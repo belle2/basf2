@@ -58,7 +58,7 @@ namespace Belle2 {
         quadtreeItemsVector.reserve(itemsVector.size());
         for (CDCConformalHit* item : itemsVector) {
           if (item->getUsedFlag()) continue;
-          if (insertItemInNode(m_quadTree, item, 0, 0))
+          if (insertItemInNode(m_quadTree, item))
             quadtreeItemsVector.push_back(new ItemType(item));
         }
       }
@@ -81,8 +81,7 @@ namespace Belle2 {
       /**
        * Do only insert the hit into a node if sinogram calculated from this hit belongs into this node
        */
-      bool insertItemInNode(QuadTree* node, CDCConformalHit* hit, unsigned int /*t_index*/,
-                            unsigned int /*r_index*/) const override final
+      bool insertItemInNode(QuadTree* node, CDCConformalHit* hit) const override final
       {
         float dist_1[2][2];
         float dist_2[2][2];

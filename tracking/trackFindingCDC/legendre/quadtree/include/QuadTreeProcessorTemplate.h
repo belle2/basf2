@@ -110,7 +110,7 @@ namespace Belle2 {
        * @param iY    index in y axes of the node
        * @return true if this item belongs into this node.
        */
-      virtual bool insertItemInNode(QuadTree* node, typeData* item, unsigned int iX, unsigned int iY) const = 0;
+      virtual bool insertItemInNode(QuadTree* node, typeData* item) const = 0;
 
       /**
        * Override that function if you want to receive debug output whenever the children of a node are filled the first time
@@ -205,7 +205,7 @@ namespace Belle2 {
 
           for (int t_index = 0; t_index < binCountX; ++t_index) {
             for (int r_index = 0; r_index < binCountY; ++r_index) {
-              if (insertItemInNode(node->getChildren()->get(t_index, r_index), item->getPointer(), t_index, r_index)) {
+              if (insertItemInNode(node->getChildren()->get(t_index, r_index), item->getPointer())) {
                 node->getChildren()->get(t_index, r_index)->insertItem(item);
               }
             }

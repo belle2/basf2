@@ -19,8 +19,8 @@
  */
 #pragma once
 
-#include <framework/logging/Logger.h>
-
+#include <array>
+#include <iterator>
 #include <functional>
 
 namespace Belle2 {
@@ -39,34 +39,40 @@ namespace Belle2 {
       /// Number of children in Y direction
       static constexpr const size_t c_nYBins = 2;
 
+      /// Iterator type to iterate over the child node
+      using iterator = typename std::array<ANode*, c_nYBins* c_nXBins>::const_iterator;
+
       /// Constructor
       QuadChildrenTemplate()
+        : m_children{} // initialize to nullptr
       {
-        // initialize to null
-        for (size_t iXBin = 0; iXBin < c_nXBins; ++iXBin) {
-          for (size_t iYBin = 0; iYBin < c_nYBins; ++iYBin) {
-            m_children[iXBin][iYBin] = nullptr;
-          }
-        }
       }
 
       /// Destructor destroying the owned pointers
       ~QuadChildrenTemplate()
       {
-        for (size_t iXBin = 0; iXBin < c_nXBins; ++iXBin) {
-          for (size_t iYBin = 0; iYBin < c_nYBins; ++iYBin) {
-            delete m_children[iXBin][iYBin];
-          }
+        for (ANode* node : m_children) {
+          delete node;
         }
+      }
+
+      /// Begin iterator over the children for the range based for loop
+      iterator begin() const
+      {
+        return std::begin(m_children);
+      }
+
+      /// End iterator over the children for the range based for loop
+      iterator end() const
+      {
+        return std::end(m_children);
       }
 
       /// This method will apply a lambda function to every child of the quad tree
       void apply(std::function<void(ANode*)> lmd)
       {
-        for (size_t iXBin = 0; iXBin < c_nXBins; ++iXBin) {
-          for (size_t iYBin = 0; iYBin < c_nYBins; ++iYBin) {
-            lmd(m_children[iXBin][iYBin]);
-          }
+        for (ANode* node : m_children) {
+          lmd(node);
         }
       }
 
@@ -80,21 +86,21 @@ namespace Belle2 {
       void set(size_t iXBin, size_t iYBin, ANode* qt)
       {
         // Delete owned node
-        delete m_children[iXBin][iYBin];
+        delete m_children[iXBin * c_nYBins + iYBin];
 
         // Reassign it
-        m_children[iXBin][iYBin] = qt;
+        m_children[iXBin * c_nYBins + iYBin] = qt;
       }
 
       /// Get pointer to the child with indexes iXBin, iYBin
       ANode* get(size_t iXBin, size_t iYBin)
       {
-        return m_children[iXBin][iYBin];
+        return m_children[iXBin * c_nYBins + iYBin];
       }
 
     private:
-      /// Array of children
-      ANode* m_children[c_nXBins][c_nYBins];
+      /// Array for the owned children
+      std::array<ANode*, c_nYBins* c_nXBins> m_children;
     };
   }
 }

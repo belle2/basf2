@@ -82,6 +82,8 @@ basf2.set_log_level(basf2.LogLevel.ERROR)
 if "BELLE2_GLOBALTAG" in os.environ:
     basf2.reset_database()
     basf2.use_central_database(os.environ["BELLE2_GLOBALTAG"])
+if "BELLE2_SEED" in os.environ:
+    basf2.set_random_seed(os.environ["BELLE2_SEED"])
 main = basf2.create_path()
 main.add_module("EventInfoSetter")
 main.add_module("ParticleGun")
@@ -293,6 +295,27 @@ def check_18_test_file():
                             "output.root", "EventMetaData", "MCParticles"]) == 0
 
 
+def check_19_eventmetadata():
+    """Check that merged files has all the correct even infos"""
+    create_testfile("test1.root", steering, run=0, events=100, BELLE2_SEED="test1")
+    create_testfile("test2.root", steering, run=1, events=100, BELLE2_SEED="test2")
+    merge_files("test1.root", "test2.root", "test1.root")
+    out = ROOT.TFile("output.root")
+    events = out.Get("tree")
+    entries = events.GetEntriesFast()
+    if entries != 300:
+        return False
+    # we expect to see the events from run 0 twice and the ones from run 1 once.
+    # So create a dictionary which contains the expected counts
+    eventcount = {(0, 0, i+1): 2 for i in range(100)}
+    eventcount.update({(0, 1, i+1): 1 for i in range(100)})
+    for i in range(entries):
+        events.GetEntry(i)
+        e = events.EventMetaData
+        eventcount[(e.getExperiment(), e.getRun(), e.getEvent())] -= 1
+    return max(eventcount.values()) == 0 and min(eventcount.values()) == 0
+
+
 def check_XX_filemetaversion():
     """Check that the Version of the FileMetaData hasn't changed.
     If this check fails please check that the changes to FileMetaData don't
@@ -302,7 +325,7 @@ def check_XX_filemetaversion():
 
 if __name__ == "__main__":
     failures = 0
-    existing = [(name, fcn) for (name, fcn) in sorted(globals().items()) if name.startswith("check_")]
+    existing = [e for e in sorted(globals().items()) if e[0].startswith("check_")]
     for name, fcn in existing:
         print("running {0}: {1}".format(name, fcn.__doc__))
         with clean_working_directory():

@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
@@ -47,6 +49,18 @@ namespace Belle2 {
     public:
       /// Generate and assign the contained variables
       bool extract(const std::pair<const CDCTrack*, const CDCRLWireHit*>* testPair) override;
+
+      void initialize() override
+      {
+        CDCMCManager::getInstance().requireTruthInformation();
+        VarSet<StereoHitTruthVarNames>::initialize();
+      }
+
+      void beginEvent() override
+      {
+        CDCMCManager::getInstance().fill();
+        VarSet<StereoHitTruthVarNames>::beginEvent();
+      }
     };
   }
 }

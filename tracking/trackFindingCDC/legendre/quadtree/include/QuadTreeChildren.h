@@ -28,66 +28,73 @@ namespace Belle2 {
 
     /**
      * Class which holds pointer to the children nodes of QuadTree
-     * @tparam quadChild type of the QuadTree
+     * @tparam ANode type of the QuadTree
      */
-    template<typename quadChild>
+    template<typename ANode>
     class QuadChildrenTemplate {
     public:
+      /// Number of children in X direction
+      static constexpr const size_t c_nXBins = 2;
 
-      //      using ChildrenHolder = std::map<std::pair<size_t, size_t>, quadChild>;
+      /// Number of children in Y direction
+      static constexpr const size_t c_nYBins = 2;
 
       /// Constructor
       QuadChildrenTemplate()
       {
         // initialize to null
-        for (size_t t_index = 0; t_index < m_sizeX; ++t_index) {
-          for (size_t r_index = 0; r_index < m_sizeY; ++r_index) {
-            m_children[t_index][r_index] = nullptr;
+        for (size_t iXBin = 0; iXBin < c_nXBins; ++iXBin) {
+          for (size_t iYBin = 0; iYBin < c_nYBins; ++iYBin) {
+            m_children[iXBin][iYBin] = nullptr;
           }
         }
-      };
+      }
 
-      /**
-       * This method will apply a lambda function to every child of the quad tree
-       */
-      void apply(std::function<void(quadChild*)> lmd)
-      {
-        for (size_t t_index = 0; t_index < m_sizeX; ++t_index) {
-          for (size_t r_index = 0; r_index < m_sizeY; ++r_index) {
-            if (m_children[t_index][r_index]->getLevel() != 0) {
-              lmd(m_children[t_index][r_index]);
-            }
-          }
-        }
-      };
-
+      /// Destructor destroying the owned pointers
       ~QuadChildrenTemplate()
       {
-        this->apply([](quadChild * qt) { delete qt;});
-      };
+        for (size_t iXBin = 0; iXBin < c_nXBins; ++iXBin) {
+          for (size_t iYBin = 0; iYBin < c_nYBins; ++iYBin) {
+            delete m_children[iXBin][iYBin];
+          }
+        }
+      }
+
+      /// This method will apply a lambda function to every child of the quad tree
+      void apply(std::function<void(ANode*)> lmd)
+      {
+        for (size_t iXBin = 0; iXBin < c_nXBins; ++iXBin) {
+          for (size_t iYBin = 0; iYBin < c_nYBins; ++iYBin) {
+            lmd(m_children[iXBin][iYBin]);
+          }
+        }
+      }
 
       /**
-       * Set child with indexes x, y
+       * Set child with indexes iXBin, iYBin
+       *
+       * Takes ownership of the node.
+       *
        * @param qt pointer to QuadTree child to set
        */
-
-      void set(size_t x, size_t y, quadChild* qt)
+      void set(size_t iXBin, size_t iYBin, ANode* qt)
       {
-        m_children[x][y] = qt;
+        // Delete owned node
+        delete m_children[iXBin][iYBin];
+
+        // Reassign it
+        m_children[iXBin][iYBin] = qt;
       }
 
-      /// Get pointer to the child with indexes x, y
-      quadChild* get(const size_t x, const size_t y)
+      /// Get pointer to the child with indexes iXBin, iYBin
+      ANode* get(size_t iXBin, size_t iYBin)
       {
-        return m_children[x][y];
+        return m_children[iXBin][iYBin];
       }
-
-      static constexpr size_t m_sizeX = 2; /**< Number of children in X dirextion */
-      static constexpr size_t m_sizeY = 2; /**< Number of children in Y dirextion */
 
     private:
       /// Array of children
-      quadChild* m_children[m_sizeX][m_sizeY];
+      ANode* m_children[c_nXBins][c_nYBins];
     };
   }
 }

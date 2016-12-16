@@ -180,6 +180,13 @@ namespace Belle2 {
         new G4PVPlacement(T, module, name, &topVolume, false, moduleID);
       }
 
+      int n = 0;
+      for (const auto& module : geo.getModules()) {
+        n += module.getPMTArray().getDecoupledPMTs().size();
+      }
+      B2INFO("GeoTOPCreator, number of optically decoupled PMT's: " << n);
+      if (n > 0) B2WARNING("GeoTOPCreator, some of PMT's are optically decoupled");
+
     }
 
 
@@ -192,14 +199,13 @@ namespace Belle2 {
 
       // create module envelope volume
 
-      auto& geoQBB = geo.getQBB();
+      const auto& geoQBB = geo.getQBB();
       auto* module = createModuleEnvelope(geoQBB, moduleID);
 
-      // add optics together with PMT array
+      // add quartz optics together with PMT array
 
-      if (!m_pmtArray) m_pmtArray = createPMTArray(geo.getPMTArray());
-      double Lz = geo.getPMTArray().getPMT().getSizeZ();
-      auto* optics = assembleOptics(geo.getModule(moduleID), m_pmtArray, Lz);
+      const auto& geoModule = geo.getModule(moduleID);
+      auto* optics = assembleOptics(geoModule);
 
       move.setZ(geoQBB.getPrismPosition() - geoQBB.getPrismEnclosure().getLength() / 2);
       optics->MakeImprint(module, move, &rot);
@@ -209,8 +215,9 @@ namespace Belle2 {
       if (!m_frontEnd) {
         m_frontEnd = assembleFrontEnd(geo.getFrontEnd(), geo.getNumBoardStacks());
       }
-      double Lprism = geo.getModule(moduleID).getPrism().getFullLength();
-      move.setZ(move.z() - Lprism - Lz);
+      double Lprism = geoModule.getPrism().getFullLength();
+      double Larray = geoModule.getPMTArray().getSizeZ();
+      move.setZ(move.z() - Lprism - Larray);
       m_frontEnd->MakeImprint(module, move, &rot);
 
       // add QBB
@@ -574,11 +581,8 @@ namespace Belle2 {
     }
 
 
-    G4AssemblyVolume* GeoTOPCreator::assembleOptics(const TOPGeoModule& geo,
-                                                    G4LogicalVolume* pmtArray,
-                                                    double La)
+    G4AssemblyVolume* GeoTOPCreator::assembleOptics(const TOPGeoModule& geo)
     {
-
       auto* optics = new G4AssemblyVolume();
       Simulation::RunManager::Instance().addAssemblyVolume(optics);
 
@@ -586,9 +590,11 @@ namespace Belle2 {
       double L1 = geo.getBarSegment1().getFullLength();
       double L2 = geo.getBarSegment2().getFullLength();
       double Lp = geo.getPrism().getFullLength();
+      double La = geo.getPMTArray().getSizeZ();
 
       // note: z = 0 is at prism-bar joint
 
+      auto* pmtArray = createPMTArray(geo.getPMTArray(), geo.getModuleID());
       double Dy = (geo.getPrism().getThickness() - geo.getPrism().getExitThickness()) / 2;
       G4ThreeVector moveArray(geo.getPMTArrayDisplacement().getX(),
                               geo.getPMTArrayDisplacement().getY() + Dy,
@@ -749,28 +755,38 @@ namespace Belle2 {
     }
 
 
-    G4LogicalVolume* GeoTOPCreator::createPMTArray(const TOPGeoPMTArray& geo)
+    G4LogicalVolume* GeoTOPCreator::createPMTArray(const TOPGeoPMTArray& geo,
+                                                   int moduleID)
     {
       // mother volume
-      auto* array = createBox(geo.getName(),
-                              geo.getSizeX(), geo.getSizeY(),
-                              geo.getPMT().getSizeZ(),
-                              geo.getMaterial());
+      auto* pmtArray = createBox(geo.getName(),
+                                 geo.getSizeX(), geo.getSizeY(),
+                                 geo.getSizeZ(),
+                                 geo.getMaterial());
 
       // single PMT
       auto* pmt = createPMT(geo.getPMT());
 
       // place PMT's
+      double halfGap = geo.getAirGap() / 2;
+      std::string message = addNumber("optically decoupled PMT's of Slot", moduleID) + ":";
       for (unsigned row = 1; row <= geo.getNumRows(); row++) {
         for (unsigned col = 1; col <= geo.getNumColumns(); col++) {
-          G4Transform3D move = G4Translate3D(geo.getX(col), geo.getY(row), 0);
           auto id = geo.getPmtID(row, col);
-          new G4PVPlacement(move, pmt, addNumber(geo.getPMT().getName(), id), array,
+          double z = halfGap;
+          if (geo.isPMTDecoupled(id)) {
+            z = -halfGap;
+            message += addNumber(" ", id);
+          }
+          G4Transform3D move = G4Translate3D(geo.getX(col), geo.getY(row), z);
+          new G4PVPlacement(move, pmt, addNumber(geo.getPMT().getName(), id), pmtArray,
                             false, id);
         }
       }
 
-      return array;
+      if (!geo.getDecoupledPMTs().empty()) B2RESULT("GeoTOPCreator, " << message);
+
+      return pmtArray;
     }
 
 
@@ -913,13 +929,13 @@ namespace Belle2 {
     {
       stringstream ss;
       if (number < 10) {
-        ss << str << "0" << number;
+        ss << "0" << number;
       } else {
-        ss << str << number;
+        ss << number;
       }
       string out;
       ss >> out;
-      return out;
+      return str + out;
     }
 
   } // name space TOP

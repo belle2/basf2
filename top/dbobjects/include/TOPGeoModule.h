@@ -14,6 +14,7 @@
 #include <top/dbobjects/TOPGeoBarSegment.h>
 #include <top/dbobjects/TOPGeoMirrorSegment.h>
 #include <top/dbobjects/TOPGeoPrism.h>
+#include <top/dbobjects/TOPGeoPMTArray.h>
 #include <top/dbobjects/TOPGeoPMTArrayDisplacement.h>
 #include <top/dbobjects/TOPGeoModuleDisplacement.h>
 #include <TVector3.h>
@@ -98,6 +99,27 @@ namespace Belle2 {
     void setPrism(const TOPGeoPrism& prism) {m_prism = prism;}
 
     /**
+     * Sets PMT array
+     * @param array PMT array geometry parameters
+     */
+    void setPMTArray(const TOPGeoPMTArray& array) {m_pmtArray = array;}
+
+    /**
+     * Sets PMT as optically decoupled
+     * @param pmtID ID of PMT to be set as decoupled (1-based)
+     */
+    void setDecoupledPMT(unsigned pmtID) {m_pmtArray.setDecoupledPMT(pmtID);}
+
+    /**
+     * Generate randomly a fraction of PMT's to be optically decoupled
+     * @param fraction decoupled fraction
+     */
+    void generateDecoupledPMTs(double fraction)
+    {
+      m_pmtArray.generateDecoupledPMTs(fraction);
+    }
+
+    /**
      * Sets PMT array displacement
      * @param displ PMT array displacement parameters
      */
@@ -168,6 +190,12 @@ namespace Belle2 {
      * @return prism geometry parameters
      */
     const TOPGeoPrism& getPrism() const {return m_prism;}
+
+    /**
+     * Returns PMT array
+     * @return PMT array geometry parameters
+     */
+    const TOPGeoPMTArray& getPMTArray() const {return m_pmtArray;}
 
     /**
      * Returns PMT array displacement
@@ -300,6 +328,7 @@ namespace Belle2 {
     TOPGeoBarSegment m_bar2; /**< bar segment 2 (backward bar) */
     TOPGeoMirrorSegment m_mirror; /**< mirror segment */
     TOPGeoPrism m_prism; /**< prism */
+    TOPGeoPMTArray m_pmtArray;  /**< geometry parameters of PMT array */
     TOPGeoPMTArrayDisplacement m_arrayDisplacement;  /**< PMT array displacement */
     TOPGeoModuleDisplacement m_moduleDisplacement;   /**< module displacement */
 
@@ -310,7 +339,7 @@ namespace Belle2 {
     /** cache for translation vector (from internal to Belle II frame) */
     mutable TVector3* m_translation = 0;  //!
 
-    ClassDef(TOPGeoModule, 2); /**< ClassDef */
+    ClassDef(TOPGeoModule, 3); /**< ClassDef */
 
   };
 

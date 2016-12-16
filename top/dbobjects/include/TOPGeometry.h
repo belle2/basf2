@@ -12,7 +12,6 @@
 
 #include <top/dbobjects/TOPGeoBase.h>
 #include <top/dbobjects/TOPGeoModule.h>
-#include <top/dbobjects/TOPGeoPMTArray.h>
 #include <top/dbobjects/TOPGeoFrontEnd.h>
 #include <top/dbobjects/TOPGeoQBB.h>
 #include <top/dbobjects/TOPNominalQE.h>
@@ -58,12 +57,6 @@ namespace Belle2 {
      * @param module module geometry parameters
      */
     void appendModule(const TOPGeoModule& module) {m_modules.push_back(module);}
-
-    /**
-     * Sets PMT array
-     * @param array PMT array geometry parameters
-     */
-    void setPMTArray(const TOPGeoPMTArray& array) {m_pmtArray = array;}
 
     /**
      * Sets front-end
@@ -114,6 +107,12 @@ namespace Belle2 {
     const TOPGeoModule& getModule(unsigned moduleID) const;
 
     /**
+     * Returns all modules
+     * @return modules
+     */
+    const std::vector<TOPGeoModule>& getModules() const {return m_modules;}
+
+    /**
      * Checks if module exists
      * @param moduleID module ID (1-based)
      * @return true if exists
@@ -122,12 +121,6 @@ namespace Belle2 {
     {
       return moduleID - 1 < m_modules.size();
     }
-
-    /**
-     * Returns PMT array
-     * @return PMT array geometry parameters
-     */
-    const TOPGeoPMTArray& getPMTArray() const {return m_pmtArray;}
 
     /**
      * Returns front-end
@@ -211,7 +204,6 @@ namespace Belle2 {
   private:
 
     std::vector<TOPGeoModule> m_modules; /**< geometry parameters of modules */
-    TOPGeoPMTArray m_pmtArray;  /**< geometry parameters of PMT array */
     TOPGeoFrontEnd m_frontEnd;  /**< geometry parameters of front-end electronics */
     TOPGeoQBB m_QBB;  /**< geometry parameters of quartz bar box */
     unsigned m_numBoardStacks = 0;  /**< number of boardstacks per module */
@@ -219,7 +211,7 @@ namespace Belle2 {
     TOPNominalTTS m_nominalTTS; /**< nominal time transition spread of PMT */
     TOPNominalTDC m_nominalTDC; /**< nominal time-to-digit conversion parameters */
 
-    ClassDef(TOPGeometry, 2); /**< ClassDef */
+    ClassDef(TOPGeometry, 3); /**< ClassDef */
 
   };
 

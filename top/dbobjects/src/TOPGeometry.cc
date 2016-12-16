@@ -85,7 +85,6 @@ bool TOPGeometry::isConsistent() const
   for (const auto& module : m_modules) {
     if (!module.isConsistent()) return false;
   }
-  if (!m_pmtArray.isConsistent()) return false;
   if (!m_frontEnd.isConsistent()) return false;
   if (!m_QBB.isConsistent()) return false;
   if (m_numBoardStacks == 0) return false;

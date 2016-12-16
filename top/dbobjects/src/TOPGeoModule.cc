@@ -62,6 +62,7 @@ bool TOPGeoModule::isConsistent() const
   if (!m_bar2.isConsistent()) return false;
   if (!m_mirror.isConsistent()) return false;
   if (!m_prism.isConsistent()) return false;
+  if (!m_pmtArray.isConsistent()) return false;
   return true;
 }
 
@@ -80,6 +81,7 @@ void TOPGeoModule::print(const std::string& title) const
   m_bar2.print("Bar segment 2 geometry parameters");
   m_mirror.print();
   m_prism.print();
+  m_pmtArray.print();
   m_arrayDisplacement.print();
   m_moduleDisplacement.print();
 

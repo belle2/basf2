@@ -166,7 +166,8 @@ namespace Belle2 {
                               arrayParams.getLength("Ygap"),
                               arrayParams.getString("stackMaterial"),
                               pmt);
-      geo->setPMTArray(pmtArray);
+      pmtArray.setAirGap(arrayParams.getLength("airGap", 0));
+      double decoupledFraction = arrayParams.getDouble("decoupledFraction", 0);
 
       // modules
 
@@ -232,6 +233,8 @@ namespace Belle2 {
         module.setBarSegment2(bar2);
         module.setMirrorSegment(mirror);
         module.setPrism(prism);
+        module.setPMTArray(pmtArray);
+        if (decoupledFraction > 0) module.generateDecoupledPMTs(decoupledFraction);
         // module.setModuleCNumber(num);
         // module.setPMTArrayDisplacement(arrayDispl);
         // module.setModuleDisplacement(moduleDispl);

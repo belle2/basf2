@@ -11,6 +11,7 @@
 #include <top/dbobjects/TOPGeoPMTArray.h>
 #include <math.h>
 #include <iostream>
+#include <TRandom.h>
 
 using namespace std;
 using namespace Belle2;
@@ -52,6 +53,26 @@ int TOPGeoPMTArray::getPixelID(double x, double y, unsigned pmtID) const
   return row * m_numColumns * m_pmt.getNumColumns() + col + 1;
 }
 
+
+void TOPGeoPMTArray::generateDecoupledPMTs(double fraction)
+{
+  if (fraction <= 0) return;
+
+  for (unsigned i = 0; i < getSize(); i++) {
+    if (gRandom->Rndm() < fraction) setDecoupledPMT(i + 1);
+  }
+
+}
+
+bool TOPGeoPMTArray::isPMTDecoupled(unsigned pmtID) const
+{
+  for (const auto& pmt : m_decoupledPMTs) {
+    if (pmtID == pmt) return true;
+  }
+  return false;
+}
+
+
 bool TOPGeoPMTArray::isConsistent() const
 {
   if (m_numRows == 0) return false;
@@ -67,9 +88,17 @@ void TOPGeoPMTArray::print(const std::string& title) const
 {
   TOPGeoBase::print(title);
   cout << " size: " << getNumColumns() << " X " << getNumRows();
-  cout << ", dimensions: " << getSizeX() << " X " << getSizeY();
+  cout << ", dimensions: " << getSizeX() << " X " << getSizeY() << " X " << getSizeZ();
   cout << " " << s_unitName << endl;
   cout << " cell: " << getDx() << " X " << getDy() << " " << s_unitName << endl;
   cout << " material: " << getMaterial() << endl;
+  cout << " air gap (decoupled PMT's): " << getAirGap() << " " << s_unitName << endl;
+  cout << " optically decoupled PMT's:";
+  if (m_decoupledPMTs.empty()) {
+    cout << " None";
+  } else {
+    for (const auto& pmt : m_decoupledPMTs) cout << " " << pmt;
+  }
+  cout << endl;
   m_pmt.print();
 }

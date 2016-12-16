@@ -157,13 +157,9 @@ namespace Belle2 {
       /**
        * Assembles optical components (PMT array, prism and bar segments) along z
        * @param geo geometry description
-       * @param pmtArray pre-created PMT array logical volume
-       * @param Lz array dimension in z
        * @return assembly volume
        */
-      G4AssemblyVolume* assembleOptics(const TOPGeoModule& geo,
-                                       G4LogicalVolume* pmtArray,
-                                       double Lz);
+      G4AssemblyVolume* assembleOptics(const TOPGeoModule& geo);
 
       /**
        * Creates quartz bar segment
@@ -189,9 +185,10 @@ namespace Belle2 {
       /**
        * Creates PMT array
        * @param geo geometry description
+       * @param moduleID module ID (e.g. slot number)
        * @return logical volume of PMT array
        */
-      G4LogicalVolume* createPMTArray(const TOPGeoPMTArray& geo);
+      G4LogicalVolume* createPMTArray(const TOPGeoPMTArray& geo, int moduleID);
 
       /**
        * Creates single PMT
@@ -261,7 +258,6 @@ namespace Belle2 {
       int m_isBeamBkgStudy = 0; /**< flag for beam backgound simulation */
 
       G4UnionSolid* m_moduleEnvelope = 0; /**< module envelope solid */
-      G4LogicalVolume* m_pmtArray = 0; /**< PMT array logical volume */
       G4AssemblyVolume* m_qbb = 0; /**< QBB assembly volume */
       G4AssemblyVolume* m_frontEnd = 0; /**< front-end electronics assembly volume */
 

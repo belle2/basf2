@@ -149,14 +149,16 @@ namespace Belle2 {
       double x = simHit.getX();
       double y = simHit.getY();
       int pmtID = simHit.getPmtID();
-      int pixelID = geo->getPMTArray().getPixelID(x, y, pmtID);
+      int moduleID = simHit.getModuleID();
+      if (!geo->isModuleIDValid(moduleID)) continue;
+      int pixelID = geo->getModule(moduleID).getPMTArray().getPixelID(x, y, pmtID);
       if (pixelID == 0) continue;
 
       // add TTS to photon time and make it relative to start time
       double time = simHit.getTime() + tts.generateTTS() - startTime;
 
       // add time to digitizer of a given pixel
-      TimeDigitizer digitizer(simHit.getModuleID(), pixelID);
+      TimeDigitizer digitizer(moduleID, pixelID);
       unsigned id = digitizer.getUniqueID();
       Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
       it->second.addTimeOfHit(time, &simHit);
@@ -165,10 +167,10 @@ namespace Belle2 {
     // add randomly distributed dark noise
     if (m_darkNoise > 0) {
       int numModules = geo->getNumModules();
-      int numPixels = geo->getPMTArray().getNumPixels();
       double timeMin = geo->getNominalTDC().getTimeMin();
       double timeMax = geo->getNominalTDC().getTimeMax();
       for (int moduleID = 1; moduleID <= numModules; moduleID++) {
+        int numPixels = geo->getModule(moduleID).getPMTArray().getNumPixels();
         int numHits = gRandom->Poisson(m_darkNoise);
         for (int i = 0; i < numHits; i++) {
           int pixelID = int(gRandom->Rndm() * numPixels) + 1;

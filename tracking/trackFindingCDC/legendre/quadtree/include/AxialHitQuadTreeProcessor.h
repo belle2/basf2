@@ -301,7 +301,7 @@ namespace Belle2 {
       void clearSeededTree()
       {
         m_seededTree.clear();
-        m_seededTree.resize(0);
+        m_seededTree.shrink_to_fit();
       }
 
       /**

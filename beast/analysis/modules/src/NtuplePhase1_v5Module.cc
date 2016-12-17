@@ -98,7 +98,10 @@ namespace Belle2 {
     addParam("input_LB_SAD_RLR_av", m_input_LB_SAD_RLR_av, "SAD Low Ring Loss Rate");
     addParam("input_HB_SAD_RLR_av", m_input_HB_SAD_RLR_av, "SAD High Ring Loss Rate");
 
-    addParam("input_BGSol", m_input_BGSol, "BG solution 0 or I");
+    addParam("input_BGSol", m_input_BGSol, "BG solution 0 or 1");
+    addParam("input_ToSol", m_input_ToSol, "To solution 0 or 1");
+
+    addParam("input_GasCorrection", m_input_GasCorrection, "GasCorrection");
 
     addParam("inputHistoFileNames", m_inputHistoFileNames,
              "List of root files with histograms");
@@ -770,11 +773,13 @@ namespace Belle2 {
     if (m_input_I_LER[1] > 0) I_LER += gRandom->Gaus(0, m_input_I_LER[1]);
     double P_HER = 0;
     if (m_beast.SKB_HER_pressure_average != 0
-        && m_beast.SKB_HER_pressure_average->size() > 0) P_HER = m_beast.SKB_HER_pressure_average->at(0) * 0.00750062 * 1e9 * 3.;
+        && m_beast.SKB_HER_pressure_average->size() > 0) P_HER = m_beast.SKB_HER_pressure_average->at(
+                0) * 0.00750062 * 1e9 * m_input_GasCorrection;
     if (m_input_P_HER[1] > 0) P_HER += gRandom->Gaus(0, m_input_P_HER[1]);
     double P_LER = 0;
     if (m_beast.SKB_LER_pressure_average != 0
-        && m_beast.SKB_LER_pressure_average->size() > 0) P_LER = m_beast.SKB_LER_pressure_average->at(0) * 0.00750062 * 1e9 * 3.;
+        && m_beast.SKB_LER_pressure_average->size() > 0) P_LER = m_beast.SKB_LER_pressure_average->at(
+                0) * 0.00750062 * 1e9 * m_input_GasCorrection;
     if (m_input_P_LER[1] > 0) P_LER += gRandom->Gaus(0, m_input_P_LER[1]);
     double sigma_y_HER = 0;
     double sigma_x_HER = 0;
@@ -892,7 +897,7 @@ namespace Belle2 {
       for (int i = 0; i < (int)m_beast.SKB_HER_pressures->size(); i++) {
         ScaleFacBG_HER[i] = 0;
         double iP_HER = 0;
-        iP_HER = m_beast.SKB_HER_pressures->at(i) * 0.00750062 * 1e9 * 3.;
+        iP_HER = m_beast.SKB_HER_pressures->at(i) * 0.00750062 * 1e9 * m_input_GasCorrection;
         if (m_input_P_HER[1] > 0) iP_HER += gRandom->Gaus(0, m_input_P_HER[1]);
         if (iP_HER < 0 || iP_HER > 260.) iP_HER = 0;
         if (I_HER > 0 && iP_HER > 0) {
@@ -907,7 +912,7 @@ namespace Belle2 {
       for (int i = 0; i < (int)m_beast.SKB_LER_pressures->size(); i++) {
         ScaleFacBG_LER[i] = 0;
         double iP_LER = 0;
-        iP_LER = m_beast.SKB_LER_pressures->at(i) * 0.00750062 * 1e9 * 3.;
+        iP_LER = m_beast.SKB_LER_pressures->at(i) * 0.00750062 * 1e9 * m_input_GasCorrection;
         if (m_input_P_LER[1] > 0) iP_LER += gRandom->Gaus(0, m_input_P_LER[1]);
         if (iP_LER < 0 || iP_LER > 260.) iP_LER = 0;
         if (I_LER > 0 && iP_LER > 0) {

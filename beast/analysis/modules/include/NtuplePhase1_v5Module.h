@@ -81,6 +81,7 @@ namespace Belle2 {
 
     Int_t m_input_BGSol; /**< time stamp start and stop */
     Int_t m_input_ToSol; /**< time stamp start and stop */
+    Double_t m_input_GasCorrection; /**< time stamp start and stop */
 
     std::vector<std::string> m_inputRateHistoNames; /**< list of file names */
     std::vector<std::string> m_inputDoseHistoNames; /**< list of file names */

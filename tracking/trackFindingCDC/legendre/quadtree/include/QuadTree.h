@@ -46,6 +46,12 @@ namespace Belle2 {
       /// Type of this class
       using This = QuadTreeTemplate<AX, AY, AItem>;
 
+      /// Type for a span in the X direction that is covered by the tree
+      using XSpan = std::array<AX, 2>;
+
+      /// Type for a span in the Y direction that is covered by the tree
+      using YSpan = std::array<AY, 2>;
+
       /// Type to store the minimum, center and maximum of the bins in X direction
       using XBinBounds = std::array<AX, 3>;
 
@@ -55,15 +61,22 @@ namespace Belle2 {
       /// Type of the child node structure for this node.
       using Children = QuadTreeChildrenTemplate<This>;
 
-      /// Constructor
-      QuadTreeTemplate(AX xMin, AX xMax, AY yMin, AY yMax, int level, This* parent)
-        : m_level(level)
-        , m_parent(level > 0 ? parent : nullptr)
-        , m_filled(false)
+      /**
+       *  Constructor setting up the potential division points.
+       *
+       *  Cppcheck may warn to pass the spans by reference here,
+       *  however this would come at performance penalty.
+       *  If somebody knows the suppression category please apply it here.
+       */
+      QuadTreeTemplate(XSpan xSpan, YSpan ySpan, int level, This* parent)
+        : m_xBinBounds( {xSpan[0], xSpan[0] + (xSpan[1] - xSpan[0]) / 2, xSpan[1]})
+      , m_yBinBounds({ySpan[0], ySpan[0] + (ySpan[1] - ySpan[0]) / 2, ySpan[1]})
+      , m_level(level)
+      , m_parent(level > 0 ? parent : nullptr)
+      , m_filled(false)
       {
         // ensure the level value fits into unsigned char
         B2ASSERT("QuadTree datastructure only supports levels < 255", level < 255);
-        computeBinBounds(xMin, xMax, yMin, yMax);
       }
 
       /** Insert item into node */
@@ -205,19 +218,6 @@ namespace Belle2 {
       {
         return m_yBinBounds[bin];
       };
-
-    private:
-      /// sets the x and y bin values and computes the bin centers
-      void computeBinBounds(AX xMin, AX xMax, AY yMin, AY yMax)
-      {
-        m_xBinBounds[0] = xMin;
-        m_xBinBounds[1] = xMin + (xMax - xMin) / 2;
-        m_xBinBounds[2] = xMax;
-
-        m_yBinBounds[0] = yMin;
-        m_yBinBounds[1] = yMin + (yMax - yMin) / 2;
-        m_yBinBounds[2] = yMax;
-      }
 
     private:
       /// bins range on r

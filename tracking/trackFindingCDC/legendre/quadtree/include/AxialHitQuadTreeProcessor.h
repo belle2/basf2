@@ -242,7 +242,7 @@ namespace Belle2 {
             float yMin = yIndex * binSizeY + y.first;
             float yMax = (yIndex + 1) * binSizeY + y.first;
 
-            m_seededTree.emplace_back(xMin, xMax, yMin, yMax, lvl, nullptr);
+            m_seededTree.push_back(QuadTree({xMin, xMax}, {yMin, yMax}, lvl, nullptr));
             QuadTree& newQuadTree = m_seededTree.back();
             if ((newQuadTree.getYMin() < -0.02)  && (newQuadTree.getYMax() < -0.02)) continue;
             newQuadTree.reserveItems(m_quadTree->getNItems() * 2);
@@ -316,7 +316,7 @@ namespace Belle2 {
 
         const rangeX& x = ranges.first;
         const rangeY& y = ranges.second;
-        QuadTree* quadTree = new QuadTree(x.first, x.second, y.first, y.second, 0, nullptr);
+        QuadTree* quadTree = new QuadTree({x.first, x.second}, {y.first, y.second}, 0, nullptr);
 
         std::vector<ItemType*>& quadtreeItems = quadTree->getItems();
 //        quadtreeItems.reserve(hitsVector.size());

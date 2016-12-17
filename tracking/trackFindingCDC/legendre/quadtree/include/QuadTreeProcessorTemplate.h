@@ -323,10 +323,8 @@ namespace Belle2 {
       {
         const rangeX& x = ranges.first;
         const rangeY& y = ranges.second;
-        m_quadTree = new QuadTree(x.first, x.second, y.first, y.second, 0, nullptr);
+        m_quadTree = new QuadTree({x.first, x.second}, {y.first, y.second}, 0, nullptr);
       }
-
-
 
       /**
        * Creates the sub node of a given node. This function is called by fillGivenTree.
@@ -339,7 +337,7 @@ namespace Belle2 {
             const ChildRanges& childRanges = createChildWithParent(node, i, j);
             const rangeX& rangeX = childRanges.first;
             const rangeY& rangeY = childRanges.second;
-            m_children->set(i, j, new QuadTree(rangeX.first, rangeX.second, rangeY.first, rangeY.second, node->getLevel() + 1, node));
+            m_children->set(i, j, new QuadTree({rangeX.first, rangeX.second}, {rangeY.first, rangeY.second}, node->getLevel() + 1, node));
           }
         }
       }

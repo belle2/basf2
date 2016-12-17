@@ -75,10 +75,10 @@ namespace Belle2 {
     addParam("input_P_HER", m_input_P_HER, "HER pressure");
     addParam("input_P_LER", m_input_P_LER, "LER pressure");
 
-    addParam("input_sigma_HER", m_input_sigma_x_HER, "HER beam size");
-    addParam("input_sigma_LER", m_input_sigma_x_LER, "LER beam size");
-    addParam("input_sigma_HER", m_input_sigma_y_HER, "HER beam size");
-    addParam("input_sigma_LER", m_input_sigma_y_LER, "LER beam size");
+    addParam("input_sigma_x_HER", m_input_sigma_x_HER, "HER beam size");
+    addParam("input_sigma_x_LER", m_input_sigma_x_LER, "LER beam size");
+    addParam("input_sigma_y_HER", m_input_sigma_y_HER, "HER beam size");
+    addParam("input_sigma_y_LER", m_input_sigma_y_LER, "LER beam size");
 
     addParam("input_bunchNb_HER", m_input_bunchNb_HER, "HER bunch number");
     addParam("input_bunchNb_LER", m_input_bunchNb_LER, "LER bunch number");

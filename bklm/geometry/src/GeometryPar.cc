@@ -361,10 +361,7 @@ namespace Belle2 {
             m_LocalReconstructionShiftX[fb - 1][sector - 1][layer - 1] = element.getLocalReconstructionShiftX(fb, sector, layer);
             m_LocalReconstructionShiftY[fb - 1][sector - 1][layer - 1] = element.getLocalReconstructionShiftY(fb, sector, layer);
             m_LocalReconstructionShiftZ[fb - 1][sector - 1][layer - 1] = element.getLocalReconstructionShiftZ(fb, sector, layer);
-            m_IsFlipped[fb - 1][sector - 1][layer - 1] = false;
-            if (layer <= NSCINTLAYER) {
-              m_IsFlipped[fb - 1][sector - 1][layer - 1] = element.isFlipped(fb, sector, layer);
-            }
+            m_IsFlipped[fb - 1][sector - 1][layer - 1] = (m_HasRPCs[layer - 1] ? false : element.isFlipped(fb, sector, layer));
           }
         }
       }
@@ -396,15 +393,18 @@ namespace Belle2 {
           if (!isForward) rotation.rotateX(M_PI);
           rotation.rotateZ(m_SectorRotation[fb - 1][sector - 1]);
           for (int layer = 1; layer <= m_NLayer; ++layer) {
+            bool isFlipped = m_IsFlipped[fb - 1][sector - 1][layer - 1];
             CLHEP::Hep3Vector localReconstructionShift(m_LocalReconstructionShiftX[fb - 1][sector - 1][layer - 1],
                                                        m_LocalReconstructionShiftY[fb - 1][sector - 1][layer - 1],
                                                        m_LocalReconstructionShiftZ[fb - 1][sector - 1][layer - 1]);
-            CLHEP::Hep3Vector localOrigin(getActiveMiddleRadius(layer), 0.0, m_ModuleFrameThickness);
+            double dx = getActiveMiddleRadius(fb, sector, layer);
+            double dz = getModuleHalfSize(layer, hasChimney).z() - getModuleInteriorHalfSize2(layer, hasChimney).z();
+            CLHEP::Hep3Vector localOrigin(dx, 0.0, dz);
             int moduleID = (isForward ? BKLM_END_MASK : 0)
                            | ((sector - 1) << BKLM_SECTOR_BIT)
                            | ((layer - 1) << BKLM_LAYER_BIT);
             if (m_HasRPCs[layer - 1]) {
-              localOrigin.setZ(localOrigin.z() + m_ModuleGasSpacerWidth);
+              localOrigin.setZ(localOrigin.z() + getModuleInteriorHalfSize1(layer, hasChimney).z() - getGasHalfSize(layer, hasChimney).z());
               Module* pModule = new Module(m_PhiStripWidth[layer - 1],
                                            (layer == 1 ? 2 : 1),
                                            m_NPhiStrips[layer - 1] - (layer == 1 ? 1 : 0),
@@ -416,15 +416,16 @@ namespace Belle2 {
                                           );
               m_Modules.insert(std::pair<int, Module*>(moduleID, pModule));
             } else {
-              localOrigin.setY(localOrigin.y() + getScintEnvelopeOffset(layer, hasChimney).y());
+              double dy = getScintEnvelopeOffset(layer, hasChimney).y() * getScintEnvelopeOffsetSign(layer) * (isFlipped ? -1.0 : 1.0);
+              localOrigin.setY(dy);
               Module* pModule = new Module(m_ScintWidth,
                                            m_NPhiScints[layer - 1],
-                                           m_ScintEnvelopeOffsetSign[layer - 1],
+                                           getScintEnvelopeOffsetSign(layer),
                                            nZScints,
                                            CLHEP::Hep3Vector(0.0, 0.0, m_OffsetZ) + rotation(localOrigin),
                                            localReconstructionShift,
                                            rotation,
-                                           m_IsFlipped[fb - 1][sector - 1][layer - 1]
+                                           isFlipped
                                           );
               m_Modules.insert(std::pair<int, Module*>(moduleID, pModule));
               double base = -0.5 * (m_NPhiScints[layer - 1] + 1) * m_ScintWidth;
@@ -564,20 +565,30 @@ namespace Belle2 {
     double GeometryPar::getModuleMiddleRadius(int layer) const
     {
       if (layer == 1) {
-        return m_Gap1InnerRadius + 0.5 * m_Gap1ActualHeight;
+        return m_Gap1InnerRadius + 0.5 * m_Gap1NominalHeight;
       }
       return m_GapInnerRadius + 0.5 * m_GapNominalHeight + m_LayerHeight * (layer - 1);
     }
 
-    double GeometryPar::getActiveMiddleRadius(int layer) const
+    double GeometryPar::getActiveMiddleRadius(int fb, int sector, int layer) const
     {
-      // place the active radius at the midplane of the innermost sensitive volume
-      // (same as inner-plane positioning in GeoBKLMCreator.cc)
-      double r = getModuleMiddleRadius(layer);
-      if (hasRPCs(layer)) {
-        r -= (getModuleGlassHeight() + 0.5 * getModuleGasHeight());
-      } else {
-        r -= (0.5 * m_ScintHeight - getPolystyreneOffsetX());
+      // place the active radius midway between the two readout planes
+      // (same as positioning in GeoBKLMCreator.cc)
+      double dx = getModuleMiddleRadius(layer) - getGapMiddleRadius(layer);
+      int s1 = sector - 1;
+      int s2 = m_NSector / 2;
+      if (s1 % s2 == 0) {
+        dx = 0.0;
+      } else if (s1 > s2) {
+        dx = -dx;
+      }
+      double r = getGapMiddleRadius(layer) + dx;
+      if (!hasRPCs(layer)) {
+        if (m_IsFlipped[fb - 1][sector - 1][layer - 1]) {
+          r -= getPolystyreneOffsetX();
+        } else {
+          r += getPolystyreneOffsetX();
+        }
       }
       return r;
     }

@@ -72,7 +72,7 @@ namespace Belle2 {
         m_LayerModuleLogical[j] = NULL;
         m_LayerGapSolid[j] = NULL;
       }
-      for (int j = 0; j < 4 * NLAYER; ++j) {
+      for (int j = 0; j < 12 * NLAYER; ++j) {
         m_LayerIronLogical[j] = NULL;
         m_LayerGapLogical[j] = NULL;
       }
@@ -530,6 +530,14 @@ namespace Belle2 {
         const Module* module = m_GeoPar->findModule(fb == BKLM_FORWARD, sector, layer);
         bool isFlipped = module->isFlipped();
         int newLvol = NLAYER * ((isFlipped ? 2 : 0) + (hasChimney ? 1 : 0)) + (layer - 1);
+        int s1 = sector - 1;
+        int s2 = m_GeoPar->getNSector() / 2;
+        if (s1 % s2 == 0) {
+        } else if (s1 > s2) {
+          newLvol += NLAYER * 4;
+        } else {
+          newLvol += NLAYER * 8;
+        }
         if (m_LayerIronLogical[newLvol] == NULL) {
           sprintf(name, "BKLM.Layer%02d%s%sIronLogical", layer, (isFlipped ? "Flipped" : ""), (hasChimney ? "Chimney" : ""));
           m_LayerIronLogical[newLvol] =
@@ -538,7 +546,7 @@ namespace Belle2 {
                                 name
                                );
           m_LayerIronLogical[newLvol]->SetVisAttributes(m_VisAttributes.front()); // invisible
-          putModuleInLayer(m_LayerIronLogical[newLvol], fb, sector, layer, hasChimney, isFlipped);
+          putModuleInLayer(m_LayerIronLogical[newLvol], fb, sector, layer, hasChimney, isFlipped, newLvol);
           if (hasChimney) {
             putChimneyInLayer(m_LayerIronLogical[newLvol], layer);
           }
@@ -693,26 +701,26 @@ namespace Belle2 {
     }
 
     void GeoBKLMCreator::putModuleInLayer(G4LogicalVolume* layerIronLogical, int fb, int sector, int layer, bool hasChimney,
-                                          bool isFlipped)
+                                          bool isFlipped, int newLvol)
     {
       const CLHEP::Hep3Vector gapHalfSize = m_GeoPar->getGapHalfSize(layer, hasChimney) * CLHEP::cm;
       const CLHEP::Hep3Vector moduleHalfSize = m_GeoPar->getModuleHalfSize(layer, hasChimney) * CLHEP::cm;
       char name[80] = "";
       // Fill gap with air
-      int newLvol = (hasChimney ? NLAYER : 0) + (layer - 1);
-      if (m_LayerModuleLogical[newLvol] == NULL) {
+      int modLvol = (hasChimney ? NLAYER : 0) + (layer - 1);
+      if (m_LayerModuleLogical[modLvol] == NULL) {
         // Module is aluminum (but interior will be filled)
         sprintf(name, "BKLM.Layer%02d%sModuleSolid", layer, (hasChimney ? "Chimney" : ""));
         G4Box* moduleBox =
           new G4Box(name,
                     moduleHalfSize.x(), moduleHalfSize.y(), moduleHalfSize.z()
                    );
-        m_LayerModuleLogical[newLvol] =
+        m_LayerModuleLogical[modLvol] =
           new G4LogicalVolume(moduleBox,
                               Materials::get("G4_Al"),
                               logicalName(moduleBox)
                              );
-        m_LayerModuleLogical[newLvol]->SetVisAttributes(m_VisAttributes.front()); // invisible
+        m_LayerModuleLogical[modLvol]->SetVisAttributes(m_VisAttributes.front()); // invisible
         sprintf(name, "BKLM.Layer%02d%sModuleInteriorSolid1", layer, (hasChimney ? "Chimney" : ""));
         const CLHEP::Hep3Vector interiorHalfSize1 = m_GeoPar->getModuleInteriorHalfSize1(layer, hasChimney) * CLHEP::cm;
         G4Box* interiorBox1 =
@@ -742,41 +750,49 @@ namespace Belle2 {
         new G4PVPlacement(G4TranslateZ3D(0.0),
                           interiorLogical,
                           physicalName(interiorLogical),
-                          m_LayerModuleLogical[newLvol],
+                          m_LayerModuleLogical[modLvol],
                           false,
                           0,
                           false
                          );
         sprintf(name, "BKLM.Layer%02d%sGapSolid", layer, (hasChimney ? "Chimney" : ""));
-        m_LayerGapSolid[newLvol] =
+        m_LayerGapSolid[modLvol] =
           new G4Box(name,
                     gapHalfSize.x(), gapHalfSize.y(), gapHalfSize.z()
                    );
       }
-      int newLvolFlip = (isFlipped ? NLAYER * 2 : 0) + newLvol;
-      if (m_LayerGapLogical[newLvolFlip] == NULL) {
+      if (m_LayerGapLogical[newLvol] == NULL) {
         sprintf(name, "BKLM.Layer%02d%s%sGapLogical", layer, (isFlipped ? "Flipped" : ""), (hasChimney ? "Chimney" : ""));
-        m_LayerGapLogical[newLvolFlip] =
-          new G4LogicalVolume(m_LayerGapSolid[newLvol],
+        m_LayerGapLogical[newLvol] =
+          new G4LogicalVolume(m_LayerGapSolid[modLvol],
                               Materials::get("G4_AIR"),
                               name
                              );
-        m_LayerGapLogical[newLvolFlip]->SetVisAttributes(m_VisAttributes.front()); // invisible
+        m_LayerGapLogical[newLvol]->SetVisAttributes(m_VisAttributes.front()); // invisible
       }
       double dx = (m_GeoPar->getModuleMiddleRadius(layer) - m_GeoPar->getGapMiddleRadius(layer)) * CLHEP::cm;
+      // Module is closer to IP within gap if in the upper octants, farther from IP within gap if in the lower octants,
+      // or in the middle of the gap if in the side octants.
+      int s1 = sector - 1;
+      int s2 = m_GeoPar->getNSector() / 2;
+      if (s1 % s2 == 0) {
+        dx = 0.0;
+      } else if (s1 > s2) {
+        dx = -dx;
+      }
       double dz = moduleHalfSize.z() - gapHalfSize.z();
       new G4PVPlacement(G4Translate3D(dx, 0.0, dz) * G4RotateZ3D(isFlipped ? M_PI : 0.0),
-                        m_LayerModuleLogical[newLvol],
-                        physicalName(m_LayerModuleLogical[newLvol]),
-                        m_LayerGapLogical[newLvolFlip],
+                        m_LayerModuleLogical[modLvol],
+                        physicalName(m_LayerModuleLogical[modLvol]),
+                        m_LayerGapLogical[newLvol],
                         false,
                         0,
                         false
                        );
       dz = gapHalfSize.z() - 0.5 * m_GeoPar->getGapLength() * CLHEP::cm;
       new G4PVPlacement(G4Translate3D(m_GeoPar->getGapMiddleRadius(layer) * CLHEP::cm, 0.0, dz),
-                        m_LayerGapLogical[newLvolFlip],
-                        physicalName(m_LayerGapLogical[newLvolFlip]),
+                        m_LayerGapLogical[newLvol],
+                        physicalName(m_LayerGapLogical[newLvol]),
                         layerIronLogical,
                         false,
                         layer,
@@ -874,8 +890,8 @@ namespace Belle2 {
                             logicalName(scintEnvelopeBox)
                            );
       innerEnvelopeLogical->SetVisAttributes(m_VisAttributes.front()); // invisible
-      double scintHalfHeight  = m_GeoPar->getScintHalfHeight() * CLHEP::cm;
-      double scintHalfWidth   = m_GeoPar->getScintHalfWidth() * CLHEP::cm;
+      double scintHalfHeight = m_GeoPar->getScintHalfHeight() * CLHEP::cm;
+      double scintHalfWidth  = m_GeoPar->getScintHalfWidth() * CLHEP::cm;
 
       int envelopeOffsetSign = m_GeoPar->getScintEnvelopeOffsetSign(layer);
       const Module* module = m_GeoPar->findModule(fb == BKLM_FORWARD, sector, layer);

@@ -285,8 +285,8 @@ namespace Belle2 {
     //! EKLM scintillator strip position variance (cm^2)
     double m_EndcapScintVariance;
 
-    //! hit-plane radius (cm) at closest distance to IP of each barrel layer
-    double m_BarrelModuleMiddleRadius[NLAYER + 1];
+    //! hit-plane radius (cm) at closest distance to IP of each barrel end | sector | layer
+    double m_BarrelModuleMiddleRadius[2][NSECTOR + 1][NLAYER + 1];
 
     //! hit-plane z (cm) of each IP layer relative to KLM midpoint
     double m_EndcapModuleMiddleZ[NLAYER + 1];

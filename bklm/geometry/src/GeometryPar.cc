@@ -361,7 +361,10 @@ namespace Belle2 {
             m_LocalReconstructionShiftX[fb - 1][sector - 1][layer - 1] = element.getLocalReconstructionShiftX(fb, sector, layer);
             m_LocalReconstructionShiftY[fb - 1][sector - 1][layer - 1] = element.getLocalReconstructionShiftY(fb, sector, layer);
             m_LocalReconstructionShiftZ[fb - 1][sector - 1][layer - 1] = element.getLocalReconstructionShiftZ(fb, sector, layer);
-            m_IsFlipped[fb - 1][sector - 1][layer - 1] = (m_HasRPCs[layer - 1] ? false : element.isFlipped(fb, sector, layer));
+            m_IsFlipped[fb - 1][sector - 1][layer - 1] = false;
+            if (layer <= NSCINTLAYER) {
+              m_IsFlipped[fb - 1][sector - 1][layer - 1] = element.isFlipped(fb, sector, layer);
+            }
           }
         }
       }

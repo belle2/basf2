@@ -19,15 +19,13 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/collections/CDCTrackList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
 void TrackProcessor::addCandidateFromHitsWithPostprocessing(std::vector<const CDCWireHit*>& hits,
                                                             const std::vector<CDCConformalHit>& conformalCDCWireHitList,
-                                                            CDCTrackList& cdcTrackList)
+                                                            std::list<CDCTrack>& cdcTrackList)
 {
   if (hits.size() == 0) return;
 
@@ -35,14 +33,15 @@ void TrackProcessor::addCandidateFromHitsWithPostprocessing(std::vector<const CD
   const CDCTrajectory2D& trackTrajectory2D = fitter.fit(hits);
   CDCTrajectory3D trajectory3D(trackTrajectory2D, CDCTrajectorySZ::basicAssumption());
 
-  CDCTrack& track = cdcTrackList.createEmptyTrack();
+  cdcTrackList.emplace_back();
+  CDCTrack& track = cdcTrackList.back();
   track.setStartTrajectory3D(trajectory3D);
   track.appendNotTaken(hits);
   postprocessTrack(track, conformalCDCWireHitList, cdcTrackList);
 }
 
 void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<CDCConformalHit>& conformalCDCWireHitList,
-                                      CDCTrackList& cdcTrackList)
+                                      std::list<CDCTrack>& cdcTrackList)
 {
   TrackQualityTools::normalizeTrack(track);
 
@@ -79,30 +78,28 @@ void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<CDCConf
   HitProcessor::unmaskHitsInTrack(track);
 }
 
-bool TrackProcessor::checkTrackQuality(const CDCTrack& track, CDCTrackList& cdcTrackList)
+bool TrackProcessor::checkTrackQuality(const CDCTrack& track, std::list<CDCTrack>& cdcTrackList)
 {
   if (track.size() < 5) {
     for (const CDCRecoHit3D& hit : track) {
       hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
       hit.getWireHit().getAutomatonCell().setTakenFlag(false);
     }
-    cdcTrackList.getCDCTracks().remove(track);
+    cdcTrackList.remove(track);
     return false;
   }
 
   return true;
 }
 
-void TrackProcessor::assignNewHits(const std::vector<CDCConformalHit>& conformalCDCWireHitList, CDCTrackList& cdcTrackList)
+void TrackProcessor::assignNewHits(const std::vector<CDCConformalHit>& conformalCDCWireHitList, std::list<CDCTrack>& cdcTrackList)
 {
-  cdcTrackList.getCDCTracks().erase(std::remove_if(cdcTrackList.getCDCTracks().begin(), cdcTrackList.getCDCTracks().end(),
-  [](const CDCTrack & track) {
-    return track.size() == 0;
-  }) , cdcTrackList.getCDCTracks().end());
-
-  cdcTrackList.doForAllTracks([&](CDCTrack & track) {
-
-    if (track.size() < 4) return;
+  cdcTrackList.erase(std::remove_if(cdcTrackList.begin(),
+                                    cdcTrackList.end(),
+  [](const CDCTrack & track) { return track.size() == 0; }),
+  cdcTrackList.end());
+  for (CDCTrack& track : cdcTrackList) {
+    if (track.size() < 4) continue;
 
     HitProcessor::assignNewHitsToTrack(track, conformalCDCWireHitList);
     TrackQualityTools::normalizeTrack(track);
@@ -114,16 +111,15 @@ void TrackProcessor::assignNewHits(const std::vector<CDCConformalHit>& conformal
 
     HitProcessor::deleteHitsFarAwayFromTrajectory(track);
     TrackQualityTools::normalizeTrack(track);
-  });
+  }
 
   // TODO: HitProcessor::reassignHitsFromOtherTracks(cdcTrackList);
-
-  cdcTrackList.doForAllTracks([](CDCTrack & cand) {
+  for (CDCTrack& cand : cdcTrackList) {
     cand.forwardTakenFlag();
-  });
+  }
 }
 
-void TrackProcessor::deleteTracksWithLowFitProbability(CDCTrackList& cdcTrackList, double minimal_probability_for_good_fit)
+void TrackProcessor::deleteTracksWithLowFitProbability(std::list<CDCTrack>& cdcTrackList, double minimal_probability_for_good_fit)
 {
   const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getNoDriftVarianceFitter();
 
@@ -135,9 +131,8 @@ void TrackProcessor::deleteTracksWithLowFitProbability(CDCTrackList& cdcTrackLis
     return TMath::Prob(chi2, dof) < minimal_probability_for_good_fit;
   };
 
-  cdcTrackList.getCDCTracks().erase(
-    std::remove_if(cdcTrackList.getCDCTracks().begin(), cdcTrackList.getCDCTracks().end(), checkProbability),
-    cdcTrackList.getCDCTracks().end());
+  cdcTrackList.erase(std::remove_if(cdcTrackList.begin(), cdcTrackList.end(), checkProbability),
+                     cdcTrackList.end());
 }
 
 

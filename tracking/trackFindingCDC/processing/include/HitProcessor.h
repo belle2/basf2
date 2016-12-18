@@ -25,7 +25,6 @@ namespace Belle2 {
     class CDCTrajectory2D;
     class CDCWireHit;
     class Vector2D;
-    class CDCTrackList;
 
     /**
      * Class performs hit assignment, reassignment and deletion of hits to the tracks
@@ -46,7 +45,7 @@ namespace Belle2 {
       static void updateRecoHit3D(CDCTrajectory2D& trajectory2D, CDCRecoHit3D& hit);
 
       /** Hits reassignment */
-      static void reassignHitsFromOtherTracks(CDCTrackList& trackList);
+      static void reassignHitsFromOtherTracks(std::list<CDCTrack>& trackList);
 
       /** Append unused hits to tracks */
       static void appendUnusedHits(std::vector<CDCTrack>& tracks,
@@ -68,7 +67,7 @@ namespace Belle2 {
       static ESign getChargeSign(CDCTrack& track);
 
       /// Reset all masked hits.
-      static void resetMaskedHits(CDCTrackList& trackList,
+      static void resetMaskedHits(std::list<CDCTrack>& trackList,
                                   std::vector<CDCConformalHit>& conformalHits);
 
       /// Unset the MASKED flag and set the TAKEN flag of all hits but do not touch the track flags.

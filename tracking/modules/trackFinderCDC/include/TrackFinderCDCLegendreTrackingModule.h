@@ -14,7 +14,6 @@
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
-#include <tracking/trackFindingCDC/eventdata/collections/CDCTrackList.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -46,10 +45,11 @@ namespace Belle2 {
     bool m_param_doEarlyMerging;        /**< Defines whether early track merging will be performed. */
 
     /// Worker
-    TrackFindingCDC::CDCTrackList
-    m_cdcTrackList;      /**< Object for holding all found cdc tracks to be passed around to the postprocessing functions. */
-    std::vector<TrackFindingCDC::CDCConformalHit>
-    m_conformalCDCWireHitList; /**< List for holding all used conformal CDC wire hits. */
+    /// Object for holding all found cdc tracks to be passed around to the postprocessing functions. */
+    std::list<TrackFindingCDC::CDCTrack> m_cdcTrackList;
+
+    /// List for holding all used conformal CDC wire hits.
+    std::vector<TrackFindingCDC::CDCConformalHit> m_conformalCDCWireHitList;
 
     void generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks);
 

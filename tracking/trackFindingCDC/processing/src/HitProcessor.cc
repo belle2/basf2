@@ -10,7 +10,6 @@
 #include <tracking/trackFindingCDC/processing/HitProcessor.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/collections/CDCTrackList.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 
@@ -69,19 +68,19 @@ void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& tracks,
   }
 }
 
-void HitProcessor::reassignHitsFromOtherTracks(CDCTrackList& trackList)
+void HitProcessor::reassignHitsFromOtherTracks(std::list<CDCTrack>& trackList)
 {
   std::vector<std::pair<CDCRecoHit3D, CDCTrack>> assignedHits;
-  trackList.doForAllTracks([&assignedHits](CDCTrack & cand) {
+  for (CDCTrack& cand : trackList) {
     for (CDCRecoHit3D& recoHit : cand) {
       recoHit.getWireHit().getAutomatonCell().setTakenFlag(true);
       recoHit.getWireHit().getAutomatonCell().setMaskedFlag(false);
 
       assignedHits.push_back(std::make_pair(recoHit, cand));
     }
-  });
+  }
 
-  B2DEBUG(100, "NCands = " << trackList.getCDCTracks().size());
+  B2DEBUG(100, "NCands = " << trackList.size());
 
   for (std::pair<CDCRecoHit3D, CDCTrack>& itemWithCand : assignedHits) {
 
@@ -97,8 +96,8 @@ void HitProcessor::reassignHitsFromOtherTracks(CDCTrackList& trackList)
     double bestHitDist = dist;
     CDCTrack* bestCandidate = nullptr;
 
-    trackList.doForAllTracks([&cand, &item, &bestHitDist, &bestCandidate](CDCTrack & candInner) {
-      if (candInner == cand) return;
+    for (CDCTrack& candInner : trackList) {
+      if (candInner == cand) continue;
       CDCTrajectory2D trajectoryInner = candInner.getStartTrajectory3D().getTrajectory2D();
 
       HitProcessor::updateRecoHit3D(trajectoryInner, item);
@@ -108,7 +107,7 @@ void HitProcessor::reassignHitsFromOtherTracks(CDCTrackList& trackList)
         bestCandidate = &candInner;
         bestHitDist = distTemp;
       }
-    });
+    }
 
     if (bestHitDist < dist) {
       const CDCRecoHit3D& recoHit3D =
@@ -258,7 +257,7 @@ ESign HitProcessor::getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy)
   }
 }
 
-void HitProcessor::resetMaskedHits(CDCTrackList& trackList,
+void HitProcessor::resetMaskedHits(std::list<CDCTrack>& trackList,
                                    std::vector<CDCConformalHit>& conformalHits)
 {
   for (CDCConformalHit& conformalHit : conformalHits) {
@@ -266,9 +265,9 @@ void HitProcessor::resetMaskedHits(CDCTrackList& trackList,
     conformalHit.setUsedFlag(false);
   }
 
-  trackList.doForAllTracks([](const CDCTrack & track) {
+  for (const CDCTrack& track : trackList) {
     track.forwardTakenFlag();
-  });
+  }
 }
 
 void HitProcessor::unmaskHitsInTrack(CDCTrack& track)

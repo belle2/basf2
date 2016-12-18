@@ -47,7 +47,7 @@ namespace Belle2 {
        *  hits belonging to found candidates will be marked as used and ignored for further filling iterations
        */
       AxialHitQuadTreeProcessor::CandidateProcessorLambda getLambdaInterface(std::vector<CDCConformalHit>& conformalCDCWireHitList,
-          CDCTrackList& cdcTrackList)
+          std::list<CDCTrack>& cdcTrackList)
       {
         AxialHitQuadTreeProcessor::CandidateProcessorLambda lmdCandidateProcessingFinal = [&](const AxialHitQuadTreeProcessor::ReturnList &
         hits __attribute__((unused)), AxialHitQuadTreeProcessor::QuadTree * qt) -> void {
@@ -61,7 +61,7 @@ namespace Belle2 {
 
       /// Gets hits from quadtree node, convert to QuadTreeHitWrapper and passes for further processing
       void candidateProcessingFinal(AxialHitQuadTreeProcessor::QuadTree* qt, std::vector<CDCConformalHit>& conformalCDCWireHitList,
-                                    CDCTrackList& cdcTrackList)
+                                    std::list<CDCTrack>& cdcTrackList)
       {
         for (AxialHitQuadTreeProcessor::ItemType* hit : qt->getItemsVector()) {
           hit->setUsedFlag(false);
@@ -151,7 +151,7 @@ namespace Belle2 {
       /// Perform conformal extension for given set of hits and create CDCTrack object of them
       void postprocessSingleNode(std::vector<CDCConformalHit*>& candidateHits,
                                  std::vector<CDCConformalHit>& conformalCDCWireHitList,
-                                 CDCTrackList& cdcTrackList)
+                                 std::list<CDCTrack>& cdcTrackList)
       {
 
         for (CDCConformalHit* hit : candidateHits) {

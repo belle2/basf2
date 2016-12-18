@@ -131,7 +131,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
     // Object which operates with AxialHitQuadTreeProcessor and QuadTreeNodeProcessor and starts quadtree search
     QuadTreeCandidateFinder quadTreeCandidateFinder;
 
-    int nCandsAdded = m_cdcTrackList.getCDCTracks().size();
+    int nCandsAdded = m_cdcTrackList.size();
 
     // Interface
     AxialHitQuadTreeProcessor::CandidateProcessorLambda lambdaInterface = quadTreeNodeProcessor.getLambdaInterface(
@@ -148,7 +148,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
       TrackMerger::doTracksMerging(m_cdcTrackList, m_conformalCDCWireHitList);
     }
 
-    nCandsAdded = m_cdcTrackList.getCDCTracks().size() - nCandsAdded;
+    nCandsAdded = m_cdcTrackList.size() - nCandsAdded;
 
     // Change to the next pass
     if (quadTreePassCounter.getPass() != LegendreFindingPass::FullRange) {
@@ -163,7 +163,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
 
   // Check quality of the track basing on holes on the trajectory;
   // if holes exsist then track is splitted
-  m_cdcTrackList.doForAllTracks([&](CDCTrack & track) {
+  for (CDCTrack& track : m_cdcTrackList) {
     if (track.size() > 3) {
       HitProcessor::maskHitsWithPoorQuality(track);
       HitProcessor::splitBack2BackTrack(track);
@@ -188,12 +188,12 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
 
     }
 //    TrackMergerNew::deleteAllMarkedHits(track);
-  });
+  }
 
   // Update tracks before storing to DataStore
-  m_cdcTrackList.doForAllTracks([&](CDCTrack & track) {
+  for (CDCTrack& track : m_cdcTrackList) {
     TrackQualityTools::normalizeTrack(track);
-  });
+  }
 
   // Remove bad tracks
   TrackProcessor::deleteTracksWithLowFitProbability(m_cdcTrackList);
@@ -208,11 +208,11 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
 
 void TrackFinderCDCLegendreTrackingModule::outputObjects(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
-  tracks.reserve(tracks.size() + m_cdcTrackList.getCDCTracks().size());
+  tracks.reserve(tracks.size() + m_cdcTrackList.size());
 
-  m_cdcTrackList.doForAllTracks([&](CDCTrack & track) {
+  for (CDCTrack& track : m_cdcTrackList) {
     if (track.size() > 5) tracks.push_back(std::move(track));
-  });
+  }
 }
 
 void TrackFinderCDCLegendreTrackingModule::clearVectors()

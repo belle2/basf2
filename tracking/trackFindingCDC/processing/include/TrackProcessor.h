@@ -20,7 +20,6 @@ namespace Belle2 {
 
     class CDCTrack;
     class CDCWireHit;
-    class CDCConformalHit;
     class CDCTrajectory2D;
 
     /// Class with high-level track (post)processing.
@@ -36,18 +35,18 @@ namespace Belle2 {
       TrackProcessor& operator=(const TrackProcessor&) = delete;
 
       /// Create CDCTrack using CDCWireHit hits and store it in the list. Then call the postprocessing on it.
-      static void addCandidateFromHitsWithPostprocessing(std::vector<const CDCWireHit*>& hits,
-                                                         const std::vector<CDCConformalHit>& conformalCDCWireHitList,
+      static void addCandidateFromHitsWithPostprocessing(std::vector<const CDCWireHit*>& foundAxialWireHits,
+                                                         const std::vector<const CDCWireHit*>& allAxialWireHits,
                                                          std::list<CDCTrack>& cdcTrackList);
 
       /// Assign new hits to all tracks (using the assignNewHitsToTrack(CDCTrack&) method of the HitsProcessor).
-      static void assignNewHits(const std::vector<CDCConformalHit>& conformalCDCWireHitList, std::list<CDCTrack>& cdcTrackList);
+      static void assignNewHits(const std::vector<const CDCWireHit*>& allWireHits, std::list<CDCTrack>& cdcTrackList);
 
       /// Check the p-values of the tracks. If they are below the given value, delete the track from the list.
       static void deleteTracksWithLowFitProbability(std::list<CDCTrack>& cdcTrackList, double minimal_probability_for_good_fit = 0.4);
 
-      /// Perform all track postprocessing.
-      static void postprocessTrack(CDCTrack& track, const std::vector<CDCConformalHit>& conformalCDCWireHitList,
+      /// Perform all track postprocessing - return whether the tracks survived the post processing
+      static void postprocessTrack(CDCTrack& track, const std::vector<const CDCWireHit*>& allAxialWireHits,
                                    std::list<CDCTrack>& cdcTrackList);
 
     private:
@@ -66,4 +65,3 @@ namespace Belle2 {
     };
   }
 }
-

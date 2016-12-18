@@ -7,23 +7,19 @@
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
-
-
 #pragma once
-#include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorTemplate.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /** A QuadTreeProcessor for TrackHits */
-    class AxialHitQuadTreeProcessorWithNewReferencePoint : public QuadTreeProcessorTemplate<float, float, CDCConformalHit, 2, 2> {
+    class AxialHitQuadTreeProcessorWithNewReferencePoint : public QuadTreeProcessorTemplate<float, float, const CDCWireHit, 2, 2> {
 
     public:
 
@@ -49,26 +45,27 @@ namespace Belle2 {
 
     public:
 
-      /// Provide CDCConformalHit to process.
-      void provideItemsSet(std::vector<CDCConformalHit*>& itemsVector) override final
+      /// Provide const CDCWireHit to process.
+      void provideItemsSet(std::vector<const CDCWireHit*>& itemsVector) override final
       {
         clear();
 
         std::vector<ItemType*>& quadtreeItemsVector = m_quadTree->getItemsVector();
         quadtreeItemsVector.reserve(itemsVector.size());
-        for (CDCConformalHit* item : itemsVector) {
-          if (item->getUsedFlag()) continue;
-          if (insertItemInNode(m_quadTree, item))
+        for (const CDCWireHit* item : itemsVector) {
+          if (item->getAutomatonCell().hasTakenFlag() or item->getAutomatonCell().hasMaskedFlag()) continue;
+          if (insertItemInNode(m_quadTree, item)) {
             quadtreeItemsVector.push_back(new ItemType(item));
+          }
         }
       }
 
       /**
        * @return Hits which belong to the QuadTree
        */
-      std::vector<CDCConformalHit*> getAssignedHits()
+      std::vector<const CDCWireHit*> getAssignedHits()
       {
-        std::vector<CDCConformalHit*> itemsToReturn;
+        std::vector<const CDCWireHit*> itemsToReturn;
         itemsToReturn.reserve(m_quadTree->getNItems());
 
         for (ItemType* item : m_quadTree->getItemsVector()) {
@@ -81,12 +78,16 @@ namespace Belle2 {
       /**
        * Do only insert the hit into a node if sinogram calculated from this hit belongs into this node
        */
-      bool insertItemInNode(QuadTree* node, CDCConformalHit* hit) const override final
+      bool insertItemInNode(QuadTree* node, const CDCWireHit* hit) const override final
       {
         float dist_1[2][2];
         float dist_2[2][2];
+        Circle2D conformalDriftCircle = hit->conformalTransformed(m_referencePoint);
 
-        std::tuple<Vector2D, double> confCoords = hit->performConformalTransformWithRespectToPoint(m_referencePoint);
+        // TODO : Resolve sad mismatch between the legendre conformal transformation and the one defined in the reset of the CDC tracking.
+        std::tuple<Vector2D, double> confCoords = std::make_tuple(conformalDriftCircle.center() * 2,
+                                                                  conformalDriftCircle.radius() * 2);
+
         Vector2D min_n12 = Vector2D::Phi(node->getXMin());
         Vector2D max_n12 = Vector2D::Phi(node->getXMax());
 

@@ -19,8 +19,6 @@ namespace Belle2 {
     class CDCTrack;
     class CDCWireHit;
     class CDCTrajectory2D;
-    class TrackProcessor;
-    class CDCConformalHit;
 
     class TrackMerger {
     public:
@@ -34,12 +32,14 @@ namespace Belle2 {
       TrackMerger& operator=(const TrackMerger&) = delete;
 
       /** The track finding often finds two curling tracks, originating from the same particle. This function merges them. */
-      static void doTracksMerging(std::list<CDCTrack>& cdcTrackList, const std::vector<CDCConformalHit>& conformalCDCWireHitList,
+      static void doTracksMerging(std::list<CDCTrack>& cdcTrackList,
+                                  const std::vector<const CDCWireHit*>& allAxialWireHits,
                                   double minimum_probability_to_be_merged = 0.85);
 
       /** Try to merge given track with tracks in tracklist. */
-      static void tryToMergeTrackWithOtherTracks(CDCTrack& track, std::list<CDCTrack>& cdcTrackList,
-                                                 const std::vector<CDCConformalHit>& conformalCDCWireHitList,
+      static void tryToMergeTrackWithOtherTracks(CDCTrack& track,
+                                                 std::list<CDCTrack>& cdcTrackList,
+                                                 const std::vector<const CDCWireHit*>& allAxialWireHits,
                                                  double minimum_probability_to_be_merged = 0.85);
 
     private:
@@ -50,7 +50,9 @@ namespace Belle2 {
        * Function to merge two track candidates. The hits of cand2 are deleted and transfered to cand1.
        * The hit sorting is not maintained.
        */
-      static void mergeTracks(CDCTrack& track1, CDCTrack& track2, const std::vector<CDCConformalHit>& conformalCDCWireHitList,
+      static void mergeTracks(CDCTrack& track1,
+                              CDCTrack& track2,
+                              const std::vector<const CDCWireHit*>& allAxialWireHits,
                               std::list<CDCTrack>& cdcTrackList);
 
       /**

@@ -33,7 +33,6 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCConformalHit;
 
     /** A QuadTreeProcessor for TrackHits */
     class AxialHitQuadTreeProcessor : public QuadTreeProcessorTemplate<unsigned long, float, CDCConformalHit, 2, 2> {

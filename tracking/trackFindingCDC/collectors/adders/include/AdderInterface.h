@@ -52,7 +52,9 @@ namespace Belle2 {
 
     protected:
       /// Override this function to implement how a collection item should be matched to a collector item.
-      virtual void add(ACollectorItem& collectorItem, const ACollectionItem& collectionItem, Weight weight)
+      virtual void add(ACollectorItem& collectorItem __attribute__((unused)),
+                       const ACollectionItem& collectionItem __attribute__((unused)),
+                       Weight weight __attribute__((unused)))
       {
       }
     };

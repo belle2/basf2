@@ -75,7 +75,8 @@ namespace Belle2 {
        * one collection items. If you override this function, you just have to return a weight - the rest of the
        * logic is handled by the MatcherInterface class.
        */
-      virtual Weight match(ACollectorItem& collectorItem, const ACollectionItem& collectionItem)
+      virtual Weight match(ACollectorItem& collectorItem __attribute__((unused)),
+                           const ACollectionItem& collectionItem __attribute__((unused)))
       {
         return NAN;
       }

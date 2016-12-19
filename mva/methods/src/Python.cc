@@ -31,8 +31,8 @@ namespace Belle2 {
       }
       m_framework = pt.get<std::string>("Python_framework");
       m_steering_file = pt.get<std::string>("Python_steering_file");
-      m_mini_batch_size = pt.get<unsigned long int>("Python_mini_batch_size");
-      m_nIterations = pt.get<unsigned long int>("Python_n_iterations");
+      m_mini_batch_size = pt.get<unsigned int>("Python_mini_batch_size");
+      m_nIterations = pt.get<unsigned int>("Python_n_iterations");
       m_config = pt.get<std::string>("Python_config");
       m_training_fraction = pt.get<double>("Python_training_fraction");
 
@@ -177,16 +177,16 @@ namespace Belle2 {
         throw std::runtime_error("Failed calling train in PythonTeacher");
       }
 
-      unsigned long int numberOfFeatures = training_data.getNumberOfFeatures();
-      unsigned long int numberOfEvents = training_data.getNumberOfEvents();
+      uint64_t numberOfFeatures = training_data.getNumberOfFeatures();
+      uint64_t numberOfEvents = training_data.getNumberOfEvents();
 
-      unsigned long int batch_size = m_specific_options.m_mini_batch_size;
+      uint64_t batch_size = m_specific_options.m_mini_batch_size;
       if (batch_size == 0) {
         batch_size = numberOfEvents;
       }
 
-      unsigned long int training_batch_size = batch_size;
-      unsigned long int validation_batch_size = 0;
+      uint64_t training_batch_size = batch_size;
+      uint64_t validation_batch_size = 0;
 
       if (m_specific_options.m_training_fraction <= 0.0) {
         B2ERROR("Please provide a positive training fraction");
@@ -194,8 +194,8 @@ namespace Belle2 {
       }
 
       if (m_specific_options.m_training_fraction < 1.0) {
-        training_batch_size = static_cast<unsigned long int>(batch_size * m_specific_options.m_training_fraction);
-        validation_batch_size = static_cast<unsigned long int>(batch_size * (1 - m_specific_options.m_training_fraction));
+        training_batch_size = static_cast<uint64_t>(batch_size * m_specific_options.m_training_fraction);
+        validation_batch_size = static_cast<uint64_t>(batch_size * (1 - m_specific_options.m_training_fraction));
       }
 
       auto X = std::unique_ptr<float[]>(new float[training_batch_size * numberOfFeatures]);
@@ -224,38 +224,38 @@ namespace Belle2 {
                      parameters);
         auto state = get_attr_from_module_else_fallback_to_framework("begin_fit", module, framework)(model);
 
-        std::vector<unsigned long int> data_indices(numberOfEvents);
+        std::vector<uint64_t> data_indices(numberOfEvents);
         std::iota(data_indices.begin(), data_indices.end(), 0);
         // disabled random shuffle since this is very slow (O(days)) on large files.
         // TODO: remove it in a more sophisticated way
         //std::random_shuffle(data_indices.begin(), data_indices.end());
 
         auto start_train = data_indices.begin();
-        auto end_train = data_indices.begin() + static_cast<unsigned long int>(numberOfEvents * m_specific_options.m_training_fraction);
+        auto end_train = data_indices.begin() + static_cast<uint64_t>(numberOfEvents * m_specific_options.m_training_fraction);
         auto end_validation = data_indices.end();
-        std::vector<unsigned long int> training_indices(start_train, end_train);
-        std::vector<unsigned long int> validation_indices(end_train, end_validation);
+        std::vector<uint64_t> training_indices(start_train, end_train);
+        std::vector<uint64_t> validation_indices(end_train, end_validation);
 
-        unsigned long int nBatches = std::floor(numberOfEvents / batch_size);
+        uint64_t nBatches = std::floor(numberOfEvents / batch_size);
         bool continue_loop = true;
-        for (unsigned long int iIteration = 0; iIteration < m_specific_options.m_nIterations and continue_loop; ++iIteration) {
+        for (uint64_t iIteration = 0; iIteration < m_specific_options.m_nIterations and continue_loop; ++iIteration) {
           // disabled random shuffle since this is very slow (O(days)) on large files.
           // TODO: remove it in a more sophisticated way
           // std::random_shuffle(training_indices.begin(), training_indices.end());
           // std::random_shuffle(validation_indices.begin(), validation_indices.end());
 
-          for (unsigned long int iBatch = 0; iBatch < nBatches and continue_loop; ++iBatch) {
-            for (unsigned long int iEvent = 0; iEvent < training_batch_size; ++iEvent) {
+          for (uint64_t iBatch = 0; iBatch < nBatches and continue_loop; ++iBatch) {
+            for (uint64_t iEvent = 0; iEvent < training_batch_size; ++iEvent) {
               training_data.loadEvent(training_indices[iEvent + iBatch * training_batch_size]);
-              for (unsigned long int iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
+              for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
                 X[iEvent * numberOfFeatures + iFeature] = training_data.m_input[iFeature];
               y[iEvent] = training_data.m_target;
               w[iEvent] = training_data.m_weight;
             }
 
-            for (unsigned long int iEvent = 0; iEvent < validation_batch_size; ++iEvent) {
+            for (uint64_t iEvent = 0; iEvent < validation_batch_size; ++iEvent) {
               training_data.loadEvent(validation_indices[iEvent + iBatch * validation_batch_size]);
-              for (unsigned long int iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
+              for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
                 X_v[iEvent * numberOfFeatures + iFeature] = training_data.m_input[iFeature];
               y_v[iEvent] = training_data.m_target;
               w_v[iEvent] = training_data.m_weight;
@@ -291,7 +291,7 @@ namespace Belle2 {
           B2WARNING("Python method didn't return the correct number of importance value. I ignore the importances");
         } else {
           std::map<std::string, float> feature_importances;
-          for (unsigned long int iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
+          for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
             boost::python::extract<float> proxy(importances[iFeature]);
             if (proxy.check()) {
               feature_importances[m_general_options.m_variables[iFeature]] = static_cast<float>(proxy);
@@ -354,15 +354,15 @@ namespace Belle2 {
     std::vector<float> PythonExpert::apply(Dataset& test_data) const
     {
 
-      unsigned long int numberOfFeatures = test_data.getNumberOfFeatures();
-      unsigned long int numberOfEvents = test_data.getNumberOfEvents();
+      uint64_t numberOfFeatures = test_data.getNumberOfFeatures();
+      uint64_t numberOfEvents = test_data.getNumberOfEvents();
 
       auto X = std::unique_ptr<float[]>(new float[numberOfEvents * numberOfFeatures]);
       npy_intp dimensions_X[2] = {static_cast<npy_intp>(numberOfEvents), static_cast<npy_intp>(numberOfFeatures)};
 
-      for (unsigned long int iEvent = 0; iEvent < numberOfEvents; ++iEvent) {
+      for (uint64_t iEvent = 0; iEvent < numberOfEvents; ++iEvent) {
         test_data.loadEvent(iEvent);
-        for (unsigned long int iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
+        for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
           X[iEvent * numberOfFeatures + iFeature] = test_data.m_input[iFeature];
       }
 
@@ -371,7 +371,7 @@ namespace Belle2 {
       try {
         auto ndarray_X = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X, NPY_FLOAT32, X.get()));
         auto result = m_framework.attr("apply")(m_state, ndarray_X);
-        for (unsigned long int iEvent = 0; iEvent < numberOfEvents; ++iEvent) {
+        for (uint64_t iEvent = 0; iEvent < numberOfEvents; ++iEvent) {
           // We have to do some nasty casting here, because the Python C-Api uses structs which are binary compatible
           // to a PyObject but do not inherit from it!
           probabilities[iEvent] = static_cast<float>(*static_cast<double*>(PyArray_GETPTR1(reinterpret_cast<PyArrayObject*>(result.ptr()),

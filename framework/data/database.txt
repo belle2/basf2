@@ -2,7 +2,7 @@ dbstore/ECLCalibrationDigitLow 1 0,0,-1,-1
 dbstore/ECLCalibrationDigitHigh 1 0,0,-1,-1
 dbstore/BeamParameters 1 0,0,-1,-1
 dbstore/VXDAlignment 1 0,0,-1,-1
-dbstore/EKLMTimeCalibration 2 0,0,-1,-1
+dbstore/EKLMTimeCalibration 3 0,0,-1,-1
 dbstore/EKLMDisplacement 1 0,0,-1,-1
 dbstore/EKLMDigitizationParameters 2 0,0,-1,-1
 dbstore/EKLMReconstructionParameters 2 0,0,-1,-1

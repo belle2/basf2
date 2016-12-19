@@ -85,6 +85,20 @@ void AxialTrackCreatorHitLegendre::exposeParameters(ModuleParamList* moduleParam
                                 m_param_minNHits,
                                 "Absolute minimal number of hits to make an axial track.",
                                 m_param_minNHits);
+
+  moduleParamList->addParameter(prefixed(prefix, "fineRelaxationSchedule"),
+                                m_param_fineRelaxationSchedule,
+                                "Relaxation schedule for the leaf processor in the fine hough tree. "
+                                "For content of the individual parameter maps consider the parameters of the "
+                                "AxialLegendreLeafProcessor",
+                                m_param_fineRelaxationSchedule);
+
+  moduleParamList->addParameter(prefixed(prefix, "roughRelaxationSchedule"),
+                                m_param_roughRelaxationSchedule,
+                                "Relaxation schedule for the leaf processor in the rough hough tree. "
+                                "For content of the individual parameter maps consider the parameters of the "
+                                "AxialLegendreLeafProcessor",
+                                m_param_roughRelaxationSchedule);
 }
 
 void AxialTrackCreatorHitLegendre::initialize()
@@ -132,6 +146,14 @@ void AxialTrackCreatorHitLegendre::initialize()
     m_roughHoughTree->assignArray<DiscreteCurv>(roughCurvBinsSpec.constructArray(), roughCurvBinsSpec.getNOverlap());
     m_roughHoughTree->initialize();
   }
+
+  if (m_param_fineRelaxationSchedule.empty()) {
+    m_param_fineRelaxationSchedule = getDefaultFineRelaxationSchedule();
+  }
+
+  if (m_param_roughRelaxationSchedule.empty()) {
+    m_param_roughRelaxationSchedule = getDefaultRoughRelaxationSchedule();
+  }
 }
 
 void AxialTrackCreatorHitLegendre::apply(const std::vector<CDCWireHit>& wireHits,
@@ -156,7 +178,7 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<CDCWireHit>& wireHits
 
   // Find tracks with increasingly relaxed conditions in the fine hough grid
   m_fineHoughTree->seed(leafProcessor.getUnusedWireHits());
-  for (const ParameterVariantMap& passParameters : getFineRelaxationSchedule()) {
+  for (const ParameterVariantMap& passParameters : m_param_fineRelaxationSchedule) {
     AssignParameterVisitor::update(&moduleParamList, passParameters);
     leafProcessor.beginWalk();
     m_fineHoughTree->findUsing(leafProcessor);
@@ -169,7 +191,7 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<CDCWireHit>& wireHits
   /*
   // Find tracks with increasingly relaxed conditions in the rougher hough grid
   m_roughHoughTree->seed(leafProcessor.getUnusedWireHits());
-  for (const ParameterVariantMap& passParameters : getRoughRelaxationSchedule()) {
+  for (const ParameterVariantMap& passParameters : m_param_roughRelaxationSchedule) {
     AssignParameterVisitor::update(&moduleParamList, passParameters);
     leafProcessor.beginWalk();
     m_roughHoughTree->findUsing(leafProcessor);
@@ -227,7 +249,7 @@ void AxialTrackCreatorHitLegendre::terminate()
 }
 
 std::vector<ParameterVariantMap>
-AxialTrackCreatorHitLegendre::getFineRelaxationSchedule() const
+AxialTrackCreatorHitLegendre::getDefaultFineRelaxationSchedule() const
 {
   std::vector<ParameterVariantMap> result;
   // Relaxation schedule of the original legendre implemenation
@@ -252,9 +274,7 @@ AxialTrackCreatorHitLegendre::getFineRelaxationSchedule() const
     {"curvResolution", std::string("origin")},
     {"nRoadSearches", 1},
     {"roadLevel", 4 - m_param_sectorLevelSkip},
-
   });
-
 
   for (double minWeight = 50.0; minWeight > 10.0; minWeight *= 0.75) {
     result.push_back(ParameterVariantMap{
@@ -290,7 +310,6 @@ AxialTrackCreatorHitLegendre::getFineRelaxationSchedule() const
     {"curvResolution", std::string("nonOrigin")},
     {"nRoadSearches", 2},
     {"roadLevel", 4 - m_param_sectorLevelSkip},
-
   });
 
   int iPass = 0;
@@ -309,7 +328,7 @@ AxialTrackCreatorHitLegendre::getFineRelaxationSchedule() const
 }
 
 std::vector<ParameterVariantMap>
-AxialTrackCreatorHitLegendre::getRoughRelaxationSchedule() const
+AxialTrackCreatorHitLegendre::getDefaultRoughRelaxationSchedule() const
 {
   std::vector<ParameterVariantMap> result;
 
@@ -321,7 +340,6 @@ AxialTrackCreatorHitLegendre::getRoughRelaxationSchedule() const
     {"curvResolution", std::string("nonOrigin")},
     {"nRoadSearches", 3},
     {"roadLevel", 0},
-
   });
 
   result.push_back(ParameterVariantMap{
@@ -331,7 +349,6 @@ AxialTrackCreatorHitLegendre::getRoughRelaxationSchedule() const
     {"curvResolution", std::string("nonOrigin")},
     {"nRoadSearches", 3},
     {"roadLevel", 0},
-
   });
 
   for (double minWeight = 30.0; minWeight > 10.0; minWeight *= 0.75) {

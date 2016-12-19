@@ -52,10 +52,10 @@ namespace Belle2 {
 
     public:
       /// Get a series of parameters to be set for each pass over the fine hough space
-      std::vector<ParameterVariantMap> getFineRelaxationSchedule() const;
+      std::vector<ParameterVariantMap> getDefaultFineRelaxationSchedule() const;
 
       /// Get a series of parameters to be set for each pass over the rough hough space
-      std::vector<ParameterVariantMap> getRoughRelaxationSchedule() const;
+      std::vector<ParameterVariantMap> getDefaultRoughRelaxationSchedule() const;
 
     private:
       /// Parameter: Level of divisions in the hough space.
@@ -93,6 +93,12 @@ namespace Belle2 {
 
       /// Parameter: Absolute minimal number of hits to make an axial track.
       double m_param_minNHits = 30;
+
+      /// Parameter: Relaxation schedule for the leaf processor in the fine hough tree
+      std::vector<ParameterVariantMap> m_param_fineRelaxationSchedule;
+
+      /// Parameter: Relaxation schedule for the leaf processor in the fine hough tree
+      std::vector<ParameterVariantMap> m_param_roughRelaxationSchedule;
 
       const double m_maxCurvAcceptance = 0.13;
       const double m_curlCurv = 0.018;

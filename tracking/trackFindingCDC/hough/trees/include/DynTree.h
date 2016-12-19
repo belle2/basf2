@@ -10,11 +10,13 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/utilities/CallIfApplicable.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <framework/logging/Logger.h>
 #include <vector>
 #include <deque>
 #include <algorithm>
 
+#include <cmath>
 #include <cassert>
 
 namespace Belle2 {
@@ -140,33 +142,33 @@ namespace Belle2 {
             // Priorities the child nodes with the priority function.
             for (Node& childNode : *children) {
               float childPriority = priority(&childNode);
+              if (std::isnan(childPriority)) continue;
               prioritisedChildNodes.push_back(std::make_pair(childPriority, &childNode));
             }
 
-            std::make_heap(prioritisedChildNodes.begin(),
-                           prioritisedChildNodes.end());
+            std::make_heap(prioritisedChildNodes.begin(), prioritisedChildNodes.end());
 
-            // while( not prioritisedChildNode.empty() ) {
-            // We know the number of children so we can make the loop counter explicit
-            for (std::size_t i = 0; i < nChildren; ++i) {
-              std::pop_heap(prioritisedChildNodes.begin(),
-                            prioritisedChildNodes.end());
-
+            while (not prioritisedChildNodes.empty()) {
+              std::pop_heap(prioritisedChildNodes.begin(), prioritisedChildNodes.end());
               Node* priorityChildNode = prioritisedChildNodes.back().second;
               prioritisedChildNodes.pop_back();
+
               priorityChildNode->walk(walker, priority);
 
               // After the walking the children we reevaluate the priority
               bool reheap = false;
-              for (std::pair<float, Node*>& prioritisedChildNode : prioritisedChildNodes) {
+              erase_remove_if(prioritisedChildNodes,
+              [&reheap, &priority](std::pair<float, Node*>& prioritisedChildNode) {
                 float childPriority = priority(prioritisedChildNode.second);
-                /// Check if weights changed and a reordering is due.
+                if (std::isnan(childPriority)) return true;
+                // Check if weights changed and a reordering is due.
                 reheap |= prioritisedChildNode.first != childPriority;
                 prioritisedChildNode.first = childPriority;
-              }
+                return false;
+              });
+
               if (reheap) {
-                std::make_heap(prioritisedChildNodes.begin(),
-                               prioritisedChildNodes.end());
+                std::make_heap(prioritisedChildNodes.begin(), prioritisedChildNodes.end());
               }
             }
             assert(prioritisedChildNodes.empty());

@@ -7,6 +7,7 @@
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <TSystem.h>
 #include <TFile.h>
@@ -91,6 +92,8 @@ The following restrictions apply:
   std::map<std::string, std::pair<Mergeable*, size_t>> persistentMergeables;
   // set of all random seeds to print warning on duplicates
   std::set<std::string> allSeeds;
+  // set of all users
+  std::set<std::string> allUsers;
   // EventInfo for the high/low event numbers of the final FileMetaData
   EventInfo lowEvt{0,0,0}, highEvt{0,0,0};
   // set of all branch names in the event tree to compare against to make sure
@@ -197,7 +200,7 @@ The following restrictions apply:
       lowEvt = EventInfo{fileMetaData->getExperimentLow(), fileMetaData->getRunLow(), fileMetaData->getEventLow()};
       highEvt = EventInfo{fileMetaData->getExperimentHigh(), fileMetaData->getRunHigh(), fileMetaData->getEventHigh()};
     } else {
-      // check meta data for consistency
+      // check meta data for consistency, we could move this into FileMetaData...
       if(fileMetaData->getRelease() != outputMetaData->getRelease()){
         B2ERROR("Release in " << input << " differs from previous files: " <<
                 fileMetaData->getRelease() << " != " << outputMetaData->getRelease());
@@ -210,7 +213,6 @@ The following restrictions apply:
         B2ERROR("Database globalTag in " << input << " differs from previous files: " <<
                 fileMetaData->getDatabaseGlobalTag() << " != " << outputMetaData->getDatabaseGlobalTag());
       }
-      // FIXME: check user? factor this into a function?
       // update event numbers ...
       outputMetaData->setMcEvents(outputMetaData->getMcEvents() + fileMetaData->getMcEvents());
       outputMetaData->setNEvents(outputMetaData->getNEvents() + fileMetaData->getNEvents());
@@ -225,6 +227,7 @@ The following restrictions apply:
     if(!it.second) {
       B2WARNING("Duplicate Random Seed: " << boost::io::quoted(fileMetaData->getRandomSeed()) << " present in more then one file");
     }
+    allUsers.insert(fileMetaData->getUser());
     // remember all parent files we encounter
     for (int i = 0; i < fileMetaData->getNParents(); ++i) {
       allParents.insert(fileMetaData->getParent(i));
@@ -237,6 +240,11 @@ The following restrictions apply:
       B2ERROR("Mergeable " << boost::io::quoted(val.first) << " only present in " << val.second.second << " out of "
               << inputfilenames.size() << " files");
     }
+  }
+
+  // Check for user names
+  if(allUsers.size()>1) {
+      B2WARNING("Multiple different users created input files: " << boost::algorithm::join(allUsers, ", "));
   }
 
   // Stop processing in case of error

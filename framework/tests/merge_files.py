@@ -297,8 +297,8 @@ def check_18_test_file():
 
 def check_19_eventmetadata():
     """Check that merged files has all the correct even infos"""
-    create_testfile("test1.root", steering, run=0, events=100, BELLE2_SEED="test1")
-    create_testfile("test2.root", steering, run=1, events=100, BELLE2_SEED="test2")
+    create_testfile("test1.root", steering, run=0, events=100, BELLE2_SEED="test1", BELLE2_USER="user1")
+    create_testfile("test2.root", steering, run=1, events=100, BELLE2_SEED="test2", BELLE2_USER="user2")
     merge_files("test1.root", "test2.root", "test1.root")
     out = ROOT.TFile("output.root")
     events = out.Get("tree")

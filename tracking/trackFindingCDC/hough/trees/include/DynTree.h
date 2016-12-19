@@ -14,6 +14,7 @@
 #include <framework/logging/Logger.h>
 #include <vector>
 #include <deque>
+#include <map>
 #include <algorithm>
 #include <functional>
 #include <type_traits>
@@ -239,8 +240,10 @@ namespace Belle2 {
       const Node& getTopNode() const
       { return m_topNode; }
 
-      /** Gets the number of nodes currently contained in the tree
-       *  Also demonstrates how to walk over the tree.*/
+      /**
+       *  Gets the number of nodes currently contained in the tree
+       *  Also demonstrates how to walk over the tree.
+       */
       int getNNodes() const
       {
         int nNodes = 0;
@@ -251,6 +254,27 @@ namespace Belle2 {
         const_cast<DynTree&>(*this).walk(countNodes);
         //walk(countNodes);
         return nNodes;
+      }
+
+      /**
+       *  Gets the number of nodes by level in the tree
+       *  Also demonstrates how to walk over the tree.
+       */
+      std::map<int, int> getNNodesByLevel() const
+      {
+        std::map<int, int> nNodesByLevel;
+        auto countNodes = [&nNodesByLevel](const Node * node) -> bool {
+          if (nNodesByLevel.count(node->getLevel()) == 0)
+          {
+            nNodesByLevel[node->getLevel()] = 1;
+          } else {
+            nNodesByLevel[node->getLevel()]++;
+          }
+          return true;
+        };
+        const_cast<DynTree&>(*this).walk(countNodes);
+        //walk(countNodes);
+        return nNodesByLevel;
       }
 
     private:

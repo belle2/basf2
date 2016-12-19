@@ -201,16 +201,16 @@ namespace Belle2 {
       auto X = std::unique_ptr<float[]>(new float[training_batch_size * numberOfFeatures]);
       auto y = std::unique_ptr<float[]>(new float[training_batch_size]);
       auto w = std::unique_ptr<float[]>(new float[training_batch_size]);
-      npy_intp dimensions_X[2] = {static_cast<npy_uint64>(training_batch_size), static_cast<npy_uint64>(numberOfFeatures)};
-      npy_intp dimensions_y[1] = {static_cast<npy_uint64>(training_batch_size)};
-      npy_intp dimensions_w[1] = {static_cast<npy_uint64>(training_batch_size)};
+      npy_intp dimensions_X[2] = {static_cast<npy_intp>(training_batch_size), static_cast<npy_intp>(numberOfFeatures)};
+      npy_intp dimensions_y[1] = {static_cast<npy_intp>(training_batch_size)};
+      npy_intp dimensions_w[1] = {static_cast<npy_intp>(training_batch_size)};
 
       auto X_v = std::unique_ptr<float[]>(new float[validation_batch_size * numberOfFeatures]);
       auto y_v = std::unique_ptr<float[]>(new float[validation_batch_size]);
       auto w_v = std::unique_ptr<float[]>(new float[validation_batch_size]);
-      npy_intp dimensions_X_v[2] = {static_cast<npy_uint64>(validation_batch_size), static_cast<npy_uint64>(numberOfFeatures)};
-      npy_intp dimensions_y_v[1] = {static_cast<npy_uint64>(validation_batch_size)};
-      npy_intp dimensions_w_v[1] = {static_cast<npy_uint64>(validation_batch_size)};
+      npy_intp dimensions_X_v[2] = {static_cast<npy_intp>(validation_batch_size), static_cast<npy_intp>(numberOfFeatures)};
+      npy_intp dimensions_y_v[1] = {static_cast<npy_intp>(validation_batch_size)};
+      npy_intp dimensions_w_v[1] = {static_cast<npy_intp>(validation_batch_size)};
 
 
       try {

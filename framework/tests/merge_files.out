@@ -1,0 +1,77 @@
+[INFO] Steering file: framework/tests/merge_files.py
+running check_01_existing: Check that merging a non exsiting file fails
+[INFO] Steering file: steering-test2.root.py
+[ERROR] Input file "test1.root" does not exist
+check_01_existing passed
+running check_02_nonroot: Check that merging fails on non-root input files
+[ERROR] Could not open "test1.root"
+check_02_nonroot passed
+running check_03_overwrite: Check that overwriting fails if -f is missing
+[INFO] Steering file: steering-test1.root.py
+[ERROR] Output file exists, use -f to force overwriting it
+check_03_overwrite passed
+running check_04_access: Check that it fails if we cannot create output file
+[INFO] Steering file: steering-test1.root.py
+[ERROR] Could not create output file "nosuchdir/foo"
+check_04_access passed
+running check_05_release: Check that it fails if the releases are different
+[INFO] Steering file: steering-test1.root.py
+[INFO] Steering file: steering-test2.root.py
+[ERROR] Release in test2.root differs from previous files: SomeOtherRelease != SomeRelease
+check_05_release passed
+running check_06_steering: Check that merging fails if the steering file is different
+[INFO] Steering file: steering-test1.root.py
+[INFO] Steering file: steering-test2.root.py
+[ERROR] Steering file for test2.root differs from previous files.
+check_06_steering passed
+running check_07_globaltag: Check that merging fails if the global tag is different
+[INFO] Steering file: steering-test1.root.py
+[INFO] Steering file: steering-test2.root.py
+[ERROR] Database globalTag in test2.root differs from previous files: OtherGlobalTag != GlobalTag
+check_07_globaltag passed
+running check_08_branches: Check that merging fails if the branches in the event tree are different
+[INFO] Steering file: steering-test1.root.py
+[INFO] Steering file: steering-test2.root.py
+[ERROR] Branches in "test2.root" differ from "test1.root"
+check_08_branches passed
+running check_09_hadded: Check that merging fails if the file has more then one entry in the persistent tree
+[INFO] Steering file: steering-test1.root.py
+hadd Target file: test11.root
+hadd compression setting for all ouput: 1
+hadd Source file 1: test1.root
+hadd Source file 2: test1.root
+hadd Target path: test11.root:/
+[ERROR] Found 2!=1 entries in the persistent tree in "test11.root"
+check_09_hadded passed
+running check_10_nopersistent: Check that merging fails without persistent tree
+[ERROR] No persistent tree found in "test1.root"
+check_10_nopersistent passed
+running check_12_noeventtree: Check that merging fails without event tree
+[ERROR] No event tree found in "test1.root"
+check_12_noeventtree passed
+running check_13_noeventbranches: Check that merging fails without event tree
+[ERROR] No branches found in event tree in "test1.root"
+check_13_noeventbranches passed
+running check_14_nonmergeable: Check that merging fails without persistent tree
+[ERROR] Branch "AnotherMetaData" in persistent tree not inheriting from Mergable
+check_14_nonmergeable passed
+running check_15_checkparentLFN: Check that parent LFN get merged correctly
+check_15_checkparentLFN passed
+running check_16_checkEventNr: Check that event and mc numbers are summed correctly
+check_16_checkEventNr passed
+running check_17_lowhigh: Check that the low/high event numbers are merged correctly
+check_17_lowhigh passed
+running check_18_test_file: Check that a merged file passes the check_basf2_file program
+[INFO] Steering file: steering-test1.root.py
+[INFO] Steering file: steering-test2.root.py
+check_18_test_file passed
+running check_19_eventmetadata: Check that merged files has all the correct even infos
+[INFO] Steering file: steering-test1.root.py
+[INFO] Steering file: steering-test2.root.py
+[WARNING] Duplicate Random Seed: "test1" present in more then one file
+[WARNING] Multiple different users created input files: user1, user2
+check_19_eventmetadata passed
+running check_XX_filemetaversion: Check that the Version of the FileMetaData hasn't changed.
+    If this check fails please check that the changes to FileMetaData don't
+    affect merge_basf2_files and adapt the correct version number here.
+check_XX_filemetaversion passed

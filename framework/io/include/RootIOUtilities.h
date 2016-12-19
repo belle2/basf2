@@ -19,6 +19,8 @@ class TTree;
 class TClass;
 
 namespace Belle2 {
+  class FileMetaData;
+
   /** Some constants and helpers common to the RootInput and RootOutput modules. */
   namespace RootIOUtilities {
     /** Given a list of input branches and lists of branches to include/exclude, returns a list of branches that are accepted.
@@ -61,6 +63,8 @@ namespace Belle2 {
     /** Load dictionaries for classes found in input files. */
     void loadDictionaries();
 
+    /** Fill the creation info of a file meta data: site, user, data */
+    void setCreationData(FileMetaData& metadata);
 
     /** Names of trees. */
     extern const std::string c_treeNames[];

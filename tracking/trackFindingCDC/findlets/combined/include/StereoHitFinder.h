@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/collectors/selectors/SingleMatchSelector.h>
 #include <tracking/trackFindingCDC/collectors/selectors/FilterSelector.h>
 #include <tracking/trackFindingCDC/filters/stereoHits/StereoHitFilterFactory.h>
-#include <tracking/trackFindingCDC/collectors/selectors/StereoHitLessOperator.h>
+#include <tracking/trackFindingCDC/utilities/HitComperator.h>
 #include <tracking/trackFindingCDC/collectors/adders/StereoHitTrackAdder.h>
 #include <tracking/trackFindingCDC/findlets/minimal/RLTaggedWireHitCreator.h>
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/HitZ0TanLambdaLegendre.h>
@@ -64,7 +64,7 @@ namespace Belle2 {
       /// Filter for the Stereo Hits added to the track
       FilterSelector<CDCTrack, CDCRLWireHit, StereoHitFilterFactory> m_filterSelector;
       /// Select only those where the relation is unique (or the best one in those groups)
-      SingleMatchSelector<CDCTrack, CDCRLWireHit, StereoHitLessOperator> m_singleMatchSelector;
+      SingleMatchSelector<CDCTrack, CDCRLWireHit, HitComperator> m_singleMatchSelector;
       /// Add the hits to the tracks
       StereoHitTrackAdder m_adder;
       /// Fit the tracks after creation

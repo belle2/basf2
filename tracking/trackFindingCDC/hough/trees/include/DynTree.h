@@ -15,6 +15,8 @@
 #include <vector>
 #include <deque>
 #include <algorithm>
+#include <functional>
+#include <type_traits>
 
 #include <cmath>
 #include <cassert>
@@ -115,6 +117,8 @@ namespace Belle2 {
         template<class AWalker>
         void walk(AWalker& walker)
         {
+          static_assert(std::is_assignable<std::function<bool(Node*)>, AWalker>(), "");
+
           bool walkChildren = walker(this);
           Children* children = getChildren();
           if (children and walkChildren) {
@@ -132,6 +136,9 @@ namespace Belle2 {
         template<class AWalker, class APriorityMeasure>
         void walk(AWalker& walker, APriorityMeasure& priority)
         {
+          static_assert(std::is_assignable<std::function<bool(Node*)>, AWalker>(), "");
+          static_assert(std::is_assignable<std::function<float(Node*)>, APriorityMeasure>(), "");
+
           bool walkChildren = walker(this);
           Children* children = getChildren();
           if (children and walkChildren) {
@@ -281,12 +288,21 @@ namespace Belle2 {
       /// Forward walk to the top node
       template<class AWalker>
       void walk(AWalker& walker)
-      { getTopNode().walk(walker); }
+      {
+        static_assert(std::is_assignable<std::function<bool(Node*)>, AWalker>(), "");
+
+        getTopNode().walk(walker);
+      }
 
       /// Forward walk to the top node
       template<class AWalker, class APriorityMeasure>
       void walk(AWalker& walker, APriorityMeasure& priority)
-      { getTopNode().walk(walker, priority); }
+      {
+        static_assert(std::is_assignable<std::function<bool(Node*)>, AWalker>(), "");
+        static_assert(std::is_assignable<std::function<float(Node*)>, APriorityMeasure>(), "");
+
+        getTopNode().walk(walker, priority);
+      }
 
       /// Fell to tree meaning deleting all child nodes from the tree. Keeps the top node.
       void fell()

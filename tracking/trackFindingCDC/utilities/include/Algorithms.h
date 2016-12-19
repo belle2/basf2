@@ -56,6 +56,48 @@ namespace Belle2 {
     }
 
     /**
+     *  Counts the number of repetitions for each unique value in a range. Unique values must be adjacent.
+     */
+    template <class It>
+    std::vector<std::pair<It, int> > unique_count(It itBegin, It itEnd)
+    {
+      std::vector<std::pair<It, int> > result;
+      if (itBegin == itEnd) return result;
+      It it = itBegin;
+      result.emplace_back(it, 1);
+      ++it;
+      for (; it != itEnd; ++it) {
+        if (*it == *result.back().first) {
+          ++result.back().second;
+        } else {
+          result.emplace_back(it, 1);
+        }
+      }
+      return result;
+    }
+
+    /**
+     *  Counts the number of repetitions for each unique value in a range. Unique values must be adjacent.
+     */
+    template <class It, class AEqual>
+    std::vector<std::pair<It, int> > unique_count(It itBegin, It itEnd, const AEqual& equal)
+    {
+      std::vector<std::pair<It, int> > result;
+      if (itBegin == itEnd) return result;
+      It it = itBegin;
+      result.emplace_back(it, 1);
+      ++it;
+      for (; it != itEnd; ++it) {
+        if (equal(*it, *result.back().first)) {
+          ++result.back().second;
+        } else {
+          result.emplace_back(it, 1);
+        }
+      }
+      return result;
+    }
+
+    /**
      *  Chunks a range of values into adjacent sub ranges that belong to the same category.
      */
     template <class It, class ACategoryFunction>

@@ -94,7 +94,6 @@ void SegmentNetworkProducerModule::event()
     m_network.create();
     B2INFO("As no network (DirectedNodeNetworkContainer) was present, a new network was created");
   }
-// // // // //   StoreObjPtr< SectorMap<SpacePoint> > sectorMap("", DataStore::c_Persistent);s
 
   vector< RawSectorData > collectedData = matchSpacePointToSectors();
 

@@ -30,7 +30,7 @@
 #include <tracking/trackFindingVXD/segmentNetwork/CACell.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
 
-#include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
+#include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
 
 #include <tracking/trackFindingVXD/tcTools/SpacePointTrackCandCreator.h>
 
@@ -135,8 +135,8 @@ namespace Belle2 {
     StoreObjPtr<Belle2::DirectedNodeNetworkContainer> m_network;
 
 
-    /** contains the sectorMap (only needed for loading the configuration). */
-    StoreObjPtr< SectorMap<SpacePoint> > m_sectorMap = StoreObjPtr< SectorMap<SpacePoint> >("", DataStore::c_Persistent);
+    /** contains the maps from sectors to filters (only needed for loading the configuration). */
+    FiltersContainer<SpacePoint>& m_filtersContainer = FiltersContainer<SpacePoint>::getInstance();
 
 
     /** contains the configuration-settings for this run. */

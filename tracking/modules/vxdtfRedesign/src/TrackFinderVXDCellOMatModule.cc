@@ -76,9 +76,8 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
 
 void TrackFinderVXDCellOMatModule::initialize()
 {
-  m_sectorMap.isRequired();
   bool wasFound = false;
-  for (auto& setup : m_sectorMap->getAllSetups()) {
+  for (auto& setup : m_filtersContainer.getAllSetups()) {
     auto& filters = *(setup.second);
 
     if (filters.getConfig().secMapName != m_PARAMsecMapName) { continue; }

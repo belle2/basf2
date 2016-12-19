@@ -15,28 +15,28 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 
-#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance1DZ.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance3DNormed.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/SlopeRZ.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance1DZSquared.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance2DXYSquared.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance3DSquared.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance1DZ.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DNormed.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/SlopeRZ.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance1DZSquared.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance2DXYSquared.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DSquared.h>
 
-#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/Angle3DSimple.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/CosAngleXY.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/AngleRZSimple.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/CircleDist2IP.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/DeltaSlopeRZ.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/DeltaSlopeZoverS.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/DeltaSoverZ.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/HelixParameterFit.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/Pt.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/CircleRadius.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/Angle3DSimple.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/CosAngleXY.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/AngleRZSimple.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/CircleDist2IP.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/DeltaSlopeRZ.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/DeltaSlopeZoverS.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/DeltaSoverZ.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/HelixParameterFit.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/Pt.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/CircleRadius.h>
 
-#include <tracking/trackFindingVXD/sectorMap/filterFramework/Shortcuts.h>
+#include <tracking/trackFindingVXD/filterMap/filterFramework/Shortcuts.h>
 #include "tracking/trackFindingVXD/filterTools/ObserverPrintResults.h"
-#include <tracking/trackFindingVXD/sectorMap/filterFramework/Observer.h> // empty observer
-#include <tracking/trackFindingVXD/sectorMap/filterFramework/VoidObserver.h> // empty observer
+#include <tracking/trackFindingVXD/filterMap/filterFramework/Observer.h> // empty observer
+#include <tracking/trackFindingVXD/filterMap/filterFramework/VoidObserver.h> // empty observer
 #include "tracking/trackFindingVXD/filterTools/ObserverCheckMCPurity.h"
 
 #include "tracking/trackFindingVXD/filterTools/Observer3HitPrintResults.h"
@@ -44,7 +44,7 @@
 #include <tracking/dataobjects/SectorMapConfig.h>
 
 #include "vxd/dataobjects/VxdID.h"
-#include <tracking/trackFindingVXD/sectorMap/map/CompactSecIDs.h>
+#include <tracking/trackFindingVXD/filterMap/map/CompactSecIDs.h>
 #include "tracking/trackFindingVXD/segmentNetwork/StaticSector.h"
 
 #include <TString.h>

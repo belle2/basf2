@@ -8,10 +8,10 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
+#include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
 
 #include <tracking/modules/VXDTFHelperTools/SecMapTrainerBaseModule.h>
-#include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
+#include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
 #include "framework/datastore/StoreObjPtr.h"
 
 #include <TRandom.h>
@@ -65,11 +65,10 @@ void SecMapTrainerBaseModule::initialize()
   // What does it mean "Appendix"? E.P.
 
 
-  StoreObjPtr< SectorMap<SpacePoint> > sectorMap("", DataStore::c_Persistent);
-  sectorMap.isRequired();
-  for (auto setup : sectorMap->getAllSetups()) {
+  FiltersContainer<SpacePoint>& filtersContainer = Belle2::FiltersContainer<SpacePoint>::getInstance();
+  for (auto setup : filtersContainer.getAllSetups()) {
     auto config = setup.second->getConfig();
-    SecMapTrainer<SelectionVariableFactory<SecMapTrainerHit> > newMap(sectorMap, setup.first, rngAppendix());
+    SecMapTrainer<SelectionVariableFactory<SecMapTrainerHit> > newMap(setup.first, rngAppendix());
     m_secMapTrainers.push_back(std::move(newMap));
   }
 

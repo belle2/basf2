@@ -8,17 +8,23 @@ from reconstruction import add_mdst_output
 import glob
 
 # ----------------------------------------------------------------------------------
-# Example of simulation/reconstruction of generic BBbar events with beam background.
+# Example of simulation/reconstruction of events with beam background only.
 #
-# This example generates BBbar events using EvtGenInput module, runs full simulation
-# with BG mixing using BeamBkgMixer module, then runs full reconstruction and finaly
-# writes the results to mdst file.
+# This example runs full simulation of beam BG only events using BeamBkgMixer module,
+# then runs full reconstruction and finaly writes the results to mdst file.
 # ----------------------------------------------------------------------------------
 
 set_log_level(LogLevel.ERROR)
 
+if 'BELLE2_BACKGROUND_DIR' not in os.environ:
+    print('BELLE2_BACKGROUND_DIR variable is not set - it must contain the path to BG samples')
+    sys.exit()
+
 # background (collision) files
-bg = glob.glob('/sw/belle2/bkg/*.root')  # if you run at KEKCC
+bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+if len(bg) == 0:
+    print('No files found in ', os.environ['BELLE2_BACKGROUND_DIR'])
+    sys.exit()
 
 # Create path
 main = create_path()
@@ -27,10 +33,6 @@ main = create_path()
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
 main.add_module(eventinfosetter)
-
-# generate BBbar events
-evtgeninput = register_module('EvtGenInput')
-main.add_module(evtgeninput)
 
 # Simulation
 add_simulation(main, bkgfiles=bg)

@@ -8,14 +8,12 @@ from reconstruction import add_mdst_output
 import glob
 import sys
 
-# ----------------------------------------------------------------------------------
-# Example of simulation/reconstruction of generic BBbar events with BG overlay.
+# ---------------------------------------------------------------------------------
+# Example of simulation/reconstruction of events with beam background only.
 #
-# This example generates BBbar events using EvtGenInput module,
-# runs full simulation and digitization,
-# then adds measured BG to simulated data using BGOverlayExecutor module,
-# runs full reconstruction and finaly writes the results to mdst file.
-# ----------------------------------------------------------------------------------
+# This example runs full simulation of beam BG only events using BGOverlayExecutor,
+# then runs full reconstruction and finaly writes the results to mdst file.
+# ---------------------------------------------------------------------------------
 
 set_log_level(LogLevel.ERROR)
 
@@ -38,10 +36,6 @@ main.add_module(eventinfosetter)
 bginput = register_module('BGOverlayInput')
 bginput.param('inputFileNames', [bg])
 main.add_module(bginput)
-
-# generate BBbar events
-evtgeninput = register_module('EvtGenInput')
-main.add_module(evtgeninput)
 
 # Simulation
 add_simulation(main)

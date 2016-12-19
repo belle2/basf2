@@ -154,6 +154,7 @@ namespace Belle2 {
 
     /// Operator to sort only according to the weight of relations.
     struct GreaterWeight {
+      /// Comparison operator for WeightedRelations.
       template <class AWeightedRelation>
       bool operator()(const AWeightedRelation& x, const AWeightedRelation& y) const
       {

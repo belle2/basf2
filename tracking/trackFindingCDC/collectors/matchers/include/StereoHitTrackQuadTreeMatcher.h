@@ -20,8 +20,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     /**
      * A matcher algorithm for using a stereo quad tree for matching rl tagged wire hits
-     * to tracks. After the quad tree has given a yes to a match, the configured filter is used to
-     * give a weight to the relation.
+     * to tracks.
      */
     template <class AQuadTree>
     class StereoHitTrackQuadTreeMatcher : public MatcherInterface<CDCTrack, CDCRLWireHit> {

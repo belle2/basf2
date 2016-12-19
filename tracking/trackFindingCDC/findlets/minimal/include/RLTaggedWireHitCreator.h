@@ -17,6 +17,11 @@ namespace Belle2 {
     class CDCWireHit;
     class CDCRLWireHit;
 
+    /**
+     * Findlet for creating a list of RLWireHits (always bot hypothesis) from a list of WireHits
+     * using only the non-taken non-axial hits. Additionally, the assigned flag of all
+     * those hits is set to false.
+     */
     class RLTaggedWireHitCreator : public Findlet<CDCWireHit&, CDCRLWireHit> {
 
     private:

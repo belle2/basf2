@@ -16,13 +16,14 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 namespace {
+  /// Test derived class from a MatcherInterface
   class SimpleMatcher : public MatcherInterface<int, double> {
     Weight match(int& a, const double& b) override
     {
       return a + b;
     }
   };
-
+  /// Test for the MatcherInterface
   TEST(TrackFindingCDCTest, matcher_interface)
   {
     SimpleMatcher matcher;

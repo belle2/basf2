@@ -16,6 +16,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 namespace {
+  /// Test for the CutSelector
   TEST(TrackFindingCDCTest, cut_selector)
   {
     CutSelector<int, double> selector;

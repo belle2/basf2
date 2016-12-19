@@ -16,6 +16,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 namespace {
+  /// Test for the SingleMatchSelector
   TEST(TrackFindingCDCTest, single_match_selector)
   {
     SingleMatchSelector<int, double> selector;
@@ -45,6 +46,7 @@ namespace {
 
   }
 
+  /// Test for the SingleMatchSelector with use single best set to false
   TEST(TrackFindingCDCTest, single_best_match_selector)
   {
     SingleMatchSelector<int, double> selector;
@@ -78,6 +80,7 @@ namespace {
     ASSERT_EQ(relations[2].getTo(), &f);
   }
 
+  /// Custom comperator for the test
   struct CustomComparer {
     bool operator()(const double* lhs, const double* rhs) const
     {
@@ -85,6 +88,7 @@ namespace {
     }
   };
 
+  /// Test for the SingleMatchSelector using a custom comperator
   TEST(TrackFindingCDCTest, single_match_selector_with_comparer)
   {
     SingleMatchSelector<int, double, CustomComparer> selector;

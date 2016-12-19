@@ -16,6 +16,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
 
+    /// Findlet for fitting a list of tracks in the SZ direction and replace their trajectory 3D.
     class TrackSZFitter : public Findlet<CDCTrack&> {
 
     private:
@@ -26,7 +27,7 @@ namespace Belle2 {
       /// Short description of the findlet
       std::string getDescription() final;
 
-      /// Generates the segment from wire hits
+      /// Fit the tracks.
       void apply(std::vector<CDCTrack>& tracks) final;
     };
   }

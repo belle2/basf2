@@ -18,6 +18,20 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    /**
+     * Selector to remove all weighted relations with a weight below a certain cut value.
+     *
+     * Most likely, the full stack is used as follows:
+     * * match two lists of elements (Collectors and Collections) resulting in a list of weighted relations among those
+     * * select only some relations using a certain criteria (this is where the difference between Collector and Collections
+     *   comes into place)
+     * * add the found relations by absorbing the collection items into the collector items.
+     *
+     * Please note that the CollectionItems are therefore const whereas the CollectorItems are not. All the passed
+     * WeightedRelations lists must be sorted.
+     *
+     * Most of the provided selectors are built to match many collection items to one collector item.
+     */
     template <class ACollectorItem, class ACollectionItem>
     class CutSelector :
       public Findlet<WeightedRelation<ACollectorItem, const ACollectionItem>> {
@@ -28,6 +42,7 @@ namespace Belle2 {
       /// The parent class
       using Super = Findlet<WeightedRelation<ACollectorItem, const ACollectionItem>>;
 
+      /// Expose the cut value to the module.
       void exposeParameters(ModuleParamList* moduleParamList,
                             const std::string& prefix) override
       {
@@ -38,6 +53,7 @@ namespace Belle2 {
                                       m_param_cutValue);
       }
 
+      /// Do the cut.
       void apply(std::vector<WeightedRelationItem>& weightedRelations) override
       {
 
@@ -52,12 +68,14 @@ namespace Belle2 {
                                 weightedRelations.end());
       }
 
+      /// Function to set the cut value (mostly for tests).
       void setCutValue(Weight cutValue)
       {
         m_param_cutValue = cutValue;
       }
 
     private:
+      /// The cut value to use.
       Weight m_param_cutValue = NAN;
     };
   }

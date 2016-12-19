@@ -21,6 +21,22 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    /**
+     * Selector to remove all weighted relations, where a definable Filter
+     * gives NaN as a result. Will also update all stored weights with the result of the filter.
+     * Please note that all other stored weights will be overriden!
+     *
+     * Most likely, the full stack is used as follows:
+     * * match two lists of elements (Collectors and Collections) resulting in a list of weighted relations among those
+     * * select only some relations using a certain criteria (this is where the difference between Collector and Collections
+     *   comes into place)
+     * * add the found relations by absorbing the collection items into the collector items.
+     *
+     * Please note that the CollectionItems are therefore const whereas the CollectorItems are not. All the passed
+     * WeightedRelations lists must be sorted.
+     *
+     * Most of the provided selectors are built to match many collection items to one collector item.
+     */
     template <class ACollectorItem, class ACollectionItem, class AFilterFactory>
     class FilterSelector :
       public Findlet<WeightedRelation<ACollectorItem, const ACollectionItem>> {
@@ -31,11 +47,13 @@ namespace Belle2 {
       /// The parent class
       using Super = Findlet<WeightedRelation<ACollectorItem, const ACollectionItem>>;
 
+      /// Add the chosen filter as a process signal listener.
       FilterSelector() : Super()
       {
         Super::addProcessingSignalListener(&m_filter);
       }
 
+      /// Expose the parameters of the filter.
       void exposeParameters(ModuleParamList* moduleParamList,
                             const std::string& prefix) override
       {
@@ -43,6 +61,7 @@ namespace Belle2 {
         m_filter.exposeParameters(moduleParamList, prefix);
       }
 
+      /// Main function of the class: calculate the filter result and remove all relations, where the filter returns NaN
       void apply(std::vector<WeightedRelationItem>& weightedRelations) override
       {
         for (auto& weightedRelation : weightedRelations) {
@@ -64,6 +83,7 @@ namespace Belle2 {
       }
 
     private:
+      /// The filter to use.
       ChooseableFilter<AFilterFactory> m_filter;
     };
   }

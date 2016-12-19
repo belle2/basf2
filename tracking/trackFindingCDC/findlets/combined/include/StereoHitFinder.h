@@ -28,6 +28,11 @@ namespace Belle2 {
     class CDCWireHit;
     class CDCTrack;
 
+    /**
+     * Complex findlet for finding stereo hits to a list of cdc tracks.
+     *
+     * Uses the collector framework and a QuadTree in the s-z-plane.
+     */
     class StereoHitFinder : public Findlet<CDCWireHit&, CDCTrack&> {
 
     private:

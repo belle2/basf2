@@ -155,50 +155,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
 
   } while (quadTreePassCounter.getPass() != LegendreFindingPass::End);
 
-
-  // Check quality of the track basing on holes on the trajectory;
-  // if holes exsist then track is splitted
-  for (CDCTrack& track : m_tracks) {
-    if (track.size() > 3) {
-      HitProcessor::maskHitsWithPoorQuality(track);
-      HitProcessor::splitBack2BackTrack(track);
-
-      TrackQualityTools::normalizeTrack(track);
-      std::vector<const CDCWireHit*> hitsToSplit;
-
-      for (CDCRecoHit3D& hit : track) {
-        if (hit.getWireHit().getAutomatonCell().hasMaskedFlag()) {
-          hitsToSplit.push_back(&(hit.getWireHit()));
-        }
-      }
-
-      HitProcessor::deleteAllMarkedHits(track);
-
-      for (const CDCWireHit* hit : hitsToSplit) {
-        hit->getAutomatonCell().setMaskedFlag(false);
-        hit->getAutomatonCell().setTakenFlag(false);
-      }
-
-      TrackProcessor::addCandidateFromHitsWithPostprocessing(hitsToSplit, m_allAxialWireHits, m_tracks);
-
-    }
-//    TrackMergerNew::deleteAllMarkedHits(track);
-  }
-
-  // Update tracks before storing to DataStore
-  for (CDCTrack& track : m_tracks) {
-    TrackQualityTools::normalizeTrack(track);
-  };
-
-  // Remove bad tracks
-  TrackProcessor::deleteTracksWithLowFitProbability(m_tracks);
-
-  // Perform tracks merging
-  TrackMerger::doTracksMerging(m_tracks, m_allAxialWireHits);
-
-  // Assign new hits
-  TrackProcessor::assignNewHits(m_allAxialWireHits, m_tracks);
-
+  TrackProcessor::mergeAndFinalizeTracks(m_tracks, m_allAxialWireHits);
 }
 
 void TrackFinderCDCLegendreTrackingModule::outputObjects(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)

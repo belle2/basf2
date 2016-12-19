@@ -45,9 +45,12 @@ namespace Belle2 {
       /// Check the p-values of the tracks. If they are below the given value, delete the track from the list.
       static void deleteTracksWithLowFitProbability(std::list<CDCTrack>& cdcTrackList, double minimal_probability_for_good_fit = 0.4);
 
-      /// Perform all track postprocessing - return whether the tracks survived the post processing
+      /// Perform all track postprocessing
       static void postprocessTrack(CDCTrack& track, const std::vector<const CDCWireHit*>& allAxialWireHits,
                                    std::list<CDCTrack>& cdcTrackList);
+
+      /// Finalize the tracks after the legendre track finder is done - includes a merging step of found tracks
+      static void mergeAndFinalizeTracks(std::list<CDCTrack>& cdcTrackList, const std::vector<const CDCWireHit*>& allWireHits);
 
     private:
       /// Check chi2 of the fit using the given two quantiles of the chi2 distribution.

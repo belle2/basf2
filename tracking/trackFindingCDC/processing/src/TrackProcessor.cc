@@ -12,6 +12,7 @@
 
 #include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/processing/HitProcessor.h>
+#include <tracking/trackFindingCDC/processing/TrackMerger.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
@@ -138,6 +139,52 @@ void TrackProcessor::deleteTracksWithLowFitProbability(std::list<CDCTrack>& cdcT
                      cdcTrackList.end());
 }
 
+void TrackProcessor::mergeAndFinalizeTracks(std::list<CDCTrack>& cdcTrackList,
+                                            const std::vector<const CDCWireHit*>& allAxialWireHits)
+{
+  // Check quality of the track basing on holes on the trajectory;
+  // if holes exsist then track is splitted
+  for (CDCTrack& track : cdcTrackList) {
+    if (track.size() > 3) {
+      HitProcessor::maskHitsWithPoorQuality(track);
+      HitProcessor::splitBack2BackTrack(track);
+
+      TrackQualityTools::normalizeTrack(track);
+      std::vector<const CDCWireHit*> hitsToSplit;
+
+      for (CDCRecoHit3D& hit : track) {
+        if (hit.getWireHit().getAutomatonCell().hasMaskedFlag()) {
+          hitsToSplit.push_back(&(hit.getWireHit()));
+        }
+      }
+
+      HitProcessor::deleteAllMarkedHits(track);
+
+      for (const CDCWireHit* hit : hitsToSplit) {
+        hit->getAutomatonCell().setMaskedFlag(false);
+        hit->getAutomatonCell().setTakenFlag(false);
+      }
+
+      TrackProcessor::addCandidateFromHitsWithPostprocessing(hitsToSplit, allAxialWireHits, cdcTrackList);
+
+    }
+//    TrackMergerNew::deleteAllMarkedHits(track);
+  }
+
+  // Update tracks before storing to DataStore
+  for (CDCTrack& track : cdcTrackList) {
+    TrackQualityTools::normalizeTrack(track);
+  };
+
+  // Remove bad tracks
+  TrackProcessor::deleteTracksWithLowFitProbability(cdcTrackList);
+
+  // Perform tracks merging
+  TrackMerger::doTracksMerging(cdcTrackList, allAxialWireHits);
+
+  // Assign new hits
+  TrackProcessor::assignNewHits(allAxialWireHits, cdcTrackList);
+}
 
 bool TrackProcessor::isChi2InQuantiles(CDCTrack& track, double lower_quantile, double upper_quantile)
 {

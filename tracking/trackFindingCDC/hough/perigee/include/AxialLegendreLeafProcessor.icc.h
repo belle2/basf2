@@ -11,6 +11,8 @@
 #pragma once
 #include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.h>
 
+#include <tracking/trackFindingCDC/processing/TrackProcessor.h>
+
 #include <tracking/trackFindingCDC/hough/perigee/StereoHitContained.h>
 #include <tracking/trackFindingCDC/hough/perigee/OffOrigin.h>
 #include <tracking/trackFindingCDC/hough/algorithms/InPhi0CurvBox.h>
@@ -20,7 +22,10 @@
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
+
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/BasePrecisionFunction.h>
+#include <tracking/trackFindingCDC/legendre/precisionFunctions/OriginPrecisionFunction.h>
+#include <tracking/trackFindingCDC/legendre/precisionFunctions/NonOriginPrecisionFunction.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -129,10 +134,22 @@ namespace Belle2 {
 
       // Mark found hit as used and safe them with the trajectory
       /////////////////////////////////////////////////////////////////////////
-      for (WithSharedMark<CDCRLWireHit>& markableRLWireHit : hits) {
-        markableRLWireHit.mark();
+      std::vector<const CDCWireHit*> foundWireHits;
+      for (CDCRLWireHit& rlWireHit : hits) {
+        foundWireHits.push_back(&rlWireHit.getWireHit());
       }
-      m_candidates.emplace_back(trajectory2D, std::vector<CDCRLWireHit>(hits.begin(), hits.end()));
+
+      TrackProcessor::addCandidateFromHitsWithPostprocessing(foundWireHits, m_axialWireHits, m_tracks);
+
+      // Sync up the marks with the used hits
+      for (WithSharedMark<CDCRLWireHit>& markableRLWireHit : leaf->getTree()->getTopNode()) {
+        const AutomatonCell& automatonCell = markableRLWireHit.getWireHit().getAutomatonCell();
+        if (automatonCell.hasTakenFlag() or automatonCell.hasMaskedFlag()) {
+          markableRLWireHit.mark();
+        } else {
+          // markableRLWireHit.unmark();
+        }
+      }
     }
 
     template <class ANode>
@@ -176,11 +193,54 @@ namespace Belle2 {
 
       return hitsInPrecisionBox;
     }
+
+    template <class ANode>
+    void AxialLegendreLeafProcessor<ANode>::migrateHits()
+    {
+      TrackProcessor::assignNewHits(m_axialWireHits, m_tracks);
+    }
+
+    template <class ANode>
+    void AxialLegendreLeafProcessor<ANode>::finalizeTracks()
+    {
+      TrackProcessor::mergeAndFinalizeTracks(m_tracks, m_axialWireHits);
+    }
+
   }
 }
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+
+    template <class ANode>
+    std::vector<const CDCWireHit*>
+    AxialLegendreLeafProcessor<ANode>::getUnusedWireHits() const
+    {
+      std::vector<const CDCWireHit*> result;
+      for (const CDCWireHit* wireHit : m_axialWireHits) {
+        const AutomatonCell& automatonCell = wireHit->getAutomatonCell();
+        if (automatonCell.hasTakenFlag() or automatonCell.hasMaskedFlag()) continue;
+        result.push_back(wireHit);
+      }
+      return result;
+    }
+
+    template <class ANode>
+    std::vector<typename AxialLegendreLeafProcessor<ANode>::Candidate>
+    AxialLegendreLeafProcessor<ANode>::getCandidates() const
+    {
+      std::vector<Candidate> result;
+      for (const CDCTrack& track : m_tracks) {
+        std::vector<CDCRLWireHit> rlWireHits;
+        for (const CDCRecoHit3D& recoHit3D : track) {
+          rlWireHits.push_back(recoHit3D.getRLWireHit());
+        }
+        CDCTrajectory2D trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
+        result.emplace_back(std::move(trajectory2D), std::move(rlWireHits));
+      }
+      return result;
+    }
+
     template <class ANode>
     void AxialLegendreLeafProcessor<ANode>::exposeParameters(ModuleParamList* moduleParamList,
                                                              const std::string& prefix)
@@ -214,6 +274,32 @@ namespace Belle2 {
                                     m_param_roadLevel,
                                     "Level of the read from which additional hits in the road search can be taken",
                                     m_param_roadLevel);
+
+      moduleParamList->addParameter(prefixed(prefix, "curvResolution"),
+                                    m_param_curvResolution,
+                                    "The name of the resolution function to be used. "
+                                    "Valid values are 'none', 'base', 'origin', 'nonOrigin'",
+                                    m_param_curvResolution);
+    }
+
+    template <class ANode>
+    void AxialLegendreLeafProcessor<ANode>::beginWalk()
+    {
+      // leafCall = 0;
+
+      // Setup the requested precision function
+      if (m_param_curvResolution == "none") {
+        m_curvResolution = [](double curv __attribute__((unused))) { return NAN; };
+      } else if (m_param_curvResolution == "base") {
+        m_curvResolution = BasePrecisionFunction().getFunction();
+      } else if (m_param_curvResolution == "origin") {
+        m_curvResolution = OriginPrecisionFunction().getFunction();
+      } else if (m_param_curvResolution == "nonOrigin") {
+        m_curvResolution = NonOriginPrecisionFunction().getFunction();
+      } else {
+        B2WARNING("Unknown curvature resolution function " << m_param_curvResolution);
+        m_curvResolution = BasePrecisionFunction().getFunction();
+      }
     }
   }
 }

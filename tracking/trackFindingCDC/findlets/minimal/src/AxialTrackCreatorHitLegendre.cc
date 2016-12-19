@@ -13,6 +13,11 @@
 #include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.icc.h>
 #include <tracking/trackFindingCDC/hough/perigee/StandardBinSpec.h>
 
+#include <tracking/trackFindingCDC/processing/TrackProcessor.h>
+#include <tracking/trackFindingCDC/processing/TrackMerger.h>
+#include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
+#include <tracking/trackFindingCDC/processing/HitProcessor.h>
+
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
@@ -46,10 +51,15 @@ void AxialTrackCreatorHitLegendre::exposeParameters(ModuleParamList* moduleParam
                                 "Number of levels to be skipped on the first level to form sectors",
                                 m_param_sectorLevelSkip);
 
-  moduleParamList->addParameter(prefixed(prefix, "curvBounds"),
-                                m_param_curvBounds,
-                                "Curvature bounds of the hough space.",
-                                m_param_curvBounds);
+  moduleParamList->addParameter(prefixed(prefix, "fineCurvBounds"),
+                                m_param_fineCurvBounds,
+                                "Curvature bounds of the fine hough space.",
+                                m_param_fineCurvBounds);
+
+  moduleParamList->addParameter(prefixed(prefix, "roughCurvBounds"),
+                                m_param_roughCurvBounds,
+                                "Curvature bounds of the rough hough space.",
+                                m_param_roughCurvBounds);
 
   moduleParamList->addParameter(prefixed(prefix, "discretePhi0Width"),
                                 m_param_discretePhi0Width,
@@ -81,56 +91,100 @@ void AxialTrackCreatorHitLegendre::initialize()
 {
   Super::initialize();
 
-  B2ASSERT("Need exactly two curv bounds", m_param_curvBounds.size() == 2);
+  B2ASSERT("Need exactly two fine curv bounds", m_param_fineCurvBounds.size() == 2);
+  B2ASSERT("Need exactly two rough curv bounds", m_param_roughCurvBounds.size() == 2);
 
   const size_t nPhi0Bins = std::pow(c_phi0Divisions, m_param_granularityLevel);
   const Phi0BinsSpec phi0BinsSpec(nPhi0Bins,
                                   m_param_discretePhi0Overlap,
                                   m_param_discretePhi0Width);
 
-  std::array<double, 2> curvBounds{{m_param_curvBounds.front(), m_param_curvBounds.back()}};
-  const size_t nCurvBins = std::pow(c_curvDivisions, m_param_granularityLevel);
-  const CurvBinsSpec curvBinsSpec(curvBounds[0],
-                                  curvBounds[1],
-                                  nCurvBins,
-                                  m_param_discreteCurvOverlap,
-                                  m_param_discreteCurvWidth);
+  {
+    std::array<double, 2> fineCurvBounds{{m_param_fineCurvBounds.front(), m_param_fineCurvBounds.back()}};
+    const size_t nFineCurvBins = std::pow(c_curvDivisions, m_param_granularityLevel);
+    const CurvBinsSpec fineCurvBinsSpec(fineCurvBounds[0],
+                                        fineCurvBounds[1],
+                                        nFineCurvBins,
+                                        m_param_discreteCurvOverlap,
+                                        m_param_discreteCurvWidth);
 
-  int maxTreeLevel = m_param_granularityLevel - m_param_sectorLevelSkip;
-  m_houghTree = makeUnique<SimpleRLTaggedWireHitPhi0CurvHough>(maxTreeLevel, m_curlCurv);
-  m_houghTree->setSectorLevelSkip(m_param_sectorLevelSkip);
-  m_houghTree->assignArray<DiscretePhi0>(phi0BinsSpec.constructArray(), phi0BinsSpec.getNOverlap());
-  m_houghTree->assignArray<DiscreteCurv>(curvBinsSpec.constructArray(), curvBinsSpec.getNOverlap());
-  m_houghTree->initialize();
+    int maxTreeLevel = m_param_granularityLevel - m_param_sectorLevelSkip;
+    m_fineHoughTree = makeUnique<SimpleRLTaggedWireHitPhi0CurvHough>(maxTreeLevel, m_curlCurv);
+    m_fineHoughTree->setSectorLevelSkip(m_param_sectorLevelSkip);
+    m_fineHoughTree->assignArray<DiscretePhi0>(phi0BinsSpec.constructArray(), phi0BinsSpec.getNOverlap());
+    m_fineHoughTree->assignArray<DiscreteCurv>(fineCurvBinsSpec.constructArray(), fineCurvBinsSpec.getNOverlap());
+    m_fineHoughTree->initialize();
+  }
+
+  {
+    std::array<double, 2> roughCurvBounds{{m_param_roughCurvBounds.front(), m_param_roughCurvBounds.back()}};
+    const size_t nRoughCurvBins = std::pow(c_curvDivisions, m_param_granularityLevel);
+    const CurvBinsSpec roughCurvBinsSpec(roughCurvBounds[0],
+                                         roughCurvBounds[1],
+                                         nRoughCurvBins,
+                                         m_param_discreteCurvOverlap,
+                                         m_param_discreteCurvWidth);
+
+    int maxTreeLevel = m_param_granularityLevel - m_param_sectorLevelSkip;
+    m_roughHoughTree = makeUnique<SimpleRLTaggedWireHitPhi0CurvHough>(maxTreeLevel, m_curlCurv);
+    // No level skip !
+    m_roughHoughTree->assignArray<DiscretePhi0>(phi0BinsSpec.constructArray(), phi0BinsSpec.getNOverlap());
+    m_roughHoughTree->assignArray<DiscreteCurv>(roughCurvBinsSpec.constructArray(), roughCurvBinsSpec.getNOverlap());
+    m_roughHoughTree->initialize();
+  }
 }
 
 void AxialTrackCreatorHitLegendre::apply(const std::vector<CDCWireHit>& wireHits,
                                          std::vector<CDCTrack>& tracks)
 {
   // Acquire the axial hits
-  size_t nAxialHits = 0;
-  std::vector<CDCRLWireHit> axialRLWireHits;
-  axialRLWireHits.reserve(wireHits.size());
+  std::vector<const CDCWireHit*> axialWireHits;
+  axialWireHits.reserve(wireHits.size());
   for (const CDCWireHit& wireHit : wireHits) {
     if (not wireHit.isAxial()) continue;
-    axialRLWireHits.emplace_back(&wireHit);
-    ++nAxialHits;
+    axialWireHits.emplace_back(&wireHit);
   }
 
-  m_houghTree->seed(std::move(axialRLWireHits));
-
+  // Setup the level processor and obtain its parameter list to be set.
   using Node = typename SimpleRLTaggedWireHitPhi0CurvHough::Node;
   int maxTreeLevel = m_param_granularityLevel - m_param_sectorLevelSkip;
   AxialLegendreLeafProcessor<Node> leafProcessor(maxTreeLevel);
+  leafProcessor.setAxialWireHits(axialWireHits);
   ModuleParamList moduleParamList;
   const std::string prefix = "";
   leafProcessor.exposeParameters(&moduleParamList, prefix);
 
-  /// Find tracks with increasingly relaxed conditions
-  for (const ParameterVariantMap& passParameters : getRelaxationSchedule()) {
+  // Find tracks with increasingly relaxed conditions in the fine hough grid
+  m_fineHoughTree->seed(leafProcessor.getUnusedWireHits());
+  for (const ParameterVariantMap& passParameters : getFineRelaxationSchedule()) {
     AssignParameterVisitor::update(&moduleParamList, passParameters);
-    m_houghTree->findUsing(leafProcessor);
+    leafProcessor.beginWalk();
+    m_fineHoughTree->findUsing(leafProcessor);
   }
+  m_fineHoughTree->fell();
+
+  // One step of migrating hits between the already found tracks
+  leafProcessor.migrateHits();
+
+  /*
+  // Find tracks with increasingly relaxed conditions in the rougher hough grid
+  m_roughHoughTree->seed(leafProcessor.getUnusedWireHits());
+  for (const ParameterVariantMap& passParameters : getRoughRelaxationSchedule()) {
+    AssignParameterVisitor::update(&moduleParamList, passParameters);
+    leafProcessor.beginWalk();
+    m_roughHoughTree->findUsing(leafProcessor);
+  }
+  m_roughHoughTree->fell();
+
+  // One step of migrating hits between the already found tracks
+  leafProcessor.migrateHits();
+  */
+
+  leafProcessor.finalizeTracks();
+
+  std::list<CDCTrack> foundTracks = leafProcessor.getTracks();
+  tracks.insert(tracks.end(), foundTracks.begin(), foundTracks.end());
+  return;
 
   // Pick up the found candidates and make tracks from them
   std::vector<std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit>>> candidates =
@@ -165,13 +219,15 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<CDCWireHit>& wireHits
 
 void AxialTrackCreatorHitLegendre::terminate()
 {
-  m_houghTree->raze();
-  m_houghTree.reset();
+  m_fineHoughTree->raze();
+  m_fineHoughTree.reset();
+  m_roughHoughTree->raze();
+  m_roughHoughTree.reset();
   Super::terminate();
 }
 
 std::vector<ParameterVariantMap>
-AxialTrackCreatorHitLegendre::getRelaxationSchedule() const
+AxialTrackCreatorHitLegendre::getFineRelaxationSchedule() const
 {
   std::vector<ParameterVariantMap> result;
   // Relaxation schedule of the original legendre implemenation
@@ -184,8 +240,8 @@ AxialTrackCreatorHitLegendre::getRelaxationSchedule() const
     {"maxLevel", 12 - m_param_sectorLevelSkip},
     {"minWeight", 50.0},
     {"maxCurv", 1.0 * m_curlCurv},
-    // {"offOriginPrecision", false},
-    {"nRoadSearches", 2},
+    {"curvResolution", std::string("origin")},
+    {"nRoadSearches", 1},
     {"roadLevel", 4 - m_param_sectorLevelSkip},
   });
 
@@ -193,22 +249,26 @@ AxialTrackCreatorHitLegendre::getRelaxationSchedule() const
     {"maxLevel", 12 - m_param_sectorLevelSkip},
     {"minWeight", 70.0},
     {"maxCurv", 2.0 * m_curlCurv},
-    // {"offOriginPrecision", false},
-    {"nRoadSearches", 2},
+    {"curvResolution", std::string("origin")},
+    {"nRoadSearches", 1},
     {"roadLevel", 4 - m_param_sectorLevelSkip},
 
   });
+
 
   for (double minWeight = 50.0; minWeight > 10.0; minWeight *= 0.75) {
     result.push_back(ParameterVariantMap{
       {"maxLevel", 12 - m_param_sectorLevelSkip},
       {"minWeight", minWeight},
       {"maxCurv", 0.07},
-      // {"offOriginPrecision", false},
-      {"nRoadSearches", 2},
+      {"curvResolution", std::string("origin")},
+      {"nRoadSearches", 1},
       {"roadLevel", 4 - m_param_sectorLevelSkip},
     });
   }
+
+  return result;
+  B2ERROR("nPass " << result.size());
 
   // Skipping other passes for the moment
   return result;
@@ -218,7 +278,7 @@ AxialTrackCreatorHitLegendre::getRelaxationSchedule() const
     {"maxLevel", 10 - m_param_sectorLevelSkip},
     {"minWeight", 50.0},
     {"maxCurv", 1.0 * m_curlCurv},
-    // {"offOriginPrecision", true},
+    {"curvResolution", std::string("nonOrigin")},
     {"nRoadSearches", 2},
     {"roadLevel", 4 - m_param_sectorLevelSkip},
   });
@@ -227,7 +287,7 @@ AxialTrackCreatorHitLegendre::getRelaxationSchedule() const
     {"maxLevel", 10 - m_param_sectorLevelSkip},
     {"minWeight", 70.0},
     {"maxCurv", 2.0 * m_curlCurv},
-    // {"offOriginPrecision", true},
+    {"curvResolution", std::string("nonOrigin")},
     {"nRoadSearches", 2},
     {"roadLevel", 4 - m_param_sectorLevelSkip},
 
@@ -239,28 +299,36 @@ AxialTrackCreatorHitLegendre::getRelaxationSchedule() const
       {"maxLevel", 10 - m_param_sectorLevelSkip},
       {"minWeight", minWeight},
       {"maxCurv", iPass == 0 ? 0.07 : 0.14},
-      // {"offOriginPrecision", true},
+      {"curvResolution", std::string("nonOrigin")},
       {"nRoadSearches", 2},
       {"roadLevel", 4 - m_param_sectorLevelSkip},
     });
     ++iPass;
   }
+  return result;
+}
+
+std::vector<ParameterVariantMap>
+AxialTrackCreatorHitLegendre::getRoughRelaxationSchedule() const
+{
+  std::vector<ParameterVariantMap> result;
 
   // FullRange pass
   result.push_back(ParameterVariantMap{
-    {"maxLevel", 10 - m_param_sectorLevelSkip},
+    {"maxLevel", 10},
     {"minWeight", 50.0},
     {"maxCurv", 1.0 * m_curlCurv},
-    // {"offOriginPrecision", true},
+    {"curvResolution", std::string("nonOrigin")},
     {"nRoadSearches", 3},
     {"roadLevel", 0},
+
   });
 
   result.push_back(ParameterVariantMap{
-    {"maxLevel", 10 - m_param_sectorLevelSkip},
+    {"maxLevel", 10},
     {"minWeight", 70.0},
     {"maxCurv", 2.0 * m_curlCurv},
-    // {"offOriginPrecision", true},
+    {"curvResolution", std::string("nonOrigin")},
     {"nRoadSearches", 3},
     {"roadLevel", 0},
 
@@ -268,10 +336,10 @@ AxialTrackCreatorHitLegendre::getRelaxationSchedule() const
 
   for (double minWeight = 30.0; minWeight > 10.0; minWeight *= 0.75) {
     result.push_back(ParameterVariantMap{
-      {"maxLevel", 10 - m_param_sectorLevelSkip},
+      {"maxLevel", 10},
       {"minWeight", minWeight},
       {"maxCurv", 0.15},
-      // {"offOriginPrecision", true},
+      {"curvResolution", std::string("nonOrigin")},
       {"nRoadSearches", 3},
       {"roadLevel", 0},
     });

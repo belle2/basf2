@@ -51,18 +51,27 @@ namespace Belle2 {
       void terminate() final;
 
     public:
-      /// Get a series of parameters to be set for each pass over the hough space
-      std::vector<ParameterVariantMap> getRelaxationSchedule() const;
+      /// Get a series of parameters to be set for each pass over the fine hough space
+      std::vector<ParameterVariantMap> getFineRelaxationSchedule() const;
+
+      /// Get a series of parameters to be set for each pass over the rough hough space
+      std::vector<ParameterVariantMap> getRoughRelaxationSchedule() const;
 
     private:
       /// Parameter: Level of divisions in the hough space.
-      int m_param_granularityLevel = 13;
+      int m_param_granularityLevel = 12;
 
       /// Parameter: Number of levels to be skipped on the first level to form sectors
-      int m_param_sectorLevelSkip = 1;
+      int m_param_sectorLevelSkip = 0;
 
       /// Parameter: Curvature bounds of the hough space.
-      std::vector<float> m_param_curvBounds{{ -0.018, 0.75}};
+      // std::vector<float> m_param_curvBounds{{ -0.018, 0.75}};
+
+      // Parameter: Fine hough bounds.
+      std::vector<float> m_param_fineCurvBounds{{ -0.02, 0.14}};
+
+      // Parameter: Rough hough bounds.
+      std::vector<float> m_param_roughCurvBounds{{ 0.0, 0.30}};
 
       /// Parameter: Width of the phi0 bins at the lowest level of the hough space.
       size_t m_param_discretePhi0Width = 5;
@@ -93,8 +102,11 @@ namespace Belle2 {
       using SimpleRLTaggedWireHitPhi0CurvHough =
         SimpleRLTaggedWireHitHoughTree<InPhi0CurvBox, c_phi0Divisions, c_curvDivisions>;
 
-      /// The hough space tree search
-      std::unique_ptr<SimpleRLTaggedWireHitPhi0CurvHough> m_houghTree;
+      /// The fine hough space tree search
+      std::unique_ptr<SimpleRLTaggedWireHitPhi0CurvHough> m_fineHoughTree;
+
+      /// The rough space tree search
+      std::unique_ptr<SimpleRLTaggedWireHitPhi0CurvHough> m_roughHoughTree;
     };
   }
 }

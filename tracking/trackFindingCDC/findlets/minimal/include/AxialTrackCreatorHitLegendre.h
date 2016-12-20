@@ -58,11 +58,18 @@ namespace Belle2 {
       std::vector<ParameterVariantMap> getDefaultRoughRelaxationSchedule() const;
 
     private:
+      /// Maximal curvature acceptance of the CDC
+      const double m_maxCurvAcceptance = 0.13;
+
+      /// Curvature below which particles from IP do not leave the CDC
+      const double m_curlCurv = 0.018;
+
+    private:
       /// Parameter: Level of divisions in the hough space.
       int m_param_granularityLevel = 12;
 
       /// Parameter: Number of levels to be skipped on the first level to form sectors
-      int m_param_sectorLevelSkip = 0;
+      int m_param_sectorLevelSkip = 2;
 
       /// Parameter: Curvature bounds of the hough space.
       // std::vector<float> m_param_curvBounds{{ -0.018, 0.75}};
@@ -97,11 +104,8 @@ namespace Belle2 {
       /// Parameter: Relaxation schedule for the leaf processor in the fine hough tree
       std::vector<ParameterVariantMap> m_param_fineRelaxationSchedule;
 
-      /// Parameter: Relaxation schedule for the leaf processor in the fine hough tree
+      /// Parameter: Relaxation schedule for the leaf processor in the rough hough tree
       std::vector<ParameterVariantMap> m_param_roughRelaxationSchedule;
-
-      const double m_maxCurvAcceptance = 0.13;
-      const double m_curlCurv = 0.018;
 
     private:
       /// Type of the hough space tree search

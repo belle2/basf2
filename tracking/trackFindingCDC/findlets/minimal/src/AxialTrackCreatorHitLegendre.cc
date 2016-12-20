@@ -109,7 +109,7 @@ void AxialTrackCreatorHitLegendre::initialize()
                                   m_param_discretePhi0Overlap,
                                   m_param_discretePhi0Width);
 
-  // Construct the fine curvature array in case two given bounds were given
+  // Construct the fine curvature array in case two bounds were given
   if (m_param_fineCurvBounds.size() == 2) {
 
     std::array<double, 2> fineCurvBounds{{m_param_fineCurvBounds.front(), m_param_fineCurvBounds.back()}};
@@ -122,7 +122,7 @@ void AxialTrackCreatorHitLegendre::initialize()
     m_param_fineCurvBounds = fineCurvBinsSpec.constructArray();
   }
 
-  // Construct the rough curvature array in case two given bounds were given
+  // Construct the rough curvature array in case two bounds were given
   if (m_param_roughCurvBounds.size() == 2) {
     std::array<double, 2> roughCurvBounds{{m_param_roughCurvBounds.front(), m_param_roughCurvBounds.back()}};
     const size_t nRoughCurvBins = std::pow(c_curvDivisions, m_param_granularityLevel);
@@ -192,6 +192,23 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<CDCWireHit>& wireHits
     leafProcessor.beginWalk();
     m_fineHoughTree->findUsing(leafProcessor);
   }
+
+  /*
+  B2WARNING("Node calls " << leafProcessor.m_nNodes);
+  B2WARNING("Skipped nodes calls " << leafProcessor.m_nSkippedNodes);
+  B2WARNING("Leaf calls " << leafProcessor.m_nLeafs);
+
+  int usedFlag = 0;
+  int maskedFlag = 0;
+  for (const CDCWireHit* wireHit : axialWireHits) {
+    const AutomatonCell automatonCell = wireHit->getAutomatonCell();
+    if (automatonCell.hasMaskedFlag()) ++maskedFlag;
+    if (automatonCell.hasMaskedFlag() or automatonCell.hasTakenFlag()) ++usedFlag;
+  }
+  B2WARNING("usedFlag " << usedFlag);
+  B2WARNING("maskedFlag " << maskedFlag);
+  */
+
   m_fineHoughTree->fell();
 
   // One step of migrating hits between the already found tracks
@@ -213,7 +230,7 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<CDCWireHit>& wireHits
 
   leafProcessor.finalizeTracks();
 
-  std::list<CDCTrack> foundTracks = leafProcessor.getTracks();
+  const std::list<CDCTrack>& foundTracks = leafProcessor.getTracks();
   tracks.insert(tracks.end(), foundTracks.begin(), foundTracks.end());
   return;
 
@@ -263,7 +280,7 @@ AxialTrackCreatorHitLegendre::getDefaultFineRelaxationSchedule() const
   std::vector<ParameterVariantMap> result;
   // Relaxation schedule of the original legendre implemenation
   // Augmented by the road search parameters
-  // Note: distinction between integer and float literals is necessary
+  // Note: distinction between integer and double literals is essential
   // For the record: the setting seem a bit non-sensical
 
   // NonCurler pass
@@ -296,9 +313,6 @@ AxialTrackCreatorHitLegendre::getDefaultFineRelaxationSchedule() const
     });
   }
 
-  return result;
-  B2ERROR("nPass " << result.size());
-
   // Skipping other passes for the moment
   return result;
 
@@ -321,17 +335,24 @@ AxialTrackCreatorHitLegendre::getDefaultFineRelaxationSchedule() const
     {"roadLevel", 4 - m_param_sectorLevelSkip},
   });
 
-  int iPass = 0;
-  for (double minWeight = 50.0; minWeight > 10.0; minWeight *= 0.75) {
+  result.push_back(ParameterVariantMap{
+    {"maxLevel", 10 - m_param_sectorLevelSkip},
+    {"minWeight", 50.0},
+    {"maxCurv", m_maxCurvAcceptance / 2},
+    {"curvResolution", std::string("nonOrigin")},
+    {"nRoadSearches", 2},
+    {"roadLevel", 4 - m_param_sectorLevelSkip},
+  });
+
+  for (double minWeight = 37.5; minWeight > 10.0; minWeight *= 0.75) {
     result.push_back(ParameterVariantMap{
       {"maxLevel", 10 - m_param_sectorLevelSkip},
       {"minWeight", minWeight},
-      {"maxCurv", iPass == 0 ? 0.07 : 0.14},
+      {"maxCurv",  m_maxCurvAcceptance},
       {"curvResolution", std::string("nonOrigin")},
       {"nRoadSearches", 2},
       {"roadLevel", 4 - m_param_sectorLevelSkip},
     });
-    ++iPass;
   }
   return result;
 }

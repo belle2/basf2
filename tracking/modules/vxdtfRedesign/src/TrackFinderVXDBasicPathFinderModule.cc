@@ -148,8 +148,7 @@ void TrackFinderVXDBasicPathFinderModule::event()
           ". Among these the pathCollector found " << m_pathCollector.nTrees <<
           " and " << collectedPaths.size() <<
           " paths while calling its collecting function " << m_pathCollector.nRecursiveCalls <<
-          " times and checking " << m_pathCollector.nNodesPassed <<
-          " nodes.");
+          " times.");
 
 
   /// convert the raw paths to fullgrown SpacePoinTrackCands

@@ -81,11 +81,6 @@ void AxialTrackCreatorHitLegendre::exposeParameters(ModuleParamList* moduleParam
                                 "Overlap of the curvature bins at the lowest level of the hough space.",
                                 m_param_discreteCurvOverlap);
 
-  moduleParamList->addParameter(prefixed(prefix, "minNHits"),
-                                m_param_minNHits,
-                                "Absolute minimal number of hits to make an axial track.",
-                                m_param_minNHits);
-
   moduleParamList->addParameter(prefixed(prefix, "fineRelaxationSchedule"),
                                 m_param_fineRelaxationSchedule,
                                 "Relaxation schedule for the leaf processor in the fine hough tree. "
@@ -192,29 +187,11 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<CDCWireHit>& wireHits
     leafProcessor.beginWalk();
     m_fineHoughTree->findUsing(leafProcessor);
   }
-
-  /*
-  B2WARNING("Node calls " << leafProcessor.m_nNodes);
-  B2WARNING("Skipped nodes calls " << leafProcessor.m_nSkippedNodes);
-  B2WARNING("Leaf calls " << leafProcessor.m_nLeafs);
-
-  int usedFlag = 0;
-  int maskedFlag = 0;
-  for (const CDCWireHit* wireHit : axialWireHits) {
-    const AutomatonCell automatonCell = wireHit->getAutomatonCell();
-    if (automatonCell.hasMaskedFlag()) ++maskedFlag;
-    if (automatonCell.hasMaskedFlag() or automatonCell.hasTakenFlag()) ++usedFlag;
-  }
-  B2WARNING("usedFlag " << usedFlag);
-  B2WARNING("maskedFlag " << maskedFlag);
-  */
-
   m_fineHoughTree->fell();
 
   // One step of migrating hits between the already found tracks
   leafProcessor.migrateHits();
 
-  /*
   // Find tracks with increasingly relaxed conditions in the rougher hough grid
   m_roughHoughTree->seed(leafProcessor.getUnusedWireHits());
   for (const ParameterVariantMap& passParameters : m_param_roughRelaxationSchedule) {
@@ -226,43 +203,13 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<CDCWireHit>& wireHits
 
   // One step of migrating hits between the already found tracks
   leafProcessor.migrateHits();
-  */
 
+  // Do some track merging and finalization steps
   leafProcessor.finalizeTracks();
 
+  // Write out tracks as return value
   const std::list<CDCTrack>& foundTracks = leafProcessor.getTracks();
   tracks.insert(tracks.end(), foundTracks.begin(), foundTracks.end());
-  return;
-
-  // Pick up the found candidates and make tracks from them
-  std::vector<std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit>>> candidates =
-    leafProcessor.getCandidates();
-
-  for (const std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit>>& candidate : candidates) {
-    const CDCTrajectory2D& trajectory2D = candidate.first;
-    const std::vector<CDCRLWireHit>& foundRLWireHits = candidate.second;
-    CDCTrack track;
-    for (const CDCRLWireHit& rlWireHit : foundRLWireHits) {
-      CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstructNearest(&rlWireHit.getWireHit(), trajectory2D);
-      // CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trajectory2D);
-      track.push_back(recoHit3D);
-    }
-    track.sortByArcLength2D();
-
-    /// Setting trajectories
-    if (track.empty()) continue;
-    const CDCRecoHit3D& startRecoHit3D = track.front();
-    CDCTrajectory3D startTrajectory3D(trajectory2D);
-    startTrajectory3D.setLocalOrigin(startRecoHit3D.getRecoPos3D());
-    track.setStartTrajectory3D(startTrajectory3D);
-
-    const CDCRecoHit3D& endRecoHit3D = track.back();
-    CDCTrajectory3D endTrajectory3D(trajectory2D);
-    endTrajectory3D.setLocalOrigin(endRecoHit3D.getRecoPos3D());
-    track.setEndTrajectory3D(endTrajectory3D);
-
-    tracks.push_back(std::move(track));
-  }
 }
 
 void AxialTrackCreatorHitLegendre::terminate()
@@ -281,7 +228,7 @@ AxialTrackCreatorHitLegendre::getDefaultFineRelaxationSchedule() const
   // Relaxation schedule of the original legendre implemenation
   // Augmented by the road search parameters
   // Note: distinction between integer and double literals is essential
-  // For the record: the setting seem a bit non-sensical
+  // For the record: the setting seem a bit non-sensical, but work kind of well, experimentation needed.
 
   // NonCurler pass
   result.push_back(ParameterVariantMap{
@@ -313,9 +260,6 @@ AxialTrackCreatorHitLegendre::getDefaultFineRelaxationSchedule() const
     });
   }
 
-  // Skipping other passes for the moment
-  return result;
-
   // NonCurlerWithIncreasedThreshold pass
   result.push_back(ParameterVariantMap{
     {"maxLevel", 10 - m_param_sectorLevelSkip},
@@ -338,7 +282,7 @@ AxialTrackCreatorHitLegendre::getDefaultFineRelaxationSchedule() const
   result.push_back(ParameterVariantMap{
     {"maxLevel", 10 - m_param_sectorLevelSkip},
     {"minWeight", 50.0},
-    {"maxCurv", m_maxCurvAcceptance / 2},
+    {"maxCurv", 0.07},
     {"curvResolution", std::string("nonOrigin")},
     {"nRoadSearches", 2},
     {"roadLevel", 4 - m_param_sectorLevelSkip},
@@ -354,6 +298,7 @@ AxialTrackCreatorHitLegendre::getDefaultFineRelaxationSchedule() const
       {"roadLevel", 4 - m_param_sectorLevelSkip},
     });
   }
+
   return result;
 }
 

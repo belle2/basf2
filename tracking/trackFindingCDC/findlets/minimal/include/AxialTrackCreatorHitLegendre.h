@@ -98,9 +98,6 @@ namespace Belle2 {
       /// Fixed parameter: Number of divisions in the curv direction
       static const size_t c_curvDivisions = 2;
 
-      /// Parameter: Absolute minimal number of hits to make an axial track.
-      double m_param_minNHits = 30;
-
       /// Parameter: Relaxation schedule for the leaf processor in the fine hough tree
       std::vector<ParameterVariantMap> m_param_fineRelaxationSchedule;
 

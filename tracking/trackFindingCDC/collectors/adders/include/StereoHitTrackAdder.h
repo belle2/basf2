@@ -7,15 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
+#include <tracking/trackFindingCDC/collectors/adders/AdderInterface.h>
 
-#include <tracking/modules/trackFinderCDC/StereoHitFinderCDCLegendreHistogrammingModule.h>
+namespace Belle2 {
+  namespace TrackFindingCDC {
+    class CDCTrack;
+    class CDCRLWireHit;
 
-using namespace Belle2;
-using namespace TrackFindingCDC;
-
-REG_MODULE(StereoHitFinderCDCLegendreHistogramming);
-
-StereoHitFinderCDCLegendreHistogrammingModule::StereoHitFinderCDCLegendreHistogrammingModule()
-  : Super{{{"CDCWireHitVector", "CDCTrackVector"}}}
-{
+    /** Class to add the matched hits to the track and set the taken flag correctly. */
+    class StereoHitTrackAdder : public AdderInterface<CDCTrack, CDCRLWireHit> {
+    private:
+      /** Add the matched hits to the track and set the taken flag correctly. We ignore the weight completely here. */
+      void add(CDCTrack& track, const CDCRLWireHit& hit, Weight weight) override;
+    };
+  }
 }

@@ -13,17 +13,14 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /** Comparer function (according to std::less) for two RLTaggedWireHits.
-     * The reason for this class is a bit non-obvious. Imagine the following scenario:
-     * We try to match RLTaggedWireHits to Tracks. One RLWireHit can be matched to a track. The
-     * same WireHit, but with a different RLInformation, can be matched to another track.
-     * If we compare those two hits without further knowledge, we would end up in two hits. Both will be added
-     * to different tracks resulting in adding the same wire twice.
+    /**
+     * Comparer function (according to std::less) for two hits.
      */
-    class StereoHitLessOperator {
+    class HitComperator {
     public:
       /**
-       * Main method of the comparator class which does the operation (according to std::less).
+       * Main method of the comparator class which does the operation (according to std::less)
+       * for CDCRLWireHits.
        * @param lhs: First CDCRLWireHit to compare.
        * @param rhs: Second CDCRLWireHit to compare.
        *

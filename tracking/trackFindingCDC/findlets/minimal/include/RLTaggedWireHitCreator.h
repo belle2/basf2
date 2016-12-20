@@ -8,21 +8,32 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
 
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <vector>
-#include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCTrack;
+    class CDCWireHit;
     class CDCRLWireHit;
 
-    /** Class to add the matched hits to the track and set the taken flag correctly. */
-    class StereoHitTrackAdder {
+    /**
+     * Findlet for creating a list of RLWireHits (always bot hypothesis) from a list of WireHits
+     * using only the non-taken non-axial hits. Additionally, the assigned flag of all
+     * those hits is set to false.
+     */
+    class RLTaggedWireHitCreator : public Findlet<CDCWireHit&, CDCRLWireHit> {
+
+    private:
+      /// Type of the base class
+      using Super = Findlet<CDCWireHit&, CDCRLWireHit&>;
+
     public:
-      /** Add the matched hits to the track and set the taken flag correctly. We ignore the weight completely here. */
-      static void add(CDCTrack& track, const std::vector<WithWeight<const CDCRLWireHit*>>& matchedHits);
+      /// Short description of the findlet
+      std::string getDescription() final;
+
+      /// Generates the segment from wire hits
+      void apply(std::vector<CDCWireHit>& inputWireHits, std::vector<CDCRLWireHit>& outputRLWireHits) final;
     };
   }
 }

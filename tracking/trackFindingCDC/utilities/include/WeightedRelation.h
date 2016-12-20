@@ -100,6 +100,12 @@ namespace Belle2 {
         return getWeightedFrom().second;
       }
 
+      /// Setter for the weight
+      void setWeight(Weight weight)
+      {
+        this->first.second = weight;
+      }
+
       /// Getter for the pointer to the weighted from side object
       const std::pair<From*, Weight>& getWeightedFrom() const
       {
@@ -143,6 +149,16 @@ namespace Belle2 {
         return std::all_of(std::begin(weightedRelations),
                            std::end(weightedRelations),
                            reversedRelationExists);
+      }
+    };
+
+    /// Operator to sort only according to the weight of relations.
+    struct GreaterWeight {
+      /// Comparison operator for WeightedRelations.
+      template <class AWeightedRelation>
+      bool operator()(const AWeightedRelation& x, const AWeightedRelation& y) const
+      {
+        return x.getWeight() > y.getWeight();
       }
     };
   }

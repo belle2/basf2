@@ -66,7 +66,7 @@ class State(object):
     # TODO: eg. xgboost, ...
 
 
-def get_model(number_of_features, number_of_events, parameters):
+def get_model(number_of_features, number_of_events, training_fraction, parameters):
     state = State()
 
     # intialize the dictionary

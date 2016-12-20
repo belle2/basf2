@@ -18,7 +18,7 @@ class State(object):
         self.estimator = estimator
 
 
-def get_model(number_of_features, number_of_events, parameters):
+def get_model(number_of_features, number_of_events, training_fraction, parameters):
     """
     Create SKLearn classifier and store it in a State object
     """

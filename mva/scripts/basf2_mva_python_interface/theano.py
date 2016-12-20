@@ -37,7 +37,7 @@ class State(object):
         self.eval_function = eval_function
 
 
-def get_model(number_of_features, number_of_events, parameters):
+def get_model(number_of_features, number_of_events, training_fraction, parameters):
 
     x = theano.tensor.matrix('x')
     y = theano.tensor.vector('y', dtype='float32')

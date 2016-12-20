@@ -221,7 +221,7 @@ namespace Belle2 {
         auto framework = boost::python::import((std::string("basf2_mva_python_interface.") + m_specific_options.m_framework).c_str());
 
         auto model = get_attr_from_module_else_fallback_to_framework("get_model", module, framework)(numberOfFeatures, numberOfEvents,
-                     parameters);
+                     m_specific_options.m_training_fraction, parameters);
         auto state = get_attr_from_module_else_fallback_to_framework("begin_fit", module, framework)(model);
 
         std::vector<uint64_t> data_indices(numberOfEvents);

@@ -30,14 +30,10 @@ DigitBase::EAppendStatus CDCHit::addBGDigit(const DigitBase* bg)
 
   int diff  = static_cast<int>(m_tdcCount) - static_cast<int>(bgDigit->getTDCCount());
 
-  // If the BG hit is faster than the true hit, the TDC count is replaced,
-  // and the true hit is moved to the second TDC count.
-  // ADC counts are summed.
+  // If the BG hit is faster than the true hit, the TDC count is replaced.
+  // ADC counts are summed up.
   if (diff < 0) {
-    m_tdcCount2ndHit = m_tdcCount;
     m_tdcCount = bgDigit->getTDCCount();
-  } else {
-    m_tdcCount2ndHit = bgDigit->getTDCCount();
   }
   m_adcCount += bgDigit->getADCCount();
   return DigitBase::c_DontAppend;

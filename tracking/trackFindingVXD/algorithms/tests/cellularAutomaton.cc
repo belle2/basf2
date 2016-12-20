@@ -70,7 +70,7 @@ namespace CellularAutomatonTests {
     DirectedNodeNetwork<int, CACell> intNetwork;
     EXPECT_EQ(0, intNetwork.size());
 
-/// filling network:
+    // filling network:
     for (unsigned int index = 1 ; index < 5; index++) {
       // correct order: outerEntry, innerEntry:
       intNetwork.linkTheseEntries(intArray.at(index - 1), intArray.at(index));
@@ -114,8 +114,10 @@ namespace CellularAutomatonTests {
       int& newOuterInt = onTheFlyCreatedInts.back();
       intNetwork.addOuterToLastInnerNode(newOuterInt);
     }
-/// filling network - end.
+    // filling network - end.
     EXPECT_EQ(17, intNetwork.size());
+    // uncomment following line if you want to stream a directed-graph-print of the network into "outputFile".gv
+    //  DNN::printNetwork(intNetwork, "outputFile");
 
 
     /// CA:
@@ -143,8 +145,8 @@ namespace CellularAutomatonTests {
     B2INFO(out);
 
 
-    EXPECT_EQ(14,
-              paths.size());  // there are more paths than seeds: why? ->the pathCollectorRecursive also adds paths which run into a dead end and still have sufficient lengths.
+    EXPECT_EQ(10,
+              paths.size());  // there could be more paths than seeds: why? ->the pathCollectorRecursive based on the CA also adds alternative paths with the same length.
     unsigned int longestPath = 0;
     for (PathCollectorType::PathPtr& aPath : paths) {
       if (longestPath < aPath->size()) { longestPath = aPath->size(); }
@@ -153,9 +155,6 @@ namespace CellularAutomatonTests {
     EXPECT_EQ(7, longestPath);  // TODO: fix
     EXPECT_EQ(nRounds, longestPath +
               1); // CA starts counting with 1, not with 0, the length of the paths is the number of Cells stored in it.
-
-/// uncomment following line if you want to stream a directed-graph-print of the network into "outputFile".gv
-//  DNN::printNetwork(intNetwork, "outputFile");
   }
 
 } // end namespace

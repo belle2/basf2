@@ -18,9 +18,6 @@
 // tracking
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
-#include <tracking/dataobjects/FullSecID.h>
-#include <tracking/dataobjects/SectorMapConfig.h>
-
 #include <tracking/trackFindingVXD/algorithms/CellularAutomaton.h>
 #include <tracking/trackFindingVXD/algorithms/PathCollectorRecursive.h>
 #include <tracking/trackFindingVXD/algorithms/CALogger.h>
@@ -30,9 +27,8 @@
 #include <tracking/trackFindingVXD/segmentNetwork/CACell.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
 
-#include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
-
 #include <tracking/trackFindingVXD/tcTools/SpacePointTrackCandCreator.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
 
 
 namespace Belle2 {
@@ -87,6 +83,11 @@ namespace Belle2 {
 /// module parameters
 
 
+    std::string m_spacePointsName; /**< SpacePoint collection name */
+
+    StoreArray<SpacePoint>
+    m_spacePoints; /**< the storeArray for SpacePoint as member, is faster than recreating link for each event */
+
     /** name for StoreArray< SpacePointTrackCand> to be filled */
     std::string m_PARAMSpacePointTrackCandArrayName;
 
@@ -107,9 +108,6 @@ namespace Belle2 {
      *
      * if true, only one path per possibility is collected, if false subsets are collected too. */
     bool m_PARAMstrictSeeding;
-
-    /** If true, the virtual interaction Point will be removed from the track candidates. */
-    bool m_PARAMremoveVirtualIP = false;
 
 /// member variables
 
@@ -133,14 +131,6 @@ namespace Belle2 {
 
     /** access to the DirectedNodeNetwork, which contains the network needed for creating TrackCandidates */
     StoreObjPtr<Belle2::DirectedNodeNetworkContainer> m_network;
-
-
-    /** contains the sectorMap (only needed for loading the configuration). */
-    StoreObjPtr< SectorMap<SpacePoint> > m_sectorMap = StoreObjPtr< SectorMap<SpacePoint> >("", DataStore::c_Persistent);
-
-
-    /** contains the configuration-settings for this run. */
-    SectorMapConfig m_config;
 
 
     /// output containers

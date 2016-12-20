@@ -63,7 +63,7 @@ void SPTCvirtualIPRemoverModule::event()
       if (aHit->getType() == VXD::SensorInfoBase::SensorType::VXD) { // vIP found
         m_nVIPsTotal++;
         hasVIP = true;
-        if (m_PARAMdoCheckOnly or (m_PARAMmaxTCLengthForVIPKeeping + 1 < nHits)) continue;
+        if (m_PARAMdoCheckOnly or (m_PARAMmaxTCLengthForVIPKeeping + 1 >= nHits)) continue;
 
         aTC.removeSpacePoint(iSp);
         m_nVIPsRemoved++;

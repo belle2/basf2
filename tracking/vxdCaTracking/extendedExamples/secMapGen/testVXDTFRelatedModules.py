@@ -245,10 +245,14 @@ else:
     cellOmat.param('printNetworks', printNetworks)
     cellOmat.param('SpacePointTrackCandArrayName', 'caSPTCs')
     cellOmat.param('NetworkName', 'test2Hits')
-    cellOmat.param('removeVirtualIP', False)
     cellOmat.param('strictSeeding', doStrictSeeds)
     cellOmat.logging.log_level = CAlogLevel
     cellOmat.logging.debug_level = CADebugLevel
+
+    momSeedRetriever = register_module('SPTCmomentumSeedRetriever')
+    momSeedRetriever.logging.log_level = LogLevel.DEBUG
+    momSeedRetriever.logging.debug_level = 2
+    momSeedRetriever.param('tcArrayName', 'caSPTCs')
 
 
 print("spot 10")
@@ -316,6 +320,7 @@ else:
         if activateSegNetAnalizer:
             main.add_module(segNetAnalyzer)
         main.add_module(cellOmat)
+        main.add_module(momSeedRetriever)
 
     if doVirtualIPRemovalb4Fit:
         main.add_module(vIPRemover)

@@ -28,7 +28,7 @@ def setBelleOrBelle2AndRevision(belleOrBelle2='Belle2', buildOrRevision='notDefi
     belleOrBelle2Flag = belleOrBelle2
 
     if buildOrRevision == 'notDefined':
-        releaseFile = open(os.environ['BELLE2_LOCAL_DIR'] + '/.release', 'r')
+        releaseFile = open(os.environ['BELLE2_RELEASE'], 'r')
         buildOrRevision = releaseFile.read().splitlines()[0]
         releaseFile.close()
 

@@ -441,8 +441,8 @@ namespace VXDTFtwoHitFilterTest {
     EXPECT_FLOAT_EQ(0., sRZ.value(innerSP, innerSP));
     EXPECT_FLOAT_EQ(atan(2.), sRZ.value(outerSP1, innerSP));
     EXPECT_FLOAT_EQ(atan(2. / 0.95), sRZ.value(outerSP2, innerSP));
-    EXPECT_FLOAT_EQ(- sRZ.value(outerSP2, innerSP),
-                    sRZ.value(innerSP, outerSP2)); // reverse order changes sign
+    EXPECT_FLOAT_EQ(M_PI - sRZ.value(outerSP2, innerSP),
+                    sRZ.value(innerSP, outerSP2)); // with latest bugfix reverse order will result in (Pi - SlopeRZ)
     EXPECT_FLOAT_EQ(atan(2. / 1.05), sRZ.value(outerSP3, innerSP));
     EXPECT_FLOAT_EQ(atan(1. / 0.45), sRZ.value(outerSP4, innerSP));
     EXPECT_FLOAT_EQ(atan(1. / 0.55), sRZ.value(outerSP5, innerSP));

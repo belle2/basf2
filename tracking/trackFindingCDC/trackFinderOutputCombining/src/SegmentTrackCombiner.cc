@@ -66,7 +66,7 @@ void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackFilter, std
 
       // Call the filter and add the match
       double filterResult = segmentTrackFilter(
-                              std::make_pair(matchingSegment->getSegment(), track->getTrackCand()));
+                              std::make_pair(track->getTrackCand(), matchingSegment->getSegment()));
       if (not std::isnan(filterResult)) {
         matchingSegment->addMatch(track, filterResult);
       }

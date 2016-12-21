@@ -30,7 +30,7 @@ namespace Belle2 {
     };
 
     /// Vehicle class to transport the variable names
-    struct SegmentTrackTruthVarNames : public VarNames<std::pair<const CDCSegment2D*, const CDCTrack*>> {
+    struct SegmentTrackTruthVarNames : public VarNames<std::pair<const CDCTrack*, const CDCSegment2D*>> {
 
       /// Number of variables to be generated
       static const size_t nVars = size(segmentTrackTruthVarNames);
@@ -50,7 +50,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the contained variables
-      bool extract(const std::pair<const CDCSegment2D*, const CDCTrack*>* testPair) final;
+      bool extract(const std::pair<const CDCTrack*, const CDCSegment2D*>* testPair) final;
     };
   }
 }

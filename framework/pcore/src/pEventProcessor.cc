@@ -112,7 +112,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   const int numProcesses = Environment::Instance().getNumberProcesses();
 
   //Check whether the number of events was set via command line argument
-  int numEventsArgument = Environment::Instance().getNumberEventsOverride();
+  unsigned int numEventsArgument = Environment::Instance().getNumberEventsOverride();
   if ((numEventsArgument > 0) && ((maxEvent == 0) || (maxEvent > numEventsArgument))) {
     maxEvent = numEventsArgument;
   }

@@ -61,7 +61,7 @@ RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentE
   addParam("ignoreCommandLineOverride"  , m_ignoreCommandLineOverride,
            "Ignore override of file name via command line argument -i.", false);
 
-  addParam("skipNEvents", m_skipNEvents, "Skip this number of events before starting.", 0);
+  addParam("skipNEvents", m_skipNEvents, "Skip this number of events before starting.", 0u);
   addParam("skipToEvent", m_skipToEvent, "Skip events until the event with "
            "the specified (experiment, run, event number) occurs. This parameter "
            "is useful for debugging to start with a specific event.", m_skipToEvent);
@@ -87,8 +87,8 @@ RootInputModule::~RootInputModule() { }
 
 void RootInputModule::initialize()
 {
-  int skipNEventsOverride = Environment::Instance().getSkipEventsOverride();
-  if (skipNEventsOverride >= 0)
+  unsigned int skipNEventsOverride = Environment::Instance().getSkipEventsOverride();
+  if (skipNEventsOverride != 0)
     m_skipNEvents = skipNEventsOverride;
 
   auto entrySequencesOverride = Environment::Instance().getEntrySequencesOverride();

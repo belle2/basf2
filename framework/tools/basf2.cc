@@ -126,10 +126,10 @@ int main(int argc, char* argv[])
     ("arg", prog::value<vector<string> >(&arguments), "additional arguments to be passed to the steering file")
     ("log_level,l", prog::value<string>(),
      "set global log level (one of DEBUG, INFO, RESULT, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
-    ("events,n", prog::value<int>(), "override number of events for EventInfoSetter; otherwise set maximum number of events.")
+    ("events,n", prog::value<unsigned int>(), "override number of events for EventInfoSetter; otherwise set maximum number of events.")
     ("run", prog::value<int>(), "override run for EventInfoSetter, must be used with -n and --experiment")
     ("experiment", prog::value<int>(), "override experiment for EventInfoSetter, must be used with -n and --run")
-    ("skip-events", prog::value<int>(),
+    ("skip-events", prog::value<unsigned int>(),
      "override skipNEvents for EventInfoSetter and RootInput. Skips this many events before starting.")
     ("input,i", prog::value<vector<string> >(),
      "override name of input file for (Seq)RootInput. Can be specified multiple times to use more than one file. For RootInput, wildcards (as in *.root or [1-3].root) can be used, but need to be escaped with \\  or by quoting the argument to avoid expansion by the shell.")
@@ -257,9 +257,9 @@ int main(int argc, char* argv[])
 
     // -n
     if (varMap.count("events")) {
-      int nevents = varMap["events"].as<int>();
-      if (nevents <= 0) {
-        B2FATAL("Invalid number of events!");
+      unsigned int nevents = varMap["events"].as<unsigned int>();
+      if (nevents == 0 or nevents == std::numeric_limits<unsigned int>::max()) {
+        B2FATAL("Invalid number of events (valid range: 1.." << std::numeric_limits<unsigned int>::max() - 1 << ")!");
       }
       Environment::Instance().setNumberEventsOverride(nevents);
     }
@@ -279,8 +279,7 @@ int main(int argc, char* argv[])
 
     // --skip-events
     if (varMap.count("skip-events")) {
-      int skipevents = varMap["skip-events"].as<int>();
-      B2ASSERT("--skip-events must be >= 0!", skipevents >= 0);
+      unsigned int skipevents = varMap["skip-events"].as<unsigned int>();
       Environment::Instance().setSkipEventsOverride(skipevents);
     }
 

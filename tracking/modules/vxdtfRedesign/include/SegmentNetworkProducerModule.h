@@ -24,7 +24,7 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/FullSecID.h>
 #include <tracking/dataobjects/SectorMapConfig.h>
-#include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
+#include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFiltersHelperFunctions.h>
 
 
@@ -82,10 +82,8 @@ namespace Belle2 {
     {
       InitializeCounters();
 
-      // load VXDTFFilters of secMap:
-      m_sectorMap.isRequired();
       // searching for correct sectorMap:
-      for (auto& setup : m_sectorMap->getAllSetups()) {
+      for (auto& setup : m_filtersContainer.getAllSetups()) {
         auto& filters = *(setup.second);
 
         if (filters.getConfig().secMapName != m_PARAMsecMapName) { continue; }
@@ -240,8 +238,8 @@ namespace Belle2 {
     B2Vector3D m_virtualIPErrors;
 
     // input containers
-    /** contains the sectorMap and with it the VXDTFFilters. */
-    StoreObjPtr< SectorMap<SpacePoint> > m_sectorMap = StoreObjPtr< SectorMap<SpacePoint> >("", DataStore::c_Persistent);
+    /** contains all the sector to filter maps and with it the VXDTFFilters. */
+    FiltersContainer<SpacePoint>& m_filtersContainer = FiltersContainer<SpacePoint>::getInstance();
 
     /** contains all sectorCombinations and Filters including cuts. */
     VXDTFFilters<SpacePoint>* m_vxdtfFilters = nullptr;

@@ -9,7 +9,7 @@
  *******************************************************************************/
 #pragma once
 #include <tracking/dataobjects/FullSecID.h>
-#include <tracking/trackFindingVXD/sectorMap/map/CompactSecIDs.h>
+#include <tracking/trackFindingVXD/filterMap/map/CompactSecIDs.h>
 
 #include <unordered_map>
 #include <tuple>

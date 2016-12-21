@@ -161,8 +161,8 @@ if newTrain:
 else:
     secMapBootStrap.param('WriteSectorMap', True)
     merger = register_module('RawSecMapMerger')
-    merger.logging.log_level = trainerVXDTFLogLevel
-    merger.logging.debug_level = trainerVXDTFDebugLevel
+    # merger.logging.log_level = trainerVXDTFLogLevel
+    # merger.logging.debug_level = trainerVXDTFDebugLevel
     merger.param('rootFileNames', acceptedRawSecMapFiles)
     # merger.param('spTCarrayName', 'checkedSPTCs')
 

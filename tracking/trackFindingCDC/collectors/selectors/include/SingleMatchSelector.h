@@ -75,13 +75,28 @@ namespace Belle2 {
         for (const auto& collectionItemToMatches : collectionItemToMatchedMap) {
           const auto& matches = collectionItemToMatches.second;
 
-          if (not m_param_useOnlySingleBestCandidate or matches.size() == 1) {
-            const auto& bestMatch = std::min_element(matches.begin(), matches.end(), GreaterWeight());
+          const auto& bestMatch = std::min_element(matches.begin(), matches.end(), GreaterWeight());
+
+          const bool addBestMatch = matches.size() == 1 or not m_param_useOnlySingleBestCandidate;
+
+          if (addBestMatch) {
             weightedRelations.push_back(*bestMatch);
+          }
+
+          for (auto& otherMatch : matches) {
+            if (not addBestMatch or otherMatch != *bestMatch) {
+              resetNonBestMatches(otherMatch);
+            }
           }
         }
 
         std::sort(weightedRelations.begin(), weightedRelations.end());
+      }
+
+      /// Function which is called on all not-best matches (which will not be in the result list)
+      virtual void resetNonBestMatches(const WeightedRelationItem& notBestMatch)
+      {
+
       }
 
       /// Set the UseOnlySingleBestCandidate parameter (mostly for tests).

@@ -101,6 +101,8 @@ namespace Belle2 {
     addParam("input_BGSol", m_input_BGSol, "BG solution 0 or 1");
     addParam("input_ToSol", m_input_ToSol, "To solution 0 or 1");
 
+    addParam("input_Z_scaling", m_input_Z_scaling, "Z scaling");
+
     addParam("input_GasCorrection", m_input_GasCorrection, "GasCorrection");
 
     addParam("inputHistoFileNames", m_inputHistoFileNames,
@@ -161,6 +163,16 @@ namespace Belle2 {
           for (int i = 0; i < h1D->GetNbinsX(); i++) {
             double counts = h1D->GetBinContent(i + 1);
             double rate = counts / m_input_Time_eqv;
+
+            if (fileName.Contains("Coulomb")) {
+              if (fileName.Contains("HER")) rate *= m_input_Z_scaling[0];
+              if (fileName.Contains("LER")) rate *= m_input_Z_scaling[1];
+            }
+            if (fileName.Contains("Brems")) {
+              if (fileName.Contains("HER")) rate *= m_input_Z_scaling[2];
+              if (fileName.Contains("LER")) rate *= m_input_Z_scaling[3];
+            }
+
             if (fileName.Contains("HER")) {
               if (HistoRateName.Contains("qcss") && fileName.Contains("Touschek")) m_input_HT_QCSS_rate.push_back(rate); //Hz
               if (HistoRateName.Contains("claws") && fileName.Contains("Touschek")) m_input_HT_CLAWS_rate.push_back(rate); //Hz
@@ -222,6 +234,16 @@ namespace Belle2 {
               double co = he->GetBinContent(j + 1);
               double va = he->GetXaxis()->GetBinCenter(j + 1);
               double esumbin = va * co;
+
+              if (fileName.Contains("Coulomb")) {
+                if (fileName.Contains("HER")) esumbin *= m_input_Z_scaling[0];
+                if (fileName.Contains("LER")) esumbin *= m_input_Z_scaling[1];
+              }
+              if (fileName.Contains("Brems")) {
+                if (fileName.Contains("HER")) esumbin *= m_input_Z_scaling[2];
+                if (fileName.Contains("LER")) esumbin *= m_input_Z_scaling[3];
+              }
+
               esum += esumbin;// / step;
               if (HistoDoseName.Contains("csi_energy")) {
                 if (fileName.Contains("HER")) {
@@ -311,6 +333,16 @@ namespace Belle2 {
             for (int i = 0; i < h2D->GetNbinsX(); i++) {
               double counts = h2D->GetBinContent(i + 1, k + 1);
               double rate = counts / m_input_Time_eqv;
+
+              if (fileName.Contains("Coulomb")) {
+                if (fileName.Contains("HER")) rate *= m_input_Z_scaling[0];
+                if (fileName.Contains("LER")) rate *= m_input_Z_scaling[1];
+              }
+              if (fileName.Contains("Brems")) {
+                if (fileName.Contains("HER")) rate *= m_input_Z_scaling[2];
+                if (fileName.Contains("LER")) rate *= m_input_Z_scaling[3];
+              }
+
               if (fileName.Contains("Coulomb_HER")) {
                 if (HistoRateName.Contains("qcss")) m_input_HC_QCSS_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("claws")) m_input_HC_CLAWS_rate[k].push_back(rate); //Hz
@@ -371,6 +403,16 @@ namespace Belle2 {
                 double co = he->GetBinContent(j + 1, k + 1);
                 double va = he->GetXaxis()->GetBinCenter(j + 1);
                 double esumbin = va * co;
+
+                if (fileName.Contains("Coulomb")) {
+                  if (fileName.Contains("HER")) esumbin *= m_input_Z_scaling[0];
+                  if (fileName.Contains("LER")) esumbin *= m_input_Z_scaling[1];
+                }
+                if (fileName.Contains("Brems")) {
+                  if (fileName.Contains("HER")) esumbin *= m_input_Z_scaling[2];
+                  if (fileName.Contains("LER")) esumbin *= m_input_Z_scaling[3];
+                }
+
                 esum += esumbin;// / step;
                 if (HistoDoseName.Contains("csi_energy")) {
                   if (fileName.Contains("HER")) {

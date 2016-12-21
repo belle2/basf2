@@ -95,6 +95,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
 
   CDCTrajectory3D trajectory3D = track.getStartTrajectory3D();
 
+  // We reset the trajectory here to start (later) at the newStartPosition of the first hit
   const Vector3D startPosition(0, 0, 0);
   trajectory3D.setLocalOrigin(startPosition);
   trajectory3D.setFlightTime(0);
@@ -102,17 +103,16 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
   CDCTrajectory2D trajectory2D = trajectory3D.getTrajectory2D();
 
   // Check if we have to reverse the trajectory. This is done by counting the number of hits
-  // with positive an with negative perpS
+  // with positive and with negative arc length
   unsigned int numberOfPositiveHits = 0;
   for (const CDCRecoHit3D& recoHit : track) {
-    const double currentPerpS = trajectory2D.calcArcLength2D(recoHit.getRecoPos2D());
-    if (currentPerpS > 0) {
+    const double currentArcLength = trajectory2D.calcArcLength2D(recoHit.getRecoPos2D());
+    if (currentArcLength > 0) {
       numberOfPositiveHits++;
     }
   }
   const bool reverseTrajectory = 2 * numberOfPositiveHits < track.size();
 
-  // We reset the trajectory here to start at the newStartPosition of the first hit
   if (reverseTrajectory) {
     trajectory3D.reverse();
     trajectory2D.reverse();
@@ -129,10 +129,10 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
     recoHit.getWireHit().getAutomatonCell().setTakenFlag();
   }
 
-  // We can now sort by perpS
+  // We can now sort by arc length
   track.sortByArcLength2D();
 
-
+  // Set the position to the first hit and let the hits start at arc length of 0
   Vector3D frontPosition = track.front().getRecoPos3D();
   double arcLengthOffset = trajectory3D.setLocalOrigin(frontPosition);
   track.setStartTrajectory3D(trajectory3D);
@@ -140,6 +140,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
     recoHit.shiftArcLength2D(-arcLengthOffset);
   }
 
+  // Set the back trajectory to start at the last hit position (and shift if necessary)
   Vector3D backPosition = track.back().getRecoPos3D();
   double backArcLength2D = trajectory3D.setLocalOrigin(backPosition);
   if (backArcLength2D < 0) {

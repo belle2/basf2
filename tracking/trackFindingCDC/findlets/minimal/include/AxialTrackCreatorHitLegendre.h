@@ -81,10 +81,10 @@ namespace Belle2 {
       std::vector<float> m_param_roughCurvBounds{{ 0.0, 0.30}};
 
       /// Parameter: Width of the phi0 bins at the lowest level of the hough space.
-      size_t m_param_discretePhi0Width = 5;
+      size_t m_param_discretePhi0Width = 6;
 
       /// Parameter: Overlap of the phi0 bins at the lowest level of the hough space.
-      size_t m_param_discretePhi0Overlap = 4;
+      size_t m_param_discretePhi0Overlap = 1;
 
       /// Parameter: Width of the curvature bins at the lowest level of the hough space.
       size_t m_param_discreteCurvWidth = 5;

@@ -101,7 +101,7 @@ namespace Belle2 {
     addParam("input_BGSol", m_input_BGSol, "BG solution 0 or 1");
     addParam("input_ToSol", m_input_ToSol, "To solution 0 or 1");
 
-    addParam("input_Z_scaling", m_input_Z_scaling, "Z scaling");
+    addParam("input_Z", m_input_Z, "Z number");
 
     addParam("input_GasCorrection", m_input_GasCorrection, "GasCorrection");
 
@@ -142,6 +142,19 @@ namespace Belle2 {
     if (m_inputFileNames.empty()) {
       B2FATAL("No valid files specified!");
     }
+
+    fctRate_HB = new TF1("fctRate_HB", "[0] * x*x * log([1] / TMath::Power(x,1./3.) + [2])", 1.0, 19.0);
+    fctRate_LB = new TF1("fctRate_LB", "[0] * x*x * log([1] / TMath::Power(x,1./3.) + [2])", 1.0, 19.0);
+    fctRate_HC = new TF1("fctRate_HC", "[0] * x*x / TMath::Power( ([1] / TMath::Power(x,1./3.) + [2]), 2.)", 1.0, 19.0);
+    fctRate_LC = new TF1("fctRate_LC", "[0] * x*x / TMath::Power( ([1] / TMath::Power(x,1./3.) + [2]), 2.)", 1.0, 19.0);
+    fctRate_HB->SetParameters(0.183373, 0.117173, 1.23431);
+    fctRate_LB->SetParameters(0.900838, 0.0455552, 1.10098);
+    fctRate_HC->SetParameters(1.80992, -0.000115401, 8.4047);
+    fctRate_LC->SetParameters(0.210872, -4.50637e-06, 1.64209);
+    m_input_Z_scaling[0] = fctRate_HC->Eval(m_input_Z[0]) / fctRate_HC->Eval(7);
+    m_input_Z_scaling[1] = fctRate_LC->Eval(m_input_Z[1]) / fctRate_LC->Eval(7);
+    m_input_Z_scaling[2] = fctRate_HB->Eval(m_input_Z[2]) / fctRate_HB->Eval(7);
+    m_input_Z_scaling[3] = fctRate_LB->Eval(m_input_Z[3]) / fctRate_LB->Eval(7);
 
     double volume = 0.;
     double rho = 0.;
@@ -816,12 +829,12 @@ namespace Belle2 {
     double P_HER = 0;
     if (m_beast.SKB_HER_pressure_average != 0
         && m_beast.SKB_HER_pressure_average->size() > 0) P_HER = m_beast.SKB_HER_pressure_average->at(
-                0) * 0.00750062 * 1e9 * m_input_GasCorrection;
+                0) * 0.00750062 * 1e9 * m_input_GasCorrection[0];
     if (m_input_P_HER[1] > 0) P_HER += gRandom->Gaus(0, m_input_P_HER[1]);
     double P_LER = 0;
     if (m_beast.SKB_LER_pressure_average != 0
         && m_beast.SKB_LER_pressure_average->size() > 0) P_LER = m_beast.SKB_LER_pressure_average->at(
-                0) * 0.00750062 * 1e9 * m_input_GasCorrection;
+                0) * 0.00750062 * 1e9 * m_input_GasCorrection[1];
     if (m_input_P_LER[1] > 0) P_LER += gRandom->Gaus(0, m_input_P_LER[1]);
     double sigma_y_HER = 0;
     double sigma_x_HER = 0;
@@ -939,7 +952,7 @@ namespace Belle2 {
       for (int i = 0; i < (int)m_beast.SKB_HER_pressures->size(); i++) {
         ScaleFacBG_HER[i] = 0;
         double iP_HER = 0;
-        iP_HER = m_beast.SKB_HER_pressures->at(i) * 0.00750062 * 1e9 * m_input_GasCorrection;
+        iP_HER = m_beast.SKB_HER_pressures->at(i) * 0.00750062 * 1e9 * m_input_GasCorrection[0];
         if (m_input_P_HER[1] > 0) iP_HER += gRandom->Gaus(0, m_input_P_HER[1]);
         if (iP_HER < 0 || iP_HER > 260.) iP_HER = 0;
         if (I_HER > 0 && iP_HER > 0) {
@@ -954,7 +967,7 @@ namespace Belle2 {
       for (int i = 0; i < (int)m_beast.SKB_LER_pressures->size(); i++) {
         ScaleFacBG_LER[i] = 0;
         double iP_LER = 0;
-        iP_LER = m_beast.SKB_LER_pressures->at(i) * 0.00750062 * 1e9 * m_input_GasCorrection;
+        iP_LER = m_beast.SKB_LER_pressures->at(i) * 0.00750062 * 1e9 * m_input_GasCorrection[1];
         if (m_input_P_LER[1] > 0) iP_LER += gRandom->Gaus(0, m_input_P_LER[1]);
         if (iP_LER < 0 || iP_LER > 260.) iP_LER = 0;
         if (I_LER > 0 && iP_LER > 0) {

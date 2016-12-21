@@ -33,7 +33,7 @@ void TrackRejecter::exposeParameters(ModuleParamList* moduleParamList, const std
   m_trackFilter.exposeParameters(moduleParamList, prefix);
   moduleParamList->addParameter(prefixed(prefix, "deleteRejected"),
                                 m_param_deleteRejected,
-                                "Delete the rejected tracks instead of marking this as background.",
+                                "Delete the rejected tracks instead of marking them as background.",
                                 m_param_deleteRejected);
 }
 

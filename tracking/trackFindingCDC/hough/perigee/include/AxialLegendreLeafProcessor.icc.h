@@ -59,7 +59,7 @@ namespace Belle2 {
       const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
 
       std::vector<WithSharedMark<CDCRLWireHit>> hits(leaf->begin(), leaf->end());
-      assert(std::is_sorted(hits.begin(), hits.end())); // Hits should be naturally sorted
+      std::sort(hits.begin(), hits.end()); // Hits should be naturally sorted
       CDCTrajectory2D trajectory2D = fitter.fit(hits);
       {
         const double curv = trajectory2D.getCurvature();
@@ -95,7 +95,7 @@ namespace Belle2 {
             // hits = this->searchRoad(*roadNode, trajectory2D); // In case you only want the road hits
             int nHitsBefore = hits.size();
             std::vector<WithSharedMark<CDCRLWireHit>> roadHits = this->searchRoad(*roadNode, trajectory2D);
-            assert(std::is_sorted(roadHits.begin(), roadHits.end()));
+            std::sort(roadHits.begin(), roadHits.end());
             hits.insert(hits.end(), roadHits.begin(), roadHits.end());
             std::inplace_merge(hits.begin(), hits.begin() + nHitsBefore, hits.end());
             hits.erase(std::unique(hits.begin(), hits.end()), hits.end());
@@ -147,7 +147,7 @@ namespace Belle2 {
         if (automatonCell.hasTakenFlag() or automatonCell.hasMaskedFlag()) {
           markableRLWireHit.mark();
         } else {
-          // markableRLWireHit.unmark();
+          markableRLWireHit.unmark();
         }
       }
     }

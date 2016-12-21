@@ -41,7 +41,7 @@ namespace Belle2 {
         for (const ACollectionItem& collectionItem : collectionItems) {
           const AutomatonCell& automatonCell = collectionItem.getAutomatonCell();
 
-          if (automatonCell.hasTakenFlag()) {
+          if (automatonCell.hasTakenFlag() or collectionItem.empty()) {
             continue;
           }
 
@@ -77,9 +77,8 @@ namespace Belle2 {
           // Get all matched collection items
           const auto& relatedCollectionItems = m_hitLookup.equal_range(&wireHit);
 
-          for (auto relatedCollectionItemIterator = relatedCollectionItems.first;
-               relatedCollectionItemIterator != relatedCollectionItems.second; ++relatedCollectionItemIterator) {
-            const ACollectionItem* collectionItem = relatedCollectionItemIterator->second;
+          for (auto& relatedCollectionItemIterator : asRange(relatedCollectionItems)) {
+            const ACollectionItem* collectionItem = relatedCollectionItemIterator.second;
             numberOfIntersectionsMap[collectionItem] += 1;
           }
         }

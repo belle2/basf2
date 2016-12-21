@@ -567,6 +567,8 @@ namespace Belle2 {
     m_tree->SetBranchAddress("SKB_LER_partialPressures_D06", &(m_beast.SKB_LER_partialPressures_D06));
     m_tree->SetBranchAddress("SKB_LER_partialPressures_D02", &(m_beast.SKB_LER_partialPressures_D02));
     m_tree->SetBranchAddress("SKB_LER_pressures_local", &(m_beast.SKB_LER_pressures_local));
+    m_tree->SetBranchAddress("SKB_LER_Zeff_D02", &(m_beast.SKB_LER_Zeff_D02));
+    m_tree->SetBranchAddress("SKB_LER_Zeff_D06", &(m_beast.SKB_LER_Zeff_D06));
 
     m_numEntries = m_tree->GetEntries();
     cout << "m_numEntries " << m_numEntries << endl;
@@ -642,6 +644,8 @@ namespace Belle2 {
     m_treeBEAST->Branch("SKB_LER_partialPressures_D06", &(m_beast.SKB_LER_partialPressures_D06));
     m_treeBEAST->Branch("SKB_LER_partialPressures_D02", &(m_beast.SKB_LER_partialPressures_D02));
     m_treeBEAST->Branch("SKB_LER_pressures_local", &(m_beast.SKB_LER_pressures_local));
+    m_treeBEAST->Branch("SKB_LER_Zeff_D02", &(m_beast.SKB_LER_Zeff_D02));
+    m_treeBEAST->Branch("SKB_LER_Zeff_D06", &(m_beast.SKB_LER_Zeff_D06));
     m_treeBEAST->Branch("PIN_dose", &(m_beast.PIN_dose));
     m_treeBEAST->Branch("BGO_energy", &(m_beast.BGO_energy));
     m_treeBEAST->Branch("HE3_rate", &(m_beast.HE3_rate));

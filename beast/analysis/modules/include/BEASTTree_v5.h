@@ -31,6 +31,8 @@ namespace Belle2 {
       std::vector<double>*  SKB_LER_current;/** */
       std::vector<double>*  SKB_HER_lifetime;/** */
       std::vector<double>*  SKB_LER_lifetime;/** */
+      std::vector<float>* SKB_LER_Zeff_D02;/** */
+      std::vector<float>* SKB_LER_Zeff_D06;/** */
       std::vector<double>  SKB_HER_RLR;/** */
       std::vector<double>  SKB_LER_RLR;/** */
       std::vector<double>*  SKB_HER_integratedCurrent;/** */
@@ -242,6 +244,8 @@ namespace Belle2 {
         SKB_LER_partialPressures_D06 = 0;
         SKB_LER_partialPressures_D02 = 0;
         SKB_LER_pressures_local = 0;
+        SKB_LER_Zeff_D02 = 0;
+        SKB_LER_Zeff_D06 = 0;
 
         PIN_dose.clear();
         BGO_energy.clear();

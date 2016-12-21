@@ -51,8 +51,10 @@ namespace Belle2 {
                  int uCells = 0, int vCells = 0, float width2 = 0):
         VXD::SensorInfoBase(SensorInfo::SVD, id, width, length, thickness, uCells, vCells, width2, -1, 0),
         m_temperature(300), m_depletionVoltage(0), m_biasVoltage(0),
-        m_backplaneCapacitance(0), m_interstripCapacitance(0),
-        m_couplingCapacitance(0), m_electronicNoiseU(0), m_electronicNoiseV(0)
+        m_backplaneCapacitanceU(0), m_interstripCapacitanceU(0),
+        m_couplingCapacitanceU(0), m_backplaneCapacitanceV(0),
+        m_interstripCapacitanceV(0), m_couplingCapacitanceV(0),
+        m_electronicNoiseU(0), m_electronicNoiseV(0)
       { }
 
       /** Change the SensorID. Useful to copy the SensorInfo from one sensor and use it for another.
@@ -68,14 +70,23 @@ namespace Belle2 {
        * @param coupling capacitance Coupling capacitance for the strips.
        */
       void setSensorParams(double depletionVoltage, double biasVoltage,
-                           double backplaneCapacitance, double interstripCapacitance, double couplingCapacitance, double electronicNoiseU,
+                           double backplaneCapacitanceU,
+                           double interstripCapacitanceU,
+                           double couplingCapacitanceU,
+                           double backplaneCapacitanceV,
+                           double interstripCapacitanceV,
+                           double couplingCapacitanceV,
+                           double electronicNoiseU,
                            double electronicNoiseV)
       {
         m_depletionVoltage = depletionVoltage;
         m_biasVoltage = biasVoltage;
-        m_backplaneCapacitance = backplaneCapacitance;
-        m_interstripCapacitance = interstripCapacitance;
-        m_couplingCapacitance = couplingCapacitance;
+        m_backplaneCapacitanceU = backplaneCapacitanceU;
+        m_interstripCapacitanceU = interstripCapacitanceU;
+        m_couplingCapacitanceU = couplingCapacitanceU;
+        m_backplaneCapacitanceV = backplaneCapacitanceV;
+        m_interstripCapacitanceV = interstripCapacitanceV;
+        m_couplingCapacitanceV = couplingCapacitanceV;
         m_electronicNoiseU = electronicNoiseU;
         m_electronicNoiseV = electronicNoiseV;
       }
@@ -86,12 +97,18 @@ namespace Belle2 {
       double getDepletionVoltage() const { return m_depletionVoltage; }
       /** Return the bias voltage on the sensor. */
       double getBiasVoltage() const { return m_biasVoltage; }
-      /** Return the backplane capacitance for the sensor. */
-      double getBackplaneCapacitance() const { return m_backplaneCapacitance; }
-      /** Return the interstrip capacitance for the sensor. */
-      double getInterstripCapacitance() const { return m_interstripCapacitance; }
-      /** Return the coupling capacitance of the sensor strips */
-      double getCouplingCapacitance() const { return m_couplingCapacitance; }
+      /** Return the backplane capacitanceU for the sensor. */
+      double getBackplaneCapacitanceU() const { return m_backplaneCapacitanceU; }
+      /** Return the interstrip capacitanceU for the sensor. */
+      double getInterstripCapacitanceU() const { return m_interstripCapacitanceU; }
+      /** Return the coupling capacitanceU of the sensor strips */
+      double getCouplingCapacitanceU() const { return m_couplingCapacitanceU; }
+      /** Return the backplane capacitanceV for the sensor. */
+      double getBackplaneCapacitanceV() const { return m_backplaneCapacitanceV; }
+      /** Return the interstrip capacitanceV for the sensor. */
+      double getInterstripCapacitanceV() const { return m_interstripCapacitanceV; }
+      /** Return the coupling capacitanceV of the sensor strips */
+      double getCouplingCapacitanceV() const { return m_couplingCapacitanceV; }
       /** Return electronic noise in e- for u (short) strips */
       double getElectronicNoiseU() const {return m_electronicNoiseU; }
       /** Return electronic noise in e- for v (long) strips */
@@ -165,12 +182,18 @@ namespace Belle2 {
       double m_depletionVoltage;
       /** The bias voltage on the sensor */
       double m_biasVoltage;
-      /** The backplane capacitance wrt. the strips. */
-      double m_backplaneCapacitance;
-      /** The interstrip capacitance for the sensor. */
-      double m_interstripCapacitance;
-      /** The coupling capacitance for the sensor. */
-      double m_couplingCapacitance;
+      /** The backplane capacitanceU wrt. the strips. */
+      double m_backplaneCapacitanceU;
+      /** The interstrip capacitanceU for the sensor. */
+      double m_interstripCapacitanceU;
+      /** The coupling capacitanceU for the sensor. */
+      double m_couplingCapacitanceU;
+      /** The backplane capacitanceV wrt. the strips. */
+      double m_backplaneCapacitanceV;
+      /** The interstrip capacitanceV for the sensor. */
+      double m_interstripCapacitanceV;
+      /** The coupling capacitanceV for the sensor. */
+      double m_couplingCapacitanceV;
       /** The electronic noise for u (short, n-side) strips. */
       double m_electronicNoiseU;
       /** The electronic noise for v (long, p-side) strips. */

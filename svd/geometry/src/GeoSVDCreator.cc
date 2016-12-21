@@ -67,9 +67,12 @@ namespace Belle2 {
       info->setSensorParams(
         sensor.getWithUnit("DepletionVoltage"),
         sensor.getWithUnit("BiasVoltage"),
-        sensor.getDouble("BackplaneCapacitance") * unit_pF,
-        sensor.getDouble("InterstripCapacitance") * unit_pF,
-        sensor.getDouble("CouplingCapacitance") * unit_pF,
+        sensor.getDouble("BackplaneCapacitanceU") * unit_pF,
+        sensor.getDouble("InterstripCapacitanceU") * unit_pF,
+        sensor.getDouble("CouplingCapacitanceU") * unit_pF,
+        sensor.getDouble("BackplaneCapacitanceV") * unit_pF,
+        sensor.getDouble("InterstripCapacitanceV") * unit_pF,
+        sensor.getDouble("CouplingCapacitanceV") * unit_pF,
         sensor.getWithUnit("ElectronicNoiseU"),
         sensor.getWithUnit("ElectronicNoiseV")
       );

@@ -44,12 +44,9 @@ void SegmentTrackCombinerFindlet::apply(std::vector<TrackFindingCDC::CDCSegment2
 {
   m_trackNormalizer.apply(tracks);
 
-  m_combiner.fillWith(tracks, segments);
-  m_combiner.match(m_chooseableSegmentTrackFilter);
+  m_combiner.match(m_chooseableSegmentTrackFilter, tracks, segments);
 
   m_trackRejecter.apply(tracks);
-
-  m_combiner.clearAndRecover();
 
   m_trackNormalizer.apply(tracks);
 }

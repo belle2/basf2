@@ -6,26 +6,17 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void SegmentTrackCombiner::clearAndRecover()
+void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackFilter, std::vector<CDCTrack>& trackList,
+                                 std::vector<CDCSegment2D>& segmentList)
 {
-  for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
-    for (SegmentInformation* segmentInformation : segments) {
-      CDCSegment2D* segment = segmentInformation->getSegment();
-      if (segment->getAutomatonCell().hasMaskedFlag()) {
-        segment->getAutomatonCell().unsetTakenFlag();
-        segment->getAutomatonCell().unsetMaskedFlag();
-      }
-    }
-  }
+  TrackLookUp trackLookUp;
+  SegmentLookUp segmentLookUp;
 
-  m_trackLookUp.clear();
-  m_segmentLookUp.clear();
-}
+  trackLookUp.fillWith(trackList);
+  segmentLookUp.fillWith(segmentList);
 
-void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackFilter)
-{
   // Mark the segments which are fully found by the legendre track finder as taken
-  for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
+  for (const std::vector<SegmentInformation*>& segments : segmentLookUp) {
     for (SegmentInformation* segment : segments) {
       const bool isFullyTaken = segment->getSegment()->isFullyTaken(1);
 
@@ -33,7 +24,7 @@ void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackFilter)
         // Ensure that all hits belong to the same track!
         TrackInformation* singleTrackWithHitsInCommon = nullptr;
         for (const CDCRecoHit2D& recoHit : * (segment->getSegment())) {
-          TrackInformation* trackWithHit = m_trackLookUp.findTrackForHit(recoHit);
+          TrackInformation* trackWithHit = trackLookUp.findTrackForHit(recoHit);
           if (trackWithHit != nullptr) {
             if (singleTrackWithHitsInCommon == nullptr) {
               singleTrackWithHitsInCommon = trackWithHit;
@@ -52,9 +43,9 @@ void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackFilter)
   }
 
   // prepare lookup
-  for (TrackInformation* track : m_trackLookUp) {
+  for (TrackInformation* track : trackLookUp) {
     for (const CDCRecoHit3D& recoHit : * (track->getTrackCand())) {
-      SegmentInformation* matchingSegment = m_segmentLookUp.findSegmentForHit(recoHit);
+      SegmentInformation* matchingSegment = segmentLookUp.findSegmentForHit(recoHit);
 
       if (matchingSegment == nullptr) {
         continue;
@@ -82,7 +73,7 @@ void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackFilter)
     }
   }
 
-  for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
+  for (const std::vector<SegmentInformation*>& segments : segmentLookUp) {
     for (SegmentInformation* segment : segments) {
       if (segment->isAlreadyTaken()) {
         continue;
@@ -108,8 +99,8 @@ void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackFilter)
           CDCTrack* cdcTrack = notBestTrack->getTrackCand();
 
           cdcTrack->erase(std::remove_if(cdcTrack->begin(), cdcTrack->end(),
-          [this, &segment](const CDCRecoHit3D & recoHit) -> bool {
-            if (m_segmentLookUp.findSegmentForHit(recoHit) == segment)
+          [&segmentLookUp, &segment](const CDCRecoHit3D & recoHit) -> bool {
+            if (segmentLookUp.findSegmentForHit(recoHit) == segment)
             {
               recoHit.getWireHit().getAutomatonCell().unsetTakenFlag();
               return true;
@@ -121,12 +112,15 @@ void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackFilter)
       }
 
       // Add the segment to the track with the highest probability to match
-      SegmentTrackCombiner::addSegmentToTrack(segment, bestMatch);
+      SegmentTrackCombiner::addSegmentToTrack(*(segment->getSegment()), *(bestMatch->getTrackCand()));
     }
   }
+
+  trackLookUp.clear();
+  segmentLookUp.clear();
 }
 
-void SegmentTrackCombiner::addSegmentToTrack(const CDCSegment2D& segment, CDCTrack& track, const bool useTakenFlagOfHits)
+void SegmentTrackCombiner::addSegmentToTrack(const CDCSegment2D& segment, CDCTrack& track)
 {
   if (segment.getAutomatonCell().hasTakenFlag()) {
     return;
@@ -134,7 +128,7 @@ void SegmentTrackCombiner::addSegmentToTrack(const CDCSegment2D& segment, CDCTra
 
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
   for (const CDCRecoHit2D& recoHit : segment) {
-    if (recoHit.getWireHit().getAutomatonCell().hasTakenFlag() and useTakenFlagOfHits) {
+    if (recoHit.getWireHit().getAutomatonCell().hasTakenFlag()) {
       continue;
     }
     CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit.getRLWireHit(), trajectory2D);
@@ -144,15 +138,4 @@ void SegmentTrackCombiner::addSegmentToTrack(const CDCSegment2D& segment, CDCTra
 
   track.setHasMatchingSegment();
   segment.getAutomatonCell().setTakenFlag();
-}
-
-
-void SegmentTrackCombiner::addSegmentToTrack(SegmentInformation* segmentInformation, TrackInformation* matchingTrack)
-{
-  addSegmentToTrack(*(segmentInformation->getSegment()), *(matchingTrack->getTrackCand()));
-
-  for (const CDCRecoHit3D& recoHit : * (matchingTrack->getTrackCand())) {
-    matchingTrack->getArcLength2DList().push_back(recoHit.getArcLength2D());
-  }
-  matchingTrack->calcArcLength2D();
 }

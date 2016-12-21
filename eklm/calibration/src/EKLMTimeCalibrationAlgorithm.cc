@@ -90,6 +90,22 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   }
   k1 = 0;
   k2 = 0;
+  /*
+   * Determination of the effective light speed. For each strip, the variance
+   * of time is
+   *
+   * sigma = \frac{1}{n - 1} \sum (t_i - (t_0 + l_i / c_{eff})^2,
+   *
+   * where t_i and l_i are time and distance from SiPM for a hit, t_0 is
+   * the time shift for this strip and c_{eff} is the effective light speed,
+   * which is common for all strips. The variance is approximated by
+   *
+   * sigma = \frac{1}{n - 1} \sum (t_i - \sum t_i  -
+   * (l_i - (\sum l_i))/ c_{eff})^2,
+   *
+   * and sum of sigmas is minimized similarly to chi^2 minimization by direct
+   * calculation.
+   */
   for (i = 0; i < m_maxStrip; i++) {
     n = stripEvents[i].size();
     if (n < 2) {
@@ -117,8 +133,8 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
     for (it = stripEvents[i].begin(); it != stripEvents[i].end(); ++it) {
       dt = it->time - averageTime[i];
       dl = it->dist - averageDist[i];
-      s1 = s1 + dt * dl;
-      s2 = s2 + dt * dt;
+      s1 = s1 + dl * dl;
+      s2 = s2 + dt * dl;
     }
     k1 = k1 + (n - 1) * s1;
     k2 = k2 + (n - 1) * s2;

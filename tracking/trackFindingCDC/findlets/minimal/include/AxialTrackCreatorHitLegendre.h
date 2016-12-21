@@ -81,22 +81,22 @@ namespace Belle2 {
       std::vector<float> m_param_roughCurvBounds{{ 0.0, 0.30}};
 
       /// Parameter: Width of the phi0 bins at the lowest level of the hough space.
-      size_t m_param_discretePhi0Width = 6;
+      int m_param_discretePhi0Width = 6;
 
       /// Parameter: Overlap of the phi0 bins at the lowest level of the hough space.
-      size_t m_param_discretePhi0Overlap = 1;
+      int m_param_discretePhi0Overlap = 1;
 
       /// Parameter: Width of the curvature bins at the lowest level of the hough space.
-      size_t m_param_discreteCurvWidth = 5;
+      int m_param_discreteCurvWidth = 5;
 
       /// Parameter: Overlap of the curvature bins at the lowest level of the hough space.
-      size_t m_param_discreteCurvOverlap = 4;
+      int m_param_discreteCurvOverlap = 4;
 
       /// Fixed parameter: Number of divisions in the phi0 direction
-      static const size_t c_phi0Divisions = 2;
+      static const int c_phi0Divisions = 2;
 
       /// Fixed parameter: Number of divisions in the curv direction
-      static const size_t c_curvDivisions = 2;
+      static const int c_curvDivisions = 2;
 
       /// Parameter: Relaxation schedule for the leaf processor in the fine hough tree
       std::vector<ParameterVariantMap> m_param_fineRelaxationSchedule;

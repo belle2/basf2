@@ -43,16 +43,21 @@ namespace Belle2 {
 
       /// Unpack the curvature
       explicit operator float() const
-      { return m_curv; }
+      {
+        return m_curv;
+      }
 
       /// Return the two dimensional arc length to the given layer id
       float getArcLength2D(ILayer iCLayer, bool secondArm = false) const
-      { return secondArm ? m_secondaryArcLength2DByICLayer[iCLayer] : m_arcLength2DByICLayer[iCLayer]; }
+      {
+        return secondArm ? m_secondaryArcLength2DByICLayer[iCLayer] : m_arcLength2DByICLayer[iCLayer];
+      }
 
       /// Output operator for debugging
-      friend std::ostream& operator<<(std::ostream& output,
-                                      const CurvWithArcLength2DCache& value)
-      { return output << value.m_curv; }
+      friend std::ostream& operator<<(std::ostream& output, const CurvWithArcLength2DCache& value)
+      {
+        return output << value.m_curv;
+      }
 
     private:
       /// Memory for the curvature

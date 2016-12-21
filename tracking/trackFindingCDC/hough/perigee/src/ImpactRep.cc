@@ -14,34 +14,26 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-ImpactBinsSpec::ImpactBinsSpec(double lowerBound,
-                               double upperBound,
-                               size_t nBins,
-                               size_t nOverlap,
-                               size_t nWidth):
-  m_lowerBound(lowerBound),
-  m_upperBound(upperBound),
-  m_nBins(nBins),
-  m_nOverlap(nOverlap),
-  m_nWidth(nWidth)
+ImpactBinsSpec::ImpactBinsSpec(double lowerBound, double upperBound, long nBins, int nOverlap, int nWidth)
+  : m_lowerBound(lowerBound)
+  , m_upperBound(upperBound)
+  , m_nBins(nBins)
+  , m_nOverlap(nOverlap)
+  , m_nWidth(nWidth)
 {
-  B2ASSERT("Overlap must be smaller than the width.",
-           m_nWidth > m_nOverlap);
-
-  B2ASSERT("Upper impactature bound must be higher than the lower bound.",
-           m_upperBound > m_lowerBound);
+  B2ASSERT("Overlap must be smaller than the width.", m_nWidth > m_nOverlap);
+  B2ASSERT("Upper impactature bound must be higher than the lower bound.", m_upperBound > m_lowerBound);
 }
-
 
 DiscreteImpact::Array ImpactBinsSpec::constructArray() const
 {
-  const size_t nPositions = getNPositions();
+  const long nPositions = getNPositions();
   return linspace<float>(m_lowerBound, m_upperBound, nPositions);
 }
 
-size_t ImpactBinsSpec::getNPositions() const
+long ImpactBinsSpec::getNPositions() const
 {
-  const size_t nPositions = (m_nWidth - m_nOverlap) * m_nBins + m_nOverlap + 1;
+  const long nPositions = (m_nWidth - m_nOverlap) * m_nBins + m_nOverlap + 1;
   return nPositions;
 }
 

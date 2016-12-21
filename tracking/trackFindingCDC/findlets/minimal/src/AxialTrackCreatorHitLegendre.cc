@@ -99,7 +99,7 @@ void AxialTrackCreatorHitLegendre::exposeParameters(ModuleParamList* moduleParam
 void AxialTrackCreatorHitLegendre::initialize()
 {
   Super::initialize();
-  const size_t nPhi0Bins = std::pow(c_phi0Divisions, m_param_granularityLevel);
+  const long nPhi0Bins = std::pow(c_phi0Divisions, m_param_granularityLevel);
   const Phi0BinsSpec phi0BinsSpec(nPhi0Bins,
                                   m_param_discretePhi0Overlap,
                                   m_param_discretePhi0Width);
@@ -108,7 +108,7 @@ void AxialTrackCreatorHitLegendre::initialize()
   if (m_param_fineCurvBounds.size() == 2) {
 
     std::array<double, 2> fineCurvBounds{{m_param_fineCurvBounds.front(), m_param_fineCurvBounds.back()}};
-    const size_t nFineCurvBins = std::pow(c_curvDivisions, m_param_granularityLevel);
+    const long nFineCurvBins = std::pow(c_curvDivisions, m_param_granularityLevel);
     const CurvBinsSpec fineCurvBinsSpec(fineCurvBounds.front(),
                                         fineCurvBounds.back(),
                                         nFineCurvBins,
@@ -120,7 +120,7 @@ void AxialTrackCreatorHitLegendre::initialize()
   // Construct the rough curvature array in case two bounds were given
   if (m_param_roughCurvBounds.size() == 2) {
     std::array<double, 2> roughCurvBounds{{m_param_roughCurvBounds.front(), m_param_roughCurvBounds.back()}};
-    const size_t nRoughCurvBins = std::pow(c_curvDivisions, m_param_granularityLevel);
+    const long nRoughCurvBins = std::pow(c_curvDivisions, m_param_granularityLevel);
     const CurvBinsSpec roughCurvBinsSpec(roughCurvBounds.front(),
                                          roughCurvBounds.back(),
                                          nRoughCurvBins,

@@ -10,13 +10,15 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/trackFinderOutputCombining/SegmentTrackCombiner.h>
 
-#include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackNormalizer.h>
-
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
+#include <tracking/trackFindingCDC/collectors/matchers/SharingHitsMatcher.h>
+#include <tracking/trackFindingCDC/collectors/selectors/CutSelector.h>
+#include <tracking/trackFindingCDC/collectors/selectors/FilterSelector.h>
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackFilterFactory.h>
+#include <tracking/trackFindingCDC/collectors/selectors/SegmentTrackBestMatchSelector.h>
+#include <tracking/trackFindingCDC/collectors/adders/SegmentTrackAdder.h>
+#include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
@@ -55,7 +57,7 @@ namespace Belle2 {
       std::string getDescription() final;
 
       /// Signal the beginning of a new event
-      //void beginEvent() final;
+      void beginEvent() final;
 
       /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
@@ -66,18 +68,29 @@ namespace Belle2 {
 
     private:
       // Findlets
-      // TODO: remove this base class in favour of collector framework
-      /// Object that handles the combination.
-      SegmentTrackCombiner m_combiner;
+      /// Matcher for creating relations between tracks and segments based on the number of shared hits
+      SharingHitsMatcher<CDCTrack, CDCSegment2D> m_sharedHitsMatcher;
+
+      /// Select only those pairs, which share at least a certain amount of hits
+      CutSelector<CDCTrack, CDCSegment2D> m_selectPairsWithSharedHits;
 
       /// Reference to the chooser to be used for matching segments and tracks in the first step.
-      ChooseableFilter<SegmentTrackFilterFactory> m_chooseableSegmentTrackFilter;
+      FilterSelector<CDCTrack, CDCSegment2D, SegmentTrackFilterFactory> m_chooseableSegmentTrackSelector;
+
+      /// Select only the best matching segment-track relations and remove the hits from the other ones
+      SegmentTrackBestMatchSelector m_bestMatchSelector;
+
+      /// Add the matched segments to tracks
+      SegmentTrackAdder m_segmentTrackAdder;
 
       /// Findlet to filter out fake tracks
       TrackRejecter m_trackRejecter;
 
       /// Findlet for normalizing the tracks
       TrackNormalizer m_trackNormalizer;
+
+      // Object pools
+      std::vector<WeightedRelation<CDCTrack, const CDCSegment2D>> m_relations;
     };
   }
 }

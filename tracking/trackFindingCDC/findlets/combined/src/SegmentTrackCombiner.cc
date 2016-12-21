@@ -18,9 +18,12 @@ using namespace TrackFindingCDC;
 SegmentTrackCombinerFindlet::SegmentTrackCombinerFindlet()
 {
   addProcessingSignalListener(&m_trackNormalizer);
+  addProcessingSignalListener(&m_sharedHitsMatcher);
+  addProcessingSignalListener(&m_selectPairsWithSharedHits);
+  addProcessingSignalListener(&m_chooseableSegmentTrackSelector);
+  addProcessingSignalListener(&m_bestMatchSelector);
+  addProcessingSignalListener(&m_segmentTrackAdder);
   addProcessingSignalListener(&m_trackRejecter);
-  addProcessingSignalListener(&m_chooseableSegmentTrackFilter);
-  //addProcessingSignalListener(m_combiner);
 }
 
 std::string SegmentTrackCombinerFindlet::getDescription()
@@ -28,14 +31,27 @@ std::string SegmentTrackCombinerFindlet::getDescription()
   return "Findlet for the combination of tracks and segments.";
 }
 
+void SegmentTrackCombinerFindlet::beginEvent()
+{
+  m_relations.clear();
+
+  Super::beginEvent();
+}
+
 void SegmentTrackCombinerFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);
 
   m_trackNormalizer.exposeParameters(moduleParamList, prefix);
+  m_sharedHitsMatcher.exposeParameters(moduleParamList, prefix);
+  m_selectPairsWithSharedHits.exposeParameters(moduleParamList, prefixed("sharedHits", prefix));
+  m_chooseableSegmentTrackSelector.exposeParameters(moduleParamList, prefixed("segmentTrack", prefix));
+  m_bestMatchSelector.exposeParameters(moduleParamList, prefix);
+  m_segmentTrackAdder.exposeParameters(moduleParamList, prefix);
   m_trackRejecter.exposeParameters(moduleParamList, prefixed(prefix, "track"));
-  m_chooseableSegmentTrackFilter.exposeParameters(moduleParamList, prefixed("segmentTrack", prefix));
-  //m_combiner.exposeParameters(moduleParamList, prefix);
+
+  moduleParamList->getParameter<double>("sharedHitsCutValue").setDefaultValue(1.0);
+  moduleParamList->getParameter<bool>("useOnlySingleBestCandidate").setDefaultValue(false);
 }
 
 // Do the combination work. See the SegmentTrackCombiner methods for full details.
@@ -44,9 +60,26 @@ void SegmentTrackCombinerFindlet::apply(std::vector<TrackFindingCDC::CDCSegment2
 {
   m_trackNormalizer.apply(tracks);
 
-  m_combiner.match(m_chooseableSegmentTrackFilter, tracks, segments);
+  // TODO: Add segments which are fully taken
 
+  // After that, relations contains all pairs of segments and tracks, with the number of shared hits as weight
+  m_sharedHitsMatcher.apply(tracks, segments, m_relations);
+
+  // Require a certain (definable) amount of shared hits between segments and tracks
+  m_selectPairsWithSharedHits.apply(m_relations);
+
+  // Apply a (mva) filter to all combinations
+  m_chooseableSegmentTrackSelector.apply(m_relations);
+
+  // Search for the best combination if there is more than one possibility and remove the hits from all other ones
+  m_bestMatchSelector.apply(m_relations);
+
+  // Add the remaining combinations
+  m_segmentTrackAdder.apply(m_relations);
+
+  // Reject tracks according to a (mva) filter
   m_trackRejecter.apply(tracks);
 
+  // Normalize the trajectories again
   m_trackNormalizer.apply(tracks);
 }

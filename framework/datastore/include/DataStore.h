@@ -29,6 +29,7 @@ class TClass;
 namespace Belle2 {
   class StoreAccessorBase;
   class DependencyMap;
+  class RelationVectorBase;
   template <class T> class RelationVector;
   struct RelationEntry;
 
@@ -318,8 +319,8 @@ namespace Belle2 {
      *                        If the special name "ALL" is given all store arrays containing objectt of type withClass are considered.
      *  @return               Vector of relation entry objects.
      */
-    std::vector<Belle2::RelationEntry> getRelationsWith(ESearchSide searchSide, const TObject* object, StoreEntry*& entry, int& index,
-                                                        const TClass* withClass, const std::string& withName);
+    RelationVectorBase getRelationsWith(ESearchSide searchSide, const TObject* object, StoreEntry*& entry, int& index,
+                                        const TClass* withClass, const std::string& withName);
 
     /** Get the first relation between an object and another object in a store array.
      *

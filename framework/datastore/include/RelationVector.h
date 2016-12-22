@@ -15,9 +15,60 @@
 #include <framework/utilities/ArrayIterator.h>
 
 #include <vector>
+#include <string>
+#include <functional>
 
 
 namespace Belle2 {
+  class RelationVectorBase {
+  public:
+    /** Construct empty set. */
+    RelationVectorBase() { }
+
+    /** Constructor.  */
+    RelationVectorBase(const std::string& name, int index, const std::vector<Belle2::RelationEntry>& relations,
+                       const std::vector<std::string>& names): m_name(name), m_index(index), m_relations(relations), m_relationNames(names) {}
+
+    /** Accessor for the relations vector.
+     *
+     *  @return           Vector of RelationEntry objects.
+     */
+    const std::vector<Belle2::RelationEntry>& relations() const {return m_relations;}
+
+
+    /** Get number of relations.
+     *
+     *  @return           Number of relations.
+     */
+    size_t size() const { return m_relations.size();}
+
+    /** Get weight with index.
+     *
+     *  @param index      Index of relation.
+     *  @return           Weight that the relation has.
+     */
+    float weight(int index) const {return m_relations[index].weight;}
+
+    /** Remove relation at given index. (Will decrease size() by one) */
+    void remove(int index);
+
+    /** Set a new weight for the given relation. */
+    void setWeight(int index, float weight);
+
+  protected:
+    /** add another list of relations. (internal use) */
+    void add(const RelationVectorBase& other);
+
+    /** apply function to the relation associated with the RelationEntry at given index. */
+    void apply(int index, const std::function<void(std::vector<unsigned int>&, std::vector<float>&, size_t)>& f);
+
+    std::string m_name; /**< entry name of array containing object these relations belong to. */
+    int m_index{ -1}; /**< index of object these relations belong to. */
+    std::vector<RelationEntry> m_relations;  /**< The vector of relation entries */
+    std::vector<std::string> m_relationNames;  /**< Names of associated relations. */
+    friend class DataStore;
+  };
+
   /** Class for type safe access to objects that are referred to in relations.
    *
    *  This class is supposed to be used by the RelationsInterface to provide
@@ -34,7 +85,7 @@ namespace Belle2 {
       \endcode
    * If you want to modify the related objects, you can use a non-const reference instead.
    */
-  template <class T> class RelationVector {
+  template <class T> class RelationVector : public RelationVectorBase {
   public:
     /** STL-like iterator over the T objects (not T* ). */
     typedef ArrayIterator<RelationVector<T>, T> iterator;
@@ -46,20 +97,8 @@ namespace Belle2 {
      *
      *  @param relations  The vector of relation objects.
      */
-    explicit RelationVector(const std::vector<Belle2::RelationEntry>& relations): m_relations(relations) {}
-
-    /** Accessor for the relations vector.
-     *
-     *  @return           Vector of RelationEntry objects.
-     */
-    const std::vector<Belle2::RelationEntry>& relations() const {return m_relations;}
-
-
-    /** Get number of relations.
-     *
-     *  @return           Number of relations.
-     */
-    size_t size() const { return m_relations.size();}
+    //explicit RelationVector(const std::vector<Belle2::RelationEntry>& relations): m_relations(relations) {}
+    explicit RelationVector(const RelationVectorBase& b): RelationVectorBase(b) {}
 
     /** Get object with index.
      *
@@ -75,13 +114,6 @@ namespace Belle2 {
      */
     T*     operator[](int index) const {return object(index);}
 
-    /** Get weight with index.
-     *
-     *  @param index      Index of relation.
-     *  @return           Weight that the relation has.
-     */
-    double weight(int index) const {return m_relations[index].weight;}
-
 
     /** Return iterator to first entry. */
     iterator begin() { return iterator(this, 0); }
@@ -92,9 +124,6 @@ namespace Belle2 {
     const_iterator begin() const { return const_iterator(this, 0); }
     /** Return const_iterator to last entry +1. */
     const_iterator end() const { return const_iterator(this, size()); }
-
-  private:
-    std::vector<Belle2::RelationEntry> m_relations;  /**< The vector of relation entries */
   };
 }
 #endif

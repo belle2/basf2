@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ErrorMessageDiagnosis>
+  <Error>
+    <Type>HLT</Type>
+    <Message>HLT trouble</Message>
+    <Diagnosis>High-Level Trigger trouble. Abort and try again. If the same error occurs, contact with DAQ(HLT) experts. </Diagnosis>
+  </Error>
+</ErrorMessageDiagnosis>

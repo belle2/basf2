@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ErrorMessageDiagnosis>
+    <Error>
+        <Type>SLC</Type>
+        <Message>HLT_CDC got down.</Message>
+        <Diagnosis>HLT_CDC is down. Abort and try again. If the same error occurs, contact with DAQ(SLC) experts. </Diagnosis>
+    </Error>
+</ErrorMessageDiagnosis>

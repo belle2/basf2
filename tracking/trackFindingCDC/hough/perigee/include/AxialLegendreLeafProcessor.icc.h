@@ -21,6 +21,7 @@
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
 
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/BasePrecisionFunction.h>
@@ -56,7 +57,12 @@ namespace Belle2 {
       // Start off by fitting the items of the leaf with a general trajectory
       // that may have a distinct impact != 0
       /////////////////////////////////////////////////////////////////////////
-      const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
+      CDCKarimakiFitter fitter;
+      // CDCRiemannFitter fitter;
+      // fitter.setFitVariance(EFitVariance::c_Unit);
+      fitter.setFitVariance(EFitVariance::c_DriftLength); // Best one of the eight combinations of fitters..
+      // fitter.setFitVariance(EFitVariance::c_Pseudo);
+      // fitter.setFitVariance(EFitVariance::c_Proper);
 
       std::vector<WithSharedMark<CDCRLWireHit>> hits(leaf->begin(), leaf->end());
       std::sort(hits.begin(), hits.end()); // Hits should be naturally sorted

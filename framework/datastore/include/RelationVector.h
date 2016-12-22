@@ -18,8 +18,8 @@
 #include <string>
 #include <functional>
 
-
 namespace Belle2 {
+  /** base class for RelationVector<T> */
   class RelationVectorBase {
   public:
     /** Construct empty set. */
@@ -28,32 +28,6 @@ namespace Belle2 {
     /** Constructor.  */
     RelationVectorBase(const std::string& name, int index, const std::vector<Belle2::RelationEntry>& relations,
                        const std::vector<std::string>& names): m_name(name), m_index(index), m_relations(relations), m_relationNames(names) {}
-
-    /** Accessor for the relations vector.
-     *
-     *  @return           Vector of RelationEntry objects.
-     */
-    const std::vector<Belle2::RelationEntry>& relations() const {return m_relations;}
-
-
-    /** Get number of relations.
-     *
-     *  @return           Number of relations.
-     */
-    size_t size() const { return m_relations.size();}
-
-    /** Get weight with index.
-     *
-     *  @param index      Index of relation.
-     *  @return           Weight that the relation has.
-     */
-    float weight(int index) const {return m_relations[index].weight;}
-
-    /** Remove relation at given index. (Will decrease size() by one) */
-    void remove(int index);
-
-    /** Set a new weight for the given relation. */
-    void setWeight(int index, float weight);
 
   protected:
     /** add another list of relations. (internal use) */
@@ -85,7 +59,7 @@ namespace Belle2 {
       \endcode
    * If you want to modify the related objects, you can use a non-const reference instead.
    */
-  template <class T> class RelationVector : public RelationVectorBase {
+  template <class T> class RelationVector : protected RelationVectorBase {
   public:
     /** STL-like iterator over the T objects (not T* ). */
     typedef ArrayIterator<RelationVector<T>, T> iterator;
@@ -95,10 +69,19 @@ namespace Belle2 {
 
     /** Constructor.
      *
-     *  @param relations  The vector of relation objects.
+     *  @param b Not type-safe base class containing the data
      */
-    //explicit RelationVector(const std::vector<Belle2::RelationEntry>& relations): m_relations(relations) {}
     explicit RelationVector(const RelationVectorBase& b): RelationVectorBase(b) {}
+
+    /** Accessor for the relations vector.
+     *
+     *  @return           Vector of RelationEntry objects.
+     */
+    const std::vector<Belle2::RelationEntry>& relations() const {return m_relations;}
+
+    /** Get number of relations.  */
+    size_t size() const { return m_relations.size();}
+
 
     /** Get object with index.
      *
@@ -114,6 +97,34 @@ namespace Belle2 {
      */
     T*     operator[](int index) const {return object(index);}
 
+    /** Get weight with index.
+     *
+     *  @param index      Index of relation.
+     *  @return           Weight that the relation has.
+     */
+    float weight(int index) const {return m_relations[index].weight;}
+
+    /** Remove relation at given index. (Will decrease size() by one) */
+    void remove(int index)
+    {
+      apply(index, [](std::vector<unsigned int>& indices, std::vector<float>& weights,
+      size_t elidx) {
+        indices.erase(indices.begin() + elidx);
+        weights.erase(weights.begin() + elidx);
+      });
+
+      m_relations.erase(m_relations.begin() + index);
+    }
+
+    /** Set a new weight for the given relation. */
+    void setWeight(int index, float weight)
+    {
+      apply(index, [weight](std::vector<unsigned int>&, std::vector<float>& weights, size_t elidx) {
+        weights[elidx] = weight;
+      });
+
+      m_relations[index].weight = weight;
+    }
 
     /** Return iterator to first entry. */
     iterator begin() { return iterator(this, 0); }

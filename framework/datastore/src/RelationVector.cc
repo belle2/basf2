@@ -49,34 +49,12 @@ void RelationVectorBase::apply(int index,
   B2FATAL("RelationVectorBase and DataStore differ!??");
 }
 
-/** Remove relation at given index. (Will decrease size() by one) */
-void RelationVectorBase::remove(int index)
-{
-  apply(index, [](std::vector<RelationElement::index_type>& indices, std::vector<RelationElement::weight_type>& weights,
-  size_t elidx) {
-    indices.erase(indices.begin() + elidx);
-    weights.erase(weights.begin() + elidx);
-  });
-
-  m_relations.erase(m_relations.begin() + index);
-}
-
-/** Set a new weight for the given relation. */
-void RelationVectorBase::setWeight(int index, float weight)
-{
-  apply(index, [weight](std::vector<RelationElement::index_type>&, std::vector<RelationElement::weight_type>& weights, size_t elidx) {
-    weights[elidx] = weight;
-  });
-
-  m_relations[index].weight = weight;
-}
-
 void RelationVectorBase::add(const RelationVectorBase& other)
 {
   if (other.m_name != m_name or other.m_index != m_index)
     B2FATAL("Trying to add RelationVectorBase for " << m_name << m_index << " and " << other.m_name << other.m_index << "!");
 
   m_relations.insert(m_relations.end(), other.m_relations.begin(), other.m_relations.end());
-  if (other.size() != 0)
+  if (other.m_relations.size() != 0)
     m_relationNames.insert(m_relationNames.end(), other.m_relationNames.begin(), other.m_relationNames.end());
 }

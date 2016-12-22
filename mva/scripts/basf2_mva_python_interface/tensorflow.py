@@ -5,12 +5,15 @@
 
 import numpy as np
 import tensorflow as tf
+import os
+import tempfile
 
 
 class State(object):
     """
     Tensorflow state
     """
+
     def __init__(self, x=None, y=None, activation=None, cost=None, optimizer=None, session=None):
         """ Constructor of the state object """
         #: feature matrix placeholder
@@ -50,7 +53,7 @@ def feature_importance(state):
     return []
 
 
-def get_model(number_of_features, number_of_events, parameters):
+def get_model(number_of_features, number_of_events, training_fraction, parameters):
     """
     Return default tensorflow model
     """
@@ -60,9 +63,10 @@ def get_model(number_of_features, number_of_events, parameters):
     b = tf.Variable(tf.zeros([1]))
     activation = tf.nn.softmax(tf.matmul(x, W) + b)
 
-    cost = tf.reduce_mean(-tf.reduce_sum(y * tf.log(activation), reduction_indices=1))
+    cost = tf.reduce_mean(-tf.reduce_sum(y * tf.log(activation + 0.0000001), reduction_indices=1))
 
     learning_rate = parameters.get('learning_rate', 0.1)
+    learning_rate = 0.1
     optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
 
     init = tf.initialize_all_variables()
@@ -76,8 +80,14 @@ def load(obj):
     Load Tensorflow estimator into state
     """
     session = tf.Session()
-    saver = tf.import_meta_graph(obj)
-    saver.restore(session, obj)
+    saver = tf.train.import_meta_graph(obj[0])
+    with tempfile.TemporaryDirectory() as path:
+        with open(os.path.join(path, obj[1] + '.data-00000-of-00001'), 'w+b') as file1, open(
+                os.path.join(path, obj[1] + '.index'), 'w+b') as file2:
+            file1.write(bytes(obj[2]))
+            file2.write(bytes(obj[3]))
+        tf.train.update_checkpoint_state(path, obj[1])
+        saver.restore(session, os.path.join(path, obj[1]))
     state = State(session=session)
     state.get_from_collection()
     return state
@@ -87,8 +97,15 @@ def apply(state, X):
     """
     Apply estimator to passed data.
     """
-    result = state.session.run(state.activation, feed_dict={state.x: X})
-    return result
+    number_events = np.shape(X)[0]
+    print(number_events)
+    cycle_size = 500
+    num_cycles = number_events // cycle_size
+    array = np.empty((number_events, 1))
+    for i in range(num_cycles):
+        start, end = i * cycle_size, (i + 1) * cycle_size
+        array[start:end] = state.session.run(state.activation, feed_dict={state.x: X[start:end]})
+    return array
 
 
 def begin_fit(state):
@@ -115,5 +132,5 @@ def end_fit(state):
     state.add_to_collection()
     graph = tf.get_default_graph()
     saver = tf.train.Saver()
-    meta_graph = tf.export_meta_graph(graph_def=graph.as_graph_def(), saver_def=saver.as_saver_def())
+    meta_graph = tf.train.export_meta_graph(graph_def=graph.as_graph_def(), saver_def=saver.as_saver_def())
     return meta_graph

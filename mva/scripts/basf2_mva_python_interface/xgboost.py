@@ -24,7 +24,7 @@ class State(object):
         self.estimator = None
 
 
-def get_model(number_of_features, number_of_events, parameters):
+def get_model(number_of_features, number_of_events, training_fraction, parameters):
     """
     Return default xgboost model
     """

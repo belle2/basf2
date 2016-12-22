@@ -237,7 +237,7 @@ AxialTrackCreatorHitLegendre::getDefaultFineRelaxationSchedule() const
     {"maxCurv", 1.0 * m_curlCurv},
     {"curvResolution", std::string("origin")},
     {"nRoadSearches", 1},
-    {"roadLevel", 4 - m_param_sectorLevelSkip},
+    {"roadLevel", 3 - m_param_sectorLevelSkip},
   });
 
   result.push_back(ParameterVariantMap{
@@ -246,7 +246,7 @@ AxialTrackCreatorHitLegendre::getDefaultFineRelaxationSchedule() const
     {"maxCurv", 2.0 * m_curlCurv},
     {"curvResolution", std::string("origin")},
     {"nRoadSearches", 1},
-    {"roadLevel", 4 - m_param_sectorLevelSkip},
+    {"roadLevel", 3 - m_param_sectorLevelSkip},
   });
 
   for (double minWeight = 50.0; minWeight > 10.0; minWeight *= 0.75) {
@@ -256,7 +256,7 @@ AxialTrackCreatorHitLegendre::getDefaultFineRelaxationSchedule() const
       {"maxCurv", 0.07},
       {"curvResolution", std::string("origin")},
       {"nRoadSearches", 1},
-      {"roadLevel", 4 - m_param_sectorLevelSkip},
+      {"roadLevel", 3 - m_param_sectorLevelSkip},
     });
   }
 
@@ -267,7 +267,7 @@ AxialTrackCreatorHitLegendre::getDefaultFineRelaxationSchedule() const
     {"maxCurv", 1.0 * m_curlCurv},
     {"curvResolution", std::string("nonOrigin")},
     {"nRoadSearches", 2},
-    {"roadLevel", 4 - m_param_sectorLevelSkip},
+    {"roadLevel", 3 - m_param_sectorLevelSkip},
   });
 
   result.push_back(ParameterVariantMap{
@@ -276,7 +276,7 @@ AxialTrackCreatorHitLegendre::getDefaultFineRelaxationSchedule() const
     {"maxCurv", 2.0 * m_curlCurv},
     {"curvResolution", std::string("nonOrigin")},
     {"nRoadSearches", 2},
-    {"roadLevel", 4 - m_param_sectorLevelSkip},
+    {"roadLevel", 3 - m_param_sectorLevelSkip},
   });
 
   result.push_back(ParameterVariantMap{
@@ -285,7 +285,7 @@ AxialTrackCreatorHitLegendre::getDefaultFineRelaxationSchedule() const
     {"maxCurv", 0.07},
     {"curvResolution", std::string("nonOrigin")},
     {"nRoadSearches", 2},
-    {"roadLevel", 4 - m_param_sectorLevelSkip},
+    {"roadLevel", 3 - m_param_sectorLevelSkip},
   });
 
   for (double minWeight = 37.5; minWeight > 10.0; minWeight *= 0.75) {
@@ -295,7 +295,7 @@ AxialTrackCreatorHitLegendre::getDefaultFineRelaxationSchedule() const
       {"maxCurv",  m_maxCurvAcceptance},
       {"curvResolution", std::string("nonOrigin")},
       {"nRoadSearches", 2},
-      {"roadLevel", 4 - m_param_sectorLevelSkip},
+      {"roadLevel", 3 - m_param_sectorLevelSkip},
     });
   }
 

@@ -2,11 +2,6 @@
 <ErrorMessageDiagnosis>
     <Error>
         <Type>COPPER_ROPC</Type>
-        <Message>Failed to bind.(Address already in use) Maybe other programs have already occupied this port</Message>
-        <Diagnosis>DAQ process maybe in the prev. run remains on COPPER, abort and try again. If the same error occurs, contact with DAQ(copper/ROPC) experts.</Diagnosis>
-    </Error>
-    <Error>
-        <Type>COPPER_ROPC</Type>
         <Message>[FATAL] CORRUPTED DATA: No COPPER blocks in RawDataBlock.</Message>
         <Diagnosis>I have no idea. Abort and try again. If the same error occurs, contact with DAQ(copper/ROPC) experts.</Diagnosis>
     </Error>
@@ -89,5 +84,10 @@
         <Type>COPPER_ROPC</Type>
         <Message>[FATAL] CORRUPTED DATA: Estimations of reduced event size are inconsistent.</Message>
         <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
+    </Error>
+    <Error>
+        <Type>COPPER_ROPC</Type>
+        <Message>Failed to bind.(Address already in use) Maybe other programs have already occupied this port</Message>
+        <Diagnosis>DAQ process maybe in the prev. run remains on COPPER, abort and try again. If the same error occurs, contact with DAQ(SLC) experts.</Diagnosis>
     </Error>
 </ErrorMessageDiagnosis>

@@ -11,15 +11,15 @@
 #ifndef BKLMDIGIT_H
 #define BKLMDIGIT_H
 
-#include <framework/datastore/RelationsObject.h>
+//#include <framework/datastore/RelationsObject.h>
+#include <framework/dataobjects/DigitBase.h>
 #include <bklm/dataobjects/BKLMStatus.h>
 
 namespace Belle2 {
-
   class BKLMSimHit;
 
   //! Store one BKLM strip hit as a ROOT object
-  class BKLMDigit : public RelationsObject {
+  class BKLMDigit : public DigitBase {
 
   public:
 
@@ -48,6 +48,19 @@ namespace Belle2 {
 
     //! Destructor
     virtual ~BKLMDigit() {}
+
+
+
+    //! Get unique channel identifier.
+    //!@return unique channel id
+    unsigned int getUniqueChannelID() const;
+
+
+
+    //! The pile-up method.
+    //! @return if the bg digit should be appended
+    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg);
+
 
     //! Determine whether hit is in RPC or scintillator
     //! @return whether hit is in RPC (true) or scintillator (false)

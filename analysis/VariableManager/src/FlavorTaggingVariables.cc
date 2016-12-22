@@ -703,34 +703,36 @@ namespace Belle2 {
           {
             const auto& tracks = roe->getTracks();
             for (auto& x : tracks) {
-              const TrackFitResult* tracki = x->getTrackFitResult(x->getRelated<PIDLikelihood>()->getMostLikely());
-              if (tracki == nullptr || particle->getTrack() == x) continue;
-              TLorentzVector momtrack(tracki->getMomentum(), 0);
-              TLorentzVector momXchargedtracki = T.rotateLabToCms() * momtrack;
-              if (momXchargedtracki == momXchargedtracki) momXchargedtracks += momXchargedtracki;
+              const TrackFitResult* iTrack = x->getTrackFitResult(x->getRelated<PIDLikelihood>()->getMostLikely());
+              if (iTrack == nullptr) continue;
+              TLorentzVector momtrack(iTrack->getMomentum(), 0);
+              if (momtrack == momtrack) momXchargedtracks += momtrack;
             }
             const auto& ecl = roe->getECLClusters();
             for (auto& x : ecl) {
               if (x == nullptr) continue;
-              TLorentzVector momXclusteri = T.rotateLabToCms() * x -> get4Vector();
-              if (momXclusteri == momXclusteri) {
-                if (x->isNeutral()) momXneutralclusters += momXclusteri;
-                else if (!(x->isNeutral())) momXchargedclusters += momXclusteri;
+              TLorentzVector iMomECLCluster = x -> get4Vector();
+              if (iMomECLCluster == iMomECLCluster) {
+                if (x->isNeutral()) momXneutralclusters += iMomECLCluster;
+                else if (!(x->isNeutral())) {
+                  if (x -> getRelated<Track>() != particle->getRelated<Track>()) momXchargedclusters += iMomECLCluster;
+                }
               }
             }
             const auto& klm = roe->getKLMClusters();
             for (auto& x : klm) {
               if (x == nullptr) continue;
-              TLorentzVector momXKLMclusteri = T.rotateLabToCms() * x -> getMomentum();
-              if (momXKLMclusteri == momXKLMclusteri) {
+              TLorentzVector iMomKLMCluster = x -> getMomentum();
+              if (iMomKLMCluster == iMomKLMCluster) {
                 if (!(x -> getAssociatedTrackFlag()) && !(x -> getAssociatedEclClusterFlag())) {
-                  momXneutralclusters += momXKLMclusteri;
+                  momXneutralclusters += iMomKLMCluster;
                 }
               }
             }
 
             TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
-            TLorentzVector momX = (momXcharged + momXneutralclusters) - momTarget; //Total Momentum of the recoiling X in CMS-System
+            TLorentzVector momX = T.rotateLabToCms() * (momXcharged + momXneutralclusters) -
+                                  momTarget; //Total Momentum of the recoiling X in CMS-System
             TLorentzVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
             if (requestedVariable == "recoilMass") Output = momX.M();
             else if (requestedVariable == "pMissCMS") Output = momMiss.Vect().Mag();
@@ -738,11 +740,11 @@ namespace Belle2 {
             else if (requestedVariable == "EW90") {
               TLorentzVector momW = momTarget + momMiss; //Momentum of the W-Boson in CMS
               float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
-              for (auto& i : ecl) {
-                if (i == nullptr) continue;
-                float Energyi = i -> getEnergy();
-                if (Energyi == Energyi) {
-                  if ((T.rotateLabToCms() * i -> get4Vector()).Vect().Dot(momW.Vect()) > 0) E_W_90 += Energyi;
+              for (auto& x : ecl) {
+                if (x == nullptr) continue;
+                float iEnergy = x -> getEnergy();
+                if (iEnergy == iEnergy) {
+                  if ((T.rotateLabToCms() * x -> get4Vector()).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
                 }
                 //       for (auto & i : klm) {
                 //         if ((T.rotateLabToCms() * i -> getMomentum()).Vect().Dot(momW.Vect()) > 0) E_W_90 +=;

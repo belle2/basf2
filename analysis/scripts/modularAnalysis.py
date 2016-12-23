@@ -14,6 +14,41 @@ from vertex import *
 from analysisPath import *
 
 
+def setAnalysisConfigParams(configParametersAndValues, path=analysis_main):
+    """
+    Sets analysis configuration parameters.
+
+    These are:
+
+    - 'tupleStyle': 'Default' (default) or 'Laconic'
+      o) defines the style of the branch name in the ntuple
+
+    - 'mcMatchingVersion': 'BelleII' (default), 'MC5' and 'Belle'
+      o) Specifies what version of mc matching algorithm is going to be used
+         Use 'MC5' for analysis of BelleII MC5, 'Belle' for analaysis of Belle MC and 'BelleII' for the rest.
+
+    @param configParametersAndValues dictionary of parameters and their values of the form {param1: value, param2: value, ...)
+    @param modules are added to this path
+    """
+
+    conf = register_module('AnalysisConfiguration')
+
+    allParameters = ['tupleStyle', 'mcMatchingVersion']
+
+    keys = configParametersAndValues.keys()
+    for key in keys:
+        if key not in allParameters:
+            allParametersString = ', '.join(allParameters)
+            B2ERROR('Invalid analysis configuration parameter: ' + key + '.\n'
+                    'Please use one of the following: ' + allParametersString)
+
+    for param in allParameters:
+        if param in configParametersAndValues:
+            conf.param(param, configParametersAndValues.get(param))
+
+    path.add_module(conf)
+
+
 def inputMdst(environmentType, filename, path=analysis_main):
     """
     Loads the specified ROOT (DST/mDST/muDST) file with the RootInput module.
@@ -79,6 +114,12 @@ def inputMdstList(environmentType, filelist, path=analysis_main):
 
         environments += 'None.'
         B2FATAL('Incorrect environment type provided: ' + environmentType + '! Please use one of the following: ' + environments)
+
+    # set the correct MCMatching algorithm for MC5 and Belle MC
+    if environmentType is 'Belle':
+        setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
+    if environmentType is 'MC5':
+        setAnalysisConfigParams({'mcMatchingVersion': 'MC5'}, path)
 
 
 def outputMdst(filename, path=analysis_main):

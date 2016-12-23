@@ -3,6 +3,7 @@
 
 from basf2 import *
 from modularAnalysis import analysis_main
+from modularAnalysis import setAnalysisConfigParams
 import os
 import re
 import requests
@@ -56,6 +57,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True, pa
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
     """
+
+    setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
 
     input = register_module('B2BIIMdstInput')
     if inputBelleMDSTFile is not None:

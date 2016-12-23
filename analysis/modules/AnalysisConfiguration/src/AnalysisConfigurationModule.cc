@@ -26,9 +26,23 @@ AnalysisConfigurationModule::AnalysisConfigurationModule() : Module()
   Possible styles on example of PX variable of pi0 from D in decay B->(D->pi0 pi) pi0:\n
   'Default': B_D_pi0_PX\n
   'Laconic': pi01_PX)DOCSTRING", std::string("Default"));
+
+  addParam("mcMatchingVersion", m_mcMatchingVersion, "Specifies what version of mc matching algorithm is going to be used. \n"
+           "Possibilities are: BelleII (default) and Belle. The latter should be used when analysing Belle MC.\n"
+           "The difference between the algorithms is only in the treatment (identification) of FSR photons. In Belle II MC \n"
+           "it is possible to identify FSR photons via special flag set by the generator, while in case of Belle MC such\n"
+           "information is not available.", std::string("BelleII"));
 }
 
 void AnalysisConfigurationModule::initialize()
 {
   AnalysisConfiguration::instance()->setTupleStyle(m_tupleStyle);
+
+  if (m_mcMatchingVersion == "BelleII")
+    AnalysisConfiguration::instance()->useLegacyMCMatching(false);
+  else if (m_mcMatchingVersion == "Belle" or m_mcMatchingVersion == "MC5")
+    AnalysisConfiguration::instance()->useLegacyMCMatching(true);
+  else
+    B2ERROR("Invalid mcMatchingVersion specified to AnalysisConfiguration: " << m_mcMatchingVersion << "\n"
+            "Please choose between BelleII or Belle depending whether you are analysing Belle II or Belle MC.");
 }

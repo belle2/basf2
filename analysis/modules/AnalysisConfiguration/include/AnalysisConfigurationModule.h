@@ -46,6 +46,7 @@ namespace Belle2 {
                               'Laconic': pi01_PX"
                               */
 
+    std::string m_mcMatchingVersion; /**< specifies the version of MC matching algorithm to be used */
   };
 
 } // Belle2 namespace

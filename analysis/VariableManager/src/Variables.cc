@@ -779,6 +779,20 @@ namespace Belle2 {
       return m_pdg;
     }
 
+    double genMotherP(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      const MCParticle* mcmother = mcparticle->getMother();
+      if (mcmother == nullptr)
+        return 0.0;
+
+      double p = mcmother->getMomentum().Mag();
+      return p;
+    }
+
     double genMotherIndex(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
@@ -1704,6 +1718,8 @@ namespace Belle2 {
                       "Check the PDG code of a particles MC mother particle");
     REGISTER_VARIABLE("genMotherID", genMotherIndex,
                       "Check the array index of a particle's generated mother");
+    REGISTER_VARIABLE("genMotherP", genMotherP,
+                      "Generated momentum of a particles MC mother particle");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,
                       "Check the array index of a particle's related MCParticle");
     REGISTER_VARIABLE("isSignalAcceptMissingNeutrino",

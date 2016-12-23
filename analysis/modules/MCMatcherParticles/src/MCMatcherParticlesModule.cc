@@ -19,6 +19,7 @@
 
 // utility
 #include <analysis/utility/MCMatching.h>
+#include <analysis/utility/AnalysisConfiguration.h>
 
 using namespace std;
 
@@ -51,6 +52,13 @@ namespace Belle2 {
     mcparticles.isRequired();
     particles.registerRelationTo(mcparticles);
     m_plist.isRequired(m_listName);
+
+    bool legacyAlgorithm = AnalysisConfiguration::instance()->useLegacyMCMatching();
+    B2INFO("MCMatcher module will search for Particle -> MCParticle associations for the ParticleList " << m_listName << ".");
+    if (legacyAlgorithm)
+      B2INFO(" - The MCMatcher will use legacy algorithm suitable for analysis of Belle MC or Belle II MC5.");
+    else
+      B2INFO("  - The MCMatcher will use default algorithm suitable for analysis of Belle II MC (for MC5 use legacy algorithm).");
   }
 
 

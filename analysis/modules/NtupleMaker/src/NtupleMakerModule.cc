@@ -11,6 +11,7 @@
 #include <analysis/modules/NtupleMaker/NtupleMakerModule.h>
 #include <analysis/NtupleTools/NtupleToolList.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/utility/AnalysisConfiguration.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -39,7 +40,9 @@ NtupleMakerModule::NtupleMakerModule() : Module()
   addParam("fileName", m_fileName, "Name of ROOT file for output", string(""));
   addParam("treeName", m_treeName, "Name of TTree to be filled.", string(""));
   addParam("comment", m_comment, "Comment about the content of the TTree.", string(""));
-  addParam("tools", m_toolNames, "List of tools and decay descriptors. Available tools are described in https://belle2.cc.kek.jp/~twiki/bin/view/Physics/NtupleTool", vector<string>());
+  addParam("tools", m_toolNames,
+           "List of tools and decay descriptors. Available tools are described in https://belle2.cc.kek.jp/~twiki/bin/view/Physics/NtupleTool",
+           vector<string>());
   addParam("listName", m_listName, "Name of particle list with reconstructed particles.", string(""));
 }
 
@@ -70,7 +73,8 @@ void NtupleMakerModule::initialize()
   m_tree = new TTree(m_treeName.c_str(), m_comment.c_str());
   m_nTrees++;
 
-  B2INFO("NtupleMaker: Creating tree with name " << m_treeName << " for the ParticleList " << m_listName << " filled with the following tools:");
+  B2INFO("NtupleMaker: Creating tree with name " << m_treeName << " for the ParticleList " << m_listName <<
+         " filled with the following tools:");
   int nTools = m_toolNames.size();
   for (int iTool =  0; iTool < (nTools - 1); iTool = iTool + 2) {
     // Create decay descriptors with selected particles from string
@@ -83,6 +87,8 @@ void NtupleMakerModule::initialize()
     NtupleFlatTool* ntool = NtupleToolList::create(m_toolNames[iTool], m_tree, m_decaydescriptors.back());
     if (ntool) m_tools.push_back(ntool);
   }
+  B2INFO(" The branch name style is going to be: " + AnalysisConfiguration::instance()->getTupleStyle());
+
 
   // Add by default 2 Branches to each tree
   // number of candidates in the event

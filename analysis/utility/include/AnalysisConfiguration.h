@@ -51,6 +51,7 @@ namespace Belle2 {
    */
   {
     string m_tupleStyle;
+    bool m_legacyMCMatching; /**< specifies the version of MC matching algorithm to be used */
 
     static AnalysisConfiguration* s_instance;
 
@@ -59,6 +60,7 @@ namespace Belle2 {
     {
       //Setting default value
       m_tupleStyle = "Default";
+      m_legacyMCMatching = false;
     }
   public:
 
@@ -74,6 +76,22 @@ namespace Belle2 {
     {
       //B2INFO("Setting style '"<<v<<"'");
       m_tupleStyle = v;
+    }
+
+    /**
+     * Determines wheter to use the legacy MCMatching algorithm (true) or not (false).
+     */
+    void useLegacyMCMatching(const bool flag)
+    {
+      m_legacyMCMatching = flag;
+    }
+
+    /**
+     * Specifies whether to use the legacy MCMatching algorithm (true) or not (false).
+     */
+    bool useLegacyMCMatching() const
+    {
+      return m_legacyMCMatching;
     }
 
     static AnalysisConfiguration* instance()

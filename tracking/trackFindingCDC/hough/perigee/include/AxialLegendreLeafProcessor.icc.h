@@ -16,6 +16,7 @@
 #include <tracking/trackFindingCDC/hough/perigee/StereoHitContained.h>
 #include <tracking/trackFindingCDC/hough/perigee/OffOrigin.h>
 #include <tracking/trackFindingCDC/hough/algorithms/InPhi0CurvBox.h>
+#include <tracking/trackFindingCDC/hough/algorithms/InPhi0ImpactCurvBox.h>
 #include <tracking/trackFindingCDC/hough/baseelements/WithSharedMark.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
@@ -167,24 +168,26 @@ namespace Belle2 {
       const float curv = circle.curvature();
       const float phi0 = circle.phi0();
 
-      StereoHitContained<OffOrigin<InPhi0CurvBox> > hitInPhi0CurvBox(m_param_curlCurv);
-      using HoughBox = StereoHitContained<OffOrigin<InPhi0CurvBox> >::HoughBox;
+      StereoHitContained<OffOrigin<InPhi0ImpactCurvBox> > hitInPhi0CurvBox(m_param_curlCurv);
+      using HoughBox = StereoHitContained<OffOrigin<InPhi0ImpactCurvBox> >::HoughBox;
       hitInPhi0CurvBox.setLocalOrigin(support);
 
       // Determine a precision that we expect to achieve at the fitted momentum
+      // There certainly is some optimizsation potential here.
+      // Spread in the impact parameter is made available here but is not activated yet.
       const float levelPrecision = 9.0;
+      // Earlier version
+      // const float levelPrecision = 10.5 - 0.24 * exp(-4.13118 * BasePrecisionFunction::convertRhoToPt(curv) + 2.74);
       const float phi0Precision = 3.1415 / std::pow(2.0, levelPrecision + 1.0);
+      const float impactPrecision = 0.0 * std::sqrt(CDCWireHit::c_simpleDriftLengthVariance);
       const float curvPrecision = 0.15 / std::pow(2.0, levelPrecision);
 
-      // Earlier version
-      // BasePrecisionFunction funct;
-      // float levelPrecision = 10.5 - 0.24 * exp(-4.13118 * funct.convertRhoToPt(curv) + 2.74);
-      // float curvPrecision = 0.15 / (pow(2., levelPrecision));
-      // float phi0Precision = M_PI / (pow(2., levelPrecision + 1));
-
       DiscreteCurv::Array curvBounds{{curv - curvPrecision, curv + curvPrecision}};
+      ContinuousImpact::Array impactBounds{{ -impactPrecision, impactPrecision}};
       DiscretePhi0::Array phi0Bounds{{Vector2D::Phi(phi0 - phi0Precision), Vector2D::Phi(phi0 + phi0Precision)}};
-      HoughBox precisionPhi0CurvBox(DiscretePhi0::getRange(phi0Bounds), DiscreteCurv::getRange(curvBounds));
+      HoughBox precisionPhi0CurvBox(DiscretePhi0::getRange(phi0Bounds),
+                                    ContinuousImpact::getRange(impactBounds),
+                                    DiscreteCurv::getRange(curvBounds));
 
       // HoughBox precisionPhi0CurvBox = *leaf;
       std::vector<WithSharedMark<CDCRLWireHit>> hitsInPrecisionBox;

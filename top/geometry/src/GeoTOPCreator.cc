@@ -180,13 +180,12 @@ namespace Belle2 {
         new G4PVPlacement(T, module, name, &topVolume, false, moduleID);
       }
 
-      int n = 0;
-      for (const auto& module : geo.getModules()) {
-        n += module.getPMTArray().getDecoupledPMTs().size();
-      }
-      B2INFO("GeoTOPCreator, number of optically decoupled PMT's: " << n);
-      if (n > 0) B2WARNING("GeoTOPCreator, some of PMT's are optically decoupled");
-
+      if (m_numDecoupledPMTs > 0) B2WARNING("GeoTOPCreator, " << m_numDecoupledPMTs
+                                              << " PMT's are optically decoupled");
+      if (m_numBrokenGlues > 0) B2WARNING("GeoTOPCreator, " << m_numBrokenGlues
+                                            << " broken glues");
+      if (m_numPeelOffRegions > 0) B2WARNING("GeoTOPCreator, " << m_numPeelOffRegions
+                                               << " peel-off cookie regions");
     }
 
 
@@ -606,20 +605,21 @@ namespace Belle2 {
       G4ThreeVector move;
       G4RotationMatrix rot;
 
-      auto* prism = createPrism(geo.getPrism());
+      auto* prism = createPrism(geo.getPrism(), geo.getModuleID());
       move.setZ(0);
       rot.rotateY(M_PI / 2);
       optics->AddPlacedVolume(prism, move, &rot);
 
-      auto* barSegment2 = createBarSegment(geo.getBarSegment2());
+      auto* barSegment2 = createBarSegment(geo.getBarSegment2(), geo.getModuleID());
       move.setZ(L2 / 2);
       optics->AddPlacedVolume(barSegment2, move, 0);
 
-      auto* barSegment1 = createBarSegment(geo.getBarSegment1());
+      auto* barSegment1 = createBarSegment(geo.getBarSegment1(), geo.getModuleID());
       move.setZ(L2 + L1 / 2);
       optics->AddPlacedVolume(barSegment1, move, 0);
 
-      auto* mirrorSegment = createMirrorSegment(geo.getMirrorSegment());
+      auto* mirrorSegment = createMirrorSegment(geo.getMirrorSegment(),
+                                                geo.getModuleID());
       move.setZ(L2 + L1 + Lm / 2);
       optics->AddPlacedVolume(mirrorSegment, move, 0);
 
@@ -627,7 +627,8 @@ namespace Belle2 {
     }
 
 
-    G4LogicalVolume* GeoTOPCreator::createBarSegment(const TOPGeoBarSegment& geo)
+    G4LogicalVolume* GeoTOPCreator::createBarSegment(const TOPGeoBarSegment& geo,
+                                                     int moduleID)
     {
       G4Transform3D move;
 
@@ -639,6 +640,17 @@ namespace Belle2 {
       auto* glue = createBox(geo.getName() + "Glue",
                              geo.getWidth(), geo.getThickness(), geo.getGlueThickness(),
                              geo.getGlueMaterial());
+      if (geo.getBrokenGlueFraction() > 0) {
+        auto* brokenGlue = createExtrudedSolid(geo.getName() + "BrokenGlue",
+                                               geo.getBrokenGlueContour(),
+                                               geo.getGlueThickness(),
+                                               geo.getBrokenGlueMaterial());
+        G4Transform3D move;
+        new G4PVPlacement(move, brokenGlue, geo.getName() + "BrokenGlue", glue, false, 1);
+        B2RESULT("GeoTOPCreator, broken glue at " << geo.getName()
+                 << addNumber(" of Slot", moduleID));
+        m_numBrokenGlues++;
+      }
 
       // place glue to -z side
       move = G4TranslateZ3D(-(geo.getFullLength() - geo.getGlueThickness()) / 2);
@@ -657,7 +669,8 @@ namespace Belle2 {
     }
 
 
-    G4LogicalVolume* GeoTOPCreator::createMirrorSegment(const TOPGeoMirrorSegment& geo)
+    G4LogicalVolume* GeoTOPCreator::createMirrorSegment(const TOPGeoMirrorSegment& geo,
+                                                        int moduleID)
     {
       G4Transform3D move;
 
@@ -677,6 +690,17 @@ namespace Belle2 {
       auto* glue = createBox(geo.getName() + "Glue",
                              geo.getWidth(), geo.getThickness(), geo.getGlueThickness(),
                              geo.getGlueMaterial());
+      if (geo.getBrokenGlueFraction() > 0) {
+        auto* brokenGlue = createExtrudedSolid(geo.getName() + "BrokenGlue",
+                                               geo.getBrokenGlueContour(),
+                                               geo.getGlueThickness(),
+                                               geo.getBrokenGlueMaterial());
+        G4Transform3D move;
+        new G4PVPlacement(move, brokenGlue, geo.getName() + "BrokenGlue", glue, false, 1);
+        B2RESULT("GeoTOPCreator, broken glue at " << geo.getName()
+                 << addNumber(" of Slot", moduleID));
+        m_numBrokenGlues++;
+      }
 
       // place glue to -z side
       move = G4TranslateZ3D(-(geo.getFullLength() - geo.getGlueThickness()) / 2);
@@ -710,7 +734,8 @@ namespace Belle2 {
     }
 
 
-    G4LogicalVolume* GeoTOPCreator::createPrism(const TOPGeoPrism& geo)
+    G4LogicalVolume* GeoTOPCreator::createPrism(const TOPGeoPrism& geo, int moduleID)
+
     {
       G4Transform3D move;
 
@@ -732,9 +757,32 @@ namespace Belle2 {
 
       // wavelenght filter
       auto* filter = createBox(geo.getName() + "Filter",
-                               geo.getFilterThickness(), geo.getExitThickness(),
+                               geo.getFilterThickness(),
+                               geo.getExitThickness(),
                                geo.getWidth(),
                                geo.getFilterMaterial());
+      // place peel-off regions (if any) into filter
+      int numRegions = 0;
+      std::string message = addNumber("peel-off cookie regions of Slot", moduleID) + ":";
+      for (const auto& region : geo.getPeelOffRegions()) {
+        if (region.fraction <= 0) continue;
+        std::string name = addNumber(geo.getName() + "PeelOff", region.ID);
+        double thickness = geo.getPeelOffThickness();
+        auto* peelOff = createExtrudedSolid(name,
+                                            geo.getPeelOffContour(region),
+                                            thickness,
+                                            geo.getPeelOffMaterial());
+        G4Transform3D T = G4Translate3D((geo.getFilterThickness() - thickness) / 2,
+                                        0,
+                                        geo.getPeelOffCenter(region));
+        G4Transform3D R = G4RotateY3D(-M_PI / 2);
+        G4Transform3D move = T * R;
+        new G4PVPlacement(move, peelOff, name, filter, false, 1);
+        message += addNumber(" ", region.ID);
+        numRegions++;
+      }
+      if (numRegions > 0) B2RESULT("GeoTOPCreator, " << message);
+      m_numPeelOffRegions += numRegions;
 
       // place filter to +x side
       move = G4Translate3D(geo.getFullLength() - geo.getFilterThickness() / 2,
@@ -777,6 +825,7 @@ namespace Belle2 {
           if (geo.isPMTDecoupled(id)) {
             z = -halfGap;
             message += addNumber(" ", id);
+            m_numDecoupledPMTs++;
           }
           G4Transform3D move = G4Translate3D(geo.getX(col), geo.getY(row), z);
           new G4PVPlacement(move, pmt, addNumber(geo.getPMT().getName(), id), pmtArray,

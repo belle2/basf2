@@ -164,23 +164,26 @@ namespace Belle2 {
       /**
        * Creates quartz bar segment
        * @param geo geometry description
+       * @param moduleID module ID (e.g. slot number)
        * @return logical volume of bar segment
        */
-      G4LogicalVolume* createBarSegment(const TOPGeoBarSegment& geo);
+      G4LogicalVolume* createBarSegment(const TOPGeoBarSegment& geo, int moduleID);
 
       /**
        * Creates quartz prism
        * @param geo geometry description
+       * @param moduleID module ID (e.g. slot number)
        * @return logical volume of prism
        */
-      G4LogicalVolume* createPrism(const TOPGeoPrism& geo);
+      G4LogicalVolume* createPrism(const TOPGeoPrism& geo, int moduleID);
 
       /**
        * Creates quartz segment with spherical mirror
        * @param geo geometry description
+       * @param moduleID module ID (e.g. slot number)
        * @return logical volume of mirror segment
        */
-      G4LogicalVolume* createMirrorSegment(const TOPGeoMirrorSegment& geo);
+      G4LogicalVolume* createMirrorSegment(const TOPGeoMirrorSegment& geo, int moduleID);
 
       /**
        * Creates PMT array
@@ -260,6 +263,10 @@ namespace Belle2 {
       G4UnionSolid* m_moduleEnvelope = 0; /**< module envelope solid */
       G4AssemblyVolume* m_qbb = 0; /**< QBB assembly volume */
       G4AssemblyVolume* m_frontEnd = 0; /**< front-end electronics assembly volume */
+
+      int m_numDecoupledPMTs = 0;  /**< number of optically decoupled PMT's */
+      int m_numBrokenGlues = 0;    /**< number of broken glues */
+      int m_numPeelOffRegions = 0; /**< number of peel-off regions */
 
     };
 

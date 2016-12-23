@@ -612,6 +612,36 @@
     </Components>        
   </Material> 
 
-
+  <Material name="TOPBrokenGlue"> 
+    <state>Gas</state>
+    <density unit="g/cm3">1.22e-3</density> 
+    <Components>   
+      <Element fraction="0.78">N</Element> 
+      <Element fraction="0.21">O</Element>  
+      <Element fraction="0.01">Ar</Element>       
+    </Components>        
+    <Property name="RINDEX" unit="eV"> 
+      <value energy="1.0">1.000274</value>
+      <value energy="2.0">1.000277</value>
+      <value energy="3.0">1.000282</value>
+      <value energy="4.0">1.000290</value>         
+    </Property> 
+  </Material> 
+    
+  <Material name="TOPPeelOffCookie"> 
+    <state>Gas</state>
+    <density unit="g/cm3">1.22e-3</density> 
+    <Components>   
+      <Element fraction="0.78">N</Element> 
+      <Element fraction="0.21">O</Element>  
+      <Element fraction="0.01">Ar</Element>       
+    </Components>        
+    <Property name="RINDEX" unit="eV"> 
+      <value energy="1.0">1.000274</value>
+      <value energy="2.0">1.000277</value>
+      <value energy="3.0">1.000282</value>
+      <value energy="4.0">1.000290</value>         
+    </Property> 
+  </Material> 
   
 </Materials> 

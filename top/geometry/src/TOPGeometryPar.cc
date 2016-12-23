@@ -73,8 +73,6 @@ namespace Belle2 {
         return;
       }
 
-      m_brokenFraction = content.getDouble("Bars/BrokenJointFraction", 0);
-
       m_valid = true;
     }
 

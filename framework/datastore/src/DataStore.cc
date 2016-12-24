@@ -463,7 +463,7 @@ const std::vector<std::string>& DataStore::getArrayNames(const std::string& arra
 }
 
 void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject,
-                            StoreEntry*& toEntry, int& toIndex, double weight)
+                            StoreEntry*& toEntry, int& toIndex, float weight)
 {
   if (!fromObject or !toObject)
     return;

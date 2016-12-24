@@ -132,7 +132,7 @@ namespace Belle2 {
      *  @param object  The object to which the relation should point.
      *  @param weight  The weight of the relation.
      */
-    void addRelationTo(const RelationsInterface<BASE>* object, double weight = 1.0) const
+    void addRelationTo(const RelationsInterface<BASE>* object, float weight = 1.0) const
     {
       if (object)
         DataStore::Instance().addRelation(this, m_cacheDataStoreEntry, m_cacheArrayIndex,
@@ -144,7 +144,7 @@ namespace Belle2 {
      *  @param object  The object to which the relation should point.
      *  @param weight  The weight of the relation.
      */
-    void addRelationTo(const TObject* object, double weight = 1.0) const
+    void addRelationTo(const TObject* object, float weight = 1.0) const
     {
       StoreEntry* toEntry = nullptr;
       int toIndex = -1;

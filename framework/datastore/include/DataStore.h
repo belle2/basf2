@@ -303,7 +303,7 @@ namespace Belle2 {
      *  @param weight         Weight of the relation.
      */
     void addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, StoreEntry*& toEntry,
-                     int& toIndex, double weight);
+                     int& toIndex, float weight);
 
 
     /** Get the relations between an object and other objects in a store array.
@@ -345,7 +345,7 @@ namespace Belle2 {
      *  @param toObject       Pointer to the object to which the relation points.
      *  @param weight         Weight of the relation.
      */
-    static void addRelationFromTo(const TObject* fromObject, const TObject* toObject, double weight = 1.0)
+    static void addRelationFromTo(const TObject* fromObject, const TObject* toObject, float weight = 1.0)
     {
       DataStore::StoreEntry* fromEntry = nullptr;
       int fromIndex = -1;

@@ -51,10 +51,10 @@ void RelationVectorBase::apply(int index,
 
 void RelationVectorBase::add(const RelationVectorBase& other)
 {
-  if (other.m_name != m_name or other.m_index != m_index)
+  if ((other.m_name != m_name) or (other.m_index != m_index))
     B2FATAL("Trying to add RelationVectorBase for " << m_name << m_index << " and " << other.m_name << other.m_index << "!");
 
   m_relations.insert(m_relations.end(), other.m_relations.begin(), other.m_relations.end());
-  if (other.m_relations.size() != 0)
+  if (!other.m_relations.empty())
     m_relationNames.insert(m_relationNames.end(), other.m_relationNames.begin(), other.m_relationNames.end());
 }

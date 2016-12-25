@@ -26,7 +26,7 @@ void fit(TH1D* h1){
 }
 
 void compare2Tracks(string name = "201607"){
-  SetBelle2Style();
+  //  SetBelle2Style();
   gStyle->SetOptFit(1111);
   string filename = name+"/output_*.root";
   const string output = "twotracks"+name+".eps";

@@ -28,10 +28,8 @@ void fit(TH1D* h1){
 void compare2Tracks(string name = "201607"){
   SetBelle2Style();
   gStyle->SetOptFit(1111);
-  //  string name = "201607";
   string filename = name+"/output_*.root";
   const string output = "twotracks"+name+".eps";
-  double DeltaPhi0 =0.15; //0.15deg
   TChain *tree = new TChain("tree");
   tree->Add(filename.c_str());
   cout<<"Open TChain: "<<filename.c_str()<<endl;
@@ -88,7 +86,12 @@ void compare2Tracks(string name = "201607"){
   TH2D*hdD0Z0 = new TH2D("hdD0Z0","#DeltaD0 vs Z0; Z0;#Delta d_0;",200,-40,100,100,-0.2,0.2);
   TH2D*hdZ0Z0 = new TH2D("hdZ0Z0","#DeltaZ0 vs Z0; Z0;#Delta z_0;",200,-40,100,100,-2,2);
 
-  double ndf, Phi0, tanLambda, D0,Z0, Pval, posSeedY;
+  double ndf;
+  double Phi0;
+  double tanLambda;
+  double D0;
+  double Z0;
+  double Pval;
   hNDF1->SetLineColor(kRed);
   hPval1->SetLineColor(kRed);
   hPhi01->SetLineColor(kRed);

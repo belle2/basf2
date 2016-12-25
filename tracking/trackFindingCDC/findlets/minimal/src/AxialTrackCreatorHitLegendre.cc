@@ -41,45 +41,42 @@ std::string AxialTrackCreatorHitLegendre::getDescription()
 void AxialTrackCreatorHitLegendre::exposeParameters(ModuleParamList* moduleParamList,
                                                     const std::string& prefix)
 {
-  moduleParamList->addParameter(prefixed(prefix, "granularityLevel"),
-                                m_param_granularityLevel,
-                                "Level of divisions in the hough space.",
-                                m_param_granularityLevel);
+  // Parameters for the fine hough space
+  moduleParamList->addParameter(prefixed(prefix, "fineGranularityLevel"),
+                                m_param_fineGranularityLevel,
+                                "Level of divisions in the fine hough space.",
+                                m_param_fineGranularityLevel);
 
-  moduleParamList->addParameter(prefixed(prefix, "sectorLevelSkip"),
-                                m_param_sectorLevelSkip,
-                                "Number of levels to be skipped on the first level to form sectors",
-                                m_param_sectorLevelSkip);
+  moduleParamList->addParameter(prefixed(prefix, "fineSectorLevelSkip"),
+                                m_param_fineSectorLevelSkip,
+                                "Number of levels to be skipped in the fine hough "
+                                "space on the first level to form sectors",
+                                m_param_fineSectorLevelSkip);
 
   moduleParamList->addParameter(prefixed(prefix, "fineCurvBounds"),
                                 m_param_fineCurvBounds,
                                 "Curvature bounds of the fine hough space. Either 2 or all discrete bounds",
                                 m_param_fineCurvBounds);
 
-  moduleParamList->addParameter(prefixed(prefix, "roughCurvBounds"),
-                                m_param_roughCurvBounds,
-                                "Curvature bounds of the rough hough space. Either 2 or all discrete bounds",
-                                m_param_roughCurvBounds);
+  moduleParamList->addParameter(prefixed(prefix, "fineDiscretePhi0Width"),
+                                m_param_fineDiscretePhi0Width,
+                                "Width of the phi0 bins at the lowest level of the fine hough space.",
+                                m_param_fineDiscretePhi0Width);
 
-  moduleParamList->addParameter(prefixed(prefix, "discretePhi0Width"),
-                                m_param_discretePhi0Width,
-                                "Width of the phi0 bins at the lowest level of the hough space.",
-                                m_param_discretePhi0Width);
+  moduleParamList->addParameter(prefixed(prefix, "fineDiscretePhi0Overlap"),
+                                m_param_fineDiscretePhi0Overlap,
+                                "Overlap of the phi0 bins at the lowest level of the fine hough space.",
+                                m_param_fineDiscretePhi0Overlap);
 
-  moduleParamList->addParameter(prefixed(prefix, "discretePhi0Overlap"),
-                                m_param_discretePhi0Overlap,
-                                "Overlap of the phi0 bins at the lowest level of the hough space.",
-                                m_param_discretePhi0Overlap);
+  moduleParamList->addParameter(prefixed(prefix, "fineDiscreteCurvWidth"),
+                                m_param_fineDiscreteCurvWidth,
+                                "Width of the curvature bins at the lowest level of the fine hough space.",
+                                m_param_fineDiscreteCurvWidth);
 
-  moduleParamList->addParameter(prefixed(prefix, "discreteCurvWidth"),
-                                m_param_discreteCurvWidth,
-                                "Width of the curvature bins at the lowest level of the hough space.",
-                                m_param_discreteCurvWidth);
-
-  moduleParamList->addParameter(prefixed(prefix, "discreteCurvOverlap"),
-                                m_param_discreteCurvOverlap,
-                                "Overlap of the curvature bins at the lowest level of the hough space.",
-                                m_param_discreteCurvOverlap);
+  moduleParamList->addParameter(prefixed(prefix, "fineDiscreteCurvOverlap"),
+                                m_param_fineDiscreteCurvOverlap,
+                                "Overlap of the curvature bins at the lowest level of the fine hough space.",
+                                m_param_fineDiscreteCurvOverlap);
 
   moduleParamList->addParameter(prefixed(prefix, "fineRelaxationSchedule"),
                                 m_param_fineRelaxationSchedule,
@@ -87,6 +84,43 @@ void AxialTrackCreatorHitLegendre::exposeParameters(ModuleParamList* moduleParam
                                 "For content of the individual parameter maps consider the parameters of the "
                                 "AxialLegendreLeafProcessor",
                                 m_param_fineRelaxationSchedule);
+
+  // Parameters for the fine hough space
+  moduleParamList->addParameter(prefixed(prefix, "roughGranularityLevel"),
+                                m_param_roughGranularityLevel,
+                                "Level of divisions in the rough hough space.",
+                                m_param_roughGranularityLevel);
+
+  moduleParamList->addParameter(prefixed(prefix, "roughSectorLevelSkip"),
+                                m_param_roughSectorLevelSkip,
+                                "Number of levels to be skipped in the rough hough "
+                                "space on the first level to form sectors",
+                                m_param_roughSectorLevelSkip);
+
+  moduleParamList->addParameter(prefixed(prefix, "roughCurvBounds"),
+                                m_param_roughCurvBounds,
+                                "Curvature bounds of the rough hough space. Either 2 or all discrete bounds",
+                                m_param_roughCurvBounds);
+
+  moduleParamList->addParameter(prefixed(prefix, "roughDiscretePhi0Width"),
+                                m_param_roughDiscretePhi0Width,
+                                "Width of the phi0 bins at the lowest level of the rough hough space.",
+                                m_param_roughDiscretePhi0Width);
+
+  moduleParamList->addParameter(prefixed(prefix, "roughDiscretePhi0Overlap"),
+                                m_param_roughDiscretePhi0Overlap,
+                                "Overlap of the phi0 bins at the lowest level of the rough hough space.",
+                                m_param_roughDiscretePhi0Overlap);
+
+  moduleParamList->addParameter(prefixed(prefix, "roughDiscreteCurvWidth"),
+                                m_param_roughDiscreteCurvWidth,
+                                "Width of the curvature bins at the lowest level of the rough hough space.",
+                                m_param_roughDiscreteCurvWidth);
+
+  moduleParamList->addParameter(prefixed(prefix, "roughDiscreteCurvOverlap"),
+                                m_param_roughDiscreteCurvOverlap,
+                                "Overlap of the curvature bins at the lowest level of the rough hough space.",
+                                m_param_roughDiscreteCurvOverlap);
 
   moduleParamList->addParameter(prefixed(prefix, "roughRelaxationSchedule"),
                                 m_param_roughRelaxationSchedule,
@@ -99,53 +133,70 @@ void AxialTrackCreatorHitLegendre::exposeParameters(ModuleParamList* moduleParam
 void AxialTrackCreatorHitLegendre::initialize()
 {
   Super::initialize();
-  const long nPhi0Bins = std::pow(c_phi0Divisions, m_param_granularityLevel);
-  const Phi0BinsSpec phi0BinsSpec(nPhi0Bins,
-                                  m_param_discretePhi0Overlap,
-                                  m_param_discretePhi0Width);
 
-  // Construct the fine curvature array in case two bounds were given
-  if (m_param_fineCurvBounds.size() == 2) {
-
-    std::array<double, 2> fineCurvBounds{{m_param_fineCurvBounds.front(), m_param_fineCurvBounds.back()}};
-    const long nFineCurvBins = std::pow(c_curvDivisions, m_param_granularityLevel);
-    const CurvBinsSpec fineCurvBinsSpec(fineCurvBounds.front(),
-                                        fineCurvBounds.back(),
-                                        nFineCurvBins,
-                                        m_param_discreteCurvOverlap,
-                                        m_param_discreteCurvWidth);
-    m_param_fineCurvBounds = fineCurvBinsSpec.constructArray();
-  }
-
-  // Construct the rough curvature array in case two bounds were given
-  if (m_param_roughCurvBounds.size() == 2) {
-    std::array<double, 2> roughCurvBounds{{m_param_roughCurvBounds.front(), m_param_roughCurvBounds.back()}};
-    const long nRoughCurvBins = std::pow(c_curvDivisions, m_param_granularityLevel);
-    const CurvBinsSpec roughCurvBinsSpec(roughCurvBounds.front(),
-                                         roughCurvBounds.back(),
-                                         nRoughCurvBins,
-                                         m_param_discreteCurvOverlap,
-                                         m_param_discreteCurvWidth);
-    m_param_roughCurvBounds = roughCurvBinsSpec.constructArray();
-  }
-
-  // Construct fine hough tree
+  // Construct the fine hough space
   {
-    int maxTreeLevel = m_param_granularityLevel - m_param_sectorLevelSkip;
-    m_fineHoughTree = makeUnique<SimpleRLTaggedWireHitPhi0CurvHough>(maxTreeLevel, m_curlCurv);
-    m_fineHoughTree->setSectorLevelSkip(m_param_sectorLevelSkip);
-    m_fineHoughTree->assignArray<DiscretePhi0>(phi0BinsSpec.constructArray(), phi0BinsSpec.getNOverlap());
-    m_fineHoughTree->assignArray<DiscreteCurv>(m_param_fineCurvBounds, m_param_discreteCurvOverlap);
+    const long nFinePhi0Bins = std::pow(c_phi0Divisions, m_param_fineGranularityLevel);
+    const Phi0BinsSpec finePhi0BinsSpec(nFinePhi0Bins,
+                                        m_param_fineDiscretePhi0Overlap,
+                                        m_param_fineDiscretePhi0Width);
+    if (m_param_fineCurvBounds.size() == 2) {
+      // If parameters are unchanged use the legendre default binning
+      if (m_param_fineDiscreteCurvOverlap == -1) {
+        m_param_fineDiscreteCurvWidth = 1;
+        std::array<float, 2> fineCurvSpan({m_param_fineCurvBounds[0], m_param_fineCurvBounds[1]});
+        m_param_fineCurvBounds = this->getDefaultCurvBounds(fineCurvSpan, m_param_fineGranularityLevel);
+      } else {
+        std::array<double, 2> fineCurvBounds{{m_param_fineCurvBounds.front(), m_param_fineCurvBounds.back()}};
+        const long nFineCurvBins = std::pow(c_curvDivisions, m_param_fineGranularityLevel);
+        const CurvBinsSpec fineCurvBinsSpec(fineCurvBounds.front(),
+                                            fineCurvBounds.back(),
+                                            nFineCurvBins,
+                                            m_param_fineDiscreteCurvOverlap,
+                                            m_param_fineDiscreteCurvWidth);
+        m_param_fineCurvBounds = fineCurvBinsSpec.constructArray();
+      }
+    }
+
+    // Construct fine hough tree
+    int fineMaxTreeLevel = m_param_fineGranularityLevel - m_param_fineSectorLevelSkip;
+    m_fineHoughTree = makeUnique<SimpleRLTaggedWireHitPhi0CurvHough>(fineMaxTreeLevel, m_curlCurv);
+    m_fineHoughTree->setSectorLevelSkip(m_param_fineSectorLevelSkip);
+    m_fineHoughTree->assignArray<DiscretePhi0>(finePhi0BinsSpec.constructArray(), finePhi0BinsSpec.getNOverlap());
+    m_fineHoughTree->assignArray<DiscreteCurv>(m_param_fineCurvBounds, m_param_fineDiscreteCurvOverlap);
     m_fineHoughTree->initialize();
   }
 
-  // Construct rough hough tree
+  // Construct the rough hough space
   {
-    int maxTreeLevel = m_param_granularityLevel - m_param_sectorLevelSkip;
-    m_roughHoughTree = makeUnique<SimpleRLTaggedWireHitPhi0CurvHough>(maxTreeLevel, m_curlCurv);
-    // No level skip !
-    m_roughHoughTree->assignArray<DiscretePhi0>(phi0BinsSpec.constructArray(), phi0BinsSpec.getNOverlap());
-    m_roughHoughTree->assignArray<DiscreteCurv>(m_param_roughCurvBounds, m_param_discreteCurvOverlap);
+    const long nRoughPhi0Bins = std::pow(c_phi0Divisions, m_param_roughGranularityLevel);
+    const Phi0BinsSpec roughPhi0BinsSpec(nRoughPhi0Bins,
+                                         m_param_roughDiscretePhi0Overlap,
+                                         m_param_roughDiscretePhi0Width);
+    if (m_param_roughCurvBounds.size() == 2) {
+      // If parameters are unchanged use the legendre default binning
+      if (m_param_roughDiscreteCurvOverlap == -1) {
+        m_param_roughDiscreteCurvWidth = 1;
+        std::array<float, 2> roughCurvSpan({m_param_roughCurvBounds[0], m_param_roughCurvBounds[1]});
+        m_param_roughCurvBounds = this->getDefaultCurvBounds(roughCurvSpan, m_param_roughGranularityLevel);
+      } else {
+        std::array<double, 2> roughCurvBounds{{m_param_roughCurvBounds.front(), m_param_roughCurvBounds.back()}};
+        const long nRoughCurvBins = std::pow(c_curvDivisions, m_param_roughGranularityLevel);
+        const CurvBinsSpec roughCurvBinsSpec(roughCurvBounds.front(),
+                                             roughCurvBounds.back(),
+                                             nRoughCurvBins,
+                                             m_param_roughDiscreteCurvOverlap,
+                                             m_param_roughDiscreteCurvWidth);
+        m_param_roughCurvBounds = roughCurvBinsSpec.constructArray();
+      }
+    }
+
+    // Construct rough hough tree
+    int roughMaxTreeLevel = m_param_roughGranularityLevel - m_param_roughSectorLevelSkip;
+    m_roughHoughTree = makeUnique<SimpleRLTaggedWireHitPhi0CurvHough>(roughMaxTreeLevel, m_curlCurv);
+    m_roughHoughTree->setSectorLevelSkip(m_param_roughSectorLevelSkip);
+    m_roughHoughTree->assignArray<DiscretePhi0>(roughPhi0BinsSpec.constructArray(), roughPhi0BinsSpec.getNOverlap());
+    m_roughHoughTree->assignArray<DiscreteCurv>(m_param_roughCurvBounds, m_param_roughDiscreteCurvOverlap);
     m_roughHoughTree->initialize();
   }
 
@@ -173,7 +224,7 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<CDCWireHit>& wireHits
 
   // Setup the level processor and obtain its parameter list to be set.
   using Node = typename SimpleRLTaggedWireHitPhi0CurvHough::Node;
-  int maxTreeLevel = m_param_granularityLevel - m_param_sectorLevelSkip;
+  int maxTreeLevel = m_param_fineGranularityLevel - m_param_fineSectorLevelSkip;
   AxialLegendreLeafProcessor<Node> leafProcessor(maxTreeLevel);
   leafProcessor.setAxialWireHits(axialWireHits);
   ModuleParamList moduleParamList;
@@ -232,70 +283,70 @@ AxialTrackCreatorHitLegendre::getDefaultFineRelaxationSchedule() const
 
   // NonCurler pass
   result.push_back(ParameterVariantMap{
-    {"maxLevel", 12 - m_param_sectorLevelSkip},
+    {"maxLevel", 12 - m_param_fineSectorLevelSkip},
     {"minWeight", 50.0},
     {"maxCurv", 1.0 * m_curlCurv},
     {"curvResolution", std::string("origin")},
     {"nRoadSearches", 1},
-    {"roadLevel", 3 - m_param_sectorLevelSkip},
+    {"roadLevel", 3 - m_param_fineSectorLevelSkip},
   });
 
   result.push_back(ParameterVariantMap{
-    {"maxLevel", 12 - m_param_sectorLevelSkip},
+    {"maxLevel", 12 - m_param_fineSectorLevelSkip},
     {"minWeight", 70.0},
     {"maxCurv", 2.0 * m_curlCurv},
     {"curvResolution", std::string("origin")},
     {"nRoadSearches", 1},
-    {"roadLevel", 3 - m_param_sectorLevelSkip},
+    {"roadLevel", 3 - m_param_fineSectorLevelSkip},
   });
 
   for (double minWeight = 50.0; minWeight > 10.0; minWeight *= 0.75) {
     result.push_back(ParameterVariantMap{
-      {"maxLevel", 12 - m_param_sectorLevelSkip},
+      {"maxLevel", 12 - m_param_fineSectorLevelSkip},
       {"minWeight", minWeight},
       {"maxCurv", 0.07},
       {"curvResolution", std::string("origin")},
       {"nRoadSearches", 1},
-      {"roadLevel", 3 - m_param_sectorLevelSkip},
+      {"roadLevel", 3 - m_param_fineSectorLevelSkip},
     });
   }
 
   // NonCurlerWithIncreasedThreshold pass
   result.push_back(ParameterVariantMap{
-    {"maxLevel", 10 - m_param_sectorLevelSkip},
+    {"maxLevel", 10 - m_param_fineSectorLevelSkip},
     {"minWeight", 50.0},
     {"maxCurv", 1.0 * m_curlCurv},
     {"curvResolution", std::string("nonOrigin")},
     {"nRoadSearches", 2},
-    {"roadLevel", 3 - m_param_sectorLevelSkip},
+    {"roadLevel", 3 - m_param_fineSectorLevelSkip},
   });
 
   result.push_back(ParameterVariantMap{
-    {"maxLevel", 10 - m_param_sectorLevelSkip},
+    {"maxLevel", 10 - m_param_fineSectorLevelSkip},
     {"minWeight", 70.0},
     {"maxCurv", 2.0 * m_curlCurv},
     {"curvResolution", std::string("nonOrigin")},
     {"nRoadSearches", 2},
-    {"roadLevel", 3 - m_param_sectorLevelSkip},
+    {"roadLevel", 3 - m_param_fineSectorLevelSkip},
   });
 
   result.push_back(ParameterVariantMap{
-    {"maxLevel", 10 - m_param_sectorLevelSkip},
+    {"maxLevel", 10 - m_param_fineSectorLevelSkip},
     {"minWeight", 50.0},
     {"maxCurv", 0.07},
     {"curvResolution", std::string("nonOrigin")},
     {"nRoadSearches", 2},
-    {"roadLevel", 3 - m_param_sectorLevelSkip},
+    {"roadLevel", 3 - m_param_fineSectorLevelSkip},
   });
 
   for (double minWeight = 37.5; minWeight > 10.0; minWeight *= 0.75) {
     result.push_back(ParameterVariantMap{
-      {"maxLevel", 10 - m_param_sectorLevelSkip},
+      {"maxLevel", 10 - m_param_fineSectorLevelSkip},
       {"minWeight", minWeight},
       {"maxCurv",  m_maxCurvAcceptance},
       {"curvResolution", std::string("nonOrigin")},
       {"nRoadSearches", 2},
-      {"roadLevel", 3 - m_param_sectorLevelSkip},
+      {"roadLevel", 3 - m_param_fineSectorLevelSkip},
     });
   }
 
@@ -309,7 +360,7 @@ AxialTrackCreatorHitLegendre::getDefaultRoughRelaxationSchedule() const
 
   // FullRange pass
   result.push_back(ParameterVariantMap{
-    {"maxLevel", 10},
+    {"maxLevel", 10 - m_param_roughSectorLevelSkip},
     {"minWeight", 50.0},
     {"maxCurv", 1.0 * m_curlCurv},
     {"curvResolution", std::string("nonOrigin")},
@@ -318,7 +369,7 @@ AxialTrackCreatorHitLegendre::getDefaultRoughRelaxationSchedule() const
   });
 
   result.push_back(ParameterVariantMap{
-    {"maxLevel", 10},
+    {"maxLevel", 10 - m_param_roughSectorLevelSkip},
     {"minWeight", 70.0},
     {"maxCurv", 2.0 * m_curlCurv},
     {"curvResolution", std::string("nonOrigin")},
@@ -328,7 +379,7 @@ AxialTrackCreatorHitLegendre::getDefaultRoughRelaxationSchedule() const
 
   for (double minWeight = 30.0; minWeight > 10.0; minWeight *= 0.75) {
     result.push_back(ParameterVariantMap{
-      {"maxLevel", 10},
+      {"maxLevel", 10 - m_param_roughSectorLevelSkip},
       {"minWeight", minWeight},
       {"maxCurv", 0.15},
       {"curvResolution", std::string("nonOrigin")},
@@ -337,5 +388,54 @@ AxialTrackCreatorHitLegendre::getDefaultRoughRelaxationSchedule() const
     });
   }
 
+  return result;
+}
+
+std::vector<float> AxialTrackCreatorHitLegendre::getDefaultCurvBounds(std::array<float, 2> curvSpan, int granularityLevel)
+{
+  using BinSpan = std::array<double, 2>;
+  using BinSpans = std::vector<BinSpan>;
+  std::vector<BinSpans> binSpansByLevel(granularityLevel + 1);
+
+  binSpansByLevel[0].push_back(BinSpan({curvSpan[0], curvSpan[1]}));
+
+  for (int level = 0; level < granularityLevel; ++level) {
+    for (BinSpan& binSpan : binSpansByLevel[level]) {
+      double subBinWidth = std::fabs(binSpan[1] - binSpan[0]) / 2;
+      double middle = (binSpan[0] + binSpan[1]) / 2;
+
+      // Expaning bins somewhat to have a overlap
+      // Assuming granularity level = 12
+      // For level 6 to 7 only expand 1 / 4, for higher levels expand  1 / 8.
+      // Never expand for curvatures lower than 0.005
+      // (copied from the legendre method. Works well, but some experimentation
+      //  needs to be made to know why)
+      double extension = 0;
+      if ((level + 7 <= granularityLevel) or (std::fabs(middle) <= 0.005)) {
+        extension = 0;
+      } else if (level + 5 < granularityLevel) {
+        extension = subBinWidth / 4.0;
+      } else {
+        extension = subBinWidth / 8.0;
+      }
+
+      double lower1 = binSpan[0];
+      double upper1 = middle + extension;
+
+      double lower2 = middle - extension;
+      double upper2 = binSpan[1];
+
+      binSpansByLevel[level + 1].push_back({lower1, upper1});
+      binSpansByLevel[level + 1].push_back({lower2, upper2});
+    }
+  }
+
+  // Return highest level as prepared bin bounds.
+  std::vector<float> result;
+
+  for (BinSpan& binSpan : binSpansByLevel[granularityLevel]) {
+    result.push_back(binSpan[0]);
+    result.push_back(binSpan[1]);
+  }
   return result;
 }

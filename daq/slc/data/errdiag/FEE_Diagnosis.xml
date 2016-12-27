@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ErrorMessageDiagnosis>
   <Error>
+    <ID></ID>
     <Type>FEE</Type>
     <Message>Example : FEE trouble</Message>
     <Diagnosis>Front-end electronics trouble. Abort and try again. If the same error occurs, contact with DAQ(Storage) experts. </Diagnosis>

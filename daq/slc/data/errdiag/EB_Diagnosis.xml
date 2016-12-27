@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ErrorMessageDiagnosis>
   <Error>
+    <ID></ID>
     <Type>EB</Type>
     <Message>Event builder trouble</Message>
     <Diagnosis>Event builder trouble. Abort and try again. If the same error occurs, contact with DAQ(event builder) experts. </Diagnosis>

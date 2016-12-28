@@ -74,13 +74,11 @@ namespace Belle2 {
         return;
       }
 
-      // print geometry if the debug level for 'top' is set
+      // print geometry if the debug level for 'top' is set 10000
       const auto& logSystem = LogSystem::Instance();
       if (logSystem.isLevelEnabled(LogConfig::c_Debug, 10000, "top")) {
         m_geo->print();
       }
-
-
 
       m_valid = true;
     }
@@ -115,6 +113,12 @@ namespace Belle2 {
       if (!m_channelMapperIRSX.isValid()) {
         B2ERROR("TOPChannelMaps: no payload found in database");
         return;
+      }
+
+      // print geometry if the debug level for 'top' is set 10000
+      const auto& logSystem = LogSystem::Instance();
+      if (logSystem.isLevelEnabled(LogConfig::c_Debug, 10000, "top")) {
+        m_geo->print();
       }
 
       m_valid = true;

@@ -366,6 +366,16 @@ namespace Belle2 {
     void exportSensorModuleMap();
 
     /**
+     * Import results of magnet test
+     */
+    void importMagnetTest();
+
+    /**
+     * Export results of magnet test
+     */
+    void exportMagnetTest();
+
+    /**
      * Export all the data
      */
     void exportAll();

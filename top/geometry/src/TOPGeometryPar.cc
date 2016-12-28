@@ -14,6 +14,7 @@
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
+#include <framework/logging/LogSystem.h>
 #include <geometry/Materials.h>
 #include <iostream>
 
@@ -72,6 +73,14 @@ namespace Belle2 {
       if (!m_channelMapperIRSX.isValid()) {
         return;
       }
+
+      // print geometry if the debug level for 'top' is set
+      const auto& logSystem = LogSystem::Instance();
+      if (logSystem.isLevelEnabled(LogConfig::c_Debug, 10000, "top")) {
+        m_geo->print();
+      }
+
+
 
       m_valid = true;
     }

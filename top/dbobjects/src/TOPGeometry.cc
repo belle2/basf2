@@ -94,9 +94,28 @@ bool TOPGeometry::isConsistent() const
   return true;
 }
 
-void TOPGeometry::print(const std::string& title) const
+void TOPGeometry::print(const std::string&) const
 {
-  TOPGeoBase::print(title);
+  cout << endl;
+  cout << "Geometry parameters of TOP counter:" << endl;
+  cout << "===================================" << endl;
+  cout << " name: " << m_name << endl;
+  cout << " number of modules: " << m_modules.size() << endl << endl;
 
+  for (const auto& module : m_modules) {
+    module.print();
+    cout << endl;
+  }
+  m_frontEnd.print();
+  cout << " Number of board stacks: " << m_numBoardStacks << endl;
+  cout << endl;
+  m_QBB.print();
+  cout << endl;
+  m_nominalQE.print();
+  cout << endl;
+  m_nominalTTS.print();
+  cout << endl;
+  m_nominalTDC.print();
+  cout << endl;
 
 }

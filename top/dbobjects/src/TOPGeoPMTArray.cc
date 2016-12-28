@@ -100,5 +100,6 @@ void TOPGeoPMTArray::print(const std::string& title) const
     for (const auto& pmt : m_decoupledPMTs) cout << " " << pmt;
   }
   cout << endl;
+  cout << endl;
   m_pmt.print();
 }

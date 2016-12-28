@@ -38,7 +38,7 @@ bool TOPNominalQE::isConsistent() const
 
 void TOPNominalQE::print(const std::string& title) const
 {
-  TOPGeoBase::print(title);
+  TOPGeoBase::printUnderlined(title);
   cout << " first point: " << getLambdaFirst() << " nm";
   cout << ", step: " << getLambdaStep() << " nm";
   cout << ", CE: " << getCE() << endl;

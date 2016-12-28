@@ -67,23 +67,32 @@ bool TOPGeoModule::isConsistent() const
 }
 
 
-void TOPGeoModule::print(const std::string& title) const
+void TOPGeoModule::print(const std::string&) const
 {
-  TOPGeoBase::print(title);
+  cout << "Slot " << getModuleID() << " geometry parameters:" << endl;
+  cout << "---------------------------" << endl;
+  cout << " name: " << m_name << endl;
+  cout << " moduleID = " << getModuleID();
+  cout << ", radius = " << getRadius() << " " << s_unitName;
+  cout << ", phi = " << getPhi() / Unit::deg << " deg";
+  cout << ", backward z = " << getBackwardZ() << " " << s_unitName;
+  cout << ", construction number = " << getModuleCNumber() << endl;
+  cout << endl;
 
-  cout << " moduleID: " << getModuleID();
-  cout << " radius: " << getRadius() << " " << s_unitName;
-  cout << " phi: " << getPhi();
-  cout << " backwardZ: " << getBackwardZ() << " " << s_unitName;
-  cout << " CNumber: " << getModuleCNumber() << endl;
-
-  m_bar1.print("Bar segment 1 geometry parameters");
-  m_bar2.print("Bar segment 2 geometry parameters");
-  m_mirror.print();
   m_prism.print();
+  cout << endl;
+  m_bar2.print("Bar segment 2 (backward) geometry parameters");
+  cout << endl;
+  m_bar1.print("Bar segment 1 (forward) geometry parameters");
+  cout << endl;
+  m_mirror.print();
+  cout << endl;
   m_pmtArray.print();
+  cout << endl;
   m_arrayDisplacement.print();
+  cout << endl;
   m_moduleDisplacement.print();
+  cout << endl;
 
 }
 

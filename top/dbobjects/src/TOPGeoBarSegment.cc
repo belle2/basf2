@@ -35,6 +35,7 @@ bool TOPGeoBarSegment::isConsistent() const
 void TOPGeoBarSegment::print(const std::string& title) const
 {
   TOPGeoBase::print(title);
+  cout << " Vendor: " << getVendor() << ", serial number: " << getSerialNumber() << endl;
   cout << " Dimensions: " << getWidth() << " X " << getThickness() << " X " << getLength()
        << " " << s_unitName << endl;
   cout << " Material: " << getMaterial() << endl;

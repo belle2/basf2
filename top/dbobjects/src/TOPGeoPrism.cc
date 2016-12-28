@@ -38,11 +38,13 @@ bool TOPGeoPrism::isConsistent() const
 void TOPGeoPrism::print(const std::string& title) const
 {
   TOPGeoBase::print(title);
+  cout << " Vendor: " << getVendor() << ", serial number: " << getSerialNumber() << endl;
   cout << " Dimensions: " << getWidth() << " X " << getThickness() << " X " << getLength()
        << " " << s_unitName << endl;
   cout << " Exit window dimensions: " << getWidth() << " X "
        << getExitThickness() << " " << s_unitName << endl;
-  cout << " Bottom flat surface length: " << getFlatLength() << " " << s_unitName << endl;
+  cout << " Prism angle: " << getAngle() / Unit::deg << " deg";
+  cout << ", flat surface length: " << getFlatLength() << " " << s_unitName << endl;
   cout << " Material: " << getMaterial() << endl;
   cout << " Wavelenght filter: " << getFilterMaterial()
        << ", thickness: " << getFilterThickness() << " " << s_unitName << endl;
@@ -57,12 +59,13 @@ void TOPGeoPrism::print(const std::string& title) const
            << ", xc = " << getPeelOffCenter(region) << " " << s_unitName << endl;
     }
   } else {
-    cout << " Peel-off regions: None";
+    cout << " Peel-off regions: None" << endl;
   }
   printSurface(m_surface);
   cout << "  - sigmaAlpha: " << getSigmaAlpha() << endl;
 
 }
+
 
 void TOPGeoPrism::appendPeelOffRegion(unsigned ID, double fraction, double angle)
 {

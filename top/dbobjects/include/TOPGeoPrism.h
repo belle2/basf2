@@ -14,6 +14,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <math.h>
 
 namespace Belle2 {
 
@@ -44,7 +45,7 @@ namespace Belle2 {
      * @param thickness thickness at bar side
      * @param length prism length
      * @param exitThickness thickness at PMT side
-     * @param flatLenght length of the flat part at the bottom
+     * @param flatLength length of the flat part at the bottom
      * @param material prism material name
      * @param name object name
      */
@@ -55,6 +56,15 @@ namespace Belle2 {
       TOPGeoBarSegment(width, thickness, length, material, name),
       m_exitThickness(exitThickness), m_flatLength(flatLength)
     {}
+
+    /**
+     * Recalculates flatLength according to given prism angle
+     * @param angle prism angle
+     */
+    void setAngle(double angle)
+    {
+      m_flatLength = m_length - (m_exitThickness - m_thickness) / tan(angle);
+    }
 
     /**
      * Sets parameters of the peel-off cookie volumes
@@ -97,6 +107,15 @@ namespace Belle2 {
      * @return bottom flat surface full length
      */
     double getFullFlatLength() const {return (m_flatLength + m_glueThickness) / s_unit;}
+
+    /**
+     * Returns prism angle
+     * @return angle
+     */
+    double getAngle() const
+    {
+      return atan((m_exitThickness - m_thickness) / (m_length - m_flatLength));
+    }
 
     /**
      * Returns wavelength filter thickness (filter on -z side)

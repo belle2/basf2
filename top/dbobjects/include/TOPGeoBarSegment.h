@@ -69,7 +69,6 @@ namespace Belle2 {
       m_brokenGlueMaterial = material;
     }
 
-
     /**
      * Sets optical surface
      * @param surface optical surface
@@ -79,6 +78,17 @@ namespace Belle2 {
     {
       m_surface = surface;
       m_sigmaAlpha = sigmaAlpha;
+    }
+
+    /**
+     * Sets vendor's name and serial number
+     * @param vendor vendor's name
+     * @param serialNumber serial number
+     */
+    void setVendorData(const std::string& vendor, const std::string serialNumber)
+    {
+      m_vendor = vendor;
+      m_serialNumber = serialNumber;
     }
 
     /**
@@ -159,6 +169,18 @@ namespace Belle2 {
     double getSigmaAlpha() const {return m_sigmaAlpha;}
 
     /**
+     * Returns vendor's name
+     * @return name
+     */
+    const std::string& getVendor() const {return m_vendor;}
+
+    /**
+     * Returns serial number
+     * @return serial number
+     */
+    const std::string& getSerialNumber() const {return m_serialNumber;}
+
+    /**
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
@@ -195,8 +217,10 @@ namespace Belle2 {
     float m_brokenFraction = 0; /**< fraction of broken (delaminated) glue */
     float m_brokenAngle = 0; /**< angle of broken (delaminated) glue */
     std::string m_brokenGlueMaterial; /**< broken glue material name */
+    std::string m_vendor; /**< vendor's name */
+    std::string m_serialNumber; /**< serial number */
 
-    ClassDef(TOPGeoBarSegment, 2); /**< ClassDef */
+    ClassDef(TOPGeoBarSegment, 3); /**< ClassDef */
 
   };
 

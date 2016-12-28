@@ -37,6 +37,7 @@ enum EKLM::FPGAFitStatus EKLM::FPGAFitter::fit(int* amp, int threshold,
    */
   const int nPointsSigBg = 10;
   double bg;
+  float sigAmp;
   int i, ithr, ibg, sum, bgSum, max;
   i = 0;
   sum = 0;
@@ -65,9 +66,12 @@ enum EKLM::FPGAFitStatus EKLM::FPGAFitter::fit(int* amp, int threshold,
   for (i = 0; i < ibg; i++)
     bgSum = bgSum + amp[i];
   bg = float(bgSum) / i;
+  sigAmp = sum - bg * m_nPoints;
+  if (sigAmp < 0)
+    sigAmp = 0;
   fitData->setStartTime(ithr);
   fitData->setBackgroundAmplitude(bg);
-  fitData->setAmplitude(sum - bg * m_nPoints);
+  fitData->setAmplitude(sigAmp);
   fitData->setMaximalAmplitude(max);
   return c_FPGASuccessfulFit;
 }

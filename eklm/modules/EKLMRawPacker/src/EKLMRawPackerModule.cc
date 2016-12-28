@@ -74,7 +74,7 @@ void EKLMRawPackerModule::event()
     int   iSector  = digit->getSector();
     int   iPlane   = digit->getPlane();
     int   iStrip   = digit->getStrip();
-    int   iNPE  = digit->getNPE();
+    int   iCharge  = digit->getCharge();
     float fTime    = digit->getTime();
 //    float fEDep    = digit->getEDep();
 //    float fMCTime  = digit->getSiPMMCTime();
@@ -99,13 +99,14 @@ void EKLMRawPackerModule::event()
     int copperId = electId & 0xF;
     int finesse = (electId >> 4) & 0xF;
 //    B2INFO("EKLMRawPacker::copperId " << copperId << " F: " << iForward << " Lay: " << iLayer << " Sect: " << iSector << " Pl: " <<
-//           iPlane << " Str: " << iStrip << " Cha: " << iNPE << " T: " << fTime << endl);
+//           iPlane << " Str: " << iStrip << " Cha: " << iCharge << " T: " << fTime << endl);
 //MAKE WORDS WITH INFORMATION
     uint16_t bword1 = 0;
     uint16_t bword2 = 0;
     uint16_t bword3 = 0;
     uint16_t bword4 = 0;
-    formatData(iForward, iLayer, iSector, iPlane, iStrip, iNPE, fTime, bword1, bword2, bword3, bword4);
+    formatData(iForward, iLayer, iSector, iPlane, iStrip, iCharge, fTime,
+               bword1, bword2, bword3, bword4);
     buf[0] |= bword2;
     buf[0] |= ((bword1 << 16));
     buf[1] |= bword4;

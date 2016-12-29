@@ -1395,7 +1395,7 @@ void EVEVisualization::addCDCHit(const CDCHit* hit)
   TEveGeoShape* cov_shape = new TEveGeoShape("cov_shape");
   //TODO: leftrightflag not set! (same for other parameters, unsure which ones should be set)
   double driftLength = tdcTranslator.getDriftLength(hit->getTDCCount(), WireID(hit->getID()));
-  double driftLengthRes = tdcTranslator.getDriftLengthResolution(hit->getTDCCount(), WireID(hit->getID()));
+  double driftLengthRes = tdcTranslator.getDriftLengthResolution(driftLength, WireID(hit->getID()));
   driftLengthRes = std::max(driftLengthRes, 0.005);
   const double lengthOfWireSection = 3.0;
 

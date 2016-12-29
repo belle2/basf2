@@ -224,6 +224,13 @@ namespace {
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = this->timeIt(100, true, [&]() {
       houghTree.fell();
+
+      for (const CDCWireHit* wireHit : m_axialWireHits) {
+        AutomatonCell& automatonCell = wireHit->getAutomatonCell();
+        automatonCell.unsetTakenFlag();
+        automatonCell.unsetTemporaryFlags();
+      }
+
       houghTree.seed(m_axialWireHits);
 
       leafProcessor.clear();
@@ -232,11 +239,13 @@ namespace {
       leafProcessor.setMaxCurv(curlCurv);
       leafProcessor.setNRoadSearches(2);
       leafProcessor.setRoadLevel(4);
+      leafProcessor.beginWalk();
       houghTree.findUsing(leafProcessor);
 
       leafProcessor.setMaxCurv(maxCurvAcceptance);
       leafProcessor.setNRoadSearches(3);
       leafProcessor.setRoadLevel(0);
+      leafProcessor.beginWalk();
       houghTree.findUsing(leafProcessor);
 
       candidates = leafProcessor.getCandidates();
@@ -322,6 +331,13 @@ namespace {
     TimeItResult timeItResult = timeIt(100, true, [&]() {
       // Exclude the timing of the resource release for comparision with the legendre test.
       houghTree.fell();
+
+      for (const CDCWireHit* wireHit : m_axialWireHits) {
+        AutomatonCell& automatonCell = wireHit->getAutomatonCell();
+        automatonCell.unsetTakenFlag();
+        automatonCell.unsetTemporaryFlags();
+      }
+
       houghTree.seed(m_axialWireHits);
 
       leafProcessor.clear();
@@ -330,11 +346,13 @@ namespace {
       leafProcessor.setMaxCurv(curlCurv);
       leafProcessor.setNRoadSearches(2);
       leafProcessor.setRoadLevel(4);
+      leafProcessor.beginWalk();
       houghTree.findUsing(leafProcessor);
 
       leafProcessor.setMaxCurv(maxCurvAcceptance);
       leafProcessor.setNRoadSearches(3);
       leafProcessor.setRoadLevel(0);
+      leafProcessor.beginWalk();
       houghTree.findUsing(leafProcessor);
 
       candidates = leafProcessor.getCandidates();

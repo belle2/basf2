@@ -1091,6 +1091,36 @@ def matchMCTruth(list_name, path=analysis_main):
     path.add_module(mcMatch)
 
 
+def looseMCTruth(list_name, path=analysis_main):
+    """
+    Performs loose MC matching for all particles in the specified
+    ParticleList.
+    The difference between loose and normal mc matching algorithm is that
+    the loose agorithm will find the common mother of the majority of daughter
+    particles while the normal algorithm finds the common mother of all daughters.
+    The results of loose mc matching algorithm are stored to the following extraInfo
+    items:
+      - looseMCMotherPDG: PDG code of most common mother
+      - looseMCMotherIndex: 1-based StoreArray<MCParticle> index of most common mother
+      - looseMCWrongDaughterN: number of daughters that don't originate from the most
+                               common mother
+      - looseMCWrongDaughterPDG: PDG code of the daughter that doesn't orginate from
+                                 the most common mother
+                                 (only if looseMCWrongDaughterN = 1)
+      - looseMCWrongDaughterBiB: 1 if the wrong daughter is Beam Induced Background
+                                 Particle
+
+    @param list_name name of the input ParticleList
+    @param path      modules are added to this path
+    """
+
+    mcMatch = register_module('MCMatcherParticles')
+    mcMatch.set_name('LooseMCMatch_' + list_name)
+    mcMatch.param('listName', list_name)
+    mcMatch.param('looseMCMatching', True)
+    path.add_module(mcMatch)
+
+
 def buildRestOfEvent(list_name, path=analysis_main):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent

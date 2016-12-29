@@ -106,8 +106,10 @@ double EKLMReconstructorModule::getTime(EKLMDigit* d, double dist)
   int strip;
   strip = m_GeoDat->stripNumber(d->getEndcap(), d->getLayer(), d->getSector(),
                                 d->getPlane(), d->getStrip()) - 1;
-  return d->getTime() - (dist / m_TimeCalibration->getEffectiveLightSpeed() +
-                         m_TimeCalibrationData[strip]->getTimeShift());
+  return d->getTime() -
+         (dist / m_TimeCalibration->getEffectiveLightSpeed() +
+          m_TimeCalibration->getAmplitudeTimeConstant() / sqrt(d->getNPE()) +
+          m_TimeCalibrationData[strip]->getTimeShift());
 }
 
 void EKLMReconstructorModule::event()

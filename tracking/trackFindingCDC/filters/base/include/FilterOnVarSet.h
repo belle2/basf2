@@ -41,7 +41,7 @@ namespace Belle2 {
 
     public:
       /// Constructor from the variable set the filter should use
-      OnVarSet(std::unique_ptr<AVarSet> varSet)
+      explicit OnVarSet(std::unique_ptr<AVarSet> varSet)
         : m_varSet(std::move(varSet))
       {
         B2ASSERT("Varset initialised as nullptr", m_varSet);

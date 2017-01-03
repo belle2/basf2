@@ -218,6 +218,8 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<CDCWireHit>& wireHits
   std::vector<const CDCWireHit*> axialWireHits;
   axialWireHits.reserve(wireHits.size());
   for (const CDCWireHit& wireHit : wireHits) {
+    wireHit.getAutomatonCell().unsetTemporaryFlags();
+    wireHit.getAutomatonCell().unsetMaskedFlag();
     if (not wireHit.isAxial()) continue;
     axialWireHits.emplace_back(&wireHit);
   }

@@ -78,7 +78,7 @@ namespace Belle2 {
       // Parameter: Fine hough bounds.
       // std::vector<float> m_param_fineCurvBounds{{ -0.018, 0.75}};
 
-      // Parameter: Fine hough bounds.
+      /// Parameter: Fine hough bounds.
       std::vector<float> m_param_fineCurvBounds{{ -0.02, 0.14}};
 
       /// Parameter: Width of the phi0 bins at the highest level of the fine hough space.
@@ -103,7 +103,7 @@ namespace Belle2 {
       /// Parameter: Number of levels to be skipped in the rough hough space on the first level to form sectors
       int m_param_roughSectorLevelSkip = 0;
 
-      // Parameter: Rough hough bounds.
+      /// Parameter: Rough hough bounds.
       std::vector<float> m_param_roughCurvBounds{{ 0.00, 0.30}};
 
       /// Parameter: Width of the phi0 bins at the highest level of the rough hough space.

@@ -380,7 +380,7 @@ namespace Belle2 {
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /*
+    /**
      * Combined Module using a combination of filters for segments
      */
     class SegmentFinderFacetAutomatonModule : public FindletModule<SegmentFinderFacetAutomaton> {
@@ -396,7 +396,7 @@ namespace Belle2 {
       }
     };
 
-    /*
+    /**
      * Combined Module using a combination of filters on segment pairs
      */
     class TrackFinderSegmentPairAutomatonModule : public FindletModule<TrackFinderSegmentPairAutomaton> {
@@ -412,7 +412,7 @@ namespace Belle2 {
       }
     };
 
-    /*
+    /**
      * Combined Module using a combination of filters on segment triples
      */
     class TrackFinderSegmentTripleAutomatonModule : public FindletModule<TrackFinderSegmentTripleAutomaton> {

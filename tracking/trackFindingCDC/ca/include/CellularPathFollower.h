@@ -116,23 +116,25 @@ namespace Belle2 {
                         const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood,
                         std::vector<Path<ACellHolder> >& paths) const
       {
-        ACellHolder* last = path.back();
-
-        bool grew = false;
-        for (const WeightedRelation<ACellHolder>& relation : cellHolderNeighborhood.equal_range(last)) {
-          if (not isHighestContinuation(relation)) continue;
-          ACellHolder* neighbor(relation.getTo());
+        auto growPathByRelation = [&](const WeightedRelation<ACellHolder>& neighborRelation) {
+          if (not this->isHighestContinuation(neighborRelation)) return false;
+          ACellHolder* neighbor(neighborRelation.getTo());
           path.push_back(neighbor);
-          growAllPaths(path, cellHolderNeighborhood, paths);
-          grew = true;
+          this->growAllPaths(path, cellHolderNeighborhood, paths);
           path.pop_back();
-        }
+          return true;
+        };
 
-        if (not grew) {
+        ACellHolder* last = path.back();
+        auto neighborRelations = cellHolderNeighborhood.equal_range(last);
+        int nRelationsUsed = std::count_if(neighborRelations.begin(),
+                                           neighborRelations.end(),
+                                           growPathByRelation);
+
+        if (nRelationsUsed == 0) {
           // end point of the recursion copy maximal path to the vector.
           paths.push_back(path);
         }
-
       }
 
       /**

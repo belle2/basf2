@@ -56,7 +56,7 @@ namespace Belle2 {
       {
         const CDCSegmentTriple* ptrFrom(relation.first);
         const CDCSegmentTriple* ptrTo(relation.second);
-        if (not ptrFrom or not ptrTo) return NAN;
+        if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
         return operator()(*ptrFrom, *ptrTo);
       }
     };

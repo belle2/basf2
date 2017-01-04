@@ -10,11 +10,40 @@
 
 #include <top/dbobjects/TOPGeoModule.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
 #include <math.h>
 #include <iostream>
 
 using namespace std;
 using namespace Belle2;
+
+void TOPGeoModule::setBrokenGlue(int glueID, double fraction, double angle,
+                                 const std::string& material)
+{
+  switch (glueID) {
+    case 1:
+      m_mirror.setGlueDelamination(fraction, angle, material);
+      break;
+    case 2:
+      m_bar1.setGlueDelamination(fraction, angle, material);
+      break;
+    case 3:
+      m_bar2.setGlueDelamination(fraction, angle, material);
+      break;
+    default:
+      B2ERROR("TOPGeoModule::setBrokenGlue: invalid glue ID " << glueID);
+  }
+}
+
+
+void TOPGeoModule::setPeelOffRegions(double thickness, const std::string& material)
+{
+  double size = 2 * m_pmtArray.getDx();
+  double offset = (m_pmtArray.getX(1) + m_pmtArray.getX(2)) / 2 +
+                  m_arrayDisplacement.getX();
+  m_prism.setPeelOffRegions(size, offset, thickness, material);
+}
+
 
 TVector3 TOPGeoModule::pointToGlobal(const TVector3& point) const
 {

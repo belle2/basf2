@@ -147,8 +147,8 @@ namespace Belle2 {
       double backwardLength = geo.getQBB().getPrismEnclosure().getLength();
       double prismPosition = geo.getQBB().getPrismPosition();
 
-      for (unsigned moduleID = 1; moduleID <= geo.getNumModules(); moduleID++) {
-        const auto& geoModule = geo.getModule(moduleID);
+      for (const auto& geoModule : geo.getModules()) {
+        int moduleID = geoModule.getModuleID();
         double barLength = geoModule.getBarLength();
 
         // go to local (bar) frame

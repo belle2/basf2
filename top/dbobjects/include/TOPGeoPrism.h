@@ -73,8 +73,8 @@ namespace Belle2 {
      * @param thickness volume thickness
      * @param material material name
      */
-    void setPeelOffData(double size, double offset, double thickness,
-                        const std::string& material)
+    void setPeelOffRegions(double size, double offset, double thickness,
+                           const std::string& material)
     {
       m_peelOffSize = size;
       m_peelOffOffset = offset;

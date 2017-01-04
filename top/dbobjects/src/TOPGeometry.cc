@@ -17,17 +17,40 @@
 using namespace std;
 using namespace Belle2;
 
-const TOPGeoModule& TOPGeometry::getModule(unsigned moduleID) const
+void TOPGeometry::appendModule(const TOPGeoModule& module)
 {
-  moduleID--;
-  if (moduleID >= m_modules.size())
-    B2FATAL("TOPGeometry::getModule: invalid module ID " << moduleID + 1);
-  return m_modules[moduleID];
+  if (isModuleIDValid(module.getModuleID())) {
+    B2ERROR("TOPGeometry::appendModule: a module with ID = " << module.getModuleID()
+            << "already appended");
+    return;
+  }
+  m_modules.push_back(module);
 }
+
+
+bool TOPGeometry::isModuleIDValid(int moduleID) const
+{
+  for (const auto& module : m_modules) {
+    if (module.getModuleID() == moduleID) return true;
+  }
+  return false;
+}
+
+
+const TOPGeoModule& TOPGeometry::getModule(int moduleID) const
+{
+  for (const auto& module : m_modules) {
+    if (module.getModuleID() == moduleID) return module;
+  }
+  B2FATAL("TOPGeometry::getModule: invalid module ID " << moduleID);
+}
+
 
 double TOPGeometry::getInnerRadius() const
 {
-  double R = 200 / s_unit;
+  if (m_modules.empty()) return 0;
+
+  double R = m_modules[0].getRadius();
   for (auto& module : m_modules) {
     double tmp = module.getRadius() + module.getBarThickness() / 2
                  - module.getPrism().getExitThickness();
@@ -38,7 +61,9 @@ double TOPGeometry::getInnerRadius() const
 
 double TOPGeometry::getOuterRadius() const
 {
-  double R = 0;
+  if (m_modules.empty()) return 0;
+
+  double R = m_modules[0].getRadius();
   for (auto& module : m_modules) {
     double x = module.getBarWidth() / 2;
     double y = module.getRadius() + module.getBarThickness() / 2;
@@ -61,7 +86,9 @@ double TOPGeometry::getRadius() const
 
 double TOPGeometry::getBackwardZ() const
 {
-  double z = 0;
+  if (m_modules.empty()) return 0;
+
+  double z = m_modules[0].getBackwardZ();
   for (auto& module : m_modules) {
     double tmp = module.getBackwardZ() - module.getPrism().getFullLength();
     if (tmp < z) z = tmp;
@@ -71,7 +98,9 @@ double TOPGeometry::getBackwardZ() const
 
 double TOPGeometry::getForwardZ() const
 {
-  double z = 0;
+  if (m_modules.empty()) return 0;
+
+  double z = m_modules[0].getForwardZ();
   for (auto& module : m_modules) {
     double tmp = module.getForwardZ();
     if (tmp > z) z = tmp;

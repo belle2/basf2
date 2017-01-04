@@ -85,7 +85,7 @@ namespace Belle2 {
      * @param vendor vendor's name
      * @param serialNumber serial number
      */
-    void setVendorData(const std::string& vendor, const std::string serialNumber)
+    void setVendorData(const std::string& vendor, const std::string& serialNumber)
     {
       m_vendor = vendor;
       m_serialNumber = serialNumber;

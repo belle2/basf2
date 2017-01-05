@@ -59,6 +59,9 @@ namespace Belle2 {
     // Add parameters
     addParam("timeZeroJitter", m_timeZeroJitter,
              "r.m.s of T0 jitter [ns]", 25e-3);
+    addParam("electronicJitter", m_electronicJitter,
+             "r.m.s of electronic jitter [ns], "
+             "if negative the one from TOPNominalTDC is used", -1.0);
     addParam("darkNoise", m_darkNoise,
              "uniformly distributed dark noise (hits per module)", 0.0);
     addParam("trigT0Sigma", m_trigT0Sigma,
@@ -90,6 +93,13 @@ namespace Belle2 {
     recBunch.registerInDataStore();
 
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+
+    if (m_electronicJitter < 0) {
+      m_electronicJitter = geo->getNominalTDC().getTimeJitter();
+    } else {
+      B2WARNING("Electronic time jitter is explicitely set in TOPDigitizer to "
+                << m_electronicJitter << " ns");
+    }
 
     // set pile-up and double hit resolution times (needed for BG overlay)
     TOPDigit::setDoubleHitResolution(geo->getNominalTDC().getDoubleHitResolution());
@@ -184,10 +194,9 @@ namespace Belle2 {
     }
 
     // digitize in time
-    double electronicJitter = geo->getNominalTDC().getTimeJitter();
     for (auto& pixel : pixels) {
-      // pixel.second.digitize(digits, electronicJitter);
-      pixel.second.digitize(rawDigits, digits, electronicJitter);
+      // pixel.second.digitize(digits, m_electronicJitter);
+      pixel.second.digitize(rawDigits, digits, m_electronicJitter);
     }
 
   }

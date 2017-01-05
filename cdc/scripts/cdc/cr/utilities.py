@@ -3,9 +3,8 @@ from ROOT import Belle2
 from tracking import add_cdc_cr_track_finding
 
 
-# Propagation velocity along the wire.
+# Propagation velocity of the light in the scinti.
 lightPropSpeed = 12.9925
-
 
 # Run range.
 run_range = {'201607': [787, 833],
@@ -14,7 +13,7 @@ run_range = {'201607': [787, 833],
              '201609': [966, 973]
              }
 # Size of trigger counter.
-triggerSize = {'201607': [100.0, 8.0, 10.0],
+triggerSize = {'201607': [20.0, 6.0, 10.0],
                '201608a': [100.0, 8.0, 10.0],
                '201608b': [100.0, 8.0, 10.0],
                '201609': [100.0, 8.0, 10.0]

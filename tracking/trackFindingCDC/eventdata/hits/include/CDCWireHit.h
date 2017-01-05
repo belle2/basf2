@@ -359,5 +359,36 @@ namespace Belle2 {
       /// Memory for the CDCHit pointer.
       const CDCHit* m_hit = nullptr;
     };
+
+    /// Generic functor to get the wire hit from an object.
+    struct GetWireHit {
+
+      /// Returns the wire hit of an object.
+      template<class T>
+      const CDCWireHit& operator()(const T& t) const
+      {
+        const int dispatchTag = 0;
+        return impl(t, dispatchTag);
+      }
+
+    private:
+      /// Returns the wire hit of an object. Favored option.
+      template <class T>
+      static auto impl(const T& t,
+                       int favouredTag __attribute__((unused)))
+      -> decltype(t.getWireHit())
+      {
+        return t.getWireHit();
+      }
+
+      /// Returns the wire hit of an object. Disfavoured option.
+      template <class T>
+      static auto impl(const T& t,
+                       long disfavouredTag __attribute__((unused)))
+      -> decltype(t->getWireHit())
+      {
+        return t->getWireHit();
+      }
+    };
   }
 }

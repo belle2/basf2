@@ -10,8 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/topology/EStereoKind.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <tracking/trackFindingCDC/utilities/GetValueType.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <climits>
 
 namespace Belle2 {
@@ -20,6 +19,40 @@ namespace Belle2 {
 
     /// The type of the layer and superlayer ids
     using ISuperLayer = signed short;
+
+    /// Generic functor to get the superlayer id from an object.
+    struct GetISuperLayer {
+
+      /// Constant returned on an invalid get operation
+      static const ISuperLayer c_Invalid = SHRT_MIN;
+
+      /// Returns the superlayer of an object.
+      template<class T>
+      ISuperLayer operator()(const T& t) const
+      {
+        const int dispatchTag = 0;
+        return impl(t, dispatchTag);
+      }
+
+    private:
+      /// Returns the superlayer of an object. Favored option.
+      template <class T>
+      static auto impl(const T& t,
+                       int favouredTag __attribute__((unused)))
+      -> decltype(t.getISuperLayer())
+      {
+        return t.getISuperLayer();
+      }
+
+      /// Returns the superlayer of an object. Disfavoured option.
+      template <class T>
+      static auto impl(const T& t,
+                       long disfavouredTag __attribute__((unused)))
+      -> decltype(t->getISuperLayer())
+      {
+        return &*t == nullptr ? c_Invalid : t->getISuperLayer();
+      }
+    };
 
     /**
      *  This is a utility class for the free ISuperLayer type.
@@ -40,7 +73,7 @@ namespace Belle2 {
       static const ISuperLayer c_OuterVolume = 9;
 
       /// Constant making an invalid superlayer id
-      static const ISuperLayer c_Invalid = SHRT_MIN;
+      static const ISuperLayer c_Invalid = GetISuperLayer::c_Invalid;
 
       /// Indicates if the given number corresponds to a true cdc superlayer - excludes the logic ids for inner and outer volume.
       static bool isInvalid(ISuperLayer iSuperLayer);
@@ -82,8 +115,7 @@ namespace Belle2 {
       template<class T1, class T2>
       static ISuperLayer getCommon(const T1& t1, const T2& t2)
       {
-        ISuperLayer iSuperLayer = getFrom(t1);
-        return iSuperLayer == getFrom(t2) ? iSuperLayer : c_Invalid;
+        return Common<GetISuperLayer>()(t1, t2);
       }
 
       /**
@@ -93,35 +125,14 @@ namespace Belle2 {
       template<class AHits>
       static ISuperLayer getCommon(const AHits& hits)
       {
-        using Hit = GetValueType<AHits>;
-        return common(hits, getFrom<Hit>, c_Invalid);
+        return Common<GetISuperLayer>()(hits);
       }
 
       /// Returns the superlayer of an object.
       template<class T>
       static ISuperLayer getFrom(const T& t)
       {
-        const int dispatchTag = 0;
-        return getFromImpl(t, dispatchTag);
-      }
-
-    private:
-      /// Returns the superlayer of an object. Favored option.
-      template <class T>
-      static auto getFromImpl(const T& t,
-                              int favouredTag __attribute__((unused)))
-      -> decltype(t.getISuperLayer())
-      {
-        return t.getISuperLayer();
-      }
-
-      /// Returns the superlayer of an object. Disfavoured option.
-      template <class T>
-      static auto getFromImpl(const T& t,
-                              long disfavouredTag __attribute__((unused)))
-      -> decltype(t->getISuperLayer())
-      {
-        return &*t == nullptr ? c_Invalid : t->getISuperLayer();
+        return GetISuperLayer()(t);
       }
     };
   }

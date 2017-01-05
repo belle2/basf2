@@ -10,26 +10,12 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /**
-     * Comparer function (according to std::less) for two hits.
-     */
-    class HitComperator {
-    public:
-      /**
-       * Main method of the comparator class which does the operation (according to std::less)
-       * for CDCRLWireHits.
-       * @param lhs: First CDCRLWireHit to compare.
-       * @param rhs: Second CDCRLWireHit to compare.
-       *
-       * @return True, if the wire hit of the lhs is less than the wire hit of the rhs.
-       */
-      bool operator()(const CDCRLWireHit* lhs, const CDCRLWireHit* rhs) const
-      {
-        return lhs->getWireHit() < rhs->getWireHit();
-      }
-    };
+
+    /// Comparer functor comparing the wire hit of two given hits
+    using HitComperator = Less<GetWireHit>;
   }
 }

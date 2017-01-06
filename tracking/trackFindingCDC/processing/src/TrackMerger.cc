@@ -64,7 +64,7 @@ void TrackMerger::doTracksMerging(std::list<CDCTrack>& cdcTrackList,
     }
   }
 
-  erase_remove_if(cdcTrackList, [&](CDCTrack & track) { return track.empty(); });
+  erase_remove_if(cdcTrackList, [](CDCTrack & otherTrack) { return (otherTrack.size() < 3); });
 }
 
 template <class ACDCTracks>

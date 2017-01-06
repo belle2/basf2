@@ -45,9 +45,7 @@ void TrackMerger::mergeTracks(CDCTrack& track1,
   TrackQualityTools::normalizeTrack(track1);
 
   TrackProcessor::addCandidateFromHitsWithPostprocessing(splittedHits, allAxialWireHits, cdcTrackList);
-
 }
-
 
 void TrackMerger::doTracksMerging(std::list<CDCTrack>& cdcTrackList,
                                   const std::vector<const CDCWireHit*>& allAxialWireHits,
@@ -107,9 +105,6 @@ TrackMerger::BestMergePartner TrackMerger::calculateBestTrackToMerge(CDCTrack& t
 
     double probabilityTemp = doTracksFitTogether(trackToBeMerged, track2);
 
-    HitProcessor::unmaskHitsInTrack(trackToBeMerged);
-    HitProcessor::unmaskHitsInTrack(track2);
-
     if (probabilityToBeMerged < probabilityTemp) {
       probabilityToBeMerged = probabilityTemp;
       candidateToMergeBest = &track2;
@@ -154,7 +149,6 @@ void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track,
   B2DEBUG(100, "Merger: Resulting nCands = " << cdcTrackList.size());
 
   for (CDCTrack& otherTrack : cdcTrackList) {
-    HitProcessor::unmaskHitsInTrack(otherTrack);
     TrackQualityTools::normalizeTrack(otherTrack);
 // const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getFitter();
 //    trackFitter.fitTrackCandidateFast(cand); <<------ TODO
@@ -162,25 +156,19 @@ void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track,
   }
 }
 
-void TrackMerger::removeStrangeHits(double factor, std::vector<const CDCWireHit*>& wireHits, CDCTrajectory2D& trajectory)
+void TrackMerger::removeStrangeHits(double factor, std::vector<const CDCWireHit*>& wireHits, CDCTrajectory2D& trajectory2D)
 {
-  for (const CDCWireHit* hit : wireHits) {
-
-    double dist = fabs(fabs(trajectory.getDist2D(hit->getRefPos2D())) - fabs(hit->getRefDriftLength()));
-
-    if (dist > hit->getRefDriftLength() * factor) {
-      hit->getAutomatonCell().setMaskedFlag(true);
-    }
-  }
-
-  HitProcessor::deleteAllMarkedHits(wireHits);
+  auto farFromTrajectory = [&trajectory2D, &factor](const CDCWireHit * wireHit) {
+    Vector2D pos2D = wireHit->getRefPos2D();
+    double driftLength = wireHit->getRefDriftLength();
+    double dist = std::fabs(trajectory2D.getDist2D(pos2D)) - driftLength;
+    return std::fabs(dist) > driftLength * factor;
+  };
+  erase_remove_if(wireHits, farFromTrajectory);
 }
 
 double TrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
 {
-  HitProcessor::unmaskHitsInTrack(track1);
-  HitProcessor::unmaskHitsInTrack(track2);
-
   // Build common hit list by copying the wire hits into one large list (we use the wire hits here as we do not want hem to bring
   // their "old" reconstructed position when fitting later.
   std::vector<const CDCWireHit*> commonHitListOfTwoTracks;
@@ -215,11 +203,8 @@ double TrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
   removeStrangeHits(1, commonHitListOfTwoTracks, commonTrajectory);
   commonTrajectory = fitter.fit(commonHitListOfTwoTracks);
 
-  HitProcessor::unmaskHitsInTrack(track1);
-  HitProcessor::unmaskHitsInTrack(track2);
-
-//TODO: perform B2B tracks check
-//if B2B return 0;
+  // TODO: perform B2B tracks check
+  // if B2B return 0;
 
   // Dismiss this possibility if the hit list size after all the removing of hits is even smaller than the two lists before or if the list is too small
   if (commonHitListOfTwoTracks.size() <= std::max(track1.size(), track2.size())

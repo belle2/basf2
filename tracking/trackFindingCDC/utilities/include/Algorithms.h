@@ -9,9 +9,11 @@
  **************************************************************************/
 #pragma once
 
-#include <iterator>
-#include <vector>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/Range.h>
+
+#include <vector>
+#include <iterator>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -51,8 +53,25 @@ namespace Belle2 {
     template <class Ts, class APredicate>
     void erase_remove_if(Ts& ts, const APredicate& predicate)
     {
-      auto itRemoved = std::remove_if(std::begin(ts), std::end(ts), predicate);
-      ts.erase(itRemoved, std::end(ts));
+      ts.erase(std::remove_if(std::begin(ts), std::end(ts), predicate), std::end(ts));
+    }
+
+    /**
+     *  Erase unique idiom in a more concise form
+     */
+    template <class Ts>
+    void erase_unique(Ts& ts)
+    {
+      ts.erase(std::unique(std::begin(ts), std::end(ts)), std::end(ts));
+    }
+
+    /**
+     *  Erase unique idiom in a more concise form
+     */
+    template <class Ts, class AEqual>
+    void erase_unique(Ts& ts, const AEqual& equal)
+    {
+      ts.erase(std::unique(std::begin(ts), std::end(ts), equal), std::end(ts));
     }
 
     /**

@@ -1,8 +1,13 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """
-This setup is used for August data, We use a long scintillator,
-so we need to add time of propagation of light in scintilator
-This was done in CosmicSector Module for Simulation and
-PlaneTriggerTrackTimeEstimator Module for reconstruction.
+Simple example script to Simulate cosmics events and reconstruct only with CDC.
+Usage :
+basf2 runSimulation+Reconstruction.py <run> <nevt> <period>
+run: Run number
+nevt: Number of events to be generated
+period : Data taking period (set 201607, 201608a, 201608b, 201609)
 """
 
 from basf2 import *

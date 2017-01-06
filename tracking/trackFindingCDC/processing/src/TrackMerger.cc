@@ -163,7 +163,7 @@ double TrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
   // than the two lists before or if the list is too small
   if (combinedWireHits.size() <= std::max(track1.size(), track2.size())
       or combinedWireHits.size() < 15) {
-    return 0;
+    return NAN;
   }
 
   return commonTrajectory2D.getPValue();

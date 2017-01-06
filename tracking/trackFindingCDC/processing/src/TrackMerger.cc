@@ -29,12 +29,12 @@ void TrackMerger::mergeTracks(CDCTrack& track1,
                               const std::vector<const CDCWireHit*>& allAxialWireHits,
                               std::list<CDCTrack>& cdcTrackList)
 {
-  if (track1 == track2) return;
+  if (&track1 == &track2) return;
 
-  for (const CDCRecoHit3D& hit : track2) {
-    const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstruct(hit.getRLWireHit(), track1.getStartTrajectory3D().getTrajectory2D());
-
-    track1.push_back(std::move(cdcRecoHit3D));
+  CDCTrajectory2D trajectory2D = track1.getStartTrajectory3D().getTrajectory2D();
+  for (const CDCRecoHit3D& orgRecoHit3D : track2) {
+    CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(orgRecoHit3D.getRLWireHit(), trajectory2D);
+    track1.push_back(std::move(recoHit3D));
   }
   track2.clear();
 
@@ -51,108 +51,62 @@ void TrackMerger::doTracksMerging(std::list<CDCTrack>& cdcTrackList,
                                   const std::vector<const CDCWireHit*>& allAxialWireHits,
                                   double minimum_probability_to_be_merged)
 {
-  // Search for best matches
+  // Search for best matches - cannot use range for here :(.
   for (std::list<CDCTrack>::iterator it1 = cdcTrackList.begin(); it1 !=  cdcTrackList.end(); ++it1) {
-    std::list<CDCTrack>::iterator it2 = it1;
-    ++it2;
-    CDCTrack& track1 = *it1;
-    double prob = 0;
-    CDCTrack* bestCandidate = nullptr;
+    CDCTrack& track = *it1;
+    auto followingTracks = asRange(std::next(it1), cdcTrackList.end());
 
-    for (; it2 !=  cdcTrackList.end(); ++it2) {
+    WithWeight<CDCTrack*> bestTrack = calculateBestTrackToMerge(track, followingTracks);
+    double fitProb = bestTrack.getWeight();
 
-      CDCTrack& track2 = *it2;
-
-      double probTemp = doTracksFitTogether(track1, track2);
-
-      if (probTemp > prob) {
-        prob = probTemp;
-        bestCandidate = &track2;
-      }
-
-    }
-
-    if (bestCandidate and prob > minimum_probability_to_be_merged) {
-      mergeTracks(track1, *bestCandidate, allAxialWireHits, cdcTrackList);
-      TrackQualityTools::normalizeTrack(*bestCandidate);
-//      const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getFitter();
-//      trackFitter.fitTrackCandidateFast(bestCandidate); <----- TODO
+    if (bestTrack != nullptr and fitProb > minimum_probability_to_be_merged) {
+      mergeTracks(track, *bestTrack, allAxialWireHits, cdcTrackList);
     }
   }
 
-  cdcTrackList.erase(std::remove_if(cdcTrackList.begin(),
-                                    cdcTrackList.end(),
-  [&](CDCTrack & track) { return (track.size() == 0); }),
-  cdcTrackList.end());
+  erase_remove_if(cdcTrackList, [&](CDCTrack & track) { return track.empty(); });
 }
 
-TrackMerger::BestMergePartner TrackMerger::calculateBestTrackToMerge(CDCTrack& trackToBeMerged,
-    std::list<CDCTrack>::iterator start_iterator, std::list<CDCTrack>::iterator end_iterator)
+template <class ACDCTracks>
+WithWeight<CDCTrack*> TrackMerger::calculateBestTrackToMerge(CDCTrack& track, ACDCTracks& tracks)
 {
-  double probabilityToBeMerged = 0;
-  CDCTrack* candidateToMergeBest = nullptr;
+  std::vector<WithWeight<CDCTrack*>> weightedTracks;
+  for (CDCTrack& track2 : tracks) {
+    if (&track == &track2) continue;
+    if (track2.size() < 3) continue;
 
-  for (auto iterator = start_iterator; iterator != end_iterator; iterator++) {
-    CDCTrack& track2 = *iterator;
-    if (trackToBeMerged == track2) {
-      continue;
-    }
+    double fitProb = doTracksFitTogether(track, track2);
+    if (std::isnan(fitProb)) continue;
 
-
-    if (track2.size() < 3) {
-      continue;
-    }
-
-    double probabilityTemp = doTracksFitTogether(trackToBeMerged, track2);
-
-    if (probabilityToBeMerged < probabilityTemp) {
-      probabilityToBeMerged = probabilityTemp;
-      candidateToMergeBest = &track2;
-    }
+    weightedTracks.emplace_back(&track2, fitProb);
   }
 
-  return std::make_pair(candidateToMergeBest, probabilityToBeMerged);
+  auto bestMatch = std::min_element(weightedTracks.begin(), weightedTracks.end(), GreaterWeight());
+  if (bestMatch == weightedTracks.end()) return {nullptr, 0};
+  else return *bestMatch;
 }
-
 
 void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track,
                                                  std::list<CDCTrack>& cdcTrackList,
                                                  const std::vector<const CDCWireHit*>& allAxialWireHits,
-
                                                  double minimum_probability_to_be_merged)
 {
-  B2DEBUG(100, "Merger: Initial nCands = " << cdcTrackList.size());
-
   bool have_merged_something;
-
   do {
     have_merged_something = false;
-    BestMergePartner candidateToMergeBest = calculateBestTrackToMerge(track, cdcTrackList.begin(),
-                                            cdcTrackList.end());
-    CDCTrack* bestFitTrackCandidate = candidateToMergeBest.first;
-    double probabilityWithCandidate = candidateToMergeBest.second;
+    WithWeight<CDCTrack*> bestTrack = calculateBestTrackToMerge(track, cdcTrackList);
+    double fitProb = bestTrack.getWeight();
 
-    if (bestFitTrackCandidate and probabilityWithCandidate > minimum_probability_to_be_merged) {
-      mergeTracks(track, *bestFitTrackCandidate, allAxialWireHits, cdcTrackList);
+    if (bestTrack and fitProb > minimum_probability_to_be_merged) {
+      mergeTracks(track, *bestTrack, allAxialWireHits, cdcTrackList);
       have_merged_something = true;
     }
 
-    B2DEBUG(100, "Cand hits vector size = " << track.size());
-
-    cdcTrackList.erase(std::remove_if(cdcTrackList.begin(),
-                                      cdcTrackList.end(),
-    [](CDCTrack & otherTrack) { return (otherTrack.size() < 3); }),
-    cdcTrackList.end());
-
+    erase_remove_if(cdcTrackList, [](CDCTrack & otherTrack) { return (otherTrack.size() < 3); });
   } while (have_merged_something);
-
-  B2DEBUG(100, "Merger: Resulting nCands = " << cdcTrackList.size());
 
   for (CDCTrack& otherTrack : cdcTrackList) {
     TrackQualityTools::normalizeTrack(otherTrack);
-// const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getFitter();
-//    trackFitter.fitTrackCandidateFast(cand); <<------ TODO
-//    cand->reestimateCharge();
   }
 }
 
@@ -169,48 +123,48 @@ void TrackMerger::removeStrangeHits(double factor, std::vector<const CDCWireHit*
 
 double TrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
 {
-  // Build common hit list by copying the wire hits into one large list (we use the wire hits here as we do not want hem to bring
-  // their "old" reconstructed position when fitting later.
-  std::vector<const CDCWireHit*> commonHitListOfTwoTracks;
+  // Build common hit list by copying the wire hits into one large list
+  // We use the wire hits here as we do not want them to bring
+  // their "old" reconstructed position when fitting.
+  std::vector<const CDCWireHit*> combinedWireHits;
   for (const CDCRecoHit3D& hit : track1) {
-    commonHitListOfTwoTracks.push_back(&(hit.getWireHit()));
+    combinedWireHits.push_back(&(hit.getWireHit()));
   }
   for (const CDCRecoHit3D& hit : track2) {
-    commonHitListOfTwoTracks.push_back(&(hit.getWireHit()));
+    combinedWireHits.push_back(&(hit.getWireHit()));
   }
 
-  // Sorting is done via pointer addresses (!!). This is not very stable and also not very meaningful (in terms of physical meaning),
-  // but it does the job for later unique.
-  std::sort(commonHitListOfTwoTracks.begin(), commonHitListOfTwoTracks.end());
-
-  commonHitListOfTwoTracks.erase(std::unique(commonHitListOfTwoTracks.begin(),
-                                             commonHitListOfTwoTracks.end()),
-                                 commonHitListOfTwoTracks.end());
+  // Sorting is done via pointer addresses (!!).
+  // This is not very stable and also not very meaningful (in terms of ordering in the track),
+  // but it does the job for unique.
+  // (the ordering is still outwards though since the wire hits are ordered like that in continuous memory)
+  std::sort(combinedWireHits.begin(), combinedWireHits.end());
+  erase_unique(combinedWireHits);
 
   // Calculate track parameters
-  CDCTrajectory2D commonTrajectory;
-
+  CDCTrajectory2D commonTrajectory2D;
   const CDCKarimakiFitter& fitter = CDCKarimakiFitter::getNoDriftVarianceFitter();
 
   // Approach the best fit
-  commonTrajectory = fitter.fit(commonHitListOfTwoTracks);
-  removeStrangeHits(5, commonHitListOfTwoTracks, commonTrajectory);
-  commonTrajectory = fitter.fit(commonHitListOfTwoTracks);
-  removeStrangeHits(3, commonHitListOfTwoTracks, commonTrajectory);
-  commonTrajectory = fitter.fit(commonHitListOfTwoTracks);
-  removeStrangeHits(1, commonHitListOfTwoTracks, commonTrajectory);
-  commonTrajectory = fitter.fit(commonHitListOfTwoTracks);
-  removeStrangeHits(1, commonHitListOfTwoTracks, commonTrajectory);
-  commonTrajectory = fitter.fit(commonHitListOfTwoTracks);
+  commonTrajectory2D = fitter.fit(combinedWireHits);
+  removeStrangeHits(5, combinedWireHits, commonTrajectory2D);
+  commonTrajectory2D = fitter.fit(combinedWireHits);
+  removeStrangeHits(3, combinedWireHits, commonTrajectory2D);
+  commonTrajectory2D = fitter.fit(combinedWireHits);
+  removeStrangeHits(1, combinedWireHits, commonTrajectory2D);
+  commonTrajectory2D = fitter.fit(combinedWireHits);
+  removeStrangeHits(1, combinedWireHits, commonTrajectory2D);
+  commonTrajectory2D = fitter.fit(combinedWireHits);
 
   // TODO: perform B2B tracks check
   // if B2B return 0;
 
-  // Dismiss this possibility if the hit list size after all the removing of hits is even smaller than the two lists before or if the list is too small
-  if (commonHitListOfTwoTracks.size() <= std::max(track1.size(), track2.size())
-      or commonHitListOfTwoTracks.size() < 15) {
+  // Dismiss this possibility if the hit list size after all the removing of hits is even smaller
+  // than the two lists before or if the list is too small
+  if (combinedWireHits.size() <= std::max(track1.size(), track2.size())
+      or combinedWireHits.size() < 15) {
     return 0;
   }
 
-  return TMath::Prob(commonTrajectory.getChi2(), commonTrajectory.getNDF());
+  return commonTrajectory2D.getPValue();
 }

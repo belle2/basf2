@@ -7,8 +7,9 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
+
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
 
 #include <list>
 #include <vector>
@@ -47,9 +48,6 @@ namespace Belle2 {
                                                  double minimum_probability_to_be_merged = 0.85);
 
     private:
-      /// Type for the results of the merging process.
-      using BestMergePartner = std::pair<CDCTrack*, double>;
-
       /**
        *  Function to merge two track candidates. The hits of cand2 are deleted and transfered to cand1.
        *  The hit sorting is not maintained.
@@ -78,13 +76,12 @@ namespace Belle2 {
 
       /**
        *  Searches for the best candidate to merge this track to.
-       *  @param trackToBeMerged track for which we try to find merging partner
-       *  @param start_iterator the iterator where to start searching (this element included)
-       *  @return a pointer to the best fit candidate.
+       *  @param track   track for which we try to find merging partner
+       *  @param tracks  search range of tracks
+       *  @return a pointer to the best fit candidate including a fit probability
        */
-      static BestMergePartner calculateBestTrackToMerge(CDCTrack& trackToBeMerged,
-                                                        std::list<CDCTrack>::iterator start_iterator,
-                                                        std::list<CDCTrack>::iterator end_iterator);
+      template <class ACDCTracks>
+      static WithWeight<CDCTrack*> calculateBestTrackToMerge(CDCTrack& track, ACDCTracks& tracks);
     };
   }
 }

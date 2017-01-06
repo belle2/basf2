@@ -100,9 +100,6 @@ namespace {
   }
 }
 
-
-
-
 CDCTrack::CDCTrack(const CDCSegment2D& segment) :
   m_startTrajectory3D(segment.getTrajectory2D()),
   m_endTrajectory3D(segment.getTrajectory2D())
@@ -161,7 +158,6 @@ CDCTrack CDCTrack::condense(const std::vector<const CDCTrack*>& trackPath)
     return result;
   }
 }
-
 
 CDCTrack CDCTrack::condense(const Path<const CDCSegmentTriple>& segmentTriplePath)
 {
@@ -391,18 +387,4 @@ void CDCTrack::shiftToPositiveArcLengths2D(bool doForAllTracks)
       }
     }
   }
-}
-
-void CDCTrack::removeAllAssignedMarkedHits()
-{
-  // Delete all hits that were marked
-  erase(std::remove_if(begin(), end(), [](const CDCRecoHit3D & recoHit) -> bool {
-    if (recoHit.getWireHit().getAutomatonCell().hasAssignedFlag())
-    {
-      recoHit.getWireHit().getAutomatonCell().unsetTakenFlag();
-      return true;
-    } else {
-      return false;
-    }
-  }), end());
 }

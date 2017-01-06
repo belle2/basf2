@@ -2,10 +2,12 @@
 
 #include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <framework/dataobjects/Helix.h>
+
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
+#include <framework/dataobjects/Helix.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -79,17 +81,22 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
         B2FATAL("Do not know corrector function " << correctorFunction);
       }
 
-      track.removeAllAssignedMarkedHits();
+      // Delete all hits that were marked
+      erase_remove_if(track, [](const CDCRecoHit3D & recoHit3D) -> bool {
+        AutomatonCell& automatonCell = recoHit3D.getWireHit().getAutomatonCell();
+        if (automatonCell.hasAssignedFlag())
+        {
+          automatonCell.unsetTakenFlag();
+          return true;
+        }
+        return false;
+      });
+
       TrackQualityTools::normalizeHitsAndResetTrajectory(track);
-    }
+    } // correctorFunction
+  } // track
 
-    if (track.size() == 0)
-      continue;
-  }
-
-  tracks.erase(std::remove_if(tracks.begin(), tracks.end(), [](const CDCTrack & track) -> bool {
-    return track.size() < 3;
-  }), tracks.end());
+  erase_remove_if(tracks, [](const CDCTrack & track) -> bool { return track.size() < 3; });
 
   for (const CDCTrack& splittedTrack : splittedTracks) {
     tracks.push_back(splittedTrack);

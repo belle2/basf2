@@ -121,9 +121,6 @@ namespace Belle2 {
        */
       void receiveMaskedFlag() const;
 
-      /** Remove all hits from the track which have an assigned flag */
-      void removeAllAssignedMarkedHits();
-
       /** Set the taken flag of all hits belonging to this track to the given value (default true),
        * but do not touch the flag of the track itself. */
       void forwardTakenFlag(bool takenFlag = true) const;

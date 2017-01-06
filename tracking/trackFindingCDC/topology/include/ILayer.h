@@ -24,30 +24,10 @@ namespace Belle2 {
       static const ILayer c_Invalid = SHRT_MIN;
 
       /// Returns the superlayer of an object.
-      template<class T>
+      template<class T, class SFINAE = decltype(&T::getILayer)>
       ILayer operator()(const T& t) const
       {
-        const int dispatchTag = 0;
-        return impl(t, dispatchTag);
-      }
-
-    private:
-      /// Returns the superlayer of an object. Favored option.
-      template <class T>
-      static auto impl(const T& t,
-                       int favouredTag __attribute__((unused)))
-      -> decltype(t.getILayer())
-      {
         return t.getILayer();
-      }
-
-      /// Returns the superlayer of an object. Disfavoured option.
-      template <class T>
-      static auto impl(const T& t,
-                       long disfavouredTag __attribute__((unused)))
-      -> decltype(t->getILayer())
-      {
-        return &*t == nullptr ? c_Invalid : t->getILayer();
       }
     };
   }

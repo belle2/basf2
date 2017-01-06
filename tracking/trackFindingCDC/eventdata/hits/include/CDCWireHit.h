@@ -364,30 +364,16 @@ namespace Belle2 {
     struct GetWireHit {
 
       /// Returns the wire hit of an object.
-      template<class T>
-      const CDCWireHit& operator()(const T& t) const
-      {
-        const int dispatchTag = 0;
-        return impl(t, dispatchTag);
-      }
-
-    private:
-      /// Returns the wire hit of an object. Favored option.
-      template <class T>
-      static auto impl(const T& t,
-                       int favouredTag __attribute__((unused)))
-      -> decltype(t.getWireHit())
+      template<class T, class SFINAE = decltype(&T::getWireHit)>
+      const CDCWireHit & operator()(const T& t) const
       {
         return t.getWireHit();
       }
 
-      /// Returns the wire hit of an object. Disfavoured option.
-      template <class T>
-      static auto impl(const T& t,
-                       long disfavouredTag __attribute__((unused)))
-      -> decltype(t->getWireHit())
+      /// If given a wire hit return it unchanged.
+      const CDCWireHit& operator()(const CDCWireHit& wireHit) const
       {
-        return t->getWireHit();
+        return wireHit;
       }
     };
   }

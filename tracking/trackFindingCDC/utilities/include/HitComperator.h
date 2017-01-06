@@ -9,13 +9,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/utilities/Functional.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Comparer functor comparing the wire hit of two given hits
-    using HitComperator = Less<GetWireHit>;
+    using HitComperator = Less<MayBeArrow<GetWireHit>>;
   }
 }

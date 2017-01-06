@@ -11,10 +11,10 @@
 
 #include <tracking/trackFindingCDC/topology/EStereoKind.h>
 #include <tracking/trackFindingCDC/utilities/Functional.h>
+#include <utility>
 #include <climits>
 
 namespace Belle2 {
-
   namespace TrackFindingCDC {
 
     /// The type of the layer and superlayer ids
@@ -22,35 +22,14 @@ namespace Belle2 {
 
     /// Generic functor to get the superlayer id from an object.
     struct GetISuperLayer {
-
       /// Constant returned on an invalid get operation
       static const ISuperLayer c_Invalid = SHRT_MIN;
 
       /// Returns the superlayer of an object.
-      template<class T>
+      template<class T, class SFINAE =  decltype(&T::getISuperLayer)>
       ISuperLayer operator()(const T& t) const
       {
-        const int dispatchTag = 0;
-        return impl(t, dispatchTag);
-      }
-
-    private:
-      /// Returns the superlayer of an object. Favored option.
-      template <class T>
-      static auto impl(const T& t,
-                       int favouredTag __attribute__((unused)))
-      -> decltype(t.getISuperLayer())
-      {
         return t.getISuperLayer();
-      }
-
-      /// Returns the superlayer of an object. Disfavoured option.
-      template <class T>
-      static auto impl(const T& t,
-                       long disfavouredTag __attribute__((unused)))
-      -> decltype(t->getISuperLayer())
-      {
-        return &*t == nullptr ? c_Invalid : t->getISuperLayer();
       }
     };
 
@@ -115,7 +94,7 @@ namespace Belle2 {
       template<class T1, class T2>
       static ISuperLayer getCommon(const T1& t1, const T2& t2)
       {
-        return Common<GetISuperLayer>()(t1, t2);
+        return Common<MayBeArrow<GetISuperLayer>>()(t1, t2);
       }
 
       /**
@@ -125,14 +104,14 @@ namespace Belle2 {
       template<class AHits>
       static ISuperLayer getCommon(const AHits& hits)
       {
-        return Common<GetISuperLayer>()(hits);
+        return Common<MayBeArrow<GetISuperLayer>>()(hits);
       }
 
       /// Returns the superlayer of an object.
       template<class T>
       static ISuperLayer getFrom(const T& t)
       {
-        return GetISuperLayer()(t);
+        return MayBeArrow<GetISuperLayer>()(t);
       }
     };
   }

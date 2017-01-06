@@ -36,30 +36,10 @@ namespace Belle2 {
       static const EStereoKind c_Invalid = EStereoKind::c_Invalid;
 
       /// Returns the stereo kind of an object.
-      template<class T>
+      template<class T, class SFINAE = decltype(&T::getStereoKind)>
       EStereoKind operator()(const T& t) const
       {
-        const int dispatchTag = 0;
-        return impl(t, dispatchTag);
-      }
-
-    private:
-      /// Returns the stereo kind of an object. Favored option.
-      template <class T>
-      static auto impl(const T& t,
-                       int favouredTag __attribute__((unused)))
-      -> decltype(t.getStereoKind())
-      {
         return t.getStereoKind();
-      }
-
-      /// Returns the stereo kind of an object. Disfavoured option.
-      template <class T>
-      static auto impl(const T& t,
-                       long disfavouredTag __attribute__((unused)))
-      -> decltype(t->getStereoKind())
-      {
-        return &*t == nullptr ? c_Invalid : t->getStereoKind();
       }
     };
 
@@ -79,14 +59,14 @@ namespace Belle2 {
       template<class AHits>
       static EStereoKind getCommon(const AHits& hits)
       {
-        return Common<GetEStereoKind>()(hits);
+        return Common<MayBeArrow<GetEStereoKind>>()(hits);
       }
 
       /// Returns the superlayer of an object
       template<class T>
       static EStereoKind getFrom(const T& t)
       {
-        return GetEStereoKind()(t);
+        return MayBeArrow<GetEStereoKind>()(t);
       }
     };
   }

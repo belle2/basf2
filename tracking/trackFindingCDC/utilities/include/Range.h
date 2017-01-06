@@ -101,5 +101,12 @@ namespace Belle2 {
     {
       return Range<AIterator>(x);
     }
+
+    /// Adapter function to make pair of iterators (e.g. from equal_range) into a range usable in range base for loops.
+    template<class AIterator>
+    Range<AIterator> asRange(AIterator const& itBegin, AIterator const& itEnd)
+    {
+      return Range<AIterator>(std::make_pair(itBegin, itEnd));
+    }
   }
 }

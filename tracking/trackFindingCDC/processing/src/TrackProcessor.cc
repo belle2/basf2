@@ -23,21 +23,32 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void TrackProcessor::addCandidateFromHitsWithPostprocessing(std::vector<const CDCWireHit*>& hits,
+void TrackProcessor::addCandidateFromHitsWithPostprocessing(std::vector<const CDCWireHit*>& foundAxialWireHits,
                                                             const std::vector<const CDCWireHit*>& allAxialWireHits,
                                                             std::list<CDCTrack>& cdcTrackList)
 {
-  if (hits.size() == 0) return;
-
-  const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
-  const CDCTrajectory2D& trackTrajectory2D = fitter.fit(hits);
-  CDCTrajectory3D trajectory3D(trackTrajectory2D, CDCTrajectorySZ::basicAssumption());
-
+  if (foundAxialWireHits.size() == 0) return;
 
   cdcTrackList.emplace_back();
   CDCTrack& track = cdcTrackList.back();
-  track.setStartTrajectory3D(trajectory3D);
-  track.appendNotTaken(hits);
+
+  // Fit trajectory
+  const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
+  CDCTrajectory2D trajectory2D = fitter.fit(foundAxialWireHits);
+  track.setStartTrajectory3D(CDCTrajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption()));
+
+  // Reconstruct and add hits
+  for (const CDCWireHit* wireHit : foundAxialWireHits) {
+    AutomatonCell& automatonCell = wireHit->getAutomatonCell();
+    if (automatonCell.hasTakenFlag() or automatonCell.hasMaskedFlag()) continue;
+
+    CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstructNearest(wireHit, trajectory2D);
+    track.push_back(std::move(recoHit3D));
+
+    automatonCell.setTakenFlag(true);
+  }
+
+  // Change everything again in the postprocessing - and even delete the just created track if need be.
   postprocessTrack(track, allAxialWireHits, cdcTrackList);
 }
 

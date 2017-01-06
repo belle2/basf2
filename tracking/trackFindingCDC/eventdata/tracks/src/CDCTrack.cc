@@ -287,21 +287,6 @@ CDCTrack CDCTrack::condense(const Path<const CDCSegmentPair>& segmentPairPath)
   return track;
 }
 
-
-void CDCTrack::appendNotTaken(const std::vector<const CDCWireHit*>& hits)
-{
-  const CDCTrajectory2D& trackTrajectory2D = this->getStartTrajectory3D().getTrajectory2D();
-
-  for (const CDCWireHit* item : hits) {
-    if (item->getAutomatonCell().hasTakenFlag() || item->getAutomatonCell().hasMaskedFlag()) continue;
-
-    const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstructNearest(item, trackTrajectory2D);
-    this->push_back(std::move(recoHit3D));
-    recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
-  }
-}
-
-
 bool CDCTrack::storeInto(StoreArray<RecoTrack>& recoTracks) const
 {
   RecoTrack* newRecoTrack = getStartTrajectory3D().storeInto(recoTracks);
@@ -310,8 +295,6 @@ bool CDCTrack::storeInto(StoreArray<RecoTrack>& recoTracks) const
   }
   return true;
 }
-
-
 
 std::vector<CDCSegment3D> CDCTrack::splitIntoSegments() const
 {
@@ -327,8 +310,6 @@ std::vector<CDCSegment3D> CDCTrack::splitIntoSegments() const
   }
   return result;
 }
-
-
 
 void CDCTrack::reverse()
 {
@@ -352,7 +333,6 @@ void CDCTrack::reverse()
 
   // Reverse the arrangement of hits.
   std::reverse(begin(), end());
-
 }
 
 CDCTrack CDCTrack::reversed() const

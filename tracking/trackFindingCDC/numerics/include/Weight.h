@@ -25,34 +25,17 @@ namespace Belle2 {
       static constexpr const Weight c_Invalid = NAN;
 
       /// Returns the weight of an object.
-      template<class T>
+      template<class T, class SFINAE = decltype(&T::getWeight)>
       Weight operator()(const T& t) const
-      {
-        const int dispatchTag = 0;
-        return impl(t, dispatchTag);
-      }
-
-    private:
-      /// Returns the weight of an object. Favored option.
-      template <class T>
-      static auto impl(const T& t,
-                       int favouredTag __attribute__((unused)))
-      -> decltype(t.getWeight())
       {
         return t.getWeight();
       }
-
-      /// Returns the weight of an object. Disfavoured option.
-      template <class T>
-      static auto impl(const T& t,
-                       long disfavouredTag __attribute__((unused)))
-      -> decltype(t->getWeight())
-      {
-        return &*t == nullptr ? c_Invalid : t->getWeight();
-      }
     };
 
-    /// Operator to sort only according to the weight of the object.
-    using GreaterWeight = Greater<GetWeight>;
+    /// Operator to sort for lowest according to the weight of the object.
+    using LessWeight = LessOf<MayIndirectTo<GetWeight>>;
+
+    /// Operator to sort for highest according to the weight of the object.
+    using GreaterWeight = GreaterOf<MayIndirectTo<GetWeight>>;
   }
 }

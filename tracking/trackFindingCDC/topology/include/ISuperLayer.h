@@ -94,7 +94,7 @@ namespace Belle2 {
       template<class T1, class T2>
       static ISuperLayer getCommon(const T1& t1, const T2& t2)
       {
-        return Common<MayBeArrow<GetISuperLayer>>()(t1, t2);
+        return Common<MayIndirectTo<GetISuperLayer>>()(t1, t2);
       }
 
       /**
@@ -104,14 +104,14 @@ namespace Belle2 {
       template<class AHits>
       static ISuperLayer getCommon(const AHits& hits)
       {
-        return Common<MayBeArrow<GetISuperLayer>>()(hits);
+        return Common<MayIndirectTo<GetISuperLayer>>()(hits);
       }
 
       /// Returns the superlayer of an object.
       template<class T>
       static ISuperLayer getFrom(const T& t)
       {
-        return MayBeArrow<GetISuperLayer>()(t);
+        return MayIndirectTo<GetISuperLayer>()(t);
       }
     };
   }

@@ -16,6 +16,6 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Comparer functor comparing the wire hit of two given hits
-    using HitComperator = Less<MayBeArrow<GetWireHit>>;
+    using HitComperator = LessOf<MayIndirectTo<GetWireHit>>;
   }
 }

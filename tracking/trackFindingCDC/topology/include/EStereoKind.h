@@ -59,14 +59,14 @@ namespace Belle2 {
       template<class AHits>
       static EStereoKind getCommon(const AHits& hits)
       {
-        return Common<MayBeArrow<GetEStereoKind>>()(hits);
+        return Common<MayIndirectTo<GetEStereoKind>>()(hits);
       }
 
       /// Returns the superlayer of an object
       template<class T>
       static EStereoKind getFrom(const T& t)
       {
-        return MayBeArrow<GetEStereoKind>()(t);
+        return MayIndirectTo<GetEStereoKind>()(t);
       }
     };
   }

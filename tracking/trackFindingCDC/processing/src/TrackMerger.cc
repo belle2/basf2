@@ -7,19 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/processing/TrackMerger.h>
 
 #include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/processing/TrackProcessor.h>
 #include <tracking/trackFindingCDC/processing/HitProcessor.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 
-#include <tracking/trackFindingCDC/processing/TrackProcessor.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <TMath.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -41,7 +41,7 @@ void TrackMerger::doTracksMerging(std::list<CDCTrack>& cdcTrackList,
     }
   }
 
-  erase_remove_if(cdcTrackList, [](CDCTrack & otherTrack) { return (otherTrack.size() < 3); });
+  erase_remove_if(cdcTrackList, Size() < 3u);
 }
 
 template <class ACDCTracks>
@@ -58,7 +58,7 @@ WithWeight<MayBePtr<CDCTrack> > TrackMerger::calculateBestTrackToMerge(CDCTrack&
     weightedTracks.emplace_back(&track2, fitProb);
   }
 
-  auto bestMatch = std::min_element(weightedTracks.begin(), weightedTracks.end(), GreaterWeight());
+  auto bestMatch = std::max_element(weightedTracks.begin(), weightedTracks.end(), LessWeight());
   if (bestMatch == weightedTracks.end()) return {nullptr, 0};
   else return *bestMatch;
 }
@@ -161,7 +161,7 @@ void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track,
       have_merged_something = true;
     }
 
-    erase_remove_if(cdcTrackList, [](CDCTrack & otherTrack) { return (otherTrack.size() < 3); });
+    erase_remove_if(cdcTrackList, Size() < 3u);
   } while (have_merged_something);
 
   for (CDCTrack& otherTrack : cdcTrackList) {

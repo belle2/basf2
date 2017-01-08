@@ -96,7 +96,7 @@ namespace Belle2 {
 
     /// Functor factory from the functional composition of two functors
     template <class AFunctor1, class AFunctor2>
-    struct Composition : public AFunctor1 {
+    struct Composition {
       /// Marker function for the isFunctor test
       operator FunctorTag();
 
@@ -105,28 +105,31 @@ namespace Belle2 {
 
       /// Constructor from the nested functor
       explicit Composition(const AFunctor2& functor2)
-        : AFunctor1()
+        : m_functor1()
         , m_functor2(functor2)
       {
       }
 
       /// Constructor from the first and the nested functor
       Composition(const AFunctor1& functor1, const AFunctor2& functor2)
-        : AFunctor1(functor1)
+        : m_functor1(functor1)
         , m_functor2(functor2)
       {
       }
 
     private: // Members here for lookup reasons
       /// Memory for the nested functor
+      AFunctor1 m_functor1;
+
+      /// Memory for the nested functor
       AFunctor2 m_functor2;
 
     public:
       /// Operator getting the result of the function composition
       template<class T>
-      auto operator()(const T& t) const -> decltype(AFunctor1::operator()(m_functor2(t)))
+      auto operator()(const T& t) const -> decltype(m_functor1(m_functor2(t)))
       {
-        return AFunctor1::operator()(m_functor2(t));
+        return m_functor1(m_functor2(t));
       }
     };
 
@@ -143,7 +146,7 @@ namespace Belle2 {
 
       /// Constructor from the nested functors
       BinaryJoin(const ABinaryOp& binaryOp, const AFunctor1& functor1, const AFunctor2& functor2)
-        : ABinaryOp(binaryOp)
+        : m_binaryOp(binaryOp)
         , m_functor1(functor1)
         , m_functor2(functor2)
       {
@@ -152,13 +155,16 @@ namespace Belle2 {
 
       /// Constructor from the nested functors
       BinaryJoin(const AFunctor1& functor1, const AFunctor2& functor2)
-        : ABinaryOp()
+        : m_binaryOp()
         , m_functor1(functor1)
         , m_functor2(functor2)
       {
       }
 
     private: // Members here for lookup reasons
+      /// Memory for the binary operation
+      ABinaryOp m_binaryOp;
+
       /// Memory for the first nested functor
       AFunctor1 m_functor1;
 
@@ -168,30 +174,33 @@ namespace Belle2 {
     public:
       /// Operator getting the result of the binary operation from two objects transformed by the two functors
       template <class T1, class T2>
-      auto operator()(const T1& t1, const T2& t2) const -> decltype(ABinaryOp::operator()(m_functor1(t1), m_functor2(t2)))
+      auto operator()(const T1& t1, const T2& t2) const -> decltype(m_binaryOp(m_functor1(t1), m_functor2(t2)))
       {
-        return ABinaryOp::operator()(m_functor1(t1), m_functor2(t2));
+        return m_binaryOp(m_functor1(t1), m_functor2(t2));
       }
 
       /// Operator getting the result of the binary operation from one object transformed by the two functors
       template <class T>
-      auto operator()(const T& t) const -> decltype(ABinaryOp::operator()(m_functor1(t), m_functor2(t)))
+      auto operator()(const T& t) const -> decltype(m_binaryOp(m_functor1(t), m_functor2(t)))
       {
-        return ABinaryOp::operator()(m_functor1(t), m_functor2(t));
+        return m_binaryOp(m_functor1(t), m_functor2(t));
       }
     };
 
     /// Generic functor to try to functors and choose the first to be applicable
     template <class AFunctor1, class AFunctor2>
-    struct Alternation : public AFunctor2 {
+    struct Alternation {
 
     public:
       /// Marker function for the isFunctor test
       operator FunctorTag();
 
     private: // Members first for lookup reasons
-      /// Memory for the first functor
+      /// Memory for the first nested functor
       AFunctor1 m_functor1;
+
+      /// Memory for the second nested functor
+      AFunctor2 m_functor2;
 
     public:
       /// Allow default construction
@@ -199,8 +208,8 @@ namespace Belle2 {
 
       /// Constructor from the nested functors
       Alternation(const AFunctor1& functor1, const AFunctor2& functor2 = AFunctor2())
-        : AFunctor2(functor2)
-        , m_functor1(functor1)
+        : m_functor1(functor1)
+        , m_functor2(functor2)
       {
       }
 
@@ -216,9 +225,9 @@ namespace Belle2 {
       /// Implementation applying the second functor. Disfavoured option.
       template <class... T>
       auto impl(long disfavouredTag __attribute__((unused)), T&& ... t) const
-      -> decltype(AFunctor2::operator()(std::forward<T>(t)...))
+      -> decltype(m_functor2(std::forward<T>(t)...))
       {
-        return AFunctor2::operator()(std::forward<T>(t)...);
+        return m_functor2(std::forward<T>(t)...);
       }
 
     public:

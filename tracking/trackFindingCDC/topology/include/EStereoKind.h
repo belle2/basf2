@@ -31,10 +31,6 @@ namespace Belle2 {
 
     /// Generic functor to get the stereo kind from an object.
     struct GetEStereoKind {
-
-      /// Constant returned on an invalid get operation
-      static const EStereoKind c_Invalid = EStereoKind::c_Invalid;
-
       /// Returns the stereo kind of an object.
       template<class T, class SFINAE = decltype(&T::getStereoKind)>
       EStereoKind operator()(const T& t) const
@@ -56,17 +52,17 @@ namespace Belle2 {
        *  Returns the common stereo type of hits in a container.
        *  EStereoKind::c_Invalid if there is no common stereo kind or the container is empty.
        */
-      template<class AHits>
+      template <class AHits>
       static EStereoKind getCommon(const AHits& hits)
       {
-        return Common<MayIndirectTo<GetEStereoKind>>()(hits);
+        return Common<MayIndirectTo<GetEStereoKind>>()(hits).value_or(EStereoKind::c_Invalid);
       }
 
       /// Returns the superlayer of an object
-      template<class T>
+      template <class T>
       static EStereoKind getFrom(const T& t)
       {
-        return MayIndirectTo<GetEStereoKind>()(t);
+        return MayIndirectTo<GetEStereoKind>()(t).value_or(EStereoKind::c_Invalid);
       }
     };
   }

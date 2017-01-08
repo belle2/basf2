@@ -22,9 +22,6 @@ namespace Belle2 {
 
     /// Generic functor to get the superlayer id from an object.
     struct GetISuperLayer {
-      /// Constant returned on an invalid get operation
-      static const ISuperLayer c_Invalid = SHRT_MIN;
-
       /// Returns the superlayer of an object.
       template<class T, class SFINAE =  decltype(&T::getISuperLayer)>
       ISuperLayer operator()(const T& t) const
@@ -52,7 +49,7 @@ namespace Belle2 {
       static const ISuperLayer c_OuterVolume = 9;
 
       /// Constant making an invalid superlayer id
-      static const ISuperLayer c_Invalid = GetISuperLayer::c_Invalid;
+      static const ISuperLayer c_Invalid = SHRT_MIN;
 
       /// Indicates if the given number corresponds to a true cdc superlayer - excludes the logic ids for inner and outer volume.
       static bool isInvalid(ISuperLayer iSuperLayer);
@@ -94,7 +91,7 @@ namespace Belle2 {
       template<class T1, class T2>
       static ISuperLayer getCommon(const T1& t1, const T2& t2)
       {
-        return Common<MayIndirectTo<GetISuperLayer>>()(t1, t2);
+        return Common<MayIndirectTo<GetISuperLayer>>()(t1, t2).value_or(c_Invalid);
       }
 
       /**
@@ -104,7 +101,7 @@ namespace Belle2 {
       template<class AHits>
       static ISuperLayer getCommon(const AHits& hits)
       {
-        return Common<MayIndirectTo<GetISuperLayer>>()(hits);
+        return Common<MayIndirectTo<GetISuperLayer>>()(hits).value_or(c_Invalid);
       }
 
       /// Returns the superlayer of an object.

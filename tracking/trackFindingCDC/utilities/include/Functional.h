@@ -11,6 +11,8 @@
 
 #include <tracking/trackFindingCDC/utilities/EnableIf.h>
 
+#include <boost/optional.hpp>
+
 #include <iterator>
 #include <functional>
 #include <type_traits>
@@ -540,49 +542,44 @@ namespace Belle2 {
 
 
     /// Adapter of a category function to find the common category of several objects
-    template <class ACategoryFunction>
+    template <class AFunctor>
     struct Common {
 
-      /// Return value for invalid operations
-      static const auto c_Invalid = ACategoryFunction::c_Invalid;
+    private:
+      /// Memory for the nested functor
+      AFunctor m_functor;
 
-      /// Returned type
-      using Category = decltype(c_Invalid);
-
+    public:
       /**
        *  Returns the common category value of a range.
        *
-       *  In case the range is empty or the category value differ between the elements
-       *  it returns the c_Invalid category value.
+       *  In case the category value differ between the values return empty optional.
        */
-      template <class Ts>
-      Category operator()(const Ts& ts) const
+      template <class Ts, class Category = decltype(m_functor(*std::declval<Ts>().begin()))>
+      boost::optional<Category> operator()(const Ts& ts) const
       {
-        auto itBegin = std::begin(ts);
+        auto it = std::begin(ts);
         auto itEnd = std::end(ts);
-        if (itBegin == itEnd) return c_Invalid; // empty case
-        ACategoryFunction catFunc;
-        const Category cat = catFunc(*itBegin);
-        for (auto it = itBegin; it != itEnd; ++it) {
-          if (cat != catFunc(*it)) return c_Invalid;
+        if (it == itEnd) return {}; // empty case
+        Category category = m_functor(*it);
+        for (; it != itEnd; ++it) {
+          if (category != m_functor(*it)) return {};
         }
-        return cat;
+        return boost::make_optional(category);
       }
 
       /**
-       *  Returns the common category value of two values.
+       *  Returns the common category of two values.
        *
-       *  In case the category value differ between the elements
-       *  it returns the c_Invalid category value.
+       *  In case the category value differ between the values return empty optional
        */
-      template<class T1, class T2>
-      Category operator()(const T1& t1, const T2& t2) const
+      template<class T1, class T2, class Category = decltype(m_functor(std::declval<T1>()))>
+      boost::optional<Category> operator()(const T1& t1, const T2& t2) const
       {
-        ACategoryFunction catFunc;
-        Category cat1 = catFunc(t1);
-        Category cat2 = catFunc(t2);
-        if (cat1 == cat2) return cat1;
-        return c_Invalid;
+        Category cat1 = m_functor(t1);
+        Category cat2 = m_functor(t2);
+        if (cat1 == cat2) return boost::make_optional(cat1);
+        return {};
       }
     };
   }

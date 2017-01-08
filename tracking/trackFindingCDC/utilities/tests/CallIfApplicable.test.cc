@@ -30,11 +30,12 @@ namespace {
   }
 
   struct Back {
-    template<class T>
-    const typename T::value_type& operator()(const T& container)
-    { return container.back(); }
+    template <class T>
+    const typename T::value_type& operator()(const T& container) const
+    {
+      return container.back();
+    }
   };
-
 
   TEST(TrackFindingCDCTest, utilities_getIfApplicable)
   {
@@ -47,6 +48,7 @@ namespace {
     EXPECT_EQ(1.0, back(v));
 
     // Valid get case
+    EXPECT_EQ(1.0, Back()(v));
     EXPECT_EQ(1.0, getIfApplicable<float>(Back(), v, -1.0));
 
     // Default case

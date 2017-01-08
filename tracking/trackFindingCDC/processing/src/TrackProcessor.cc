@@ -133,23 +133,6 @@ void TrackProcessor::assignNewHits(const std::vector<const CDCWireHit*>& allAxia
   }
 }
 
-
-void TrackProcessor::deleteTracksWithLowFitProbability(std::list<CDCTrack>& cdcTrackList, double minimal_probability_for_good_fit)
-{
-  const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getNoDriftVarianceFitter();
-
-  const auto& checkProbability = [&](CDCTrack & track) {
-    const CDCTrajectory2D& fittedTrajectory = trackFitter.fit(track);
-    const double chi2 = fittedTrajectory.getChi2();
-    const int dof = track.size() - 4;
-
-    return TMath::Prob(chi2, dof) < minimal_probability_for_good_fit;
-  };
-
-  cdcTrackList.erase(std::remove_if(cdcTrackList.begin(), cdcTrackList.end(), checkProbability),
-                     cdcTrackList.end());
-}
-
 void TrackProcessor::mergeAndFinalizeTracks(std::list<CDCTrack>& cdcTrackList,
                                             const std::vector<const CDCWireHit*>& allAxialWireHits)
 {
@@ -195,6 +178,16 @@ void TrackProcessor::mergeAndFinalizeTracks(std::list<CDCTrack>& cdcTrackList,
 
   // Assign new hits
   TrackProcessor::assignNewHits(allAxialWireHits, cdcTrackList);
+}
+
+void TrackProcessor::deleteTracksWithLowFitProbability(std::list<CDCTrack>& cdcTrackList, double minimal_probability_for_good_fit)
+{
+  const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getNoDriftVarianceFitter();
+  const auto lowPValue = [&](const CDCTrack & track) {
+    CDCTrajectory2D fittedTrajectory = trackFitter.fit(track);
+    return not(fittedTrajectory.getPValue() >= minimal_probability_for_good_fit);
+  };
+  erase_remove_if(cdcTrackList, lowPValue);
 }
 
 bool TrackProcessor::isChi2InQuantiles(CDCTrack& track, double lower_quantile, double upper_quantile)

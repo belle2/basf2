@@ -32,6 +32,9 @@ namespace Belle2 {
     /// Type for discrete curv values
     using DiscreteCurv = DiscreteValue<float, CurvTag>;
 
+    /// Type to have explicit curv values
+    using ContinuousCurv = ContinuousValue<double, CurvTag>;
+
     /**
      *  Class representing a curvature value that also caches two dimensional arc length
      *  to each layer in the CDC

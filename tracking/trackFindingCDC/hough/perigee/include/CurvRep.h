@@ -86,21 +86,35 @@ namespace Belle2 {
 
     /// Functor to get the lower curvature bound of a hough box.
     struct GetLowerCurv {
-      /// Getter function for the lower curvature bound of a hough box.
-      template <class AHoughBox>
-      EnableIf<AHoughBox::template HasType<DiscreteCurv>::value, float> operator()(const AHoughBox& houghBox)
+      /// Getter function for the lower curvature bound of a hough box - discrete version
+      template <class AHoughBox, class SFINAE = EnableIf<AHoughBox::template HasType<DiscreteCurv>::value > >
+      float operator()(const AHoughBox& houghBox) const
       {
         return static_cast<float>(houghBox.template getLowerBound<DiscreteCurv>());
+      }
+
+      /// Getter function for the lower curvature bound of a hough box - continuous version
+      template <class AHoughBox, class SFINAE = EnableIf<AHoughBox::template HasType<ContinuousCurv>::value > >
+      double operator()(const AHoughBox& houghBox) const
+      {
+        return static_cast<float>(houghBox.template getLowerBound<ContinuousCurv>());
       }
     };
 
     /// Functor to get the upper curvature bound of a hough box.
     struct GetUpperCurv {
-      /// Getter function for the upper curvature bound of a hough box.
-      template <class AHoughBox>
-      EnableIf<AHoughBox::template HasType<DiscreteCurv>::value, float> operator()(const AHoughBox& houghBox)
+      /// Getter function for the upper curvature bound of a hough box - discrete version
+      template <class AHoughBox, class SFINAE = EnableIf<AHoughBox::template HasType<DiscreteCurv>::value> >
+      float operator()(const AHoughBox& houghBox) const
       {
         return static_cast<float>(houghBox.template getUpperBound<DiscreteCurv>());
+      }
+
+      /// Getter function for the upper curvature bound of a hough box - continuous version
+      template <class AHoughBox, class SFINAE = EnableIf<AHoughBox::template HasType<ContinuousCurv>::value> >
+      double operator()(const AHoughBox& houghBox) const
+      {
+        return static_cast<float>(houghBox.template getUpperBound<ContinuousCurv>());
       }
     };
 

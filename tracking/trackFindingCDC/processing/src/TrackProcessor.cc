@@ -98,10 +98,8 @@ bool TrackProcessor::checkTrackQuality(const CDCTrack& track)
 void TrackProcessor::assignNewHits(const std::vector<const CDCWireHit*>& allAxialWireHits,
                                    std::list<CDCTrack>& cdcTrackList)
 {
-  cdcTrackList.erase(std::remove_if(cdcTrackList.begin(),
-                                    cdcTrackList.end(),
-  [](const CDCTrack & track) { return track.size() == 0; }),
-  cdcTrackList.end());
+  erase_remove_if(cdcTrackList, Size() == 0u);
+
   for (CDCTrack& track : cdcTrackList) {
     if (track.size() < 4) continue;
 
@@ -117,7 +115,6 @@ void TrackProcessor::assignNewHits(const std::vector<const CDCWireHit*>& allAxia
     TrackQualityTools::normalizeTrack(track);
   }
 
-
   // TODO: HitProcessor::reassignHitsFromOtherTracks(cdcTrackList);
   for (CDCTrack& cand : cdcTrackList) {
     cand.forwardTakenFlag();
@@ -130,29 +127,28 @@ void TrackProcessor::mergeAndFinalizeTracks(std::list<CDCTrack>& cdcTrackList,
   // Check quality of the track basing on holes on the trajectory;
   // if holes exsist then track is splitted
   for (CDCTrack& track : cdcTrackList) {
-    if (track.size() > 3) {
-      HitProcessor::maskHitsWithPoorQuality(track);
-      HitProcessor::splitBack2BackTrack(track);
+    if (track.size() < 4) continue;
 
-      TrackQualityTools::normalizeTrack(track);
-      std::vector<const CDCWireHit*> hitsToSplit;
+    HitProcessor::maskHitsWithPoorQuality(track);
+    HitProcessor::splitBack2BackTrack(track);
 
-      for (CDCRecoHit3D& hit : track) {
-        if (hit.getWireHit().getAutomatonCell().hasMaskedFlag()) {
-          hitsToSplit.push_back(&(hit.getWireHit()));
-        }
+    TrackQualityTools::normalizeTrack(track);
+    std::vector<const CDCWireHit*> hitsToSplit;
+
+    for (CDCRecoHit3D& hit : track) {
+      if (hit.getWireHit().getAutomatonCell().hasMaskedFlag()) {
+        hitsToSplit.push_back(&(hit.getWireHit()));
       }
-
-      HitProcessor::deleteAllMarkedHits(track);
-
-      for (const CDCWireHit* hit : hitsToSplit) {
-        hit->getAutomatonCell().setMaskedFlag(false);
-        hit->getAutomatonCell().setTakenFlag(false);
-      }
-
-      TrackProcessor::addCandidateFromHitsWithPostprocessing(hitsToSplit, allAxialWireHits, cdcTrackList);
-
     }
+
+    HitProcessor::deleteAllMarkedHits(track);
+
+    for (const CDCWireHit* hit : hitsToSplit) {
+      hit->getAutomatonCell().setMaskedFlag(false);
+      hit->getAutomatonCell().setTakenFlag(false);
+    }
+
+    TrackProcessor::addCandidateFromHitsWithPostprocessing(hitsToSplit, allAxialWireHits, cdcTrackList);
   }
 
   // Update tracks before storing to DataStore

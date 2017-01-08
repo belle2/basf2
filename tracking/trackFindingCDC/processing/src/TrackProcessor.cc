@@ -29,8 +29,8 @@ void TrackProcessor::addCandidateFromHitsWithPostprocessing(std::vector<const CD
 {
   if (foundAxialWireHits.size() == 0) return;
 
-  cdcTrackList.emplace_back();
-  CDCTrack& track = cdcTrackList.back();
+  // New track
+  CDCTrack track;
 
   // Fit trajectory
   const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
@@ -48,60 +48,51 @@ void TrackProcessor::addCandidateFromHitsWithPostprocessing(std::vector<const CD
     automatonCell.setTakenFlag(true);
   }
 
-  // Change everything again in the postprocessing - and even delete the just created track if need be.
-  postprocessTrack(track, allAxialWireHits, cdcTrackList);
+  // Change everything again in the postprocessing
+  bool success = postprocessTrack(track, allAxialWireHits);
+  if (success) {
+    /// Mark hits as taken and add the new track to the track list
+    for (const CDCRecoHit3D& recoHit3D : track) {
+      recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
+    }
+    cdcTrackList.emplace_back(std::move(track));
+  } else {
+    /// Masked bad hits
+    for (const CDCRecoHit3D& recoHit3D : track) {
+      recoHit3D.getWireHit().getAutomatonCell().setMaskedFlag(true);
+      recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(false);
+    }
+  }
 }
 
-void TrackProcessor::postprocessTrack(CDCTrack& track,
-                                      const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                      std::list<CDCTrack>& cdcTrackList)
+bool TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<const CDCWireHit*>& allAxialWireHits)
 {
   TrackQualityTools::normalizeTrack(track);
 
-  HitProcessor::splitBack2BackTrack(track);
-  TrackQualityTools::normalizeTrack(track);
-  if (not checkTrackQuality(track, cdcTrackList)) {
-    return;
+  for (int iPass = 0; iPass < 2; ++iPass) {
+    HitProcessor::splitBack2BackTrack(track);
+    TrackQualityTools::normalizeTrack(track);
+    if (not checkTrackQuality(track)) {
+      return false;
+    }
+
+    HitProcessor::deleteHitsFarAwayFromTrajectory(track);
+    TrackQualityTools::normalizeTrack(track);
+    if (not checkTrackQuality(track)) {
+      return false;
+    }
+
+    HitProcessor::assignNewHitsToTrack(track, allAxialWireHits);
+    TrackQualityTools::normalizeTrack(track);
   }
-
-  HitProcessor::deleteHitsFarAwayFromTrajectory(track);
-  TrackQualityTools::normalizeTrack(track);
-  if (not checkTrackQuality(track, cdcTrackList)) {
-    return;
-  }
-
-  HitProcessor::assignNewHitsToTrack(track, allAxialWireHits);
-  TrackQualityTools::normalizeTrack(track);
-
-  HitProcessor::splitBack2BackTrack(track);
-  TrackQualityTools::normalizeTrack(track);
-  if (not checkTrackQuality(track, cdcTrackList)) {
-    return;
-  }
-
-  HitProcessor::deleteHitsFarAwayFromTrajectory(track);
-  TrackQualityTools::normalizeTrack(track);
-  if (not checkTrackQuality(track, cdcTrackList)) {
-    return;
-  }
-
-  HitProcessor::assignNewHitsToTrack(track, allAxialWireHits);
-  TrackQualityTools::normalizeTrack(track);
 
   HitProcessor::unmaskHitsInTrack(track);
+  return true;
 }
 
-bool TrackProcessor::checkTrackQuality(const CDCTrack& track, std::list<CDCTrack>& cdcTrackList)
+bool TrackProcessor::checkTrackQuality(const CDCTrack& track)
 {
-  if (track.size() < 5) {
-    for (const CDCRecoHit3D& hit : track) {
-      hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
-      hit.getWireHit().getAutomatonCell().setTakenFlag(false);
-    }
-    cdcTrackList.remove(track);
-    return false;
-  }
-  return true;
+  return not(track.size() < 5);
 }
 
 void TrackProcessor::assignNewHits(const std::vector<const CDCWireHit*>& allAxialWireHits,
@@ -162,7 +153,6 @@ void TrackProcessor::mergeAndFinalizeTracks(std::list<CDCTrack>& cdcTrackList,
       TrackProcessor::addCandidateFromHitsWithPostprocessing(hitsToSplit, allAxialWireHits, cdcTrackList);
 
     }
-//    TrackMergerNew::deleteAllMarkedHits(track);
   }
 
   // Update tracks before storing to DataStore

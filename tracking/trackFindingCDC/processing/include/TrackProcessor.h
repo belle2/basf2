@@ -42,10 +42,8 @@ namespace Belle2 {
       /// Assign new hits to all tracks (using the assignNewHitsToTrack(CDCTrack&) method of the HitsProcessor).
       static void assignNewHits(const std::vector<const CDCWireHit*>& allWireHits, std::list<CDCTrack>& cdcTrackList);
 
-      /// Perform all track postprocessing
-      static void postprocessTrack(CDCTrack& track,
-                                   const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                   std::list<CDCTrack>& cdcTrackList);
+      /// Perform all track postprocessing - return whether the track is considered good after the postprocessing
+      static bool postprocessTrack(CDCTrack& track, const std::vector<const CDCWireHit*>& allAxialWireHits);
 
       /// Finalize the tracks after the legendre track finder is done - includes a merging step of found tracks
       static void mergeAndFinalizeTracks(std::list<CDCTrack>& cdcTrackList,
@@ -69,7 +67,7 @@ namespace Belle2 {
       static double calculateChi2ForQuantile(double alpha, double n);
 
       /// Check track quality -- currently based on number of hits only.
-      static bool checkTrackQuality(const CDCTrack& track, std::list<CDCTrack>& cdcTrackList);
+      static bool checkTrackQuality(const CDCTrack& track);
     };
   }
 }

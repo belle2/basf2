@@ -199,17 +199,14 @@ void TrackProcessor::mergeAndFinalizeTracks(std::list<CDCTrack>& cdcTrackList,
 
 bool TrackProcessor::isChi2InQuantiles(CDCTrack& track, double lower_quantile, double upper_quantile)
 {
-  const CDCTrajectory2D& trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
-
-  const double minChi2 = calculateChi2ForQuantile(lower_quantile, trackTrajectory2D.getNDF());
-  const double maxChi2 = calculateChi2ForQuantile(upper_quantile, trackTrajectory2D.getNDF());
-  const double chi2 = trackTrajectory2D.getChi2();
-
-  return ((chi2 >= minChi2) and (chi2 <= maxChi2));
+  double pValue = track.getStartTrajectory3D().getPValue();
+  return (lower_quantile <= pValue) and (pValue <= upper_quantile);
 }
 
 double TrackProcessor::calculateChi2ForQuantile(double alpha, double n)
 {
+  return TMath::ChisquareQuantile(alpha, n);
+  /*
   double d;
   if (alpha > 0.5) {
     d = 2.0637 * pow(log(1. / (1. - alpha)) - 0.16, 0.4274) - 1.5774;
@@ -224,4 +221,5 @@ double TrackProcessor::calculateChi2ForQuantile(double alpha, double n)
   const double E = d * (9 * d * d * d * d + 256 * d * d - 433) / (4860. * pow(2., 0.5));
 
   return n + A * pow(n, 0.5) + B + C / pow(n, 0.5) + D / n + E / (n * pow(n, 0.5));
+  */
 }

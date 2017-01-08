@@ -396,7 +396,14 @@ namespace Belle2 {
       template <class T>
       auto operator()(const T& t) const -> decltype(*t)
       {
-        assert(&*t != nullptr);
+        return *t;
+      }
+
+      /// Specialisation for pointers to make an assertion that no nullptr is derefernced
+      template <class T>
+      auto operator()(const T* t) const -> decltype(*t)
+      {
+        assert(t != nullptr);
         return *t;
       }
     };

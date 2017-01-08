@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
-#include <tracking/trackFindingCDC/utilities/CallIfApplicable.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 
 #include <vector>
 #include <algorithm>

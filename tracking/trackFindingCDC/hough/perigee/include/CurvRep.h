@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/axes/StandardAxes.h>
-#include <tracking/trackFindingCDC/utilities/CallIfApplicable.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/EnableIf.h>
 
 namespace Belle2 {

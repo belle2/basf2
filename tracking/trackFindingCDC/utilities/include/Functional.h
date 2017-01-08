@@ -14,6 +14,7 @@
 #include <iterator>
 #include <functional>
 #include <type_traits>
+#include <utility>
 #include <cassert>
 
 namespace Belle2 {
@@ -37,9 +38,9 @@ namespace Belle2 {
 
       /// Operator that just returns the object itself - gets me.
       template <class T>
-      constexpr const T& operator()(const T& t) const
+      T&& operator()(T&& t) const
       {
-        return t;
+        return std::forward<T>(t);
       }
     };
 
@@ -52,7 +53,7 @@ namespace Belle2 {
       Constant() = default;
 
       /// Constructor from the constant value
-      explicit Constant(const T& t)
+      Constant(const T& t)
         : m_t(t)
       {
       }
@@ -195,7 +196,7 @@ namespace Belle2 {
       Alternation() = default;
 
       /// Constructor from the nested functors
-      Alternation(const AFunctor1& functor1, const AFunctor2& functor2)
+      Alternation(const AFunctor1& functor1, const AFunctor2& functor2 = AFunctor2())
         : AFunctor2(functor2)
         , m_functor1(functor1)
       {
@@ -204,29 +205,69 @@ namespace Belle2 {
     public:
       /// Implementation applying the first functor. Favoured option.
       template <class... T>
-      auto impl(int favouredTag __attribute__((unused)), const T& ... t) const
-      -> decltype(m_functor1(t...))
+      auto impl(int favouredTag __attribute__((unused)), T&& ... t) const
+      -> decltype(m_functor1(std::forward<T>(t)...))
       {
-        return m_functor1(t...);
+        return m_functor1(std::forward<T>(t)...);
       }
 
       /// Implementation applying the second functor. Disfavoured option.
       template <class... T>
-      auto impl(long disfavouredTag __attribute__((unused)), const T& ... t) const
-      -> decltype(AFunctor2::operator()(t...))
+      auto impl(long disfavouredTag __attribute__((unused)), T&& ... t) const
+      -> decltype(AFunctor2::operator()(std::forward<T>(t)...))
       {
-        return AFunctor2::operator()(t...);
+        return AFunctor2::operator()(std::forward<T>(t)...);
       }
 
     public:
       /// Operator to dispatch to the two functors and returns the first applicable option.
       template <class... T>
-      auto operator()(const T& ... t) const -> decltype(this->impl(0, t...))
+      auto operator()(T&& ... t) const -> decltype(this->impl(0, std::forward<T>(t)...))
       {
         int dispatchTag = 0;
-        return impl(dispatchTag, t...);
+        return impl(dispatchTag, std::forward<T>(t)...);
       }
     };
+
+
+    // ******************** (void)(?) ********************
+
+    /// Functor returning void from an abitrary objects.
+    struct Void {
+      /// Marker function for the isFunctor test
+      operator FunctorTag();
+
+      /// Operator always returning void
+      template <class T>
+      void operator()(T&& t __attribute__((unused))) const
+      {
+      }
+    };
+
+    /// Meta-functor that discards any return value that the given functor emits
+    template <int I, class AFunctor = Id>
+    using VoidOf = Composition<Void, AFunctor>;
+
+    /// Meta-functor that calles the given functor in case the call works - otherwise do nothing
+    template <class AFunctor>
+    using IfApplicable = Alternation<AFunctor, Void>;
+
+    /// Invokes a function with the given arguments if the call is allowed - otherwise do nothing
+    template<class AFunction, class... T>
+    void invokeIfApplicable(AFunction&& function, T&& ... t)
+    {
+      IfApplicable<AFunction> invokeIfApplicableImpl(std::forward<AFunction>(function));
+      invokeIfApplicableImpl(std::forward<T>(t)...);
+    }
+
+    /// Invokes a getter function with the given argument if the call is allowed - otherwise return the default value
+    template<class ADefault, class AFunctor, class T>
+    ADefault getIfApplicable(AFunctor&& function, T&& obj, ADefault value)
+    {
+      Alternation<AFunctor, Constant<ADefault> > getIfApplicableImpl{std::forward<AFunctor>(function), value};
+      return getIfApplicableImpl(std::forward<T>(obj));
+    }
+
 
     // ******************** get<I>(?) ********************
 
@@ -291,6 +332,31 @@ namespace Belle2 {
     template <class AFunctor = Id>
     using SizeOf = Composition<Size, AFunctor>;
 
+
+    // ******************** ?.clear() ********************
+
+    /// Functor to get the .clear() from an abitrary objects.
+    struct Clear {
+      /// Marker function for the isFunctor test
+      operator FunctorTag();
+
+      /// Operator getting the .clear() of an abitrary object
+      template <class T>
+      auto operator()(T& t) const -> decltype(t.clear())
+      {
+        return t.clear();
+      }
+    };
+
+    /// Meta-functor to get the .clear() of an abitrary object returned from another functor
+    template <class AFunctor = Id>
+    using ClearOf = Composition<Clear, AFunctor>;
+
+    /// Functor invoking the clear method of an object if present - otherwise do nothing
+    using ClearIfApplicable = IfApplicable<Clear>;
+
+    /// Function invoking the clear method of an object if present - otherwise do nothing
+    static const ClearIfApplicable clearIfApplicable{};
 
     // ******************** not(?) ********************
 

@@ -9,8 +9,8 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/CallIfApplicable.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <framework/logging/Logger.h>
 #include <vector>
 #include <deque>

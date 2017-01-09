@@ -4,6 +4,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/pcore/Mergeable.h>
 #include <framework/core/FileCatalog.h>
+#include <background/dataobjects/BackgroundInfo.h>
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
@@ -13,6 +14,7 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TBranchElement.h>
+#include <TClonesArray.h>
 
 #include <iostream>
 #include <iomanip>
@@ -85,6 +87,8 @@ The following restrictions apply:
 
   // the final metadata we will write out
   FileMetaData* outputMetaData{nullptr};
+  // BackgroundInfo of the merged files
+  BackgroundInfo* outputBackgroundInfo{nullptr};
   // set of all parent LFNs encountered in any file
   std::set<std::string> allParents;
   // map of all mergable objects found in the persistent tree. The size_t is
@@ -163,6 +167,7 @@ The following restrictions apply:
       }
     }
 
+    bool foundBackgroundInfo{!outputBackgroundInfo};
     // File looks good so far, now fixup the persistent stuff, i.e. merge all
     // objects in persistent tree
     for(TObject* brObj: *persistent->GetListOfBranches()){
@@ -170,6 +175,53 @@ The following restrictions apply:
       // FileMetaData is handled separately
       if(br && br->GetTargetClass() == FileMetaData::Class() && std::string(br->GetName()) == "FileMetaData")
         continue;
+      // special handling for BackgroundInfo. This should be moved into BackgroundInfo and background info should become a objptr derived from mergeable
+      if(br && br->GetTargetClass() == TClonesArray::Class() && std::string(br->GetName()) == "BackgroundInfos") {
+        TClonesArray* object{nullptr};
+        br->SetAddress(&object);
+        if(br->GetEntry(0)<=0) {
+            B2ERROR("Could not read branch " << boost::io::quoted(br->GetName()) << " of entry 0 from persistent tree in "
+                    << boost::io::quoted(input));
+            continue;
+        }
+        // empty, assume non-existent
+        if(object->GetEntriesFast()==0) continue;
+        if(object->GetEntriesFast()>1) {
+            B2ERROR("More then one BackgroundInfo in file " << boost::io::quoted(input));
+            continue;
+        }
+        if(object->GetClass() != BackgroundInfo::Class()){
+            B2ERROR("Branch BackgroundInfo is of type StoreArray<" << object->GetClass()->GetName()
+                    << ">, not StoreArray<BackgroundInfo>");
+            continue;
+        }
+        BackgroundInfo* bginfo = static_cast<BackgroundInfo*>(object->At(0));
+        if(!outputBackgroundInfo) {
+            // No background info yet.
+            if(outputMetaData) B2ERROR("Found BackgroundInfo in " << boost::io::quoted(input)
+                                       << " which was not present in previous files.");
+            outputBackgroundInfo = new BackgroundInfo(*bginfo);
+            if(LogSystem::Instance().isLevelEnabled(LogConfig::c_Info)){
+                B2INFO("Found Background Information: ");
+                outputBackgroundInfo->print();
+            }
+        }else{
+            if(!(*bginfo == *outputBackgroundInfo)){
+                B2ERROR("BackgroundInfo in " << boost::io::quoted(input) << " differs from previous files.");
+            }
+            // merge the resused counting: for n files we set it to
+            // sum_n(reused+1) - 1 = (n-1) + sum_n(reused)
+            // If no file has reused a sample then they still have the same
+            // samples in for all files so it gets reused once per file except
+            // for the first.
+            const auto &backgroundDesc = bginfo->getBackgroundDescr();
+            for(size_t i=0; i<backgroundDesc.size(); ++i){
+                for(unsigned int r=0; r<=backgroundDesc[i].reused; ++r) outputBackgroundInfo->incrementReusedCounter(i);
+            }
+        }
+        foundBackgroundInfo = true;
+        continue;
+      }
       // Make sure the branch is mergeable
       if(!br || !br->GetTargetClass()->InheritsFrom(Mergeable::Class())){
         B2ERROR("Branch " << boost::io::quoted(br->GetName()) << " in persistent tree not inheriting from Mergable");
@@ -191,6 +243,11 @@ The following restrictions apply:
       }else{
         B2INFO("Found mergable object " << boost::io::quoted(br->GetName()) << " in persistent tree");
       }
+    }
+
+    // check if we found the background info in this file if we saw it already in previous files
+    if(!foundBackgroundInfo){
+        B2ERROR("No BackgroundInfo in current file");
     }
 
     // so, event tree looks good too. Now we merge the FileMetaData
@@ -313,10 +370,18 @@ The following restrictions apply:
   for(auto it: persistentMergeables){
     outputMetaDataTree.Branch(it.first.c_str(), &it.second.first);
   }
+  TClonesArray* bginfo{nullptr};
+  if(outputBackgroundInfo){
+      bginfo = new TClonesArray(BackgroundInfo::Class(), 1);
+      new(bginfo->AddrAt(0)) BackgroundInfo(*outputBackgroundInfo);
+      outputMetaDataTree.Branch("BackgroundInfos", &bginfo);
+  }
   outputMetaDataTree.Fill();
   outputMetaDataTree.Write();
 
   // now clean up the mess ...
+  delete bginfo;
+  delete outputBackgroundInfo;
   for(auto val: persistentMergeables){
     delete val.second.first;
   }

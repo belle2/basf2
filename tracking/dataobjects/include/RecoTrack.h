@@ -568,6 +568,15 @@ namespace Belle2 {
       return getMeasuredStateOnPlaneFromHit(0, representation);
     }
 
+    /** Return genfit's MeasuredStateOnPlane for the first hit in a fit
+    * useful for extrapolation of measurements other locations
+    * Const version.
+    */
+    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromFirstHit(const genfit::AbsTrackRep* representation = nullptr) const
+    {
+      return getMeasuredStateOnPlaneFromHit(0, representation);
+    }
+
     /** Return genfit's MeasuredStateOnPlane for the last hit in a fit
     * useful for extrapolation of measurements other locations
     */
@@ -576,10 +585,29 @@ namespace Belle2 {
       return getMeasuredStateOnPlaneFromHit(-1, representation);
     }
 
+    /** Return genfit's MeasuredStateOnPlane for the last hit in a fit
+    * useful for extrapolation of measurements other locations
+    * Const version.
+    */
+    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation = nullptr) const
+    {
+      return getMeasuredStateOnPlaneFromHit(-1, representation);
+    }
+
     /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
     * useful for extrapolation of measurements other locations
     */
     const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr)
+    {
+      checkDirtyFlag();
+      return m_genfitTrack.getFittedState(id, representation);
+    }
+
+    /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
+    * useful for extrapolation of measurements other locations
+    * Const version.
+    */
+    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr) const
     {
       checkDirtyFlag();
       return m_genfitTrack.getFittedState(id, representation);

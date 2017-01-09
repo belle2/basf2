@@ -287,7 +287,7 @@ namespace Belle2 {
         auto importances = get_attr_from_module_else_fallback_to_framework("feature_importance", module, framework)(state);
         if (len(importances) == 0) {
           B2INFO("Python method returned empty feature importance. There won't be any information about the feature importance in the weightfile.");
-        } else if (numberOfFeatures != len(importances)) {
+        } else if (numberOfFeatures != static_cast<uint64_t>(len(importances))) {
           B2WARNING("Python method didn't return the correct number of importance value. I ignore the importances");
         } else {
           std::map<std::string, float> feature_importances;

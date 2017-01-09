@@ -16,7 +16,13 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /**
-     TODO
+     Selector based on a SingleMatchSelector, for extracting those combinations of tracks and segments,
+     which should later be merged.
+     It inherits the functionality of the SingleMatchSelector, meaning it will only output those
+     combinations, which are best for all segments and tracks.
+     Additionaly, it will remove all shared hits between segments and tracks, which are *not* part of the best
+     combinations. This means, if the algorithm determines that a segment should belong to a certain track,
+     all hits that are part of other tracks are removed from those tracks. This increases the hit purity.
      */
     class SegmentTrackBestMatchSelector : public SingleMatchSelector<CDCTrack, CDCSegment2D> {
       /// The parent class

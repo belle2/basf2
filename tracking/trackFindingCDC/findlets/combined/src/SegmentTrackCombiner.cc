@@ -77,9 +77,9 @@ void SegmentTrackCombinerFindlet::apply(std::vector<TrackFindingCDC::CDCSegment2
   // Add the remaining combinations
   m_segmentTrackAdder.apply(m_relations);
 
-  // Reject tracks according to a (mva) filter
-  m_trackRejecter.apply(tracks);
-
   // Normalize the trajectories again
   m_trackNormalizer.apply(tracks);
+
+  // Reject tracks according to a (mva) filter
+  m_trackRejecter.apply(tracks);
 }

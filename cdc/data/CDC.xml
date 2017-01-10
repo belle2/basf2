@@ -3917,116 +3917,116 @@
       <ElectronicsBoard id="0">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">326.0</EBInnerR>
         <EBOuterR desc="Outer radius of electronics board" unit="mm">331.2</EBOuterR>
-        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-861.0</EBBackwardZ>
-        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-711.0</EBForwardZ>
+        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-866.9</EBBackwardZ>
+        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-686.0</EBForwardZ>
       </ElectronicsBoard>
       <ElectronicsBoard id="1">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">354.0</EBInnerR>
         <EBOuterR desc="Outer radius of electronics board" unit="mm">359.2</EBOuterR>
-        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-861.0</EBBackwardZ>
-        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-711.0</EBForwardZ>
+        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-866.0</EBBackwardZ>
+        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-686.0</EBForwardZ>
       </ElectronicsBoard>
       <ElectronicsBoard id="2">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">382.0</EBInnerR>
         <EBOuterR desc="Outer radius of electronics board" unit="mm">387.2</EBOuterR>
-        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-861.0</EBBackwardZ>
-        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-711.0</EBForwardZ>
+        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-866.0</EBBackwardZ>
+        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-686.0</EBForwardZ>
       </ElectronicsBoard>
       <ElectronicsBoard id="3">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">410.0</EBInnerR>
         <EBOuterR desc="Outer radius of electronics board" unit="mm">415.2</EBOuterR>
-        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-861.0</EBBackwardZ>
-        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-711.0</EBForwardZ>
+        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-866.0</EBBackwardZ>
+        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-686.0</EBForwardZ>
       </ElectronicsBoard>
       <ElectronicsBoard id="4">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">438.0</EBInnerR>
         <EBOuterR desc="Outer radius of electronics board" unit="mm">443.2</EBOuterR>
-        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-861.0</EBBackwardZ>
-        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-711.0</EBForwardZ>
+        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-866.0</EBBackwardZ>
+        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-686.0</EBForwardZ>
       </ElectronicsBoard>
       <ElectronicsBoard id="5">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">486.0</EBInnerR>
         <EBOuterR desc="Outer radius of electronics board" unit="mm">491.2</EBOuterR>
-        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-876.0</EBBackwardZ>
-        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-726.0</EBForwardZ>
+        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-903.0</EBBackwardZ>
+        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-723.0</EBForwardZ>
       </ElectronicsBoard>
       <ElectronicsBoard id="6">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">516.0</EBInnerR>
         <EBOuterR desc="Outer radius of electronics board" unit="mm">521.2</EBOuterR>
-        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-876.0</EBBackwardZ>
-        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-726.0</EBForwardZ>
+        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-903.0</EBBackwardZ>
+        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-723.0</EBForwardZ>
       </ElectronicsBoard>
       <ElectronicsBoard id="7">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">564.6</EBInnerR>
         <EBOuterR desc="Outer radius of electronics board" unit="mm">569.8</EBOuterR>
-        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-886.0</EBBackwardZ>
-        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-736.0</EBForwardZ>
+        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-903.0</EBBackwardZ>
+        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-723.0</EBForwardZ>
       </ElectronicsBoard>
       <ElectronicsBoard id="8">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">594.6</EBInnerR>
         <EBOuterR desc="Outer radius of electronics board" unit="mm">599.8</EBOuterR>
-        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-886.0</EBBackwardZ>
-        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-736.0</EBForwardZ>
+        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-903.0</EBBackwardZ>
+        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-723.0</EBForwardZ>
       </ElectronicsBoard>
       <ElectronicsBoard id="9">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">630.4</EBInnerR>
         <EBOuterR desc="Outer radius of electronics board" unit="mm">635.6</EBOuterR>
-        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-904.0</EBBackwardZ>
-        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-754.0</EBForwardZ>
+        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-903.0</EBBackwardZ>
+        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-723.0</EBForwardZ>
       </ElectronicsBoard>
       <ElectronicsBoard id="10">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">660.4</EBInnerR>
         <EBOuterR desc="Outer radius of electronics board" unit="mm">665.6</EBOuterR>
-        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-904.0</EBBackwardZ>
-        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-754.0</EBForwardZ>
+        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-903.0</EBBackwardZ>
+        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-723.0</EBForwardZ>
       </ElectronicsBoard>
       <ElectronicsBoard id="11">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">705.6</EBInnerR>
         <EBOuterR desc="Outer radius of electronics board" unit="mm">710.8</EBOuterR>
-        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-926.0</EBBackwardZ>
-        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-776.0</EBForwardZ>
+        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-946.0</EBBackwardZ>
+        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-766.0</EBForwardZ>
       </ElectronicsBoard>
       <ElectronicsBoard id="12">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">743.6</EBInnerR>
         <EBOuterR desc="Outer radius of electronics board" unit="mm">748.8</EBOuterR>
-        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-926.0</EBBackwardZ>
-        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-776.0</EBForwardZ>
+        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-946.0</EBBackwardZ>
+        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-766.0</EBForwardZ>
       </ElectronicsBoard>
       <ElectronicsBoard id="13">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">812.8</EBInnerR>
         <EBOuterR desc="Outer radius of electronics board" unit="mm">818.0</EBOuterR>
-        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-960.0</EBBackwardZ>
-        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-810.0</EBForwardZ>
+        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-946.0</EBBackwardZ>
+        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-766.0</EBForwardZ>
       </ElectronicsBoard>
       <ElectronicsBoard id="14">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">850.8</EBInnerR>
         <EBOuterR desc="Outer radius of electronics board" unit="mm">856.0</EBOuterR>
-        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-960.0</EBBackwardZ>
-        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-810.0</EBForwardZ>
+        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-946.0</EBBackwardZ>
+        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-766.0</EBForwardZ>
       </ElectronicsBoard>
       <ElectronicsBoard id="15">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">924.0</EBInnerR>
         <EBOuterR desc="Outer radius of electronics board" unit="mm">929.2</EBOuterR>
-        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-974.0</EBBackwardZ>
-        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-824.0</EBForwardZ>
+        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-972.0</EBBackwardZ>
+        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-792.0</EBForwardZ>
       </ElectronicsBoard>
       <ElectronicsBoard id="16">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">962.0</EBInnerR>
         <EBOuterR desc="Outer radius of electronics board" unit="mm">967.2</EBOuterR>
-        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-974.0</EBBackwardZ>
-        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-824.0</EBForwardZ>
+        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-972.0</EBBackwardZ>
+        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-792.0</EBForwardZ>
       </ElectronicsBoard>
       <ElectronicsBoard id="17">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">1031.2</EBInnerR>
         <EBOuterR desc="Outer radius of electronics board" unit="mm">1036.4</EBOuterR>
-        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-977.5</EBBackwardZ>
-        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-827.5</EBForwardZ>
+        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-972.0</EBBackwardZ>
+        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-792.0</EBForwardZ>
       </ElectronicsBoard>
       <ElectronicsBoard id="18">
         <EBInnerR desc="Inner radius of electronics board" unit="mm">1069.2</EBInnerR>
         <EBOuterR desc="Outer radius of electronics board" unit="mm">1074.4</EBOuterR>
-        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-977.5</EBBackwardZ>
-        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-827.5</EBForwardZ>
+        <EBBackwardZ desc="Backward z position of electronics board" unit="mm">-972.0</EBBackwardZ>
+        <EBForwardZ desc="Forward z position of electronics board" unit="mm">-792.0</EBForwardZ>
       </ElectronicsBoard>
     </ElectronicsBoards>
 

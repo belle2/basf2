@@ -18,7 +18,6 @@
 
 namespace Belle2 {
 
-
   /** This class contains everything needed by the VXDTF that is not going
   * to change during a RUN, i.e. IP position, B field @ IP, static sectors,
   * 2 space points filters, 3 space points filters,  etc. etc.

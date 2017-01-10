@@ -15,6 +15,10 @@
 #include <tracking/trackFindingCDC/processing/TrackProcessor.h>
 
 #include <TMath.h>
+
+#include <boost/range/algorithm/stable_partition.hpp>
+#include <boost/range/algorithm_ext/erase.hpp>
+
 #include <numeric>
 
 using namespace Belle2;
@@ -122,40 +126,24 @@ std::vector<const CDCWireHit*> HitProcessor::splitBack2BackTrack(CDCTrack& track
   std::vector<const CDCWireHit*> removedHits;
 
   if (track.size() < 5) return removedHits;
+  if (not isBack2BackTrack(track)) return removedHits;
 
-  for (CDCRecoHit3D& hit : track) {
-    hit.getWireHit().getAutomatonCell().setTakenFlag(true);
-    hit.getWireHit().getAutomatonCell().setMaskedFlag(false);
+  ESign majorArm = getChargeSign(track);
+  Vector2D center = track.getStartTrajectory3D().getGlobalCircle().center();
+
+  auto isOnMajorArm = [&center, &majorArm](const CDCRecoHit3D & hit) {
+    return getCurvatureSignWrt(hit, center) == majorArm;
+  };
+
+  auto minorArmHits = boost::stable_partition<boost::return_found_end>(track, isOnMajorArm);
+
+  for (const CDCRecoHit3D& recoHit3D : minorArmHits) {
+    const CDCWireHit* wireHit = &recoHit3D.getWireHit();
+    wireHit->getAutomatonCell().setTakenFlag(false);
+    removedHits.push_back(wireHit);
   }
 
-  if (isBack2BackTrack(track)) {
-
-    ESign trackCharge = getChargeSign(track);
-
-    for (const CDCRecoHit3D& hit : track) {
-
-      if (getCurvatureSignWrt(hit, track.getStartTrajectory3D().getGlobalCircle().center()) != trackCharge) {
-        hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
-        hit.getWireHit().getAutomatonCell().setTakenFlag(false);
-      }
-
-    }
-
-    for (CDCRecoHit3D& hit : track) {
-      if (hit.getWireHit().getAutomatonCell().hasMaskedFlag()) {
-        removedHits.push_back(&(hit.getWireHit()));
-      }
-    }
-
-    deleteAllMarkedHits(track);
-
-    for (const CDCWireHit* hit : removedHits) {
-      hit->getAutomatonCell().setMaskedFlag(false);
-      hit->getAutomatonCell().setTakenFlag(false);
-    }
-
-
-  }
+  boost::erase(track, minorArmHits);
 
   return removedHits;
 }
@@ -188,18 +176,14 @@ bool HitProcessor::isBack2BackTrack(CDCTrack& track)
 
 void HitProcessor::deleteAllMarkedHits(CDCTrack& track)
 {
-  track.erase(
-  std::remove_if(track.begin(), track.end(), [](const CDCRecoHit3D & hit) {
-    return hit.getWireHit().getAutomatonCell().hasMaskedFlag();
-  }), track.end());
+  auto hasMaskedFlag = [](const CDCRecoHit3D & hit) { return hit.getWireHit().getAutomatonCell().hasMaskedFlag(); };
+  boost::remove_erase_if(track, hasMaskedFlag);
 }
 
 void HitProcessor::deleteAllMarkedHits(std::vector<const CDCWireHit*>& wireHits)
 {
-  wireHits.erase(std::remove_if(wireHits.begin(), wireHits.end(),
-  [&](const CDCWireHit * hit) {
-    return hit->getAutomatonCell().hasMaskedFlag();
-  }), wireHits.end());
+  auto hasMaskedFlag = [](const CDCWireHit * hit) { return hit->getAutomatonCell().hasMaskedFlag(); };
+  boost::remove_erase_if(wireHits, hasMaskedFlag);
 }
 
 
@@ -235,20 +219,7 @@ ESign HitProcessor::getChargeSign(CDCTrack& track)
 
 ESign HitProcessor::getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy)
 {
-  double phi_diff = atan2(xy.y(), xy.x()) - hit.getRecoPos3D().phi();
-
-  while (phi_diff > /*2 */ TMath::Pi()) {
-    phi_diff -= 2 * TMath::Pi();
-  }
-  while (phi_diff < -1. * TMath::Pi()) {
-    phi_diff += 2 * TMath::Pi();
-  }
-
-  if (phi_diff > 0 /*TMath::Pi()*/) {
-    return ESign::c_Minus;
-  } else {
-    return ESign::c_Plus;
-  }
+  return static_cast<ESign>(xy.isRightOrLeftOf(hit.getRecoPos2D()));
 }
 
 void HitProcessor::resetMaskedHits(std::list<CDCTrack>& trackList,
@@ -343,12 +314,9 @@ void HitProcessor::maskHitsWithPoorQuality(CDCTrack& track)
           hit.getWireHit().getAutomatonCell().setMaskedFlag();
         }
       }
-
     }
-
     // We do not use emptyEndingSLayers here, as it would leave to a severy efficiency drop.
   }
-
   deleteAllMarkedHits(track);
 }
 

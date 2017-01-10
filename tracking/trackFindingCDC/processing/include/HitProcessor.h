@@ -57,7 +57,7 @@ namespace Belle2 {
       /** Tries to split back-to-back tracks into two different tracks */
       static std::vector<const CDCWireHit*> splitBack2BackTrack(CDCTrack& track);
 
-      /** Tries to split back-to-back tracks into two different tracks */
+      /** Checks whether the track has hits on both arms as seen from the origin */
       static bool isBack2BackTrack(CDCTrack& track);
 
       /** Estimate sign of the track charge. */

@@ -147,24 +147,27 @@ std::vector<const CDCWireHit*> HitProcessor::splitBack2BackTrack(CDCTrack& track
 
 bool HitProcessor::isBack2BackTrack(CDCTrack& track)
 {
-  int votePos = 0;
-  int voteNeg = 0;
+  // int votePos = 0;
+  // int voteNeg = 0;
+
+  // Vector2D center = track.getStartTrajectory3D().getGlobalCenter();
+  // for (const CDCRecoHit3D& hit : track) {
+  //   ESign curve_sign = getArmSign(hit, center);
+
+  //   if (curve_sign == ESign::c_Plus) {
+  //     ++votePos;
+  //   } else if (curve_sign == ESign::c_Minus) {
+  //     ++voteNeg;
+  //   } else {
+  //     B2ERROR("Unexpected value from getArmSign");
+  //     return false;
+  //   }
+  // }
+  // int armSignVote = votePos - voteNeg;
 
   Vector2D center = track.getStartTrajectory3D().getGlobalCenter();
-  for (const CDCRecoHit3D& hit : track) {
-    ESign curve_sign = getArmSign(hit, center);
-
-    if (curve_sign == ESign::c_Plus) {
-      ++votePos;
-    } else if (curve_sign == ESign::c_Minus) {
-      ++voteNeg;
-    } else {
-      B2ERROR("Unexpected value from getArmSign");
-      return false;
-    }
-  }
-
-  if (std::abs(votePos - voteNeg) < (votePos + voteNeg) and std::fabs(center.cylindricalR()) > 60.) {
+  int armSignVote = getArmSignVote(track, center);
+  if (std::abs(armSignVote) < track.size() and std::fabs(center.cylindricalR()) > 60.) {
     return true;
   }
   return false;
@@ -183,6 +186,16 @@ void HitProcessor::deleteAllMarkedHits(std::vector<const CDCWireHit*>& wireHits)
 }
 
 ESign HitProcessor::getMajorArmSign(const CDCTrack& track, const Vector2D& center)
+{
+  int armSignVote = getArmSignVote(track, center);
+  if (armSignVote > 0) {
+    return ESign::c_Plus;
+  } else {
+    return ESign::c_Minus;
+  }
+}
+
+int HitProcessor::getArmSignVote(const CDCTrack& track, const Vector2D& center)
 {
   int votePos = 0;
   int voteNeg = 0;
@@ -203,12 +216,8 @@ ESign HitProcessor::getMajorArmSign(const CDCTrack& track, const Vector2D& cente
       B2ERROR("Strange behaviour of getArmSign");
     }
   }
-
-  if (votePos > voteNeg) {
-    return ESign::c_Plus;
-  } else {
-    return ESign::c_Minus;
-  }
+  int armSignVote = votePos - voteNeg;
+  return armSignVote;
 }
 
 ESign HitProcessor::getArmSign(const CDCRecoHit3D& hit, const Vector2D& center)

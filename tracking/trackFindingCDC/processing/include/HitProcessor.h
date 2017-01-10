@@ -72,6 +72,12 @@ namespace Belle2 {
        */
       static ESign getMajorArmSign(const CDCTrack& track, const Vector2D& center);
 
+      /**
+       *  Calculate the sum of right and left votes for the hits relative to the center.
+       *  Positive indicates a majority of right by that amout. Negative indicates a left majority.
+       */
+      static int getArmSignVote(const CDCTrack& track, const Vector2D& center);
+
       /// Reset all masked hits.
       static void resetMaskedHits(std::list<CDCTrack>& trackList, std::vector<const CDCWireHit*>& wireHits);
 

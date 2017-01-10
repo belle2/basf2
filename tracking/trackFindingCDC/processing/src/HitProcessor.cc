@@ -12,10 +12,6 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/processing/TrackProcessor.h>
-
-#include <TMath.h>
-
 #include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/algorithm/stable_partition.hpp>
 #include <boost/range/algorithm_ext/erase.hpp>
@@ -261,14 +257,13 @@ void HitProcessor::assignNewHitsToTrack(CDCTrack& track,
                                         double minimalDistance)
 {
   if (track.size() < 10) return;
-  unmaskHitsInTrack(track);
 
   const CDCTrajectory2D& trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
 
   for (const CDCWireHit* wireHit : allAxialWireHits) {
     if (wireHit->getAutomatonCell().hasTakenFlag() or wireHit->getAutomatonCell().hasMaskedFlag()) continue;
 
-    const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstructNearest(wireHit, trackTrajectory2D);
+    CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstructNearest(wireHit, trackTrajectory2D);
     const Vector2D& recoPos2D = recoHit3D.getRecoPos2D();
 
     if (fabs(trackTrajectory2D.getDist2D(recoPos2D)) < minimalDistance) {

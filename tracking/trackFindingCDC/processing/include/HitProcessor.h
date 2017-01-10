@@ -7,25 +7,22 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
+
 #include <tracking/trackFindingCDC/numerics/ESign.h>
 
-#include <list>
 #include <vector>
+#include <list>
 #include <map>
-
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     class CDCTrack;
-    class CDCConformalHit;
     class CDCRecoHit3D;
     class CDCTrajectory2D;
     class CDCWireHit;
     class Vector2D;
-    class CDCTrackList;
 
     /**
      * Class performs hit assignment, reassignment and deletion of hits to the tracks
@@ -46,11 +43,10 @@ namespace Belle2 {
       static void updateRecoHit3D(CDCTrajectory2D& trajectory2D, CDCRecoHit3D& hit);
 
       /** Hits reassignment */
-      static void reassignHitsFromOtherTracks(CDCTrackList& trackList);
+      static void reassignHitsFromOtherTracks(std::list<CDCTrack>& trackList);
 
       /** Append unused hits to tracks */
-      static void appendUnusedHits(std::vector<CDCTrack>& tracks,
-                                   const std::vector<CDCConformalHit*>& axialConformalHits);
+      static void appendUnusedHits(std::list<CDCTrack>& tracks, const std::vector<const CDCWireHit*>& axialWireHits);
 
       /** Delete all hits marked as bad (MASKED) in a track. Should be called after every hit reassignment. */
       static void deleteAllMarkedHits(CDCTrack& track);
@@ -68,8 +64,7 @@ namespace Belle2 {
       static ESign getChargeSign(CDCTrack& track);
 
       /// Reset all masked hits.
-      static void resetMaskedHits(CDCTrackList& trackList,
-                                  std::vector<CDCConformalHit>& conformalHits);
+      static void resetMaskedHits(std::list<CDCTrack>& trackList, std::vector<const CDCWireHit*>& wireHits);
 
       /// Unset the MASKED flag and set the TAKEN flag of all hits but do not touch the track flags.
       static void unmaskHitsInTrack(CDCTrack& track);
@@ -86,7 +81,7 @@ namespace Belle2 {
 
       /// Assign new hits to the track basing on the distance from the hit to the track.
       static void assignNewHitsToTrack(CDCTrack& track,
-                                       const std::vector<CDCConformalHit>& conformalWireHits,
+                                       const std::vector<const CDCWireHit*>& allAxialWireHits,
                                        double minimalDistance = 0.15);
 
       /// Mask hits after breaks in the superlayer as masked and delete them.

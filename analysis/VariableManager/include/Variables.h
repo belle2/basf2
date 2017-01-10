@@ -283,6 +283,11 @@ namespace Belle2 {
     double genMotherIndex(const Particle* particle);
 
     /**
+     * generated momentum of a particles MC mother
+     */
+    double genMotherP(const Particle* particle);
+
+    /**
      * check the array index of a particle's related MCParticle
      */
     double genParticleIndex(const Particle* particle);

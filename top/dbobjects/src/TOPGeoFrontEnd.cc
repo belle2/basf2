@@ -44,7 +44,7 @@ bool TOPGeoFrontEnd::isConsistent() const
 
 void TOPGeoFrontEnd::print(const std::string& title) const
 {
-  TOPGeoBase::print(title);
+  TOPGeoBase::printUnderlined(title);
 
   cout << " Front board: " << getFrontBoardWidth() << " X " <<
        getFrontBoardHeight() << " X " << getFrontBoardThickness() << " " << s_unitName;

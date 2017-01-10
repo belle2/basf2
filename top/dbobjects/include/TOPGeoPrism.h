@@ -11,6 +11,10 @@
 #pragma once
 
 #include <top/dbobjects/TOPGeoBarSegment.h>
+#include <string>
+#include <vector>
+#include <utility>
+#include <math.h>
 
 namespace Belle2 {
 
@@ -19,6 +23,15 @@ namespace Belle2 {
    */
   class TOPGeoPrism: public TOPGeoBarSegment {
   public:
+
+    /**
+     * Parameters of peel-off cookie region (corresponds to 2x2 PMT's)
+     */
+    struct PeelOffRegion {
+      unsigned ID; /**< ID of the region (1-based) */
+      float fraction; /**< fraction of peel-off area */
+      float angle;    /**< angle of peel-off area */
+    };
 
     /**
      * Default constructor
@@ -32,7 +45,7 @@ namespace Belle2 {
      * @param thickness thickness at bar side
      * @param length prism length
      * @param exitThickness thickness at PMT side
-     * @param flatLenght length of the flat part at the bottom
+     * @param flatLength length of the flat part at the bottom
      * @param material prism material name
      * @param name object name
      */
@@ -43,6 +56,39 @@ namespace Belle2 {
       TOPGeoBarSegment(width, thickness, length, material, name),
       m_exitThickness(exitThickness), m_flatLength(flatLength)
     {}
+
+    /**
+     * Recalculates flatLength according to given prism angle
+     * @param angle prism angle
+     */
+    void setAngle(double angle)
+    {
+      m_flatLength = m_length - (m_exitThickness - m_thickness) / tan(angle);
+    }
+
+    /**
+     * Sets parameters of the peel-off cookie volumes
+     * @param size volume size in x
+     * @param offset offset in x of the center of volume ID = 1
+     * @param thickness volume thickness
+     * @param material material name
+     */
+    void setPeelOffRegions(double size, double offset, double thickness,
+                           const std::string& material)
+    {
+      m_peelOffSize = size;
+      m_peelOffOffset = offset;
+      m_peelOffThickness = thickness;
+      m_peelOffMaterial = material;
+    }
+
+    /**
+     * Appends peel-off cookie region
+     * @param ID region ID (1-based)
+     * @param fraction fraction of the area
+     * @param angle angle of the area
+     */
+    void appendPeelOffRegion(unsigned ID, double fraction, double angle);
 
     /**
      * Returns prism thickness at PMT side
@@ -63,6 +109,15 @@ namespace Belle2 {
     double getFullFlatLength() const {return (m_flatLength + m_glueThickness) / s_unit;}
 
     /**
+     * Returns prism angle
+     * @return angle
+     */
+    double getAngle() const
+    {
+      return atan((m_exitThickness - m_thickness) / (m_length - m_flatLength));
+    }
+
+    /**
      * Returns wavelength filter thickness (filter on -z side)
      * @return thickness
      */
@@ -79,6 +134,47 @@ namespace Belle2 {
      * @return thickness
      */
     double getGlueThickness() const {return 0;}
+
+    /**
+     * Returns cookie size in x (corresponding to 2x2 PMT)
+     * @return size in x
+     */
+    double getPeelOffSize() const {return m_peelOffSize / s_unit;}
+
+    /**
+     * Returns peel-off thickness
+     * @return thickness
+     */
+    double getPeelOffThickness() const {return m_peelOffThickness / s_unit;}
+
+    /**
+     * Returns peel-off material
+     * @return material name
+     */
+    const std::string& getPeelOffMaterial() const {return m_peelOffMaterial;}
+
+    /**
+     * Returns peel-off cookie regions
+     * @return vector of regions
+     */
+    const std::vector<PeelOffRegion>& getPeelOffRegions() const {return m_peelOffRegions;}
+
+    /**
+     * Returns peel-off offset in x of the given region
+     * @param region peel-off region
+     * @return offset in x
+     */
+    double getPeelOffCenter(const PeelOffRegion& region) const
+    {
+      return (m_peelOffOffset - (region.ID - 1) * m_peelOffSize) / s_unit;
+    }
+
+    /**
+     * Returns the x-y contour of the peel-off region
+     * @param region peel-off region
+     * @return clock-wise polygon
+     */
+    std::vector<std::pair<double, double> > getPeelOffContour(const PeelOffRegion& region) const;
 
     /**
      * Check for consistency of data members
@@ -98,7 +194,13 @@ namespace Belle2 {
     float m_exitThickness = 0; /**< thickness at PMT side */
     float m_flatLength = 0; /**< length of the flat part at the bottom */
 
-    ClassDef(TOPGeoPrism, 1); /**< ClassDef */
+    float m_peelOffSize = 0;       /**< size in x of peel-off volume */
+    float m_peelOffOffset = 0;     /**< offset in x of the peel-off volume ID = 1 */
+    float m_peelOffThickness = 0;  /**< thickness of peel-off volume */
+    std::string m_peelOffMaterial; /**< material name of peel-off volume */
+    std::vector<PeelOffRegion> m_peelOffRegions; /**< peel-off regions */
+
+    ClassDef(TOPGeoPrism, 2); /**< ClassDef */
 
   };
 

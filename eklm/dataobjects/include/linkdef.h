@@ -17,6 +17,7 @@
 
 /* Digitization stage. */
 #pragma link C++ class Belle2::EKLMSim2Hit+;
+#pragma link C++ class Belle2::EKLMFPGAFit+;
 #pragma link C++ class Belle2::EKLMDigit+;
 
 /* Reconstuction stage. */

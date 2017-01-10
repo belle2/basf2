@@ -21,7 +21,11 @@
       <xi:include href="TOP-PMT.xml"/>
       <xi:include href="../../../top/TOP-QENaKSbCs.xml"/>
       <xi:include href="../../../top/TOP-Materials.xml"/>
-      <xi:include href="../../../top/TOP-Support.xml"/>
+      <xi:include href="../../../top/QBB.xml"/>
+      <xi:include href="../../../top/FrontEndGeo.xml"/>
+      <xi:include href="../../../top/FrontEndMapping.xml"/>
+      <xi:include href="../../../top/ChannelMappingIRSX.xml"/>
+      <xi:include href="../../../top/ChannelMappingIRS3B.xml"/>
       <xi:include href="TOP-Mirror.xml"/>
       
       <BeamBackgroundStudy desc="not used">0</BeamBackgroundStudy>

@@ -14,7 +14,7 @@
   <FiberDeExTime desc="ns">10.0</FiberDeExTime>
   <FiberLightSpeed desc="cm/ns">17.0</FiberLightSpeed>
   <AttenuationLength desc="cm">300.0</AttenuationLength>
-  <PEAttenuationFreq desc="ns^-1">0.3</PEAttenuationFreq>
+  <PEAttenuationFreq desc="ns^-1">0.11428571428571428571</PEAttenuationFreq>
   <MeanSiPMNoise desc="">-1</MeanSiPMNoise>
   <EnableConstBkg desc="">0</EnableConstBkg>
   <TimeResolution desc="ns">3.0</TimeResolution>

@@ -13,12 +13,11 @@
 
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
-#include <tracking/trackFindingCDC/eventdata/collections/CDCTrackList.h>
-
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
+    class CDCConformalHit;
+    class CDCWireHit;
   }
 
   /**
@@ -42,15 +41,24 @@ namespace Belle2 {
 
   private:
     /// Parameter
-    int m_param_maxLevel;               /**< Maximum Level of FastHough Algorithm. */
-    bool m_param_doEarlyMerging;        /**< Defines whether early track merging will be performed. */
+    /// Maximum Level of FastHough Algorithm.
+    int m_param_maxLevel;
+
+    /// Defines whether early track merging will be performed.
+    bool m_param_doEarlyMerging;
 
     /// Worker
-    TrackFindingCDC::CDCTrackList
-    m_cdcTrackList;      /**< Object for holding all found cdc tracks to be passed around to the postprocessing functions. */
-    std::vector<TrackFindingCDC::CDCConformalHit>
-    m_conformalCDCWireHitList; /**< List for holding all used conformal CDC wire hits. */
+    /// Object for holding all found cdc tracks to be passed around to the postprocessing functions.
+    std::list<TrackFindingCDC::CDCTrack> m_tracks;
 
+    /// List to collect all axial wire hits
+    std::vector<const TrackFindingCDC::CDCWireHit*> m_allAxialWireHits;
+
+
+    /// List for holding all used conformal CDC wire hits.
+    std::vector<TrackFindingCDC::CDCConformalHit> m_conformalCDCWireHitList;
+
+    /// Main method to apply the track finding.
     void generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks);
 
     /// All objects in m_hitList and m_trackList are deleted and the two lists are cleared.

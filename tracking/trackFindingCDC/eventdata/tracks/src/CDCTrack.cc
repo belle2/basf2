@@ -100,9 +100,6 @@ namespace {
   }
 }
 
-
-
-
 CDCTrack::CDCTrack(const CDCSegment2D& segment) :
   m_startTrajectory3D(segment.getTrajectory2D()),
   m_endTrajectory3D(segment.getTrajectory2D())
@@ -161,7 +158,6 @@ CDCTrack CDCTrack::condense(const std::vector<const CDCTrack*>& trackPath)
     return result;
   }
 }
-
 
 CDCTrack CDCTrack::condense(const Path<const CDCSegmentTriple>& segmentTriplePath)
 {
@@ -287,21 +283,6 @@ CDCTrack CDCTrack::condense(const Path<const CDCSegmentPair>& segmentPairPath)
   return track;
 }
 
-
-void CDCTrack::appendNotTaken(const std::vector<const CDCWireHit*>& hits)
-{
-  const CDCTrajectory2D& trackTrajectory2D = this->getStartTrajectory3D().getTrajectory2D();
-
-  for (const CDCWireHit* item : hits) {
-    if (item->getAutomatonCell().hasTakenFlag() || item->getAutomatonCell().hasMaskedFlag()) continue;
-
-    const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstructNearest(item, trackTrajectory2D);
-    this->push_back(std::move(recoHit3D));
-    recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
-  }
-}
-
-
 bool CDCTrack::storeInto(StoreArray<RecoTrack>& recoTracks) const
 {
   RecoTrack* newRecoTrack = getStartTrajectory3D().storeInto(recoTracks);
@@ -310,8 +291,6 @@ bool CDCTrack::storeInto(StoreArray<RecoTrack>& recoTracks) const
   }
   return true;
 }
-
-
 
 std::vector<CDCSegment3D> CDCTrack::splitIntoSegments() const
 {
@@ -327,8 +306,6 @@ std::vector<CDCSegment3D> CDCTrack::splitIntoSegments() const
   }
   return result;
 }
-
-
 
 void CDCTrack::reverse()
 {
@@ -352,7 +329,6 @@ void CDCTrack::reverse()
 
   // Reverse the arrangement of hits.
   std::reverse(begin(), end());
-
 }
 
 CDCTrack CDCTrack::reversed() const
@@ -411,18 +387,4 @@ void CDCTrack::shiftToPositiveArcLengths2D(bool doForAllTracks)
       }
     }
   }
-}
-
-void CDCTrack::removeAllAssignedMarkedHits()
-{
-  // Delete all hits that were marked
-  erase(std::remove_if(begin(), end(), [](const CDCRecoHit3D & recoHit) -> bool {
-    if (recoHit.getWireHit().getAutomatonCell().hasAssignedFlag())
-    {
-      recoHit.getWireHit().getAutomatonCell().unsetTakenFlag();
-      return true;
-    } else {
-      return false;
-    }
-  }), end());
 }

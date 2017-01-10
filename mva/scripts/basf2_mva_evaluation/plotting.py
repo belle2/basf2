@@ -677,7 +677,7 @@ class Overtraining(Plotter):
         distribution.set_fill_options({'color': distribution.plots[1][0].get_color(), 'alpha': 0.5, 'step': 'mid'})
         distribution.add(data, column, train_mask & bckgrd_mask, weight_column)
 
-        distribution.labels = ['Train-Signal', 'Train-Background', 'Test-Signal', 'Test-Background']
+        distribution.labels = ['Test-Signal', 'Test-Background', 'Train-Signal', 'Train-Background']
 
         distribution.finish()
 

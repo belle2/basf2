@@ -101,6 +101,8 @@ namespace Belle2 {
     addParam("input_BGSol", m_input_BGSol, "BG solution 0 or 1");
     addParam("input_ToSol", m_input_ToSol, "To solution 0 or 1");
 
+    addParam("input_Z", m_input_Z, "Z number");
+
     addParam("input_GasCorrection", m_input_GasCorrection, "GasCorrection");
 
     addParam("inputHistoFileNames", m_inputHistoFileNames,
@@ -141,6 +143,19 @@ namespace Belle2 {
       B2FATAL("No valid files specified!");
     }
 
+    fctRate_HB = new TF1("fctRate_HB", "[0] * x*x * log([1] / TMath::Power(x,1./3.) + [2])", 1.0, 19.0);
+    fctRate_LB = new TF1("fctRate_LB", "[0] * x*x * log([1] / TMath::Power(x,1./3.) + [2])", 1.0, 19.0);
+    fctRate_HC = new TF1("fctRate_HC", "[0] * x*x / TMath::Power( ([1] / TMath::Power(x,1./3.) + [2]), 2.)", 1.0, 19.0);
+    fctRate_LC = new TF1("fctRate_LC", "[0] * x*x / TMath::Power( ([1] / TMath::Power(x,1./3.) + [2]), 2.)", 1.0, 19.0);
+    fctRate_HB->SetParameters(0.183373, 0.117173, 1.23431);
+    fctRate_LB->SetParameters(0.900838, 0.0455552, 1.10098);
+    fctRate_HC->SetParameters(1.80992, -0.000115401, 8.4047);
+    fctRate_LC->SetParameters(0.210872, -4.50637e-06, 1.64209);
+    m_input_Z_scaling[0] = fctRate_HC->Eval(m_input_Z[0]) / fctRate_HC->Eval(7);
+    m_input_Z_scaling[1] = fctRate_LC->Eval(m_input_Z[1]) / fctRate_LC->Eval(7);
+    m_input_Z_scaling[2] = fctRate_HB->Eval(m_input_Z[2]) / fctRate_HB->Eval(7);
+    m_input_Z_scaling[3] = fctRate_LB->Eval(m_input_Z[3]) / fctRate_LB->Eval(7);
+
     double volume = 0.;
     double rho = 0.;
     double mass = 0.;
@@ -161,6 +176,16 @@ namespace Belle2 {
           for (int i = 0; i < h1D->GetNbinsX(); i++) {
             double counts = h1D->GetBinContent(i + 1);
             double rate = counts / m_input_Time_eqv;
+
+            if (fileName.Contains("Coulomb")) {
+              if (fileName.Contains("HER")) rate *= m_input_Z_scaling[0];
+              if (fileName.Contains("LER")) rate *= m_input_Z_scaling[1];
+            }
+            if (fileName.Contains("Brems")) {
+              if (fileName.Contains("HER")) rate *= m_input_Z_scaling[2];
+              if (fileName.Contains("LER")) rate *= m_input_Z_scaling[3];
+            }
+
             if (fileName.Contains("HER")) {
               if (HistoRateName.Contains("qcss") && fileName.Contains("Touschek")) m_input_HT_QCSS_rate.push_back(rate); //Hz
               if (HistoRateName.Contains("claws") && fileName.Contains("Touschek")) m_input_HT_CLAWS_rate.push_back(rate); //Hz
@@ -222,6 +247,16 @@ namespace Belle2 {
               double co = he->GetBinContent(j + 1);
               double va = he->GetXaxis()->GetBinCenter(j + 1);
               double esumbin = va * co;
+
+              if (fileName.Contains("Coulomb")) {
+                if (fileName.Contains("HER")) esumbin *= m_input_Z_scaling[0];
+                if (fileName.Contains("LER")) esumbin *= m_input_Z_scaling[1];
+              }
+              if (fileName.Contains("Brems")) {
+                if (fileName.Contains("HER")) esumbin *= m_input_Z_scaling[2];
+                if (fileName.Contains("LER")) esumbin *= m_input_Z_scaling[3];
+              }
+
               esum += esumbin;// / step;
               if (HistoDoseName.Contains("csi_energy")) {
                 if (fileName.Contains("HER")) {
@@ -311,6 +346,16 @@ namespace Belle2 {
             for (int i = 0; i < h2D->GetNbinsX(); i++) {
               double counts = h2D->GetBinContent(i + 1, k + 1);
               double rate = counts / m_input_Time_eqv;
+
+              if (fileName.Contains("Coulomb")) {
+                if (fileName.Contains("HER")) rate *= m_input_Z_scaling[0];
+                if (fileName.Contains("LER")) rate *= m_input_Z_scaling[1];
+              }
+              if (fileName.Contains("Brems")) {
+                if (fileName.Contains("HER")) rate *= m_input_Z_scaling[2];
+                if (fileName.Contains("LER")) rate *= m_input_Z_scaling[3];
+              }
+
               if (fileName.Contains("Coulomb_HER")) {
                 if (HistoRateName.Contains("qcss")) m_input_HC_QCSS_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("claws")) m_input_HC_CLAWS_rate[k].push_back(rate); //Hz
@@ -371,6 +416,16 @@ namespace Belle2 {
                 double co = he->GetBinContent(j + 1, k + 1);
                 double va = he->GetXaxis()->GetBinCenter(j + 1);
                 double esumbin = va * co;
+
+                if (fileName.Contains("Coulomb")) {
+                  if (fileName.Contains("HER")) esumbin *= m_input_Z_scaling[0];
+                  if (fileName.Contains("LER")) esumbin *= m_input_Z_scaling[1];
+                }
+                if (fileName.Contains("Brems")) {
+                  if (fileName.Contains("HER")) esumbin *= m_input_Z_scaling[2];
+                  if (fileName.Contains("LER")) esumbin *= m_input_Z_scaling[3];
+                }
+
                 esum += esumbin;// / step;
                 if (HistoDoseName.Contains("csi_energy")) {
                   if (fileName.Contains("HER")) {
@@ -512,6 +567,8 @@ namespace Belle2 {
     m_tree->SetBranchAddress("SKB_LER_partialPressures_D06", &(m_beast.SKB_LER_partialPressures_D06));
     m_tree->SetBranchAddress("SKB_LER_partialPressures_D02", &(m_beast.SKB_LER_partialPressures_D02));
     m_tree->SetBranchAddress("SKB_LER_pressures_local", &(m_beast.SKB_LER_pressures_local));
+    m_tree->SetBranchAddress("SKB_LER_Zeff_D02", &(m_beast.SKB_LER_Zeff_D02));
+    m_tree->SetBranchAddress("SKB_LER_Zeff_D06", &(m_beast.SKB_LER_Zeff_D06));
 
     m_numEntries = m_tree->GetEntries();
     cout << "m_numEntries " << m_numEntries << endl;
@@ -587,6 +644,8 @@ namespace Belle2 {
     m_treeBEAST->Branch("SKB_LER_partialPressures_D06", &(m_beast.SKB_LER_partialPressures_D06));
     m_treeBEAST->Branch("SKB_LER_partialPressures_D02", &(m_beast.SKB_LER_partialPressures_D02));
     m_treeBEAST->Branch("SKB_LER_pressures_local", &(m_beast.SKB_LER_pressures_local));
+    m_treeBEAST->Branch("SKB_LER_Zeff_D02", &(m_beast.SKB_LER_Zeff_D02));
+    m_treeBEAST->Branch("SKB_LER_Zeff_D06", &(m_beast.SKB_LER_Zeff_D06));
     m_treeBEAST->Branch("PIN_dose", &(m_beast.PIN_dose));
     m_treeBEAST->Branch("BGO_energy", &(m_beast.BGO_energy));
     m_treeBEAST->Branch("HE3_rate", &(m_beast.HE3_rate));
@@ -774,12 +833,12 @@ namespace Belle2 {
     double P_HER = 0;
     if (m_beast.SKB_HER_pressure_average != 0
         && m_beast.SKB_HER_pressure_average->size() > 0) P_HER = m_beast.SKB_HER_pressure_average->at(
-                0) * 0.00750062 * 1e9 * m_input_GasCorrection;
+                0) * 0.00750062 * 1e9 * m_input_GasCorrection[0];
     if (m_input_P_HER[1] > 0) P_HER += gRandom->Gaus(0, m_input_P_HER[1]);
     double P_LER = 0;
     if (m_beast.SKB_LER_pressure_average != 0
         && m_beast.SKB_LER_pressure_average->size() > 0) P_LER = m_beast.SKB_LER_pressure_average->at(
-                0) * 0.00750062 * 1e9 * m_input_GasCorrection;
+                0) * 0.00750062 * 1e9 * m_input_GasCorrection[1];
     if (m_input_P_LER[1] > 0) P_LER += gRandom->Gaus(0, m_input_P_LER[1]);
     double sigma_y_HER = 0;
     double sigma_x_HER = 0;
@@ -897,7 +956,7 @@ namespace Belle2 {
       for (int i = 0; i < (int)m_beast.SKB_HER_pressures->size(); i++) {
         ScaleFacBG_HER[i] = 0;
         double iP_HER = 0;
-        iP_HER = m_beast.SKB_HER_pressures->at(i) * 0.00750062 * 1e9 * m_input_GasCorrection;
+        iP_HER = m_beast.SKB_HER_pressures->at(i) * 0.00750062 * 1e9 * m_input_GasCorrection[0];
         if (m_input_P_HER[1] > 0) iP_HER += gRandom->Gaus(0, m_input_P_HER[1]);
         if (iP_HER < 0 || iP_HER > 260.) iP_HER = 0;
         if (I_HER > 0 && iP_HER > 0) {
@@ -912,7 +971,7 @@ namespace Belle2 {
       for (int i = 0; i < (int)m_beast.SKB_LER_pressures->size(); i++) {
         ScaleFacBG_LER[i] = 0;
         double iP_LER = 0;
-        iP_LER = m_beast.SKB_LER_pressures->at(i) * 0.00750062 * 1e9 * m_input_GasCorrection;
+        iP_LER = m_beast.SKB_LER_pressures->at(i) * 0.00750062 * 1e9 * m_input_GasCorrection[1];
         if (m_input_P_LER[1] > 0) iP_LER += gRandom->Gaus(0, m_input_P_LER[1]);
         if (iP_LER < 0 || iP_LER > 260.) iP_LER = 0;
         if (I_LER > 0 && iP_LER > 0) {

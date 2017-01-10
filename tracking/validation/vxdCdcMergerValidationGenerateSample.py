@@ -15,8 +15,9 @@ from ROOT import Belle2
 from simulation import add_simulation
 from reconstruction import add_mdst_output, add_reconstruction
 from modularAnalysis import generateY4S
-from tracking.validation.harvesting import HarvestingModule
-from tracking.validation import refiners, tracking_efficiency_helpers
+from tracking.harvest.harvesting import HarvestingModule
+from tracking.harvest import refiners
+from tracking.validation import tracking_efficiency_helpers
 import numpy
 
 

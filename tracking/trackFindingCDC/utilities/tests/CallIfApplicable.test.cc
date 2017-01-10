@@ -7,13 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-/*
-This file contains test to check the behaviour of the c++ programming language.
-Its purpose is mainly to asure the programmer that his assumptions about run time behaviour are correct.
-*/
-
-#include <tracking/trackFindingCDC/utilities/CallIfApplicable.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 
 #include <gtest/gtest.h>
 
@@ -28,18 +22,20 @@ namespace {
     EXPECT_FALSE(v.empty());
 
     clearIfApplicable(f);
-    clearIfApplicable(v);
+    invokeIfApplicable(Clear(), v);
+
 
     EXPECT_TRUE(v.empty());
     EXPECT_EQ(2, f);
   }
 
   struct Back {
-    template<class T>
-    const typename T::value_type& operator()(const T& container)
-    { return container.back(); }
+    template <class T>
+    const typename T::value_type& operator()(const T& container) const
+    {
+      return container.back();
+    }
   };
-
 
   TEST(TrackFindingCDCTest, utilities_getIfApplicable)
   {
@@ -52,10 +48,12 @@ namespace {
     EXPECT_EQ(1.0, back(v));
 
     // Valid get case
+    EXPECT_EQ(1.0, Back()(v));
     EXPECT_EQ(1.0, getIfApplicable<float>(Back(), v, -1.0));
 
     // Default case
     EXPECT_EQ(-1.0, getIfApplicable<float>(Back(), f, -1.0));
+
 
   }
 }

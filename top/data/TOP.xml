@@ -13,6 +13,8 @@
     <xi:include href="FrontEndMapping.xml"/>
     <xi:include href="ChannelMappingIRS3B.xml"/>
     <xi:include href="ChannelMappingIRSX.xml"/>
+    <xi:include href="BrokenGlues.xml"/>
+    <xi:include href="PeelOffCookies.xml"/>
     
     <BeamBackgroundStudy desc="select 1 to record neutron and gamma hits">0</BeamBackgroundStudy>
 

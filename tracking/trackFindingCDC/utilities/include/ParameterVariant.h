@@ -29,6 +29,7 @@ namespace Belle2 {
     /// A helper class to unpack a boost::variant parameter value and set it in the parameter list.
     struct AssignParameterVisitor : public boost::static_visitor<> {
 
+      /// Transfer all the parameters from the map boost:variant values to the module parmeter list.
       template <class ... T>
       static void update(ModuleParamList* moduleParamList,
                          const std::map<std::string, boost::variant<T...> >& valuesByName)

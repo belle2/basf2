@@ -11,6 +11,7 @@
 #pragma once
 
 #include <vector>
+#include <list>
 
 
 namespace Belle2 {
@@ -19,8 +20,6 @@ namespace Belle2 {
 
     class CDCTrack;
     class CDCWireHit;
-    class CDCTrackList;
-    class CDCConformalHit;
     class CDCTrajectory2D;
 
     /// Class with high-level track (post)processing.
@@ -36,19 +35,23 @@ namespace Belle2 {
       TrackProcessor& operator=(const TrackProcessor&) = delete;
 
       /// Create CDCTrack using CDCWireHit hits and store it in the list. Then call the postprocessing on it.
-      static void addCandidateFromHitsWithPostprocessing(std::vector<const CDCWireHit*>& hits,
-                                                         const std::vector<CDCConformalHit>& conformalCDCWireHitList,
-                                                         CDCTrackList& cdcTrackList);
+      static void addCandidateFromHitsWithPostprocessing(std::vector<const CDCWireHit*>& foundAxialWireHits,
+                                                         const std::vector<const CDCWireHit*>& allAxialWireHits,
+                                                         std::list<CDCTrack>& cdcTrackList);
 
       /// Assign new hits to all tracks (using the assignNewHitsToTrack(CDCTrack&) method of the HitsProcessor).
-      static void assignNewHits(const std::vector<CDCConformalHit>& conformalCDCWireHitList, CDCTrackList& cdcTrackList);
+      static void assignNewHits(const std::vector<const CDCWireHit*>& allWireHits, std::list<CDCTrack>& cdcTrackList);
 
-      /// Check the p-values of the tracks. If they are below the given value, delete the track from the list.
-      static void deleteTracksWithLowFitProbability(CDCTrackList& cdcTrackList, double minimal_probability_for_good_fit = 0.4);
+      /// Perform all track postprocessing - return whether the track is considered good after the postprocessing
+      static bool postprocessTrack(CDCTrack& track, const std::vector<const CDCWireHit*>& allAxialWireHits);
 
-      /// Perform all track postprocessing.
-      static void postprocessTrack(CDCTrack& track, const std::vector<CDCConformalHit>& conformalCDCWireHitList,
-                                   CDCTrackList& cdcTrackList);
+      /// Finalize the tracks after the legendre track finder is done - includes a merging step of found tracks
+      static void mergeAndFinalizeTracks(std::list<CDCTrack>& cdcTrackList,
+                                         const std::vector<const CDCWireHit*>& allWireHits);
+
+      /// Check an (improper) p-values of the tracks. If they are below the given value, delete the track from the list.
+      static void deleteTracksWithLowFitProbability(std::list<CDCTrack>& cdcTrackList,
+                                                    double minimal_probability_for_good_fit = 0.4);
 
     private:
       /// Check chi2 of the fit using the given two quantiles of the chi2 distribution.
@@ -58,12 +61,13 @@ namespace Belle2 {
        * Calculate the quantile of chi2 with the given number of freedoms using the known chi2 distribution.
        * @param alpha quantile of chi2
        * @param n number degrees of freedom
+       *
+       * Note: Use TMath::ChisquareQuantile instead of the handcrafted version
        */
       static double calculateChi2ForQuantile(double alpha, double n);
 
       /// Check track quality -- currently based on number of hits only.
-      static bool checkTrackQuality(const CDCTrack& track, CDCTrackList& cdcTrackList);
+      static bool checkTrackQuality(const CDCTrack& track);
     };
   }
 }
-

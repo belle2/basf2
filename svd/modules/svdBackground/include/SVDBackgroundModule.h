@@ -158,7 +158,7 @@ namespace Belle2 {
       std::string m_storeMCParticlesName; /**< MCParticles StoreArray name */
       std::string m_storeSimHitsName; /**< SVDSimHits StoreArray name */
       std::string m_storeTrueHitsName; /**< SVDTrueHits StoreArray name */
-      std::string m_relParticlesTrueHitsName; /** MCParticlesToSVDTrueHits RelationArray name */
+      std::string m_relParticlesTrueHitsName; /**< MCParticlesToSVDTrueHits RelationArray name */
       std::string m_storeDigitsName; /**< SVDDigits StoreArray name */
       std::string m_relDigitsMCParticlesName; /**< StoreArray name of SVDDigits to MCParticles relation */
       std::string m_relDigitsTrueHitsName; /**< StoreArray name of SVDDigits to SVDTrueHits relation */

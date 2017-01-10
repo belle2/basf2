@@ -95,6 +95,9 @@ class TestingModule(Module):
         processed_event_numbers.append(emd.obj().getEvent())
 
     def terminate(self):
+        """
+        perform check
+        """
         # We only want to do the check if we actually execute the process() but
         # since this script is called from basf2_args with --dry-run this is not
         # always the case

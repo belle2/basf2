@@ -17,6 +17,7 @@
 #include "TFile.h"
 #include "TChain.h"
 #include "Riostream.h"
+#include "TF1.h"
 
 namespace Belle2 {
 
@@ -79,9 +80,11 @@ namespace Belle2 {
 
     std::vector<std::string> m_inputFileNames; /**< list of file names */
 
+    Double_t m_input_Z_scaling[4]; /**< time stamp start and stop */
+    std::vector<Double_t> m_input_Z; /** input Z */
     Int_t m_input_BGSol; /**< time stamp start and stop */
     Int_t m_input_ToSol; /**< time stamp start and stop */
-    Double_t m_input_GasCorrection; /**< time stamp start and stop */
+    std::vector<Double_t> m_input_GasCorrection; /**< time stamp start and stop */
 
     std::vector<std::string> m_inputRateHistoNames; /**< list of file names */
     std::vector<std::string> m_inputDoseHistoNames; /**< list of file names */
@@ -227,6 +230,11 @@ namespace Belle2 {
     std::vector<Double_t> m_input_HC_DOSI_av; /**< list of PIN HC dose */
     std::vector<Double_t> m_input_LB_DOSI_av; /**< list of PIN LB dose */
     std::vector<Double_t> m_input_HB_DOSI_av; /**< list of PIN HB dose */
+
+    TF1* fctRate_HB;  /** fct HB */
+    TF1* fctRate_HC;  /** fct HC */
+    TF1* fctRate_LB;  /** fct LB */
+    TF1* fctRate_LC;  /** fct LC */
 
     TTree* m_treeBEAST = 0;   /**< BEAST tree pointer */
     TTree* m_treeTruth = 0;   /**< Truth tree pointer */

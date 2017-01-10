@@ -14,6 +14,7 @@
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
+#include <framework/logging/LogSystem.h>
 #include <geometry/Materials.h>
 #include <iostream>
 
@@ -73,7 +74,11 @@ namespace Belle2 {
         return;
       }
 
-      m_brokenFraction = content.getDouble("Bars/BrokenJointFraction", 0);
+      // print geometry if the debug level for 'top' is set 10000
+      const auto& logSystem = LogSystem::Instance();
+      if (logSystem.isLevelEnabled(LogConfig::c_Debug, 10000, "top")) {
+        m_geo->print();
+      }
 
       m_valid = true;
     }
@@ -108,6 +113,12 @@ namespace Belle2 {
       if (!m_channelMapperIRSX.isValid()) {
         B2ERROR("TOPChannelMaps: no payload found in database");
         return;
+      }
+
+      // print geometry if the debug level for 'top' is set 10000
+      const auto& logSystem = LogSystem::Instance();
+      if (logSystem.isLevelEnabled(LogConfig::c_Debug, 10000, "top")) {
+        m_geo->print();
       }
 
       m_valid = true;
@@ -240,6 +251,57 @@ namespace Belle2 {
         // module.setModuleDisplacement(moduleDispl);
         geo->appendModule(module);
         phi += 2 * M_PI / numModules;
+      }
+
+      // broken glues (if any)
+
+      GearDir brokenGlues(content, "BrokenGlues");
+      if (brokenGlues) {
+        if (brokenGlues.getInt("SwitchON") != 0) {
+          auto material = brokenGlues.getString("material");
+          for (const GearDir& slot : brokenGlues.getNodes("Slot")) {
+            int moduleID = slot.getInt("@ID");
+            if (!geo->isModuleIDValid(moduleID)) {
+              B2WARNING("TOPGeometryPar: BrokenGlues.xml: invalid moduleID " << moduleID);
+              continue;
+            }
+            auto& module = const_cast<TOPGeoModule&>(geo->getModule(moduleID));
+            for (const GearDir& glue : slot.getNodes("Glue")) {
+              int glueID = glue.getInt("@ID");
+              double fraction = glue.getDouble("fraction");
+              if (fraction <= 0) continue;
+              double angle = glue.getAngle("angle");
+              module.setBrokenGlue(glueID, fraction, angle, material);
+            }
+          }
+        }
+      }
+
+      // peel-off cookies (if any)
+
+      GearDir peelOff(content, "PeelOffCookies");
+      if (peelOff) {
+        if (peelOff.getInt("SwitchON") != 0) {
+          auto material = peelOff.getString("material");
+          double thickness = peelOff.getLength("thickness");
+          for (const GearDir& slot : peelOff.getNodes("Slot")) {
+            int moduleID = slot.getInt("@ID");
+            if (!geo->isModuleIDValid(moduleID)) {
+              B2WARNING("TOPGeometryPar: PeelOffCookiess.xml: invalid moduleID "
+                        << moduleID);
+              continue;
+            }
+            auto& module = const_cast<TOPGeoModule&>(geo->getModule(moduleID));
+            module.setPeelOffRegions(thickness, material);
+            for (const GearDir& region : slot.getNodes("Region")) {
+              int regionID = region.getInt("@ID");
+              double fraction = region.getDouble("fraction");
+              if (fraction <= 0) continue;
+              double angle = region.getAngle("angle");
+              module.appendPeelOffRegion(regionID, fraction, angle);
+            }
+          }
+        }
       }
 
       // front-end electronics geometry

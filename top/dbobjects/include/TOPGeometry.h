@@ -53,10 +53,10 @@ namespace Belle2 {
     static void useGeantUnits() {s_unit = Unit::mm; s_unitName = "mm";}
 
     /**
-     * Appends module
+     * Appends module (if its ID differs from already appended modules)
      * @param module module geometry parameters
      */
-    void appendModule(const TOPGeoModule& module) {m_modules.push_back(module);}
+    void appendModule(const TOPGeoModule& module);
 
     /**
      * Sets front-end
@@ -104,7 +104,7 @@ namespace Belle2 {
      * @param moduleID valid module ID (1-based)
      * @return module geometry parameters
      */
-    const TOPGeoModule& getModule(unsigned moduleID) const;
+    const TOPGeoModule& getModule(int moduleID) const;
 
     /**
      * Returns all modules
@@ -113,14 +113,11 @@ namespace Belle2 {
     const std::vector<TOPGeoModule>& getModules() const {return m_modules;}
 
     /**
-     * Checks if module exists
+     * Checks if module exists in m_modules
      * @param moduleID module ID (1-based)
      * @return true if exists
      */
-    bool isModuleIDValid(unsigned moduleID) const
-    {
-      return moduleID - 1 < m_modules.size();
-    }
+    bool isModuleIDValid(int moduleID) const;
 
     /**
      * Returns front-end

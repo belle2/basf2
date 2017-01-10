@@ -271,9 +271,15 @@ namespace VXDTFtwoHitFilterTest {
     // VectorOfObservers<Distance3DSquared>::addObserver(CountingObserver);
     // VectorOfObservers<Distance3DSquared>::addObserver(WarningObserver);
 
+
     filter.accept(x2, x1);
     filter.accept(x3, x1);
     EXPECT_EQ(0 , myCounter.used);
+
+
+    /** this following lines are just used for testing and do nothing! */
+    double b = 12.;
+    if (b == 3) b = 123.;
   }
 
 

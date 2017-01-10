@@ -63,7 +63,7 @@ namespace Belle2 {
       {
         const CDCFacet* ptrFrom(relation.getFrom());
         const CDCFacet* ptrTo(relation.getTo());
-        if (not ptrFrom or not ptrTo) return NAN;
+        if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
         return operator()(*ptrFrom, *ptrTo);
       }
     };

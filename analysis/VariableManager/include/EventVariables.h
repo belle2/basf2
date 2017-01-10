@@ -54,6 +54,11 @@ namespace Belle2 {
     double KLMEnergy(const Particle*);
 
     /**
+     * return difference between the total energy of tracks and clusters in CMS and the beam energy
+     */
+    double missingEnergy(const Particle*);
+
+    /**
     * return experiment number
     */
     double expNum(const Particle*);

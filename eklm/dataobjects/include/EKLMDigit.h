@@ -17,7 +17,6 @@
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <framework/dataobjects/DigitBase.h>
-#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
@@ -55,6 +54,18 @@ namespace Belle2 {
      * The pile-up method.
      */
     EAppendStatus addBGDigit(const DigitBase* bg);
+
+    /**
+     * Get charge.
+     * @return Charge.
+     */
+    uint16_t getCharge() const;
+
+    /**
+     * Set charge.
+     * @param[in] charge Charge.
+     */
+    void setCharge(uint16_t charge);
 
     /**
      * Get number of photoelectrons (fit result).
@@ -156,8 +167,8 @@ namespace Belle2 {
     /** If hit passes threshold. */
     bool m_good;
 
-    /** Number of photo electrons. */
-    float m_NPE;
+    /** Charge (integral of ADC signal). */
+    uint16_t m_Charge;
 
     /** Generated number of photoelectrons (MC only). */
     int m_generatedNPE;
@@ -169,7 +180,7 @@ namespace Belle2 {
     float m_sMCTime;
 
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMDigit, 5);
+    ClassDef(Belle2::EKLMDigit, 6);
 
   };
 

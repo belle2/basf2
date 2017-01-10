@@ -115,10 +115,17 @@ namespace Belle2 {
     static bool isFSP(int pdg);
 
     /**
-     * Returns true if given MCParticle is a final state radiation (FSR) photon.
+     * Returns true if given MCParticle is a final state radiation (FSR) photon based on MCParticle::c_IsFSRPhoton.
      * Assumes PDG code of p is 22.
      */
     static bool isFSR(const Belle2::MCParticle* p);
+
+    /**
+     * Returns true if given MCParticle is a final state radiation (FSR) photon.
+     * This is a legacy version of isFSR(const Belle2::MCParticle* p) function that works on MC samples
+     * without MCParticle::c_IsFSRPhoton and MCParticle::c_IsPHOTOSPhoton properly set (for example Belle MC).
+     */
+    static bool isFSRLegacy(const Belle2::MCParticle* p);
 
     /**
      * Returns true if given MCParticle is a radiative photon.

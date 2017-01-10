@@ -29,11 +29,17 @@
       <Material>QCSMONITOR-Material</Material>
       <ThetaZ unit="deg">0.0</ThetaZ>
       <Phi unit="deg">90.</Phi>
+      <!--
       <dx_scint unit="cm">0.25</dx_scint>
       <dy_scint unit="cm">2.0</dy_scint>
       <dz_scint unit="cm">15.</dz_scint>
+      -->
+      <dx_scint unit="cm">1.0</dx_scint>
+      <dy_scint unit="cm">4.0</dy_scint>
+      <dz_scint unit="cm">10.</dz_scint>
       <x unit="cm">19.5,19.5</x>
-      <y unit="cm">27.4,27.4</y>
+      <!--y unit="cm">27.4,27.4</y-->
+      <y unit="cm">26.9,26.9</y>
       <z unit="cm">55,-55</z>
     </Active>
 

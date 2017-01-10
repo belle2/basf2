@@ -40,7 +40,6 @@ void EKLMADCModule::generateHistogram(const char* name, double l, double d,
                                       int npe)
 {
   int j;
-  int gnpe;
   double t, s;
   EKLM::FiberAndElectronics fe(&(*m_DigPar), NULL, 0, false);
   TH1F* h = NULL;
@@ -54,8 +53,10 @@ void EKLMADCModule::generateHistogram(const char* name, double l, double d,
     m_hDir[j] = 0;
     m_hRef[j] = 0;
   }
-  fe.fillSiPMOutput(l, d, npe, 0, false, m_hDir, &gnpe);
-  fe.fillSiPMOutput(l, d, npe, 0, true, m_hRef, &gnpe);
+  fe.generatePhotoelectrons(l, d, npe, 0, false);
+  fe.generatePhotoelectrons(l, d, npe, 0, true);
+  fe.fillSiPMOutput(m_hDir, true, false);
+  fe.fillSiPMOutput(m_hRef, false, true);
   s = 0;
   for (j = 0; j < m_DigPar->getNDigitizations(); j++)
     s = s + m_hDir[j] + m_hRef[j];

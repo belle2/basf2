@@ -243,7 +243,7 @@ bool TOPGeoQBB::isConsistent() const
 
 void TOPGeoQBB::print(const std::string& title) const
 {
-  TOPGeoBase::print(title);
+  TOPGeoBase::printUnderlined(title);
 
   cout << " width = " << getWidth() << " " << s_unitName;
   cout << ", length = " << getLength() << " " << s_unitName;

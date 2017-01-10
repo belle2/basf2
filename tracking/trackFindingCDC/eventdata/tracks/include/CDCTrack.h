@@ -50,9 +50,6 @@ namespace Belle2 {
         return false;
       }
 
-      /// Copies the hit content of the hit vector track to the CDCTrack. Do not use any taken or masked hits.
-      void appendNotTaken(const std::vector<const CDCWireHit*>& hits);
-
       /// Copies the hit and trajectory content of this track to a new RecoTrack and store it into the store array.
       bool storeInto(StoreArray<RecoTrack>& recoTracks) const;
 
@@ -123,10 +120,6 @@ namespace Belle2 {
        * of the contained wire hits is flagged as masked.
        */
       void receiveMaskedFlag() const;
-
-
-      /** Remove all hits from the track which have an assigned flag */
-      void removeAllAssignedMarkedHits();
 
       /** Set the taken flag of all hits belonging to this track to the given value (default true),
        * but do not touch the flag of the track itself. */

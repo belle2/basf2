@@ -10,9 +10,7 @@
 #include <tracking/trackFindingCDC/processing/HitProcessor.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/collections/CDCTrackList.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 
 #include <tracking/trackFindingCDC/processing/TrackProcessor.h>
 
@@ -35,8 +33,8 @@ void HitProcessor::updateRecoHit3D(CDCTrajectory2D& trajectory2D, CDCRecoHit3D& 
   hit.setArcLength2D(perpS);
 }
 
-void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& tracks,
-                                    const std::vector<CDCConformalHit*>& axialConformalHits)
+void HitProcessor::appendUnusedHits(std::list<CDCTrack>& tracks,
+                                    const std::vector<const CDCWireHit*>& axialWireHits)
 {
   for (CDCTrack& track : tracks) {
     if (track.size() < 5) continue;
@@ -44,14 +42,9 @@ void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& tracks,
     // ESign trackCharge = TrackMergerNew::getChargeSign(track);
     CDCTrajectory2D trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
 
+    for (const CDCWireHit* wireHit : axialWireHits) {
+      if (wireHit->getAutomatonCell().hasTakenFlag() or wireHit->getAutomatonCell().hasMaskedFlag()) continue;
 
-    for (const CDCConformalHit* conformalHit : axialConformalHits) {
-      if (conformalHit->getUsedFlag() || conformalHit->getMaskedFlag()) continue;
-
-      const CDCWireHit* wireHit = conformalHit->getWireHit();
-      if (wireHit->getAutomatonCell().hasTakenFlag()) {
-        continue;
-      }
       ERightLeft rlInfo = trackTrajectory2D.isRightOrLeft(wireHit->getRefPos2D());
       CDCRLWireHit rlWireHit(wireHit, rlInfo, wireHit->getRefDriftLength());
 
@@ -69,19 +62,19 @@ void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& tracks,
   }
 }
 
-void HitProcessor::reassignHitsFromOtherTracks(CDCTrackList& trackList)
+void HitProcessor::reassignHitsFromOtherTracks(std::list<CDCTrack>& trackList)
 {
   std::vector<std::pair<CDCRecoHit3D, CDCTrack>> assignedHits;
-  trackList.doForAllTracks([&assignedHits](CDCTrack & cand) {
+  for (CDCTrack& cand : trackList) {
     for (CDCRecoHit3D& recoHit : cand) {
       recoHit.getWireHit().getAutomatonCell().setTakenFlag(true);
       recoHit.getWireHit().getAutomatonCell().setMaskedFlag(false);
 
       assignedHits.push_back(std::make_pair(recoHit, cand));
     }
-  });
+  }
 
-  B2DEBUG(100, "NCands = " << trackList.getCDCTracks().size());
+  B2DEBUG(100, "NCands = " << trackList.size());
 
   for (std::pair<CDCRecoHit3D, CDCTrack>& itemWithCand : assignedHits) {
 
@@ -97,8 +90,9 @@ void HitProcessor::reassignHitsFromOtherTracks(CDCTrackList& trackList)
     double bestHitDist = dist;
     CDCTrack* bestCandidate = nullptr;
 
-    trackList.doForAllTracks([&cand, &item, &bestHitDist, &bestCandidate](CDCTrack & candInner) {
-      if (candInner == cand) return;
+
+    for (CDCTrack& candInner : trackList) {
+      if (candInner == cand) continue;
       CDCTrajectory2D trajectoryInner = candInner.getStartTrajectory3D().getTrajectory2D();
 
       HitProcessor::updateRecoHit3D(trajectoryInner, item);
@@ -108,7 +102,7 @@ void HitProcessor::reassignHitsFromOtherTracks(CDCTrackList& trackList)
         bestCandidate = &candInner;
         bestHitDist = distTemp;
       }
-    });
+    }
 
     if (bestHitDist < dist) {
       const CDCRecoHit3D& recoHit3D =
@@ -120,7 +114,6 @@ void HitProcessor::reassignHitsFromOtherTracks(CDCTrackList& trackList)
       deleteAllMarkedHits(cand);
       recoHit3D.getWireHit().getAutomatonCell().setMaskedFlag(false);
     }
-
   }
 }
 
@@ -258,17 +251,17 @@ ESign HitProcessor::getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy)
   }
 }
 
-void HitProcessor::resetMaskedHits(CDCTrackList& trackList,
-                                   std::vector<CDCConformalHit>& conformalHits)
+void HitProcessor::resetMaskedHits(std::list<CDCTrack>& trackList,
+                                   std::vector<const CDCWireHit*>& allAxialWireHits)
 {
-  for (CDCConformalHit& conformalHit : conformalHits) {
-    conformalHit.setMaskedFlag(false);
-    conformalHit.setUsedFlag(false);
+  for (const CDCWireHit* wireHit : allAxialWireHits) {
+    wireHit->getAutomatonCell().setMaskedFlag(false);
+    wireHit->getAutomatonCell().setTakenFlag(false);
   }
 
-  trackList.doForAllTracks([](const CDCTrack & track) {
+  for (const CDCTrack& track : trackList) {
     track.forwardTakenFlag();
-  });
+  }
 }
 
 void HitProcessor::unmaskHitsInTrack(CDCTrack& track)
@@ -292,7 +285,7 @@ void HitProcessor::deleteHitsFarAwayFromTrajectory(CDCTrack& track, double maxim
 }
 
 void HitProcessor::assignNewHitsToTrack(CDCTrack& track,
-                                        const std::vector<CDCConformalHit>& conformalWireHits,
+                                        const std::vector<const CDCWireHit*>& allAxialWireHits,
                                         double minimalDistance)
 {
   if (track.size() < 10) return;
@@ -300,13 +293,10 @@ void HitProcessor::assignNewHitsToTrack(CDCTrack& track,
 
   const CDCTrajectory2D& trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
 
-  for (const CDCConformalHit& hit : conformalWireHits) {
-    if (hit.getUsedFlag() or hit.getMaskedFlag()) {
-      continue;
-    }
+  for (const CDCWireHit* wireHit : allAxialWireHits) {
+    if (wireHit->getAutomatonCell().hasTakenFlag() or wireHit->getAutomatonCell().hasMaskedFlag()) continue;
 
-    const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstructNearest(hit.getWireHit(),
-                                    trackTrajectory2D);
+    const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstructNearest(wireHit, trackTrajectory2D);
     const Vector2D& recoPos2D = recoHit3D.getRecoPos2D();
 
     if (fabs(trackTrajectory2D.getDist2D(recoPos2D)) < minimalDistance) {

@@ -25,6 +25,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 
 //
 #include <analysis/utility/PCmsLabTransform.h>
@@ -110,6 +111,44 @@ namespace Belle2 {
         result += klmClusters[i]->getMomentum().Energy();
       }
       return result;
+    }
+
+    double missingEnergy(const Particle*)
+    {
+      PCmsLabTransform T;
+      TLorentzVector totalMomChargedtracks; //Momentum of charged X tracks in CMS-System
+      TLorentzVector totalMomChargedclusters; //Momentum of charged X clusters in CMS-System
+      TLorentzVector momNeutralClusters; //Momentum of neutral X clusters in CMS-System
+      double ECMS = T.getCMSEnergy();
+
+      StoreArray<Track> tracks;
+      for (int i = 0; i < tracks.getEntries(); ++i) {
+        const TrackFitResult* iTrack = tracks[i]->getTrackFitResult(tracks[i]->getRelated<PIDLikelihood>()->getMostLikely());
+        if (iTrack == nullptr) continue;
+        TLorentzVector momtrack(iTrack->getMomentum(), 0);
+        if (momtrack == momtrack) totalMomChargedtracks += momtrack;
+      }
+      StoreArray<ECLCluster> eclClusters;
+      for (int i = 0; i < eclClusters.getEntries(); ++i) {
+        TLorentzVector iMomECLCluster = eclClusters[i] -> get4Vector();
+        if (iMomECLCluster == iMomECLCluster) {
+          if (eclClusters[i]->isNeutral()) momNeutralClusters += iMomECLCluster;
+          else if (!(eclClusters[i]->isNeutral())) totalMomChargedclusters += iMomECLCluster;
+        }
+      }
+      StoreArray<KLMCluster> klmClusters;
+      for (int i = 0; i < klmClusters.getEntries(); ++i) {
+        TLorentzVector iMomKLMCluster = klmClusters[i] -> getMomentum();
+        if (iMomKLMCluster == iMomKLMCluster) {
+          if (!(klmClusters[i] -> getAssociatedTrackFlag()) && !(klmClusters[i] -> getAssociatedEclClusterFlag())) {
+            momNeutralClusters += iMomKLMCluster;
+          }
+        }
+      }
+      TLorentzVector totalMomCharged(totalMomChargedtracks.Vect(), totalMomChargedclusters.E());
+      TLorentzVector totalMom = T.rotateLabToCms() * (totalMomCharged + momNeutralClusters);
+
+      return totalMom.E() - ECMS;
     }
 
     double uniqueEventID(const Particle*)
@@ -254,6 +293,8 @@ namespace Belle2 {
                       "[Eventbased] total energy in ECL in the event");
     REGISTER_VARIABLE("KLMEnergy", KLMEnergy,
                       "[Eventbased] total energy in KLM in the event");
+    REGISTER_VARIABLE("missingEnergy", missingEnergy,
+                      "[Eventbased] difference between the total energy of tracks and clusters in CMS and the beam energy");
 
     REGISTER_VARIABLE("uniqueEventID", uniqueEventID,
                       "[Eventbased] In some MC the expNum and runNum are 0, hence it is difficult to distinguish"

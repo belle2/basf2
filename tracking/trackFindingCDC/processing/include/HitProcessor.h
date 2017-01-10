@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 #include <tracking/trackFindingCDC/numerics/ESign.h>
 
 #include <vector>
@@ -92,8 +93,8 @@ namespace Belle2 {
                                        const std::vector<const CDCWireHit*>& allAxialWireHits,
                                        double minimalDistance = 0.15);
 
-      /// Mask hits after breaks in the superlayer as masked and delete them.
-      static void maskHitsWithPoorQuality(CDCTrack& track);
+      /// Searches for a break in the super layer chain and remove all hits that come after that
+      static void removeHitsAfterSuperLayerBreak(CDCTrack& track);
 
     private:
       /**
@@ -107,22 +108,14 @@ namespace Belle2 {
        */
       static ESign getArmSign(const CDCRecoHit3D& hit, const Vector2D& center);
 
+      /** Helper function getting the empty axial! super layers that appear in the chain of super layers that is supposed to be occupied*/
+      static std::vector<ISuperLayer> getSLayerHoles(const std::array<int, ISuperLayerUtil::c_N>& nHitsBySLayer);  // return 0;
+
       /** Helper function to extract the first filled entry in the array of super layers ( = the start superlayer of the track). */
-      static int startingSLayer(const std::vector<double>& startingArmSLayers);
+      static ISuperLayer getFirstOccupiedISuperLayer(const std::array<int, ISuperLayerUtil::c_N>& nHitsBySLayer);
 
       /** Helper function to extract the last filled entry in the array of super layers ( = the final superlayer of the track). */
-      static int endingSLayer(const std::vector<double>& startingArmSLayers);
-
-      /** Return true of both the starting arm and the ending arm array has one non-zero entry. */
-      static bool isTwoSided(const std::vector<double>& startingArmSLayers,
-                             const std::vector<double>& endingArmSLayers);
-
-      /** Fill the two arrays emptyStartingSLayers (for the outgoing arm) and emptyEndingSLayers (for the ingoing arm) with the superlayers between start end end of the track that are empty.
-       * Return true if we have found such a case. */
-      static bool hasHoles(const std::vector<double>& startingArmSLayers,
-                           const std::vector<double>& endingArmSLayers,
-                           std::vector<int>& emptyStartingSLayers,
-                           std::vector<int>& emptyEndingSLayers);
+      static ISuperLayer getLastOccupiedISuperLayer(const std::array<int, ISuperLayerUtil::c_N>& nHitsBySLayer);
     };
   }
 }

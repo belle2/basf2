@@ -129,7 +129,7 @@ void TrackProcessor::mergeAndFinalizeTracks(std::list<CDCTrack>& cdcTrackList,
   for (CDCTrack& track : cdcTrackList) {
     if (track.size() < 4) continue;
 
-    HitProcessor::maskHitsWithPoorQuality(track);
+    HitProcessor::removeHitsAfterSuperLayerBreak(track);
     HitProcessor::splitBack2BackTrack(track);
 
     TrackQualityTools::normalizeTrack(track);

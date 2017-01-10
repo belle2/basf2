@@ -12,8 +12,8 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/algorithm/stable_partition.hpp>
+#include <boost/range/algorithm_ext/is_sorted.hpp>
 #include <boost/range/algorithm_ext/erase.hpp>
 
 #include <numeric>
@@ -273,121 +273,80 @@ void HitProcessor::assignNewHitsToTrack(CDCTrack& track,
   }
 }
 
-void HitProcessor::maskHitsWithPoorQuality(CDCTrack& track)
+void HitProcessor::removeHitsAfterSuperLayerBreak(CDCTrack& track)
 {
-  double apogeeArcLenght = fabs(track.getStartTrajectory3D().getGlobalCircle().perimeter()) / 4.;
+  double apogeeArcLength = fabs(track.getStartTrajectory3D().getGlobalCircle().perimeter()) / 2.;
 
-  std::vector<double> startingArmSLayers;
-  std::vector<double> endingArmSLayers;
-
-  for (int ii = 0; ii <= 8; ii++) {
-    startingArmSLayers.push_back(0);
-    endingArmSLayers.push_back(0);
-  }
+  std::array<int, ISuperLayerUtil::c_N> nForwardArmHitsBySLayer = {0};
+  std::array<int, ISuperLayerUtil::c_N> nBackwardArmHitsBySLayer = {0};
 
   // Count the number of hits in the outgoing and ingoing arm per superlayer.
   for (const CDCRecoHit3D& hit : track) {
-    if ((hit.getArcLength2D() <= apogeeArcLenght) && (hit.getArcLength2D() > 0)) {
-      startingArmSLayers[hit->getISuperLayer()]++;
+    if ((hit.getArcLength2D() <= apogeeArcLength) and (hit.getArcLength2D() > 0)) {
+      nForwardArmHitsBySLayer[hit->getISuperLayer()]++;
     } else {
-      endingArmSLayers[hit->getISuperLayer()]++;
+      nBackwardArmHitsBySLayer[hit->getISuperLayer()]++;
     }
   }
 
-  std::vector<int> emptyStartingSLayers;
-  std::vector<int> emptyEndingSLayers;
+  std::vector<ISuperLayer> forwardSLayerHoles = getSLayerHoles(nForwardArmHitsBySLayer);
+  std::vector<ISuperLayer> backwardSLayerHoles = getSLayerHoles(nBackwardArmHitsBySLayer);
 
-  if (hasHoles(startingArmSLayers, endingArmSLayers, emptyStartingSLayers, emptyEndingSLayers)) {
-    sort(emptyStartingSLayers.begin(), emptyStartingSLayers.end());
+  // No missing layers
+  if (forwardSLayerHoles.empty() and backwardSLayerHoles.empty()) return;
 
-    if (emptyStartingSLayers.size() > 0) {
-      const int breakSLayer = emptyStartingSLayers.front();
-      for (CDCRecoHit3D& hit : track) {
-        if (hit.getArcLength2D() >= apogeeArcLenght || hit.getArcLength2D() < 0) {
-          hit.getWireHit().getAutomatonCell().setMaskedFlag();
-        }
-        if (hit.getISuperLayer() >= breakSLayer) {
-          hit.getWireHit().getAutomatonCell().setMaskedFlag();
-        }
-      }
-    }
-    // We do not use emptyEndingSLayers here, as it would leave to a severy efficiency drop.
-  }
-  deleteAllMarkedHits(track);
+  // We only check for holes in the forward arm for now
+  // We do not use emptyEndingSLayers here, as it would leave to a severy efficiency drop.
+  assert(boost::is_sorted(forwardSLayerHoles));
+  if (forwardSLayerHoles.empty()) return;
+
+  const ISuperLayer breakSLayer = forwardSLayerHoles.front();
+
+  auto isInBackwardArm = [apogeeArcLength](const CDCRecoHit3D & recoHit3D) {
+    recoHit3D.getWireHit().getAutomatonCell().unsetTakenFlag();
+    return (recoHit3D.getArcLength2D() >= apogeeArcLength) or (recoHit3D.getArcLength2D() < 0);
+  };
+  boost::remove_erase_if(track, isInBackwardArm);
+
+  auto isAfterSLayerBreak = [breakSLayer](const CDCRecoHit3D & recoHit3D) {
+    recoHit3D.getWireHit().getAutomatonCell().unsetTakenFlag();
+    return recoHit3D.getISuperLayer() >= breakSLayer;
+  };
+  boost::remove_erase_if(track, isAfterSLayerBreak);
 }
 
-int HitProcessor::startingSLayer(const std::vector<double>& startingArmSLayers)
+std::vector<ISuperLayer> HitProcessor::getSLayerHoles(const std::array<int, ISuperLayerUtil::c_N>& nHitsBySLayer)
 {
-  std::vector<double>::const_iterator startSlIt = std::find_if(startingArmSLayers.begin(),
-                                                  startingArmSLayers.end(),
-  [](double val) { return val > 0; });
+  std::vector<ISuperLayer> sLayerHoles;
 
-  if (startSlIt != startingArmSLayers.end()) {
-    return startSlIt - startingArmSLayers.begin();
-  } else {
-    return 8;
-  }
-}
-
-
-int HitProcessor::endingSLayer(const std::vector<double>& startingArmSLayers)
-{
-  std::vector<double>::const_reverse_iterator endSlIt;
-  endSlIt = std::find_if(startingArmSLayers.rbegin(), startingArmSLayers.rend(), [](double val) {
-    return val > 0;
-  });
-
-  if (endSlIt != startingArmSLayers.rend()) {
-    return 8 - (endSlIt - startingArmSLayers.rbegin());
-  } else {
-    return 0;
-  }
-}
-
-bool HitProcessor::isTwoSided(const std::vector<double>& startingArmSLayers,
-                              const std::vector<double>& endingArmSLayers)
-{
-  if ((std::accumulate(startingArmSLayers.begin(), startingArmSLayers.end(), 0) > 0) &&
-      (std::accumulate(endingArmSLayers.begin(), endingArmSLayers.end(), 0) > 0)) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-bool HitProcessor::hasHoles(const std::vector<double>& startingArmSLayers,
-                            const std::vector<double>& endingArmSLayers,
-                            std::vector<int>& emptyStartingSLayers,
-                            std::vector<int>& emptyEndingSLayers)
-{
   // Find the start end end point.
-  int startingSlayer = startingSLayer(startingArmSLayers);
-  int endingSlayer = endingSLayer(startingArmSLayers);
+  ISuperLayer firstSlayer = getFirstOccupiedISuperLayer(nHitsBySLayer);
+  ISuperLayer lastSlayer = getLastOccupiedISuperLayer(nHitsBySLayer);
 
-  std::vector<double>::const_iterator first = startingArmSLayers.begin() + startingSlayer;
-  std::vector<double>::const_iterator last = startingArmSLayers.begin() + endingSlayer;
-
-  for (; first <= last; first += 2) {
-    if (*first == 0) {
-      emptyStartingSLayers.push_back(first - startingArmSLayers.begin());
-    }
+  if (ISuperLayerUtil::isInvalid(firstSlayer) or ISuperLayerUtil::isInvalid(lastSlayer)) {
+    return sLayerHoles;
   }
 
-  if (isTwoSided(startingArmSLayers, endingArmSLayers)) {
-
-    // Find the start end end point.
-    startingSlayer = startingSLayer(endingArmSLayers);
-    endingSlayer = endingSLayer(endingArmSLayers);
-
-    std::vector<double>::const_iterator rfirst = endingArmSLayers.begin() + startingSlayer;
-    std::vector<double>::const_iterator rlast = endingArmSLayers.begin() + endingSlayer;
-
-    for (; rfirst <= rlast; rfirst += 2) {
-      if (*rfirst == 0) {
-        emptyEndingSLayers.push_back(rfirst - endingArmSLayers.begin());
-      }
+  for (ISuperLayer iSLayer = firstSlayer; iSLayer <= lastSlayer; iSLayer += 2) {
+    if (nHitsBySLayer[iSLayer] == 0) {
+      sLayerHoles.push_back(iSLayer);
     }
   }
+  return sLayerHoles;
+}
 
-  return emptyStartingSLayers.size() > 0 or emptyEndingSLayers.size() > 0;
+ISuperLayer HitProcessor::getFirstOccupiedISuperLayer(const std::array<int, ISuperLayerUtil::c_N>& nHitsBySLayer)
+{
+  for (ISuperLayer iSLayer = 0; iSLayer < ISuperLayerUtil::c_N; ++iSLayer) {
+    if (nHitsBySLayer[iSLayer] > 0) return iSLayer;
+  }
+  return ISuperLayerUtil::c_Invalid;
+}
+
+ISuperLayer HitProcessor::getLastOccupiedISuperLayer(const std::array<int, ISuperLayerUtil::c_N>& nHitsBySLayer)
+{
+  for (ISuperLayer iSLayer = ISuperLayerUtil::c_N - 1; iSLayer >= 0; --iSLayer) {
+    if (nHitsBySLayer[iSLayer] > 0) return iSLayer;
+  }
+  return ISuperLayerUtil::c_Invalid;
 }

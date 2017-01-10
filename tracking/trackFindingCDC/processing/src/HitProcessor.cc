@@ -53,7 +53,7 @@ void HitProcessor::appendUnusedHits(std::list<CDCTrack>& tracks,
       CDCRLWireHit rlWireHit(wireHit, rlInfo, wireHit->getRefDriftLength());
 
       // if(fabs(track.getStartTrajectory3D().getTrajectory2D().getGlobalCircle().radius()) > 60.)
-      // if(TrackMergerNew::getCurvatureSignWrt(recoHit3D, track.getStartTrajectory3D().getGlobalCircle().center()) != trackCharge) continue;
+      // if(getArmSign(recoHit3D, track.getStartTrajectory3D().getGlobalCircle().center()) != trackCharge) continue;
 
       const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trackTrajectory2D);
 
@@ -128,11 +128,11 @@ std::vector<const CDCWireHit*> HitProcessor::splitBack2BackTrack(CDCTrack& track
   if (track.size() < 5) return removedHits;
   if (not isBack2BackTrack(track)) return removedHits;
 
-  ESign majorArm = getChargeSign(track);
-  Vector2D center = track.getStartTrajectory3D().getGlobalCircle().center();
+  Vector2D center = track.getStartTrajectory3D().getGlobalCenter();
+  ESign majorArmSign = getMajorArmSign(track, center);
 
-  auto isOnMajorArm = [&center, &majorArm](const CDCRecoHit3D & hit) {
-    return getCurvatureSignWrt(hit, center) == majorArm;
+  auto isOnMajorArm = [&center, &majorArmSign](const CDCRecoHit3D & hit) {
+    return getArmSign(hit, center) == majorArmSign;
   };
 
   auto minorArmHits = boost::stable_partition<boost::return_found_end>(track, isOnMajorArm);
@@ -150,25 +150,24 @@ std::vector<const CDCWireHit*> HitProcessor::splitBack2BackTrack(CDCTrack& track
 
 bool HitProcessor::isBack2BackTrack(CDCTrack& track)
 {
-  int vote_pos = 0;
-  int vote_neg = 0;
+  int votePos = 0;
+  int voteNeg = 0;
 
-  Vector2D circle_center = track.getStartTrajectory3D().getTrajectory2D().getGlobalCircle().center();
+  Vector2D center = track.getStartTrajectory3D().getGlobalCenter();
   for (const CDCRecoHit3D& hit : track) {
-    ESign curve_sign = getCurvatureSignWrt(hit, circle_center);
+    ESign curve_sign = getArmSign(hit, center);
 
     if (curve_sign == ESign::c_Plus) {
-      ++vote_pos;
+      ++votePos;
     } else if (curve_sign == ESign::c_Minus) {
-      ++vote_neg;
+      ++voteNeg;
     } else {
-      B2ERROR("Unexpected value from TrackHit::getCurvatureSignWrt");
+      B2ERROR("Unexpected value from getArmSign");
       return false;
     }
   }
 
-  if (std::abs(vote_pos - vote_neg) < (vote_pos + vote_neg) and
-      std::fabs(circle_center.cylindricalR()) > 60.) {
+  if (std::abs(votePos - voteNeg) < (votePos + voteNeg) and std::fabs(center.cylindricalR()) > 60.) {
     return true;
   }
   return false;
@@ -186,12 +185,10 @@ void HitProcessor::deleteAllMarkedHits(std::vector<const CDCWireHit*>& wireHits)
   boost::remove_erase_if(wireHits, hasMaskedFlag);
 }
 
-
-ESign HitProcessor::getChargeSign(CDCTrack& track)
+ESign HitProcessor::getMajorArmSign(const CDCTrack& track, const Vector2D& center)
 {
-  int vote_pos(0), vote_neg(0);
-
-  Vector2D center(track.getStartTrajectory3D().getGlobalCircle().center());
+  int votePos = 0;
+  int voteNeg = 0;
 
   if (std::isnan(center.x())) {
     B2WARNING("Trajectory is not setted or wrong!");
@@ -199,27 +196,27 @@ ESign HitProcessor::getChargeSign(CDCTrack& track)
   }
 
   for (const CDCRecoHit3D& hit : track) {
-    ESign curve_sign = getCurvatureSignWrt(hit, center);
+    ESign curve_sign = getArmSign(hit, center);
 
     if (curve_sign == ESign::c_Plus) {
-      ++vote_pos;
+      ++votePos;
     } else if (curve_sign == ESign::c_Minus) {
-      ++vote_neg;
+      ++voteNeg;
     } else {
-      B2FATAL("Strange behaviour of TrackHit::getCurvatureSignWrt");
+      B2ERROR("Strange behaviour of getArmSign");
     }
   }
 
-  if (vote_pos > vote_neg) {
+  if (votePos > voteNeg) {
     return ESign::c_Plus;
   } else {
     return ESign::c_Minus;
   }
 }
 
-ESign HitProcessor::getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy)
+ESign HitProcessor::getArmSign(const CDCRecoHit3D& hit, const Vector2D& center)
 {
-  return static_cast<ESign>(xy.isRightOrLeftOf(hit.getRecoPos2D()));
+  return sign(center.isRightOrLeftOf(hit.getRecoPos2D()));
 }
 
 void HitProcessor::resetMaskedHits(std::list<CDCTrack>& trackList,

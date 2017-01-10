@@ -68,8 +68,13 @@ void TrackQualityTools::normalizeTrack(CDCTrack& track)
 
   const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
   CDCTrajectory2D trackTrajectory2D = fitter.fit(observations2D);
+  Vector2D center = trackTrajectory2D.getGlobalCenter();
 
-  if (trackTrajectory2D.getChargeSign() != HitProcessor::getChargeSign(track)) trackTrajectory2D.reverse();
+  // Arm used as a proxy for the charge of the track
+  // Correct if the track originates close to the origin
+  ESign expectedCharge = HitProcessor::getMajorArmSign(track, center);
+
+  if (trackTrajectory2D.getChargeSign() != expectedCharge) trackTrajectory2D.reverse();
 
   trackTrajectory2D.setLocalOrigin(trackTrajectory2D.getGlobalPerigee());
   for (CDCRecoHit3D& recoHit : track) {

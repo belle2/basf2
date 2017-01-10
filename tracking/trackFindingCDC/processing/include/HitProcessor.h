@@ -60,8 +60,16 @@ namespace Belle2 {
       /** Checks whether the track has hits on both arms as seen from the origin */
       static bool isBack2BackTrack(CDCTrack& track);
 
-      /** Estimate sign of the track charge. */
-      static ESign getChargeSign(CDCTrack& track);
+      /**
+       *  Calculate whether the majority of hits is to the right or to the left
+       *  relative to the line from origin to given center.
+       *
+       *  @retval ESign::c_Right most hits are on the right
+       *  @retval ESign::c_Left most hits are on the left
+       *  @retval ESign::c_Zero no majority
+       *  @retval ESign::c_Invalid given center has a nan value
+       */
+      static ESign getMajorArmSign(const CDCTrack& track, const Vector2D& center);
 
       /// Reset all masked hits.
       static void resetMaskedHits(std::list<CDCTrack>& trackList, std::vector<const CDCWireHit*>& wireHits);
@@ -88,8 +96,16 @@ namespace Belle2 {
       static void maskHitsWithPoorQuality(CDCTrack& track);
 
     private:
-      /** Estimate the sign of the point curvature with respect to the given point.*/
-      static ESign getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy);
+      /**
+       *  Calculate whether the hits is to the right or to the left
+       *  relative to the line from origin to the given center.
+       *
+       *  @retval ESign::c_Right   hit is on the right
+       *  @retval ESign::c_Left    hit is on the left
+       *  @retval ESign::c_Zero    rare boarderline case
+       *  @retval ESign::c_Invalid given hit has a nan value
+       */
+      static ESign getArmSign(const CDCRecoHit3D& hit, const Vector2D& center);
 
       /** Helper function to extract the first filled entry in the array of super layers ( = the start superlayer of the track). */
       static int startingSLayer(const std::vector<double>& startingArmSLayers);

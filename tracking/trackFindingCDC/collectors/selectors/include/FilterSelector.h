@@ -37,7 +37,7 @@ namespace Belle2 {
      *
      * Most of the provided selectors are built to match many collection items to one collector item.
      */
-    template <class ACollectorItem, class ACollectionItem, class AFilterFactory>
+    template <class ACollectorItem, class ACollectionItem, class AFilter>
     class FilterSelector :
       public Findlet<WeightedRelation<ACollectorItem, const ACollectionItem>> {
     public:
@@ -65,7 +65,7 @@ namespace Belle2 {
       void apply(std::vector<WeightedRelationItem>& weightedRelations) override
       {
         for (auto& weightedRelation : weightedRelations) {
-          Weight filterResult = m_filter({ weightedRelation.getFrom(), weightedRelation.getTo() });
+          Weight filterResult = m_filter({weightedRelation.getFrom(), weightedRelation.getTo()});
           weightedRelation.setWeight(filterResult);
         }
 
@@ -84,7 +84,7 @@ namespace Belle2 {
 
     private:
       /// The filter to use.
-      ChooseableFilter<AFilterFactory> m_filter;
+      AFilter m_filter;
     };
   }
 }

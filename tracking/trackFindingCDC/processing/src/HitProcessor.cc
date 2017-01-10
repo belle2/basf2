@@ -16,6 +16,7 @@
 
 #include <TMath.h>
 
+#include <boost/range/algorithm/for_each.hpp>
 #include <boost/range/algorithm/stable_partition.hpp>
 #include <boost/range/algorithm_ext/erase.hpp>
 
@@ -243,13 +244,16 @@ void HitProcessor::unmaskHitsInTrack(CDCTrack& track)
 void HitProcessor::deleteHitsFarAwayFromTrajectory(CDCTrack& track, double maximumDistance)
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
-  for (CDCRecoHit3D& recoHit : track) {
-    const Vector2D& recoPos2D = recoHit.getRecoPos2D();
+  auto farFromTrajectory = [&trajectory2D, &maximumDistance](CDCRecoHit3D & recoHit3D) {
+    Vector2D recoPos2D = recoHit3D.getRecoPos2D();
     if (fabs(trajectory2D.getDist2D(recoPos2D)) > maximumDistance) {
-      recoHit->getWireHit().getAutomatonCell().setMaskedFlag(true);
+      // This would be correct but worsens efficiency...
+      // recoHit3D->getWireHit().getAutomatonCell().setTakenFlag(false);
+      return true;
     }
-  }
-  deleteAllMarkedHits(track);
+    return false;
+  };
+  boost::remove_erase_if(track, farFromTrajectory);
 }
 
 void HitProcessor::assignNewHitsToTrack(CDCTrack& track,

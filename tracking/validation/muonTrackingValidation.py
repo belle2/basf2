@@ -32,7 +32,7 @@ class Full(TrackingValidationRun):
         'UseSVDHits': True,
         'UseCDCHits': True,
     }
-    fit_geometry = "default"
+    fit_geometry = None
     # tracks will be already fitted by
     # add_tracking_reconstruction finder module set above
     fit_tracks = False

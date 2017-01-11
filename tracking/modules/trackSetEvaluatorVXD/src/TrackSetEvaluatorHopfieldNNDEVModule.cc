@@ -140,6 +140,10 @@ bool TrackSetEvaluatorHopfieldNNDEVModule::doHopfield(std::vector<TrackSetEvalua
 {
   unsigned int nTCs = tcs.size();
   B2DEBUG(100, "TrackSetEvaluatorHopfieldNNDEVModule::doHopfield now with " << nTCs << " overlapping TCs");
+
+  // this case caused seg faults ( may want to add a warning for that)
+  if (nTCs == 0) return false;
+
   // WARNING hardcoded!
   double T = 3.1; // temperature for annealing, original: 3.1
   double Tmin = 0.1;

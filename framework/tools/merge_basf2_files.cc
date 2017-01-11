@@ -265,6 +265,8 @@ The following restrictions apply:
                     << boost::io::quoted(input));
             continue;
         }
+        // Ok, we want to delete the pointer once we're done with it. So let's create a unique_ptr to take ownership
+        std::unique_ptr<TClonesArray> arrayDestructor{bginfoArray};
         // empty, assume non-existent
         if(bginfoArray->GetEntriesFast()==0) continue;
         // non empty, make sure it's the right class
@@ -312,6 +314,8 @@ The following restrictions apply:
       if(!it.second) {
         it.first->second.first->merge(object);
         it.first->second.second++;
+        // ok, merged, get rid of it.
+        delete object;
       }else{
         B2INFO("Found mergable object " << boost::io::quoted(br->GetName()) << " in persistent tree");
       }

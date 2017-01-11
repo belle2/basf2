@@ -29,6 +29,86 @@ namespace fs = boost::filesystem;
  * working comparison operator */
 typedef std::tuple<int, int, unsigned int> EventInfo;
 
+/** Print the background info.
+ * Similar to the function BackgroundInfo::print() but less verbose to just
+ * print the values we actually compare for compatibility.
+ */
+void printBackgroundInfo(const BackgroundInfo& a)
+{
+  static std::map<BackgroundInfo::EMethod, std::string> methodNames{
+    {BackgroundInfo::c_Mixing, "mixing"},
+    {BackgroundInfo::c_Overlay, "overlay"},
+    {BackgroundInfo::c_Unknown, "unknown"}
+  };
+
+  B2INFO("Background method: " << methodNames[a.getMethod()]);
+  B2INFO("       components: " << (a.getComponents().empty() ? "all" : boost::algorithm::join(a.getComponents(), ",")));
+  B2INFO("      time window: "
+         << "PXD [" << a.getMinTimePXD() << ", " << a.getMaxTimePXD() << "] ns, "
+         << "ECL [" << a.getMinTimeECL() << ", " << a.getMaxTimeECL() << "] ns, "
+         << "other components [" << a.getMinTime() << ", " << a.getMaxTime() << "] ns, ");
+  B2INFO("  wrapping around: " << (a.getWrapAround() ? "enabled" : "disabled"));
+  B2INFO("   ECL energy cut: " << a.getMaxEdepECL() << " GeV");
+  B2INFO("Background samples: ");
+  auto da = a.getBackgroundDescr();
+  auto cmpfn = [](const BackgroundInfo::BackgroundDescr & a, const BackgroundInfo::BackgroundDescr & b) {return a.type < b.type; };
+  std::sort(da.begin(), da.end(), cmpfn);
+  for (const auto& d : da) {
+    B2INFO("  " << d.type << ", scale " << d.scaleFactor);
+  }
+}
+
+/** Check if two BackgroundInfo instances are compatible
+ * We check that all settings (method, components, min/max times, wrap around,
+ * max ECL energy deposition) are the same and that the same background samples
+ * are used with the same scale factor.
+ *
+ * number of events, file names and realtime are not checked to allow for
+ * different file sets to be used. We cannot check the background rate either
+ * since this is slightly fluctuating as it's calculated by #events/realtime.
+ * @param a basic background info to compare against
+ * @param b new background info which has to be compatible
+ */
+void checkBackgroundCompatible(const BackgroundInfo& a, const BackgroundInfo& b, const std::string& filename)
+{
+  int errorCount = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
+  if (a.getMethod() != b.getMethod()) B2ERROR("Incompatible background mixing method in " << boost::io::quoted(filename));
+  if (a.getComponents() != b.getComponents())
+    B2ERROR("Incompatible background detector components in " << boost::io::quoted(filename));
+  if (a.getMinTime() != b.getMinTime()) B2ERROR("Incompatible background MinTime in " << boost::io::quoted(filename));
+  if (a.getMaxTime() != b.getMaxTime()) B2ERROR("Incompatible background MaxTime in " << boost::io::quoted(filename));
+  if (a.getMinTimeECL() != b.getMinTimeECL()) B2ERROR("Incompatible background MinTimeECL in " << boost::io::quoted(filename));
+  if (a.getMaxTimeECL() != b.getMaxTimeECL()) B2ERROR("Incompatible background MaxTimeECL in " << boost::io::quoted(filename));
+  if (a.getMinTimePXD() != b.getMinTimePXD()) B2ERROR("Incompatible background MinTimePXD in " << boost::io::quoted(filename));
+  if (a.getMaxTimePXD() != b.getMaxTimePXD()) B2ERROR("Incompatible background MaxTimePXD in " << boost::io::quoted(filename));
+  if (a.getWrapAround() != b.getWrapAround()) B2ERROR("Incompatible background WrapAround in " << boost::io::quoted(filename));
+  if (a.getMaxEdepECL() != b.getMaxEdepECL()) B2ERROR("Incompatible background MaxEdepECL in " << boost::io::quoted(filename));
+
+  auto da = a.getBackgroundDescr();
+  auto db = b.getBackgroundDescr();
+  if (da.size() != db.size()) {
+    B2ERROR("Incompatible backround types in " << boost::io::quoted(filename));
+  } else {
+    auto cmpfn = [](const BackgroundInfo::BackgroundDescr & a, const BackgroundInfo::BackgroundDescr & b) {return a.type < b.type; };
+    std::sort(da.begin(), da.end(), cmpfn);
+    std::sort(db.begin(), db.end(), cmpfn);
+    for (size_t i = 0; i < da.size(); ++i) {
+      if (da[i].type != db[i].type) {
+        B2ERROR("Incompatible backround types in " << boost::io::quoted(filename));
+        break;
+      }
+      if (da[i].scaleFactor != db[i].scaleFactor) {
+        B2ERROR("Incompatible scale factor for " << da[i].type << " in " << boost::io::quoted(filename));
+      }
+    }
+  }
+  if (errorCount < LogSystem::Instance().getMessageCounter(LogConfig::c_Error)) {
+    //at least one error, print background info
+    B2INFO("Incompatible BackgroundInfo:");
+    printBackgroundInfo(b);
+  }
+}
+
 int main(int argc, char* argv[])
 {
   // Parse options
@@ -88,7 +168,7 @@ The following restrictions apply:
   // the final metadata we will write out
   FileMetaData* outputMetaData{nullptr};
   // BackgroundInfo of the merged files
-  BackgroundInfo* outputBackgroundInfo{nullptr};
+  TClonesArray* outputBackgroundInfo = new TClonesArray(BackgroundInfo::Class(), inputfilenames.size());
   // set of all parent LFNs encountered in any file
   std::set<std::string> allParents;
   // map of all mergable objects found in the persistent tree. The size_t is
@@ -167,7 +247,7 @@ The following restrictions apply:
       }
     }
 
-    bool foundBackgroundInfo{!outputBackgroundInfo};
+    bool foundBackgroundInfo{false};
     // File looks good so far, now fixup the persistent stuff, i.e. merge all
     // objects in persistent tree
     for(TObject* brObj: *persistent->GetListOfBranches()){
@@ -177,47 +257,39 @@ The following restrictions apply:
         continue;
       // special handling for BackgroundInfo. This should be moved into BackgroundInfo and background info should become a objptr derived from mergeable
       if(br && br->GetTargetClass() == TClonesArray::Class() && std::string(br->GetName()) == "BackgroundInfos") {
-        TClonesArray* object{nullptr};
-        br->SetAddress(&object);
+        B2INFO("Found BackgroundInfo");
+        TClonesArray* bginfoArray{nullptr};
+        br->SetAddress(&bginfoArray);
         if(br->GetEntry(0)<=0) {
             B2ERROR("Could not read branch " << boost::io::quoted(br->GetName()) << " of entry 0 from persistent tree in "
                     << boost::io::quoted(input));
             continue;
         }
         // empty, assume non-existent
-        if(object->GetEntriesFast()==0) continue;
-        if(object->GetEntriesFast()>1) {
-            B2ERROR("More then one BackgroundInfo in file " << boost::io::quoted(input));
-            continue;
-        }
-        if(object->GetClass() != BackgroundInfo::Class()){
-            B2ERROR("Branch BackgroundInfo is of type StoreArray<" << object->GetClass()->GetName()
+        if(bginfoArray->GetEntriesFast()==0) continue;
+        // non empty, make sure it's the right class
+        if(bginfoArray->GetClass() != BackgroundInfo::Class()){
+            B2ERROR("Branch BackgroundInfo is of type StoreArray<" << bginfoArray->GetClass()->GetName()
                     << ">, not StoreArray<BackgroundInfo>");
             continue;
         }
-        BackgroundInfo* bginfo = static_cast<BackgroundInfo*>(object->At(0));
-        if(!outputBackgroundInfo) {
-            // No background info yet.
-            if(outputMetaData) B2ERROR("Found BackgroundInfo in " << boost::io::quoted(input)
-                                       << " which was not present in previous files.");
-            outputBackgroundInfo = new BackgroundInfo(*bginfo);
-            if(LogSystem::Instance().isLevelEnabled(LogConfig::c_Info)){
-                B2INFO("Found Background Information: ");
-                outputBackgroundInfo->print();
+        // ok we have an array of background infos. Add each one to the list
+        // and make sure they are all compatible with each other: same method,
+        // components, settings, types and scaling factors.
+        for(TObject* obj: *bginfoArray){
+            BackgroundInfo* bginfo = static_cast<BackgroundInfo*>(obj);
+            if(outputBackgroundInfo->GetEntriesFast()==0) {
+                printBackgroundInfo(*bginfo);
+                //no background info yet but if outputMetaData exists this is not the first file ...
+                if(outputMetaData) B2ERROR("Found BackgroundInfo in " << boost::io::quoted(input)
+                                           << " which was not present in previous files.");
+            } else {
+                B2INFO("Checking if background info is compatible...");
+                checkBackgroundCompatible(*static_cast<BackgroundInfo*>((*outputBackgroundInfo)[0]), *bginfo, input);
             }
-        }else{
-            if(!(*bginfo == *outputBackgroundInfo)){
-                B2ERROR("BackgroundInfo in " << boost::io::quoted(input) << " differs from previous files.");
-            }
-            // merge the resused counting: for n files we set it to
-            // sum_n(reused+1) - 1 = (n-1) + sum_n(reused)
-            // If no file has reused a sample then they still have the same
-            // samples in for all files so it gets reused once per file except
-            // for the first.
-            const auto &backgroundDesc = bginfo->getBackgroundDescr();
-            for(size_t i=0; i<backgroundDesc.size(); ++i){
-                for(unsigned int r=0; r<=backgroundDesc[i].reused; ++r) outputBackgroundInfo->incrementReusedCounter(i);
-            }
+            // now add it to the list of all background infos. Since we abort
+            // on error we can just add all even if they are not compatible
+            new(outputBackgroundInfo->AddrAt(outputBackgroundInfo->GetEntriesFast())) BackgroundInfo(*bginfo);
         }
         foundBackgroundInfo = true;
         continue;
@@ -246,8 +318,8 @@ The following restrictions apply:
     }
 
     // check if we found the background info in this file if we saw it already in previous files
-    if(!foundBackgroundInfo){
-        B2ERROR("No BackgroundInfo in current file");
+    if(outputBackgroundInfo->GetEntriesFast()>0 && !foundBackgroundInfo){
+        B2ERROR("No BackgroundInfo in file " << boost::io::quoted(input));
     }
 
     // so, event tree looks good too. Now we merge the FileMetaData
@@ -370,17 +442,13 @@ The following restrictions apply:
   for(auto it: persistentMergeables){
     outputMetaDataTree.Branch(it.first.c_str(), &it.second.first);
   }
-  TClonesArray* bginfo{nullptr};
-  if(outputBackgroundInfo){
-      bginfo = new TClonesArray(BackgroundInfo::Class(), 1);
-      new(bginfo->AddrAt(0)) BackgroundInfo(*outputBackgroundInfo);
-      outputMetaDataTree.Branch("BackgroundInfos", &bginfo);
+  if(outputBackgroundInfo->GetEntriesFast()){
+    outputMetaDataTree.Branch("BackgroundInfos", &outputBackgroundInfo);
   }
   outputMetaDataTree.Fill();
   outputMetaDataTree.Write();
 
   // now clean up the mess ...
-  delete bginfo;
   delete outputBackgroundInfo;
   for(auto val: persistentMergeables){
     delete val.second.first;

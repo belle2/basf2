@@ -36,18 +36,6 @@ namespace Belle2 {
      * Structure for background description
      */
     struct BackgroundDescr {
-      bool operator==(const BackgroundDescr& b) const
-      {
-        return (tag == b.tag) && (type == b.type) && (fileType == b.fileType) &&
-               (fileNames == b.fileNames) && (realTime == b.realTime) &&
-               (scaleFactor == b.scaleFactor) && (rate == b.rate);
-        // in theory this could be compared as well but it's dependent
-        // on the length of the job so we ignore it for now. When
-        // merging files this should be handled separately and summed up
-        // somehow {n files: reused' = (n-1) + \sum_{n}(reused)}
-        //&& (reused == b.reused);
-      }
-
       SimHitBase::BG_TAG tag = SimHitBase::bg_none;  /**< background tag denoting type */
       std::string type; /**< background type */
       BackgroundMetaData::EFileType fileType = BackgroundMetaData::c_Usual; /**< file type */
@@ -69,16 +57,6 @@ namespace Belle2 {
      * Destructor.
      */
     ~BackgroundInfo() {}
-
-    bool operator==(const BackgroundInfo& b)
-    {
-      return (m_method == b.m_method) && (m_backgrounds == b.m_backgrounds) &&
-             (m_components == b.m_components) &&
-             (m_minTime == b.m_minTime) && (m_maxTime == b.m_maxTime) &&
-             (m_minTimeECL == b.m_minTimeECL) && (m_maxTimeECL == b.m_maxTimeECL) &&
-             (m_minTimePXD == b.m_minTimePXD) && (m_maxTimePXD == b.m_maxTimePXD) &&
-             (m_wrapAround == b.m_wrapAround) && (m_maxEdepECL == b.m_maxEdepECL);
-    }
 
     /**
      * Set method that is used to add BG

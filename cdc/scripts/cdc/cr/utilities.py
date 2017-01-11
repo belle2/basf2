@@ -166,6 +166,11 @@ def getRunNumber(fname):
     return run
 
 
+def getExpNumber(fname):
+    exp = int((fname.split('/')[-1]).split('.')[2])
+    return exp
+
+
 def getDataPeriod(run):
     period = None
     global run_range

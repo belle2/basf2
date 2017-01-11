@@ -9,6 +9,6 @@ env['TOOLS_LIBS']['showmetadata'] = ['$XML_LIBS', 'framework', 'boost_program_op
 env['TOOLS_LIBS']['addmetadata'] = ['$XML_LIBS', 'framework', 'boost_program_options', '$ROOT_LIBS']
 
 env['TOOLS_LIBS']['addtocatalog'] = ['$XML_LIBS', 'framework', 'boost_program_options', '$ROOT_LIBS']
-env['TOOLS_LIBS']['merge_basf2_files'] = ['framework_io', 'framework', 'boost_program_options', '$ROOT_LIBS']
+env['TOOLS_LIBS']['merge_basf2_files'] = ['background_dataobjects', 'framework_io', 'framework', 'boost_program_options', '$ROOT_LIBS']
 
 Return('env')

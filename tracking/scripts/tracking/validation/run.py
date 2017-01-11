@@ -36,7 +36,7 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
     #: Use the "expert" folder in the validation file as the destination of the pull and residual plots
     use_expert_folder = True
 
-    #: not fit by default
+    #: not add the geometry modules by default
     #: can be overridden by derived validation class
     fit_geometry = None
 
@@ -45,6 +45,9 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
 
     #: Exclude some of the perigee parameters from the pr side plots
     exclude_profile_pr_parameter = []
+
+    #: Do not fit the tracks but access the fit information for pulls etc.
+    use_fit_information = False
 
     def preparePathValidation(self, path):
         """The default way to add the validation module to the path.
@@ -57,7 +60,7 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
         trackingValidationModule = ExpertTrackingValidationModule(
             self.name,
             contact=self.contact,
-            fit=self.fit_tracks,
+            fit=self.use_fit_information or self.fit_tracks,
             pulls=self.pulls,
             resolution=self.resolution,
             output_file_name=self.output_file_name,

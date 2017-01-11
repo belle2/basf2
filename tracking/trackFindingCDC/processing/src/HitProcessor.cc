@@ -147,24 +147,6 @@ std::vector<const CDCWireHit*> HitProcessor::splitBack2BackTrack(CDCTrack& track
 
 bool HitProcessor::isBack2BackTrack(CDCTrack& track)
 {
-  // int votePos = 0;
-  // int voteNeg = 0;
-
-  // Vector2D center = track.getStartTrajectory3D().getGlobalCenter();
-  // for (const CDCRecoHit3D& hit : track) {
-  //   ESign curve_sign = getArmSign(hit, center);
-
-  //   if (curve_sign == ESign::c_Plus) {
-  //     ++votePos;
-  //   } else if (curve_sign == ESign::c_Minus) {
-  //     ++voteNeg;
-  //   } else {
-  //     B2ERROR("Unexpected value from getArmSign");
-  //     return false;
-  //   }
-  // }
-  // int armSignVote = votePos - voteNeg;
-
   Vector2D center = track.getStartTrajectory3D().getGlobalCenter();
   int armSignVote = getArmSignVote(track, center);
   if (std::abs(armSignVote) < track.size() and std::fabs(center.cylindricalR()) > 60.) {
@@ -200,20 +182,20 @@ int HitProcessor::getArmSignVote(const CDCTrack& track, const Vector2D& center)
   int votePos = 0;
   int voteNeg = 0;
 
-  if (std::isnan(center.x())) {
+  if (center.hasNAN()) {
     B2WARNING("Trajectory is not setted or wrong!");
-    return track.getStartTrajectory3D().getChargeSign();
+    return 0;
   }
 
   for (const CDCRecoHit3D& hit : track) {
-    ESign curve_sign = getArmSign(hit, center);
+    ESign armSign = getArmSign(hit, center);
 
-    if (curve_sign == ESign::c_Plus) {
+    if (armSign == ESign::c_Plus) {
       ++votePos;
-    } else if (curve_sign == ESign::c_Minus) {
+    } else if (armSign == ESign::c_Minus) {
       ++voteNeg;
     } else {
-      B2ERROR("Strange behaviour of getArmSign");
+      B2ERROR("Strange behaviour of getArmSignVote");
     }
   }
   int armSignVote = votePos - voteNeg;

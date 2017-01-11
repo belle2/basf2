@@ -61,15 +61,16 @@ def get_model(number_of_features, number_of_events, training_fraction, parameter
     y = tf.placeholder("float", [None])
     W = tf.Variable(tf.zeros([number_of_features, 1]))
     b = tf.Variable(tf.zeros([1]))
-    activation = tf.nn.softmax(tf.matmul(x, W) + b)
+
+    x_clean = tf.select(tf.is_nan(x), tf.ones_like(x) * 0., x)
+    activation = tf.nn.softmax(tf.matmul(x_clean, W) + b)
 
     cost = tf.reduce_mean(-tf.reduce_sum(y * tf.log(activation + 0.0000001), reduction_indices=1))
 
-    learning_rate = parameters.get('learning_rate', 0.1)
     learning_rate = 0.1
     optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
 
-    init = tf.initialize_all_variables()
+    init = tf.global_variables_initializer()
     session = tf.Session()
     session.run(init)
     return State(x, y, activation, cost, optimizer, session)
@@ -97,15 +98,7 @@ def apply(state, X):
     """
     Apply estimator to passed data.
     """
-    number_events = np.shape(X)[0]
-    print(number_events)
-    cycle_size = 500
-    num_cycles = number_events // cycle_size
-    array = np.empty((number_events, 1))
-    for i in range(num_cycles):
-        start, end = i * cycle_size, (i + 1) * cycle_size
-        array[start:end] = state.session.run(state.activation, feed_dict={state.x: X[start:end]})
-    return array
+    return state.session.run(state.activation, feed_dict={state.x: X})
 
 
 def begin_fit(state):
@@ -130,7 +123,11 @@ def end_fit(state):
     Store tensorflow session in a graph
     """
     state.add_to_collection()
-    graph = tf.get_default_graph()
     saver = tf.train.Saver()
-    meta_graph = tf.train.export_meta_graph(graph_def=graph.as_graph_def(), saver_def=saver.as_saver_def())
-    return meta_graph
+    with tempfile.TemporaryDirectory() as path:
+        filename = saver.save(state.session, os.path.join(path, 'mymodel'))
+        with open(filename + str('.data-00000-of-00001'), 'rb') as file1, open(filename + str('.index'), 'rb') as file2:
+            data1 = file1.read()
+            data2 = file2.read()
+    meta_graph = saver.export_meta_graph()
+    return [meta_graph, os.path.basename(filename), data1, data2]

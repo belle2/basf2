@@ -63,9 +63,9 @@ void printBackgroundInfo(const BackgroundInfo& a)
  * max ECL energy deposition) are the same and that the same background samples
  * are used with the same scale factor.
  *
- * number of events, file names and realtime are not checked to allow for
+ * number of events, file names and real time are not checked to allow for
  * different file sets to be used. We cannot check the background rate either
- * since this is slightly fluctuating as it's calculated by #events/realtime.
+ * since this is slightly fluctuating as it's calculated by #events/real time.
  * @param a basic background info to compare against
  * @param b new background info which has to be compatible
  */
@@ -87,14 +87,14 @@ void checkBackgroundCompatible(const BackgroundInfo& a, const BackgroundInfo& b,
   auto da = a.getBackgroundDescr();
   auto db = b.getBackgroundDescr();
   if (da.size() != db.size()) {
-    B2ERROR("Incompatible backround types in " << boost::io::quoted(filename));
+    B2ERROR("Incompatible background types in " << boost::io::quoted(filename));
   } else {
     auto cmpfn = [](const BackgroundInfo::BackgroundDescr & a, const BackgroundInfo::BackgroundDescr & b) {return a.type < b.type; };
     std::sort(da.begin(), da.end(), cmpfn);
     std::sort(db.begin(), db.end(), cmpfn);
     for (size_t i = 0; i < da.size(); ++i) {
       if (da[i].type != db[i].type) {
-        B2ERROR("Incompatible backround types in " << boost::io::quoted(filename));
+        B2ERROR("Incompatible background types in " << boost::io::quoted(filename));
         break;
       }
       if (da[i].scaleFactor != db[i].scaleFactor) {
@@ -136,13 +136,13 @@ int main(int argc, char* argv[])
     std::cout << (R"DOC(
 This program is intended to merge files created by separate basf2 jobs. It's
 similar to hadd but does correctly update the metadata in the file and merges
-the objects correctly.
+the objects in the persistent tree correctly.
 
 The following restrictions apply:
   - The files have to be created with the same release and steering file
-  - The persistent tree is only allowed to contain FileMetaData and objects
-    inheriting from Mergeable and the same list of objects needs to be present
-    in all files.
+  - The persistent tree is only allowed to contain FileMetaData, BackgroundInfo
+    and objects inheriting from Mergeable and the same list of objects needs to
+    be present in all files.
   - The event tree needs to contain the same DataStore entries in all files.
 )DOC");
     return 1;
@@ -171,7 +171,7 @@ The following restrictions apply:
   TClonesArray* outputBackgroundInfo = new TClonesArray(BackgroundInfo::Class(), inputfilenames.size());
   // set of all parent LFNs encountered in any file
   std::set<std::string> allParents;
-  // map of all mergable objects found in the persistent tree. The size_t is
+  // map of all mergeable objects found in the persistent tree. The size_t is
   // for counting to make sure we see all objects in all files
   std::map<std::string, std::pair<Mergeable*, size_t>> persistentMergeables;
   // set of all random seeds to print warning on duplicates
@@ -185,7 +185,7 @@ The following restrictions apply:
   std::set<std::string> allEventBranches;
 
   // so let's loop over all files and create FileMetaData and merge persistent
-  // objects if they inherit from Mergable, bail if there's something else in
+  // objects if they inherit from Mergeable, bail if there's something else in
   // there. The idea is that merging the persistent stuff is fast so we catch
   // errors more quickly when we do this as a first step and events later on.
   for (const auto& input : inputfilenames) {
@@ -219,7 +219,7 @@ The following restrictions apply:
       B2ERROR("Problem loading FileMetaData from " << input);
       continue;
     }
-    // File looks useable, start checking metadata ...
+    // File looks usable, start checking metadata ...
     B2INFO("adding file " << boost::io::quoted(input));
     if(LogSystem::Instance().isLevelEnabled(LogConfig::c_Info)) fileMetaData->Print("all");
 
@@ -248,14 +248,14 @@ The following restrictions apply:
     }
 
     bool foundBackgroundInfo{false};
-    // File looks good so far, now fixup the persistent stuff, i.e. merge all
+    // File looks good so far, now fix the persistent stuff, i.e. merge all
     // objects in persistent tree
     for(TObject* brObj: *persistent->GetListOfBranches()){
       TBranchElement* br = dynamic_cast<TBranchElement*>(brObj);
       // FileMetaData is handled separately
       if(br && br->GetTargetClass() == FileMetaData::Class() && std::string(br->GetName()) == "FileMetaData")
         continue;
-      // special handling for BackgroundInfo. This should be moved into BackgroundInfo and background info should become a objptr derived from mergeable
+      // special handling for BackgroundInfo.
       if(br && br->GetTargetClass() == TClonesArray::Class() && std::string(br->GetName()) == "BackgroundInfos") {
         B2INFO("Found BackgroundInfo");
         TClonesArray* bginfoArray{nullptr};
@@ -317,7 +317,7 @@ The following restrictions apply:
         // ok, merged, get rid of it.
         delete object;
       }else{
-        B2INFO("Found mergable object " << boost::io::quoted(br->GetName()) << " in persistent tree");
+        B2INFO("Found mergeable object " << boost::io::quoted(br->GetName()) << " in persistent tree");
       }
     }
 
@@ -367,7 +367,7 @@ The following restrictions apply:
     }
   }
 
-  //Check if the same mergables were found in all files
+  //Check if the same mergeables were found in all files
   for(const auto &val: persistentMergeables){
     if(val.second.second != inputfilenames.size()){
       B2ERROR("Mergeable " << boost::io::quoted(val.first) << " only present in " << val.second.second << " out of "
@@ -383,7 +383,7 @@ The following restrictions apply:
   // Stop processing in case of error
   if (LogSystem::Instance().getMessageCounter(LogConfig::c_Error) > 0) return 1;
 
-  // Final changes to MetaData
+  // Final changes to metadata
   outputMetaData->setLfn("");
   outputMetaData->setParents(std::vector<std::string>(allParents.begin(), allParents.end()));
   outputMetaData->setLow(std::get<0>(lowEvt), std::get<1>(lowEvt), std::get<2>(lowEvt));

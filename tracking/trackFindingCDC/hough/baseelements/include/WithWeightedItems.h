@@ -59,11 +59,11 @@ namespace Belle2 {
       void eraseIf(const APredicate& predicate)
       {
         // Sneakily hide the items instead of erasing them.
-        auto notPredicate = [&predicate](AItem & item) { return not predicate(item); };
-        m_itEnd = std::partition(m_items.begin(), m_items.end(), notPredicate);
+        // auto notPredicate = [&predicate](AItem & item) { return not predicate(item); };
+        // m_itEnd = std::partition(m_items.begin(), m_items.end(), notPredicate);
         // Properly delete use the following.
-        // m_itEnd = std::remove_if(m_items.begin(), m_items.end(), predicate);
-        // m_items.erase(m_itEnd, m_items.end());
+        m_itEnd = std::remove_if(m_items.begin(), m_items.end(), predicate);
+        m_items.erase(m_itEnd, m_items.end());
       }
 
       /// Add an item with weight.

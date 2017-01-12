@@ -19,7 +19,6 @@
 #include <TMatrixD.h>
 
 #include <assert.h>
-#include <framework/geometry/BFieldManager.h>
 
 using namespace Belle2;
 using namespace HelixParameterIndex;

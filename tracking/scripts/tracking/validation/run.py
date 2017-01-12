@@ -36,10 +36,6 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
     #: Use the "expert" folder in the validation file as the destination of the pull and residual plots
     use_expert_folder = True
 
-    #: not add the geometry modules by default
-    #: can be overridden by derived validation class
-    fit_geometry = None
-
     #: Exclude some of the perigee parameters from the mc side plots
     exclude_profile_mc_parameter = []
 

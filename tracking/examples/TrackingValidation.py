@@ -44,8 +44,6 @@ class Standalone(TrackingValidationRun):
                   'MagneticFieldConstant4LimitedRCDC']
     #: will be selected by command line
     finder_module = None
-    #: will be selected by command line
-    fit_geometry = None
     #: Calculate also pull variables
     pulls = True
     #: The contact person (Thomas Hauth)
@@ -56,18 +54,12 @@ def main():
     argument_parser = argparse.ArgumentParser()
 
     # Indication if tracks should be fitted.
-    # Currently tracks are not fitted because of a segmentation fault related TGeo / an assertation error in Geant4 geometry.
     argument_parser.add_argument(
         '-f',
         '--fit',
         action='store_true',
         help='Perform fitting of the generated tracks with Genfit. Default is not '
         'to perform a fit but use the seed values generated in track finding.')
-
-    # Geometry name to be used in the Genfit extrapolation.
-    argument_parser.add_argument('-g', '--geometry', choices=['TGeo', 'Geant4'],
-                                 default='Geant4',
-                                 help='Geometry to be used with Genfit.')
 
     argument_parser.add_argument('-s', '--show', action='store_true',
                                  help='Show generated plots in a TBrowser immediatly.')
@@ -97,9 +89,9 @@ def main():
     ############################
     standalone_validation_run = Standalone()
     if arguments.fit:
-        standalone_validation_run.fit_geometry = arguments.geometry
+        standalone_validation_run.fit_tracks = True
     else:
-        standalone_validation_run.fit_geometry = None
+        standalone_validation_run.fit_tracks = False
 
     # setup input root file #
     #########################

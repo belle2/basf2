@@ -145,7 +145,7 @@ bool FileMetaData::read(std::istream& input, std::string& physicalFileName)
   return false;
 }
 
-bool FileMetaData::write(std::ostream& output, std::string physicalFileName)
+bool FileMetaData::write(std::ostream& output, std::string physicalFileName) const
 {
   output << "  <File>\n";
   output << "    <LFN>" << HTML::escape(m_lfn) << "</LFN>\n";

@@ -211,7 +211,7 @@ namespace Belle2 {
      *  @param physicalFileName The physical file name.
      *  @return True if metadata could be written
      */
-    bool write(std::ostream& output, std::string physicalFileName);
+    bool write(std::ostream& output, std::string physicalFileName) const;
 
   private:
 

@@ -57,7 +57,7 @@ def run_test(argument):
     global options
     global print_lock
 
-    # output on dump terminal to avoid ESC[?1034h in output
+    # output on dumb terminal to avoid ESC[?1034h in output
     # happens when loading readline https://bugzilla.redhat.com/show_bug.cgi?id=304181
     os.putenv('TERM', 'vt100')
 

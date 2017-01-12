@@ -106,7 +106,9 @@ namespace Belle2 {
     double random01();
 
     /** Generate a random value in (0,1), both limits excluded. */
-    Double_t Rndm(Int_t = 0) { return random01(); }
+    Double_t Rndm() { return random01(); }
+    /** Generate a random value in (0,1), both limits excluded (backward compatibility with root < 6.08). */
+    Double_t Rndm(Int_t) { return Rndm(); }
     /** Fill an array of floats with random values in (0,1), both limits excluded.
      * @param n number of floats to generate
      * @param array pointer to an array where the numbers should be stored
@@ -154,6 +156,8 @@ namespace Belle2 {
     /** override base class SetSeed to do nothing, we don't need it but it gets
      * called by parent constructor */
     void SetSeed(UInt_t) {}
+    /** argument type was changed in root 6.08. */
+    void SetSeed(ULong_t) {}
 
     /** Set the state of the random number generator.
      * To achieve maximum reproducibility the generator is reset at the begin

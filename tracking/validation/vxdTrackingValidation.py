@@ -39,7 +39,7 @@ class VXD(TrackingValidationRun):
     finder_module = staticmethod(lambda path: tracking.add_vxd_track_finding(path, components=["PXD", "SVD"]))
 
     #: fit the tracks after the track finder
-    fit_geometry = "default"
+    fit_tracks = True
 
     #: use only hits from the VXD detectors
     tracking_coverage = {

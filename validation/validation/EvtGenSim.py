@@ -39,6 +39,9 @@ main.add_module(evtgeninput)
 bg = None
 if 'BELLE2_BACKGROUND_DIR' in os.environ:
     bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+
+assert bg
+
 add_simulation(main, bkgfiles=bg)
 
 # memory profile

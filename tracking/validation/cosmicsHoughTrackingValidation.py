@@ -54,7 +54,6 @@ class CosmicsHough(TrackingValidationRun):
         'UseCDCHits': True,
         'UseOnlyAxialCDCHits': False,
     }
-    fit_geometry = None
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE
 

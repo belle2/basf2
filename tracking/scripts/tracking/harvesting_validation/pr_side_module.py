@@ -9,8 +9,8 @@ import warnings
 
 import numpy as np
 
-import tracking.validation.harvesting as harvesting
-import tracking.validation.refiners as refiners
+import tracking.harvest.harvesting as harvesting
+import tracking.harvest.refiners as refiners
 import tracking.validation.utilities as utilities
 
 import tracking.harvest.peelers as peelers

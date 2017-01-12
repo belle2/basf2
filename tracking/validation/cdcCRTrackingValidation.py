@@ -49,7 +49,6 @@ class CDCCR(TrackingValidationRun):
         'UseOnlyAxialCDCHits': False
         }
 
-    fit_geometry = "default"
     fit_tracks = True
     pulls = True
     resolution = True

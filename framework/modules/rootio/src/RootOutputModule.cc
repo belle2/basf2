@@ -154,9 +154,7 @@ void RootOutputModule::initialize()
       //HasDictionary() is a new function in root 6
       //using it instead of GetClassInfo() avoids  having to parse header files (and
       //the associated memory cost)
-      //
-      //it also is missing a 'const', hopefully this will be fixed at some point
-      if (!const_cast<TClass*>(entryClass)->HasDictionary()) {
+      if (!entryClass->HasDictionary()) {
         B2WARNING("No dictionary found for class " << entryClass->GetName() << ", branch '" << branchName <<
                   "' will not be saved. (This is probably an obsolete class that is still present in the input file.)");
         continue;

@@ -347,7 +347,7 @@ void NeuroTriggerTrainerModule::event()
           thetaHistsMC[isector]->Fill(mcTrack->getMomentum().Theta());
           zHistsMC[isector]->Fill(mcTrack->getProductionVertex().Z());
           phiHists2D[isector]->Fill(tracks[itrack]->getPhi0());
-          ptHists2D[isector]->Fill(tracks[itrack]->getKappa());
+          ptHists2D[isector]->Fill(tracks[itrack]->getKappa(1.5));
         }
         if (m_trainSets[isector].nSamples() % 1000 == 0) {
           B2DEBUG(50, m_trainSets[isector].nSamples() << " samples collected for sector " << isector);

@@ -145,7 +145,7 @@ def getHelixFromMCParticle(mc_particle):
     position = mc_particle.getVertex()
     momentum = mc_particle.getMomentum()
     charge_sign = (-1 if mc_particle.getCharge() < 0 else 1)
-    b_field = 1.5
+    b_field = Belle2.BFieldManager.getField(position).Z() / Belle2.Unit.T
 
     seed_helix = Belle2.Helix(position, momentum, charge_sign, b_field)
     return seed_helix
@@ -159,7 +159,7 @@ def getSeedTrackFitResult(reco_track):
     # It does not matter, which particle we put in here, so we just use a pion
     particle_type = Belle2.Const.pion
     p_value = float('nan')
-    b_field = 1.5
+    b_field = Belle2.BFieldManager.getField(position).Z() / Belle2.Unit.T
     cdc_hit_pattern = 0
     svd_hit_pattern = 0
 

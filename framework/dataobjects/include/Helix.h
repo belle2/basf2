@@ -133,7 +133,7 @@ namespace Belle2 {
      *  of the magnetic field along the z-axis to give back the momentum.
      *  @param bZ            Magnetic field at the perigee.
      */
-    TVector3 getMomentum(const double bZ = 1.5) const;
+    TVector3 getMomentum(const double bZ) const;
 
     /** Getter for unit vector of momentum at the perigee position
      *
@@ -145,10 +145,10 @@ namespace Belle2 {
      *
      *  @param bZ            Magnetic field at the perigee
      */
-    double getTransverseMomentum(const double bZ = 1.5) const;
+    double getTransverseMomentum(const double bZ) const;
 
     /** Getter for kappa, which is charge / transverse momentum or equivalently omega * alpha */
-    double getKappa(const double bZ = 1.5) const;
+    double getKappa(const double bZ) const;
 
     /** Calculates the alpha value for a given magnetic field in Tesla */
     static double getAlpha(const double bZ);

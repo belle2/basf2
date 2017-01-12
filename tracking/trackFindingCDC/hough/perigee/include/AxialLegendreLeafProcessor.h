@@ -112,7 +112,7 @@ namespace Belle2 {
 
     public:
       /// Getter for the axial hits that are not yet used.
-      std::vector<const CDCWireHit*> getUnusedWireHits() const;
+      std::vector<const CDCWireHit*> getUnusedWireHits();
 
       /// Getter for the candidates structure still used in some tests.
       std::vector<Candidate> getCandidates() const;

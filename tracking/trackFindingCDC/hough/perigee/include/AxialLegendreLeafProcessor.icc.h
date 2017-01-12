@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.h>
 
 #include <tracking/trackFindingCDC/processing/TrackProcessor.h>
+#include <tracking/trackFindingCDC/processing/HitProcessor.h>
 
 #include <tracking/trackFindingCDC/hough/perigee/StereoHitContained.h>
 #include <tracking/trackFindingCDC/hough/perigee/OffOrigin.h>
@@ -169,8 +170,8 @@ namespace Belle2 {
       const float phi0 = circle.phi0();
 
       StereoHitContained<OffOrigin<InPhi0ImpactCurvBox> > hitInPhi0CurvBox(m_param_curlCurv);
-      using HoughBox = StereoHitContained<OffOrigin<InPhi0ImpactCurvBox> >::HoughBox;
       hitInPhi0CurvBox.setLocalOrigin(support);
+      using RoadHoughBox = StereoHitContained<OffOrigin<InPhi0ImpactCurvBox> >::HoughBox;
 
       // Determine a precision that we expect to achieve at the fitted momentum
       // There certainly is some optimizsation potential here.
@@ -185,16 +186,16 @@ namespace Belle2 {
       DiscreteCurv::Array curvBounds{{curv - curvPrecision, curv + curvPrecision}};
       ContinuousImpact::Array impactBounds{{ -impactPrecision, impactPrecision}};
       DiscretePhi0::Array phi0Bounds{{Vector2D::Phi(phi0 - phi0Precision), Vector2D::Phi(phi0 + phi0Precision)}};
-      HoughBox precisionPhi0CurvBox(DiscretePhi0::getRange(phi0Bounds),
-                                    ContinuousImpact::getRange(impactBounds),
-                                    DiscreteCurv::getRange(curvBounds));
+      RoadHoughBox precisionPhi0CurvBox(DiscretePhi0::getRange(phi0Bounds),
+                                        ContinuousImpact::getRange(impactBounds),
+                                        DiscreteCurv::getRange(curvBounds));
 
       // HoughBox precisionPhi0CurvBox = *leaf;
       std::vector<WithSharedMark<CDCRLWireHit>> hitsInPrecisionBox;
 
       // Explicitly making a copy here to ensure that we do not change the node content
       for (WithSharedMark<CDCRLWireHit> markableRLWireHit : node) {
-        // Remove marked hits - redunadent since we removed them above
+        // Remove marked hits
         if (markableRLWireHit.isMarked()) continue;
         Weight weight = hitInPhi0CurvBox(markableRLWireHit, &precisionPhi0CurvBox);
         if (not std::isnan(weight)) hitsInPrecisionBox.push_back(markableRLWireHit);
@@ -213,6 +214,8 @@ namespace Belle2 {
     void AxialLegendreLeafProcessor<ANode>::finalizeTracks()
     {
       TrackProcessor::mergeAndFinalizeTracks(m_tracks, m_axialWireHits);
+      HitProcessor::resetMaskedHits(m_tracks, m_axialWireHits);
+      erase_remove_if(m_tracks, Size() == 0u);
     }
 
   }
@@ -223,12 +226,13 @@ namespace Belle2 {
 
     template <class ANode>
     std::vector<const CDCWireHit*>
-    AxialLegendreLeafProcessor<ANode>::getUnusedWireHits() const
+    AxialLegendreLeafProcessor<ANode>::getUnusedWireHits()
     {
+      HitProcessor::resetMaskedHits(m_tracks, m_axialWireHits);
       std::vector<const CDCWireHit*> result;
       for (const CDCWireHit* wireHit : m_axialWireHits) {
         const AutomatonCell& automatonCell = wireHit->getAutomatonCell();
-        if (automatonCell.hasTakenFlag() or automatonCell.hasMaskedFlag()) continue;
+        if (automatonCell.hasTakenFlag()) continue;
         result.push_back(wireHit);
       }
       return result;
@@ -294,8 +298,6 @@ namespace Belle2 {
     template <class ANode>
     void AxialLegendreLeafProcessor<ANode>::beginWalk()
     {
-      // leafCall = 0;
-
       // Setup the requested precision function
       if (m_param_curvResolution == "none") {
         m_curvResolution = [](double curv __attribute__((unused))) { return NAN; };

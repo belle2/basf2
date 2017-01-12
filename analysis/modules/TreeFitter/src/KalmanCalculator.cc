@@ -97,7 +97,7 @@ namespace TreeFitter {
             m_matrixRinv.fast(row, col) += tmp * m_matrixCGT(k, col) ;
 #endif
     m_matrixR = m_matrixRinv ;
-    if (vtxverbose >= 8) std::cout << "KalmanCalculator:: R  = " << std::endl << m_matrixR << std::endl;
+    if (vtxverbose >= 8) std::cout << "KalmanCalculator:: R = G*C*GT+V = " << std::endl << m_matrixR << std::endl;
     m_matrixRinv.invert(m_ierr) ;//could be InvertFast
     if (vtxverbose >= 8) {
       std::cout << "KalmanCalculator:: Rinv  = " << std::endl << m_matrixRinv << std::endl;
@@ -110,6 +110,7 @@ namespace TreeFitter {
 
     // calculate the gain matrix
     m_matrixK = m_matrixCGT * m_matrixRinv ;
+    if (vtxverbose >= 8) std::cout << "KalmanCalculator:: K(gain matrix) = C*GT*Rinv = " << std::endl << m_matrixK << std::endl;
     m_chisq = -1 ;
 //     // let's see if we get same results using sparce matrices
 //     VtkSparseMatrix Gs(G) ;

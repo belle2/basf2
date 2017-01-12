@@ -22,6 +22,8 @@
 #include <TVector3.h>
 #include "analysis/modules/TreeFitter/HelixUtils.h"
 
+#include <framework/dataobjects/Helix.h>
+
 using std::cout;
 using std::endl;
 
@@ -75,7 +77,13 @@ namespace TreeFitter {
     double pz = vertexpar[in_pz] ;
 
     const double a  = Bz * Belle2::Unit::T * Belle2::Const::speedOfLight; //FT: a>0 for in Belle2 unlike BaBar
-
+    /*
+    cout<<"a(BaBar) = " << a <<endl;
+    TVector3 position(x,y,z);
+    TVector3 momentum(px,py,pz);
+    Belle2::Helix hx(position, momentum,charge,Bz);
+    cout<<"alpha(Belle) = " << hx.getAlpha(Bz);
+    */
     // omega
     double aq    = a * charge ;
     double pt2   = px * px + py * py ;
@@ -130,10 +138,10 @@ namespace TreeFitter {
     double dphi0dx  = -aq * dphi0dpy ;
     double dphi0dy  = aq * dphi0dpx ;
 
-    double dd0dpx = (dpt0dpx - dptdpx) / aq ;
-    double dd0dpy = (dpt0dpy - dptdpy) / aq ;
-    double dd0dx  = dpt0dx / aq ;
-    double dd0dy  = dpt0dy / aq ;
+    double dd0dpx = -(dpt0dpx - dptdpx) / aq ; //FT also changed sign to all derivatives
+    double dd0dpy = -(dpt0dpy - dptdpy) / aq ;
+    double dd0dx  = -dpt0dx / aq ;
+    double dd0dy  = -dpt0dy / aq ;
 
     double dldx  = -dphi0dx / omega ;
     double dldy  = -dphi0dy / omega ;

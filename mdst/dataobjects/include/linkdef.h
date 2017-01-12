@@ -125,7 +125,8 @@
   const double tanLambda = onfile.m_tau[4];         \
   const Belle2::Helix helix(d0,0, omega, 0, tanLambda);	    \
   const TVector3 position = helix.getPerigee();	\
-  const TVector3 momentum = helix.getMomentum();          \
+  // Attention! Using a hardcoded 1.5 here. \
+  const TVector3 momentum = helix.getMomentum(1.5);          \
   const int charge = helix.getChargeSign();		      \
   							\
   const double alpha =  1.0 / (bZ * TMath::C()) * 1E11;     \

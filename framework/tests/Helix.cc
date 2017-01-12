@@ -327,7 +327,7 @@ namespace {
           if (omega != 0) {
 
             Helix helix(d0, phi0, omega, z0, tanLambda);
-            TVector3 momentumAtPerigee = helix.getMomentum();
+            TVector3 momentumAtPerigee = helix.getMomentum(nominalBz);
             for (const float chi : chis) {
 
               float arcLength2D = -chi / omega;

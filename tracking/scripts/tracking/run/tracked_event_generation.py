@@ -51,6 +51,7 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
         tracking_argument_group.add_argument(
             '--fit',
             action="store_true",
+            default=self.fit_tracks,
             dest='fit_tracks',
             help='Apply the fitting to the found tracks'
         )

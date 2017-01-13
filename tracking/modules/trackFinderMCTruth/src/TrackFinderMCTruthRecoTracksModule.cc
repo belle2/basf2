@@ -654,8 +654,6 @@ void TrackFinderMCTruthRecoTracksModule::event()
     newRecoTrack->addRelationTo(aMcParticlePtr);
     B2DEBUG(100, " --- Create relation between genfit::TrackCand " << counter << " and MCParticle " << iPart);
 
-    CDC::CDCGeometryPar& cdcGeometry = CDC::CDCGeometryPar::Instance();
-
     hitCounter = 0;
     for (const TimeHitIDDetector& hitInformation : hitsWithTimeAndDetectorInformation) {
       const Const::EDetector& detectorInformation = std::get<2>(hitInformation);
@@ -670,6 +668,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
         TVector3 simMom = aCDCSimHitPtr->getMomentum();
         TVector3 simHitPosOnWire = aCDCSimHitPtr->getPosWire();
 
+        CDC::CDCGeometryPar& cdcGeometry = CDC::CDCGeometryPar::Instance();
         const unsigned short isRightHit = cdcGeometry.getNewLeftRightRaw(simHitPosOnWire, simHitPos, simMom);
 
         if (isRightHit) {

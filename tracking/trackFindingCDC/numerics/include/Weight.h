@@ -20,9 +20,8 @@ namespace Belle2 {
 
     /// Generic functor to get the weight from an object.
     struct GetWeight {
-
-      /// Constant returned on an invalid get operation
-      static constexpr const Weight c_Invalid = NAN;
+      /// Marker function for the isFunctor test
+      operator FunctorTag();
 
       /// Returns the weight of an object.
       template<class T, class SFINAE = decltype(&T::getWeight)>

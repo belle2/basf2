@@ -598,7 +598,7 @@ void MCRecoTracksMatcherModule::event()
           if (m_param_relateClonesToMCParticles) {
 
             // Set the McTrackId to the related MCParticle
-            prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_matched);
+            prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_clone);
             B2DEBUG(100, "Stored PRTrack " << prRecoTrackId << " as matched, although it is a "
                     "clone (because the module "
                     "parameter is set).");

@@ -67,47 +67,36 @@ TrackMatchLookUp::MCToPRMatchInfo
 TrackMatchLookUp::extractMCToPRMatchInfo(const RecoTrack* prRecoTrack, const float& efficiency)
 {
   if (not prRecoTrack) return MCToPRMatchInfo::c_Missing;
-  if (efficiency < 0) {
+  if (std::isnan(efficiency)) return MCToPRMatchInfo::c_Invalid;
+
+  bool efficiencySign = std::signbit(efficiency);
+  if (efficiencySign) {
     return MCToPRMatchInfo::c_Merged;
-  } else if (efficiency > 0) {
+  } else {
     return MCToPRMatchInfo::c_Matched;
   }
-  return MCToPRMatchInfo::c_Invalid;
 }
 
 TrackMatchLookUp::PRToMCMatchInfo
 TrackMatchLookUp::extractPRToMCMatchInfo(const RecoTrack& prRecoTrack,
                                          const RecoTrack* mcRecoTrack,
-                                         const float& purity)
+                                         const float& purity __attribute__((unused)))
 {
-  if (not mcRecoTrack) {
-    // The patter recognition track has no associated Monte Carlo track.
-    // Figure out of it is a clone or a match by the McTrackId property assigned to the track.
-    // That is also why we need the pattern recogntion track in this method as well.
-    const RecoTrack::MatchingStatus matchingStatus = prRecoTrack.getMatchingStatus();
+  // The patter recognition track has no associated Monte Carlo track.
+  // Figure out of it is a clone or a match by the McTrackId property assigned to the track.
+  // That is also why we need the pattern recogntion track in this method as well.
+  const RecoTrack::MatchingStatus matchingStatus = prRecoTrack.getMatchingStatus();
 
-    if (matchingStatus == RecoTrack::MatchingStatus::c_ghost) {
-      return PRToMCMatchInfo::c_Ghost;
-    } else if (matchingStatus == RecoTrack::MatchingStatus::c_background) {
-      return PRToMCMatchInfo::c_Background;
-    } else if (matchingStatus == RecoTrack::MatchingStatus::c_clone) {
-      // MCTrackMatcher is running without
-      // RelateClonesToMcParticles
-      return PRToMCMatchInfo::c_Clone;
-    } else if (matchingStatus == RecoTrack::MatchingStatus::c_undefined) {
-      return PRToMCMatchInfo::c_Invalid;
-    }
-
-  } else {
-    // The patter recognition track has an associated Monte Carlo track.
-    // Figure out of it is a clone or a match by the sign of the purity.
-    if (purity < 0) {
-      return PRToMCMatchInfo::c_Clone;
-    } else if (purity > 0) {
-      return PRToMCMatchInfo::c_Matched;
-    } else {
-      return PRToMCMatchInfo::c_Invalid;
-    }
+  if (matchingStatus == RecoTrack::MatchingStatus::c_ghost) {
+    return PRToMCMatchInfo::c_Ghost;
+  } else if (matchingStatus == RecoTrack::MatchingStatus::c_background) {
+    return PRToMCMatchInfo::c_Background;
+  } else if (matchingStatus == RecoTrack::MatchingStatus::c_clone) {
+    return PRToMCMatchInfo::c_Clone;
+  } else if (matchingStatus == RecoTrack::MatchingStatus::c_matched) {
+    return PRToMCMatchInfo::c_Matched;
+  } else if (matchingStatus == RecoTrack::MatchingStatus::c_undefined) {
+    return PRToMCMatchInfo::c_Invalid;
   }
   return PRToMCMatchInfo::c_Invalid;
 }

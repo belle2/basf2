@@ -7,22 +7,17 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/modules/mcMatcher/MCRecoTracksMatcherModule.h>
 
-#include <framework/dataobjects/EventMetaData.h>
-
-//datastore types
+// datastore types
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/DataStore.h>
 
 #include <framework/gearbox/Const.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-//hit types
+// hit types
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
@@ -223,11 +218,16 @@ void MCRecoTracksMatcherModule::initialize()
     m_param_mcRecoTracksStoreArrayName = storeMCRecoTracks.getName();
 
     // Purity relation - for each PRTrack to store the purest MCTrack
-    storeMCRecoTracks.registerRelationTo(storePRRecoTracks);
-    // Efficiency relation - for each MCTrack to store the most efficient PRTrack
     storePRRecoTracks.registerRelationTo(storeMCRecoTracks);
-    // MC matching relation
+
+    // Efficiency relation - for each MCTrack to store the most efficient PRTrack
+    storeMCRecoTracks.registerRelationTo(storePRRecoTracks);
+
+    // MCParticle matching relation - purity
     storePRRecoTracks.registerRelationTo(storeMCParticles);
+
+    // MCParticle matching relation - efficiency
+    storeMCParticles.registerRelationTo(storePRRecoTracks);
 
     // Announce optional store arrays to the hits or clusters in case they should be used
     // We make them optional in case of limited detector setup.
@@ -620,50 +620,53 @@ void MCRecoTracksMatcherModule::event()
   // Meaning save the highest weighted efficiency relation to the data store.
   for (RecoTrackId mcId = 0; mcId < nMCRecoTracks; ++mcId) {
     RecoTrack* mcRecoTrack = mcRecoTracks[mcId];
+    MCParticle* mcParticle = mcRecoTrack->getRelated<MCParticle>();
 
     const MostWeightEfficientPRId& mostWeightEfficiencyPRId = mostWeightEfficientPRId_by_mcId[mcId];
 
     const RecoTrackId& prId = mostWeightEfficiencyPRId.id;
     const Efficiency& weightedEfficiency = mostWeightEfficiencyPRId.weightedEfficiency;
+    // const Efficiency& efficiency = mostWeightEfficiencyPRId.efficiency;
 
-    if (prId >= nPRRecoTracks or prId < 0) {
-      B2ERROR("Index of pattern recognition tracks out of range.");
+    B2ASSERT("Index of pattern recognition tracks out of range.", prId < nPRRecoTracks and prId >= 0);
+
+    RecoTrack* prRecoTrack = prRecoTracks[prId];
+
+    const MostPureMCId& mostPureMCId_for_prId = mostPureMCId_by_prId[prId];
+    const RecoTrackId& mostPureMCId = mostPureMCId_for_prId.id;
+
+    // MATCHED
+    if (mcId == mostPureMCId and
+        (prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_matched or
+         prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_clone)) {
+      // Setup the relation with positive weighted efficiency for this case.
+      mcRecoTrack->addRelationTo(prRecoTrack, weightedEfficiency);
+      mcParticle->addRelationTo(prRecoTrack, weightedEfficiency);
+      B2DEBUG(100, "Efficiency rel: mcId " << mcId  << " -> prId " << prId << " : " << weightedEfficiency);
+      continue;
     }
 
-    if (prRecoTracks[prId]->getMatchingStatus() != RecoTrack::MatchingStatus::c_matched or
-        not(weightedEfficiency > 0) or not(weightedEfficiency >= m_param_minimalEfficiency)) {
+    // MERGED
+    // This MCTrack has a significant portion of hits in a PRTrack
+    // which in turn better describes a MCTrack different form this.
+    // Setup the relation with negative weighted efficiency for this case.
+    bool isMergedMCRecoTrack =
+      weightedEfficiency >= m_param_minimalEfficiency and
+      (prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_matched or
+       prRecoTrack->getMatchingStatus() == RecoTrack::MatchingStatus::c_clone);
 
-      // MISSING
-      // No related pattern recognition track
-      // Do not create a relation.
-      B2DEBUG(100, "mcId " << mcId << " is missing. No relation created.");
-
-    } else {
-
-      RecoTrack* prRecoTrack = prRecoTracks[prId];
-
-      const MostPureMCId& mostPureMCId_for_prId = mostPureMCId_by_prId[prId];
-      const RecoTrackId& mostPureMCId = mostPureMCId_for_prId.id;
-
-      if (mcId != mostPureMCId) {
-        // MERGED
-        // this MCTrack is in a PRTrack which in turn better describes a MCTrack different form this.
-
-        // Setup the relation with negative weighted efficiency for this case.
-        mcRecoTrack->addRelationTo(prRecoTrack, -weightedEfficiency);
-        B2DEBUG(100, "Efficiency rel: mcId " << mcId << " -> prId " << prId << " : " << -weightedEfficiency);
-
-      } else {
-        // MATCHED
-
-        // Setup the relation with positive weighted efficiency for this case.
-        mcRecoTrack->addRelationTo(prRecoTrack, weightedEfficiency);
-        B2DEBUG(100, "Efficiency rel: mcId " << mcId << " -> prId " << prId << " : " << weightedEfficiency);
-
-      }
+    if (isMergedMCRecoTrack) {
+      mcRecoTrack->addRelationTo(prRecoTrack, -weightedEfficiency);
+      mcParticle->addRelationTo(prRecoTrack, -weightedEfficiency);
+      B2DEBUG(100, "Efficiency rel: mcId " << mcId << " -> prId " << prId << " : " << -weightedEfficiency);
+      continue;
     }
 
-  }
+    // MISSING
+    // No related pattern recognition track
+    // Do not create a relation.
+    B2DEBUG(100, "mcId " << mcId << " is missing. No relation created.");
+  } // end for mcId
 
   B2DEBUG(100, "########## End MCRecoTracksMatcherModule ############");
 

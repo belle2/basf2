@@ -1,3 +1,18 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+'''
+An example script to reconstruct osmics events with standalone CDC.
+Usage :
+basf2 runReconstruction.py <input> <output>
+input: Input root file (after CDC unpacker).
+       These data are ussually stored in
+       /ghi/fs01/belle2/bdata/group/detector/CDC/unpacked/
+output : Output root file, which contains helix parameters.
+         N.B. this is not the basf2 root file!
+         To see the halix parameters.
+         Please use compare2Tracks.C for example.
+'''
 import basf2
 from basf2 import *
 import ROOT

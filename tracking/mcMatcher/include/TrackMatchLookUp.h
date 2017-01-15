@@ -59,7 +59,9 @@ namespace Belle2 {
      * Helper function to assume the correct matching category for the Monte Carlo tracks from the
      * information efficiency relation.
      */
-    MCToPRMatchInfo extractMCToPRMatchInfo(const RecoTrack* prRecoTrack, const float& efficiency);
+    MCToPRMatchInfo extractMCToPRMatchInfo(const RecoTrack& mcRecoTrack,
+                                           const RecoTrack* prRecoTrack,
+                                           const float& efficiency);
 
     /*!
      * Helper function to assume the correct matching category for the pattern recognition tracks
@@ -111,7 +113,7 @@ namespace Belle2 {
     {
       float efficiency = NAN;
       const RecoTrack* prRecoTrack = getRelatedPRRecoTrack(mcRecoTrack, efficiency);
-      return extractMCToPRMatchInfo(prRecoTrack, efficiency);
+      return extractMCToPRMatchInfo(mcRecoTrack, prRecoTrack, efficiency);
     }
 
     /*!

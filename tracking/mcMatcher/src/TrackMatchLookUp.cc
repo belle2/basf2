@@ -66,17 +66,22 @@ TrackMatchLookUp::getRelatedPRRecoTrack(const RecoTrack& mcRecoTrack, float& eff
 }
 
 TrackMatchLookUp::MCToPRMatchInfo
-TrackMatchLookUp::extractMCToPRMatchInfo(const RecoTrack* prRecoTrack, const float& efficiency)
+TrackMatchLookUp::extractMCToPRMatchInfo(const RecoTrack& mcRecoTrack,
+                                         const RecoTrack* prRecoTrack,
+                                         const float& efficiency)
 {
   if (not prRecoTrack) return MCToPRMatchInfo::c_Missing;
   if (std::isnan(efficiency)) return MCToPRMatchInfo::c_Invalid;
+  assert(isMCRecoTrack(mcRecoTrack));
   assert(isPRRecoTrack(*prRecoTrack));
 
-  bool efficiencySign = std::signbit(efficiency);
-  if (efficiencySign) {
-    return MCToPRMatchInfo::c_Merged;
-  } else {
+  const RecoTrack* roundTripMCRecoTrack =
+    prRecoTrack->getRelatedTo<RecoTrack>(m_mcTracksStoreArrayName);
+
+  if (roundTripMCRecoTrack == &mcRecoTrack) {
     return MCToPRMatchInfo::c_Matched;
+  } else {
+    return MCToPRMatchInfo::c_Merged;
   }
 }
 
@@ -171,7 +176,7 @@ const RecoTrack* TrackMatchLookUp::getMatchedPRRecoTrack(const RecoTrack& mcReco
   float efficiency = NAN;
   const RecoTrack* prRecoTrack = getRelatedPRRecoTrack(mcRecoTrack, efficiency);
 
-  if (extractMCToPRMatchInfo(prRecoTrack, efficiency) == MCToPRMatchInfo::c_Matched) {
+  if (extractMCToPRMatchInfo(mcRecoTrack, prRecoTrack, efficiency) == MCToPRMatchInfo::c_Matched) {
     return prRecoTrack;
   } else {
     return nullptr;

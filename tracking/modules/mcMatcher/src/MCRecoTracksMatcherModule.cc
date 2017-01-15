@@ -189,11 +189,6 @@ MCRecoTracksMatcherModule::MCRecoTracksMatcherModule()
      "compensate for false hits. Essentially this number is subtracted from the number "
      "of signal hits before calculating the purity.",
      5);*/
-
-  addParam("RelateClonesToMCParticles",
-           m_param_relateClonesToMCParticles,
-           "Indicates whether the mc matching to MCParticles should also govern clone tracks",
-           bool(true));
 }
 
 void MCRecoTracksMatcherModule::initialize()
@@ -588,10 +583,8 @@ void MCRecoTracksMatcherModule::event()
     B2DEBUG(100, "Purity rel: prId " << prId << " -> mcId " << mcId << " : " << -purity);
     B2DEBUG(100, "Stored PRTrack " << prId << " as clone.");
 
-    if (m_param_relateClonesToMCParticles) {
-      prRecoTrack->addRelationTo(mcParticle, -purity);
-      B2DEBUG(100, "MC Match prId " << prId << " to mcPartId " << mcParticle->getArrayIndex());
-    }
+    prRecoTrack->addRelationTo(mcParticle, -purity);
+    B2DEBUG(100, "MC Match prId " << prId << " to mcPartId " << mcParticle->getArrayIndex());
   } // end for prId
 
 

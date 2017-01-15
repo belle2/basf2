@@ -171,9 +171,6 @@ namespace Belle2 {
       compensate for false hits. Essentially this number is subtracted from the number
       of signal hits before calculating the purity. */
 
-    //! Parameter : Switch to create relations between MCParticles and clone pattern recognition tracks.
-    bool m_param_relateClonesToMCParticles;
-
   public: // Other variables
     //! Descriptive type defintion for a number of degrees of freedom.
     using NDF = int;

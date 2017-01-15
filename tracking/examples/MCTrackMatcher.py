@@ -126,7 +126,6 @@ mcTrackMatcherModule.param({
     'UsePXDHits': False,
     'mcRecoTracksStoreArrayName': 'MCRecoTracks',
     'MinimalPurity': 0.66,
-    'RelateClonesToMCParticles': True,
 })
 
 # ######## Create paths and add modules  ########

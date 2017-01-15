@@ -79,7 +79,7 @@ TrackMatchLookUp::extractMCToPRMatchInfo(const RecoTrack* prRecoTrack, const flo
 
 TrackMatchLookUp::PRToMCMatchInfo
 TrackMatchLookUp::extractPRToMCMatchInfo(const RecoTrack& prRecoTrack,
-                                         const RecoTrack* mcRecoTrack,
+                                         const RecoTrack* mcRecoTrack __attribute__((unused)),
                                          const float& purity __attribute__((unused)))
 {
   // The patter recognition track has no associated Monte Carlo track.
@@ -144,6 +144,8 @@ float TrackMatchLookUp::getRelatedEfficiency(const RecoTrack& mcRecoTrack)
 
 const RecoTrack* TrackMatchLookUp::getMatchedMCRecoTrack(const RecoTrack& prRecoTrack)
 {
+  assert(isPRRecoTrack(prRecoTrack));
+
   float purity = NAN;
   const RecoTrack* mcRecoTrack = getRelatedMCRecoTrack(prRecoTrack, purity);
 
@@ -156,6 +158,8 @@ const RecoTrack* TrackMatchLookUp::getMatchedMCRecoTrack(const RecoTrack& prReco
 
 const RecoTrack* TrackMatchLookUp::getMatchedPRRecoTrack(const RecoTrack& mcRecoTrack)
 {
+  assert(isMCRecoTrack(mcRecoTrack));
+
   float efficiency = NAN;
   const RecoTrack* prRecoTrack = getRelatedPRRecoTrack(mcRecoTrack, efficiency);
 
@@ -179,7 +183,12 @@ float TrackMatchLookUp::getMatchedPurity(const RecoTrack& recoTrack)
 
   } else {
     const RecoTrack& prRecoTrack = recoTrack;
-    return getRelatedPurity(prRecoTrack);
+    const RecoTrack* mcRecoTrack = getMatchedMCRecoTrack(prRecoTrack);
+    if (mcRecoTrack) {
+      return getRelatedPurity(prRecoTrack);
+    } else {
+      return NAN;
+    }
   }
 }
 
@@ -196,6 +205,11 @@ float TrackMatchLookUp::getMatchedEfficiency(const RecoTrack& recoTrack)
 
   } else {
     const RecoTrack& mcRecoTrack = recoTrack;
-    return getRelatedPurity(mcRecoTrack);
+    const RecoTrack* prRecoTrack = getMatchedPRRecoTrack(mcRecoTrack);
+    if (prRecoTrack) {
+      return getRelatedEfficiency(mcRecoTrack);
+    } else {
+      return NAN;
+    }
   }
 }

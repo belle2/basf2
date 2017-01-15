@@ -24,12 +24,10 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <cdc/dataobjects/CDCHit.h>
 
-#include <time.h>
 #include <map>
 
 #include <Eigen/Dense>
 
-using namespace std;
 using namespace Belle2;
 
 REG_MODULE(MCRecoTracksMatcher);
@@ -138,12 +136,12 @@ MCRecoTracksMatcherModule::MCRecoTracksMatcherModule()
   addParam("prRecoTracksStoreArrayName",
            m_param_prRecoTracksStoreArrayName,
            "Name of the collection containing the tracks as generate a patter recognition algorithm to be evaluated ",
-           string(""));
+           std::string(""));
 
   addParam("mcRecoTracksStoreArrayName",
            m_param_mcRecoTracksStoreArrayName,
            "Name of the collection containing the reference tracks as generate by a Monte-Carlo-Tracker (e.g. MCTrackFinder)",
-           string("MCGFTrackCands"));
+           std::string("MCGFTrackCands"));
 
   // Hit content to be evaluated
   addParam("UsePXDHits",
@@ -272,7 +270,7 @@ void MCRecoTracksMatcherModule::event()
   }
 
   // ### Build a detector_id hit_id to reco track map for easier lookup later ###
-  multimap< pair< DetId, HitId>, WeightedRecoTrackId > mcId_by_hitId;
+  std::multimap<DetHitIdPair, WeightedRecoTrackId > mcId_by_hitId;
   fillIDsFromStoreArray(mcId_by_hitId, mcRecoTracks);
 
   //  Use set instead of multimap to handel to following situation
@@ -280,13 +278,13 @@ void MCRecoTracksMatcherModule::event()
   //  * One hit assigned twice or more to the same track should not contribute to the purity multiple times
   //  The first part is handled well by the multimap. But to enforce that one hit is also only assigned
   //  once to a track we use a set.
-  set< pair< pair< DetId, HitId >, WeightedRecoTrackId> > prId_by_hitId;
+  std::set<std::pair<DetHitIdPair, WeightedRecoTrackId>> prId_by_hitId;
   fillIDsFromStoreArray(prId_by_hitId, prRecoTracks);
 
   // ### Get the number of relevant hits for each detector ###
   // Since we are mostly dealing with indices in this module, this is all we need from the StoreArray
   // Silently skip store arrays that are not present in reduced detector setups.
-  map<DetId, int> nHits_by_detId;
+  std::map<DetId, int> nHits_by_detId;
 
   // PXD
   if (m_param_usePXDHits) {
@@ -335,14 +333,14 @@ void MCRecoTracksMatcherModule::event()
 
   // for each detector examine every hit to which mcRecoTrack and prRecoTrack it belongs
   // if the hit is not part of any mcRecoTrack put the hit in the background column.
-  for (const pair<const DetId, NDF>& detId_nHits_pair : nHits_by_detId) {
+  for (const std::pair<const DetId, NDF>& detId_nHits_pair : nHits_by_detId) {
 
     DetId detId = detId_nHits_pair.first;
     int nHits = detId_nHits_pair.second;
     NDF ndfForOneHit = m_ndf_by_detId[detId];
 
     for (HitId hitId = 0; hitId < nHits; ++hitId) {
-      pair<DetId, HitId> detId_hitId_pair(detId, hitId);
+      DetHitIdPair detId_hitId_pair(detId, hitId);
 
       if (m_param_useOnlyAxialCDCHits and detId == Const::CDC) {
         StoreArray<CDCHit> cdcHits;
@@ -359,10 +357,10 @@ void MCRecoTracksMatcherModule::event()
 
       // Seek all pattern recognition tracks with the given hit
       const auto prIds_for_detId_hitId_pair =
-        as_range(equal_range(prId_by_hitId.begin(),
-                             prId_by_hitId.end(),
-                             detId_hitId_pair,
-                             CompDetHitIdPair()));
+        as_range(std::equal_range(prId_by_hitId.begin(),
+                                  prId_by_hitId.end(),
+                                  detId_hitId_pair,
+                                  CompDetHitIdPair()));
 
       // Assign the hits/ndf to the total ndf vector seperatly separately to avoid double counting,
       // if patter recognition track share hits.
@@ -409,14 +407,13 @@ void MCRecoTracksMatcherModule::event()
     } // end for hitId
   } // end for detId
 
-  B2DEBUG(200, "Confusion matrix of the event : " << endl <<  confusionMatrix);
-  B2DEBUG(200, "Weighted confusion matrix of the event : " << endl <<  weightedConfusionMatrix);
+  B2DEBUG(200, "Confusion matrix of the event : " << std::endl <<  confusionMatrix);
+  B2DEBUG(200, "Weighted confusion matrix of the event : " << std::endl <<  weightedConfusionMatrix);
 
-  B2DEBUG(200, "totalNDF_by_mcId : " << endl << totalNDF_by_mcId);
-  B2DEBUG(200, "totalWeight_by_mcId : " << endl << totalWeight_by_mcId);
+  B2DEBUG(200, "totalNDF_by_mcId : " << std::endl << totalNDF_by_mcId);
+  B2DEBUG(200, "totalWeight_by_mcId : " << std::endl << totalWeight_by_mcId);
 
-  B2DEBUG(200, "totalNDF_by_prId : " << endl << totalNDF_by_prId);
-
+  B2DEBUG(200, "totalNDF_by_prId : " << std::endl << totalNDF_by_prId);
 
   Eigen::ArrayXXd purityMatrix = confusionMatrix.colwise() / totalNDF_by_prId.array();
   Eigen::ArrayXXd efficiencyMatrix = confusionMatrix.rowwise() / totalNDF_by_mcId.array();

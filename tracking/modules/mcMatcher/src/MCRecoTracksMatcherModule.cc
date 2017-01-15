@@ -428,7 +428,6 @@ void MCRecoTracksMatcherModule::event()
   Eigen::ArrayXXd weightedEfficiencyMatrix = weightedConfusionMatrix.rowwise() / totalWeight_by_mcId.array();
 
   // ### Building the Monte-Carlo track to highest efficiency patter recognition track relation ###
-
   // Weighted efficiency
   using Efficiency = float;
   struct MostWeightEfficientPRId {
@@ -510,109 +509,90 @@ void MCRecoTracksMatcherModule::event()
   // ### Classify the patter recognition tracks ###
   // Means saving the highest purity relation to the data store
   // + setup the PRTrack to MCParticle relation
-  // + save the McTrackId property
+  // + save the set the MatchingStatus
   for (RecoTrackId prId = 0; prId < nPRRecoTracks; ++prId) {
     RecoTrack* prRecoTrack = prRecoTracks[prId];
 
-    const MostPureMCId& mostPureMCId =
-      mostPureMCId_by_prId[prId];
+    const MostPureMCId& mostPureMCId = mostPureMCId_by_prId[prId];
 
     const RecoTrackId& mcId = mostPureMCId.id;
     const Purity& purity = mostPureMCId.purity;
 
+    // GHOST
     if (not(purity > 0) or not(purity >= m_param_minimalPurity)) {
-      // GHOST
       prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_ghost);
-      B2DEBUG(100, "Stored PRTrack " << prId << " as ghost.");
 
-    } else if (mcId == mcBkgId) {
-      // BACKGROUND
-      prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_background);
-      B2DEBUG(100, "Stored PRTrack " << prId << " as background because of too low purity.");
-    } else {
-
-      // after the classification for bad purity and background we examine, whether
-      // the highest purity Monte-Carlo track has in turn the highest efficiency patter recognition track
-      // equal to this track.
-      // All extra patter recognition tracks are stored with negativelly signed purity
-
-      RecoTrack* mcRecoTrack = mcRecoTracks[mcId];
-
-      const MostWeightEfficientPRId& mostWeightEfficientPRId_for_mcId =
-        mostWeightEfficientPRId_by_mcId[mcId];
-
-      const RecoTrackId& mostWeightEfficientPRId = mostWeightEfficientPRId_for_mcId.id;
-      const Efficiency& weightedEfficiency = mostWeightEfficientPRId_for_mcId.weightedEfficiency;
-
-      if (prId != mostWeightEfficientPRId) {
-        if (weightedEfficiency >= m_param_minimalEfficiency) {
-
-          // CLONE
-          if (m_param_relateClonesToMCParticles) {
-
-            // Set the McTrackId to the related MCParticle
-            prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_clone);
-            B2DEBUG(100, "Stored PRTrack " << prId << " as matched, although it is a "
-                    "clone (because the module "
-                    "parameter is set).");
-
-            // Add the mc matching relation
-            MCParticle* mcParticle = mcRecoTrack->getRelated<MCParticle>();
-            B2ASSERT("No relation from MCRecoTrack to MCParticle.", mcParticle);
-            prRecoTrack->addRelationTo(mcParticle, -purity);
-            B2DEBUG(100, "MC Match prId " << prId << " to mcPartId " << mcParticle->getArrayIndex());
-
-
-          } else {
-
-            prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_clone);
-            B2DEBUG(100, "Stored PRTrack " << prId << " as clone.");
-
-          }
-          // Setup the relation with negative purity for this case
-          prRecoTrack->addRelationTo(mcRecoTrack, -purity);
-          B2DEBUG(100, "Purity rel: prId " << prId << " -> mcId " << mcId << " : " << -purity);
-
-        } else {
-          // Pattern recognition track fails the minimal efficiency requirement to be matched
-          // We might want to introduce a different classification here, if we see problems
-          // with too many ghosts and want to investigate the specific source of the mismatch
-
-          // GHOST
-          prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_ghost);
-          B2DEBUG(100, "Stored PRTrack " << prId << " as ghost because of too low efficiency.");
-
-        }
-
-      } else {
-        // MATCHED
-
-        // Set the McTrackId to the related MCParticle
-        prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_matched);
-        B2DEBUG(100, "Stored PRTrack " << prId << " as matched.");
-
-        // Add the mc matching relation
-        MCParticle* mcParticle = mcRecoTrack->getRelated<MCParticle>();
-        B2ASSERT("No relation from MCRecoTrack to MCParticle.", mcParticle);
-        prRecoTrack->addRelationTo(mcParticle, purity);
-        B2DEBUG(100, "MC Match prId " << prId << " to mcPartId " <<  mcParticle->getArrayIndex());
-
-        // Setup the relation with positive purity for this case
-        prRecoTrack->addRelationTo(mcRecoTrack, purity);
-        B2DEBUG(100, "Purity rel: prId " << prId << " -> mcId " << mcId << " : " << purity);
-
-
-      }
+      B2DEBUG(100, "Stored PRTrack " << prId << " as ghost because of too low purity");
+      continue;
     }
 
-  }
+    // BACKGROUND
+    if (mcId == mcBkgId) {
+      prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_background);
 
+      B2DEBUG(100, "Stored PRTrack " << prId << " as background because of too low purity.");
+      continue;
+    }
 
+    // After the classification for bad purity and background we examine,
+    // whether the highest purity Monte-Carlo track has in turn the highest efficiency
+    // patter recognition track equal to this track.
+    // All extra patter recognition tracks are marked as clones.
 
+    RecoTrack* mcRecoTrack = mcRecoTracks[mcId];
+    MCParticle* mcParticle = mcRecoTrack->getRelated<MCParticle>();
+    B2ASSERT("No relation from MCRecoTrack to MCParticle.", mcParticle);
 
+    const MostWeightEfficientPRId& mostWeightEfficientPRId_for_mcId =
+      mostWeightEfficientPRId_by_mcId[mcId];
 
+    const RecoTrackId& mostWeightEfficientPRId = mostWeightEfficientPRId_for_mcId.id;
+    const Efficiency& weightedEfficiency = mostWeightEfficientPRId_for_mcId.weightedEfficiency;
+    // const Efficiency& efficiency = mostWeightEfficientPRId_for_mcId.efficiency;
 
+    // Note : The matched category may also contain higher order clones recognisable by their low
+    // absolute efficiency
 
+    // MATCHED
+    if (prId == mostWeightEfficientPRId) {
+      // Setup the relation purity relation
+      prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_matched);
+      prRecoTrack->addRelationTo(mcRecoTrack, purity);
+
+      // Add the mc matching relation
+      prRecoTrack->addRelationTo(mcParticle, purity);
+
+      B2DEBUG(100, "Stored PRTrack " << prId << " as matched.");
+      B2DEBUG(100, "MC Match prId " << prId << " to mcPartId " << mcParticle->getArrayIndex());
+      B2DEBUG(100, "Purity rel: prId " << prId << " -> mcId " << mcId << " : " << purity);
+      continue;
+    }
+
+    // GHOST
+    // Pattern recognition track fails the minimal efficiency requirement to be matched.
+    // We might want to introduce a different classification here, if we see problems
+    // with too many ghosts and want to investigate the specific source of the mismatch.
+    if (not(weightedEfficiency >= m_param_minimalEfficiency)) {
+      prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_ghost);
+      B2DEBUG(100, "Stored PRTrack " << prId << " as ghost because of too low efficiency.");
+      continue;
+    }
+
+    // Final category
+    // CLONE
+    // Setup the relation purity relation
+    prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_clone);
+    prRecoTrack->addRelationTo(mcRecoTrack, -purity);
+
+    // Add the mc matching relation to the mc particle
+    B2DEBUG(100, "Purity rel: prId " << prId << " -> mcId " << mcId << " : " << -purity);
+    B2DEBUG(100, "Stored PRTrack " << prId << " as clone.");
+
+    if (m_param_relateClonesToMCParticles) {
+      prRecoTrack->addRelationTo(mcParticle, -purity);
+      B2DEBUG(100, "MC Match prId " << prId << " to mcPartId " << mcParticle->getArrayIndex());
+    }
+  } // end for prId
 
 
 

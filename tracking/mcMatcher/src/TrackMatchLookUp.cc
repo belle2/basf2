@@ -38,8 +38,9 @@ bool TrackMatchLookUp::isPRRecoTrack(const RecoTrack& recoTrack)
 const RecoTrack*
 TrackMatchLookUp::getRelatedMCRecoTrack(const RecoTrack& prRecoTrack, float& purity)
 {
+  assert(isPRRecoTrack(prRecoTrack));
   std::pair<RecoTrack*, double> mcRecoTrackAndWeight =
-    prRecoTrack.getRelatedWithWeight<RecoTrack>(getMCTracksStoreArrayName());
+    prRecoTrack.getRelatedToWithWeight<RecoTrack>(getMCTracksStoreArrayName());
   const RecoTrack* mcRecoTrack = mcRecoTrackAndWeight.first;
   if (mcRecoTrack) {
     purity = mcRecoTrackAndWeight.second;
@@ -52,8 +53,9 @@ TrackMatchLookUp::getRelatedMCRecoTrack(const RecoTrack& prRecoTrack, float& pur
 const RecoTrack*
 TrackMatchLookUp::getRelatedPRRecoTrack(const RecoTrack& mcRecoTrack, float& efficiency)
 {
+  assert(isMCRecoTrack(mcRecoTrack));
   std::pair<RecoTrack*, double> prRecoTrackAndWeight =
-    mcRecoTrack.getRelatedWithWeight<RecoTrack>(getPRTracksStoreArrayName());
+    mcRecoTrack.getRelatedToWithWeight<RecoTrack>(getPRTracksStoreArrayName());
   const RecoTrack* prRecoTrack = prRecoTrackAndWeight.first;
   if (prRecoTrack) {
     efficiency = prRecoTrackAndWeight.second;
@@ -68,6 +70,7 @@ TrackMatchLookUp::extractMCToPRMatchInfo(const RecoTrack* prRecoTrack, const flo
 {
   if (not prRecoTrack) return MCToPRMatchInfo::c_Missing;
   if (std::isnan(efficiency)) return MCToPRMatchInfo::c_Invalid;
+  assert(isPRRecoTrack(*prRecoTrack));
 
   bool efficiencySign = std::signbit(efficiency);
   if (efficiencySign) {
@@ -79,12 +82,10 @@ TrackMatchLookUp::extractMCToPRMatchInfo(const RecoTrack* prRecoTrack, const flo
 
 TrackMatchLookUp::PRToMCMatchInfo
 TrackMatchLookUp::extractPRToMCMatchInfo(const RecoTrack& prRecoTrack,
-                                         const RecoTrack* mcRecoTrack __attribute__((unused)),
+                                         const RecoTrack* mcRecoTrack,
                                          const float& purity __attribute__((unused)))
 {
-  // The patter recognition track has no associated Monte Carlo track.
-  // Figure out of it is a clone or a match by the McTrackId property assigned to the track.
-  // That is also why we need the pattern recogntion track in this method as well.
+  assert(isPRRecoTrack(prRecoTrack));
   const RecoTrack::MatchingStatus matchingStatus = prRecoTrack.getMatchingStatus();
 
   if (matchingStatus == RecoTrack::MatchingStatus::c_ghost) {
@@ -92,8 +93,10 @@ TrackMatchLookUp::extractPRToMCMatchInfo(const RecoTrack& prRecoTrack,
   } else if (matchingStatus == RecoTrack::MatchingStatus::c_background) {
     return PRToMCMatchInfo::c_Background;
   } else if (matchingStatus == RecoTrack::MatchingStatus::c_clone) {
+    if (not mcRecoTrack) B2WARNING("Clone with no related Monte Carlo RecoTrack");
     return PRToMCMatchInfo::c_Clone;
   } else if (matchingStatus == RecoTrack::MatchingStatus::c_matched) {
+    if (not mcRecoTrack) B2WARNING("Match with no related Monte Carlo RecoTrack");
     return PRToMCMatchInfo::c_Matched;
   } else if (matchingStatus == RecoTrack::MatchingStatus::c_undefined) {
     return PRToMCMatchInfo::c_Invalid;
@@ -101,20 +104,22 @@ TrackMatchLookUp::extractPRToMCMatchInfo(const RecoTrack& prRecoTrack,
   return PRToMCMatchInfo::c_Invalid;
 }
 
-const MCParticle* TrackMatchLookUp::getRelatedMCParticle(const RecoTrack& prRecoTrack)
+const MCParticle* TrackMatchLookUp::getRelatedMCParticle(const RecoTrack& recoTrack)
 {
-  return prRecoTrack.getRelated<MCParticle>();
+  return recoTrack.getRelatedTo<MCParticle>();
 }
 
 const RecoTrack* TrackMatchLookUp::getRelatedMCRecoTrack(const RecoTrack& prRecoTrack)
 {
-  return prRecoTrack.getRelated<RecoTrack>(getMCTracksStoreArrayName());
+  assert(isPRRecoTrack(prRecoTrack));
+  return prRecoTrack.getRelatedTo<RecoTrack>(getMCTracksStoreArrayName());
 }
 
 const TrackFitResult* TrackMatchLookUp::getRelatedTrackFitResult(const RecoTrack& prRecoTrack,
     Const::ChargedStable chargedStable)
 {
-  Belle2::Track* b2track = prRecoTrack.getRelated<Belle2::Track>();
+  assert(isPRRecoTrack(prRecoTrack));
+  Belle2::Track* b2track = prRecoTrack.getRelatedFrom<Belle2::Track>();
   if (b2track) {
     // Query the Belle2::Track for the selected fit hypothesis
     return b2track->getTrackFitResult(chargedStable);
@@ -125,11 +130,13 @@ const TrackFitResult* TrackMatchLookUp::getRelatedTrackFitResult(const RecoTrack
 
 const RecoTrack* TrackMatchLookUp::getRelatedPRRecoTrack(const RecoTrack& mcRecoTrack)
 {
-  return mcRecoTrack.getRelated<RecoTrack>(getPRTracksStoreArrayName());
+  assert(isMCRecoTrack(mcRecoTrack));
+  return mcRecoTrack.getRelatedTo<RecoTrack>(getPRTracksStoreArrayName());
 }
 
 float TrackMatchLookUp::getRelatedPurity(const RecoTrack& prRecoTrack)
 {
+  assert(isPRRecoTrack(prRecoTrack));
   float purity = NAN;
   getRelatedMCRecoTrack(prRecoTrack, purity);
   return std::fabs(purity);
@@ -137,6 +144,7 @@ float TrackMatchLookUp::getRelatedPurity(const RecoTrack& prRecoTrack)
 
 float TrackMatchLookUp::getRelatedEfficiency(const RecoTrack& mcRecoTrack)
 {
+  assert(isMCRecoTrack(mcRecoTrack));
   float efficiency = NAN;
   getRelatedPRRecoTrack(mcRecoTrack, efficiency);
   return std::fabs(efficiency);

@@ -177,16 +177,6 @@ MCRecoTracksMatcherModule::MCRecoTracksMatcherModule()
            "This number encodes which fraction of the true hits must at least be in the reconstructed track. "
            "The default 0.05 suggests that at least 20% of the true hits should have been picked up.",
            0.05);
-
-  // PRTracks purity minimal constrains
-  /* addParam("MinimalExcessNDF",
-     m_param_minimalExcessNdf,
-     "Minimum number of correct of degrees of freedom in the PRtrack. 2D hits count as 2. "
-     "The number can be given to insure that a minimum of correct degress of freedom "
-     "is in the track for the fit as well as the rest of the correct hits is able to "
-     "compensate for false hits. Essentially this number is subtracted from the number "
-     "of signal hits before calculating the purity.",
-     5);*/
 }
 
 void MCRecoTracksMatcherModule::initialize()

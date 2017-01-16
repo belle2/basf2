@@ -164,13 +164,6 @@ namespace Belle2 {
      */
     double m_param_minimalEfficiency;
 
-    /*int m_param_minimalExcessNdf; <
-      Minimum number of degrees of freedom in the PRtrack. 2D hits count as 2.
-      The number can be given to insure that a minimum of correct degress of freedom
-      is in the track for the fit as well as the rest of the correct hits is able to
-      compensate for false hits. Essentially this number is subtracted from the number
-      of signal hits before calculating the purity. */
-
   public: // Other variables
     //! Descriptive type defintion for a number of degrees of freedom.
     using NDF = int;

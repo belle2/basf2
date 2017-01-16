@@ -55,6 +55,7 @@ class Histograms(object):
         @param bins use given bins instead of default 100
         """
         isfinite = numpy.isfinite(data[column])
+        bins = numpy.percentile(data[column][isfinite], q=range(bins + 1))
         self.hist, self.bins = numpy.histogram(data[column][isfinite], bins=bins,
                                                weights=None if weight_column is None else data[weight_column])
         self.bin_centers = (self.bins + numpy.roll(self.bins, 1))[1:] / 2.0

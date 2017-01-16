@@ -33,12 +33,16 @@ RecoTrackCreatorModule::RecoTrackCreatorModule() :
   addParam("recreateSortingParameters", m_param_recreateSortingParameters,
            "Flag to recreate the sorting parameters of the hit out of the stored order.", m_param_recreateSortingParameters);
 
-  addParam("cdcHitsStoreArrayName", m_param_cdcHitsStoreArrayName, "StoreArray name of the input cdc hits.",
-           m_param_cdcHitsStoreArrayName);
-  addParam("pxdHitsStoreArrayName", m_param_pxdHitsStoreArrayName, "StoreArray name of the input pxd hits.",
+  addParam("pxdHitsStoreArrayName", m_param_pxdHitsStoreArrayName, "StoreArray name of the input PXD hits.",
            m_param_pxdHitsStoreArrayName);
-  addParam("svdHitsStoreArrayName", m_param_svdHitsStoreArrayName, "StoreArray name of the input svd hits.",
+  addParam("svdHitsStoreArrayName", m_param_svdHitsStoreArrayName, "StoreArray name of the input SVD hits.",
            m_param_svdHitsStoreArrayName);
+  addParam("cdcHitsStoreArrayName", m_param_cdcHitsStoreArrayName, "StoreArray name of the input CDC hits.",
+           m_param_cdcHitsStoreArrayName);
+  addParam("bklmHitsStoreArrayName", m_param_bklmHitsStoreArrayName, "StoreArray name of the input BKLM hits.",
+           m_param_bklmHitsStoreArrayName);
+  addParam("eklmHitsStoreArrayName", m_param_eklmHitsStoreArrayName, "StoreArray name of the input EKLM hits.",
+           m_param_eklmHitsStoreArrayName);
 }
 
 void RecoTrackCreatorModule::initialize()
@@ -58,28 +62,13 @@ void RecoTrackCreatorModule::initialize()
     recoTracks.registerRelationTo(mcParticles);
   }
 
-  StoreArray<RecoHitInformation> recoHitInformations(m_param_recoHitInformationStoreArrayName);
-  recoHitInformations.registerInDataStore();
-
-  StoreArray<RecoHitInformation::UsedCDCHit> cdcHits(m_param_cdcHitsStoreArrayName);
-  if (cdcHits.isOptional()) {
-    cdcHits.registerRelationTo(recoTracks);
-    recoHitInformations.registerRelationTo(cdcHits);
-  }
-
-  StoreArray<RecoHitInformation::UsedSVDHit> svdHits(m_param_svdHitsStoreArrayName);
-  if (svdHits.isOptional()) {
-    svdHits.registerRelationTo(recoTracks);
-    recoHitInformations.registerRelationTo(svdHits);
-  }
-
-  StoreArray<RecoHitInformation::UsedPXDHit> pxdHits(m_param_pxdHitsStoreArrayName);
-  if (pxdHits.isOptional()) {
-    pxdHits.registerRelationTo(recoTracks);
-    recoHitInformations.registerRelationTo(pxdHits);
-  }
-
-  recoTracks.registerRelationTo(recoHitInformations);
+  RecoTrack::registerRequiredRelations(recoTracks,
+                                       m_param_pxdHitsStoreArrayName,
+                                       m_param_svdHitsStoreArrayName,
+                                       m_param_cdcHitsStoreArrayName,
+                                       m_param_bklmHitsStoreArrayName,
+                                       m_param_eklmHitsStoreArrayName,
+                                       m_param_recoHitInformationStoreArrayName);
 }
 
 void RecoTrackCreatorModule::event()

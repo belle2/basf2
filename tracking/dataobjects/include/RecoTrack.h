@@ -121,9 +121,9 @@ namespace Belle2 {
      */
     static void registerRequiredRelations(
       StoreArray<RecoTrack>& recoTracks,
-      std::string cdcHitsStoreArrayName = "",
-      std::string svdHitsStoreArrayName = "",
       std::string pxdHitsStoreArrayName = "",
+      std::string svdHitsStoreArrayName = "",
+      std::string cdcHitsStoreArrayName = "",
       std::string bklmHitsStoreArrayName = "",
       std::string eklmHitsStoreArrayName = "",
       std::string recoHitInformationStoreArrayName = "")

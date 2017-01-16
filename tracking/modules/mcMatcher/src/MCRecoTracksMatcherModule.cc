@@ -319,12 +319,12 @@ void MCRecoTracksMatcherModule::event()
   Eigen::ArrayXXd confusionMatrix = Eigen::ArrayXXd::Zero(nPRRecoTracks, nMCRecoTracks + 1);
   Eigen::ArrayXXd weightedConfusionMatrix = Eigen::ArrayXXd::Zero(nPRRecoTracks, nMCRecoTracks + 1);
 
-  // Accumulated the total number of hits/ndf for each Monte-Carlo track seperatly to avoid double counting,
+  // Accumulated the total number of hits/ndf for each Monte-Carlo track separately to avoid double counting,
   // in case patter recognition tracks share hits.
   Eigen::RowVectorXd totalNDF_by_mcId = Eigen::RowVectorXd::Zero(nMCRecoTracks + 1);
   Eigen::RowVectorXd totalWeight_by_mcId = Eigen::RowVectorXd::Zero(nMCRecoTracks + 1);
 
-  // Accumulated the total number of hits/ndf for each pattern recognition track seperatly to avoid double counting,
+  // Accumulated the total number of hits/ndf for each pattern recognition track separately to avoid double counting,
   // in case Monte-Carlo tracks share hits.
   Eigen::VectorXd totalNDF_by_prId = Eigen::VectorXd::Zero(nPRRecoTracks);
 
@@ -362,7 +362,7 @@ void MCRecoTracksMatcherModule::event()
                                   detId_hitId_pair,
                                   CompDetHitIdPair()));
 
-      // Assign the hits/ndf to the total ndf vector seperatly separately to avoid double counting,
+      // Assign the hits/ndf to the total ndf vector separately to avoid double counting,
       // if patter recognition track share hits.
       if (mcIds_for_detId_hitId_pair.empty()) {
         // If the hit is not assigned to any mcRecoTrack
@@ -380,7 +380,7 @@ void MCRecoTracksMatcherModule::event()
         }
       }
 
-      // Assign the hits/ndf to the total ndf vector seperatly here to avoid double counting,
+      // Assign the hits/ndf to the total ndf vector separately here to avoid double counting,
       // if Monte-Carlo track share hits.
       for (const auto& detId_hitId_pair_and_prId : prIds_for_detId_hitId_pair) {
         RecoTrackId prId = detId_hitId_pair_and_prId.second;

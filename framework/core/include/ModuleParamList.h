@@ -145,7 +145,7 @@ namespace Belle2 {
     template<typename T>
     ModuleParam<T>& getParameter(const std::string& name) const;
 
-    /* Returns list of unset parameters (if they are required to have a value. */
+    /** Returns list of unset parameters (if they are required to have a value. */
     std::vector<std::string> getUnsetForcedParams() const;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

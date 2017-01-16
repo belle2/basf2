@@ -316,8 +316,8 @@ void MCRecoTracksMatcherModule::event()
 
   // Reserve enough space for the confusion matrix
   // The last row is meant for hits not assigned to a mcRecoTrack (aka background hits)
-  Eigen::ArrayXXd confusionMatrix = Eigen::ArrayXXd::Zero(nPRRecoTracks, nMCRecoTracks + 1);
-  Eigen::ArrayXXd weightedConfusionMatrix = Eigen::ArrayXXd::Zero(nPRRecoTracks, nMCRecoTracks + 1);
+  Eigen::MatrixXd confusionMatrix = Eigen::MatrixXd::Zero(nPRRecoTracks, nMCRecoTracks + 1);
+  Eigen::MatrixXd weightedConfusionMatrix = Eigen::MatrixXd::Zero(nPRRecoTracks, nMCRecoTracks + 1);
 
   // Accumulated the total number of hits/ndf for each Monte-Carlo track separately to avoid double counting,
   // in case patter recognition tracks share hits.
@@ -415,9 +415,9 @@ void MCRecoTracksMatcherModule::event()
 
   B2DEBUG(200, "totalNDF_by_prId : " << std::endl << totalNDF_by_prId);
 
-  Eigen::ArrayXXd purityMatrix = confusionMatrix.colwise() / totalNDF_by_prId.array();
-  Eigen::ArrayXXd efficiencyMatrix = confusionMatrix.rowwise() / totalNDF_by_mcId.array();
-  Eigen::ArrayXXd weightedEfficiencyMatrix = weightedConfusionMatrix.rowwise() / totalWeight_by_mcId.array();
+  Eigen::MatrixXd purityMatrix = confusionMatrix.array().colwise() / totalNDF_by_prId.array();
+  Eigen::MatrixXd efficiencyMatrix = confusionMatrix.array().rowwise() / totalNDF_by_mcId.array();
+  Eigen::MatrixXd weightedEfficiencyMatrix = weightedConfusionMatrix.array().rowwise() / totalWeight_by_mcId.array();
 
   // ### Building the Monte-Carlo track to highest efficiency patter recognition track relation ###
   // Weighted efficiency

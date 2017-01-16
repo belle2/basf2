@@ -1,9 +1,6 @@
 #include <tracking/trackFindingCDC/collectors/adders/SegmentTrackAdder.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-
-#include <utility>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

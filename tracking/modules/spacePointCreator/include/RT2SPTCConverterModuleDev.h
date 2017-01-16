@@ -88,6 +88,7 @@ namespace Belle2 {
     bool m_useTrueHits; /**< If true the method getSpacePointsFromSVDClustersViaTrueHits is utilized. Requires TrueHits to be present and to have relations to SpacePoints! */
     bool m_skipProblematicCluster; /**< If true problematic clusters are ignored. If false the conversion of a RecoTrack containing such a cluster is aborted */
     bool m_useSingleClusterSP; /**< If true use single cluster SpacePoint collection as fallback */
+    bool m_markRecoTracks; /**< If True RecoTracks where conversion problems occurred are marked dirty */
 
     // state variables
 

@@ -9,9 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/vxdCaTracking/SharedFunctions.h> // e.g. PositionInfo
-#include <tracking/vxdCaTracking/TrackletFilters.h>
-
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 

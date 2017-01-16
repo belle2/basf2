@@ -17,7 +17,7 @@
 #include <tracking/trackFindingCDC/collectors/selectors/FilterSelector.h>
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackFilterFactory.h>
 #include <tracking/trackFindingCDC/collectors/selectors/SegmentTrackBestMatchSelector.h>
-#include <tracking/trackFindingCDC/collectors/adders/SegmentTrackAdder.h>
+#include <tracking/trackFindingCDC/findlets/minimal/SegmentTrackAdderWithNormalization.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
@@ -81,7 +81,7 @@ namespace Belle2 {
       SegmentTrackBestMatchSelector m_bestMatchSelector;
 
       /// Add the matched segments to tracks
-      SegmentTrackAdder m_segmentTrackAdder;
+      SegmentTrackAdderWithNormalization m_segmentTrackAdderWithNormalization;
 
       /// Findlet to filter out fake tracks
       TrackRejecter m_trackRejecter;

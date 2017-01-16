@@ -190,5 +190,14 @@ namespace Belle2 {
       }
       return result;
     }
+
+    /**
+     * Shortcut for applying the std::any_of function.
+     */
+    template <class Ts, class AUnaryPredicate>
+    bool any(const Ts& ts, const AUnaryPredicate& comparator)
+    {
+      return std::any_of(std::begin(ts), std::end(ts), comparator);
+    }
   }
 }

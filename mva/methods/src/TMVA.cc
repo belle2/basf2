@@ -179,6 +179,7 @@ namespace Belle2 {
     {
 
       unsigned int numberOfFeatures = training_data.getNumberOfFeatures();
+      unsigned int numberOfSpectators = training_data.getNumberOfSpectators();
       unsigned int numberOfEvents = training_data.getNumberOfEvents();
 
       WorkingDirectoryManager dummy(specific_options.m_workingDirectory);
@@ -197,6 +198,11 @@ namespace Belle2 {
         factory.AddVariable(Belle2::makeROOTCompatible(var));
       }
 
+      // Add variables to the factory
+      for (auto& var : m_general_options.m_spectators) {
+        factory.AddSpectator(Belle2::makeROOTCompatible(var));
+      }
+
       factory.SetWeightExpression(Belle2::makeROOTCompatible(m_general_options.m_weight_variable));
 
       TTree* signal_tree = new TTree("signal_tree", "signal_tree");
@@ -207,6 +213,13 @@ namespace Belle2 {
                             &training_data.m_input[iFeature]);
         background_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]).c_str(),
                                 &training_data.m_input[iFeature]);
+      }
+
+      for (unsigned int iSpectator = 0; iSpectator < numberOfSpectators; ++iSpectator) {
+        signal_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_spectators[iSpectator]).c_str(),
+                            &training_data.m_spectators[iSpectator]);
+        background_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_spectators[iSpectator]).c_str(),
+                                &training_data.m_spectators[iSpectator]);
       }
 
       signal_tree->Branch("__weight__", &training_data.m_weight);
@@ -243,6 +256,7 @@ namespace Belle2 {
     {
 
       unsigned int numberOfFeatures = training_data.getNumberOfFeatures();
+      unsigned int numberOfSpectators = training_data.getNumberOfSpectators();
       unsigned int numberOfEvents = training_data.getNumberOfEvents();
 
       WorkingDirectoryManager dummy(specific_options.m_workingDirectory);
@@ -260,6 +274,9 @@ namespace Belle2 {
       for (auto& var : m_general_options.m_variables) {
         factory.AddVariable(Belle2::makeROOTCompatible(var));
       }
+      for (auto& var : m_general_options.m_spectators) {
+        factory.AddSpectator(Belle2::makeROOTCompatible(var));
+      }
       factory.AddTarget(Belle2::makeROOTCompatible(m_general_options.m_target_variable));
 
 
@@ -268,6 +285,10 @@ namespace Belle2 {
       for (unsigned int iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
         regression_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]).c_str(),
                                 &training_data.m_input[iFeature]);
+      }
+      for (unsigned int iSpectator = 0; iSpectator < numberOfSpectators; ++iSpectator) {
+        regression_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_spectators[iSpectator]).c_str(),
+                                &training_data.m_spectators[iSpectator]);
       }
       regression_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_target_variable).c_str(),
                               &training_data.m_target);

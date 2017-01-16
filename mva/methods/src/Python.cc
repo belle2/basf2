@@ -178,6 +178,7 @@ namespace Belle2 {
       }
 
       uint64_t numberOfFeatures = training_data.getNumberOfFeatures();
+      uint64_t numberOfSpectators = training_data.getNumberOfSpectators();
       uint64_t numberOfEvents = training_data.getNumberOfEvents();
 
       uint64_t batch_size = m_specific_options.m_mini_batch_size;
@@ -199,16 +200,20 @@ namespace Belle2 {
       }
 
       auto X = std::unique_ptr<float[]>(new float[training_batch_size * numberOfFeatures]);
+      auto S = std::unique_ptr<float[]>(new float[training_batch_size * numberOfSpectators]);
       auto y = std::unique_ptr<float[]>(new float[training_batch_size]);
       auto w = std::unique_ptr<float[]>(new float[training_batch_size]);
       npy_intp dimensions_X[2] = {static_cast<npy_intp>(training_batch_size), static_cast<npy_intp>(numberOfFeatures)};
+      npy_intp dimensions_S[2] = {static_cast<npy_intp>(training_batch_size), static_cast<npy_intp>(numberOfSpectators)};
       npy_intp dimensions_y[1] = {static_cast<npy_intp>(training_batch_size)};
       npy_intp dimensions_w[1] = {static_cast<npy_intp>(training_batch_size)};
 
       auto X_v = std::unique_ptr<float[]>(new float[validation_batch_size * numberOfFeatures]);
+      auto S_v = std::unique_ptr<float[]>(new float[validation_batch_size * numberOfSpectators]);
       auto y_v = std::unique_ptr<float[]>(new float[validation_batch_size]);
       auto w_v = std::unique_ptr<float[]>(new float[validation_batch_size]);
       npy_intp dimensions_X_v[2] = {static_cast<npy_intp>(validation_batch_size), static_cast<npy_intp>(numberOfFeatures)};
+      npy_intp dimensions_S_v[2] = {static_cast<npy_intp>(validation_batch_size), static_cast<npy_intp>(numberOfSpectators)};
       npy_intp dimensions_y_v[1] = {static_cast<npy_intp>(validation_batch_size)};
       npy_intp dimensions_w_v[1] = {static_cast<npy_intp>(validation_batch_size)};
 
@@ -220,7 +225,8 @@ namespace Belle2 {
         auto module = boost::python::import(steering_path.stem().c_str());
         auto framework = boost::python::import((std::string("basf2_mva_python_interface.") + m_specific_options.m_framework).c_str());
 
-        auto model = get_attr_from_module_else_fallback_to_framework("get_model", module, framework)(numberOfFeatures, numberOfEvents,
+        auto model = get_attr_from_module_else_fallback_to_framework("get_model", module, framework)(numberOfFeatures, numberOfSpectators,
+                     numberOfEvents,
                      m_specific_options.m_training_fraction, parameters);
         auto state = get_attr_from_module_else_fallback_to_framework("begin_fit", module, framework)(model);
 
@@ -249,6 +255,8 @@ namespace Belle2 {
               training_data.loadEvent(training_indices[iEvent + iBatch * training_batch_size]);
               for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
                 X[iEvent * numberOfFeatures + iFeature] = training_data.m_input[iFeature];
+              for (uint64_t iSpectator = 0; iSpectator < numberOfSpectators; ++iSpectator)
+                S[iEvent * numberOfSpectators + iSpectator] = training_data.m_spectators[iSpectator];
               y[iEvent] = training_data.m_target;
               w[iEvent] = training_data.m_weight;
             }
@@ -257,20 +265,25 @@ namespace Belle2 {
               training_data.loadEvent(validation_indices[iEvent + iBatch * validation_batch_size]);
               for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
                 X_v[iEvent * numberOfFeatures + iFeature] = training_data.m_input[iFeature];
+              for (uint64_t iSpectator = 0; iSpectator < numberOfSpectators; ++iSpectator)
+                S_v[iEvent * numberOfSpectators + iSpectator] = training_data.m_spectators[iSpectator];
               y_v[iEvent] = training_data.m_target;
               w_v[iEvent] = training_data.m_weight;
             }
             // Maybe slow, create ndarrays outside of loop?
             auto ndarray_X = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X, NPY_FLOAT32, X.get()));
+            auto ndarray_S = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_S, NPY_FLOAT32, S.get()));
             auto ndarray_y = boost::python::handle<>(PyArray_SimpleNewFromData(1, dimensions_y, NPY_FLOAT32, y.get()));
             auto ndarray_w = boost::python::handle<>(PyArray_SimpleNewFromData(1, dimensions_w, NPY_FLOAT32, w.get()));
 
             auto ndarray_X_v = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X_v, NPY_FLOAT32, X_v.get()));
+            auto ndarray_S_v = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_S_v, NPY_FLOAT32, S_v.get()));
             auto ndarray_y_v = boost::python::handle<>(PyArray_SimpleNewFromData(1, dimensions_y_v, NPY_FLOAT32, y_v.get()));
             auto ndarray_w_v = boost::python::handle<>(PyArray_SimpleNewFromData(1, dimensions_w_v, NPY_FLOAT32, w_v.get()));
 
-            auto r = get_attr_from_module_else_fallback_to_framework("partial_fit", module, framework)(state, ndarray_X, ndarray_y, ndarray_w,
-                     ndarray_X_v, ndarray_y_v, ndarray_w_v, iIteration * nBatches + iBatch);
+            auto r = get_attr_from_module_else_fallback_to_framework("partial_fit", module, framework)(state, ndarray_X, ndarray_S, ndarray_y,
+                     ndarray_w,
+                     ndarray_X_v, ndarray_S_v, ndarray_y_v, ndarray_w_v, iIteration * nBatches + iBatch);
             boost::python::extract<bool> proxy(r);
             if (proxy.check())
               continue_loop = static_cast<bool>(proxy);

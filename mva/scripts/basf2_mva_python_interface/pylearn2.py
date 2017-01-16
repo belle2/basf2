@@ -66,7 +66,7 @@ class State(object):
     # TODO: eg. xgboost, ...
 
 
-def get_model(number_of_features, number_of_events, training_fraction, parameters):
+def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
     state = State()
 
     # intialize the dictionary
@@ -126,7 +126,7 @@ def begin_fit(state):
     return state
 
 
-def partial_fit(state, X, y, w, Xvalid, yvalid, wvalid, epoch):
+def partial_fit(state, X, S, y, w, Xvalid, Svalid, yvalid, wvalid, epoch):
     if len(np.unique(w)) != 1:
         raise NotImplementedError('Weighted files for pylearn2 training are not implemented.')
     state.X.append(X)

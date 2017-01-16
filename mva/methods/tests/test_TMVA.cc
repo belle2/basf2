@@ -115,6 +115,7 @@ namespace {
     }
 
     virtual unsigned int getNumberOfFeatures() const override { return 1; }
+    virtual unsigned int getNumberOfSpectators() const override { return 0; }
     virtual unsigned int getNumberOfEvents() const override { return m_data.size(); }
     virtual void loadEvent(unsigned int iEvent) override { m_input[0] = m_data[iEvent]; m_target = iEvent % 2; m_isSignal = m_target == 1; };
     virtual float getSignalFraction() override { return 0.1; };
@@ -239,6 +240,7 @@ namespace {
     }
 
     virtual unsigned int getNumberOfFeatures() const override { return 1; }
+    virtual unsigned int getNumberOfSpectators() const override { return 0; }
     virtual unsigned int getNumberOfEvents() const override { return m_data.size(); }
     virtual void loadEvent(unsigned int iEvent) override { m_input[0] = m_data[iEvent]; m_target = static_cast<float>((static_cast<int>(iEvent % 48) - 24) / 4) / 24.0;};
     virtual float getSignalFraction() override { return 0.0; };

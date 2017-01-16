@@ -37,7 +37,7 @@ class State(object):
         self.eval_function = eval_function
 
 
-def get_model(number_of_features, number_of_events, training_fraction, parameters):
+def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
 
     x = theano.tensor.matrix('x')
     y = theano.tensor.vector('y', dtype='float32')
@@ -110,7 +110,7 @@ def begin_fit(state):
     return state
 
 
-def partial_fit(state, X, y, w, Xvalid, yvalid, wvalid, epoch):
+def partial_fit(state, X, S, y, w, Xvalid, Svalid, yvalid, wvalid, epoch):
     avg_cost = state.train_function(X, y) / len(y)
     print("Epoch:", '%04d' % (epoch), "cost=", "{:.9f}".format(avg_cost))
     return True

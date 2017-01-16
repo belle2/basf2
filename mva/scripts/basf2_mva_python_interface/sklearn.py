@@ -18,7 +18,7 @@ class State(object):
         self.estimator = estimator
 
 
-def get_model(number_of_features, number_of_events, training_fraction, parameters):
+def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
     """
     Create SKLearn classifier and store it in a State object
     """
@@ -69,7 +69,7 @@ def begin_fit(state):
     return state
 
 
-def partial_fit(state, X, y, w, Xtest, ytest, wtest, epoch):
+def partial_fit(state, X, S, y, w, Xtest, Stest, ytest, wtest, epoch):
     """
     Stores received training data.
     SKLearn is usually not able to perform a partial fit.

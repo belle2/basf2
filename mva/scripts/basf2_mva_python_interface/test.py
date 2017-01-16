@@ -22,7 +22,7 @@ def feature_importance(state):
     return []
 
 
-def get_model(number_of_features, number_of_events, training_fraction, parameters):
+def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
     """
     Return default test model
     """
@@ -58,12 +58,12 @@ def begin_fit(state):
     return state
 
 
-def partial_fit(state, X, y, w, Xtest, ytest, wtest, epoch):
+def partial_fit(state, X, S, y, w, Xtest, Stest, ytest, wtest, epoch):
     """
     Test partial_fit function
     """
     print("Called partial_fit")
-    print(state, X, y, w, Xtest, ytest, wtest, epoch)
+    print(state, X, S, y, w, Xtest, Stest, ytest, wtest, epoch)
     return True
 
 

@@ -55,9 +55,9 @@ namespace Belle2 {
       description.add_options()
       ("framework", po::value<std::string>(&m_framework),
        "Framework which should be used. Currently supported are sklearn, tensorflow and theano")
-      ("model", po::value<std::string>(&m_steering_file), "Steering file which describes")
+      ("steering_file", po::value<std::string>(&m_steering_file), "Steering file which describes")
       ("mini_batch_size", po::value<unsigned int>(&m_mini_batch_size), "Size of the mini batch given to partial_fit function")
-      ("n_iterations", po::value<unsigned int>(&m_nIterations), "Number of iterations")
+      ("nIterations", po::value<unsigned int>(&m_nIterations), "Number of iterations")
       ("training_fraction", po::value<double>(&m_training_fraction),
        "Training fraction used to split up dataset in training and validation sample.")
       ("config", po::value<std::string>(&m_config), "Json encoded python object passed to begin_fit function");

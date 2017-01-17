@@ -92,7 +92,7 @@ namespace Belle2 {
 
     bool IsNeuroBayesAvailable()
     {
-      return (::NeuroBayesTeacher::Instance() != 0);
+      return (nb_init_common(0, NULL, NULL, NULL, 0) != NULL and ::NeuroBayesTeacher::Instance() != 0);
     }
 
     void NeuroBayesOptions::load(const boost::property_tree::ptree& pt)

@@ -118,7 +118,7 @@ namespace Belle2 {
       }
 
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
-      if (!factory.BookMethod(data_loader, specific_options.m_type, specific_options.m_method, specific_options.m_config)) {
+      if (!factory.BookMethod(&data_loader, specific_options.m_type, specific_options.m_method, specific_options.m_config)) {
 #else
       if (!factory.BookMethod(specific_options.m_type, specific_options.m_method, specific_options.m_config)) {
 #endif

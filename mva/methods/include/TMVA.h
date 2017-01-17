@@ -25,6 +25,9 @@
 #include <TMVA/Factory.h>
 #include <TMVA/Tools.h>
 #include <TMVA/Reader.h>
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
+#include <TMVA/DataLoader.h>
+#endif
 
 #include <memory>
 

@@ -41,7 +41,7 @@ bool SegmentTrackTruthVarSet::extract(const std::pair<const CDCSegment2D*, const
 
     double numberOfCorrectHits = 0;
     for (const CDCRecoHit3D& recoHit : *track) {
-      if (mcHitLookup.getMCTrackId(recoHit->getWireHit()->getHit()) == segmentMCMatch) {
+      if (mcHitLookup.getMCTrackId(recoHit.getWireHit().getHit()) == segmentMCMatch) {
         numberOfCorrectHits++;
       }
     }

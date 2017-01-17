@@ -59,8 +59,8 @@ namespace Belle2 {
       friend std::ostream& operator<<(std::ostream& output, const CDCTangent& tangent)
       {
         output << "Tangent" << std::endl;
-        output << "From : " << tangent.getFromWireHit()->getWire() << " " <<  tangent.getFromRecoDisp2D() << std::endl;
-        output << "To : " << tangent.getToWireHit()->getWire() << " " <<  tangent.getToRecoDisp2D()  << std::endl;
+        output << "From : " << tangent.getFromWireHit().getWire() << " " <<  tangent.getFromRecoDisp2D() << std::endl;
+        output << "To : " << tangent.getToWireHit().getWire() << " " <<  tangent.getToRecoDisp2D()  << std::endl;
         return output;
       }
 
@@ -78,7 +78,7 @@ namespace Belle2 {
 
       /// Getter for displacement of the touching point from the first wire in the reference plane.
       Vector2D getFromRecoDisp2D() const
-      { return getFromRecoPos2D() - getFromWireHit()->getRefPos2D(); }
+      { return getFromRecoPos2D() - getFromWireHit().getRefPos2D(); }
 
       /// Getter for the touching point of the tangent to the second drift circle.
       Vector2D getToRecoPos2D() const
@@ -86,7 +86,7 @@ namespace Belle2 {
 
       /// Getter for displacement of the touching point from the second wire in the reference plane.
       Vector2D getToRecoDisp2D() const
-      { return getToRecoPos2D() - getToWireHit()->getRefPos2D(); }
+      { return getToRecoPos2D() - getToWireHit().getRefPos2D(); }
 
       /// Getter for the vector from the first to the second touch point.*/
       const Vector2D& getFlightVec2D() const

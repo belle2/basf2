@@ -75,7 +75,7 @@ bool TruthSegmentVarSet::extract(const CDCSegment2D* segment)
     for (const CDCWireHit& wireHit : wireHits) {
       if (hitLookup.getMCTrackId(wireHit.getHit()) == segmentMCMatch) {
         numberOfHitsInThisTrack++;
-        if (wireHit->getAutomatonCell().hasTakenFlag()) {
+        if (wireHit.getAutomatonCell().hasTakenFlag()) {
           numberOfTakenHitsInThisTrack++;
         }
       }

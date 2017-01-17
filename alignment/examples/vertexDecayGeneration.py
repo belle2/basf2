@@ -48,7 +48,7 @@ main.add_module("Progress")
 main.add_module(kkgeninput)
 
 sim.add_simulation(main)
-reco.add_mc_reconstruction(main)
+reco.add_mc_reconstruction(main, pruneTracks=False)
 
 ana.fillParticleList('mu+:good', 'muid > 0.1 and useLabFrame(p) > 2.', True, main)
 

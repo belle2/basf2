@@ -352,7 +352,7 @@ std::string MillepedeCollectorModule::getUniqueMilleName()
   return name;
 }
 
-void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack)
+void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* primary)
 {
   std::shared_ptr<genfit::GblFitter> gbl(new genfit::GblFitter());
   gbl->setOptions("", true, true, 1, 0);
@@ -361,24 +361,24 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack)
 
   // We need the store arrays
   StoreArray <CDCHit> cdcHits("");
-  StoreArray <PXDCluster> pxdClusters("");
-  StoreArray <SVDCluster> svdClusters("");
+  StoreArray <PXDCluster> pxdHits("");
+  StoreArray <SVDCluster> svdHits("");
   StoreArray<RecoHitInformation::UsedBKLMHit> bklmHits("");
   StoreArray<RecoHitInformation::UsedEKLMHit> eklmHits("");
 
   // Create the genfit::MeasurementFactory
   genfit::MeasurementFactory<genfit::AbsMeasurement> genfitMeasurementFactory;
 
-  // Example stub:
-  if (pxdClusters.isOptional()) {
+  // Add producer for alignable RecoHits to factory
+  if (pxdHits.isOptional()) {
     genfit::MeasurementProducer <RecoHitInformation::UsedPXDHit, AlignablePXDRecoHit>* PXDProducer =  new genfit::MeasurementProducer
-    <RecoHitInformation::UsedPXDHit, AlignablePXDRecoHit> (pxdClusters.getPtr());
+    <RecoHitInformation::UsedPXDHit, AlignablePXDRecoHit> (pxdHits.getPtr());
     genfitMeasurementFactory.addProducer(Const::PXD, PXDProducer);
   }
 
-  if (svdClusters.isOptional())  {
+  if (svdHits.isOptional())  {
     genfit::MeasurementProducer <RecoHitInformation::UsedSVDHit, AlignableSVDRecoHit>* SVDProducer =  new genfit::MeasurementProducer
-    <RecoHitInformation::UsedSVDHit, AlignableSVDRecoHit> (svdClusters.getPtr());
+    <RecoHitInformation::UsedSVDHit, AlignableSVDRecoHit> (svdHits.getPtr());
     genfitMeasurementFactory.addProducer(Const::SVD, SVDProducer);
   }
 
@@ -402,69 +402,89 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack)
 
 
   // Create the measurement creators
-  std::vector<std::shared_ptr<CDCBaseMeasurementCreator>> cdcMeasurementCreators = { std::shared_ptr<CDCBaseMeasurementCreator>(new CDCCoordinateMeasurementCreator(genfitMeasurementFactory)) };
-  // TODO: Create a new MeasurementCreator based on SVDBaseMeasurementCreator (or on SVDCoordinateMeasurementCreator), which does the combination on the fly.
-  std::vector<std::shared_ptr<SVDBaseMeasurementCreator>> svdMeasurementCreators = { std::shared_ptr<SVDBaseMeasurementCreator>(new SVDCoordinateMeasurementCreator(genfitMeasurementFactory)) };
   std::vector<std::shared_ptr<PXDBaseMeasurementCreator>> pxdMeasurementCreators = { std::shared_ptr<PXDBaseMeasurementCreator>(new PXDCoordinateMeasurementCreator(genfitMeasurementFactory)) };
+  std::vector<std::shared_ptr<SVDBaseMeasurementCreator>> svdMeasurementCreators = { std::shared_ptr<SVDBaseMeasurementCreator>(new SVDCoordinateMeasurementCreator(genfitMeasurementFactory)) };
+  // TODO: Create a new MeasurementCreator based on SVDBaseMeasurementCreator (or on SVDCoordinateMeasurementCreator), which does the combination on the fly.
 
+  std::vector<std::shared_ptr<CDCBaseMeasurementCreator>> cdcMeasurementCreators = { std::shared_ptr<CDCBaseMeasurementCreator>(new CDCCoordinateMeasurementCreator(genfitMeasurementFactory)) };
   std::vector<std::shared_ptr<BKLMBaseMeasurementCreator>> bklmMeasurementCreators = { std::shared_ptr<BKLMBaseMeasurementCreator>(new BKLMCoordinateMeasurementCreator(genfitMeasurementFactory)) };
-
   std::vector<std::shared_ptr<EKLMBaseMeasurementCreator>> eklmMeasurementCreators = { std::shared_ptr<EKLMBaseMeasurementCreator>(new EKLMCoordinateMeasurementCreator(genfitMeasurementFactory)) };
 
   // TODO: Or put it in here and leave the svdMeasurementCreators empty.
   std::vector<std::shared_ptr<BaseMeasurementCreator>> additionalMeasurementCreators = {};
   factory.resetMeasurementCreators(pxdMeasurementCreators, svdMeasurementCreators, cdcMeasurementCreators, bklmMeasurementCreators,
                                    eklmMeasurementCreators, additionalMeasurementCreators);
-
-  const int currentPdgCode = TrackFitter::createCorrectPDGCodeForChargedStable(Const::chargedStableSet.find(211), recoTrack);
-  genfit::AbsTrackRep* trackRep = new genfit::RKTrackRep(currentPdgCode);
   factory.addMeasurements(recoTrack);
 
   auto& gfTrack = RecoTrackGenfitAccess::getGenfitTrack(recoTrack);
+
+  const int currentPdgCode = TrackFitter::createCorrectPDGCodeForChargedStable(Const::muon, recoTrack);
+  genfit::AbsTrackRep* trackRep = new genfit::RKTrackRep(currentPdgCode);
   gfTrack.addTrackRep(trackRep);
   gfTrack.setCardinalRep(gfTrack.getIdForRep(trackRep));
 
-  //try {
-  for (unsigned int i = 0; i < gfTrack.getNumPoints() - 1; ++i) {
-    //if (gfTrack.getPointWithMeasurement(i)->getNumRawMeasurements() != 1)
-    //  continue;
-    genfit::PlanarMeasurement* planarMeas1 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(
-                                               i)->getRawMeasurement(0));
-    genfit::PlanarMeasurement* planarMeas2 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(
-                                               i + 1)->getRawMeasurement(0));
+  if (primary) {
+    TVector3 vertexPos = primary->getVertex();
+    TVector3 vertexMom = primary->getMomentum();
+    genfit::StateOnPlane vertexSOP(gfTrack.getCardinalRep());
+    TVector3 vertexRPhiDir(vertexPos[0], vertexPos[1], 0);
+    TVector3 vertexZDir(0, 0, vertexPos[2]);
+    genfit::SharedPlanePtr vertexPlane(new genfit::DetPlane(vertexPos, vertexRPhiDir, vertexZDir));
+    vertexSOP.setPlane(vertexPlane);
+    vertexSOP.setPosMom(vertexPos, vertexMom);
+    TMatrixDSym vertexCov(5);
+    vertexCov.UnitMatrix();
+    vertexCov *= -1.;
+    genfit::MeasuredStateOnPlane mop(vertexSOP, vertexCov);
+    genfit::FullMeasurement* vertex = new genfit::FullMeasurement(mop, Const::IR);
+    gfTrack.insertMeasurement(vertex, 0);
+  }
 
-    if (planarMeas1 != NULL && planarMeas2 != NULL &&
-        planarMeas1->getDetId() == planarMeas2->getDetId() &&
-        planarMeas1->getPlaneId() != -1 &&   // -1 is default plane id
-        planarMeas1->getPlaneId() == planarMeas2->getPlaneId()) {
-      Belle2::AlignableSVDRecoHit* hit1 = dynamic_cast<Belle2::AlignableSVDRecoHit*>(planarMeas1);
-      Belle2::AlignableSVDRecoHit* hit2 = dynamic_cast<Belle2::AlignableSVDRecoHit*>(planarMeas2);
-      if (hit1 && hit2) {
-        Belle2::AlignableSVDRecoHit* hitU(NULL);
-        Belle2::AlignableSVDRecoHit* hitV(NULL);
-        // We have to decide U/V now (else AlignableSVDRecoHit2D could throw FATAL)
-        if (hit1->isU() && !hit2->isU()) {
-          hitU = hit1;
-          hitV = hit2;
-        } else if (!hit1->isU() && hit2->isU()) {
-          hitU = hit2;
-          hitV = hit1;
-        } else {
-          continue;
+  try {
+    for (unsigned int i = 0; i < gfTrack.getNumPoints() - 1; ++i) {
+      //if (gfTrack.getPointWithMeasurement(i)->getNumRawMeasurements() != 1)
+      //  continue;
+      genfit::PlanarMeasurement* planarMeas1 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(
+                                                 i)->getRawMeasurement(0));
+      genfit::PlanarMeasurement* planarMeas2 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(
+                                                 i + 1)->getRawMeasurement(0));
+
+      if (planarMeas1 != NULL && planarMeas2 != NULL &&
+          planarMeas1->getDetId() == planarMeas2->getDetId() &&
+          planarMeas1->getPlaneId() != -1 &&   // -1 is default plane id
+          planarMeas1->getPlaneId() == planarMeas2->getPlaneId()) {
+        Belle2::AlignableSVDRecoHit* hit1 = dynamic_cast<Belle2::AlignableSVDRecoHit*>(planarMeas1);
+        Belle2::AlignableSVDRecoHit* hit2 = dynamic_cast<Belle2::AlignableSVDRecoHit*>(planarMeas2);
+        if (hit1 && hit2) {
+          Belle2::AlignableSVDRecoHit* hitU(NULL);
+          Belle2::AlignableSVDRecoHit* hitV(NULL);
+          // We have to decide U/V now (else AlignableSVDRecoHit2D could throw FATAL)
+          if (hit1->isU() && !hit2->isU()) {
+            hitU = hit1;
+            hitV = hit2;
+          } else if (!hit1->isU() && hit2->isU()) {
+            hitU = hit2;
+            hitV = hit1;
+          } else {
+            continue;
+          }
+          Belle2::AlignableSVDRecoHit2D* hit = new Belle2::AlignableSVDRecoHit2D(*hitU, *hitV);
+          // insert measurement before point i (increases number of currect point to i+1)
+          gfTrack.insertMeasurement(hit, i);
+          // now delete current point (at its original place, we have the new 2D recohit)
+          gfTrack.deletePoint(i + 1);
+          gfTrack.deletePoint(i + 1);
         }
-        Belle2::AlignableSVDRecoHit2D* hit = new Belle2::AlignableSVDRecoHit2D(*hitU, *hitV);
-        // insert measurement before point i (increases number of currect point to i+1)
-        gfTrack.insertMeasurement(hit, i);
-        // now delete current point (at its original place, we have the new 2D recohit)
-        gfTrack.deletePoint(i + 1);
-        gfTrack.deletePoint(i + 1);
       }
     }
+  } catch (...) {
+    B2ERROR("SVD Cluster combination failed.");
   }
-  //} catch (...) {}
   try {
     gbl->processTrack(&gfTrack, true);
-  } catch (...) {}
+  } catch (...) {
+    B2ERROR("GBL fit failed.");
+  }
 }
 
 
@@ -486,29 +506,12 @@ std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::
     auto recoTrack = belle2Track->getRelatedTo<RecoTrack>();
 
     if (!recoTrack) {
-      B2INFO("No related RecoTrack for track candidate");
+      B2INFO("No related RecoTrack for Belle2::Track");
       continue;
     }
     auto& track = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
 
-    if (primary) {
-      TVector3 vertexPos = primary->getVertex();
-      TVector3 vertexMom = primary->getMomentum();
-      genfit::StateOnPlane vertexSOP(track.getCardinalRep());
-      TVector3 vertexRPhiDir(vertexPos[0], vertexPos[1], 0);
-      TVector3 vertexZDir(0, 0, vertexPos[2]);
-      genfit::SharedPlanePtr vertexPlane(new genfit::DetPlane(vertexPos, vertexRPhiDir, vertexZDir));
-      vertexSOP.setPlane(vertexPlane);
-      vertexSOP.setPosMom(vertexPos, vertexMom);
-      TMatrixDSym vertexCov(5);
-      vertexCov.UnitMatrix();
-      vertexCov *= -1.;
-      genfit::MeasuredStateOnPlane mop(vertexSOP, vertexCov);
-      genfit::FullMeasurement* vertex = new genfit::FullMeasurement(mop, Const::IR);
-      track.insertMeasurement(vertex, 0);
-    }
-
-    fitRecoTrack(*recoTrack);
+    fitRecoTrack(*recoTrack, primary);
 
     if (!track.hasFitStatus()) {
       B2INFO("Track has no fit status");
@@ -516,7 +519,7 @@ std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::
     }
     genfit::GblFitStatus* fs = dynamic_cast<genfit::GblFitStatus*>(track.getFitStatus());
     if (!fs) {
-      B2INFO("Fit status is not GblFitStatus. You need tracks fitted by GBLfit module.");
+      B2INFO("Fit status is not GblFitStatus.");
       continue;
     }
     if (!fs->isFittedWithReferenceTrack()) {

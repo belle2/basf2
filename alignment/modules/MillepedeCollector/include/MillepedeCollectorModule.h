@@ -50,11 +50,18 @@ namespace Belle2 {
     /** Make a name for mille binary (encodes module name + starting exp, run and event + process id) */
     std::string getUniqueMilleName();
 
-    /** Get all useable tracks for particles */
+    /**
+     * Get all useable tracks for particles
+     *
+     * @param particles vector of Belle2::Particles to be changed in vector of genfit::Tracks
+     * @param primary Pointer to primary particle to add its vertex as additional point
+     * for vertex fit, nullptr to not add vertex point
+     */
     std::vector<genfit::Track*> getParticlesTracks(std::vector<Particle*> particles, Particle* primary = nullptr);
 
-    /** Get all useable tracks for particles */
-    void fitRecoTrack(RecoTrack& recoTrack);
+
+    /** Fit given RecoTrack with GBL */
+    void fitRecoTrack(RecoTrack& recoTrack, Particle* primary = nullptr);
 
     /** Compute the transformation matrix d(q/p,u',v',u,v)/d(x,y,z,px,py,pz) from state at first track point (vertex) */
     TMatrixD getGlobalToLocalTransform(genfit::MeasuredStateOnPlane msop);

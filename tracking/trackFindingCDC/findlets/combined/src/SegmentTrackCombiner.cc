@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include "../include/SegmentTrackCombiner.h"
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -21,9 +22,12 @@ SegmentTrackCombinerFindlet::SegmentTrackCombinerFindlet()
   addProcessingSignalListener(&m_sharedHitsMatcher);
   addProcessingSignalListener(&m_selectPairsWithSharedHits);
   addProcessingSignalListener(&m_chooseableSegmentTrackSelector);
-  addProcessingSignalListener(&m_bestMatchSelector);
+  addProcessingSignalListener(&m_singleMatchSelector);
   addProcessingSignalListener(&m_segmentTrackAdderWithNormalization);
   addProcessingSignalListener(&m_trackRejecter);
+
+  addProcessingSignalListener(&m_cleanTracksAsserter);
+  addProcessingSignalListener(&m_cleanSegmentAsserter);
 }
 
 std::string SegmentTrackCombinerFindlet::getDescription()
@@ -46,7 +50,7 @@ void SegmentTrackCombinerFindlet::exposeParameters(ModuleParamList* moduleParamL
   m_sharedHitsMatcher.exposeParameters(moduleParamList, prefix);
   m_selectPairsWithSharedHits.exposeParameters(moduleParamList, prefixed("sharedHits", prefix));
   m_chooseableSegmentTrackSelector.exposeParameters(moduleParamList, prefixed("segmentTrack", prefix));
-  m_bestMatchSelector.exposeParameters(moduleParamList, prefix);
+  m_singleMatchSelector.exposeParameters(moduleParamList, prefix);
   m_segmentTrackAdderWithNormalization.exposeParameters(moduleParamList, prefix);
   m_trackRejecter.exposeParameters(moduleParamList, prefixed(prefix, "track"));
 
@@ -58,13 +62,12 @@ void SegmentTrackCombinerFindlet::exposeParameters(ModuleParamList* moduleParamL
 void SegmentTrackCombinerFindlet::apply(std::vector<TrackFindingCDC::CDCSegment2D>& segments,
                                         std::vector<TrackFindingCDC::CDCTrack>& tracks)
 {
-  for (const CDCTrack& track : tracks) {
-    track.unsetAndForwardMaskedFlag();
-  }
+  m_cleanTracksAsserter.apply(tracks);
+  //m_cleanSegmentAsserter.apply(segments);
 
   m_trackNormalizer.apply(tracks);
 
-  // TODO: Add segments which are fully taken
+  // TODO: Add a precut to add segments which are fully taken immediately at this stage
 
   // After that, relations contains all pairs of segments and tracks, with the number of shared hits as weight
   m_sharedHitsMatcher.apply(tracks, segments, m_relations);
@@ -75,11 +78,11 @@ void SegmentTrackCombinerFindlet::apply(std::vector<TrackFindingCDC::CDCSegment2
   // Apply a (mva) filter to all combinations
   m_chooseableSegmentTrackSelector.apply(m_relations);
 
-  // Search for the best combination if there is more than one possibility and remove the hits from all other ones
-  m_bestMatchSelector.apply(m_relations);
+  // Search for the best combinations
+  m_singleMatchSelector.apply(m_relations);
 
-  // Add the remaining combinations
-  m_segmentTrackAdderWithNormalization.apply(m_relations, tracks);
+  // Add those combinations and remove all hits, that are part of other tracks (non-selected combinations)
+  m_segmentTrackAdderWithNormalization.apply(m_relations, tracks, segments);
 
   // Reject tracks according to a (mva) filter
   m_trackRejecter.apply(tracks);

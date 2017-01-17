@@ -24,26 +24,28 @@ namespace Belle2 {
 
     /**
      * Add the matched segments to the tracks and normalize the tracks afterwards.
-     * Also deletes all masked hits from the selection method before.
+     * Also deletes all hits from the tracks, that are part of segments, that were not matched to these tracks.
      */
-    class SegmentTrackAdderWithNormalization : public Findlet<WeightedRelation<CDCTrack, const CDCSegment2D>&, CDCTrack&> {
+    class SegmentTrackAdderWithNormalization : public
+      Findlet<WeightedRelation<CDCTrack, const CDCSegment2D>, CDCTrack, const CDCSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<WeightedRelation<CDCTrack, const CDCSegment2D>&, CDCTrack&>;
+      using Super = Findlet<WeightedRelation<CDCTrack, const CDCSegment2D>, CDCTrack, const CDCSegment2D>;
 
     public:
-      /// Constructor for registering the sub.findlets
+      /// Constructor for registering the sub-findlets
       SegmentTrackAdderWithNormalization();
 
       /// Expose the parameters of the sub-findlets.
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
       /// Short description of the findlet
-      std::string getDescription();
+      std::string getDescription() override;
 
       /// Apply the findlet
-      void apply(std::vector<WeightedRelation<CDCTrack, const CDCSegment2D>>& relations, std::vector<CDCTrack>& tracks);
+      void apply(std::vector<WeightedRelation<CDCTrack, const CDCSegment2D>>& relations,
+                 std::vector<CDCTrack>& tracks, const std::vector<CDCSegment2D>& segment) override;
 
     private:
       // Findlets

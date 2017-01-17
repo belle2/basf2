@@ -16,9 +16,10 @@
 #include <tracking/trackFindingCDC/collectors/selectors/CutSelector.h>
 #include <tracking/trackFindingCDC/collectors/selectors/FilterSelector.h>
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackFilterFactory.h>
-#include <tracking/trackFindingCDC/collectors/selectors/SegmentTrackBestMatchSelector.h>
+#include <tracking/trackFindingCDC/collectors/selectors/SingleMatchSelector.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentTrackAdderWithNormalization.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
+#include <tracking/trackFindingCDC/findlets/minimal/CleanHitSetAsserter.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
@@ -78,7 +79,7 @@ namespace Belle2 {
       FilterSelector<CDCTrack, CDCSegment2D, SegmentTrackFilterFactory> m_chooseableSegmentTrackSelector;
 
       /// Select only the best matching segment-track relations and remove the hits from the other ones
-      SegmentTrackBestMatchSelector m_bestMatchSelector;
+      SingleMatchSelector<CDCTrack, CDCSegment2D> m_singleMatchSelector;
 
       /// Add the matched segments to tracks
       SegmentTrackAdderWithNormalization m_segmentTrackAdderWithNormalization;
@@ -88,6 +89,12 @@ namespace Belle2 {
 
       /// Findlet for normalizing the tracks
       TrackNormalizer m_trackNormalizer;
+
+      /// Findlet for asserting a clean track hit set
+      CleanHitSetAsserter<CDCTrack> m_cleanTracksAsserter;
+
+      /// Findlet for asserting a clean segment hit set
+      CleanHitSetAsserter<CDCSegment2D> m_cleanSegmentAsserter;
 
       // Object pools
       std::vector<WeightedRelation<CDCTrack, const CDCSegment2D>> m_relations;

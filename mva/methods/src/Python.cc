@@ -387,7 +387,7 @@ namespace Belle2 {
         for (uint64_t iEvent = 0; iEvent < numberOfEvents; ++iEvent) {
           // We have to do some nasty casting here, because the Python C-Api uses structs which are binary compatible
           // to a PyObject but do not inherit from it!
-          probabilities[iEvent] = static_cast<float>(*static_cast<double*>(PyArray_GETPTR1(reinterpret_cast<PyArrayObject*>(result.ptr()),
+          probabilities[iEvent] = static_cast<float>(*static_cast<float*>(PyArray_GETPTR1(reinterpret_cast<PyArrayObject*>(result.ptr()),
                                                      iEvent)));
         }
       } catch (...) {

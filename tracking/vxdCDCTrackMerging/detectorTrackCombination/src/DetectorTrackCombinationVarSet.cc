@@ -11,6 +11,8 @@
 #include <tracking/vxdCDCTrackMerging/detectorTrackCombination/DetectorTrackCombinationVarSet.h>
 #include <tracking/trackFindingCDC/numerics/ToFinite.h>
 
+#include <TMath.h>
+
 #include <framework/dataobjects/Helix.h>
 #include <framework/geometry/BFieldManager.h>
 
@@ -20,6 +22,9 @@ using namespace TrackFindingCDC;
 
 bool DetectorTrackCombinationVarSet::extract(const BaseDetectorTrackCombinationFilter::Object* pair)
 {
+  // TODO: Make parameter
+  const double cdcRadius = 16.25;
+
   const RecoTrack* collectorItem = *(pair->first);
   const RecoTrack* collectionItem = *(pair->second);
 
@@ -43,7 +48,7 @@ bool DetectorTrackCombinationVarSet::extract(const BaseDetectorTrackCombinationF
   const double thetaRel = fabs(thetaCDC - thetaVXD) / thetaVXD;
 
   //Absolute and relative phi
-  const double phiAbs = fmod(abs(phiCDC - phiVXD), 3.1415926);
+  const double phiAbs = fmod(fabs(phiCDC - phiVXD), 2 * TMath::Pi());
   const double phiRel = fabs(phiCDC - phiVXD) / phiVXD;
 
   //absolute and relative transverse momentum
@@ -61,13 +66,18 @@ bool DetectorTrackCombinationVarSet::extract(const BaseDetectorTrackCombinationF
   const unsigned int numberHitsVXD = collectionItem->getNumberOfSVDHits() + collectionItem->getNumberOfPXDHits();
 
   //distance between the two tracks on the detector interface
-  const TVector3& posCDC = CDCHelix.getPositionAtArcLength2D(CDCHelix.getArcLength2DAtCylindricalR(16.25));
-  const TVector3& posVXD = VXDHelix.getPositionAtArcLength2D(VXDHelix.getArcLength2DAtCylindricalR(16.25));
+  const TVector3& posCDC = CDCHelix.getPositionAtArcLength2D(CDCHelix.getArcLength2DAtCylindricalR(cdcRadius));
+  const TVector3& posVXD = VXDHelix.getPositionAtArcLength2D(VXDHelix.getArcLength2DAtCylindricalR(cdcRadius));
   const double distance = (posCDC - posVXD).Perp();
 
   const double vertex = (posCDC - posVXD).Mag();
   const double vertexCDC = posCDC.Mag();
   const double vertexVXD = posVXD.Mag();
+
+  // Short cut:
+  if (distance >= cdcRadius or phiAbs > TMath::Pi()) {
+    return false;
+  }
 
   var<named("phiCDC")>() = toFinite(phiCDC, 0);
   var<named("thetaCDC")>() = toFinite(thetaCDC, 0);

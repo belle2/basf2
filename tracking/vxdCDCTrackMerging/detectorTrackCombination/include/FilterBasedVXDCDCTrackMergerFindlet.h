@@ -79,7 +79,7 @@ namespace Belle2 {
           // Add the already found items from the filter-based decision
           m_relationAdder.apply(weightedRelations);
 
-          // Clear all found relations and start from scratch - this time only using those items which vere not used before
+          // Clear all found relations and start from scratch - this time only using those items which were not used before
 
           m_storeArrayMerger.removeCDCRecoTracksWithPartner(cdcRecoTrackVector);
           m_storeArrayMerger.removeVXDRecoTracksWithPartner(vxdRecoTrackVector);

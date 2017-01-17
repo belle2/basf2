@@ -58,7 +58,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     Return default tensorflow model
     """
     x = tf.placeholder("float", [None, number_of_features])
-    y = tf.placeholder("float", [None])
+    y = tf.placeholder("float", [None, 1])
     W = tf.Variable(tf.zeros([number_of_features, 1]))
     b = tf.Variable(tf.zeros([1]))
 

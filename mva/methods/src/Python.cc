@@ -205,8 +205,8 @@ namespace Belle2 {
       auto w = std::unique_ptr<float[]>(new float[training_batch_size]);
       npy_intp dimensions_X[2] = {static_cast<npy_intp>(training_batch_size), static_cast<npy_intp>(numberOfFeatures)};
       npy_intp dimensions_S[2] = {static_cast<npy_intp>(training_batch_size), static_cast<npy_intp>(numberOfSpectators)};
-      npy_intp dimensions_y[1] = {static_cast<npy_intp>(training_batch_size)};
-      npy_intp dimensions_w[1] = {static_cast<npy_intp>(training_batch_size)};
+      npy_intp dimensions_y[2] = {static_cast<npy_intp>(training_batch_size), 1};
+      npy_intp dimensions_w[2] = {static_cast<npy_intp>(training_batch_size), 1};
 
       auto X_v = std::unique_ptr<float[]>(new float[validation_batch_size * numberOfFeatures]);
       auto S_v = std::unique_ptr<float[]>(new float[validation_batch_size * numberOfSpectators]);
@@ -214,8 +214,8 @@ namespace Belle2 {
       auto w_v = std::unique_ptr<float[]>(new float[validation_batch_size]);
       npy_intp dimensions_X_v[2] = {static_cast<npy_intp>(validation_batch_size), static_cast<npy_intp>(numberOfFeatures)};
       npy_intp dimensions_S_v[2] = {static_cast<npy_intp>(validation_batch_size), static_cast<npy_intp>(numberOfSpectators)};
-      npy_intp dimensions_y_v[1] = {static_cast<npy_intp>(validation_batch_size)};
-      npy_intp dimensions_w_v[1] = {static_cast<npy_intp>(validation_batch_size)};
+      npy_intp dimensions_y_v[2] = {static_cast<npy_intp>(validation_batch_size), 1};
+      npy_intp dimensions_w_v[2] = {static_cast<npy_intp>(validation_batch_size), 1};
 
 
       try {
@@ -273,13 +273,13 @@ namespace Belle2 {
             // Maybe slow, create ndarrays outside of loop?
             auto ndarray_X = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X, NPY_FLOAT32, X.get()));
             auto ndarray_S = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_S, NPY_FLOAT32, S.get()));
-            auto ndarray_y = boost::python::handle<>(PyArray_SimpleNewFromData(1, dimensions_y, NPY_FLOAT32, y.get()));
-            auto ndarray_w = boost::python::handle<>(PyArray_SimpleNewFromData(1, dimensions_w, NPY_FLOAT32, w.get()));
+            auto ndarray_y = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_y, NPY_FLOAT32, y.get()));
+            auto ndarray_w = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_w, NPY_FLOAT32, w.get()));
 
             auto ndarray_X_v = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X_v, NPY_FLOAT32, X_v.get()));
             auto ndarray_S_v = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_S_v, NPY_FLOAT32, S_v.get()));
-            auto ndarray_y_v = boost::python::handle<>(PyArray_SimpleNewFromData(1, dimensions_y_v, NPY_FLOAT32, y_v.get()));
-            auto ndarray_w_v = boost::python::handle<>(PyArray_SimpleNewFromData(1, dimensions_w_v, NPY_FLOAT32, w_v.get()));
+            auto ndarray_y_v = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_y_v, NPY_FLOAT32, y_v.get()));
+            auto ndarray_w_v = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_w_v, NPY_FLOAT32, w_v.get()));
 
             auto r = get_attr_from_module_else_fallback_to_framework("partial_fit", module, framework)(state, ndarray_X, ndarray_S, ndarray_y,
                      ndarray_w,

@@ -24,9 +24,6 @@ SegmentTrackCombinerFindlet::SegmentTrackCombinerFindlet()
   addProcessingSignalListener(&m_singleMatchSelector);
   addProcessingSignalListener(&m_segmentTrackAdderWithNormalization);
   addProcessingSignalListener(&m_trackRejecter);
-
-  addProcessingSignalListener(&m_cleanTracksAsserter);
-  addProcessingSignalListener(&m_cleanSegmentAsserter);
 }
 
 std::string SegmentTrackCombinerFindlet::getDescription()

@@ -154,11 +154,22 @@ namespace Belle2 {
        */
       TMVATeacher(const GeneralOptions& general_options, const TMVAOptions& specific_options);
 
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
       /**
-       * Train a mva method using the given dataset returning a Weightfile
-       * @param training_data used to train the method
+       * Train a mva method using the given data loader returning a Weightfile
+       * @param factory used to train the method
+       * @param data_loader used to train the method
+       * @param jobName name of the TMVA training
+       */
+      Weightfile trainFactory(TMVA::Factory& factory, TMVA::DataLoader& data_loader, std::string& jobName) const;
+#else
+      /**
+       * Train a mva method using the given factory returning a Weightfile
+       * @param factory used to train the method
+       * @param jobName name of the TMVA training
        */
       Weightfile trainFactory(TMVA::Factory& factory, std::string& jobName) const;
+#endif
 
     private:
       TMVAOptions specific_options; /**< Method specific options */

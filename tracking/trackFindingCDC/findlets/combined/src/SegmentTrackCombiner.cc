@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include "../include/SegmentTrackCombiner.h"
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -62,9 +61,6 @@ void SegmentTrackCombinerFindlet::exposeParameters(ModuleParamList* moduleParamL
 void SegmentTrackCombinerFindlet::apply(std::vector<TrackFindingCDC::CDCSegment2D>& segments,
                                         std::vector<TrackFindingCDC::CDCTrack>& tracks)
 {
-  m_cleanTracksAsserter.apply(tracks);
-  //m_cleanSegmentAsserter.apply(segments);
-
   m_trackNormalizer.apply(tracks);
 
   // TODO: Add a precut to add segments which are fully taken immediately at this stage

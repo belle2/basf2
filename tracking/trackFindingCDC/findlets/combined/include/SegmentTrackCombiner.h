@@ -19,7 +19,6 @@
 #include <tracking/trackFindingCDC/collectors/selectors/SingleMatchSelector.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentTrackAdderWithNormalization.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
-#include <tracking/trackFindingCDC/findlets/minimal/CleanHitSetAsserter.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
@@ -89,12 +88,6 @@ namespace Belle2 {
 
       /// Findlet for normalizing the tracks
       TrackNormalizer m_trackNormalizer;
-
-      /// Findlet for asserting a clean track hit set
-      CleanHitSetAsserter<CDCTrack> m_cleanTracksAsserter;
-
-      /// Findlet for asserting a clean segment hit set
-      CleanHitSetAsserter<CDCSegment2D> m_cleanSegmentAsserter;
 
       // Object pools
       std::vector<WeightedRelation<CDCTrack, const CDCSegment2D>> m_relations;

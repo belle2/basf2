@@ -175,6 +175,32 @@ namespace Belle2 {
     EXPECT_B2FATAL(m_recoTrack->setRightLeftInformation(cdcHit, RecoHitInformation::RightLeftInformation::c_left));
   }
 
+  /** Test simple Correct handling fo the MCFinderCategory */
+  TEST_F(RecoTrackTest, cdcHitMCFinderCategory)
+  {
+    StoreArray<CDCHit> cdcHits(m_storeArrayNameOfCDCHits);
+
+    EXPECT_FALSE(m_recoTrack->hasCDCHits());
+
+    // Add three cdc hits to the track
+    m_recoTrack->addCDCHit(cdcHits[0], 1, RecoHitInformation::RightLeftInformation::c_right,
+                           RecoHitInformation::OriginTrackFinder::c_undefinedTrackFinder,
+                           RecoHitInformation::RecoHitMCFinderCategory::c_priorityHit);
+    m_recoTrack->addCDCHit(cdcHits[1], 0, RecoHitInformation::RightLeftInformation::c_right,
+                           RecoHitInformation::OriginTrackFinder::c_undefinedTrackFinder,
+                           RecoHitInformation::RecoHitMCFinderCategory::c_auxiliaryHit);
+    // the mcfinder prorperty of this hit is not provided explicitly and therefore should be set to undefined
+    m_recoTrack->addCDCHit(cdcHits[2], 2);
+
+    // get the RecoHitInfo and check their category
+    EXPECT_EQ(m_recoTrack->getRecoHitInformation(cdcHits[0])->getMCFinderCategory(),
+              RecoHitInformation::RecoHitMCFinderCategory::c_priorityHit);
+    EXPECT_EQ(m_recoTrack->getRecoHitInformation(cdcHits[1])->getMCFinderCategory(),
+              RecoHitInformation::RecoHitMCFinderCategory::c_auxiliaryHit);
+    EXPECT_EQ(m_recoTrack->getRecoHitInformation(cdcHits[2])->getMCFinderCategory(),
+              RecoHitInformation::RecoHitMCFinderCategory::c_undefinedRecoHitMCFinderCategory);
+  }
+
   /** Test conversion to genfit track cands. */
   TEST_F(RecoTrackTest, testGenfitConversionOne)
   {

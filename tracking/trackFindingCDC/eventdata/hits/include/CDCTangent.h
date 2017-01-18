@@ -64,14 +64,6 @@ namespace Belle2 {
         return output;
       }
 
-      /// Access the object methods and methods from a pointer in the same way.
-      /** In situations where the type is not known to be a pointer or a reference there is no way to tell
-       *  if one should use the dot '.' or operator '->' for method look up.
-       *  So this function defines the -> operator for the object.
-       *  No matter you have a pointer or an object access is given with '->'.*/
-      const CDCTangent* operator->() const
-      { return this; }
-
       /// Getter for the touching point of the tangent to the first drift circle.
       const Vector2D& getFromRecoPos2D() const
       { return getLine().support(); }

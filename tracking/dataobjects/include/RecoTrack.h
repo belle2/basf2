@@ -265,9 +265,9 @@ namespace Belle2 {
 
     /**
      * Adds a svd hit with the given information to the reco track.
-     * You only have to provide the hit and the arc length, all other parameters have default value.
+     * You only have to provide the hit and the sorting parameter, all other parameters have default value.
      * @param svdHit The pointer to a stored SVDHit in the store array you provided earlier, which you want to add.
-     * @param sortingParameter The arc length of the hit. The arc length is - by our definition - between -pi and pi.
+     * @param sortingParameter The index of the hit. It starts with 0 with the first hit.
      * @param foundByTrackFinder Which track finder has found the hit?
      * @return True if the hit was not already added to the track.
      */
@@ -279,9 +279,9 @@ namespace Belle2 {
 
     /**
      * Adds a bklm hit with the given information to the reco track.
-     * You only have to provide the hit and the arc length, all other parameters have default value.
+     * You only have to provide the hit and the sorting parameter, all other parameters have default value.
      * @param bklmHit The pointer to a stored BKLMHit in the store array you provided earlier, which you want to add.
-     * @param sortingParameter The arc length of the hit. The arc length is - by our definition - between -pi and pi.
+     * @param sortingParameter The index of the hit. It starts with 0 with the first hit.
      * @param foundByTrackFinder Which track finder has found the hit?
      * @return True if the hit was not already added to the track.
      */
@@ -293,9 +293,9 @@ namespace Belle2 {
 
     /**
      * Adds an eklm hit with the given information to the reco track.
-     * You only have to provide the hit and the arc length, all other parameters have default value.
+     * You only have to provide the hit and the sorting parameter, all other parameters have default value.
      * @param bklmHit The pointer to a stored BKLMHit in the store array you provided earlier, which you want to add.
-     * @param sortingParameter The arc length of the hit. The arc length is - by our definition - between -pi and pi.
+     * @param sortingParameter The index of the hit. It starts with 0 with the first hit.
      * @param foundByTrackFinder Which track finder has found the hit?
      * @return True if the hit was not already added to the track.
      */

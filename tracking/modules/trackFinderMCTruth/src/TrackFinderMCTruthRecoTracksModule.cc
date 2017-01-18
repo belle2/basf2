@@ -522,8 +522,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
     // prepare rejection of CDC hits from higher order loops
     const TVector3 origin(0.0, 0.0, 0.0);
     const double Bz = BFieldMap::Instance().getBField(origin).Z();
-    const double nLoops = m_useNLoops;
-    auto isWithinNLoops = [Bz, nLoops](const CDCHit * cdcHit) {
+    auto isWithinNLoops = [Bz](const CDCHit * cdcHit, double nLoops) {
       const CDCSimHit* cdcSimHit = cdcHit->getRelated<CDCSimHit>();
       if (not cdcSimHit) return false;
       const MCParticle* mcParticle = cdcSimHit->getRelated<MCParticle>();

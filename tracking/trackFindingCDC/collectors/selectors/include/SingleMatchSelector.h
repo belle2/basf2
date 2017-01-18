@@ -82,21 +82,9 @@ namespace Belle2 {
           if (addBestMatch) {
             weightedRelations.push_back(*bestMatch);
           }
-
-          for (auto& otherMatch : matches) {
-            if (not addBestMatch or otherMatch != *bestMatch) {
-              resetNonBestMatches(otherMatch);
-            }
-          }
         }
 
         std::sort(weightedRelations.begin(), weightedRelations.end());
-      }
-
-      /// Function which is called on all not-best matches (which will not be in the result list)
-      virtual void resetNonBestMatches(const WeightedRelationItem& notBestMatch)
-      {
-
       }
 
       /// Set the UseOnlySingleBestCandidate parameter (mostly for tests).

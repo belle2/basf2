@@ -78,8 +78,9 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            false);
   addParam("UseNLoops",
            m_useNLoops,
-           "Set the number of loops to be included in the MC tracks. "
-           "Default includes all",
+           "Set the number of loops whose hits will be marked as priortiy hits. All other hits "
+           "will be marked as auxiliary and therfore not considered for efficiency computations. "
+           "By default, all hits will be priority hits.",
            INFINITY);
 
 

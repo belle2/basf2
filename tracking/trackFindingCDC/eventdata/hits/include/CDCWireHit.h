@@ -350,6 +350,8 @@ namespace Belle2 {
 
     /// Generic functor to get the wire hit from an object.
     struct GetWireHit {
+      /// Marker function for the isFunctor test
+      operator FunctorTag();
 
       /// Returns the wire hit of an object.
       template<class T, class SFINAE = decltype(&T::getWireHit)>

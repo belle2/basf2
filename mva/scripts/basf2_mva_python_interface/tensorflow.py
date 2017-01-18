@@ -32,7 +32,7 @@ class State(object):
     def add_to_collection(self):
         """ Add the stored members to the current tensorflow collection """
         tf.add_to_collection('x', self.x)
-        tf.add_to_collection('y', self.x)
+        tf.add_to_collection('y', self.y)
         tf.add_to_collection('activation', self.activation)
         tf.add_to_collection('cost', self.cost)
         tf.add_to_collection('optimizer', self.optimizer)

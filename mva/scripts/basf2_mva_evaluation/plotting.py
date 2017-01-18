@@ -454,8 +454,10 @@ class Distribution(Plotter):
         self.keep_first_binning = keep_first_binning
         #: first binning
         self.first_binning = None
+        #: x axis label
+        self.x_axis_label = ''
 
-    def add(self, data, column, mask=None, weight_column=None):
+    def add(self, data, column, mask=None, weight_column=None, label=None):
         """
         Add a new distribution to the plots
         @param data pandas.DataFrame containing all data
@@ -469,7 +471,7 @@ class Distribution(Plotter):
         bins = 100
         if self.keep_first_binning and self.first_binning is not None:
             bins = self.first_binning
-        hists = histogram.Histograms(data, column, {'Total': mask}, weight_column=weight_column, bins=bins)
+        hists = histogram.Histograms(data, column, {'Total': mask}, weight_column=weight_column, bins=bins, equal_frequency=False)
         if self.keep_first_binning and self.first_binning is None:
             self.first_binning = hists.bins
         hist, hist_error = hists.get_hist('Total')
@@ -488,7 +490,11 @@ class Distribution(Plotter):
 
         p = self._plot_datapoints(self.axis, hists.bin_centers, hist, xerr=hists.bin_widths / 2, yerr=hist_error)
         self.plots.append(p)
-        self.labels.append(column)
+        self.x_axis_label = column
+        if label is None:
+            self.labels.append(column)
+        else:
+            self.labels.append(label)
         return self
 
     def finish(self):
@@ -499,7 +505,7 @@ class Distribution(Plotter):
         self.axis.set_xlim((self.xmin, self.xmax))
         self.axis.set_ylim((self.ymin, self.ymax))
         self.axis.set_title("Distribution Plot")
-        self.axis.get_xaxis().set_label_text('Classifier Output')
+        self.axis.get_xaxis().set_label_text(self.x_axis_label)
         if self.normed_to_all_entries and self.normed_to_bin_width:
             self.axis.get_yaxis().set_label_text('# Entries per Bin / (# Entries * Bin Width)')
         elif self.normed_to_all_entries:
@@ -527,9 +533,9 @@ class Box(Plotter):
         """
         if mask is None:
             mask = numpy.ones(len(data)).astype('bool')
-        x = data.loc[mask, column].reset_index(drop=True)
+        x = data[column][mask]
         if weight_column is not None:
-            weight = data.loc[mask, weight_column].reset_index(drop=True)
+            weight = data[weight_column][mask]
             B2WARNING("Weights are currently not used in boxplot, due to limitations in matplotlib")
 
         if len(x) == 0:
@@ -543,6 +549,7 @@ class Box(Plotter):
                               )
         self.plots.append(p)
         self.labels.append(column)
+        self.x_axis_label = column
         """
         self.axis.text(0.1, 0.9, (r'$     \mu = {:.2f}$' + '\n' + r'$median = {:.2f}$').format(x.mean(), x.median()),
                        fontsize=28, verticalalignment='top', horizontalalignment='left', transform=self.axis.transAxes)
@@ -560,7 +567,7 @@ class Box(Plotter):
         Sets limits, title, axis-labels and legend of the plot
         """
         matplotlib.artist.setp(self.axis.get_yaxis(), visible=False)
-        self.axis.get_xaxis().set_label_text('Classifier Output')
+        self.axis.get_xaxis().set_label_text(self.x_axis_label)
         self.axis.set_title("Box Plot")
         return self
 
@@ -576,7 +583,7 @@ class Difference(Plotter):
     #: @var ymin
     #: min y value
 
-    def add(self, data, column, minuend_mask, subtrahend_mask, weight_column=None):
+    def add(self, data, column, minuend_mask, subtrahend_mask, weight_column=None, shift_to_zero=False, label=None):
         """
         Add a new difference plot
         @param data pandas.DataFrame containing all data
@@ -584,12 +591,16 @@ class Difference(Plotter):
         @param minuend_mask boolean numpy.array defining which events are for the minuend histogram
         @param subtrahend_mask boolean numpy.array defining which events are for the subtrahend histogram
         @param weight_column column in data containing the weights for each event
+        @param shift_to_zero mean difference is shifted to zero, to remove constant offset due to e.g. different sample sizes
         """
-        hists = histogram.Histograms(data, column,
-                                     {'Minuend': minuend_mask, 'Subtrahend': subtrahend_mask}, weight_column=weight_column)
+        hists = histogram.Histograms(data, column, {'Minuend': minuend_mask, 'Subtrahend': subtrahend_mask},
+                                     weight_column=weight_column, equal_frequency=False)
         minuend, minuend_error = hists.get_hist('Minuend')
         subtrahend, subtrahend_error = hists.get_hist('Subtrahend')
         difference, difference_error = minuend - subtrahend, histogram.poisson_error(minuend + subtrahend)
+
+        if shift_to_zero:
+            difference = difference - numpy.mean(difference)
 
         self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
         self.ymin = min((difference - difference_error).min(), self.ymin)
@@ -597,7 +608,11 @@ class Difference(Plotter):
 
         p = self._plot_datapoints(self.axis, hists.bin_centers, difference, xerr=hists.bin_widths / 2, yerr=difference_error)
         self.plots.append(p)
-        self.labels.append(column)
+        if label is None:
+            self.labels.append(label)
+        else:
+            self.labels.append(column)
+        self.x_axis_label = column
         return self
 
     def finish(self, line_color='black'):
@@ -610,7 +625,7 @@ class Difference(Plotter):
         self.axis.set_ylim((self.ymin, self.ymax))
         self.axis.set_title("Difference Plot")
         self.axis.get_yaxis().set_major_locator(matplotlib.ticker.MaxNLocator(5))
-        self.axis.get_xaxis().set_label_text('Classifier Output')
+        self.axis.get_xaxis().set_label_text(self.x_axis_label)
         self.axis.get_yaxis().set_label_text('Difference')
         self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
         return self
@@ -686,7 +701,7 @@ class Overtraining(Plotter):
         difference_signal.set_plot_options(self.plot_kwargs)
         difference_signal.set_errorbar_options(self.errorbar_kwargs)
         difference_signal.set_errorband_options(self.errorband_kwargs)
-        difference_signal.add(data, column, train_mask & signal_mask, test_mask & signal_mask, weight_column)
+        difference_signal.add(data, column, train_mask & signal_mask, test_mask & signal_mask, weight_column, shift_to_zero=True)
         self.axis_d1.set_xlim((difference_signal.xmin, difference_signal.xmax))
         self.axis_d1.set_ylim((difference_signal.ymin, difference_signal.ymax))
         difference_signal.plots = difference_signal.labels = []
@@ -697,7 +712,7 @@ class Overtraining(Plotter):
         difference_bckgrd.set_plot_options(self.plot_kwargs)
         difference_bckgrd.set_errorbar_options(self.errorbar_kwargs)
         difference_bckgrd.set_errorband_options(self.errorband_kwargs)
-        difference_bckgrd.add(data, column, train_mask & bckgrd_mask, test_mask & bckgrd_mask, weight_column)
+        difference_bckgrd.add(data, column, train_mask & bckgrd_mask, test_mask & bckgrd_mask, weight_column, shift_to_zero=True)
         self.axis_d2.set_xlim((difference_bckgrd.xmin, difference_bckgrd.xmax))
         self.axis_d2.set_ylim((difference_bckgrd.ymin, difference_bckgrd.ymax))
         difference_bckgrd.plots = difference_bckgrd.labels = []
@@ -761,7 +776,7 @@ class VerboseDistribution(Plotter):
         self.normed = normed
         self.box_axes = []
 
-    def add(self, data, column, mask=None, weight_column=None):
+    def add(self, data, column, mask=None, weight_column=None, label=None):
         """
         Add a new distribution plot, with additional information like a boxplot compared to
         the ordinary Distribution plot.
@@ -774,7 +789,7 @@ class VerboseDistribution(Plotter):
         distribution.set_plot_options(self.plot_kwargs)
         distribution.set_errorbar_options(self.errorbar_kwargs)
         distribution.set_errorband_options(self.errorband_kwargs)
-        distribution.add(data, column, mask, weight_column)
+        distribution.add(data, column, mask, weight_column, label=label)
         distribution.finish()
         self.plots += distribution.plots
         self.labels += distribution.labels
@@ -823,7 +838,7 @@ class Correlation(Plotter):
         @param quantiles list of quantiles between 0 and 100, defining the different cuts
         @param weight_column column in data containing the weights for each event
         """
-        if data[cut_column].empty:
+        if len(data[cut_column]) == 0:
             B2WARNING("Ignore empty Correlation.")
             return self
         percentiles = numpy.percentile(data[cut_column], q=quantiles)
@@ -843,6 +858,39 @@ class Correlation(Plotter):
         distribution.plots = distribution.plots[:len(quantiles)]
         distribution.labels = [str(q) + '% Quantiles' for q in quantiles]
         distribution.finish()
+        return self
+
+    def finish(self):
+        """
+        Sets limits, title, axis-labels and legend of the plot
+        """
+        return self
+
+
+class TSNE(Plotter):
+    """
+    Plots multivariate distribution using TSNE algorithm
+    """
+
+    def add(self, data, columns, *masks):
+        """
+        Add a new correlation plot.
+        @param data pandas.DataFrame containing all data
+        @param columns which are used to calculate the correlations
+        @param masks different classes to show in TSNE
+        """
+        try:
+            import sklearn
+            import sklearn.manifold
+            model = sklearn.manifold.TSNE(n_components=2, random_state=0)
+            data = numpy.array([data[column] for column in columns]).T
+            model.fit(data)
+            for mask in masks:
+                data = numpy.array([data[column][mask] for column in columns]).T
+                data = model.transform(data)
+                self.axis.scatter(data[:, 0], data[:, 1])
+        except ImportError:
+            print("Cannot create TSNE plot. Install sklearn if you want it")
         return self
 
     def finish(self):

@@ -43,7 +43,7 @@ class Histograms(object):
     #: Dictionary of histograms for the given masks
     hists = None
 
-    def __init__(self, data, column, masks=dict(), weight_column=None, bins=100):
+    def __init__(self, data, column, masks=dict(), weight_column=None, bins=100, equal_frequency=True):
         """
         Creates a common binning of the given column of the given pandas.Dataframe,
         and stores for each given mask the histogram of the column
@@ -53,9 +53,11 @@ class Histograms(object):
                      used for the creation of histograms with these names
         @param weight_column identifiying the column in the pandas.DataFrame which is used as weight
         @param bins use given bins instead of default 100
+        @param equal_frequency perform an equal_frequency binning
         """
         isfinite = numpy.isfinite(data[column])
-        bins = numpy.percentile(data[column][isfinite], q=range(bins + 1))
+        if equal_frequency:
+            bins = numpy.percentile(data[column][isfinite], q=range(bins + 1))
         self.hist, self.bins = numpy.histogram(data[column][isfinite], bins=bins,
                                                weights=None if weight_column is None else data[weight_column])
         self.bin_centers = (self.bins + numpy.roll(self.bins, 1))[1:] / 2.0

@@ -12,8 +12,10 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
-#include <tracking/trackFindingCDC/collectors/adders/SegmentTrackAdder.h>
+#include <tracking/trackFindingCDC/utilities/HitComperator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackNormalizer.h>
+#include <tracking/trackFindingCDC/collectors/selectors/SingleMatchSelector.h>
+
 
 #include <vector>
 
@@ -21,6 +23,8 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
     class CDCSegment2D;
+    class CDCWireHit;
+    class CDCRecoHit2D;
 
     /**
      * Add the matched segments to the tracks and normalize the tracks afterwards.
@@ -37,6 +41,12 @@ namespace Belle2 {
       /// Constructor for registering the sub-findlets
       SegmentTrackAdderWithNormalization();
 
+      void beginEvent() override
+      {
+        m_relationsFromTracksToHits.clear();
+        m_mapHitsToMatchedTracks.clear();
+      }
+
       /// Expose the parameters of the sub-findlets.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
@@ -49,11 +59,17 @@ namespace Belle2 {
 
     private:
       // Findlets
-      /// Algorithm for performing the adding of segments to tracks according to their relations
-      SegmentTrackAdder m_segmentTrackAdder;
+      SingleMatchSelector<CDCTrack, CDCRecoHit2D, HitComperator> m_singleHitSelector;
 
       /// Findlet for performing the normalization of the tracks afterwards
       TrackNormalizer m_trackNormalizer;
+
+      // Object pools
+      /// Vector of relations between hits and tracks
+      std::vector<WeightedRelation<CDCTrack, const CDCRecoHit2D>> m_relationsFromTracksToHits;
+
+      /// Thinned out mapping between hits and tracks
+      std::map<const CDCWireHit*, CDCTrack*> m_mapHitsToMatchedTracks;
     };
   }
 }

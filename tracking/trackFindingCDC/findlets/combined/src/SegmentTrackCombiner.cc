@@ -60,7 +60,14 @@ void SegmentTrackCombinerFindlet::apply(std::vector<TrackFindingCDC::CDCSegment2
 {
   m_trackNormalizer.apply(tracks);
 
-  // TODO: Add a precut to add segments which are fully taken immediately at this stage
+  // Add a precut to add segments which are fully taken immediately at this stage
+  for (const CDCSegment2D& segment : segments) {
+    if (segment.isFullyTaken()) {
+      segment.getAutomatonCell().setTakenFlag();
+    } else {
+      segment.getAutomatonCell().unsetTakenFlag();
+    }
+  }
 
   // After that, relations contains all pairs of segments and tracks, with the number of shared hits as weight
   m_sharedHitsMatcher.apply(tracks, segments, m_relations);

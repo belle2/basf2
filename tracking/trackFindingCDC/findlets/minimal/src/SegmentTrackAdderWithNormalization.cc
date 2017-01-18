@@ -40,16 +40,17 @@ std::string SegmentTrackAdderWithNormalization::getDescription()
 void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCTrack, const CDCSegment2D>>& relations,
                                                std::vector<CDCTrack>& tracks, const std::vector<CDCSegment2D>& segments)
 {
-  std::vector<std::tuple<std::pair<const CDCWireHit*, double>, CDCTrack*, CDCRecoHit2D>> hitTrackRelations;
-
+  std::vector<std::tuple<std::pair<const CDCWireHit*, double>, CDCTrack*, CDCRecoHit3D>> hitTrackRelations;
   // Add the relations for the matched segments
   for (const auto& relation : relations) {
     CDCTrack* track = relation.getFrom();
     const CDCSegment2D& segment = *(relation.getTo());
     const Weight weight = relation.getWeight();
+    const CDCTrajectory2D& trajectory2D = track->getStartTrajectory3D().getTrajectory2D();
 
     for (const CDCRecoHit2D& recoHit : segment) {
-      hitTrackRelations.push_back({{&recoHit.getWireHit(), weight},  track, recoHit});
+      CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit.getRLWireHit(), trajectory2D);
+      hitTrackRelations.push_back({{&recoHit.getWireHit(), weight},  track, recoHit3D});
     }
     segment.getAutomatonCell().setTakenFlag();
   }
@@ -60,7 +61,7 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
     if (segment.getAutomatonCell().hasTakenFlag()) continue;
 
     for (const CDCRecoHit2D& recoHit : segment) {
-      hitTrackRelations.push_back({{&recoHit.getWireHit(), 0},  nullptr, recoHit});
+      hitTrackRelations.push_back({{&recoHit.getWireHit(), 0},  nullptr, CDCRecoHit3D()});
     }
   }
 
@@ -73,21 +74,19 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
   for (const auto& relation : hitTrackRelations) {
     const CDCWireHit* cdcWireHit = std::get<0>(relation).first;
     CDCTrack* track = std::get<1>(relation);
-    const CDCRecoHit2D& recoHit = std::get<2>(relation);
+    const CDCRecoHit3D& recoHit3D = std::get<2>(relation);
 
     m_mapHitsToMatchedTracks.insert({cdcWireHit, track});
     if (not track) continue;
 
-    const CDCTrajectory2D& trajectory2D = track->getStartTrajectory3D().getTrajectory2D();
     AutomatonCell& automatonCell = cdcWireHit->getAutomatonCell();
 
-    const auto& trackHitAndSegmentHitAreTheSame = [&cdcWireHit](const CDCRecoHit3D & recoHit3D) {
-      return &(recoHit3D.getWireHit()) == cdcWireHit;
+    const auto& trackHitAndSegmentHitAreTheSame = [&cdcWireHit](const CDCRecoHit3D & otherRecoHit3D) {
+      return &(otherRecoHit3D.getWireHit()) == cdcWireHit;
     };
 
     // Do only add the hit, if it is not already present in the track.
     if (not any(*track, trackHitAndSegmentHitAreTheSame)) {
-      CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit.getRLWireHit(), trajectory2D);
       track->push_back(recoHit3D);
       automatonCell.setTakenFlag();
     }

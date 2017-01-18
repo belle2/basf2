@@ -528,7 +528,9 @@ void TrackFinderMCTruthRecoTracksModule::event()
       const MCParticle* mcParticle = cdcSimHit->getRelated<MCParticle>();
       if (not mcParticle) return false;
 
-      const double tof = cdcSimHit->getFlightTime();
+      // subtract the production time here in order for this classification to also work
+      // for particles produced at times t' > t0
+      const double tof = cdcSimHit->getFlightTime() - mcParticle->getProductionTime();
       const double speed = mcParticle->get4Vector().Beta() * Const::speedOfLight;
       const float absMom3D = mcParticle->getMomentum().Mag();
 

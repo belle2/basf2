@@ -110,7 +110,6 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                 mc_track_matcher_module.param({
                     'mcRecoTracksStoreArrayName': 'MCRecoTracks',
                     'MinimalPurity': 0.66,
-                    'RelateClonesToMCParticles': True,
                     'prRecoTracksStoreArrayName': "RecoTracks",
                     **tracking_coverage
                 })

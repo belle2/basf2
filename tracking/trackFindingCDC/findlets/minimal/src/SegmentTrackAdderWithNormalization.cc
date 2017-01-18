@@ -41,6 +41,11 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
                                                std::vector<CDCTrack>& tracks, const std::vector<CDCSegment2D>& segments)
 {
   std::vector<std::tuple<std::pair<const CDCWireHit*, double>, CDCTrack*, CDCRecoHit3D>> hitTrackRelations;
+  // Establish the ordering
+  for (CDCTrack& track : tracks) {
+    track.sortByArcLength2D();
+  }
+
   // Add the original hit content of the track with low priority
   for (CDCTrack& track : tracks) {
     for (const CDCRecoHit3D& recoHit3D : track) {

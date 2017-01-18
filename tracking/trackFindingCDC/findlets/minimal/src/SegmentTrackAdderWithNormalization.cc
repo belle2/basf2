@@ -42,7 +42,7 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
 {
   std::vector<std::tuple<std::pair<const CDCWireHit*, double>, CDCTrack*, CDCRecoHit2D>> hitTrackRelations;
 
-  // Create weighted relations between all hits in the segments and their tracks (matched over the segment-track-relation)
+  // Add the relations for the matched segments
   for (const auto& relation : relations) {
     CDCTrack* track = relation.getFrom();
     const CDCSegment2D& segment = *(relation.getTo());
@@ -71,58 +71,48 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
 
   // Now we have a list of relations between hits and track pointers
   for (const auto& relation : hitTrackRelations) {
-    const CDCRecoHit2D& recoHit = std::get<2>(relation);
     const CDCWireHit* cdcWireHit = std::get<0>(relation).first;
     CDCTrack* track = std::get<1>(relation);
-
-    if (track) {
-      const CDCTrajectory2D& trajectory2D = track->getStartTrajectory3D().getTrajectory2D();
-
-      AutomatonCell& automatonCell = cdcWireHit->getAutomatonCell();
-
-      const auto& trackHitAndSegmentHitAreTheSame = [&cdcWireHit](const CDCRecoHit3D & recoHit3D) {
-        return &(recoHit3D.getWireHit()) == cdcWireHit;
-      };
-
-      // Do only add the hit, if it is not already present in the track.
-      if (not any(*track, trackHitAndSegmentHitAreTheSame)) {
-        CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit.getRLWireHit(), trajectory2D);
-        track->push_back(recoHit3D);
-        automatonCell.setTakenFlag();
-      }
-    }
+    const CDCRecoHit2D& recoHit = std::get<2>(relation);
 
     m_mapHitsToMatchedTracks.insert({cdcWireHit, track});
+    if (not track) continue;
+
+    const CDCTrajectory2D& trajectory2D = track->getStartTrajectory3D().getTrajectory2D();
+    AutomatonCell& automatonCell = cdcWireHit->getAutomatonCell();
+
+    const auto& trackHitAndSegmentHitAreTheSame = [&cdcWireHit](const CDCRecoHit3D & recoHit3D) {
+      return &(recoHit3D.getWireHit()) == cdcWireHit;
+    };
+
+    // Do only add the hit, if it is not already present in the track.
+    if (not any(*track, trackHitAndSegmentHitAreTheSame)) {
+      CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit.getRLWireHit(), trajectory2D);
+      track->push_back(recoHit3D);
+      automatonCell.setTakenFlag();
+    }
   }
 
   // Now go through all the tracks and delete those hits, that are now part of another track or not matched to any
   // track at all
-  const auto& hitIsInOtherTrack = [this](const CDCTrack & thisTrack, const CDCRecoHit3D & recoHit) {
-    const CDCWireHit* cdcWireHit = &(recoHit.getWireHit());
-    // If the hit is not part of any segments, it should stay
-    if (m_mapHitsToMatchedTracks.find(cdcWireHit) == m_mapHitsToMatchedTracks.end()) {
-      return false;
-    }
-
-    const CDCTrack* matchedTrack = m_mapHitsToMatchedTracks[cdcWireHit];
-    // If the segment it belonged to, was not matched to any track, the matched track is a nullptr.
-    // This means we delete the hit from the track and untick its taken flag.
-    if (not matchedTrack) {
-      recoHit.getWireHit().getAutomatonCell().unsetTakenFlag();
-      return true;
-    }
-
-    // If the track, this hit should belong to (because the segment was matched to this track),
-    // is the track we are currently looking on, the hit can stay. If not, the hit should be deleted from
-    // this track. We do not have to untick the taken flag, because the hit is still used (by the other track).
-    return matchedTrack != &thisTrack;
-  };
-
   for (CDCTrack& track : tracks) {
-    // Will call hitIsInOtherTrack(track, hit) for each hit in the track and remove those, where
+    // Will call hitIsInOtherTrack(hit) for each hit in the track and remove those, where
     // hitIsInOtherTrack yields true.
-    erase_remove_if(track,
-                    std::bind(hitIsInOtherTrack, std::cref(track), std::placeholders::_1));
+    const auto& hitIsInOtherTrack = [this, &track](const CDCRecoHit3D & recoHit) {
+      const CDCWireHit* cdcWireHit = &(recoHit.getWireHit());
+      // If the hit is not part of any segments, it should stay
+      if (not m_mapHitsToMatchedTracks.count(cdcWireHit)) return false;
+      const CDCTrack* matchedTrack = m_mapHitsToMatchedTracks[cdcWireHit];
+      // If the segment it belonged to, was not matched to any track, the matched track is a nullptr.
+      // This means we delete the hit from the track and untick its taken flag.
+      recoHit.getWireHit().getAutomatonCell().setTakenFlag(matchedTrack != nullptr);
+
+      // If the track, this hit should belong to (because the segment was matched to this track),
+      // is the track we are currently looking on, the hit can stay. If not, the hit should be deleted from
+      // this track. We do not have to untick the taken flag, because the hit is still used (by the other track).
+      return matchedTrack != &track;
+    };
+    erase_remove_if(track, hitIsInOtherTrack);
   }
 
   // Normalize the trajectory and hit contents of the tracks

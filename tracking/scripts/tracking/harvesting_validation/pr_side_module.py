@@ -98,10 +98,10 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
 
     def peel_pr_to_mc_match_info(self, reco_track):
         track_match_look_up = self.track_match_look_up
-        is_matched = track_match_look_up.isMatchedPRTrackCand(reco_track)
-        is_clone = track_match_look_up.isClonePRTrackCand(reco_track)
-        is_background = track_match_look_up.isBackgroundPRTrackCand(reco_track)
-        is_ghost = track_match_look_up.isGhostPRTrackCand(reco_track)
+        is_matched = track_match_look_up.isMatchedPRRecoTrack(reco_track)
+        is_clone = track_match_look_up.isClonePRRecoTrack(reco_track)
+        is_background = track_match_look_up.isBackgroundPRRecoTrack(reco_track)
+        is_ghost = track_match_look_up.isGhostPRRecoTrack(reco_track)
 
         reco_track_det_hit_ids = utilities.get_det_hit_ids(reco_track)
         n_intersecting_mc_tracks = 0

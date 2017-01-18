@@ -179,7 +179,6 @@ AvailableCategories = {
 trackLevelParticleLists = []
 eventLevelParticleLists = []
 variablesCombinerLevel = []
-categoriesCombinationCode = 'CatCode'
 
 
 def WhichCategories(categories=[
@@ -227,6 +226,7 @@ def WhichCategories(categories=[
                     '"Muon", "IntermediateMuon", "KinLepton", "IntermediateKinLepton", "Kaon", "SlowPion", "FastPion", '
                     '"Lambda", "FSC", "MaximumPstar" or "KaonPion" ')
     global categoriesCombinationCode
+    categoriesCombinationCode = 'CatCode'
     for code in sorted(categoriesCombination):
         categoriesCombinationCode = categoriesCombinationCode + '%02d' % code
 
@@ -391,7 +391,7 @@ def FillParticleLists(mode='Expert', path=analysis_main):
                 readyParticleLists.append('pi+:inRoe')
 
             if 'K_S0:inRoe' not in readyParticleLists:
-                reconstructDecay('K_S0:inRoe -> pi+:inRoe pi-:inRoe', '0.40<=M<=0.60', True, path=path)
+                reconstructDecay('K_S0:inRoe -> pi+:inRoe pi-:inRoe', '0.40<=M<=0.60', False, path=path)
                 fitVertex('K_S0:inRoe', 0.01, fitter='kfitter', path=path)
                 readyParticleLists.append('K_S0:inRoe')
 
@@ -404,7 +404,7 @@ def FillParticleLists(mode='Expert', path=analysis_main):
             if particleList == 'Lambda0:inRoe':
                 fillParticleList('p+:inRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
                 reconstructDecay(particleList + ' -> pi-:inRoe p+:inRoe',
-                                 '1.00<=M<=1.23', True, path=path)
+                                 '1.00<=M<=1.23', False, path=path)
                 fitVertex(particleList, 0.01, fitter='kfitter', path=path)
                 # if mode != 'Expert':
                 matchMCTruth(particleList, path=path)
@@ -1020,7 +1020,7 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
 
 
 def flavorTagger(
-    particleList,
+    particleLists=[],
     mode='Expert',
     weightFiles='B2JpsiKs_mu',
     workingDirectory='.',
@@ -1047,11 +1047,24 @@ def flavorTagger(
     path=analysis_main,
 ):
     """
-      Defines the whole flavor tagging process.
-      For each Rest of Event built in the steering file.
+      Defines the whole flavor tagging process for each selected Rest of Event (ROE) built in the steering file.
       The flavor is predicted by Multivariate Methods trained with Variables and MetaVariables which use
       Tracks, ECL- and KLMClusters from the corresponding RestOfEvent dataobject.
-      This function can be used to train or to test the flavorTagger: The available modes are "Teacher" or "Expert".
+      This function can be used to sample the training information, to train or to test the flavorTagger.
+
+      @param particleLists                      The ROEs for flavor tagging are selected from the given particle lists.
+      @param mode                               The available modes are "Sampler", "Teacher" or "Expert".
+      @param weightFiles                        The name of the weightfiles of the trained method
+      @param workingDirectory                   Path to the directory containing the FlavorTagging/ folder.
+      @param combinerMethods                    Multivariate method used for the combiner: 'TMVA-FBDT' or 'FANN-MLP'.
+      @param categories                         Categories used for flavor tagging
+      @param belleOrBelle2                      Uses Files trained for Belle or Belle2 MC
+      @param buildOrRevision                    Name of the basf2 build or revision
+      @param downloadFromDatabaseIfNotfound     Looks for weight files in the Database if not found in workingDirectory.
+      @param uploadToDatabaseAfterTraining      Uploads the weight files into the Database after training.
+      @param samplerFileId                      Identifier to paralellize training.
+      @param path                               modules are added to this path
+
     """
 
     if mode != 'Sampler' and mode != 'Teacher' and mode != 'Expert':
@@ -1113,11 +1126,11 @@ def flavorTagger(
 
     # Events containing ROE without B-Meson (but not empty) are discarded for training
     if mode == 'Sampler':
-        signalSideParticleFilter(particleList, 'hasRestOfEventTracks > 0 and abs(qrCombined) == 1', roe_path, deadEndPath)
+        signalSideParticleListsFilter(particleLists, 'hasRestOfEventTracks > 0 and abs(qrCombined) == 1', roe_path, deadEndPath)
 
     # If trigger returns 1 jump into empty path skipping further modules in roe_path
     if mode == 'Expert':
-        signalSideParticleFilter(particleList, 'hasRestOfEventTracks > 0', roe_path, deadEndPath)
+        signalSideParticleListsFilter(particleLists, 'hasRestOfEventTracks > 0', roe_path, deadEndPath)
         # Initialation of flavorTaggerInfo dataObject needs to be done in the main path
         flavorTaggerInfoBuilder = register_module('FlavorTaggerInfoBuilder')
         path.add_module(flavorTaggerInfoBuilder)

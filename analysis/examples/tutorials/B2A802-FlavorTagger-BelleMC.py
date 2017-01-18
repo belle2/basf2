@@ -144,12 +144,12 @@ applyCuts('B0:jspiks', 'abs(DeltaT)<25.')
 #
 # Flavor Tagging Function. Default Expert mode to use the default weight files for the B2JpsiKs_mu channel.
 flavorTagger(
-    particleList='B0:jspiks',
+    particleLists=['B0:jspiks'],
     combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
     workingDirectory=os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data',
     belleOrBelle2='Belle')
 #
-# By default the FlavorTagger trains and applies two methods, 'TMVA-FBDT' and 'FANN-MLP', for the combiner.
+# By default the flavorTagger trains and applies two methods, 'TMVA-FBDT' and 'FANN-MLP', for the combiner.
 # If you want to train or test the Flavor Tagger only for one of them you have to specify it like:
 #
 # combinerMethods=['TMVA-FBDT']

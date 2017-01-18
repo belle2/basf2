@@ -120,17 +120,6 @@ namespace Belle2 {
       friend bool operator<(const CDCWireHit& wireHit, const CDCRLWireHit& rlWireHit)
       { return wireHit < rlWireHit.getWireHit(); }
 
-      /**
-       *  Access the object methods and methods from a pointer in the same way.
-       *  In situations where the type is not known to be a pointer or a reference
-       *  there is no way to tell if one should use the dot '.' or operator '->' for method look up.
-       *  So this function defines the -> operator for the object.
-       *  No matter you have a pointer or an object access is given with '->'
-       *  The object is effectively equal to a pointer to itself.
-       */
-      const CDCRLWireHit* operator->() const
-      { return this; }
-
       /// Make the wire hit automatically castable to its underlying cdcHit.
       operator const Belle2::CDCHit* () const
       { return getWireHit().getHit(); }

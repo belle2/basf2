@@ -58,7 +58,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     Return default tensorflow model
     """
     x = tf.placeholder("float", [None, number_of_features])
-    y = tf.placeholder("float", [None])
+    y = tf.placeholder("float", [None, 1])
     W = tf.Variable(tf.zeros([number_of_features, 1]))
     b = tf.Variable(tf.zeros([1]))
 
@@ -98,7 +98,8 @@ def apply(state, X):
     """
     Apply estimator to passed data.
     """
-    return state.session.run(state.activation, feed_dict={state.x: X})
+    r = state.session.run(state.activation, feed_dict={state.x: X}).flatten()
+    return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
 def begin_fit(state):
@@ -130,4 +131,5 @@ def end_fit(state):
             data1 = file1.read()
             data2 = file2.read()
     meta_graph = saver.export_meta_graph()
+    del state
     return [meta_graph, os.path.basename(filename), data1, data2]

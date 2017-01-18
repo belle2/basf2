@@ -274,9 +274,9 @@ void HitProcessor::removeHitsAfterSuperLayerBreak(CDCTrack& track)
   // Count the number of hits in the outgoing and ingoing arm per superlayer.
   for (const CDCRecoHit3D& hit : track) {
     if ((hit.getArcLength2D() <= apogeeArcLength) and (hit.getArcLength2D() > 0)) {
-      nForwardArmHitsBySLayer[hit->getISuperLayer()]++;
+      nForwardArmHitsBySLayer[hit.getISuperLayer()]++;
     } else {
-      nBackwardArmHitsBySLayer[hit->getISuperLayer()]++;
+      nBackwardArmHitsBySLayer[hit.getISuperLayer()]++;
     }
   }
 

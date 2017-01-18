@@ -21,7 +21,6 @@
 #include <framework/utilities/NumberSequence.h>
 
 #include <TClonesArray.h>
-#include <TFile.h>
 #include <TEventList.h>
 #include <TObjArray.h>
 #include <TChainElement.h>
@@ -80,6 +79,10 @@ RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentE
   addParam("parentLevel", m_parentLevel,
            "Number of generations of parent files (files used as input when creating a file) to be read. This can be useful if a file is missing some information available in its parent. See https://confluence.desy.de/display/BI/Software+ParentFiles for details.",
            0);
+
+  addParam("collectStatistics"  , m_collectStatistics,
+           "Collect statistics on amount of data read and print statistics (seperate for input & parent files) after processing. Data is collected from TFile using GetBytesRead(), GetBytesReadExtra(), GetReadCalls()",
+           false);
 }
 
 
@@ -265,9 +268,25 @@ void RootInputModule::event()
 void RootInputModule::terminate()
 {
   B2DEBUG(200, "Term called");
+  if (m_collectStatistics and m_tree) {
+    //add stats for last file
+    m_readStats.addFromFile(m_tree->GetFile());
+  }
   delete m_tree;
   delete m_persistent;
-  for (auto entry : m_parentTrees) delete entry.second->GetCurrentFile();
+  ReadStats parentReadStats;
+  for (auto entry : m_parentTrees) {
+    TFile* f = entry.second->GetCurrentFile();
+    if (m_collectStatistics)
+      parentReadStats.addFromFile(f);
+
+    delete f;
+  }
+
+  if (m_collectStatistics) {
+    B2INFO("Statistics for event tree: " << m_readStats.getString());
+    B2INFO("Statistics for event tree (parent files): " << parentReadStats.getString());
+  }
 
   for (int ii = 0; ii < DataStore::c_NDurabilityTypes; ++ii) {
     m_connectedBranches[ii].clear();
@@ -284,6 +303,12 @@ void RootInputModule::readTree()
   if (!m_tree)
     return;
 
+  //keep snapshot of TFile stats (to use if it changes)
+  ReadStats currentEventStats;
+  if (m_collectStatistics) {
+    currentEventStats.addFromFile(m_tree->GetFile());
+  }
+
   // Check if there are still new entries available.
   int  localEntryNumber = m_nextEntry;
   if (m_entrySequences.size() > 0) {
@@ -297,7 +322,6 @@ void RootInputModule::readTree()
     B2FATAL("Failed to load tree, corrupt file? Check standard error for additional messages. (TChain::LoadTree() returned error " <<
             localEntryNumber << ")");
   }
-
   B2DEBUG(200, "Reading file entry " << m_nextEntry);
 
   //Make sure transient members of objects are reinitialised
@@ -326,9 +350,12 @@ void RootInputModule::readTree()
   const long treeNum = m_tree->GetTreeNumber();
   const bool fileChanged = (m_lastPersistentEntry != treeNum);
   if (fileChanged) {
+    if (m_collectStatistics) {
+      m_readStats.add(currentEventStats);
+    }
     // file changed, read the FileMetaData object from the persistent tree and update the parent file metadata
-    B2INFO("New input file with LFN:" << FileCatalog::Instance().getPhysicalFileName(fileMetaData->getLfn()));
     readPersistentEntry(treeNum);
+    B2INFO("Loading new input file with LFN:" << FileCatalog::Instance().getPhysicalFileName(fileMetaData->getLfn()));
   }
 
   for (auto entry : m_storeEntries) {

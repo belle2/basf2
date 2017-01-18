@@ -100,13 +100,13 @@ class VxdCdcMergerHarvester(HarvestingModule):
 
         reco_tracks = Belle2.PyStoreArray('RecoTracks')
 
-        this_best_track_cdc = self.mc_track_matcher_cdc.getRelatedPRTrackCand(mc_track)
-        this_best_track_vxd = self.mc_track_matcher_vxd.getRelatedPRTrackCand(mc_track)
+        this_best_track_cdc = self.mc_track_matcher_cdc.getRelatedPRRecoTrack(mc_track)
+        this_best_track_vxd = self.mc_track_matcher_vxd.getRelatedPRRecoTrack(mc_track)
 
         # here we know, the above tracks should have been merged because they stem
         # from the same MC Track. Have they?
 
-        this_best_track_merged = self.mc_track_matcher.getRelatedPRTrackCand(mc_track)
+        this_best_track_merged = self.mc_track_matcher.getRelatedPRRecoTrack(mc_track)
 
         # todo: once moved to RecoTrack: use more elaborate comparison method to indentify vxd/cdc tracks
         # in merged tracks

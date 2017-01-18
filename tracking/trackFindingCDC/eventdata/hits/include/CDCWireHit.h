@@ -158,24 +158,6 @@ namespace Belle2 {
         return wireSuperLayer.getISuperLayer() < wireHit.getISuperLayer();
       }
 
-      /**
-       *  @name Mimic pointer
-       *
-       *  Access the object methods and methods from a pointer in the same way.
-       *  In situations where the type is not known to be a pointer or a reference
-       *  there is no way to tell if one should use the dot '.' or operator '->' for method look up.
-       *  So this function defines the -> operator for the object.
-       *  No matter you have a pointer or an object access is given with '->'
-       *  The object is effectively equal to a pointer to itself.
-       *
-       *  @{
-       */
-      const CDCWireHit* operator->() const
-      {
-        return this;
-      }
-      /// @}
-
       /// Getter for the CDCHit pointer into the StoreArray.
       const CDCHit* getHit() const
       {

@@ -27,7 +27,7 @@ def main(argv):
     # We'll use the same data for all calibrations but this is not a requirement in general.
     input_files_test = []
     for run in range(1, 5):
-        cosmics_file_path = os.path.join(data_dir, 'DST_exp1_run{0}.root'.format(run))
+        cosmics_file_path = os.path.abspath(os.path.join(data_dir, 'DST_exp1_run{0}.root'.format(run)))
         input_files_test.append(cosmics_file_path)
 
     ###################################################

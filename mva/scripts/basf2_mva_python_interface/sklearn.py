@@ -75,8 +75,8 @@ def partial_fit(state, X, S, y, w, Xtest, Stest, ytest, wtest, epoch):
     SKLearn is usually not able to perform a partial fit.
     """
     state.X.append(X)
-    state.y.append(y)
-    state.w.append(w)
+    state.y.append(y.flatten())
+    state.w.append(w.flatten())
     return True
 
 

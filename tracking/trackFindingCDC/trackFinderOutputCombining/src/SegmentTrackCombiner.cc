@@ -111,7 +111,7 @@ void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackFilter)
           [this, &segment](const CDCRecoHit3D & recoHit) -> bool {
             if (m_segmentLookUp.findSegmentForHit(recoHit) == segment)
             {
-              recoHit->getWireHit().getAutomatonCell().unsetTakenFlag();
+              recoHit.getWireHit().getAutomatonCell().unsetTakenFlag();
               return true;
             } else {
               return false;

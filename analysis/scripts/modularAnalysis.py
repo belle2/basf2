@@ -1038,7 +1038,34 @@ def signalSideParticleFilter(
     """
     mod = register_module('SignalSideParticleFilter')
     mod.set_name('SigSideParticleFilter_' + particleList)
-    mod.param('particleListName', particleList)
+    mod.param('particleLists', [particleList])
+    mod.param('selection', selection)
+    roe_path.add_module(mod)
+    mod.if_false(deadEndPath)
+
+
+def signalSideParticleListsFilter(
+    particleLists,
+    selection,
+    roe_path,
+    deadEndPath
+):
+    """
+    Checks if the current ROE object in the for_each roe path (argument roe_path) is related
+    to the particle from the input ParticleList. Additional selection criteria can be applied.
+    If ROE is not related to any of the Particles from ParticleList or the Particle doesn't
+    meet the selection criteria the execution of deadEndPath is started. This path, as the name
+    sugest should be empty and its purpose is to end the execution of for_each roe path for
+    the current ROE object.
+
+    @param particleLists  The input ParticleLists
+    @param selection Selection criteria that Particle needs meet in order for for_each ROE path to continue
+    @param for_each roe path in which this filter is executed
+    @param deadEndPath empty path that ends execution of or_each roe path for the current ROE object.
+    """
+    mod = register_module('SignalSideParticleFilter')
+    mod.set_name('SigSideParticleFilter_' + particleLists[0])
+    mod.param('particleLists', particleLists)
     mod.param('selection', selection)
     roe_path.add_module(mod)
     mod.if_false(deadEndPath)

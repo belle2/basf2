@@ -217,9 +217,10 @@ namespace Belle2 {
       // catch case when sector is not part of the sectorMap:
       if (staticSector == nullptr)
         return just_in_case;
-      const auto filter = staticSector->getFilter2sp(inner);
-      return filter;
-
+      const auto* filterPtr = staticSector->getFilter2sp(inner);
+      if (filterPtr == NULL)
+        return just_in_case;
+      return *filterPtr;
     }
 
 

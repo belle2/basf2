@@ -107,14 +107,18 @@ namespace Belle2 {
 
 
     /** for given pair of Hits, the static sector will provide the filters for testing and apply them, returns true if it was accepted */
+    /*
     bool acceptTwoHitCombination(const FullSecID secID,
                                  const HitType& outerHit,
                                  const HitType& innerHit) const
     {
       return m_staticSector->accept(secID, outerHit.getHit(), innerHit.getHit());
     }
+    */
+
 
     /** for given triple of Hits, the static sector will provide the filters for testing and apply them, returns true if it was accepted */
+    /*
     bool acceptThreeHitCombination(const FullSecID centerSecID,
                                    const FullSecID innerSecID,
                                    const HitType& outerHit,
@@ -123,8 +127,10 @@ namespace Belle2 {
     {
       return m_staticSector->accept(centerSecID, innerSecID, outerHit.getHit(), centerHit.getHit(), innerHit.getHit());
     }
+    */
 
     /** for given triple of Hits, the static sector will provide the filters for testing and apply them, returns true if it was accepted */
+    /*
     bool acceptFourHitCombination(const FullSecID outerCenterSecID,
                                   const FullSecID innerCenterSecID,
                                   const FullSecID innerSecID,
@@ -136,6 +142,9 @@ namespace Belle2 {
       return m_staticSector->accept(outerCenterSecID, innerCenterSecID, innerSecID, outerHit.getHit(), outerCenterHit.getHit(),
                                     innerCenterHit.getHit(), innerHit.getHit());
     }
+    */
+
+
 /// setters:
 
     /** adds new Hit to vector of Hits */

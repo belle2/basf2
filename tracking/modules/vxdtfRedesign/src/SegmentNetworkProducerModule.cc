@@ -11,6 +11,7 @@
 #include <tracking/modules/vxdtfRedesign/SegmentNetworkProducerModule.h>
 
 #include <tracking/trackFindingVXD/segmentNetwork/NodeNetworkHelperFunctions.h>
+#include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 
 using namespace std;
 using namespace Belle2;
@@ -307,10 +308,23 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
     const vector<TrackNode*>& outerHits = outerSector->getEntry().getHits();
     if (outerHits.empty()) continue;
 
+    // get the point to the static sector
+    const StaticSectorType* outerStaticSector = outerSector->getEntry().getAttachedStaticSector();
+    // should not happen, but just in case:
+    if (outerStaticSector == NULL) {
+      B2WARNING("Static sector not found. This should not happen!");
+      continue;
+    }
+
     // loop over inner sectors to get their hits(->innerHits) and check their compatibility
     for (auto* innerSector : outerSector->getInnerNodes()) {
       const vector<TrackNode*>& innerHits = innerSector->getEntry().getHits();
       if (innerHits.empty()) continue;
+
+
+      //retrieve the filter, a null pointer is returned if there is no filter
+      const auto* filter2sp = outerStaticSector->getFilter2sp(innerSector->getEntry().getFullSecID());
+      if (filter2sp == NULL) continue;
 
       for (TrackNode* outerHit : outerHits) {
         // skip double-adding of nodes into the network after first time found -> speeding up the code:
@@ -318,10 +332,14 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
 
         for (TrackNode* innerHit : innerHits) {
           // applying filters provided by the sectorMap:
+          bool accepted = filter2sp->accept(outerHit->getHit(), innerHit->getHit());
+
+          /*
           bool accepted = outerSector->getEntry().acceptTwoHitCombination(
                             innerSector->getEntry().getFullSecID(),
                             *outerHit,
                             *innerHit);
+          */
 
           if (m_PARAMallFiltersOff) accepted = true; // bypass all filters
 
@@ -358,6 +376,7 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
 /** old name: nbFinder. use connected SpacePoints to form segments which will stored and linked in a DirectedNodeNetwork< Segment > */
 void SegmentNetworkProducerModule::buildSegmentNetwork()
 {
+
   DirectedNodeNetwork<Belle2::TrackNode, VoidMetaInfo>& hitNetwork = m_network->accessHitNetwork();
   DirectedNodeNetwork<Segment< Belle2::TrackNode>, CACell>& segmentNetwork = m_network->accessSegmentNetwork();
   vector<Belle2::Segment<Belle2::TrackNode>* >& segments = m_network->accessSegments();
@@ -367,6 +386,14 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
     const vector<DirectedNode<TrackNode, VoidMetaInfo>*>& centerHits = outerHit->getInnerNodes();
     if (centerHits.empty()) continue; // go to next outerHit
 
+    // get the point to the static sector
+    const StaticSectorType* outerStaticSector = outerHit->getEntry().sector->getAttachedStaticSector();
+    // should not happen, but just in case:
+    if (outerStaticSector == NULL) {
+      B2WARNING("Static sector not found. This should not happen!");
+      continue;
+    }
+
     for (DirectedNode<TrackNode, VoidMetaInfo>* centerHit : centerHits) {
       const vector<DirectedNode<TrackNode, VoidMetaInfo>*>& innerHits = centerHit->getInnerNodes();
       if (innerHits.empty()) continue; // go to next centerHit
@@ -375,13 +402,25 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
       bool wasAnythingFoundSoFar = false;
       for (DirectedNode<TrackNode, VoidMetaInfo>* innerHit : innerHits) {
 
+        //retrieve the filter
+        const auto* filter3sp = outerStaticSector->getFilter3sp(centerHit->getEntry().sector->getFullSecID(),
+                                                                innerHit->getEntry().sector->getFullSecID());
+        if (filter3sp == NULL) continue;
+
+        // the filter accepts spacepoint combinations
+        bool accepted = filter3sp->accept(outerHit->getEntry().getHit(), centerHit->getEntry().getHit(),
+                                          innerHit->getEntry().getHit());
+
         // applying filters provided by the sectorMap:
+        /*
         bool accepted = outerHit->getEntry().sector->acceptThreeHitCombination(
                           centerHit->getEntry().sector->getFullSecID(),
                           innerHit->getEntry().sector->getFullSecID(),
                           outerHit->getEntry(),
                           centerHit->getEntry(),
                           innerHit->getEntry());
+
+        */
 
         B2DEBUG(5, "buildSegmentNetwork: outer/Center/Inner: " << outerHit->getEntry().getName() << "/" << centerHit->getEntry().getName()
                 << "/" << innerHit->getEntry().getName() << ", accepted: " << std::to_string(accepted));

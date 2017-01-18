@@ -51,18 +51,39 @@ namespace Belle2 {
 
     // ACCESSOR FUNCTIONS
 
-    /** Get the 2 Space Point filter assigned to the
-    friendship relation among this sector and the
+    /** Get the pionter to the 2 Space Point filter assigned to the
+    friendship relation among this sector; will return NULL if filter is not found
     @param innerSector one */
-    Filter2sp getFilter2sp(FullSecID innerSector) const
+    const Filter2sp* getFilter2sp(FullSecID innerSector) const
     {
-      static Filter2sp just_in_case;
-
       auto filter = m_2spFilters.find(m_compactSecIDsMap->getCompactID(innerSector));
-      if (filter != m_2spFilters.end())
-        return filter->second;
-      return just_in_case;
+      if (filter == m_2spFilters.end()) {
+        return NULL;
+      }
+      return &(filter->second);
     }
+
+    const Filter3sp* getFilter3sp(const FullSecID& centerID, const  FullSecID& innerID) const
+    {
+      auto filter = m_3spFilters.find(m_compactSecIDsMap->getCompactID(centerID, innerID));
+      if (filter == m_3spFilters.end()) {
+        B2DEBUG(1, "StaticSector:getFilter3sp: could not find compactID for given SecIDs  (c/i: " << centerID.getFullSecString() <<
+                "/"  << innerID.getFullSecString() << ")! Returning false.");
+        return NULL;
+      }
+      return &(filter->second);
+    }
+
+
+
+    const Filter4sp* getFilter4sp(const FullSecID& /*outerCenterID*/, const FullSecID& /*innerCenterID*/,
+                                  const FullSecID& /*innerID*/) const
+    {
+      B2WARNING("StaticSector:getFilter4sp  4 hit, all 4 hits are yet ignored in here! TODO: implement!");
+      return NULL;
+    }
+
+
 
     /** Get constant access to the whole set of 2 Space Point filters.
      */
@@ -162,6 +183,7 @@ namespace Belle2 {
     * (this Sector and sector with passed fullSecID) on given hits,
     * sorting of parameters: from outer to inner, independently for SecID and Hits
     * returns true if accepted */
+    /*
     bool accept(const FullSecID& innerID,
                 const HitType& spOnThisSec,
                 const HitType& spOnInnerSec) const
@@ -174,11 +196,13 @@ namespace Belle2 {
       }
       return filter->second.accept(spOnThisSec , spOnInnerSec);
     }
+    */
 
     /** applies all filters enabled for given combination of sectors
     * (this Sector and sector with passed fullSecID) on given hits,
     * sorting of parameters: from outer to inner, independently for SecID and Hits
     * returns true if accepted */
+    /*
     bool accept(const FullSecID& centerID, const  FullSecID& innerID,
                 const HitType& outerSp, const HitType& centerSp, const HitType& innerSp) const
     {
@@ -189,19 +213,22 @@ namespace Belle2 {
         return false;
       }
       // TODO WARNING
-//       B2WARNING("StaticSector:accept 3 hit TODO implement!")
-//       return false;
+    //       B2WARNING("StaticSector:accept 3 hit TODO implement!")
+    //       return false;
       return filter->second.accept(outerSp, centerSp, innerSp);
 
     }
+    */
+
 
     /** applies all filters enabled for given combination of sectors
     * (this Sector and sector with passed fullSecID) on given hits,
     * sorting of parameters: from outer to inner, independently for SecID and Hits
     * returns true if accepted */
+    /*
     bool accept(const FullSecID& outerCenterID, const FullSecID& innerCenterID, const FullSecID& innerID,
-                const HitType& /*outerSp*/, const HitType& /*outerCenterSp*/,
-                const HitType& /*innerCenterSp*/, const HitType& /*innerSp*/) const
+                const HitType& outerSp, const HitType& outerCenterSp,
+                const HitType& innerCenterSp, const HitType& innerSp) const
     {
       B2WARNING("StaticSector:accept 4 hit, all 4 hits are yet ignored in here! TODO: implement!");
       auto filter = m_4spFilters.find(m_compactSecIDsMap->getCompactID(outerCenterID, innerCenterID, innerID));
@@ -214,9 +241,9 @@ namespace Belle2 {
       // TODO WARNING
       B2WARNING("StaticSector:accept 4 hit TODO implement!");
       return false;
-//    return filter->second.accept(outerSp , outerCenterSp, innerCenterSp, innerSp);
+    //    return filter->second.accept(outerSp , outerCenterSp, innerCenterSp, innerSp);
     }
-
+    */
   };
 
 

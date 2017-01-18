@@ -175,7 +175,7 @@ void MillepedeCollectorModule::collect()
   for (auto listName : m_particles) {
     StoreObjPtr<ParticleList> list(listName);
     for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
-      for (auto& track : getParticlesTracks({list->getParticle(iParticle)}, nullptr)) {
+      for (auto& track : getParticlesTracks({list->getParticle(iParticle)})) {
         auto gblfs = dynamic_cast<genfit::GblFitStatus*>(track->getFitStatus());
 
         getObject<TH1F>("chi2/ndf").Fill(gblfs->getChi2() / gblfs->getNdf());
@@ -196,7 +196,7 @@ void MillepedeCollectorModule::collect()
       auto mother = list->getParticle(iParticle);
       std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
 
-      for (auto& track : getParticlesTracks(mother->getDaughters(), mother))
+      for (auto& track : getParticlesTracks(mother->getDaughters()))
         daughters.push_back({
         gbl->collectGblPoints(track, track->getCardinalRep()),
         getGlobalToLocalTransform(track->getFittedState()).GetSub(0, 4, 0, 2)
@@ -232,7 +232,7 @@ void MillepedeCollectorModule::collect()
       TMatrixD extProjection(3, 5);
 
       bool first(true);
-      for (auto& track : getParticlesTracks(mother->getDaughters(), mother)) {
+      for (auto& track : getParticlesTracks(mother->getDaughters())) {
         if (first) {
           // For first trajectory only
           extProjection = getLocalToGlobalTransform(track->getFittedState()).GetSub(0, 2, 0, 4);
@@ -352,10 +352,10 @@ std::string MillepedeCollectorModule::getUniqueMilleName()
   return name;
 }
 
-void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* primary)
+void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* particle)
 {
   std::shared_ptr<genfit::GblFitter> gbl(new genfit::GblFitter());
-  gbl->setOptions("", true, true, 1, 0);
+  gbl->setOptions("", true, true, 1, 1);
 
   MeasurementAdder factory("", "", "", "", "");
 
@@ -423,9 +423,11 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* prim
   gfTrack.addTrackRep(trackRep);
   gfTrack.setCardinalRep(gfTrack.getIdForRep(trackRep));
 
-  if (primary) {
-    TVector3 vertexPos = primary->getVertex();
-    TVector3 vertexMom = primary->getMomentum();
+  if (particle) {
+    TVector3 vertexPos = particle->getVertex();
+    TVector3 vertexMom = particle->getMomentum();
+    gfTrack.setStateSeed(vertexPos, vertexMom);
+
     genfit::StateOnPlane vertexSOP(gfTrack.getCardinalRep());
     TVector3 vertexRPhiDir(vertexPos[0], vertexPos[1], 0);
     TVector3 vertexZDir(0, 0, vertexPos[2]);
@@ -488,7 +490,7 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* prim
 }
 
 
-std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::vector<Particle*> particles, Particle* primary)
+std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::vector<Particle*> particles)
 {
   std::vector< genfit::Track* > tracks;
   for (auto particle : particles) {
@@ -511,7 +513,7 @@ std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::
     }
     auto& track = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
 
-    fitRecoTrack(*recoTrack, primary);
+    fitRecoTrack(*recoTrack, particle);
 
     if (!track.hasFitStatus()) {
       B2INFO("Track has no fit status");

@@ -31,7 +31,7 @@ nevents = int(sys.argv[3])
 main = create_path()
 
 main.add_module("EventInfoSetter", expList=[experiment], runList=[run], evtNumList=[nevents])
-# beam.add_beamparameters(main, "Y4S")
+beam.add_beamparameters(main, "Y4S")
 
 ana.loadGearbox(main)
 main.add_module('Geometry')

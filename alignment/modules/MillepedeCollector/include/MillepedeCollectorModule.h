@@ -54,14 +54,15 @@ namespace Belle2 {
      * Get all useable tracks for particles
      *
      * @param particles vector of Belle2::Particles to be changed in vector of genfit::Tracks
-     * @param primary Pointer to primary particle to add its vertex as additional point
-     * for vertex fit, nullptr to not add vertex point
      */
-    std::vector<genfit::Track*> getParticlesTracks(std::vector<Particle*> particles, Particle* primary = nullptr);
+    std::vector<genfit::Track*> getParticlesTracks(std::vector<Particle*> particles);
 
-
-    /** Fit given RecoTrack with GBL */
-    void fitRecoTrack(RecoTrack& recoTrack, Particle* primary = nullptr);
+    /** Fit given RecoTrack with GBL
+     *
+     * @param particles vector of Belle2::Particles to be changed in vector of genfit::Tracks
+     * @param particle Pointer to reconstructed daughter particle updated by vertex fit OR nullptr for single track
+     */
+    void fitRecoTrack(RecoTrack& recoTrack, Particle* particle = nullptr);
 
     /** Compute the transformation matrix d(q/p,u',v',u,v)/d(x,y,z,px,py,pz) from state at first track point (vertex) */
     TMatrixD getGlobalToLocalTransform(genfit::MeasuredStateOnPlane msop);

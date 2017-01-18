@@ -146,7 +146,7 @@ namespace {
       for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {
         B2DEBUG(100, "    " <<
                 "rl = " << static_cast<int>(rlTaggedWireHit.getRLInfo()) << " " <<
-                "dl = " << rlTaggedWireHit->getRefDriftLength());
+                "dl = " << rlTaggedWireHit.getRefDriftLength());
       }
 
       for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {

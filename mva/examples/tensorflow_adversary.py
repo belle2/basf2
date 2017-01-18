@@ -104,7 +104,11 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
                                                       var_list=get_variables(inference_vars))
 
     init = tf.global_variables_initializer()
-    session = tf.Session()
+
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+    session = tf.Session(config=config)
+
     session.run(init)
     state = State(x, y, inference_activation, total_loss, inference_minimize, session)
     state.adversary_cost = adversary_loss
@@ -150,6 +154,6 @@ if __name__ == "__main__":
     specific_options.m_mini_batch_size = 100
 
     for i, l in enumerate([1, 2, 5, 10, 20, 50, 100]):
-        general_options.m_identifier = "Adversary_{}".format(i)
+        general_options.m_identifier = "TensorflowAdversary_{}".format(i)
         specific_options.m_config = '{"adversary_steps": 20, "learning_rate": 0.001, "lambda": ' + str(i) + '}'
         basf2_mva.teacher(general_options, specific_options)

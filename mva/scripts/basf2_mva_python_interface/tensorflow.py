@@ -59,28 +59,40 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     """
     x = tf.placeholder("float", [None, number_of_features])
     y = tf.placeholder("float", [None, 1])
+    w = tf.placeholder("float", [None, 1])
     W = tf.Variable(tf.zeros([number_of_features, 1]))
     b = tf.Variable(tf.zeros([1]))
 
     x_clean = tf.select(tf.is_nan(x), tf.ones_like(x) * 0., x)
-    activation = tf.nn.softmax(tf.matmul(x_clean, W) + b)
+    activation = tf.nn.sigmoid(tf.matmul(x_clean, W) + b)
 
-    cost = tf.reduce_mean(-tf.reduce_sum(y * tf.log(activation + 0.0000001), reduction_indices=1))
+    epsilon = 1e-5
+    cost = -tf.reduce_sum(y * w * tf.log(activation + epsilon) + (1 - y) * w * tf.log(1 - activation + epsilon)) / tf.reduce_sum(w)
 
-    learning_rate = 0.1
-    optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
+    learning_rate = 0.001
+    global_step = tf.Variable(0, name='global_step', trainable=False)
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost, global_step=global_step)
 
     init = tf.global_variables_initializer()
-    session = tf.Session()
+
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+    session = tf.Session(config=config)
     session.run(init)
-    return State(x, y, activation, cost, optimizer, session)
+
+    state = State(x, y, activation, cost, optimizer, session)
+    state.w = w
+    return state
 
 
 def load(obj):
     """
     Load Tensorflow estimator into state
     """
-    session = tf.Session()
+    tf.reset_default_graph()
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+    session = tf.Session(config=config)
     saver = tf.train.import_meta_graph(obj[0])
     with tempfile.TemporaryDirectory() as path:
         with open(os.path.join(path, obj[1] + '.data-00000-of-00001'), 'w+b') as file1, open(
@@ -113,9 +125,12 @@ def partial_fit(state, X, S, y, w, Xtest, Stest, ytest, wtest, epoch):
     """
     Pass received data to tensorflow session
     """
-    state.session.run(state.optimizer, feed_dict={state.x: X, state.y: y})
-    avg_cost = state.session.run(state.cost, feed_dict={state.x: X, state.y: y}) / len(y)
-    print("Epoch:", '%04d' % (epoch), "cost=", "{:.9f}".format(avg_cost))
+    state.session.run(state.optimizer, feed_dict={state.x: X, state.y: y, state.w: w})
+    avg_cost = state.session.run(state.cost, feed_dict={state.x: X, state.y: y, state.w: w})
+    if epoch % 1000 == 0:
+        print("Epoch:", '%04d' % (epoch), "cost=", "{:.9f}".format(avg_cost))
+    if epoch == 100000:
+        return False
     return True
 
 

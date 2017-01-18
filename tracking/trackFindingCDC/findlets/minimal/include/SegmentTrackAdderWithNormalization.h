@@ -45,7 +45,6 @@ namespace Belle2 {
       void beginEvent() override
       {
         Super::beginEvent();
-        m_relationsFromTracksToHits.clear();
         m_mapHitsToMatchedTracks.clear();
       }
 
@@ -61,16 +60,10 @@ namespace Belle2 {
 
     private:
       // Findlets
-      /// The selector for finding the track each hit should belong to.
-      SingleMatchSelector<CDCTrack, CDCRecoHit2D, HitComperator> m_singleHitSelector;
-
       /// Findlet for performing the normalization of the tracks afterwards
       TrackNormalizer m_trackNormalizer;
 
       // Object pools
-      /// Vector of relations between hits and tracks
-      std::vector<WeightedRelation<CDCTrack, const CDCRecoHit2D>> m_relationsFromTracksToHits;
-
       /// Thinned out mapping between hits and tracks
       std::map<const CDCWireHit*, CDCTrack*> m_mapHitsToMatchedTracks;
     };

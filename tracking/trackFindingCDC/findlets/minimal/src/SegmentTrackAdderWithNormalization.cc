@@ -22,13 +22,11 @@ using namespace TrackFindingCDC;
 SegmentTrackAdderWithNormalization::SegmentTrackAdderWithNormalization() : Super()
 {
   addProcessingSignalListener(&m_trackNormalizer);
-  addProcessingSignalListener(&m_singleHitSelector);
 }
 
 /// Expose the parameters of the sub-findlets.
 void SegmentTrackAdderWithNormalization::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  m_singleHitSelector.exposeParameters(moduleParamList, prefixed(prefix, "hitSelector"));
 }
 
 /// Short description of the findlet
@@ -42,41 +40,40 @@ std::string SegmentTrackAdderWithNormalization::getDescription()
 void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCTrack, const CDCSegment2D>>& relations,
                                                std::vector<CDCTrack>& tracks, const std::vector<CDCSegment2D>& segments)
 {
+  std::vector<std::tuple<std::pair<const CDCWireHit*, double>, CDCTrack*, CDCRecoHit2D>> hitTrackRelations;
+
   // Create weighted relations between all hits in the segments and their tracks (matched over the segment-track-relation)
   for (const auto& relation : relations) {
     CDCTrack* track = relation.getFrom();
     const CDCSegment2D& segment = *(relation.getTo());
     const Weight weight = relation.getWeight();
 
-    segment.getAutomatonCell().setTakenFlag();
-
     for (const CDCRecoHit2D& recoHit : segment) {
-      m_relationsFromTracksToHits.emplace_back(track, weight, &recoHit);
+      hitTrackRelations.push_back({{&recoHit.getWireHit(), weight},  track, recoHit});
     }
+    segment.getAutomatonCell().setTakenFlag();
   }
 
   // Add also those segments, that have no track-partner (and therefore do not have a taken flag)
   for (const CDCSegment2D& segment : segments) {
     // hits were already used in the step before
-    if (segment.getAutomatonCell().hasTakenFlag()) {
-      continue;
-    }
+    if (segment.getAutomatonCell().hasTakenFlag()) continue;
 
     for (const CDCRecoHit2D& recoHit : segment) {
-      m_relationsFromTracksToHits.emplace_back(nullptr, 0, &recoHit);
+      hitTrackRelations.push_back({{&recoHit.getWireHit(), 0},  nullptr, recoHit});
     }
   }
 
-  std::sort(m_relationsFromTracksToHits.begin(), m_relationsFromTracksToHits.end());
+  std::sort(hitTrackRelations.begin(), hitTrackRelations.end(), GreaterOf<First>());
 
   // Thin out those weighted relations, by selecting only the best matching track for each hit
-  m_singleHitSelector.apply(m_relationsFromTracksToHits);
+  erase_unique(hitTrackRelations, EqualOf<FirstOf<First>>());
 
   // Now we have a list of relations between hits and track pointers
-  for (const auto& relation : m_relationsFromTracksToHits) {
-    const CDCRecoHit2D* recoHit = relation.getTo();
-    const CDCWireHit* cdcWireHit = &(recoHit->getWireHit());
-    CDCTrack* track = relation.getFrom();
+  for (const auto& relation : hitTrackRelations) {
+    const CDCRecoHit2D& recoHit = std::get<2>(relation);
+    const CDCWireHit* cdcWireHit = std::get<0>(relation).first;
+    CDCTrack* track = std::get<1>(relation);
 
     if (track) {
       const CDCTrajectory2D& trajectory2D = track->getStartTrajectory3D().getTrajectory2D();
@@ -89,7 +86,7 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
 
       // Do only add the hit, if it is not already present in the track.
       if (not any(*track, trackHitAndSegmentHitAreTheSame)) {
-        CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit->getRLWireHit(), trajectory2D);
+        CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit.getRLWireHit(), trajectory2D);
         track->push_back(recoHit3D);
         automatonCell.setTakenFlag();
       }

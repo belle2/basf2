@@ -125,8 +125,8 @@ namespace Belle2 {
     anotherSpacePointTC.setPdgCode(-11);
     EXPECT_TRUE(aSpacePointTC == anotherSpacePointTC);
 
-    // add a space point and compare again, should now give false
-    anotherSpacePointTC.addSpacePoint(&anotherSVDSpacePoint);
+    // add a space point with arbitrary sorting parameter and compare again, should now give false
+    anotherSpacePointTC.addSpacePoint(&anotherSVDSpacePoint, 1.0);
 
     EXPECT_FALSE(aSpacePointTC == anotherSpacePointTC);
 
@@ -138,12 +138,12 @@ namespace Belle2 {
 
     // create an empty TC and add SpacePoints by hand and compare again with the other TCs
     Belle2::SpacePointTrackCand newSpacePointTC;
-    newSpacePointTC.addSpacePoint(&aPXDSpacePoint);
-    newSpacePointTC.addSpacePoint(&aSVDSpacePoint);
+    newSpacePointTC.addSpacePoint(&aPXDSpacePoint, 1.0);
+    newSpacePointTC.addSpacePoint(&aSVDSpacePoint, 1.1);
 
     EXPECT_TRUE(newSpacePointTC == aSpacePointTC);
 
-    newSpacePointTC.addSpacePoint(&anotherSVDSpacePoint);
+    newSpacePointTC.addSpacePoint(&anotherSVDSpacePoint, 1.2);
 
     EXPECT_TRUE(newSpacePointTC == anotherSpacePointTC);
 

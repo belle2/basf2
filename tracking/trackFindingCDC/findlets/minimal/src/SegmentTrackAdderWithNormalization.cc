@@ -61,8 +61,17 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
     const CDCTrajectory2D& trajectory2D = track->getStartTrajectory3D().getTrajectory2D();
 
     for (const CDCRecoHit2D& recoHit : segment) {
-      CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit.getRLWireHit(), trajectory2D);
-      hitTrackRelations.push_back({{&recoHit.getWireHit(), weight},  track, recoHit3D});
+      auto itRecoHit3D =
+        std::find_if(track->begin(), track->end(), GetWireHit() == recoHit.getWireHit());
+
+      if (itRecoHit3D == track->end()) {
+        CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit.getRLWireHit(), trajectory2D);
+        assert(recoHit3D.getRLInfo() == recoHit.getRLInfo());
+        hitTrackRelations.push_back({{&recoHit.getWireHit(), weight},  track, recoHit3D});
+      } else {
+        CDCRecoHit3D recoHit3D = *itRecoHit3D;
+        hitTrackRelations.push_back({{&recoHit.getWireHit(), weight},  track, recoHit3D});
+      }
     }
     segment.getAutomatonCell().setTakenFlag();
   }

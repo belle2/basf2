@@ -1,20 +1,7 @@
 Import('env')
 
 env['PYTHON_MODULE'] = True
-# try to work around the STATIC_TLS bug by linking against libraries which do
-# have a static TLS block even if we don't need. This should load them first and
-# help with the Problem.
-TLS_LIBS = ['m', 'crypt', 'pthread', 'rt', 'util']
-if env.get('HAS_TEVE', False):
-    TLS_LIBS += ['GL', 'glapi']
-if env.get('HAS_OPENMP', False):
-    TLS_LIBS += ['gomp']
-# and make sure the linker keeps them
-env.Append(LINKFLAGS="-Wl,--no-as-needed")
-
 env['LIBS'] = ['framework',
-               # and add them here
-               ] + TLS_LIBS + [
                'boost_python',
                '$ROOT_LIBS',
                '$PYTHON_LIBS']

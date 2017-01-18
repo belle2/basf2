@@ -41,10 +41,10 @@ void TrackRejecter::apply(std::vector<CDCTrack>& tracks)
 {
   auto reject = [this](CDCTrack & track) {
     double filterWeight = m_trackFilter(track);
-    track.getAutomatonCell().setCellWeight(filterWeight);
+    track->setCellWeight(filterWeight);
     if (std::isnan(filterWeight)) {
-      track.getAutomatonCell().setBackgroundFlag();
-      track.getAutomatonCell().setTakenFlag();
+      track->setBackgroundFlag();
+      track->setTakenFlag();
       return true;
     } else {
       return false;

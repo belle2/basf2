@@ -26,8 +26,8 @@ void RLTaggedWireHitCreator::apply(std::vector<CDCWireHit>& inputWireHits, std::
 {
   // Initialize the RL hits
   for (const CDCWireHit& wireHit : inputWireHits) {
-    if (not wireHit.getAutomatonCell().hasTakenFlag() and not wireHit.isAxial()) {
-      wireHit.getAutomatonCell().unsetAssignedFlag();
+    if (not wireHit->hasTakenFlag() and not wireHit.isAxial()) {
+      wireHit->unsetAssignedFlag();
 
       for (ERightLeft rlInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {
         outputRLWireHits.emplace_back(&wireHit, rlInfo, wireHit.getRefDriftLength());

@@ -54,7 +54,7 @@ void TrackCreatorSingleSegments::apply(const std::vector<CDCSegment2D>& segments
 
   if (not m_param_minimalHitsBySuperLayerId.empty()) {
     for (const CDCSegment2D& segment : segments) {
-      if (segment.getAutomatonCell().hasMaskedFlag()) continue;
+      if (segment->hasMaskedFlag()) continue;
 
       ISuperLayer iSuperLayer = segment.getISuperLayer();
       if (m_param_minimalHitsBySuperLayerId.count(iSuperLayer) and

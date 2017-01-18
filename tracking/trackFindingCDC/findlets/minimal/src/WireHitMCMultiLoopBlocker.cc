@@ -88,8 +88,8 @@ void WireHitMCMultiLoopBlocker::apply(std::vector<CDCWireHit>& wireHits)
 
   for (CDCWireHit& wireHit : wireHits) {
     if (not isWithinMCLoops(wireHit)) {
-      wireHit.getAutomatonCell().setBackgroundFlag();
-      wireHit.getAutomatonCell().setTakenFlag();
+      wireHit->setBackgroundFlag();
+      wireHit->setTakenFlag();
     }
   }
 }

@@ -86,7 +86,12 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
 
       AutomatonCell& automatonCell = cdcWireHit->getAutomatonCell();
 
-      if (not automatonCell.hasTakenFlag()) {
+      const auto& trackHitAndSegmentHitAreTheSame = [&cdcWireHit](const CDCRecoHit3D & recoHit3D) {
+        return &(recoHit3D.getWireHit()) == cdcWireHit;
+      };
+
+      // Do only add the hit, if it is not already present in the track.
+      if (not any(*track, trackHitAndSegmentHitAreTheSame)) {
         CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit->getRLWireHit(), trajectory2D);
         track->push_back(recoHit3D);
         automatonCell.setTakenFlag();

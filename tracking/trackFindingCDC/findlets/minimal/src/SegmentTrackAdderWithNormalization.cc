@@ -41,6 +41,13 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
                                                std::vector<CDCTrack>& tracks, const std::vector<CDCSegment2D>& segments)
 {
   std::vector<std::tuple<std::pair<const CDCWireHit*, double>, CDCTrack*, CDCRecoHit3D>> hitTrackRelations;
+  // Add the original hit content of the track with low priority
+  for (CDCTrack& track : tracks) {
+    for (const CDCRecoHit3D& recoHit3D : track) {
+      hitTrackRelations.push_back({{&recoHit3D.getWireHit(), -INFINITY},  &track, recoHit3D});
+    }
+  }
+
   // Add the relations for the matched segments
   for (const auto& relation : relations) {
     CDCTrack* track = relation.getFrom();

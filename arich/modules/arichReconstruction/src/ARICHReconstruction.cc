@@ -555,11 +555,13 @@ namespace Belle2 {
     //******************************************
     // store LikeliHOOD info
     //******************************************
+
     int flag = 1;
+    if ((thetaCh[0][0] > 0 || thetaCh[0][1] > 0) &&  nSig_w_acc[0][m_nAerogelLayers] == 0) flag = 0;
+
     double exppho[6] = {0.0};
     for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
       exppho[iHyp] = nSig_w_acc[iHyp][m_nAerogelLayers];
-      if ((thetaCh[iHyp][0] > 0 || thetaCh[iHyp][1] > 0) &&  nSig_w_acc[iHyp][m_nAerogelLayers] == 0) flag = 0;
     }
 
     // set values of ARICHLikelihood

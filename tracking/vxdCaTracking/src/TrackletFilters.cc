@@ -408,14 +408,6 @@ std::pair<double, TVector3> TrackletFilters::circleFit(const std::vector<Positio
 
 
 
-
-
-
-
-
-
-
-
 /** does a tripletFit of the given hits
  * The filter is based on the paper 'A New Three-Dimensional Track Fit with Multiple Scattering'
  * by Andre Schoening et al. https://arxiv.org/abs/1606.04990*/
@@ -455,13 +447,9 @@ std::pair<double, TVector3> TrackletFilters::tripletFit(const std::vector<Positi
     double R_C = (d01 * d12 * d02) / sqrt(-d01sq * d01sq - d12sq * d12sq - d02sq * d02sq + 2 * d01sq * d12sq + 2 * d12sq * d02sq + 2 *
                                           d02sq * d01sq);
 
-    B2WARNING("TRIPLETFIT d01, d12, R_C " << d01 << ", " << d12 << ", " << R_C);
-
     double Phi1C = 2. * asin(d01 / (2. * R_C));
     double Phi2C = 2. * asin(d12 / (2. * R_C));
     // TODO Phi1C and Phi2C have 2 solutions (<Pi and >Pi), each, of which the correct one must be chosen!
-
-    B2WARNING("TRIPLETFIT Phi1C, Phi2C " << Phi1C << ", " << Phi2C);
 
     double R3D1C = sqrt(R_C * R_C + (z01 * z01) / (Phi1C * Phi1C));
     double R3D2C = sqrt(R_C * R_C + (z12 * z12) / (Phi2C * Phi2C));
@@ -481,13 +469,13 @@ std::pair<double, TVector3> TrackletFilters::tripletFit(const std::vector<Positi
     double beta = (1 - alpha2) / (R3D2C * tan(theta2C)) - (1 - alpha1) / (R3D1C * tan(theta1C));
 
     // Calculation of sigmaMS
-    double bField = 1.5; // TODO Replace hard-coded value by database value;
+    double bField = 1.5; // TODO Replace hard-coded value with database value;
 
     /** Using average material budged of SVD sensors for approximation of radiation length
      *  Belle II TDR page 156 states a value of 0.57% X_0.
      *  This approximation is a first approach to the problem and must be checked.
      */
-    double XoverX0 = 0.0057 / cos(M_PI - theta1C);
+    double XoverX0 = 0.0057 / cos(M_PI / 2. - theta1C);
 
     double R3D = - eta * PhiTilde * sin(theta) * sin(theta) + beta * ThetaTilde;
     R3D *= 1. / (eta * eta * sin(theta) * sin(theta) + beta * beta);
@@ -508,15 +496,6 @@ std::pair<double, TVector3> TrackletFilters::tripletFit(const std::vector<Positi
   TVector3 pTVector(1, 2, 3);
   return make_pair(combinedChi2, pTVector);
 }
-
-
-
-
-
-
-
-
-
 
 
 

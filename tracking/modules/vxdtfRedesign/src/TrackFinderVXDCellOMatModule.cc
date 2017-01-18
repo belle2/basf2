@@ -72,7 +72,7 @@ void TrackFinderVXDCellOMatModule::initialize()
   m_spacePoints.isRequired(m_spacePointsName);
 
   m_network.isRequired(m_PARAMNetworkName);
-  m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
+  m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_WriteOut);
 
   //Relations SpacePoints and SpacePointTCs:
   m_TCs.registerRelationTo(m_spacePoints, DataStore::c_Event, DataStore::c_DontWriteOut);

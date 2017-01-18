@@ -50,7 +50,7 @@ void QualityEstimatorVXDTripletFitModule::event()
    *  THIS IS A TEMPORARY SOLUTION!
    * The TripletFit used here is using the interface of the old VXDTF and it is planned to use the CDC-Version of the same fitter to reduce redundancy of implementations.
    * Please remove this reminder as soon as this is done.
-   * Felix Metzner 28th, 2016
+   * Felix Metzner 15th December , 2016
    *
    * WARNING hardcoded values so far, should be passed by parameter (or be solved in a general way)!
    * */
@@ -102,6 +102,18 @@ void QualityEstimatorVXDTripletFitModule::event()
               << " hits has pT: " << result.second.Perp()
               << ", chi^2: " << chi2
               << " and probability: " << probability);
+
+    std::pair<double, TVector3> CompResult = fitter.circleFit();
+    double CompChi2 = CompResult.first;
+    double CompProbability = TMath::Prob(CompChi2, nHits - 3);
+
+    B2WARNING("QualityEstimatorVXDTripletFitModule: event " << m_eventCounter
+              << " TripletChi2: " << chi2
+              << " CircleChi2: " << CompChi2
+              << " Triplet/Circle: " << chi2 / CompChi2
+              << " TripletProb: " << probability
+              << " CircleProb: " << CompProbability
+              << " Triplet/Circle: " << probability / CompProbability);
 
     aTC.setQualityIndex(probability);
     ++nTC;

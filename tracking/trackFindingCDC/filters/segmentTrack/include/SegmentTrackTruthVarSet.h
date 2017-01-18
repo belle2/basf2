@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
+
 #include <utility>
 
 namespace Belle2 {
@@ -51,6 +53,19 @@ namespace Belle2 {
     public:
       /// Generate and assign the contained variables
       bool extract(const std::pair<const CDCTrack*, const CDCSegment2D*>* testPair) final;
+
+
+      void initialize() override
+      {
+        CDCMCManager::getInstance().requireTruthInformation();
+        VarSet<SegmentTrackTruthVarNames>::initialize();
+      }
+
+      void beginEvent() override
+      {
+        CDCMCManager::getInstance().fill();
+        VarSet<SegmentTrackTruthVarNames>::beginEvent();
+      }
     };
   }
 }

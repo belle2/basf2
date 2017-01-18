@@ -41,8 +41,10 @@ namespace Belle2 {
       /// Constructor for registering the sub-findlets
       SegmentTrackAdderWithNormalization();
 
+      /// Is called before the event starts to clear all maps and lists.
       void beginEvent() override
       {
+        Super::beginEvent();
         m_relationsFromTracksToHits.clear();
         m_mapHitsToMatchedTracks.clear();
       }
@@ -59,6 +61,7 @@ namespace Belle2 {
 
     private:
       // Findlets
+      /// The selector for finding the track each hit should belong to.
       SingleMatchSelector<CDCTrack, CDCRecoHit2D, HitComperator> m_singleHitSelector;
 
       /// Findlet for performing the normalization of the tracks afterwards

@@ -43,8 +43,8 @@ void SegmentTrackCombinerFindlet::exposeParameters(ModuleParamList* moduleParamL
   Super::exposeParameters(moduleParamList, prefix);
 
   m_sharedHitsMatcher.exposeParameters(moduleParamList, prefix);
-  m_selectPairsWithSharedHits.exposeParameters(moduleParamList, prefixed("sharedHits", prefix));
-  m_chooseableSegmentTrackSelector.exposeParameters(moduleParamList, prefixed("segmentTrack", prefix));
+  m_selectPairsWithSharedHits.exposeParameters(moduleParamList, prefixed(prefix, "sharedHits"));
+  m_chooseableSegmentTrackSelector.exposeParameters(moduleParamList, prefixed(prefix, "segmentTrack"));
   m_singleMatchSelector.exposeParameters(moduleParamList, prefix);
   m_segmentTrackAdderWithNormalization.exposeParameters(moduleParamList, prefix);
   m_trackRejecter.exposeParameters(moduleParamList, prefixed(prefix, "track"));

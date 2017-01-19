@@ -135,7 +135,7 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
     // Do only add the hit, if it is not already present in the track.
     if (itRecoHit3D != track->end()) {
       assert(*itRecoHit3D == recoHit3D);
-      continue;
+      track->erase(itRecoHit3D);
     }
 
     track->push_back(recoHit3D);

@@ -92,29 +92,8 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
   // Thin out those weighted relations, by selecting only the best matching track for each hit
   erase_unique(hitTrackRelations, EqualOf<FirstOf<First>>());
 
-  // Now we have a list of relations between hits and track pointers
-  for (const auto& relation : hitTrackRelations) {
-    const CDCWireHit* cdcWireHit = std::get<0>(relation).first;
-    CDCTrack* track = std::get<1>(relation);
-    const CDCRecoHit3D& recoHit3D = std::get<2>(relation);
-
-    if (not track) continue;
-
-    AutomatonCell& automatonCell = cdcWireHit->getAutomatonCell();
-
-    const auto& trackHitAndSegmentHitAreTheSame = [&cdcWireHit](const CDCRecoHit3D & otherRecoHit3D) {
-      return &(otherRecoHit3D.getWireHit()) == cdcWireHit;
-    };
-
-    // Do only add the hit, if it is not already present in the track.
-    if (not any(*track, trackHitAndSegmentHitAreTheSame)) {
-      track->push_back(recoHit3D);
-      automatonCell.setTakenFlag();
-    }
-  }
-
-  // Now go through all the tracks and delete those hits, that are now part of another track or not matched to any
-  // track at all
+  // Now go through all the tracks and delete those hits, that are now part of another track or
+  // not matched to any track at all
   for (CDCTrack& track : tracks) {
     // Will call hitIsInOtherTrack(hit) for each hit in the track and remove those, where
     // hitIsInOtherTrack yields true.
@@ -141,6 +120,27 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
       return matchedTrack != &track;
     };
     erase_remove_if(track, hitIsInOtherTrack);
+  }
+
+  // Now we have a list of relations between hits and track pointers
+  for (const auto& relation : hitTrackRelations) {
+    const CDCWireHit* cdcWireHit = std::get<0>(relation).first;
+    CDCTrack* track = std::get<1>(relation);
+    const CDCRecoHit3D& recoHit3D = std::get<2>(relation);
+
+    if (not track) continue;
+
+    AutomatonCell& automatonCell = cdcWireHit->getAutomatonCell();
+
+    const auto& trackHitAndSegmentHitAreTheSame = [&cdcWireHit](const CDCRecoHit3D & otherRecoHit3D) {
+      return &(otherRecoHit3D.getWireHit()) == cdcWireHit;
+    };
+
+    // Do only add the hit, if it is not already present in the track.
+    if (not any(*track, trackHitAndSegmentHitAreTheSame)) {
+      track->push_back(recoHit3D);
+      automatonCell.setTakenFlag();
+    }
   }
 
   // Establish the ordering

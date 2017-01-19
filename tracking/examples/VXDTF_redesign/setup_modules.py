@@ -96,6 +96,7 @@ def setup_VXDTF2(path=None,
 
     cellOmat = register_module('TrackFinderVXDCellOMat')
     cellOmat.param('NetworkName', 'test2Hits')
+    cellOmat.param('printNetworks', False)
     cellOmat.param('strictSeeding', True)
     cellOmat.logging.log_level = log_level
     cellOmat.logging.debug_level = debug_level
@@ -239,8 +240,9 @@ def setup_RTCtoSPTCConverters(
     recoTrackCandConverter.param('RecoTracksName', RTCinput)
     recoTrackCandConverter.param('SpacePointTCName', 'SPTracks')
     recoTrackCandConverter.param('SVDDoubleClusterSP', svdSPs)
-    recoTrackCandConverter.param('useTrueHits', False)
+    recoTrackCandConverter.param('useTrueHits', True)
     recoTrackCandConverter.param('useSingleClusterSP', False)
+    recoTrackCandConverter.param('minSP', 3)
     recoTrackCandConverter.param('skipProblematicCluster', False)
 
     # SpacePointTrackCand referee
@@ -249,12 +251,12 @@ def setup_RTCtoSPTCConverters(
     sptcReferee.param('sptcName', 'SPTracks')
     sptcReferee.param('newArrayName', sptcOutput)
     sptcReferee.param('storeNewArray', True)
-    sptcReferee.param('checkCurling', False)
+    sptcReferee.param('checkCurling', True)
     sptcReferee.param('splitCurlers', True)
     sptcReferee.param('keepOnlyFirstPart', True)
     sptcReferee.param('kickSpacePoint', True)
     sptcReferee.param('checkSameSensor', True)
-    sptcReferee.param('useMCInfo', False)
+    sptcReferee.param('useMCInfo', True)
 
     if path is 0:
         return [sp2thConnector, recoTrackCandConverter, sptcReferee]

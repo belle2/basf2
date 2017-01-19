@@ -74,7 +74,7 @@ void QualityEstimatorVXDCircleFitModule::event()
     convertedPath.reserve(nHits);
 
     // collecting actual hits
-    for (const SpacePoint* aHit : aTC) { // is a const SpacePoint* here
+    for (const SpacePoint* aHit : aTC.getSortedHits()) { // is a const SpacePoint* here
       PositionInfo convertedHit{
         TVector3(aHit->getPosition()),
         TVector3(aHit->getPositionError()),

@@ -63,6 +63,10 @@ namespace Belle2 {
       return &(filter->second);
     }
 
+    /** Get the pionter to the 3 Space Point filter assigned to the
+    friendship relation among this sector; will return NULL if filter is not found
+    @param centerID : FullSecID for the sector between the inner and this sector
+    @param innerID : FullSecID for the inner sector*/
     const Filter3sp* getFilter3sp(const FullSecID& centerID, const  FullSecID& innerID) const
     {
       auto filter = m_3spFilters.find(m_compactSecIDsMap->getCompactID(centerID, innerID));
@@ -75,7 +79,9 @@ namespace Belle2 {
     }
 
 
-
+    /** Get the pionter to the 4 Space Point filter assigned to the
+    WARNING: not implemented yet. Will return a NULL pointer in any case!
+    */
     const Filter4sp* getFilter4sp(const FullSecID& /*outerCenterID*/, const FullSecID& /*innerCenterID*/,
                                   const FullSecID& /*innerID*/) const
     {
@@ -176,74 +182,6 @@ namespace Belle2 {
       return (getFullSecID() == b);
     }
 
-
-
-
-    /** applies all filters enabled for given combination of sectors
-    * (this Sector and sector with passed fullSecID) on given hits,
-    * sorting of parameters: from outer to inner, independently for SecID and Hits
-    * returns true if accepted */
-    /*
-    bool accept(const FullSecID& innerID,
-                const HitType& spOnThisSec,
-                const HitType& spOnInnerSec) const
-    {
-      auto filter = m_2spFilters.find(m_compactSecIDsMap->getCompactID(innerID));
-      if (filter == m_2spFilters.end()) {
-        B2DEBUG(1, "StaticSector:accept: could not find compactID for given SecID (" << innerID.getFullSecString() <<
-                ")! Returning false.");
-        return false;
-      }
-      return filter->second.accept(spOnThisSec , spOnInnerSec);
-    }
-    */
-
-    /** applies all filters enabled for given combination of sectors
-    * (this Sector and sector with passed fullSecID) on given hits,
-    * sorting of parameters: from outer to inner, independently for SecID and Hits
-    * returns true if accepted */
-    /*
-    bool accept(const FullSecID& centerID, const  FullSecID& innerID,
-                const HitType& outerSp, const HitType& centerSp, const HitType& innerSp) const
-    {
-      auto filter = m_3spFilters.find(m_compactSecIDsMap->getCompactID(centerID, innerID));
-      if (filter == m_3spFilters.end()) {
-        B2DEBUG(1, "StaticSector:accept: could not find compactID for given SecIDs  (c/i: " << centerID.getFullSecString() <<
-                "/"  << innerID.getFullSecString() << ")! Returning false.");
-        return false;
-      }
-      // TODO WARNING
-    //       B2WARNING("StaticSector:accept 3 hit TODO implement!")
-    //       return false;
-      return filter->second.accept(outerSp, centerSp, innerSp);
-
-    }
-    */
-
-
-    /** applies all filters enabled for given combination of sectors
-    * (this Sector and sector with passed fullSecID) on given hits,
-    * sorting of parameters: from outer to inner, independently for SecID and Hits
-    * returns true if accepted */
-    /*
-    bool accept(const FullSecID& outerCenterID, const FullSecID& innerCenterID, const FullSecID& innerID,
-                const HitType& outerSp, const HitType& outerCenterSp,
-                const HitType& innerCenterSp, const HitType& innerSp) const
-    {
-      B2WARNING("StaticSector:accept 4 hit, all 4 hits are yet ignored in here! TODO: implement!");
-      auto filter = m_4spFilters.find(m_compactSecIDsMap->getCompactID(outerCenterID, innerCenterID, innerID));
-      if (filter == m_4spFilters.end()) {
-        B2DEBUG(1, "StaticSector:accept: could not find compactID for given SecIDs  (oc/ic/i: " << outerCenterID.getFullSecString() <<
-                "/"  << innerCenterID.getFullSecString() <<
-                "/"  << innerID.getFullSecString() << ")! Returning false.");
-        return false;
-      }
-      // TODO WARNING
-      B2WARNING("StaticSector:accept 4 hit TODO implement!");
-      return false;
-    //    return filter->second.accept(outerSp , outerCenterSp, innerCenterSp, innerSp);
-    }
-    */
   };
 
 

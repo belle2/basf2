@@ -51,6 +51,20 @@ def compare_log(template_file, log, ignore_lines=0, diff_lines=10):
     return None
 
 
+def format_output(name, out, err):
+    """Nicely format the stdout and stderr of testcase called name"""
+    if options.quiet:
+        return ""
+    output = []
+    if out.strip():
+        output += ["=== stdout of %s ===\n" % name, out.decode()]
+    if err.strip():
+        output += ["=== stderr of %s ===\n" % name, err.decode()]
+    if len(output):
+        output.append("=== end %s ===\n" % name)
+    return "".join(output)
+
+
 def run_test(argument):
     """Run the test for the given steering file"""
 
@@ -63,14 +77,24 @@ def run_test(argument):
 
     name, release_dir = argument
     steering = os.path.join(release_dir, name)
-    # print 'starting test %s' % name
-    process = subprocess.Popen(['basf2', steering], stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE)
-    (out, err) = process.communicate()
     result = None
     message = None
+    extra = ""
+    try:
+        process = subprocess.run(['basf2', steering], stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE, timeout=options.timeout)
+    except subprocess.TimeoutExpired as e:
+        # apparently test case took to long so format result message. Without
+        # timeout result would be None so we can distinguish later.
+        result = False
+        message = "timeout of %d seconds reached" % options.timeout
+        extra = format_output(name, e.stderr, e.stdout)
+
     with print_lock:
-        if process.returncode != 0:
+        if result is False:
+            # timeout happened, everthing is already setup and the process
+            pass
+        elif process.returncode != 0:
             # check for skipped test
             skipped = re.search(b"^TEST SKIPPED:\s*(.+)$", err, re.MULTILINE)
             if skipped:
@@ -79,30 +103,19 @@ def run_test(argument):
             else:
                 result = False
                 message = "return code %d" % process.returncode
-
+                extra = format_output(name, process.stdout, process.stderr)
         else:
-            log_tests = [compare_log(steering[:-2] + 'out', out, 1, options.diff_lines),
-                         compare_log(steering[:-2] + 'err', err, 0, options.diff_lines)]
+            log_tests = [compare_log(steering[:-2] + 'out', process.stdout, 1, options.diff_lines),
+                         compare_log(steering[:-2] + 'err', process.stderr, 0, options.diff_lines)]
             if log_tests[0] is None and log_tests[1] is None:
                 result = True
                 message = "finished successfully"
-            elif not (log_tests[0] == False or log_tests[1] == False):
+            elif not (log_tests[0] is False or log_tests[1] is False):
                 result = True
                 message = "logs ok"
             else:
                 result = False
                 message = "logs differ"
-
-        extra = ""
-        if not options.quiet and process.returncode != 0:
-            output = []
-            if out.strip():
-                output += ["=== stdout of %s ===\n" % name, out.decode()]
-            if err.strip():
-                output += ["=== stderr of %s ===\n" % name, err.decode()]
-            if len(output):
-                output.append("=== end %s ===\n" % name)
-            extra = "".join(output)
 
         result_message = {True: "passed", None: "skipped", False: "FAILED"}[result]
         print("%sfinished test %s\n     -> %s: %s" % (extra, name, result_message, message), flush=True)
@@ -159,6 +172,9 @@ parser.add_argument("--filter", type=str, default=None, help="If given only run 
                     "of the steering file matches the regular expression given")
 parser.add_argument("directories", nargs="*", help="run all tests included in these directories. "
                     "If none are specified run all tests")
+parser.add_argument("-t", "--timeout", type=int, default=None, metavar="SECONDS",
+                    help="if given this is the maximum runtime in seconds for each "
+                    "test case before they are killed and marked as failed")
 options = parser.parse_args()
 
 # check whether a release is set up
@@ -167,7 +183,7 @@ if not ('BELLE2_LOCAL_DIR' in os.environ or 'BELLE2_RELEASE_DIR' in os.environ):
     sys.exit(-1)
 
 # first let's collect all tests
-print("running steering file tests in %d %s" % (options.nprocess, "process" if options.nprocess==1 else "processes"), flush=True)
+print("running steering file tests in %d %s" % (options.nprocess, "process" if options.nprocess == 1 else "processes"), flush=True)
 all_tests = []
 processed_dirs = []
 if "BELLE2_LOCAL_DIR" in os.environ:

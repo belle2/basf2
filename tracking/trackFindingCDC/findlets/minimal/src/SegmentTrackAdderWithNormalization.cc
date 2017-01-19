@@ -122,7 +122,7 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
     erase_remove_if(track, hitIsInOtherTrack);
   }
 
-  // Now add the hits to their destination tracks
+  // Remove all hits from their tracks.
   for (const auto& relation : hitTrackRelations) {
     const CDCWireHit& wireHit = *std::get<0>(relation).first;
     CDCTrack* track = std::get<1>(relation);
@@ -136,7 +136,22 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
     if (itRecoHit3D != track->end()) {
       assert(*itRecoHit3D == recoHit3D);
       track->erase(itRecoHit3D);
+      wireHit.getAutomatonCell().unsetTakenFlag();
     }
+  }
+
+  // Check that indeed all hits have been removed
+  for (CDCTrack& track : tracks) {
+    assert(track.empty());
+  }
+
+  // Now add the hits to their destination tracks
+  for (const auto& relation : hitTrackRelations) {
+    const CDCWireHit& wireHit = *std::get<0>(relation).first;
+    CDCTrack* track = std::get<1>(relation);
+    const CDCRecoHit3D& recoHit3D = std::get<2>(relation);
+
+    if (not track) continue;
 
     track->push_back(recoHit3D);
     wireHit.getAutomatonCell().setTakenFlag();

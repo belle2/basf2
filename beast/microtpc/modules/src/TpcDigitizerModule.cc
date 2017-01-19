@@ -117,8 +117,8 @@ void TpcDigitizerModule::event()
       simHitPosition.Y() / 100. - m_TPCCenter[detNb].Y(),
       simHitPosition.Z() / 100. - m_TPCCenter[detNb].Z() + m_z_DG / 2.
     );
-    chipPosition.RotateX(-m_TPCAngleX[detNb] * TMath::DegToRad());
     chipPosition.RotateZ(-m_TPCAngleZ[detNb] * TMath::DegToRad());
+    chipPosition.RotateX(-m_TPCAngleX[detNb] * TMath::DegToRad());
     const double T = chipPosition.Z();
     if (T < T0[detNb]) {
       T0[detNb] = T;
@@ -156,8 +156,9 @@ void TpcDigitizerModule::event()
       simHitPosition.Y() / 100. - m_TPCCenter[detNb].Y(),
       simHitPosition.Z() / 100. - m_TPCCenter[detNb].Z() + m_z_DG / 2.
     );
-    chipPosition.RotateX(-m_TPCAngleX[detNb] * TMath::DegToRad());
     chipPosition.RotateZ(-m_TPCAngleZ[detNb] * TMath::DegToRad());
+    chipPosition.RotateX(-m_TPCAngleX[detNb] * TMath::DegToRad());
+
     //If new detector filled the chip
     if (olddetNb != detNb && m_dchip_map.size() > 0 && m_dchip.size() < 20000 && oldtrkID != trkID) {
       Pixelization();

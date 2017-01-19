@@ -85,8 +85,6 @@ namespace Belle2 {
     /// Copy the definitions from the RecoHitInformation to this class.
     typedef RecoHitInformation::OriginTrackFinder OriginTrackFinder;
     /// Copy the definitions from the RecoHitInformation to this class.
-    typedef RecoHitInformation::RecoHitMCFinderCategory HitMCFinderCategory;
-    /// Copy the definitions from the RecoHitInformation to this class.
     typedef RecoHitInformation::UsedCDCHit UsedCDCHit;
     /// Copy the definitions from the RecoHitInformation to this class.
     typedef RecoHitInformation::UsedSVDHit UsedSVDHit;
@@ -242,16 +240,13 @@ namespace Belle2 {
      * @param sortingParameter The index of the hit. It starts with 0 with the first hit.
      * @param rightLeftInformation The right left information (if you know it).
      * @param foundByTrackFinder Which track finder has found the hit?
-     * @param hitMCFinderCategory The importance to find the hit. Used to compute track effieciencies and only set
-     *        by MCTrackFinders
      * @return True if the hit was not already added to the track.
      */
     bool addCDCHit(const UsedCDCHit* cdcHit, const unsigned int sortingParameter,
                    RightLeftInformation rightLeftInformation = RightLeftInformation::c_undefinedRightLeftInformation,
-                   OriginTrackFinder foundByTrackFinder = OriginTrackFinder::c_undefinedTrackFinder,
-                   HitMCFinderCategory hitMCFinderCategory = HitMCFinderCategory::c_undefinedRecoHitMCFinderCategory)
+                   OriginTrackFinder foundByTrackFinder = OriginTrackFinder::c_undefinedTrackFinder)
     {
-      return addHit(cdcHit, rightLeftInformation, foundByTrackFinder, sortingParameter, hitMCFinderCategory);
+      return addHit(cdcHit, rightLeftInformation, foundByTrackFinder, sortingParameter);
     }
 
     /**
@@ -260,15 +255,12 @@ namespace Belle2 {
      * @param pxdHit The pointer to a stored PXDHit/Cluster in the store array you provided earlier, which you want to add.
      * @param sortingParameter The index of the hit. It starts with 0 with the first hit.
      * @param foundByTrackFinder Which track finder has found the hit?
-     * @param hitMCFinderCategory The importance to find the hit. Used to compute track effieciencies and only set
-     *        by MCTrackFinders
      * @return True if the hit was not already added to the track.
      */
     bool addPXDHit(const UsedPXDHit* pxdHit, const unsigned int sortingParameter,
-                   OriginTrackFinder foundByTrackFinder = OriginTrackFinder::c_undefinedTrackFinder,
-                   HitMCFinderCategory hitMCFinderCategory = HitMCFinderCategory::c_undefinedRecoHitMCFinderCategory)
+                   OriginTrackFinder foundByTrackFinder = OriginTrackFinder::c_undefinedTrackFinder)
     {
-      return addHit(pxdHit, foundByTrackFinder, sortingParameter, hitMCFinderCategory);
+      return addHit(pxdHit, foundByTrackFinder, sortingParameter);
     }
 
     /**
@@ -277,15 +269,12 @@ namespace Belle2 {
      * @param svdHit The pointer to a stored SVDHit in the store array you provided earlier, which you want to add.
      * @param sortingParameter The index of the hit. It starts with 0 with the first hit.
      * @param foundByTrackFinder Which track finder has found the hit?
-     * @param hitMCFinderCategory The importance to find the hit. Used to compute track effieciencies and only set
-     *        by MCTrackFinders
      * @return True if the hit was not already added to the track.
      */
     bool addSVDHit(const UsedSVDHit* svdHit, const unsigned int sortingParameter,
-                   OriginTrackFinder foundByTrackFinder = OriginTrackFinder::c_undefinedTrackFinder,
-                   HitMCFinderCategory hitMCFinderCategory = HitMCFinderCategory::c_undefinedRecoHitMCFinderCategory)
+                   OriginTrackFinder foundByTrackFinder = OriginTrackFinder::c_undefinedTrackFinder)
     {
-      return addHit(svdHit, foundByTrackFinder, sortingParameter, hitMCFinderCategory);
+      return addHit(svdHit, foundByTrackFinder, sortingParameter);
     }
 
     /**

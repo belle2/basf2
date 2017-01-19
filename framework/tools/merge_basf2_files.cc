@@ -383,6 +383,16 @@ The following restrictions apply:
   // Stop processing in case of error
   if (LogSystem::Instance().getMessageCounter(LogConfig::c_Error) > 0) return 1;
 
+  if(!outputMetaData){
+      // technically it's rather impossible to arrive here: if there were no
+      // input files we exit with a usage message and if any of the files could
+      // not be processed then the error count should be >0. Nevertheless
+      // let's do this check to be on the very safe side and to make clang
+      // analyzer happy.
+      B2FATAL("For some reason no files could be processed");
+      return 1;
+  }
+
   // Final changes to metadata
   outputMetaData->setLfn("");
   outputMetaData->setParents(std::vector<std::string>(allParents.begin(), allParents.end()));

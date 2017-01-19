@@ -133,13 +133,7 @@ namespace Belle2 {
 
 
       /// Sort the recoHits according to their perpS information
-      void sortByArcLength2D()
-      {
-        std::stable_sort(begin(), end(),
-        [](const CDCRecoHit3D & recoHit, const CDCRecoHit3D & otherRecoHit) {
-          return recoHit.getArcLength2D() < otherRecoHit.getArcLength2D();
-        });
-      }
+      void sortByArcLength2D();
 
       /// Set all arcLengths to have positive values by shifting them by pi*radius if they are negative.
       /// This can only be done if the radius is not infinity (for example cosmics).

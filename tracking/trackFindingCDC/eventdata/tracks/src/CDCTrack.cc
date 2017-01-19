@@ -374,6 +374,19 @@ void CDCTrack::forwardTakenFlag(bool takenFlag) const
   }
 }
 
+void CDCTrack::sortByArcLength2D()
+{
+  std::stable_sort(begin(),
+                   end(),
+  [](const CDCRecoHit3D & recoHit, const CDCRecoHit3D & otherRecoHit) {
+    double arcLength = recoHit.getArcLength2D();
+    double otherArcLength = otherRecoHit.getArcLength2D();
+    if (std::isnan(arcLength)) return false;
+    if (std::isnan(otherArcLength)) return true;
+    return arcLength < otherArcLength;
+  });
+}
+
 void CDCTrack::shiftToPositiveArcLengths2D(bool doForAllTracks)
 {
   const CDCTrajectory2D& startTrajectory2D = getStartTrajectory3D().getTrajectory2D();

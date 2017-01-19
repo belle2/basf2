@@ -146,6 +146,9 @@ namespace Belle2 {
       /// Return a reversed copy of the track.
       CDCTrack reversed() const;
 
+      /// Finds the first CDCRecoHit3D that is based on the given wire hit - nullptr if none
+      MayBePtr<const CDCRecoHit3D> find(const CDCWireHit& wireHit) const;
+
       /// Set the flag which indicates that the track has a matching segment (probably only used in the SegmentTrackCombiner).
       void setHasMatchingSegment(bool hasMatchingSegment = true)
       {

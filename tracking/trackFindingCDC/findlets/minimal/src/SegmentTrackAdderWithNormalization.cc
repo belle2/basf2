@@ -41,6 +41,7 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
                                                std::vector<CDCTrack>& tracks, const std::vector<CDCSegment2D>& segments)
 {
   std::vector<std::tuple<std::pair<const CDCWireHit*, double>, CDCTrack*, CDCRecoHit3D>> hitTrackRelations;
+
   // Establish the ordering
   for (CDCTrack& track : tracks) {
     track.sortByArcLength2D();
@@ -118,11 +119,19 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
   for (CDCTrack& track : tracks) {
     // Will call hitIsInOtherTrack(hit) for each hit in the track and remove those, where
     // hitIsInOtherTrack yields true.
-    const auto& hitIsInOtherTrack = [this, &track](const CDCRecoHit3D & recoHit) {
-      const CDCWireHit* cdcWireHit = &(recoHit.getWireHit());
-      // If the hit is not part of any segments, it should stay
-      if (not m_mapHitsToMatchedTracks.count(cdcWireHit)) return false;
-      const CDCTrack* matchedTrack = m_mapHitsToMatchedTracks[cdcWireHit];
+    const auto& hitIsInOtherTrack = [&hitTrackRelations, &track](const CDCRecoHit3D & recoHit) {
+
+      // Look for the destination track of the given hit
+      const CDCWireHit* wireHit = &(recoHit.getWireHit());
+      auto itHitTrackRelation = std::partition_point(hitTrackRelations.begin(),
+                                                     hitTrackRelations.end(),
+                                                     FirstOf<First>() > wireHit);
+
+      assert(itHitTrackRelation != hitTrackRelations.end());
+      assert(std::get<0>(*itHitTrackRelation).first == wireHit);
+
+      const CDCTrack* matchedTrack = std::get<1>(*itHitTrackRelation);
+
       // If the segment it belonged to, was not matched to any track, the matched track is a nullptr.
       // This means we delete the hit from the track and untick its taken flag.
       recoHit.getWireHit().getAutomatonCell().setTakenFlag(matchedTrack != nullptr);
@@ -133,6 +142,11 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
       return matchedTrack != &track;
     };
     erase_remove_if(track, hitIsInOtherTrack);
+  }
+
+  // Establish the ordering
+  for (CDCTrack& track : tracks) {
+    track.sortByArcLength2D();
   }
 
   // Normalize the trajectory and hit contents of the tracks

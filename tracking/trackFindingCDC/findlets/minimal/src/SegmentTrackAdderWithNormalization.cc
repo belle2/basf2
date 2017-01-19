@@ -122,24 +122,18 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
     erase_remove_if(track, hitIsInOtherTrack);
   }
 
-  // Now we have a list of relations between hits and track pointers
+  // Now add the hits to their destination tracks
   for (const auto& relation : hitTrackRelations) {
-    const CDCWireHit* cdcWireHit = std::get<0>(relation).first;
+    const CDCWireHit& wireHit = *std::get<0>(relation).first;
     CDCTrack* track = std::get<1>(relation);
     const CDCRecoHit3D& recoHit3D = std::get<2>(relation);
 
     if (not track) continue;
 
-    AutomatonCell& automatonCell = cdcWireHit->getAutomatonCell();
-
-    const auto& trackHitAndSegmentHitAreTheSame = [&cdcWireHit](const CDCRecoHit3D & otherRecoHit3D) {
-      return &(otherRecoHit3D.getWireHit()) == cdcWireHit;
-    };
-
     // Do only add the hit, if it is not already present in the track.
-    if (not any(*track, trackHitAndSegmentHitAreTheSame)) {
+    if (not any(*track, GetWireHit() == wireHit)) {
       track->push_back(recoHit3D);
-      automatonCell.setTakenFlag();
+      wireHit.getAutomatonCell().setTakenFlag();
     }
   }
 

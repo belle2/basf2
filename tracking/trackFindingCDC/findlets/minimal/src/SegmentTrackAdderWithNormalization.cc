@@ -23,10 +23,12 @@ SegmentTrackAdderWithNormalization::SegmentTrackAdderWithNormalization()
   : Super()
 {
   addProcessingSignalListener(&m_trackNormalizer);
+  addProcessingSignalListener(&m_singleHitSelector);
 }
 
 void SegmentTrackAdderWithNormalization::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
+  m_singleHitSelector.exposeParameters(moduleParamList, prefixed(prefix, "hitSelector"));
 }
 
 std::string SegmentTrackAdderWithNormalization::getDescription()
@@ -87,20 +89,9 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
     }
   }
 
-  // Sort such that wire hits are grouped together with the highest weight at the front.
-  auto greaterWireHitAndWeight = [](const WeightedRelation<CDCTrack, const CDCRecoHit3D>& lhs,
-  const WeightedRelation<CDCTrack, const CDCRecoHit3D>& rhs) {
-    return std::make_pair(lhs.getTo()->getWireHit(), lhs.getWeight()) >
-           std::make_pair(rhs.getTo()->getWireHit(), rhs.getWeight());
-  };
-  std::sort(trackHitRelations.begin(), trackHitRelations.end(), greaterWireHitAndWeight);
-
   // Thin out those weighted relations, by selecting only the best matching track for each hit.
-  auto equalWireHit = [](const WeightedRelation<CDCTrack, const CDCRecoHit3D>& lhs,
-  const WeightedRelation<CDCTrack, const CDCRecoHit3D>& rhs) {
-    return lhs.getTo()->getWireHit() == rhs.getTo()->getWireHit();
-  };
-  erase_unique(trackHitRelations, equalWireHit);
+  std::sort(trackHitRelations.begin(), trackHitRelations.end());
+  m_singleHitSelector.apply(trackHitRelations);
 
   // Remove all hits from the tracks in order to rebuild them completely
   for (CDCTrack& track : tracks) {

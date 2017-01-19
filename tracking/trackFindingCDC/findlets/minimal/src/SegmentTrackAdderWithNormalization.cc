@@ -66,19 +66,22 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
     CDCTrack* track = relation.getFrom();
     const CDCSegment2D& segment = *(relation.getTo());
     const Weight weight = relation.getWeight();
-    const CDCTrajectory2D& trajectory2D = track->getStartTrajectory3D().getTrajectory2D();
+    const CDCTrajectory3D& trajectory3D = track->getStartTrajectory3D();
 
     for (const CDCRecoHit2D& recoHit : segment) {
+
+      // In case the hit is already in the matched track - keep its reconstructed position
       MayBePtr<const CDCRecoHit3D> ptrRecoHit3D = track->find(recoHit.getWireHit());
-      if (ptrRecoHit3D == nullptr) {
-        CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit.getRLWireHit(), trajectory2D);
-        assert(recoHit3D.getRLInfo() == recoHit.getRLInfo());
-        recoHits3D.push_back(recoHit3D);
-        trackHitRelations.push_back({track, weight, &recoHits3D.back()});
-      } else {
+      if (ptrRecoHit3D != nullptr) {
         recoHits3D.push_back(*ptrRecoHit3D);
         trackHitRelations.push_back({track, weight, &recoHits3D.back()});
+        continue;
       }
+
+      // Otherwise reconstruct the position into the third dimension
+      CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit, trajectory3D);
+      recoHits3D.push_back(recoHit3D);
+      trackHitRelations.push_back({track, weight, &recoHits3D.back()});
     }
     segment.getAutomatonCell().setTakenFlag();
   }

@@ -98,7 +98,6 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
     CDCTrack* track = std::get<1>(relation);
     const CDCRecoHit3D& recoHit3D = std::get<2>(relation);
 
-    m_mapHitsToMatchedTracks.insert({cdcWireHit, track});
     if (not track) continue;
 
     AutomatonCell& automatonCell = cdcWireHit->getAutomatonCell();

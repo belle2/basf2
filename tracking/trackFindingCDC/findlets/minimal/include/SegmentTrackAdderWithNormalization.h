@@ -41,13 +41,6 @@ namespace Belle2 {
       /// Constructor for registering the sub-findlets
       SegmentTrackAdderWithNormalization();
 
-      /// Is called before the event starts to clear all maps and lists.
-      void beginEvent() override
-      {
-        Super::beginEvent();
-        m_mapHitsToMatchedTracks.clear();
-      }
-
       /// Expose the parameters of the sub-findlets.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
@@ -62,10 +55,6 @@ namespace Belle2 {
       // Findlets
       /// Findlet for performing the normalization of the tracks afterwards
       TrackNormalizer m_trackNormalizer;
-
-      // Object pools
-      /// Thinned out mapping between hits and tracks
-      std::map<const CDCWireHit*, CDCTrack*> m_mapHitsToMatchedTracks;
     };
   }
 }

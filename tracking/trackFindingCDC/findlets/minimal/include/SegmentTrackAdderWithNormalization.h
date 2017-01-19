@@ -12,10 +12,7 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
-#include <tracking/trackFindingCDC/utilities/HitComperator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackNormalizer.h>
-#include <tracking/trackFindingCDC/collectors/selectors/SingleMatchSelector.h>
-
 
 #include <vector>
 
@@ -23,19 +20,17 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
     class CDCSegment2D;
-    class CDCWireHit;
-    class CDCRecoHit2D;
 
     /**
      * Add the matched segments to the tracks and normalize the tracks afterwards.
      * Also deletes all hits from the tracks, that are part of segments, that were not matched to these tracks.
      */
-    class SegmentTrackAdderWithNormalization : public
-      Findlet<WeightedRelation<CDCTrack, const CDCSegment2D>, CDCTrack, const CDCSegment2D> {
+    class SegmentTrackAdderWithNormalization
+      : public Findlet<WeightedRelation<CDCTrack, const CDCSegment2D>&, CDCTrack&, const CDCSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<WeightedRelation<CDCTrack, const CDCSegment2D>, CDCTrack, const CDCSegment2D>;
+      using Super = Findlet<WeightedRelation<CDCTrack, const CDCSegment2D>&, CDCTrack&, const CDCSegment2D>;
 
     public:
       /// Constructor for registering the sub-findlets

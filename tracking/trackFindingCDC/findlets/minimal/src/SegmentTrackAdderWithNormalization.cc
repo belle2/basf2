@@ -18,34 +18,27 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-/// Constructor for registering the sub.findlets
-SegmentTrackAdderWithNormalization::SegmentTrackAdderWithNormalization() : Super()
+SegmentTrackAdderWithNormalization::SegmentTrackAdderWithNormalization()
+  : Super()
 {
   addProcessingSignalListener(&m_trackNormalizer);
 }
 
-/// Expose the parameters of the sub-findlets.
 void SegmentTrackAdderWithNormalization::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
 }
 
-/// Short description of the findlet
 std::string SegmentTrackAdderWithNormalization::getDescription()
 {
   return "Add the matched segments to the tracks and normalize the tracks afterwards. Also deletes all "
          "hits from tracks, that are now part in another track (or should not be part in any).";
 }
 
-/// Apply the findlet
 void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCTrack, const CDCSegment2D>>& relations,
                                                std::vector<CDCTrack>& tracks, const std::vector<CDCSegment2D>& segments)
 {
   std::vector<std::tuple<std::pair<const CDCWireHit*, double>, CDCTrack*, CDCRecoHit3D>> hitTrackRelations;
-
-  // Establish the ordering
-  for (CDCTrack& track : tracks) {
-    track.sortByArcLength2D();
-  }
+  hitTrackRelations.reserve(2500);
 
   // Add the original hit content of the track with low priority
   for (CDCTrack& track : tracks) {
@@ -54,7 +47,7 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
     }
   }
 
-  // Add the relations for the matched segments
+  // Add the relations for the matched segments with the match weight
   for (const auto& relation : relations) {
     CDCTrack* track = relation.getFrom();
     const CDCSegment2D& segment = *(relation.getTo());
@@ -77,19 +70,21 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
     segment.getAutomatonCell().setTakenFlag();
   }
 
-  // Add also those segments, that have no track-partner (and therefore do not have a taken flag)
+  // Add also those segments, that have no track-partner and schedule them for removal
   for (const CDCSegment2D& segment : segments) {
-    // hits were already used in the step before
+    // Skip segment already used in the steps before or marked outside as already taken.
     if (segment.getAutomatonCell().hasTakenFlag()) continue;
 
+    // Add with destination track nullptr
     for (const CDCRecoHit2D& recoHit : segment) {
       hitTrackRelations.push_back({{&recoHit.getWireHit(), 0},  nullptr, CDCRecoHit3D()});
     }
   }
 
+  // Sort such that wire hits are grouped together with the highest weight at the front.
   std::sort(hitTrackRelations.begin(), hitTrackRelations.end(), GreaterOf<First>());
 
-  // Thin out those weighted relations, by selecting only the best matching track for each hit
+  // Thin out those weighted relations, by selecting only the best matching track for each hit.
   erase_unique(hitTrackRelations, EqualOf<FirstOf<First>>());
 
   // Remove all hits from the tracks in order to rebuild them completely
@@ -107,7 +102,7 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
     CDCTrack* track = std::get<1>(relation);
     const CDCRecoHit3D& recoHit3D = std::get<2>(relation);
 
-    if (not track) continue;
+    if (track == nullptr) continue;
 
     track->push_back(recoHit3D);
     wireHit.getAutomatonCell().setTakenFlag();

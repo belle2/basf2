@@ -12,9 +12,6 @@
 
 #include <framework/database/DBAccessorBase.h>
 
-#include <TCollection.h> //for TIter
-
-class TClonesArray;
 class TClass;
 class TObject;
 
@@ -26,7 +23,7 @@ namespace Belle2 {
    * \code{.py}
      from ROOT import Belle2
      beamparams = Belle2.PyDBObj('BeamParameters')
-     # Alternative: simhits = Belle2.PyDBObj(Belle2.BeamParameters.Class())
+     # Alternative: beamparams = Belle2.PyDBObj(Belle2.BeamParameters.Class())
      print(beamparams.obj().getMass(), beamparams.obj().getEnergy())
      \endcode
    *
@@ -49,7 +46,7 @@ namespace Belle2 {
     using DBAccessorBase::hasChanged;
 
     /** Return the object */
-    const TObject* obj() { return isValid() ? *m_object : nullptr; }
+    const TObject* obj() const { return isValid() ? *m_object : nullptr; }
   private:
     /** Pointer to the actual object */
     TObject** m_object;

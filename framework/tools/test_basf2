@@ -92,7 +92,7 @@ def run_test(argument):
 
     with print_lock:
         if result is False:
-            # timeout happened, everthing is already setup and the process
+            # timeout happened, everything is already setup
             pass
         elif process.returncode != 0:
             # check for skipped test

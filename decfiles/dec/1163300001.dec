@@ -1,0 +1,130 @@
+#------------------------------------------------------------
+# EventType:1163300001
+# Descriptor: B -> D* tau nu (had) against semileptonic Btag
+# NickName: Bd_Dsttaunu_had
+# Documentation: decay mode for sensitivity studies
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Romulus Godang
+# Email: godang@southalabama.edu
+# Cuts: None
+# Date: 20161214
+#-----------------------------------------------------------
+#
+Alias SigB0 B0
+Alias SigAntiB0 anti-B0
+Alias MyTau+ tau+
+Alias MyTau- tau-
+Alias MyK0 K0
+Alias Myanti-K0 anti-K0
+Alias MyKs K_S0
+Alias MyD0 D0
+Alias Myanti-D0 anti-D0
+Alias MyD+ D+
+Alias MyD- D-
+Alias MyD*+ D*+
+Alias MyD*- D*-
+#
+#
+ChargeConj SigB0 SigAntiB0
+#
+Decay Upsilon(4S)
+1.000 B0 anti-B0 SigB0 SigAntiB0 VSS_BMIX dm;
+Enddecay
+#
+## Force Btag B decays to D* ell nu_ell
+#
+Decay anti-B0
+0.0501   MyD*+    e-   anti-nu_e       PHOTOS HQET 0.77 1.33 0.92;
+0.0217   MyD+     e-   anti-nu_e       PHOTOS ISGW2;
+0.0501   MyD*+    mu-  anti-nu_mu      PHOTOS HQET 0.77 1.33 0.92;
+0.0217   MyD+     mu-  anti-nu_mu      PHOTOS ISGW2;
+Enddecay
+#
+Decay B0
+0.0501   MyD*-    e+   nu_e            PHOTOS HQET 0.77 1.33 0.92;
+0.0217   MyD-     e+   nu_e            PHOTOS ISGW2;
+0.0501   MyD*-    mu+  nu_mu           PHOTOS HQET 0.77 1.33 0.92;
+0.0217   MyD-     mu+  nu_mu           PHOTOS ISGW2;
+Enddecay
+#
+# Force Bsignal decays to D* tau nu_tau (tau->had)
+#
+Decay SigB0
+1.0000 MyD*-     MyTau+ nu_tau         ISGW2;
+Enddecay
+#
+Decay SigAntiB0
+1.0000 MyD*+     MyTau- anti-nu_tau    ISGW2;
+Enddecay
+#
+#
+Decay MyTau+
+0.1091         pi+   anti-nu_tau       TAUSCALARNU;
+0.0070         K+    anti-nu_tau       TAUSCALARNU;
+0.2552         rho+  anti-nu_tau       TAUVECTORNU;
+Enddecay
+#
+Decay MyTau-
+0.1091         pi-   nu_tau            TAUSCALARNU;
+0.0070         K-    nu_tau            TAUSCALARNU;
+0.2552         rho-  nu_tau            TAUVECTORNU;
+Enddecay
+#
+Decay MyD*+
+0.6770    MyD0  pi+                    VSS;
+0.3070    MyD+  pi0                    VSS;
+0.0160    MyD+  gamma                  VSP_PWAVE;
+Enddecay
+#
+Decay MyD*-
+0.6770    Myanti-D0 pi-                VSS;
+0.3070    MyD-  pi0                    VSS;
+0.0160    MyD-  gamma                  VSP_PWAVE;
+Enddecay
+#
+Decay MyD+
+0.0914   K-  pi+  pi+                  D_DALITZ;
+0.0847   K-  pi+  pi+   pi0            PHSP;
+0.0484   Myanti-K0   pi+  pi0          D_DALITZ;
+Enddecay
+#
+Decay MyD-
+0.0914   K+  pi-  pi-                  D_DALITZ;
+0.0847   K+  pi-  pi-   pi0            PHSP;
+0.0484   MyK0  pi-  pi0                D_DALITZ;
+Enddecay
+#
+Decay MyD0
+0.0389   K-  pi+                       PHSP;
+0.1390   K-  pi+  pi0                  D_DALITZ;
+0.0133   K-  pi+  pi+   pi-            PHSP;
+Enddecay
+#
+Decay Myanti-D0
+0.0389   K+  pi-                       PHSP;
+0.1390   K+  pi-  pi0                  D_DALITZ;
+0.0133   K+  pi-  pi+   pi-            PHSP;
+Enddecay
+#
+Decay MyKs
+1.000     pi+ pi-                      PHSP;
+Enddecay
+#
+Decay MyK0
+1.000     MyKs                         PHSP;
+Enddecay
+#
+Decay Myanti-K0
+1.000     MyKs                         PHSP;
+Enddecay
+#
+Decay rho+
+1.000    pi+  pi0                      VSS;
+Enddecay
+#
+Decay rho-
+1.000    pi-  pi0                      VSS;
+Enddecay
+#
+End

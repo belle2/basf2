@@ -40,6 +40,10 @@ namespace Belle2 {
      * @param fileBaseName   Base name for conditions files
      * @param fileBaseLocal  Directory name for local conditions files copies
      * @param logLevel       The level of log messages about not-found payloads.
+     * @param invertLogging  If true log messages will be created when a
+     *                       payload is found. This is intended for override
+     *                       setups where a few payloads are taken from non
+     *                       standard locations
      * @return               A pointer to the created database instance
      */
     static void createInstance(const std::string& globalTag, const std::string& restBaseName, const std::string& fileBaseName,

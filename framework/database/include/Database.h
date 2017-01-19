@@ -175,15 +175,15 @@ namespace Belle2 {
      * Set level of log messages about not-found payloads.
      *
      * @param logLevel  The level of log messages about not-found payloads.
-     * @param invert    If true log messages will be created when a payload is
-     *                  found. This is intended for the local database to
-     *                  notify the user that a non-standard payload from a
-     *                  local directory is used.
+     * @param invertLogging  If true log messages will be created when a
+     *                  payload is found. This is intended for the local
+     *                  database to notify the user that a non-standard payload
+     *                  from a local directory is used.
      */
-    void setLogLevel(LogConfig::ELogLevel logLevel = LogConfig::c_Warning, bool invert = false)
+    void setLogLevel(LogConfig::ELogLevel logLevel = LogConfig::c_Warning, bool invertLogging = false)
     {
       m_logLevel = logLevel;
-      m_invertLogging = invert;
+      m_invertLogging = invertLogging;
     }
 
   protected:

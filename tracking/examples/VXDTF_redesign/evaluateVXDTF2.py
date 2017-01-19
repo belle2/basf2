@@ -32,7 +32,6 @@ arg_parser.add_argument('--secmap', '-s', type=str,
 
 arguments = arg_parser.parse_args(sys.argv[1:])
 secmap_name = arguments.secmap
-expert_level = arguments.expertLevel
 
 
 # ---------------------------------------------------------------------------------------

@@ -18,4 +18,8 @@ REG_MODULE(SegmentTrackCombiner);
 SegmentTrackCombinerModule::SegmentTrackCombinerModule()
   : Super{{{"CDCSegment2DVector", "CDCTrackVector"}}}
 {
+  ModuleParamList moduleParamList = this->getParamList();
+  moduleParamList.getParameter<double>("sharedHitsCutValue").setDefaultValue(1.0);
+  moduleParamList.getParameter<bool>("useOnlySingleBestCandidate").setDefaultValue(false);
+  this->setParamList(moduleParamList);
 }

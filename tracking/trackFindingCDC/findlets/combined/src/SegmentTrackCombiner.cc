@@ -48,9 +48,6 @@ void SegmentTrackCombinerFindlet::exposeParameters(ModuleParamList* moduleParamL
   m_singleMatchSelector.exposeParameters(moduleParamList, prefix);
   m_segmentTrackAdderWithNormalization.exposeParameters(moduleParamList, prefix);
   m_trackRejecter.exposeParameters(moduleParamList, prefixed(prefix, "track"));
-
-  moduleParamList->getParameter<double>("sharedHitsCutValue").setDefaultValue(1.0);
-  moduleParamList->getParameter<bool>("useOnlySingleBestCandidate").setDefaultValue(false);
 }
 
 // Do the combination work. See the SegmentTrackCombiner methods for full details.

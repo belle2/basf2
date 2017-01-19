@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <vector>
 #include <deque>
@@ -29,6 +30,11 @@ SegmentTrackAdderWithNormalization::SegmentTrackAdderWithNormalization()
 void SegmentTrackAdderWithNormalization::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   m_singleHitSelector.exposeParameters(moduleParamList, prefixed(prefix, "hitSelector"));
+  moduleParamList->addParameter(prefixed(prefix, "removeUnmatchedSegments"),
+                                m_param_removeUnmatchedSegments,
+                                "Swtich to remove hits in segments that have no matching track from all tracks",
+                                m_param_removeUnmatchedSegments);
+
 }
 
 std::string SegmentTrackAdderWithNormalization::getDescription()
@@ -78,14 +84,16 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
   }
 
   // Add also those segments, that have no track-partner and schedule them for removal
-  for (const CDCSegment2D& segment : segments) {
-    // Skip segment already used in the steps before or marked outside as already taken.
-    if (segment.getAutomatonCell().hasTakenFlag()) continue;
+  if (m_param_removeUnmatchedSegments) {
+    for (const CDCSegment2D& segment : segments) {
+      // Skip segment already used in the steps before or marked outside as already taken.
+      if (segment.getAutomatonCell().hasTakenFlag()) continue;
 
-    // Add hit with destination track nullptr
-    for (const CDCRecoHit2D& recoHit : segment) {
-      recoHits3D.push_back({recoHit.getRLWireHit(), Vector3D(recoHit.getRecoPos2D()), 0});
-      trackHitRelations.push_back({nullptr, 0, &recoHits3D.back()});
+      // Add hit with destination track nullptr
+      for (const CDCRecoHit2D& recoHit : segment) {
+        recoHits3D.push_back({recoHit.getRLWireHit(), Vector3D(recoHit.getRecoPos2D()), 0});
+        trackHitRelations.push_back({nullptr, 0, &recoHits3D.back()});
+      }
     }
   }
 

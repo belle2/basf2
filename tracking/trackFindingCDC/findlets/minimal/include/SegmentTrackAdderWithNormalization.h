@@ -51,6 +51,10 @@ namespace Belle2 {
                  std::vector<CDCTrack>& tracks, const std::vector<CDCSegment2D>& segment) override;
 
     private:
+      // Parameters
+      /// Parameter : Swtich to remove hits in segments that have no matching track from all tracks
+      bool m_param_removeUnmatchedSegments = true;
+
       // Findlets
       /// The selector for finding the track each hit should belong to.
       SingleMatchSelector<CDCTrack, CDCRecoHit3D, HitComperator> m_singleHitSelector;

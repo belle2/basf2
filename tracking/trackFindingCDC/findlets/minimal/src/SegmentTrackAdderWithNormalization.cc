@@ -28,9 +28,7 @@ SegmentTrackAdderWithNormalization::SegmentTrackAdderWithNormalization() : Super
 /// Expose the parameters of the sub-findlets.
 void SegmentTrackAdderWithNormalization::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  m_singleHitSelector.exposeParameters(moduleParamList, prefixed(prefix, "HitSelector"));
-
-  moduleParamList->getParameter<bool>("HitSelectorUseOnlySingleBestCandidate").setDefaultValue(false);
+  m_singleHitSelector.exposeParameters(moduleParamList, prefixed(prefix, "hitSelector"));
 }
 
 /// Short description of the findlet

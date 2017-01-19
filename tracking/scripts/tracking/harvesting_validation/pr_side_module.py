@@ -117,7 +117,6 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             is_ghost=is_ghost,
             is_clone_or_match=(is_matched or is_clone),
             is_fake=not (is_matched or is_clone),
-            hit_efficiency=track_match_look_up.getRelatedEfficiency(reco_track),
             hit_purity=track_match_look_up.getRelatedPurity(reco_track),
             n_intersecting_mc_tracks=n_intersecting_mc_tracks,
         )

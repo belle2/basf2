@@ -92,57 +92,13 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
   // Thin out those weighted relations, by selecting only the best matching track for each hit
   erase_unique(hitTrackRelations, EqualOf<FirstOf<First>>());
 
-  // Now go through all the tracks and delete those hits, that are now part of another track or
-  // not matched to any track at all
+  // Remove all hits from the tracks in order to rebuild them completely
   for (CDCTrack& track : tracks) {
-    // Will call hitIsInOtherTrack(hit) for each hit in the track and remove those, where
-    // hitIsInOtherTrack yields true.
-    const auto& hitIsInOtherTrack = [&hitTrackRelations, &track](const CDCRecoHit3D & recoHit) {
-
-      // Look for the destination track of the given hit
-      const CDCWireHit* wireHit = &(recoHit.getWireHit());
-      auto itHitTrackRelation = std::partition_point(hitTrackRelations.begin(),
-                                                     hitTrackRelations.end(),
-                                                     FirstOf<First>() > wireHit);
-
-      assert(itHitTrackRelation != hitTrackRelations.end());
-      assert(std::get<0>(*itHitTrackRelation).first == wireHit);
-
-      const CDCTrack* matchedTrack = std::get<1>(*itHitTrackRelation);
-
-      // If the segment it belonged to, was not matched to any track, the matched track is a nullptr.
-      // This means we delete the hit from the track and untick its taken flag.
-      recoHit.getWireHit().getAutomatonCell().setTakenFlag(matchedTrack != nullptr);
-
-      // If the track, this hit should belong to (because the segment was matched to this track),
-      // is the track we are currently looking on, the hit can stay. If not, the hit should be deleted from
-      // this track. We do not have to untick the taken flag, because the hit is still used (by the other track).
-      return matchedTrack != &track;
-    };
-    erase_remove_if(track, hitIsInOtherTrack);
-  }
-
-  // Remove all hits from their tracks.
-  for (const auto& relation : hitTrackRelations) {
-    const CDCWireHit& wireHit = *std::get<0>(relation).first;
-    CDCTrack* track = std::get<1>(relation);
-    const CDCRecoHit3D& recoHit3D = std::get<2>(relation);
-
-    if (not track) continue;
-
-    auto itRecoHit3D = std::find_if(track->begin(), track->end(), GetWireHit() == wireHit);
-
-    // Do only add the hit, if it is not already present in the track.
-    if (itRecoHit3D != track->end()) {
-      assert(*itRecoHit3D == recoHit3D);
-      track->erase(itRecoHit3D);
-      wireHit.getAutomatonCell().unsetTakenFlag();
+    for (const CDCRecoHit3D& recoHit3D : track) {
+      recoHit3D.getWireHit().getAutomatonCell().unsetTakenFlag();
     }
-  }
-
-  // Check that indeed all hits have been removed
-  for (CDCTrack& track : tracks) {
-    assert(track.empty());
+    std::vector<CDCRecoHit3D>& recoHits3D = track;
+    recoHits3D.clear();
   }
 
   // Now add the hits to their destination tracks

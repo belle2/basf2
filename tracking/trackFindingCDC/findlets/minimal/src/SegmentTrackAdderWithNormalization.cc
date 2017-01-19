@@ -130,11 +130,16 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
 
     if (not track) continue;
 
+    auto itRecoHit3D = std::find_if(track->begin(), track->end(), GetWireHit() == wireHit);
+
     // Do only add the hit, if it is not already present in the track.
-    if (not any(*track, GetWireHit() == wireHit)) {
-      track->push_back(recoHit3D);
-      wireHit.getAutomatonCell().setTakenFlag();
+    if (itRecoHit3D != track->end()) {
+      assert(*itRecoHit3D == recoHit3D);
+      continue;
     }
+
+    track->push_back(recoHit3D);
+    wireHit.getAutomatonCell().setTakenFlag();
   }
 
   // Establish the ordering

@@ -15,7 +15,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-SegmentTrackCombinerFindlet::SegmentTrackCombinerFindlet()
+SegmentTrackCombiner::SegmentTrackCombiner()
 {
   addProcessingSignalListener(&m_trackNormalizer);
   addProcessingSignalListener(&m_sharedHitsMatcher);
@@ -26,19 +26,19 @@ SegmentTrackCombinerFindlet::SegmentTrackCombinerFindlet()
   addProcessingSignalListener(&m_trackRejecter);
 }
 
-std::string SegmentTrackCombinerFindlet::getDescription()
+std::string SegmentTrackCombiner::getDescription()
 {
   return "Findlet for the combination of tracks and segments.";
 }
 
-void SegmentTrackCombinerFindlet::beginEvent()
+void SegmentTrackCombiner::beginEvent()
 {
   m_relations.clear();
 
   Super::beginEvent();
 }
 
-void SegmentTrackCombinerFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void SegmentTrackCombiner::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);
 
@@ -51,8 +51,8 @@ void SegmentTrackCombinerFindlet::exposeParameters(ModuleParamList* moduleParamL
 }
 
 // Do the combination work. See the SegmentTrackCombiner methods for full details.
-void SegmentTrackCombinerFindlet::apply(std::vector<TrackFindingCDC::CDCSegment2D>& segments,
-                                        std::vector<TrackFindingCDC::CDCTrack>& tracks)
+void SegmentTrackCombiner::apply(std::vector<TrackFindingCDC::CDCSegment2D>& segments,
+                                 std::vector<TrackFindingCDC::CDCTrack>& tracks)
 {
   m_trackNormalizer.apply(tracks);
 

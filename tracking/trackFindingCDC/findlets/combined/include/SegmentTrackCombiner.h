@@ -43,7 +43,7 @@ namespace Belle2 {
      *  3. Filtering of fake tracks in the made combinations.
      *  4. Cleanup of the lookup cache.
      */
-    class SegmentTrackCombinerFindlet : public Findlet<CDCSegment2D&, CDCTrack&> {
+    class SegmentTrackCombiner : public Findlet<CDCSegment2D&, CDCTrack&> {
 
     private:
       /// Type of the base class
@@ -51,7 +51,7 @@ namespace Belle2 {
 
     public:
       /// Constructor setting up the filter parameters
-      SegmentTrackCombinerFindlet();
+      SegmentTrackCombiner();
 
       /// Short description of the findlet
       std::string getDescription() final;

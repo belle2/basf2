@@ -107,6 +107,12 @@ namespace Belle2 {
         return m_automatonCell;
       }
 
+      /// Indirection to the automaton cell for easier access to the flags
+      AutomatonCell* operator->() const
+      {
+        return &m_automatonCell;
+      }
+
       /// Unset the masked flag of the automaton cell of this segment and of all contained wire hits.
       void unsetAndForwardMaskedFlag() const;
 

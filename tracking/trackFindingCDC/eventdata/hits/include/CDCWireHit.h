@@ -304,6 +304,12 @@ namespace Belle2 {
         return m_automatonCell;
       }
 
+      /// Indirection to the automaton cell for easier access to the flags
+      AutomatonCell* operator->() const
+      {
+        return &m_automatonCell;
+      }
+
       /// Getter for the super cluster id
       int getISuperCluster() const
       {

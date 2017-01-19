@@ -14,6 +14,7 @@
 
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <vector>
+#include <deque>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -37,13 +38,18 @@ std::string SegmentTrackAdderWithNormalization::getDescription()
 void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCTrack, const CDCSegment2D>>& relations,
                                                std::vector<CDCTrack>& tracks, const std::vector<CDCSegment2D>& segments)
 {
-  std::vector<std::tuple<std::pair<const CDCWireHit*, double>, CDCTrack*, CDCRecoHit3D>> hitTrackRelations;
-  hitTrackRelations.reserve(2500);
+  // Storage space for the hits - deque for address persistence
+  std::deque<CDCRecoHit3D> recoHits3D;
+
+  // Relations for the matching tracks
+  std::vector<WeightedRelation<CDCTrack, const CDCRecoHit3D>> trackHitRelations;
+  trackHitRelations.reserve(2500);
 
   // Add the original hit content of the track with low priority
   for (CDCTrack& track : tracks) {
     for (const CDCRecoHit3D& recoHit3D : track) {
-      hitTrackRelations.push_back({{&recoHit3D.getWireHit(), -INFINITY},  &track, recoHit3D});
+      recoHits3D.push_back(recoHit3D);
+      trackHitRelations.push_back({&track, -INFINITY, &recoHits3D.back()});
     }
   }
 
@@ -59,10 +65,11 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
       if (ptrRecoHit3D == nullptr) {
         CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit.getRLWireHit(), trajectory2D);
         assert(recoHit3D.getRLInfo() == recoHit.getRLInfo());
-        hitTrackRelations.push_back({{&recoHit.getWireHit(), weight},  track, recoHit3D});
+        recoHits3D.push_back(recoHit3D);
+        trackHitRelations.push_back({track, weight, &recoHits3D.back()});
       } else {
-        const CDCRecoHit3D& recoHit3D = *ptrRecoHit3D;
-        hitTrackRelations.push_back({{&recoHit.getWireHit(), weight},  track, recoHit3D});
+        recoHits3D.push_back(*ptrRecoHit3D);
+        trackHitRelations.push_back({track, weight, &recoHits3D.back()});
       }
     }
     segment.getAutomatonCell().setTakenFlag();
@@ -73,37 +80,45 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
     // Skip segment already used in the steps before or marked outside as already taken.
     if (segment.getAutomatonCell().hasTakenFlag()) continue;
 
-    // Add with destination track nullptr
+    // Add hit with destination track nullptr
     for (const CDCRecoHit2D& recoHit : segment) {
-      hitTrackRelations.push_back({{&recoHit.getWireHit(), 0},  nullptr, CDCRecoHit3D()});
+      recoHits3D.push_back({recoHit.getRLWireHit(), Vector3D(recoHit.getRecoPos2D()), 0});
+      trackHitRelations.push_back({nullptr, 0, &recoHits3D.back()});
     }
   }
 
   // Sort such that wire hits are grouped together with the highest weight at the front.
-  std::sort(hitTrackRelations.begin(), hitTrackRelations.end(), GreaterOf<First>());
+  auto greaterWireHitAndWeight = [](const WeightedRelation<CDCTrack, const CDCRecoHit3D>& lhs,
+  const WeightedRelation<CDCTrack, const CDCRecoHit3D>& rhs) {
+    return std::make_pair(lhs.getTo()->getWireHit(), lhs.getWeight()) >
+           std::make_pair(rhs.getTo()->getWireHit(), rhs.getWeight());
+  };
+  std::sort(trackHitRelations.begin(), trackHitRelations.end(), greaterWireHitAndWeight);
 
   // Thin out those weighted relations, by selecting only the best matching track for each hit.
-  erase_unique(hitTrackRelations, EqualOf<FirstOf<First>>());
+  auto equalWireHit = [](const WeightedRelation<CDCTrack, const CDCRecoHit3D>& lhs,
+  const WeightedRelation<CDCTrack, const CDCRecoHit3D>& rhs) {
+    return lhs.getTo()->getWireHit() == rhs.getTo()->getWireHit();
+  };
+  erase_unique(trackHitRelations, equalWireHit);
 
   // Remove all hits from the tracks in order to rebuild them completely
   for (CDCTrack& track : tracks) {
     for (const CDCRecoHit3D& recoHit3D : track) {
       recoHit3D.getWireHit().getAutomatonCell().unsetTakenFlag();
     }
-    std::vector<CDCRecoHit3D>& recoHits3D = track;
-    recoHits3D.clear();
+    track.clear();
   }
 
   // Now add the hits to their destination tracks
-  for (const auto& relation : hitTrackRelations) {
-    const CDCWireHit& wireHit = *std::get<0>(relation).first;
-    CDCTrack* track = std::get<1>(relation);
-    const CDCRecoHit3D& recoHit3D = std::get<2>(relation);
+  for (const auto& trackHitRelation : trackHitRelations) {
+    CDCTrack* track = trackHitRelation.getFrom();
+    const CDCRecoHit3D* recoHit3D = trackHitRelation.getTo();
 
     if (track == nullptr) continue;
 
-    track->push_back(recoHit3D);
-    wireHit.getAutomatonCell().setTakenFlag();
+    track->push_back(*recoHit3D);
+    recoHit3D->getWireHit()->setTakenFlag();
   }
 
   // Establish the ordering

@@ -253,8 +253,8 @@ for (test, release_dir), result in zip(all_tests, results):
     if not test_results.add(test, *result):
         tests_failed.append(test)
     suite = os.path.dirname(test)
-    if suite.endswith("tests"):
-        suite = suite[:-5].strip("/")
+    if suite.endswith("/tests"):
+        suite = os.path.dirname(suite)
     test_suites[suite].add(test, *result)
 
 if options.xml and len(all_tests):
@@ -266,7 +266,8 @@ if options.xml and len(all_tests):
         suite_el = ET.SubElement(root_el, "testsuite", name=suite, tests=str(len(tests)),
                                  failures=str(tests.failed), skipped=str(tests.skipped), time=str(tests.time))
         for name, passed, message, time in tests:
-            test_el = ET.SubElement(suite_el, "testcase", name=os.path.basename(name), classname=name, time=str(time))
+            test_el = ET.SubElement(suite_el, "testcase", name=os.path.basename(name),
+                                    classname=suite, time=str(time))
             if passed is not True:
                 ET.SubElement(test_el, "failure" if passed is False else "skipped", message=message)
 

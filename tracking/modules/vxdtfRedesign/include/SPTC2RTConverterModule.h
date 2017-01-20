@@ -36,7 +36,6 @@ namespace Belle2 {
     std::string m_param_recoTracksStoreArrayName; /**< Output RecoTracks StoreArray name. */
 
     std::string m_param_recoHitInformationStoreArrayName; /**< StoreArray name of RecoHitInformation. Related to RecoTracks. */
-    std::string m_param_cdcHitsStoreArrayName; /**< StoreArray name of CDChits. Related to RecoTracks. */
     std::string m_param_pxdHitsStoreArrayName; /**< StoreArray name of PXDhits. Related to RecoTracks. */
     std::string m_param_svdHitsStoreArrayName; /**< StoreArray name of SVDhits. Related to RecoTracks. */
 

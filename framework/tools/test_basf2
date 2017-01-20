@@ -96,7 +96,7 @@ def run_test(argument):
             pass
         elif process.returncode != 0:
             # check for skipped test
-            skipped = re.search(b"^TEST SKIPPED:\s*(.+)$", err, re.MULTILINE)
+            skipped = re.search(b"^TEST SKIPPED:\s*(.+)$", process.stderr, re.MULTILINE)
             if skipped:
                 result = None
                 message = skipped.group(1).decode()

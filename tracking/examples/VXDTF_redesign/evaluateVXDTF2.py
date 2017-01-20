@@ -95,7 +95,6 @@ mcTrackMatcherModule.param({
     'UsePXDHits': False,
     'mcRecoTracksStoreArrayName': 'MCRecoTracks',
     'MinimalPurity': .66,
-    'RelateClonesToMCParticles': True,
 })
 path.add_module(mcTrackMatcherModule)
 

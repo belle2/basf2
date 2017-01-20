@@ -130,16 +130,6 @@ namespace Belle2 {
 
 
 
-    /** does a tripletFit of the given hits
-     * The filter is based on the paper 'A New Three-Dimensional Track Fit with Multiple Scattering'
-     * by Andre Schoening et al. https://arxiv.org/abs/1606.04990*/
-    std::pair<double, TVector3> tripletFit(const std::vector<PositionInfo*>* hits, bool useBackwards = false);
-
-    /** As it seems to be customary to use another layer: */
-    std::pair<double, TVector3> tripletFit() { return tripletFit(m_hits); }
-
-
-
     /** does a complete helixFit of the given hits */
     std::pair<double, TVector3> helixFit(const std::vector<PositionInfo*>* hits, bool useBackwards = false,
                                          double setMomentumMagnitude = 0);

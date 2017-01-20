@@ -11,7 +11,7 @@
 #include <tracking/modules/qualityEstimatorVXD/QualityEstimatorVXDCircleFitModule.h>
 #include <framework/logging/Logger.h>
 
-#include <tracking/vxdCaTracking/TrackletFilters.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimators.h>
 #include <tracking/vxdCaTracking/SharedFunctions.h> // e.g. PositionInfo
 
 // ROOT
@@ -58,7 +58,7 @@ void QualityEstimatorVXDCircleFitModule::event()
 
   double bFieldValue = 1.5; /**< magnetic field. WARNING hardcoded! */
 
-  auto fitter = TrackletFilters();
+  auto fitter = QualityEstimators();
   fitter.resetMagneticField(bFieldValue);
 
   unsigned nTC = 0;

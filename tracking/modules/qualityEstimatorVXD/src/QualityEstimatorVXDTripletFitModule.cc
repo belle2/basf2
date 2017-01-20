@@ -11,7 +11,7 @@
 #include <tracking/modules/qualityEstimatorVXD/QualityEstimatorVXDTripletFitModule.h>
 #include <framework/logging/Logger.h>
 
-#include <tracking/vxdCaTracking/TrackletFilters.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimators.h>
 #include <tracking/vxdCaTracking/SharedFunctions.h> // e.g. PositionInfo
 
 // ROOT
@@ -47,18 +47,12 @@ void QualityEstimatorVXDTripletFitModule::event()
 
 
   /** WARNING!
-   *  THIS IS A TEMPORARY SOLUTION!
-   * The TripletFit used here is using the interface of the old VXDTF and it is planned to use the CDC-Version of the same fitter to reduce redundancy of implementations.
-   * Please remove this reminder as soon as this is done.
-   * Felix Metzner 15th December , 2016
-   *
-   * WARNING hardcoded values so far, should be passed by parameter (or be solved in a general way)!
-   * */
-
+   * Hardcoded values so far, should be passed by parameter (or be solved in a general way)!
+   **/
 
   double bFieldValue = 1.5; /**< magnetic field. WARNING hardcoded! */
 
-  auto fitter = TrackletFilters();
+  auto fitter = QualityEstimators();
   fitter.resetMagneticField(bFieldValue);
 
   unsigned nTC = 0;

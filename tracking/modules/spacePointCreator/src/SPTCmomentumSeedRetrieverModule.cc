@@ -11,7 +11,7 @@
 #include <tracking/modules/spacePointCreator/SPTCmomentumSeedRetrieverModule.h>
 #include <framework/logging/Logger.h>
 
-#include <tracking/vxdCaTracking/TrackletFilters.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimators.h>
 #include <tracking/vxdCaTracking/SharedFunctions.h> // e.g. PositionInfo
 
 #include <geometry/bfieldmap/BFieldMap.h>
@@ -87,7 +87,7 @@ void SPTCmomentumSeedRetrieverModule::endRun()
 bool SPTCmomentumSeedRetrieverModule::createSPTCmomentumSeed(SpacePointTrackCand& aTC)
 {
   // create tool for generating the momentum seed:
-  auto seedGenerator = TrackletFilters();
+  auto seedGenerator = QualityEstimators();
   seedGenerator.resetMagneticField(m_bFieldZ);
 
   int chargeSignFactor = 0; /**< == 1 if pdg code is for a lepton, -1 if not. */

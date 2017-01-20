@@ -131,7 +131,6 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
             is_merged=track_match_look_up.isMergedMCRecoTrack(mc_reco_track),
             is_missing=track_match_look_up.isMissingMCRecoTrack(mc_reco_track),
             hit_efficiency=track_match_look_up.getRelatedEfficiency(mc_reco_track),
-            hit_purity=track_match_look_up.getRelatedPurity(mc_reco_track),
         )
 
     def peel_hit_efficiencies_in_all_pr_tracks(self, mc_reco_track):

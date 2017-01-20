@@ -18,6 +18,6 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCSegment2D;
     class CDCTrack;
-    using BaseSegmentTrackFilter = Filter<std::pair<const CDCSegment2D*, const CDCTrack*>>;
+    using BaseSegmentTrackFilter = Filter<std::pair<const CDCTrack*, const CDCSegment2D*>>;
   }
 }

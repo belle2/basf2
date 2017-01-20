@@ -104,7 +104,7 @@ void SPTC2RTConverterModule::createRecoTrack(const SpacePointTrackCand& spacePoi
 
   // Add individual Hits/Clusters
   unsigned int sortingParameter = 0; // Recreate sorting since there are two cluster per SVD hit.
-  for (auto spacePoint : spacePointTC.getHits()) {
+  for (auto spacePoint : spacePointTC.getSortedHits()) {
 
     int detID = spacePoint->getType();
 

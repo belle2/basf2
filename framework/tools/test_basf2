@@ -196,14 +196,14 @@ else:
     results = map(run_test, all_tests)
 
 tests_passed = 0
-tests_failed = 0
+tests_failed = []
 tests_skipped = 0
 # and present the results
-for passed, message in results:
+for (test, release_dir), (passed, message) in zip(all_tests, results):
     if passed is True:
         tests_passed += 1
     elif passed is False:
-        tests_failed += 1
+        tests_failed.append(test)
     else:
         tests_skipped += 1
 
@@ -212,7 +212,7 @@ if options.xml and len(all_tests):
     xml_file = open(options.xml, 'w')
     xml_file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
     xml_file.write('<testsuites tests="%d" failures="%d" skipped="%d">\n' %
-                   (total_tests, tests_failed, tests_skipped))
+                   (total_tests, len(tests_failed), tests_skipped))
     for (name, release_dir), (passed, message) in zip(all_tests, results):
         xml_file.write('  <testcase name="%s"' % name)
         if passed is False:
@@ -224,6 +224,10 @@ if options.xml and len(all_tests):
     xml_file.write('</testsuites>\n')
     xml_file.close()
 
+# print a list of failed tests to find them more easily
+print(flush=True)
+if len(tests_failed):
+    print("FAILED TESTS:", "\n    ".join([""] + tests_failed), flush=True)
 # print summary and exit
-print('\n %d out of %d tests failed, %d were skipped' % (tests_failed, len(all_tests), tests_skipped), flush=True)
-sys.exit(tests_failed)
+print('%d out of %d tests failed, %d were skipped' % (len(tests_failed), len(all_tests), tests_skipped), flush=True)
+sys.exit(len(tests_failed))

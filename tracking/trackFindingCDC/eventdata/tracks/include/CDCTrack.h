@@ -107,6 +107,12 @@ namespace Belle2 {
         return m_automatonCell;
       }
 
+      /// Indirection to the automaton cell for easier access to the flags
+      AutomatonCell* operator->() const
+      {
+        return &m_automatonCell;
+      }
+
       /// Unset the masked flag of the automaton cell of this segment and of all contained wire hits.
       void unsetAndForwardMaskedFlag() const;
 
@@ -127,13 +133,7 @@ namespace Belle2 {
 
 
       /// Sort the recoHits according to their perpS information
-      void sortByArcLength2D()
-      {
-        std::stable_sort(begin(), end(),
-        [](const CDCRecoHit3D & recoHit, const CDCRecoHit3D & otherRecoHit) {
-          return recoHit.getArcLength2D() < otherRecoHit.getArcLength2D();
-        });
-      }
+      void sortByArcLength2D();
 
       /// Set all arcLengths to have positive values by shifting them by pi*radius if they are negative.
       /// This can only be done if the radius is not infinity (for example cosmics).
@@ -145,6 +145,9 @@ namespace Belle2 {
 
       /// Return a reversed copy of the track.
       CDCTrack reversed() const;
+
+      /// Finds the first CDCRecoHit3D that is based on the given wire hit - nullptr if none
+      MayBePtr<const CDCRecoHit3D> find(const CDCWireHit& wireHit) const;
 
       /// Set the flag which indicates that the track has a matching segment (probably only used in the SegmentTrackCombiner).
       void setHasMatchingSegment(bool hasMatchingSegment = true)

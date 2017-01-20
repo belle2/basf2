@@ -304,6 +304,12 @@ namespace Belle2 {
         return m_automatonCell;
       }
 
+      /// Indirection to the automaton cell for easier access to the flags
+      AutomatonCell* operator->() const
+      {
+        return &m_automatonCell;
+      }
+
       /// Getter for the super cluster id
       int getISuperCluster() const
       {
@@ -344,6 +350,8 @@ namespace Belle2 {
 
     /// Generic functor to get the wire hit from an object.
     struct GetWireHit {
+      /// Marker function for the isFunctor test
+      operator FunctorTag();
 
       /// Returns the wire hit of an object.
       template<class T, class SFINAE = decltype(&T::getWireHit)>

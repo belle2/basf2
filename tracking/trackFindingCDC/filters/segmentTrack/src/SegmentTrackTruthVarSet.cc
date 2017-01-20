@@ -17,12 +17,12 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool SegmentTrackTruthVarSet::extract(const std::pair<const CDCSegment2D*, const CDCTrack*>* testPair)
+bool SegmentTrackTruthVarSet::extract(const std::pair<const CDCTrack*, const CDCSegment2D*>* testPair)
 {
   if (not testPair) return false;
 
-  const CDCSegment2D* segment = testPair->first;
-  const CDCTrack* track = testPair->second;
+  const CDCTrack* track = testPair->first;
+  const CDCSegment2D* segment = testPair->second;
 
   var<named("belongs_to_same_track_truth")>() = 0.0;
 

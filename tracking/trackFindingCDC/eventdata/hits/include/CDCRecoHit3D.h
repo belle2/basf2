@@ -341,8 +341,7 @@ namespace Belle2 {
       Vector3D m_recoPos3D;
 
       /// Memory for the travel distance as see in the xy projection.
-      double m_arcLength2D;
-
+      double m_arcLength2D = 0;
     };
   }
 }

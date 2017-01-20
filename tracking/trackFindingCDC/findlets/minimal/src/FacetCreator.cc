@@ -98,7 +98,7 @@ void FacetCreator::createFacets(const CDCWireHitCluster& wireHits,
   for (const CDCWireHit* ptrMiddleWireHit : wireHits) {
     if (not ptrMiddleWireHit) continue;
     const CDCWireHit& middleWireHit = *ptrMiddleWireHit;
-    if (middleWireHit.getAutomatonCell().hasTakenFlag()) continue;
+    if (middleWireHit->hasTakenFlag()) continue;
 
     const auto neighbors = neighborhood.equal_range(ptrMiddleWireHit);
     for (const WeightedRelation<const CDCWireHit>& startWireHitRelation : neighbors) {
@@ -106,14 +106,14 @@ void FacetCreator::createFacets(const CDCWireHitCluster& wireHits,
 
       if (not ptrStartWireHit) continue;
       const CDCWireHit& startWireHit = *ptrStartWireHit;
-      if (startWireHit.getAutomatonCell().hasTakenFlag()) continue;
+      if (startWireHit->hasTakenFlag()) continue;
 
       for (const WeightedRelation<const CDCWireHit>& endWireHitRelation : neighbors) {
         const CDCWireHit* ptrEndWireHit(endWireHitRelation.getTo());
 
         if (not ptrEndWireHit) continue;
         const CDCWireHit& endWireHit = *ptrEndWireHit;
-        if (endWireHit.getAutomatonCell().hasTakenFlag()) continue;
+        if (endWireHit->hasTakenFlag()) continue;
 
         // Skip combinations where the facet starts and ends on the same wire
         if (not(ptrStartWireHit->getWire() == ptrEndWireHit->getWire())) {

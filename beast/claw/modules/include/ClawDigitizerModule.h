@@ -80,7 +80,7 @@ namespace Belle2 {
       /** Energy threshold */
       double m_PEthres;
       /** Event PE array*/
-      double hitsarrayinPE[1000][100];
+      //double hitsarrayinPE[1000][100];
 
     };
 

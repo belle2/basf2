@@ -338,6 +338,15 @@ CDCTrack CDCTrack::reversed() const
   return reversedTrack;
 }
 
+MayBePtr<const CDCRecoHit3D> CDCTrack::find(const CDCWireHit& wireHit) const
+{
+  auto hasWireHit = [&wireHit](const CDCRecoHit3D & recoHit3D) {
+    return recoHit3D.getWireHit() == wireHit;
+  };
+  auto itRecoHit3D = std::find_if(this->begin(), this->end(), hasWireHit);
+  return itRecoHit3D == this->end() ? nullptr : &*itRecoHit3D;
+}
+
 void CDCTrack::unsetAndForwardMaskedFlag() const
 {
   getAutomatonCell().unsetMaskedFlag();
@@ -372,6 +381,19 @@ void CDCTrack::forwardTakenFlag(bool takenFlag) const
   for (const CDCRecoHit3D& recoHit3D : *this) {
     recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(takenFlag);
   }
+}
+
+void CDCTrack::sortByArcLength2D()
+{
+  std::stable_sort(begin(),
+                   end(),
+  [](const CDCRecoHit3D & recoHit, const CDCRecoHit3D & otherRecoHit) {
+    double arcLength = recoHit.getArcLength2D();
+    double otherArcLength = otherRecoHit.getArcLength2D();
+    if (std::isnan(arcLength)) return false;
+    if (std::isnan(otherArcLength)) return true;
+    return arcLength < otherArcLength;
+  });
 }
 
 void CDCTrack::shiftToPositiveArcLengths2D(bool doForAllTracks)

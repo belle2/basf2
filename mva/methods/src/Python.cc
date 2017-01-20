@@ -244,7 +244,8 @@ namespace Belle2 {
 
         uint64_t nBatches = std::floor(numberOfEvents / batch_size);
         bool continue_loop = true;
-        for (uint64_t iIteration = 0; iIteration < m_specific_options.m_nIterations and continue_loop; ++iIteration) {
+        for (uint64_t iIteration = 0; (iIteration < m_specific_options.m_nIterations or m_specific_options.m_nIterations == 0)
+             and continue_loop; ++iIteration) {
           // disabled random shuffle since this is very slow (O(days)) on large files.
           // TODO: remove it in a more sophisticated way
           // std::random_shuffle(training_indices.begin(), training_indices.end());

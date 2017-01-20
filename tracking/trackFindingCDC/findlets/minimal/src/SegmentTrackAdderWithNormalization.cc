@@ -53,15 +53,13 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
   std::vector<WeightedRelation<CDCTrack, const CDCRecoHit3D>> trackHitRelations;
   trackHitRelations.reserve(2500);
 
-  // Add the original hit content of the track with low priority
-  for (CDCTrack& track : tracks) {
-    for (const CDCRecoHit3D& recoHit3D : track) {
-      recoHits3D.push_back(recoHit3D);
-      trackHitRelations.push_back({&track, -INFINITY, &recoHits3D.back()});
-    }
-  }
+  // We construct track hit relations denoting to which track each hit should belong from 3 sources
+  // 1. From the given track segment matches with the weight of the match
+  // 2. From the unmatch, untaken segments schedule the hits for removal with lower weight
+  // 3. From the original track content with lowest weight
+  // Hence if a hit is mentioned in source 1. it takes precedence over 2. and 3. to so on.
 
-  // Add the relations for the matched segments with the match weight
+  // 1. Add the relations for the matched segments with the match weight
   for (const auto& relation : relations) {
     CDCTrack* track = relation.getFrom();
     const CDCSegment2D& segment = *(relation.getTo());
@@ -83,14 +81,15 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
       recoHits3D.push_back(recoHit3D);
       trackHitRelations.push_back({track, weight, &recoHits3D.back()});
     }
-    segment.getAutomatonCell().setTakenFlag();
+    segment->setTakenFlag();
   }
 
-  // Add also those segments, that have no track-partner and schedule them for removal
+  // 2. Add also those segments, that have no track-partner and schedule them for removal
   if (m_param_removeUnmatchedSegments) {
     for (const CDCSegment2D& segment : segments) {
+
       // Skip segment already used in the steps before or marked outside as already taken.
-      if (segment.getAutomatonCell().hasTakenFlag()) continue;
+      if (segment->hasTakenFlag()) continue;
 
       // Add hit with destination track nullptr
       for (const CDCRecoHit2D& recoHit : segment) {
@@ -100,14 +99,22 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
     }
   }
 
-  // Thin out those weighted relations, by selecting only the best matching track for each hit.
+  // 3. Add the original hit content of the track with lowest priority
+  for (CDCTrack& track : tracks) {
+    for (const CDCRecoHit3D& recoHit3D : track) {
+      recoHits3D.push_back(recoHit3D);
+      trackHitRelations.push_back({&track, -INFINITY, &recoHits3D.back()});
+    }
+  }
+
+  // Thin out the weighted relations by selecting only the best matching track for each hit.
   std::sort(trackHitRelations.begin(), trackHitRelations.end());
   m_singleHitSelector.apply(trackHitRelations);
 
   // Remove all hits from the tracks in order to rebuild them completely
   for (CDCTrack& track : tracks) {
     for (const CDCRecoHit3D& recoHit3D : track) {
-      recoHit3D.getWireHit().getAutomatonCell().unsetTakenFlag();
+      recoHit3D.getWireHit()->unsetTakenFlag();
     }
     track.clear();
   }

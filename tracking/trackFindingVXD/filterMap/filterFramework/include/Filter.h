@@ -214,7 +214,7 @@ namespace Belle2 {
 
     template< class otherObserver >
     Filter< Variable, Range, otherObserver>
-    observe(const otherObserver&)
+    observe(const otherObserver&) const
     {
       return Filter< Variable , Range, otherObserver>(m_range);
     }
@@ -446,6 +446,20 @@ namespace Belle2 {
       return ! m_filter.accept(args ...);
     }
 
+
+    /** will set the observer for this filter
+    @param otherObserver : the new observer
+    */
+    template< class otherObserver >
+    Filter<  Belle2::OperatorNot, decltype(someFilter().observe(otherObserver())), otherObserver>
+    observe(const otherObserver&) const
+    {
+      return Filter< Belle2::OperatorNot, decltype(someFilter().observe(otherObserver())), otherObserver >
+             (m_filter.observe(otherObserver()));
+    }
+
+
+
     /** Persist the filter on a TTree.
      * @param t is the TTree under which the TBranch will be created
      * @param branchname is the name of the TBranch holding m_range
@@ -518,12 +532,21 @@ namespace Belle2 {
       return returnValue;
     }
 
+    /** will set the observer for this and both "AND" filters it contains
+    @param otherObserver : the new observer
+    */
     template< class otherObserver >
-    Filter<  Belle2::OperatorAnd, FilterA, FilterB, otherObserver>
-    observe(const otherObserver&)
+    Filter<  Belle2::OperatorAnd, decltype(FilterA().observe(otherObserver())),
+             decltype(FilterB().observe(otherObserver())),
+             otherObserver>
+             observe(const otherObserver&) const
     {
-      return Filter< Belle2::OperatorAnd, FilterA, FilterB, otherObserver >(m_filterA, m_filterB);
+      // this will recursively loop over all "and" Filters and set the SAME observer
+      return Filter< Belle2::OperatorAnd, decltype(FilterA().observe(otherObserver())),
+             decltype(FilterB().observe(otherObserver())),
+             otherObserver >(m_filterA.observe(otherObserver()), m_filterB.observe(otherObserver()));
     }
+
 
     /** Persist the filter on a TTree.
      * @param t is the TTree under which the TBranch will be created
@@ -569,6 +592,15 @@ namespace Belle2 {
     FilterB  m_filterB;
 
   };
+
+
+  /*
+    template< typename ... argsType >
+    typename std::enable_if <
+    all_same< argumentType, argumentTypeB,
+    argsType ... >::value, bool >::type
+    accept(const argsType& ... args) const
+  */
 
   template <
     typename ... types1,
@@ -621,6 +653,23 @@ namespace Belle2 {
     Filter(const FilterA& filterA, const FilterB& filterB):
       m_filterA(filterA), m_filterB(filterB) { };
     Filter() {};
+
+
+    /** will set the observer for this and both "OR" filters it contains
+    @param otherObserver : the new observer
+    */
+    template< class otherObserver >
+    Filter<  Belle2::OperatorOr, decltype(FilterA().observe(otherObserver())),
+             decltype(FilterB().observe(otherObserver())),
+             otherObserver>
+             observe(const otherObserver&) const
+    {
+      // this will recursively loop over all "and" Filters and set the SAME observer
+      return Filter< Belle2::OperatorOr, decltype(FilterA().observe(otherObserver())),
+             decltype(FilterB().observe(otherObserver())),
+             otherObserver >(m_filterA.observe(otherObserver()), m_filterB.observe(otherObserver()));
+    }
+
 
     /** Persist the filter on a TTree.
      * @param t is the TTree under which the TBranch will be created

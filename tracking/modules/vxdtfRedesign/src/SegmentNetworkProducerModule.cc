@@ -13,6 +13,7 @@
 #include <tracking/trackFindingVXD/segmentNetwork/NodeNetworkHelperFunctions.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 
+
 using namespace std;
 using namespace Belle2;
 
@@ -81,7 +82,76 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
            m_PARAMallFiltersOff,
            "For debugging purposes: if true, all filters are deactivated for all hit-combinations and therefore all combinations are accepted.",
            bool(false));
+
+  addParam("observeFilters",
+           m_PARAMobserveFilters,
+           "For debugging ONLY! If true the answer of the SelectionVariables in the filter will be observed, which means that"
+           "the response of each FilterVariable is written to a root file. NOTE: that observing filters makes the code slow!"
+           "So only use for debugging purposes.",
+           bool(false));
 }
+
+
+
+/** Initializes the Module.
+ */
+void
+SegmentNetworkProducerModule::initialize()
+{
+  InitializeCounters();
+
+  // searching for correct sectorMap:
+  for (auto& setup : m_filtersContainer.getAllSetups()) {
+    auto& filters = *(setup.second);
+
+    if (filters.getConfig().secMapName != m_PARAMsecMapName) { continue; }
+    B2INFO("SegmentNetworkProducerModule::initialize(): loading mapName: " << m_PARAMsecMapName << " with nCompactSecIDs: " <<
+           filters.size());
+
+    m_vxdtfFilters = &filters;
+    SecMapHelper::printStaticSectorRelations(filters, filters.getConfig().secMapName + "segNetProducer", 2, true, true);
+    if (m_vxdtfFilters == nullptr) B2FATAL("SegmentNetworkProducerModule::initialize(): requested secMapName '" << m_PARAMsecMapName <<
+                                             "' does not exist! Can not continue...");
+    break; // have found our secMap no need for further searching
+  }
+
+  if (m_PARAMCreateNeworks < 1 or m_PARAMCreateNeworks > 3) {
+    B2FATAL("SegmentNetworkProducerModule::Initialize(): parameter 'createNeworks' is set to " << m_PARAMCreateNeworks <<
+            "which is invalid, please read the documentation (basf2 - m SegmentNetworkProducer)!");
+  }
+
+  for (std::string& anArrayName : m_PARAMSpacePointsArrayNames) {
+    m_spacePoints.push_back(StoreArray<SpacePoint>(anArrayName));
+    m_spacePoints.back().isRequired();
+  }
+
+  m_network.registerInDataStore(m_PARAMNetworkOutputName, DataStore::c_DontWriteOut);
+
+  // TODO catch cases when m_network already existed in DataStore!
+
+
+  // for debugging purposes the filter responses can be observed and stored to a root file
+  if (m_PARAMobserveFilters == true) {
+    /** This TFile is used by the observers, at present it is created by default.
+      TODO : this might not be a good construction for parallel processing! Replace by something which is good for parallel
+      preocessing!
+    */
+    if (m_tfile) delete m_tfile;
+    m_tfile = new TFile("observeFilterSegNetProducer.root", "RECREATE");
+    m_tfile->cd();
+    TTree* newTree = new TTree("twoHitsTree", "Observers");
+
+    // create a dummy verison of the 2-hit-filter
+    VXDTFFilters<SpacePoint>::twoHitFilter_t aFilter;
+    // initialize the !observed! verion of the Filter
+    initializeObservers(aFilter.observe(SegmentNetworkProducerModule::ObserverType_2sp()) , newTree);
+    initializeObservers(aFilter.observe(SegmentNetworkProducerModule::ObserverType_3sp()) , newTree);
+
+  } else {
+    m_tfile = NULL;
+  }
+
+} // end initialize
 
 
 
@@ -102,11 +172,18 @@ void SegmentNetworkProducerModule::event()
 
   if (m_PARAMCreateNeworks < 2) { B2DEBUG(10, "SegmentNetworkProducerModule:event: event " << m_eventCounter << ": finished work after creating activeSectorNetwork"); return; }
 
-  buildTrackNodeNetwork(); // apply-two-hit-filters
+
+  // use VoidObserver to deactivate observation of filters
+  if (m_PARAMobserveFilters == true)
+    buildTrackNodeNetwork<SegmentNetworkProducerModule::ObserverType_2sp>();  // apply-two-hit-filters
+  else buildTrackNodeNetwork<VoidObserver>(); // apply-two-hit-filters
 
   if (m_PARAMCreateNeworks < 3) { B2DEBUG(10, "SegmentNetworkProducerModule:event: event " << m_eventCounter << ": finished work after creating trackNodeNetwork"); return; }
 
-  buildSegmentNetwork(); // apply-three-hit-filters
+  // use VoidObserver to deactivate observation of filters
+  if (m_PARAMobserveFilters == true)
+    buildSegmentNetwork<SegmentNetworkProducerModule::ObserverType_3sp>();  // apply-three-hit-filters
+  else buildSegmentNetwork<VoidObserver>(); // apply-three-hit-filters
 
   // TODO debug output with counters!
 }
@@ -295,6 +372,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
 
 
 /** old name: segFinder. use SpacePoints stored in ActiveSectors to store and link them in a DirectedNodeNetwork< SpacePoint > */
+template < class ObserverType >
 void SegmentNetworkProducerModule::buildTrackNodeNetwork()
 {
   DirectedNodeNetwork<ActiveSector<StaticSectorType, Belle2::TrackNode>, VoidMetaInfo>& activeSectorNetwork =
@@ -332,14 +410,8 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
 
         for (TrackNode* innerHit : innerHits) {
           // applying filters provided by the sectorMap:
-          bool accepted = filter2sp->accept(outerHit->getHit(), innerHit->getHit());
-
-          /*
-          bool accepted = outerSector->getEntry().acceptTwoHitCombination(
-                            innerSector->getEntry().getFullSecID(),
-                            *outerHit,
-                            *innerHit);
-          */
+          // ->observe() gives back an observed version of the filter (the default filter has the VoidObserver)
+          bool accepted = (filter2sp->observe(ObserverType())).accept(outerHit->getHit(), innerHit->getHit());
 
           if (m_PARAMallFiltersOff) accepted = true; // bypass all filters
 
@@ -374,6 +446,7 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
 
 
 /** old name: nbFinder. use connected SpacePoints to form segments which will stored and linked in a DirectedNodeNetwork< Segment > */
+template < class ObserverType >
 void SegmentNetworkProducerModule::buildSegmentNetwork()
 {
 
@@ -408,19 +481,9 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
         if (filter3sp == NULL) continue;
 
         // the filter accepts spacepoint combinations
-        bool accepted = filter3sp->accept(outerHit->getEntry().getHit(), centerHit->getEntry().getHit(),
-                                          innerHit->getEntry().getHit());
-
-        // applying filters provided by the sectorMap:
-        /*
-        bool accepted = outerHit->getEntry().sector->acceptThreeHitCombination(
-                          centerHit->getEntry().sector->getFullSecID(),
-                          innerHit->getEntry().sector->getFullSecID(),
-                          outerHit->getEntry(),
-                          centerHit->getEntry(),
-                          innerHit->getEntry());
-
-        */
+        // ->observe gives back an observed version of the filter
+        bool accepted = (filter3sp->observe(ObserverType())).accept(outerHit->getEntry().getHit(), centerHit->getEntry().getHit(),
+                                                                    innerHit->getEntry().getHit());
 
         B2DEBUG(5, "buildSegmentNetwork: outer/Center/Inner: " << outerHit->getEntry().getName() << "/" << centerHit->getEntry().getName()
                 << "/" << innerHit->getEntry().getName() << ", accepted: " << std::to_string(accepted));

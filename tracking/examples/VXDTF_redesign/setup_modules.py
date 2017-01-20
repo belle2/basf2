@@ -20,6 +20,7 @@ def setup_VXDTF2(path=None,
                  use_svd=True,
                  filter_overlapping=True,
                  use_segment_network_filters=True,
+                 observe_network_filters=False,
                  quality_estimator='circleFit',
                  overlap_filter='greedy',
                  secmap_name=None,
@@ -35,6 +36,7 @@ def setup_VXDTF2(path=None,
     :param quality_estimator: which fit to use to determine track quality. Options 'circle', 'random'. Default 'circle'.
     :param filter_overlapping: if true overlapping tracks are reduced to a single track using the qualitiy indicator.
     :param use_segment_network_filters: if true use filters for segmentMap training. Default True.
+    :param observe_network_filters: FOR DEBUG ONLY! If true results for FilterVariables are stored to a root file. Default False.
     :param overlap_filter: which filter network to use. Options 'hopfield', 'greedy'. Default 'hopfield'.
     :param log_level: LogLevel of all modules in the chain
     :param debug_level: debug level of all modules in the chain.
@@ -85,6 +87,7 @@ def setup_VXDTF2(path=None,
     segNetProducer.param('SpacePointsArrayNames', ['SpacePoints'])
     segNetProducer.param('printNetworks', False)
     segNetProducer.param('addVirtualIP', False)
+    segNetProducer.param('observeFilters', observe_network_filters)
     segNetProducer.logging.log_level = log_level
     segNetProducer.logging.debug_level = debug_level
     modules.append(segNetProducer)

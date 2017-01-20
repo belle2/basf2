@@ -12,6 +12,7 @@
 #include <tracking/trackFindingVXD/filterTools/SelectionVariableType.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFiltersHelperFunctions.h>
+#include <tracking/trackFindingVXD/filterTools/ObserverCheckMCPurity.h>
 
 using namespace std;
 using namespace Belle2;
@@ -473,17 +474,17 @@ template <class FilterType> void RawSecMapMergerModule::add2HitFilters(VXDTFFilt
     (
       (
         (filterCutsMap.at("Distance3DSquared").getMin() <= Distance3DSquared<SpacePoint>() <=
-         filterCutsMap.at("Distance3DSquared").getMax()).observe(ObserverCheckMCPurity()) &&
+         filterCutsMap.at("Distance3DSquared").getMax())  &&
         (filterCutsMap.at("Distance2DXYSquared").getMin() <= Distance2DXYSquared<SpacePoint>() <=
-         filterCutsMap.at("Distance2DXYSquared").getMax()).observe(ObserverCheckMCPurity()) &&
-        (filterCutsMap.at("Distance1DZ").getMin() <= Distance1DZ<SpacePoint>() <= filterCutsMap.at("Distance1DZ").getMax()).observe(
-          ObserverCheckMCPurity()) &&
-        (filterCutsMap.at("SlopeRZ").getMin() <= SlopeRZ<SpacePoint>() <= filterCutsMap.at("SlopeRZ").getMax()).observe(
-          ObserverCheckMCPurity()) &&
+         filterCutsMap.at("Distance2DXYSquared").getMax()) &&
+        (filterCutsMap.at("Distance1DZ").getMin() <= Distance1DZ<SpacePoint>() <= filterCutsMap.at("Distance1DZ").getMax()) &&
+        (filterCutsMap.at("SlopeRZ").getMin() <= SlopeRZ<SpacePoint>() <= filterCutsMap.at("SlopeRZ").getMax()) &&
         (filterCutsMap.at("Distance3DNormed").getMin() <= Distance3DNormed<SpacePoint>() <=
-         filterCutsMap.at("Distance3DNormed").getMax()).observe(ObserverCheckMCPurity())
-      ).observe(ObserverCheckMCPurity())
+         filterCutsMap.at("Distance3DNormed").getMax())
+      )
     );
+
+
 
   // JKL Jan 2016 - standard version:
   // // // // // // //       (

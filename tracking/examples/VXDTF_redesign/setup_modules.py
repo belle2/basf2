@@ -107,11 +107,6 @@ def setup_VXDTF2(path=None,
     # Analyzer
     #################
 
-    momSeedRetriever = register_module('SPTCmomentumSeedRetriever')
-    momSeedRetriever.logging.log_level = log_level
-    momSeedRetriever.logging.debug_level = debug_level
-    modules.append(momSeedRetriever)
-
     # Quality
 
     if quality_estimator is "random":
@@ -160,6 +155,10 @@ def setup_VXDTF2(path=None,
     # VXDTF2 Step 5
     # Converter
     #################
+    momSeedRetriever = register_module('SPTCmomentumSeedRetriever')
+    momSeedRetriever.logging.log_level = log_level
+    momSeedRetriever.logging.debug_level = debug_level
+    modules.append(momSeedRetriever)
 
     converter = register_module('SPTC2RTConverter')
     converter.logging.log_level = log_level

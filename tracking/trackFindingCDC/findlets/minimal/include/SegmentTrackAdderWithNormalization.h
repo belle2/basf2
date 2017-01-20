@@ -10,12 +10,12 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
-#include <tracking/trackFindingCDC/utilities/HitComperator.h>
-#include <tracking/trackFindingCDC/findlets/minimal/TrackNormalizer.h>
 #include <tracking/trackFindingCDC/collectors/selectors/SingleMatchSelector.h>
+#include <tracking/trackFindingCDC/findlets/minimal/TrackNormalizer.h>
 
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackFindingCDC/utilities/HitComperator.h>
 
 #include <vector>
 
@@ -23,31 +23,22 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
     class CDCSegment2D;
-    class CDCWireHit;
-    class CDCRecoHit2D;
+    class CDCRecoHit3D;
 
     /**
      * Add the matched segments to the tracks and normalize the tracks afterwards.
      * Also deletes all hits from the tracks, that are part of segments, that were not matched to these tracks.
      */
-    class SegmentTrackAdderWithNormalization : public
-      Findlet<WeightedRelation<CDCTrack, const CDCSegment2D>, CDCTrack, const CDCSegment2D> {
+    class SegmentTrackAdderWithNormalization
+      : public Findlet<WeightedRelation<CDCTrack, const CDCSegment2D>&, CDCTrack&, const CDCSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<WeightedRelation<CDCTrack, const CDCSegment2D>, CDCTrack, const CDCSegment2D>;
+      using Super = Findlet<WeightedRelation<CDCTrack, const CDCSegment2D>&, CDCTrack&, const CDCSegment2D>;
 
     public:
       /// Constructor for registering the sub-findlets
       SegmentTrackAdderWithNormalization();
-
-      /// Is called before the event starts to clear all maps and lists.
-      void beginEvent() override
-      {
-        Super::beginEvent();
-        m_relationsFromTracksToHits.clear();
-        m_mapHitsToMatchedTracks.clear();
-      }
 
       /// Expose the parameters of the sub-findlets.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
@@ -60,19 +51,16 @@ namespace Belle2 {
                  std::vector<CDCTrack>& tracks, const std::vector<CDCSegment2D>& segment) override;
 
     private:
+      // Parameters
+      /// Parameter : Swtich to remove hits in segments that have no matching track from all tracks
+      bool m_param_removeUnmatchedSegments = true;
+
       // Findlets
       /// The selector for finding the track each hit should belong to.
-      SingleMatchSelector<CDCTrack, CDCRecoHit2D, HitComperator> m_singleHitSelector;
+      SingleMatchSelector<CDCTrack, CDCRecoHit3D, HitComperator> m_singleHitSelector;
 
       /// Findlet for performing the normalization of the tracks afterwards
       TrackNormalizer m_trackNormalizer;
-
-      // Object pools
-      /// Vector of relations between hits and tracks
-      std::vector<WeightedRelation<CDCTrack, const CDCRecoHit2D>> m_relationsFromTracksToHits;
-
-      /// Thinned out mapping between hits and tracks
-      std::map<const CDCWireHit*, CDCTrack*> m_mapHitsToMatchedTracks;
     };
   }
 }

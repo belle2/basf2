@@ -12,120 +12,127 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <vector>
+#include <deque>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-/// Constructor for registering the sub.findlets
-SegmentTrackAdderWithNormalization::SegmentTrackAdderWithNormalization() : Super()
+SegmentTrackAdderWithNormalization::SegmentTrackAdderWithNormalization()
+  : Super()
 {
   addProcessingSignalListener(&m_trackNormalizer);
   addProcessingSignalListener(&m_singleHitSelector);
 }
 
-/// Expose the parameters of the sub-findlets.
 void SegmentTrackAdderWithNormalization::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   m_singleHitSelector.exposeParameters(moduleParamList, prefixed(prefix, "hitSelector"));
+  moduleParamList->addParameter(prefixed(prefix, "removeUnmatchedSegments"),
+                                m_param_removeUnmatchedSegments,
+                                "Swtich to remove hits in segments that have no matching track from all tracks",
+                                m_param_removeUnmatchedSegments);
+
 }
 
-/// Short description of the findlet
 std::string SegmentTrackAdderWithNormalization::getDescription()
 {
   return "Add the matched segments to the tracks and normalize the tracks afterwards. Also deletes all "
          "hits from tracks, that are now part in another track (or should not be part in any).";
 }
 
-/// Apply the findlet
 void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCTrack, const CDCSegment2D>>& relations,
                                                std::vector<CDCTrack>& tracks, const std::vector<CDCSegment2D>& segments)
 {
-  // Create weighted relations between all hits in the segments and their tracks (matched over the segment-track-relation)
+  // Storage space for the hits - deque for address persistence
+  std::deque<CDCRecoHit3D> recoHits3D;
+
+  // Relations for the matching tracks
+  std::vector<WeightedRelation<CDCTrack, const CDCRecoHit3D>> trackHitRelations;
+  trackHitRelations.reserve(2500);
+
+  // We construct track hit relations denoting to which track each hit should belong from 3 sources
+  // 1. From the given track segment matches with the weight of the match
+  // 2. From the unmatch, untaken segments schedule the hits for removal with lower weight
+  // 3. From the original track content with lowest weight
+  // Hence if a hit is mentioned in source 1. it takes precedence over 2. and 3. to so on.
+
+  // 1. Add the relations for the matched segments with the match weight
   for (const auto& relation : relations) {
     CDCTrack* track = relation.getFrom();
     const CDCSegment2D& segment = *(relation.getTo());
     const Weight weight = relation.getWeight();
-
-    segment.getAutomatonCell().setTakenFlag();
-
-    for (const CDCRecoHit2D& recoHit : segment) {
-      m_relationsFromTracksToHits.emplace_back(track, weight, &recoHit);
-    }
-  }
-
-  // Add also those segments, that have no track-partner (and therefore do not have a taken flag)
-  for (const CDCSegment2D& segment : segments) {
-    // hits were already used in the step before
-    if (segment.getAutomatonCell().hasTakenFlag()) {
-      continue;
-    }
+    const CDCTrajectory3D& trajectory3D = track->getStartTrajectory3D();
 
     for (const CDCRecoHit2D& recoHit : segment) {
-      m_relationsFromTracksToHits.emplace_back(nullptr, 0, &recoHit);
+
+      // In case the hit is already in the matched track - keep its reconstructed position
+      MayBePtr<const CDCRecoHit3D> ptrRecoHit3D = track->find(recoHit.getWireHit());
+      if (ptrRecoHit3D != nullptr) {
+        recoHits3D.push_back(*ptrRecoHit3D);
+        trackHitRelations.push_back({track, weight, &recoHits3D.back()});
+        continue;
+      }
+
+      // Otherwise reconstruct the position into the third dimension
+      CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit, trajectory3D);
+      recoHits3D.push_back(recoHit3D);
+      trackHitRelations.push_back({track, weight, &recoHits3D.back()});
     }
+    segment->setTakenFlag();
   }
 
-  std::sort(m_relationsFromTracksToHits.begin(), m_relationsFromTracksToHits.end());
+  // 2. Add also those segments, that have no track-partner and schedule them for removal
+  if (m_param_removeUnmatchedSegments) {
+    for (const CDCSegment2D& segment : segments) {
 
-  // Thin out those weighted relations, by selecting only the best matching track for each hit
-  m_singleHitSelector.apply(m_relationsFromTracksToHits);
+      // Skip segment already used in the steps before or marked outside as already taken.
+      if (segment->hasTakenFlag()) continue;
 
-  // Now we have a list of relations between hits and track pointers
-  for (const auto& relation : m_relationsFromTracksToHits) {
-    const CDCRecoHit2D* recoHit = relation.getTo();
-    const CDCWireHit* cdcWireHit = &(recoHit->getWireHit());
-    CDCTrack* track = relation.getFrom();
-
-    if (track) {
-      const CDCTrajectory2D& trajectory2D = track->getStartTrajectory3D().getTrajectory2D();
-
-      AutomatonCell& automatonCell = cdcWireHit->getAutomatonCell();
-
-      const auto& trackHitAndSegmentHitAreTheSame = [&cdcWireHit](const CDCRecoHit3D & recoHit3D) {
-        return &(recoHit3D.getWireHit()) == cdcWireHit;
-      };
-
-      // Do only add the hit, if it is not already present in the track.
-      if (not any(*track, trackHitAndSegmentHitAreTheSame)) {
-        CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit->getRLWireHit(), trajectory2D);
-        track->push_back(recoHit3D);
-        automatonCell.setTakenFlag();
+      // Add hit with destination track nullptr
+      for (const CDCRecoHit2D& recoHit : segment) {
+        recoHits3D.push_back({recoHit.getRLWireHit(), Vector3D(recoHit.getRecoPos2D()), 0});
+        trackHitRelations.push_back({nullptr, 0, &recoHits3D.back()});
       }
     }
-
-    m_mapHitsToMatchedTracks.insert({cdcWireHit, track});
   }
 
-  // Now go through all the tracks and delete those hits, that are now part of another track or not matched to any
-  // track at all
-  const auto& hitIsInOtherTrack = [this](const CDCTrack & thisTrack, const CDCRecoHit3D & recoHit) {
-    const CDCWireHit* cdcWireHit = &(recoHit.getWireHit());
-    // If the hit is not part of any segments, it should stay
-    if (m_mapHitsToMatchedTracks.find(cdcWireHit) == m_mapHitsToMatchedTracks.end()) {
-      return false;
-    }
-
-    const CDCTrack* matchedTrack = m_mapHitsToMatchedTracks[cdcWireHit];
-    // If the segment it belonged to, was not matched to any track, the matched track is a nullptr.
-    // This means we delete the hit from the track and untick its taken flag.
-    if (not matchedTrack) {
-      recoHit.getWireHit().getAutomatonCell().unsetTakenFlag();
-      return true;
-    }
-
-    // If the track, this hit should belong to (because the segment was matched to this track),
-    // is the track we are currently looking on, the hit can stay. If not, the hit should be deleted from
-    // this track. We do not have to untick the taken flag, because the hit is still used (by the other track).
-    return matchedTrack != &thisTrack;
-  };
-
+  // 3. Add the original hit content of the track with lowest priority
   for (CDCTrack& track : tracks) {
-    // Will call hitIsInOtherTrack(track, hit) for each hit in the track and remove those, where
-    // hitIsInOtherTrack yields true.
-    erase_remove_if(track,
-                    std::bind(hitIsInOtherTrack, std::cref(track), std::placeholders::_1));
+    for (const CDCRecoHit3D& recoHit3D : track) {
+      recoHits3D.push_back(recoHit3D);
+      trackHitRelations.push_back({&track, -INFINITY, &recoHits3D.back()});
+    }
+  }
+
+  // Thin out the weighted relations by selecting only the best matching track for each hit.
+  std::sort(trackHitRelations.begin(), trackHitRelations.end());
+  m_singleHitSelector.apply(trackHitRelations);
+
+  // Remove all hits from the tracks in order to rebuild them completely
+  for (CDCTrack& track : tracks) {
+    for (const CDCRecoHit3D& recoHit3D : track) {
+      recoHit3D.getWireHit()->unsetTakenFlag();
+    }
+    track.clear();
+  }
+
+  // Now add the hits to their destination tracks
+  for (const auto& trackHitRelation : trackHitRelations) {
+    CDCTrack* track = trackHitRelation.getFrom();
+    const CDCRecoHit3D* recoHit3D = trackHitRelation.getTo();
+
+    if (track == nullptr) continue;
+
+    track->push_back(*recoHit3D);
+    recoHit3D->getWireHit()->setTakenFlag();
+  }
+
+  // Establish the ordering
+  for (CDCTrack& track : tracks) {
+    track.sortByArcLength2D();
   }
 
   // Normalize the trajectory and hit contents of the tracks

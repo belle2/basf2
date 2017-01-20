@@ -15,6 +15,10 @@ from concurrent.futures import ThreadPoolExecutor
 import threading
 import argparse
 import re
+import datetime
+import timeit
+import xml.etree.cElementTree as ET
+from collections import defaultdict
 
 # allow stopping tests with Ctrl+c
 import signal
@@ -80,6 +84,7 @@ def run_test(argument):
     result = None
     message = None
     extra = ""
+    time_start = timeit.default_timer()
     try:
         process = subprocess.run(['basf2', steering], stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE, timeout=options.timeout)
@@ -89,6 +94,8 @@ def run_test(argument):
         result = False
         message = "timeout of %d seconds reached" % options.timeout
         extra = format_output(name, e.stderr, e.stdout)
+
+    time = timeit.default_timer() - time_start
 
     with print_lock:
         if result is False:
@@ -119,7 +126,7 @@ def run_test(argument):
 
         result_message = {True: "passed", None: "skipped", False: "FAILED"}[result]
         print("%sfinished test %s\n     -> %s: %s" % (extra, name, result_message, message), flush=True)
-    return (result, message)
+    return (result, message, time)
 
 
 def process_dir(dir, release_dir):
@@ -211,39 +218,65 @@ if options.nprocess > 1:
 else:
     results = map(run_test, all_tests)
 
-tests_passed = 0
-tests_failed = []
-tests_skipped = 0
+
+class TestSuite(list):
+    """Class to aggregate test case results by directory"""
+    def __init__(self):
+        """Init the suite with empty values"""
+        #: number of passed tests in the suite/package
+        self.passed = 0
+        #: number of failed tests in the suite/package
+        self.failed = 0
+        #: number of skippedtests in the suite/package
+        self.skipped = 0
+        #: time in seconds needed for test execution
+        self.time = 0
+
+    def add(self, name, passed, message, time):
+        """Add a new test to the suite. Return True if test was successful or
+        skipped, False if it failed"""
+        self.append((name, passed, message, time))
+        self.time += time
+        if passed is True:
+            self.passed += 1
+        elif passed is False:
+            self.failed += 1
+        else:
+            self.skipped += 1
+        return (passed is not False)
+
 # and present the results
-for (test, release_dir), (passed, message) in zip(all_tests, results):
-    if passed is True:
-        tests_passed += 1
-    elif passed is False:
+test_results = TestSuite()
+test_suites = defaultdict(TestSuite)
+tests_failed = []
+for (test, release_dir), result in zip(all_tests, results):
+    if not test_results.add(test, *result):
         tests_failed.append(test)
-    else:
-        tests_skipped += 1
+    suite = os.path.dirname(test)
+    if suite.endswith("tests"):
+        suite = suite[:-5].strip("/")
+    test_suites[suite].add(test, *result)
 
 if options.xml and len(all_tests):
-    total_tests = len(all_tests)
-    xml_file = open(options.xml, 'w')
-    xml_file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-    xml_file.write('<testsuites tests="%d" failures="%d" skipped="%d">\n' %
-                   (total_tests, len(tests_failed), tests_skipped))
-    for (name, release_dir), (passed, message) in zip(all_tests, results):
-        xml_file.write('  <testcase name="%s"' % name)
-        if passed is False:
-            xml_file.write('>\n    <failure message="%s">\n    </failure>\n  </testcase>\n' % message)
-        elif passed is None:
-            xml_file.write('>\n    <skipped message="%s">\n    </skipped>\n  </testcase>\n' % message)
-        else:
-            xml_file.write(' />\n')
-    xml_file.write('</testsuites>\n')
-    xml_file.close()
+    # now let's make the xml
+    root_el = ET.Element("testsuites", tests=str(len(test_results)), failures=str(test_results.failed),
+                         skipped=str(test_results.skipped), timestamp=datetime.datetime.now().isoformat(),
+                         time=str(test_results.time), name="Basf2 Tests")
+    for suite, tests in sorted(test_suites.items()):
+        suite_el = ET.SubElement(root_el, "testsuite", name=suite, tests=str(len(tests)),
+                                 failures=str(tests.failed), skipped=str(tests.skipped), time=str(tests.time))
+        for name, passed, message, time in tests:
+            test_el = ET.SubElement(suite_el, "testcase", name=os.path.basename(name), classname=name, time=str(time))
+            if passed is not True:
+                ET.SubElement(test_el, "failure" if passed is False else "skipped", message=message)
+
+    tree = ET.ElementTree(root_el)
+    tree.write(options.xml, encoding="UTF-8", xml_declaration=True)
 
 # print a list of failed tests to find them more easily
 print(flush=True)
-if len(tests_failed):
+if test_results.failed > 0:
     print("FAILED TESTS:", "\n    ".join([""] + tests_failed), flush=True)
 # print summary and exit
-print('%d out of %d tests failed, %d were skipped' % (len(tests_failed), len(all_tests), tests_skipped), flush=True)
+print('%d out of %d tests failed, %d were skipped' % (test_results.failed, len(test_results), test_results.skipped), flush=True)
 sys.exit(len(tests_failed))

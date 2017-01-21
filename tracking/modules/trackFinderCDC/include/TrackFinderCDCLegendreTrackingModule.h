@@ -8,10 +8,9 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
-#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
+#include <framework/core/Module.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -26,18 +25,21 @@ namespace Belle2 {
    * "Implementation of the Legendre Transform for track segment reconstruction in drift tube chambers"
    * by T. Alexopoulus, et al. NIM A592 456-462 (2008).
    */
-  class TrackFinderCDCLegendreTrackingModule: public TrackFinderCDCBaseModule {
+  class TrackFinderCDCLegendreTrackingModule: public Module {
 
   private:
     /// Type of the base class
-    using Super = TrackFinderCDCBaseModule;
+    using Super = Module;
 
   public:
     /// Create and allocate memory for variables here and add the module parameters in this method.
     TrackFinderCDCLegendreTrackingModule();
 
     /// Initialisation before the event processing starts
-    void initialize();
+    void initialize() override;
+
+    /// Processes the event and generates track candidates
+    void event() override;
 
   private:
     /// Parameter
@@ -47,13 +49,19 @@ namespace Belle2 {
     /// Defines whether early track merging will be performed.
     bool m_param_doEarlyMerging;
 
+    /// Parameter: Name of the output StoreObjPtr of the tracks generated within this module.
+    std::string m_param_tracksStoreObjName = "CDCTrackVector";
+
+    /// Parameter: Flag to use the CDCTracks in the given StoreObjPtr as input and output of the module.
+    bool m_param_tracksStoreObjNameIsInput = false;
+
+  private:
     /// Worker
     /// Object for holding all found cdc tracks to be passed around to the postprocessing functions.
     std::list<TrackFindingCDC::CDCTrack> m_tracks;
 
     /// List to collect all axial wire hits
     std::vector<const TrackFindingCDC::CDCWireHit*> m_allAxialWireHits;
-
 
     /// List for holding all used conformal CDC wire hits.
     std::vector<TrackFindingCDC::CDCConformalHit> m_conformalCDCWireHitList;

@@ -33,7 +33,7 @@ using namespace TrackFindingCDC;
 REG_MODULE(TrackFinderCDCLegendreTracking);
 
 TrackFinderCDCLegendreTrackingModule::TrackFinderCDCLegendreTrackingModule() :
-  TrackFinderCDCBaseModule()
+  Module()
 {
   setDescription("Performs the pattern recognition in the CDC with the conformal finder:"
                  "digitized CDCHits are combined to track candidates (genfit::TrackCand)");
@@ -47,13 +47,41 @@ TrackFinderCDCLegendreTrackingModule::TrackFinderCDCLegendreTrackingModule() :
            m_param_doEarlyMerging,
            "Set whether merging of track should be performed after each pass candidate finding; has impact on CPU time",
            false);
+
+
+  addParam("TracksStoreObjName",
+           m_param_tracksStoreObjName,
+           "Name of the output StoreObjPtr of the tracks generated within this module.",
+           m_param_tracksStoreObjName);
+
+  addParam("TracksStoreObjNameIsInput",
+           m_param_tracksStoreObjNameIsInput,
+           "Flag to use the CDCTracks in the given StoreObjPtr as input and output of the module",
+           m_param_tracksStoreObjNameIsInput);
+
+  setPropertyFlags(c_ParallelProcessingCertified bitor c_TerminateInAllProcesses);
 }
 
 void TrackFinderCDCLegendreTrackingModule::initialize()
 {
   StoreWrappedObjPtr<std::vector<CDCWireHit> > storedWireHits("CDCWireHitVector");
   storedWireHits.isRequired();
+
+  StoreWrappedObjPtr<std::vector<CDCTrack>> storedTracks(m_param_tracksStoreObjName);
+  storedTracks.registerInDataStore();
+
   Super::initialize();
+}
+
+void TrackFinderCDCLegendreTrackingModule::event()
+{
+  // Now aquire the store vector
+  StoreWrappedObjPtr<std::vector<CDCTrack>> storedTracks(m_param_tracksStoreObjName);
+  storedTracks.create();
+
+  // We now let the generate-method fill or update the outputTracks
+  std::vector<CDCTrack>& outputTracks = *storedTracks;
+  generate(outputTracks);
 }
 
 void TrackFinderCDCLegendreTrackingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)

@@ -36,7 +36,6 @@ class CosmicsHough(TrackingValidationRun):
         path.add_module('AxialTrackCreatorSegmentHough',
                         tracks="CDCAxialTrackVector")
         path.add_module('StereoHitFinderCDCLegendreHistogramming',
-                        TracksStoreObjNameIsInput=True,
                         TracksStoreObjName="CDCAxialTrackVector")
         path.add_module('TrackExporter',
                         inputTracks="CDCAxialTrackVector")

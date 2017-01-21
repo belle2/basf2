@@ -316,7 +316,6 @@ def add_cdc_cr_track_finding(path,
 
     # Combine segments with axial tracks
     path.add_module('SegmentTrackCombiner',
-                    TracksStoreObjNameIsInput=True,
                     SegmentTrackFilter="mva",
                     SegmentTrackFilterParameters={"cut": 0.75},
                     TrackFilter="mva",

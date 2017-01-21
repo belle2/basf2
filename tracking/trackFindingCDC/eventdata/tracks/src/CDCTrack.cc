@@ -16,6 +16,8 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/RecoTrackUtil.h>
+
+#include <tracking/trackFindingCDC/numerics/FloatComparing.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 using namespace Belle2;
@@ -390,9 +392,7 @@ void CDCTrack::sortByArcLength2D()
   [](const CDCRecoHit3D & recoHit, const CDCRecoHit3D & otherRecoHit) {
     double arcLength = recoHit.getArcLength2D();
     double otherArcLength = otherRecoHit.getArcLength2D();
-    if (std::isnan(arcLength)) return false;
-    if (std::isnan(otherArcLength)) return true;
-    return arcLength < otherArcLength;
+    return lessFloatHighNaN(arcLength, otherArcLength);
   });
 }
 

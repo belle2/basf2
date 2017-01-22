@@ -22,7 +22,7 @@ import os.path
 import argparse
 from tracking import add_cdc_cr_track_finding
 from ROOT import Belle2
-from cdc.cr.utilities import *
+from cdc.cr import *
 
 reset_database()
 use_database_chain()

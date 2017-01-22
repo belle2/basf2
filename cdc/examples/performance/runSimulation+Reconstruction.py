@@ -15,7 +15,7 @@ import datetime
 from tracking import add_cdc_cr_track_finding
 import os.path
 import sys
-from cdc.cr.utilities import *
+from cdc.cr import *
 
 
 # Set the global log level

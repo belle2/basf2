@@ -78,6 +78,32 @@ namespace Belle2 {
       return trackNPXDHits(part) + trackNSVDHits(part);
     }
 
+    double trackFirstSVDLayer(const Particle* part)
+    {
+      const Track* track = part->getTrack();
+      if (!track) {
+        return 0.0;
+      }
+      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
+      if (!trackFit) {
+        return 0.0;
+      }
+      return trackFit->getHitPatternVXD().getFirstSVDLayer();
+    }
+
+    double trackFirstPXDLayer(const Particle* part)
+    {
+      const Track* track = part->getTrack();
+      if (!track) {
+        return 0.0;
+      }
+      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
+      if (!trackFit) {
+        return 0.0;
+      }
+      return trackFit->getHitPatternVXD().getFirstPXDLayer(HitPatternVXD::PXDMode::normal);
+    }
+
     double trackD0(const Particle* part)
     {
       const Track* track = part->getTrack();
@@ -147,6 +173,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("nSVDHits", trackNSVDHits,     "Number of SVD hits associated to the track");
     REGISTER_VARIABLE("nPXDHits", trackNPXDHits,     "Number of PXD hits associated to the track");
     REGISTER_VARIABLE("nVXDHits", trackNVXDHits,     "Number of PXD and SVD hits associated to the track");
+    REGISTER_VARIABLE("firstSVDLayer", trackFirstSVDLayer,     "First activated SVD layer associated to the track");
+    REGISTER_VARIABLE("firstPXDLayer", trackFirstPXDLayer,     "First activated PXD layer associated to the track");
 
     REGISTER_VARIABLE("d0",     trackD0,     "Signed distance to the POCA in the r-phi plane");
     REGISTER_VARIABLE("z0",     trackZ0,     "z coordinate of the POCA");

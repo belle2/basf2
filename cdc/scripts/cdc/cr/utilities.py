@@ -1,7 +1,7 @@
 from basf2 import *
 from ROOT import Belle2
 from tracking import add_cdc_cr_track_finding
-
+from tracking import add_cdc_track_finding
 
 # Propagation velocity of the light in the scinti.
 lightPropSpeed = 12.9925
@@ -10,39 +10,46 @@ lightPropSpeed = 12.9925
 run_range = {'201607': [787, 833],
              '201608a': [885, 896],
              '201608b': [917, 924],
-             '201609': [966, 973]
+             '201609': [966, 973],
+             'noamal': [-1, -1]
              }
 # Size of trigger counter.
 triggerSize = {'201607': [20.0, 6.0, 10.0],
                '201608a': [100.0, 8.0, 10.0],
                '201608b': [100.0, 8.0, 10.0],
-               '201609': [100.0, 8.0, 10.0]
+               '201609': [100.0, 8.0, 10.0],
+               'normal': [100.0, 8.0, 10.0]
                }
 # Center position of trigger counter.
 triggerPosition = {'201607': [0.3744, 0.0, -1.284],
                    '201608a': [-1.87, -1.25, 18.7],
                    '201608b': [-1.87, -1.25, 11.0],
-                   '201609': [0, 0, 11.0]}
+                   '201609': [0, 0, 11.0],
+                   'normal': [0.0, 0.0, 0.0]
+                   }
 
 # Normal direction of the trigger plane.
 triggerPlaneDirection = {'201607': [1, -1, 0],
                          '201608a': [0, 1, 0],
                          '201608b': [0, 1, 0],
-                         '201609': [0, 1, 0]
+                         '201609': [0, 1, 0],
+                         'normal': [0, 1, 0]
                          }
 
 # PMT position.
 pmtPosition = {'201607': [0, 0, 0],
                '201608a': [-1.87, 0, -25.0],
                '201608b': [-1.87, 0, -42.0],
-               '201609': [0, 0, -42.0]
+               '201609': [0, 0, -42.0],
+               'normal': [0, 0, -50.0]
                }
 
 # Global phi rotation.
 globalPhiRotation = {'201607': 1.875,
                      '201608a': 1.875,
                      '201608b': 1.875,
-                     '201609': 1.875
+                     '201609': 1.875,
+                     'normal': 0.0
                      }
 
 lengthOfCounter = 100.0
@@ -50,31 +57,24 @@ widthOfCounter = 8.0
 triggerPos = []
 normTriggerPlanDirection = []
 readOutPos = []
+globalPhi = 0.0
 
 
 def set_cdc_cr_parameters(period):
 
-    if period is '201607':
-        pass
-    elif period is '201608a':
-        pass
-    elif period is '201608b':
-        pass
-    elif period is '201609':
-        pass
-    else:
-        pass
     global lengthOfCounter
     global widthOfCounter
     global triggerPos
     global normTriggerPlanDirection
     global readOutPos
+    global globalPhi
 
     lengthOfCounter = triggerSize[period][0]
     widthOfCounter = triggerSize[period][1]
     triggerPos = triggerPosition[period]
     normTriggerPlanDirection = triggerPlaneDirection[period]
     readOutPos = pmtPosition[period]
+    globalPhi = globalPhiRotation[period]
 
 
 def add_cdc_cr_simulation(path, empty_path):
@@ -183,3 +183,8 @@ def getDataPeriod(run):
     if period is None:
         B2ERROR("No valid data period is specified.")
     return period
+
+
+def getPhiRotation():
+    global globalPhi
+    return(globalPhi)

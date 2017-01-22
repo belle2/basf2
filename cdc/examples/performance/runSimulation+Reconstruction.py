@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 
 """
-Simple example script to Simulate cosmics events and reconstruct only with CDC.
+Simple example script to simulate cosmics events and reconstruct only with CDC.
 Usage :
-basf2 runSimulation+Reconstruction.py <run> <nevt> <period>
+basf2 runSimulation+Reconstruction.py <run> <nevt>
 run: Run number
 nevt: Number of events to be generated
-period : Data taking period (set 201607, 201608a, 201608b, 201609)
 """
 
 from basf2 import *
@@ -18,11 +17,6 @@ import os.path
 import sys
 from cdc.cr.utilities import *
 
-
-# DB setting.
-use_central_database("cdc_cr_mc", LogLevel.WARNING)
-set_experiment_name(0, "cdc_crt_e000000")
-# use_local_database("cdc_crt1/database.txt", "cdc_crt1", False)
 
 # Set the global log level
 set_log_level(LogLevel.INFO)
@@ -43,20 +37,22 @@ def main(run, evt, period, mode):
 
     main_path.add_module('Progress')
 
+    set_cdc_cr_parameters(period)
+
+    phi = getPhiRotation()
+
     gearbox = register_module('Gearbox',
                               override=[
                                   ("/Global/length", "8.", "m"),
                                   ("/Global/width", "8.", "m"),
                                   ("/Global/height", "1.5", "m"),
-                                  ("/DetectorComponent[@name='CDC']//GlobalPhiRotation", "1.875", "deg"),
+                                  ("/DetectorComponent[@name='CDC']//GlobalPhiRotation", str(phi), "deg"),
                               ])
     main_path.add_module(gearbox)
 
     main_path.add_module('Geometry',
                          components=['CDC']
                          )
-
-    set_cdc_cr_parameters(period)
 
     if mode is not 'rec':
         # Simulation.
@@ -82,10 +78,11 @@ def main(run, evt, period, mode):
 if __name__ == "__main__":
 
     import argparse
-    parser = argparse.ArgumentParser(description='CDC CR simulation and reconstruction.')
+    parser = argparse.ArgumentParser()
     parser.add_argument('run', help='Run number')
     parser.add_argument('evt', help='Number of events to be generated')
-    parser.add_argument('period', help='Data period')
+    parser.add_argument('--period', dest='period', default='normal', help='Data period')
+
     args = parser.parse_args()
 
     date = datetime.datetime.today()

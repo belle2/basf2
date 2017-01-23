@@ -66,6 +66,10 @@ namespace Belle2 {
 
       /// DB identifier of the expert or file name
       std::string m_identifier;
+
+      /// A mapping from index in the m_namedVariables to index in the m_dataset->m_input
+      std::map<int, int> m_indexMapping;
+      ;
     };
 
   }

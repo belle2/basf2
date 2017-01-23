@@ -54,17 +54,6 @@ void MVAExpert::beginRun()
                 "Expected '" << nExpectedVars << "' " <<
                 "but received '" << nActualVars << "'");
       }
-
-      for (int iVar = 0; iVar < nActualVars; ++iVar) {
-        std::string variableElementName = "variable" + std::to_string(iVar);
-        std::string expectedName = weightfile->getElement<std::string>(variableElementName);
-        std::string actualName = m_namedVariables[iVar].getName();
-        if (expectedName != actualName) {
-          B2ERROR("Variable name " << iVar << " mismatch for FastBDT. " <<
-                  "Expected '" << expectedName << "' " <<
-                  "but received '" << actualName << "'");
-        }
-      }
     } else {
       B2WARNING("Unpacked new kind of classifier. Consider to extend the feature variable check.");
     }
@@ -79,6 +68,20 @@ void MVAExpert::beginRun()
     std::vector<float> dummy;
     dummy.resize(m_namedVariables.size(), 0);
     m_dataset = makeUnique<MVA::SingleDataset>(generalOptions, std::move(dummy), 0);
+
+    // Fill in the index mapping for cases, where the variables are in a different order than expected from the expert
+    for (int iVar = 0; iVar < m_namedVariables.size(); ++iVar) {
+      std::string variableName = m_namedVariables[iVar].getName();
+
+      const auto position = std::find(generalOptions.m_variables.begin(),
+                                      generalOptions.m_variables.end(),
+                                      variableName);
+
+      const int index = std::distance(generalOptions.m_variables.begin(), position);
+
+      B2ASSERT("Mapped index is negative indicating that something is wrong with the variables", index >= 0);
+      m_indexMapping.insert({iVar, index});
+    }
   } else {
     B2ERROR("Could not find weight file for identifier " << m_identifier);
   }
@@ -104,7 +107,8 @@ double MVAExpert::predict()
 
   // Transfer the extracted values to the data set were the expert can find them
   for (unsigned int i = 0; i < m_namedVariables.size(); ++i) {
-    m_dataset->m_input[i] = *m_namedVariables[i];
+    const int index = m_indexMapping[i];
+    m_dataset->m_input[index] = *m_namedVariables[i];
   }
   return m_expert->apply(*m_dataset)[0];
 }

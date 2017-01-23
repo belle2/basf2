@@ -33,7 +33,7 @@ using namespace TrackFindingCDC;
 REG_MODULE(TrackFinderCDCLegendreTracking);
 
 TrackFinderCDCLegendreTrackingModule::TrackFinderCDCLegendreTrackingModule() :
-  TrackFinderCDCBaseModule()
+  Module()
 {
   setDescription("Performs the pattern recognition in the CDC with the conformal finder:"
                  "digitized CDCHits are combined to track candidates (genfit::TrackCand)");
@@ -47,19 +47,37 @@ TrackFinderCDCLegendreTrackingModule::TrackFinderCDCLegendreTrackingModule() :
            m_param_doEarlyMerging,
            "Set whether merging of track should be performed after each pass candidate finding; has impact on CPU time",
            false);
+
+  addParam("TracksStoreObjName",
+           m_param_tracksStoreObjName,
+           "Name of the output StoreObjPtr of the tracks generated within this module.",
+           m_param_tracksStoreObjName);
+
+  setPropertyFlags(c_ParallelProcessingCertified bitor c_TerminateInAllProcesses);
 }
 
 void TrackFinderCDCLegendreTrackingModule::initialize()
 {
   StoreWrappedObjPtr<std::vector<CDCWireHit> > storedWireHits("CDCWireHitVector");
   storedWireHits.isRequired();
+
+  StoreWrappedObjPtr<std::vector<CDCTrack>> storedTracks(m_param_tracksStoreObjName);
+  storedTracks.registerInDataStore();
+
+  B2ASSERT("Maximal level of QuadTree search is setted to be greater than lookuptable grid level! ",
+           m_param_maxLevel <= BasePrecisionFunction::getLookupGridLevel());
+
   Super::initialize();
 }
 
-void TrackFinderCDCLegendreTrackingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
+void TrackFinderCDCLegendreTrackingModule::event()
 {
-  B2ASSERT("Maximal level of QuadTree search is setted to be greater than lookuptable grid level! ",
-           m_param_maxLevel <= BasePrecisionFunction::getLookupGridLevel());
+  // Now aquire the store vector
+  StoreWrappedObjPtr<std::vector<CDCTrack>> storedTracks(m_param_tracksStoreObjName);
+  storedTracks.create();
+
+  // We now let the generate-method fill or update the outputTracks
+  std::vector<CDCTrack>& tracks = *storedTracks;
 
   startNewEvent();
   findTracks();

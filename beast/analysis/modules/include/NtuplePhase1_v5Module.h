@@ -136,6 +136,17 @@ namespace Belle2 {
     std::vector<Double_t> m_input_LB_HE3_rate_av; /**< list of HE3 LB rate */
     std::vector<Double_t> m_input_HB_HE3_rate_av; /**< list of HE3 HB rate */
 
+    std::vector<Double_t> m_input_LT_TPC_rate; /**< list of TPC LT rate */
+    std::vector<Double_t> m_input_HT_TPC_rate; /**< list of TPC HT rate */
+    std::vector<Double_t> m_input_LC_TPC_rate[12]; /**< list of TPC LC rate */
+    std::vector<Double_t> m_input_HC_TPC_rate[12]; /**< list of TPC HC rate */
+    std::vector<Double_t> m_input_LB_TPC_rate[12]; /**< list of TPC LB rate */
+    std::vector<Double_t> m_input_HB_TPC_rate[12]; /**< list of TPC HB rate */
+    std::vector<Double_t> m_input_LC_TPC_rate_av; /**< list of TPC LC rate */
+    std::vector<Double_t> m_input_HC_TPC_rate_av; /**< list of TPC HC rate */
+    std::vector<Double_t> m_input_LB_TPC_rate_av; /**< list of TPC LB rate */
+    std::vector<Double_t> m_input_HB_TPC_rate_av; /**< list of TPC HB rate */
+
     std::vector<Double_t> m_input_LT_CSI_dose; /**< list of CSI LT dose */
     std::vector<Double_t> m_input_HT_CSI_dose; /**< list of CSI HT dose */
     std::vector<Double_t> m_input_LC_CSI_dose[12]; /**< list of CSI LC dose */

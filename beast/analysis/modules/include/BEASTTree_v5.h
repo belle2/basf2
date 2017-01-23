@@ -179,6 +179,9 @@ namespace Belle2 {
       std::vector<float> DOSI;/** */
       std::vector<float> DOSI_av;/** */
 
+      std::vector<float> TPC_rate_av[2][4];/** */
+      std::vector<float> TPC_rate[2][4];/** */
+
       /**
        *.clear the structure: set elements to zero
        */
@@ -260,6 +263,12 @@ namespace Belle2 {
         PIN_dose_av.clear();
         BGO_energy_av.clear();
         HE3_rate_av.clear();
+        for (int i = 0; i < 2; i ++) {
+          for (int j = 0; j < 4; j ++) {
+            TPC_rate_av[i][j].clear();
+            TPC_rate[i][j].clear();
+          }
+        }
         CLAWS_rate_av.clear();
         QCSS_rate_av.clear();
         CSI_sumE_av.clear();

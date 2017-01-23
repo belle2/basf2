@@ -65,8 +65,8 @@ class Histograms(object):
         self.bin_widths = (self.bins - numpy.roll(self.bins, 1))[1:] - 0.00001
         self.hists = dict()
         for name, mask in masks.items():
-            self.hists[name] = numpy.histogram(data[column][mask], bins=self.bins,
-                                               weights=None if weight_column is None else data[weight_column][mask])[0]
+            self.hists[name] = numpy.histogram(data[column][mask & isfinite], bins=self.bins,
+                                               weights=None if weight_column is None else data[weight_column][mask & isfinite])[0]
 
     def get_hist(self, name=None):
         """

@@ -48,16 +48,10 @@ TrackFinderCDCLegendreTrackingModule::TrackFinderCDCLegendreTrackingModule() :
            "Set whether merging of track should be performed after each pass candidate finding; has impact on CPU time",
            false);
 
-
   addParam("TracksStoreObjName",
            m_param_tracksStoreObjName,
            "Name of the output StoreObjPtr of the tracks generated within this module.",
            m_param_tracksStoreObjName);
-
-  addParam("TracksStoreObjNameIsInput",
-           m_param_tracksStoreObjNameIsInput,
-           "Flag to use the CDCTracks in the given StoreObjPtr as input and output of the module",
-           m_param_tracksStoreObjNameIsInput);
 
   setPropertyFlags(c_ParallelProcessingCertified bitor c_TerminateInAllProcesses);
 }
@@ -70,6 +64,9 @@ void TrackFinderCDCLegendreTrackingModule::initialize()
   StoreWrappedObjPtr<std::vector<CDCTrack>> storedTracks(m_param_tracksStoreObjName);
   storedTracks.registerInDataStore();
 
+  B2ASSERT("Maximal level of QuadTree search is setted to be greater than lookuptable grid level! ",
+           m_param_maxLevel <= BasePrecisionFunction::getLookupGridLevel());
+
   Super::initialize();
 }
 
@@ -81,9 +78,6 @@ void TrackFinderCDCLegendreTrackingModule::event()
 
   // We now let the generate-method fill or update the outputTracks
   std::vector<CDCTrack>& tracks = *storedTracks;
-
-  B2ASSERT("Maximal level of QuadTree search is setted to be greater than lookuptable grid level! ",
-           m_param_maxLevel <= BasePrecisionFunction::getLookupGridLevel());
 
   startNewEvent();
   findTracks();

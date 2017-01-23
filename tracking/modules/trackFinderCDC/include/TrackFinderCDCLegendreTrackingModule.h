@@ -52,9 +52,6 @@ namespace Belle2 {
     /// Parameter: Name of the output StoreObjPtr of the tracks generated within this module.
     std::string m_param_tracksStoreObjName = "CDCTrackVector";
 
-    /// Parameter: Flag to use the CDCTracks in the given StoreObjPtr as input and output of the module.
-    bool m_param_tracksStoreObjNameIsInput = false;
-
   private:
     /// Worker
     /// Object for holding all found cdc tracks to be passed around to the postprocessing functions.

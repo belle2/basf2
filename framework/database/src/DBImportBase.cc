@@ -10,6 +10,7 @@
 
 #include <framework/database/DBImportBase.h>
 #include <framework/database/EventDependency.h>
+#include <framework/database/Database.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;
@@ -69,3 +70,12 @@ void DBImportBase::clear()
   m_tags.clear();
 }
 
+bool DBImportBase::storeData(TObject* intraRun, const IntervalOfValidity& iov)
+{
+  return Database::Instance().storeData(m_package, m_module, intraRun, iov);
+}
+
+DBImportBase::~DBImportBase()
+{
+  for (auto& object : m_objects) delete object;
+}

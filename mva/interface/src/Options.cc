@@ -26,7 +26,7 @@ namespace Belle2 {
       ("identifier", po::value<std::string>(&m_identifier)->required(), "Identifier of the outputted weightfile")
       ("variables", po::value<std::vector<std::string>>(&m_variables)->required()->multitoken(),
        "feature variables used in the training")
-      ("spectators", po::value<std::vector<std::string>>(&m_spectators)->required()->multitoken(),
+      ("spectators", po::value<std::vector<std::string>>(&m_spectators)->multitoken(),
        "spectator variables used in the training")
       ("target_variable", po::value<std::string>(&m_target_variable),
        "target variable used to distinguish between signal and background, isSignal is used as default.")

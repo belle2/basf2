@@ -233,6 +233,64 @@ class Plotter(object):
         return self
 
 
+class PurityAndEfficiencyOverCut(Plotter):
+    """
+    Plots the purity and the efficiency over the cut value (for cut choosing)
+    """
+
+    def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, normed=True):
+        """
+        Add a new curve to the plot
+        @param data pandas.DataFrame containing all data
+        @param column which is used to calculate efficiency and purity for different cuts
+        @param signal_mask boolean numpy.array defining which events are signal events
+        @param bckgrd_mask boolean numpy.array defining which events are background events
+        @param weight_column column in data containing the weights for each event
+        """
+
+        hists = histogram.Histograms(data, column, {'Signal': signal_mask, 'Background': bckgrd_mask}, weight_column=weight_column)
+
+        if normed:
+            efficiency, efficiency_error = hists.get_efficiency(['Signal'])
+            purity, purity_error = hists.get_purity(['Signal'], ['Background'])
+        else:
+            efficiency, efficiency_error = hists.get_true_positives(['Signal'])
+            purity, purity_error = hists.get_false_positives(['Background'])
+
+        cuts = hists.bin_centers
+
+        self.xmin, self.xmax = numpy.nanmin([numpy.nanmin(cuts), self.xmin]), numpy.nanmax([numpy.nanmax(cuts), self.xmax])
+        self.ymin, self.ymax = numpy.nanmin([numpy.nanmin(efficiency), numpy.nanmin(purity), self.ymin]), \
+            numpy.nanmax([numpy.nanmax(efficiency), numpy.nanmax(purity), self.ymax])
+
+        self.plots.append(self._plot_datapoints(self.axis, cuts, efficiency, xerr=0, yerr=efficiency_error))
+
+        if normed:
+            self.labels.append("Efficiency")
+        else:
+            self.labels.append("True positive")
+
+        self.plots.append(self._plot_datapoints(self.axis, cuts, purity, xerr=0, yerr=purity_error))
+
+        if normed:
+            self.labels.append("Purity")
+        else:
+            self.labels.append("False positive")
+
+        return self
+
+    def finish(self):
+        """
+        Sets limits, title, axis-labels and legend of the plot
+        """
+        self.axis.set_xlim((self.xmin, self.xmax))
+        self.axis.set_ylim((self.ymin, self.ymax))
+        self.axis.set_title("Classification Plot")
+        self.axis.get_xaxis().set_label_text('Cut Value')
+        self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
+        return self
+
+
 class PurityOverEfficiency(Plotter):
     """
     Plots the purity over the efficiency also known as ROC curve
@@ -923,8 +981,8 @@ class Importance(Plotter):
         importance_heatmap = self.axis.pcolor(importance_matrix, cmap=matplotlib.pyplot.cm.RdBu, vmin=0.0, vmax=100)
 
         # put the major ticks at the middle of each cell
-        self.axis.set_yticks(numpy.arange(importance_matrix.shape[0])+0.5, minor=False)
-        self.axis.set_xticks(numpy.arange(importance_matrix.shape[1])+0.5, minor=False)
+        self.axis.set_yticks(numpy.arange(importance_matrix.shape[0]) + 0.5, minor=False)
+        self.axis.set_xticks(numpy.arange(importance_matrix.shape[1]) + 0.5, minor=False)
 
         self.axis.set_xticklabels(columns, minor=False, rotation=90)
         self.axis.set_yticklabels(variables, minor=False)
@@ -1003,15 +1061,15 @@ class CorrelationMatrix(Plotter):
         self.bckgrd_axis.xaxis.tick_top()
 
         # put the major ticks at the middle of each cell
-        self.signal_axis.set_xticks(numpy.arange(signal_corr.shape[0])+0.5, minor=False)
-        self.signal_axis.set_yticks(numpy.arange(signal_corr.shape[1])+0.5, minor=False)
+        self.signal_axis.set_xticks(numpy.arange(signal_corr.shape[0]) + 0.5, minor=False)
+        self.signal_axis.set_yticks(numpy.arange(signal_corr.shape[1]) + 0.5, minor=False)
 
         self.signal_axis.set_xticklabels(columns, minor=False, rotation=90)
         self.signal_axis.set_yticklabels(columns, minor=False)
 
         # put the major ticks at the middle of each cell
-        self.bckgrd_axis.set_xticks(numpy.arange(bckgrd_corr.shape[0])+0.5, minor=False)
-        self.bckgrd_axis.set_yticks(numpy.arange(bckgrd_corr.shape[1])+0.5, minor=False)
+        self.bckgrd_axis.set_xticks(numpy.arange(bckgrd_corr.shape[0]) + 0.5, minor=False)
+        self.bckgrd_axis.set_yticks(numpy.arange(bckgrd_corr.shape[1]) + 0.5, minor=False)
 
         self.bckgrd_axis.set_xticklabels(columns, minor=False, rotation=90)
         self.bckgrd_axis.set_yticklabels(columns, minor=False)

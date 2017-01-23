@@ -21,7 +21,7 @@ def poisson_error(n_tot):
     """
     use poisson error, except for 0 we use an 68% CL upper limit
     """
-    return numpy.where(n_tot > 0, numpy.sqrt(n_tot), numpy.log(1.0/(1-0.6827)))
+    return numpy.where(n_tot > 0, numpy.sqrt(n_tot), numpy.log(1.0 / (1 - 0.6827)))
 
 
 class Histograms(object):
@@ -101,6 +101,28 @@ class Histograms(object):
         efficiency = cumsignal / signal.sum()
         efficiency_error = binom_error(cumsignal, signal.sum())
         return efficiency, efficiency_error
+
+    def get_true_positives(self, signal_names):
+        """
+        Return the cumulative true positives in each bin of the sum of the histograms with the given names.
+        @param names names of the histograms
+        @return numpy.array with hist data, numpy.array with corresponding binomial errors
+        """
+        signal, _ = self.get_summed_hist(signal_names)
+        cumsignal = (signal.sum() - signal.cumsum()).astype('float')
+        signal_error = poisson_error(cumsignal)
+        return cumsignal, signal_error
+
+    def get_false_positives(self, bckgrd_names):
+        """
+        Return the cumulative false positives in each bin of the sum of the histograms with the given names.
+        @param names names of the histograms
+        @return numpy.array with hist data, numpy.array with corresponding binomial errors
+        """
+        background, _ = self.get_summed_hist(bckgrd_names)
+        cumbackground = (background.sum() - background.cumsum()).astype('float')
+        background_error = poisson_error(cumbackground)
+        return cumbackground, background_error
 
     def get_purity(self, signal_names, bckgrd_names):
         """

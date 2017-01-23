@@ -232,7 +232,23 @@ if __name__ == '__main__':
                 graphics.add('roc_test_{}.png'.format(hash(identifier)), width=1.0)
                 o += graphics.finish()
 
-        o += b2latex.SubSection("Diagonal Plot")
+        o += b2latex.Section("Classification Results")
+
+        for identifier in identifiers:
+            graphics = b2latex.Graphics()
+            p = plotting.Multiplot(plotting.PurityAndEfficiencyOverCut, 2)
+            p.add(0, test_probability, identifier, test_target[identifier] == 1, test_target[identifier] == 0, normed=True)
+            p.sub_plots[0].axis.set_title("Classification result in test data for {identifier}".format(identifier=identifier))
+
+            p.add(1, test_probability, identifier, test_target[identifier] == 1, test_target[identifier] == 0, normed=False)
+            p.sub_plots[1].axis.set_title("Classification result in test data for {identifier}".format(identifier=identifier))
+            p.finish()
+
+            p.save('classification_result_{identifier}.png'.format(identifier=hash(identifier)))
+            graphics.add('classification_result_{identifier}.png'.format(identifier=hash(identifier)), width=1)
+            o += graphics.finish()
+
+        o += b2latex.Section("Diagonal Plot")
         graphics = b2latex.Graphics()
         p = plotting.Diagonal()
         for identifier in identifiers:

@@ -126,7 +126,7 @@ if __name__ == '__main__':
 
         o = b2latex.LatexFile()
         o += b2latex.TitlePage(title='Automatic MVA Evaluation',
-                               authors=[r'Thomas Keck\\ Moritz Gelb'],
+                               authors=[r'Thomas Keck\\ Moritz Gelb\\ Nils Braun'],
                                abstract='Evaluation plots',
                                add_table_of_contents=True).finish()
 

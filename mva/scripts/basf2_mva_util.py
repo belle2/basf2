@@ -24,6 +24,8 @@ def tree2dict(tree, tree_columns, dict_columns=None):
     @param tree_columns the column (or branch) names in the tree
     @param dict_columns the corresponding column names in the dictionary
     """
+    if len(tree_columns) == 0:
+        return dict()
     if dict_columns is None:
         dict_columns = tree_columns
     try:

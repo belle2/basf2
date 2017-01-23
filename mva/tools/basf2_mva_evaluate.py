@@ -235,12 +235,15 @@ if __name__ == '__main__':
         o += b2latex.Section("Classification Results")
 
         for identifier in identifiers:
+            identifier_abbr = identifier_abbreviations[identifier]
             graphics = b2latex.Graphics()
             p = plotting.Multiplot(plotting.PurityAndEfficiencyOverCut, 2)
-            p.add(0, test_probability, identifier, test_target[identifier] == 1, test_target[identifier] == 0, normed=True)
+            p.add(0, test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
+                  test_target[identifier_abbr] == 0, normed=True)
             p.sub_plots[0].axis.set_title("Classification result in test data for {identifier}".format(identifier=identifier))
 
-            p.add(1, test_probability, identifier, test_target[identifier] == 1, test_target[identifier] == 0, normed=False)
+            p.add(1, test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
+                  test_target[identifier_abbr] == 0, normed=False)
             p.sub_plots[1].axis.set_title("Classification result in test data for {identifier}".format(identifier=identifier))
             p.finish()
 

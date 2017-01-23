@@ -80,12 +80,8 @@ void TrackFinderCDCLegendreTrackingModule::event()
   storedTracks.create();
 
   // We now let the generate-method fill or update the outputTracks
-  std::vector<CDCTrack>& outputTracks = *storedTracks;
-  generate(outputTracks);
-}
+  std::vector<CDCTrack>& tracks = *storedTracks;
 
-void TrackFinderCDCLegendreTrackingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
-{
   B2ASSERT("Maximal level of QuadTree search is setted to be greater than lookuptable grid level! ",
            m_param_maxLevel <= BasePrecisionFunction::getLookupGridLevel());
 

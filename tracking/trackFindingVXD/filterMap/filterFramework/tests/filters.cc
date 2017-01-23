@@ -257,6 +257,47 @@ namespace VXDTFfilterTest {
     EXPECT_EQ(2 , counter< SquaredDistance3D >::N);
   }
 
+  /** shows how to switch all observers of a filter of interest */
+  TEST_F(FilterTest, SwitchingObservers)
+  {
+    //build an dummy filter which is unobserved (VoidObserver)
+    auto dummyFilter = (
+                         (-10. <= SquaredDistance3D() <= 10.) &&
+                         ((-10. <=  SquaredDistance2Dxy() <= 10.) ||    // put 2nd pair of parentheses to silence warning
+                          (-10. <= SquaredDistance1Dx() <= 10.)) &&
+                         !(-10. <= SquaredDistance1Dx() <= -10.)
+                       );
+
+    // are chosen in that way that they pass all sub-filters of dummyFilter (see comment below)
+    spacePoint x1(0.0f , 0.0f, 0.0f);
+    spacePoint x2(0.5f , 0.0f, 0.0f);
+    spacePoint x3(2.0f , 0.0f, 0.0f);
+
+    counter< SquaredDistance3D >::N = 0;
+    counter< SquaredDistance1Dx >::N = 0;
+    counter< SquaredDistance2Dxy >::N = 0;
+
+    dummyFilter.accept(x1, x2);
+    dummyFilter.accept(x1, x3);
+
+    // useless test as it tests if realy unobserved
+    EXPECT_EQ(0 , counter< SquaredDistance3D >::N);
+    EXPECT_EQ(0 , counter< SquaredDistance2Dxy >::N);
+    EXPECT_EQ(0 , counter< SquaredDistance1Dx >::N);
+
+    // Now switch observer, this is done recursively for each of the underlying filters
+    // One cannot switch the observer of an existing filter (as it would mean to switch type) so one has to create a new one!
+    // Note that if one filter is evaluated as false the other filter are not evaluated anymore and thus no observed!
+    auto observedDummyFilter = dummyFilter.observe(Observer());
+    observedDummyFilter.accept(x1, x2);
+    observedDummyFilter.accept(x1, x3);
+
+    EXPECT_EQ(2 , counter< SquaredDistance3D >::N);
+    EXPECT_EQ(2 , counter< SquaredDistance2Dxy >::N);
+    //Note although SquaredDistance1D is used twice in the filter it is only evaluated once!
+    EXPECT_EQ(2 , counter< SquaredDistance1Dx >::N);
+  }
+
 
   /** shows how to bypass a filter which itself was not initially planned to be bypassed */
   TEST_F(FilterTest, BypassableFilter)

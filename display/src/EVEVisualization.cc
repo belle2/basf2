@@ -122,8 +122,7 @@ namespace {
 EVEVisualization::EVEVisualization():
   m_assignToPrimaries(false),
   m_eclData(0),
-  m_bfield(new EveVisBField()),
-  m_unassignedRecoHits(0)
+  m_bfield(new EveVisBField())
 {
   setErrScale();
 
@@ -1143,8 +1142,10 @@ void EVEVisualization::makeTracks()
   gEve->AddElement(m_calo3d);
 
   if (m_unassignedRecoHits) {
+    m_unassignedRecoHits->SetRnrState(m_unassignedRecoHitsVisibility);
     gEve->AddElement(m_unassignedRecoHits);
   }
+
 }
 
 void EVEVisualization::clearEvent()
@@ -1178,6 +1179,8 @@ void EVEVisualization::clearEvent()
   m_eclData->IncDenyDestroy();
   m_eclData->RefSliceInfo(0).Setup("ECL", ecl_threshold, kRed);
 
+  if (m_unassignedRecoHits)
+    m_unassignedRecoHitsVisibility = m_unassignedRecoHits->GetRnrState();
   destroyEveElement(m_unassignedRecoHits);
 
   gEve->GetSelection()->RemoveElements();

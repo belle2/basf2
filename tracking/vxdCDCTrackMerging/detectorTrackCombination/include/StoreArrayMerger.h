@@ -12,6 +12,8 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <framework/dataobjects/Helix.h>
+#include <framework/geometry/BFieldManager.h>
 
 namespace Belle2 {
   class StoreArrayMerger : public TrackFindingCDC::Findlet<> {
@@ -66,16 +68,37 @@ namespace Belle2 {
       // Combine the vxd and cdc tracks based on the relations between tracks in the Data Store
       // write all vxd tracks to StoreArray and add a CDC track, if there is one.
       for (const auto& currentVXDTrack : m_vxdRecoTracks) {
-        auto newRecoTrack = m_mergedRecoTracks.appendNew(currentVXDTrack.getPositionSeed(),
-                                                         currentVXDTrack.getMomentumSeed(),
-                                                         currentVXDTrack.getChargeSeed());
-        newRecoTrack->addHitsFromRecoTrack(&currentVXDTrack);
 
         auto relatedCDCRecoTrack = currentVXDTrack.getRelated<RecoTrack>(m_param_cdcRecoTrackStoreArrayName);
 
         //add related RecoTracks to VXD tracks if merging was successful
         if (relatedCDCRecoTrack) {
+          // We construct a helix out of the CDC track parameter and "extrapolate" it to the vxd start position to get
+          // the momentum right
+          // TODO: If the track was already fitted, it may be better to just use the fitted position here...
+          const auto& vxdPosition = currentVXDTrack.getPositionSeed();
+          const auto& cdcPosition = relatedCDCRecoTrack->getPositionSeed();
+          const auto& cdcMomentum = relatedCDCRecoTrack->getMomentumSeed();
+          const auto& charge = relatedCDCRecoTrack->getChargeSeed();
+
+          const auto bField = BFieldManager::getField(cdcPosition).Z();
+
+          const Helix cdcHelix(cdcPosition, cdcMomentum, charge, bField);
+          const double arcLengthOfVXDPosition = cdcHelix.getArcLength2DAtXY(vxdPosition.X(), vxdPosition.Y());
+
+          const auto& momentum = cdcHelix.getMomentumAtArcLength2D(arcLengthOfVXDPosition, bField);
+
+          auto newRecoTrack = m_mergedRecoTracks.appendNew(vxdPosition,
+                                                           momentum,
+                                                           charge);
+          newRecoTrack->addHitsFromRecoTrack(&currentVXDTrack);
           newRecoTrack->addHitsFromRecoTrack(relatedCDCRecoTrack, newRecoTrack->getNumberOfTotalHits());
+        } else {
+          // And not if not...
+          auto newRecoTrack = m_mergedRecoTracks.appendNew(currentVXDTrack.getPositionSeed(),
+                                                           currentVXDTrack.getMomentumSeed(),
+                                                           currentVXDTrack.getChargeSeed());
+          newRecoTrack->addHitsFromRecoTrack(&currentVXDTrack);
         }
       }
 

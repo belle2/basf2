@@ -14,7 +14,7 @@
 #include <tracking/vxdCDCTrackMerging/detectorTrackCombination/FilterBasedVXDCDCTrackMergerFindlet.h>
 
 namespace Belle2 {
-  // TODO
+  /// This module merges tracks which are reconstructed, separately, in the silicon (PXD+VXD) and in the CDC
   class FilterBasedVXDCDCTrackMergerModule : public TrackFindingCDC::FindletModule<FilterBasedVXDCDCTrackMergerFindlet> {
   public:
     FilterBasedVXDCDCTrackMergerModule()

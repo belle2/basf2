@@ -11,128 +11,47 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <framework/core/ModuleParamList.h>
+
 #include <tracking/dataobjects/RecoTrack.h>
-#include <framework/dataobjects/Helix.h>
-#include <framework/geometry/BFieldManager.h>
 
 namespace Belle2 {
+  /**
+   * Findlet for using the relations between two store arrays of RecoTracks
+   * to create new RecoTracks with the merged tracks and write them to a new store array.
+   *
+   * Additionally, this findlet has helper function to
+   * * remove all tracks which have already a related partner from a std::vector of CDC tracks
+   * * ... and of VXD tracks
+   * * fetch the RecoTracks from a StoreArray and write their pointers into two std::vectors
+   */
   class StoreArrayMerger : public TrackFindingCDC::Findlet<> {
   public:
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
-    {
-      // input
-      moduleParamList->addParameter("CDCRecoTrackStoreArrayName", m_param_cdcRecoTrackStoreArrayName,
-                                    "StoreArray name of the CDC Track Store Array", m_param_cdcRecoTrackStoreArrayName);
-      moduleParamList->addParameter("VXDRecoTrackStoreArrayName", m_param_vxdRecoTrackStoreArrayName,
-                                    "StoreArray name of the VXD Track Store Array", m_param_vxdRecoTrackStoreArrayName);
+    /// Expose the parameters of the findlet
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
-      // output
-      moduleParamList->addParameter("MergedRecoTrackStoreArrayName", m_param_mergedRecoTrackStoreArrayName,
-                                    "StoreArray name of the merged Track Store Array", m_param_mergedRecoTrackStoreArrayName);
-    }
+    /// Require/register the store arrays
+    void initialize() override;
 
-    void initialize() override
-    {
-      m_cdcRecoTracks.isRequired(m_param_cdcRecoTrackStoreArrayName);
-      m_vxdRecoTracks.isRequired(m_param_vxdRecoTrackStoreArrayName);
-      m_mergedRecoTracks.registerInDataStore(m_param_mergedRecoTrackStoreArrayName);
-
-      // register all required relations to be able to use RecoTrack
-      // and its relations
-      RecoTrack::registerRequiredRelations(m_mergedRecoTracks);
-
-      m_cdcRecoTracks.registerRelationTo(m_vxdRecoTracks);
-      m_vxdRecoTracks.registerRelationTo(m_cdcRecoTracks);
-
-      TrackFindingCDC::Findlet<>::initialize();
-    }
+    /// Fetch the RecoTracks from the two input Store Arrays and fill them into two vectors.
+    void fetch(std::vector<RecoTrack*>& cdcRecoTrackVector, std::vector<RecoTrack*>& vxdRecoTrackVector);
 
     /**
+     * Use the relations between elements in the two CDC and VXD Store Arrays and
+     * merge them together into a new store array.
+     * During this, all hits are filled into a new reco track (in the order VXD -> CDC)
+     * and the track parameters are chosen, that the position comes from the VXD track and
+     * the momentum from the CDC track.
      */
-    void fetch(std::vector<RecoTrack*>& cdcRecoTrackVector, std::vector<RecoTrack*>& vxdRecoTrackVector)
-    {
-      cdcRecoTrackVector.reserve(m_cdcRecoTracks.getEntries());
-      vxdRecoTrackVector.reserve(m_vxdRecoTracks.getEntries());
+    void apply() override;
 
-      for (RecoTrack& recoTrack : m_cdcRecoTracks) {
-        cdcRecoTrackVector.push_back(&recoTrack);
-      }
+    /// Helper function to remove all tracks, which have a related VXD track from the vector.
+    void removeCDCRecoTracksWithPartner(std::vector<RecoTrack*>& tracks);
 
-      for (RecoTrack& recoTrack : m_vxdRecoTracks) {
-        vxdRecoTrackVector.push_back(&recoTrack);
-      }
-    }
-
-    void apply() override
-    {
-      // Combine the vxd and cdc tracks based on the relations between tracks in the Data Store
-      // write all vxd tracks to StoreArray and add a CDC track, if there is one.
-      for (const auto& currentVXDTrack : m_vxdRecoTracks) {
-
-        auto relatedCDCRecoTrack = currentVXDTrack.getRelated<RecoTrack>(m_param_cdcRecoTrackStoreArrayName);
-
-        //add related RecoTracks to VXD tracks if merging was successful
-        if (relatedCDCRecoTrack) {
-          // We construct a helix out of the CDC track parameter and "extrapolate" it to the vxd start position to get
-          // the momentum right
-          // TODO: If the track was already fitted, it may be better to just use the fitted position here...
-          const auto& vxdPosition = currentVXDTrack.getPositionSeed();
-          const auto& cdcPosition = relatedCDCRecoTrack->getPositionSeed();
-          const auto& cdcMomentum = relatedCDCRecoTrack->getMomentumSeed();
-          const auto& charge = relatedCDCRecoTrack->getChargeSeed();
-
-          const auto bField = BFieldManager::getField(cdcPosition).Z();
-
-          const Helix cdcHelix(cdcPosition, cdcMomentum, charge, bField);
-          const double arcLengthOfVXDPosition = cdcHelix.getArcLength2DAtXY(vxdPosition.X(), vxdPosition.Y());
-
-          const auto& momentum = cdcHelix.getMomentumAtArcLength2D(arcLengthOfVXDPosition, bField);
-
-          auto newRecoTrack = m_mergedRecoTracks.appendNew(vxdPosition,
-                                                           momentum,
-                                                           charge);
-          newRecoTrack->addHitsFromRecoTrack(&currentVXDTrack);
-          newRecoTrack->addHitsFromRecoTrack(relatedCDCRecoTrack, newRecoTrack->getNumberOfTotalHits());
-        } else {
-          // And not if not...
-          auto newRecoTrack = m_mergedRecoTracks.appendNew(currentVXDTrack.getPositionSeed(),
-                                                           currentVXDTrack.getMomentumSeed(),
-                                                           currentVXDTrack.getChargeSeed());
-          newRecoTrack->addHitsFromRecoTrack(&currentVXDTrack);
-        }
-      }
-
-      // add all unmatched CDCTracks to the StoreArray as well
-      for (const auto& currentCDCTrack : m_cdcRecoTracks) {
-        auto relatedVXDRecoTrack = currentCDCTrack.getRelated<RecoTrack>(m_param_vxdRecoTrackStoreArrayName);
-        if (not relatedVXDRecoTrack) {
-          auto newRecoTrack = m_mergedRecoTracks.appendNew(currentCDCTrack.getPositionSeed(), currentCDCTrack.getMomentumSeed(),
-                                                           currentCDCTrack.getChargeSeed());
-          newRecoTrack->addHitsFromRecoTrack(&currentCDCTrack);
-        }
-      }
-    }
-
-    void removeCDCRecoTracksWithPartner(std::vector<RecoTrack*>& tracks)
-    {
-      removeRecoTracksWithPartner(tracks, m_param_vxdRecoTrackStoreArrayName);
-    }
-
-    void removeVXDRecoTracksWithPartner(std::vector<RecoTrack*>& tracks)
-    {
-      removeRecoTracksWithPartner(tracks, m_param_cdcRecoTrackStoreArrayName);
-    }
+    /// Helper function to remove all tracks, which have a related CDC track from the vector.
+    void removeVXDRecoTracksWithPartner(std::vector<RecoTrack*>& tracks);
 
   private:
-    void removeRecoTracksWithPartner(std::vector<RecoTrack*>& tracks, const std::string& partnerStoreArrayName)
-    {
-      const auto& trackHasAlreadyRelations = [&partnerStoreArrayName](const RecoTrack * recoTrack) {
-        return recoTrack->getRelated<RecoTrack>(partnerStoreArrayName) != nullptr;
-      };
-
-      TrackFindingCDC::erase_remove_if(tracks, trackHasAlreadyRelations);
-    }
-
     // Parameters
     /** StoreArray name of the VXD Track Store Array */
     std::string m_param_vxdRecoTrackStoreArrayName;
@@ -148,5 +67,8 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_vxdRecoTracks;
     /// Merged Reco Tracks Store Array
     StoreArray<RecoTrack> m_mergedRecoTracks;
+
+    /// Helper function to remove all element in a std::vector, which have already a relation to the given store array
+    void removeRecoTracksWithPartner(std::vector<RecoTrack*>& tracks, const std::string& partnerStoreArrayName);
   };
 }

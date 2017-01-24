@@ -13,11 +13,16 @@
 #include <framework/core/ModuleParamList.h>
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-
 namespace Belle2 {
   class RecoTrack;
 
+  /**
+   * Selector doing an extrapolation of the two tracks in the relations
+   * onto a common radius (e.g. the CDC radius) and calculating the distance
+   * on this plane. If it is below the cutValue, the relation will be updated
+   * with 1 / distance (calculated on the same plane). If the distance is
+   * too large, the relation is deleted from the list.
+   */
   class ExtrapolationDetectorTrackCombinationSelector :
     public TrackFindingCDC::Findlet<TrackFindingCDC::WeightedRelation<RecoTrack*, RecoTrack* const>> {
   public:
@@ -28,15 +33,7 @@ namespace Belle2 {
     using Super = TrackFindingCDC::Findlet<WeightedRelationItem>;
 
     /// Expose the cut value to the module.
-    void exposeParameters(ModuleParamList* moduleParamList,
-                          const std::string& prefix) override
-    {
-      Super::exposeParameters(moduleParamList, prefix);
-
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "cutValue"), m_param_cutValue,
-                                    "TODO",
-                                    m_param_cutValue);
-    }
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
     /// Do the extrapolation.
     void apply(std::vector<WeightedRelationItem>& weightedRelations) override;
@@ -44,5 +41,6 @@ namespace Belle2 {
   private:
     /// The cut value to use.
     TrackFindingCDC::Weight m_param_cutValue = 2.0;
+    double m_param_radius = 16.25;
   };
 }

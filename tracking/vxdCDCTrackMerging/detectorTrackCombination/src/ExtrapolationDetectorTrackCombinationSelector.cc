@@ -13,8 +13,26 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/MeasuredStateOnPlane.h>
 
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+void ExtrapolationDetectorTrackCombinationSelector::exposeParameters(ModuleParamList* moduleParamList,
+    const std::string& prefix)
+{
+  Super::exposeParameters(moduleParamList, prefix);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "cutValue"), m_param_cutValue,
+                                "The maximal distance of extrapolated tracks defined on a plane with the"
+                                " given radius, above the relation will be deleted.",
+                                m_param_cutValue);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "radius"), m_param_radius,
+                                "Radius to which the two tracks in each relation should be extrapolated. "
+                                "This can be for example the CDC inner wall radius.",
+                                m_param_radius);
+}
 
 void ExtrapolationDetectorTrackCombinationSelector::apply(std::vector<WeightedRelationItem>& weightedRelations)
 {
@@ -24,8 +42,6 @@ void ExtrapolationDetectorTrackCombinationSelector::apply(std::vector<WeightedRe
   // The used track fitting algorithm
   TrackFitter trackFitter;
 
-  // TODO: Make parameter
-  const double cdcWallRadius = 16.25;
 
   // Create a map from all items in the weighted relations (no matter if "from" or "to" items)
   // to their measured state on plane (from first hit for "from" items and from last hit for "to" items).
@@ -54,7 +70,7 @@ void ExtrapolationDetectorTrackCombinationSelector::apply(std::vector<WeightedRe
       genfit::MeasuredStateOnPlane stateOnPlane = cdcTrack->getMeasuredStateOnPlaneFromFirstHit();
 
       try {
-        stateOnPlane.extrapolateToCylinder(cdcWallRadius);
+        stateOnPlane.extrapolateToCylinder(m_param_radius);
       } catch (genfit::Exception const& exception) {
         // if the extrapolation is not possible, skip this track
         B2DEBUG(9, "CDCTrack extrapolation to cylinder failed: " << exception.what());
@@ -78,7 +94,7 @@ void ExtrapolationDetectorTrackCombinationSelector::apply(std::vector<WeightedRe
       genfit::MeasuredStateOnPlane stateOnPlane = vxdTrack->getMeasuredStateOnPlaneFromLastHit();
 
       try {
-        stateOnPlane.extrapolateToCylinder(cdcWallRadius);
+        stateOnPlane.extrapolateToCylinder(m_param_radius);
       } catch (genfit::Exception const& exception) {
         // if the extrapolation is not possible, skip this track
         B2DEBUG(9, "VXDTrack extrapolation to cylinder failed: " << exception.what());

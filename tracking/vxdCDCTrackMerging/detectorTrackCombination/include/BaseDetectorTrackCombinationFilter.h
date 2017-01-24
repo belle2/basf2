@@ -13,6 +13,11 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
-  /// Base filter for VXD - CDC relations.
+  /**
+   * Base filter for detector track combination filters. Please note that for implementation reasons
+   * the base object includes poitners to pointers.
+   *
+   * TODO: We should remove this...
+   */
   using BaseDetectorTrackCombinationFilter = TrackFindingCDC::Filter<std::pair<RecoTrack**, RecoTrack* const*>>;
 }

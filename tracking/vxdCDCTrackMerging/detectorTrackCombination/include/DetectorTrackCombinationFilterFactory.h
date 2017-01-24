@@ -13,6 +13,7 @@
 #include <tracking/vxdCDCTrackMerging/detectorTrackCombination/BaseDetectorTrackCombinationFilter.h>
 
 namespace Belle2 {
+  /// Filter factory for detector track combination filters.
   class DetectorTrackCombinationFilterFactory : public TrackFindingCDC::FilterFactory<BaseDetectorTrackCombinationFilter> {
 
   private:

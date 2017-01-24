@@ -479,6 +479,8 @@ void EKLM::GeometryData::initializeFromGearbox()
   mode = gd.getInt("Mode");
   if (mode < 0 || mode > 1)
     B2FATAL("EKLM started with unknown geometry mode " << mode << ".");
+  if (mode == 1)
+    B2FATAL("EKLM background study mode is disabled, please use normal mode.");
   m_Mode = (enum DetectorMode)mode;
   /* Numbers of elements. */
   m_NEndcaps = gd.getInt("NEndcaps");

@@ -59,6 +59,7 @@ namespace Belle2 {
      * for testing purposes only! - will be removed ...
      */
     void importTest(int runNumber, double syncTimeBase);
+    void importTest();
 
   private:
 

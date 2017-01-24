@@ -32,7 +32,7 @@ gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
 # new ECL geometry contains custom objects that cannot be converted to TGeo
 # add MagneticField off B-field (also greatly speeds up startup)
-geometry.param('excludedComponents', ['ECL'])
+geometry.param('excludedComponents', ['ECL', 'Cryostat'])
 
 main.add_module(rootinput)
 main.add_module(gearbox)

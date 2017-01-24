@@ -67,7 +67,7 @@ bool BKLMTrackFinder::filter(std::list<BKLMHit2d*>& seed,
     if ((*i)->isOnStaTrack() == false) {
       double error, sigma;
       m_Fitter->distanceToHit(*i, error, sigma);
-      B2INFO("BKLMTrackFinder" << " Error: " << error << " Sigma: " << sigma);
+      //B2INFO("BKLMTrackFinder" << " Error: " << error << " Sigma: " << sigma);
       if (sigma < 5.0) {
         track.push_back(*i);
       }

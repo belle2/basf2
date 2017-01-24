@@ -1205,8 +1205,8 @@ namespace Belle2 {
       double HBG = m_input_HB_TPC_rate_av[i] + m_input_HC_TPC_rate_av[i];
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_TPC_rate[i] + ScaleFacTo_HER * m_input_HT_TPC_rate[i];
-      int tpc_ch = (int)(i / 6);
-      int n_type = i - 4 * tpc_ch;
+      int tpc_ch = (int)(i / 5);
+      int n_type = i - 5 * tpc_ch;
       //if (TMath::IsNaN(To)) To = 0;
       //if (TMath::IsNaN(BG)) BG = 0;
       //if (n_type == 0) m_beast.TPC_N_neutrons_av[tpc_ch].push_back(BG + To);

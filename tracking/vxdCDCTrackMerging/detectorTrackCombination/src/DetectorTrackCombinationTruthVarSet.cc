@@ -24,7 +24,7 @@ bool DetectorTrackCombinationTruthVarSet::extract(const BaseDetectorTrackCombina
   TrackMatchLookUp mcCDCMatchLookUp("MCRecoTracks", "CDCRecoTracks");
   TrackMatchLookUp mcVXDMatchLookUp("MCRecoTracks", "VXDRecoTracks");
   const RecoTrack* cdcMCTrack = mcCDCMatchLookUp.getMatchedMCRecoTrack(*cdcTrack);
-  const RecoTrack* vxdMCTrack = mcCDCMatchLookUp.getMatchedMCRecoTrack(*vxdTrack);
+  const RecoTrack* vxdMCTrack = mcVXDMatchLookUp.getMatchedMCRecoTrack(*vxdTrack);
 
   if (cdcMCTrack == vxdMCTrack && cdcMCTrack != nullptr) {
     var<named("truth")>() = true;

@@ -93,9 +93,9 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
 
 @format_crop_keys
 def peel_reco_track_hit_content(reco_track, key="{part_name}"):
-    n_pxd_hits = reco_track.getNumberOfCDCHits()
+    n_cdc_hits = reco_track.getNumberOfCDCHits()
     n_svd_hits = reco_track.getNumberOfSVDHits()
-    n_cdc_hits = reco_track.getNumberOfPXDHits()
+    n_pxd_hits = reco_track.getNumberOfPXDHits()
     ndf = 2 * n_pxd_hits + 2 * n_svd_hits + n_cdc_hits
 
     return dict(

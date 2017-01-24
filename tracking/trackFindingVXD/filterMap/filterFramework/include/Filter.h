@@ -643,9 +643,10 @@ namespace Belle2 {
                argsType ... >::value, bool >::type
                accept(const argsType& ... args) const
     {
-
-      return m_filterA.accept(args ...) || m_filterB.accept(args ...);
-
+      templateObserverType::prepare(args ...);
+      bool returnValue =  m_filterA.accept(args ...) || m_filterB.accept(args ...);
+      templateObserverType::collect(args ...);
+      return returnValue;
     }
 
 

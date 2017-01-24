@@ -43,6 +43,12 @@
 #pragma link C++ class Belle2::RecoHitInformation+;
 #pragma link C++ class Belle2::SectorMapConfig+;
 
+#pragma link C++ class Belle2::SpacePointInfo+;//implicit
+#pragma link C++ class std::map<std::string, double>+;
+#pragma link C++ class std::map<std::string, bool>+;
+#pragma link C++ class std::vector<SpacePointInfo>+;
+#pragma link C++ class Belle2::ObserverInfo+;
+
 // #pragma link C++ class Belle2::BaseTFInfo+;
 // #pragma link C++ class Belle2::CellTFInfo+;
 // #pragma link C++ class Belle2::SectorTFInfo+;

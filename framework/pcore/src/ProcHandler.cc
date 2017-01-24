@@ -8,7 +8,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/core/EventProcessor.h>
 
-#include <set>
+#include <vector>
 
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -25,19 +25,48 @@ using namespace std;
 using namespace Belle2;
 
 namespace {
-  /// Set static process ID number
   static int s_processID = -1;
-  // Set static number of processes
-  static int s_nproc = 0;
-  // global list of PIDs managed by ProcHandler.
-  static std::set<int> s_pidList;
+  static int s_numEventProcesses = 0;
 
-  static bool s_signalHandlerInstalled = false;
+  // global list of PIDs managed by ProcHandler.
+  // (directly modifying STL structures in the signal handler is unsafe, so let's be overly
+  // cautious and use only C-like functions there.)
+  // PIDs are addedusing addPID() while forking, items are set to 0 when process stops
+  static std::vector<int> s_pidVector;
+  static int* s_pids = nullptr;
+  static int s_numpids = 0;
+  void addPID(int pid)
+  {
+    s_pidVector.push_back(pid);
+    s_pids = s_pidVector.data();
+    s_numpids = s_pidVector.size();
+  }
+
+  //in signal handler, use only the following functions, or s_numpids
+  bool containsPID(int pid)
+  {
+    for (int i = 0; i < s_numpids; i++)
+      if (s_pids[i] == pid)
+        return true;
+    return false;
+  }
+  void removePID(int pid)
+  {
+    for (int i = 0; i < s_numpids; i++)
+      if (s_pids[i] == pid)
+        s_pids[i] = 0;
+  }
+  void clearPIDs()
+  {
+    for (int i = 0; i < s_numpids; i++)
+      s_pids[i] = 0;
+    s_numpids = 0;
+  }
 
   void sigChldHandler(int)
   {
     int raiseSig = 0;
-    while (!s_pidList.empty()) {
+    while (s_numpids != 0) {
       int status;
       int pid = waitpid(-1, &status, WNOHANG);
       if (pid == -1) {
@@ -49,7 +78,7 @@ namespace {
           //
           //actually, this is ok in case we already called waitpid() somewhere else.
           //In case I want to avoid this, waitid() and WNOWAIT might help, but require libc >= 2.12 (not present in SL5)
-          s_pidList.clear();
+          clearPIDs();
           return;
         } else {
           //also shouldn't happen
@@ -74,26 +103,19 @@ namespace {
         }
 
         //remove pid from global list
-        s_pidList.erase(pid);
+        removePID(pid);
       }
     }
 
     if (raiseSig)
       raise(raiseSig);
-
-    //TODO do what exactly?
-    //a)
-    //cleanup && raise()
-    //TODO what actually is cleanup here? how does this prevent deadlocks?
-    //b) kill all children? and wait?
-    //
-
   }
 
 
   /** Start a new process, adding its PID to processList, and setting s_processID = id. */
   bool startProc(std::set<int>* processList, const std::string& procType, int id)
   {
+    static bool s_signalHandlerInstalled = false;
     if (not s_signalHandlerInstalled) {
       EventProcessor::installSignalHandler(SIGCHLD, sigChldHandler);
       s_signalHandlerInstalled = true;
@@ -104,7 +126,7 @@ namespace {
     pid_t pid = fork();
     if (pid > 0) {   // Mother process
       processList->insert(pid);
-      s_pidList.insert(pid);
+      addPID(pid);
       B2INFO("ProcHandler: " << procType << " process forked. pid = " << pid);
       fflush(stdout);
     } else if (pid < 0) {
@@ -141,7 +163,7 @@ void ProcHandler::startWorkerProcesses(int nproc)
     if (startProc(&m_processList, "worker", i))
       break; // in child process
   }
-  s_nproc = nproc;
+  s_numEventProcesses = nproc;
 }
 
 void ProcHandler::startOutputProcess() { s_processID = 20000; }
@@ -156,12 +178,12 @@ bool ProcHandler::isOutputProcess() { return s_processID >= 20000; }
 
 int ProcHandler::numEventProcesses()
 {
-  return s_nproc;
+  return s_numEventProcesses;
 }
 
 std::set<int> ProcHandler::globalProcessList()
 {
-  return s_pidList;
+  return std::set<int>(s_pidVector.begin(), s_pidVector.end());
 }
 std::set<int> ProcHandler::processList() const
 {
@@ -188,7 +210,8 @@ void ProcHandler::waitForAllProcesses()
 {
   while (!m_processList.empty()) {
     for (int pid : m_processList) {
-      if (s_pidList.count(pid) == 0) {
+      //once a process is gone from the global list, remove them from our own, too.
+      if (!containsPID(pid)) {
         m_processList.erase(pid);
         break;
       }

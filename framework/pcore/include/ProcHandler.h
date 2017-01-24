@@ -39,7 +39,7 @@ namespace Belle2 {
     static bool isOutputProcess();
 
 
-    /** Return number of worker processes */
+    /** Return number of worker processes (configured value, not current) */
     static int numEventProcesses();
 
     /** Return list of PIDs managed by this ProcHandler instance. */

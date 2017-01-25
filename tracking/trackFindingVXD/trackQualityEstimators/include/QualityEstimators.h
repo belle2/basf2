@@ -17,8 +17,6 @@
 #include <boost/assign/std/vector.hpp>
 #include <array>
 
-//#include "tracking/vxdCaTracking/SharedFunctions.h"
-
 
 namespace Belle2 {
 
@@ -28,6 +26,7 @@ namespace Belle2 {
     double sigmaU; /**< error in (u-direction locally)x-direction of hitPosition in global coordinates */
     double sigmaV; /**< error of y-direction of hitPosition in global coordinates */
   };
+
 
   class QualityEstimators {
 
@@ -164,8 +163,6 @@ namespace Belle2 {
 
 
   protected:
-
-
 
     const std::vector<PositionInfo*>* m_hits; /**< stores hits using TVector3 format in a vector */
     double m_radius; /**< stores radius of tracklet-circle */

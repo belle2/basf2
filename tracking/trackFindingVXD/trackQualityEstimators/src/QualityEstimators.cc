@@ -15,11 +15,11 @@
 // c++-base/stl:
 #include <list>
 #include <iostream>
-#include <limits>       // std::numeric_limits
+#include <limits>
 #include <stdio.h>
-#include <math.h>       // isnan, pow 
+#include <math.h>
 #include <fstream>
-#include <iomanip>      // std::setprecision
+#include <iomanip>
 #include <utility>
 
 // root
@@ -31,82 +31,10 @@
 #include <boost/math/special_functions/fpclassify.hpp> // abs
 #include <boost/math/special_functions/sign.hpp> // sign
 
-// Vc
-// #include <Vc/Vc>
-
-
 
 using namespace std;
 using namespace Belle2;
 using boost::math::sign;
-
-
-
-bool QualityEstimators::ziggZaggXY()
-{
-  if (m_hits == NULL) B2FATAL(" QualityEstimators::ziggZaggXY hits not set, therefore no calculation possible - please check that!");
-  list<int> chargeSigns;
-  bool isZiggZagging = false; // good: not ziggZagging
-  for (int i = 0; i < m_numHits - 2; ++i) {
-    int signValue = m_3hitFilterBox.calcSign(m_hits->at(i)->hitPosition, m_hits->at(i + 1)->hitPosition,
-                                             m_hits->at(i + 2)->hitPosition);
-    chargeSigns.push_back(signValue);
-  }
-  chargeSigns.sort();
-  chargeSigns.unique();
-  if (int(chargeSigns.size()) != 1) {
-    isZiggZagging = true;
-  }
-  return isZiggZagging;
-}
-
-
-
-bool QualityEstimators::ziggZaggXYWithSigma()
-{
-  if (m_hits == NULL)
-    B2FATAL(" QualityEstimators::ziggZaggXYWithSigma: hits not set, therefore no calculation possible - please check that!");
-  list<int> chargeSigns;
-  bool isZiggZagging = false; // good: not ziggZagging
-  for (int i = 0; i < m_numHits - 2; ++i) {
-    int signValue = m_3hitFilterBox.calcSign(m_hits->at(i)->hitPosition, m_hits->at(i + 1)->hitPosition, m_hits->at(i + 2)->hitPosition,
-                                             m_hits->at(i)->hitSigma, m_hits->at(i + 1)->hitSigma, m_hits->at(i + 2)->hitSigma);
-    chargeSigns.push_back(signValue);
-  }
-  chargeSigns.remove(0);    //removes approximately (calcSign defines what approximately means) straight segments.
-  chargeSigns.sort();
-  chargeSigns.unique();
-  if (int(chargeSigns.size()) > 1) {  //size can be 1 or 0, if all the elements were '0' before
-    isZiggZagging = true;
-  }
-  return isZiggZagging;
-}
-
-
-
-bool QualityEstimators::ziggZaggRZ()
-{
-  if (m_hits == NULL) B2FATAL(" QualityEstimators::ziggZaggRZ: hits not set, therefore no calculation possible - please check that!");
-  list<int> chargeSigns;
-  bool isZiggZagging = false; // good: not ziggZagging
-  vector<TVector3> rzHits;
-  TVector3 currentVector;
-  for (PositionInfo* aHit : *m_hits) {
-    currentVector.SetXYZ(aHit->hitPosition.Perp(), aHit->hitPosition[1], 0.);
-    rzHits.push_back(currentVector);
-  }
-  for (int i = 0; i < m_numHits - 2; ++i) {
-    int signValue = m_3hitFilterBox.calcSign(rzHits.at(i), rzHits.at(i + 1), rzHits.at(i + 2));
-    chargeSigns.push_back(signValue);
-  }
-  chargeSigns.sort();
-  chargeSigns.unique();
-  if (int(chargeSigns.size()) != 1) {
-    isZiggZagging = true;
-  }
-  return isZiggZagging;
-}
-
 
 
 std::pair<TVector3, int> QualityEstimators::calcMomentumSeed(bool useBackwards, double setMomentumMagnitude)
@@ -176,8 +104,8 @@ std::pair<TVector3, int> QualityEstimators::calcMomentumSeed(bool useBackwards, 
   if (signValue == 0) {
     // means that 3 hits are completely in a line, if magnetic field is off, this can occur and therefore does not need to produce an error
     signValue = 1;
-    if (m_3hitFilterBox.getMagneticField() != 0) {
-      B2ERROR("QualityEstimators::calcMomentumSeed: segments parallel although field is " << m_3hitFilterBox.getMagneticField() <<
+    if (getMagneticField() != 0) {
+      B2ERROR("QualityEstimators::calcMomentumSeed: segments parallel although field is " << getMagneticField() <<
               "!\nHit0: " << (*m_hits)[0]->hitPosition.X() << "/" << (*m_hits)[0]->hitPosition.Y() << "/" <<
               (*m_hits)[0]->hitPosition.Z() << ", Hit1: " << (*m_hits)[1]->hitPosition.X() << "/" << (*m_hits)[1]->hitPosition.Y() << "/" <<
               (*m_hits)[1]->hitPosition.Z() << ", Hit2: " << (*m_hits)[2]->hitPosition.X() << "/" << (*m_hits)[2]->hitPosition.Y() << "/" <<
@@ -423,7 +351,7 @@ std::pair<double, TVector3> QualityEstimators::tripletFit(const std::vector<Posi
 
   // TODO Include modification for strong multiple scattering as described in the paper
 
-  int nTriplets = hits->size() - 2;
+  const int nTriplets = hits->size() - 2;
 
   double combinedChi2 = 0.;
 
@@ -431,44 +359,45 @@ std::pair<double, TVector3> QualityEstimators::tripletFit(const std::vector<Posi
   for (int i = 0; i < nTriplets; i++) {
 
     // Three hits relevant for curent triplet
-    TVector3 hit0 = hits->at(i)->hitPosition;
-    TVector3 hit1 = hits->at(i + 1)->hitPosition;
-    TVector3 hit2 = hits->at(i + 2)->hitPosition;
+    const TVector3 hit0 = hits->at(i)->hitPosition;
+    const TVector3 hit1 = hits->at(i + 1)->hitPosition;
+    const TVector3 hit2 = hits->at(i + 2)->hitPosition;
 
-    double d01sq = pow(hit1.X() - hit0.X(), 2) + pow(hit1.Y() - hit0.Y(), 2);
-    double d12sq = pow(hit2.X() - hit1.X(), 2) + pow(hit2.Y() - hit1.Y(), 2);
-    double d02sq = pow(hit2.X() - hit0.X(), 2) + pow(hit2.Y() - hit0.Y(), 2);
+    const double d01sq = pow(hit1.X() - hit0.X(), 2) + pow(hit1.Y() - hit0.Y(), 2);
+    const double d12sq = pow(hit2.X() - hit1.X(), 2) + pow(hit2.Y() - hit1.Y(), 2);
+    const double d02sq = pow(hit2.X() - hit0.X(), 2) + pow(hit2.Y() - hit0.Y(), 2);
 
-    double d01 = sqrt(d01sq);
-    double d12 = sqrt(d12sq);
-    double d02 = sqrt(d02sq);
+    const double d01 = sqrt(d01sq);
+    const double d12 = sqrt(d12sq);
+    const double d02 = sqrt(d02sq);
 
-    double z01 = hit1.Z() - hit0.Z();
-    double z12 = hit2.Z() - hit1.Z();
+    const double z01 = hit1.Z() - hit0.Z();
+    const double z12 = hit2.Z() - hit1.Z();
 
-    double R_C = (d01 * d12 * d02) / sqrt(-d01sq * d01sq - d12sq * d12sq - d02sq * d02sq + 2 * d01sq * d12sq + 2 * d12sq * d02sq + 2 *
-                                          d02sq * d01sq);
+    const double R_C = (d01 * d12 * d02) / sqrt(-d01sq * d01sq - d12sq * d12sq - d02sq * d02sq + 2 * d01sq * d12sq + 2 * d12sq * d02sq +
+                                                2 *
+                                                d02sq * d01sq);
 
-    double Phi1C = 2. * asin(d01 / (2. * R_C));
-    double Phi2C = 2. * asin(d12 / (2. * R_C));
+    const double Phi1C = 2. * asin(d01 / (2. * R_C));
+    const double Phi2C = 2. * asin(d12 / (2. * R_C));
     // TODO Phi1C and Phi2C have 2 solutions (<Pi and >Pi), each, of which the correct one must be chosen!
 
-    double R3D1C = sqrt(R_C * R_C + (z01 * z01) / (Phi1C * Phi1C));
-    double R3D2C = sqrt(R_C * R_C + (z12 * z12) / (Phi2C * Phi2C));
+    const double R3D1C = sqrt(R_C * R_C + (z01 * z01) / (Phi1C * Phi1C));
+    const double R3D2C = sqrt(R_C * R_C + (z12 * z12) / (Phi2C * Phi2C));
 
-    double theta1C = acos(z01 / (Phi1C * R3D1C));
-    double theta2C = acos(z12 / (Phi2C * R3D2C));
-    double theta = (theta1C + theta2C) / 2.;
+    const double theta1C = acos(z01 / (Phi1C * R3D1C));
+    const double theta2C = acos(z12 / (Phi2C * R3D2C));
+    const double theta = (theta1C + theta2C) / 2.;
 
     double alpha1 = R_C * R_C * Phi1C * Phi1C + z01 * z01;
     alpha1 *= 1. / (0.5 * R_C * R_C * Phi1C * Phi1C * Phi1C / tan(Phi1C / 2.) + z01 * z01);
     double alpha2 = R_C * R_C * Phi2C * Phi2C + z12 * z12;
     alpha2 *= 1. / (0.5 * R_C * R_C * Phi2C * Phi2C * Phi2C / tan(Phi2C / 2.) + z12 * z12);
 
-    double PhiTilde = - 0.5 * (Phi1C * alpha1 + Phi2C * alpha2);
-    double eta = 0.5 * Phi1C * alpha1 / R3D1C + 0.5 * Phi2C * alpha2 / R3D2C;
-    double ThetaTilde = theta2C - theta1C - (1 - alpha2) / tan(theta2C) + (1 - alpha1) / tan(theta1C);
-    double beta = (1 - alpha2) / (R3D2C * tan(theta2C)) - (1 - alpha1) / (R3D1C * tan(theta1C));
+    const double PhiTilde = - 0.5 * (Phi1C * alpha1 + Phi2C * alpha2);
+    const double eta = 0.5 * Phi1C * alpha1 / R3D1C + 0.5 * Phi2C * alpha2 / R3D2C;
+    const double ThetaTilde = theta2C - theta1C - (1 - alpha2) / tan(theta2C) + (1 - alpha1) / tan(theta1C);
+    const double beta = (1 - alpha2) / (R3D2C * tan(theta2C)) - (1 - alpha1) / (R3D1C * tan(theta1C));
 
     // Calculation of sigmaMS
     double bField = 1.5; // TODO Replace hard-coded value with database value;
@@ -477,12 +406,12 @@ std::pair<double, TVector3> QualityEstimators::tripletFit(const std::vector<Posi
      *  Belle II TDR page 156 states a value of 0.57% X_0.
      *  This approximation is a first approach to the problem and must be checked.
      */
-    double XoverX0 = 0.0057 / cos(M_PI / 2. - theta1C);
+    const double XoverX0 = 0.0057 / cos(M_PI / 2. - theta1C);
 
     double R3D = - eta * PhiTilde * sin(theta) * sin(theta) + beta * ThetaTilde;
     R3D *= 1. / (eta * eta * sin(theta) * sin(theta) + beta * beta);
-    double b = 4.5 / bField * sqrt(XoverX0);
-    double sigmaMS = b / R3D;
+    const double b = 4.5 / bField * sqrt(XoverX0);
+    const double sigmaMS = b / R3D;
 
     double Chi2min = pow(beta * PhiTilde - eta * ThetaTilde, 2);
     Chi2min *= 1. / (sigmaMS * sigmaMS * (eta * eta + beta * beta / pow(sin(theta), 2)));
@@ -492,10 +421,11 @@ std::pair<double, TVector3> QualityEstimators::tripletFit(const std::vector<Posi
      *       which does include a further term considering the radii R3D.
      */
     combinedChi2 += Chi2min;
-  };
+  }
 
   // TODO return real momentum vector?
   TVector3 pTVector(1, 2, 3);
+
   return make_pair(combinedChi2, pTVector);
 }
 
@@ -863,7 +793,7 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
   TVector3 radialVector(xc, yc, 0.); // here it is the center of the circle
   radialVector = radialVector - seedHit; // now it's the radialVector
   radialVector.SetZ(0.);
-  double pT = m_3hitFilterBox.calcPt(rho);
+  double pT = calcPt(rho);
   TVector3 pVector = (radialVector.Orthogonal()).Unit(); // is the direction of the momentum without actual magnitude of the momentum
   if (setMomentumMagnitude == 0) {
     pVector = pT * pVector; // now it is the pT-Vector, therefore without pZ information
@@ -905,7 +835,7 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
   if (lambdaCheckVector4NAN(pVector) == true) { B2ERROR("helixFit: pVector got 'nan'-entries x/y/z: " << pVector.X() << "/" << pVector.Y() << "/" << pVector.Z()); didNanAppear = true; }
 
   if (didNanAppear == true && LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true) {
-    B2DEBUG(3, "helixFit: there was a 'nan'-value detected. When using magnetic field of " << m_3hitFilterBox.getMagneticField() <<
+    B2DEBUG(3, "helixFit: there was a 'nan'-value detected. When using magnetic field of " << getMagneticField() <<
             ", the following hits were part of this TC: \n" << printHits(m_hits) << "\n pVector  x/y/z: " << pVector.X() << "/" << pVector.Y()
             << "/" << pVector.Z());
   }

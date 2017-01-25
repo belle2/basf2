@@ -33,6 +33,7 @@
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
 #include <boost/python/object.hpp>
+#include <boost/python/dict.hpp>
 #include <boost/python/import.hpp>
 #include <boost/python/extract.hpp>
 #if !defined(__GNUG__) || defined(__ICC)

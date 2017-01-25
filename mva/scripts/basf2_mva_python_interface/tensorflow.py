@@ -85,6 +85,10 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     return state
 
 
+def get_custom_objects():
+    return []
+
+
 def load(obj):
     """
     Load Tensorflow estimator into state

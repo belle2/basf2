@@ -37,6 +37,10 @@ class State(object):
         self.eval_function = eval_function
 
 
+def get_custom_objects():
+    return []
+
+
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
 
     x = theano.tensor.matrix('x')
@@ -103,7 +107,7 @@ def load(obj):
 
 def apply(state, X):
     result = state.eval_function(X)
-    return result
+    return np.require(result, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
 def begin_fit(state):

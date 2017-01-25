@@ -18,6 +18,10 @@ class State(object):
         self.estimator = estimator
 
 
+def get_custom_objects():
+    return []
+
+
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
     """
     Create SKLearn classifier and store it in a State object
@@ -55,8 +59,10 @@ def apply(state, X):
     If the estimator has a predict_proba it is called, otherwise call just predict.
     """
     if hasattr(state.estimator, 'predict_proba'):
-        return state.estimator.predict_proba(X)[:, 1]
-    return state.estimator.predict(X)
+        x = state.estimator.predict_proba(X)[:, 1]
+    else:
+        x = state.estimator.predict(X)
+    return np.require(x, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
 def begin_fit(state):

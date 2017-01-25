@@ -24,6 +24,10 @@ class State(object):
         self.estimator = None
 
 
+def get_custom_objects():
+    return []
+
+
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
     """
     Return default xgboost model
@@ -60,7 +64,8 @@ def apply(state, X):
     Apply estimator to passed data.
     """
     data = xgb.DMatrix(X)
-    return state.estimator.predict(data)
+    result = state.estimator.predict(data)
+    return np.require(result, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
 def begin_fit(state):

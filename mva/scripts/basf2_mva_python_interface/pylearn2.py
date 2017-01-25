@@ -66,6 +66,10 @@ class State(object):
     # TODO: eg. xgboost, ...
 
 
+def get_custom_objects():
+    return []
+
+
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
     state = State()
 

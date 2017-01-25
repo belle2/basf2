@@ -159,6 +159,7 @@ namespace Belle2 {
 
       Weightfile weightfile;
       std::string custom_weightfile = weightfile.getFileName();
+      std::string custom_objectsfile = weightfile.getFileName();
 
       auto steering_path = boost::filesystem::path(m_specific_options.m_steering_file);
 
@@ -298,6 +299,16 @@ namespace Belle2 {
         auto file = builtins.attr("open")(custom_weightfile.c_str(), "wb");
         pickle.attr("dump")(result, file);
 
+        auto custom_objects = get_attr_from_module_else_fallback_to_framework("get_custom_objects", module, framework)();
+        auto inspect = boost::python::import("inspect");
+        boost::python::list source_codes;
+        for (int i = 0; i < boost::python::len(custom_objects); ++i) {
+          auto source_code = inspect.attr("getsource")(boost::python::object(custom_objects[i]));
+          source_codes.append(source_code);
+        }
+        auto object_file = builtins.attr("open")(custom_objectsfile.c_str(), "wb");
+        pickle.attr("dump")(source_codes, object_file);
+
         auto importances = get_attr_from_module_else_fallback_to_framework("feature_importance", module, framework)(state);
         if (len(importances) == 0) {
           B2INFO("Python method returned empty feature importance. There won't be any information about the feature importance in the weightfile.");
@@ -327,6 +338,7 @@ namespace Belle2 {
       weightfile.addOptions(m_general_options);
       weightfile.addOptions(m_specific_options);
       weightfile.addFile("Python_Weightfile", custom_weightfile);
+      weightfile.addFile("Python_CustomObjects", custom_objectsfile);
       weightfile.addSignalFraction(training_data.getSignalFraction());
 
       return weightfile;
@@ -343,7 +355,9 @@ namespace Belle2 {
     {
 
       std::string custom_weightfile = weightfile.getFileName();
+      std::string custom_objects = weightfile.getFileName();
       weightfile.getFile("Python_Weightfile", custom_weightfile);
+      weightfile.getFile("Python_CustomObjects", custom_objects);
       weightfile.getOptions(m_general_options);
       weightfile.getOptions(m_specific_options);
 
@@ -351,11 +365,18 @@ namespace Belle2 {
         auto pickle = boost::python::import("pickle");
         auto builtins = boost::python::import("builtins");
         auto file = builtins.attr("open")(custom_weightfile.c_str(), "rb");
-        auto unpickled_object = pickle.attr("load")(file);
+        auto unpickled_fit_object = pickle.attr("load")(file);
+
+        auto object_file = builtins.attr("open")(custom_objects.c_str(), "rb");
+        auto unpickled_custom_objects = pickle.attr("load")(object_file);
 
         m_framework = boost::python::import((std::string("basf2_mva_python_interface.") + m_specific_options.m_framework).c_str());
-        //m_framework = boost::python::import((std::string("basf2_mva_") + m_specific_options.m_framework).c_str());
-        m_state = m_framework.attr("load")(unpickled_object);
+
+        for (int i = 0; i < boost::python::len(unpickled_custom_objects); ++i) {
+          builtins.attr("exec")(boost::python::object(unpickled_custom_objects[i]), boost::python::object(m_framework.attr("__dict__")));
+        }
+
+        m_state = m_framework.attr("load")(unpickled_fit_object);
       } catch (...) {
         PyErr_Print();
         PyErr_Clear();

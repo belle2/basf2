@@ -4,8 +4,39 @@
 # Thomas Keck 2017
 
 import numpy as np
-import tensorflow as tf
 import basf2_mva
+
+
+def get_custom_objects():
+    return [apply, preprocessor]
+
+
+def preprocessor(X):
+    return X*2
+
+
+def apply(state, X):
+    """
+    Apply estimator to passed data.
+    If the estimator has a predict_proba it is called, otherwise call just predict.
+    """
+    X = preprocessor(X)
+    if hasattr(state.estimator, 'predict_proba'):
+        x = state.estimator.predict_proba(X)[:, 1]
+    else:
+        x = state.estimator.predict(X)
+    return np.require(x, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
+
+
+def partial_fit(state, X, S, y, w, Xtest, Stest, ytest, wtest, epoch):
+    """
+    Stores received training data.
+    SKLearn is usually not able to perform a partial fit.
+    """
+    state.X.append(preprocessor(X))
+    state.y.append(y.flatten())
+    state.w.append(w.flatten())
+    return True
 
 
 if __name__ == "__main__":
@@ -20,13 +51,11 @@ if __name__ == "__main__":
     general_options.m_target_variable = "isSignal"
 
     specific_options = basf2_mva.PythonOptions()
-    specific_options.m_mini_batch_size = 100
+    specific_options.m_mini_batch_size = 10000
+    specific_options.m_steering_file = 'mva/examples/python_based.py'
 
-    for i, l in enumerate(["tensorflow", "sklearn", "xgboost"]):
+    for i, l in enumerate(["sklearn", "xgboost"]):
         general_options.m_identifier = "Python_{}".format(i)
-        if i == 0:
-            specific_options.m_nIterations = 100
-        else:
-            specific_options.m_nIterations = 1
+        specific_options.m_nIterations = 1
         specific_options.m_framework = l
         basf2_mva.teacher(general_options, specific_options)

@@ -15,6 +15,10 @@ class State(object):
         pass
 
 
+def get_custom_objects():
+    return []
+
+
 def feature_importance(state):
     """
     Return a list containing the feature importances
@@ -46,7 +50,8 @@ def apply(state, X):
     """
     print("Called apply")
     print(state, X)
-    return np.zeros(len(X))
+    p = np.zeros(len(X))
+    return np.require(p, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
 def begin_fit(state):

@@ -659,7 +659,7 @@ namespace Belle2 {
     m_treeBEAST->Branch("PIN_dose", &(m_beast.PIN_dose));
     m_treeBEAST->Branch("BGO_energy", &(m_beast.BGO_energy));
     m_treeBEAST->Branch("HE3_rate", &(m_beast.HE3_rate));
-    m_treeBEAST->Branch("TPC_rate", &(m_beast.TPC_rate));
+    m_treeBEAST->Branch("TPC_rate", &(m_beast.TPC_rate), "TPC_rate[2][5]/F");
     m_treeBEAST->Branch("CSI_sumE", &(m_beast.CSI_sumE));
     m_treeBEAST->Branch("CSI_Ebin", &(m_beast.CSI_Ebin));
     m_treeBEAST->Branch("CSI_hitRate", &(m_beast.CSI_hitRate));
@@ -672,7 +672,7 @@ namespace Belle2 {
     m_treeBEAST->Branch("PIN_dose_av", &(m_beast.PIN_dose_av));
     m_treeBEAST->Branch("BGO_energy_av", &(m_beast.BGO_energy_av));
     m_treeBEAST->Branch("HE3_rate_av", &(m_beast.HE3_rate_av));
-    m_treeBEAST->Branch("RPC_rate_av", &(m_beast.TPC_rate_av));
+    m_treeBEAST->Branch("TPC_rate_av", &(m_beast.TPC_rate_av), "TPC_rate_av[2][5]/F");
     m_treeBEAST->Branch("CSI_sumE_av", &(m_beast.CSI_sumE_av));
     m_treeBEAST->Branch("CSI_Ebin_av", &(m_beast.CSI_Ebin_av));
     m_treeBEAST->Branch("CSI_hitRate_av", &(m_beast.CSI_hitRate_av));
@@ -1207,6 +1207,7 @@ namespace Belle2 {
       double To = ScaleFacTo_LER * m_input_LT_TPC_rate[i] + ScaleFacTo_HER * m_input_HT_TPC_rate[i];
       int tpc_ch = (int)(i / 5);
       int n_type = i - 5 * tpc_ch;
+      cout << "tpc ch " << tpc_ch << " type " << n_type << " LBG " << LBG << " HBG " << HBG << " BG " << BG << " To " << To << endl;
       //if (TMath::IsNaN(To)) To = 0;
       //if (TMath::IsNaN(BG)) BG = 0;
       //if (n_type == 0) m_beast.TPC_N_neutrons_av[tpc_ch].push_back(BG + To);
@@ -1215,7 +1216,8 @@ namespace Belle2 {
       //if (n_type == 1) m_beast.TPC_N_xrays_av[tpc_ch].push_back(BG + To);
       //if (n_type == 2) m_beast.TPC_N_protons_av[tpc_ch].push_back(BG + To);
       //if (n_type == 3) m_beast.TPC_N_others_av[tpc_ch].push_back(BG + To);
-      m_beast.TPC_rate_av[tpc_ch][n_type].push_back(BG + To);
+      //m_beast.TPC_rate_av[tpc_ch][n_type].push_back(BG + To);
+      m_beast.TPC_rate_av[tpc_ch][n_type] = (BG + To);
       BG = 0; LBG = 0; HBG = 0;
       for (int j = 0; j < 12; j++) {
         LBG = 0; HBG = 0;
@@ -1234,7 +1236,8 @@ namespace Belle2 {
       //if (n_type == 1) m_beast.TPC_N_xrays[tpc_ch].push_back(BG + To);
       //if (n_type == 2) m_beast.TPC_N_protons[tpc_ch].push_back(BG + To);
       //if (n_type == 3) m_beast.TPC_N_others[tpc_ch].push_back(BG + To);
-      m_beast.TPC_rate[tpc_ch][n_type].push_back(BG + To);
+      //m_beast.TPC_rate[tpc_ch][n_type].push_back(BG + To);
+      m_beast.TPC_rate[tpc_ch][n_type] = (BG + To);
     }
 
 

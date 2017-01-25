@@ -436,7 +436,7 @@ std::pair<double, TVector3> QualityEstimators::tripletFit(const std::vector<Posi
     TVector3 hit2 = hits->at(i + 2)->hitPosition;
 
     double d01sq = pow(hit1.X() - hit0.X(), 2) + pow(hit1.Y() - hit0.Y(), 2);
-    double d12sq = pow(hit2.X() - hit1.X(), 2) + pow(hit2.Y() - hit0.Y(), 2);
+    double d12sq = pow(hit2.X() - hit1.X(), 2) + pow(hit2.Y() - hit1.Y(), 2);
     double d02sq = pow(hit2.X() - hit0.X(), 2) + pow(hit2.Y() - hit0.Y(), 2);
 
     double d01 = sqrt(d01sq);

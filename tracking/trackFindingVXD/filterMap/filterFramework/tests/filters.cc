@@ -424,8 +424,8 @@ namespace VXDTFfilterTest {
   TEST_F(FilterTest, ShortCircuitsEvaluation)
   {
     auto filter(
-      (SquaredDistance2Dxy() < 1).observe(Observer()) &&
-      (SquaredDistance3D()   < 1).observe(Observer())
+      (SquaredDistance2Dxy() < 1).observeLeaf(Observer()) &&
+      (SquaredDistance3D()   < 1).observeLeaf(Observer())
     );
 
     spacePoint x1(0.0f , 0.0f, 0.0f);

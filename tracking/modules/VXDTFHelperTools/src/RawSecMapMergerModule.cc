@@ -556,25 +556,20 @@ template <class FilterType> void RawSecMapMergerModule::add3HitFilters(VXDTFFilt
   /// JKL Feb 2016 - big working example:
   VXDTFFilters<SpacePoint>::threeHitFilter_t threeHitFilter =
     (
-      (filterCutsMap.at("Angle3DSimple").getMin() <= Angle3DSimple<SpacePoint>() <= filterCutsMap.at("Angle3DSimple").getMax()).observe(
-        VoidObserver()) &&
-      (filterCutsMap.at("CosAngleXY").getMin() <= CosAngleXY<SpacePoint>() <= filterCutsMap.at("CosAngleXY").getMax()).observe(
-        VoidObserver()) &&
-      (filterCutsMap.at("AngleRZSimple").getMin() <= AngleRZSimple<SpacePoint>() <= filterCutsMap.at("AngleRZSimple").getMax()).observe(
-        VoidObserver()) &&
-      (CircleDist2IP<SpacePoint>() <= filterCutsMap.at("CircleDist2IP").getMax()).observe(VoidObserver()) &&
-      (filterCutsMap.at("DeltaSlopeRZ").getMin() <= DeltaSlopeRZ<SpacePoint>()).observe(VoidObserver()) <=
-      filterCutsMap.at("DeltaSlopeRZ").getMax() &&
+      (filterCutsMap.at("Angle3DSimple").getMin() <= Angle3DSimple<SpacePoint>() <= filterCutsMap.at("Angle3DSimple").getMax()) &&
+      (filterCutsMap.at("CosAngleXY").getMin() <= CosAngleXY<SpacePoint>() <= filterCutsMap.at("CosAngleXY").getMax()) &&
+      (filterCutsMap.at("AngleRZSimple").getMin() <= AngleRZSimple<SpacePoint>() <= filterCutsMap.at("AngleRZSimple").getMax()) &&
+      (CircleDist2IP<SpacePoint>() <= filterCutsMap.at("CircleDist2IP").getMax()) &&
+      (filterCutsMap.at("DeltaSlopeRZ").getMin() <= DeltaSlopeRZ<SpacePoint>()) <= filterCutsMap.at("DeltaSlopeRZ").getMax() &&
       (filterCutsMap.at("DeltaSlopeZoverS").getMin() <= DeltaSlopeZoverS<SpacePoint>() <=
-       filterCutsMap.at("DeltaSlopeZoverS").getMax()).observe(VoidObserver()) &&
-      (filterCutsMap.at("DeltaSoverZ").getMin() <= DeltaSoverZ<SpacePoint>() <= filterCutsMap.at("DeltaSoverZ").getMax()).observe(
-        VoidObserver()) &&
+       filterCutsMap.at("DeltaSlopeZoverS").getMax())  &&
+      (filterCutsMap.at("DeltaSoverZ").getMin() <= DeltaSoverZ<SpacePoint>() <= filterCutsMap.at("DeltaSoverZ").getMax()) &&
       (filterCutsMap.at("HelixParameterFit").getMin() <= HelixParameterFit<SpacePoint>() <=
-       filterCutsMap.at("HelixParameterFit").getMax()).observe(VoidObserver()) &&
-      (filterCutsMap.at("Pt").getMin() <= Pt<SpacePoint>() <= filterCutsMap.at("Pt").getMax()).observe(VoidObserver()) &&
-      (filterCutsMap.at("CircleRadius").getMin() <= CircleRadius<SpacePoint>() <= filterCutsMap.at("CircleRadius").getMax()).observe(
-        VoidObserver())
-    );
+       filterCutsMap.at("HelixParameterFit").getMax()) &&
+      (filterCutsMap.at("Pt").getMin() <= Pt<SpacePoint>() <= filterCutsMap.at("Pt").getMax()) &&
+      (filterCutsMap.at("CircleRadius").getMin() <= CircleRadius<SpacePoint>() <= filterCutsMap.at("CircleRadius").getMax())
+
+    ).observe(VoidObserver());
 
 
   auto secIDs = subGraph.getID().getFullSecIDs();

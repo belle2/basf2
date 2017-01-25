@@ -87,8 +87,7 @@ void QualityEstimatorVXDTripletFitModule::event()
 
     // Calculating a probaility from the Chi2 value which considers the degrees of freedom
     // TODO: check degrees of freedom! Look at comment remaining from Jakobs circle fit!
-    double probability = TMath::Prob(chi2, nHits -
-                                     3); // -3: 3 parameters are estimated, which reduces the nDF (number of Hits, since only one ndF per hit is added in a circleFit (unlike the situation for helix fits)
+    double probability = TMath::Prob(chi2, 2 * nHits - 5);
 
     B2WARNING("QualityEstimatorVXDTripletFitModule: event " << m_eventCounter
               << ": TC " << nTC

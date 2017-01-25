@@ -121,12 +121,11 @@ std::pair<TVector3, int> QualityEstimators::calcMomentumSeed(bool useBackwards, 
 }
 
 
-// poca = point of closest approach of fitted circle to origin
 double QualityEstimators::circleFit(double& pocaPhi, double& pocaD, double& curvature)
 {
   if (m_hits == NULL) { B2FATAL(" QualityEstimators::circleFit hits not set, therefore no calculation possible - please check that!"); }
 
-  //thomas: WARNING this one throws uncaught execeptions
+  //thomas: TODO: WARNING this one throws uncaught execeptions
   bool clockwise =
     CalcCurvature(); // Calculates Curvature: True means clockwise, False means counterclockwise.TODO this is not an optimized approach; just to get things to work. CalcCurvature could be integrated into the looping over the hits which CircleFit does anyhow.
 
@@ -206,7 +205,7 @@ double QualityEstimators::circleFit(double& pocaPhi, double& pocaD, double& curv
   }
 
   return sumWeights * (1. + curvature * pocaD) * (1. + curvature * pocaD) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY +
-         cosPhi * cosPhi * covYY - kappa * kappa * covR2R2); /// returns chi2
+         cosPhi * cosPhi * covYY - kappa * kappa * covR2R2); // returns chi2
 }
 
 
@@ -225,18 +224,10 @@ std::pair<double, TVector3> QualityEstimators::circleFit(const std::vector<Posit
    * */
   double phiValue = 0, rValue = 0, curvature = 0;
 
-  // transverse momentum (z-value is 0), vector pointing from the circle origin to the innermost hit:
   TVector3 pTVector, vec2Hit;
 
-  /** The following values are angles for:
-   * psi: the vector pointing to the poca,
-   * the vector pointing to the innermost hit (iHit)
-   * the pTVector
-   * (all are measured to the x-axis)
-   * */
   double psi = 0, alfa = 0, beta = 0;
 
-  // x and y-values of the poca, the circleCenter and the hit where the pT is calculated for
   double xPoca = 0, yPoca = 0, xCc = 0, yCc = 0, xHit = 0, yHit = 0;
 
   double chi2 = circleFit(phiValue, rValue, curvature);
@@ -254,13 +245,6 @@ std::pair<double, TVector3> QualityEstimators::circleFit(const std::vector<Posit
   xPoca = absRValue * cos(psi);
   yPoca = absRValue * sin(psi);
 
-  /// poca as result:
-//  if (0 == false) {
-//    pTVector.SetX(xPoca);
-//    pTVector.SetY(yPoca);
-//    return make_pair(chi2, pTVector);
-//  }
-
 
   double signValue = sign(curvature);
   if (sign(rValue) == sign(curvature)) {  // check clockwise
@@ -275,14 +259,6 @@ std::pair<double, TVector3> QualityEstimators::circleFit(const std::vector<Posit
           <<
           ", xCc: " << xCc << ", yCc: " << yCc);
 
-  /// circleCenter as result:
-//  if (0 == false) {
-//    pTVector.SetX(xCc);
-//    pTVector.SetY(yCc);
-//    return make_pair(chi2, pTVector);
-//  }
-
-  // last entry of hits is the innermost one
   if (useBackwards == false) {
     xHit = hits->back()->hitPosition.X();
     yHit = hits->back()->hitPosition.Y();
@@ -294,41 +270,21 @@ std::pair<double, TVector3> QualityEstimators::circleFit(const std::vector<Posit
   B2DEBUG(100, "QualityEstimators::circleFit: xHit: " << xHit << ", yHit: " << yHit << ", xCc: " << xCc << ", yCc: " << yCc <<
           ", curvature: " << curvature);
 
-  /// seedHitPosition as result:
-//  if (0 == false) {
-//    pTVector.SetX(xHit);
-//    pTVector.SetY(yHit);
-//    return make_pair(chi2, pTVector);
-//  }
   vec2Hit.SetX(xCc - xHit);
   vec2Hit.SetY(yCc - yHit);
-  /// vector circleCenter to seedHitPosition as result:
-//  if (0 == false) {
-//    return make_pair(chi2, vec2Hit);
-//  }
-  alfa = vec2Hit.Phi();//acos(vec2Hit.X()*fabs(curvature));
+
+  alfa = vec2Hit.Phi();
 
   if (curvature /*<*/ > 0) { // clockwise
     beta = alfa - M_PI * 0.5;
   } else {
     beta = alfa + M_PI * 0.5;
   }
-//  if ( beta > M_PI ) beta -= 2.*M_PI;
-//  if ( beta < -M_PI ) beta += 2.*M_PI;
-//  if ( rValue < 0 ) {  // check right handed system
-//    beta = alfa + M_PI*0.5;
-//  } else {
-//    beta = alfa - M_PI*0.5;
-//  }
+
   B2DEBUG(100, "QualityEstimators::circleFit: phiValue: " << phiValue << ", psi: " << psi << ", alfa: " << alfa << ", beta: " <<
           beta);
 
-  if (setMomentumMagnitude ==
-      0) { // in this case, we do not want an artificial magnitude for the pT-Vector and calculate the value ourself
-
-    setMomentumMagnitude = calcPt(absRadius);
-//    setMomentumMagnitude = calcPt(m_radius);
-  }
+  if (setMomentumMagnitude == 0) { setMomentumMagnitude = calcPt(absRadius); }
 
   pTVector.SetX(setMomentumMagnitude * cos(beta));
   pTVector.SetY(setMomentumMagnitude * sin(beta));
@@ -440,9 +396,8 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
 
   if (nHits < 3) { B2ERROR(" QualityEstimators::circleFit number of hits too low: " << nHits << " hits, therefore no useful calculation possible - please check that!"); }
 
-
   // WARNING this function assumes that hits are sorted and first hit is innermost hit!!!
-  /** NOTE:
+  /** TODO:
    * current implementations lacks of style. This approach would be perfect for a vectorized approach
    * still missing:
    * - chi2 calculation currently returns -1, chi2 of circleFit and of lineFit has to be combined
@@ -452,16 +407,11 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
    * - detailed check whether results are okay
    * */
 
-  double  x = 0, // current x variable
+  double  x = 0,
           y = 0,
           z = 0,
-          //      varXY = 0, // variance of XY
           invVarZ = 0, // inverse variance of Z
-///         phi = 0, // angle phi  // not used yet, but will be needed for some calculations which are not implemented yet
           r2 = 0, // radius^2
-//          tempRadius = 0,
-//          r = 0,
-///         rPhi = 0,  // not used yet, but will be needed for some calculations which are not implemented yet
           sumWeights = 0, // the sum of the weightsXY
           inverseVarianceXY = 0; // current inverse of varianceXY
 
@@ -474,14 +424,12 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
   TMatrixD invVarZvalues(nHits, 1); // carries inverse of the variances for the line fit
 
   int index = 0;
-//  ofstream hitsFileStream;
-//  hitsFileStream.open("hitHelixFit.data", std::ios_base::trunc); // trunc=overwrite app=append
+
   TVector3 seedHit = (*hits).at(0)->hitPosition;
   TVector3 secondHit = (*hits).at(1)->hitPosition; // need this one for definition of direction of flight for the particle
   if (useBackwards == false) { seedHit = (*hits).at(nHits - 1)->hitPosition; secondHit = (*hits).at(nHits - 2)->hitPosition; } // want innermost hit
-//  B2ERROR(" useBackwards == " << useBackwards << ", seedHit.Mag()/secondHit.Mag(): " << seedHit.Mag()<<"/"<< secondHit.Mag())
 
-  for (PositionInfo* hit : *hits) {  // column vectors now
+  for (PositionInfo* hit : *hits) {
     x = hit->hitPosition.X();
     y = hit->hitPosition.Y();
     z = hit->hitPosition.Z();
@@ -492,10 +440,7 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
             hit->hitPosition.Z() << ", hit.sigmaU: " << hit->sigmaU << ", hit.sigmaV: " << hit->sigmaV << ", hit.hitSigma X/Y/Z: " <<
             hit->hitSigma.X() << "/" << hit->hitSigma.Y() << "/" << hit->hitSigma.Z());
 
-//    hitsFileStream << setprecision(14) << x << " " << y << " " << z << " " << varU << " " << varV << endl;
-///   phi = atan2(y , x);  // not used yet, but will be needed for some calculations which are not implemented yet
     r2 = x * x + y * y;
-///     rPhi = phi*sqrt(r2); // not used yet, but will be needed for some calculations which are not implemented yet
     inverseVarianceXY = 1. / sqrt(hit->hitSigma.X() * hit->hitSigma.X() + hit->hitSigma.Y() * hit->hitSigma.Y());
     if (std::isnan(inverseVarianceXY) == true or std::isinf(inverseVarianceXY) == true) { B2ERROR("QualityEstimators::helixFit, chosen inverseVarianceXY is 'nan': " << inverseVarianceXY << ", setting arbitrary error: " << 0.000001 << ")"); inverseVarianceXY = 0.000001; }
     sumWeights += inverseVarianceXY;
@@ -513,15 +458,11 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
             ", y: " << y << ", z: " << z << ", r2: " << r2);
   }
 
-//  hitsFileStream.close();
-//  B2INFO("inverseCovMatrix nRows: " << inverseCovMatrix.GetNrows() << ", nCols: " << inverseCovMatrix.GetNcols() )
-//  B2INFO("X nRows: " << X.GetNrows() << ", nCols: " << X.GetNcols() )
-//  B2INFO("onesC nRows: " << onesC.GetNrows() << ", nCols: " << onesC.GetNcols() )
-//  B2INFO("onesR nRows: " << onesR.GetNrows() << ", nCols: " << onesR.GetNcols() )
 
-  bool didNanAppear = false; // if nan appeared at least once, -> didNanAppear = true;
-  /** local lambda-function used for checking TMatrixDs, whether there are nan values included, returns true, if there are */
-  auto lambdaCheckMatrix4NAN = [](TMatrixD & aMatrix) -> bool { /// testing c++11 lambda functions...
+  bool didNanAppear = false;
+
+  /** Checking if nan values in TMatrixDs */
+  auto lambdaCheckMatrix4NAN = [](TMatrixD & aMatrix) -> bool {
     double totalEntries = 0;
     for (int i = 0; i < aMatrix.GetNrows(); ++i)
     {
@@ -530,23 +471,15 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
       }
     }
     return std::isnan(totalEntries);
-  }; // should be converted to normal function, since feature could be used much more often...
-// TEST for lambdaCheckMatrix4NAN:
-//   TMatrixD lambdaTestMatrix(nHits, 1);
-//   for (int i = 0; i < nHits; ++i) { lambdaTestMatrix(i, 0) = 1.; }
-//   B2DEBUG(175, "lambdaCheckMatrix4NAN(lambdaTestMatrix): " << lambdaCheckMatrix4NAN(lambdaTestMatrix) << " (should be 0)")
-//   lambdaTestMatrix(nHits - 2, 0) = sqrt(-1); // producing 'nan'
-//   B2DEBUG(175, "lambdaCheckMatrix4NAN(lambdaTestMatrix): " << lambdaCheckMatrix4NAN(lambdaTestMatrix) << " (should be 1)")
+  };
 
   if (lambdaCheckMatrix4NAN(inverseCovMatrix) == true) { B2DEBUG(3, "helixFit: inverseCovMatrix got 'nan'-entries!"); didNanAppear = true; }
   if (lambdaCheckMatrix4NAN(X) == true) { B2DEBUG(3, "helixFit: X got 'nan'-entries!"); didNanAppear = true; }
-
 
   /// transform to paraboloid:
   double inverseSumWeights = 1. / sumWeights;
   TMatrixD xBar = onesR * inverseCovMatrix * X * inverseSumWeights; // weighed sample mean values
   if (lambdaCheckMatrix4NAN(xBar) == true) { B2DEBUG(3, "helixFit: xBar got 'nan'-entries!"); didNanAppear = true; }
-
 
   TMatrixD transX = X;
   TMatrixD transxBar = xBar;
@@ -555,7 +488,6 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
 
   TMatrixD weighedSampleCovMatrix = transX * inverseCovMatrix * X - transxBar * xBar * sumWeights;
   if (lambdaCheckMatrix4NAN(weighedSampleCovMatrix) == true) { B2DEBUG(3, "helixFit: weighedSampleCovMatrix got 'nan'-entries!"); didNanAppear = true; }
-
 
   /// find eigenvector to smallest eigenvalue
   TMatrixDEigen eigenCollection(weighedSampleCovMatrix);
@@ -577,9 +509,7 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
 
   double distanceOfPlane = 0;
   for (int i = 0; i < nEVs; ++i) {// calculating scalar product by hand
-    distanceOfPlane += eigenVectors(i, minValueIndex) * xBar(0,
-                                                             i); // eigenVectors(:,minValueIndex) = normal vector of the fitted plane (the normalized eigenvector of the smalles eigenValue of weighedSampleCovMatrix)
-//     distanceOfPlane += xBar(0, i) * eigenVectors(i, minValueIndex); // eigenVectors(:,minValueIndex) = normal vector of the fitted plane (the normalized eigenvector of the smalles eigenValue of weighedSampleCovMatrix)
+    distanceOfPlane += eigenVectors(i, minValueIndex) * xBar(0, i);
   }
   distanceOfPlane *= -1.;
 
@@ -588,23 +518,19 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
          n3 = eigenVectors(2, minValueIndex);
 
   /** In the case of a straight line, the HelixFit can not work. So we check if the plane is "straight up", or the z-normal vector is zero, n3 has the unit of cm(?) */
-  if (fabs(n3) < 1e-06) { throw FilterExceptions::Straight_Line(); } /// WARNING: this value for catching straight lines is hardcoded: its resolution should be finer than the possible resolution of the detectors (we assume that the unit is cm)
+  if (fabs(n3) < 1e-06) { throw FilterExceptions::Straight_Line(); } /// TODO WARNING: this value for catching straight lines is hardcoded: its resolution should be finer than the possible resolution of the detectors (we assume that the unit is cm)
 
   /** In the case of the fitted plane being parallel to the x-y plane, helixFit produces a nan pZ. TODO Why */
   if (fabs(n1) < 1e-10 && fabs(n2) < 1e-10) { throw FilterExceptions::Center_Is_Origin(); }
 
-  double a = 1. / (2.*n3); // temporary value
+  double a = 1. / (2.*n3); // TODO temporary value
 
   double xc = -n1 * a; // x coordinate of the origin of the circle
   double yc = -n2 * a; // y coordinate of the origin of the circle
-//  double rho2=(1.-n3*n3-4.*distanceOfPlane*n3)*(a*a);
 
-  double rho = sqrt((1. - n3 * n3 - 4.*distanceOfPlane * n3) * (a * a)); // radius of the circle
-/// fix dec8,2013:
-//  double rho = sqrt((1. - n3 * n3 - 4.*distanceOfPlane * n3) * aInv * aInv); // radius of the circle
+  double rho = sqrt((1. - n3 * n3 - 4.*distanceOfPlane * n3) * (a * a));
 
   B2DEBUG(25, "helixFit: circle: origin x: " << xc << ", y: " << yc << ", radius: " << rho  << endl);
-
 
   /// line fit:
   TMatrixD H = distanceOfPlane + R2 * n3; // temporary value
@@ -638,8 +564,8 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
     }
   }
 
-  T.Sqrt(); // take square root of all elements
-//   for (int i = 0; i < T.GetNrows(); ++i) { T(i, 0) = sqrt(T(i, 0)); }
+  T.Sqrt();
+
   if (lambdaCheckMatrix4NAN(T) == true) { B2DEBUG(3, "helixFit: T got 'nan'-entries after Sqrt! Before: T.min: " << T2.Min() << ", T.max: " << T2.Max() << ", after: T.min: " << T.Min() << ", T.max: " << T.Max()); didNanAppear = true; }
 
   b = 1. / b;
@@ -720,8 +646,8 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
     double radiusYb = ys(i, 0) - yc;
     double radiusMagb = sqrt(radiusXb * radiusXb + radiusYb * radiusYb);
 
-    s(i, 0) = rho * acos(((radiusX * radiusXb + radiusY * radiusYb) / radiusMag) / radiusMagb); // version 1
-//     s(i, 0) = rho * acos(((radiusX * radiusXb + radiusY * radiusYb) * invRadiusMag) / radiusMagb); // version 2
+    s(i, 0) = rho * acos(((radiusX * radiusXb + radiusY * radiusYb) / radiusMag) / radiusMagb);
+
     if (std::isnan(s(i, 0)) == true) {
       didNanAppear = true;
       B2DEBUG(3, "helixFit: i: " << i << ", s(i) = 'nan', components - rho: " << rho << ", radiusX: " << radiusX << ", radiusY: " <<
@@ -729,8 +655,6 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
               radiusMagb << ", xs(i): " << xs(i, 0) << ", ys(i): " << ys(i, 0));
     }
   }
-
-  /// fit line s (= arc length) versus z
 
   TMatrixD AtGA(2, 2);
   TMatrixD AtG(2, nHits);
@@ -757,8 +681,7 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
   if (lambdaCheckMatrix4NAN(AtGAInv) == true) {B2DEBUG(10, "helixFit: AtGAInv got 'nan'-entries!"); didNanAppear = true; }
   if (lambdaCheckMatrix4NAN(zValues) == true) {B2DEBUG(10, "helixFit: zValues got 'nan'-entries!"); didNanAppear = true; }
 
-  TMatrixD p = AtGAInv * AtG *
-               zValues; // fitted z value in the first point, tan(lambda) -> WARNING FIXME why is the first point 1,0 not 0,0? jkl feb8th2014
+  TMatrixD p = AtGAInv * AtG * zValues; // fitted z value in the first point, tan(lambda)
   if (lambdaCheckMatrix4NAN(p) == true) { B2DEBUG(10, "helixFit: p got 'nan'-entries!"); }
 
   TMatrixD TAtG = AtG;
@@ -769,25 +692,14 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
   TMatrixD sigma2M = zValuesT * (Diag * TAtG * AtGAInv * AtG) * zValues;
   double sigma2 = sigma2M(0, 0) / (nHits - 2);
 
-  double thetaVal = (M_PI * 0.5 - atan(p(1,
-                                         0))); // WARNING: was M_PI*0.5 - atan(p(1,0)), but values were wrong! double-WARNING: but + atan was wrong too!
-//    double thetaVal = (M_PI * 0.5 - atan2(rho, p(1, 0))); // test feb8th: trying to calculate Thetaval like TVector3.Theta...
-/// opposite leg = r, adjacent leg = z
+  double thetaVal = (M_PI * 0.5 - atan(p(1, 0)));
+
   if (std::isnan(thetaVal) == true) {
     didNanAppear = true;
     thetaVal = (hits->at(0)->hitPosition - hits->at(nHits - 1)->hitPosition).Theta(); /// INFO swapped! feb4th2014
     B2DEBUG(3, "helixFit: calculating theta for momentum produced 'nan' -> fallback-solution produces theta: " << thetaVal);
     if (std::isnan(thetaVal) == true) { B2ERROR("helixFit: no usable Theta value could be produced -> serious error telling us that helix fit does not work! bypass is setting the value to 0!"); thetaVal = 0; }
   }
-
-  /// calc direction:
-//  TVector3 radialVector = (center - seedHit);
-// double radiusInCm = radialVector.Perp();
-// double pT = m_3hitFilterBox.calcPt(radiusInCm);
-// TVector3 pTVector = (pT / radiusInCm) * radialVector.Orthogonal();
-// pZ = pT / tan(theta);
-// TVector3 pVector = pTVector;
-//     TVector3 pVector.SetZ(pZ);
 
   TVector3 radialVector(xc, yc, 0.); // here it is the center of the circle
   radialVector = radialVector - seedHit; // now it's the radialVector
@@ -806,31 +718,17 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
   }; // should be converted to normal function, since feature could be used much more often...
   if (lambdaCheckVector4NAN(pVector) == true) { B2ERROR("helixFit: pTVector got 'nan'-entries x/y/z: " << pVector.X() << "/" << pVector.Y() << "/" << pVector.Z()); didNanAppear = true; }
 
-
-//   double pZ = pT / tan(thetaVal);
-//  double pZ = -calcPt(rho)*p(1,0); // TODO check that !!!1111eleven
   double pZ = calcPt(rho) * p(1, 0) ;
-  // pz = pt / tan (Theta); where Theta is Arctan(s/z), s... arc length in (x,y) = radius * Phi in radians, z... z-distance.
-  // So pz = pt * z / s = magneticFieldFactor*rho*z/s, and p(1,0).."fitted z-value" (TODO: check that!) seems to be z/s. => calcPt(rho)p(1,0)
+
   B2DEBUG(25, "helixFit: radius(rho): " << rho << ", theta: " << thetaVal << ", pT: " << pT << ", pZ: " << pZ << ", pVector.Perp: " <<
           pVector.Perp() << ", pVector.Mag: " << pVector.Mag() << ", fitted zValue: " << p(0, 0));
   TVector3 vectorToSecondHit = secondHit - seedHit;
   vectorToSecondHit.SetZ(0);
 
-
   if (((useBackwards == true) && (vectorToSecondHit.Angle(pVector) < M_PI * 0.5)) || ((useBackwards == false)
       && (vectorToSecondHit.Angle(pVector) > M_PI * 0.5))) { pVector *= -1.; }
   pVector.SetZ(-pZ); // now that track carries full momentum
 
-  // Tobias approach
-//  if ((useBackwards && vectorToSecondHit.Angle(pVector) < M_PI/2)
-//       || (!useBackwards && vectorToSecondHit.Angle(pVector) > M_PI/2)) {
-//     pVector *= -1.;
-//   }
-
-
-//  if (((useBackwards == true) && (vectorToSecondHit.Angle(pVector) < M_PI * 0.5)) || ((useBackwards == false) && (vectorToSecondHit.Angle(pVector) > M_PI * 0.5))) { pVector.SetZ(-pZ); /*pVector *= -1.;*/ } else { pVector.SetZ(pZ); }
-  // if (((useBackwards == true) && (vectorToSecondHit.Angle(pVector) > M_PI * 0.5)) || ((useBackwards == false) && (vectorToSecondHit.Angle(pVector) < M_PI * 0.5))) { pVector *= -1.; } // edit: Feb4-2014: swapped values...
   if (lambdaCheckVector4NAN(pVector) == true) { B2ERROR("helixFit: pVector got 'nan'-entries x/y/z: " << pVector.X() << "/" << pVector.Y() << "/" << pVector.Z()); didNanAppear = true; }
 
   if (didNanAppear == true && LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 1, PACKAGENAME()) == true) {
@@ -839,150 +737,32 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
             << "/" << pVector.Z());
   }
 
-
-//     B2WARNING("helixFit: strange pVector (Mag="<<pVector.Mag()<< ") detected. The following hits were part of this TC: \n" << printHits(m_hits) << "\n pVector  x/y/z: " << pVector.X()<<"/"<< pVector.Y()<<"/"<< pVector.Z())
-///   }
-//    B2ERROR("again: useBackwards == " << useBackwards << ", seedHit.Mag()/secondHit.Mag(): " << seedHit.Mag()<<"/"<< secondHit.Mag())
-
-//  B2WARNING("Circle: origin x: " << xc << ", y: " << yc << ", radius: " << rho << ", pT: " << pT << ", thetaVal: " << thetaVal << ", p(1,0): " << p(1,0)<< ", pVector: " << pVector.Mag())
-
-
-//  double xHit = (*hits)[0]->hitPosition.X();
-//  double yHit = (*hits)[0]->hitPosition.Y();
-//
-//  double vecCircleX = xHit - xc;
-//  double vecCircleY = yHit - yc;
-//  double tangCircleX =  vecCircleY;
-//  double tangCircleY = -vecCircleX;
-// //   B2WARNING(" hit: x,y: " << xHit<< "," <<yHit << ", circleCenter x,y: " << xc<< "," << yc ", mag hit+tangentenVector: " << sqrt((tangCircleX+xHit)*(tangCircleX+xHit) + (tangCircleY+yHit)*(tangCircleY+yHit)))
-//  if ( sqrt((tangCircleX+xHit)*(tangCircleX+xHit) + (tangCircleY+yHit)*(tangCircleY+yHit)) < sqrt(xHit*xHit + yHit*yHit)) {
-//    tangCircleX *= -1.;
-//    tangCircleY *= -1.;
-//  }
-//
-//  double magTangent = sqrt(tangCircleX*tangCircleX + tangCircleY*tangCircleY);
-//  tangCircleX /= magTangent;
-//  tangCircleY /= magTangent;
-//  B2WARNING(" hit: x,y: " << xHit<< "," <<yHit << ", circleCenter x,y: " << xc<< "," << yc ", mag hit+tangentenVector: " << sqrt((tangCircleX+xHit)*(tangCircleX+xHit) + (tangCircleY+yHit)*(tangCircleY+yHit)))
-
-//    TMatrixD Rs(nHits,1); //
-//  for (int i = 1; i < nHits; ++i) {
-//    Rs(i,0) = atan2(ys(i,0),xs(i,0));
-//    B2WARNING("Rs Rows: " <<  i << ", value: " << Rs(i,0) )
-//  }
-//
-//  TMatrixD Phis(nHits,1); //
-//  for (int i = 1; i < nHits; ++i) {
-//    Phis(i,0) = sqrt(ys(i,0)*ys(i,0)+xs(i,0)*xs(i,0));
-//    B2WARNING("Phis Rows: " <<  i << ", value: " << Rs(i,0) )
-//  }
-
-  /// chi2 of circle fit
-// Phis=atan2(ys,xs);
-// Rs=sqrt(xs.^2+ys.^2);
-// RPhis=Rs.*Phis;
-// res=(RPhi-RPhis);
-// chi2=dot(res.^2,wgtu);
-  /// fit line s versus z
-// A=[ones(n,1) s(:)];
-// G=1./varz';
-// AtG=A'.*repmat(G,2,1);
-// par=inv(AtG*A)*AtG*z;
-// theta=pi/2-atan(par(2));
-// zfit=A*par;
-  /// res, resZ = residuals
-// resz=z-zfit;
-// chi2=chi2+dot(resz.^2,G);
-//  rv2=[xs(i)-xc; ys(i)-yc];
-//  phi=acos(dot(rv1,rv2)/norm(rv1)/norm(rv2));
-//  s(i)=rho*phi;
-// end
-
-  //function [xc,yc,rho,theta,chi2]=helixfit(x,y,z,varu,varz)
-//event0
-// event=[1.0045598807718539 0.98064240740937836 0.89077305908203108 2.0833333333333334e-06 2.520833306014538e-06
-// 1.6478037593653985 1.5384201678761289 1.4337223846435547 2.0833333333333334e-06 4.0833324988683497e-06
-// 2.9125750550834417 2.5197562332487138 2.434219932556152 2.0963745096426766e-06 2.0351833840888175e-05
-// 7.0478994508509487 4.787722223489471 5.4111187877655036 4.707051327516743e-06 4.8015625973494028e-05
-// 8.9823161930530837 5.4741719839834033 6.7053809738159185 4.707051327516743e-06 4.8015625973494028e-05
-// 12.078509159296951 6.1589094409158482 8.6692161655426041 4.707051327516743e-06 4.8015625973494028e-05];
-/// convert to column vectors
-// x=event(:,1);y=event(:,2);z=event(:,3);varu=event(:,4);varz=event(:,5);n=length(x);
-// Phi=atan2(y,x);
-// R=sqrt(x.^2+y.^2);
-// RPhi=R.*Phi;
-/// transform to paraboloid
-// R2=R.^2;
-// w=R2;
-// X=[x y w];
-// wgtu=1./varu; // weights, inverse variances
-// W=diag(wgtu);
-// eins=ones(n,1);
-// xbar=eins'*W*X/sum(wgtu);
-// VX=X'*W*X-xbar'*xbar*sum(wgtu); // covariance matrix of mean
-// // find eigenvector to smallest eigenvalue
-// [U,D]=eig(VX); // U unitäre Matrix deren Spalten die Eigenvektoren sind. D diagonalmatrix, deren diagonalelemente die eigenwerte sind
-// lam=diag(D);
-// [minlam,imin]=min(lam);
-// nv=U(:,imin);
-// c=-dot(xbar,nv);
-// n1=nv(1);
-// n2=nv(2);
-// n3=nv(3);
-// a=2*n3;
-// xc=-n1/a;
-// yc=-n2/a;
-// rho2=(1-n3^2-4*c*n3)/a^2;
-// rho=sqrt(rho2);
-// h=c+R2*n3;
-// t=sqrt((n1^2+n2^2)*R2-h.^2);
-// x1=(-n1*h+n2*t)/(n1^2+n2^2);
-// y1=(-n2*h-n1*t)/(n1^2+n2^2);
-// x2=(-n1*h-n2*t)/(n1^2+n2^2);
-// y2=(-n2*h+n1*t)/(n1^2+n2^2);
-// dx1=max(abs(x1-x));
-// dx2=max(abs(x2-x));
-// imin=1;
-// if dx2<dx1,imin=2;end
-// if imin==1
-//  xs=x1;
-//  ys=y1;
-// else
-//  xs=x2;
-//  ys=y2;
-// end
-/// radius vectors
-// rv1=[xs(1)-xc; ys(1)-yc]
-// s(1)=0;
-// for i=2:n
-//  rv2=[xs(i)-xc; ys(i)-yc];
-//  phi=acos(dot(rv1,rv2)/norm(rv1)/norm(rv2));
-//  s(i)=rho*phi;
-// end
-/// chi2 of circle fit
-// Phis=atan2(ys,xs);
-// Rs=sqrt(xs.^2+ys.^2);
-// RPhis=Rs.*Phis;
-// res=(RPhi-RPhis);
-// chi2=dot(res.^2,wgtu);
-/// fit line s versus z
-// A=[ones(n,1) s(:)];
-// G=1./varz';
-// AtG=A'.*repmat(G,2,1);
-// par=inv(AtG*A)*AtG*z;
-// theta=pi/2-atan(par(2));
-// zfit=A*par;
-  // res, resZ = residuals
-// resz=z-zfit;
-// chi2=chi2+dot(resz.^2,G);
-// return
-
   if (std::isnan(rho) == true or lambdaCheckVector4NAN(pVector) == true) {
     throw FilterExceptions::Invalid_result_Nan();
   }
   return make_pair(rho, pVector);
 }
 
+
+bool QualityEstimators::CalcCurvature()
+{
+  if (m_hits == NULL)
+    B2FATAL(" QualityEstimators::CalcCurvature: hits not set, therefore no calculation possible - please check that!");
+  double sumOfCurvature = 0.;
+  for (int i = 0; i < m_numHits - 2; ++i) {
+    TVector3 ab = m_hits->at(i)->hitPosition - m_hits->at(i + 1)->hitPosition;
+    ab.SetZ(0.);
+    TVector3 bc = m_hits->at(i + 1)->hitPosition - m_hits->at(i + 2)->hitPosition;
+    bc.SetZ(0.);
+    sumOfCurvature += bc.Orthogonal() * ab; //normal vector of m_vecBC times segment of ba
+  }
+  //B2WARNING(sumOfCurvature);
+  if (sumOfCurvature == 0.) {
+    throw FilterExceptions::Calculating_Curvature_Failed();
+  }
+  if (sumOfCurvature > 0.) { return true; }
+  else { return false; }
+}
 
 
 pair<double, TVector3> QualityEstimators::simpleLineFit3D(const vector<PositionInfo*>* hits, bool useBackwards,
@@ -1078,104 +858,6 @@ pair<double, TVector3> QualityEstimators::simpleLineFit3D(const vector<PositionI
   return make_pair(chi2, directionVector);
 }
 
-/*
- NOTE: old version for calculating momentum seed (maybe fallback?)
-TVector3 radialVector = (center - seedHit);
-double radiusInCm = radialVector.Perp();
-double pT = m_3hitFilterBox.calcPt(radiusInCm);
-TVector3 pTVector = (pT / radiusInCm) * radialVector.Orthogonal();
-
-    if (aTC->getCondition() == false) { continue; }
-    const vector<VXDTFHit*>& currentHits = aTC->getHits();
-    numOfCurrentHits = currentHits.size();
-
-    if (numOfCurrentHits < 3) {
-      B2ERROR("calcInitialValues4TCs: currentTC got " << numOfCurrentHits << " hits! At this point only tcs having at least 3 hits should exist!");
-    }
-
-    TVector3 hitA, hitB, hitC;
-  TVector3 hitA_T, hitB_T, hitC_T; // those with _T are the hits of the transverlal plane
-  TVector3 intersection, radialVector, pTVector, pVector; //coords of center of projected circle of trajectory & vector pointing from center to innermost hit
-  ThreeHitFilters threeHitFilterBox = ThreeHitFilters();
-  TVector3 segAB, segBC, segAC, cpAB, cpBC, nAB, nBC;
-  int numOfCurrentHits, signCurvature, pdGCode;
-  double radiusInCm, pT, theta, pZ, preFactor; // needed for dPt calculation
-
-    hitA_T = hitA; hitA_T.SetZ(0.);
-    hitB_T = hitB; hitB_T.SetZ(0.);
-    hitC_T = hitC; hitC_T.SetZ(0.);
-    segAB = hitB - hitA;
-    segAC = hitC - hitA;
-    theta = segAC.Theta();
-
-
-    segAB.SetZ(0.);
-    segBC = hitC_T - hitB_T;
-    nBC = segBC.Orthogonal();
-
-    signCurvature = sign(nBC * segAB);
-
-    currentPass->threeHitFilterBox.calcCircleCenter(hitA_T, hitB_T, hitC_T, intersection);
-    if (m_KFBackwardFilter == true) {
-      TVector3 radialVector = (intersection - hitC);
-    } else {
-      TVector3 radialVector = (intersection - hitA);
-    }
-
-    radiusInCm = aTC->getEstRadius();
-    if (radiusInCm  < 0.1 || radiusInCm > 100000.) { // if it is not set, value stays at zero, therefore small check should be enough
-      radiusInCm = radialVector.Perp(); // = radius in [cm], sign here not needed. normally: signKappaAB/normAB1
-    }
-
-    pT = currentPass->threeHitFilterBox.calcPt(radiusInCm); // pT[GeV/c] = 0.3*B[T]*r[m] = 0.45*r[cm]/100 = 0.45*r*0.01 length of pT
-    B2DEBUG(150, "event: " << m_eventCounter << ": calculated pT: " << pT);
-    pZ = pT / tan(theta);
-    preFactor = pT / radiusInCm;
-    TVector3 pTVector = (pT / radiusInCm) * radialVector.Orthogonal() ;
-
-    if (m_KFBackwardFilter == true) {
-      if ((hitC + pTVector).Mag() < hitC.Mag()) { pTVector = pTVector * -1; }
-    } else {
-      if ((hitA + pTVector).Mag() < hitA.Mag()) { pTVector = pTVector * -1; }
-    }
-
-    TVector3 pVector = pTVector;
-    TVector3 pVector.SetZ(pZ);
-
-    // the sign of curvature determines the charge of the particle, negative sign for curvature means positively charged particle. The signFactor is needed since the sign of PDG-codes are not defined by their charge but by being a particle or an antiparticle
-
-    pdGCode = signCurvature * m_PARAMpdGCode * m_chargeSignFactor;
-
-    if (m_KFBackwardFilter == true) {
-      aTC->setInitialValue(hitC, pVector, pdGCode);
-    } else {
-      aTC->setInitialValue(hitA, pVector, pdGCode);
-    }
-
-    B2DEBUG(10, " TC has got momentum/pT of " << pVector.Mag() << "/" << pTVector.Mag() << "GeV and estimated pdgCode " << pdGCode);*/
-
-
-
-bool QualityEstimators::CalcCurvature()
-{
-  if (m_hits == NULL)
-    B2FATAL(" QualityEstimators::CalcCurvature: hits not set, therefore no calculation possible - please check that!");
-  double sumOfCurvature = 0.;
-  for (int i = 0; i < m_numHits - 2; ++i) {
-    TVector3 ab = m_hits->at(i)->hitPosition - m_hits->at(i + 1)->hitPosition;
-    ab.SetZ(0.);
-    TVector3 bc = m_hits->at(i + 1)->hitPosition - m_hits->at(i + 2)->hitPosition;
-    bc.SetZ(0.);
-    sumOfCurvature += bc.Orthogonal() * ab; //normal vector of m_vecBC times segment of ba
-  }
-  //B2WARNING(sumOfCurvature);
-  if (sumOfCurvature == 0.) {
-    throw FilterExceptions::Calculating_Curvature_Failed();
-  }
-  if (sumOfCurvature > 0.) { return true; }
-  else { return false; }
-}
-
 
 std::string QualityEstimators::printHits(const std::vector<PositionInfo*>* hits) const
 {
@@ -1196,15 +878,3 @@ std::string QualityEstimators::printHits(const std::vector<PositionInfo*>* hits)
   }
   return hitX.str() + "\n" + hitY.str() + "\n" + hitZ.str() + "\n" + sigmaX.str() + "\n" + sigmaY.str() + "\n" + sigmaZ.str() + "\n";
 }
-// bool QualityEstimators::CalcCurvature()
-// {
-//   if (m_hits == NULL) B2FATAL(" QualityEstimators::CalcCurvature: hits not set, therefore no calculation possible - please check that!")
-//     int sumOfCurvature = 0;
-//   for (int i = 0; i < m_numHits - 2; ++i) {
-//     sumOfCurvature += m_3hitFilterBox.calcSign(m_hits->at(i)->hitPosition, m_hits->at(i + 1)->hitPosition, m_hits->at(i + 2)->hitPosition);
-//     //We sum over the Signs: a positive value represents a left-oriented (from out to in) curvature, a negative value means having a right-oriented curvature.
-//   }
-//   if (sumOfCurvature == 0) { throw FilterExceptions::Calculating_Curvature_Failed(); }  //Maybe one should define a more suitable exception; TODO and one could try weighting the Curvature -1,0,1 by the 3D Distance. (if the ==0 case appears too often.)
-//   if (sumOfCurvature > 0) { return true; }
-//   else { return false; }
-// }

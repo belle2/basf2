@@ -10,12 +10,7 @@
 
 #include <tracking/modules/spacePointCreator/SPTCmomentumSeedRetrieverModule.h>
 #include <framework/logging/Logger.h>
-
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimators.h>
-#include <tracking/vxdCaTracking/SharedFunctions.h> // e.g. PositionInfo
-
 #include <geometry/bfieldmap/BFieldMap.h>
-
 
 // ROOT
 #include <TVector3.h>

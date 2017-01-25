@@ -11,9 +11,6 @@
 #include <tracking/modules/qualityEstimatorVXD/QualityEstimatorVXDTripletFitModule.h>
 #include <framework/logging/Logger.h>
 
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimators.h>
-#include <tracking/vxdCaTracking/SharedFunctions.h> // e.g. PositionInfo
-
 // ROOT
 #include <TVector3.h>
 #include <TMath.h>

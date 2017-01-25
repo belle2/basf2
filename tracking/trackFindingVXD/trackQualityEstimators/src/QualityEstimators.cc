@@ -28,8 +28,8 @@
 #include <TMatrixDEigen.h>
 
 // boost
-#include <boost/math/special_functions/fpclassify.hpp> // abs
-#include <boost/math/special_functions/sign.hpp> // sign
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/math/special_functions/sign.hpp>
 
 
 using namespace std;
@@ -341,7 +341,7 @@ std::pair<double, TVector3> QualityEstimators::circleFit(const std::vector<Posit
 /** does a tripletFit of the given hits
  * The filter is based on the paper 'A New Three-Dimensional Track Fit with Multiple Scattering'
  * by Andre Schoening et al. https://arxiv.org/abs/1606.04990*/
-std::pair<double, TVector3> QualityEstimators::tripletFit(const std::vector<PositionInfo*>* hits, bool useBackwards)
+std::pair<double, TVector3> QualityEstimators::tripletFit(const std::vector<PositionInfo*>* hits)
 {
   if (hits == NULL) { B2FATAL(" QualityEstimators::tripletFit hits not set, therefore no calculation possible - please check that!"); }
 
@@ -631,8 +631,7 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
       //Console Output:
       B2DEBUG(5, "T" << k << " was " << T(k, 0) << " and will manually be set to 0.");
       if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 3, PACKAGENAME()) == true) {
-        B2DEBUG(10, "The following hits were part of this TC: \n" << printHits(m_hits) << "\n'T' had following entries: " <<
-                printMyMatrixstring(T));
+        B2DEBUG(10, "The following hits were part of this TC: \n" << printHits(m_hits));
       }
 
       T(k, 0) = 0;

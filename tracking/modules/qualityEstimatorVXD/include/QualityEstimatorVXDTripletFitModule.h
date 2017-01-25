@@ -10,10 +10,12 @@
 
 #pragma once
 
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimators.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
-#include <framework/datastore/StoreArray.h>
 
+#include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
+
 #include <string>
 #include <vector>
 

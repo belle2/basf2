@@ -14,16 +14,21 @@
 #include <tuple>
 #include <TVector3.h>
 #include <vector>
-#include <boost/assign/std/vector.hpp> // overloading + to fill many values at once in vector;
+#include <boost/assign/std/vector.hpp>
 #include <array>
-#include "tracking/vxdCaTracking/ThreeHitFilters.h"
 
-#include "tracking/vxdCaTracking/SharedFunctions.h" // e.g. PositionInfo
+//#include "tracking/vxdCaTracking/SharedFunctions.h"
 
 
 namespace Belle2 {
 
-  /** bundles filter methods using any number of hits (starts making sense when using 4 or more hits). */
+  struct PositionInfo {
+    TVector3 hitPosition; /**< contains global hitPosition */
+    TVector3 hitSigma; /**< contains errors in global coordinates */
+    double sigmaU; /**< error in (u-direction locally)x-direction of hitPosition in global coordinates */
+    double sigmaV; /**< error of y-direction of hitPosition in global coordinates */
+  };
+
   class QualityEstimators {
 
   public:
@@ -116,7 +121,7 @@ namespace Belle2 {
     /** does a tripletFit of the given hits
      * The filter is based on the paper 'A New Three-Dimensional Track Fit with Multiple Scattering'
      * by Andre Schoening et al. https://arxiv.org/abs/1606.04990*/
-    std::pair<double, TVector3> tripletFit(const std::vector<PositionInfo*>* hits, bool useBackwards = false);
+    std::pair<double, TVector3> tripletFit(const std::vector<PositionInfo*>* hits);
 
 
     /** As it seems to be customary to use another layer: */

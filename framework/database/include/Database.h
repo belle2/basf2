@@ -209,6 +209,7 @@ namespace Belle2 {
     /** Level of log messages about not found objects. */
     LogConfig::ELogLevel m_logLevel;
 
+    /** If true logging should be inverted: i.e. show messages if a payload was found, not if it wasn't */
     bool m_invertLogging{false};
   };
 } // namespace Belle2

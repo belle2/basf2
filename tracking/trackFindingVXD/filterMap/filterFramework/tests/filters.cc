@@ -263,12 +263,13 @@ namespace VXDTFfilterTest {
     //build an dummy filter which is unobserved (VoidObserver)
     auto dummyFilter = (
                          (-10. <= SquaredDistance3D() <= 10.) &&
-                         ((-10. <=  SquaredDistance2Dxy() <= 10.) ||    // put 2nd pair of parentheses to silence warning
+                         ((-100. <=  SquaredDistance2Dxy() <= -10.) ||    // put 2nd pair of parentheses to silence warning
                           (-10. <= SquaredDistance1Dx() <= 10.)) &&
                          !(-10. <= SquaredDistance1Dx() <= -10.)
                        );
 
-    // are chosen in that way that they pass all sub-filters of dummyFilter (see comment below)
+    // values are chosen in that way that all sub-filters of dummyFilter have to be called (see comment below)
+    // and so that dummyFilter is always true
     spacePoint x1(0.0f , 0.0f, 0.0f);
     spacePoint x2(0.5f , 0.0f, 0.0f);
     spacePoint x3(2.0f , 0.0f, 0.0f);
@@ -287,15 +288,15 @@ namespace VXDTFfilterTest {
 
     // Now switch observer, this is done recursively for each of the underlying filters
     // One cannot switch the observer of an existing filter (as it would mean to switch type) so one has to create a new one!
-    // Note that if one filter is evaluated as false the other filter are not evaluated anymore and thus no observed!
+    // Note that if one filter is evaluated as false the other filter are not evaluated anymore and thus not observed!
     auto observedDummyFilter = dummyFilter.observe(Observer());
     observedDummyFilter.accept(x1, x2);
     observedDummyFilter.accept(x1, x3);
 
     EXPECT_EQ(2 , counter< SquaredDistance3D >::N);
     EXPECT_EQ(2 , counter< SquaredDistance2Dxy >::N);
-    //Note although SquaredDistance1D is used twice in the filter it is only evaluated once!
-    EXPECT_EQ(2 , counter< SquaredDistance1Dx >::N);
+    //Note SquaredDistance1D is used twice in the filter so it is evaluated twice!
+    EXPECT_EQ(4 , counter< SquaredDistance1Dx >::N);
   }
 
 

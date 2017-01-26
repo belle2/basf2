@@ -548,6 +548,22 @@ namespace Belle2 {
              otherObserver >(m_filterA.observeLeaf(otherObserver()), m_filterB.observeLeaf(otherObserver()));
     }
 
+    /** will set the observer for the Leaves of this filter, this "AND" filter will not be observed.
+    NOTE: if this function is used on the top level Boolean filter, the whole filter will NOT be observed! See accept funtion!
+    @param otherObserver : the new observer
+    */
+    template< class otherObserver >
+    Filter<  Belle2::OperatorAnd, decltype(FilterA().observeLeaf(otherObserver())),
+             decltype(FilterB().observeLeaf(otherObserver())),
+             VoidObserver >
+             observeLeaf(const otherObserver&) const
+    {
+      // this will recursively loop over all "and" Filters and set the SAME observer
+      return Filter< Belle2::OperatorAnd, decltype(FilterA().observeLeaf(otherObserver())),
+             decltype(FilterB().observeLeaf(otherObserver())),
+             VoidObserver >(m_filterA.observeLeaf(otherObserver()), m_filterB.observeLeaf(otherObserver()));
+    }
+
 
 
 
@@ -592,20 +608,6 @@ namespace Belle2 {
 
   private:
 
-    /** will set the observer for the Leaves of this filter, this "AND" filter will not be observed .
-    @param otherObserver : the new observer
-    */
-    template< class otherObserver >
-    Filter<  Belle2::OperatorAnd, decltype(FilterA().observeLeaf(otherObserver())),
-             decltype(FilterB().observeLeaf(otherObserver())),
-             VoidObserver >
-             observeLeaf(const otherObserver&) const
-    {
-      // this will recursively loop over all "and" Filters and set the SAME observer
-      return Filter< Belle2::OperatorAnd, decltype(FilterA().observeLeaf(otherObserver())),
-             decltype(FilterB().observeLeaf(otherObserver())),
-             VoidObserver >(m_filterA.observeLeaf(otherObserver()), m_filterB.observeLeaf(otherObserver()));
-    }
 
     FilterA  m_filterA;
     FilterB  m_filterB;
@@ -692,6 +694,7 @@ namespace Belle2 {
 
 
     /** will set the observer for  both "OR" filters it contains, this filter will not be observed (VoidObserver)
+    NOTE: if this function is used on the top level Boolean filter, the whole filter will NOT be observed! See accept funtion!
     @param otherObserver : the new observer
     */
     template< class otherObserver >

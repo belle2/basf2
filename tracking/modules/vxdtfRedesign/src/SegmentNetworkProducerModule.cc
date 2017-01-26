@@ -13,6 +13,10 @@
 #include <tracking/trackFindingVXD/segmentNetwork/NodeNetworkHelperFunctions.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 
+//Observer types
+#include <tracking/trackFindingVXD/filterMap/filterFramework/VoidObserver.h>
+#include <tracking/trackFindingVXD/filterTools/ObserverCheckMCPurity.h>
+#include <tracking/trackFindingVXD/filterTools/ObserverCheckFilters.h>
 
 using namespace std;
 using namespace Belle2;
@@ -83,12 +87,15 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
            "For debugging purposes: if true, all filters are deactivated for all hit-combinations and therefore all combinations are accepted.",
            bool(false));
 
-  addParam("observeFilters",
-           m_PARAMobserveFilters,
-           "For debugging ONLY! If true the answer of the SelectionVariables in the filter will be observed, which means that"
-           "the response of each FilterVariable is written to a root file. NOTE: that observing filters makes the code slow!"
+  addParam("observerType",
+           m_PARAMobserverType,
+           "Use this option for debugging ONLY!"
+           "0 -> No observer (VoidObserver) This is the default!; "
+           "1 -> ObserverCheckMCPurity : observes filter, values are written to a root file;"
+           "2 -> ObserverCheckFilters : observes filter, values are stored to the datastore (WARNING creates lots of data)"
+           "NOTE: that observing filters (using another option than 0 VoidObserver) makes the code slow!"
            "So only use for debugging purposes.",
-           bool(false));
+           int(SegmentNetworkProducerModule::c_VoidObserver));
 }
 
 
@@ -130,12 +137,13 @@ SegmentNetworkProducerModule::initialize()
   // TODO catch cases when m_network already existed in DataStore!
 
 
-  // for debugging purposes the filter responses can be observed and stored to a root file
-  if (m_PARAMobserveFilters == true) {
+  // for debugging purposes the filter responses can be observed and stored to a root file or to the datastore
+  if (m_PARAMobserverType == SegmentNetworkProducerModule::c_ObserverCheckMCPurity) {
     /** This TFile is used by the observers, at present it is created by default.
       TODO : this might not be a good construction for parallel processing! Replace by something which is good for parallel
       preocessing!
     */
+
     if (m_tfile) delete m_tfile;
     m_tfile = new TFile("observeFilterSegNetProducer.root", "RECREATE");
     m_tfile->cd();
@@ -144,12 +152,23 @@ SegmentNetworkProducerModule::initialize()
     // create a dummy verison of the 2-hit-filter
     VXDTFFilters<SpacePoint>::twoHitFilter_t aFilter;
     // initialize the !observed! verion of the Filter
-    initializeObservers(aFilter.observe(SegmentNetworkProducerModule::ObserverType_2sp()) , newTree);
-    initializeObservers(aFilter.observe(SegmentNetworkProducerModule::ObserverType_3sp()) , newTree);
-
+    bool isinitialized = initializeObservers(aFilter.observe(ObserverCheckMCPurity()) , newTree);
+    if (!isinitialized) B2WARNING("Observers not initialized properly! The results of the observation may be faulty!");
   } else {
     m_tfile = NULL;
   }
+
+  // for this observer the results will be dumped into the datastore
+  if (m_PARAMobserverType == SegmentNetworkProducerModule::c_ObserverCheckFilters) {
+    // needs a StoreArray to store the data
+    StoreArray<ObserverInfo> observerInfoArray("observerInfos", DataStore::c_Event);
+    observerInfoArray.registerInDataStore();
+
+    VXDTFFilters<SpacePoint>::twoHitFilter_t aFilter;
+    bool isinitialized = initializeObservers(aFilter.observe(ObserverCheckFilters()) , observerInfoArray);
+    if (!isinitialized) B2WARNING("Observers not initialized properly! The results of the observation may be faulty!");
+  }
+
 
 } // end initialize
 
@@ -174,15 +193,15 @@ void SegmentNetworkProducerModule::event()
 
 
   // use VoidObserver to deactivate observation of filters
-  if (m_PARAMobserveFilters == true)
-    buildTrackNodeNetwork<SegmentNetworkProducerModule::ObserverType_2sp>();  // apply-two-hit-filters
+  if (m_PARAMobserverType == c_ObserverCheckMCPurity) buildTrackNodeNetwork<ObserverCheckMCPurity>();
+  else if (m_PARAMobserverType == c_ObserverCheckFilters) buildTrackNodeNetwork<ObserverCheckFilters>();
   else buildTrackNodeNetwork<VoidObserver>(); // apply-two-hit-filters
 
   if (m_PARAMCreateNeworks < 3) { B2DEBUG(10, "SegmentNetworkProducerModule:event: event " << m_eventCounter << ": finished work after creating trackNodeNetwork"); return; }
 
-  // use VoidObserver to deactivate observation of filters
-  if (m_PARAMobserveFilters == true)
-    buildSegmentNetwork<SegmentNetworkProducerModule::ObserverType_3sp>();  // apply-three-hit-filters
+  // use VoidObserver to deactivate observation, currently we dont observe the three hits so all VoidObserver
+  if (m_PARAMobserverType == c_ObserverCheckMCPurity) buildSegmentNetwork<VoidObserver>();
+  else if (m_PARAMobserverType == c_ObserverCheckFilters) buildSegmentNetwork<VoidObserver>();
   else buildSegmentNetwork<VoidObserver>(); // apply-three-hit-filters
 
   // TODO debug output with counters!

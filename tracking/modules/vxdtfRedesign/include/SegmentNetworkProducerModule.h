@@ -27,9 +27,6 @@
 #include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFiltersHelperFunctions.h>
 
-//Observer types
-#include <tracking/trackFindingVXD/filterMap/filterFramework/VoidObserver.h>
-#include <tracking/trackFindingVXD/filterTools/ObserverCheckMCPurity.h>
 
 //root
 #include <TFile.h>
@@ -56,11 +53,8 @@ namespace Belle2 {
     /** to improve readability of the code, here the definition of the static sector type. */
     using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
 
-    /** the type of the observer for the observed version of the module */
-    // two hits:
-    using ObserverType_2sp = ObserverCheckMCPurity;
-    // three hits: currently not observed so use the VoidObserver
-    using ObserverType_3sp = VoidObserver;
+    /** enum to handle the currently implemented observer types */
+    enum eObserverTypes { c_VoidObserver = 0, c_ObserverCheckMCPurity = 1, c_ObserverCheckFilters = 2 };
 
     /** simple struct for collecting raw data for a single sector */
     struct RawSectorData {
@@ -226,10 +220,10 @@ namespace Belle2 {
     /** For debugging purposes: if true, all filters are deactivated for all hit-combinations and therefore all combinations are accepted. */
     bool m_PARAMallFiltersOff;
 
-    /** if true the filters will be observed, which means that the response of each filter is written to a root file.
+    /** integer switch to decide which observer to use: see enum eObserverTypes
       NOTE: that observing filters make the code slow! So only use for debugging purposes
     */
-    bool m_PARAMobserveFilters;
+    int m_PARAMobserverType;
 
 // member variables
 

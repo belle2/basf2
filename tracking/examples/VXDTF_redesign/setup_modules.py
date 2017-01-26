@@ -20,7 +20,7 @@ def setup_VXDTF2(path=None,
                  use_svd=True,
                  filter_overlapping=True,
                  use_segment_network_filters=True,
-                 observe_network_filters=False,
+                 observerType=0,
                  quality_estimator='circleFit',
                  overlap_filter='greedy',
                  secmap_name=None,
@@ -87,7 +87,7 @@ def setup_VXDTF2(path=None,
     segNetProducer.param('SpacePointsArrayNames', ['SpacePoints'])
     segNetProducer.param('printNetworks', False)
     segNetProducer.param('addVirtualIP', False)
-    segNetProducer.param('observeFilters', observe_network_filters)
+    segNetProducer.param('observerType', observerType)
     segNetProducer.logging.log_level = log_level
     segNetProducer.logging.debug_level = debug_level
     modules.append(segNetProducer)

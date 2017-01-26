@@ -351,6 +351,12 @@ namespace Belle2 {
       return frame.getVertex(part).Perp();
     }
 
+    double particleDPhi(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(part).Phi();
+    }
+
     double particleDistance(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -1680,6 +1686,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("y", particleDY, "y coordinate of vertex");
     REGISTER_VARIABLE("z", particleDZ, "z coordinate of vertex");
     REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP");
+    REGISTER_VARIABLE("dphi", particleDPhi, "momentum azimuthal angle in degrees in respect to IP");
 
     REGISTER_VARIABLE("M", particleMass,
                       "invariant mass(determined from particle's 4-momentum vector)");

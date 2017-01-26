@@ -37,6 +37,7 @@ namespace {
   static int s_numpids = 0;
   void addPID(int pid)
   {
+    s_pidVector.reserve(20); //TODO: only for testing wether this avoids what I think is a race condition. (happens only on buildbot)
     s_pidVector.push_back(pid);
     s_pids = s_pidVector.data();
     s_numpids = s_pidVector.size();
@@ -55,6 +56,12 @@ namespace {
     for (int i = 0; i < s_numpids; i++)
       if (s_pids[i] == pid)
         s_pids[i] = 0;
+
+    //set s_numpids if empty (or stop searching)
+    for (int i = 0; i < s_numpids; i++)
+      if (s_pids[i] != 0)
+        return;
+    s_numpids = 0;
   }
   void clearPIDs()
   {
@@ -74,9 +81,9 @@ namespace {
           continue; //interrupted, try again
         } else if (errno == ECHILD) {
           //We don't have any child processes?
-          //EventProcessor::writeToStdErr("\n Called waitpid() without any children left. This shouldn't happen and and indicates a problem.\n");
+          EventProcessor::writeToStdErr("\n Called waitpid() without any children left. This shouldn't happen and and indicates a problem.\n");
           //
-          //actually, this is ok in case we already called waitpid() somewhere else.
+          //actually, this is ok in case we already called waitpid() somewhere else. (but we don't do that...)
           //In case I want to avoid this, waitid() and WNOWAIT might help, but require libc >= 2.12 (not present in SL5)
           clearPIDs();
           return;

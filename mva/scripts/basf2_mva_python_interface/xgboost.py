@@ -24,10 +24,6 @@ class State(object):
         self.estimator = None
 
 
-def get_custom_objects():
-    return []
-
-
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
     """
     Return default xgboost model
@@ -68,20 +64,20 @@ def apply(state, X):
     return np.require(result, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
-def begin_fit(state):
+def begin_fit(state, Xtest, Stest, ytest, wtest):
     """
     Initialize lists which will store the received data
     """
     state.X = []
     state.y = []
     state.w = []
-    state.Xtest = []
-    state.ytest = []
-    state.wtest = []
+    state.Xtest = Xtest
+    state.ytest = ytest.flatten()
+    state.wtest = wtest.flatten()
     return state
 
 
-def partial_fit(state, X, S, y, w, Xtest, Stest, ytest, wtest, epoch):
+def partial_fit(state, X, S, y, w, epoch):
     """
     Stores received training data.
     XGBoost is usually not able to perform a partial fit.
@@ -89,9 +85,6 @@ def partial_fit(state, X, S, y, w, Xtest, Stest, ytest, wtest, epoch):
     state.X.append(X)
     state.y.append(y.flatten())
     state.w.append(w.flatten())
-    state.Xtest.append(Xtest)
-    state.ytest.append(ytest.flatten())
-    state.wtest.append(wtest.flatten())
     return True
 
 
@@ -100,8 +93,13 @@ def end_fit(state):
     Merge received data together and fit estimator
     """
     dtrain = xgb.DMatrix(np.vstack(state.X), label=np.hstack(state.y).astype(int), weight=np.hstack(state.w))
-    dtest = xgb.DMatrix(np.vstack(state.Xtest), label=np.hstack(state.ytest).astype(int), weight=np.hstack(state.wtest))
-    evallist = [(dtest, 'eval'), (dtrain, 'train')]
+
+    if len(state.Xtest) > 0:
+        dtest = xgb.DMatrix(state.Xtest, label=state.ytest.astype(int), weight=state.wtest)
+        evallist = [(dtest, 'eval'), (dtrain, 'train')]
+    else:
+        evallist = [(dtrain, 'train')]
+
     state.estimator = xgb.train(state.parameters, dtrain, state.num_round, evallist)
     f = tempfile.NamedTemporaryFile(delete=False)
     f.close()

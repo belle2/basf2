@@ -14,15 +14,15 @@ class State(object):
         """ Constructor of the state object """
         pass
 
-
-def get_custom_objects():
-    return []
+    def __repr__(self):
+        return 'State'
 
 
 def feature_importance(state):
     """
     Return a list containing the feature importances
     """
+    print("Called feature importance")
     return []
 
 
@@ -49,26 +49,26 @@ def apply(state, X):
     Test apply function
     """
     print("Called apply")
-    print(state, X)
+    print(state, X.shape)
     p = np.zeros(len(X))
     return np.require(p, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
-def begin_fit(state):
+def begin_fit(state, Xtest, Stest, ytest, wtest):
     """
     Test begin_fit function
     """
     print("Called begin_fit")
-    print(state)
+    print(state, Xtest.shape, Stest.shape, ytest.shape, wtest.shape)
     return state
 
 
-def partial_fit(state, X, S, y, w, Xtest, Stest, ytest, wtest, epoch):
+def partial_fit(state, X, S, y, w, epoch):
     """
     Test partial_fit function
     """
     print("Called partial_fit")
-    print(state, X, S, y, w, Xtest, Stest, ytest, wtest, epoch)
+    print(state, X.shape, S.shape, y.shape, w.shape, epoch)
     return True
 
 

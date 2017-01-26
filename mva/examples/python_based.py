@@ -7,14 +7,6 @@ import numpy as np
 import basf2_mva
 
 
-def get_custom_objects():
-    return [apply, preprocessor]
-
-
-def preprocessor(X):
-    return X*2
-
-
 def apply(state, X):
     """
     Apply estimator to passed data.
@@ -28,12 +20,12 @@ def apply(state, X):
     return np.require(x, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
-def partial_fit(state, X, S, y, w, Xtest, Stest, ytest, wtest, epoch):
+def partial_fit(state, X, S, y, w, epoch):
     """
     Stores received training data.
     SKLearn is usually not able to perform a partial fit.
     """
-    state.X.append(preprocessor(X))
+    state.X.append(X)
     state.y.append(y.flatten())
     state.w.append(w.flatten())
     return True

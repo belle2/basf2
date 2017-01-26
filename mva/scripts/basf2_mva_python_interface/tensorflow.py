@@ -85,10 +85,6 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     return state
 
 
-def get_custom_objects():
-    return []
-
-
 def load(obj):
     """
     Load Tensorflow estimator into state
@@ -118,14 +114,14 @@ def apply(state, X):
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
-def begin_fit(state):
+def begin_fit(state, Xtest, Stest, ytest, wtest):
     """
     Returns just the state object
     """
     return state
 
 
-def partial_fit(state, X, S, y, w, Xtest, Stest, ytest, wtest, epoch):
+def partial_fit(state, X, S, y, w, epoch):
     """
     Pass received data to tensorflow session
     """

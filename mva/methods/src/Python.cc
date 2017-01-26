@@ -17,7 +17,10 @@
 #include <numpy/arrayobject.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
 #include <numeric>
+#include <fstream>
+
 
 namespace Belle2 {
   namespace MVA {
@@ -144,117 +147,104 @@ namespace Belle2 {
       PythonInitializerSingleton::GetInstance();
     }
 
-    boost::python::object get_attr_from_module_else_fallback_to_framework(const std::string& attrName, boost::python::object module,
-        boost::python::object framework)
-    {
-      if (PyObject_HasAttrString(module.ptr(), attrName.c_str())) {
-        return module.attr(attrName.c_str());
-      } else {
-        return framework.attr(attrName.c_str());
-      }
-    }
 
     Weightfile PythonTeacher::train(Dataset& training_data) const
     {
 
       Weightfile weightfile;
       std::string custom_weightfile = weightfile.getFileName();
-      std::string custom_objectsfile = weightfile.getFileName();
-
-      auto steering_path = boost::filesystem::path(m_specific_options.m_steering_file);
-
-      try {
-        auto parent_path = boost::filesystem::canonical(steering_path).parent_path();
-        auto sys = boost::python::import("sys");
-        sys.attr("path").attr("append")(parent_path.c_str());
-      } catch (boost::filesystem::filesystem_error& e) {
-        // Filesystem error is fine, this means the given steering_file was not found
-        // in the current or absolute directory, however maybe we can still load the module
-        // using the usual PYTHON_PATH
-      } catch (...) {
-        PyErr_Print();
-        PyErr_Clear();
-        B2ERROR("Failed calling train in PythonTeacher");
-        throw std::runtime_error("Failed calling train in PythonTeacher");
-      }
+      std::string custom_steeringfile = weightfile.getFileName();
 
       uint64_t numberOfFeatures = training_data.getNumberOfFeatures();
       uint64_t numberOfSpectators = training_data.getNumberOfSpectators();
       uint64_t numberOfEvents = training_data.getNumberOfEvents();
+
+      auto numberOfValidationEvents = static_cast<uint64_t>(numberOfEvents * (1 - m_specific_options.m_training_fraction));
+      auto numberOfTrainingEvents = static_cast<uint64_t>(numberOfEvents * m_specific_options.m_training_fraction);
 
       uint64_t batch_size = m_specific_options.m_mini_batch_size;
       if (batch_size == 0) {
         batch_size = numberOfEvents;
       }
 
-      uint64_t training_batch_size = batch_size;
-      uint64_t validation_batch_size = 0;
-
-      if (m_specific_options.m_training_fraction <= 0.0) {
+      if (m_specific_options.m_training_fraction <= 0.0 or m_specific_options.m_training_fraction > 1.0) {
         B2ERROR("Please provide a positive training fraction");
-        throw std::runtime_error("Please provide a positive training fraction");
+        throw std::runtime_error("Please provide a training fraction between (0.0,1.0]");
       }
 
-      if (m_specific_options.m_training_fraction < 1.0) {
-        training_batch_size = static_cast<uint64_t>(batch_size * m_specific_options.m_training_fraction);
-        validation_batch_size = static_cast<uint64_t>(batch_size * (1 - m_specific_options.m_training_fraction));
+      auto X = std::unique_ptr<float[]>(new float[batch_size * numberOfFeatures]);
+      auto S = std::unique_ptr<float[]>(new float[batch_size * numberOfSpectators]);
+      auto y = std::unique_ptr<float[]>(new float[batch_size]);
+      auto w = std::unique_ptr<float[]>(new float[batch_size]);
+      npy_intp dimensions_X[2] = {static_cast<npy_intp>(batch_size), static_cast<npy_intp>(numberOfFeatures)};
+      npy_intp dimensions_S[2] = {static_cast<npy_intp>(batch_size), static_cast<npy_intp>(numberOfSpectators)};
+      npy_intp dimensions_y[2] = {static_cast<npy_intp>(batch_size), 1};
+      npy_intp dimensions_w[2] = {static_cast<npy_intp>(batch_size), 1};
+
+      auto X_v = std::unique_ptr<float[]>(new float[numberOfValidationEvents * numberOfFeatures]);
+      auto S_v = std::unique_ptr<float[]>(new float[numberOfValidationEvents * numberOfSpectators]);
+      auto y_v = std::unique_ptr<float[]>(new float[numberOfValidationEvents]);
+      auto w_v = std::unique_ptr<float[]>(new float[numberOfValidationEvents]);
+      npy_intp dimensions_X_v[2] = {static_cast<npy_intp>(numberOfValidationEvents), static_cast<npy_intp>(numberOfFeatures)};
+      npy_intp dimensions_S_v[2] = {static_cast<npy_intp>(numberOfValidationEvents), static_cast<npy_intp>(numberOfSpectators)};
+      npy_intp dimensions_y_v[2] = {static_cast<npy_intp>(numberOfValidationEvents), 1};
+      npy_intp dimensions_w_v[2] = {static_cast<npy_intp>(numberOfValidationEvents), 1};
+
+      std::string steering_file_source_code;
+      if (m_specific_options.m_steering_file != "") {
+        std::string filename = FileSystem::findFile(m_specific_options.m_steering_file);
+        std::ifstream steering_file(filename);
+        if (not steering_file) {
+          throw std::runtime_error(std::string("Couldn't open file ") + filename);
+        }
+        steering_file.seekg(0, std::ios::end);
+        steering_file_source_code.resize(steering_file.tellg());
+        steering_file.seekg(0, std::ios::beg);
+        steering_file.read(&steering_file_source_code[0], steering_file_source_code.size());
       }
-
-      auto X = std::unique_ptr<float[]>(new float[training_batch_size * numberOfFeatures]);
-      auto S = std::unique_ptr<float[]>(new float[training_batch_size * numberOfSpectators]);
-      auto y = std::unique_ptr<float[]>(new float[training_batch_size]);
-      auto w = std::unique_ptr<float[]>(new float[training_batch_size]);
-      npy_intp dimensions_X[2] = {static_cast<npy_intp>(training_batch_size), static_cast<npy_intp>(numberOfFeatures)};
-      npy_intp dimensions_S[2] = {static_cast<npy_intp>(training_batch_size), static_cast<npy_intp>(numberOfSpectators)};
-      npy_intp dimensions_y[2] = {static_cast<npy_intp>(training_batch_size), 1};
-      npy_intp dimensions_w[2] = {static_cast<npy_intp>(training_batch_size), 1};
-
-      auto X_v = std::unique_ptr<float[]>(new float[validation_batch_size * numberOfFeatures]);
-      auto S_v = std::unique_ptr<float[]>(new float[validation_batch_size * numberOfSpectators]);
-      auto y_v = std::unique_ptr<float[]>(new float[validation_batch_size]);
-      auto w_v = std::unique_ptr<float[]>(new float[validation_batch_size]);
-      npy_intp dimensions_X_v[2] = {static_cast<npy_intp>(validation_batch_size), static_cast<npy_intp>(numberOfFeatures)};
-      npy_intp dimensions_S_v[2] = {static_cast<npy_intp>(validation_batch_size), static_cast<npy_intp>(numberOfSpectators)};
-      npy_intp dimensions_y_v[2] = {static_cast<npy_intp>(validation_batch_size), 1};
-      npy_intp dimensions_w_v[2] = {static_cast<npy_intp>(validation_batch_size), 1};
-
 
       try {
+        // Load python modules
         auto json = boost::python::import("json");
-        auto parameters = json.attr("loads")(m_specific_options.m_config.c_str());
+        auto builtins = boost::python::import("builtins");
+        auto inspect = boost::python::import("inspect");
 
-        auto module = boost::python::import(steering_path.stem().c_str());
+        // Load framework
         auto framework = boost::python::import((std::string("basf2_mva_python_interface.") + m_specific_options.m_framework).c_str());
+        // Overwrite framework with user-defined code from the steering file
+        builtins.attr("exec")(steering_file_source_code.c_str(), boost::python::object(framework.attr("__dict__")));
 
-        auto model = get_attr_from_module_else_fallback_to_framework("get_model", module, framework)(numberOfFeatures, numberOfSpectators,
-                     numberOfEvents,
-                     m_specific_options.m_training_fraction, parameters);
-        auto state = get_attr_from_module_else_fallback_to_framework("begin_fit", module, framework)(model);
+        // Call get_model with the parameters provided by the user
+        auto parameters = json.attr("loads")(m_specific_options.m_config.c_str());
+        auto model = framework.attr("get_model")(numberOfFeatures, numberOfSpectators,
+                                                 numberOfEvents,  m_specific_options.m_training_fraction, parameters);
 
-        std::vector<uint64_t> data_indices(numberOfEvents);
-        std::iota(data_indices.begin(), data_indices.end(), 0);
-        // disabled random shuffle since this is very slow (O(days)) on large files.
-        // TODO: remove it in a more sophisticated way
-        //std::random_shuffle(data_indices.begin(), data_indices.end());
+        // Call begin_fit with validation sample
+        for (uint64_t iEvent = 0; iEvent < numberOfValidationEvents; ++iEvent) {
+          training_data.loadEvent(iEvent);
+          for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
+            X_v[iEvent * numberOfFeatures + iFeature] = training_data.m_input[iFeature];
+          for (uint64_t iSpectator = 0; iSpectator < numberOfSpectators; ++iSpectator)
+            S_v[iEvent * numberOfSpectators + iSpectator] = training_data.m_spectators[iSpectator];
+          y_v[iEvent] = training_data.m_target;
+          w_v[iEvent] = training_data.m_weight;
+        }
 
-        auto start_train = data_indices.begin();
-        auto end_train = data_indices.begin() + static_cast<uint64_t>(numberOfEvents * m_specific_options.m_training_fraction);
-        auto end_validation = data_indices.end();
-        std::vector<uint64_t> training_indices(start_train, end_train);
-        std::vector<uint64_t> validation_indices(end_train, end_validation);
+        auto ndarray_X_v = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X_v, NPY_FLOAT32, X_v.get()));
+        auto ndarray_S_v = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_S_v, NPY_FLOAT32, S_v.get()));
+        auto ndarray_y_v = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_y_v, NPY_FLOAT32, y_v.get()));
+        auto ndarray_w_v = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_w_v, NPY_FLOAT32, w_v.get()));
 
-        uint64_t nBatches = std::floor(numberOfEvents / batch_size);
+        auto state = framework.attr("begin_fit")(model, ndarray_X_v, ndarray_S_v, ndarray_y_v, ndarray_w_v);
+
+        uint64_t nBatches = std::floor(numberOfTrainingEvents / batch_size);
         bool continue_loop = true;
         for (uint64_t iIteration = 0; (iIteration < m_specific_options.m_nIterations or m_specific_options.m_nIterations == 0)
              and continue_loop; ++iIteration) {
-          // disabled random shuffle since this is very slow (O(days)) on large files.
-          // TODO: remove it in a more sophisticated way
-          // std::random_shuffle(training_indices.begin(), training_indices.end());
-          // std::random_shuffle(validation_indices.begin(), validation_indices.end());
 
           for (uint64_t iBatch = 0; iBatch < nBatches and continue_loop; ++iBatch) {
-            for (uint64_t iEvent = 0; iEvent < training_batch_size; ++iEvent) {
-              training_data.loadEvent(training_indices[iEvent + iBatch * training_batch_size]);
+            for (uint64_t iEvent = 0; iEvent < batch_size; ++iEvent) {
+              training_data.loadEvent(iEvent + iBatch * batch_size + numberOfValidationEvents);
               for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
                 X[iEvent * numberOfFeatures + iFeature] = training_data.m_input[iFeature];
               for (uint64_t iSpectator = 0; iSpectator < numberOfSpectators; ++iSpectator)
@@ -263,53 +253,30 @@ namespace Belle2 {
               w[iEvent] = training_data.m_weight;
             }
 
-            for (uint64_t iEvent = 0; iEvent < validation_batch_size; ++iEvent) {
-              training_data.loadEvent(validation_indices[iEvent + iBatch * validation_batch_size]);
-              for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
-                X_v[iEvent * numberOfFeatures + iFeature] = training_data.m_input[iFeature];
-              for (uint64_t iSpectator = 0; iSpectator < numberOfSpectators; ++iSpectator)
-                S_v[iEvent * numberOfSpectators + iSpectator] = training_data.m_spectators[iSpectator];
-              y_v[iEvent] = training_data.m_target;
-              w_v[iEvent] = training_data.m_weight;
-            }
             // Maybe slow, create ndarrays outside of loop?
             auto ndarray_X = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X, NPY_FLOAT32, X.get()));
             auto ndarray_S = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_S, NPY_FLOAT32, S.get()));
             auto ndarray_y = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_y, NPY_FLOAT32, y.get()));
             auto ndarray_w = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_w, NPY_FLOAT32, w.get()));
 
-            auto ndarray_X_v = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X_v, NPY_FLOAT32, X_v.get()));
-            auto ndarray_S_v = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_S_v, NPY_FLOAT32, S_v.get()));
-            auto ndarray_y_v = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_y_v, NPY_FLOAT32, y_v.get()));
-            auto ndarray_w_v = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_w_v, NPY_FLOAT32, w_v.get()));
-
-            auto r = get_attr_from_module_else_fallback_to_framework("partial_fit", module, framework)(state, ndarray_X, ndarray_S, ndarray_y,
-                     ndarray_w,
-                     ndarray_X_v, ndarray_S_v, ndarray_y_v, ndarray_w_v, iIteration * nBatches + iBatch);
+            auto r = framework.attr("partial_fit")(state, ndarray_X, ndarray_S, ndarray_y,
+                                                   ndarray_w, iIteration * nBatches + iBatch);
             boost::python::extract<bool> proxy(r);
             if (proxy.check())
               continue_loop = static_cast<bool>(proxy);
           }
         }
 
-        auto result = get_attr_from_module_else_fallback_to_framework("end_fit", module, framework)(state);
+        auto result = framework.attr("end_fit")(state);
 
         auto pickle = boost::python::import("pickle");
-        auto builtins = boost::python::import("builtins");
         auto file = builtins.attr("open")(custom_weightfile.c_str(), "wb");
         pickle.attr("dump")(result, file);
 
-        auto custom_objects = get_attr_from_module_else_fallback_to_framework("get_custom_objects", module, framework)();
-        auto inspect = boost::python::import("inspect");
-        boost::python::list source_codes;
-        for (int i = 0; i < boost::python::len(custom_objects); ++i) {
-          auto source_code = inspect.attr("getsource")(boost::python::object(custom_objects[i]));
-          source_codes.append(source_code);
-        }
-        auto object_file = builtins.attr("open")(custom_objectsfile.c_str(), "wb");
-        pickle.attr("dump")(source_codes, object_file);
+        auto steeringfile = builtins.attr("open")(custom_steeringfile.c_str(), "wb");
+        pickle.attr("dump")(steering_file_source_code.c_str(), steeringfile);
 
-        auto importances = get_attr_from_module_else_fallback_to_framework("feature_importance", module, framework)(state);
+        auto importances = framework.attr("feature_importance")(state);
         if (len(importances) == 0) {
           B2INFO("Python method returned empty feature importance. There won't be any information about the feature importance in the weightfile.");
         } else if (numberOfFeatures != static_cast<uint64_t>(len(importances))) {
@@ -338,7 +305,7 @@ namespace Belle2 {
       weightfile.addOptions(m_general_options);
       weightfile.addOptions(m_specific_options);
       weightfile.addFile("Python_Weightfile", custom_weightfile);
-      weightfile.addFile("Python_CustomObjects", custom_objectsfile);
+      weightfile.addFile("Python_Steeringfile", custom_steeringfile);
       weightfile.addSignalFraction(training_data.getSignalFraction());
 
       return weightfile;
@@ -367,15 +334,12 @@ namespace Belle2 {
 
         m_framework = boost::python::import((std::string("basf2_mva_python_interface.") + m_specific_options.m_framework).c_str());
 
-        if (weightfile.containsElement("Python_CustomObjects")) {
-          std::string custom_objects = weightfile.getFileName();
-          weightfile.getFile("Python_CustomObjects", custom_objects);
-          auto object_file = builtins.attr("open")(custom_objects.c_str(), "rb");
-          auto unpickled_custom_objects = pickle.attr("load")(object_file);
-
-          for (int i = 0; i < boost::python::len(unpickled_custom_objects); ++i) {
-            builtins.attr("exec")(boost::python::object(unpickled_custom_objects[i]), boost::python::object(m_framework.attr("__dict__")));
-          }
+        if (weightfile.containsElement("Python_Steeringfile")) {
+          std::string custom_steeringfile = weightfile.getFileName();
+          weightfile.getFile("Python_Steeringfile", custom_steeringfile);
+          auto steeringfile = builtins.attr("open")(custom_steeringfile.c_str(), "rb");
+          auto source_code = pickle.attr("load")(steeringfile);
+          builtins.attr("exec")(boost::python::object(source_code), boost::python::object(m_framework.attr("__dict__")));
         }
 
         m_state = m_framework.attr("load")(unpickled_fit_object);

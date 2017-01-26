@@ -355,9 +355,7 @@ namespace Belle2 {
     {
 
       std::string custom_weightfile = weightfile.getFileName();
-      std::string custom_objects = weightfile.getFileName();
       weightfile.getFile("Python_Weightfile", custom_weightfile);
-      weightfile.getFile("Python_CustomObjects", custom_objects);
       weightfile.getOptions(m_general_options);
       weightfile.getOptions(m_specific_options);
 
@@ -367,13 +365,17 @@ namespace Belle2 {
         auto file = builtins.attr("open")(custom_weightfile.c_str(), "rb");
         auto unpickled_fit_object = pickle.attr("load")(file);
 
-        auto object_file = builtins.attr("open")(custom_objects.c_str(), "rb");
-        auto unpickled_custom_objects = pickle.attr("load")(object_file);
-
         m_framework = boost::python::import((std::string("basf2_mva_python_interface.") + m_specific_options.m_framework).c_str());
 
-        for (int i = 0; i < boost::python::len(unpickled_custom_objects); ++i) {
-          builtins.attr("exec")(boost::python::object(unpickled_custom_objects[i]), boost::python::object(m_framework.attr("__dict__")));
+        if (weightfile.containsElement("Python_CustomObjects")) {
+          std::string custom_objects = weightfile.getFileName();
+          weightfile.getFile("Python_CustomObjects", custom_objects);
+          auto object_file = builtins.attr("open")(custom_objects.c_str(), "rb");
+          auto unpickled_custom_objects = pickle.attr("load")(object_file);
+
+          for (int i = 0; i < boost::python::len(unpickled_custom_objects); ++i) {
+            builtins.attr("exec")(boost::python::object(unpickled_custom_objects[i]), boost::python::object(m_framework.attr("__dict__")));
+          }
         }
 
         m_state = m_framework.attr("load")(unpickled_fit_object);

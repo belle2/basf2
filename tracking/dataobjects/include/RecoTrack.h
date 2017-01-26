@@ -525,6 +525,9 @@ namespace Belle2 {
     /// Set the covariance of the seed. ATTENTION: This is not the fitted covariance.
     void setSeedCovariance(const TMatrixDSym& seedCovariance) { m_genfitTrack.setCovSeed(seedCovariance); }
 
+    /// Set the tracking seed by using the fitted state at the first measurement. Will fail if the state is not present.
+    void copyStateFromSeed();
+
     // Fitting
     /// Returns true if the last fit with the given representation was successful.
     bool wasFitSuccessful(const genfit::AbsTrackRep* representation = nullptr) const;

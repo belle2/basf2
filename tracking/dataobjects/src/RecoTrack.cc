@@ -301,3 +301,22 @@ void RecoTrack::deleteFittedInformation()
     m_genfitTrack.deleteTrackRep(i);
   }
 }
+
+void RecoTrack::copyStateFromSeed()
+{
+  if (getRepresentations().empty()) {
+    B2FATAL("No representation present, so it is not possible to copy the state!");
+  }
+  const auto& measuredStateFromFirstHit = getMeasuredStateOnPlaneFromFirstHit();
+
+  const auto& position = measuredStateFromFirstHit.getPos();
+  const auto& momentum = measuredStateFromFirstHit.getMom();
+  const auto& charge = measuredStateFromFirstHit.getCharge();
+  const auto& time = measuredStateFromFirstHit.getTime();
+  const auto& covariance = measuredStateFromFirstHit.getCov();
+
+  setPositionAndMomentum(position, momentum);
+  setChargeSeed(charge);
+  setTimeSeed(time);
+  setSeedCovariance(covariance);
+}

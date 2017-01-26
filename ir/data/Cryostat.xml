@@ -1704,7 +1704,7 @@
 		<Z37 unit="cm">164.192</Z37>
 		<Z38 unit="cm">164.192</Z38>
 		<Z39 unit="cm">164.319</Z39>
-		<Z40 unit="cm">164.310</Z40>
+		<Z40 unit="cm">164.319</Z40>
 		<Z41 unit="cm">175.749</Z41>
 		<Z42 unit="cm">175.749</Z42>		
 		<Z43 unit="cm">175.888</Z43>
@@ -3147,7 +3147,7 @@
 	</Straight>
 
         <F1wal1>
-		<N desc="Number of planes">20</N>
+		<N desc="Number of planes">19</N>
 
 		<Z0 unit="cm">-62.73</Z0>
 		<Z1 unit="cm">-74.34</Z1>
@@ -3168,7 +3168,6 @@
 		<Z16 unit="cm">-336.941</Z16>
 		<Z17 unit="cm">-339.10</Z17>
 		<Z18 unit="cm">-716.10</Z18>
-              <Z19 unit="cm">-716.10</Z19>
  
 		<R0 unit="cm">12.805</R0>
 		<R1 unit="cm">17.018</R1>
@@ -3189,7 +3188,6 @@
 		<R16 unit="cm">63.00</R16>
 		<R17 unit="cm">63.00</R17>
 		<R18 unit="cm">75.00</R18>
-              <R19 unit="cm">75.00</R19>
 
 		<Material>SUS316L</Material>
 		<Desc>Vacuum vessel</Desc>

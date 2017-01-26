@@ -39,6 +39,7 @@ if __name__ == "__main__":
 
     # Skip test if files are not available
     if not (os.path.isfile('train.root') and os.path.isfile('test.root')):
+        print("TEST SKIPPED: Not runnable on build bot", file=sys.stderr)
         sys.exit(0)
 
     general_options = basf2_mva.GeneralOptions()

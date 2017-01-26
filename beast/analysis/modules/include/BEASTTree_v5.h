@@ -183,6 +183,8 @@ namespace Belle2 {
       //std::vector<float> TPC_rate[2][5];/** */
       float TPC_rate_av[2][5];/** */
       float TPC_rate[2][5];/** */
+      float TPC_dose_av[2][5];/** */
+      float TPC_dose[2][5];/** */
 
       /**
        *.clear the structure: set elements to zero
@@ -271,6 +273,8 @@ namespace Belle2 {
             //TPC_rate[i][j].clear();
             TPC_rate_av[i][j] = 0;
             TPC_rate[i][j] = 0;
+            TPC_dose_av[i][j] = 0;
+            TPC_dose[i][j] = 0;
           }
         }
         CLAWS_rate_av.clear();

@@ -231,7 +231,8 @@ namespace Belle2 {
     std::string m_outputDigitsName;  /**< name of TOPDigit store array */
     std::string m_outputRawDigitsName;  /**< name of TOPRawDigit store array */
     std::string m_outputWaveformsName;  /**< name of TOPRawWaveform store array */
-    bool m_swapBytes;     /**< if true, swap bytes */
+    bool m_swapBytes = false;     /**< if true, swap bytes */
+    int m_dataFormat = 0;         /**< data format */
 
     TOP::TOPGeometryPar* m_topgp = TOP::TOPGeometryPar::Instance(); /**< geometry param */
 

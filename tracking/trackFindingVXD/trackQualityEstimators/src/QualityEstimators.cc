@@ -205,7 +205,7 @@ double QualityEstimators::circleFit(double& pocaPhi, double& pocaD, double& curv
 
 
 
-std::pair<double, TVector3> QualityEstimators::circleFit(const std::vector<PositionInfo*>* hits, bool useBackwards,
+std::pair<double, TVector3> QualityEstimators::circleFit(std::vector<PositionInfo*> const* hits, bool useBackwards,
                                                          double setMomentumMagnitude)
 {
   /** The following values are set by the circleFit.
@@ -292,7 +292,7 @@ std::pair<double, TVector3> QualityEstimators::circleFit(const std::vector<Posit
 /** does a tripletFit of the given hits
  * The filter is based on the paper 'A New Three-Dimensional Track Fit with Multiple Scattering'
  * by Andre Schoening et al. https://arxiv.org/abs/1606.04990*/
-std::pair<double, TVector3> QualityEstimators::tripletFit(const std::vector<PositionInfo*>* hits)
+std::pair<double, TVector3> QualityEstimators::tripletFit(std::vector<PositionInfo*> const* hits)
 {
   if (hits == NULL) { B2FATAL(" QualityEstimators::tripletFit hits not set, therefore no calculation possible - please check that!"); }
 

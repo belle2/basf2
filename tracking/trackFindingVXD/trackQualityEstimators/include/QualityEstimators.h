@@ -53,7 +53,7 @@ namespace Belle2 {
      * (first entry should be the outermost hit. Atm not needed yet, but relevant for possible
      * future changes where a dependency of related classes like the ThreeHitFilters expect a
      * sorted input that way) */
-    QualityEstimators(const std::vector<PositionInfo*>* hits, double magneticFieldStrength = 1.5):
+    QualityEstimators(std::vector<PositionInfo*> const* hits, double magneticFieldStrength = 1.5):
       m_hits(hits),
       m_radius(0),
       m_chi2(0)
@@ -73,7 +73,7 @@ namespace Belle2 {
     /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one.
      * Expects a vector of PostitionInof-structs (TVector3 formatted hits + their sigmaU and sigmaV)
      * ordered by magnitude in x-y where the first entry should be the outermost hit */
-    void resetValues(const std::vector<PositionInfo*>* hits)
+    void resetValues(std::vector<PositionInfo*> const* hits)
     {
       m_lineParameters.clear();
       m_hits = hits;
@@ -100,11 +100,11 @@ namespace Belle2 {
      * Pt-vector is for the innermost hit (= the last hit in 'hits', useBackwards = false)
      * or the outermost one (useBackwards = true)
      **/
-    std::pair<double, TVector3> circleFit(const std::vector<PositionInfo*>* hits, bool useBackwards = false,
+    std::pair<double, TVector3> circleFit(std::vector<PositionInfo*> const* hits, bool useBackwards = false,
                                           double setMomentumMagnitude = 0);
 
 
-    /** using circleFit(const std::vector<PositionInfo*>*, bool, double) to calculate the vector for the transverse momentum.
+    /** using circleFit to calculate the vector for the transverse momentum.
      *
      * It uses the standard-values of that member and fills it with the hits stored in current QualityEstimator-instance.
      * .first is the chi2-value of the fit
@@ -134,7 +134,7 @@ namespace Belle2 {
     /** does a tripletFit of the given hits
      * The filter is based on the paper 'A New Three-Dimensional Track Fit with Multiple Scattering'
      * by Andre Schoening et al. https://arxiv.org/abs/1606.04990*/
-    std::pair<double, TVector3> tripletFit(const std::vector<PositionInfo*>* hits);
+    std::pair<double, TVector3> tripletFit(std::vector<PositionInfo*> const* hits);
 
 
     /** As it seems to be customary to use another layer: */
@@ -142,7 +142,7 @@ namespace Belle2 {
 
 
     /** does a complete helixFit of the given hits */
-    std::pair<double, TVector3> helixFit(const std::vector<PositionInfo*>* hits, bool useBackwards = false,
+    std::pair<double, TVector3> helixFit(std::vector<PositionInfo*> const* hits, bool useBackwards = false,
                                          double setMomentumMagnitude = 0);
 
 
@@ -172,7 +172,7 @@ namespace Belle2 {
 
 
     /** straight line fits expecting the hits stored in a vector of PositionInfo */
-    std::pair<double, TVector3> simpleLineFit3D(const std::vector<PositionInfo*>* hits, bool useBackwards = false,
+    std::pair<double, TVector3> simpleLineFit3D(std::vector<PositionInfo*> const* hits, bool useBackwards = false,
                                                 double setMomentumMagnitude = 0);
 
 
@@ -187,17 +187,17 @@ namespace Belle2 {
 
     /** prints positions and sigmas of all hits in given vector of PositionInfos
      * TODO use SpacePoints instead of PositionInfo for all filters, SpacePoints shall get a print-Function */
-    std::string printHits(const std::vector<PositionInfo*>* hits) const ;
+    std::string printHits(std::vector<PositionInfo*> const* hits) const ;
 
 
   protected:
 
-    const std::vector<PositionInfo*>* m_hits; /**< stores hits using TVector3 format in a vector */
-    double m_radius; /**< stores radius of tracklet-circle */
-    double m_chi2; /**< stores chi2 of tracklet-circle */
-    int m_numHits; /**< stores number of hits for some speed optimizations */
-    std::vector<double> m_lineParameters; /**< position0: slopeYest, 1: interceptYest, 2: slopeZest: 3: interceptZest */
-    double m_bFieldZ = 0.; /**< value of z component of magnetic field. */
+    std::vector<PositionInfo*> const* m_hits;   /**< stores hits using TVector3 format in a vector */
+    double m_radius;                           /**< stores radius of tracklet-circle */
+    double m_chi2;                             /**< stores chi2 of tracklet-circle */
+    int m_numHits;                             /**< stores number of hits for some speed optimizations */
+    std::vector<double> m_lineParameters;      /**< position0: slopeYest, 1: interceptYest, 2: slopeZest: 3: interceptZest */
+    double m_bFieldZ = 0.;                     /**< value of z component of magnetic field. */
 
   }; //end class QualityEstimators
 } //end namespace Belle2

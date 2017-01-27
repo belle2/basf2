@@ -550,6 +550,11 @@ namespace Belle2 {
       return part->getMdstArrayIndex();
     }
 
+    double particleCosMdstArrayIndex(const Particle* part)
+    {
+      return std::cos(part->getMdstArrayIndex());
+    }
+
     double particlePvalue(const Particle* part)
     {
       return part->getPValue();
@@ -1803,6 +1808,8 @@ namespace Belle2 {
                       "called connected - region(CR) track match");
     REGISTER_VARIABLE("mdstIndex", particleMdstArrayIndex,
                       "StoreArray index(0 - based) of the MDST object from which the Particle was created");
+    REGISTER_VARIABLE("CosMdstIndex", particleCosMdstArrayIndex,
+                      " Cosinus of StoreArray index(0 - based) of the MDST object from which the Particle was created. To be used for random ranking.");
 
     REGISTER_VARIABLE("pRecoil", recoilMomentum,
                       "magnitude of 3 - momentum recoiling against given Particle");

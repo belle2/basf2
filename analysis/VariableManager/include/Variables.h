@@ -212,6 +212,12 @@ namespace Belle2 {
     double particleMdstArrayIndex(const Particle* part);
 
     /**
+     * returns cosinus of StoreArray index (0-based) of the MDST object from which the Particle was created.
+     * To be used for random ranking.
+     */
+    double particleCosMdstArrayIndex(const Particle* part);
+
+    /**
      * return prob(chi^2,ndf) of fit
      */
     double particlePvalue(const Particle* part);

@@ -322,8 +322,8 @@ std::pair<double, TVector3> QualityEstimators::tripletFit(std::vector<PositionIn
     const double d12 = sqrt(d12sq);
     const double d02 = sqrt(d02sq);
 
-    const double z01 = hit1.Z() - hit0.Z();
-    const double z12 = hit2.Z() - hit1.Z();
+    const double z01 = std::abs(hit1.Z() - hit0.Z());
+    const double z12 = std::abs(hit2.Z() - hit1.Z());
 
     const double R_C = (d01 * d12 * d02) / sqrt(-d01sq * d01sq - d12sq * d12sq - d02sq * d02sq + 2 * d01sq * d12sq + 2 * d12sq * d02sq +
                                                 2 *
@@ -351,7 +351,7 @@ std::pair<double, TVector3> QualityEstimators::tripletFit(std::vector<PositionIn
     const double beta = (1 - alpha2) / (R3D2C * tan(theta2C)) - (1 - alpha1) / (R3D1C * tan(theta1C));
 
     // Calculation of sigmaMS
-    double bField = 1.5; // TODO Replace hard-coded value with database value;
+    double bField = getMagneticField();
 
     /** Using average material budged of SVD sensors for approximation of radiation length
      *  Belle II TDR page 156 states a value of 0.57% X_0.
@@ -359,7 +359,7 @@ std::pair<double, TVector3> QualityEstimators::tripletFit(std::vector<PositionIn
      */
     const double XoverX0 = 0.0057 / cos(M_PI / 2. - theta1C);
 
-    double R3D = - eta * PhiTilde * sin(theta) * sin(theta) + beta * ThetaTilde;
+    double R3D = - (eta * PhiTilde * sin(theta) * sin(theta) + beta * ThetaTilde);
     R3D *= 1. / (eta * eta * sin(theta) * sin(theta) + beta * beta);
     const double b = 4.5 / bField * sqrt(XoverX0);
     const double sigmaMS = b / R3D;

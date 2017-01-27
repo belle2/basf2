@@ -52,6 +52,9 @@ PXDDataRedAnalysisModule::PXDDataRedAnalysisModule() : Module()
   , m_rootFileName("")
   , m_writeToRoot(false)
   , m_rootEvent(-1)
+  //pxd sensors
+  , m_nSensorsL1(0)
+  , m_nSensorsL2(0)
   //efficiency graphs
   , m_gEff2(NULL)
   , m_gEff(NULL)
@@ -434,11 +437,46 @@ void PXDDataRedAnalysisModule::initialize()
 void PXDDataRedAnalysisModule::beginRun()
 {
   m_rootEvent = 0;
+
+  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+
+  std::set<Belle2::VxdID> pxdLayers = aGeometry.getLayers(VXD::SensorInfoBase::PXD);
+  std::set<Belle2::VxdID>::iterator itPxdLayers = pxdLayers.begin();
+
+  while ((itPxdLayers != pxdLayers.end()) && (itPxdLayers->getLayerNumber() != 7)) {
+
+    std::set<Belle2::VxdID> pxdLadders = aGeometry.getLadders(*itPxdLayers);
+    std::set<Belle2::VxdID>::iterator itPxdLadders = pxdLadders.begin();
+
+    while (itPxdLadders != pxdLadders.end()) {
+
+      std::set<Belle2::VxdID> pxdSensors = aGeometry.getSensors(*itPxdLadders);
+      std::set<Belle2::VxdID>::iterator itPxdSensors = pxdSensors.begin();
+
+      while (itPxdSensors != pxdSensors.end()) {
+
+        if (itPxdLadders->getLayerNumber() == 1)
+          m_nSensorsL1++;
+        if (itPxdLadders->getLayerNumber() == 2)
+          m_nSensorsL2++;
+
+        ++itPxdSensors;
+      }
+      ++itPxdLadders;
+    }
+    ++itPxdLayers;
+  }
+
+
 }
 
 
 void PXDDataRedAnalysisModule::event()
 {
+
+  B2RESULT("number of sensors on L1 = " << m_nSensorsL1 << ", and on L2 = " << m_nSensorsL2);
+
+
 
   typedef RelationIndex < RecoTrack, PXDIntercept>::range_from PXDInterceptsFromRecoTracks;
   typedef RelationIndex < RecoTrack, PXDIntercept>::iterator_from PXDInterceptIteratorType;
@@ -867,8 +905,8 @@ void PXDDataRedAnalysisModule::event()
 
   m_rootEvent++;
   m_h1totArea->Fill(totArea_L1 + totArea_L2);
-  double redFactor_L1 = totArea_L1 / 768. / 250. / 40.; //18
-  double redFactor_L2 = totArea_L2 / 768. / 250. / 40.; //22
+  double redFactor_L1 = totArea_L1 / 768. / 250. / (m_nSensorsL1 + m_nSensorsL2); //18
+  double redFactor_L2 = totArea_L2 / 768. / 250. / (m_nSensorsL1 + m_nSensorsL2); //22
   m_h1redFactor->Fill((double) redFactor_L1 + redFactor_L2);
   m_h1redFactor_L1->Fill((double) redFactor_L1);
   m_h1redFactor_L2->Fill((double) redFactor_L2);

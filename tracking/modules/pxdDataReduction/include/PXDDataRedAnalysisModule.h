@@ -73,6 +73,10 @@ namespace Belle2 {
 
     int m_rootEvent;   /**<  event number*/
 
+    //pxd sensor number
+    Int_t m_nSensorsL1; /**<  number of sensors on L1*/
+    Int_t m_nSensorsL2; /**<  number of sensors on L2*/
+
     //graphs & histos - results
     Double_t pt[6]  = {0.05, 0.15, 0.25, 0.4, 0.75, 1.5}; /**< bin edges (in pt = transverse momentum)*/
     Double_t ptErr[6] = { 0.05, 0.05, 0.05, 0.1, 0.25, 0.5}; /**< bin widths (transverse momentum) */

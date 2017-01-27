@@ -80,7 +80,7 @@ setup_VXDTF2(path=path,
              use_pxd=usePXD,
              secmap_name=secmap_name,
              overlap_filter='hopfield',
-             quality_estimator='tripletFit')  # 'circleFit')
+             quality_estimator='circleFit')
 
 
 if performFit:

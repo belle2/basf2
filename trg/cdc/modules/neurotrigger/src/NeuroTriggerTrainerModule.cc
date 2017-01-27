@@ -333,7 +333,7 @@ void NeuroTriggerTrainerModule::event()
           continue;
         }
         // check hit pattern
-        unsigned long hitPattern = m_NeuroTrigger.getInputPattern(isector);
+        unsigned long hitPattern = m_NeuroTrigger.getInputPattern(isector, *tracks[itrack]);
         unsigned long sectorPattern = m_NeuroTrigger[isector].getSLpattern();
         B2DEBUG(250, "hitPattern " << hitPattern << " sectorPattern " << sectorPattern);
         if (sectorPattern > 0 && (sectorPattern & hitPattern) != sectorPattern) {

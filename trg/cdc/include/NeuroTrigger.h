@@ -141,9 +141,10 @@ namespace Belle2 {
 
     /** Calculate input pattern for MLP.
      * @param isector index of the MLP that will use the input
+     * @param track   axial hit relations are taken from given track
      * @return super layer pattern of hits in the current track
      */
-    unsigned long getInputPattern(unsigned isector);
+    unsigned long getInputPattern(unsigned isector, const CDCTriggerTrack& track);
 
     /** Select best hits for each super layer
      * @param isector              index of the MLP that will use the input

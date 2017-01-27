@@ -156,7 +156,7 @@ namespace TrgTest {
       }
       for (unsigned isector = 0; isector < p.nMLP; ++isector) {
         // check hit pattern
-        unsigned long hitPattern = neuroTrigger.getInputPattern(isector);
+        unsigned long hitPattern = neuroTrigger.getInputPattern(isector, *track);
         unsigned long sectorPattern = neuroTrigger[isector].getSLpattern();
         bool useForTrain = ((hitPattern & sectorPattern) == sectorPattern);
         bool useForTest = (hitPattern == sectorPattern);

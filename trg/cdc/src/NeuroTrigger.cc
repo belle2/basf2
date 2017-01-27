@@ -265,7 +265,7 @@ NeuroTrigger::selectMLP(const CDCTriggerTrack& track)
   for (unsigned isector = 0; isector < m_MLPs.size(); ++isector) {
     if (m_MLPs[isector].inPhiRange(phi0) && m_MLPs[isector].inInvptRange(invpt)
         && m_MLPs[isector].inThetaRange(theta)) {
-      unsigned long hitPattern = getInputPattern(isector);
+      unsigned long hitPattern = getInputPattern(isector, track);
       unsigned long sectorPattern = m_MLPs[isector].getSLpattern();
       B2DEBUG(250, "hitPattern " << hitPattern << " sectorPattern " << sectorPattern);
       // no hit pattern restriction -> keep looking for exact match
@@ -386,16 +386,41 @@ NeuroTrigger::getRelId(const CDCTriggerSegmentHit& hit)
 }
 
 unsigned long
-NeuroTrigger::getInputPattern(unsigned isector)
+NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track)
 {
   StoreArray<CDCTriggerSegmentHit> hits;
   CDCTriggerMLP& expert = m_MLPs[isector];
   unsigned long hitPattern = 0;
   vector<unsigned> nHits;
   nHits.assign(9, 0);
-  // loop over hits
+  // loop over axial hits related to input track
+  RelationVector<CDCTriggerSegmentHit> axialHits =
+    track.getRelationsTo<CDCTriggerSegmentHit>();
+  for (unsigned ihit = 0; ihit < axialHits.size(); ++ ihit) {
+    // skip hits with negative relation weight (not selected in finder)
+    if (axialHits.weight(ihit) < 0) continue;
+    unsigned short iSL = axialHits[ihit]->getISuperLayer();
+    // skip stereo hits (should not be related to track, but check anyway)
+    if (iSL % 2 == 1) continue;
+    // get priority time (TODO: get event time)
+    int t = axialHits[ihit]->priorityTime();
+    if (t < 0 || t > expert.getTMax()) continue;
+    double relId = getRelId(*axialHits[ihit]);
+    if (expert.isRelevant(relId, iSL)) {
+      if (nHits[iSL] < expert.getMaxHitsPerSL()) {
+        hitPattern |= 1 << (iSL + 9 * nHits[iSL]);
+        ++nHits[iSL];
+      }
+      B2DEBUG(250, "hit in SL " << iSL);
+    } else {
+      B2DEBUG(250, "hit in SL " << iSL << " not relevant (relId = " << relId << ")");
+    }
+  }
+  // loop over stereo hits
   for (int ihit = 0; ihit < hits.getEntries(); ++ ihit) {
     unsigned short iSL = hits[ihit]->getISuperLayer();
+    // skip axial hits
+    if (iSL % 2 == 0) continue;
     // get priority time (TODO: get event time)
     int t = hits[ihit]->priorityTime();
     if (t < 0 || t > expert.getTMax()) continue;
@@ -406,6 +431,8 @@ NeuroTrigger::getInputPattern(unsigned isector)
         ++nHits[iSL];
       }
       B2DEBUG(250, "hit in SL " << iSL);
+    } else {
+      B2DEBUG(250, "hit in SL " << iSL << " not relevant (relId = " << relId << ")");
     }
   }
   B2DEBUG(250, "hitPattern " << hitPattern);

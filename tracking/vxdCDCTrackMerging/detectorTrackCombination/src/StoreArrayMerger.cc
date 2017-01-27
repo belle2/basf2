@@ -15,6 +15,23 @@
 
 using namespace Belle2;
 
+namespace {
+  /// Helper function to get the seed or the measured state on plane from a track
+  void extractTrackState(const RecoTrack& recoTrack, TVector3& position, TVector3& momentum, int& charge)
+  {
+    if (recoTrack.getRepresentations().empty() or not recoTrack.wasFitSuccessful()) {
+      position = recoTrack.getPositionSeed();
+      momentum = recoTrack.getMomentumSeed();
+      charge = recoTrack.getChargeSeed();
+    } else {
+      const auto& measuredStateOnPlane = recoTrack.getMeasuredStateOnPlaneFromFirstHit();
+      position = measuredStateOnPlane.getPos();
+      momentum = measuredStateOnPlane.getMom();
+      charge = measuredStateOnPlane.getCharge();
+    }
+  }
+}
+
 void StoreArrayMerger::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   // input
@@ -66,33 +83,40 @@ void StoreArrayMerger::apply()
 
     auto relatedCDCRecoTrack = currentVXDTrack.getRelated<RecoTrack>(m_param_cdcRecoTrackStoreArrayName);
 
-    //add related RecoTracks to VXD tracks if merging was successful
+    // vxd position will be filled with seed or fitted position.
+    TVector3 vxdPosition;
+    TVector3 vxdMomentum;
+    int vxdCharge;
+
+    extractTrackState(currentVXDTrack, vxdPosition, vxdMomentum, vxdCharge);
+
+    // add related RecoTracks to VXD tracks if merging was successful
     if (relatedCDCRecoTrack) {
       // We construct a helix out of the CDC track parameter and "extrapolate" it to the vxd start position to get
       // the momentum right
-      // TODO: If the track was already fitted, it may be better to just use the fitted position here...
-      const auto& vxdPosition = currentVXDTrack.getPositionSeed();
-      const auto& cdcPosition = relatedCDCRecoTrack->getPositionSeed();
-      const auto& cdcMomentum = relatedCDCRecoTrack->getMomentumSeed();
-      const auto& charge = relatedCDCRecoTrack->getChargeSeed();
+      TVector3 cdcPosition;
+      TVector3 cdcMomentum;
+      int cdcCharge;
+
+      extractTrackState(*relatedCDCRecoTrack, cdcPosition, cdcMomentum, cdcCharge);
 
       const auto bField = BFieldManager::getField(cdcPosition).Z();
 
-      const Helix cdcHelix(cdcPosition, cdcMomentum, charge, bField);
+      const Helix cdcHelix(cdcPosition, cdcMomentum, cdcCharge, bField);
       const double arcLengthOfVXDPosition = cdcHelix.getArcLength2DAtXY(vxdPosition.X(), vxdPosition.Y());
 
-      const auto& momentum = cdcHelix.getMomentumAtArcLength2D(arcLengthOfVXDPosition, bField);
+      const auto& extrapolatedMomentum = cdcHelix.getMomentumAtArcLength2D(arcLengthOfVXDPosition, bField);
 
       auto newRecoTrack = m_mergedRecoTracks.appendNew(vxdPosition,
-                                                       momentum,
-                                                       charge);
+                                                       extrapolatedMomentum,
+                                                       cdcCharge);
       newRecoTrack->addHitsFromRecoTrack(&currentVXDTrack);
       newRecoTrack->addHitsFromRecoTrack(relatedCDCRecoTrack, newRecoTrack->getNumberOfTotalHits());
     } else {
       // And not if not...
-      auto newRecoTrack = m_mergedRecoTracks.appendNew(currentVXDTrack.getPositionSeed(),
-                                                       currentVXDTrack.getMomentumSeed(),
-                                                       currentVXDTrack.getChargeSeed());
+      auto newRecoTrack = m_mergedRecoTracks.appendNew(vxdPosition,
+                                                       vxdMomentum,
+                                                       vxdCharge);
       newRecoTrack->addHitsFromRecoTrack(&currentVXDTrack);
     }
   }
@@ -101,8 +125,14 @@ void StoreArrayMerger::apply()
   for (const auto& currentCDCTrack : m_cdcRecoTracks) {
     auto relatedVXDRecoTrack = currentCDCTrack.getRelated<RecoTrack>(m_param_vxdRecoTrackStoreArrayName);
     if (not relatedVXDRecoTrack) {
-      auto newRecoTrack = m_mergedRecoTracks.appendNew(currentCDCTrack.getPositionSeed(), currentCDCTrack.getMomentumSeed(),
-                                                       currentCDCTrack.getChargeSeed());
+      TVector3 cdcPosition;
+      TVector3 cdcMomentum;
+      int cdcCharge;
+
+      extractTrackState(currentCDCTrack, cdcPosition, cdcMomentum, cdcCharge);
+
+      auto newRecoTrack = m_mergedRecoTracks.appendNew(cdcPosition, cdcMomentum,
+                                                       cdcCharge);
       newRecoTrack->addHitsFromRecoTrack(&currentCDCTrack);
     }
   }

@@ -29,8 +29,8 @@ namespace Belle2 {
     {
       int version = pt.get<int>("Python_version");
       if (version != 1) {
-        B2ERROR("Unkown weightfile version " << std::to_string(version));
-        throw std::runtime_error("Unkown weightfile version " + std::to_string(version));
+        B2ERROR("Unknown weightfile version " << std::to_string(version));
+        throw std::runtime_error("Unknown weightfile version " + std::to_string(version));
       }
       m_framework = pt.get<std::string>("Python_framework");
       m_steering_file = pt.get<std::string>("Python_steering_file");
@@ -68,7 +68,7 @@ namespace Belle2 {
     }
 
     /**
-    Singleton class which handles the initalization and finalization of Python
+    Singleton class which handles the initialization and finalization of Python
         and numpy
     */
     class PythonInitializerSingleton {
@@ -119,7 +119,7 @@ namespace Belle2 {
       PythonInitializerSingleton(const PythonInitializerSingleton&) = delete;
 
       /**
-        Helper funtion which initalizes array system of numpy.
+        Helper funtion which initializes array system of numpy.
         Since import_array is a weird macro we need this wrapper function
         to protect us from the return statement in this macro
       */
@@ -164,7 +164,7 @@ namespace Belle2 {
 
       uint64_t batch_size = m_specific_options.m_mini_batch_size;
       if (batch_size == 0) {
-        batch_size = numberOfEvents;
+        batch_size = numberOfTrainingEvents;
       }
 
       if (m_specific_options.m_training_fraction <= 0.0 or m_specific_options.m_training_fraction > 1.0) {

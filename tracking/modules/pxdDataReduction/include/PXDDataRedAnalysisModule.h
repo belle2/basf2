@@ -101,6 +101,9 @@ namespace Belle2 {
     TH1F* m_h1Track_lambda; /**< denominator track lambda*/
     TH1F* m_h1Track_Theta; /**< denominator track cosTheta*/
     TH1F* m_h1Track_cosTheta; /**< denominator track cosTheta*/
+    TH1F* m_h1Track_pVal; /**< denominator track pVal*/
+    TH1F* m_h1Track_nSVDhits; /**< denominator track pVal*/
+    TH1F* m_h1Track_nCDChits; /**< denominator track pVal*/
 
     TH1F* m_h1INtrack1; /**< track with no intercept  */
     TH1F* m_h1INtrack1_pt; /**<  track with no intercept pT*/
@@ -108,6 +111,9 @@ namespace Belle2 {
     TH1F* m_h1INtrack1_lambda; /**< track with no intercept lambda*/
     TH1F* m_h1INtrack1_Theta; /**< track with no intercept costheta*/
     TH1F* m_h1INtrack1_cosTheta; /**< track with no intercept costheta*/
+    TH1F* m_h1INtrack1_pVal; /**< denominator track pVal*/
+    TH1F* m_h1INtrack1_nSVDhits; /**< denominator track pVal*/
+    TH1F* m_h1INtrack1_nCDChits; /**< denominator track pVal*/
 
     TH1F* m_h1notINtrack2; /**< track with no intercept  */
     TH1F* m_h1notINtrack2_pt; /**<  track with no intercept pT*/
@@ -115,6 +121,9 @@ namespace Belle2 {
     TH1F* m_h1notINtrack2_lambda; /**< track with no intercept lambda*/
     TH1F* m_h1notINtrack2_Theta; /**< track with no intercept costheta*/
     TH1F* m_h1notINtrack2_cosTheta; /**< track with no intercept costheta*/
+    TH1F* m_h1notINtrack2_pVal; /**< denominator track pVal*/
+    TH1F* m_h1notINtrack2_nSVDhits; /**< denominator track pVal*/
+    TH1F* m_h1notINtrack2_nCDChits; /**< denominator track pVal*/
 
     TH1F* m_h1notINtrack5; /**< track with no intercept  */
     TH1F* m_h1notINtrack5_pt; /**<  track with no intercept pT*/
@@ -122,6 +131,9 @@ namespace Belle2 {
     TH1F* m_h1notINtrack5_lambda; /**< track with no intercept lambda*/
     TH1F* m_h1notINtrack5_Theta; /**< track with no intercept costheta*/
     TH1F* m_h1notINtrack5_cosTheta; /**< track with no intercept costheta*/
+    TH1F* m_h1notINtrack5_pVal; /**< denominator track pVal*/
+    TH1F* m_h1notINtrack5_nSVDhits; /**< denominator track pVal*/
+    TH1F* m_h1notINtrack5_nCDChits; /**< denominator track pVal*/
 
 
     //fill digits inside ROIs
@@ -193,6 +205,8 @@ namespace Belle2 {
     TH1F* m_h1totROIs; /**< distribution of number of all ROIs*/
     TH1F* m_h1okROIs; /**< distribution of number of ROIs containin a PXDDigit*/
     TH1F* m_h1redFactor; /**< distribution of number of ROIsreduction factor*/
+    TH1F* m_h1redFactor_L1; /**< distribution of number of ROIsreduction factor*/
+    TH1F* m_h1redFactor_L2; /**< distribution of number of ROIsreduction factor*/
     TH1F* m_h1totArea; /**< distribution of Area of all ROIs*/
     TH1F* m_h1okArea; /**< distribution of Area of ROIs containing a PXDDigit*/
 

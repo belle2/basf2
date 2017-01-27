@@ -69,18 +69,37 @@ PXDDataRedAnalysisModule::PXDDataRedAnalysisModule() : Module()
   , m_h1Track_phi(NULL)
   , m_h1Track_lambda(NULL)
   , m_h1Track_cosTheta(NULL)
+  , m_h1Track_pVal(NULL)
+  , m_h1Track_nSVDhits(NULL)
+  , m_h1Track_nCDChits(NULL)
   //tracks with at least one digit in ROI
   , m_h1INtrack1(NULL)
   , m_h1INtrack1_pt(NULL)
   , m_h1INtrack1_phi(NULL)
   , m_h1INtrack1_lambda(NULL)
   , m_h1INtrack1_cosTheta(NULL)
+  , m_h1INtrack1_pVal(NULL)
+  , m_h1INtrack1_nSVDhits(NULL)
+  , m_h1INtrack1_nCDChits(NULL)
+  //
+  , m_h1notINtrack2(NULL)
+  , m_h1notINtrack2_pt(NULL)
+  , m_h1notINtrack2_phi(NULL)
+  , m_h1notINtrack2_lambda(NULL)
+  , m_h1notINtrack2_Theta(NULL)
+  , m_h1notINtrack2_cosTheta(NULL)
+  , m_h1notINtrack2_pVal(NULL)
+  , m_h1notINtrack2_nSVDhits(NULL)
+  , m_h1notINtrack2_nCDChits(NULL)
   //tracks with no intercept
   , m_h1notINtrack5(NULL)
   , m_h1notINtrack5_pt(NULL)
   , m_h1notINtrack5_phi(NULL)
   , m_h1notINtrack5_lambda(NULL)
   , m_h1notINtrack5_cosTheta(NULL)
+  , m_h1notINtrack5_pVal(NULL)
+  , m_h1notINtrack5_nSVDhits(NULL)
+  , m_h1notINtrack5_nCDChits(NULL)
   //digits inside ROI
   , m_h1PullU(NULL)
   , m_h1PullV(NULL)
@@ -142,6 +161,8 @@ PXDDataRedAnalysisModule::PXDDataRedAnalysisModule() : Module()
   , m_h1totROIs(NULL)
   , m_h1okROIs(NULL)
   , m_h1redFactor(NULL)
+  , m_h1redFactor_L1(NULL)
+  , m_h1redFactor_L2(NULL)
 
   , m_h1totArea(NULL)
   , m_h1okArea(NULL)
@@ -331,7 +352,9 @@ void PXDDataRedAnalysisModule::initialize()
   m_h2MaplocL2_out5 = new TH2F("h2MaplocL2_out5", "L2 local u v ID", 1535, -767.5, 767.5, 250, -0.5, 249.5);
 
 
-  m_h1redFactor = new TH1F("hRedFactor", "reduction factor", 100, 0, 0.1);
+  m_h1redFactor = new TH1F("hRedFactor", "reduction factor", 1000, 0, 1);
+  m_h1redFactor_L1 = new TH1F("hRedFactor_L1", "L1 reduction factor", 1000, 0, 1);
+  m_h1redFactor_L2 = new TH1F("hRedFactor_L2", "L2 reduction factor", 1000, 0, 1);
 
   m_h1totROIs = new TH1F("h1TotNROIs", "number of all ROIs", 100, 0, 100);
   m_h1okROIs = new TH1F("h1OkNROIs", "number of all ROIs containing a PXDDigit", 100, 0, 100);
@@ -373,18 +396,27 @@ void PXDDataRedAnalysisModule::initialize()
   m_h1notINtrack5_phi = new TH1F("h1NoInterTrack_phi", "hNoInterTrack_phi", 100, -180, 180);
   m_h1notINtrack5_lambda = new TH1F("h1NoInterTrack_lambda", "hNoInterTrack_lambda", 100, -180, 180);
   m_h1notINtrack5_cosTheta = new TH1F("h1NoInterTrack_cosTheta", "hNoInterTrack_cosTheta", 100, -1, 1);
+  m_h1notINtrack5_pVal = new TH1F("hNoInterTrack_pVal", "track with no intercepts", 100, 0, 1);
+  m_h1notINtrack5_nSVDhits = new TH1F("hNoInterTrack_nSVDhits", "track with no intercepts", 50, 0, 50);
+  m_h1notINtrack5_nCDChits = new TH1F("hNoInterTrack_nCDChits", "track with no intercepts", 100, 0, 100);
 
   m_h1INtrack1 = new TH1F("hINTrack", "track with at least one digit inside ROI", 20, 0, 20);
   m_h1INtrack1_pt = new TH1F("hINTrack_pT", "track with at least one digit inside ROI", 100, 0, 6);
   m_h1INtrack1_phi = new TH1F("h1INTrack_phi", "hINTrack_phi", 100, -180, 180);
   m_h1INtrack1_lambda = new TH1F("h1INTrack_lambda", "hINTrack_lambda", 100, -180, 180);
   m_h1INtrack1_cosTheta = new TH1F("h1INTrack_cosTheta", "hINTrack_cosTheta", 100, -1, 1);
+  m_h1INtrack1_pVal = new TH1F("h1INTrack_pVal", "track with no intercepts", 100, 0, 1);
+  m_h1INtrack1_nSVDhits = new TH1F("h1INTrack_nSVDhits", "track with no intercepts", 50, 0, 50);
+  m_h1INtrack1_nCDChits = new TH1F("h1INTrack_nCDChits", "track with no intercepts", 100, 0, 100);
 
   m_h1Track = new TH1F("hTrack", "all tracks", 20, 0, 20);
   m_h1Track_pt = new TH1F("hTrack_pT", "all tracks with digits", 100, 0, 6);
   m_h1Track_lambda = new TH1F("h1Track_lambda", "hTrack_lambda", 100, -180, 180);
   m_h1Track_phi = new TH1F("h1Track_phi", "hTrack_phi", 100, -180, 180);
   m_h1Track_cosTheta = new TH1F("h1Track_cosTheta", "hTrack_cos theta", 100, -1, 1);
+  m_h1Track_pVal = new TH1F("h1Track_pVal", "track with no intercepts", 100, 0, 1);
+  m_h1Track_nSVDhits = new TH1F("h1Track_nSVDhits", "track with no intercepts", 50, 0, 50);
+  m_h1Track_nCDChits = new TH1F("h1Track_nCDChits", "track with no intercepts", 100, 0, 100);
 
   m_h1digiIn = new TH1F("hdigiIn", "digits inside ROI", 6, lowBin);
   m_h1digiOut2 = new TH1F("hdigiOut2", "ROI exists with with correct VxdID but no digits inside ROI", 6, lowBin);
@@ -427,7 +459,8 @@ void PXDDataRedAnalysisModule::event()
   B2DEBUG(1, "  ++++++++++++++ PXDDataRedAnalysisModule");
 
   int nROIs = 0;
-  int totArea = 0;
+  int totArea_L1 = 0;
+  int totArea_L2 = 0;
 
   //ROIs general
   StoreArray<ROIid> ROIList(m_ROIListName);
@@ -628,7 +661,11 @@ void PXDDataRedAnalysisModule::event()
 
 
                   m_h1okArea->Fill(tmpArea);
-                  totArea = totArea + tmpArea;
+                  if (VxdID(m_vxdIDmc).getLayerNumber() == 1) //L1
+                    totArea_L1 = totArea_L1 + tmpArea;
+                  if (VxdID(m_vxdIDmc).getLayerNumber() == 2) //L2
+                    totArea_L2 = totArea_L2 + tmpArea;
+
                   nROIs++;
 
 
@@ -829,9 +866,13 @@ void PXDDataRedAnalysisModule::event()
   n_tracksWithDigitsInROI += NtrackHit;
 
   m_rootEvent++;
-  m_h1totArea->Fill(totArea);
-  m_h1redFactor->Fill((double)totArea / 768. / 250. / 40.);
-  B2RESULT(" o  PXDDataReduction ANALYSIS: area = " << totArea << "  redFactor = " << (double)totArea / 768. / 250. / 40.);
+  m_h1totArea->Fill(totArea_L1 + totArea_L2);
+  double redFactor_L1 = totArea_L1 / 768. / 250. / 40.; //18
+  double redFactor_L2 = totArea_L2 / 768. / 250. / 40.; //22
+  m_h1redFactor->Fill((double) redFactor_L1 + redFactor_L2);
+  m_h1redFactor_L1->Fill((double) redFactor_L1);
+  m_h1redFactor_L2->Fill((double) redFactor_L2);
+  B2RESULT(" o  PXDDataReduction ANALYSIS: redFactor L1 = " << redFactor_L1 << ", redFactor L2 = " << redFactor_L2);
   B2RESULT(" o                           : NtrackHit/Ntrack = " << NtrackHit << "/ " << Ntrack << " = " <<
            (double)NtrackHit / Ntrack);
 
@@ -1165,6 +1206,8 @@ void PXDDataRedAnalysisModule::terminate()
     m_h1okROIs->Write();
     m_h1totROIs->Write();
     m_h1redFactor->Write();
+    m_h1redFactor_L1->Write();
+    m_h1redFactor_L2->Write();
 
     //    m_h2_VXDhitsPR_xy->Write();
     //    m_h2_VXDhitsPR_rz->Write();

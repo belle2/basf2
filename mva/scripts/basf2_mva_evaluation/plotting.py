@@ -237,6 +237,10 @@ class PurityAndEfficiencyOverCut(Plotter):
     """
     Plots the purity and the efficiency over the cut value (for cut choosing)
     """
+    #: @var xmax
+    #: Maximum x value
+    #: @var ymax
+    #: Maximum y value
 
     def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, normed=True):
         """
@@ -580,6 +584,8 @@ class Box(Plotter):
     """
     Create a boxplot
     """
+    #: @var x_axis_label
+    #: Label on x axis
 
     def add(self, data, column, mask=None, weight_column=None):
         """
@@ -640,6 +646,8 @@ class Difference(Plotter):
     #: Maximum y value
     #: @var ymin
     #: min y value
+    #: @var x_axis_label
+    #: Label on x axis
 
     def add(self, data, column, minuend_mask, subtrahend_mask, weight_column=None, shift_to_zero=False, label=None):
         """

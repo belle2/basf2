@@ -12,30 +12,64 @@ from basf2_mva_python_interface.tensorflow import State
 
 
 class Prior(object):
+    """
+    Calculates prior from signal and background pdfs of the fit variable
+    """
     def __init__(self, z, y):
+        """
+        Constructor of a new prior distribution
+            @param z fit variable
+            @param y target variable
+        """
+        #: signal cdf, pdf and binning
         self.signal_cdf, self.signal_pdf, self.signal_bins = calculate_cdf_and_pdf(z[y == 1])
+        #: background cdf, pdf and binning
         self.bckgrd_cdf, self.bckgrd_pdf, self.bckgrd_bins = calculate_cdf_and_pdf(z[y == 0])
         # Avoid numerical instabilities
         self.bckgrd_pdf[0] = self.bckgrd_pdf[-1] = 1
 
     def get_signal_pdf(self, X):
+        """
+        Calculate signal pdf for given fit variable value
+            @param X nd-array containing fit variable values
+        """
         return self.signal_pdf[np.digitize(X, bins=self.signal_bins)]
 
     def get_bckgrd_pdf(self, X):
+        """
+        Calculate background pdf for given fit variable value
+            @param X nd-array containing fit variable values
+        """
         return self.bckgrd_pdf[np.digitize(X, bins=self.bckgrd_bins)]
 
     def get_signal_cdf(self, X):
+        """
+        Calculate signal cdf for given fit variable value
+            @param X nd-array containing fit variable values
+        """
         return self.signal_cdf[np.digitize(X, bins=self.signal_bins)]
 
     def get_bckgrd_cdf(self, X):
+        """
+        Calculate background cdf for given fit variable value
+            @param X nd-array containing fit variable values
+        """
         return self.bckgrd_cdf[np.digitize(X, bins=self.bckgrd_bins)]
 
     def get_prior(self, X):
+        """
+        Calculate prior signal probability for given fit variable value
+            @param X nd-array containing fit variable values
+        """
         prior = self.get_signal_pdf(X) / (self.get_signal_pdf(X) + self.get_bckgrd_pdf(X))
         prior = np.where(np.isfinite(prior), prior, 0.5)
         return prior
 
     def get_boost_weights(self, X):
+        """
+        Calculate boost weights used in dplot boost training step
+            @param X nd-array containing fit variable values
+        """
         signal_weight = self.get_signal_cdf(X) / self.get_bckgrd_pdf(X)
         signal_weight = np.where(np.isfinite(signal_weight), signal_weight, 0)
         # NOT self.get_bckgrd_cdf() here, signal and background are handlet asymmetrical!
@@ -44,6 +78,11 @@ class Prior(object):
         return np.r_[signal_weight, bckgrd_weight]
 
     def get_uncorrelation_weights(self, X, boost_prediction):
+        """
+        Calculate uncorrelation weights used in dplot classifier training step
+            @param X nd-array containing fit variable values
+            @param boost_prediction output of the boost classifier
+        """
         reg_boost_prediction = boost_prediction * 0.99 + 0.005
         weights = (self.get_signal_cdf(X) / reg_boost_prediction +
                    (1.0 - self.get_signal_cdf(X)) / (1.0 - reg_boost_prediction)) / 2

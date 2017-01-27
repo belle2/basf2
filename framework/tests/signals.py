@@ -98,6 +98,8 @@ def run_test(init_signal, event_signal, abort, test_in_process):
 
         def event(self):
             """reimplementation of Module::event()."""
+            if init_signal:
+                B2FATAL("Processing should have been stopped in init!")
             if event_signal:
                 pid = os.getpid()
                 B2INFO("Killing %s in event (sig %d)" % (pid, event_signal))
@@ -152,9 +154,6 @@ for nproc in [0, 3]:
             raise
 
 set_log_level(LogLevel.INFO)
-
-# TODO add 'immediate_abort' condition
-#       test that signal in init aborts immediately, and the rest of the module's init function is not execetuded
 
 
 print("\n")

@@ -83,27 +83,15 @@ void QualityEstimatorVXDTripletFitModule::event()
     if (chi2 < 0) { B2WARNING("QualityEstimatorVXDTripletFitModule: event " << m_eventCounter << ": chi2 is reset to 0! (before: " << chi2 << ")"); chi2 = 0; }
 
     // Calculating a probaility from the Chi2 value which considers the degrees of freedom
-    // TODO: check degrees of freedom! Look at comment remaining from Jakobs circle fit!
+    // TODO: check degrees of freedom!
     double probability = TMath::Prob(chi2, 2 * nHits - 5);
 
-    B2WARNING("QualityEstimatorVXDTripletFitModule: event " << m_eventCounter
-              << ": TC " << nTC
-              << " with " << nHits
-              << " hits has pT: " << result.second.Perp()
-              << ", chi^2: " << chi2
-              << " and probability: " << probability);
-
-    std::pair<double, TVector3> CompResult = fitter.circleFit();
-    double CompChi2 = CompResult.first;
-    double CompProbability = TMath::Prob(CompChi2, nHits - 3);
-
-    B2WARNING("QualityEstimatorVXDTripletFitModule: event " << m_eventCounter
-              << " TripletChi2: " << chi2
-              << " CircleChi2: " << CompChi2
-              << " Triplet/Circle: " << chi2 / CompChi2
-              << " TripletProb: " << probability
-              << " CircleProb: " << CompProbability
-              << " Triplet/Circle: " << probability / CompProbability);
+    B2DEBUG(1, "QualityEstimatorVXDTripletFitModule: event " << m_eventCounter
+            << ": TC " << nTC
+            << " with " << nHits
+            << " hits has pT: " << result.second.Perp()
+            << ", chi^2: " << chi2
+            << " and probability: " << probability);
 
     aTC.setQualityIndex(probability);
     ++nTC;

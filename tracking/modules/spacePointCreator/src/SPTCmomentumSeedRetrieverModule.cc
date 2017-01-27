@@ -24,8 +24,6 @@ REG_MODULE(SPTCmomentumSeedRetriever)
 
 SPTCmomentumSeedRetrieverModule::SPTCmomentumSeedRetrieverModule() : Module()
 {
-  InitializeCounters();
-
   //Set module properties
   setDescription("A module for creating momentum seeds for spacepoint track candidates.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -36,7 +34,6 @@ SPTCmomentumSeedRetrieverModule::SPTCmomentumSeedRetrieverModule() : Module()
 }
 
 
-
 void SPTCmomentumSeedRetrieverModule::beginRun()
 {
   InitializeCounters();
@@ -45,7 +42,6 @@ void SPTCmomentumSeedRetrieverModule::beginRun()
   m_bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
   B2DEBUG(1, "SPTCmomentumSeedRetrieverModule:beginRun: B-Field z-component: " << m_bFieldZ);
 }
-
 
 
 void SPTCmomentumSeedRetrieverModule::event()
@@ -65,7 +61,6 @@ void SPTCmomentumSeedRetrieverModule::event()
 }
 
 
-
 void SPTCmomentumSeedRetrieverModule::endRun()
 {
   if (m_eventCounter == 0) { m_eventCounter++; } // prevents division by zero
@@ -75,7 +70,6 @@ void SPTCmomentumSeedRetrieverModule::endRun()
          << ", nSPTCsPerEvent: " << invEvents * float(m_nTCsTotal)
         );
 }
-
 
 
 //    unsigned int createSPTCmomentumSeeds(SPTCContainerType& tcContainer, std::vector<std::vector<const SpacePoint*> > allPaths)

@@ -28,7 +28,6 @@ namespace Belle2 {
 
   public:
 
-
     /**
      * Constructor of the module.
      */
@@ -44,13 +43,8 @@ namespace Belle2 {
     }
 
 
-    /**
-     * Prints a header for each new run.
-     */
-    virtual void beginRun()
-    {
-      InitializeCounters();
-    }
+    /** Prints a header for each new run. */
+    virtual void beginRun();
 
 
     /** Applies the tripletFit at given sets of TCs. */
@@ -69,21 +63,19 @@ namespace Belle2 {
 
     // module parameters
 
-
     /** sets the name of expected StoreArray with SpacePointTrackCand in it. */
     std::string m_PARAMtcArrayName;
 
-
     // member variables
 
+    /** Bz component of the magnetic field, will be updated runwise. */
+    double m_bFieldZ = 0.;
 
     /** knows current event number. */
     unsigned int m_eventCounter;
 
-
     /** total number of TCs found in SpacePointTrackCand-container. */
     unsigned int m_nTCsTotal;
-
 
     /** the storeArray for SpacePointTrackCands as member, is faster than recreating link for each event. */
     StoreArray<SpacePointTrackCand> m_spacePointTrackCands;

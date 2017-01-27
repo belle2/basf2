@@ -28,14 +28,11 @@ namespace Belle2 {
   public:
 
 
-    /**
-     * Constructor of the module.
-     */
+    /** Constructor of the module. */
     QualityEstimatorVXDCircleFitModule();
 
 
-    /** Initializes the Module.
-     */
+    /** Initializes the Module. */
     virtual void initialize()
     {
       InitializeCounters();
@@ -43,13 +40,8 @@ namespace Belle2 {
     }
 
 
-    /**
-     * Prints a header for each new run.
-     */
-    virtual void beginRun()
-    {
-      InitializeCounters();
-    }
+    /** Prints a header for each new run. */
+    virtual void beginRun();
 
 
     /** Applies the circleFit at given sets of TCs. */
@@ -75,6 +67,8 @@ namespace Belle2 {
 
     // member variables
 
+    /** Bz component of the magnetic field, will be updated runwise. */
+    double m_bFieldZ = 0.;
 
     /** knows current event number. */
     unsigned int m_eventCounter;

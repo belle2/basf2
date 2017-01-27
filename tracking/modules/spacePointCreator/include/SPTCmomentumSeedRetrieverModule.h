@@ -26,7 +26,6 @@ namespace Belle2 {
 
   public:
 
-
     /**
      * Constructor of the module.
      */
@@ -63,6 +62,7 @@ namespace Belle2 {
       m_nTCsTotal = 0;
     }
 
+
     /** Generates momentum seed at the position of innermost hit of given TC */
     bool createSPTCmomentumSeed(SpacePointTrackCand& aTC);
 
@@ -75,7 +75,6 @@ namespace Belle2 {
     /** sets default PDG code for all track candidate in this module. */
     /** WARNING hardcoded values so far, should be passed by parameter! */
     int m_PARAMstdPDGCode = 211;
-
 
     // member variables
 

@@ -23,17 +23,21 @@ REG_MODULE(QualityEstimatorVXDTripletFit)
 
 QualityEstimatorVXDTripletFitModule::QualityEstimatorVXDTripletFitModule() : Module()
 {
-  InitializeCounters();
-
   //Set module properties
   setDescription("The quality estimator module for SpacePointTrackCandidates using a circleFit.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
 
   addParam("tcArrayName", m_PARAMtcArrayName, " sets the name of expected StoreArray with SpacePointTrackCand in it", string(""));
-
 }
 
+
+void QualityEstimatorVXDTripletFitModule::beginRun()
+{
+  InitializeCounters();
+  // now retrieving the bfield value used in this module
+  m_bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+}
 
 
 void QualityEstimatorVXDTripletFitModule::event()
@@ -42,15 +46,8 @@ void QualityEstimatorVXDTripletFitModule::event()
   B2DEBUG(1, "\n" << "QualityEstimatorVXDTripletFitModule:event: event " << m_eventCounter << "\n");
   m_nTCsTotal += m_spacePointTrackCands.getEntries();
 
-
-  /** WARNING!
-   * Hardcoded values so far, should be passed by parameter (or be solved in a general way)!
-   **/
-
-  double bFieldValue = 1.5; /**< magnetic field. WARNING hardcoded! */
-
   auto fitter = QualityEstimators();
-  fitter.resetMagneticField(bFieldValue);
+  fitter.resetMagneticField(m_bFieldZ);
 
   unsigned nTC = 0;
   // assign a QI computed using a triplet fit for each given SpacePointTrackCand
@@ -99,7 +96,6 @@ void QualityEstimatorVXDTripletFitModule::event()
 }
 
 
-
 void QualityEstimatorVXDTripletFitModule::endRun()
 {
   if (m_eventCounter == 0) { m_eventCounter++; } // prevents division by zero
@@ -109,7 +105,6 @@ void QualityEstimatorVXDTripletFitModule::endRun()
          << ", nSPTCsPerEvent: " << invEvents * float(m_nTCsTotal)
         );
 }
-
 
 
 void QualityEstimatorVXDTripletFitModule::InitializeCounters()

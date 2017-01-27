@@ -160,6 +160,24 @@ void ARICHDatabaseImporter::importModulesInfo()
 
 }
 
+void ARICHDatabaseImporter::setHAPDQE(unsigned modID, double qe, bool import)
+{
+
+  DBObjPtr<ARICHModulesInfo> modInfo;
+  if (modID < 1 || modID > 420) { B2ERROR("Module ID out of range!"); return;}
+
+  for (int k = 0; k < 144; k++) {
+    modInfo->setChannelQE(modID, k, qe);
+  }
+
+  if (import) {
+    IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+    DBImportObjPtr<ARICHModulesInfo> importObj;
+    importObj.construct(*modInfo);
+    importObj.import(iov);
+  }
+}
+
 
 void ARICHDatabaseImporter::importChannelMask()
 {

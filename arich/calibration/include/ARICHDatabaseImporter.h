@@ -72,6 +72,11 @@ namespace Belle2 {
     void printModulesInfo();
 
     /**
+     *  Example function for importing HAPD QE to database class (ARICHModulesInfo)
+     */
+    void setHAPDQE(unsigned modID, double qe = 0.27, bool import = false);
+
+    /**
      * Import channel mask for all HAPD modules from the database (list of dead channels)
      * Goes through the list of installed modules in ARICH-InstalledModules.xml,
      * finds corresponding lists of dead channels in the database and imports lightweight

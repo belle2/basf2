@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Felix Metzner                                            *
+ * Contributors: Jakob Lettenbichler, Felix Metzner                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,10 +11,13 @@
 #pragma once
 
 #include "tracking/vxdCaTracking/FilterExceptions.h"
-#include <tuple>
+
 #include <TVector3.h>
-#include <vector>
+
 #include <boost/assign/std/vector.hpp>
+
+#include <tuple>
+#include <vector>
 #include <array>
 
 

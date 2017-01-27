@@ -3,16 +3,21 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Felix Metzner                                            *
+ * Contributors: Jakob Lettenbichler, Felix Metzner                       *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-//fw
 #include "tracking/trackFindingVXD/trackQualityEstimators/QualityEstimators.h"
 #include <framework/logging/Logger.h>
 
-// c++-base/stl:
+#include <TMathBase.h>
+#include <TMatrixD.h>
+#include <TMatrixDEigen.h>
+
+#include <boost/math/special_functions/fpclassify.hpp>
+#include <boost/math/special_functions/sign.hpp>
+
 #include <list>
 #include <iostream>
 #include <limits>
@@ -21,16 +26,6 @@
 #include <fstream>
 #include <iomanip>
 #include <utility>
-
-// root
-#include <TMathBase.h>
-#include <TMatrixD.h>
-#include <TMatrixDEigen.h>
-
-// boost
-#include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/math/special_functions/sign.hpp>
-
 
 using namespace std;
 using namespace Belle2;

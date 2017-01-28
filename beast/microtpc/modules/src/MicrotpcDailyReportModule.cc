@@ -291,7 +291,7 @@ void MicrotpcDailyReportModule::event()
       h_tpc_rates->Fill((det * 5 + 4));
       type = 4;
     }
-    if (type != -1) {
+    if (type != -1 && Inside) {
       tpc_dose[det][type] += esum;
       h_tpc_doses[det * 5 + type]->Fill(t, tpc_dose[det][type]);
     }

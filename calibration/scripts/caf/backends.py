@@ -224,13 +224,17 @@ class Local(Backend):
         The function that is used by multiprocessing.Pool.map during process creation. This runs a
         shell command in a subprocess and captures the stdout and stderr of the subprocess to files.
         """
+        from subprocess import PIPE, STDOUT, Popen
         stdout_file_path = os.path.join(job.output_dir, 'stdout')
-        stderr_file_path = os.path.join(job.output_dir, 'stderr')
-        # Open the stdout and stderr for redirection of subprocess
-        with open(stdout_file_path, 'w') as f_out, open(stderr_file_path, 'w') as f_err:
-            B2INFO('Starting Sub Process: {0}'.format(job.name))
-            subprocess.run(job.cmd, shell=False, stdout=f_out, stderr=f_err, cwd=job.working_dir)
-            B2INFO('Sub Process {0} Finished.'.format(job.name))
+        # Create unix command to redirect stdour and stderr
+        B2INFO(" ".join(job.cmd))
+        B2INFO('Starting Sub Process: {0}'.format(job.name))
+        B2INFO('Log files for SubProcess {0} visible at:\n\t{1}'.format(job.name, stdout_file_path))
+        with open(stdout_file_path, 'w', buffering=1) as f_out:
+            with Popen(job.cmd, stdout=PIPE, stderr=STDOUT, bufsize=1, universal_newlines=True, cwd=job.working_dir) as p:
+                for line in p.stdout:
+                    print(line, end='', file=f_out)
+        B2INFO('Sub Process {0} Finished.'.format(job.name))
 
 
 class PBS(Backend):

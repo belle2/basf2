@@ -115,7 +115,27 @@ namespace Belle2 {
      */
     G4Polycone* createRotationSolid(const std::string& name, const GearDir& params, double& minZ, double& maxZ);
 
-
+    /** Create a solid by roating two polylines around the Z-Axis.
+     * This function will create a polycone shape. The InnerPoints
+     * and OuterPoints are passed directly as stl::lists to avoid dependence on
+     * gearbox.
+     *
+     * Where OuterPoints and InnerPoints specify a polyline which is the outer
+     * respective inner envelope of the Polycone. The number of points does
+     * not have to be the same for Outer- and InnerPoints. Needed positions
+     * will be interpolated when creating the Polycone.
+     *
+     * The Positions for Outer- and InnerPoints have to be in ascending Z
+     * coordinates. The first and last point of OuterPoints will be connected to the
+     * first respective last point of InnerPoints. The resulting shape will be
+     * rotated around the z axis to create the polycone.
+     *
+     * @param name Name of the Solid
+     * @param innerPoints List of inner points
+     * @param outerPoints List of outer points
+     * @param[out] minZ will contain the minimal z coordinate of the polycone
+     * @param[out] maxZ will contain the maximal z coordinate of the polycone
+     */
     G4Polycone* createRotationSolid(const std::string& name,
                                     std::list< std::pair<double, double> > innerPoints,
                                     std::list< std::pair<double, double> > outerPoints,

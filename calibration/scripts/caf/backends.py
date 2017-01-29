@@ -186,20 +186,28 @@ class Local(Backend):
                     shutil.copy(file_path, job.working_dir)
 
         # Check if we have any valid input files
-        existing_input_files = []
-        for input_file_path in job.input_files:
-            if input_file_path[:7] != "root://":
-                if os.path.exists(input_file_path):
-                    existing_input_files.append(input_file_path)
+        existing_input_files = set()
+        for input_file_pattern in job.input_files:
+            if input_file_pattern[:7] != "root://":
+                input_files = glob.glob(input_file_pattern)
+                if not input_files:
+                    B2WARNING("No files matching {0} can be found, it will be skipped!".format(input_file_pattern))
                 else:
-                    B2WARNING("Requested local input file {0} can't be found, it will be skipped!".format(input_file_path))
+                    for file_path in input_files:
+                        file_path = os.path.abspath(file_path)
+                        if os.path.isfile(file_path):
+                            existing_input_files.add(file_path)
             else:
-                existing_input_files.append(input_file_path)
+                B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
+                        " before collector submission.".format(input_file_path)))
+                existing_input_files.add(input_file_path)
 
         if existing_input_files:
             # Now make a python file in our input sandbox containing a list of these valid files
             with open(os.path.join(job.working_dir, 'input_data_files.data'), 'bw') as input_data_file:
-                pickle.dump(existing_input_files, input_data_file)
+                pickle.dump(list(existing_input_files), input_data_file)
+        else:
+            B2FATAL("No valid input files found for job {0}".format(job.name))
 
         result = Local.Result(job, pool.apply_async(Local.run_job, (job,)))
         B2INFO('Job {0} submitted'.format(job.name))
@@ -417,20 +425,28 @@ class PBS(Backend):
                     shutil.copy(file_path, job.working_dir)
 
         # Check if we have any valid input files
-        existing_input_files = []
-        for input_file_path in job.input_files:
-            if input_file_path[:7] != "root://":
-                if os.path.exists(input_file_path):
-                    existing_input_files.append(input_file_path)
+        existing_input_files = set()
+        for input_file_pattern in job.input_files:
+            if input_file_pattern[:7] != "root://":
+                input_files = glob.glob(input_file_pattern)
+                if not input_files:
+                    B2WARNING("No files matching {0} can be found, it will be skipped!".format(input_file_pattern))
                 else:
-                    B2WARNING("Requested local input file {0} can't be found, it will be skipped!".format(input_file_path))
+                    for file_path in input_files:
+                        file_path = os.path.abspath(file_path)
+                        if os.path.isfile(file_path):
+                            existing_input_files.add(file_path)
             else:
-                existing_input_files.append(input_file_path)
+                B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
+                        " before collector submission.".format(input_file_path)))
+                existing_input_files.add(input_file_path)
 
         if existing_input_files:
             # Now make a python file in our input sandbox containing a list of these valid files
             with open(os.path.join(job.working_dir, 'input_data_files.data'), 'bw') as input_data_file:
-                pickle.dump(existing_input_files, input_data_file)
+                pickle.dump(list(existing_input_files), input_data_file)
+        else:
+            B2FATAL("No valid input files found for job {0}".format(job.name))
 
         # If the user hasn't explicitly set the basf2_setup attribute, then do the default here from the config values
         if not self.basf2_setup:
@@ -640,20 +656,28 @@ class LSF(Backend):
                     shutil.copy(file_path, job.working_dir)
 
         # Check if we have any valid input files
-        existing_input_files = []
-        for input_file_path in job.input_files:
-            if input_file_path[:7] != "root://":
-                if os.path.exists(input_file_path):
-                    existing_input_files.append(input_file_path)
+        existing_input_files = set()
+        for input_file_pattern in job.input_files:
+            if input_file_pattern[:7] != "root://":
+                input_files = glob.glob(input_file_pattern)
+                if not input_files:
+                    B2WARNING("No files matching {0} can be found, it will be skipped!".format(input_file_pattern))
                 else:
-                    B2INFO("Requested local input file {0} can't be found, it will be skipped!".format(input_file_path))
+                    for file_path in input_files:
+                        file_path = os.path.abspath(file_path)
+                        if os.path.isfile(file_path):
+                            existing_input_files.add(file_path)
             else:
-                existing_input_files.append(input_file_path)
+                B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
+                        " before collector submission.".format(input_file_path)))
+                existing_input_files.add(input_file_path)
 
         if existing_input_files:
             # Now make a python file in our input sandbox containing a list of these valid files
             with open(os.path.join(job.working_dir, 'input_data_files.data'), 'bw') as input_data_file:
-                pickle.dump(existing_input_files, input_data_file)
+                pickle.dump(list(existing_input_files), input_data_file)
+        else:
+            B2FATAL("No valid input files found for job {0}".format(job.name))
 
         # If the user hasn't explicitly set the basf2_setup attribute, then do the default here from the config values
         if not self.basf2_setup:

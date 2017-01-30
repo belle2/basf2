@@ -16,22 +16,17 @@
 
 namespace Belle2 {
 
-  class GearDir;
-
-
   /**
   * The Class for VXD Polycone Plane
   */
 
   class VXDPolyConePlanePar: public TObject {
   public:
+    /** Constructor */
+    VXDPolyConePlanePar(double posZ = 0, double innerRadius = 0, double outerRadius = 0):
+      m_posZ(posZ), m_innerRadius(innerRadius), m_outerRadius(outerRadius)
+    {}
 
-    //! Default constructor
-    VXDPolyConePlanePar() {}
-    //! Constructor using Gearbox
-    explicit VXDPolyConePlanePar(const GearDir& content) { read(content); }
-    //! Read parameters from Gearbox
-    void read(const GearDir&);
     //! Get PosZ in mm
     double getPosZ(void) const { return m_posZ; }
     //! Get InnerRadius in mm
@@ -57,17 +52,17 @@ namespace Belle2 {
 
   class VXDPolyConePar: public TObject {
   public:
+    /** Constructor */
+    VXDPolyConePar(const std::string& name = "", const std::string& material = "", double minPhi = 0, double maxPhi = 0,
+                   bool doCutOut = false, double cutOutWidth = 0, double cutOutHeight = 0, double cutOutDepth = 0):
+      m_name(name), m_material(material), m_minPhi(minPhi), m_maxPhi(maxPhi), m_doCutOut(doCutOut), m_cutOutWidth(cutOutWidth),
+      m_cutOutHeight(cutOutHeight), m_cutOutDepth(cutOutDepth)
+    {}
 
-    //! Default constructor
-    VXDPolyConePar() {}
-    //! Constructor using Gearbox
-    explicit VXDPolyConePar(const GearDir& content) { read(content); }
-    //! Read parameters from Gearbox
-    void read(const GearDir&);
     //! Get name
     std::string getName(void) const { return m_name; }
     //! Get material name
-    std::string getMaterial(void) const { return m_materialName; }
+    std::string getMaterial(void) const { return m_material; }
     //! Get MinPhi in rad
     double getMinPhi(void) const { return m_minPhi; }
     //! Get MaxPhi in rad
@@ -81,17 +76,19 @@ namespace Belle2 {
     //! Get CutOut Depth in mm
     double getCutOutDepth(void) const { return m_cutOutDepth; }
     //! Get planes
-    std::vector<VXDPolyConePlanePar> getPlanes(void) const { return m_planes; }
+    std::vector<VXDPolyConePlanePar>& getPlanes(void) { return m_planes; }
+    //! Get planes
+    const std::vector<VXDPolyConePlanePar>& getPlanes(void) const { return m_planes; }
 
   private:
     //! Name
     std::string m_name;
+    //! Material name
+    std::string m_material;
     //! minPhi in rad
     double m_minPhi;
     //! maxPhi in rad
     double m_maxPhi;
-    //! Material name
-    std::string m_materialName;
     //! doCutOut flag
     bool m_doCutOut;
     //! CutOut Width in mm

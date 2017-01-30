@@ -17,9 +17,6 @@
 
 namespace Belle2 {
 
-  class GearDir;
-
-
   /**
   * The Class for VXD Heavy Metal Shield
   */
@@ -29,12 +26,11 @@ namespace Belle2 {
 
     //! Default constructor
     HeavyMetalShieldGeometryPar() {}
-    //! Constructor using Gearbox
-    explicit HeavyMetalShieldGeometryPar(const GearDir& content) { read(content); }
-    //! Read parameters from Gearbox
-    void read(const GearDir&);
     //! Get shields
-    std::vector<VXDPolyConePar> getShields(void) const { return m_shields; }
+    std::vector<VXDPolyConePar>& getShields(void) { return m_shields; }
+    //! Get shields
+    const std::vector<VXDPolyConePar>& getShields(void) const { return m_shields; }
+
 
   private:
     //! Shields

@@ -26,7 +26,26 @@ void PXDGeometryPar::createHalfShellSupport(GearDir support)
   if (!support) return;
 
   for (const GearDir& endflange : support.getNodes("Endflange")) {
-    m_endflanges.push_back(VXDPolyConePar(endflange));
+    VXDPolyConePar endflangePar(
+      endflange.getString("@name"),
+      endflange.getString("Material", "Air"),
+      endflange.getAngle("minPhi", 0),
+      endflange.getAngle("maxPhi", 2 * M_PI),
+      (endflange.getNodes("Cutout").size() > 0),
+      endflange.getLength("Cutout/width", 0.),
+      endflange.getLength("Cutout/height", 0.),
+      endflange.getLength("Cutout/depth", 0.)
+    );
+
+    for (const GearDir& plane : endflange.getNodes("Plane")) {
+      VXDPolyConePlanePar planePar(
+        plane.getLength("posZ"),
+        plane.getLength("innerRadius"),
+        plane.getLength("outerRadius")
+      );
+      endflangePar.getPlanes().push_back(planePar);
+    }
+    m_endflanges.push_back(endflangePar);
   }
 
   // Cout outs for endflanges

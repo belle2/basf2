@@ -14,10 +14,11 @@
 #include <geometry/CreatorBase.h>
 
 #include <framework/logging/Logger.h>
-#include <vxd/dbobjects/HeavyMetalShieldGeometryPar.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
+
+#include <vxd/dbobjects/HeavyMetalShieldGeometryPar.h>
 
 namespace Belle2 {
 
@@ -28,24 +29,19 @@ namespace Belle2 {
     class GeoHeavyMetalShieldCreator : public geometry::CreatorBase {
     private:
       //! Create a parameter object from the Gearbox XML parameters.
-      HeavyMetalShieldGeometryPar createConfiguration(const GearDir& param)
-      {
-        HeavyMetalShieldGeometryPar heavyMetalShieldGeometryPar;
-        heavyMetalShieldGeometryPar.read(param);
-        return heavyMetalShieldGeometryPar;
-      };
+      HeavyMetalShieldGeometryPar createConfiguration(const GearDir& param);
 
       //! Create the geometry from a parameter object.
       void createGeometry(const HeavyMetalShieldGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
     public:
-      /**
-       * Creates the ROOT Objects for the HeavyMetalShield geometry.
-       * @param content A reference to the content part of the parameter
-       *                description, which should to be used to create the ROOT
-       *                objects.
-       */
-      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
+      /** The old create member: create the configuration object(s) on the fly
+       * and call the geometry creation routine.*/
+      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override
+      {
+        HeavyMetalShieldGeometryPar config = createConfiguration(content);
+        createGeometry(config, topVolume, type);
+      }
 
       /** Create the configuration objects and save them in the Database.  If
        * more than one object is needed adjust accordingly */

@@ -67,6 +67,9 @@ namespace Belle2 {
     const std::string& getTubesMaterial() const { return m_tubesMaterial; }
     /** get  Endflanges */
     const std::vector<VXDPolyConePar>& getEndflanges() const {return m_endflanges;}
+    /** get  Endflanges */
+    std::vector<VXDPolyConePar>& getEndflanges() {return m_endflanges;}
+
 
     /**
      * Read the sensor definitions from the database

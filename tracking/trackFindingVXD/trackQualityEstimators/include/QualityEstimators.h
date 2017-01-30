@@ -90,7 +90,7 @@ namespace Belle2 {
     /** Returns value of z-component of magnetic field. */
     double getMagneticField() { return m_bFieldZ; }
 
-    /** Returns a value for the transverse momentun Pt calculated from a provided radius and the m_bFieldZ */
+    /** Returns a value for the transverse momentun Pt in GeV calculated from a provided radius and the m_bFieldZ and speed of light*/
     double calcPt(double radius) { return m_bFieldZ * radius * 0.00299792458; }
 
 

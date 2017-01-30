@@ -10,6 +10,7 @@
 
 #include <tracking/modules/qualityEstimatorVXD/QualityEstimatorVXDCircleFitModule.h>
 #include <framework/logging/Logger.h>
+#include <geometry/bfieldmap/BFieldMap.h>
 
 // ROOT
 #include <TVector3.h>

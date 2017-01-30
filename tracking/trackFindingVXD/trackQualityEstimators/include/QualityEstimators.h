@@ -91,7 +91,7 @@ namespace Belle2 {
     double getMagneticField() { return m_bFieldZ; }
 
     /** Returns a value for the transverse momentun Pt calculated from a provided radius and the m_bFieldZ */
-    double calcPt(double radius) { return m_bFieldZ * radius; }
+    double calcPt(double radius) { return m_bFieldZ * radius * 0.00299792458; }
 
 
     /** using double circleFit(double&, double&, double&) to calculate the vector for the transverse momentum.

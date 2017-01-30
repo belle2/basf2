@@ -65,8 +65,8 @@ namespace Belle2 {
       void apply(std::vector<WeightedRelationItem>& weightedRelations) override
       {
         for (auto& weightedRelation : weightedRelations) {
-          Weight filterResult = m_filter({weightedRelation.getFrom(), weightedRelation.getTo()});
-          weightedRelation.setWeight(filterResult);
+          const Weight weight = m_filter(weightedRelation);
+          weightedRelation.setWeight(weight);
         }
 
         const auto& weightIsNan = [](const WeightedRelationItem & item) {

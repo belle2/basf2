@@ -9,7 +9,7 @@
  **************************************************************************/
 
 
-#include <vxd/dbobjects/PXDGeometryPar.h>
+#include <pxd/dbobjects/PXDGeometryPar.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/GearDir.h>

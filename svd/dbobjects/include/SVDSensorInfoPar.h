@@ -14,7 +14,7 @@
 #include <string>
 
 #include <vxd/dbobjects/VXDSensorInfoBasePar.h>
-//#include <root/TVector3.h>
+
 
 namespace Belle2 {
 

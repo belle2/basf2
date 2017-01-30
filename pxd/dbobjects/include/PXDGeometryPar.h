@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <vxd/dbobjects/PXDSensorInfoPar.h>
+#include <pxd/dbobjects/PXDSensorInfoPar.h>
 #include <vxd/dbobjects/VXDGeometryPar.h>
 #include <vxd/dbobjects/VXDPolyConePar.h>
 

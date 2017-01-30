@@ -9,12 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <vxd/dbobjects/SVDSensorInfoPar.h>
+#include <svd/dbobjects/SVDSensorInfoPar.h>
 #include <vxd/dbobjects/VXDGeometryPar.h>
 
-#include <vxd/dbobjects/SVDCoolingPipesPar.h>
-#include <vxd/dbobjects/SVDSupportRibsPar.h>
-#include <vxd/dbobjects/SVDEndringsPar.h>
+#include <svd/dbobjects/SVDCoolingPipesPar.h>
+#include <svd/dbobjects/SVDSupportRibsPar.h>
+#include <svd/dbobjects/SVDEndringsPar.h>
 #include <vxd/dbobjects/VXDRotationSolidPar.h>
 
 

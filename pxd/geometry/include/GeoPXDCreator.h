@@ -14,7 +14,7 @@
 
 #include <vector>
 #include <vxd/geometry/GeoVXDCreator.h>
-#include <vxd/dbobjects/PXDGeometryPar.h>
+#include <pxd/dbobjects/PXDGeometryPar.h>
 
 
 namespace Belle2 {

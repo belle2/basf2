@@ -60,7 +60,6 @@ namespace {
 }
 
 pEventProcessor::pEventProcessor() : EventProcessor(),
-  m_procHandler(new ProcHandler()),
   m_histoman(nullptr)
 {
   g_pEventProcessor = this;
@@ -75,7 +74,7 @@ pEventProcessor::~pEventProcessor()
 
 void pEventProcessor::cleanup()
 {
-  if (!m_procHandler->parallelProcessingUsed() or m_procHandler->isOutputProcess()) {
+  if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
     delete m_rbin;
     m_rbin = nullptr;
     delete m_rbout;
@@ -192,6 +191,8 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   //Path for current process
   PathPtr localPath;
 
+  m_procHandler.reset(new ProcHandler(numProcesses));
+
   // 3. Fork input path
   m_procHandler->startInputProcess();
   if (m_procHandler->isInputProcess()) {   // In input process
@@ -203,7 +204,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 
   if (localPath == nullptr) { //not forked yet
     // 5. Fork out worker path (parallel section)
-    m_procHandler->startWorkerProcesses(numProcesses);
+    m_procHandler->startWorkerProcesses();
     if (m_procHandler->isWorkerProcess()) {
       localPath = m_mainPath;
       m_master = localPath->getModules().begin()->get(); //set Rx as master

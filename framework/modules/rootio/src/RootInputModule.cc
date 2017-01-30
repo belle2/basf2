@@ -22,6 +22,7 @@
 
 #include <TClonesArray.h>
 #include <TEventList.h>
+#include <TEntryListArray.h>
 #include <TObjArray.h>
 #include <TChainElement.h>
 
@@ -31,14 +32,57 @@ using namespace std;
 using namespace Belle2;
 using namespace RootIOUtilities;
 
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
 REG_MODULE(RootInput)
 
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
+void RootInputModule::addEventListForIndexFile()
+{
+  static bool first = true;
+  if (!first)
+    return;
+  first = false;
+  //TODO
+  //suspect this should be done in readParentTrees() so we can detect changed files
+  //TODO
+  //entrylist vs eventlist. both ok with cache?
+  B2INFO("Index file detected, scanning to generate event list.");
+  const bool eventlist = false;
+  TEventList* elist;
+  TEntryListArray* entlist;
+  if (eventlist)
+    elist = new TEventList("parent_entrylist");
+  else
+    entlist = new TEntryListArray();
+
+  TBranch* branch = m_tree->GetBranch("EventMetaData");
+  auto* address = branch->GetAddress();
+  EventMetaData* eventMetaData = 0;
+  branch->SetAddress(&eventMetaData);
+  long nEntries = m_tree->GetEntries();
+  TTree* tree = nullptr;
+  for (long i = m_nextEntry; i < nEntries; i++) {
+    branch->GetEntry(i);
+    int experiment = eventMetaData->getExperiment();
+    int run = eventMetaData->getRun();
+    unsigned int event = eventMetaData->getEvent();
+    std::string parentLfn = eventMetaData->getParentLfn();
+    //TODO stop if parent changes
+
+    tree = m_parentTrees[parentLfn];
+    long entry = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, event, run, experiment);
+    if (eventlist)
+      elist->Enter(entry);
+    else
+      entlist->Enter(entry);
+
+  }
+  branch->SetAddress(address);
+
+  if (eventlist)
+    tree->SetEventList(elist);
+  else
+    tree->SetEntryList(entlist);
+}
+
 RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentEntry(-1), m_tree(0), m_persistent(0)
 {
   //Set module properties
@@ -465,7 +509,7 @@ bool RootInputModule::createParentStoreEntries()
     TFile* file = TFile::Open(parentPfn.c_str(), "READ");
     dir->cd();
     if (!file || !file->IsOpen()) {
-      B2ERROR("Couldn't open parent file " << parentPfn);
+      B2ERROR("Couldn't open parent file " << parentLfn << " " << parentPfn);
       return false;
     }
 
@@ -552,6 +596,9 @@ bool RootInputModule::readParentTrees()
     // set the parent LFN to the next level
     parentLfn = parentMetaData->getParentLfn();
   }
+
+  if (m_parentLevel > 0 and m_storeEntries.size() == 1)
+    addEventListForIndexFile();
 
   return true;
 }

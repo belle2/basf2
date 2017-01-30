@@ -100,6 +100,8 @@ namespace Belle2 {
     /** Check if we warn the user or abort after an entry was missing after changing files. */
     void entryNotFound(std::string entryOrigin, std::string name, bool fileChanged = true);
 
+    void addEventListForIndexFile();
+
     //first the steerable variables:
     /** File to read from. Cannot be used together with m_inputFileNames. */
     std::string m_inputFileName;

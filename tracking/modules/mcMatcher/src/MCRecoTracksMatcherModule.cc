@@ -100,20 +100,27 @@ namespace {
     for (const RecoTrack& recoTrack : storedRecoTracks) {
       ++recoTrackId;
 
+      using OriginTrackFinder = RecoHitInformation::OriginTrackFinder;
+      const OriginTrackFinder c_MCTrackFinderAuxiliaryHit =
+        OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
+
       for (const RecoHitInformation::UsedCDCHit* cdcHit : recoTrack.getCDCHitList()) {
-        double weight = 1;
+        OriginTrackFinder originFinder = recoTrack.getFoundByTrackFinder(cdcHit);
+        double weight = originFinder == c_MCTrackFinderAuxiliaryHit ? 0 : 1;
         itInsertHint =
           recoTrackID_by_hitID.insert(itInsertHint,
         {{Const::CDC, cdcHit->getArrayIndex()}, {recoTrackId, weight}});
       }
       for (const RecoHitInformation::UsedSVDHit* svdHit : recoTrack.getSVDHitList()) {
-        double weight = 1;
+        OriginTrackFinder originFinder = recoTrack.getFoundByTrackFinder(svdHit);
+        double weight = originFinder == c_MCTrackFinderAuxiliaryHit ? 0 : 1;
         itInsertHint =
           recoTrackID_by_hitID.insert(itInsertHint,
         {{Const::SVD, svdHit->getArrayIndex()}, {recoTrackId, weight}});
       }
       for (const RecoHitInformation::UsedPXDHit* pxdHit : recoTrack.getPXDHitList()) {
-        double weight = 1;
+        OriginTrackFinder originFinder = recoTrack.getFoundByTrackFinder(pxdHit);
+        double weight = originFinder == c_MCTrackFinderAuxiliaryHit ? 0 : 1;
         itInsertHint =
           recoTrackID_by_hitID.insert(itInsertHint,
         {{Const::PXD, pxdHit->getArrayIndex()}, {recoTrackId, weight}});

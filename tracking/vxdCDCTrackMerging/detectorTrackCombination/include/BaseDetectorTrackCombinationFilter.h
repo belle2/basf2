@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
@@ -19,5 +20,5 @@ namespace Belle2 {
    *
    * TODO: We should remove this...
    */
-  using BaseDetectorTrackCombinationFilter = TrackFindingCDC::Filter<std::pair<RecoTrack**, RecoTrack* const*>>;
+  using BaseDetectorTrackCombinationFilter = TrackFindingCDC::Filter<TrackFindingCDC::WeightedRelation<RecoTrack*, RecoTrack* const>>;
 }

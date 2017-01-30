@@ -16,7 +16,8 @@ namespace Belle2 {
   /// Names of the variables to be generated.
   constexpr
   static char const* const detectorTrackCombinationTruthNames[] = {
-    "truth"
+    "truth",
+    "truth_relation_weight"
   };
 
   /// Vehicle class to transport the variable names

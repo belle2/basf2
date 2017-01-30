@@ -16,8 +16,8 @@ using namespace TrackFindingCDC;
 
 bool DetectorTrackCombinationTruthVarSet::extract(const BaseDetectorTrackCombinationFilter::Object* pair)
 {
-  const RecoTrack* cdcTrack = *(pair->first);
-  const RecoTrack* vxdTrack = *(pair->second);
+  const RecoTrack* cdcTrack = *(pair->getFrom());
+  const RecoTrack* vxdTrack = *(pair->getTo());
 
   if (not pair or not cdcTrack or not vxdTrack) return false;
 
@@ -31,6 +31,8 @@ bool DetectorTrackCombinationTruthVarSet::extract(const BaseDetectorTrackCombina
   } else {
     var<named("truth")>() = false;
   }
+
+  var<named("truth_relation_weight")>() = pair->getWeight();
 
   return true;
 }

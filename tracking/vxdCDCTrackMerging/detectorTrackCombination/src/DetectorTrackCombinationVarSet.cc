@@ -25,8 +25,8 @@ bool DetectorTrackCombinationVarSet::extract(const BaseDetectorTrackCombinationF
   // TODO: Make parameter
   const double cdcRadius = 16.25;
 
-  const RecoTrack* collectorItem = *(pair->first);
-  const RecoTrack* collectionItem = *(pair->second);
+  const RecoTrack* collectorItem = *(pair->getFrom());
+  const RecoTrack* collectionItem = *(pair->getTo());
 
   if (not pair or not collectorItem or not collectionItem) return false;
 

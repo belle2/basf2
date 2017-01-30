@@ -21,6 +21,7 @@ FilterBasedVXDCDCTrackMergerFindlet::FilterBasedVXDCDCTrackMergerFindlet()
   addProcessingSignalListener(&m_relationAdder);
   addProcessingSignalListener(&m_extrapolationSelector);
   addProcessingSignalListener(&m_distanceCutSelector);
+  addProcessingSignalListener(&m_distanceFilterCut);
 }
 
 void FilterBasedVXDCDCTrackMergerFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -32,6 +33,7 @@ void FilterBasedVXDCDCTrackMergerFindlet::exposeParameters(ModuleParamList* modu
   m_relationAdder.exposeParameters(moduleParamList, prefix);
   m_extrapolationSelector.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("extrapolation", prefix));
   m_distanceCutSelector.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("distanceWeight", prefix));
+  m_distanceFilterCut.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("distance", prefix));
 
   moduleParamList->addParameter("extrapolate", m_param_extrapolate, "TODO", m_param_extrapolate);
   moduleParamList->addParameter("mergeAndExtrapolate", m_param_mergeAndExtrapolate, "TODO", m_param_mergeAndExtrapolate);
@@ -74,6 +76,7 @@ void FilterBasedVXDCDCTrackMergerFindlet::apply()
       weightedRelations.clear();
       m_allMatcher.apply(cdcRecoTrackVector, vxdRecoTrackVector, weightedRelations);
     }
+
     // Calculate a measure based on an extrapolation to the CDC inner wall
     m_extrapolationSelector.apply(weightedRelations);
 
@@ -86,6 +89,9 @@ void FilterBasedVXDCDCTrackMergerFindlet::apply()
 
   // Add the already found items from the filter-based decision
   m_relationAdder.apply(weightedRelations);
+
+  // Record what is in the weighted relations so far
+  m_distanceFilterCut.apply(weightedRelations);
 
   // Use the relations to merge the tracks and fill them into a new store array entry
   m_storeArrayMerger.apply();

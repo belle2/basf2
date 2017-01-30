@@ -19,7 +19,10 @@
 #include <tracking/vxdCDCTrackMerging/detectorTrackCombination/DetectorTrackCombinationFilterFactory.h>
 #include <tracking/vxdCDCTrackMerging/detectorTrackCombination/ExtrapolationDetectorTrackCombinationSelector.h>
 #include <tracking/vxdCDCTrackMerging/detectorTrackCombination/StoreArrayMerger.h>
+#include <tracking/vxdCDCTrackMerging/detectorTrackCombination/DetectorTrackCombinationVarSet.h>
+#include <tracking/vxdCDCTrackMerging/detectorTrackCombination/DetectorTrackCombinationTruthVarSet.h>
 #include <tracking/trackFindingCDC/collectors/adders/RelationAdder.h>
+//#include <tracking/trackFindingCDC/findlets/minimal/RelationRecorder.h>
 
 namespace Belle2 {
   /**
@@ -72,5 +75,8 @@ namespace Belle2 {
     ExtrapolationDetectorTrackCombinationSelector m_extrapolationSelector;
     /// A filter which cuts the weights on a given value.
     TrackFindingCDC::CutSelector<RecoTrack*, RecoTrack*> m_distanceCutSelector;
+
+    TrackFindingCDC::FilterSelector<RecoTrack*, RecoTrack*,
+                    TrackFindingCDC::ChooseableFilter<DetectorTrackCombinationFilterFactory>> m_distanceFilterCut;
   };
 }

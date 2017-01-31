@@ -23,8 +23,12 @@ namespace Belle2 {
   class VXDAlignmentPar: public TObject {
   public:
     /** Constructor */
-    VXDAlignmentPar(double dU = 0, double dV = 0, double dW = 0, double alpha = 0, double beta = 0, double gamma = 0):
+    VXDAlignmentPar(double dU, double dV, double dW, double alpha, double beta, double gamma):
       m_dU(dU), m_dV(dV), m_dW(dW), m_alpha(alpha), m_beta(beta), m_gamma(gamma)
+    {}
+    /** Constructor */
+    VXDAlignmentPar():
+      m_dU(0.), m_dV(0.), m_dW(0.), m_alpha(0.), m_beta(0.), m_gamma(0.)
     {}
     /** get dU */
     double getDU() const { return m_dU; }

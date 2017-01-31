@@ -149,7 +149,6 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
                                           params.getAngle("gamma")
                                          );
 
-
   //Read the definition of all sensor types
   GearDir components(content, "Components/");
   for (const GearDir& paramsSensor : components.getNodes("Sensor")) {
@@ -192,7 +191,7 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
 
     string shellName = m_prefix + "." + shell.getString("@name");
 
-    path = (boost::format("Align[@component='%1%']/") % shellName).str();
+    string path = (boost::format("Align[@component='%1%']/") % shellName).str();
     GearDir params(GearDir(content, "Alignment/"), path);
     if (!params) {
       B2WARNING("Could not find alignment parameters for component " << shellName);
@@ -205,8 +204,6 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
                                              params.getAngle("beta"),
                                              params.getAngle("gamma")
                                             );
-
-
 
     VXDHalfShellPar halfShell(shell.getString("@name") , shell.getAngle("shellAngle", 0));
 
@@ -270,7 +267,20 @@ void VXDGeometryPar::readLadderInfo(int layerID, int ladderID,  GearDir content)
   VxdID ladder(layerID, ladderID, 0);
 
   // Read alignment for ladder
-  m_alignment[ladder] = VXDAlignmentPar(ladder, GearDir(content, "Alignment/"));
+  string path = (boost::format("Align[@component='%1%']/") % ladder).str();
+  GearDir params(GearDir(content, "Alignment/"), path);
+  if (!params) {
+    B2WARNING("Could not find alignment parameters for ladder " << ladder);
+    return;
+  }
+  m_alignment[ladder] = VXDAlignmentPar(params.getLength("du"),
+                                        params.getLength("dv"),
+                                        params.getLength("dw"),
+                                        params.getAngle("alpha"),
+                                        params.getAngle("beta"),
+                                        params.getAngle("gamma")
+                                       );
+
 
   for (const VXDGeoSensorPlacementPar& p : m_ladders[layerID].getSensors()) {
     VxdID sensorID(ladder);
@@ -285,7 +295,20 @@ void VXDGeometryPar::readLadderInfo(int layerID, int ladderID,  GearDir content)
 
     //Now create all the other components and place the Sensor
     if (!m_globals.getOnlyActiveMaterial()) cacheSubComponents(s.getComponents() , GearDir(content, "Components/"));
-    m_alignment[sensorID] = VXDAlignmentPar(sensorID, GearDir(content, "Alignment/"));
+    // Read alignment for sensor
+    string pathSensor = (boost::format("Align[@component='%1%']/") % sensorID).str();
+    GearDir paramsSensor(GearDir(content, "Alignment/"), pathSensor);
+    if (!paramsSensor) {
+      B2WARNING("Could not find alignment parameters for sensorID " << sensorID);
+      return;
+    }
+    m_alignment[sensorID] = VXDAlignmentPar(paramsSensor.getLength("du"),
+                                            paramsSensor.getLength("dv"),
+                                            paramsSensor.getLength("dw"),
+                                            paramsSensor.getAngle("alpha"),
+                                            paramsSensor.getAngle("beta"),
+                                            paramsSensor.getAngle("gamma")
+                                           );
   }
   return;
 }

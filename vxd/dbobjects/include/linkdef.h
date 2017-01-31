@@ -12,7 +12,7 @@
 #pragma link C++ class Belle2::VXDServiceGeometryPar+;
 #pragma link C++ class Belle2::VXDBoxTypesPar+;  // implicit
 #pragma link C++ class Belle2::VXDBoxPositionsPar+; // implicit
-#pragma link C++ class Belle2::VXDSlotTypesPar+; // implicit
+#pragma link C++ class Belle2::VXDSlotsPar+; // implicit
 
 
 #pragma link C++ class Belle2::VXDGeometryPar+;

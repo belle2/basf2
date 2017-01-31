@@ -16,22 +16,17 @@
 
 namespace Belle2 {
 
-  class GearDir;
-
-
   /**
   * The Class for VXD doc box
   */
-
   class VXDBoxTypesPar: public TObject {
   public:
 
-    //! Default constructor
-    VXDBoxTypesPar() {}
-    //! Constructor using Gearbox
-    explicit VXDBoxTypesPar(const GearDir& content) { read(content); }
-    //! Read parameters from Gearbox
-    void read(const GearDir&);
+    /**Constructor */
+    VXDBoxTypesPar(const std::string& name = "", const std::string& material = "", int identifier = 0,
+                   double width = 0, double length = 0, double height = 0) :
+      m_name(name), m_material(material), m_identifier(identifier), m_width(width), m_length(length), m_height(height)
+    {}
     //! Get width in mm
     double getWidth(void) const { return m_width; }
     //! Get length in mm
@@ -46,18 +41,18 @@ namespace Belle2 {
     int getIdentifier(void) const { return m_identifier; }
 
   private:
+    //! Name
+    std::string m_name;
+    //! Material
+    std::string m_material;
+    //! Identifier
+    int m_identifier;
     //! Width in mm
     double m_width;
     //! Lenght in mm
     double m_length;
     //! Height in mm
     double m_height;
-    //! Material
-    std::string m_material;
-    //! Name
-    std::string m_name;
-    //! Identifier
-    int m_identifier;
 
     ClassDef(VXDBoxTypesPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };
@@ -65,43 +60,38 @@ namespace Belle2 {
   /**
   * The Class for Slot types
   */
-
-  class VXDSlotTypesPar: public TObject {
+  class VXDSlotsPar: public TObject {
   public:
 
-    //! Default constructor
-    VXDSlotTypesPar() {}
-    //! Constructor using Gearbox
-    explicit VXDSlotTypesPar(const GearDir& content) { read(content); }
-    //! Read parameters from Gearbox
-    void read(const GearDir&);
+    /**Constructor */
+    VXDSlotsPar(const std::string& type = ""): m_type(type) {}
     //! Get type
-    std::string getType(void) const { return m_type; }
+    const std::string& getType(void) const { return m_type; }
     //! Get slot numbers
-    std::vector<double> getSlots(void) const { return m_slots; }
+    const std::vector<double>& getSlotNumbers(void) const { return m_slotNumbers; }
+    //! Get slot numbers
+    std::vector<double>& getSlotNumbers(void) { return m_slotNumbers; }
 
   private:
     //! Slots numbers
-    std::vector<double> m_slots;
+    std::vector<double> m_slotNumbers;
     //! Type
     std::string m_type;
 
-    ClassDef(VXDSlotTypesPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(VXDSlotsPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };
 
   /**
   * The Class for VXD doc box envelope
   */
-
   class VXDBoxPositionsPar: public TObject {
   public:
 
-    //! Default constructor
-    VXDBoxPositionsPar() {}
-    //! Constructor using Gearbox
-    explicit VXDBoxPositionsPar(const GearDir& content) { read(content); }
-    //! Read parameters from Gearbox
-    void read(const GearDir&);
+    /** Constructor */
+    VXDBoxPositionsPar(const std::string& name = "", double minZ = 0, double maxZ = 0, double minR = 0, double maxR = 0,
+                       int divisions = 0) :
+      m_name(name), m_minZ(minZ), m_maxZ(maxZ), m_minR(minR), m_maxR(maxR), m_divisions(divisions)
+    {}
     //! Get minZ in mm
     double getMinZ(void) const { return m_minZ; }
     //! Get maxZ in mm
@@ -113,11 +103,15 @@ namespace Belle2 {
     //! Get divisions
     int getDivisions(void) const { return m_divisions; }
     //! Get slots
-    std::vector<VXDSlotTypesPar> getSlotTypes(void) const { return m_slotTypes; }
+    const std::vector<VXDSlotsPar>& getSlots(void) const { return m_slots; }
+    //! Get slots
+    std::vector<VXDSlotsPar>& getSlots(void) { return m_slots; }
     //! Get name
-    std::string getName(void) const { return m_name; }
+    const std::string& getName(void) const { return m_name; }
 
   private:
+    //! Name
+    std::string m_name;
     //! MinZ in mm
     double m_minZ;
     //! MaxZ in mm
@@ -129,9 +123,7 @@ namespace Belle2 {
     //! Divisions
     int m_divisions;
     //! Slots for doc boxes
-    std::vector<VXDSlotTypesPar> m_slotTypes;
-    //! Name
-    std::string m_name;
+    std::vector<VXDSlotsPar> m_slots;
 
     ClassDef(VXDBoxPositionsPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };
@@ -139,39 +131,26 @@ namespace Belle2 {
   /**
   * The Class for VXD service geometry
   */
-
   class VXDServiceGeometryPar: public TObject {
 
   public:
-
-    //! Default constructor
-    VXDServiceGeometryPar() {}
-
-    //! Constructor using Gearbox
-    explicit VXDServiceGeometryPar(const GearDir& content) { read(content); }
-
-    //! Destructor
-    ~VXDServiceGeometryPar() {}
-
-    //! Get geometry parameters from Gearbox
-    void read(const GearDir&);
-
+    /** Constructor */
+    VXDServiceGeometryPar(bool recordBackground = false): m_recordBackground(recordBackground) {}
     //! Record background
     bool getRecordBackground(void) const { return m_recordBackground; }
-
     //! Get boxes
-    std::vector<VXDBoxTypesPar> getBoxTypes(void) const { return m_vxdBoxTypes; }
-
+    const std::vector<VXDBoxTypesPar>& getBoxTypes(void) const { return m_vxdBoxTypes; }
+    //! Get boxes
+    std::vector<VXDBoxTypesPar>& getBoxTypes(void)  { return m_vxdBoxTypes; }
     //! Get positions
-    std::vector<VXDBoxPositionsPar> getPositions(void) const { return m_vxdBoxPositions; }
+    const std::vector<VXDBoxPositionsPar>& getPositions(void) const { return m_vxdBoxPositions; }
+    //! Get positions
+    std::vector<VXDBoxPositionsPar>& getPositions(void)  { return m_vxdBoxPositions; }
 
   private:
-
     //! Record background
     bool m_recordBackground;
-
     std::vector<VXDBoxTypesPar> m_vxdBoxTypes;
-
     std::vector<VXDBoxPositionsPar> m_vxdBoxPositions;
 
     ClassDef(VXDServiceGeometryPar, 5);  /**< ClassDef, must be the last term before the closing {}*/

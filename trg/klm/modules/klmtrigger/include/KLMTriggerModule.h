@@ -22,7 +22,7 @@ namespace Belle2 {
     KLMTriggerModule();
 
     // Destructor
-    virtual ~KLMTriggerModule();
+    virtual ~KLMTriggerModule() { };
 
     virtual void initialize();
     virtual void beginRun();
@@ -36,6 +36,9 @@ namespace Belle2 {
     void fillTracks();
     void calcChisq();
     void geometryConverter(bool fwd, int sector, int layer, int phiStrip, int zStrip, double& x, double& y, double& z);
+
+    const int nSectors = 8;
+    const int nLayers = 15;
 
     // Debug level
     int _debugLevel;

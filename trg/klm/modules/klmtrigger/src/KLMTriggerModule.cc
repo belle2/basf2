@@ -8,11 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <trg/klm/modules/klmTrigger/KLMTriggerModule.h>
+#include <trg/klm/modules/klmtrigger/KLMTriggerModule.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 
 // event data
@@ -83,7 +84,7 @@ void KLMTriggerModule::event()
 void KLMTriggerModule::fillHits()
 {
   StoreArray<BKLMDigit> bklmDigits;
-  if (bklmDigits.isValid() != true)
+  if (!bklmDigits.isValid())
     return;
 
   StoreArray<KLMTriggerHit> klmTriggerHits;
@@ -111,8 +112,8 @@ void KLMTriggerModule::fillHits()
           phiStrip = bklmDigit_j->getStrip() - 1; // zero-based
         }
 
-        double x = 0.0, y = 0.0,  = 0.0;
-        convertGeometry(fwd, sector, layer, phiStrip, zStrip, x, y, z);
+        double x = 0.0, y = 0.0, z = 0.0;
+        geometryConverter(fwd, sector, layer, phiStrip, zStrip, x, y, z);
 
         KLMTriggerHit* hit = klmTriggerHits.appendNew(fwd, sector, layer, phiStrip, zStrip);
         hit->setX(x);
@@ -131,7 +132,7 @@ void KLMTriggerModule::fillHits()
 void KLMTriggerModule::fillTracks()
 {
   StoreArray<KLMTriggerHit> klmTriggerHits;
-  if (klmTriggerHits.isValid() != true)
+  if (!klmTriggerHits.isValid())
     return;
 
   StoreArray<KLMTriggerTrack> klmTriggerTracks;
@@ -145,7 +146,7 @@ void KLMTriggerModule::fillTracks()
     bool fwd = hit->isForward();
     int sector = hit->getSector();
 
-    int fwdInt = fwd ? : 1 : 0;
+    int fwdInt = fwd ? 1 : 0;
     int sectorID = fwdInt * 8 + sector;
 
     if (trackMap.find(sectorID) == trackMap.end())
@@ -158,13 +159,13 @@ void KLMTriggerModule::fillTracks()
 
 void KLMTriggerModule::calcChisq()
 {
-  StoreArray<KLMTriggerTracks> klmTriggerTracks;
-  if (klmTriggerTracks.isValid() != true)
+  StoreArray<KLMTriggerTrack> klmTriggerTracks;
+  if (!klmTriggerTracks.isValid())
     return;
 
   int nEntries = klmTriggerTracks.getEntries();
   for (int i = 0; i < nEntries; ++i) {
-    const KLMTriggerTrack* track = klmTriggerTracks[i];
+    KLMTriggerTrack* track = klmTriggerTracks[i];
     RelationVector<KLMTriggerHit> hits = track->getRelationsWith<KLMTriggerHit>();
 
     int nHits = hits.size();
@@ -193,21 +194,22 @@ void KLMTriggerModule::calcChisq()
     }
 
     // calculate chisq using sums
-    double denom = sumXX * n - sumX * sumX;
-    double slopeXY = (sumXY * n - sumX * sumY) / denom;
+    double denom = sumXX * nHits - sumX * sumX;
+
+    double slopeXY = (sumXY * nHits - sumX * sumY) / denom;
     double interceptXY = (sumXX * sumY - sumX * sumXY) / denom;
     double ipXY = interceptXY / sqrt(slopeXY * slopeXY + 1.0);
-    double chisqXY = slopeXY * slopeXY * sumXX + interceptXY * interceptXY * n + sumYY + 2.0 * slopeXY * interceptXY * sumX - 2.0 *
+    double chisqXY = slopeXY * slopeXY * sumXX + interceptXY * interceptXY * nHits + sumYY + 2.0 * slopeXY * interceptXY * sumX - 2.0 *
                      slopeXY * sumXY - 2.0 * interceptXY * sumY;
 
-    double slopeXZ = (sumXZ * n - sumX * sumZ) / denom;
+    double slopeXZ = (sumXZ * nHits - sumX * sumZ) / denom;
     double interceptXZ = (sumXX * sumZ - sumX * sumXZ) / denom;
     double ipXZ = interceptXZ / sqrt(slopeXZ * slopeXZ + 1.0);
-    double chisqXZ = slopeXZ * slopeXZ * sumXX + interceptXZ * interceptXZ * n + sumZZ + 2.0 * slopeXZ * interceptXZ * sumX - 2.0 *
+    double chisqXZ = slopeXZ * slopeXZ * sumXX + interceptXZ * interceptXZ * nHits + sumZZ + 2.0 * slopeXZ * interceptXZ * sumX - 2.0 *
                      slopeXZ * sumXZ - 2.0 * interceptXZ * sumZ;
 
     // calculate number of fired layers
-    for (int i = 0; i < nLayers; ++i)
+    for (int i = 0; i < 15; ++i)
       if (firedLayers[i] == true)
         ++nFiredLayers;
 
@@ -221,7 +223,7 @@ void KLMTriggerModule::calcChisq()
     track->setChisqXZ(chisqXZ);
     track->setImpactParameterXZ(ipXZ);
 
-    track->set(nFiredLayers);
+    track->setNFiredLayers(nFiredLayers);
 
     if (chisqXY < m_maxChisq && ipXY < m_maxIP &&
         chisqXZ < m_maxChisq && ipXZ < m_maxIP &&
@@ -234,27 +236,27 @@ void KLMTriggerModule::calcChisq()
 void KLMTriggerModule::geometryConverter(bool fwd, int sector, int layer, int phiStrip, int zStrip, double& x, double& y, double& z)
 {
   // lengths are in centimeters
-  double phi_width[15] = {4.0, 4.0, 4.90, 5.11, 5.32, 5.53, 4.30, 4.46, 4.62, 4.77, 4.93, 5.09, 5.25, 5.40, 5.56};
-  int phi_nstrips[15] = {37, 42, 36, 36, 36, 36, 48, 48, 48, 48, 48, 48, 48, 48, 48};
-  double cosine[8] = {1.0, 0.707107, 0.0, -0.707107, -1.0, -0.707107, 0.0, 0.707107};
-  double sine[8] = {0.0, 0.707107, 1.0, 0.707107, 0.0, -0.707107, -1.0, -0.707107};
-  double z_width = (layer < 2 ? 4.0 : 4.52);
-  double z_offset = 47.0;
-  double r0 = 201.9;
-  double gap_height = 4.4;
-  double first_gap_height = 4.1;
-  double iron_height = 4.7;
-  double frame_thickness = 0.3;
+  const double phi_width[15] = {4.0, 4.0, 4.90, 5.11, 5.32, 5.53, 4.30, 4.46, 4.62, 4.77, 4.93, 5.09, 5.25, 5.40, 5.56};
+  const int phi_nstrips[15] = {37, 42, 36, 36, 36, 36, 48, 48, 48, 48, 48, 48, 48, 48, 48};
+  const double cosine[8] = {1.0, 0.707107, 0.0, -0.707107, -1.0, -0.707107, 0.0, 0.707107};
+  const double sine[8] = {0.0, 0.707107, 1.0, 0.707107, 0.0, -0.707107, -1.0, -0.707107};
+  const double z_width = (layer < 2 ? 4.0 : 4.52);
+  const double z_offset = 47.0;
+  const double r0 = 201.9;
+  const double gap_height = 4.4;
+  const double first_gap_height = 4.1;
+  const double iron_height = 4.7;
+  const double frame_thickness = 0.3;
 
-  double tan_pi_to_8 = 0.414214;
-  double gap_iron_width = (layer == 0 ? 7.94 : 3.0);
-  int y_offset_sign = (layer == 0 ? -1 : 1);
-  double spacer_width = 0.6;
-  double scint_height = 1.0;
-  double ps_inner_height = 0.635;
-  double ps_outer_height = 0.47625;
-  double glass_height = 0.238125;
-  double gas_height = 0.2;
+  const double tan_pi_to_8 = 0.414214;
+  const double gap_iron_width = (layer == 0 ? 7.94 : 3.0);
+  const int y_offset_sign = (layer == 0 ? -1 : 1);
+  const double spacer_width = 0.6;
+  const double scint_height = 1.0;
+  const double ps_inner_height = 0.635;
+  const double ps_outer_height = 0.47625;
+  const double glass_height = 0.238125;
+  const double gas_height = 0.2;
 
   if (layer == 0)
     x = r0 + 0.5 * first_gap_height;
@@ -288,8 +290,8 @@ void KLMTriggerModule::geometryConverter(bool fwd, int sector, int layer, int ph
   z += z_offset;
 
   // rotate the sector to its position
-//  double x_tmp = x, y_tmp = y;
-//  x = x_tmp*cosine[sector] - y_tmp*sine[sector];
-//  y = x_tmp*sine[sector] + y_tmp*cosine[sector];
+  double x_tmp = x, y_tmp = y;
+  x_tmp = x_tmp * cosine[sector] - y_tmp * sine[sector];
+  y_tmp = x_tmp * sine[sector] + y_tmp * cosine[sector];
 }
 

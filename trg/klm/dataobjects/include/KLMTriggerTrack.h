@@ -31,7 +31,9 @@ namespace Belle2 {
       m_slopeXZ(0.0),
       m_interceptXZ(0.0),
       m_impactParameterXZ(0.0),
-      m_chisqXZ(0.0)
+      m_chisqXZ(0.0),
+      m_nFiredLayers(0),
+      m_trigger(false)
     { }
 
     //! Constructor with initial values for a track
@@ -48,7 +50,9 @@ namespace Belle2 {
       m_slopeXZ(0.0),
       m_interceptXZ(0.0),
       m_impactParameterXZ(0.0),
-      m_chisqXZ(0.0)
+      m_chisqXZ(0.0),
+      m_nFiredLayers(0),
+      m_trigger(false)
     { }
 
     //! Destructor
@@ -96,6 +100,14 @@ namespace Belle2 {
     //! @return chi squared of the track in XZ plain
     double getChisqXZ() const { return m_chisqXZ; }
 
+    //! Get number of fired layers
+    //! @return number of fired layers
+    int getNFiredLayers() const { return m_nFiredLayers; }
+
+    //! Get trigger flag
+    //! @return if the track generates a trigger
+    bool getTrigger() const { return m_trigger; }
+
     // modifiers
 
     //! Set slope parameter of the track in XY plain
@@ -130,6 +142,14 @@ namespace Belle2 {
     //! @param chisqXZ chi squared of the track in XZ plain
     void setChisqXZ(double chisqXZ)  { m_chisqXZ = chisqXZ; }
 
+    //! Set number of fired layers
+    //! @param nLayers number of fired layers
+    void setNFiredLayers(int nLayers)  { m_nFiredLayers = nLayers; }
+
+    //! Set trigger flag
+    //! @param trg if the track generates a trigger
+    void setTrigger(bool trg)  { m_trigger = trg; }
+
   private:
     //! forward-backward
     int m_fwd;
@@ -163,6 +183,12 @@ namespace Belle2 {
 
     //! calculated chi squared of the straight track in XZ plain
     double m_chisqXZ;
+
+    //! number of fired layers
+    int m_nFiredLayers;
+
+    //! if the track generates a trigger
+    bool m_trigger;
 
     //! Needed to make the ROOT object storable
     //! version 4 adds ctime etc

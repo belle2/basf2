@@ -121,10 +121,10 @@ namespace Belle2 {
     double m_x;
 
     //! y coordinate
-    double m_x;
+    double m_y;
 
     //! z coordinate
-    double m_x;
+    double m_z;
 
     //! Needed to make the ROOT object storable
     ClassDef(KLMTriggerHit, 1);

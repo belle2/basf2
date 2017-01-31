@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  class GearDir;
+
 
   /**
   * The Class for VXD Radiation Sensor Position parameters
@@ -28,8 +28,6 @@ namespace Belle2 {
       m_z(z), m_radius(radius), m_theta(theta) {}
     //! Destructor
     ~VXDGeoRadiationSensorsPositionPar() {}
-    //! Get geometry parameters from Gearbox
-    void read(const GearDir&);
     /** get the common z position of the sensor centers  */
     double getZ() const { return m_z; }
     /** set the common z position of the sensor centers  */
@@ -73,8 +71,6 @@ namespace Belle2 {
       m_material(material) {}
     //! Destructor
     ~VXDGeoRadiationSensorsPar() {}
-    //! Get geometry parameters from Gearbox
-    //void read(const GearDir&);
     /** get the name of the subdetector */
     const std::string& getSubDetector() const { return  m_subdetector; }
     /** set the name of the subdetector */

@@ -16,7 +16,7 @@
 
 namespace Belle2 {
 
-  class GearDir;
+
 
   /**
   * The Class for VXD Sensor Placement payload

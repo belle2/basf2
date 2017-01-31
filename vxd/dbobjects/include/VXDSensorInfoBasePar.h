@@ -13,10 +13,6 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <cmath>
 #include <float.h>
-
-//#include <TGeoMatrix.h>
-//#include <TVector3.h>
-
 #include <TObject.h>
 
 namespace Belle2 {

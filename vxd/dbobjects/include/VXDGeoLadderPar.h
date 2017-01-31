@@ -19,7 +19,7 @@
 
 namespace Belle2 {
 
-  class GearDir;
+
 
   /**
   * The Class for VXD Ladder payload
@@ -35,8 +35,7 @@ namespace Belle2 {
       m_glueSize(glueSize), m_glueMaterial(glueMaterial) {}
     //! Destructor
     ~VXDGeoLadderPar() {}
-    //! Get geometry parameters from Gearbox
-    //void read(const GearDir&);
+
     /** get the layer id */
     int getLayerID() const { return m_layerID; }
     /** set the layer id */

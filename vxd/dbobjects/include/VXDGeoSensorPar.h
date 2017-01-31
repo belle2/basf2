@@ -16,13 +16,12 @@
 
 
 #include <vxd/dbobjects/VXDSensorInfoBasePar.h>
-//#include <vxd/dbobjects/PXDSensorInfoPar.h>
 #include <vxd/dbobjects/VXDGeoComponentPar.h>
 #include <vxd/dbobjects/VXDGeoPlacementPar.h>
 
 namespace Belle2 {
 
-  class GearDir;
+
 
   /**
   * The Class for VXD Sensor payload

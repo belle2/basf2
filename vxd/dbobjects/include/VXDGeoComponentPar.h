@@ -19,8 +19,6 @@
 
 namespace Belle2 {
 
-  class GearDir;
-
 
   /**
   * The Class for VXD geometry component

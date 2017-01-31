@@ -17,7 +17,7 @@
 
 namespace Belle2 {
 
-  class GearDir;
+
 
   /**
   * The Class for VXD placement payload
@@ -30,8 +30,6 @@ namespace Belle2 {
                        std::string w = "bottom", double woffset = 0);
     //! Destructor
     ~VXDGeoPlacementPar() {}
-    //! Get geometry parameters from Gearbox
-    //void read(const GearDir&);
     /** get name of the component */
     const std::string& getName() const { return m_name; }
     /** set name of the component */

@@ -129,7 +129,16 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
   m_prefix = prefix;
 
   //Read some global parameters
-  m_globals = VXDGlobalPar(content);
+  m_globals = VXDGlobalPar((float)content.getDouble("ElectronTolerance", 100),
+                           (float)content.getDouble("MinimumElectrons", 10),
+                           content.getLength("ActiveStepSize", 0.005),
+                           content.getBool("ActiveChips", false),
+                           content.getBool("SeeNeutrons", false),
+                           content.getBool("OnlyPrimaryTrueHits", false),
+                           content.getBool("OnlyActiveMaterial", false),
+                           (float)content.getLength("DistanceTolerance", 0.005),
+                           content.getString("DefaultMaterial", "Air")
+                          );
 
   //Read envelope parameters
   GearDir envelopeParams(content, "Envelope/");

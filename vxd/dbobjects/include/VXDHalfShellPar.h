@@ -18,9 +18,6 @@
 
 namespace Belle2 {
 
-  class GearDir;
-
-
   /**
   * The Class for VXD half shell payload
   */

@@ -132,7 +132,23 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
   m_globals = VXDGlobalPar(content);
 
   //Read envelope parameters
-  m_envelope = VXDEnvelopePar(GearDir(content, "Envelope/"));
+  GearDir envelopeParams(content, "Envelope/");
+  m_envelope = VXDEnvelopePar(envelopeParams.getString("Name", ""),
+                              envelopeParams.getString("Material", "Air"),
+                              envelopeParams.getString("Color", ""),
+                              envelopeParams.getAngle("minPhi", 0),
+                              envelopeParams.getAngle("maxPhi", 2 * M_PI),
+                              (envelopeParams.getNodes("InnerPoints/point").size() > 0)
+                             );
+
+  for (const GearDir point : envelopeParams.getNodes("InnerPoints/point")) {
+    pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
+    m_envelope.getInnerPoints().push_back(ZXPoint);
+  }
+  for (const GearDir point : envelopeParams.getNodes("OuterPoints/point")) {
+    pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
+    m_envelope.getOuterPoints().push_back(ZXPoint);
+  }
 
   // Read alignment for detector m_prefix ('PXD' or 'SVD')
   string path = (boost::format("Align[@component='%1%']/") % m_prefix).str();

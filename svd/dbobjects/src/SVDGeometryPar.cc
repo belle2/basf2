@@ -83,8 +83,25 @@ void SVDGeometryPar::createHalfShellSupport(GearDir support)
 {
   if (!support) return;
 
-  for (const GearDir& rotationsolid : support.getNodes("HalfShell/RotationSolid")) {
-    m_halfShell.push_back(VXDRotationSolidPar(rotationsolid));
+  for (const GearDir& params : support.getNodes("HalfShell/RotationSolid")) {
+
+    VXDRotationSolidPar rotationSolidPar(params.getString("Name", ""),
+                                         params.getString("Material", "Air"),
+                                         params.getString("Color", ""),
+                                         params.getAngle("minPhi", 0),
+                                         params.getAngle("maxPhi", 2 * M_PI),
+                                         (params.getNodes("InnerPoints/point").size() > 0)
+                                        );
+
+    for (const GearDir point : params.getNodes("InnerPoints/point")) {
+      pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
+      rotationSolidPar.getInnerPoints().push_back(ZXPoint);
+    }
+    for (const GearDir point : params.getNodes("OuterPoints/point")) {
+      pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
+      rotationSolidPar.getOuterPoints().push_back(ZXPoint);
+    }
+    m_halfShell.push_back(rotationSolidPar);
   }
   return;
 }

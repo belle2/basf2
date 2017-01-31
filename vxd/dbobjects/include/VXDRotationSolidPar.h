@@ -25,9 +25,14 @@ namespace Belle2 {
   class VXDRotationSolidPar: public TObject {
   public:
     /** Constructor */
-    VXDRotationSolidPar(const std::string& name = "", const std::string& material = "", const std::string& color = "",
-                        double minPhi = 0, double maxPhi = 0, bool exists = false):
+    VXDRotationSolidPar(const std::string& name, const std::string& material, const std::string& color,
+                        double minPhi, double maxPhi, bool exists):
       m_name(name), m_material(material), m_color(color), m_minPhi(minPhi), m_maxPhi(maxPhi), m_exists(exists)
+    {}
+
+    /** Constructor */
+    VXDRotationSolidPar():
+      m_name(""), m_material(""), m_color(""), m_minPhi(0), m_maxPhi(0), m_exists(false)
     {}
 
     /** returns if rotation solid has inner points */

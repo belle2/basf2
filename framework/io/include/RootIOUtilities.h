@@ -66,6 +66,15 @@ namespace Belle2 {
     /** Fill the creation info of a file meta data: site, user, data */
     void setCreationData(FileMetaData& metadata);
 
+    /** Return git SHA1 hashes taking into account local & central release.
+     *
+     * ID is a combined hash $CENTRAL_SHA1[+$LOCAL_SHA1][-modified],
+     * or just SHA1[-modified] if only one release or they are on the
+     * same revision.
+     * Empty string denotes at least one untracked release directory.
+     */
+    std::string getCommitID();
+
     /** Names of trees. */
     extern const std::string c_treeNames[];
 

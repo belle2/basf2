@@ -117,6 +117,15 @@ namespace Belle2 {
      */
     std::string getDatabaseGlobalTag() const { return m_databaseGlobalTag; }
 
+    /** Return git SHA1 hashes taking into account local & central release.
+     *
+     * ID is a combined hash $CENTRAL_SHA1[+$LOCAL_SHA1][-modified],
+     * or just SHA1[-modified] if only one release or they are on the
+     * same revision.
+     * Empty string denotes at least one untracked release directory.
+     */
+    std::string getCommitID() const { return m_commitID; }
+
     /** Setter for LFN.
       *
       *  @param lfn The logical file name.
@@ -186,6 +195,9 @@ namespace Belle2 {
      */
     void setDatabaseGlobalTag(const std::string& globalTag) { m_databaseGlobalTag = globalTag; }
 
+    /** Set commit ID. */
+    void setCommitID(const std::string& commitID) { m_commitID = commitID; }
+
     /**
      * Exposes methods of the FileMetaData class to Python.
      */
@@ -249,7 +261,9 @@ namespace Belle2 {
 
     std::string m_databaseGlobalTag; /**< Global tag in the database used for production of this file */
 
-    ClassDefOverride(FileMetaData, 8); /**< Metadata information about a file. */
+    std::string m_commitID; /**< git SHA1 hashes taking into account local & central release. */
+
+    ClassDefOverride(FileMetaData, 9); /**< Metadata information about a file. */
 
   }; //class
 

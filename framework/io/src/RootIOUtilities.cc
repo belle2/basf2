@@ -171,3 +171,7 @@ void RootIOUtilities::setCreationData(FileMetaData& metadata)
   if (!release) release = "unknown";
   metadata.setCreationData(date, site, user, release);
 }
+std::string RootIOUtilities::getCommitID()
+{
+  return GIT_COMMITID;
+}

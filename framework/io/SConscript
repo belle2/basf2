@@ -1,6 +1,56 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 Import('env')
 
 env['SUBLIB'] = True
 env['LIBS'] = ['framework', '$ROOT_LIBS']
+
+import subprocess
+import os
+
+# combined commit ID
+identifier = None
+# local modifications?
+modifications = False
+
+head_commitid = dict()
+release_dir_vars = ['BELLE2_LOCAL_DIR', 'BELLE2_RELEASE_DIR']
+
+for var in release_dir_vars:
+    if var not in os.environ:
+        continue
+    with open(os.devnull, 'w') as devnull:
+        proc = subprocess.Popen(['git', '-C', os.environ[var], 'rev-parse', 'HEAD'], stdout=subprocess.PIPE, stderr=devnull)
+        head_commitid[var] = proc.communicate()[0].strip()
+        if proc.returncode != 0 or len(head_commitid[var]) != 40:
+            # release dir is set, but we couldn't get a commit id -> not tracked
+            identifier = ""
+            continue
+
+        # check for modifications, ignoring untracked files
+        proc = subprocess.Popen(['git', '-C', os.environ[var], 'status', '-uno', '--porcelain'], stdout=subprocess.PIPE, stderr=devnull)
+        changes = proc.communicate()[0].strip()
+        if len(changes) != 0:
+            modifications = True
+
+if identifier is None:
+    if len(head_commitid) == 2:
+        if head_commitid['BELLE2_RELEASE_DIR'] != head_commitid['BELLE2_LOCAL_DIR']:
+            identifier = head_commitid['BELLE2_RELEASE_DIR'] + '+' + head_commitid['BELLE2_LOCAL_DIR']
+        else:
+            identifier = head_commitid['BELLE2_RELEASE_DIR']
+    elif 'BELLE2_RELEASE_DIR' in head_commitid:
+        identifier = head_commitid['BELLE2_RELEASE_DIR']
+    elif 'BELLE2_LOCAL_DIR' in head_commitid:
+        identifier = head_commitid['BELLE2_LOCAL_DIR']
+    else:
+        print('both central & local dir seem not to be git repositories, but we failed to detect this earlier. Please report this.')
+        identifier = ''
+if identifier != '' and modifications:
+    identifier += '-modified'
+
+env.Append(CPPDEFINES={'GIT_COMMITID': '\\"' + identifier + '\\"'})
+
 
 Return('env')

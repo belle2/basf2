@@ -18,22 +18,17 @@
 
 namespace Belle2 {
 
-  class GearDir;
-
 
   /**
   * The Class for VXD Envelope parameters
   */
   class VXDRotationSolidPar: public TObject {
   public:
-    //! Default constructor
-    VXDRotationSolidPar() {}
-    //! Constructor using Gearbox
-    explicit VXDRotationSolidPar(const GearDir& content) { read(content); }
-    //! Destructor
-    ~VXDRotationSolidPar() {}
-    //! Get geometry parameters from Gearbox
-    void read(const GearDir&);
+    /** Constructor */
+    VXDRotationSolidPar(const std::string& name = "", const std::string& material = "", const std::string& color = "",
+                        double minPhi = 0, double maxPhi = 0, bool exists = false):
+      m_name(name), m_material(material), m_color(color), m_minPhi(minPhi), m_maxPhi(maxPhi), m_exists(exists)
+    {}
 
     /** returns if rotation solid has inner points */
     bool getExists() const { return  m_exists; }
@@ -48,9 +43,13 @@ namespace Belle2 {
     /** get max Phi */
     double getMaxPhi() const { return m_maxPhi; }
     /** get inner XZ points */
-    std::list< std::pair<double, double> > getInnerPoints() const { return m_innerPoints; }
+    const std::list< std::pair<double, double> >& getInnerPoints() const { return m_innerPoints; }
     /** get outer XZ points */
-    std::list< std::pair<double, double> > getOuterPoints() const { return m_outerPoints; }
+    const std::list< std::pair<double, double> >& getOuterPoints() const { return m_outerPoints; }
+    /** get inner XZ points */
+    std::list< std::pair<double, double> >& getInnerPoints()  { return m_innerPoints; }
+    /** get outer XZ points */
+    std::list< std::pair<double, double> >& getOuterPoints()  { return m_outerPoints; }
 
   private:
     std::string m_name;
@@ -58,10 +57,10 @@ namespace Belle2 {
     std::string m_color;
     double m_minPhi;
     double m_maxPhi;
+    bool m_exists;
     //! List of points in the ZX plane
     std::list< std::pair<double, double> > m_innerPoints;
     std::list< std::pair<double, double> > m_outerPoints;
-    bool m_exists {false};
 
     ClassDef(VXDRotationSolidPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };

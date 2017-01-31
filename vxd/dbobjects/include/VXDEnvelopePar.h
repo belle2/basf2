@@ -13,17 +13,16 @@
 
 namespace Belle2 {
 
-  class GearDir;
-
   /**
   * The Class for VXD Envelope parameters
   */
   class VXDEnvelopePar: public VXDRotationSolidPar {
   public:
-    //! Default constructor
-    VXDEnvelopePar() {}
-    //! Constructor using Gearbox
-    explicit VXDEnvelopePar(const GearDir& content) : VXDRotationSolidPar(content) { }
+    VXDEnvelopePar(const std::string& name = "", const std::string& material = "", const std::string& color = "",
+                   double minPhi = 0, double maxPhi = 0, bool exists = false):
+      VXDRotationSolidPar(name, material, color, minPhi, maxPhi, exists)
+    {}
+
   private:
     ClassDef(VXDEnvelopePar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };

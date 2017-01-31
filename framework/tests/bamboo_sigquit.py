@@ -2,12 +2,6 @@ import signal
 import os
 import sys
 
-pid = os.getpid()
-ret = os.system('strace -o /dev/null true')
-if ret != 0:
-    print('Process is being traced!')
-    sys.exit(1)
-
 got_signal = False
 
 
@@ -22,6 +16,7 @@ for sig in signals:
     got_signal = False
     prevsig = signal.signal(sig, sigquithandler)
     print('handler installed, previous handler was: ', prevsig)
+    pid = os.getpid()
     print("Killing %s in init (sig %d)" % (pid, sig))
     os.kill(pid, sig)
 

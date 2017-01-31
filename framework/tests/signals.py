@@ -16,6 +16,9 @@ import tempfile
 import shutil
 from basf2 import *
 
+# unblock SIGQUIT
+print(pthread_sigmask(SIG_UNBLOCK, [signal.SIGQUIT]))
+
 # we test for stray resources later, so let's clean up first
 os.system('clear_basf2_ipc')
 

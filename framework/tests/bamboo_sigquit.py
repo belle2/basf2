@@ -3,6 +3,7 @@ import os
 import sys
 
 got_signal = False
+print('blocked signals:', signal.pthread_sigmask(signal.SIG_BLOCK, []))
 
 
 def sigquithandler(sig, frame):

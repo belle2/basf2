@@ -16,6 +16,9 @@ import tempfile
 import shutil
 from basf2 import *
 
+# TODO investigating test failure on bamboo. (fails to die on SIGQUIT in single process.)
+signal.signal(signal.SIGQUIT, signal.SIG_DFL)
+
 # we test for stray resources later, so let's clean up first
 os.system('clear_basf2_ipc')
 

@@ -135,7 +135,20 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
   m_envelope = VXDEnvelopePar(GearDir(content, "Envelope/"));
 
   // Read alignment for detector m_prefix ('PXD' or 'SVD')
-  m_alignment[m_prefix] = VXDAlignmentPar(m_prefix, GearDir(content, "Alignment/"));
+  string path = (boost::format("Align[@component='%1%']/") % m_prefix).str();
+  GearDir params(GearDir(content, "Alignment/"), path);
+  if (!params) {
+    B2WARNING("Could not find alignment parameters for component " << m_prefix);
+    return;
+  }
+  m_alignment[m_prefix] = VXDAlignmentPar(params.getLength("du"),
+                                          params.getLength("dv"),
+                                          params.getLength("dw"),
+                                          params.getAngle("alpha"),
+                                          params.getAngle("beta"),
+                                          params.getAngle("gamma")
+                                         );
+
 
   //Read the definition of all sensor types
   GearDir components(content, "Components/");
@@ -179,7 +192,22 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
 
     string shellName = m_prefix + "." + shell.getString("@name");
 
-    m_alignment[ shellName ] = VXDAlignmentPar(shellName , GearDir(content, "Alignment/"));
+    path = (boost::format("Align[@component='%1%']/") % shellName).str();
+    GearDir params(GearDir(content, "Alignment/"), path);
+    if (!params) {
+      B2WARNING("Could not find alignment parameters for component " << shellName);
+      return;
+    }
+    m_alignment[shellName] = VXDAlignmentPar(params.getLength("du"),
+                                             params.getLength("dv"),
+                                             params.getLength("dw"),
+                                             params.getAngle("alpha"),
+                                             params.getAngle("beta"),
+                                             params.getAngle("gamma")
+                                            );
+
+
+
     VXDHalfShellPar halfShell(shell.getString("@name") , shell.getAngle("shellAngle", 0));
 
     for (const GearDir& layer : shell.getNodes("Layer")) {

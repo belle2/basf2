@@ -17,21 +17,15 @@
 
 namespace Belle2 {
 
-  class GearDir;
-
   /**
   * The Class for VXD Alignment payload
   */
   class VXDAlignmentPar: public TObject {
   public:
-    //! Default constructor
-    VXDAlignmentPar() {}
-    //! Constructor using Gearbox
-    explicit VXDAlignmentPar(const std::string& component, const GearDir& alignment) { read(component, alignment); }
-    //! Destructor
-    ~VXDAlignmentPar() {}
-    //! Get geometry parameters from Gearbox
-    void read(const std::string&, const GearDir&);
+    /** Constructor */
+    VXDAlignmentPar(double dU = 0, double dV = 0, double dW = 0, double alpha = 0, double beta = 0, double gamma = 0):
+      m_dU(dU), m_dV(dV), m_dW(dW), m_alpha(alpha), m_beta(beta), m_gamma(gamma)
+    {}
     /** get dU */
     double getDU() const { return m_dU; }
     /** get dV */
@@ -52,7 +46,6 @@ namespace Belle2 {
     double m_alpha;
     double m_beta;
     double m_gamma;
-
 
     ClassDef(VXDAlignmentPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };

@@ -81,10 +81,6 @@ def run_test(init_signal, event_signal, abort, test_in_process):
     output.param('outputFileName', testFile.name)
     output.param('updateFileCatalog', False)
 
-    def sigquithandler(sig, frame):
-        B2INFO('SIGQUIT handler called')
-        B2FATAL("dummy abort")
-
     class TestModule(Module):
         """test"""
 
@@ -94,9 +90,6 @@ def run_test(init_signal, event_signal, abort, test_in_process):
 
         def initialize(self):
             """reimplementation of Module::initialize()."""
-            # TODO investigating test failure on bamboo. (fails to die on SIGQUIT in single process.)
-            prevsig = signal.signal(signal.SIGQUIT, sigquithandler)
-            print('handler installed, previous handler was: ', prevsig)
 
             if init_signal:
                 pid = os.getpid()

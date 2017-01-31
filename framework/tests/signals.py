@@ -16,9 +16,6 @@ import tempfile
 import shutil
 from basf2 import *
 
-# TODO investigating test failure on bamboo. (fails to die on SIGQUIT in single process.)
-signal.signal(signal.SIGQUIT, signal.SIG_DFL)
-
 # we test for stray resources later, so let's clean up first
 os.system('clear_basf2_ipc')
 
@@ -93,6 +90,9 @@ def run_test(init_signal, event_signal, abort, test_in_process):
 
         def initialize(self):
             """reimplementation of Module::initialize()."""
+            # TODO investigating test failure on bamboo. (fails to die on SIGQUIT in single process.)
+            signal.signal(signal.SIGQUIT, signal.SIG_DFL)
+
             if init_signal:
                 pid = os.getpid()
                 B2INFO("Killing %s in init (sig %d)" % (pid, init_signal))

@@ -15,8 +15,10 @@ pid = os.getpid()
 print("Killing %s in init (sig %d)" % (pid, signal.SIGQUIT))
 os.kill(pid, signal.SIGQUIT)
 
+print("didn't work, try numeric value")
 # this wouldn't change a thing, right?
-# os.kill(pid, 3)
+os.kill(pid, 3)
 
+print("yup, signal handling is broken")
 # if handler is called we never end up here.
 sys.exit(1)

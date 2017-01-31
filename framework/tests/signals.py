@@ -16,8 +16,10 @@ import tempfile
 import shutil
 from basf2 import *
 
-# unblock SIGQUIT
-print(pthread_sigmask(SIG_UNBLOCK, [signal.SIGQUIT]))
+# Tests running in Bamboo have SIGQUIT blocked via sigmask(3),
+# so let's unblock it for this test.
+# See Jira ticket BII-1948 for details
+pthread_sigmask(SIG_UNBLOCK, [signal.SIGQUIT])
 
 # we test for stray resources later, so let's clean up first
 os.system('clear_basf2_ipc')

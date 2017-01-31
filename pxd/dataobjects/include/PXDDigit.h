@@ -100,7 +100,12 @@ namespace Belle2 {
     * @return unique channel ID, composed of VxdID (1 - 16), u pixel number (17-23), and v pixel number (24-32).
     */
     unsigned int getUniqueChannelID() const
-    { return m_vCellID + (m_uCellID << 9) + (m_sensorID << 16); }
+    {
+      // shift segment part of sensorID by two bits to make place for u+v
+      VxdID sensorID(m_sensorID);
+      sensorID.setSegmentNumber(sensorID.getSegmentNumber() << 2);
+      return m_vCellID + (m_uCellID << 10) + (sensorID << 16);
+    }
 
     /**
     * Implementation of the base class function.

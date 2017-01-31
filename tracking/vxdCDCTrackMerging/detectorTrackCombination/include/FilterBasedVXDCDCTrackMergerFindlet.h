@@ -73,9 +73,7 @@ namespace Belle2 {
     TrackFindingCDC::RelationAdder<RecoTrack*, RecoTrack*> m_relationAdder;
     /// A filter based on an extrapolation to a common plane.
     ExtrapolationDetectorTrackCombinationSelector m_extrapolationSelector;
-    /// A filter which cuts the weights on a given value.
-    TrackFindingCDC::CutSelector<RecoTrack*, RecoTrack*> m_distanceCutSelector;
-
+    /// A filter based on the extrapolation result and some additional variables
     TrackFindingCDC::FilterSelector<RecoTrack*, RecoTrack*,
                     TrackFindingCDC::ChooseableFilter<DetectorTrackCombinationFilterFactory>> m_distanceFilterCut;
   };

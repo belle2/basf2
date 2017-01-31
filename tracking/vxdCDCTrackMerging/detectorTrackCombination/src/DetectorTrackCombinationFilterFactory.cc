@@ -10,6 +10,7 @@
 #include <tracking/vxdCDCTrackMerging/detectorTrackCombination/DetectorTrackCombinationFilterFactory.h>
 
 #include <tracking/vxdCDCTrackMerging/detectorTrackCombination/DetectorTrackCombinationVarSet.h>
+#include <tracking/vxdCDCTrackMerging/detectorTrackCombination/DetectorTrackCombinationWeightVarSet.h>
 #include <tracking/vxdCDCTrackMerging/detectorTrackCombination/DetectorTrackCombinationTruthVarSet.h>
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
@@ -32,11 +33,19 @@ namespace {
   using RecordingDetectorTrackCombinationFilter =
     RecordingFilter<VariadicUnionVarSet<DetectorTrackCombinationTruthVarSet, DetectorTrackCombinationVarSet>>;
 
+  using RecordingDetectorTrackCombinationWeightFilter =
+    RecordingFilter<VariadicUnionVarSet<DetectorTrackCombinationTruthVarSet, DetectorTrackCombinationVarSet,
+    DetectorTrackCombinationWeightVarSet>>;
+
   /// All filter for VXD - CDC relations.
   using AllDetectorTrackCombinationFilter = AllFilter<BaseDetectorTrackCombinationFilter>;
 
   /// MVA filter for VXD - CDC relations.
   using MVADetectorTrackCombinationFilter = MVAFilter<DetectorTrackCombinationVarSet>;
+
+  /// MVA filter for VXD - CDC relations.
+  using MVADetectorTrackCombinationWeightFilter = MVAFilter <
+                                                  VariadicUnionVarSet<DetectorTrackCombinationVarSet, DetectorTrackCombinationWeightVarSet >>;
 }
 
 DetectorTrackCombinationFilterFactory::DetectorTrackCombinationFilterFactory(const std::string& defaultFilterName)
@@ -77,8 +86,12 @@ DetectorTrackCombinationFilterFactory::create(const std::string& filterName) con
     return makeUnique<MCDetectorTrackCombinationFilter>();
   } else if (filterName == "recording") {
     return makeUnique<RecordingDetectorTrackCombinationFilter>("DetectorTrackCombinationFilter.root");
+  } else if (filterName == "recording_weight") {
+    return makeUnique<RecordingDetectorTrackCombinationWeightFilter>("DetectorTrackCombinationWeightFilter.root");
   } else if (filterName == "mva") {
     return makeUnique<MVADetectorTrackCombinationFilter>("tracking/data/vxdcdc_DetectorTrackCombinationFilter.xml");
+  } else if (filterName == "mva_weight") {
+    return makeUnique<MVADetectorTrackCombinationWeightFilter>("tracking/data/vxdcdc_DetectorTrackCombinationWeightFilter.xml");
   } else {
     return Super::create(filterName);
   }

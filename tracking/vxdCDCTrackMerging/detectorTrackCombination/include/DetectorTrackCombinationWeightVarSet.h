@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Malwin Weiler, Nils Braun                                *
+ * Contributors: Nils Braun                                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -15,33 +15,40 @@
 namespace Belle2 {
   /// Names of the variables to be generated.
   constexpr
-  static char const* const detectorTrackCombinationTruthNames[] = {
-    "truth"
+  static char const* const detectorTrackCombinationWeightVarNames[] = {
+    "relation_weight"
   };
 
   /// Vehicle class to transport the variable names
-  class DetectorTrackCombinationTruthVarNames : public TrackFindingCDC::VarNames<BaseDetectorTrackCombinationFilter::Object> {
+  class DetectorTrackCombinationWeightVarNames : public TrackFindingCDC::VarNames<BaseDetectorTrackCombinationFilter::Object> {
 
   public:
     /// Number of variables to be generated.
-    static const size_t nVars = TrackFindingCDC::size(detectorTrackCombinationTruthNames);
+    static const size_t nVars = TrackFindingCDC::size(detectorTrackCombinationWeightVarNames);
 
     /// Get the name of the column.
     constexpr
     static char const* getName(int iName)
     {
-      return detectorTrackCombinationTruthNames[iName];
+      return detectorTrackCombinationWeightVarNames[iName];
     }
   };
 
   /**
-   * Var set used in the VXD-CDC-Merger for calculating the probability of a VXD-CDC-track match,
-   * which knows the truth information if two tracks belong together or not.
+   * Var set used in the VXD-CDC-Merger for calculating the probability of a VXD-CDC-track match.
    */
-  class DetectorTrackCombinationTruthVarSet : public TrackFindingCDC::VarSet<DetectorTrackCombinationTruthVarNames> {
+  class DetectorTrackCombinationWeightVarSet : public TrackFindingCDC::VarSet<DetectorTrackCombinationWeightVarNames> {
 
   public:
-    /// Generate and assign the variables from the pair.
-    virtual bool extract(const BaseDetectorTrackCombinationFilter::Object* pair) override;
+    /// Generate and assign the variables from the VXD-CDC-pair
+    bool extract(const BaseDetectorTrackCombinationFilter::Object* pair) final {
+      if (not pair)
+      {
+        return false;
+      }
+
+      var<named("relation_weight")>() = pair->getWeight();
+      return true;
+    }
   };
 }

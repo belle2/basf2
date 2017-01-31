@@ -20,7 +20,6 @@ FilterBasedVXDCDCTrackMergerFindlet::FilterBasedVXDCDCTrackMergerFindlet()
   addProcessingSignalListener(&m_cutFilter);
   addProcessingSignalListener(&m_relationAdder);
   addProcessingSignalListener(&m_extrapolationSelector);
-  addProcessingSignalListener(&m_distanceCutSelector);
   addProcessingSignalListener(&m_distanceFilterCut);
 }
 
@@ -32,7 +31,6 @@ void FilterBasedVXDCDCTrackMergerFindlet::exposeParameters(ModuleParamList* modu
   m_cutFilter.exposeParameters(moduleParamList, prefix);
   m_relationAdder.exposeParameters(moduleParamList, prefix);
   m_extrapolationSelector.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("extrapolation", prefix));
-  m_distanceCutSelector.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("distanceWeight", prefix));
   m_distanceFilterCut.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("distance", prefix));
 
   moduleParamList->addParameter("extrapolate", m_param_extrapolate, "TODO", m_param_extrapolate);
@@ -68,7 +66,6 @@ void FilterBasedVXDCDCTrackMergerFindlet::apply()
       m_relationAdder.apply(weightedRelations);
 
       // Clear all found relations and start from scratch - this time only using those items which were not used before
-
       m_storeArrayMerger.removeCDCRecoTracksWithPartner(cdcRecoTrackVector);
       m_storeArrayMerger.removeVXDRecoTracksWithPartner(vxdRecoTrackVector);
 
@@ -80,8 +77,8 @@ void FilterBasedVXDCDCTrackMergerFindlet::apply()
     // Calculate a measure based on an extrapolation to the CDC inner wall
     m_extrapolationSelector.apply(weightedRelations);
 
-    // Cut on this measure, so that too large distances are dismissed
-    m_distanceCutSelector.apply(weightedRelations);
+    // Record what is in the weighted relations so far
+    m_distanceFilterCut.apply(weightedRelations);
   }
 
   // Find the best matching elements
@@ -89,9 +86,6 @@ void FilterBasedVXDCDCTrackMergerFindlet::apply()
 
   // Add the already found items from the filter-based decision
   m_relationAdder.apply(weightedRelations);
-
-  // Record what is in the weighted relations so far
-  m_distanceFilterCut.apply(weightedRelations);
 
   // Use the relations to merge the tracks and fill them into a new store array entry
   m_storeArrayMerger.apply();

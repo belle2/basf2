@@ -32,7 +32,5 @@ bool DetectorTrackCombinationTruthVarSet::extract(const BaseDetectorTrackCombina
     var<named("truth")>() = false;
   }
 
-  var<named("truth_relation_weight")>() = pair->getWeight();
-
   return true;
 }

@@ -23,7 +23,7 @@ namespace Belle2 {
         "This module merges tracks which are reconstructed, separately, in the silicon (PXD+VXD) and in the CDC");
 
       ModuleParamList moduleParamList = this->getParamList();
-      moduleParamList.getParameter<std::string>("distanceFilter").setDefaultValue("recording");
+      moduleParamList.getParameter<std::string>("distanceFilter").setDefaultValue("mva_weights");
       this->setParamList(moduleParamList);
     }
   };

@@ -42,7 +42,7 @@ namespace Belle2 {
      * Usefull constructor
      * @param scrodID SCROD ID
      */
-    TOPRawDigit(unsigned short scrodID): m_scrodID(scrodID)
+    explicit TOPRawDigit(unsigned short scrodID): m_scrodID(scrodID)
     {}
 
     /**

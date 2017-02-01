@@ -13,15 +13,10 @@
 #include <TObject.h>
 #include <string>
 
-//#include <algorithm>
-//#include <root/TVector3.h>
-
 #include <vxd/dbobjects/VXDSensorInfoBasePar.h>
 
 
 namespace Belle2 {
-
-  class GearDir;
 
   /**
   * The Class for VXD geometry

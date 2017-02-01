@@ -257,7 +257,6 @@ void RootOutputModule::fillFileMetaData()
   fileMetaDataPtr->setSteering(Environment::Instance().getSteering());
   fileMetaDataPtr->setMcEvents(Environment::Instance().getNumberOfMCEvents());
   fileMetaDataPtr->setDatabaseGlobalTag(Database::getGlobalTag());
-  fileMetaDataPtr->setCommitID(RootIOUtilities::getCommitID());
 
   //register the file in the catalog
   if (m_updateFileCatalog) {

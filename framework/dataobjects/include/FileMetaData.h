@@ -166,9 +166,11 @@ namespace Belle2 {
      *  @param site The site where the file was created.
      *  @param user The user who created the file.
      *  @param release The software release.
+     *  @param commitid git SHA1-like commit ID.
      */
-    void setCreationData(const std::string& date, const std::string& site, const std::string& user, const std::string& release)
-    {m_date = date; m_site = site; m_user = user; m_release = release;}
+    void setCreationData(const std::string& date, const std::string& site, const std::string& user, const std::string& release,
+                         const std::string& commitid)
+    {m_date = date; m_site = site; m_user = user; m_release = release; m_commitID = commitid; }
 
     /** Random seed setter.
      *

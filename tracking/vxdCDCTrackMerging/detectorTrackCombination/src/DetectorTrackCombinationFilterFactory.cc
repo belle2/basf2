@@ -15,6 +15,7 @@
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
+#include <tracking/trackFindingCDC/filters/base/PassThroughFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RandomFilter.h>
@@ -46,6 +47,8 @@ namespace {
   /// MVA filter for VXD - CDC relations.
   using MVADetectorTrackCombinationWeightFilter = MVAFilter <
                                                   VariadicUnionVarSet<DetectorTrackCombinationVarSet, DetectorTrackCombinationWeightVarSet >>;
+
+  using PassThroughDetectorTrackCombinationWeightFilter = PassThroughFilter<BaseDetectorTrackCombinationFilter>;
 }
 
 DetectorTrackCombinationFilterFactory::DetectorTrackCombinationFilterFactory(const std::string& defaultFilterName)
@@ -71,7 +74,10 @@ DetectorTrackCombinationFilterFactory::getValidFilterNamesAndDescriptions() cons
     {"all", "set all track combinations as good"},
     {"truth", "monte carlo truth"},
     {"recording", "record variables to a TTree"},
-    {"mva", "test with a mva method"}
+    {"recording_weight", "record variables to a TTree"},
+    {"mva", "test with a mva method"},
+    {"mva_weight", "test with a mva method"},
+    {"pass_through", "do not touch the weights"}
   };
 }
 
@@ -92,6 +98,8 @@ DetectorTrackCombinationFilterFactory::create(const std::string& filterName) con
     return makeUnique<MVADetectorTrackCombinationFilter>("tracking/data/vxdcdc_DetectorTrackCombinationFilter.xml");
   } else if (filterName == "mva_weight") {
     return makeUnique<MVADetectorTrackCombinationWeightFilter>("tracking/data/vxdcdc_DetectorTrackCombinationWeightFilter.xml");
+  } else if (filterName == "pass_through") {
+    return makeUnique<PassThroughDetectorTrackCombinationWeightFilter>();
   } else {
     return Super::create(filterName);
   }

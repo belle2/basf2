@@ -117,7 +117,26 @@ void SVDGeometryPar::createLayerSupport(int layer, GearDir support)
   //Check if there are any endrings defined for this layer. If not we don't create any
   GearDir endrings(support, (boost::format("Endrings/Layer[@id='%1%']") % layer).str());
   if (endrings) {
-    m_endrings[layer] = SVDEndringsPar(layer, support);
+    m_endrings[layer] = SVDEndringsPar(support.getString("Endrings/Material"),
+                                       support.getLength("Endrings/length"),
+                                       support.getLength("Endrings/gapWidth"),
+                                       support.getLength("Endrings/baseThickness")
+                                      );
+
+    //Create  the endrings
+    for (const GearDir& endring : endrings.getNodes("Endring")) {
+      SVDEndringsTypePar endringPar(endring.getString("@name"),
+                                    endring.getLength("z"),
+                                    endring.getLength("baseRadius"),
+                                    endring.getLength("innerRadius"),
+                                    endring.getLength("outerRadius"),
+                                    endring.getLength("horizontalBar"),
+                                    endring.getLength("verticalBar")
+                                   );
+      m_endrings[layer].getTypes().push_back(endringPar);
+    }
+
+
   }
 
   // Now let's add the cooling pipes to the Support

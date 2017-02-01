@@ -16,22 +16,26 @@
 
 namespace Belle2 {
 
-  class GearDir;
+
 
   /**
   * The Class for SVD Endring Type
   */
-
   class SVDEndringsTypePar: public TObject {
 
   public:
+    /** Constructor */
+    SVDEndringsTypePar(const std::string& name, double z, double baseRadius, double innerRadius, double outerRadius,
+                       double horizontalBarWidth, double verticalBarWidth):
+      m_name(name), m_z(z), m_baseRadius(baseRadius), m_innerRadius(innerRadius), m_outerRadius(outerRadius),
+      m_horizontalBarWidth(horizontalBarWidth), m_verticalBarWidth(verticalBarWidth)
+    {}
+    /** Constructor */
+    SVDEndringsTypePar():
+      m_name(""), m_z(0), m_baseRadius(0), m_innerRadius(0), m_outerRadius(0),
+      m_horizontalBarWidth(0), m_verticalBarWidth(0)
+    {}
 
-    //! Default constructor
-    SVDEndringsTypePar() {}
-    //! Constructor using Gearbox
-    explicit SVDEndringsTypePar(const GearDir& endring) { read(endring); }
-    //! Get geometry parameters from Gearbox
-    void read(const GearDir&);
     /** get name */
     const std::string& getName() const { return m_name; }
     /** get z */
@@ -67,13 +71,15 @@ namespace Belle2 {
   class SVDEndringsPar: public TObject {
 
   public:
+    /** Constructor */
+    SVDEndringsPar(const std::string& material, double length, double gapWidth, double baseThickness):
+      m_material(material),  m_length(length), m_gapWidth(gapWidth), m_baseThickness(baseThickness)
+    {}
+    /** Constructor */
+    SVDEndringsPar():
+      m_material(""),  m_length(0), m_gapWidth(0), m_baseThickness(0)
+    {}
 
-    //! Default constructor
-    SVDEndringsPar() {}
-    //! Constructor using Gearbox
-    explicit SVDEndringsPar(int layer, const GearDir& support) { read(layer, support); }
-    //! Get geometry parameters from Gearbox
-    void read(int, const GearDir&);
     /** get material */
     const std::string& getMaterial() const { return m_material; }
     /** get length */
@@ -84,6 +90,8 @@ namespace Belle2 {
     double getBaseThickness() const { return m_baseThickness; }
     /** get types (forward/backward) */
     const std::vector<SVDEndringsTypePar>& getTypes() const { return m_types; }
+    /** get types (forward/backward) */
+    std::vector<SVDEndringsTypePar>& getTypes() { return m_types; }
 
   private:
 

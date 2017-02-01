@@ -3,7 +3,7 @@
  * Copyright(C) 2011 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jakob Lettenbichler                                      *
+ * Contributors: Felix Metzner                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -22,17 +22,20 @@
 
 namespace Belle2 {
 
-  /** The quality estimator module for SpacePointTrackCandidates using a circleFit. */
-  class QualityEstimatorVXDCircleFitModule : public Module {
+  /** The quality estimator module for SpacePointTrackCandidates using a tripletFit. */
+  /** Based on the paper https://arxiv.org/abs/1606.04990 */
+  class QualityEstimatorVXDTripletFitModule : public Module {
 
   public:
 
+    /**
+     * Constructor of the module.
+     */
+    QualityEstimatorVXDTripletFitModule();
 
-    /** Constructor of the module. */
-    QualityEstimatorVXDCircleFitModule();
 
-
-    /** Initializes the Module. */
+    /** Initializes the Module.
+     */
     virtual void initialize()
     {
       InitializeCounters();
@@ -44,7 +47,7 @@ namespace Belle2 {
     virtual void beginRun();
 
 
-    /** Applies the circleFit at given sets of TCs. */
+    /** Applies the tripletFit at given sets of TCs. */
     virtual void event();
 
 
@@ -60,10 +63,8 @@ namespace Belle2 {
 
     // module parameters
 
-
     /** sets the name of expected StoreArray with SpacePointTrackCand in it. */
     std::string m_PARAMtcArrayName;
-
 
     // member variables
 
@@ -73,10 +74,8 @@ namespace Belle2 {
     /** knows current event number. */
     unsigned int m_eventCounter;
 
-
     /** total number of TCs found in SpacePointTrackCand-container. */
     unsigned int m_nTCsTotal;
-
 
     /** the storeArray for SpacePointTrackCands as member, is faster than recreating link for each event. */
     StoreArray<SpacePointTrackCand> m_spacePointTrackCands;

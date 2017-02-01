@@ -11,9 +11,6 @@
 #include <tracking/modules/spacePointCreator/SPTCvirtualIPRemoverModule.h>
 #include <framework/logging/Logger.h>
 
-#include <tracking/vxdCaTracking/TrackletFilters.h>
-#include <tracking/vxdCaTracking/SharedFunctions.h> // e.g. PositionInfo
-
 // ROOT
 #include <TVector3.h>
 #include <TMath.h>
@@ -40,7 +37,6 @@ SPTCvirtualIPRemoverModule::SPTCvirtualIPRemoverModule() : Module()
            "If you want to keep the vIP only for short TCs, then set this value to the number of hits a TC is maximally allowed to have to not loose its vIP (number of hits without counting the vIP).",
            unsigned(3));
 }
-
 
 
 void SPTCvirtualIPRemoverModule::event()
@@ -71,7 +67,7 @@ void SPTCvirtualIPRemoverModule::event()
       }
     }
 
-    B2DEBUG(1, "QualityEstimatorVXDCircleFitModule: event " << m_eventCounter
+    B2DEBUG(1, "SPTCvirtualIPRemoverModule:event: event " << m_eventCounter
             << ": TC " << nTC
             << " with " << nHits
             << " hits has vIP: " << (hasVIP ? "true" : "false")
@@ -81,7 +77,6 @@ void SPTCvirtualIPRemoverModule::event()
   }
 
 }
-
 
 
 void SPTCvirtualIPRemoverModule::endRun()
@@ -95,4 +90,3 @@ void SPTCvirtualIPRemoverModule::endRun()
          << ", nVIPsRemovedPerEvent: " << invEvents * float(m_nVIPsRemoved)
         );
 }
-

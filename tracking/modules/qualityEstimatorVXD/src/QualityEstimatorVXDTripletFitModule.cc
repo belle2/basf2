@@ -3,12 +3,12 @@
  * Copyright(C) 2011 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jakob Lettenbichler                                      *
+ * Contributors: Felix Metzner                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/qualityEstimatorVXD/QualityEstimatorVXDCircleFitModule.h>
+#include <tracking/modules/qualityEstimatorVXD/QualityEstimatorVXDTripletFitModule.h>
 #include <framework/logging/Logger.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 
@@ -20,9 +20,9 @@ using namespace std;
 using namespace Belle2;
 
 
-REG_MODULE(QualityEstimatorVXDCircleFit)
+REG_MODULE(QualityEstimatorVXDTripletFit)
 
-QualityEstimatorVXDCircleFitModule::QualityEstimatorVXDCircleFitModule() : Module()
+QualityEstimatorVXDTripletFitModule::QualityEstimatorVXDTripletFitModule() : Module()
 {
   //Set module properties
   setDescription("The quality estimator module for SpacePointTrackCandidates using a circleFit.");
@@ -30,11 +30,10 @@ QualityEstimatorVXDCircleFitModule::QualityEstimatorVXDCircleFitModule() : Modul
 
 
   addParam("tcArrayName", m_PARAMtcArrayName, " sets the name of expected StoreArray with SpacePointTrackCand in it", string(""));
-
 }
 
 
-void QualityEstimatorVXDCircleFitModule::beginRun()
+void QualityEstimatorVXDTripletFitModule::beginRun()
 {
   InitializeCounters();
   // now retrieving the bfield value used in this module
@@ -42,18 +41,17 @@ void QualityEstimatorVXDCircleFitModule::beginRun()
 }
 
 
-void QualityEstimatorVXDCircleFitModule::event()
+void QualityEstimatorVXDTripletFitModule::event()
 {
   m_eventCounter++;
-  B2DEBUG(1, "\n" << "QualityEstimatorVXDCircleFitModule:event: event " << m_eventCounter << "\n");
+  B2DEBUG(1, "\n" << "QualityEstimatorVXDTripletFitModule:event: event " << m_eventCounter << "\n");
   m_nTCsTotal += m_spacePointTrackCands.getEntries();
-
 
   auto fitter = QualityEstimators();
   fitter.resetMagneticField(m_bFieldZ);
 
   unsigned nTC = 0;
-  // assign a QI computed using a circleFit for each given SpacePointTrackCand
+  // assign a QI computed using a triplet fit for each given SpacePointTrackCand
   for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
 
     unsigned nHits = aTC.size();
@@ -65,7 +63,7 @@ void QualityEstimatorVXDCircleFitModule::event()
     convertedPath.reserve(nHits);
 
     // collecting actual hits
-    for (const SpacePoint* aHit : aTC.getSortedHits()) { // is a const SpacePoint* here
+    for (const SpacePoint* aHit : aTC) { // is a const SpacePoint* here
       PositionInfo convertedHit{
         TVector3(aHit->getPosition()),
         TVector3(aHit->getPositionError()),
@@ -77,14 +75,16 @@ void QualityEstimatorVXDCircleFitModule::event()
 
     fitter.resetValues(&convertedPath);
 
-    std::pair<double, TVector3> result = fitter.circleFit();
+    std::pair<double, TVector3> result = fitter.tripletFit();
     double chi2 = result.first;
 
-    if (chi2 < 0) { B2WARNING("QualityEstimatorVXDCircleFitModule: event " << m_eventCounter << ": chi2 is reset to 0! (before: " << chi2 << ")"); chi2 = 0; }
-    double probability = TMath::Prob(chi2, nHits -
-                                     3); // -3: 3 parameters are estimated, which reduces the nDF (number of Hits, since only one ndF per hit is added in a circleFit (unlike the situation for helix fits)
+    if (chi2 < 0) { B2WARNING("QualityEstimatorVXDTripletFitModule: event " << m_eventCounter << ": chi2 is reset to 0! (before: " << chi2 << ")"); chi2 = 0; }
 
-    B2DEBUG(1, "QualityEstimatorVXDCircleFitModule: event " << m_eventCounter
+    // Calculating a probaility from the Chi2 value which considers the degrees of freedom
+    // TODO: check degrees of freedom!
+    double probability = TMath::Prob(chi2, 2 * nHits - 5);
+
+    B2DEBUG(1, "QualityEstimatorVXDTripletFitModule: event " << m_eventCounter
             << ": TC " << nTC
             << " with " << nHits
             << " hits has pT: " << result.second.Perp()
@@ -97,20 +97,18 @@ void QualityEstimatorVXDCircleFitModule::event()
 }
 
 
-
-void QualityEstimatorVXDCircleFitModule::endRun()
+void QualityEstimatorVXDTripletFitModule::endRun()
 {
   if (m_eventCounter == 0) { m_eventCounter++; } // prevents division by zero
   double invEvents = 1. / m_eventCounter;
 
-  B2INFO("QualityEstimatorVXDCircleFitModule:endRun: events: " << m_eventCounter
+  B2INFO("QualityEstimatorVXDTripletFitModule:endRun: events: " << m_eventCounter
          << ", nSPTCsPerEvent: " << invEvents * float(m_nTCsTotal)
         );
 }
 
 
-
-void QualityEstimatorVXDCircleFitModule::InitializeCounters()
+void QualityEstimatorVXDTripletFitModule::InitializeCounters()
 {
   m_eventCounter = 0;
   m_nTCsTotal = 0;

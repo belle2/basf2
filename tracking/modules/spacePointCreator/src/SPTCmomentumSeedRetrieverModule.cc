@@ -10,12 +10,7 @@
 
 #include <tracking/modules/spacePointCreator/SPTCmomentumSeedRetrieverModule.h>
 #include <framework/logging/Logger.h>
-
-#include <tracking/vxdCaTracking/TrackletFilters.h>
-#include <tracking/vxdCaTracking/SharedFunctions.h> // e.g. PositionInfo
-
 #include <geometry/bfieldmap/BFieldMap.h>
-
 
 // ROOT
 #include <TVector3.h>
@@ -29,8 +24,6 @@ REG_MODULE(SPTCmomentumSeedRetriever)
 
 SPTCmomentumSeedRetrieverModule::SPTCmomentumSeedRetrieverModule() : Module()
 {
-  InitializeCounters();
-
   //Set module properties
   setDescription("A module for creating momentum seeds for spacepoint track candidates.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -41,7 +34,6 @@ SPTCmomentumSeedRetrieverModule::SPTCmomentumSeedRetrieverModule() : Module()
 }
 
 
-
 void SPTCmomentumSeedRetrieverModule::beginRun()
 {
   InitializeCounters();
@@ -50,7 +42,6 @@ void SPTCmomentumSeedRetrieverModule::beginRun()
   m_bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
   B2DEBUG(1, "SPTCmomentumSeedRetrieverModule:beginRun: B-Field z-component: " << m_bFieldZ);
 }
-
 
 
 void SPTCmomentumSeedRetrieverModule::event()
@@ -70,7 +61,6 @@ void SPTCmomentumSeedRetrieverModule::event()
 }
 
 
-
 void SPTCmomentumSeedRetrieverModule::endRun()
 {
   if (m_eventCounter == 0) { m_eventCounter++; } // prevents division by zero
@@ -82,12 +72,11 @@ void SPTCmomentumSeedRetrieverModule::endRun()
 }
 
 
-
 //    unsigned int createSPTCmomentumSeeds(SPTCContainerType& tcContainer, std::vector<std::vector<const SpacePoint*> > allPaths)
 bool SPTCmomentumSeedRetrieverModule::createSPTCmomentumSeed(SpacePointTrackCand& aTC)
 {
   // create tool for generating the momentum seed:
-  auto seedGenerator = TrackletFilters();
+  auto seedGenerator = QualityEstimators();
   seedGenerator.resetMagneticField(m_bFieldZ);
 
   int chargeSignFactor = 0; /**< == 1 if pdg code is for a lepton, -1 if not. */

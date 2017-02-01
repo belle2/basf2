@@ -17,9 +17,6 @@
 
 namespace Belle2 {
 
-  class GearDir;
-
-
   /**
   * The Class for SVD Support Box
   */

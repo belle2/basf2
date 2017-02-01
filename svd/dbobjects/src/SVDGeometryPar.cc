@@ -123,7 +123,17 @@ void SVDGeometryPar::createLayerSupport(int layer, GearDir support)
   // Now let's add the cooling pipes to the Support
   GearDir pipes(support, (boost::format("CoolingPipes/Layer[@id='%1%']") % layer).str());
   if (pipes) {
-    m_coolingPipes[layer] = SVDCoolingPipesPar(layer, support);
+    m_coolingPipes[layer] = SVDCoolingPipesPar(support.getString("CoolingPipes/Material"),
+                                               support.getLength("CoolingPipes/outerDiameter"),
+                                               support.getLength("CoolingPipes/wallThickness"),
+                                               pipes.getInt("nPipes"),
+                                               pipes.getAngle("startPhi"),
+                                               pipes.getAngle("deltaPhi"),
+                                               pipes.getLength("radius"),
+                                               pipes.getLength("zstart"),
+                                               pipes.getLength("zend")
+                                              );
+    if (pipes.exists("deltaL")) m_coolingPipes[layer].setDeltaL(pipes.getLength("deltaL"));
   }
 
   return;

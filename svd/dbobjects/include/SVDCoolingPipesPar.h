@@ -17,8 +17,6 @@
 
 namespace Belle2 {
 
-  class GearDir;
-
   /**
   * The Class for SVD Cooling Pipes
   */
@@ -27,12 +25,18 @@ namespace Belle2 {
 
   public:
 
-    //! Default constructor
-    SVDCoolingPipesPar() {}
-    //! Constructor using Gearbox
-    explicit SVDCoolingPipesPar(int layer, const GearDir& support) { read(layer, support); }
-    //! Get geometry parameters from Gearbox
-    void read(int, const GearDir&);
+    /** Constructor */
+    SVDCoolingPipesPar(const std::string& material, double outerDiameter, double wallThickness, int nPipes,
+                       double startPhi, double deltaPhi, double radius, double zstart, double zend, double deltaL = 0):
+      m_material(material), m_outerDiameter(outerDiameter), m_wallThickness(wallThickness), m_nPipes(nPipes),
+      m_startPhi(startPhi), m_deltaPhi(deltaPhi), m_radius(radius), m_zstart(zstart), m_zend(zend), m_deltaL(deltaL)
+    {}
+    /** Constructor */
+    SVDCoolingPipesPar():
+      m_material(""), m_outerDiameter(0.), m_wallThickness(0.), m_nPipes(0),
+      m_startPhi(0), m_deltaPhi(0), m_radius(0), m_zstart(0), m_zend(0), m_deltaL(0)
+    {}
+
     /** get material */
     const std::string& getMaterial() const { return m_material; }
     /** get outer diameter */
@@ -53,19 +57,21 @@ namespace Belle2 {
     double getZEnd() const { return m_zend; }
     /** get deltal */
     double getDeltaL() const { return m_deltaL; }
+    /** set deltal */
+    void setDeltaL(double deltaL)  { m_deltaL = deltaL; }
 
   private:
     std::string m_material;
     double m_outerDiameter;
     double m_wallThickness;
 
-    int m_nPipes {0};
-    double m_startPhi {0};
-    double m_deltaPhi {0};
-    double m_radius {0};
-    double m_zstart {0};
-    double m_zend {0};
-    double m_deltaL {0};
+    int m_nPipes;
+    double m_startPhi;
+    double m_deltaPhi;
+    double m_radius;
+    double m_zstart;
+    double m_zend;
+    double m_deltaL;
 
 
     ClassDef(SVDCoolingPipesPar, 5);  /**< ClassDef, must be the last term before the closing {}*/

@@ -74,10 +74,7 @@ namespace Belle2 {
         };
 
         // Erase all items with a weight of NAN
-        weightedRelations.erase(std::remove_if(weightedRelations.begin(),
-                                               weightedRelations.end(),
-                                               weightIsNan),
-                                weightedRelations.end());
+        erase_remove_if(weightedRelations, weightIsNan);
 
         std::sort(weightedRelations.begin(), weightedRelations.end());
       }

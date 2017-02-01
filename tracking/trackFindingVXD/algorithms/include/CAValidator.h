@@ -24,8 +24,8 @@ namespace Belle2 {
     /** determines max number of iterations allowed by user, standard value is (number of VXD layers x 4) + 1. */
     int nMaxIterations = 25;
 
-    /** threshold for being seed, standard value is 2 */
-    unsigned int seedThreshold = 2;
+    /** threshold for being seed, standard value is 1 */
+    unsigned int seedThreshold = 1;
   };
 
 } //Belle2 namespace

@@ -23,7 +23,7 @@ public:
        };
 public:
   SA0xChannelParam() {}
-  ~SA0xChannelParam() {}
+  virtual ~SA0xChannelParam() {}
   unsigned int getMaskVariable() { return MASK_VARIABLE; }
   /* individual value */
   void set_decaytime(int x)

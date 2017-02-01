@@ -12,9 +12,9 @@ namespace Belle2 {
     virtual ~CDCFEE() throw() {}
 
   public:
-    virtual void init(RCCallback& callback, HSLB& hslb, const DBObject& obj);
-    virtual void boot(RCCallback& callback, HSLB& hslb, const DBObject& obj);
-    virtual void load(RCCallback& callback, HSLB& hslb, const DBObject& obj);
+    virtual void init(RCCallback& callback, HSLB& hslb);
+    virtual void boot(RCCallback& callback, HSLB& hslb, const DBObject& conf);
+    virtual void load(RCCallback& callback, HSLB& hslb, const DBObject& conf);
     virtual void monitor(RCCallback& callback, HSLB& hslb);
 
   };

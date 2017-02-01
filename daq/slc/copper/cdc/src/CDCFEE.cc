@@ -16,7 +16,7 @@ CDCFEE::CDCFEE()
 {
 }
 
-void CDCFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
+void CDCFEE::init(RCCallback& callback, HSLB& hslb)
 {
   std::string vname = StringUtil::form("cdc[%d]", hslb.get_finid());
   LogFile::warning(vname);

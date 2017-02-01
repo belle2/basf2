@@ -15,7 +15,7 @@ TEMPLATEFEE::TEMPLATEFEE()
 {
 }
 
-void TEMPLATEFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
+void TEMPLATEFEE::init(RCCallback& callback, HSLB& hslb)
 {
   std::string vname = StringUtil::form("template[%d].", hslb.get_finid());
   callback.add(new FEE8Handler(vname + "reg0", callback, hslb, *this, REG0_ADDR));

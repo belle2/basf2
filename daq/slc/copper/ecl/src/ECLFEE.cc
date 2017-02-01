@@ -19,7 +19,7 @@ ECLFEE::ECLFEE()
 {
 }
 
-void ECLFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
+void ECLFEE::init(RCCallback& callback, HSLB& hslb)
 {
   std::string vname = StringUtil::form("ecl[%d].", hslb.get_finid());
   callback.add(new FEE8Handler(vname + "shaper_mask_low", callback, hslb, *this, 0x20));

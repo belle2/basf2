@@ -28,12 +28,14 @@ namespace Belle2 {
 
   public:
 
-    //! Default constructor
-    SVDSupportBoxPar() {}
-    //! Constructor using Gearbox
-    explicit SVDSupportBoxPar(const GearDir& content) { read(content); }
-    //! Get geometry parameters from Gearbox
-    void read(const GearDir&);
+    /** Constructor */
+    SVDSupportBoxPar(double theta, double zpos, double rpos, double length):
+      m_theta(theta), m_zpos(zpos), m_rpos(rpos), m_length(length)
+    {}
+    /** Constructor */
+    SVDSupportBoxPar():
+      m_theta(0.), m_zpos(0.), m_rpos(0.), m_length(0.)
+    {}
 
     /** get theta */
     double getTheta() const { return m_theta; }
@@ -61,12 +63,14 @@ namespace Belle2 {
 
   public:
 
-    //! Default constructor
-    SVDSupportTabPar() {}
-    //! Constructor using Gearbox
-    explicit SVDSupportTabPar(const GearDir& content) { read(content); }
-    //! Get geometry parameters from Gearbox
-    void read(const GearDir&);
+    /** Constructor */
+    SVDSupportTabPar(double theta, double zpos, double rpos):
+      m_theta(theta), m_zpos(zpos), m_rpos(rpos)
+    {}
+    /** Constructor */
+    SVDSupportTabPar():
+      m_theta(0.), m_zpos(0.), m_rpos(0.)
+    {}
 
     /** get theta */
     double getTheta() const { return m_theta; }
@@ -90,13 +94,14 @@ namespace Belle2 {
   class SVDEndmountPar: public TObject {
 
   public:
-
-    //! Default constructor
-    SVDEndmountPar() {}
-    //! Constructor using Gearbox
-    explicit SVDEndmountPar(const GearDir& content) { read(content); }
-    //! Get geometry parameters from Gearbox
-    void read(const GearDir&);
+    /** Constructor */
+    SVDEndmountPar(const std::string& name, double height, double width, double length, double zpos, double rpos):
+      m_name(name), m_height(height), m_width(width), m_length(length), m_zpos(zpos), m_rpos(rpos)
+    {}
+    /** Constructor */
+    SVDEndmountPar():
+      m_name(""), m_height(0.), m_width(0.), m_length(0.), m_zpos(0.), m_rpos(0.)
+    {}
 
     /** get name */
     const std::string& getName() const { return m_name; }
@@ -132,18 +137,29 @@ namespace Belle2 {
   class SVDSupportRibsPar: public TObject {
 
   public:
+    /** Constructor */
+    SVDSupportRibsPar(double spacing, double height, double innerWidth, double outerWidth, double tabLength,
+                      const std::string& outerMaterial, const std::string& innerMaterial, const std::string& outerColor, const std::string& innerColor,
+                      const std::string& endmountMaterial):
+      m_spacing(spacing), m_height(height), m_innerWidth(innerWidth), m_outerWidth(outerWidth), m_tabLength(tabLength),
+      m_outerMaterial(outerMaterial), m_innerMaterial(innerMaterial), m_outerColor(outerColor), m_innerColor(innerColor),
+      m_endmountMaterial(endmountMaterial)
+    {}
+    /** Constructor */
+    SVDSupportRibsPar():
+      m_spacing(0.), m_height(0.), m_innerWidth(0.), m_outerWidth(0.), m_tabLength(0.),
+      m_outerMaterial(""), m_innerMaterial(""), m_outerColor(""), m_innerColor(""), m_endmountMaterial("")
+    {}
 
-    //! Default constructor
-    SVDSupportRibsPar() {}
-    //! Constructor using Gearbox
-    explicit SVDSupportRibsPar(int layer, const GearDir& support) { read(layer, support); }
-    //! Get geometry parameters from Gearbox
-    void read(int, const GearDir&);
 
     /** get spacing */
     double getSpacing() const { return m_spacing; }
+    /** set spacing */
+    void setSpacing(double spacing)  { m_spacing = spacing; }
     /** get height */
     double getHeight() const { return m_height; }
+    /** set height */
+    void setHeight(double height) { m_height = height; }
     /** get inner width */
     double getInnerWidth() const { return m_innerWidth; }
     /** get outer width */
@@ -166,6 +182,12 @@ namespace Belle2 {
     const std::vector<SVDSupportBoxPar>& getBoxes() const { return m_boxes; }
     /** get endmounts*/
     const std::vector<SVDEndmountPar>& getEndmounts() const { return m_endmounts; }
+    /** get tabs*/
+    std::vector<SVDSupportTabPar>& getTabs() { return m_tabs; }
+    /** get boxes*/
+    std::vector<SVDSupportBoxPar>& getBoxes()  { return m_boxes; }
+    /** get endmounts*/
+    std::vector<SVDEndmountPar>& getEndmounts()  { return m_endmounts; }
 
   private:
 

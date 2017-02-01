@@ -138,7 +138,50 @@ void SVDGeometryPar::createLadderSupport(int layer, GearDir support)
   // Check if there are any support ribs defined for this layer. If not return empty assembly
   GearDir params(support, (boost::format("SupportRibs/Layer[@id='%1%']") % layer).str());
   if (params) {
-    m_supportRibs[layer] = SVDSupportRibsPar(layer, support);
+    m_supportRibs[layer] = SVDSupportRibsPar(support.getLength("SupportRibs/spacing"),
+                                             support.getLength("SupportRibs/height"),
+                                             support.getLength("SupportRibs/inner/width"),
+                                             support.getLength("SupportRibs/outer/width"),
+                                             support.getLength("SupportRibs/inner/tabLength"),
+                                             support.getString("SupportRibs/outer/Material"),
+                                             support.getString("SupportRibs/inner/Material"),
+                                             support.getString("SupportRibs/outer/Color"),
+                                             support.getString("SupportRibs/inner/Color"),
+                                             support.getString("SupportRibs/endmount/Material")
+                                            );
+
+    // Get values for the layer if available
+    if (params.exists("spacing")) m_supportRibs[layer].setSpacing(params.getLength("spacing"));
+    if (params.exists("height")) m_supportRibs[layer].setHeight(params.getLength("height"));
+
+    for (const GearDir& box : params.getNodes("box")) {
+      SVDSupportBoxPar boxPar(box.getAngle("theta"),
+                              box.getLength("z"),
+                              box.getLength("r"),
+                              box.getLength("length")
+                             );
+      m_supportRibs[layer].getBoxes().push_back(boxPar);
+    }
+
+    for (const GearDir& tab : params.getNodes("tab")) {
+      SVDSupportTabPar tabPar(tab.getAngle("theta"),
+                              tab.getLength("z"),
+                              tab.getLength("r")
+                             );
+      m_supportRibs[layer].getTabs().push_back(tabPar);
+    }
+
+    for (const GearDir& endmount : params.getNodes("Endmount")) {
+      SVDEndmountPar mountPar(endmount.getString("@name"),
+                              endmount.getLength("height"),
+                              endmount.getLength("width"),
+                              endmount.getLength("length"),
+                              endmount.getLength("z"),
+                              endmount.getLength("r")
+                             );
+      m_supportRibs[layer].getEndmounts().push_back(mountPar);
+    }
+
   }
 
   return;

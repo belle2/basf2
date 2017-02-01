@@ -33,9 +33,9 @@ namespace Belle2 {
     //! Default constructor
     SVDGeometryPar() {}
     //! Constructor using Gearbox
-    explicit SVDGeometryPar(const std::string& prefix, const GearDir& content) :  VXDGeometryPar(prefix, content) {  }
+    //explicit SVDGeometryPar(const std::string& prefix, const GearDir& content) :  VXDGeometryPar(prefix, content) {  }
     //! Destructor
-    ~SVDGeometryPar() {}
+    //~SVDGeometryPar() {}
 
     /** get SVD halfshell Rotation Solids */
     const std::vector<VXDRotationSolidPar>& getRotationSolids() const {return m_halfShell;}

@@ -117,6 +117,13 @@ namespace Belle2 {
       return sensitive;
     }
 
+    SVDGeometryPar GeoSVDCreator::createConfiguration(const GearDir& param)
+    {
+      SVDGeometryPar svdGeometryPar;
+      svdGeometryPar.read(m_prefix, param);
+      return svdGeometryPar;
+    }
+
     void GeoSVDCreator::createGeometry(const SVDGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
     {
 

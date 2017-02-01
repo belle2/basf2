@@ -27,12 +27,7 @@ namespace Belle2 {
     class GeoPXDCreator : public VXD::GeoVXDCreator {
     private:
       //! Create a parameter object from the Gearbox XML parameters.
-      PXDGeometryPar createConfiguration(const GearDir& param)
-      {
-        PXDGeometryPar pxdGeometryPar;
-        pxdGeometryPar.read(m_prefix, param);
-        return pxdGeometryPar;
-      };
+      PXDGeometryPar createConfiguration(const GearDir& param);
 
       //! Create the geometry from a parameter object.
       void createGeometry(const PXDGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes type);

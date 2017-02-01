@@ -128,6 +128,13 @@ namespace Belle2 {
       return info;
     }
 
+    PXDGeometryPar GeoPXDCreator::createConfiguration(const GearDir& param)
+    {
+      PXDGeometryPar pxdGeometryPar;
+      pxdGeometryPar.read(m_prefix, param);
+      return pxdGeometryPar;
+    }
+
     void GeoPXDCreator::createGeometry(const PXDGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
     {
 

@@ -14,7 +14,7 @@
 #include <TMath.h>
 
 #include <framework/dataobjects/Helix.h>
-#include <framework/geometry/BFieldManager.h>
+#include <geometry/bfieldmap/BFieldMap.h>
 
 using namespace std;
 using namespace Belle2;
@@ -30,10 +30,18 @@ bool DetectorTrackCombinationVarSet::extract(const BaseDetectorTrackCombinationF
 
   if (not pair or not collectorItem or not collectionItem) return false;
 
-  Belle2::Helix VXDHelix(collectionItem->getPositionSeed(), collectionItem->getMomentumSeed(), collectionItem->getChargeSeed(), 1.5);
-  Belle2::Helix CDCHelix(collectorItem->getPositionSeed(), collectorItem->getMomentumSeed(), collectorItem->getChargeSeed(), 1.5);
+  const auto& vxdPosition = collectionItem->getPositionSeed();
+  const auto& vxdMomentum = collectionItem->getMomentumSeed();
+  const auto vxdCharge = collectionItem->getChargeSeed();
 
-  const double bField = BFieldManager::getField(CDCHelix.getPerigee()).Z();
+  const auto& cdcPosition = collectorItem->getPositionSeed();
+  const auto& cdcMomentum = collectorItem->getMomentumSeed();
+  const auto cdcCharge = collectorItem->getChargeSeed();
+
+  const double bField = BFieldMap::Instance().getBField(cdcPosition).Z();
+
+  Belle2::Helix VXDHelix(vxdPosition, vxdMomentum, vxdCharge, bField);
+  Belle2::Helix CDCHelix(cdcPosition, cdcMomentum, cdcCharge, bField);
 
   const double phiCDC = CDCHelix.getMomentum(bField).Phi();
   const double thetaCDC = CDCHelix.getMomentum(bField).Theta();

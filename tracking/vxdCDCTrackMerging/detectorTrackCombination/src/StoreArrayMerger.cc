@@ -11,7 +11,7 @@
 #include <tracking/vxdCDCTrackMerging/detectorTrackCombination/StoreArrayMerger.h>
 #include <framework/dataobjects/Helix.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <framework/geometry/BFieldManager.h>
+#include <geometry/bfieldmap/BFieldMap.h>
 
 using namespace Belle2;
 
@@ -100,7 +100,7 @@ void StoreArrayMerger::apply()
 
       extractTrackState(*relatedCDCRecoTrack, cdcPosition, cdcMomentum, cdcCharge);
 
-      const auto bField = BFieldManager::getField(cdcPosition).Z();
+      const auto bField = BFieldMap::Instance().getBField(cdcPosition).Z();
 
       const Helix cdcHelix(cdcPosition, cdcMomentum, cdcCharge, bField);
       const double arcLengthOfVXDPosition = cdcHelix.getArcLength2DAtXY(vxdPosition.X(), vxdPosition.Y());

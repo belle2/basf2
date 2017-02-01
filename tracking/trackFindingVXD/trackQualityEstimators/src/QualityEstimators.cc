@@ -306,6 +306,11 @@ std::pair<double, TVector3> QualityEstimators::tripletFit(std::vector<PositionIn
 
   double combinedChi2 = 0.;
 
+  std::vector<double> R3Ds;
+  R3Ds.reserve(nTriplets);
+  std::vector<double> sigmaR3DSquareds;
+  sigmaR3DSquareds.reserve(nTriplets);
+
   // looping over all triplets
   for (int i = 0; i < nTriplets; i++) {
 
@@ -364,20 +369,40 @@ std::pair<double, TVector3> QualityEstimators::tripletFit(std::vector<PositionIn
     const double b = 4.5 / bField * sqrt(XoverX0);
     const double sigmaMS = b / R3D;
 
+    double sigmaR3DSquared = pow(sigmaMS, 2) / (pow(eta * sin(theta), 2) + pow(beta, 2));
+
     double Chi2min = pow(beta * PhiTilde - eta * ThetaTilde, 2);
     Chi2min *= 1. / (sigmaMS * sigmaMS * (eta * eta + beta * beta / pow(sin(theta), 2)));
 
-    // Summation of the Chi2 values of all triplets of the track candidate
-    /** TODO Check other version presented at Connecting the Dots, Vienna, Feb 2016 by A. Schoening
-     *       which does include a further term considering the radii R3D.
-     */
+    // store values for combination
+    R3Ds.push_back(R3D);
+    sigmaR3DSquareds.push_back(sigmaR3DSquared);
+
     combinedChi2 += Chi2min;
   }
+
+  // Calculate average R3D
+  double numerator = 0;
+  double denominator = 0;
+  for (short i = 0; i < nTriplets; ++i) {
+    numerator += R3Ds.at(i) / sigmaR3DSquareds.at(i);
+    denominator += 1. / sigmaR3DSquareds.at(i);
+  }
+  double const averageR3D = numerator / denominator;
+
+  // Compare individual R3Ds with average R3D to improve chi2 as presented at:
+  // Connecting the Dots, Vienna, Feb 2016 by A. Schoening
+  double globalCompatibilityOfR3Ds = 0;
+  for (short i = 0; i < nTriplets; ++i) {
+    globalCompatibilityOfR3Ds += pow(R3Ds.at(i) - averageR3D, 2) / sigmaR3DSquareds.at(i);
+  }
+
+  double const finalChi2 = combinedChi2 + globalCompatibilityOfR3Ds;
 
   // TODO return real momentum vector?
   TVector3 pTVector(1, 2, 3);
 
-  return make_pair(combinedChi2, pTVector);
+  return make_pair(finalChi2, pTVector);
 }
 
 

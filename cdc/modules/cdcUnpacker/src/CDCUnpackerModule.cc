@@ -429,7 +429,9 @@ void CDCUnpackerModule::event()
       int tdc1 = hit.getTDCCount();
       int tdc2 = hit.getTDCCount2ndHit();
       tdc1  = tdc1 - (tdcCountTrig - m_tdcOffset);
-      tdc2  = tdc2 - (tdcCountTrig - m_tdcOffset);
+      if (tdc2 != 0) {
+        tdc2  = tdc2 - (tdcCountTrig - m_tdcOffset);
+      }
       hit.setTDCCount(static_cast<unsigned short>(tdc1));
       hit.setTDCCount2ndHit(static_cast<unsigned short>(tdc2));
     }

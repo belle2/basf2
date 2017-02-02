@@ -186,6 +186,11 @@ namespace Belle2 {
       float TPC_dose_av[2][5];/** */
       float TPC_dose[2][5];/** */
 
+      float TPC_angular_rate_av[2][9][18];/** */
+      float TPC_angular_rate[2][9][18];/** */
+      float TPC_angular_dose_av[2][9][18];/** */
+      float TPC_angular_dose[2][9][18];/** */
+
       /**
        *.clear the structure: set elements to zero
        */
@@ -275,6 +280,14 @@ namespace Belle2 {
             TPC_rate[i][j] = 0;
             TPC_dose_av[i][j] = 0;
             TPC_dose[i][j] = 0;
+          }
+          for (int j = 0; j < 9; j ++) {
+            for (int k = 0; k < 18; k ++) {
+              TPC_angular_rate[i][j][k] = 0;
+              TPC_angular_dose[i][j][k] = 0;
+              TPC_angular_rate_av[i][j][k] = 0;
+              TPC_angular_dose_av[i][j][k] = 0;
+            }
           }
         }
         CLAWS_rate_av.clear();

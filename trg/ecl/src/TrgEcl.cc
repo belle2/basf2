@@ -42,7 +42,7 @@ using namespace Belle2;
 //
 //
 TrgEcl::TrgEcl():
-  bitECLtoGDL(0)
+  bitECLtoGDL(0), _Clustering(1), _Bhabha(1), _EventTiming(2)
 {
   for (int iTCId = 0; iTCId < 576; iTCId++) {
     for (int iTimeindex = 0; iTimeindex < 64; iTimeindex++) {
@@ -159,8 +159,8 @@ TrgEcl::setPRS(int iBin)
 void
 TrgEcl::simulate(int m_nEvent)
 {
-//  TrgEclFAM* obj_trgeclfam = new TrgEclFAM();
-//   obj_trgeclfam->setup(m_nEvent, 1);
+  //  TrgEclFAM* obj_trgeclfam = new TrgEclFAM();
+  //   obj_trgeclfam->setup(m_nEvent, 1);
   // setPRS(obj_trgeclfam);
   //
   //----------
@@ -209,15 +209,12 @@ TrgEcl::simulate(int m_nEvent)
     EventTiming[iBin] = 0;
   }
 
-  getEventTiming(1); //1: belle , 2: Energetic , 3 : Energy weighted
+  getEventTiming(_EventTiming); //1: belle , 2: Energetic , 3 : Energy weighted
 
   for (int iBin = 0 ; iBin < 64; iBin ++) {
 
     if (EventTiming[iBin] == 0) {continue;}
-    //  cout << "hmm???" << endl;
     setPRS(iBin);
-
-
     //--------------------------------------------------
 
     double E_tot = 0;
@@ -229,6 +226,15 @@ TrgEcl::simulate(int m_nEvent)
     //
     // // Threshold for each combination of PRS
     // //
+    int NofTCHit = 0;
+    for (int iTCId = 0; iTCId < 576; iTCId++) {
+      for (int itime = 0; itime < 64; itime++) {
+        if (HitTC[iBin][iTCId][itime] == 1) {
+          NofTCHit++;
+        }
+      }
+    }
+
 
 
 
@@ -298,7 +304,7 @@ TrgEcl::simulate(int m_nEvent)
     //----------
     //
     // TrgEclCluster obj_cluster;
-    obj_cluster->setICN(HitTC[iBin]);
+    obj_cluster->setICN(HitTC[iBin], _Clustering);
 
 
     int ICN = obj_cluster->getICNFwBr();
@@ -318,7 +324,7 @@ TrgEcl::simulate(int m_nEvent)
       double ClusterPositionY = (obj_cluster->getClusterPosition(incluster)).Y();
       double ClusterPositionZ = (obj_cluster->getClusterPosition(incluster)).Z();
 
-      if (ClusterEnergy == 0 && ClusterTiming == 0) {continue;}
+      if (ClusterEnergy == 0) {continue;}
 
       StoreArray<TRGECLCluster> ClusterArray;
       ClusterArray.appendNew();
@@ -446,6 +452,8 @@ TrgEcl::simulate(int m_nEvent)
     trgEcltrgArray[m_hitEneNum]->setPRS17(_PhiRingSum[16]);
     //
     trgEcltrgArray[m_hitEneNum]->setEtot(E_tot);
+    trgEcltrgArray[m_hitEneNum]->setNofTCHit(NofTCHit);
+    //
     //
     trgEcltrgArray[m_hitEneNum]->setBhabha01(vct_bhabha[0]);
     trgEcltrgArray[m_hitEneNum]->setBhabha02(vct_bhabha[1]);
@@ -510,7 +518,7 @@ void TrgEcl::getEventTiming(int method)
 
 
 
-  if (method == 1) { //belle1 method
+  if (method == 0) { //belle1 method
     nBin = 0;
     TimeWindow = 250;
     WindowStart = -4000;
@@ -548,7 +556,7 @@ void TrgEcl::getEventTiming(int method)
   }
 
 
-  if (method == 2) { // Energetic TC
+  if (method == 1) { // Energetic TC
     TimeWindow = 250;
     OverlapWindow = 125;
     nBin = 2 * 8000 / TimeWindow ;
@@ -592,7 +600,7 @@ void TrgEcl::getEventTiming(int method)
   }
 
 
-  if (method == 3) { // Energy weighted
+  if (method == 2) { // Energy weighted
     TimeWindow = 250;
     OverlapWindow = 125;
     nBin = 2 * 8000 / TimeWindow ;

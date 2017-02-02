@@ -68,6 +68,14 @@ namespace Belle2 {
     void setPRS(int iBin);
     /** Get Event timing */
     void getEventTiming(int option);
+    /** Set Cluster*/
+    void setClusterMethod(int cluster) {_Clustering = cluster;}
+    /** Set Bhabha*/
+    void setBhabhaMethod(int bhabha) {_Bhabha = bhabha;}
+    /** Set Cluster*/
+    void setEventTimingMethod(int EventTiming) {_EventTiming = EventTiming;}
+
+
 
 
   private:
@@ -91,6 +99,15 @@ namespace Belle2 {
     double _PhiRingSum[17];
     /**  Cluster object */
     TrgEclCluster* obj_cluster;
+
+    /** clutering option*/
+    int _Clustering;
+
+    /** Bhabha option*/
+    int _Bhabha;
+
+    /** EventTiming option*/
+    int _EventTiming;
 
 
   };

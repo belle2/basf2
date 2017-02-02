@@ -29,6 +29,8 @@
 #include "trg/ecl/dataobjects/TRGECLDigi.h"
 #include "trg/ecl/dataobjects/TRGECLDigi0.h"
 #include "trg/ecl/dataobjects/TRGECLHit.h"
+#include "trg/ecl/dataobjects/TRGECLWaveform.h"
+
 #include <stdlib.h>
 #include <iostream>
 
@@ -54,7 +56,9 @@ namespace Belle2 {
     : Module::Module(),
       _debugLevel(0),
       _famMethod(1),
-      _binTimeInterval(100)
+      _binTimeInterval(100),
+      _waveform(0)
+
   {
 
     string desc = "TRGECLFAMModule(" + version() + ")";
@@ -64,6 +68,9 @@ namespace Belle2 {
     addParam("FAMFitMethod", _famMethod, "TRGECLFAM fit method", _famMethod);
     addParam("FAMBinTimeInterval", _binTimeInterval, "TRGECLFAM binTimeInterval",
              _binTimeInterval);
+    addParam("TCWaveform", _waveform, "TRGECLFAM Output the TC waveform ",
+             _waveform);
+
 
     if (TRGDebug::level()) {
       std::cout << "TRGECLFAMModule ... created" << std::endl;
@@ -100,6 +107,10 @@ namespace Belle2 {
     std::cout << "TRGECLFAMModule::initialize> FAM Bin of Time Interval = "
               << _binTimeInterval
               << std::endl;
+    std::cout << "TRGECLFAMModule::initialize> FAM output TC waveforml = "
+              << _waveform
+              << std::endl;
+
     //
     m_nRun   = 0;
     m_nEvent = 1;
@@ -107,6 +118,8 @@ namespace Belle2 {
     StoreArray<TRGECLDigi>::registerPersistent();
     StoreArray<TRGECLDigi0>::registerPersistent();
     StoreArray<TRGECLHit>::registerPersistent();
+    StoreArray<TRGECLWaveform>::registerPersistent();
+
   }
 //
 //
@@ -143,6 +156,8 @@ namespace Belle2 {
     //
     // FAM simulation
     TrgEclFAM* obj_trgeclfam = new TrgEclFAM();
+
+    obj_trgeclfam-> setWaveform(_waveform);
     obj_trgeclfam->setup(m_nEvent, _famMethod);
     //
     //

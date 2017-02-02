@@ -59,7 +59,7 @@ if args.unpacking:
 add_reconstruction(main, magnet=not args.magnet_off, svd_only=args.svd_only, telescopes=False, momentum=args.momentum)
 
 
-def add_dqms(path, raw_dqm=True, svd_only=False):
+def add_dqms(path, raw_dqm=True, svd_only=args.svd_only):
     path.add_module('HistoManager')
     if not svd_only:
         if raw_dqm:

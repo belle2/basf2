@@ -50,6 +50,14 @@ namespace Belle2 {
     std::string m_outerTSLUTFilename;
     /** switch for simulating clock by clock */
     bool m_clockSimulation;
+    /** switch for saving the number of true left/right for each pattern */
+    bool m_makeTrueLRTable;
+    /** filename for the table which contains the number of true left/right
+     *  for each pattern in the inner-most super layer */
+    std::string m_innerTrueLRTableFilename;
+    /** filename for the table which contains the number of true left/right
+     *  for each pattern in the outer super layers */
+    std::string m_outerTrueLRTableFilename;
 
   private:
     /** structure to hold pointers to all wires in the CDC */
@@ -58,6 +66,12 @@ namespace Belle2 {
     std::vector<TRGCDCLayer*> tsLayers;
     /** list of clocks used in the TSF */
     std::vector<TRGClock*> clocks;
+    /** list of (# true right, # true left, # true background)
+     *  for the inner-most super layer */
+    std::vector<std::vector<unsigned>> innerTrueLRTable = {};
+    /** list of (# true right, # true left, # true background)
+     *  for the outer super layers */
+    std::vector<std::vector<unsigned>> outerTrueLRTable = {};
   };
 
 } // namespace Belle2

@@ -3,6 +3,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -10,6 +11,8 @@
 #include <trg/cdc/Wire.h>
 #include <trg/cdc/WireHit.h>
 #include <trg/cdc/Segment.h>
+
+#include <fstream>
 
 #define P3D HepGeom::Point3D<double>
 
@@ -47,6 +50,19 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
            m_clockSimulation,
            "Switch to simulate each data clock cycle separately.",
            false);
+  addParam("makeTrueLRTable",
+           m_makeTrueLRTable,
+           "Switch to create a table of hit pattern <-> "
+           "number of true left / true right, which is needed to create the LUT",
+           false);
+  addParam("innerTrueLRTableFilename",
+           m_innerTrueLRTableFilename,
+           "Filename for the true left/right table for the innermost super layer.",
+           string("innerTrueLRTable.dat"));
+  addParam("outerTrueLRTableFilename",
+           m_outerTrueLRTableFilename,
+           "Filename for the true left/right table for the outer super layers.",
+           string("outerTrueLRTable.dat"));
 }
 
 void
@@ -55,6 +71,11 @@ CDCTriggerTSFModule::initialize()
   // register DataStore elements
   StoreArray<CDCTriggerSegmentHit>::registerPersistent(m_TSHitCollectionName);
   StoreArray<CDCHit>::required(m_CDCHitCollectionName);
+  if (m_makeTrueLRTable) {
+    StoreArray<CDCSimHit>::required();
+    innerTrueLRTable.assign(pow(2, 16), vector<unsigned>(3, 0));
+    outerTrueLRTable.assign(pow(2, 12), vector<unsigned>(3, 0));
+  }
   // register relations
   StoreArray<CDCTriggerSegmentHit> segmentHits(m_TSHitCollectionName);
   StoreArray<CDCHit> cdcHits(m_CDCHitCollectionName);
@@ -303,6 +324,21 @@ CDCTriggerTSFModule::event()
         for (unsigned imc = 0; imc < mcrel.size(); ++imc) {
           mcrel[imc]->addRelationTo(tsHit, mcrel.weight(imc));
         }
+        // get true left/right
+        if (m_makeTrueLRTable) {
+          const CDCSimHit* simHit = priorityHit->getRelatedFrom<CDCSimHit>();
+          if (simHit && !simHit->getBackgroundTag()) {
+            if (isl == 0)
+              innerTrueLRTable[s.lutPattern()][simHit->getLeftRightPassage()] += 1;
+            else
+              outerTrueLRTable[s.lutPattern()][simHit->getLeftRightPassage()] += 1;
+          } else {
+            if (isl == 0)
+              innerTrueLRTable[s.lutPattern()][2] += 1;
+            else
+              outerTrueLRTable[s.lutPattern()][2] += 1;
+          }
+        }
       }
     }
   }
@@ -340,6 +376,24 @@ CDCTriggerTSFModule::terminate()
     delete tsLayers[isl];
   }
   tsLayers.clear();
+
+  // save true left/right table
+  if (m_makeTrueLRTable) {
+    ofstream innerFile(m_innerTrueLRTableFilename);
+    ostream_iterator<unsigned> innerIterator(innerFile, " ");
+    for (unsigned pattern = 0; pattern < innerTrueLRTable.size(); ++pattern) {
+      copy(innerTrueLRTable[pattern].begin(), innerTrueLRTable[pattern].end(),
+           innerIterator);
+      innerFile << "\n";
+    }
+    ofstream outerFile(m_outerTrueLRTableFilename);
+    ostream_iterator<unsigned> outerIterator(outerFile, " ");
+    for (unsigned pattern = 0; pattern < outerTrueLRTable.size(); ++pattern) {
+      copy(outerTrueLRTable[pattern].begin(), outerTrueLRTable[pattern].end(),
+           outerIterator);
+      outerFile << "\n";
+    }
+  }
 }
 
 void

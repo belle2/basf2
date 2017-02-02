@@ -14,9 +14,17 @@ identifier = None
 # local modifications?
 modifications = False
 
+# find out what we think the release is
+release_version = 'HEAD'
+release_commit = None
+if 'BELLE2_RELEASE' in os.environ:
+    release_version = os.environ['BELLE2_RELEASE']
+if release_version.lower() == 'head':
+    release_version = 'HEAD'
+
+# check .git to confirm
 head_commitid = dict()
 release_dir_vars = ['BELLE2_LOCAL_DIR', 'BELLE2_RELEASE_DIR']
-
 for var in release_dir_vars:
     if var not in os.environ:
         continue
@@ -33,6 +41,17 @@ for var in release_dir_vars:
         changes = proc.communicate()[0].strip()
         if len(changes) != 0:
             modifications = True
+
+        # get hash for release_version (if set)
+        if release_commit is not None or release_version == 'HEAD':
+            continue
+        proc = subprocess.Popen(['git', '-C', os.environ[var], 'rev-parse', release_version], stdout=subprocess.PIPE, stderr=devnull)
+        release_commit = proc.communicate()[0].strip()
+        if proc.returncode != 0 or len(release_commit) != 40:
+            # unsure why this would fail, but whatever
+            release_commit = None
+        elif release_commit == head_commitid[var]:
+            head_commitid[var] = release_version
 
 if identifier is None:
     if len(head_commitid) == 2:

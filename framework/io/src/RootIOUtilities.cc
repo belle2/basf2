@@ -167,10 +167,8 @@ void RootIOUtilities::setCreationData(FileMetaData& metadata)
   if (!user) user = getenv("USER");
   if (!user) user = getlogin();
   if (!user) user = "unknown";
-  const char* release = getenv("BELLE2_RELEASE");
-  if (!release) release = "unknown";
   auto commitid = RootIOUtilities::getCommitID();
-  metadata.setCreationData(date, site, user, release, commitid);
+  metadata.setCreationData(date, site, user, commitid);
 }
 std::string RootIOUtilities::getCommitID()
 {

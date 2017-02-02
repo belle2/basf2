@@ -63,7 +63,6 @@ void FileMetaData::exposePythonAPI()
   .def("get_user", &FileMetaData::getUser)
   .def("get_random_seed", &FileMetaData::getRandomSeed)
   .def("get_release", &FileMetaData::getRelease)
-  .def("get_commit_id", &FileMetaData::getCommitID)
   .def("get_steering", &FileMetaData::getSteering)
   .def("get_mc_events", &FileMetaData::getMcEvents)
   .def("get_global_tag", &FileMetaData::getDatabaseGlobalTag)
@@ -79,23 +78,22 @@ void FileMetaData::Print(Option_t* option) const
 
   const bool all = (option && (strcmp(option, "all") == 0));
   cout << "FileMetaData" << endl;
-  cout << "  LFN      : " << m_lfn << endl;
-  cout << "  #event   : " << m_nEvents << endl;
-  cout << "  range    : " << m_experimentLow << "/" << m_runLow << "/" << m_eventLow
+  cout << "  LFN    : " << m_lfn << endl;
+  cout << "  #event : " << m_nEvents << endl;
+  cout << "  range  : " << m_experimentLow << "/" << m_runLow << "/" << m_eventLow
        << " - "  << m_experimentHigh << "/" << m_runHigh << "/" << m_eventHigh << endl;
-  cout << "  parents  :";
+  cout << "  parents:";
   for (std::string parent : m_parentLfns)
     cout << " " << parent;
   cout << endl;
   if (all) {
-    cout << "  date     : " << m_date << endl;
-    cout << "  site     : " << m_site << endl;
-    cout << "  user     : " << m_user << endl;
-    cout << "  seed     : " << m_randomSeed << endl;
-    cout << "  release  : " << m_release << endl;
-    cout << "  commit ID: " << m_commitID << endl;
-    cout << "  #MC      : " << m_mcEvents << endl;
-    cout << "globalTag  : " << m_databaseGlobalTag << endl;
+    cout << "  date   : " << m_date << endl;
+    cout << "  site   : " << m_site << endl;
+    cout << "  user   : " << m_user << endl;
+    cout << "  seed   : " << m_randomSeed << endl;
+    cout << "  release: " << m_release << endl;
+    cout << "  #MC    : " << m_mcEvents << endl;
+    cout << "globalTag: " << m_databaseGlobalTag << endl;
   }
 }
 

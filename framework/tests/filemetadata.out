@@ -4,12 +4,12 @@
 [INFO] Write TTree tree
 [INFO] Write TTree persistent
 FileMetaData
-  LFN      : 
-  #event   : 10
-  range    : 7/1/1 - 7/15/1
-  parents  :
+  LFN    : 
+  #event : 10
+  range  : 7/1/1 - 7/15/1
+  parents:
 FileMetaData
-  LFN      : /logical/file/name
-  #event   : 10
-  range    : 7/1/1 - 7/15/1
-  parents  :
+  LFN    : /logical/file/name
+  #event : 10
+  range  : 7/1/1 - 7/15/1
+  parents:

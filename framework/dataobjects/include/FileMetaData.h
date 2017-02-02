@@ -117,15 +117,6 @@ namespace Belle2 {
      */
     std::string getDatabaseGlobalTag() const { return m_databaseGlobalTag; }
 
-    /** Return git SHA1 hashes taking into account local & central release.
-     *
-     * ID is a combined hash $CENTRAL_SHA1[+$LOCAL_SHA1][-modified],
-     * or just SHA1[-modified] if only one release or they are on the
-     * same revision.
-     * Empty string denotes at least one untracked release directory.
-     */
-    std::string getCommitID() const { return m_commitID; }
-
     /** Setter for LFN.
       *
       *  @param lfn The logical file name.
@@ -166,11 +157,9 @@ namespace Belle2 {
      *  @param site The site where the file was created.
      *  @param user The user who created the file.
      *  @param release The software release.
-     *  @param commitid git SHA1-like commit ID.
      */
-    void setCreationData(const std::string& date, const std::string& site, const std::string& user, const std::string& release,
-                         const std::string& commitid)
-    {m_date = date; m_site = site; m_user = user; m_release = release; m_commitID = commitid; }
+    void setCreationData(const std::string& date, const std::string& site, const std::string& user, const std::string& release)
+    {m_date = date; m_site = site; m_user = user; m_release = release;}
 
     /** Random seed setter.
      *
@@ -196,9 +185,6 @@ namespace Belle2 {
      * database was used an empty string should be set.
      */
     void setDatabaseGlobalTag(const std::string& globalTag) { m_databaseGlobalTag = globalTag; }
-
-    /** Set commit ID. */
-    void setCommitID(const std::string& commitID) { m_commitID = commitID; }
 
     /**
      * Exposes methods of the FileMetaData class to Python.
@@ -263,9 +249,7 @@ namespace Belle2 {
 
     std::string m_databaseGlobalTag; /**< Global tag in the database used for production of this file */
 
-    std::string m_commitID; /**< git SHA1 hashes taking into account local & central release. */
-
-    ClassDefOverride(FileMetaData, 9); /**< Metadata information about a file. */
+    ClassDefOverride(FileMetaData, 8); /**< Metadata information about a file. */
 
   }; //class
 

@@ -33,6 +33,11 @@ CDCTriggerETFModule::event()
 {
   StoreArray<CDCTriggerSegmentHit> hits;
 
-  // find the event time
+  // find the event time (dummy for now)
   // ... TODO ...
+  unsigned int T0 = 0;
+
+  // save event time
+  StoreObjPtr<TRGTiming> eventTime("CDCTriggerEventTime");
+  eventTime.construct(Const::CDC, T0);
 }

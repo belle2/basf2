@@ -113,6 +113,8 @@ void EventProcessor::process(PathPtr startPath, long maxEvent)
         break;
       }
     }
+    if (!m_profileModule)
+      B2FATAL("Module profiling was requested via --profile, but no module '" << m_profileModuleName << "' was found!");
   }
 
   //Initialize modules

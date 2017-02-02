@@ -144,6 +144,7 @@ namespace Belle2 {
 
     TH3F* m_h3_MCParticle;  /**< efficiency*/
     TH3F* m_h3_TracksPerMCParticle;  /**< efficiency*/
+    TH3F* m_h3_TrackswPXDHitsPerMCParticle;  /**< efficiency*/
     TH3F* m_h3_MCTrackCand;  /**< efficiency*/
     TH3F* m_h3_TracksPerMCTrackCand;  /**< efficiency*/
 

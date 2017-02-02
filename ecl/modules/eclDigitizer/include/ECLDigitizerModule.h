@@ -120,7 +120,7 @@ namespace Belle2 {
       void getfitparams(const ECLWaveformData&, const ECLWFAlgoParams&, fitparams_t&);
 
       /**< input arrays */
-      StoreArray<ECLHit>    m_eclHits;  //**< hits array  */
+      StoreArray<ECLHit>    m_eclHits;  /**< hits array  */
       StoreArray<ECLHit>    m_eclDiodeHits;
       StoreArray<ECLSimHit> m_eclSimHits;
       /**< Output Arrays */
@@ -129,8 +129,8 @@ namespace Belle2 {
       StoreArray<ECLTrig>   m_eclTrigs;
 
       /**< Module parameters */
-      bool m_background;  /** background flag */
-      bool m_calibration;  //** calibration flag */
+      bool m_background;  /**< background flag */
+      bool m_calibration;  /**< calibration flag */
       bool m_inter;
     };
   }//ECL

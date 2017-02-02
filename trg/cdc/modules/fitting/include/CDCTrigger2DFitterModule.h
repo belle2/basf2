@@ -28,6 +28,8 @@ namespace Belle2 {
     std::string m_inputCollectionName;
     /** Name of the StoreArray containing the resulting fitted tracks. */
     std::string m_outputCollectionName;
+    /** Minimal number of hits required for fitting. */
+    unsigned m_minHits;
 
   private:
   };

@@ -1743,6 +1743,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("px", particlePx, "momentum component x");
     REGISTER_VARIABLE("py", particlePy, "momentum component y");
     REGISTER_VARIABLE("pz", particlePz, "momentum component z");
+    REGISTER_VARIABLE("pt", particlePt, "transverse momentum");
     REGISTER_VARIABLE("pErr", particlePErr, "error of momentum magnitude");
     REGISTER_VARIABLE("pxErr", particlePxErr, "error of momentum component x");
     REGISTER_VARIABLE("pyErr", particlePyErr, "error of momentum component y");

@@ -9,8 +9,8 @@ Create a left/right LUT from a table of true left/right counts for each pattern.
 
 Condition for left/right:
 
-left:    nBkg > b * nTotal and nLeft > p * nMC + 3 * sqrt(p * (1 - p) * nMC)
-right:   nBkg > b * nTotal and nRight > p * nMC + 3 * sqrt(p * (1 - p) * nMC)
+left:    nBkg <= b * nTotal and nLeft > p * nMC + 3 * sqrt(p * (1 - p) * nMC)
+right:   nBkg <= b * nTotal and nRight > p * nMC + 3 * sqrt(p * (1 - p) * nMC)
 unknown: otherwise
 """
 

@@ -112,6 +112,62 @@ namespace Belle2 {
       return part->getMomentumVertexErrorMatrix()(elementI, elementJ);
     }
 
+    double particlePErr(const Particle* part)
+    {
+      TMatrixD jacobianRot(3, 3);
+      jacobianRot.Zero();
+
+      double cosPhi = cos(particlePhi(part));
+      double sinPhi = sin(particlePhi(part));
+      double cosTheta = particleCosTheta(part);
+      double sinTheta = sin(acos(cosTheta));
+      double p = particleP(part);
+
+      jacobianRot(0, 0) = sinTheta * cosPhi;
+      jacobianRot(0, 1) = p * cosTheta * cosPhi;
+      jacobianRot(1, 0) = sinPhi * sinTheta;
+      jacobianRot(1, 1) = p * cosTheta * sinPhi;
+      jacobianRot(0, 2) = -p * sinTheta * sinPhi;
+      jacobianRot(2, 0) = cosTheta;
+      jacobianRot(1, 2) = p * sinTheta * cosPhi;
+      jacobianRot(2, 1) = -p * sinTheta;
+
+      return part->getMomentumVertexErrorMatrix().GetSub(0, 2, 0, 2, " ").Similarity(jacobianRot)(0, 0);
+    }
+
+    double particlePxErr(const Particle* part)
+    {
+      return part->getMomentumVertexErrorMatrix()(0, 0);
+    }
+
+    double particlePyErr(const Particle* part)
+    {
+      return part->getMomentumVertexErrorMatrix()(1, 1);
+    }
+
+    double particlePzErr(const Particle* part)
+    {
+      return part->getMomentumVertexErrorMatrix()(2, 2);
+    }
+
+    double particlePtErr(const Particle* part)
+    {
+      TMatrixD jacobianRot(3, 3);
+      jacobianRot.Zero();
+
+      double cosPhi = cos(particlePhi(part));
+      double sinPhi = sin(particlePhi(part));
+      double pt = particlePt(part);
+
+      jacobianRot(0, 0) = cosPhi;
+      jacobianRot(0, 1) = -pt * sinPhi;
+      jacobianRot(1, 0) = sinPhi;
+      jacobianRot(1, 1) = pt * cosPhi;
+      jacobianRot(2, 2) = 1;
+
+      return part->getMomentumVertexErrorMatrix().GetSub(0, 2, 0, 2, " ").Similarity(jacobianRot)(0, 0);
+    }
+
     double momentumDeviationChi2(const Particle* part)
     {
       double result = 1e6;
@@ -139,10 +195,53 @@ namespace Belle2 {
       return frame.getMomentum(part).CosTheta();
     }
 
+    double particleCosThetaErr(const Particle* part)
+    {
+      TMatrixD jacobianRot(3, 3);
+      jacobianRot.Zero();
+
+      double cosPhi = cos(particlePhi(part));
+      double sinPhi = sin(particlePhi(part));
+      double cosTheta = particleCosTheta(part);
+      double sinTheta = sin(acos(cosTheta));
+      double p = particleP(part);
+
+      jacobianRot(0, 0) = sinTheta * cosPhi;
+      jacobianRot(0, 1) = p * cosTheta * cosPhi;
+      jacobianRot(1, 0) = sinPhi * sinTheta;
+      jacobianRot(1, 1) = p * cosTheta * sinPhi;
+      jacobianRot(0, 2) = -p * sinTheta * sinPhi;
+      jacobianRot(2, 0) = cosTheta;
+      jacobianRot(1, 2) = p * sinTheta * cosPhi;
+      jacobianRot(2, 1) = -p * sinTheta;
+
+      double ThetaErr = part->getMomentumVertexErrorMatrix().GetSub(0, 2, 0, 2, " ").Similarity(jacobianRot)(1, 1);
+
+      return fabs(ThetaErr * sinTheta);
+    }
+
     double particlePhi(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getMomentum(part).Phi();
+    }
+
+    double particlePhiErr(const Particle* part)
+    {
+      TMatrixD jacobianRot(3, 3);
+      jacobianRot.Zero();
+
+      double cosPhi = cos(particlePhi(part));
+      double sinPhi = sin(particlePhi(part));
+      double pt = particlePt(part);
+
+      jacobianRot(0, 0) = cosPhi;
+      jacobianRot(0, 1) = -pt * sinPhi;
+      jacobianRot(1, 0) = sinPhi;
+      jacobianRot(1, 1) = pt * cosPhi;
+      jacobianRot(2, 2) = 1;
+
+      return part->getMomentumVertexErrorMatrix().GetSub(0, 2, 0, 2, " ").Similarity(jacobianRot)(1, 1);
     }
 
     double particlePDGCode(const Particle* part)
@@ -1644,7 +1743,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("px", particlePx, "momentum component x");
     REGISTER_VARIABLE("py", particlePy, "momentum component y");
     REGISTER_VARIABLE("pz", particlePz, "momentum component z");
-    REGISTER_VARIABLE("pt", particlePt, "transverse momentum");
+    REGISTER_VARIABLE("pErr", particlePErr, "error of momentum magnitude");
+    REGISTER_VARIABLE("pxErr", particlePxErr, "error of momentum component x");
+    REGISTER_VARIABLE("pyErr", particlePyErr, "error of momentum component y");
+    REGISTER_VARIABLE("pzErr", particlePzErr, "error of momentum component z");
+    REGISTER_VARIABLE("ptErr", particlePtErr, "error of transverse momentum");
     REGISTER_VARIABLE("momVertCovM(i,j)", covMatrixElement,
                       "returns the (i,j)-th element of the MomentumVertex Covariance Matrix (7x7).\n"
                       "Order of elements in the covariance matrix is: px, py, pz, E, x, y, z.");
@@ -1652,9 +1755,10 @@ namespace Belle2 {
                       "momentum deviation chi^2 value calculated as"
                       "chi^2 = sum_i (p_i - mc(p_i))^2/sigma(p_i)^2, where sum runs over i = px, py, pz and"
                       "mc(p_i) is the mc truth value and sigma(p_i) is the estimated error of i-th component of momentum vector")
-    REGISTER_VARIABLE("cosTheta", particleCosTheta,
-                      "momentum cosine of polar angle");
+    REGISTER_VARIABLE("cosTheta", particleCosTheta, "momentum cosine of polar angle");
+    REGISTER_VARIABLE("cosThetaErr", particleCosThetaErr, "error of momentum cosine of polar angle");
     REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle in degrees");
+    REGISTER_VARIABLE("phiErr", particlePhiErr, "error of momentum azimuthal angle in degrees");
     REGISTER_VARIABLE("PDG", particlePDGCode, "PDG code");
 
     REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVector",

@@ -1061,8 +1061,10 @@ int PXDUnpackerDHHModule::nr5bits(int i) const
   return lut[i & 0x1F];
 }
 
+#ifndef __clang__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
 void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int Frame_Number, const int Frames_in_event)
 {
   /// The following STATIC variables are used to save some state or count some things
@@ -1508,7 +1510,9 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
   countedBytesInDHE += len;
 
 }
+#ifndef __clang__
 #pragma GCC diagnostic pop
+#endif
 
 //Remaps of inner forward (IF) and outer backward (OB) modules of the PXD
 void PXDUnpackerDHHModule::remap_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int dhp_id, unsigned int dhe_ID)

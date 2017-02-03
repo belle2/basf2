@@ -91,7 +91,7 @@ namespace Belle2 {
         fitparams_t::int_array_24x16_t;  /**<  weighting coefficients amplitude calculation. Time is fixed by trigger */
       using uint_pair_t        = std::pair<unsigned int, unsigned int>;
 
-      /**< ffsets for storages of ECL channels */
+      /** ffsets for storages of ECL channels */
       struct crystallinks_t {
         short unsigned int idn;
         short unsigned int inoise;
@@ -101,34 +101,34 @@ namespace Belle2 {
 
       std::vector<crystallinks_t> m_tbl;
 
-      /**< Fit algorihtm parameters shared by group of crystals */
+      /** Fit algorihtm parameters shared by group of crystals */
       std::vector<algoparams_t> m_idn; /**< parameters that needs for waveform fit */
-      std::vector<fitparams_t> m_fitparams; /*  */
+      std::vector<fitparams_t> m_fitparams; /**<  */
       std::vector<ECLNoiseData> m_noise; /**< parameters for correlated noise simulation */
       std::vector<signalsample_t> m_ss; /**< tabulated shape line */
 
-      /**< Storage for adc hits from entire calorimeter (8736 crystals) */
+      /** Storage for adc hits from entire calorimeter (8736 crystals) */
       std::vector<adccounts_t> m_adc;  /**< ACD counts */
       /** function wrapper for waveform fit */
       void shapeFitterWrapper(const int j, const int* FitA, const int m_ttrig,
                               int& m_lar, int& m_ltr, int& m_lq, int& m_chi) const ;
 
-      /**< read Shaper-DSP data from root file */
+      /** read Shaper-DSP data from root file */
       void readDSPDB();
 
       void repack(const ECLWFAlgoParams&, algoparams_t&);
       void getfitparams(const ECLWaveformData&, const ECLWFAlgoParams&, fitparams_t&);
 
-      /**< input arrays */
+      /** input arrays */
       StoreArray<ECLHit>    m_eclHits;  /**< hits array  */
       StoreArray<ECLHit>    m_eclDiodeHits;
       StoreArray<ECLSimHit> m_eclSimHits;
-      /**< Output Arrays */
+      /** Output Arrays */
       StoreArray<ECLDigit>  m_eclDigits;
       StoreArray<ECLDsp>    m_eclDsps;
       StoreArray<ECLTrig>   m_eclTrigs;
 
-      /**< Module parameters */
+      /** Module parameters */
       bool m_background;  /**< background flag */
       bool m_calibration;  /**< calibration flag */
       bool m_inter;

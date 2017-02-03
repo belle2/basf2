@@ -149,11 +149,6 @@ namespace {
     }
   }
 
-  // Declare function as currently unused to avoid compiler warning
-  PerigeeCircle fitSeperateOffset(Matrix< double, 4, 1 > means,
-                                  Matrix< double, 4, 4 > c,
-                                  bool lineConstrained) __attribute__((__unused__));
-
   /// Variant without drift circles and seperating the offset before the matrix solving
   PerigeeCircle fitSeperateOffset(Matrix< double, 4, 1 > means,
                                   Matrix< double, 4, 4 > c,
@@ -185,15 +180,14 @@ namespace {
         B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
       }
 
-      //the eigenvalues are generated in increasing order
-      //we are interested in the lowest one since we want to compute the normal vector of the plane
+      // the eigenvalues are generated in increasing order
+      // we are interested in the lowest one since we want to compute the normal vector of the plane
       Matrix<double, 4, 1> n;
       n.middleRows<3>(iX) = eigensolver.eigenvectors().col(0);
       n(iW) = -means.middleRows<3>(iX).transpose() * n.middleRows<3>(iX);
       return PerigeeCircle::fromN(n(iW), n(iX), n(iY), n(iR2));
 
     }
-
   }
 
 
@@ -282,7 +276,7 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fitInternal(CDCObservations2D& ob
   // The same as above without drift lengths
   Matrix<double, 4, 4> sNoL = s.block<4, 4>(0, 0);
 
-  // Determine NDF : Circle fit eats up to 3 degrees of freedom debpending on the constraints
+  // Determine NDF : Circle fit eats up to 3 degrees of freedom depending on the constraints
   size_t ndf = observations2D.size() - 1;
 
   if (not isOriginConstrained()) {
@@ -295,7 +289,7 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fitInternal(CDCObservations2D& ob
 
   // Parameters to be fitted
   UncertainPerigeeCircle resultCircle;
-  double chi2;
+  double chi2 = 0;
 
   size_t nObservationsWithDriftRadius = observations2D.getNObservationsWithDriftRadius();
   if (nObservationsWithDriftRadius > 0) {
@@ -319,16 +313,15 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fitInternal(CDCObservations2D& ob
     } else {
       resultCircle = ::fit(sNoL, isLineConstrained(), isOriginConstrained());
     }
-    chi2 = calcChi2(resultCircle, sNoL);
 
+    chi2 = calcChi2(resultCircle, sNoL);
   }
 
-  // Covariance calculation does not need the drift lengths, which is why we do not forward them
-  PerigeePrecision perigeePrecision = calcPrecision(resultCircle, sNoL,
-                                                    isLineConstrained(),
-                                                    isOriginConstrained());
+  // Covariance calculation does not need the drift lengths, which is why we do not forward them.
+  PerigeePrecision perigeePrecision =
+    calcPrecision(resultCircle, sNoL, isLineConstrained(), isOriginConstrained());
 
-  // Use in pivotingin caset the matrix is not full rank as is for the constrained cases-
+  // Use in pivoting in case the matrix is not full rank as it is for the constrained cases
   PerigeeCovariance perigeeCovariance = perigeePrecision.colPivHouseholderQr().inverse();
 
   resultCircle.setNDF(ndf);

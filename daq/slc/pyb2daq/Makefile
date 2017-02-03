@@ -7,7 +7,7 @@ RM      = rm -f
 
 TARGET = python
 
-SLCDIR   = ..
+SLCDIR   = $(BELLE2_DAQ_SLC)
 SRCDIR   = ./src
 INCDIR   = ./include
 TMPDIR   = $(SLCDIR)/tmp
@@ -29,15 +29,17 @@ CFLAGS  += -DNOT_USE_PSQL
 else 
 CFLAGS  += -I$(PGSQL_INC_PATH)
 endif
-CFLAGS  += $(EXTERNAL_CFLAGS)
+CFLAGS  += -I$(BELLE2_DAQ_SLC)/externals/boost/include
+CFLAGS  += -I$(BELLE2_DAQ_SLC)/externals/python/include/python3.5m
 
 EX_LIB = $(BELLE2_EXTERNALS_DIR)/lib
 EX_INC = $(BELLE2_EXTERNALS_DIR)/include
 #EX_LIB = $(B2DAQ_EXTERNALS_DIR)/lib
 #EX_INC = $(B2DAQ_EXTERNALS_DIR)/include
-CFLAGS += -isystem/$(EX_INC)/python3.5 -isystem/$(EX_INC) -I$(EX_INC)/python3.5
+#CFLAGS += -isystem/python3.5 -isystem/$(EX_INC) -I$(EX_INC)/python3.5
 
-LIBS   += -L$(EX_LIB) -lboost_python -lboost_filesystem -lboost_program_options -lboost_system -lpython3.5
+LIBS   += -L$(BELLE2_DAQ_SLC)/externals/boost/lib -lboost_python -lboost_filesystem -lboost_program_options -lboost_system
+LIBS   += -L$(BELLE2_DAQ_SLC)/externals/python/lib -lpython3.5m
 
 LIBS    += -lm -lpthread -ldl -lrt \
          -L$(SLCDIR)/lib -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database -ldaq_slc_psql \
@@ -58,6 +60,7 @@ inc:
 $(LIBTARGET) : $(OBJS)
 	@ echo "<< creating shared librariy $@ >>"
 	 $(CXX) -shared  $(CFLAGS) $^ -o $@ $(LIBS)
+	@ ln -s $@ lib/libdaq_slc_pyb2daq.so
 	@ echo "<< compiling succeede!! >>"
 	@ $(RM) *~ */*~ */*/*~ */*/*/*~ */*/*/*/*~ \#*\#* */\#*\#*
 

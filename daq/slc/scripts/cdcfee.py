@@ -8,7 +8,7 @@ def set_non(hslb, val):
     return True
 
 
-def init(hslb):
+def init(hslb, db):
     print('initing')
     vname = ('cdc[%d].' % hslb.get_finid())
     callback.addFloat(vname + 'temp', 0)

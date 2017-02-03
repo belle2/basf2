@@ -307,29 +307,6 @@ bool NSMVHandlerHSLBTest::handleGetText(std::string& val)
   return false;
 }
 
-bool NSMVHandlerHSLBUsed::handleSetInt(int val)
-{
-  NSMVHandlerInt::handleSetInt(val);
-  try {
-    int used = 0;
-    val = 0;
-    for (int i = 0; i < 4; i++) {
-      std::string vname = StringUtil::form("hslb[%d].used", i);
-      m_callback.get(vname, used);
-      val += (used << i);
-    }
-    m_callback.getTTRX().write(0x130, val);
-  } catch (const std::exception& e) {
-    LogFile::error(e.what());
-  }
-  return true;
-}
-
-bool NSMVHandlerHSLBUsed::handleGetInt(int& val)
-{
-  return NSMVHandlerInt::handleGetInt(val);
-}
-
 /*
 bool NSMVHandlerHSLBCheckFee::handleGetText(std::string& val)
 {

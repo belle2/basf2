@@ -78,8 +78,8 @@ namespace Belle2 {
       const int N = 2;
 
       double stepMax = 5.0 * Unit::mm;
-      bool flag_limitStep = false;
-      //bool flag_limitStep = true;
+      int flag_limitStep = content.getInt("LimitStepLength");
+
 
       //double unitFactor = 10.0;
       const double unitFactor = 1 / Unit::mm;

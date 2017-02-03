@@ -148,6 +148,80 @@ namespace Belle2 {
     unsigned int m_addr;
   };
 
+  class NSMVHandlerMaxTimeFT : public NSMVHandlerFloat {
+  public:
+    NSMVHandlerMaxTimeFT(TTDACallback& callback, const std::string& name)
+      : NSMVHandlerFloat(name, true, true, 0), m_callback(callback) {}
+    virtual ~NSMVHandlerMaxTimeFT() throw() {}
+    bool handleSetFloat(float usec)
+    {
+      unsigned int offset = 0x500 >> 2;
+      int v = read_ftsw(g_ftsw, offset);
+      unsigned int val = (v & 0xFF000000) | (unsigned int)(usec * 1e+3 / 7.8);
+      write_ftsw(g_ftsw, offset, val);
+      LogFile::info("0x%x<<%x", 0x500, val);
+      return true;
+    }
+    bool handleGetFloat(float& val)
+    {
+      unsigned int addr = 0x500;
+      unsigned int offset = addr >> 2;
+      int v = read_ftsw(g_ftsw, offset);
+      val = (v & 0xFFFFFF) * 7.8e-3;
+      LogFile::info("0x%x>>0x%d", addr, v);
+      LogFile::info("0x%x>>%f", addr, val);
+      return true;
+    }
+  private:
+    TTDACallback& m_callback;
+  };
+
+  class NSMVHandlerMaxTrigFT : public NSMVHandlerInt {
+  public:
+    NSMVHandlerMaxTrigFT(TTDACallback& callback, const std::string& name)
+      : NSMVHandlerInt(name, true, true, 0), m_callback(callback) {}
+    virtual ~NSMVHandlerMaxTrigFT() throw() {}
+    bool handleSetInt(int maxtrg)
+    {
+      unsigned int offset = 0x500 >> 2;
+      int v = read_ftsw(g_ftsw, offset);
+      unsigned int val = (v & 0xFFFFFF) | (maxtrg << 24);
+      write_ftsw(g_ftsw, offset, val);
+      LogFile::info("0x%x<<%x", 0x500, val);
+      return true;
+    }
+    bool handleGetInt(int& val)
+    {
+      unsigned int addr = 0x500;
+      unsigned int offset = addr >> 2;
+      int v = read_ftsw(g_ftsw, offset);
+      val = v >> 24;
+      LogFile::info("0x%x>>0x%d", addr, v);
+      LogFile::info("0x%x>>%f", addr, val);
+      return true;
+    }
+  private:
+    TTDACallback& m_callback;
+  };
+
+  class NSMVHandlerCmdFT : public NSMVHandlerInt {
+  public:
+    NSMVHandlerCmdFT(TTDACallback& callback, const std::string& name)
+      : NSMVHandlerInt(name, true, true, 0), m_callback(callback) {}
+    virtual ~NSMVHandlerCmdFT() throw() {}
+    bool handleSetInt(int val)
+    {
+      uint32_t cmdhi = val & 0xFF;
+      uint32_t cmdlo = (val >> 16) & 0xFF;
+      write_ftsw(g_ftsw, FTSWREG(0x18), cmdhi);
+      write_ftsw(g_ftsw, FTSWREG(0x19), cmdlo);
+      return true;
+    }
+  private:
+    TTDACallback& m_callback;
+  };
+
+
   class NSMVHandlerPortFT : public NSMVHandlerInt {
   public:
     NSMVHandlerPortFT(TTDACallback& callback, const std::string& name, int enable)
@@ -215,7 +289,7 @@ namespace Belle2 {
         g_mutex.lock();
         try {
           if (g_flag == true) {
-            stat2u067(g_ftsw, m_ftswid);
+            //stat2u067(g_ftsw, m_ftswid);
             std::string state = g_ftstat.state;
             if (state == "READY" && g_ftstat.toutcnt >= g_ftstat.tlimit) {
               //m_callback.set("tincnt", (int)g_ftstat.tincnt);
@@ -260,16 +334,18 @@ TTDACallback::TTDACallback(int ftswid, const std::string& ttdname)
 void TTDACallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
   std::string ttdname = m_ttdnode.getName();
-  configure(obj);
   if (ttdname.size() > 0) {
     openData(ttdname + "FAST", "pocket_ttd_fast", pocket_ttd_fast_revision);
     openData(ttdname + "SLOW", "pocket_ttd", pocket_ttd_revision);
   }
-  //int ftswid = obj.getInt("ftsw");
-  //m_ftswid = ftswid;
+  configure(obj);
   setAutoReply(true);
   if (g_ftsw == NULL) {
-    g_ftsw = open_ftsw(m_ftswid, 0x01);
+    LogFile::debug("ftsw = %d", m_ftswid);
+    g_ftsw = open_ftsw(m_ftswid, FTSW_RDWR);
+    if (g_ftsw == NULL) {
+      LogFile::error("failed to open ftsw");
+    }
   }
   configure(obj);
   g_flag = false;
@@ -301,6 +377,13 @@ void TTDACallback::configure(const DBObject& obj) throw(RCHandlerException)
   add(new NSMVHandlerText("ftstate", true, false, "UNKNOWN"));
   add(new NSMVHandlerStatFT(*this, "statft"));
   add(new NSMVHandlerResetFT(*this, "resetft"));
+  add(new NSMVHandlerTrigIO(*this, "trigio"));
+  add(new NSMVHandlerInt("endft", true, false, 0));
+  add(new NSMVHandlerRegFT(*this, "portmask", 0x170));
+  add(new NSMVHandlerRegFT(*this, "jtagmask", 0x1a0));
+  add(new NSMVHandlerMaxTimeFT(*this, "maxtime"));
+  add(new NSMVHandlerMaxTrigFT(*this, "maxtrig"));
+  add(new NSMVHandlerCmdFT(*this, "cmdft"));
   for (int i = 0; i < 4; i++) {
     int enable = obj("port")("cpr", i).getBool("enable");
     add(new NSMVHandlerPortFT(*this, StringUtil::form("port.cpr[%d].enable", i), enable));
@@ -383,7 +466,7 @@ void TTDACallback::monitor() throw(RCHandlerException)
     } catch (const NSMHandlerException& e) {}
   } else {
     try {
-      stat2u067(g_ftsw, m_ftswid);
+      //stat2u067(g_ftsw, m_ftswid);
       set("expno", (int)g_ftstat.exp);
       set("runno", (int)g_ftstat.run);
       set("subno", (int)g_ftstat.sub);

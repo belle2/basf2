@@ -19,7 +19,7 @@ ECLFEE::ECLFEE()
 {
 }
 
-void ECLFEE::init(RCCallback& callback, HSLB& hslb)
+void ECLFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& /*obj*/)
 {
   std::string vname = StringUtil::form("ecl[%d].", hslb.get_finid());
   callback.add(new FEE32Handler(vname + "reg_num_wdata", callback, hslb, *this, 0xB0));

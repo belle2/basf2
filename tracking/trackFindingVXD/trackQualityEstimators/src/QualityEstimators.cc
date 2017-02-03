@@ -714,8 +714,6 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
   TMatrixD sigma2M = zValuesT * (TAtG * AtGAInv * AtG) * zValues;
   double sigma2 = sigma2M(0, 0) / (nHits - 2);
 
-  if false {B2WARNING(" ====> Sigma2 = " << sigma2);}
-
   double thetaVal = (M_PI * 0.5 - atan(p(1, 0)));
 
   if (std::isnan(thetaVal) == true) {

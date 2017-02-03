@@ -1,4 +1,4 @@
-make -C arich
+make -C ecl arich
 #for dir in `ls .`
 #do
 #if [ -d $dir ] ; then

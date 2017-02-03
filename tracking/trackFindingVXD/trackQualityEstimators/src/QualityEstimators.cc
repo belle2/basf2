@@ -676,9 +676,10 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
     }
   }
 
+  // Linear Regression for the fit in z direction
   TMatrixD AtGA(2, 2);
   TMatrixD AtG(2, nHits);
-  TMatrixDSparse Diag(nHits, nHits);
+  TMatrixD Diag(nHits, nHits);
   double sumWi = 0, sumWiSi = 0, sumWiSi2 = 0, sw = 0;
   for (int i = 0; i < nHits; ++i) {
     sumWi += invVarZvalues(i, 0);
@@ -687,6 +688,7 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
     sumWiSi2 += invVarZvalues(i, 0) * s(i, 0) * s(i, 0);
     AtG(0, i) = invVarZvalues(i, 0);
     AtG(1, i) = sw;
+    for (int j = 0; j < nHits; ++j) { Diag(i, j) = 0.; }
     Diag(i, i) = 1.;
     B2DEBUG(75, "hit i: " <<  i << ", sumWi: " << sumWi << ", sw: " << sw << ", sumWiSi: " << sumWiSi << ", sumWiSi2: " << sumWiSi2 <<
             ", s(i): " << s(i, 0) << ", invVarZvalues(i): " << invVarZvalues(i, 0));
@@ -709,8 +711,10 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
   TMatrixD zValuesT = zValues;
   zValuesT.T();
 
-  TMatrixD sigma2M = zValuesT * (Diag * TAtG * AtGAInv * AtG) * zValues;
+  TMatrixD sigma2M = zValuesT * (TAtG * AtGAInv * AtG) * zValues;
   double sigma2 = sigma2M(0, 0) / (nHits - 2);
+
+  if false {B2WARNING(" ====> Sigma2 = " << sigma2);}
 
   double thetaVal = (M_PI * 0.5 - atan(p(1, 0)));
 

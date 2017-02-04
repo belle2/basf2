@@ -32,12 +32,6 @@ endif
 CFLAGS  += -I$(BELLE2_DAQ_SLC)/externals/boost/include
 CFLAGS  += -I$(BELLE2_DAQ_SLC)/externals/python/include/python3.5m
 
-EX_LIB = $(BELLE2_EXTERNALS_DIR)/lib
-EX_INC = $(BELLE2_EXTERNALS_DIR)/include
-#EX_LIB = $(B2DAQ_EXTERNALS_DIR)/lib
-#EX_INC = $(B2DAQ_EXTERNALS_DIR)/include
-#CFLAGS += -isystem/python3.5 -isystem/$(EX_INC) -I$(EX_INC)/python3.5
-
 LIBS   += -L$(BELLE2_DAQ_SLC)/externals/boost/lib -lboost_python -lboost_filesystem -lboost_program_options -lboost_system
 LIBS   += -L$(BELLE2_DAQ_SLC)/externals/python/lib -lpython3.5m
 
@@ -60,7 +54,7 @@ inc:
 $(LIBTARGET) : $(OBJS)
 	@ echo "<< creating shared librariy $@ >>"
 	 $(CXX) -shared  $(CFLAGS) $^ -o $@ $(LIBS)
-	@ ln -s $@ lib/libdaq_slc_pyb2daq.so
+	@ ln -s $@ $(LIBDIR)/libdaq_slc_pyb2daq.so
 	@ echo "<< compiling succeede!! >>"
 	@ $(RM) *~ */*~ */*/*~ */*/*/*~ */*/*/*/*~ \#*\#* */\#*\#*
 

@@ -27,25 +27,42 @@ namespace Belle2 {
     virtual void initialize();
     virtual void beginRun();
     virtual void event();
-    virtual void endRun() { };
+    virtual void endRun();
     virtual void terminate() { };
 
   private: // Parameters
 
+    //! Create 2D hits from KLM Digits
     void fillHits();
+
+    //! Create tracks from 2D hits
     void fillTracks();
+
+    //! Calculate track parameters, chi squared, impact parameter and number of fired layers
     void calcChisq();
-    void geometryConverter(bool fwd, int sector, int layer, int phiStrip, int zStrip, double& x, double& y, double& z);
 
-    const int nSectors = 8;
-    const int nLayers = 15;
+    //! Convert sector, layer and channel numbers to x, y, z coordinates
+    //! @param fwd detector end (forward=true and backward=false)
+    //! @param sector sector number
+    //! @param layer layer number
+    //! @param phiStrip phi strip number
+    //! @param zStrip z strip number
+    //! @param x x coordinate of the hit
+    //! @param y y coordinate of the hit
+    //! @param z x coordinate of the hit
+    void geometryConverter(bool fwd, int sector, int layer, int phiStrip, int zStrip, int& x, int& y, int& z);
 
-    // Debug level
-    int _debugLevel;
+    const int c_TotalSectors = 8;
+    const int c_TotalLayers = 15;
 
+    //! Trigger thresholds
     double m_maxChisq;
     double m_maxIP;
-    int m_minFiredLayers;
+    int m_minLayers;
+
+    //! Total number of processed events and found tracks
+    int m_nEvents;
+    int m_nTracks;
   };
 
 } // namespace Belle2

@@ -27,27 +27,30 @@ namespace Belle2 {
       m_zStrip(0),
       m_x(0.0),
       m_y(0.0),
-      m_z(0.0)
+      m_z(0.0),
+      m_xInt(0),
+      m_yInt(0),
+      m_zInt(0)
     { }
 
     //! Constructor with initial values for a hit
     //! @param fwd detector end (forward=true and backward=false)
     //! @param sector sector number
     //! @param layer layer number
-    //! @param nphi phi strip number
-    //! @param nz z strip number
-    //! @param x x coordinate of the hit
-    //! @param y y coordinate of the hit
-    //! @param z x coordinate of the hit
-    KLMTriggerHit(bool fwd, int sector, int layer, int nphi, int nz, double x = 0.0, double y = 0.0, double z = 0.0):
+    //! @param phiStrip phi strip number
+    //! @param zStrip z strip number
+    KLMTriggerHit(bool fwd, int sector, int layer, int phiStrip, int zStrip):
       m_fwd(fwd),
       m_sector(sector),
       m_layer(layer),
-      m_phiStrip(nphi),
-      m_zStrip(nz),
-      m_x(x),
-      m_y(y),
-      m_z(z)
+      m_phiStrip(phiStrip),
+      m_zStrip(zStrip),
+      m_x(0.0),
+      m_y(0.0),
+      m_z(0.0),
+      m_xInt(0),
+      m_yInt(0),
+      m_zInt(0)
     { }
 
     //! Destructor
@@ -87,6 +90,18 @@ namespace Belle2 {
     //! @return z coordinate of the hit
     double getZ() const { return m_z; }
 
+    //! Get x integer coordinate
+    //! @return x integer coordinate of the hit in 1/8 cm
+    int getXInt() const { return m_xInt; }
+
+    //! Get y integer coordinate
+    //! @return y integer coordinate of the hit in 1/8 cm
+    int getYInt() const { return m_yInt; }
+
+    //! Get z integer coordinate
+    //! @return z integer coordinate of the hit in 1/8 cm
+    int getZInt() const { return m_zInt; }
+
     // modifiers
 
     //! Set x coordinate
@@ -100,6 +115,18 @@ namespace Belle2 {
     //! Set z coordinate
     //! @param z z coordinate of the hit
     void setZ(double z) { m_z = z; }
+
+    //! Set x integer coordinate
+    //! @param x x integer coordinate of the hit in 1/8 cm
+    void setXInt(int xInt) { m_xInt = xInt; }
+
+    //! Set y integer coordinate
+    //! @param y y integer coordinate of the hit in 1/8 cm
+    void setYInt(int yInt) { m_yInt = yInt; }
+
+    //! Set z integer coordinate
+    //! @param z z integer coordinate of the hit in 1/8 cm
+    void setZInt(int zInt) { m_zInt = zInt; }
 
   private:
     //! forward-backward
@@ -125,6 +152,15 @@ namespace Belle2 {
 
     //! z coordinate
     double m_z;
+
+    //! x integer coordinate in 1/8 cm
+    int m_xInt;
+
+    //! y integer coordinate in 1/8 cm
+    int m_yInt;
+
+    //! z integer coordinate in 1/8 cm
+    int m_zInt;
 
     //! Needed to make the ROOT object storable
     ClassDef(KLMTriggerHit, 1);

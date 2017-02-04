@@ -32,7 +32,7 @@ namespace Belle2 {
       m_interceptXZ(0.0),
       m_impactParameterXZ(0.0),
       m_chisqXZ(0.0),
-      m_nFiredLayers(0),
+      m_nLayers(0),
       m_trigger(false)
     { }
 
@@ -51,7 +51,7 @@ namespace Belle2 {
       m_interceptXZ(0.0),
       m_impactParameterXZ(0.0),
       m_chisqXZ(0.0),
-      m_nFiredLayers(0),
+      m_nLayers(0),
       m_trigger(false)
     { }
 
@@ -102,7 +102,15 @@ namespace Belle2 {
 
     //! Get number of fired layers
     //! @return number of fired layers
-    int getNFiredLayers() const { return m_nFiredLayers; }
+    int getNLayers() const { return m_nLayers; }
+
+    //! Get number of the first fired layer
+    //! @return number of the first fired layer
+    int getFirstLayer() const { return m_firstLayer; }
+
+    //! Get number of the last fired layer
+    //! @return number of the last fired layer
+    int getLastLayer() const { return m_lastLayer; }
 
     //! Get trigger flag
     //! @return if the track generates a trigger
@@ -112,43 +120,51 @@ namespace Belle2 {
 
     //! Set slope parameter of the track in XY plain
     //! @param slopeXY slope parameter of the track in XY plain
-    void setSlopeXY(double slopeXY)  { m_slopeXY = slopeXY; }
+    void setSlopeXY(double slopeXY) { m_slopeXY = slopeXY; }
 
     //! Set intercept parameter of the track in XY plain
     //! @param interceptXY intercept parameter of the track in XY plain
-    void setInterceptXY(double interceptXY)  { m_interceptXY = interceptXY; }
+    void setInterceptXY(double interceptXY) { m_interceptXY = interceptXY; }
 
     //! Set impact parameter of the track in XY plain
     //! @param ipXY impact parameter of the track in XY plain
-    void setImpactParameterXY(double ipXY)  { m_impactParameterXY = ipXY; }
+    void setImpactParameterXY(double ipXY) { m_impactParameterXY = ipXY; }
 
     //! Set chi squared of the track in XY plain
     //! @param chisqXY chi squared of the track in XY plain
-    void setChisqXY(double chisqXY)  { m_chisqXY = chisqXY; }
+    void setChisqXY(double chisqXY) { m_chisqXY = chisqXY; }
 
     //! Set slope parameter of the track in XZ plain
     //! @param slopeXZ slope parameter of the track in XZ plain
-    void setSlopeXZ(double slopeXZ)  { m_slopeXZ = slopeXZ; }
+    void setSlopeXZ(double slopeXZ) { m_slopeXZ = slopeXZ; }
 
     //! Set intercept parameter of the track in XZ plain
     //! @param interceptXZ intercept parameter of the track in XZ plain
-    void setInterceptXZ(double interceptXZ)  { m_interceptXZ = interceptXZ; }
+    void setInterceptXZ(double interceptXZ) { m_interceptXZ = interceptXZ; }
 
     //! Set impact parameter of the track in XZ plain
     //! @param ipXZ impact parameter of the track in XZ plain
-    void setImpactParameterXZ(double ipXZ)  { m_impactParameterXZ = ipXZ; }
+    void setImpactParameterXZ(double ipXZ) { m_impactParameterXZ = ipXZ; }
 
     //! Set chi squared of the track in XZ plain
     //! @param chisqXZ chi squared of the track in XZ plain
-    void setChisqXZ(double chisqXZ)  { m_chisqXZ = chisqXZ; }
+    void setChisqXZ(double chisqXZ) { m_chisqXZ = chisqXZ; }
 
     //! Set number of fired layers
     //! @param nLayers number of fired layers
-    void setNFiredLayers(int nLayers)  { m_nFiredLayers = nLayers; }
+    void setNLayers(int nLayers) { m_nLayers = nLayers; }
+
+    //! Set number of the first fired layer
+    //! @param firstLayer number of the first fired layer
+    void setFirstLayer(int firstLayer) { m_firstLayer = firstLayer; }
+
+    //! Set number of the last fired layer
+    //! @param lastLayer number of the last fired layer
+    void setLastLayer(int lastLayer) { m_lastLayer = lastLayer; }
 
     //! Set trigger flag
     //! @param trg if the track generates a trigger
-    void setTrigger(bool trg)  { m_trigger = trg; }
+    void setTrigger(bool trg) { m_trigger = trg; }
 
   private:
     //! forward-backward
@@ -185,7 +201,13 @@ namespace Belle2 {
     double m_chisqXZ;
 
     //! number of fired layers
-    int m_nFiredLayers;
+    int m_nLayers;
+
+    //! number of the first fired layer
+    int m_firstLayer;
+
+    //! number of the last fired layer
+    int m_lastLayer;
 
     //! if the track generates a trigger
     bool m_trigger;

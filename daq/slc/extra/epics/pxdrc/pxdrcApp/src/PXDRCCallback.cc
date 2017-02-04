@@ -23,6 +23,8 @@ void connectionCallback(struct connection_handler_args args);
 void accessRightsCallback(struct access_rights_handler_args args);
 void eventCallback(struct event_handler_args eha);
 
+#include <cadef.h>
+
 PXDRCCallback::PXDRCCallback(const NSMNode& node)
   : RCCallback()
 {
@@ -32,11 +34,11 @@ PXDRCCallback::PXDRCCallback(const NSMNode& node)
 
 void PXDRCCallback::init(NSMCommunicator&) throw()
 {
-  int status = ca_create_channel("B2:PXD:PSC:State:req:S", NULL, NULL, 0, &m_PSRqs);
+  int status = ca_create_channel("B2:PXD:RC:State:cur:S", NULL, NULL, 0, &m_RC_cur);
   SEVCHK(status, "Create channel failed");
   status = ca_pend_io(1.0);
   SEVCHK(status, "Channel connection failed");
-  status = ca_create_channel("B2:PXD:RC:State:req:S", NULL, NULL, 0, &m_RCRqs);
+  status = ca_create_channel("B2:PXD:RC:State:req:S", NULL, NULL, 0, &m_RC_req);
   SEVCHK(status, "Create channel failed");
   status = ca_pend_io(1.0);
   SEVCHK(status, "Channel connection failed");
@@ -46,9 +48,7 @@ void PXDRCCallback::init(NSMCommunicator&) throw()
   add(new NSMVHandlerText("rcconfig", true, false, "default"));
   add(new NSMVHandlerText("dbtable", true, false, "none"));
   addPV("B2:PXD:RC:State:req:S");
-  addPV("B2:PXD:PSC:State:req:S");
   addPV("B2:PXD:RC:State:cur:S");
-  addPV("B2:PXD:PSC:State:cur:S");
 }
 
 int PXDRCCallback::putPV(chid cid, const char* val)
@@ -60,34 +60,46 @@ int PXDRCCallback::putPV(chid cid, const char* val)
   return status;
 }
 
+RCState PXDRCCallback::getRCCurrent()
+{
+  char pvalue[100];
+  ca_get(DBR_STRING, m_RC_cur, pvalue);
+  return RCState(pvalue);
+}
+
+RCState PXDRCCallback::getRCRequest()
+{
+  char pvalue[100];
+  ca_get(DBR_STRING, m_RC_req, pvalue);
+  return RCState(pvalue);
+}
+
 void PXDRCCallback::load(const DBObject&) throw(RCHandlerException)
 {
-  if (m_rcstate == RCState::NOTREADY_S) {
-    putPV(m_RCRqs, "READY");
-  } else if (m_rcstate == RCState::READY_S) {
+  if (m_state_req == RCState::NOTREADY_S) {
+    putPV(m_RC_req, "READY");
+  } else if (m_state_req == RCState::READY_S) {
     setState(RCState::READY_S);
   }
 }
 
 void PXDRCCallback::abort() throw(RCHandlerException)
 {
-  if (m_rcstate == RCState::NOTREADY_S) {
+  if (m_state_req == RCState::NOTREADY_S) {
     setState(RCState::NOTREADY_S);
-  } else if (m_rcstate == RCState::RUNNING_S) {
-    putPV(m_RCRqs, "READY");
   } else {
-    putPV(m_RCRqs, "NOTREADY");
+    putPV(m_RC_req, "NOTREADY");
   }
 }
 
 void PXDRCCallback::start(int expno, int runno) throw(RCHandlerException)
 {
-  putPV(m_RCRqs, "RUNNING");
+  putPV(m_RC_req, "RUNNING");
 }
 
 void PXDRCCallback::stop() throw(RCHandlerException)
 {
-  putPV(m_RCRqs, "READY");
+  putPV(m_RC_req, "READY");
 }
 
 bool PXDRCCallback::addPV(const std::string& pvname) throw()

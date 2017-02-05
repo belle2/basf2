@@ -870,8 +870,10 @@ void PXDUnpackerModule::event()
   }
 }
 
+#ifndef __clang__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstack-usage="
+#endif
 void PXDUnpackerModule::unpack_event(RawPXD& px)
 {
   int Frames_in_event;
@@ -953,7 +955,9 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
   }
 
 }
+#ifndef __clang__
 #pragma GCC diagnostic pop
+#endif
 
 void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsigned int dhe_ID, unsigned dhe_DHPport, VxdID vxd_id)
 {

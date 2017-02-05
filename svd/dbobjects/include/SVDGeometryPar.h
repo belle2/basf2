@@ -20,9 +20,6 @@
 
 namespace Belle2 {
 
-  class GearDir;
-
-
   /**
   * The Class for VXD geometry
   */
@@ -32,13 +29,30 @@ namespace Belle2 {
   public:
     //! Default constructor
     SVDGeometryPar() {}
-    //! Constructor using Gearbox
-    //explicit SVDGeometryPar(const std::string& prefix, const GearDir& content) :  VXDGeometryPar(prefix, content) {  }
-    //! Destructor
-    //~SVDGeometryPar() {}
 
     /** get SVD halfshell Rotation Solids */
     const std::vector<VXDRotationSolidPar>& getRotationSolids() const {return m_halfShell;}
+
+    /** get SVD halfshell Rotation Solids */
+    std::vector<VXDRotationSolidPar>& getRotationSolids() {return m_halfShell;}
+
+    /** get endrings */
+    const std::map<int, SVDEndringsPar>& getEndrings() const {return m_endrings;}
+
+    /** get endrings */
+    std::map<int, SVDEndringsPar>& getEndrings()  {return m_endrings;}
+
+    /** get cooling pipes */
+    const std::map<int, SVDCoolingPipesPar>& getCoolingPipes() const {return m_coolingPipes;}
+
+    /** get cooling pipes */
+    std::map<int, SVDCoolingPipesPar>& getCoolingPipes() {return m_coolingPipes;}
+
+    /** get support ribs */
+    const std::map<int, SVDSupportRibsPar>& getSupportRibs() const {return m_supportRibs;}
+
+    /** get support ribs */
+    std::map<int, SVDSupportRibsPar>& getSupportRibs() {return m_supportRibs;}
 
     /** get SVD Support Ribs */
     const SVDSupportRibsPar& getSupportRibs(int) const;
@@ -58,32 +72,8 @@ namespace Belle2 {
     /** return if endrings exist */
     bool getCoolingPipesExist(int) const;
 
-    /**
-     * Read the sensor definitions from the database
-     * @param sensors Reference to the database containing the parameters
-     */
-    VXDSensorInfoBasePar* createSensorInfo(const GearDir& sensor);
-
-    /**
-     * Create support structure for VXD Half Shell, that means everything
-     * thagt does not depend on layer or sensor alignment
-     * @param support Reference to the database containing the parameters
-     */
-    void createHalfShellSupport(GearDir support);
-
-    /**
-     * Create support structure for a VXD Layer
-     * @param layer Layer ID to create the support for
-     * @param support Reference to the database containing the parameters
-     */
-    void createLayerSupport(int layer, GearDir support);
-
-    /**
-     * Create support structure for a VXD Ladder
-     * @param layer Layer ID to create the support for
-     * @param support Reference to the database containing the parameters
-     */
-    void createLadderSupport(int layer, GearDir support);
+    /** get sensorInfos */
+    std::vector<SVDSensorInfoPar*>& getSensorInfos()  {return m_SensorInfo;}
 
   private:
 

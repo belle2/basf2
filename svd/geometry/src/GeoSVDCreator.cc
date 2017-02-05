@@ -107,6 +107,31 @@ namespace Belle2 {
       return info;
     }
 
+    SVDSensorInfoPar* GeoSVDCreator::readSensorInfo(const GearDir& sensor)
+    {
+
+      SVDSensorInfoPar* info = new SVDSensorInfoPar(
+        VxdID(0, 0, 0),
+        sensor.getLength("width"),
+        sensor.getLength("length"),
+        sensor.getLength("height"),
+        sensor.getInt("stripsU"),
+        sensor.getInt("stripsV"),
+        sensor.getLength("width2", 0)
+      );
+
+      info->setSensorParams(
+        sensor.getWithUnit("DepletionVoltage"),
+        sensor.getWithUnit("BiasVoltage"),
+        sensor.getDouble("BackplaneCapacitance") ,
+        sensor.getDouble("InterstripCapacitance") ,
+        sensor.getDouble("CouplingCapacitance") ,
+        sensor.getWithUnit("ElectronicNoiseU"),
+        sensor.getWithUnit("ElectronicNoiseV")
+      );
+
+      return info;
+    }
 
     VXD::SensitiveDetectorBase* GeoSVDCreator::createSensitiveDetector(
       VxdID sensorID, const VXDGeoSensor& sensor, const VXDGeoSensorPlacement&)
@@ -117,10 +142,165 @@ namespace Belle2 {
       return sensitive;
     }
 
-    SVDGeometryPar GeoSVDCreator::createConfiguration(const GearDir& param)
+    SVDGeometryPar GeoSVDCreator::createConfiguration(const GearDir& content)
     {
       SVDGeometryPar svdGeometryPar;
-      //svdGeometryPar.read(m_prefix, param);
+
+      //Read prefix ('SVD' or 'PXD')
+      svdGeometryPar.setPrefix(m_prefix);
+
+      //Read some global parameters
+      VXDGlobalPar globals((float)content.getDouble("ElectronTolerance", 100),
+                           (float)content.getDouble("MinimumElectrons", 10),
+                           content.getLength("ActiveStepSize", 0.005),
+                           content.getBool("ActiveChips", false),
+                           content.getBool("SeeNeutrons", false),
+                           content.getBool("OnlyPrimaryTrueHits", false),
+                           content.getBool("OnlyActiveMaterial", false),
+                           (float)content.getLength("DistanceTolerance", 0.005),
+                           content.getString("DefaultMaterial", "Air")
+                          );
+      svdGeometryPar.setGlobalParams(globals);
+
+      //Read envelope parameters
+      GearDir envelopeParams(content, "Envelope/");
+      VXDEnvelopePar envelope(envelopeParams.getString("Name", ""),
+                              envelopeParams.getString("Material", "Air"),
+                              envelopeParams.getString("Color", ""),
+                              envelopeParams.getAngle("minPhi", 0),
+                              envelopeParams.getAngle("maxPhi", 2 * M_PI),
+                              (envelopeParams.getNodes("InnerPoints/point").size() > 0)
+                             );
+
+      for (const GearDir point : envelopeParams.getNodes("InnerPoints/point")) {
+        pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
+        envelope.getInnerPoints().push_back(ZXPoint);
+      }
+      for (const GearDir point : envelopeParams.getNodes("OuterPoints/point")) {
+        pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
+        envelope.getOuterPoints().push_back(ZXPoint);
+      }
+      svdGeometryPar.setEnvelope(envelope);
+
+      // Read alignment for detector m_prefix ('PXD' or 'SVD')
+      string pathAlign = (boost::format("Align[@component='%1%']/") % m_prefix).str();
+      GearDir paramsAlign(GearDir(content, "Alignment/"), pathAlign);
+      if (!paramsAlign) {
+        B2WARNING("Could not find alignment parameters for component " << m_prefix);
+        return svdGeometryPar;
+      }
+      svdGeometryPar.getAlignmentMap()[m_prefix] = VXDAlignmentPar(paramsAlign.getLength("du"),
+                                                   paramsAlign.getLength("dv"),
+                                                   paramsAlign.getLength("dw"),
+                                                   paramsAlign.getAngle("alpha"),
+                                                   paramsAlign.getAngle("beta"),
+                                                   paramsAlign.getAngle("gamma")
+                                                                  );
+
+      //Read the definition of all sensor types
+      GearDir components(content, "Components/");
+      for (const GearDir& paramsSensor : components.getNodes("Sensor")) {
+        string sensorTypeID = paramsSensor.getString("@type");
+
+        VXDGeoSensorPar sensor(paramsSensor.getString("Material"),
+                               paramsSensor.getString("Color", ""),
+                               paramsSensor.getLength("width"),
+                               paramsSensor.getLength("width2", 0),
+                               paramsSensor.getLength("length"),
+                               paramsSensor.getLength("height"),
+                               paramsSensor.getBool("@slanted", false)
+                              );
+        sensor.setActive(VXDGeoComponentPar(
+                           paramsSensor.getString("Material"),
+                           paramsSensor.getString("Active/Color", "#f00"),
+                           paramsSensor.getLength("Active/width"),
+                           paramsSensor.getLength("Active/width2", 0),
+                           paramsSensor.getLength("Active/length"),
+                           paramsSensor.getLength("Active/height")
+                         ), VXDGeoPlacementPar(
+                           "Active",
+                           paramsSensor.getLength("Active/u"),
+                           paramsSensor.getLength("Active/v"),
+                           paramsSensor.getString("Active/w", "center"),
+                           paramsSensor.getLength("Active/woffset", 0)
+                         ));
+
+        SVDSensorInfoPar* svdInfo = readSensorInfo(GearDir(paramsSensor, "Active"));
+        sensor.setSensorInfo(svdInfo);
+        sensor.setComponents(getSubComponentsNEW(paramsSensor));
+        svdGeometryPar.getSensorMap()[sensorTypeID] = sensor;
+        svdGeometryPar.getSensorInfos().push_back(svdInfo);
+      }
+
+      //Build all ladders including Sensors
+      GearDir support(content, "Support/");
+      readHalfShellSupport(support, svdGeometryPar);
+
+      for (const GearDir& shell : content.getNodes("HalfShell")) {
+
+        string shellName = m_prefix + "." + shell.getString("@name");
+        string pathShell = (boost::format("Align[@component='%1%']/") % shellName).str();
+        GearDir paramsShell(GearDir(content, "Alignment/"), pathShell);
+        if (!paramsShell) {
+          B2WARNING("Could not find alignment parameters for component " << shellName);
+          return svdGeometryPar;
+        }
+        svdGeometryPar.getAlignmentMap()[shellName] = VXDAlignmentPar(paramsShell.getLength("du"),
+                                                      paramsShell.getLength("dv"),
+                                                      paramsShell.getLength("dw"),
+                                                      paramsShell.getAngle("alpha"),
+                                                      paramsShell.getAngle("beta"),
+                                                      paramsShell.getAngle("gamma")
+                                                                     );
+
+        VXDHalfShellPar halfShell(shell.getString("@name") , shell.getAngle("shellAngle", 0));
+
+        for (const GearDir& layer : shell.getNodes("Layer")) {
+          int layerID = layer.getInt("@id");
+
+          readLadder(layerID, components, svdGeometryPar);
+          readLayerSupport(layerID, support, svdGeometryPar);
+          readLadderSupport(layerID, support, svdGeometryPar);
+
+          //Loop over defined ladders
+          for (const GearDir& ladder : layer.getNodes("Ladder")) {
+            int ladderID = ladder.getInt("@id");
+            double phi = ladder.getAngle("phi", 0);
+            readLadderComponents(layerID, ladderID, content, svdGeometryPar);
+            halfShell.addLadder(layerID, ladderID,  phi);
+          }
+        }
+        svdGeometryPar.getHalfShells().push_back(halfShell);
+      }
+
+      //Create diamond radiation sensors if defined and in background mode
+      GearDir radiationDir(content, "RadiationSensors");
+      if (svdGeometryPar.getGlobalParams().getActiveChips() &&  radiationDir) {
+        VXDGeoRadiationSensorsPar radiationSensors(
+          m_prefix,
+          radiationDir.getBool("insideEnvelope"),
+          radiationDir.getLength("width"),
+          radiationDir.getLength("length"),
+          radiationDir.getLength("height"),
+          radiationDir.getString("material")
+        );
+
+        //Add radiation sensor positions
+        for (GearDir& position : radiationDir.getNodes("position")) {
+          VXDGeoRadiationSensorsPositionPar diamonds(position.getLength("z"),
+                                                     position.getLength("radius"),
+                                                     position.getAngle("theta")
+                                                    );
+
+          //Loop over all phi positions
+          for (GearDir& sensor : position.getNodes("phi")) {
+            //Add sensor with angle and id
+            diamonds.addSensor(sensor.getInt("@id"), sensor.getAngle());
+          }
+          radiationSensors.addPosition(diamonds);
+        }
+        svdGeometryPar.setRadiationSensors(radiationSensors);
+      }
       return svdGeometryPar;
     }
 
@@ -302,6 +482,132 @@ namespace Belle2 {
       if (m_activeChips) {
         createDiamondsFromDB(parameters.getRadiationSensors(), topVolume, *envelope);
       }
+    }
+
+    void GeoSVDCreator::readHalfShellSupport(GearDir support, SVDGeometryPar& svdGeometryPar)
+    {
+      if (!support) return;
+
+      for (const GearDir& params : support.getNodes("HalfShell/RotationSolid")) {
+
+        VXDRotationSolidPar rotationSolidPar(params.getString("Name", ""),
+                                             params.getString("Material", "Air"),
+                                             params.getString("Color", ""),
+                                             params.getAngle("minPhi", 0),
+                                             params.getAngle("maxPhi", 2 * M_PI),
+                                             (params.getNodes("InnerPoints/point").size() > 0)
+                                            );
+
+        for (const GearDir point : params.getNodes("InnerPoints/point")) {
+          pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
+          rotationSolidPar.getInnerPoints().push_back(ZXPoint);
+        }
+        for (const GearDir point : params.getNodes("OuterPoints/point")) {
+          pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
+          rotationSolidPar.getOuterPoints().push_back(ZXPoint);
+        }
+        svdGeometryPar.getRotationSolids().push_back(rotationSolidPar);
+      }
+      return;
+    }
+
+    void GeoSVDCreator::readLayerSupport(int layer, GearDir support, SVDGeometryPar& svdGeometryPar)
+    {
+      if (!support) return;
+
+      //Check if there are any endrings defined for this layer. If not we don't create any
+      GearDir endrings(support, (boost::format("Endrings/Layer[@id='%1%']") % layer).str());
+      if (endrings) {
+        svdGeometryPar.getEndrings()[layer] = SVDEndringsPar(support.getString("Endrings/Material"),
+                                                             support.getLength("Endrings/length"),
+                                                             support.getLength("Endrings/gapWidth"),
+                                                             support.getLength("Endrings/baseThickness")
+                                                            );
+
+        //Create  the endrings
+        for (const GearDir& endring : endrings.getNodes("Endring")) {
+          SVDEndringsTypePar endringPar(endring.getString("@name"),
+                                        endring.getLength("z"),
+                                        endring.getLength("baseRadius"),
+                                        endring.getLength("innerRadius"),
+                                        endring.getLength("outerRadius"),
+                                        endring.getLength("horizontalBar"),
+                                        endring.getLength("verticalBar")
+                                       );
+          svdGeometryPar.getEndrings()[layer].getTypes().push_back(endringPar);
+        }
+      }
+
+      // Now let's add the cooling pipes to the Support
+      GearDir pipes(support, (boost::format("CoolingPipes/Layer[@id='%1%']") % layer).str());
+      if (pipes) {
+        svdGeometryPar.getCoolingPipes()[layer] = SVDCoolingPipesPar(support.getString("CoolingPipes/Material"),
+                                                  support.getLength("CoolingPipes/outerDiameter"),
+                                                  support.getLength("CoolingPipes/wallThickness"),
+                                                  pipes.getInt("nPipes"),
+                                                  pipes.getAngle("startPhi"),
+                                                  pipes.getAngle("deltaPhi"),
+                                                  pipes.getLength("radius"),
+                                                  pipes.getLength("zstart"),
+                                                  pipes.getLength("zend")
+                                                                    );
+        if (pipes.exists("deltaL")) svdGeometryPar.getCoolingPipes()[layer].setDeltaL(pipes.getLength("deltaL"));
+      }
+      return;
+    }
+
+    void GeoSVDCreator::readLadderSupport(int layer, GearDir support, SVDGeometryPar& svdGeometryPar)
+    {
+      if (!support) return;
+
+      // Check if there are any support ribs defined for this layer. If not return empty assembly
+      GearDir params(support, (boost::format("SupportRibs/Layer[@id='%1%']") % layer).str());
+      if (params) {
+        svdGeometryPar.getSupportRibs()[layer] = SVDSupportRibsPar(support.getLength("SupportRibs/spacing"),
+                                                                   support.getLength("SupportRibs/height"),
+                                                                   support.getLength("SupportRibs/inner/width"),
+                                                                   support.getLength("SupportRibs/outer/width"),
+                                                                   support.getLength("SupportRibs/inner/tabLength"),
+                                                                   support.getString("SupportRibs/outer/Material"),
+                                                                   support.getString("SupportRibs/inner/Material"),
+                                                                   support.getString("SupportRibs/outer/Color"),
+                                                                   support.getString("SupportRibs/inner/Color"),
+                                                                   support.getString("SupportRibs/endmount/Material")
+                                                                  );
+
+        // Get values for the layer if available
+        if (params.exists("spacing")) svdGeometryPar.getSupportRibs()[layer].setSpacing(params.getLength("spacing"));
+        if (params.exists("height")) svdGeometryPar.getSupportRibs()[layer].setHeight(params.getLength("height"));
+
+        for (const GearDir& box : params.getNodes("box")) {
+          SVDSupportBoxPar boxPar(box.getAngle("theta"),
+                                  box.getLength("z"),
+                                  box.getLength("r"),
+                                  box.getLength("length")
+                                 );
+          svdGeometryPar.getSupportRibs()[layer].getBoxes().push_back(boxPar);
+        }
+
+        for (const GearDir& tab : params.getNodes("tab")) {
+          SVDSupportTabPar tabPar(tab.getAngle("theta"),
+                                  tab.getLength("z"),
+                                  tab.getLength("r")
+                                 );
+          svdGeometryPar.getSupportRibs()[layer].getTabs().push_back(tabPar);
+        }
+
+        for (const GearDir& endmount : params.getNodes("Endmount")) {
+          SVDEndmountPar mountPar(endmount.getString("@name"),
+                                  endmount.getLength("height"),
+                                  endmount.getLength("width"),
+                                  endmount.getLength("length"),
+                                  endmount.getLength("z"),
+                                  endmount.getLength("r")
+                                 );
+          svdGeometryPar.getSupportRibs()[layer].getEndmounts().push_back(mountPar);
+        }
+      }
+      return;
     }
 
     VXD::GeoVXDAssembly GeoSVDCreator::createHalfShellSupportFromDB(const SVDGeometryPar& parameters)

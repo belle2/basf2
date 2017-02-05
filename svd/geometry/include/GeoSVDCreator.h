@@ -58,6 +58,7 @@ namespace Belle2 {
         createGeometry(*dbObj, topVolume, type);
       }
 
+
       /**
        * Create support structure for SVD Half Shell, that means everything
        * thagt does not depend on layer or sensor alignment
@@ -115,6 +116,12 @@ namespace Belle2 {
       virtual VXD::SensorInfoBase* createSensorInfoFromDB(const VXDGeoSensorPar& sensor);
 
       /**
+       * Read the sensor definitions from gearbox
+       * @param sensors Reference to the database containing the parameters
+       */
+      SVDSensorInfoPar* readSensorInfo(const GearDir& sensor);
+
+      /**
        * Return a SensitiveDetector implementation for a given sensor
        * @param sensorID  SensorID for the sensor
        * @param sensor    Information about the sensor to create the Sensitive Detector for
@@ -123,7 +130,26 @@ namespace Belle2 {
       virtual VXD::SensitiveDetectorBase* createSensitiveDetector(
         VxdID sensorID, const VXDGeoSensor& sensor, const VXDGeoSensorPlacement& placement);
 
+      /**
+       * Create support structure for SVD Half Shell, that means everything
+       * thagt does not depend on layer or sensor alignment
+       * @param support Reference to the database containing the parameters
+       */
+      void readHalfShellSupport(GearDir support, SVDGeometryPar& svdGeometryPar);
 
+      /**
+       * Create support structure for a SVD Layer
+       * @param layer Layer ID to create the support for
+       * @param support Reference to the database containing the parameters
+       */
+      void readLayerSupport(int layer, GearDir support, SVDGeometryPar& svdGeometryPar);
+
+      /**
+       * Create support structure for a SVD Ladder
+       * @param layer Layer ID to create the support for
+       * @param support Reference to the database containing the parameters
+       */
+      void readLadderSupport(int layer, GearDir support, SVDGeometryPar& svdGeometryPar);
 
     private:
 

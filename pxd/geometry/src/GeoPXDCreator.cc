@@ -14,7 +14,6 @@
 #include <pxd/geometry/SensorInfo.h>
 #include <pxd/simulation/SensitiveDetector.h>
 
-
 #include <simulation/background/BkgSensitiveDetector.h>
 
 #include <geometry/Materials.h>

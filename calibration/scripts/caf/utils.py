@@ -301,3 +301,51 @@ def merge_local_databases(list_database_dirs, output_database_dir):
                 with open(os.path.join(directory, 'database.txt'), 'r') as f:
                     for line in f.readlines():
                         db_file.write(line)
+
+
+def get_iov_from_file(file_path):
+    """
+    Returns an IoV of the exp/run contained within the given file.
+    Uses the showmetadata basf2 tool.
+    """
+    import subprocess
+    metadata_output = subprocess.check_output(['showmetadata', file_path], universal_newlines=True)
+    for line in metadata_output.split("\n"):
+        if "range" in line:
+            words = line.split()
+            low_range = words[2]
+            high_range = words[4]
+            exp_low, run_low, event_low = low_range.split('/')
+            exp_high, run_high, event_high = high_range.split('/')
+    return IoV(exp_low, run_low, exp_high, run_high)
+
+
+def find_absolute_file_paths(file_path_patterns):
+    """
+    Takes a file path list (including wildcards) and performs glob.glob()
+    to extract the absolute file paths to all matching files.
+
+    Also uses set() to prevent multiple instances of the same file path
+    but returns a list of file paths.
+
+    Any root:// urls are taken as absolute file paths already and are simply
+    passed through. They should NOT contain wildcard patterns.
+    """
+    import glob
+    existing_file_paths = set()
+    for file_pattern in file_path_patterns:
+        if file_pattern[:7] != "root://":
+            input_files = glob.glob(file_pattern)
+            if not input_files:
+                B2WARNING("No files matching {0} can be found, it will be skipped!".format(file_pattern))
+            else:
+                for file_path in input_files:
+                    file_path = os.path.abspath(file_path)
+                    if os.path.isfile(file_path):
+                        existing_file_paths.add(file_path)
+        else:
+            B2INFO(("Found an xrootd file path {0} it will not be checked for validity.".format(input_file_path)))
+            existing_file_paths.add(file_pattern)
+
+    abs_file_paths = list(existing_file_paths)
+    return abs_file_paths

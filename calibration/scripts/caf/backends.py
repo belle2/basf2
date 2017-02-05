@@ -199,8 +199,8 @@ class Local(Backend):
                             existing_input_files.add(file_path)
             else:
                 B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
-                        " before collector submission.".format(input_file_path)))
-                existing_input_files.add(input_file_path)
+                        " before collector submission.".format(input_file_pattern)))
+                existing_input_files.add(input_file_pattern)
 
         if existing_input_files:
             # Now make a python file in our input sandbox containing a list of these valid files
@@ -438,8 +438,8 @@ class PBS(Backend):
                             existing_input_files.add(file_path)
             else:
                 B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
-                        " before collector submission.".format(input_file_path)))
-                existing_input_files.add(input_file_path)
+                        " before collector submission.".format(input_file_pattern)))
+                existing_input_files.add(input_file_pattern)
 
         if existing_input_files:
             # Now make a python file in our input sandbox containing a list of these valid files
@@ -669,8 +669,8 @@ class LSF(Backend):
                             existing_input_files.add(file_path)
             else:
                 B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
-                        " before collector submission.".format(input_file_path)))
-                existing_input_files.add(input_file_path)
+                        " before collector submission.".format(input_file_pattern)))
+                existing_input_files.add(input_file_pattern)
 
         if existing_input_files:
             # Now make a python file in our input sandbox containing a list of these valid files

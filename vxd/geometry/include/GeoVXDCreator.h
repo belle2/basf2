@@ -208,6 +208,39 @@ namespace Belle2 {
 
       void createDiamondsFromDB(const VXDGeoRadiationSensorsPar& params, G4LogicalVolume& topVolume, G4LogicalVolume& envelopeVolume);
 
+      /**
+       * Return vector of VXDGeoPlacements with all the components defined inside a given path
+       */
+      std::vector<VXDGeoPlacementPar> getSubComponentsNEW(GearDir path);
+
+      /**
+       * Read parameters for a ladder in layer with given ID from gearbox and layer
+       * store them in payload
+       */
+      virtual void readLadder(int layer, GearDir components, VXDGeometryPar& geoparameters);
+
+      /**
+        * Read parameters for ladder components and their alignment corresponding
+        * to the given ladder id
+        */
+      virtual void readLadderComponents(int layerID, int ladderID, GearDir content, VXDGeometryPar& vxdGeometryPar);
+
+      /**
+       * Read parameters for component name from Gearbox into geometry payload.
+       * The name is assumed to be unique and Volumes are cached.
+       * @param name Name of the component
+       * @param components Path to components
+       */
+      void readComponent(const std::string& name, GearDir components, VXDGeometryPar& vxdGeometryPar);
+
+      /**
+       * Read parameters for all components in placement container from Gearbox
+       * into payload.
+       * @param placements container holding names of all components to be cached
+       * @param componentDir Path to Gearbox where parameters are to be found
+       */
+      void readSubComponents(const std::vector<VXDGeoPlacementPar>& placements , GearDir componentsDir, VXDGeometryPar& vxdGeometryPar);
+
     protected:
       /** Prefix to prepend to all volume names */
       std::string m_prefix;

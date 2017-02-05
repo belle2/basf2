@@ -19,7 +19,7 @@
 using namespace Belle2;
 using namespace std;
 
-
+/*
 std::vector<VXDGeoPlacementPar> VXDGeometryPar::getSubComponents(GearDir path)
 {
   vector<VXDGeoPlacementPar> result;
@@ -46,6 +46,8 @@ std::vector<VXDGeoPlacementPar> VXDGeometryPar::getSubComponents(GearDir path)
   }
   return result;
 }
+*/
+
 
 const VXDGeoComponentPar& VXDGeometryPar::getComponent(std::string name) const
 {
@@ -58,6 +60,7 @@ const VXDGeoComponentPar& VXDGeometryPar::getComponent(std::string name) const
 }
 
 
+
 int  VXDGeometryPar::getSensitiveChipID(std::string name) const
 {
   //Check if sensorType already exists
@@ -67,6 +70,7 @@ int  VXDGeometryPar::getSensitiveChipID(std::string name) const
   }
   return cached->second;
 }
+
 
 
 const VXDGeoSensorPar& VXDGeometryPar::getSensor(string sensorTypeID) const
@@ -89,6 +93,7 @@ const VXDGeoLadderPar& VXDGeometryPar::getLadder(int layer) const
   return cached->second;
 }
 
+/*
 void VXDGeometryPar::cacheLadder(int layer, GearDir components)
 {
   string path = (boost::format("Ladder[@layer=%1%]/") % layer).str();
@@ -119,10 +124,10 @@ void VXDGeometryPar::cacheLadder(int layer, GearDir components)
                                ));
   }
 }
-
+*/
 
 // Get VXD geometry parameters from Gearbox (no calculations here)
-// *** This is a DIVOT ***
+/*
 void VXDGeometryPar::read(const string& prefix, const GearDir& content)
 {
   //Read prefix ('SVD' or 'PXD')
@@ -285,8 +290,9 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
   //m_sensorMap.clear();
 
 }
+*/
 
-
+/*
 void VXDGeometryPar::readLadderInfo(int layerID, int ladderID,  GearDir content)
 {
   VxdID ladder(layerID, ladderID, 0);
@@ -337,7 +343,7 @@ void VXDGeometryPar::readLadderInfo(int layerID, int ladderID,  GearDir content)
   }
   return;
 }
-
+*/
 
 VXDAlignmentPar VXDGeometryPar::getAlignment(std::string name) const
 {
@@ -349,6 +355,7 @@ VXDAlignmentPar VXDGeometryPar::getAlignment(std::string name) const
   return cached->second;
 }
 
+/*
 void VXDGeometryPar::cacheComponent(const std::string& name, GearDir componentsDir)
 {
   //Check if component already exists
@@ -385,8 +392,9 @@ void VXDGeometryPar::cacheComponent(const std::string& name, GearDir componentsD
   }
   m_componentCache[name] = c;
 }
+*/
 
-
+/*
 void VXDGeometryPar::cacheSubComponents(const std::vector<VXDGeoPlacementPar>& placements , GearDir componentsDir)
 {
   for (const VXDGeoPlacementPar& p : placements) {
@@ -394,7 +402,7 @@ void VXDGeometryPar::cacheSubComponents(const std::vector<VXDGeoPlacementPar>& p
   }
   return;
 }
-
+*/
 
 
 

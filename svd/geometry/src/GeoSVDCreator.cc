@@ -120,7 +120,7 @@ namespace Belle2 {
     SVDGeometryPar GeoSVDCreator::createConfiguration(const GearDir& param)
     {
       SVDGeometryPar svdGeometryPar;
-      svdGeometryPar.read(m_prefix, param);
+      //svdGeometryPar.read(m_prefix, param);
       return svdGeometryPar;
     }
 

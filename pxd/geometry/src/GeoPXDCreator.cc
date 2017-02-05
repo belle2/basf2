@@ -128,11 +128,263 @@ namespace Belle2 {
       return info;
     }
 
-    PXDGeometryPar GeoPXDCreator::createConfiguration(const GearDir& param)
+
+    PXDSensorInfoPar* GeoPXDCreator::readSensorInfo(const GearDir& sensor)
     {
+      PXDSensorInfoPar* info = new PXDSensorInfoPar(
+        VxdID(0, 0, 0),
+        sensor.getLength("width"),
+        sensor.getLength("length"),
+        sensor.getLength("height"),
+        sensor.getInt("pixelsU"),
+        sensor.getInt("pixelsV[1]"),
+        sensor.getLength("splitLength", 0),
+        sensor.getInt("pixelsV[2]", 0)
+      );
+
+      info->setDEPFETParams(
+        sensor.getDouble("BulkDoping"),
+        sensor.getWithUnit("BackVoltage"),
+        sensor.getWithUnit("TopVoltage"),
+        sensor.getLength("SourceBorderSmallPixel"),
+        sensor.getLength("ClearBorderSmallPixel"),
+        sensor.getLength("DrainBorderSmallPixel"),
+        sensor.getLength("SourceBorderLargePixel"),
+        sensor.getLength("ClearBorderLargePixel"),
+        sensor.getLength("DrainBorderLargePixel"),
+        sensor.getLength("GateDepth"),
+        sensor.getBool("DoublePixel"),
+        sensor.getDouble("ChargeThreshold"),
+        sensor.getDouble("NoiseFraction")
+      );
+      info->setIntegrationWindow(
+        sensor.getTime("IntegrationStart"),
+        sensor.getTime("IntegrationEnd")
+      );
+      return info;
+    }
+
+
+    PXDGeometryPar GeoPXDCreator::createConfiguration(const GearDir& content)
+    {
+      // Create an empty payload
       PXDGeometryPar pxdGeometryPar;
-      pxdGeometryPar.read(m_prefix, param);
+
+      //Read prefix ('SVD' or 'PXD')
+      pxdGeometryPar.setPrefix(m_prefix);
+
+      //Read some global parameters
+      VXDGlobalPar globals((float)content.getDouble("ElectronTolerance", 100),
+                           (float)content.getDouble("MinimumElectrons", 10),
+                           content.getLength("ActiveStepSize", 0.005),
+                           content.getBool("ActiveChips", false),
+                           content.getBool("SeeNeutrons", false),
+                           content.getBool("OnlyPrimaryTrueHits", false),
+                           content.getBool("OnlyActiveMaterial", false),
+                           (float)content.getLength("DistanceTolerance", 0.005),
+                           content.getString("DefaultMaterial", "Air")
+                          );
+      pxdGeometryPar.setGlobalParams(globals);
+
+      //Read envelope parameters
+      GearDir envelopeParams(content, "Envelope/");
+      VXDEnvelopePar envelope(envelopeParams.getString("Name", ""),
+                              envelopeParams.getString("Material", "Air"),
+                              envelopeParams.getString("Color", ""),
+                              envelopeParams.getAngle("minPhi", 0),
+                              envelopeParams.getAngle("maxPhi", 2 * M_PI),
+                              (envelopeParams.getNodes("InnerPoints/point").size() > 0)
+                             );
+
+      for (const GearDir point : envelopeParams.getNodes("InnerPoints/point")) {
+        pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
+        envelope.getInnerPoints().push_back(ZXPoint);
+      }
+      for (const GearDir point : envelopeParams.getNodes("OuterPoints/point")) {
+        pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
+        envelope.getOuterPoints().push_back(ZXPoint);
+      }
+      pxdGeometryPar.setEnvelope(envelope);
+
+      // Read alignment for detector m_prefix ('PXD' or 'SVD')
+      string pathAlign = (boost::format("Align[@component='%1%']/") % m_prefix).str();
+      GearDir paramsAlign(GearDir(content, "Alignment/"), pathAlign);
+      if (!paramsAlign) {
+        B2WARNING("Could not find alignment parameters for component " << m_prefix);
+        return pxdGeometryPar;
+      }
+      pxdGeometryPar.getAlignmentMap()[m_prefix] = VXDAlignmentPar(paramsAlign.getLength("du"),
+                                                   paramsAlign.getLength("dv"),
+                                                   paramsAlign.getLength("dw"),
+                                                   paramsAlign.getAngle("alpha"),
+                                                   paramsAlign.getAngle("beta"),
+                                                   paramsAlign.getAngle("gamma")
+                                                                  );
+
+      //Read the definition of all sensor types
+      GearDir components(content, "Components/");
+      for (const GearDir& paramsSensor : components.getNodes("Sensor")) {
+        string sensorTypeID = paramsSensor.getString("@type");
+
+        VXDGeoSensorPar sensor(paramsSensor.getString("Material"),
+                               paramsSensor.getString("Color", ""),
+                               paramsSensor.getLength("width"),
+                               paramsSensor.getLength("width2", 0),
+                               paramsSensor.getLength("length"),
+                               paramsSensor.getLength("height"),
+                               paramsSensor.getBool("@slanted", false)
+                              );
+        sensor.setActive(VXDGeoComponentPar(
+                           paramsSensor.getString("Material"),
+                           paramsSensor.getString("Active/Color", "#f00"),
+                           paramsSensor.getLength("Active/width"),
+                           paramsSensor.getLength("Active/width2", 0),
+                           paramsSensor.getLength("Active/length"),
+                           paramsSensor.getLength("Active/height")
+                         ), VXDGeoPlacementPar(
+                           "Active",
+                           paramsSensor.getLength("Active/u"),
+                           paramsSensor.getLength("Active/v"),
+                           paramsSensor.getString("Active/w", "center"),
+                           paramsSensor.getLength("Active/woffset", 0)
+                         ));
+
+        PXDSensorInfoPar* pxdInfo = readSensorInfo(GearDir(paramsSensor, "Active"));
+        sensor.setSensorInfo(pxdInfo);
+        sensor.setComponents(getSubComponentsNEW(paramsSensor));
+        pxdGeometryPar.getSensorMap()[sensorTypeID] = sensor;
+        pxdGeometryPar.getSensorInfos().push_back(pxdInfo);
+      }
+
+      //Build all ladders including Sensors
+      GearDir support(content, "Support/");
+      readHalfShellSupport(support, pxdGeometryPar);
+
+      for (const GearDir& shell : content.getNodes("HalfShell")) {
+
+        string shellName = m_prefix + "." + shell.getString("@name");
+        string pathShell = (boost::format("Align[@component='%1%']/") % shellName).str();
+        GearDir paramsShell(GearDir(content, "Alignment/"), pathShell);
+        if (!paramsShell) {
+          B2WARNING("Could not find alignment parameters for component " << shellName);
+          return pxdGeometryPar;
+        }
+        pxdGeometryPar.getAlignmentMap()[shellName] = VXDAlignmentPar(paramsShell.getLength("du"),
+                                                      paramsShell.getLength("dv"),
+                                                      paramsShell.getLength("dw"),
+                                                      paramsShell.getAngle("alpha"),
+                                                      paramsShell.getAngle("beta"),
+                                                      paramsShell.getAngle("gamma")
+                                                                     );
+
+        VXDHalfShellPar halfShell(shell.getString("@name") , shell.getAngle("shellAngle", 0));
+
+        for (const GearDir& layer : shell.getNodes("Layer")) {
+          int layerID = layer.getInt("@id");
+
+          readLadder(layerID, components, pxdGeometryPar);
+          readLayerSupport(layerID, support, pxdGeometryPar);
+          readLadderSupport(layerID, support, pxdGeometryPar);
+
+          //Loop over defined ladders
+          for (const GearDir& ladder : layer.getNodes("Ladder")) {
+            int ladderID = ladder.getInt("@id");
+            double phi = ladder.getAngle("phi", 0);
+            readLadderComponents(layerID, ladderID, content, pxdGeometryPar);
+            halfShell.addLadder(layerID, ladderID,  phi);
+          }
+        }
+        pxdGeometryPar.getHalfShells().push_back(halfShell);
+      }
+
+      //Create diamond radiation sensors if defined and in background mode
+      GearDir radiationDir(content, "RadiationSensors");
+      if (pxdGeometryPar.getGlobalParams().getActiveChips() &&  radiationDir) {
+        VXDGeoRadiationSensorsPar radiationSensors(
+          m_prefix,
+          radiationDir.getBool("insideEnvelope"),
+          radiationDir.getLength("width"),
+          radiationDir.getLength("length"),
+          radiationDir.getLength("height"),
+          radiationDir.getString("material")
+        );
+
+        //Add radiation sensor positions
+        for (GearDir& position : radiationDir.getNodes("position")) {
+          VXDGeoRadiationSensorsPositionPar diamonds(position.getLength("z"),
+                                                     position.getLength("radius"),
+                                                     position.getAngle("theta")
+                                                    );
+
+          //Loop over all phi positions
+          for (GearDir& sensor : position.getNodes("phi")) {
+            //Add sensor with angle and id
+            diamonds.addSensor(sensor.getInt("@id"), sensor.getAngle());
+          }
+          radiationSensors.addPosition(diamonds);
+        }
+        pxdGeometryPar.setRadiationSensors(radiationSensors);
+      }
+
       return pxdGeometryPar;
+    }
+
+    void GeoPXDCreator::readHalfShellSupport(GearDir support, PXDGeometryPar& pxdGeometryPar)
+    {
+      if (!support) return;
+
+      for (const GearDir& endflange : support.getNodes("Endflange")) {
+        VXDPolyConePar endflangePar(
+          endflange.getString("@name"),
+          endflange.getString("Material", "Air"),
+          endflange.getAngle("minPhi", 0),
+          endflange.getAngle("maxPhi", 2 * M_PI),
+          (endflange.getNodes("Cutout").size() > 0),
+          endflange.getLength("Cutout/width", 0.),
+          endflange.getLength("Cutout/height", 0.),
+          endflange.getLength("Cutout/depth", 0.)
+        );
+
+        for (const GearDir& plane : endflange.getNodes("Plane")) {
+          VXDPolyConePlanePar planePar(
+            plane.getLength("posZ"),
+            plane.getLength("innerRadius"),
+            plane.getLength("outerRadius")
+          );
+          endflangePar.getPlanes().push_back(planePar);
+        }
+        pxdGeometryPar.getEndflanges().push_back(endflangePar);
+      }
+
+      // Cout outs for endflanges
+      pxdGeometryPar.setNCutOuts(support.getInt("Cutout/count"));
+      pxdGeometryPar.setCutOutWidth(support.getLength("Cutout/width"));
+      pxdGeometryPar.setCutOutHeight(support.getLength("Cutout/height"));
+      pxdGeometryPar.setCutOutShift(support.getLength("Cutout/shift"));
+      pxdGeometryPar.setCutOutRPhi(support.getLength("Cutout/rphi"));
+      pxdGeometryPar.setCutOutStartPhi(support.getAngle("Cutout/startPhi"));
+      pxdGeometryPar.setCutOutDeltaPhi(support.getAngle("Cutout/deltaPhi"));
+
+      //Create Carbon cooling tubes
+      pxdGeometryPar.setNTubes(support.getInt("CarbonTubes/count"));
+      pxdGeometryPar.setTubesMinZ(support.getLength("CarbonTubes/minZ"));
+      pxdGeometryPar.setTubesMaxZ(support.getLength("CarbonTubes/maxZ"));
+      pxdGeometryPar.setTubesMinR(support.getLength("CarbonTubes/innerRadius"));
+      pxdGeometryPar.setTubesMaxR(support.getLength("CarbonTubes/outerRadius"));
+      pxdGeometryPar.setTubesRPhi(support.getLength("CarbonTubes/rphi"));
+      pxdGeometryPar.setTubesStartPhi(support.getAngle("CarbonTubes/startPhi"));
+      pxdGeometryPar.setTubesDeltaPhi(support.getAngle("CarbonTubes/deltaPhi"));
+      pxdGeometryPar.setTubesMaterial(support.getString("CarbonTubes/Material", "Carbon"));
+
+      return;
+    }
+
+    void GeoPXDCreator::readLayerSupport(int layer, GearDir support, PXDGeometryPar& pxdGeometryPar)
+    {
+    }
+
+    void GeoPXDCreator::readLadderSupport(int layer, GearDir support, PXDGeometryPar& pxdGeometryPar)
+    {
     }
 
     void GeoPXDCreator::createGeometry(const PXDGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes type)

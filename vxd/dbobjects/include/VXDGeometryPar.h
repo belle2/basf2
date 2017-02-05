@@ -28,9 +28,6 @@
 
 namespace Belle2 {
 
-  class GearDir;
-
-
   /**
   * The Class for VXD geometry
   */
@@ -39,25 +36,33 @@ namespace Belle2 {
   public:
     //! Default constructor
     VXDGeometryPar() {}
-    //! Constructor using Gearbox
-    //explicit VXDGeometryPar(const std::string& prefix, const GearDir& content) { read(prefix, content); }
-    //! Destructor
-    //virtual ~VXDGeometryPar() {}
-    //! Get geometry parameters from Gearbox
-    void read(const std::string&, const GearDir&);
 
     /** get prefix */
     std::string getPrefix() const {return m_prefix;}
+    /** set prefix */
+    void setPrefix(const std::string& prefix) { m_prefix = prefix;}
     /** get global parameters */
     const VXDGlobalPar& getGlobalParams() const {return m_globals;}
+    /** set global parameters */
+    void setGlobalParams(const VXDGlobalPar& globals)  { m_globals = globals;}
     /** get envelope parameters */
     const VXDEnvelopePar& getEnvelope() const {return m_envelope;}
+    /** set envelope parameters */
+    void setEnvelope(const VXDEnvelopePar& envelope) {m_envelope = envelope;}
+    /** get radiation sensor parameters */
+    const VXDGeoRadiationSensorsPar& getRadiationSensors() const {return m_radiationsensors;}
+    /** set radiation sensor parameters */
+    void setRadiationSensors(const VXDGeoRadiationSensorsPar& diamonds) {m_radiationsensors = diamonds;}
+    /** get alignmant map*/
+    std::map<std::string, VXDAlignmentPar>& getAlignmentMap() {return m_alignment;}
     /** get alignment parameters for component name */
     VXDAlignmentPar getAlignment(std::string name) const;
-    /** get radiation sensors */
-    const VXDGeoRadiationSensorsPar& getRadiationSensors() const {return m_radiationsensors;}
     /** get half-shell */
     const std::vector<VXDHalfShellPar>& getHalfShells() const {return m_halfShells;}
+    /** get half-shell */
+    std::vector<VXDHalfShellPar>& getHalfShells() {return m_halfShells;}
+    /** get ladder map */
+    std::map<int, VXDGeoLadderPar>& getLadderMap() { return m_ladders; }
     /** get ladder for given layer */
     const VXDGeoLadderPar& getLadder(int layerID) const;
     /** get sensor type */
@@ -66,72 +71,16 @@ namespace Belle2 {
     const VXDGeoComponentPar& getComponent(std::string name) const;
     /** get sensor map */
     const std::map<std::string, VXDGeoSensorPar>& getSensorMap() const {return m_sensorMap;}
+    /** get sensor map */
+    std::map<std::string, VXDGeoSensorPar>& getSensorMap() {return m_sensorMap;}
     /** get component maps */
     const std::map<std::string, VXDGeoComponentPar>& getComponentMap() const {return m_componentCache;   }
-
+    /** get component maps */
+    std::map<std::string, VXDGeoComponentPar>& getComponentMap() {return m_componentCache;   }
     /** get Bkg sensitive chip Id*/
     int getSensitiveChipID(std::string name) const;
-
-  private:
-    /**
-     * Return vector of VXDGeoPlacements with all the components defined inside a given path
-     */
-    std::vector<VXDGeoPlacementPar> getSubComponents(GearDir path);
-
-    /**
-     * Read the sensor definitions from the database
-     * @param sensor Reference to the database containing the parameters
-     */
-    virtual VXDSensorInfoBasePar* createSensorInfo(const GearDir& sensor) = 0;
-
-    /**
-     * Create support structure for VXD Half Shell, that means everything
-     * thagt does not depend on layer or sensor alignment
-     * @param support Reference to the database containing the parameters
-     */
-    virtual void createHalfShellSupport(GearDir support) = 0;
-
-    /**
-     * Create support structure for a VXD Layer
-     * @param layer Layer ID to create the support for
-     * @param support Reference to the database containing the parameters
-     */
-    virtual void createLayerSupport(int layer, GearDir support) = 0;
-
-    /**
-     * Create support structure for a VXD Ladder
-     * @param layer Layer ID to create the support for
-     * @param support Reference to the database containing the parameters
-     */
-    virtual void createLadderSupport(int layer, GearDir support) = 0;
-
-    /**
-     * Read parameters for a ladder in layer with given ID from gearbox and layer
-     * store them in chache m_ladders
-     */
-    virtual void cacheLadder(int layer, GearDir components);
-
-    /**
-     * Read parameters for ladder components and their alignment corresponding
-     * to the given ladder id
-     */
-    virtual void readLadderInfo(int layerID, int ladderID, GearDir content);
-
-    /**
-     * Read parameters for component name from Gearbox into m_components cache.
-     * The name is assumed to be unique and Volumes are cached.
-     * @param name Name of the component
-     * @param components Path to components
-     */
-    void cacheComponent(const std::string& name, GearDir components);
-
-    /**
-     * Read parameters for all components in placement container from Gearbox
-     * into m_components cache.
-     * @param placements container holding names of all components to be cached
-     * @param componentDir Path to Gearbox where parameters are to be found
-     */
-    void cacheSubComponents(const std::vector<VXDGeoPlacementPar>& placements , GearDir componentsDir);
+    /** get sensitive chip id map */
+    std::map<std::string, int>& getSensitiveChipIdMap() {return m_sensitiveIDCache;}
 
   private:
 
@@ -155,7 +104,6 @@ namespace Belle2 {
     std::map<int, VXDGeoLadderPar> m_ladders;
     /** Cache of all Bkg sensitive chip Ids*/
     std::map<std::string, int> m_sensitiveIDCache;
-
 
     ClassDef(VXDGeometryPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };

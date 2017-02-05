@@ -15,8 +15,6 @@
 
 namespace Belle2 {
 
-  class GearDir;
-
 
   /**
   * The Class for VXD geometry
@@ -26,77 +24,79 @@ namespace Belle2 {
   public:
     //! Default constructor
     PXDGeometryPar() {}
-    //! Constructor using Gearbox
-    //explicit PXDGeometryPar(const std::string& prefix, const GearDir& content) : VXDGeometryPar(prefix, content) {  }
-    //! Destructor
-    //~PXDGeometryPar() {}
     /** build support */
     bool getBuildSupport() const { return (m_nCutouts > 0); }
     /** get number of cutouts */
     int getNCutOuts() const { return m_nCutouts; }
+    /** set number of cutouts */
+    void setNCutOuts(int nCutouts) { m_nCutouts = nCutouts; }
     /** get width of cutouts */
     double getCutOutWidth() const { return m_cutOutWidth; }
+    /** set width of cutouts */
+    void setCutOutWidth(double width) { m_cutOutWidth = width; }
     /** get height of cutouts */
     double getCutOutHeight() const { return m_cutOutHeight; }
+    /** set height of cutouts */
+    void setCutOutHeight(double height) { m_cutOutHeight = height; }
     /** get  shift of cutouts */
     double getCutOutShift() const { return m_cutOutShift; }
+    /** set  shift of cutouts */
+    void setCutOutShift(double shift) { m_cutOutShift = shift; }
     /** get rphi of cutouts */
     double getCutOutRPhi() const { return m_cutOutRphi; }
+    /** set rphi of cutouts */
+    void setCutOutRPhi(double rphi) { m_cutOutRphi = rphi; }
     /** get start phi of cutouts */
     double getCutOutStartPhi() const { return m_cutOutStartPhi; }
+    /** set start phi of cutouts */
+    void setCutOutStartPhi(double start)  { m_cutOutStartPhi = start; }
     /** get deltaphi of cutouts */
     double getCutOutDeltaPhi() const { return m_cutOutDeltaPhi; }
+    /** set deltaphi of cutouts */
+    void setCutOutDeltaPhi(double delta) { m_cutOutDeltaPhi = delta; }
 
     /** get number of tubes */
     int getNTubes() const { return m_nTubes; }
+    /** set number of tubes */
+    void setNTubes(int nTubes)  { m_nTubes = nTubes; }
     /** get tubes minZ*/
     double getTubesMinZ() const { return m_tubesMinZ; }
+    /** set tubes minZ*/
+    void setTubesMinZ(double minZ) { m_tubesMinZ = minZ; }
     /** get tubes maxZ*/
     double getTubesMaxZ() const { return m_tubesMaxZ; }
+    /** set tubes maxZ*/
+    void setTubesMaxZ(double maxZ)  { m_tubesMaxZ = maxZ; }
     /** get tubes minR*/
     double getTubesMinR() const { return m_tubesMinR; }
+    /** set tubes minR*/
+    void setTubesMinR(double minR) { m_tubesMinR = minR; }
     /** get tubes maxR*/
     double getTubesMaxR() const { return m_tubesMaxR; }
+    /** set tubes maxR*/
+    void setTubesMaxR(double maxR) { m_tubesMaxR = maxR; }
     /** get tubes tubes RPhi*/
     double getTubesRPhi() const { return m_tubesRPhi; }
+    /** set tubes tubes RPhi*/
+    void setTubesRPhi(double rphi) { m_tubesRPhi = rphi; }
     /** get tubes tubes StartPhi*/
     double getTubesStartPhi() const { return m_tubesStartPhi; }
+    /** set tubes tubes StartPhi*/
+    void setTubesStartPhi(double start) { m_tubesStartPhi = start; }
     /** get tubes tubes DeltaPhi*/
     double getTubesDeltaPhi() const { return m_tubesDeltaPhi; }
+    /** set tubes tubes DeltaPhi*/
+    void setTubesDeltaPhi(double delta) { m_tubesDeltaPhi = delta; }
     /** get tubes tubes material*/
     const std::string& getTubesMaterial() const { return m_tubesMaterial; }
+    /** set tubes tubes material*/
+    void setTubesMaterial(const std::string& material) { m_tubesMaterial = material; }
     /** get  Endflanges */
     const std::vector<VXDPolyConePar>& getEndflanges() const {return m_endflanges;}
+    /** get  sensorInfos */
+    std::vector<PXDSensorInfoPar*>& getSensorInfos()  {return m_SensorInfo;}
     /** get  Endflanges */
     std::vector<VXDPolyConePar>& getEndflanges() {return m_endflanges;}
-
-
-    /**
-     * Read the sensor definitions from the database
-     * @param sensors Reference to the database containing the parameters
-       */
-    VXDSensorInfoBasePar* createSensorInfo(const GearDir& sensor);
-
-    /**
-     * Create support structure for VXD Half Shell, that means everything
-     * thagt does not depend on layer or sensor alignment
-     * @param support Reference to the database containing the parameters
-     */
-    void createHalfShellSupport(GearDir support);
-
-    /**
-     * Create support structure for a VXD Layer
-     * @param layer Layer ID to create the support for
-     * @param support Reference to the database containing the parameters
-     */
-    void createLayerSupport(int layer, GearDir support);
-
-    /**
-     * Create support structure for a VXD Ladder
-     * @param layer Layer ID to create the support for
-     * @param support Reference to the database containing the parameters
-     */
-    void createLadderSupport(int layer, GearDir support);
 
   private:
 

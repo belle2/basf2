@@ -856,5 +856,167 @@ namespace Belle2 {
                            ));
       }
     }
+
+    void GeoVXDCreator::readLadderComponents(int layerID, int ladderID,  GearDir content, VXDGeometryPar& vxdGeometryPar)
+    {
+      VxdID ladder(layerID, ladderID, 0);
+
+      // Read alignment for ladder
+      string path = (boost::format("Align[@component='%1%']/") % ladder).str();
+      GearDir params(GearDir(content, "Alignment/"), path);
+      if (!params) {
+        B2WARNING("Could not find alignment parameters for ladder " << ladder);
+        return;
+      }
+      vxdGeometryPar.getAlignmentMap()[ladder] = VXDAlignmentPar(params.getLength("du"),
+                                                                 params.getLength("dv"),
+                                                                 params.getLength("dw"),
+                                                                 params.getAngle("alpha"),
+                                                                 params.getAngle("beta"),
+                                                                 params.getAngle("gamma")
+                                                                );
+
+
+
+      for (const VXDGeoSensorPlacementPar& p : vxdGeometryPar.getLadderMap()[layerID].getSensors()) {
+        VxdID sensorID(ladder);
+        sensorID.setSensorNumber(p.getSensorID());
+
+        std::map<string, VXDGeoSensorPar>::iterator it = vxdGeometryPar.getSensorMap().find(p.getSensorTypeID());
+        if (it == vxdGeometryPar.getSensorMap().end()) {
+          B2FATAL("Invalid SensorTypeID " << p.getSensorTypeID() << ", please check the definition of " << sensorID);
+        }
+        VXDGeoSensorPar& s = it->second;
+        string name = m_prefix + "." + (string)sensorID;
+
+        //Now create all the other components and place the Sensor
+        if (!vxdGeometryPar.getGlobalParams().getOnlyActiveMaterial()) readSubComponents(s.getComponents() , GearDir(content,
+              "Components/"), vxdGeometryPar);
+        // Read alignment for sensor
+        string pathSensor = (boost::format("Align[@component='%1%']/") % sensorID).str();
+        GearDir paramsSensor(GearDir(content, "Alignment/"), pathSensor);
+        if (!paramsSensor) {
+          B2WARNING("Could not find alignment parameters for sensorID " << sensorID);
+          return;
+        }
+        vxdGeometryPar.getAlignmentMap()[sensorID] = VXDAlignmentPar(paramsSensor.getLength("du"),
+                                                     paramsSensor.getLength("dv"),
+                                                     paramsSensor.getLength("dw"),
+                                                     paramsSensor.getAngle("alpha"),
+                                                     paramsSensor.getAngle("beta"),
+                                                     paramsSensor.getAngle("gamma")
+                                                                    );
+      }
+      return;
+    }
+
+    void GeoVXDCreator::readSubComponents(const std::vector<VXDGeoPlacementPar>& placements , GearDir componentsDir,
+                                          VXDGeometryPar& vxdGeometryPar)
+    {
+      for (const VXDGeoPlacementPar& p : placements) {
+        readComponent(p.getName(), componentsDir, vxdGeometryPar);
+      }
+      return;
+    }
+
+    void GeoVXDCreator::readComponent(const std::string& name, GearDir componentsDir, VXDGeometryPar& vxdGeometryPar)
+    {
+
+
+      //Check if component already exists
+      if (vxdGeometryPar.getComponentMap().find(name) != vxdGeometryPar.getComponentMap().end()) {
+        return; // nothing to do
+      }
+
+      //Component does not exist, so lets create a new one
+      string path = (boost::format("descendant::Component[@name='%1%']/") % name).str();
+      GearDir params(componentsDir, path);
+      if (!params) {
+        B2FATAL("Could not find definition for component " << name);
+        return;
+      }
+
+      VXDGeoComponentPar c(
+        params.getString("Material",  vxdGeometryPar.getGlobalParams().getDefaultMaterial()),
+        params.getString("Color", ""),
+        params.getLength("width", 0),
+        params.getLength("width2", 0),
+        params.getLength("length", 0),
+        params.getLength("height", 0),
+        params.getAngle("angle", 0)
+      );
+
+      if (c.getWidth() <= 0 || c.getLength() <= 0 || c.getHeight() <= 0) {
+        B2DEBUG(100, "One dimension empty, using auto resize for component");
+      }
+
+      c.setSubComponents(getSubComponentsNEW(params));
+      readSubComponents(c.getSubComponents(), componentsDir, vxdGeometryPar);
+
+      if (vxdGeometryPar.getGlobalParams().getActiveChips() && params.exists("activeChipID")) {
+        int chipID = params.getInt("activeChipID");
+        vxdGeometryPar.getSensitiveChipIdMap()[name] = chipID;
+      }
+      vxdGeometryPar.getComponentMap()[name] = c;
+    }
+
+    void GeoVXDCreator::readLadder(int layer, GearDir components, VXDGeometryPar& geoparameters)
+    {
+      string path = (boost::format("Ladder[@layer=%1%]/") % layer).str();
+      GearDir paramsLadder(components, path);
+      if (!paramsLadder) {
+        B2FATAL("Could not find Ladder definition for layer " << layer);
+      }
+
+      geoparameters.getLadderMap()[layer] = VXDGeoLadderPar(
+                                              layer,
+                                              paramsLadder.getLength("shift"),
+                                              paramsLadder.getLength("radius"),
+                                              paramsLadder.getAngle("slantedAngle", 0),
+                                              paramsLadder.getLength("slantedRadius", 0),
+                                              paramsLadder.getLength("Glue/oversize", 0),
+                                              paramsLadder.getString("Glue/Material", "")
+                                            );
+
+      for (const GearDir& sensorInfo : paramsLadder.getNodes("Sensor")) {
+
+        geoparameters.getLadderMap()[layer].addSensor(VXDGeoSensorPlacementPar(
+                                                        sensorInfo.getInt("@id"),
+                                                        sensorInfo.getString("@type"),
+                                                        sensorInfo.getLength("."),
+                                                        sensorInfo.getBool("@flipU", false),
+                                                        sensorInfo.getBool("@flipV", false),
+                                                        sensorInfo.getBool("@flipW", false)
+                                                      ));
+      }
+    }
+
+    std::vector<VXDGeoPlacementPar> GeoVXDCreator::getSubComponentsNEW(GearDir path)
+    {
+      vector<VXDGeoPlacementPar> result;
+      for (const GearDir& component : path.getNodes("Component")) {
+        string type;
+        if (!component.exists("@type")) {
+          type = component.getString("@name");
+        } else {
+          type = component.getString("@type");
+        }
+        int nPos = max(component.getNumberNodes("u"), component.getNumberNodes("v"));
+        nPos = max(nPos, component.getNumberNodes("w"));
+        nPos = max(nPos, component.getNumberNodes("woffset"));
+        for (int iPos = 1; iPos <= nPos; ++iPos) {
+          string index = (boost::format("[%1%]") % iPos).str();
+          result.push_back(VXDGeoPlacementPar(
+                             type,
+                             component.getLength("u" + index, 0),
+                             component.getLength("v" + index, 0),
+                             component.getString("w" + index, "bottom"),
+                             component.getLength("woffset" + index, 0)
+                           ));
+        }
+      }
+      return result;
+    }
+
   }  // namespace VXD
 }  // namespace Belle2

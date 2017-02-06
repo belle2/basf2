@@ -34,10 +34,6 @@ namespace {
   using RecordingDetectorTrackCombinationFilter =
     RecordingFilter<VariadicUnionVarSet<DetectorTrackCombinationTruthVarSet, DetectorTrackCombinationVarSet>>;
 
-  using RecordingDetectorTrackCombinationWeightFilter =
-    RecordingFilter<VariadicUnionVarSet<DetectorTrackCombinationTruthVarSet, DetectorTrackCombinationVarSet,
-    DetectorTrackCombinationWeightVarSet>>;
-
   /// All filter for VXD - CDC relations.
   using AllDetectorTrackCombinationFilter = AllFilter<BaseDetectorTrackCombinationFilter>;
 
@@ -47,8 +43,6 @@ namespace {
   /// MVA filter for VXD - CDC relations.
   using MVADetectorTrackCombinationWeightFilter = MVAFilter <
                                                   VariadicUnionVarSet<DetectorTrackCombinationVarSet, DetectorTrackCombinationWeightVarSet >>;
-
-  using PassThroughDetectorTrackCombinationWeightFilter = PassThroughFilter<BaseDetectorTrackCombinationFilter>;
 }
 
 DetectorTrackCombinationFilterFactory::DetectorTrackCombinationFilterFactory(const std::string& defaultFilterName)
@@ -74,10 +68,8 @@ DetectorTrackCombinationFilterFactory::getValidFilterNamesAndDescriptions() cons
     {"all", "set all track combinations as good"},
     {"truth", "monte carlo truth"},
     {"recording", "record variables to a TTree"},
-    {"recording_weight", "record variables to a TTree"},
     {"mva", "test with a mva method"},
-    {"mva_weight", "test with a mva method"},
-    {"pass_through", "do not touch the weights"}
+    {"pass_through", "do not do anything to the weights"},
   };
 }
 
@@ -92,12 +84,8 @@ DetectorTrackCombinationFilterFactory::create(const std::string& filterName) con
     return makeUnique<MCDetectorTrackCombinationFilter>();
   } else if (filterName == "recording") {
     return makeUnique<RecordingDetectorTrackCombinationFilter>("DetectorTrackCombinationFilter.root");
-  } else if (filterName == "recording_weight") {
-    return makeUnique<RecordingDetectorTrackCombinationWeightFilter>("DetectorTrackCombinationWeightFilter.root");
   } else if (filterName == "mva") {
     return makeUnique<MVADetectorTrackCombinationFilter>("tracking/data/vxdcdc_DetectorTrackCombinationFilter.xml");
-  } else if (filterName == "mva_weight") {
-    return makeUnique<MVADetectorTrackCombinationWeightFilter>("tracking/data/vxdcdc_DetectorTrackCombinationWeightFilter.xml");
   } else if (filterName == "pass_through") {
     return makeUnique<PassThroughDetectorTrackCombinationWeightFilter>();
   } else {

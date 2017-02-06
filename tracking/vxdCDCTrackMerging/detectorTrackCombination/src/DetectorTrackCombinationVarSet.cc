@@ -83,7 +83,12 @@ bool DetectorTrackCombinationVarSet::extract(const BaseDetectorTrackCombinationF
   const double vertexVXD = posVXD.Mag();
 
   // Short cut:
-  if (distance >= cdcRadius or phiAbs > TMath::Pi()) {
+  if (distance >= 3 or (phiAbs > 0.3 and thetaAbs > 0.3)) {
+    return false;
+  }
+
+  // Do not use curlers, as they are to hard to decide properly (because of clones etc.)
+  if (pCDC < 0.3) {
     return false;
   }
 

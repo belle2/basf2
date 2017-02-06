@@ -1638,6 +1638,30 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr qOutput(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string combinerMethod = arguments[0];
+        auto func = [combinerMethod](const Particle * particle) -> double {
+
+          double output = -2;
+          FlavorTaggerInfo* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
+
+          if (flavorTaggerInfo != nullptr)
+          {
+            if (Variable::hasRestOfEventTracks(particle) > 0) {
+              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+              output = TMath::Sign(1, flavorTaggerInfo->getMethodMap(combinerMethod)->getQrCombined());
+            }
+          }
+          return output;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function qOutput");
+      }
+    }
+
     VARIABLE_GROUP("Flavor Tagger Variables");
 
     REGISTER_VARIABLE("pMissTag", momentumMissingTagSide,  "Calculates the missing Momentum for a given particle on the tag side.");
@@ -1710,7 +1734,8 @@ namespace Belle2 {
                       "Returns 1 if the given category tags the B0 MC flavor correctly. 0 Else.")
     REGISTER_VARIABLE("qrOutput(combinerMethod)", qrOutput,
                       "Returns the output of the flavorTagger for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.")
-
+    REGISTER_VARIABLE("qOutput(combinerMethod)", qOutput,
+                      "Returns the flavor tag q output of the flavorTagger for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.")
 
   }
 }

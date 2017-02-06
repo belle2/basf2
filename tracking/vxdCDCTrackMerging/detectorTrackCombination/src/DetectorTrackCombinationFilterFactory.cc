@@ -10,7 +10,6 @@
 #include <tracking/vxdCDCTrackMerging/detectorTrackCombination/DetectorTrackCombinationFilterFactory.h>
 
 #include <tracking/vxdCDCTrackMerging/detectorTrackCombination/DetectorTrackCombinationVarSet.h>
-#include <tracking/vxdCDCTrackMerging/detectorTrackCombination/DetectorTrackCombinationWeightVarSet.h>
 #include <tracking/vxdCDCTrackMerging/detectorTrackCombination/DetectorTrackCombinationTruthVarSet.h>
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
@@ -40,9 +39,8 @@ namespace {
   /// MVA filter for VXD - CDC relations.
   using MVADetectorTrackCombinationFilter = MVAFilter<DetectorTrackCombinationVarSet>;
 
-  /// MVA filter for VXD - CDC relations.
-  using MVADetectorTrackCombinationWeightFilter = MVAFilter <
-                                                  VariadicUnionVarSet<DetectorTrackCombinationVarSet, DetectorTrackCombinationWeightVarSet >>;
+  // A pass through filter
+  using PassThroughDetectorTrackCombinationWeightFilter = PassThroughFilter<BaseDetectorTrackCombinationFilter>;
 }
 
 DetectorTrackCombinationFilterFactory::DetectorTrackCombinationFilterFactory(const std::string& defaultFilterName)

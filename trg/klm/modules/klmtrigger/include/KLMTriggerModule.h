@@ -52,8 +52,8 @@ namespace Belle2 {
     //! @param z x coordinate of the hit
     void geometryConverter(bool fwd, int sector, int layer, int phiStrip, int zStrip, int& x, int& y, int& z);
 
-    const int c_TotalSectors = 8;
-    const int c_TotalLayers = 15;
+    static const int c_TotalSectors = 8;
+    static const int c_TotalLayers = 15;
 
     //! Trigger thresholds
     double m_maxChisq;

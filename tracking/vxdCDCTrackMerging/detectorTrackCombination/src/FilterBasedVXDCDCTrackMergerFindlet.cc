@@ -33,8 +33,10 @@ void FilterBasedVXDCDCTrackMergerFindlet::exposeParameters(ModuleParamList* modu
   m_extrapolationSelector.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("extrapolation", prefix));
   m_distanceFilterCut.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("distance", prefix));
 
-  moduleParamList->addParameter("extrapolate", m_param_extrapolate, "TODO", m_param_extrapolate);
-  moduleParamList->addParameter("mergeAndExtrapolate", m_param_mergeAndExtrapolate, "TODO", m_param_mergeAndExtrapolate);
+  moduleParamList->addParameter("extrapolate", m_param_extrapolate, "Call the extrapolation and fitting routine after the prefilter.",
+                                m_param_extrapolate);
+  moduleParamList->addParameter("mergeAndExtrapolate", m_param_mergeAndExtrapolate,
+                                "Merge the prefiltered combinations immediately and extrapolate afterwards.", m_param_mergeAndExtrapolate);
 }
 
 void FilterBasedVXDCDCTrackMergerFindlet::apply()

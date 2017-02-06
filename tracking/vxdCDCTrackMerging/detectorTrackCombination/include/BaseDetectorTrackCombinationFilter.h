@@ -17,8 +17,6 @@ namespace Belle2 {
   /**
    * Base filter for detector track combination filters. Please note that for implementation reasons
    * the base object includes poitners to pointers.
-   *
-   * TODO: We should remove this...
    */
   using BaseDetectorTrackCombinationFilter = TrackFindingCDC::Filter<TrackFindingCDC::WeightedRelation<RecoTrack*, RecoTrack* const>>;
 }

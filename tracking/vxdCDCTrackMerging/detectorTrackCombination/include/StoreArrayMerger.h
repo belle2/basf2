@@ -59,6 +59,8 @@ namespace Belle2 {
     std::string m_param_cdcRecoTrackStoreArrayName;
     /** StoreArray name of the merged Track Store Array */
     std::string m_param_mergedRecoTrackStoreArrayName;
+    /** Also add tracks, which could not be fitted and have no partner to the resulting array. */
+    bool m_param_addUnfittableTracks = true;
 
     // Store Arrays
     /// CDC Reco Tracks Store Array

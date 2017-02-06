@@ -43,6 +43,11 @@ void StoreArrayMerger::exposeParameters(ModuleParamList* moduleParamList, const 
   // output
   moduleParamList->addParameter("MergedRecoTrackStoreArrayName", m_param_mergedRecoTrackStoreArrayName,
                                 "StoreArray name of the merged Track Store Array", m_param_mergedRecoTrackStoreArrayName);
+
+  // parameter
+  moduleParamList->addParameter("AddUnfittableTracks", m_param_addUnfittableTracks,
+                                "Also add tracks, which could not be fitted and have no partner to the resulting array.",
+                                m_param_addUnfittableTracks);
 }
 
 void StoreArrayMerger::initialize()
@@ -115,7 +120,7 @@ void StoreArrayMerger::apply()
     } else {
       // And not if not...
       // TODO: Make this optional
-      if (currentVXDTrack.getRepresentations().empty() or currentVXDTrack.wasFitSuccessful()) {
+      if (m_param_addUnfittableTracks or currentVXDTrack.getRepresentations().empty() or currentVXDTrack.wasFitSuccessful()) {
         auto newRecoTrack = m_mergedRecoTracks.appendNew(vxdPosition,
                                                          vxdMomentum,
                                                          vxdCharge);
@@ -127,7 +132,8 @@ void StoreArrayMerger::apply()
   // add all unmatched CDCTracks to the StoreArray as well
   for (const auto& currentCDCTrack : m_cdcRecoTracks) {
     auto relatedVXDRecoTrack = currentCDCTrack.getRelated<RecoTrack>(m_param_vxdRecoTrackStoreArrayName);
-    if (not relatedVXDRecoTrack and (currentCDCTrack.getRepresentations().empty() or currentCDCTrack.wasFitSuccessful())) {
+    if (not relatedVXDRecoTrack and (m_param_addUnfittableTracks or currentCDCTrack.getRepresentations().empty()
+                                     or currentCDCTrack.wasFitSuccessful())) {
       TVector3 cdcPosition;
       TVector3 cdcMomentum;
       int cdcCharge;

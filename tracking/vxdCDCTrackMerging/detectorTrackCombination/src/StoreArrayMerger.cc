@@ -114,17 +114,20 @@ void StoreArrayMerger::apply()
       newRecoTrack->addHitsFromRecoTrack(relatedCDCRecoTrack, newRecoTrack->getNumberOfTotalHits());
     } else {
       // And not if not...
-      auto newRecoTrack = m_mergedRecoTracks.appendNew(vxdPosition,
-                                                       vxdMomentum,
-                                                       vxdCharge);
-      newRecoTrack->addHitsFromRecoTrack(&currentVXDTrack);
+      // TODO: Make this optional
+      if (currentVXDTrack.getRepresentations().empty() or currentVXDTrack.wasFitSuccessful()) {
+        auto newRecoTrack = m_mergedRecoTracks.appendNew(vxdPosition,
+                                                         vxdMomentum,
+                                                         vxdCharge);
+        newRecoTrack->addHitsFromRecoTrack(&currentVXDTrack);
+      }
     }
   }
 
   // add all unmatched CDCTracks to the StoreArray as well
   for (const auto& currentCDCTrack : m_cdcRecoTracks) {
     auto relatedVXDRecoTrack = currentCDCTrack.getRelated<RecoTrack>(m_param_vxdRecoTrackStoreArrayName);
-    if (not relatedVXDRecoTrack) {
+    if (not relatedVXDRecoTrack and (currentCDCTrack.getRepresentations().empty() or currentCDCTrack.wasFitSuccessful())) {
       TVector3 cdcPosition;
       TVector3 cdcMomentum;
       int cdcCharge;

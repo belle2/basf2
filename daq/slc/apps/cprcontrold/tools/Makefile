@@ -5,6 +5,8 @@ CP      = cp -f
 
 BELLE2_LIB = $(BELLE2_DAQ_SLC)/lib
 BELLE2_INC = $(BELLE2_DAQ_SLC)/include
+BELLE2EX_LIB = $(BELLE2_EXTERNAL_LOCAL_DIR)/lib/$(shell echo `uname -s`_`uname -m`)/opt
+BELLE2EX_INC = $(BELLE2_EXTERNAL_LOCAL_DIR)/include
 
 BINDIR  = $(BELLE2_DAQ_SLC)/bin
 SRCDIR  = $(BELLE2_DAQ_SLC)/src
@@ -15,16 +17,12 @@ LIBDIR  = $(BELLE2_DAQ_SLC)/lib
 LIBS    += -lm -lpthread -ldl -lrt
 LIBS    += -L$(BELLE2_LIB) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database\
  -ldaq_slc_nsm -ldaq_slc_runcontrol -ldaq_slc_readout -ldaq_slc_copper \
- -ldaq_slc_apps_cprcontrold -lhs -lttrx -ldaq_slc_pyb2daq
-LIBS    += -lnsm2_corelib -lnsm2_b2lib
-LIBS   += -L$(BELLE2_DAQ_SLC)/externals/boost/lib -lboost_python -lboost_filesystem -lboost_program_options -lboost_system
-LIBS   += -L$(BELLE2_DAQ_SLC)/externals/python/lib -lpython3.5m
+ -ldaq_slc_apps_cprcontrold -lhs -lttrx
 LIBS    += -lnsm2_corelib -lnsm2_b2lib
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT
 CFLAGS  += -I$(BELLE2_DAQ_SLC)/include -I.
-CFLAGS  += -I$(BELLE2_DAQ_SLC)/externals/python/include/python3.5m 
-CFLAGS  += -I$(BELLE2_DAQ_SLC)/externals/boost/include
+CFLAGS  += -I$(BELLE2_INC)
 
 MAINS   = $(wildcard *.cc)
 TARGETS = $(MAINS:%.cc=$(BINDIR)/%)

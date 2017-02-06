@@ -2,7 +2,7 @@
 
 #include <daq/slc/runcontrol/RCNodeDaemon.h>
 
-#include <daq/slc/pyb2daq/PyFEE.h>
+//#include <daq/slc/pyb2daq/PyFEE.h>
 
 #include <daq/slc/system/DynamicLoader.h>
 
@@ -24,22 +24,25 @@ int main(int argc, char** argv)
     FEE* fee[4] = {NULL, NULL, NULL, NULL};
     const std::string libname = config.get("fee.lib");
     std::string name = config.get("fee.name");
+    /*
     const std::string script = config.get("fee.script");
     if (script.size() > 0) {
       for (int i = 0; i < 4; i++) {
-        if (config.getBool(StringUtil::form("fee.%c.used", i + 'a'))) {
-          try {
-            fee[i] = new PyFEE(script);
-            fee[i]->setName(name);
-          } catch (const std::exception& e) {
-            LogFile::fatal("failed to load script %s: %s", script.c_str(), e.what());
-            return 1;
-          }
-        } else {
-          fee[i] = NULL;
-        }
+    if (config.getBool(StringUtil::form("fee.%c.used", i+'a'))) {
+    try {
+      fee[i] = new PyFEE(script);
+      fee[i]->setName(name);
+    } catch (const std::exception& e) {
+      LogFile::fatal("failed to load script %s: %s", script.c_str(), e.what());
+      return 1;
+    }
+    } else {
+    fee[i] = NULL;
+    }
       }
-    } else if (libname.size() > 0) {
+    } else
+    */
+    if (libname.size() > 0) {
       std::string funcname = "get" + name + "FEE";
       LogFile::debug("dlopen(lib=%s, func=%s)", libname.c_str(), funcname.c_str());
       DynamicLoader dl(libname);

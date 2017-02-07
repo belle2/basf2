@@ -88,7 +88,7 @@ namespace Belle2 {
 
     int m_eclDigitMultip; /**< Number of ECLDigits per event */
     std::vector<int>* m_eclDigitIdx; /**< ECLDigit index */
-    std::vector<int>* m_eclDigitToMc; /**< Index of MCParticle related to that ECLDigit */
+    std::vector<int>* m_eclDigitToMC; /**< Index of MCParticle related to that ECLDigit */
     //std::vector<int>* m_eclDigitToHit; /**< Index of ECLHit related to that ECLDigit */
     std::vector<int>* m_eclDigitCellId; /**< Number of ECLDigit CellId */
     std::vector<int>* m_eclDigitAmp;  /**< ECLDigit amplitude */
@@ -99,22 +99,22 @@ namespace Belle2 {
 
     int m_eclCalDigitMultip; /**< Number of ECLCalDigits per event */
     std::vector<int>* m_eclCalDigitIdx; /**< ECLCalDigit index */
-    //std::vector<int>* m_eclCalDigitToMc; /**< Index of MCParticle related to that ECLCalDigit */
-    std::vector<int>* m_eclCalDigitToMc1; /**< Index of first MCParticle related to ECLCalDigit */
-    std::vector<int>* m_eclCalDigitToMc1PDG; /**< PDG code of first MCParticle related to ECLCalDigit */
-    std::vector<double>* m_eclCalDigitToMcWeight1; /**< Energy contribution of first MCParticle related to ECLCalDigit */
-    std::vector<int>* m_eclCalDigitToMc2; /**< Index of second MCParticle related to ECLCalDigit */
-    std::vector<int>* m_eclCalDigitToMc2PDG; /**< PDG code of second MCParticle related to ECLCalDigit */
-    std::vector<double>* m_eclCalDigitToMcWeight2; /**< Energy contribution of second MCParticle related to ECLCalDigit */
-    std::vector<int>* m_eclCalDigitToMc3; /**< Index of third MCParticle related to ECLCalDigit */
-    std::vector<int>* m_eclCalDigitToMc3PDG; /**< PDG code of third MCParticle related to ECLCalDigit */
-    std::vector<double>* m_eclCalDigitToMcWeight3; /**< Energy contribution of third MCParticle related to ECLCalDigit */
-    std::vector<int>* m_eclCalDigitToMc4; /**< Index of fourth MCParticle related to ECLCalDigit */
-    std::vector<int>* m_eclCalDigitToMc4PDG; /**< PDG code of fourth MCParticle related to ECLCalDigit */
-    std::vector<double>* m_eclCalDigitToMcWeight4; /**< Energy contribution of fourth MCParticle related to ECLCalDigit */
-    std::vector<int>* m_eclCalDigitToMc5; /**< Index of fifth MCParticle related to ECLCalDigit */
-    std::vector<int>* m_eclCalDigitToMc5PDG; /**< PDG code of fifth MCParticle related to ECLCalDigit */
-    std::vector<double>* m_eclCalDigitToMcWeight5; /**< Energy contribution of fifth MCParticle related to ECLCalDigit */
+    //std::vector<int>* m_eclCalDigitToMC; /**< Index of MCParticle related to that ECLCalDigit */
+    std::vector<int>* m_eclCalDigitToMC1; /**< Index of first MCParticle related to ECLCalDigit */
+    std::vector<int>* m_eclCalDigitToMC1PDG; /**< PDG code of first MCParticle related to ECLCalDigit */
+    std::vector<double>* m_eclCalDigitToMCWeight1; /**< Energy contribution of first MCParticle related to ECLCalDigit */
+    std::vector<int>* m_eclCalDigitToMC2; /**< Index of second MCParticle related to ECLCalDigit */
+    std::vector<int>* m_eclCalDigitToMC2PDG; /**< PDG code of second MCParticle related to ECLCalDigit */
+    std::vector<double>* m_eclCalDigitToMCWeight2; /**< Energy contribution of second MCParticle related to ECLCalDigit */
+    std::vector<int>* m_eclCalDigitToMC3; /**< Index of third MCParticle related to ECLCalDigit */
+    std::vector<int>* m_eclCalDigitToMC3PDG; /**< PDG code of third MCParticle related to ECLCalDigit */
+    std::vector<double>* m_eclCalDigitToMCWeight3; /**< Energy contribution of third MCParticle related to ECLCalDigit */
+    std::vector<int>* m_eclCalDigitToMC4; /**< Index of fourth MCParticle related to ECLCalDigit */
+    std::vector<int>* m_eclCalDigitToMC4PDG; /**< PDG code of fourth MCParticle related to ECLCalDigit */
+    std::vector<double>* m_eclCalDigitToMCWeight4; /**< Energy contribution of fourth MCParticle related to ECLCalDigit */
+    std::vector<int>* m_eclCalDigitToMC5; /**< Index of fifth MCParticle related to ECLCalDigit */
+    std::vector<int>* m_eclCalDigitToMC5PDG; /**< PDG code of fifth MCParticle related to ECLCalDigit */
+    std::vector<double>* m_eclCalDigitToMCWeight5; /**< Energy contribution of fifth MCParticle related to ECLCalDigit */
     std::vector<double>*
     m_eclCalDigitToBkgWeight; /**< Remaining energy contribution not associated to first five MCParticles related to ECLCalDigit */
     std::vector<double>* m_eclCalDigitSimHitSum; /**< Full energy contribution related to ECLCalDigit */
@@ -139,11 +139,11 @@ namespace Belle2 {
 
     int m_eclSimHitMultip;  /**< Number of ECLSimHits per event */
     std::vector<int>* m_eclSimHitIdx;  /**< Index of ECLSimHit*/
-    std::vector<int>* m_eclSimHitToMc; /**< Index of MCParticle related to that ECLSimHit */
+    std::vector<int>* m_eclSimHitToMC; /**< Index of MCParticle related to that ECLSimHit */
     std::vector<int>* m_eclSimHitCellId; /**< ECLSimHit CellId */
     std::vector<int>* m_eclSimHitPdg; /**< PDG code of MCParticle associted to that ECLDigit */
     std::vector<double>* m_eclSimHitEnergyDep; /**< Energy deposition of ECLSimHit */
-    std::vector<double>* m_eclSimHitFlightTime; /**< ??? */
+    std::vector<double>* m_eclSimHitFlightTime; /**< ECLSimhit Flight Time */
     std::vector<double>* m_eclSimHitX; /**< ECLSimHit X position */
     std::vector<double>* m_eclSimHitY; /**< ECLSimHit Y position */
     std::vector<double>* m_eclSimHitZ; /**< ECLSimHit Z position */
@@ -153,7 +153,7 @@ namespace Belle2 {
 
     int m_eclHitMultip; /**< Number of ECLHits per event */
     std::vector<int>* m_eclHitIdx; /**< Index of ECLHits */
-    std::vector<int>* m_eclHitToMc; /**< Index of MCParticle related to ECLHit */
+    std::vector<int>* m_eclHitToMC; /**< Index of MCParticle related to ECLHit */
     std::vector<int>* m_eclHitToDigit; /**< Index of ECLDigit related to ECLHit */
     std::vector<int>* m_eclHitToDigitAmp; /**< Amplitude of ECLDigit related to ECLHit */
     std::vector<int>* m_eclHitToPureDigit; /**< Index of ECLDigit related to ECLHit */
@@ -162,26 +162,28 @@ namespace Belle2 {
     std::vector<double>* m_eclHitEnergyDep; /**< ECLHit energy */
     std::vector<double>* m_eclHitTimeAve; /**< ECLHit time */
 
-    int m_eclClusterMultip;  /**< Number of ECLClusterss per event */
+    int m_eclClusterMultip;  /**< Number of ECLClusters per event */
+    int m_eclClusterTrueMultip;  /**< Number of ECLClusters per event */
+    int m_eclClusterGammaMultip;  /**< Number of ECLClusters per event */
     std::vector<int>* m_eclClusterIdx;  /**< ECLCluster index */
-    std::vector<int>* m_eclClusterToMc1; /**< Index of first MCParticle related to ECLCluster */
-    std::vector<double>* m_eclClusterToMcWeight1; /**< Energy contribution of first MCParticle related to ECLCluster */
-    std::vector<int>* m_eclClusterToMc1PDG; /**< PDG code of first MCParticle related to ECLCluster */
-    std::vector<int>* m_eclClusterToMc2; /**< Index of second MCParticle related to ECLCluster */
-    std::vector<double>* m_eclClusterToMcWeight2; /**< Energy contribution of second MCParticle related to ECLCluster */
-    std::vector<int>* m_eclClusterToMc2PDG; /**< PDG code of second MCParticle related to ECLCluster */
-    std::vector<int>* m_eclClusterToMc3; /**< Index of third MCParticle related to ECLCluster */
-    std::vector<double>* m_eclClusterToMcWeight3; /**< Energy contribution of third MCParticle related to ECLCluster */
-    std::vector<int>* m_eclClusterToMc3PDG; /**< PDG code of third MCParticle related to ECLCluster */
-    std::vector<int>* m_eclClusterToMc4; /**< Index of fourth MCParticle related to ECLCluster */
-    std::vector<double>* m_eclClusterToMcWeight4; /**< Energy contribution of fourth MCParticle related to ECLCluster */
-    std::vector<int>* m_eclClusterToMc4PDG; /**< PDG code of fourth MCParticle related to ECLCluster */
-    std::vector<int>* m_eclClusterToMc5; /**< Index of fifth MCParticle related to ECLCluster */
-    std::vector<double>* m_eclClusterToMcWeight5; /**< Energy contribution of fifth MCParticle related to ECLCluster */
-    std::vector<int>* m_eclClusterToMc5PDG; /**< PDG code of fifth MCParticle related to ECLCluster */
+    std::vector<int>* m_eclClusterToMC1; /**< Index of first MCParticle related to ECLCluster */
+    std::vector<double>* m_eclClusterToMCWeight1; /**< Energy contribution of first MCParticle related to ECLCluster */
+    std::vector<int>* m_eclClusterToMC1PDG; /**< PDG code of first MCParticle related to ECLCluster */
+    std::vector<int>* m_eclClusterToMC2; /**< Index of second MCParticle related to ECLCluster */
+    std::vector<double>* m_eclClusterToMCWeight2; /**< Energy contribution of second MCParticle related to ECLCluster */
+    std::vector<int>* m_eclClusterToMC2PDG; /**< PDG code of second MCParticle related to ECLCluster */
+    std::vector<int>* m_eclClusterToMC3; /**< Index of third MCParticle related to ECLCluster */
+    std::vector<double>* m_eclClusterToMCWeight3; /**< Energy contribution of third MCParticle related to ECLCluster */
+    std::vector<int>* m_eclClusterToMC3PDG; /**< PDG code of third MCParticle related to ECLCluster */
+    std::vector<int>* m_eclClusterToMC4; /**< Index of fourth MCParticle related to ECLCluster */
+    std::vector<double>* m_eclClusterToMCWeight4; /**< Energy contribution of fourth MCParticle related to ECLCluster */
+    std::vector<int>* m_eclClusterToMC4PDG; /**< PDG code of fourth MCParticle related to ECLCluster */
+    std::vector<int>* m_eclClusterToMC5; /**< Index of fifth MCParticle related to ECLCluster */
+    std::vector<double>* m_eclClusterToMCWeight5; /**< Energy contribution of 5th MCParticle related to ECLCluster */
+    std::vector<int>* m_eclClusterToMC5PDG; /**< PDG code of fifth MCParticle related to ECLCluster */
     std::vector<double>*
     m_eclClusterToBkgWeight; /**< Remaining energy contribution not associated to first five MCParticles related to ECLCluster */
-    std::vector<double>* m_eclClusterSimHitSum; /**< Energy contribution of first MCParticle related to ECLCluster */
+    std::vector<double>* m_eclClusterSimHitSum; /**< Energy contribution of 1st MCParticle related to ECLCluster */
     std::vector<int>* m_eclClusterToShower; /**< Index of ECLShower related to ECLCluster */
     //std::vector<int>* m_eclClusterToTrack;
     std::vector<double>* m_eclClusterEnergy; /**< ECLCluster energy */
@@ -194,21 +196,29 @@ namespace Belle2 {
     std::vector<double>* m_eclClusterEnergyDepSum;  /**< ECLCluster simulated energy */
     std::vector<double>* m_eclClusterTiming;  /**< ECLCluster time */
     std::vector<double>* m_eclClusterTimingError;  /**< ECLCluster time error */
-    std::vector<double>* m_eclClusterE9oE25;  /**< Ratio of 3x3 over 5x5 crystal matrices energies for ECLCluster*/
+    std::vector<double>* m_eclClusterE9oE21;  /**< Ratio of 3x3 over 5x5 crystal matrices energies for ECLCluster*/
     std::vector<double>* m_eclClusterHighestE; /**< Highest energy deposit (per crystal) in ECLCluster */
-    std::vector<double>* m_eclClusterLat; /**< ECLCluster shape parameter */
     std::vector<int>* m_eclClusterNofCrystals;  /**< Number of crystals in ECLCluster */
     std::vector<int>* m_eclClusterCrystalHealth;  /**< Crystal healt flag */
     std::vector<double>* m_eclClusterPx;  /**< Reconstructed momentum along X */
     std::vector<double>* m_eclClusterPy;  /**< Reconstructed momentum along Y */
     std::vector<double>* m_eclClusterPz;  /**< Reconstructed momentum along Z */
     std::vector<bool>* m_eclClusterIsTrack; /**< Flag for charged clusters */
-    std::vector<bool>* m_eclClusterClosestTrackDist; /**< Flag for charged clusters */
-    std::vector<double>* m_eclClusterDeltaL; /**< ??? */
+    std::vector<double>* m_eclClusterClosestTrackDist; /**< Flag for charged clusters */
+    std::vector<double>* m_eclClusterDeltaL; /**< Reconstructed Cluster DeltaL */
+    std::vector<double>* m_eclClusterAbsZernike40; /**< Reconstructed Abs Zernike40 */
+    std::vector<double>* m_eclClusterAbsZernike51; /**< Reconstructed Abs Zernike51 */
+    std::vector<double>* m_eclClusterZernikeMVA; /**< Zernike MVA */
+    std::vector<double>* m_eclClusterE1oE9; /**< Reconstructed E1 over E9 */
+    std::vector<double>* m_eclClusterSecondMoment; /**< Reconstructed Second Moment */
+    std::vector<double>* m_eclClusterLAT; /**< Reconstructed LAT */
+    std::vector<double>* m_eclClusterDeltaTime99; /**< DeltaTime99 */
+    std::vector<int>* m_eclClusterDetectorRegion; /**< Cluster Detector Region */
+    std::vector<int>* m_eclClusterHypothesisId; /**< Cluster Detector Region */
 
     int m_eclPureDigitMultip; /**< Number of ECLPureDigits per event */
     std::vector<int>* m_eclPureDigitIdx; /**< ECLPureDigit index */
-    std::vector<int>* m_eclPureDigitToMc; /**< Index of MCParticle related to that ECLPureDigit */
+    std::vector<int>* m_eclPureDigitToMC; /**< Index of MCParticle related to that ECLPureDigit */
     std::vector<int>* m_eclPureDigitCellId; /**< Number of ECLPureDigit CellId */
     std::vector<int>* m_eclPureDigitAmp;  /**< ECLPureDigit amplitude */
     std::vector<int>* m_eclPureDigitTimeFit;  /**< ECLPureDigit timing */
@@ -217,7 +227,7 @@ namespace Belle2 {
 
     int m_eclPureClusterMultip;  /**< Number of ECLClusterss per event */
     std::vector<int>* m_eclPureClusterIdx;  /**< ECLCluster index */
-    std::vector<int>* m_eclPureClusterToMc; /**< Index of MCParticle related to that ECLPureCluster */
+    std::vector<int>* m_eclPureClusterToMC; /**< Index of MCParticle related to that ECLPureCluster */
     std::vector<double>* m_eclPureClusterEnergy; /**< ECLPureCluster energy */
     std::vector<double>* m_eclPureClusterEnergyError; /**< ECLPureCluster energy error*/
     std::vector<double>* m_eclPureClusterTheta;  /**< ECLPureCluster polar direction */
@@ -228,7 +238,7 @@ namespace Belle2 {
     std::vector<double>* m_eclPureClusterEnergyDepSum;  /**< ECLPureCluster simulated energy */
     std::vector<double>* m_eclPureClusterTiming;  /**< ECLPureCluster time */
     std::vector<double>* m_eclPureClusterTimingError;  /**< ECLPureCluster time error */
-    std::vector<double>* m_eclPureClusterE9oE25;  /**< Ratio of 3x3 over 5x5 crystal matrices energies for ECLPureCluster*/
+    std::vector<double>* m_eclPureClusterE9oE21;  /**< Ratio of 3x3 over 5x5 crystal matrices energies for ECLPureCluster*/
     std::vector<double>* m_eclPureClusterHighestE; /**< Highest energy deposit (per crystal) in ECLPureCluster */
     std::vector<double>* m_eclPureClusterLat; /**< ECLPureCluster shape parameter */
     std::vector<int>* m_eclPureClusterNofCrystals;  /**< Number of crystals in ECLPureCluster */
@@ -238,7 +248,7 @@ namespace Belle2 {
     std::vector<double>* m_eclPureClusterPy;  /**< Reconstructed momentum along Y */
     std::vector<double>* m_eclPureClusterPz;  /**< Reconstructed momentum along Z */
     std::vector<bool>* m_eclPureClusterIsTrack; /**< Flag for charged clusters */
-    std::vector<double>* m_eclPureClusterDeltaL; /**< ??? */
+    std::vector<double>* m_eclPureClusterDeltaL; /**< Reconstructed Cluster DeltaL */
 
     /*
     int m_eclGammaMultip;
@@ -269,21 +279,41 @@ namespace Belle2 {
 
     int m_eclShowerMultip; /**< Number of ECLShowers per event */
     std::vector<int>* m_eclShowerIdx; /**< Shower Index */
-    std::vector<int>* m_eclShowerToMc1; /**< Index of first MCParticle related to ECLShower */
-    std::vector<double>* m_eclShowerToMcWeight1; /**< Energy contribution of first MCParticle related to ECLShower */
-    std::vector<int>* m_eclShowerToMc1PDG; /**< PDG code of first MCParticle related to ECLShower */
-    std::vector<int>* m_eclShowerToMc2; /**< Index of second MCParticle related to ECLShower */
-    std::vector<double>* m_eclShowerToMcWeight2; /**< Energy contribution of second MCParticle related to ECLShower */
-    std::vector<int>* m_eclShowerToMc2PDG; /**< PDG code of second MCParticle related to ECLShower */
-    std::vector<int>* m_eclShowerToMc3; /**< Index of third MCParticle related to ECLShower */
-    std::vector<double>* m_eclShowerToMcWeight3; /**< Energy contribution of third MCParticle related to ECLShower */
-    std::vector<int>* m_eclShowerToMc3PDG; /**< PDG code of third MCParticle related to ECLShower */
-    std::vector<int>* m_eclShowerToMc4; /**< Index of fourth MCParticle related to ECLShower */
-    std::vector<double>* m_eclShowerToMcWeight4; /**< Energy contribution of fourth MCParticle related to ECLShower */
-    std::vector<int>* m_eclShowerToMc4PDG; /**< PDG code of fourth MCParticle related to ECLShower */
-    std::vector<int>* m_eclShowerToMc5; /**< Index of fifth MCParticle related to ECLShower */
-    std::vector<double>* m_eclShowerToMcWeight5; /**< Energy contribution of fifth MCParticle related to ECLShower */
-    std::vector<int>* m_eclShowerToMc5PDG; /**< PDG code of fifth MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC1; /**< Index of first MCParticle related to ECLShower */
+    std::vector<double>* m_eclShowerToMCWeight1; /**< Energy contribution of first MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC1PDG; /**< PDG code of first MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC1Moth; /**< Mother index of first MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC1MothPDG; /**< PDG code of parent of first MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC1GMoth; /**< GMother index of first MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC1GMothPDG; /**< PDG code of Gparent of first MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC2; /**< Index of second MCParticle related to ECLShower */
+    std::vector<double>* m_eclShowerToMCWeight2; /**< Energy contribution of second MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC2PDG; /**< PDG code of second MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC2Moth; /**< Mother index of first MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC2MothPDG; /**< PDG code of parent of first MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC2GMoth; /**< GMother index of second MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC2GMothPDG; /**< PDG code of Gparent of second MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC3; /**< Index of third MCParticle related to ECLShower */
+    std::vector<double>* m_eclShowerToMCWeight3; /**< Energy contribution of third MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC3PDG; /**< PDG code of third MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC3Moth; /**< Mother index of first MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC3MothPDG; /**< PDG code of parent of first MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC3GMoth; /**< GMother index of third MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC3GMothPDG; /**< PDG code of Gparent of third MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC4; /**< Index of fourth MCParticle related to ECLShower */
+    std::vector<double>* m_eclShowerToMCWeight4; /**< Energy contribution of fourth MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC4PDG; /**< PDG code of fourth MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC4Moth; /**< Mother index of fourth MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC4MothPDG; /**< PDG code of parent of fourth MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC4GMoth; /**< GMother index of fourth MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC4GMothPDG; /**< PDG code of Gparent of fourth MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC5; /**< Index of fifth MCParticle related to ECLShower */
+    std::vector<double>* m_eclShowerToMCWeight5; /**< Energy contribution of fifth MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC5PDG; /**< PDG code of fifth MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC5Moth; /**< Mother index of fifth MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC5MothPDG; /**< PDG code of parent of fifth MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC5GMoth; /**< GMother index of fifth MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC5GMothPDG; /**< PDG code of Gparent of fifth MCParticle related to ECLShower */
     std::vector<double>*
     m_eclShowerToBkgWeight; /**< Remaining energy contribution not associated to first five MCParticles related to ECLShower */
     std::vector<int>* m_eclShowerToLM1; /**< Index of first maximum related to ECLShower */
@@ -298,7 +328,7 @@ namespace Belle2 {
     std::vector<double>* m_eclShowerPhi; /**< Shower Phi */
     std::vector<double>* m_eclShowerR; /**< Shower R */
     std::vector<double>* m_eclShowerNHits; /**< Shower NHits */
-    std::vector<double>* m_eclShowerE9oE25; /**< Shower E9oE25 */
+    std::vector<double>* m_eclShowerE9oE21; /**< Shower E9oE21 */
     std::vector<double>* m_eclShowerTime;  /**< Shower Timing */
     std::vector<double>* m_eclShowerT99;  /**< Shower T99 */
     std::vector<double>* m_eclShowerConnectedRegionId; /**< Matched Connetcted Region Idx */
@@ -321,6 +351,7 @@ namespace Belle2 {
     std::vector<int>* m_eclShowerIsTrack; /**< Shower Track Match */
     std::vector<bool>* m_eclShowerIsCluster; /**< Shower Cluster Match */
     std::vector<int>*   m_eclShowerMCVtxInEcl; /**< Int, 1 if particle decays (interacts) in ECL, 0 otherwise*/
+    std::vector<int>*   m_eclShowerMCFlightMatch; /**< Int, 1 if particle flight direction is "well" reconstructed in ECL, 0 otherwise*/
     std::vector<double>*   m_eclShowerHighestE1mE2; /**< Energy difference for 2 highest energy deposits in shower*/
 
 
@@ -359,7 +390,7 @@ namespace Belle2 {
     std::vector<int>* m_eclpidtrkIdx; /**< PID track index */
     std::vector<double>* m_eclpidEnergy; /**< PID track energy */
     std::vector<double>* m_eclpidEop; /**< PID track E/p */
-    std::vector<double>* m_eclpidE9E25; /**< PID track ration of 3x3 over 5x5 crystal matrices energies */
+    std::vector<double>* m_eclpidE9E21; /**< PID track ration of 3x3 over 5x5 crystal matrices energies */
     std::vector<int>* m_eclpidNCrystals; /**< PID track number of crystals */
     std::vector<int>* m_eclpidNClusters; /**< PID track number of clusters */
     std::vector<double>* m_eclLogLikeEl; /**< PID track electron likelyhood */

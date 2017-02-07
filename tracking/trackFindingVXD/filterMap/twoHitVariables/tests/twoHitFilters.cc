@@ -593,8 +593,8 @@ namespace VXDTFtwoHitFilterTest {
   TEST_F(TwoHitFilterTest, ShortCircuitsEvaluation)
   {
     auto filter(
-      (Distance2DXYSquared<SpacePoint>() < 1).observe(CountingObserver()) &&
-      (Distance3DSquared<SpacePoint>()   < 1).observe(CountingObserver())
+      ((Distance2DXYSquared<SpacePoint>() < 1) &&
+       (Distance3DSquared<SpacePoint>()   < 1)).observe(CountingObserver())
     );
 
     SpacePoint x1 = provideSpacePointDummy(0.0f , 0.0f, 0.0f);

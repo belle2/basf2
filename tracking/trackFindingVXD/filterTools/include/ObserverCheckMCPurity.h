@@ -105,6 +105,7 @@ namespace Belle2 {
     ObserverCheckMCPurity() {};
 
 
+
     /** _static_ method used by the observed object to initialize the observer.
      *
      * will be called once per Filter containing a single SelectionVariable and its range.
@@ -136,16 +137,18 @@ namespace Belle2 {
       s_ttree = attree;
 
       if (s_ttree != nullptr) {
-        s_ttree->Branch("outerHit", &s_outerHitOfTwo);
-        s_ttree->Branch("innerHit", &s_innerHitOfTwo);
+        // added some protection for creating branches twice, as the observer is initialized recursively
+        if (!s_ttree->GetBranch("outerHit")) s_ttree->Branch("outerHit", &s_outerHitOfTwo);
+        if (!s_ttree->GetBranch("innerHit")) s_ttree->Branch("innerHit", &s_innerHitOfTwo);
 
-        s_ttree->Branch("mcParticleID", &s_mainMCParticleID);
-        s_ttree->Branch("mcPurity", &s_mainPurity);
+        if (!s_ttree->GetBranch("mcParticleID")) s_ttree->Branch("mcParticleID", &s_mainMCParticleID);
+        if (!s_ttree->GetBranch("mcPurity")) s_ttree->Branch("mcPurity", &s_mainPurity);
+      } else {
+        return false;
       }
 
       return true;
     }
-
 
 //  /** _static_ method used by the observed object to initialize the observer (partial template specialization of the general version).
 //   */

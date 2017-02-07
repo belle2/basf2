@@ -132,22 +132,27 @@ namespace Belle2 {
       jacobianRot(1, 2) = p * sinTheta * cosPhi;
       jacobianRot(2, 1) = -p * sinTheta;
 
-      return part->getMomentumVertexErrorMatrix().GetSub(0, 2, 0, 2, " ").Similarity(jacobianRot)(0, 0);
+      const auto& frame = ReferenceFrame::GetCurrent();
+
+      return frame.getMomentumErrorMatrix(part).GetSub(0, 2, 0, 2, " ").Similarity(jacobianRot)(0, 0);
     }
 
     double particlePxErr(const Particle* part)
     {
-      return part->getMomentumVertexErrorMatrix()(0, 0);
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentumErrorMatrix(part)(0, 0);
     }
 
     double particlePyErr(const Particle* part)
     {
-      return part->getMomentumVertexErrorMatrix()(1, 1);
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentumErrorMatrix(part)(1, 1);
     }
 
     double particlePzErr(const Particle* part)
     {
-      return part->getMomentumVertexErrorMatrix()(2, 2);
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentumErrorMatrix(part)(2, 2);
     }
 
     double particlePtErr(const Particle* part)
@@ -165,7 +170,9 @@ namespace Belle2 {
       jacobianRot(1, 1) = pt * cosPhi;
       jacobianRot(2, 2) = 1;
 
-      return part->getMomentumVertexErrorMatrix().GetSub(0, 2, 0, 2, " ").Similarity(jacobianRot)(0, 0);
+      const auto& frame = ReferenceFrame::GetCurrent();
+
+      return frame.getMomentumErrorMatrix(part).GetSub(0, 2, 0, 2, " ").Similarity(jacobianRot)(0, 0);
     }
 
     double momentumDeviationChi2(const Particle* part)
@@ -215,7 +222,8 @@ namespace Belle2 {
       jacobianRot(1, 2) = p * sinTheta * cosPhi;
       jacobianRot(2, 1) = -p * sinTheta;
 
-      double ThetaErr = part->getMomentumVertexErrorMatrix().GetSub(0, 2, 0, 2, " ").Similarity(jacobianRot)(1, 1);
+      const auto& frame = ReferenceFrame::GetCurrent();
+      double ThetaErr = frame.getMomentumErrorMatrix(part).GetSub(0, 2, 0, 2, " ").Similarity(jacobianRot)(1, 1);
 
       return fabs(ThetaErr * sinTheta);
     }
@@ -241,7 +249,9 @@ namespace Belle2 {
       jacobianRot(1, 1) = pt * cosPhi;
       jacobianRot(2, 2) = 1;
 
-      return part->getMomentumVertexErrorMatrix().GetSub(0, 2, 0, 2, " ").Similarity(jacobianRot)(1, 1);
+      const auto& frame = ReferenceFrame::GetCurrent();
+
+      return frame.getMomentumErrorMatrix(part).GetSub(0, 2, 0, 2, " ").Similarity(jacobianRot)(1, 1);
     }
 
     double particlePDGCode(const Particle* part)

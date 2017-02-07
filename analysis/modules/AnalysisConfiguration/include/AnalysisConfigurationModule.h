@@ -11,6 +11,7 @@
 #ifndef ANALYSISCONFIGURATIONMODULE_H
 #define ANALYSISCONFIGURATIONMODULE_H
 #include <string>
+#include <set>
 #include <framework/core/Module.h>
 
 namespace Belle2 {
@@ -42,9 +43,11 @@ namespace Belle2 {
     std::string m_tupleStyle; /**< Style of variables in nTuple
                               Possible styles on example of PX variable of pi0 from D
                               in decay B->(D->pi0 pi) pi0:
-                              'Default': B_D_pi0_PX
-                              'Laconic': pi01_PX"
+                              'default': B_D_pi0_PX
+                              'semilaconic': D_pi0_PX
+                              'laconic': pi01_PX"
                               */
+    std::set<std::string> m_styles = {"default", "laconic", "semilaconic" };
 
     std::string m_mcMatchingVersion; /**< specifies the version of MC matching algorithm to be used */
   };

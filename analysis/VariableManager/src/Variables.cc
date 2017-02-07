@@ -196,13 +196,13 @@ namespace Belle2 {
       return result;
     }
 
-    double particleCosTheta(const Particle* part)
+    double particleTheta(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getMomentum(part).CosTheta();
+      return acos(frame.getMomentum(part).CosTheta());
     }
 
-    double particleCosThetaErr(const Particle* part)
+    double particleThetaErr(const Particle* part)
     {
       TMatrixD jacobianRot(3, 3);
       jacobianRot.Zero();
@@ -223,9 +223,19 @@ namespace Belle2 {
       jacobianRot(2, 1) = -p * sinTheta;
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      double ThetaErr = frame.getMomentumErrorMatrix(part).GetSub(0, 2, 0, 2, " ").Similarity(jacobianRot)(1, 1);
 
-      return fabs(ThetaErr * sinTheta);
+      return frame.getMomentumErrorMatrix(part).GetSub(0, 2, 0, 2, " ").Similarity(jacobianRot)(1, 1);
+    }
+
+    double particleCosTheta(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(part).CosTheta();
+    }
+
+    double particleCosThetaErr(const Particle* part)
+    {
+      return fabs(particleThetaErr(part) * sin(particleTheta(part)));
     }
 
     double particlePhi(const Particle* part)
@@ -1766,6 +1776,8 @@ namespace Belle2 {
                       "momentum deviation chi^2 value calculated as"
                       "chi^2 = sum_i (p_i - mc(p_i))^2/sigma(p_i)^2, where sum runs over i = px, py, pz and"
                       "mc(p_i) is the mc truth value and sigma(p_i) is the estimated error of i-th component of momentum vector")
+    REGISTER_VARIABLE("Theta", particleTheta, "polar angle");
+    REGISTER_VARIABLE("ThetaErr", particleThetaErr, "error of polar angle");
     REGISTER_VARIABLE("cosTheta", particleCosTheta, "momentum cosine of polar angle");
     REGISTER_VARIABLE("cosThetaErr", particleCosThetaErr, "error of momentum cosine of polar angle");
     REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle in degrees");

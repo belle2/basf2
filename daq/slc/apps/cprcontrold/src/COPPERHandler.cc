@@ -124,7 +124,6 @@ bool NSMVHandlerHSLBFirmware::handleSetText(const std::string& firmware)
 bool NSMVHandlerHSLBBoot::handleSetText(const std::string& val)
 {
   std::string firmware = val;
-  m_callback.get(vname, firmware);
   if (File::exist(firmware)) {
     LogFile::info("Loading HSLB firmware: " + firmware);
     try {

@@ -868,11 +868,10 @@ namespace Belle2 {
 
     double particleMCMatchWeight(const Particle* particle)
     {
-      std::pair<MCParticle*, double> relation = particle->getRelatedToWithWeight <
-                                                MCParticle > ();
+      auto relWithWeight = particle->getRelatedToWithWeight<MCParticle>();
 
-      if (relation.first) {
-        return relation.second;
+      if (relWithWeight.first) {
+        return relWithWeight.second;
       } else {
         return 0.0;
       }

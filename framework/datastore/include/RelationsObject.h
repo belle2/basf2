@@ -68,7 +68,7 @@ namespace Belle2 {
       RelationVector<CDCSimHit> cdcRelations = particle->getRelationsTo<CDCSimHit>();
       for (unsigned int iHit = 0; iHit < cdcRelations.size(); iHit++) {
         const CDCSimHit *simhit = cdcRelations[iHit];
-        double weight = cdcRelations.weight(iHit);
+        float weight = cdcRelations.weight(iHit);
         //...
       }
       \endcode
@@ -278,7 +278,7 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type TO are considered.
      *  @return        Pair of first related object and the relation weight, or (NULL, 1.0) if none found.
      */
-    template <class TO> std::pair<TO*, double> getRelatedToWithWeight(const std::string& name = "") const
+    template <class TO> std::pair<TO*, float> getRelatedToWithWeight(const std::string& name = "") const
     {
       RelationEntry entry = DataStore::Instance().getRelationWith(DataStore::c_ToSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex,
                                                                   TO::Class(), name);
@@ -293,7 +293,7 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type FROM are considered.
      *  @return        Pair of first related object and the relation weight, or (NULL, 1.0) if none found.
      */
-    template <class FROM> std::pair<FROM*, double> getRelatedFromWithWeight(const std::string& name = "") const
+    template <class FROM> std::pair<FROM*, float> getRelatedFromWithWeight(const std::string& name = "") const
     {
       RelationEntry entry = DataStore::Instance().getRelationWith(DataStore::c_FromSide, this, m_cacheDataStoreEntry, m_cacheArrayIndex,
                                                                   FROM::Class(), name);
@@ -308,7 +308,7 @@ namespace Belle2 {
      *                 If the special name "ALL" is given all store arrays containing objects of type T are considered.
      *  @return        Pair of first related object and the relation weight, or (NULL, 1.0) if none found.
      */
-    template <class T> std::pair<T*, double> getRelatedWithWeight(const std::string& name = "") const
+    template <class T> std::pair<T*, float> getRelatedWithWeight(const std::string& name = "") const
     {
       RelationEntry entry = DataStore::Instance().getRelationWith(DataStore::c_BothSides, this, m_cacheDataStoreEntry, m_cacheArrayIndex,
                                                                   T::Class(), name);

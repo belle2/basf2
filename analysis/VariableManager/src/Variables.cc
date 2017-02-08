@@ -124,13 +124,13 @@ namespace Belle2 {
       double p = particleP(part);
 
       jacobianRot(0, 0) = sinTheta * cosPhi;
-      jacobianRot(0, 1) = p * cosTheta * cosPhi;
-      jacobianRot(1, 0) = sinPhi * sinTheta;
-      jacobianRot(1, 1) = p * cosTheta * sinPhi;
-      jacobianRot(0, 2) = -p * sinTheta * sinPhi;
-      jacobianRot(2, 0) = cosTheta;
-      jacobianRot(1, 2) = p * sinTheta * cosPhi;
-      jacobianRot(2, 1) = -p * sinTheta;
+      jacobianRot(0, 1) = sinTheta * sinPhi;
+      jacobianRot(1, 0) = cosTheta * cosPhi / p;
+      jacobianRot(1, 1) = cosTheta * sinPhi / p;
+      jacobianRot(0, 2) = cosTheta;
+      jacobianRot(2, 0) = -sinPhi / sinTheta / p;
+      jacobianRot(1, 2) = -sinTheta / p;
+      jacobianRot(2, 1) = cosPhi / sinTheta / p;
 
       const auto& frame = ReferenceFrame::GetCurrent();
 
@@ -181,14 +181,14 @@ namespace Belle2 {
       TMatrixD jacobianRot(3, 3);
       jacobianRot.Zero();
 
-      double cosPhi = cos(particlePhi(part));
-      double sinPhi = sin(particlePhi(part));
+      double px = particlePx(part);
+      double py = particlePy(part);
       double pt = particlePt(part);
 
-      jacobianRot(0, 0) = cosPhi;
-      jacobianRot(0, 1) = -pt * sinPhi;
-      jacobianRot(1, 0) = sinPhi;
-      jacobianRot(1, 1) = pt * cosPhi;
+      jacobianRot(0, 0) = px / pt;
+      jacobianRot(0, 1) = py / pt;
+      jacobianRot(1, 0) = -py / (pt * pt);
+      jacobianRot(1, 1) = px / (pt * pt);
       jacobianRot(2, 2) = 1;
 
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -240,13 +240,13 @@ namespace Belle2 {
       double p = particleP(part);
 
       jacobianRot(0, 0) = sinTheta * cosPhi;
-      jacobianRot(0, 1) = p * cosTheta * cosPhi;
-      jacobianRot(1, 0) = sinPhi * sinTheta;
-      jacobianRot(1, 1) = p * cosTheta * sinPhi;
-      jacobianRot(0, 2) = -p * sinTheta * sinPhi;
-      jacobianRot(2, 0) = cosTheta;
-      jacobianRot(1, 2) = p * sinTheta * cosPhi;
-      jacobianRot(2, 1) = -p * sinTheta;
+      jacobianRot(0, 1) = sinTheta * sinPhi;
+      jacobianRot(1, 0) = cosTheta * cosPhi / p;
+      jacobianRot(1, 1) = cosTheta * sinPhi / p;
+      jacobianRot(0, 2) = cosTheta;
+      jacobianRot(2, 0) = -sinPhi / sinTheta / p;
+      jacobianRot(1, 2) = -sinTheta / p;
+      jacobianRot(2, 1) = cosPhi / sinTheta / p;
 
       const auto& frame = ReferenceFrame::GetCurrent();
       double errorSquared = frame.getMomentumErrorMatrix(part).GetSub(0, 2, 0, 2, " ").Similarity(jacobianRot)(1, 1);
@@ -279,14 +279,14 @@ namespace Belle2 {
       TMatrixD jacobianRot(3, 3);
       jacobianRot.Zero();
 
-      double cosPhi = cos(particlePhi(part));
-      double sinPhi = sin(particlePhi(part));
+      double px = particlePx(part);
+      double py = particlePy(part);
       double pt = particlePt(part);
 
-      jacobianRot(0, 0) = cosPhi;
-      jacobianRot(0, 1) = -pt * sinPhi;
-      jacobianRot(1, 0) = sinPhi;
-      jacobianRot(1, 1) = pt * cosPhi;
+      jacobianRot(0, 0) = px / pt;
+      jacobianRot(0, 1) = py / pt;
+      jacobianRot(1, 0) = -py / (pt * pt);
+      jacobianRot(1, 1) = px / (pt * pt);
       jacobianRot(2, 2) = 1;
 
       const auto& frame = ReferenceFrame::GetCurrent();

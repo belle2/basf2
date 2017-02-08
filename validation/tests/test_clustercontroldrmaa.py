@@ -12,7 +12,9 @@ from validationscript import Script
 
 
 class TestClusterControlDrmaa(unittest.TestCase):
-
+    """
+    Test for for the DRMAA-backend of the clustercontrol
+    """
     class SessionMock():
 
         class JobState(Enum):

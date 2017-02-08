@@ -38,6 +38,11 @@ namespace Belle2 {
    *  not introduce a large overhead.
    *
    *  <h1>Retrieving relations</h1>
+   *
+   *  \note Remember to use references or pointers when iterating over a
+   *        StoreArray. Accessing relations through a copied object will
+   *        not work.
+   *
    *  You can either retrieve a vector of relations using getRelations...(),
       \code
       //retrieve all CDCSimHits for given particle

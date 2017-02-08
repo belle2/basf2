@@ -600,7 +600,7 @@ namespace Belle2 {
 
     /** For an array containing RelationsObjects, update index and entry cache for entire contents.
      *
-     * You must ensure the array actually contains objects inheriting from RelationObject!
+     * You must ensure the array actually contains objects inheriting from RelationsObject!
      */
     static void updateRelationsObjectCache(StoreEntry& entry);
 

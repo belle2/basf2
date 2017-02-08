@@ -282,6 +282,8 @@ namespace Belle2 {
      */
     void setPdgCode(int pdgCode);
 
+    void setChargeSeed(double charge) { m_q = charge; }
+
     /**
      * set the 6D state seed
      */
@@ -399,6 +401,6 @@ namespace Belle2 {
     double m_qualityIndex;
 
     // last members added: RefereeStatutsBit(5), m_refereeProperties(5) m_iTrackStub(4), m_flightDirection(3), m_sortingParameters (2), m_qualityIndex
-    ClassDef(SpacePointTrackCand, 7)
+    ClassDef(SpacePointTrackCand, 8)
   };
 }

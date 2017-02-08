@@ -72,9 +72,6 @@ namespace Belle2 {
 
     /** sets the name of expected StoreArray with SpacePointTrackCand in it. */
     std::string m_PARAMtcArrayName;
-    /** sets default PDG code for all track candidate in this module. */
-    /** WARNING hardcoded values so far, should be passed by parameter! */
-    int m_PARAMstdPDGCode = 211;
 
     // member variables
 

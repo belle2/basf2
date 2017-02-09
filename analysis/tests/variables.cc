@@ -29,6 +29,7 @@
 
 #include <gtest/gtest.h>
 
+#include <TMatrixFSym.h>
 #include <TRandom3.h>
 #include <TLorentzVector.h>
 #include <TMath.h>
@@ -52,6 +53,16 @@ namespace {
 
     {
       Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
+
+      TMatrixFSym error(7);
+      error.Zero();
+      error(0, 0) = 0.05;
+      error(1, 1) = 0.2;
+      error(2, 2) = 0.4;
+      error(0, 1) = -0.1;
+      error(0, 2) = 0.9;
+      p.setMomentumVertexErrorMatrix(error);
+
       EXPECT_FLOAT_EQ(0.9, particleP(&p));
       EXPECT_FLOAT_EQ(1.0, particleE(&p));
       EXPECT_FLOAT_EQ(0.1, particlePx(&p));
@@ -60,6 +71,15 @@ namespace {
       EXPECT_FLOAT_EQ(0.412310562, particlePt(&p));
       EXPECT_FLOAT_EQ(0.8 / 0.9, particleCosTheta(&p));
       EXPECT_FLOAT_EQ(-1.325817664, particlePhi(&p));
+
+      EXPECT_FLOAT_EQ(0.737446378, particlePErr(&p));
+      EXPECT_FLOAT_EQ(sqrt(0.05), particlePxErr(&p));
+      EXPECT_FLOAT_EQ(sqrt(0.2), particlePyErr(&p));
+      EXPECT_FLOAT_EQ(sqrt(0.4), particlePzErr(&p));
+      EXPECT_FLOAT_EQ(0.488093530, particlePtErr(&p));
+      EXPECT_FLOAT_EQ(0.156402664, particleCosThetaErr(&p));
+      EXPECT_FLOAT_EQ(0.263066820, particlePhiErr(&p));
+
 
       {
         UseReferenceFrame<CMSFrame> dummy;
@@ -71,6 +91,8 @@ namespace {
         EXPECT_FLOAT_EQ(0.40426421, particlePt(&p));
         EXPECT_FLOAT_EQ(0.80522972, particleCosTheta(&p));
         EXPECT_FLOAT_EQ(-1.4254233, particlePhi(&p));
+
+        EXPECT_FLOAT_EQ(sqrt(0.2), particlePyErr(&p));
       }
 
       {
@@ -81,6 +103,7 @@ namespace {
         EXPECT_ALL_NEAR(0.0, particlePy(&p), 1e-9);
         EXPECT_ALL_NEAR(0.0, particlePz(&p), 1e-9);
         EXPECT_ALL_NEAR(0.0, particlePt(&p), 1e-9);
+
       }
 
       {
@@ -93,6 +116,14 @@ namespace {
         EXPECT_FLOAT_EQ(0.412310562, particlePt(&p));
         EXPECT_FLOAT_EQ(0.8 / 0.9, particleCosTheta(&p));
         EXPECT_FLOAT_EQ(-1.325817664, particlePhi(&p));
+
+        EXPECT_FLOAT_EQ(0.737446378, particlePErr(&p));
+        EXPECT_FLOAT_EQ(sqrt(0.05), particlePxErr(&p));
+        EXPECT_FLOAT_EQ(sqrt(0.2), particlePyErr(&p));
+        EXPECT_FLOAT_EQ(sqrt(0.4), particlePzErr(&p));
+        EXPECT_FLOAT_EQ(0.488093530, particlePtErr(&p));
+        EXPECT_FLOAT_EQ(0.156402664, particleCosThetaErr(&p));
+        EXPECT_FLOAT_EQ(0.263066820, particlePhiErr(&p));
       }
 
       {

@@ -12,6 +12,7 @@
 
 #include <framework/datastore/RelationsObject.h>
 #include <vector>
+#include <array>
 #include <string>
 
 namespace Belle2 {
@@ -54,6 +55,7 @@ namespace Belle2 {
                    unsigned flags,
                    unsigned referenceASIC,
                    unsigned segmentASIC,
+                   std::array<unsigned short, 4> windows,
                    unsigned electronicType,
                    std::string electronicName,
                    const std::vector<short>& data):
@@ -69,6 +71,7 @@ namespace Belle2 {
       m_flags = flags;
       m_referenceASIC = referenceASIC;
       m_segmentASIC = segmentASIC;
+      m_windows = windows;
       m_electronicType = electronicType;
     }
 
@@ -164,6 +167,14 @@ namespace Belle2 {
     unsigned getReferenceWindow() const { return m_referenceASIC; }
 
     /**
+     * bad hack
+     * This corresponds to the last window in the analog memory sampled.
+     * All timing is a "look-back" from this window.
+     * @return reference window number
+     */
+    std::array<unsigned short, 4> getReferenceWindows() const { return m_windows; }
+
+    /**
      * Returns IRS analog storage window this waveform was taken from.
      * @return segment window number
      */
@@ -238,6 +249,7 @@ namespace Belle2 {
     unsigned short m_flags = 0;         /**< event flags (bits 0:7) */
     unsigned short m_referenceASIC = 0; /**< reference ASIC window */
     unsigned short m_segmentASIC = 0;   /**< segment ASIC window (storage window) */
+    std::array<unsigned short, 4> m_windows;
     std::vector<short> m_data;  /**< waveform ADC values */
     unsigned m_electronicType = 0;      /**< electronic type (see ChannelMapper::EType) */
     std::string m_electronicName;   /**< electronic name */

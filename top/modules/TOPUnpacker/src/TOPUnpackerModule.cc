@@ -30,6 +30,8 @@
 #include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPSlowData.h>
 
+
+
 using namespace std;
 
 namespace Belle2 {
@@ -290,6 +292,7 @@ namespace Belle2 {
     unsigned short scrodID = word & 0x0FFF;
     word = array.getWord(); // header word 1 (what it contains?)
 
+
     while (array.getRemainingWords() > 15) {
 
       unsigned header = array.getWord(); // word 0
@@ -308,6 +311,7 @@ namespace Belle2 {
       }
 
       word = array.getWord(); // word 2 (what it contains?)
+      unsigned lastWrAddr = word & 0xFF;
 
       // feature-extracted data (positive signal)
       word = array.getWord(); // word 3
@@ -372,6 +376,9 @@ namespace Belle2 {
       unsigned short asic = (word >> 12) & 0x03;
       unsigned short asicChannel = (word >> 9) & 0x07;
       unsigned short window = word & 0x1FF;
+      unsigned carrier_asic_channel_window = word;
+
+
       if (window != convertedAddr)
         B2ERROR("TOPUnpacker: Type2or3Ver1 - window numbers differ " << window <<
                 " " << convertedAddr);
@@ -415,9 +422,19 @@ namespace Belle2 {
         digits.push_back(digit);
       }
 
+      //reading out all four window addresses, to be for correcnt alignment of individual readout windows in written waveform
+      std::array<unsigned short, 4> windows;
+      windows.at(0) = window;
+
       word = array.getWord(); // word 20
+      windows.at(1) = word & 0x1FF;
+
       word = array.getWord(); // word 21
+      windows.at(2) = word & 0x1FF;
+
       word = array.getWord(); // word 22
+      windows.at(3) = word & 0x1FF;
+
 
       int numWords = 4 * 32; // (numPoints + 1) / 2;
       if (array.getRemainingWords() < numWords) {
@@ -451,9 +468,8 @@ namespace Belle2 {
       int pixelID = mapper.getPixelID(channel);
 
       // store to raw waveforms
-      unsigned lastWriteAddr = 0; // not important, but maybe available somewhere?
       auto* waveform = waveforms.appendNew(moduleID, pixelID, channel, scrodID, 0,
-                                           0, 0, lastWriteAddr, window,
+                                           0, 0, lastWrAddr, carrier_asic_channel_window, windows,
                                            mapper.getType(), mapper.getName(), adcData);
       waveform->setPedestalSubtractedFlag(pedestalSubtracted);
 
@@ -520,8 +536,10 @@ namespace Belle2 {
           unsigned data = array.getWord();
           wfdata.push_back(data & 0xFFFF);
         }
+
+        std::array<unsigned short, 4> windows;
         waveforms.appendNew(moduleID, pixelID, channel, scrod, freezeDate,
-                            triggerType, flags, referenceASIC, segmentASIC,
+                            triggerType, flags, referenceASIC, segmentASIC, windows,
                             mapper.getType(), mapper.getName(), wfdata);
       } // iseg
     } // k
@@ -584,8 +602,10 @@ namespace Belle2 {
           int pixelID = mapper.getPixelID(channel);
           unsigned segmentASIC = convertedAddr + (chan << 9) + (carrier << 12) +
                                  (asic << 14);
+
+          std::array<unsigned short, 4> windows;
           waveforms.appendNew(moduleID, pixelID, channel, scrod, 0,
-                              trigPattern, 0, lastWriteAddr, segmentASIC,
+                              trigPattern, 0, lastWriteAddr, segmentASIC, windows,
                               mapper.getType(), mapper.getName(), wfdata);
         } // chan
       } // win

@@ -376,7 +376,7 @@ namespace Belle2 {
       unsigned short asic = (word >> 12) & 0x03;
       unsigned short asicChannel = (word >> 9) & 0x07;
       unsigned short window = word & 0x1FF;
-      unsigned carrier_asic_channel_window = word;
+      unsigned carrierAsicChannelWindow = word;
 
 
       if (window != convertedAddr)
@@ -423,17 +423,17 @@ namespace Belle2 {
       }
 
       //reading out all four window addresses, to be for correcnt alignment of individual readout windows in written waveform
-      std::array<unsigned short, 4> windows;
-      windows.at(0) = window;
+      std::vector<unsigned short> windows;
+      windows.push_back(window);
 
       word = array.getWord(); // word 20
-      windows.at(1) = word & 0x1FF;
+      windows.push_back(word & 0x1FF);
 
       word = array.getWord(); // word 21
-      windows.at(2) = word & 0x1FF;
+      windows.push_back(word & 0x1FF);
 
       word = array.getWord(); // word 22
-      windows.at(3) = word & 0x1FF;
+      windows.push_back(word & 0x1FF);
 
 
       int numWords = 4 * 32; // (numPoints + 1) / 2;
@@ -469,7 +469,7 @@ namespace Belle2 {
 
       // store to raw waveforms
       auto* waveform = waveforms.appendNew(moduleID, pixelID, channel, scrodID, 0,
-                                           0, 0, lastWrAddr, carrier_asic_channel_window, windows,
+                                           0, 0, lastWrAddr, carrierAsicChannelWindow, windows,
                                            mapper.getType(), mapper.getName(), adcData);
       waveform->setPedestalSubtractedFlag(pedestalSubtracted);
 
@@ -537,7 +537,7 @@ namespace Belle2 {
           wfdata.push_back(data & 0xFFFF);
         }
 
-        std::array<unsigned short, 4> windows;
+        std::vector<unsigned short> windows;
         waveforms.appendNew(moduleID, pixelID, channel, scrod, freezeDate,
                             triggerType, flags, referenceASIC, segmentASIC, windows,
                             mapper.getType(), mapper.getName(), wfdata);
@@ -603,7 +603,7 @@ namespace Belle2 {
           unsigned segmentASIC = convertedAddr + (chan << 9) + (carrier << 12) +
                                  (asic << 14);
 
-          std::array<unsigned short, 4> windows;
+          std::vector<unsigned short> windows;
           waveforms.appendNew(moduleID, pixelID, channel, scrod, 0,
                               trigPattern, 0, lastWriteAddr, segmentASIC, windows,
                               mapper.getType(), mapper.getName(), wfdata);

@@ -141,6 +141,8 @@ namespace Belle2 {
     std::pair<double, TVector3> tripletFit() { return tripletFit(m_hits); }
 
 
+    std::pair<double, TVector3> riemannHelixFit(const std::vector<PositionInfo*>* hits);
+
     /** does a complete helixFit of the given hits */
     std::pair<double, TVector3> helixFit(std::vector<PositionInfo*> const* hits, bool useBackwards = false,
                                          double setMomentumMagnitude = 0);
@@ -148,10 +150,9 @@ namespace Belle2 {
 
     /** using paper "Helix fitting by an extended Riemann fit" from R. Frühwirth,
      * (Nucl.Instr.and Meth. in Physics Research, A490 (2002), Elsevier) does a
-     * full fit onto a helix and calculates the chi2 value (.first) including
+     * full fit onto a helix and calculates the radius value (.first) and
      * the momentum vector (.second) */
     std::pair<double, TVector3> helixFit() { return helixFit(m_hits); }
-    //Thomas: returns radius (.first) and not chi2. (as of feb 2014) WARNING still the case?
 
 
     /** calculates the momentum vector on first or last hitPosition in the hitVector.

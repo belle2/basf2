@@ -18,6 +18,8 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/math/special_functions/sign.hpp>
 
+#include <Eigen/Dense>
+
 #include <list>
 #include <iostream>
 #include <limits>
@@ -27,9 +29,11 @@
 #include <iomanip>
 #include <utility>
 
-using namespace std;
 using namespace Belle2;
 using boost::math::sign;
+
+// Set precision to be used for Eigen Library
+typedef double Precision;
 
 
 std::pair<TVector3, int> QualityEstimators::calcMomentumSeed(bool useBackwards, double setMomentumMagnitude)
@@ -49,9 +53,11 @@ std::pair<TVector3, int> QualityEstimators::calcMomentumSeed(bool useBackwards, 
   hitC = hitC.Orthogonal();
 
   std::pair<double, TVector3> fitResults;
-
+  fitResults = riemannHelixFit(m_hits);
+  B2WARNING("Riemann CircleFit rho = " << fitResults.first << std::endl);
   try {
     fitResults = helixFit(m_hits, useBackwards, setMomentumMagnitude);
+    B2WARNING("Jakob CircleFit rho = " << fitResults.first << std::endl);
   } catch (FilterExceptions::Straight_Line& anException) {
     B2DEBUG(1, "Exception caught: QualityEstimators::calcMomentumSeed - helixFit said: " << anException.what());
     try {
@@ -112,7 +118,8 @@ std::pair<TVector3, int> QualityEstimators::calcMomentumSeed(bool useBackwards, 
               (*m_hits)[2]->hitPosition.X() << "/" << (*m_hits)[2]->hitPosition.Y() << "/" << (*m_hits)[2]->hitPosition.Z());
     }
   }
-  return make_pair(fitResults.second, signValue); //.first: momentum vector. .second: sign of curvature
+
+  return std::make_pair(fitResults.second, signValue); //.first: momentum vector. .second: sign of curvature
 }
 
 
@@ -284,7 +291,7 @@ std::pair<double, TVector3> QualityEstimators::circleFit(std::vector<PositionInf
   pTVector.SetX(setMomentumMagnitude * cos(beta));
   pTVector.SetY(setMomentumMagnitude * sin(beta));
 
-  return make_pair(chi2, pTVector);
+  return std::make_pair(chi2, pTVector);
 }
 
 
@@ -402,8 +409,87 @@ std::pair<double, TVector3> QualityEstimators::tripletFit(std::vector<PositionIn
   // TODO return real momentum vector?
   TVector3 pTVector(1, 2, 3);
 
-  return make_pair(finalChi2, pTVector);
+  return std::make_pair(finalChi2, pTVector);
 }
+
+
+std::pair<double, TVector3> QualityEstimators::riemannHelixFit(const std::vector<PositionInfo*>* hits)
+{
+  // Based on R. Fruehwirth, A. Strandlie, W. Waltenberger,
+  // Nuclear instruments and Methods in Physics Research A 490 (2002) 366-378
+
+  const int nHits = hits->size();
+
+  // Circle Fit
+
+  Eigen::Matrix<Precision, Eigen::Dynamic, Eigen::Dynamic> W = Eigen::Matrix<Precision, Eigen::Dynamic, Eigen::Dynamic>::Zero(nHits,
+      nHits);
+  Eigen::Matrix<Precision, Eigen::Dynamic, 3> X = Eigen::Matrix<Precision, Eigen::Dynamic, 3>::Zero(nHits, 3);
+  Precision traceOfW = 0.;
+
+  short index = 0;
+  for (PositionInfo* hit : *hits) {
+    double x = hit->hitPosition.X();
+    double y = hit->hitPosition.Y();
+    double z = hit->hitPosition.Z();
+    double sigmaX = hit->hitSigma.X();
+    double sigmaY = hit->hitSigma.Y();
+    double sigmaZ = hit->hitSigma.Z();
+
+    double r2 = x * x + y * y;
+    double inverseVarianceXY = 1. / sqrt(sigmaX * sigmaX + sigmaY * sigmaY);
+
+    // The following weight matrix W can be improved for cases with multiple scattering
+    // by adding a correction term which will make the matrix non-diagonal.
+    // However, this requires prior knowledge of the curvature of the track and thus a
+    // second iteration (see page 368 of above mentioned source).
+    W(index, index) = inverseVarianceXY;
+    traceOfW += inverseVarianceXY;
+
+    X(index, 0) = x;
+    X(index, 1) = y;
+    X(index, 2) = r2;
+
+    index++;
+  }
+
+  Eigen::Matrix<Precision, 1, 3> xBar = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits, 1).transpose() * W * X / traceOfW;
+  Eigen::Matrix<Precision, 3, 3> Vx = X.transpose() * W * X - xBar.transpose() * xBar * traceOfW;
+
+  // Find eigenvector to smallest eigenvalue
+  Eigen::EigenSolver<Eigen::Matrix<Precision, 3, 3>> eigencollection(Vx);
+  Eigen::Matrix<Precision, 3, 1> eigenvalues = eigencollection.eigenvalues().real();
+  Eigen::Matrix<std::complex<Precision>, 3, 3> eigenvectors = eigencollection.eigenvectors();
+  Eigen::Matrix<Precision, 3, 1>::Index minRow, minCol;
+  auto val = eigenvalues.minCoeff(&minRow, &minCol);
+
+  Eigen::Matrix<Precision, 3, 1> n = eigenvectors.col(minRow).real();
+
+  // Calculate results with this eigenvector
+  Precision c = - xBar * n;
+  Precision x0 = - 0.5 * n(0) / n(2);
+  Precision y0 = - 0.5 * n(1) / n(2);
+  Precision rho2 = (1 - n(2) * (n(2) + 4 * c)) / (4 * n(2) * n(2));
+  Precision rho = sqrt(rho2);
+
+  // Calculation of 3 different versions of a distance d for Chi Squared calculation
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> d = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits, 1) * c + X * n;
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> d_trans = (d + d.cwiseProduct(X.col(2))) / sqrt(1 - n(2) * n(2));
+
+  // Calculate Chi Squared for circle fit
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> d_over_sigma = W * d_trans;
+  Precision chi2 = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits,
+                   1).transpose() * (d_over_sigma.cwiseProduct(d_over_sigma));
+  std::cout << "Chi Squared of Riemann Circle fit = " << chi2 << std::endl;
+
+  // Line Fit for extension to Helix Fit
+
+
+
+
+  return std::make_pair(rho, TVector3(1.0, 1.0, 1.0));
+}
+
 
 
 
@@ -550,7 +636,7 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
 
   double rho = sqrt((1. - n3 * n3 - 4.*distanceOfPlane * n3) * (a * a));
 
-  B2DEBUG(25, "helixFit: circle: origin x: " << xc << ", y: " << yc << ", radius: " << rho  << endl);
+  B2DEBUG(25, "helixFit: circle: origin x: " << xc << ", y: " << yc << ", radius: " << rho  << std::endl);
 
   /// line fit:
   TMatrixD H = distanceOfPlane + R2 * n3; // temporary value
@@ -762,7 +848,7 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
   if (std::isnan(rho) == true or lambdaCheckVector4NAN(pVector) == true) {
     throw FilterExceptions::Invalid_result_Nan();
   }
-  return make_pair(rho, pVector);
+  return std::make_pair(rho, pVector);
 }
 
 
@@ -787,8 +873,8 @@ bool QualityEstimators::CalcCurvature()
 }
 
 
-pair<double, TVector3> QualityEstimators::simpleLineFit3D(const vector<PositionInfo*>* hits, bool useBackwards,
-                                                          double setMomentumMagnitude)
+std::pair<double, TVector3> QualityEstimators::simpleLineFit3D(const std::vector<PositionInfo*>* hits, bool useBackwards,
+    double setMomentumMagnitude)
 {
   /** Testbeam:
    * Coords:   Sensors:
@@ -877,13 +963,13 @@ pair<double, TVector3> QualityEstimators::simpleLineFit3D(const vector<PositionI
 
   if (setMomentumMagnitude != 0) { directionVector = setMomentumMagnitude * directionVector.Unit(); } // means we want to set the magnitude of the momentum artificially
 
-  return make_pair(chi2, directionVector);
+  return std::make_pair(chi2, directionVector);
 }
 
 
 std::string QualityEstimators::printHits(const std::vector<PositionInfo*>* hits) const
 {
-  stringstream hitX, hitY, hitZ, sigmaX, sigmaY, sigmaZ;
+  std::stringstream hitX, hitY, hitZ, sigmaX, sigmaY, sigmaZ;
   hitX << "xPos: ";
   hitY << "yPos: ";
   hitZ << "zPos: ";

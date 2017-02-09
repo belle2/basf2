@@ -179,25 +179,13 @@ namespace Belle2 {
      * Returns ASIC number
      * @return ASIC number
      */
-    unsigned getASICNumber() const { return ((m_segmentASIC >> 14) & 0x0003);}
+    unsigned getASICNumber() const { return ((m_segmentASIC >> 12) & 0x0003);}
 
     /**
      * Returns carrier board number
      * @return carrier number
      */
-    unsigned getCarrierNumber() const { return ((m_segmentASIC >> 12) & 0x0003);}
-
-    /**
-     * Returns ASIC row (IRS3B naming convention)
-     * @return row number
-     */
-    unsigned getASICRow() const { return getCarrierNumber();}
-
-    /**
-     * Returns ASIC column (IRS3B naming convention)
-     * @return column number
-     */
-    unsigned getASICCol() const { return getASICNumber();}
+    unsigned getCarrierNumber() const { return ((m_segmentASIC >> 14) & 0x0003);}
 
     /**
      * Returns type of electronic used to measure this waveform
@@ -249,4 +237,3 @@ namespace Belle2 {
 
 
 } // end namespace Belle2
-

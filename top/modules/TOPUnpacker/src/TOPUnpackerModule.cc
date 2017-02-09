@@ -447,13 +447,14 @@ namespace Belle2 {
 
       // determine hardware channel and pixelID (valid only if feemap available!)
       const auto& mapper = m_topgp->getChannelMapper();
-      unsigned channel = mapper.getChannel(boardstack, carrier, asic, asicChannel);
+      unsigned channel = mapper.isValid()
+                         ? mapper.getChannel(boardstack, carrier, asic, asicChannel)
+                         : asicChannel;
       int pixelID = mapper.getPixelID(channel);
 
       // store to raw waveforms
-      unsigned lastWriteAddr = 0; // not important, but maybe available somewhere?
       auto* waveform = waveforms.appendNew(moduleID, pixelID, channel, scrodID, 0,
-                                           0, 0, lastWriteAddr, window,
+                                           0, 0, window, word,
                                            mapper.getType(), mapper.getName(), adcData);
       waveform->setPedestalSubtractedFlag(pedestalSubtracted);
 
@@ -504,8 +505,8 @@ namespace Belle2 {
       for (int iseg = 0; iseg < numofSegments; iseg++) {
         unsigned segmentASIC = array.getWord();
         unsigned chan = (segmentASIC >> 9) & 0x0007;
-        unsigned asic = (segmentASIC >> 14) & 0x0003; // called also asicCol
-        unsigned carrier = (segmentASIC >> 12) & 0x0003; // called also asicRow
+        unsigned asic = (segmentASIC >> 12) & 0x0003; // called also asicCol
+        unsigned carrier = (segmentASIC >> 14) & 0x0003; // called also asicRow
         unsigned channel = mapper.getChannel(boardstack, carrier, asic, chan);
         int pixelID = mapper.getPixelID(channel);
 
@@ -606,4 +607,3 @@ namespace Belle2 {
 
 
 } // end Belle2 namespace
-

@@ -33,15 +33,17 @@ void TOPDataQualityPlotterModule::defineHisto()
   m_samples = new TH1F("ADCvalues", "ADC values ", 100, -50, 50);
   m_samples->GetXaxis()->SetTitle("ADC Value");
   m_samples->GetYaxis()->SetTitle("Number of Samples");
-  m_hitmap = new TH2F("Hitmap", "carrier vs. row", 4, 0, 4, 4, 0, 4);
+  m_hitmap = new TH2F("Hitmap", "carrier vs. asic", 4, 0, 4, 4, 0, 4);
   m_scrod_id = new TH1F("scrodID", "scrodID", 100, 0, 100);
-  m_asic_row = new TH1F("asicRow", "asic row", 4, 0, 4);
-  m_asic_col = new TH1F("asicCol", "asic col", 4, 0, 4);
+  m_asic = new TH1F("IRSX", "IRSX", 4, 0, 4);
+  m_carrier = new TH1F("asicCol", "asic col", 4, 0, 4);
   m_asic_ch = new TH1F("asicCh", "channel", 8, 0, 8);
   m_errorFlag = new TH1F("errorFlag", "errorFlag", 1000, 0, 1000);
   m_flag = new TH1F("flag", "parser flag", 4, 0, 4);
   m_asic_win = new TH1F("window", "window", 4, 0, 4);
   m_entries = new TH1F("entries", "entries", 100, 0, 2600);
+  m_moduleID = new TH1F("moduleID", "moduleID", 16, 1, 17);
+  m_pixelID = new TH1F("pixelID", "pixelID", 512, 1, 513);
   oldDir->cd();
 }
 
@@ -65,10 +67,12 @@ void TOPDataQualityPlotterModule::basicDebuggingPlots(TOPRawWaveform* rawwave)
 {
   m_scrod_id->Fill(rawwave->getScrodID());
   m_asic_ch->Fill(rawwave->getASICChannel());
-  m_asic_row->Fill(rawwave->getASICRow());
-  m_asic_col->Fill(rawwave->getASICNumber());
+  m_asic->Fill(rawwave->getASICNumber());
+  m_carrier->Fill(rawwave->getCarrierNumber());
   m_asic_win->Fill(rawwave->getStorageWindow());
   m_entries->Fill(rawwave->getWaveform().size());
+  m_moduleID->Fill(rawwave->getModuleID());
+  m_pixelID->Fill(rawwave->getPixelID());
 }
 
 void

@@ -4,7 +4,6 @@
 # ---------------------------------------------------------------------------------------
 # Display of waveforms with feature extraction points superimposed
 # Unpacker is set for Interim FE format v2.1
-# Usage: basf2 showFEWaveforms.py -i <file_name.sroot>
 # ---------------------------------------------------------------------------------------
 
 # avoid race conditions beetween pyroot and GUI thread
@@ -15,6 +14,18 @@ from basf2 import *
 import sys
 from ROOT import Belle2
 from ROOT import TH1F, TCanvas, TGraph
+
+import argparse
+parser = argparse.ArgumentParser(description='Go through a data file, apply calibration, and write the waveforms to a root file.',
+                                 usage='%(prog)s [options]')
+
+# parser.add_argument(
+#     '--inputRun',
+#     metavar='InputRun',
+#     required=True,
+#     help='the name for the input data files.')
+#
+args = parser.parse_args()
 
 set_log_level(LogLevel.INFO)
 

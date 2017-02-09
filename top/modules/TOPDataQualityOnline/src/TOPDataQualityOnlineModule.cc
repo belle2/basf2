@@ -89,7 +89,7 @@ namespace Belle2 {
     if (scrodid == 0) {
       return;
     }
-    int asicid = v.getASICRow() + 4 * v.getASICCol();
+    int asicid = v.getASICNumber() + 4 * v.getCarrierNumber();
     if (m_channelLabels[scrodid].find(asicid) == m_channelLabels[scrodid].end()) {
       string gname = string("channels") + to_string(scrodid) + string("_") + to_string(asicid);
       m_channels[scrodid].insert(make_pair(asicid, new TMultiGraph(gname.c_str(), gname.c_str())));

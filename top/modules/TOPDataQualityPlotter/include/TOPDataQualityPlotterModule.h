@@ -34,13 +34,16 @@ namespace Belle2 {
     TH1F* m_samples;//Plot all ADC sample values.
     TH2F* m_hitmap;
     TH1F* m_scrod_id;
-    TH1F* m_asic_row;
-    TH1F* m_asic_col;
+    TH1F* m_asic;
+    TH1F* m_carrier;
     TH1F* m_asic_ch;
     TH1F* m_errorFlag;
     TH1F* m_flag;
     TH1F* m_asic_win;
     TH1F* m_entries;
+    TH1F* m_moduleID;
+    TH1F* m_pixelID;
+
     StoreArray<TOPRawWaveform> m_waveform;
     std::map<topcaf_channel_id_t, TH1F*> m_channelNoiseMap; // histogram of the values after correction;
     std::map<topcaf_channel_id_t, int> m_channelEventMap; // to find in which chunk a given channel is

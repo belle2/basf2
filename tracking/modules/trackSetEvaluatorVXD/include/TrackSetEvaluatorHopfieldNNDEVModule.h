@@ -15,7 +15,6 @@
 #include <tracking/trackFindingVXD/trackSetEvaluator/OverlapNetwork.h>
 #include <tracking/trackFindingVXD/trackSetEvaluator/OverlapResolverNodeInfo.h>
 
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/Module.h>
@@ -57,35 +56,13 @@ namespace Belle2 {
       m_overlapNetworks.isRequired(m_PARAMtcNetworkName);
     }
 
-    /** set up for the begin of the run. */
-    virtual void beginRun() override final { InitializeCounters(); }
-
-    /** Applies the Hopfield neural network algorithm at given sets of TCs. */
+    /** Applies the Hopfield neural network algorithm at given sets of SpacePointTrackCandidates. */
     virtual void event() override final;
 
-    /** End run clean up. */
+    /** Report on performance. */
     virtual void endRun() override final;
 
-    /** initialize variables to avoid nondeterministic behavior TODO check if still needed! */
-    void InitializeCounters();
-
-
-    /** Convert data to be readable for the HNN. */
-    std::vector<OverlapResolverNodeInfo> convertOverlappingNetwork();
-
-    /** Hopfield neural network function, returns true if it was successful.
-     *
-     * Algorithm:
-     * Neural network of Hopfield type as described in:
-     * R. Frühwirth, “Selection of optimal subsets of tracks with a feedback neural network,”
-     * C omput.Phys.Commun., vol. 78, pp. 23–28, 1993.*
-     */
-//    bool doHopfield(std::vector<TcInfo4Hopfield>& tcs, double omega = 0.5);
-    bool doHopfield(std::vector<OverlapResolverNodeInfo>& tcs);
-
-
   private:
-
     /** ************************************** Module Parameters ************************************************ */
 
     /** sets the name of expected StoreArray with SpacePointTrackCand in it. */
@@ -103,24 +80,15 @@ namespace Belle2 {
     StoreArray<OverlapNetwork> m_overlapNetworks;
 
     /** knows current event number. */
-    unsigned int m_eventCounter;
+    unsigned int m_eventCounter       = 0;
 
     /** total number of TCs evaluated so far. */
-    unsigned int m_nTCsTotal;
-
-    /** number of clean TCs in total spTC-network before cleaning it. */
-    unsigned int m_nTCsCleanAtStart;
-
-    /** number of overlapping TCs so far. */
-    unsigned int m_nTCsOverlapping;
+    unsigned int m_nTCsTotal          = 0;
 
     /** number of TCs found for final sets of non-overlapping TCs so far. */
-    unsigned int m_nFinalTCs;
-
-    /** number of TCs rejected for final sets of non-overlapping TCs so far. */
-    unsigned int m_nRejectedTCs;
+    unsigned int m_nFinalTCs          = 0;
 
     /** counts number of times when Hopfield was not able to clean overlaps. */
-    unsigned int m_nHopfieldFails;
+    unsigned int m_nHopfieldFails     = 0;
   };
 }

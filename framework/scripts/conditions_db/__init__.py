@@ -82,7 +82,7 @@ class ConditionsDB:
                     method=method, url=url,
                     code=response["code"],
                     reason=response["reason"],
-                    message=response["message"],
+                    message=response.get("message", ""),
                 )
             except json.JSONDecodeError:
                 # seems the reply was not even json

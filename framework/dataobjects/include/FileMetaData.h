@@ -110,6 +110,13 @@ namespace Belle2 {
      */
     unsigned int getMcEvents() const {return m_mcEvents;}
 
+    /** Get the database global tag used when creating this file. If more then
+     * one global tag was used by multiple conditions database instances all
+     * are concatenated using ',' as separation. If no conditions database was
+     * used an empty string is returned
+     */
+    std::string getDatabaseGlobalTag() const { return m_databaseGlobalTag; }
+
     /** Setter for LFN.
       *
       *  @param lfn The logical file name.
@@ -172,6 +179,13 @@ namespace Belle2 {
      */
     void setMcEvents(unsigned int nEvents) {m_mcEvents = nEvents;}
 
+    /** Set the database global tag used when creating this file. If more then
+     * one global tag was used by multiple conditions database instances all
+     * should be concatenated using ',' as separation. If no conditions
+     * database was used an empty string should be set.
+     */
+    void setDatabaseGlobalTag(const std::string& globalTag) { m_databaseGlobalTag = globalTag; }
+
     /**
      * Exposes methods of the FileMetaData class to Python.
      */
@@ -197,7 +211,7 @@ namespace Belle2 {
      *  @param physicalFileName The physical file name.
      *  @return True if metadata could be written
      */
-    bool write(std::ostream& output, std::string physicalFileName);
+    bool write(std::ostream& output, std::string physicalFileName) const;
 
   private:
 
@@ -233,7 +247,9 @@ namespace Belle2 {
 
     unsigned int m_mcEvents; /**< Number of generated events, 0 for real data.  */
 
-    ClassDefOverride(FileMetaData, 7); /**< Metadata information about a file. */
+    std::string m_databaseGlobalTag; /**< Global tag in the database used for production of this file */
+
+    ClassDefOverride(FileMetaData, 8); /**< Metadata information about a file. */
 
   }; //class
 

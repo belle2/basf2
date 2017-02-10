@@ -11,6 +11,7 @@
 #pragma once
 
 #include <TObject.h>
+#include <math.h>
 
 namespace Belle2 {
 
@@ -34,9 +35,31 @@ namespace Belle2 {
      * Useful constructor
      * @param serialNumber serial number
      */
-    TOPPmtGainPar(const std::string& serialNumber):
+    explicit TOPPmtGainPar(const std::string& serialNumber):
       m_serialNumber(serialNumber)
     {}
+
+    /**
+     * Sets the data for a given PMT channel
+     * @param channel channel number (1-based)
+     * @param constant fitting function constant (gain vs HV)
+     * @param slope fitting function slope (gain vs HV)
+     * @param ratio ratio of gains at B = 1.5 T and B = 0
+     */
+    void setChannelData(unsigned channel, double constant, double slope, double ratio)
+    {
+      channel--;
+      if (channel >= c_NumChannels) return;
+      m_constant[channel] = constant;
+      m_slope[channel] = slope;
+      m_ratio[channel] = ratio;
+    }
+
+    /**
+     * Sets the high voltage at gain of 5x10^5
+     * @param HV high voltage [V]
+     */
+    void setNominalHV(double HV) {m_HV = HV;}
 
     /**
      * Returns PMT serial number
@@ -49,10 +72,10 @@ namespace Belle2 {
      * @param channel channel number (1-based)
      * @return constant
      */
-    float getGainConstant(unsigned channel) const
+    double getConstant(unsigned channel) const
     {
-      if (channel > c_NumChannels) channel = c_numChannels;
       channel--;
+      if (channel >= c_NumChannels) return 0;
       return m_constant[channel];
     }
 
@@ -61,10 +84,10 @@ namespace Belle2 {
      * @param channel channel number (1-based)
      * @return slope
      */
-    float getGainSlope(unsigned channel) const
+    double getSlope(unsigned channel) const
     {
-      if (channel > c_NumChannels) channel = c_numChannels;
       channel--;
+      if (channel >= c_NumChannels) return 0;
       return m_slope[channel];
     }
 
@@ -73,29 +96,58 @@ namespace Belle2 {
      * @param channel channel number (1-based)
      * @return gain ratio
      */
-    float getGainRatio(unsigned channel) const
+    double getRatio(unsigned channel) const
     {
-      if (channel > c_NumChannels) channel = c_numChannels;
       channel--;
+      if (channel >= c_NumChannels) return 0;
       return m_ratio[channel];
     }
 
     /**
-     * Returns nominal HV (corresponding to a gain of 5x10^5)
-     * @return HV
+     * Returns nominal HV (corresponding to a gain of 5x10^5 at B = 0)
+     * @return HV in [V]
      */
-    float getNominalHV() const {return m_HV;}
+    double getNominalHV() const {return m_HV;}
+
+    /**
+     * Returns channel gain at B = 0 for a given high voltage
+     * @param channel channel number (1-based)
+     * @param HV high voltage [V]
+     * @return gain
+     */
+    double getGain0(unsigned channel, double HV) const
+    {
+      channel--;
+      if (channel >= c_NumChannels) return 0;
+      return exp(m_constant[channel] + m_slope[channel] * HV) * 1.0e6;
+    }
+
+    /**
+     * Returns channel gain at B = 1.5 T for a given high voltage
+     * @param channel channel number (1-based)
+     * @param HV high voltage [V]
+     * @return gain
+     */
+    double getGain(unsigned channel, double HV) const
+    {
+      return getGain0(channel, HV) * getRatio(channel);
+    }
+
+    /**
+     * Print the class content
+     */
+    void print() const;
 
 
   private:
 
-    std::string m_serialNumber;          /**< serial number, e.g. JTxxxx */
-    float m_constant[c_NumChannels] = 0; /**< constant */
-    float m_slope[c_NumChannels] = 0;    /**< slope */
-    float m_ratio[c_NumChannels] = 0;    /**< ratio of gains at B = 1.5 T and B = 0 */
-    float m_HV = 0;                      /**< high voltage setting to obtain the gain of 5e5 */
+    std::string m_serialNumber;            /**< serial number, e.g. JTxxxx */
+    float m_constant[c_NumChannels] = {0}; /**< constant */
+    float m_slope[c_NumChannels] = {0};    /**< slope */
+    float m_ratio[c_NumChannels] = {0};    /**< ratio of gains at B = 1.5 T and B = 0 */
+    float m_HV = 0;                        /**< high voltage for the gain of 5x10^5 */
 
-    ClassDef(TOPPmtGainPar, 1); /**< ClassDef */
+    ClassDef(TOPPmtGainPar, 2); /**< ClassDef */
 
   };
 

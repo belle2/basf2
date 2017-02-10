@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="PINDIODE">
+  <Creator library="beast">PINDIODECreator</Creator>
+  <Content>
+    <!-- normally, parameters should be defined with a unit attribute. This
+         enables automatic conversion to the default framework unit --> 
+    <stepSize unit="um">200</stepSize>
+    <!--if we don't supply a unit there can be no conversion but is still valid -->
+    <divisions>32</divisions>
+    <!-- valid values for false are: "", "0", "off", "false" (case
+         insensitive), everything else will be interpreted as true -->
+    <foo>true</foo>
+    <!-- we can also have arrays as parameters which makes it easy to get a
+         number of values as vector<double>.  The numbers can be divided by
+         whitespace, comma or semi-colon -->
+    <bar unit="mm">1 2 3 4 5 6 7 8 9 10 11 12
+    </bar>
+    <CrematGain>1.4</CrematGain>
+    <WorkFunction>4.6</WorkFunction>
+    <FanoFactor>0.1</FanoFactor>
+       
+    <Active>
+      <phase >2</phase>
+      <Material>PINDIODE-Material</Material>
+      <!--
+      <ThetaZ unit="deg">90,90,90,90,90,90,90,90,90,90,90,90</ThetaZ>
+      <Phi unit="deg">0.,90.,180.,-90.,0.,90.,180.,-90.,0.,90.,180.,-90.</Phi>
+      <z unit="cm">280,271,220,150,180,106,-80.00,-160.0,-170.0,-215.,-265,-310</z>
+      <r_pin unit="cm">32.25,31.59,35.65,27.06,26.95,23.45,22.65,25.95,25.95,33.35,41.95,55.95</r_pin>
+      -->
+      <ThetaZ unit="deg">
+      90,90,90,90,
+      <!--90,90,90,90,
+      90,90,90,90,-->
+      90,90,90,90
+      <!--90,90,90,90,
+      90,90,90,90,
+      90,90,90,90
+      90,90,90,90,
+      90,90,90,90
+      90,90,90,90-->
+      </ThetaZ>
+      <Phi unit="deg">
+      0.,90.,180.,-90.,
+      <!--0.,90.,180.,-90.,
+      0.,90.,180.,-90.,-->
+      0.,90.,180.,-90.
+      <!--0.,90.,180.,-90.,
+      0.,90.,180.,-90.
+      0.,90.,180.,-90.
+      0.,90.,180.,-90.,
+      0.,90.,180.,-90.
+      0.,90.,180.,-90.-->
+      </Phi>
+      <z unit="cm">
+	280,280,280,280,
+	<!--271,271,271,271,
+	220,220,220,220,-->
+	150,150,150,150
+    <!--180,180,180,180,
+	106,106,106,106,
+	-90,-90,-90,-90,
+	-150,-150,-150,-150,
+	-190,-190,-190,-190,
+	-216,-216,-216,-216-->
+      </z>
+      <r_pin unit="cm">
+	32.25,32.25,32.25,32.25,
+        <!--31.59,31.59,31.59,31.59,
+	35.65,35.65,35.65,35.65,-->
+	27.00,27.00,27.00,27.00
+    <!--27.00,27.00,27.00,27.00,
+	26.95,26.95,26.95,26.95,
+	22.20,22.20,22.20,22.20
+	25.50,25.50,25.50,25.50,
+	25.50,25.50,25.50,25.50,
+	33.00,33.00,33.00,33.00-->
+      </r_pin>
+    </Active>
+  
+
+  </Content>
+</DetectorComponent>

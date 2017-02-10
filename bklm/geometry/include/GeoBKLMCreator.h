@@ -121,7 +121,7 @@ namespace Belle2 {
       void putChimneyInLayer(G4LogicalVolume*, int);
 
       //! Put the module (and enclosing air gap) into each layer
-      void putModuleInLayer(G4LogicalVolume*, int, int, int, bool, bool);
+      void putModuleInLayer(G4LogicalVolume*, int, int, int, bool, bool, int);
 
       //! Put the RPCs into each detector module's interior (module is itself in an air gap)
       void putRPCsInInterior(G4LogicalVolume*, int, bool);
@@ -189,14 +189,14 @@ namespace Belle2 {
       //! Pointers to solids for iron in each layer [layer-1]
       G4Polyhedra* m_LayerIronSolid[NLAYER];
 
-      //! Pointers to logical volumes for iron in each layer [isFlipped | hasChimney | layer-1]
-      G4LogicalVolume* m_LayerIronLogical[4 * NLAYER];
+      //! Pointers to logical volumes for iron in each layer [side/bottom/top | isFlipped | hasChimney | layer-1]
+      G4LogicalVolume* m_LayerIronLogical[12 * NLAYER];
 
       //! Pointers to solids for air gap in each layer [hasChimney | layer-1]
       G4Box* m_LayerGapSolid[2 * NLAYER];
 
-      //! Pointers to logical volumes for air gap in each layer [isFlipped | hasChimney | layer-1]
-      G4LogicalVolume* m_LayerGapLogical[4 * NLAYER];
+      //! Pointers to logical volumes for air gap in each layer [side/bottom/top | isFlipped | hasChimney | layer-1]
+      G4LogicalVolume* m_LayerGapLogical[12 * NLAYER];
 
       //! Pointers to logical volumes for detector modules in each layer's air gap [hasChimney | layer-1]
       G4LogicalVolume* m_LayerModuleLogical[2 * NLAYER];

@@ -62,6 +62,7 @@ Environment::Environment() :
   m_steering(""),
   m_numberEventsOverride(0),
   m_inputFilesOverride(),
+  m_entrySequencesOverride(),
   m_outputFileOverride(""),
   m_numberProcessesOverride(-1),
   m_logLevelOverride(LogConfig::c_Default),
@@ -71,7 +72,7 @@ Environment::Environment() :
   m_mcEvents(0),
   m_run(-1),
   m_experiment(-1),
-  m_skipNEvents(-1)
+  m_skipNEvents(0)
 {
   // Check for environment variables set by setuprel
   const char* envarReleaseDir = getenv("BELLE2_RELEASE_DIR");

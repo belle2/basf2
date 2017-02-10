@@ -32,10 +32,11 @@ class Full(TrackingValidationRun):
         'UseSVDHits': True,
         'UseCDCHits': True,
     }
-    fit_geometry = "default"
     # tracks will be already fitted by
     # add_tracking_reconstruction finder module set above
     fit_tracks = False
+    # But we need to tell the validation module to use the fit information
+    use_fit_information = True
     use_expert_folder = False
     pulls = True
     resolution = True

@@ -69,6 +69,12 @@ namespace Belle2 {
 
   protected:
 
+    /**
+     * Print the content of the class
+     * @param title title to be printed
+     */
+    void printUnderlined(const std::string& title) const;
+
     static double s_unit; /**< conversion unit for length */
     static std::string s_unitName; /**< conversion unit name */
 

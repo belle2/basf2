@@ -29,6 +29,10 @@ import json
 from contextlib import redirect_stdout
 import ROOT
 
+# avoid root bug
+import signal
+signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+
 parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
 parser.add_argument("-n", "--events", type=int, dest='expected_no_of_events', default=None, help="Expected number of events")
 parser.add_argument("--mcevents", type=int, dest='expected_no_of_mcevents', default=None, help="Expected number of generated events")

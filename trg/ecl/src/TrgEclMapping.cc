@@ -618,13 +618,6 @@ TrgEclMapping::getXtalIdFromTCId(int TCId)
     {8347, 8348, 8349, 8443, 8444, 8445, 8539, 8540, 8541, 8605, 8606, 8669, 8670, 8733, 8734,  0}  // TC Id : 576
   };
 
-  //  XtalId = TC2Xtal[TCId - 1][count - 1];
-
-  // if (XtalId == 0) {
-
-  //   B2ERROR("TrgEclMapping> Input count  is out of bound!!!");
-  // }
-
   return TC2Xtal[TCId - 1];
 }
 int

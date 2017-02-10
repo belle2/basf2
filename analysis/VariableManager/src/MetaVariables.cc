@@ -343,6 +343,95 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr nParticlesInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string listName = arguments[0];
+        auto func = [listName](const Particle * particle) -> double {
+
+          (void) particle;
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to isDaughterOfList");
+
+          return listOfParticles->getListSize();
+
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function isDaughterOfList");
+      }
+    }
+
+    Manager::FunctionPtr isDaughterOfList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() > 0) {
+        auto listNames = arguments;
+        auto func = [listNames](const Particle * particle) -> double {
+          double output = 0;
+
+          for (auto& iListName : listNames)
+          {
+
+            StoreObjPtr<ParticleList> listOfParticles(iListName);
+
+            if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << iListName << " given to isDaughterOfList");
+
+            for (unsigned i = 0; i < listOfParticles->getListSize(); ++i) {
+              Particle* iParticle = listOfParticles->getParticle(i);
+              for (unsigned j = 0; j < iParticle->getNDaughters(); ++j) {
+                if (particle == iParticle->getDaughter(j)) {
+                  output = 1; goto endloop;
+                }
+              }
+            }
+          }
+endloop:
+          return output;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function isDaughterOfList");
+      }
+    }
+
+    Manager::FunctionPtr isGrandDaughterOfList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() > 0) {
+        auto listNames = arguments;
+        auto func = [listNames](const Particle * particle) -> double {
+          double output = 0;
+
+          for (auto& iListName : listNames)
+          {
+
+            StoreObjPtr<ParticleList> listOfParticles(iListName);
+
+            if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << iListName << " given to isGrandDaughterOfList");
+
+            for (unsigned i = 0; i < listOfParticles->getListSize(); ++i) {
+              Particle* iParticle = listOfParticles->getParticle(i);
+              for (unsigned j = 0; j < iParticle->getNDaughters(); ++j) {
+                const Particle* jDaughter = iParticle->getDaughter(j);
+                for (unsigned k = 0; k < jDaughter->getNDaughters(); ++k) {
+
+                  if (particle == jDaughter->getDaughter(k)) {
+                    output = 1; goto endloop;
+                  }
+                }
+              }
+            }
+
+          }
+endloop:
+          return output;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function isGrandDaughterOfList");
+      }
+    }
+
     Manager::FunctionPtr daughterProductOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -920,6 +1009,12 @@ namespace Belle2 {
     REGISTER_VARIABLE("varFor(pdgCode, variable)", varFor,
                       "Returns the value of the variable for the given particle if its abs(pdgCode) agrees with the given one.\n"
                       "E.g. varFor(11, p) returns the momentum if the particle is an electron or a positron.");
+    REGISTER_VARIABLE("nParticlesInList(particleListName)", nParticlesInList,
+                      "Returns number of particles in the given particle List.");
+    REGISTER_VARIABLE("isDaughterOfList(particleListNames)", isDaughterOfList,
+                      "Returns 1 if the given particle is a daughter of at least one of the particles in the given particle Lists.");
+    REGISTER_VARIABLE("isGrandDaughterOfList(particleListNames)", isGrandDaughterOfList,
+                      "Returns 1 if the given particle is a grand daughter of at least one of the particles in the given particle Lists.");
     REGISTER_VARIABLE("daughter(i, variable)", daughter,
                       "Returns value of variable for the i-th daughter."
                       "E.g. daughter(0, p) returns the total momentum of the first daughter.\n"

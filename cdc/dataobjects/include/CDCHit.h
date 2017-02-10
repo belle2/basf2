@@ -14,8 +14,8 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <cdc/dataobjects/WireID.h>
-#include <framework/datastore/RelationsObject.h>
-
+// #include <framework/datastore/RelationsObject.h>
+#include <framework/dataobjects/DigitBase.h>
 
 namespace Belle2 {
   /** Class that is the result of the unpacker in raw data and the result of the Digitizer in simulation.
@@ -27,7 +27,7 @@ namespace Belle2 {
    *  the accumulated ADC count of the charge in the hit cell,<br>
    *  and the WireID.
    */
-  class CDCHit : public RelationsObject {
+  class CDCHit : public DigitBase {
   public:
     /** Empty constructor for ROOT IO. */
     CDCHit() :
@@ -175,6 +175,23 @@ namespace Belle2 {
       return m_adcCount;
     }
 
+
+    /**
+     * Implementation of the base class function.
+     * Enables BG overlay module to identify uniquely the physical channel of this Digit.
+     * @return unique channel ID, the WireID is returned for the CDC.
+     */
+    unsigned int getUniqueChannelID() const {return static_cast<int>(m_eWire);}
+
+    /**
+     * Implementation of the base class function.
+     * Pile-up method.
+     * @param bg BG digit
+     * @return append status
+     */
+    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg);
+
+
   protected:
 
     /** Wire encoding.
@@ -199,7 +216,7 @@ namespace Belle2 {
 
   private:
     /** ROOT Macro.*/
-    ClassDef(CDCHit, 5);
+    ClassDef(CDCHit, 6);
   };
 } // end namespace Belle2
 

@@ -29,15 +29,22 @@ class CDCLegendre(TrackingValidationRun):
     @staticmethod
     def finder_module(path):
         path.add_module('WireHitPreparer')
-        path.add_module('TrackFinderCDCLegendreTracking')
+
+        use_legendre_finder = True
+        if use_legendre_finder:
+            path.add_module('TrackFinderCDCLegendreTracking')
+        else:
+            path.add_module('AxialTrackCreatorHitLegendre')
+
         path.add_module('TrackExporter')
 
-    tracking_coverage = {'UsePXDHits': False,
-                         'UseSVDHits': False,
-                         'UseCDCHits': True,
-                         'UseOnlyAxialCDCHits': True}
+    tracking_coverage = {
+        'UsePXDHits': False,
+        'UseSVDHits': False,
+        'UseCDCHits': True,
+        'UseOnlyAxialCDCHits': True,
+    }
 
-    fit_geometry = None
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE
 

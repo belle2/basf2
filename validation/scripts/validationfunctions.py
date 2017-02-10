@@ -58,6 +58,24 @@ def get_compact_git_hash(repo_folder):
     return current_git_commit
 
 
+def basf2_command_builder(steering_file, parameters, use_multi_processing=True):
+    """
+    This utility function takes the steering file name and other basf2 parameters
+    and returns a list which can be executed via the OS shell for example to
+    subprocess.Popen(params ...)
+    If use_multi_processing is True, the script will be executed in multi-processing
+    mode with only 1 parallel process in order to test if the code also performs
+    as expected in multi-processing mode
+    """
+    cmd_params = ['basf2']
+    if use_multi_processing:
+        cmd_params += ['-p1']
+    cmd_params += [steering_file]
+    cmd_params += parameters
+
+    return cmd_params
+
+
 def available_revisions(work_folder):
     """
     Loops over the results folder and looks for revisions. It then returns an
@@ -171,7 +189,7 @@ def get_validation_folders(location, basepaths, log):
     return results
 
 
-def parse_cmd_line_arguments(isTest=None, tag=None):
+def parse_cmd_line_arguments(isTest=None, tag=None, modes=["local"]):
     """!
     Sets up a parser for command line arguments, parses them and returns the
     arguments.
@@ -189,8 +207,9 @@ def parse_cmd_line_arguments(isTest=None, tag=None):
                         "steering files (for debugging purposes).",
                         action='store_true')
     parser.add_argument("-m", "--mode", help="The mode which will be used for "
-                        "running the validation. Two possible values: 'local', "
-                        "'cluster' or 'cluster-sge'. Default is 'local'",
+                        "running the validation. "
+                        "Possible values: " + str(modes) +
+                        " Default is 'local'",
                         type=str, nargs='?', default='local')
     parser.add_argument("-i", "--intervals", help="Comma seperated list of intervals "
                         "for which to execute the validation scripts. Default is 'nightly'",
@@ -278,7 +297,7 @@ def scripts_in_dir(dirpath, log, ext='*'):
             # If the file has the requested extension, append its full paths to
             # the results
             if current_file.endswith(ext):
-                results.append(root + '/' + current_file)
+                results.append(os.path.join(root, current_file))
 
     # Return our sorted results
     return sorted(results)

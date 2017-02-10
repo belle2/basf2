@@ -333,22 +333,6 @@ double BFieldComponentQuad::getApertureLER(double s) const
   return getAperture(s, m_offset_ap_ler[i]);
 }
 
-/**
- * A simple 3d vector structure
- */
-struct vector3_t {
-  double x; /**< x component */
-  double y; /**< y component */
-  double z; /**< z component */
-
-  /**
-   * get the square of the component transverse to the Z axis
-   *
-   * @return transerse component squared
-   */
-  inline double rho2() const {return x * x + y * y;}
-};
-
 int BFieldComponentQuad::getRange(double s, const ranges_t& r) const
 {
   auto it0 = r.begin() + 1;
@@ -364,40 +348,42 @@ double BFieldComponentQuad::getAperture(double s, std::vector<ApertPoint>::const
   return p1.r + (p2.r - p1.r) / (p2.s - p1.s) * (s - p1.s);
 }
 
-TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
+B2Vector3D BFieldComponentQuad::calculate(const B2Vector3D& point) const
 {
   const double sa = sin(0.0415), ca = cos(0.0415);
   //assume point is given in [cm]
-  TVector3 B(0, 0, 0); //return B;
+  B2Vector3D B(0, 0, 0);
 
-  vector3_t v = {point.x(), point.y(), point.z()};
-  double xc = v.x * ca, zs = v.z * sa, zc = v.z * ca, xs = v.x * sa;
-  vector3_t vh = {(xc - zs), -v.y, -(zc + xs)}; // to the HER beamline frame
-  vector3_t vl = {(xc + zs), -v.y, -(zc - xs)}; // to the LER beamline frame
+  const B2Vector3D& v{point};
+  double xc = v.x() * ca, zs = v.z() * sa, zc = v.z() * ca, xs = v.x() * sa;
+  B2Vector3D vh{(xc - zs), -v.y(), -(zc + xs)}; // to the HER beamline frame
+  B2Vector3D vl{(xc + zs), -v.y(), -(zc - xs)}; // to the LER beamline frame
 
-  double r2h = vh.rho2(), r2l = vl.rho2();
+  double r2h = vh.Perp2(), r2l = vl.Perp2();
 
   if (r2h < r2l) { /* the point is closer to HER*/
     if (r2h < m_maxr2) { /* within max radius */
-      double s = vh.z;
+      double s = vh.z();
       int i = getRange(s, m_ranges_her);
       if (i < 0) return B;
       double r = getAperture(s, m_offset_ap_her[i]);
       if (r2h < r * r) {
         auto kt = m_offset_pp_her[i] + static_cast<unsigned int>(s - m_ranges_her[i + 1].r0);
-        double Bx = kt->getBx(vh.x, vh.y), By = kt->getBy(vh.x, vh.y);
+        double Bx = kt->getBx(vh.x(), vh.y());
+        double By = kt->getBy(vh.x(), vh.y());
         B.SetXYZ(Bx * ca, -By, -Bx * sa); // to the detector frame
       }
     }
   } else {      /* the point is closer to LER*/
     if (r2l < m_maxr2) { /* within max radius */
-      double s = vl.z;
+      double s = vl.z();
       int i = getRange(s, m_ranges_ler);
       if (i < 0) return B;
       double r = getAperture(s, m_offset_ap_ler[i]);
       if (r2l < r * r) {
         auto kt = m_offset_pp_ler[i] + static_cast<unsigned int>(s - m_ranges_ler[i + 1].r0);
-        double Bx = kt->getBx(vl.x, vl.y), By = kt->getBy(vl.x, vl.y);
+        double Bx = kt->getBx(vl.x(), vl.y());
+        double By = kt->getBy(vl.x(), vl.y());
         B.SetXYZ(Bx * ca, -By, Bx * sa); // to the detector frame
       }
     }

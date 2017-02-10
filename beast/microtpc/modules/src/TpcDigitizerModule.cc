@@ -111,8 +111,15 @@ void TpcDigitizerModule::event()
 
   for (const auto& microtpcSimHit : microtpcSimHits) {
     const int detNb = microtpcSimHit.getdetNb();
-    const TVector3 trackPosition = microtpcSimHit.gettkPos();
-    const double T = trackPosition.Z() / 100. - m_TPCCenter[detNb].Z() + m_z_DG / 2.;
+    const TVector3 simHitPosition = microtpcSimHit.gettkPos();
+    TVector3 chipPosition(
+      simHitPosition.X() / 100. - m_TPCCenter[detNb].X(),
+      simHitPosition.Y() / 100. - m_TPCCenter[detNb].Y(),
+      simHitPosition.Z() / 100. - m_TPCCenter[detNb].Z() + m_z_DG / 2.
+    );
+    chipPosition.RotateZ(-m_TPCAngleZ[detNb] * TMath::DegToRad());
+    chipPosition.RotateX(-m_TPCAngleX[detNb] * TMath::DegToRad());
+    const double T = chipPosition.Z();
     if (T < T0[detNb]) {
       T0[detNb] = T;
     }
@@ -144,11 +151,13 @@ void TpcDigitizerModule::event()
     const int trkID = microtpcSimHit.gettkID();
 
     const TVector3 simHitPosition = microtpcSimHit.gettkPos();
-    const TVector3 chipPosition(
+    TVector3 chipPosition(
       simHitPosition.X() / 100. - m_TPCCenter[detNb].X(),
       simHitPosition.Y() / 100. - m_TPCCenter[detNb].Y(),
       simHitPosition.Z() / 100. - m_TPCCenter[detNb].Z() + m_z_DG / 2.
     );
+    chipPosition.RotateZ(-m_TPCAngleZ[detNb] * TMath::DegToRad());
+    chipPosition.RotateX(-m_TPCAngleX[detNb] * TMath::DegToRad());
 
     //If new detector filled the chip
     if (olddetNb != detNb && m_dchip_map.size() > 0 && m_dchip.size() < 20000 && oldtrkID != trkID) {
@@ -678,6 +687,9 @@ void TpcDigitizerModule::getXMLData()
 
     m_TPCCenter.push_back(TVector3(activeParams.getLength("TPCpos_x"), activeParams.getLength("TPCpos_y"),
                                    activeParams.getLength("TPCpos_z")));
+    m_TPCAngleX.push_back(activeParams.getLength("AngleX"));
+    m_TPCAngleZ.push_back(activeParams.getLength("AngleZ"));
+
     m_nTPC++;
   }
   m_LookAtRec = content.getDouble("LookAtRec");

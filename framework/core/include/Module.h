@@ -324,7 +324,7 @@ namespace Belle2 {
     bool hasProperties(unsigned int propertyFlags) const;
 
     /**
-     * Returns true if the module has still unset parameters which the user has to set in the steering file.
+     * Returns true and prints error message if the module has unset parameters which the user has to set in the steering file.
      */
     bool hasUnsetForcedParams() const;
 

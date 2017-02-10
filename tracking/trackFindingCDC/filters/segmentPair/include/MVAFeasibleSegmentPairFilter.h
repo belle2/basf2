@@ -10,32 +10,30 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/segmentPair/BaseSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
-
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
 #include <tracking/trackFindingCDC/filters/segmentPair/BasicSegmentPairVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/SkimmedHitGapSegmentPairVarSet.h>
 
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
+
+#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    using MVAFeasibleSegmentPairVarSet =
+      VariadicUnionVarSet<BasicSegmentPairVarSet, SkimmedHitGapSegmentPairVarSet>;
+
     /// Filter for the constuction of segment pairs based on simple criteria without the common fit.
-    class MVAFeasibleSegmentPairFilter :
-      public MVAFilter<VariadicUnionVarSet<BasicSegmentPairVarSet, SkimmedHitGapSegmentPairVarSet> > {
+    class MVAFeasibleSegmentPairFilter : public MVAFilter<MVAFeasibleSegmentPairVarSet> {
 
     private:
       /// Type of the base class
-      using Super = MVAFilter<VariadicUnionVarSet<BasicSegmentPairVarSet, SkimmedHitGapSegmentPairVarSet> >;
+      using Super = MVAFilter<MVAFeasibleSegmentPairVarSet>;
 
     public:
       /// Constructor initialising the MVAFilter with standard training name for this filter.
-      MVAFeasibleSegmentPairFilter()
-        : Super("trackfindingcdc_FeasibleSegmentPairFilter", 0.004)
-      {
-      }
-
+      MVAFeasibleSegmentPairFilter();
     };
-
   }
 }

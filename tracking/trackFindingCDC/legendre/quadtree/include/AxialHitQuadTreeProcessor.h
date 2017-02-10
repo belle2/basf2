@@ -33,7 +33,6 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCConformalHit;
 
     /** A QuadTreeProcessor for TrackHits */
     class AxialHitQuadTreeProcessor : public QuadTreeProcessorTemplate<unsigned long, float, CDCConformalHit, 2, 2> {
@@ -92,8 +91,7 @@ namespace Belle2 {
        * @param hit hit being checked
        * @return returns true if sinogram of the hit crosses (geometrically) borders of the node
        */
-      bool insertItemInNode(QuadTree* node, CDCConformalHit* hit, unsigned int /*t_index*/,
-                            unsigned int /*r_index*/) const override final
+      bool insertItemInNode(QuadTree* node, CDCConformalHit* hit) const override final
       {
         using Quadlet = std::array< std::array<float, 2>, 2>;
         Quadlet dist_1;
@@ -258,7 +256,7 @@ namespace Belle2 {
             for (ItemType* item : items) {
               if (item->isUsed()) continue;
 
-              if (insertItemInNode(&newQuadTree, item->getPointer(), 0, 0)) {
+              if (insertItemInNode(&newQuadTree, item->getPointer())) {
                 if (twoSidedPhasespace && (newQuadTree.getYMin() < 0.02)  && (newQuadTree.getYMax() < 0.02)) {
                   if (checkDerivative(&newQuadTree, item->getPointer())) {
                     newQuadTree.insertItem(item);
@@ -330,7 +328,7 @@ namespace Belle2 {
 //        quadtreeItemsVector.reserve(hitsVector.size());
         for (ItemType* item : hitsVector) {
           if (item->isUsed()) continue;
-          if (insertItemInNode(quadTree, item->getPointer(), 0, 0)) {
+          if (insertItemInNode(quadTree, item->getPointer())) {
             quadtreeItemsVector.push_back(item);
           }
         }

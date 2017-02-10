@@ -6,6 +6,7 @@ env['LIBS'] = ['framework', 'framework_io', 'mva_dataobjects', 'boost_program_op
 
 env.Append(LIBS = ['NeuroBayesExpertCPP'])
 env.Append(LIBS = ['NeuroBayesTeacherCPP'])
+#env.Append(LIBS = ['NeuroBayesCPPInterface_shared'])
 env.Append(LIBS = ['TMVA','MLP','XMLIO'])
 
 Return('env')

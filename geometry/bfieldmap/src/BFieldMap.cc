@@ -11,8 +11,6 @@
 #include <geometry/bfieldmap/BFieldMap.h>
 #include <framework/logging/Logger.h>
 
-#include <boost/foreach.hpp>
-
 using namespace std;
 using namespace Belle2;
 
@@ -22,31 +20,16 @@ BFieldMap& BFieldMap::Instance()
   return *instance;
 }
 
-const TVector3 BFieldMap::getBField(const TVector3& point)
+void BFieldMap::initialize()
 {
-  TVector3 magFieldVec(0.0, 0.0, 0.0);
-
-  //Check that the point makes sense
-  if (std::isnan(point.X()) || std::isnan(point.Y()) || std::isnan(point.Z())) {
-    B2ERROR("Bfield requested for a position containing NaN, returning field 0");
-    return magFieldVec;
-  }
-
-  //Check if the map has been initialized yet. If not, initialize all components of the map.
   if (!m_isMapInitialized) {
-    BOOST_FOREACH(BFieldComponentAbs * comp, m_components) {
+    for (BFieldComponentAbs* comp : m_components) {
       comp->initialize();
     }
 
     m_isMapInitialized = true;
     B2DEBUG(10, "The magnetic field map has been initialized.");
   }
-
-  //Loop over all magnetic field components and add their magnetic field vectors
-  BOOST_FOREACH(BFieldComponentAbs * comp, m_components) {
-    magFieldVec += comp->calculate(point);
-  }
-  return magFieldVec;
 }
 
 void BFieldMap::clear()
@@ -69,7 +52,7 @@ BFieldMap::~BFieldMap()
 {
   if (m_isMapInitialized) {
     //Delete the magnetic field components by calling their terminate() method and freeing their memory.
-    BOOST_FOREACH(BFieldComponentAbs * comp, m_components) {
+    for (BFieldComponentAbs* comp : m_components) {
       comp->terminate();
       delete comp;
     }

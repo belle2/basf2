@@ -34,7 +34,6 @@ class Cosmics(TrackingValidationRun):
         'UseCDCHits': True,
         'UseOnlyAxialCDCHits': False
         }
-    fit_geometry = None
     pulls = True
     contact = CONTACT
     output_file_name = VALIDATION_OUTPUT_FILE

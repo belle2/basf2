@@ -5,6 +5,8 @@
 #include <analysis/utility/EvtPDLUtil.h>
 #include <analysis/dataobjects/Particle.h>
 
+#include <analysis/utility/AnalysisConfiguration.h>
+
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/logging/Logger.h>
@@ -30,7 +32,8 @@ DecayDescriptor::DecayDescriptor() :
   m_isIgnorePhotons(false),
   m_isIgnoreIntermediate(false),
   m_isInclusive(false),
-  m_isNULL(false)
+  m_isNULL(false),
+  m_isLaconic(false)
 {
 }
 
@@ -41,7 +44,8 @@ DecayDescriptor::DecayDescriptor(const DecayDescriptor& other) :
   m_isIgnorePhotons(other.m_isIgnorePhotons),
   m_isIgnoreIntermediate(other.m_isIgnoreIntermediate),
   m_isInclusive(other.m_isInclusive),
-  m_isNULL(other.m_isNULL)
+  m_isNULL(other.m_isNULL),
+  m_isLaconic(other.m_isLaconic)
 {
 }
 
@@ -63,6 +67,15 @@ bool DecayDescriptor::init(const DecayString& s)
   // The DecayString is a hybrid, it can be
   // a) DecayStringParticleList
   // b) DecayStringDecay
+
+  //Checking variable naming scheme from AnalysisConfiguratin
+  //For example, effect of possible schemes for PX variable
+  //of pi0 from D in decay B->(D->pi0 pi) pi0:
+  //Default: B_D_pi0_PX
+  //"Laconic": pi01_PX
+  if (AnalysisConfiguration::instance()->getTupleStyle() == "Laconic") {
+    m_isLaconic = true;
+  }
 
   bool isInitOK = false;
 
@@ -314,8 +327,10 @@ vector<string> DecayDescriptor::getSelectionNames()
   for (vector<DecayDescriptor>::iterator i = m_daughters.begin(); i != m_daughters.end(); ++i) {
     vector<string> strDaughterNames = i->getSelectionNames();
     int nDaughters = strDaughterNames.size();
-    for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
-      strDaughterNames[iDaughter] = m_mother.getNameSimple() + "_" + strDaughterNames[iDaughter];
+    if (not m_isLaconic) {
+      for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
+        strDaughterNames[iDaughter] = m_mother.getNameSimple() + "_" + strDaughterNames[iDaughter];
+      }
     }
     strNames.insert(strNames.end(), strDaughterNames.begin(), strDaughterNames.end());
   }

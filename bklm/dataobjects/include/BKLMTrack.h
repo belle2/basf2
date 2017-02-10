@@ -121,7 +121,7 @@ namespace Belle2 {
     float m_LocalTrackParamErr[4][4];
 
     //! Needed to make the ROOT object storable
-    ClassDef(BKLMTrack, 0)
+    ClassDef(BKLMTrack, 1)
 
   };
 

@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
-#include <tracking/trackFindingCDC/ca/Relation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 #include <boost/range/iterator_range.hpp>
 
@@ -56,7 +56,7 @@ namespace Belle2 {
       {
         const CDCSegmentTriple* ptrFrom(relation.first);
         const CDCSegmentTriple* ptrTo(relation.second);
-        if (not ptrFrom or not ptrTo) return NAN;
+        if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
         return operator()(*ptrFrom, *ptrTo);
       }
     };

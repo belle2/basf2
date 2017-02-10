@@ -71,7 +71,7 @@ class PackerUnpackerTest(Module):
             # From EKLMDigit
             assert digit.getPlane() == digitUnpacked.getPlane()
             assert digit.getStrip() == digitUnpacked.getStrip()
-            # assert digit.getNPE() == digitUnpacked.getNPE()
+            assert digit.getCharge() == digitUnpacked.getCharge()
 
 main = create_path()
 

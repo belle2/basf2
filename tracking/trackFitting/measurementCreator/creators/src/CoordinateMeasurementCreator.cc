@@ -33,3 +33,5 @@ std::vector<genfit::TrackPoint*> CoordinateMeasurementCreator<HitType, detector>
 template class Belle2::CoordinateMeasurementCreator<RecoHitInformation::UsedCDCHit, Const::CDC>;
 template class Belle2::CoordinateMeasurementCreator<RecoHitInformation::UsedSVDHit, Const::SVD>;
 template class Belle2::CoordinateMeasurementCreator<RecoHitInformation::UsedPXDHit, Const::PXD>;
+template class Belle2::CoordinateMeasurementCreator<RecoHitInformation::UsedBKLMHit, Const::BKLM>;
+template class Belle2::CoordinateMeasurementCreator<RecoHitInformation::UsedEKLMHit, Const::EKLM>;

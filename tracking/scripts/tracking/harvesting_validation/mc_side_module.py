@@ -83,14 +83,14 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
 
             found_det_hit_ids |= det_hit_ids
 
-            if track_match_look_up.isMatchedPRTrackCand(reco_track):
+            if track_match_look_up.isMatchedPRRecoTrack(reco_track):
                 matched_det_hit_ids |= det_hit_ids
 
-            if track_match_look_up.isClonePRTrackCand(reco_track):
+            if track_match_look_up.isClonePRRecoTrack(reco_track):
                 clone_det_hit_ids |= det_hit_ids
 
-            if (track_match_look_up.isGhostPRTrackCand(reco_track) or
-                    track_match_look_up.isBackgroundPRTrackCand(reco_track)):
+            if (track_match_look_up.isGhostPRRecoTrack(reco_track) or
+                    track_match_look_up.isBackgroundPRRecoTrack(reco_track)):
                 fake_det_hit_ids |= det_hit_ids
 
         self.found_det_hit_ids = found_det_hit_ids
@@ -127,11 +127,10 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
     def peel_mc_to_pr_match_info(self, mc_reco_track):
         track_match_look_up = self.track_match_look_up
         return dict(
-            is_matched=track_match_look_up.isMatchedMCTrackCand(mc_reco_track),
-            is_merged=track_match_look_up.isMergedMCTrackCand(mc_reco_track),
-            is_missing=track_match_look_up.isMissingMCTrackCand(mc_reco_track),
+            is_matched=track_match_look_up.isMatchedMCRecoTrack(mc_reco_track),
+            is_merged=track_match_look_up.isMergedMCRecoTrack(mc_reco_track),
+            is_missing=track_match_look_up.isMissingMCRecoTrack(mc_reco_track),
             hit_efficiency=track_match_look_up.getRelatedEfficiency(mc_reco_track),
-            hit_purity=track_match_look_up.getRelatedPurity(mc_reco_track),
         )
 
     def peel_hit_efficiencies_in_all_pr_tracks(self, mc_reco_track):

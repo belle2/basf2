@@ -24,15 +24,15 @@ namespace Belle2 {
       using Super = MCSymmetricFilterMixin<BaseTrackRelationFilter >;
 
     public:
-      /** Constructor also setting the switch ,
+      /**
+       *  Constructor also setting the switch ,
        *  if the reversed version of a track relation (in comparision to MC truth) shall be accepted.
        */
-      MCTrackRelationFilter(bool allowReverse = false) : Super(allowReverse) {}
+      MCTrackRelationFilter(bool allowReverse = false);
 
     public:
       /// Checks if a track relation is a good combination.
       Weight operator()(const CDCTrack& fromTrack, const CDCTrack& toTrack) final;
     };
-
   }
 }

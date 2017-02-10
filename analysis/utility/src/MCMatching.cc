@@ -4,6 +4,8 @@
 // ******************************************************************
 
 #include <analysis/utility/MCMatching.h>
+#include <analysis/utility/AnalysisConfiguration.h>
+
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -203,8 +205,9 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
     // tau -> rho nu, where a the matched mother is  the rho, but we have only a missing resonance and not added a wrong particle.
     auto mother = mcParticle->getMother();
     if (mother and particle->getPDGCode() == mother->getPDG() and getNumberOfDaughtersWithoutNeutrinos(mother) == 1) {
-      if (abs(mother->getPDG()) != 15) {
-        B2WARNING("Special treatment in MCMatching for tau is called for a non-tau particle. Check if you discovered another special case here, or if we have a bug!");
+      if (abs(mother->getPDG()) != 15 and abs(mcParticle->getPDG()) != 15) {
+        B2WARNING("Special treatment in MCMatching for tau is called for a non-tau particle. Check if you discovered another special case here, or if we have a bug! "
+                  << mother->getPDG() << " " << particle->getPDGCode() << " " << mcParticle->getPDG());
       }
       status |= MCErrorFlags::c_MissingResonance;
     } else {
@@ -274,6 +277,26 @@ bool MCMatching::isFSP(int pdg)
 bool MCMatching::isFSR(const MCParticle* p)
 {
   return p->hasStatus(MCParticle::c_IsFSRPhoton);
+}
+
+bool MCMatching::isFSRLegacy(const MCParticle* p)
+{
+  // In older versions of MC MCParticles don't have c_IsFSRPhoton, c_IsISRPhoton or c_ISPHOTOSPhoton bits
+  // properly set. Instead this approximation is used to check if given photon is radiative (physics) photon
+  // or produced by PHOTOS (FSR).
+
+  const MCParticle* mother = p->getMother();
+  if (!mother) {
+    B2ERROR("The hell? why would this gamma not have a mother?");
+    return false; //?
+  }
+
+  int ndaug = mother->getNDaughters();
+  if (ndaug > 2) { // M -> A B (...) gamma is probably FSR
+    return true;
+  } else { // M -> A gamma is probably a decay
+    return false;
+  }
 }
 
 
@@ -348,13 +371,23 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
       if (!isFSP(generatedPDG)) {
         flags |= c_MissingResonance;
       } else if (generatedPDG == 22) { //missing photon
-        if (isFSR(genPart))
-          flags |= c_MissFSR;
-        else if (genPart->hasStatus(MCParticle::c_IsPHOTOSPhoton))
-          flags |= c_MissPHOTOS;
-        else
-          flags |= c_MissGamma;
-
+        if (AnalysisConfiguration::instance()->useLegacyMCMatching()) {
+          if (!(flags & c_MissFSR) or !(flags & c_MissGamma)) {
+            if (isFSRLegacy(genPart)) {
+              flags |= c_MissFSR;
+              flags |= c_MissPHOTOS;
+            } else {
+              flags |= c_MissGamma;
+            }
+          }
+        } else {
+          if (isFSR(genPart))
+            flags |= c_MissFSR;
+          else if (genPart->hasStatus(MCParticle::c_IsPHOTOSPhoton))
+            flags |= c_MissPHOTOS;
+          else
+            flags |= c_MissGamma;
+        }
       } else if (absGeneratedPDG == 12 || absGeneratedPDG == 14 || absGeneratedPDG == 16) { // missing neutrino
         flags |= c_MissNeutrino;
 

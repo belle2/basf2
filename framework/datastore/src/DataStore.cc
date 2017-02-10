@@ -463,7 +463,7 @@ const std::vector<std::string>& DataStore::getArrayNames(const std::string& arra
 }
 
 void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject,
-                            StoreEntry*& toEntry, int& toIndex, double weight)
+                            StoreEntry*& toEntry, int& toIndex, float weight)
 {
   if (!fromObject or !toObject)
     return;
@@ -515,23 +515,24 @@ void DataStore::addRelation(const TObject* fromObject, StoreEntry*& fromEntry, i
   }
 }
 
-std::vector<RelationEntry> DataStore::getRelationsWith(ESearchSide searchSide, const TObject* object, DataStore::StoreEntry*& entry,
-                                                       int& index, const TClass* withClass, const std::string& withName)
+RelationVectorBase DataStore::getRelationsWith(ESearchSide searchSide, const TObject* object, DataStore::StoreEntry*& entry,
+                                               int& index, const TClass* withClass, const std::string& withName)
 {
   if (searchSide == c_BothSides) {
-    std::vector<RelationEntry> result = getRelationsWith(c_ToSide, object, entry, index, withClass, withName);
-    const std::vector<RelationEntry>& fromResult = getRelationsWith(c_FromSide, object, entry, index, withClass, withName);
-    result.insert(result.end(), fromResult.begin(), fromResult.end());
+    auto result = getRelationsWith(c_ToSide, object, entry, index, withClass, withName);
+    const auto& fromResult = getRelationsWith(c_FromSide, object, entry, index, withClass, withName);
+    result.add(fromResult);
     return result;
   }
 
   std::vector<RelationEntry> result;
 
   // get StoreEntry for 'object'
-  if (!findStoreEntry(object, entry, index)) return result;
+  if (!findStoreEntry(object, entry, index)) return RelationVectorBase();
 
   // get names of store arrays to search
   const std::vector<string>& names = getArrayNames(withName, withClass);
+  vector<string> relationNames;
 
   // loop over found store arrays
   for (const std::string& name : names) {
@@ -540,6 +541,8 @@ std::vector<RelationEntry> DataStore::getRelationsWith(ESearchSide searchSide, c
     RelationIndex<TObject, TObject> relIndex(relationsName, c_Event);
     if (!relIndex)
       continue;
+
+    const size_t prevsize = result.size();
 
     //get relations with object
     if (searchSide == c_ToSide) {
@@ -555,9 +558,12 @@ std::vector<RelationEntry> DataStore::getRelationsWith(ESearchSide searchSide, c
           result.emplace_back(fromObject, rel.weight);
       }
     }
+
+    if (result.size() != prevsize)
+      relationNames.push_back(relationsName);
   }
 
-  return result;
+  return RelationVectorBase(entry->name, index, result, relationNames);
 }
 
 RelationEntry DataStore::getRelationWith(ESearchSide searchSide, const TObject* object, DataStore::StoreEntry*& entry, int& index,

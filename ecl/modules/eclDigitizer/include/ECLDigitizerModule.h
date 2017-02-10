@@ -128,6 +128,7 @@ namespace Belle2 {
       /** Module parameters */
       bool m_background;
       bool m_calibration;
+      bool m_inter;
     };
   }//ECL
 }//Belle2

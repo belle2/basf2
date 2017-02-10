@@ -42,6 +42,7 @@ namespace Belle2 {
       shaperdspshift_t _tstride, _toffset, _tzero;
 
       void Sv123_init(double t01, double tb1, double t02, double tb2, double td1, double ts1);
+      void init(const double*, double) __attribute__((noinline));
       void init(const double*) __attribute__((noinline));
 
       double Sv123(const sv123shift_t&) const;
@@ -56,9 +57,10 @@ namespace Belle2 {
     public:
       ShaperDSP_t() { init(_defs); }
       ShaperDSP_t(const std::vector<double>& s) { init(s); }
+      ShaperDSP_t(const std::vector<double>& s, double u) { init(s, u); }
       ~ShaperDSP_t() {}
 
-      void init(const std::vector<double>& s);
+      void init(const std::vector<double>& s, double u = 27.7221);
       double operator()(double) const;
       double operator()(double*, double*);   // TF1 ROOT interface
       void settimestride(double);

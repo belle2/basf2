@@ -27,6 +27,6 @@ const CDCKarimakiFitter& CDCKarimakiFitter::getLineFitter()
 const CDCKarimakiFitter& CDCKarimakiFitter::getNoDriftVarianceFitter()
 {
   static CDCKarimakiFitter noDriftVarianceFitter;
-  noDriftVarianceFitter.setNotUseDriftVariance();
+  noDriftVarianceFitter.setFitVariance(EFitVariance::c_DriftLength);
   return noDriftVarianceFitter;
 }

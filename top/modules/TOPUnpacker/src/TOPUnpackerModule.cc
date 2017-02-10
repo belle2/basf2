@@ -30,6 +30,8 @@
 #include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPSlowData.h>
 
+
+
 using namespace std;
 
 namespace Belle2 {
@@ -62,6 +64,8 @@ namespace Belle2 {
     addParam("outputRawDigitsName", m_outputRawDigitsName,
              "name of TOPRawDigit store array", string(""));
     addParam("swapBytes", m_swapBytes, "if true, swap bytes", false);
+    addParam("dataFormat", m_dataFormat,
+             "data format as defined in top/include/RawDataTypes.h, 0 = auto detect", 0);
 
   }
 
@@ -127,9 +131,12 @@ namespace Belle2 {
         if (bufferSize < 1) continue;
 
         int err = 0;
-        DataArray array(buffer, bufferSize, m_swapBytes);
-        unsigned word = array.getWord();
-        int dataFormat = (word >> 16);
+        int dataFormat = m_dataFormat;
+        if (dataFormat == 0) { // auto detect data format
+          DataArray array(buffer, bufferSize, m_swapBytes);
+          unsigned word = array.getWord();
+          dataFormat = (word >> 16);
+        }
         switch (dataFormat) {
           case static_cast<int>(TOP::RawDataType::c_Type0Ver16):
             unpackType0Ver16(buffer, bufferSize, rawDigits, slowData);
@@ -281,85 +288,104 @@ namespace Belle2 {
     }
 
     DataArray array(buffer, bufferSize, m_swapBytes);
+    unsigned word = array.getWord(); // header word 0
+    unsigned short scrodID = word & 0x0FFF;
+    word = array.getWord(); // header word 1 (what it contains?)
 
-    unsigned word = 0;
-    while (array.getRemainingWords() > 21) {
 
-      word = array.getWord(); // word 0 (header with Type/Version)
-      if ((word & 0xFFFF) != 0xAAAA) {
-        B2ERROR("TOPUnpacker: corrupted data for Type2or3Ver1 - no 0xAAAA in header word");
+    while (array.getRemainingWords() > 15) {
+
+      unsigned header = array.getWord(); // word 0
+      if (header != 0xaaaa0103 and header != 0xaaaa0100) {
+        B2ERROR("TOPUnpacker: corrupted data - invalid FE header word");
         return array.getRemainingWords();
       }
 
       word = array.getWord(); // word 1
-      unsigned short convertedAddr = word & 0x1FF;
-      unsigned short scrodID = (word >> 9) & 0x7F;
+      unsigned short ScrodID = word >> 25;
+      unsigned short convertedAddr = (word >> 16) & 0x1FF;
+      if (ScrodID != scrodID) {
+        B2ERROR("TOPUnpacker: corrupted data - scrodID's differ " << scrodID << " "
+                << ScrodID);
+        return array.getRemainingWords();
+      }
 
-      word = array.getWord(); // word 2
-      // not clear where to find carrier, asic and channel numbers for FE data
-      // should be in word 1 or 2
+      word = array.getWord(); // word 2 (what it contains?)
+      unsigned lastWrAddr = word & 0xFF;
 
       // feature-extracted data (positive signal)
       word = array.getWord(); // word 3
       word = array.getWord(); // word 4
-      short samplePeak_p = (word >> 16) & 0xFFFF;
-      short valuePeak_p = word & 0xFFFF;
+      short samplePeak_p = word & 0xFFFF;
+      short valuePeak_p = (word >> 16) & 0xFFFF;
 
       word = array.getWord(); // word 5
-      short sampleRise_p = (word >> 16) & 0xFFFF;
-      short valueRise0_p = word & 0xFFFF;
+      short sampleRise_p = word & 0xFFFF;
+      short valueRise0_p = (word >> 16) & 0xFFFF;
 
       word = array.getWord(); // word 6
-      short valueRise1_p = (word >> 16) & 0xFFFF;
-      short sampleFall_p = word & 0xFFFF;
+      short valueRise1_p = word & 0xFFFF;
+      short sampleFall_p = (word >> 16) & 0xFFFF;
 
       word = array.getWord(); // word 7
-      short valueFall0_p = (word >> 16) & 0xFFFF;
-      short valueFall1_p = word & 0xFFFF;
+      short valueFall0_p = word & 0xFFFF;
+      short valueFall1_p = (word >> 16) & 0xFFFF;
 
       word = array.getWord(); // word 8
-      short integral_p = (word >> 16) & 0xFFFF;
-      short qualityFlags_p = word & 0xFFFF;
+      short integral_p = word & 0xFFFF;
+      //      short qualityFlags_p = (word >> 16) & 0xFFFF;
 
       // feature-extracted data (negative signal)
       word = array.getWord(); // word 9
       word = array.getWord(); // word 10
-      short samplePeak_n = (word >> 16) & 0xFFFF;
-      short valuePeak_n = word & 0xFFFF;
+      short samplePeak_n = word & 0xFFFF;
+      short valuePeak_n = (word >> 16) & 0xFFFF;
 
       word = array.getWord(); // word 11
-      short sampleRise_n = (word >> 16) & 0xFFFF;
-      short valueRise0_n = word & 0xFFFF;
+      short sampleRise_n = word & 0xFFFF;
+      short valueRise0_n = (word >> 16) & 0xFFFF;
 
       word = array.getWord(); // word 12
-      short valueRise1_n = (word >> 16) & 0xFFFF;
-      short sampleFall_n = word & 0xFFFF;
+      short valueRise1_n = word & 0xFFFF;
+      short sampleFall_n = (word >> 16) & 0xFFFF;
 
       word = array.getWord(); // word 13
-      short valueFall0_n = (word >> 16) & 0xFFFF;
-      short valueFall1_n = word & 0xFFFF;
+      short valueFall0_n = word & 0xFFFF;
+      short valueFall1_n = (word >> 16) & 0xFFFF;
 
       word = array.getWord(); // word 14
-      short integral_n = (word >> 16) & 0xFFFF;
-      short qualityFlags_n = word & 0xFFFF;
+      short integral_n = word & 0xFFFF;
+      //      short qualityFlags_n = (word >> 16) & 0xFFFF;
+
+      // magic word
+      word = array.getWord(); // word 15
+      if (word != 0x7473616c) {
+        B2ERROR("TOPUnpacker: corrupted data - no magic word at the end of FE header");
+        return array.getRemainingWords();
+      }
+
+      if (header != 0xaaaa0103) continue;
 
       // waveform header
-      word = array.getWord(); // word 15
       word = array.getWord(); // word 16
       word = array.getWord(); // word 17
       word = array.getWord(); // word 18
-      int numPoints = (word >> 16) & 0xFFFF;
+      word = array.getWord(); // word 19
+      // int numPoints = (word >> 16) & 0xFFFF;
       unsigned short carrier = (word >> 14) & 0x03;
       unsigned short asic = (word >> 12) & 0x03;
       unsigned short asicChannel = (word >> 9) & 0x07;
       unsigned short window = word & 0x1FF;
+      unsigned carrierAsicChannelWindow = word;
+
+
       if (window != convertedAddr)
         B2ERROR("TOPUnpacker: Type2or3Ver1 - window numbers differ " << window <<
                 " " << convertedAddr);
 
       // store to raw digits (carrier/asic/channel not available before waveform header!)
       std::vector<TOPRawDigit*> digits; // needed for creating relations to waveforms
-      if (abs(valuePeak_p) > 1) {
+      if (abs(valuePeak_p) != 9999) {
         auto* digit = rawDigits.appendNew(scrodID);
         digit->setCarrierNumber(carrier);
         digit->setASICNumber(asic);
@@ -374,10 +400,10 @@ namespace Belle2 {
         digit->setValueFall0(valueFall0_p);
         digit->setValueFall1(valueFall1_p);
         digit->setIntegral(integral_p);
-        digit->setErrorFlags(qualityFlags_p); // temporary solution !
+        //        digit->setErrorFlags(qualityFlags_p); // not good solution !
         digits.push_back(digit);
       }
-      if (abs(valuePeak_n) > 1) {
+      if (abs(valuePeak_n) != 9999) {
         auto* digit = rawDigits.appendNew(scrodID);
         digit->setCarrierNumber(carrier);
         digit->setASICNumber(asic);
@@ -392,15 +418,25 @@ namespace Belle2 {
         digit->setValueFall0(valueFall0_n);
         digit->setValueFall1(valueFall1_n);
         digit->setIntegral(integral_n);
-        digit->setErrorFlags(qualityFlags_n); // temporary solution !
+        //        digit->setErrorFlags(qualityFlags_n); // not good solution !
         digits.push_back(digit);
       }
 
-      word = array.getWord(); // word 19
-      word = array.getWord(); // word 20
-      word = array.getWord(); // word 21
+      //reading out all four window addresses, to be for correcnt alignment of individual readout windows in written waveform
+      std::vector<unsigned short> windows;
+      windows.push_back(window);
 
-      int numWords = (numPoints + 1) / 2;
+      word = array.getWord(); // word 20
+      windows.push_back(word & 0x1FF);
+
+      word = array.getWord(); // word 21
+      windows.push_back(word & 0x1FF);
+
+      word = array.getWord(); // word 22
+      windows.push_back(word & 0x1FF);
+
+
+      int numWords = 4 * 32; // (numPoints + 1) / 2;
       if (array.getRemainingWords() < numWords) {
         B2ERROR("TOPUnpacker: too few words for waveform data, needed " << numWords);
         return array.getRemainingWords();
@@ -413,7 +449,7 @@ namespace Belle2 {
         adcData.push_back(word & 0xFFFF);
         adcData.push_back((word >> 16) & 0xFFFF);
       }
-      if (numWords * 2 != numPoints) adcData.pop_back(); // numPoints is even
+      // if (numWords * 2 != numPoints) adcData.pop_back(); // numPoints is even
 
       // determine slot number (moduleID) and boardstack
       int moduleID = 0;
@@ -432,9 +468,8 @@ namespace Belle2 {
       int pixelID = mapper.getPixelID(channel);
 
       // store to raw waveforms
-      unsigned lastWriteAddr = 0; // not important, but maybe available somewhere?
       auto* waveform = waveforms.appendNew(moduleID, pixelID, channel, scrodID, 0,
-                                           0, 0, lastWriteAddr, window,
+                                           0, 0, lastWrAddr, carrierAsicChannelWindow, windows,
                                            mapper.getType(), mapper.getName(), adcData);
       waveform->setPedestalSubtractedFlag(pedestalSubtracted);
 
@@ -501,8 +536,10 @@ namespace Belle2 {
           unsigned data = array.getWord();
           wfdata.push_back(data & 0xFFFF);
         }
+
+        std::vector<unsigned short> windows;
         waveforms.appendNew(moduleID, pixelID, channel, scrod, freezeDate,
-                            triggerType, flags, referenceASIC, segmentASIC,
+                            triggerType, flags, referenceASIC, segmentASIC, windows,
                             mapper.getType(), mapper.getName(), wfdata);
       } // iseg
     } // k
@@ -565,8 +602,10 @@ namespace Belle2 {
           int pixelID = mapper.getPixelID(channel);
           unsigned segmentASIC = convertedAddr + (chan << 9) + (carrier << 12) +
                                  (asic << 14);
+
+          std::vector<unsigned short> windows;
           waveforms.appendNew(moduleID, pixelID, channel, scrod, 0,
-                              trigPattern, 0, lastWriteAddr, segmentASIC,
+                              trigPattern, 0, lastWriteAddr, segmentASIC, windows,
                               mapper.getType(), mapper.getName(), wfdata);
         } // chan
       } // win

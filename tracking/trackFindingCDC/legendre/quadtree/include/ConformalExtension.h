@@ -12,7 +12,6 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/processing/TrackProcessor.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessorWithNewReferencePoint.h>
 
@@ -38,7 +37,8 @@ namespace Belle2 {
 
       /// Perform transformation for set of given hits; reference position taken as POCA of the fitted trajectory
       std::vector<const CDCWireHit*> newRefPoint(std::vector<const CDCWireHit*>& cdcWireHits,
-                                                 std::vector<CDCConformalHit>& conformalCDCWireHitList, bool doMaskInitialHits = false)
+                                                 const std::vector<const CDCWireHit*>& allAxialWireHits,
+                                                 bool doMaskInitialHits = false)
       {
         const CDCKarimakiFitter& fitter = CDCKarimakiFitter::getNoDriftVarianceFitter();
         CDCTrajectory2D trackTrajectory2D = fitter.fit(cdcWireHits);
@@ -56,7 +56,7 @@ namespace Belle2 {
 
         }
 
-        std::vector<const CDCWireHit*> newAssignedHits = getHitsWRTtoRefPos(refPos, curv, theta, conformalCDCWireHitList);
+        std::vector<const CDCWireHit*> newAssignedHits = getHitsWRTtoRefPos(refPos, curv, theta, allAxialWireHits);
 
         if (newAssignedHits.size() > 0) {
 
@@ -91,7 +91,8 @@ namespace Belle2 {
 
 
       /// perform transformation for the given track; reference position taken as POCA of the fitted trajectory
-      std::vector<const CDCWireHit*> newRefPoint(CDCTrack& track, std::vector<CDCConformalHit>& conformalCDCWireHitList)
+      std::vector<const CDCWireHit*> newRefPoint(CDCTrack& track,
+                                                 const std::vector<const CDCWireHit*>& allAxialWireHits)
       {
         std::vector<const CDCWireHit*> cdcWireHits;
 
@@ -119,7 +120,7 @@ namespace Belle2 {
 
         }
 
-        std::vector<const CDCWireHit*> newAssignedHits = getHitsWRTtoRefPos(refPos, curv, theta, conformalCDCWireHitList);
+        std::vector<const CDCWireHit*> newAssignedHits = getHitsWRTtoRefPos(refPos, curv, theta, allAxialWireHits);
 
         if (newAssignedHits.size() > 0) {
 
@@ -162,7 +163,7 @@ namespace Belle2 {
        * @return vector of CDCWireHit objects which satisfy legendre transformation with respect to the given parameters
        */
       std::vector<const CDCWireHit*> getHitsWRTtoRefPos(Vector2D refPos, double curv, double theta,
-                                                        std::vector<CDCConformalHit>& conformalCDCWireHitList)
+                                                        const std::vector<const CDCWireHit*>& allAxialWireHits)
       {
 
         double precision_r, precision_theta;
@@ -175,23 +176,16 @@ namespace Belle2 {
                AxialHitQuadTreeProcessorWithNewReferencePoint::rangeY(static_cast<float>(curv - precision_r),
                    static_cast<float>(curv + precision_r)));
 
-        std::vector<CDCConformalHit*> hitsVector;
-        for (CDCConformalHit& trackHit : conformalCDCWireHitList) {
-          if (trackHit.getUsedFlag() or trackHit.getMaskedFlag()) continue;
-          hitsVector.push_back(&trackHit);
+        std::vector<const CDCWireHit*> hitsVector;
+        for (const CDCWireHit* wireHit : allAxialWireHits) {
+          if (wireHit->getAutomatonCell().hasTakenFlag() or wireHit->getAutomatonCell().hasMaskedFlag()) continue;
+          hitsVector.push_back(wireHit);
         }
 
         AxialHitQuadTreeProcessorWithNewReferencePoint qtProcessor(ranges, std::make_pair(refPos.x(), refPos.y()));
         qtProcessor.provideItemsSet(hitsVector);
 
-        std::vector<CDCConformalHit*> newAssignedHits = qtProcessor.getAssignedHits();
-
-        std::vector<const CDCWireHit*> newCdcWireHits;
-
-        for (CDCConformalHit* hit : newAssignedHits) {
-          newCdcWireHits.push_back(hit->getWireHit());
-        }
-
+        std::vector<const CDCWireHit*> newCdcWireHits = qtProcessor.getAssignedHits();
 
         return newCdcWireHits;
       }

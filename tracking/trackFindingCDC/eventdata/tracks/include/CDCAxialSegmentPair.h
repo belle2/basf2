@@ -162,11 +162,11 @@ namespace Belle2 {
         }
       }
 
-      /// Getter for the automaton cell.
-      AutomatonCell& getAutomatonCell() { return m_automatonCell; }
-
-      /// Constant getter for the automaton cell.
-      const AutomatonCell& getAutomatonCell() const { return m_automatonCell; }
+      /// Mutable getter for the automaton cell.
+      AutomatonCell& getAutomatonCell() const
+      {
+        return m_automatonCell;
+      }
 
     private:
       /// Reference to the start segment
@@ -180,8 +180,6 @@ namespace Belle2 {
 
       /// Automaton cell assoziated with the pair of segments
       mutable AutomatonCell m_automatonCell;
-
     };
-
   }
 }

@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['pxd', 'vxd', 'rawdata_dataobjects', 'pxd_dataobjects', 'vxd_dataobjects', 'framework']
+env['LIBS'] = ['vxd', 'rawdata_dataobjects', 'pxd_dataobjects', 'framework']
 
 
 Return('env')

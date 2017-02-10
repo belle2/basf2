@@ -2,7 +2,7 @@
 #include <topcaf/dataobjects/topFileMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/conditions/ConditionsService.h>
+//#include <framework/conditions/ConditionsService.h>
 
 
 #include <iostream>
@@ -66,11 +66,14 @@ void PedestalModule::beginRun()
   if (m_mode == 1) { // read pedestals
     TList* list;
     if (m_conditions == 1) { // read peds using conditions service
-      B2INFO("Retrieving pedestal data from service.");
-      std::string filename = (ConditionsService::getInstance()->getPayloadFileURL(this));
-      m_in_ped_file = TFile::Open(filename.c_str(), "READ");
+//      B2INFO("Retrieving pedestal data from service.");
+      B2INFO("Should retrieve pedestal data from service. Code waiting modification!!!");
 
-      B2INFO("Retrieving pedestal data from service. done");
+      /* FIXME      std::string filename = (ConditionsService::getInstance()->getPayloadFileURL(this));
+            m_in_ped_file = TFile::Open(filename.c_str(), "READ");
+
+            B2INFO("Retrieving pedestal data from service. done");
+      */
     } else if (m_conditions == 0) { // read peds from local file
       m_in_ped_file = TFile::Open(m_in_ped_filename.c_str(), "READ");
     }
@@ -183,7 +186,7 @@ void  PedestalModule::terminate()
         m_sample2ped[key]->Write();
       }
       m_out_ped_file->Close();
-      ConditionsService::getInstance()->writePayloadFile(tempFile, this);
+//FIXME      ConditionsService::getInstance()->writePayloadFile(tempFile, this);
     }
     if (m_writefile == 1) {
       B2INFO("writing itop pedestal file manually to " << m_out_ped_filename);

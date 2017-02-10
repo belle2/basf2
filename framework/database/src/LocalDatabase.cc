@@ -27,10 +27,10 @@ using namespace Belle2;
 namespace fs = boost::filesystem;
 
 void LocalDatabase::createInstance(const std::string& fileName, const std::string& payloadDir, bool readOnly,
-                                   LogConfig::ELogLevel logLevel)
+                                   LogConfig::ELogLevel logLevel, bool invertLogging)
 {
   LocalDatabase* database = new LocalDatabase(fileName, payloadDir, readOnly);
-  database->setLogLevel(logLevel);
+  database->setLogLevel(logLevel, invertLogging);
   Database::setInstance(database);
 }
 
@@ -93,10 +93,14 @@ pair<TObject*, IntervalOfValidity> LocalDatabase::tryDefault(const std::string& 
     result.first = readPayload(defaultName, module);
     if (!result.first) return result;
     result.second = IntervalOfValidity(0, -1, -1, -1);
+    if (m_invertLogging)
+      B2LOG(m_logLevel, 0, "Obtained " << package << "/" << module << " from " << defaultName << ". IoV="
+            << result.second);
     return result;
   }
 
-  B2LOG(m_logLevel, 0, "Failed to get " << package << "/" << module << " from local database " << m_fileName << ".");
+  if (!m_invertLogging)
+    B2LOG(m_logLevel, 0, "Failed to get " << package << "/" << module << " from local database " << m_fileName << ".");
   return result;
 }
 
@@ -119,12 +123,16 @@ pair<TObject*, IntervalOfValidity> LocalDatabase::getData(const EventMetaData& e
       result.first = readPayload(payloadFileName(m_payloadDir, package, module, revision), module);
       if (!result.first) return result;
       result.second = entry.second;
+      if (m_invertLogging)
+        B2LOG(m_logLevel, 0, "Obtained " << package << "/" << module << " from local database " << m_fileName <<
+              ". IoV=" << result.second);
       return result;
     }
   }
 
-  B2LOG(m_logLevel, 0, "Failed to get " << package << "/" << module << " from local database " << m_fileName <<
-        ". No matching entry for experiment/run " << event.getExperiment() << "/" << event.getRun() << " found.");
+  if (!m_invertLogging)
+    B2LOG(m_logLevel, 0, "Failed to get " << package << "/" << module << " from local database " << m_fileName <<
+          ". No matching entry for experiment/run " << event.getExperiment() << "/" << event.getRun() << " found.");
   return result;
 }
 

@@ -200,6 +200,10 @@ namespace Belle2 {
       Vector3D getGlobalPerigee() const
       { return getLocalHelix()->closestXY(-m_localOrigin.xy()) + m_localOrigin; }
 
+      /// Getter for the center of the helix in global coordinates
+      Vector2D getGlobalCenter() const
+      { return getLocalHelix()->centerXY() + m_localOrigin.xy(); }
+
     public:
       /// Checks if the trajectory leaves the outer radius of the CDC times the given tolerance factor
       bool isCurler(double factor = 1) const;

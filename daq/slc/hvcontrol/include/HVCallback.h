@@ -74,7 +74,7 @@ namespace Belle2 {
     void setPeakConfig(const std::string& name) throw() { m_configname_peak = name; }
 
   public:
-    void addAll(const HVConfig& config) throw();
+    virtual void addAll(const HVConfig& config) throw();
     void lock() { m_mutex.lock(); }
     void unlock() { m_mutex.unlock(); }
     void paramLock() { m_param_mutex.lock(); }

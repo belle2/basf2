@@ -33,7 +33,7 @@ VisualRepMap* VisualRepMap::getInstance()
 
 VisualRepMap::VisualRepMap() : m_currentlySelecting(false), m_dataStoreEveElementMap(new DataStoreEveElementMap) { }
 
-VisualRepMap::~VisualRepMap() { delete m_dataStoreEveElementMap; }
+VisualRepMap::~VisualRepMap() { clear(); delete m_dataStoreEveElementMap; }
 
 void VisualRepMap::clear()
 {

@@ -33,7 +33,7 @@ BKLMRawPackerModule::BKLMRawPackerModule() : Module()
   ///  maximum # of events to produce( -1 : inifinite)
   addParam("MaxEventNum", max_nevt, "Maximum event number to make", -1);
   addParam("useDefaultModuleId", m_useDefaultElectId, "use default elect id if not found in mapping", true);
-  addParam("loadMapFromDB", m_loadMapFromDB, "load electronic map from DataBase or not", false);
+  addParam("loadMapFromDB", m_loadMapFromDB, "load electronic map from DataBase or not", true);
 
   ///  maximum # of events to produce( -1 : inifinite)
   addParam("NodeID", m_nodeid, "Node ID", 0);

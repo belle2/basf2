@@ -1,0 +1,30 @@
+# EventType: 1293300005
+# Descriptor: [B+ -> Xc tau nu ]cc
+# NickName: Bu_Xctaunu
+# Documentation: b->c tau nu process
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Phillip Urquijo
+# Email: purquijo@unimelb.edu.au
+# Cuts: None
+# Date: 20151103
+#
+#
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+0.0220   anti-D*0    tau+ nu_tau        PHOTOS        ISGW2;
+0.0070   anti-D0    tau+ nu_tau         PHOTOS       ISGW2;
+0.0013   anti-D_10   tau+ nu_tau      PHOTOS          ISGW2;
+0.0013   anti-D_0*0   tau+ nu_tau     PHOTOS           ISGW2;
+0.0020   anti-D'_10   tau+ nu_tau       PHOTOS         ISGW2;
+0.0020   anti-D_2*0   tau+ nu_tau       PHOTOS         ISGW2;
+Enddecay
+CDecay B-sig
+
+#
+End

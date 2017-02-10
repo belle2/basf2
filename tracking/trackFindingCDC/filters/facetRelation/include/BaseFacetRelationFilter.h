@@ -15,7 +15,7 @@
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
-#include <tracking/trackFindingCDC/ca/Relation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 #include <boost/range/iterator_range.hpp>
 
@@ -63,7 +63,7 @@ namespace Belle2 {
       {
         const CDCFacet* ptrFrom(relation.getFrom());
         const CDCFacet* ptrTo(relation.getTo());
-        if (not ptrFrom or not ptrTo) return NAN;
+        if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
         return operator()(*ptrFrom, *ptrTo);
       }
     };

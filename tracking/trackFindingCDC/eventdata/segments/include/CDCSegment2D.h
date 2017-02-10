@@ -10,10 +10,12 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
-
 #include <tracking/trackFindingCDC/eventdata/segments/CDCFacetSegment.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
+
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -85,16 +87,16 @@ namespace Belle2 {
       /// Reverses the order of hits and their right left passage hypotheses inplace.
       void reverse();
 
-      /// Getter for the automaton cell.
-      AutomatonCell& getAutomatonCell()
+      /// Mutable getter for the automaton cell.
+      AutomatonCell& getAutomatonCell() const
       {
         return m_automatonCell;
       }
 
-      /// Constant getter for the automaton cell.
-      const AutomatonCell& getAutomatonCell() const
+      /// Indirection to the automaton cell for easier access to the flags
+      AutomatonCell* operator->() const
       {
-        return m_automatonCell;
+        return &m_automatonCell;
       }
 
       /// Unset the masked flag of the automaton cell of this segment
@@ -135,11 +137,12 @@ namespace Belle2 {
       bool isFullyTaken(unsigned int maxNotTaken = 0) const;
 
     private:
-      /** Memory for the automaton cell.
+      /**
+       *  Memory for the automaton cell.
        *  It is declared mutable because it can vary
        *  rather freely despite of the hit content might be required fixed.
        */
-      AutomatonCell m_automatonCell;
+      mutable AutomatonCell m_automatonCell;
 
       /// Memory for the global super cluster id.
       int m_iSuperCluster = -1;

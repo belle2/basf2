@@ -61,7 +61,7 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
     }
 
     // ADC information
-    double adc = static_cast<double>(recoHit.getWireHit()->getHit()->getADCCount());
+    double adc = static_cast<double>(recoHit.getWireHit().getHit()->getADCCount());
     adc_sum += adc;
     adc_sum_squared += adc * adc;
 

@@ -24,6 +24,7 @@ REG_MODULE(SegmentRejecter);
 REG_MODULE(SegmentOrienter);
 REG_MODULE(SegmentCreatorMCTruth);
 
+REG_MODULE(AxialTrackCreatorHitLegendre)
 REG_MODULE(AxialTrackCreatorSegmentHough)
 
 REG_MODULE(AxialSegmentPairCreator)
@@ -35,6 +36,7 @@ REG_MODULE(TrackCreatorSegmentTripleAutomaton)
 REG_MODULE(TrackCreatorSingleSegments)
 
 REG_MODULE(TrackLinker)
+REG_MODULE(TrackCombiner)
 REG_MODULE(TrackOrienter)
 REG_MODULE(TrackFlightTimeAdjuster)
 REG_MODULE(TrackRejecter)

@@ -73,88 +73,150 @@ namespace Belle2 {
 
     int m_rootEvent;   /**<  event number*/
 
+    //pxd sensor number
+    Int_t m_nSensorsL1; /**<  number of sensors on L1*/
+    Int_t m_nSensorsL2; /**<  number of sensors on L2*/
+
     //graphs & histos - results
     Double_t pt[6]  = {0.05, 0.15, 0.25, 0.4, 0.75, 1.5}; /**< bin edges (in pt = transverse momentum)*/
     Double_t ptErr[6] = { 0.05, 0.05, 0.05, 0.1, 0.25, 0.5}; /**< bin widths (transverse momentum) */
 
+    TGraphErrors* m_gEff2; /**< efficiency graph */
     TGraphErrors* m_gEff; /**< efficiency graph */
+
+    TH1F* m_h1DigitsPerParticle;
+    TH1F* m_h1RecoTracksPerParticle;
+
     TH1F* m_h1digiIn; /**< digits contained in ROI histogram*/
     TH1F* m_h1digiOut2; /**< lost digit: ROI exist with right vxdID */
     TH1F* m_h1digiOut3; /**< lost digit: ROI exist with wrong vxdID */
     TH1F* m_h1digiOut4; /**< lost digit: ROI does not exist, intercept with right vxdID */
     TH1F* m_h1digiOut5; /**< lost digit: ROI does not exist, intercept with wrong vxdID */
 
-    //histograms
-    TH1F* m_h1ptAll; /**< distribution of transverse momentum for all PDXDigits*/
-    TH1F* m_h1pt; /**< distribution of transverse momentum for PDXDigits contained in a ROI*/
-    TH1F* m_h1ptBad; /**< distribution of transverse momentum for PDXDigits  when no ROI exists and intercept has wrong vxdid*/
+    TH1F* m_h1TrackOneDigiIn; /**<tracks with at least digit contained in ROI*/
+    TH1F* m_h1nnotINtrack2; /**< tracks with lost digit: ROI exist with right vxdID */
+    TH1F* m_h1nnotINtrack3; /**< lost digit: ROI exist with wrong vxdID */
+    TH1F* m_h1nnotINtrack4; /**< lost digit: ROI does not exist, intercept with right vxdID */
+    TH1F* m_h1nnotINtrack5; /**< lost digit: ROI does not exist, intercept with wrong vxdID */
 
-    TH1F* m_h1GlobalTime; /**< distribution of global time for PDXDigits contained in a ROI*/
-    TH1F* m_h1GlobalTimeFail; /**< distribution of global time for PDXDigits not contained in a ROI*/
-    TH1F* m_h1GlobalTimeNoROI; /**< distribution of global time for PDXDigits when no ROI exists*/
-    TH1F* m_h1GlobalTimeBad; /**< distribution of global time for PDXDigits when no ROI exists and intercept has wrong vxdid*/
+    TH1F* m_h1Track; /**< denominator track  */
+    TH1F* m_h1Track_pt; /**< denominator track pT*/
+    TH1F* m_h1Track_phi; /**< denominator track phi*/
+    TH1F* m_h1Track_lambda; /**< denominator track lambda*/
+    TH1F* m_h1Track_Theta; /**< denominator track cosTheta*/
+    TH1F* m_h1Track_cosTheta; /**< denominator track cosTheta*/
+    TH1F* m_h1Track_pVal; /**< denominator track pVal*/
+    TH1F* m_h1Track_nSVDhits; /**< denominator track pVal*/
+    TH1F* m_h1Track_nCDChits; /**< denominator track pVal*/
 
-    TH1F* m_h1CoorUBad; /**< distribution of U cell positions for PDXDigits when no ROI exists and vxdid intercept is wrong*/
-    TH1F* m_h1CoorVBad; /**< distribution of U cell positions for PDXDigits when no ROI exists and vxdid intercept is wrong*/
-    TH2F* m_h2CoorUVBad; /**< distribution of U cell positions for PDXDigits when no ROI exists and vxdid intercept is wrong*/
+    TH1F* m_h1INtrack1; /**< track with no intercept  */
+    TH1F* m_h1INtrack1_pt; /**<  track with no intercept pT*/
+    TH1F* m_h1INtrack1_phi; /**< track with no intercept phi*/
+    TH1F* m_h1INtrack1_lambda; /**< track with no intercept lambda*/
+    TH1F* m_h1INtrack1_Theta; /**< track with no intercept costheta*/
+    TH1F* m_h1INtrack1_cosTheta; /**< track with no intercept costheta*/
+    TH1F* m_h1INtrack1_pVal; /**< denominator track pVal*/
+    TH1F* m_h1INtrack1_nSVDhits; /**< denominator track pVal*/
+    TH1F* m_h1INtrack1_nCDChits; /**< denominator track pVal*/
 
+    TH1F* m_h1notINtrack2; /**< track with no intercept  */
+    TH1F* m_h1notINtrack2_pt; /**<  track with no intercept pT*/
+    TH1F* m_h1notINtrack2_phi; /**< track with no intercept phi*/
+    TH1F* m_h1notINtrack2_lambda; /**< track with no intercept lambda*/
+    TH1F* m_h1notINtrack2_Theta; /**< track with no intercept costheta*/
+    TH1F* m_h1notINtrack2_cosTheta; /**< track with no intercept costheta*/
+    TH1F* m_h1notINtrack2_pVal; /**< denominator track pVal*/
+    TH1F* m_h1notINtrack2_nSVDhits; /**< denominator track pVal*/
+    TH1F* m_h1notINtrack2_nCDChits; /**< denominator track pVal*/
+
+    TH1F* m_h1notINtrack5; /**< track with no intercept  */
+    TH1F* m_h1notINtrack5_pt; /**<  track with no intercept pT*/
+    TH1F* m_h1notINtrack5_phi; /**< track with no intercept phi*/
+    TH1F* m_h1notINtrack5_lambda; /**< track with no intercept lambda*/
+    TH1F* m_h1notINtrack5_Theta; /**< track with no intercept costheta*/
+    TH1F* m_h1notINtrack5_cosTheta; /**< track with no intercept costheta*/
+    TH1F* m_h1notINtrack5_pVal; /**< denominator track pVal*/
+    TH1F* m_h1notINtrack5_nSVDhits; /**< denominator track pVal*/
+    TH1F* m_h1notINtrack5_nCDChits; /**< denominator track pVal*/
+
+
+    //fill digits inside ROIs
     TH1F* m_h1PullU; /**< distribution of U pulls for PDXDigits contained in a ROI*/
     TH1F* m_h1PullV; /**< distribution of V pulls for PDXDigits contained in a ROI*/
-    TH1F* m_h1PullUFail; /**< distribution of U pulls for PDXDigits NOT contained in a ROI*/
-    TH1F* m_h1PullVFail; /**< distribution of V pulls for PDXDigits NOT contained in a ROI*/
-    TH1F* m_h1PullUNoROI; /**< distribution of U pulls for PDXDigits when no ROI exists*/
-    TH1F* m_h1PullVNoROI; /**< distribution of V pulls for PDXDigits when no ROI exists*/
+    TH2F* m_h2sigmaUphi; /**< distribution of sigmaU VS phi for PDXDigits contained in a ROI*/
+    TH2F* m_h2sigmaVphi; /**< distribution of sigmaV VS phi for PDXDigits contained in a ROI*/
+    TH1F* m_h1ResidU; /**< distribution of U resid for PXDDigits contained in a ROI*/
+    TH1F* m_h1ResidV; /**< distribution of V resid for PXDDigits contained in a ROI*/
+    TH2F* m_h2ResidUV; /**< distribution of V resid for PXDDigits contained in a ROI*/
+    TH1F* m_h1SigmaU; /**< distribution of sigmaU for PXDDigits contained in a ROI*/
+    TH1F* m_h1SigmaV; /**< distribution of sigmaV for PXDDigits contained in a ROI*/
+    TH1F* m_h1GlobalTime; /**< distribution of global time for PDXDigits contained in a ROI*/
+    TH2F* m_h2Mapglob; /**<sensor perp,phi */
+    TH2F* m_h2MaplocL1; /**< L1 ladder u,v */
+    TH2F* m_h2MaplocL2; /**< L2 ladder u,v */
 
-    TH1F* m_h1ResidU; /**< distribution of U resid for intercepts contained in a ROI*/
-    TH1F* m_h1ResidV; /**< distribution of V resid for intercepts contained in a ROI*/
-    TH1F* m_h1ResidUFail; /**< distribution of U resid for intercepts NOT contained in a ROI*/
-    TH1F* m_h1ResidVFail; /**< distribution of V resid for intercepts NOT contained in a ROI*/
-    TH1F* m_h1ResidUNoROI; /**< distribution of U resid for intercepts when no ROI exists*/
-    TH1F* m_h1ResidVNoROI; /**< distribution of V resid for intercepts when no ROI exists*/
+    //fill digits outside2 ROIs
+    TH2F* m_h2sigmaUphi_out2; /**< distribution of sigmaU VS phi for PDXDigits not contained in a ROI*/
+    TH2F* m_h2sigmaVphi_out2; /**< distribution of sigmaV VS phi for PDXDigits not contained in a ROI*/
+    TH1F* m_h1ResidU_out2; /**< distribution of U resid for PXDDigits not contained in a ROI*/
+    TH1F* m_h1ResidV_out2; /**< distribution of V resid for PXDDigits not contained in a ROI*/
+    TH2F* m_h2ResidUV_out2; /**< distribution of V resid for PXDDigits not contained in a ROI*/
+    TH1F* m_h1SigmaU_out2; /**< distribution of sigmaU for PXDDigits not contained in a ROI*/
+    TH1F* m_h1SigmaV_out2; /**< distribution of sigmaV for PXDDigits not contained in a ROI*/
+    TH1F* m_h1GlobalTime_out2; /**< distribution of global time for PDXDigits not contained in a ROI*/
+    TH2F* m_h2Mapglob_out2; /**<sensor perp,phi */
+    TH2F* m_h2MaplocL1_out2; /**< L1 ladder u,v */
+    TH2F* m_h2MaplocL2_out2; /**< L2 ladder u,v */
 
-    TH1F* m_h1SigmaU; /**< distribution of sigmaU for intercepts contained in a ROI*/
-    TH1F* m_h1SigmaV; /**< distribution of sigmaV for intercepts contained in a ROI*/
-    TH1F* m_h1SigmaUFail; /**< distribution of sigmaU for intercepts NOT contained in a ROI*/
-    TH1F* m_h1SigmaVFail; /**< distribution of sigmaV for intercepts NOT contained in a ROI*/
-    TH1F* m_h1SigmaUNoROI; /**< distribution of sigmaU for intercepts when no ROI exists*/
-    TH1F* m_h1SigmaVNoROI; /**< distribution of sigmaV for intercepts when no ROI exists*/
+    //fill digits outside3 ROIs
+    TH2F* m_h2sigmaUphi_out3; /**< distribution of sigmaU VS phi for PDXDigits not contained in a ROI*/
+    TH2F* m_h2sigmaVphi_out3; /**< distribution of sigmaV VS phi for PDXDigits not contained in a ROI*/
+    TH1F* m_h1ResidU_out3; /**< distribution of U resid for PXDDigits not contained in a ROI*/
+    TH1F* m_h1ResidV_out3; /**< distribution of V resid for PXDDigits not contained in a ROI*/
+    TH2F* m_h2ResidUV_out3; /**< distribution of V resid for PXDDigits not contained in a ROI*/
+    TH1F* m_h1SigmaU_out3; /**< distribution of sigmaU for PXDDigits not contained in a ROI*/
+    TH1F* m_h1SigmaV_out3; /**< distribution of sigmaV for PXDDigits not contained in a ROI*/
+    TH1F* m_h1GlobalTime_out3; /**< distribution of global time for PDXDigits not contained in a ROI*/
+    TH2F* m_h2Mapglob_out3; /**<sensor perp,phi */
+    TH2F* m_h2MaplocL1_out3; /**< L1 ladder u,v */
+    TH2F* m_h2MaplocL2_out3; /**< L2 ladder u,v */
 
-    TH1F* m_h1DistUFail;  /**< distribution of distance between ROI and PXDDigits not contained in it in U direction */
-    TH1F* m_h1DistVFail;  /**< distribution of distance between ROI and PXDDigits not contained in it in V direction */
-    TH2F* m_h2DistUVFail;  /**< distribution of distance between ROI and PXDDigits not contained in it in U,V plane */
+    //fill digits outside4 ROIs
+    TH2F* m_h2sigmaUphi_out4; /**< distribution of sigmaU VS phi for PDXDigits not contained in a ROI*/
+    TH2F* m_h2sigmaVphi_out4; /**< distribution of sigmaV VS phi for PDXDigits not contained in a ROI*/
+    TH1F* m_h1SigmaU_out4; /**< distribution of sigmaU for PXDDigits not contained in a ROI*/
+    TH1F* m_h1SigmaV_out4; /**< distribution of sigmaV for PXDDigits not contained in a ROI*/
+    TH1F* m_h1GlobalTime_out4; /**< distribution of global time for PDXDigits not contained in a ROI*/
+    TH2F* m_h2Mapglob_out4; /**<sensor perp,phi */
+    TH2F* m_h2MaplocL1_out4; /**< L1 ladder u,v */
+    TH2F* m_h2MaplocL2_out4; /**< L2 ladder u,v */
 
-    TH1F* m_h1totROIs; /**< distribution of number of ROIs*/
-    TH1F* m_h1nROIs; /**< distribution of number of ROIs*/
-    TH1F* m_h1nROIs_all; /**< distribution of number of ROIs*/
-    TH1F* m_h1redFactor; /**< distribution of number of ROIs*/
+    //fill digits outside5 ROIs
+    TH1F* m_h1GlobalTime_out5; /**< distribution of global time for PDXDigits not contained in a ROI*/
+    TH2F* m_h2Mapglob_out5; /**<sensor perp,phi */
+    TH2F* m_h2MaplocL1_out5; /**< L1 ladder u,v */
+    TH2F* m_h2MaplocL2_out5; /**< L2 ladder u,v */
 
-    TH1F* m_h1totarea; /**< distribution of ROI areas*/
-    TH1F* m_h1area; /**< distribution of ROI areas*/
-    TH1F* m_h1areaFail; /**< distribution of ROI areas when PXDDigit is not contained*/
+    //BOH
+    //    TH2F* m_h2_VXDhitsPR_xy;
+    //    TH2F* m_h2_VXDhitsPR_rz;
 
-    TH1F* m_h1Theta; /**< distribution of theta when the PXDDigit is contained in a ROI */
-    TH1F* m_h1ThetaBad; /**< distribution of theta when the PXDDigit is contained in a ROI */
-    TH1F* m_h1CosTheta; /**< distribution of costheta when the PXDDigit is contained in a ROI */
-    TH1F* m_h1CosThetaMCPart; /**< distribution of costheta when the PXDDigit is contained in a ROI */
-    TH1F* m_h1CosThetaBad; /**< distribution of costheta when the PXDDigit is contained in a ROI */
-    TH1F* m_h1Phi; /**< distribution of phi when the PXDDigit is contained in a ROI */
-    TH1F* m_h1Lambda; /**< distribution of lambda when the PXDDigit is contained in a ROI */
-    TH1F* m_h1PhiBad; /**< distribution of phi when no ROI and intercept has wrong vxdID */
-    TH1F* m_h1PhiBad_L1; /**< distribution of phi when no ROI and intercept has wrong vxdID (Layer1)*/
-    TH1F* m_h1PhiBad_L2; /**< distribution of phi when no ROI and intercept has wrong vxdID (Layer1)*/
-    TH1F* m_h1PhiBadLambda0_L2; /**< distribution of phi when no ROI and intercept has wrong vxdID (Layer1)*/
-    TH1F* m_h1PhiBadLambda0_L1; /**< distribution of phi when no ROI and intercept has wrong vxdID (Layer1)*/
-    TH1F* m_h1PhiBadLambdaF_L2; /**< distribution of phi when no ROI and intercept has wrong vxdID (Layer1)*/
-    TH1F* m_h1PhiBadLambdaF_L1; /**< distribution of phi when no ROI and intercept has wrong vxdID (Layer1)*/
-    TH1F* m_h1LambdaBad; /**< distribution of phi when no ROI and intercept has wrong vxdID */
-    TH1F* m_h1LambdaBad_timeL1; /**< distribution of phi when no ROI and intercept has wrong vxdID and GlobalTime<1*/
-    TH1F* m_h1LambdaBad_timeG1; /**< distribution of phi when no ROI and intercept has wrong vxdID and GlobalTime<1*/
+    //ROI stuff
+    TH2F* m_h2ROIbottomLeft;
+    TH2F* m_h2ROItopRight;
+    TH2F* m_h2ROIuMinMax;
+    TH2F* m_h2ROIvMinMax;
+    TH1F* m_h1totROIs; /**< distribution of number of all ROIs*/
+    TH1F* m_h1okROIs; /**< distribution of number of ROIs containin a PXDDigit*/
+    TH1F* m_h1redFactor; /**< distribution of number of ROIsreduction factor*/
+    TH1F* m_h1redFactor_L1; /**< distribution of number of ROIsreduction factor*/
+    TH1F* m_h1redFactor_L2; /**< distribution of number of ROIsreduction factor*/
+    TH1F* m_h1totArea; /**< distribution of Area of all ROIs*/
+    TH1F* m_h1okArea; /**< distribution of Area of ROIs containing a PXDDigit*/
 
-    TH1F* m_hNhits; /**< number of hits per candidate*/
+    TH1F* m_h1effPerTrack;
 
-    TH2F* m_h2Map; /**<sensor perp,phi */
-    TH2F* m_h2MapBad_L1; /**<sensor perp,phi - no digit in - layer2*/
-    TH2F* m_h2MapBad_L2; /**<sensor perp,phi - no digit in - layer1*/
+
 
     //variables
     double m_globalTime; /**< global hit time */
@@ -169,38 +231,47 @@ namespace Belle2 {
     int m_Uidmc; /**< true intercept U id  */
     int m_Vidmc; /**< true intercept V id  */
     int m_vxdIDmc; /**< true intercept VXD id  */
-    double pT; /**< transverse momentum */
+    double m_pTmc; /**< transverse momentum */
     double m_momXmc; /**< true p along X */
     double m_momYmc;/**< true p along Y */
     double m_momZmc; /**< true p along Z */
     double m_thetamc; /**< true theta*/
-    //    double m_theta;
     double m_costhetamc; /**< true cos theta */
-    //    double m_costhetaMCPart; /**< cos theta of MC particle */
     double m_phimc;  /**< true phi */
     double m_lambdamc;  /**< true lambda = pi/2 - theta*/
 
+    unsigned int Ntrack; /**< nuner of tracks with pxd digits */
+    unsigned int NtrackHit; /**< nuner of tracks with hits */
+    unsigned int n_notINtrack2; /**< nuner of tracks with no digits in ROI (correct vxdID) */
+    unsigned int n_notINtrack3; /**< nuner of tracks with no digits in ROI (wrong vxdID) */
+    unsigned int n_notINtrack4; /**< nuner of tracks with no ROI (intercept with correct vxdID) */
+    unsigned int n_notINtrack5; /**< nuner of tracks with no ROI (intercept with wrong vxdID) */
+
+
+    unsigned int n_rois;
+    unsigned int n_intercepts;
     unsigned int n_tracks; /**< number of tracks */
     unsigned int n_tracksWithDigits; /**< number of tracks with digits */
+    unsigned int n_tracksWithDigitsInROI; /**< number of tracks with digits in ROI */
+    unsigned int n_pxdDigit; /**< number of pxd digits*/
+    unsigned int n_pxdDigitInROI; /**< number of pxd digits in ROIs*/
+
+    unsigned int n_notINdigit2; /**< number of lost digits: no hit, correct vxdID*/
+    unsigned int n_notINdigit3;/**< number of lost digits: no hit, wrong vxdID*/
+    unsigned int n_notINdigit4; /**< number of lost digits: no ROI, intercepts with correct vxdID*/
+    unsigned int n_notINdigit5; /**< number of lost digits: no ROI, intercepts with wrong vxdID*/
+
     unsigned int npxdDigit[6]; /**< number of pxd digits in bins of pt*/
     unsigned int npxdDigitInROI[6]; /**< number of pxd digits inside ROI in bins of pt*/
-    unsigned int n_pxdDigit; /**< number of pxd digits*/
-    unsigned int n_pxdDigitInROI; /**< number of pxd digits*/
-    //    unsigned int n_noHit;
-    unsigned int n_noHit2; /**< number of lost digits: no hit, correct vxdID*/
-    unsigned int n_noHit3;/**< number of lost digits: no hit, wrong vxdID*/
-    unsigned int n_noROI4; /**< number of lost digits: no ROI, intercepts with correct vxdID*/
-    unsigned int n_noROI5; /**< number of lost digits: no ROI, intercepts with wrong vxdID*/
-    unsigned int nnoHit2[6]; /**< number of lost digits in bins of pt: no hit, correct vxdID*/
-    unsigned int nnoHit3[6]; /**< number of lost digits in bins of pt: no hit, wrong vxdID*/
-    unsigned int nnoROI4[6];  /**< number of lost digits in bins of pt: no ROI, intercepts with correct vxdID*/
-    unsigned int nnoROI5[6];  /**< number of lost digits in bins of pt: no ROI, intercepts with wrong vxdID*/
-
-    unsigned int NtrackHit; /**< nuner of tracks with hits */
-    unsigned int NtrackNoHit2; /**< nuner of tracks with no digits in ROI (correct vxdID) */
-    unsigned int NtrackNoHit3; /**< nuner of tracks with no digits in ROI (wrong vxdID) */
-    unsigned int NtrackNoROI4; /**< nuner of tracks with no ROI (intercept with correct vxdID) */
-    unsigned int NtrackNoROI5; /**< nuner of tracks with no ROI (intercept with wrong vxdID) */
+    unsigned int nnotINdigit2[6]; /**< number of lost digits in bins of pt: no hit, correct vxdID*/
+    unsigned int nnotINdigit3[6]; /**< number of lost digits in bins of pt: no hit, wrong vxdID*/
+    unsigned int nnotINdigit4[6];  /**< number of lost digits in bins of pt: no ROI, intercepts with correct vxdID*/
+    unsigned int nnotINdigit5[6];  /**< number of lost digits in bins of pt: no ROI, intercepts with wrong vxdID*/
+    unsigned int TrackOneDigiIn[6];
+    unsigned int nnotINtrack2[6];
+    unsigned int nnotINtrack3[6];
+    unsigned int nnotINtrack4[6];
+    unsigned int nnotINtrack5[6];
 
   };
 

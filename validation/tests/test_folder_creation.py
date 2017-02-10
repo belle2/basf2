@@ -19,8 +19,6 @@ def main():
     """
     success = True
 
-    return 0
-
     rev_to_gen = "test_folder_creation"
     all_tags = ["reference", rev_to_gen]
 

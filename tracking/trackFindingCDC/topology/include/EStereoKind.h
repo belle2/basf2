@@ -9,8 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <tracking/trackFindingCDC/utilities/GetValueType.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -30,6 +29,16 @@ namespace Belle2 {
       c_Invalid = -999,
     };
 
+    /// Generic functor to get the stereo kind from an object.
+    struct GetEStereoKind {
+      /// Returns the stereo kind of an object.
+      template<class T, class SFINAE = decltype(&T::getStereoKind)>
+      EStereoKind operator()(const T& t) const
+      {
+        return t.getStereoKind();
+      }
+    };
+
     /**
      *  This is a utility class for the free EStereoKind type.
      *  It provides the basic methods to operate on the EStereoKind numbers.
@@ -41,44 +50,20 @@ namespace Belle2 {
 
       /**
        *  Returns the common stereo type of hits in a container.
-       *  EStereoKind::c_Invalid if there is no common super layer or the container is empty.
+       *  EStereoKind::c_Invalid if there is no common stereo kind or the container is empty.
        */
-      template<class AHits>
+      template <class AHits>
       static EStereoKind getCommon(const AHits& hits)
       {
-        using Hit = GetValueType<AHits>;
-        return common(hits, getFrom<Hit>, EStereoKind::c_Invalid);
+        return Common<MayIndirectTo<GetEStereoKind>>()(hits).value_or(EStereoKind::c_Invalid);
       }
 
       /// Returns the superlayer of an object
-      template<class T>
+      template <class T>
       static EStereoKind getFrom(const T& t)
       {
-        const int dispatchTag = 0;
-        return getFromImpl(t, dispatchTag);
+        return MayIndirectTo<GetEStereoKind>()(t).value_or(EStereoKind::c_Invalid);
       }
-
-    private:
-      /// Returns the stereo kind of an object. Favoured option.
-      template <class T>
-      static auto getFromImpl(const T& t,
-                              int favouredTag __attribute__((unused)))
-      -> decltype(t.getStereoKind())
-      {
-        return t.getStereoKind();
-      }
-
-      /// Returns the stereo kind of an object. Disfavoured option.
-      template <class T>
-      static auto getFromImpl(const T& t,
-                              long disfavouredTag __attribute__((unused)))
-      -> decltype(t->getStereoKind())
-      {
-        return &*t == nullptr ? EStereoKind::c_Invalid  : t->getStereoKind();
-      }
-
     };
-
   }
-
 }

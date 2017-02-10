@@ -1,15 +1,9 @@
-#include <tracking/trackFindingCDC/config/CompileConfiguration.h>
-
 #pragma link off all globals;
 #pragma link off all classes;
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#ifdef TRACKFINDINGCDC_USE_ROOT_DICTIONARY
-
-/// Some dictionaries for weighted relations that will be needed
-#pragma extra_include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>;
-
-#pragma link C++ class Belle2::TrackFindingCDC::VectorRange<Belle2::TrackFindingCDC::CDCWireHit>-;
-
-#endif
+// Sentinel to trigger the dictionary generation of the StoreWrapper.
+// Other instances can be defined in other linkdef.h files.
+#pragma link C++ class Belle2::TrackFindingCDC::Relation<int, int>+;
+#pragma link C++ class Belle2::TrackFindingCDC::WeightedRelation<int, int>+;

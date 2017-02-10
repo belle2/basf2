@@ -10,10 +10,10 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/findlets/base/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
+
+#include <framework/core/ModuleParamList.h>
 
 #include <vector>
 
@@ -45,14 +45,14 @@ namespace Belle2 {
           if (m_classMnemomicName != "") {
             m_classMnemomicDescription = m_classMnemomicName;
           } else {
-            m_classMnemomicDescription =
-              m_classMnemomics.getParameterDescription(static_cast<IOType*>(nullptr));
+            // Just a little bit of ADL
+            m_classMnemomicDescription = getClassMnemomicParameterDescription(static_cast<IOType*>(nullptr));
           }
         }
 
         if (m_classMnemomicName == "") {
-          m_classMnemomicName =
-            m_classMnemomics.getParameterName(static_cast<IOType*>(nullptr));
+          // Just a little bit of ADL
+          m_classMnemomicName = getClassMnemomicParameterName(static_cast<IOType*>(nullptr));
         }
       }
 
@@ -65,16 +65,14 @@ namespace Belle2 {
         if (not a_alwaysWrite) {
           moduleParamList->addParameter(prefixed(prefix, "Write" + classMnemomicCapitalName + "s"),
                                         m_param_writeStoreVector,
-                                        "Switch if " +
-                                        m_classMnemomicDescription +
+                                        "Switch if " + m_classMnemomicDescription +
                                         "s shall be written to the DataStore",
                                         m_param_writeStoreVector);
         }
 
         moduleParamList->addParameter(prefixed(prefix, classMnemomicCapitalName + "sStoreObjName"),
                                       m_param_storeVectorName,
-                                      "Name of the output StoreObjPtr of the " +
-                                      m_classMnemomicDescription +
+                                      "Name of the output StoreObjPtr of the " + m_classMnemomicDescription +
                                       "s generated within this module.",
                                       std::string(m_param_storeVectorName));
         //FIXME: Small parameter names
@@ -83,9 +81,7 @@ namespace Belle2 {
       /// Short description of the findlet
       std::string getDescription() override
       {
-        return "Swaps an interal vector of " +
-               m_classMnemomics.getParameterDescription(static_cast<IOType*>(nullptr)) +
-               " to the DataStore";
+        return "Swaps an interal vector of " + m_classMnemomicDescription + "s to the DataStore";
       }
 
     public:
@@ -137,12 +133,8 @@ namespace Belle2 {
       /// Short description for the type of objects to be written out.
       std::string m_classMnemomicDescription;
 
-      /// Helper object to lookup short hand names and descriptions
-      ClassMnemomics m_classMnemomics;
-
       /// Backup storage if the vector should not be written to the DataStore
       std::vector<IOType> m_backup;
-
     };
   }
 }

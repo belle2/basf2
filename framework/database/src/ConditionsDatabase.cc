@@ -40,12 +40,13 @@ void ConditionsDatabase::createDefaultInstance(const std::string& globalTag, Log
 
 void ConditionsDatabase::createInstance(const std::string& globalTag, const std::string& restBaseName,
                                         const std::string& fileBaseName,
-                                        const std::string& fileBaseLocal, LogConfig::ELogLevel logLevel)
+                                        const std::string& fileBaseLocal, LogConfig::ELogLevel logLevel,
+                                        bool invertLogging)
 {
   ConditionsDatabase* database = new ConditionsDatabase(globalTag, fileBaseLocal);
   database->setRESTBase(restBaseName);
   database->addLocalDirectory(fileBaseName, EConditionsDirectoryStructure::c_logicalSubdirectories);
-  database->setLogLevel(logLevel);
+  database->setLogLevel(logLevel, invertLogging);
   Database::setInstance(database);
 }
 
@@ -80,8 +81,9 @@ pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaDa
   }
 
   if (!m_downloader->exists(module)) {
-    B2LOG(m_logLevel, 0, "No payload " << module << " found in the conditions database for global tag "
-          << m_globalTag << ".");
+    if (!m_invertLogging)
+      B2LOG(m_logLevel, 0, "No payload " << module << " found in the conditions database for global tag "
+            << m_globalTag << ".");
     return result;
   }
 
@@ -96,6 +98,10 @@ pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaDa
   if (!result.first) return result;
 
   result.second = info.iov;
+
+  if (m_invertLogging)
+    B2LOG(m_logLevel, 0, "payload " << module << " found in the conditions database for global tag "
+          << m_globalTag << ". IoV=" << info.iov);
 
   // Update database local cache file but only if payload is found in m_payloadDir
   if (fs::absolute(fs::path(info.filename)).parent_path() != fs::path(m_payloadDir)) {

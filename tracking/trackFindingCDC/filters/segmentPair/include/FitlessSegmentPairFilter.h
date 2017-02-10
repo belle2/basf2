@@ -10,10 +10,9 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/segmentPair/BaseSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
-
 #include <tracking/trackFindingCDC/filters/segmentPair/SkimmedHitGapSegmentPairVarSet.h>
 
+#include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -29,6 +28,5 @@ namespace Belle2 {
       /// Checks if a pair of segments is a good combination
       Weight operator()(const CDCSegmentPair& segmentPair) final;
     };
-
   }
 }

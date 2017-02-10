@@ -30,8 +30,6 @@ from vertex import *
 from modularAnalysis import *
 from reconstruction import *
 from stdFSParticles import *
-from stdLooseFSParticles import *
-
 
 # load input ROOT file
 inputMdst('default', '../mdst-dstars.root')

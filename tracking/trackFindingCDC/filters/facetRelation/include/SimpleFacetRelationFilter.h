@@ -31,7 +31,7 @@ namespace Belle2 {
       SimpleFacetRelationFilter();
 
       /// Constructor using given direction of flight deviation cut off.
-      SimpleFacetRelationFilter(double deviationCosCut);
+      explicit SimpleFacetRelationFilter(double deviationCosCut);
 
     public:
       /// Expose the set of parameters of the filter to the module parameter list.

@@ -15,7 +15,7 @@
 
 #include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
 
-#include <tracking/trackFindingCDC/ca/Relation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 #include <vector>
 #include <string>
@@ -34,11 +34,11 @@ namespace Belle2 {
 
     public:
       /// Get the valid names of variable sets for track relations.
-      std::vector<std::string> getValidVarSetNames() const override;
+      std::vector<std::string> getValidVarSetNames() const final;
 
       /// Create a concrete variables set for track relations from a name.
       std::unique_ptr<BaseVarSet<Relation<const CDCTrack> > >
-      createVarSet(const std::string& name) const override;
+      createVarSet(const std::string& name) const final;
     };
   }
 }

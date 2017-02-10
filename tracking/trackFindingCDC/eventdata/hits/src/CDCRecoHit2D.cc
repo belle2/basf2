@@ -78,7 +78,7 @@ CDCRecoHit2D CDCRecoHit2D::fromRecoPos2D(const CDCRLWireHit& rlWireHit,
                                          const Vector2D& recoPos2D,
                                          bool snap)
 {
-  CDCRecoHit2D result(rlWireHit, recoPos2D - rlWireHit->getRefPos2D());
+  CDCRecoHit2D result(rlWireHit, recoPos2D - rlWireHit.getRefPos2D());
   if (snap) result.snapToDriftCircle();
   return result;
 }

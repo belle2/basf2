@@ -40,10 +40,15 @@ namespace Belle2 {
      * @param fileBaseName   Base name for conditions files
      * @param fileBaseLocal  Directory name for local conditions files copies
      * @param logLevel       The level of log messages about not-found payloads.
+     * @param invertLogging  If true log messages will be created when a
+     *                       payload is found. This is intended for override
+     *                       setups where a few payloads are taken from non
+     *                       standard locations
      * @return               A pointer to the created database instance
      */
     static void createInstance(const std::string& globalTag, const std::string& restBaseName, const std::string& fileBaseName,
-                               const std::string& fileBaseLocal, LogConfig::ELogLevel logLevel = LogConfig::c_Warning);
+                               const std::string& fileBaseLocal, LogConfig::ELogLevel logLevel = LogConfig::c_Warning,
+                               bool invertLogging = false);
 
     /**
      * Request an object from the database.
@@ -77,6 +82,9 @@ namespace Belle2 {
      */
     virtual bool addPayload(const std::string& package, const std::string& module, const std::string& fileName,
                             const IntervalOfValidity& iov) override;
+
+    /** Return the global tag */
+    std::string getGlobalTag() const { return m_globalTag; }
 
     /** set a mapping from experiment name to experiment number.
      * The experiment numbers and names need to be unique as we have to

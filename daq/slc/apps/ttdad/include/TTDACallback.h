@@ -13,12 +13,13 @@ namespace Belle2 {
   class TTDACallback : public RCCallback {
 
   public:
-    TTDACallback();
+    TTDACallback(int ftswid, const std::string& ttdname);
     virtual ~TTDACallback() throw() {}
 
   public:
     virtual void initialize(const DBObject& obj) throw(RCHandlerException);
     virtual void configure(const DBObject& obj) throw(RCHandlerException);
+    virtual void boot(const DBObject& obj) throw(RCHandlerException);
     virtual void load(const DBObject& obj) throw(RCHandlerException);
     virtual void start(int expno, int runno) throw(RCHandlerException);
     virtual void stop() throw(RCHandlerException);
@@ -31,8 +32,10 @@ namespace Belle2 {
     virtual void error(const char* nodename, const char* data) throw();
     void trigft() throw(RCHandlerException);
     void resetft() throw();
+    void trigio(const std::string& type) throw(RCHandlerException);
 
   private:
+    int m_ftswid;
     RCNode m_ttdnode;
     std::map<std::string, int> m_trgcommands;
 

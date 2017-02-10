@@ -221,6 +221,9 @@ void ECLSplitterN1Module::terminate()
   if (m_fileNOptimalFWD) delete m_fileNOptimalFWD;
   if (m_fileNOptimalBarrel) delete m_fileNOptimalBarrel;
   if (m_fileNOptimalBWD) delete m_fileNOptimalBWD;
+
+  if (m_NeighbourMap9) delete m_NeighbourMap9;
+  if (m_NeighbourMap21) delete m_NeighbourMap21;
 }
 
 void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
@@ -625,6 +628,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       B2DEBUG(175, "old phi: " << oldshowerposition->Phi());
       B2DEBUG(175, "old R: " << oldshowerposition->Mag());
       B2DEBUG(175, "old energy: " << energyEstimation);
+      delete oldshowerposition;
 
       // New position (with reduced number of neighbours)
       // There are some cases where high backgrounds fake local maxima and the splitted centroid position is far
@@ -637,6 +641,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       B2DEBUG(175, "new theta: " << showerposition->Theta());
       B2DEBUG(175, "new phi: " << showerposition->Phi());
       B2DEBUG(175, "new R: " << showerposition->Mag());
+      delete showerposition;
 
       // Get Energy, if requested, set weights to zero for energy calculation.
       double showerEnergy = 0.0;

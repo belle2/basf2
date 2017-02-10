@@ -124,6 +124,9 @@ GBLfitModule::GBLfitModule() :
   addParam("GFTrackCandidatesColName", m_gfTrackCandsColName,
            "Name of collection holding the genfit::TrackCandidates (should be created by the pattern recognition or MCTrackFinderModule)",
            string(""));
+  addParam("GFTracksColName", m_gfTracksColName,
+           "Name of collection holding the genfit::Tracks (output)",
+           string(""));
   addParam("CDCHitsColName", m_cdcHitsColName, "CDCHits collection", string(""));
   addParam("SVDHitsColName", m_svdHitsColName, "SVDHits collection", string(""));
   addParam("PXDHitsColName", m_pxdHitsColName, "PXDHits collection", string(""));
@@ -231,25 +234,22 @@ void GBLfitModule::initialize()
 
   StoreArray<Track> tracks;
   StoreArray<TrackFitResult> trackfitresults;
-  StoreArray < genfit::Track > gf2tracks;
+  StoreArray < genfit::Track > gf2tracks(m_gfTracksColName);
+  gf2tracks.registerInDataStore();
+  B2RESULT(gf2tracks.getName());
+
   StoreArray < genfit::TrackCand > trackcands(m_gfTrackCandsColName);
   StoreArray<MCParticle> mcparticles;
-  StoreArray<EKLMHit2d> eklmHit2ds;
-  StoreArray<EKLMAlignmentHit> eklmAlignmentHits;
-
-  eklmAlignmentHits.registerInDataStore();
-  eklmAlignmentHits.registerRelationTo(eklmHit2ds);
 
   trackcands.isRequired();
 
-  gf2tracks.registerPersistent();
-  trackcands.registerPersistent();
+  //trackcands.registerPersistent();
   gf2tracks.registerRelationTo(mcparticles);
   trackcands.registerRelationTo(gf2tracks);
 
   if (m_buildBelle2Tracks) {
-    tracks.registerPersistent();
-    trackfitresults.registerPersistent();
+    tracks.registerInDataStore();
+    trackfitresults.registerInDataStore();
 
     mcparticles.registerRelationTo(tracks);
     gf2tracks.registerRelationTo(trackfitresults);

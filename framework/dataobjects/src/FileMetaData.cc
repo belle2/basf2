@@ -65,6 +65,7 @@ void FileMetaData::exposePythonAPI()
   .def("get_release", &FileMetaData::getRelease)
   .def("get_steering", &FileMetaData::getSteering)
   .def("get_mc_events", &FileMetaData::getMcEvents)
+  .def("get_global_tag", &FileMetaData::getDatabaseGlobalTag)
   .def("set_lfn", &FileMetaData::setLfn);
 }
 
@@ -92,6 +93,7 @@ void FileMetaData::Print(Option_t* option) const
     cout << "  seed   : " << m_randomSeed << endl;
     cout << "  release: " << m_release << endl;
     cout << "  #MC    : " << m_mcEvents << endl;
+    cout << "globalTag: " << m_databaseGlobalTag << endl;
   }
 }
 
@@ -143,7 +145,7 @@ bool FileMetaData::read(std::istream& input, std::string& physicalFileName)
   return false;
 }
 
-bool FileMetaData::write(std::ostream& output, std::string physicalFileName)
+bool FileMetaData::write(std::ostream& output, std::string physicalFileName) const
 {
   output << "  <File>\n";
   output << "    <LFN>" << HTML::escape(m_lfn) << "</LFN>\n";

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/legendre/testFixtures/CDCLegendreTestFixture.h>
+#include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithSimpleSimulation.h>
 
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
@@ -28,57 +28,66 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TEST_F(CDCLegendreTestFixture, legendre_QuadTreeTest)
-{
-  //high-pt candidate
-  AxialHitQuadTreeProcessor::ChildRanges ranges1(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2,
-                                                 BasePrecisionFunction::getLookupGridLevel())),
-                                                 AxialHitQuadTreeProcessor::rangeY(0., 0.15));
-  OriginPrecisionFunction originPrecisionFunction;
-  BasePrecisionFunction::PrecisionFunction highPtPrecisionFunction = originPrecisionFunction.getFunction();
+namespace {
 
-  //low-pt candidate
-  AxialHitQuadTreeProcessor::ChildRanges ranges2(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2,
-                                                 BasePrecisionFunction::getLookupGridLevel())),
-                                                 AxialHitQuadTreeProcessor::rangeY(0., 0.30));
-  NonOriginPrecisionFunction nonOriginPrecisionFunction;
-  BasePrecisionFunction::PrecisionFunction lowPtPrecisionFunction = nonOriginPrecisionFunction.getFunction();
+  TEST_F(TrackFindingCDCTestWithSimpleSimulation, legendre_QuadTreeTest)
+  {
+    // high-pt candidate
+    AxialHitQuadTreeProcessor::ChildRanges
+    ranges1(AxialHitQuadTreeProcessor::rangeX(0,
+                                              std::pow(2, BasePrecisionFunction::getLookupGridLevel())),
+            AxialHitQuadTreeProcessor::rangeY(0., 0.15));
+    OriginPrecisionFunction originPrecisionFunction;
+    BasePrecisionFunction::PrecisionFunction highPtPrecisionFunction = originPrecisionFunction.getFunction();
 
+    // low-pt candidate
+    AxialHitQuadTreeProcessor::ChildRanges
+    ranges2(AxialHitQuadTreeProcessor::rangeX(0,
+                                              std::pow(2, BasePrecisionFunction::getLookupGridLevel())),
+            AxialHitQuadTreeProcessor::rangeY(0., 0.30));
 
-  std::vector<AxialHitQuadTreeProcessor::ReturnList> candidates;
+    NonOriginPrecisionFunction nonOriginPrecisionFunction;
+    BasePrecisionFunction::PrecisionFunction lowPtPrecisionFunction =
+      nonOriginPrecisionFunction.getFunction();
 
-  markAllHitsAsUnused();
-  std::vector<CDCConformalHit*>& hitsVector = getHitVector();
+    std::vector<AxialHitQuadTreeProcessor::ReturnList> candidates;
 
-  AxialHitQuadTreeProcessor::CandidateProcessorLambda lmdProcessor = [&candidates](const AxialHitQuadTreeProcessor::ReturnList & hits,
-  AxialHitQuadTreeProcessor::QuadTree*) {
-    candidates.push_back(hits);
-  };
+    this->loadPreparedEvent();
+    const int numberOfPossibleTrackCandidate = m_mcTracks.size();
+    std::vector<CDCConformalHit> conformalHits(m_axialWireHits.begin(), m_axialWireHits.end());
 
+    std::vector<CDCConformalHit*> hitsVector;
+    for (CDCConformalHit& conformalHit : conformalHits) {
+      hitsVector.push_back(&conformalHit);
+    }
 
+    AxialHitQuadTreeProcessor::CandidateProcessorLambda lmdProcessor =
+      [&candidates](const AxialHitQuadTreeProcessor::ReturnList & hits,
+    AxialHitQuadTreeProcessor::QuadTree*) { candidates.push_back(hits); };
 
-  auto now = std::chrono::high_resolution_clock::now();
-  AxialHitQuadTreeProcessor qtProcessor1(13, ranges1, highPtPrecisionFunction);
-  qtProcessor1.provideItemsSet(hitsVector);
+    auto now = std::chrono::high_resolution_clock::now();
+    AxialHitQuadTreeProcessor qtProcessor1(13, ranges1, highPtPrecisionFunction);
+    qtProcessor1.provideItemsSet(hitsVector);
 
-  // actual filling of the hits into the quad tree structure
-  qtProcessor1.fillGivenTree(lmdProcessor, 30);
+    // actual filling of the hits into the quad tree structure
+    qtProcessor1.fillGivenTree(lmdProcessor, 30);
 
-  AxialHitQuadTreeProcessor qtProcessor2(11, ranges2, lowPtPrecisionFunction);
-  qtProcessor2.provideItemsSet(hitsVector);
+    AxialHitQuadTreeProcessor qtProcessor2(11, ranges2, lowPtPrecisionFunction);
+    qtProcessor2.provideItemsSet(hitsVector);
 
-  // actual filling of the hits into the quad tree structure
-  qtProcessor2.fillGivenTree(lmdProcessor, 30);
-  auto later = std::chrono::high_resolution_clock::now();
+    // actual filling of the hits into the quad tree structure
+    qtProcessor2.fillGivenTree(lmdProcessor, 30);
+    auto later = std::chrono::high_resolution_clock::now();
 
-  ASSERT_EQ(numberOfPossibleTrackCandidate, candidates.size());
+    ASSERT_EQ(numberOfPossibleTrackCandidate, candidates.size());
 
-  std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(later - now);
-  B2INFO("QuadTree took " << time_span.count() << " seconds, found " << candidates.size() << " candidates");
+    std::chrono::duration<double> time_span =
+      std::chrono::duration_cast<std::chrono::duration<double>>(later - now);
+    B2INFO("QuadTree took " << time_span.count() << " seconds, found " << candidates.size() << " candidates");
 
-  // Check for the parameters of the track candidates
-  // The actual hit numbers are more than 30, but this is somewhat a lower bound
-  EXPECT_GE(candidates[0].size(), 30);
-  EXPECT_GE(candidates[1].size(), 30);
+    // Check for the parameters of the track candidates
+    // The actual hit numbers are more than 30, but this is somewhat a lower bound
+    EXPECT_GE(candidates[0].size(), 30);
+    EXPECT_GE(candidates[1].size(), 30);
+  }
 }
-

@@ -26,6 +26,7 @@
 #include "trg/ecl/dataobjects/TRGECLDigi.h"
 #include "trg//ecl/dataobjects/TRGECLDigi0.h"
 #include "trg/ecl/dataobjects/TRGECLHit.h"
+#include "trg/ecl/dataobjects/TRGECLWaveform.h" // by shebalin 
 
 #include <stdlib.h>
 #include <iostream>
@@ -38,7 +39,7 @@ using namespace Belle2;
 //
 //
 //
-TrgEclFAM::TrgEclFAM(): TimeRange(0)//, bin(0)
+TrgEclFAM::TrgEclFAM(): TimeRange(0), _waveform(0)//, bin(0)
 {
 
   CoeffSigPDF0.clear();
@@ -273,14 +274,6 @@ TrgEclFAM::getTCHit(int TableFlag)
 
 
   }
-
-  // for(int iii=0; iii< 576 ; iii++){
-  //   std::vector<int> iTCIdm = _TCMap->getXtalIdFromTCId(iii+1);
-  //   for(int jjj =0; jjj< 16; jjj++){
-  //     cout << iTCIdm[jjj] <<" ";
-  //   }
-  //   cout << endl;
-  // }
 
   for (int iXtalIdm = 0; iXtalIdm < 8736; iXtalIdm++) {
     int iTCIdm = _TCMap->getTCIdFromXtalId(iXtalIdm + 1) - 1;
@@ -1106,6 +1099,21 @@ TrgEclFAM::save(int m_nEvent)
 
     }
   }
+
+  if (_waveform == 1) {
+    StoreArray<TRGECLWaveform> TCWaveformArray;
+    for (int iTCIdm = 0; iTCIdm < 576;  iTCIdm++) {
+      if (iTCIdm == 80) iTCIdm =
+          512; // skip barrel
+      int tc_phi_id = _TCMap->getTCPhiIdFromTCId(iTCIdm + 1);
+      int tc_theta_id   = _TCMap->getTCThetaIdFromTCId(iTCIdm + 1);
+      TRGECLWaveform* newWf = TCWaveformArray.appendNew(iTCIdm + 1, TCDigiE[iTCIdm]);
+      newWf->setThetaPhiIDs(tc_theta_id, tc_phi_id);
+    }
+
+  }
+
+
   // for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
 
   //   _tcnoutput.push_back(noutput[iTCIdm]);
@@ -1561,7 +1569,7 @@ TrgEclFAM::FAMFit(int nbin_pedestal,
   int Nsmalldt = 10;
   int SmallOffset = 1;
   double IntervaldT  = fam_sampling_interval * 0.001 / Nsmalldt;
-  double EThreshold = 100; //[GeV]
+  double EThreshold = 50; //[GeV]
   int FitSleepCounter   = 100; // counter to suspend fit
   int FitSleepThreshold = 2;   // # of clk to suspend fit
   double FitE = 0;

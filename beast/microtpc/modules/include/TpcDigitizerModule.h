@@ -192,6 +192,10 @@ namespace Belle2 {
       int m_nTPC = 0;
       /** TPC coordinate */
       std::vector<TVector3> m_TPCCenter;
+      /** TPC angle X */
+      std::vector<float> m_TPCAngleX;
+      /** TPC angle Z */
+      std::vector<float> m_TPCAngleZ;
 
       /** Lower timing cut */
       double m_lowerTimingCut = 0;

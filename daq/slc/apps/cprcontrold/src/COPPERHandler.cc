@@ -123,27 +123,23 @@ bool NSMVHandlerHSLBFirmware::handleSetText(const std::string& firmware)
 
 bool NSMVHandlerHSLBBoot::handleSetText(const std::string& val)
 {
-  if (val == "on") {
-    std::string vname = StringUtil::replace(getName(), ".boot", ".firm");
-    std::string firmware;
-    m_callback.get(vname, firmware);
-    if (File::exist(firmware)) {
-      LogFile::info("Loading HSLB firmware: " + firmware);
-      try {
-        std::string cmd = StringUtil::form("booths -%c ", ('a' + m_hslb)) + firmware;
-        system(cmd.c_str());
-        //m_callback.getHSLB(m_hslb).bootfpga(firmware);
-        cmd = StringUtil::form("tesths -%c ", ('a' + m_hslb));
-        system(cmd.c_str());
-        m_callback.log(LogFile::INFO, "Loeded HSLB firm " + firmware);
-        return true;
-      } catch (const HSLBHandlerException& e) {
-        m_callback.log(LogFile::ERROR, "Failed to load HSLB firm " + firmware);
-      }
-    } else {
-      m_callback.log(LogFile::ERROR, "HSLB firmware %s not exists",
-                     firmware.c_str());
+  std::string firmware = val;
+  if (File::exist(firmware)) {
+    LogFile::info("Loading HSLB firmware: " + firmware);
+    try {
+      std::string cmd = StringUtil::form("booths -%c ", ('a' + m_hslb)) + firmware;
+      system(cmd.c_str());
+      //m_callback.getHSLB(m_hslb).bootfpga(firmware);
+      cmd = StringUtil::form("tesths -%c ", ('a' + m_hslb));
+      system(cmd.c_str());
+      m_callback.log(LogFile::INFO, "Loeded HSLB firm " + firmware);
+      return true;
+    } catch (const HSLBHandlerException& e) {
+      m_callback.log(LogFile::ERROR, "Failed to load HSLB firm " + firmware);
     }
+  } else {
+    m_callback.log(LogFile::ERROR, "HSLB firmware %s not exists",
+                   firmware.c_str());
   }
   return false;
 }
@@ -305,6 +301,29 @@ bool NSMVHandlerHSLBTest::handleGetText(std::string& val)
     LogFile::error("Failed to Test HSLB:%c", m_hslb + 'a');
   }
   return false;
+}
+
+bool NSMVHandlerHSLBUsed::handleSetInt(int val)
+{
+  NSMVHandlerInt::handleSetInt(val);
+  try {
+    int used = 0;
+    val = 0;
+    for (int i = 0; i < 4; i++) {
+      std::string vname = StringUtil::form("hslb[%d].used", i);
+      m_callback.get(vname, used);
+      val += (used << i);
+    }
+    m_callback.getTTRX().write(0x130, val);
+  } catch (const std::exception& e) {
+    LogFile::error(e.what());
+  }
+  return true;
+}
+
+bool NSMVHandlerHSLBUsed::handleGetInt(int& val)
+{
+  return NSMVHandlerInt::handleGetInt(val);
 }
 
 /*

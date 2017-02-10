@@ -14,18 +14,17 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-Phi0BinsSpec::Phi0BinsSpec(size_t nBins, size_t nOverlap, size_t nWidth) :
-  m_nBins(nBins),
-  m_nOverlap(nOverlap),
-  m_nWidth(nWidth)
+Phi0BinsSpec::Phi0BinsSpec(long nBins, int nOverlap, int nWidth)
+  : m_nBins(nBins)
+  , m_nOverlap(nOverlap)
+  , m_nWidth(nWidth)
 {
-  B2ASSERT("Overlap must be smaller than the width.",
-           m_nWidth > m_nOverlap);
+  B2ASSERT("Overlap must be smaller than the width.", m_nWidth > m_nOverlap);
 }
 
 DiscretePhi0::Array Phi0BinsSpec::constructArray() const
 {
-  const size_t nPositions = getNPositions();
+  const long nPositions = getNPositions();
   const double overlap = getOverlap();
   // Adjust the angle bounds such that overlap occures at the wrap around as well
   const double lowerBound = -M_PI - overlap / 2;
@@ -33,9 +32,9 @@ DiscretePhi0::Array Phi0BinsSpec::constructArray() const
   return linspace<Vector2D>(lowerBound, upperBound, nPositions, &(Vector2D::Phi));
 }
 
-size_t Phi0BinsSpec::getNPositions() const
+long Phi0BinsSpec::getNPositions() const
 {
-  const size_t nPositions = (m_nWidth - m_nOverlap) * m_nBins + m_nOverlap + 1;
+  const long nPositions = (m_nWidth - m_nOverlap) * m_nBins + m_nOverlap + 1;
   return nPositions;
 }
 

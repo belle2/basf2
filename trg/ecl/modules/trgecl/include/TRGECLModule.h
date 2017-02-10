@@ -85,6 +85,11 @@ namespace Belle2 {
     int    m_nRun;           //  Run number
     int    m_nEvent;         //  Event number
 
+    int _Bhabha;  // Bhabha option
+    int _Clustering; // Clustering option
+    int _EventTiming;  // Eventtiming option
+
+
   };
 
 } // namespace Belle2

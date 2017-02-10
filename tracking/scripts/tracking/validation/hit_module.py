@@ -12,13 +12,13 @@ from .pull import PullAnalysis
 from .fom import (
     ValidationFiguresOfMerit,
     ValidationManyFiguresOfMerit
-    )
+)
 
 from .module import (
     AlwaysPassFilter,
     getHelixFromMCParticle,
     TrackingValidationModule
-    )
+)
 
 import basf2
 
@@ -103,7 +103,8 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         # PT information
         # This is the number of mcTrackCands sharing a hit with the track cand.
         self.number_of_connected_tracks = collections.deque()
-        self.number_of_wrong_hits = collections.deque()  # This number gives information about the "badness" of the fake.
+        # This number gives information about the "badness" of the fake.
+        self.number_of_wrong_hits = collections.deque()
         # It is calculated by going through all hits of the fake track and the connected mc track cands and counting the number.
         # These numbers are than summed up and substracted by the biggest number
         # of hits this candidates shares with the mc track cands.
@@ -158,14 +159,14 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
                 cdcHitIDs = set(cdcHitIDs)
 
             totalHitListPR.extend(cdcHitIDs)
-            if self.trackMatchLookUp.isMatchedPRTrackCand(trackCand):
+            if self.trackMatchLookUp.isMatchedPRRecoTrack(trackCand):
                 totalHitListPRGood.extend(cdcHitIDs)
 
-            if self.trackMatchLookUp.isClonePRTrackCand(trackCand):
+            if self.trackMatchLookUp.isClonePRRecoTrack(trackCand):
                 totalHitListPRClone.extend(cdcHitIDs)
 
-            if (self.trackMatchLookUp.isBackgroundPRTrackCand(trackCand) or
-                    self.trackMatchLookUp.isBackgroundPRTrackCand(trackCand)):
+            if (self.trackMatchLookUp.isBackgroundPRRecoTrack(trackCand) or
+                    self.trackMatchLookUp.isBackgroundPRRecoTrack(trackCand)):
                 totalHitListPRFake.extend(cdcHitIDs)
 
         # Make the ids unqiue
@@ -186,8 +187,8 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
 
         for trackCand in trackCands:
 
-            is_matched = self.trackMatchLookUp.isMatchedPRTrackCand(trackCand)
-            is_clone = self.trackMatchLookUp.isClonePRTrackCand(trackCand)
+            is_matched = self.trackMatchLookUp.isMatchedPRRecoTrack(trackCand)
+            is_clone = self.trackMatchLookUp.isClonePRRecoTrack(trackCand)
 
             trackCandHits = [cdcHit.getArrayIndex() for cdcHit in trackCand.getCDCHitList()]
             # Working around a bug in ROOT where you should not access empty std::vectors
@@ -229,7 +230,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
 
             if is_matched or is_clone:
                 mcTrackCand = \
-                    self.trackMatchLookUp.getRelatedMCTrackCand(trackCand)
+                    self.trackMatchLookUp.getRelatedMCRecoTrack(trackCand)
                 mcTrackCandHits = [cdcHit.getArrayIndex() for cdcHit in mcTrackCand.getCDCHitList()]  # Checked
                 # Working around a bug in ROOT where you should not access empty std::vectors
                 if len(mcTrackCandHits) == 0:
@@ -243,7 +244,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
 
         for mcTrackCand in mcTrackCands:
             is_missing = \
-                self.trackMatchLookUp.isMissingMCTrackCand(mcTrackCand)
+                self.trackMatchLookUp.isMissingMCRecoTrack(mcTrackCand)
 
             mcTrackCandHits = [cdcHit.getArrayIndex() for cdcHit in mcTrackCand.getCDCHitList()]  # Checked
 

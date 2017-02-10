@@ -35,7 +35,7 @@ void FeasibleRLFacetFilter::exposeParameters(ModuleParamList* moduleParamList,
                                 m_param_hardRLCut);
 }
 
-CellState FeasibleRLFacetFilter::operator()(const CDCFacet& facet)
+Weight FeasibleRLFacetFilter::operator()(const CDCFacet& facet)
 {
   if (this->isFeasible(facet)) {
     return 3;

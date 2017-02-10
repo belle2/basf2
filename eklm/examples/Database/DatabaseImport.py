@@ -9,10 +9,6 @@ from ROOT.Belle2 import EKLMDatabaseImporter
 
 set_log_level(LogLevel.INFO)
 
-# Uncomment to upload the result to central database
-# reset_database()
-# use_central_database("eklm_test", LogLevel.INFO)
-
 eventinfosetter = register_module('EventInfoSetter')
 
 # Gearbox

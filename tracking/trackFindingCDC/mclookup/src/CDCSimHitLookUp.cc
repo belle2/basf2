@@ -297,8 +297,7 @@ const CDCWireHit* CDCSimHitLookUp::getWireHit(const CDCHit* ptrHit,
                                               const std::vector<CDCWireHit>& wireHits) const
 {
   if (not ptrHit) return nullptr;
-  ConstVectorRange<CDCWireHit> wireHit =
-    std::equal_range(wireHits.begin(), wireHits.end(), *ptrHit);
+  ConstVectorRange<CDCWireHit> wireHit{std::equal_range(wireHits.begin(), wireHits.end(), *ptrHit)};
 
   if (wireHit.empty()) {
     return nullptr;

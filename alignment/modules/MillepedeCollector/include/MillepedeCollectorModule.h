@@ -17,6 +17,8 @@
 #include <genfit/MeasuredStateOnPlane.h>
 #include <analysis/dataobjects/Particle.h>
 
+#include <tracking/dataobjects/RecoTrack.h>
+
 namespace Belle2 {
   /**
    * Calibration data collector for Millepede Algorithm
@@ -48,8 +50,19 @@ namespace Belle2 {
     /** Make a name for mille binary (encodes module name + starting exp, run and event + process id) */
     std::string getUniqueMilleName();
 
-    /** Get all useable tracks for particles */
+    /**
+     * Get all useable tracks for particles
+     *
+     * @param particles vector of Belle2::Particles to be changed in vector of genfit::Tracks
+     */
     std::vector<genfit::Track*> getParticlesTracks(std::vector<Particle*> particles);
+
+    /** Fit given RecoTrack with GBL
+     *
+     * @param particles vector of Belle2::Particles to be changed in vector of genfit::Tracks
+     * @param particle Pointer to reconstructed daughter particle updated by vertex fit OR nullptr for single track
+     */
+    void fitRecoTrack(RecoTrack& recoTrack, Particle* particle = nullptr);
 
     /** Compute the transformation matrix d(q/p,u',v',u,v)/d(x,y,z,px,py,pz) from state at first track point (vertex) */
     TMatrixD getGlobalToLocalTransform(genfit::MeasuredStateOnPlane msop);

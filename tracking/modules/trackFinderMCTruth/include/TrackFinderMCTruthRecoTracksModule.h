@@ -61,7 +61,7 @@ namespace Belle2 {
     bool m_useSVDHits;                                          /**< Boolean to select if SVDHits should be used*/
     bool m_useCDCHits;                                          /**< Boolean to select if CDCHits should be used*/
     bool m_useOnlyAxialCDCHits;                                 /**< Boolean to select if only axial CDCHits should be used*/
-    bool m_useOnlyBeforeTOP;                                         /**< Boolean to select if CDC hits after TOP detector are discarded*/
+    bool m_useOnlyBeforeTOP;                                    /**< Boolean to select if CDC hits after TOP detector are discarded*/
     float m_useNLoops;                                          /**< Number of loops to include in the MC tracks - effects only CDC.*/
 
 

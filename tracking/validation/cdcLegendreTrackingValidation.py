@@ -43,6 +43,8 @@ class CDCLegendre(TrackingValidationRun):
         'UseSVDHits': False,
         'UseCDCHits': True,
         'UseOnlyAxialCDCHits': True,
+        'UseOnlyBeforeTOP': True,
+        'UseNLoops': 1
     }
 
     pulls = True

@@ -107,7 +107,6 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                 tracking_coverage.pop("WhichParticles", None)
                 tracking_coverage.pop("EnergyCut", None)
                 tracking_coverage.pop("UseNLoops", None)
-                tracking_coverage.pop("UseNLoops", None)
 
                 matching_coverage = {key: value for key, value in tracking_coverage.items()
                                      if key in ('UsePXDHits', 'UseSVDHits', 'UseCDCHits')}

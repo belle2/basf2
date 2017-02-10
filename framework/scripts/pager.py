@@ -46,7 +46,7 @@ class Pager(object):
         if self.prompt is None:
             self.prompt = '%f'  # same as default prompt
         self.prompt += ' (press h for help or q to quit)'
-        p = subprocess.Popen(['less', '-R', '-Ps' + self.prompt, self.tmp_file.name])
+        p = subprocess.Popen(['less', '-R', '-F', '-X', '-Ps' + self.prompt, self.tmp_file.name])
         p.communicate()
         self.tmp_file.close()
         sys.stdout = sys.__stdout__

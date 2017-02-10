@@ -1,0 +1,11 @@
+#!/bin/bash
+echo -e "\033[0;31mAttention:\033[0m upload_localdatabase has been replaced.
+
+There is now a more general conditionsdb tool which in addition to uploading
+payloads also allows you to list, show, modify or download global tags.
+See \033[0;32m'conditionsdb --help'\033[0mfor more information
+
+Please use \033[0;32m'conditionsdb upload'\033[0m as replacement.
+
+\033[0;31mAttention:\033[0m upload_localdatabase has been replaced."
+exit 1

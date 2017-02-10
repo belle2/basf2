@@ -254,7 +254,7 @@ namespace Belle2 {
     std::string m_electronicName;   /**< electronic name */
     bool m_pedestalSubtracted = false; /**< true, if pedestal already subtracted */
 
-    ClassDef(TOPRawWaveform, 5); /**< ClassDef */
+    ClassDef(TOPRawWaveform, 6); /**< ClassDef */
 
   };
 

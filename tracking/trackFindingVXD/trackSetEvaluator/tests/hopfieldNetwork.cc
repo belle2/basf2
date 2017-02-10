@@ -38,9 +38,9 @@ protected:
   vector<OverlapResolverNodeInfo> getInput()
   {
     vector<OverlapResolverNodeInfo> trackCandidateInfos;
-    unsigned int myNTrackCands  = 100;
+    unsigned int myNTrackCands  = 200;
     unsigned int diff           = myNTrackCands - myTrueTracks;
-    unsigned int nOverlaps      = 7;
+    unsigned int nOverlaps      = 6;
 
     //Create competitor IDs
     vector <vector <unsigned short> > competitorIDMatrix(myNTrackCands);
@@ -57,10 +57,10 @@ protected:
       float qualityIndex = 0;
       if (ii < myTrueTracks) {
         qualityIndex = static_cast<float>(rand() % 100) / 100.;
-        B2INFO("TrueQI: " << qualityIndex);
+        B2INFO("Track Index" << ii << ", TrueQI: " << qualityIndex);
       } else {
         qualityIndex = 1 / (static_cast<float>(rand() % 100) + 1.2);
-        B2INFO("FakeQI: " << qualityIndex);
+        B2INFO("Track Index" << ii << ", FakeQI: " << qualityIndex);
       }
       trackCandidateInfos.emplace_back(qualityIndex, ii, competitorIDMatrix[ii], 0.8);
     }
@@ -77,7 +77,7 @@ TEST_F(HopfieldNetworkTest, TestPerformance)
   int countCorrectTracksSurvived  = 0;
   int countWrongTracksSurvived    = 0;
   for (auto && info : m_trackCandidateInfos) {
-    B2INFO("RealID: " << info.trackIndex << ", Neuron Value: " << info.activityState);
+    B2INFO("TrackIndex: " << info.trackIndex << ", Neuron Value: " << info.activityState);
     if (info.trackIndex <  myTrueTracks && info.activityState > 0.7) countCorrectTracksSurvived++;
     if (info.trackIndex >= myTrueTracks && info.activityState > 0.7) countWrongTracksSurvived++;
   }

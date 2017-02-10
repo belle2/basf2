@@ -17,7 +17,6 @@
 #include <TMatrixD.h>
 
 
-using namespace std;
 using namespace Belle2;
 
 
@@ -31,14 +30,19 @@ TrackSetEvaluatorHopfieldNNDEVModule::TrackSetEvaluatorHopfieldNNDEVModule() : M
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("tcArrayName", m_PARAMtcArrayName, " sets the name of expected StoreArray with SpacePointTrackCand in it",
-           string(""));
-  addParam("tcNetworkName", m_PARAMtcNetworkName, " sets the name of expected StoreArray<OverlapNetwork>", string(""));
+           std::string(""));
+  addParam("tcNetworkName", m_PARAMtcNetworkName, " sets the name of expected StoreArray<OverlapNetwork>",
+           std::string(""));
 }
 
 
 void TrackSetEvaluatorHopfieldNNDEVModule::event()
 {
   m_eventCounter++;
+  //If no SpacePointTrackCands are available, later algorithms may crash.
+  if (not m_spacePointTrackCands.getEntries()) {
+    return;
+  }
   m_nTCsTotal += m_spacePointTrackCands.getEntries();
 
   //Prepare the information for the actual HNN.

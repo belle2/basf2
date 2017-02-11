@@ -18,7 +18,7 @@
 namespace Belle2 {
   /** create human-readable or JSON output for key value pairs.
    *
-   * Usage example:
+   * Usage example for human-readable output:
       \code
       KeyValuePrinter pr(false); //JSON=false
       pr.put("a", 123);
@@ -32,8 +32,11 @@ namespace Belle2 {
       \endcode
    *
    * std::string, numeric types and std::vector<SUPPORTED TYPE>
-   * are supported for values.
-   * Compared to boost::property_tree::json_parser::write, KeyValuePrinter
+   * are supported as value types for put().
+   *
+   * JSON output is suitable for reading via e.g. json.loads() in Python,
+   * and performs the necessary escaping for strings.
+   * Compared to boost::property_tree::json_parser::write_json, KeyValuePrinter
    * handles non-string types correctly.
    */
   class KeyValuePrinter {

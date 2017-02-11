@@ -76,8 +76,8 @@ void FileMetaData::Print(Option_t* option) const
     cout << m_steering << endl;
     return;
   }
-  const bool use_json = (option == std::string("json"));
-  const bool all = (option && (option == std::string("all") || use_json));
+  const bool use_json = (option && option == std::string("json"));
+  const bool all = use_json || (option && option == std::string("all"));
   KeyValuePrinter printer(use_json);
   printer.put("LFN", m_lfn);
   printer.put("nEvents", m_nEvents);

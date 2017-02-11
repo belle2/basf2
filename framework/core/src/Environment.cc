@@ -131,10 +131,11 @@ void Environment::setJobInformation(const boost::shared_ptr<Path>& path)
   const std::list<ModulePtr>& modules = path->getModules();
 
   for (ModulePtr m : modules) {
-    string name = m->getName();
-    if (name == "RootInput") {
+    string type = m->getType();
+    if (type == "RootInput") {
+      bool ignoreOverride = m->getParam<bool>("ignoreCommandLineOverride").getValue();
       std::vector<std::string> inputFiles = Environment::Instance().getInputFilesOverride();
-      if (inputFiles.empty()) {
+      if (ignoreOverride or inputFiles.empty()) {
         string inputFileName = m->getParam<string>("inputFileName").getValue();
         if (!inputFileName.empty())
           inputFiles.push_back(inputFileName);
@@ -145,9 +146,10 @@ void Environment::setJobInformation(const boost::shared_ptr<Path>& path)
       for (string file : inputFiles) {
         m_jobInfoOutput += "INPUT FILE: " + file + "\n";
       }
-    } else if (name == "RootOutput") {
+    } else if (type == "RootOutput") {
       std::string out = Environment::Instance().getOutputFileOverride();
-      if (out.empty())
+      bool ignoreOverride = m->getParam<bool>("ignoreCommandLineOverride").getValue();
+      if (ignoreOverride or out.empty())
         out = m->getParam<string>("outputFileName").getValue();
       m_jobInfoOutput += "OUTPUT FILE: " + out + "\n";
     }

@@ -85,7 +85,7 @@ def command_tag_list(args, db=None):
 
     # and print, either detailed info for each tag or summary table at the end
     table = []
-    with Pager("List of global tags{}{}".format(tagfilter, " (detailed)" if getattr(args, "detail", False) else "")):
+    with Pager("List of global tags{}{}".format(tagfilter, " (detailed)" if getattr(args, "detail", False) else ""), True):
         for item in taglist:
             if getattr(args, "detail", False):
                 print_globaltag(item)
@@ -154,7 +154,7 @@ def command_tag_show(args, db=None):
         objects.append(req.json())
 
     # we retrieved all we could, print them
-    with Pager("Global tag Information"):
+    with Pager("Global tag Information", True):
         for info in objects:
             print_globaltag(info)
 
@@ -343,7 +343,7 @@ def command_iov(args, db):
         msg = "Obtaining list of iovs for global tag {tag}{filter}".format(tag=args.tag, filter=iovfilter)
         req = db.request("GET", "/globalTag/{tag}/globalTagPayloads".format(**vars(args)), msg)
 
-    with Pager("List of IoVs{}{}".format(iovfilter, " (detailed)" if args.detail else "")):
+    with Pager("List of IoVs{}{}".format(iovfilter, " (detailed)" if args.detail else ""), True):
         table = []
         for item in req.json():
             payload = item["payload" if 'payload' in item else "payloadId"]
@@ -421,7 +421,6 @@ class FullHelpAction(argparse._HelpAction):
 
     def __call__(self, parser, namespace, values, option_string=None):
         """Show full help message"""
-        print(namespace, values, option_string)
         # run in pager because amount of options will be looong
         with Pager("{} {}".format(parser.prog, option_string)):
             parser.print_help()

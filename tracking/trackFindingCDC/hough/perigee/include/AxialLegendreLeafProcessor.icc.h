@@ -27,8 +27,6 @@
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
 
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/BasePrecisionFunction.h>
-#include <tracking/trackFindingCDC/legendre/precisionFunctions/OriginPrecisionFunction.h>
-#include <tracking/trackFindingCDC/legendre/precisionFunctions/NonOriginPrecisionFunction.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -291,7 +289,7 @@ namespace Belle2 {
       moduleParamList->addParameter(prefixed(prefix, "curvResolution"),
                                     m_param_curvResolution,
                                     "The name of the resolution function to be used. "
-                                    "Valid values are 'none', 'base', 'origin', 'nonOrigin'",
+                                    "Valid values are 'none', 'basic', 'origin', 'nonOrigin'",
                                     m_param_curvResolution);
     }
 
@@ -301,15 +299,15 @@ namespace Belle2 {
       // Setup the requested precision function
       if (m_param_curvResolution == "none") {
         m_curvResolution = [](double curv __attribute__((unused))) { return NAN; };
-      } else if (m_param_curvResolution == "base") {
-        m_curvResolution = BasePrecisionFunction().getFunction();
+      } else if (m_param_curvResolution == "basic") {
+        m_curvResolution = &BasePrecisionFunction::getBasicCurvPrecision;
       } else if (m_param_curvResolution == "origin") {
-        m_curvResolution = OriginPrecisionFunction().getFunction();
+        m_curvResolution = &BasePrecisionFunction::getOriginCurvPrecision;
       } else if (m_param_curvResolution == "nonOrigin") {
-        m_curvResolution = NonOriginPrecisionFunction().getFunction();
+        m_curvResolution = &BasePrecisionFunction::getNonOriginCurvPrecision;
       } else {
         B2WARNING("Unknown curvature resolution function " << m_param_curvResolution);
-        m_curvResolution = BasePrecisionFunction().getFunction();
+        m_curvResolution = [](double curv __attribute__((unused))) { return NAN; };
       }
     }
   }

@@ -14,8 +14,6 @@
 #include <tracking/trackFindingCDC/processing/TrackProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/ConformalExtension.h>
-#include <tracking/trackFindingCDC/legendre/precisionFunctions/OriginPrecisionFunction.h>
-#include <tracking/trackFindingCDC/legendre/precisionFunctions/NonOriginPrecisionFunction.h>
 
 #include <list>
 #include <vector>
@@ -36,7 +34,7 @@ namespace Belle2 {
 
       ///Constructor
       QuadTreeNodeProcessor(AxialHitQuadTreeProcessor& qtProcessor,
-                            BasePrecisionFunction::PrecisionFunction& precisionFunct) :
+                            BasePrecisionFunction::PrecisionFunction precisionFunct) :
         m_qtProcessor(qtProcessor), m_precisionFunct(precisionFunct)
       {
       };

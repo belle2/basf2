@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
+
 #include <tracking/trackFindingCDC/legendre/quadtreetools/QuadTreePassCounter.h>
 
 namespace Belle2 {
@@ -27,18 +27,17 @@ namespace Belle2 {
         m_rangesFine(std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, BasePrecisionFunction::getLookupGridLevel())),
                                     AxialHitQuadTreeProcessor::rangeY(-0.02, 0.14))),
         m_rangesRough(std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, BasePrecisionFunction::getLookupGridLevel())),
-                                     AxialHitQuadTreeProcessor::rangeY(0., 0.30))),
-        m_originPrecisionFunction(),
-        m_nonOriginPrecisionFunction()
+                                     AxialHitQuadTreeProcessor::rangeY(0., 0.30)))
       {};
 
       /// Get precision function for quadtree
-      BasePrecisionFunction::PrecisionFunction& getPrecisionFunction()
+      BasePrecisionFunction::PrecisionFunction getPrecisionFunction()
       {
-        if (m_legendreFindingPass == LegendreFindingPass::NonCurlers)
-          return m_originPrecisionFunction.getFunction();
-        else
-          return m_nonOriginPrecisionFunction.getFunction();
+        if (m_legendreFindingPass == LegendreFindingPass::NonCurlers) {
+          return &BasePrecisionFunction::getOriginCurvPrecision;
+        } else {
+          return &BasePrecisionFunction::getNonOriginCurvPrecision;
+        }
       };
 
       /// Get threshold on number of hits
@@ -99,13 +98,8 @@ namespace Belle2 {
 
       AxialHitQuadTreeProcessor::ChildRanges m_rangesFine; /**< Ranges which correspond to more fine binning*/
       AxialHitQuadTreeProcessor::ChildRanges m_rangesRough; /**< Ranges which correspond to more rough binning*/
-
-      OriginPrecisionFunction m_originPrecisionFunction; /**< More finer precision function (deeper quadtree). */
-      NonOriginPrecisionFunction m_nonOriginPrecisionFunction; /**< More rough precision function. */
-
     };
 
   }
 
 }
-

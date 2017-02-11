@@ -15,8 +15,6 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeNodeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessorWithNewReferencePoint.h>
-#include <tracking/trackFindingCDC/legendre/precisionFunctions/OriginPrecisionFunction.h>
-#include <tracking/trackFindingCDC/legendre/precisionFunctions/NonOriginPrecisionFunction.h>
 #include <tracking/trackFindingCDC/legendre/quadtreetools/QuadTreeParameters.h>
 
 #include <list>

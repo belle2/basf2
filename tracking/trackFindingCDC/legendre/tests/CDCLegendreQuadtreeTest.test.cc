@@ -13,8 +13,7 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
-#include <tracking/trackFindingCDC/legendre/precisionFunctions/OriginPrecisionFunction.h>
-#include <tracking/trackFindingCDC/legendre/precisionFunctions/NonOriginPrecisionFunction.h>
+#include <tracking/trackFindingCDC/legendre/precisionFunctions/BasePrecisionFunction.h>
 
 #include <set>
 #include <cmath>
@@ -37,8 +36,7 @@ namespace {
     ranges1(AxialHitQuadTreeProcessor::rangeX(0,
                                               std::pow(2, BasePrecisionFunction::getLookupGridLevel())),
             AxialHitQuadTreeProcessor::rangeY(0., 0.15));
-    OriginPrecisionFunction originPrecisionFunction;
-    BasePrecisionFunction::PrecisionFunction highPtPrecisionFunction = originPrecisionFunction.getFunction();
+    BasePrecisionFunction::PrecisionFunction highPtPrecisionFunction = &BasePrecisionFunction::getOriginCurvPrecision;
 
     // low-pt candidate
     AxialHitQuadTreeProcessor::ChildRanges
@@ -46,9 +44,7 @@ namespace {
                                               std::pow(2, BasePrecisionFunction::getLookupGridLevel())),
             AxialHitQuadTreeProcessor::rangeY(0., 0.30));
 
-    NonOriginPrecisionFunction nonOriginPrecisionFunction;
-    BasePrecisionFunction::PrecisionFunction lowPtPrecisionFunction =
-      nonOriginPrecisionFunction.getFunction();
+    BasePrecisionFunction::PrecisionFunction lowPtPrecisionFunction = &BasePrecisionFunction::getNonOriginCurvPrecision;
 
     std::vector<AxialHitQuadTreeProcessor::ReturnList> candidates;
 

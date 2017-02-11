@@ -95,7 +95,7 @@ def command_tag_list(args, db=None):
                     item["name"],
                     item.get("description", ""),
                     item["globalTagType"]["name"],
-                    tagstatus,
+                    item["globalTagStatus"]["name"],
                     item["payloadCount"],
                 ])
 

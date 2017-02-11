@@ -7,9 +7,8 @@
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
-
-
 #pragma once
+
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorTemplate.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
@@ -19,7 +18,7 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
-#include <tracking/trackFindingCDC/legendre/precisionFunctions/BasePrecisionFunction.h>
+#include <tracking/trackFindingCDC/legendre/precisionFunctions/PrecisionUtil.h>
 
 
 #include <TF1.h>
@@ -41,7 +40,7 @@ namespace Belle2 {
 
       /// Constructor
       AxialHitQuadTreeProcessor(unsigned char lastLevel, const ChildRanges& ranges,
-                                BasePrecisionFunction::PrecisionFunction lmdFunctLevel,
+                                PrecisionUtil::PrecisionFunction lmdFunctLevel,
                                 bool standartBinning = false) :
         QuadTreeProcessorTemplate(lastLevel, ranges), m_standartBinning(standartBinning), m_lmdFunctLevel(lmdFunctLevel) { }
 
@@ -55,7 +54,7 @@ namespace Belle2 {
       bool m_standartBinning;
 
       /// Lambda which holds resolution function for the quadtree
-      BasePrecisionFunction::PrecisionFunction m_lmdFunctLevel;
+      PrecisionUtil::PrecisionFunction m_lmdFunctLevel;
 
       /// Function to check whether sinogram is crossing the node (see AxialHitQuadTreeProcessor::insertItemInNode())
       bool sameSign(double n1, double n2, double n3, double n4) const

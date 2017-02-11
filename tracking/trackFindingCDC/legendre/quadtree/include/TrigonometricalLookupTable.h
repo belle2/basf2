@@ -17,7 +17,7 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Utils.h>
-#include <tracking/trackFindingCDC/legendre/precisionFunctions/BasePrecisionFunction.h>
+#include <tracking/trackFindingCDC/legendre/precisionFunctions/PrecisionUtil.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
@@ -33,7 +33,7 @@ namespace Belle2 {
      * Deepness (grid level) of the table could be modified via template parameter. Number of bins in the table is 2^level.
      * Since default value for quadtree search is 12 as default deepness of 16 has been chosen to keep ability to perform bins overlapping.
      */
-    template<unsigned int maxLvl = BasePrecisionFunction::getLookupGridLevel()>
+    template<unsigned int maxLvl = PrecisionUtil::getLookupGridLevel()>
     class TrigonometricalLookupTable {
 
     public:

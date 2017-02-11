@@ -24,19 +24,19 @@ namespace Belle2 {
       /// Constructor
       QuadTreeParameters(int maxLevel, LegendreFindingPass& legendreFindingPass):
         m_maxLevel(maxLevel), m_legendreFindingPass(legendreFindingPass),
-        m_rangesFine(std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, BasePrecisionFunction::getLookupGridLevel())),
+        m_rangesFine(std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, PrecisionUtil::getLookupGridLevel())),
                                     AxialHitQuadTreeProcessor::rangeY(-0.02, 0.14))),
-        m_rangesRough(std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, BasePrecisionFunction::getLookupGridLevel())),
+        m_rangesRough(std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, PrecisionUtil::getLookupGridLevel())),
                                      AxialHitQuadTreeProcessor::rangeY(0., 0.30)))
       {};
 
       /// Get precision function for quadtree
-      BasePrecisionFunction::PrecisionFunction getPrecisionFunction()
+      PrecisionUtil::PrecisionFunction getPrecisionFunction()
       {
         if (m_legendreFindingPass == LegendreFindingPass::NonCurlers) {
-          return &BasePrecisionFunction::getOriginCurvPrecision;
+          return &PrecisionUtil::getOriginCurvPrecision;
         } else {
-          return &BasePrecisionFunction::getNonOriginCurvPrecision;
+          return &PrecisionUtil::getNonOriginCurvPrecision;
         }
       };
 

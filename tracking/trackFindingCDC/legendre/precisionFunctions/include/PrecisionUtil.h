@@ -19,7 +19,7 @@ namespace Belle2 {
      * Basic function for checking quadtree's node "r" boundaries:
      * when used in quadtree processor marks nodes at lvl==13 as leafs
      */
-    class BasePrecisionFunction {
+    class PrecisionUtil {
 
     public: // Auxiliary stuff
       /// Returns desired deepness of the trigonometrical lookup table. Used as template parameter for the TrigonometricalLookupTable<> class.

@@ -34,7 +34,7 @@ namespace Belle2 {
 
       ///Constructor
       QuadTreeNodeProcessor(AxialHitQuadTreeProcessor& qtProcessor,
-                            BasePrecisionFunction::PrecisionFunction precisionFunct) :
+                            PrecisionUtil::PrecisionFunction precisionFunct) :
         m_qtProcessor(qtProcessor), m_precisionFunct(precisionFunct)
       {
       };
@@ -173,10 +173,10 @@ namespace Belle2 {
     private:
       AxialHitQuadTreeProcessor& m_qtProcessor; /**< Reference to the quadtree processor. */
 
-      BasePrecisionFunction::PrecisionFunction m_precisionFunct; /**< Quadtree precision function. */
+      PrecisionUtil::PrecisionFunction m_precisionFunct; /**< Quadtree precision function. */
 
       const unsigned long m_nbinsTheta = pow(2,
-                                             TrackFindingCDC::BasePrecisionFunction::getLookupGridLevel()); /**< Number of theta bins.*/
+                                             TrackFindingCDC::PrecisionUtil::getLookupGridLevel()); /**< Number of theta bins.*/
     };
 
   }

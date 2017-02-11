@@ -430,7 +430,16 @@ namespace Belle2 {
       unsigned short window = word & 0x1FF;
       unsigned carrierAsicChannelWindow = word;
 
-
+      // checks for data corruption
+      if (carrier != carrierFE)
+        B2ERROR("TOPUnpacker: Type2or3Ver1 - carrier numbers differ " << carrier <<
+                " " << carrierFE);
+      if (asic != asicFE)
+        B2ERROR("TOPUnpacker: Type2or3Ver1 - ASIC numbers differ " << asic <<
+                " " << asicFE);
+      if (asicChannel != asicChannelFE)
+        B2ERROR("TOPUnpacker: Type2or3Ver1 - ASIC channel numbers differ " << asicChannel <<
+                " " << asicChannelFE);
       if (window != convertedAddr)
         B2ERROR("TOPUnpacker: Type2or3Ver1 - window numbers differ " << window <<
                 " " << convertedAddr);
@@ -448,7 +457,6 @@ namespace Belle2 {
 
       word = array.getWord(); // word 22
       windows.push_back(word & 0x1FF);
-
 
       int numWords = 4 * 32; // (numPoints + 1) / 2;
       if (array.getRemainingWords() < numWords) {

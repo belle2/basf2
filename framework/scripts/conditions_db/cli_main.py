@@ -442,6 +442,8 @@ def main():
     return.
     """
 
+    # disable error summary
+    logging.enable_summary(False)
     # modify logging to remove the useless module: lines
     for level in LogLevel.values.values():
         logging.set_info(level, LogInfo.LEVEL | LogInfo.MESSAGE)
@@ -512,7 +514,7 @@ def main():
     # manage some common options for up and downloading. slightly hacky but
     # need to be given to ConditionsDB on construction so meh
     nprocess = getattr(args, "nprocess", 1)
-    retries = getattr(args, "retries", 1)
+    retries = getattr(args, "retries", 0)
     # need at least one worker thread
     if nprocess <= 0:
         B2WARNING("-j must be larger than zero, ignoring")

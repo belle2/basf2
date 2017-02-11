@@ -142,10 +142,10 @@ namespace Belle2 {
             unpackType0Ver16(buffer, bufferSize, rawDigits, slowData);
             break;
           case static_cast<int>(TOP::RawDataType::c_Type2Ver1):
-            err = unpackType2or3Ver1(buffer, bufferSize, rawDigits, waveforms, false);
+            err = unpackInterimFEVer01(buffer, bufferSize, rawDigits, waveforms, false);
             break;
           case static_cast<int>(TOP::RawDataType::c_Type3Ver1):
-            err = unpackType2or3Ver1(buffer, bufferSize, rawDigits, waveforms, true);
+            err = unpackInterimFEVer01(buffer, bufferSize, rawDigits, waveforms, true);
             break;
           case static_cast<int>(TOP::RawDataType::c_Draft):
             unpackProductionDraft(buffer, bufferSize, digits);
@@ -273,10 +273,10 @@ namespace Belle2 {
   }
 
 
-  int TOPUnpackerModule::unpackType2or3Ver1(const int* buffer, int bufferSize,
-                                            StoreArray<TOPRawDigit>& rawDigits,
-                                            StoreArray<TOPRawWaveform>& waveforms,
-                                            bool pedestalSubtracted)
+  int TOPUnpackerModule::unpackInterimFEVer01(const int* buffer, int bufferSize,
+                                              StoreArray<TOPRawDigit>& rawDigits,
+                                              StoreArray<TOPRawWaveform>& waveforms,
+                                              bool pedestalSubtracted)
   {
 
     if (pedestalSubtracted) {
@@ -292,6 +292,7 @@ namespace Belle2 {
     unsigned short scrodID = word & 0x0FFF;
     word = array.getWord(); // header word 1 (what it contains?)
 
+    short asicChanFix = 0; // temporary fix since it's not given in FE header
 
     while (array.getRemainingWords() > 15) {
 
@@ -310,8 +311,17 @@ namespace Belle2 {
         return array.getRemainingWords();
       }
 
-      word = array.getWord(); // word 2 (what it contains?)
-      unsigned lastWrAddr = word & 0xFF;
+      word = array.getWord(); // word 2
+      //      unsigned lastWrAddr = word & 0x1FF;
+      unsigned lastWrAddr = (word & 0x0FF) << 1;
+      unsigned short asicChannelFE = (word >> 9) & 0x07;
+      unsigned short asicFE = (word >> 12) & 0x03;
+      unsigned short carrierFE = (word >> 14) & 0x03;
+
+      // temporary fix since it's not given in FE (in which order they come?)
+      asicChannelFE = asicChanFix % 8;
+      asicChanFix++;
+      // end fix
 
       // feature-extracted data (positive signal)
       word = array.getWord(); // word 3
@@ -364,6 +374,48 @@ namespace Belle2 {
         return array.getRemainingWords();
       }
 
+      // store to raw digits
+      std::vector<TOPRawDigit*> digits; // needed for creating relations to waveforms
+      if (abs(valuePeak_p) != 9999) {
+        auto* digit = rawDigits.appendNew(scrodID);
+        digit->setCarrierNumber(carrierFE);
+        digit->setASICNumber(asicFE);
+        digit->setASICChannel(asicChannelFE);
+        digit->setASICWindow(convertedAddr);
+        digit->setLastWriteAddr(lastWrAddr);
+        digit->setSampleRise(sampleRise_p);
+        digit->setDeltaSamplePeak(samplePeak_p - sampleRise_p);
+        digit->setDeltaSampleFall(sampleFall_p - sampleRise_p);
+        digit->setValueRise0(valueRise0_p);
+        digit->setValueRise1(valueRise1_p);
+        digit->setValuePeak(valuePeak_p);
+        digit->setValueFall0(valueFall0_p);
+        digit->setValueFall1(valueFall1_p);
+        digit->setIntegral(integral_p);
+        //        digit->setErrorFlags(qualityFlags_p); // not good solution !
+        digits.push_back(digit);
+      }
+      if (abs(valuePeak_n) != 9999) {
+        auto* digit = rawDigits.appendNew(scrodID);
+        digit->setCarrierNumber(carrierFE);
+        digit->setASICNumber(asicFE);
+        digit->setASICChannel(asicChannelFE);
+        digit->setASICWindow(convertedAddr);
+        digit->setLastWriteAddr(lastWrAddr);
+        digit->setSampleRise(sampleRise_n);
+        digit->setDeltaSamplePeak(samplePeak_n - sampleRise_n);
+        digit->setDeltaSampleFall(sampleFall_n - sampleRise_n);
+        digit->setValueRise0(valueRise0_n);
+        digit->setValueRise1(valueRise1_n);
+        digit->setValuePeak(valuePeak_n);
+        digit->setValueFall0(valueFall0_n);
+        digit->setValueFall1(valueFall1_n);
+        digit->setIntegral(integral_n);
+        //        digit->setErrorFlags(qualityFlags_n); // not good solution !
+        digits.push_back(digit);
+      }
+
+
       if (header != 0xaaaa0103) continue;
 
       // waveform header
@@ -383,46 +435,8 @@ namespace Belle2 {
         B2ERROR("TOPUnpacker: Type2or3Ver1 - window numbers differ " << window <<
                 " " << convertedAddr);
 
-      // store to raw digits (carrier/asic/channel not available before waveform header!)
-      std::vector<TOPRawDigit*> digits; // needed for creating relations to waveforms
-      if (abs(valuePeak_p) != 9999) {
-        auto* digit = rawDigits.appendNew(scrodID);
-        digit->setCarrierNumber(carrier);
-        digit->setASICNumber(asic);
-        digit->setASICChannel(asicChannel);
-        digit->setASICWindow(window);
-        digit->setSampleRise(sampleRise_p);
-        digit->setDeltaSamplePeak(samplePeak_p - sampleRise_p);
-        digit->setDeltaSampleFall(sampleFall_p - sampleRise_p);
-        digit->setValueRise0(valueRise0_p);
-        digit->setValueRise1(valueRise1_p);
-        digit->setValuePeak(valuePeak_p);
-        digit->setValueFall0(valueFall0_p);
-        digit->setValueFall1(valueFall1_p);
-        digit->setIntegral(integral_p);
-        //        digit->setErrorFlags(qualityFlags_p); // not good solution !
-        digits.push_back(digit);
-      }
-      if (abs(valuePeak_n) != 9999) {
-        auto* digit = rawDigits.appendNew(scrodID);
-        digit->setCarrierNumber(carrier);
-        digit->setASICNumber(asic);
-        digit->setASICChannel(asicChannel);
-        digit->setASICWindow(window);
-        digit->setSampleRise(sampleRise_n);
-        digit->setDeltaSamplePeak(samplePeak_n - sampleRise_n);
-        digit->setDeltaSampleFall(sampleFall_n - sampleRise_n);
-        digit->setValueRise0(valueRise0_n);
-        digit->setValueRise1(valueRise1_n);
-        digit->setValuePeak(valuePeak_n);
-        digit->setValueFall0(valueFall0_n);
-        digit->setValueFall1(valueFall1_n);
-        digit->setIntegral(integral_n);
-        //        digit->setErrorFlags(qualityFlags_n); // not good solution !
-        digits.push_back(digit);
-      }
-
-      //reading out all four window addresses, to be for correcnt alignment of individual readout windows in written waveform
+      // reading out all four window addresses
+      // to be for correcnt alignment of individual readout windows in written waveform
       std::vector<unsigned short> windows;
       windows.push_back(window);
 

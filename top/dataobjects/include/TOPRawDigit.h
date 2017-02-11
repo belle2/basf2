@@ -70,6 +70,12 @@ namespace Belle2 {
     void setASICWindow(unsigned short window) {m_window = window;}
 
     /**
+     * Sets current (reference) window number
+     * @param window number
+     */
+    void setLastWriteAddr(unsigned short window) {m_lastWriteAddr = window;}
+
+    /**
      * Sets fine timing for 50% CFD at rising edge (within two samples)
      * @param tfine fine timing
      */
@@ -162,9 +168,15 @@ namespace Belle2 {
 
     /**
      * Returns ASIC storage window number
-     * @return storage window number
+     * @return window number
      */
     unsigned getASICWindow() const {return m_window;}
+
+    /**
+     * Returns current (reference) ASIC window number
+     * @return window number
+     */
+    unsigned getLastWriteAddr() const {return m_lastWriteAddr;}
 
     /**
      * Returns fine timing for 50% CFD (within two samples)
@@ -331,8 +343,9 @@ namespace Belle2 {
     short m_VFall1 = 0;       /**< ADC value at m_sampleRise + m_dSampleFall + 1 */
     short m_integral = 0;     /**< integral of a pulse (e.g. \propto charge) */
     unsigned short m_errorFlags = 0; /**< feature extraction error flags (see enum) */
+    unsigned short m_lastWriteAddr = 0; /**< current (reference) window number */
 
-    ClassDef(TOPRawDigit, 1); /**< ClassDef */
+    ClassDef(TOPRawDigit, 2); /**< ClassDef */
 
   };
 

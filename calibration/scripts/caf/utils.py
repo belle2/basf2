@@ -413,15 +413,9 @@ def get_iov_from_file(file_path):
     Uses the showmetadata basf2 tool.
     """
     import subprocess
-    metadata_output = subprocess.check_output(['showmetadata', file_path], universal_newlines=True)
-    for line in metadata_output.split("\n"):
-        if "range" in line:
-            words = line.split()
-            low_range = words[2]
-            high_range = words[4]
-            exp_low, run_low, event_low = low_range.split('/')
-            exp_high, run_high, event_high = high_range.split('/')
-    return IoV(int(exp_low), int(run_low), int(exp_high), int(run_high))
+    metadata_output = subprocess.check_output(['showmetadata', '--json', file_path])
+    m = json.loads(metadata_output.decode('utf-8'))
+    return IoV(m['experimentLow'], m['runLow'], m['experimentHigh'], m['runHigh'])
 
 
 def find_absolute_file_paths(file_path_patterns):

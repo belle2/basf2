@@ -110,7 +110,7 @@ namespace Belle2 {
       return magFieldVec;
     }
     //Loop over all magnetic field components and add their magnetic field vectors
-    for (BFieldComponentAbs* comp : m_components) {
+    for (const BFieldComponentAbs* comp : m_components) {
       magFieldVec += comp->calculate(point);
     }
     return magFieldVec;

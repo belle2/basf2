@@ -89,6 +89,12 @@ void DisplayModule::initialize()
   StoreArray<CDCHit>::optional();
   StoreArray<ARICHHit>::optional();
   StoreArray<ROIid>::optional();
+  StoreArray<RecoHitInformation::UsedPXDHit>::optional();
+  StoreArray<RecoHitInformation::UsedSVDHit>::optional();
+  StoreArray<RecoHitInformation::UsedCDCHit>::optional();
+  StoreArray<TrackCandidateTFInfo>::optional();
+  StoreArray<CellTFInfo>::optional();
+  StoreArray<SectorTFInfo>::optional();
 
   m_display = new DisplayUI(m_automatic);
   //pass some parameters to DisplayUI to be able to change them at run time
@@ -167,9 +173,7 @@ void DisplayModule::event()
     for (std::string colName : recoTrackArrays) {
       StoreArray<RecoTrack> recoTracks(colName);
       for (const RecoTrack& recoTrack : recoTracks) {
-
         m_visualizer->addTrackCandidate(colName, recoTrack);
-
       }
     }
 

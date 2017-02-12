@@ -13,7 +13,7 @@ import argparse
 from basf2 import B2ERROR, B2WARNING, LogLevel, LogInfo, logging, pretty_print_table
 from pager import Pager
 from dateutil.parser import parse as parse_date
-from . import ConditionsDB, enable_debugging
+from . import ConditionsDB, enable_debugging, encode_name
 from .cli_utils import ItemFilter
 # the command_* functions are imported but not used so disable warning about
 # this if pylama/pylint is used to check
@@ -143,7 +143,7 @@ def command_tag_show(args, db=None):
     objects = []
     for tag in args.tag:
         try:
-            req = db.request("GET", "/globalTag/{}".format(tag),
+            req = db.request("GET", "/globalTag/{}".format(encode_name(tag)),
                              "Getting info for global tag {}".format(tag))
         except ConditionsDB.RequestError as e:
             # ok, there's an error for this one, let's continue with the other
@@ -189,7 +189,8 @@ def command_tag_create(args, db=None):
     if typeinfo is None:
         return 1
 
-    db.request("POST", "/globalTag/{name}".format(**typeinfo), "Creating global tag {name}".format(**info),
+    db.request("POST", "/globalTag/{}".format(encode_name(typeinfo["name"])),
+               "Creating global tag {name}".format(**info),
                json=info)
 
 
@@ -210,7 +211,7 @@ def command_tag_modify(args, db=None):
         return
 
     # first we need to get the old tag information
-    req = db.request("GET", "/globalTag/{}".format(args.tag),
+    req = db.request("GET", "/globalTag/{}".format(encode_name(args.tag)),
                      "Getting info for global tag {}".format(args.tag))
 
     # now we update the tag information
@@ -250,11 +251,11 @@ def command_tag_clone(args, db=None):
         return
 
     # first we need to get the old tag information
-    req = db.request("GET", "/globalTag/{}".format(args.tag),
+    req = db.request("GET", "/globalTag/{}".format(encode_name(args.tag)),
                      "Getting info for global tag {}".format(args.tag))
     info = req.json()
 
-    # now we clone the tag
+    # now we clone the tag. id came from the database so no need for escape
     req = db.request("POST", "/globalTags/{globalTagId}".format(**info),
                      "Cloning global tag {name} (id={globalTagId})".format(**info))
 
@@ -285,7 +286,8 @@ def command_tag_publish(args, db):
         B2ERROR("Names don't match, aborting")
         return 1
 
-    db.request("PUT", "/globalTag/{}/PUBLISH".format(args.tag), "Publishing global tag {}".format(args.tag))
+    db.request("PUT", "/globalTag/{}/PUBLISH".format(encode_name(args.tag)),
+               "Publishing global tag {}".format(args.tag))
 
 
 def command_tag_invalidate(args, db):
@@ -306,7 +308,8 @@ def command_tag_invalidate(args, db):
         B2ERROR("Names don't match, aborting")
         return 1
 
-    db.request("PUT", "/globalTag/{}/INVALID".format(args.tag), "invalidateing global tag {}".format(args.tag))
+    db.request("PUT", "/globalTag/{}/INVALID".format(encode_name(args.tag)),
+               "invalidateing global tag {}".format(args.tag))
 
 
 def command_iov(args, db):
@@ -341,7 +344,7 @@ def command_iov(args, db):
                                                              'runNumber': args.run[1]})
     else:
         msg = "Obtaining list of iovs for global tag {tag}{filter}".format(tag=args.tag, filter=iovfilter)
-        req = db.request("GET", "/globalTag/{tag}/globalTagPayloads".format(**vars(args)), msg)
+        req = db.request("GET", "/globalTag/{}/globalTagPayloads".format(encode_name(args.tag)), msg)
 
     with Pager("List of IoVs{}{}".format(iovfilter, " (detailed)" if args.detail else ""), True):
         table = []

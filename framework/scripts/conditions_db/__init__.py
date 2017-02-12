@@ -14,6 +14,7 @@ from requests.packages.urllib3.fields import RequestField
 from requests.packages.urllib3.filepost import encode_multipart_formdata
 import json
 import hashlib
+import urllib
 
 
 def calculate_checksum(filename):
@@ -22,6 +23,11 @@ def calculate_checksum(filename):
     with open(filename, "rb") as data:
         md5hash.update(data.read())
     return md5hash.hexdigest()
+
+
+def encode_name(name):
+    """Escape name to be used in an url"""
+    return urllib.parse.quote(name, safe="")
 
 
 class ConditionsDB:
@@ -120,7 +126,7 @@ class ConditionsDB:
         id or None if the tag was not found"""
 
         try:
-            req = self.request("GET", "/globalTag/{globalTagName}".format(globalTagName=name))
+            req = self.request("GET", "/globalTag/{globalTagName}".format(globalTagName=encode_name(name)))
         except ConditionsDB.RequestError as e:
             B2ERROR("Cannot find global tag '{}': {}".format(name, e))
             return None
@@ -150,7 +156,8 @@ class ConditionsDB:
 
         try:
             if global_tag:
-                req = self.request("GET", "/globalTag/{global_tag}/payloads".format(global_tag=global_tag))
+                req = self.request("GET", "/globalTag/{global_tag}/payloads"
+                                   .format(global_tag=encode_name(global_tag)))
             else:
                 req = self.request("GET", "/payloads")
         except ConditionsDB.RequestError as e:
@@ -199,7 +206,8 @@ class ConditionsDB:
         # now make the request. Note to self: if multipart/form-data would be
         # accepted this would be so much nicer here. but it works.
         try:
-            req = self.request("POST", "/package/dbstore/module/{moduleName}/payload".format(moduleName=module),
+            req = self.request("POST", "/package/dbstore/module/{moduleName}/payload"
+                               .format(moduleName=encode_name(module)),
                                data=post_body, headers=headers)
         except ConditionsDB.RequestError as e:
             B2ERROR("Could not create Payload: {}".format(e))
@@ -222,10 +230,20 @@ class ConditionsDB:
         Returns:
             payloadIovId of the created iov, None if creation was not successful
         """
+        try:
+            # try to convert all arguments except self to integers to make sure they are
+            # valid.
+            local_variables = locals()
+            variables = {e: int(local_variables[e]) for e in
+                         ["globalTagId", "payloadId", "firstExp", "firstRun", "finalExp", "finalRun"]}
+        except ValueError:
+            B2ERROR("create_iov: All parameters need to be integers")
+            return None
+
         # try to create the iov
         try:
             req = self.request("POST", "/globalTagPayload/{globalTagId},{payloadId}"
-                               "/payloadIov/{firstExp},{firstRun},{finalExp},{finalRun}".format(**locals()))
+                               "/payloadIov/{firstExp},{firstRun},{finalExp},{finalRun}".format(**variables))
         except ConditionsDB.RequestError as e:
             B2ERROR("Could not create IOV: {}".format(e))
             return None
@@ -237,7 +255,8 @@ class ConditionsDB:
         which maps (payloadId, first runId, final runId) to iovId"""
 
         try:
-            req = self.request("GET", "/globalTag/{globalTagName}/globalTagPayloads".format(globalTagName=globalTagName))
+            req = self.request("GET", "/globalTag/{globalTagName}/globalTagPayloads"
+                               .format(globalTagName=encode_name(globalTagName)))
         except ConditionsDB.RequestError as e:
             # there could be just no iovs so no error
             return {}

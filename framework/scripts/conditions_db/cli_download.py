@@ -13,7 +13,7 @@ import os
 import requests
 import shutil
 from urllib.parse import urljoin
-from . import calculate_checksum
+from . import calculate_checksum, encode_name
 from .cli_utils import ItemFilter
 from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging
 from concurrent.futures import ThreadPoolExecutor
@@ -103,7 +103,7 @@ def command_download(args, db=None):
     for level in LogLevel.values.values():
         logging.set_info(level, LogInfo.LEVEL | LogInfo.MESSAGE | LogInfo.TIMESTAMP)
 
-    req = db.request("GET", "/globalTag/{tag}/globalTagPayloads".format(**vars(args)),
+    req = db.request("GET", "/globalTag/{}/globalTagPayloads".format(encode_name(args.tag)),
                      "Downloading list of payloads for {tag} tag{}".format(payloadfilter, **vars(args)))
     B2INFO("Done")
 

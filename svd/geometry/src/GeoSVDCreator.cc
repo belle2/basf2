@@ -208,6 +208,7 @@ namespace Belle2 {
                                paramsSensor.getLength("width2", 0),
                                paramsSensor.getLength("length"),
                                paramsSensor.getLength("height"),
+                               paramsSensor.getAngle("angle", 0),
                                paramsSensor.getBool("@slanted", false)
                               );
         sensor.setActive(VXDGeoComponentPar(

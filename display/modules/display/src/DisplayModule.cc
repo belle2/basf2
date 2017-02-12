@@ -6,7 +6,6 @@
 #include <display/EveGeometry.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <geometry/GeometryManager.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -17,7 +16,6 @@
 #include <genfit/GFRaveVertex.h>
 
 #include <TApplication.h>
-#include <TGeoManager.h>
 #include <TEveManager.h>
 
 using namespace Belle2;
@@ -92,16 +90,6 @@ void DisplayModule::initialize()
   StoreArray<ARICHHit>::optional();
   StoreArray<ROIid>::optional();
 
-  if (!gGeoManager) { //TGeo geometry not initialized, do it ourselves
-    //convert geant4 geometry to TGeo geometry
-    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-    geoManager.createTGeoRepresentation();
-  }
-  if (!gGeoManager) {
-    B2ERROR("Couldn't create TGeo geometry!");
-    return;
-  }
-
   m_display = new DisplayUI(m_automatic);
   //pass some parameters to DisplayUI to be able to change them at run time
   m_display->addParameter("Show full geometry", getParam<bool>("fullGeometry"), 0);
@@ -117,10 +105,9 @@ void DisplayModule::initialize()
   m_display->addParameter("Show candidates and rec. hits", getParam<bool>("showRecoTracks"), 0);
   m_display->addParameter("Show tracks, vertices, gammas", getParam<bool>("showTrackLevelObjects"), 0);
 
-
+  EveGeometry::addGeometry();
   m_visualizer = new EVEVisualization();
   m_visualizer->setOptions(m_options);
-  EveGeometry::addGeometry();
 
   if (!m_fullGeometry and Gearbox::getInstance().exists("Detector/Name")) {
     std::string detectorName = Gearbox::getInstance().getString("Detector/Name");

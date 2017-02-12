@@ -15,7 +15,7 @@ namespace Belle2 {
     {
       TEveVector v;
 
-      v.Set(BFieldMap::Instance().getBField(TVector3(x, y, z)));
+      v.Set(BFieldMap::Instance().getBField(B2Vector3D(x, y, z)));
       v.fZ *= -1; //Eve has inverted B field convention
       v.fZ -= 1e-6; //field must not be zero!
 

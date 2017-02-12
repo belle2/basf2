@@ -43,6 +43,7 @@ int main(int argc, char* argv[])
   ("file,f", prog::value<string>(), "local file name")
   ("lfn,l", prog::value<string>(), "logical file name")
   ("all,a", "print all information")
+  ("json", "print machine-readable information in JSON format. Implies --all and --steering.")
   ("steering,s", "print steering file contents")
   ;
 
@@ -55,7 +56,7 @@ int main(int argc, char* argv[])
   prog::notify(varMap);
 
   //Check for help option
-  if (varMap.count("help")) {
+  if (varMap.count("help") or argc == 1) {
     cout << "Usage: " << argv[0] << " [OPTIONS] [FILE]\n";
     cout << options << endl;
     return 0;
@@ -100,9 +101,10 @@ int main(int argc, char* argv[])
   }
 
   const char* option = "";
-  if (varMap.count("all")) option = "all";
+  if (varMap.count("json")) option = "json";
+  else if (varMap.count("all")) option = "all";
   metaDataPtr->Print(option);
-  if (varMap.count("steering")) metaDataPtr->Print("steering");
+  if (string(option) != "json" and varMap.count("steering")) metaDataPtr->Print("steering");
 
   return 0;
 }

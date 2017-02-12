@@ -19,6 +19,7 @@
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <arich/dataobjects/ARICHHit.h>
+#include <top/dataobjects/TOPDigit.h>
 #include <vxd/geometry/GeoCache.h>
 #include <tracking/dataobjects/ROIid.h>
 
@@ -39,7 +40,6 @@
 #include <TEveTrack.h>
 
 #include <string>
-#include <vector>
 
 
 class TEveBox;
@@ -202,6 +202,9 @@ namespace Belle2 {
 
     /** show CDCHits directly. */
     void addCDCHit(const CDCHit* hit);
+
+    /** Add TOPDigits (shown aggregated per module). */
+    void addTOPDigits(const StoreArray<TOPDigit>& digits);
 
     /** Generic function to keep track of which objects have which visual representation.
      *

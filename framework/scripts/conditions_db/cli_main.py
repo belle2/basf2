@@ -10,7 +10,7 @@ separate modules named cli_*.py
 
 import os
 import argparse
-from basf2 import B2ERROR, B2WARNING, LogLevel, LogInfo, logging, pretty_print_table
+from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging, pretty_print_table
 from pager import Pager
 from dateutil.parser import parse as parse_date
 from . import ConditionsDB, enable_debugging, encode_name
@@ -189,9 +189,10 @@ def command_tag_create(args, db=None):
     if typeinfo is None:
         return 1
 
-    db.request("POST", "/globalTag/{}".format(encode_name(typeinfo["name"])),
-               "Creating global tag {name}".format(**info),
-               json=info)
+    req = db.request("POST", "/globalTag/{}".format(encode_name(typeinfo["name"])),
+                     "Creating global tag {name}".format(**info),
+                     json=info)
+    B2INFO("Succesfully created global tag {name} (id={globalTagId})".format(**req.json()))
 
 
 def command_tag_modify(args, db=None):

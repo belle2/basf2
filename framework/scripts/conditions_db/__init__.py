@@ -103,6 +103,12 @@ class ConditionsDB:
             else:
                 raise ConditionsDB.RequestError(error)
 
+        try:
+            req.json()
+        except json.JSONDecodeError as e:
+            B2INFO("Invalid response: {}".format(req.content))
+            raise ConditionsDB.RequestError("{method} {url} returned invalid JSON response {}"
+                                            .format(e, method=method, url=url))
         return req
 
     def get_globalTags(self):

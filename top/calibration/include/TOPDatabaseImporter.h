@@ -60,6 +60,11 @@ namespace Belle2 {
      */
     void importTest(int runNumber, double syncTimeBase);
 
+    /**
+     * for testing purposes only! - will be removed ...
+     */
+    void importTest();
+
   private:
 
     // ClassDef(TOPDatabaseImporter, 1);  /**< ClassDef - why this is needed? */

@@ -152,6 +152,9 @@ def main():
     Runs two test validations, starts the web server and queries data
     """
 
+    print("TEST SKIPPED: Not properly runnable on build bot", file=sys.stderr)
+    sys.exit(1)
+
     # only run the test on dev machines with splinter installed. Also for the tests which
     # don't use splinter, there are currently some connection problems to the test webserver
     # on the central build system

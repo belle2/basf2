@@ -86,7 +86,6 @@ namespace Belle2 {
     // variables needed for booking
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     m_numModules = geo->getNumModules();
-    int numPixels = geo->getPMTArray().getNumPixels();
     int numTDCbins = geo->getNominalTDC().getOverflowValue();
 
     // book histograms
@@ -96,8 +95,10 @@ namespace Belle2 {
     m_barHits->GetYaxis()->SetTitle("hits per bar");
 
     for (int i = 0; i < m_numModules; i++) {
-      string name = str(format("hitsBar%1%") % (i + 1));
-      string title = str(format("Number of hits per pixel, bar#%1%") % (i + 1));
+      int moduleID = i + 1;
+      string name = str(format("hitsBar%1%") % (moduleID));
+      string title = str(format("Number of hits per pixel, bar#%1%") % (moduleID));
+      int numPixels = geo->getModule(moduleID).getPMTArray().getNumPixels();
       TH1F* h1 = new TH1F(name.c_str(), title.c_str(),
                           numPixels, 0.5, numPixels + 0.5);
       h1->GetXaxis()->SetTitle("pixel ID");
@@ -106,8 +107,9 @@ namespace Belle2 {
     }
 
     for (int i = 0; i < m_numModules; i++) {
-      string name = str(format("timeBar%1%") % (i + 1));
-      string title = str(format("Time distribution, bar#%1%") % (i + 1));
+      int moduleID = i + 1;
+      string name = str(format("timeBar%1%") % (moduleID));
+      string title = str(format("Time distribution, bar#%1%") % (moduleID));
       TH1F* h1 = new TH1F(name.c_str(), title.c_str(),
                           numTDCbins, 0, numTDCbins);
       h1->GetXaxis()->SetTitle("time [TDC bins]");

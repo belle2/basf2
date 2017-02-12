@@ -65,7 +65,7 @@ bool TOPNominalTTS::isConsistent() const
 
 void TOPNominalTTS::print(const std::string& title) const
 {
-  TOPGeoBase::print(title);
+  TOPGeoBase::printUnderlined(title);
   if (m_tts.empty()) {
     cout << " -> vector is empty!" << endl;
     return;

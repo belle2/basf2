@@ -64,3 +64,13 @@ bool TTRX::isLinkUpError() throw()
   if (m_ttrx == NULL) return false;
   return B(m_info.csr2, 31) != 0;
 }
+
+unsigned int TTRX::read(unsigned int addr) throw()
+{
+  return read_ttrx(m_ttrx, addr >> 2);
+}
+
+int TTRX::write(unsigned int addr, unsigned int val) throw()
+{
+  return write_ttrx(m_ttrx, addr >> 2, val);
+}

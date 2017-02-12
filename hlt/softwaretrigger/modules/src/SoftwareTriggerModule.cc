@@ -58,6 +58,11 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPo
            "file, in which the results of the calculation are stored, if storeDebugOutput is "
            "turned on. Please note that already present files will be overridden. "
            "ATTENTION: This file debugging mode does not work in parallel processing.", m_param_debugOutputFileName);
+
+  addParam("calibParticleListName", m_particlename, "the name list of particle for the calibration and dqm",
+           std::vector<std::string>());
+
+  addParam("calibExtraInfoName", m_extrainfoname, "the variable name list that attched to the particles", std::vector<std::string>());
 }
 
 void SoftwareTriggerModule::initialize()
@@ -112,7 +117,7 @@ void SoftwareTriggerModule::initializeCalculation()
   } else if (m_param_baseIdentifier == "hlt") {
     m_calculation.reset(new HLTCalculator());
   } else if (m_param_baseIdentifier == "calib") {
-    m_calculation.reset(new CalibSampleCalculator());
+    m_calculation.reset(new CalibSampleCalculator(m_particlename, m_extrainfoname));
   } else {
     B2FATAL("You gave an invalid base identifier " << m_param_baseIdentifier << ".");
   }

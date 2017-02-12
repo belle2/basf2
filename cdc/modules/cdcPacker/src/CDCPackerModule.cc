@@ -14,6 +14,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRawHit.h>
 #include <cdc/dataobjects/CDCRawHitWaveForm.h>
+#include <cdc/dbobjects/CDCChannelMap.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -21,6 +22,11 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+
+#include <framework/database/Database.h>
+#include <framework/database/DBArray.h>
+#include <framework/database/IntervalOfValidity.h>
+#include <framework/database/DBImportArray.h>
 
 #include <sstream>
 #include <iostream>
@@ -57,7 +63,9 @@ CDCPackerModule::CDCPackerModule() : Module()
            string("/cdc/data/ch_map.dat"));
   addParam("enableStoreRawCDC", m_enableStoreCDCRawHit, "Enable to store to the RawCDC object", true);
   addParam("enablePrintOut", m_enablePrintOut, "Enable to print out the data to the terminal", true);
+  addParam("enableDatabase", m_enableDatabase, "Enable database to read the channel map.", true);
 
+  m_channelMapFromDB.addCallback(this, &CDCPackerModule::loadMap);
 }
 
 CDCPackerModule::~CDCPackerModule()
@@ -140,7 +148,6 @@ int CDCPackerModule::getFEEID(int copper_id, int slot_id)
 
 void CDCPackerModule::event()
 {
-
   // Create Data objects.
   StoreArray<CDCRawHitWaveForm> cdcRawHitWFs(m_cdcRawHitWaveFormName);
   StoreArray<CDCRawHit> cdcRawHits(m_cdcRawHitName);
@@ -284,50 +291,59 @@ const WireID CDCPackerModule::getWireID(int iBoard, int iCh)
 void CDCPackerModule::loadMap()
 {
 
-  if (! FileSystem::fileExists(m_xmlMapFileName)) {
-    B2ERROR("CDC packer can't fine a filename: " << m_xmlMapFileName);
-    exit(1);
-  } else {
-    B2INFO("CDC packer found a filename: " << m_xmlMapFileName);
-  }
+  // Frontend : 48 channels/board
+  // Number of board : 302
 
-
-  ifstream ifs;
-  ifs.open(m_xmlMapFileName.c_str());
-  int isl;
-  int icl;
-  int iw;
-  int iBoard;
-  int iCh;
-
-  //  ch 48/board
-  // board 302
-  //
-
-  for (int i = 0 ; i < 9; i++) {
-    for (int j = 0 ; j < 8; j++) {
-      for (int k = 0 ; k < 384; k++) {
+  for (int i = 0 ; i < 9; ++i) {
+    for (int j = 0 ; j < 8; ++j) {
+      for (int k = 0 ; k < 384; ++k) {
         m_fee_board[i][j][k] = -1;
         m_fee_ch[i][j][k] = -1;
       }
     }
   }
 
+  if (m_enableDatabase == false) {
 
-  while (!ifs.eof()) {
-    //    ifs >> std::cout;
-    //    ifs >>  isl >> icl >> iw >> lay >> cpr >> finess >> ch;
-    ifs >>  isl >> icl >> iw >> iBoard >> iCh;
-    //     B2INFO("CDC ch " << iCh);
-    if (isl >= 9) continue;
-    const WireID  wireId(isl, icl, iw);
-    m_map[iBoard][iCh] = wireId;
-    m_fee_board[isl][icl][iw] = iBoard;
-    m_fee_ch[isl][icl][iw] = iCh;
+    // Read the channel map from the local text.
+    std::string fileName = FileSystem::findFile(m_xmlMapFileName);
+    std::cout << fileName << std::endl;
+    if (fileName == "") {
+      B2ERROR("CDCPacker can't fine a filename: " << m_xmlMapFileName);
+      exit(1);
+    }
 
+    ifstream ifs;
+    ifs.open(fileName.c_str());
+    int isl;
+    int il;
+    int iw;
+    int iBoard;
+    int iCh;
+
+    while (!ifs.eof()) {
+
+      ifs >>  isl >> il >> iw >> iBoard >> iCh;
+      if (isl >= 9) continue; // Super layers should be from 0 t0 8.
+      const WireID  wireId(isl, il, iw);
+      m_map[iBoard][iCh] = wireId;
+      m_fee_board[isl][il][iw] = iBoard;
+      m_fee_ch[isl][il][iw] = iCh;
+    }
+  } else {
+    // Read the channel map from the database.
+    for (const auto& cm : m_channelMapFromDB) {
+      const int isl = cm.getISuperLayer();
+      if (isl >= 9) continue; // Super layers should be from 0 t0 8.
+      const int il = cm.getILayer();
+      const int iw = cm.getIWire();
+      const int iBoard = cm.getBoardID();
+      const int iCh = cm.getBoardChannel();
+      const WireID  wireId(isl, il, iw);
+      m_map[iBoard][iCh] = wireId;
+      m_fee_board[isl][il][iw] = iBoard;
+      m_fee_ch[isl][il][iw] = iCh;
+    }
   }
-
-
-
 }
 

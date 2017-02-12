@@ -33,6 +33,22 @@
 
 #include <TMath.h>
 
+#include <genfit/FullMeasurement.h>
+#include <tracking/trackFitting/fitter/base/TrackFitter.h>
+#include <tracking/trackFitting/measurementCreator/adder/MeasurementAdder.h>
+
+#include <alignment/reconstruction/AlignableSVDRecoHit2D.h>
+#include <alignment/reconstruction/AlignableSVDRecoHit.h>
+
+#include <genfit/PlanarMeasurement.h>
+
+#include <alignment/reconstruction/AlignableCDCRecoHit.h>
+#include <alignment/reconstruction/AlignablePXDRecoHit.h>
+#include <alignment/reconstruction/AlignableSVDRecoHit.h>
+#include <alignment/reconstruction/AlignableSVDRecoHit2D.h>
+#include <alignment/reconstruction/BKLMRecoHit.h>
+#include <alignment/reconstruction/AlignableEKLMRecoHit.h>
+
 using namespace Belle2;
 using namespace std;
 
@@ -76,16 +92,17 @@ void MillepedeCollectorModule::prepare()
 
   if (!m_tracks.empty()) {
     for (auto arrayName : m_tracks)
-      StoreArray<genfit::Track>::required(arrayName);
+      StoreArray<RecoTrack>::required(arrayName);
   }
 
   if (!m_particles.empty() || !m_vertices.empty() || !m_primaryVertices.empty()) {
-    StoreArray<genfit::TrackCand> TrackCands;
-    StoreArray<genfit::Track> GF2Tracks;
-    RelationArray TrackCandsToGF2Tracks(TrackCands, GF2Tracks);
-    TrackCands.isRequired();
-    GF2Tracks.isRequired();
-    TrackCandsToGF2Tracks.isRequired();
+    StoreArray<RecoTrack> recoTracks;
+    StoreArray<Track> tracks;
+    StoreArray<TrackFitResult> trackFitResults;
+
+    recoTracks.isRequired();
+    tracks.isRequired();
+    trackFitResults.isRequired();
   }
 
   for (auto listName : m_particles) {
@@ -128,10 +145,11 @@ void MillepedeCollectorModule::collect()
 
 
   for (auto arrayName : m_tracks) {
-    // Input tracks (have to be fitted by GBL)
-    StoreArray<genfit::Track> tracks(arrayName);
+    StoreArray<RecoTrack> recoTracks(arrayName);
 
-    for (auto track : tracks) {
+    for (auto& recoTrack : recoTracks) {
+      fitRecoTrack(recoTrack);
+      auto& track = RecoTrackGenfitAccess::getGenfitTrack(recoTrack);
       if (!track.hasFitStatus())
         continue;
       genfit::GblFitStatus* fs = dynamic_cast<genfit::GblFitStatus*>(track.getFitStatus());
@@ -157,7 +175,7 @@ void MillepedeCollectorModule::collect()
   for (auto listName : m_particles) {
     StoreObjPtr<ParticleList> list(listName);
     for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
-      for (auto track : getParticlesTracks({list->getParticle(iParticle)})) {
+      for (auto& track : getParticlesTracks({list->getParticle(iParticle)})) {
         auto gblfs = dynamic_cast<genfit::GblFitStatus*>(track->getFitStatus());
 
         getObject<TH1F>("chi2/ndf").Fill(gblfs->getChi2() / gblfs->getNdf());
@@ -178,7 +196,7 @@ void MillepedeCollectorModule::collect()
       auto mother = list->getParticle(iParticle);
       std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
 
-      for (auto track : getParticlesTracks(mother->getDaughters()))
+      for (auto& track : getParticlesTracks(mother->getDaughters()))
         daughters.push_back({
         gbl->collectGblPoints(track, track->getCardinalRep()),
         getGlobalToLocalTransform(track->getFittedState()).GetSub(0, 4, 0, 2)
@@ -214,7 +232,7 @@ void MillepedeCollectorModule::collect()
       TMatrixD extProjection(3, 5);
 
       bool first(true);
-      for (auto track : getParticlesTracks(mother->getDaughters())) {
+      for (auto& track : getParticlesTracks(mother->getDaughters())) {
         if (first) {
           // For first trajectory only
           extProjection = getLocalToGlobalTransform(track->getFittedState()).GetSub(0, 2, 0, 4);
@@ -317,7 +335,6 @@ void MillepedeCollectorModule::storeTrajectory(gbl::GblTrajectory& trajectory)
   }
 }
 
-
 std::string MillepedeCollectorModule::getUniqueMilleName()
 {
   StoreObjPtr<EventMetaData> emd;
@@ -335,6 +352,143 @@ std::string MillepedeCollectorModule::getUniqueMilleName()
   return name;
 }
 
+void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* particle)
+{
+  std::shared_ptr<genfit::GblFitter> gbl(new genfit::GblFitter());
+  gbl->setOptions("", true, true, 1, 1);
+
+  MeasurementAdder factory("", "", "", "", "");
+
+  // We need the store arrays
+  StoreArray <CDCHit> cdcHits("");
+  StoreArray <PXDCluster> pxdHits("");
+  StoreArray <SVDCluster> svdHits("");
+  StoreArray<RecoHitInformation::UsedBKLMHit> bklmHits("");
+  StoreArray<RecoHitInformation::UsedEKLMHit> eklmHits("");
+
+  // Create the genfit::MeasurementFactory
+  genfit::MeasurementFactory<genfit::AbsMeasurement> genfitMeasurementFactory;
+
+  // Add producer for alignable RecoHits to factory
+  if (pxdHits.isOptional()) {
+    genfit::MeasurementProducer <RecoHitInformation::UsedPXDHit, AlignablePXDRecoHit>* PXDProducer =  new genfit::MeasurementProducer
+    <RecoHitInformation::UsedPXDHit, AlignablePXDRecoHit> (pxdHits.getPtr());
+    genfitMeasurementFactory.addProducer(Const::PXD, PXDProducer);
+  }
+
+  if (svdHits.isOptional())  {
+    genfit::MeasurementProducer <RecoHitInformation::UsedSVDHit, AlignableSVDRecoHit>* SVDProducer =  new genfit::MeasurementProducer
+    <RecoHitInformation::UsedSVDHit, AlignableSVDRecoHit> (svdHits.getPtr());
+    genfitMeasurementFactory.addProducer(Const::SVD, SVDProducer);
+  }
+
+  if (cdcHits.isOptional()) {
+    genfit::MeasurementProducer <RecoHitInformation::UsedCDCHit, AlignableCDCRecoHit>* CDCProducer =  new genfit::MeasurementProducer
+    <RecoHitInformation::UsedCDCHit, AlignableCDCRecoHit> (cdcHits.getPtr());
+    genfitMeasurementFactory.addProducer(Const::CDC, CDCProducer);
+  }
+
+  if (bklmHits.isOptional()) {
+    genfit::MeasurementProducer <RecoHitInformation::UsedBKLMHit, BKLMRecoHit>* BKLMProducer =  new genfit::MeasurementProducer
+    <RecoHitInformation::UsedBKLMHit, BKLMRecoHit> (cdcHits.getPtr());
+    genfitMeasurementFactory.addProducer(Const::BKLM, BKLMProducer);
+  }
+
+  if (eklmHits.isOptional()) {
+    genfit::MeasurementProducer <RecoHitInformation::UsedEKLMHit, AlignableEKLMRecoHit>* EKLMProducer =  new genfit::MeasurementProducer
+    <RecoHitInformation::UsedEKLMHit, AlignableEKLMRecoHit> (cdcHits.getPtr());
+    genfitMeasurementFactory.addProducer(Const::EKLM, EKLMProducer);
+  }
+
+
+  // Create the measurement creators
+  std::vector<std::shared_ptr<PXDBaseMeasurementCreator>> pxdMeasurementCreators = { std::shared_ptr<PXDBaseMeasurementCreator>(new PXDCoordinateMeasurementCreator(genfitMeasurementFactory)) };
+  std::vector<std::shared_ptr<SVDBaseMeasurementCreator>> svdMeasurementCreators = { std::shared_ptr<SVDBaseMeasurementCreator>(new SVDCoordinateMeasurementCreator(genfitMeasurementFactory)) };
+  // TODO: Create a new MeasurementCreator based on SVDBaseMeasurementCreator (or on SVDCoordinateMeasurementCreator), which does the combination on the fly.
+
+  std::vector<std::shared_ptr<CDCBaseMeasurementCreator>> cdcMeasurementCreators = { std::shared_ptr<CDCBaseMeasurementCreator>(new CDCCoordinateMeasurementCreator(genfitMeasurementFactory)) };
+  std::vector<std::shared_ptr<BKLMBaseMeasurementCreator>> bklmMeasurementCreators = { std::shared_ptr<BKLMBaseMeasurementCreator>(new BKLMCoordinateMeasurementCreator(genfitMeasurementFactory)) };
+  std::vector<std::shared_ptr<EKLMBaseMeasurementCreator>> eklmMeasurementCreators = { std::shared_ptr<EKLMBaseMeasurementCreator>(new EKLMCoordinateMeasurementCreator(genfitMeasurementFactory)) };
+
+  // TODO: Or put it in here and leave the svdMeasurementCreators empty.
+  std::vector<std::shared_ptr<BaseMeasurementCreator>> additionalMeasurementCreators = {};
+  factory.resetMeasurementCreators(pxdMeasurementCreators, svdMeasurementCreators, cdcMeasurementCreators, bklmMeasurementCreators,
+                                   eklmMeasurementCreators, additionalMeasurementCreators);
+  factory.addMeasurements(recoTrack);
+
+  auto& gfTrack = RecoTrackGenfitAccess::getGenfitTrack(recoTrack);
+
+  const int currentPdgCode = TrackFitter::createCorrectPDGCodeForChargedStable(Const::muon, recoTrack);
+  genfit::AbsTrackRep* trackRep = new genfit::RKTrackRep(currentPdgCode);
+  gfTrack.addTrackRep(trackRep);
+  gfTrack.setCardinalRep(gfTrack.getIdForRep(trackRep));
+
+  if (particle) {
+    TVector3 vertexPos = particle->getVertex();
+    TVector3 vertexMom = particle->getMomentum();
+    gfTrack.setStateSeed(vertexPos, vertexMom);
+
+    genfit::StateOnPlane vertexSOP(gfTrack.getCardinalRep());
+    TVector3 vertexRPhiDir(vertexPos[0], vertexPos[1], 0);
+    TVector3 vertexZDir(0, 0, vertexPos[2]);
+    genfit::SharedPlanePtr vertexPlane(new genfit::DetPlane(vertexPos, vertexRPhiDir, vertexZDir));
+    vertexSOP.setPlane(vertexPlane);
+    vertexSOP.setPosMom(vertexPos, vertexMom);
+    TMatrixDSym vertexCov(5);
+    vertexCov.UnitMatrix();
+    vertexCov *= -1.;
+    genfit::MeasuredStateOnPlane mop(vertexSOP, vertexCov);
+    genfit::FullMeasurement* vertex = new genfit::FullMeasurement(mop, Const::IR);
+    gfTrack.insertMeasurement(vertex, 0);
+  }
+
+  try {
+    for (unsigned int i = 0; i < gfTrack.getNumPoints() - 1; ++i) {
+      //if (gfTrack.getPointWithMeasurement(i)->getNumRawMeasurements() != 1)
+      //  continue;
+      genfit::PlanarMeasurement* planarMeas1 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(
+                                                 i)->getRawMeasurement(0));
+      genfit::PlanarMeasurement* planarMeas2 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(
+                                                 i + 1)->getRawMeasurement(0));
+
+      if (planarMeas1 != NULL && planarMeas2 != NULL &&
+          planarMeas1->getDetId() == planarMeas2->getDetId() &&
+          planarMeas1->getPlaneId() != -1 &&   // -1 is default plane id
+          planarMeas1->getPlaneId() == planarMeas2->getPlaneId()) {
+        Belle2::AlignableSVDRecoHit* hit1 = dynamic_cast<Belle2::AlignableSVDRecoHit*>(planarMeas1);
+        Belle2::AlignableSVDRecoHit* hit2 = dynamic_cast<Belle2::AlignableSVDRecoHit*>(planarMeas2);
+        if (hit1 && hit2) {
+          Belle2::AlignableSVDRecoHit* hitU(NULL);
+          Belle2::AlignableSVDRecoHit* hitV(NULL);
+          // We have to decide U/V now (else AlignableSVDRecoHit2D could throw FATAL)
+          if (hit1->isU() && !hit2->isU()) {
+            hitU = hit1;
+            hitV = hit2;
+          } else if (!hit1->isU() && hit2->isU()) {
+            hitU = hit2;
+            hitV = hit1;
+          } else {
+            continue;
+          }
+          Belle2::AlignableSVDRecoHit2D* hit = new Belle2::AlignableSVDRecoHit2D(*hitU, *hitV);
+          // insert measurement before point i (increases number of currect point to i+1)
+          gfTrack.insertMeasurement(hit, i);
+          // now delete current point (at its original place, we have the new 2D recohit)
+          gfTrack.deletePoint(i + 1);
+          gfTrack.deletePoint(i + 1);
+        }
+      }
+    }
+  } catch (...) {
+    B2ERROR("SVD Cluster combination failed.");
+  }
+  try {
+    gbl->processTrack(&gfTrack, true);
+  } catch (...) {
+    B2ERROR("GBL fit failed.");
+  }
+}
+
 
 std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::vector<Particle*> particles)
 {
@@ -345,28 +499,29 @@ std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::
       B2INFO("No Belle2::Track for particle");
       continue;
     }
-    auto trackFitResult = belle2Track->getTrackFitResult(Const::chargedStableSet.find(abs(particle->getPDGCode())));
-    if (!trackFitResult) {
-      B2INFO("No track fit result for track");
+//     auto trackFitResult = belle2Track->getTrackFitResult(Const::chargedStableSet.find(abs(particle->getPDGCode())));
+//     if (!trackFitResult) {
+//       B2INFO("No track fit result for track");
+//       continue;
+//     }
+//    auto recoTrack = trackFitResult->getRelatedFrom<RecoTrack>();
+    auto recoTrack = belle2Track->getRelatedTo<RecoTrack>();
+
+    if (!recoTrack) {
+      B2INFO("No related RecoTrack for Belle2::Track");
       continue;
     }
-    auto trackCand = trackFitResult->getRelatedFrom<genfit::TrackCand>();
-    if (!trackCand) {
-      B2INFO("No related track candidate for track fit result");
-      continue;
-    }
-    auto track = DataStore::getRelated<genfit::Track>(trackCand);
-    if (!track) {
-      B2INFO("No related track for track candidate");
-      continue;
-    }
-    if (!track->hasFitStatus()) {
+    auto& track = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
+
+    fitRecoTrack(*recoTrack, particle);
+
+    if (!track.hasFitStatus()) {
       B2INFO("Track has no fit status");
       continue;
     }
-    genfit::GblFitStatus* fs = dynamic_cast<genfit::GblFitStatus*>(track->getFitStatus());
+    genfit::GblFitStatus* fs = dynamic_cast<genfit::GblFitStatus*>(track.getFitStatus());
     if (!fs) {
-      B2INFO("Fit status is not GblFitStatus. You need tracks fitted by GBLfit module.");
+      B2INFO("Fit status is not GblFitStatus.");
       continue;
     }
     if (!fs->isFittedWithReferenceTrack()) {
@@ -374,7 +529,7 @@ std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::
       continue;
     }
 
-    tracks.push_back(track);
+    tracks.push_back(&track);
   }
 
   return tracks;

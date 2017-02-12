@@ -9,8 +9,6 @@ import ROOT
 from tracking.harvest.harvesting import harvest
 from tracking.harvest.refiners import save_tree, save_pull_analysis
 
-DriftTimeUtil = Belle2.TrackFindingCDC.DriftTimeUtil
-
 
 class RandomizeTrackTimeModule(basf2.Module):
     """
@@ -111,12 +109,12 @@ def add_harvester(path, mc_drift, generator_module, track_finder, turns):
         """
         mc_particles = Belle2.PyStoreArray("MCParticles")
 
-        if event_t0 not is None:
+        if event_t0 is not None:
             time_seed = event_t0.getEventT0()
         else:
             time_seed = -999
 
-        if mc_particles[0] not is None:
+        if mc_particles[0] is not None:
             mc_time = mc_particles[0].getProductionTime()
         else:
             mc_time = -999
@@ -180,9 +178,18 @@ def add_harvester(path, mc_drift, generator_module, track_finder, turns):
             except ZeroDivisionError:
                 chi2 = 999
 
+            number_of_fitted_hits = np.mean([weight for x in reco_track.getHitPointsWithMeasurement()
+                                             for weight in x.getKalmanFitterInfo().getWeights()])
+            reco_hit_information = reco_track.getRelationsTo("RecoHitInformations")
+            number_of_reco_hit_information = len(reco_hit_information)
+            number_of_fitted_reco_hit_information = sum(x.getFlag() != 1 for x in reco_hit_information)
+
             yield dict(t0_estimate=reco_track.getTimeSeed(),
                        chi2=chi2,
                        extracted_time=extractedTime,
+                       number_of_fitted_hits=number_of_fitted_hits,
+                       number_of_reco_hit_information=number_of_reco_hit_information,
+                       number_of_fitted_reco_hit_information=number_of_fitted_reco_hit_information,
                        )
 
         reco_track.setTimeSeed(initial_value)
@@ -218,9 +225,11 @@ def add_harvester(path, mc_drift, generator_module, track_finder, turns):
             chi2 = Belle2.TimeExtractionUtils.extractReducedChi2(reco_track)
             derivatives_pair = Belle2.TimeExtractionUtils.getChi2Derivatives(reco_track)
 
+            number_of_fitted_hits = len(reco_track.getHitPointsWithMeasurement())
+
             reco_track_time = reco_track.getTimeSeed()
             try_list.append(dict(chi2=chi2, extracted_time=reco_track_time, event_number=event_number, finished=False,
-                                 first_deriv=derivatives_pair.first,
+                                 first_deriv=derivatives_pair.first, number_of_fitted_hits=number_of_fitted_hits,
                                  second_deriv=derivatives_pair.second, delta_t0=np.NaN, delta_chi2=np.NaN))
             current_try += 1
 
@@ -244,8 +253,11 @@ def add_harvester(path, mc_drift, generator_module, track_finder, turns):
 
                 finished = derivatives_pair.second > 2.7122 and chi2 < 1.739
 
+                number_of_fitted_hits = len(reco_track.getHitPointsWithMeasurement())
+
                 try_list.append(dict(chi2=chi2, extracted_time=reco_track_time,
                                      event_number=event_number,
+                                     number_of_fitted_hits=number_of_fitted_hits,
                                      first_deriv=derivatives_pair.first,
                                      second_deriv=derivatives_pair.second,
                                      finished=finished, delta_t0=np.NaN, delta_chi2=np.NaN))

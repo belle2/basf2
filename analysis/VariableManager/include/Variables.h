@@ -49,14 +49,59 @@ namespace Belle2 {
     double particlePt(const Particle* part);
 
     /**
-     * return  momentum cosine of polar angle
+     * return error of momentum
+     */
+    double particlePErr(const Particle* part);
+
+    /**
+     * return error of momentum component x
+     */
+    double particlePxErr(const Particle* part);
+
+    /**
+     * return error of momentum component y
+     */
+    double particlePyErr(const Particle* part);
+
+    /**
+     * return error of momentum component z
+     */
+    double particlePzErr(const Particle* part);
+
+    /**
+     * return error of transverse momentum
+     */
+    double particlePtErr(const Particle* part);
+
+    /**
+     * return polar angle
+     */
+    double particleTheta(const Particle* part);
+
+    /**
+     * return error of polar angle
+     */
+    double particleThetaErr(const Particle* part);
+
+    /**
+     * return momentum cosine of polar angle
      */
     double particleCosTheta(const Particle* part);
+
+    /**
+     * return error of momentum cosine of polar angle
+     */
+    double particleCosThetaErr(const Particle* part);
 
     /**
      * return momentum azimuthal angle
      */
     double particlePhi(const Particle* part);
+
+    /**
+     * return error of momentum azimuthal angle
+     */
+    double particlePhiErr(const Particle* part);
 
     /**
      * return particle's pdg code
@@ -83,6 +128,12 @@ namespace Belle2 {
      */
     double cosHelicityAngle(const Particle* part);
 
+    /**
+     * To be used for the decay pi0 -> e+ e- gamma: cosine of the angle between the momentum of the gamma in the frame
+     * of the given particle (mother) and the momentum of the given particle in the lab frame.
+     * Else: 0.
+     */
+    double cosHelicityAnglePi0Dalitz(const Particle* part);
 
     /**
      * return Zdistance of daughter tracks at vertex point
@@ -206,6 +257,12 @@ namespace Belle2 {
     double particleMdstArrayIndex(const Particle* part);
 
     /**
+     * returns cosinus of StoreArray index (0-based) of the MDST object from which the Particle was created.
+     * To be used for random ranking.
+     */
+    double particleCosMdstArrayIndex(const Particle* part);
+
+    /**
      * return prob(chi^2,ndf) of fit
      */
     double particlePvalue(const Particle* part);
@@ -275,6 +332,11 @@ namespace Belle2 {
      * check the array index of a particle's MC mother
      */
     double genMotherIndex(const Particle* particle);
+
+    /**
+     * generated momentum of a particles MC mother
+     */
+    double genMotherP(const Particle* particle);
 
     /**
      * check the array index of a particle's related MCParticle
@@ -509,12 +571,25 @@ namespace Belle2 {
     bool isGoodBelleGamma(int region, double energy);
 
     /**
+     * Returns true if the cluster with given attributes passes loose skim 'good gamma' criteria.
+     */
+    bool isGoodSkimGamma(int region, double energy);
+
+    /**
      * Return 1 if ECLCluster passes the following selection criteria:
      * Forward  : E > 100 MeV
      * Barrel   : E >  50 MeV
      * Backward : E > 150 MeV
      */
     double goodBelleGamma(const Particle* particle);
+
+    /**
+     * Return 1 if ECLCluster passes the following selection criteria:
+     * Forward  : E > 30 MeV
+     * Barrel   : E > 20 MeV
+     * Backward : E > 40 MeV
+     */
+    double goodSkimGamma(const Particle* particle);
 
     /**
      * return ECL cluster's Error on Energy

@@ -119,6 +119,9 @@ FullGridTrackTimeExtractionModule::FullGridTrackTimeExtractionModule() : Module(
   addParam("maximalT0Shift", m_param_maximalT0Shift, "Maximal shift of the event time which is allowed.",
            m_param_maximalT0Shift);
 
+  addParam("t0Uncertainty", m_param_t0Uncertainty, "Use this as sigma t0.",
+           m_param_t0Uncertainty);
+
   addParam("overwriteExistingEstimation", m_param_overwriteExistingEstimation,
            "Whether to replace an existing time estimation or not.",
            m_param_overwriteExistingEstimation);
@@ -185,7 +188,7 @@ void FullGridTrackTimeExtractionModule::event()
       if (not convergedTries.empty()) {
         const double extractedTime = convergedTries.back().m_extractedT0;
         // The uncertainty was calculated using a test MC sample
-        m_eventT0->addEventT0(extractedTime, 5.1, Const::EDetector::CDC);
+        m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
         break;
       }
     }

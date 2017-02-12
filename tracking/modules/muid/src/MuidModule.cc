@@ -123,12 +123,15 @@ MuidModule::MuidModule() :
     m_BarrelPhiStripVariance[j] = 0.0;
     m_BarrelZStripVariance[j] = 0.0;
     m_BarrelPhiStripVariance[j] = 0.0;
-    m_BarrelModuleMiddleRadius[j] = 0.0;
     m_EndcapModuleMiddleZ[j] = 0.0;
   }
-  for (int j = 0; j < NSECTOR + 1; ++j) {
-    m_BarrelSectorPerp[j] = TVector3(0.0, 0.0, 0.0);
-    m_BarrelSectorPhi[j] = TVector3(0.0, 0.0, 0.0);
+  for (int s = 0; s < NSECTOR + 1; ++s) {
+    for (int j = 0; j < NLAYER + 1; ++j) {
+      m_BarrelModuleMiddleRadius[0][s][j] = 0.0;
+      m_BarrelModuleMiddleRadius[1][s][j] = 0.0;
+    }
+    m_BarrelSectorPerp[s] = TVector3(0.0, 0.0, 0.0);
+    m_BarrelSectorPhi[s] = TVector3(0.0, 0.0, 0.0);
   }
   m_PDGCode.clear();
   setDescription("Identifies muons by extrapolating tracks from CDC to KLM using geant4e");
@@ -150,7 +153,7 @@ MuidModule::MuidModule() :
            double(0.1));
   addParam("MinKE", m_MinKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation (default 0.002)", double(0.002));
   addParam("MaxStep", m_MaxStep, "[cm] Maximum step size during extrapolation (use 0 for infinity; default 25)", double(25.0));
-  addParam("MaxDistSigma", m_MaxDistSqInVariances, "[#sigmas] Maximum hit-to-extrapolation difference (default 7.5)", double(7.5));
+  addParam("MaxDistSigma", m_MaxDistSqInVariances, "[#sigmas] Maximum hit-to-extrapolation difference (default 3.5)", double(3.5));
   addParam("MaxKLMClusterTrackConeAngle", m_MaxClusterTrackConeAngle,
            "[degrees] Maximum cone angle between matching track and KLM cluster.", double(15.0));
   addParam("Cosmic", m_Cosmic, "Particle source (0 = beam, 1 = cosmic ray.", 0);
@@ -178,6 +181,9 @@ MuidModule::~MuidModule()
 
 void MuidModule::initialize()
 {
+
+  // Convert from sigma to variance for hit-position uncertainty
+  m_MaxDistSqInVariances *= m_MaxDistSqInVariances;
 
   // Convert from GeV to GEANT4 energy units (MeV); avoid negative values
   m_MinPt = max(0.0, m_MinPt) * CLHEP::GeV;
@@ -248,8 +254,14 @@ void MuidModule::initialize()
   // KLM geometry (for associating KLM hit with extrapolated crossing point)
 
   m_OutermostActiveBarrelLayer = nBarrelLayers - 1; // zero-based counting
-  for (int layer = 1; layer <= nBarrelLayers; ++layer) {
-    m_BarrelModuleMiddleRadius[layer - 1] = bklmGeometry->getActiveMiddleRadius(layer); // in G4e units (cm)
+  int nBarrelSectors = bklmGeometry->getNSector();
+  for (int sector = 1; sector <= nBarrelSectors; ++sector) {
+    for (int layer = 1; layer <= nBarrelLayers; ++layer) {
+      m_BarrelModuleMiddleRadius[BKLM_FORWARD - 1][sector - 1][layer - 1] = bklmGeometry->getActiveMiddleRadius(BKLM_FORWARD, sector,
+          layer); // in G4e units (cm)
+      m_BarrelModuleMiddleRadius[BKLM_BACKWARD - 1][sector - 1][layer - 1] = bklmGeometry->getActiveMiddleRadius(BKLM_BACKWARD, sector,
+          layer); // in G4e units (cm)
+    }
   }
   double dz(eklmGeometry.getLayerShiftZ() / CLHEP::cm); // in G4e units (cm)
   double z0((eklmGeometry.getEndcapPosition()->getZ()
@@ -530,8 +542,10 @@ void MuidModule::registerVolumes()
     if (name.compare(0, 5, "BKLM.") == 0) {
       if ((name.find("ScintActiveType") != string::npos) ||
           (name.find("GasPhysical") != string::npos)) {
-        m_BKLMVolumes->push_back(*iVol);
         m_EnterExit->push_back(*iVol);
+      } else if ((name.find("ScintType") != string::npos) ||
+                 (name.find("ElectrodePhysical") != string::npos)) {
+        m_BKLMVolumes->push_back(*iVol);
       }
     }
     // Endcap KLM: StripSensitive_*
@@ -863,13 +877,14 @@ bool MuidModule::findBarrelIntersection(const TVector3& oldPosition, Point& poin
   if (phi < 0.0) { phi += TWOPI; }
   if (phi > TWOPI - PI_8) { phi -= TWOPI; }
   int sector = (int)((phi + PI_8) / M_PI_4);
+  int fb = (point.position.Z() > m_OffsetZ ? BKLM_FORWARD : BKLM_BACKWARD) - 1;
 
   double oldR = oldPosition * m_BarrelSectorPerp[sector];
   double newR = point.position * m_BarrelSectorPerp[sector];
 
   for (int layer = m_FirstBarrelLayer; layer <= m_OutermostActiveBarrelLayer; ++layer) {
-    if (newR <  m_BarrelModuleMiddleRadius[layer]) break;
-    if (oldR <= m_BarrelModuleMiddleRadius[layer]) {
+    if (newR <  m_BarrelModuleMiddleRadius[fb][sector][layer]) break;
+    if (oldR <= m_BarrelModuleMiddleRadius[fb][sector][layer]) {
       m_FirstBarrelLayer = layer + 1; // ratchet outward for next call's loop starting value
       if (m_FirstBarrelLayer > m_OutermostActiveBarrelLayer) m_Escaped = true;
       point.inBarrel = true;
@@ -952,11 +967,13 @@ bool MuidModule::findMatchingBarrelHit(Point& point, const Track&)
     } else {
       // Accept a nearby hit in adjacent sector
       if (fabs(dn) > 50.0) continue;
-      int dSector = abs(point.sector - hit->getSector() + 1);
+      int sector = hit->getSector() - 1;
+      int dSector = abs(point.sector - sector);
       if ((dSector != 1) && (dSector != 7)) continue;
       // Use the normal vector of the adjacent (hit's) sector
-      TVector3 nHit(m_BarrelSectorPerp[hit->getSector() - 1]);
-      double dn2 = point.position * nHit - m_BarrelModuleMiddleRadius[point.layer];
+      TVector3 nHit(m_BarrelSectorPerp[sector]);
+      int fb = (point.isForward ? BKLM_FORWARD : BKLM_BACKWARD) - 1;
+      double dn2 = point.position * nHit - m_BarrelModuleMiddleRadius[fb][sector][point.layer];
       dn = diff * nHit + dn2;
       if (fabs(dn) > 1.0) continue;
       // Project extrapolated track to the hit's plane in the adjacent sector

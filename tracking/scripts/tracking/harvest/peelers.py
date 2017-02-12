@@ -93,9 +93,9 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
 
 @format_crop_keys
 def peel_reco_track_hit_content(reco_track, key="{part_name}"):
-    n_pxd_hits = reco_track.getNumberOfCDCHits()
+    n_cdc_hits = reco_track.getNumberOfCDCHits()
     n_svd_hits = reco_track.getNumberOfSVDHits()
-    n_cdc_hits = reco_track.getNumberOfPXDHits()
+    n_pxd_hits = reco_track.getNumberOfPXDHits()
     ndf = 2 * n_pxd_hits + 2 * n_svd_hits + n_cdc_hits
 
     return dict(
@@ -157,6 +157,8 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
             pt_variance=pt_variance,
             pt_resolution=pt_resolution,
 
+            b_field=Belle2.BFieldManager.getField(pos).Z(),
+
             px_estimate=mom.X(),
             px_variance=cov6(3, 3),
             py_estimate=mom.Y(),
@@ -211,7 +213,7 @@ def get_helix_from_mc_particle(mc_particle):
     position = mc_particle.getVertex()
     momentum = mc_particle.getMomentum()
     charge_sign = (-1 if mc_particle.getCharge() < 0 else 1)
-    b_field = 1.5
+    b_field = Belle2.BFieldManager.getField(position).Z() / Belle2.Unit.T
 
     seed_helix = Belle2.Helix(position, momentum, charge_sign, b_field)
     return seed_helix
@@ -225,7 +227,7 @@ def get_seed_track_fit_result(reco_track):
     # It does not matter, which particle we put in here, so we just use a pion
     particle_type = Belle2.Const.pion
     p_value = float('nan')
-    b_field = 1.5
+    b_field = Belle2.BFieldManager.getField(position).Z() / Belle2.Unit.T
     cdc_hit_pattern = 0
     svd_hit_pattern = 0
 

@@ -47,7 +47,7 @@ class SVD4Layer(TrackingValidationRun):
     }
 
     #: perform fit after track finding
-    fit_geometry = "default"
+    fit_tracks = True
     #: plot pull distributions
     pulls = True
     #: output file of plots

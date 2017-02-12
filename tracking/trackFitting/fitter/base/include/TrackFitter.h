@@ -111,11 +111,14 @@ namespace Belle2 {
   class TrackFitter {
   public:
     /// Create a new fitter instance.
-    TrackFitter(const std::string& storeArrayNameOfCDCHits = "",
+    TrackFitter(const std::string& storeArrayNameOfPXDHits = "",
                 const std::string& storeArrayNameOfSVDHits = "",
-                const std::string& storeArrayNameOfPXDHits = "",
+                const std::string& storeArrayNameOfCDCHits = "",
+                const std::string& storeArrayNameOfBKLMHits = "",
+                const std::string& storeArrayNameOfEKLMHits = "",
                 const bool& cosmicsTemporaryFix = false) :
-      m_measurementAdder(storeArrayNameOfCDCHits, storeArrayNameOfSVDHits, storeArrayNameOfPXDHits, cosmicsTemporaryFix)
+      m_measurementAdder(storeArrayNameOfPXDHits, storeArrayNameOfSVDHits, storeArrayNameOfCDCHits,
+                         storeArrayNameOfBKLMHits, storeArrayNameOfEKLMHits, cosmicsTemporaryFix)
     {
       resetFitterToDefaultSettings();
     }
@@ -231,13 +234,19 @@ namespace Belle2 {
      * and the track must be refitted afterwards.
      */
     void resetMeasurementCreators(
-      const std::vector<std::shared_ptr<CDCBaseMeasurementCreator>>& cdcMeasurementCreators,
-      const std::vector<std::shared_ptr<SVDBaseMeasurementCreator>>& svdMeasurementCreators,
       const std::vector<std::shared_ptr<PXDBaseMeasurementCreator>>& pxdMeasurementCreators,
+      const std::vector<std::shared_ptr<SVDBaseMeasurementCreator>>& svdMeasurementCreators,
+      const std::vector<std::shared_ptr<CDCBaseMeasurementCreator>>& cdcMeasurementCreators,
+      const std::vector<std::shared_ptr<BKLMBaseMeasurementCreator>>& bklmMeasurementCreators,
+      const std::vector<std::shared_ptr<EKLMBaseMeasurementCreator>>& eklmMeasurementCreators,
       const std::vector<std::shared_ptr<BaseMeasurementCreator>>& additionalMeasurementCreators)
     {
-      m_measurementAdder.resetMeasurementCreators(cdcMeasurementCreators, svdMeasurementCreators,
-                                                  pxdMeasurementCreators, additionalMeasurementCreators);
+      m_measurementAdder.resetMeasurementCreators(pxdMeasurementCreators,
+                                                  svdMeasurementCreators,
+                                                  cdcMeasurementCreators,
+                                                  bklmMeasurementCreators,
+                                                  eklmMeasurementCreators,
+                                                  additionalMeasurementCreators);
     }
 
     /**
@@ -258,13 +267,19 @@ namespace Belle2 {
      * and the track must be refitted afterwards.
      */
     void resetMeasurementCreatorsUsingFactories(
-      const std::map<std::string, std::map<std::string, std::string>>& cdcMeasurementCreators,
-      const std::map<std::string, std::map<std::string, std::string>>& svdMeasurementCreators,
       const std::map<std::string, std::map<std::string, std::string>>& pxdMeasurementCreators,
+      const std::map<std::string, std::map<std::string, std::string>>& svdMeasurementCreators,
+      const std::map<std::string, std::map<std::string, std::string>>& cdcMeasurementCreators,
+      const std::map<std::string, std::map<std::string, std::string>>& bklmMeasurementCreators,
+      const std::map<std::string, std::map<std::string, std::string>>& eklmMeasurementCreators,
       const std::map<std::string, std::map<std::string, std::string>>& additionalMeasurementCreators)
     {
-      m_measurementAdder.resetMeasurementCreatorsUsingFactories(cdcMeasurementCreators, svdMeasurementCreators,
-                                                                pxdMeasurementCreators, additionalMeasurementCreators);
+      m_measurementAdder.resetMeasurementCreatorsUsingFactories(pxdMeasurementCreators,
+                                                                svdMeasurementCreators,
+                                                                cdcMeasurementCreators,
+                                                                bklmMeasurementCreators,
+                                                                eklmMeasurementCreators,
+                                                                additionalMeasurementCreators);
     }
 
   private:

@@ -13,7 +13,7 @@
 
 #include <vxd/dataobjects/VxdID.h>
 
-#include <framework/datastore/RelationsObject.h>
+#include <framework/dataobjects/DigitBase.h>
 
 namespace Belle2 {
 
@@ -23,7 +23,7 @@ namespace Belle2 {
    * This is a development implementation which is intentionally kept
    * somewhat bulky. The coordinates probably won't be kept in future.
    */
-  class PXDDigit : public RelationsObject {
+  class PXDDigit : public DigitBase {
   public:
 
     /** Useful Constructor.
@@ -52,7 +52,8 @@ namespace Belle2 {
     /** Set frame number of this digit.
      * @param frame Frame number to be set.
      */
-    void setFrameNumber(unsigned short frame) {
+    void setFrameNumber(unsigned short frame)
+    {
       VxdID id(m_sensorID);
       id.setSegmentNumber(frame);
       m_sensorID = id;
@@ -93,6 +94,32 @@ namespace Belle2 {
      */
     void setCharge(float charge) { m_charge = charge; }
 
+    /**
+    * Implementation of the base class function.
+    * Enables BG overlay module to identify uniquely the physical channel of this Digit.
+    * @return unique channel ID, composed of VxdID (1 - 16), u pixel number (17-23), and v pixel number (24-32).
+    */
+    unsigned int getUniqueChannelID() const
+    {
+      // shift segment part of sensorID by two bits to make place for u+v
+      VxdID sensorID(m_sensorID);
+      sensorID.setSegmentNumber(sensorID.getSegmentNumber() << 2);
+      return m_vCellID + (m_uCellID << 10) + (sensorID << 16);
+    }
+
+    /**
+    * Implementation of the base class function.
+    * Pile-up method.
+    * @param bg BG digit
+    * @return append status
+    */
+    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg)
+    {
+      m_charge += dynamic_cast<const PXDDigit*>(bg)->getCharge();
+      return DigitBase::c_DontAppend;
+    }
+
+
   private:
 
     unsigned short m_sensorID; /**< Compressed sensor identifier.*/
@@ -102,7 +129,7 @@ namespace Belle2 {
     float m_vCellPosition;     /**< Absolute cell position in z. */
     float m_charge;            /**< Deposited charge (units depend on user selection). */
 
-    ClassDef(PXDDigit, 3)
+    ClassDef(PXDDigit, 4)
 
   }; // class PXDDigit
 

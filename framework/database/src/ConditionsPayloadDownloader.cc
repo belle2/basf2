@@ -58,9 +58,10 @@ namespace {
   {
     std::ostream& stream = *static_cast<std::ostream*>(userp);
     // size in bytes is size*nmemb so copy the correct amount and return it to curl
-    stream.write(static_cast<const char*>(buffer), size * nmemb);
-    if (!stream.good()) {
-      B2ERROR("Writing error while downloading...");
+    try {
+      stream.write(static_cast<const char*>(buffer), size * nmemb);
+    } catch (std::ios_base::failure& e) {
+      B2ERROR("Writing error while downloading: " << e.what());
       return 0;
     }
     return size * nmemb;
@@ -458,6 +459,9 @@ namespace Belle2 {
       B2ERROR("Cannot write to stream when downloading " << url);
       return false;
     }
+    // Set the exception flags to notify us of any problem during writing
+    auto oldExceptionMask = buffer.exceptions();
+    buffer.exceptions(std::ios::failbit | std::ios::badbit);
     // build the request ...
     CURLcode res{CURLE_FAILED_INIT};
     // and set all the curl options
@@ -466,6 +470,7 @@ namespace Belle2 {
     // perform the request ...
     res = curl_easy_perform(m_session->curl);
     // flush output
+    buffer.exceptions(oldExceptionMask);
     buffer.flush();
     // and check for errors which occured during download ...
     if (res != CURLE_OK) {

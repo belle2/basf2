@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCFitter2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
+#include <tracking/trackFindingCDC/fitting/CDCSZObservations.h>
 
 #include <tracking/trackFindingCDC/fitting/RiemannsMethod.h>
 
@@ -197,15 +198,13 @@ TEST(TrackFindingCDCTest, fitting_CDCRiemannFitter_LineFit_WithDriftLength)
 TEST(TrackFindingCDCTest, fitting_CDCSZFitter)
 {
   CDCSZFitter fitter;
+  CDCSZObservations szObservations;
 
-  CDCObservations2D observations2D;
-  observations2D.fill(Vector2D(0, 0), 0);
-  observations2D.fill(Vector2D(5, 3), 0);
-  observations2D.fill(Vector2D(10, 0), 0);
+  szObservations.fill(0, 0);
+  szObservations.fill(5, 3);
+  szObservations.fill(10, 0);
 
-  CDCTrajectorySZ trajectorySZ;
-  fitter.update(trajectorySZ, observations2D);
-
+  CDCTrajectorySZ trajectorySZ = fitter.fit(szObservations);
   const UncertainSZLine& fittedSZLine = trajectorySZ.getSZLine();
 
   EXPECT_NEAR(0.0, fittedSZLine->slope(), 10e-10);

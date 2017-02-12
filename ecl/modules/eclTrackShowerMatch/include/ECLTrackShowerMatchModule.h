@@ -63,6 +63,8 @@ namespace Belle2 {
 
     /** Minimal distance between track and shower. */
     double computeTrkMinDistance(const ECLShower&, StoreArray<Track>&) const;
+
+    /** Compute depth. */
     void computeDepth(const ECLShower& shower, double& lTrk, double& lShower) const;
   };
 

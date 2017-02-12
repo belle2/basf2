@@ -251,10 +251,10 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
           auto flags = obj->TestBit(c_IsTransient) ? DataStore::c_DontWriteOut : DataStore::c_WriteOut;
           DataStore::Instance().registerEntry(namelist.at(i), durability, cl, array, flags);
         }
+        DataStore::StoreEntry* entry = DataStore::Instance().getEntry(StoreAccessorBase(namelist.at(i), durability, cl, array));
         //only restore object if it is valid for current event
         bool ptrIsNULL = obj->TestBit(c_IsNull);
         if (!ptrIsNULL) {
-          DataStore::StoreEntry* entry = DataStore::Instance().getEntry(StoreAccessorBase(namelist.at(i), durability, cl, array));
           bool merge = m_handleMergeable and !array and entry->ptr != NULL and isMergeable(obj);
           if (merge) {
             B2DEBUG(100, "Will now merge " << namelist.at(i));
@@ -273,6 +273,9 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
           }
           //   B2DEBUG(100, "restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " stored");
         } else {
+          //usually entry should already be invalidated, but e.g. for CrashHandler, it might not be.
+          if (entry->ptr)
+            entry->invalidate();
           //not stored, clean up
           delete obj;
         }

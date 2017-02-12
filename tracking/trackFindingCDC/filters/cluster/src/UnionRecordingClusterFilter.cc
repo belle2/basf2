@@ -9,22 +9,18 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/cluster/UnionRecordingClusterFilter.h>
 
-#include <tracking/trackFindingCDC/filters/cluster/ClusterVarSets.h>
+#include <tracking/trackFindingCDC/filters/cluster/BasicClusterVarSet.h>
+#include <tracking/trackFindingCDC/filters/cluster/BkgTruthClusterVarSet.h>
 
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-UnionRecordingClusterFilter::UnionRecordingClusterFilter()
-  : Super("ClusterFilter.root")
-{
-}
-
 std::vector<std::string> UnionRecordingClusterFilter::getValidVarSetNames() const
 {
   std::vector<std::string> varSetNames = Super::getValidVarSetNames();
-  varSetNames.insert(varSetNames.end(), {"basic", "truth"});
+  varSetNames.insert(varSetNames.end(), {"basic", "bkg_truth"});
   return varSetNames;
 }
 

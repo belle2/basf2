@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
-#include <tracking/trackFindingCDC/ca/Relation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -49,7 +49,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the contained variables
-      bool extract(const Relation<const CDCSegmentPair>* ptrSegmentPairRelation) override;
+      bool extract(const Relation<const CDCSegmentPair>* ptrSegmentPairRelation) final;
     };
   }
 }

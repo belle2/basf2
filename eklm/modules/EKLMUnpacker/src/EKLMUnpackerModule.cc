@@ -101,7 +101,7 @@ void EKLMUnpackerModule::event()
           uint16_t ctime = bword2 & 0xFFFF; //full bword
           /* Unused yet? */
           //uint16_t tdc = bword3 & 0x7FF;
-          uint16_t charge = bword4 & 0xFFF;
+          uint16_t charge = bword4 & 0x7FFF;
           B2DEBUG(1, "copper: " << copperId << " finesse: " << finesse_num);
           EKLMDigit* digit = eklmDigits.appendNew();
           digit->setTime(ctime);
@@ -111,7 +111,7 @@ void EKLMUnpackerModule::event()
           digit->setPlane(plane);
           digit->setStrip(strip);
           digit->isGood(true);
-          digit->setNPE(charge);
+          digit->setCharge(charge);
           //digit->setEDep(charge);
           B2DEBUG(1, "from digit:endcap " << digit->getEndcap() <<
                   " layer: " << digit->getLayer() << " strip: " <<

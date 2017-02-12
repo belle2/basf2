@@ -11,9 +11,6 @@
 #include <tracking/modules/spacePointCreator/SPTCvirtualIPRemoverModule.h>
 #include <framework/logging/Logger.h>
 
-#include <tracking/vxdCaTracking/TrackletFilters.h>
-#include <tracking/vxdCaTracking/SharedFunctions.h> // e.g. PositionInfo
-
 // ROOT
 #include <TVector3.h>
 #include <TMath.h>
@@ -42,7 +39,6 @@ SPTCvirtualIPRemoverModule::SPTCvirtualIPRemoverModule() : Module()
 }
 
 
-
 void SPTCvirtualIPRemoverModule::event()
 {
   m_eventCounter++;
@@ -63,7 +59,7 @@ void SPTCvirtualIPRemoverModule::event()
       if (aHit->getType() == VXD::SensorInfoBase::SensorType::VXD) { // vIP found
         m_nVIPsTotal++;
         hasVIP = true;
-        if (m_PARAMdoCheckOnly or (m_PARAMmaxTCLengthForVIPKeeping + 1 < nHits)) continue;
+        if (m_PARAMdoCheckOnly or (m_PARAMmaxTCLengthForVIPKeeping + 1 >= nHits)) continue;
 
         aTC.removeSpacePoint(iSp);
         m_nVIPsRemoved++;
@@ -71,7 +67,7 @@ void SPTCvirtualIPRemoverModule::event()
       }
     }
 
-    B2DEBUG(1, "QualityEstimatorVXDCircleFitModule: event " << m_eventCounter
+    B2DEBUG(1, "SPTCvirtualIPRemoverModule:event: event " << m_eventCounter
             << ": TC " << nTC
             << " with " << nHits
             << " hits has vIP: " << (hasVIP ? "true" : "false")
@@ -81,7 +77,6 @@ void SPTCvirtualIPRemoverModule::event()
   }
 
 }
-
 
 
 void SPTCvirtualIPRemoverModule::endRun()
@@ -95,4 +90,3 @@ void SPTCvirtualIPRemoverModule::endRun()
          << ", nVIPsRemovedPerEvent: " << invEvents * float(m_nVIPsRemoved)
         );
 }
-

@@ -14,6 +14,7 @@ from modularAnalysis import *
 from stdCharged import *
 from stdFSParticles import *
 from stdV0s import *
+from stdPi0s import *
 
 reset_database()
 use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True, LogLevel.ERROR)
@@ -54,6 +55,7 @@ inputMdstList('default', filelist)
 stdFSParticles()
 loadStdCharged()
 loadStdKS()
+loadStdPi0()
 
 from Charm3BodyHadronic_List import *
 

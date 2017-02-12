@@ -9,7 +9,14 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPair/UnionRecordingSegmentPairFilter.h>
 
-#include <tracking/trackFindingCDC/filters/segmentPair/SegmentPairVarSets.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/BasicSegmentPairVarSet.h>
+
+#include <tracking/trackFindingCDC/filters/segmentPair/HitGapSegmentPairVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/SkimmedHitGapSegmentPairVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/FitlessSegmentPairVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/FitSegmentPairVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/TruthSegmentPairVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/TrailSegmentPairVarSet.h>
 
 #include <tracking/trackFindingCDC/filters/segmentPair/MVAFeasibleSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/MVARealisticSegmentPairFilter.h>
@@ -23,7 +30,8 @@ UnionRecordingSegmentPairFilter::getValidVarSetNames() const
   std::vector<std::string> varSetNames = Super::getValidVarSetNames();
   varSetNames.insert(varSetNames.end(), {
     "basic",
-    "hit_gap", "skimmed_hit_gap",
+    "hit_gap",
+    "skimmed_hit_gap",
     "fitless",
     "feasible",
     "pre_fit",
@@ -51,7 +59,7 @@ UnionRecordingSegmentPairFilter::createVarSet(const std::string& name) const
     MVAFeasibleSegmentPairFilter filter;
     return std::move(filter).releaseVarSet();
   } else if (name == "pre_fit") {
-    bool preliminaryFit = true;
+    const bool preliminaryFit = true;
     return makeUnique<FitSegmentPairVarSet>(preliminaryFit);
   } else if (name == "fit") {
     return makeUnique<FitSegmentPairVarSet>(false);

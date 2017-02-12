@@ -75,8 +75,7 @@ std::string TakenFlagColorMap::map(int index __attribute__((unused)), const CDCH
 {
   if (m_storedWireHits) {
     const std::vector<CDCWireHit>& wireHits = *m_storedWireHits;
-    ConstVectorRange<CDCWireHit> wireHitRange =
-      std::equal_range(wireHits.begin(), wireHits.end(), hit);
+    ConstVectorRange<CDCWireHit> wireHitRange{std::equal_range(wireHits.begin(), wireHits.end(), hit)};
 
     if (not wireHitRange.empty()) {
       const CDCWireHit& wireHit =  wireHitRange.front();

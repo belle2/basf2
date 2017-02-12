@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
-#include <tracking/trackFindingCDC/ca/Relation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
@@ -19,6 +19,8 @@
 
 #include <tracking/trackFindingCDC/utilities/Range.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
+#include <framework/core/ModuleParamList.h>
 
 #include <vector>
 #include <map>
@@ -108,7 +110,7 @@ namespace Belle2 {
           const CDCWire* neighborWire = wireAndOClockDirection.first;
           int oClockDirection = wireAndOClockDirection.second;
 
-          Range<ACDCWireHitIterator> wireHitRange = std::equal_range(itBegin, itEnd, *neighborWire);
+          Range<ACDCWireHitIterator> wireHitRange{std::equal_range(itBegin, itEnd, *neighborWire)};
           if (wireHitRange.empty()) {
             int ccwOClockDirection = oClockDirection - 1;
             int cwOClockDirection = oClockDirection == 11 ? 0 : oClockDirection + 1;
@@ -137,7 +139,7 @@ namespace Belle2 {
 
         for (std::pair<const CDCWire*, int> wireAndOClockDirection : wireNeighbors) {
           const CDCWire* neighborWire = wireAndOClockDirection.first;
-          Range<ACDCWireHitIterator> wireHitRange = std::equal_range(itBegin, itEnd, *neighborWire);
+          Range<ACDCWireHitIterator> wireHitRange{std::equal_range(itBegin, itEnd, *neighborWire)};
           wireHitNeighbors.insert(wireHitNeighbors.end(),
                                   wireHitRange.begin(),
                                   wireHitRange.end());

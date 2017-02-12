@@ -22,21 +22,27 @@ import logging
 import tracking
 
 from tracking.validation.run import TrackingValidationRun
+from tracking.adjustments import adjust_module
 
 
 class CDCFull(TrackingValidationRun):
     n_events = N_EVENTS
     root_input_file = '../EvtGenSimNoBkg.root'
-    finder_module = staticmethod(tracking.add_cdc_track_finding)
+
+    def finder_module(self, path):
+        tracking.add_cdc_track_finding(path)
+        # adjust_module(path, "WireHitPreparer",
+        #               UseNLoops=1)
+
     tracking_coverage = {
         'UsePXDHits': False,
         'UseSVDHits': False,
         'UseCDCHits': True,
         'UseOnlyAxialCDCHits': False,
         # 'WhichParticles': ['CDC'], # Uncomment to count also secondary tracks
+        # "UseNLoops" : 1,
         # 'EnergyCut': 0.1,
     }
-    fit_geometry = None
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE
 

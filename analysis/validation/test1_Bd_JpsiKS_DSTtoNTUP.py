@@ -22,6 +22,8 @@ from vertex import *
 from modularAnalysis import *
 from reconstruction import *
 
+set_log_level(LogLevel.ERROR)
+
 # load input ROOT file
 inputMdst('default', '../mdst-jpsiks.root')
 
@@ -32,7 +34,7 @@ inputMdst('default', '../mdst-jpsiks.root')
 # reconstruct everything as muons, use truth in analysis
 fillParticleList('mu-:std', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4')
 fillParticleList('e-:std', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4')
-fillParticleList('pi-:std', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4')
+fillParticleList('pi-:std', 'chiProb > 0.001')
 
 # --------------------------------------------------
 # Reconstruct B->J/psi(->ee,mumu) Ks and truth match

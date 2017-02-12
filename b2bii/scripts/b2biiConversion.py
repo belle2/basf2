@@ -3,6 +3,7 @@
 
 from basf2 import *
 from modularAnalysis import analysis_main
+from modularAnalysis import setAnalysisConfigParams
 import os
 import re
 import requests
@@ -17,7 +18,7 @@ def setupBelleMagneticField(path=analysis_main):
               'The Belle magnetic field is now being set via the settings in inputMdst(List) fucntion.')
 
 
-def setupB2BIIDatabase(isMC=False):
+def setupB2BIIDatabase(isMC=False, setExperimentNames=True):
     """
     Setup the database for B2BII
 
@@ -25,6 +26,8 @@ def setupB2BIIDatabase(isMC=False):
 
     Args:
         mc (bool): should be True for MC data and False for real data
+        setExperimentNames (bool): if you want to add further databases
+                                   this has to be false and you have to add the names yourself!
     """
     # we only want the central database with the B2BII content
     tagname = "B2BII%s" % ("_MC" if isMC else "")
@@ -45,8 +48,9 @@ def setupB2BIIDatabase(isMC=False):
     previous_loglevel = logging.log_level
     logging.log_level = LogLevel.WARNING
     # set all the names, doesn't matter if some don't exist so we just set 0-99
-    for exp in range(100):
-        set_experiment_name(exp, "BELLE_exp%d" % exp)
+    if setExperimentNames:
+        for exp in range(100):
+            set_experiment_name(exp, "BELLE_exp%d" % exp)
     # and restore the logging output
     logging.log_level = previous_loglevel
 
@@ -56,6 +60,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True, pa
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
     """
+
+    setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
 
     input = register_module('B2BIIMdstInput')
     if inputBelleMDSTFile is not None:

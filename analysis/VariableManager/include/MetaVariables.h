@@ -34,6 +34,23 @@ namespace Belle2 {
     Manager::FunctionPtr varFor(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the number of particles in the given particle List.
+     */
+    Manager::FunctionPtr nParticlesInList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns 1 if the given particle is a daughter of at least one of the particles of the
+     * given particle Lists.
+     */
+    Manager::FunctionPtr isDaughterOfList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns 1 if the given particle is a grand daughter of at least one of the particles of the
+     * given particle Lists.
+     */
+    Manager::FunctionPtr isGrandDaughterOfList(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the product of a variable over all daughters of the given particle
      * First argument in the argument vector must be the name of variable
      */

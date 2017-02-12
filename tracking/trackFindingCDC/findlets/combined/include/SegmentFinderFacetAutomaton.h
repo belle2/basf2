@@ -13,7 +13,6 @@
 #include <tracking/trackFindingCDC/findlets/minimal/ClusterBackgroundDetector.h>
 #include <tracking/trackFindingCDC/findlets/minimal/ClusterRefiner.h>
 #include <tracking/trackFindingCDC/findlets/minimal/FacetCreator.h>
-#include <tracking/trackFindingCDC/findlets/minimal/WeightedRelationCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentCreatorFacetAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentLinker.h>
 
@@ -21,22 +20,23 @@
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentAliasResolver.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentOrienter.h>
 
-#include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
+#include <tracking/trackFindingCDC/filters/wireHitRelation/BridgingWireHitRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/ChooseableFacetRelationFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
+#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
+#include <tracking/trackFindingCDC/findlets/minimal/WeightedRelationCreator.h>
+#include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
+
 #include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Legacy : Findlet implementing the segment finding part of the full track finder
-    template <class AClusterFilter,
-              class AFacetFilter,
-              class AFacetRelationFilter,
-              class ASegmentRelationFilter>
+    /// Findlet implementing the segment finding part of the full track finder
     class SegmentFinderFacetAutomaton : public Findlet<CDCWireHit&, CDCSegment2D> {
 
     private:
@@ -45,97 +45,19 @@ namespace Belle2 {
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
-      SegmentFinderFacetAutomaton()
-      {
-        this->addProcessingSignalListener(&m_superClusterCreator);
-        this->addProcessingSignalListener(&m_clusterRefiner);
-        this->addProcessingSignalListener(&m_clusterBackgroundDetector);
-        this->addProcessingSignalListener(&m_facetCreator);
-        this->addProcessingSignalListener(&m_facetRelationCreator);
-        this->addProcessingSignalListener(&m_segmentCreatorFacetAutomaton);
-        this->addProcessingSignalListener(&m_segmentLinker);
-
-        this->addProcessingSignalListener(&m_segmentFitter);
-        this->addProcessingSignalListener(&m_segmentAliasResolver);
-        this->addProcessingSignalListener(&m_segmentOrienter);
-
-        this->addProcessingSignalListener(&m_superClusterSwapper);
-        this->addProcessingSignalListener(&m_clusterSwapper);
-        this->addProcessingSignalListener(&m_facetSwapper);
-
-        m_superClusters.reserve(150);
-        m_clusters.reserve(200);
-        m_facets.reserve(1000);
-        m_facetRelations.reserve(1000);
-        m_segments.reserve(200);
-        m_intermediateSegments.reserve(200);
-      }
+      SegmentFinderFacetAutomaton();
 
       /// Short description of the findlet
-      std::string getDescription() final {
-        return "Generates segments from hits using a cellular automaton build from hit triples (facets).";
-      }
+      std::string getDescription() final;
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
-        m_superClusterCreator.exposeParameters(moduleParamList, prefix);
-        m_clusterRefiner.exposeParameters(moduleParamList, prefix);
-        m_clusterBackgroundDetector.exposeParameters(moduleParamList, prefixed(prefix, "Cluster"));
-        m_facetCreator.exposeParameters(moduleParamList, prefixed(prefix, "Facet"));
-        m_facetRelationCreator.exposeParameters(moduleParamList, prefixed(prefix, "FacetRelation"));
-        m_segmentCreatorFacetAutomaton.exposeParameters(moduleParamList, prefix);
-        m_segmentLinker.exposeParameters(moduleParamList, prefixed(prefix, "SegmentRelation"));
-
-        m_segmentFitter.exposeParameters(moduleParamList, prefix);
-        m_segmentAliasResolver.exposeParameters(moduleParamList, prefix);
-        m_segmentOrienter.exposeParameters(moduleParamList, prefix);
-
-        m_superClusterSwapper.exposeParameters(moduleParamList, prefix);
-        m_clusterSwapper.exposeParameters(moduleParamList, prefix);
-        m_facetSwapper.exposeParameters(moduleParamList, prefix);
-      }
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Signal the beginning of a new event
-      void beginEvent() final {
-        m_superClusters.clear();
-        m_clusters.clear();
-        m_facets.clear();
-        m_facetRelations.clear();
-        m_segments.clear();
-        m_intermediateSegments.clear();
-        Super::beginEvent();
-      }
+      void beginEvent() final;
 
       /// Generates the segment from wire hits
-      void apply(std::vector<CDCWireHit>& inputWireHits,
-                 std::vector<CDCSegment2D>& outputSegments) final {
-        outputSegments.reserve(200);
-
-        m_superClusterCreator.apply(inputWireHits, m_superClusters);
-        m_clusterRefiner.apply(m_superClusters, m_clusters);
-        m_clusterBackgroundDetector.apply(m_clusters);
-        m_facetCreator.apply(m_clusters, m_facets);
-        m_facetRelationCreator.apply(m_facets, m_facetRelations);
-        m_segmentCreatorFacetAutomaton.apply(m_facets, m_facetRelations, m_segments);
-        m_segmentFitter.apply(m_segments);
-
-        m_segmentOrienter.apply(m_segments, m_intermediateSegments);
-        m_segmentFitter.apply(m_intermediateSegments);
-
-        m_segmentAliasResolver.apply(m_intermediateSegments);
-
-        m_segmentLinker.apply(m_intermediateSegments, outputSegments);
-        m_segmentFitter.apply(outputSegments);
-
-        // Move superclusters to the DataStore
-        m_superClusterSwapper.apply(m_superClusters);
-
-        // Move clusters to the DataStore
-        m_clusterSwapper.apply(m_clusters);
-
-        // Move facets to the DataStore
-        m_facetSwapper.apply(m_facets);
-      }
+      void apply(std::vector<CDCWireHit>& inputWireHits, std::vector<CDCSegment2D>& outputSegments) final;
 
     private:
       // Findlets
@@ -143,16 +65,16 @@ namespace Belle2 {
       SuperClusterCreator m_superClusterCreator;
 
       /// Creates the clusters from super clusters
-      ClusterRefiner<> m_clusterRefiner;
+      ClusterRefiner<BridgingWireHitRelationFilter> m_clusterRefiner;
 
       /// Marks the clusters as background
-      ClusterBackgroundDetector<AClusterFilter> m_clusterBackgroundDetector;
+      ClusterBackgroundDetector m_clusterBackgroundDetector;
 
       /// Creates the facet (hit triplet) cells of the cellular automaton
-      FacetCreator<AFacetFilter> m_facetCreator;
+      FacetCreator m_facetCreator;
 
       /// Creates the facet (hit triplet) relations of the cellular automaton
-      WeightedRelationCreator<const CDCFacet, AFacetRelationFilter> m_facetRelationCreator;
+      WeightedRelationCreator<const CDCFacet, ChooseableFacetRelationFilter> m_facetRelationCreator;
 
       /// Find the segments by composition of facets path from a cellular automaton
       SegmentCreatorFacetAutomaton m_segmentCreatorFacetAutomaton;
@@ -167,7 +89,7 @@ namespace Belle2 {
       SegmentOrienter m_segmentOrienter;
 
       /// Link segments with closeby segments of the same super cluster
-      SegmentLinker<ASegmentRelationFilter> m_segmentLinker;
+      SegmentLinker m_segmentLinker;
 
       /// Puts the internal super clusters on the DataStore
       StoreVectorSwapper<CDCWireHitCluster> m_superClusterSwapper{

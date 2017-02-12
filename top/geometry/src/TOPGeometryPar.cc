@@ -14,6 +14,7 @@
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
+#include <framework/logging/LogSystem.h>
 #include <geometry/Materials.h>
 #include <iostream>
 
@@ -55,8 +56,6 @@ namespace Belle2 {
         return;
       }
 
-      readOldQBB(content);
-
       GearDir frontEndMapping(content, "FrontEndMapping");
       m_frontEndMapper.initialize(frontEndMapping);
       if (!m_frontEndMapper.isValid()) {
@@ -73,6 +72,12 @@ namespace Belle2 {
       m_channelMapperIRSX.initialize(channelMapping1);
       if (!m_channelMapperIRSX.isValid()) {
         return;
+      }
+
+      // print geometry if the debug level for 'top' is set 10000
+      const auto& logSystem = LogSystem::Instance();
+      if (logSystem.isLevelEnabled(LogConfig::c_Debug, 10000, "top")) {
+        m_geo->print();
       }
 
       m_valid = true;
@@ -108,6 +113,12 @@ namespace Belle2 {
       if (!m_channelMapperIRSX.isValid()) {
         B2ERROR("TOPChannelMaps: no payload found in database");
         return;
+      }
+
+      // print geometry if the debug level for 'top' is set 10000
+      const auto& logSystem = LogSystem::Instance();
+      if (logSystem.isLevelEnabled(LogConfig::c_Debug, 10000, "top")) {
+        m_geo->print();
       }
 
       m_valid = true;
@@ -166,7 +177,8 @@ namespace Belle2 {
                               arrayParams.getLength("Ygap"),
                               arrayParams.getString("stackMaterial"),
                               pmt);
-      geo->setPMTArray(pmtArray);
+      pmtArray.setAirGap(arrayParams.getLength("airGap", 0));
+      double decoupledFraction = arrayParams.getDouble("decoupledFraction", 0);
 
       // modules
 
@@ -220,18 +232,20 @@ namespace Belle2 {
                     arrayParams.getString("glueMaterial"));
       prism.setSurface(barSurface, sigmaAlpha);
 
-      double radius = barParams.getLength("Radius") + barParams.getLength("QThickness") / 2;
+      double R = barParams.getLength("Radius") + barParams.getLength("QThickness") / 2;
       double phi = barParams.getLength("Phi0");
       double backwardZ = barParams.getLength("QZBackward");
       int numModules = barParams.getInt("Nbar");
       for (int i = 0; i < numModules; i++) {
         unsigned id = i + 1;
-        TOPGeoModule module(id, radius, phi, backwardZ);
+        TOPGeoModule module(id, R, phi, backwardZ);
         module.setName(addNumber(module.getName(), id));
         module.setBarSegment1(bar1);
         module.setBarSegment2(bar2);
         module.setMirrorSegment(mirror);
         module.setPrism(prism);
+        module.setPMTArray(pmtArray);
+        if (decoupledFraction > 0) module.generateDecoupledPMTs(decoupledFraction);
         // module.setModuleCNumber(num);
         // module.setPMTArrayDisplacement(arrayDispl);
         // module.setModuleDisplacement(moduleDispl);
@@ -239,10 +253,85 @@ namespace Belle2 {
         phi += 2 * M_PI / numModules;
       }
 
-      // boardstack
+      // broken glues (if any)
 
-      TOPGeoBoardStack bs; // TODO
-      geo->setBoardStack(bs);
+      GearDir brokenGlues(content, "BrokenGlues");
+      if (brokenGlues) {
+        if (brokenGlues.getInt("SwitchON") != 0) {
+          auto material = brokenGlues.getString("material");
+          for (const GearDir& slot : brokenGlues.getNodes("Slot")) {
+            int moduleID = slot.getInt("@ID");
+            if (!geo->isModuleIDValid(moduleID)) {
+              B2WARNING("TOPGeometryPar: BrokenGlues.xml: invalid moduleID " << moduleID);
+              continue;
+            }
+            auto& module = const_cast<TOPGeoModule&>(geo->getModule(moduleID));
+            for (const GearDir& glue : slot.getNodes("Glue")) {
+              int glueID = glue.getInt("@ID");
+              double fraction = glue.getDouble("fraction");
+              if (fraction <= 0) continue;
+              double angle = glue.getAngle("angle");
+              module.setBrokenGlue(glueID, fraction, angle, material);
+            }
+          }
+        }
+      }
+
+      // peel-off cookies (if any)
+
+      GearDir peelOff(content, "PeelOffCookies");
+      if (peelOff) {
+        if (peelOff.getInt("SwitchON") != 0) {
+          auto material = peelOff.getString("material");
+          double thickness = peelOff.getLength("thickness");
+          for (const GearDir& slot : peelOff.getNodes("Slot")) {
+            int moduleID = slot.getInt("@ID");
+            if (!geo->isModuleIDValid(moduleID)) {
+              B2WARNING("TOPGeometryPar: PeelOffCookiess.xml: invalid moduleID "
+                        << moduleID);
+              continue;
+            }
+            auto& module = const_cast<TOPGeoModule&>(geo->getModule(moduleID));
+            module.setPeelOffRegions(thickness, material);
+            for (const GearDir& region : slot.getNodes("Region")) {
+              int regionID = region.getInt("@ID");
+              double fraction = region.getDouble("fraction");
+              if (fraction <= 0) continue;
+              double angle = region.getAngle("angle");
+              module.appendPeelOffRegion(regionID, fraction, angle);
+            }
+          }
+        }
+      }
+
+      // front-end electronics geometry
+
+      GearDir feParams(content, "FrontEndGeo");
+      GearDir fbParams(feParams, "FrontBoard");
+      TOPGeoFrontEnd frontEnd;
+      frontEnd.setFrontBoard(fbParams.getLength("width"),
+                             fbParams.getLength("height"),
+                             fbParams.getLength("thickness"),
+                             fbParams.getLength("gap"),
+                             fbParams.getLength("y"),
+                             fbParams.getString("material"));
+      GearDir hvParams(feParams, "HVBoard");
+      frontEnd.setHVBoard(hvParams.getLength("width"),
+                          hvParams.getLength("length"),
+                          hvParams.getLength("thickness"),
+                          hvParams.getLength("gap"),
+                          hvParams.getLength("y"),
+                          hvParams.getString("material"));
+      GearDir bsParams(feParams, "BoardStack");
+      frontEnd.setBoardStack(bsParams.getLength("width"),
+                             bsParams.getLength("height"),
+                             bsParams.getLength("length"),
+                             bsParams.getLength("gap"),
+                             bsParams.getLength("y"),
+                             bsParams.getString("material"),
+                             bsParams.getLength("spacerWidth"),
+                             bsParams.getString("spacerMaterial"));
+      geo->setFrontEnd(frontEnd, feParams.getInt("numBoardStacks"));
 
       // QBB
 
@@ -287,17 +376,17 @@ namespace Belle2 {
                                 sideRailsParams.getString("material"));
       qbb.setSideRails(sideRails);
 
-      GearDir prismEnclosureParams(qbbParams, "prismEnclosure");
-      TOPGeoPrismEnclosure prismEnclosure(prismEnclosureParams.getLength("length"),
-                                          prismEnclosureParams.getLength("height"),
-                                          prismEnclosureParams.getAngle("angle"),
-                                          prismEnclosureParams.getLength("bottomThickness"),
-                                          prismEnclosureParams.getLength("sideThickness"),
-                                          prismEnclosureParams.getLength("backThickness"),
-                                          prismEnclosureParams.getLength("frontThickness"),
-                                          prismEnclosureParams.getLength("extensionThickness"),
-                                          prismEnclosureParams.getString("material"));
-      qbb.setPrismEnclosure(prismEnclosure);
+      GearDir prismEnclParams(qbbParams, "prismEnclosure");
+      TOPGeoPrismEnclosure prismEncl(prismEnclParams.getLength("length"),
+                                     prismEnclParams.getLength("height"),
+                                     prismEnclParams.getAngle("angle"),
+                                     prismEnclParams.getLength("bottomThickness"),
+                                     prismEnclParams.getLength("sideThickness"),
+                                     prismEnclParams.getLength("backThickness"),
+                                     prismEnclParams.getLength("frontThickness"),
+                                     prismEnclParams.getLength("extensionThickness"),
+                                     prismEnclParams.getString("material"));
+      qbb.setPrismEnclosure(prismEncl);
 
       GearDir endPlateParams(qbbParams, "forwardEndPlate");
       TOPGeoEndPlate endPlate(endPlateParams.getLength("thickness"),
@@ -382,30 +471,6 @@ namespace Belle2 {
       ss >> out;
       return out;
     }
-
-
-    void TOPGeometryPar::readOldQBB(const GearDir& content)
-    {
-
-      // Support structure
-
-      GearDir supParams(content, "Support");
-      m_PannelThickness = supParams.getLength("PannelThickness");
-      m_PlateThickness = supParams.getLength("PlateThickness");
-      m_LowerGap = supParams.getLength("lowerGap");
-      m_UpperGap = supParams.getLength("upperGap");
-      m_SideGap = supParams.getLength("sideGap");
-      m_forwardGap = supParams.getLength("forwardGap");
-      m_backwardGap = supParams.getLength("backGap");
-      m_pannelMaterial = supParams.getString("PannelMaterial");
-      m_insideMaterial = supParams.getString("FillMaterial");
-
-      // other
-
-      m_brokenFraction = content.getDouble("Bars/BrokenJointFraction", 0);
-
-    }
-
 
   } // End namespace TOP
 } // End namespace Belle2

@@ -24,8 +24,8 @@
 #include <framework/logging/Logger.h>
 
 // detector Digits, Clusters or waveforms
-#include <pxd/dataobjects/PXDCluster.h>
-#include <svd/dataobjects/SVDCluster.h>
+#include <pxd/dataobjects/PXDDigit.h>
+#include <svd/dataobjects/SVDDigit.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <arich/dataobjects/ARICHDigit.h>
@@ -66,8 +66,8 @@ namespace Belle2 {
   {
 
     // registration in datastore (all as optional input - see template function)
-    registerDigits<PXDCluster>();
-    registerDigits<SVDCluster>();
+    registerDigits<PXDDigit>();
+    registerDigits<SVDDigit>();
     registerDigits<CDCHit>();
     registerDigits<TOPDigit>();
     registerDigits<ARICHDigit>();
@@ -85,13 +85,13 @@ namespace Belle2 {
   {
     /* note: dataobject must inherit from DigitBase */
 
-    //    addBGDigits<PXDCluster>();
-    //    addBGDigits<SVDCluster>();
-    //    addBGDigits<CDCHit>();
+    addBGDigits<PXDDigit>();
+    addBGDigits<SVDDigit>();
+    addBGDigits<CDCHit>();
     addBGDigits<TOPDigit>();
     addBGDigits<ARICHDigit>();
     //    addBGDigits<ECLDigit>(); // not yet clear which one
-    //    addBGDigits<BKLMDigit>();
+    addBGDigits<BKLMDigit>();
     addBGDigits<EKLMDigit>();
 
   }

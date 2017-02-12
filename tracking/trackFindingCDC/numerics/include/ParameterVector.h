@@ -19,6 +19,7 @@ namespace Belle2 {
     template <int N>
     using ParameterVector = Eigen::Matrix<double, N, 1>;
 
+    /// Structure to gather some utility functions for the ParameterVector.
     struct ParameterVectorUtil {
 
       /// Gets a sub vector from a parameter vector
@@ -39,6 +40,5 @@ namespace Belle2 {
         return result;
       }
     };
-
   }
 }

@@ -87,6 +87,26 @@ namespace Belle2 {
       /** Energy deposited */
       TH1F* h_dosi_edep8[18];
 
+      /** Energy deposited */
+      TH2F* h_dosi_rs_edep0[18];
+      /** Energy deposited */
+      TH2F* h_dosi_rs_edep1[18];
+      /** Energy deposited */
+      TH2F* h_dosi_rs_edep2[18];
+      /** Energy deposited */
+      TH2F* h_dosi_rs_edep3[18];
+      /** Energy deposited */
+      TH2F* h_dosi_rs_edep4[18];
+      /** Energy deposited */
+      TH2F* h_dosi_rs_edep5[18];
+      /** Energy deposited */
+      TH2F* h_dosi_rs_edep6[18];
+      /** Energy deposited */
+      TH2F* h_dosi_rs_edep7[18];
+      /** Energy deposited */
+      TH2F* h_dosi_rs_edep8[18];
+
+
     };
 
   }

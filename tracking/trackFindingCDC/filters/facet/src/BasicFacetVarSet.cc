@@ -19,8 +19,7 @@ bool BasicFacetVarSet::extract(const CDCFacet* ptrFacet)
   if (not ptrFacet) return false;
   const CDCFacet& facet = *ptrFacet;
 
-  ISuperLayer superlayerID = facet.getISuperLayer();
-
+  const ISuperLayer superlayerID = facet.getISuperLayer();
 
   const CDCRLWireHit& startRLWirehit = facet.getStartRLWireHit();
   const double startDriftLength = startRLWirehit.getSignedRefDriftLength();
@@ -40,9 +39,9 @@ bool BasicFacetVarSet::extract(const CDCFacet* ptrFacet)
   const ERightLeft startRLInfo = facet.getStartRLInfo();
   const ERightLeft middleRLInfo = facet.getMiddleRLInfo();
   const ERightLeft endRLInfo = facet.getEndRLInfo();
-  CDCRLWireHitTriple::Shape shape = facet.getShape();
-  short oClockDelta = shape.getOClockDelta();
-  short cellExtend = shape.getCellExtend();
+  const CDCRLWireHitTriple::Shape shape = facet.getShape();
+  const short oClockDelta = shape.getOClockDelta();
+  const short cellExtend = shape.getCellExtend();
   const short stableTwist = -sign(shape.getOClockDelta()) * middleRLInfo;
   const bool startToMiddleIsCrossing = startRLInfo != middleRLInfo;
   const bool middleToEndIsCrossing = middleRLInfo != endRLInfo;

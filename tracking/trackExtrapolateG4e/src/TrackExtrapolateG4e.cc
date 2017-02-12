@@ -377,14 +377,19 @@ void TrackExtrapolateG4e::registerVolumes()
   for (vector<G4VPhysicalVolume*>::iterator iVol = pvStore->begin();
        iVol != pvStore->end(); ++iVol) {
     const G4String name = (*iVol)->GetName();
-    // TOP doesn't have one envelope; it has several "PlacedTOPModule"s
-    if (name == "PlacedTOPModule") {
+    // TOP doesn't have one envelope; it has 16 "TOPModule"s
+    if (name.find("TOPModule") != string::npos) {
       m_EnterExit->push_back(*iVol);
     }
     // TOP quartz bar (=sensitive) has an automatically generated PV name
     // av_WWW_impr_XXX_YYY_ZZZ because it is an imprint of a G4AssemblyVolume;
-    // YYY is cuttest.
-    else if (name.find("_cuttest_") != string::npos) {
+    // YYY is as below
+    else if (name.find("_TOPPrism_") != string::npos or
+             name.find("_TOPBarSegment") != string::npos or
+             name.find("_TOPMirrorSegment") != string::npos or
+             name.find("TOPBarSegment1Glue") != string::npos or
+             name.find("TOPBarSegment2Glue") != string::npos or
+             name.find("TOPMirrorSegmentGlue") != string::npos) {
       m_EnterExit->push_back(*iVol);
     } else if (name == "ARICH.AerogelSupportPlate") {
       m_EnterExit->push_back(*iVol);
@@ -425,17 +430,19 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
   if (name.find("CDC") != string::npos) {
     detID = Const::EDetector::CDC;
     copyID = touch->GetVolume(0)->GetCopyNo();
-  }
-  // TOP doesn't have one envelope; it has several "PlacedTOPModule"s
-  else if (name == "PlacedTOPModule") {
+  } else if (name.find("TOP") != string::npos) {
     detID = Const::EDetector::TOP;
-  }
-  // TOP quartz bar (=sensitive) has an automatically generated PV name
-  // av_WWW_impr_XXX_YYY_ZZZ because it is an imprint of a G4AssemblyVolume;
-  // YYY is cuttest.
-  else if (name.find("_cuttest_") != string::npos) {
-    detID = Const::EDetector::TOP;
-    copyID = (touch->GetHistoryDepth() >= 2) ? touch->GetVolume(2)->GetCopyNo() : 0;
+    if (name.find("TOPModule") != string::npos) {
+      copyID = -touch->GetVolume(0)->GetCopyNo(); // negative to distinguish module and quartz hits
+    } else if (name.find("_TOPPrism_") != string::npos or
+               name.find("_TOPBarSegment") != string::npos or
+               name.find("_TOPMirrorSegment") != string::npos) {
+      copyID = (touch->GetHistoryDepth() >= 1) ? touch->GetVolume(1)->GetCopyNo() : 0;
+    } else if (name.find("TOPBarSegment1Glue") != string::npos or
+               name.find("TOPBarSegment2Glue") != string::npos or
+               name.find("TOPMirrorSegmentGlue") != string::npos) {
+      copyID = (touch->GetHistoryDepth() >= 2) ? touch->GetVolume(2)->GetCopyNo() : 0;
+    }
   }
   // ARICH has an envelope that contains modules that each contain a moduleWindow
   else if (name == "ARICH.AerogelSupportPlate") {
@@ -455,69 +462,16 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
 
 }
 
+
 void TrackExtrapolateG4e::getStartPoint(RecoTrack* recoTrack, const genfit::AbsTrackRep* gfTrackRep, int pdgCode,
                                         G4ThreeVector& position, G4ThreeVector& momentum,
                                         G4ErrorTrajErr& covG4e, double& tof)
 {
-  bool firstLast = true; // for genfit exception catch
   try {
-    const genfit::MeasuredStateOnPlane& firstState = recoTrack->getMeasuredStateOnPlaneFromFirstHit(gfTrackRep);
-    TVector3 firstPosition, firstMomentum;
-    TMatrixDSym firstCov(6);
-    gfTrackRep->getPosMomCov(firstState, firstPosition, firstMomentum, firstCov);
-    int charge = gfTrackRep->getCharge(firstState);
-    TVector3 firstDirection(firstMomentum.Unit());
-
-    TVector3 ipPosition(firstPosition);
-    TVector3 ipDirection(firstDirection);
-    double Bz = genfit::FieldManager::getInstance()->getFieldVal(TVector3(0, 0, 0)).Z() * CLHEP::kilogauss / CLHEP::tesla;
-    if (Bz > 0.0) {
-      double radius = (firstMomentum.Perp() * CLHEP::GeV / CLHEP::eV) /
-                      (CLHEP::c_light / (CLHEP::m / CLHEP::s) * charge * Bz) *
-                      (CLHEP::m / CLHEP::cm);
-      double centerPhi = ipDirection.Phi() - M_PI_2;
-      double centerX = ipPosition.X() + radius * cos(centerPhi);
-      double centerY = ipPosition.Y() + radius * sin(centerPhi);
-      double pocaPhi = atan2(charge * centerY, charge * centerX) + M_PI;
-      double dPhi = pocaPhi - centerPhi - M_PI;
-      if (dPhi > M_PI) { dPhi -= TWOPI; }
-      if (dPhi < -M_PI) { dPhi  += TWOPI; }
-      ipPosition.SetX(centerX + radius * cos(pocaPhi));
-      ipPosition.SetY(centerY + radius * sin(pocaPhi));
-      double ipPerp = ipDirection.Perp();
-      if (ipPerp > 0.0) {
-        ipPosition.SetZ(ipPosition.Z() - dPhi * radius * ipDirection.Z() / ipPerp);
-        ipDirection.SetX(+sin(pocaPhi) * ipPerp);
-        ipDirection.SetY(-cos(pocaPhi) * ipPerp);
-      }
-      // or, approximately, ipPosition=(0,0,0) and ipDirection=(?,?,firstDirection.Z())
-    }
-    firstLast = false;
     const genfit::MeasuredStateOnPlane& lastState = recoTrack->getMeasuredStateOnPlaneFromLastHit(gfTrackRep);
     TVector3 lastPosition, lastMomentum;
     TMatrixDSym lastCov(6);
     gfTrackRep->getPosMomCov(lastState, lastPosition, lastMomentum, lastCov);
-    TVector3 lastDirection(lastMomentum.Unit());
-    double lastMomMag = lastMomentum.Mag();
-
-    // The path length should really be taken from the fit result ...
-    // ... but leave this as is for exact comparison.
-    double pathLength = 0.0;
-    double avgW = 0.5 * (ipDirection.Z() + lastDirection.Z());
-    if ((fabs(avgW) > 1.0E-10) && (ipDirection.Z()*lastDirection.Z() > 0.0)) {
-      pathLength = fabs((lastPosition.Z() - ipPosition.Z()) / avgW);
-    } else {
-      double deltaPhi = lastDirection.Phi() - ipDirection.Phi();
-      if (deltaPhi < -CLHEP::pi) { deltaPhi += CLHEP::twopi; }
-      if (deltaPhi >  CLHEP::pi) { deltaPhi -= CLHEP::twopi; }
-      double dx = lastPosition.X() - ipPosition.X();
-      double dy = lastPosition.Y() - ipPosition.Y();
-      pathLength = sqrt(dx * dx + dy * dy) / (ipDirection.Perp() + lastDirection.Perp())
-                   * (deltaPhi / sin(0.5 * deltaPhi));
-    }
-    double mass = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetPDGMass() / CLHEP::GeV;
-    // time of flight from I.P. (ns) at the last point on the Genfit track
-    tof = pathLength * (sqrt(lastMomMag * lastMomMag + mass * mass) / (lastMomMag * CLHEP::c_light / (CLHEP::cm / CLHEP::ns)));
 
     covG4e = fromPhasespaceToG4e(lastMomentum, lastCov); // in Geant4e units (GeV/c, cm)
     position.setX(lastPosition.X() * CLHEP::cm); // in Geant4 units (mm)
@@ -526,10 +480,17 @@ void TrackExtrapolateG4e::getStartPoint(RecoTrack* recoTrack, const genfit::AbsT
     momentum.setX(lastMomentum.X() * CLHEP::GeV);  // in Geant4 units (MeV/c)
     momentum.setY(lastMomentum.Y() * CLHEP::GeV);
     momentum.setZ(lastMomentum.Z() * CLHEP::GeV);
+
+    tof = lastState.getTime(); // NOTE: must be revised, when IP profile (reconstructed beam spot) become available!
+    if (pdgCode != lastState.getPDG()) {
+      double p2 = lastMomentum.Mag2();
+      double mass = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode)->GetPDGMass() / CLHEP::GeV;
+      tof *= sqrt((p2 + mass * mass) / (p2 + lastState.getMass() * lastState.getMass()));
+    }
   }
 
   catch (genfit::Exception& e) {
-    B2WARNING("Caught genfit exception for " << (firstLast ? "first" : "last") << " point on track; will not extrapolate. " <<
+    B2WARNING("Caught genfit exception for last point on track; will not extrapolate. " <<
               e.what());
     // Do not extrapolate this track by forcing minPt cut to fail
     momentum.setX(0.0);
@@ -537,6 +498,7 @@ void TrackExtrapolateG4e::getStartPoint(RecoTrack* recoTrack, const genfit::AbsT
     momentum.setZ(0.0);
   }
 }
+
 
 TMatrixDSym TrackExtrapolateG4e::fromG4eToPhasespace(const G4ErrorFreeTrajState* g4eState)
 {

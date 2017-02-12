@@ -6,6 +6,7 @@ import os
 import subprocess
 import multiprocessing
 import validationpath
+import validationfunctions
 
 
 class Local:
@@ -21,6 +22,27 @@ class Local:
     @var max_number_of_processes: The maximum number of parallel processes
     @var current_number_of_processes: The number of processes currently running
     """
+
+    @staticmethod
+    def is_supported():
+        """
+        Local control is always supported
+        """
+        return True
+
+    @staticmethod
+    def name():
+        """
+        Returns name of this job contol
+        """
+        return "local"
+
+    @staticmethod
+    def description():
+        """
+        Returns description of this job control
+        """
+        return "Multi-processing on the local machine"
 
     def __init__(self, max_number_of_processes=None):
         """!
@@ -108,7 +130,7 @@ class Local:
             # 'options' contains an option-string for basf2, e.g. '-n 100 -p
             # 8'. This string will be split on white-spaces and added to the
             # params-list, since subprocess.Popen does not like strings...
-            params = ['basf2', job.path] + options.split()
+            params = validationfunctions.basf2_command_builder(job.path, options.split())
 
         # Log the command we are about the execute
         self.logger.debug(subprocess.list2cmdline(params))
@@ -148,3 +170,14 @@ class Local:
             return [True, process.returncode]
         else:
             return [False, 0]
+
+    def terminate(self, job):
+        """!
+        Terminate a running job
+        """
+        # look which process belongs to the given job
+        process = self.jobs_processes[job]
+
+        process.terminate()
+        del self.jobs_processes[job]
+        self.current_number_of_processes = len(self.jobs_processes)

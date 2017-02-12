@@ -125,8 +125,8 @@ namespace Belle2 {
     anotherSpacePointTC.setPdgCode(-11);
     EXPECT_TRUE(aSpacePointTC == anotherSpacePointTC);
 
-    // add a space point and compare again, should now give false
-    anotherSpacePointTC.addSpacePoint(&anotherSVDSpacePoint);
+    // add a space point with arbitrary sorting parameter and compare again, should now give false
+    anotherSpacePointTC.addSpacePoint(&anotherSVDSpacePoint, 1.0);
 
     EXPECT_FALSE(aSpacePointTC == anotherSpacePointTC);
 
@@ -138,12 +138,12 @@ namespace Belle2 {
 
     // create an empty TC and add SpacePoints by hand and compare again with the other TCs
     Belle2::SpacePointTrackCand newSpacePointTC;
-    newSpacePointTC.addSpacePoint(&aPXDSpacePoint);
-    newSpacePointTC.addSpacePoint(&aSVDSpacePoint);
+    newSpacePointTC.addSpacePoint(&aPXDSpacePoint, 1.0);
+    newSpacePointTC.addSpacePoint(&aSVDSpacePoint, 1.1);
 
     EXPECT_TRUE(newSpacePointTC == aSpacePointTC);
 
-    newSpacePointTC.addSpacePoint(&anotherSVDSpacePoint);
+    newSpacePointTC.addSpacePoint(&anotherSVDSpacePoint, 1.2);
 
     EXPECT_TRUE(newSpacePointTC == anotherSpacePointTC);
 
@@ -403,5 +403,78 @@ namespace Belle2 {
 
     // try to remove a SpacePoint that is out of bounds
     ASSERT_THROW(fullTrackCand.removeSpacePoint(fullTrackCand.getNHits()), SpacePointTrackCand::SPTCIndexOutOfBounds);
+  }
+
+  /**
+   * Test setPdgCode method, by comparing its results with the expected values for the according particles
+   */
+  TEST_F(SpacePointTrackCandTest, testGetSortedHits)
+  {
+    // set up some SpacePoints and add them to a SpacePointTrackCand
+    VxdID aVxdID1 = VxdID(1, 1, 1);
+    VXD::SensorInfoBase sensorInfoBase1 = createSensorInfo(aVxdID1, 2.3, 4.2);
+    PXDCluster aCluster = PXDCluster(aVxdID1, 0., 0., 0.1, 0.1, 0, 0, 1, 1, 1, 1, 1, 1);
+    const SpacePoint aPXDSpacePoint = SpacePoint(&aCluster, &sensorInfoBase1);
+
+    VxdID aVxdID2 = VxdID(2, 2, 2);
+    VXD::SensorInfoBase sensorInfoBase2 = createSensorInfo(aVxdID2, 2.3, 4.2);
+    SVDCluster aUCluster = SVDCluster(aVxdID2, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster aVCluster = SVDCluster(aVxdID2, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1);
+    std::vector<const SVDCluster*> UVClusterVec1 = { &aUCluster, &aVCluster };
+    std::vector<const SVDCluster*> VClusterVec = { &aVCluster };
+    std::vector<const SVDCluster*> UClusterVec = { &aUCluster };
+    const SpacePoint SVDSpacePoint1 = SpacePoint(UVClusterVec1, &sensorInfoBase2);
+    const SpacePoint SVDSpacePoint2 = SpacePoint(VClusterVec, &sensorInfoBase2);
+    const SpacePoint SVDSpacePoint3 = SpacePoint(UClusterVec, &sensorInfoBase2);
+
+    VxdID aVxdId3 = VxdID(3, 3, 3);
+    VXD::SensorInfoBase sensorInfoBase3 = createSensorInfo(aVxdId3, 2.3, 4.2);
+    SVDCluster aUCluster2 = SVDCluster(aVxdId3, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster aVCluster2 = SVDCluster(aVxdId3, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1);
+    std::vector<const SVDCluster*> UVClusterVec2 = { &aUCluster2, &aVCluster2 };
+    std::vector<const SVDCluster*> VClusterVec2 = { &aVCluster2 };
+    std::vector<const SVDCluster*> UClusterVec2 = { &aUCluster2 };
+    const SpacePoint SVDSpacePoint4 = SpacePoint(UVClusterVec2, &sensorInfoBase3);
+    const SpacePoint SVDSpacePoint5 = SpacePoint(VClusterVec2, &sensorInfoBase3);
+    const SpacePoint SVDSpacePoint6 = SpacePoint(UClusterVec2, &sensorInfoBase3);
+
+
+    SpacePointTrackCand unsortedConstructed;
+    // add a SpacePoint with sorting parameter
+    unsortedConstructed.addSpacePoint(&aPXDSpacePoint, 1.0);
+    // add some SVD SpacePoints in logical order
+    unsortedConstructed.addSpacePoint(&SVDSpacePoint1, 2.34);
+    unsortedConstructed.addSpacePoint(&SVDSpacePoint2, 3.45);
+    unsortedConstructed.addSpacePoint(&SVDSpacePoint3, 4.56);
+    // add some SpacePoints in 'wrong' order
+    unsortedConstructed.addSpacePoint(&SVDSpacePoint4, 5.67);
+    unsortedConstructed.addSpacePoint(&SVDSpacePoint6, 7.89);
+    unsortedConstructed.addSpacePoint(&SVDSpacePoint5, 6.78);
+
+    // set up a SpacePointTrackCands already properly sorted
+    SpacePointTrackCand sortedConstructed;
+    sortedConstructed.addSpacePoint(&aPXDSpacePoint, 1.23);
+    sortedConstructed.addSpacePoint(&SVDSpacePoint1, 2.34);
+    sortedConstructed.addSpacePoint(&SVDSpacePoint2, 3.45);
+    sortedConstructed.addSpacePoint(&SVDSpacePoint3, 4.56);
+    sortedConstructed.addSpacePoint(&SVDSpacePoint4, 5.67);
+    sortedConstructed.addSpacePoint(&SVDSpacePoint5, 6.78);
+    sortedConstructed.addSpacePoint(&SVDSpacePoint6, 7.89);
+
+    // test sorting
+    SpacePointTrackCand sorted = unsortedConstructed.getSortedHits();
+    // == compares the spacepoints
+    EXPECT_TRUE(sorted == sortedConstructed);
+
+    SpacePointTrackCand nothingChanged = sortedConstructed.getSortedHits();
+    EXPECT_TRUE(nothingChanged == sortedConstructed);
+
+
+    std::vector<double> sortParams1 = { 1.0, 2.0, 3.0 , 4.0, 5.0, 7.0, 6.0};
+    sortedConstructed.setSortingParameters(sortParams1);
+
+    // verify that sorting changed according to new sortParams
+    SpacePointTrackCand unsorted = sortedConstructed.getSortedHits();
+    EXPECT_TRUE(unsorted == unsortedConstructed);
   }
 }

@@ -33,7 +33,7 @@ progress = register_module('Progress')
 
 # Gearbox
 gearbox = register_module('Gearbox')
-gearbox.param('fileName', 'testbeam/top/CRT/TOP.xml')
+gearbox.param('fileName', 'testbeam/top/CRT2013/TOP.xml')
 
 # Geometry
 geometry = register_module('Geometry')
@@ -51,8 +51,8 @@ TOPdigi.param('timeZeroJitter', 25e-3)
 output = register_module('RootOutput')
 output.param('outputFileName', outfile)
 
-# suppress messages and warnings during processing:
-set_log_level(LogLevel.ERROR)
+# suppress messages during processing:
+set_log_level(LogLevel.WARNING)
 
 # Create path
 main = create_path()

@@ -39,6 +39,8 @@ namespace Belle2 {
     }
     bool isBelle2LinkError() throw();
     bool isLinkUpError() throw();
+    unsigned int read(unsigned int addr) throw();
+    int write(unsigned int addr, unsigned int val) throw();
 
   private:
     ttrx_t* m_ttrx;

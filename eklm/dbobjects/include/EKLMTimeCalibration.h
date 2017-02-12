@@ -59,15 +59,27 @@ namespace Belle2 {
     void cleanTimeCalibrationData();
 
     /**
+     * Get effective light speed.
+     */
+    float getEffectiveLightSpeed() const;
+
+    /**
      * Set effective light speed.
-     * @pparam[in] lightSpeed Effective light speed.
+     * @param[in] lightSpeed Effective light speed.
      */
     void setEffectiveLightSpeed(float lightSpeed);
 
     /**
-     * Get effective light speed.
+     * Get amplitude dependence time constant.
      */
-    float getEffectiveLightSpeed() const;
+    float getAmplitudeTimeConstant() const;
+
+    /**
+     * Set amplitude dependence time constant.
+     * @param[in] amplitudeTimeConstant Amplitude dependence time constant.
+     */
+    void setAmplitudeTimeConstant(float amplitudeTimeConstant);
+
 
   private:
 
@@ -77,8 +89,11 @@ namespace Belle2 {
     /** Effective light speed. */
     float m_EffectiveLightSpeed;
 
+    /** Amplitude dependence time constant. */
+    float m_AmplitudeTimeConstant;
+
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMTimeCalibration, 1);
+    ClassDef(Belle2::EKLMTimeCalibration, 2);
 
   };
 

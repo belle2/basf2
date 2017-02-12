@@ -25,10 +25,9 @@ def main(argv):
     # Input Data
     # This part assumes that you've created the data using the calibration/examples/1_create_sample_DSTs.sh
     # We'll use the same data for all calibrations but this is not a requirement in general.
+    # ALWAYS USE ABSOLUTE PATHS TO THE FILES! i.e. remember to os.path.abspath(file) them
     input_files_test = []
-    for run in range(1, 5):
-        cosmics_file_path = os.path.join(data_dir, 'DST_exp1_run{0}.root'.format(run))
-        input_files_test.append(cosmics_file_path)
+    input_files_test.append(os.path.join(os.path.abspath(data_dir), '*.root'))
 
     ###################################################
     # Test Calibration Setup

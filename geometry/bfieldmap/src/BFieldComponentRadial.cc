@@ -76,9 +76,9 @@ inline BFieldComponentRadial::BFieldPoint operator+(const BFieldComponentRadial:
   return {u.r + v.r, u.z + v.z};
 }
 
-TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
+B2Vector3D BFieldComponentRadial::calculate(const B2Vector3D& point) const
 {
-  TVector3 B;
+  B2Vector3D B;
   // If both 'Radial' and 'Beamline' components are defined in xml file,
   // '3d' component returns zero field where 'Beamline' component is defined.
   // If no 'Beamline' component is defined in xml file, the following function will never be called.

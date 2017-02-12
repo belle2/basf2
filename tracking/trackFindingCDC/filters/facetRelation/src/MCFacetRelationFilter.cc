@@ -23,9 +23,7 @@ Weight MCFacetRelationFilter::operator()(const CDCFacet& fromFacet,
                                          const CDCFacet& toFacet)
 {
   // the last wire of the neighbor should not be the same as the start wire of the facet
-  if (fromFacet.getStartWire() == toFacet.getEndWire()) {
-    return NAN;
-  }
+  if (fromFacet.getStartWire() == toFacet.getEndWire()) return NAN;
 
   // Despite of that two facets are neighbors if both are true facets
   // That also implies the correct tof alignment of the hits not common to both facets

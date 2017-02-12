@@ -24,10 +24,6 @@ namespace Belle2 {
       using Super = MCSymmetricFilterMixin<BaseSegmentTripleRelationFilter >;
 
     public:
-      /// Importing all overloads from the super class
-      using Super::operator();
-
-    public:
       /** Constructor. */
       MCSegmentTripleRelationFilter(bool allowReverse = true);
 

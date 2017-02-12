@@ -26,6 +26,7 @@
 // C++-std:
 #include <vector>
 
+
 namespace Belle2 {
 
 
@@ -36,6 +37,8 @@ namespace Belle2 {
    *
    * TODO: create constructor for vIPs in SpacePoint. What about activeSectors for vIP? -> solution dependent of treatment in static sectorMap.
    */
+
+  // WARNING: all data members which are followed by "//!" will not be streamed by root (so no I/O for them)
   class DirectedNodeNetworkContainer : public RelationsObject {
   public:
     /** to improve readability of the code, here the definition of the static sector type. */
@@ -45,28 +48,28 @@ namespace Belle2 {
 
 
     /** Stores the full network of activeSectors, which contain hits in that event and have compatible Sectors with hits too*/
-    DirectedNodeNetwork<ActiveSector<StaticSectorType, TrackNode>, Belle2::VoidMetaInfo > m_ActiveSectorNetwork;
+    DirectedNodeNetwork<ActiveSector<StaticSectorType, TrackNode>, Belle2::VoidMetaInfo > m_ActiveSectorNetwork;//!
 
     /** stores the actual ActiveSectors, since the ActiveSectorNetwork does only keep references - TODO switch to unique pointers! */
-    std::vector<ActiveSector<StaticSectorType, TrackNode>* > m_activeSectors;
+    std::vector<ActiveSector<StaticSectorType, TrackNode>* > m_activeSectors;//!
 
     /** Stores the full network of TrackNode< SpaacePoint>, which were accepted by activated two-hit-filters of the assigned sectorMap */
-    DirectedNodeNetwork<TrackNode, Belle2::VoidMetaInfo> m_HitNetwork;
+    DirectedNodeNetwork<TrackNode, Belle2::VoidMetaInfo> m_HitNetwork;//!
 
     /** Stores the full network of Segments, which were accepted by activated three-hit-filters of the assigned sectorMap */
-    DirectedNodeNetwork<Segment<TrackNode>, Belle2::CACell > m_SegmentNetwork;
+    DirectedNodeNetwork<Segment<TrackNode>, Belle2::CACell > m_SegmentNetwork;//!
 
     /** stores the actual Segments, since the SegmentNetwork does only keep references - TODO switch to unique pointers! */
-    std::vector<Segment<TrackNode>* > m_segments;
+    std::vector<Segment<TrackNode>* > m_segments;//!
 
     /** stores the actual trackNodes, since the SegmentNetwork does only keep references - TODO switch to unique pointers! */
-    std::vector<TrackNode* > m_trackNodes;
+    std::vector<TrackNode* > m_trackNodes;//!
 
     /** stores a SpacePoint representing the virtual interaction point if set, NULL if not. */
-    Belle2::TrackNode* m_VirtualInteractionPoint;
+    Belle2::TrackNode* m_VirtualInteractionPoint;//!
 
     /** stores the SpacePoint needed for the virtual IP */
-    SpacePoint* m_VIPSpacePoint;
+    SpacePoint* m_VIPSpacePoint;//!
 
   public:
     /** ************************* CONSTRUCTORS ************************* */

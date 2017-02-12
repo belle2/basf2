@@ -30,6 +30,7 @@
 
 // DB objects
 #include <top/dbobjects/TOPCalTimebase.h>
+#include <top/dbobjects/TOPPmtGainPar.h>
 
 #include <iostream>
 #include <fstream>
@@ -213,6 +214,9 @@ void TOPDatabaseImporter::printSampleTimeCalibration()
 }
 
 
+
+//---- for testing only -- will be removed --------------------------------
+
 void TOPDatabaseImporter::importTest(int runNumber, double syncTimeBase)
 {
 
@@ -237,5 +241,31 @@ void TOPDatabaseImporter::importTest(int runNumber, double syncTimeBase)
 
   IntervalOfValidity iov(1, runNumber, 1, runNumber);
   timeBase.import(iov);
+
+}
+
+
+void TOPDatabaseImporter::importTest()
+{
+
+  DBImportArray<TOPPmtGainPar> pmtGains;
+
+  auto* pmtGain = pmtGains.appendNew("JT00123");
+  pmtGain->setNominalHV(3520);
+  for (unsigned channel = 1; channel <= 16; channel++) {
+    pmtGain->setChannelData(channel, -13.77, 0.0042, 0.4);
+  }
+
+  pmtGain = pmtGains.appendNew("JT02135");
+  pmtGain->setNominalHV(3450);
+  for (unsigned channel = 1; channel <= 16; channel++) {
+    pmtGain->setChannelData(channel, -12.77, 0.0045, 0.4);
+  }
+
+  for (const auto& pmtGain : pmtGains) pmtGain.print();
+
+  //  IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+  //  pmtGains.import(iov);
+
 
 }

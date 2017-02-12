@@ -498,7 +498,7 @@ void BKLMEffnRadioModule::getEffs()
   // -extrapolate to the layer in question
   // -check if there is any hit close enough within it size (number of strips)
   //  float r1=m_GeoPar->getLayerInnerRadius(1)+2;
-  float r1 = m_GeoPar->getActiveMiddleRadius(1);
+  float r1 = m_GeoPar->getActiveMiddleRadius(BKLM_FORWARD, 1, 1);
   //there is no layer 16, so counting the tracks found with no layer excluded should give all 'regular' tracks
   for (int effLayer = 1; effLayer <= 16; effLayer++) {
     int numTracks = 0;
@@ -507,7 +507,7 @@ void BKLMEffnRadioModule::getEffs()
     float effX = 0;
 
     if (effLayer < 16) {
-      effX = m_GeoPar->getActiveMiddleRadius(effLayer) - r1;
+      effX = m_GeoPar->getActiveMiddleRadius(BKLM_FORWARD, 1, effLayer) - r1;
     }
     //exclude layer for which we want to measure the efficiency
 

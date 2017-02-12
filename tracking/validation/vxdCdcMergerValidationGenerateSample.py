@@ -15,8 +15,9 @@ from ROOT import Belle2
 from simulation import add_simulation
 from reconstruction import add_mdst_output, add_reconstruction
 from modularAnalysis import generateY4S
-from tracking.validation.harvesting import HarvestingModule
-from tracking.validation import refiners, tracking_efficiency_helpers
+from tracking.harvest.harvesting import HarvestingModule
+from tracking.harvest import refiners
+from tracking.validation import tracking_efficiency_helpers
 import numpy
 
 
@@ -99,13 +100,13 @@ class VxdCdcMergerHarvester(HarvestingModule):
 
         reco_tracks = Belle2.PyStoreArray('RecoTracks')
 
-        this_best_track_cdc = self.mc_track_matcher_cdc.getRelatedPRTrackCand(mc_track)
-        this_best_track_vxd = self.mc_track_matcher_vxd.getRelatedPRTrackCand(mc_track)
+        this_best_track_cdc = self.mc_track_matcher_cdc.getRelatedPRRecoTrack(mc_track)
+        this_best_track_vxd = self.mc_track_matcher_vxd.getRelatedPRRecoTrack(mc_track)
 
         # here we know, the above tracks should have been merged because they stem
         # from the same MC Track. Have they?
 
-        this_best_track_merged = self.mc_track_matcher.getRelatedPRTrackCand(mc_track)
+        this_best_track_merged = self.mc_track_matcher.getRelatedPRRecoTrack(mc_track)
 
         # todo: once moved to RecoTrack: use more elaborate comparison method to indentify vxd/cdc tracks
         # in merged tracks

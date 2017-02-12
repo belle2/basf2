@@ -77,8 +77,10 @@ void SVDUnpackerModule::beginRun()
 
 }
 
-# pragma GCC diagnostic push
+#ifndef __clang__
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstack-usage="
+#endif
 void SVDUnpackerModule::event()
 {
   StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
@@ -253,7 +255,9 @@ void SVDUnpackerModule::event()
 
   }
 } //end event function
+#ifndef __clang__
 #pragma GCC diagnostic pop
+#endif
 
 void SVDUnpackerModule::endRun()
 {

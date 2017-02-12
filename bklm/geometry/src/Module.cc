@@ -48,14 +48,14 @@ namespace Belle2 {
     }
 
     // constructor for RPC module
-    Module::Module(double             phiStripWidth,
-                   int                phiStripMin,
-                   int                phiStripMax,
-                   double             zStripWidth,
-                   int                zStripNumber,
-                   CLHEP::Hep3Vector  globalOrigin,
-                   CLHEP::Hep3Vector  localReconstructionShift,
-                   CLHEP::HepRotation rotation) :
+    Module::Module(double                    phiStripWidth,
+                   int                       phiStripMin,
+                   int                       phiStripMax,
+                   double                    zStripWidth,
+                   int                       zStripNumber,
+                   const CLHEP::Hep3Vector&  globalOrigin,
+                   const CLHEP::Hep3Vector&  localReconstructionShift,
+                   const CLHEP::HepRotation& rotation) :
       m_HasRPCs(true),
       m_IsFlipped(false),
       m_PhiStripWidth(phiStripWidth),
@@ -82,14 +82,14 @@ namespace Belle2 {
     }
 
     // constructor for scint module
-    Module::Module(double             stripWidth,
-                   int                phiStripNumber,
-                   int                phiSensorSide,
-                   int                zStripNumber,
-                   CLHEP::Hep3Vector  globalOrigin,
-                   CLHEP::Hep3Vector  localReconstructionShift,
-                   CLHEP::HepRotation rotation,
-                   bool               isFlipped) :
+    Module::Module(double                    stripWidth,
+                   int                       phiStripNumber,
+                   int                       phiSensorSide,
+                   int                       zStripNumber,
+                   const CLHEP::Hep3Vector&  globalOrigin,
+                   const CLHEP::Hep3Vector&  localReconstructionShift,
+                   const CLHEP::HepRotation& rotation,
+                   bool                      isFlipped) :
       m_HasRPCs(false),
       m_IsFlipped(isFlipped),
       m_PhiStripWidth(stripWidth),
@@ -104,8 +104,9 @@ namespace Belle2 {
       m_SignalSpeed(0.5671 * Const::speedOfLight), // m_firstPhotonlightSpeed, from EKLM
       m_GlobalOrigin(globalOrigin),
       m_LocalReconstructionShift(localReconstructionShift),
-      m_Rotation(isFlipped ? rotation.rotateZ(M_PI) : rotation)
+      m_Rotation(rotation)
     {
+      if (isFlipped) m_Rotation.rotateZ(M_PI);
       m_RotationInverse = m_Rotation.inverse();
       m_PhiScintLengths.clear();
       m_PhiScintPositions.clear();

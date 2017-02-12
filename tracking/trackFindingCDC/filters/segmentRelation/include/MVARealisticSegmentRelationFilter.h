@@ -31,10 +31,9 @@ namespace Belle2 {
       using Super = MVA<BaseSegmentRelationFilter>;
 
       /// Type of the VarSet the filter is working on
-      using VarSet = VariadicUnionVarSet <
-                     BasicSegmentRelationVarSet,
-                     FitlessSegmentRelationVarSet,
-                     FitSegmentRelationVarSet >;
+      using VarSet = VariadicUnionVarSet<BasicSegmentRelationVarSet,
+            FitlessSegmentRelationVarSet,
+            FitSegmentRelationVarSet>;
 
     public:
       /// Constructor initialising the MVAFilter with standard training name for this filter.

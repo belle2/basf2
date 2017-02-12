@@ -34,9 +34,7 @@ void SegmentCreatorFacetAutomaton::apply(
   std::vector<CDCSegment2D>& outputSegments)
 {
   std::vector<ConstVectorRange<CDCFacet>> facetsByICluster =
-                                         adjacent_groupby(inputFacets.begin(),
-                                                          inputFacets.end(),
-                                                          std::mem_fn(&CDCFacet::getICluster));
+                                         adjacent_groupby(inputFacets.begin(), inputFacets.end(), std::mem_fn(&CDCFacet::getICluster));
 
   for (const ConstVectorRange<CDCFacet>& facetsInCluster : facetsByICluster) {
     if (facetsInCluster.empty()) continue;

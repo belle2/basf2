@@ -11,6 +11,8 @@
 #include <analysis/utility/ReferenceFrame.h>
 #include <framework/logging/Logger.h>
 
+#include <TMatrixD.h>
+
 using namespace Belle2;
 
 std::stack<const ReferenceFrame*> ReferenceFrame::m_reference_frames;
@@ -51,6 +53,17 @@ TLorentzVector RestFrame::getMomentum(const Particle* particle) const
   return m_lab2restframe * particle->get4Vector();
 }
 
+TMatrixFSym RestFrame::getMomentumErrorMatrix(const Particle* particle) const
+{
+  TMatrixD lorentzrot(4, 4);
+
+  for (int i = 0; i < 4; ++i)
+    for (int j = 0; j < 4; ++j)
+      lorentzrot(i, j) = m_lab2restframe(i, j);
+
+  return particle->getMomentumErrorMatrix().Similarity(lorentzrot);
+}
+
 TVector3 LabFrame::getVertex(const Particle* particle) const
 {
   return particle->getVertex();
@@ -59,6 +72,11 @@ TVector3 LabFrame::getVertex(const Particle* particle) const
 TLorentzVector LabFrame::getMomentum(const Particle* particle) const
 {
   return particle->get4Vector();
+}
+
+TMatrixFSym LabFrame::getMomentumErrorMatrix(const Particle* particle) const
+{
+  return particle->getMomentumErrorMatrix();
 }
 
 TVector3 CMSFrame::getVertex(const Particle* particle) const
@@ -75,4 +93,15 @@ TLorentzVector CMSFrame::getMomentum(const Particle* particle) const
 {
   // 1. Boost momentum into cms frame
   return m_transform.rotateLabToCms() * particle->get4Vector();
+}
+
+TMatrixFSym CMSFrame::getMomentumErrorMatrix(const Particle* particle) const
+{
+  TMatrixD lorentzrot(4, 4);
+
+  for (int i = 0; i < 4; ++i)
+    for (int j = 0; j < 4; ++j)
+      lorentzrot(i, j) = m_transform.rotateLabToCms()(i, j);
+
+  return particle->getMomentumErrorMatrix().Similarity(lorentzrot);
 }

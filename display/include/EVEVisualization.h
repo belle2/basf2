@@ -339,7 +339,9 @@ namespace Belle2 {
     std::set<const TObject*> m_shownRecohits;
 
     /** Unassigned recohits. */
-    TEveStraightLineSet* m_unassignedRecoHits;
+    TEveStraightLineSet* m_unassignedRecoHits = nullptr;
+    /** is m_unassignedRecoHits visible? */
+    bool m_unassignedRecoHitsVisibility = true;
 
     /** don't show MCParticles with momentum below this cutoff. */
     static constexpr double c_minPCut = 0.00;

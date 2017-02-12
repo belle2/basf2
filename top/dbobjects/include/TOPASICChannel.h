@@ -44,6 +44,20 @@ namespace Belle2 {
     }
 
     /**
+     * Copy constructor
+     */
+    TOPASICChannel(const TOPASICChannel& chan): TObject()
+    {
+      *this = chan;
+      for (auto& pedestals : m_pedestals) {
+        if (pedestals) pedestals = new TOPASICPedestals(*pedestals);
+      }
+      for (auto& gains : m_gains) {
+        if (gains) gains = new TOPASICGains(*gains);
+      }
+    }
+
+    /**
      * Destructor
      */
     ~TOPASICChannel()

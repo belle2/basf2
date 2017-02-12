@@ -11,6 +11,8 @@
 #ifndef FPGAFITTER_H
 #define FPGAFITTER_H
 
+#include <eklm/dataobjects/EKLMFPGAFit.h>
+
 /**
  * @file
  * This file will contain an exact reimplementation of FPGA fitter.
@@ -27,15 +29,6 @@ namespace Belle2 {
     enum FPGAFitStatus {
       c_FPGASuccessfulFit, /**< Successful fit. */
       c_FPGANoSignal,      /**< Signal is too small to do any fitting. */
-    };
-
-    /**
-     * Fit parameters/results.
-     */
-    struct FPGAFitParams {
-      double startTime;       /**< Start of signal. */
-      double amplitude;       /**< Amplitude. */
-      double bgAmplitude;     /**< Background amplitude. */
     };
 
     /**
@@ -58,11 +51,12 @@ namespace Belle2 {
 
       /**
        * FPGA fitter.
-       * @param[in]  amp     Digital amplitude.
-       * @param[out] par     Fit parameters.
+       * @param[in]  amp       Digital amplitude.
+       * @param[in]  threshold Threshold.
+       * @param[out] fitData   Fit data.
        * @return Fit status.
        */
-      enum FPGAFitStatus fit(int* amp, struct FPGAFitParams* par);
+      enum FPGAFitStatus fit(int* amp, int threshold, EKLMFPGAFit* fitData);
 
     private:
 

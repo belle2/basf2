@@ -11,6 +11,7 @@
 #include <boost/python/def.hpp>
 #include <boost/python/overloads.hpp>
 #include <boost/python/docstring_options.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <framework/database/Database.h>
 
@@ -37,7 +38,7 @@ Database& Database::Instance()
     DatabaseChain::createInstance(true);
     LocalDatabase::createInstance(FileSystem::findFile("data/framework/database.txt"), "", true, LogConfig::c_Error);
     ConditionsDatabase::createDefaultInstance("production", LogConfig::c_Warning);
-    LocalDatabase::createInstance("localdb/database.txt", "", LogConfig::c_Debug);
+    LocalDatabase::createInstance("localdb/database.txt", "", false, LogConfig::c_Warning, true);
   }
   return *s_instance;
 }
@@ -154,20 +155,6 @@ bool Database::writePayload(const std::string& fileName, const std::string& modu
   return true;
 }
 
-#if !defined(__GNUG__) || defined(__ICC)
-#else
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#endif
-BOOST_PYTHON_FUNCTION_OVERLOADS(chain_createInstance_overloads, DatabaseChain::createInstance, 0, 2);
-BOOST_PYTHON_FUNCTION_OVERLOADS(local_createInstance_overloads, LocalDatabase::createInstance, 0, 4);
-BOOST_PYTHON_FUNCTION_OVERLOADS(condition_createDefaultInstance_overloads, ConditionsDatabase::createDefaultInstance, 1, 3);
-BOOST_PYTHON_FUNCTION_OVERLOADS(condition_createInstance_overloads, ConditionsDatabase::createInstance, 4, 5);
-#if !defined(__GNUG__) || defined(__ICC)
-#else
-#pragma GCC diagnostic pop
-#endif
-
 namespace {
   void Database_addExperimentName(int experiment, const std::string& name)
   {
@@ -191,9 +178,32 @@ namespace {
   }
 }
 
+std::string Database::getGlobalTag()
+{
+  std::vector<Database*> databases{&Database::Instance()};
+  std::vector<std::string> tags;
+  DatabaseChain* chain = dynamic_cast<DatabaseChain*>(databases[0]);
+  if (chain) {
+    databases = chain->getDatabases();
+  }
+  for (Database* db : databases) {
+    ConditionsDatabase* cond = dynamic_cast<ConditionsDatabase*>(db);
+    if (cond) {
+      std::string tag = cond->getGlobalTag();
+      if (std::find(tags.begin(), tags.end(), tag) == tags.end()) {
+        tags.emplace_back(tag);
+      }
+    }
+  }
+  if (tags.empty()) return "";
+  return boost::algorithm::join(tags, ",");
+}
+
 void Database::exposePythonAPI()
 {
   using namespace boost::python;
+  // to avoid confusion between std::arg and boost::python::arg we want a shorthand namespace as well
+  namespace bp = boost::python;
   // make sure the default instance is created
   Database::Instance();
 
@@ -215,7 +225,9 @@ Example:
 :param str name: name of the experiment when looking up payloads
 )DOCSTRING");
   def("reset_database", &Database::reset, "Reset the database setup to have no database sources");
-  def("use_database_chain", &DatabaseChain::createInstance, chain_createInstance_overloads(args("resetIoVs", "loglevel"), R"DOCSTRING(
+  def("use_database_chain", &DatabaseChain::createInstance,
+      (bp::arg("resetIoVs")=true, bp::arg("loglevel")=LogConfig::c_Warning, bp::arg("invertLogging")=false),
+      R"DOCSTRING(
 Use a database chain: Multiple database sources are used on a first found
 basis: If the payload is not found in one source try the next and so on.
 
@@ -229,8 +241,15 @@ chain. If there was already a DatabaseChain nothing changes.
         next run.
 :param basf2.LogLevel loglevel: The LogLevel of messages from the database
         chain, defaults to LogLevel.WARNING
-)DOCSTRING"));
-  def("use_local_database", &LocalDatabase::createInstance, local_createInstance_overloads(args("filename", "directory", "readonly", "loglevel"), R"DOCSTRING(
+:param bool invertLogging: A flag to indicate whether logging of obtained
+        payloads should be inverted. If False a log message with level
+        `loglevel` will be emitted everytime a payload cannot be found. If true
+        a message will be emitted if a payload is actually found.
+)DOCSTRING");
+  def("use_local_database", &LocalDatabase::createInstance,
+      (bp::arg("filename"), bp::arg("directory")="", bp::arg("readonly")=false,
+       bp::arg("loglevel")=LogConfig::c_Warning, bp::arg("invertLogging")=false),
+      R"DOCSTRING(
 Use a local database backend: a single file containing the payload information in plain text.
 
 :param str filename: filename containing the payload information, defaults to
@@ -240,26 +259,38 @@ Use a local database backend: a single file containing the payload information i
 :param bool readonly: if True the database will refuse to create new payloads
 :param basf2.LogLevel loglevel: The LogLevel of messages from this backend when
         payloads cannot be found, defaults to LogLevel.WARNING
-)DOCSTRING"));
-  def("use_central_database", &ConditionsDatabase::createDefaultInstance, condition_createDefaultInstance_overloads(
-              args("globalTag", "loglevel"), R"DOCSTRING(
+:param bool invertLogging: A flag to indicate whether logging of obtained
+        payloads should be inverted. If False a log message with level
+        `loglevel` will be emitted everytime a payload cannot be found. If true
+        a message will be emitted if a payload is actually found.
+)DOCSTRING");
+  def("use_central_database", &ConditionsDatabase::createDefaultInstance,
+      (bp::arg("globalTag"), bp::arg("loglevel")=LogConfig::c_Warning, bp::arg("payloaddir")="centraldb"),
+      R"DOCSTRING(
 Use the central database via REST api and the default connection parameters.
 
 :param str globalTag: name of the global tag to use for payload lookup
 :param basf2.LogLevel loglevel: The LogLevel of messages from this backend when
         payloads cannot be found, defaults to LogLevel.WARNING
-)DOCSTRING"));
-  def("use_central_database", &ConditionsDatabase::createInstance, condition_createInstance_overloads(
-              args("globalTag", "restBaseName", "fileBaseName", "fileBaseLocal", "loglevel"), R"DOCSTRING(
+:param str payloaddir: directory where to save downloaded payloads
+)DOCSTRING");
+  def("use_central_database", &ConditionsDatabase::createInstance,
+      (bp::arg("globalTag"), bp::arg("restBaseName"), bp::arg("payloaddir"), bp::arg("fileBaseLocal"),
+       bp::arg("loglevel")=LogConfig::c_Warning, bp::arg("invertLogging")=false),
+      R"DOCSTRING(
 Use the central database via REST api and the custom connection parameters.
 This version should only used by experts to debug the conditions database or
 use a different database.
 
 :param str globalTag: name of the global tag to use for payload lookup
-:param restBaseName: base URL for the REST api
-:param fileBaseName: base URL for the payload download
-:param fileBaseLocal: directory where to save downloaded payloads
+:param str restBaseName: base URL for the REST api
+:param str fileBaseName: base URL for the payload download
+:param str payloaddir: directory where to save downloaded payloads
 :param basf2.LogLevel loglevel: The LogLevel of messages from this backend when
         payloads cannot be found, defaults to LogLevel.WARNING
-)DOCSTRING"));
+:param bool invertLogging: A flag to indicate whether logging of obtained
+        payloads should be inverted. If False a log message with level
+        `loglevel` will be emitted everytime a payload cannot be found. If true
+        a message will be emitted if a payload is actually found.
+)DOCSTRING");
 }

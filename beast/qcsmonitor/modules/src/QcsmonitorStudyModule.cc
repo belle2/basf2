@@ -67,7 +67,7 @@ QcsmonitorStudyModule::~QcsmonitorStudyModule()
 //This module is a histomodule. Any histogram created here will be saved by the HistoManager module
 void QcsmonitorStudyModule::defineHisto()
 {
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < 40; i++) {
     h_qcss_Evtof1[i] = new TH2F(TString::Format("qcss_Evtof1_%d", i), "Energy deposited [MeV] vs TOF [ns] - all", 500, 0., 1000.,
                                 100, 0., 10.);
     h_qcss_Evtof2[i] = new TH2F(TString::Format("qcss_Evtof2_%d", i), "Energy deposited [MeV] vs TOF [ns] - only photons", 500, 0.,
@@ -80,40 +80,42 @@ void QcsmonitorStudyModule::defineHisto()
     h_Wqcss_edep[i] = new TH1F(TString::Format("Wqcss_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 10.);
   }
 
-  h_qcss_hitrate1 = new TH1F("qcss_hitrate1", "Hit distributions", 2, 0., 2.);
-  h_qcss_hitrate2 = new TH1F("qcss_hitrate2", "Hit distributions", 2, 0., 2.);
-  h_qcss_hitrate1W = new TH1F("qcss_hitrate1W", "Hit distributions", 2, 0., 2.);
-  h_qcss_hitrate2W = new TH1F("qcss_hitrate2W", "Hit distributions", 2, 0., 2.);
+  h_qcss_hitrate0 = new TH1F("qcss_hitrate0", "Hit distributions", 100, 0., 100.);
+  h_qcss_hitrate1 = new TH1F("qcss_hitrate1", "Hit distributions", 100, 0., 100.);
+  h_qcss_hitrate2 = new TH1F("qcss_hitrate2", "Hit distributions", 100, 0., 100.);
+  h_qcss_hitrate1W = new TH1F("qcss_hitrate1W", "Hit distributions", 100, 0., 100.);
+  h_qcss_hitrate2W = new TH1F("qcss_hitrate2W", "Hit distributions", 100, 0., 100.);
 
+  h_qcss_hitrate0->Sumw2();
   h_qcss_hitrate1->Sumw2();
   h_qcss_hitrate1W->Sumw2();
   h_qcss_hitrate2->Sumw2();
   h_qcss_hitrate2W->Sumw2();
 
-  h_qcss_rs_hitrate1 = new TH2F("qcss_rs_hitrate1", "Hit distributions vs rs", 2, 0., 2., 12, 0., 12.);
-  h_qcss_rs_hitrate2 = new TH2F("qcss_rs_hitrate2", "Hit distributions vs rs", 2, 0., 2., 12, 0., 12.);
-  h_qcss_rs_hitrate1W = new TH2F("qcss_rs_hitrate1W", "Hit distributions vs rs", 2, 0., 2., 12, 0., 12.);
-  h_qcss_rs_hitrate2W = new TH2F("qcss_rs_hitrate2W", "Hit distributions vs rs", 2, 0., 2., 12, 0., 12.);
+  h_qcss_rs_hitrate1 = new TH2F("qcss_rs_hitrate1", "Hit distributions vs rs", 100, 0., 100., 12, 0., 12.);
+  h_qcss_rs_hitrate2 = new TH2F("qcss_rs_hitrate2", "Hit distributions vs rs", 100, 0., 100., 12, 0., 12.);
+  h_qcss_rs_hitrate1W = new TH2F("qcss_rs_hitrate1W", "Hit distributions vs rs", 100, 0., 100., 12, 0., 12.);
+  h_qcss_rs_hitrate2W = new TH2F("qcss_rs_hitrate2W", "Hit distributions vs rs", 100, 0., 100., 12, 0., 12.);
 
   h_qcss_rs_hitrate1->Sumw2();
   h_qcss_rs_hitrate1W->Sumw2();
   h_qcss_rs_hitrate2->Sumw2();
   h_qcss_rs_hitrate2W->Sumw2();
 
-  for (int i = 0; i < 2; i++) {
-    h_qcss_rate1[i] = new TH1F(TString::Format("qcss_rate1_%d", i), "PE distributions", 5000, 0., 5000.);
-    h_qcss_rate2[i] = new TH1F(TString::Format("qcss_rate2_%d", i), "PE distributions", 5000, 0., 5000.);
-    h_qcss_rate1W[i] = new TH1F(TString::Format("qcss_rate1W_%d", i), "PE distributions", 5000, 0., 5000.);
-    h_qcss_rate2W[i] = new TH1F(TString::Format("qcss_rate2W_%d", i), "PE distributions", 5000, 0., 5000.);
-    h_qcss_pe1[i] = new TH2F(TString::Format("qcss_pe1_%d", i), "PE distributions", 5000, 0., 5000., 1000, 0., 1000.);
-    h_qcss_pe2[i] = new TH2F(TString::Format("qcss_pe2_%d", i), "PE distributions", 5000, 0., 5000., 1000, 0., 1000.);
-    h_qcss_pe1W[i] = new TH2F(TString::Format("qcss_pe1W_%d", i), "PE distributions", 5000, 0., 5000., 1000, 0., 1000.);
-    h_qcss_pe2W[i] = new TH2F(TString::Format("qcss_pe2W_%d", i), "PE distributions", 5000, 0., 5000., 1000, 0., 1000.);
+  for (int i = 0; i < 40; i++) {
+    h_qcss_rate1[i] = new TH1F(TString::Format("qcss_rate1_%d", i), "PE distributions", 500, 0., 5000.);
+    h_qcss_rate2[i] = new TH1F(TString::Format("qcss_rate2_%d", i), "PE distributions", 500, 0., 5000.);
+    h_qcss_rate1W[i] = new TH1F(TString::Format("qcss_rate1W_%d", i), "PE distributions", 500, 0., 5000.);
+    h_qcss_rate2W[i] = new TH1F(TString::Format("qcss_rate2W_%d", i), "PE distributions", 500, 0., 5000.);
+    h_qcss_pe1[i] = new TH2F(TString::Format("qcss_pe1_%d", i), "PE distributions", 500, 0., 5000., 100, 0., 1000.);
+    h_qcss_pe2[i] = new TH2F(TString::Format("qcss_pe2_%d", i), "PE distributions", 500, 0., 5000., 100, 0., 1000.);
+    h_qcss_pe1W[i] = new TH2F(TString::Format("qcss_pe1W_%d", i), "PE distributions", 500, 0., 5000., 100, 0., 1000.);
+    h_qcss_pe2W[i] = new TH2F(TString::Format("qcss_pe2W_%d", i), "PE distributions", 500, 0., 5000., 100, 0., 1000.);
 
-    h_qcss_rs_rate1[i] = new TH2F(TString::Format("qcss_rs_rate1_%d", i), "PE distributions", 5000, 0., 5000., 12, 0., 12.);
-    h_qcss_rs_rate2[i] = new TH2F(TString::Format("qcss_rs_rate2_%d", i), "PE distributions", 5000, 0., 5000., 12, 0., 12.);
-    h_qcss_rs_rate1W[i] = new TH2F(TString::Format("qcss_rs_rate1W_%d", i), "PE distributions", 5000, 0., 5000., 12, 0., 12.);
-    h_qcss_rs_rate2W[i] = new TH2F(TString::Format("qcss_rs_rate2W_%d", i), "PE distributions", 5000, 0., 5000., 12, 0., 12.);
+    h_qcss_rs_rate1[i] = new TH2F(TString::Format("qcss_rs_rate1_%d", i), "PE distributions", 500, 0., 5000., 12, 0., 12.);
+    h_qcss_rs_rate2[i] = new TH2F(TString::Format("qcss_rs_rate2_%d", i), "PE distributions", 500, 0., 5000., 12, 0., 12.);
+    h_qcss_rs_rate1W[i] = new TH2F(TString::Format("qcss_rs_rate1W_%d", i), "PE distributions", 500, 0., 5000., 12, 0., 12.);
+    h_qcss_rs_rate2W[i] = new TH2F(TString::Format("qcss_rs_rate2W_%d", i), "PE distributions", 500, 0., 5000., 12, 0., 12.);
 
     h_qcss_rate1[i]->Sumw2();
     h_qcss_rate2[i]->Sumw2();
@@ -166,12 +168,13 @@ void QcsmonitorStudyModule::event()
   for (int i = 0; i < nSimHits; i++) {
     QcsmonitorSimHit* aHit = SimHits[i];
     int detNB = aHit->getCellId();
-    if (detNB < 2) {
+    if (detNB < 40) {
       //int trkID = aHit->getTrackId();
       int pdg = aHit->getPDGCode();
       double Edep = aHit->getEnergyDep() * 1e3; //GeV -> MeV
       double tof = aHit->getFlightTime(); //ns
 
+      h_qcss_hitrate0->Fill(detNB);
       h_qcss_Evtof1[detNB]->Fill(tof, Edep);
       if (pdg == 22) h_qcss_Evtof2[detNB]->Fill(tof, Edep);
       else if (fabs(pdg) == 11) h_qcss_Evtof3[detNB]->Fill(tof, Edep);
@@ -185,7 +188,7 @@ void QcsmonitorStudyModule::event()
 
   for (const auto& Hit : Hits) {
     const int detNb = Hit.getdetNb();
-    if (detNb < 2) {
+    if (detNb < 40) {
       const int timebin = Hit.gettime();
       const float edep = Hit.getedep();
       const float pe = Hit.getPE();

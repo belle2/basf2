@@ -1,5 +1,6 @@
 Import('env')
 
+env['CONTINUE'] = False
 env['PYTHON_MODULE'] = True
 env['LIBS'] = ['framework', 'daq', 
                'boost_python',

@@ -25,9 +25,9 @@ converter = register_module('Convert2RawDet')
 
 # Receiver
 receiver.param('NodeID', 3)  # ROPC node ID (only used for Run control)
-receiver.param('NumConn', 1)
-receiver.param('HostNameFrom', ['localhost', 'cpr007'])
-receiver.param('PortFrom', [int(argvs[2]), int(argvs[2])])
+receiver.param('NumConn', 2)
+receiver.param('HostNameFrom', ['localhost', 'localhost'])
+receiver.param('PortFrom', [34008, 34009])
 receiver.param('EventDataBufferWords', 4801)
 receiver.param('MaxTime', -1.)
 receiver.param('MaxEventNum', -1)
@@ -49,8 +49,8 @@ main = create_path()
 # Add modules to main path
 main.add_module(receiver)
 main.add_module(converter)
-# main.add_module(dump)
-main.add_module(sender)
+main.add_module(dump)
+# main.add_module(sender)
 
 # Process all events
 process(main)

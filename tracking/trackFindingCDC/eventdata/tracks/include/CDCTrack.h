@@ -50,9 +50,6 @@ namespace Belle2 {
         return false;
       }
 
-      /// Copies the hit content of the hit vector track to the CDCTrack. Do not use any taken or masked hits.
-      void appendNotTaken(const std::vector<const CDCWireHit*>& hits);
-
       /// Copies the hit and trajectory content of this track to a new RecoTrack and store it into the store array.
       bool storeInto(StoreArray<RecoTrack>& recoTracks) const;
 
@@ -104,16 +101,16 @@ namespace Belle2 {
         return m_endTrajectory3D;
       }
 
-      /// Getter for the automaton cell.
-      AutomatonCell& getAutomatonCell()
+      /// Mutable getter for the automaton cell.
+      AutomatonCell& getAutomatonCell() const
       {
         return m_automatonCell;
       }
 
-      /// Constant getter for the automaton cell.
-      const AutomatonCell& getAutomatonCell() const
+      /// Indirection to the automaton cell for easier access to the flags
+      AutomatonCell* operator->() const
       {
-        return m_automatonCell;
+        return &m_automatonCell;
       }
 
       /// Unset the masked flag of the automaton cell of this segment and of all contained wire hits.
@@ -130,23 +127,13 @@ namespace Belle2 {
        */
       void receiveMaskedFlag() const;
 
-
-      /** Remove all hits from the track which have an assigned flag */
-      void removeAllAssignedMarkedHits();
-
       /** Set the taken flag of all hits belonging to this track to the given value (default true),
        * but do not touch the flag of the track itself. */
       void forwardTakenFlag(bool takenFlag = true) const;
 
 
       /// Sort the recoHits according to their perpS information
-      void sortByArcLength2D()
-      {
-        std::stable_sort(begin(), end(),
-        [](const CDCRecoHit3D & recoHit, const CDCRecoHit3D & otherRecoHit) {
-          return recoHit.getArcLength2D() < otherRecoHit.getArcLength2D();
-        });
-      }
+      void sortByArcLength2D();
 
       /// Set all arcLengths to have positive values by shifting them by pi*radius if they are negative.
       /// This can only be done if the radius is not infinity (for example cosmics).
@@ -158,6 +145,9 @@ namespace Belle2 {
 
       /// Return a reversed copy of the track.
       CDCTrack reversed() const;
+
+      /// Finds the first CDCRecoHit3D that is based on the given wire hit - nullptr if none
+      MayBePtr<const CDCRecoHit3D> find(const CDCWireHit& wireHit) const;
 
       /// Set the flag which indicates that the track has a matching segment (probably only used in the SegmentTrackCombiner).
       void setHasMatchingSegment(bool hasMatchingSegment = true)
@@ -176,7 +166,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the automaton cell.
-      AutomatonCell m_automatonCell;
+      mutable AutomatonCell m_automatonCell;
 
       /// Memory for the three dimensional trajectory at the start of the track
       CDCTrajectory3D m_startTrajectory3D;

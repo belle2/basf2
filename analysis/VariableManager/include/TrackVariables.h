@@ -45,6 +45,16 @@ namespace Belle2 {
     double trackNVXDHits(const Particle* part);
 
     /**
+     * returns the first activated SVD layer associated to the track
+     */
+    double trackFirstSVDLayer(const Particle* part);
+
+    /**
+     * returns the first activated PXD layer associated to the track
+     */
+    double trackFirstPXDLayer(const Particle* part);
+
+    /**
      * returns the track's D0 impact parameter
      */
     double trackD0(const Particle* part);

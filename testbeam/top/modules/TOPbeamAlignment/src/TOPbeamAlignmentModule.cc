@@ -133,10 +133,11 @@ namespace Belle2 {
     m_t0 = 0;
 
     const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
-    m_numPMTrows = geo->getPMTArray().getNumRows();
-    m_numPMTcols = geo->getPMTArray().getNumColumns();
-    m_numPADrows = geo->getPMTArray().getPMT().getNumRows();
-    m_numPADcols = geo->getPMTArray().getPMT().getNumColumns();
+    const auto& pmtArray = geo->getModule(1).getPMTArray();
+    m_numPMTrows = pmtArray.getNumRows();
+    m_numPMTcols = pmtArray.getNumColumns();
+    m_numPADrows = pmtArray.getPMT().getNumRows();
+    m_numPADcols = pmtArray.getPMT().getNumColumns();
     m_numChannels = m_numPMTrows * m_numPMTcols * m_numPADrows * m_numPADcols;
     m_numEvents = 0;
 

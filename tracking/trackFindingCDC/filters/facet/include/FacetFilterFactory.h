@@ -27,16 +27,16 @@ namespace Belle2 {
       FacetFilterFactory(const std::string& defaultFilterName = "chi2");
 
       /// Getter for a short identifier for the factory
-      std::string getIdentifier() const override;
+      std::string getIdentifier() const final;
 
       /// Getter for a descriptive purpose of the constructed filters
-      std::string getFilterPurpose() const override;
+      std::string getFilterPurpose() const final;
 
       /// Getter for valid filter names and a description for each
-      std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
+      std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const final;
 
       /// Create a filter with the given name.
-      std::unique_ptr<BaseFacetFilter> create(const std::string& filterName) const override;
+      std::unique_ptr<BaseFacetFilter> create(const std::string& filterName) const final;
     };
   }
 }

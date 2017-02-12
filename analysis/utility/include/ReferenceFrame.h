@@ -40,6 +40,13 @@ namespace Belle2 {
     virtual TLorentzVector getMomentum(const Particle* particle) const = 0;
 
     /**
+     * Get Momentum error matrix in reference frame
+     * @param particle
+     * @return Covariance matrix in reference frame
+     */
+    virtual TMatrixFSym getMomentumErrorMatrix(const Particle* particle) const = 0;
+
+    /**
      * Get current rest frame
      * @return RestFrame
      */
@@ -94,6 +101,13 @@ namespace Belle2 {
      */
     virtual TLorentzVector getMomentum(const Particle* particle) const;
 
+    /**
+     * Get Momentum error matrix in rest frame
+     * @param particle
+     * @return Covariance matrix in rest frame
+     */
+    virtual TMatrixFSym getMomentumErrorMatrix(const Particle* particle) const;
+
   private:
     TLorentzVector m_momentum;         /**< momentum of RF in the lab frame */
     TVector3 m_displacement;           /**< displacement of RF origin in th lab frame */
@@ -122,6 +136,13 @@ namespace Belle2 {
      */
     virtual TLorentzVector getMomentum(const Particle* particle) const;
 
+    /**
+     * Get Momentum error matrix in lab frame
+     * @param particle
+     * @return Covariance matrix in lab frame
+     */
+    virtual TMatrixFSym getMomentumErrorMatrix(const Particle* particle) const;
+
   };
 
   /**
@@ -143,6 +164,13 @@ namespace Belle2 {
      * @return Lorentz vector in cms frame
      */
     virtual TLorentzVector getMomentum(const Particle* particle) const;
+
+    /**
+     * Get Momentum error matrix in cms frame
+     * @param particle
+     * @return Covariance matrix in cms frame
+     */
+    virtual TMatrixFSym getMomentumErrorMatrix(const Particle* particle) const;
 
   private:
     PCmsLabTransform m_transform; /**< Lab to CMS Transform */

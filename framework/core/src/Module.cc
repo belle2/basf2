@@ -167,7 +167,14 @@ bool Module::hasProperties(unsigned int propertyFlags) const
 
 bool Module::hasUnsetForcedParams() const
 {
-  return m_moduleParamList.hasUnsetForcedParams();
+  auto missing = m_moduleParamList.getUnsetForcedParams();
+  string allMissing = "";
+  for (auto s : missing)
+    allMissing += s + " ";
+  if (!missing.empty())
+    B2ERROR("The following required parameters of Module '" << getName() << "' were not specified: " << allMissing <<
+            "\nPlease add them to your steering file.");
+  return !missing.empty();
 }
 
 

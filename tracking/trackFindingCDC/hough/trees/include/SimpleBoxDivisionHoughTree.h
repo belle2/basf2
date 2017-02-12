@@ -25,12 +25,17 @@ namespace Belle2 {
 
       /// The HoughBox we use.
       using HoughBox = typename AInBoxAlgorithm::HoughBox;
+
+      /// Type of the width in coordinate I.
+      template <size_t I>
+      using Width = typename HoughBox::template Width<I>;
+
     public:
       /// Constructor using the given maximal level.
       SimpleBoxDivisionHoughTree(float maximumX,
                                  float maximumY,
-                                 float overlapX = 0,
-                                 float overlapY = 0)
+                                 Width<0> overlapX = 0,
+                                 Width<1> overlapY = 0)
         : Super(0)
         , m_maximumX(maximumX)
         , m_maximumY(maximumY)
@@ -79,13 +84,13 @@ namespace Belle2 {
       }
 
       /// Return the overlap in x direction.
-      float getOverlapX() const
+      Width<0> getOverlapX() const
       {
         return m_overlapX;
       }
 
       /// Return the overlap in y direction.
-      float getOverlapY() const
+      Width<1> getOverlapY() const
       {
         return m_overlapY;
       }
@@ -93,12 +98,15 @@ namespace Belle2 {
     private:
       /// The maximum value in X direction.
       float m_maximumX = 0;
+
       /// The maximum value in y direction.
       float m_maximumY = 0;
+
       /// The overlap in X direction.
-      float m_overlapX = 0;
+      Width<0> m_overlapX = 0;
+
       /// The overlap in Y direction.
-      float m_overlapY = 0;
+      Width<1> m_overlapY = 0;
     };
   }
 }

@@ -37,6 +37,16 @@ namespace Belle2 {
     {}
 
     /**
+     * Copy constructor (since class includes pointers in its cache)
+     */
+    TOPCalTimebase(const TOPCalTimebase& timeBase): TObject()
+    {
+      *this = timeBase;
+      m_map.clear();
+      m_sampleTime = 0;
+    }
+
+    /**
      * Destructor
      */
     ~TOPCalTimebase()

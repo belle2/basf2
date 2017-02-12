@@ -10,10 +10,9 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/findlets/base/ClassMnemomics.h>
-
+#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
-#include <tracking/trackFindingCDC/ca/WeightedRelation.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -55,7 +54,7 @@ namespace Belle2 {
       /// Short description of the findlet
       std::string getDescription() final {
         return "Constructs geometrically constrained relations between " +
-        ClassMnemomics::getParameterDescription((AItem*)nullptr) +
+        getClassMnemomicParameterDescription((AItem*)nullptr) +
         " filter by some acceptance criterion.";
       }
 
@@ -65,7 +64,7 @@ namespace Belle2 {
         moduleParamList->addParameter(prefixed(prefix, "onlyBest"),
         m_param_onlyBest,
         "Maximal number of the best relation to keep from each " +
-        ClassMnemomics::getParameterDescription((AItem*)nullptr),
+        getClassMnemomicParameterDescription((AItem*)nullptr),
         m_param_onlyBest);
       }
 

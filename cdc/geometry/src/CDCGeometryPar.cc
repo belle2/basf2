@@ -322,9 +322,9 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   m_nominalPropSpeed = 27.25;  //in cm/nsec (Belle's result, provided by iwasaki san)
 
   m_nominalSpaceResol = geom.getNominalSpaceResolution();
-  m_maxSpaceResol = 2.5 * m_nominalSpaceResol;
-
+  //  m_maxSpaceResol = 2.5 * m_nominalSpaceResol;
   CDCGeoControlPar& gcp = CDCGeoControlPar::getInstance();
+  m_maxSpaceResol = gcp.getMaxSpaceResolution();
 
   //Set displacement params. (from input data)
   m_displacement = CDCGeoControlPar::getInstance().getDisplacement();
@@ -450,6 +450,10 @@ void CDCGeometryPar::openFile(std::ifstream& ifs, const std::string& fileName0) 
 {
   std::string fileName1 = "/cdc/data/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName1);
+
+  if (fileName == "") {
+    fileName = FileSystem::findFile(fileName0);
+  }
 
   if (fileName == "") {
     B2FATAL("CDCGeometryPar: " << fileName1 << " not exist!");

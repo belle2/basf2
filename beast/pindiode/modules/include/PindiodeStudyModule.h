@@ -72,8 +72,6 @@ namespace Belle2 {
       //int nPIN = 0;
       /** PIN coordinate */
       //std::vector<TVector3> PINCenter;
-      /** Event counter */
-      //int Event = 0;
       /** Cremat gain */
       double m_CrematGain;
       /** Work function */

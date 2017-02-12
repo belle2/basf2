@@ -67,6 +67,7 @@ namespace Belle2 {
   private:
 
     double m_timeZeroJitter = 0;       /**< r.m.s of T0 jitter */
+    double m_electronicJitter = 0;     /**< r.m.s of electronic jitter */
     double m_darkNoise = 0;            /**< uniform dark noise (hits per bar) */
     double m_trigT0Sigma = 0;          /**< trigger T0 resolution */
     double m_bunchTimeSep = 0;         /**< time between two bunches */

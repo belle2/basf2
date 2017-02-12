@@ -18,6 +18,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <framework/core/ModuleParamList.h>
 
@@ -117,20 +118,20 @@ void AxialTrackCreatorSegmentHough::initialize()
                                   m_param_discreteCurvOverlap,
                                   m_param_discreteCurvWidth);
 
-  m_houghTree.setMaxLevel(m_param_maxLevel);
-  m_houghTree.assignArray<DiscretePhi0>(phi0BinsSpec.constructArray(), phi0BinsSpec.getNOverlap());
-  m_houghTree.assignArray<ContinuousImpact>(impactBounds, impactBinsSpec.getOverlap()); // Continuous
-  m_houghTree.assignArray<DiscreteCurv>(curvBinsSpec.constructArray(), curvBinsSpec.getNOverlap());
-  m_houghTree.initialize();
+  m_houghTree = makeUnique<SimpleSegmentPhi0ImpactCurvHoughTree>(m_param_maxLevel);
+  m_houghTree->assignArray<DiscretePhi0>(phi0BinsSpec.constructArray(), phi0BinsSpec.getNOverlap());
+  m_houghTree->assignArray<ContinuousImpact>(impactBounds, impactBinsSpec.getOverlap()); // Continuous
+  m_houghTree->assignArray<DiscreteCurv>(curvBinsSpec.constructArray(), curvBinsSpec.getNOverlap());
+  m_houghTree->initialize();
 }
 
 void AxialTrackCreatorSegmentHough::apply(const std::vector<CDCSegment2D>& segments,
                                           std::vector<CDCTrack>& tracks)
 {
-  m_houghTree.fell();
+  m_houghTree->fell();
 
   size_t nAxialHits = 0;
-  std::vector<const Belle2::TrackFindingCDC::CDCSegment2D*> ptrAxialSegments;
+  std::vector<const CDCSegment2D*> ptrAxialSegments;
   ptrAxialSegments.reserve(segments.size());
 
   for (const CDCSegment2D& segment : segments) {
@@ -140,13 +141,13 @@ void AxialTrackCreatorSegmentHough::apply(const std::vector<CDCSegment2D>& segme
     }
   }
 
-  m_houghTree.seed(ptrAxialSegments);
+  m_houghTree->seed(ptrAxialSegments);
   using HoughBox = SimpleSegmentPhi0ImpactCurvHoughTree::HoughBox;
 
   Weight minWeight = std::min(m_param_minNHits, nAxialHits * m_param_minFractionNHits);
 
   using Candidate = std::pair<HoughBox, std::vector<const CDCSegment2D*> >;
-  std::vector<Candidate> candidates = m_houghTree.findBest(minWeight);
+  std::vector<Candidate> candidates = m_houghTree->findBest(minWeight);
 
   for (const Candidate& candidate : candidates) {
     const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
@@ -196,6 +197,7 @@ void AxialTrackCreatorSegmentHough::apply(const std::vector<CDCSegment2D>& segme
 
 void AxialTrackCreatorSegmentHough::terminate()
 {
-  m_houghTree.raze();
+  m_houghTree->raze();
+  m_houghTree.reset();
   Super::terminate();
 }

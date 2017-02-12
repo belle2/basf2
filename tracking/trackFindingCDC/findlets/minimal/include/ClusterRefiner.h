@@ -11,14 +11,12 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/filters/wireHitRelation/BridgingWireHitRelationFilter.h>
-
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/ca/Clusterizer.h>
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
-#include <tracking/trackFindingCDC/ca/WeightedRelation.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <boost/range/adaptor/indirected.hpp>
 
@@ -30,7 +28,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Refines the clustering of wire hits from super clusters to clustexrs
-    template <class AWireHitRelationFilter = BridgingWireHitRelationFilter>
+    template <class AWireHitRelationFilter>
     class ClusterRefiner : public Findlet<const CDCWireHitCluster, CDCWireHitCluster> {
 
     private:

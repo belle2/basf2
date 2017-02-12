@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPair/FitSegmentPairVarSet.h>
+
 #include <tracking/trackFindingCDC/fitting/CDCAxialStereoFusion.h>
 
 using namespace Belle2;

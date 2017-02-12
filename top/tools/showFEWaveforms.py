@@ -24,7 +24,7 @@ class WFDisplay(Module):
     '''
 
     #: 1D histograms
-    hist = [TH1F('h' + str(i), 'wf', 64*4, 0.0, 64.0*4) for i in range(4)]
+    hist = [TH1F('h' + str(i), 'wf', 64 * 4, 0.0, 64.0 * 4) for i in range(4)]
     for i in range(4):
         hist[i].SetXTitle("sample number")
         hist[i].SetYTitle("sample value [ADC counts]")

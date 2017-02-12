@@ -47,4 +47,4 @@ namespace Belle2 {
     /// Importing only the enum but not the constants
     using ERotation = NRotation::ERotation;
   }
-} // namespace Belle2
+}

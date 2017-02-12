@@ -10,27 +10,32 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/facet/FacetFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
+
 #include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.h>
+
+#include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
+
+#include <vector>
+#include <string>
+#include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCFacet;
 
-    /// Records the encountered CDCWireHitFacets.
+    /// Filter to record multiple chooseable variable sets for facets
     class UnionRecordingFacetFilter: public UnionRecordingFilter<FacetFilterFactory> {
 
     private:
       /// Type of the base class
-      typedef  UnionRecordingFilter<FacetFilterFactory> Super;
+      using Super = UnionRecordingFilter<FacetFilterFactory>;
 
     public:
-      /// Valid names of variable sets for facets.
-      virtual std::vector<std::string> getValidVarSetNames() const override;
+      /// Get the valid names of variable sets for facets.
+      std::vector<std::string> getValidVarSetNames() const final;
 
       /// Create a concrete variables set for facets from a name.
-      virtual
-      std::unique_ptr<BaseVarSet<CDCFacet>> createVarSet(const std::string& name) const override;
-
+      std::unique_ptr<BaseVarSet<const CDCFacet>> createVarSet(const std::string& name) const final;
     };
   }
 }

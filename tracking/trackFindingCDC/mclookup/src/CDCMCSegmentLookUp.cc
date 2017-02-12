@@ -7,19 +7,13 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
-
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
-
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-const CDCMCSegmentLookUp&
-CDCMCSegmentLookUp::
-getInstance()
+const CDCMCSegment2DLookUp& CDCMCSegmentLookUp::getInstance()
 {
-  return CDCMCManager::getMCSegmentLookUp();
+  return CDCMCManager::getMCSegment2DLookUp();
 }

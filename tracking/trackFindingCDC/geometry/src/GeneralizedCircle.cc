@@ -13,7 +13,6 @@
 #include <tracking/trackFindingCDC/numerics/Quadratic.h>
 #include <cmath>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -137,7 +136,7 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
     const double b = nParallel;
     const double c = n0() + (nOrthogonal + n3() * closestOrthogonal) * closestOrthogonal;
 
-    const pair<double, double> closestParallel12 = solveQuadraticABC(a, b, c);
+    const std::pair<double, double> closestParallel12 = solveQuadraticABC(a, b, c);
 
     // take the solution with smaller distance to point
     const double pointParallel = point.unnormalizedParallelComp(coordinateSystem);
@@ -200,22 +199,22 @@ Vector2D GeneralizedCircle::chooseNextForwardOf(const Vector2D& start,
   return Vector2D(NAN, NAN); // just avoid a compiler warning
 }
 
-pair<Vector2D, Vector2D> GeneralizedCircle::atCylindricalR(const double R) const
+std::pair<Vector2D, Vector2D> GeneralizedCircle::atCylindricalR(const double cylindricalR) const
 {
   // extraploted to r
   // solve
   //  n0 + n1*x + n2*y + n3*r*r == 0
-  //  and r = R
+  //  and r = cylindricalR
   // search for x and y
 
   // solve the equation in a coordinate system parallel and orthogonal to the reduced circle center
   const Vector2D nUnit = n12().unit();
 
   // parallel component
-  const double sameCylindricalRParallel = -(n0() + n3() * R * R) / n12().norm();
+  const double sameCylindricalRParallel = -(n0() + n3() * square(cylindricalR)) / n12().norm();
 
   // orthogonal component
-  const double sameCylindricalROrthogonal = sqrt(square(R) - square(sameCylindricalRParallel));
+  const double sameCylindricalROrthogonal = sqrt(square(cylindricalR) - square(sameCylindricalRParallel));
 
   /// Two versions in this case
   Vector2D sameCylindricalR1 =
@@ -224,14 +223,14 @@ pair<Vector2D, Vector2D> GeneralizedCircle::atCylindricalR(const double R) const
   Vector2D sameCylindricalR2 =
     Vector2D::compose(nUnit, sameCylindricalRParallel, sameCylindricalROrthogonal);
 
-  pair<Vector2D, Vector2D> result(sameCylindricalR1, sameCylindricalR2);
+  std::pair<Vector2D, Vector2D> result(sameCylindricalR1, sameCylindricalR2);
   return result;
 }
 
 Vector2D GeneralizedCircle::atCylindricalRForwardOf(const Vector2D& startPoint,
                                                     const double cylindricalR) const
 {
-  pair<Vector2D, Vector2D> candidatePoints = atCylindricalR(cylindricalR);
+  std::pair<Vector2D, Vector2D> candidatePoints = atCylindricalR(cylindricalR);
   return chooseNextForwardOf(startPoint, candidatePoints.first, candidatePoints.second);
 }
 
@@ -337,10 +336,10 @@ GeneralizedCircle::intersections(const GeneralizedCircle& generalizedCircle) con
   double b = mn12Orthogonal;
   double c = (a * xParallel + mn12Parallel) * xParallel + m0 + n0;
 
-  pair<double, double> xOrthogonal = solveQuadraticABC(a, b, c);
+  std::pair<double, double> xOrthogonal = solveQuadraticABC(a, b, c);
 
-  return make_pair(Vector2D::compose(unitC, xParallel, xOrthogonal.first),
-                   Vector2D::compose(unitC, xParallel, xOrthogonal.second));
+  return std::make_pair(Vector2D::compose(unitC, xParallel, xOrthogonal.first),
+                        Vector2D::compose(unitC, xParallel, xOrthogonal.second));
 }
 
 Vector2D GeneralizedCircle::atArcLength(const double arcLength) const

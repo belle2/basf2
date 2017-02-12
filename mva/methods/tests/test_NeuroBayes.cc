@@ -113,6 +113,7 @@ namespace {
     }
 
     virtual unsigned int getNumberOfFeatures() const override { return 1; }
+    virtual unsigned int getNumberOfSpectators() const override { return 0; }
     virtual unsigned int getNumberOfEvents() const override { return m_data.size(); }
     virtual void loadEvent(unsigned int iEvent) override { m_input[0] = m_data[iEvent]; m_target = iEvent % 2; m_isSignal = m_target == 1; };
     virtual float getSignalFraction() override { return 0.1; };
@@ -128,33 +129,36 @@ namespace {
   TEST(NeuroBayesTTest, NeuroBayesInterface)
   {
 #ifndef DEACTIVATE_NEUROBAYES
-    MVA::Interface<MVA::NeuroBayesOptions, MVA::NeuroBayesTeacher, MVA::NeuroBayesExpert> interface;
 
-    MVA::GeneralOptions general_options;
-    general_options.m_variables = {"A"};
-    MVA::NeuroBayesOptions specific_options;
-    std::vector<float> data;
-    std::vector<float> template_data = {1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0};
-    for (unsigned int i = 0; i < 1000; ++i) {
-      data.push_back(template_data[i % template_data.size()]);
+    if (MVA::IsNeuroBayesAvailable()) {
+      MVA::Interface<MVA::NeuroBayesOptions, MVA::NeuroBayesTeacher, MVA::NeuroBayesExpert> interface;
+
+      MVA::GeneralOptions general_options;
+      general_options.m_variables = {"A"};
+      MVA::NeuroBayesOptions specific_options;
+      std::vector<float> data;
+      std::vector<float> template_data = {1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0};
+      for (unsigned int i = 0; i < 1000; ++i) {
+        data.push_back(template_data[i % template_data.size()]);
+      }
+      TestDataset dataset(data);
+
+      auto teacher = interface.getTeacher(general_options, specific_options);
+      auto weightfile = teacher->train(dataset);
+
+      auto expert = interface.getExpert();
+      expert->load(weightfile);
+      auto probabilities = expert->apply(dataset);
+      EXPECT_EQ(probabilities.size(), dataset.getNumberOfEvents());
+      for (unsigned int i = 0; i < 4; ++i) {
+        EXPECT_LE(probabilities[i], 0.2);
+        EXPECT_GE(probabilities[i], -0.2);
+      }
+      EXPECT_LE(probabilities[4], -0.6);
+      EXPECT_GE(probabilities[5], 0.6);
+      EXPECT_LE(probabilities[6], -0.6);
+      EXPECT_GE(probabilities[7], 0.6);
     }
-    TestDataset dataset(data);
-
-    auto teacher = interface.getTeacher(general_options, specific_options);
-    auto weightfile = teacher->train(dataset);
-
-    auto expert = interface.getExpert();
-    expert->load(weightfile);
-    auto probabilities = expert->apply(dataset);
-    EXPECT_EQ(probabilities.size(), dataset.getNumberOfEvents());
-    for (unsigned int i = 0; i < 4; ++i) {
-      EXPECT_LE(probabilities[i], 0.6);
-      EXPECT_GE(probabilities[i], 0.4);
-    }
-    EXPECT_LE(probabilities[4], 0.2);
-    EXPECT_GE(probabilities[5], 0.8);
-    EXPECT_LE(probabilities[6], 0.2);
-    EXPECT_GE(probabilities[7], 0.8);
 #endif
 
   }

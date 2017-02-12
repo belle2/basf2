@@ -7,11 +7,19 @@ using namespace Belle2;
 using namespace Belle2::ECL;
 using namespace std;
 
-void EclConfiguration::signalsample_t::InitSample(const double* MPd)
+// define the constexpr here to make clang happy. Could be a bug or some strict
+// adherence to the standard. I guess it's just a different interpretation of
+// how to use these values by clang.
+// http://stackoverflow.com/questions/28264279/undefined-reference-when-accessing-static-constexpr-float-member
+constexpr double EclConfiguration::s_clock;
+constexpr double EclConfiguration::m_rf;
+constexpr double EclConfiguration::m_step;
+
+void EclConfiguration::signalsample_t::InitSample(const double* MPd, double u)
 {
   const int N = m_ns * m_nl;
   vector<double> MP(MPd, MPd + 10);
-  ShaperDSP_t dsp(MP);
+  ShaperDSP_t dsp(MP, u);
   dsp.settimestride(m_step / m_ns);
   dsp.fillarray(0.0, N, m_ft);
 
@@ -21,11 +29,11 @@ void EclConfiguration::signalsample_t::InitSample(const double* MPd)
 }
 
 
-void EclConfiguration::signalsample_t::InitSample(const float* MP)
+void EclConfiguration::signalsample_t::InitSample(const float* MP, double u)
 {
   double MPd[10];
   for (int i = 0; i < 10; i++) MPd[i] = MP[i];
-  InitSample(MPd);
+  InitSample(MPd, u);
 }
 
 void EclConfiguration::adccounts_t::AddHit(const double a, const double t0, const EclConfiguration::signalsample_t& s)

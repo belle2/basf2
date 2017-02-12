@@ -12,6 +12,7 @@
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
 #include <TVector3.h>
 #include <TMatrixDSym.h>
@@ -26,7 +27,8 @@
 
 using namespace Belle2;
 
-bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack)
+bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const Const::ParticleType& defaultHypothesis,
+                                           const bool useClosestHitToIP)
 {
 
   StoreArray<Track> tracks(m_trackColName);
@@ -47,14 +49,19 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack)
 
     // Check if the fit worked.
     if (not recoTrack.wasFitSuccessful(trackRep)) {
-      B2DEBUG(100, "The fit with the given track representation was not successful. Skipping ...");
+      B2DEBUG(100, "The fit with the given track representation (" << std::abs(trackRep->getPDG()) <<
+              ") was not successful. Skipping ...");
       continue;
     }
 
     // Extrapolate the tracks to the perigee.
     genfit::MeasuredStateOnPlane msop;
     try {
-      msop = recoTrack.getMeasuredStateOnPlaneFromFirstHit(trackRep);
+      if (useClosestHitToIP) {
+        msop = recoTrack.getMeasuredStateOnPlaneClosestTo(TVector3(0, 0, 0), trackRep);
+      } else {
+        msop = recoTrack.getMeasuredStateOnPlaneFromFirstHit(trackRep);
+      }
     } catch (genfit::Exception& exception) {
       B2WARNING(exception.what());
       continue;
@@ -63,7 +70,9 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack)
     try {
       msop.extrapolateToLine(m_beamSpot, m_beamAxis);
     } catch (...) {
-      B2WARNING("Could not extrapolate the fit result to the perigee point. Why, I don't know.");
+      B2WARNING("Could not extrapolate the fit result for pdg " << particleType.getPDGCode() <<
+                " to the perigee point. Why, I don't know.");
+      continue;
     }
 
     // Build track fit result.
@@ -93,6 +102,15 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack)
     newTrack.setTrackFitResultIndex(particleType, newTrackFitResultArrayIndex);
 
   }
+
+  try {
+    const auto msop = recoTrack.getMeasuredStateOnPlaneFromFirstHit(TrackFitter::getTrackRepresentationForPDG(
+                        defaultHypothesis.getPDGCode(), recoTrack));
+  } catch (genfit::Exception e) {
+    B2WARNING("The default hypothesis is not available after track creation. Discarding track.");
+    return false;
+  }
+
 
   B2DEBUG(100, "Number of fitted hypothesis = " << newTrack.getNumberOfFittedHypotheses());
   if (newTrack.getNumberOfFittedHypotheses() > 0) {

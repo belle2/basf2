@@ -70,7 +70,7 @@ def main(argv):
     # will fail.
     vxd_align_input_files = []
     for run in range(1, 5):
-        cosmics_file_path = os.path.join(data_dir, 'DST_exp1_run{0}.root'.format(run))
+        cosmics_file_path = os.path.abspath(os.path.join(data_dir, 'DST_exp1_run{0}.root'.format(run)))
         vxd_align_input_files.append(cosmics_file_path)
 
     # Setup the actual Calibration and CAF and run

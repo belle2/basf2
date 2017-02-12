@@ -324,7 +324,7 @@ namespace Belle2 {
     bool hasProperties(unsigned int propertyFlags) const;
 
     /**
-     * Returns true if the module has still unset parameters which the user has to set in the steering file.
+     * Returns true and prints error message if the module has unset parameters which the user has to set in the steering file.
      */
     bool hasUnsetForcedParams() const;
 
@@ -599,6 +599,11 @@ namespace Belle2 {
     std::string m_moduleType; /**< The type name of the module. (without trailing "Module") */
     std::string m_package; /**< Package this module is found in (may be empty). */
   };
+
+
+#ifndef _PACKAGE_
+#define _PACKAGE_ "" /**< make sure REG_MODULE works outside the normal build system */
+#endif
 
   //------------------------------------------------------
   //             Define convenient macro

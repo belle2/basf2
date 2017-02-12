@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include <fstream>
+#include <numeric>
 
 using namespace Belle2;
 
@@ -32,13 +33,25 @@ namespace {
     }
 
     virtual unsigned int getNumberOfFeatures() const override { return 5; }
+    virtual unsigned int getNumberOfSpectators() const override { return 2; }
     virtual unsigned int getNumberOfEvents() const override { return 20; }
-    virtual void loadEvent(unsigned int iEvent) override { float f = static_cast<float>(iEvent); m_input = {f + 1, f + 2, f + 3, f + 4, f + 5}; };
+    virtual void loadEvent(unsigned int iEvent) override
+    {
+      float f = static_cast<float>(iEvent);
+      m_input = {f + 1, f + 2, f + 3, f + 4, f + 5};
+      m_spectators = {f + 6, f + 7};
+    };
     virtual float getSignalFraction() override { return 0.1; };
     virtual std::vector<float> getFeature(unsigned int iFeature) override
     {
       std::vector<float> a(20, 0.0);
       std::iota(a.begin(), a.end(), iFeature + 1);
+      return a;
+    }
+    virtual std::vector<float> getSpectator(unsigned int iSpectator) override
+    {
+      std::vector<float> a(20, 0.0);
+      std::iota(a.begin(), a.end(), iSpectator + 6);
       return a;
     }
 
@@ -49,12 +62,15 @@ namespace {
 
     MVA::GeneralOptions general_options;
     general_options.m_variables = {"a", "b", "c"};
+    general_options.m_spectators = {"e", "f"};
     general_options.m_signal_class = 2;
     std::vector<float> input = {1.0, 2.0, 3.0};
+    std::vector<float> spectators = {4.0, 5.0};
 
-    MVA::SingleDataset x(general_options, input, 2.0);
+    MVA::SingleDataset x(general_options, input, 2.0, spectators);
 
     EXPECT_EQ(x.getNumberOfFeatures(), 3);
+    EXPECT_EQ(x.getNumberOfSpectators(), 2);
     EXPECT_EQ(x.getNumberOfEvents(), 1);
 
     // Should just work
@@ -65,6 +81,10 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_input[1], 2.0);
     EXPECT_FLOAT_EQ(x.m_input[2], 3.0);
 
+    EXPECT_EQ(x.m_spectators.size(), 2);
+    EXPECT_FLOAT_EQ(x.m_spectators[0], 4.0);
+    EXPECT_FLOAT_EQ(x.m_spectators[1], 5.0);
+
     EXPECT_FLOAT_EQ(x.m_weight, 1.0);
     EXPECT_FLOAT_EQ(x.m_target, 2.0);
     EXPECT_EQ(x.m_isSignal, true);
@@ -74,6 +94,10 @@ namespace {
     auto feature = x.getFeature(1);
     EXPECT_EQ(feature.size(), 1);
     EXPECT_FLOAT_EQ(feature[0], 2.0);
+
+    auto spectator = x.getSpectator(1);
+    EXPECT_EQ(spectator.size(), 1);
+    EXPECT_FLOAT_EQ(spectator[0], 5.0);
 
     // Same result for mother class implementation
     feature = x.Dataset::getFeature(1);
@@ -87,16 +111,18 @@ namespace {
 
     MVA::GeneralOptions general_options;
     general_options.m_variables = {"a", "b", "c"};
+    general_options.m_spectators = {"e", "f"};
     general_options.m_signal_class = 2;
     std::vector<std::vector<float>> matrix = {{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}, {7.0, 8.0, 9.0}};
+    std::vector<std::vector<float>> spectator_matrix = {{12.0, 13.0}, {15.0, 16.0}, {18.0, 19.0}};
     std::vector<float> targets = {2.0, 0.0, 2.0};
     std::vector<float> weights = {1.0, 2.0, 3.0};
 
-    EXPECT_B2ERROR(MVA::MultiDataset(general_options, matrix, {1.0}, weights));
+    EXPECT_B2ERROR(MVA::MultiDataset(general_options, matrix, spectator_matrix, {1.0}, weights));
 
-    EXPECT_B2ERROR(MVA::MultiDataset(general_options, matrix, targets, {1.0}));
+    EXPECT_B2ERROR(MVA::MultiDataset(general_options, matrix, spectator_matrix, targets, {1.0}));
 
-    MVA::MultiDataset x(general_options, matrix, targets, weights);
+    MVA::MultiDataset x(general_options, matrix, spectator_matrix, targets, weights);
 
     EXPECT_EQ(x.getNumberOfFeatures(), 3);
     EXPECT_EQ(x.getNumberOfEvents(), 3);
@@ -108,6 +134,10 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_input[0], 1.0);
     EXPECT_FLOAT_EQ(x.m_input[1], 2.0);
     EXPECT_FLOAT_EQ(x.m_input[2], 3.0);
+
+    EXPECT_EQ(x.m_spectators.size(), 2);
+    EXPECT_FLOAT_EQ(x.m_spectators[0], 12.0);
+    EXPECT_FLOAT_EQ(x.m_spectators[1], 13.0);
 
     EXPECT_FLOAT_EQ(x.m_weight, 1.0);
     EXPECT_FLOAT_EQ(x.m_target, 2.0);
@@ -121,6 +151,10 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_input[1], 5.0);
     EXPECT_FLOAT_EQ(x.m_input[2], 6.0);
 
+    EXPECT_EQ(x.m_spectators.size(), 2);
+    EXPECT_FLOAT_EQ(x.m_spectators[0], 15.0);
+    EXPECT_FLOAT_EQ(x.m_spectators[1], 16.0);
+
     EXPECT_FLOAT_EQ(x.m_weight, 2.0);
     EXPECT_FLOAT_EQ(x.m_target, 0.0);
     EXPECT_EQ(x.m_isSignal, false);
@@ -132,6 +166,10 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_input[0], 7.0);
     EXPECT_FLOAT_EQ(x.m_input[1], 8.0);
     EXPECT_FLOAT_EQ(x.m_input[2], 9.0);
+
+    EXPECT_EQ(x.m_spectators.size(), 2);
+    EXPECT_FLOAT_EQ(x.m_spectators[0], 18.0);
+    EXPECT_FLOAT_EQ(x.m_spectators[1], 19.0);
 
     EXPECT_FLOAT_EQ(x.m_weight, 3.0);
     EXPECT_FLOAT_EQ(x.m_target, 2.0);
@@ -145,6 +183,12 @@ namespace {
     EXPECT_FLOAT_EQ(feature[1], 5.0);
     EXPECT_FLOAT_EQ(feature[2], 8.0);
 
+    auto spectator = x.getSpectator(1);
+    EXPECT_EQ(spectator.size(), 3);
+    EXPECT_FLOAT_EQ(spectator[0], 13.0);
+    EXPECT_FLOAT_EQ(spectator[1], 16.0);
+    EXPECT_FLOAT_EQ(spectator[2], 19.0);
+
 
   }
 
@@ -154,9 +198,11 @@ namespace {
     MVA::GeneralOptions general_options;
     general_options.m_signal_class = 3;
     general_options.m_variables = {"a", "b", "c", "d", "e"};
+    general_options.m_spectators = {"f", "g"};
     TestDataset test_dataset(general_options);
 
     general_options.m_variables = {"a", "d", "e"};
+    general_options.m_spectators = {"g"};
     std::vector<bool> events = {true, false, true, false, true, false, true, false, true, false,
                                 true, false, true, false, true, false, true, false, true, false
                                };
@@ -173,6 +219,9 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_input[1], 4.0);
     EXPECT_FLOAT_EQ(x.m_input[2], 5.0);
 
+    EXPECT_EQ(x.m_spectators.size(), 1);
+    EXPECT_FLOAT_EQ(x.m_spectators[0], 7.0);
+
     EXPECT_FLOAT_EQ(x.m_weight, -3.0);
     EXPECT_FLOAT_EQ(x.m_target, 3.0);
     EXPECT_EQ(x.m_isSignal, true);
@@ -185,11 +234,23 @@ namespace {
       EXPECT_FLOAT_EQ(feature[iEvent], iEvent * 2 + 4);
     };
 
+    auto spectator = x.getSpectator(0);
+    EXPECT_EQ(spectator.size(), 10);
+    for (unsigned int iEvent = 0; iEvent < 10; ++iEvent) {
+      EXPECT_FLOAT_EQ(spectator[iEvent], iEvent * 2 + 7);
+    };
+
     // Same result for mother class implementation
     feature = x.Dataset::getFeature(1);
     EXPECT_EQ(feature.size(), 10);
     for (unsigned int iEvent = 0; iEvent < 10; ++iEvent) {
       EXPECT_FLOAT_EQ(feature[iEvent], iEvent * 2 + 4);
+    };
+
+    spectator = x.Dataset::getSpectator(0);
+    EXPECT_EQ(spectator.size(), 10);
+    for (unsigned int iEvent = 0; iEvent < 10; ++iEvent) {
+      EXPECT_FLOAT_EQ(spectator[iEvent], iEvent * 2 + 7);
     };
 
     // Test without event indices
@@ -200,6 +261,12 @@ namespace {
       EXPECT_FLOAT_EQ(feature[iEvent], iEvent + 4);
     };
 
+    spectator = y.getSpectator(0);
+    EXPECT_EQ(spectator.size(), 20);
+    for (unsigned int iEvent = 0; iEvent < 20; ++iEvent) {
+      EXPECT_FLOAT_EQ(spectator[iEvent], iEvent + 7);
+    };
+
     // Same result for mother class implementation
     feature = y.Dataset::getFeature(1);
     EXPECT_EQ(feature.size(), 20);
@@ -207,7 +274,22 @@ namespace {
       EXPECT_FLOAT_EQ(feature[iEvent], iEvent + 4);
     };
 
+    spectator = y.Dataset::getSpectator(0);
+    EXPECT_EQ(spectator.size(), 20);
+    for (unsigned int iEvent = 0; iEvent < 20; ++iEvent) {
+      EXPECT_FLOAT_EQ(spectator[iEvent], iEvent + 7);
+    };
+
     general_options.m_variables = {"a", "d", "e", "DOESNOTEXIST"};
+    try {
+      EXPECT_B2ERROR(MVA::SubDataset(general_options, events, test_dataset));
+    } catch (...) {
+
+    }
+    EXPECT_THROW(MVA::SubDataset(general_options, events, test_dataset), std::runtime_error);
+
+    general_options.m_variables = {"a", "d", "e"};
+    general_options.m_spectators = {"DOESNOTEXIST"};
     try {
       EXPECT_B2ERROR(MVA::SubDataset(general_options, events, test_dataset));
     } catch (...) {
@@ -224,7 +306,7 @@ namespace {
     TFile file("datafile.root", "RECREATE");
     file.cd();
     TTree tree("tree", "TreeTitle");
-    float a, b, c, d, e, f, g = 0;
+    float a, b, c, d, e, f, g, v, w = 0;
     tree.Branch("a", &a);
     tree.Branch("b", &b);
     tree.Branch("c", &c);
@@ -233,6 +315,8 @@ namespace {
     tree.Branch("f__bo__bc", &f);
     tree.Branch("g", &g);
     tree.Branch("__weight__", &c);
+    tree.Branch("v__bo__bc", &v);
+    tree.Branch("w", &w);
 
     for (unsigned int i = 0; i < 5; ++i) {
       a = i + 1.0;
@@ -242,6 +326,8 @@ namespace {
       e = i + 1.4;
       f = i + 1.5;
       g = i % 2 == 0;
+      w = i + 1.6;
+      v = i + 1.7;
       tree.Fill();
     }
 
@@ -250,6 +336,7 @@ namespace {
     MVA::GeneralOptions general_options;
     // Both names with and without makeROOTCompatible should work
     general_options.m_variables = {"a", "b", "e__bo__bc", "f()"};
+    general_options.m_spectators = {"w", "v()"};
     general_options.m_signal_class = 1;
     general_options.m_datafiles = {"datafile.root"};
     general_options.m_treename = "tree";
@@ -258,6 +345,7 @@ namespace {
     MVA::ROOTDataset x(general_options);
 
     EXPECT_EQ(x.getNumberOfFeatures(), 4);
+    EXPECT_EQ(x.getNumberOfSpectators(), 2);
     EXPECT_EQ(x.getNumberOfEvents(), 5);
 
     // Should just work
@@ -267,6 +355,9 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_input[1], 1.1);
     EXPECT_FLOAT_EQ(x.m_input[2], 1.4);
     EXPECT_FLOAT_EQ(x.m_input[3], 1.5);
+    EXPECT_EQ(x.m_spectators.size(), 2);
+    EXPECT_FLOAT_EQ(x.m_spectators[0], 1.6);
+    EXPECT_FLOAT_EQ(x.m_spectators[1], 1.7);
     EXPECT_FLOAT_EQ(x.m_weight, 1.2);
     EXPECT_FLOAT_EQ(x.m_target, 1.0);
     EXPECT_EQ(x.m_isSignal, true);
@@ -277,6 +368,9 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_input[1], 2.1);
     EXPECT_FLOAT_EQ(x.m_input[2], 2.4);
     EXPECT_FLOAT_EQ(x.m_input[3], 2.5);
+    EXPECT_EQ(x.m_spectators.size(), 2);
+    EXPECT_FLOAT_EQ(x.m_spectators[0], 2.6);
+    EXPECT_FLOAT_EQ(x.m_spectators[1], 2.7);
     EXPECT_FLOAT_EQ(x.m_weight, 2.2);
     EXPECT_FLOAT_EQ(x.m_target, 0.0);
     EXPECT_EQ(x.m_isSignal, false);
@@ -287,6 +381,9 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_input[1], 3.1);
     EXPECT_FLOAT_EQ(x.m_input[2], 3.4);
     EXPECT_FLOAT_EQ(x.m_input[3], 3.5);
+    EXPECT_EQ(x.m_spectators.size(), 2);
+    EXPECT_FLOAT_EQ(x.m_spectators[0], 3.6);
+    EXPECT_FLOAT_EQ(x.m_spectators[1], 3.7);
     EXPECT_FLOAT_EQ(x.m_weight, 3.2);
     EXPECT_FLOAT_EQ(x.m_target, 1.0);
     EXPECT_EQ(x.m_isSignal, true);
@@ -297,6 +394,9 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_input[1], 4.1);
     EXPECT_FLOAT_EQ(x.m_input[2], 4.4);
     EXPECT_FLOAT_EQ(x.m_input[3], 4.5);
+    EXPECT_EQ(x.m_spectators.size(), 2);
+    EXPECT_FLOAT_EQ(x.m_spectators[0], 4.6);
+    EXPECT_FLOAT_EQ(x.m_spectators[1], 4.7);
     EXPECT_FLOAT_EQ(x.m_weight, 4.2);
     EXPECT_FLOAT_EQ(x.m_target, 0.0);
     EXPECT_EQ(x.m_isSignal, false);
@@ -307,6 +407,9 @@ namespace {
     EXPECT_FLOAT_EQ(x.m_input[1], 5.1);
     EXPECT_FLOAT_EQ(x.m_input[2], 5.4);
     EXPECT_FLOAT_EQ(x.m_input[3], 5.5);
+    EXPECT_EQ(x.m_spectators.size(), 2);
+    EXPECT_FLOAT_EQ(x.m_spectators[0], 5.6);
+    EXPECT_FLOAT_EQ(x.m_spectators[1], 5.7);
     EXPECT_FLOAT_EQ(x.m_weight, 5.2);
     EXPECT_FLOAT_EQ(x.m_target, 1.0);
     EXPECT_EQ(x.m_isSignal, true);
@@ -329,6 +432,23 @@ namespace {
     EXPECT_FLOAT_EQ(feature[2], 3.1);
     EXPECT_FLOAT_EQ(feature[3], 4.1);
     EXPECT_FLOAT_EQ(feature[4], 5.1);
+
+    auto spectator = x.getSpectator(1);
+    EXPECT_EQ(spectator.size(), 5);
+    EXPECT_FLOAT_EQ(spectator[0], 1.7);
+    EXPECT_FLOAT_EQ(spectator[1], 2.7);
+    EXPECT_FLOAT_EQ(spectator[2], 3.7);
+    EXPECT_FLOAT_EQ(spectator[3], 4.7);
+    EXPECT_FLOAT_EQ(spectator[4], 5.7);
+
+    // Same result for mother class implementation
+    spectator = x.Dataset::getSpectator(1);
+    EXPECT_EQ(spectator.size(), 5);
+    EXPECT_FLOAT_EQ(spectator[0], 1.7);
+    EXPECT_FLOAT_EQ(spectator[1], 2.7);
+    EXPECT_FLOAT_EQ(spectator[2], 3.7);
+    EXPECT_FLOAT_EQ(spectator[3], 4.7);
+    EXPECT_FLOAT_EQ(spectator[4], 5.7);
 
     auto weights = x.getWeights();
     EXPECT_EQ(weights.size(), 5);
@@ -385,6 +505,13 @@ namespace {
       MVA::ROOTDataset chain_test(general_options);
       EXPECT_EQ(chain_test.getNumberOfEvents(), 15);
     }
+    // Test m_max_events feature
+    {
+      general_options.m_max_events = 10;
+      MVA::ROOTDataset chain_test(general_options);
+      EXPECT_EQ(chain_test.getNumberOfEvents(), 10);
+      general_options.m_max_events = 0;
+    }
 
     // Check for missing tree
     general_options.m_treename = "missing tree";
@@ -405,7 +532,19 @@ namespace {
     }
     EXPECT_THROW(MVA::ROOTDataset{general_options}, std::runtime_error);
 
+    // Check for missing branch
+    general_options.m_treename = "tree";
+    general_options.m_variables = {"a", "b", "e", "f"};
+    general_options.m_spectators = {"missing branch"};
+    try {
+      EXPECT_B2ERROR(MVA::ROOTDataset{general_options});
+    } catch (...) {
+
+    }
+    EXPECT_THROW(MVA::ROOTDataset{general_options}, std::runtime_error);
+
     // Check for missing file
+    general_options.m_spectators = {};
     general_options.m_datafiles = {"DOESNOTEXIST.root"};
     general_options.m_treename = "tree";
     try {

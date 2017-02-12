@@ -9,8 +9,11 @@
  **************************************************************************/
 #pragma once
 
-#include <iterator>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/Range.h>
+
+#include <vector>
+#include <iterator>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -19,8 +22,8 @@ namespace Belle2 {
      *  Returns the common category value if all items in a range belong to the same category
      *  or the default value if the categories of the items differ.
      */
-    template<class Ts, class ACategoryFunction, class Category>
-    Category common(const Ts& items, const ACategoryFunction& catFunc, const Category defaultCat)
+    template <class Ts, class ACategoryFunction, class ACategory>
+    ACategory common(const Ts& items, const ACategoryFunction& catFunc, const ACategory defaultCat)
     {
       auto it = std::begin(items);
       auto itEnd = std::end(items);
@@ -31,7 +34,7 @@ namespace Belle2 {
      *  Returns the common category value if all items in a range belong to the same category
      *  or the default value if the categories of the items differ.
      */
-    template<class It, class ACategoryFunction, class ACategory>
+    template <class It, class ACategoryFunction, class ACategory>
     ACategory common(It itBegin, It itEnd, const ACategoryFunction& catFunc, const ACategory defaultCat)
     {
       if (itBegin == itEnd) return defaultCat; // empty case
@@ -45,12 +48,81 @@ namespace Belle2 {
     }
 
     /**
-     * Chunks a range of values into adjacent sub ranges that belong to the same category.
+     *  Erase remove idiom in a more concise form
      */
-    template<class It, class ACategoryFunction>
-    std::vector<Range<It> > adjacent_groupby(It itBegin, It itEnd, const ACategoryFunction& catFunc)
+    template <class Ts, class APredicate>
+    void erase_remove_if(Ts& ts, const APredicate& predicate)
     {
-      std::vector<Range<It> > result;
+      ts.erase(std::remove_if(std::begin(ts), std::end(ts), predicate), std::end(ts));
+    }
+
+    /**
+     *  Erase unique idiom in a more concise form
+     */
+    template <class Ts>
+    void erase_unique(Ts& ts)
+    {
+      ts.erase(std::unique(std::begin(ts), std::end(ts)), std::end(ts));
+    }
+
+    /**
+     *  Erase unique idiom in a more concise form
+     */
+    template <class Ts, class AEqual>
+    void erase_unique(Ts& ts, const AEqual& equal)
+    {
+      ts.erase(std::unique(std::begin(ts), std::end(ts), equal), std::end(ts));
+    }
+
+    /**
+     *  Counts the number of repetitions for each unique value in a range. Unique values must be adjacent.
+     */
+    template <class It>
+    std::vector<std::pair<It, int> > unique_count(It itBegin, It itEnd)
+    {
+      std::vector<std::pair<It, int> > result;
+      if (itBegin == itEnd) return result;
+      It it = itBegin;
+      result.emplace_back(it, 1);
+      ++it;
+      for (; it != itEnd; ++it) {
+        if (*it == *result.back().first) {
+          ++result.back().second;
+        } else {
+          result.emplace_back(it, 1);
+        }
+      }
+      return result;
+    }
+
+    /**
+     *  Counts the number of repetitions for each unique value in a range. Unique values must be adjacent.
+     */
+    template <class It, class AEqual>
+    std::vector<std::pair<It, int> > unique_count(It itBegin, It itEnd, const AEqual& equal)
+    {
+      std::vector<std::pair<It, int> > result;
+      if (itBegin == itEnd) return result;
+      It it = itBegin;
+      result.emplace_back(it, 1);
+      ++it;
+      for (; it != itEnd; ++it) {
+        if (equal(*it, *result.back().first)) {
+          ++result.back().second;
+        } else {
+          result.emplace_back(it, 1);
+        }
+      }
+      return result;
+    }
+
+    /**
+     *  Chunks a range of values into adjacent sub ranges that belong to the same category.
+     */
+    template <class It, class ACategoryFunction>
+    std::vector<Range<It>> adjacent_groupby(It itBegin, It itEnd, const ACategoryFunction& catFunc)
+    {
+      std::vector<Range<It>> result;
       if (itBegin == itEnd) return result; // empty case
 
       It itFirstOfGroup = itBegin;
@@ -58,7 +130,7 @@ namespace Belle2 {
 
       for (It it = itBegin; it != itEnd; ++it) {
         auto cat = catFunc(*it);
-        if (catOfGroup != catFunc(*it)) {
+        if (catOfGroup != cat) {
           result.emplace_back(itFirstOfGroup, it);
           itFirstOfGroup = it;
           catOfGroup = cat;
@@ -68,49 +140,64 @@ namespace Belle2 {
       return result;
     }
 
-    /** Makes adjacent pairs from an input range,
+    /**
+     *  Makes adjacent pairs from an input range,
      *  invoking the map with two arguments and writes to the output iterator
      */
-    template<class AInputIterator, class AOutputIterator, class ABinaryOperation>
-    AOutputIterator transform_adjacent_pairs(AInputIterator first, AInputIterator last,
-                                             AOutputIterator result, const ABinaryOperation& map)
+    template <class AInputIterator, class AOutputIterator, class ABinaryOperation>
+    AOutputIterator transform_adjacent_pairs(AInputIterator itBegin,
+                                             AInputIterator itEnd,
+                                             AOutputIterator result,
+                                             const ABinaryOperation& map)
     {
-      if (first == last) return result;
+      if (itBegin == itEnd) return result;
 
-      AInputIterator second = first;
+      AInputIterator second = itBegin;
       ++second;
-      while (second != last) {
-        *result = map(*first, *second);
+      while (second != itEnd) {
+        *result = map(*itBegin, *second);
         ++result;
-        ++first;
+        ++itBegin;
         ++second;
       }
       return result;
     }
 
-    /** Makes adjacent triples from an input range,
+    /**
+     *  Makes adjacent triples from an input range,
      *  invoking the map with three arguments and writes to the output iterator
      */
-    template<class AInputIterator, class AOutputIterator, class ATrinaryOperation>
-    AOutputIterator transform_adjacent_triples(AInputIterator first, AInputIterator last,
-                                               AOutputIterator result, const ATrinaryOperation& map)
+    template <class AInputIterator, class AOutputIterator, class ATrinaryOperation>
+    AOutputIterator transform_adjacent_triples(AInputIterator itBegin,
+                                               AInputIterator itEnd,
+                                               AOutputIterator result,
+                                               const ATrinaryOperation& map)
     {
-      if (not(first != last)) return result;
+      if (not(itBegin != itEnd)) return result;
 
-      AInputIterator second{first};
+      AInputIterator second = itBegin;
       ++second;
-      if (not(second != last)) return result;
+      if (not(second != itEnd)) return result;
 
-      AInputIterator third{second};
+      AInputIterator third = second;
       ++third;
-      while (third != last) {
-        *result = map(*first, *second, *third);
+      while (third != itEnd) {
+        *result = map(*itBegin, *second, *third);
         ++result;
-        ++first;
+        ++itBegin;
         ++second;
         ++third;
       }
       return result;
     }
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+
+    /**
+     * Shortcut for applying the std::any_of function.
+     */
+    template <class Ts, class AUnaryPredicate>
+    bool any(const Ts& ts, const AUnaryPredicate& comparator)
+    {
+      return std::any_of(std::begin(ts), std::end(ts), comparator);
+    }
+  }
+}

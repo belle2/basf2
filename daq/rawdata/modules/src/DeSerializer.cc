@@ -200,7 +200,7 @@ void DeSerializerModule::openOutputFile()
 {
   if ((m_fp_dump = fopen(m_dump_fname.c_str(), "wb")) == NULL) {
     char err_buf[500];
-    sprintf(err_buf, "Failed to open file %s. Exiting...\n", m_dump_fname.c_str());
+    sprintf(err_buf, "[FATAL] Failed to open file %s. Exiting...\n", m_dump_fname.c_str());
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   }
@@ -210,7 +210,7 @@ void DeSerializerModule::dumpData(char* buf, int size)
 {
   if (fwrite(buf, size, 1, m_fp_dump) <= 0) {
     char err_buf[500];
-    sprintf(err_buf, "Failed to write buffer to a file. Exiting...\n");
+    sprintf(err_buf, "[FATAL] Failed to write buffer to a file. Exiting...\n");
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   }
@@ -257,7 +257,7 @@ int* DeSerializerModule::getNewBuffer(int nwords, int* delete_flag)
   } else {
     if ((temp_buf = getPreAllocBuf()) == 0x0) {
       char err_buf[500];
-      sprintf(err_buf, "Null pointer from GetPreALlocBuf(). Exting...\n");
+      sprintf(err_buf, "[FATAL] Null pointer from GetPreALlocBuf(). Exting...\n");
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(1);
@@ -279,7 +279,7 @@ int* DeSerializerModule::getPreAllocBuf()
   } else {
     char err_buf[500];
     sprintf(err_buf,
-            "No pre-allocated buffers are left. %d > %d. Not enough buffers are allocated or memory leak or forget to call ClearNumUsedBuf every event loop. Exting...",
+            "[FATAL] No pre-allocated buffers are left. %d > %d. Not enough buffers are allocated or memory leak or forget to call ClearNumUsedBuf every event loop. Exting...",
             m_num_usedbuf, NUM_PREALLOC_BUF);
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);
@@ -320,7 +320,7 @@ void DeSerializerModule::openRunPauseNshm()
   int fd = shm_open(path_shm, O_RDONLY, 0666);
   if (fd < 0) {
     printf("[DEBUG] %s\n", path_shm);
-    perror("[ERROR] shm_open2");
+    perror("[FATAL] failed to open shm");
     exit(1);
   }
   m_ptr = (int*)mmap(NULL, sizeof(int), PROT_READ, MAP_SHARED, fd, 0);

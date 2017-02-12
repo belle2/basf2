@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DetectorComponent name="MagneticField3dQuadBeamline" xmlns:xi="http://www.w3.org/2001/XInclude" isDefault="false">
+	<Description>The magnetic field description for the Belle II Detector</Description>
+	<Version>0</Version>
+        <Creator>GeoMagneticField</Creator>
+	<Content>
+		<!-- The components of the Belle II magnetic field -->		
+		<Components>
+			<!-- Quadruple solenoid magnetic field map
+			    This class represents a magnetic field map from quadrupole magnets QC[1/2]*.
+			    Only the field from QC[1/2]* inside beam pipes is described.
+			    Leak field inside the beam pipe from the quadruple magnet 
+			    on the other beam line is also included,
+			    however, leak field outside both beam pipe are not described.
+			    Therefore, we should turn on this field component only when we need 
+			    accurate propagation of beam particles, such as 
+			    Synchrotron radiation study, and spent e+e- tracking from Radiative Bhabha / 2-photon process. 
+			    Field strength are calculated from the magnet parameters (K0,K1,SK0,SK1,ROTATE,DX,DY) 
+			    used in accelerator simulation.
+			    These parameters are provided for each 1cm slice in the beam direction.
+			-->
+			<!-- based on sher_5753, sler_1682, irdata.class.SKEKB20121116A -->
+			<Component type="Quad">
+				<MapFilenameHER>geometry/QuadFieldMapHER.dat</MapFilenameHER>
+				<MapFilenameLER>geometry/QuadFieldMapLER.dat</MapFilenameLER>
+				<MapFilenameHERleak>geometry/QuadFieldMapHERleak.dat</MapFilenameHERleak>
+				<MapSizeHER>424</MapSizeHER>
+				<MapSizeLER>396</MapSizeLER>
+				<MapSizeHERleak>203</MapSizeHERleak>
+				<ApertFilenameHER>geometry/ApertHER.dat</ApertFilenameHER>
+				<ApertFilenameLER>geometry/ApertLER.dat</ApertFilenameLER>
+				<ApertSizeHER>22</ApertSizeHER>
+				<ApertSizeLER>26</ApertSizeLER>
+				<CircumferenceHER unit="m">3016.314517</CircumferenceHER>
+				<CircumferenceLER unit="m">3016.305585</CircumferenceLER>
+			</Component>
+			<!-- 3D magnetic field map near beam pipe
+			     The magnetic field map is stored as a grid in cylindrical coordinates.
+			     Magnetic field map in the region with 0.5<r<1.4 is bad.
+			     So region with r<0.5 are only used.
+			-->
+			<!-- based on version 20121005 from Yamaoka-san.-->
+			<Component type="Beamline">
+				<RadiusMin unit="cm">0.0</RadiusMin>
+				<RadiusMax unit="cm">0.5</RadiusMax>
+				<ZMin unit="cm">-399.9</ZMin>
+				<ZMax unit="cm">399.9</ZMax>
+				<BeamAngle unit="cm">0.0415</BeamAngle>
+				<MapFilenameHER>geometry/BeamlineFieldMap_r25_her.dat.gz</MapFilenameHER>
+				<MapFilenameLER>geometry/BeamlineFieldMap_r25_ler.dat.gz</MapFilenameLER>
+				<InterFilenameHER>geometry/BeamlineDelaunay_her.dat</InterFilenameHER>
+				<InterFilenameLER>geometry/BeamlineDelaunay_ler.dat</InterFilenameLER>
+			</Component>
+			<!-- 3d magnetic field map
+			     The magnetic field map is stored as a grid in r:phi:z:Br:Bphi:Bz.
+			     It is defined by a minimum radius and a maximum radius, a minimum z and
+			     a maximum z value, a pitch size in both, r, and z and the number of grid
+			     points. The ZOffset is used to account for the fact that the acceleration
+			     group defines 0 to be in the center of the detector, while the detector
+			     group defines the IP to be the center. This offset will shift the values
+                             from the magnetic field map file to fit inside the region given by the
+                             ZMin and ZMax values. The filename points to the zip file containing the
+                             magnetic field map.
+			-->
+                        <!-- Tracking volume (include TOP) with fine grid
+                             * r [m]    : [0.000, 1.200],   dr = 0.010    
+                             * phi [deg]: [0, 360],         dphi = 2      
+                             * z [m]    : [-1.000, 2.000],  dz = 0.010    
+                        -->
+			<!-- To avoid double-counting of solenoid field, 
+                             '3d' component returns zero value inside the region where 'Beamline' component is defined. -->
+                        <Component type="3d">
+                                <NumberGridPointsR>121</NumberGridPointsR>
+                                <GridPitchR unit="m">0.010</GridPitchR>
+                                <RadiusMin unit="m">0.000</RadiusMin>
+                                <RadiusMax unit="m">1.200</RadiusMax>
+                                <ExcludeRadiusMin unit="m">0.000</ExcludeRadiusMin>
+                                <ExcludeRadiusMax unit="m">0.000</ExcludeRadiusMax>
+                                <NumberGridPointsPhi>91</NumberGridPointsPhi>
+                                <GridPitchPhi unit="deg">2</GridPitchPhi>
+                                <NumberGridPointsZ>301</NumberGridPointsZ>
+                                <GridPitchZ unit="m">0.010</GridPitchZ>
+                                <ZMin unit="m">-1.000</ZMin>
+                                <ZMax unit="m">2.000</ZMax>
+                                <ExcludeZMin unit="m">0.000</ExcludeZMin>
+                                <ExcludeZMax unit="m">0.000</ExcludeZMax>
+                                <ZOffset unit="m">0.000</ZOffset>
+				<BiasRadiusMin unit="m">0.000</BiasRadiusMin>
+                                <BiasRadiusMax unit="m">0.000</BiasRadiusMax>
+				<BiasBr>1.000</BiasBr>
+				<BiasBphi>1.000</BiasBphi>
+				<BiasBz>1.000</BiasBz>
+                                <MirrorPhi>1</MirrorPhi>
+                                <enableInterpolation>1</enableInterpolation>
+                                <EnableCoordinate>rphiz</EnableCoordinate>
+                                <MapFilename>geometry/MagneticField3d_TrackingVolume-150302-01-05_cylindrical.dat.gz</MapFilename>
+                        </Component>
+			<!-- Total Belle2 detector volume with coarse grid, excluding tracking volume
+			     * r [m]    : [0.000, 4.200],   dr = 0.040
+			     * phi [deg]: [0, 360],         dphi = 2
+			     * z [m]    : [-3.280, 4.200],  dz = 0.040
+			-->
+			<Component type="3d">
+				<NumberGridPointsR>106</NumberGridPointsR>
+				<GridPitchR unit="m">0.040</GridPitchR>
+				<RadiusMin unit="m">0.000</RadiusMin>
+				<RadiusMax unit="m">4.200</RadiusMax>
+				<ExcludeRadiusMin unit="m">0.000</ExcludeRadiusMin>
+                                <ExcludeRadiusMax unit="m">1.200</ExcludeRadiusMax>
+				<NumberGridPointsPhi>91</NumberGridPointsPhi>
+                                <GridPitchPhi unit="deg">2</GridPitchPhi>
+				<NumberGridPointsZ>188</NumberGridPointsZ>
+				<GridPitchZ unit="m">0.040</GridPitchZ>
+				<ZMin unit="m">-3.280</ZMin>
+				<ZMax unit="m">4.200</ZMax>
+				<ExcludeZMin unit="m">-1.000</ExcludeZMin>
+                                <ExcludeZMax unit="m">2.000</ExcludeZMax>
+				<ZOffset unit="m">0.000</ZOffset>
+				<BiasRadiusMin unit="m">0.000</BiasRadiusMin>
+                                <BiasRadiusMax unit="m">0.000</BiasRadiusMax>
+				<BiasBr>1.000</BiasBr>
+				<BiasBphi>1.000</BiasBphi>
+                                <BiasBz>1.000</BiasBz>
+                                <MirrorPhi>1</MirrorPhi>
+                                <enableInterpolation>1</enableInterpolation>
+                                <EnableCoordinate>rphiz</EnableCoordinate>
+ 				<MapFilename>geometry/MagneticField3d_TotalVolume-150302-01-04_cylindrical.dat.gz</MapFilename>
+			</Component>
+		</Components>
+	</Content>
+</DetectorComponent>

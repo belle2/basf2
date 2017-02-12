@@ -9,35 +9,37 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facet/UnionRecordingFacetFilter.h>
 
-#include <tracking/trackFindingCDC/filters/facet/FacetVarSets.h>
+#include <tracking/trackFindingCDC/filters/facet/FitFacetVarSet.h>
+#include <tracking/trackFindingCDC/filters/facet/BendFacetVarSet.h>
+#include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
+#include <tracking/trackFindingCDC/filters/facet/BasicFacetVarSet.h>
 
-using namespace std;
+#include <tracking/trackFindingCDC/filters/facet/MVAFacetFilter.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
 
 std::vector<std::string> UnionRecordingFacetFilter::getValidVarSetNames() const
 {
   std::vector<std::string> varSetNames = Super::getValidVarSetNames();
-  varSetNames.insert(varSetNames.end(), {"basic", "fitless", "fit", "bend", "tmva", "truth"});
+  varSetNames.insert(varSetNames.end(), {"basic", "fitless", "bend", "fit", "mva"});
   return varSetNames;
 }
 
-std::unique_ptr<BaseVarSet<CDCFacet> >
+std::unique_ptr<BaseVarSet<const CDCFacet> >
 UnionRecordingFacetFilter::createVarSet(const std::string& name) const
 {
   if (name == "basic") {
-    return std::unique_ptr<BaseVarSet<CDCFacet> >(new BasicFacetVarSet());
+    return makeUnique<BasicFacetVarSet>();
   } else if (name == "fitless") {
-    return std::unique_ptr<BaseVarSet<CDCFacet> >(new FitlessFacetVarSet());
+    return makeUnique<FitlessFacetVarSet>();
   } else if (name == "bend") {
-    return std::unique_ptr<BaseVarSet<CDCFacet> >(new BendFacetVarSet());
+    return makeUnique<BendFacetVarSet>();
   } else if (name == "fit") {
-    return std::unique_ptr<BaseVarSet<CDCFacet> >(new FitFacetVarSet());
-  } else if (name == "tmva") {
-    return std::unique_ptr<BaseVarSet<CDCFacet> >(new TMVAFacetVarSet());
-  } else if (name == "truth") {
-    return std::unique_ptr<BaseVarSet<CDCFacet> >(new TruthFacetVarSet());
+    return makeUnique<FitFacetVarSet>();
+  } else if (name == "mva") {
+    MVAFacetFilter mvaFacetFilter;
+    return std::move(mvaFacetFilter).releaseVarSet();
   } else {
     return Super::createVarSet(name);
   }

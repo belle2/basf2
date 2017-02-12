@@ -28,7 +28,12 @@ class Cosmics(TrackingValidationRun):
     root_input_file = '../CosmicsSimNoBkg.root'
     components = None
     finder_module = 'TrackFinderCDCCosmics'
-    fit_geometry = None
+    tracking_coverage = {
+        'UsePXDHits': False,
+        'UseSVDHits': False,
+        'UseCDCHits': True,
+        'UseOnlyAxialCDCHits': False
+        }
     pulls = True
     contact = CONTACT
     output_file_name = VALIDATION_OUTPUT_FILE

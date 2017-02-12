@@ -68,13 +68,13 @@ class ReadOrGenerateEventsRun(MinimalRun):
             help='Name module or short name of the generator to be used.',
         )
 
-        simulation_argument_group = argument_parser.add_argument_group("Generator arguments")
+        simulation_argument_group = argument_parser.add_argument_group("Simulation arguments")
         simulation_argument_group.add_argument(
             '-b',
             '--bkg-file',
             dest='bkg_files',
+            nargs='+',
             default=self.bkg_files,
-            action='append',
             metavar='BACKGROUND_DIRECTORY',
             help='Path to folder of files or to a file containing the background to be used. ' +
                  'Can be given multiple times.',
@@ -91,6 +91,18 @@ class ReadOrGenerateEventsRun(MinimalRun):
     def create_path(self):
         path = super().create_path()
 
+        # Gearbox & Geometry must always be registered
+        path.add_module("Gearbox")
+        path.add_module("Geometry")
+        if self.detector_setup:
+            detector_setup = self.detector_setup
+            detector_setup_function = detector_setups_by_short_name[detector_setup]
+            components = detector_setup_function(path)
+
+        if self.components:
+            adjustments.adjust_module(path, "Geometry", components=self.components)
+            components = self.components
+
         # Only generate events if no input file has been provided
         if self.root_input_file is None:
             # Check if generator means a decay file
@@ -103,18 +115,6 @@ class ReadOrGenerateEventsRun(MinimalRun):
                                       self.generator_module,
                                       generators_by_short_name,
                                       allow_function_import=True)
-
-        # Gearbox & Geometry must always be registered
-        path.add_module("Gearbox")
-        path.add_module("Geometry")
-        if self.detector_setup:
-            detector_setup = self.detector_setup
-            detector_setup_function = detector_setups_by_short_name[detector_setup]
-            components = detector_setup_function(path)
-
-        if self.components:
-            adjustments.adjust_module(path, "Geometry", components=self.components)
-            components = self.components
 
         # Only simulate if generator is setup
         if self.root_input_file is None:
@@ -163,6 +163,18 @@ def add_single_gun_generator(path):
                     momentumParams=[0.6, 1.4],
                     thetaGeneration='uniform',
                     thetaParams=[17., 150.])
+
+
+def add_transverse_gun_generator(path):
+    """Add ParticleGun to illuminate a region of the phase space with low efficiency"""
+    path.add_module("ParticleGun",
+                    pdgCodes=[muon_pdg_code, -muon_pdg_code],
+                    nTracks=1,
+                    varyNTracks=False,
+                    momentumGeneration='inversePt',
+                    momentumParams=[0.275, 0.276],
+                    thetaGeneration='uniform',
+                    thetaParams=[89., 91.])
 
 
 def add_simple_gun_generator(path):
@@ -223,27 +235,6 @@ def add_cosmics_generator(path):
     path.add_module("Cosmics")
 
 
-def add_cosmics_tb_generator(path):
-    """Add simple cosmics generator resembling the test beam setup"""
-    path.add_module("Cosmics",
-                    ipRequirement=1,
-                    ipdr=5,
-                    ipdz=15,
-                    )
-
-    # Use point trigger
-    tof_mode = 1
-    cosmics_selector = path.add_module('CDCCosmicSelector',
-                                       xOfCounter=0.0,
-                                       yOfCounter=0.0,
-                                       zOfCounter=0.0,
-                                       TOF=tof_mode,
-                                       cryGenerator=False,
-                                       )
-
-    cosmics_selector.if_false(basf2.create_path())
-
-
 def add_sector_tb_generator(path, sector=1):
     phiBounds = (240 + 60.0 * sector % 360.0, 300 + 60.0 * sector % 360.0)
     path.add_module("ParticleGun",
@@ -258,6 +249,31 @@ def add_sector_tb_generator(path, sector=1):
                     thetaParams=[70., 110.])
 
 
+def add_cosmics_tb_generator(path):
+    """Add simple cosmics generator resembling the test beam setup"""
+    path.add_module("Cosmics",
+                    ipRequirement=1,
+                    ipdr=5,
+                    ipdz=15,
+                    )
+
+    # Use point trigger
+    tof_mode = 1
+    # Do not add time of propagation in the scintilator
+    top_mode = False
+
+    cosmics_selector = path.add_module('CDCCosmicSelector',
+                                       xOfCounter=0.0,
+                                       yOfCounter=0.0,
+                                       zOfCounter=0.0,
+                                       TOF=tof_mode,
+                                       TOP=top_mode,
+                                       cryGenerator=False,
+                                       )
+
+    cosmics_selector.if_false(basf2.create_path())
+
+
 def add_cry_tb_generator(path):
     """Add cry generator resembling the test beam setup"""
     from ROOT import Belle2
@@ -266,15 +282,15 @@ def add_cry_tb_generator(path):
                     CosmicDataDir=Belle2.FileSystem.findFile('data/generators/modules/cryinput/'),
                     SetupFile=Belle2.FileSystem.findFile('data/tracking/muon_cry.setup'),
                     # acceptance half-lengths - at least one particle has to enter that box to use that event
-                    acceptLength=0.5,
-                    acceptWidth=0.5,
-                    acceptHeight=0.5,
+                    acceptLength=0.7,
+                    acceptWidth=0.3,
+                    acceptHeight=0.3,
                     maxTrials=10000,
 
                     # keep half-lengths - all particles that do not enter the box are removed (keep box >= accept box)
-                    keepLength=0.5,
-                    keepWidth=0.5,
-                    keepHeight=0.5,
+                    keepLength=0.7,
+                    keepWidth=0.3,
+                    keepHeight=0.3,
 
                     # minimal kinetic energy - all particles below that energy are ignored
                     kineticEnergyThreshold=0.01,
@@ -282,13 +298,17 @@ def add_cry_tb_generator(path):
 
     # Use plane trigger
     tof_mode = 2
+    # Add time of propagation in the scintilator
+    top_mode = True
+
     cosmics_selector = path.add_module('CDCCosmicSelector',
-                                       lOfCounter=30.,
+                                       lOfCounter=100.,
                                        wOfCounter=10.,
                                        xOfCounter=0.0,
                                        yOfCounter=0.0,
                                        zOfCounter=0.0,
                                        TOF=tof_mode,
+                                       TOP=top_mode,
                                        cryGenerator=True,
                                        )
 
@@ -304,6 +324,7 @@ def add_no_generator(path):
 # None as a special value for background only simulation
 generators_by_short_name = {
     'single_gun': add_single_gun_generator,
+    'transverse_gun': add_transverse_gun_generator,
     'simple_gun': add_simple_gun_generator,
     'low_gun': add_low_gun_generator,
     'forward_gun': add_forward_gun_generator,

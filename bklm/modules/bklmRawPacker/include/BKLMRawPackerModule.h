@@ -57,6 +57,9 @@ namespace Belle2 {
     //! use default elect id, if not found in mapping file
     bool m_useDefaultElectId = true;
 
+    //! use electronic map from DataBase or not
+    bool m_loadMapFromDB = false;
+
     //! # of events in a run
     int max_nevt;
 
@@ -79,7 +82,7 @@ namespace Belle2 {
     StoreArray<RawKLM> rawklmarray;
 
     //! to map logical coordinates to hardware coordinates
-    map<int, int> m_ModuleIdToelectId;
+    std::map<int, int> m_ModuleIdToelectId;
 
     //! format the data
     //! @param[in] channel rpc channel
@@ -103,10 +106,13 @@ namespace Belle2 {
     //! fill m_ModuleIdToelectId from xml file
     void loadMap();
 
+    //! fill m_ModuleIdToelectId from data base
+    void loadMapFromDB();
+
     //! To be used to map module id to electronics address
     //! @param copperId id of the copper board
     //! @param finesse is the Finesse slot on the copper boards
-    void intToElectCoo(int id, int& copper, int& finesse, int& lane);
+    void intToElectCoo(int id, int& copper, int& finesse, int& lane, int& plane);
 
     //! TO be used to map electronics address to module id
     int electCooToInt(int copper, int finesse, int lane, int axis);

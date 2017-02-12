@@ -78,13 +78,17 @@ namespace Belle2 {
       /// Constructor taking three oriented wire hits.
       CDCRLWireHitTriple(const CDCRLWireHit& startRLWireHit,
                          const CDCRLWireHit& middleRLWireHit,
-                         const CDCRLWireHit& endRLWireHit);
+                         const CDCRLWireHit& endRLWireHit,
+                         int iCluster = 0);
 
       /// Constructs the reverse tiple from this one.
       CDCRLWireHitTriple reversed() const;
 
       /// Reverses the triple inplace.
       void reverse();
+
+      /// Returns the aliased version of this oriented wire hit triple
+      CDCRLWireHitTriple getAlias() const;
 
       /// Equality comparision considering all three oriented wire hits.
       bool operator==(const CDCRLWireHitTriple& other) const
@@ -140,14 +144,6 @@ namespace Belle2 {
                 " with rl " << static_cast<int>(rlWireHitTriple.getEndRLInfo()));
       }
 
-      /// Access the object methods and methods from a pointer in the same way.
-      /** In situations where the type is not known to be a pointer or a reference there is no way to tell \n
-       *  if one should use the dot '.' or operator '->' for method look up. \n
-       *  So this function defines the -> operator for the object. \n
-       *  No matter you have a pointer or an object access is given with '->'.*/
-      const CDCRLWireHitTriple* operator->() const
-      { return this; }
-
       /// Getter for the shape of this tiple if all three oriented wire hits are neighbors. Else ILLSHAPE
       Shape getShape() const;
 
@@ -177,7 +173,7 @@ namespace Belle2 {
 
       /// Indicator if any of the three oriented wire hits is based on the given wire.
       bool hasWire(const CDCWire& wire) const
-      { return getStartRLWireHit()->isOnWire(wire) or getRearRLWireHitPair()->hasWire(wire); }
+      { return getStartRLWireHit().isOnWire(wire) or getRearRLWireHitPair().hasWire(wire); }
 
       /// Getter for the right left passage information of the first oriented wire hit.
       ERightLeft getStartRLInfo() const
@@ -205,7 +201,7 @@ namespace Belle2 {
 
       /// Indicator if any of the three oriented wire hits is based on the given wire hit.
       bool hasWireHit(const CDCWireHit& wirehit) const
-      { return getStartWireHit() == wirehit or getRearRLWireHitPair()->hasWireHit(wirehit); }
+      { return getStartWireHit() == wirehit or getRearRLWireHitPair().hasWireHit(wirehit); }
 
       /// Getter for the first oriented wire hit.
       CDCRLWireHit& getStartRLWireHit()
@@ -278,6 +274,6 @@ namespace Belle2 {
       /// Memory for the second and third wire hits.
       CDCRLWireHitPair m_rearRLWireHitPair;
 
-    }; //end class CDCRLWireHitTriple
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

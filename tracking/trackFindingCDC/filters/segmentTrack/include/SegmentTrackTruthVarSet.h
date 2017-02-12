@@ -12,51 +12,60 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
+
+#include <utility>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
     class CDCTrack;
 
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
-    static char const* const segmentTrackTruthNames[5] = {
+    static char const* const segmentTrackTruthVarNames[] = {
       "belongs_to_same_track_truth",
       "segment_is_fake_truth",
       "segment_purity_truth",
       "track_purity_truth",
-      "truth"
+      "truth",
     };
 
-    /** Class that specifies the names of the variables
-     *  that should be generated from a wire hits cluster.
-     */
-    class SegmentTrackTruthVarNames : public VarNames<std::pair<const CDCRecoSegment2D*, const CDCTrack*>> {
+    /// Vehicle class to transport the variable names
+    struct SegmentTrackTruthVarNames : public VarNames<std::pair<const CDCTrack*, const CDCSegment2D*>> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = 5;
+      /// Number of variables to be generated
+      static const size_t nVars = size(segmentTrackTruthVarNames);
 
-      /// Get the name of the corresponding column.
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
-        return segmentTrackTruthNames[iName];
+        return segmentTrackTruthVarNames[iName];
       }
     };
 
-    /** Class that computes floating point variables from a wire hit clusters.
-     *  that can be forwarded to a flat TNTuple or a TMVA method
+    /**
+     *  Class to compute floating point variables from a segment to track match
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class SegmentTrackTruthVarSet : public VarSet<SegmentTrackTruthVarNames> {
 
     public:
-      /// Construct the peeler.
-      explicit SegmentTrackTruthVarSet() : VarSet<SegmentTrackTruthVarNames>() { }
+      /// Generate and assign the contained variables
+      bool extract(const std::pair<const CDCTrack*, const CDCSegment2D*>* testPair) final;
 
-      /// Generate and assign the variables from the cluster
-      virtual bool extract(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>* testPair) override final;
 
+      void initialize() override
+      {
+        CDCMCManager::getInstance().requireTruthInformation();
+        VarSet<SegmentTrackTruthVarNames>::initialize();
+      }
+
+      void beginEvent() override
+      {
+        CDCMCManager::getInstance().fill();
+        VarSet<SegmentTrackTruthVarNames>::beginEvent();
+      }
     };
   }
 }

@@ -9,10 +9,10 @@
  **************************************************************************/
 
 /*
-This file contains test to check the behaviour of the c++ programming language.
-Its purpose is mainly to asure the programmer that his assumptions about run time behaviour are correct.
-*/
-
+ * This file contains test to check the behaviour of the c++ programming language.
+ * Its purpose is mainly to asure the programmer that his assumptions about run time behaviour are
+ * correct.
+ */
 
 #include <cmath>
 #include <gtest/gtest.h>
@@ -21,16 +21,12 @@ Its purpose is mainly to asure the programmer that his assumptions about run tim
 #include <map>
 #include <vector>
 
-
-using namespace std;
-
 TEST(TrackFindingCDCTest, cpp_float)
 {
   EXPECT_TRUE(std::signbit(-0.0));
   EXPECT_FALSE(std::signbit(0.0));
   EXPECT_FALSE(std::signbit(NAN));
 }
-
 
 TEST(TrackFindingCDCTest, cpp_max)
 {
@@ -42,9 +38,15 @@ TEST(TrackFindingCDCTest, cpp_max)
 
   double maximum2 = std::max(value, NAN);
   EXPECT_EQ(value, maximum2);
-
 }
 
+TEST(TrackFindingCDCTest, cpp_array_init)
+{
+  float values[10] = {};
+  for (int i = 0; i < 10; ++i) {
+    EXPECT_EQ(0, values[i]);
+  }
+}
 
 TEST(TrackFindingCDCTest, cpp_char_is_signed)
 {
@@ -56,7 +58,9 @@ TEST(TrackFindingCDCTest, cpp_stringstream_copy)
 {
   // Howto copy a string stream even if its constant.
   std::stringstream filled_non_const;
-  filled_non_const << "filled " << "with " << "stuff.";
+  filled_non_const << "filled "
+                   << "with "
+                   << "stuff.";
 
   const std::stringstream& filled = filled_non_const;
 
@@ -70,15 +74,13 @@ TEST(TrackFindingCDCTest, cpp_stringstream_copy)
 
   EXPECT_EQ(filled.str(), copy1.str());
   EXPECT_EQ(filled.str(), copy2.str());
-
 }
-
 
 TEST(TrackFindingCDCTest, cpp_map_insert)
 {
-  std::map<int, int> defaults {{ 1, 1}, {2, 2}};
+  std::map<int, int> defaults{{1, 1}, {2, 2}};
 
-  std::map<int, int> concret {{ 1, 10}};
+  std::map<int, int> concret{{1, 10}};
 
   concret.insert(defaults.begin(), defaults.end());
 
@@ -87,9 +89,7 @@ TEST(TrackFindingCDCTest, cpp_map_insert)
 
   // Inserts new value.
   EXPECT_EQ(2, concret[2]);
-
 }
-
 
 TEST(TrackFindingCDCTest, cpp_remainder)
 {
@@ -108,5 +108,4 @@ TEST(TrackFindingCDCTest, cpp_remainder)
 
     EXPECT_FLOAT_EQ(1.0 / 2.0, reduced_value);
   }
-
 }

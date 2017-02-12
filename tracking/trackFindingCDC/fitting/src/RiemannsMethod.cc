@@ -13,26 +13,16 @@
 #include <Eigen/Dense>
 
 
-using namespace std;
 using namespace Belle2;
 using namespace Eigen;
 
 using namespace TrackFindingCDC;
 
-
-RiemannsMethod::RiemannsMethod() :
-  m_lineConstrained(false),
-  m_originConstrained(false)
+RiemannsMethod::RiemannsMethod()
+  : m_lineConstrained(false)
+  , m_originConstrained(false)
 {
 }
-
-
-
-RiemannsMethod::~RiemannsMethod()
-{
-}
-
-
 
 void RiemannsMethod::update(CDCTrajectory2D& trajectory2D,
                             CDCObservations2D& observations2D) const
@@ -226,7 +216,4 @@ void RiemannsMethod::updateWithDriftLength(CDCTrajectory2D& trajectory2D, CDCObs
     trajectory2D.setGlobalCircle(PerigeeCircle::fromN(parameters(0), parameters(1), parameters(2), parameters(3)));
 
   }
-
 }
-
-

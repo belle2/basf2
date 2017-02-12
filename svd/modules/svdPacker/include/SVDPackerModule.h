@@ -69,11 +69,12 @@ namespace Belle2 {
       //SVDStripNoiseMap* m_noiseMap;
       std::unordered_map<unsigned short, unsigned short> fadcNumbers;
       short iCRC;
-      vector<uint32_t> data_words;
+      std::vector<uint32_t> data_words;
       uint32_t crc16Input[1000];
 
       //adds data32 to data vector and to crc16Input for further crc16 calculation
-      void inline addData32(uint32_t data32) {
+      void inline addData32(uint32_t data32)
+      {
         data_words.push_back(data32);
         crc16Input[iCRC] = data32;
         iCRC++;

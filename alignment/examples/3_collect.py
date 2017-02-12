@@ -31,18 +31,17 @@ set_random_seed(100)
 
 main = create_path()
 
-main.add_module('RootInput', excludeBranchNames=['GF2TracksToMCParticles', 'TrackCandsToGF2Tracks', 'GF2Tracks'])
+main.add_module('RootInput')
 main.add_module('Gearbox')
 
 if magnet:
     print('Using magnetic field')
-    main.add_module('Geometry', components=['BeamPipe', 'MagneticFieldConstant4LimitedRCDC', 'PXD', 'SVD'])
+    main.add_module('Geometry', components=['BeamPipe', 'MagneticFieldConstant4LimitedRCDC', 'PXD', 'SVD', 'CDC'])
 else:
     print('Using NO magnetic field')
-    main.add_module('Geometry', components=['BeamPipe', 'PXD', 'SVD'])
+    main.add_module('Geometry', components=['BeamPipe', 'PXD', 'SVD', 'CDC'])
 
 main.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
-main.add_module('GBLfit')
 main.add_module('MillepedeCollector')
 main.add_module('RootOutput', branchNames=['EventMetaData'])
 main.add_module('Progress')

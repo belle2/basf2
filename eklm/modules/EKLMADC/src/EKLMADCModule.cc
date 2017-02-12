@@ -40,26 +40,27 @@ void EKLMADCModule::generateHistogram(const char* name, double l, double d,
                                       int npe)
 {
   int j;
-  int gnpe;
   double t, s;
-  EKLM::FiberAndElectronics fe(&m_digPar, NULL);
+  EKLM::FiberAndElectronics fe(&(*m_DigPar), NULL, 0, false);
   TH1F* h = NULL;
-  t = m_digPar.nDigitizations * m_digPar.ADCSamplingTime;
+  t = m_DigPar->getNDigitizations() * m_DigPar->getADCSamplingTime();
   try {
-    h = new TH1F(name, "", m_digPar.nDigitizations, 0, t);
+    h = new TH1F(name, "", m_DigPar->getNDigitizations(), 0, t);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  for (j = 0; j < m_digPar.nDigitizations; j++) {
+  for (j = 0; j < m_DigPar->getNDigitizations(); j++) {
     m_hDir[j] = 0;
     m_hRef[j] = 0;
   }
-  fe.fillSiPMOutput(l, d, npe, 0, false, m_hDir, &gnpe);
-  fe.fillSiPMOutput(l, d, npe, 0, true, m_hRef, &gnpe);
+  fe.generatePhotoelectrons(l, d, npe, 0, false);
+  fe.generatePhotoelectrons(l, d, npe, 0, true);
+  fe.fillSiPMOutput(m_hDir, true, false);
+  fe.fillSiPMOutput(m_hRef, false, true);
   s = 0;
-  for (j = 0; j < m_digPar.nDigitizations; j++)
+  for (j = 0; j < m_DigPar->getNDigitizations(); j++)
     s = s + m_hDir[j] + m_hRef[j];
-  for (j = 1; j <= m_digPar.nDigitizations; j++)
+  for (j = 1; j <= m_DigPar->getNDigitizations(); j++)
     h->SetBinContent(j, (m_hDir[j - 1] + m_hRef[j - 1]) / s);
   h->Write();
   delete h;
@@ -70,18 +71,18 @@ void EKLMADCModule::initialize()
   char str[32];
   int i;
   double l;
-  EKLM::setDefDigitizationParams(&m_digPar);
+  if (!m_DigPar.isValid())
+    B2FATAL("EKLM digitization parameters are not available.");
   const EKLM::GeometryData* geoDat = &EKLM::GeometryData::Instance();
-  m_digPar.debug = false;
   try {
     m_fout = new TFile(m_out.c_str(), "recreate");
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  m_hDir = (float*)malloc(m_digPar.nDigitizations * sizeof(float));
+  m_hDir = (float*)malloc(m_DigPar->getNDigitizations() * sizeof(float));
   if (m_hDir == NULL)
     B2FATAL(MemErr);
-  m_hRef = (float*)malloc(m_digPar.nDigitizations * sizeof(float));
+  m_hRef = (float*)malloc(m_DigPar->getNDigitizations() * sizeof(float));
   if (m_hRef == NULL)
     B2FATAL(MemErr);
   if (m_mode.compare("Strips") == 0) {
@@ -93,7 +94,7 @@ void EKLMADCModule::initialize()
       generateHistogram(str, l, l, 10000);
     }
   } else if (m_mode.compare("Shape") == 0) {
-    m_digPar.mirrorReflectiveIndex = 0;
+    m_DigPar->setMirrorReflectiveIndex(0);
     generateHistogram("FitShape", 0, 0, 1000000);
   } else
     B2FATAL("Unknown operation mode.");

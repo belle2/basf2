@@ -153,6 +153,15 @@ namespace Belle2 {
       }
 
       /**
+       * Returns true if given element is stored in the property tree
+       * @param identifier of the stored element
+       */
+      bool containsElement(const std::string& identifier) const
+      {
+        return m_pt.count(identifier) > 0;
+      }
+
+      /**
        * Returns a stored element from the xml tree
        * @param identifier of the stored element
        */
@@ -263,6 +272,11 @@ namespace Belle2 {
        * set temporary directory which is used to store temporary directories
        */
       void setTemporaryDirectory(const std::string& temporary_directory) { m_temporary_directory = temporary_directory; }
+
+      /**
+       * Get xml tree
+       */
+      const boost::property_tree::ptree& getXMLTree() const { return m_pt; };
 
     private:
       boost::property_tree::ptree m_pt; /**< xml tree containing all the saved information of this weightfile */

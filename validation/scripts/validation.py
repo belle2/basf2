@@ -33,10 +33,18 @@ pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 from validationscript import Script, ScriptStatus
 from validationfunctions import get_start_time, get_validation_folders, scripts_in_dir, \
     find_creator, parse_cmd_line_arguments
+import validationfunctions
 
 import validationserver
 import validationplots
 import validationscript
+import validationpath
+
+# local and cluster control backends
+import localcontrol
+import clustercontrol
+import clustercontrolsge
+import clustercontroldrmaa
 
 
 def statistics_plots(
@@ -384,17 +392,18 @@ class Validation:
         # directory. Default is 'current'.
         self.tag = tag
 
+        # This dictionary holds the paths to the local and central release dir
+        # (or 'None' if one of them does not exist)
+        self.basepaths = validationpath.get_basepath()
+
+        # Folder used for the intermediate and final results of the validation
+        self.work_folder = os.path.abspath(os.getcwd())
+
         # The logging-object for the validation (Instance of the logging-
         # module). Initialize the log as 'None' and then call the method
         # 'create_log()' to create the actual log.
         self.log = None
         self.create_log()
-
-        # This dictionary holds the paths to the local and central release dir
-        # (or 'None' if one of them does not exist)
-        self.basepaths = {'local': os.environ.get('BELLE2_LOCAL_DIR', None),
-                          'central': os.environ.get('BELLE2_RELEASE_DIR',
-                                                    None)}
 
         # The list which holds all steering file objects
         # (as instances of class Script)
@@ -431,6 +440,41 @@ class Validation:
 
         # If this is set, dependencies will be ignored.
         self.ignore_dependencies = False
+
+        #: reporting time (in minutes)
+        # the time in minutes when there will be there first logoutput if a script
+        # is still not complete
+        # This prints every 30 minutes which scripts are still running
+        self.running_script_reporting_interval = 30
+
+        # The maximum time before a script is skipped, if it does not terminate
+        # The curren limit is 10h
+        self.script_max_runtime_in_minutes = 720
+
+    def get_useable_basepath(self):
+        """
+        Checks if a local path is available. If only a central release is available, return the path
+        to this central release
+        """
+        if self.basepaths["local"]:
+            return self.basepaths["local"]
+        else:
+            return self.basepaths["central"]
+
+    @staticmethod
+    def get_available_job_control():
+        """
+        insert the possible backend controls, they will be checed via their
+        is_supported method if they actually can be executed in the current environment
+        """
+        return [localcontrol.Local,
+                clustercontrol.Cluster,
+                clustercontrolsge.Cluster,
+                clustercontroldrmaa.Cluster]
+
+    @staticmethod
+    def get_available_job_control_names():
+        return [c.name() for c in Validation.get_available_job_control()]
 
     def build_dependencies(self):
         """!
@@ -528,13 +572,16 @@ class Validation:
         # information available for debugging later.
 
         # Make sure the folder for the log file exists
-        log_dir = './results/{0}/__general__/'.format(self.tag)
+        log_dir = validationpath.get_results_tag_general_folder(self.work_folder, self.tag)
         if not os.path.exists(log_dir):
+            print("Creating " + log_dir)
             os.makedirs(log_dir)
 
         # Define the handler and its level (=DEBUG to get everything)
-        file_handler = logging.FileHandler(log_dir + 'validate_basf2.log',
-                                           'w+')
+        file_handler = logging.FileHandler(
+            os.path.join(
+                validationpath.get_results_tag_general_folder(self.work_folder,
+                                                              self.tag), 'validate_basf2.log'), 'w+')
         file_handler.setLevel(logging.DEBUG)
 
         # Format the handler. We want the datetime, the module that produced
@@ -589,16 +636,21 @@ class Validation:
         # Thats it, now there is a complete list of all steering files on
         # which we are going to perform the validation in self.list_of_scripts
 
+    def get_log_folder(self):
+        """!
+        Get the log folder for this validation run. The command log files (successful, failed)
+        scripts will be recorded there
+        """
+        return validationpath.get_results_tag_folder(self.work_folder, self.tag)
+
     def log_failed(self):
         """!
         This method logs all scripts with property failed into a single file
         to be read in run_validation_server.py
         """
-        # Folder, where we have the log
-        flder = "./results/{0}/__general__/".format(self.tag)
 
         # Open the log for writing
-        list_failed = open(flder + "list_of_failed_scripts.log", "w+")
+        list_failed = open(os.path.join(self.get_log_folder(), "list_of_failed_scripts.log"), "w+")
 
         # Select only failed scripts
         list_of_failed_scripts = [script for script in self.list_of_scripts if
@@ -615,11 +667,9 @@ class Validation:
         This method logs all scripts with property skipped into a single file
         to be read in run_validation_server.py
         """
-        # Folder, where we have the log
-        flder = "./results/{0}/__general__/".format(self.tag)
 
         # Open the log for writing
-        list_skipped = open(flder + "list_of_skipped_scripts.log", "w+")
+        list_skipped = open(os.path.join(self.get_log_folder(), "list_of_skipped_scripts.log"), "w+")
 
         # Select only failed scripts
         list_of_skipped_scripts = [script for script in self.list_of_scripts if
@@ -639,7 +689,7 @@ class Validation:
         run_times = {}
 
         # Open the data
-        runtimes = open("./runtimes.dat", "r")
+        runtimes = open(validationpath.get_results_runtime_file(self.work_folder), "r")
 
         # Get our data
         for line in runtimes:
@@ -734,8 +784,7 @@ class Validation:
     def apply_script_caching(self):
         cacheable_scripts = [s for s in self.list_of_scripts if s.is_cacheable()]
 
-        output_dir_datafiles = os.path.abspath('./results/{0}/'.
-                                               format(self.tag))
+        output_dir_datafiles = validationpath.get_results_tag_folder(self.work_folder, self.tag)
 
         for s in cacheable_scripts:
             # for for all output files
@@ -758,8 +807,9 @@ class Validation:
                 if dep_script.status == ScriptStatus.cached:
                     script.dependencies.remove(dep_script)
 
-    def store_run_results_json(self):
+    def store_run_results_json(self, git_hash):
 
+        # retrieve the git hash which was used for executing this validation scripts
         json_package = []
         for p in self.list_of_packages:
             this_package_scrits = [s for s in self.list_of_scripts if s.package == p]
@@ -770,9 +820,12 @@ class Validation:
             json_package.append(json_objects.Package(p, scriptfiles=json_scripts, fail_count=fail_count))
 
         # todo: assign correct color here
-        rev = json_objects.Revision(self.tag, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), packages=json_package)
-        results_file = "./results/{}/revision.json".format(self.tag)
-        json_objects.dump(results_file, rev)
+        rev = json_objects.Revision(label=self.tag,
+                                    creation_date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                                    creation_timezone=validationfunctions.get_timezone(),
+                                    packages=json_package,
+                                    git_hash=git_hash)
+        json_objects.dump(validationpath.get_results_tag_revision_file(self.work_folder, self.tag), rev)
 
     def add_script(self, script):
         """!
@@ -804,11 +857,26 @@ class Validation:
 
         # Depending on the selected mode, load either the controls for the
         # cluster or for local multi-processing
-        if self.mode == 'cluster':
-            import clustercontrol
-            control = clustercontrol.Cluster()
-        else:
-            control = local_control
+
+        selected_control = [(c.name(), c.description(), c) for c in self.get_available_job_control() if c.name() == self.mode]
+
+        if not len(selected_control) == 1:
+            print("Selected mode {} does not exist".format(self.mode))
+            sys.exit(1)
+
+        self.log.note(selected_control[0][1])
+        if not selected_control[0][2].is_supported():
+            print("Selected mode {} is not supported on your system".format(self.mode))
+            sys.exit(1)
+
+        # instantiate the selected job control backend
+        control = selected_control[0][2]()
+
+        # read the git hash which is used to produce this validation
+        src_basepath = self.get_useable_basepath()
+        git_hash = validationfunctions.get_compact_git_hash(src_basepath)
+        self.log.note("Git hash of repository located at {} is {}".format(src_basepath,
+                                                                          git_hash))
 
         # If we do have runtime data, then read them
         if os.path.exists("./runtimes.dat") and os.stat("./runtimes.dat").st_size:
@@ -816,13 +884,13 @@ class Validation:
             if os.path.exists("./runtimes-old.dat"):
                 # If there is an old data backup, delete it, we backup only one run
                 os.remove("./runtimes-old.dat")
-            if not self.mode == "cluster":
+            if self.mode == "local":
                 # Backup the old data file
                 shutil.copyfile("./runtimes.dat", "./runtimes-old.dat")
 
         # Open runtimes log and start logging, but log only if we are
         # running in the local mode
-        if not self.mode == "cluster":
+        if self.mode == "local":
             runtimes = open('./runtimes.dat', 'w+')
 
         if not self.quiet:
@@ -859,7 +927,7 @@ class Validation:
 
                         # If we are running locally, log a runtime
                         script_object.runtime = time.time() - script_object.start_time
-                        if not self.mode == "cluster":
+                        if self.mode == "local":
                             runtimes.write(script_object.name + "=" + str(script_object.runtime) + "\n")
 
                         # Check for the return code and set variables
@@ -894,6 +962,29 @@ class Validation:
                                 len(waiting), len(running),
                                 script_object.path,
                                 script_object.status))
+                    else:
+
+                        if (time.time() - script_object.last_report_time) / 60.0 > self.running_script_reporting_interval:
+                            print(
+                                "Script {} running since {} seconds".format(
+                                    script_object.name_not_sanitized,
+                                    time.time() - script_object.start_time))
+                            # explicit flush so this will show up in log file right away
+                            sys.stdout.flush()
+
+                            # not finished yet, log time
+                            script_object.last_report_time = time.time()
+
+                        # check for the maximum time a script is allow to run and terminate if exceeded
+                        total_runtime_in_minutes = (time.time() - script_object.start_time) / 60.0
+                        if total_runtime_in_minutes > self.script_max_runtime_in_minutes:
+                            script_object.status = ScriptStatus.failed
+                            self.log.warning('Script {0} did not finish after {1} minutes, skipping '
+                                             .format(script_object.path, total_runtime_in_minutes))
+                            # kill the running process
+                            script_object.control.terminate(script_object)
+                            # Skip all dependent scripts
+                            self.skip_script(script_object)
 
                 # Otherwise (the script is waiting) and if it is ready to be
                 # executed
@@ -924,8 +1015,10 @@ class Validation:
                         script_object.control.execute(script_object,
                                                       self.basf2_options,
                                                       self.dry, self.tag)
+
                         # Log the script execution start time
                         script_object.start_time = time.time()
+                        script_object.last_report_time = time.time()
 
                         # Some printout in quiet mode
                         if self.quiet:
@@ -956,11 +1049,11 @@ class Validation:
         self.log_skipped()
 
         # And close the runtime data file
-        if not self.mode == "cluster":
+        if self.mode == "local":
             runtimes.close()
         print()
 
-        self.store_run_results_json()
+        self.store_run_results_json(git_hash)
         # todo: update list of available revisions with the current run
 
     def create_plots(self):
@@ -973,21 +1066,24 @@ class Validation:
         # Go to the html directory and create a link to the results folder
         # if it is not yet existing
         save_dir = os.getcwd()
-        if not os.path.exists('html'):
-            os.mkdir('html')
+        if not os.path.exists(validationpath.folder_name_html):
+            os.mkdir(validationpath.folder_name_html)
 
-        os.chdir('html')
-        if not os.path.exists('results'):
-            os.symlink('../results', 'results')
+        if not os.path.exists(validationpath.folder_name_results):
+            self.log.error("Folder {} not found in the current directory {}, please run validate_basf2 first".format(
+                           validationpath.folder_name_results,
+                           save_dir))
+
+        os.chdir(validationpath.folder_name_html)
 
         # import and run plot function
-        validationplots.create_plots(force=True)
+        validationplots.create_plots(force=True, work_folder=self.work_folder)
 
         # restore original working directory
         os.chdir(save_dir)
 
 
-def execute():
+def execute(tag=None, isTest=None):
     """!
     Parses the comnmand line and executes the full validation suite
     """
@@ -1002,7 +1098,15 @@ def execute():
 
         # Now we process the command line arguments.
         # First of all, we read them in:
-        cmd_arguments = parse_cmd_line_arguments()
+        cmd_arguments = parse_cmd_line_arguments(tag=tag, isTest=isTest,
+                                                 modes=Validation.get_available_job_control_names())
+
+        # overwrite with default settings with parameters give in method
+        # call
+        if tag is not None:
+            cmd_arguments.tag = tag
+        if isTest is not None:
+            cmd_arguments.test = isTest
 
         # Create the validation object. 'validation' holds all global variables
         # and provides the logger!
@@ -1030,14 +1134,7 @@ def execute():
                                 .format(validation.basf2_options))
 
         # Check if we are using the cluster or local multiprocessing:
-        if cmd_arguments.mode and cmd_arguments.mode in ['local', 'cluster']:
-            validation.mode = cmd_arguments.mode
-        else:
-            validation.mode = 'local'
-        if validation.mode == 'local':
-            validation.log.note('Validation will use local multi-processing.')
-        elif validation.mode == 'cluster':
-            validation.log.note('Validation will use the cluster.')
+        validation.mode = cmd_arguments.mode
 
         # Set if we have a limit on the maximum number of local processes
         validation.parallel = cmd_arguments.parallel
@@ -1055,6 +1152,9 @@ def execute():
             validation.ignored_packages = []
             validation.packages = ["validation-test"]
             validation.log.note('Running in test mode')
+
+        validation.log.note("Release Folder: {} Local Folder:{}".format(validation.basepaths["central"],
+                                                                        validation.basepaths["local"]))
 
         # Now collect the steering files which will be used in this validation.
         # This will fill validation.list_of_sf_paths with values.

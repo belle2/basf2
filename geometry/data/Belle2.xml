@@ -4,8 +4,16 @@
   <Description>The Belle II detector</Description>
   <Global>
     <material>Air</material>
+    <!-- size of the global volume in each direction, that is a width of 8 m
+         will create a 16 m wide global volume with 8 m in +x and in -x
+         direction. If any of width, length or height is missing or <=0 it will
+         be determined automatically to fit all volumes placed inside of it.
+         -->
+    <!-- half-width along x direction -->
     <width  unit="m">8.0</width>
+    <!-- half-length along z direction -->
     <length unit="m">8.0</length>
+    <!-- half-height along y direction -->
     <height unit="m">8.0</height>
   </Global>
 
@@ -29,7 +37,7 @@
   <xi:include href="../geometry/MagneticFieldConstant4LimitedRCDC.xml"/>
   <xi:include href="../geometry/MagneticFieldConstantBelle.xml"/>
   <xi:include href="../geometry/MagneticField2d.xml"/>
-  <xi:include href="../geometry/MagneticField3d.xml"/>
+  <xi:include href="../geometry/MagneticField3dQuadBeamline.xml"/>
   <xi:include href="../geometry/MagneticField3dTotalVolume.xml"/>
 
   <!-- Accelerator -->

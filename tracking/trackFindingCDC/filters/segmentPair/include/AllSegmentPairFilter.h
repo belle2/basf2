@@ -13,27 +13,17 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegmentPair;
+
     /// Filter for the constuction of axial to stereo segment pairs based on simple criteria.
     class AllSegmentPairFilter : public Filter<CDCSegmentPair> {
 
     public:
-      /** Checks if a pair of segments is a good combination.
-       *  All implementation always accepts the total number of hits.
+      /**
+       *  Checks if a pair of segments is a good combination.
+       *  All implementation always accepts with the total number of hits as weight.
        */
-      virtual
-      Weight operator()(const CDCSegmentPair& segmentPair) override final
-      {
-        const CDCRecoSegment2D* ptrStartSegment = segmentPair.getFromSegment();
-        const CDCRecoSegment2D* ptrEndSegment = segmentPair.getToSegment();
-
-        assert(ptrStartSegment);
-        assert(ptrEndSegment);
-
-        const CDCRecoSegment2D& startSegment = *ptrStartSegment;
-        const CDCRecoSegment2D& endSegment = *ptrEndSegment;
-        return startSegment.size() + endSegment.size();
-      }
-
-    }; // end class AllSegmentPairFilter
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+      Weight operator()(const CDCSegmentPair& segmentPair) final;
+    };
+  }
+}

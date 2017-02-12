@@ -99,14 +99,24 @@ namespace Belle2 {
     double hasRestOfEventTracks(const Particle* part);
 
     /**
-     * 0 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0). The MCError of Breco has to be 0 or 1, the output of the variable is -2 otherwise.
+     * -1 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0). The MCError bit of Breco has to be 0, 1, 2, 16 or 1024. The output of the variable is 0 otherwise. If one Particle in the Rest of Event is found to belong the reconstructed B0, the output is -2(2) for a B0bar (B0) on the CP side.
      */
     double isRelatedRestOfEventB0Flavor(const Particle* part);
 
     /**
-     * 0 (1) if current RestOfEvent is related to a B0bar (B0). The MCError of Breco has to be 0 or 1, the output of the variable is -2 otherwise.
+     * -1 (1) if current RestOfEvent is related to a B0bar (B0). The MCError bit of Breco has to be 0, 1, 2, 16 or 1024. The output of the variable is 0 otherwise. If one Particle in the Rest of Event is found to belong the reconstructed B0, the output is -2(2) for a B0bar (B0) on the CP side.
      */
     double isRestOfEventB0Flavor(const Particle*);
+
+    /**
+     * checks the decay chain upwards up to the Y(4S) resonance.Output is 0 (1) if an ancestor is found to be a B0bar (B0), if not -2.
+     */
+    double ancestorHasWhichFlavor(const Particle* particle);
+
+    /**
+     * mcErrors MCMatching Flag on the reconstructed B0_cp.
+     */
+    double B0mcErrors(const Particle* particle);
 
     /**
      * 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a B0bar (B0).
@@ -202,5 +212,10 @@ namespace Belle2 {
      */
     Manager::FunctionPtr isTrueCategory(const std::vector<std::string>& arguments);
 
+    /**
+     * Returns function which returns the output of the flavorTagger for the given combinerMethod.
+     * This is a Flavor Tagging variable for general use.
+     */
+    Manager::FunctionPtr qrOutput(const std::vector<std::string>& arguments);
   }
 }

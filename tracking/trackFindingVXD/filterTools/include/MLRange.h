@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <tracking/trackFindingVXD/filterTools/TBranchLeafType.h>
+#include <tracking/trackFindingVXD/filterMap/filterFramework/TBranchLeafType.h>
 #include <TTree.h>
 #include <TBranch.h>
 #include <array>

@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
-#include <tracking/trackFindingCDC/ca/Relation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 #include <boost/range/iterator_range.hpp>
 
@@ -27,41 +27,36 @@ namespace Belle2 {
       /// Returns the full range of tracks.
       template<class ACDCTrackIterator>
       boost::iterator_range<ACDCTrackIterator>
-      getPossibleNeighbors(const CDCTrack& /* track */,
+      getPossibleNeighbors(const CDCTrack& track  __attribute__((unused)),
                            const ACDCTrackIterator& itBegin,
                            const ACDCTrackIterator& itEnd) const
       {
         return boost::iterator_range<ACDCTrackIterator>(itBegin, itEnd);
       }
 
-      /** Main filter method returning the weight of the neighborhood relation.
+      /**
+       *  Main filter method returning the weight of the neighborhood relation.
        *  Return always returns NAN to reject all track neighbors.
        */
-      virtual Weight operator()(const CDCTrack& /* from */,
-                                const CDCTrack& /* to */)
+      virtual Weight operator()(const CDCTrack& from  __attribute__((unused)),
+                                const CDCTrack& to  __attribute__((unused)))
       {
         return NAN;
       }
 
-      /** Main filter method overriding the filter interface method.
+      /**
+       *  Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
-       *  the method implementing the rejection.*/
-      virtual Weight operator()(const Relation<const CDCTrack>& relation) override
+       *  the method implementing the rejection.
+       */
+      Weight operator()(const Relation<const CDCTrack>& relation) override
       {
         const CDCTrack* ptrFrom(relation.first);
         const CDCTrack* ptrTo(relation.second);
         if (ptrFrom == ptrTo) return NAN; // Prevent relation to same.
-        if (not ptrFrom or not ptrTo) return NAN;
+        if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
         return operator()(*ptrFrom, *ptrTo);
       }
-
-      /// Legacy method
-      virtual Weight isGoodNeighbor(const CDCTrack& from,
-                                    const CDCTrack& to)
-      {
-        return operator()(from, to);
-      }
-    }; // end class
-
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

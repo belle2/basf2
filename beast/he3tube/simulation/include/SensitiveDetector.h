@@ -22,8 +22,15 @@ namespace Belle2 {
       /** Constructor */
       SensitiveDetector();
 
-      //! Save He3MCParticles into datastore
-      int saveSimHit();
+      //! Save saveG4TrackInfo into datastore
+      int saveG4TrackInfo(
+        int trackID,
+        int PDG,
+        float Mass,
+        float Energy,
+        float vtx[3],
+        float mom[3]
+      );
 
     protected:
       /** Step processing method
@@ -32,6 +39,7 @@ namespace Belle2 {
        */
       bool step(G4Step* step, G4TouchableHistory*);
       int m_simhitNumber;               /** The current number of created hits in an event. Used to fill the DataStore */
+      int m_trackID;                    /** track id */
     };
 
   } //he3tube namespace

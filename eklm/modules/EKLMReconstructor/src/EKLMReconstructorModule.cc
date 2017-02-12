@@ -12,7 +12,6 @@
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/EKLMHit2d.h>
 #include <eklm/modules/EKLMReconstructor/EKLMReconstructorModule.h>
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 
@@ -71,14 +70,15 @@ void EKLMReconstructorModule::initialize()
   m_GeoDat = &(EKLM::GeometryData::Instance());
   if (m_GeoDat->getNPlanes() != 2)
     B2FATAL("It is not possible to run EKLM reconstruction with 1 plane.");
-  m_nStrip = m_GeoDat->getMaximalStripNumber();
+  m_nStrip = m_GeoDat->getMaximalStripGlobalNumber();
   m_TimeCalibrationData = new EKLMTimeCalibrationData*[m_nStrip];
-  setDefDigitizationParams(&m_digPar);
 }
 
 void EKLMReconstructorModule::beginRun()
 {
   int i;
+  if (!m_RecPar.isValid())
+    B2FATAL("EKLM digitization parameters are not available.");
   if (!m_TimeCalibration.isValid())
     B2FATAL("EKLM time calibration data is not available.");
   if (m_TimeCalibration.hasChanged()) {
@@ -97,7 +97,8 @@ void EKLMReconstructorModule::beginRun()
 bool EKLMReconstructorModule::fastHit(HepGeom::Point3D<double>& pos,
                                       double time)
 {
-  return time < pos.mag() / Const::speedOfLight - 2.0 * m_digPar.timeResolution;
+  return time < pos.mag() / Const::speedOfLight -
+         2.0 * m_RecPar->getTimeResolution();
 }
 
 double EKLMReconstructorModule::getTime(EKLMDigit* d, double dist)
@@ -105,8 +106,10 @@ double EKLMReconstructorModule::getTime(EKLMDigit* d, double dist)
   int strip;
   strip = m_GeoDat->stripNumber(d->getEndcap(), d->getLayer(), d->getSector(),
                                 d->getPlane(), d->getStrip()) - 1;
-  return d->getTime() - (dist / m_TimeCalibration->getEffectiveLightSpeed() +
-                         m_TimeCalibrationData[strip]->getTimeShift());
+  return d->getTime() -
+         (dist / m_TimeCalibration->getEffectiveLightSpeed() +
+          m_TimeCalibration->getAmplitudeTimeConstant() / sqrt(d->getNPE()) +
+          m_TimeCalibrationData[strip]->getTimeShift());
 }
 
 void EKLMReconstructorModule::event()
@@ -156,7 +159,8 @@ void EKLMReconstructorModule::event()
         hit2d->setEDep((*it4)->getEDep() + (*it5)->getEDep());
         hit2d->setPosition(crossPoint.x(), crossPoint.y(), crossPoint.z());
         hit2d->setChiSq((t1 - t2) * (t1 - t2) /
-                        m_digPar.timeResolution / m_digPar.timeResolution);
+                        m_RecPar->getTimeResolution() /
+                        m_RecPar->getTimeResolution());
         hit2d->setTime(t);
         hit2d->setMCTime(((*it4)->getMCTime() + (*it5)->getMCTime()) / 2);
         hit2d->addRelationTo(*it4);

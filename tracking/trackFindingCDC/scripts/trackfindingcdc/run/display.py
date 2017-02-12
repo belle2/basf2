@@ -1,38 +1,40 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 import basf2
 import logging
 
 from tracking.run.tracked_event_generation import ReadOrGenerateTrackedEventsRun
-
 import trackfindingcdc.cdcdisplay as cdcdisplay
 
 
 class CDCDisplayRun(ReadOrGenerateTrackedEventsRun):
 
+    #: Destination folder for displays
     output_folder = '/tmp'
+
+    #: Switch to show the event display after each event. Run in batch mode for false
     iteractive = True
 
-    # Also show draw options that are related to the cellular automaton track finder on the command line?
+    #: Switch to also show draw command line options only related to the cellular automaton track finder
     show_all_drawoptions = False
 
+    #: Prefix of the output files
+    filename_prefix = ""
+
     def __init__(self):
-        super(CDCDisplayRun, self).__init__()
+        super().__init__()
         self._cdc_display_module = cdcdisplay.CDCSVGDisplayModule(self.output_folder)
 
     @property
     def cdc_display_module(self):
         cdc_display_module = self._cdc_display_module
-
-        # Reinforce the output folder in case it has changed
         return cdc_display_module
 
     def create_argument_parser(self, **kwds):
-        argument_parser = super(CDCDisplayRun, self).create_argument_parser(**kwds)
+        argument_parser = super().create_argument_parser(**kwds)
 
         argument_parser.add_argument(
-            '-d',
+            '-o',
             '--output-folder',
             dest='output_folder',
             default=self.output_folder,
@@ -62,7 +64,7 @@ class CDCDisplayRun(ReadOrGenerateTrackedEventsRun):
         argument_parser.add_argument(
             "-pf",
             '--filename_prefix',
-            default="",
+            default=self.filename_prefix,
             help='Prefix to the names of the generated files'
         )
 
@@ -106,7 +108,7 @@ Note that some options are only relevant, if the cellular automaton finder in th
         return argument_parser
 
     def configure(self, arguments):
-        super(CDCDisplayRun, self).configure(arguments)
+        super().configure(arguments)
 
         cdc_display_module = self.cdc_display_module
 
@@ -133,18 +135,6 @@ Note that some options are only relevant, if the cellular automaton finder in th
                 setattr(cdc_display_module, option, is_active_option)
 
     def create_path(self):
-        main_path = super(CDCDisplayRun, self).create_path()
-
+        main_path = super().create_path()
         main_path.add_module(self.cdc_display_module)
-
         return main_path
-
-
-def main():
-    cdc_display_run = CDCDisplayRun()
-    cdc_display_run.configure_and_execute_from_commandline()
-
-
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
-    main()

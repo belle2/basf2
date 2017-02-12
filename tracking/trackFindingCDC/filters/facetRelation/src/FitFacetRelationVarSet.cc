@@ -13,21 +13,13 @@
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
 #include <tracking/trackFindingCDC/numerics/Angle.h>
-#include <assert.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-FitFacetRelationVarSet::FitFacetRelationVarSet()
-  : Super()
-{
-}
-
 bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRelation)
 {
-  bool extracted = Super::extract(ptrFacetRelation);
-  if (not extracted or not ptrFacetRelation) return false;
+  if (not ptrFacetRelation) return false;
 
   const CDCFacet* fromFacet = ptrFacetRelation->first;
   const CDCFacet* toFacet   = ptrFacetRelation->second;
@@ -47,7 +39,7 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
   Vector2D tangential = Vector2D::average(fromTangential, toTangential);
 
   double fromMiddleCos = fromFacet->getStartToMiddleLine().tangential().cosWith(toTangential);
-  double toMiddleCos   = fromTangential.cosWith(toFacet->getMiddleToEndLine().tangential());
+  double toMiddleCos = fromTangential.cosWith(toFacet->getMiddleToEndLine().tangential());
 
   var<named("cos_delta")>() = fromTangential.cosWith(toTangential);
 
@@ -119,12 +111,12 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
     refParameters(c_Phi0) = AngleUtil::average(fromParameters(c_Phi0), toParameters(c_Phi0));
 
     LineParameters relFromParameters;
-    relFromParameters(c_I)    = fromParameters(c_I) - refParameters(c_I);
+    relFromParameters(c_I) = fromParameters(c_I) - refParameters(c_I);
     relFromParameters(c_Phi0) = AngleUtil::normalised(fromParameters(c_Phi0) - refParameters(c_Phi0));
 
     LineParameters relToParameters;
-    relToParameters(c_I)    = toParameters(c_I) - refParameters(c_I);
-    relToParameters(c_Phi0) =  AngleUtil::normalised(toParameters(c_Phi0) - refParameters(c_Phi0));
+    relToParameters(c_I) = toParameters(c_I) - refParameters(c_I);
+    relToParameters(c_Phi0) = AngleUtil::normalised(toParameters(c_Phi0) - refParameters(c_Phi0));
 
     LineParameters relAvgParameters;
     LineCovariance avgCovariance;

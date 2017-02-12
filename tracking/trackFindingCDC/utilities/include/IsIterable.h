@@ -24,5 +24,5 @@ namespace Belle2 {
     template<class Ts>
     using IsIterable = std::integral_constant<bool, not std::is_void<GetIterator<Ts> >::value >;
 
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

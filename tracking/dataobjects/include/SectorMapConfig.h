@@ -21,9 +21,13 @@
 namespace Belle2 {
 
   /** simple struct containing all the configuration data needed for the SecMapTrainer. */
-  class SectorMapConfig: public TObject {
+  struct SectorMapConfig: public TObject {
 
   public:
+
+    SectorMapConfig() {}
+
+
 
     /** stores pTCuts for min pT allowed for this . */
     double pTmin = 0.02;
@@ -90,7 +94,6 @@ namespace Belle2 {
     /** the quantiles to be chosen in the end for determining the cuts first is quantile, second is 1-quantile. */
     std::pair<double, double> quantiles = {0.005, 1. - 0.005};
 
-    SectorMapConfig() {}
 
     ClassDef(SectorMapConfig, 1);
 

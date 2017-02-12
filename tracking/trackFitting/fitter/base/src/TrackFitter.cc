@@ -37,7 +37,12 @@ bool TrackFitter::fit(RecoTrack& recoTrack, const Const::ChargedStable& particle
 bool TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRep& trackRepresentation) const
 {
   // Fit the track
-  m_fitter->processTrack(&RecoTrackGenfitAccess::getGenfitTrack(recoTrack), false);
+  try {
+    m_fitter->processTrack(&RecoTrackGenfitAccess::getGenfitTrack(recoTrack), false);
+  } catch (genfit::Exception& e) {
+    B2WARNING(e.getExcString());
+  }
+
   recoTrack.setDirtyFlag(false);
 
   // Do the hits synchronisation
@@ -91,7 +96,7 @@ bool TrackFitter::fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresenta
 
 void TrackFitter::resetFitterToDefaultSettings()
 {
-  genfit::DAF* dafFitter = new genfit::DAF(true);
+  genfit::DAF* dafFitter = new genfit::DAF(true, m_dafDeltaPval);
   dafFitter->setProbCut(0.001);
   dafFitter->setMaxFailedHits(5);
 

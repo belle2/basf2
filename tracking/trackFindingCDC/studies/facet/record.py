@@ -7,17 +7,50 @@ import os.path
 import basf2
 
 from trackfindingcdc.run.recording import RecordingRun
-
 import logging
 
 
 class CDCFacetRecordingRun(RecordingRun):
     """Run for recording facets encountered at the filter"""
-    # n_events = 50
-    # bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
+    detector_setup = "TrackingDetectorConstB"
+    n_events = 100
 
-    root_output_file_name = "FacetFilter.root"
-    varsets = ["tmva", "filter(truth)", ]
+    @property
+    def root_output_file_name(self):
+        print("get")
+        file_name = ""
+        if self.n_loops == self.n_loops:
+            file_name = "loop-" + str(self.n_loops)
+        else:
+            file_name = "all"
+
+        if self.flight_time_reestimation:
+            file_name += "-re"
+
+        if self.facet_least_square_fit:
+            file_name += "-lq"
+
+        if self.skim:
+            file_name += "-skim-" + self.skim
+
+        if self.root_input_file:
+            file_name += "-" + os.path.split(self.root_input_file)[1]
+        else:
+            file_name += ".root"
+
+        return file_name
+
+    varsets = [
+        "basic",
+        "truth",
+        "bend",
+        "fit",
+        'filter(truth)',
+        'filter(realistic)',
+        'filter(chi2)',
+    ]
+
+    # varsets = ["mva", "filter(truth)", ]
 
     recording_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton")
     recording_filter_parameter_name = "FacetFilterParameters"
@@ -56,7 +89,7 @@ class CDCFacetRecordingRun(RecordingRun):
         self.recording_finder_module.param(
             dict(FacetUpdateDriftLength=self.flight_time_reestimation,
                  FacetLeastSquareFit=self.facet_least_square_fit)
-            )
+        )
 
 
 def main():

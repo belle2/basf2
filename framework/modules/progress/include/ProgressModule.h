@@ -16,15 +16,13 @@
 
 namespace Belle2 {
   /**
-   * The Progress module.
-   *
-   * This module periodically writes the number of processed events/runs to the
+   * Periodically writes the number of processed events/runs to the
    * logging system to give a progress indication.
-   * The output is logarithmically, meaning it will output the first 10 events,
-   * then every tenth event up to 100, then every hundreth event up to 1000 and
-   * then every 1000th.
    *
-   * The maximum interval between output can be configured.
+   * The output is logarithmic, meaning it will output the first 10 events,
+   * then every tenth event up to 100, then every hundreth event up to 1000, etc.
+   *
+   * The maximum interval between outputs can be configured.
    */
   class ProgressModule : public Module {
 

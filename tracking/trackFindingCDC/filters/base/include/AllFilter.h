@@ -13,13 +13,12 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Filter type that accepts all items (just for reference).
+    /// Filter adapter type that accepts all items (just for reference).
     template<class AFilter>
     class AllFilter : public AFilter {
     public:
-      /** Accept all items. */
-      virtual Weight operator()(const typename AFilter::Object&) override final
-      {
+      /// Accept all items.
+      Weight operator()(const typename AFilter::Object& obj __attribute__((unused))) final {
         return 1;
       }
 

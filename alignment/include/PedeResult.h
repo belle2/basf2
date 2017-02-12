@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015  Belle II Collaboration                              *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Tadeas Bilka                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #ifndef PEDERESULT_H
 #define PEDERESULT_H
 
@@ -5,7 +15,6 @@
 #include <vector>
 #include <map>
 
-using namespace std;
 namespace Belle2 {
   namespace alignment {
     //! Class to process Pede result file(s)
@@ -15,11 +24,11 @@ namespace Belle2 {
       PedeResult() : data(), eigenNumbers(), valid(false), labelIndices() {}
       //! Constructor which loads given file
       //! @param filename Name of the result file (millepede.res)
-      explicit PedeResult(string filename);
+      explicit PedeResult(const std::string& filename);
       //! Reads the result file and inits the object
-      void read(string filename = "millepede.res");
+      void read(std::string filename = "millepede.res");
       //! Reads file with eigen-vector/numbers
-      void readEigenFile(string filename = "millepede.eve");
+      void readEigenFile(std::string filename = "millepede.eve");
       //! Was the object initialized properly from a result file?
       bool isValid() {return valid;}
       //! Dump the content to std::cout
@@ -84,17 +93,17 @@ namespace Belle2 {
         //! param presigma
         double presigma;
         //! Weights of this param in eigenvectors
-        vector<double> eigenweights;
+        std::vector<double> eigenweights;
       };
     private:
       //! Vector with all the parameter data
-      vector<parameterData> data;
+      std::vector<parameterData> data;
       //! Vector of loaded eigennumbers
-      vector<double> eigenNumbers;
+      std::vector<double> eigenNumbers;
       //! Flag to check if data wa loaded
       bool valid;
       //! Map to link parameter labels and their indices in result
-      map<int, int> labelIndices;
+      std::map<int, int> labelIndices;
       //! Number of parameters actually determined
       int noDeterminedParams{0};
     };

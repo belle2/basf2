@@ -29,14 +29,22 @@ namespace Belle2 {
 
   private:
     std::string m_param_trackCandidatesStoreArrayName = "TrackCands"; /**< StoreArray name of the input track candidates. */
-    std::string m_param_recoTracksStoreArrayName = "RecoTracks"; /**< StoreArray name of the output reco tracks. */
-    std::string m_param_recoHitInformationStoreArrayName =
-      "RecoHitInformations"; /**< StoreArray name of the output reco hit information. */
     bool m_param_recreateSortingParameters = false; /**< Flag to recreate the sorting parameters of the hit out of the stored order. */
 
-    std::string m_param_cdcHitsStoreArrayName = "CDCHits"; /**< StoreArray name of the input cdc hits. */
-    std::string m_param_svdHitsStoreArrayName = "SVDClusters"; /**< StoreArray name of the input svd hits. */
-    std::string m_param_pxdHitsStoreArrayName = "PXDClusters"; /**< StoreArray name of the input pxd hits. */
+    /** StoreArray name of the input and output reco tracks. */
+    std::string m_param_recoTracksStoreArrayName = "RecoTracks";
+    /** StoreArray name of the PXD hits. */
+    std::string m_param_pxdHitsStoreArrayName = "";
+    /** StoreArray name of the SVD hits. */
+    std::string m_param_svdHitsStoreArrayName = "";
+    /** StoreArray name of the CDC hits. */
+    std::string m_param_cdcHitsStoreArrayName = "";
+    /** StoreArray name of the BKLM hits. */
+    std::string m_param_bklmHitsStoreArrayName = "";
+    /** StoreArray name of the EKLM hits. */
+    std::string m_param_eklmHitsStoreArrayName = "";
+    /** StoreArray name of the output reco hit information. */
+    std::string m_param_recoHitInformationStoreArrayName = "";
   };
 }
 

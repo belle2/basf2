@@ -7,19 +7,15 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 #include <tracking/trackFindingCDC/ca/Path.h>
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
-#include <tracking/trackFindingCDC/ca/CellWeight.h>
-#include <tracking/trackFindingCDC/ca/NeighborWeight.h>
 
 #include <framework/logging/Logger.h>
 
 #include <vector>
-#include <limits>
 
 namespace Belle2 {
 
@@ -43,7 +39,7 @@ namespace Belle2 {
       template<class ACellHolderRange>
       std::vector<Path<ACellHolder> > followAll(ACellHolderRange& cellHolders,
                                                 const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood,
-                                                CellState minStateToFollow = -std::numeric_limits<CellState>::infinity()) const
+                                                Weight minStateToFollow = -INFINITY) const
       {
         // Result
         std::vector<Path<ACellHolder> > paths;
@@ -79,7 +75,7 @@ namespace Belle2 {
        */
       Path<ACellHolder> followSingle(ACellHolder* startCellHolderPtr,
                                      const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood,
-                                     CellState minStateToFollow = -std::numeric_limits<CellState>::infinity()) const
+                                     Weight minStateToFollow = -INFINITY) const
       {
         Path<ACellHolder> path;
         if (not startCellHolderPtr) return path;
@@ -112,33 +108,33 @@ namespace Belle2 {
     private:
       /**
        *  Helper function for recursively growing paths.
-       *  @param[in] path           Current path to be extended
-       *  @param[in] neighborhood   Considered relations to follow to extend the path
-       *  @param[out] paths         Longest paths generated
+       *  @param[in]  path                    Current path to be extended
+       *  @param[in]  cellHolderNeighborhood  Considered relations to follow to extend the path
+       *  @param[out] paths                   Longest paths generated
        */
       void growAllPaths(Path<ACellHolder>& path,
                         const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood,
                         std::vector<Path<ACellHolder> >& paths) const
       {
+        auto growPathByRelation = [&](const WeightedRelation<ACellHolder>& neighborRelation) {
+          if (not this->isHighestContinuation(neighborRelation)) return false;
+          ACellHolder* neighbor(neighborRelation.getTo());
+          path.push_back(neighbor);
+          this->growAllPaths(path, cellHolderNeighborhood, paths);
+          path.pop_back();
+          return true;
+        };
+
         ACellHolder* last = path.back();
+        auto neighborRelations = cellHolderNeighborhood.equal_range(last);
+        int nRelationsUsed = std::count_if(neighborRelations.begin(),
+                                           neighborRelations.end(),
+                                           growPathByRelation);
 
-        bool grew = false;
-        for (const WeightedRelation<ACellHolder>& relation
-             : cellHolderNeighborhood.equal_range(last)) {
-          if (isHighestContinuation(relation)) {
-            ACellHolder* neighbor(relation.getTo());
-            path.push_back(neighbor);
-            growAllPaths(path, cellHolderNeighborhood, paths);
-            grew = true;
-            path.pop_back();
-          }
-        }
-
-        if (not grew) {
+        if (nRelationsUsed == 0) {
           // end point of the recursion copy maximal path to the vector.
           paths.push_back(path);
         }
-
       }
 
       /**
@@ -146,7 +142,7 @@ namespace Belle2 {
        *  indicating to be a start cell and that its state exceeds the minimal requirement.
        */
       static bool validStartCell(const AutomatonCell& automatonCell,
-                                 CellState minStateToFollow)
+                                 Weight minStateToFollow)
       {
         return
           automatonCell.hasStartFlag() and
@@ -167,10 +163,10 @@ namespace Belle2 {
         if (not cellHolderPtr or not neighborCellHolderPtr) return false;
 
         ACellHolder& cellHolder = *cellHolderPtr;
-        NeighborWeight weight = relation.getWeight();
+        Weight relationWeight = relation.getWeight();
         ACellHolder& neighborCellHolder = *neighborCellHolderPtr;
 
-        return isHighestContinuation(cellHolder, weight, neighborCellHolder);
+        return isHighestContinuation(cellHolder, relationWeight, neighborCellHolder);
       }
 
       /**
@@ -178,21 +174,16 @@ namespace Belle2 {
        *  Since this is an algebraic property no comparision to the other alternatives is necessary.
        */
       static bool isHighestContinuation(ACellHolder& cellHolder,
-                                        NeighborWeight weight,
+                                        Weight relationWeight,
                                         ACellHolder& neighborCellHolder)
       {
         const AutomatonCell& automatonCell = cellHolder.getAutomatonCell();
         const AutomatonCell& neighborAutomatonCell = neighborCellHolder.getAutomatonCell();
 
-        return
-          not neighborAutomatonCell.hasCycleFlag() and
-          not neighborAutomatonCell.hasMaskedFlag() and
-          (automatonCell.getCellState() == (neighborAutomatonCell.getCellState() + weight + automatonCell.getCellWeight()));
+        return not neighborAutomatonCell.hasCycleFlag() and not neighborAutomatonCell.hasMaskedFlag() and
+               (automatonCell.getCellState() ==
+                (neighborAutomatonCell.getCellState() + relationWeight + automatonCell.getCellWeight()));
       }
-
-    }; // end class CellularPathFollower
-
-  } //end namespace TrackFindingCDC
-
-} //end namespace Belle2
-
+    };
+  }
+}

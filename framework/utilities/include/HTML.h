@@ -41,6 +41,13 @@ namespace Belle2 {
      */
     std::string chooseUnitOfLength(const TVector3& vec);
 
+    /** Create hexdump of given buffer.
+     *
+     * @param buf the buffer
+     * @param length size of buf in 32bit words
+     */
+    std::string getHexDump(const int* buf, int length);
+
     /** Reformat given HTML string into terminal-friendly plain text. */
     std::string htmlToPlainText(const std::string& html);
 

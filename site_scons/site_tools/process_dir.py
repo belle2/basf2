@@ -221,6 +221,7 @@ def process_dir(
                 'bin',
                 'modules',
                 'data',
+                'site_scons',
             ]:
                 continue
             process_dir(env, os.path.join(dir_name, entry), is_module_dir and dir_name != '.', release_dir)
@@ -372,7 +373,8 @@ def process_dir(
             result = SConscript(sconscript_name, exports='env')
             if isinstance(result, Environment):
                 local_test_env = result
-        local_test_env.AppendUnique(LIBS=['gtest', 'pthread'])
+        local_test_env.PrependUnique(LIBS=['test_main'])
+        local_test_env.AppendUnique(LIBS=['framework', '$ROOT_LIBS', 'gtest', 'pthread'])
         env['TEST_FILES'] = [test_file for test_file in env['TEST_FILES']
                              if test_file not in local_test_files]
         env.Prepend(TEST_FILES=local_test_env.SharedObject(local_test_files))

@@ -15,6 +15,7 @@
 #include <utility>
 #include <map>
 #include <vector>
+#include <fstream>
 
 #include <root/TVector2.h>
 
@@ -68,31 +69,6 @@ namespace Belle2 {
             a.getCoord().first.Y() == b.getCoord().first.Y());
   }
 
-  /**
-   * Hough Track class.
-   * A track is the center of a cluster of candidates.
-   * It contains the center coordinates and a hit list.
-   */
-  class CDCTriggerHoughTrack {
-  public:
-    /** Constructor for hough candidates */
-    CDCTriggerHoughTrack(std::vector<unsigned>& _list, TVector2 _coord):
-      hitList(_list), coord(_coord) {}
-
-    ~CDCTriggerHoughTrack() {}
-
-    /** Get Index list */
-    std::vector<unsigned> getIdList() { return hitList; }
-    /** Get center coordinates */
-    TVector2 getCoord() { return coord; }
-
-  private:
-    /** ID list of points */
-    std::vector<unsigned> hitList;
-    /** Coordinate of cluster center */
-    TVector2 coord;
-  };
-
   class CDCTriggerHoughtrackingModule : public Module {
   public:
     /** Constructor.  */
@@ -102,6 +78,8 @@ namespace Belle2 {
     virtual void initialize();
     /** Run tracking */
     virtual void event();
+    /** Clean up */
+    virtual void terminate();
 
     /** Fast intercept finder
      *  Divide Hough plane recursively to find cells with enough crossing lines.
@@ -144,18 +122,64 @@ namespace Belle2 {
     /** Merge lists a and b and put the result in merged. */
     void mergeIdList(std::vector<unsigned>& merged, std::vector<unsigned>& a, std::vector<unsigned>& b);
 
+    /** Combine Hough candidates to tracks by a fixed pattern algorithm.
+     *  The Hough plane is first divided in 2 x 2 squares, then squares are combined. */
+    void patternClustering();
+    /** Check for left/right connection of patterns in 2 x 2 squares */
+    bool connectedLR(unsigned patternL, unsigned patternR);
+    /** Check for up/down connection of patterns in 2 x 2 squares */
+    bool connectedUD(unsigned patternD, unsigned patternU);
+    /** Check for diagonal connected of patterns in 2 x 2 squares */
+    bool connectedDiag(unsigned patternLD, unsigned patternRU);
+    /** Find the top right square within a cluster of 2 x 2 squares
+     *  In case of ambiguity, top is favored over right
+     *  @ return   index of corner within pattern vector */
+    unsigned topRightSquare(std::vector<unsigned>& pattern);
+    /** Find the top right corner within 2 x 2 square.
+     *  In case of ambiguity right corner is returned.
+     *  x .
+     *  . x   -> return this one
+     *  @ return   index of corner within pattern */
+    unsigned topRightCorner(unsigned pattern);
+    /** Find the bottom left corner within 2 x 2 square.
+     *  In case of ambiguity left corner is returned.
+     *  x .   -> return this one
+     *  . x
+     *  @ return   index of corner within pattern */
+    unsigned bottomLeftCorner(unsigned pattern);
+
+    /** Find all hits whose Hough curve crosses the rectangle
+     *  with corners (x1, y1) and (x2, y2) and add the hit indices to list. */
+    void findAllCrossingHits(std::vector<unsigned>& list,
+                             double x1, double x2, double y1, double y2);
+    /** Select one hit per super layer.
+     *  @param list        input list of hit Ids
+     *  @param selected    selected hit Ids are added to selected
+     *  @param unselected  the rest of the hit Ids are added to unselected */
+    void selectHits(std::vector<unsigned>& list, std::vector<unsigned>& selected,
+                    std::vector<unsigned>& unselected);
+
   protected:
 
     /** Name of the StoreArray containing the tracks found by the Hough tracking. */
     std::string m_outputCollectionName;
+    /** Name of the StoreArray containing the clusters formed in the Hough plane. */
+    std::string m_clusterCollectionName;
     /** number of Hough cells in phi */
     unsigned m_nCellsPhi;
     /** number of Hough cells in 1/r */
     unsigned m_nCellsR;
     /** Hough plane limit in Pt [GeV] */
     double m_minPt;
+    /** shift the Hough plane in 1/r to avoid curvature 0 tracks
+     *  < 0: shift in negative direction (negative half is larger)
+     *    0: no shift (same limits for negative and positive half)
+     *  > 0: shift in positive direction (positive half is larger) */
+    int m_shiftPt;
     /** Hough plane limit in 1/r [1/cm] */
     double maxR;
+    /** Hough plane shift in 1/r [1/cm] */
+    double shiftR;
     /** number of iterations for the fast peak finder,
      *  smallest n such that 2^(n+1) > max(nCellsPhi, nCellsR) */
     unsigned maxIterations;
@@ -175,12 +199,32 @@ namespace Belle2 {
     unsigned m_connect;
     /** switch to skip second priority hits */
     bool m_ignore2nd;
+    /** switch between priority position and center position of track segment */
+    bool m_usePriority;
     /** switch to check separately for a hit in the innermost super layer */
     bool m_requireSL0;
 
     /** switch to save the Hough plane in DataStore
      *  (0: don't save, 1: save only peaks, 2: save full plane) */
     unsigned m_storePlane;
+    /** switch for clustering algorithm (if true use nested patterns) */
+    bool m_clusterPattern;
+    /** maximum cluster size for pattern algorithm */
+    unsigned m_clusterSizeX;
+    /** maximum cluster size for pattern algorithm */
+    unsigned m_clusterSizeY;
+    /** switch for creating relations to hits in the pattern clustering algorithm.
+     *   true: create relations for all hits passing through the corners of
+     *         a cluster,
+     *   false: create relations for all hits passing though the estimated
+     *          center of the cluster (can be 0 hits if center is not part
+     *          of the cluster) */
+    bool m_hitRelationsFromCorners;
+
+    /** filename for test output for firmware debugging */
+    std::string m_testFilename;
+    /** filestream for test output for firmware debugging */
+    std::ofstream testFile;
 
     /** map of TS hits containing <iHit, <iSL, (x, y)>> with
      *  iHit: hit index in StoreArray
@@ -189,8 +233,6 @@ namespace Belle2 {
     cdcMap hitMap;
     /** Hough Candidates */
     std::vector<CDCTriggerHoughCand> houghCand;
-    /** Purified Hough Candidates */
-    std::vector<CDCTriggerHoughTrack> houghTrack;
 
     /** Radius of the CDC layers with priority wires (2 per super layer) */
     double radius[9][2];

@@ -27,6 +27,30 @@ namespace Belle2 {
     Manager::FunctionPtr extraInfo(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the value of the given variable for the given particle if its abs(pdgCode) agrees with the given one
+     * First argument in the argument vector must be the name of variable.
+     * Second argument in the argument vector must be an integers corresponding to a PDG code.
+     */
+    Manager::FunctionPtr varFor(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the number of particles in the given particle List.
+     */
+    Manager::FunctionPtr nParticlesInList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns 1 if the given particle is a daughter of at least one of the particles of the
+     * given particle Lists.
+     */
+    Manager::FunctionPtr isDaughterOfList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns 1 if the given particle is a grand daughter of at least one of the particles of the
+     * given particle Lists.
+     */
+    Manager::FunctionPtr isGrandDaughterOfList(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the product of a variable over all daughters of the given particle
      * First argument in the argument vector must be the name of variable
      */
@@ -34,9 +58,50 @@ namespace Belle2 {
 
     /**
      * Returns function which returns the sum of a variable over all daughters of the given particle
-     * First argument in the argument vector must be the name of variable
+     * The single argument in the argument vector must be the name of variable
      */
     Manager::FunctionPtr daughterSumOf(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the lowest value of a variable among all daughters of the given particle
+     * The single argument in the argument vector must be the name of variable
+     */
+    Manager::FunctionPtr daughterLowest(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the highest value of a variable among all daughters of the given particle
+     * The single argument in the argument vector must be the name of variable
+     */
+    Manager::FunctionPtr daughterHighest(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the difference of the given variable between the two given daughters
+     * First two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     * Third argument the name of the variable.
+     */
+    Manager::FunctionPtr daughterDiffOf(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the normalized difference of the given variable between the two given daughters
+     * First two arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     * Third argument the name of the variable.
+     */
+    Manager::FunctionPtr daughterNormDiffOf(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the angle between daughters:
+     * If two indices given: returns the angle between the momenta of the two given daughters.
+     * If three indices given: Variable returns the angle between the momentum of the third particle and a vector
+     * which is the sum of the first two daughter momenta.
+     * The arguments in the argument vector must be integers corresponding to the ith and jth (and kth) daughters.
+     */
+    Manager::FunctionPtr daughterAngleInBetween(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the invariant Mass m_ij=sqrt((pi + pj)^2) of the two given daughters
+     * The two possible arguments in the argument vector must be integers corresponding to the ith and jth daughters.
+     */
+    Manager::FunctionPtr daughterInvM(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the remainder after division of value of variable by n
@@ -100,6 +165,13 @@ namespace Belle2 {
       * Second argument must be a valid variable name
       */
     Manager::FunctionPtr NBDeltaIfMissing(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns the number of non-overlapping particles in the given particle lists
+     * with respect to the particle the variable is applied on.
+     * Arguments are the particle lists
+     */
+    Manager::FunctionPtr numberOfNonOverlappingParticles(const std::vector<std::string>& arguments);
 
   }
 }

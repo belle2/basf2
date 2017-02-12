@@ -10,23 +10,22 @@
 
 #include <tracking/trackFindingCDC/filters/segmentTriple/AllSegmentTripleFilter.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 Weight AllSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStartSegment();
-  const CDCStereoRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddleSegment();
-  const CDCAxialRecoSegment2D* ptrEndSegment = segmentTriple.getEndSegment();
+  const CDCAxialSegment2D* ptrStartSegment = segmentTriple.getStartSegment();
+  const CDCStereoSegment2D* ptrMiddleSegment = segmentTriple.getMiddleSegment();
+  const CDCAxialSegment2D* ptrEndSegment = segmentTriple.getEndSegment();
 
   assert(ptrStartSegment);
   assert(ptrMiddleSegment);
   assert(ptrEndSegment);
 
-  const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCAxialRecoSegment2D& middleSegment = *ptrMiddleSegment;
-  const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
+  const CDCAxialSegment2D& startSegment = *ptrStartSegment;
+  const CDCAxialSegment2D& middleSegment = *ptrMiddleSegment;
+  const CDCAxialSegment2D& endSegment = *ptrEndSegment;
 
   Weight result = startSegment.size() + middleSegment.size() + endSegment.size();
 

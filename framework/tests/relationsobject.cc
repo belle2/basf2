@@ -131,6 +131,12 @@ namespace {
     EXPECT_EQ(2u, rels1.size());
 
 
+    //preserve order
+    EXPECT_FLOAT_EQ(1.0, rels1.weight(0));
+    EXPECT_FLOAT_EQ(2.0, rels1.weight(1));
+    EXPECT_FLOAT_EQ(1.0, relObjData[1]->getRelatedFromWithWeight<EventMetaData>().second);
+
+
     //add another one in opposite direction
     DataStore::Instance().addRelationFromTo((relObjData)[1], (evtData)[0], 1.0);
     RelationVector<EventMetaData> rels2 = (relObjData)[1]->getRelationsFrom<EventMetaData>();
@@ -168,6 +174,30 @@ namespace {
     EXPECT_TRUE(relObjData[3] == relObjData[3]->getRelated<RelationsObject>());
     EXPECT_TRUE(relObjData[3] == relObjData[3]->getRelatedFrom<RelationsObject>());
     EXPECT_TRUE(relObjData[3] == relObjData[3]->getRelatedTo<RelationsObject>());
+  }
+
+  TEST_F(RelationsObjectTest, ModifyRelations)
+  {
+    relObjData.registerRelationTo(profileData);
+    DataStore::Instance().setInitializeActive(false);
+
+    (relObjData)[0]->addRelationTo((profileData)[0], -42.0);
+
+    //weights
+    RelationVector<ProfileInfo> rels = (relObjData)[0]->getRelationsTo<ProfileInfo>();
+    EXPECT_DOUBLE_EQ(rels.weight(0), -42.0);
+    rels.setWeight(0, -3.0);
+    EXPECT_DOUBLE_EQ(rels.weight(0), -3.0); //updated immediately
+    RelationVector<ProfileInfo> rels2 = (relObjData)[0]->getRelationsTo<ProfileInfo>();
+    EXPECT_DOUBLE_EQ(rels2.weight(0), -3.0); //and in DataStore
+
+    //removal
+    EXPECT_EQ(1u, relObjData[0]->getRelationsTo<ProfileInfo>().size());
+    EXPECT_EQ(1u, relObjData[0]->getRelationsWith<ProfileInfo>().size());
+    rels2.remove(0);
+    EXPECT_EQ(0u, rels2.size());
+    EXPECT_EQ(0u, relObjData[0]->getRelationsTo<ProfileInfo>().size());
+    EXPECT_EQ(0u, relObjData[0]->getRelationsWith<ProfileInfo>().size());
   }
 
 

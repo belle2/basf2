@@ -86,17 +86,26 @@ namespace Belle2 {
   CPRHANDLER_INT_GET(NSMVHandlerHSLBCRCError);
   CPRHANDLER_INT_GET(NSMVHandlerTTRXBelle2LinkError);
   CPRHANDLER_INT_GET(NSMVHandlerTTRXLinkUpError);
-  CPRHANDLER_INT(NSMVHandlerHSLBUsed);
+  class NSMVHandlerHSLBUsed : public NSMVHandlerInt, HandlerCPR {
+  public:
+    NSMVHandlerHSLBUsed(COPPERCallback& callback, const std::string& name,
+                        int hslb, int val)
+      : NSMVHandlerInt(name, true, true, val),
+        HandlerCPR(callback, hslb, -1, -1) {}
+    virtual ~NSMVHandlerHSLBUsed() throw() {}
+    virtual bool handleGetInt(int& val);
+    virtual bool handleSetInt(int val);
+  };
   CPRHANDLER_INT(NSMVHandlerHSLBRegValue);
   CPRHANDLER_INT(NSMVHandlerHSLBRegFixed);
-  CPRHANDLER_INT_SET(NSMVHandlerHSLBBoot);
+  CPRHANDLER_TEXT(NSMVHandlerHSLBBoot);
   CPRHANDLER_TEXT_GET(NSMVHandlerHSLBTest);
   //CPRHANDLER_TEXT_GET(NSMVHandlerHSLBCheckFee);
   CPRHANDLER_TEXT(NSMVHandlerTTRXFirmware);
   CPRHANDLER_TEXT(NSMVHandlerHSLBFirmware);
   CPRHANDLER_TEXT(NSMVHandlerFEEStream);
-  CPRHANDLER_INT_SET(NSMVHandlerFEEBoot);
-  CPRHANDLER_INT_SET(NSMVHandlerFEELoad);
+  CPRHANDLER_TEXT(NSMVHandlerFEEBoot);
+  CPRHANDLER_TEXT(NSMVHandlerFEELoad);
   CPRHANDLER_INT_SET(NSMVHandlerFEELoadAll);
 
 }

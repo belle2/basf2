@@ -8,9 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* System headers. */
-#include <stdio.h>
-
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMHit2d.h>
 

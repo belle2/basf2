@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
 #include <TVector3.h>
-#include <math.h>
+#include <cmath>
 #include <iostream>
 
 namespace Belle2 {
@@ -159,6 +159,14 @@ namespace Belle2 {
       friend std::ostream& operator<<(std::ostream& output, const Vector3D& vector)
       {
         return output << "Vector3D(" << vector.x() << "," << vector.y() << "," << vector.z() << ")";
+      }
+
+      /// Output operator for python
+      std::string __str__() const
+      {
+        std::stringstream sstream;
+        sstream << *this;
+        return sstream.str();
       }
 
       /// Calculates the three dimensional dot product.
@@ -564,7 +572,7 @@ namespace Belle2 {
       /// Memory for the third coordinate
       double m_z;
 
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

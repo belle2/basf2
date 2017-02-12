@@ -7,14 +7,17 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/filters/trackRelation/MCTrackRelationFilter.h>
+
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+MCTrackRelationFilter::MCTrackRelationFilter(bool allowReverse)
+  : Super(allowReverse)
+{
+}
 
 Weight MCTrackRelationFilter::operator()(const CDCTrack& fromTrack,
                                          const CDCTrack& toTrack)
@@ -25,7 +28,8 @@ Weight MCTrackRelationFilter::operator()(const CDCTrack& fromTrack,
   EForwardBackward pairFBInfo = mcTrackLookUp.areAlignedInMCTrack(&fromTrack, &toTrack);
   if (pairFBInfo == EForwardBackward::c_Invalid) return NAN;
 
-  if (pairFBInfo == EForwardBackward::c_Forward or (getAllowReverse() and pairFBInfo == EForwardBackward::c_Backward)) {
+  if (pairFBInfo == EForwardBackward::c_Forward or
+      (getAllowReverse() and pairFBInfo == EForwardBackward::c_Backward)) {
     // Final check for the distance between the track
     Index fromNPassedSuperLayers = mcTrackLookUp.getLastNPassedSuperLayers(&fromTrack);
     if (fromNPassedSuperLayers == c_InvalidIndex) return NAN;

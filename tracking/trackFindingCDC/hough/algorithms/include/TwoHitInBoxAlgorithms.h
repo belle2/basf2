@@ -7,6 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
+
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 #include <cmath>
 
@@ -22,14 +24,14 @@ namespace Belle2 {
     class TwoHitInBoxAlgorithm {
     public:
       /// The type of the underlaying HoughBox (copied from the first underlying hit algorithm)
-      typedef typename AHitInBoxAlgorithm::HoughBox HoughBox;
+      using HoughBox = typename AHitInBoxAlgorithm::HoughBox;
 
       /**
        * Returns the sum of the resulting weights of both algorithms (of not NAN).
        */
       template<class AObject>
-      inline Weight operator()(const AObject& object,
-                               const HoughBox* box)
+      Weight operator()(const AObject& object,
+                        const HoughBox* box)
       {
         AHitInBoxAlgorithm hitInBoxAlgorithm;
         AnotherHitInBoxAlgorithm anotherHitInBoxAlgorithm;

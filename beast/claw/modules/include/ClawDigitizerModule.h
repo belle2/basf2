@@ -65,18 +65,23 @@ namespace Belle2 {
       /** reads data from CLAW.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();
 
-      /** Number of CLAW scintillator cell */
-      int m_ScintCell;
       /** Time step */
       double m_TimeStep;
+      /** Convertor factor keV to MIP */
+      double m_C_keV_to_MIP;
+      /** Convertor factor MIP to PE */
+      std::vector<Double_t> m_C_MIP_to_PE;
+      /** Number of CLAW scintillator cell */
+      int m_ScintCell;
       /** Lower time limit */
       double m_MinTime;
       /** Upper time limit */
       double m_MaxTime;
       /** Energy threshold */
-      double m_Ethres;
-      /** Convertor factor energy to count */
-      double m_ConvFac;
+      double m_PEthres;
+      /** Event PE array*/
+      //double hitsarrayinPE[1000][100];
+
     };
 
   }

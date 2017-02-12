@@ -10,7 +10,6 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -23,8 +22,8 @@ CDCSegmentPair::CDCSegmentPair() :
 
 
 
-CDCSegmentPair::CDCSegmentPair(const CDCRecoSegment2D* fromSegment,
-                               const CDCRecoSegment2D* toSegment):
+CDCSegmentPair::CDCSegmentPair(const CDCSegment2D* fromSegment,
+                               const CDCSegment2D* toSegment):
   m_fromSegment(fromSegment),
   m_toSegment(toSegment)
 {
@@ -33,8 +32,8 @@ CDCSegmentPair::CDCSegmentPair(const CDCRecoSegment2D* fromSegment,
 }
 
 
-CDCSegmentPair::CDCSegmentPair(const CDCRecoSegment2D* fromSegment,
-                               const CDCRecoSegment2D* toSegment,
+CDCSegmentPair::CDCSegmentPair(const CDCSegment2D* fromSegment,
+                               const CDCSegment2D* toSegment,
                                const CDCTrajectory3D& trajectory3D) :
   m_fromSegment(fromSegment),
   m_toSegment(toSegment),
@@ -47,8 +46,8 @@ CDCSegmentPair::CDCSegmentPair(const CDCRecoSegment2D* fromSegment,
 
 double CDCSegmentPair::computeDeltaPhiAtSuperLayerBound() const
 {
-  const CDCRecoSegment2D* ptrFromSegment = getFromSegment();
-  const CDCRecoSegment2D* ptrToSegment = getToSegment();
+  const CDCSegment2D* ptrFromSegment = getFromSegment();
+  const CDCSegment2D* ptrToSegment = getToSegment();
 
   if (not ptrFromSegment) {
     return NAN;
@@ -58,8 +57,8 @@ double CDCSegmentPair::computeDeltaPhiAtSuperLayerBound() const
     return NAN;
   }
 
-  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
-  const CDCRecoSegment2D& toSegment = *ptrToSegment;
+  const CDCSegment2D& fromSegment = *ptrFromSegment;
+  const CDCSegment2D& toSegment = *ptrToSegment;
 
   if (fromSegment.empty() or toSegment.empty()) {
     return NAN;
@@ -80,8 +79,8 @@ double CDCSegmentPair::computeDeltaPhiAtSuperLayerBound() const
 
 double CDCSegmentPair::computeFromIsBeforeToFitless() const
 {
-  const CDCRecoSegment2D* ptrFromSegment = getFromSegment();
-  const CDCRecoSegment2D* ptrToSegment = getToSegment();
+  const CDCSegment2D* ptrFromSegment = getFromSegment();
+  const CDCSegment2D* ptrToSegment = getToSegment();
 
   if (not ptrFromSegment) {
     return NAN;
@@ -91,8 +90,8 @@ double CDCSegmentPair::computeFromIsBeforeToFitless() const
     return NAN;
   }
 
-  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
-  const CDCRecoSegment2D& toSegment = *ptrToSegment;
+  const CDCSegment2D& fromSegment = *ptrFromSegment;
+  const CDCSegment2D& toSegment = *ptrToSegment;
 
   if (fromSegment.empty() or toSegment.empty()) {
     return NAN;
@@ -118,8 +117,8 @@ double CDCSegmentPair::computeFromIsBeforeToFitless() const
 
 double CDCSegmentPair::computeToIsAfterFromFitless() const
 {
-  const CDCRecoSegment2D* ptrFromSegment = getFromSegment();
-  const CDCRecoSegment2D* ptrToSegment = getToSegment();
+  const CDCSegment2D* ptrFromSegment = getFromSegment();
+  const CDCSegment2D* ptrToSegment = getToSegment();
 
   if (not ptrFromSegment) {
     return NAN;
@@ -129,8 +128,8 @@ double CDCSegmentPair::computeToIsAfterFromFitless() const
     return NAN;
   }
 
-  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
-  const CDCRecoSegment2D& toSegment = *ptrToSegment;
+  const CDCSegment2D& fromSegment = *ptrFromSegment;
+  const CDCSegment2D& toSegment = *ptrToSegment;
 
   if (fromSegment.empty() or toSegment.empty()) {
     return NAN;
@@ -155,8 +154,8 @@ double CDCSegmentPair::computeToIsAfterFromFitless() const
 
 double CDCSegmentPair::computeIsCoalignedFitless() const
 {
-  const CDCRecoSegment2D* ptrFromSegment = getFromSegment();
-  const CDCRecoSegment2D* ptrToSegment = getToSegment();
+  const CDCSegment2D* ptrFromSegment = getFromSegment();
+  const CDCSegment2D* ptrToSegment = getToSegment();
 
   if (not ptrFromSegment) {
     return NAN;
@@ -167,8 +166,8 @@ double CDCSegmentPair::computeIsCoalignedFitless() const
   }
 
 
-  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
-  const CDCRecoSegment2D& toSegment = *ptrToSegment;
+  const CDCSegment2D& fromSegment = *ptrFromSegment;
+  const CDCSegment2D& toSegment = *ptrToSegment;
 
   if (fromSegment.empty() or toSegment.empty()) {
     return NAN;

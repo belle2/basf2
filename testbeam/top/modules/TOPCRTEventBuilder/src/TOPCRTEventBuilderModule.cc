@@ -172,7 +172,6 @@ namespace Belle2 {
     }
 
     StoreArray<RawTOP> rawData;
-    rawData.create();
 
     while (m_entryCount < m_numEntries) {
       m_tree->GetEntry(m_entryCount);

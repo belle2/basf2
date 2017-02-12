@@ -13,43 +13,30 @@
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
 
 namespace Belle2 {
-
   namespace TrackFindingCDC {
 
-    /**
-     * Specialisation the filter factory for segment pairs
-     *
-     * It knows about all available filters and their parameters.
-     * Can collaborate with a Module and expose these parameters to the user in steering files.
-     */
-    class SegmentPairFilterFactory :
-      public FilterFactory<Filter<CDCSegmentPair> > {
+    /// Factory that can create appropriate segment pair filters from associated names.
+    class SegmentPairFilterFactory : public FilterFactory<BaseSegmentPairFilter> {
 
     private:
       /// Type of the base class
-      typedef FilterFactory<Filter<CDCSegmentPair> > Super;
+      using Super = FilterFactory<BaseSegmentPairFilter>;
 
     public:
-      /** Fill the default filter name and parameter values*/
-      SegmentPairFilterFactory(const std::string& defaultFilterName = "simple");
+      /// Constructor forwarding the default filter name
+      SegmentPairFilterFactory(const std::string& defaultFilterName = "realistic");
 
-      using Super::create;
+      /// Getter for a short identifier for the factory
+      std::string getIdentifier() const final;
 
-      /** Create a filter with the given name, does not set filter specific parameters. */
-      virtual std::unique_ptr<Filter<CDCSegmentPair> > create(const std::string& name) const override;
+      /// Getter for a descriptive purpose of the constructed filters
+      std::string getFilterPurpose() const final;
 
-      /** Getter for a descriptive purpose of the filter.*/
-      virtual std::string getFilterPurpose() const override;
+      /// Getter for valid filter names and a description for each
+      std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const final;
 
-      /** Getter for the valid filter names and a description for each */
-      virtual std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
-
-      /** Getter for the prefix prepended to a Module parameter.*/
-      virtual std::string getModuleParamPrefix() const override;
-
+      /// Create a filter with the given name.
+      std::unique_ptr<BaseSegmentPairFilter> create(const std::string& filterName) const final;
     };
-
-    typedef SegmentPairFilterFactory SegmentPairFilterFactory;
-
   }
 }

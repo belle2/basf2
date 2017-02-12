@@ -48,6 +48,9 @@ namespace Belle2 {
      */
     void setExtraInfo(const std::string& name, float value);
 
+    /** Return a short summary of this object's contents in HTML format. */
+    std::string getInfoHTML() const;
+
   private:
     std::map<std::string, float> eventExtraInfo; /**< map variable names to values. */
 

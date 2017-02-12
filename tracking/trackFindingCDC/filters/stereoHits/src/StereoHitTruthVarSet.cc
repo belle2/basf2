@@ -10,31 +10,28 @@
 #include <tracking/trackFindingCDC/filters/stereoHits/StereoHitTruthVarSet.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool StereoHitTruthVarSet::extract(const std::pair<const CDCRecoHit3D*, const CDCTrack*>* testPair)
+bool StereoHitTruthVarSet::extract(const std::pair<const CDCTrack*, const CDCRLWireHit*>* testPair)
 {
-  const CDCRecoHit3D* recoHit = testPair->first;
-  const CDCTrack* track = testPair->second;
+  const CDCRLWireHit* rlWireHit = testPair->second;
+  const CDCTrack* track = testPair->first;
 
-  bool extracted = extractNested(testPair);
-  if (not extracted or not testPair or not recoHit or not track) return false;
+  if (not testPair or not rlWireHit or not track) return false;
 
   const CDCMCTrackLookUp& mcTrackLookup = CDCMCTrackLookUp::getInstance();
   const CDCMCHitLookUp& hitLookup = CDCMCHitLookUp::getInstance();
 
-  const Belle2::CDCHit* hit = recoHit->getWireHit().getHit();
+  const Belle2::CDCHit* hit = rlWireHit->getWireHit().getHit();
 
   ITrackType trackMCMatch = mcTrackLookup.getMCTrackId(track);
   ITrackType hitMCMatch = hitLookup.getMCTrackId(hit);
-  ERightLeft hitMCRLInfo = hitLookup.getRLInfo(recoHit->getWireHit().getHit());
+  ERightLeft hitMCRLInfo = hitLookup.getRLInfo(rlWireHit->getWireHit().getHit());
 
   if (trackMCMatch == INVALID_ITRACK) {
     var<named("track_is_fake_truth")>() = true;
@@ -43,7 +40,7 @@ bool StereoHitTruthVarSet::extract(const std::pair<const CDCRecoHit3D*, const CD
   } else {
     var<named("track_is_fake_truth")>() = false;
     var<named("truth_may_reversed")>() = trackMCMatch == hitMCMatch;
-    var<named("truth")>() = trackMCMatch == hitMCMatch and hitMCRLInfo == recoHit->getRLInfo();
+    var<named("truth")>() = trackMCMatch == hitMCMatch and hitMCRLInfo == rlWireHit->getRLInfo();
   }
 
   return true;

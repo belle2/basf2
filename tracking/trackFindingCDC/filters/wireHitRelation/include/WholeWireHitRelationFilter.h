@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
-#include <tracking/trackFindingCDC/ca/Relation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
@@ -126,17 +126,16 @@ namespace Belle2 {
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.
        */
-      inline Weight operator()(const Relation<const CDCWireHit>& relation) override final
-      {
-        const CDCWireHit* ptrFrom(relation.first);
-        const CDCWireHit* ptrTo(relation.second);
+      Weight operator()(const Relation<const CDCWireHit>& relation) final {
+        const CDCWireHit * ptrFrom(relation.first);
+        const CDCWireHit * ptrTo(relation.second);
         if (not ptrFrom or not ptrTo) return NAN;
         return 0;
       }
 
     private:
 
-    }; // end class
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

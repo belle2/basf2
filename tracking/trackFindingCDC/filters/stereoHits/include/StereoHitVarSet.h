@@ -8,18 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
-
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
-    class CDCRecoHit3D;
+    class CDCRLWireHit;
 
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
-    static char const* const stereoHitNames[] = {
+    static char const* const stereoHitVarNames[] = {
       "track_size",
       "pt",
       "reco_s",
@@ -36,38 +36,31 @@ namespace Belle2 {
       "track_mean_s",
       "s_distance",
       "track_radius",
-      "superlayer_id"
+      "superlayer_id",
     };
 
-    /** Class that specifies the names of the variables
-     *  that should be generated from a stereo hit and a track pair.
-     */
-    class StereoHitVarNames : public VarNames<std::pair<const CDCRecoHit3D*, const CDCTrack*>> {
+    /// Vehicle class to transport the variable names
+    struct StereoHitVarNames : public VarNames<std::pair<const CDCTrack*, const CDCRLWireHit*>> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = 17;
+      /// Number of variables to be generated
+      static const size_t nVars = size(stereoHitVarNames);
 
-      /// Get the name of the column.
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
-        return stereoHitNames[iName];
+        return stereoHitVarNames[iName];
       }
     };
 
-    /** Class that computes floating point variables from a stereo hit and a track pair
-     *  that can be forwarded to a flat TNTuple or a TMVA method
+    /**
+     *  Class to compute floating point variables from a stereo hit to track match
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class StereoHitVarSet : public VarSet<StereoHitVarNames> {
 
     public:
-      /// Construct the peeler.
-      explicit StereoHitVarSet() : VarSet<StereoHitVarNames>() { }
-
-      /// Generate and assign the variables from the pair
-      virtual bool extract(const std::pair<const CDCRecoHit3D*, const CDCTrack*>* testPair) override;
-
+      /// Generate and assign the contained variables
+      bool extract(const std::pair<const CDCTrack*, const CDCRLWireHit*>* testPair) override;
     };
   }
 }

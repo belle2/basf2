@@ -144,13 +144,13 @@ namespace Belle2 {
         G4double x = activeParams.getLength("x") * CLHEP::cm;
         G4double y = activeParams.getLength("y") * CLHEP::cm;
         G4double z = activeParams.getLength("z_claw") * CLHEP::cm;
-        G4double r = 0;
+        /*G4double r = 0;
         if (x == 0 && y == 0)
           r = activeParams.getLength("r_claw") * CLHEP::cm;
         else
-          r = sqrt(x * x + y * y);
-        G4double phi = activeParams.getAngle("Phi");
-        G4double thetaZ = activeParams.getAngle("ThetaZ");
+        r = sqrt(x * x + y * y);*/
+        //G4double phi = activeParams.getAngle("Phi");
+        //G4double thetaZ = activeParams.getAngle("ThetaZ");
         G4double dx_board = activeParams.getLength("dx_board") / 2.*CLHEP::cm;
         G4double dy_board = activeParams.getLength("dy_board") / 2.*CLHEP::cm;
         G4double dz_board = activeParams.getLength("dz_board") / 2.*CLHEP::cm;
@@ -208,7 +208,8 @@ namespace Belle2 {
         //for(int i = 0; i < dimz; i++) {
 
         //G4Transform3D transform = G4RotateZ3D(-M_PI / 2 + phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]);
-        G4Transform3D transform = G4RotateZ3D(-M_PI / 2 + phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ);
+        //G4Transform3D transform = G4RotateZ3D(-M_PI / 2 + phi) * G4Translate3D(0, r, z) * G4RotateX3D(-M_PI / 2 - thetaZ);
+        G4Transform3D transform = G4Translate3D(x, y, z);
         new G4PVPlacement(transform, l_air, "p_air", &topVolume, false, 1);
         new G4PVPlacement(0, G4ThreeVector(0, 0, r_board), l_board, "p_board", l_air, false, 1);
         new G4PVPlacement(0, G4ThreeVector(0, 0, r_Culayer_bot), l_Culayer, "p_Culayer_bot", l_air, false, 1);
@@ -219,6 +220,7 @@ namespace Belle2 {
 
           new G4PVPlacement(0, G4ThreeVector(0, i_z, r_Al), l_Al, "p_Al", l_air, false, 1);
           new G4PVPlacement(0, G4ThreeVector(0, i_z, r_Al), l_scint, "p_scint", l_air, false, detID);
+          B2INFO("Phase1-CLAWS-" << detID << " placed at: " << transform.getTranslation() << " mm");
           detID++;
           //}
         }

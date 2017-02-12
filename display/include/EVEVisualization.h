@@ -18,6 +18,7 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
+#include <arich/dataobjects/ARICHHit.h>
 #include <vxd/geometry/GeoCache.h>
 #include <tracking/dataobjects/ROIid.h>
 
@@ -172,6 +173,9 @@ namespace Belle2 {
 
     /** Add a reconstructed cluster in the KLM. */
     void addKLMCluster(const KLMCluster* cluster);
+
+    /** Add recontructed hit in ARICH */
+    void addARICHHit(const ARICHHit* hit);
 
     /** Add a Region Of Interest, computed by the PXDDataReduction module */
     void addROI(const ROIid* roi);
@@ -335,7 +339,9 @@ namespace Belle2 {
     std::set<const TObject*> m_shownRecohits;
 
     /** Unassigned recohits. */
-    TEveStraightLineSet* m_unassignedRecoHits;
+    TEveStraightLineSet* m_unassignedRecoHits = nullptr;
+    /** is m_unassignedRecoHits visible? */
+    bool m_unassignedRecoHitsVisibility = true;
 
     /** don't show MCParticles with momentum below this cutoff. */
     static constexpr double c_minPCut = 0.00;

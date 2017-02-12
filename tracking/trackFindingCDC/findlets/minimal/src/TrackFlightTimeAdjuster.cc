@@ -10,9 +10,12 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackFlightTimeAdjuster.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+
+#include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/gearbox/Const.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <vector>
 
@@ -21,33 +24,21 @@ using namespace TrackFindingCDC;
 
 std::string TrackFlightTimeAdjuster::getDescription()
 {
-  return "Adjusts the flight time of tracks relative to a trigger point";
-}
-
-void TrackFlightTimeAdjuster::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
-{
-  moduleParamList->addParameter(prefixed(prefix, "triggerPoint"),
-                                m_param_triggerPoint,
-                                "Point relative to which the flight times of tracks should be adjusted",
-                                m_param_triggerPoint);
-}
-
-void TrackFlightTimeAdjuster::initialize()
-{
-  m_triggerPoint = Vector3D(std::get<0>(m_param_triggerPoint),
-                            std::get<1>(m_param_triggerPoint),
-                            std::get<2>(m_param_triggerPoint));
+  return "Adjusts the flight time of tracks relative to the flight time zero location";
 }
 
 void TrackFlightTimeAdjuster::apply(std::vector<CDCTrack>& tracks)
 {
   for (CDCTrack& track : tracks) {
     CDCTrajectory3D startTrajectory3D = track.getStartTrajectory3D();
-    double arcLength2D = startTrajectory3D.calcArcLength2D(m_triggerPoint);
-    double arcLength3D = arcLength2D * hypot2(1, startTrajectory3D.getTanLambda());
-    double flightTime = arcLength3D / Const::speedOfLight;
-    // Insert negative drift time such that the time at the trigger point is 0.
-    startTrajectory3D.setFlightTime(-flightTime);
+    const Vector2D pos2D = startTrajectory3D.getSupport().xy();
+    const Vector2D dir2D = startTrajectory3D.getFlightDirection3DAtSupport().xy();
+    const double alpha = pos2D.angleWith(dir2D);
+    const double beta = 1;
+    const double flightTime2D =
+      FlightTimeEstimator::instance().getFlightTime2D(pos2D, alpha, beta);
+    const double flightTime3D = flightTime2D * hypot2(1, startTrajectory3D.getTanLambda());
+    startTrajectory3D.setFlightTime(flightTime3D);
     track.setStartTrajectory3D(startTrajectory3D);
   }
 }

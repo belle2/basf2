@@ -67,9 +67,7 @@ namespace prog = boost::program_options;
 namespace {
   void executePythonFile(const string& pythonFile)
   {
-    boost::filesystem::path fullPath(boost::filesystem::initial_path<boost::filesystem::path>());
-
-    fullPath = boost::filesystem::system_complete(boost::filesystem::path(pythonFile));
+    auto fullPath = boost::filesystem::system_complete(boost::filesystem::path(pythonFile));
     if ((!(boost::filesystem::is_directory(fullPath))) && (boost::filesystem::exists(fullPath))) {
 
       std::ifstream file(fullPath.string().c_str());
@@ -120,10 +118,6 @@ int main(int argc, char* argv[])
     ("info", "print information about basf2")
     ("modules,m", prog::value<string>()->implicit_value(""),
      "print a list of all available modules (can be limited to a given package), or give detailed information on a specific module given as an argument (case sensitive).")
-    ("module-io", prog::value<string>(),
-     "Create diagram of inputs and outputs for a single module, saved as ModuleName.dot. To create a PostScript file, use e.g. 'dot ModuleName.dot -Tps -o out.ps'.")
-    ("execute-path", prog::value<string>(),
-     "Do not read any provided steering file, instead execute the pickled (serialized) path from the given file.")
     ;
 
     prog::options_description config("Configuration");
@@ -132,18 +126,34 @@ int main(int argc, char* argv[])
     ("arg", prog::value<vector<string> >(&arguments), "additional arguments to be passed to the steering file")
     ("log_level,l", prog::value<string>(),
      "set global log level (one of DEBUG, INFO, RESULT, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
-    ("events,n", prog::value<int>(), "override number of events for EventInfoSetter; otherwise set maximum number of events.")
+    ("events,n", prog::value<unsigned int>(), "override number of events for EventInfoSetter; otherwise set maximum number of events.")
+    ("run", prog::value<int>(), "override run for EventInfoSetter, must be used with -n and --experiment")
+    ("experiment", prog::value<int>(), "override experiment for EventInfoSetter, must be used with -n and --run")
+    ("skip-events", prog::value<unsigned int>(),
+     "override skipNEvents for EventInfoSetter and RootInput. Skips this many events before starting.")
     ("input,i", prog::value<vector<string> >(),
      "override name of input file for (Seq)RootInput. Can be specified multiple times to use more than one file. For RootInput, wildcards (as in *.root or [1-3].root) can be used, but need to be escaped with \\  or by quoting the argument to avoid expansion by the shell.")
+    ("sequence,S", prog::value<vector<string> >(),
+     "override the number sequence (e.g. 23:42,101) defining the entries (starting from 0) which are processed by RootInput."
+     "Must be specified exactly once for each file to be opened."
+     "This means one sequence per input file AFTER wildcard expansion."
+     "The first event has the number 0.")
     ("output,o", prog::value<string>(), "override name of output file for (Seq)RootOutput")
-    ("processes,p", prog::value<int>(), "override number of worker processes (>=1 enables, 0 disables parallel processing)")
+    ("processes,p", prog::value<int>(), "override number of worker processes (>=1 enables, 0 disables parallel processing)");
+
+    prog::options_description advanced("Advanced Options");
+    advanced.add_options()
+    ("module-io", prog::value<string>(),
+     "Create diagram of inputs and outputs for a single module, saved as ModuleName.dot. To create a PostScript file, use e.g. 'dot ModuleName.dot -Tps -o out.ps'.")
     ("visualize-dataflow", "Generate data flow diagram (dataflow.dot) for the executed steering file.")
     ("no-stats",
-     "Disable collection of statistics during event processing. Useful for very high-rate applications, but produces empty table with 'print statistics'.")
+     "Disable collection of statistics during event processing. Useful for very high-rate applications, but produces empty table with 'print(statistics)'.")
     ("dry-run",
      "Read steering file, but do not start any event processing when process(path) is called. Prints information on input/output files that would be used during normal execution.")
     ("dump-path", prog::value<string>(),
      "Read steering file, but do not actually start any event processing. The module path the steering file would execute is instead pickled (serialized) into the given file.")
+    ("execute-path", prog::value<string>(),
+     "Do not read any provided steering file, instead execute the pickled (serialized) path from the given file.")
 #ifdef HAS_CALLGRIND
     ("profile", prog::value<string>(),
      "Name of a module to profile using callgrind. If more than one module of that name is registered only the first one will be profiled.")
@@ -151,7 +161,7 @@ int main(int argc, char* argv[])
     ;
 
     prog::options_description cmdlineOptions;
-    cmdlineOptions.add(generic).add(config);
+    cmdlineOptions.add(generic).add(config).add(advanced);
 
     prog::positional_options_description posOptDesc;
     posOptDesc.add("steering", 1);
@@ -223,7 +233,7 @@ int main(int argc, char* argv[])
           "--callgrind-out-file=callgrind." + profileModule + ".%p",
         };
         //As execvp wants non-const char* pointers we have to copy the string contents.
-        for (auto argv : valgrind_argv) { cmd.push_back(strdup(argv.c_str())); }
+        for (auto arg : valgrind_argv) { cmd.push_back(strdup(arg.c_str())); }
         //And now we add our own arguments, including the program name.
         for (int i = 0; i < argc; ++i)  { cmd.push_back(argv[i]); }
         //Finally, execvp wants a nullptr as last argument
@@ -247,17 +257,42 @@ int main(int argc, char* argv[])
 
     // -n
     if (varMap.count("events")) {
-      int nevents = varMap["events"].as<int>();
-      if (nevents <= 0) {
-        B2FATAL("Invalid number of events!");
+      unsigned int nevents = varMap["events"].as<unsigned int>();
+      if (nevents == 0 or nevents == std::numeric_limits<unsigned int>::max()) {
+        B2FATAL("Invalid number of events (valid range: 1.." << std::numeric_limits<unsigned int>::max() - 1 << ")!");
       }
       Environment::Instance().setNumberEventsOverride(nevents);
+    }
+    // --run & --experiment
+    if (varMap.count("experiment") or varMap.count("run")) {
+      if (!varMap.count("events"))
+        B2FATAL("--experiment and --run must be used with --events/-n!");
+      if (!(varMap.count("run") and varMap.count("experiment")))
+        B2FATAL("Both --experiment and --run must be specified!");
+
+      int run = varMap["run"].as<int>();
+      int experiment = varMap["experiment"].as<int>();
+      B2ASSERT("run must be >= 0!", run >= 0);
+      B2ASSERT("experiment must be >= 0!", experiment >= 0);
+      Environment::Instance().setRunExperimentOverride(run, experiment);
+    }
+
+    // --skip-events
+    if (varMap.count("skip-events")) {
+      unsigned int skipevents = varMap["skip-events"].as<unsigned int>();
+      Environment::Instance().setSkipEventsOverride(skipevents);
     }
 
     // -i
     if (varMap.count("input")) {
       const vector<string>& names = varMap["input"].as<vector<string> >();
       Environment::Instance().setInputFilesOverride(names);
+    }
+
+    // -S
+    if (varMap.count("sequence")) {
+      const vector<string>& sequences = varMap["sequence"].as<vector<string> >();
+      Environment::Instance().setEntrySequencesOverride(sequences);
     }
 
     // -o

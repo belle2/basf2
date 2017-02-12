@@ -11,11 +11,11 @@
 #include <gtest/gtest.h>
 
 #include <tracking/trackFindingVXD/filterTools/ObserverCheckMCPurity.h>
-#include <tracking/trackFindingVXD/filterTools/ClosedRange.h>
-#include <tracking/trackFindingVXD/threeHitFilters/CircleRadius.h> // used since it is easy for testing
+#include <tracking/trackFindingVXD/filterMap/filterFramework/ClosedRange.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/CircleRadius.h> // used since it is easy for testing
 #include <tracking/spacePointCreation/SpacePoint.h>
 
-#include "tracking/trackFindingVXD/filterTools/Shortcuts.h"
+#include <tracking/trackFindingVXD/filterMap/filterFramework/Shortcuts.h>
 
 
 using namespace std;

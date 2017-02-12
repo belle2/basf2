@@ -10,8 +10,16 @@
 
 #include <tracking/trackFindingCDC/filters/facetRelation/AllFacetRelationFilter.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-//only here to trigger a compilation of the source file
+Weight AllFacetRelationFilter::operator()(const CDCFacet& fromFacet, const CDCFacet& toFacet)
+{
+  // The last wire of the neighbor should not be the same as the start wire of the facet
+  // The  default weight must be -2 because the overlap of the facets is two points
+  // so the amount of two facets is 4 points hence the cellular automat
+  // must calculate 3 + (-2) + 3 = 4 as cellstate
+  // this can of course be adjusted for a more realistic information measure
+  // ( together with the facet creator filter)
+  return fromFacet.getStartWire() == toFacet.getEndWire() ? NAN : -2;
+}

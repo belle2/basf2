@@ -13,6 +13,9 @@
 #include <top/dbobjects/TOPGeoBase.h>
 #include <geometry/dbobjects/GeoOpticalSurface.h>
 #include <string>
+#include <vector>
+#include <utility>
+
 
 namespace Belle2 {
 
@@ -38,7 +41,7 @@ namespace Belle2 {
      */
     TOPGeoBarSegment(double width, double thickness, double length,
                      const std::string& material,
-                     const std::string& name = "TOPbarSegment"): TOPGeoBase(name),
+                     const std::string& name = "TOPBarSegment"): TOPGeoBase(name),
       m_width(width), m_thickness(thickness), m_length(length), m_material(material)
     {}
 
@@ -54,6 +57,19 @@ namespace Belle2 {
     }
 
     /**
+     * Sets glue to be broken (delaminated)
+     * @param fraction fraction of the delaminated surface
+     * @param angle angle of the delaminated surface
+     * @param material material name to simulate the delaminated glue
+     */
+    void setGlueDelamination(double fraction, double angle, const std::string& material)
+    {
+      m_brokenFraction = fraction;
+      m_brokenAngle = angle;
+      m_brokenGlueMaterial = material;
+    }
+
+    /**
      * Sets optical surface
      * @param surface optical surface
      * @param sigmaAlpha geant4 parameter for surface roughness
@@ -62,6 +78,17 @@ namespace Belle2 {
     {
       m_surface = surface;
       m_sigmaAlpha = sigmaAlpha;
+    }
+
+    /**
+     * Sets vendor's name and serial number
+     * @param vendor vendor's name
+     * @param serialNumber serial number
+     */
+    void setVendorData(const std::string& vendor, const std::string& serialNumber)
+    {
+      m_vendor = vendor;
+      m_serialNumber = serialNumber;
     }
 
     /**
@@ -107,6 +134,29 @@ namespace Belle2 {
     const std::string& getGlueMaterial() const {return m_glueMaterial;}
 
     /**
+     * Returns fraction of the delaminated surface
+     * @return fraction
+     */
+    double getBrokenGlueFraction() const {return m_brokenFraction;}
+
+    /**
+     * Returns angle of the delaminated surface
+     * @return angle
+     */
+    double getBrokenGlueAngle() const {return m_brokenAngle;}
+
+    /**
+     * Returns material name which represents broken glue
+     * @return material name
+     */
+    const std::string& getBrokenGlueMaterial() const {return m_brokenGlueMaterial;}
+
+    /**
+     * Returns the x-y contour of broken glue
+     */
+    std::vector<std::pair<double, double> > getBrokenGlueContour() const;
+
+    /**
      * Returns optical surface
      * @return optical surface
      */
@@ -117,6 +167,18 @@ namespace Belle2 {
      * @return surface roughness
      */
     double getSigmaAlpha() const {return m_sigmaAlpha;}
+
+    /**
+     * Returns vendor's name
+     * @return name
+     */
+    const std::string& getVendor() const {return m_vendor;}
+
+    /**
+     * Returns serial number
+     * @return serial number
+     */
+    const std::string& getSerialNumber() const {return m_serialNumber;}
 
     /**
      * Check for consistency of data members
@@ -133,6 +195,17 @@ namespace Belle2 {
 
   protected:
 
+    /**
+     * Construct a 2D contour
+     * @param A dimension in x
+     * @param B dimension in y
+     * @param fraction surface fraction
+     * @param angle angle
+     * @param contour clock-wise polygon to return
+     */
+    void constructContour(double A, double B, double fraction, double angle,
+                          std::vector<std::pair<double, double> >& contour) const;
+
     float m_width = 0; /**< bar segment width */
     float m_thickness = 0; /**< bar segment thickness */
     float m_length = 0; /**< bar segment length */
@@ -141,8 +214,13 @@ namespace Belle2 {
     std::string m_glueMaterial; /**< glue material name */
     GeoOpticalSurface m_surface; /**< optical surface */
     float m_sigmaAlpha = 0; /**< geant4 parameter for surface roughness */
+    float m_brokenFraction = 0; /**< fraction of broken (delaminated) glue */
+    float m_brokenAngle = 0; /**< angle of broken (delaminated) glue */
+    std::string m_brokenGlueMaterial; /**< broken glue material name */
+    std::string m_vendor; /**< vendor's name */
+    std::string m_serialNumber; /**< serial number */
 
-    ClassDef(TOPGeoBarSegment, 1); /**< ClassDef */
+    ClassDef(TOPGeoBarSegment, 3); /**< ClassDef */
 
   };
 

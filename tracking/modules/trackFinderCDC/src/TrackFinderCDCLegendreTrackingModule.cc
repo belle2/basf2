@@ -8,31 +8,24 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/modules/trackFinderCDC/TrackFinderCDCLegendreTrackingModule.h>
-#include <framework/datastore/StoreArray.h>
-#include <tracking/trackFindingCDC/processing/TrackMerger.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/ConformalExtension.h>
+
+#include <tracking/trackFindingCDC/legendre/quadtreetools/QuadTreePassCounter.h>
 
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeCandidateFinder.h>
 
-#include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessorWithNewReferencePoint.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeNodeProcessor.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
+
+#include <tracking/trackFindingCDC/processing/TrackMerger.h>
+#include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/processing/HitProcessor.h>
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
-#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeNodeProcessor.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-
-#include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
-#include <tracking/trackFindingCDC/legendre/quadtreetools/QuadTreePassCounter.h>
-
-#include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
-
-#include <cdc/dataobjects/CDCHit.h>
-
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -40,7 +33,7 @@ using namespace TrackFindingCDC;
 REG_MODULE(TrackFinderCDCLegendreTracking);
 
 TrackFinderCDCLegendreTrackingModule::TrackFinderCDCLegendreTrackingModule() :
-  TrackFinderCDCBaseModule()
+  Module()
 {
   setDescription("Performs the pattern recognition in the CDC with the conformal finder:"
                  "digitized CDCHits are combined to track candidates (genfit::TrackCand)");
@@ -54,19 +47,37 @@ TrackFinderCDCLegendreTrackingModule::TrackFinderCDCLegendreTrackingModule() :
            m_param_doEarlyMerging,
            "Set whether merging of track should be performed after each pass candidate finding; has impact on CPU time",
            false);
+
+  addParam("TracksStoreObjName",
+           m_param_tracksStoreObjName,
+           "Name of the output StoreObjPtr of the tracks generated within this module.",
+           m_param_tracksStoreObjName);
+
+  setPropertyFlags(c_ParallelProcessingCertified bitor c_TerminateInAllProcesses);
 }
 
 void TrackFinderCDCLegendreTrackingModule::initialize()
 {
   StoreWrappedObjPtr<std::vector<CDCWireHit> > storedWireHits("CDCWireHitVector");
   storedWireHits.isRequired();
+
+  StoreWrappedObjPtr<std::vector<CDCTrack>> storedTracks(m_param_tracksStoreObjName);
+  storedTracks.registerInDataStore();
+
+  B2ASSERT("Maximal level of QuadTree search is setted to be greater than lookuptable grid level! ",
+           m_param_maxLevel <= BasePrecisionFunction::getLookupGridLevel());
+
   Super::initialize();
 }
 
-void TrackFinderCDCLegendreTrackingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
+void TrackFinderCDCLegendreTrackingModule::event()
 {
-  B2ASSERT("Maximal level of QuadTree search is setted to be greater than lookuptable grid level! ",
-           m_param_maxLevel <= BasePrecisionFunction::getLookupGridLevel());
+  // Now aquire the store vector
+  StoreWrappedObjPtr<std::vector<CDCTrack>> storedTracks(m_param_tracksStoreObjName);
+  storedTracks.create();
+
+  // We now let the generate-method fill or update the outputTracks
+  std::vector<CDCTrack>& tracks = *storedTracks;
 
   startNewEvent();
   findTracks();
@@ -96,6 +107,7 @@ void TrackFinderCDCLegendreTrackingModule::startNewEvent()
     const double factor = wireHit.isAxial() ? 0.8 : 0.9; // Stereo case does not happen, copied from original method.
     if (not(wireHit.getRefDriftLength() < lateralCellWidth * factor)) continue;
 
+    m_allAxialWireHits.push_back(&wireHit);
     m_conformalCDCWireHitList.emplace_back(&wireHit);
   }
 
@@ -108,7 +120,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
 
   // Here starts iteration over finding passes -- in each pass slightly different conditions of track finding applied
   do {
-    HitProcessor::resetMaskedHits(m_cdcTrackList, m_conformalCDCWireHitList);
+    HitProcessor::resetMaskedHits(m_tracks, m_allAxialWireHits);
 
     // Create object which holds and generates parameters
     QuadTreeParameters quadTreeParameters(m_param_maxLevel, quadTreePassCounter.getPass());
@@ -132,24 +144,24 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
     // Object which operates with AxialHitQuadTreeProcessor and QuadTreeNodeProcessor and starts quadtree search
     QuadTreeCandidateFinder quadTreeCandidateFinder;
 
-    int nCandsAdded = m_cdcTrackList.getCDCTracks().size();
+    int nCandsAdded = m_tracks.size();
 
     // Interface
-    AxialHitQuadTreeProcessor::CandidateProcessorLambda lambdaInterface = quadTreeNodeProcessor.getLambdaInterface(
-          m_conformalCDCWireHitList, m_cdcTrackList);
+    AxialHitQuadTreeProcessor::CandidateProcessorLambda lambdaInterface =
+      quadTreeNodeProcessor.getLambdaInterface(m_allAxialWireHits, m_tracks);
 
     // Start candidate finding
     quadTreeCandidateFinder.doTreeTrackFinding(lambdaInterface, quadTreeParameters, qtProcessor);
 
     // Assign new hits to the tracks
-    TrackProcessor::assignNewHits(m_conformalCDCWireHitList, m_cdcTrackList);
+    TrackProcessor::assignNewHits(m_allAxialWireHits, m_tracks);
 
     // Try to merge tracks
     if (m_param_doEarlyMerging) {
-      TrackMerger::doTracksMerging(m_cdcTrackList, m_conformalCDCWireHitList);
+      TrackMerger::doTracksMerging(m_tracks, m_allAxialWireHits);
     }
 
-    nCandsAdded = m_cdcTrackList.getCDCTracks().size() - nCandsAdded;
+    nCandsAdded = m_tracks.size() - nCandsAdded;
 
     // Change to the next pass
     if (quadTreePassCounter.getPass() != LegendreFindingPass::FullRange) {
@@ -161,63 +173,22 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
 
   } while (quadTreePassCounter.getPass() != LegendreFindingPass::End);
 
-
-  // Check quality of the track basing on holes on the trajectory;
-  // if holes exsist then track is splitted
-  m_cdcTrackList.doForAllTracks([&](CDCTrack & track) {
-    if (track.size() > 3) {
-      HitProcessor::maskHitsWithPoorQuality(track);
-      HitProcessor::splitBack2BackTrack(track);
-
-      TrackQualityTools::normalizeTrack(track);
-      std::vector<const CDCWireHit*> hitsToSplit;
-
-      for (CDCRecoHit3D& hit : track) {
-        if (hit.getWireHit().getAutomatonCell().hasMaskedFlag()) {
-          hitsToSplit.push_back(&(hit.getWireHit()));
-        }
-      }
-
-      HitProcessor::deleteAllMarkedHits(track);
-
-      for (const CDCWireHit* hit : hitsToSplit) {
-        hit->getAutomatonCell().setMaskedFlag(false);
-        hit->getAutomatonCell().setTakenFlag(false);
-      }
-
-      TrackProcessor::addCandidateFromHitsWithPostprocessing(hitsToSplit, m_conformalCDCWireHitList, m_cdcTrackList);
-
-    }
-//    TrackMergerNew::deleteAllMarkedHits(track);
-  });
-
-  // Update tracks before storing to DataStore
-  m_cdcTrackList.doForAllTracks([&](CDCTrack & track) {
-    TrackQualityTools::normalizeTrack(track);
-  });
-
-  // Remove bad tracks
-  TrackProcessor::deleteTracksWithLowFitProbability(m_cdcTrackList);
-
-  // Perform tracks merging
-  TrackMerger::doTracksMerging(m_cdcTrackList, m_conformalCDCWireHitList);
-
-  // Assign new hits
-  TrackProcessor::assignNewHits(m_conformalCDCWireHitList, m_cdcTrackList);
-
+  TrackProcessor::mergeAndFinalizeTracks(m_tracks, m_allAxialWireHits);
 }
 
 void TrackFinderCDCLegendreTrackingModule::outputObjects(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
-  tracks.reserve(tracks.size() + m_cdcTrackList.getCDCTracks().size());
-
-  m_cdcTrackList.doForAllTracks([&](CDCTrack & track) {
-    if (track.size() > 5) tracks.push_back(std::move(track));
-  });
+  tracks.reserve(tracks.size() + m_tracks.size());
+  for (CDCTrack& track : m_tracks) {
+    if (track.size() > 5) {
+      tracks.push_back(std::move(track));
+    }
+  }
 }
 
 void TrackFinderCDCLegendreTrackingModule::clearVectors()
 {
   m_conformalCDCWireHitList.clear();
-  m_cdcTrackList.clear();
+  m_allAxialWireHits.clear();
+  m_tracks.clear();
 }

@@ -166,11 +166,16 @@ class ConditionsDB:
             B2ERROR("Cannot get run id for experiment {0}, run {1}: no such run".format(experiment, run))
             return None
 
-    def get_payloads(self):
-        """Get a list of all defined payloads. Returns a dictionary which maps
-        (package, module, checksum) to the payload id"""
+    def get_payloads(self, global_tag=None):
+        """
+        Get a list of all defined payloads (for the given global_tag or by default for all).
+        Returns a dictionary which maps (package, module, checksum) to the payload id.
+        """
 
-        req = self.request("GET", "/payloads")
+        if global_tag:
+            req = self.request("GET", "/globalTag/{global_tag}/payloads".format(global_tag=global_tag))
+        else:
+            req = self.request("GET", "/payloads")
         if req.status_code != requests.codes.ok:
             B2ERROR("Cannot get list of payloads")
             return {}

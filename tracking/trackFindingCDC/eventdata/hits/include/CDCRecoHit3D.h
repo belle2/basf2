@@ -47,14 +47,12 @@ namespace Belle2 {
       CDCRecoHit3D() = default;
 
       /// Constructor taking all stored variables of the reconstructed hit.
-      CDCRecoHit3D(const CDCRLWireHit& rlWireHit,
-                   const Vector3D& position,
-                   double arcLength2D = 0);
+      CDCRecoHit3D(const CDCRLWireHit& rlWireHit, const Vector3D& recoPos3D, double arcLength2D = 0);
 
       /// Constructor taking all stored variables of the reconstructed hit.
       CDCRecoHit3D(const CDCWireHit* wireHit,
                    ERightLeft rlInfo,
-                   const Vector3D& position,
+                   const Vector3D& recoPos3D,
                    double arcLength2D = 0);
 
       /**
@@ -79,7 +77,7 @@ namespace Belle2 {
        *  as seen from the xy plane. Hence also xy position and transvers travel distance are available.
        *  Only the stereo hits have then the full information to go head and make the sz trajectory.
        */
-      static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit,
+      static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit2D,
                                       const CDCTrajectory2D& trajectory2D);
 
       /**
@@ -131,7 +129,7 @@ namespace Belle2 {
        *  at just calculated the transvers travel distance, since the trajectory should be more exact than the shifting
        *  along the wire.
        */
-      static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit,
+      static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit2D,
                                       const CDCTrajectory2D& trajectory2D,
                                       const CDCTrajectorySZ& trajectorySZ);
 
@@ -272,6 +270,12 @@ namespace Belle2 {
         return getRecoDisp2D().orthogonal(rotation);
       }
 
+      /// Getter for the direction of flight relative to the position
+      double getAlpha() const
+      {
+        return getRecoPos2D().angleWith(getFlightDirection2D());
+      }
+
       /**
        *  Constructs a two dimensional reconstructed hit by
        *  carrying out the stereo ! projection to the wire reference postion.
@@ -291,7 +295,7 @@ namespace Belle2 {
       { return getWire().getWirePos2DAtZ(getRecoZ()); }
 
       /// Scales the displacement vector in place to lie on the dirft circle.
-      void snapToDriftCircle();
+      void snapToDriftCircle(bool switchSide = false);
 
       /**
        *  Returns the drift length next to the reconstructed position.
@@ -300,9 +304,8 @@ namespace Belle2 {
       double getSignedRecoDriftLength() const
       { return getRLWireHit().getSignedRefDriftLength(); }
 
-      /// Settter to update the drift length of the hit
-      void setRecoDriftLength(double driftLength)
-      { m_rlWireHit.setRefDriftLength(driftLength); }
+      /// Setter to update the drift length of the hit
+      void setRecoDriftLength(double driftLength, bool snapRecoPos);
 
       /**
        *  Returns the drift length variance next to the reconstructed position.
@@ -330,16 +333,6 @@ namespace Belle2 {
       bool isInCellZBounds(const double factor = 1) const
       { return getWire().isInCellZBounds(getRecoPos3D(), factor); }
 
-      /**
-       *  Access the object methods and methods from a pointer in the same way.
-       *  In situations where the type is not known to be a pointer or a reference there is no way to tell
-       *  if one should use the dot '.' or operator '->' for method look up.
-       *  So this function defines the -> operator for the object.
-       *  No matter you have a pointer or an object access is given with '->'.
-       */
-      const CDCRecoHit3D* operator->() const
-      { return this; }
-
     private:
       /// Memory for the oriented wire hit reference.
       CDCRLWireHit m_rlWireHit;
@@ -348,8 +341,7 @@ namespace Belle2 {
       Vector3D m_recoPos3D;
 
       /// Memory for the travel distance as see in the xy projection.
-      double m_arcLength2D;
-
-    }; // class CDCRecoHit3D
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+      double m_arcLength2D = 0;
+    };
+  }
+}

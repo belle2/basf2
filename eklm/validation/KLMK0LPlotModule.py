@@ -201,11 +201,11 @@ class KLMK0LPlotModule(Module):
                 self.hist_pres.Fill(momentum_k.Mag() - momentum.Mag())
                 self.hist_ptres.Fill(momentum_k.Theta() - momentum.Theta())
                 self.hist_ppres.Fill(momentum_k.Phi() - momentum.Phi())
-        self.vertex_k_av = self.vertex_k_av * (1.0 / len(self.vertex))
-        self.momentum_av = self.momentum_av * (1.0 / len(self.vertex))
 
     def terminate(self):
         """ Termination function. """
+        self.vertex_k_av = self.vertex_k_av * (1.0 / len(self.vertex))
+        self.momentum_av = self.momentum_av * (1.0 / len(self.vertex))
         # x, y, z, e
         cov_mat = numpy.zeros((4, 4))
         corr_mat = numpy.zeros((4, 4))
@@ -249,6 +249,8 @@ class KLMK0LPlotModule(Module):
         self.hist_covmat.SetBinContent(4, cov_mat[1][1])
         self.hist_covmat.SetBinContent(5, cov_mat[1][2])
         self.hist_covmat.SetBinContent(6, cov_mat[2][2])
+        for i in range(1, 7):
+            self.hist_covmat.SetBinError(i, 100)
         for i in range(0, 4):
             for j in range(i, 4):
                 corr_mat[i][j] = cov_mat[i][j] / \
@@ -263,6 +265,8 @@ class KLMK0LPlotModule(Module):
         self.hist_corrmat.SetBinContent(8, corr_mat[2][2])
         self.hist_corrmat.SetBinContent(9, corr_mat[2][3])
         self.hist_corrmat.SetBinContent(10, corr_mat[3][3])
+        for i in range(1, 11):
+            self.hist_corrmat.SetBinError(i, 0.05)
         self.output_file.cd()
         self.hist_nkl.Write()
         self.hist_xres.Write()

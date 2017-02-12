@@ -9,5 +9,3 @@
  **************************************************************************/
 
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
-
-ClassImp(Belle2::DatabaseRepresentationOfWeightfile);

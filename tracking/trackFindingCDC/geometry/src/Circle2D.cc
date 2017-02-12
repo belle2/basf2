@@ -9,6 +9,5 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/geometry/Circle2D.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;

@@ -27,7 +27,6 @@
 #include <testbeam/vxd/dataobjects/TelTrueHit.h>
 #include <testbeam/vxd/dataobjects/TelCluster.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <framework/dataobjects/SimpleVec.h>
 #include <genfit/TrackCand.h>
 #include <genfit/WireTrackCandHit.h>
 
@@ -281,7 +280,6 @@ void TrackFinderMCVXDTBModule::event()
 
   //register StoreArray which will be filled by this module
   StoreArray<genfit::TrackCand> trackCandidates(m_gfTrackCandsColName);
-  trackCandidates.create();
   RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
 
   //an auxiliary variable to discard neutrals if necessary (assume that no particles with charge -999 exist)

@@ -7,6 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
+
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 namespace Belle2 {
@@ -19,12 +21,12 @@ namespace Belle2 {
     class FirstOfPairInBox {
     public:
       /// The type of the underlaying HoughBox (copied from the underlaying hit algorithm)
-      typedef typename AHitInBoxAlgorithm::HoughBox HoughBox;
+      using HoughBox = typename AHitInBoxAlgorithm::HoughBox;
 
       /// Redirect the first element of a pair to the next algorithm.
       template<class APairObject>
-      inline Weight operator()(const APairObject& pairObject,
-                               const HoughBox* box)
+      Weight operator()(const APairObject& pairObject,
+                        const HoughBox* box)
       {
         AHitInBoxAlgorithm hitInBoxAlgorithm;
         return hitInBoxAlgorithm(pairObject.first, box);

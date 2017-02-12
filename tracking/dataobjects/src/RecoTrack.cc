@@ -14,11 +14,15 @@ RecoTrack::RecoTrack(const TVector3& seedPosition, const TVector3& seedMomentum,
                      const std::string& storeArrayNameOfCDCHits,
                      const std::string& storeArrayNameOfSVDHits,
                      const std::string& storeArrayNameOfPXDHits,
+                     const std::string& storeArrayNameOfBKLMHits,
+                     const std::string& storeArrayNameOfEKLMHits,
                      const std::string& storeArrayNameOfRecoHitInformation) :
   m_charge(seedCharge),
   m_storeArrayNameOfCDCHits(storeArrayNameOfCDCHits),
   m_storeArrayNameOfSVDHits(storeArrayNameOfSVDHits),
   m_storeArrayNameOfPXDHits(storeArrayNameOfPXDHits),
+  m_storeArrayNameOfBKLMHits(storeArrayNameOfBKLMHits),
+  m_storeArrayNameOfEKLMHits(storeArrayNameOfEKLMHits),
   m_storeArrayNameOfRecoHitInformation(storeArrayNameOfRecoHitInformation)
 {
   m_genfitTrack.setStateSeed(seedPosition, seedMomentum);
@@ -38,6 +42,8 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
                                           const std::string& storeArrayNameOfCDCHits,
                                           const std::string& storeArrayNameOfSVDHits,
                                           const std::string& storeArrayNameOfPXDHits,
+                                          const std::string& storeArrayNameOfBKLMHits,
+                                          const std::string& storeArrayNameOfEKLMHits,
                                           const std::string& storeArrayNameOfRecoHitInformation,
                                           const bool recreateSortingParameters
                                          )
@@ -48,6 +54,8 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
   StoreArray<UsedCDCHit> cdcHits(storeArrayNameOfCDCHits);
   StoreArray<UsedSVDHit> svdHits(storeArrayNameOfSVDHits);
   StoreArray<UsedPXDHit> pxdHits(storeArrayNameOfPXDHits);
+  StoreArray<UsedBKLMHit> bklmHits(storeArrayNameOfBKLMHits);
+  StoreArray<UsedEKLMHit> eklmHits(storeArrayNameOfEKLMHits);
 
   // Set the tracking parameters
   const TVector3& position = trackCand.getPosSeed();
@@ -57,7 +65,9 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
 
   RecoTrack* newRecoTrack = recoTracks.appendNew(position, momentum, charge,
                                                  cdcHits.getName(), svdHits.getName(),
-                                                 pxdHits.getName(), recoHitInformations.getName());
+                                                 pxdHits.getName(),
+                                                 bklmHits.getName(), eklmHits.getName(),
+                                                 recoHitInformations.getName());
   newRecoTrack->setTimeSeed(time);
 
   // TODO Set the covariance seed (that should be done by the tracking package)
@@ -97,6 +107,12 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
     } else if (detID == Const::PXD) {
       UsedPXDHit* pxdHit = pxdHits[hitID];
       newRecoTrack->addPXDHit(pxdHit, sortingParameter);
+    } else if (detID == Const::BKLM) {
+      UsedBKLMHit* bklmHit = bklmHits[hitID];
+      newRecoTrack->addBKLMHit(bklmHit, sortingParameter);
+    } else if (detID == Const::EKLM) {
+      UsedEKLMHit* eklmHit = eklmHits[hitID];
+      newRecoTrack->addEKLMHit(eklmHit, sortingParameter);
     }
   }
 
@@ -133,6 +149,14 @@ genfit::TrackCand RecoTrack::createGenfitTrackCand() const
   mapOnHits<UsedPXDHit>(m_storeArrayNameOfPXDHits, [&createdTrackCand](const RecoHitInformation & hitInformation,
   const UsedPXDHit * const hit) {
     createdTrackCand.addHit(Const::PXD, hit->getArrayIndex(), -1, hitInformation.getSortingParameter());
+  });
+  mapOnHits<UsedBKLMHit>(m_storeArrayNameOfBKLMHits, [&createdTrackCand](const RecoHitInformation & hitInformation,
+  const UsedBKLMHit * const hit) {
+    createdTrackCand.addHit(Const::BKLM, hit->getArrayIndex(), -1, hitInformation.getSortingParameter());
+  });
+  mapOnHits<UsedEKLMHit>(m_storeArrayNameOfEKLMHits, [&createdTrackCand](const RecoHitInformation & hitInformation,
+  const UsedEKLMHit * const hit) {
+    createdTrackCand.addHit(Const::EKLM, hit->getArrayIndex(), -1, hitInformation.getSortingParameter());
   });
 
   createdTrackCand.sortHits();
@@ -171,6 +195,20 @@ size_t RecoTrack::addHitsFromRecoTrack(const RecoTrack* recoTrack, const unsigne
                             recoHitInfo->getFoundByTrackFinder());
   }
 
+  for (auto* bklmHit : recoTrack->getBKLMHitList()) {
+    auto recoHitInfo = recoTrack->getRecoHitInformation(bklmHit);
+    assert(recoHitInfo);
+    hitsCopied += addBKLMHit(bklmHit, recoHitInfo->getSortingParameter() + sortingParameterOffset,
+                             recoHitInfo->getFoundByTrackFinder());
+  }
+
+  for (auto* eklmHit : recoTrack->getEKLMHitList()) {
+    auto recoHitInfo = recoTrack->getRecoHitInformation(eklmHit);
+    assert(recoHitInfo);
+    hitsCopied += addEKLMHit(eklmHit, recoHitInfo->getSortingParameter() + sortingParameterOffset,
+                             recoHitInfo->getFoundByTrackFinder());
+  }
+
   return hitsCopied;
 }
 
@@ -178,6 +216,10 @@ size_t RecoTrack::addHitsFromRecoTrack(const RecoTrack* recoTrack, const unsigne
 bool RecoTrack::wasFitSuccessful(const genfit::AbsTrackRep* representation) const
 {
   checkDirtyFlag();
+
+  if (getRepresentations().empty()) {
+    return false;
+  }
 
   if (not hasTrackFitStatus(representation)) {
     return false;
@@ -226,4 +268,55 @@ void RecoTrack::prune()
 genfit::Track& RecoTrackGenfitAccess::getGenfitTrack(RecoTrack& recoTrack)
 {
   return recoTrack.m_genfitTrack;
+}
+
+const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(const TVector3& closestPoint,
+    const genfit::AbsTrackRep* representation)
+{
+  checkDirtyFlag();
+  const unsigned int numberOfPoints = m_genfitTrack.getNumPointsWithMeasurement();
+
+  assert(numberOfPoints > 0);
+
+  const genfit::MeasuredStateOnPlane* nearestStateOnPlane = nullptr;
+  double minimalDistance2 = 0;
+  for (unsigned int hitIndex = 0; hitIndex < numberOfPoints; hitIndex++) {
+    const genfit::MeasuredStateOnPlane& measuredStateOnPlane = m_genfitTrack.getFittedState(hitIndex, representation);
+
+    const double currentDistance2 = (measuredStateOnPlane.getPos() - closestPoint).Mag2();
+
+    if (not nearestStateOnPlane or currentDistance2 < minimalDistance2) {
+      nearestStateOnPlane = &measuredStateOnPlane;
+      minimalDistance2 = currentDistance2;
+    }
+  }
+  return *nearestStateOnPlane;
+}
+
+
+void RecoTrack::deleteFittedInformation()
+{
+  // Delete all fitted information for all representations
+  for (unsigned int i = 0; i < getRepresentations().size(); i++) {
+    m_genfitTrack.deleteTrackRep(i);
+  }
+}
+
+void RecoTrack::copyStateFromSeed()
+{
+  if (getRepresentations().empty()) {
+    B2FATAL("No representation present, so it is not possible to copy the state!");
+  }
+  const auto& measuredStateFromFirstHit = getMeasuredStateOnPlaneFromFirstHit();
+
+  const auto& position = measuredStateFromFirstHit.getPos();
+  const auto& momentum = measuredStateFromFirstHit.getMom();
+  const auto& charge = measuredStateFromFirstHit.getCharge();
+  const auto& time = measuredStateFromFirstHit.getTime();
+  const auto& covariance = measuredStateFromFirstHit.getCov();
+
+  setPositionAndMomentum(position, momentum);
+  setChargeSeed(charge);
+  setTimeSeed(time);
+  setSeedCovariance(covariance);
 }

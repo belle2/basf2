@@ -279,7 +279,8 @@ void HVTUI::run()
             getChannel(m_ir, crate, slot, channel);
             bool switchon = !StringUtil::find(value, "ON");
             setSwitch(crate, slot, channel, switchon);
-            requestSwitch(crate, slot, channel);
+            //usleep(500000);
+            //requestSwitch(crate, slot, channel);
           }
         } else {
           if (key == '\n') {
@@ -381,6 +382,11 @@ void HVTUI::Listener::run()
           case HVMessage::ON:  sflag = " ON"; wattrset((WINDOW*)m_tui->m_pad, COLOR_PAIR(2) | A_REVERSE); break;
           case HVMessage::OVP: sflag = "OVP"; wattrset((WINDOW*)m_tui->m_pad, COLOR_PAIR(1) | A_REVERSE); break;
           case HVMessage::OCP: sflag = "OCP"; wattrset((WINDOW*)m_tui->m_pad, COLOR_PAIR(1) | A_REVERSE); break;
+          case HVMessage::RAMPUP: sflag = "RUP"; wattrset((WINDOW*)m_tui->m_pad, COLOR_PAIR(3) | A_REVERSE); break;
+          case HVMessage::RAMPDOWN: sflag = "RDW"; wattrset((WINDOW*)m_tui->m_pad, COLOR_PAIR(3) | A_REVERSE); break;
+          case HVMessage::TRIP: sflag = "TRIP"; wattrset((WINDOW*)m_tui->m_pad, COLOR_PAIR(1) | A_REVERSE); break;
+          case HVMessage::ETRIP: sflag = "ETRIP"; wattrset((WINDOW*)m_tui->m_pad, COLOR_PAIR(1) | A_REVERSE); break;
+          case HVMessage::INTERLOCK: sflag = "ILCK"; wattrset((WINDOW*)m_tui->m_pad, COLOR_PAIR(1) | A_REVERSE); break;
         }
         m_tui->setValue(9, index, sflag);
         wattrset((WINDOW*)m_tui->m_pad, COLOR_PAIR(10));
@@ -436,6 +442,7 @@ void HVTUI::Monitor::run()
       int crate = m_tui->m_table[i].crate;
       int slot = m_tui->m_table[i].slot;
       int channel = m_tui->m_table[i].channel;
+      m_tui->requestSwitch(crate, slot, channel);
       m_tui->requestState(crate, slot, channel);
       m_tui->requestVoltageMonitor(crate, slot, channel);
       m_tui->requestCurrentMonitor(crate, slot, channel);

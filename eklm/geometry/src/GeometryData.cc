@@ -296,7 +296,8 @@ static void getDetailDxDy(HepGeom::Point3D<double>* points, int nPoints,
                           double& dx, double& dy)
 {
   int i;
-  double a, b, c, d, t, maxt, x1, y1, x2, y2, u;
+  /* Variable maxt is initialized to avoid a false-positive warning. */
+  double a, b, c, d, t, maxt = 0, x1, y1, x2, y2, u;
   bool intersection;
   /*
    * Contact by one of the detail points.
@@ -478,6 +479,8 @@ void EKLM::GeometryData::initializeFromGearbox()
   mode = gd.getInt("Mode");
   if (mode < 0 || mode > 1)
     B2FATAL("EKLM started with unknown geometry mode " << mode << ".");
+  if (mode == 1)
+    B2FATAL("EKLM background study mode is disabled, please use normal mode.");
   m_Mode = (enum DetectorMode)mode;
   /* Numbers of elements. */
   m_NEndcaps = gd.getInt("NEndcaps");

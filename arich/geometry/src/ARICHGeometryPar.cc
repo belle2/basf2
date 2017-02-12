@@ -315,6 +315,7 @@ namespace Belle2 {
     TVector2 locloc = position - chipPos;
     int ix = int(locloc.X() / m_padSize);
     int iy = int(locloc.Y() / m_padSize);
+    if (locloc.X() < 0 || locloc.Y() < 0) return -1;
     if (ix > Npad - 1 || iy > Npad - 1) return -1;
     int chID = ChipID * Npad * Npad + iy + ix * Npad;
     return chID;

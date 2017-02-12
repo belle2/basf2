@@ -64,7 +64,7 @@ DAF::DAF(AbsKalmanFitter* kalman, double deltaPval, double deltaWeight)
   kalman_->setMultipleMeasurementHandling(weightedAverage); // DAF makes no sense otherwise
   kalman_->setMaxIterations(1);
 
-  if (dynamic_cast<KalmanFitterRefTrack*>(kalman_.get()) != NULL) {
+  if (dynamic_cast<KalmanFitterRefTrack*>(kalman_.get()) != nullptr) {
     static_cast<KalmanFitterRefTrack*>(kalman_.get())->setRefitAll();
   }
 
@@ -131,7 +131,7 @@ void DAF::processTrackWithRep(Track* tr, const AbsTrackRep* rep, bool resortHits
     try{
       converged = calcWeights(tr, rep, betas_.at(iBeta));
       if (!converged && iBeta >= minIterations_-1 &&
-          status->getBackwardPVal() != 0 && abs(lastPval - status->getBackwardPVal()) < this->deltaPval_) {
+          status->getBackwardPVal() != 0 && fabs(lastPval - status->getBackwardPVal()) < this->deltaPval_) {
         if (debugLvl_ > 0) {
           debugOut << "converged by Pval = " << status->getBackwardPVal() << " even though weights changed at iBeta = " << iBeta << std::endl;
         }
@@ -267,7 +267,7 @@ bool DAF::calcWeights(Track* tr, const AbsTrackRep* rep, double beta) {
       continue;
     }
     AbsFitterInfo* fi = (*tp)->getFitterInfo(rep);
-    if (dynamic_cast<KalmanFitterInfo*>(fi) == NULL){
+    if (dynamic_cast<KalmanFitterInfo*>(fi) == nullptr){
       Exception exc("DAF::getWeights ==> can only use KalmanFitterInfos",__LINE__,__FILE__);
       throw exc;
     }

@@ -43,6 +43,8 @@ namespace Belle2 {
 
     /** get [TC ID] from [Xtal ID] */
     int getTCIdFromXtalId(int);
+    /** get [Xtal ID] from [TC ID] (Output as a vector)*/
+    std::vector<int> getXtalIdFromTCId(int);
     /** get [TC sub ID] from [Xtal ID]*/
     int getTCSubIdFromXtalId(int);
     /** get [TC Theta ID] from [TC ID] */
@@ -51,6 +53,7 @@ namespace Belle2 {
     int getTCPhiIdFromTCId(int);
     /**TC position (cm)*/
     TVector3 getTCPosition(int);
+
   private:
 
 
@@ -63,6 +66,8 @@ namespace Belle2 {
     /** */
     int _tcphiid;    // ID = 0-35(0-31 for both endcap)
 
+    /** Matrix of the relation of TC and Xtal*/
+    std::vector<std::vector<int>> TC2Xtal;
   };
 //
 //

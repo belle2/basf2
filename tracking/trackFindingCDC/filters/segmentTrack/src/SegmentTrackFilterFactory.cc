@@ -8,62 +8,65 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/segmentTrack/SimpleSegmentTrackFilter.h>
 
-using namespace std;
+#include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackVarSet.h>
+
+#include <tracking/trackFindingCDC/filters/base/AllFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MCFilter.h>
+#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
+
+#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+namespace {
+  using AllSegmentTrackFilter = AllFilter<BaseSegmentTrackFilter>;
+  using MCSegmentTrackFilter = MCFilter<VariadicUnionVarSet<SegmentTrackTruthVarSet, SegmentTrackVarSet>>;
+  using RecordingSegmentTrackFilter = RecordingFilter<VariadicUnionVarSet<SegmentTrackTruthVarSet, SegmentTrackVarSet>>;
+  using MVASegmentTrackFilter = MVAFilter<SegmentTrackVarSet>;
+}
+
+SegmentTrackFilterFactory::SegmentTrackFilterFactory(const std::string& defaultFilterName)
+  : Super(defaultFilterName)
+{
+}
 
 std::map<std::string, std::string>
 SegmentTrackFilterFactory::getValidFilterNamesAndDescriptions() const
 {
-  std::map<std::string, std::string>
-  filterNames = Super::getValidFilterNamesAndDescriptions();
-
-  filterNames.insert({
-    {"truth", "monte carlo truth"},
+  return {
     {"none", "no segment track combination is valid"},
-    {"simple", "mc free with simple criteria"},
+    {"truth", "monte carlo truth"},
+    {"mva", "test with a mva method"},
     {"recording", "record variables to a TTree"},
-    {"tmva", "test with a tmva method"}
-  });
-  return filterNames;
+  };
 }
 
 std::unique_ptr<BaseSegmentTrackFilter>
 SegmentTrackFilterFactory::create(const std::string& filterName) const
 {
-  if (filterName == string("none")) {
-    return std::unique_ptr<BaseSegmentTrackFilter>(new BaseSegmentTrackFilter());
-  } else if (filterName == string("truth")) {
-    return std::unique_ptr<BaseSegmentTrackFilter>(new MCSegmentTrackFilter());
-  } else if (filterName == string("simple")) {
-    return std::unique_ptr<BaseSegmentTrackFilter>(new SimpleSegmentTrackFilter());
+  if (filterName == "none") {
+    return makeUnique<BaseSegmentTrackFilter>();
+  } else if (filterName == "truth") {
+    return makeUnique<MCSegmentTrackFilter>();
+  } else if (filterName == "mva") {
+    return makeUnique<MVASegmentTrackFilter>("tracking/data/trackfindingcdc_SegmentTrackFilterFirstStep.xml");
+  } else if (filterName == "recording") {
+    return makeUnique<RecordingSegmentTrackFilter>("SegmentTrackFilterFirstStep.root");
   } else {
     return Super::create(filterName);
   }
 }
 
-std::unique_ptr<BaseSegmentTrackFilter>
-SegmentTrackFilterFirstStepFactory::create(const std::string& filterName) const
+std::string SegmentTrackFilterFactory::getFilterPurpose() const
 {
-  if (filterName == string("tmva")) {
-    return std::unique_ptr<BaseSegmentTrackFilter>(new TMVASegmentTrackFilter("SegmentTrackFilterFirstStep"));
-  } else if (filterName == string("recording")) {
-    return std::unique_ptr<BaseSegmentTrackFilter>(new RecordingSegmentTrackFilter("SegmentTrackFilterFirstStep.root"));
-  } else {
-    return Super::create(filterName);
-  }
+  return "Segment track chooser to be used during the combination of segment track pairs";
 }
 
-std::unique_ptr<BaseSegmentTrackFilter>
-SegmentTrackFilterSecondStepFactory::create(const std::string& filterName) const
+std::string SegmentTrackFilterFactory::getIdentifier() const
 {
-  if (filterName == string("tmva")) {
-    return std::unique_ptr<BaseSegmentTrackFilter>(new TMVASegmentTrackFilter("SegmentTrackFilterSecondStep"));
-  } else if (filterName == string("recording")) {
-    return std::unique_ptr<BaseSegmentTrackFilter>(new RecordingSegmentTrackFilter("SegmentTrackFilterSecondStep.root"));
-  } else {
-    return Super::create(filterName);
-  }
+  return "SegmentTrackFilter";
 }

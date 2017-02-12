@@ -17,8 +17,10 @@
 #include <TTree.h>
 #include <TFile.h>
 #include <TRandom.h>
+#include <unistd.h>
 
 using namespace Belle2;
+using namespace std;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -38,12 +40,16 @@ CaTestModule::CaTestModule() : CalibrationCollectorModule()
   // Parameter definitions
   addParam("spread", m_spread,
            "Spread of gaussian (mean=42) filling of test histogram (range=<0,100>) - probability of algo iterations depend on it", int(17.));
+  addParam("wait", m_wait,
+           "Time in microseconds to usleep during prepare() method before starting.", int(0));
 }
 
 void CaTestModule::prepare()
 {
 
   StoreObjPtr<EventMetaData>::required();
+
+  usleep(m_wait);
 
   // Data object creation --------------------------------------------------
   auto histo1 = new TH1F("histo", "Test histogram, which mean value should be found by test calibration algo", 100, 0., 100.);

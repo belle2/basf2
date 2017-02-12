@@ -40,10 +40,13 @@ namespace Belle2 {
     /** Disable handling of Mergeable objects. Useful for special applications like AsyncWrapper. */
     void disableMergeableHandling(bool disable = true) { m_handleMergeable = !disable; }
 
-  private:
+    /** initialize m_streamer. */
+    void initStreamer();
+
     /** Gets data from m_rbuf and puts it into the data store. */
     void readEvent();
 
+  private:
     /** attached RingBuffer. */
     RingBuffer* m_rbuf;
 

@@ -13,6 +13,28 @@
 #include <framework/logging/Logger.h>
 #include <sstream>
 
+// Template specialization to fix NAN sort bug of FastBDT in upto Version 3.2
+#if FastBDT_VERSION_MAJOR <= 3 && FastBDT_VERSION_MINOR <= 2
+namespace FastBDT {
+  template<>
+  bool compareIncludingNaN(float i, float j)
+  {
+    if (std::isnan(i)) {
+      if (std::isnan(j)) {
+        // If both are NAN i is NOT smaller
+        return false;
+      } else {
+        // In all other cases i is smaller
+        return true;
+      }
+    }
+    // If j is NaN the following line will return false,
+    // which is fine in our case.
+    return i < j;
+  }
+}
+#endif
+
 namespace Belle2 {
   namespace MVA {
 

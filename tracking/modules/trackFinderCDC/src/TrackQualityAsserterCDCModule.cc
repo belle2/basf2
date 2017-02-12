@@ -2,20 +2,48 @@
 
 #include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <framework/dataobjects/Helix.h>
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 REG_MODULE(TrackQualityAsserterCDC);
 
-void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
+std::string TrackQualityAsserter::getDescription()
 {
-  // Only use the not fitted tracks if set
+  return "Many tracks in the CDC can not be fitted. For fitting them, we remove "
+         "parts of the hits or maybe the whole track.";
+}
+
+void TrackQualityAsserter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  moduleParamList->addParameter(prefixed(prefix, "corrections"),
+                                m_param_corrections,
+                                "The list of corrections to apply. "
+                                "Choose from LayerBreak, LargeAngle, "
+                                "LargeBreak2, OneSuperlayer, Small, B2B, "
+                                "MoveToNextAxial, None, Split, and "
+  "ArcLength2D.", {
+    std::string("LayerBreak"),
+    std::string("LargeAngle"),
+    std::string("OneSuperlayer"),
+    std::string("Small")
+  });
+
+  moduleParamList->addParameter(prefixed(prefix, "onlyNotFittedTracks"),
+                                m_param_onlyNotFittedTracks,
+                                "Flag to apply the corrections only to not fitted tracks.",
+                                false);
+}
+
+void TrackQualityAsserter::apply(std::vector<CDCTrack>& tracks)
+{
+  // Only use the not fitted tracks if set - was unused
+  /*
   if (m_param_onlyNotFittedTracks) {
     tracks.erase(std::remove_if(tracks.begin(), tracks.end(), [](const CDCTrack & track) {
       const genfit::TrackCand* trackCand = track.getRelatedGenfitTrackCandidate();
@@ -32,6 +60,7 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
       return false;
     }), tracks.end());
   }
+  */
 
   std::vector<CDCTrack> splittedTracks;
 
@@ -78,19 +107,29 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
         B2FATAL("Do not know corrector function " << correctorFunction);
       }
 
-      track.removeAllAssignedMarkedHits();
+      // Delete all hits that were marked
+      erase_remove_if(track, [](const CDCRecoHit3D & recoHit3D) -> bool {
+        AutomatonCell& automatonCell = recoHit3D.getWireHit().getAutomatonCell();
+        if (automatonCell.hasAssignedFlag())
+        {
+          automatonCell.unsetTakenFlag();
+          return true;
+        }
+        return false;
+      });
+
       TrackQualityTools::normalizeHitsAndResetTrajectory(track);
-    }
+    } // correctorFunction
+  } // track
 
-    if (track.size() == 0)
-      continue;
-  }
-
-  tracks.erase(std::remove_if(tracks.begin(), tracks.end(), [](const CDCTrack & track) -> bool {
-    return track.size() < 3;
-  }), tracks.end());
+  erase_remove_if(tracks, [](const CDCTrack & track) -> bool { return track.size() < 3; });
 
   for (const CDCTrack& splittedTrack : splittedTracks) {
     tracks.push_back(splittedTrack);
   }
+}
+
+TrackQualityAsserterCDCModule::TrackQualityAsserterCDCModule()
+  : Super( {"CDCTrackVector"})
+{
 }

@@ -116,6 +116,37 @@ namespace Belle2 {
      */
     void printSigma();
 
+    /**
+     * Import displacement of wire position to the database.
+     */
+    void importDisplacement(std::string fileName);
+
+    /**
+     * Get the displacement of wire position from the database and
+     * print it.
+     */
+    void printDisplacement();
+
+    /**
+     * Import wire alignment table to the database.
+     */
+    void importWirPosAlign(std::string fileName);
+    /**
+     * Get the wire alignment table from the database and
+     * print it.
+     */
+    void printWirPosAlign();
+
+    /**
+     * Import wire misalignment table to the database.
+     */
+    void importWirPosMisalign(std::string fileName);
+    /**
+     * Get the wire misalignment table from the database and
+     * print it.
+     */
+    void printWirPosMisalign();
+
   private:
 
     /**

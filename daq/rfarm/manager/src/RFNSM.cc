@@ -165,7 +165,7 @@ void RFNSM::m_Stop(NSMmsg* msg, NSMcontext* ctx)
   int stat = g_nsmserver->Stop(msg, ctx);
   if (stat == 0) {
     RFNSM_Status::Instance().set_state(RFSTATE_CONFIGURED);
-    b2nsm_ok(msg, "Configured", NULL);
+    b2nsm_ok(msg, "Stopped", NULL);
   } else
     b2nsm_error(msg, NULL);
 }

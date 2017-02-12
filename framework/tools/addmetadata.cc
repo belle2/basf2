@@ -46,6 +46,7 @@ int main(int argc, char* argv[])
   // check for help option
   if (varMap.count("help")) {
     cout << "Usage: " << argv[0] << " [OPTIONS] [FILE]\n";
+    cout << "Add/edit LFN in given file, also update file catalog.\n\n";
     cout << options << endl;
     return 0;
   }

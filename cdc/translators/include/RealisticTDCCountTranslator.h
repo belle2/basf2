@@ -13,8 +13,9 @@
 
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
 #include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeoControlPar.h>
 
-#include <TVector3.h>
+#include <framework/dataobjects/EventT0.h>
 
 namespace Belle2 {
   namespace CDC {
@@ -28,10 +29,18 @@ namespace Belle2 {
       /** Destructor. */
       ~RealisticTDCCountTranslator() {};
 
-      /** If trigger jitter was simulated, in every event one has to give an estimate of the effect. */
-      void setEventTime(double eventTime = 0)
+      /**
+       * If trigger jitter was simulated, in every event one has to give an estimate of the effect.
+       * To reproduce the old behaviour, the other extracted event T0s are deleted before.
+       * */
+      void setEventTime(double eventTime = 0) __attribute__((deprecated))
       {
-        m_eventTime = eventTime;
+        if (not m_eventTimeStoreObject.isValid()) {
+          m_eventTimeStoreObject.create();
+        }
+
+        m_eventTimeStoreObject->clear();
+        m_eventTimeStoreObject->addEventT0(eventTime, 0, Const::CDC);
       }
 
       /**
@@ -82,18 +91,17 @@ namespace Belle2 {
       bool m_useInWirePropagationDelay;
 
       /**
-       * Wire position at the cdc backward endplate.
+       * Event timing. The event time is fetched from the data store using this pointer.
        */
-      TVector3 m_backWirePos;
+      StoreObjPtr<EventT0> m_eventTimeStoreObject;
 
       /**
-       * Event timing.
-       * If this is not simulated, m_eventTime is set to be 0.
+       * Cached reference to CDC GeoControlPar object.
        */
-      double m_eventTime;
+      const CDCGeoControlPar& m_gcp;
 
       /**
-       * Reference to CDC GeometryPar object.
+       * Cached reference to CDC GeometryPar object.
        */
       const CDCGeometryPar& m_cdcp;
 
@@ -103,15 +111,10 @@ namespace Belle2 {
       //      unsigned short m_tdcOffset;
 
       /**
-       * TDC bin width (ns).
+       * Cached TDC bin width (ns).
        * N.B. The declaration should be after m_cdcp for proper initialization.
        */
       const double m_tdcBinWidth;
-
-      /**
-       * Conv. factor to 'drift length' (cm/ns) when drift time < 0.
-       */
-      const double m_vFactor;
     };
   }
 }

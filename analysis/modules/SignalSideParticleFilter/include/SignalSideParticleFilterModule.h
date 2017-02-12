@@ -22,7 +22,7 @@
 
 namespace Belle2 {
   /**
-   * The module returns true if the current RestOfEvent object is related to any of the Particles from the input ParticleList.
+   * The module returns true if the current RestOfEvent object is related to any of the Particles in the input ParticleLists.
    *
    * This module should be executed in for_each Rest of Event path only. The ROE objects in DataStore might be created just for Particles
    * from one ParticleList, or they might be created for particles from multiple ParticleLists, or particles reconstructed in multiple
@@ -47,8 +47,7 @@ namespace Belle2 {
 
   private:
 
-    std::string m_particleListName;  /**< Input ParticleList name */
-    StoreObjPtr<ParticleList> m_inputList; /**< input particle list */
+    std::vector<std::string> m_particleLists;  /**< Name of the input particle lists */
 
     std::string m_selection;  /**< Additional selection criteria */
     std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */

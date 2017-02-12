@@ -206,7 +206,7 @@ void DesSer::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawDataBlo
       printf("[DEBUG] i= %d : num entries %d : Tot words %d\n", i , rawdblk->GetNumEntries(), rawdblk->TotalBufNwords());
       printData(rawdblk->GetBuffer(0), rawdblk->TotalBufNwords());
 
-      char err_buf[500] = "CORRUPTED DATA: No COPPER blocks in RawDataBlock. Exiting...";
+      char err_buf[500] = "[FATAL] CORRUPTED DATA: No COPPER blocks in RawDataBlock. Exiting...";
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(-1);
@@ -255,17 +255,18 @@ int DesSer::sendByWriteV(RawDataBlockFormat* rawdblk)
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "WRITEV error.(%s) Exiting... : sent %d bytes, header %d bytes body %d trailer %d\n" ,
+        sprintf(err_buf, "[ERROR] WRITEV error.(%s) : sent %d bytes, header %d bytes body %d trailer %d\n" ,
                 strerror(errno), n, iov[0].iov_len, iov[1].iov_len, iov[2].iov_len);
 #ifdef NONSTOP
         m_run_error = 1;
         //        B2ERROR(err_buf);
-        printf("[ERROR] %s\n", err_buf); fflush(stdout);
+        printf("%s\n", err_buf); fflush(stdout);
         string err_str = "RUN_ERROR";
         throw (err_str);  // To exit this module, go to DeSerializer** and wait for run-resume.
-#endif
+#else
         print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         exit(1);
+#endif
       }
     }
     break;
@@ -332,16 +333,17 @@ int DesSer::Send(int socket, char* buf, int size_bytes)
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "SEND ERROR.(%s) Exiting...", strerror(errno));
+        sprintf(err_buf, "[ERROR] SEND ERROR.(%s)", strerror(errno));
 #ifdef NONSTOP
         m_run_error = 1;
         //        B2ERROR(err_buf);
-        printf("[ERROR] %s\n", err_buf); fflush(stdout);
+        printf("%s\n", err_buf); fflush(stdout);
         string err_str = "RUN_ERROR";
         throw (err_str);  // To exit this module, go to DeSerializer** and wait for run-resume.
-#endif
+#else
         print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         exit(1);
+#endif
       }
     }
     sent_bytes += ret;
@@ -359,7 +361,7 @@ void DesSer::Accept(bool close_listen)
   host = gethostbyname(m_hostname_local.c_str());
   if (host == NULL) {
     char temp_buf[500];
-    sprintf(temp_buf, "[ERROR] hostname(%s) cannot be resolved(%s). Check /etc/hosts. Exiting...\n",
+    sprintf(temp_buf, "[FATAL] hostname(%s) cannot be resolved(%s). Check /etc/hosts. Exiting...\n",
             m_hostname_local.c_str(), strerror(errno));
     print_err.PrintError(temp_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);
@@ -386,7 +388,7 @@ void DesSer::Accept(bool close_listen)
 
   if (bind(fd_listen, (struct sockaddr*)&sock_listen, sizeof(struct sockaddr)) < 0) {
     char temp_char[500];
-    sprintf(temp_char, "Failed to bind.(%s) Maybe other programs have already occupied this port(%d). Exiting...",
+    sprintf(temp_char, "[FATAL] Failed to bind.(%s) Maybe other programs have already occupied this port(%d). Exiting...",
             strerror(errno), m_port_to);
     print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
@@ -412,7 +414,7 @@ void DesSer::Accept(bool close_listen)
 
   if ((fd_accept = accept(fd_listen, (struct sockaddr*) & (sock_accept), &addrlen)) == 0) {
     char err_buf[500];
-    sprintf(err_buf, "Failed to accept(%s). Exiting...", strerror(errno));
+    sprintf(err_buf, "[FATAL] Failed to accept(%s). Exiting...", strerror(errno));
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   } else {
@@ -425,7 +427,7 @@ void DesSer::Accept(bool close_listen)
     timeout.tv_usec = 0;
     ret = setsockopt(fd_accept, SOL_SOCKET, SO_SNDTIMEO, &timeout, (socklen_t)sizeof(timeout));
     if (ret < 0) {
-      char temp_char[100] = "Failed to set TIMEOUT. Exiting...";
+      char temp_char[100] = "[FATAL] Failed to set TIMEOUT. Exiting...";
       print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     }

@@ -18,12 +18,12 @@
     <!-- Lets define 3 sensitive Boxes at different z positions and with different sizes -->
 
     <LookAtRec>0</LookAtRec>
-    <GEMGain1>40</GEMGain1>
+    <GEMGain1>30</GEMGain1>
     <GEMGain2>50</GEMGain2>
     <GEMGainRMS1>0.2</GEMGainRMS1>
     <GEMGainRMS2>0.2</GEMGainRMS2>
-    <ScaleGain1>10</ScaleGain1>
-    <ScaleGain2>10</ScaleGain2>
+    <ScaleGain1>1</ScaleGain1>
+    <ScaleGain2>1</ScaleGain2>
     <GEMpitch>0.014</GEMpitch>
     <PixelThreshold>3000</PixelThreshold>
     <PixelThresholdRMS>150</PixelThresholdRMS>
@@ -33,22 +33,14 @@
     <ChipRowY>0.84</ChipRowY>
     <PixelTimeBinNb>256</PixelTimeBinNb>
     <PixelTimeBin>25</PixelTimeBin>
-    <TOTA1>10640.8</TOTA1>
-    <TOTB1>-18.4</TOTB1>
-    <TOTC1>96007.6</TOTC1>
-    <TOTQ1>57.</TOTQ1>
-    <TOTA2>29.4</TOTA2>
-    <TOTB2>64.7</TOTB2>
-    <TOTC2>1082.7</TOTC2>
-    <TOTQ2>57.</TOTQ2>
-    <!--TOTA1>24.4678</TOTA1-->
-    <!--TOTB1>-34.7008</TOTB1-->
-    <!--TOTC1>264.282</TOTC1-->
-    <!--TOTQ1>57.</TOTQ1-->
-    <!--TOTA2>24.4678</TOTA2-->
-    <!--TOTB2>-34.7008</TOTB2-->
-    <!--TOTC2>264.282</TOTC2-->
-    <!--TOTQ2>57.</TOTQ2-->
+    <TOTA1>4273.33</TOTA1>
+    <TOTB1>-61.7181</TOTB1>
+    <TOTC1>115547</TOTC1>
+    <TOTQ1>54.</TOTQ1>
+    <TOTA2>43.1155</TOTA2>
+    <TOTB2>-20.1135</TOTB2>
+    <TOTC2>2021.21</TOTC2>
+    <TOTQ2>54.</TOTQ2>
     <Workfct>35.075</Workfct>
     <Fanofac>0.19</Fanofac>
     <GasAbs>0.05</GasAbs>
@@ -56,32 +48,34 @@
     <z_DG>12.0</z_DG>
     <z_TG>0.28</z_TG>
     <z_CG>0.34</z_CG>
-    <Dt_DG>0.0129286</Dt_DG>
+    <Dt_DG>0.0128233</Dt_DG>
     <Dt_TG>0.0153198</Dt_TG>
-    <Dt_CG>0.014713</Dt_CG>
-    <Dl_DG>0.0124361</Dl_DG>
+    <Dt_CG>0.01436818</Dt_CG>
+    <Dl_DG>0.0123371</Dl_DG>
     <Dl_TG>0.0131141</Dl_TG>
-    <Dl_CG>0.0134958</Dl_CG>
-    <v_DG>0.00100675</v_DG>
-    <v_TG>0.0004079</v_TG>
-    <v_CG>0.00038828</v_CG>
-    
+    <Dl_CG>0.0132903</Dl_CG>
+    <v_DG>0.00103182</v_DG>
+    <v_TG>0.004079</v_TG>
+    <v_CG>0.00390826</v_CG>
+
+    <!-- Position 1 prot # 2 -->    
     <Active>
       <MaterialVessel>MICROTPC-Material</MaterialVessel>
       <MaterialGas>MICROTPC-Material</MaterialGas>
       <ScaleGas>MICROTPC-Material</ScaleGas>
       <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
       <Material>MICROTPC-Material</Material>
-      <dx_Vessel unit="cm">15.0</dx_Vessel>
-      <dy_Vessel unit="cm">10.4</dy_Vessel>
-      <dz_Vessel unit="cm">31.0</dz_Vessel>
-      <AngleX unit="deg">0.0</AngleX>
+      <dx_Vessel unit="cm">12.7</dx_Vessel>
+      <dy_Vessel unit="cm">10.16</dy_Vessel>
+      <dz_Vessel unit="cm">30.0</dz_Vessel>
+      <AngleX unit="deg">180.0</AngleX>
       <AngleZ unit="deg">90.0</AngleZ>
       <TPCpos_x unit="cm">POS_X1</TPCpos_x>
       <TPCpos_y unit="cm">POS_Y1</TPCpos_y>
       <TPCpos_z unit="cm">POS_Z1</TPCpos_z>
     </Active>
 
+    <!-- Position 2 TPC # 2 -->
     <Active>
       <MaterialVessel>MICROTPC-Material</MaterialVessel>
       <MaterialGas>MICROTPC-Material</MaterialGas>
@@ -91,13 +85,15 @@
       <dx_Vessel unit="cm">15.0</dx_Vessel>
       <dy_Vessel unit="cm">10.4</dy_Vessel>
       <dz_Vessel unit="cm">31.0</dz_Vessel>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleZ unit="deg">90.0</AngleZ>
+      <AngleX unit="deg">180.0</AngleX>
+      <AngleZ unit="deg">0.0</AngleZ>
+
       <TPCpos_x unit="cm">POS_X2</TPCpos_x>
       <TPCpos_y unit="cm">POS_Y2</TPCpos_y>
       <TPCpos_z unit="cm">POS_Z2</TPCpos_z>
     </Active>
 
+    <!-- Position 3 TPC # 1 -->
     <Active>
       <MaterialVessel>MICROTPC-Material</MaterialVessel>
       <MaterialGas>MICROTPC-Material</MaterialGas>
@@ -107,24 +103,27 @@
       <dx_Vessel unit="cm">15.0</dx_Vessel>
       <dy_Vessel unit="cm">10.4</dy_Vessel>
       <dz_Vessel unit="cm">31.0</dz_Vessel>
-      <AngleX unit="deg">0.0</AngleX>
-      <AngleZ unit="deg">0.0</AngleZ>
+      <AngleX unit="deg">180.0</AngleX>
+      <AngleZ unit="deg">90.0</AngleZ>
+      
       <TPCpos_x unit="cm">POS_X3</TPCpos_x>
       <TPCpos_y unit="cm">POS_Y3</TPCpos_y>
       <TPCpos_z unit="cm">POS_Z3</TPCpos_z>
     </Active>
 
+    <!-- Position 4 prot # 1 -->
     <Active>
       <MaterialVessel>MICROTPC-Material</MaterialVessel>
       <MaterialGas>MICROTPC-Material</MaterialGas>
       <ScaleGas>MICROTPC-Material</ScaleGas>
       <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
       <Material>MICROTPC-Material</Material>
-      <dx_Vessel unit="cm">15.0</dx_Vessel>
-      <dy_Vessel unit="cm">10.4</dy_Vessel>
-      <dz_Vessel unit="cm">31.0</dz_Vessel>
-      <AngleX unit="deg">0.0</AngleX>
+      <dx_Vessel unit="cm">12.7</dx_Vessel>
+      <dy_Vessel unit="cm">10.16</dy_Vessel>
+      <dz_Vessel unit="cm">30.0</dz_Vessel>
+      <AngleX unit="deg">180.0</AngleX>
       <AngleZ unit="deg">0.0</AngleZ>
+      
       <TPCpos_x unit="cm">POS_X4</TPCpos_x>
       <TPCpos_y unit="cm">POS_Y4</TPCpos_y>
       <TPCpos_z unit="cm">POS_Z4</TPCpos_z>

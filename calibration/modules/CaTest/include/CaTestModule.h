@@ -39,6 +39,8 @@ namespace Belle2 {
 
     /** Spread of gaussian (mean=42) filling test histogram (range=<0,100>) - probability of algo iterations depend on it */
     int m_spread;
+    /** Time (us) to wait during prepare method - useful for slowing down the collector for checking*/
+    int m_wait;
   };
 }
 

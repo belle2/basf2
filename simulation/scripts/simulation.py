@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from tracking import add_tracking_for_PXDDataReduction_simulation
 
 
 def check_simulation(path):
@@ -39,40 +40,19 @@ def add_PXDDataReduction(path, components=None):
     pxd_digitizer.param('Digits', pxd_unfiltered_digits)
     path.add_module(pxd_digitizer)
 
-    # track fitting
-    setupGenfit = register_module('SetupGenfitExtrapolation')
-    setupGenfit.set_name('SetupGenfitExtrapolationForDataReduction')
-    path.add_module(setupGenfit)
+    # SVD+CDC tracking
 
-    svd_trackcands = '__ROIsvdGFTrackCands'
-    svd_tracks = '__ROIsvdGFTracks'
+    svd_reco_tracks = '__ROIsvdRecoTracks'
 
-    svd_trackfinder = register_module('VXDTF')
-    svd_trackfinder.set_name('SVD-only VXDTF')
-    svd_trackfinder.param('GFTrackCandidatesColName', svd_trackcands)
-    # WARNING: workaround for possible clashes between fitting and VXDTF
-    # stays until the redesign of the VXDTF is finished.
-    svd_trackfinder.param('TESTERexpandedTestingRoutines', False)
-    svd_trackfinder.param('sectorSetup',
-                          ['shiftedL3IssueTestSVDStd-moreThan400MeV_SVD',
-                           'shiftedL3IssueTestSVDStd-100to400MeV_SVD',
-                           'shiftedL3IssueTestSVDStd-25to100MeV_SVD'
-                           ])
-    svd_trackfinder.param('tuneCutoffs', 0.06)
-    path.add_module(svd_trackfinder)
-
-    trackfitter = register_module('GenFitter')
-    trackfitter.param({"GFTracksColName": svd_tracks,
-                       "PDGCodes": [211],
-                       'GFTrackCandidatesColName': svd_trackcands})
-    trackfitter.set_name('SVD-only GenFitter')
-    path.add_module(trackfitter)
+    add_tracking_for_PXDDataReduction_simulation(path, ['SVD', 'CDC'], False)
 
     pxdDataRed = register_module('PXDDataReduction')
     param_pxdDataRed = {
-        'gfTrackListName': svd_tracks,
+        'recoTrackListName': svd_reco_tracks,
         'PXDInterceptListName': 'PXDIntercepts',
         'ROIListName': 'ROIs',
+        'tolerancePhi': 0.15,
+        'toleranceZ': 0.5,
         'sigmaSystU': 0.02,
         'sigmaSystV': 0.02,
         'numSigmaTotU': 10,

@@ -2,54 +2,116 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import os
 import time
 import subprocess
-from multiprocessing import Process
 import validationserver
+import tempfile
+import os
+import time
+import requests
+import traceback
 
-try:
-    import splinter
-except ImportError:
-    print("The splinter package is required to run this test. Run 'pip3 install splinter' to install")
-    # don't give an error exit code here to not fail if splinter is not available
-    sys.exit(0)
+import validationpath
+from validationtestutil import check_excecute
 
-
-def check_excecute(cmd, terminate_on_error=True):
-    """
-    Executes a shell commands and check for =! 0 return codes
-    """
-
-    print("Executing command '{}'".format(cmd))
-    res = os.system(cmd)
-    print("Command '{}' exited with code {}".format(cmd, res))
-    if not res == 0:
-        print("FATAL: Exit code is not 0")
-        if terminate_on_error:
-            sys.exit(res)
-        return False
-
-    return True
+# url of the local validation webserver
+validation_url = "http://localhost:8000/"
 
 
 def start_webserver():
     """
     Start the validation server process, this will not
-    return. Therefor this function must be started within
+    return. Therefore this function must be started within
     a new subprocess
     """
     validationserver.run_server()
+
+
+def http_post(command, json_args):
+    call_url = validation_url + command
+    print("Posting {} to {}".format(json_args, command))
+    r = requests.post(call_url,
+                      json=json_args)
+    if not r.ok:
+        print("REST call {} with arguments {} failed".format(call_url, json_args))
+        print(str(r))
+        return None
+
+    return r
+
+
+def check_for_plotting(revs, tmp_folder):
+    """
+    Checks if creating new plots for a revision combination works
+    """
+
+    print("Trying to recreate plots for revisions {}".format(revs))
+
+    res = http_post("create_comparison", {"revision_list": revs})
+    if not res:
+        return False
+
+    # will be used to check on the progress
+    prog_key = res.json()["progress_key"]
+
+    done = False
+    waitTime = 0.1  # in seconds
+    maxWaitTime = 3
+    summedWaitTime = 0
+
+    # check the plot status with the webserver and only exit after a timeout
+    # or if the plot combination has been created
+    while not done:
+        res = http_post("check_comparison_status", {"input": prog_key})
+        if not res:
+            return False
+
+        if res.json():
+            if res.json()["status"] == "complete":
+                # plots are done
+                break
+
+        time.sleep(waitTime)
+        summedWaitTime += waitTime
+        if summedWaitTime > maxWaitTime:
+            print("Waited for {} seconds for the requested plots to complete and nothing happened".format(summedWaitTime))
+            return False
+
+    # check if the plots are really present
+    comp_folder = validationpath.get_html_plots_tag_comparison_folder(tmp_folder, revs)
+    comp_json = validationpath.get_html_plots_tag_comparison_json(tmp_folder, revs)
+
+    if not os.path.exists(comp_folder):
+        print("Comparison folder {} does not exist".format(comp_folder))
+        return False
+    if not os.path.isfile(comp_json):
+        print("Comparison json {} does not exist".format(comp_json))
+        return False
+
+    # just check for one random plot
+    some_plot = os.path.join(comp_folder, "validation-test/validationTestPlotsB_gaus_histogram.pdf")
+    if not os.path.isfile(some_plot):
+        print("Comparison plot {} does not exist".format(some_plot))
+        return False
+
+    print("Comparison properly created")
+    return True
 
 
 def check_for_content(revs, min_matrix_plots, min_plot_objects):
     """
     Checks for the expected content on the validation website
     """
+    try:
+        import splinter
+    except ImportError:
+        print("The splinter package is required to run this test. Run 'pip3 install splinter' to install")
+        # don't give an error exit code here to not fail if splinter is not available
+        return True
 
     with splinter.Browser() as browser:
         # Visit URL
-        url = "localhost:8000/static/validation.html"
+        url = validation_url + "static/validation.html"
         print("Opening {} to perform checks", url)
         browser.visit(url)
 
@@ -89,35 +151,63 @@ def main():
     """
     Runs two test validations, starts the web server and queries data
     """
+
+    print("TEST SKIPPED: Not properly runnable on build bot", file=sys.stderr)
+    sys.exit(1)
+
+    # only run the test on dev machines with splinter installed. Also for the tests which
+    # don't use splinter, there are currently some connection problems to the test webserver
+    # on the central build system
+    try:
+        import splinter
+    except ImportError:
+        print("TEST SKIPPED: The splinter package is required to run this test." +
+              "Run 'pip3 install splinter' to install", file=sys.stderr)
+        sys.exit(1)
+
     success = True
 
-    revs_to_gen = ["stack_test_1", "stack_test_2"]
+    revs_to_gen = ["stack_test_1", "stack_test_2", "stack_test_3"]
 
-    for r in revs_to_gen:
-        check_excecute("validate_basf2 --test --tag {}".format(r))
+    # create a temporary test folder in order not to interfere with
+    # already existing validation results
+    with tempfile.TemporaryDirectory() as tmpdir:
 
-    # make sure the webserver process is terminated in any case
-    try:
-        # start webserver to serve json output files, plots and
-        # interactive website
-        server_process = subprocess.Popen(["python3", "validation/scripts/validationserver.py"])
+        # switch to this folder
+        os.chdir(str(tmpdir))
 
-        # wait for one second for the server to start
-        time.sleep(1)
-        success = success and check_for_content(revs_to_gen + ["reference"], 7, 7)
-    except:
-        e = sys.exc_info()[0]
-        # print exception again
-        print("Error {}".format(e))
-        success = False
-    finally:
-        # send terminate command
-        server_process.terminate()
-        # wait for the webserver to actually terminate
-        server_process.wait()
+        for r in revs_to_gen:
+            check_excecute("validate_basf2 --test --tag {}".format(r))
 
-    if not success:
-        sys.exit(1)
+        # make sure the webserver process is terminated in any case
+        try:
+            # start webserver to serve json output files, plots and
+            # interactive website
+            server_process = subprocess.Popen(["run_validation_server"])
+
+            # wait for one second for the server to start
+            time.sleep(2)
+            # check the content of the webserver, will need splinter
+            success = success and check_for_content(revs_to_gen + ["reference"], 7, 7)
+
+            # check if the plott creating triggering works
+            success = success and check_for_plotting(revs_to_gen[:-1], str(tmpdir))
+        except:
+            # catch any exceptions so the finally block can terminate the
+            # webserver process properly
+            e = sys.exc_info()[0]
+            # print exception again
+            print("Error {}".format(e))
+            print(traceback.format_exc())
+            success = False
+        finally:
+            # send terminate command
+            server_process.terminate()
+            # wait for the webserver to actually terminate
+            server_process.wait()
+
+        if not success:
+            sys.exit(1)
 
 if __name__ == "__main__":
     main()

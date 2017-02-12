@@ -30,18 +30,18 @@ namespace Belle2 {
 
     public:
       /// The houghBox to which this object correspondes.
-      typedef typename T::HoughBox HoughBox;
+      using HoughBox = typename T::HoughBox;
 
     public:
       /** Function that gives the sign of the distance from an observed drift circle to the sweeped object
        */
-      inline ESign getDistanceSign(const HoughBox& houghBox,
-                                   const float& x,
-                                   const float& y,
-                                   const float& signedDriftLength,
-                                   const float& dxdz = 0,
-                                   const float& dydz = 0,
-                                   ILayer /*iCLayer*/ = -1) const
+      ESign getDistanceSign(const HoughBox& houghBox,
+                            float x,
+                            float y,
+                            float signedDriftLength,
+                            float dxdz = 0,
+                            float dydz = 0,
+                            ILayer /*iCLayer*/ = -1) const
       {
         return Super::getDistanceSign(houghBox,
                                       x - m_localOriginX,
@@ -71,5 +71,5 @@ namespace Belle2 {
       float m_localOriginY = 0.0;
 
     };
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

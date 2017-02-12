@@ -17,15 +17,14 @@
 
 #include <TClonesArray.h>
 #include <TClass.h>
+#include <TStreamerInfo.h>
+#include <TList.h>
 
 #include <unistd.h>
 #include <stdio.h>                      // for NULL, printf
 
 #include <algorithm>
 #include <queue>
-
-#include <TStreamerInfo.h>
-#include <TList.h>
 
 
 using namespace std;
@@ -99,7 +98,7 @@ DataStoreStreamer::~DataStoreStreamer()
   delete m_msghandler;
 }
 
-void DataStoreStreamer::registerStreamObjs(const vector<string>& objlist)
+void DataStoreStreamer::setStreamingObjects(const vector<string>& objlist)
 {
   m_streamobjnames = objlist;
 }
@@ -214,7 +213,7 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
     B2INFO("Got termination message. Exitting...");
     //msg doesn't really contain data, set EventMetaData to something equivalent
     StoreObjPtr<EventMetaData> eventMetaData;
-    if (m_initStatus == 0)
+    if (m_initStatus == 0 && DataStore::Instance().getInitializeActive())
       eventMetaData.registerInDataStore();
     eventMetaData.create();
     eventMetaData->setEndOfData();
@@ -230,8 +229,6 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
     m_msghandler->decode_msg(msg, objlist, namelist);
     int nobjs = (msg->header())->nObjects;
     int narrays = (msg->header())->nArrays;
-
-    //    if ( m_initStatus != 0 ) return 0;   // Debugging only
 
     // Restore objects in DataStore
     for (int i = 0; i < nobjs + narrays; i++) {
@@ -250,14 +247,14 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
         const TClass* cl = obj->IsA();
         if (array)
           cl = static_cast<TClonesArray*>(obj)->GetClass();
-        if (m_initStatus == 0) { //are we called by the module's initialize() function?
+        if (m_initStatus == 0 && DataStore::Instance().getInitializeActive()) { //are we called by the module's initialize() function?
           auto flags = obj->TestBit(c_IsTransient) ? DataStore::c_DontWriteOut : DataStore::c_WriteOut;
           DataStore::Instance().registerEntry(namelist.at(i), durability, cl, array, flags);
         }
+        DataStore::StoreEntry* entry = DataStore::Instance().getEntry(StoreAccessorBase(namelist.at(i), durability, cl, array));
         //only restore object if it is valid for current event
         bool ptrIsNULL = obj->TestBit(c_IsNull);
         if (!ptrIsNULL) {
-          DataStore::StoreEntry* entry = DataStore::Instance().getEntry(StoreAccessorBase(namelist.at(i), durability, cl, array));
           bool merge = m_handleMergeable and !array and entry->ptr != NULL and isMergeable(obj);
           if (merge) {
             B2DEBUG(100, "Will now merge " << namelist.at(i));
@@ -276,6 +273,9 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
           }
           //   B2DEBUG(100, "restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " stored");
         } else {
+          //usually entry should already be invalidated, but e.g. for CrashHandler, it might not be.
+          if (entry->ptr)
+            entry->invalidate();
           //not stored, clean up
           delete obj;
         }
@@ -360,8 +360,6 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
 
     // Construct EvtMessage
     EvtMessage* msg = new EvtMessage(evtbuf);
-    //    EvtMessage* msg = new EvtMessage();
-    //    msg->buffer(evtbuf);
 
     // Decode EvtMessage into Objects
     vector<TObject*> objlist;
@@ -425,7 +423,7 @@ int DataStoreStreamer::restoreDataStoreAsync()
       const TClass* cl = obj->IsA();
       if (array)
         cl = static_cast<TClonesArray*>(obj)->GetClass();
-      if (m_initStatus == 0) { //are we called by the module's initialize() function?
+      if (m_initStatus == 0 && DataStore::Instance().getInitializeActive()) { //are we called by the module's initialize() function?
         auto flags = obj->TestBit(c_IsTransient) ? DataStore::c_DontWriteOut : DataStore::c_WriteOut;
         DataStore::Instance().registerEntry(namelist.at(i), durability, cl, array, flags);
       }

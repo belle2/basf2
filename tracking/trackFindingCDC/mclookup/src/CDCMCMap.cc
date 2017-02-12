@@ -15,7 +15,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -23,24 +22,12 @@ namespace {
   template< class MapType >
   void print_map(const MapType& m)
   {
-    typedef typename MapType::const_iterator const_iterator;
+    using const_iterator = typename MapType::const_iterator;
     for (const_iterator iter = m.begin(), iend = m.end(); iter != iend; ++iter) {
       std::cout << iter->first << "-->" << iter->second << std::endl;
     }
   }
 }
-
-CDCMCMap::CDCMCMap()
-{
-}
-
-
-
-CDCMCMap::~CDCMCMap()
-{
-}
-
-
 
 void CDCMCMap::clear()
 {

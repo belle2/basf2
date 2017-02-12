@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/ca/WeightedRelation.h>
-#include <tracking/trackFindingCDC/ca/Relation.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 #include <tracking/trackFindingCDC/utilities/SortedRange.h>
 
@@ -63,46 +63,33 @@ namespace Belle2 {
        *
        *  * operator(Relation<AItem>) checks every neighboring object and returns a weight to
        *    indicate the quality of the neighbor. \n
-       *    It returns NOT_A_NEIGHBOR (NaN) in case the neighbor is invalid and shall not be saved.\n
+       *    It returns NaN in case the neighbor is invalid and shall not be saved.\n
        */
       /**@{*/
-
-      /// Appends relations between elements in the given AItemRange using the ARelationFilter.
-      template<class ARelationFilter, class AItemRange>
+      /// Appends relations between elements in the given AItems using the ARelationFilter.
+      template <class ARelationFilter, class AItems>
       static void appendUsing(ARelationFilter& relationFilter,
-                              AItemRange& itemRange,
-                              std::vector<WeightedRelation<AItem> >& weightedRelations)
+                              AItems& items,
+                              std::vector<WeightedRelation<AItem>>& weightedRelations)
       {
-        for (auto && item : itemRange) {
-          AItem& itemRef(item);
-          AItem* itemPtr = &itemRef; // Relations point to the elements. Take the address of the item here
-          auto possibleNeighbors = relationFilter.getPossibleNeighbors(item,
-                                   std::begin(itemRange),
-                                   std::end(itemRange));
-          for (auto && neighbor : possibleNeighbors) {
-            AItem& neighborRef(neighbor);
-            AItem* neighborPtr = &neighborRef; // Relations point to the elements. Take the address of the item here
-
-            Relation<AItem> neighborRelation(itemPtr, neighborPtr);
+        for (AItem& from : items) {
+          auto possibleNeighbors =
+            relationFilter.getPossibleNeighbors(from, std::begin(items), std::end(items));
+          for (AItem& to : possibleNeighbors) {
+            // Relations point to the elements. Take the address of the item here
+            AItem* ptrFrom = &from;
+            AItem* ptrTo = &to;
+            if (ptrFrom == ptrTo) continue;
+            Relation<AItem> neighborRelation(ptrFrom, ptrTo);
             Weight weight = relationFilter(neighborRelation);
-
-            if (not std::isnan(weight)) {
-              // The neighborhood takes references and keeps them
-              // Make a emplace_back here and sort the whole vector afterwards
-              weightedRelations.push_back(WeightedRelation<AItem>(neighborRelation.getFrom(),
-                                                                  weight,
-                                                                  neighborRelation.getTo()));
-            }
-
-          } //end for possibleNeighbor
-
-        } // end for item
-
+            if (std::isnan(weight)) continue;
+            weightedRelations.emplace_back(ptrFrom, weight, ptrTo);
+          } // end for from
+        } // end for to
         // sort everything afterwards
         std::sort(std::begin(weightedRelations), std::end(weightedRelations));
       }
       /**@}*/
-
 
     public:
       /// Using the constructors of the base class
@@ -113,67 +100,6 @@ namespace Belle2 {
         : Super(weightedRelations.begin(), weightedRelations.end())
       {
       }
-
-      /**
-      *  @name Retrival of neigbors
-      *  Important: Since the underlying container stores pointers the _same_ object address that have been \n
-      *  used to store the items have to be used for the retrival.
-      *  This should not be a problem since the memory holding the items should still be available. \n
-      *  If the memory was already freed the pointers are rendered invalid anyways and now valid object \n
-      *  can be retived anymore.
-      */
-      /**@{*/
-      /// Checks if the item given by pointers has neighbors in the neighborhood
-      bool hasNeighbors(AItem* itemPtr) const
-      { return getLightestNeighbor(itemPtr) != this->end(); }
-
-      /// Checks if the two given elements are registered as neighbors with the given weight.
-      bool areNeighborsWithWeight(AItem* itemPtr,
-                                  Weight weight,
-                                  AItem* neighborPtr) const
-      {
-        for (const WeightedRelation<AItem>& relation
-             : this->equal_range(std::make_pair(itemPtr, weight))) {
-          if (relation.getTo() == neighborPtr and relation.getWeight() == weight) {
-            return true;
-          }
-        }
-        return false;
-      }
-
-      /// Checks if the two given elements are registered as neighbors with any weight.
-      bool areNeighbors(AItem* itemPtr, AItem* neighborPtr) const
-      {
-        for (const WeightedRelation<AItem>& relation : this->equal_range(itemPtr)) {
-          if (relation.getTo == neighborPtr) {
-            return true;
-          }
-        }
-        return false;
-      }
-
-      /**
-       *  Checks for the symmetry of the neighborhood
-       *  Explicitly checks for each neighborhood relation, if their is an inverse relation \n
-       *  with the same weight. Returns true if all such inverse relations exist.
-       */
-      bool isSymmetric() const
-      {
-        bool result = true;
-        for (const WeightedRelation<AItem>& relation : *this) {
-          AItem* itemPtr = relation.getFrom();
-          Weight weight = relation.getWeight();
-          AItem* neighborPtr = relation.getTo();
-
-          if (not areNeighborsWithWeight(neighborPtr, weight, itemPtr)) {
-            B2WARNING(" Neighborhood is not symmetric in " << *itemPtr <<
-                      " to " << *neighborPtr);
-            result = false;
-          }
-        }
-        return result;
-      }
-
-    }; // class WeightedNeighborhood
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

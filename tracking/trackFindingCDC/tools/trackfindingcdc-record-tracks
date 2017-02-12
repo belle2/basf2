@@ -27,7 +27,7 @@ class TrackFilterRecordingRun(StandardEventGenerationRun):
         add_cdc_track_finding(main_path)
 
         for m in main_path.modules():
-            if m.name().startswith("SegmentTrackCombinerDev"):
+            if m.name().startswith("SegmentTrackCombiner"):
                 m.param({"TrackFilter": "recording",
                          "TrackFilterParameters": {"rootFileName": self.root_output_file_name},
                          })

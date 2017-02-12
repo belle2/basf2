@@ -16,7 +16,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>

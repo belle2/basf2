@@ -712,6 +712,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 
   TMatrixD AtGA(2, 2);
   TMatrixD AtG(2, nHits);
+  TMatrixDSparse Diag(nHits, nHits);
   double sumWi = 0, sumWiSi = 0, sumWiSi2 = 0, sw = 0;
   for (int i = 0; i < nHits; ++i) {
     sumWi += invVarZvalues(i, 0);
@@ -720,6 +721,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
     sumWiSi2 += invVarZvalues(i, 0) * s(i, 0) * s(i, 0);
     AtG(0, i) = invVarZvalues(i, 0);
     AtG(1, i) = sw;
+    Diag(i, i) = 1.;
     B2DEBUG(75, "hit i: " <<  i << ", sumWi: " << sumWi << ", sw: " << sw << ", sumWiSi: " << sumWiSi << ", sumWiSi2: " << sumWiSi2 <<
             ", s(i): " << s(i, 0) << ", invVarZvalues(i): " << invVarZvalues(i, 0));
   }
@@ -736,6 +738,14 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
   TMatrixD p = AtGAInv * AtG *
                zValues; // fitted z value in the first point, tan(lambda) -> WARNING FIXME why is the first point 1,0 not 0,0? jkl feb8th2014
   if (lambdaCheckMatrix4NAN(p) == true) { B2DEBUG(10, "helixFit: p got 'nan'-entries!"); }
+
+  TMatrixD TAtG = AtG;
+  TAtG.T();
+  TMatrixD zValuesT = zValues;
+  zValuesT.T();
+
+  TMatrixD sigma2M = zValuesT * (Diag * TAtG * AtGAInv * AtG) * zValues;
+  double sigma2 = sigma2M(0, 0) / (nHits - 2);
 
   double thetaVal = (M_PI * 0.5 - atan(p(1,
                                          0))); // WARNING: was M_PI*0.5 - atan(p(1,0)), but values were wrong! double-WARNING: but + atan was wrong too!
@@ -777,10 +787,11 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 
 //   double pZ = pT / tan(thetaVal);
 //  double pZ = -calcPt(rho)*p(1,0); // TODO check that !!!1111eleven
-  double pZ = calcPt(rho) * p(1,
-                              0); // pz = pt / tan (Theta); where Theta is Arctan(s/z), s... arc length in (x,y) = radius * Phi in radians, z... z-distance. So pz = pt * z / s = magneticFieldFactor*rho*z/s, and p(1,0).."fitted z-value" (TODO: check that!) seems to be z/s. => calcPt(rho)p(1,0)
+  double pZ = calcPt(rho) * p(1, 0) ;
+  // pz = pt / tan (Theta); where Theta is Arctan(s/z), s... arc length in (x,y) = radius * Phi in radians, z... z-distance.
+  // So pz = pt * z / s = magneticFieldFactor*rho*z/s, and p(1,0).."fitted z-value" (TODO: check that!) seems to be z/s. => calcPt(rho)p(1,0)
   B2DEBUG(25, "helixFit: radius(rho): " << rho << ", theta: " << thetaVal << ", pT: " << pT << ", pZ: " << pZ << ", pVector.Perp: " <<
-          pVector.Perp() << ", pVector.Mag: " << pVector.Mag() << ", fitted zValue: " << p(1, 0));
+          pVector.Perp() << ", pVector.Mag: " << pVector.Mag() << ", fitted zValue: " << p(0, 0));
   TVector3 vectorToSecondHit = secondHit - seedHit;
   vectorToSecondHit.SetZ(0);
 

@@ -12,11 +12,10 @@
 
 #include <framework/logging/Logger.h>
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -28,16 +27,16 @@ MCAxialSegmentPairFilter::MCAxialSegmentPairFilter(bool allowReverse) :
 
 Weight MCAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axialSegmentPair)
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = axialSegmentPair.getStartSegment();
-  const CDCAxialRecoSegment2D* ptrEndSegment = axialSegmentPair.getEndSegment();
+  const CDCAxialSegment2D* ptrStartSegment = axialSegmentPair.getStartSegment();
+  const CDCAxialSegment2D* ptrEndSegment = axialSegmentPair.getEndSegment();
 
   assert(ptrStartSegment);
   assert(ptrEndSegment);
 
-  const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
+  const CDCAxialSegment2D& startSegment = *ptrStartSegment;
+  const CDCAxialSegment2D& endSegment = *ptrEndSegment;
 
-  const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
 
   // Check if the segments are aligned correctly along the Monte Carlo track
   EForwardBackward pairFBInfo =

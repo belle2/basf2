@@ -27,6 +27,7 @@ from b2biiMonitors import addConvertedPhotonConversionMonitors
 from b2biiMonitors import addLambda0ConversionMonitors
 from b2biiMonitors import addNeutralsConversionMonitors
 from b2biiMonitors import addMCParticlesConversionMonitors
+from b2biiMonitors import addKlongConversionMonitors
 
 if len(sys.argv) != 3:
     sys.exit('Must provide two input parameters: [mc|data] [input_Belle_MDST_file].\n'
@@ -45,7 +46,7 @@ inputBelleMDSTFile = sys.argv[2]
 # set the location of the Belle DB server
 # options are: ekpbelle.physik.uni-karlsruhe.de
 # or ekpbelle.physik.uni-karlsruhe.de (if you're running outside KEKCC computers)
-os.environ['BELLE_POSTGRES_SERVER'] = 'can51'
+os.environ['BELLE_POSTGRES_SERVER'] = 'can01'
 os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
 
 # Convert
@@ -59,6 +60,7 @@ loadGearbox()
 addBeamParamsConversionMonitors()
 addTrackConversionMonitors()
 addKshortConversionMonitors()
+addKlongConversionMonitors()
 addLambda0ConversionMonitors()
 addConvertedPhotonConversionMonitors()
 addNeutralsConversionMonitors()

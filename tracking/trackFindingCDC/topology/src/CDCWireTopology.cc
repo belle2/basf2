@@ -10,6 +10,8 @@
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+
 #include <cdc/geometry/CDCGeometryPar.h>
 
 using namespace Belle2;
@@ -41,9 +43,8 @@ void CDCWireTopology::initialize()
   }
 
   // create all wire layers
-  std::vector<VectorRange<CDCWire> > wiresByILayer =
-    adjacent_groupby(m_wires.begin(), m_wires.end(),
-                     ILayerUtil::getFrom<CDCWire>);
+  std::vector<VectorRange<CDCWire>> wiresByILayer =
+                                   adjacent_groupby(m_wires.begin(), m_wires.end(), GetILayer());
 
   for (VectorRange<CDCWire> wiresForILayer : wiresByILayer) {
     m_wireLayers.push_back(CDCWireLayer(wiresForILayer));
@@ -51,8 +52,7 @@ void CDCWireTopology::initialize()
 
   // create all superlayers
   std::vector<VectorRange<CDCWireLayer> > layersByISuperLayer =
-    adjacent_groupby(m_wireLayers.begin(), m_wireLayers.end(),
-                     ISuperLayerUtil::getFrom<CDCWireLayer>);
+    adjacent_groupby(m_wireLayers.begin(), m_wireLayers.end(), Common<GetISuperLayer>());
 
   for (VectorRange<CDCWireLayer> layersForISuperLayer : layersByISuperLayer) {
     m_wireSuperLayers.push_back(CDCWireSuperLayer(layersForISuperLayer));
@@ -97,14 +97,16 @@ ISuperLayer CDCWireTopology::getISuperLayerAtCylindricalR(const double cylindric
   return ISuperLayerUtil::c_OuterVolume;
 }
 
-WireNeighborKind CDCWireTopology::getNeighborKind(const WireID& wireID, const WireID& otherID) const
+WireNeighborKind CDCWireTopology::getNeighborKind(const WireID& wireID, const WireID& otherWireID) const
 {
-  if (wireID.getISuperLayer() !=  otherID.getISuperLayer() and
+  if (wireID.getISuperLayer() !=  otherWireID.getISuperLayer() and
       isValidISuperLayer(wireID.getISuperLayer())) {
     return WireNeighborKind();
   } else {
     const CDCWireSuperLayer& superlayer = getWireSuperLayer(wireID.getISuperLayer());
-    return superlayer.getNeighborKind(wireID.getILayer(), wireID.getIWire(),
-                                      otherID.getILayer(), otherID.getIWire());
+    return superlayer.getNeighborKind(wireID.getILayer(),
+                                      wireID.getIWire(),
+                                      otherWireID.getILayer(),
+                                      otherWireID.getIWire());
   }
 }

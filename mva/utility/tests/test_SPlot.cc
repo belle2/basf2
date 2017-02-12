@@ -13,6 +13,7 @@
 #include <framework/utilities/TestHelpers.h>
 
 #include <gtest/gtest.h>
+#include <numeric>
 
 using namespace Belle2;
 
@@ -34,6 +35,7 @@ namespace {
     }
 
     virtual unsigned int getNumberOfFeatures() const override { return 1; }
+    virtual unsigned int getNumberOfSpectators() const override { return 0; }
     virtual unsigned int getNumberOfEvents() const override { return 20; }
     virtual void loadEvent(unsigned int iEvent) override { m_input[0] = m_a[iEvent]; m_target = iEvent % 2; m_isSignal = m_target == 1; };
     virtual float getSignalFraction() override { return 0.5; };

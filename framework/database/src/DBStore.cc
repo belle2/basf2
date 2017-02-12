@@ -236,6 +236,10 @@ void DBStore::addConstantOverride(const std::string& package, const std::string&
     }
   }
   B2WARNING("An override for DBEntry " << package << "/" << module << " was created.");
+  // run callbacks
+  for (auto& callback : dbEntry.callbackFunctions) {
+    callback.second();
+  }
 }
 
 void DBStore::addCallback(const std::string& package, const std::string& module, DBCallback callback, DBCallbackId id)

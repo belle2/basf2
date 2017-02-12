@@ -13,7 +13,7 @@
 #include <framework/logging/Logger.h>
 #include <tracking/spacePointCreation/MCVXDPurityInfo.h>
 #include <tracking/spacePointCreation/PurityCalculatorTools.h> // determines purity
-#include "tracking/trackFindingVXD/filterTools/TBranchLeafType.h"
+#include <tracking/trackFindingVXD/filterMap/filterFramework/TBranchLeafType.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 

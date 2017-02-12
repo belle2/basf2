@@ -13,44 +13,30 @@
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
 
 namespace Belle2 {
-
   namespace TrackFindingCDC {
 
-    /**
-     *  Factory that creates apropriate track relation filter instances from parameters.
-     *
-     *  It knows about all available filters and their parameters.
-     *  Can collaborate with a Module and expose these parameters to the user in steering files.
-    */
-    class TrackRelationFilterFactory :
-      public FilterFactory<BaseTrackRelationFilter > {
+    /// Factory that can create appropriate track relation filters from associated names.
+    class TrackRelationFilterFactory : public FilterFactory<BaseTrackRelationFilter> {
 
     private:
       /// Type of the base class
-      typedef FilterFactory<BaseTrackRelationFilter > Super;
+      using Super = FilterFactory<BaseTrackRelationFilter>;
 
     public:
-      /** Fill the default filter name and parameter values*/
-      TrackRelationFilterFactory(const std::string& defaultFilterName = "none");
+      /// Constructor forwarding the default filter name
+      TrackRelationFilterFactory(const std::string& defaultFilterName = "realistic");
 
-      using Super::create;
+      /// Getter for a short identifier for the factory
+      std::string getIdentifier() const final;
 
-      /** Create a cluster filter with the given name, does not set filter specific parameters. */
-      virtual std::unique_ptr<BaseTrackRelationFilter > create(const std::string& name) const override;
+      /// Getter for a descriptive purpose of the constructed filters
+      std::string getFilterPurpose() const final;
 
-      /** Getter for a descriptive purpose of the clusterfilter.*/
-      virtual std::string getFilterPurpose() const override;
+      /// Getter for valid filter names and a description for each
+      std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const final;
 
-      /** Getter for the valid clusterf ilter names and a description for each */
-      virtual std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
-
-      /** Getter for the prefix prepended to a Module parameter.*/
-      virtual std::string getModuleParamPrefix() const override;
-
+      /// Create a filter with the given name.
+      std::unique_ptr<BaseTrackRelationFilter> create(const std::string& filterName) const final;
     };
-
-    /// Legacy alias for the track relation filter factory
-    typedef TrackRelationFilterFactory TrackRelationFilterFactory;
-
   }
 }

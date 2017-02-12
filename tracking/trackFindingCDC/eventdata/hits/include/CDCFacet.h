@@ -50,16 +50,6 @@ namespace Belle2 {
       /// Constructs the reverse tiple from this one.
       CDCFacet reversed() const;
 
-      /**
-       *  Access the object methods and methods from a pointer in the same way.
-       *  In situations where the type is not known to be a pointer or a reference there is no way to tell
-       *  if one should use the dot '.' or operator '->' for method look up.
-       *  So this function defines the -> operator for the object.
-       *  No matter you have a pointer or an object access is given with '->'.
-       */
-      const CDCFacet* operator->() const
-      { return this; }
-
       /// Adjusts the contained fit line to touch such that it touches the first and third hit.
       void adjustFitLine() const;
 
@@ -160,22 +150,18 @@ namespace Belle2 {
         }
       }
 
-      /// Getter for the automaton cell.
-      AutomatonCell& getAutomatonCell()
-      { return m_automatonCell; }
-
-      /// Constant getter for the automaton cell.
-      const AutomatonCell& getAutomatonCell() const
-      { return m_automatonCell; }
+      /// Mutable getter for the automaton cell.
+      AutomatonCell& getAutomatonCell() const
+      {
+        return m_automatonCell;
+      }
 
     private:
       /// Memory for a line fit to the three contained hits
       mutable UncertainParameterLine2D m_fitLine;
 
       /// Memory for the cellular automaton cell assoziated with the facet.
-      AutomatonCell m_automatonCell;
-
-    }; //class
-
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+      mutable AutomatonCell m_automatonCell;
+    };
+  }
+}

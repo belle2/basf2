@@ -24,6 +24,7 @@
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/FlavorTaggerInfo.h>
 #include <analysis/ContinuumSuppression/Thrust.h>
 #include <analysis/dataobjects/Vertex.h>
 
@@ -356,11 +357,12 @@ namespace Belle2 {
       } else return 0;
     }
 
-    double isRelatedRestOfEventB0Flavor(const Particle* part)
+    double isRelatedRestOfEventB0Flavor(const Particle* particle)
     {
-      const RestOfEvent* roe = part->getRelatedTo<RestOfEvent>();
+      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
-      float OutputB0tagQ = -2;
+      float BtagFlavor = 0;
+      float BcpFlavor = 0;
 
       if (roe != nullptr) {
         const Particle* Bcp = roe->getRelated<Particle>();
@@ -368,34 +370,45 @@ namespace Belle2 {
 
         int MCMatchingError = MCMatching::getMCErrors(Bcp, BcpMC);
 
-        if (MCMatchingError == 0 || MCMatchingError == 1) {
+        MCMatchingError &= (~MCMatching::c_MissFSR);
+        MCMatchingError &= (~MCMatching::c_MissPHOTOS);
+        MCMatchingError &= (~MCMatching::c_MissingResonance);
+        MCMatchingError &= (~MCMatching::c_MissGamma);
+
+        if (MCMatchingError == MCMatching::c_Correct) {
           const MCParticle* Y4S = BcpMC->getMother();
-          StoreArray<MCParticle> AllMCParticles;
-          unsigned numParticles = AllMCParticles.getEntries();
-
-          if (AllMCParticles.isValid()) {
-            for (unsigned i = 0; i < numParticles; ++i) {
-              const MCParticle* newParticle = AllMCParticles[i];
-              const MCParticle* newMother = newParticle->getMother();
-
-              if (newMother != nullptr) {
-                if (newMother == Y4S &&  newParticle != BcpMC) {
-                  if (newParticle -> getPDG() == 511) OutputB0tagQ = 1;
-                  else OutputB0tagQ = 0;
+          if (Y4S != nullptr) {
+            for (auto& iTrack : roe->getTracks()) {
+              const MCParticle* mcParticle = iTrack->getRelated<MCParticle>();
+              while (mcParticle != nullptr) {
+                if (mcParticle->getMother() == Y4S) {
+                  if (mcParticle == BcpMC) {
+                    if (mcParticle -> getPDG() > 0) BcpFlavor = 2;
+                    else BcpFlavor = -2;
+                  } else if (BtagFlavor == 0) {
+                    if (TMath::Abs(mcParticle -> getPDG()) == 511) {
+                      if (mcParticle -> getPDG() > 0) BtagFlavor = 1;
+                      else BtagFlavor = -1;
+                    } else BtagFlavor = 5;
+                  }
+                  break;
                 }
+                mcParticle = mcParticle->getMother();
               }
+              if (BcpFlavor != 0 || BtagFlavor == 5) break;
             }
           }
         }
       }
-      return OutputB0tagQ;
+      return (BcpFlavor != 0) ? BcpFlavor : BtagFlavor;
     }
 
     double isRestOfEventB0Flavor(const Particle*)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
 
-      float OutputB0tagQ = -2;
+      float BtagFlavor = 0;
+      float BcpFlavor = 0;
 
       if (roe.isValid()) {
         const Particle* Bcp = roe->getRelated<Particle>();
@@ -403,34 +416,85 @@ namespace Belle2 {
 
         int MCMatchingError = MCMatching::getMCErrors(Bcp, BcpMC);
 
-        if (MCMatchingError == 0 || MCMatchingError == 1) {
+        MCMatchingError &= (~MCMatching::c_MissFSR);
+        MCMatchingError &= (~MCMatching::c_MissPHOTOS);
+        MCMatchingError &= (~MCMatching::c_MissingResonance);
+        MCMatchingError &= (~MCMatching::c_MissGamma);
+
+        if (MCMatchingError == MCMatching::c_Correct) {
           const MCParticle* Y4S = BcpMC->getMother();
-          StoreArray<MCParticle> AllMCParticles;
-          unsigned numParticles = AllMCParticles.getEntries();
-
-          if (AllMCParticles.isValid()) {
-            for (unsigned i = 0; i < numParticles; ++i) {
-              const MCParticle* newParticle = AllMCParticles[i];
-              const MCParticle* newMother = newParticle->getMother();
-
-              if (newMother != nullptr) {
-                if (newMother == Y4S &&  newParticle != BcpMC) {
-                  if (newParticle -> getPDG() == 511 || newParticle -> getPDG() == 521) OutputB0tagQ = 1;
-                  else OutputB0tagQ = 0;
+          if (Y4S != nullptr) {
+            for (auto& iTrack : roe->getTracks()) {
+              const MCParticle* mcParticle = iTrack->getRelated<MCParticle>();
+              while (mcParticle != nullptr) {
+                if (mcParticle->getMother() == Y4S) {
+                  if (mcParticle == BcpMC) {
+                    if (mcParticle -> getPDG() > 0) BcpFlavor = 2;
+                    else BcpFlavor = -2;
+                  } else if (BtagFlavor == 0) {
+                    if (TMath::Abs(mcParticle -> getPDG()) == 511) {
+                      if (mcParticle -> getPDG() > 0) BtagFlavor = 1;
+                      else BtagFlavor = -1;
+                    } else BtagFlavor = 5;
+                  }
+                  break;
                 }
+                mcParticle = mcParticle->getMother();
               }
+              if (BcpFlavor != 0 || BtagFlavor == 5) break;
             }
           }
         }
       }
-      return OutputB0tagQ;
+      return (BcpFlavor != 0) ? BcpFlavor : BtagFlavor;
+    }
+
+    double ancestorHasWhichFlavor(const Particle* particle)
+    {
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      (void)particle;
+      float outputB0tagQ = 0;
+      if (roe.isValid()) {
+        const MCParticle* BcpMC = roe->getRelated<Particle>()->getRelatedTo<MCParticle>();
+        const MCParticle* Y4S = BcpMC->getMother();
+        const MCParticle* mcParticle = particle->getRelatedTo<MCParticle>();
+        while (mcParticle != nullptr) {
+          if (mcParticle->getMother() == Y4S) {
+            if (mcParticle != BcpMC && TMath::Abs(mcParticle -> getPDG()) == 511) {
+              if (mcParticle -> getPDG() == 511) outputB0tagQ = 1;
+              else outputB0tagQ = -1;
+            } else if (mcParticle == BcpMC) {
+              if (mcParticle -> getPDG() == 511) outputB0tagQ = 2;
+              else outputB0tagQ = -2;
+            } else outputB0tagQ = 5;
+            break;
+          }
+          mcParticle = mcParticle->getMother();
+        }
+      }
+
+      return outputB0tagQ;
+    }
+
+    double B0mcErrors(const Particle* particle)
+    {
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      (void)particle;
+      int MCMatchingError = -1;
+      if (roe.isValid()) {
+        const Particle* Bcp = roe->getRelated<Particle>();
+        const MCParticle* BcpMC = roe->getRelated<Particle>()->getRelatedTo<MCParticle>();
+
+        MCMatchingError = MCMatching::getMCErrors(Bcp, BcpMC);
+      }
+      return MCMatchingError;
     }
 
     double isRelatedRestOfEventMajorityB0Flavor(const Particle* part)
     {
       const RestOfEvent* roe = part->getRelatedTo<RestOfEvent>();
 
-      float OutputStandard = 0.0;
+      float outputStandard = 0.0;
 
       float q_MC = 0; //Flavor of B
       if (roe != nullptr) {
@@ -483,12 +547,12 @@ namespace Belle2 {
       }
 
       if (q_MC > 0) {
-        OutputStandard = 1;
+        outputStandard = 1;
       } else if (q_MC < 0) {
-        OutputStandard = 0;
-      } else OutputStandard = -2;
+        outputStandard = 0;
+      } else outputStandard = -2;
 
-      return OutputStandard;
+      return outputStandard;
     }
 
     double isRestOfEventMajorityB0Flavor(const Particle*)
@@ -633,65 +697,67 @@ namespace Belle2 {
           TLorentzVector momXneutralclusters; //Momentum of neutral X clusters in CMS-System
           TLorentzVector momTarget = T.rotateLabToCms() * particle -> get4Vector();  //Momentum of Mu in CMS-System
 
-          double Output = 0.0;
+          double output = 0.0;
 
           StoreObjPtr<RestOfEvent> roe("RestOfEvent");
           if (roe.isValid())
           {
             const auto& tracks = roe->getTracks();
             for (auto& x : tracks) {
-              const TrackFitResult* tracki = x->getTrackFitResult(x->getRelated<PIDLikelihood>()->getMostLikely());
-              if (tracki == nullptr || particle->getTrack() == x) continue;
-              TLorentzVector momtrack(tracki->getMomentum(), 0);
-              TLorentzVector momXchargedtracki = T.rotateLabToCms() * momtrack;
-              if (momXchargedtracki == momXchargedtracki) momXchargedtracks += momXchargedtracki;
+              const TrackFitResult* iTrack = x->getTrackFitResult(x->getRelated<PIDLikelihood>()->getMostLikely());
+              if (iTrack == nullptr) continue;
+              TLorentzVector momtrack(iTrack->getMomentum(), 0);
+              if (momtrack == momtrack) momXchargedtracks += momtrack;
             }
             const auto& ecl = roe->getECLClusters();
             for (auto& x : ecl) {
               if (x == nullptr) continue;
-              TLorentzVector momXclusteri = T.rotateLabToCms() * x -> get4Vector();
-              if (momXclusteri == momXclusteri) {
-                if (x->isNeutral()) momXneutralclusters += momXclusteri;
-                else if (!(x->isNeutral())) momXchargedclusters += momXclusteri;
+              TLorentzVector iMomECLCluster = x -> get4Vector();
+              if (iMomECLCluster == iMomECLCluster) {
+                if (x->isNeutral()) momXneutralclusters += iMomECLCluster;
+                else if (!(x->isNeutral())) {
+                  if (x -> getRelated<Track>() != particle->getRelated<Track>()) momXchargedclusters += iMomECLCluster;
+                }
               }
             }
             const auto& klm = roe->getKLMClusters();
             for (auto& x : klm) {
               if (x == nullptr) continue;
-              TLorentzVector momXKLMclusteri = T.rotateLabToCms() * x -> getMomentum();
-              if (momXKLMclusteri == momXKLMclusteri) {
+              TLorentzVector iMomKLMCluster = x -> getMomentum();
+              if (iMomKLMCluster == iMomKLMCluster) {
                 if (!(x -> getAssociatedTrackFlag()) && !(x -> getAssociatedEclClusterFlag())) {
-                  momXneutralclusters += momXKLMclusteri;
+                  momXneutralclusters += iMomKLMCluster;
                 }
               }
             }
 
             TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
-            TLorentzVector momX = (momXcharged + momXneutralclusters) - momTarget; //Total Momentum of the recoiling X in CMS-System
+            TLorentzVector momX = T.rotateLabToCms() * (momXcharged + momXneutralclusters) -
+                                  momTarget; //Total Momentum of the recoiling X in CMS-System
             TLorentzVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
-            if (requestedVariable == "recoilMass") Output = momX.M();
-            else if (requestedVariable == "pMissCMS") Output = momMiss.Vect().Mag();
-            else if (requestedVariable == "cosThetaMissCMS") Output = TMath::Cos(momTarget.Angle(momMiss.Vect()));
+            if (requestedVariable == "recoilMass") output = momX.M();
+            else if (requestedVariable == "pMissCMS") output = momMiss.Vect().Mag();
+            else if (requestedVariable == "cosThetaMissCMS") output = TMath::Cos(momTarget.Angle(momMiss.Vect()));
             else if (requestedVariable == "EW90") {
               TLorentzVector momW = momTarget + momMiss; //Momentum of the W-Boson in CMS
               float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
-              for (auto& i : ecl) {
-                if (i == nullptr) continue;
-                float Energyi = i -> getEnergy();
-                if (Energyi == Energyi) {
-                  if ((T.rotateLabToCms() * i -> get4Vector()).Vect().Dot(momW.Vect()) > 0) E_W_90 += Energyi;
+              for (auto& x : ecl) {
+                if (x == nullptr) continue;
+                float iEnergy = x -> getEnergy();
+                if (iEnergy == iEnergy) {
+                  if ((T.rotateLabToCms() * x -> get4Vector()).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
                 }
                 //       for (auto & i : klm) {
                 //         if ((T.rotateLabToCms() * i -> getMomentum()).Vect().Dot(momW.Vect()) > 0) E_W_90 +=;
                 //         }
               }
-              Output = E_W_90;
+              output = E_W_90;
             } else {
               B2FATAL("Wrong variable  " << requestedVariable <<
                       " requested. The possibilities are recoilMass, pMissCMS, cosThetaMissCMS or EW90");
             }
           }
-          return Output;
+          return output;
         };
         return func;
       } else {
@@ -713,7 +779,7 @@ namespace Belle2 {
 
           float chargeTargetKaon = particle -> getCharge();
 
-          double Output = 0.0;
+          double output = 0.0;
 
           if ((requestedVariable == "HaveOpositeCharges") || (requestedVariable == "cosKaonPion"))
           {
@@ -735,17 +801,17 @@ namespace Belle2 {
               }
             }
             if (requestedVariable == "HaveOpositeCharges") {
-              if (chargeTargetKaon * chargeTargetSlowPion == -1) Output = 1;
+              if (chargeTargetKaon * chargeTargetSlowPion == -1) output = 1;
             }
             if (requestedVariable == "cosKaonPion") {
               if (momTargetKaon == momTargetKaon
-                  && momTargetSlowPion == momTargetSlowPion) Output = TMath::Cos(momTargetKaon.Angle(momTargetSlowPion.Vect()));
+                  && momTargetSlowPion == momTargetSlowPion) output = TMath::Cos(momTargetKaon.Angle(momTargetSlowPion.Vect()));
             }
 
           } else {
             B2FATAL("Wrong variable  " << requestedVariable << " requested. The possibilities are cosKaonPion or HaveOpositeCharges");
           }
-          return Output;
+          return output;
         };
         return func;
       } else {
@@ -763,7 +829,7 @@ namespace Belle2 {
           TLorentzVector momSlowPion = T.rotateLabToCms() * particle -> get4Vector();  //Momentum of Slow Pion in CMS-System
           TLorentzVector momFastParticle;  //Momentum of Fast Pion in CMS-System
 
-          double Output = 0.0;
+          double output = 0.0;
 
           if ((requestedVariable == "pFastCMS") || (requestedVariable == "cosSlowFast") || (requestedVariable == "cosTPTOFast") || (requestedVariable == "SlowFastHaveOpositeCharges"))
           {
@@ -785,22 +851,22 @@ namespace Belle2 {
                 }
               }
               if (TargetFastParticle != nullptr) {
-                if (requestedVariable == "cosTPTOFast") Output = Variable::Manager::Instance().getVariable("cosTPTO")->function(
+                if (requestedVariable == "cosTPTOFast") output = Variable::Manager::Instance().getVariable("cosTPTO")->function(
                                                                      TargetFastParticle);
                 if (momSlowPion == momSlowPion) {
-                  if (requestedVariable == "cosSlowFast") Output = TMath::Cos(momSlowPion.Angle(momFastParticle.Vect()));
+                  if (requestedVariable == "cosSlowFast") output = TMath::Cos(momSlowPion.Angle(momFastParticle.Vect()));
                   else if (requestedVariable == "SlowFastHaveOpositeCharges") {
                     if (particle->getCharge()*TargetFastParticle->getCharge() == -1) {
-                      Output = 1;
+                      output = 1;
                     }
-                  } else Output = momFastParticle.P();
+                  } else output = momFastParticle.P();
                 }
               }
             }
           } else {
             B2FATAL("Wrong variable " << requestedVariable << " requested. The possibilities are pFastCMS, cosSlowFast or cosTPTOFast");
           }
-          return Output;
+          return output;
         };
         return func;
       } else {
@@ -832,7 +898,7 @@ namespace Belle2 {
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
           PCmsLabTransform T;
 
-          double Output = 0.0;
+          double output = 0.0;
 
           if (ListOfParticles.isValid())
           {
@@ -857,12 +923,12 @@ namespace Belle2 {
               }
             }
             if ((extraInfoName == "isRightTrack(MaximumPstar)" && (T.rotateLabToCms() * particle -> get4Vector()).P() == maximumProb)) {
-              Output = 1.0;
+              output = 1.0;
             } else if (extraInfoName != "isRightTrack(MaximumPstar)" && particle -> hasExtraInfo(extraInfoName)) {
-              if (particle -> getExtraInfo(extraInfoName) == maximumProb) Output = 1.0;
+              if (particle -> getExtraInfo(extraInfoName) == maximumProb) output = 1.0;
             }
           }
-          return Output;
+          return output;
         };
         return func;
       } else {
@@ -1448,13 +1514,13 @@ namespace Belle2 {
 
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
 
-          double Output = 0.0;
+          double output = 0.0;
 
-          int nTargets = 0;
           Variable::Manager& manager = Variable::Manager::Instance();
 
           if (ListOfParticles.isValid())
           {
+            int nTargets = 0;
             for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
               Particle* iParticle = ListOfParticles->getParticle(i);
               if (iParticle != nullptr) {
@@ -1470,11 +1536,11 @@ namespace Belle2 {
               }
             }
 
-            if (nTargets > 0) Output = 1;
+            if (nTargets > 0) output = 1;
 
             if (nTargets > 1) B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");
           }
-          return Output;
+          return output;
         };
         return func;
       } else {
@@ -1508,14 +1574,14 @@ namespace Belle2 {
 
           StoreObjPtr<ParticleList> ListOfParticles(particleListName);
 
-          double Output = 0.0;
+          double output = 0.0;
 
           std::vector<Particle*> targetParticles;
-          int nTargets = 0;
           Variable::Manager& manager = Variable::Manager::Instance();
 
           if (ListOfParticles.isValid())
           {
+            int nTargets = 0;
             for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
               Particle* iParticle = ListOfParticles->getParticle(i);
               if (iParticle != nullptr) {
@@ -1533,18 +1599,42 @@ namespace Belle2 {
 
             for (auto& targetParticle : targetParticles) {
               if (manager.getVariable("isRightCategory(" +  categoryName + ")")-> function(targetParticle) == 1) {
-                Output = 1;
+                output = 1;
                 nTargets += 1;
               }
             }
 
             if (nTargets > 1) B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");
           }
-          return Output;
+          return output;
         };
         return func;
       } else {
         B2FATAL("Wrong number of arguments (1 required) for meta function isCategoryTrue");
+      }
+    }
+
+    Manager::FunctionPtr qrOutput(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string combinerMethod = arguments[0];
+        auto func = [combinerMethod](const Particle * particle) -> double {
+
+          double output = -2;
+          FlavorTaggerInfo* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
+
+          if (flavorTaggerInfo != nullptr)
+          {
+            if (Variable::hasRestOfEventTracks(particle) > 0) {
+              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+              output = flavorTaggerInfo->getMethodMap(combinerMethod)->getQrCombined();
+            }
+          }
+          return output;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function qrOutput");
       }
     }
 
@@ -1576,9 +1666,12 @@ namespace Belle2 {
     REGISTER_VARIABLE("hasRestOfEventTracks", hasRestOfEventTracks,
                       "Returns the amount of tracks in the RestOfEvent related to the given Particle. -2 If ROE is empty.");
     REGISTER_VARIABLE("isRelatedRestOfEventB0Flavor", isRelatedRestOfEventB0Flavor,
-                      "0 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0). The MCError of Breco has to be 0 or 1, the output of the variable is -2 otherwise.");
+                      "-1 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0). The MCError bit of Breco has to be 0, 1, 2, 16 or 1024. The output of the variable is 0 otherwise. If one Particle in the Rest of Event is found to belong the reconstructed B0, the output is -2(2) for a B0bar (B0) on the reco side.");
     REGISTER_VARIABLE("qrCombined", isRestOfEventB0Flavor,
-                      "0 (1) if current RestOfEvent is related to a B0bar (B0). The MCError of Breco has to be 0 or 1, the output of the variable is -2 otherwise.");
+                      "-1 (1) if current RestOfEvent is related to a B0bar (B0). The MCError bit of Breco has to be 0, 1, 2, 16 or 1024. The output of the variable is 0 otherwise. If one Particle in the Rest of Event is found to belong the reconstructed B0, the output is -2(2) for a B0bar (B0) on the reco side.");
+    REGISTER_VARIABLE("ancestorHasWhichFlavor", ancestorHasWhichFlavor,
+                      "checks the decay chain of the given particle upwards up to the Y(4S) resonance.Output is 0 (1) if an ancestor is found to be a B0bar (B0), if not -2.");
+    REGISTER_VARIABLE("B0mcErrors", B0mcErrors, "mcErrors MCMatching Flag on the reconstructed B0_cp.");
     REGISTER_VARIABLE("isRelatedRestOfEventMajorityB0Flavor", isRelatedRestOfEventMajorityB0Flavor,
                       " 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a B0bar (B0).");
     REGISTER_VARIABLE("isRestOfEventMajorityB0Flavor", isRestOfEventMajorityB0Flavor,
@@ -1615,7 +1708,8 @@ namespace Belle2 {
                       "Returns 1 if the given category has a target. 0 Else.")
     REGISTER_VARIABLE("isTrueCategory(categoryName)", isTrueCategory,
                       "Returns 1 if the given category tags the B0 MC flavor correctly. 0 Else.")
-
+    REGISTER_VARIABLE("qrOutput(combinerMethod)", qrOutput,
+                      "Returns the output of the flavorTagger for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.")
 
 
   }

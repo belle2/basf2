@@ -10,31 +10,13 @@
 
 #include <tracking/trackFindingCDC/filters/segmentTripleRelation/MCSegmentTripleRelationFilter.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 MCSegmentTripleRelationFilter::MCSegmentTripleRelationFilter(bool allowReverse) :
   m_mcSegmentTripleFilter(allowReverse)
 {
-}
-
-void MCSegmentTripleRelationFilter::beginEvent()
-{
-  m_mcSegmentTripleFilter.beginEvent();
-  Super::beginEvent();
-}
-
-void MCSegmentTripleRelationFilter::initialize()
-{
-  Super::initialize();
-  m_mcSegmentTripleFilter.initialize();
-}
-
-void MCSegmentTripleRelationFilter::terminate()
-{
-  m_mcSegmentTripleFilter.terminate();
-  Super::terminate();
+  this->addProcessingSignalListener(&m_mcSegmentTripleFilter);
 }
 
 Weight MCSegmentTripleRelationFilter::operator()(const CDCSegmentTriple& triple,

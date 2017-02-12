@@ -203,6 +203,48 @@ def addKshortConversionMonitors(outputRootFile='b2biiKshortConversionMonitors.ro
     path.add_module(fittdKS2hist)
 
 
+def addKlongConversionMonitors(outputRootFile='b2biiKlongConversionMonitors.root', path=analysis_main):
+    """
+    Creates copies of KLong particles from 'K_L0:mdst' ParticleList and fills them to a new ParticleList called
+    'K_L0:b2bii_monitor'. For each Klong candidate several quantities are stored to histograms with 'VariablesToHistogram' module
+    for monitoring purpuses: e.g. to be compared with same distributions obtained within BASF.
+
+    @param outputRootFile name of the output ROOT file to which the histograms are saved.
+    @param path modules are added to this path
+    """
+
+    matchMCTruth('K_L0:mdst', path)
+
+    # register VariablesToHistogram and fill it with monitored variables
+    klong2hist = register_module('VariablesToHistogram')
+    klong2hist.param('particleList', 'K_L0:mdst')
+
+    # define variables that are monitored and specify
+    # the corresponding histogram (#bins, low, high)
+    # ('variable_name', number_of_bins, x_low, x_high)
+    klong2hist_pos_x = ('klmClusterPositionX', 100, -3.0, 3.0)
+    klong2hist_pos_y = ('klmClusterPositionY', 100, -3.0, 3.0)
+    klong2hist_pos_z = ('klmClusterPositionZ', 100, -3.0, 3.0)
+    klong2hist_layers = ('klmClusterLayers', 100, 0.0, 35.0)
+    klong2hist_innermost_layer = ('klmClusterInnermostLayer', 100, 0.0, 35.0)
+
+    # (vague) mc truth missing
+    # mcPDG, mE, mPX, mPY, mPZ
+    klong2hist_mcPDG = ('mcPDG', 1000, 0, 1000)
+    klong2hist_mE = ('mcE', 100, 0.0, 6.0)
+    klong2hist_mPX = ('mcPX', 100, -5.0, 5.0)
+    klong2hist_mPY = ('mcPY', 100, -5.0, 5.0)
+    klong2hist_mPZ = ('mcPZ', 100, -5.0, 5.0)
+    klong2hist.param('variables', [klong2hist_pos_x, klong2hist_pos_y, klong2hist_pos_z,
+                                   klong2hist_layers, klong2hist_innermost_layer,
+                                   klong2hist_mcPDG, klong2hist_mE, klong2hist_mPX, klong2hist_mPY, klong2hist_mPZ
+                                   ])
+
+    klong2hist.param('fileName', outputRootFile)
+
+    path.add_module(klong2hist)
+
+
 def addLambda0ConversionMonitors(outputRootFile='b2biiLambda0ConversionMonitors.root', path=analysis_main):
     """
     Creates copies of Lambda0 particles from 'Lambda0:mdst' ParticleList and c.c. and fills them to a new ParticleList called
@@ -598,6 +640,8 @@ def addNeutralsConversionMonitors(gammaOutputRootFile='b2biiGammaConversionMonit
     gamma2hist_Emax = ('clusterHighestE', 100, 0.0, 2.0)
     gamma2hist_E9E25 = ('clusterE9E25', 100, 0.0, 1.0)
     gamma2hist_noC = ('clusterNHits', 100, 0.0, 30.0)
+    gamma2hist_Quality = ('clusterBelleQuality', 10, 0.0, 20.0)
+    gamma2hist_Width = ('clusterLAT', 100, 0.0, 50.0)
 
     gamma2hist_Err00 = ('momVertCovM(0,0)', 100, -0.0005, 0.0005)
     gamma2hist_Err10 = ('momVertCovM(1,0)', 100, -0.0005, 0.0005)
@@ -647,6 +691,8 @@ def addNeutralsConversionMonitors(gammaOutputRootFile='b2biiGammaConversionMonit
                       gamma2hist_Emax,
                       gamma2hist_E9E25,
                       gamma2hist_noC,
+                      gamma2hist_Quality,
+                      gamma2hist_Width,
                       gamma2hist_Err00,
                       gamma2hist_Err10,
                       gamma2hist_Err11,

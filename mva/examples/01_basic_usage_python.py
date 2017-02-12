@@ -11,7 +11,7 @@ if __name__ == "__main__":
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
-    general_options.m_weightfile = "MVADatabaseIdentifier"
+    general_options.m_identifier = "MVADatabaseIdentifier"
     general_options.m_variables = basf2_mva.vector('p', 'pz', 'daughter(0, Kid)')
     general_options.m_target_variable = "isSignal"
 
@@ -23,7 +23,7 @@ if __name__ == "__main__":
     basf2_mva.download('MVADatabaseIdentifier', 'weightfile.root')
 
     # Train a MVA method and store the weightfile on disk in a root file
-    general_options.m_weightfile = "weightfile2.root"
+    general_options.m_identifier = "weightfile2.root"
     basf2_mva.teacher(general_options, fastbdt_options)
 
     # Upload the weightfile on disk to the database

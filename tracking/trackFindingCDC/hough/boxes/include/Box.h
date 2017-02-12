@@ -17,58 +17,62 @@
 
 #include <array>
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
+#include <numeric>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-     * The base class for all boxes. This "box" (which can be a very generic box) can be used to
-     * build a hough tree from it. Decision algorithms can be sued to decide if a certain item (e.g. a hit)
-     * belongs to a box (e.g. a rectangle in the legendre space) or not. This is used to fill the whole hough tree
-     * and find the point of largest interceptions of all hits.
+     *  The base class for all boxes. This "box" (which can be a very generic box) can be used to
+     *  build a hough tree from it. Decision algorithms can be sued to decide if a certain item (e.g. a hit)
+     *  belongs to a box (e.g. a rectangle in the legendre space) or not. This is used to fill the whole hough tree
+     *  and find the point of largest interceptions of all hits.
      */
     template<class... ATypes>
     class Box;
 
-
     /**
-     * Box Base class specification without any template arguments. Is the "zero-th" element in the list of
-     * stacked boxes (see below).
+     *  Box Base class specification without any template arguments. Is the "zero-th" element in the list of
+     *  stacked boxes (see below).
      */
     template<>
     class Box<> {
     public:
       /// Nothing to do on set bounds.
-      void setBounds() {}
+      void setBounds()
+      {
+      }
 
       /// Nothing to do on printing
-      friend std::ostream& operator<<(std::ostream& output, const Box<>&)
-      { return output; }
+      friend std::ostream& operator<<(std::ostream& output, const Box<>& voidBox __attribute__((unused)))
+      {
+        return output;
+      }
     };
 
     /**
-     * Box Base class specification without a first and subordinary types which can be used to "stack"
-     * various template until the full box is described correctly. E.g.:
-     * Box<A, B, C> = Box< A, (B, C) > = Box< A, ( B, (C) ) )>
-     * With this principle it is possible to describe all sorts and numbers of lists of template
-     * arguments with only one single class. The zero-th box (the "beginning") is defined above.
+     *  Box Base class specification without a first and subordinary types which can be used to "stack"
+     *  various template until the full box is described correctly. E.g.:
+     *  Box<A, B, C> = Box< A, (B, C) > = Box< A, ( B, (C) ) )>
+     *  With this principle it is possible to describe all sorts and numbers of lists of template
+     *  arguments with only one single class. The zero-th box (the "beginning") is defined above.
      */
     template<class AFirstType, class... ASubordinaryTypes>
     class Box<AFirstType, ASubordinaryTypes...> {
     public:
       /// Type of the first coordinate
-      typedef AFirstType FirstType;
+      using FirstType = AFirstType;
 
       /// Type of this box
-      typedef Box<AFirstType, ASubordinaryTypes...> This;
+      using This = Box<AFirstType, ASubordinaryTypes...>;
 
       /// Tuple of the types of each coordinates
-      typedef std::tuple<FirstType, ASubordinaryTypes...> Point;
+      using Point = std::tuple<FirstType, ASubordinaryTypes...>;
 
       /// Tuple of differencs in each coordinate
-      typedef std::tuple < decltype(FirstType() - FirstType()),
-              decltype(ASubordinaryTypes() - ASubordinaryTypes())... > Delta;
+      using Delta = std::tuple < decltype(FirstType() - FirstType()),
+            decltype(ASubordinaryTypes() - ASubordinaryTypes())... >;
 
       /// Accessor for the individual coordinate types.
       template<std::size_t I>
@@ -90,14 +94,17 @@ namespace Belle2 {
       static const size_t c_nTypes = std::tuple_size<Point>::value;
 
       /// Helper class to iterate over the individual coordinates
-      typedef GenIndices<c_nTypes> Indices;
+      using Indices = GenIndices<c_nTypes>;
 
       /// Initialise the box with bound in each dimension.
       Box(const std::array<FirstType, 2>& firstBound,
-          const std::array<ASubordinaryTypes, 2>& ... subordinaryBounds) :
-        m_firstBounds{{std::min(firstBound[0], firstBound[1]), std::max(firstBound[0], firstBound[1])}},
-      m_subordinaryBox(subordinaryBounds...)
-      {}
+          const std::array<ASubordinaryTypes, 2>& ... subordinaryBounds)
+        : m_firstBounds{{
+          std::min(firstBound[0], firstBound[1]),
+          std::max(firstBound[1], firstBound[0])}}
+      , m_subordinaryBox(subordinaryBounds...)
+      {
+      }
 
       /// Output operator for debugging
       friend std::ostream& operator<<(std::ostream& output, const This& box)
@@ -119,12 +126,16 @@ namespace Belle2 {
 
       /// Getter for the box in excluding the first coordinate
       const Box<ASubordinaryTypes...>& getSubordinaryBox() const
-      { return m_subordinaryBox; }
+      {
+        return m_subordinaryBox;
+      }
 
       /// Get the lower bound of the box in the coordinate I - first coordinate case
       template<std::size_t I>
       const EnableIf<I == 0, Type<I> >& getLowerBound() const
-      { return m_firstBounds[0]; }
+      {
+        return m_firstBounds[0];
+      }
 
       /// Get the lower bound of the box in the coordinate I - subordinary coordinate case
       template<std::size_t I>
@@ -136,15 +147,18 @@ namespace Belle2 {
       }
 
       /// Get the lower bound of the box by the type of the coordinate.
-      template<class T>
-      const EnableIf< HasType<T>::value, T>&
-      getLowerBound() const
-      { return getLowerBound< TypeIndex<T>::value > (); }
+      template <class T>
+      const EnableIf<HasType<T>::value, T>& getLowerBound() const
+      {
+        return getLowerBound<TypeIndex<T>::value>();
+      }
 
       /// Get the upper bound of the box in the coordinate I
-      template<std::size_t I>
-      const EnableIf<I == 0, Type<I> >& getUpperBound() const
-      { return m_firstBounds[1]; }
+      template <std::size_t I>
+      const EnableIf<I == 0, Type<I>>& getUpperBound() const
+      {
+        return m_firstBounds[1];
+      }
 
       /// Get the lower bound of the box in the coordinate I - subordinary coordinate case
       template<std::size_t I>
@@ -156,35 +170,40 @@ namespace Belle2 {
       }
 
       /// Get the upper bound of the box by the type of the coordinate.
-      template<class T>
-      const EnableIf< HasType<T>::value, T>&
-      getUpperBound() const
-      { return getUpperBound< TypeIndex<T>::value > (); }
+      template <class T>
+      const EnableIf<HasType<T>::value, T>& getUpperBound() const
+      {
+        return getUpperBound<TypeIndex<T>::value>();
+      }
 
       /// Get the bounds of the box in the coordinate I - first coordinate case
-      template<std::size_t I>
-      const EnableIf< I == 0, std::array<Type<I>, 2> >& getBounds() const
-      { return m_firstBounds; }
+      template <std::size_t I>
+      const EnableIf<I == 0, std::array<Type<I>, 2>>& getBounds() const
+      {
+        return m_firstBounds;
+      }
 
       /// Get the bounds of the box in the coordinate I - subordinary coordinate case
-      template<std::size_t I>
-      const EnableIf < I != 0, std::array<Type<I>, 2> > & getBounds() const
+      template <std::size_t I>
+      const EnableIf < I != 0, std::array<Type<I>, 2 >>& getBounds() const
       {
-        static_assert(I < c_nTypes,
-                      "Accessed index exceeds number of coordinates");
+        static_assert(I < c_nTypes, "Accessed index exceeds number of coordinates");
         return m_subordinaryBox.template getBounds < I - 1 > ();
       }
 
       /// Get the bounds of the box by the type of the coordinate.
-      template<class T>
-      const EnableIf< HasType<T>::value, std::array<T, 2> >&
-      getBounds() const
-      { return getBounds< TypeIndex<T>::value > (); }
+      template <class T>
+      const EnableIf<HasType<T>::value, std::array<T, 2>>& getBounds() const
+      {
+        return getBounds<TypeIndex<T>::value>();
+      }
 
       /// Get the difference of upper and lower bound
-      template<std::size_t I>
+      template <std::size_t I>
       Width<I> getWidth() const
-      { return getUpperBound<I>() - getLowerBound<I>(); }
+      {
+        return getUpperBound<I>() - getLowerBound<I>();
+      }
 
     public:
       /// Get for break point in the range of coordinate I out of nDivsions equal spaced points
@@ -205,10 +224,11 @@ namespace Belle2 {
       }
 
       /// Get for the distance between two division bounds with overlap.
-      template<std::size_t I>
+      template <std::size_t I>
       Width<I> getDivisionWidthWithOverlap(const Width<I>& overlap, size_t nDivisions) const
-      { return (getWidth<I>() + (nDivisions - 1) * overlap) / nDivisions; }
-
+      {
+        return (getWidth<I>() + (nDivisions - 1) * overlap) / nDivisions;
+      }
 
       /**
        *  Getter for the lower bound of a subbox along the Ith axes in an equal spaced division with overlap.
@@ -284,28 +304,36 @@ namespace Belle2 {
       }
 
       /// Get the center of the box in the coordinate I
-      template<std::size_t I>
+      template <std::size_t I>
       Type<I> getCenter() const
-      { return getDivision<I>(2, 1); }
+      {
+        return getDivision<I>(2, 1);
+      }
 
       /// Get the lower partition in the coordinate I
-      template<std::size_t I>
+      template <std::size_t I>
       std::array<Type<I>, 2> getLowerHalfBounds() const
-      { return getDivisionBounds(2, 0); }
+      {
+        return getDivisionBounds(2, 0);
+      }
 
       /// Get the upper partition in the coordinate I
-      template<std::size_t I>
+      template <std::size_t I>
       std::array<Type<I>, 2> getUpperHalfBounds() const
-      { return getDivisionBounds(2, 1); }
+      {
+        return getDivisionBounds(2, 1);
+      }
 
       /// Indicate if the given value is in the range of the coordinate I
-      template<std::size_t I, class ASubordinaryValue>
+      template <std::size_t I, class ASubordinaryValue>
       bool isIn(const ASubordinaryValue& value) const
-      { return getLowerBound<I>() < value and not(getUpperBound<I>() < value); }
+      {
+        return getLowerBound<I>() < value and not(getUpperBound<I>() < value);
+      }
 
     private:
       /// Indicates if any of the boolean values is true.
-      inline static bool any(const std::initializer_list<bool>& booleans)
+      static bool any(const std::initializer_list<bool>& booleans)
       {
         return std::accumulate(std::begin(booleans), std::end(booleans),
         false, [](const bool & lhs, const bool & rhs) {return lhs or rhs;});
@@ -313,13 +341,14 @@ namespace Belle2 {
       }
 
       /// Indicates if all of the boolean values are true.
-      inline static bool all(const std::initializer_list<bool>& booleans)
+      static bool all(const std::initializer_list<bool>& booleans)
       {
         return std::accumulate(std::begin(booleans), std::end(booleans),
         true, [](const bool & lhs, const bool & rhs) {return lhs and rhs;});
       }
 
-      /** Indicates if this box intersects with the other box
+      /**
+       *  Indicates if this box intersects with the other box.
        *  Implementation unroling the individual coordinates.
        *
        *  Checks if the lower bound of one box is higher than the upper bound in the other box
@@ -327,32 +356,43 @@ namespace Belle2 {
        *  If no such bound can be found there is no intersection.
        *  Negation yields the desired result.
        */
-      template<size_t ... Is>
-      bool intersectsImpl(const This& box, IndexSequence<Is...>) const
+      template <size_t... Is>
+      bool intersectsImpl(const This& box,
+                          IndexSequence<Is...> is __attribute__((unused))) const
       {
-        return not(any({box.getUpperBound<Is>() < getLowerBound<Is>()... }) or
-                   any({getUpperBound<Is>() < box.getLowerBound<Is>()... }));
+        return not(any({box.getUpperBound<Is>() < this->getLowerBound<Is>()... }) or
+                   any({this->getUpperBound<Is>() < box.getLowerBound<Is>()... }));
       }
 
-      /** Indicate if all given values are in the range of their coordinates.
+      /**
+       *  Indicate if all given values are in the range of their coordinates.
        *  Implementation unroling the individual coordinates.
        */
-      template<size_t ... Is>
-      bool isInImpl(const Point& point, IndexSequence<Is...>) const
-      { return not all({isIn<Is>(std::get<Is>(point)) ... }); }
+      template <size_t... Is>
+      bool isInImpl(const Point& point,
+                    IndexSequence<Is...> is __attribute__((unused))) const
+      {
+        return not all({isIn<Is>(std::get<Is>(point))...});
+      }
 
     public:
       /// Indicates if this box intersects with the other box
       bool intersects(const This& box) const
-      { return intersectsImpl(box, Indices());  }
+      {
+        return intersectsImpl(box, Indices());
+      }
 
       /// Indicate if all given values are in the range of their coordinates.
       bool isIn(const Point& point) const
-      { return isInImpl(point, Indices()); }
+      {
+        return isInImpl(point, Indices());
+      }
 
       /// Indicate if all given values are in the range of their coordinates.
       bool isIn(const FirstType& value, const ASubordinaryTypes& ... values) const
-      { return isInImpl(Point(value, values...), Indices()); }
+      {
+        return isInImpl(Point(value, values...), Indices());
+      }
 
     private:
       /// Bound in the first coordindate

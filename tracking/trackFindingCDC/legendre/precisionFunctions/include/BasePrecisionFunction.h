@@ -23,16 +23,11 @@ namespace Belle2 {
 
     public:
 
-      /// typedef for function which is used for resolution calculations (resolution<double>=f(curvature<double>)
-      typedef std::function<double(double)> PrecisionFunction;
-
-      /// Default constructor
-      BasePrecisionFunction()
-      {
-      }
+      /// Function type which is used for resolution calculations (resolution=f(curvature))
+      using PrecisionFunction = std::function<double(double)>;
 
       /// Destructor
-      virtual ~BasePrecisionFunction() {};
+      virtual ~BasePrecisionFunction() = default;
 
       /// Returns desired deepness of the trigonometrical lookup table. Used as template parameter for the TrigonometricalLookupTable<> class.
       static constexpr int getLookupGridLevel() {return c_lookupGridLevel; };
@@ -41,10 +36,10 @@ namespace Belle2 {
       PrecisionFunction& getFunction() { return m_function; };
 
       /** convert rho (one of the axis in legendre phase-space) to Pt (in GeV) */
-      double convertRhoToPt(double rho) {return 1.5 * 0.00299792458 / fabs(rho); };
+      static double convertRhoToPt(double rho) {return 1.5 * 0.00299792458 / fabs(rho); };
 
       /** Pt (in GeV)convert  to rho (one of the axis in legendre phase-space) */
-      double convertPtToRho(double pt) {return 1.5 * 0.00299792458 / fabs(pt); };
+      static double convertPtToRho(double pt) {return 1.5 * 0.00299792458 / fabs(pt); };
 
     protected:
 

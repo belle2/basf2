@@ -10,16 +10,14 @@
 
 #include <tracking/trackFindingCDC/filters/segmentTripleRelation/AllSegmentTripleRelationFilter.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-Weight
-AllSegmentTripleRelationFilter::operator()(const CDCSegmentTriple&,
-                                           const CDCSegmentTriple& toTriple)
+Weight AllSegmentTripleRelationFilter::operator()(const CDCSegmentTriple& fromSegmentTriple
+                                                  __attribute__((unused)),
+                                                  const CDCSegmentTriple& toSegmentTriple)
 {
   // Just let all found neighors pass for the base implementation
   // with the default weight
-  return  -toTriple.getStartSegment()->size();
+  return  -toSegmentTriple.getStartSegment()->size();
 }

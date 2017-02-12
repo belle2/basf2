@@ -1,7 +1,14 @@
-# $Id: DECAY.DEC,v 1.55 2009-11-26 14:16:27 robbep Exp $
-# Updated to PDG 2010 by Tomas Pilar - T.Pilar@warwick.ac.uk
-# Updated Mixing Parameters Mark Whitehead May 2009
+# BelleII collaboration generic DECAY.DEC
+# Based on EvtGen DECAY.DEC and Belle DECAY.DEC 
 #
+# Changes
+#
+#
+# October 2016, Umberto Tamponi (tamponi@to.infn.it)
+#   Light meson decays (rho, eta, phi, f'_0...) updated to PDG 2015
+#   New Dalitz modes for eta and eta' 
+
+
 Define qoverp_incohMix_B_s0 1.0
 Define dm_incohMix_B_s0 17.8e12
 Define qoverp_incohMix_B0 1.0
@@ -227,23 +234,23 @@ Decay anti-B0
 # Updated to PDG 2008
 #                   b -> c semileptonic
 #
-0.050100000 D*+     e-      anti-nu_e                       PHOTOS  HQET 0.77 1.33 0.92; #[Reconstructed PDG2011]
-0.021700000 D+      e-      anti-nu_e                       PHOTOS  ISGW2; #[Reconstructed PDG2011]
-0.0054   D_1+   e-   anti-nu_e          PHOTOS  ISGW2;
-0.0020   D_0*+   e-   anti-nu_e          PHOTOS  ISGW2;
-0.0050   D'_1+   e-   anti-nu_e          PHOTOS  ISGW2;
-0.0022   D_2*+   e-   anti-nu_e          PHOTOS  ISGW2;
+0.050100000 D*+     e-      anti-nu_e                       PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854; 
+0.021700000 D+      e-      anti-nu_e                       PHOTOS  HQET3 1.082 1.186 1.0;
+0.0054   D_1+   e-   anti-nu_e          PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+0.0020   D_0*+   e-   anti-nu_e          PHOTOS  LLSW 0.68 -0.2 0.3;
+0.0050   D'_1+   e-   anti-nu_e          PHOTOS  LLSW 0.68 -0.2 0.3;
+0.0022   D_2*+   e-   anti-nu_e          PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
 0.0003   D*+  pi0   e-   anti-nu_e      PHOTOS  GOITY_ROBERTS;
 0.004900000 D*0     pi+     e-      anti-nu_e               PHOTOS  GOITY_ROBERTS; #[Reconstructed PDG2011]
 0.0010   D+   pi0   e-   anti-nu_e      PHOTOS  GOITY_ROBERTS;
 0.0000   D0   pi+   e-   anti-nu_e      PHOTOS  GOITY_ROBERTS;
 
-0.050100000 D*+     mu-     anti-nu_mu                      PHOTOS  HQET 0.77 1.33 0.92; #[Reconstructed PDG2011]
-0.021700000 D+      mu-     anti-nu_mu                      PHOTOS  ISGW2; #[Reconstructed PDG2011]
-0.0054   D_1+   mu-  anti-nu_mu         PHOTOS  ISGW2;
-0.0020   D_0*+   mu-  anti-nu_mu         PHOTOS  ISGW2;
-0.0050   D'_1+   mu-  anti-nu_mu         PHOTOS  ISGW2;
-0.0022   D_2*+   mu-  anti-nu_mu         PHOTOS  ISGW2;
+0.050100000 D*+     mu-     anti-nu_mu                      PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.021700000 D+      mu-     anti-nu_mu                      PHOTOS  HQET3 1.082 1.186 1.0;
+0.0054   D_1+   mu-  anti-nu_mu         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+0.0020   D_0*+   mu-  anti-nu_mu         PHOTOS  LLSW 0.68 -0.2 0.3;
+0.0050   D'_1+   mu-  anti-nu_mu         PHOTOS  LLSW 0.68 -0.2 0.3;
+0.0022   D_2*+   mu-  anti-nu_mu         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
 0.0003   D*+  pi0   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS;
 0.004900000 D*0     pi+     mu-     anti-nu_mu              PHOTOS   GOITY_ROBERTS; #[Reconstructed PDG2011]
 0.0010   D+   pi0   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS;
@@ -251,12 +258,12 @@ Decay anti-B0
 #
 #                    b -> c tau nu
 #
-0.015000000 D*+     tau-    anti-nu_tau                     ISGW2; #[Reconstructed PDG2011]
-0.011000000 D+      tau-    anti-nu_tau                     ISGW2; #[Reconstructed PDG2011]
-0.0013   D_1+   tau- anti-nu_tau                 ISGW2;
-0.0013   D_0*+   tau- anti-nu_tau                 ISGW2;
-0.0020   D'_1+   tau- anti-nu_tau                 ISGW2;
-0.0020   D_2*+   tau- anti-nu_tau                 ISGW2;
+0.015000000 D*+     tau-    anti-nu_tau                     HQET3 0.908 1.207 1.21 1.401 0.854;
+0.011000000 D+      tau-    anti-nu_tau                     HQET3 1.082 1.186 1.0;
+0.0013   D_1+   tau- anti-nu_tau                 LLSW 0.71 -1.6 -0.5 2.9;
+0.0013   D_0*+   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3;
+0.0020   D'_1+   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3;
+0.0020   D_2*+   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3
 #
 #                    b -> u l nu
 #
@@ -1489,24 +1496,24 @@ Decay B0
 # Updated to PDG 2008
 #                   b -> c semileptonic
 #
-0.050100000 D*-     e+      nu_e                            PHOTOS HQET 0.77 1.33 0.92; #[Reconstructed PDG2011]
-0.021700000 D-      e+      nu_e                            PHOTOS ISGW2; #[Reconstructed PDG2011]
-0.0054   D_1-   e+   nu_e           PHOTOS ISGW2;
-0.0020   D_0*-   e+   nu_e           PHOTOS ISGW2;
-0.0050   D'_1-   e+   nu_e           PHOTOS ISGW2;
-0.0022   D_2*-   e+   nu_e           PHOTOS ISGW2;
+0.050100000 D*-     e+      nu_e                            PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.021700000 D-      e+      nu_e                            PHOTOS  HQET3 1.082 1.186 1.0;
+0.0054   D_1-   e+   nu_e           PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
+0.0020   D_0*-   e+   nu_e           PHOTOS LLSW 0.68 -0.2 0.3;
+0.0050   D'_1-   e+   nu_e           PHOTOS LLSW 0.68 -0.2 0.3;
+0.0022   D_2*-   e+   nu_e           PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
 0.0003   D*-  pi0   e+   nu_e       PHOTOS GOITY_ROBERTS;
 0.004900000 anti-D*0 pi-     e+      nu_e                   PHOTOS GOITY_ROBERTS; #[Reconstructed PDG2011]
 0.0010   D-   pi0   e+   nu_e       PHOTOS GOITY_ROBERTS;
 # Now 0 as it duplicates other decays
 0.0000   anti-D0  pi-   e+   nu_e       PHOTOS GOITY_ROBERTS;
 #
-0.050100000 D*-     mu+     nu_mu                           PHOTOS HQET 0.77 1.33 0.92; #[Reconstructed PDG2011]
-0.021700000 D-      mu+     nu_mu                           PHOTOS ISGW2; #[Reconstructed PDG2011]
-0.0054   D_1-   mu+  nu_mu           PHOTOS ISGW2;
-0.0020   D_0*-   mu+  nu_mu          PHOTOS  ISGW2;
-0.0050   D'_1-   mu+  nu_mu          PHOTOS  ISGW2;
-0.0022   D_2*-   mu+  nu_mu          PHOTOS  ISGW2;
+0.050100000 D*-     mu+     nu_mu                           PHOTOS HQET3 0.908 1.207 1.21 1.401 0.854;
+0.021700000 D-      mu+     nu_mu                           PHOTOS HQET3 1.082 1.186 1.0;
+0.0054   D_1-   mu+  nu_mu           PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
+0.0020   D_0*-   mu+  nu_mu          PHOTOS  LLSW 0.68 -0.2 0.3;
+0.0050   D'_1-   mu+  nu_mu          PHOTOS  LLSW 0.68 -0.2 0.3;
+0.0022   D_2*-   mu+  nu_mu          PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
 0.0003   D*-  pi0   mu+  nu_mu       PHOTOS GOITY_ROBERTS;
 0.004900000 anti-D*0 pi-     mu+     nu_mu                  PHOTOS     GOITY_ROBERTS; #[Reconstructed PDG2011]
 0.0010   D-   pi0   mu+  nu_mu       PHOTOS GOITY_ROBERTS;
@@ -1514,12 +1521,12 @@ Decay B0
 #
 #                    b -> c tau nu
 #
-0.015000000 D*-     tau+    nu_tau                          ISGW2; #[Reconstructed PDG2011]
-0.011000000 D-      tau+    nu_tau                          ISGW2; #[Reconstructed PDG2011]
-0.0013   D_1-   tau+ nu_tau                  ISGW2;
-0.0013   D_0*-   tau+ nu_tau                  ISGW2;
-0.0020   D'_1-   tau+ nu_tau                  ISGW2;
-0.0020   D_2*-   tau+ nu_tau                  ISGW2;
+0.015000000 D*-     tau+    nu_tau                          HQET3 0.908 1.207 1.21 1.401 0.854;
+0.011000000 D-      tau+    nu_tau                          HQET3 1.082 1.186 1.0;
+0.0013   D_1-   tau+ nu_tau                  LLSW 0.71 -1.6 -0.5 2.9;
+0.0013   D_0*-   tau+ nu_tau                  LLSW 0.68 -0.2 0.3;
+0.0020   D'_1-   tau+ nu_tau                  LLSW 0.68 -0.2 0.3;
+0.0020   D_2*-   tau+ nu_tau                  LLSW 0.71 -1.6 -0.5 2.9;
 #
 #                    b -> u l nu
 #
@@ -2707,24 +2714,24 @@ Decay B-
 # Updated to PDG 2008
 #                  b -> c semileptonic
 #
-0.056800000 D*0     e-      anti-nu_e                       PHOTOS  HQET 0.77 1.33 0.92; #[Reconstructed PDG2011]
-0.022300000 D0      e-      anti-nu_e                       PHOTOS  ISGW2; #[Reconstructed PDG2011]
-0.0040   D_10   e-   anti-nu_e         PHOTOS  ISGW2;
-0.0024   D_0*0   e-   anti-nu_e         PHOTOS  ISGW2;
-0.0007   D'_10   e-   anti-nu_e         PHOTOS  ISGW2;
-0.0018   D_2*0   e-   anti-nu_e         PHOTOS  ISGW2;
+0.056800000 D*0     e-      anti-nu_e                       PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.022300000 D0      e-      anti-nu_e                       PHOTOS  HQET3 1.082 1.186 1.0;
+0.0040   D_10   e-   anti-nu_e         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+0.0024   D_0*0   e-   anti-nu_e         PHOTOS  LLSW 0.68 -0.2 0.3;;
+0.0007   D'_10   e-   anti-nu_e         PHOTOS  LLSW 0.68 -0.2 0.3;;
+0.0018   D_2*0   e-   anti-nu_e         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
 0.006100000 D*+     pi-     e-      anti-nu_e               PHOTOS  GOITY_ROBERTS; #[Reconstructed PDG2011]
 0.0003   D*0  pi0   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
 # covered by other decays
 0.0000   D+   pi-   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
 0.0010   D0   pi0   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
 #
-0.056800000 D*0     mu-     anti-nu_mu                      PHOTOS   HQET 0.77 1.33 0.92; #[Reconstructed PDG2011]
-0.022300000 D0      mu-     anti-nu_mu                      PHOTOS   ISGW2; #[Reconstructed PDG2011]
-0.0040   D_10  mu-  anti-nu_mu         PHOTOS   ISGW2;
-0.0024   D_0*0  mu-  anti-nu_mu        PHOTOS    ISGW2;
-0.0007   D'_10  mu-  anti-nu_mu        PHOTOS    ISGW2;
-0.0018   D_2*0  mu-  anti-nu_mu        PHOTOS    ISGW2;
+0.056800000 D*0     mu-     anti-nu_mu                      PHOTOS   HQET3 0.908 1.207 1.21 1.401 0.854;
+0.022300000 D0      mu-     anti-nu_mu                      PHOTOS   HQET3 1.082 1.186 1.0;
+0.0040   D_10  mu-  anti-nu_mu         PHOTOS   LLSW 0.71 -1.6 -0.5 2.9;
+0.0024   D_0*0  mu-  anti-nu_mu        PHOTOS    LLSW 0.68 -0.2 0.3;
+0.0007   D'_10  mu-  anti-nu_mu        PHOTOS    LLSW 0.68 -0.2 0.3;
+0.0018   D_2*0  mu-  anti-nu_mu        PHOTOS    LLSW 0.71 -1.6 -0.5 2.9;
 0.006100000 D*+     pi-     mu-     anti-nu_mu              PHOTOS   GOITY_ROBERTS; #[Reconstructed PDG2011]
 0.0003   D*0   pi0   mu-   anti-nu_mu  PHOTOS   GOITY_ROBERTS;
 0.0000   D+    pi-   mu-   anti-nu_mu  PHOTOS   GOITY_ROBERTS;
@@ -2732,12 +2739,12 @@ Decay B-
 #
 #                   b -> c tau nu
 #
-0.020000000 D*0     tau-    anti-nu_tau                     ISGW2; #[Reconstructed PDG2011]
-0.007000000 D0      tau-    anti-nu_tau                     ISGW2; #[Reconstructed PDG2011]
-0.0013   D_10   tau- anti-nu_tau                 ISGW2;
-0.0013   D_0*0   tau- anti-nu_tau                 ISGW2;
-0.0020   D'_10   tau- anti-nu_tau                 ISGW2;
-0.0020   D_2*0   tau- anti-nu_tau                 ISGW2;
+0.020000000 D*0     tau-    anti-nu_tau                     HQET3 0.908 1.207 1.21 1.401 0.854;
+0.007000000 D0      tau-    anti-nu_tau                     HQET3 1.082 1.186 1.0;
+0.0013   D_10   tau- anti-nu_tau                 LLSW 0.71 -1.6 -0.5 2.9;
+0.0013   D_0*0   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3;
+0.0020   D'_10   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3;
+0.0020   D_2*0   tau- anti-nu_tau                 LLSW 0.71 -1.6 -0.5 2.9;
 #
 #                   b -> u l nu
 #
@@ -3712,24 +3719,24 @@ Decay B+
 # Updated to PDG 2008
 #                  b -> c semileptonic
 #
-0.056800000 anti-D*0 e+      nu_e                           PHOTOS  HQET 0.77 1.33 0.92; #[Reconstructed PDG2011]
-0.022300000 anti-D0 e+      nu_e                            PHOTOS  ISGW2; #[Reconstructed PDG2011]
-0.0040   anti-D_10   e+   nu_e        PHOTOS  ISGW2;
-0.0024   anti-D_0*0   e+   nu_e        PHOTOS  ISGW2;
-0.0007   anti-D'_10   e+   nu_e        PHOTOS  ISGW2;
-0.0018   anti-D_2*0   e+   nu_e        PHOTOS  ISGW2;
+0.056800000 anti-D*0 e+      nu_e                           PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.022300000 anti-D0 e+      nu_e                            PHOTOS  HQET3 1.082 1.186 1.0;
+0.0040   anti-D_10   e+   nu_e        PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+0.0024   anti-D_0*0   e+   nu_e        PHOTOS  LLSW 0.68 -0.2 0.3;
+0.0007   anti-D'_10   e+   nu_e        PHOTOS  LLSW 0.68 -0.2 0.3;
+0.0018   anti-D_2*0   e+   nu_e        PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
 0.006100000 D*-     pi+     e+      nu_e                    PHOTOS  GOITY_ROBERTS; #[Reconstructed PDG2011]
 0.0003   anti-D*0  pi0   e+   nu_e    PHOTOS  GOITY_ROBERTS;
 # covered by other decays
 0.0000   D-   pi+   e+   nu_e    PHOTOS  GOITY_ROBERTS;
 0.0010   anti-D0  pi0   e+   nu_e    PHOTOS  GOITY_ROBERTS;
 
-0.056800000 anti-D*0 mu+     nu_mu                          PHOTOS   HQET 0.77 1.33 0.92; #[Reconstructed PDG2011]
-0.022300000 anti-D0 mu+     nu_mu                           PHOTOS  ISGW2; #[Reconstructed PDG2011]
-0.0040   anti-D_10   mu+  nu_mu       PHOTOS   ISGW2;
-0.0024   anti-D_0*0   mu+  nu_mu      PHOTOS    ISGW2;
-0.0007   anti-D'_10   mu+  nu_mu      PHOTOS    ISGW2;
-0.0018   anti-D_2*0   mu+  nu_mu      PHOTOS    ISGW2;
+0.056800000 anti-D*0 mu+     nu_mu                          PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.022300000 anti-D0 mu+     nu_mu                           PHOTOS  HQET3 1.082 1.186 1.0;
+0.0040   anti-D_10   mu+  nu_mu       PHOTOS   LLSW 0.71 -1.6 -0.5 2.9;
+0.0024   anti-D_0*0   mu+  nu_mu      PHOTOS    LLSW 0.68 -0.2 0.3;
+0.0007   anti-D'_10   mu+  nu_mu      PHOTOS    LLSW 0.68 -0.2 0.3;
+0.0018   anti-D_2*0   mu+  nu_mu      PHOTOS    LLSW 0.71 -1.6 -0.5 2.9;
 0.006100000 D*-     pi+     mu+     nu_mu                   PHOTOS    GOITY_ROBERTS; #[Reconstructed PDG2011]
 0.0003   anti-D*0  pi0   mu+   nu_mu  PHOTOS         GOITY_ROBERTS;
 0.0000   D-   pi+   mu+   nu_mu       PHOTOS    GOITY_ROBERTS;
@@ -3737,12 +3744,12 @@ Decay B+
 #
 #                   b -> c tau nu
 #
-0.020000000 anti-D*0 tau+    nu_tau                         ISGW2; #[Reconstructed PDG2011]
-0.007000000 anti-D0 tau+    nu_tau                          ISGW2; #[Reconstructed PDG2011]
-0.0013   anti-D_10   tau+ nu_tau                ISGW2;
-0.0013   anti-D_0*0   tau+ nu_tau                ISGW2;
-0.0020   anti-D'_10   tau+ nu_tau                ISGW2;
-0.0020   anti-D_2*0   tau+ nu_tau                ISGW2;
+0.020000000 anti-D*0 tau+    nu_tau                         HQET3 0.908 1.207 1.21 1.401 0.854;
+0.007000000 anti-D0 tau+    nu_tau                          HQET3 1.082 1.186 1.0;
+0.0013   anti-D_10   tau+ nu_tau                LLSW 0.71 -1.6 -0.5 2.9;
+0.0013   anti-D_0*0   tau+ nu_tau                LLSW 0.68 -0.2 0.3;
+0.0020   anti-D'_10   tau+ nu_tau                LLSW 0.68 -0.2 0.3;
+0.0020   anti-D_2*0   tau+ nu_tau                LLSW 0.71 -1.6 -0.5 2.9;
 #
 #                   b -> u l nu
 #
@@ -5763,6 +5770,10 @@ Decay tau-
 Enddecay
 #
 CDecay tau+
+
+
+
+
 #
 #   Vector Mesons Updated PDG 2008
 #
@@ -6847,11 +6858,18 @@ Decay D*(2S)-
 0.1667    D-  pi0                        VSS;
 0.3333    anti-D0  pi-                       VSS;
 Enddecay
-#
-#
-#  Strange Mesons updated to PDG 2008
-#
-#
+
+
+#  --------------------------------------------------------
+#  +------------------------------------------------------+
+#  +                                                      +
+#  +                      Kaons                           +
+#  +                                                      + 
+#  + Last Update: PDG 2011?                               +
+#  +                                                      +
+#  +                                                      +
+#  +------------------------------------------------------+
+#  --------------------------------------------------------
 Decay K_S0
 0.691321852 pi+     pi-                                     PHSP; #[Reconstructed PDG2011]
 0.306221852 pi0     pi0                                     PHSP; #[Reconstructed PDG2011]
@@ -7195,106 +7213,173 @@ Decay anti-Xss
 1.00000     anti-s s  PYTHIA 11;
 Enddecay
 
-#
-#  Light Mesons Updated to PDG 2008
+#  --------------------------------------------------------
+#  +------------------------------------------------------+
+#  +                                                      +
+#  +            Light Unflavoured Mesons                  +
+#  +                                                      + 
+#  + Last Update: October 2016                            +
+#  +              Umberto Tamponi (tamponi@to.infn.it)    +
+#  +                                                      +
+#  +------------------------------------------------------+
+#  --------------------------------------------------------
 #
 Decay pi0
-0.988228297 gamma   gamma                                   PHSP; #[Reconstructed PDG2011]
-0.011738247 e+      e-      gamma                           PI0_DALITZ; #[Reconstructed PDG2011]
-0.000033392 e+      e+      e-      e-                      PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.000000065 e+      e-                                      PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.988228297 gamma   gamma                        PHSP; #[Reconstructed PDG2011]
+0.011738247 e+      e-      gamma                PI0_DALITZ; #[Reconstructed PDG2011]
+0.000033392 e+      e+      e-      e-           PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.000000065 e+      e-                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
 Enddecay
 #
-Decay eta
-0.393100000 gamma   gamma                                   PHSP; #[Reconstructed PDG2011]
-0.325700000 pi0     pi0     pi0                             PHSP; #[Reconstructed PDG2011]
-0.227400000 pi-     pi+     pi0                             ETA_DALITZ; #[Reconstructed PDG2011]
-0.046000000 gamma   pi-     pi+                             PHSP; #[Reconstructed PDG2011]
-0.007000000 gamma   e+      e-                              PHSP; #[Reconstructed PDG2011]
-0.000310000 gamma   mu+     mu-                             PHSP; #[Reconstructed PDG2011]
-0.000270000 gamma   gamma   pi0                             PHSP; #[Reconstructed PDG2011]
-0.000214200 pi+     pi-     e+      e-                      PHSP; #[Reconstructed PDG2011]
-0.000005800 mu+     mu-                                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
+# 
+#
+Decay eta # Edited by U. Tamponi, October 2016 
+0.393100000 gamma   gamma                        PHSP; #[Reconstructed PDG2011]
+0.325700000 pi0     pi0     pi0                  ETA_PI0DALITZ  -0.0135; #[Reconstructed PDG2011] #New decay model
+0.227400000 pi-     pi+     pi0                  ETA_FULLDALITZ  -1.128  0.153  0.0  0.085  0.0  0.173; # New decay model
+0.046000000 gamma   pi-     pi+                  PHSP; #[Reconstructed PDG2011]
+0.007000000 gamma   e+      e-                   PHSP; #[Reconstructed PDG2011]
+0.000310000 gamma   mu+     mu-                  PHSP; #[Reconstructed PDG2011]
+0.000270000 gamma   gamma   pi0                  PHSP; #[Reconstructed PDG2011]
+0.000214200 pi+     pi-     e+      e-           PHSP; #[Reconstructed PDG2011]
+0.000005800 mu+     mu-                          PHSP;  #[New mode added] #[Reconstructed PDG2011]
 Enddecay
 #
-Decay rho0 # Edited by U. Tamponi, March 2016
-0.998951 pi+ pi- PHOTOS VSS;
-0.000610 pi0 gamma VSP_PWAVE;
-0.000300 eta gamma VSP_PWAVE;
-0.000045 pi0 pi0 gamma PHSP;
-0.000047 mu+ mu- PHOTOS VLL;
-0.000047 e+ e- PHOTOS VLL;
+#  rho
+#
+#  Edited by U. Tamponi, March 2016
+#
+Decay rho0 #  Edited by U. Tamponi, March 2016
+0.998951000 pi+     pi-                          VSS;
+0.000610000 pi0     gamma                        VSP_PWAVE;
+0.000300000 eta     gamma                        VSP_PWAVE;
+0.000045000 pi0     pi0    gamma                 PHSP;
+0.000047000 mu+     mu-                          VLL;
+0.000047000 e+      e-                           VLL;
 Enddecay
 Decay rho+ # Edited by U. Tamponi, March 2016
-0.99955 pi+ pi0 PHOTOS VSS;
-0.00045 pi+ gamma PHOTOS VSP_PWAVE;
+0.999550000 pi+     pi0                          VSS;
+0.000450000 pi+     gamma                        VSP_PWAVE;
 Enddecay
 Decay rho- # Edited by U. Tamponi, March 2016
-0.99955 pi- pi0 PHOTOS VSS;
-0.00045 pi- gamma PHOTOS VSP_PWAVE;
+0.999550000 pi-     pi0                          VSS;
+0.000450000 pi-     gamma                        VSP_PWAVE;
 Enddecay
 #
-Decay omega # Edited by U. Tamponi, March 2016 
-0.899000000 pi- pi+ pi0     OMEGA_DALITZ;  # 1-Sum(other modes). PDG reports 0.892 \pm 0.07
-0.015300000 pi- pi+         PHOTOS VSS;  # includes pi+ pi- gamma, never directly observed
-0.000066000 rho0    gamma   HELAMP 1. 0. 1. 0. -1. 0. -1. 0.;  # was pi0 pi0 gamma
-0.082800000 pi0     gamma   VSP_PWAVE; 
-0.000460000 eta     gamma   VSP_PWAVE; 
-0.000770000 pi0     e+      e-    PHOTOS PHSP; 
-0.000130000 pi0     mu+     mu-   PHOTOS PHSP;
-0.00050    pi+ pi- pi+ pi-        PHSP;
-0.000072800 e+      e-            PHOTOS VLL;  # should be equal by LFU
-0.000090000 mu+     mu-           PHOTOS VLL;  # should be equal by LFU
+Decay omega # Edited by U. Tamponi, October 2016 
+0.903000000 pi-     pi+    pi0                   OMEGA_DALITZ;  # 1-Sum(other modes). PDG reports 0.892 \pm 0.07
+0.015300000 pi-     pi+                          VSS;  # includes pi+ pi- gamma, never directly observed
+0.000066000 pi0     pi0    gamma                 PHSP;
+0.082800000 pi0     gamma                        VSP_PWAVE; 
+0.000460000 eta     gamma                        VSP_PWAVE; 
+0.000770000 pi0     e+      e-                   PHSP; 
+0.000130000 pi0     mu+     mu-                  PHSP;
+0.000500000 pi+     pi-     pi+     pi-          PHSP;
+0.000072800 e+      e-                           VLL;  
+0.000090000 mu+     mu-                          VLL; 
 Enddecay
 #
-Decay eta'
-0.432000000 pi+     pi-     eta                             PHSP; #[Reconstructed PDG2011]  MISSING DALITZ!!!
-0.217000000 pi0     pi0     eta                             PHSP; #[Reconstructed PDG2011]  MISSING DALITZ!!!
-0.293511000 rho0    gamma                                   SVP_HELAMP  1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
-0.027500000 omega   gamma                                   SVP_HELAMP  1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
-0.022200000 gamma   gamma                                   PHSP; #[Reconstructed PDG2011]
-0.001680000 pi0     pi0     pi0                             PHSP; #[Reconstructed PDG2011]
-0.000109000 gamma   mu-     mu+                             PHOTOS   PHSP; #[Reconstructed PDG2011]
-0.003600000 pi+     pi-     pi0                             PHSP;  #[New mode added] #[Reconstructed PDG2011]
-0.002400000 pi+     pi-     e+      e-                      PHSP;  #[New mode added] #[Reconstructed PDG2011]
+Decay eta' # Edited by U. Tamponi, October 2016
+0.432000000 pi+     pi-     eta                  ETAPRIME_DALITZ  -0.047  -0.069  0.0    0.073; # New dalitz mode
+0.217000000 pi0     pi0     eta                  ETAPRIME_DALITZ  -0.047  -0.069  0.0    0.073;# New dalitz mode
+0.293511000 rho0    gamma                        SVP_HELAMP  1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
+0.027500000 omega   gamma                        SVP_HELAMP  1.0 0.0 1.0 0.0; #[Reconstructed PDG2011]
+0.022200000 gamma   gamma                        PHSP; #[Reconstructed PDG2011]
+0.001680000 pi0     pi0     pi0                  ETA_PI0DALITZ -0.5; # PDG reporst -0.61 +- 0.08, outside of the physical boudaries. Forced back to the closest maeningful value
+0.000109000 gamma   mu-     mu+                  PHSP; #[Reconstructed PDG2011]
+0.003600000 pi+     pi-     pi0                  PHSP;  #[New mode added] #[Reconstructed PDG2011]
+0.002400000 pi+     pi-     e+      e-           PHSP;  #[New mode added] #[Reconstructed PDG2011]
 Enddecay
 #
-Decay phi # Edited by U. Tamponi, March 2016
-0.489700000 K+      K-              VSS; 
-0.342500000 K_L0    K_S0       VSS;
-0.0425   rho+ pi-                        VVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;  
-0.0425   rho0 pi0                       VVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
-0.0425   rho- pi+                        VVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
-0.0250   pi+  pi- pi0                    PHSP;
-0.013090000 eta     gamma       VSP_PWAVE; 
-0.000687600 pi0     gamma       VSP_PWAVE;
-0.000295400 e+      e-                PHOTOS  VLL;
-0.000287000 mu+ mu-               PHOTOS   VLL; 
-0.000113000 pi0 pi0 gamma      PHSP;    # further studies are needed for the pipigamma FV pipi modes
-0.000322000 f_0 gamma            PHSP;
-0.000105000 pi+ pi-                    PHOTOS VSS; 
-0.000047000 omega   pi0                 PHSP; 
-0.000004000 pi+     pi-     pi+     pi-   PHSP; 
-0.000072700 pi0     eta     gamma    PHSP; 
-0.000062500 eta'    gamma              PHSP; 
-0.000115000 eta     e+      e-            PHSP;
-0.000011200 pi0     e+      e-             PHSP; 
+Decay phi # Edited by U. Tamponi, October 2016
+0.048160000 rho+    pi-                          PARTWAVE 0.0 0.0 1.0 0.0 0.0 0.0; # From (BF[3pi]_tot - BF[3pi]_nonres)/3  
+0.048160000 rho0    pi0                          PARTWAVE 0.0 0.0 1.0 0.0 0.0 0.0; # Isospin symmetry
+0.048160000 rho-    pi+                          PARTWAVE 0.0 0.0 1.0 0.0 0.0 0.0; # Isospin symmetry
+0.008700000 pi+     pi-     pi0                  PHSP; #Non resonant component according to PDG 2015
+0.489700000 K+      K-                           VSS; 
+0.342500000 K_L0    K_S0                         VSS;
+0.013090000 eta     gamma                        VSP_PWAVE; 
+0.000687600 pi0     gamma                        VSP_PWAVE;
+0.000295400 e+      e-                           VLL;
+0.000287000 mu+     mu-                          VLL; 
+0.000113000 pi0     pi0     gamma                PHSP; # further studies are needed for the pipigamma FV pipi modes
+0.000322000 f_0     gamma                        PHSP;
+0.000105000 pi+     pi-                          VSS; 
+0.000047000 omega   pi0                          PHSP; 
+0.000004000 pi+     pi-     pi+     pi-          PHSP; 
+0.000072700 pi0     eta     gamma                PHSP; 
+0.000062500 eta'    gamma                        PHSP; 
+0.000115000 eta     e+      e-                   PHSP;
+0.000011200 pi0     e+      e-                   PHSP; 
 Enddecay
 #
-Decay a_1+
-0.4920   rho0 pi+                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.5080   rho+ pi0                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-Enddecay
-Decay a_10
-0.5000   rho- pi+                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.5000   rho+ pi-                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-Enddecay
-Decay a_1-
-0.4920   rho0 pi-                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.5080   rho- pi0                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+# a_0's
+#
+# - Correct PDG name: a_00 -> a_0(980)
+# - The BFs are adjusted in order to match the most precise measurement reported by PDG,
+#   BF[KKbar]/BF[eta pi0] = 18.3 %.
+# - BF[gamma gamma] = 0.03% assumes Gamma(a_00) ~ 100 MeV and Gamma(a_00 -> gamma gamma) = 0.3 KeV
+#
+Decay a_00 #  Edited by U. Tamponi, March 2016
+0.84530000  eta     pi0                          PHSP; # 0+ -> 0- 0- is PHSP  
+0.0773      K+      K-                           PHSP;
+0.0386      K_S0    K_S0                         PHSP;
+0.0386      K_L0    K_L0                         PHSP;
+0.0003      gamma   gamma                        PHSP;
 Enddecay
 #
-Decay a_2+
+Decay a_0+ #  Edited by U. Tamponi, March 2016
+0.8453      eta     pi+                          PHSP;
+0.1547      anti-K0 K+                           PHSP;
+Enddecay
+#
+Decay a_0- #  Edited by U. Tamponi, March 2016
+0.8453      eta      pi-                         PHSP;
+0.1547      K0  K-                          PHSP;
+Enddecay
+#
+# a_1's
+#
+# - Without a dedicated dalitz, but given the known rho pi dominance, the decay si modeled with incoherent sum of
+#   paritial amplitudes. Interference effects are significant but neglected here
+# - Partial amplitudes from CLEO, Phys.Rev. D61 (2000) 01200.
+#
+Decay a_10 #  Edited by U. Tamponi, March 2016
+0.2333   rho- pi+                        PHOTOS VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.2333   rho+ pi-                        PHOTOS VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.2334   rho0 pi0                        PHOTOS VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.2000   pi+ pi- pi0                     PHSP; #placeholder for K* K final states, which are off-shell
+0.0250   K+ pi- K0                       PHSP; #placeholder for K* K final states, which are off-shell
+0.0250   K- pi+ anti-K0                  PHSP; #placeholder for K* K final states, which are off-shell
+0.0250   anti-K0 pi0 K0                  PHSP; #placeholder for K* K final states, which are off-shell
+0.0250   K+ K- pi0                       PHSP; #placeholder for K* K final states, which are off-shell
+Enddecay
+#
+Decay a_1+ #  Edited by U. Tamponi, March 2016
+0.30875   rho0 pi+                        VVS_PWAVE .9788 0.0 0.0 0.0 .0212 0.0; # S- and D-wave
+0.30875   rho+ pi0                        VVS_PWAVE .9788 0.0 0.0 0.0 .0212 0.0; # S- and D-wave
+#0.01300  rho(2S)0 pi+                    VVS_PWAVE .2154 0.0 0.0 0.0 .7846 0.0; # S- and D-wave. #off mass shell, removed to speed up simulation 
+#0.01300  rho(2S)+ pi0                    VVS_PWAVE .2154 0.0 0.0 0.0 .7846 0.0; # S- and D-wave # off mass shell, removed to speed up simulation
+0.1618    sigma_0 pi+                     PHSP;
+0.0250    K+ K0 pi0     	          PHSP; #placeholder for K* K final states, which are off-shell
+0.0250    anti-K0 K0 pi+                       PHSP; #placeholder for K* K final states, which are off-shell
+0.1473    pi+ pi+ pi-                     PHSP; # added to fix the sum of the BF to 1. f_2(1270) and f_0(1370) contributions should be present
+Enddecay
+#
+Decay a_1- #  Edited by U. Tamponi, March 2016
+0.30875   rho0 pi-                        VVS_PWAVE .9788 0.0 0.0 0.0 .0212 0.0; # S- and D-wave
+0.30875   rho- pi0                        VVS_PWAVE .9788 0.0 0.0 0.0 .0212 0.0; # S- and D-wave
+#0.01300   rho(2S)0 pi-                    VVS_PWAVE .2154 0.0 0.0 0.0 .7846 0.0; # S- and D-wave  # off mass shell, removed to speed up simulation
+#0.01300   rho(2S)- pi0                    VVS_PWAVE .2154 0.0 0.0 0.0 .7846 0.0; # S- and D-wave  # off mass shell, removed to speed up simulation
+0.1618    sigma_0 pi-                     PHSP;
+0.0250    K- anti-K0 pi0     	          PHSP; #placeholder for K* K final states, which are off-shell
+0.0250    anti-K0 K0 pi-                  PHSP; #placeholder for K* K final states, which are off-shell
+0.1473    pi+ pi- pi-                     PHSP; # added to fix the sum of the BF to 1. f_2(1270) and f_0(1370) contributions should be present
+Enddecay
+#
+# a_2's
+#
+Decay a_2+ #  Checked by U. Tamponi, October 2016
 0.3500   rho0 pi+                        TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
 0.3500   rho+ pi0                        TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
 0.1430   eta  pi+                        TSS;
@@ -7304,7 +7389,7 @@ Decay a_2+
 0.0053   eta' pi+                        TSS;
 Enddecay
 #
-Decay a_2-
+Decay a_2- #  Checked by U. Tamponi, October 2016
 0.3500   rho0 pi-                        TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
 0.3500   rho- pi0                        TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
 0.1430   eta  pi-                        TSS;
@@ -7314,7 +7399,7 @@ Decay a_2-
 0.0053   eta' pi-                        TSS;
 Enddecay
 #
-Decay a_20
+Decay a_20 #  Checked by U. Tamponi, October 2016
 0.3500   rho+ pi-                        TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
 0.3500   rho- pi+                        TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
 0.1430   eta  pi0                        TSS;
@@ -7326,53 +7411,50 @@ Decay a_20
 0.0053   eta' pi0                        TSS;
 Enddecay
 #
-Decay b_1+
+Decay b_1+ #  Checked by U. Tamponi, October 2016
 0.9984   omega pi+                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.0016   pi+  gamma                       VSP_PWAVE;
 Enddecay
-Decay b_1-
+#
+Decay b_1- #  Checked by U. Tamponi, October 2016
 0.9984   omega pi-                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.0016   pi-  gamma                       VSP_PWAVE;
 Enddecay
-Decay b_10
+#
+Decay b_10 #  Checked by U. Tamponi, October 2016
 0.9984   omega pi0                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.0016   pi0  gamma                       VSP_PWAVE;
 Enddecay
 #
-Decay a_00
-0.9000    eta  pi0                       PHSP;
-0.0500    K+   K-                        PHSP;
-0.0250    K_S0  K_S0                       PHSP;
-0.0250    K_L0  K_L0                       PHSP;
-Enddecay
-Decay a_0+
-0.9000    eta  pi+                       PHSP;
-0.1000    anti-K0    K+                        PHSP;
-Enddecay
-Decay a_0-
-0.9000    eta  pi-                       PHSP;
-0.1000    K0   K-                        PHSP;
+#  BFs are  adjusted assuming BF(pipi) / (BF(KKbar)+BF(pipi)) = 0.75 [BESIII, Phys.Rev. D72 (2005) 092002].
+#  BaBar [Phys.Rev. D74 (2006) 032003] reports 0.52, in disagreement with BESIII and the previous measurements.
+Decay f_0 #  Edited by U. Tamponi, October 2016
+0.5000   pi+  pi-                        PHSP;
+0.2500   pi0  pi0                        PHSP;
+0.1249   K+   K-                         PHSP;
+0.0624   K_S0  K_S0                      PHSP;
+0.0624   K_L0  K_L0                      PHSP;
+0.0003   gamma gamma                     PHSP;
 Enddecay
 #
-Decay f_0
-0.6667   pi+  pi-                        PHSP;
-0.3333   pi0  pi0                        PHSP;
-#0.1100   K+   K-                         PHSP;
-#0.0550   K_S0  K_S0                        PHSP;
-#0.0550   K_L0  K_L0                        PHSP;
+#  PDG doesn't report explicit averages for BF, and in many cases different measuremenst are in disagreement
+#  The only value explicitly quote by the PDG is  BF(f_0' -> pipi) = 0.26. Therefore BF(pi+pi-) = 0.1733 and BF(pi0pi0) = 0.0867
+#  The most complete and coherent study seems to be Phys.Atom.Nucl. 65 (2002) 1545-1552, Yad.Fiz. 65 (2002) 1583-1590, whose
+#  results are used here.
+#  The dominant 4 pi decay has actually sizable contribution by 2-body intermediate states (sigma sigma, rho rho...), whose
+#  amplitudes are not well measured. Therefore, PHSP is used in lack of realiable alternative models
+Decay f'_0 # Edited by U. Tamponi, October 2016 
+0.1357   pi+  pi-                        PHSP;
+0.0678   pi0  pi0                        PHSP;
+0.3783   pi+ pi+ pi- pi-                 PHSP; # Approximation of several 2 broad mesons amplitudes
+0.3783   pi+ pi- pi0 pi0                 PHSP; # Approximation of several 2 broad mesons amplitudes
+0.0111   K+   K-                         PHSP;
+0.0055  K_S0  K_S0                       PHSP;
+0.0055   K_L0  K_L0                      PHSP;
+0.0018  eta eta                          PHSP;
 Enddecay
 #
-Decay f'_0
-0.5200   pi+  pi-                        PHSP;
-0.2600   pi0  pi0                        PHSP;
-0.0750   pi+ pi+ pi- pi-                 PHSP;
-0.0750   pi+ pi- pi0 pi0                 PHSP;
-0.0350   K+   K-                         PHSP;
-0.0175   K_S0  K_S0                        PHSP;
-0.0175   K_L0  K_L0                        PHSP;
-Enddecay
-#
-Decay f_1
+Decay f_1 # Checked by U. Tamponi, october 2016. No changes are needed
 0.110000000 rho0    pi+     pi-                             PHSP; #[Reconstructed PDG2011]
 0.043364159 rho0    pi0     pi0                             PHSP; #[Reconstructed PDG2011]
 0.043442860 rho+    pi-     pi0                             PHSP; #[Reconstructed PDG2011]
@@ -7392,13 +7474,24 @@ Decay f_1
 0.000740000 phi     gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 Enddecay
 #
+# Edited by U. Tamponi, October 2016
+#  Reverted to the Belle DECAY table, which is coherent with PDG 2015 infos
 Decay f'_1
-0.2500   K+   K-   pi0                   PHSP;
-0.2500   K0   anti-K0   pi0                   PHSP;
-0.2500   anti-K0   K+   pi-                   PHSP;
-0.2500   K0   K-   pi+                   PHSP;
+0.2000   K*+  K-                         PHOTOS VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.2000   K*-  K+                         PHOTOS VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.2000   K*0  anti-K0                           VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.2000   anti-K*0  K0                           VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.0400   K+   K-   pi0                   PHOTOS PHSP;
+0.0400   K0   anti-K0   pi0              PHSP;
+0.0400   anti-K0   K+   pi-              PHOTOS PHSP;
+0.0400   K0   K-   pi+                   PHOTOS PHSP;
+0.0132   a_00  pi0                              VSS;
+0.0132   a_0+  pi-                       PHOTOS VSS;
+0.0132   a_0-  pi+                       PHOTOS VSS;
+0.0004   phi gamma                              VVP 1.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
 #
+# Checked by U. Tamponi, october 2016. No changes are needed
 Decay f_2
 0.5650   pi+  pi-                        TSS;
 0.2820   pi0  pi0                        TSS;
@@ -7412,11 +7505,13 @@ Decay f_2
 0.000016400 gamma   gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 Enddecay
 #
-Decay f_0(1500)
-0.019000000 eta     eta'                                    PHSP; #[Reconstructed PDG2011]
-0.051000000 eta     eta                                     PHSP; #[Reconstructed PDG2011]
-0.1410   pi0  pi0  pi0  pi0              PHSP;
-0.3540   pi+  pi-  pi+  pi-              PHSP;
+#  The dominant 4 pi decay has actually sizable contribution by 2-body intermediate states (sigma sigma, rho rho...), whose
+#  amplitudes are not well measured. Therefore, PHSP is used in lack of realiable alternative models
+Decay f_0(1500) # Checked by U. Tamponi
+0.019000000 eta     eta'                 PHSP; #[Reconstructed PDG2011]
+0.051000000 eta     eta                  PHSP; #[Reconstructed PDG2011]
+0.1410   pi0  pi0  pi0  pi0              PHSP; #Approximation of complex dalitz
+0.3540   pi+  pi-  pi+  pi-              PHSP; #Approximation of complex dalitz
 0.2330   pi+  pi-                        PHSP;
 0.1160   pi0  pi0                        PHSP;
 0.0430   K+   K-                         PHSP;
@@ -7424,7 +7519,7 @@ Decay f_0(1500)
 0.0215   K_L0  K_L0                      PHSP;
 Enddecay
 #
-Decay f'_2
+Decay f'_2 # Checked by U. Tamponi October 2016
 0.443904021 K+      K-                                      TSS; #[Reconstructed PDG2011]
 0.221952010 K_S0    K_S0                                    TSS; #[Reconstructed PDG2011]
 0.221952010 K_L0    K_L0                                    TSS; #[Reconstructed PDG2011]
@@ -7434,219 +7529,104 @@ Decay f'_2
 0.000001110 gamma   gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 Enddecay
 #
-Decay h_1
+Decay h_1 # Checked by U. Tamponi October 2016
 0.3333   rho+ pi-                        VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
 0.3333   rho- pi+                        VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
 0.3334   rho0 pi0                        VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
 #
-Decay h'_1
+Decay h'_1 # Checked by U. Tamponi October 2016
 0.2500   K*+  K-                         VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
 0.2500   K*-  K+                         VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
 0.2500   anti-K*0  K0                         VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
 0.2500   K*0  anti-K0                         VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
 #
-Decay rho(2S)+
+#
+# rho(2S) are  PHSP. Substructure are present but not understood enough
+# to be included in the simulation
+#
+Decay rho(2S)+ # Checked by U. Tamponi October 2016
 0.4000   pi+ pi0                         PHSP;
 0.4000   pi+ pi+ pi- pi0                 PHSP;
 0.2000   pi+ pi0 pi0 pi0                 PHSP;
 Enddecay
-Decay rho(2S)-
+#
+Decay rho(2S)- # Checked by U. Tamponi October 2016
 0.4000   pi- pi0                         PHSP;
 0.4000   pi- pi+ pi- pi0                 PHSP;
 0.2000   pi- pi0 pi0 pi0                 PHSP;
 Enddecay
-Decay rho(2S)0
+#
+Decay rho(2S)0 # Checked by U. Tamponi October 2016
 0.4000   pi+ pi-                         PHSP;
 0.3500   pi+ pi- pi+ pi-                 PHSP;
 0.1500   pi+ pi- pi0 pi0                 PHSP;
 0.1000   pi0 pi0 pi0 pi0                 PHSP;
 Enddecay
-Decay phi(1680)
-0.08   pi+ pi-                                      PHSP;
-0.05   pi+ pi+ pi-  pi-                             PHSP;
-0.10   pi0 pi+ pi-                                  PHSP;
-0.10   pi0 pi+ pi+ pi- pi-                          PHSP;
-0.12   pi0 pi0 pi+ pi-                              PHSP;
-0.04   pi0 pi+ pi+ pi+ pi- pi- pi-                  PHSP;
-0.14   pi0 pi0 pi+ pi+ pi- pi-                      PHSP;
-0.05   pi0 pi0 pi0 pi+ pi-                          PHSP;
-0.06   pi0 pi0 pi0 pi+ pi+ pi- pi-                  PHSP;
-0.03   pi0 pi0 pi0 pi+ pi+ pi+ pi- pi- pi-          PHSP;
-0.03   pi0 pi0 pi0 pi0 pi+ pi+ pi- pi-              PHSP;
-0.04   K+ K- pi+ pi-                                PHSP;
-0.02   K0 K- pi+                                    PHSP;
-0.02   anti-K0 K+ pi-                               PHSP;
-0.02   K0 K- pi+ pi+ pi-                            PHSP;
-0.02   anti-K0 K+ pi- pi- pi+                       PHSP;
-0.02   K0 K- pi0 pi+                                PHSP;
-0.02   anti-K0 K+ pi0 pi-                           PHSP;
-0.02   eta pi0 pi+ pi-                              PHSP;
-0.01   eta rho- pi0 pi+                             PHSP;
-0.01   eta rho+ pi0 pi-                             PHSP;
+#
+# rho(3S) decay table was reporting several multi-pion finla states, not even listed on the PDG.
+# The origin of these modes is unknown (Pythia fragmentation?) and not referenced. The decay table has been
+# simplified according to the PDG report and the Belle Decay table
+#
+Decay rho(3S)+ # Edited by U. Tamponi October 2016
+0.1700   pi+   pi0   pi0   pi0       PHOTOS PHSP;
+0.4340   pi+   pi+   pi-   pi0       PHOTOS PHSP;
+0.2360   pi+   pi0                   PHOTOS VSS;
+0.1600   omega pi+                   PHOTOS VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
-Decay rho(3S)0
-0.08   pi+ pi-                                      PHSP;
-0.05   pi+ pi+ pi-  pi-                             PHSP;
-0.10   pi0 pi+ pi-                                  PHSP;
-0.10   pi0 pi+ pi+ pi- pi-                          PHSP;
-0.12   pi0 pi0 pi+ pi-                              PHSP;
-0.04   pi0 pi+ pi+ pi+ pi- pi- pi-                  PHSP;
-0.14   pi0 pi0 pi+ pi+ pi- pi-                      PHSP;
-0.05   pi0 pi0 pi0 pi+ pi-                          PHSP;
-0.06   pi0 pi0 pi0 pi+ pi+ pi- pi-                  PHSP;
-0.03   pi0 pi0 pi0 pi+ pi+ pi+ pi- pi- pi-          PHSP;
-0.03   pi0 pi0 pi0 pi0 pi+ pi+ pi- pi-              PHSP;
-0.04   K+ K- pi+ pi-                                PHSP;
-0.02   K0 K- pi+                                    PHSP;
-0.02   anti-K0 K+ pi-                               PHSP;
-0.02   K0 K- pi+ pi+ pi-                            PHSP;
-0.02   anti-K0 K+ pi- pi- pi+                       PHSP;
-0.02   K0 K- pi0 pi+                                PHSP;
-0.02   anti-K0 K+ pi0 pi-                           PHSP;
-0.02   eta pi0 pi+ pi-                              PHSP;
-0.01   eta rho- pi0 pi+                             PHSP;
-0.01   eta rho+ pi0 pi-                             PHSP;
+#
+Decay rho(3S)- # Edited by U. Tamponi October 2016
+0.1700   pi-   pi0   pi0   pi0       PHOTOS PHSP;
+0.4340   pi+   pi-   pi-   pi0       PHOTOS PHSP;
+0.2360   pi-   pi0                   PHOTOS VSS;
+0.1600   omega pi-                   PHOTOS VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
-Decay omega(1650)
-0.08   pi+ pi-                                      PHSP;
-0.05   pi+ pi+ pi-  pi-                             PHSP;
-0.10   pi0 pi+ pi-                                  PHSP;
-0.10   pi0 pi+ pi+ pi- pi-                          PHSP;
-0.12   pi0 pi0 pi+ pi-                              PHSP;
-0.04   pi0 pi+ pi+ pi+ pi- pi- pi-                  PHSP;
-0.14   pi0 pi0 pi+ pi+ pi- pi-                      PHSP;
-0.05   pi0 pi0 pi0 pi+ pi-                          PHSP;
-0.06   pi0 pi0 pi0 pi+ pi+ pi- pi-                  PHSP;
-0.03   pi0 pi0 pi0 pi+ pi+ pi+ pi- pi- pi-          PHSP;
-0.03   pi0 pi0 pi0 pi0 pi+ pi+ pi- pi-              PHSP;
-0.04   K+ K- pi+ pi-                                PHSP;
-0.02   K0 K- pi+                                    PHSP;
-0.02   anti-K0 K+ pi-                               PHSP;
-0.02   K0 K- pi+ pi+ pi-                            PHSP;
-0.02   anti-K0 K+ pi- pi- pi+                       PHSP;
-0.02   K0 K- pi0 pi+                                PHSP;
-0.02   anti-K0 K+ pi0 pi-                           PHSP;
-0.02   eta pi0 pi+ pi-                              PHSP;
-0.01   eta rho- pi0 pi+                             PHSP;
-0.01   eta rho+ pi0 pi-                             PHSP;
+#
+Decay rho(3S)0 # Edited by U. Tamponi October 2016
+0.3020   pi+   pi-   pi+   pi-       PHOTOS PHSP;
+0.2010   pi+   pi-   pi0   pi0       PHOTOS PHSP;
+0.1010   pi0   pi0   pi0   pi0       PHSP;
+0.2360   pi+   pi-                   PHOTOS VSS;
+0.1600   omega pi0                   VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
-#Decay rho(1900)
-#0.08   pi+ pi-                                      PHSP;
-#0.05   pi+ pi+ pi-  pi-                             PHSP;
-#0.10   pi0 pi+ pi-                                  PHSP;
-#0.10   pi0 pi+ pi+ pi- pi-                          PHSP;
-#0.12   pi0 pi0 pi+ pi-                              PHSP;
-#0.04   pi0 pi+ pi+ pi+ pi- pi- pi-                  PHSP;
-#0.14   pi0 pi0 pi+ pi+ pi- pi-                      PHSP;
-#0.05   pi0 pi0 pi0 pi+ pi-                          PHSP;
-#0.06   pi0 pi0 pi0 pi+ pi+ pi- pi-                  PHSP;
-#0.03   pi0 pi0 pi0 pi+ pi+ pi+ pi- pi- pi-          PHSP;
-#0.03   pi0 pi0 pi0 pi0 pi+ pi+ pi- pi-              PHSP;
-#0.04   K+ K- pi+ pi-                                PHSP;
-#0.02   K0 K- pi+                                    PHSP;
-#0.02   anti-K0 K+ pi-                               PHSP;
-#0.02   K0 K- pi+ pi+ pi-                            PHSP;
-#0.02   anti-K0 K+ pi- pi- pi+                       PHSP;
-#0.02   K0 K- pi0 pi+                                PHSP;
-#0.02   anti-K0 K+ pi0 pi-                           PHSP;
-#0.02   eta pi0 pi+ pi-                              PHSP;
-#0.01   eta rho- pi0 pi+                             PHSP;
-#0.01   eta rho+ pi0 pi-                             PHSP;
-#Enddecay
-Decay omega(2S)
-0.08   pi+ pi-                                      PHSP;
-0.05   pi+ pi+ pi-  pi-                             PHSP;
-0.10   pi0 pi+ pi-                                  PHSP;
-0.10   pi0 pi+ pi+ pi- pi-                          PHSP;
-0.12   pi0 pi0 pi+ pi-                              PHSP;
-0.04   pi0 pi+ pi+ pi+ pi- pi- pi-                  PHSP;
-0.14   pi0 pi0 pi+ pi+ pi- pi-                      PHSP;
-0.05   pi0 pi0 pi0 pi+ pi-                          PHSP;
-0.06   pi0 pi0 pi0 pi+ pi+ pi- pi-                  PHSP;
-0.03   pi0 pi0 pi0 pi+ pi+ pi+ pi- pi- pi-          PHSP;
-0.03   pi0 pi0 pi0 pi0 pi+ pi+ pi- pi-              PHSP;
-0.04   K+ K- pi+ pi-                                PHSP;
-0.02   K0 K- pi+                                    PHSP;
-0.02   anti-K0 K+ pi-                               PHSP;
-0.02   K0 K- pi+ pi+ pi-                            PHSP;
-0.02   anti-K0 K+ pi- pi- pi+                       PHSP;
-0.02   K0 K- pi0 pi+                                PHSP;
-0.02   anti-K0 K+ pi0 pi-                           PHSP;
-0.02   eta pi0 pi+ pi-                              PHSP;
-0.01   eta rho- pi0 pi+                             PHSP;
-0.01   eta rho+ pi0 pi-                             PHSP;
+#
+# phi(1680) was modeled as the rho(3S) with many, unreported multi-pion modes.
+# Reverted to Belle decay table (20060309 A.Ishikawa), which agrees with PDG
+# More recently observed final states, like (phi pi pi), are still omitted.
+#
+Decay phi(1680) # Edited by U. Tamponi October 2016
+0.2425   anti-K*0 K0                    HELAMP 1.0 0.0  0.0 0.0  -1.0 0.0;
+0.2425   K*0 anti-K0                    HELAMP 1.0 0.0  0.0 0.0  -1.0 0.0;
+0.2425   K*+ K-                         PHOTOS HELAMP 1.0 0.0  0.0 0.0  -1.0 0.0;
+0.2425   K*- K+                         PHOTOS HELAMP 1.0 0.0  0.0 0.0  -1.0 0.0;
+0.015    K_S0 K_L0                      VSS;
+0.015    K+ K-                          PHOTOS VSS;
 Enddecay
-#Decay rho(2150)
-#0.08   pi+ pi-                                      PHSP;
-#0.05   pi+ pi+ pi-  pi-                             PHSP;
-#0.10   pi0 pi+ pi-                                  PHSP;
-#0.10   pi0 pi+ pi+ pi- pi-                          PHSP;
-#0.12   pi0 pi0 pi+ pi-                              PHSP;
-#0.04   pi0 pi+ pi+ pi+ pi- pi- pi-                  PHSP;
-#0.14   pi0 pi0 pi+ pi+ pi- pi-                      PHSP;
-#0.05   pi0 pi0 pi0 pi+ pi-                          PHSP;
-#0.06   pi0 pi0 pi0 pi+ pi+ pi- pi-                  PHSP;
-#0.03   pi0 pi0 pi0 pi+ pi+ pi+ pi- pi- pi-          PHSP;
-#0.03   pi0 pi0 pi0 pi0 pi+ pi+ pi- pi-              PHSP;
-#0.04   K+ K- pi+ pi-                                PHSP;
-#0.02   K0 K- pi+                                    PHSP;
-#0.02   anti-K0 K+ pi-                               PHSP;
-#0.02   K0 K- pi+ pi+ pi-                            PHSP;
-#0.02   anti-K0 K+ pi- pi- pi+                       PHSP;
-#0.02   K0 K- pi0 pi+                                PHSP;
-#0.02   anti-K0 K+ pi0 pi-                           PHSP;
-#0.02   eta pi0 pi+ pi-                              PHSP;
-#0.01   eta rho- pi0 pi+                             PHSP;
-#0.01   eta rho+ pi0 pi-                             PHSP;
-#Enddecay
-#Decay omega(1960)
-#0.08   pi+ pi-                                      PHSP;
-#0.05   pi+ pi+ pi-  pi-                             PHSP;
-#0.10   pi0 pi+ pi-                                  PHSP;
-#0.10   pi0 pi+ pi+ pi- pi-                          PHSP;
-#0.12   pi0 pi0 pi+ pi-                              PHSP;
-#0.04   pi0 pi+ pi+ pi+ pi- pi- pi-                  PHSP;
-#0.14   pi0 pi0 pi+ pi+ pi- pi-                      PHSP;
-#0.05   pi0 pi0 pi0 pi+ pi-                          PHSP;
-#0.06   pi0 pi0 pi0 pi+ pi+ pi- pi-                  PHSP;
-#0.03   pi0 pi0 pi0 pi+ pi+ pi+ pi- pi- pi-          PHSP;
-#0.03   pi0 pi0 pi0 pi0 pi+ pi+ pi- pi-              PHSP;
-#0.04   K+ K- pi+ pi-                                PHSP;
-#0.02   K0 K- pi+                                    PHSP;
-#0.02   anti-K0 K+ pi-                               PHSP;
-#0.02   K0 K- pi+ pi+ pi-                            PHSP;
-#0.02   anti-K0 K+ pi- pi- pi+                       PHSP;
-#0.02   K0 K- pi0 pi+                                PHSP;
-#0.02   anti-K0 K+ pi0 pi-                           PHSP;
-#0.02   eta pi0 pi+ pi-                              PHSP;
-#0.01   eta rho- pi0 pi+                             PHSP;
-#0.01   eta rho+ pi0 pi-                             PHSP;
-#Enddecay
-#Decay rho(1965)
-#0.08   pi+ pi-                                      PHSP;
-#0.05   pi+ pi+ pi-  pi-                             PHSP;
-#0.10   pi0 pi+ pi-                                  PHSP;
-#0.10   pi0 pi+ pi+ pi- pi-                          PHSP;
-#0.12   pi0 pi0 pi+ pi-                              PHSP;
-#0.04   pi0 pi+ pi+ pi+ pi- pi- pi-                  PHSP;
-#0.14   pi0 pi0 pi+ pi+ pi- pi-                      PHSP;
-#0.05   pi0 pi0 pi0 pi+ pi-                          PHSP;
-#0.06   pi0 pi0 pi0 pi+ pi+ pi- pi-                  PHSP;
-#0.03   pi0 pi0 pi0 pi+ pi+ pi+ pi- pi- pi-          PHSP;
-#0.03   pi0 pi0 pi0 pi0 pi+ pi+ pi- pi-              PHSP;
-#0.04   K+ K- pi+ pi-                                PHSP;
-#0.02   K0 K- pi+                                    PHSP;
-#0.02   anti-K0 K+ pi-                               PHSP;
-#0.02   K0 K- pi+ pi+ pi-                            PHSP;
-#0.02   anti-K0 K+ pi- pi- pi+                       PHSP;
-#0.02   K0 K- pi0 pi+                                PHSP;
-#0.02   anti-K0 K+ pi0 pi-                           PHSP;
-#0.02   eta pi0 pi+ pi-                              PHSP;
-#0.01   eta rho- pi0 pi+                             PHSP;
-#0.01   eta rho+ pi0 pi-                             PHSP;
-#Enddecay
+#
+# Combining the informations from Phys.Rev. D73 (2006) 052003 and Z.Phys. C56 (1992) 15-20
+# one can estimate the ratios  BF(rho pi) : BF(omega pi pi) : BF(eta pi) = 2:2:0.6
+Decay omega(1650) # Edited by U. Tamponi October 2016
+0.1450   rho+ pi-                                      PHSP;
+0.1450   rho- pi+                                     PHSP;
+0.1450   rho0 pi0                                     PHSP;
+0.4348   omega pi+ pi-                                PHSP;
+0.1302   eta pi0                                VSS;
+Enddecay
+#
+# omega(2S) was modeled as the rho(3S) with many, unreported multi-pion modes.
+# Reverted to Belle decay table (20060309 A.Ishikawa), which agrees with PDG
+# More recently observed final states, like (phi pi pi), are still omitted.
+# On PDG: omega(2S) = omega(1420)
+Decay omega(2S) # Edited by U. Tamponi October 2016
+0.233   rho+  pi-                   PHOTOS HELAMP 1.0 0.0  0.0 0.0  -1.0 0.0;
+0.233   rho-  pi+                   PHOTOS HELAMP 1.0 0.0  0.0 0.0  -1.0 0.0;
+0.234   rho0  pi0                          HELAMP 1.0 0.0  0.0 0.0  -1.0 0.0;
+0.100   b_1+  pi-                   PHOTOS HELAMP 1.0 0.0  0.0 0.0  -1.0 0.0;
+0.100   b_1-  pi+                   PHOTOS HELAMP 1.0 0.0  0.0 0.0  -1.0 0.0;
+0.100   b_10  pi0                          HELAMP 1.0 0.0  0.0 0.0  -1.0 0.0;
+Enddecay
+
 #
 #
 #    cc=  mesons Updated to PDG 2008

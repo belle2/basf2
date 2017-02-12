@@ -13,10 +13,11 @@
 #include <G4Step.hh>
 
 /* Belle2 headers. */
+#include <eklm/dbobjects/EKLMSimulationParameters.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/EKLMSensitiveDetector.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
@@ -26,13 +27,12 @@ EKLM::EKLMSensitiveDetector::
 EKLMSensitiveDetector(G4String name, enum SensitiveType type)
   : Simulation::SensitiveDetectorBase(name, Const::KLM)
 {
+  DBObjPtr<EKLMSimulationParameters> simPar;
+  if (!simPar.isValid())
+    B2FATAL("EKLM simulation parameters are not available.");
   m_GeoDat = &(EKLM::GeometryData::Instance());
   m_type = type;
-  GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
-  gd.append("/SensitiveDetector");
-  m_ThresholdHitTime =
-    Unit::convertValue(gd.getDouble("HitTimeThreshold") , "ns");
-
+  m_ThresholdHitTime = simPar->getHitTimeThreshold();
   StoreArray<EKLMSimHit> simHits;
   StoreArray<MCParticle> particles;
   simHits.registerInDataStore();
@@ -41,39 +41,21 @@ EKLMSensitiveDetector(G4String name, enum SensitiveType type)
   registerMCParticleRelation(particleToSimHits);
 }
 
-//-----------------------------------------------------
-// Method invoked for every step in sensitive detector
-//-----------------------------------------------------
 bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
 {
   int stripLevel = 1;
   HepGeom::Point3D<double> gpos, lpos;
-  G4TouchableHandle hist = aStep->GetPreStepPoint()->
-                           GetTouchableHandle();
-
-  /**
-   * Get deposited energy
-   */
+  G4TouchableHandle hist = aStep->GetPreStepPoint()->GetTouchableHandle();
   const G4double eDep = aStep->GetTotalEnergyDeposit();
-
-  /**
-   * get reference to the track
-   */
   const G4Track& track = * aStep->GetTrack();
-
-  /**
-   * get time of hit
-   */
   const G4double hitTime = track.GetGlobalTime();
-
-  // No time cut for background studeis
+  /* No time cut for background studies. */
   if (hitTime > m_ThresholdHitTime &&
       m_GeoDat->getDetectorMode() == EKLMGeometry::c_DetectorNormal) {
     B2INFO("EKLMSensitiveDetector: "
            " ALL HITS WITH TIME > hitTimeThreshold ARE DROPPED!!");
     return false;
   }
-
   /* Hit position. */
   gpos = 0.5 * (aStep->GetPostStepPoint()->GetPosition() +
                 aStep->GetPreStepPoint()->GetPosition());
@@ -97,7 +79,7 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   hit->setTime(hitTime);
   if (m_GeoDat->getDetectorMode() == EKLMGeometry::c_DetectorBackground)
     stripLevel = 2;
-  /** Get information on mother volumes and store them to the hit. */
+  /* Get information on mother volumes and store them to the hit. */
   switch (m_type) {
     case c_SensitiveStrip:
       hit->setStrip(hist->GetVolume(stripLevel)->GetCopyNo());

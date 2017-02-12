@@ -29,6 +29,7 @@
 #include <bklm/dataobjects/BKLMSimHitPosition.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
+#include <arich/dbobjects/ARICHGeometryConfig.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 
 #include <svd/reconstruction/SVDRecoHit.h>
@@ -67,6 +68,7 @@
 #include <TGeoEltu.h>
 #include <TGeoMatrix.h>
 #include <TGeoNode.h>
+#include <TGeoManager.h>
 #include <TGeoSphere.h>
 #include <TGeoTube.h>
 #include <TGLLogicalShape.h>
@@ -99,13 +101,28 @@ namespace {
     el->DecDenyDestroy(); //also deletes el when refcount <= 0
     el = nullptr;
   }
+
+  /** TEveGeoShape contains a TGeoShape and feels responsible for deletion; but TGeoShape is owned by global TGeoManager.
+   *
+   * What we want is deletion by TEve (after changing events), so we explictly remove the object
+   * from TGeoManager's garbage collection list. (some objects might not be in the list because these
+   * things are horribly inconsistent. doesn't hurt to try though.)
+   */
+  void fixGeoShapeRefCount(TEveGeoShape* eveshape)
+  {
+    TGeoShape* s = eveshape->GetShape();
+    //Remove(obj) usually takes about 20us, but since usually s is at the end, we can shorten this
+    if (gGeoManager->GetListOfShapes()->Last() == s)
+      gGeoManager->GetListOfShapes()->RemoveAt(gGeoManager->GetListOfShapes()->GetLast());
+    else
+      gGeoManager->GetListOfShapes()->Remove(s);
+  }
 }
 
 EVEVisualization::EVEVisualization():
   m_assignToPrimaries(false),
   m_eclData(0),
-  m_bfield(new EveVisBField()),
-  m_unassignedRecoHits(0)
+  m_bfield(new EveVisBField())
 {
   setErrScale();
 
@@ -488,8 +505,8 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
           if (wire_hit) {
             TEveGeoShape* det_shape = new TEveGeoShape("det_shape");
-            det_shape->IncDenyDestroy();
             det_shape->SetShape(new TGeoTube(std::max(0., (double)(hit_u - 0.0105 / 2.)), hit_u + 0.0105 / 2., plane_size));
+            fixGeoShapeRefCount(det_shape);
 
             TVector3 norm = u.Cross(v);
             TGeoRotation det_rot("det_rot", (u.Theta() * 180) / TMath::Pi(), (u.Phi() * 180) / TMath::Pi(),
@@ -548,7 +565,6 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
               // calculate eigenvalues to draw error-ellipse ----------------------------
               TMatrixDSymEigen eigen_values(hit_cov);
               TEveGeoShape* cov_shape = new TEveGeoShape("PXDRecoHit");
-              cov_shape->IncDenyDestroy();
               const TVectorD& ev = eigen_values.GetEigenValues();
               const TMatrixD& eVec = eigen_values.GetEigenVectors();
               double pseudo_res_0 = m_errorScale * std::sqrt(ev(0));
@@ -557,6 +573,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
               // calculate the semiaxis of the error ellipse ----------------------------
               cov_shape->SetShape(new TGeoEltu(pseudo_res_0, pseudo_res_1, 0.0105));
+              fixGeoShapeRefCount(cov_shape);
               TVector3 pix_pos = o + hit_u * u + hit_v * v;
               TVector3 u_semiaxis = (pix_pos + eVec(0, 0) * u + eVec(1, 0) * v) - pix_pos;
               TVector3 v_semiaxis = (pix_pos + eVec(0, 1) * u + eVec(1, 1) * v) - pix_pos;
@@ -584,8 +601,8 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
             // get eigenvalues of covariance to know how to draw the ellipsoid ------------
             TMatrixDSymEigen eigen_values(m->getRawHitCov());
             TEveGeoShape* cov_shape = new TEveGeoShape("SpacePoint Hit");
-            cov_shape->IncDenyDestroy();
             cov_shape->SetShape(new TGeoSphere(0., 1.));
+            fixGeoShapeRefCount(cov_shape);
             const TVectorD& ev = eigen_values.GetEigenValues();
             const TMatrixD& eVec = eigen_values.GetEigenVectors();
             TVector3 eVec1(eVec(0, 0), eVec(1, 0), eVec(2, 0));
@@ -624,12 +641,12 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
           if (wire_hit) {
             const double cdcErrorScale = 1.0;
             TEveGeoShape* cov_shape = new TEveGeoShape("CDCRecoHit");
-            cov_shape->IncDenyDestroy();
             double pseudo_res_0 = cdcErrorScale * std::sqrt(hit_cov(0, 0));
             double pseudo_res_1 = plane_size;
             if (wirepoint_hit) pseudo_res_1 = cdcErrorScale * std::sqrt(hit_cov(1, 1));
 
             cov_shape->SetShape(new TGeoTube(std::max(0., (double)(hit_u - pseudo_res_0)), hit_u + pseudo_res_0, pseudo_res_1));
+            fixGeoShapeRefCount(cov_shape);
             TVector3 norm = u.Cross(v);
 
             // rotate and translate -------------------------------------------------------
@@ -1125,8 +1142,10 @@ void EVEVisualization::makeTracks()
   gEve->AddElement(m_calo3d);
 
   if (m_unassignedRecoHits) {
+    m_unassignedRecoHits->SetRnrState(m_unassignedRecoHitsVisibility);
     gEve->AddElement(m_unassignedRecoHits);
   }
+
 }
 
 void EVEVisualization::clearEvent()
@@ -1160,6 +1179,8 @@ void EVEVisualization::clearEvent()
   m_eclData->IncDenyDestroy();
   m_eclData->RefSliceInfo(0).Setup("ECL", ecl_threshold, kRed);
 
+  if (m_unassignedRecoHits)
+    m_unassignedRecoHitsVisibility = m_unassignedRecoHits->GetRnrState();
   destroyEveElement(m_unassignedRecoHits);
 
   gEve->GetSelection()->RemoveElements();
@@ -1181,8 +1202,8 @@ void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex)
 
   TMatrixDSymEigen eigen_values(vertex->getCov());
   TEveGeoShape* det_shape = new TEveGeoShape(ObjectInfo::getInfo(vertex) + " Error");
-  det_shape->IncDenyDestroy();
   det_shape->SetShape(new TGeoSphere(0., 1.));   //Initially created as a sphere, then "scaled" into an ellipsoid.
+  fixGeoShapeRefCount(det_shape);
   const TVectorD& ev = eigen_values.GetEigenValues(); //Assigns the eigenvalues into the "ev" matrix.
   const TMatrixD& eVec = eigen_values.GetEigenVectors();  //Assigns the eigenvalues into the "eVec" matrix.
   TVector3 eVec1(eVec(0, 0), eVec(1, 0), eVec(2,
@@ -1225,11 +1246,11 @@ void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex)
 void EVEVisualization::addECLCluster(const ECLCluster* cluster)
 {
   const float phi = cluster->getPhi();
-  float dPhi = cluster->getErrorPhi();
-  float dTheta = cluster->getErrorTheta();
-  if (dPhi >= M_PI / 4 or dTheta >= M_PI / 4 or cluster->getErrorEnergy() == 1.0) {
+  float dPhi = cluster->getUncertaintyPhi();
+  float dTheta = cluster->getUncertaintyTheta();
+  if (dPhi >= M_PI / 4 or dTheta >= M_PI / 4 or cluster->getUncertaintyEnergy() == 1.0) {
     B2WARNING("Found ECL cluster with broken errors (unit matrix or too large). Using 0.05 as error in phi/theta. The 3x3 error matrix previously was:");
-    cluster->getError3x3().Print();
+    cluster->getCovarianceMatrix3x3().Print();
     dPhi = dTheta = 0.05;
   }
 
@@ -1375,10 +1396,9 @@ void EVEVisualization::addCDCHit(const CDCHit* hit)
   const TVector3& wire_pos_b = cdcgeo.wireBackwardPosition(WireID(hit->getID()));
   static CDC::RealisticTDCCountTranslator tdcTranslator;
   TEveGeoShape* cov_shape = new TEveGeoShape("cov_shape");
-  cov_shape->IncDenyDestroy();
   //TODO: leftrightflag not set! (same for other parameters, unsure which ones should be set)
   double driftLength = tdcTranslator.getDriftLength(hit->getTDCCount(), WireID(hit->getID()));
-  double driftLengthRes = tdcTranslator.getDriftLengthResolution(hit->getTDCCount(), WireID(hit->getID()));
+  double driftLengthRes = tdcTranslator.getDriftLengthResolution(driftLength, WireID(hit->getID()));
   driftLengthRes = std::max(driftLengthRes, 0.005);
   const double lengthOfWireSection = 3.0;
 
@@ -1392,6 +1412,7 @@ void EVEVisualization::addCDCHit(const CDCHit* hit)
 
   cov_shape->SetShape(new TGeoTube(std::max(0., (double)(driftLength - driftLengthRes)), driftLength + driftLengthRes,
                                    lengthOfWireSection));
+  fixGeoShapeRefCount(cov_shape);
 
   TGeoRotation det_rot("det_rot",
                        xaxis.Theta() * 180 / TMath::Pi(), xaxis.Phi() * 180 / TMath::Pi(),
@@ -1411,6 +1432,28 @@ void EVEVisualization::addCDCHit(const CDCHit* hit)
   addToGroup("CDCHits", cov_shape);
   addObject(hit, cov_shape);
 }
+
+void EVEVisualization::addARICHHit(const ARICHHit* hit)
+{
+  DBObjPtr<ARICHGeometryConfig> arichGeo;
+
+  int hitModule = hit->getModule();
+  float fi = arichGeo->getDetectorPlane().getSlotPhi(hitModule);
+
+  TVector3 centerPos3D =  hit->getPosition();
+
+  TVector3 channelX(1, 0, 0);    channelX.RotateZ(fi);
+  TVector3 channelY(0, 1, 0);    channelY.RotateZ(fi);
+
+  auto* arichbox = boxCreator(centerPos3D, arichGeo->getMasterVolume().momentumToGlobal(channelX),
+                              arichGeo->getMasterVolume().momentumToGlobal(channelY), 0.49, 0.49, 0.05);
+  arichbox->SetMainColor(kOrange + 10);
+  arichbox->SetName((std::to_string(hitModule)).c_str());
+
+  addToGroup("ARICHHits", arichbox);
+  addObject(hit, arichbox);
+}
+
 
 void EVEVisualization::showUserData(const DisplayData& displayData)
 {

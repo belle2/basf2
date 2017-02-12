@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
               "  pass the string with wildcards to b2display to prevent expansion by the shell, e.g.\n"
               "    b2display \"my/files/mdst_*.root\".\n\n"
 
-              "  Using http:// or root:// URLs is also possible.\n\n"
+              "  Using .sroot files, http:// or root:// URLs is also possible.\n\n"
 
               "  Configuration of the display can be changed from the defaults by\n"
               "  editing display/examples/display.py.\n"

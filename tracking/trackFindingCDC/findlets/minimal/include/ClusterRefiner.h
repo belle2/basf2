@@ -9,63 +9,57 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/wireHitRelation/BridgingWireHitRelationFilter.h>
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/ca/Clusterizer.h>
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
-
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-
-#include <framework/logging/Logger.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <boost/range/adaptor/indirected.hpp>
 
 #include <vector>
-#include <iterator>
+#include <string>
 #include <algorithm>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Refines the clustering of wire hits from super clusters to clustexrs
-    template<class AWireHitRelationFilter = BridgingWireHitRelationFilter>
-    class ClusterRefiner:
-      public Findlet<const CDCWireHitCluster, CDCWireHitCluster> {
+    template <class AWireHitRelationFilter>
+    class ClusterRefiner : public Findlet<const CDCWireHitCluster, CDCWireHitCluster> {
 
     private:
       /// Type of the base class
-      typedef Findlet<const CDCWireHitCluster, CDCWireHitCluster> Super;
+      using Super = Findlet<const CDCWireHitCluster, CDCWireHitCluster>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
       ClusterRefiner()
       {
-        addProcessingSignalListener(&m_wireHitRelationFilter);
+        this->addProcessingSignalListener(&m_wireHitRelationFilter);
       }
 
       /// Short description of the findlet
-      virtual std::string getDescription() override
-      {
+      std::string getDescription() final {
         return "Breaks bigger wire hit super cluster into smaller wire hit clusters";
       }
 
-      /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
-      {
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
         m_wireHitRelationFilter.exposeParameters(moduleParamList, prefix);
       }
 
     public:
       /// Main algorithm applying the cluster refinement
-      virtual void apply(const std::vector<CDCWireHitCluster>& inputSuperClusters,
-                         std::vector<CDCWireHitCluster>& outputClusters) override final
-      {
-        for (const CDCWireHitCluster& superCluster : inputSuperClusters) {
+      void apply(const std::vector<CDCWireHitCluster>& inputSuperClusters,
+                 std::vector<CDCWireHitCluster>& outputClusters) final {
+        for (const CDCWireHitCluster& superCluster : inputSuperClusters)
+        {
           B2ASSERT("Expect the clusters to be sorted", std::is_sorted(superCluster.begin(),
-                                                                      superCluster.end()));
+          superCluster.end()));
 
           m_wireHitRelations.clear();
           auto wireHits = superCluster | boost::adaptors::indirected;
@@ -95,8 +89,6 @@ namespace Belle2 {
 
       /// Wire hit neighborhood relation filter
       AWireHitRelationFilter m_wireHitRelationFilter;
-
-    }; // end class
-
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

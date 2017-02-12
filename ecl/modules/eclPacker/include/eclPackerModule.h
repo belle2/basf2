@@ -43,25 +43,23 @@ namespace Belle2 {
 
       BELLE2_DEFINE_EXCEPTION(Write_adc_samples_error,
                               "Error packing adc samples to buffer");
+      BELLE2_DEFINE_EXCEPTION(eclPacker_internal_error,
+                              "Something wrong with ECL Packer");
 
 
     protected:
 
 
     private:
-//      /** CPU time     */
-//      double m_timeCPU;
-//      /** Run number   */
-//      int    m_nRun;
       /** Event number */
       int    m_EvtNum;
 
-      /** pointer to data  */
-      int* m_bufPtr;
       /** position in the  data array */
       int m_bufPos;
+
       /** length data  */
       int m_bufLength;
+
       /** bit position for bit-by-bit data read  */
       int m_bitPos;
 
@@ -71,8 +69,12 @@ namespace Belle2 {
       /** eneble/disable compression of waveform data */
       bool m_compressMode;
 
+      /** the rate of writing of the ADC samples*/
+      int m_WaveformRareFactor;
+
       /** name of output collection for RawCOPPER */
       std::string m_eclRawCOPPERsName;
+
       /** name of the file with correspondence between cellID and crate/shaper/channel numbers  */
       std::string m_eclMapperInitFileName;
 
@@ -83,6 +85,8 @@ namespace Belle2 {
 
       /** Output data  */
       StoreArray<RawECL> m_eclRawCOPPERs;
+
+      unsigned int adcBuffer_temp[ECL_CHANNELS_IN_SHAPER * ECL_ADC_SAMPLES_PER_CHANNEL];
 
       // number of hits, masks etc ...
       int collectorMaskArray[ECL_CRATES];
@@ -95,8 +99,8 @@ namespace Belle2 {
 
 
 
-      int  readNBits(int* buff, int bitsToRead);
-      void writeNBits(int* buff, int value, int bitsToWrite);
+//      unsigned int readNBits(unsigned int* buff, unsigned int bitsToRead);
+      void writeNBits(unsigned int* buff, unsigned int value, unsigned int bitsToWrite);
       void resetBuffPosition();
       void setBuffLength(int bufLength);
 

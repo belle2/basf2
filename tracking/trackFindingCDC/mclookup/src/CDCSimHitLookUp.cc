@@ -20,7 +20,6 @@
 
 #include <vector>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -58,7 +57,7 @@ void CDCSimHitLookUp::fillPrimarySimHits()
   }
 
   const CDCMCMap& mcMap = *m_ptrMCMap;
-
+  int nMissingPrimarySimHits = 0;
   for (const CDCMCMap::CDCSimHitByCDCHitRelation& relation : mcMap.getSimHitByHitRelations()) {
 
     const CDCHit* ptrHit = relation.get<CDCHit>();
@@ -70,12 +69,19 @@ void CDCSimHitLookUp::fillPrimarySimHits()
     }
 
     if (mcMap.isReassignedSecondary(ptrSimHit)) {
-      m_primarySimHits[ptrHit] = getClosestPrimarySimHit(ptrSimHit);
+      MayBePtr<const CDCSimHit> primarySimHit = getClosestPrimarySimHit(ptrSimHit);
+      if (not primarySimHit) {
+        ++nMissingPrimarySimHits;
+      }
+      m_primarySimHits[ptrHit] = primarySimHit;
     }
+  }
+  if (nMissingPrimarySimHits != 0) {
+    B2WARNING("NO primary hit found for " << nMissingPrimarySimHits << " reassigned secondaries");
   }
 }
 
-const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSimHit) const
+MayBePtr<const CDCSimHit> CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSimHit) const
 {
   if (not ptrSimHit) {
     return nullptr;
@@ -122,28 +128,23 @@ const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSi
 
     // Now from the neighboring primary CDCSimHits pick to one with the smallest distance to the
     // secondary CDCSimHit.
-    auto itClosestPrimarySimHit =
-      std::min_element(primarySimHitsOnSameOrNeighborWire.begin(),
-                       primarySimHitsOnSameOrNeighborWire.end(),
-                       [&simHit](const CDCSimHit * primarySimHit,
+    auto compareDistanceBetweenSimHits =
+      [&simHit](const CDCSimHit * primarySimHit,
     const CDCSimHit * otherPrimarySimHit) -> bool {
+      Vector3D primaryHitPos(primarySimHit->getPosTrack());
+      Vector3D otherPrimaryHitPos(otherPrimarySimHit->getPosTrack());
+      Vector3D secondaryHitPos(simHit.getPosTrack());
+      return primaryHitPos.distance(secondaryHitPos) < otherPrimaryHitPos.distance(secondaryHitPos);
+    };
 
-      Vector3D primaryHitPos{primarySimHit->getPosTrack()};
-      Vector3D otherPrimaryHitPos{otherPrimarySimHit->getPosTrack()};
-
-      Vector3D secondaryHitPos{simHit.getPosTrack()};
-
-      return primaryHitPos.distance(secondaryHitPos) <
-             otherPrimaryHitPos.distance(secondaryHitPos);
-
-    });
+    auto itClosestPrimarySimHit = std::min_element(primarySimHitsOnSameOrNeighborWire.begin(),
+                                                   primarySimHitsOnSameOrNeighborWire.end(),
+                                                   compareDistanceBetweenSimHits);
 
     if (itClosestPrimarySimHit != primarySimHitsOnSameOrNeighborWire.end()) {
       // Found primary simulated hit for secondary hit.
       return *itClosestPrimarySimHit;
-
     } else {
-      B2WARNING("NO primary hit for reassigned secondary");
       return nullptr;
     }
   }
@@ -152,19 +153,20 @@ const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSi
 const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCHit* ptrHit) const
 {
   if (not m_ptrMCMap) {
-    B2WARNING("CDCMCMap not set. Look up closest primary sim hit.");
+    B2WARNING("CDCMCMap not set in look up of closest primary sim hit.");
     return nullptr;
   }
   const CDCMCMap& mcMap = *m_ptrMCMap;
 
   if (mcMap.isReassignedSecondary(ptrHit)) {
-
     auto itFoundPrimarySimHit = m_primarySimHits.find(ptrHit);
-    return itFoundPrimarySimHit == m_primarySimHits.end() ? nullptr : itFoundPrimarySimHit->second;
-
-  } else {
-    return mcMap.getSimHit(ptrHit);
+    if (itFoundPrimarySimHit != m_primarySimHits.end()) {
+      const CDCSimHit* simHit = itFoundPrimarySimHit->second;
+      if (simHit) return simHit;
+    }
   }
+  // Return the normal (potentially secondary) CDCSimHit of no primary is available
+  return mcMap.getSimHit(ptrHit);
 }
 
 Vector3D CDCSimHitLookUp::getDirectionOfFlight(const CDCHit* ptrHit)
@@ -295,13 +297,13 @@ const CDCWireHit* CDCSimHitLookUp::getWireHit(const CDCHit* ptrHit,
                                               const std::vector<CDCWireHit>& wireHits) const
 {
   if (not ptrHit) return nullptr;
-  ConstVectorRange<CDCWireHit> wireHit =
-    std::equal_range(wireHits.begin(), wireHits.end(), *ptrHit);
+  ConstVectorRange<CDCWireHit> wireHit{std::equal_range(wireHits.begin(), wireHits.end(), *ptrHit)};
 
-  if (wireHit.empty())
+  if (wireHit.empty()) {
     return nullptr;
-  else
+  } else {
     return &(wireHit.front());
+  }
 }
 
 CDCRLWireHit CDCSimHitLookUp::getRLWireHit(const CDCHit* ptrHit,

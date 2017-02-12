@@ -1,10 +1,13 @@
 #include <framework/utilities/FileSystem.h>
+#include <framework/utilities/WorkingDirectoryManager.h>
 #include <boost/filesystem.hpp>
 
 #include <gtest/gtest.h>
 
 #include <sys/types.h>
 #include <sys/wait.h>
+
+#include <unistd.h>
 
 using namespace std;
 using namespace Belle2;
@@ -31,6 +34,15 @@ namespace {
       ASSERT_TRUE(FileSystem::fileExists(filename));
       ASSERT_FALSE(FileSystem::isDir(filename));
       ASSERT_TRUE(FileSystem::fileDirExists(filename));
+
+      {
+        //check relative filenames
+        WorkingDirectoryManager pwd("/tmp"); //don't influence other tests by changing pwd
+        std::string relname = fs::relative(filename, "/tmp").string();
+        ASSERT_TRUE(FileSystem::fileExists(relname));
+        chdir("/");
+        ASSERT_FALSE(FileSystem::fileExists(relname));
+      }
     }
     ASSERT_FALSE(FileSystem::fileExists(filename));
     ASSERT_FALSE(FileSystem::isDir(filename));

@@ -33,19 +33,19 @@ class ReconstructionPositionHarvester(HarvestingModule):
 
         number_of_wrong_rl_infos = 0
 
-        for reco_hit in list(track_cand.items()):
-            underlaying_cdc_hit = reco_hit.getWireHit().getHit()
-            hit_difference = mc_hit_lookup.getRecoPos3D(underlaying_cdc_hit) - reco_hit.getRecoPos3D()
+        for reco_hit3D in list(track_cand.items()):
+            underlaying_cdc_hit = reco_hit3D.getWireHit().getHit()
+            hit_difference = mc_hit_lookup.getRecoPos3D(underlaying_cdc_hit) - reco_hit3D.getRecoPos3D()
             sum_of_difference_norms_axial += hit_difference.xy().norm()
             num_norms_axial += 1
 
-            if reco_hit.getStereoType() != 0:  # AXIAL
+            if reco_hit3D.getStereoType() != 0:  # AXIAL
                 sum_of_difference_norms_stereo += abs(hit_difference.z())
                 num_norms_stereo += 1
 
                 correct_rl_info = mc_hit_lookup.getRLInfo(underlaying_cdc_hit)
 
-                if correct_rl_info != reco_hit.getRLInfo():
+                if correct_rl_info != reco_hit3D.getRLInfo():
                     number_of_wrong_rl_infos += 1
 
         return dict(sum_of_difference_norms_axial=sum_of_difference_norms_axial,
@@ -168,10 +168,10 @@ class SegmentFakeRatesModule(HarvestingModule):
 
         cdc_hits = self.cdcHits
 
-        is_background = mc_track_matcher_local.isBackgroundPRTrackCand(local_track_cand)
-        is_ghost = mc_track_matcher_local.isGhostPRTrackCand(local_track_cand)
-        is_matched = mc_track_matcher_local.isMatchedPRTrackCand(local_track_cand)
-        is_clone = mc_track_matcher_local.isClonePRTrackCand(local_track_cand)
+        is_background = mc_track_matcher_local.isBackgroundPRRecoTrack(local_track_cand)
+        is_ghost = mc_track_matcher_local.isGhostPRRecoTrack(local_track_cand)
+        is_matched = mc_track_matcher_local.isMatchedPRRecoTrack(local_track_cand)
+        is_clone = mc_track_matcher_local.isClonePRRecoTrack(local_track_cand)
         is_clone_or_matched = is_matched or is_clone
         hit_purity = abs(mc_track_matcher_local.getRelatedPurity(local_track_cand))
 
@@ -192,13 +192,13 @@ class SegmentFakeRatesModule(HarvestingModule):
         partner_has_stereo_information = np.NaN
 
         if is_clone_or_matched:
-            related_mc_track_cand = mc_track_matcher_local.getRelatedMCTrackCand(local_track_cand)
-            has_partner = (mc_track_matcher_legendre.isMatchedMCTrackCand(related_mc_track_cand) or
-                           mc_track_matcher_legendre.isMergedMCTrackCand(related_mc_track_cand))
+            related_mc_track_cand = mc_track_matcher_local.getRelatedMCRecoTrack(local_track_cand)
+            has_partner = (mc_track_matcher_legendre.isMatchedMCRecoTrack(related_mc_track_cand) or
+                           mc_track_matcher_legendre.isMergedMCRecoTrack(related_mc_track_cand))
             mc_track_pt = related_mc_track_cand.getMomSeed().Pt()
             mc_track_dist = related_mc_track_cand.getPosSeed().Mag()
             if has_partner:
-                partner_legendre_track_cand = mc_track_matcher_legendre.getRelatedPRTrackCand(related_mc_track_cand)
+                partner_legendre_track_cand = mc_track_matcher_legendre.getRelatedPRRecoTrack(related_mc_track_cand)
                 hit_purity_of_partner = abs(mc_track_matcher_legendre.getRelatedPurity(partner_legendre_track_cand))
                 hit_efficiency_of_partner = abs(mc_track_matcher_legendre.getRelatedEfficiency(related_mc_track_cand))
 
@@ -267,11 +267,11 @@ class SegmentFinderParameterExtractorModule(HarvestingModule):
         """ Extract the information from the local track candidate. """
         mc_track_matcher = self.mc_track_matcher
 
-        is_matched = mc_track_matcher.isMatchedPRTrackCand(local_track_cand)
-        is_background = mc_track_matcher.isBackgroundPRTrackCand(local_track_cand)
-        is_ghost = mc_track_matcher.isGhostPRTrackCand(local_track_cand)
+        is_matched = mc_track_matcher.isMatchedPRRecoTrack(local_track_cand)
+        is_background = mc_track_matcher.isBackgroundPRRecoTrack(local_track_cand)
+        is_ghost = mc_track_matcher.isGhostPRRecoTrack(local_track_cand)
 
-        related_mc_track_cand = mc_track_matcher.getRelatedMCTrackCand(local_track_cand)
+        related_mc_track_cand = mc_track_matcher.getRelatedMCRecoTrack(local_track_cand)
 
         track_momentum = np.NaN
         track_position = np.NaN
@@ -288,17 +288,19 @@ class SegmentFinderParameterExtractorModule(HarvestingModule):
             track_position = related_mc_track_cand.getPosSeed()
             track_pt = track_momentum.Pt()
             track_phi = track_momentum.Phi()
-            trajectory_track = Belle2.TrackFindingCDC.CDCTrajectory3D(Belle2.TrackFindingCDC.Vector3D(track_position),
-                                                                      Belle2.TrackFindingCDC.Vector3D(track_momentum),
-                                                                      related_mc_track_cand.getChargeSeed())
+            trajectory_track = \
+                Belle2.TrackFindingCDC.CDCTrajectory3D(Belle2.TrackFindingCDC.Vector3D(track_position),
+                                                       Belle2.TrackFindingCDC.Vector3D(track_momentum),
+                                                       related_mc_track_cand.getChargeSeed())
 
             segment_momentum = local_track_cand.getMomSeed()
             segment_position = local_track_cand.getPosSeed()
             segment_pt = segment_momentum.Pt()
             segment_phi = segment_momentum.Phi()
-            trajectory_segment = Belle2.TrackFindingCDC.CDCTrajectory3D(Belle2.TrackFindingCDC.Vector3D(segment_position),
-                                                                        Belle2.TrackFindingCDC.Vector3D(segment_momentum),
-                                                                        local_track_cand.getChargeSeed())
+            trajectory_segment = \
+                Belle2.TrackFindingCDC.CDCTrajectory3D(Belle2.TrackFindingCDC.Vector3D(segment_position),
+                                                       Belle2.TrackFindingCDC.Vector3D(segment_momentum),
+                                                       local_track_cand.getChargeSeed())
 
         return dict(is_matched=is_matched,
                     is_background=is_background,
@@ -338,7 +340,7 @@ class SeedsAnalyser(HarvestingModule):
             helix = Belle2.Helix(legendre_track_cand.getPosSeed(), legendre_track_cand.getMomSeed(), -1, 1.5)
 
         matcher = Belle2.TrackMatchLookUp("MCTrackCands", self.foreach)
-        mc_track_cand = matcher.getMatchedMCTrackCand(legendre_track_cand)
+        mc_track_cand = matcher.getMatchedMCRecoTrack(legendre_track_cand)
 
         pxd_clusters = Belle2.PyStoreArray("PXDClusters")
         svd_clusters = Belle2.PyStoreArray("SVDClusters")

@@ -10,13 +10,12 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-vector<const CDCWire*> CDCWireHitSegment::getWireSegment() const
+std::vector<const CDCWire*> CDCWireHitSegment::getWireSegment() const
 {
-  vector<const CDCWire*> wireSegment;
+  std::vector<const CDCWire*> wireSegment;
   for (const CDCWireHit* ptrWireHit : *this) {
     wireSegment.push_back(&(ptrWireHit->getWire()));
   }

@@ -16,24 +16,18 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter for the constuction of segment relations based on MC information.
-    class MCSegmentRelationFilter :
-      public MCSymmetricFilterMixin<BaseSegmentRelationFilter > {
+    class MCSegmentRelationFilter : public MCSymmetricFilterMixin<BaseSegmentRelationFilter> {
 
     private:
       /// Type of the super class
-      typedef MCSymmetricFilterMixin<BaseSegmentRelationFilter > Super;
+      using Super = MCSymmetricFilterMixin<BaseSegmentRelationFilter >;
 
     public:
       /// Constructor
-      MCSegmentRelationFilter(bool allowReverse = true) :
-        Super(allowReverse)
-      {}
+      MCSegmentRelationFilter(bool allowReverse = true);
 
       /// Checks if a segment relation is a good combination.
-      virtual Weight operator()(const CDCRecoSegment2D& fromSegment,
-                                const CDCRecoSegment2D& toSegment) override final;
-
-    }; // end class MCSegmentRelationFilter
-
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+      Weight operator()(const CDCSegment2D& fromSegment, const CDCSegment2D& toSegment) final;
+    };
+  }
+}

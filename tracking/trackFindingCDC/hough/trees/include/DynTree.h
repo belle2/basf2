@@ -9,13 +9,18 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/CallIfApplicable.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <framework/logging/Logger.h>
 #include <vector>
 #include <deque>
+#include <map>
 #include <algorithm>
+#include <functional>
+#include <type_traits>
 
-#include <assert.h>
+#include <cmath>
+#include <cassert>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -29,13 +34,13 @@ namespace Belle2 {
     class DynTree {
 
       /// Type of this class
-      typedef DynTree<AProperties, ASubPropertiesFactory> This;
+      using This = DynTree<AProperties, ASubPropertiesFactory>;
 
       /// Type of the Properties
-      typedef AProperties Properties;
+      using Properties = AProperties;
 
       /// Type of the factory for the sub node properties
-      typedef ASubPropertiesFactory SubPropertiesFactory;
+      using SubPropertiesFactory = ASubPropertiesFactory;
 
     public:
       /// Class for a node in the tree
@@ -43,16 +48,16 @@ namespace Belle2 {
 
       public:
         /// Type of the tree containing this node.
-        typedef This Tree;
+        using Tree = This;
 
         /// Allow the tree access to the node constructor to create the top node.
         friend Tree;
 
         /// Type of the Properties
-        typedef AProperties Properties;
+        using Properties = AProperties;
 
         /// Type of the container of the children of the node
-        typedef std::vector<Node> Children;
+        using Children = std::vector<Node>;
 
       private:
         /** Inheriting the constructors of the properties such that we can
@@ -113,6 +118,8 @@ namespace Belle2 {
         template<class AWalker>
         void walk(AWalker& walker)
         {
+          static_assert(std::is_assignable<std::function<bool(Node*)>, AWalker>(), "");
+
           bool walkChildren = walker(this);
           Children* children = getChildren();
           if (children and walkChildren) {
@@ -130,6 +137,9 @@ namespace Belle2 {
         template<class AWalker, class APriorityMeasure>
         void walk(AWalker& walker, APriorityMeasure& priority)
         {
+          static_assert(std::is_assignable<std::function<bool(Node*)>, AWalker>(), "");
+          static_assert(std::is_assignable<std::function<float(Node*)>, APriorityMeasure>(), "");
+
           bool walkChildren = walker(this);
           Children* children = getChildren();
           if (children and walkChildren) {
@@ -140,33 +150,33 @@ namespace Belle2 {
             // Priorities the child nodes with the priority function.
             for (Node& childNode : *children) {
               float childPriority = priority(&childNode);
+              if (std::isnan(childPriority)) continue;
               prioritisedChildNodes.push_back(std::make_pair(childPriority, &childNode));
             }
 
-            std::make_heap(prioritisedChildNodes.begin(),
-                           prioritisedChildNodes.end());
+            std::make_heap(prioritisedChildNodes.begin(), prioritisedChildNodes.end());
 
-            // while( not prioritisedChildNode.empty() ) {
-            // We know the number of children so we can make the loop counter explicit
-            for (std::size_t i = 0; i < nChildren; ++i) {
-              std::pop_heap(prioritisedChildNodes.begin(),
-                            prioritisedChildNodes.end());
-
+            while (not prioritisedChildNodes.empty()) {
+              std::pop_heap(prioritisedChildNodes.begin(), prioritisedChildNodes.end());
               Node* priorityChildNode = prioritisedChildNodes.back().second;
               prioritisedChildNodes.pop_back();
+
               priorityChildNode->walk(walker, priority);
 
               // After the walking the children we reevaluate the priority
               bool reheap = false;
-              for (std::pair<float, Node*>& prioritisedChildNode : prioritisedChildNodes) {
+              erase_remove_if(prioritisedChildNodes,
+              [&reheap, &priority](std::pair<float, Node*>& prioritisedChildNode) {
                 float childPriority = priority(prioritisedChildNode.second);
-                /// Check if weights changed and a reordering is due.
+                if (std::isnan(childPriority)) return true;
+                // Check if weights changed and a reordering is due.
                 reheap |= prioritisedChildNode.first != childPriority;
                 prioritisedChildNode.first = childPriority;
-              }
+                return false;
+              });
+
               if (reheap) {
-                std::make_heap(prioritisedChildNodes.begin(),
-                               prioritisedChildNodes.end());
+                std::make_heap(prioritisedChildNodes.begin(), prioritisedChildNodes.end());
               }
             }
             assert(prioritisedChildNodes.empty());
@@ -174,7 +184,7 @@ namespace Belle2 {
         }
 
         /// Get the level of the node
-        std::size_t getLevel() const { return m_level; }
+        int getLevel() const { return m_level; }
 
         /** Getter of the node one up the hierarchy.
          *  Usually the highest node of level 0 has no parent.
@@ -199,7 +209,7 @@ namespace Belle2 {
         Children* m_children = nullptr;
 
         /// Level of the node within the tree
-        std::size_t m_level = 0;
+        int m_level = 0;
 
         /// Parent in the tree hierachy of this node.
         Node* m_parent = nullptr;
@@ -230,11 +240,13 @@ namespace Belle2 {
       const Node& getTopNode() const
       { return m_topNode; }
 
-      /** Gets the number of nodes currently contained in the tree
-       *  Also demonstrates how to walk over the tree.*/
-      size_t getNNodes() const
+      /**
+       *  Gets the number of nodes currently contained in the tree
+       *  Also demonstrates how to walk over the tree.
+       */
+      int getNNodes() const
       {
-        std::size_t nNodes = 0;
+        int nNodes = 0;
         auto countNodes = [&nNodes](const Node*) -> bool {
           ++nNodes;
           return true;
@@ -244,14 +256,33 @@ namespace Belle2 {
         return nNodes;
       }
 
+      /**
+       *  Gets the number of nodes by level in the tree
+       *  Also demonstrates how to walk over the tree.
+       */
+      std::map<int, int> getNNodesByLevel() const
+      {
+        std::map<int, int> nNodesByLevel;
+        auto countNodes = [&nNodesByLevel](const Node * node) -> bool {
+          if (nNodesByLevel.count(node->getLevel()) == 0)
+          {
+            nNodesByLevel[node->getLevel()] = 1;
+          } else {
+            nNodesByLevel[node->getLevel()]++;
+          }
+          return true;
+        };
+        const_cast<DynTree&>(*this).walk(countNodes);
+        //walk(countNodes);
+        return nNodesByLevel;
+      }
+
     private:
       /// Create child nodes for the given parents.
       std::vector<Node>* createChildren(Node* parentNode)
       {
-        Properties& parentProperties = *parentNode;
         std::vector<Node>* result = getUnusedChildren();
-
-        auto subProperties = m_subPropertiesFactory(parentProperties);
+        auto subProperties = m_subPropertiesFactory(*parentNode);
         if (subProperties.empty()) {
           result->clear();
         } else {
@@ -281,12 +312,21 @@ namespace Belle2 {
       /// Forward walk to the top node
       template<class AWalker>
       void walk(AWalker& walker)
-      { getTopNode().walk(walker); }
+      {
+        static_assert(std::is_assignable<std::function<bool(Node*)>, AWalker>(), "");
+
+        getTopNode().walk(walker);
+      }
 
       /// Forward walk to the top node
       template<class AWalker, class APriorityMeasure>
       void walk(AWalker& walker, APriorityMeasure& priority)
-      { getTopNode().walk(walker, priority); }
+      {
+        static_assert(std::is_assignable<std::function<bool(Node*)>, AWalker>(), "");
+        static_assert(std::is_assignable<std::function<float(Node*)>, APriorityMeasure>(), "");
+
+        getTopNode().walk(walker, priority);
+      }
 
       /// Fell to tree meaning deleting all child nodes from the tree. Keeps the top node.
       void fell()
@@ -306,7 +346,7 @@ namespace Belle2 {
       /// Like fell but also releases all memory the tree has aquired during long execution.
       void raze()
       {
-        fell();
+        this->fell();
         m_children.clear();
         m_children.shrink_to_fit();
       }
@@ -323,7 +363,6 @@ namespace Belle2 {
 
       /// Last index of used children.
       size_t m_nUsedChildren = 0;
-
     };
   }
 }

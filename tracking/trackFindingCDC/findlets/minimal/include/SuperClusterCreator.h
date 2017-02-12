@@ -9,75 +9,40 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/wireHitRelation/SecondaryWireHitRelationFilter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/ClusterCreator.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
+
+#include <tracking/trackFindingCDC/filters/wireHitRelation/SecondaryWireHitRelationFilter.h>
 
 #include <vector>
-#include <iterator>
-#include <assert.h>
+#include <string>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCWireHit;
+    class CDCWireHitCluster;
 
     /// Refines the clustering of wire hits from  clusters to clusters
-    class SuperClusterCreator:
-      public Findlet<CDCWireHit, CDCWireHitCluster> {
+    class SuperClusterCreator : public Findlet<CDCWireHit&, CDCWireHitCluster> {
 
     private:
       /// Type of the base class
-      typedef Findlet<CDCWireHit, CDCWireHitCluster> Super;
+      using Super = Findlet<CDCWireHit, CDCWireHitCluster>;
 
     public:
+      /// Constructor
+      SuperClusterCreator();
+
       /// Short description of the findlet
-      virtual std::string getDescription() override
-      {
-        return "Groups the wire hits into super cluster by expanding the secondary wire neighborhood";
-      }
-
-      /// Signals the beginning of the event processing
-      void initialize() override
-      {
-        Super::initialize();
-        m_clusterCreator.initialize();
-      }
-
-      /// Signals the beginning of a new event
-      void beginEvent() override
-      {
-        Super::beginEvent();
-        m_clusterCreator.beginEvent();
-      }
-
-      /// Signals the end of the event processing
-      void terminate() override
-      {
-        m_clusterCreator.terminate();
-        Super::terminate();
-      }
+      std::string getDescription() final;
 
     public:
       /// Main algorithm applying the cluster refinement
-      virtual void apply(std::vector<CDCWireHit>& inputWireHits,
-                         std::vector<CDCWireHitCluster>& outputSuperClusters) override final
-      {
-        m_clusterCreator.apply(inputWireHits, outputSuperClusters);
-
-        int iSuperCluster = -1;
-        for (CDCWireHitCluster& superCluster : outputSuperClusters) {
-          ++iSuperCluster;
-          superCluster.setISuperCluster(iSuperCluster);
-          for (CDCWireHit* wireHit : superCluster) {
-            wireHit->setISuperCluster(iSuperCluster);
-          }
-          std::sort(superCluster.begin(), superCluster.end());
-        }
-      }
+      void apply(std::vector<CDCWireHit>& inputWireHits,
+                 std::vector<CDCWireHitCluster>& outputSuperClusters) final;
 
     private:
       /// Creator of the super clusters
       ClusterCreator<SecondaryWireHitRelationFilter> m_clusterCreator;
-
-    }; // end class
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

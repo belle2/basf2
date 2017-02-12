@@ -13,7 +13,6 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-using namespace std;
 
 
 void TrackQualityTools::moveToNextAxialLayer(CDCTrack& track)
@@ -69,8 +68,13 @@ void TrackQualityTools::normalizeTrack(CDCTrack& track)
 
   const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
   CDCTrajectory2D trackTrajectory2D = fitter.fit(observations2D);
+  Vector2D center = trackTrajectory2D.getGlobalCenter();
 
-  if (trackTrajectory2D.getChargeSign() != HitProcessor::getChargeSign(track)) trackTrajectory2D.reverse();
+  // Arm used as a proxy for the charge of the track
+  // Correct if the track originates close to the origin
+  ESign expectedCharge = HitProcessor::getMajorArmSign(track, center);
+
+  if (trackTrajectory2D.getChargeSign() != expectedCharge) trackTrajectory2D.reverse();
 
   trackTrajectory2D.setLocalOrigin(trackTrajectory2D.getGlobalPerigee());
   for (CDCRecoHit3D& recoHit : track) {
@@ -91,6 +95,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
 
   CDCTrajectory3D trajectory3D = track.getStartTrajectory3D();
 
+  // We reset the trajectory here to start (later) at the newStartPosition of the first hit
   const Vector3D startPosition(0, 0, 0);
   trajectory3D.setLocalOrigin(startPosition);
   trajectory3D.setFlightTime(0);
@@ -98,17 +103,16 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
   CDCTrajectory2D trajectory2D = trajectory3D.getTrajectory2D();
 
   // Check if we have to reverse the trajectory. This is done by counting the number of hits
-  // with positive an with negative perpS
+  // with positive and with negative arc length
   unsigned int numberOfPositiveHits = 0;
   for (const CDCRecoHit3D& recoHit : track) {
-    const double currentPerpS = trajectory2D.calcArcLength2D(recoHit.getRecoPos2D());
-    if (currentPerpS > 0) {
+    const double currentArcLength = trajectory2D.calcArcLength2D(recoHit.getRecoPos2D());
+    if (currentArcLength > 0) {
       numberOfPositiveHits++;
     }
   }
   const bool reverseTrajectory = 2 * numberOfPositiveHits < track.size();
 
-  // We reset the trajectory here to start at the newStartPosition of the first hit
   if (reverseTrajectory) {
     trajectory3D.reverse();
     trajectory2D.reverse();
@@ -125,10 +129,10 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
     recoHit.getWireHit().getAutomatonCell().setTakenFlag();
   }
 
-  // We can now sort by perpS
+  // We can now sort by arc length
   track.sortByArcLength2D();
 
-
+  // Set the position to the first hit and let the hits start at arc length of 0
   Vector3D frontPosition = track.front().getRecoPos3D();
   double arcLengthOffset = trajectory3D.setLocalOrigin(frontPosition);
   track.setStartTrajectory3D(trajectory3D);
@@ -136,6 +140,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
     recoHit.shiftArcLength2D(-arcLengthOffset);
   }
 
+  // Set the back trajectory to start at the last hit position (and shift if necessary)
   Vector3D backPosition = track.back().getRecoPos3D();
   double backArcLength2D = trajectory3D.setLocalOrigin(backPosition);
   if (backArcLength2D < 0) {
@@ -145,17 +150,17 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
 
 }
 
-void TrackQualityTools::removeHitsAfterCDCWall(CDCTrack& track, double m_outerCylindricalRFactor)
+void TrackQualityTools::removeHitsAfterCDCWall(CDCTrack& track, double outerCylindricalRFactor)
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
   const double radius = trajectory2D.getLocalCircle()->absRadius();
 
   // Curler are allowed to have hits on both arms
-  if (trajectory2D.isCurler(m_outerCylindricalRFactor)) {
+  if (trajectory2D.isCurler(outerCylindricalRFactor)) {
     return;
   }
 
-  const Vector2D& outerExitWithFactor = trajectory2D.getOuterExit(m_outerCylindricalRFactor);
+  const Vector2D& outerExitWithFactor = trajectory2D.getOuterExit(outerCylindricalRFactor);
 
   double arcLength2DOfExitWithFactor = trajectory2D.calcArcLength2D(outerExitWithFactor);
   if (arcLength2DOfExitWithFactor < 0) {
@@ -250,7 +255,7 @@ void TrackQualityTools::removeHitsAfterLayerBreak(CDCTrack& track, double m_maxi
     const double currentArcLength2D = recoHit.getArcLength2D();
     if (not std::isnan(lastArcLength2D)) {
       const double delta = (currentArcLength2D - lastArcLength2D);
-      if (abs(delta) > m_maximumArcLength2DDistance) {
+      if (std::fabs(delta) > m_maximumArcLength2DDistance) {
         trackletList.emplace_back();
         currentTracklet = &(trackletList.back());
       }

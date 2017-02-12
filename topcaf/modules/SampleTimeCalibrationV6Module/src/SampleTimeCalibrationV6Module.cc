@@ -4,7 +4,7 @@
 #include <topcaf/dataobjects/TopConfigurations.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/conditions/ConditionsService.h>
+//#include <framework/conditions/ConditionsService.h>
 
 #include <iostream>
 #include <cstdlib>
@@ -29,11 +29,10 @@ namespace topcafSampleTimeCalibrationV6MinuitParameters {
   std::vector< double > g_dt_ave;
   std::map< topcaf_channel_id_t, std::vector<double> > g_averages;
   int g_cycles;
-  TH2D h1o("h1o", "time1 diff vs sample", 256, 0, 256, 100, 190, 210);
-  TH2D h2o("h2o", "time2 diff vs sample", 256, 0, 256, 100, 190, 210);
-
-  TH2D h1f("h1f", "time1 diff vs sample", 256, 0, 256, 100, 190, 210);
-  TH2D h2f("h2f", "time2 diff vs sample", 256, 0, 256, 100, 190, 210);
+  TH2D* g_h1o = nullptr;
+  TH2D* g_h2o = nullptr;
+  TH2D* g_h1f = nullptr;
+  TH2D* g_h2f = nullptr;
 }
 
 SampleTimeCalibrationV6Module::SampleTimeCalibrationV6Module() : Module()
@@ -79,7 +78,9 @@ SampleTimeCalibrationV6Module::SampleTimeCalibrationV6Module() : Module()
   m_time_calib_tdc_h = nullptr;
 }
 
-SampleTimeCalibrationV6Module::~SampleTimeCalibrationV6Module() {}
+SampleTimeCalibrationV6Module::~SampleTimeCalibrationV6Module()
+{
+}
 
 void SampleTimeCalibrationV6Module::initialize()
 {
@@ -100,12 +101,10 @@ void SampleTimeCalibrationV6Module::initialize()
     m_residual_h = new TH1D("m_residual_h", "m_residual_h", m_channel_samples, 0, 0);
     m_corr_residual_h = new TH1D("m_corr_residual_h", "m_corr_residual_h", m_channel_samples, 0, 0);
   }
-
 }
 
 void SampleTimeCalibrationV6Module::beginRun()
 {
-
   StoreObjPtr<topFileMetaData> metadata_ptr;
   metadata_ptr.isRequired();
 
@@ -136,10 +135,10 @@ void SampleTimeCalibrationV6Module::beginRun()
     TList* list = nullptr;
 
     if (m_conditions == 1) { // read using conditions service
-
-      std::string filename = (ConditionsService::getInstance()->getPayloadFileURL(this));
-      m_in_file = TFile::Open(filename.c_str(), "READ");
-
+      /* FIXME
+            std::string filename = (ConditionsService::getInstance()->getPayloadFileURL(this));
+            m_in_file = TFile::Open(filename.c_str(), "READ");
+      */
     } else if (m_conditions == 0) { // read  from local file
 
       m_in_file = TFile::Open(m_in_filename.c_str(), "READ");
@@ -367,12 +366,7 @@ void  SampleTimeCalibrationV6Module::terminate()
       }
       m_out_file->cd();
     }
-
-
-
-
     for (auto iter = m_cal_photon_pairs.begin(); iter != m_cal_photon_pairs.end(); iter++) {
-
       topcaf_channel_id_t ch_id = iter->first;
       g_hitinfo = iter->second;
       B2INFO("Calibrating channel " << ch_id);
@@ -404,8 +398,6 @@ void  SampleTimeCalibrationV6Module::terminate()
         }
 
       } else { //use non-minuit based fitter
-
-
         //if (2100000000 != ch_id) {continue;}
         B2INFO("Using non-Minuit based fitting procedure for sample time calibration.");
         B2INFO("Calibrating channel " << ch_id << " using " << g_hitinfo.size() << " hits.");
@@ -436,15 +428,10 @@ void  SampleTimeCalibrationV6Module::terminate()
         TH1F* h1 = new TH1F(name, title, m_nMinimiserBins, m_min_time_diff, m_max_time_diff);
         h1->SetXTitle("Sample number % 256");
         h1->SetYTitle("time difference / default sample widths");
-
-
         //m_iteration_vs_tdiff = new TH2D()
-
         //name  = "smp_vs_smp_" + ch_id;
         //title = "Sample1 vs Sample2 for channel" + ch_id;
         //m_samples_hit1_vs_hit2 = new TH2D(name, title, 256, 0.0, 256.0, 256, 0.0, 256.0);
-
-
         name = "iteration_vs_tdiff_";
         name += ch_id;
         title = "Width vs iteration for channel ";
@@ -452,18 +439,9 @@ void  SampleTimeCalibrationV6Module::terminate()
         m_iteration_vs_tdiff = new TH2D(name, title, m_nIterations, 0.0, m_nIterations, m_nMinimiserBins, m_min_time_diff, m_max_time_diff);
         m_iteration_vs_tdiff->SetXTitle("Iteration number");
         m_iteration_vs_tdiff->SetYTitle("width / default sample widths");
-
-
-
-
-
-
         //Fill h1 for the first time:
         for (auto it(g_hitinfo.begin()); it != g_hitinfo.end(); ++it) {
-
-
           int total = 256;
-
           int time1_nwin = it->sample1 / total;
           int time2_nwin = it->sample2 / total;
           double sample1 = fmod(it->sample1, total);
@@ -515,16 +493,9 @@ void  SampleTimeCalibrationV6Module::terminate()
         h1_initial_title += "_initial";
         TH1F* h1_initial = (TH1F*) h1->Clone(h1_initial_title);
 
-
-
-
-
-
-
         m_out_file->cd("extra");
         h1_initial->Write();
         m_out_file->cd();
-
 
         Float_t tryRMS, aMean, tryDt[256];
         Float_t bestRMS = 10.0;
@@ -533,10 +504,8 @@ void  SampleTimeCalibrationV6Module::terminate()
 
         for (Int_t nSize = 0; nSize < m_nIterations; nSize++) {
           stepDtRef /= 1.2;  // ad hoc 20% reduction each pass (perhaps not make magic number)
-
           for (Int_t nOuter = 1; nOuter < 256; nOuter++) {
             moBettah = 1;
-
             while (moBettah) {
               stepDt = stepDtRef;
               moBettah = 0; // abort loop unless get at least one improvement
@@ -544,8 +513,6 @@ void  SampleTimeCalibrationV6Module::terminate()
               // sign loop
               for (Int_t nSign = 0; nSign < 2; nSign++) {
                 for (Int_t nI = 0; nI < 256; nI++) {tryDt[nI] = m_dTval[nI];} // assign starting place
-
-
                 // update timing  for trial exchanges
                 tryDt[nOuter] = m_dTval[nOuter] + stepDt * (0.5 - 1.0 * nSign);
 
@@ -572,13 +539,10 @@ void  SampleTimeCalibrationV6Module::terminate()
                   s1index = s1index % 256;
                   s2index = s2index % 256;
 
-
                   //B2INFO("it.sample1 = " << it->sample1 << "\tsample1index = " << s1index << "\tsample1_frac = " << sample1_frac);
                   //B2INFO("it.sample2 = " << it->sample2 << "\tsample2index = " << s2index << "\tsample2_frac = " << sample2_frac);
-                  double tLeading;
-                  double tTrailing;
-
-
+                  double tLeading = 0;
+                  double tTrailing = 0;
 
                   //tLeading = tryDt[s1index] + sample1_frac * (tryDt[s1index+1] - tryDt[s1index]);
                   //tTrailing = tryDt[s2index] + sample2_frac * (tryDt[s2index+1] - tryDt[s2index]);
@@ -595,7 +559,6 @@ void  SampleTimeCalibrationV6Module::terminate()
                   double time_diff(0);
                   if ((time2 - time1) > 0) {time_diff = (time2 - time1);}
                   if ((time2 - time1) < 0) {time_diff = ((winDt2 + time2) - time1);}
-
 
                   time1  += time1_nwin * total;
                   time2  += time2_nwin * total;
@@ -674,10 +637,7 @@ void  SampleTimeCalibrationV6Module::terminate()
         h1_final->Write();
         m_out_file->cd();
         delete h1;
-
-
       } // non-minuit based fitter
-
       // Write out sample time calibration histograms (same format for both minuit and non-minuit based fitter.
       if (m_out_file) {
         if (m_smoothSamples) {
@@ -689,19 +649,13 @@ void  SampleTimeCalibrationV6Module::terminate()
           m_out_file->cd();
           smoothSampleHistogram(m_channel_time_calib_h);
         }
-
         m_channel_time_calib_h->Write();
 
         m_out_file->cd("extra");
         m_channel_time_calib_cumulative_h->Write();
         m_iteration_vs_tdiff->Write();
-
-
-
-
         m_out_file->cd();
       }
-
       delete m_channel_time_calib_h;
       makeClosurePlots(ch_id, g_hitinfo);
     } // end loop over cal_photon_pairs
@@ -709,14 +663,19 @@ void  SampleTimeCalibrationV6Module::terminate()
     //make closure plots
 //    makeClosurePlots(ch_id, g_hitinfo);
 
-
-
-
     if (m_out_file) {
-      h1o.Write();
-      h2o.Write();
-      h1f.Write();
-      h2f.Write();
+      if (g_h1o) {
+        g_h1o->Write();
+      }
+      if (g_h2o) {
+        g_h2o->Write();
+      }
+      if (g_h1f) {
+        g_h1f->Write();
+      }
+      if (g_h2f) {
+        g_h2f->Write();
+      }
       m_out_file->cd("extra");
       for (auto it(m_sample_occupancies_vs_tdiff_hit1.begin()); it != m_sample_occupancies_vs_tdiff_hit1.end(); ++it) {
         it->second->Write();
@@ -729,7 +688,7 @@ void  SampleTimeCalibrationV6Module::terminate()
 
 
     if (m_conditions == 1 && m_out_file) {
-      ConditionsService::getInstance()->writePayloadFile(m_out_file->GetName(), this);
+//FIXME      ConditionsService::getInstance()->writePayloadFile(m_out_file->GetName(), this);
     }
 
   }
@@ -757,8 +716,21 @@ void topcafSampleTimeCalibrationV6MinuitParameters::fcnSamplingTime(int& npar, d
   double ave = 0.;
   std::vector<double> time_diffs;
   int total = npar + 1;
-  h1f.Reset();
-  h2f.Reset();
+  if (not g_h1o) {
+    g_h1o = new TH2D("h1o", "time1 diff vs sample", 256, 0, 256, 100, 190, 210);
+  }
+  if (not g_h2o) {
+    g_h2o = new TH2D("h2o", "time2 diff vs sample", 256, 0, 256, 100, 190, 210);
+  }
+  if (not g_h1f) {
+    g_h1f = new TH2D("h1f", "time1 diff vs sample", 256, 0, 256, 100, 190, 210);
+  }
+  if (not g_h2f) {
+    g_h2f = new TH2D("h2f", "time2 diff vs sample", 256, 0, 256, 100, 190, 210);
+  }
+
+  g_h1f->Reset();
+  g_h2f->Reset();
   for (unsigned int c = 0; c < g_hitinfo.size(); c++) {
     int time1_nwin = g_hitinfo[c].sample1 / total;
     int time2_nwin = g_hitinfo[c].sample2 / total;
@@ -806,11 +778,11 @@ void topcafSampleTimeCalibrationV6MinuitParameters::fcnSamplingTime(int& npar, d
     B2INFO("time1 = " << time1 << "\ttime2 = " << time2 << "\ttime_diff = " << time_diff);
 
 
-    h1f.Fill(sample1, time_diff);
-    h2f.Fill(sample2, time_diff);
+    g_h1f->Fill(sample1, time_diff);
+    g_h2f->Fill(sample2, time_diff);
     if (g_cycles == 0) {
-      h1o.Fill(sample1, time_diff);
-      h2o.Fill(sample2, time_diff);
+      g_h1o->Fill(sample1, time_diff);
+      g_h2o->Fill(sample2, time_diff);
 
       //      B2INFO("s1: "<<sample1<<"\ts2: "<<sample2<<"\ttime1: "<<time1<<"\ttime2: "<<time2<<"\tdt: "<<time_diff);
     }
@@ -1027,15 +999,3 @@ void SampleTimeCalibrationV6Module::makeClosurePlots(topcaf_channel_id_t ch_id, 
   }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-

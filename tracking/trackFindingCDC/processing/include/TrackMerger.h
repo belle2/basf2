@@ -3,12 +3,14 @@
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Viktor Trusov, Nils Braun                                *
+ * Contributors: Viktor Trusov, Nils Braun, Oliver Frost                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
+
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 
 #include <list>
 #include <vector>
@@ -19,63 +21,63 @@ namespace Belle2 {
     class CDCTrack;
     class CDCWireHit;
     class CDCTrajectory2D;
-    class TrackProcessor;
-    class CDCConformalHit;
-    class CDCTrackList;
 
+    /// Utility structure implementing functionality for the axial track merging used after the legendre tree search.
     class TrackMerger {
     public:
       /// Static class only.
       TrackMerger() = delete;
 
-      /// Static class only.
-      TrackMerger(const TrackMerger& copy) = delete;
-
-      /// Static class only.
-      TrackMerger& operator=(const TrackMerger&) = delete;
-
-      /** The track finding often finds two curling tracks, originating from the same particle. This function merges them. */
-      static void doTracksMerging(CDCTrackList& cdcTrackList, const std::vector<CDCConformalHit>& conformalCDCWireHitList,
+      /**
+       *  The track finding often finds two curling tracks, originating from the same particle.
+       *  This function merges them.
+       */
+      static void doTracksMerging(std::list<CDCTrack>& cdcTrackList,
+                                  const std::vector<const CDCWireHit*>& allAxialWireHits,
                                   double minimum_probability_to_be_merged = 0.85);
 
-      /** Try to merge given track with tracks in tracklist. */
-      static void tryToMergeTrackWithOtherTracks(CDCTrack& track, CDCTrackList& cdcTrackList,
-                                                 const std::vector<CDCConformalHit>& conformalCDCWireHitList,
-                                                 double minimum_probability_to_be_merged = 0.85);
-
     private:
-      /** Some typedefs for the results of the merging process */
-      typedef std::pair<CDCTrack*, double> BestMergePartner;
+      /**
+       *  Searches for the best candidate to merge this track to.
+       *  @param track   track for which we try to find merging partner
+       *  @param tracks  search range of tracks
+       *  @return        a pointer to the best fit candidate including a fit probability
+       *  @retval        <tt>{nullptr, 0}<\tt> in case no match was found
+       */
+      template <class ACDCTracks>
+      static WithWeight<MayBePtr<CDCTrack> > calculateBestTrackToMerge(CDCTrack& track, ACDCTracks& tracks);
 
       /**
-       * Function to merge two track candidates. The hits of cand2 are deleted and transfered to cand1.
-       * The hit sorting is not maintained.
+       *  Fits the hit content of both tracks in a common fit repeated with an annealing schedule removing far away hits
+       *
+       *  @return Some measure of fit probability
        */
-      static void mergeTracks(CDCTrack& track1, CDCTrack& track2, const std::vector<CDCConformalHit>& conformalCDCWireHitList,
-                              CDCTrackList& cdcTrackList);
-
-      /**
-       * Marks hits away from the trajectory as bad. This method is used for calculating the chi2 of the tracks to be merged.
-       * @param factor gives a number how far the hit is allowed to be.
-       */
-      static void removeStrangeHits(double factor, std::vector<const CDCWireHit*>& wireHits, CDCTrajectory2D& trajectory);
-
-      /** Try to merge the two tracks
-       * For this, build a common hit list and do a fast fit.
-       * Then, throw away hits with a very high distance and fit again. Repeat this process three times.
-       * As a result. the reduced probability for a good fit is given.
-       * The bad hits are marked but none of them is deleted!
-       * This method does not do the actual merging. */
       static double doTracksFitTogether(CDCTrack& track1, CDCTrack& track2);
 
       /**
-       * Searches for the best candidate to merge this track to.
-       * @param trackToBeMerged track for which we try to find merging partner
-       * @param start_iterator the iterator where to start searching (this element included)
-       * @return a pointer to the best fit candidate.
+       *  Remove all hits that are further than factor * driftlength waay from the trajectory
+       *
+       *  @param factor gives a number how far the hit is allowed to be.
        */
-      static BestMergePartner calculateBestTrackToMerge(CDCTrack& trackToBeMerged,
-                                                        std::list<CDCTrack>::iterator start_iterator, std::list<CDCTrack>::iterator end_iterator);
+      static void removeStrangeHits(double factor, std::vector<const CDCWireHit*>& wireHits, CDCTrajectory2D& trajectory);
+
+      /**
+       *  Function to merge two track candidates.
+       *  The hits of track2 are deleted and transfered to track1 and the track1 is resorted.
+       *  The method also applys some postprocessing and splits the track1 in case it appears
+       *  to contain two back-to-back arms,
+       */
+      static void mergeTracks(CDCTrack& track1,
+                              CDCTrack& track2,
+                              const std::vector<const CDCWireHit*>& allAxialWireHits,
+                              std::list<CDCTrack>& cdcTrackList);
+
+    private: // Currently unused
+      /// Try to merge given track with tracks in tracklist.
+      static void tryToMergeTrackWithOtherTracks(CDCTrack& track,
+                                                 std::list<CDCTrack>& cdcTrackList,
+                                                 const std::vector<const CDCWireHit*>& allAxialWireHits,
+                                                 double minimum_probability_to_be_merged = 0.85);
     };
   }
 }

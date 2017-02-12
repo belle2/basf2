@@ -70,6 +70,7 @@ namespace Belle2 {
     m_beamAxis;   ///< BeamAxis define the coordinate system in which the tracks will be extrapolated to the perigee.
     std::vector<int> m_additionalPDGCodes;  ///< PDG codes for which TrackFitResults will be created.
     int m_defaultPDGCode; ///< Default PDG code, for which TrackFitResults will be created.
+
+    bool m_useClosestHitToIP = false; ///< Flag to turn on special handling which measurement to choose; especially useful for Cosmics.
   };
 }
-

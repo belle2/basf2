@@ -27,7 +27,7 @@ REG_MODULE(FlavorTaggerInfoFiller)
 FlavorTaggerInfoFillerModule::FlavorTaggerInfoFillerModule() : Module()
 {
   //Set module properties
-  setDescription("Filter based on ParticleLists, by setting return value to true if at least one of the given lists is not empty.");
+  setDescription("Creates a new flavorTaggerInfoMap DataObject for the specific methods. Saves there all the relevant information of the flavorTagger.");
   setPropertyFlags(c_ParallelProcessingCertified);
   //Parameter definition
   addParam("trackLevelParticleLists", m_trackLevelParticleLists, "Used Flavor Tagger trackLevel Categories of the lists ",
@@ -65,7 +65,8 @@ void FlavorTaggerInfoFillerModule::event()
   if (m_FANNmlp) {
     flavorTaggerInfo -> addMethodMap("FANN");
     FlavorTaggerInfoMap* infoMapsFANN = flavorTaggerInfo -> getMethodMap("FANN");
-    float qrCombined = 2 * (eventExtraInfo->getExtraInfo("qrCombinedFANN") - 0.5);
+    // float qrCombined = 2 * (eventExtraInfo->getExtraInfo("qrCombinedFANN") - 0.5);
+    float qrCombined = eventExtraInfo->getExtraInfo("qrCombinedFANN");
     if (qrCombined < 1.1 && qrCombined > 1.0) qrCombined = 1.0;
     if (qrCombined > - 1.1 && qrCombined < -1.0) qrCombined = -1.0;
     float B0Probability = eventExtraInfo->getExtraInfo("qrCombinedFANN");

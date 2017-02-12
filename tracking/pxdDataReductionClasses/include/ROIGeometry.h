@@ -14,12 +14,12 @@
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/PXDIntercept.h>
 #include <tracking/pxdDataReductionClasses/ROIDetPlane.h>
-
-#include <genfit/Track.h>
-#include <genfit/TrackCand.h>
-class ROIDetPlane;
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <list>
+
+//class ROIDetPlane;
+
 
 namespace Belle2 {
 
@@ -38,12 +38,15 @@ namespace Belle2 {
 
     /** Append the PXDIntercept infos related to the track theTrack to the listToBeFilled.
      */
-    void appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled, genfit::Track* theTrack,
-                          int theGFTrackIndex, RelationArray* gfTrackToPXDIntercepts);
+    //    void appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled, RecoTrack* theTrack,
+    //                          int recoTrackIndex, RelationArray* recoTrackToPXDIntercepts);
 
     std::list<ROIDetPlane> m_planeList; /**< list of planes*/
 
-    void fillPlaneList(); /**< fill the list of planes*/
+    void fillPlaneList(double toleranceZ, double tolerancePhi); /**< fill the list of planes*/
+
+    void appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVector3 recoTrackPosition);
+
   };
 }
 

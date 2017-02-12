@@ -8,17 +8,15 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
-#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
-
-#include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
-#include <tracking/trackFindingCDC/eventdata/collections/CDCTrackList.h>
+#include <framework/core/Module.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
+    class CDCConformalHit;
+    class CDCWireHit;
   }
 
   /**
@@ -27,30 +25,45 @@ namespace Belle2 {
    * "Implementation of the Legendre Transform for track segment reconstruction in drift tube chambers"
    * by T. Alexopoulus, et al. NIM A592 456-462 (2008).
    */
-  class TrackFinderCDCLegendreTrackingModule: public TrackFinderCDCBaseModule {
+  class TrackFinderCDCLegendreTrackingModule: public Module {
 
   private:
     /// Type of the base class
-    using Super = TrackFinderCDCBaseModule;
+    using Super = Module;
 
   public:
     /// Create and allocate memory for variables here and add the module parameters in this method.
     TrackFinderCDCLegendreTrackingModule();
 
     /// Initialisation before the event processing starts
-    void initialize();
+    void initialize() override;
+
+    /// Processes the event and generates track candidates
+    void event() override;
 
   private:
     /// Parameter
-    int m_param_maxLevel;               /**< Maximum Level of FastHough Algorithm. */
-    bool m_param_doEarlyMerging;        /**< Defines whether early track merging will be performed. */
+    /// Maximum Level of FastHough Algorithm.
+    int m_param_maxLevel;
 
+    /// Defines whether early track merging will be performed.
+    bool m_param_doEarlyMerging;
+
+    /// Parameter: Name of the output StoreObjPtr of the tracks generated within this module.
+    std::string m_param_tracksStoreObjName = "CDCTrackVector";
+
+  private:
     /// Worker
-    TrackFindingCDC::CDCTrackList
-    m_cdcTrackList;      /**< Object for holding all found cdc tracks to be passed around to the postprocessing functions. */
-    std::vector<TrackFindingCDC::CDCConformalHit>
-    m_conformalCDCWireHitList; /**< List for holding all used conformal CDC wire hits. */
+    /// Object for holding all found cdc tracks to be passed around to the postprocessing functions.
+    std::list<TrackFindingCDC::CDCTrack> m_tracks;
 
+    /// List to collect all axial wire hits
+    std::vector<const TrackFindingCDC::CDCWireHit*> m_allAxialWireHits;
+
+    /// List for holding all used conformal CDC wire hits.
+    std::vector<TrackFindingCDC::CDCConformalHit> m_conformalCDCWireHitList;
+
+    /// Main method to apply the track finding.
     void generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks);
 
     /// All objects in m_hitList and m_trackList are deleted and the two lists are cleared.

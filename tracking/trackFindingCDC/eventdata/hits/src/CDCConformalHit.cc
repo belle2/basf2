@@ -7,14 +7,9 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <cdc/geometry/CDCGeometryPar.h>
 
-using namespace std;
 using namespace Belle2;
-using namespace CDC;
 using namespace TrackFindingCDC;
 
 CDCConformalHit::CDCConformalHit(const CDCWireHit* wireHit)

@@ -9,8 +9,7 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/IsIterable.h>
-#include <tracking/trackFindingCDC/utilities/EnableIf.h>
+#include <tracking/trackFindingCDC/utilities/GetIterator.h>
 
 #include <algorithm>
 #include <iterator>
@@ -35,6 +34,9 @@ namespace Belle2 {
       using Reference = typename std::iterator_traits<AIterator>::reference;
 
     public:
+      /// Default constructor for ROOT
+      Range() = default;
+
       /// Constructor to adapt a pair as returned by e.g. std::equal_range.
       template<class AOtherIterator>
       explicit Range(const std::pair<AOtherIterator, AOtherIterator>& itPair)
@@ -42,8 +44,8 @@ namespace Belle2 {
       {}
 
       /// Constructor from another range
-      template<class Ts>
-      explicit Range(EnableIf<IsIterable<Ts>::value == true, Ts&> ts)
+      template<class Ts, class ItT = GetIterator<Ts>>
+      explicit Range(const Ts& ts)
         : Super(AIterator(std::begin(ts)), AIterator(std::end(ts)))
       {}
 
@@ -92,5 +94,19 @@ namespace Belle2 {
       { return std::count(this->begin(), this->end(), t); }
 
     };
+
+    /// Adapter function to make pair of iterators (e.g. from equal_range) into a range usable in range base for loops.
+    template<class AIterator>
+    Range<AIterator> asRange(std::pair<AIterator, AIterator> const& x)
+    {
+      return Range<AIterator>(x);
+    }
+
+    /// Adapter function to make pair of iterators (e.g. from equal_range) into a range usable in range base for loops.
+    template<class AIterator>
+    Range<AIterator> asRange(AIterator const& itBegin, AIterator const& itEnd)
+    {
+      return Range<AIterator>(std::make_pair(itBegin, itEnd));
+    }
   }
 }

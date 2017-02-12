@@ -17,6 +17,7 @@
 /* Belle2 headers. */
 #include <eklm/simulation/FiberAndElectronics.h>
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
 
@@ -85,7 +86,7 @@ namespace Belle2 {
     TFile* m_fout;
 
     /** Digitization parameters. */
-    struct EKLM::DigitizationParams m_digPar;
+    DBObjPtr<EKLMDigitizationParameters> m_DigPar;
 
     /** Direct histogram. */
     float* m_hDir;

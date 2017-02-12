@@ -196,6 +196,25 @@ namespace {
 
   }
 
+  TEST_F(HelixTest, Center)
+  {
+    /** Setup a helix
+     *  for counterclockwise travel
+     *  starting at -1.0, 0.0, 0.0
+     *  heading in the negative y direction initially
+     */
+
+    TVector3 center(0.0, -2.0, 0.0);
+    float radius = -1;
+    // Keep it flat
+    float tanLambda = 0;
+
+    Helix helix = helixFromCenter(center, radius, tanLambda);
+
+    TVector3 actualCenter = helix.getPerigee() * ((1 / helix.getOmega() + helix.getD0()) / helix.getD0());
+    EXPECT_NEAR(center.X(), actualCenter.X(), absError);
+    EXPECT_NEAR(center.Y(), actualCenter.Y(), absError);
+  }
 
   TEST_F(HelixTest, Explicit)
   {
@@ -308,7 +327,7 @@ namespace {
           if (omega != 0) {
 
             Helix helix(d0, phi0, omega, z0, tanLambda);
-            TVector3 momentumAtPerigee = helix.getMomentum();
+            TVector3 momentumAtPerigee = helix.getMomentum(nominalBz);
             for (const float chi : chis) {
 
               float arcLength2D = -chi / omega;

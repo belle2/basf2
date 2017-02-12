@@ -12,20 +12,19 @@
 
 #include <framework/logging/Logger.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 Weight AllAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axialSegmentPair)
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = axialSegmentPair.getStartSegment();
-  const CDCAxialRecoSegment2D* ptrEndSegment = axialSegmentPair.getEndSegment();
+  const CDCAxialSegment2D* ptrStartSegment = axialSegmentPair.getStartSegment();
+  const CDCAxialSegment2D* ptrEndSegment = axialSegmentPair.getEndSegment();
 
   assert(ptrStartSegment);
   assert(ptrEndSegment);
 
-  const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
+  const CDCAxialSegment2D& startSegment = *ptrStartSegment;
+  const CDCAxialSegment2D& endSegment = *ptrEndSegment;
 
   return startSegment.size() + endSegment.size();
 }

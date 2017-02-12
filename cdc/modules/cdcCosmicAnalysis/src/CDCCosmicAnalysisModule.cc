@@ -27,7 +27,7 @@
 #include "TMath.h"
 #include <Math/ProbFuncMathCore.h>
 #include "iostream"
-
+#include "TVector3.h"
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
@@ -68,13 +68,14 @@ void CDCCosmicAnalysisModule::initialize()
   m_relRecoTrackTrackName = relRecoTrackTrack.getName();
 
   tfile = new TFile(m_OutputFileName.c_str(), "RECREATE");
-  tree = new TTree("treeTrk", "treeTrk");
+  tree = new TTree("tree", "tree");
   tree->Branch("Pval1", &Pval1, "Pval1/D");
   tree->Branch("ndf1", &ndf1, "ndf1/D");
   tree->Branch("Phi01", &Phi01, "Phi01/D");
   tree->Branch("tanLambda1", &tanLambda1, "tanLambda1/D");
   tree->Branch("D01", &D01, "D01/D");
   tree->Branch("Z01", &Z01, "Z01/D");
+  tree->Branch("posSeed1", "TVector3", &posSeed1);
 
   tree->Branch("Pval2", &Pval2, "Pval2/D");
   tree->Branch("ndf2", &ndf2, "ndf2/D");
@@ -82,6 +83,7 @@ void CDCCosmicAnalysisModule::initialize()
   tree->Branch("tanLambda2", &tanLambda2, "tanLambda2/D");
   tree->Branch("D02", &D02, "D02/D");
   tree->Branch("Z02", &Z02, "Z02/D");
+  tree->Branch("posSeed2", "TVector3", &posSeed2);
 
 }
 
@@ -129,10 +131,12 @@ void CDCCosmicAnalysisModule::event()
     else {ndf = fs->getNdf();}
     double Chi2 = fs->getChi2();
     double TrPval = std::max(0., ROOT::Math::chisquared_cdf_c(Chi2, ndf));
-    double Phi0 = fitresult->getPhi0() * 180 / M_PI;
+    double Phi0 = fitresult->getPhi0();
+    TVector3 posSeed = track->getPositionSeed();
 
     /*** Two track case.***/
     if (nfitted == 1) {
+      posSeed1 = posSeed;
       Phi01 = Phi0;
       tanLambda1 = fitresult->getTanLambda();
       Z01 = fitresult->getZ0();
@@ -141,7 +145,8 @@ void CDCCosmicAnalysisModule::event()
       Pval1 = TrPval;
       n += 1;
     }
-    if (nfitted > 1 && Phi0 * Phi01 < 0) {
+    if (nfitted > 1 && posSeed1.Y()*posSeed.Y() < 0) {
+      posSeed2 = posSeed;
       Phi02 = Phi0;
       tanLambda2 = fitresult->getTanLambda();
       Z02 = fitresult->getZ0();
@@ -164,19 +169,3 @@ void CDCCosmicAnalysisModule::terminate()
   tree->Write();
   tfile->Close();
 }
-
-
-TVector3 CDCCosmicAnalysisModule::getTriggerHitPosition(const Helix h, double yofcounter = -13.25)
-{
-  //  double yofcounter = -16.25+3.;
-  double d0 = h.getD0();
-  double z0 = h.getZ0();
-  double tanlambda = h.getTanLambda();
-  double phi0 = h.getPhi0();
-  double l = (yofcounter + d0 * cos(phi0)) / sin(phi0);
-  //  double t = (yofcounter -h.getPerigeeY()-d0*sin(phi0))/cos(phi0);
-  double xofcounter = l * cos(phi0) + d0 * sin(phi0);
-  double zofcounter = fma(l, tanlambda, z0);
-  return TVector3(xofcounter, yofcounter, zofcounter);
-}
-

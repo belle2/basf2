@@ -10,7 +10,6 @@
 
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -19,7 +18,7 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-    //typedef WeightedNeighborhood<const int> ExampleNeighborHood;
+    //using ExampleNeighborHood = WeightedNeighborhood<const int>;
 
 
   }

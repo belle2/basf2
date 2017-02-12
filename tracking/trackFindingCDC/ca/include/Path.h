@@ -18,5 +18,5 @@ namespace Belle2 {
     template<class T>
     using Path = std::vector<T*>;
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

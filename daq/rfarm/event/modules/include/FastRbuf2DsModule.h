@@ -11,7 +11,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/RingBuffer.h>
 
 #include <pthread.h>
@@ -61,9 +60,6 @@ namespace Belle2 {
 
     //! Input thread ID
     pthread_t m_thr_input;
-
-    //! Messaage handler (obsolete)
-    MsgHandler* m_msghandler;
 
     //! DataStore streamer
     DataStoreStreamer* m_streamer;

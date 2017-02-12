@@ -226,6 +226,9 @@ special_targets = ['tests', 'test_all', 'include', 'lib', 'bin', 'modules', 'dat
 explicit_package_targets = [p.rstrip('/') for p in COMMAND_LINE_TARGETS if p.rstrip('/') not in special_targets and
                             '/' not in p.rstrip('/') and os.path.isdir(p)]
 
+# make the static library containing the main() function for test executables
+global_env.Library(os.path.join(global_env['LIBDIR'], 'test_main'), "$BUILDDIR/site_scons/test_main.cc")
+
 # process the analysis directory
 if analysis:
     global_env['PACKAGE'] = os.path.basename(os.environ['BELLE2_ANALYSIS_DIR'])
@@ -234,7 +237,7 @@ if analysis:
 # process the package directories
 else:
     # loop over directory entries and select package directories
-    exclude_dirs = ['build', 'include', 'lib', 'bin', 'modules', 'data']
+    exclude_dirs = ['build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons']
     local_packages = []
     for entry in os.listdir(os.getcwd()):
         if entry.find('.') > -1 or os.path.isfile(entry) or entry in exclude_dirs:
@@ -261,6 +264,8 @@ else:
             global_env['PACKAGE'] = entry
 
             global_env.ProcessDirectory(entry, False, repository)
+    # for global things (e.g. tests) no package should be set
+    del global_env['PACKAGE']
 
 
 # build global dataobjects library

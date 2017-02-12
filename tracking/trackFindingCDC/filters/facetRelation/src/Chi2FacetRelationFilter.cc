@@ -11,42 +11,43 @@
 #include <tracking/trackFindingCDC/filters/facetRelation/Chi2FacetRelationFilter.h>
 
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
+
 #include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-using namespace std;
+#include <framework/core/ModuleParamList.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 Chi2FacetRelationFilter::Chi2FacetRelationFilter(double chi2Cut, double penaltyWidth)
-  : m_param_chi2Cut(chi2Cut),
-    m_param_penaltyWidth(penaltyWidth)
-{}
+  : m_param_chi2Cut(chi2Cut)
+  , m_param_penaltyWidth(penaltyWidth)
+{
+}
 
 void Chi2FacetRelationFilter::exposeParameters(ModuleParamList* moduleParamList,
                                                const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);
-
   moduleParamList->addParameter(prefixed(prefix, "chi2Cut"),
                                 m_param_chi2Cut,
                                 "Acceptable chi2 fit value",
                                 m_param_chi2Cut);
-
   moduleParamList->addParameter(prefixed(prefix, "penaltyWidth"),
                                 m_param_penaltyWidth,
                                 "Width used in translation from chi2 values to weight penalties",
                                 m_param_penaltyWidth);
 }
 
-Weight Chi2FacetRelationFilter::operator()(const CDCFacet& fromFacet,
-                                           const CDCFacet& toFacet)
+Weight Chi2FacetRelationFilter::operator()(const CDCFacet& fromFacet, const CDCFacet& toFacet)
 {
   if (fromFacet.getStartWire() == toFacet.getEndWire()) return NAN;
 
-  int nSteps = 0;
-  UncertainParameterLine2D fitLine = FacetFitter::fit(fromFacet, toFacet, nSteps);
-  double chi2 = fitLine.chi2();
+  constexpr const int nSteps = 0;
+  const UncertainParameterLine2D fitLine = FacetFitter::fit(fromFacet, toFacet, nSteps);
+  const double chi2 = fitLine.chi2();
 
   if (chi2 > m_param_chi2Cut or std::isnan(chi2)) {
     return NAN;

@@ -7,26 +7,26 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/filters/facet/SimpleFacetFilter.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <framework/logging/Logger.h>
+#include <framework/core/ModuleParamList.h>
+
 #include <cmath>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-SimpleFacetFilter::SimpleFacetFilter():
-  m_param_deviationCosCut(cos(M_PI / 180.0 * 9))
+SimpleFacetFilter::SimpleFacetFilter()
+  : m_param_deviationCosCut(std::cos(M_PI / 180.0 * 9))
 {
 }
 
-
-SimpleFacetFilter::SimpleFacetFilter(double deviationCosCut):
-  m_param_deviationCosCut(deviationCosCut)
+SimpleFacetFilter::SimpleFacetFilter(double deviationCosCut)
+  : m_param_deviationCosCut(deviationCosCut)
 {
 }
 
@@ -46,25 +46,19 @@ Weight SimpleFacetFilter::operator()(const CDCFacet& facet)
   facet.adjustFitLine();
 
   const ParameterLine2D& startToMiddle = facet.getStartToMiddleLine();
-  const ParameterLine2D& startToEnd    = facet.getStartToEndLine();
-  const ParameterLine2D& middleToEnd   = facet.getMiddleToEndLine();
+  const ParameterLine2D& startToEnd = facet.getStartToEndLine();
+  const ParameterLine2D& middleToEnd = facet.getMiddleToEndLine();
 
   const double startCos  = startToMiddle.tangential().cosWith(startToEnd.tangential());
   // const double middleCos = startToMiddle.tangential().cosWith(middleToEnd.tangential());
   const double endCos = startToEnd.tangential().cosWith(middleToEnd.tangential());
 
-  /* cut on the angle of */
+  // cut on the angle of
   if (startCos > m_param_deviationCosCut and endCos > m_param_deviationCosCut) {
-
-    //Good facet contains three points of the track
+    // Good facet contains three points of the track
     // the amount carried by this facet can the adjusted more realistically
     return 3;
-
   } else {
-
-    //B2DEBUG(200,"Rejected facet because flight directions do not match");
     return NAN;
-
   }
-
 }

@@ -2,6 +2,7 @@
 
 #include "daq/slc/apps/nsm2socket/NSM2SocketCallback.h"
 
+#include <daq/slc/runcontrol/RCCommand.h>
 #include <daq/slc/nsm/NSMCommunicator.h>
 #include <daq/slc/nsm/NSMNodeDaemon.h>
 
@@ -92,7 +93,11 @@ void NSM2SocketBridge::run() throw()
         NSMNode node(msg.getNodeName());
         NSMVar var;
         m_reader.readObject(var);
-        m_callback->send(NSMMessage(node, var));
+        if (var.getName() == "rcreq") {
+          m_callback->send(NSMMessage(node, RCCommand(var.getText())));
+        } else {
+          m_callback->send(NSMMessage(node, var));
+        }
       } else {
         m_callback->send(msg);
       }

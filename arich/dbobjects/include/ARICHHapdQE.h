@@ -30,7 +30,7 @@ namespace Belle2 {
      * Constructor
      */
 
-    ARICHHapdQE(std::string serial, TH2F* qe): m_serial(serial), m_quantumEfficiency2D(qe) { };
+    ARICHHapdQE(const std::string& serial, TH2F* qe): m_serial(serial), m_quantumEfficiency2D(qe) { };
 
     /**
      * Destructor

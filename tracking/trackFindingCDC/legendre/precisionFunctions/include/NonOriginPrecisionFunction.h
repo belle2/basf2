@@ -37,15 +37,20 @@ namespace Belle2 {
         m_function = [&](double r_qt) -> double {
           double res;
           if ((convertRhoToPt(fabs(r_qt)) > 3.) && (r_qt != 0))
+          {
             r_qt = fabs(convertPtToRho(3.)) * r_qt / fabs(r_qt);
+          }
 
           if (r_qt != 0)
-            if (convertRhoToPt(fabs(r_qt)) < 0.36)
+          {
+            if (convertRhoToPt(fabs(r_qt)) < 0.36) {
               res = exp(-0.356965 - 0.00186066 * convertRhoToPt(fabs(r_qt))) - 0.697526;
-            else
+            } else {
               res = exp(-0.357335 + 0.000438872 * convertRhoToPt(fabs(r_qt))) - 0.697786;
-          else
+            }
+          } else {
             res = 0.00005;
+          }
           B2DEBUG(100, "non origin: res = " << res << "; r = " << r_qt);
           return res;
         };

@@ -11,6 +11,7 @@ import queue
 import webbrowser
 from multiprocessing import Process, Queue
 from validationplots import create_plots
+import validationpath
 import functools
 
 g_plottingProcesses = {}
@@ -97,7 +98,7 @@ def check_plotting_status(progress_key):
 
 
 # todo: limit the number of running plotting requests and terminate hanging ones
-def start_plotting_request(revision_names):
+def start_plotting_request(revision_names, results_folder):
     """
     Start a new comparison between the supplied revisions
     """
@@ -113,7 +114,11 @@ def start_plotting_request(revision_names):
     qu = Queue()
 
     # start a new process for creating the plots
-    p = Process(target=create_plots, args=(revision_names, False, qu))
+    p = Process(target=create_plots, args=(revision_names, False, qu,
+                                           # go one folder up, because this function
+                                           # expects the work dir, which then contains
+                                           # the results folder
+                                           os.path.dirname(results_folder)))
     p.start()
     g_plottingProcesses[rev_key] = (p, qu, None)
 
@@ -152,7 +157,7 @@ class ValidationRoot(object):
         """
         rev_list = cherrypy.request.json["revision_list"]
         logging.debug('Creating plots for revisions: ' + str(rev_list))
-        progress_key = start_plotting_request(rev_list)
+        progress_key = start_plotting_request(rev_list, self.results_folder)
         return {"progress_key": progress_key}
 
     @cherrypy.expose
@@ -166,7 +171,7 @@ class ValidationRoot(object):
     @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
-    def create_comparison_status(self):
+    def check_comparison_status(self):
         """
         Checks on the status of a comparison creation
         """
@@ -188,7 +193,7 @@ class ValidationRoot(object):
 
         # always add the reference revision
         combined_list = []
-        reference_revision = json.loads(json_objects.dumps(json_objects.Revision("reference", None, "black")))
+        reference_revision = json.loads(json_objects.dumps(json_objects.Revision(label="reference")))
 
         # load and combine
         for r in rev_list:
@@ -212,7 +217,16 @@ class ValidationRoot(object):
             rdate_str = r["creation_date"]
             if isinstance(rdate_str, str):
                 if len(rdate_str) > 0:
-                    rdate = time.strptime(rdate_str, "%Y-%m-%d %H:%M:%S")
+                    try:
+                        rdate = time.strptime(rdate_str, "%Y-%m-%d %H:%M")
+                    except ValueError:
+                        # some old validation results might still contain seconds
+                        # and therefore cannot properly be converted
+                        rdate = None
+
+                    if rdate is None:
+                        continue
+
                     if newest_date is None:
                         newest_date = rdate
                         newest_rev = r
@@ -240,6 +254,11 @@ class ValidationRoot(object):
 
         # todo: ensure this file is not outside of the webserver
         full_path = os.path.join(self.comparison_folder, comparison_label, "comparison.json")
+
+        # check if this comparison actually exists
+        if not os.path.isfile(full_path):
+            raise cherrypy.HTTPError(404, "Json Comparison file {} does not exist".format(full_path))
+
         return deliver_json(full_path)
 
 
@@ -279,28 +298,24 @@ def parse_cmd_line_arguments():
     parser.add_argument("-v", "--view", help="Open validation website"
                         " in the system's default browser.",
                         action='store_true')
+
     # Return the parsed arguments!
     return parser.parse_args()
 
 
-def run_server(ip='127.0.0.1', port=8000, parseCommandLine=False, openSite=False):
+def run_server(ip='127.0.0.1', port=8000, parseCommandLine=False, openSite=False, dryRun=False):
 
     # Setup options for logging
     logging.basicConfig(level=logging.DEBUG,
                         format='%(asctime)s %(levelname)-8s %(message)s',
                         datefmt='%H:%M:%S')
 
+    basepath = validationpath.get_basepath()
+    cwd_folder = os.getcwd()
+
     # Only execute the program if a basf2 release is set up!
     if os.environ.get('BELLE2_RELEASE', None) is None:
         sys.exit('Error: No basf2 release set up!')
-
-    # Make sure the output of validate_basf2.py is there
-    if not os.path.isdir('html/results'):
-        sys.exit('Error: No html/results '
-                 'dir found! Run validate_basf2.py first.')
-
-    # Go to the html directory
-    os.chdir('html')
 
     cherry_config = dict()
     # just empty, will be filled below
@@ -308,19 +323,48 @@ def run_server(ip='127.0.0.1', port=8000, parseCommandLine=False, openSite=False
     # will ensure also the json requests are gzipped
     setup_gzip_compression("/", cherry_config)
 
-    var_b2_local_dir = "BELLE2_LOCAL_DIR"
+    # check if static files are provided via central release
+    static_folder_list = ["validation", "html_static"]
+    static_folder = None
 
-    if var_b2_local_dir not in os.environ:
-        logging.fatal("{} hast to be set, exiting".format(var_b2_local_dir))
-        return
+    if basepath["central"] is not None:
+        static_folder_central = os.path.join(basepath["central"], *static_folder_list)
+        if os.path.isdir(static_folder_central):
+            static_folder = static_folder_central
 
-    # get local directory of the belle 2 release
-    local_dir = os.environ[var_b2_local_dir]
+    # check if there is also a collection of static files in the local release
+    # this overwrites the usage of the central release
+    if basepath["local"] is not None:
+        static_folder_local = os.path.join(basepath["local"], *static_folder_list)
+        if os.path.isdir(static_folder_local):
+            static_folder = static_folder_local
+
+    if static_folder is None:
+        sys.exit("Either BELLE2_RELEASE_DIR or BELLE2_LOCAL_DIR has to bet to provide static HTML content. Did you run setuprel ?")
 
     # join the paths of the various result folders
-    results_folder = os.path.join(local_dir, "results")
-    comparison_folder = os.path.join(local_dir, "html", "plots")
-    static_folder = os.path.join(local_dir, "validation", "html_static")
+    results_folder = validationpath.get_results_folder(cwd_folder)
+    comparison_folder = validationpath.get_html_plots_folder(cwd_folder)
+
+    logging.info("Serving static content from {}".format(static_folder))
+    logging.info("Serving result content and plots from {}".format(cwd_folder))
+
+    # check if the results folder exists and has at least one folder
+    if not os.path.isdir(results_folder):
+        sys.exit("Result folder {} does not exist, run validate_basf2 first to create validation output".format(results_folder))
+
+    results_count = sum([os.path.isdir(os.path.join(results_folder, f)) for f in os.listdir(results_folder)])
+    if results_count == 0:
+        sys.exit("Result folder {} contains no folders, " +
+                 "run validate_basf2 first to create validation output".format(results_folder))
+
+    # Go to the html directory
+    if not os.path.exists('html'):
+        os.mkdir('html')
+    os.chdir('html')
+
+    if not os.path.exists('plots'):
+        os.mkdir('plots')
 
     # export js, css and html templates
     cherry_config["/static"] = {
@@ -369,9 +413,10 @@ def run_server(ip='127.0.0.1', port=8000, parseCommandLine=False, openSite=False
     if openSite:
         webbrowser.open("http://" + ip + ":" + str(port))
 
-    cherrypy.quickstart(ValidationRoot(results_folder=results_folder,
-                                       comparison_folder=comparison_folder),
-                        '/', cherry_config)
+    if not dryRun:
+        cherrypy.quickstart(ValidationRoot(results_folder=results_folder,
+                                           comparison_folder=comparison_folder),
+                            '/', cherry_config)
 
 
 if __name__ == '__main__':

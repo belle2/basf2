@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
-#include <tracking/trackFindingCDC/ca/Relation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 #include <boost/range/iterator_range.hpp>
 
@@ -35,23 +35,16 @@ namespace Belle2 {
                            const ACDCSegmentTripleIterator& itEnd)
       {
 
-        const CDCAxialRecoSegment2D* endSegment = triple.getEndSegment();
+        const CDCAxialSegment2D* endSegment = triple.getEndSegment();
         std::pair<ACDCSegmentTripleIterator,  ACDCSegmentTripleIterator> itPairPossibleNeighbors = std::equal_range(itBegin, itEnd,
             endSegment);
         return boost::iterator_range<ACDCSegmentTripleIterator>(itPairPossibleNeighbors.first, itPairPossibleNeighbors.second);
 
       }
 
-      /// Legacy method
-      virtual Weight isGoodNeighbor(const CDCSegmentTriple& from,
-                                    const CDCSegmentTriple& to) final {
-
-        return operator()(from, to);
-      }
-
       /// Main filter method returning the weight of the neighborhood relation. Return NAN if relation shall be rejected.
-      virtual Weight operator()(const CDCSegmentTriple& /* from */,
-                                const CDCSegmentTriple& /* to */)
+      virtual Weight operator()(const CDCSegmentTriple& from  __attribute__((unused)),
+                                const CDCSegmentTriple& to  __attribute__((unused)))
       {
         return NAN;
       }
@@ -59,17 +52,13 @@ namespace Belle2 {
       /** Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.*/
-      virtual Weight operator()(const Relation<const CDCSegmentTriple>& relation) override final
+      Weight operator()(const Relation<const CDCSegmentTriple>& relation) override
       {
         const CDCSegmentTriple* ptrFrom(relation.first);
         const CDCSegmentTriple* ptrTo(relation.second);
-        if (not ptrFrom or not ptrTo) return NAN;
+        if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
         return operator()(*ptrFrom, *ptrTo);
       }
-
-
-    }; // end class
-
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
-
+    };
+  }
+}

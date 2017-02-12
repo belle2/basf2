@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import basf2
-
-from tracking.run.event_generation import ReadOrGenerateEventsRun
-from tracking.metamodules import IfMCParticlesPresentModule, IfStoreArrayPresentModule
-
 import tracking
-import tracking.utilities as utilities
+
+from tracking.metamodules import IfMCParticlesPresentModule, IfStoreArrayPresentModule
+from . import utilities
+from .event_generation import ReadOrGenerateEventsRun
 
 import logging
 
@@ -17,43 +16,47 @@ def get_logger():
 
 
 class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
+    #: Descriptio fof the run setup to be displayed on command line
+    description = "Apply tracking to presimulated events or events generated on the fly."
+
+    #: Name of the finder module to be used - can be everything that is accepted by tracking.run.utilities.extend_path
     finder_module = None
+
     #: States which detectors the finder module covers like as a dictionary like
-    #: {'UsePXDHits': True, 'UseSVDHits': True,'UseCDCHits': True, 'UseOnlyAxialCDCHits': False}
-    tracking_coverage = {}
-    fit_geometry = None  # Determines which fit geometry should be used.
-    fit_tracks = False  # If true, tracks will be fitted after they have been found
-    # This flag is ignored when running the full reco chain
-    trackCandidatesColumnName = 'RecoTracks'
+    tracking_coverage = {
+        'UsePXDHits': True,
+        'UseSVDHits': True,
+        'UseCDCHits': True,
+        'UseOnlyAxialCDCHits': False,
+        'WhichParticles': ['primary'],
+        'EnergyCut': 0.1,
+    }
+
+    #: Add the track fitting to the execution
+    fit_tracks = False
 
     def create_argument_parser(self, **kwds):
-        argument_parser = super(ReadOrGenerateTrackedEventsRun, self).create_argument_parser(**kwds)
+        argument_parser = super().create_argument_parser(**kwds)
 
-        # Indication if tracks should be fitted with which geomety
-        # Currently tracks are not fitted because of a segmentation fault related TGeo / an assertation error in Geant4 geometry.
-        # Geometry name to be used in the Genfit extrapolation.
-        argument_parser.add_argument(
+        tracking_argument_group = argument_parser.add_argument_group("Tracking setup arguments")
+
+        tracking_argument_group.add_argument(
             '-f',
             '--finder',
-            choices=utilities.NonstrictChoices(['StandardReco',
-                                                'VXDTF',
-                                                'TrackFinderCDCAutomaton',
-                                                'TrackFinderCDCLegendreTracking',
-                                                'Trasan',
-                                                ]),
+            choices=utilities.NonstrictChoices(finder_modules_by_short_name.keys()),
             default=self.finder_module,
             dest='finder_module',
             help='Name of the finder module to be evaluated.',)
 
-        argument_parser.add_argument(
-            '--fit-geometry',
-            choices=['TGeo', 'Geant4', 'default'],
-            default=self.fit_geometry,
-            dest='fit_geometry',
-            help='Geometry to be used with Genfit. If unset no fit is performed'
+        tracking_argument_group.add_argument(
+            '--fit',
+            action="store_true",
+            default=self.fit_tracks,
+            dest='fit_tracks',
+            help='Apply the fitting to the found tracks'
         )
 
-        argument_parser.add_argument(
+        tracking_argument_group.add_argument(
             '-so',
             '--simulate-only',
             action='store_true',
@@ -63,177 +66,112 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
 
         return argument_parser
 
-    @staticmethod
-    def get_module_param(module, name):
-        parameters = module.available_params()
-        for parameter in parameters:
-            if name == parameter.name:
-                return parameter.values
-            else:
-                raise AttributeError('%s module does not have a parameter named %s' % (module, name))
-
-    def determine_tracking_coverage(self, finder_module_or_name):
-        # Use value overwritten in the concrete subclass
-        if self.tracking_coverage:
-            return self.tracking_coverage
-
-        # Else try to determine it from the module name
-        finder_module_name = self.get_basf2_module_name(finder_module_or_name)
-
-        if (finder_module_name == 'TrackFinderCDCLegendreTracking' or
-                finder_module_name.startswith("TrackFinderCDCAxial")):
-            return {'UsePXDHits': False,
-                    'UseSVDHits': False,
-                    'UseCDCHits': True,
-                    'UseOnlyAxialCDCHits': True}
-
-        elif (finder_module_name in ('add_cdc_track_finding', 'Trasan') or
-                finder_module_name.startswith('TrackFinderCDC')):
-            return {'UsePXDHits': False,
-                    'UseSVDHits': False,
-                    'UseCDCHits': True,
-                    'UseOnlyAxialCDCHits': False}
-
-        elif finder_module_name == 'VXDTF':
-            return {'UsePXDHits': True,
-                    'UseSVDHits': True,
-                    'UseCDCHits': False,
-                    'UseOnlyAxialCDCHits': False}
-
-        elif finder_module_name in ("add_tracking_reconstruction", 'StandardReco', 'StandardTrackingReconstruction'):
-            return {'UsePXDHits': 'PXD' in self.components,
-                    'UseSVDHits': 'SVD' in self.components,
-                    'UseCDCHits': 'CDC' in self.components,
-                    'UseOnlyAxialCDCHits': False}
-
-        elif finder_module_name == 'TrackFinderMCTruthRecoTracks':
-            if isinstance(finder_module_or_name, basf2.Module):
-                return {'UsePXDHits': self.get_module_param(finder_module_or_name, 'UsePXDHits'),
-                        'UseSVDHits': self.get_module_param(finder_module_or_name, 'UseSVDHits'),
-                        'UseCDCHits': self.get_module_param(finder_module_or_name, 'UseCDCHits'),
-                        'UseOnlyAxialCDCHits': False}
-            else:
-                return {'UsePXDHits': 'PXD' in self.components,
-                        'UseSVDHits': 'SVD' in self.components,
-                        'UseCDCHits': 'CDC' in self.components,
-                        'UseOnlyAxialCDCHits': False}
-        else:
-            get_logger().info('Could not determine tracking coverage for module name %s. '
-                              'Using the default of the MCRecoTracksMatcherModule',
-                              finder_module_name)
-            return {}
-
     def create_path(self):
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
-        main_path = super(ReadOrGenerateTrackedEventsRun, self).create_path()
+        path = super().create_path()
 
         # early return if only a simulation run was requested
         if self.simulate_only:
-            return main_path
+            return path
 
         # setting up fitting is only necessary when testing
         # track finding comonenst ex-situ
-        if (self.fit_geometry and
-                self.finder_module != 'StandardReco'):
-
-            # Prepare Genfit extrapolation
-            setup_genfit_extrapolation_module = basf2.register_module('SetupGenfitExtrapolation')
-
-            # only set if the default is not requested
-            if not self.fit_geometry == "default":
-                setup_genfit_extrapolation_module.param({'whichGeometry': self.fit_geometry})
-            main_path.add_module(setup_genfit_extrapolation_module)
+        if self.fit_tracks:
+            if 'SetupGenfitExtrapolation' not in path:
+                # Prepare Genfit extrapolation
+                path.add_module('SetupGenfitExtrapolation')
 
         if self.finder_module is not None:
             # Setup track finder
+            utilities.extend_path(path,
+                                  self.finder_module,
+                                  finder_modules_by_short_name,
+                                  allow_function_import=True)
+
             # determine which sub-detector hits will be used
-            tracking_coverage = self.determine_tracking_coverage(self.finder_module)
+            tracking_coverage = dict(self.tracking_coverage)
 
-            if self.finder_module == 'StandardReco':
-                track_finder_module = StandardTrackingReconstructionModule(components=self.components)
-                main_path.add_module(track_finder_module)
-
-            elif callable(self.finder_module):
-                # finder module is a convenience function
-                self.finder_module(main_path)
-
-            else:
-                track_finder_module = self.get_basf2_module(self.finder_module)
-                main_path.add_module(track_finder_module)
-
-            # check for detector geometry, necessary for track extrapolation in genfit
-            if 'MCRecoTracksMatcher' not in main_path:
+            # Include the mc tracks if the monte carlo data is presentx
+            if 'MCRecoTracksMatcher' not in path:
                 # Reference Monte Carlo tracks
                 track_finder_mc_truth_module = basf2.register_module('TrackFinderMCTruthRecoTracks')
                 track_finder_mc_truth_module.param({
-                    'WhichParticles': ['primary'],
-                    'EnergyCut': 0.1,
-                    'RecoTracksStoreArrayName': 'MCRecoTracks'
+                    'RecoTracksStoreArrayName': 'MCRecoTracks',
+                    **tracking_coverage
                 })
-                track_finder_mc_truth_module.param(tracking_coverage)
 
                 # Track matcher
                 mc_track_matcher_module = basf2.register_module('MCRecoTracksMatcher')
+
+                tracking_coverage.pop("WhichParticles", None)
+                tracking_coverage.pop("EnergyCut", None)
+                tracking_coverage.pop("UseNLoops", None)
                 mc_track_matcher_module.param({
                     'mcRecoTracksStoreArrayName': 'MCRecoTracks',
                     'MinimalPurity': 0.66,
-                    'RelateClonesToMCParticles': True,
                     'prRecoTracksStoreArrayName': "RecoTracks",
-                    'UsePXDHits': tracking_coverage.get('UsePXDHits', True),
-                    'UseSVDHits': tracking_coverage.get('UseSVDHits', True),
-                    'UseCDCHits': tracking_coverage.get('UseCDCHits', True),
+                    **tracking_coverage
                 })
 
-                main_path.add_module(IfMCParticlesPresentModule(track_finder_mc_truth_module))
-                main_path.add_module(IfMCParticlesPresentModule(mc_track_matcher_module))
+                path.add_module(IfMCParticlesPresentModule(track_finder_mc_truth_module))
+                path.add_module(IfMCParticlesPresentModule(mc_track_matcher_module))
 
         if self.fit_tracks:
             # Fit tracks
             gen_fitter_module = basf2.register_module('DAFRecoFitter')
             gen_fitter_module.param({'pdgCodesToUseForFitting': [13]})
-            main_path.add_module(gen_fitter_module)
-
+            path.add_module(gen_fitter_module)
             trackbuilder = basf2.register_module('TrackCreator', defaultPDGCode=13)
-            main_path.add_module(trackbuilder)
+            path.add_module(trackbuilder)
 
-        return main_path
+        return path
+
+
+def add_standard_finder(path):
+    import tracking
+    components = None
+    for module in path.modules():
+        if module.type() == "Geometry":
+            components = utilities.get_module_param(module, "components")
+    if not components:
+        components = None
+
+    if 'SetupGenfitExtrapolation' not in path:
+        path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
+
+    tracking.add_track_finding(path, components=components)
+
+
+def add_standard_reconstruction(path):
+    import reconstruction
+    components = None
+    for module in path.modules():
+        if module.type() == "Geometry":
+            components = utilities.get_module_param(module, "components")
+    if not components:
+        components = None
+    reconstruction.add_reconstruction(path, components=components)
+
+finder_modules_by_short_name = {
+    'MC': 'TrackFinderMCTruthRecoTracks',
+    'Reconstruction': add_standard_reconstruction,
+    'TrackFinder': add_standard_finder,
+    'TrackFinderCDC': tracking.add_cdc_track_finding,
+    'TrackFinderVXD': tracking.add_vxd_track_finding,
+    'TrackFinderCDCLegendre': lambda path: (path.add_module('WireHitPreparer'),
+                                            path.add_module('TrackFinderCDCLegendreTracking')),
+    'SegmentFinderCDC': lambda path: (path.add_module('WireHitPreparer'),
+                                      path.add_module('SegmentFinderCDCFacetAutomaton'),
+                                      path.add_module('TrackCreatorSingleSegments',
+                                                      MinimalHitsBySuperLayerId={sl_id: 0 for sl_id in range(9)}),
+                                      path.add_module('TrackExporter'),
+                                      ),
+}
 
 
 class StandardReconstructionEventsRun(ReadOrGenerateTrackedEventsRun):
     generator_module = 'EvtGenInput'
 
-    def finder_module(self, main_path):
-        tracking.add_tracking_reconstruction(main_path, components=self.components)
-
-
-def main():
-    generateTrackedEventsRun = StandardReconstructionEventsRun()
-
-    # Allow presimulated events to be tracked in a second step
-    allow_input = True
-    argument_parser = generateTrackedEventsRun.create_argument_parser(allow_input=allow_input)
-
-    argument_parser.add_argument('root_output_file',
-                                 help='Output file to which the simulated events shall be written.')
-
-    arguments = argument_parser.parse_args()
-
-    # Configure the read or event generation from the command line
-    generateTrackedEventsRun.configure(arguments)
-
-    # Add the output module
-    root_output_file_path = arguments.root_output_file
-    root_output_module = basf2.register_module('RootOutput')
-    root_output_params = {'outputFileName': root_output_file_path}
-    root_output_module.param(root_output_params)
-
-    generateTrackedEventsRun.add_module(root_output_module)
-
-    # Execute the run
-    generateTrackedEventsRun.execute()
-
-
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
-    main()
+    def finder_module(self, path):
+        tracking.add_tracking_reconstruction(path, components=self.components)

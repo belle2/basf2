@@ -10,28 +10,33 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/segmentPair/SegmentPairFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/BaseSegmentPairFilter.h>
+
 #include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.h>
+
+#include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
+
+#include <vector>
+#include <string>
+#include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegmentPair;
 
-    /// Records the encountered CDCSegmentPairs.
+    /// Filter to record multiple chooseable variable sets for segment pairs
     class UnionRecordingSegmentPairFilter: public UnionRecordingFilter<SegmentPairFilterFactory> {
 
     private:
       /// Type of the base class
-      typedef  UnionRecordingFilter<SegmentPairFilterFactory> Super;
+      using Super = UnionRecordingFilter<SegmentPairFilterFactory>;
 
     public:
-      /// Valid names of variable sets for segment pairs.
-      virtual std::vector<std::string> getValidVarSetNames() const override;
+      /// Get the valid names of variable sets for segment pairs.
+      std::vector<std::string> getValidVarSetNames() const final;
 
       /// Create a concrete variables set for segment pairs from a name.
-      virtual
       std::unique_ptr<BaseVarSet<CDCSegmentPair> >
-      createVarSet(const std::string& name) const override;
-
+      createVarSet(const std::string& name) const final;
     };
   }
 }

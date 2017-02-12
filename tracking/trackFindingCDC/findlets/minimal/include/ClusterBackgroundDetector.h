@@ -9,67 +9,42 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/cluster/BaseClusterFilter.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <tracking/trackFindingCDC/filters/cluster/ChooseableClusterFilter.h>
+
 #include <vector>
-#include <iterator>
-#include <memory>
+#include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
+    class CDCWireHitCluster;
 
     /// Marks clusters as background based on a background measure
-    template<class ClusterFilter = BaseClusterFilter>
-    class ClusterBackgroundDetector :
-      public Findlet<CDCWireHitCluster&> {
+    class ClusterBackgroundDetector : public Findlet<CDCWireHitCluster&> {
 
     private:
       /// Type of the base class
-      typedef Findlet<CDCWireHitCluster&> Super;
+      using Super = Findlet<CDCWireHitCluster&>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
-      ClusterBackgroundDetector()
-      {
-        addProcessingSignalListener(&m_clusterFilter);
-      }
+      ClusterBackgroundDetector();
 
       /// Short description of the findlet
-      virtual std::string getDescription() override
-      {
-        return "Marks clusters as background if the used filter detectes them as such";
-      }
+      std::string getDescription() final;
 
-      /// Expose the parameters of the cluster filter to a module
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
-      {
-        m_clusterFilter.exposeParameters(moduleParamList, prefix);
-      }
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Main algorithm applying the cluster background detection
-      virtual void apply(std::vector<CDCWireHitCluster>& outputClusters) override final
-      {
-        for (CDCWireHitCluster& cluster : outputClusters) {
-          CellWeight clusterWeight = m_clusterFilter(cluster);
-          if (isNotACell(clusterWeight)) {
-            // Cluster detected as background
-            cluster.setBackgroundFlag(true);
-            for (const CDCWireHit* wireHit : cluster) {
-              wireHit->getAutomatonCell().setBackgroundFlag();
-              wireHit->getAutomatonCell().setTakenFlag();
-            }
-          }
-        }
-      }
+      void apply(std::vector<CDCWireHitCluster>& outputClusters) final;
 
     private:
-      /// Reference to the filter to be used to filter background
-      ClusterFilter m_clusterFilter;
-
-    }; // end class ClusterBackgroundDetector
-
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+      /// Chooseable cluster filter to be used to filter background
+      ChooseableClusterFilter m_clusterFilter;
+    };
+  }
+}

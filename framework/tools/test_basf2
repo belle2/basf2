@@ -15,6 +15,10 @@ from concurrent.futures import ThreadPoolExecutor
 import threading
 import argparse
 import re
+import datetime
+import timeit
+import xml.etree.cElementTree as ET
+from collections import defaultdict
 
 # allow stopping tests with Ctrl+c
 import signal
@@ -43,11 +47,26 @@ def compare_log(template_file, log, ignore_lines=0, diff_lines=10):
                 # decode/encode first
                 sys.stdout.buffer.write(b"\n".join(diff[2:2 + diff_lines]))
                 sys.stdout.buffer.write(b"\n")
+                sys.stdout.buffer.flush()
             return False
         else:
             return True
 
     return None
+
+
+def format_output(name, out, err):
+    """Nicely format the stdout and stderr of testcase called name"""
+    if options.quiet:
+        return ""
+    output = []
+    if out.strip():
+        output += ["=== stdout of %s ===\n" % name, out.decode()]
+    if err.strip():
+        output += ["=== stderr of %s ===\n" % name, err.decode()]
+    if len(output):
+        output.append("=== end %s ===\n" % name)
+    return "".join(output)
 
 
 def run_test(argument):
@@ -56,55 +75,58 @@ def run_test(argument):
     global options
     global print_lock
 
-    # output on dump terminal to avoid ESC[?1034h in output
+    # output on dumb terminal to avoid ESC[?1034h in output
     # happens when loading readline https://bugzilla.redhat.com/show_bug.cgi?id=304181
     os.putenv('TERM', 'vt100')
 
     name, release_dir = argument
     steering = os.path.join(release_dir, name)
-    # print 'starting test %s' % name
-    process = subprocess.Popen(['basf2', steering], stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE)
-    (out, err) = process.communicate()
     result = None
     message = None
+    extra = ""
+    time_start = timeit.default_timer()
+    try:
+        process = subprocess.run(['basf2', steering], stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE, timeout=options.timeout)
+    except subprocess.TimeoutExpired as e:
+        # apparently test case took to long so format result message. Without
+        # timeout result would be None so we can distinguish later.
+        result = False
+        message = "timeout of %d seconds reached" % options.timeout
+        extra = format_output(name, e.stderr, e.stdout)
+
+    time = timeit.default_timer() - time_start
+
     with print_lock:
-        if process.returncode != 0:
+        if result is False:
+            # timeout happened, everything is already setup
+            pass
+        elif process.returncode != 0:
             # check for skipped test
-            skipped = re.search(b"^TEST SKIPPED:\s*(.+)$", err, re.MULTILINE)
+            skipped = re.search(b"^TEST SKIPPED:\s*(.+)$", process.stderr, re.MULTILINE)
             if skipped:
                 result = None
                 message = skipped.group(1).decode()
             else:
                 result = False
                 message = "return code %d" % process.returncode
-
+                extra = format_output(name, process.stdout, process.stderr)
         else:
-            log_tests = [compare_log(steering[:-2] + 'out', out, 1, options.diff_lines),
-                         compare_log(steering[:-2] + 'err', err, 0, options.diff_lines)]
+            log_tests = [compare_log(steering[:-2] + 'out', process.stdout, 1, options.diff_lines),
+                         compare_log(steering[:-2] + 'err', process.stderr, 0, options.diff_lines)]
             if log_tests[0] is None and log_tests[1] is None:
                 result = True
                 message = "finished successfully"
-            elif not (log_tests[0] == False or log_tests[1] == False):
+            elif not (log_tests[0] is False or log_tests[1] is False):
                 result = True
                 message = "logs ok"
             else:
                 result = False
                 message = "logs differ"
 
-        extra = ""
-        if not options.quiet and process.returncode != 0:
-            output = []
-            if out.strip():
-                output += ["=== stdout of %s ===\n" % name, out.decode()]
-            if err.strip():
-                output += ["=== stderr of %s ===\n" % name, err.decode()]
-            if len(output):
-                output.append("=== end %s ===\n" % name)
-            extra = "".join(output)
-
-        print("%sfinished test %s\n     -> %s: %s" % (extra, name, {True: "passed", None: "skipped", False: "FAILED"}[result], message))
-    return (result, message)
+        result_message = {True: "passed", None: "skipped", False: "FAILED"}[result]
+        print("%sfinished test %s\n     -> %s: %s" % (extra, name, result_message, message), flush=True)
+    return (result, message, time)
 
 
 def process_dir(dir, release_dir):
@@ -157,6 +179,9 @@ parser.add_argument("--filter", type=str, default=None, help="If given only run 
                     "of the steering file matches the regular expression given")
 parser.add_argument("directories", nargs="*", help="run all tests included in these directories. "
                     "If none are specified run all tests")
+parser.add_argument("-t", "--timeout", type=int, default=None, metavar="SECONDS",
+                    help="if given this is the maximum runtime in seconds for each "
+                    "test case before they are killed and marked as failed")
 options = parser.parse_args()
 
 # check whether a release is set up
@@ -165,6 +190,7 @@ if not ('BELLE2_LOCAL_DIR' in os.environ or 'BELLE2_RELEASE_DIR' in os.environ):
     sys.exit(-1)
 
 # first let's collect all tests
+print("running steering file tests in %d %s" % (options.nprocess, "process" if options.nprocess == 1 else "processes"), flush=True)
 all_tests = []
 processed_dirs = []
 if "BELLE2_LOCAL_DIR" in os.environ:
@@ -183,44 +209,78 @@ if options.filter is not None:
     all_tests = [e for e in all_tests if re_filter.search(e[0]) is not None]
 
 all_tests.sort()
-print("Collected %d tests..." % len(all_tests))
+print("Collected %d tests..." % len(all_tests), flush=True)
 
 # now let's run them, either in multiprocessing or in a single process
 if options.nprocess > 1:
     with ThreadPoolExecutor(max_workers=options.nprocess) as pool:
-        results = pool.map(run_test, all_tests)
+        # run tests in multiple threads but consume the iterator right away to
+        # avoid a bug in python 3.5 when zipping over a futures result iterator
+        # and then exiting using sys.exit().
+        results = list(pool.map(run_test, all_tests))
 else:
     results = map(run_test, all_tests)
 
-tests_passed = 0
-tests_failed = 0
-tests_skipped = 0
+
+class TestSuite(list):
+    """Class to aggregate test case results by directory"""
+    def __init__(self):
+        """Init the suite with empty values"""
+        #: number of passed tests in the suite/package
+        self.passed = 0
+        #: number of failed tests in the suite/package
+        self.failed = 0
+        #: number of skippedtests in the suite/package
+        self.skipped = 0
+        #: time in seconds needed for test execution
+        self.time = 0
+
+    def add(self, name, passed, message, time):
+        """Add a new test to the suite. Return True if test was successful or
+        skipped, False if it failed"""
+        self.append((name, passed, message, time))
+        self.time += time
+        if passed is True:
+            self.passed += 1
+        elif passed is False:
+            self.failed += 1
+        else:
+            self.skipped += 1
+        return (passed is not False)
+
 # and present the results
-for passed, message in results:
-    if passed is True:
-        tests_passed += 1
-    elif passed is False:
-        tests_failed += 1
-    else:
-        tests_skipped += 1
+test_results = TestSuite()
+test_suites = defaultdict(TestSuite)
+tests_failed = []
+for (test, release_dir), result in zip(all_tests, results):
+    if not test_results.add(test, *result):
+        tests_failed.append(test)
+    suite = os.path.dirname(test)
+    if suite.endswith("/tests"):
+        suite = os.path.dirname(suite)
+    test_suites[suite].add(test, *result)
 
 if options.xml and len(all_tests):
-    total_tests = len(all_tests)
-    xml_file = open(options.xml, 'w')
-    xml_file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-    xml_file.write('<testsuites tests="%d" failures="%d" skipped="%d">\n' %
-                   (total_tests, tests_failed, tests_skipped))
-    for (name, release_dir), (passed, message) in zip(all_tests, results):
-        xml_file.write('  <testcase name="%s"' % name)
-        if passed is False:
-            xml_file.write('>\n    <failure message="%s">\n    </failure>\n  </testcase>\n' % message)
-        elif passed is None:
-            xml_file.write('>\n    <skipped message="%s">\n    </skipped>\n  </testcase>\n' % message)
-        else:
-            xml_file.write(' />\n')
-    xml_file.write('</testsuites>\n')
-    xml_file.close()
+    # now let's make the xml
+    root_el = ET.Element("testsuites", tests=str(len(test_results)), failures=str(test_results.failed),
+                         skipped=str(test_results.skipped), timestamp=datetime.datetime.now().isoformat(),
+                         time=str(test_results.time), name="Basf2 Tests")
+    for suite, tests in sorted(test_suites.items()):
+        suite_el = ET.SubElement(root_el, "testsuite", name=suite, tests=str(len(tests)),
+                                 failures=str(tests.failed), skipped=str(tests.skipped), time=str(tests.time))
+        for name, passed, message, time in tests:
+            test_el = ET.SubElement(suite_el, "testcase", name=os.path.basename(name),
+                                    classname=suite, time=str(time))
+            if passed is not True:
+                ET.SubElement(test_el, "failure" if passed is False else "skipped", message=message)
 
+    tree = ET.ElementTree(root_el)
+    tree.write(options.xml, encoding="UTF-8", xml_declaration=True)
+
+# print a list of failed tests to find them more easily
+print(flush=True)
+if test_results.failed > 0:
+    print("FAILED TESTS:", "\n    ".join([""] + tests_failed), flush=True)
 # print summary and exit
-print('\n %d out of %d tests failed, %d were skipped' % (tests_failed, len(all_tests), tests_skipped))
-sys.exit(tests_failed)
+print('%d out of %d tests failed, %d were skipped' % (test_results.failed, len(test_results), test_results.skipped), flush=True)
+sys.exit(len(tests_failed))

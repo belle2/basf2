@@ -39,9 +39,6 @@ namespace {
       evtPtr.create();
       evtPtr->setEvent(42);
 
-      evtDataDifferentName.create(); //StoreArrays can be explicitly created (can also be omitted)
-      evtDataDifferentDurability.create();
-      profileInfo.create();
 
       ProfileInfo profileInfoObject(128, 64, 60.0);
       for (int i = 0; i < 10; ++i) {
@@ -232,12 +229,19 @@ namespace {
     EXPECT_TRUE(evtPtr.isValid());
     EXPECT_EQ(evtPtr->getEvent(), 1);
   }
+  TEST_F(DataStoreTest, FailedCreation)
+  {
+    StoreArray<EventMetaData> none("doesntexist");
+    EXPECT_THROW(none.getPtr(), std::runtime_error);
+    EXPECT_THROW(none.appendNew(), std::runtime_error);
+    none.clear();
+    EXPECT_THROW(none.getPtr(), std::runtime_error);
+    EXPECT_EQ(0, none.getEntries());
+  }
   TEST_F(DataStoreTest, RawAccess)
   {
     StoreArray<EventMetaData> evtData;
-    StoreArray<EventMetaData> none("doesntexist");
     EXPECT_TRUE(evtData.getPtr() != nullptr);
-    EXPECT_TRUE(none.getPtr() == nullptr);
   }
 
   /** check TClonesArray consistency (i.e. no gaps) */
@@ -451,6 +455,8 @@ namespace {
     EXPECT_FALSE(evtArray.isOptional());
     EXPECT_FALSE(evtPtr.isRequired());
     EXPECT_FALSE(evtArray.isRequired());
+    EXPECT_FALSE(evtPtr.isValid());
+    EXPECT_FALSE(evtArray.isValid());
     EXPECT_FALSE(StoreObjPtr<EventMetaData>::optional(evtPtr.getName()));
     EXPECT_FALSE(StoreArray<EventMetaData>::optional(evtArray.getName()));
     EXPECT_FALSE(StoreObjPtr<EventMetaData>(evtPtr.getName()).isRequired());
@@ -472,6 +478,8 @@ namespace {
     EXPECT_TRUE(evtArray.isOptional());
     EXPECT_TRUE(evtPtr.isRequired());
     EXPECT_TRUE(evtArray.isRequired());
+    EXPECT_FALSE(evtPtr.isValid()); // not valid until created
+    EXPECT_TRUE(evtArray.isValid());
     EXPECT_TRUE(StoreObjPtr<EventMetaData>::optional(evtPtr.getName()));
     EXPECT_TRUE(StoreArray<EventMetaData>::optional(evtArray.getName()));
     EXPECT_TRUE(StoreObjPtr<EventMetaData>(evtPtr.getName()).isRequired());
@@ -489,9 +497,6 @@ namespace {
     //accessing unregistered things doesn't work.
     StoreArray<EventMetaData> someothernewname("someothernewname");
     EXPECT_FALSE(someothernewname.isValid());
-    //usually one shouldn't call StoreArray::create(), but everything like appendNew() would crash
-    EXPECT_B2ERROR(EXPECT_FALSE(someothernewname.create()));
-    EXPECT_FALSE(someothernewname.isValid()); //still invalid (as create() failed)
   }
 
   TEST_F(DataStoreTest, ConstructedBeforeInitializeButWithNonDefaultName)

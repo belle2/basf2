@@ -11,14 +11,13 @@
 
 #include <tracking/trackFindingCDC/hough/axes/StandardAxes.h>
 
-#include <array>
-
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Strategy to construct discrete impact points from discrete overlap specifications.
     class ImpactBinsSpec {
     public:
-      /** Constructs a specification for equally spaced discrete impactature values
+      /**
+       *  Constructs a specification for equally spaced discrete impactature values
        *  with discrete overlap specification
        *
        *  @param lowerBound Lower bound of the value range
@@ -29,29 +28,31 @@ namespace Belle2 {
        *  @param nOverlap   Number of discrete values that overlapping bins have in common
        *                    (counted semi open [start, stop)).
        */
-      ImpactBinsSpec(double lowerBound,
-                     double upperBound,
-                     size_t nBins,
-                     size_t nOverlap,
-                     size_t nWidth);
+      ImpactBinsSpec(double lowerBound, double upperBound, long nBins, int nOverlap, int nWidth);
 
       /// Constuct the array of discrete impact positions
       DiscreteImpact::Array constructArray() const;
 
       /// Getter for the number of bounds
-      size_t getNPositions() const;
+      long getNPositions() const;
 
-      /** Getter for the bin width in real impact to investigate the value
-       *  that results from the discrete overlap specification*/
+      /**
+       *  Getter for the bin width in real impact to investigate the value
+       *  that results from the discrete overlap specification
+       */
       double getBinWidth() const;
 
-      /** Getter for the overlap in real impact to investigate the value
-       *  that results from the discrete overlap specification*/
+      /**
+       *  Getter for the overlap in real impact to investigate the value
+       *  that results from the discrete overlap specification
+       */
       double getOverlap() const;
 
       /// Getter for the overlap in discrete number of positions
-      size_t getNOverlap() const
-      { return m_nOverlap; }
+      long getNOverlap() const
+      {
+        return m_nOverlap;
+      }
 
     private:
       /// Lower bound of the binning range
@@ -61,15 +62,13 @@ namespace Belle2 {
       double m_upperBound;
 
       /// Number of accessable bins
-      size_t m_nBins;
+      long m_nBins;
 
       /// Overlap of the leaves in impact counted in number of discrete values.
-      size_t m_nOverlap = 1;
+      int m_nOverlap = 1;
 
       /// Width of the leaves at the maximal level in impact counted in number of discrete values.
-      size_t m_nWidth = 3;
+      int m_nWidth = 3;
     };
-
-
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

@@ -12,7 +12,7 @@
 
 #define REDUCED_RAWCOPPER
 
-#define NONSTOP
+//#define NONSTOP
 //#define NONSTOP_DEBUG
 //#define NONSTOP_SLC
 
@@ -24,7 +24,7 @@
 
 #define BASE_PORT_ROPC_COPPER 33000
 #define NUM_EVT_PER_BASF2LOOP_COPPER 50
-#define NUM_EVT_PER_BASF2LOOP_PC 1
+#define NUM_EVT_PER_BASF2LOOP_PC 10
 #define NUM_PREALLOC_BUF 500
 
 // global variables for non-stop DAQ

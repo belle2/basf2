@@ -10,6 +10,9 @@
 
 // Own include
 #include <arich/modules/arichUnpacker/ARICHUnpackerModule.h>
+#include <arich/modules/arichUnpacker/ARICHRawDataHeader.h>
+
+#include <framework/core/ModuleManager.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -45,18 +48,19 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  ARICHUnpackerModule::ARICHUnpackerModule() : Module(), m_bitMask(0), m_debug(0),
-    m_arichgp(ARICHGeometryPar::Instance())
-
+  ARICHUnpackerModule::ARICHUnpackerModule() : Module(), m_bitMask(0), m_debug(0)
   {
     // set module description
     setDescription("Raw data unpacker for ARICH");
     setPropertyFlags(c_ParallelProcessingCertified);
 
-    addParam("bitMask", m_bitMask, "hit bit mask (4 bits/channel)", (uint8_t)0xF);
-    addParam("debug", m_debug, "print data words bitmap", 0);
+    addParam("bitMask", m_bitMask, "hit bit mask (8 bits/channel)", (uint8_t)0xFF);
+    addParam("debug", m_debug, "prints debug information", 0);
+
     addParam("inputRawDataName", m_inputRawDataName, "name of RawARICH store array", string(""));
     addParam("outputDigitsName", m_outputDigitsName, "name of ARICHDigit store array", string(""));
+
+
   }
 
   ARICHUnpackerModule::~ARICHUnpackerModule()
@@ -72,12 +76,6 @@ namespace Belle2 {
     StoreArray<ARICHDigit> digits(m_outputDigitsName);
     digits.registerInDataStore();
 
-    if (!m_arichgp->isInit()) {
-      GearDir content("/Detector/DetectorComponent[@name='ARICH']/Content");
-      m_arichgp->Initialize(content);
-    }
-    if (!m_arichgp->isInit()) B2ERROR("Component ARICH not found in Gearbox");
-
   }
 
   void ARICHUnpackerModule::beginRun()
@@ -89,14 +87,15 @@ namespace Belle2 {
 
     StoreArray<RawARICH> rawData(m_inputRawDataName);
     StoreArray<ARICHDigit> digits(m_outputDigitsName);
-    digits.clear();
     StoreObjPtr<EventMetaData> evtMetaData;
+
+    digits.clear();
+
     if (m_debug) {
       std::cout << std::endl << "------------------------" << std::endl;
       std::cout << "Run: " << evtMetaData->getRun() << " Event: " << evtMetaData->getEvent()  << std::endl;
       std::cout << "------------------------" << std::endl << std::endl;
     }
-
 
     for (auto& raw : rawData) {
       for (int finesse = 0; finesse < 4; finesse++) {
@@ -112,10 +111,11 @@ namespace Belle2 {
 
         readHeader(buffer, ibyte, head);
 
+        if (m_debug > 1) printBits(buffer, bufferSize);
+
         if (m_debug) {
           std::cout << "Merger header" << std::endl;
           head.print();
-          if (m_debug > 1) printBits(buffer, bufferSize);
         }
 
         switch (head.type) {
@@ -130,6 +130,7 @@ namespace Belle2 {
         }
       }
     }
+
   }
 
   void ARICHUnpackerModule::unpackUnsuppressedData(const int* buffer, int bufferSize, unsigned& ibyte, ARICHRawHeader& head)
@@ -142,18 +143,23 @@ namespace Belle2 {
       // new feb
       ARICHRawHeader febHead;
       readHeader(buffer, ibyte, febHead);
-
+      if (febHead.type != head.type || febHead.version != head.version || febHead.mergerID != head.mergerID
+          || febHead.trigger != head.trigger) B2ERROR("ARICHUnpackerModule: data in FEB header " << (unsigned)febHead.FEBSlot <<
+                                                        " not consistent with data in merger header " << (unsigned)head.mergerID);
       // feb header shift
       ibyte += ARICHFEB_HEADER_SIZE;
       int dataLen = febHead.length - ARICHFEB_HEADER_SIZE;
+
+      // get module ID from mapper
+
+      febHead.FEBSlot += 1; /// temporary! FEB Slots on merger should be 1-6 (now 0-5). Remove when firmware is updated!
 
       if (m_debug) {
         std::cout << std::endl << "FEB header" << std::endl;
         febHead.print();
       }
+      unsigned moduleID = m_mergerMap->getModuleID((unsigned)head.mergerID, (unsigned)febHead.FEBSlot);
 
-      // get module ID from mapper
-      unsigned moduleID = m_arichgp->getBoardFromMerger((unsigned)head.mergerID, (unsigned)febHead.FEBSlot);
 
       if (!moduleID) { B2ERROR("ARICHUnpackerModule: no merger 2 module mapping for mergerID " << (unsigned)head.mergerID << " FEB slot: " << (unsigned)febHead.FEBSlot); break;}
       if (m_debug) std::cout << "Hit channels: " << std::endl;
@@ -179,7 +185,6 @@ namespace Belle2 {
 
   }
 
-
   void ARICHUnpackerModule::unpackSuppressedData(const int* buffer, int bufferSize, unsigned& ibyte, ARICHRawHeader& head)
   {
 
@@ -190,11 +195,18 @@ namespace Belle2 {
       ARICHRawHeader febHead;
       readHeader(buffer, ibyte, febHead);
       if (m_debug) febHead.print();
+
+      if (febHead.type != head.type || febHead.version != head.version || febHead.mergerID != head.mergerID
+          || febHead.trigger != head.trigger) B2ERROR("ARICHUnpackerModule: data in FEB header " << (unsigned)febHead.FEBSlot <<
+                                                        " not consistent with data in merger header " << (unsigned)head.mergerID);
+
       // feb header shift
       ibyte += ARICHFEB_HEADER_SIZE;
       int dataLen = febHead.length - ARICHFEB_HEADER_SIZE;
 
-      unsigned moduleID =  m_arichgp->getBoardFromMerger((unsigned)head.mergerID, (unsigned)febHead.FEBSlot);
+      febHead.FEBSlot += 1; /// temporary! FEB Slots on merger should be 1-6 (now 0-5). Remove when firmware is updated!
+
+      unsigned moduleID = m_mergerMap->getModuleID((unsigned)head.mergerID, (unsigned)febHead.FEBSlot);
 
       if (!moduleID) { B2ERROR("ARICHUnpackerModule: no merger 2 module mapping for mergerID " << (unsigned)head.mergerID << " FEB slot: " << (unsigned)febHead.FEBSlot); break;}
 
@@ -219,6 +231,7 @@ namespace Belle2 {
                 (unsigned)bufferSize << " vs. " << ceil(ibyte / 4.));
 
   }
+
 
   void ARICHUnpackerModule::readHeader(const int* buffer, unsigned& ibyte, ARICHRawHeader& head)
   {
@@ -266,6 +279,7 @@ namespace Belle2 {
       std::cout << i << "-th word bitset: " << std::bitset<32>(*(buffer + i)) << std::endl;
     }
   }
+
 
   void ARICHUnpackerModule::endRun()
   {

@@ -12,6 +12,14 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+const ISuperLayer ISuperLayerUtil::c_N;
+
+const ISuperLayer ISuperLayerUtil::c_InnerVolume;
+
+const ISuperLayer ISuperLayerUtil::c_OuterVolume;
+
+const ISuperLayer ISuperLayerUtil::c_Invalid;
+
 bool ISuperLayerUtil::isAxial(ISuperLayer iSuperLayer)
 {
   return isInCDC(iSuperLayer) and (iSuperLayer % 2) == 0;
@@ -20,9 +28,13 @@ bool ISuperLayerUtil::isAxial(ISuperLayer iSuperLayer)
 EStereoKind ISuperLayerUtil::getStereoKind(ISuperLayer iSuperLayer)
 {
   if (not isInCDC(iSuperLayer)) return EStereoKind::c_Invalid;
-  if (isAxial(iSuperLayer)) return EStereoKind::c_Axial;
-  else if ((iSuperLayer % 4) == 1) return EStereoKind::c_StereoU;
-  else return EStereoKind::c_StereoV;
+  if (isAxial(iSuperLayer)) {
+    return EStereoKind::c_Axial;
+  } else if ((iSuperLayer % 4) == 1) {
+    return EStereoKind::c_StereoU;
+  } else {
+    return EStereoKind::c_StereoV;
+  }
 }
 
 bool ISuperLayerUtil::isInvalid(ISuperLayer iSuperLayer)
@@ -52,12 +64,18 @@ bool ISuperLayerUtil::isOuterVolume(ISuperLayer iSuperLayer)
 
 ISuperLayer ISuperLayerUtil::getNextInwards(ISuperLayer iSuperLayer)
 {
-  if (isInvalid(iSuperLayer) or isInnerVolume(iSuperLayer)) return c_Invalid;
-  else return iSuperLayer - 1;
+  if (isInvalid(iSuperLayer) or isInnerVolume(iSuperLayer)) {
+    return c_Invalid;
+  } else {
+    return iSuperLayer - 1;
+  }
 }
 
 ISuperLayer ISuperLayerUtil::getNextOutwards(ISuperLayer iSuperLayer)
 {
-  if (isInvalid(iSuperLayer) or isOuterVolume(iSuperLayer)) return c_Invalid;
-  else return iSuperLayer + 1;
+  if (isInvalid(iSuperLayer) or isOuterVolume(iSuperLayer)) {
+    return c_Invalid;
+  } else {
+    return iSuperLayer + 1;
+  }
 }

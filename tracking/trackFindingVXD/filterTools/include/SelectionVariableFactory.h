@@ -14,30 +14,29 @@
 #include <tracking/trackFindingVXD/filterTools/SelectionVariableType.h>
 
 // 2-hit:
-#include <tracking/trackFindingVXD/twoHitFilters/Distance3DSquared.h>
-#include <tracking/trackFindingVXD/twoHitFilters/Distance2DXYSquared.h>
-#include <tracking/trackFindingVXD/twoHitFilters/Distance1DZ.h>
-#include <tracking/trackFindingVXD/twoHitFilters/Distance1DZTemp.h>
-#include <tracking/trackFindingVXD/twoHitFilters/SlopeRZ.h>
-#include <tracking/trackFindingVXD/twoHitFilters/Distance3DNormed.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DSquared.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance2DXYSquared.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance1DZ.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/SlopeRZ.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DNormed.h>
 // 3-hit:
-#include <tracking/trackFindingVXD/threeHitFilters/Angle3DSimple.h>
-#include <tracking/trackFindingVXD/threeHitFilters/Angle3DFull.h>
-#include <tracking/trackFindingVXD/threeHitFilters/AngleXYSimple.h>
-#include <tracking/trackFindingVXD/threeHitFilters/AngleXYFull.h>
-#include <tracking/trackFindingVXD/threeHitFilters/AngleRZSimple.h>
-#include <tracking/trackFindingVXD/threeHitFilters/AngleRZFull.h>
-#include <tracking/trackFindingVXD/threeHitFilters/CircleDist2IP.h>
-#include <tracking/trackFindingVXD/threeHitFilters/DeltaSlopeRZ.h>
-#include <tracking/trackFindingVXD/threeHitFilters/DeltaSlopeZoverS.h>
-#include <tracking/trackFindingVXD/threeHitFilters/DeltaSoverZ.h>
-#include <tracking/trackFindingVXD/threeHitFilters/HelixParameterFit.h>
-#include <tracking/trackFindingVXD/threeHitFilters/Pt.h>
-#include <tracking/trackFindingVXD/threeHitFilters/CircleRadius.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/Angle3DSimple.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/Angle3DFull.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/CosAngleXY.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/AngleXYFull.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/AngleRZSimple.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/AngleRZFull.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/CircleDist2IP.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/DeltaSlopeRZ.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/DeltaSlopeZoverS.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/DeltaSoverZ.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/HelixParameterFit.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/Pt.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/CircleRadius.h>
 // 4-hit:
-#include <tracking/trackFindingVXD/fourHitFilters/DeltaPt.h>
-#include <tracking/trackFindingVXD/fourHitFilters/DeltaDistCircleCenter.h>
-#include <tracking/trackFindingVXD/fourHitFilters/DeltaCircleRadius.h>
+#include <tracking/trackFindingVXD/filterMap/fourHitVariables/DeltaPt.h>
+#include <tracking/trackFindingVXD/filterMap/fourHitVariables/DeltaDistCircleCenter.h>
+#include <tracking/trackFindingVXD/filterMap/fourHitVariables/DeltaCircleRadius.h>
 
 #include <framework/logging/Logger.h>
 
@@ -104,11 +103,6 @@ namespace Belle2 {
         { return Distance1DZ<PointType>::value(outerHit, innerHit); };
       }
 
-      if (variableType == SelectionVariableType::Distance1DZTemplate) {
-        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
-        { return Distance1DZTemplate<PointType>::value(outerHit, innerHit); };
-      }
-
       if (variableType == SelectionVariableType::SlopeRZ) {
         return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
         { return SlopeRZ<PointType>::value(outerHit, innerHit); };
@@ -118,6 +112,7 @@ namespace Belle2 {
         return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
         { return Distance3DNormed<PointType>::value(outerHit, innerHit); };
       }
+
 
       // 2+1 hits:
 
@@ -131,9 +126,9 @@ namespace Belle2 {
         { return Angle3DFull<PointType>::value(outerHit, innerHit, m_virtualIP); };
       }
 
-      if (variableType == SelectionVariableType::AngleXYSimpleHighOccupancy) {
+      if (variableType == SelectionVariableType::CosAngleXYHighOccupancy) {
         return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
-        { return AngleXYSimple<PointType>::value(outerHit, innerHit, m_virtualIP); };
+        { return CosAngleXY<PointType>::value(outerHit, innerHit, m_virtualIP); };
       }
 
       if (variableType == SelectionVariableType::AngleXYFullHighOccupancy) {
@@ -223,11 +218,11 @@ namespace Belle2 {
         { return Angle3DFull<PointType>::value(outerHit, centerHit, innerHit); };
       }
 
-      if (variableType == SelectionVariableType::AngleXYSimple) {
+      if (variableType == SelectionVariableType::CosAngleXY) {
         return [ & ](const PointType & outerHit,
                      const PointType & centerHit,
                      const PointType & innerHit) -> double
-        { return AngleXYSimple<PointType>::value(outerHit, centerHit, innerHit); };
+        { return CosAngleXY<PointType>::value(outerHit, centerHit, innerHit); };
       }
 
       if (variableType == SelectionVariableType::AngleXYFull) {

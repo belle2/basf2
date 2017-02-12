@@ -16,11 +16,11 @@
 
 #include <chrono>
 #include <random>
+#include <cstring>
 
 //dlopen etc.
 #include <dlfcn.h>
 #include <fcntl.h>
-#include <string.h>
 
 using namespace std;
 using namespace Belle2;
@@ -28,26 +28,26 @@ namespace fs = boost::filesystem;
 
 bool FileSystem::fileExists(const string& filename)
 {
-  fs::path fullPath = fs::absolute(filename, fs::initial_path<fs::path>());
+  fs::path fullPath = fs::absolute(filename);
   return fs::exists(fullPath);
 }
 
 bool FileSystem::fileDirExists(const string& filename)
 {
-  fs::path fullPath = fs::absolute(filename, fs::initial_path<fs::path>());
+  fs::path fullPath = fs::absolute(filename);
   fullPath.remove_filename();
   return fs::exists(fullPath);
 }
 
 bool FileSystem::isFile(const string& filename)
 {
-  fs::path fullPath = fs::absolute(filename, fs::initial_path<fs::path>());
+  fs::path fullPath = fs::absolute(filename);
   return (fs::exists(fullPath)) && (fs::is_regular_file(fullPath));
 }
 
 bool FileSystem::isDir(const string& filename)
 {
-  fs::path fullPath = fs::absolute(filename, fs::initial_path<fs::path>());
+  fs::path fullPath = fs::absolute(filename);
   return (fs::exists(fullPath)) && (fs::is_directory(fullPath));
 }
 
@@ -59,7 +59,7 @@ bool FileSystem::loadLibrary(std::string library, bool fullname)
   void* libPointer = dlopen(library.c_str() , RTLD_LAZY | RTLD_GLOBAL);
 
   if (libPointer == NULL) {
-    B2ERROR("Could not open shared library file (error in dlopen) : " + string(dlerror()));
+    B2ERROR("Could not open shared library file (error in dlopen) : " << dlerror());
     return false;
   }
 
@@ -100,7 +100,7 @@ FileSystem::Lock::~Lock()
   if (m_file >= 0) close(m_file);
 }
 
-bool FileSystem::Lock::lock(int timeout)
+bool FileSystem::Lock::lock(int timeout, bool ignoreErrors)
 {
   if (m_file < 0) return false;
 
@@ -127,9 +127,10 @@ bool FileSystem::Lock::lock(int timeout)
       return true;
     else if (std::chrono::steady_clock::now() > maxtime)
       break;
+    if (errno != EAGAIN && errno != EACCES && errno != EINTR) break;
     usleep(uniform(random) * 1000);
   }
-  B2ERROR("Locking failed: " << strerror(errno));
+  if (!ignoreErrors) B2ERROR("Locking failed: " << strerror(errno));
   return false;
 }
 
@@ -139,7 +140,7 @@ FileSystem::TemporaryFile::TemporaryFile(std::ios_base::openmode mode): std::fst
   m_filename = filename.native();
   open(m_filename.c_str(), mode);
   if (!is_open()) {
-    B2ERROR("Cannot create temporary file:" << strerror(errno));
+    B2ERROR("Cannot create temporary file: " << strerror(errno));
   }
 }
 

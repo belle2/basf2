@@ -29,7 +29,7 @@ def main(argv):
     # We'll use the same data for all calibrations but this is not a requirement in general.
     input_files_test = []
     for run in range(1, 5):
-        cosmics_file_path = os.path.join(data_dir, 'DST_exp1_run{0}.root'.format(run))
+        cosmics_file_path = os.path.abspath(os.path.join(data_dir, 'DST_exp1_run{0}.root'.format(run)))
         input_files_test.append(cosmics_file_path)
 
     ###################################################
@@ -47,9 +47,12 @@ def main(argv):
     calibrations = []
     for i in range(1, 5):
         col_test = register_module('CaTest')
-        col_test.set_name('Test{}'.format(i))  # Sets the prefix of the collected data in the datastore
-        col_test.param('spread', 15)  # Proportional to the probability of algorithm requesting iteration
-        col_test.param('granularity', 'all')  # Allows us to execute algorithm over all data, in one big IoV
+        col_test.set_name('Test{}'.format(i))   # Sets the prefix of the collected data in the datastore.
+        col_test.param('granularity', 'all')    # Allows us to execute algorithm over all data, in one big IoV.
+        col_test.param('spread', 15)            # Proportional to the probability of algorithm requesting iteration.
+        # Allows us to force the test collector to wait before starting its event loop (microseconds).
+        # Nice for slowing everything down to a human pace.
+        col_test.param('wait', 1000000)
 
         alg_test = TestCalibrationAlgorithm()
         # Since we're using several instances of the same test algorithm here, we still want the database entries to have

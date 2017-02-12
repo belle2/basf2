@@ -19,6 +19,7 @@ from basf2 import *
 # Create paths
 main = create_path()
 
+# Input file
 inputs = 'mdst_000544_prod00000001_task00000544.root'
 
 simpleinput = register_module('RootInput')

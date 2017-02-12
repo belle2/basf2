@@ -65,7 +65,7 @@ int main(int argc, char** argv)
 {
 
   if (argc != 6) {
-    printf("Usage : %s <COPPER hostname> <COPPER node ID> <bit flag of FINNESEs> <Use NSM(Network Shared Memory)? yes=1/no=0> <NSM nodename>",
+    printf("[FATAL] Usage : %s <COPPER hostname> <COPPER node ID> <bit flag of FINNESEs> <Use NSM(Network Shared Memory)? yes=1/no=0> <NSM nodename>",
            argv[0]);
     //      printf("Usage : %s <COPPER hostname> <Use NSM(Network Shared Memory)? yes=1/no=0> <port # to eb0> <NSM nodename>", argv[0]);;
     exit(1);

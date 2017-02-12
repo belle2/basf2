@@ -8,215 +8,145 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPair/FitlessSegmentPairVarSet.h>
-#include <assert.h>
 
-#include <tracking/trackFindingCDC/fitting/CDCAxialStereoFusion.h>
-#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
-#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
-
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-namespace {
-  double nanmin(double x, double y)
-  {
-    if (std::isnan(x)) return y;
-    if (std::isnan(y)) return x;
-    return std::min(x, y);
-  }
-
-  double nanmax(double x, double y)
-  {
-    if (std::isnan(x)) return y;
-    if (std::isnan(y)) return x;
-    return std::max(x, y);
-  }
-
-}
-
-FitlessSegmentPairVarSet::FitlessSegmentPairVarSet()
-  : Super()
-{
-}
-
 bool FitlessSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 {
-  bool extracted = extractNested(ptrSegmentPair);
-  if (not extracted or not ptrSegmentPair) return false;
+  if (not ptrSegmentPair) return false;
 
-  const CDCSegmentPair segmentPair = *ptrSegmentPair;
+  const CDCSegmentPair& segmentPair = *ptrSegmentPair;
 
-  const CDCRecoSegment2D* ptrStartSegment = segmentPair.getFromSegment();
-  const CDCRecoSegment2D* ptrEndSegment = segmentPair.getToSegment();
+  const CDCSegment2D* ptrFromSegment = segmentPair.getFromSegment();
+  const CDCSegment2D* ptrToSegment = segmentPair.getToSegment();
 
-  const CDCRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCRecoSegment2D& endSegment = *ptrEndSegment;
+  const CDCSegment2D& fromSegment = *ptrFromSegment;
+  const CDCSegment2D& toSegment = *ptrToSegment;
 
-  const CDCAxialRecoSegment2D* ptrAxialSegment = segmentPair.getAxialSegment();
-  const CDCStereoRecoSegment2D* ptrStereoSegment = segmentPair.getStereoSegment();
+  const CDCSegment2D* ptrAxialSegment = segmentPair.getAxialSegment();
+  const CDCSegment2D& axialSegment = *ptrAxialSegment;
 
-  const CDCAxialRecoSegment2D& axialSegment = *ptrAxialSegment;
-  const CDCStereoRecoSegment2D& stereoSegment = *ptrStereoSegment;
+  const CDCSegment2D* ptrStereoSegment = segmentPair.getStereoSegment();
+  const CDCSegment2D& stereoSegment = *ptrStereoSegment;
 
   // Segment fit should have been done at this point
-  CDCTrajectory2D& startFit =  startSegment.getTrajectory2D();
-  CDCTrajectory2D& endFit = endSegment.getTrajectory2D();
-  CDCTrajectory2D& axialFit =  axialSegment.getTrajectory2D();
-  // CDCTrajectory2D& stereoFit = stereoSegment.getTrajectory2D();
+  const CDCTrajectory2D& fromFit = fromSegment.getTrajectory2D();
+  const CDCTrajectory2D& toFit = toSegment.getTrajectory2D();
+  const CDCTrajectory2D& axialFit = axialSegment.getTrajectory2D();
+  // const CDCTrajectory2D& stereoFit = stereoSegment.getTrajectory2D();
 
-  ISuperLayer startFitISuperLayer = startFit.getStartISuperLayer();
-  ISuperLayer endFitISuperLayer = endFit.getStartISuperLayer();
+  finitevar<named("from_ndf")>() = fromFit.getNDF();
+  finitevar<named("to_ndf")>() = toFit.getNDF();
 
-  var<named("start_fit_superlayer_id")>() = startFitISuperLayer;
-  var<named("end_fit_superlayer_id")>() = endFitISuperLayer;
+  finitevar<named("from_chi2_over_ndf")>() = fabs(fromFit.getChi2() / fromFit.getNDF());
+  finitevar<named("to_chi2_over_ndf")>() = fabs(toFit.getChi2() / toFit.getNDF());
 
-  // Cross check of fit against the superlayer of the segment
-  var<named("start_fit_superlayer_id_difference")>() = startFitISuperLayer - startSegment.getISuperLayer();
-  var<named("end_fit_superlayer_id_difference")>() = endFitISuperLayer - endSegment.getISuperLayer();
+  finitevar<named("from_p_value")>() = fromFit.getPValue();
+  finitevar<named("to_p_value")>() = toFit.getPValue();
 
-  // Super layer coarse extrapolation
-  var<named("next_superlayer_id_difference")>() = startFit.getNextISuperLayer() - endFitISuperLayer;
-  var<named("previous_superlayer_id_difference")>() = endFit.getPreviousISuperLayer() - startFitISuperLayer;
+  // Direction agreement
+  using namespace NPerigeeParameterIndices;
+  const double fromCurv = fromFit.isFitted() ? fromFit.getCurvature() : NAN;
+  const double fromCurvVar = fromFit.getLocalVariance(c_Curv);
+
+  const double toCurv = toFit.isFitted() ? toFit.getCurvature() : NAN;
+  const double toCurvVar = toFit.getLocalVariance(c_Curv);
+
+  const double deltaCurvVar = fromCurvVar + toCurvVar;
+  const double avgPrecision = 1 / fromCurvVar + 1 / toCurvVar;
+  const double deltaCurvSigma = std::sqrt(deltaCurvVar);
+
+  finitevar<named("abs_avg_curv")>() = std::fabs(toCurv / toCurvVar  + fromCurv / fromCurvVar) / avgPrecision;
+  finitevar<named("delta_curv_var")>() = deltaCurvVar;
+  finitevar<named("delta_curv")>() = toCurv - fromCurv;
+  finitevar<named("delta_curv_pull")>() = (toCurv - fromCurv) / deltaCurvSigma;
 
   // Hits
-  //const CDCRecoHit2D& startFirstHit = startSegment.front();
-  const CDCRecoHit2D& startLastHit = startSegment.back();
+  const CDCRecoHit2D& fromFirstHit = fromSegment.front();
+  const CDCRecoHit2D& fromLastHit = fromSegment.back();
+  const CDCRecoHit2D& toFirstHit = toSegment.front();
+  const CDCRecoHit2D& toLastHit = toSegment.back();
 
-  const CDCRecoHit2D& endFirstHit = endSegment.front();
-  //const CDCRecoHit2D& endLastHit = endSegment.back();
+  const Vector2D fromHitPos = fromLastHit.getRecoPos2D();
+  const Vector2D toHitPos = toFirstHit.getRecoPos2D();
 
-  const CDCRecoHit2D& stereoFirstHit = stereoSegment.front();
-  const CDCRecoHit2D& stereoLastHit = stereoSegment.back();
+  // Fit
+  const Vector2D fromFitPos = fromFit.getClosest(fromHitPos);
+  const Vector2D toFitPos = toFit.getClosest(toHitPos);
+  const Vector2D fromFitMom = fromFit.getFlightDirection2D(fromHitPos);
+  const Vector2D toFitMom = toFit.getFlightDirection2D(toHitPos);
 
-  // Reconstructed position
-  // const Vector2D startFirstRecoPos2D = startFirstHit.getRecoPos2D();
-  const Vector2D startLastRecoPos2D = startLastHit.getRecoPos2D();
+  const Vector2D fromOtherFitMom = toFit.getFlightDirection2D(fromHitPos);
+  const Vector2D toOtherFitMom = fromFit.getFlightDirection2D(toHitPos);
 
-  const Vector2D endFirstRecoPos2D = endFirstHit.getRecoPos2D();
-  // const Vector2D endLastRecoPos2D = endLastHit.getRecoPos2D();
+  const double deltaPosPhi = fromFitPos.angleWith(toFitPos);
+  const double deltaMomPhi = fromFitMom.angleWith(toFitMom);
+  const double deltaAlpha = AngleUtil::normalised(deltaMomPhi - deltaPosPhi);
 
-  // Wires
-  // const CDCWire& startFirstWire = startFirstHit.getWire();
-  // const CDCWire& startLastWire = startLastHit.getWire();
+  finitevar<named("delta_pos_phi")>() = deltaPosPhi;
+  finitevar<named("delta_mom_phi")>() = deltaMomPhi;
 
-  // const CDCWire& endFirstWire = endFirstHit.getWire();
-  // const CDCWire& endLastWire = endLastHit.getWire();
+  finitevar<named("from_delta_mom_phi")>() = fromFitMom.angleWith(fromOtherFitMom);
+  finitevar<named("to_delta_mom_phi")>() = toFitMom.angleWith(toOtherFitMom);
+  finitevar<named("delta_alpha")>() = deltaAlpha;
 
-  const CDCWire& stereoFirstWire = stereoFirstHit.getWire();
-  const CDCWire& stereoLastWire = stereoLastHit.getWire();
+  // Reconstructed quantities
+  // One of the fitted positions corresponds to the axial hit and one to the stereo hit.
+  const CDCRecoHit2D& nearAxialHit = toFirstHit.isAxial() ? toFirstHit : fromLastHit;
+  const CDCRecoHit2D& farStereoHit = not fromFirstHit.isAxial() ? fromFirstHit : toLastHit;
+  const CDCRecoHit2D& nearStereoHit = not toFirstHit.isAxial() ? toFirstHit : fromLastHit;
 
-  // Momentum vector
-  const Vector2D startLastUnitMom2D = startFit.getFlightDirection2D(startLastRecoPos2D);
-  const Vector2D endFirstUnitMom2D = endFit.getFlightDirection2D(endFirstRecoPos2D);
+  const CDCWire& farStereoWire = farStereoHit.getWire();
+  const WireLine& farWireLine = farStereoWire.getWireLine();
 
-  const double endFirstToStartLastHitPosPhiDifference = endFirstRecoPos2D.angleWith(startLastRecoPos2D);
-  const double endFirstToStartLastHitMomPhiDifference = endFirstUnitMom2D.angleWith(startLastUnitMom2D);
+  const CDCWire& nearStereoWire = nearStereoHit.getWire();
+  const WireLine& nearWireLine = nearStereoWire.getWireLine();
 
-  var<named("end_first_to_start_last_hit_pos_phi_difference")>() = endFirstToStartLastHitPosPhiDifference;
-  var<named("end_first_to_start_last_hit_mom_phi_difference")>() = endFirstToStartLastHitMomPhiDifference;
-  const double endFirstToStartLastHitPhiDifference =
-    endFirstToStartLastHitMomPhiDifference - endFirstToStartLastHitPosPhiDifference;
+  const Vector3D nearAxialRecoPos = nearAxialHit.reconstruct3D(axialFit);
+  const Vector3D farStereoRecoPos = farStereoHit.reconstruct3D(axialFit);
+  const double farZ = farStereoRecoPos.z();
 
-  var<named("end_first_to_start_last_hit_phi_difference")>() = endFirstToStartLastHitPhiDifference;
+  const Vector3D nearStereoRecoPos = nearStereoHit.reconstruct3D(axialFit);
+  const double nearZ = nearStereoRecoPos.z();
 
-  const Vector3D stereoLastRecoPosition3D = stereoLastHit.reconstruct3D(axialFit);
-  const Vector3D stereoFirstRecoPosition3D = stereoFirstHit.reconstruct3D(axialFit);
+  const double stereoArcLength2D =
+    axialFit.calcArcLength2DBetween(nearStereoRecoPos.xy(),
+                                    farStereoRecoPos.xy());
 
-  const double stereoFirstHitDistZForwardWall = stereoFirstRecoPosition3D.z() - stereoFirstWire.getForwardZ();
-  const double stereoFirstHitDistZBackwardWall = stereoFirstRecoPosition3D.z() - stereoFirstWire.getBackwardZ();
+  const double arcLength2DGap =
+    axialFit.calcArcLength2DBetween(nearAxialRecoPos.xy(),
+                                    nearStereoRecoPos.xy());
 
-  const double stereoLastHitDistZForwardWall = stereoLastRecoPosition3D.z() - stereoLastWire.getForwardZ();
-  const double stereoLastHitDistZBackwardWall = stereoLastRecoPosition3D.z() - stereoLastWire.getBackwardZ();
+  finitevar<named("reco_arc_length_gap")>() = fabs(arcLength2DGap);
+  finitevar<named("stereo_arc_length")>() = fabs(stereoArcLength2D);
 
-  var<named("stereo_first_hit_z")>() = stereoFirstRecoPosition3D.z();
-  var<named("stereo_last_hit_z")>() = stereoLastRecoPosition3D.z();
+  finitevar<named("near_reco_z")>() = nearZ;
+  finitevar<named("near_z_bound_factor")>() = nearWireLine.outOfZBoundsFactor(nearZ);
 
-  var<named("stereo_first_hit_dist_z_forward_wall")>() = stereoFirstHitDistZForwardWall;
-  var<named("stereo_first_hit_dist_z_backward_wall")>() = stereoFirstHitDistZBackwardWall;
+  finitevar<named("far_reco_z")>() = farZ;
+  finitevar<named("far_z_bound_factor")>() = farWireLine.outOfZBoundsFactor(farZ);
 
-  var<named("stereo_last_hit_dist_z_forward_wall")>() = stereoLastHitDistZForwardWall;
-  var<named("stereo_last_hit_dist_z_backward_wall")>() = stereoLastHitDistZBackwardWall;
+  finitevar<named("coarse_tanl")>() = (farZ - nearZ) / stereoArcLength2D;
 
-  var<named("stereo_hits_max_dist_z_forward_wall")>() = nanmax(stereoFirstHitDistZForwardWall,
-                                                        stereoLastHitDistZForwardWall);
+  finitevar<named("stereo_rel_size")>() = fabs(stereoSegment.size() / stereoArcLength2D);
 
-  var<named("stereo_hits_min_dist_z_forward_wall")>() = nanmin(stereoFirstHitDistZForwardWall,
-                                                        stereoLastHitDistZForwardWall);
+  finitevar<named("arc_length_front_offset")>() =
+    (fromFit.getArcLength2DFrontOffset(fromSegment, toSegment)
+     + toFit.getArcLength2DFrontOffset(fromSegment, toSegment)) / 2;
 
-  var<named("stereo_hits_max_dist_z_backward_wall")>() = nanmax(stereoFirstHitDistZBackwardWall,
-                                                         stereoLastHitDistZBackwardWall);
+  finitevar<named("arc_length_back_offset")>() =
+    (fromFit.getArcLength2DBackOffset(fromSegment, toSegment)
+     + toFit.getArcLength2DBackOffset(fromSegment, toSegment)) / 2;
 
-  var<named("stereo_hits_min_dist_z_backward_wall")>() = nanmin(stereoFirstHitDistZBackwardWall,
-                                                         stereoLastHitDistZBackwardWall);
+  finitevar<named("from_arc_length_total")>() = toFit.getTotalArcLength2D(fromSegment);
+  finitevar<named("to_arc_length_total")>() = fromFit.getTotalArcLength2D(toSegment);
 
-  var<named("start_arc_length_front_offset")>() = startFit.getArcLength2DFrontOffset(startSegment, endSegment);
-  var<named("end_arc_length_front_offset")>() = endFit.getArcLength2DFrontOffset(startSegment, endSegment);
-
-  var<named("start_arc_length_back_offset")>() = startFit.getArcLength2DBackOffset(startSegment, endSegment);
-  var<named("end_arc_length_back_offset")>() = endFit.getArcLength2DBackOffset(startSegment, endSegment);
+  finitevar<named("arc_length_gap")>() =
+    (fromFit.getArcLength2DGap(fromSegment, toSegment)
+     + toFit.getArcLength2DGap(fromSegment, toSegment)) / 2;
 
   return true;
-  /*
-    // const double arcLength2DGap = axialFit.calcPerpSBetween(startLastRecoPosition3D.xy(),
-    // endFirstRecoPosition3D.xy());
-
-    // var<named("arc_length2d_gap")>() = arcLength2DGap;
-    var<named("arc_length2d_gap")>() = 0;
-    // if (arcLength2DGap < 0) return false;
-
-    // Fit variance and chi2
-    var<named("start_fit_chi2")>() = startFit.getChi2();
-    var<named("end_fit_chi2")>() = endFit.getChi2();
-
-    // Momentum agreement
-    var<named("start_fit_curvature_xy")>() = startFit.getCurvature() == 0 ? NAN : startFit.getCurvature();
-    var<named("end_fit_curvature_xy")>() = endFit.getCurvature() == 0 ? NAN :  endFit.getCurvature();
-
-
-    // Coalignment indicators
-    var<named("startFit_totalPerpS_startSegment")>() = startFit.getTotalPerpS(startSegment);
-    var<named("endFit_totalPerpS_startSegment")>() = endFit.getTotalPerpS(startSegment);
-
-    var<named("startFit_totalPerpS_endSegment")>() = startFit.getTotalPerpS(endSegment);
-    var<named("endFit_totalPerpS_endSegment")>() = endFit.getTotalPerpS(endSegment);
-
-    var<named("startFit_isForwardOrBackwardTo_startSegment")>() = startFit.isForwardOrBackwardTo(startSegment);
-    var<named("endFit_isForwardOrBackwardTo_startSegment")>() = endFit.isForwardOrBackwardTo(startSegment);
-
-    var<named("startFit_isForwardOrBackwardTo_endSegment")>() = startFit.isForwardOrBackwardTo(endSegment);
-    var<named("endFit_isForwardOrBackwardTo_endSegment")>() = endFit.isForwardOrBackwardTo(endSegment);
-
-
-    var<named("startFit_perpSGap")>() = startFit.getPerpSGap(startSegment, endSegment);
-    var<named("endFit_perpSGap")>() = endFit.getPerpSGap(startSegment, endSegment);
-
-
-    // Proximity indicators
-    var<named("startFit_dist2DToCenter_endSegment")>() = startFit.getDist2DToCenter(endSegment);
-    var<named("endFit_dist2DToCenter_startSegment")>() = endFit.getDist2DToCenter(startSegment);
-
-    var<named("startFit_dist2DToFront_endSegment")>() = startFit.getDist2DToFront(endSegment);
-    var<named("endFit_dist2DToBack_startSegment")>() = endFit.getDist2DToBack(startSegment);
-
-    // Momentum agreement
-    var<named("startFit_absMom2D")>() = startFit.getAbsMom2D();
-    var<named("endFit_absMom2D")>() = endFit.getAbsMom2D();
-
-    Vector2D startMomAtCenter = startFit.getFlightDirection2DAtCenter(startSegment);
-    Vector2D endMomAtCenter = endFit.getFlightDirection2DAtCenter(endSegment);
-
-    Vector2D startMomAtExtrapolation = startFit.getFlightDirection2DAtCenter(endSegment);
-    Vector2D endMomAtExtrapolation = endFit.getFlightDirection2DAtCenter(startSegment);
-
-    var<named("momAngleAtCenter_startSegment")>() = startMomAtCenter.angleWith(endMomAtExtrapolation);
-    var<named("momAngleAtCenter_endSegment")>() = endMomAtCenter.angleWith(startMomAtExtrapolation);
-
-
-    var<named("axialFit_curvatureXY")>() = axialFit.getCurvature();
-    var<named("axialFit_curvatureXY_variance")>() = axialFit.getLocalVariance(c_Curv);
-
-    return true;
-  */
 }

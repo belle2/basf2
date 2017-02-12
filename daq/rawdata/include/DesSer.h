@@ -140,7 +140,7 @@ namespace Belle2 {
     int m_num_usedbuf;
 
     //! Node Name for SLC
-    string m_nodename;
+    std::string m_nodename;
 
     //! Node ID for SLC
     int m_nodeid;

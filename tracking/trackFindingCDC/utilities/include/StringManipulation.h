@@ -16,7 +16,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Adds a prefix and captialises the value if necessary to get a camelCase concatenated name.
+    /// Adds a prefix and captialises the name if necessary to get a camelCase concatenated name.
     inline std::string prefixed(const std::string& prefix, const std::string& name)
     {
       if (prefix == "") {
@@ -31,23 +31,23 @@ namespace Belle2 {
     }
 
     /// Add quoting characters to a string.
-    inline std::string quoted(std::string value)
+    inline std::string quoted(const std::string& text)
     {
-      return "\"" + value + "\"";
+      return "\"" + text + "\"";
     }
 
     /// bAdd quoting characters to a string.
-    inline std::string bracketed(std::string value)
+    inline std::string bracketed(const std::string& text)
     {
-      return "(" + value + ")";
+      return "(" + text + ")";
     }
 
-    /// Join together a series of values with the given separator.
-    template<class Ts>
-    std::string join(const std::string& sep, const Ts& values)
+    /// Join together a series of texts with the given separator.
+    template <class Ts>
+    std::string join(const std::string& sep, const Ts& texts)
     {
-      auto it = std::begin(values);
-      auto itEnd = std::end(values);
+      auto it = std::begin(texts);
+      auto itEnd = std::end(texts);
       if (it == itEnd) return std::string{};
       std::ostringstream result;
       result << *it++;
@@ -57,5 +57,5 @@ namespace Belle2 {
       return result.str();
     }
 
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

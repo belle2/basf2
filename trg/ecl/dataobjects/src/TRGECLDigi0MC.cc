@@ -15,4 +15,4 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(TRGECLDigi0MC)
+//ClassImp(TRGECLDigi0MC)

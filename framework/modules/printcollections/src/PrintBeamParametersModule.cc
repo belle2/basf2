@@ -39,7 +39,8 @@ void PrintBeamParametersModule::event()
   const TLorentzVector& ler = m_beamparams->getLER();
   const TLorentzVector& cms = her + ler;
   const TVector3& vtx = m_beamparams->getVertex();
-  out << "BeamParameters: cms Energy=" << m_beamparams->getMass() << " GeV, flags=" << m_beamparams->getGenerationFlags() << std::endl
+  out << "BeamParameters: cms Energy=" << m_beamparams->getMass() << " GeV, flags="
+      << m_beamparams->getGenerationFlagString() << std::endl
       << "   HER=(" << her.X() << ", " << her.Y() << ", " << her.Z() << ", " << her.E() << "), " << std::endl
       << "   LER=(" << ler.X() << ", " << ler.Y() << ", " << ler.Z() << ", " << ler.E() << "), " << std::endl
       << "   CMS=(" << cms.X() << ", " << cms.Y() << ", " << cms.Z() << ", " << cms.E() << "), " << std::endl

@@ -97,7 +97,7 @@ EventProcessor::~EventProcessor()
 void EventProcessor::process(PathPtr startPath, long maxEvent)
 {
   //Check whether the number of events was set via command line argument
-  int numEventsArgument = Environment::Instance().getNumberEventsOverride();
+  unsigned int numEventsArgument = Environment::Instance().getNumberEventsOverride();
   if ((numEventsArgument > 0) && ((maxEvent == 0) || (maxEvent > numEventsArgument))) {
     maxEvent = numEventsArgument;
   }
@@ -205,7 +205,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList, bool
     Module* module = modPtr.get();
 
     if (module->hasUnsetForcedParams()) {
-      B2ERROR("The module " << module->getName() << " has unset parameters which have to be set by the user!");
+      //error message was printed by module
       continue;
     }
 

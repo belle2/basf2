@@ -27,6 +27,7 @@
 
 #include <vector>
 #include <map>
+#include <memory>
 
 
 namespace genfit {
@@ -59,11 +60,11 @@ class DAF : public AbsKalmanFitter {
    *
    * @param useRefKalman If false, use KalmanFitter as fitter.
    */
-  DAF(bool useRefKalman = true, double deltaWeight = 1e-3, double deltaPval = 1e-3);
+  DAF(bool useRefKalman = true, double deltaPval = 1e-3, double deltaWeight = 1e-3);
   /**
    * @brief Create DAF. Use the provided AbsKalmanFitter as fitter.
    */
-  DAF(AbsKalmanFitter* kalman, double deltaWeight = 1e-3, double deltaPval = 1e-3);
+  DAF(AbsKalmanFitter* kalman, double deltaPval = 1e-3, double deltaWeight = 1e-3);
   ~DAF() {};
 
   //! Process a track using the DAF.
@@ -124,7 +125,7 @@ class DAF : public AbsKalmanFitter {
 			// where time may be used in the fit.  Zeroth
 			// entry is not used.
 #ifndef __CINT__
-  boost::scoped_ptr<AbsKalmanFitter> kalman_;
+  std::unique_ptr<AbsKalmanFitter> kalman_;
 #else
   AbsKalmanFitter* kalman_;
 #endif

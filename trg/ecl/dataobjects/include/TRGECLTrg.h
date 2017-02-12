@@ -105,10 +105,13 @@ namespace Belle2 {
     int m_BeamBkgVeto;
     //! max TC Id
     int m_maxTCId;
+    //! The number of TC Hit
+    int m_NofTCHit;
     //! max TC Energy
     double m_maxTCEnergy;
     //! max TC Timing
     double m_eventtiming;
+
 
     //! Set event id
     void setEventId(int eventId) { m_eventId = eventId; }
@@ -193,13 +196,66 @@ namespace Belle2 {
     //!
     void setMaxTCEnergy(double maxTCEnergy) { m_maxTCEnergy = maxTCEnergy; }
     //!
+    void setNofTCHit(double NofTCHit) { m_NofTCHit = NofTCHit; }
 
 
 
 
 //! Empty constructor
     //! Recommended for ROOT IO
-    TRGECLTrg() {;}
+    TRGECLTrg()
+    {
+      m_eventId = 0;
+      //!
+      m_prs01 = 0;
+      m_prs02 = 0;
+      m_prs03 = 0;
+      m_prs04 = 0;
+      m_prs05 = 0;
+      m_prs06 = 0;
+      m_prs07 = 0;
+      m_prs08 = 0;
+      m_prs09 = 0;
+      m_prs10 = 0;
+      m_prs11 = 0;
+      m_prs12 = 0;
+      m_prs13 = 0;
+      m_prs14 = 0;
+      m_prs15 = 0;
+      m_prs16 = 0;
+      m_prs17 = 0;
+      //!
+      m_etot = 0;
+      //!
+      m_bhabha01 = 0;
+      m_bhabha02 = 0;
+      m_bhabha03 = 0;
+      m_bhabha04 = 0;
+      m_bhabha05 = 0;
+      m_bhabha06 = 0;
+      m_bhabha07 = 0;
+      m_bhabha08 = 0;
+      m_bhabha09 = 0;
+      m_bhabha10 = 0;
+      m_bhabha11 = 0;
+      //!
+      m_icn = 0;
+      m_icn_br = 0;
+      m_icn_fw = 0;
+      m_icn_bw = 0;
+      //!
+      m_bitECLtoGDL = 0;
+      m_BeamBkgVeto = 0;
+      m_eventtiming = 0;
+      m_itimebin = 0;
+      m_maxTCId = 0;
+      m_maxTCEnergy = 0;
+      m_NofTCHit = 0;
+
+
+
+
+    }
 
     //!! Useful Constructor
     TRGECLTrg(

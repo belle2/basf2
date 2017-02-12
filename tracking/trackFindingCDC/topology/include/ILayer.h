@@ -12,35 +12,17 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// The type of the layer ids enumerating layers within a superlayer
-    using ILayer = signed short ;
+    /// The type of the layer ids enumerating layers within a superlayer.
+    using ILayer = signed short;
 
-    /**
-     *  This is a utility class for the free ILayer type.
-     *  It provides the basic methods to operate on the ILayer numbers.
-     */
-    struct ILayerUtil {
-      /// Utility classes should not be instantiated
-      ILayerUtil() = delete;
-
-      /** Returns the layer of an object */
-      template<class T>
-      static ILayer getFrom(const T& t)
-      { return getFromImpl(t, 0); }
-
-    private:
-      /** Returns the layer of an object. Favored option. */
-      template<class T>
-      static auto getFromImpl(const T& t, int) -> decltype(t.getILayer())
-      { return t.getILayer(); }
-
-      /** Returns the layer of an object. Unfavored option. */
-      template<class T>
-      static auto getFromImpl(const T& t, long) -> decltype(t->getILayer())
-      { return t->getILayer(); }
-
+    /// Generic functor to get the superlayer id from an object.
+    struct GetILayer {
+      /// Returns the superlayer of an object.
+      template <class T, class SFINAE = decltype(&T::getILayer)>
+      ILayer operator()(const T& t) const
+      {
+        return t.getILayer();
+      }
     };
-
-  } // namespace TrackFindingCDC
-} // namespace Belle2
-
+  }
+}

@@ -13,7 +13,7 @@
 #include <functional>
 #include <utility>
 #include <cmath>
-#include <assert.h>
+#include <cassert>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -42,5 +42,5 @@ namespace Belle2 {
     inline bool isOdd(const AInt& x)
     { return (x % 2) != 0; }
 
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

@@ -69,7 +69,7 @@ class SegmentPairFitValidationRun(HarvestingRun):
 
         argument_parser.add_argument(
             "--fit",
-            choices=["zreco", "fuse-sz", "fuse-sz-re"],
+            choices=["zreco", "fuse-pre", "fuse-sz", "fuse-sz-re"],
             default=self.fit_method_name,
             dest="fit_method_name",
             help=("Choose which fit positional information of the segment should be used. \n"
@@ -91,6 +91,15 @@ class SegmentPairFitValidationRun(HarvestingRun):
             def z_reconstruction_fit(pair):
                 return sz_fitter.update(pair)
             return z_reconstruction_fit
+
+        elif fit_method_name.startswith('fuse-pre'):
+            CDCAxialStereoFusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
+            CDCSegmentPair = Belle2.TrackFindingCDC.CDCSegmentPair
+            fusionFit = CDCAxialStereoFusion()
+
+            def sz_segment_pair_preliminary_fit(pair):
+                fusionFit.fusePreliminary(pair)
+            return sz_segment_pair_preliminary_fit
 
         elif fit_method_name.startswith('fuse-sz'):
             CDCAxialStereoFusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
@@ -142,7 +151,7 @@ class SegmentPairFitValidationRun(HarvestingRun):
         # based on the properties in the base class.
         path = super().create_path()
 
-        path.add_module("WireHitTopologyPreparer",
+        path.add_module("WireHitPreparer",
                         flightTimeEstimation="outwards",
                         UseNLoops=0.5
                         )
@@ -153,12 +162,24 @@ class SegmentPairFitValidationRun(HarvestingRun):
                             SegmentOrientation="outwards"
                             )
 
+            path.add_module("SegmentFitter",
+                            inputSegments="CDCSegment2DVector",
+                            updateDriftLength=True,
+                            useAlphaInDriftLength=True,
+                            )
+
         elif self.monte_carlo == "medium":
             # Medium MC - proper generation logic, but true facets and facet relations
             path.add_module("SegmentFinderCDCFacetAutomaton",
                             FacetFilter="truth",
                             FacetRelationFilter="truth",
                             SegmentOrientation="outwards"
+                            )
+
+            path.add_module("SegmentFitter",
+                            inputSegments="CDCSegment2DVector",
+                            updateDriftLength=True,
+                            useAlphaInDriftLength=True,
                             )
 
         elif self.monte_carlo == "full":
@@ -170,24 +191,24 @@ class SegmentPairFitValidationRun(HarvestingRun):
                             # segments="MCSegments"
                             )
 
+            path.add_module("SegmentFitter",
+                            inputSegments="CDCSegment2DVector",
+                            updateDriftLength=False,
+                            # useAlphaInDriftLength=True,
+                            )
+
         else:
             raise ValueError("Invalid degree of Monte Carlo information")
 
-        path.add_module("SegmentFitter",
-                        inputSegments="CDCRecoSegment2DVector",
-                        updateDriftLength=False,
-                        # useAlphaInDriftLength=True,
-                        )
-
         path.add_module("SegmentOrienter",
-                        # SegmentOrientation="outwards",
+                        SegmentOrientation="outwards",
                         # SegmentOrientation="none",
-                        inputSegments="CDCRecoSegment2DVector",
-                        segments="CDCRecoSegment2DVectorOriented"
+                        inputSegments="CDCSegment2DVector",
+                        segments="CDCSegment2DVectorOriented"
                         )
 
         path.add_module("TrackFinderSegmentPairAutomaton",
-                        inputSegments="CDCRecoSegment2DVectorOriented",
+                        inputSegments="CDCSegment2DVectorOriented",
                         WriteSegmentPairs=True,
                         SegmentPairFilter="truth",
                         SegmentPairFilterParameters={"allowReverse": True},
@@ -211,7 +232,7 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
         self.mc_segment_lookup = None
 
     def initialize(self):
-        self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
+        self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
         super(SegmentPairFitValidationModule, self).initialize()
 
     def prepare(self):

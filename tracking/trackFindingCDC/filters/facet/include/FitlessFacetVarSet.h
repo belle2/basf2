@@ -8,73 +8,53 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
-#include <tracking/trackFindingCDC/varsets/EmptyVarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
-
-#include <vector>
-#include <string>
-#include <assert.h>
-
-
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Forward declaration of the CDCFacet.
     class CDCFacet;
 
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
-    static char const* const facetFitlessNames[] = {
+    static char const* const fitlessFacetVarNames[] = {
       "superlayer_id",
-      // "oclock_delta",
+      "oclock_delta",
       "abs_oclock_delta",
       "cell_extend",
-      // "short_arm_is_crossing",
-      // "long_arm_is_crossing",
-      // "stable_twist",
-      // "abs_layer_id_difference",
+      "short_arm_is_crossing",
+      "long_arm_is_crossing",
+      "stable_twist",
+      "abs_layer_id_difference",
       "layer_id_difference",
       "crossing_id",
       "shape_id",
-      // "is_forward_progression",
+      "is_forward_progression",
     };
 
-    /** Class that specifies the names of the variables
-     *  that should be generated from a facet
-     */
-    class FitlessFacetVarNames : public VarNames<CDCFacet> {
+    /// Vehicle class to transport the variable names
+    struct FitlessFacetVarNames : public VarNames<const CDCFacet> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(facetFitlessNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(fitlessFacetVarNames);
 
-      /// Getter for the name a the given index
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
-        return facetFitlessNames[iName];
+        return fitlessFacetVarNames[iName];
       }
     };
 
-    /** Class that computes floating point variables from a facet.
-     *  that can be forwarded to a flat TNtuple or a TMVA method
+    /**
+     *  Class to compute floating point variables from a facet
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class FitlessFacetVarSet : public VarSet<FitlessFacetVarNames> {
 
-    private:
-      /// Type of the base class
-      using Super = VarSet<FitlessFacetVarNames>;
-
     public:
-      /// Construct the varset to be prepended to all variable names.
-      explicit FitlessFacetVarSet();
-
-      /// Generate and assign the variables from the cluster
-      virtual bool extract(const CDCFacet* facet) override final;
-
+      /// Generate and assign the contained variables
+      bool extract(const CDCFacet* ptrFacet) final;
     };
   }
 }

@@ -12,10 +12,6 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
-namespace genfit {
-  class TrackCand;
-}
-
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCWire;
@@ -28,6 +24,7 @@ namespace Belle2 {
 
       /// Getter for the vector of wires the hits of this segment are based on in the same order
       std::vector<const Belle2::TrackFindingCDC::CDCWire*> getWireSegment() const;
-    }; //end class CDCRLWireHitSegment
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+
+    };
+  }
+}

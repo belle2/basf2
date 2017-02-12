@@ -11,16 +11,17 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 std::string WireHitMCMultiLoopBlocker::getDescription()
 {
-  return "Marks all hits that were not reached after the specified number of loops as background based on MC information.";
+  return "Marks all hits that were not reached after the specified number of loops as background "
+         "based on MC information.";
 }
 
 void WireHitMCMultiLoopBlocker::exposeParameters(ModuleParamList* moduleParamList,
@@ -28,7 +29,7 @@ void WireHitMCMultiLoopBlocker::exposeParameters(ModuleParamList* moduleParamLis
 {
   moduleParamList->addParameter(prefixed(prefix, "UseNLoops"),
                                 m_param_useNLoops,
-                                "Maximal number of loops accepted as non background",
+                                "Maximal number of loops accepted",
                                 m_param_useNLoops);
 }
 
@@ -51,18 +52,20 @@ void WireHitMCMultiLoopBlocker::beginEvent()
 void WireHitMCMultiLoopBlocker::apply(std::vector<CDCWireHit>& wireHits)
 {
   if (not std::isfinite(m_param_useNLoops)) return;
-  const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
 
-  auto isWithinMCLoops = [&mcHitLookUp, this](const CDCWireHit & wireHit) {
+  const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
+  double nLoops = m_param_useNLoops;
+  auto isWithinMCLoops = [&mcHitLookUp, nLoops](const CDCWireHit & wireHit) {
+
+    // Reject hits with no assoziated CDCSimHit.
     const CDCSimHit* simHit = mcHitLookUp.getClosestPrimarySimHit(wireHit.getHit());
     if (not simHit) return false;
-    // Reject hits with no assoziated CDCSimHit.
 
     const double tof = simHit->getFlightTime();
 
+    // Accept hits with no assoziated MCParticle (e.g. beam background.)
     const MCParticle* mcParticle = simHit->getRelated<MCParticle>();
     if (not mcParticle) return true;
-    // Accept hits with no assoziated MCParticle (e.g. beam background.)
 
     const double speed = mcParticle->get4Vector().Beta() * Const::speedOfLight;
 
@@ -75,7 +78,8 @@ void WireHitMCMultiLoopBlocker::apply(std::vector<CDCWireHit>& wireHits)
     const double bendCircumfence =  2 * M_PI * bendRadius;
     const double loopLength = bendCircumfence * absMom3D / absMom2D;
     const double loopTOF =  loopLength / speed;
-    if (tof > loopTOF * m_param_useNLoops) {
+
+    if (tof > loopTOF * nLoops) {
       return false;
     } else {
       return true;
@@ -84,8 +88,8 @@ void WireHitMCMultiLoopBlocker::apply(std::vector<CDCWireHit>& wireHits)
 
   for (CDCWireHit& wireHit : wireHits) {
     if (not isWithinMCLoops(wireHit)) {
-      wireHit.getAutomatonCell().setBackgroundFlag();
-      wireHit.getAutomatonCell().setTakenFlag();
+      wireHit->setBackgroundFlag();
+      wireHit->setTakenFlag();
     }
   }
 }

@@ -48,6 +48,9 @@ namespace Belle2 {
 
     /** Disable handling of Mergeable objects. Useful for special applications like AsyncWrapper. */
     void disableMergeableHandling(bool disable = true) { m_handleMergeable = !disable; }
+
+    /** Disable sending of RandomGenerator state. */
+    void disableSendRandomState(bool disable = true) { m_sendRandomState = !disable; }
   private:
 
     //!Compression parameter
@@ -66,6 +69,7 @@ namespace Belle2 {
     bool m_blockingInsert;
 
     bool m_handleMergeable = true; /**< Whether to handle Mergeable objects. */
+    bool m_sendRandomState = true; /**< Whether to transfer the RandomGenerator state. */
 
     /** Random Generator object to pass to RxModule */
     StoreObjPtr<RandomGenerator> m_randomgenerator;

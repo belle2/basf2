@@ -10,6 +10,12 @@ namespace Belle2 {
                       int argc, char** argv,
                       int nargc, const char* msg);
 
+    static bool restart();
+
+  private:
+    static int g_argc;
+    static char** g_argv;
+
   };
 
 };

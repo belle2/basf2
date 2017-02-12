@@ -68,10 +68,12 @@ namespace Belle2 {
     PXDInterceptor* m_thePXDInterceptor; /**< the pxd interceptor object*/
     std::string m_PXDInterceptListName; /**< intercept list name*/
     std::string m_ROIListName; /**< ROI list name*/
-    std::string m_badTracksListName; /**< bad track list name*/
-    std::string m_gfTracksListName; /**< track list name*/
+    std::string m_recoTracksListName; /**< track list name*/
 
     int m_numIterKalmanFilter; /**< number of iterations of the Kalman Filter*/
+
+    double m_toleranceZ;
+    double m_tolerancePhi;
 
     double m_sigmaSystU; /**< fixed width to add in quadrature to the extrapolation error and obtain the ROI U width */
     double m_sigmaSystV;  /**< fixed width to add in quadrature to the extrapolation error and obtain the ROI V width */

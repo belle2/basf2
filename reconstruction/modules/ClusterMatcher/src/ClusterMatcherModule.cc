@@ -69,7 +69,7 @@ void ClusterMatcherModule::event()
 
   for (const ECLCluster& eclCluster : eclClusters) {
 
-    const TVector3& eclClusterPos = eclCluster.getclusterPosition();
+    const TVector3& eclClusterPos = eclCluster.getClusterPosition();
 
 
     Cluster* clusterecl = Clusters.appendNew();

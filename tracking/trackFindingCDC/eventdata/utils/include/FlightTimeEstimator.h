@@ -26,7 +26,7 @@ namespace Belle2 {
 
     public:
       /// Making the destructor virtual for this interface class
-      virtual ~FlightTimeEstimator() {};
+      virtual ~FlightTimeEstimator() = default;
 
       /// Default estimator for the flight time
       virtual double
@@ -66,7 +66,7 @@ namespace Belle2 {
 
     public:
       /// Constructor also setting up the flight time lookup table
-      CosmicRayFlightTimeEstimator(Vector3D triggerPoint = Vector3D(0, 0, 0));
+      explicit CosmicRayFlightTimeEstimator(Vector3D triggerPoint = Vector3D(0, 0, 0));
 
       /// Flight time estimator for cosmic ray events
       double getFlightTime2D(const Vector2D& pos2D, double alpha, double beta = 1) const override
@@ -87,5 +87,5 @@ namespace Belle2 {
       LookupTable<float> m_halfPeriodAlphaFlightTimeFactor;
     };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

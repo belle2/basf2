@@ -81,6 +81,32 @@ def LoadParticles(resource: fei.dag.Resource, names: typing.Sequence[str]) -> Ha
     return resource.hash
 
 
+def LoadParticlesB2BII(resource: fei.dag.Resource, names: typing.Sequence[str]) -> Hash:
+    """
+    Load FSP and V0 Particles from B2BII Particle lists
+    Restricts loading to Particles contained in current Rest Of Event if specific FEI mode is used.
+        @param resource object
+    """
+    resource.cache = True
+    cut = 'isInRestOfEvent > 0.5' if resource.env['ROE'] else ''
+
+    fillParticleLists([('K+:FSP', cut), ('pi+:FSP', cut), ('e+:FSP', cut),
+                       ('mu+:FSP', cut), ('p+:FSP', cut), ('K_L0:FSP', cut)], writeOut=True, path=resource.path)
+
+    for outputList, inputList in [('gamma:FSP', 'gamma:mdst'), ('K_S0:V0', 'K_S0:mdst'),
+                                  ('pi0:FSP', 'pi0:mdst'), ('gamma:V0', 'gamma:v0mdst')]:
+        copyParticles(outputList, inputList, writeOut=True, path=resource.path)
+        applyCuts(outputList, cut, path=resource.path)
+
+    if resource.env['monitor']:
+        hist_filename = 'Monitor_MCCounts.root'
+        unique_abs_pdgs = set([abs(pdg.from_name(name)) for name in names])
+        hist_variables = [('NumberOfMCParticlesInEvent({i})'.format(i=pdgcode), 100, -0.5, 99.5) for pdgcode in unique_abs_pdgs]
+        variablesToHistogram('', variables=hist_variables,
+                             filename=removeJPsiSlash(hist_filename), path=resource.path)
+    return resource.hash
+
+
 def MakeParticleList(resource: fei.dag.Resource, particleName: str, daughterParticleLists: typing.Sequence[ParticleList],
                      preCutConfig: fei.config.PreCutConfiguration,
                      mvaConfig: fei.config.MVAConfiguration, decayModeID: int) -> ParticleList:
@@ -420,8 +446,8 @@ def TrainMultivariateClassifier(resource: fei.dag.Resource, databasePrefix: str,
 
         command = (
             "{externTeacher} --method '{method}' --target_variable '{target}' --treename variables --datafile '{prefix}.root' "
-            "--signal_class 1 --variables '{variables}' --weightfile '{prefix}.xml' {config} > '{prefix}'.log 2>&1"
-            " && basf2_mva_upload --filename '{prefix}.xml' --identifier '{databasePrefix}_{prefix}'".format(
+            "--signal_class 1 --variables '{variables}' --identifier '{prefix}.xml' {config} > '{prefix}'.log 2>&1"
+            " && basf2_mva_upload --identifier '{prefix}.xml' --db_identifier '{databasePrefix}_{prefix}'".format(
                 databasePrefix=databasePrefix,
                 externTeacher=resource.env['externTeacher'],
                 method=mvaConfig.method,
@@ -454,7 +480,7 @@ def SignalProbability(resource: fei.dag.Resource, databasePrefix: str, particleL
         @param databasePrefix used to store the generated weightfile
         @param particleList the particleList which is used for training and classification
         @param mvaConfig configuration for the multivariate analysis
-        @param tmvaPrefix used to train teh TMVA classifier
+        @param mvaPrefix used to train teh MVA classifier
         @return string config filename
     """
     resource.cache = True
@@ -624,7 +650,7 @@ def SaveSummary(resource: fei.dag.Resource, mcCounts: typing.Mapping[int, typing
         @param clists raw channel list names
         @param mlists matched channel list names
         @param cnames channel names of each channel
-        @param trainingData filename of TMVA training data input for each channel
+        @param trainingData filename of MVA training data input for each channel
     """
 
     resource.cache = True

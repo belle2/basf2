@@ -158,7 +158,7 @@ namespace Belle2 {
      *
      * Needed only for tests.
      */
-    bool inputListsCollide(std::pair<unsigned, unsigned> pair) const;
+    bool inputListsCollide(const std::pair<unsigned, unsigned>& pair) const;
 
     /**
      * Returns the unique ID assigned to Particle with given index from the IndicesToUniqueID map.

@@ -96,9 +96,8 @@ void ECLSplitterN2Module::event()
 
   // Loop over all connected regions (CR_.
   for (auto& aCR : m_eclConnectedRegions) {
-    int iShower = 0;
+    unsigned int iShower = 1;
 
-    if (!m_eclShowers) m_eclShowers.create();
     const auto aECLShower = m_eclShowers.appendNew();
 
     // Add relation to the CR.
@@ -152,12 +151,12 @@ void ECLSplitterN2Module::event()
     aECLShower->setR(showerposition.Mag());
 
     aECLShower->setEnergy(energySum);
-    aECLShower->setEnedepsum(energySum);
-    aECLShower->setHighestEnergy(highestEnergy);
+    aECLShower->setEnergyRaw(energySum);
+    aECLShower->setEnergyHighestCrystal(highestEnergy);
     aECLShower->setCentralCellId(highestEnergyID);
     aECLShower->setTime(highestEnergyTime);
-    aECLShower->setTimeResolution(highestEnergyTimeResolution);
-    aECLShower->setNofCrystals(weightSum);
+    aECLShower->setDeltaTime99(highestEnergyTimeResolution);
+    aECLShower->setNumberOfCrystals(weightSum);
 
     aECLShower->setShowerId(iShower);
     aECLShower->setHypothesisId(Belle2::ECLConnectedRegion::c_N2);
@@ -169,7 +168,7 @@ void ECLSplitterN2Module::event()
     B2DEBUG(175, "  R               = " << aECLShower->getR());
     B2DEBUG(175, "  energy          = " << aECLShower->getEnergy());
     B2DEBUG(175, "  time            = " << aECLShower->getTime());
-    B2DEBUG(175, "  time resolution = " << aECLShower->getTimeResolution());
+    B2DEBUG(175, "  time resolution = " << aECLShower->getDeltaTime99());
 
   } // end auto& aCR
 

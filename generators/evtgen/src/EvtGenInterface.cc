@@ -138,10 +138,8 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParen
 int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph, TVector3 pPrimaryVertex)
 {
   //Fill top particle in the tree & starting the queue:
-  int position = graph.size();
-  int nParticles = 0;
-  graph.addParticle(); nParticles++;
-  MCParticleGraph::GraphParticle* p = &graph[position];
+  const int existingParticles = graph.size();
+  MCParticleGraph::GraphParticle* p = &graph.addParticle();
   updateGraphParticle(top, p, pPrimaryVertex);
 
   typedef pair<MCParticleGraph::GraphParticle*, EvtParticle*> halfFamily;
@@ -163,11 +161,8 @@ int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph
     EvtParticle* currDaughter = currFamily.second;
 
     //putting the daughter in the graph:
-    position = graph.size();
-    graph.addParticle(); nParticles++;
-    MCParticleGraph::GraphParticle* graphDaughter = &graph[position];
+    MCParticleGraph::GraphParticle* graphDaughter = &graph.addParticle();
     updateGraphParticle(currDaughter, graphDaughter, pPrimaryVertex);
-    position = graph.size();
 
     //add relation between mother and daughter to graph:
     currMother->decaysInto((*graphDaughter));
@@ -188,7 +183,7 @@ int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph
     }
   }
 
-  return nParticles;
+  return graph.size() - existingParticles;
 }
 
 

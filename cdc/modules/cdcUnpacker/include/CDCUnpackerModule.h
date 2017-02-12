@@ -305,7 +305,7 @@ namespace Belle2 {
       /**
        * Channel map retrieved from DB.
        */
-      //      DBArray<CDCChannelMap> m_channelMapFromDB;
+      DBArray<CDCChannelMap> m_channelMapFromDB;
     };//end class declaration
 
 

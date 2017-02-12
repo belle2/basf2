@@ -11,7 +11,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
 #include <daq/dataflow/EvtSocket.h>
 
 #include <boost/shared_ptr.hpp>
@@ -52,9 +51,6 @@ namespace Belle2 {
 
     //! Reciever Socket
     EvtSocketRecv* m_recv;
-
-    //! Messaage handler (obsolete)
-    MsgHandler* m_msghandler;
 
     //! DataStoreStreamer
     DataStoreStreamer* m_streamer;

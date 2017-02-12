@@ -9,15 +9,18 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
 #include <tracking/trackFindingCDC/varsets/UnionVarSet.h>
-#include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
+#include <tracking/trackFindingCDC/utilities/Named.h>
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 
 #include <vector>
 #include <string>
 #include <memory>
-#include <assert.h>
+#include <cassert>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -34,79 +37,86 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef BaseVarSet<typename FirstType<AVarSets...>::Object> Super;
+      using Super = BaseVarSet<typename FirstType<AVarSets...>::Object>;
 
     public:
       /// Object type from which variables shall be extracted.
-      typedef typename Super::Object Object;
+      using Object = typename Super::Object;
 
     private:
       /// Type of the contained variable sets
-      typedef BaseVarSet<Object> ContainedVarSet;
+      using ContainedVarSet = BaseVarSet<Object>;
 
     public:
       /// Create the union variable set.
       explicit VariadicUnionVarSet()
       {
-        EvalVariadic{
-          (m_multiVarSet.push_back(std::unique_ptr<ContainedVarSet>(new AVarSets())) , true)...
-        };
-
+        EvalVariadic{(m_multiVarSet.push_back(makeUnique<AVarSets>()), true)...};
         assert(m_multiVarSet.size() == sizeof...(AVarSets));
       }
 
     public:
       using Super::extract;
 
-      /**
-       *  Initialize all contained variable set before event processing.
-       */
-      virtual void initialize() override final
-      { m_multiVarSet.initialize(); }
+      /// Initialize all contained variable set before event processing.
+      void initialize() final {
+        m_multiVarSet.initialize();
+      }
 
       /// Signal the beginning of a new run
-      virtual void beginRun() override final
-      { m_multiVarSet.beginRun(); }
+      void beginRun() final {
+        m_multiVarSet.beginRun();
+      }
 
       /// Signal the beginning of a new event
-      virtual void beginEvent() override
-      { m_multiVarSet.beginEvent(); }
+      void beginEvent() override
+      {
+        m_multiVarSet.beginEvent();
+      }
 
       /// Signal the end of a run
-      virtual void endRun() override
-      { m_multiVarSet.beginRun(); }
+      void endRun() override
+      {
+        m_multiVarSet.beginRun();
+      }
 
-      /**
-       *  Terminate all contained variable set after event processing.
-       */
-      virtual void terminate() override final
-      { m_multiVarSet.terminate(); }
+      /// Terminate all contained variable set after event processing.
+      void terminate() final {
+        m_multiVarSet.terminate();
+      }
 
       /**
        *  Main method that extracts the variable values from the complex object.
        *  @returns  Indication whether the extraction could be completed successfully.
        */
-      virtual bool extract(const Object* obj) override final
-      { return m_multiVarSet.extract(obj); }
+      bool extract(const Object* obj) final {
+        return m_multiVarSet.extract(obj);
+      }
+
+      // Importing name from the base class.
+      using Super::getNamedVariables;
 
       /**
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
        */
-      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix = "") override
-      { return m_multiVarSet.getNamedVariables(prefix); }
+      std::vector<Named<Float_t*>> getNamedVariables(std::string prefix) override
+      {
+        return m_multiVarSet.getNamedVariables(prefix);
+      }
 
       /**
        *   Pointer to the variable with the given name.
        *   Returns nullptr if not found.
        */
-      virtual MayBePtr<Float_t> find(std::string varName) override
-      { return m_multiVarSet.find(varName); }
+      MayBePtr<Float_t> find(std::string varName) override
+      {
+        return m_multiVarSet.find(varName);
+      }
 
     private:
       /// Container for the multiple variable sets.
       UnionVarSet<Object> m_multiVarSet;
-
-    }; //end class
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

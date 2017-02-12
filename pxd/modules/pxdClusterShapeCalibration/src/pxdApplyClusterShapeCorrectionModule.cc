@@ -19,7 +19,7 @@
 #include <pxd/reconstruction/PXDRecoHit.h>
 
 #include <genfit/Track.h>
-#include <genfit/TrackPoint.h>
+//#include <genfit/TrackPoint.h>
 
 #include <framework/pcore/ProcHandler.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -30,22 +30,22 @@
 
 #include <vxd/geometry/GeoCache.h>
 
-#include <pxd/dataobjects/PXDCluster.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
+//#include <pxd/dataobjects/PXDCluster.h>
+//#include <pxd/dataobjects/PXDTrueHit.h>
 
 //#include <pxd/reconstruction/PXDClusterShape.h>
 
-#include <genfit/Track.h>
-#include <genfit/TrackCand.h>
-#include <genfit/RKTrackRep.h>
-#include <genfit/AbsKalmanFitter.h>
-#include <genfit/KalmanFitter.h>
-#include <genfit/KalmanFitterRefTrack.h>
-#include <genfit/KalmanFitStatus.h>
-#include <genfit/KalmanFitterInfo.h>
-#include <genfit/DAF.h>
-#include <genfit/Exception.h>
-#include <genfit/MeasurementFactory.h>
+//#include <genfit/Track.h>
+//#include <genfit/TrackCand.h>
+//#include <genfit/RKTrackRep.h>
+//#include <genfit/AbsKalmanFitter.h>
+//#include <genfit/KalmanFitter.h>
+//#include <genfit/KalmanFitterRefTrack.h>
+//#include <genfit/KalmanFitStatus.h>
+//#include <genfit/KalmanFitterInfo.h>
+//#include <genfit/DAF.h>
+//#include <genfit/Exception.h>
+//#include <genfit/MeasurementFactory.h>
 
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
@@ -59,6 +59,7 @@
 
 using namespace Belle2;
 using namespace Belle2::PXD;
+using namespace std;
 
 class PXDClusterShapeCalibrationAlgorithm;
 

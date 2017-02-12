@@ -11,34 +11,32 @@
 #ifndef VXDTFFILTERS_HH
 #define VXDTFFILTERS_HH
 
-#include <iostream>
 #include "tracking/dataobjects/FullSecID.h"
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 
-#include "tracking/trackFindingVXD/twoHitFilters/Distance1DZ.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance1DZTemp.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance3DNormed.h"
-#include "tracking/trackFindingVXD/twoHitFilters/SlopeRZ.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance1DZSquared.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance2DXYSquared.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance3DSquared.h"
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance1DZ.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DNormed.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/SlopeRZ.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance1DZSquared.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance2DXYSquared.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DSquared.h>
 
-#include "tracking/trackFindingVXD/threeHitFilters/Angle3DSimple.h"
-#include "tracking/trackFindingVXD/threeHitFilters/AngleXYSimple.h"
-#include "tracking/trackFindingVXD/threeHitFilters/AngleRZSimple.h"
-#include "tracking/trackFindingVXD/threeHitFilters/CircleDist2IP.h"
-#include "tracking/trackFindingVXD/threeHitFilters/DeltaSlopeRZ.h"
-#include "tracking/trackFindingVXD/threeHitFilters/DeltaSlopeZoverS.h"
-#include "tracking/trackFindingVXD/threeHitFilters/DeltaSoverZ.h"
-#include "tracking/trackFindingVXD/threeHitFilters/HelixParameterFit.h"
-#include "tracking/trackFindingVXD/threeHitFilters/Pt.h"
-#include "tracking/trackFindingVXD/threeHitFilters/CircleRadius.h"
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/Angle3DSimple.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/CosAngleXY.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/AngleRZSimple.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/CircleDist2IP.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/DeltaSlopeRZ.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/DeltaSlopeZoverS.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/DeltaSoverZ.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/HelixParameterFit.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/Pt.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/CircleRadius.h>
 
-#include "tracking/trackFindingVXD/filterTools/Shortcuts.h"
+#include <tracking/trackFindingVXD/filterMap/filterFramework/Shortcuts.h>
 #include "tracking/trackFindingVXD/filterTools/ObserverPrintResults.h"
-#include "tracking/trackFindingVXD/filterTools/Observer.h" // empty observer
-#include "tracking/trackFindingVXD/filterTools/VoidObserver.h" // empty observer
+#include <tracking/trackFindingVXD/filterMap/filterFramework/Observer.h> // empty observer
+#include <tracking/trackFindingVXD/filterMap/filterFramework/VoidObserver.h> // empty observer
 #include "tracking/trackFindingVXD/filterTools/ObserverCheckMCPurity.h"
 
 #include "tracking/trackFindingVXD/filterTools/Observer3HitPrintResults.h"
@@ -46,9 +44,10 @@
 #include <tracking/dataobjects/SectorMapConfig.h>
 
 #include "vxd/dataobjects/VxdID.h"
-#include "tracking/trackFindingVXD/sectorMapTools/CompactSecIDs.h"
+#include <tracking/trackFindingVXD/filterMap/map/CompactSecIDs.h>
 #include "tracking/trackFindingVXD/segmentNetwork/StaticSector.h"
 
+#include <TString.h>
 //#include <unordered_map>
 #include <set>
 
@@ -93,7 +92,7 @@ namespace Belle2 {
     /// big working example for 3-hits:
     typedef decltype(
       (0. <= Angle3DSimple<point_t>()   <= 0.).observe(VoidObserver())&&
-      (0. <= AngleXYSimple<point_t>()   <= 0.).observe(VoidObserver())&&
+      (0. <= CosAngleXY<point_t>()   <= 0.).observe(VoidObserver())&&
       (0. <= AngleRZSimple<point_t>()   <= 0.).observe(VoidObserver())&&
       (CircleDist2IP<point_t>()         <= 0.).observe(VoidObserver())&&
       (0. <= DeltaSlopeRZ<point_t>()    <= 0.).observe(VoidObserver())&&
@@ -109,21 +108,25 @@ namespace Belle2 {
     typedef StaticSector< point_t, twoHitFilter_t, threeHitFilter_t , int >
     staticSector_t;
 
-
+    /** Construct the container of all the filters used by the VXD Track Finder**/
     VXDTFFilters(): m_testConfig()
     {
       m_staticSectors.resize(2);
       // The first static sector is not used and will never be since the first
-      // compact id is 1.
+      // compact id is 1 and compact id = 0 is reserved to signal an error.
       m_staticSectors[0] = nullptr;
       // initialize the first slot of the Static sector vector
       m_staticSectors[1] = nullptr;
     }
 
-
-    int addSectorsOnSensor(const vector<double>&              normalizedUsup,
-                           const vector<double>&              normalizedVsup,
-                           const vector< vector<FullSecID> >& sectorIds)
+    /** To add an array of sectors on a sensor.
+     * @param normalizedUsup and @param normalizedVsup
+     * are two vectors of double coding the geometry of the sectors.
+     * @param sectorIds is a rectangular matrix of FullSecID.
+     * It returns the number of sectors added to the compactSecIDsMap**/
+    int addSectorsOnSensor(const std::vector<double>&              normalizedUsup,
+                           const std::vector<double>&              normalizedVsup,
+                           const std::vector< std::vector<FullSecID> >& sectorIds)
     {
 
       auto addedSectors = m_compactSecIDsMap.addSectors(normalizedUsup,
@@ -158,7 +161,6 @@ namespace Belle2 {
                         FullSecID inner,
                         const twoHitFilter_t& filter)
     {
-      // TODO add the friendship relation to the static sector
       if (m_staticSectors.size() <= m_compactSecIDsMap[ outer ] ||
           m_compactSecIDsMap[ outer ] == 0)
         return 0;
@@ -174,7 +176,7 @@ namespace Belle2 {
                           FullSecID inner,
                           const threeHitFilter_t& filter)
     {
-      // TODO add the friendship relation to the static sector
+
       if (m_staticSectors.size() <= m_compactSecIDsMap[ outer ] ||
           m_compactSecIDsMap[ outer ] == 0 ||
           m_compactSecIDsMap[ center ] == 0 ||
@@ -266,26 +268,26 @@ namespace Belle2 {
 
       if (! m_testConfig.Write("config"))
         return false;
-      if (! m_compactSecIDsMap.persist())
+      if (! persistSectors())
         return false;
 
-      if (! persistStaticSectors())
+      if (! persistFilters())
         return false;
 
       return true;
     };
 
     /// Retrieves from the current TDirectory all the VXDTFFilters
-    bool retrieveFromRootFile(void)
+    bool retrieveFromRootFile(const TString* dirName)
     {
 
       if (! m_testConfig.Read("config"))
         return false;
 
-      if (! m_compactSecIDsMap.read())
+      if (! retrieveSectors(dirName))
         return false;
 
-      if (! retrieveStaticSectors())
+      if (! retrieveFilters(dirName))
         return false;
 
       return true;
@@ -293,8 +295,85 @@ namespace Belle2 {
 
   private:
 
+    /// Persists all the sectors on the current TDirectory
+    bool persistSectors(void) const
+    {
+      TTree* tree = new TTree(c_CompactSecIDstreeName, c_CompactSecIDstreeName);
+      UInt_t layer, ladder, sensor;
+      tree->Branch("layer" , & layer , "layer/i");
+      tree->Branch("ladder", & ladder, "ladder/i");
+      tree->Branch("sensor", & sensor, "sensor/i");
+
+      std::vector< double >* normalizedUsup = new std::vector< double> ();
+      tree->Branch("normalizedUsup", & normalizedUsup);
+
+      std::vector< double >* normalizedVsup = new std::vector< double> ({1., 2., 3., 4.});
+      tree->Branch("normalizedVsup", & normalizedVsup);
+
+      std::vector< std::vector< unsigned int > >* fullSecIDs =
+        new std::vector< std::vector< unsigned int > > ();
+      tree->Branch("fullSecID", & fullSecIDs);
+
+      unsigned nOfLayers = m_compactSecIDsMap.nOfLayers();
+      for (layer = 0 ; layer < nOfLayers ; layer ++) {
+        unsigned nOfLadders = m_compactSecIDsMap.nOfLadders(layer);
+        for (ladder = 0; ladder < nOfLadders ; ladder ++) {
+          unsigned nOfSensors = m_compactSecIDsMap.nOfSensors(layer, ladder);
+          for (sensor = 0; sensor < nOfSensors ; sensor ++) {
+            normalizedUsup->clear();
+            normalizedVsup->clear();
+            fullSecIDs->clear();
+            auto sectorsOnSensor =
+              m_compactSecIDsMap.getSectorsOnSensor(layer, ladder, sensor);
+            sectorsOnSensor.get(normalizedUsup, normalizedVsup, fullSecIDs);
+            tree->Fill();
+          }
+        }
+      }
+      delete normalizedVsup;
+      delete normalizedUsup;
+      delete fullSecIDs;
+      return true;
+    }
+
+    /// Read the whole CompactSecIDs from the current TDirectory
+    bool retrieveSectors(const TString* dirName)
+    {
+      TString treeName = *dirName;
+      treeName.Append("/");
+      treeName.Append(c_CompactSecIDstreeName);
+      TTree* tree = (TTree*) gFile->Get(treeName);
+      UInt_t layer, ladder, sensor;
+      tree->SetBranchAddress("layer" , & layer);
+      tree->SetBranchAddress("ladder", & ladder);
+      tree->SetBranchAddress("sensor", & sensor);
+
+      std::vector< double >* normalizedUsup = new std::vector< double> ();
+      tree->SetBranchAddress("normalizedUsup", & normalizedUsup);
+
+      std::vector< double >* normalizedVsup = new std::vector< double> ({1., 2., 3., 4.});
+      tree->SetBranchAddress("normalizedVsup", & normalizedVsup);
+
+      std::vector< std::vector< unsigned int > >* fullSecIDs =
+        new std::vector< std::vector< unsigned int > > ();
+      tree->SetBranchAddress("fullSecID", & fullSecIDs);
+
+
+      for (Long64_t i = 0; i < tree->GetEntries() ; i++) {
+        tree->GetEntry(i);
+        this->addSectorsOnSensor(* normalizedUsup,
+                                 * normalizedVsup,
+                                 * fullSecIDs);
+      }
+
+      delete normalizedVsup;
+      delete normalizedUsup;
+      delete fullSecIDs;
+      return true;
+    }
+
     /// Persists on the current TDirectory the StaticSectors.
-    bool persistStaticSectors(void) const
+    bool persistFilters(void) const
     {
 
       TTree* sp2tree = new TTree("SegmentFilters", "SegmentFilters");
@@ -348,9 +427,70 @@ namespace Belle2 {
     }
 
     /// Retrieves from the current TDirectory the StaticSectors.
-    bool retrieveStaticSectors(void)
+    bool retrieveFilters(const TString* dirName)
     {
+      TString sp2treeName = *dirName;
+      sp2treeName.Append("/SegmentFilters");
+      TTree* sp2tree = (TTree*) gFile->Get(sp2treeName);
+      if (!sp2tree)
+        return false;
+
+      twoHitFilter_t twoHitFilter;
+      twoHitFilter.setBranchAddress(sp2tree, "filter");
+
+      unsigned int outerFullSecID2sp, innerFullSecID2sp;
+      sp2tree->SetBranchAddress("outerFullSecID", & outerFullSecID2sp);
+      sp2tree->SetBranchAddress("innerFullSecID", & innerFullSecID2sp);
+
+      for (Long64_t i = 0 ; i < sp2tree->GetEntries() ; i++) {
+        sp2tree->GetEntry(i);
+        if (!addTwoHitFilter(outerFullSecID2sp, innerFullSecID2sp,
+                             twoHitFilter))
+          return false;
+
+      }
+
+      TString sp3treeName = *dirName;
+      sp3treeName.Append("/TripletsFilters");
+      TTree* sp3tree = (TTree*) gFile->Get(sp3treeName);
+      if (! sp3tree)
+        return false;
+      threeHitFilter_t threeHitFilter;
+      threeHitFilter.setBranchAddress(sp3tree, "filter");
+
+      unsigned int outerFullSecID3sp, centerFullSecID3sp,
+               innerFullSecID3sp;
+      sp3tree->SetBranchAddress("outerFullSecID", & outerFullSecID3sp);
+      sp3tree->SetBranchAddress("centerFullSecID", & centerFullSecID3sp);
+      sp3tree->SetBranchAddress("innerFullSecID", & innerFullSecID3sp);
+
+      for (Long64_t i = 0 ; i < sp3tree->GetEntries() ; i++) {
+        sp3tree->GetEntry(i);
+        if (!addThreeHitFilter(outerFullSecID3sp, centerFullSecID3sp,
+                               innerFullSecID3sp,
+                               threeHitFilter))
+          return false;
+
+      }
+
       return true;
+    }
+
+    int addSectorsOnSensor(const std::vector< double>&   normalizedUsup,
+                           const std::vector< double>&   normalizedVsup,
+                           const std::vector< std::vector< unsigned int >>&
+                           fullSecIDsBaseType)
+    {
+      std::vector< std::vector< FullSecID >> fullSecIDs;
+
+      for (auto col : fullSecIDsBaseType) {
+        std::vector< FullSecID > tmp_col;
+        for (auto id : col)
+          tmp_col.push_back(FullSecID(id));
+        fullSecIDs.push_back(tmp_col);
+      }
+
+      return addSectorsOnSensor(normalizedUsup, normalizedVsup, fullSecIDs);
     }
 
     /**
@@ -363,11 +503,13 @@ namespace Belle2 {
     /** This vector contains all the static sectors on a sector map.
      *  The index is the compact ID provided by the CompactSecIDs
      */
-    vector< staticSector_t* > m_staticSectors;
+    std::vector< staticSector_t* > m_staticSectors;
 
     /** Configuration: i.e. name of the sector map, tuning
     parameters, etc.  */
     SectorMapConfig m_testConfig;
+
+    const char* c_CompactSecIDstreeName = "CompactSecIDs";
 
   };
 

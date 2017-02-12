@@ -3,18 +3,18 @@
   <Creator library="top">TOPCreator</Creator>
   <Content>
     <xi:include href="TOP-Bars.xml"/>
-    <xi:include href="TOP-BarsAlignment.xml"/>
+    <xi:include href="TOP-Mirror.xml"/>
     <xi:include href="TOP-PMT.xml"/>
     <xi:include href="TOP-TDC.xml"/>
     <xi:include href="TOP-QENaKSbCs.xml"/>
-    <xi:include href="TOP-PMTAlignment.xml"/>
     <xi:include href="TOP-Materials.xml"/>
-    <xi:include href="TOP-Support.xml"/>
-    <xi:include href="TOP-Mirror.xml"/>
-    <xi:include href="TOP-SupportAlignment.xml"/>
+    <xi:include href="QBB.xml"/>
+    <xi:include href="FrontEndGeo.xml"/>
     <xi:include href="FrontEndMapping.xml"/>
     <xi:include href="ChannelMappingIRS3B.xml"/>
     <xi:include href="ChannelMappingIRSX.xml"/>
+    <xi:include href="BrokenGlues.xml"/>
+    <xi:include href="PeelOffCookies.xml"/>
     
     <BeamBackgroundStudy desc="select 1 to record neutron and gamma hits">0</BeamBackgroundStudy>
 

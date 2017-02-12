@@ -260,6 +260,7 @@ class HarvestingModule(basf2.Module):
 
         self.stash.close()
         del self.stash
+
         self.refine(self.crops)
 
     @staticmethod
@@ -294,7 +295,10 @@ class HarvestingModule(basf2.Module):
             try:
                 while True:
                     for part_name, parts in list(raw_crops.items()):
-                        parts.append(crop[part_name])
+                        if part_name in crop:
+                            parts.append(crop[part_name])
+                        else:
+                            parts.append(np.NaN)
                     # next crop
                     crop = (yield)
             except GeneratorExit:

@@ -34,28 +34,72 @@ namespace Belle2 {
   class BFieldComponentQuad : public BFieldComponentAbs {
 
   public:
+    /** Range data structure. */
+    struct range_t {
+      double r0; /**< min of the range */
+      double r1; /**< max of the range */
+    };
+    /** vector of Range data structure. */
+    typedef std::vector<range_t> ranges_t;
 
     /** Aperture data structure. */
     struct ApertPoint {
-      double s; /**< s in [mm] */
-      double r; /**< r in [mm] */
+      double s; /**< length along beamline in [cm] */
+      double r; /**< aperture in [cm] */
     };
 
-    /** Magnetic field data structure. */
-    struct ParamPoint {
-      double s;   /**< s in [m] */
-      double L;   /**< element length in [m] */
-      double K0;  /**< dipole component in [dimensionless] */
-      double K1;  /**< quadrupole component in [1/m] */
-      double SK0; /**< skew dipole component  in [dimensionless] */
-      double SK1; /**< skew quadrupole component in [1/m] */
-      double ROTATE; /**< rotation in [radian] */
-      double DX;   /**< horizontal displacement in [m] */
-      double DY;   /**< vertical displacement in [m] */
-
-      /* Note that K parameters used in SAD is multiplied by the element length.
-       * Popular definitions are:  K0,SK0[1/m] and K1,SK1[1/m^2]
+    /** Quadrupole lense data structure. This is a flat structure so
+    magnetic field has only X and Y components */
+    struct ParamPoint3 {
+      double s;   /**< s in [cm] */
+      double L;   /**< element length in [cm] */
+      double mxx; /**< xx coefficents to calculate Bx */
+      double mxy; /**< xy coefficents to calculate Bx */
+      double mx0; /**< x0 coefficents to calculate Bx */
+      double myx; /**< yx coefficents to calculate By */
+      double myy; /**< yy coefficents to calculate By */
+      double my0; /**< y0 coefficents to calculate By */
+      /**
+       * Calculates the X component of the magnetic field vector at
+       * the specified space point from a quadrupole lense.
+       *
+       * @param x The X component of the space point in Cartesian coordinates (x,y) in [cm]
+       * @param y The Y component of the space point in Cartesian coordinates (x,y) in [cm]
+       * @return  The X component of magnetic field vector at the given space point in [T].
        */
+      inline double getBx(double x, double y) const {return x * mxx + y * mxy + mx0;}
+      /**
+       * Calculates the Y component of the magnetic field vector at
+       * the specified space point from a quadrupole lense.
+       *
+       * @param x The X component of the space point in Cartesian coordinates (x,y) in [cm]
+       * @param y The Y component of the space point in Cartesian coordinates (x,y) in [cm]
+       * @return  The Y component of magnetic field vector at the given space point in [T].
+       */
+      inline double getBy(double x, double y) const {return x * myx + y * myy + my0;}
+
+      /**
+       * Sum up the matrix components of quadrupole lenses
+       *
+       * @param t the lense structure to add
+       * @return  reference to resulting lense structure
+       */
+      ParamPoint3& operator +=(const ParamPoint3& t)
+      {
+        mxx += t.mxx;
+        mxy += t.mxy;
+        mx0 += t.mx0;
+        myx += t.myx;
+        myy += t.myy;
+        my0 += t.my0;
+        return *this;
+      }
+    };
+
+    /** start and stop indicies to narrow search in array */
+    struct irange_t {
+      short int i0; /**< start index */
+      short int i1; /**< stop index */
     };
 
     /** The BFieldComponentQuad constructor. */
@@ -76,13 +120,7 @@ namespace Belle2 {
      * @param point The space point in Cartesian coordinates (x,y,z) in [cm] at which the magnetic field vector should be calculated.
      * @return The magnetic field vector at the given space point in [T]. Returns a zero vector TVector(0,0,0) if the space point lies outside the region described by the component.
      */
-    virtual TVector3 calculate(const TVector3& point) const;
-
-    /**
-     * Terminates the magnetic field component.
-     * This method closes the magnetic field map file.
-     */
-    virtual void terminate();
+    virtual B2Vector3D calculate(const B2Vector3D& point) const;
 
     /**
      * Returns the HER beam pipe aperture at given position.
@@ -129,6 +167,22 @@ namespace Belle2 {
     void setApertSize(int sizeHER, int sizeLER) { m_apertSizeHER = sizeHER; m_apertSizeLER = sizeLER; }
 
   private:
+    /** Search for range occuped by optics since now only for ranges are present use linear search
+     *
+     * @param a   cooridinate along beamline
+     * @param b   vector with ranges with sentinel at the begining and the end
+     * @return    the range number if out of ranges return -1
+     */
+    inline int getRange(double a, const ranges_t& b) const;
+
+    /** Returns the beam pipe aperture at given position. Small number of points again linear search.
+     *
+     * @param s    The position in beam-axis coordinate.
+     * @param hint Start search from this position
+     * @return     The beam pipe aperture at given position.
+     */
+    inline double getAperture(double s, std::vector<ApertPoint>::const_iterator hint) const;
+
     /** Magnetic field map of HER   */
     std::string m_mapFilenameHER{""};
     /** Magnetic field map of LER   */
@@ -149,17 +203,30 @@ namespace Belle2 {
     int m_apertSizeHER{0};
     /** The size of the aperture for LER */
     int m_apertSizeLER{0};
+    /** The square of maximal aperture for fast rejection */
+    double m_maxr2{0};
 
-    /** The map buffer for HER  */
-    ParamPoint* m_mapBufferHER{nullptr};
-    /** The map buffer for LER  */
-    ParamPoint* m_mapBufferLER{nullptr};
-    /** The memory buffer for the field parameters. */
-    ParamPoint* m_mapBufferHERleak{nullptr};
-    /** The memory buffer for the aperture parameters (HER). */
-    ApertPoint* m_apertBufferHER{nullptr};
-    /** The memory buffer for the aperture parameters (LER). */
-    ApertPoint* m_apertBufferLER{nullptr};
+    ranges_t m_ranges_her; /**< ranges vector for HER */
+    ranges_t m_ranges_ler; /**< ranges vector for LER */
+
+    /** The the aperture parameters for HER. */
+    std::vector<ApertPoint> m_ah;
+    /** The the aperture parameters for LER. */
+    std::vector<ApertPoint> m_al;
+
+    /** The map for HER */
+    std::vector<ParamPoint3> m_h3;
+    /** The map for LER */
+    std::vector<ParamPoint3 >m_l3;
+
+    /** The vector of pointer to accelerate search in maps for her */
+    std::vector<std::vector<ParamPoint3>::const_iterator> m_offset_pp_her;
+    /** The vector of pointer to accelerate search in maps for ler */
+    std::vector<std::vector<ParamPoint3>::const_iterator> m_offset_pp_ler;
+    /** The vector of pointer to accelerate search in aperture for her */
+    std::vector<std::vector<ApertPoint>::const_iterator> m_offset_ap_her;
+    /** The vector of pointer to accelerate search in aperture for ler */
+    std::vector<std::vector<ApertPoint>::const_iterator> m_offset_ap_ler;
   };
 
 } //end of namespace Belle2

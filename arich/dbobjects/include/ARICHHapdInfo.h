@@ -34,14 +34,14 @@ namespace Belle2 {
     ARICHHapdInfo(): m_serial(""), m_qe400(0.0), m_highVoltage(0.0), m_guardBias(0), m_current(0.0), m_quantumEfficiency(NULL),
       m_pulseHeight(NULL)
     {
-      for (unsigned i = 0; i < 4; i++) m_HAPDChipInfo[i] = Belle2::ARICHHapdChipInfo();
+      for (unsigned i = 0; i < 4; i++) m_HAPDChipInfo[i] = NULL;
     }
 
 
     /**
      * Constructor
      */
-    ARICHHapdInfo(std::string serial, float qe400, float hv, int gb, float I, ARICHHapdChipInfo* HAPDChipInfo, TGraph* qe,
+    ARICHHapdInfo(const std::string& serial, float qe400, float hv, int gb, float I, ARICHHapdChipInfo** HAPDChipInfo, TGraph* qe,
                   TGraph* pulseHeight): m_serial(serial), m_qe400(qe400), m_highVoltage(hv), m_guardBias(gb), m_current(I), m_quantumEfficiency(qe),
       m_pulseHeight(pulseHeight)
     {
@@ -118,14 +118,14 @@ namespace Belle2 {
      * @param i index of the chip
      * @return HapdChipInfo
      */
-    ARICHHapdChipInfo getHapdChipInfo(unsigned int i) const;
+    ARICHHapdChipInfo* getHapdChipInfo(unsigned int i) const;
 
     /**
      * Set HapdChipInfo of the chip i
      * @param i index of the chip
      * @param chipInfo ARICHHapdChipInfo
      */
-    void setHapdChipInfo(unsigned int i, ARICHHapdChipInfo chipInfo);
+    void setHapdChipInfo(unsigned int i, ARICHHapdChipInfo* chipInfo);
 
     /**
      * Return Quantum Efficiency as a function of wavelength
@@ -156,13 +156,13 @@ namespace Belle2 {
     std::string m_serial;                   /**< serial number of the sensor */
     float   m_qe400;                        /**< quantum efficiency at 400 nm */
     float   m_highVoltage;                  /**< Operational high voltage */
-    int   m_guardBias;                      /**< guard HV (V) */
+    int     m_guardBias;                    /**< guard HV (V) */
     float   m_current;                      /**< Current (A)  */
-    ARICHHapdChipInfo m_HAPDChipInfo[4];    /**< HapdChipInfo id of the i-th chip in the sensor */
+    ARICHHapdChipInfo* m_HAPDChipInfo[4];   /**< HapdChipInfo id of the i-th chip in the sensor */
     TGraph*  m_quantumEfficiency;           /**< Quantum Efficiency as a function of wavelength */
     TGraph*  m_pulseHeight;                 /**< Pulse height distribution */
 
-    ClassDef(ARICHHapdInfo, 1); /**< ClassDef */
+    ClassDef(ARICHHapdInfo, 2); /**< ClassDef */
   };
 } // end namespace Belle2
 

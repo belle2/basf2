@@ -7,11 +7,13 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
 #include <tuple>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -67,7 +69,8 @@ namespace Belle2 {
       bool getMaskedFlag() const {return m_wireHit->getAutomatonCell().hasMaskedFlag();};
 
       /// Calculate conformal coordinates with respect to choosen point by transforming the wire coordinates. Returns (x',y',driftLength)
-      std::tuple<Vector2D, double> performConformalTransformWithRespectToPoint(const Vector2D& refPos2D) const;
+      std::tuple<Vector2D, double>
+      performConformalTransformWithRespectToPoint(const Vector2D& pos2D) const;
 
     private:
       /// Pointer to the wire hit.
@@ -79,6 +82,6 @@ namespace Belle2 {
       /// Drift time of the hit in the conformal plane
       double m_conformalDriftLength;
 
-    }; //end class CDCTrackHit
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

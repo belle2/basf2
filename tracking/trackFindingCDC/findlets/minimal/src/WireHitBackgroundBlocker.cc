@@ -11,12 +11,11 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
+#include <framework/core/ModuleParamList.h>
+
 #include <vector>
-#include <algorithm>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -37,11 +36,9 @@ void WireHitBackgroundBlocker::exposeParameters(ModuleParamList* moduleParamList
 
   moduleParamList->addParameter(prefixed(prefix, "noiseChargeDeposit"),
                                 m_param_noiseChargeDeposit,
-                                "Threshold energy below which the hit is considered as electronic noise",
+                                "Threshold energy below which the hit is considered "
+                                "to be electronic noise",
                                 m_param_noiseChargeDeposit);
-
-
-
 }
 
 void WireHitBackgroundBlocker::apply(std::vector<CDCWireHit>& wireHits)
@@ -60,8 +57,8 @@ void WireHitBackgroundBlocker::apply(std::vector<CDCWireHit>& wireHits)
     }
 
     if (markAsBackground) {
-      wireHit.getAutomatonCell().setBackgroundFlag();
-      wireHit.getAutomatonCell().setTakenFlag();
+      wireHit->setBackgroundFlag();
+      wireHit->setTakenFlag();
     }
   }
 }

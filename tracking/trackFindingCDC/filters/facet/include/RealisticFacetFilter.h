@@ -11,16 +11,20 @@
 
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
+    class CDCFacet;
+
     /// Filter for the constuction of good facets based on simple criterions.
-    class RealisticFacetFilter : public Filter<CDCFacet> {
+    class RealisticFacetFilter : public BaseFacetFilter {
 
     private:
       /// Type of the super class
-      typedef Filter<CDCFacet> Super;
+      using Super = BaseFacetFilter;
 
     public:
       /// Constructor using default direction of flight deviation cut off.
@@ -31,21 +35,18 @@ namespace Belle2 {
 
     public:
       /// Expose the set of parameters of the filter to the module parameter list.
-      virtual void exposeParameters(ModuleParamList* moduleParamList,
-                                    const std::string& prefix = "") override;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
     public:
       /**
        *  Main filter method returning the weight of the facet
        *  Returns NAN if the cell shall be rejected.
        */
-      virtual
-      Weight operator()(const CDCFacet& facet) override final;
+      Weight operator()(const CDCFacet& facet) final;
 
     private:
       /// Memory for the pull cu
       double m_param_phiPullCut;
-
-    }; // end class RealisticFacetFilter
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

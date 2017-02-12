@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import tracking
-from trackfindingcdc.cli.displaying import run_cdc_display
+import basf2
+import logging
+
+from trackfindingcdc.run.display import CDCDisplayRun
 
 def main():
-    arguments = dict(show_all_draw_options=True, file_name_prefix="event_")
-    run_cdc_display(arguments)
+    cdc_display_run = CDCDisplayRun()
+    cdc_display_run.show_all_drawoptions = True
+    file_name_prefix = "event_"
+    cdc_display_run.configure_and_execute_from_commandline()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     main()

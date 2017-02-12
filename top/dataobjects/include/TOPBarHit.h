@@ -39,6 +39,9 @@ namespace Belle2 {
      * @param momentum   impact momentum
      * @param time       impact time
      * @param length     length of particle trajectory to impact point
+     * @param impactLoc  impact point in local (bar) frame
+     * @param theta      impact polar angle in local (bar) frame
+     * @param phi        impact azimuthal angle in local (bar) frame
      */
     TOPBarHit(
       int moduleID,
@@ -47,7 +50,10 @@ namespace Belle2 {
       TVector3 impact,
       TVector3 momentum,
       double time,
-      double length
+      double length,
+      TVector3 impactLoc,
+      double theta,
+      double phi
     )
     {
       m_moduleID = moduleID;
@@ -63,6 +69,11 @@ namespace Belle2 {
       m_pz = (float) momentum.z();
       m_time = (float) time;
       m_length = (float) length;
+      m_xloc = (float) impactLoc.x();
+      m_yloc = (float) impactLoc.y();
+      m_zloc = (float) impactLoc.z();
+      m_theta = (float) theta;
+      m_phi = (float) phi;
     }
 
     /**
@@ -81,19 +92,25 @@ namespace Belle2 {
      * Returns production point
      * @return production position
      */
-    TVector3 getProductionPoint() const { TVector3 vec(m_x0, m_y0, m_z0); return vec; }
+    TVector3 getProductionPoint() const {return TVector3(m_x0, m_y0, m_z0);}
 
     /**
      * Returns impact point
      * @return impact position
      */
-    TVector3 getPosition() const { TVector3 vec(m_x, m_y, m_z); return vec; }
+    TVector3 getPosition() const { return TVector3(m_x, m_y, m_z);}
+
+    /**
+     * Returns impact point
+     * @return impact position
+     */
+    TVector3 getLocalPosition() const { return TVector3(m_xloc, m_yloc, m_zloc);}
 
     /**
      * Returns impact momentum
      * @return impact momentum vector
      */
-    TVector3 getMomentum() const { TVector3 vec(m_px, m_py, m_pz); return vec; }
+    TVector3 getMomentum() const {return TVector3(m_px, m_py, m_pz); }
 
     /**
      * Returns tract length from production to impact point
@@ -107,24 +124,40 @@ namespace Belle2 {
      */
     double getTime() const { return m_time; }
 
+    /**
+     * Returns polar angle in local (bar) frame
+     * @return polar angle
+     */
+    double getTheta() const {return m_theta;}
+
+    /**
+     * Returns azimuthal angle in local (bar) frame
+     * @return azimuthal angle
+     */
+    double getPhi() const {return m_phi;}
 
   private:
 
-    int m_moduleID = 0;       /**< TOP module ID */
-    int m_pdg = 0;            /**< PDG code of particle */
-    float m_x0 = 0;           /**< production point, x component */
-    float m_y0 = 0;           /**< production point, y component */
-    float m_z0 = 0;           /**< production point, z component */
-    float m_x = 0;            /**< impact point, x component */
-    float m_y = 0;            /**< impact point, y component */
-    float m_z = 0;            /**< impact point, z component */
-    float m_px = 0;           /**< impact momentum, x component */
-    float m_py = 0;           /**< impact momentum, y component */
-    float m_pz = 0;           /**< impact momentum, z component */
-    float m_time = 0;         /**< impact time */
-    float m_length = 0;       /**< length of particle trajectory to impact point */
+    int m_moduleID = 0; /**< TOP module ID */
+    int m_pdg = 0;      /**< PDG code of particle */
+    float m_x0 = 0;     /**< production point, x component */
+    float m_y0 = 0;     /**< production point, y component */
+    float m_z0 = 0;     /**< production point, z component */
+    float m_x = 0;      /**< impact point, x component */
+    float m_y = 0;      /**< impact point, y component */
+    float m_z = 0;      /**< impact point, z component */
+    float m_px = 0;     /**< impact momentum, x component */
+    float m_py = 0;     /**< impact momentum, y component */
+    float m_pz = 0;     /**< impact momentum, z component */
+    float m_time = 0;   /**< impact time */
+    float m_length = 0; /**< length of particle trajectory to impact point */
+    float m_xloc = 0;   /**< impact point, x component in local (bar) frame */
+    float m_yloc = 0;   /**< impact point, y component in local (bar) frame */
+    float m_zloc = 0;   /**< impact point, z component in local (bar) frame */
+    float m_theta = 0;  /**< impact polar angle in local (bar) frame */
+    float m_phi = 0;    /**< impact azimuthal angle in local (bar) frame */
 
-    ClassDef(TOPBarHit, 2);     /**< ClassDef */
+    ClassDef(TOPBarHit, 3);     /**< ClassDef */
 
   };
 

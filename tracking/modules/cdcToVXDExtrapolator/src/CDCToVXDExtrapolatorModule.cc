@@ -566,7 +566,10 @@ bool CDCToVXDExtrapolatorModule::extrapolateToLayer(genfit::Track* track, int se
         fitter->setMultipleMeasurementHandling(genfit::unweightedClosestToPredictionWire);
         fitter->setMaxFailedHits(5);
         try {
-          if (!track->checkConsistency()) {
+          try {
+            track->checkConsistency();
+          } catch (genfit::Exception& e) {
+            B2DEBUG(50, e.getExcString());
             B2DEBUG(50, "Inconsistent track found, attempting to sort!");
             bool sorted = track->sort();
             if (!sorted) {
@@ -708,7 +711,10 @@ bool CDCToVXDExtrapolatorModule::refitTrack(genfit::Track* track)
     fitter->setMaxFailedHits(5);
   }
   try {
-    if (!track->checkConsistency()) {
+    try {
+      track->checkConsistency();
+    } catch (genfit::Exception& e) {
+      B2DEBUG(50, e.getExcString());
       B2DEBUG(50, "Inconsistent track found, attempting to sort!");
       bool sorted = track->sort();
       if (!sorted) {
@@ -717,6 +723,7 @@ bool CDCToVXDExtrapolatorModule::refitTrack(genfit::Track* track)
         B2DEBUG(50, "Track points SORTED!! Hopefully this works now!");
       }
     }
+
     fitter->processTrack(track);
 
     genfit::FitStatus* fs = 0;
@@ -839,9 +846,7 @@ void CDCToVXDExtrapolatorModule::event()
   StoreArray<MCParticle> mcParticles(m_mcParticlesColName);
   int nTracks = gfTracks.getEntries();
   StoreArray<genfit::Track> outGfTracks(m_OutGFTrackColName);
-  outGfTracks.create();
   StoreArray<genfit::TrackCand> outGfTrackCands(m_OutGFTrackCandColName);
-  outGfTrackCands.create();
   RelationArray gfTrackCandidatesTogfTracks(outGfTrackCands, outGfTracks);
   RelationArray gfTracksToMCPart(outGfTracks, mcParticles);
 

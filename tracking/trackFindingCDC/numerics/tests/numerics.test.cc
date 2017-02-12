@@ -10,13 +10,14 @@
 #include <tracking/trackFindingCDC/numerics/SinEqLine.h>
 
 #include <tracking/trackFindingCDC/geometry/Line2D.h>
+#include <tracking/trackFindingCDC/numerics/Median.h>
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
 #include <tracking/trackFindingCDC/numerics/ESign.h>
 
 #include <framework/gearbox/Unit.h>
 
 #include <gtest/gtest.h>
 
-using namespace std;
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -206,4 +207,22 @@ TEST(TrackFindingCDCTest, numerics_SinEqLine_computeRootForLargeSlope)
 
   EXPECT_NEAR(rootX, solvedRootX, 10e-7);
   EXPECT_NEAR(0.0, solvedRootY, 10e-7);
+}
+
+
+
+TEST(TrackFindingCDCTest, numerics_median)
+{
+  std::vector<double> fourValues{0.0, 3.0, 5.0, 100};
+  EXPECT_EQ(4.0, median(std::move(fourValues)));
+
+  std::vector<double> threeValues{0.0, 3.0, 5.0, 100.0, 1000.0};
+  EXPECT_EQ(5.0, median(std::move(threeValues)));
+
+  std::vector<WithWeight<double>> weightedValues{{0.0, 0.2},
+    {3.0, 0.1},
+    {5.0, 0.1},
+    {100.0, 0.3},
+    {1000.0, 0.3}};
+  EXPECT_EQ(100.0, weightedMedian(std::move(weightedValues)));
 }

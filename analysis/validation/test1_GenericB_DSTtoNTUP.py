@@ -17,12 +17,13 @@ from stdCharged import *
 from stdV0s import *
 from stdPhotons import *
 from stdPi0s import *
+from stdLightMesons import *
 
 inputMdst('default', '../GenericB_GENSIMRECtoDST.dst.root')
 loadStdCharged()
-loadStdPhotons()
-loadStdPi0s()
-loadStdV0s()
+loadStdPhoton()
+loadStdPi0()
+loadStdKS()
 loadStdLightMesons()
 
 
@@ -135,7 +136,7 @@ ntupleTree('truthpi0tuple', 'pi0:gen', truthToolsPi0)
 
 ##########
 # Check the KS0 candidates
-matchMCTruth('K_S0:loose')
+matchMCTruth('K_S0:all')
 recoToolsKs = [
     'EventMetaData',
     '^K_S0',
@@ -150,7 +151,7 @@ recoToolsKs = [
     'MCVertex',
     'K_S0 -> ^pi- ^pi+',
 ]
-ntupleTree('kstuple', 'K_S0:loose', recoToolsKs)
+ntupleTree('kstuple', 'K_S0:all', recoToolsKs)
 
 ##########
 # dump all event summary information

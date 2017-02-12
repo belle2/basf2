@@ -21,14 +21,28 @@ namespace Belle2 {
 
     private:
       /// The Super class.
-      typedef BoxDivisionHoughTree<AHitPtr, typename AInBoxAlgorithm::HoughBox, divisionX, divisionY> Super;
+      using Super = BoxDivisionHoughTree<AHitPtr, typename AInBoxAlgorithm::HoughBox, divisionX, divisionY>;
 
       /// The HoughBox we use.
-      typedef typename AInBoxAlgorithm::HoughBox HoughBox;
+      using HoughBox = typename AInBoxAlgorithm::HoughBox;
+
+      /// Type of the width in coordinate I.
+      template <size_t I>
+      using Width = typename HoughBox::template Width<I>;
+
     public:
       /// Constructor using the given maximal level.
-      SimpleBoxDivisionHoughTree(const float maximumX, const float maximumY, const float overlapX = 0, const float overlapY = 0) :
-        Super(0), m_maximumX(maximumX), m_maximumY(maximumY), m_overlapX(overlapX), m_overlapY(overlapY) {}
+      SimpleBoxDivisionHoughTree(float maximumX,
+                                 float maximumY,
+                                 Width<0> overlapX = 0,
+                                 Width<1> overlapY = 0)
+        : Super(0)
+        , m_maximumX(maximumX)
+        , m_maximumY(maximumY)
+        , m_overlapX(overlapX)
+        , m_overlapY(overlapY)
+      {
+      }
 
       /// Initialize the tree with the given values.
       void initialize()
@@ -58,25 +72,25 @@ namespace Belle2 {
       }
 
       /// Return the maximum value in x direction.
-      const float& getMaximumX() const
+      float getMaximumX() const
       {
         return m_maximumX;
       }
 
       /// Return the maximum value in y direction.
-      const float& getMaximumY() const
+      float getMaximumY() const
       {
         return m_maximumY;
       }
 
       /// Return the overlap in x direction.
-      const float& getOverlapX() const
+      Width<0> getOverlapX() const
       {
         return m_overlapX;
       }
 
       /// Return the overlap in y direction.
-      const float& getOverlapY() const
+      Width<1> getOverlapY() const
       {
         return m_overlapY;
       }
@@ -84,12 +98,15 @@ namespace Belle2 {
     private:
       /// The maximum value in X direction.
       float m_maximumX = 0;
+
       /// The maximum value in y direction.
       float m_maximumY = 0;
+
       /// The overlap in X direction.
-      float m_overlapX = 0;
+      Width<0> m_overlapX = 0;
+
       /// The overlap in Y direction.
-      float m_overlapY = 0;
+      Width<1> m_overlapY = 0;
     };
   }
 }

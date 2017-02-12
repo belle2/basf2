@@ -9,14 +9,15 @@
  **************************************************************************/
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
+#include <TVector3.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
 
 RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagationDelay) :
-  m_useInWirePropagationDelay(useInWirePropagationDelay), m_eventTime(0), m_cdcp(CDCGeometryPar::Instance()),
-  m_tdcBinWidth(m_cdcp.getTdcBinWidth()), m_vFactor(1.)
+  m_useInWirePropagationDelay(useInWirePropagationDelay), m_gcp(CDCGeoControlPar::getInstance()), m_cdcp(CDCGeometryPar::Instance()),
+  m_tdcBinWidth(m_cdcp.getTdcBinWidth())
 {
   //  m_tdcOffset   = m_cdcp.getTdcOffset();
   //  m_tdcBinWidth = m_cdcp.getTdcBinWidth();
@@ -26,7 +27,6 @@ RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagati
   cout << "RealisticTDCCountTranslator constructor" << endl;
   cout << "m_cdcp=" << &m_cdcp << endl;
   cout << "m_tdcBinWidth=" << m_tdcBinWidth << endl;
-  cout << "m_vFactor=" << m_vFactor << endl;
 #endif
 }
 
@@ -50,19 +50,23 @@ double RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
   // First: Undo propagation in wire, if it was used:
   if (m_useInWirePropagationDelay) {
     //N.B. stereo-angle effect is ignored in the following corr.
-    m_backWirePos = m_cdcp.wireBackwardPosition(wireID, CDCGeometryPar::c_Aligned);
+    const TVector3& backWirePos = m_cdcp.wireBackwardPosition(wireID, CDCGeometryPar::c_Aligned);
     //subtract distance divided by speed of electric signal in the wire from the drift time.
-    double zb = m_backWirePos.Z();
-    if (m_cdcp.getSenseWireZposMode() == 1) {
+    double zb = backWirePos.Z();
+    //    if (m_cdcp.getSenseWireZposMode() == 1) {
+    //    std::cout << m_gcp.getSenseWireZposMode() << std::endl;
+    if (m_gcp.getSenseWireZposMode() == 1) {
       //      std::cout <<"layer,zb,dzb,zf,dzf= "<< layer <<" "<< zb <<" "<< m_cdcp.getBwdDeltaZ(layer) <<" "<< m_cdcp.wireForwardPosition(wireID, CDCGeometryPar::c_Aligned).Z() <<" "<< m_cdcp.getFwdDeltaZ(layer) << std::endl;
       zb -= m_cdcp.getBwdDeltaZ(layer);
     }
-    //    driftTime -= (z - m_backWirePos.Z()) * m_cdcp.getPropSpeedInv(layer);
+    //    driftTime -= (z - backWirePos.Z()) * m_cdcp.getPropSpeedInv(layer);
     driftTime -= (z - zb) * m_cdcp.getPropSpeedInv(layer);
   }
 
   // Second: correct for event time. If this wasn't simulated, m_eventTime can just be set to 0.
-  driftTime -= m_eventTime;
+  if (m_eventTimeStoreObject.isValid()) {
+    driftTime -= m_eventTimeStoreObject->getEventT0();
+  }
 
   //Third: If time of flight was simulated, this has to be undone, too. If it wasn't timeOfFlightEstimator should be taken as 0.
   driftTime -= timeOfFlightEstimator;
@@ -72,8 +76,7 @@ double RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
 
   //Now we have an estimate for the time it took from the ionisation to the hitting of the wire.
   //Need to reverse calculate the relation between drift lenght and drift time.
-  double driftL = (driftTime >= 0.) ? m_cdcp.getDriftLength(driftTime, layer, leftRight, alpha,
-                                                            theta) : m_vFactor * driftTime;
+  double driftL = std::copysign(m_cdcp.getDriftLength(fabs(driftTime), layer, leftRight, alpha, theta), driftTime);
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;

@@ -57,9 +57,10 @@ void ECLTrackShowerMatchModule::event()
   Const::EDetector myDetID = Const::EDetector::ECL;
   const int pdgCodePiPlus = Const::pion.getPDGCode();
   const int pdgCodePiMinus = -1 * Const::pion.getPDGCode();
-  ECLGeometryPar* geometry = ECLGeometryPar::Instance();
   for (const Track& track : tracks) {
-    set<int> clid;
+
+    //Unique shower ids related to this track
+    set<int> uniqueShowerIds;
 
     // Find extrapolated track hits in the ECL, considering
     // only hit points where the track enters the crystal
@@ -72,33 +73,30 @@ void ECLTrackShowerMatchModule::event()
       int copyid =  extHit.getCopyID();
       if (copyid == -1) continue;
       const int cell = copyid + 1;
-      TVector3 cpos   = geometry->GetCrystalPos(copyid);
-      TVector3 trkpos = extHit.getPosition();
+
+      //Find ECLCalDigit with same cell ID as ExtHit
       const auto idigit = find_if(eclDigits.begin(), eclDigits.end(),
       [&](const ECLCalDigit & d) { return d.getCellId() == cell; }
                                  );
-      if (idigit != eclDigits.end()) {
-        RelationVector<ECLShower> eclShower = idigit->getRelationsFrom<ECLShower>();
-        for (const auto& sh : eclShower) clid.insert(sh.getShowerId());
-      }
-    } // end loop on ExtHit
+      //Couldn't find ECLCalDigit with same cell ID as the ExtHit
+      if (idigit == eclDigits.end()) continue;
 
-    // Make a track --> shower relation for every shower that has a digit been hit.
-    for (const auto& id : clid) {
-      const auto ish = find_if(eclRecShowers.begin(), eclRecShowers.end(),
-      [&](const ECLShower & element) { return element.getShowerId() == id; }
-                              );
-      if (ish != eclRecShowers.end()) {
-        ish->setIsTrack(true);
-        const ECLShower* shower = &(*ish);
-        track.addRelationTo(shower);
-        ECLCluster* cluster = shower->getRelatedFrom<ECLCluster>();
+      //Save all unique shower IDs of the showers related to idigit
+      for (auto& shower : idigit->getRelationsFrom<ECLShower>()) {
+        bool inserted = (uniqueShowerIds.insert(shower.getUniqueId())).second;
+
+        //If this track <-> shower relation hasn't been set yet, set it for the shower and the ECLCLuster
+        if (!inserted) continue;
+
+        shower.setIsTrack(true);
+        track.addRelationTo(&shower);
+        ECLCluster* cluster = shower.getRelatedFrom<ECLCluster>();
         if (cluster != nullptr) {
-          cluster->setisTrack(true);
+          cluster->setIsTrack(true);
           track.addRelationTo(cluster);
         }
-      }
-    } // end loop on shower id
+      } //end loop on shower related to idigit
+    } // end loop on ExtHit
   } // end loop on Tracks
 
   for (auto& shower : eclRecShowers) {

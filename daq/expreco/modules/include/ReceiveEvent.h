@@ -11,7 +11,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
 #include <daq/dataflow/EvtSocket.h>
 
 #include <boost/shared_ptr.hpp>

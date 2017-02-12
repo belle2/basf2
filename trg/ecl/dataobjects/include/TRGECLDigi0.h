@@ -69,7 +69,16 @@ namespace Belle2 {
 
     //! Empty constructor
     //! Recommended for ROOT IO
-    TRGECLDigi0() {;}
+    TRGECLDigi0()
+    {
+      m_eventid    = 0;
+      m_tcid       = 0;
+      m_ibintime   = 0;
+      m_raw_energy = 0;
+      m_raw_timing = 0;
+
+
+    }
 
     //! Useful Constructor
     TRGECLDigi0(

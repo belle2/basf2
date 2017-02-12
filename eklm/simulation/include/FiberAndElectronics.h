@@ -14,7 +14,7 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/simulation/Digitizer.h>
+#include <eklm/dbobjects/EKLMDigitizationParameters.h>
 #include <eklm/simulation/FPGAFitter.h>
 
 namespace Belle2 {
@@ -30,15 +30,21 @@ namespace Belle2 {
 
       /** Photoelectron data. */
       struct Photoelectron {
-        int bin;        /**< Hit time bin in ADC output histogram */
-        double expTime; /**< exp(-m_DigPar->PEAttenuationFreq * (-time)) */
+        int bin;          /**< Hit time bin in ADC output histogram */
+        double expTime;   /**< exp(-m_DigPar->PEAttenuationFreq * (-time)) */
+        bool isReflected; /**< Direct (false) or reflected (true). */
       };
 
       /**
        * Constructor.
+       * @param[in] digPar                  Digitization parameters.
+       * @param[in] digitizationInitialTime Initial digitization time.
+       * @param[in] fitter                  Fitter.
+       * @param[in] debug                   Use debug mode.
        */
-      FiberAndElectronics(struct EKLM::DigitizationParams* digPar,
-                          FPGAFitter* fitter);
+      FiberAndElectronics(EKLMDigitizationParameters* digPar,
+                          FPGAFitter* fitter, double digitizationInitialTime,
+                          bool debug);
 
       /**
        * Destructor.
@@ -51,9 +57,9 @@ namespace Belle2 {
       void processEntry();
 
       /**
-       * Get fit results.
+       * Get fit data.
        */
-      struct FPGAFitParams* getFitResults();
+      EKLMFPGAFit* getFPGAFit();
 
       /**
        * Get fit status.
@@ -80,26 +86,38 @@ namespace Belle2 {
                        std::multimap<int, EKLMSimHit*>::iterator& end);
 
       /**
-       * Fill SiPM output.
+       * Generate photoelectrons.
        * @param[in]     stripLen    Strip length.
        * @param[in]     distSiPM    Distance from hit to SiPM.
        * @param[in]     nPE         Number of photons to be simulated.
        * @param[in]     timeShift   Time of hit.
        * @param[in]     isReflected Whether the hits are reflected or not.
-       * @param[in,out] hist        Output histogram (signal is added to it).
-       * @param[out]    gnpe        Number of generated photoelectrons.
        */
-      void fillSiPMOutput(double stripLen, double distSiPM, int nPhotons,
-                          double timeShift, bool isReflected, float* hist,
-                          int* gnpe);
+      void generatePhotoelectrons(double stripLen, double distSiPM,
+                                  int nPhotons, double timeShift,
+                                  bool isReflected);
+
+      /**
+       * Fill SiPM output.
+       * @param[in,out] hist         Output histogram (signal is added to it).
+       * @param[in]     useDirect    Use direct photons.
+       * @param[in]     useReflected Use reflected photons.
+       */
+      void fillSiPMOutput(float* hist, bool useDirect, bool useReflected);
 
     private:
 
       /** Parameters. */
-      struct EKLM::DigitizationParams* m_DigPar;
+      EKLMDigitizationParameters* m_DigPar;
 
       /** Fitter. */
       FPGAFitter* m_fitter;
+
+      /** Initial digitization time. */
+      double m_DigitizationInitialTime;
+
+      /** Debug mode (generates additional output files with histograms). */
+      bool m_Debug;
 
       /** Stands for nDigitizations*ADCSamplingTime. */
       double m_histRange;
@@ -137,8 +155,8 @@ namespace Belle2 {
       /** FPGA fit status. */
       enum FPGAFitStatus m_FPGAStat;
 
-      /** FPGA fit results. */
-      struct FPGAFitParams m_FPGAParams;
+      /** FPGA fit data. */
+      EKLMFPGAFit m_FPGAFit;
 
       /** Number of photoelectrons (generated). */
       int m_npe;

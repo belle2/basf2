@@ -123,7 +123,7 @@ namespace Belle2 {
       { return getSZLine().ndf(); }
 
       /// Setter for the number of degrees of freedom of the line fit.
-      void setNDF(const size_t& ndf)
+      void setNDF(std::size_t ndf)
       { return m_szLine.setNDF(ndf); }
 
       /// Getter for the line in sz space
@@ -138,6 +138,6 @@ namespace Belle2 {
       /// Memory for the line representation
       UncertainSZLine m_szLine;
 
-    }; //class
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

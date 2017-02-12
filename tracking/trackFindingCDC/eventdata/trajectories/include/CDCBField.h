@@ -102,5 +102,5 @@ namespace Belle2 {
       static double curvatureToAbsMom2D(double curvature,
                                         const Vector3D& pos3D);
     };
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

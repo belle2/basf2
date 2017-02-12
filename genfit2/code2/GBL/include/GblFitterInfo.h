@@ -40,10 +40,7 @@
 #include "AbsHMatrix.h"
 
 #include <vector>
-
-#ifndef __CINT__
-#include <boost/scoped_ptr.hpp>
-#endif
+#include <memory>
 
 
 namespace genfit {
@@ -245,7 +242,7 @@ namespace genfit {
     void deleteReferenceInfo() {;} // Empty because we really do not want to delete reference without a new one
     void deleteMeasurementInfo() {;} // We do not keep the measurements
     virtual void Print(const Option_t* = "") const;
-    virtual bool checkConsistency(const genfit::PruneFlags* = NULL) const;
+    virtual bool checkConsistency(const genfit::PruneFlags* = nullptr) const;
        
   private:
     TMatrixD jacobian_;
@@ -268,8 +265,8 @@ namespace genfit {
     TMatrixD hMatrix_;
     
     #ifndef __CINT__
-    mutable boost::scoped_ptr<MeasuredStateOnPlane> fittedStateBwd_; //!  cache
-    mutable boost::scoped_ptr<MeasuredStateOnPlane> fittedStateFwd_; //!  cache    
+    mutable std::unique_ptr<MeasuredStateOnPlane> fittedStateBwd_; //!  cache
+    mutable std::unique_ptr<MeasuredStateOnPlane> fittedStateFwd_; //!  cache
     #else
     class MeasuredStateOnPlane* fittedStateBwd_; //!  cache
     class MeasuredStateOnPlane* fittedStateFwd_; //!  cache    

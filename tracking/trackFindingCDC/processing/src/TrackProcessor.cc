@@ -12,149 +12,180 @@
 
 #include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/processing/HitProcessor.h>
+#include <tracking/trackFindingCDC/processing/TrackMerger.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/collections/CDCTrackList.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-void TrackProcessor::addCandidateFromHitsWithPostprocessing(std::vector<const CDCWireHit*>& hits,
-                                                            const std::vector<CDCConformalHit>& conformalCDCWireHitList,
-                                                            CDCTrackList& cdcTrackList)
+void TrackProcessor::addCandidateFromHitsWithPostprocessing(std::vector<const CDCWireHit*>& foundAxialWireHits,
+                                                            const std::vector<const CDCWireHit*>& allAxialWireHits,
+                                                            std::list<CDCTrack>& cdcTrackList)
 {
-  if (hits.size() == 0) return;
+  if (foundAxialWireHits.size() == 0) return;
 
+  // New track
+  CDCTrack track;
+
+  // Fit trajectory
   const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
-  const CDCTrajectory2D& trackTrajectory2D = fitter.fit(hits);
-  CDCTrajectory3D trajectory3D(trackTrajectory2D, CDCTrajectorySZ::basicAssumption());
+  CDCTrajectory2D trajectory2D = fitter.fit(foundAxialWireHits);
+  track.setStartTrajectory3D(CDCTrajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption()));
 
-  CDCTrack& track = cdcTrackList.createEmptyTrack();
-  track.setStartTrajectory3D(trajectory3D);
-  track.appendNotTaken(hits);
-  postprocessTrack(track, conformalCDCWireHitList, cdcTrackList);
+  // Reconstruct and add hits
+  for (const CDCWireHit* wireHit : foundAxialWireHits) {
+    AutomatonCell& automatonCell = wireHit->getAutomatonCell();
+    if (automatonCell.hasTakenFlag() or automatonCell.hasMaskedFlag()) continue;
+
+    CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstructNearest(wireHit, trajectory2D);
+    track.push_back(std::move(recoHit3D));
+
+    automatonCell.setTakenFlag(true);
+  }
+
+  // Change everything again in the postprocessing
+  bool success = postprocessTrack(track, allAxialWireHits);
+  if (success) {
+    /// Mark hits as taken and add the new track to the track list
+    for (const CDCRecoHit3D& recoHit3D : track) {
+      recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
+    }
+    cdcTrackList.emplace_back(std::move(track));
+  } else {
+    /// Masked bad hits
+    for (const CDCRecoHit3D& recoHit3D : track) {
+      recoHit3D.getWireHit().getAutomatonCell().setMaskedFlag(true);
+      recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(false);
+    }
+  }
 }
 
-void TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<CDCConformalHit>& conformalCDCWireHitList,
-                                      CDCTrackList& cdcTrackList)
+bool TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<const CDCWireHit*>& allAxialWireHits)
 {
   TrackQualityTools::normalizeTrack(track);
 
-  HitProcessor::splitBack2BackTrack(track);
-  TrackQualityTools::normalizeTrack(track);
-  if (not checkTrackQuality(track, cdcTrackList)) {
-    return;
+  for (int iPass = 0; iPass < 2; ++iPass) {
+    HitProcessor::splitBack2BackTrack(track);
+    TrackQualityTools::normalizeTrack(track);
+    if (not checkTrackQuality(track)) {
+      return false;
+    }
+
+    HitProcessor::deleteHitsFarAwayFromTrajectory(track);
+    TrackQualityTools::normalizeTrack(track);
+    if (not checkTrackQuality(track)) {
+      return false;
+    }
+
+    HitProcessor::assignNewHitsToTrack(track, allAxialWireHits);
+    TrackQualityTools::normalizeTrack(track);
   }
-
-  HitProcessor::deleteHitsFarAwayFromTrajectory(track);
-  TrackQualityTools::normalizeTrack(track);
-  if (not checkTrackQuality(track, cdcTrackList)) {
-    return;
-  }
-
-  HitProcessor::assignNewHitsToTrack(track, conformalCDCWireHitList);
-  TrackQualityTools::normalizeTrack(track);
-
-  HitProcessor::splitBack2BackTrack(track);
-  TrackQualityTools::normalizeTrack(track);
-  if (not checkTrackQuality(track, cdcTrackList)) {
-    return;
-  }
-
-  HitProcessor::deleteHitsFarAwayFromTrajectory(track);
-  TrackQualityTools::normalizeTrack(track);
-  if (not checkTrackQuality(track, cdcTrackList)) {
-    return;
-  }
-
-  HitProcessor::assignNewHitsToTrack(track, conformalCDCWireHitList);
-  TrackQualityTools::normalizeTrack(track);
 
   HitProcessor::unmaskHitsInTrack(track);
-}
-
-bool TrackProcessor::checkTrackQuality(const CDCTrack& track, CDCTrackList& cdcTrackList)
-{
-  if (track.size() < 5) {
-    for (const CDCRecoHit3D& hit : track) {
-      hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
-      hit.getWireHit().getAutomatonCell().setTakenFlag(false);
-    }
-    cdcTrackList.getCDCTracks().remove(track);
-    return false;
-  }
-
   return true;
 }
 
-void TrackProcessor::assignNewHits(const std::vector<CDCConformalHit>& conformalCDCWireHitList, CDCTrackList& cdcTrackList)
+bool TrackProcessor::checkTrackQuality(const CDCTrack& track)
 {
-  cdcTrackList.getCDCTracks().erase(std::remove_if(cdcTrackList.getCDCTracks().begin(), cdcTrackList.getCDCTracks().end(),
-  [](const CDCTrack & track) {
-    return track.size() == 0;
-  }) , cdcTrackList.getCDCTracks().end());
+  return not(track.size() < 5);
+}
 
-  cdcTrackList.doForAllTracks([&](CDCTrack & track) {
+void TrackProcessor::assignNewHits(const std::vector<const CDCWireHit*>& allAxialWireHits,
+                                   std::list<CDCTrack>& cdcTrackList)
+{
+  erase_remove_if(cdcTrackList, Size() == 0u);
 
-    if (track.size() < 4) return;
+  for (CDCTrack& track : cdcTrackList) {
+    if (track.size() < 4) continue;
 
-    HitProcessor::assignNewHitsToTrack(track, conformalCDCWireHitList);
+    HitProcessor::assignNewHitsToTrack(track, allAxialWireHits);
     TrackQualityTools::normalizeTrack(track);
 
     std::vector<const CDCWireHit*> splittedHits = HitProcessor::splitBack2BackTrack(track);
     TrackQualityTools::normalizeTrack(track);
 
-    addCandidateFromHitsWithPostprocessing(splittedHits, conformalCDCWireHitList, cdcTrackList);
+    addCandidateFromHitsWithPostprocessing(splittedHits, allAxialWireHits, cdcTrackList);
 
     HitProcessor::deleteHitsFarAwayFromTrajectory(track);
     TrackQualityTools::normalizeTrack(track);
-  });
+  }
 
   // TODO: HitProcessor::reassignHitsFromOtherTracks(cdcTrackList);
-
-  cdcTrackList.doForAllTracks([](CDCTrack & cand) {
+  for (CDCTrack& cand : cdcTrackList) {
     cand.forwardTakenFlag();
-  });
+  }
 }
 
-void TrackProcessor::deleteTracksWithLowFitProbability(CDCTrackList& cdcTrackList, double minimal_probability_for_good_fit)
+void TrackProcessor::mergeAndFinalizeTracks(std::list<CDCTrack>& cdcTrackList,
+                                            const std::vector<const CDCWireHit*>& allAxialWireHits)
 {
-  const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getNoDriftVarianceFitter();
+  // Check quality of the track basing on holes on the trajectory;
+  // if holes exsist then track is splitted
+  for (CDCTrack& track : cdcTrackList) {
+    if (track.size() < 4) continue;
 
-  const auto& checkProbability = [&](CDCTrack & track) {
-    const CDCTrajectory2D& fittedTrajectory = trackFitter.fit(track);
-    const double chi2 = fittedTrajectory.getChi2();
-    const int dof = track.size() - 4;
+    HitProcessor::removeHitsAfterSuperLayerBreak(track);
+    HitProcessor::splitBack2BackTrack(track);
 
-    return TMath::Prob(chi2, dof) < minimal_probability_for_good_fit;
+    TrackQualityTools::normalizeTrack(track);
+    std::vector<const CDCWireHit*> hitsToSplit;
+
+    for (CDCRecoHit3D& hit : track) {
+      if (hit.getWireHit().getAutomatonCell().hasMaskedFlag()) {
+        hitsToSplit.push_back(&(hit.getWireHit()));
+      }
+    }
+
+    HitProcessor::deleteAllMarkedHits(track);
+
+    for (const CDCWireHit* hit : hitsToSplit) {
+      hit->getAutomatonCell().setMaskedFlag(false);
+      hit->getAutomatonCell().setTakenFlag(false);
+    }
+
+    TrackProcessor::addCandidateFromHitsWithPostprocessing(hitsToSplit, allAxialWireHits, cdcTrackList);
+  }
+
+  // Update tracks before storing to DataStore
+  for (CDCTrack& track : cdcTrackList) {
+    TrackQualityTools::normalizeTrack(track);
   };
 
-  cdcTrackList.getCDCTracks().erase(
-    std::remove_if(cdcTrackList.getCDCTracks().begin(), cdcTrackList.getCDCTracks().end(), checkProbability),
-    cdcTrackList.getCDCTracks().end());
+  // Remove bad tracks
+  TrackProcessor::deleteTracksWithLowFitProbability(cdcTrackList);
+
+  // Perform tracks merging
+  TrackMerger::doTracksMerging(cdcTrackList, allAxialWireHits);
+
+  // Assign new hits
+  TrackProcessor::assignNewHits(allAxialWireHits, cdcTrackList);
 }
 
+void TrackProcessor::deleteTracksWithLowFitProbability(std::list<CDCTrack>& cdcTrackList, double minimal_probability_for_good_fit)
+{
+  const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getNoDriftVarianceFitter();
+  const auto lowPValue = [&](const CDCTrack & track) {
+    CDCTrajectory2D fittedTrajectory = trackFitter.fit(track);
+    return not(fittedTrajectory.getPValue() >= minimal_probability_for_good_fit);
+  };
+  erase_remove_if(cdcTrackList, lowPValue);
+}
 
 bool TrackProcessor::isChi2InQuantiles(CDCTrack& track, double lower_quantile, double upper_quantile)
 {
-  const CDCTrajectory2D& trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
-
-  const double minChi2 = calculateChi2ForQuantile(lower_quantile, trackTrajectory2D.getNDF());
-  const double maxChi2 = calculateChi2ForQuantile(upper_quantile, trackTrajectory2D.getNDF());
-  const double chi2 = trackTrajectory2D.getChi2();
-
-  return ((chi2 >= minChi2) and (chi2 <= maxChi2));
+  double pValue = track.getStartTrajectory3D().getPValue();
+  return (lower_quantile <= pValue) and (pValue <= upper_quantile);
 }
 
 double TrackProcessor::calculateChi2ForQuantile(double alpha, double n)
 {
+  return TMath::ChisquareQuantile(alpha, n);
+  /*
   double d;
   if (alpha > 0.5) {
     d = 2.0637 * pow(log(1. / (1. - alpha)) - 0.16, 0.4274) - 1.5774;
@@ -169,4 +200,5 @@ double TrackProcessor::calculateChi2ForQuantile(double alpha, double n)
   const double E = d * (9 * d * d * d * d + 256 * d * d - 433) / (4860. * pow(2., 0.5));
 
   return n + A * pow(n, 0.5) + B + C / pow(n, 0.5) + D / n + E / (n * pow(n, 0.5));
+  */
 }

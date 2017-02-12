@@ -56,17 +56,17 @@ namespace Belle2 {
     alignment::PedeApplication m_pede{};
 
     /// Convert IOV to string (to be able to use it as a key in map)
-    std::string to_string(IntervalOfValidity iov)
+    std::string to_string(const IntervalOfValidity& iov)
     {
-      stringstream stream;
+      std::stringstream stream;
       stream << iov;
       return stream.str();
     }
 
     /// Convert string to IOV (to convert map key back to IOV)
-    IntervalOfValidity to_IOV(std::string iov)
+    IntervalOfValidity to_IOV(const std::string& iov)
     {
-      stringstream stream;
+      std::stringstream stream;
       stream << iov;
       IntervalOfValidity IOV;
       stream >> IOV;

@@ -13,8 +13,8 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
@@ -51,23 +51,25 @@ namespace Belle2 {
 
     public:
       /// Forward the Attributre map from the primitive plotter.
-      typedef PrimitivePlotter::AttributeMap AttributeMap;
+      using AttributeMap = PrimitivePlotter::AttributeMap;
 
     public:
       /// Default constructor for ROOT compatibility. Uses an SVGPrimitivePlotter as backend.
       explicit EventDataPlotter(bool animate = false);
 
-      /** Constructor taking the specifc PrimitivePlotter instance as backend.
+      /**
+       *  Constructor taking the specifc PrimitivePlotter instance as backend.
        *
        *  Note that the EventDataPlotter takes ownership of the PrimitivePlotter and destroys it on its on own deconstruction.
        */
-      EventDataPlotter(std::unique_ptr<PrimitivePlotter> primitivePlotter, bool animate = false);
+      EventDataPlotter(std::unique_ptr<PrimitivePlotter> ptrPrimitivePlotter, bool animate = false);
 
       /// Copy constructor
-      EventDataPlotter(const EventDataPlotter& EventDataPlotter);
+      EventDataPlotter(const EventDataPlotter& eventDataPlotter);
 
     public:
-      /** Saves the current plot stead to a file.
+      /**
+       *  Saves the current plot stead to a file.
        *
        *  Deriving instances may should implement the approriate thing here and
        *  may return a modified string indicating the file name to which the plot as been written.
@@ -78,9 +80,7 @@ namespace Belle2 {
        */
       const std::string save(const std::string& fileName);
 
-      /** Clears all drawed elements from the plotter.
-       *
-       */
+      /// Clears all drawed elements from the plotter.
       void clear();
 
     public:
@@ -96,22 +96,28 @@ namespace Belle2 {
       /// Getter for the canvas height in pixels.
       float getCanvasHeight() const;
 
-      /** Setter for the canvas width in pixels.
+      /**
+       *  Setter for the canvas width in pixels.
        *  The canvas height denotes the size of the image being produced.
        *  The coordinates space that is visible in the picture is a seperate concept
-       *  which is stored in the bounding box (getBoundingBox()). */
-      void setCanvasWidth(const float& width);
+       *  which is stored in the bounding box (getBoundingBox()).
+       */
+      void setCanvasWidth(float width);
 
-      /** Setter for the canvas height in pixels
+      /**
+       *  Setter for the canvas height in pixels
        *  The canvas height denotes the size of the image being produced.
        *  The coordinates space that is visible in the picture is a seperate concept
-       *  which is stored in the bounding box (getBoundingBox()). */
-      void setCanvasHeight(const float& height);
+       *  which is stored in the bounding box (getBoundingBox()).
+       */
+      void setCanvasHeight(float height);
 
     public:
       /// Converts a time given in nanoseconds to a time sting of the from "%fs".
-      std::string getAnimationTimeFromNanoSeconds(const float& nanoseconds)
-      { return std::to_string(nanoseconds) + "s"; }
+      std::string getAnimationTimeFromNanoSeconds(float nanoseconds)
+      {
+        return std::to_string(nanoseconds) + "s";
+      }
 
     private:
       /// Start a group in the underlying plotter with an animation uncovering the elements at the time of flight of the CDCSimHit.
@@ -133,8 +139,11 @@ namespace Belle2 {
       /// Draw the super layer bounds of the CDC.
       void drawSuperLayerBoundaries(const AttributeMap& attributeMap = AttributeMap());
 
-      ///Draws a straight Line.
-      void drawLine(const float& startX, const float& startY, const float& endX, const float& endY,
+      /// Draws a straight Line.
+      void drawLine(float startX,
+                    float startY,
+                    float endX,
+                    float endY,
                     const AttributeMap& attributeMap = AttributeMap());
 
     public:
@@ -190,15 +199,15 @@ namespace Belle2 {
       }
 
       /// Draws all CDCRecoHits2D of the segment
-      void draw(const CDCRecoSegment2D& recoSegment2D, const AttributeMap& attributeMap = AttributeMap())
+      void draw(const CDCSegment2D& segment2D, const AttributeMap& attributeMap = AttributeMap())
       {
-        drawRange(recoSegment2D, attributeMap);
+        drawRange(segment2D, attributeMap);
       }
 
       /// Draws all CDCRecoHits3D of the segment
-      void draw(const CDCRecoSegment3D& recoSegment3D, const AttributeMap& attributeMap = AttributeMap())
+      void draw(const CDCSegment3D& segment3D, const AttributeMap& attributeMap = AttributeMap())
       {
-        drawRange(recoSegment3D, attributeMap);
+        drawRange(segment3D, attributeMap);
       }
 
       /// Draws the pair of segments as an arrow connecting the centers of them.
@@ -219,10 +228,13 @@ namespace Belle2 {
       /// Draws the hit content of the RecoTrack.
       void draw(const RecoTrack& recoTrack, const AttributeMap& attributeMap = AttributeMap());
 
-      /// Draws trajectory the CDCRecoSegment2D
-      void drawTrajectory(const CDCRecoSegment2D& segment, const AttributeMap& attributeMap = AttributeMap());
+      /// Draws trajectory of the CDCSegment2D
+      void drawTrajectory(const CDCSegment2D& segment, const AttributeMap& attributeMap = AttributeMap());
 
-      /// Draws trajectory the CDCTrack
+      /// Draws trajectory of the CDCSegmentTriple
+      void drawTrajectory(const CDCSegmentTriple& segmentTriple, const AttributeMap& attributeMap = AttributeMap());
+
+      /// Draws trajectory of the CDCTrack
       void drawTrajectory(const CDCTrack& track, const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws curve along the fitted points of the RecoTrack
@@ -264,7 +276,7 @@ namespace Belle2 {
       /// Memory for the flag if the event data should be animated. If animation is supported is backend dependent.
       bool m_animate = false;
 
-    }; //class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-
 #include <tracking/trackFindingCDC/filters/segmentTripleRelation/BaseSegmentTripleRelationFilter.h>
 
 namespace Belle2 {
@@ -20,19 +19,12 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef BaseSegmentTripleRelationFilter Super;
-
-    public:
-      /// Importing all overloads from the super class
-      using Super::operator();
+      using Super = BaseSegmentTripleRelationFilter;
 
     public:
       /// Implementation currently accepts all combinations
-      virtual Weight operator()(const CDCSegmentTriple&,
-                                const CDCSegmentTriple& neighborTriple) override final;
-
-    }; // end class
-
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
-
+      Weight operator()(const CDCSegmentTriple& fromSegmentTriple,
+                        const CDCSegmentTriple& toSegmentTriple) final;
+    };
+  }
+}

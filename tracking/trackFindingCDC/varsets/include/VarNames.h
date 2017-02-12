@@ -9,8 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/EmptyVarSet.h>
-
+#include <cstddef>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -21,26 +20,16 @@ namespace Belle2 {
 
     public:
       /// Basic type from which the variables are generated.
-      typedef AObject Object;
+      using Object = AObject;
 
       /// Number of variables to be generated.
-      static const size_t nNames = 0;
+      static const std::size_t nVars = 0;
 
-      /// Names of the variables to be generated.
-      //constexpr
-      //static char const* const names[nNames] = {};
-
-      constexpr
-      static char const* getName(int /*iName*/)
-      { return ""; }
-
-      /// Marking that no further variables nested variables are to be extracted
-      typedef EmptyVarSet<Object> NestedVarSet;
-
-      /// Unpack the object for for the nested variable set
-      static const Object* getNested(const Object* obj)
-      { return obj; }
-
+      /// Function looking up the variable name at the given index as compile time
+      constexpr static char const* getName(int iName __attribute__((unused)))
+      {
+        return "";
+      }
     };
   }
 }

@@ -23,13 +23,17 @@ namespace Belle2 {
 
       /// Constructor taking two oriented wire hits.
       CDCRLWireHitPair(const CDCRLWireHit& fromRLWireHit,
-                       const CDCRLWireHit& toRLWireHit);
+                       const CDCRLWireHit& toRLWireHit,
+                       int iCluster = 0);
 
       /// Constructs a oriented wire hit pair that is the reverse of this one.
       CDCRLWireHitPair reversed() const;
 
       /// Reverses the oriented wire hit pair inplace.
       void reverse();
+
+      /// Returns the aliased version of this oriented wire hit pair
+      CDCRLWireHitPair getAlias() const;
 
       /// Equality comparision based the two oriented wire hits.
       bool operator==(const CDCRLWireHitPair& other) const
@@ -59,14 +63,6 @@ namespace Belle2 {
       friend bool operator<(const CDCWireHit& wireHit, const CDCRLWireHitPair& rlWireHitPair)
       { return wireHit <  rlWireHitPair.getFromWireHit(); }
 
-      /// Access the object methods and methods from a pointer in the same way.
-      /** In situations where the type is not known to be a pointer or a reference there is no way to tell,
-       *  if one should use the dot '.' or operator '->' for method look up.
-       *  So this function defines the -> operator for the object.
-       *  No matter you have a pointer or an object access is given with '->'.*/
-      const CDCRLWireHitPair* operator->() const
-      { return this; }
-
       /// Getter for the WireNeighborKind of the two underlying wires
       WireNeighborKind getNeighborKind() const
       { return getFromWire().getNeighborKind(getToWire()); }
@@ -88,35 +84,35 @@ namespace Belle2 {
 
       /// Getter for the wire the first oriented wire hit is based on.
       const CDCWire& getFromWire() const
-      { return getFromRLWireHit()->getWire(); }
+      { return getFromRLWireHit().getWire(); }
 
       /// Getter for the wire the second oriented wire hit is based on.
       const CDCWire& getToWire() const
-      { return getToRLWireHit()->getWire(); }
+      { return getToRLWireHit().getWire(); }
 
       /// Indicator if any of the two oriented wire hits is based on the given wire.
       bool hasWire(const CDCWire& wire) const
-      { return getFromRLWireHit()->isOnWire(wire) or getToRLWireHit()->isOnWire(wire); }
+      { return getFromRLWireHit().isOnWire(wire) or getToRLWireHit().isOnWire(wire); }
 
       /// Getter for the hit wire of the first oriented wire hit.
       const CDCWireHit& getFromWireHit() const
-      { return getFromRLWireHit()->getWireHit(); }
+      { return getFromRLWireHit().getWireHit(); }
 
       /// Getter for the hit wire of the second oriented wire hit.
       const CDCWireHit& getToWireHit() const
-      { return getToRLWireHit()->getWireHit(); }
+      { return getToRLWireHit().getWireHit(); }
 
       /// Indicator if any of the two oriented wire hits is based on the given wire hit.
       bool hasWireHit(const CDCWireHit& wirehit) const
-      { return getFromRLWireHit()->hasWireHit(wirehit) or getToRLWireHit()->hasWireHit(wirehit); }
+      { return getFromRLWireHit().hasWireHit(wirehit) or getToRLWireHit().hasWireHit(wirehit); }
 
       /// Getter for the right left passage information of the first oriented wire hit.
       ERightLeft getFromRLInfo() const
-      { return getFromRLWireHit()->getRLInfo(); }
+      { return getFromRLWireHit().getRLInfo(); }
 
       /// Getter for the right left passage information of the second oriented wire hit.
       ERightLeft getToRLInfo() const
-      { return getToRLWireHit()->getRLInfo(); }
+      { return getToRLWireHit().getRLInfo(); }
 
       /// Getter for the  first oriented wire hit.
       CDCRLWireHit& getFromRLWireHit()
@@ -166,6 +162,6 @@ namespace Belle2 {
       /// Memory for the cluster id of this facet
       int m_iCluster = -1;
 
-    }; //end class CDCRLWireHitPair
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

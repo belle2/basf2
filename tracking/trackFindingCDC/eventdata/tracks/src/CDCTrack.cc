@@ -12,22 +12,20 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/GenfitUtil.h>
+#include <tracking/trackFindingCDC/eventdata/utils/RecoTrackUtil.h>
+
+#include <tracking/trackFindingCDC/numerics/FloatComparing.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <genfit/TrackCand.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
-using namespace genfit;
-
 
 namespace {
   /// Reconstruct a segment with the two fits and append it to the track
-  void appendReconstructed(const CDCRecoSegment2D* segment,
+  void appendReconstructed(const CDCSegment2D* segment,
                            const CDCTrajectory3D& trajectory3D,
                            double perpSOffset,
                            CDCTrack& track)
@@ -54,7 +52,7 @@ namespace {
    *  Return value is the travel distance by which the following trajectories have to be shifted to match the overall track travel distance scale
    *  on the last hit of the given segment.
    */
-  double appendReconstructedAverage(const CDCRecoSegment2D* segment,
+  double appendReconstructedAverage(const CDCSegment2D* segment,
                                     const CDCTrajectory3D& trajectory3D,
                                     double perpSOffset,
                                     const CDCTrajectory3D& parallelTrajectory3D,
@@ -104,10 +102,7 @@ namespace {
   }
 }
 
-
-
-
-CDCTrack::CDCTrack(const CDCRecoSegment2D& segment) :
+CDCTrack::CDCTrack(const CDCSegment2D& segment) :
   m_startTrajectory3D(segment.getTrajectory2D()),
   m_endTrajectory3D(segment.getTrajectory2D())
 {
@@ -165,7 +160,6 @@ CDCTrack CDCTrack::condense(const std::vector<const CDCTrack*>& trackPath)
     return result;
   }
 }
-
 
 CDCTrack CDCTrack::condense(const Path<const CDCSegmentTriple>& segmentTriplePath)
 {
@@ -291,42 +285,18 @@ CDCTrack CDCTrack::condense(const Path<const CDCSegmentPair>& segmentPairPath)
   return track;
 }
 
-
-void CDCTrack::appendNotTaken(const std::vector<const CDCWireHit*>& hits)
-{
-  const CDCTrajectory2D& trackTrajectory2D = this->getStartTrajectory3D().getTrajectory2D();
-
-  for (const CDCWireHit* item : hits) {
-    if (item->getAutomatonCell().hasTakenFlag() || item->getAutomatonCell().hasMaskedFlag()) continue;
-
-    const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstructNearest(item, trackTrajectory2D);
-    this->push_back(std::move(recoHit3D));
-    recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
-  }
-}
-
-
-
-bool CDCTrack::fillInto(genfit::TrackCand& trackCand) const
-{
-  GenfitUtil::fill(trackCand, *this);
-  return getStartTrajectory3D().fillInto(trackCand);
-}
-
 bool CDCTrack::storeInto(StoreArray<RecoTrack>& recoTracks) const
 {
   RecoTrack* newRecoTrack = getStartTrajectory3D().storeInto(recoTracks);
   if (newRecoTrack) {
-    GenfitUtil::fill(*newRecoTrack, *this);
+    RecoTrackUtil::fill(*this, *newRecoTrack);
   }
   return true;
 }
 
-
-
-vector<CDCRecoSegment3D> CDCTrack::splitIntoSegments() const
+std::vector<CDCSegment3D> CDCTrack::splitIntoSegments() const
 {
-  vector<CDCRecoSegment3D> result;
+  vector<CDCSegment3D> result;
   ISuperLayer lastISuperLayer = -1;
   for (const CDCRecoHit3D& recoHit3D : *this) {
     ISuperLayer iSuperLayer = recoHit3D.getISuperLayer();
@@ -338,8 +308,6 @@ vector<CDCRecoSegment3D> CDCTrack::splitIntoSegments() const
   }
   return result;
 }
-
-
 
 void CDCTrack::reverse()
 {
@@ -363,7 +331,6 @@ void CDCTrack::reverse()
 
   // Reverse the arrangement of hits.
   std::reverse(begin(), end());
-
 }
 
 CDCTrack CDCTrack::reversed() const
@@ -371,6 +338,15 @@ CDCTrack CDCTrack::reversed() const
   CDCTrack reversedTrack(*this);
   reversedTrack.reverse();
   return reversedTrack;
+}
+
+MayBePtr<const CDCRecoHit3D> CDCTrack::find(const CDCWireHit& wireHit) const
+{
+  auto hasWireHit = [&wireHit](const CDCRecoHit3D & recoHit3D) {
+    return recoHit3D.getWireHit() == wireHit;
+  };
+  auto itRecoHit3D = std::find_if(this->begin(), this->end(), hasWireHit);
+  return itRecoHit3D == this->end() ? nullptr : &*itRecoHit3D;
 }
 
 void CDCTrack::unsetAndForwardMaskedFlag() const
@@ -409,6 +385,17 @@ void CDCTrack::forwardTakenFlag(bool takenFlag) const
   }
 }
 
+void CDCTrack::sortByArcLength2D()
+{
+  std::stable_sort(begin(),
+                   end(),
+  [](const CDCRecoHit3D & recoHit, const CDCRecoHit3D & otherRecoHit) {
+    double arcLength = recoHit.getArcLength2D();
+    double otherArcLength = otherRecoHit.getArcLength2D();
+    return lessFloatHighNaN(arcLength, otherArcLength);
+  });
+}
+
 void CDCTrack::shiftToPositiveArcLengths2D(bool doForAllTracks)
 {
   const CDCTrajectory2D& startTrajectory2D = getStartTrajectory3D().getTrajectory2D();
@@ -416,23 +403,10 @@ void CDCTrack::shiftToPositiveArcLengths2D(bool doForAllTracks)
     const double shiftValue = startTrajectory2D.getLocalCircle()->arcLengthPeriod();
     if (std::isfinite(shiftValue)) {
       for (CDCRecoHit3D& recoHit : *this) {
-        if (recoHit.getArcLength2D() < 0)
+        if (recoHit.getArcLength2D() < 0) {
           recoHit.shiftArcLength2D(shiftValue);
+        }
       }
     }
   }
-}
-
-void CDCTrack::removeAllAssignedMarkedHits()
-{
-  // Delete all hits that were marked
-  erase(std::remove_if(begin(), end(), [](const CDCRecoHit3D & recoHit) -> bool {
-    if (recoHit.getWireHit().getAutomatonCell().hasAssignedFlag())
-    {
-      recoHit.getWireHit().getAutomatonCell().unsetTakenFlag();
-      return true;
-    } else {
-      return false;
-    }
-  }), end());
 }

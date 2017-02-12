@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ErrorMessageDiagnosis>
+  <Error>
+    <ID></ID>
+    <Type>STORAGE</Type>
+    <Message>Example : Storage trouble</Message>
+    <Diagnosis>Storage trouble. Abort and try again. If the same error occurs, contact with DAQ(Storage) experts. </Diagnosis>
+  </Error>
+</ErrorMessageDiagnosis>

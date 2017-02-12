@@ -69,6 +69,28 @@ namespace Belle2 {
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part);
 
     /**
+     * cosine of the angle between momentum the particle and a true B particle. Is somewhere between -1 and 1
+     * if only a massless particle like a neutrino is missing in the reconstruction.
+     */
+    double cosThetaBetweenParticleAndTrueB(const Particle* part);
+
+    /**
+     * If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference
+     * of the two daughters in the frame of the given particle (mother) and the momentum of the given particle in the lab frame.
+     * If the given particle has three daughters: cosine of the angle between the normal vector of the plane
+     * defined by the momenta of the three daughters in the frame of the given particle (mother) and the momentum of the given particle in the lab frame.
+     * Else: 0.
+     */
+    double cosHelicityAngle(const Particle* part);
+
+    /**
+     * To be used for the decay pi0 -> e+ e- gamma: cosine of the angle between the momentum of the gamma in the frame
+     * of the given particle (mother) and the momentum of the given particle in the lab frame.
+     * Else: 0.
+     */
+    double cosHelicityAnglePi0Dalitz(const Particle* part);
+
+    /**
      * return Zdistance of daughter tracks at vertex point
      */
     double VertexZDist(const Particle*);
@@ -190,6 +212,12 @@ namespace Belle2 {
     double particleMdstArrayIndex(const Particle* part);
 
     /**
+     * returns cosinus of StoreArray index (0-based) of the MDST object from which the Particle was created.
+     * To be used for random ranking.
+     */
+    double particleCosMdstArrayIndex(const Particle* part);
+
+    /**
      * return prob(chi^2,ndf) of fit
      */
     double particlePvalue(const Particle* part);
@@ -259,6 +287,11 @@ namespace Belle2 {
      * check the array index of a particle's MC mother
      */
     double genMotherIndex(const Particle* particle);
+
+    /**
+     * generated momentum of a particles MC mother
+     */
+    double genMotherP(const Particle* particle);
 
     /**
      * check the array index of a particle's related MCParticle
@@ -493,12 +526,25 @@ namespace Belle2 {
     bool isGoodBelleGamma(int region, double energy);
 
     /**
+     * Returns true if the cluster with given attributes passes loose skim 'good gamma' criteria.
+     */
+    bool isGoodSkimGamma(int region, double energy);
+
+    /**
      * Return 1 if ECLCluster passes the following selection criteria:
      * Forward  : E > 100 MeV
      * Barrel   : E >  50 MeV
      * Backward : E > 150 MeV
      */
     double goodBelleGamma(const Particle* particle);
+
+    /**
+     * Return 1 if ECLCluster passes the following selection criteria:
+     * Forward  : E > 30 MeV
+     * Barrel   : E > 20 MeV
+     * Backward : E > 40 MeV
+     */
+    double goodSkimGamma(const Particle* particle);
 
     /**
      * return ECL cluster's Error on Energy
@@ -541,9 +587,39 @@ namespace Belle2 {
     double eclClusterHighestE(const Particle* particle);
 
     /**
-     * return ratio of energies in inner 3x3 and 5x5 cells
+     * return ratio of energies of the central crystal and 3x3 crystals around the central crystal
      */
-    double eclClusterE9E25(const Particle* particle);
+    double eclClusterE1E9(const Particle* particle);
+
+    /**
+     * return ratio of energies in inner 3x3 and (5x5 cells without corners)
+     */
+    double eclClusterE9E21(const Particle* particle);
+
+    /**
+     * Deprecated - kept for backwards compatibility
+     */
+    inline double eclClusterE9E25(const Particle* particle) {return eclClusterE9E21(particle);}
+
+    /**
+     * return absolute value of Zernike Moment 40
+     */
+    double eclClusterAbsZernikeMoment40(const Particle* particle);
+
+    /**
+     * return absolute value of Zernike Moment 51
+     */
+    double eclClusterAbsZernikeMoment40(const Particle* particle);
+
+    /**
+     * return result of MVA using zernike moments
+     */
+    double eclClusterZernikeMVA(const Particle* particle);
+
+    /**
+     * return second moment shower shape variable
+     */
+    double eclClusterSecondMoment(const Particle* particle);
 
     /**
      * return LAT (shower variable)

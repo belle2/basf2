@@ -255,9 +255,12 @@ namespace Belle2 {
       /**@}*/
 
     private:
-      Vector2D m_center; ///< Memory for the central point
-      double m_radius;   ///< Memory for the signed radius
+      /// Memory for the central point
+      Vector2D m_center;
 
-    }; // class
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+      /// Memory for the signed radius
+      double m_radius;
+
+    };
+  }
+}

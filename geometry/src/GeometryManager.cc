@@ -36,6 +36,8 @@
 #include "G4OpticalSurface.hh"
 #include "G4LogicalBorderSurface.hh"
 #include "G4LogicalSkinSurface.hh"
+#include "G4VisAttributes.hh"
+#include "G4VoxelLimits.hh"
 
 //VGM stuff
 #include "Geant4GM/volumes/Factory.h"
@@ -49,6 +51,43 @@ using namespace std;
 
 namespace Belle2 {
   using namespace gearbox;
+
+  namespace {
+    /** calculate the minimal half length of the top volume along a given
+     * axis (x, y or z) and return either the current value if it is large
+     * enough or emit a warning and return the new value.
+     * @param name Axis name in the warning
+     * @param axis which axis to calculate the extent for
+     * @param volume to look at
+     * @param current current half length of the volume along the given axis
+     * @returns minimum size if larger then current, otherwise current
+     */
+    double getTopMinSize(const std::string& name, EAxis axis, G4LogicalVolume* volume, double current)
+    {
+      G4VoxelLimits dummyLimits;
+      double extent{0};
+      for (int i = 0; i < volume->GetNoDaughters(); ++i) {
+        G4VPhysicalVolume* daughter = volume->GetDaughter(i);
+        G4AffineTransform trans(daughter->GetRotation(), daughter->GetTranslation());
+        double vmin{0}, vmax{0};
+        daughter->GetLogicalVolume()->GetSolid()->CalculateExtent((EAxis) axis, dummyLimits, trans, vmin, vmax);
+        extent = std::max({extent, std::fabs(vmin), std::fabs(vmax)});
+      }
+      B2DEBUG(100, "Current global volume size in " << name << ": " << std::fixed
+              << std::setprecision(std::numeric_limits<double>::max_digits10)
+              << current << ", needed: " <<  extent);
+      if (current < extent && (extent - current) > Unit::um) {
+        if (current > 0) {
+          B2WARNING("Global volume not large enough in " << name << " direction, enlarging from "
+                    << current << " mm to " << extent << " mm");
+        } else {
+          B2INFO("Setting global volume size to " << name << "= +-" << extent << " mm");
+        }
+        return extent;
+      }
+      return current;
+    }
+  }
 
   namespace geometry {
 
@@ -91,9 +130,9 @@ namespace Belle2 {
                 << detectorDir.getPath() << " points to the geometry description");
       }
 
-      const double width  = detectorDir.getLength("Global/width",  8 * Unit::m);
-      const double height = detectorDir.getLength("Global/height", 8 * Unit::m);
-      const double length = detectorDir.getLength("Global/length", 8 * Unit::m);
+      const double width  = detectorDir.getLength("Global/width",  0);
+      const double height = detectorDir.getLength("Global/height", 0);
+      const double length = detectorDir.getLength("Global/length", 0);
       const std::string material = detectorDir.getString("Global/material", "Air");
 
       GeoConfiguration config(detectorName, width, height, length, material);
@@ -204,11 +243,18 @@ namespace Belle2 {
       //Interface the magnetic field
       BFieldManager::getInstance().addComponent(new BFieldFrameworkInterface());
 
-      //Now set Top volume
+      //Now set Top volume. Be aware that Geant4 uses "half size" so the size
+      //will be in each direction even though the member name suggests a total size
       G4Material*      top_mat = Materials::get(config.getGlobalMaterial());
-      G4Box*           top_box = new G4Box("Top", config.getGlobalWidth() / Unit::cm * CLHEP::cm,
-                                           config.getGlobalHeight() / Unit::cm * CLHEP::cm,
-                                           config.getGlobalLength() / Unit::cm * CLHEP::cm);
+      double xHalfLength = config.getGlobalWidth() / Unit::cm * CLHEP::cm;
+      double yHalfLength = config.getGlobalHeight() / Unit::cm * CLHEP::cm;
+      double zHalfLength = config.getGlobalLength() / Unit::cm * CLHEP::cm;
+      //Geant4 doesn't like negative dimensions so lets make sure it gets at
+      //least a positive value. We'll rezize the box anyway if the length is
+      //zero so this is not important now
+      G4Box*           top_box = new G4Box("Top", xHalfLength > 0 ? xHalfLength : 1,
+                                           yHalfLength > 0 ? yHalfLength : 1,
+                                           zHalfLength > 0 ? zHalfLength : 1);
       G4LogicalVolume* top_log = new G4LogicalVolume(top_box, top_mat, "Top", 0, 0, 0);
       setVisibility(*top_log, false);
       m_topVolume = new G4PVPlacement(0, G4ThreeVector(), top_log, "Top", 0, false, 0);
@@ -264,10 +310,15 @@ namespace Belle2 {
       B2INFO("Created a total of " << newSolids << " solids, " << newLogical
              << " logical volumes and " << newPhysical << " physical volumes");
 
+      //Enlarge top volume to always encompass all volumes
+      top_box->SetXHalfLength(getTopMinSize("x", kXAxis, top_log, xHalfLength));
+      top_box->SetYHalfLength(getTopMinSize("y", kYAxis, top_log, yHalfLength));
+      top_box->SetZHalfLength(getTopMinSize("z", kZAxis, top_log, zHalfLength));
+
       B2INFO("Initializing magnetic field if present ...");
       B2INFO_MEASURE_TIME(
         "Initialization of magnetic field took ",
-        BFieldMap::Instance().getBField(TVector3(0, 0, 0));
+        BFieldMap::Instance().initialize();
       );
       B2INFO("Optimizing geometry and creating lookup tables ...");
       B2INFO_MEASURE_TIME(
@@ -296,6 +347,12 @@ namespace Belle2 {
       gGeoManager->CloseGeometry();
       delete g4Factory.Top();
       delete rtFactory.Top();
+    }
+
+    G4VisAttributes* GeometryManager::newVisAttributes()
+    {
+      m_VisAttributes.push_back(new G4VisAttributes());
+      return m_VisAttributes.back();
     }
   }
 } //Belle2 namespace

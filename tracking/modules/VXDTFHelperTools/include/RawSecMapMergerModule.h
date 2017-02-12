@@ -13,11 +13,11 @@
 
 #include <framework/core/Module.h>
 
-#include "tracking/trackFindingVXD/filterTools/Shortcuts.h"
+#include <tracking/trackFindingVXD/filterMap/filterFramework/Shortcuts.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 #include <tracking/dataobjects/SectorMapConfig.h>
 #include <tracking/trackFindingVXD/sectorMapTools/MinMaxCollector.h>
-#include <tracking/trackFindingVXD/sectorMapTools/SectorMap.h>
+#include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 
@@ -542,16 +542,17 @@ namespace Belle2 {
      */
     virtual void initialize()
     {
-      StoreObjPtr< SectorMap<SpacePoint> > sectorMap("", DataStore::c_Persistent);
+      FiltersContainer<SpacePoint>& filtersContainer = Belle2::FiltersContainer<SpacePoint>::getInstance();
       B2INFO("RawSecMapMerger::initialize():");
 
-      // loop over all the setups in the sectorMap:
-      for (auto& setup : sectorMap->getAllSetups()) {
+      // loop over all the setups in the filtersContainer:
+      for (auto& setup : filtersContainer.getAllSetups()) {
 
         auto config = setup.second->getConfig();
         B2INFO("RawSecMapMerger::initialize(): loading mapName: " << config.secMapName);
 
-        if (config.secMapName != "lowTestRedesign") { continue; } // TODO WARNING DEBUG we do not want to run more than one run yet!
+        // Thomas : removed to be able to test other sector maps settings:
+        //if (config.secMapName != "lowTestRedesign") { continue; } // TODO WARNING DEBUG we do not want to run more than one run yet!
 
         VXDTFFilters<SpacePoint>* xHitFilters = new VXDTFFilters<SpacePoint>;
 
@@ -565,15 +566,17 @@ namespace Belle2 {
         // catching case of empty xHitFilters:
         if (xHitFilters->size() == 0) {
           delete xHitFilters;
-          B2FATAL("RawSecMapMerger:initialize: after processSectorCombinations an empty VXDTFFilters was returned, training data did not work!");
+          // Thomas : added the continue to be able to have other sector maps trainings!
+          continue;
+          // B2FATAL("RawSecMapMerger:initialize: after processSectorCombinations an empty VXDTFFilters was returned, training data did not work!");
         }
         B2INFO("\n\nRawSecMapMerger::initialize(): for mapName " << config.secMapName << ": process 3-hit-combinations:\n\n");
         processSectorCombinations(config, xHitFilters, 3);
-        sectorMap->assignFilters(config.secMapName, xHitFilters);
+        filtersContainer.assignFilters(config.secMapName, xHitFilters);
         return; // TODO WARNING DEBUG we do not want to run more than one run yet!
 
         B2INFO("\n\nRawSecMapMerger::initialize(): for mapName " << config.secMapName << ": process 4-hit-combinations:\n\n");
-        B2INFO(" assigning no filters to sectorMap: ");
+        B2INFO(" assigning no filters to the FiltersContainer: ");
         processSectorCombinations(config, xHitFilters, 4);
 
       }

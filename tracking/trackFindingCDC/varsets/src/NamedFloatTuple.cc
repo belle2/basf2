@@ -9,13 +9,10 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-NamedFloatTuple::~NamedFloatTuple()
-{
-}
+NamedFloatTuple::~NamedFloatTuple() = default;
 
 std::map<std::string, Float_t> NamedFloatTuple::getNamedValues(std::string prefix) const
 {

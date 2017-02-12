@@ -87,13 +87,16 @@ def add_packers(path, components=None):
         svdpacker = register_module('SVDPacker')
         path.add_module(svdpacker)
 
-    # CDC (parameters from cdc_packer_unpacker.py)
+    # CDC
     if components is None or 'CDC' in components:
-        cdc_mapping_file = Belle2.FileSystem.findFile("data/cdc/ch_map.dat")
         cdcpacker = register_module('CDCPacker')
-        cdcpacker.param('xmlMapFileName', cdc_mapping_file)
-        cdcpacker.param('cdcHitName', "CDCHits")
+        cdcpacker.param('xmlMapFileName', Belle2.FileSystem.findFile("data/cdc/ch_map.dat"))
         path.add_module(cdcpacker)
+
+    # ECL
+    if components is None or 'ECL' in components:
+        eclpacker = register_module('ECLPacker')
+        path.add_module(eclpacker)
 
     # TOP
     if components is None or 'TOP' in components:
@@ -109,6 +112,11 @@ def add_packers(path, components=None):
     if components is None or 'BKLM' in components:
         bklmpacker = register_module('BKLMRawPacker')
         path.add_module(bklmpacker)
+
+    # EKLM
+    if components is None or 'EKLM' in components:
+        eklmpacker = register_module('EKLMRawPacker')
+        path.add_module(eklmpacker)
 
 
 def add_unpackers(path, components=None):
@@ -126,25 +134,40 @@ def add_unpackers(path, components=None):
         pxdhitsorter.param('mergeFrames', False)
         path.add_module(pxdhitsorter)
 
+        pxd_clusterizer = register_module('PXDClusterizer')
+        path.add_module(pxd_clusterizer)
+
     # SVD
     if components is None or 'SVD' in components:
         svdunpacker = register_module('SVDUnpacker')
         path.add_module(svdunpacker)
 
-    # CDC (parameters from cdc_packer_unpacker.py)
+        svd_clusterizer = register_module('SVDClusterizer')
+        path.add_module(svd_clusterizer)
+
+    # CDC
     if components is None or 'CDC' in components:
-        cdc_mapping_file = Belle2.FileSystem.findFile("data/cdc/ch_map.dat")
-        cdc_hits_pack_unpack_collection = "CDCHits_test_output"
         cdcunpacker = register_module('CDCUnpacker')
-        cdcunpacker.param('xmlMapFileName', cdc_mapping_file)
-        cdcunpacker.param('cdcHitName', cdc_hits_pack_unpack_collection)
+        cdcunpacker.param('xmlMapFileName', Belle2.FileSystem.findFile("data/cdc/ch_map.dat"))
         cdcunpacker.param('enablePrintOut', False)
         path.add_module(cdcunpacker)
+
+    # ECL
+    if components is None or 'ECL' in components:
+        eclunpacker = register_module('ECLUnpacker')
+        path.add_module(eclunpacker)
 
     # TOP
     if components is None or 'TOP' in components:
         topunpacker = register_module('TOPUnpacker')
         path.add_module(topunpacker)
+        topconverter = register_module('TOPRawDigitConverter')
+        topconverter.param('useSampleTimeCalibration', False)
+        topconverter.param('useChannelT0Calibration', False)
+        topconverter.param('useModuleT0Calibration', False)
+        topconverter.param('useCommonT0Calibration', False)
+        topconverter.param('subtractOffset', True)
+        path.add_module(topconverter)
 
     # ARICH
     if components is None or 'ARICH' in components:
@@ -156,6 +179,11 @@ def add_unpackers(path, components=None):
         bklmunpacker = register_module('BKLMUnpacker')
         path.add_module(bklmunpacker)
 
+    # EKLM
+    if components is None or 'EKLM' in components:
+        eklmunpacker = register_module('EKLMUnpacker')
+        path.add_module(eklmunpacker)
+
 
 def add_raw_output(path, filename='raw.root', additionalBranches=[]):
     """
@@ -164,7 +192,20 @@ def add_raw_output(path, filename='raw.root', additionalBranches=[]):
 
     output = register_module('RootOutput')
     output.param('outputFileName', filename)
-    branches = ['RawPXDs', 'RawSVDs', 'RawTOPs', 'RawARICHs', 'RawKLMs']
+    branches = ['RawPXDs', 'RawSVDs', 'RawCDCs', 'RawTOPs', 'RawARICHs', 'RawECLs', 'RawKLMs']
     branches += additionalBranches
     output.param('branchNames', branches)
+    path.add_module(output)
+
+
+def add_raw_seqoutput(path, filename='raw.sroot', additionalObjects=[]):
+    """
+    This function adds an seqroot output module for raw data to a path.
+    """
+
+    output = register_module('SeqRootOutput')
+    output.param('outputFileName', filename)
+    objects = ['EventMetaData', 'RawPXDs', 'RawSVDs', 'RawCDCs', 'RawTOPs', 'RawARICHs', 'RawECLs', 'RawKLMs']
+    objects += additionalObjects
+    output.param('saveObjs', objects)
     path.add_module(output)

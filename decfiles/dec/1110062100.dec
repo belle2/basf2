@@ -1,0 +1,44 @@
+# EventType: 1110062100
+# Descriptor: [B0 -> (eta' -> (eta -> pi+ pi- pi0) pi+ pi- ) (K_S0 -> pi+ pi-)]cc
+# NickName: Bd_etapKS_eta2pi+2pi-_pi+pi-pi0
+# Documentation: Decay mode for sensitivity studies
+# Tested: Yes
+# PhysicsWG: TDPCV
+# Responsible: Alessandro Gaz
+# Email: gaz@hepl.phys.nagoya-u.ac.jp
+# Cuts: None
+# Date: 20150319
+#  Last change by A. Morda' (morda@pd.infn.it):
+#      added Dalitz decay models  for eta' and eta 
+#
+#
+Alias      eta'sig  eta'
+ChargeConj eta'sig  eta'sig
+Alias      etasig   eta
+ChargeConj etasig   etasig
+Alias      K_S0sig  K_S0
+ChargeConj K_S0sig  K_S0sig
+#
+#
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0	             	VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+1.000    eta'sig      K_S0sig    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0. -1.0 0.;
+Enddecay
+CDecay anti-B0sig
+#
+Decay K_S0sig
+1.000        pi+       pi-                 PHSP;
+Enddecay
+#
+Decay eta'sig
+1.000          etasig    pi+     pi-        ETAPRIME_DALITZ -0.047 -0.069 0.0 0.073;
+Enddecay
+#
+Decay etasig
+1.000   pi+   pi-    pi0               ETA_FULLDALITZ  -1.128  0.153  0.0  0.085  0.0  0.173;
+Enddecay
+#
+End

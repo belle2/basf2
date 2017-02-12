@@ -140,10 +140,10 @@ namespace Belle2 {
 
 
       /** Returns the orientation of the collection of hits relative to its matched track.
-       *  * Returns EForwardBackward::c_Invalid if the collection of hits is not matched to anz hit.
+       *  * Returns EForwardBackward::c_Invalid if the collection of hits is not matched to any track.
        *  * Returns EForwardBackward::c_Forward if the collection of hits is coaligned with the matched track.
        *  * Returns EForwardBackward::c_Backward if the collection of hits is coaligned with the matched track interpreted in reverse.
-       *  * Returns EForwardBackward::c_Invalid if the collection of hits has only a single hit.
+       *  * Returns EForwardBackward::c_Unknown if the matter cannot be decided.
        */
       EForwardBackward isForwardOrBackwardToMCTrack(const ACDCHitCollection* ptrHits) const;
 
@@ -165,7 +165,7 @@ namespace Belle2 {
       /** Returns the trajectory of the collection of hits */
       CDCTrajectory3D getTrajectory3D(const ACDCHitCollection* ptrHits) const;
 
-    }; //class
+    };
 
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

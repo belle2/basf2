@@ -34,8 +34,8 @@ using namespace std;
 
 namespace Belle2 {
 
-TRGCDCDisplayDrawingAreaHough::TRGCDCDisplayDrawingAreaHough(
-    TRGCDCDisplay & w,
+  TRGCDCDisplayDrawingAreaHough::TRGCDCDisplayDrawingAreaHough(
+    TRGCDCDisplay& w,
     int size)
     : TRGCDCDisplayDrawingArea(w, size, 10),
       _scale(1),
@@ -43,7 +43,10 @@ TRGCDCDisplayDrawingAreaHough::TRGCDCDisplayDrawingAreaHough(
       _oldCDC(false),
       _x(0),
       _y(0),
-      _hp(0) {
+      _scaleX(0), _scaleY(0),
+      _winx(0), _winy(0), _winw(0), _winh(0), _wind(0),
+      _hp(0)
+  {
 
     _blue = Gdk::Color("blue");
     _red = Gdk::Color("red");
@@ -72,39 +75,43 @@ TRGCDCDisplayDrawingAreaHough::TRGCDCDisplayDrawingAreaHough(
     colormap->alloc_color(_gray3);
 
     add_events(Gdk::EXPOSURE_MASK | Gdk::BUTTON_PRESS_MASK);
-}
+  }
 
-TRGCDCDisplayDrawingAreaHough::~TRGCDCDisplayDrawingAreaHough() {
-}
+  TRGCDCDisplayDrawingAreaHough::~TRGCDCDisplayDrawingAreaHough()
+  {
+  }
 
-void
-TRGCDCDisplayDrawingAreaHough::on_realize() {
+  void
+  TRGCDCDisplayDrawingAreaHough::on_realize()
+  {
     Gtk::DrawingArea::on_realize();
     _window = get_window();
     _window->get_geometry(_winx, _winy, _winw, _winh, _wind);
     if (_hp) {
-        _x = _hp->nX() / 2;
-        _y = _hp->nY() / 2;
+      _x = _hp->nX() / 2;
+      _y = _hp->nY() / 2;
     }
     _gc = Gdk::GC::create(_window);
     _window->set_background(_white);
     _window->clear();
-}
+  }
 
-bool
-TRGCDCDisplayDrawingAreaHough::on_expose_event(GdkEventExpose *) {
+  bool
+  TRGCDCDisplayDrawingAreaHough::on_expose_event(GdkEventExpose*)
+  {
     Glib::RefPtr<Gdk::Window> window = get_window();
     window->get_geometry(_winx, _winy, _winw, _winh, _wind);
     window->clear();
     draw();
     return true;
-}
+  }
 
-bool
-TRGCDCDisplayDrawingAreaHough::on_button_press_event(GdkEventButton * e) {
+  bool
+  TRGCDCDisplayDrawingAreaHough::on_button_press_event(GdkEventButton* e)
+  {
 
     //...Clear window as a default...
-    on_expose_event((GdkEventExpose *) NULL);
+    on_expose_event((GdkEventExpose*) NULL);
 
     //...HP there?...
     if (! _hp) return true;
@@ -120,8 +127,8 @@ TRGCDCDisplayDrawingAreaHough::on_button_press_event(GdkEventButton * e) {
     //...Information...
     display().information("Cell(" + TRGUtilities::itostring(cx0) + "," +
                           TRGUtilities::itostring(cy0) + ", sid" +
-			  TRGUtilities::itostring(sid) + ") " +
-			  TRGUtilities::itostring(n) + "hits");
+                          TRGUtilities::itostring(sid) + ") " +
+                          TRGUtilities::itostring(n) + "hits");
 
     //...Draw cell...
     _gc->set_foreground(_red);
@@ -132,41 +139,41 @@ TRGCDCDisplayDrawingAreaHough::on_button_press_event(GdkEventButton * e) {
 
     //...Draw TSs if rphi display exists...
     if (display().rphi()) {
-        const TRGCDC & cdc = * TRGCDC::getTRGCDC();
-        const TCHPlaneMulti2 & hp =
-            * dynamic_cast<const TCHPlaneMulti2 *>(_hp);
-        vector<const TCSegment *> list;
-	string segs;
-        for (unsigned i = 0; i < 5; i++) {
-            const vector<unsigned> & l = hp.patternId(i, sid);
-            for (unsigned j = 0; j < l.size(); j++) {
-                list.push_back(& cdc.segment(i * 2, l[j]));
-		if (list.size() == 1) {
-		    segs = "s" + cdc.segment(i * 2, l[j]).name();
-		}
-		else {
-		    segs += ",s" + cdc.segment(i * 2, l[j]).name();
-		}
-	    }
+      const TRGCDC& cdc = * TRGCDC::getTRGCDC();
+      const TCHPlaneMulti2& hp =
+        * dynamic_cast<const TCHPlaneMulti2*>(_hp);
+      vector<const TCSegment*> list;
+      string segs;
+      for (unsigned i = 0; i < 5; i++) {
+        const vector<unsigned>& l = hp.patternId(i, sid);
+        for (unsigned j = 0; j < l.size(); j++) {
+          list.push_back(& cdc.segment(i * 2, l[j]));
+          if (list.size() == 1) {
+            segs = "s" + cdc.segment(i * 2, l[j]).name();
+          } else {
+            segs += ",s" + cdc.segment(i * 2, l[j]).name();
+          }
         }
-	display().rphi()->information(segs);
-        display().rphi()->area().on_expose_event(0);
-        display().rphi()->area().oneShot(list, _red);
+      }
+      display().rphi()->information(segs);
+      display().rphi()->area().on_expose_event(0);
+      display().rphi()->area().oneShot(list, _red);
     }
 
     //...Debug...
     _x = xR(e->x);
     _y = yR(e->y);
-  cout <<"***********************"<<endl;
-  cout << "x=" << e->x << ",y=" << e->y << endl;
-  cout << "cx0=" << cx0 << ",cy0=" << cy0 << endl;
-  cout <<"************************"<<endl;
-    
-    return true;
-}
+    cout << "***********************" << endl;
+    cout << "x=" << e->x << ",y=" << e->y << endl;
+    cout << "cx0=" << cx0 << ",cy0=" << cy0 << endl;
+    cout << "************************" << endl;
 
-void
-TRGCDCDisplayDrawingAreaHough::draw(void) {
+    return true;
+  }
+
+  void
+  TRGCDCDisplayDrawingAreaHough::draw(void)
+  {
     if (! _hp) return;
 
     Glib::RefPtr<Gdk::Colormap> colormap = get_default_colormap();
@@ -188,35 +195,35 @@ TRGCDCDisplayDrawingAreaHough::draw(void) {
     //...Search maximum...
     unsigned nMax = 0;
     for (unsigned i = 0; i < _hp->nX(); i++) {
-        for (unsigned j = 0; j < _hp->nY(); j++) {
-            const unsigned n = _hp->entry(i, j);
-            if (n > nMax) nMax = n;
-        }
+      for (unsigned j = 0; j < _hp->nY(); j++) {
+        const unsigned n = _hp->entry(i, j);
+        if (n > nMax) nMax = n;
+      }
     }
 
     if (nMax == 0)
-        cout << "max entry=" << nMax << endl;
+      cout << "max entry=" << nMax << endl;
 
     //...Draw...
     for (unsigned i = 0; i < _hp->nX(); i++) {
-        for (unsigned j = 0; j < _hp->nY(); j++) {
-            const unsigned n = _hp->entry(i, j);
-            if (! n) continue;
+      for (unsigned j = 0; j < _hp->nY(); j++) {
+        const unsigned n = _hp->entry(i, j);
+        if (! n) continue;
 
-            //...Decide color...
-            if (n == 1)
-                _gc->set_foreground(_gray0);
-            else if (n == 2)
-                _gc->set_foreground(_gray1);
-            else if (n == 3)
-                _gc->set_foreground(_gray2);
-            else if (n == 4)
-                _gc->set_foreground(_blue);
-            else
-                _gc->set_foreground(_red);
+        //...Decide color...
+        if (n == 1)
+          _gc->set_foreground(_gray0);
+        else if (n == 2)
+          _gc->set_foreground(_gray1);
+        else if (n == 3)
+          _gc->set_foreground(_gray2);
+        else if (n == 4)
+          _gc->set_foreground(_blue);
+        else
+          _gc->set_foreground(_red);
 
-            drawCell(i, j);
-        }
+        drawCell(i, j);
+      }
     }
 
     //...Draw boundary...
@@ -239,9 +246,9 @@ TRGCDCDisplayDrawingAreaHough::draw(void) {
                              Gdk::LINE_SOLID,
                              Gdk::CAP_NOT_LAST,
                              Gdk::JOIN_MITER);
-    const vector<vector<unsigned> *> & regions = _hp->regions();
+    const vector<vector<unsigned> *>& regions = _hp->regions();
     for (unsigned i = 0; i < (unsigned) regions.size(); i++)
-        drawRegion(* regions[i]);
+      drawRegion(* regions[i]);
 
     //...Draw text...
 //     _xPositionText = _hp->xMin() + _hp->xSize() * _hp->nX() * 0.1;
@@ -259,38 +266,44 @@ TRGCDCDisplayDrawingAreaHough::draw(void) {
 //     _window.draw_segment(xMin, yOuterWall, xMax, yOuterWall, leda_gray2);
 
 //    on_expose_event((GdkEventExpose *) NULL);
-}
+  }
 
-void
-TRGCDCDisplayDrawingAreaHough::resetPosition(void) {
+  void
+  TRGCDCDisplayDrawingAreaHough::resetPosition(void)
+  {
     _x = _winw / 2;
     _y = _winh / 2;
-}
+  }
 
-int
-TRGCDCDisplayDrawingAreaHough::xT(double x) const {
+  int
+  TRGCDCDisplayDrawingAreaHough::xT(double x) const
+  {
     const double xx = x - _x + double(_hp->nX()) / 2;
     return int(xx * _hp->xSize() * _scaleX);
-}
+  }
 
-int
-TRGCDCDisplayDrawingAreaHough::yT(double y) const {
+  int
+  TRGCDCDisplayDrawingAreaHough::yT(double y) const
+  {
     const double yy = y - _y + double(_hp->nY()) / 2;
     return - int(yy * _hp->ySize() * _scaleY) + _winh;
-}
+  }
 
-int
-TRGCDCDisplayDrawingAreaHough::xR(double x) const {
+  int
+  TRGCDCDisplayDrawingAreaHough::xR(double x) const
+  {
     return int(x / _hp->xSize() * _scaleX);
-}
+  }
 
-int
-TRGCDCDisplayDrawingAreaHough::yR(double y) const {
+  int
+  TRGCDCDisplayDrawingAreaHough::yR(double y) const
+  {
     return - int((y - double(_winh)) / _hp->ySize() / _scaleY);
-}
+  }
 
-int
-TRGCDCDisplayDrawingAreaHough::drawCell(unsigned xCell, unsigned yCell) {
+  int
+  TRGCDCDisplayDrawingAreaHough::drawCell(unsigned xCell, unsigned yCell)
+  {
     const float x = float(xCell) * _hp->xSize() * _scaleX;
     const float y = float(yCell) * _hp->ySize() * _scaleY;
 
@@ -307,53 +320,54 @@ TRGCDCDisplayDrawingAreaHough::drawCell(unsigned xCell, unsigned yCell) {
 //          << y1 << endl;
 
     return 0;
-}
+  }
 
-int
-TRGCDCDisplayDrawingAreaHough:: drawRegion(const std::vector<unsigned> & r) {
+  int
+  TRGCDCDisplayDrawingAreaHough:: drawRegion(const std::vector<unsigned>& r)
+  {
     for (unsigned i = 0; i < r.size(); i++) {
-        const unsigned id = r[i];
-        unsigned ix = 0;
-        unsigned iy = 0;
-        _hp->id(id, ix, iy);
+      const unsigned id = r[i];
+      unsigned ix = 0;
+      unsigned iy = 0;
+      _hp->id(id, ix, iy);
 
-        const float x = float(ix) * _hp->xSize() * _scaleX;
-        const float y = float(iy) * _hp->ySize() * _scaleY;
+      const float x = float(ix) * _hp->xSize() * _scaleX;
+      const float y = float(iy) * _hp->ySize() * _scaleY;
 
-        const int x0 = int(x);
-        const int y0 = int(y);
-        const int z0 = toY(y0);
+      const int x0 = int(x);
+      const int y0 = int(y);
+      const int z0 = toY(y0);
 
-        const int x1 = int(x + _hp->xSize() * _scaleX);
-        const int y1 = int(y + _hp->ySize() * _scaleY) - y0;
-        const int z1 = z0 + y1;
+      const int x1 = int(x + _hp->xSize() * _scaleX);
+      const int y1 = int(y + _hp->ySize() * _scaleY) - y0;
+      const int z1 = z0 + y1;
 
-        for (unsigned k = 0; k < 8; k++) {
-            if (k % 2) continue;
-            unsigned idx = _hp->neighbor(id, k);
+      for (unsigned k = 0; k < 8; k++) {
+        if (k % 2) continue;
+        unsigned idx = _hp->neighbor(id, k);
 
-            if (idx == id) continue;
-            bool found = false;
-            for (unsigned l = 0; l < (unsigned) r.size(); l++) {
-                if (idx == r[l]) {
-                    found = true;
-                    break;
-                }
-            }
-            if (found) continue;
-            if (k == 0)
-                _window->draw_line(_gc, x0, z0, x1, z0);
-            else if (k == 2)
-                _window->draw_line(_gc, x1, z0, x1, z1);
-            else if (k == 4)
-                _window->draw_line(_gc, x0, z1, x1, z1);
-            else if (k == 6)
-                _window->draw_line(_gc, x0, z0, x0, z1);
+        if (idx == id) continue;
+        bool found = false;
+        for (unsigned l = 0; l < (unsigned) r.size(); l++) {
+          if (idx == r[l]) {
+            found = true;
+            break;
+          }
         }
+        if (found) continue;
+        if (k == 0)
+          _window->draw_line(_gc, x0, z0, x1, z0);
+        else if (k == 2)
+          _window->draw_line(_gc, x1, z0, x1, z1);
+        else if (k == 4)
+          _window->draw_line(_gc, x0, z1, x1, z1);
+        else if (k == 6)
+          _window->draw_line(_gc, x0, z0, x0, z1);
+      }
     }
 
     return 0;
-}
+  }
 
 } // namespace Belle2
 

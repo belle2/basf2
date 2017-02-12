@@ -134,11 +134,11 @@ void VXDCDCTrackMergerModule::event()
 
       // Extrapolate tracks to same plane & Match Tracks
       if (TMath::Sqrt((cdcpos - vxdpos) * (cdcpos - vxdpos)) < m_merge_radius) {
+        genfit::MeasuredStateOnPlane vxd_sop;
+        genfit::MeasuredStateOnPlane cdc_sop;
         try {
-          genfit::MeasuredStateOnPlane vxd_sop =
-            vxdTrack.getMeasuredStateOnPlaneFromLastHit();
-          genfit::MeasuredStateOnPlane cdc_sop =
-            cdcTrack.getMeasuredStateOnPlaneFromFirstHit();
+          vxd_sop = vxdTrack.getMeasuredStateOnPlaneFromLastHit();
+          cdc_sop = cdcTrack.getMeasuredStateOnPlaneFromFirstHit();
           cdc_sop.extrapolateToCylinder(m_CDC_wall_radius, position, momentum);
           vxd_sop.extrapolateToPlane(cdc_sop.getPlane());
         } catch (genfit::Exception const&) {
@@ -146,12 +146,6 @@ void VXDCDCTrackMergerModule::event()
           B2DEBUG(9, "VXDTrack extrapolation to plane failed!");
           continue;
         }
-        genfit::MeasuredStateOnPlane vxd_sop =
-          vxdTrack.getMeasuredStateOnPlaneFromLastHit();
-        genfit::MeasuredStateOnPlane cdc_sop =
-          cdcTrack.getMeasuredStateOnPlaneFromFirstHit();
-        cdc_sop.extrapolateToCylinder(m_CDC_wall_radius, position, momentum);
-        vxd_sop.extrapolateToPlane(cdc_sop.getPlane());
 
         try {
           TMatrixDSym inv_covmtrx = (vxd_sop.getCov() + cdc_sop.getCov()).Invert();
@@ -176,7 +170,6 @@ void VXDCDCTrackMergerModule::event()
     }
   }    //loop on CDC
 
-  m_mergedRecoTracks.create();
   // add merged tracks to output collection
   for (auto match : vxdCdcMatched) {
     auto vxdTrack = m_VXDRecoTracks[match.first];

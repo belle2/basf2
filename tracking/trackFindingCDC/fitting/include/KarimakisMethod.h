@@ -23,24 +23,28 @@ namespace Belle2 {
       KarimakisMethod();
 
       /// Executes the fit and updates the trajectory parameters. This may render the information in the observation object.
-      void update(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const;
+      void update(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const;
 
     private:
       /// Internal method doing the heavy work.
-      UncertainPerigeeCircle fitInternal(CDCObservations2D&) const;
+      UncertainPerigeeCircle fitInternal(CDCObservations2D& observations2D) const;
 
     public:
       /// Getter for the indictor that lines should be fitted by this fitter
       bool isLineConstrained() const
-      { return m_lineConstrained; }
+      {
+        return m_lineConstrained;
+      }
 
       /// Indicator if this fitter is setup to fit lines
       void setLineConstrained(bool constrained = true)
-      { m_lineConstrained = constrained; }
+      {
+        m_lineConstrained = constrained;
+      }
 
-    protected:
-      bool m_lineConstrained; ///< Memory for the flag indicating that lines should be fitted
-
-    }; //class
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+    private:
+      /// Memory for the flag indicating that lines should be fitted
+      bool m_lineConstrained;
+    };
+  }
+}

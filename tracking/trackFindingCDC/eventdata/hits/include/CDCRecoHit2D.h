@@ -69,12 +69,11 @@ namespace Belle2 {
        *  Constructs a two dimensional reconstructed hit from an absolute position.
        *
        *  @param rlWireHit the oriented wire hit the reconstructed hit is assoziated to
-       *  @param pos2D     the absolut position of the wire
+       *  @param recoPos2D the absolut position of the wire
        *  @param snap      optional indicator if the displacement shall be shrank to the drift circle (default true)
        */
-      static CDCRecoHit2D fromRecoPos2D(const CDCRLWireHit& rlWireHit,
-                                        const Vector2D& recoPos2D,
-                                        bool snap = true);
+      static CDCRecoHit2D
+      fromRecoPos2D(const CDCRLWireHit& rlWireHit, const Vector2D& recoPos2D, bool snap = true);
 
       /**
        *  Turns the orientation in place.
@@ -85,6 +84,9 @@ namespace Belle2 {
 
       /// Returns the recohit with the opposite right left information.
       CDCRecoHit2D reversed() const;
+
+      /// Getter for the alias version of the reco hit
+      CDCRecoHit2D getAlias() const;
 
       /**
        *  Constructs a two dimensional reconstructed hit from a sim hit and the assoziated wirehit.
@@ -143,16 +145,6 @@ namespace Belle2 {
         return output;
       }
 
-      /**
-       *  Access the object methods and methods from a pointer in the same way.
-       *  In situations where the type is not known to be a pointer or a reference there is no way to tell
-       *  if one should use the dot '.' or operator '->' for method look up.
-       *  So this function defines the -> operator for the object.
-       *  No matter you have a pointer or an object access is given with '->'.
-       */
-      const CDCRecoHit2D* operator->() const
-      { return this; }
-
       /// Getter for the stereo type of the underlying wire.
       EStereoKind getStereoKind() const
       { return getRLWireHit().getStereoKind(); }
@@ -198,8 +190,7 @@ namespace Belle2 {
       { return getRLWireHit().getRefDriftLength(); }
 
       /// Setter for the drift length at the wire reference position.
-      void setRefDriftLength(double driftLength)
-      { return m_rlWireHit.setRefDriftLength(driftLength); }
+      void setRefDriftLength(double driftLength, bool snapRecoPos);
 
       /// Getter for the drift length at the wire reference position signed with the right left passage hypotheses.
       double getSignedRefDriftLength() const
@@ -211,7 +202,11 @@ namespace Belle2 {
 
       /// Getter for the position in the reference plane.
       Vector2D getRecoPos2D() const
-      { return getRecoDisp2D() + getWireHit().getRefPos2D(); }
+      { return getRecoDisp2D() + getRefPos2D(); }
+
+      /// Setter for the position in the reference plane.
+      void setRecoPos2D(const Vector2D& recoPos2D)
+      { m_recoDisp2D = recoPos2D - getRefPos2D(); }
 
       /// Getter for the displacement from the wire reference position.
       const Vector2D& getRecoDisp2D() const
@@ -224,9 +219,14 @@ namespace Belle2 {
         return getRecoDisp2D().orthogonal(rotation);
       }
 
+      /// Getter for the direction of flight relative to the position
+      double getAlpha() const
+      {
+        return getRecoPos2D().angleWith(getFlightDirection2D());
+      }
+
       /// Scales the displacement vector in place to lie on the dirft circle.
-      void snapToDriftCircle()
-      { m_recoDisp2D.normalizeTo(getRLWireHit().getRefDriftLength()); }
+      void snapToDriftCircle(bool switchSide = false);
 
       /**
        *  Reconstruct the three dimensional position (especially of stereo hits)
@@ -253,7 +253,7 @@ namespace Belle2 {
       /// Memory for the displacement fo the assoziated wire reference position.
       Vector2D m_recoDisp2D;
 
-    }; // class CDCRecoHit2D
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

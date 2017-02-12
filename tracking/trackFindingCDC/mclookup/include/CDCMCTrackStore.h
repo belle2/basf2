@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 #include <tracking/trackFindingCDC/mclookup/ITrackType.h>
 #include <tracking/trackFindingCDC/numerics/Index.h>
 
@@ -19,13 +18,16 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCMCMap;
+    class CDCSimHitLookUp;
+
 
     ///Class to organize and present the monte carlo hit information
     class CDCMCTrackStore {
 
     public:
       /// Type for an ordered sequence of pointers to the CDCHit
-      typedef std::vector<const CDCHit*> CDCHitVector;
+      using CDCHitVector = std::vector<const CDCHit*>;
 
     public:
       /// Getter for the singletone instance
@@ -42,7 +44,7 @@ namespace Belle2 {
       /** Fill the store with the tracks from Monte Carlo information.
        *  It uses the CDCMCMap to construct the Monte Carlo tracks.
        */
-      void fill(const CDCMCMap* ptrMCMap);
+      void fill(const CDCMCMap* ptrMCMap, const CDCSimHitLookUp* ptrSimHitLookUp);
 
     public:
       /// Getter for the stored Monte Carlo tracks ordered by their Monte Carlo Id
@@ -83,17 +85,20 @@ namespace Belle2 {
 
     public:
       /// Getter for the index of the hit within its track.
-      Index getInTrackId(const CDCHit* hit) const;
+      Index getInTrackId(const CDCHit* ptrHit) const;
 
       /// Getter for the index of the segment of the hit within its track.
-      Index getInTrackSegmentId(const CDCHit* hit) const;
+      Index getInTrackSegmentId(const CDCHit* ptrHit) const;
 
       /// Getter for the number of super layers traversed until this hit.
-      Index getNPassedSuperLayers(const CDCHit* hit) const;
+      Index getNPassedSuperLayers(const CDCHit* ptrHit) const;
 
     private:
       /// Reference to the MC map of the current event
       const CDCMCMap* m_ptrMCMap;
+
+      /// Reference to the CDCSimHit look up for additional information about related primary sim hits
+      const CDCSimHitLookUp* m_ptrSimHitLookUp;
 
       /// The memory for the tracks made of CDCHits sorted for the time of flight and assoziated to the Monte Carlo particle id
       std::map<ITrackType, CDCHitVector> m_mcTracksByMCParticleIdx;
@@ -110,6 +115,6 @@ namespace Belle2 {
       /// Look up table for the number of super layers the particle traversed before making the individual hit
       std::map<const CDCHit*, int> m_nPassedSuperLayers;
 
-    }; //class CDCMCTrackStore
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

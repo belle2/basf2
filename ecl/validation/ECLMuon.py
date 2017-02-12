@@ -16,6 +16,7 @@
 """
 
 import os
+import glob
 from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
@@ -39,9 +40,9 @@ set_random_seed(123456)
 pGun = register_module('ParticleGun')
 param_pGun = {
     'pdgCodes': [13],
-    'nTracks': 0,
-    'momentumGeneration': 'fixed',
-    'momentumParams': [1.0],
+    'nTracks': 1,
+    'momentumGeneration': 'uniform',
+    'momentumParams': [0.5, 3],
     'thetaGeneration': 'uniform',
     'thetaParams': [13., 155.],
     'phiGeneration': 'uniform',
@@ -55,13 +56,20 @@ param_pGun = {
 pGun.param(param_pGun)
 main.add_module(pGun)
 
-add_simulation(main)
+# bg = None
+if 'BELLE2_BACKGROUND_DIR' in os.environ:
+    bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+else:
+    print('Warning: variable BELLE2_BACKGROUND_DIR is not set')
+
+add_simulation(main, bkgfiles=bg)
 add_reconstruction(main)
 
 # eclDataAnalysis module
 ecldataanalysis = register_module('ECLDataAnalysis')
 ecldataanalysis.param('rootFileName', '../ECLMuonOutput.root')
 ecldataanalysis.param('doTracking', 1)
+ecldataanalysis.param('doSimulation', 0)
 main.add_module(ecldataanalysis)
 
 process(main)

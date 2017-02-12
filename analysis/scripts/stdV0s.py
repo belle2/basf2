@@ -21,7 +21,7 @@ def loadStdKS(path=analysis_main):
     stdKshorts(path)
 
 # def loadStdAllKS(path=analysis_main):
-#    loadStdAllPi(path)
+#    stdPi('all',path)
 #    reconstructDecay('K_S0:all -> pi-:all pi+:all', '0.4 < M < 0.6', 1, True,
 #                     path)
 #    vertexKFit('K_S0:all', 0.0)

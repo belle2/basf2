@@ -12,8 +12,7 @@
 
 #include <top/dbobjects/TOPGeoBase.h>
 #include <top/dbobjects/TOPGeoModule.h>
-#include <top/dbobjects/TOPGeoPMTArray.h>
-#include <top/dbobjects/TOPGeoBoardStack.h>
+#include <top/dbobjects/TOPGeoFrontEnd.h>
 #include <top/dbobjects/TOPGeoQBB.h>
 #include <top/dbobjects/TOPNominalQE.h>
 #include <top/dbobjects/TOPNominalTTS.h>
@@ -54,25 +53,19 @@ namespace Belle2 {
     static void useGeantUnits() {s_unit = Unit::mm; s_unitName = "mm";}
 
     /**
-     * Appends module
+     * Appends module (if its ID differs from already appended modules)
      * @param module module geometry parameters
      */
-    void appendModule(const TOPGeoModule& module) {m_modules.push_back(module);}
+    void appendModule(const TOPGeoModule& module);
 
     /**
-     * Sets PMT array
-     * @param array PMT array geometry parameters
-     */
-    void setPMTArray(const TOPGeoPMTArray& array) {m_pmtArray = array;}
-
-    /**
-     * Sets board stack
-     * @param bs board stack geometry parameters
+     * Sets front-end
+     * @param frontEnd front-end geometry parameters
      * @param num number of board stacks per module
      */
-    void setBoardStack(const TOPGeoBoardStack& bs, unsigned num = 4)
+    void setFrontEnd(const TOPGeoFrontEnd& frontEnd, unsigned num = 4)
     {
-      m_boardStack = bs;
+      m_frontEnd = frontEnd;
       m_numBoardStacks = num;
     }
 
@@ -111,29 +104,26 @@ namespace Belle2 {
      * @param moduleID valid module ID (1-based)
      * @return module geometry parameters
      */
-    const TOPGeoModule& getModule(unsigned moduleID) const;
+    const TOPGeoModule& getModule(int moduleID) const;
 
     /**
-     * Checks if module exists
+     * Returns all modules
+     * @return modules
+     */
+    const std::vector<TOPGeoModule>& getModules() const {return m_modules;}
+
+    /**
+     * Checks if module exists in m_modules
      * @param moduleID module ID (1-based)
      * @return true if exists
      */
-    bool isModuleIDValid(unsigned moduleID) const
-    {
-      return moduleID - 1 < m_modules.size();
-    }
+    bool isModuleIDValid(int moduleID) const;
 
     /**
-     * Returns PMT array
-     * @return PMT array geometry parameters
+     * Returns front-end
+     * @return front-end geometry parameters
      */
-    const TOPGeoPMTArray& getPMTArray() const {return m_pmtArray;}
-
-    /**
-     * Returns board stack
-     * @return board stack geometry parameters
-     */
-    const TOPGeoBoardStack& getBoardStack() const {return m_boardStack;}
+    const TOPGeoFrontEnd& getFrontEnd() const {return m_frontEnd;}
 
     /**
      * Returns number of boardstacks per module
@@ -211,15 +201,14 @@ namespace Belle2 {
   private:
 
     std::vector<TOPGeoModule> m_modules; /**< geometry parameters of modules */
-    TOPGeoPMTArray m_pmtArray;  /**< geometry parameters of PMT array */
-    TOPGeoBoardStack m_boardStack;  /**< geometry parameters of boardstack */
+    TOPGeoFrontEnd m_frontEnd;  /**< geometry parameters of front-end electronics */
     TOPGeoQBB m_QBB;  /**< geometry parameters of quartz bar box */
     unsigned m_numBoardStacks = 0;  /**< number of boardstacks per module */
     TOPNominalQE m_nominalQE; /**< nominal quantum efficiency of PMT */
     TOPNominalTTS m_nominalTTS; /**< nominal time transition spread of PMT */
     TOPNominalTDC m_nominalTDC; /**< nominal time-to-digit conversion parameters */
 
-    ClassDef(TOPGeometry, 1); /**< ClassDef */
+    ClassDef(TOPGeometry, 3); /**< ClassDef */
 
   };
 

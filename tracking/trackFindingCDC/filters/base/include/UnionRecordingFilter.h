@@ -14,57 +14,63 @@
 #include <tracking/trackFindingCDC/filters/base/FilterVarSet.h>
 
 #include <tracking/trackFindingCDC/varsets/UnionVarSet.h>
+#include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
+
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+
 #include <boost/algorithm/string.hpp>
+
+#include <vector>
+#include <string>
+#include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// A filter that records variables form given objects. It may record native varsets and returned weigths from other filters.
-    template<class AFilterFactory>
-    class UnionRecordingFilter:
-      public Recording<typename AFilterFactory::CreatedFilter> {
+    /// A filter that records variables form given objects. It may record native varsets and/or weigths from other filters.
+    template <class AFilterFactory>
+    class UnionRecordingFilter : public Recording<typename AFilterFactory::CreatedFilter> {
 
     private:
       /// Type of the super class
       using Super = Recording<typename AFilterFactory::CreatedFilter>;
 
       /// Type of the filters that can be included in the recodring
-      typedef typename AFilterFactory::CreatedFilter CreatedFilter;
+      using CreatedFilter = typename AFilterFactory::CreatedFilter;
 
     public:
       /// Type of the object to be analysed.
-      typedef typename CreatedFilter::Object Object;
+      using Object = typename CreatedFilter::Object;
 
     public:
       /// Constructor of the filter.
       UnionRecordingFilter(const std::string& defaultRootFileName = "records.root",
-                           const std::string& defaultTreeName = "records") :
-        Super(std::unique_ptr<UnionVarSet<Object> >(new UnionVarSet<Object>),
-              defaultRootFileName,
-              defaultTreeName),
-        m_filterFactory("truth")
-      {}
+                           const std::string& defaultTreeName = "records")
+        : Super(makeUnique<UnionVarSet<Object>>(), defaultRootFileName, defaultTreeName)
+        , m_filterFactory()
+      {
+      }
 
       /// Expose the set of parameters of the filter to the module parameter list.
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
         Super::exposeParameters(moduleParamList, prefix);
 
         moduleParamList->addParameter(prefixed(prefix, "varSets"),
                                       m_param_varSetNames,
                                       "List of names refering to concrete variable sets."
-                                      "Valid names: " + join(", ", getValidVarSetNames()),
+                                      "Valid names: " + join(", ", this->getValidVarSetNames()),
                                       m_param_varSetNames);
 
         moduleParamList->addParameter(prefixed(prefix, "skim"),
                                       m_param_skim,
                                       "Filter name which object must pass to be recorded."
-                                      "Valid names: " + join(", ", getValidFilterNames()),
+                                      "Valid names: " + join(", ", this->getValidFilterNames()),
                                       m_param_skim);
       }
 
       /// Initialize the recorder before event processing.
-      virtual void initialize() override
+      void initialize() override
       {
         /// Create the skimming filter
         if (m_param_skim != "") {
@@ -72,7 +78,7 @@ namespace Belle2 {
           this->setSkimFilter(std::move(skimFilter));
         }
 
-        std::unique_ptr<UnionVarSet<Object> > multiVarSet(new UnionVarSet<Object>());
+        auto multiVarSet = makeUnique<UnionVarSet<Object>>();
 
         /// Create and add the concrete varsets from the varset parameter.
         for (std::string name : getVarSetNames()) {
@@ -83,7 +89,7 @@ namespace Belle2 {
             B2WARNING("Could not create a variable set from name " << name);
           }
         }
-        Super::setVarSet(std::move(multiVarSet));
+        this->setVarSet(std::move(multiVarSet));
         Super::initialize();
       }
 

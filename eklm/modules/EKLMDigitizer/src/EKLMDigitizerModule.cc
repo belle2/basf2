@@ -8,13 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* System headers. */
-#include <math.h>
-
 /* External headers. */
 #include <boost/graph/adjacency_list.hpp>
 
 /* Belle2 headers. */
+#include <eklm/dataobjects/EKLMFPGAFit.h>
 #include <eklm/modules/EKLMDigitizer/EKLMDigitizerModule.h>
 #include <eklm/simulation/FiberAndElectronics.h>
 
@@ -29,13 +27,14 @@ EKLMDigitizerModule::EKLMDigitizerModule() : Module()
   addParam("DiscriminatorThreshold", m_DiscriminatorThreshold,
            "Strip hits with npe lower this value will be marked as bad",
            double(7.));
-  addParam("DigitizationInitialTime", m_DigPar.digitizationInitialTime,
-           "Initial digitization time (ns).", double(0.));
+  addParam("DigitizationInitialTime", m_DigitizationInitialTime,
+           "Initial digitization time (ns).", double(-40.));
   addParam("CreateSim2Hits", m_CreateSim2Hits,
-           "Create merged EKLMSim2Hits", bool(false));
-  addParam("Debug", m_DigPar.debug,
+           "Create merged EKLMSim2Hits", false);
+  addParam("SaveFPGAFit", m_SaveFPGAFit, "Save FPGA fit data", false);
+  addParam("Debug", m_Debug,
            "Debug mode (generates additional output files with histograms).",
-           bool(false));
+           false);
   m_GeoDat = NULL;
   m_Fitter = NULL;
 }
@@ -52,13 +51,19 @@ void EKLMDigitizerModule::initialize()
   digits.registerRelationTo(simHits);
   if (m_CreateSim2Hits)
     StoreArray<EKLMSim2Hit>::registerPersistent();
+  if (m_SaveFPGAFit) {
+    StoreArray<EKLMFPGAFit> fpgaFits;
+    fpgaFits.registerPersistent();
+    digits.registerRelationTo(fpgaFits);
+  }
   m_GeoDat = &(EKLM::GeometryData::Instance());
-  EKLM::setDefDigitizationParams(&m_DigPar);
-  m_Fitter = new EKLM::FPGAFitter(m_DigPar.nDigitizations);
+  m_Fitter = new EKLM::FPGAFitter(m_DigPar->getNDigitizations());
 }
 
 void EKLMDigitizerModule::beginRun()
 {
+  if (!m_DigPar.isValid())
+    B2FATAL("EKLM digitization parameters are not available.");
 }
 
 void EKLMDigitizerModule::readAndSortSimHits()
@@ -66,7 +71,7 @@ void EKLMDigitizerModule::readAndSortSimHits()
   EKLMSimHit* hit;
   StoreArray<EKLMSimHit> simHitsArray;
   int i, strip, maxStrip;
-  maxStrip = m_GeoDat->getMaximalStripNumber();
+  maxStrip = m_GeoDat->getMaximalStripGlobalNumber();
   m_SimHitVolumeMap.clear();
   for (i = 0; i < simHitsArray.getEntries(); i++) {
     hit = simHitsArray[i];
@@ -200,13 +205,16 @@ void EKLMDigitizerModule::makeSim2Hits()
  */
 void EKLMDigitizerModule::mergeSimHitsToStripHits()
 {
-  EKLM::FiberAndElectronics fes(&m_DigPar, m_Fitter);
+  EKLM::FiberAndElectronics fes(&(*m_DigPar), m_Fitter,
+                                m_DigitizationInitialTime, m_Debug);
   std::multimap<int, EKLMSimHit*>::iterator it, ub;
   for (it = m_SimHitVolumeMap.begin(); it != m_SimHitVolumeMap.end();
        it = m_SimHitVolumeMap.upper_bound(it->first)) {
     ub = m_SimHitVolumeMap.upper_bound(it->first);
     fes.setHitRange(it, ub);
     fes.processEntry();
+    if (fes.getGeneratedNPE() == 0)
+      continue;
     EKLMSimHit* simHit = it->second;
     EKLMDigit* digit = m_Digits.appendNew(simHit);
     digit->setMCTime(simHit->getTime());
@@ -215,7 +223,7 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
     digit->setGeneratedNPE(fes.getGeneratedNPE());
     digit->addRelationTo(simHit);
     if (!fes.getFitStatus()) {
-      digit->setTime(fes.getFitResults()->startTime);
+      digit->setTime(fes.getFPGAFit()->getStartTime());
       digit->setNPE(fes.getNPE());
     } else {
       digit->setTime(0.);
@@ -226,6 +234,11 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
       digit->isGood(true);
     else
       digit->isGood(false);
+    if (fes.getFitStatus() == EKLM::c_FPGASuccessfulFit && m_SaveFPGAFit) {
+      StoreArray<EKLMFPGAFit> fpgaFits;
+      EKLMFPGAFit* fit = fpgaFits.appendNew(*fes.getFPGAFit());
+      digit->addRelationTo(fit);
+    }
     /* cppcheck-suppress memleak */
   }
 }

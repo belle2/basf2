@@ -61,7 +61,7 @@ main = create_path()
 # generate a few runs which look good in hex
 main.add_module("EventInfoSetter", evtNumList=[3, 4, 5],
                 runList=[0x11121314, 0x21222324, 0x31323334],
-                expList=[0x12345678, 0x23456789, 0x3456789A])
+                expList=[0x123, 0x234, 0x345])
 # We could add a single processing RandomBarrier to check random barrier
 # transport in multi processing. But since output is unordered in multi
 # processing we don't do this in the automatic test

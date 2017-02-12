@@ -13,13 +13,9 @@
 #pragma link C++ class Belle2::MCInitialParticles+;
 #pragma link C++ class Belle2::DigitBase+;
 
-#pragma link C++ class Belle2::SimpleVec<int>+;
-#pragma link C++ class Belle2::SimpleVec<double>+;
-#pragma link C++ class Belle2::SimpleVec<float>+;
-#pragma link C++ class Belle2::SimpleVec<char>+;
-
 #pragma link C++ class Belle2::Helix+;
 #pragma link C++ class Belle2::UncertainHelix+;
+#pragma link C++ class Belle2::EventT0+;
 
 #pragma read sourceClass="Belle2::FileMetaData" version="[-3]" \
   source="unsigned int m_randomSeed" \

@@ -7,24 +7,28 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/filters/facet/RealisticFacetFilter.h>
 
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+
+#include <tracking/trackFindingCDC/numerics/Quadratic.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <framework/logging/Logger.h>
+
+#include <framework/core/ModuleParamList.h>
+
 #include <cmath>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-RealisticFacetFilter::RealisticFacetFilter():
-  m_param_phiPullCut(11)
+RealisticFacetFilter::RealisticFacetFilter()
+  : m_param_phiPullCut(11)
 {
 }
 
-RealisticFacetFilter::RealisticFacetFilter(double phiPullCut):
-  m_param_phiPullCut(phiPullCut)
+RealisticFacetFilter::RealisticFacetFilter(double phiPullCut)
+  : m_param_phiPullCut(phiPullCut)
 {
 }
 
@@ -96,28 +100,24 @@ Weight RealisticFacetFilter::operator()(const CDCFacet& facet)
                                     middleToEndSigmaPhi,
                                     endToStartSigmaPhi - endToMiddleSigmaPhi);
 
-  double startPhiPull = startPhi / startPhiSigma;
-  double middlePhiPull = middlePhi / middlePhiSigma;
-  double endPhiPull = endPhi / endPhiSigma;
+  const double startPhiPull = startPhi / startPhiSigma;
+  const double middlePhiPull = middlePhi / middlePhiSigma;
+  const double endPhiPull = endPhi / endPhiSigma;
 
-  /* cut on the angle of */
   if (startPhiPull < m_param_phiPullCut and
       middlePhiPull < m_param_phiPullCut and
       endPhiPull < m_param_phiPullCut) {
 
-    // Introducing a mini penilty to distiguish better facets.
+    // Introducing a mini penalty to distiguish straighter facets as better
+    // This is important since otherwise the ordering of the wires takes precedence and biases
+    // for counterclockwise tracks.
     double miniPenalty =
-      min(0.1, (startPhiPull + middlePhiPull + endPhiPull) / m_param_phiPullCut / 1000);
+      std::fmin(0.1, (startPhiPull + middlePhiPull + endPhiPull) / m_param_phiPullCut / 1000);
 
-    //Good facet contains three points of the track
+    // Good facet contains three points of the track
     // the amount carried by this facet can the adjusted more realistically
     return 3 - miniPenalty;
-
   } else {
-
-    //B2DEBUG(200,"Rejected facet because flight directions do not match");
     return NAN;
-
   }
-
 }

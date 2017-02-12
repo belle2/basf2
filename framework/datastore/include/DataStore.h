@@ -29,6 +29,7 @@ class TClass;
 namespace Belle2 {
   class StoreAccessorBase;
   class DependencyMap;
+  class RelationVectorBase;
   template <class T> class RelationVector;
   struct RelationEntry;
 
@@ -302,11 +303,10 @@ namespace Belle2 {
      *  @param weight         Weight of the relation.
      */
     void addRelation(const TObject* fromObject, StoreEntry*& fromEntry, int& fromIndex, const TObject* toObject, StoreEntry*& toEntry,
-                     int& toIndex, double weight);
+                     int& toIndex, float weight);
 
 
     /** Get the relations between an object and other objects in a store array.
-     *
      *
      *  @param searchSide     Search objects of type withClass on this side of relations (with 'object' on the other side).
      *  @param object         Pointer to the object from or to which the relations point.
@@ -315,11 +315,11 @@ namespace Belle2 {
      *  @param withClass      Class of the objects to or from which the relations point.
      *  @param withName        The name of the store array to or from which the relations point.
      *                        If empty the default store array name for withClass will be used.
-     *                        If the special name "ALL" is given all store arrays containing objectt of type withClass are considered.
-     *  @return               Vector of relation entry objects.
+     *                        If the special name "ALL" is given all store arrays containing object of type withClass are considered.
+     *  @return               Vector of relation entry objects (not type-safe).
      */
-    std::vector<Belle2::RelationEntry> getRelationsWith(ESearchSide searchSide, const TObject* object, StoreEntry*& entry, int& index,
-                                                        const TClass* withClass, const std::string& withName);
+    RelationVectorBase getRelationsWith(ESearchSide searchSide, const TObject* object, StoreEntry*& entry, int& index,
+                                        const TClass* withClass, const std::string& withName);
 
     /** Get the first relation between an object and another object in a store array.
      *
@@ -330,7 +330,7 @@ namespace Belle2 {
      *  @param withClass      Class of the objects to or from which the relation points.
      *  @param withName       The name of the store array to or from which the relation points.
      *                        If empty the default store array name for withClass will be used.
-     *                        If the special name "ALL" is given all store arrays containing objectt of type withClass are considered.
+     *                        If the special name "ALL" is given all store arrays containing object of type withClass are considered.
      *  @return               The entry of the first related object.
      */
     Belle2::RelationEntry getRelationWith(ESearchSide searchSide, const TObject* object, StoreEntry*& entry, int& index,
@@ -345,7 +345,7 @@ namespace Belle2 {
      *  @param toObject       Pointer to the object to which the relation points.
      *  @param weight         Weight of the relation.
      */
-    static void addRelationFromTo(const TObject* fromObject, const TObject* toObject, double weight = 1.0)
+    static void addRelationFromTo(const TObject* fromObject, const TObject* toObject, float weight = 1.0)
     {
       DataStore::StoreEntry* fromEntry = nullptr;
       int fromIndex = -1;
@@ -396,7 +396,7 @@ namespace Belle2 {
      *
      *  Relations in both directions are returned.
      *
-     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching. Currently this should only be necessary for genfit objects.
+     *  @note Using this function should only be necessary for genfit objects. If possible, use RelationsObject members instead, as they allow more efficent caching.
      *
      *  @sa RelationsObject::getRelationsWith
      *  @param object         Pointer to the object from or to which the relations point.
@@ -415,7 +415,7 @@ namespace Belle2 {
 
     /** Get the object to which another object has a relation.
      *
-     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching. Currently this should only be necessary for genfit objects.
+     *  @note Using this function should only be necessary for genfit objects. If possible, use RelationsObject members instead, as they allow more efficent caching.
      *  @warning Note that the naming is not consistent with similar member functions of RelationsObject (exactly switched around). Method will be removed at some point.
      *
      *  @param fromObject  Pointer to the object from which the relation points.
@@ -657,5 +657,5 @@ namespace Belle2 {
     DependencyMap* m_dependencyMap;
   };
 
-  ADD_BITMASK_OPERATORS(DataStore::EStoreFlags);
+  ADD_BITMASK_OPERATORS(DataStore::EStoreFlags); /**< Add bitmask operators to DataStore::EStoreFlags. */
 } // namespace Belle2

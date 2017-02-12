@@ -15,16 +15,18 @@
 #  History:
 #  06 Nov 2013    ver. 0.1   First example
 #  29 Nov 2013    ver. 0.2   Cleanup, P.Kvasnicka
+#  21 Oct 2016    ver. 0.3   Actualization, P.Kodys
 #
 ##############################################################################
-"""
-<header>
-<output>PXDValidationTTreeOutput.root</output>
-<output>PXDValidationTTreeSimHitOutput.root</output>
-<output>PXDValidationTTreeDigitOutput.root</output>
+"""<header>
+<input>PXDValidationTTreeOutput.root</input>
+<input>PXDValidationTTreeSimHitOutput.root</input>
+<input>PXDValidationTTreeDigitOutput.root</input>
+<output>PXDValidation.root</output>
 <contact>Peter Kodys, peter.kodys@mff.cuni.cz</contact>
-</header>
-"""
+<description>This steering file run the PXD response on an input file with own generated events.</description>
+</header>"""
+
 from basf2 import *
 from PXDValidationTTree import PXDValidationTTree
 from PXDValidationTTreeSimHit import PXDValidationTTreeSimHit
@@ -99,14 +101,14 @@ print_params(particlegun)
 geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
 
 pxddigi.param('statisticsFilename', 'PXDValidationDiags3.root')
-pxddigi.param('ElectronicEffects', True)
-pxddigi.param('ElectronicEffects', False)
-pxddigi.param('SimpleDriftModel', False)
-pxddigi.param('PoissonSmearing', True)
-pxddigi.param('NoiseSN', 1.0)
+# pxddigi.param('ElectronicEffects', True)
+# pxddigi.param('ElectronicEffects', False)
+# pxddigi.param('SimpleDriftModel', False)
+# pxddigi.param('PoissonSmearing', True)
+# pxddigi.param('NoiseSN', 1.0)
 
-pxdclust.param('NoiseSN', 1.0)
-pxdclust.param('TanLorentz', 0.0)
+# pxdclust.param('NoiseSN', 1.0)
+# pxdclust.param('TanLorentz', 0.0)
 
 # ============================================================================
 # create processing path

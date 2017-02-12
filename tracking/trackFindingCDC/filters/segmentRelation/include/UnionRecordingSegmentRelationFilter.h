@@ -10,27 +10,34 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/segmentRelation/SegmentRelationFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/segmentRelation/BaseSegmentRelationFilter.h>
+
 #include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.h>
+
+#include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
+
+#include <tracking/trackFindingCDC/utilities/Relation.h>
+
+#include <vector>
+#include <string>
+#include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegment2D;
 
-    /// Records the encountered relations between segments.
-    class UnionRecordingSegmentRelationFilter:
-      public UnionRecordingFilter<SegmentRelationFilterFactory> {
+    /// Filter to record multiple chooseable variable sets for segment relations
+    class UnionRecordingSegmentRelationFilter : public UnionRecordingFilter<SegmentRelationFilterFactory> {
 
     private:
       /// Type of the base class
-      typedef  UnionRecordingFilter<SegmentRelationFilterFactory> Super;
+      using Super = UnionRecordingFilter<SegmentRelationFilterFactory>;
 
     public:
-      /// Valid names of variable sets for segments.
-      virtual std::vector<std::string> getValidVarSetNames() const override;
+      /// Get the valid names of variable sets for segment relations.
+      std::vector<std::string> getValidVarSetNames() const override;
 
-      /// Create a concrete variables set for segments from a name.
-      virtual
-      std::unique_ptr<BaseVarSet<Relation<const CDCRecoSegment2D> > >
+      /// Create a concrete variables set for segment relations from a name.
+      std::unique_ptr<BaseVarSet<Relation<const CDCSegment2D> > >
       createVarSet(const std::string& name) const override;
     };
   }

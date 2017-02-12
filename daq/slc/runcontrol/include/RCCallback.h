@@ -73,6 +73,8 @@ namespace Belle2 {
   private:
     void dbload(int length, const char* data) throw(IOException);
 
+  public:
+    DBObject dbload(const std::string& path);
   protected:
     void dbrecord(DBObject obj, int expno, int runno, bool isstart) throw(IOException);
 

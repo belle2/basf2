@@ -221,6 +221,9 @@ void ECLSplitterN1Module::terminate()
   if (m_fileNOptimalFWD) delete m_fileNOptimalFWD;
   if (m_fileNOptimalBarrel) delete m_fileNOptimalBarrel;
   if (m_fileNOptimalBWD) delete m_fileNOptimalBWD;
+
+  if (m_NeighbourMap9) delete m_NeighbourMap9;
+  if (m_NeighbourMap21) delete m_NeighbourMap21;
 }
 
 void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
@@ -248,7 +251,6 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
   if (nLocalMaximums == 1 or nLocalMaximums >= m_maxSplits) {
 
     // Create a shower.
-    if (!m_eclShowers) m_eclShowers.create();
     const auto aECLShower = m_eclShowers.appendNew();
 
     // Add relation to the CR.
@@ -325,11 +327,11 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     }
 
     aECLShower->setEnergy(showerEnergy);
-    aECLShower->setEnedepsum(showerEnergy);
-    aECLShower->setHighestEnergy(highestEnergy);
+    aECLShower->setEnergyRaw(showerEnergy);
+    aECLShower->setEnergyHighestCrystal(highestEnergy);
     aECLShower->setTime(highestEnergyTime);
-    aECLShower->setTimeResolution(highestEnergyTimeResolution);
-    aECLShower->setNofCrystals(weightSum);
+    aECLShower->setDeltaTime99(highestEnergyTimeResolution);
+    aECLShower->setNumberOfCrystals(weightSum);
     aECLShower->setCentralCellId(highestEnergyID);
 
     B2DEBUG(175, "theta           = " << showerposition.Theta());
@@ -553,14 +555,13 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     // DONE!
 
     // Create the ECLShower objects, one per LocalMaximum
-    unsigned int iShower = 0;
+    unsigned int iShower = 1;
     for (const auto& locmaxpoint : localMaximumsPoints) {
 
       const int locmaxcellid = locmaxpoint.first;
       const int posLM = m_StoreArrPositionLM[locmaxcellid];
 
       // Create a shower
-      if (!m_eclShowers) m_eclShowers.create();
       const auto aECLShower = m_eclShowers.appendNew();
 
       // Use the same method for the estimate (3x3).
@@ -627,6 +628,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       B2DEBUG(175, "old phi: " << oldshowerposition->Phi());
       B2DEBUG(175, "old R: " << oldshowerposition->Mag());
       B2DEBUG(175, "old energy: " << energyEstimation);
+      delete oldshowerposition;
 
       // New position (with reduced number of neighbours)
       // There are some cases where high backgrounds fake local maxima and the splitted centroid position is far
@@ -639,6 +641,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       B2DEBUG(175, "new theta: " << showerposition->Theta());
       B2DEBUG(175, "new phi: " << showerposition->Phi());
       B2DEBUG(175, "new R: " << showerposition->Mag());
+      delete showerposition;
 
       // Get Energy, if requested, set weights to zero for energy calculation.
       double showerEnergy = 0.0;
@@ -661,18 +664,18 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       }
 
       aECLShower->setEnergy(showerEnergy);
-      aECLShower->setEnedepsum(showerEnergy);
-      aECLShower->setHighestEnergy(highestEnergy);
+      aECLShower->setEnergyRaw(showerEnergy);
+      aECLShower->setEnergyHighestCrystal(highestEnergy);
       aECLShower->setTime(highestEnergyTime);
-      aECLShower->setTimeResolution(highestEnergyTimeResolution);
-      aECLShower->setNofCrystals(weightSum);
+      aECLShower->setDeltaTime99(highestEnergyTimeResolution);
+      aECLShower->setNumberOfCrystals(weightSum);
       aECLShower->setCentralCellId(locmaxcellid);
 
       B2DEBUG(175, "new energy: " << showerEnergy);
 
       // Get unique ID
-      ++iShower;
       aECLShower->setShowerId(iShower);
+      ++iShower;
       aECLShower->setHypothesisId(Belle2::ECLConnectedRegion::c_N1);
       aECLShower->setConnectedRegionId(aCR.getCRId());
 

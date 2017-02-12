@@ -82,8 +82,8 @@ namespace Belle2 {
       }
 
       // pmt and module ID
-      int pmtID = photon.GetTouchableHandle()->GetReplicaNumber(2);
-      int moduleID = photon.GetTouchableHandle()->GetReplicaNumber(5);
+      int pmtID = photon.GetTouchableHandle()->GetReplicaNumber(m_pmtReplicaDepth);
+      int moduleID = photon.GetTouchableHandle()->GetReplicaNumber(m_moduleReplicaDepth);
 
       // photon at detection
       const G4ThreeVector& g_detPoint = photon.GetPosition();
@@ -115,7 +115,6 @@ namespace Belle2 {
       // write to store arrays; add relations
 
       StoreArray<TOPSimHit> simHits;
-      if (!simHits.isValid()) simHits.create();
       TOPSimHit* simHit = simHits.appendNew(moduleID, pmtID, xLocal, yLocal,
                                             detTime, energy);
 
@@ -126,7 +125,6 @@ namespace Belle2 {
       relParticleHit.add(parentID, simHit->getArrayIndex());
 
       StoreArray<TOPSimPhoton> simPhotons;
-      if (!simPhotons.isValid()) simPhotons.create();
       const auto* geo = m_topgp->getGeometry();
       if (geo->isModuleIDValid(moduleID)) {
         // transform to local frame

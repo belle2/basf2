@@ -23,24 +23,15 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef MCSymmetricFilterMixin<Filter<CDCSegmentTriple> > Super;
+      using Super = MCSymmetricFilterMixin<Filter<CDCSegmentTriple> >;
 
     public:
       /// Constructor initializing the symmetry flag.
       explicit MCSegmentTripleFilter(bool allowReverse = true);
 
     public:
-      /// Used to prepare the Monte Carlo information for this event.
-      virtual void beginEvent() override final;
-
-      /// Forwards the modules initialize to the filter
-      virtual void initialize() override final;
-
-      /// Forwards the modules initialize to the filter
-      virtual void terminate() override final;
-
       /// Check if the segment triple is aligned in the Monte Carlo track. Signals NAN if not.
-      virtual Weight operator()(const CDCSegmentTriple& triple) override final;
+      Weight operator()(const CDCSegmentTriple& segmentTriple) final;
 
     private:
       /// Sets the trajectories of the segment triple from Monte Carlo information. Is executed for good segment triples.
@@ -57,7 +48,6 @@ namespace Belle2 {
     private:
       /// Instance of the cell filter to reject neighborhoods of false cells.
       MCAxialSegmentPairFilter m_mcAxialSegmentPairFilter;
-
-    }; // end class MCSegmentTripleFilter
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

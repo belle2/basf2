@@ -165,7 +165,7 @@ TrackFinderMCTruthModule::~TrackFinderMCTruthModule()
 
 void TrackFinderMCTruthModule::initialize()
 {
-  B2WARNING("This module is depricated as it uses genfit::Track(Cand)s instead of RecoTracks. It will be removed in the future. If you need information on the transition, please contact Nils Braun (nils.braun@kit.edu).");
+  B2FATAL("This module is depricated as it uses genfit::Track(Cand)s instead of RecoTracks. It will be removed in the future. If you need information on the transition, please contact Nils Braun (nils.braun@kit.edu).");
   StoreArray<MCParticle> mcparticles;
   mcparticles.isRequired();
 
@@ -311,7 +311,6 @@ void TrackFinderMCTruthModule::event()
 
   //register StoreArray which will be filled by this module
   StoreArray<genfit::TrackCand> trackCandidates(m_gfTrackCandsColName);
-  trackCandidates.create();
   RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
 
   // loop over MCParticles. And check several user selected properties. Make a track candidate only if MCParticle has properties wanted by user options.

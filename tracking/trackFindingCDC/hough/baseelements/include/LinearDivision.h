@@ -15,7 +15,7 @@
 #include <tuple>
 #include <array>
 #include <iterator>
-#include <assert.h>
+#include <cassert>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -51,7 +51,7 @@ namespace Belle2 {
 
       /// Make all subboxs with overlap of the given box.
       template<std::size_t... Is>
-      inline
+
       std::array<ABox, s_nSubBoxes>
       makeSubBoxes(const ABox& box, IndexSequence<Is...> /*globalSubBoxIndex*/)
       {
@@ -61,7 +61,7 @@ namespace Belle2 {
 
       /// Make the subbox with overlaps of the given box at global index.
       template<std::size_t... Is>
-      inline
+
       ABox makeSubBox(const ABox& box,
                       std::size_t globalISubBox,
                       IndexSequence<Is...> /*coordinatesIndex*/)

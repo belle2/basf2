@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/database/Database.h>
+#include <framework/database/DBStore.h>
 #include <framework/database/IntervalOfValidity.h>
 
 namespace Belle2 {
@@ -34,10 +34,7 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~DBImportBase()
-    {
-      for (auto& object : m_objects) delete object;
-    }
+    virtual ~DBImportBase();
 
     /**
      * Returns the name under which the object will be stored in the database
@@ -134,8 +131,16 @@ namespace Belle2 {
       }
       if (m_object) m_objects.pop_back(); // restore initial state (mandatory!)
 
-      return Database::Instance().storeData(m_package, m_module, &intraRun, iov);
+      return storeData(&intraRun, iov);
     }
+
+    /** Store intra run dependent objects.
+     * This is an extra function to hide implementation details of Database.h
+     *
+     * @param intraRun pointer to the Intra Run implementation which has to inherit from TObject
+     * @param iov interval of validity
+     */
+    bool storeData(TObject* intraRun, const IntervalOfValidity& iov);
 
 
     EIntraRunDependency m_dependency = c_None;  /**< dependency type */

@@ -10,37 +10,42 @@
 #include <tracking/trackFindingCDC/filters/stereoHits/StereoHitVarSet.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+
+#include <tracking/trackFindingCDC/numerics/ToFinite.h>
 
 #include <numeric>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool StereoHitVarSet::extract(const std::pair<const CDCRecoHit3D*, const CDCTrack*>* testPair)
+bool StereoHitVarSet::extract(const std::pair<const CDCTrack*, const CDCRLWireHit*>* testPair)
 {
-  const CDCRecoHit3D* recoHit = testPair->first;
-  const CDCTrack* track = testPair->second;
+  const CDCRLWireHit* rlWireHit = testPair->second;
+  const CDCTrack* track = testPair->first;
 
-  bool extracted = extractNested(testPair);
-  if (not extracted or not testPair or not recoHit or not track) return false;
+  if (not testPair or not rlWireHit or not track) return false;
+
 
   const CDCTrajectory2D& trajectory2D = track->getStartTrajectory3D().getTrajectory2D();
+
+  const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstruct(*rlWireHit, trajectory2D);
+
   const Vector2D& startMomentum = trajectory2D.getMom2DAtSupport();
   const double radius = trajectory2D.getLocalCircle()->radius();
   const double size = track->size();
-  const Vector3D& reconstructedPosition = recoHit->getRecoPos3D();
-  const double reconstructedDriftLength = recoHit->getSignedRecoDriftLength();
-  const double reconstructedS = recoHit->getArcLength2D();
-  const unsigned short int adcCount = recoHit->getWireHit().getHit()->getADCCount();
-  const ERightLeft rlInformation = recoHit->getRLInfo();
+  const Vector3D& reconstructedPosition = recoHit3D.getRecoPos3D();
+  const double reconstructedDriftLength = recoHit3D.getSignedRecoDriftLength();
+  const double reconstructedS = recoHit3D.getArcLength2D();
+  const unsigned short int adcCount = rlWireHit->getWireHit().getHit()->getADCCount();
+  const ERightLeft rlInformation = rlWireHit->getRLInfo();
   const double backArcLength2D = track->back().getArcLength2D();
   const double frontArcLength2D = track->front().getArcLength2D();
   const double arcLength2DSum = std::accumulate(track->begin(), track->end(), 0.0, [](const double sum,
   const CDCRecoHit3D & listRecoHit) { return sum + listRecoHit.getArcLength2D();});
 
-  const CDCWire& wire = recoHit->getWire();
+  const CDCWire& wire = rlWireHit->getWire();
   Vector2D wirePos = wire.getWirePos2DAtZ(reconstructedPosition.z());
   Vector2D disp2D = reconstructedPosition.xy() - wirePos;
   const double xyDistance = disp2D.norm();
@@ -51,21 +56,21 @@ bool StereoHitVarSet::extract(const std::pair<const CDCRecoHit3D*, const CDCTrac
   });
 
   var<named("track_size")>() = size;
-  setVariableIfNotNaN<named("pt")>(trajectory2D.getAbsMom2D());
-  setVariableIfNotNaN<named("reco_s")>(reconstructedS);
-  setVariableIfNotNaN<named("reco_z")>(reconstructedPosition.z());
-  setVariableIfNotNaN<named("phi_track")>(startMomentum.phi());
+  var<named("pt")>() = toFinite(trajectory2D.getAbsMom2D(), 0);
+  var<named("reco_s")>() = toFinite(reconstructedS, 0);
+  var<named("reco_z")>() = toFinite(reconstructedPosition.z(), 0);
+  var<named("phi_track")>() = toFinite(startMomentum.phi(), 0);
   var<named("phi_hit")>() = reconstructedPosition.phi();
   var<named("theta_hit")>() = reconstructedPosition.theta();
   var<named("drift_length")>() = reconstructedDriftLength;
   var<named("adc_count")>() = adcCount;
-  setVariableIfNotNaN<named("xy_distance_zero_z")>(xyDistance);
+  var<named("xy_distance_zero_z")>() = toFinite(xyDistance, 0);
   var<named("right_hit")>() = rlInformation == ERightLeft::c_Right;
-  setVariableIfNotNaN<named("track_back_s")>(backArcLength2D);
-  setVariableIfNotNaN<named("track_front_s")>(frontArcLength2D);
-  setVariableIfNotNaN<named("track_mean_s")>(arcLength2DSum / size);
-  setVariableIfNotNaN<named("s_distance")>(nearestAxialHit->getArcLength2D() - reconstructedS);
-  setVariableIfNotNaN<named("track_radius")>(radius);
-  var<named("superlayer_id")>() = recoHit->getISuperLayer();
+  var<named("track_back_s")>() = toFinite(backArcLength2D, 0);
+  var<named("track_front_s")>() = toFinite(frontArcLength2D, 0);
+  var<named("track_mean_s")>() = toFinite(arcLength2DSum / size, 0);
+  var<named("s_distance")>() = toFinite(nearestAxialHit->getArcLength2D() - reconstructedS, 0);
+  var<named("track_radius")>() = toFinite(radius, 0);
+  var<named("superlayer_id")>() = rlWireHit->getISuperLayer();
   return true;
 }

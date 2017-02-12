@@ -14,6 +14,7 @@
   <xi:include href="../../../top/TOP-Materials.xml"/>
   <xi:include href="../../../ecl/ECL-Materials.xml"/>
   <xi:include href="../../../bklm/BKLM-Materials.xml"/>
+  <xi:include href="../../../cdc/CDC-Materials.xml"/>
   <xi:include href="Materials.xml"/>
 
   <!-- Subdedectors -->

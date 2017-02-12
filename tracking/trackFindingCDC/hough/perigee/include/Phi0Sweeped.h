@@ -29,24 +29,24 @@ namespace Belle2 {
 
     public:
       /// The box to which this object correspondes.
-      typedef SweepBox<APhi0, typename T::HoughBox> HoughBox;
+      using HoughBox = SweepBox<APhi0, typename T::HoughBox>;
 
       /// The hough box without the sweep in phi0
-      typedef typename T::HoughBox SubordinaryHoughBox;
+      using SubordinaryHoughBox = typename T::HoughBox;
 
       /// Constructor taking the curling curvature.
-      APhi0Sweeped(const float& curlCurv) : m_curlCurv(curlCurv) {}
+      APhi0Sweeped(float curlCurv) : m_curlCurv(curlCurv) {}
 
     public:
       /** Function that gives the sign of the distance from an observed drift circle to the sweeped object
        */
-      inline ESign getDistanceSign(const HoughBox& houghBox,
-                                   const float& x,
-                                   const float& y,
-                                   const float& signedDriftLength,
-                                   const float& dxdz = 0,
-                                   const float& dydz = 0,
-                                   ILayer iCLayer = -1) const
+      ESign getDistanceSign(const HoughBox& houghBox,
+                            float x,
+                            float y,
+                            float signedDriftLength,
+                            float dxdz = 0,
+                            float dydz = 0,
+                            ILayer iCLayer = -1) const
       {
         const Vector2D& lowerPhi0Vec(houghBox.template getLowerBound<APhi0>());
         const Vector2D& upperPhi0Vec(houghBox.template getUpperBound<APhi0>());
@@ -55,8 +55,8 @@ namespace Belle2 {
         const float lowerX = x * lowerPhi0Vec.x() + y * lowerPhi0Vec.y();
         const float upperX = x * upperPhi0Vec.x() + y * upperPhi0Vec.y();
 
-        const float& lowerCurv(getLowerCurv(houghBox));
-        const float& upperCurv(getUpperCurv(houghBox));
+        float lowerCurv(getLowerCurv(houghBox));
+        float upperCurv(getUpperCurv(houghBox));
 
         const bool lowerIsNonCurler = fabs(lowerCurv) < m_curlCurv;
         const bool upperIsNonCurler = fabs(upperCurv) < m_curlCurv;
@@ -95,5 +95,5 @@ namespace Belle2 {
       float m_curlCurv = NAN;
 
     };
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

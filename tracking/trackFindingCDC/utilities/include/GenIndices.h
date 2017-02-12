@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tuple>
-#include <stddef.h>
+#include <cstddef>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -52,7 +52,7 @@ namespace Belle2 {
     template< template<size_t> class AFunction, size_t ... Is>
     struct MapIndicesImpl<AFunction, IndexSequence<Is...> > {
       /// Result sequence of the function application.
-      typedef std::tuple<AFunction<Is>...> Type;
+      using Type = std::tuple<AFunction<Is>...>;
     };
 
     /// Generate the first N indices and apply the template function to them.

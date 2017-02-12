@@ -24,7 +24,7 @@ void Alignment()
 
   TString odir[] = { "ph1sustr" , "microtpc" , "he3tube" };
   TString ifn[] = { "tmp_PH1SUSTR.xml" , "tmp_MICROTPC.xml" , "tmp_HE3TUBE.xml" };
-  TString ofn[] = { "PH1SUSTR.xml" , "MICROTPC-phase1-test.xml" , "HE3TUBE-phase1-test.xml" };
+  TString ofn[] = { "PH1SUSTR.xml" , "MICROTPC-phase1_bak.xml" , "HE3TUBE-phase1_bak.xml" };
   
   //Set the Al plate position in centimeter
   /*
@@ -63,6 +63,7 @@ void Alignment()
       {0,-45.,30.}
     };
   */
+  /*GOOD
     double PlatePos[4][3] = 
     {
       //{51.8,0.8,0.4},
@@ -71,7 +72,54 @@ void Alignment()
       {2.1,-50.5,42.3}
       {-53.2,-0.3,37.7},
     };
+  */
+  /*
+     Right (+x):
 
+     Distance: 591.08mm  [23.271in ]
+     Delta X: 468.91mm  [18.461in ]
+     Delta Y: 7.52mm  [0.296in ]
+     Delta Z: 359.77mm  [14.164in ]
+     
+     
+     Top (+y):
+     
+     Distance: 644.85mm  [25.388in ]
+     Delta X: 29.57mm  [1.164in ]
+     Delta Y: 520.89mm  [20.507in ]
+     Delta Z: 379.00mm  [14.921in ]
+     
+     
+     Left (-x):
+     
+     Distance: 655.47mm  [25.806in ]
+     Delta X: 537.05mm  [21.144in ]
+     Delta Y: 3.40mm  [0.134in ]
+     Delta Z: 375.77mm  [14.794in ]
+     
+     Bottom (-y):
+     
+     Distance: 658.73mm  [25.934in ]
+     Delta X: 9.53mm  [0.375in ]
+     Delta Y: 504.89mm  [19.877in ]
+     Delta Z: 423.00mm  [16.653in ] 
+  */
+  /**** Last 
+  double PlatePos[4][3] = 
+    {
+      {46.891,0.752,35.977},
+      {2.957,52.089,37.9},
+      {-53.705,0.34,37.577},
+      {0.953,-50.489,42.3}
+    };
+  ****/
+  double PlatePos[4][3] = 
+    {
+      {49.2,-0.7,36.0},//
+      {-3.0,52.1,37.9},//
+      {-53.2,-0.3,37.7},//
+      {-1.0,-50.5,42.3}//
+    };
   /*
   double PlatePos[4][3] = 
     {
@@ -82,63 +130,45 @@ void Alignment()
     };
   */
   //Calculate TPC and Tube positions
-  double dx_tpc = 15.0;
-  double dy_tpc = 10.4;
-  double tub_rad = 2.38;
-  double plate_l = 40.;
-  double plate_w = 27.47788;
-  double plate_hw = 0.4765*2.;//2.54 * 0.35;
+  double dx_tpc[] = {12.7, 15.0, 15.0, 12.7};
+  double dy_tpc[] = {10.16, 10.4, 10.4, 10.16};
+  double tub_rad = 2.54;
+  double plate_l = 50.0;
+  double plate_w = 32.0;//27.47788;
+  double plate_hw = 0.5;//2.54 * 0.35;
   double TPCpos[4][3];
   double Tubpos[4][3];
+  double tpc_offset = 1.5;
+  double he3_offset = 5;
   for(int i=0;i<4;i++)
     {
       cout << "plate # " << i;
-      for(int j=0;j<3;j++)
-	{
-	  if(j==2)
-	    {
-	      TPCpos[i][j]=PlatePos[i][j];
-	      Tubpos[i][j]=PlatePos[i][j];
-	    }
-	  if(i<2){
-	    if(j==0 && PlatePos[i][j]>0)
-	      {
-		TPCpos[i][j]=PlatePos[i][j]-dy_tpc/2.-plate_hw;
-		Tubpos[i][j]=PlatePos[i][j]-tub_rad-plate_hw;
-	      }
-	    else if(j==0 && PlatePos[i][j]<0)
-	      {
-		TPCpos[i][j]=PlatePos[i][j]+dy_tpc/2.+plate_hw;
-		Tubpos[i][j]=PlatePos[i][j]+tub_rad+plate_hw;
-	      }
-	    else if(j==1){
-	      //TPCpos[i][j]=PlatePos[i][j]+dx_tpc/2.+2;
-	      //Tubpos[i][j]=PlatePos[i][j]-tub_rad-2.;
-	      TPCpos[i][j]=PlatePos[i][j]+plate_w/2.-dx_tpc/2.;
-	      Tubpos[i][j]=PlatePos[i][j]-plate_w/2.+tub_rad;
-	    }
-	  }else{
-	    if(j==1 && PlatePos[i][j]>0)
-	      {
-		TPCpos[i][j]=PlatePos[i][j]-dy_tpc/2.-plate_hw;
-		Tubpos[i][j]=PlatePos[i][j]-tub_rad-plate_hw;
-              }
-            else if(j==1 && PlatePos[i][j]<0)
-	      {
-                TPCpos[i][j]=PlatePos[i][j]+dy_tpc/2.+plate_hw;
-		Tubpos[i][j]=PlatePos[i][j]+tub_rad+plate_hw;
-              }
-            else if(j==0){
-              //TPCpos[i][j]=PlatePos[i][j]+dx_tpc/2.+2.;
-	      //Tubpos[i][j]=PlatePos[i][j]-tub_rad-2.;
-	      TPCpos[i][j]=PlatePos[i][j]+plate_w/2.-dx_tpc/2.;
-	      Tubpos[i][j]=PlatePos[i][j]-plate_w/2.+tub_rad;
-            }
-	  }
-	  cout << " TPC " << TPCpos[i][j] << " r " << sqrt(TPCpos[i][0]*TPCpos[i][0]+TPCpos[i][1]*TPCpos[i][1])<< endl;; 
-	  cout << " Tub " << Tubpos[i][j] << " r " << endl; 
-	}
-      cout << endl;
+      if (i == 0) {	
+	TPCpos[i][0] = PlatePos[i][0] - plate_hw / 2. - dy_tpc[i] / 2.;
+	Tubpos[i][0] = PlatePos[i][0] - plate_hw / 2. - tub_rad;
+	TPCpos[i][1] = PlatePos[i][1] - plate_w / 2. + dx_tpc[i] / 2. + tpc_offset;
+	Tubpos[i][1] = PlatePos[i][1] + plate_w / 2. - tub_rad - he3_offset;
+      }
+      if (i == 1) {	
+	TPCpos[i][0] = PlatePos[i][0] + plate_w / 2. - dx_tpc[i] / 2. - tpc_offset;
+	Tubpos[i][0] = PlatePos[i][0] - plate_w / 2. + tub_rad + he3_offset;
+	TPCpos[i][1] = PlatePos[i][1] - plate_hw / 2. - dy_tpc[i] / 2.;
+	Tubpos[i][1] = PlatePos[i][1] - plate_hw / 2. - tub_rad;
+      }
+      if ( i == 2) {
+	TPCpos[i][0] = PlatePos[i][0] + plate_hw / 2. + dy_tpc[i] / 2.;
+	Tubpos[i][0] = PlatePos[i][0] + plate_hw / 2. + tub_rad;
+	TPCpos[i][1] = PlatePos[i][1] + plate_w / 2. - dx_tpc[i] / 2. - tpc_offset;
+	Tubpos[i][1] = PlatePos[i][1] - plate_w / 2. + tub_rad + he3_offset;
+      }
+      if (i == 3) {	
+	TPCpos[i][0] = PlatePos[i][0] - plate_w / 2. + dx_tpc[i] / 2. + tpc_offset;
+	Tubpos[i][0] = PlatePos[i][0] + plate_w / 2. - tub_rad - he3_offset;
+	TPCpos[i][1] = PlatePos[i][1] + plate_hw / 2. + dy_tpc[i] / 2.;
+	Tubpos[i][1] = PlatePos[i][1] + plate_hw / 2. + tub_rad;
+      }
+      TPCpos[i][2]=PlatePos[i][2];
+      Tubpos[i][2]=PlatePos[i][2];
     }
   
   //Write and move new xml files in ph1sustr, microtpc, and he3tube directories
@@ -182,9 +212,12 @@ void Alignment()
       TString Action = "fixstyle "+ofn[i];
       cout << Action << endl;
       system(Action);
+      Action = "cp ../"+odir[i]+"/data/"+ofn[i]+" ../"+odir[i]+"/data/"+ofn[i]+"_backup";
+      cout << Action << endl;
+      system(Action);
       Action = "cp "+ofn[i]+" ../"+odir[i]+"/data/.";
       cout << Action << endl;
       system(Action);
     }
-  
+
 }

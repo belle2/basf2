@@ -29,14 +29,12 @@ from VXDTF.setup_modules_ml import *
 # rootInputFileName = "seed11nEv100pGun1_1T.root"  # test- and TrainSample
 # rootInputFileName = "seed12nEv200pGun1_2T.root"  # test- and TrainSample 0-90° phi, 60-85° Theta
 rootInputFileName = "seed12345nEv1000pGun1_20T.root"  # test- and TrainSample 0-90° phi, 60-85° Theta
-
+rootInputFileName = "MyRootFile.root"  # test- and TrainSample 0-90° phi, 60-85° Theta
+# rootInputFileName = "TestFile.root"
 
 # file name into which the segNetAnalize stores its stuff
-segNetAnaRFN = 'SegNetAnalyzer_SM_train.root'
-fbdtSamplesFN = 'FBDTClassifier_samples_train_10k.dat'
-fbdtFN = 'FBDTClassifier_1000_3.dat'
-# fitType = 'circleFit'  # currently supported: 'random' and 'circleFit'
-fitType = 'random'  # currently supported: 'random' and 'circleFit'
+fitType = 'circleFit'  # currently supported: 'random' and 'circleFit'
+# fitType = 'random'  # currently supported: 'random' and 'circleFit'
 setFilterType = 'hopfield'  # currently supported: 'greedy' and 'hopfield'
 
 usePXD = False
@@ -48,8 +46,6 @@ oldTFNoSubsetSelection = True  # if true, the old vxdtf does not its hopfield-pa
 ignoreDeadTCs = True  # if true, the TrackFinderVXDAnalizer will not add dead TCs to the efficiencies
 bypassCA = False  # if true, no CA will be used but the BasicPathFinder instead...
 
-trainFBDT = False  # with the current settings: collects samples but does not train a FastBDT!
-useFBDT = False  # use the ML Filter for creating the SegmentNetwork instead of the SectorMap filters
 activateSegNetAnalizer = False  # only needed when studying FastBDT-behavior
 
 doStrictSeeds = False  # if true, a smaller amount of TCs are created from the same segment-tree
@@ -58,6 +54,12 @@ doVirtualIPRemovalb4Fit = True  # if false, the vIP willbe removed after the fit
 doEventSummary = True  # if true TFVXDAnalizer will produce event-wise results
 switchFiltersOff = False  # if true, SegNetProducer does not apply any filters of the sectorMap.
 
+trainFBDT = False  # with the current settings: collects samples but does not train a FastBDT!
+useFBDT = False  # use the ML Filter for creating the SegmentNetwork instead of the SectorMap filters
+
+segNetAnaRFN = 'SegNetAnalyzer_SM_train.root'
+fbdtSamplesFN = 'FBDTClassifier_samples_train_10k.dat'
+fbdtFN = 'FBDTClassifier_1000_3.dat'
 if useFBDT:
     cNetworks = int(2)
 else:
@@ -65,13 +67,13 @@ else:
 
 # Important parameters:
 
-tempStringList = rootInputFileName.split('nEv', 1)
-stringInitialValue = tempStringList[0].split("seed", 1)
-print("found seed: " + stringInitialValue[1])
-numEvents = 20  # WARNING has to be identical with the value named in rootInputFileName!
+# tempStringList = rootInputFileName.split('nEv', 1)
+# stringInitialValue = tempStringList[0].split("seed", 1)
+# print("found seed: " + stringInitialValue[1])
+# numEvents = 20  # WARNING has to be identical with the value named in rootInputFileName!
 # comment Martin: this doesn't seem to be true. With
-initialValue = int(stringInitialValue[1])
-# initialValue = 4
+# initialValue = int(stringInitialValue[1])
+initialValue = 0
 
 set_log_level(LogLevel.ERROR)
 set_random_seed(initialValue)
@@ -92,6 +94,9 @@ AnalizerDebugLevel = 1
 if (initialValue == 2):
     print("chosen initialvalue 2! " + rootInputFileName)
     acceptedRawSecMapFiles = ['lowTestRedesign_1373026662.root']  # 42
+elif (initialValue == 0):
+    print("chosen initialvalue 0! " + rootInputFileName)
+    acceptedRawSecMapFiles = ['lowTestRedesign.root']  # 23
 elif (initialValue == 3):
     print("chosen initialvalue 3! " + rootInputFileName)
     acceptedRawSecMapFiles = ['lowTestRedesign_202608818.root']  # 23
@@ -151,11 +156,9 @@ eventinfoprinter = register_module('EventInfoPrinter')
 
 gearbox = register_module('Gearbox')
 
-
 secMapBootStrap = register_module('SectorMapBootstrap')
-
-
-secMapBootStrap = register_module('SectorMapBootstrap')
+secMapBootStrap.param('ReadSectorMap', False)
+secMapBootStrap.param('WriteSectorMap', True)
 
 evtStepSize = 1
 if newTrain:
@@ -271,9 +274,9 @@ vxdAnal.logging.debug_level = AnalizerDebugLevel
 
 print("spot 11")
 if newTrain:
-    log_to_file('testRedesign' + str(initialValue) + '_' + str(numEvents) + '.log', append=False)
+    log_to_file('testRedesign' + str(initialValue) + '.log', append=False)
 else:
-    log_to_file('testsegNetExecute' + str(initialValue) + '_' + str(numEvents) + '.log', append=False)
+    log_to_file('testsegNetExecute' + str(initialValue) + '.log', append=False)
 # Create paths
 main = create_path()
 
@@ -340,7 +343,9 @@ else:
         tcNetworkProducer.param('tcNetworkName', 'tcNetwork')
         main.add_module(tcNetworkProducer)
 
-        tsEvaluator = register_module('TrackSetEvaluatorGreedy')
+        tsEvaluator = register_module('TrackSetEvaluatorHopfieldNN')
+        tsEvaluator.logging.log_level = LogLevel.DEBUG
+        tsEvaluator.logging.debug_level = 3
         tsEvaluator.param('tcArrayName', 'caSPTCs')
         tsEvaluator.param('tcNetworkName', 'tcNetwork')
         main.add_module(tsEvaluator)
@@ -348,9 +353,14 @@ else:
         svdOverlapChecker = register_module('SVDOverlapChecker')
         svdOverlapChecker.param('NameSpacePointTrackCands', 'caSPTCs')
         main.add_module(svdOverlapChecker)
-        myGreedy = register_module('TrackSetEvaluatorGreedyDEV')
-        myGreedy.param('NameSpacePointTrackCands', 'caSPTCs')
-        main.add_module(myGreedy)
+        # myGreedy = register_module('TrackSetEvaluatorGreedyDEV')
+        # myGreedy.param('NameSpacePointTrackCands', 'caSPTCs')
+        # main.add_module(myGreedy)
+        myHopfield = register_module('TrackSetEvaluatorHopfieldNNDEV')
+        myHopfield.logging.log_level = LogLevel.DEBUG
+        myHopfield.logging.debug_level = 3
+        myHopfield.param('tcArrayName', 'caSPTCs')
+        main.add_module(myHopfield)
 
 #        setup_trackSetEvaluators(main, setFilterType, 'caSPTCs', 'tcNetwork')
     main.add_module(vxdAnal)

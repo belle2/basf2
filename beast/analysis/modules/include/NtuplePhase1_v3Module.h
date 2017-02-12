@@ -140,6 +140,17 @@ namespace Belle2 {
     std::vector<Double_t> m_input_LB_CSI_dose_av; /**< list of CSI LB dose */
     std::vector<Double_t> m_input_HB_CSI_dose_av; /**< list of CSI HB dose */
 
+    std::vector<Double_t> m_input_LT_CSI_dose_binE; /**< list of CSI LT dose_binE */
+    std::vector<Double_t> m_input_HT_CSI_dose_binE; /**< list of CSI HT dose_binE */
+    std::vector<Double_t> m_input_LC_CSI_dose_binE[12]; /**< list of CSI LC dose_binE */
+    std::vector<Double_t> m_input_HC_CSI_dose_binE[12]; /**< list of CSI HC dose_binE */
+    std::vector<Double_t> m_input_LB_CSI_dose_binE[12]; /**< list of CSI LB dose_binE */
+    std::vector<Double_t> m_input_HB_CSI_dose_binE[12]; /**< list of CSI HB dose_binE */
+    std::vector<Double_t> m_input_LC_CSI_dose_binE_av; /**< list of CSI LC dose_binE */
+    std::vector<Double_t> m_input_HC_CSI_dose_binE_av; /**< list of CSI HC dose_binE */
+    std::vector<Double_t> m_input_LB_CSI_dose_binE_av; /**< list of CSI LB dose_binE */
+    std::vector<Double_t> m_input_HB_CSI_dose_binE_av; /**< list of CSI HB dose_binE */
+
     std::vector<Double_t> m_input_LT_CSI_rate; /**< list of CSI LT rate */
     std::vector<Double_t> m_input_HT_CSI_rate; /**< list of CSI HT rate */
     std::vector<Double_t> m_input_LC_CSI_rate[12]; /**< list of CSI LC rate */
@@ -150,6 +161,28 @@ namespace Belle2 {
     std::vector<Double_t> m_input_HC_CSI_rate_av; /**< list of CSI HC rate */
     std::vector<Double_t> m_input_LB_CSI_rate_av; /**< list of CSI LB rate */
     std::vector<Double_t> m_input_HB_CSI_rate_av; /**< list of CSI HB rate */
+
+    std::vector<Double_t> m_input_LT_CLAWS_rate; /**< list of CLAWS_rate LT  */
+    std::vector<Double_t> m_input_HT_CLAWS_rate; /**< list of CLAWS_rate HT  */
+    std::vector<Double_t> m_input_LC_CLAWS_rate[12]; /**< list of CLAWS_rate LC  */
+    std::vector<Double_t> m_input_HC_CLAWS_rate[12]; /**< list of CLAWS_rate HC  */
+    std::vector<Double_t> m_input_LB_CLAWS_rate[12]; /**< list of CLAWS_rate LB  */
+    std::vector<Double_t> m_input_HB_CLAWS_rate[12]; /**< list of CLAWS_rate HB  */
+    std::vector<Double_t> m_input_LC_CLAWS_rate_av; /**< list of CLAWS_rate LC  */
+    std::vector<Double_t> m_input_HC_CLAWS_rate_av; /**< list of CLAWS_rate HC  */
+    std::vector<Double_t> m_input_LB_CLAWS_rate_av; /**< list of CLAWS_rate LB  */
+    std::vector<Double_t> m_input_HB_CLAWS_rate_av; /**< list of CLAWS_rate HB  */
+
+    std::vector<Double_t> m_input_LT_QCSS_rate; /**< list of QCSS_rate LT  */
+    std::vector<Double_t> m_input_HT_QCSS_rate; /**< list of QCSS_rate HT  */
+    std::vector<Double_t> m_input_LC_QCSS_rate[12]; /**< list of QCSS_rate LC  */
+    std::vector<Double_t> m_input_HC_QCSS_rate[12]; /**< list of QCSS_rate HC  */
+    std::vector<Double_t> m_input_LB_QCSS_rate[12]; /**< list of QCSS_rate LB  */
+    std::vector<Double_t> m_input_HB_QCSS_rate[12]; /**< list of QCSS_rate HB  */
+    std::vector<Double_t> m_input_LC_QCSS_rate_av; /**< list of QCSS_rate LC  */
+    std::vector<Double_t> m_input_HC_QCSS_rate_av; /**< list of QCSS_rate HC  */
+    std::vector<Double_t> m_input_LB_QCSS_rate_av; /**< list of QCSS_rate LB  */
+    std::vector<Double_t> m_input_HB_QCSS_rate_av; /**< list of QCSS_rate HB  */
 
     std::vector<Double_t> m_input_I_HER; /**< HER current and error */
     std::vector<Double_t> m_input_I_LER; /**< LER current and error */
@@ -162,11 +195,13 @@ namespace Belle2 {
 
     Double_t m_input_data_bunchNb_LER; /**< LER bunch number and error */
     Double_t m_input_data_bunchNb_HER; /**< HER bunch number and error */
+    std::string m_input_data_SingleBeam; /**< LER or HER or Both*/
 
     std::vector<Double_t> m_input_sigma_LER; /**< LER beam size and errors */
     std::vector<Double_t> m_input_sigma_HER; /**< HER beam size and errors */
 
     TTree* m_treeBEAST = 0;   /**< BEAST tree pointer */
+    TTree* m_treeTruth = 0;   /**< Truth tree pointer */
     TChain* m_tree = 0;            /**< tree pointer */
     std::string m_inputFileName;  /**< input file name */
     std::vector<std::string> m_inputHistoFileNames; /**< list of histo. file names */

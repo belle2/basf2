@@ -11,12 +11,10 @@
 #pragma once
 
 #include <framework/core/ModuleStatistics.h>
-#include <framework/utilities/Utils.h>
-
 #include <framework/pcore/Mergeable.h>
 
 #include <map>
-
+#include <vector>
 
 namespace Belle2 {
   class Module;
@@ -35,11 +33,11 @@ namespace Belle2 {
    * print the event statistics after the process loop:
    *
    * >>> process(...)
-   * >>> print statistics
+   * >>> print(statistics)
    *
    * Different types of statistics can be printed using
    *
-   * >>> print statistics(type)
+   * >>> print(statistics(type))
    *
    * where type can be one of
    *  - statistics.INIT        -> time/calls spent in initialize()
@@ -56,15 +54,15 @@ namespace Belle2 {
    * >>> bar = register_module("Bar")
    * ...
    * >>> process(...)
-   * >>> print statistics([foo,bar])
-   * >>> print statistics([foo,bar],statistics.BEGIN_RUN)
+   * >>> print(statistics([foo,bar]))
+   * >>> print(statistics([foo,bar],statistics.BEGIN_RUN))
    *
    * More detailed statistics can be reached by accessing the statistics
    * for all modules directly:
    *
    * >>> process(...)
    * >>> for stats in statistics.modules:
-   * >>>     print stats.name, stats.time(statistics.EVENT), stats.calls(statistics.BEGIN_RUN)
+   * >>>     print(stats.name, stats.time(statistics.EVENT), stats.calls(statistics.BEGIN_RUN))
    *
    * Available attributes/methods for the statistics objects are
    *  - name:                         name of the module
@@ -90,14 +88,14 @@ namespace Belle2 {
     /**
      * Return string with statistics for all modules.
      *
-     * Can be used in steering file with 'print statistics'.
+     * Can be used in steering file with 'print(statistics)'.
      *
      * @param type    counter type to use for statistics
      * @param modules map of modules to use. If NULL, default map will be
      *                used
      */
     std::string getStatisticsString(ModuleStatistics::EStatisticCounters type = ModuleStatistics::c_Event,
-                                    const std::vector<Belle2::ModuleStatistics>* modules = 0) const;
+                                    const std::vector<Belle2::ModuleStatistics>* modules = nullptr) const;
 
     /** Get global statistics. */
     const ModuleStatistics& getGlobal() const { return m_global; }
@@ -166,13 +164,16 @@ namespace Belle2 {
     int getIndex(const Module* module);
 
     /** Merge other ProcessStatistics object into this one. */
-    virtual void merge(const Mergeable* other);
+    virtual void merge(const Mergeable* other) override;
 
     /** Clear collected statistics but keep names of modules */
-    virtual void clear();
+    virtual void clear() override;
 
     /** Reimplement TObject::Clone() since we also need m_modulesToStatsIndex. */
-    virtual TObject* Clone(const char* newname = "") const; /* override */
+    virtual TObject* Clone(const char* newname = "") const override;
+
+    /** Return a short summary of this object's contents in HTML format. */
+    std::string getInfoHTML() const;
 
   private:
     /** Hide copy constructor */
@@ -221,7 +222,7 @@ namespace Belle2 {
      * element so we keep it a plain double. */
     double m_suspendedMemory; //! (transient)
 
-    ClassDef(ProcessStatistics, 2); /**< Class to collect call statistics for all modules. */
+    ClassDefOverride(ProcessStatistics, 2); /**< Class to collect call statistics for all modules. */
   };
 
 } //Belle2 namespace

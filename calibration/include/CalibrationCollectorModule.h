@@ -12,7 +12,6 @@
 
 #include <framework/core/Module.h>
 #include <string>
-#include <vector>
 #include <TFile.h>
 
 #include <framework/dataobjects/EventMetaData.h>
@@ -48,9 +47,9 @@ namespace Belle2 {
 
     /// Register object with name, takes ownership, do not access the pointer beyond prepare()
     template <class T>
-    void registerObject(string name, T* obj)
+    void registerObject(std::string name, T* obj)
     {
-      string fullName = getName() + "_" + name;
+      std::string fullName = getName() + "_" + name;
 
       StoreObjPtr<CalibRootObj<T>> storeobj(fullName, DataStore::c_Persistent);
       storeobj.registerInDataStore();
@@ -64,7 +63,7 @@ namespace Belle2 {
 
     /// Get object valid for current experiment and run by its name
     template <class T>
-    T& getObject(string name)
+    T& getObject(std::string name)
     {
       std::string strExpRun = std::to_string(m_currentExpRun.first) + "." + std::to_string(m_currentExpRun.second);
       std::string fullName = getName() + "_" + name;

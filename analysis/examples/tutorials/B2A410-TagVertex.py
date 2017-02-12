@@ -35,8 +35,7 @@ from vertex import vertexRave
 from modularAnalysis import buildRestOfEvent
 from modularAnalysis import fillParticleList
 from vertex import TagV
-from stdLooseFSParticles import stdLoosePi
-from stdLooseFSParticles import stdLooseMu
+from stdCharged import *
 
 # Add 10 signal MC files (each containing 1000 generated events)
 filelistSIG = \

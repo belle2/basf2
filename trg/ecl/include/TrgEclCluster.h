@@ -43,13 +43,13 @@ namespace Belle2 {
   public:
 
     /** set ICN for each part(Fw,Br,Bw) */
-    void setICN(int HitTC[][64]);
+    void setICN(int HitTC[][64], int);
     /**  calculate ICN in Barrel */
-    int setBarrelICN(int HitTC[][64]);
+    int setBarrelICN(int HitTC[][64], int);
     /**  calculate ICN in Foward endcap */
-    int setForwardICN(int HitTC[][64]);
+    int setForwardICN(int HitTC[][64], int);
     /** calculate ICN in Backward endcap */
-    int setBackwardICN(int HitTC[][64]);
+    int setBackwardICN(int HitTC[][64], int);
     //
     //
     /** get ICN in Barrel and Forward */
@@ -132,7 +132,8 @@ namespace Belle2 {
     double ClusterPositionZ[100];
     /** Maximum contribution TC Id in Cluster */
     int MaxTCId[100];
-
+    /** Temporal Cluster **/
+    int TempCluster[9];
     /** Object of TC Mapping */
     TrgEclMapping* _TCMap;
 

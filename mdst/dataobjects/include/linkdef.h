@@ -34,6 +34,7 @@
 #pragma link C++ class pair<short, short>+;
 
 #pragma link C++ class Belle2::TRGSummary+;
+#pragma link C++ class Belle2::SoftwareTriggerResult+;
 
 #pragma link C++ class Belle2::HLTTag;
 
@@ -124,7 +125,8 @@
   const double tanLambda = onfile.m_tau[4];         \
   const Belle2::Helix helix(d0,0, omega, 0, tanLambda);	    \
   const TVector3 position = helix.getPerigee();	\
-  const TVector3 momentum = helix.getMomentum();          \
+  /* Attention! Using a hardcoded 1.5 here. */ \
+  const TVector3 momentum = helix.getMomentum(bZ);          \
   const int charge = helix.getChargeSign();		      \
   							\
   const double alpha =  1.0 / (bZ * TMath::C()) * 1E11;     \
@@ -158,4 +160,78 @@
     }                 \
   }                 \
   }"
+
+#pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
+  source="float m_Energy" \
+  targetClass="Belle2::ECLCluster" target="m_logEnergy" \
+  code="{if(onfile.m_Energy>0.0) m_logEnergy = log(onfile.m_Energy); \
+         else m_logEnergy = -5.;}"
+
+#pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
+  source="float m_HighestE" \
+  targetClass="Belle2::ECLCluster" target="m_logEnergyHighestCrystal" \
+  code="{if(onfile.m_HighestE>0.0) m_logEnergyHighestCrystal = log(onfile.m_HighestE); \
+         else m_logEnergyHighestCrystal = -5.;}"
+
+#pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
+  source="float m_EnedepSum" \
+  targetClass="Belle2::ECLCluster" target="m_logEnergyRaw" \
+  code="{if(onfile.m_EnedepSum>0.0) m_logEnergyRaw = log(onfile.m_EnedepSum); \
+	else m_logEnergyRaw = -5.;}"
+
+#pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
+  source="float m_Theta" \
+  targetClass="Belle2::ECLCluster" target="m_theta" \
+  code="{m_theta = onfile.m_Theta;}"
+
+#pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
+  source="float m_Phi" \
+  targetClass="Belle2::ECLCluster" target="m_phi" \
+  code="{m_phi = onfile.m_Phi;}"
+
+#pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
+  source="float m_R" \
+  targetClass="Belle2::ECLCluster" target="m_r" \
+  code="{m_r = onfile.m_R;}"
+
+#pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
+  source="float m_Timing" \
+  targetClass="Belle2::ECLCluster" target="m_time" \
+  code="{m_time = onfile.m_Timing;}"
+
+#pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
+  source="float m_ErrorTiming" \
+  targetClass="Belle2::ECLCluster" target="m_deltaTime99" \
+  code="{m_deltaTime99 = onfile.m_ErrorTiming;}"
+
+#pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
+  source="float m_E9oE25" \
+  targetClass="Belle2::ECLCluster" target="m_E9oE21" \
+  code="{m_E9oE21 = onfile.m_E9oE25;}"
+
+#pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
+  source="int m_NofCrystals" \
+  targetClass="Belle2::ECLCluster" target="m_numberOfCrystals" \
+  code="{m_numberOfCrystals = (double) onfile.m_NofCrystals;}"
+
+#pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
+  source="int m_CrystHealth" \
+  targetClass="Belle2::ECLCluster" target="m_status" \
+  code="{m_status = onfile.m_CrystHealth;}"
+
+#pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
+  source="float m_Error[6]" \
+  targetClass="Belle2::ECLCluster" target="m_sqrtcovmat_00" \
+  code="{m_sqrtcovmat_00 = onfile.m_Error[0];}"
+
+#pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
+  source="float m_Error[6]" \
+  targetClass="Belle2::ECLCluster" target="m_sqrtcovmat_11" \
+  code="{m_sqrtcovmat_11 = onfile.m_Error[2];}"
+
+#pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
+  source="float m_Error[6]" \
+  targetClass="Belle2::ECLCluster" target="m_sqrtcovmat_22" \
+  code="{m_sqrtcovmat_22 = onfile.m_Error[5];}"
+
 #endif

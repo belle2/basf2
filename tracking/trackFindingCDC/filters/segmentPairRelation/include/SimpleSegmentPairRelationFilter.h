@@ -15,24 +15,11 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class filtering the neighborhood of axial stereo segment pairs based on simple criteria.
-    class SimpleSegmentPairRelationFilter :
-      public BaseSegmentPairRelationFilter {
-
-    private:
-      /// Type of the super class
-      typedef BaseSegmentPairRelationFilter Super;
+    class SimpleSegmentPairRelationFilter : public BaseSegmentPairRelationFilter {
 
     public:
-      /// Importing all overloads from the super class
-      using Super::operator();
-
-    public:
-      /// TODO implement something sensable here.
-      virtual
-      Weight operator()(const CDCSegmentPair& fromPair,
-                        const CDCSegmentPair& toPair) override final;
-
-    }; // end class
-
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+      /// Main filter method weighting the relation between the segment pairs.
+      Weight operator()(const CDCSegmentPair& fromSegmentPair, const CDCSegmentPair& toSegmentPair) final;
+    };
+  }
+}

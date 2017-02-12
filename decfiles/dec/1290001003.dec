@@ -1,0 +1,33 @@
+# EventType: 1290001003
+# Descriptor: [B+ -> Xd gamma]cc
+# NickName: Bd_Xdgamma
+# Documentation: Rare b->d gamma process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Phillip Urquijo
+# Email: purquijo@unimelb.edu.au
+# Cuts: None
+# Date: 20151103
+#
+#
+
+Particle anti-Xdu- 1.6 2.5
+LSNONRELBW anti-Xdu-
+ChangeMassMin anti-Xdu- 0.3
+
+Particle Xdu+ 1.6 2.5
+LSNONRELBW Xdu+
+ChangeMassMin Xdu+ 0.3
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.0  Xdu+ gamma               PHOTOS PHSP;
+Enddecay
+CDecay B-sig
+
+#
+End

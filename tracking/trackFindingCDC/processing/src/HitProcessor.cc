@@ -7,88 +7,75 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-
 #include <tracking/trackFindingCDC/processing/HitProcessor.h>
 
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/collections/CDCTrackList.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 
-#include <tracking/trackFindingCDC/processing/TrackProcessor.h>
+#include <boost/range/algorithm/stable_partition.hpp>
+#include <boost/range/algorithm_ext/is_sorted.hpp>
+#include <boost/range/algorithm_ext/erase.hpp>
 
-#include <TMath.h>
-
-using namespace std;
+#include <numeric>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void HitProcessor::updateRecoHit3D(CDCTrajectory2D& trackTrajectory2D, CDCRecoHit3D& hit)
+void HitProcessor::updateRecoHit3D(CDCTrajectory2D& trajectory2D, CDCRecoHit3D& hit)
 {
-  hit.setRecoPos3D(hit.getRecoHit2D().getRLWireHit().reconstruct3D(trackTrajectory2D));
+  hit.setRecoPos3D(hit.getRecoHit2D().getRLWireHit().reconstruct3D(trajectory2D));
 
-  double perpS = trackTrajectory2D.calcArcLength2D(hit.getRecoPos2D());
+  double perpS = trajectory2D.calcArcLength2D(hit.getRecoPos2D());
   if (perpS < 0.) {
-    double perimeter = fabs(trackTrajectory2D.getGlobalCircle().perimeter()) / 2.;
+    double perimeter = fabs(trajectory2D.getGlobalCircle().perimeter()) / 2.;
     perpS += perimeter;
   }
   // Recalculate the perpS of the hits
   hit.setArcLength2D(perpS);
-
 }
 
-
-void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& trackCandidates, const std::vector<CDCConformalHit*>& axialHitList)
+void HitProcessor::appendUnusedHits(std::list<CDCTrack>& tracks,
+                                    const std::vector<const CDCWireHit*>& axialWireHits)
 {
-  for (CDCTrack& trackCandidate : trackCandidates) {
-    if (trackCandidate.size() < 5) continue;
+  for (CDCTrack& track : tracks) {
+    if (track.size() < 5) continue;
 
-    const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-//    ESign trackCharge = TrackMergerNew::getChargeSign(trackCandidate);
-    CDCTrajectory2D trackTrajectory2D = trackCandidate.getStartTrajectory3D().getTrajectory2D();
+    // ESign trackCharge = TrackMergerNew::getChargeSign(track);
+    CDCTrajectory2D trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
 
+    for (const CDCWireHit* wireHit : axialWireHits) {
+      if (wireHit->getAutomatonCell().hasTakenFlag() or wireHit->getAutomatonCell().hasMaskedFlag()) continue;
 
-    for (const CDCConformalHit* hit : axialHitList) {
-      if (hit->getUsedFlag() || hit->getMaskedFlag()) continue;
-
-      ERightLeft rlInfo = trackTrajectory2D.isRightOrLeft(hit->getWireHit()->getRefPos2D());
-      // Is this lookup really necessary?
-      const CDCWireHit* wireHit = wireHitTopology.getWireHit(hit->getWireHit()->getHit());
+      ERightLeft rlInfo = trackTrajectory2D.isRightOrLeft(wireHit->getRefPos2D());
       CDCRLWireHit rlWireHit(wireHit, rlInfo, wireHit->getRefDriftLength());
-      if (wireHit->getAutomatonCell().hasTakenFlag())
-        continue;
 
-      //        if(fabs(track.getStartTrajectory3D().getTrajectory2D().getGlobalCircle().radius()) > 60.)
-      //          if(TrackMergerNew::getCurvatureSignWrt(cdcRecoHit3D, track.getStartTrajectory3D().getGlobalCircle().center()) != trackCharge) continue;
+      // if(fabs(track.getStartTrajectory3D().getTrajectory2D().getGlobalCircle().radius()) > 60.)
+      // if(getArmSign(recoHit3D, track.getStartTrajectory3D().getGlobalCircle().center()) != trackCharge) continue;
 
-      const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trackTrajectory2D);
+      const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstruct(rlWireHit, trackTrajectory2D);
 
-      if (fabs(trackTrajectory2D.getDist2D(cdcRecoHit3D.getRecoPos2D())) < 0.1) {
-        trackCandidate.push_back(std::move(cdcRecoHit3D));
-        cdcRecoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
+      if (fabs(trackTrajectory2D.getDist2D(recoHit3D.getRecoPos2D())) < 0.1) {
+        track.push_back(std::move(recoHit3D));
+        recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
       }
     }
 
   }
 }
 
-void HitProcessor::reassignHitsFromOtherTracks(CDCTrackList& cdcTrackList)
+void HitProcessor::reassignHitsFromOtherTracks(std::list<CDCTrack>& trackList)
 {
   std::vector<std::pair<CDCRecoHit3D, CDCTrack>> assignedHits;
-  cdcTrackList.doForAllTracks([&assignedHits](CDCTrack & cand) {
+  for (CDCTrack& cand : trackList) {
     for (CDCRecoHit3D& recoHit : cand) {
       recoHit.getWireHit().getAutomatonCell().setTakenFlag(true);
       recoHit.getWireHit().getAutomatonCell().setMaskedFlag(false);
 
       assignedHits.push_back(std::make_pair(recoHit, cand));
     }
-  });
+  }
 
-
-  B2DEBUG(100, "NCands = " << cdcTrackList.getCDCTracks().size());
+  B2DEBUG(100, "NCands = " << trackList.size());
 
   for (std::pair<CDCRecoHit3D, CDCTrack>& itemWithCand : assignedHits) {
 
@@ -102,10 +89,11 @@ void HitProcessor::reassignHitsFromOtherTracks(CDCTrackList& cdcTrackList)
     double dist = fabs(trajectory.getDist2D(item.getRecoPos2D()));
 
     double bestHitDist = dist;
-    CDCTrack* bestCandidate = NULL;
+    CDCTrack* bestCandidate = nullptr;
 
-    cdcTrackList.doForAllTracks([&cand, &item, &bestHitDist, &bestCandidate](CDCTrack & candInner) {
-      if (candInner == cand) return;
+
+    for (CDCTrack& candInner : trackList) {
+      if (candInner == cand) continue;
       CDCTrajectory2D trajectoryInner = candInner.getStartTrajectory3D().getTrajectory2D();
 
       HitProcessor::updateRecoHit3D(trajectoryInner, item);
@@ -115,164 +103,121 @@ void HitProcessor::reassignHitsFromOtherTracks(CDCTrackList& cdcTrackList)
         bestCandidate = &candInner;
         bestHitDist = distTemp;
       }
-    });
-
-    if (bestHitDist < dist) {
-      const CDCRecoHit3D& cdcRecoHit3D  =  CDCRecoHit3D::reconstruct(item.getRLWireHit(),
-                                           bestCandidate->getStartTrajectory3D().getTrajectory2D());
-
-      bestCandidate->push_back(std::move(cdcRecoHit3D));
-      item.getWireHit().getAutomatonCell().setMaskedFlag(true);
-      deleteAllMarkedHits(cand);
-      cdcRecoHit3D.getWireHit().getAutomatonCell().setMaskedFlag(false);
     }
 
+    if (bestHitDist < dist) {
+      const CDCRecoHit3D& recoHit3D =
+        CDCRecoHit3D::reconstruct(item.getRLWireHit(),
+                                  bestCandidate->getStartTrajectory3D().getTrajectory2D());
+
+      bestCandidate->push_back(std::move(recoHit3D));
+      item.getWireHit().getAutomatonCell().setMaskedFlag(true);
+      deleteAllMarkedHits(cand);
+      recoHit3D.getWireHit().getAutomatonCell().setMaskedFlag(false);
+    }
   }
-
-
 }
 
-std::vector<const CDCWireHit*> HitProcessor::splitBack2BackTrack(CDCTrack& trackCandidate)
+std::vector<const CDCWireHit*> HitProcessor::splitBack2BackTrack(CDCTrack& track)
 {
   std::vector<const CDCWireHit*> removedHits;
 
-  if (trackCandidate.size() < 5) return removedHits;
+  if (track.size() < 5) return removedHits;
+  if (not isBack2BackTrack(track)) return removedHits;
 
-  for (CDCRecoHit3D& hit : trackCandidate) {
-    hit.getWireHit().getAutomatonCell().setTakenFlag(true);
-    hit.getWireHit().getAutomatonCell().setMaskedFlag(false);
+  Vector2D center = track.getStartTrajectory3D().getGlobalCenter();
+  ESign majorArmSign = getMajorArmSign(track, center);
+
+  auto isOnMajorArm = [&center, &majorArmSign](const CDCRecoHit3D & hit) {
+    return getArmSign(hit, center) == majorArmSign;
+  };
+
+  auto minorArmHits = boost::stable_partition<boost::return_found_end>(track, isOnMajorArm);
+
+  for (const CDCRecoHit3D& recoHit3D : minorArmHits) {
+    const CDCWireHit* wireHit = &recoHit3D.getWireHit();
+    wireHit->getAutomatonCell().setTakenFlag(false);
+    removedHits.push_back(wireHit);
   }
 
-
-  if (isBack2BackTrack(trackCandidate)) {
-
-    ESign trackCharge = getChargeSign(trackCandidate);
-
-    for (const CDCRecoHit3D& hit : trackCandidate) {
-
-      if (getCurvatureSignWrt(hit, trackCandidate.getStartTrajectory3D().getGlobalCircle().center()) != trackCharge) {
-        hit.getWireHit().getAutomatonCell().setMaskedFlag(true);
-        hit.getWireHit().getAutomatonCell().setTakenFlag(false);
-      }
-
-    }
-
-    for (CDCRecoHit3D& hit : trackCandidate) {
-      if (hit.getWireHit().getAutomatonCell().hasMaskedFlag())
-        removedHits.push_back(&(hit.getWireHit()));
-    }
-
-    deleteAllMarkedHits(trackCandidate);
-
-    for (const CDCWireHit* hit : removedHits) {
-      hit->getAutomatonCell().setMaskedFlag(false);
-      hit->getAutomatonCell().setTakenFlag(false);
-    }
-
-
-  }
+  boost::erase(track, minorArmHits);
 
   return removedHits;
 }
 
 bool HitProcessor::isBack2BackTrack(CDCTrack& track)
 {
-  int vote_pos = 0;
-  int vote_neg = 0;
-
-  for (const CDCRecoHit3D& hit : track) {
-    int curve_sign = getCurvatureSignWrt(hit, track.getStartTrajectory3D().getTrajectory2D().getGlobalCircle().center());
-
-    if (curve_sign == ESign::c_Plus)
-      ++vote_pos;
-    else if (curve_sign == ESign::c_Minus)
-      ++vote_neg;
-    else {
-      B2ERROR(
-        "Strange behaviour of TrackHit::getCurvatureSignWrt");
-      exit(EXIT_FAILURE);
-    }
-  }
-
-  if ((fabs(vote_pos - vote_neg) / (double)(vote_pos + vote_neg) < 1.)
-      && fabs(track.getStartTrajectory3D().getTrajectory2D().getGlobalCircle().radius()) > 60.)
+  Vector2D center = track.getStartTrajectory3D().getGlobalCenter();
+  int armSignVote = getArmSignVote(track, center);
+  if (std::abs(armSignVote) < track.size() and std::fabs(center.cylindricalR()) > 60.) {
     return true;
-
+  }
   return false;
 }
 
 void HitProcessor::deleteAllMarkedHits(CDCTrack& track)
 {
-  track.erase(
-  std::remove_if(track.begin(), track.end(), [](const CDCRecoHit3D & hit) {
-    return hit.getWireHit().getAutomatonCell().hasMaskedFlag();
-  }), track.end());
+  auto hasMaskedFlag = [](const CDCRecoHit3D & hit) { return hit.getWireHit().getAutomatonCell().hasMaskedFlag(); };
+  boost::remove_erase_if(track, hasMaskedFlag);
 }
 
 void HitProcessor::deleteAllMarkedHits(std::vector<const CDCWireHit*>& wireHits)
 {
-  wireHits.erase(std::remove_if(wireHits.begin(), wireHits.end(),
-  [&](const CDCWireHit * hit) {
-    return hit->getAutomatonCell().hasMaskedFlag();
-  }), wireHits.end());
+  auto hasMaskedFlag = [](const CDCWireHit * hit) { return hit->getAutomatonCell().hasMaskedFlag(); };
+  boost::remove_erase_if(wireHits, hasMaskedFlag);
 }
 
-
-ESign HitProcessor::getChargeSign(CDCTrack& track)
+ESign HitProcessor::getMajorArmSign(const CDCTrack& track, const Vector2D& center)
 {
-  int vote_pos(0), vote_neg(0);
+  int armSignVote = getArmSignVote(track, center);
+  if (armSignVote > 0) {
+    return ESign::c_Plus;
+  } else {
+    return ESign::c_Minus;
+  }
+}
 
-  Vector2D center(track.getStartTrajectory3D().getGlobalCircle().center());
+int HitProcessor::getArmSignVote(const CDCTrack& track, const Vector2D& center)
+{
+  int votePos = 0;
+  int voteNeg = 0;
 
-  if (std::isnan(center.x())) {
+  if (center.hasNAN()) {
     B2WARNING("Trajectory is not setted or wrong!");
-    return track.getStartTrajectory3D().getChargeSign();
+    return 0;
   }
 
   for (const CDCRecoHit3D& hit : track) {
-    ESign curve_sign = getCurvatureSignWrt(hit, center);
+    ESign armSign = getArmSign(hit, center);
 
-    if (curve_sign == ESign::c_Plus)
-      ++vote_pos;
-    else if (curve_sign == ESign::c_Minus)
-      ++vote_neg;
-    else {
-      B2FATAL("Strange behaviour of TrackHit::getCurvatureSignWrt");
+    if (armSign == ESign::c_Plus) {
+      ++votePos;
+    } else if (armSign == ESign::c_Minus) {
+      ++voteNeg;
+    } else {
+      B2ERROR("Strange behaviour of getArmSignVote");
     }
   }
-
-  if (vote_pos > vote_neg)
-    return ESign::c_Plus;
-  else
-    return ESign::c_Minus;
+  int armSignVote = votePos - voteNeg;
+  return armSignVote;
 }
 
-ESign HitProcessor::getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy)
+ESign HitProcessor::getArmSign(const CDCRecoHit3D& hit, const Vector2D& center)
 {
-  double phi_diff = atan2(xy.y(), xy.x()) - hit.getRecoPos3D().phi();
-
-  while (phi_diff > /*2 */ TMath::Pi())
-    phi_diff -= 2 * TMath::Pi();
-  while (phi_diff < -1. * TMath::Pi())
-    phi_diff += 2 * TMath::Pi();
-
-  if (phi_diff > 0 /*TMath::Pi()*/)
-    return ESign::c_Minus;
-  else
-    return ESign::c_Plus;
-
+  return sign(center.isRightOrLeftOf(hit.getRecoPos2D()));
 }
 
-void HitProcessor::resetMaskedHits(CDCTrackList& cdcTrackList, std::vector<CDCConformalHit>& conformalCDCWireHitList)
+void HitProcessor::resetMaskedHits(std::list<CDCTrack>& trackList,
+                                   std::vector<const CDCWireHit*>& allAxialWireHits)
 {
-  for (CDCConformalHit& hit : conformalCDCWireHitList) {
-    hit.setMaskedFlag(false);
-    hit.setUsedFlag(false);
+  for (const CDCWireHit* wireHit : allAxialWireHits) {
+    wireHit->getAutomatonCell().setMaskedFlag(false);
+    wireHit->getAutomatonCell().setTakenFlag(false);
   }
 
-  cdcTrackList.doForAllTracks([](const CDCTrack & cdcTrack) {
-    cdcTrack.forwardTakenFlag();
-  });
+  for (const CDCTrack& track : trackList) {
+    track.forwardTakenFlag();
+  }
 }
 
 void HitProcessor::unmaskHitsInTrack(CDCTrack& track)
@@ -283,152 +228,116 @@ void HitProcessor::unmaskHitsInTrack(CDCTrack& track)
   }
 }
 
-void HitProcessor::deleteHitsFarAwayFromTrajectory(CDCTrack& track, double maximum_distance)
+void HitProcessor::deleteHitsFarAwayFromTrajectory(CDCTrack& track, double maximumDistance)
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
-  for (CDCRecoHit3D& recoHit : track) {
-    const Vector2D& recoPos2D = recoHit.getRecoPos2D();
-    if (fabs(trajectory2D.getDist2D(recoPos2D)) > maximum_distance)
-      recoHit->getWireHit().getAutomatonCell().setMaskedFlag(true);
-  }
-
-  deleteAllMarkedHits(track);
+  auto farFromTrajectory = [&trajectory2D, &maximumDistance](CDCRecoHit3D & recoHit3D) {
+    Vector2D recoPos2D = recoHit3D.getRecoPos2D();
+    if (fabs(trajectory2D.getDist2D(recoPos2D)) > maximumDistance) {
+      // This would be correct but worsens efficiency...
+      // recoHit3D->getWireHit().getAutomatonCell().setTakenFlag(false);
+      return true;
+    }
+    return false;
+  };
+  boost::remove_erase_if(track, farFromTrajectory);
 }
 
-void HitProcessor::assignNewHitsToTrack(CDCTrack& track, const std::vector<CDCConformalHit>& conformalCDCWireHitList,
-                                        double minimal_distance_to_track)
+void HitProcessor::assignNewHitsToTrack(CDCTrack& track,
+                                        const std::vector<const CDCWireHit*>& allAxialWireHits,
+                                        double minimalDistance)
 {
   if (track.size() < 10) return;
-  unmaskHitsInTrack(track);
 
   const CDCTrajectory2D& trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
 
-  for (const CDCConformalHit& hit : conformalCDCWireHitList) {
-    if (hit.getUsedFlag() or hit.getMaskedFlag()) {
-      continue;
-    }
+  for (const CDCWireHit* wireHit : allAxialWireHits) {
+    if (wireHit->getAutomatonCell().hasTakenFlag() or wireHit->getAutomatonCell().hasMaskedFlag()) continue;
 
-    const CDCRecoHit3D& cdcRecoHit3D = CDCRecoHit3D::reconstructNearest(hit.getWireHit(), trackTrajectory2D);
-    const Vector2D& recoPos2D = cdcRecoHit3D.getRecoPos2D();
+    CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstructNearest(wireHit, trackTrajectory2D);
+    const Vector2D& recoPos2D = recoHit3D.getRecoPos2D();
 
-    if (fabs(trackTrajectory2D.getDist2D(recoPos2D)) < minimal_distance_to_track) {
-      track.push_back(std::move(cdcRecoHit3D));
-      cdcRecoHit3D.getWireHit().getAutomatonCell().setTakenFlag();
+    if (fabs(trackTrajectory2D.getDist2D(recoPos2D)) < minimalDistance) {
+      track.push_back(std::move(recoHit3D));
+      recoHit3D.getWireHit().getAutomatonCell().setTakenFlag();
     }
   }
 }
 
-void HitProcessor::maskHitsWithPoorQuality(CDCTrack& track)
+void HitProcessor::removeHitsAfterSuperLayerBreak(CDCTrack& track)
 {
-  double apogeeArcLenght = fabs(track.getStartTrajectory3D().getGlobalCircle().perimeter()) / 4.;
+  double apogeeArcLength = fabs(track.getStartTrajectory3D().getGlobalCircle().perimeter()) / 2.;
 
-  std::vector<double> startingArmSLayers;
-  std::vector<double> endingArmSLayers;
-
-  for (int ii = 0; ii <= 8; ii++) {
-    startingArmSLayers.push_back(0);
-    endingArmSLayers.push_back(0);
-  }
+  std::array<int, ISuperLayerUtil::c_N> nForwardArmHitsBySLayer = {0};
+  std::array<int, ISuperLayerUtil::c_N> nBackwardArmHitsBySLayer = {0};
 
   // Count the number of hits in the outgoing and ingoing arm per superlayer.
   for (const CDCRecoHit3D& hit : track) {
-    if ((hit.getArcLength2D() <= apogeeArcLenght) && (hit.getArcLength2D() > 0)) {
-      startingArmSLayers[hit->getISuperLayer()]++;
+    if ((hit.getArcLength2D() <= apogeeArcLength) and (hit.getArcLength2D() > 0)) {
+      nForwardArmHitsBySLayer[hit.getISuperLayer()]++;
     } else {
-      endingArmSLayers[hit->getISuperLayer()]++;
+      nBackwardArmHitsBySLayer[hit.getISuperLayer()]++;
     }
   }
 
-  std::vector<int> emptyStartingSLayers;
-  std::vector<int> emptyEndingSLayers;
+  std::vector<ISuperLayer> forwardSLayerHoles = getSLayerHoles(nForwardArmHitsBySLayer);
+  std::vector<ISuperLayer> backwardSLayerHoles = getSLayerHoles(nBackwardArmHitsBySLayer);
 
-  if (hasHoles(startingArmSLayers, endingArmSLayers, emptyStartingSLayers, emptyEndingSLayers)) {
-    sort(emptyStartingSLayers.begin(), emptyStartingSLayers.end());
+  // No missing layers
+  if (forwardSLayerHoles.empty() and backwardSLayerHoles.empty()) return;
 
-    if (emptyStartingSLayers.size() > 0) {
-      const int breakSLayer = emptyStartingSLayers.front();
-      for (CDCRecoHit3D& hit : track) {
-        if (hit.getArcLength2D() >= apogeeArcLenght || hit.getArcLength2D() < 0) {
-          hit.getWireHit().getAutomatonCell().setMaskedFlag();
-        }
-        if (hit.getISuperLayer() >= breakSLayer) {
-          hit.getWireHit().getAutomatonCell().setMaskedFlag();
-        }
-      }
+  // We only check for holes in the forward arm for now
+  // We do not use emptyEndingSLayers here, as it would leave to a severy efficiency drop.
+  assert(boost::is_sorted(forwardSLayerHoles));
+  if (forwardSLayerHoles.empty()) return;
 
-    }
+  const ISuperLayer breakSLayer = forwardSLayerHoles.front();
 
-    // We do not use emptyEndingSLayers here, as it would leave to a severy efficiency drop.
-  }
+  auto isInBackwardArm = [apogeeArcLength](const CDCRecoHit3D & recoHit3D) {
+    recoHit3D.getWireHit().getAutomatonCell().unsetTakenFlag();
+    return (recoHit3D.getArcLength2D() >= apogeeArcLength) or (recoHit3D.getArcLength2D() < 0);
+  };
+  boost::remove_erase_if(track, isInBackwardArm);
 
-  deleteAllMarkedHits(track);
+  auto isAfterSLayerBreak = [breakSLayer](const CDCRecoHit3D & recoHit3D) {
+    recoHit3D.getWireHit().getAutomatonCell().unsetTakenFlag();
+    return recoHit3D.getISuperLayer() >= breakSLayer;
+  };
+  boost::remove_erase_if(track, isAfterSLayerBreak);
 }
 
-int HitProcessor::startingSLayer(const std::vector<double>& startingArmSLayers)
+std::vector<ISuperLayer> HitProcessor::getSLayerHoles(const std::array<int, ISuperLayerUtil::c_N>& nHitsBySLayer)
 {
-  std::vector<double>::const_iterator startSlIt = std::find_if(startingArmSLayers.begin(), startingArmSLayers.end(), [](double val) {
-    return val > 0;
-  });
-
-  if (startSlIt != startingArmSLayers.end())
-    return startSlIt - startingArmSLayers.begin();
-  else
-    return 8;
-}
-
-
-int HitProcessor::endingSLayer(const std::vector<double>& startingArmSLayers)
-{
-  std::vector<double>::const_reverse_iterator endSlIt;
-  endSlIt = std::find_if(startingArmSLayers.rbegin(), startingArmSLayers.rend(), [](double val) {return val > 0;});
-
-  if (endSlIt != startingArmSLayers.rend())
-    return 8 - (endSlIt - startingArmSLayers.rbegin());
-  else
-    return 0;
-}
-
-bool HitProcessor::isTwoSided(const std::vector<double>& startingArmSLayers, const std::vector<double>& endingArmSLayers)
-{
-  if ((std::accumulate(startingArmSLayers.begin(), startingArmSLayers.end(), 0) > 0) &&
-      (std::accumulate(endingArmSLayers.begin(), endingArmSLayers.end(), 0) > 0)) return true;
-  else return false;
-}
-
-bool HitProcessor::hasHoles(const std::vector<double>& startingArmSLayers,
-                            const std::vector<double>& endingArmSLayers,
-                            std::vector<int>& emptyStartingSLayers, std::vector<int>& emptyEndingSLayers)
-{
+  std::vector<ISuperLayer> sLayerHoles;
 
   // Find the start end end point.
-  int startingSlayer = startingSLayer(startingArmSLayers);
-  int endingSlayer = endingSLayer(startingArmSLayers);
+  ISuperLayer firstSlayer = getFirstOccupiedISuperLayer(nHitsBySLayer);
+  ISuperLayer lastSlayer = getLastOccupiedISuperLayer(nHitsBySLayer);
 
-
-  std::vector<double>::const_iterator first = startingArmSLayers.begin() + startingSlayer;
-  std::vector<double>::const_iterator last = startingArmSLayers.begin() + endingSlayer;
-
-  for (; first <= last; first += 2) {
-    if (*first == 0) {
-      emptyStartingSLayers.push_back(first - startingArmSLayers.begin());
-    }
+  if (ISuperLayerUtil::isInvalid(firstSlayer) or ISuperLayerUtil::isInvalid(lastSlayer)) {
+    return sLayerHoles;
   }
 
-  if (isTwoSided(startingArmSLayers, endingArmSLayers)) {
-
-    // Find the start end end point.
-    startingSlayer = startingSLayer(endingArmSLayers);
-    endingSlayer = endingSLayer(endingArmSLayers);
-
-    std::vector<double>::const_iterator rfirst = endingArmSLayers.begin() + startingSlayer;
-    std::vector<double>::const_iterator rlast = endingArmSLayers.begin() + endingSlayer;
-
-    for (; rfirst <= rlast; rfirst += 2) {
-      if (*rfirst == 0) {
-        emptyEndingSLayers.push_back(rfirst - endingArmSLayers.begin());
-      }
+  for (ISuperLayer iSLayer = firstSlayer; iSLayer <= lastSlayer; iSLayer += 2) {
+    if (nHitsBySLayer[iSLayer] == 0) {
+      sLayerHoles.push_back(iSLayer);
     }
   }
+  return sLayerHoles;
+}
 
-  return emptyStartingSLayers.size() > 0 or emptyEndingSLayers.size() > 0;
+ISuperLayer HitProcessor::getFirstOccupiedISuperLayer(const std::array<int, ISuperLayerUtil::c_N>& nHitsBySLayer)
+{
+  for (ISuperLayer iSLayer = 0; iSLayer < ISuperLayerUtil::c_N; ++iSLayer) {
+    if (nHitsBySLayer[iSLayer] > 0) return iSLayer;
+  }
+  return ISuperLayerUtil::c_Invalid;
+}
+
+ISuperLayer HitProcessor::getLastOccupiedISuperLayer(const std::array<int, ISuperLayerUtil::c_N>& nHitsBySLayer)
+{
+  for (ISuperLayer iSLayer = ISuperLayerUtil::c_N - 1; iSLayer >= 0; --iSLayer) {
+    if (nHitsBySLayer[iSLayer] > 0) return iSLayer;
+  }
+  return ISuperLayerUtil::c_Invalid;
 }

@@ -90,7 +90,7 @@ def setup(args):
 
 def run_basf2(args):
     os.chdir(args.directory + '/collection')
-    if args.site == 'kekcc':
+    if args.site == 'kekcc' or args.site == 'kekcc2':
         ret = subprocess.call(['basf2', args.steering, '--dump-path', 'basf2_path.pickle', '-i', 'dummy.root', '--', '-monitor',
                                '--prune',
                                '--verbose', '--nThreads', '4', '--cache', 'cache.pkl', '--externTeacher', 'externClusterTeacher'])
@@ -107,8 +107,12 @@ def dump_final_fei_path(args):
     ret = subprocess.call(['basf2', args.steering, '--dump-path', 'basf2_final_path.pickle', '-i', 'dummy.root', '--',
                            '--verbose', '--dump-path'])
     shutil.copy2('basf2_final_path.pickle', 'basf2_path.pickle')
+    ret = subprocess.call(['basf2', args.steering, '--dump-path', 'basf2_final_path_without_selection.pickle',
+                           '-i', 'dummy.root', '--', '--verbose', '--dump-path', '--noSelection'])
     ret = subprocess.call(['basf2', args.steering, '--dump-path', 'basf2_monitor_path.pickle', '-i', 'dummy.root', '--',
                            '--verbose', '--dump-path', '--monitor'])
+    ret = subprocess.call(['basf2', args.steering, '--dump-path', 'basf2_monitor_path_without_selection.pickle',
+                           '-i', 'dummy.root', '--', '--verbose', '--dump-path', '--noSelection', '--monitor'])
     os.chdir(args.directory)
     return ret == 0
 

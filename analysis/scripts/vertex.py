@@ -22,7 +22,7 @@ def fitVertex(
     Perform the specified kinematic fit for each Particle in the given ParticleList.
 
     @param list_name    name of the input ParticleList
-    @param conf_level   minimum value of the confidence level to accept the fit
+    @param conf_level   minimum value of the confidence level to accept the fit. 0 selects CL > 0
     @param decay_string select particles used for the vertex fit
     @param fitter       rave or kfitter
     @param fit_type     type of the kinematic fit (valid options are vertex/massvertex/mass)
@@ -359,7 +359,7 @@ def TagV(
     save the MC Btag in case of signal MC
 
     @param list_name name of the input Breco ParticleList
-    @param confidenceLevel minimum value of the ConfidenceLevel to accept the fit
+    @param confidenceLevel minimum value of the ConfidenceLevel to accept the fit. 0 selects CL > 0
     @param MCassociation: use standard MC association or the internal one
     @param useConstraint: choose constraint for the tag vertes fit
     @param path      modules are added to this path

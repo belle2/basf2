@@ -18,6 +18,7 @@
 #include <genfit/FieldManager.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/PXDIntercept.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <time.h>
 #include <list>
 #include <genfit/Track.h> //giulia
@@ -41,12 +42,11 @@ PXDDataReductionModule::PXDDataReductionModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
 
-  addParam("gfTrackListName", m_gfTracksListName, " name of the list of the fitted tracks", std::string("gfTracks"));
+  addParam("recoTrackListName", m_recoTracksListName, " name of the list of the fitted tracks", std::string(""));
 
-  addParam("badTrackListName", m_badTracksListName, " name of the list of the bad_track_status tracks",
-           std::string("badTracksForROI"));
+  addParam("tolerancePhi", m_tolerancePhi, "Tolerance by finding sensor in phi coordinate (radians).", double(0.15));
 
-  addParam("numIterKalmanFilter", m_numIterKalmanFilter, " number of iterations of the kalman filter ", int(5));
+  addParam("toleranceZ", m_toleranceZ, "Tolerance by finding sensor in Z coordinate (cm).", double(0.5));
 
   addParam("sigmaSystU", m_sigmaSystU, " systematic sigma in the u local coordinate ", double(0.025));
   addParam("sigmaSystV", m_sigmaSystV, " systematic sigma in the V local coordinate ", double(0.025));
@@ -67,15 +67,13 @@ PXDDataReductionModule::~PXDDataReductionModule()
 
 void PXDDataReductionModule::initialize()
 {
-  StoreArray<genfit::Track> trackList(m_gfTracksListName);
+  StoreArray<RecoTrack> trackList(m_recoTracksListName);
 
   StoreArray<ROIid> ROIList(m_ROIListName);
   ROIList.registerInDataStore();
 
   StoreArray<PXDIntercept> PXDInterceptList(m_PXDInterceptListName);
   PXDInterceptList.registerInDataStore();
-
-  StoreArray<genfit::TrackCand>::registerPersistent(m_badTracksListName);
 
   trackList.registerRelationTo(PXDInterceptList);
   PXDInterceptList.registerRelationTo(ROIList);
@@ -98,11 +96,9 @@ void PXDDataReductionModule::beginRun()
   m_ROIinfo.maxWidthV = m_maxWidthV;
   m_ROIinfo.PXDInterceptListName = m_PXDInterceptListName;
   m_ROIinfo.ROIListName = m_ROIListName;
-  m_ROIinfo.badTracksListName = m_badTracksListName;
-  m_ROIinfo.gfTracksListName = m_gfTracksListName;
+  m_ROIinfo.recoTracksListName = m_recoTracksListName;
 
-  m_thePXDInterceptor = new PXDInterceptor(&m_ROIinfo);
-  m_thePXDInterceptor->setNumIterKalmanFilter(m_numIterKalmanFilter);
+  m_thePXDInterceptor = new PXDInterceptor(&m_ROIinfo, m_toleranceZ, m_tolerancePhi);
 
   m_thePixelTranslator = new ROIPixelTranslator(&m_ROIinfo);
 
@@ -113,29 +109,23 @@ void PXDDataReductionModule::event()
 {
 
   StoreArray<PXDIntercept> PXDInterceptList(m_PXDInterceptListName);
-  PXDInterceptList.create();
 
   StoreArray<ROIid> ROIList(m_ROIListName);
-  ROIList.create(true);
 
-  StoreArray<genfit::Track> trackList(m_gfTracksListName);
-  B2DEBUG(1, "%%%%%%%% EVENT # of tracks =  " << trackList.getEntries());
+  StoreArray<RecoTrack> trackList(m_recoTracksListName);
+  B2DEBUG(1, "%%%%%%%% Number of RecoTracks in the events =  " << trackList.getEntries());
 
-
-  RelationArray gfTrackToPXDIntercepts(trackList, PXDInterceptList);
-  gfTrackToPXDIntercepts.create();
+  RelationArray recoTrackToPXDIntercepts(trackList, PXDInterceptList);
+  recoTrackToPXDIntercepts.create();
 
   RelationArray PXDInterceptsToROIids(PXDInterceptList, ROIList);
   PXDInterceptsToROIids.create();
-
-  StoreArray<genfit::TrackCand> trackCandBadStats(m_badTracksListName);
-  trackCandBadStats.create(true);
 
   //  timespec time1, time2, time3;
 
   //  clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time1);
 
-  m_thePXDInterceptor->fillInterceptList(&PXDInterceptList, trackList, &gfTrackToPXDIntercepts);
+  m_thePXDInterceptor->fillInterceptList(&PXDInterceptList, trackList, &recoTrackToPXDIntercepts);
 
   //clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time2);
 

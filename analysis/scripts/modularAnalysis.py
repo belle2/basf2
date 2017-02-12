@@ -14,6 +14,41 @@ from vertex import *
 from analysisPath import *
 
 
+def setAnalysisConfigParams(configParametersAndValues, path=analysis_main):
+    """
+    Sets analysis configuration parameters.
+
+    These are:
+
+    - 'tupleStyle': 'Default' (default) or 'Laconic'
+      o) defines the style of the branch name in the ntuple
+
+    - 'mcMatchingVersion': 'BelleII' (default), 'MC5' and 'Belle'
+      o) Specifies what version of mc matching algorithm is going to be used
+         Use 'MC5' for analysis of BelleII MC5, 'Belle' for analaysis of Belle MC and 'BelleII' for the rest.
+
+    @param configParametersAndValues dictionary of parameters and their values of the form {param1: value, param2: value, ...)
+    @param modules are added to this path
+    """
+
+    conf = register_module('AnalysisConfiguration')
+
+    allParameters = ['tupleStyle', 'mcMatchingVersion']
+
+    keys = configParametersAndValues.keys()
+    for key in keys:
+        if key not in allParameters:
+            allParametersString = ', '.join(allParameters)
+            B2ERROR('Invalid analysis configuration parameter: ' + key + '.\n'
+                    'Please use one of the following: ' + allParametersString)
+
+    for param in allParameters:
+        if param in configParametersAndValues:
+            conf.param(param, configParametersAndValues.get(param))
+
+    path.add_module(conf)
+
+
 def inputMdst(environmentType, filename, path=analysis_main):
     """
     Loads the specified ROOT (DST/mDST/muDST) file with the RootInput module.
@@ -80,6 +115,12 @@ def inputMdstList(environmentType, filelist, path=analysis_main):
         environments += 'None.'
         B2FATAL('Incorrect environment type provided: ' + environmentType + '! Please use one of the following: ' + environments)
 
+    # set the correct MCMatching algorithm for MC5 and Belle MC
+    if environmentType is 'Belle':
+        setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
+    if environmentType is 'MC5':
+        setAnalysisConfigParams({'mcMatchingVersion': 'MC5'}, path)
+
 
 def outputMdst(filename, path=analysis_main):
     """
@@ -90,10 +131,12 @@ def outputMdst(filename, path=analysis_main):
     reconstruction.add_mdst_output(path, mc=True, filename=filename)
 
 
-def outputUdst(filename, particleLists=[], path=analysis_main):
+def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main):
     """
     Save uDST (micro-Data Summary Tables) = MDST + Particles + ParticleLists
     The charge-conjugate lists of those given in particleLists are also stored.
+    Additional Store Arrays and Relations to be stored can be specified via includeArrays
+    list argument.
 
     Note that this does not reduce the amount of Particle objects saved,
     see skimOutputUdst() for a function that does.
@@ -109,15 +152,17 @@ def outputUdst(filename, particleLists=[], path=analysis_main):
 
     partBranches = ['Particles', 'ParticlesToMCParticles',
                     'ParticlesToPIDLikelihoods', 'ParticleExtraInfoMap',
-                    'EventExtraInfo'] + list(plSet)
+                    'EventExtraInfo'] + includeArrays + list(plSet)
     reconstruction.add_mdst_output(path, mc=True, filename=filename,
                                    additionalBranches=partBranches)
 
 
-def skimOutputUdst(skimname, particleLists=[], path=analysis_main):
+def skimOutputUdst(skimname, particleLists=[], includeArrays=[], path=analysis_main):
     """
     Create a new path for events that contain a non-empty particle list.
     Write the accepted events as a udst file, saving only necessary particles.
+    Additional Store Arrays and Relations to be stored can be specified via includeArrays
+    list argument.
 
     Currently mdst are also written. This is for testing purposes
     and will be removed in the future.
@@ -133,7 +178,7 @@ def skimOutputUdst(skimname, particleLists=[], path=analysis_main):
     # add_independent_path() is rather expensive, only do this for skimmed events
     skim_path = create_path()
     removeParticlesNotInLists(particleLists, path=skim_path)
-    outputUdst(skimname + '.udst.root', particleLists, path=skim_path)
+    outputUdst(skimname + '.udst.root', particleLists, includeArrays, path=skim_path)
     outputMdst(skimname + '.mdst.root', path=skim_path)
     filter_path.add_independent_path(skim_path, "skim_" + skimname)
 
@@ -601,6 +646,29 @@ def reconstructDecay(
     path.add_module(pmake)
 
 
+def replaceMass(
+    replacerName,
+    particleLists=[],
+    pdgCode=22,
+    path=analysis_main,
+):
+    """
+    replaces the mass of the particles inside the given particleLists
+    with the invariant mass of the particle corresponding to the given pdgCode.
+
+    @param particleLists new ParticleList filled with copied Particles
+    @param pdgCode PDG   code for mass reference
+    @param path          modules are added to this path
+    """
+
+    # first copy original particles to the new ParticleList
+    pmassupdater = register_module('ParticleMassUpdater')
+    pmassupdater.set_name('ParticleMassUpdater_' + replacerName)
+    pmassupdater.param('particleLists', particleLists)
+    pmassupdater.param('pdgCode', pdgCode)
+    path.add_module(pmassupdater)
+
+
 def reconstructRecoil(
     decayString,
     cut,
@@ -730,84 +798,6 @@ def rankByLowest(
     bcs.param('selectLowest', True)
     bcs.param('outputVariable', outputVariable)
     path.add_module(bcs)
-
-
-def trainTMVAMethod(
-    decayString,
-    variables,
-    methods=[('FastBDT', 'Plugin',
-              '!H:!V:CreateMVAPdfs:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'
-              )],
-    target='isSignal',
-    prefix='TMVA',
-    workingDirectory='.',
-    path=analysis_main,
-):
-    """
-    Trains a TMVA Method
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param variables list of variables which are registered in the VariableManager
-    @param methods list of tuples (name, type, config) of the TMVA methods
-    @param target variable registered in VariableManager which is used as target
-    @param prefix prefix which is used to identify the weight files created by TMVA
-    @param workingDirectory in which the config file and the weight file directory are created
-    @param path         modules are added to this path
-    """
-
-    teacher = register_module('TMVAOnTheFlyTeacher')
-    teacher.param('prefix', prefix)
-    teacher.param('methods', methods)
-    teacher.param('variables', variables)
-    teacher.param('target', target)
-    teacher.param('workingDirectory', workingDirectory)
-    teacher.param('listNames', decayString)
-    path.add_module(teacher)
-
-
-def applyTMVAMethod(
-    decayString,
-    method='FastBDT',
-    expertOutputName='isSignal',
-    signalFraction=-1,
-    signalClass=1,
-    prefix='TMVA',
-    transformToProbability=True,
-    sPlotPrior='',
-    workingDirectory='.',
-    path=analysis_main,
-):
-    """
-    Applies a trained TMVA method to a particle list
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param method name of the TMVA method
-    @param expertOutputName extra-info name which is used to store the classifier output in the particle
-    @param signalFraction to calculate probability, -1 for training fraction
-    @param signalClass is the cluster to calculate the probability of beeing signal
-    @param prefix prefix which is used to identify the weight files created by TMVA
-    @param workingDirectory in which the expert finds the config file and the weight file directory
-    @param path         modules are added to this path
-    """
-
-    expert = register_module('TMVAExpert')
-    expert.param('prefix', prefix)
-    expert.param('method', method)
-    expert.param('workingDirectory', workingDirectory)
-    expert.param('listNames', decayString)
-    expert.param('expertOutputName', expertOutputName)
-    expert.param('signalFraction', signalFraction)
-    expert.param('transformToProbability', transformToProbability)
-    expert.param('sPlotPrior', sPlotPrior)
-    expert.param('signalClass', signalClass)
-    path.add_module(expert)
-
-
-def isTMVAMethodAvailable(prefix='TMVA'):
-    """
-    True of a TMVA method with the given prefix was trained
-    @param prefix which is used to identify the weight files created by TMVA
-    """
-
-    return os.path.isfile(prefix + '_1.config')
 
 
 def printDataStore(path=analysis_main):
@@ -1048,7 +1038,34 @@ def signalSideParticleFilter(
     """
     mod = register_module('SignalSideParticleFilter')
     mod.set_name('SigSideParticleFilter_' + particleList)
-    mod.param('particleListName', particleList)
+    mod.param('particleLists', [particleList])
+    mod.param('selection', selection)
+    roe_path.add_module(mod)
+    mod.if_false(deadEndPath)
+
+
+def signalSideParticleListsFilter(
+    particleLists,
+    selection,
+    roe_path,
+    deadEndPath
+):
+    """
+    Checks if the current ROE object in the for_each roe path (argument roe_path) is related
+    to the particle from the input ParticleList. Additional selection criteria can be applied.
+    If ROE is not related to any of the Particles from ParticleList or the Particle doesn't
+    meet the selection criteria the execution of deadEndPath is started. This path, as the name
+    sugest should be empty and its purpose is to end the execution of for_each roe path for
+    the current ROE object.
+
+    @param particleLists  The input ParticleLists
+    @param selection Selection criteria that Particle needs meet in order for for_each ROE path to continue
+    @param for_each roe path in which this filter is executed
+    @param deadEndPath empty path that ends execution of or_each roe path for the current ROE object.
+    """
+    mod = register_module('SignalSideParticleFilter')
+    mod.set_name('SigSideParticleFilter_' + particleLists[0])
+    mod.param('particleLists', particleLists)
     mod.param('selection', selection)
     roe_path.add_module(mod)
     mod.if_false(deadEndPath)
@@ -1098,6 +1115,36 @@ def matchMCTruth(list_name, path=analysis_main):
     mcMatch = register_module('MCMatcherParticles')
     mcMatch.set_name('MCMatch_' + list_name)
     mcMatch.param('listName', list_name)
+    path.add_module(mcMatch)
+
+
+def looseMCTruth(list_name, path=analysis_main):
+    """
+    Performs loose MC matching for all particles in the specified
+    ParticleList.
+    The difference between loose and normal mc matching algorithm is that
+    the loose agorithm will find the common mother of the majority of daughter
+    particles while the normal algorithm finds the common mother of all daughters.
+    The results of loose mc matching algorithm are stored to the following extraInfo
+    items:
+      - looseMCMotherPDG: PDG code of most common mother
+      - looseMCMotherIndex: 1-based StoreArray<MCParticle> index of most common mother
+      - looseMCWrongDaughterN: number of daughters that don't originate from the most
+                               common mother
+      - looseMCWrongDaughterPDG: PDG code of the daughter that doesn't orginate from
+                                 the most common mother
+                                 (only if looseMCWrongDaughterN = 1)
+      - looseMCWrongDaughterBiB: 1 if the wrong daughter is Beam Induced Background
+                                 Particle
+
+    @param list_name name of the input ParticleList
+    @param path      modules are added to this path
+    """
+
+    mcMatch = register_module('MCMatcherParticles')
+    mcMatch.set_name('LooseMCMatch_' + list_name)
+    mcMatch.param('listName', list_name)
+    mcMatch.param('looseMCMatching', True)
     path.add_module(mcMatch)
 
 

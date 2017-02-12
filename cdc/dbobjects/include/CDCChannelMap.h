@@ -24,7 +24,7 @@ namespace Belle2 {
      * Default constructor
      */
     CDCChannelMap():
-      m_cell(65535), m_board(0), m_channel(0)
+      m_wire(65535), m_board(0), m_channel(0)
     {}
 
     /**
@@ -33,7 +33,7 @@ namespace Belle2 {
     CDCChannelMap(unsigned short slayer, unsigned short layer,
                   unsigned short wire,
                   unsigned short board, unsigned short channel):
-      m_cell(WireID(slayer, layer, wire).getEWire()),
+      m_wire(WireID(slayer, layer, wire).getEWire()),
       m_board(board), m_channel(channel)
     {
 
@@ -54,7 +54,7 @@ namespace Belle2 {
      */
     unsigned short getISuperLayer() const
     {
-      return (m_cell / 4096);
+      return (m_wire / 4096);
     }
 
     /**
@@ -62,7 +62,7 @@ namespace Belle2 {
      */
     unsigned short getILayer() const
     {
-      return ((m_cell % 4096) / 512);
+      return ((m_wire % 4096) / 512);
     }
 
     /**
@@ -70,11 +70,11 @@ namespace Belle2 {
      */
     unsigned short getIWire() const
     {
-      return (m_cell % 512);
+      return (m_wire % 512);
     }
 
   private:
-    unsigned short m_cell; /**< Cell ID */
+    unsigned short m_wire; /**< Wire ID */
     unsigned short m_board; /**< Board ID. */
     unsigned short m_channel; /**< Channel ID */
 

@@ -52,14 +52,14 @@ namespace Belle2 {
       void fillPrimarySimHits();
 
       /// Helper function to find the closest primary hit for the given CDCSimHit from the same MCParticle - nullptr if no suitable hit can be found
-      const CDCSimHit* getClosestPrimarySimHit(const CDCSimHit* ptrSimHit) const;
+      MayBePtr<const CDCSimHit> getClosestPrimarySimHit(const CDCSimHit* ptrSimHit) const;
 
     public:
-      /// Look up and return the closest primary simulated hit for the given CDCHit - nullptr if no suitable hit can be found
-      const CDCSimHit* getClosestPrimarySimHit(const CDCHit* hit) const;
+      /// Look up and return the closest primary simulated hit for the given CDCHit - if no suitable hit can be found return the secondary
+      const CDCSimHit* getClosestPrimarySimHit(const CDCHit* ptrHit) const;
 
       /// Calculate the local direction of flight. If the hit is secondary take the direction of flight from a close by primary - null vector if it cannot be assumed this way
-      Vector3D getDirectionOfFlight(const CDCHit* hit);
+      Vector3D getDirectionOfFlight(const CDCHit* ptrHit);
 
     private:
       /// Construct the look up relation for the right left passage information as used in track finding
@@ -113,11 +113,11 @@ namespace Belle2 {
       const CDCMCMap* m_ptrMCMap;
 
       /// Memory for the look up relation of close primary CDCSimHits
-      std::map<const CDCHit*, const CDCSimHit*>  m_primarySimHits;
+      std::map<const CDCHit*, MayBePtr<const CDCSimHit> >  m_primarySimHits;
 
       /// Memory for the look up relation of the right left passage information as defined in tracking.
       std::map<const CDCHit*, ERightLeft> m_rightLeftInfos;
 
-    }; //class
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

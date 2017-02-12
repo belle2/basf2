@@ -34,8 +34,7 @@ namespace Belle2 {
   namespace arich {
 
     SensitiveDetector::SensitiveDetector():
-      Simulation::SensitiveDetectorBase("ARICH", Const::ARICH),
-      m_arichgp(ARICHGeometryPar::Instance())
+      Simulation::SensitiveDetectorBase("ARICH", Const::ARICH)
     {
 
       StoreArray<MCParticle> particles;
@@ -44,6 +43,7 @@ namespace Belle2 {
       registerMCParticleRelation(relation);
       hits.registerInDataStore();
       particles.registerRelationTo(hits);
+
     }
 
 
@@ -55,10 +55,6 @@ namespace Belle2 {
 
       //Get time (check for proper global time)
       const G4double globalTime = track.GetGlobalTime();
-      if (std::isnan(globalTime)) {
-        B2ERROR("ARICH Sensitive Detector: global time is nan !");
-        return false;
-      }
 
       const G4StepPoint& postStep  = *aStep->GetPostStepPoint();
       const G4ThreeVector& postworldPosition = postStep.GetPosition();
@@ -74,7 +70,10 @@ namespace Belle2 {
       if (dir == 1 && postStep.GetStepStatus() != fGeomBoundary) { return false;}
       if (dir == -1 && preStep.GetStepStatus() != fGeomBoundary) { return false;}
 
-      if ((track.GetNextVolume())->GetName() == "moduleWall") return false;
+      if ((track.GetNextVolume())->GetName() == "ARICH.HAPDWall") {
+        track.SetTrackStatus(fStopAndKill);
+        return false;
+      }
 
       // Check if photon is internally reflected in HAPD window
       G4OpBoundaryProcessStatus theStatus = Undefined;
@@ -96,30 +95,34 @@ namespace Belle2 {
       // if photon is internally reflected and going backward, do nothing
       if (theStatus == 3 && dir < 0) return 0;
 
-
-
       // apply quantum efficiency if not yet done
       bool applyQE = true;
       Simulation::TrackInfo* info =
         dynamic_cast<Simulation::TrackInfo*>(track.GetUserInformation());
       if (info) applyQE = info->getStatus() < 2;
+
       if (applyQE) {
-        double energy = track.GetKineticEnergy() * Unit::MeV / Unit::eV;
-        double qeffi  = m_arichgp->QE(energy) * m_arichgp->getColEffi();
+
+        double energy = track.GetKineticEnergy() / CLHEP::eV;
+        double qeffi  = m_simPar->getQE(energy) * m_simPar->getColEff();
+
         double fraction = info->getFraction();
         //correct Q.E. for internally reflected photons
-        if (theStatus == 3) qeffi *= m_arichgp->getQEScaling();
+        if (theStatus == 3) qeffi *= m_simPar->getQEScaling();
         if (gRandom->Uniform() * fraction > qeffi) {
           // apply possible absorbtion in HAPD window (for internally reflected photons only)
-          if (theStatus == 3 && gRandom->Uniform() < m_arichgp->getWindowAbsorbtion()) track.SetTrackStatus(fStopAndKill);
+          if (theStatus == 3 && gRandom->Uniform() < m_simPar->getWindowAbsorbtion()) track.SetTrackStatus(fStopAndKill);
           return false;
         }
       }
 
       //Get module ID number
-      const G4int moduleID = dir > 0 ? postStep.GetTouchableHandle()->GetReplicaNumber(0) :
-                             preStep.GetTouchableHandle()->GetReplicaNumber(1);
+      const G4int moduleID = dir > 0 ? postStep.GetTouchableHandle()->GetReplicaNumber(1) :
+                             preStep.GetTouchableHandle()->GetReplicaNumber(2);
 
+      if (moduleID <= 0) return false;
+      //std::cout << "moduleID " << moduleID << std::endl;
+      //      std::cout << m_arichgp->getColEff() << " " << info->getFraction() << " " << m_arichgp->getQEScaling() <<" " << m_arichgp->QE(2.0) << std::endl;
       //Transform to local position
       G4ThreeVector localPosition = dir > 0 ? postStep.GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(
                                       postworldPosition) :
@@ -134,7 +137,6 @@ namespace Belle2 {
 
       TVector2 locpos(localPosition.x() / CLHEP::cm, localPosition.y() / CLHEP::cm);
       StoreArray<ARICHSimHit> arichSimHits;
-      if (!arichSimHits.isValid()) arichSimHits.create();
       ARICHSimHit* simHit = arichSimHits.appendNew(moduleID, locpos, globalTime, energy);
 
       // add relation to MCParticle
@@ -144,7 +146,6 @@ namespace Belle2 {
 
       // after detection photon track is killed
       track.SetTrackStatus(fStopAndKill);
-
       return true;
     }
 

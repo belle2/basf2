@@ -8,10 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* System headers. */
-#include <fcntl.h>
-#include <unistd.h>
-
 /* External headers. */
 #include <TFile.h>
 #include <TTree.h>
@@ -52,7 +48,7 @@ EKLMTimeCalibrationAlgorithm::EKLMTimeCalibrationAlgorithm() :
   CalibrationAlgorithm("EKLMTimeCalibrationCollector")
 {
   m_GeoDat = &(EKLM::GeometryData::Instance());
-  m_maxStrip = m_GeoDat->getMaximalStripNumber();
+  m_maxStrip = m_GeoDat->getMaximalStripGlobalNumber();
   m_Debug = false;
 }
 
@@ -62,9 +58,9 @@ EKLMTimeCalibrationAlgorithm::~EKLMTimeCalibrationAlgorithm()
 
 CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
 {
-  int i, n, strip;
-  double s1, s2, k1, k2, dt, dl, effectiveLightSpeed;
-  double* averageDist, *averageTime, *timeShift, timeShift0;
+  int i, j1, j2, n, strip;
+  double s[2][3], k[2][3], dt, dl, dn, effectiveLightSpeed, tau;
+  double* averageDist, *averageTime, *averageSqrtN, *timeShift, timeShift0;
   struct Event ev;
   std::vector<struct Event>* stripEvents;
   std::vector<struct Event>::iterator it;
@@ -81,19 +77,43 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   stripEvents = new std::vector<struct Event>[m_maxStrip];
   averageDist = new double[m_maxStrip];
   averageTime = new double[m_maxStrip];
+  averageSqrtN = new double[m_maxStrip];
   timeShift = new double[m_maxStrip];
   calibrateStrip = new bool[m_maxStrip];
   t = &getObject<TTree>("calibration_data");
   t->SetBranchAddress("time", &ev.time);
   t->SetBranchAddress("dist", &ev.dist);
+  t->SetBranchAddress("npe", &ev.npe);
   t->SetBranchAddress("strip", &strip);
   n = t->GetEntries();
   for (i = 0; i < n; i++) {
     t->GetEntry(i);
     stripEvents[strip - 1].push_back(ev);
   }
-  k1 = 0;
-  k2 = 0;
+  for (j1 = 0; j1 < 2; j1++) {
+    for (j2 = 0; j2 < 3; j2++)
+      k[j1][j2] = 0;
+  }
+  /*
+   * Determination of the effective light speed. For each strip, the variance
+   * of time is
+   *
+   * sigma = \frac{1}{n - 1} \sum (t_i - (t_0 + l_i / c_{eff} +
+   * \tau / \sqrt{N_i})^2, (1)
+   *
+   * where t_i, l_i and N_i are time, distance from SiPM and number of
+   * photoelectrons for a hit, respectively, t_0 is the time shift for this
+   * strip, c_{eff} is the effective light speed and \tau is signal amplitude
+   * dependence time constant. The parameters c_{eff} and \tau are constant
+   * for all strips. The variance is approximated by
+   *
+   * sigma = \frac{1}{n - 1} \sum (t_i - \sum t_i  -
+   * (l_i - (\sum l_i))/ c_{eff} + \tau / \sqrt{N_i})^2, (2)
+   *
+   * and sum of sigmas is minimized similarly to chi^2 minimization by direct
+   * calculation. Partial derivatives of Eq. (2) by c_{eff} and \tau are equal
+   * to 0 at the minimum.
+   */
   for (i = 0; i < m_maxStrip; i++) {
     n = stripEvents[i].size();
     if (n < 2) {
@@ -103,6 +123,7 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
       delete[] stripEvents;
       delete[] averageDist;
       delete[] averageTime;
+      delete[] averageSqrtN;
       delete[] timeShift;
       delete[] calibrateStrip;
       return CalibrationAlgorithm::c_NotEnoughData;
@@ -110,33 +131,59 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
     calibrateStrip[i] = true;
     averageDist[i] = 0;
     averageTime[i] = 0;
+    averageSqrtN[i] = 0;
     for (it = stripEvents[i].begin(); it != stripEvents[i].end(); ++it) {
       averageDist[i] = averageDist[i] + it->dist;
       averageTime[i] = averageTime[i] + it->time;
+      averageSqrtN[i] = averageSqrtN[i] + 1.0 / sqrt(it->npe);
     }
     averageDist[i] = averageDist[i] / n;
     averageTime[i] = averageTime[i] / n;
-    s1 = 0;
-    s2 = 0;
+    averageSqrtN[i] = averageSqrtN[i] / n;
+    for (j1 = 0; j1 < 2; j1++) {
+      for (j2 = 0; j2 < 3; j2++)
+        s[j1][j2] = 0;
+    }
     for (it = stripEvents[i].begin(); it != stripEvents[i].end(); ++it) {
       dt = it->time - averageTime[i];
       dl = it->dist - averageDist[i];
-      s1 = s1 + dt * dl;
-      s2 = s2 + dt * dt;
+      dn = 1.0 / sqrt(it->npe);
+      s[0][0] += dl * dl;
+      s[0][1] += dl * dn;
+      s[0][2] += dl * dt;
+      s[1][0] += dn * dl;
+      s[1][1] += dn * dn;
+      s[1][2] += dn * dt;
     }
-    k1 = k1 + (n - 1) * s1;
-    k2 = k2 + (n - 1) * s2;
+    for (j1 = 0; j1 < 2; j1++) {
+      for (j2 = 0; j2 < 3; j2++)
+        k[j1][j2] += (n - 1) * s[j1][j2];
+    }
   }
+  /*
+   * Now, the system of equations is
+   *
+   * k[0][0] / c_{eff} + k[0][1] \tau = k[0][2],
+   * k[1][0] / c_{eff} + k[1][1] \tau = k[1][2].
+   */
   h = new TH1F("h", "", 200, -10., 10.);
   h2 = new TH1F("h2", "", 200, -10., 10.);
-  effectiveLightSpeed = k1 / k2;
+  effectiveLightSpeed = (k[0][0] * k[1][1] - k[1][0] * k[0][1]) /
+                        (k[0][2] * k[1][1] - k[1][2] * k[0][1]);
+  tau = (k[0][0] * k[1][2] - k[1][0] * k[0][2]) /
+        (k[0][0] * k[1][1] - k[1][0] * k[0][1]);
+  B2INFO("Effective light speed = " << effectiveLightSpeed << " cm / ns");
+  B2INFO("Amplitude time constant = " << tau << " ns");
   calibration->setEffectiveLightSpeed(effectiveLightSpeed);
+  calibration->setAmplitudeTimeConstant(tau);
   for (i = 0; i < m_maxStrip; i++) {
     if (!calibrateStrip[i])
       continue;
-    timeShift[i] = averageTime[i] - averageDist[i] / effectiveLightSpeed;
+    timeShift[i] = averageTime[i] - averageDist[i] / effectiveLightSpeed -
+                   averageSqrtN[i] * tau;
     for (it = stripEvents[i].begin(); it != stripEvents[i].end(); ++it) {
-      h->Fill(it->time - (timeShift[i] + it->dist / effectiveLightSpeed));
+      h->Fill(it->time - (timeShift[i] + it->dist / effectiveLightSpeed +
+                          tau / sqrt(it->npe)));
     }
   }
   fcn->SetParameter(0, h->Integral());
@@ -167,7 +214,8 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
     calibrationData.setTimeShift(timeShift[i]);
     calibration->setTimeCalibrationData(i + 1, &calibrationData);
     for (it = stripEvents[i].begin(); it != stripEvents[i].end(); ++it) {
-      h2->Fill(it->time - (timeShift[i] + it->dist / effectiveLightSpeed));
+      h2->Fill(it->time - (timeShift[i] + it->dist / effectiveLightSpeed +
+                           tau / sqrt(it->npe)));
     }
   }
   if (m_Debug) {
@@ -178,6 +226,7 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   delete[] stripEvents;
   delete[] averageDist;
   delete[] averageTime;
+  delete[] averageSqrtN;
   delete[] timeShift;
   delete[] calibrateStrip;
   saveCalibration(calibration, "EKLMTimeCalibration", getIovFromData());

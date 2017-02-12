@@ -19,15 +19,16 @@ namespace Belle2 {
   /** SVD DQM Module */
   class SVDDQM2Module : public HistoModule {  // <- derived from HistoModule class
 
-    static const char* const type[]; // array of strings used to name type of sensor in histo
+    static const char* const type[]; /**< array of strings used to name type of sensor in histo */
 
   public:
 
+    /** Enum with some basic SVD parameters for plots */
     enum {
-      c_nSVDPlanes = 4,
-      c_firstSVDPlane = 3,
-      c_lastSVDPlane = 6,
-      c_nTypes = 2,
+      c_nSVDPlanes = 4, /**< Number of SVD planes */
+      c_firstSVDPlane = 3, /**< Layer number of the first SVD plane */
+      c_lastSVDPlane = 6, /**< Layer number of the last SVD plane */
+      c_nTypes = 2, /**< Number of sensor types */
     };
 
     /** Constructor */

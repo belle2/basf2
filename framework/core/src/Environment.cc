@@ -62,13 +62,17 @@ Environment::Environment() :
   m_steering(""),
   m_numberEventsOverride(0),
   m_inputFilesOverride(),
+  m_entrySequencesOverride(),
   m_outputFileOverride(""),
   m_numberProcessesOverride(-1),
   m_logLevelOverride(LogConfig::c_Default),
   m_visualizeDataFlow(false),
   m_noStats(false),
   m_dryRun(false),
-  m_mcEvents(0)
+  m_mcEvents(0),
+  m_run(-1),
+  m_experiment(-1),
+  m_skipNEvents(0)
 {
   // Check for environment variables set by setuprel
   const char* envarReleaseDir = getenv("BELLE2_RELEASE_DIR");
@@ -90,19 +94,27 @@ Environment::Environment() :
   }
 
   // add module directories for current build options
+  std::string added_dirs;
   if (envarAnalysisDir) {
     const string analysisModules = (fs::path(envarAnalysisDir) / "modules" / envarSubDir).string();
     ModuleManager::Instance().addModuleSearchPath(analysisModules);
+    added_dirs += analysisModules;
   }
 
   if (envarLocalDir) {
     const string localModules = (fs::path(envarLocalDir) / "modules" / envarSubDir).string();
     ModuleManager::Instance().addModuleSearchPath(localModules);
+    added_dirs += " " + localModules;
   }
 
   if (envarReleaseDir) {
     const string centralModules = (fs::path(envarReleaseDir) / "modules" / envarSubDir).string();
     ModuleManager::Instance().addModuleSearchPath(centralModules);
+    added_dirs += " " + centralModules;
+  }
+
+  if (ModuleManager::Instance().getAvailableModules().empty()) {
+    B2ERROR("No modules found! Did you forget to run 'scons'? Module paths added: " << added_dirs);
   }
 
   //set path to external software

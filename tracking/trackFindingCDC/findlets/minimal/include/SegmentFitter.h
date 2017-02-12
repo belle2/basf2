@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
@@ -17,35 +17,38 @@
 #include <tracking/trackFindingCDC/fitting/EFitPos.h>
 #include <tracking/trackFindingCDC/fitting/EFitVariance.h>
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackFindingCDC/eventdata/utils/DriftLengthEstimator.h>
 
 #include <vector>
 #include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
+    class CDCSegment2D;
 
     /// Fits segments with the Riemann method.
     class SegmentFitter:
-      public Findlet<CDCRecoSegment2D&> {
+      public Findlet<CDCSegment2D&> {
 
     private:
       /// Type of the base class
-      typedef Findlet<CDCRecoSegment2D&> Super;
+      using Super = Findlet<CDCSegment2D&>;
 
     public:
       /// Short description of the findlet
-      virtual std::string getDescription();
+      std::string getDescription() override;
 
-      /// Add the parameters of the filter to the module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "");
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
       /// Signals the beginning of the event processing
-      void initialize();
+      void initialize() override;
 
     public:
       /// Main algorithm applying the fit to each segment
-      virtual void apply(std::vector<CDCRecoSegment2D>& outputSegments);
+      void apply(std::vector<CDCSegment2D>& outputSegments) override;
 
     private:
       /// Parameter : Switch to use Karimaki fit
@@ -60,12 +63,6 @@ namespace Belle2 {
       /// Parameter : Switch to reestimate the drift length before the fit
       bool m_param_updateDriftLength = true;
 
-      /// Parameter : Switch to serve the alpha angle to the drift length translator.
-      bool m_param_useAlphaInDriftLength = true;
-
-      /// Parameter : Mass to estimate the velocity in the flight time to the hit
-      double m_param_tofMassScale = NAN;
-
       /// Option which positional information from the hits should be used
       EFitPos m_fitPos = EFitPos::c_RecoPos;
 
@@ -78,6 +75,8 @@ namespace Belle2 {
       /// Instance of the karimaki fitter to be used.
       CDCKarimakiFitter m_karimakiFitter;
 
-    }; // end class
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+      /// Instance of the drift length estimator to be used.
+      DriftLengthEstimator m_driftLengthEstimator;
+    };
+  }
+}

@@ -9,32 +9,45 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentRelation/UnionRecordingSegmentRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/segmentRelation/SegmentRelationVarSets.h>
+#include <tracking/trackFindingCDC/filters/segmentRelation/BasicSegmentRelationVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentRelation/HitGapSegmentRelationVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentRelation/FitlessSegmentRelationVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentRelation/FitSegmentRelationVarSet.h>
 
-using namespace std;
+#include <tracking/trackFindingCDC/filters/segmentRelation/MVAFeasibleSegmentRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentRelation/MVARealisticSegmentRelationFilter.h>
+
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
 
 std::vector<std::string>
 UnionRecordingSegmentRelationFilter::getValidVarSetNames() const
 {
   std::vector<std::string> varSetNames = Super::getValidVarSetNames();
-  varSetNames.insert(varSetNames.end(), {"fit"});
+  varSetNames.insert(varSetNames.end(), {"basic", "hit_gap", "feasible", "fitless", "fit", "realistic"});
   return varSetNames;
 }
 
-
-std::unique_ptr<BaseVarSet<Relation<const CDCRecoSegment2D> > >
+std::unique_ptr<BaseVarSet<Relation<const CDCSegment2D> > >
 UnionRecordingSegmentRelationFilter::createVarSet(const std::string& name) const
 {
-  // if (name == "basic") {
-  //   return std::unique_ptr<BaseVarSet<Relation<const CDCRecoSegment2D> > >(new CDCSegmentRelationBasicVarSet());
-  //} else
-  if (name == "fit") {
-    return std::unique_ptr<BaseVarSet<Relation<const CDCRecoSegment2D> > >(new FitSegmentRelationVarSet);
+  if (name == "basic") {
+    return makeUnique<BasicSegmentRelationVarSet>();
+  } else if (name == "hit_gap") {
+    return makeUnique<HitGapSegmentRelationVarSet>();
+  } else if (name == "feasible") {
+    MVAFeasibleSegmentRelationFilter filter;
+    return std::move(filter).releaseVarSet();
+  } else if (name == "fitless") {
+    return makeUnique<FitlessSegmentRelationVarSet>();
+  } else if (name == "fit") {
+    return makeUnique<FitSegmentRelationVarSet>();
+  } else if (name == "realistic") {
+    MVARealisticSegmentRelationFilter filter;
+    return std::move(filter).releaseVarSet();
   } else {
     return Super::createVarSet(name);
   }
-
 }

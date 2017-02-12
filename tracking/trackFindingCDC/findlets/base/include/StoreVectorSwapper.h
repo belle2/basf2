@@ -10,10 +10,10 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/findlets/base/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
+
+#include <framework/core/ModuleParamList.h>
 
 #include <vector>
 
@@ -30,7 +30,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef Findlet<IOType> Super;
+      using Super = Findlet<IOType>;
 
     public:
       /// Constructor taking the default name of the store vector which is the target of the swap.
@@ -45,19 +45,19 @@ namespace Belle2 {
           if (m_classMnemomicName != "") {
             m_classMnemomicDescription = m_classMnemomicName;
           } else {
-            m_classMnemomicDescription =
-              m_classMnemomics.getParameterDescription(static_cast<IOType*>(nullptr));
+            // Just a little bit of ADL
+            m_classMnemomicDescription = getClassMnemomicParameterDescription(static_cast<IOType*>(nullptr));
           }
         }
 
         if (m_classMnemomicName == "") {
-          m_classMnemomicName =
-            m_classMnemomics.getParameterName(static_cast<IOType*>(nullptr));
+          // Just a little bit of ADL
+          m_classMnemomicName = getClassMnemomicParameterName(static_cast<IOType*>(nullptr));
         }
       }
 
       /// Expose the parameters  to a module
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
         std::string classMnemomicCapitalName = m_classMnemomicName;
         classMnemomicCapitalName[0] = ::toupper(classMnemomicCapitalName.at(0));
@@ -65,32 +65,28 @@ namespace Belle2 {
         if (not a_alwaysWrite) {
           moduleParamList->addParameter(prefixed(prefix, "Write" + classMnemomicCapitalName + "s"),
                                         m_param_writeStoreVector,
-                                        "Switch if " +
-                                        m_classMnemomicDescription +
-                                        " shall be written to the DataStore",
+                                        "Switch if " + m_classMnemomicDescription +
+                                        "s shall be written to the DataStore",
                                         m_param_writeStoreVector);
         }
 
         moduleParamList->addParameter(prefixed(prefix, classMnemomicCapitalName + "sStoreObjName"),
                                       m_param_storeVectorName,
-                                      "Name of the output StoreObjPtr of the " +
-                                      m_classMnemomicDescription +
+                                      "Name of the output StoreObjPtr of the " + m_classMnemomicDescription +
                                       "s generated within this module.",
                                       std::string(m_param_storeVectorName));
         //FIXME: Small parameter names
       }
 
       /// Short description of the findlet
-      virtual std::string getDescription() override
+      std::string getDescription() override
       {
-        return "Swaps an interal vector of " +
-               m_classMnemomics.getParameterDescription(static_cast<IOType*>(nullptr)) +
-               " to the DataStore";
+        return "Swaps an interal vector of " + m_classMnemomicDescription + "s to the DataStore";
       }
 
     public:
       /// Receive signal before the start of the event processing
-      virtual void initialize() override
+      void initialize() override
       {
         if (m_param_writeStoreVector) {
           StoreWrappedObjPtr< std::vector<IOType> > storeVector(m_param_storeVectorName);
@@ -112,10 +108,10 @@ namespace Belle2 {
       }
 
       /// Swaps the items to the DataStore or to the backup storage location.
-      virtual void apply(std::vector<IOType>& input) override final
-      {
+      void apply(std::vector<IOType>& input) final {
         // Swap items to the DataStore
-        if (m_param_writeStoreVector) {
+        if (m_param_writeStoreVector)
+        {
           StoreWrappedObjPtr< std::vector<IOType> > storeVector(m_param_storeVectorName);
           std::vector<IOType>& sink = *storeVector;
           sink.swap(input);
@@ -137,12 +133,8 @@ namespace Belle2 {
       /// Short description for the type of objects to be written out.
       std::string m_classMnemomicDescription;
 
-      /// Helper object to lookup short hand names and descriptions
-      ClassMnemomics m_classMnemomics;
-
       /// Backup storage if the vector should not be written to the DataStore
       std::vector<IOType> m_backup;
-
-    }; // end class
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

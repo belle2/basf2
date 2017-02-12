@@ -2,7 +2,10 @@
 <DetectorComponent name="STR" xmlns:xi="http://www.w3.org/2001/XInclude">
     <Creator library="structure">STRCreator</Creator>
     <Content>
-	<PolePieceL description="PolePiece L-side">
+
+      <!--Pole Pieces -->
+      
+	<PolePieceL description="BWD_Pole">
 	  <Material>Fe</Material>
 	  <Plane>
 	    <posZ unit="mm">-3151</posZ>
@@ -66,7 +69,7 @@
 	  </Plane>
 	</PolePieceL>
 
-	<PolePieceR description="PolePiece R-side">
+	<PolePieceR description="FWD_Pole">
 	  <Material>Fe</Material>
 	  <Plane>
 	    <posZ unit="mm">2417.5</posZ>
@@ -123,6 +126,8 @@
         <Phi unit="deg">0</Phi>
         <Dphi unit="deg">360.0</Dphi>
 
+
+	<!-- Shield D1: to be defined -->
 	<ShieldD1>
 	  <Material desc="material of the Shield of the Belle II detector">Lead</Material>
 	  <Phi unit="deg">0</Phi>
@@ -140,70 +145,110 @@
 	</ShieldD1>
 
 
-	<!-- Add all the shields -->
+	<!-- ECL Shields-->
 
-	<!-- Default Values -->
-	<!-- (Should be changed in the Python steering script and not directly in this file-->
-	<ForwardShieldType>FWDA1</ForwardShieldType>
-	<BackwardShieldType>BWDA1</BackwardShieldType>
+	<!-- FWD-A1 -->
+	<FWD_Shield desc="Parameters of the forward shield (Concept FWD-A1)">
+	  <Layers>    
+	    <Layer id="1">
+	      <Material desc="Material for top part of the FW ECL Shield">STR-Lead</Material>
+	      <Plane id="1">
+		<posZ unit="cm">209.8</posZ>
+		<innerRadius unit="cm">42.8</innerRadius>
+		<outerRadius unit="cm">42.8</outerRadius>
+	      </Plane>
+	      <Plane id="2">
+		<posZ unit="cm">214.95</posZ>
+		<innerRadius unit="cm">42.8</innerRadius>
+		<outerRadius unit="cm">44.0</outerRadius>
+	      </Plane>
+	      <Plane id="3">
+		<posZ unit="cm">214.95</posZ>
+		<innerRadius unit="cm">40.35</innerRadius>
+		<outerRadius unit="cm">44.0</outerRadius>
+	      </Plane>	
+	      <Plane id="4">
+		<posZ unit="cm">229.95</posZ>
+		<innerRadius unit="cm">43.85</innerRadius>
+		<outerRadius unit="cm">47.5</outerRadius>
+	      </Plane>
+	      <Plane id="5">
+		<posZ unit="cm">239.75</posZ>
+		<innerRadius unit="cm">43.85</innerRadius>
+		<outerRadius unit="cm">47.5</outerRadius>
+	      </Plane>
+	    </Layer>
 
-	<xi:include href="SHIELD-FWD0.xml"/>	
-	<xi:include href="SHIELD-BWD0.xml"/>	
+	    <Layer id="2">
+	      <Material desc="Material for bottom part of the FW ECL Shield">STR-HDPE</Material>
+	      <Phi unit="deg">0</Phi>
+	      <Dphi unit="deg">360.0</Dphi>
+	      <Plane id="1">
+		<posZ unit="cm">215</posZ>
+		<innerRadius unit="cm">36.7</innerRadius>
+		<outerRadius unit="cm">40.35</outerRadius>
+	      </Plane>
+	      <Plane id="2">
+		<posZ unit="cm">229.95</posZ>
+		<innerRadius unit="cm">36.7</innerRadius>
+		<outerRadius unit="cm">43.85</outerRadius>
+	      </Plane>
+	      <Plane id="3">
+		<posZ unit="cm">239.75</posZ>
+		<innerRadius unit="cm">36.7</innerRadius>
+		<outerRadius unit="cm">43.85</outerRadius>
+	      </Plane>
+	    </Layer>
+	  </Layers>
+	</FWD_Shield>
 
-	<xi:include href="SHIELD-FWDA1.xml"/>	
-	<xi:include href="SHIELD-BWDA1.xml"/>	
-
-	<xi:include href="SHIELD-FWDA2.xml"/>	
-	<xi:include href="SHIELD-BWDA2.xml"/>	
-
-	<xi:include href="SHIELD-FWDB1.xml"/>	
-	<xi:include href="SHIELD-BWDB1.xml"/>	
-
-	<xi:include href="SHIELD-FWDB2.xml"/>	
-	<xi:include href="SHIELD-BWDB2.xml"/>	
-
-	<xi:include href="SHIELD-FWDC1.xml"/>	
-	<xi:include href="SHIELD-BWDC1.xml"/>	
-
-	<xi:include href="SHIELD-FWDC2.xml"/>	
-	<xi:include href="SHIELD-BWDC2.xml"/>	
 
 
-	<xi:include href="SHIELD-FWDA1-065.xml"/>	
-	<xi:include href="SHIELD-FWDA1-165.xml"/>	
-	<xi:include href="SHIELD-FWDA1-265.xml"/>	
-	<xi:include href="SHIELD-FWDA1-315.xml"/>	
-	<xi:include href="SHIELD-FWDA1-365.xml"/>	
-	<xi:include href="SHIELD-FWDA1-415.xml"/>	
-	<xi:include href="SHIELD-FWDA1-465.xml"/>	
-
-	<xi:include href="SHIELD-BWDA1-100.xml"/>	
-	<xi:include href="SHIELD-BWDA1-200.xml"/>	
-	<xi:include href="SHIELD-BWDA1-300.xml"/>	
-	<xi:include href="SHIELD-BWDA1-350.xml"/>	
-	<xi:include href="SHIELD-BWDA1-400.xml"/>	
-	<xi:include href="SHIELD-BWDA1-450.xml"/>	
-	<xi:include href="SHIELD-BWDA1-500.xml"/>	
-
-	<xi:include href="SHIELD-FWDA1-001B.xml"/>	
-	<xi:include href="SHIELD-FWDA1-003B.xml"/>	
-	<xi:include href="SHIELD-FWDA1-005B.xml"/>	
-	<xi:include href="SHIELD-FWDA1-010B.xml"/>	
-	<xi:include href="SHIELD-FWDA1-015B.xml"/>	
-	<xi:include href="SHIELD-FWDA1-020B.xml"/>	
-	<xi:include href="SHIELD-FWDA1-025B.xml"/>	
-	<xi:include href="SHIELD-FWDA1-030B.xml"/>	
-
-	<xi:include href="SHIELD-BWDA1-001B.xml"/>	
-	<xi:include href="SHIELD-BWDA1-003B.xml"/>	
-	<xi:include href="SHIELD-BWDA1-005B.xml"/>	
-	<xi:include href="SHIELD-BWDA1-010B.xml"/>	
-	<xi:include href="SHIELD-BWDA1-015B.xml"/>	
-	<xi:include href="SHIELD-BWDA1-020B.xml"/>	
-	<xi:include href="SHIELD-BWDA1-025B.xml"/>	
-	<xi:include href="SHIELD-BWDA1-030B.xml"/>	
-
-	<xi:include href="SHIELD-BWDB1-005B.xml"/>	
-
+	<!-- BWD: A1 -->
+	<BWD_Shield desc="Parameters of the backward ECL shield (Concept BWD-A1)">
+	  <Layers>  
+	    <Layer id="1">
+	      <Material desc="Material for top part of the BW ECL Shield">STR-Lead</Material>
+	      <Plane id="1">
+		<posZ unit="cm">-145</posZ>
+		<innerRadius unit="cm">51.5</innerRadius>
+		<outerRadius unit="cm">55.5</outerRadius>
+	      </Plane>
+	      <Plane id="2">
+		<posZ unit="cm">-125</posZ>
+		<innerRadius unit="cm">51.5</innerRadius>
+		<outerRadius unit="cm">55.5</outerRadius>
+	      </Plane>
+	      <Plane id="3">
+		<posZ unit="cm">-115.6</posZ>
+		<innerRadius unit="cm">46.5</innerRadius>
+		<outerRadius unit="cm">50.5</outerRadius>
+	      </Plane>
+	      <Plane id="4">
+		<posZ unit="cm">-108</posZ>
+		<innerRadius unit="cm">46.5</innerRadius>
+		<outerRadius unit="cm">46.5</outerRadius>
+	      </Plane>
+	    </Layer>
+	    <Layer id="2">
+	      <Material desc="Material for bottom part of the BW ECL Shield">STR-HDPE</Material>
+	      <Plane id="1">
+		<posZ unit="cm">-145</posZ>
+		<innerRadius unit="cm">46.5</innerRadius>
+		<outerRadius unit="cm">51.5</outerRadius>
+	      </Plane>
+	      <Plane id="2">
+		<posZ unit="cm">-125</posZ>
+		<innerRadius unit="cm">46.5</innerRadius>
+		<outerRadius unit="cm">51.5</outerRadius>
+	      </Plane>
+	      <Plane id="3">
+		<posZ unit="cm">-115.6</posZ>
+		<innerRadius unit="cm">46.5</innerRadius>
+		<outerRadius unit="cm">46.5</outerRadius>
+	      </Plane>
+	    </Layer>
+	  </Layers>
+	</BWD_Shield>
     </Content>
 </DetectorComponent>

@@ -241,6 +241,10 @@ function getNewestRevision( rev_data) {
 
 function setupRactiveFromRevision(rev_data, rev_string, rev_list)
 {
+	// don't event attempt to show comparisons for empty revisions
+	if (rev_string == "")
+		return;
+	
     // make dynamic
     var comparisonLoadPath = "../comparisons/" + rev_string
     var createComparisonUrl = "../create_comparison"
@@ -309,7 +313,7 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list)
             });
     }).fail(function() {
 
-        console.log("Comparison " + rev_string + " does not exist yet, requesting it")
+        console.log("Comparison " + rev_string + " does not exist yet, requesting it");
 
         $.ajax({
 			url: createComparisonUrl,
@@ -327,9 +331,18 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list)
     });
 }
 
+/* this function call is triggered by the button 
+   under the revisions list
+*/
 function loadSelectedRevisions(data) {
+	
     rev_string = get_selected_revs_string();
     rev_list = get_selected_revs_list();
+    
+    if (rev_string == "") {
+    	alert("Please select at least one tag!");
+    } 
+    
     console.log("Loading rev via string " + rev_string );
 
     setupRactiveFromRevision(data, rev_string, rev_list);

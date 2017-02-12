@@ -10,34 +10,37 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+
 #include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCFacet;
+    class CDCRLWireHitTriple;
 
     /// Filter for the constuction of good facets based on monte carlo information
-    class MCFacetFilter : public MCSymmetricFilterMixin<Filter<CDCFacet> > {
+    class MCFacetFilter : public MCSymmetricFilterMixin<BaseFacetFilter> {
     private:
       /// Type of the super class
-      typedef MCSymmetricFilterMixin<Filter<CDCFacet> > Super;
+      using Super = MCSymmetricFilterMixin<BaseFacetFilter>;
 
     public:
-      /** Constructor also setting the switch ,
+      /**
+       *  Constructor also setting the switch,
        *  if the reversed version of a facet (in comparision to MC truth) shall be accepted.
        */
-      explicit MCFacetFilter(bool allowReverse = true) : Super(allowReverse) {}
+      explicit MCFacetFilter(bool allowReverse = true);
 
     public:
-      /** Main filter method returning the weight of the facet.
-       *  Returns NAN if the cell shall be rejected.
+      /**
+       *  Main filter method returning the weight of the facet.
+       *  Returns NAN, if the cell shall be rejected.
        */
-      virtual Weight operator()(const CDCFacet& facet) override final;
+      Weight operator()(const CDCFacet& facet) final;
 
     private:
       /// Indicated if the oriented triple is a correct hypotheses
-      bool operator()(const CDCRLWireHitTriple& rlWireHit, int inTrackHitDistanceTolerance = 99999);
-
-    }; // end class MCFacetFilter
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+      bool operator()(const CDCRLWireHitTriple& rlWireHitTriple, int maxInTrackHitIdDifference);
+    };
+  }
+}

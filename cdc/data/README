@@ -10,6 +10,8 @@ xt-relation in new format
 * change wrt old format file 
  - add incident angle bin info. at the top of a file in old format.
  - add xt parameterization mode and no. of params. after that. 
+   mode=0: normal    polynomial;
+       =1: Chebyshev polynomial.
  - shift alpha points: -80 - 90deg --> -85 - 85deg.
  - sort in order of alpha
  (- Unit: cm and nsec).
@@ -40,8 +42,15 @@ Unit: cm and microsec.
 * xt_v1.dat      : obsolete. xt = xt(layer,l/r,alpha.theta)
 * xt_v0.dat      : obsolete. 1'st version of realistic xt; only layer and L/R dependence is taken into account.
 * xt_simple.dat  : obsolete. ideal linear xt. v=40 mu/ns.
-* xt_noB_v0.3.dat: obsolete. xt for B-field = 0.
-
+* xt_noB_v0.3.dat: obsolete. 
+                              xt for B-field = 0 ([cdc-soft:00383] ).
+                              Just calculated for alpha = -10, 0 and 10 deg, 
+                                                           theta = 60, 90, 120 and 130 deg.
+                             xt for other angles are also set but they are duplicates,  i.e.
+                             xt(alpha =  90 -  20) = xt(alpha =  10); 
+                             xt(alpha = -20 - -80) = xt(alpha = -10;)
+                             xt(theta = 18, 40) = xt(theta = 60);
+                             xt(theta = 149) = xt(theta = 130).
 
 
 sigma in new format
@@ -49,6 +58,9 @@ sigma in new format
 * change wrt old format file 
  - add incident angle bin info. at the top of a file in old format.
  - add sigma parameterization mode and no. of params. after that. 
+   mode=0: default;
+       =1: add 2 params. to describe sigma better near a cell boundary;
+       =2: similar to mode=1 but slightly-different parameterization.
 * sigma_v1.dat       : created from sigma_v0.1.dat.
 
 sigma in old format
@@ -99,8 +111,9 @@ The file contains a list of bad wires.
 
 Format: layerID (0-55), wireID(0-)
 
-* badwire_sample.dat: Just a sample file.
+* badwire_sample.dat: Just a sample file. <- obsolete
 * badwire_off.dat   : Empty file; the file for turning-off badwire effect.
+* badwire_v1.dat    : contains bad wires known as of Oct.21 2016.
 
 
 
@@ -119,22 +132,37 @@ Format: frontend electronics boardID (0-299), A [ns/sqrt(ADCcount)]
 
 (mis)alignment
 ==============
-The file contains (mis)alignment parameters w.r.t. displaced geometry (=ideal geometry currently). Misalignment params. are use in digitization; alignment ones in reconstruction.
+The file contains (mis)alignment parameters w.r.t. displaced geometry (=design+displacement geometry). Misalignment params. are used in digitization; alignment ones in reconstruction.
 
 Format: layerID (0-55), wireID (0-), shift (dx,dy,dz) of sense wire at backward end-plate [cm], (dx,dy,dz) of sense wire at forward end-plate [cm], tension [grW]
 
 * misalignment.dat: assume (dx,dy,dz)=0 and tension=50grW for all wires.
-* alignment.dat:  : = misalignment.dat.
+* alignment.dat:  : = misalignment.dat <- obsolete.
 
 * misalignment_v1.dat: assume (dx,dy,dz)=0 and measured tensions for all wires except for Layer#7 47 and Layer#8 47.
-* alignment_v1.dat:  : = misalignment_v1.dat.
+* alignment_v1.dat:  : = misalignment_v1.dat <- obsolete
+
+* misalignment_v2.dat: assume (dx,dy,dz)=0 and measured tensions for all wires = 0 
+* alignment_v2.dat:  : = misalignment_v2.dat
 
 
 tentative correction for the difference betw. old design and final design
-=========================================================================
+===========================================
 Only apply to sense wire z-positions.
 To be eliminated when the final design is implemented in geometry in future.
 
 Format: layer  backward-deltaz (cm)  forward-deltaz (cm)
 
-deltaz.dat
+deltaz.dat: obsolete (no longer needed).
+
+
+displacement  w.r.t. final design
+===========================================
+Only apply to sense wire positions.
+
+Format: layerID (0-55), wireID (0-), displacement (dx,dy,dz) of sense wire at backward end-plate [cm], ibid. at forward end-plate [cm]
+
+* deisplacement.dat:  <- obsolete
+* deisplacement_v1.dat: tensions added <- obsolete
+* deisplacement_v1.1.dat: add corrections for the longer outer wall (by 430um w.r.t. design)
+

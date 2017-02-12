@@ -71,7 +71,6 @@ void SerializerModule::initialize()
   }
 
   // Create Message Handler
-  m_msghandler = new MsgHandler(m_compressionLevel);
   memset(time_array0, 0, sizeof(time_array0));
   memset(time_array1, 0, sizeof(time_array1));
   memset(time_array2, 0, sizeof(time_array2));
@@ -133,7 +132,7 @@ void SerializerModule::shmOpen(char* path_cfg, char* path_sta)
   m_shmfd_cfg = shm_open(path_cfg, O_RDWR, 0666);
   if (m_shmfd_cfg < 0) {
     char err_buf[500];
-    sprintf(err_buf, "shm_open2(%s). Exiting... : path %s\n" ,
+    sprintf(err_buf, "[FATAL] Failed to shm_open (%s). Exiting... : path %s\n" ,
             strerror(errno), path_cfg);
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);
@@ -143,7 +142,7 @@ void SerializerModule::shmOpen(char* path_cfg, char* path_sta)
   m_shmfd_sta = shm_open(path_sta , O_RDWR, 0666);
   if (m_shmfd_sta < 0) {
     char err_buf[500];
-    sprintf(err_buf, "shm_open2(%s). Exiting... : path %s\n" ,
+    sprintf(err_buf, "[FATAL] Failed to shm_open (%s). Exiting... : path %s\n" ,
             strerror(errno), path_sta);
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);
@@ -177,7 +176,7 @@ void SerializerModule::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
   if (rawdblk->GetNumEntries() == 1) {
     if (total_send_nwords != (rawdblk->GetBuffer(0))[ 0 ] + 8) {
       char err_buf[500];
-      sprintf(err_buf, "Length error. total length %d rawdblk length %d. Exting...\n" ,
+      sprintf(err_buf, "[FATAL] Length error. total length %d rawdblk length %d. Exting...\n" ,
               total_send_nwords, (rawdblk->GetBuffer(0))[ 0 ]);
       printData(rawdblk->GetBuffer(0), rawdblk->TotalBufNwords());
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -203,7 +202,7 @@ void SerializerModule::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
       printf("[DEBUG] i= %d : num entries %d : Tot words %d\n", i , rawdblk->GetNumEntries(), rawdblk->TotalBufNwords());
       printData(rawdblk->GetBuffer(0), rawdblk->TotalBufNwords());
 
-      char err_buf[500] = "CORRUPTED DATA: No COPPER blocks in RawDataBlock. Exiting...";
+      char err_buf[500] = "[FATAL] CORRUPTED DATA: No COPPER blocks in RawDataBlock. Exiting...";
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(-1);
@@ -255,7 +254,7 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "WRITEVa error.(%s) Exiting... : sent %d bytes, header %d bytes body %d trailer %d : %s %s %d\n" ,
+        sprintf(err_buf, "[ERROR] WRITEVa error.(%s) : sent %d bytes, header %d bytes body %d trailer %d : %s %s %d\n" ,
                 strerror(errno), n, iov[0].iov_len, iov[1].iov_len, iov[2].iov_len,
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #ifdef NONSTOP
@@ -329,7 +328,7 @@ int SerializerModule::Send(int socket, char* buf, int size_bytes)
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "Send Error. (%s) : %s %s %d", strerror(errno), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        sprintf(err_buf, "[ERROR] Send Error. (%s) : %s %s %d", strerror(errno), __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #ifdef NONSTOP
         g_run_error = 1;
         B2ERROR(err_buf);
@@ -358,7 +357,7 @@ void SerializerModule::Accept()
   host = gethostbyname(m_hostname_local.c_str());
   if (host == NULL) {
     char temp_buf[500];
-    sprintf(temp_buf, "[ERROR] hostname(%s) cannot be resolved(%s). Check /etc/hosts. Exiting...\n",
+    sprintf(temp_buf, "[FATAL] hostname(%s) cannot be resolved(%s). Check /etc/hosts. Exiting...\n",
             m_hostname_local.c_str(), strerror(errno));
     print_err.PrintError(temp_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);
@@ -388,7 +387,7 @@ void SerializerModule::Accept()
 
   if (bind(fd_listen, (struct sockaddr*)&sock_listen, sizeof(struct sockaddr)) < 0) {
     char temp_char[500];
-    sprintf(temp_char, "Failed to bind.(%s) Maybe other programs have already occupied this port(%d). Exiting...",
+    sprintf(temp_char, "[FATAL] Failed to bind.(%s) Maybe other programs have already occupied this port(%d). Exiting...",
             strerror(errno), m_port_to);
     print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
@@ -399,7 +398,7 @@ void SerializerModule::Accept()
   int backlog = 1;
   if (listen(fd_listen, backlog) < 0) {
     char err_buf[500];
-    sprintf(err_buf, "Failed in listen(%s). Exting...", strerror(errno));
+    sprintf(err_buf, "[FATAL] Failed in listen(%s). Exting...", strerror(errno));
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   }
@@ -415,7 +414,7 @@ void SerializerModule::Accept()
   B2INFO("Accepting...");
   if ((fd_accept = accept(fd_listen, (struct sockaddr*) & (sock_accept), &addrlen)) == 0) {
     char err_buf[500];
-    sprintf(err_buf, "Failed to accept(%s). Exiting...", strerror(errno));
+    sprintf(err_buf, "[FATAL] Failed to accept(%s). Exiting...", strerror(errno));
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   } else {
@@ -428,7 +427,7 @@ void SerializerModule::Accept()
     timeout.tv_usec = 0;
     ret = setsockopt(fd_accept, SOL_SOCKET, SO_SNDTIMEO, &timeout, (socklen_t)sizeof(timeout));
     if (ret < 0) {
-      char temp_char[100] = "Failed to set TIMEOUT. Exiting...";
+      char temp_char[100] = "[FATAL] Failed to set TIMEOUT. Exiting...";
       print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     }
@@ -498,7 +497,7 @@ void SerializerModule::openRunPauseNshm()
   int fd = shm_open(path_shm, O_RDONLY, 0666);
   if (fd < 0) {
     printf("[DEBUG] %s\n", path_shm);
-    perror("[ERROR] shm_open2");
+    perror("[FATAL] Failed to open shm_open");
     exit(1);
   }
   m_ptr = (int*)mmap(NULL, sizeof(int), PROT_READ, MAP_SHARED, fd, 0);

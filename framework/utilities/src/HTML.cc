@@ -113,6 +113,22 @@ std::string HTML::chooseUnitOfLength(const TVector3& vec)
   return unitType;
 }
 
+std::string HTML::getHexDump(const int* buf, int length)
+{
+  std::stringstream stream;
+  stream << "<small><tt>";
+  char str[10];
+  //print everything in blocks of 4 bytes, 4 blocks per line
+  for (int i = 0; i < length; i++) {
+    //byte = 2letters
+    //4byte = 8 letters
+    snprintf(str, sizeof(str), "%08x ", buf[i]);
+    stream << str;
+  }
+  stream << "</tt></small>";
+  return stream.str();
+}
+
 
 std::string HTML::htmlToPlainText(const std::string& html)
 {

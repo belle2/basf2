@@ -5,7 +5,8 @@
 #
 # Had skims
 # P. Urquijo, 6/Jan/2015
-#
+# C-L. Hsu 3/Jun/2016
+# P. Urquijo 1/Oct/2016
 ######################################################
 
 from basf2 import *
@@ -24,7 +25,8 @@ def CharmlessHadList():
                      'rho-:loose pi+:loose',
                      'K+:loose rho-:loose',
                      'rho+:loose K-:loose',
-                     'rho0:loose pi0:all'
+                     'rho0:loose pi0:all',
+                     'pi+:all pi-:all pi0:all'
                      ]
 
     bd_VVChannels = ['rho+:loose rho-:loose',
@@ -42,10 +44,12 @@ def CharmlessHadList():
     bu_VVChannels = ['rho0:loose rho-:loose',
                      ]
 
-    bu_PPPChannels = ['pi+:loose pi-:loose pi+:loose',
-                      'K+:loose K-:loose pi+:loose',
-                      'K+:loose K-:loose K+:loose',
-                      'K+:loose pi-:loose pi+:loose'
+    bu_PPPChannels = ['pi+:loose pi-:loose pi-:loose',
+                      'K+:loose K-:loose pi-:loose',
+                      'K+:loose K-:loose K-:loose',
+                      'K+:loose pi-:loose pi-:loose',
+                      'K-:loose pi+:loose pi-:loose',
+                      'pi-:loose pi0:all pi0:all'
                       ]
 
     bdPPList = []

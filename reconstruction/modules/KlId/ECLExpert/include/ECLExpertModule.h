@@ -84,14 +84,14 @@ namespace Belle2 {
 
     /** mva identifier. no ending means its loaded from the database  */
     std::string m_identifier = FileSystem::findFile(
-                                 "reconstruction/data/weights/ECLExpert.xml");
+                                 "reconstruction/data/weights/ECLKLExpert.xml");
 
-    /**< Database pointer to the Database representation of the weightfile */
+    /** Database pointer to the Database representation of the weightfile */
     std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>
                                                                m_weightfile_representation;
-    /**< Pointer to the current MVA Expert */
+    /** Pointer to the current MVA Expert */
     std::unique_ptr<MVA::Expert> m_expert;
-    /**< Pointer to the current dataset */
+    /** Pointer to the current dataset */
     std::unique_ptr<MVA::SingleDataset> m_dataset;
 
 

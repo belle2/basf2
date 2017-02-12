@@ -28,6 +28,7 @@ def peel_segment2d(segment, key="{part_name}"):
 def peel_trajectory2d(trajectory2d, key="{part_name}"):
     chi2 = trajectory2d.getChi2()
     ndf = trajectory2d.getNDF()
+    is_fitted = trajectory2d.isFitted()
 
     i_curv = 0
     curvature_estimate = trajectory2d.getCurvature()
@@ -36,6 +37,7 @@ def peel_trajectory2d(trajectory2d, key="{part_name}"):
     return dict(
         chi2=chi2,
         ndf=ndf,
+        is_fitted=is_fitted,
         p_value=prob(chi2, ndf),
         curvature_estimate=curvature_estimate,
         curvature_variance=curvature_variance,

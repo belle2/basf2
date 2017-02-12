@@ -33,7 +33,10 @@ namespace Belle2 {
       OVP,     // trip due to over voltage
       ERR,     // another error
       RAMPUP,  // ramping up voltage
-      RAMPDOWN // ramping down voltage
+      RAMPDOWN, // ramping down voltage
+      TRIP,     // Trip due to current trip
+      ETRIP,    // External trip
+      INTERLOCK // Inter lock
     };
 
   public:

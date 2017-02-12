@@ -11,7 +11,6 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/GearDir.h>
 
 using namespace Belle2;
 
@@ -21,7 +20,7 @@ EKLMDigit::EKLMDigit()
   m_Plane = -1;
   m_Strip = -1;
   m_good = false;
-  m_NPE = -1;
+  m_Charge = 0;
   m_generatedNPE = -1;
   m_fitStatus = -1;
   m_sMCTime = -1;
@@ -34,7 +33,7 @@ EKLMDigit::EKLMDigit(const EKLMSimHit* hit)
 {
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
   m_good = false;
-  m_NPE = -1;
+  m_Charge = 0;
   m_generatedNPE = -1;
   m_fitStatus = -1;
   m_sMCTime = -1;
@@ -66,14 +65,31 @@ DigitBase::EAppendStatus EKLMDigit::addBGDigit(const DigitBase* bg)
   return DigitBase::c_DontAppend;
 }
 
+uint16_t EKLMDigit::getCharge() const
+{
+  return m_Charge;
+}
+
+void EKLMDigit::setCharge(uint16_t charge)
+{
+  m_Charge = charge;
+}
+
+/*
+ * TODO: the photoelectron / charge conversion constant should be determined
+ * from calibration.
+ */
 float EKLMDigit::getNPE() const
 {
-  return m_NPE;
+  return float(m_Charge) / 32;
 }
 
 void EKLMDigit::setNPE(float npe)
 {
-  m_NPE = npe;
+  m_Charge = uint16_t(npe * 32);
+  /* 15 bits for charge. */
+  if (m_Charge >= 0x8000)
+    m_Charge = 0x7FFF;
 }
 
 int EKLMDigit::getGeneratedNPE() const

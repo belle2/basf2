@@ -11,19 +11,14 @@
 
 #include <Eigen/Dense>
 
-using namespace std;
 using namespace Belle2::TrackFindingCDC;
 using namespace Eigen;
 
-
-
-ExtendedRiemannsMethod::ExtendedRiemannsMethod() :
-  m_lineConstrained(false),
-  m_originConstrained(false)
+ExtendedRiemannsMethod::ExtendedRiemannsMethod()
+  : m_lineConstrained(false)
+  , m_originConstrained(false)
 {
 }
-
-
 
 void ExtendedRiemannsMethod::update(CDCTrajectory2D& trajectory2D,
                                     CDCObservations2D& observations2D) const
@@ -55,9 +50,6 @@ void ExtendedRiemannsMethod::update(CDCTrajectory2D& trajectory2D,
 
   trajectory2D = CDCTrajectory2D(ref, perigeeCircle);
 }
-
-
-
 
 namespace {
   /// Helper indices for meaningfull matrix access to the observations matrices
@@ -278,7 +270,7 @@ namespace {
     return perigeePrecision;
   }
 
-} // end anonymuous namespace
+}
 
 
 

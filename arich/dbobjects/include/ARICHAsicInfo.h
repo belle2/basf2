@@ -32,22 +32,12 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    ARICHAsicInfo(std::string id, TTimeStamp timeFinishGain, TTimeStamp timeFinishOffset, std::vector<int> deadChannel,
-                  std::vector<int> badConnChannel, std::vector<int> badOffsetChannel, std::vector<int> badLinChannel,
-                  int numProbCh, std::vector<TH3F*> gain, std::vector<TH3F*> offset, std::string comment): m_id(id), m_timeFinishGain(timeFinishGain),
+    ARICHAsicInfo(const std::string& id, TTimeStamp timeFinishGain, TTimeStamp timeFinishOffset, std::vector<int>& deadChannel,
+                  std::vector<int>& badConnChannel, std::vector<int>& badOffsetChannel, std::vector<int>& badLinChannel, int numProbCh,
+                  std::vector<TH3F*>& gain, std::vector<TH3F*>& offset, const std::string& comment): m_id(id),  m_timeFinishGain(timeFinishGain),
       m_timeFinishOffset(timeFinishOffset), m_deadChannel(deadChannel), m_badConnChannel(badConnChannel),
       m_badOffsetChannel(badOffsetChannel), m_badLinChannel(badLinChannel), m_numProblematicChannels(numProbCh), m_gain(gain),
       m_offset(offset), m_comment(comment) {};
-
-    /**
-     * Constructor
-     */
-    ARICHAsicInfo(std::string id, TTimeStamp timeFinishGain, TTimeStamp timeFinishOffset, std::vector<int> deadChannel,
-                  std::vector<int> badConnChannel, std::vector<int> badOffsetChannel, std::vector<int> badLinChannel,
-                  int numProbCh, std::vector<TH3F*> gain, std::vector<TH3F*> offset): m_id(id), m_timeFinishGain(timeFinishGain),
-      m_timeFinishOffset(timeFinishOffset), m_deadChannel(deadChannel), m_badConnChannel(badConnChannel),
-      m_badOffsetChannel(badOffsetChannel), m_badLinChannel(badLinChannel), m_numProblematicChannels(numProbCh), m_gain(gain),
-      m_offset(offset), m_comment("") {};
 
     /**
      * Destructor

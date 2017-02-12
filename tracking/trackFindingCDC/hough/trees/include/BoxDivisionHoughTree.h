@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 #include <tracking/trackFindingCDC/hough/trees/WeightedFastHoughTree.h>
-#include <tracking/trackFindingCDC/hough/baseelements/LinearDivision.h>
+#include <tracking/trackFindingCDC/hough/baseelements/SectoredLinearDivision.h>
 
 #include <tracking/trackFindingCDC/numerics/LookupTable.h>
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
@@ -28,7 +28,7 @@ namespace Belle2 {
      *  A fast hough algorithm with rectangular boxes, which are split linearly by a fixed number of
      *  divisions in each coordinate up to a maximal level.
      */
-    template<class AItemPtr, class AHoughBox, size_t ... divisions>
+    template <class AItemPtr, class AHoughBox, size_t ... divisions>
     class BoxDivisionHoughTree {
 
     public:
@@ -36,25 +36,25 @@ namespace Belle2 {
       using HoughBox = AHoughBox;
 
       /// Type of the box division strategy
-      using BoxDivision = LinearDivision<HoughBox, divisions...>;
+      using BoxDivision = SectoredLinearDivision<HoughBox, divisions...>;
 
       /// Type of the fast hough tree structure
       using HoughTree = WeightedFastHoughTree<AItemPtr, HoughBox, BoxDivision>;
 
       /// Type of the coordinate I.
-      template<size_t I>
+      template <size_t I>
       using Type = typename HoughBox::template Type<I>;
 
       /// Predicate that the given type is indeed a coordinate of the hough space
-      template<class T>
+      template <class T>
       using HasType = typename HoughBox::template HasType<T>;
 
       /// Function to get the coordinate index from its type
-      template<class T>
+      template <class T>
       using TypeIndex = typename HoughBox::template TypeIndex<T>;
 
       /// Type of the width in coordinate I.
-      template<size_t I>
+      template <size_t I>
       using Width = typename HoughBox::template Width<I>;
 
       /// Type of the nodes used in the tree for the search.
@@ -62,15 +62,17 @@ namespace Belle2 {
 
     public:
       /// Constructor using the given maximal level.
-      template<class...  RangeSpecOverlap>
-      explicit BoxDivisionHoughTree(size_t maxLevel) :
-        m_maxLevel(maxLevel),
-        m_overlaps((divisions * 0) ...)
-      {}
+      template <class... RangeSpecOverlap>
+      explicit BoxDivisionHoughTree(int maxLevel, int sectorLevelSkip = 0)
+        : m_maxLevel(maxLevel)
+        , m_sectorLevelSkip(sectorLevelSkip)
+        , m_overlaps((divisions * 0)...)
+      {
+      }
 
     private:
       /// Type of the discrete value array to coordinate index I.
-      template<size_t I>
+      template <size_t I>
       using Array = typename Type<I>::Array;
 
       /// Tuple type of the discrete value arrays
@@ -78,125 +80,175 @@ namespace Belle2 {
 
     public:
       /// Getter the number of divisions at each level for coordinate index I.
-      size_t getDivision(const size_t i) const
-      { return m_divisions[i]; }
+      size_t getDivision(size_t i) const
+      {
+        return m_divisions[i];
+      }
 
       /**
        *  Construct the discrete value array at coordinate index I
+       *
+       *  This function is only applicable for discrete axes.
+       *  For continuous axes assignArray should be call with an array containing only the
+       *  lower and upper bound of the axes range and an optional overlap.
+       *
        *  @param lowerBound  Lower bound of the value range
        *  @param upperBound  Upper bound of the value range
-       *  @param overlap     Overlap of neighboring bins. Default is no overlap.
+       *  @param nBinOverlap Overlap of neighboring bins. Default is no overlap.
        *                     Usuallly this is counted in number of discrete values
-       *  @param width       Width of the bins at lowest level. Default is width of 1.
+       *  @param nBinWidth   Width of the bins at lowest level. Default is width of 1.
        *                     Usually this is counted in numbers of discrete values
        */
-      template<size_t I>
-      void constructArray(const double lowerBound,
-                          const double upperBound,
-                          const Width<I>& overlap = 0,
-                          Width<I> width = 0)
+      template <size_t I>
+      void constructArray(double lowerBound,
+                          double upperBound,
+                          Width<I> nBinOverlap = 0,
+                          Width<I> nBinWidth = 0)
       {
+        static_assert(std::is_integral<Width<I> >::value, "Method only applicable to discrete axes");
         const size_t division = getDivision(I);
-        const size_t nBins = std::pow(division, m_maxLevel);
+        const int granularityLevel = m_maxLevel + m_sectorLevelSkip;
+        const size_t nBins = std::pow(division, granularityLevel);
 
-        if (width == 0) {
-          width = overlap + 1;
+        if (nBinWidth == 0) {
+          nBinWidth = nBinOverlap + 1;
         }
-        B2ASSERT("Width " << width << "is not bigger than overlap " << overlap, overlap < width);
 
-        const auto nPositions = (width - overlap) * nBins + overlap + 1;
+        B2ASSERT("Width " << nBinWidth << "is not bigger than overlap " << nBinOverlap,
+                 nBinOverlap < nBinWidth);
+
+        const auto nPositions = (nBinWidth - nBinOverlap) * nBins + nBinOverlap + 1;
         std::get<I>(m_arrays) = linspace<float>(lowerBound, upperBound, nPositions);
-        std::get<I>(m_overlaps) = overlap;
-
-        const Array<I>& array  = std::get<I>(m_arrays);
-
-        B2INFO("Constructing array for coordinate " << I);
-        B2INFO("Lower value " << array.front());
-        B2INFO("Upper value " << array.back());
+        std::get<I>(m_overlaps) = nBinOverlap;
       }
 
       /// Provide an externally constructed array by coordinate index
-      template<size_t I>
-      void
-      assignArray(Array<I> array, Width<I> overlap)
+      template <size_t I>
+      void assignArray(Array<I> array, Width<I> overlap = 0)
       {
-        // Double move assignment idiom
         std::get<I>(m_arrays) = std::move(array);
         std::get<I>(m_overlaps) = overlap;
+
+        // In case of a discrete axes, check whether the size of the array is sensible
+        // such that the bin width at the highest granularity level is a whole number given the overlap.
+        if (std::is_integral<Width<I> >::value) {
+          const int division = getDivision(I);
+          const int granularityLevel = m_maxLevel + m_sectorLevelSkip;
+          const long int nBins = std::pow(division, granularityLevel);
+          const long int nPositions = std::get<I>(m_arrays).size();
+          const long int nWidthTimeNBins = nPositions - 1 + (nBins - 1) * overlap;
+
+          B2ASSERT("Not enough positions in array to cover all bins.\n"
+                   "Expected: positions = " << nBins - (nBins - 1) * overlap + 1 << " at least.\n"
+                   "Actual:   positions = " << nPositions << " (overlap = " << overlap << ", bins = " << nBins << ")\n",
+                   nWidthTimeNBins >= nBins);
+
+          B2ASSERT("Number of positions in array introduces inhomogeneous width at the highest granularity level.\n"
+                   "Expected: positions = 'width * bins - (bins - 1) * overlap + 1'\n"
+                   "Actual:   positions = " << nPositions << " (overlap = " << overlap << ", bins = " << nBins << ")\n",
+                   nWidthTimeNBins % nBins == 0);
+        }
       }
 
       /// Provide an externally constructed array by coordinate type
-      template<class T>
+      template <class T>
       EnableIf< HasType<T>::value, void>
-      assignArray(Array<TypeIndex<T>::value > array, Width<TypeIndex<T>::value > overlap)
+      assignArray(Array<TypeIndex<T>::value > array, Width<TypeIndex<T>::value > overlap = 0)
       {
-        // Double move assignment idiom
-        // Double move assignment idiom
-        std::get<TypeIndex<T>::value >(m_arrays) = std::move(array);
-        std::get<TypeIndex<T>::value >(m_overlaps) = overlap;
-
+        assignArray<TypeIndex<T>::value>(std::move(array), overlap);
       }
 
     public:
       /// Initialise the algorithm by constructing the hough tree from the parameters
-      virtual void initialize()
+      void initialize()
       {
         // Compose the hough space
         HoughBox houghPlane = constructHoughPlane();
-        BoxDivision boxDivision(m_overlaps);
+        BoxDivision boxDivision(m_overlaps, m_sectorLevelSkip);
         m_houghTree.reset(new HoughTree(std::move(houghPlane), std::move(boxDivision)));
       }
 
       /// Prepare the leave finding by filling the top node with given hits
-      template<class AItemPtrs>
+      template <class AItemPtrs>
       void seed(const AItemPtrs& items)
       {
-        if (not m_houghTree) { initialize(); }
+        if (not m_houghTree) initialize();
         m_houghTree->seed(items);
       }
 
       /// Terminates the processing by striping all hit information from the tree
-      virtual void fell()
-      { m_houghTree->fell(); }
+      void fell()
+      {
+        m_houghTree->fell();
+      }
 
       /// Release all memory that the tree aquired during the runs.
-      virtual void raze()
-      { m_houghTree->raze(); }
+      void raze()
+      {
+        m_houghTree->raze();
+      }
 
     public:
       /// Getter for the tree used in the search in the hough plane.
       HoughTree* getTree() const
-      { return m_houghTree.get(); }
+      {
+        return m_houghTree.get();
+      }
 
       /// Getter for the currently set maximal level
-      size_t getMaxLevel() const
-      { return m_maxLevel; }
+      int getMaxLevel() const
+      {
+        return m_maxLevel;
+      }
 
       /// Setter maximal level of the hough tree.
-      void setMaxLevel(size_t maxLevel)
-      { m_maxLevel = maxLevel; }
+      void setMaxLevel(int maxLevel)
+      {
+        m_maxLevel = maxLevel;
+      }
+
+      /// Getter for number of levels to skip in first level to form a finer sectored hough space.
+      int getSectorLevelSkip() const
+      {
+        return m_sectorLevelSkip;
+      }
+
+      /// Setter for number of levels to skip in first level to form a finer sectored hough space.
+      void setSectorLevelSkip(int sectorLevelSkip)
+      {
+        m_sectorLevelSkip = sectorLevelSkip;
+      }
 
       /// Getter for the array of discrete value for coordinate I.
-      template<size_t I>
+      template <size_t I>
       const Array<I>& getArray() const
-      { return std::get<I>(m_arrays); }
+      {
+        return std::get<I>(m_arrays);
+      }
 
     private:
       /// Construct the box of the top node of the tree. Implementation unroling the indices.
-      template<size_t ... Is>
-      HoughBox constructHoughPlaneImpl(const IndexSequence<Is...>&)
-      { return HoughBox(Type<Is>::getRange(std::get<Is>(m_arrays))...); }
+      template <size_t... Is>
+      HoughBox constructHoughPlaneImpl(const IndexSequence<Is...>& is __attribute__((unused)))
+      {
+        return HoughBox(Type<Is>::getRange(std::get<Is>(m_arrays))...);
+      }
 
       /// Construct the box of the top node of the tree.
       HoughBox constructHoughPlane()
-      { return constructHoughPlaneImpl(GenIndices<sizeof ...(divisions)>()); }
+      {
+        return constructHoughPlaneImpl(GenIndices<sizeof...(divisions)>());
+      }
 
     private:
       /// Number of the maximum tree level.
-      size_t m_maxLevel;
+      int m_maxLevel;
+
+      /// Number of levels to skip in first level to form a finer sectored hough space.
+      int m_sectorLevelSkip;
 
       /// Array of the number of divisions at each level
-      const std::array<size_t, sizeof ...(divisions)> m_divisions{{divisions ...}};
+      const std::array<size_t, sizeof ...(divisions)> m_divisions = {{divisions ...}};
 
       /// An tuple of division overlaps in each coordinate.
       typename HoughBox::Delta m_overlaps;
@@ -205,7 +257,7 @@ namespace Belle2 {
       Arrays m_arrays;
 
       /// Dynamic hough tree structure traversed in the leaf search.
-      std::unique_ptr<HoughTree> m_houghTree{nullptr};
+      std::unique_ptr<HoughTree> m_houghTree = nullptr;
     };
   }
 }

@@ -9,19 +9,18 @@
  *******************************************************************************/
 
 #include <iostream>
-#include "tracking/trackFindingVXD/twoHitFilters/Distance1DZ.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance1DZTemp.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance3DNormed.h"
-#include "tracking/trackFindingVXD/twoHitFilters/SlopeRZ.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance1DZSquared.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance2DXYSquared.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance3DSquared.h"
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance1DZ.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DNormed.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/SlopeRZ.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance1DZSquared.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance2DXYSquared.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DSquared.h>
 
 
-#include "tracking/trackFindingVXD/filterTools/Shortcuts.h"
-#include "tracking/trackFindingVXD/filterTools/Observer.h"
+#include <tracking/trackFindingVXD/filterMap/filterFramework/Shortcuts.h>
+#include <tracking/trackFindingVXD/filterMap/filterFramework/Observer.h>
 
-#include "tracking/trackFindingVXD/sectorMapTools/SectorMap.h"
+#include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
 #include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
 #include "tracking/modules/vxdtfRedesign/SectorMapBootstrapModule.h"
 #include "tracking/vxdCaTracking/PassData.h"
@@ -32,6 +31,9 @@
 #include "framework/datastore/StoreObjPtr.h"
 
 #include <tracking/spacePointCreation/SpacePoint.h>
+
+#include <vxd/geometry/GeoCache.h>
+#include <vxd/geometry/SensorInfoBase.h>
 
 #include <TString.h>
 #include <TFile.h>
@@ -50,18 +52,37 @@ SectorMapBootstrapModule::SectorMapBootstrapModule() : Module()
 {
   setDescription("Create the VXDTF SectorMap for the following modules."
                 );
+
+  addParam("SectorMapsInputFile", m_sectorMapsInputFile,
+           "File from which the SectorMaps will be retrieved if\
+ ReadSectorMap is set to true", m_sectorMapsInputFile);
+
+  addParam("SectorMapsOutputFile", m_sectorMapsOutputFile,
+           "File into which the SectorMaps will be written if\
+ WriteSectorMap is set to true", m_sectorMapsOutputFile);
+
+  addParam("ReadSectorMap", m_readSectorMap, "If set to true \
+retrieve the SectorMaps from SectorMapsInputFile during initialize.", m_readSectorMap);
+
+  addParam("WriteSectorMap", m_writeSectorMap, "If set to true \
+at endRun write the SectorMaps to SectorMapsOutputFile.", m_writeSectorMap);
+
+
 }
 
 void
 SectorMapBootstrapModule::initialize()
 {
-  StoreObjPtr< SectorMap<SpacePoint> > sectorMap("", DataStore::c_Persistent);
-  sectorMap.registerInDataStore(DataStore::c_DontWriteOut);
-  sectorMap.create();
-  bootstrapSectorMap();
+
+  if (m_readSectorMap)
+    retrieveSectorMap();
+  else
+    bootstrapSectorMap();
+
+  //This file is used by the observers, at present it is created by default.
   m_tfile = new TFile("observeTheSecMap.root", "RECREATE");
   m_tfile->cd();
-  TTree* newTree = new TTree("twoHitTree", "reallyWeWantToHaveThatTTreeNow");
+  TTree* newTree = new TTree("twoHitsTree", "Observers");
 
   // take care of two-hit-filters:
 //   auto outerHit = new SpacePoint();
@@ -88,8 +109,8 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
 {
 
 
-  // TO DO: Most of these informations are not used at all.
-  //        It seems to me (EP) that onlue the SectorDividers are used.
+  // TODO: Most of these informations are not used at all.
+  //        It seems to me (EP) that only the SectorDividers are used.
 
   SectorMapConfig config1;
 //   config1.pTmin = 0.02;
@@ -114,7 +135,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1.vIP = B2Vector3D(0, 0, 0);
   config1.secMapName = "lowTestRedesign";
   config1.twoHitFilters = { "Distance3DSquared", "Distance2DXYSquared", "Distance1DZ", "SlopeRZ", "Distance3DNormed"};
-  config1.threeHitFilters = { "Angle3DSimple", "AngleXYSimple", "AngleRZSimple", "CircleDist2IP", "DeltaSlopeRZ", "DeltaSlopeZoverS", "DeltaSoverZ", "HelixParameterFit", "Pt", "CircleRadius"};
+  config1.threeHitFilters = { "Angle3DSimple", "CosAngleXY", "AngleRZSimple", "CircleDist2IP", "DeltaSlopeRZ", "DeltaSlopeZoverS", "DeltaSoverZ", "HelixParameterFit", "Pt", "CircleRadius"};
   config1.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
   config1.mField = 1.5;
   config1.rarenessThreshold = 0.; //0.001;
@@ -197,27 +218,50 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   }
 
   bootstrapSectorMap(config4);
+
+
+  SectorMapConfig configTB;
+  configTB.pTmin = 1.0; // minimal relevant version
+  configTB.pTmax = 8.0; // minimal relevant version // Feb18-onePass-Test
+  configTB.pTSmear = 0.;
+  configTB.allowedLayers = {0, 3, 4, 5, 6};
+  configTB.uSectorDivider = { .3, .7, 1.}; // standard relevant version
+  configTB.vSectorDivider = { .3, .7, 1.}; // standard relevant version
+  configTB.pdgCodesAllowed = { -11, 11};
+  configTB.seedMaxDist2IPXY = 23.5;
+  configTB.seedMaxDist2IPZ = 23.5;
+  configTB.nHitsMin = 3;
+  configTB.vIP = B2Vector3D(-100, 0, 0); // should be the same as for the MC generation!
+  configTB.secMapName = "testbeamTEST";
+  configTB.twoHitFilters = { "Distance3DSquared", "Distance2DXYSquared", "Distance1DZ", "SlopeRZ", "Distance3DNormed"};
+  configTB.threeHitFilters = { "Angle3DSimple", "CosAngleXY", "AngleRZSimple", "CircleDist2IP", "DeltaSlopeRZ", "DeltaSlopeZoverS", "DeltaSoverZ", "HelixParameterFit", "Pt", "CircleRadius"};
+  configTB.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
+  configTB.mField = 1.;
+  configTB.rarenessThreshold = 0.; //0.001;
+  configTB.quantiles = {0., 1.};  //{0.005, 1. - 0.005};
+  // TODO: still missing: minimal sample-size, quantiles for smaller samplesizes, threshshold small <-> big sampleSize.
+  bootstrapSectorMap(configTB);
+
+
+
 }
 
 void
 SectorMapBootstrapModule::endRun()
 {
-  persistSectorMap();
+  if (m_writeSectorMap)
+    persistSectorMap();
 }
 
 void
 SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
 {
 
-  StoreObjPtr< SectorMap<SpacePoint> > newSectorMap("", DataStore::c_Persistent);
   VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
   segmentFilters->setConfig(config);
 
   // TO DO: All these informations must be retrieved from the geometry
   CompactSecIDs compactSecIds;
-  vector<int> layers  = { 1, 2, 3, 4, 5, 6};
-  vector<int> ladders = { 8, 12, 7, 10, 12, 16};
-  vector<int> sensors = { 2, 2, 2, 3, 4, 5};
 
   vector< double > uDividersMinusLastOne = config.uSectorDivider;
   uDividersMinusLastOne.pop_back();
@@ -232,26 +276,34 @@ SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
   unsigned nSectorsInU = config.uSectorDivider.size(),
            nSectorsInV = config.vSectorDivider.size();
 
+  // retrieve the full list of sensors from the geometry
+  VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
+  std::vector<VxdID> listOfSensors = geometry.getListOfSensors();
+  for (VxdID aSensorId : listOfSensors) {
 
-  for (auto layer : layers)
-    for (int ladder = 1 ; ladder <= ladders.at(layer - 1) ; ladder++) {
-      for (int sensor = 1 ; sensor <=  sensors.at(layer - 1) ; sensor++) {
-        int counter = 0;
-        for (unsigned int i = 0; i < nSectorsInU; i++) {
-          sectors.at(i).resize(nSectorsInV);
-          for (unsigned int j = 0; j < nSectorsInV ; j++) {
-            sectors.at(i).at(j) = FullSecID(VxdID(layer, ladder , sensor),
-                                            false, counter);
-            counter ++;
-          }
-        }
-        segmentFilters->addSectorsOnSensor(uDividersMinusLastOne ,
-                                           vDividersMinusLastOne,
-                                           sectors) ;
-      }
+    // for testbeams there might be other sensors in the geometry so filter for SVD and PXD only, as the CompactSecID dont like those!
+    VXD::SensorInfoBase::SensorType type = geometry.getSensorInfo(aSensorId).getType();
+    if (type != VXD::SensorInfoBase::SVD && type != VXD::SensorInfoBase::PXD) {
+      B2WARNING("Found sensor which is not PXD or SVD with VxdID: " << aSensorId << " ! Will skip that sensor ");
+      continue;
     }
 
-  newSectorMap->assignFilters(config.secMapName, segmentFilters);
+    int counter = 0;
+    for (unsigned int i = 0; i < nSectorsInU; i++) {
+      sectors.at(i).resize(nSectorsInV);
+      for (unsigned int j = 0; j < nSectorsInV ; j++) {
+        sectors.at(i).at(j) = FullSecID(aSensorId, false, counter);
+        counter ++;
+      }
+    }
+    segmentFilters->addSectorsOnSensor(uDividersMinusLastOne ,
+                                       vDividersMinusLastOne,
+                                       sectors) ;
+  }//end loop over sensors
+
+
+  // put config into the container
+  FiltersContainer<SpacePoint>::getInstance().assignFilters(config.secMapName, segmentFilters);
 
 }
 
@@ -261,9 +313,8 @@ void
 SectorMapBootstrapModule::persistSectorMap(void)
 {
 
-  StoreObjPtr< SectorMap<SpacePoint> > theSectorMap("", DataStore::c_Persistent);
-  const char* rootFileName = "testSectorMap.root";
-  TFile rootFile(rootFileName , "RECREATE");
+
+  TFile rootFile(m_sectorMapsOutputFile.c_str() , "RECREATE");
 
   TTree* tree = new TTree(c_setupKeyNameTTreeName.c_str(),
                           c_setupKeyNameTTreeName.c_str());
@@ -273,7 +324,7 @@ SectorMapBootstrapModule::persistSectorMap(void)
   tree->Branch(c_setupKeyNameBranchName.c_str(),
                & setupKeyName);
 
-  auto allSetupsFilters = theSectorMap->getAllSetups();
+  auto allSetupsFilters = FiltersContainer<SpacePoint>::getInstance().getAllSetups();
   for (auto singleSetupFilters : allSetupsFilters) {
 
     setupKeyName = TString(singleSetupFilters.first.c_str());
@@ -292,18 +343,16 @@ SectorMapBootstrapModule::persistSectorMap(void)
   rootFile.Write();
   rootFile.Close();
 
-  retrieveSectorMap();
+
 }
 
 
-/// Persist the whole sector map on a root file
+/// Retrieve the whole sector map from a root file
 void
 SectorMapBootstrapModule::retrieveSectorMap(void)
 {
 
-  StoreObjPtr< SectorMap<SpacePoint> > theSectorMap("", DataStore::c_Persistent);
-  const char* rootFileName = "testSectorMap.root";
-  TFile rootFile(rootFileName);
+  TFile rootFile(m_sectorMapsInputFile.c_str());
 
   TTree* tree ;
   rootFile.GetObject(c_setupKeyNameTTreeName.c_str(), tree);
@@ -312,17 +361,18 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
   tree->SetBranchAddress(c_setupKeyNameBranchName.c_str(),
                          & setupKeyName);
 
+  FiltersContainer<SpacePoint>& filtersContainer = FiltersContainer<SpacePoint>::getInstance();
   auto nEntries = tree->GetEntriesFast();
   for (int i = 0;  i < nEntries ; i++) {
     tree->GetEntry(i);
     rootFile.cd(setupKeyName->Data());
 
     VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
-    segmentFilters->retrieveFromRootFile();
 
     string setupKeyNameStd = string(setupKeyName->Data());
+    segmentFilters->retrieveFromRootFile(setupKeyName);
 
-    theSectorMap->assignFilters(setupKeyNameStd, segmentFilters);
+    filtersContainer.assignFilters(setupKeyNameStd, segmentFilters);
 
     rootFile.cd("..");
 

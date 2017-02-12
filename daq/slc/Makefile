@@ -43,6 +43,7 @@ copyinc:
 	@ make -C extra/ttrx 
 	@ mkdir -p include/ecldaq
 	@ make -C extra/ecldaq 
+	@ ln -sf $(PGSQL_INC_PATH) include/pgsql
 
 $(SUBPACKAGES): %:
 	@ make -f Makefile.src TARGET=$@ NOT_USE_PSQL=$(NOT_USE_PSQL)

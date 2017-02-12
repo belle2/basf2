@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
-#include <tracking/trackFindingCDC/ca/Relation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
@@ -19,6 +19,8 @@
 
 #include <tracking/trackFindingCDC/utilities/Range.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
+#include <framework/core/ModuleParamList.h>
 
 #include <vector>
 #include <map>
@@ -42,9 +44,13 @@ namespace Belle2 {
      */
     class BridgingWireHitRelationFilter : public Filter<Relation<const CDCWireHit> > {
 
+    private:
+      /// Type of the base class
+      using Super = Filter<Relation<const CDCWireHit> >;
+
     public:
       /// Expose the set of parameters of the filter to the module parameter list.
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
         moduleParamList->addParameter(prefixed(prefix, "missingPrimaryNeighborThresholds"),
                                       m_param_missingPrimaryNeighborThresholdMap,
@@ -55,8 +61,9 @@ namespace Belle2 {
                                      );
       }
 
-      virtual void initialize() override
+      void initialize() override
       {
+        Super::initialize();
         for (short oClockDirection = 0; oClockDirection < 12; oClockDirection++) {
           m_missingPrimaryNeighborThresholds[oClockDirection] = 3;
           if (m_param_missingPrimaryNeighborThresholdMap.count(oClockDirection)) {
@@ -103,7 +110,7 @@ namespace Belle2 {
           const CDCWire* neighborWire = wireAndOClockDirection.first;
           int oClockDirection = wireAndOClockDirection.second;
 
-          Range<ACDCWireHitIterator> wireHitRange = std::equal_range(itBegin, itEnd, *neighborWire);
+          Range<ACDCWireHitIterator> wireHitRange{std::equal_range(itBegin, itEnd, *neighborWire)};
           if (wireHitRange.empty()) {
             int ccwOClockDirection = oClockDirection - 1;
             int cwOClockDirection = oClockDirection == 11 ? 0 : oClockDirection + 1;
@@ -132,7 +139,7 @@ namespace Belle2 {
 
         for (std::pair<const CDCWire*, int> wireAndOClockDirection : wireNeighbors) {
           const CDCWire* neighborWire = wireAndOClockDirection.first;
-          Range<ACDCWireHitIterator> wireHitRange = std::equal_range(itBegin, itEnd, *neighborWire);
+          Range<ACDCWireHitIterator> wireHitRange{std::equal_range(itBegin, itEnd, *neighborWire)};
           wireHitNeighbors.insert(wireHitNeighbors.end(),
                                   wireHitRange.begin(),
                                   wireHitRange.end());
@@ -152,10 +159,9 @@ namespace Belle2 {
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.
        */
-      inline Weight operator()(const Relation<const CDCWireHit>& relation) override final
-      {
-        const CDCWireHit* ptrFrom(relation.first);
-        const CDCWireHit* ptrTo(relation.second);
+      Weight operator()(const Relation<const CDCWireHit>& relation) final {
+        const CDCWireHit * ptrFrom(relation.first);
+        const CDCWireHit * ptrTo(relation.second);
         if (not ptrFrom or not ptrTo) return NAN;
         return 0;
       }
@@ -170,8 +176,6 @@ namespace Belle2 {
 
       /// Indices of the considered o'clock positions of the secondary neighborhood.
       std::vector<short> m_consideredSecondaryNeighbors;
-
-    }; // end class
-
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

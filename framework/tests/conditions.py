@@ -32,33 +32,75 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
     a payloadfile. It will return different payloads for the experiments to
     check for different error conditions"""
 
-    #: xml string containing information for one payload
-    example_payload = """
-        <currentPayloadIovs><currentPayloadIov>
-        <payload payloadId="1">
-            <checksum>{checksum}</checksum>
-            <payloadUrl>dbstore_BeamParameters_rev_{revision}.root</payloadUrl>
-            <basf2Module><name>BeamParameters</name><basf2Package><name>dbstore</name></basf2Package></basf2Module>
-        </payload><payloadIov>
-            <initialRunId><name>{{exp}}</name><experiment><name>{{run}}</name></experiment></initialRunId>
-            <finalRunId><name>{{exp}}</name><experiment><name>{{run}}</name></experiment></finalRunId>
-        </payloadIov>
-        </currentPayloadIov></currentPayloadIovs>"""
+    #: json string containing information for one payload, old api
+    example_payload_v1 = """[{{
+        "payload": {{
+            "payloadId":1,
+            "checksum":"{checksum}",
+            "revision":{revision},
+            "payloadUrl":"dbstore_BeamParameters_rev_{revision}.root",
+            "basf2Module": {{ "name":"BeamParameters", "basf2Package": {{ "name":"dbstore" }} }}
+        }}, "payloadIov": {{
+            "initialRunId": {{ "name":"%(run)s", "experiment": {{ "name": "%(exp)s" }} }},
+            "finalRunId": {{ "name":"%(run)s", "experiment": {{ "name": "%(exp)s" }} }}
+        }}
+        }}]"""
+
+    #: json string containing information for one payload
+    example_payload = """[{{
+        "payload": {{
+            "baseUrl": "%(baseurl)s",
+            "payloadId":1,
+            "checksum":"{checksum}",
+            "revision":{revision},
+            "payloadUrl":"dbstore_BeamParameters_rev_{revision}.root",
+            "basf2Module": {{ "name":"BeamParameters", "basf2Package": {{ "name":"dbstore" }} }}
+        }}, "payloadIov": {{
+            "expStart": %(exp)s,
+            "expEnd": %(exp)s,
+            "runStart": %(run)s,
+            "runEnd": %(run)s
+        }}
+        }}]"""
 
     #: map payload information to be returned for different experiments
     payloads = {
         # let's start with empty information
-        "0": "<foo/>",
+        "0": "[]",
         # or one child but the wrong one
-        "1": "<currentPayloadIovs><foo/></currentPayloadIovs>",
+        "1": '[{ "foo": { } }]',
         # or let's have some invalid XML
-        "2": "<foo><ba",
+        "2": '[{ "foo',
         # let's provide one correct payload
         "3": example_payload.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="1"),
         # same payload but checksum mismatch
         "4": example_payload.format(checksum="[wrong checksum]", revision="1"),
         # non existing payload file
         "5": example_payload.format(checksum="missing", revision="2"),
+        # duplicate payload, or in this case triple
+        "6": example_payload.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="2")[:-1] + "," +
+             example_payload.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="1")[1:-1] + "," +
+             example_payload.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="3")[1:],
+    }
+
+    #: map payload information to be returned for different experiments, old api
+    payloads_v1 = {
+        # let's start with empty information
+        "0": "[]",
+        # or one child but the wrong one
+        "1": '[{ "foo": { } }]',
+        # or let's have some invalid XML
+        "2": '[{ "foo',
+        # let's provide one correct payload
+        "3": example_payload_v1.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="1"),
+        # same payload but checksum mismatch
+        "4": example_payload_v1.format(checksum="[wrong checksum]", revision="1"),
+        # non existing payload file
+        "5": example_payload_v1.format(checksum="missing", revision="2"),
+        # duplicate payload, or in this case triple
+        "6": example_payload_v1.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="2")[:-1] + "," +
+             example_payload_v1.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="1")[1:-1] + "," +
+             example_payload_v1.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="3")[1:],
     }
 
     def reply(self, xml):
@@ -80,14 +122,29 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
         url = urlparse(self.path)
         params = parse_qs(url.query)
         # return mock payload info
-        if url.path == "/iovPayloads/":
-            exp = params["expName"][0]
-            run = params["runName"][0]
-            if exp in self.payloads:
-                return self.reply(self.payloads[exp].format(exp=exp, run=run))
+        if url.path.endswith("/iovPayloads/"):
+            if "expName" in params:
+                exp = params["expName"][0]
+                run = params["runName"][0]
+            else:
+                exp = params["expNumber"][0]
+                run = params["runNumber"][0]
+
+            if url.path.startswith("/v2"):
+                if int(run) > 1:
+                    exp = None
+                payloads = self.payloads
+            else:
+                payloads = self.payloads_v1
+
+            if exp in payloads:
+                baseurl = "http://%s:%s" % self.server.socket.getsockname()
+                return self.reply(payloads[exp] % dict(exp=exp, run=run, baseurl=baseurl))
         else:
             # check if a fallback payload file exists in the data/framework directory
             filename = os.path.basename(url.path)
+            # replace rev_3 with rev_1
+            filename = filename.replace("rev_3", "rev_1")
             basedir = Belle2.FileSystem.findFile("data/framework")
             path = os.path.join(basedir, filename)
             if os.path.isfile(path):
@@ -105,8 +162,15 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
 def run_mockdb(pipe):
     """Startup the mock conditions db server and send the port we listen on back
     to the parent process"""
-    # listen on port 0 means we want to listen on any free port
-    httpd = HTTPServer(("127.0.0.1", 0), SimpleConditionsDB)
+    # listen on port 0 means we want to listen on any free port which would be
+    # nice. But since the new code prints the full url including port when there
+    # is a problem we choose a fixed one and hope that it it's free ...
+    try:
+        httpd = HTTPServer(("127.0.0.1", 12701), SimpleConditionsDB)
+    except OSError:
+        print("TEST SKIPPED: Socket 12701 is in use, cannot continue", file=sys.stderr)
+        pipe.send(None)
+        return
     # so see which port we actually got
     port = httpd.socket.getsockname()[1]
     # and send to parent
@@ -159,6 +223,9 @@ mock_conditionsdb.daemon = True
 mock_conditionsdb.start()
 # mock db has started when we recieve the port number from the child, so wait for that
 port = conn[0].recv()
+# if the port we got is None the server didn't start ... so bail
+if port is None:
+    sys.exit(1)
 # and remember host for database access
 host = "http://localhost:%d/" % port
 
@@ -170,17 +237,20 @@ main.add_module("PrintBeamParameters")
 
 # run trough a set of experiments, each time we want to process two runs to make
 # sure that it works correctly for more than one run
-for exp in range(7):
-    evtinfo.param({"expList": [exp, exp], "runList": [0, 1], "evtNumList": [1, 1]})
+for exp in range(len(SimpleConditionsDB.payloads) + 1):
+    evtinfo.param({"expList": [exp, exp, exp], "runList": [0, 1, 2], "evtNumList": [1, 1, 1]})
     dbprocess(host, main)
+
+# the following ones fail, no need for 3 times
+evtinfo.param({"expList": [0], "runList": [0], "evtNumList": [1]})
 
 # try to open localhost on port 0, this should always be refused
 dbprocess("http://localhost:0", main)
 
-# and once more with a non existing host name to check for routing errors
+# and once more with a non existing host name to check for lookup errors
 dbprocess("http://nosuchurl/", main)
 
-# and once more with a non exsiting protocol
+# and once more with a non existing protocol
 dbprocess("nosuchproto://nosuchurl/", main)
 
 # and once more with a totally bogus url

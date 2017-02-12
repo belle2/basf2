@@ -11,10 +11,12 @@
 
 #include "tracking/pxdDataReductionClasses/ROIGeometry.h"
 #include <framework/logging/Logger.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/RKTrackRep.h>
 #include <genfit/Track.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
+#include <tracking/pxdDataReductionClasses/ROIDetPlane.h>
 
 #include <set>
 
@@ -23,8 +25,6 @@ using namespace Belle2;
 
 ROIGeometry::ROIGeometry()
 {
-
-  fillPlaneList();
 
 }
 
@@ -35,62 +35,7 @@ ROIGeometry::~ROIGeometry()
 
 
 void
-ROIGeometry::appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled,
-                              genfit::Track* theTrack, int theGFTrackIndex,
-                              RelationArray* gfTrackToPXDIntercepts)
-{
-
-  PXDIntercept tmpPXDIntercept;
-
-  std::list<ROIDetPlane>::iterator itPlanes = m_planeList.begin();
-
-  B2DEBUG(1, "appendIntercepts, checking " << m_planeList.size() << " planes");
-
-  double lambda = 0;
-
-  for (int propDir = -1; propDir <= 1; propDir += 2) {
-    theTrack->getCardinalRep()->setPropDir(propDir);
-
-    while (itPlanes != m_planeList.end()) {
-
-      genfit::MeasuredStateOnPlane state;
-
-      try {
-        state = theTrack->getFittedState();
-        genfit::SharedPlanePtr plane(new ROIDetPlane(*itPlanes)); // TODO: save copying
-        lambda = state.extrapolateToPlane(plane);
-      }  catch (...) {
-        B2WARNING("extrapolation failed");
-        ++itPlanes;
-        continue;
-      }
-
-      const TVectorD& predictedIntersect = state.getState();
-      const TMatrixDSym& covMatrix = state.getCov();
-
-      tmpPXDIntercept.setCoorU(predictedIntersect[3]);
-      tmpPXDIntercept.setCoorV(predictedIntersect[4]);
-      tmpPXDIntercept.setSigmaU(sqrt(covMatrix(3, 3)));
-      tmpPXDIntercept.setSigmaV(sqrt(covMatrix(4, 4)));
-      tmpPXDIntercept.setSigmaUprime(sqrt(covMatrix(1, 1)));
-      tmpPXDIntercept.setSigmaVprime(sqrt(covMatrix(2, 2)));
-      tmpPXDIntercept.setLambda(lambda);
-      tmpPXDIntercept.setVxdID(itPlanes->getSensorInfo());
-
-
-      listToBeFilled->appendNew(tmpPXDIntercept);
-
-      gfTrackToPXDIntercepts->add(theGFTrackIndex, listToBeFilled->getEntries() - 1);
-
-      ++itPlanes;
-
-    }
-  }
-
-};
-
-void
-ROIGeometry::fillPlaneList()
+ROIGeometry::fillPlaneList(double toleranceZ, double tolerancePhi)
 {
 
 
@@ -115,10 +60,10 @@ ROIGeometry::fillPlaneList()
       while (itPxdSensors != pxdSensors.end()) {
         B2DEBUG(1, "    pxd sensor info " << *itPxdSensors);
 
-        ROIDetPlane plane(*itPxdSensors);
+        ROIDetPlane plane(*itPxdSensors, toleranceZ, tolerancePhi);
+        genfit::SharedPlanePtr sharedPlane(new ROIDetPlane(plane));
+        plane.setSharedPlanePtr(sharedPlane);
 
-
-        plane.Print();
         m_planeList.push_back(plane);
 
         ++itPxdSensors;
@@ -128,4 +73,25 @@ ROIGeometry::fillPlaneList()
     ++itPxdLayers;
   }
 
+  B2DEBUG(1, "just filled the plane list with " << m_planeList.size() << "planes");
 };
+
+
+void
+ROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVector3 recoTrackPosition)
+{
+
+
+  std::list<ROIDetPlane>::iterator itPlanes = m_planeList.begin();
+
+  B2DEBUG(1, "append Planes, checking " << m_planeList.size() << " planes");
+
+  while (itPlanes != m_planeList.end()) {
+
+    if (itPlanes->isSensorInRange(recoTrackPosition))
+      selectedPlanes->push_back(*itPlanes);
+
+    itPlanes++;
+
+  }
+}

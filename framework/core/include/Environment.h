@@ -65,8 +65,27 @@ namespace Belle2 {
     /** Returns number of events in run 1 for EventInfoSetter module, or 0 for no override. */
     unsigned int getNumberEventsOverride() const { return m_numberEventsOverride; }
 
+    /** Override the number sequences (e.g. 23:42,101) defining the entries which are processed for each filename given in inputFilesOverride*/
+    void setEntrySequencesOverride(const std::vector<std::string>& sequences) { m_entrySequencesOverride = sequences; }
+
+    /** Returns the number sequences (e.g. 23:42,101) defining the entry which are processed for each filename given in inputFilesOverride*/
+    std::vector<std::string> getEntrySequencesOverride() const { return m_entrySequencesOverride; }
+
     /** Return the number of events, from either input or EventInfoSetter, or -n command line override (if less). */
     unsigned int getNumberOfEvents() const;
+
+    /** Override run and experiment for EventInfoSetter. */
+    void setRunExperimentOverride(int run, int experiment) { m_run = run; m_experiment = experiment; }
+
+    /** Get run override, or -1 if unset. */
+    int getRunOverride() const { return m_run; }
+    /** Get experiment override, or -1 if unset. */
+    int getExperimentOverride() const { return m_experiment; }
+
+    /** Set skipNEvents override */
+    void setSkipEventsOverride(unsigned int skipEvents) { m_skipNEvents = skipEvents; }
+    /** Get skipNEvents override, or 0 if unset. */
+    unsigned int getSkipEventsOverride() const { return m_skipNEvents; }
 
     /** Number of generated events (from EventInfoSetter). */
     unsigned int getNumberOfMCEvents() const { return m_mcEvents; }
@@ -186,6 +205,8 @@ namespace Belle2 {
     std::string m_steering;       /**< The content of the steering file. */
     unsigned int m_numberEventsOverride;   /**< Override number of events in the first run. */
     std::vector<std::string> m_inputFilesOverride; /**< Override input file names for input modules */
+    std::vector<std::string>
+    m_entrySequencesOverride; /**< A number sequence (e.g. 23:42,101) defining the entries which are processed for each input file in m_inputFilesOverride.*/
     std::string m_outputFileOverride; /**< Override name of output file for output module */
     int m_numberProcessesOverride; /**< Override m_numberProcesses if >= 0 */
     int m_logLevelOverride; /**< Override global log level if != LogConfig::c_Default. */
@@ -197,6 +218,9 @@ namespace Belle2 {
     std::string m_picklePath; /**< Path to the file where the pickled path is stored */
     std::vector<std::string> m_streamingObjects;  /**< objects to be streamed in Tx module (all if empty) */
     unsigned int m_mcEvents; /**< counter for number of generated events. */
+    int m_run; /**< override run for EventInfoSetter. */
+    int m_experiment; /**< override experiment for EventInfoSetter. */
+    unsigned int m_skipNEvents; /**< override skipNEvents for EventInfoSetter/RootInput. */
 
     /**
      *  Set up environment from standard BELLE2_ environment variables.

@@ -9,29 +9,27 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackTruthVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool SegmentTrackTruthVarSet::extract(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>* testPair)
+bool SegmentTrackTruthVarSet::extract(const std::pair<const CDCTrack*, const CDCSegment2D*>* testPair)
 {
-  bool extracted = extractNested(testPair);
-  if (not extracted or not testPair) return false;
+  if (not testPair) return false;
 
-  const CDCRecoSegment2D* segment = testPair->first;
-  const CDCTrack* track = testPair->second;
+  const CDCTrack* track = testPair->first;
+  const CDCSegment2D* segment = testPair->second;
 
   var<named("belongs_to_same_track_truth")>() = 0.0;
 
   const CDCMCHitLookUp& mcHitLookup =  CDCMCHitLookUp::getInstance();
 
   // Find the track with the highest number of hits in the segment
-  const CDCMCSegmentLookUp& mcSegmentLookup = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment2DLookUp& mcSegmentLookup = CDCMCSegment2DLookUp::getInstance();
   ITrackType segmentMCMatch = mcSegmentLookup.getMCTrackId(segment);
   if (segmentMCMatch == INVALID_ITRACK) {
     var<named("segment_is_fake_truth")>() = 1.0;
@@ -43,7 +41,7 @@ bool SegmentTrackTruthVarSet::extract(const std::pair<const CDCRecoSegment2D*, c
 
     double numberOfCorrectHits = 0;
     for (const CDCRecoHit3D& recoHit : *track) {
-      if (mcHitLookup.getMCTrackId(recoHit->getWireHit()->getHit()) == segmentMCMatch) {
+      if (mcHitLookup.getMCTrackId(recoHit.getWireHit().getHit()) == segmentMCMatch) {
         numberOfCorrectHits++;
       }
     }

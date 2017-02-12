@@ -62,17 +62,14 @@ namespace Belle2 {
        *  Construct a trajectory with given start point, transverse momentum at the start point,
        *  the given charge and the magnetic field value in z direction.
        */
-      CDCTrajectory2D(const Vector2D& startPoint,
-                      const double startTime,
-                      const Vector2D& startMomentum,
-                      const double charge,
-                      const double bZ);
+      CDCTrajectory2D(const Vector2D& pos2D,
+                      double time,
+                      const Vector2D& mom2D,
+                      double charge,
+                      double bZ);
 
       /// Construct a trajectory with given start point, transverse momentum at the start point and given charge.
-      CDCTrajectory2D(const Vector2D& startPoint,
-                      const double startTime,
-                      const Vector2D& startMomentum,
-                      const double charge);
+      CDCTrajectory2D(const Vector2D& pos2D, double time, const Vector2D& mom2D, double charge);
 
     public:
       /// Checks if the circle is already set to a valid value.
@@ -109,8 +106,7 @@ namespace Belle2 {
        *  stereo layer of the stereo wires.  The point is determined such that it is at the (signed)
        *  distance to  the wire line.
        */
-      Vector3D reconstruct3D(const WireLine& wireLine,
-                             const double distance = 0.0) const;
+      Vector3D reconstruct3D(const WireLine& wireLine, double distance = 0.0) const;
 
       /// Calculates the closest approach on the trajectory to the given point
       Vector2D getClosest(const Vector2D& point) const
@@ -133,13 +129,13 @@ namespace Belle2 {
        *  Indicates which superlayer is traversed after the current one following
        *  the trajectory forward or backward as indicated by the input.
        */
-      ISuperLayer getISuperLayerAfterStart(const EForwardBackward forwardBackwardInfo) const;
+      ISuperLayer getISuperLayerAfterStart(EForwardBackward forwardBackwardInfo) const;
 
       /**
        *  Indicates which axial superlayer is traversed after the one, where the start point of the trajectory is located considering
        *  if you want to follow the trajectory in the forward or backward direction.
        */
-      ISuperLayer getAxialISuperLayerAfterStart(const EForwardBackward forwardBackwardInfo) const;
+      ISuperLayer getAxialISuperLayerAfterStart(EForwardBackward forwardBackwardInfo) const;
 
     public:
       /// Indicates which superlayer the trajectory traverses after the one, where the start point of the trajectory is located.
@@ -250,13 +246,13 @@ namespace Belle2 {
 
     public:
       /// Setter for start point and momentum at the start point subjected to the charge sign.
-      void setPosMom2D(const Vector2D& pos2D, const Vector2D& mom2D, const double charge);
+      void setPosMom2D(const Vector2D& pos2D, const Vector2D& mom2D, double charge);
 
       /// Gets the charge sign of the trajectory
       ESign getChargeSign() const;
 
       /// Get the estimation for the absolute value of the transvers momentum
-      double getAbsMom2D(const double bZ) const;
+      double getAbsMom2D(double bZ) const;
 
       /// Get the estimation for the absolute value of the transvers momentum
       double getAbsMom2D() const;
@@ -293,6 +289,10 @@ namespace Belle2 {
       Vector2D getGlobalPerigee() const
       { return getLocalCircle()->closest(-m_localOrigin) + m_localOrigin; }
 
+      /// Getter for the center of the trajectory in global coordinates
+      Vector2D getGlobalCenter() const
+      { return getLocalCircle()->center() + m_localOrigin; }
+
       /**
        *  Calculates the point where the trajectory meets the outer wall of the CDC.
        *  This method returns the first point in forward flight direction from the start
@@ -321,6 +321,9 @@ namespace Belle2 {
 
       /// Checks if the trajectory leaves the outer radius of the CDC times the given tolerance factor
       bool isCurler(double factor = 1) const;
+
+      /// Checks if the trajectory intersects with the inner radius of the CDC time the given tolerance factor
+      bool isOriginer(double factor = 1) const;
 
       /// Getter for the maximal distance from the origin
       double getMaximalCylindricalR() const
@@ -391,7 +394,7 @@ namespace Belle2 {
       { return getLocalCircle().ndf(); }
 
       /// Setter for the number of degrees of freedom of the circle fit.
-      void setNDF(const size_t& ndf)
+      void setNDF(std::size_t ndf)
       { return m_localPerigeeCircle.setNDF(ndf); }
 
       /// Setter for the generalized circle that describes the trajectory.
@@ -446,7 +449,7 @@ namespace Belle2 {
       /// Memory for the estimation of the time at which the particle arrived at the support point
       double m_flightTime = NAN;
 
-    }; //class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

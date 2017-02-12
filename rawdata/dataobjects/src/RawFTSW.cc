@@ -10,8 +10,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(RawFTSW);
-
 RawFTSW::RawFTSW()
 {
   m_access = new RawFTSWFormat;

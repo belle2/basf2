@@ -21,7 +21,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class.
-      typedef Filter<CDCSegmentTriple> Super;
+      using Super = Filter<CDCSegmentTriple>;
 
     public:
       /**
@@ -30,7 +30,7 @@ namespace Belle2 {
        *  Returns NAN if the connection shall not be made or
        *  a finit value be used as the cell weight of the cell to constructed.
        */
-      virtual Weight operator()(const CDCSegmentTriple& triple) override final;
+      Weight operator()(const CDCSegmentTriple& segmentTriple) final;
 
     private:
       /// Returns the xy fitter instance that is used by this filter
@@ -47,7 +47,7 @@ namespace Belle2 {
 
       /// Memory of the Riemann fitter for the circle fits.
       CDCRiemannFitter m_riemannFitter;
-    }; // end class SimpleSegmentTripleFilter
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

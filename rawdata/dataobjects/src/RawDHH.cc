@@ -11,8 +11,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(RawDHH);
-
 RawDHH::RawDHH() : m_nwords(0), m_buffer(NULL)
 {
 }

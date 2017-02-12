@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'geometry', 'simulation', 'simulation_dataobjects', 'vxd_dbobjects',
-               'vxd_dataobjects', 'mdst_dataobjects', 'genfit2', '$ROOT_LIBS', '$GEANT4_LIBS']
+env['LIBS'] = ['framework', 'geometry', 'simulation', 'vxd_dbobjects',
+               'vxd_dataobjects', 'genfit2', '$ROOT_LIBS', '$GEANT4_LIBS']
 
 Return('env')

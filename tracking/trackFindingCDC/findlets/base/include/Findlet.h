@@ -9,19 +9,20 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/ProcessingSignalListener.h>
+#include <tracking/trackFindingCDC/utilities/CompositeProcessingSignalListener.h>
 
-#include <framework/core/ModuleParamList.h>
-#include <boost/range/adaptor/reversed.hpp>
 #include <vector>
 #include <tuple>
+#include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
 
     /// Interface for a minimal algorithm part that wants to expose some parameters to a module
     template<class ... AIOTypes>
-    class Findlet : public ProcessingSignalListener {
+    class Findlet : public CompositeProcessingSignalListener {
 
     public:
       /// Types that should be served to apply on invokation
@@ -32,14 +33,14 @@ namespace Belle2 {
       template<class T>
       struct ToVectorImpl {
         /// A mutable range of Ts.
-        using Type = std::vector<typename std::remove_reference<T>::type >;
+        using Type = std::vector<typename std::remove_reference<T>::type>;
       };
 
       /// Specialisation to only forward a range for immutable types.
       template<class T>
       struct ToVectorImpl<const T> {
         /// An immutable range of Ts.
-        using Type = const std::vector<T>;
+        using Type = const std::vector<typename std::remove_reference<T>::type>;
       };
 
       /// Short hand for ToRangeImpl
@@ -50,14 +51,8 @@ namespace Belle2 {
       /// Vector types that should be served to apply on invokation
       using IOVectors = std::tuple< std::vector<AIOTypes>... >;
 
-      /// Allow default constructin
-      Findlet() = default;
-
-      /// Disallow copies
-      Findlet(const Findlet&) = delete;
-
-      /// Disallow assignment
-      Findlet& operator= (const Findlet&) = delete;
+      /// Make destructor of interface virtual
+      virtual ~Findlet() = default;
 
     public:
       /// Brief description of the purpose of the concret findlet.
@@ -66,65 +61,14 @@ namespace Belle2 {
         return "(no description)";
       }
 
-      /** Forward prefixed parameters of this findlet to the module parameter list */
-      virtual void exposeParameters(ModuleParamList*, const std::string& = "")
+      /// Forward prefixed parameters of this findlet to the module parameter list
+      virtual void exposeParameters(ModuleParamList* moduleParamList __attribute__((unused)),
+                                    const std::string& prefix __attribute__((unused)))
       {
       }
 
       /// Main function executing the algorithm
-      virtual void apply(ToVector<AIOTypes>& ... ranges) = 0;
-
-      /// Register a processing signal listener that is contained in this findlet.
-      void addProcessingSignalListener(ProcessingSignalListener* psl)
-      { m_subordinaryProcessingSignalListeners.push_back(psl); }
-
-      /// Receive signal before the start of the event processing
-      virtual void initialize() override
-      {
-        for (ProcessingSignalListener* psl :  m_subordinaryProcessingSignalListeners) {
-          psl->initialize();
-        }
-      }
-
-      /// Receive signal for the beginning of a new run.
-      virtual void beginRun() override
-      {
-        for (ProcessingSignalListener* psl :  m_subordinaryProcessingSignalListeners) {
-          psl->beginRun();
-        }
-      }
-
-      /// Receive signal for the start of a new event.
-      virtual void beginEvent() override
-      {
-        for (ProcessingSignalListener* psl :  m_subordinaryProcessingSignalListeners) {
-          psl->beginEvent();
-        }
-      }
-
-      /// Receive signal for the end of the run.
-      virtual void endRun() override
-      {
-        using boost::adaptors::reverse;
-        for (ProcessingSignalListener* psl : reverse(m_subordinaryProcessingSignalListeners)) {
-          psl->endRun();
-        }
-      }
-
-      /// Receive Signal for termination of the event processing.
-      virtual void terminate() override
-      {
-        using boost::adaptors::reverse;
-        for (ProcessingSignalListener* psl : reverse(m_subordinaryProcessingSignalListeners)) {
-          psl->terminate();
-        }
-      }
-
-    private:
-      /// References to subordinary signal processing listener contained in this findlet.
-      std::vector<ProcessingSignalListener*> m_subordinaryProcessingSignalListeners;
-
+      virtual void apply(ToVector<AIOTypes>& ... ioVectors) = 0;
     };
-
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

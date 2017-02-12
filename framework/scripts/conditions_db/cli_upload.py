@@ -213,5 +213,5 @@ def command_upload(args, db=None):
                 failed += 1
 
     if failed > 0:
-        B2ERROR("Some payloads could not be uploaded")
+        B2ERROR("{} out of {} payloads could not be uploaded".format(failed, len(entries)))
         return 1

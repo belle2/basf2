@@ -130,5 +130,5 @@ def command_download(args, db=None):
             txtfile.writelines(sorted(dbfile))
 
     if failed > 0:
-        B2ERROR("Some payloads could not be downloaded")
+        B2ERROR("{} out of {} payloads could not be downloaded".format(failed, len(download_list)))
         return 1

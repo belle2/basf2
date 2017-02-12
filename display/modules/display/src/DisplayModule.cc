@@ -88,6 +88,7 @@ void DisplayModule::initialize()
   StoreArray<SVDCluster>::optional();
   StoreArray<CDCHit>::optional();
   StoreArray<ARICHHit>::optional();
+  StoreArray<TOPDigit>::optional();
   StoreArray<ROIid>::optional();
   StoreArray<RecoHitInformation::UsedPXDHit>::optional();
   StoreArray<RecoHitInformation::UsedSVDHit>::optional();
@@ -254,6 +255,8 @@ void DisplayModule::event()
 
       m_visualizer->addKLMCluster(&cluster);
     }
+
+    m_visualizer->addTOPDigits(StoreArray<TOPDigit>());
   }
 
   //all hits/tracks are added, finish visual representations

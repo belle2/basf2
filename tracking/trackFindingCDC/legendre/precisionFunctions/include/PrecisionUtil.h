@@ -9,6 +9,7 @@
 **************************************************************************/
 #pragma once
 
+#include <framework/logging/Logger.h>
 #include <functional>
 #include <cmath>
 

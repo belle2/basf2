@@ -96,24 +96,22 @@ bool TrackProcessor::checkTrackQuality(const CDCTrack& track)
 void TrackProcessor::assignNewHits(const std::vector<const CDCWireHit*>& allAxialWireHits,
                                    std::list<CDCTrack>& cdcTrackList)
 {
-  erase_remove_if(cdcTrackList, Size() == 0u);
-
+  // First release some hits
   for (CDCTrack& track : cdcTrackList) {
-    if (track.size() < 4) continue;
-
-    HitProcessor::assignNewHitsToTrack(track, allAxialWireHits);
-    TrackQualityTools::normalizeTrack(track);
-
-    std::vector<const CDCWireHit*> splittedHits = HitProcessor::splitBack2BackTrack(track);
-    TrackQualityTools::normalizeTrack(track);
-
-    addCandidateFromHitsWithPostprocessing(splittedHits, allAxialWireHits, cdcTrackList);
-
     HitProcessor::deleteHitsFarAwayFromTrajectory(track);
     TrackQualityTools::normalizeTrack(track);
   }
 
-  // TODO: HitProcessor::reassignHitsFromOtherTracks(cdcTrackList);
+  // Now add new ones
+  for (CDCTrack& track : cdcTrackList) {
+    if (track.size() < 4) continue;
+    HitProcessor::assignNewHitsToTrack(track, allAxialWireHits);
+    TrackQualityTools::normalizeTrack(track);
+
+    HitProcessor::splitBack2BackTrack(track);
+    TrackQualityTools::normalizeTrack(track);
+  }
+
   for (CDCTrack& cand : cdcTrackList) {
     cand.forwardTakenFlag();
   }

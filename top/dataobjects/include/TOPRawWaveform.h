@@ -248,7 +248,7 @@ namespace Belle2 {
     unsigned short m_flags = 0;         /**< event flags (bits 0:7) */
     unsigned short m_referenceASIC = 0; /**< reference ASIC window */
     unsigned short m_segmentASIC = 0;   /**< segment ASIC window (storage window) */
-    std::vector<unsigned short> m_windows;/** reference windows of ASIC waveform segments */
+    std::vector<unsigned short> m_windows; /**< storage windows of ASIC waveform segments */
     std::vector<short> m_data;  /**< waveform ADC values */
     unsigned m_electronicType = 0;      /**< electronic type (see ChannelMapper::EType) */
     std::string m_electronicName;   /**< electronic name */

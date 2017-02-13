@@ -69,12 +69,6 @@ bool TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<const C
 {
   TrackQualityTools::normalizeTrack(track);
 
-  HitProcessor::splitBack2BackTrack(track);
-  TrackQualityTools::normalizeTrack(track);
-  if (not checkTrackQuality(track)) {
-    return false;
-  }
-
   HitProcessor::deleteHitsFarAwayFromTrajectory(track);
   TrackQualityTools::normalizeTrack(track);
   if (not checkTrackQuality(track)) {
@@ -83,6 +77,12 @@ bool TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<const C
 
   HitProcessor::assignNewHitsToTrack(track, allAxialWireHits);
   TrackQualityTools::normalizeTrack(track);
+
+  HitProcessor::splitBack2BackTrack(track);
+  TrackQualityTools::normalizeTrack(track);
+  if (not checkTrackQuality(track)) {
+    return false;
+  }
 
   HitProcessor::unmaskHitsInTrack(track);
   return true;

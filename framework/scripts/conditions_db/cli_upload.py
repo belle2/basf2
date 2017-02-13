@@ -19,15 +19,34 @@ class LocalDatabaseEntry:
     """Class to keep information about an entry in the local database file"""
     def __init__(self, line, basedir):
         """Create new entry from line in database file"""
-        name, revision, iov = line.split()
-        name = name.split("/")
-        #: module name
-        self.module = name[1]
+        try:
+            name, revision, iov = line.split()
+        except ValueError:
+            raise ValueError("line must be of the form 'dbstore/<payloadname> <revision> "
+                             "<firstExp>,<firstRun>,<finalExp>,<finalRun>'")
+        try:
+            revision = int(revision)
+        except ValueError:
+            raise ValueError("revision must be an integer")
+
+        try:
+            #: module name
+            self.module = name.split("/")[1]
+        except IndexError:
+            raise ValueError("payload name must be of the form dbstore/<payloadname>")
+
+        try:
+            iov = [int(e) for e in iov.split(",")]
+        except ValueError:
+            raise ValueError("experiment and run numbers need to be integers")
+
+        if len(iov) != 4:
+            raise ValueError("IoV needs to be four values (firstExp,firstRun,finalExp,finalRun)")
+
         #: filename
-        self.filename = os.path.join(basedir, "{package}_{module}_rev_{revision}.root".format(
-            package="dbstore", module=self.module, revision=revision,
+        self.filename = os.path.join(basedir, "dbstore_{module}_rev_{revision}.root".format(
+            module=self.module, revision=revision,
         ))
-        iov = [int(e) for e in iov.split(",")]
         #: experiment/run of the first run
         self.firstRun = {"exp": iov[0], "run": iov[1]}
         #: experiment/run of the final run
@@ -69,6 +88,70 @@ class LocalDatabaseEntry:
         return hash(self.__id)
 
 
+def parse_database_file(filename, payload_dir=None, check_existing=True):
+    """
+    Parse a local database file
+
+    This is the python equivalent of LocalDatabase::readDatabase implemented in
+    python. Each line in in the file should be of the form
+
+    "dbstore/{payloadname} {revision} {firstExp},{firstRun},{finalExp},{finalRun}"
+
+    Comments can be started using "#", everything including this character to
+    the end of the line will be ignored.
+
+    :param filename: filename of the local database file to parse
+    :param payload_dir: diretories where the payloads should be. In case of None
+                        the directory of the database file will be used.
+    :param check_existing: if True check if the payloads actually exist where they
+                           should be
+    :returns: a list of LocalDatabaseEntry objects or None if there were any errors
+    """
+
+    # make sure the database file exists
+    if not os.path.exists(filename):
+        B2ERROR("Given database file does not exist")
+        return None
+
+    # set the directory if not given
+    if payload_dir is None:
+        payload_dir = os.path.dirname(filename)
+
+    # remember the list of errors before start of the function to see if we
+    # create any new ones
+    old_error_count = logging.log_stats[LogLevel.ERROR]
+    entries = []
+    with open(filename) as dbfile:
+        for lineno, line in enumerate(dbfile, 1):
+            # ignore comments
+            line = line.split("#", 1)[0].strip()
+            # and empty lines
+            if not line:
+                continue
+            # parse the line
+            try:
+                entry = LocalDatabaseEntry(line, payload_dir)
+            except ValueError as e:
+                B2ERROR("{filename}:{line} error: {error}".format(
+                    filename=filename, line=lineno, error=e
+                ))
+                continue
+
+            if check_existing and not os.path.exists(entry.filename):
+                B2ERROR("{filename}:{line} error: cannot find payload file {missing}".format(
+                    filename=filename, line=lineno, missing=entry.filename
+                ))
+                continue
+
+            entries.append(entry)
+
+    # ok, if we had any errors so far, exit
+    if logging.log_stats[LogLevel.ERROR] > old_error_count:
+        return None
+
+    return entries
+
+
 def command_upload(args, db=None):
     """
     Upload a local database to the conditions database.
@@ -102,43 +185,21 @@ def command_upload(args, db=None):
     for level in LogLevel.values.values():
         logging.set_info(level, LogInfo.LEVEL | LogInfo.MESSAGE | LogInfo.TIMESTAMP)
 
-    # need at least one worker thread
-    if args.nprocess <= 0:
-        B2WARNING("-j must be larger than zero, ignoring")
-        args.nprocess = 1
+    # first create a list of payloads
+    entries = parse_database_file(args.dbfile, args.dbdir)
+    if entries is None:
+        B2ERROR("Problems with database file, exiting")
+        return 1
 
-    B2INFO("Using %d simultaneous connections" % args.nprocess)
+    if not entries:
+        B2INFO("No payloads found in {}, exiting".format(args.dbfile))
+        return 0
 
-    # and get the id for the global tag
+    # time to get the id for the global tag
     tagId = db.get_globalTagInfo(args.tag)
     if tagId is None:
         return 1
     tagId = tagId["globalTagId"]
-
-    # make sure the database file exists
-    if not os.path.exists(args.dbfile):
-        B2FATAL("Given database file does not exist")
-
-    # and set the directory if not given on the command line
-    if args.dbdir is None:
-        args.dbdir = os.path.dirname(args.dbfile)
-
-    # first create a list of payloads and a set of all experiments we encountered
-    # also count the missing files
-    entries = []
-    missing = 0
-    with open(args.dbfile) as dbfile:
-        for line in dbfile:
-            entry = LocalDatabaseEntry(line, args.dbdir)
-            if not os.path.exists(entry.filename):
-                B2ERROR("Cannot find payload file %s" % entry.filename)
-                missing += 1
-            entries.append(entry)
-
-    # ok, we couldn't find all payload files, no need to continue
-    if missing > 0:
-        B2ERROR("Some payload files could not be found, exiting")
-        return 1
 
     # now we could have more than one payload with the same iov so let's go over
     # it again and remove duplicates but keep the last one for each

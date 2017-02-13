@@ -469,8 +469,7 @@ namespace Belle2 {
       }
 
       //Read the component cache from DB
-      for (const pair<const string, VXDGeoComponentPar>& nameAndComponent : parameters.getComponentMap()) {
-        const string& name = nameAndComponent.first;
+      for (const string& name : parameters.getComponentInsertOder()) {
         if (m_componentCache.find(name) != m_componentCache.end()) {
           // already created due to being a sub component of a previous
           // component. Seems fishy since the information of this component
@@ -479,7 +478,7 @@ namespace Belle2 {
           B2WARNING("Component " << name << " already created from previous subcomponents, should not be here");
           continue;
         }
-        const VXDGeoComponentPar& paramsComponent = nameAndComponent.second;
+        const VXDGeoComponentPar& paramsComponent = parameters.getComponent(name);
         VXDGeoComponent  c(
           paramsComponent.getMaterial(),
           paramsComponent.getColor(),

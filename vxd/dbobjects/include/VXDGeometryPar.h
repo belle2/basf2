@@ -81,6 +81,10 @@ namespace Belle2 {
     int getSensitiveChipID(std::string name) const;
     /** get sensitive chip id map */
     std::map<std::string, int>& getSensitiveChipIdMap() {return m_sensitiveIDCache;}
+    /** get component insert order */
+    const std::vector<std::string>& getComponentInsertOder() const {return m_componentInsertOrder;}
+    /** get component insert order */
+    std::vector<std::string>& getComponentInsertOder() {return m_componentInsertOrder;}
 
   private:
 
@@ -96,6 +100,8 @@ namespace Belle2 {
     std::vector<VXDHalfShellPar> m_halfShells;
     /** Cache of all previously created components */
     std::map<std::string, VXDGeoComponentPar> m_componentCache;
+    /** Vector remembering the order of insertions into component cache */
+    std::vector<std::string> m_componentInsertOrder;
     /** Map containing Information about all defined sensor types */
     std::map<std::string, VXDGeoSensorPar> m_sensorMap;
     /** Diamond radiation sensors */

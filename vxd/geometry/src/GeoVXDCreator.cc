@@ -958,6 +958,7 @@ namespace Belle2 {
         vxdGeometryPar.getSensitiveChipIdMap()[name] = chipID;
       }
       vxdGeometryPar.getComponentMap()[name] = c;
+      vxdGeometryPar.getComponentInsertOder().push_back(name);
     }
 
     void GeoVXDCreator::readLadder(int layer, GearDir components, VXDGeometryPar& geoparameters)

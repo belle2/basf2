@@ -43,12 +43,6 @@ namespace Belle2 {
       /** update given CDCRecoHit3D with given trajectory */
       static void updateRecoHit3D(CDCTrajectory2D& trajectory2D, CDCRecoHit3D& hit);
 
-      /** Hits reassignment */
-      static void reassignHitsFromOtherTracks(std::list<CDCTrack>& trackList);
-
-      /** Append unused hits to tracks */
-      static void appendUnusedHits(std::list<CDCTrack>& tracks, const std::vector<const CDCWireHit*>& axialWireHits);
-
       /** Delete all hits marked as bad (MASKED) in a track. Should be called after every hit reassignment. */
       static void deleteAllMarkedHits(CDCTrack& track);
 

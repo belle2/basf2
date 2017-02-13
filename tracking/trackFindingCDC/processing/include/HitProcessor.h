@@ -85,7 +85,7 @@ namespace Belle2 {
       /// Assign new hits to the track basing on the distance from the hit to the track.
       static void assignNewHitsToTrack(CDCTrack& track,
                                        const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                       double minimalDistance = 0.15);
+                                       double minimalDistance = 0.2);
 
       /// Searches for a break in the super layer chain and remove all hits that come after that
       static void removeHitsAfterSuperLayerBreak(CDCTrack& track);

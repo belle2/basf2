@@ -71,18 +71,6 @@ bool HitProcessor::isBack2BackTrack(CDCTrack& track)
   return false;
 }
 
-void HitProcessor::deleteAllMarkedHits(CDCTrack& track)
-{
-  auto hasMaskedFlag = [](const CDCRecoHit3D & hit) { return hit.getWireHit().getAutomatonCell().hasMaskedFlag(); };
-  boost::remove_erase_if(track, hasMaskedFlag);
-}
-
-void HitProcessor::deleteAllMarkedHits(std::vector<const CDCWireHit*>& wireHits)
-{
-  auto hasMaskedFlag = [](const CDCWireHit * hit) { return hit->getAutomatonCell().hasMaskedFlag(); };
-  boost::remove_erase_if(wireHits, hasMaskedFlag);
-}
-
 ESign HitProcessor::getMajorArmSign(const CDCTrack& track, const Vector2D& center)
 {
   int armSignVote = getArmSignVote(track, center);

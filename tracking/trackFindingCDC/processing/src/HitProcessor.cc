@@ -138,8 +138,9 @@ void HitProcessor::deleteHitsFarAwayFromTrajectory(CDCTrack& track, double maxim
   auto farFromTrajectory = [&trajectory2D, &maximumDistance](CDCRecoHit3D & recoHit3D) {
     Vector2D recoPos2D = recoHit3D.getRecoPos2D();
     if (fabs(trajectory2D.getDist2D(recoPos2D)) > maximumDistance) {
-      // This would be correct but worsens efficiency...
-      // recoHit3D->getWireHit().getAutomatonCell().setTakenFlag(false);
+      recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(false);
+      // This must be here as the deleted hits must not participate in the hough search again.
+      recoHit3D.getWireHit().getAutomatonCell().setMaskedFlag(true);
       return true;
     }
     return false;

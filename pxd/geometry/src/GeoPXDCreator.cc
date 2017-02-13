@@ -231,6 +231,7 @@ namespace Belle2 {
                                paramsSensor.getLength("width2", 0),
                                paramsSensor.getLength("length"),
                                paramsSensor.getLength("height"),
+                               paramsSensor.getAngle("angle", 0),
                                paramsSensor.getBool("@slanted", false)
                               );
         sensor.setActive(VXDGeoComponentPar(
@@ -470,6 +471,14 @@ namespace Belle2 {
       //Read the component cache from DB
       for (const pair<const string, VXDGeoComponentPar>& nameAndComponent : parameters.getComponentMap()) {
         const string& name = nameAndComponent.first;
+        if (m_componentCache.find(name) != m_componentCache.end()) {
+          // already created due to being a sub component of a previous
+          // component. Seems fishy since the information of this component
+          // is in the db at least twice so we could run into
+          // inconsistencies.
+          B2WARNING("Component " << name << " already created from previous subcomponents, should not be here");
+          continue;
+        }
         const VXDGeoComponentPar& paramsComponent = nameAndComponent.second;
         VXDGeoComponent  c(
           paramsComponent.getMaterial(),

@@ -128,33 +128,14 @@ void TrackProcessor::mergeAndFinalizeTracks(std::list<CDCTrack>& cdcTrackList,
   // if holes exsist then track is splitted
   for (CDCTrack& track : cdcTrackList) {
     if (track.size() < 4) continue;
-
     HitProcessor::removeHitsAfterSuperLayerBreak(track);
-    HitProcessor::splitBack2BackTrack(track);
-
     TrackQualityTools::normalizeTrack(track);
-    std::vector<const CDCWireHit*> hitsToSplit;
-
-    for (CDCRecoHit3D& hit : track) {
-      if (hit.getWireHit().getAutomatonCell().hasMaskedFlag()) {
-        hitsToSplit.push_back(&(hit.getWireHit()));
-      }
-    }
-
-    HitProcessor::deleteAllMarkedHits(track);
-
-    for (const CDCWireHit* hit : hitsToSplit) {
-      hit->getAutomatonCell().setMaskedFlag(false);
-      hit->getAutomatonCell().setTakenFlag(false);
-    }
-
-    TrackProcessor::addCandidateFromHitsWithPostprocessing(hitsToSplit, allAxialWireHits, cdcTrackList);
   }
 
   // Update tracks before storing to DataStore
   for (CDCTrack& track : cdcTrackList) {
     TrackQualityTools::normalizeTrack(track);
-  };
+  }
 
   // Remove bad tracks
   TrackProcessor::deleteTracksWithLowFitProbability(cdcTrackList);

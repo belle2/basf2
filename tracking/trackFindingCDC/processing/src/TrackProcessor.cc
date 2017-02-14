@@ -40,7 +40,7 @@ void TrackProcessor::addCandidateFromHitsWithPostprocessing(const std::vector<co
   // Reconstruct and add hits
   for (const CDCWireHit* wireHit : foundAxialWireHits) {
     AutomatonCell& automatonCell = wireHit->getAutomatonCell();
-    if (automatonCell.hasTakenFlag() or automatonCell.hasMaskedFlag()) continue;
+    if (automatonCell.hasTakenFlag()) continue;
 
     CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstructNearest(wireHit, trajectory2D);
     track.push_back(std::move(recoHit3D));

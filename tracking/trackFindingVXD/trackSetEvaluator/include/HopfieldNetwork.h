@@ -37,9 +37,23 @@ namespace Belle2 {
    */
   class HopfieldNetwork {
   public:
-    HopfieldNetwork(): m_omega(0.5) //InitializerList
+    /** Constructor taking parameters for the algorithm.
+     *
+     *  @param omega  Should be between 0 and 1; small values lead to large number of nodes, large ones to large sums of quality indicators.
+     *  @param T      Temperature for annealing.
+     *  @param Tmin   Minimal reached temperature in the annealing scheme.
+     *  @param cmax   Maximum change of weights between iterations, so we accept the network as converged.
+     */
+    HopfieldNetwork(float omega = 0.5, float T = 3.1, float Tmin = 0.1, float cmax = 0.01):
+      m_omega(omega), m_T(T), m_Tmin(Tmin), m_cmax(cmax)
     {}
 
+    /** Performance of the actual algorithm.
+     *
+     *  Currently this algorithm can only be used once for each instance,
+     *  as the algorithm parameter variables are changed during the performance.
+     *  @sa OverlapResolverNodeInfo
+     */
     bool doHopfield(std::vector<OverlapResolverNodeInfo>& overlapResolverNodeInfos)
     {
       //Start value for neurons if they are compatible.
@@ -74,8 +88,6 @@ namespace Belle2 {
 
       //Store for results from last round:
       TMatrixD xMatrixOld(1, overlapResolverNodeInfos.size());
-      //Just to determine the new value for 'c'....
-      TMatrixD tempMatrix(1, overlapResolverNodeInfos.size());
 
       //Order of execution for neuron values:
       std::vector<unsigned short> sequenceVector(overlapResolverNodeInfos.size());
@@ -91,10 +103,12 @@ namespace Belle2 {
 
       //Store all values of c for protocolling:
       std::array<float, 100> cValues = {};
-      unsigned nIterations = 0;
+      //Store for maximum change of weights between iterations.
+      float c = 1.0;
 
       //Iterate until change in weights is small:
-      while (c > cmax) {
+      unsigned nIterations = 0;
+      while (c > m_cmax) {
 
         std::shuffle(sequenceVector.begin(), sequenceVector.end(), TRandomWrapper());
 
@@ -102,38 +116,33 @@ namespace Belle2 {
 
         for (unsigned int i : sequenceVector) {
           float aTempVal = 0.0;
-          for (unsigned int a = 0; a < overlapResolverNodeInfos.size(); a++) { aTempVal += W(i, a) * xMatrix(0, a); }
+          for (unsigned int a = 0; a < overlapResolverNodeInfos.size(); a++) {
+            aTempVal += W(i, a) * xMatrix(0, a);
+          }
 
           float act = aTempVal + m_omega * overlapResolverNodeInfos[i].qualityIndex;
 
-          xMatrix(0, i) = 0.5 * (1. + tanh(act / T));
-
-          B2DEBUG(100, "tc, random number " << i << " -  old neuron value: " << xMatrix(0, i));
+          xMatrix(0, i) = 0.5 * (1. + tanh(act / m_T));
         }
 
-        T = 0.5 * (T + Tmin);
+        m_T = 0.5 * (m_T + m_Tmin);
 
-        tempMatrix = (xMatrix - xMatrixOld);
-        tempMatrix.Abs();
-        c = tempMatrix.Max();
-        B2DEBUG(10, " c value is " << c << " at iteration " << nIterations);
+        //Determine maximum change in weights:
+        c = ((xMatrix - xMatrixOld).Abs()).Max();
+        B2DEBUG(10, "c value is " << c << " at iteration " << nIterations);
         cValues.at(nIterations) = c;
-
-        xMatrixOld = xMatrix;
 
         if (nIterations == 99 || std::isnan(c) == true) {
           std::string cOutPut;
           for (double entry : cValues) { if (entry != 0) { cOutPut += std::to_string(entry) + " ";} }
           B2ERROR("Hopfield took " << nIterations <<
                   " iterations or is nan, current c/cmax: " << c <<
-                  "/" << cmax <<
+                  "/" << m_cmax <<
                   " and c-history: " << cOutPut);
           return false;
         }
         nIterations++;
       }
-
-      B2DEBUG(3, "Hopfield network - found subset of TCs within " << nIterations << " iterations... with c=" << c);
 
       // update activityStates:
       for (unsigned int i = 0; i < overlapResolverNodeInfos.size(); i++) {
@@ -148,10 +157,9 @@ namespace Belle2 {
 
   private:
     float m_omega;
-    float T = 3.1; // temperature for annealing, original: 3.1
-    float Tmin = 0.1;
-    float cmax = 0.01;
-    float c = 1.0; // biggest difference in neuron values between two iterations
+    float m_T;
+    float m_Tmin;
+    float m_cmax;
 
     //--- Structs to help simplify the process ------------------------------------------------------------------------
     /** Wrap TRandom to be useable as a uniform random number generator with std algorithms like std::shuffle. */
@@ -170,4 +178,3 @@ namespace Belle2 {
     };
   };
 }
-

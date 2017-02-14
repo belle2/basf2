@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2011 - Belle II Collaboration                             *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jakob Lettenbichler                                      *
+ * Contributors: Jonas Wagner                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -15,6 +15,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/core/Module.h>
+#include <Eigen/Sparse>
 
 
 namespace Belle2 {
@@ -41,19 +42,29 @@ namespace Belle2 {
 
   protected:
 
-    void fillSVDClusterToRecoTrackMap();
+    void fillMatrixWithMCInformation();
 
-    int countMatchesToMCRecoTrack(SpacePointTrackCand sptc);
+    std::pair<int, int> getBestMatchToMCClusters(SpacePointTrackCand sptc);
+
+    double calculateQualityIndex(int nClusters, std::pair<int, int> match);
 
 
     // module parameters
-
 
     /** sets the name of expected StoreArray with mcRecoTracks in it. */
     std::string m_mcRecoTracksName;
 
     /** sets the name of expected StoreArray with SPTCs in it. */
     std::string m_SPTCsName;
+
+    /** If true only SPTCs containing SVDClusters corresponding to a single MCRecoTrack get a QI != 0.
+     *  If a SVDCluster corresponds to several MCRecoTracks it is still valid as long as the correct MCRecoTrack is one of them.
+     */
+    bool m_strictQualityIndex;
+
+    // module members
+
+    std::string m_svdClustersName;
 
     /** the storeArray for SpacePointTrackCands as member */
     StoreArray<SpacePointTrackCand> m_spacePointTrackCands;
@@ -62,6 +73,6 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_mcRecoTracks;
 
     /** store relation SVDClusterIndex to MCRecoTrackIndex */
-    std::map<int, int> m_mapIndexSVDToIndexRecoTrack;
+    Eigen::SparseMatrix<bool> m_linkMatrix;
   };
 }

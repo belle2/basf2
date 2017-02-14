@@ -23,56 +23,88 @@ MCQualityEstimatorVXDModule::MCQualityEstimatorVXDModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
 
-  addParam("SPTCsName", m_SPTCsName, " Sets the name of expected StoreArray with SpacePointTrackCand in it", std::string(""));
+  addParam("SPTCsName", m_SPTCsName, "Sets the name of expected StoreArray with SpacePointTrackCand in it", std::string(""));
 
-  addParam("mcRecoTracksName", m_mcRecoTracksName, " Sets the name of expected StoreArray with mcRecoTracks in it",
+  addParam("mcRecoTracksName", m_mcRecoTracksName, "Sets the name of expected StoreArray with mcRecoTracks in it",
            std::string("MCRecoTracks"));
 
+  addParam("strictQualityIndex", m_strictQualityIndex,
+           "If true only SPTCs containing SVDClusters corresponding to a single MCRecoTrack get a QI != 0.", true);
 }
 
 void MCQualityEstimatorVXDModule::event()
 {
-  // create relation SVDClusterID to MCRecoTrackID
-  fillSVDClusterToRecoTrackMap();
 
+  if (m_mcRecoTracks.getEntries() == 0) {
+    B2WARNING("MCQualityEstimator::Event: No MCRecoTracks present. Skipping this module.");
+    return;
+  }
+  // store to make sure SPTCs are compared to the correct SVDStoreArray
+  m_svdClustersName = m_mcRecoTracks[0]->getStoreArrayNameOfSVDHits();
 
+  // initialize Matrix
+  m_linkMatrix = Eigen::SparseMatrix<bool> (m_mcRecoTracks.getEntries(), StoreArray<SVDCluster>("").getEntries());
+  m_linkMatrix.reserve(m_mcRecoTracks.getEntries() * 8);
 
+  // create relation SVDClusterIndex to MCRecoTrackIndex
+  fillMatrixWithMCInformation();
 
+  // evaluate Matrix for each SPTC
   for (SpacePointTrackCand& spTC : m_spacePointTrackCands) {
-    // count matches
-    int nMatches = countMatchesToMCRecoTrack(spTC);
 
-    spTC.setQualityIndex(1 - (1. / nMatches));
+    std::pair<int, int> match = getBestMatchToMCClusters(spTC);
+
+    // assuming that each SpacePoint corresponds to two Clusters. Only valid for SVD!
+    double qi = calculateQualityIndex(spTC.getNHits() * 2, match);
+    spTC.setQualityIndex(qi);
   } // end loop SpacePointTrackCandidates
 }
 
-void MCQualityEstimatorVXDModule::fillSVDClusterToRecoTrackMap()
+void MCQualityEstimatorVXDModule::fillMatrixWithMCInformation()
 {
-  m_mapIndexSVDToIndexRecoTrack.clear();
+  // fill Matrix
   for (RecoTrack& mcRecoTrack : m_mcRecoTracks) {
-    int mcRecoTrackID = mcRecoTrack.getArrayIndex();
+    int mcRecoTrackIndex = mcRecoTrack.getArrayIndex();
     for (SVDCluster* cluster : mcRecoTrack.getSVDHitList()) {
-      m_mapIndexSVDToIndexRecoTrack[cluster->getArrayIndex()] = mcRecoTrackID;
+      m_linkMatrix.insert(mcRecoTrackIndex, cluster->getArrayIndex()) = true;
     }
   }
+  B2DEBUG(1, "Number of Entries: " << m_linkMatrix.nonZeros() << ", OuterSize: " << m_linkMatrix.outerSize() << ", InnerSize: " <<
+          m_linkMatrix.innerSize());
 }
 
-int MCQualityEstimatorVXDModule::countMatchesToMCRecoTrack(SpacePointTrackCand sptc)
+std::pair<int, int> MCQualityEstimatorVXDModule::getBestMatchToMCClusters(SpacePointTrackCand sptc)
 {
-  int relatedRecoTrackIndex = -1;
+  std::map<int, int> matches;
 
   for (const SpacePoint* spacePoint : sptc.getHits()) {
-    for (SVDCluster& cluster : spacePoint->getRelationsTo<SVDCluster>()) {
-      // find related RecoTrack
-      auto iter = m_mapIndexSVDToIndexRecoTrack.find(cluster.getArrayIndex());
-      if (iter == m_mapIndexSVDToIndexRecoTrack.end()) return 0;
+    for (SVDCluster& cluster : spacePoint->getRelationsTo<SVDCluster>(m_svdClustersName)) {
+      int svdClusterIndex = cluster.getArrayIndex();
 
-      // if it is the first relation store value
-      if (relatedRecoTrackIndex == -1) relatedRecoTrackIndex = iter->second;
+      // Due to MCRecoTracks overlapping each SVDCluster might match to multiple MCRecoTracks
+      for (Eigen::SparseMatrix<bool>::InnerIterator it(m_linkMatrix, svdClusterIndex); it; ++it) {
+        ++matches[it.row()];
+      }
 
-      // verify it is the same RecoTrack as before
-      if (relatedRecoTrackIndex != iter->second) return 0;
-    }
+    } // end loop SVDClusters
   } // end loop SpacePoints
-  return sptc.getNHits();
+
+  // select best match as the one with the most matched clusters.
+  std::pair<int, int> bestMatch(0, 0);
+  for (auto& relation : matches) {
+    if (relation.second > bestMatch.second) bestMatch = relation;
+  }
+  return bestMatch;
+}
+
+double MCQualityEstimatorVXDModule::calculateQualityIndex(int nClusters, std::pair<int, int> match)
+{
+  double qualityIndex = 0;
+  if (m_strictQualityIndex) {
+    if (nClusters == match.second) qualityIndex = 1 - (1. / nClusters);
+  } else {
+    int nRecoTrackClusters =  m_mcRecoTracks[match.first]->getNumberOfSVDHits();
+    qualityIndex = std::pow(match.second, 3) / (nRecoTrackClusters * nClusters * nClusters);
+  }
+  return qualityIndex;
 }

@@ -143,12 +143,20 @@ void TrackProcessor::mergeAndFinalizeTracks(std::list<CDCTrack>& cdcTrackList,
   TrackProcessor::assignNewHits(allAxialWireHits, cdcTrackList);
 }
 
-void TrackProcessor::deleteTracksWithLowFitProbability(std::list<CDCTrack>& cdcTrackList, double minimal_probability_for_good_fit)
+void TrackProcessor::deleteTracksWithLowFitProbability(std::list<CDCTrack>& cdcTrackList,
+                                                       double minimal_probability_for_good_fit)
 {
   const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getNoDriftVarianceFitter();
   const auto lowPValue = [&](const CDCTrack & track) {
     CDCTrajectory2D fittedTrajectory = trackFitter.fit(track);
-    return not(fittedTrajectory.getPValue() >= minimal_probability_for_good_fit);
+    // Keep good fits - p-value is not really a probability,
+    // but what can you do if the original author did not mind...
+    if (track.size() < 5 or not(fittedTrajectory.getPValue() >= minimal_probability_for_good_fit)) {
+      // Release hits
+      track.forwardTakenFlag(false);
+      return true;
+    }
+    return false;
   };
   erase_remove_if(cdcTrackList, lowPValue);
 }

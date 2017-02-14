@@ -50,11 +50,16 @@ namespace Belle2 {
 
     /** Performance of the actual algorithm.
      *
+     *  HINT FOR SPEED OPTIMIZATION: A lot of time is spend for checking the Logger,
+     *  if you don't have LOG_NO_B2DEBUG defined. If you have done that,
+     *  a lot of time is taken by the tanh function and drawing random
+     *  numbers.<br>
+     *
      *  Currently this algorithm can only be used once for each instance,
      *  as the algorithm parameter variables are changed during the performance.
      *  @sa OverlapResolverNodeInfo
      */
-    bool doHopfield(std::vector<OverlapResolverNodeInfo>& overlapResolverNodeInfos)
+    unsigned short doHopfield(std::vector<OverlapResolverNodeInfo>& overlapResolverNodeInfos, unsigned short nIterations = 20)
     {
       //Start value for neurons if they are compatible.
       //Each compatible connection activates a node with this value.
@@ -102,12 +107,12 @@ namespace Belle2 {
       }
 
       //Store all values of c for protocolling:
-      std::array<float, 100> cValues = {};
+      std::vector<float> cValues(nIterations);
       //Store for maximum change of weights between iterations.
       float c = 1.0;
 
       //Iterate until change in weights is small:
-      unsigned nIterations = 0;
+      unsigned iIterations = 0;
       while (c > m_cmax) {
 
         std::shuffle(sequenceVector.begin(), sequenceVector.end(), TRandomWrapper());
@@ -129,30 +134,25 @@ namespace Belle2 {
 
         //Determine maximum change in weights:
         c = ((xMatrix - xMatrixOld).Abs()).Max();
-        B2DEBUG(10, "c value is " << c << " at iteration " << nIterations);
-        cValues.at(nIterations) = c;
+        B2DEBUG(10, "c value is " << c << " at iteration " << iIterations);
+        cValues.at(iIterations) = c;
 
-        if (nIterations == 99 || std::isnan(c) == true) {
-          std::string cOutPut;
-          for (double entry : cValues) { if (entry != 0) { cOutPut += std::to_string(entry) + " ";} }
-          B2ERROR("Hopfield took " << nIterations <<
-                  " iterations or is nan, current c/cmax: " << c <<
-                  "/" << m_cmax <<
-                  " and c-history: " << cOutPut);
-          return false;
+        if (iIterations + 1 == nIterations) {
+          B2INFO("Hopfield reached maximum number of iterations without convergence. cValues are:");
+          for (auto && entry : cValues) {
+            B2INFO(std::to_string(entry));
+          }
+          break;
         }
-        nIterations++;
+        iIterations++;
       }
 
-      // update activityStates:
+      //Copy Node values into the activity state of the OverlapResolverNodeInfo objects:
       for (unsigned int i = 0; i < overlapResolverNodeInfos.size(); i++) {
-        B2DEBUG(50, "tc " << i <<
-                " - got final neuron value: " << xMatrix(0, i) <<
-                " and quality indicator " << overlapResolverNodeInfos[i].qualityIndex);
         overlapResolverNodeInfos[i].activityState = xMatrix(0, i);
       }
 
-      return true;
+      return iIterations;
     }
 
   private:

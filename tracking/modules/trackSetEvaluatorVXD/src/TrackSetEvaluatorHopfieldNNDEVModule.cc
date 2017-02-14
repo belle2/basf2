@@ -57,10 +57,10 @@ void TrackSetEvaluatorHopfieldNNDEVModule::event()
   //Performs the actual HNN.
   //As the parameter is taken as reference, the values are changed and can be reused below.
   HopfieldNetwork hopfieldNetwork;
-  if (!hopfieldNetwork.doHopfield(overlapResolverNodeInfos)) {
+  unsigned maxIterations = 20;
+  if (hopfieldNetwork.doHopfield(overlapResolverNodeInfos, maxIterations) == maxIterations) {
     B2INFO("Hopfield Network failed converge.");
     m_nHopfieldFails++;
-    return;
   }
 
   //Update tcs and kill those which were rejected by the Hopfield algorithm

@@ -71,13 +71,6 @@ namespace Belle2 {
                               CDCTrack& track2,
                               const std::vector<const CDCWireHit*>& allAxialWireHits,
                               std::list<CDCTrack>& cdcTrackList);
-
-    private: // Currently unused
-      /// Try to merge given track with tracks in tracklist.
-      static void tryToMergeTrackWithOtherTracks(CDCTrack& track,
-                                                 std::list<CDCTrack>& cdcTrackList,
-                                                 const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                                 double minimum_probability_to_be_merged = 0.85);
     };
   }
 }

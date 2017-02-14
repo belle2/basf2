@@ -144,27 +144,3 @@ void TrackMerger::mergeTracks(CDCTrack& track1,
 
   TrackProcessor::addCandidateFromHitsWithPostprocessing(splittedHits, allAxialWireHits, cdcTrackList);
 }
-
-void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track,
-                                                 std::list<CDCTrack>& cdcTrackList,
-                                                 const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                                 double minimum_probability_to_be_merged)
-{
-  bool have_merged_something;
-  do {
-    have_merged_something = false;
-    WithWeight<MayBePtr<CDCTrack> > bestTrack = calculateBestTrackToMerge(track, cdcTrackList);
-    double fitProb = bestTrack.getWeight();
-
-    if (bestTrack and fitProb > minimum_probability_to_be_merged) {
-      mergeTracks(track, *bestTrack, allAxialWireHits, cdcTrackList);
-      have_merged_something = true;
-    }
-
-    erase_remove_if(cdcTrackList, Size() < 3u);
-  } while (have_merged_something);
-
-  for (CDCTrack& otherTrack : cdcTrackList) {
-    TrackQualityTools::normalizeTrack(otherTrack);
-  }
-}

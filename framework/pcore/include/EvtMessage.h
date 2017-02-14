@@ -116,13 +116,27 @@ namespace Belle2 {
 
   };
 
-  /**  Message class derived from TMessage */
+  /**  Message class derived from TMessage (for reading only) */
   class InMessage : public TMessage {
+    TClass* m_class; /**< set in SetBuffer(). */
   public:
-    /** Constructor to build a message */
-    InMessage(void* buf, int len) : TMessage(buf, len)
+    InMessage() : TMessage(), m_class(nullptr)
     {
-      this->SetBit(kIsOwner, false);
+      SetReadMode();
+      SetWhat(kMESS_ANY);
+    }
+
+    /** override TMessage::GetClass(), class stored there is wrong. */
+    TClass* GetClass() const { return m_class; }
+
+    /** Replace buffer (doesn't take ownership). */
+    void SetBuffer(const void* ptr, UInt_t bufsize)
+    {
+      TBuffer::SetBuffer(const_cast<void*>(ptr), bufsize, false);
+      InitMap();
+      m_class = ReadClass();
+      SetBufferOffset(sizeof(UInt_t) * 2);
+      ResetMap();
     }
   };
 

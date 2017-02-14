@@ -173,14 +173,13 @@ EvtMessage* DataStoreStreamer::streamDataStore(bool addPersistentDurability, boo
       entry->object->SetBit(c_IsTransient, entry->dontWriteOut);
       entry->object->SetBit(c_IsNull, (entry->ptr == NULL));
       entry->object->SetBit(c_PersistentDurability, (durability == DataStore::c_Persistent));
-      if (m_msghandler->add(entry->object, it->first)) {
-        B2DEBUG(100, "adding item " << it->first);
+      m_msghandler->add(entry->object, it->first);
+      B2DEBUG(100, "adding item " << it->first);
 
-        if (entry->isArray)
-          narrays++;
-        else
-          nobjs++;
-      }
+      if (entry->isArray)
+        narrays++;
+      else
+        nobjs++;
 
       //reset bits (are checked to be false when streaming the object)
       entry->object->SetBit(c_IsTransient, false);

@@ -60,12 +60,12 @@ namespace Belle2 {
     /** Clear object list */
     virtual void clear();
     /** Add an object to be streamed */
-    virtual bool add(const TObject*, const std::string& name);
+    virtual void add(const TObject*, const std::string& name);
 
     /** Stream object list into an EvtMessage. Caller is responsible for deletion. */
     virtual EvtMessage* encode_msg(RECORD_TYPE rectype);
     /** Decode an EvtMessage into a vector list of objects with names */
-    virtual int decode_msg(EvtMessage* msg, std::vector<TObject*>& objlist, std::vector<std::string>& namelist);
+    virtual void decode_msg(EvtMessage* msg, std::vector<TObject*>& objlist, std::vector<std::string>& namelist);
 
   private:
     std::unique_ptr<CharBuffer> m_buf; /**< EvtMessage character buffer for encode_msg(). */

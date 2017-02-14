@@ -50,7 +50,7 @@ void MsgHandler::clear()
   m_buf->clear();
 }
 
-bool MsgHandler::add(const TObject* obj, const string& name)
+void MsgHandler::add(const TObject* obj, const string& name)
 {
   m_msg->WriteObject(obj);
   m_msg->Compress(); //no effect if m_complevel == 0
@@ -74,7 +74,6 @@ bool MsgHandler::add(const TObject* obj, const string& name)
   m_buf->add(&len, sizeof(len));
   m_buf->add(buf, len);
   m_msg->Reset();
-  return true;
 }
 
 EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
@@ -90,8 +89,8 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
   return evtmsg;
 }
 
-int MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
-                           vector<string>& namelist)
+void MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
+                            vector<string>& namelist)
 {
   const char* msgptr = msg->msg();
   const char* end = msgptr + msg->msg_size();
@@ -121,5 +120,4 @@ int MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
 
     tmsg.Reset();
   }
-  return 0;
 }

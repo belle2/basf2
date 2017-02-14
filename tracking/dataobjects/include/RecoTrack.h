@@ -110,7 +110,10 @@ namespace Belle2 {
     /**
      * Convenience method which registers all relations required to fully use
      * a RecoTrack. If you create a new RecoTrack StoreArray, call this method
-     * in the initialize() method of your module.
+     * in the initialize() method of your module. Note that the BKLM and EKLM
+     * relations may not be registered because the KLM modules are loaded after
+     * tracking; in this case, a second call of this method is required after
+     * creation of the BKLM and EKLM hits store arrays.
      * @param recoTracks  Reference to the store array where the new RecoTrack list is located
      * @param cdcHitsStoreArrayName  name of the StoreArray holding the CDCHits lists
      * @param svdHitsStoreArrayName  name of the StoreArray holding the SVDClusters lists

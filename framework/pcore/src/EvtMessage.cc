@@ -39,7 +39,7 @@ EvtMessage::EvtMessage(const char* sobjs, int size, RECORD_TYPE type = MSG_EVENT
   int fullsize = size + sizeof(EvtHeader);
   int bufsize = roundToNearestInt(fullsize);
   m_data = new char[bufsize]; // Allocate new buffer
-  msg(sobjs, size, type);
+  setMsg(sobjs, size, type);
   for (int i = bufsize - fullsize; i > 0; i--)
     m_data[bufsize - i] = '\0'; //zero extra bytes
   m_ownsBuffer = true;
@@ -151,7 +151,7 @@ struct timeval EvtMessage::time() const {
   return tv;
 }
 
-void EvtMessage::time(struct timeval& tbuf)
+void EvtMessage::setTime(const struct timeval& tbuf)
 {
   (reinterpret_cast<EvtHeader*>(m_data))->time_sec = tbuf.tv_sec;
   (reinterpret_cast<EvtHeader*>(m_data))->time_usec = tbuf.tv_usec;
@@ -171,15 +171,14 @@ char* EvtMessage::msg()
 
 // set_message
 
-void EvtMessage::msg(char const* msgin, int size, RECORD_TYPE type)
+void EvtMessage::setMsg(char const* msgin, int size, RECORD_TYPE type)
 {
-  EvtHeader* hdr = reinterpret_cast<EvtHeader*>(m_data);
+  EvtHeader* hdr = header();
   hdr->size = size + sizeof(EvtHeader);
   hdr->rectype = type;
   struct timeval tv;
   gettimeofday(&tv, NULL);
-  (reinterpret_cast<EvtHeader*>(m_data))->time_sec = tv.tv_sec;
-  (reinterpret_cast<EvtHeader*>(m_data))->time_usec = tv.tv_usec;
+  this->setTime(tv);
   hdr->src = -1;
   hdr->dest = -1;
   //TODO: set durability, nobjs, narrays here?

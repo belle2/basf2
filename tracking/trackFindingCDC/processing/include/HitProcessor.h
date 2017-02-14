@@ -32,7 +32,7 @@ namespace Belle2 {
 
     public:
       /** update given CDCRecoHit3D with given trajectory */
-      static void updateRecoHit3D(CDCTrajectory2D& trajectory2D, CDCRecoHit3D& hit);
+      static void updateRecoHit3D(const CDCTrajectory2D& trajectory2D, CDCRecoHit3D& hit);
 
       /** Tries to split back-to-back tracks into two different tracks */
       static std::vector<const CDCWireHit*> splitBack2BackTrack(CDCTrack& track);

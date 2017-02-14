@@ -21,12 +21,12 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void HitProcessor::updateRecoHit3D(CDCTrajectory2D& trajectory2D, CDCRecoHit3D& hit)
+void HitProcessor::updateRecoHit3D(const CDCTrajectory2D& trajectory2D, CDCRecoHit3D& hit)
 {
-  hit.setRecoPos3D(hit.getRLWireHit().reconstruct3D(trajectory2D));
+  hit = CDCRecoHit3D::reconstructNearest(&hit.getWireHit(), trajectory2D);
 
   // Recalculate the perpS of the hits
-  double arcLength2D = trajectory2D.calcArcLength2D(hit.getRecoPos2D());
+  double arcLength2D = hit.getArcLength2D();
   if (arcLength2D < -trajectory2D.getArcLength2DPeriod() / 4.0) {
     arcLength2D += trajectory2D.getArcLength2DPeriod();
   }

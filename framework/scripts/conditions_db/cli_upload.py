@@ -38,7 +38,7 @@ class LocalDatabaseEntry:
         try:
             iov = [int(e) for e in iov.split(",")]
         except ValueError:
-            raise ValueError("experiment and run numbers need to be integers")
+            raise ValueError("experiment and run numbers must be integers")
 
         if len(iov) != 4:
             raise ValueError("IoV needs to be four values (firstExp,firstRun,finalExp,finalRun)")

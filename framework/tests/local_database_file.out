@@ -19,13 +19,13 @@ testing 'dbstore/bad_revision revision 0,0,0,0\n'
 [ERROR] database-06.txt:1 error: revision must be an integer
 [ERROR] database-06.txt:1 error: revision must be an integer
 testing 'dbstore/no_revision 0,1,2,3\n'
-[ERROR] database-07.txt:1 error: line must be of the form 'dbstore/<payloadname> <revision> <firstExp>,<firstRun>,<finalExp>,<finalRun>
+[ERROR] database-07.txt:1 error: line must be of the form 'dbstore/<payloadname> <revision> <firstExp>,<firstRun>,<finalExp>,<finalRun>'
 [ERROR] database-07.txt:1 error: line must be of the form 'dbstore/<payloadname> <revision> <firstExp>,<firstRun>,<finalExp>,<finalRun>'
 testing 'no_package 1 0,0,-1,-1\n'
 [ERROR] database-08.txt:1 error: payload name must be of the form dbstore/<payloadname>
 [ERROR] database-08.txt:1 error: payload name must be of the form dbstore/<payloadname>
 testing 'dbstore/no_iov 1\n'
-[ERROR] database-09.txt:1 error: line must be of the form 'dbstore/<payloadname> <revision> <firstExp>,<firstRun>,<finalExp>,<finalRun>
+[ERROR] database-09.txt:1 error: line must be of the form 'dbstore/<payloadname> <revision> <firstExp>,<firstRun>,<finalExp>,<finalRun>'
 [ERROR] database-09.txt:1 error: line must be of the form 'dbstore/<payloadname> <revision> <firstExp>,<firstRun>,<finalExp>,<finalRun>'
 testing 'dbstore/iov_only_1 1 0\n'
 [ERROR] database-10.txt:1 error: IoV needs to be four values (firstExp,firstRun,finalExp,finalRun)
@@ -56,16 +56,16 @@ testing 'dbstore/bad_with_spaces_31 1    0,1,2, 3\n'
 [ERROR] database-18.txt:1 error: line must be of the form 'dbstore/<payloadname> <revision> <firstExp>,<firstRun>,<finalExp>,<finalRun>'
 testing 'dbstore/bad_text_exp1 1 exp1,0,0,0\n'
 [ERROR] database-19.txt:1 error: experiment and run numbers must be integers
-[ERROR] database-19.txt:1 error: experiment and run numbers need to be integers
+[ERROR] database-19.txt:1 error: experiment and run numbers must be integers
 testing 'dbstore/bad_text_run1 1 0,run1,0,0\n'
 [ERROR] database-20.txt:1 error: experiment and run numbers must be integers
-[ERROR] database-20.txt:1 error: experiment and run numbers need to be integers
+[ERROR] database-20.txt:1 error: experiment and run numbers must be integers
 testing 'dbstore/bad_text_exp2 1 0,0,exp2,0\n'
 [ERROR] database-21.txt:1 error: experiment and run numbers must be integers
-[ERROR] database-21.txt:1 error: experiment and run numbers need to be integers
+[ERROR] database-21.txt:1 error: experiment and run numbers must be integers
 testing 'dbstore/bad_text_run2 1 0,0,0,run2\n'
 [ERROR] database-22.txt:1 error: experiment and run numbers must be integers
-[ERROR] database-22.txt:1 error: experiment and run numbers need to be integers
+[ERROR] database-22.txt:1 error: experiment and run numbers must be integers
 testing '#only comment\n'
 testing '    # and with whitespace\n'
 testing '\t#including tabs\n'

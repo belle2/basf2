@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <vector>
+
 namespace Belle2 {
   /** Struct for holding information needed by overlap resolving algorithms for one node.
    *
@@ -18,7 +20,7 @@ namespace Belle2 {
   struct OverlapResolverNodeInfo {
     /** Constructor with initializer list for all relevant info for e.g. greedy algorithm (Scrooge) or Hopfield.
      */
-    OverlapResolverNodeInfo(float qI, unsigned short tI, std::vector<unsigned short> o, float aS):
+    OverlapResolverNodeInfo(float qI, unsigned short tI, std::vector<unsigned short> const& o, float aS):
       qualityIndex(qI), trackIndex(tI), overlaps(o), activityState(aS) {}
     float                       qualityIndex;   ///<Estimate of quality, e.g. from Circle Fitter or other fast fitter.
     unsigned short              trackIndex;     ///<Index of the SpacePointTrackCand in the StoreArray.

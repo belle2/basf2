@@ -109,7 +109,7 @@ ESign HitProcessor::getArmSign(const CDCRecoHit3D& hit, const Vector2D& center)
   return sign(center.isRightOrLeftOf(hit.getRecoPos2D()));
 }
 
-void HitProcessor::resetMaskedHits(std::list<CDCTrack>& trackList,
+void HitProcessor::resetMaskedHits(std::vector<CDCTrack>& axialTracks,
                                    std::vector<const CDCWireHit*>& allAxialWireHits)
 {
   for (const CDCWireHit* wireHit : allAxialWireHits) {
@@ -117,7 +117,7 @@ void HitProcessor::resetMaskedHits(std::list<CDCTrack>& trackList,
     wireHit->getAutomatonCell().setTakenFlag(false);
   }
 
-  for (const CDCTrack& track : trackList) {
+  for (const CDCTrack& track : axialTracks) {
     track.forwardTakenFlag();
   }
 }

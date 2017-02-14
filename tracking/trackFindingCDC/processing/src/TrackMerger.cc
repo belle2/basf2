@@ -24,14 +24,14 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void TrackMerger::doTracksMerging(std::list<CDCTrack>& cdcTrackList,
+void TrackMerger::doTracksMerging(std::vector<CDCTrack>& axialTracks,
                                   const std::vector<const CDCWireHit*>& allAxialWireHits,
                                   double minimum_probability_to_be_merged)
 {
   // Search for best matches - cannot use range for here :(.
-  for (std::list<CDCTrack>::iterator it1 = cdcTrackList.begin(); it1 !=  cdcTrackList.end(); ++it1) {
-    CDCTrack& track = *it1;
-    auto followingTracks = asRange(std::next(it1), cdcTrackList.end());
+  for (auto itTrack = axialTracks.begin(); itTrack !=  axialTracks.end(); ++itTrack) {
+    CDCTrack& track = *itTrack;
+    auto followingTracks = asRange(std::next(itTrack), axialTracks.end());
 
     WithWeight<MayBePtr<CDCTrack> > bestTrack = calculateBestTrackToMerge(track, followingTracks);
     double fitProb = bestTrack.getWeight();
@@ -41,7 +41,7 @@ void TrackMerger::doTracksMerging(std::list<CDCTrack>& cdcTrackList,
     }
   }
 
-  TrackProcessor::deleteShortTracks(cdcTrackList);
+  TrackProcessor::deleteShortTracks(axialTracks);
 }
 
 template <class ACDCTracks>

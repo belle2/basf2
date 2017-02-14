@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 
-#include <list>
 #include <vector>
 
 namespace Belle2 {
@@ -32,7 +31,7 @@ namespace Belle2 {
        *  The track finding often finds two curling tracks, originating from the same particle.
        *  This function merges them.
        */
-      static void doTracksMerging(std::list<CDCTrack>& cdcTrackList,
+      static void doTracksMerging(std::vector<CDCTrack>& axialTracks,
                                   const std::vector<const CDCWireHit*>& allAxialWireHits,
                                   double minimum_probability_to_be_merged = 0.85);
 

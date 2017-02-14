@@ -25,7 +25,7 @@ using namespace TrackFindingCDC;
 
 void TrackProcessor::addCandidateFromHitsWithPostprocessing(const std::vector<const CDCWireHit*>& foundAxialWireHits,
                                                             const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                                            std::list<CDCTrack>& cdcTrackList)
+                                                            std::vector<CDCTrack>& axialTracks)
 {
   if (foundAxialWireHits.empty()) return;
 
@@ -55,7 +55,7 @@ void TrackProcessor::addCandidateFromHitsWithPostprocessing(const std::vector<co
     for (const CDCRecoHit3D& recoHit3D : track) {
       recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
     }
-    cdcTrackList.emplace_back(std::move(track));
+    axialTracks.emplace_back(std::move(track));
   } else {
     /// Masked bad hits
     for (const CDCRecoHit3D& recoHit3D : track) {
@@ -94,16 +94,16 @@ bool TrackProcessor::checkTrackQuality(const CDCTrack& track)
 }
 
 void TrackProcessor::assignNewHits(const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                   std::list<CDCTrack>& cdcTrackList)
+                                   std::vector<CDCTrack>& axialTracks)
 {
   // First release some hits
-  for (CDCTrack& track : cdcTrackList) {
+  for (CDCTrack& track : axialTracks) {
     HitProcessor::deleteHitsFarAwayFromTrajectory(track);
     TrackQualityTools::normalizeTrack(track);
   }
 
   // Now add new ones
-  for (CDCTrack& track : cdcTrackList) {
+  for (CDCTrack& track : axialTracks) {
     if (track.size() < 5) continue;
     HitProcessor::assignNewHitsToTrack(track, allAxialWireHits);
     TrackQualityTools::normalizeTrack(track);
@@ -112,39 +112,39 @@ void TrackProcessor::assignNewHits(const std::vector<const CDCWireHit*>& allAxia
     TrackQualityTools::normalizeTrack(track);
   }
 
-  for (CDCTrack& cand : cdcTrackList) {
-    cand.forwardTakenFlag();
+  for (CDCTrack& track : axialTracks) {
+    track.forwardTakenFlag();
   }
 }
 
-void TrackProcessor::mergeAndFinalizeTracks(std::list<CDCTrack>& cdcTrackList,
+void TrackProcessor::mergeAndFinalizeTracks(std::vector<CDCTrack>& axialTracks,
                                             const std::vector<const CDCWireHit*>& allAxialWireHits)
 {
   // Check quality of the track basing on holes on the trajectory;
   // if holes exsist then track is splitted
-  for (CDCTrack& track : cdcTrackList) {
+  for (CDCTrack& track : axialTracks) {
     if (track.size() < 5) continue;
     HitProcessor::removeHitsAfterSuperLayerBreak(track);
     TrackQualityTools::normalizeTrack(track);
   }
 
   // Update tracks before storing to DataStore
-  for (CDCTrack& track : cdcTrackList) {
+  for (CDCTrack& track : axialTracks) {
     TrackQualityTools::normalizeTrack(track);
   }
 
   // Remove bad tracks
-  TrackProcessor::deleteShortTracks(cdcTrackList);
-  TrackProcessor::deleteTracksWithLowFitProbability(cdcTrackList);
+  TrackProcessor::deleteShortTracks(axialTracks);
+  TrackProcessor::deleteTracksWithLowFitProbability(axialTracks);
 
   // Perform tracks merging
-  TrackMerger::doTracksMerging(cdcTrackList, allAxialWireHits);
+  TrackMerger::doTracksMerging(axialTracks, allAxialWireHits);
 
   // Assign new hits
-  TrackProcessor::assignNewHits(allAxialWireHits, cdcTrackList);
+  TrackProcessor::assignNewHits(allAxialWireHits, axialTracks);
 }
 
-void TrackProcessor::deleteTracksWithLowFitProbability(std::list<CDCTrack>& cdcTrackList,
+void TrackProcessor::deleteTracksWithLowFitProbability(std::vector<CDCTrack>& axialTracks,
                                                        double minimal_probability_for_good_fit)
 {
   const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getNoDriftVarianceFitter();
@@ -159,10 +159,10 @@ void TrackProcessor::deleteTracksWithLowFitProbability(std::list<CDCTrack>& cdcT
     }
     return false;
   };
-  erase_remove_if(cdcTrackList, lowPValue);
+  erase_remove_if(axialTracks, lowPValue);
 }
 
-void TrackProcessor::deleteShortTracks(std::list<CDCTrack>& cdcTrackList, double minimal_size)
+void TrackProcessor::deleteShortTracks(std::vector<CDCTrack>& axialTracks, double minimal_size)
 {
   const auto isShort = [&](const CDCTrack & track) {
     if (track.size() < minimal_size) {
@@ -172,5 +172,5 @@ void TrackProcessor::deleteShortTracks(std::list<CDCTrack>& cdcTrackList, double
     }
     return false;
   };
-  erase_remove_if(cdcTrackList, isShort);
+  erase_remove_if(axialTracks, isShort);
 }

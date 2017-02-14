@@ -19,10 +19,8 @@
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/NonOriginPrecisionFunction.h>
 #include <tracking/trackFindingCDC/legendre/quadtreetools/QuadTreeParameters.h>
 
-#include <list>
 #include <vector>
 #include <map>
-
 
 namespace Belle2 {
   namespace TrackFindingCDC {

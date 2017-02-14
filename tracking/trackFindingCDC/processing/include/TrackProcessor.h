@@ -10,7 +10,6 @@
 #pragma once
 
 #include <vector>
-#include <list>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -25,24 +24,24 @@ namespace Belle2 {
       /// Create CDCTrack using CDCWireHit hits and store it in the list. Then call the postprocessing on it.
       static void addCandidateFromHitsWithPostprocessing(const std::vector<const CDCWireHit*>& foundAxialWireHits,
                                                          const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                                         std::list<CDCTrack>& cdcTrackList);
+                                                         std::vector<CDCTrack>& axialTracks);
 
       /// Perform all track postprocessing - return whether the track is considered good after the postprocessing
       static bool postprocessTrack(CDCTrack& track, const std::vector<const CDCWireHit*>& allAxialWireHits);
 
       /// Assign new hits to all tracks (using the assignNewHitsToTrack(CDCTrack&) method of the HitsProcessor).
-      static void assignNewHits(const std::vector<const CDCWireHit*>& allWireHits, std::list<CDCTrack>& cdcTrackList);
+      static void assignNewHits(const std::vector<const CDCWireHit*>& allWireHits, std::vector<CDCTrack>& axialTracks);
 
       /// Finalize the tracks after the legendre track finder is done - includes a merging step of found tracks
-      static void mergeAndFinalizeTracks(std::list<CDCTrack>& cdcTrackList,
+      static void mergeAndFinalizeTracks(std::vector<CDCTrack>& axialTracks,
                                          const std::vector<const CDCWireHit*>& allWireHits);
 
       /// Check an (improper) p-values of the tracks. If they are below the given value, delete the track from the list.
-      static void deleteTracksWithLowFitProbability(std::list<CDCTrack>& cdcTrackList,
+      static void deleteTracksWithLowFitProbability(std::vector<CDCTrack>& axialTracks,
                                                     double minimal_probability_for_good_fit = 0.4);
 
       /// Remove tracks that are shorter than the given number of hits.
-      static void deleteShortTracks(std::list<CDCTrack>& cdcTrackList, double minimal_size = 5);
+      static void deleteShortTracks(std::vector<CDCTrack>& axialTracks, double minimal_size = 5);
 
     private:
       /// Check track quality -- currently based on number of hits only.

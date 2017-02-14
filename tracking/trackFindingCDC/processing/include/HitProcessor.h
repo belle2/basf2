@@ -13,7 +13,6 @@
 #include <tracking/trackFindingCDC/numerics/ESign.h>
 
 #include <vector>
-#include <list>
 #include <map>
 
 namespace Belle2 {
@@ -58,7 +57,7 @@ namespace Belle2 {
       static int getArmSignVote(const CDCTrack& track, const Vector2D& center);
 
       /// Reset all masked hits.
-      static void resetMaskedHits(std::list<CDCTrack>& trackList, std::vector<const CDCWireHit*>& wireHits);
+      static void resetMaskedHits(std::vector<CDCTrack>& axialTracks, std::vector<const CDCWireHit*>& wireHits);
 
       /// Unset the MASKED flag and set the TAKEN flag of all hits but do not touch the track flags.
       static void unmaskHitsInTrack(CDCTrack& track);

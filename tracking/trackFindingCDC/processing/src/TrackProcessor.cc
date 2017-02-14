@@ -27,7 +27,7 @@ void TrackProcessor::addCandidateFromHitsWithPostprocessing(const std::vector<co
                                                             const std::vector<const CDCWireHit*>& allAxialWireHits,
                                                             std::list<CDCTrack>& cdcTrackList)
 {
-  if (foundAxialWireHits.size() == 0) return;
+  if (foundAxialWireHits.empty()) return;
 
   // New track
   CDCTrack track;
@@ -104,7 +104,7 @@ void TrackProcessor::assignNewHits(const std::vector<const CDCWireHit*>& allAxia
 
   // Now add new ones
   for (CDCTrack& track : cdcTrackList) {
-    if (track.size() < 4) continue;
+    if (track.size() < 5) continue;
     HitProcessor::assignNewHitsToTrack(track, allAxialWireHits);
     TrackQualityTools::normalizeTrack(track);
 
@@ -123,7 +123,7 @@ void TrackProcessor::mergeAndFinalizeTracks(std::list<CDCTrack>& cdcTrackList,
   // Check quality of the track basing on holes on the trajectory;
   // if holes exsist then track is splitted
   for (CDCTrack& track : cdcTrackList) {
-    if (track.size() < 4) continue;
+    if (track.size() < 5) continue;
     HitProcessor::removeHitsAfterSuperLayerBreak(track);
     TrackQualityTools::normalizeTrack(track);
   }

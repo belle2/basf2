@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # ---------------------------------------------------------------------------------------
-# draw summary plots from output of MY_TOPInterimFEAna module (run******_slot**_ana.root)
-# Usage: basf2 MY_TOPInterimFEPlot <output root file of MY_TOPInterimFECheck.py> (to be called in "MY_TOPInterimFECheck.py")
+# draw summary plots from output of makeInterimFEDataNtuple module (run******_slot**_ana.root)
+# Usage: basf2 plotInterimFEDataNtuple <output root file of makeInterimFEDataNtuple.py> (to be called in this steering file)
 # ---------------------------------------------------------------------------------------
 
 import sys

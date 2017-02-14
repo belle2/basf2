@@ -3,7 +3,7 @@
 
 # ---------------------------------------------------------------------------------------
 # Unpack raw data in Interim FE format v2.1 to TOPDigits and gives summary plots
-# Usage: basf2 MY_TOPInterimFECheck.py <input_file.sroot>
+# Usage: basf2 makeInterimFEDataNtuple.py <input_file.sroot>
 # ---------------------------------------------------------------------------------------
 
 from basf2 import *

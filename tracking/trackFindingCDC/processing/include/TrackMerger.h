@@ -69,8 +69,7 @@ namespace Belle2 {
        */
       static void mergeTracks(CDCTrack& track1,
                               CDCTrack& track2,
-                              const std::vector<const CDCWireHit*>& allAxialWireHits,
-                              std::list<CDCTrack>& cdcTrackList);
+                              const std::vector<const CDCWireHit*>& allAxialWireHits);
     };
   }
 }

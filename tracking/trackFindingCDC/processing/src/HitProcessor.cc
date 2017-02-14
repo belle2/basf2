@@ -33,9 +33,9 @@ void HitProcessor::updateRecoHit3D(const CDCTrajectory2D& trajectory2D, CDCRecoH
   hit.setArcLength2D(arcLength2D);
 }
 
-std::vector<const CDCWireHit*> HitProcessor::splitBack2BackTrack(CDCTrack& track)
+std::vector<CDCRecoHit3D> HitProcessor::splitBack2BackTrack(CDCTrack& track)
 {
-  std::vector<const CDCWireHit*> removedHits;
+  std::vector<CDCRecoHit3D> removedHits;
 
   if (track.size() < 5) return removedHits;
   if (not isBack2BackTrack(track)) return removedHits;
@@ -50,9 +50,8 @@ std::vector<const CDCWireHit*> HitProcessor::splitBack2BackTrack(CDCTrack& track
   auto minorArmHits = boost::stable_partition<boost::return_found_end>(track, isOnMajorArm);
 
   for (const CDCRecoHit3D& recoHit3D : minorArmHits) {
-    const CDCWireHit* wireHit = &recoHit3D.getWireHit();
-    wireHit->getAutomatonCell().setTakenFlag(false);
-    removedHits.push_back(wireHit);
+    recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(false);
+    removedHits.push_back(recoHit3D);
   }
 
   boost::erase(track, minorArmHits);

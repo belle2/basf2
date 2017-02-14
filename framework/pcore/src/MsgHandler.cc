@@ -14,7 +14,9 @@
 #include <TMessage.h>
 
 #include <stdlib.h>
-#include <memory>
+
+using namespace std;
+using namespace Belle2;
 
 
 namespace {
@@ -22,11 +24,9 @@ namespace {
   const static int c_maxObjectSizeBytes = 50000000; //50MB
 }
 
-using namespace std;
-using namespace Belle2;
-
 MsgHandler::MsgHandler(int complevel):
-  m_buf(100000)
+  m_buf(new CharBuffer(100000)),
+  m_msg(new TMessage(kMESS_OBJECT))
 {
   if (complevel != 0) {
     B2FATAL("Compression support disabled because of https://sft.its.cern.ch/jira/browse/ROOT-4550 . You can enable it manually by removing this check in MsgHandler, but be aware of huge memory leaks.");
@@ -36,6 +36,9 @@ MsgHandler::MsgHandler(int complevel):
   //Schema evolution is needed to stream genfit tracks
   //If disabled, streamers will crash when reading data.
   TMessage::EnableSchemaEvolutionForAll();
+
+  m_msg->SetWriteMode();
+  m_msg->SetCompressionLevel(complevel);
 }
 
 MsgHandler::~MsgHandler()
@@ -44,28 +47,20 @@ MsgHandler::~MsgHandler()
 
 void MsgHandler::clear()
 {
-  m_buf.clear();
+  m_buf->clear();
 }
 
 bool MsgHandler::add(const TObject* obj, const string& name)
 {
-  static std::unique_ptr<TMessage> msg(new TMessage(kMESS_OBJECT));
-  msg->Reset();
-  msg->SetWriteMode();
-  msg->SetCompressionLevel(m_complevel);
+  m_msg->WriteObject(obj);
+  m_msg->Compress(); //no effect if m_complevel == 0
 
-  // Write object in TMessage
-  msg->WriteObject(obj);
-  msg->Compress(); //no effect if m_complevel == 0
-  //  msg->ForceWriteInfo(obj->, true );
-
-  int len = msg->Length();
-  char* buf = msg->Buffer();
-  if (msg->CompBuffer()) { // Compression ON
-    len = msg->CompLength();
-    buf = msg->CompBuffer();
+  int len = m_msg->Length();
+  char* buf = m_msg->Buffer();
+  if (m_msg->CompBuffer()) { // Compression ON
+    len = m_msg->CompLength();
+    buf = m_msg->CompBuffer();
   }
-  //  printf ( "MsgHandler : size of %s = %d (pid=%d)\n", name.c_str(), len, (int)getpid() );
 
   if (len > c_maxObjectSizeBytes) {
     B2WARNING("MsgHandler: Object " << name << " is very large (" << len  << " bytes), parallel processing may be slow.");
@@ -73,11 +68,12 @@ bool MsgHandler::add(const TObject* obj, const string& name)
 
   // Put name of object in output buffer
   UInt_t nameLength = name.size() + 1;
-  m_buf.add(&nameLength, sizeof(nameLength));
-  m_buf.add(name.c_str(), nameLength);
+  m_buf->add(&nameLength, sizeof(nameLength));
+  m_buf->add(name.c_str(), nameLength);
   // Copy object into buffer
-  m_buf.add(&len, sizeof(len));
-  m_buf.add(buf, len);
+  m_buf->add(&len, sizeof(len));
+  m_buf->add(buf, len);
+  m_msg->Reset();
   return true;
 }
 
@@ -88,7 +84,7 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
     return eod;
   }
 
-  EvtMessage* evtmsg = new EvtMessage(m_buf.data(), m_buf.size(), rectype);
+  EvtMessage* evtmsg = new EvtMessage(m_buf->data(), m_buf->size(), rectype);
   clear();
 
   return evtmsg;
@@ -97,29 +93,31 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
 int MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
                            vector<string>& namelist)
 {
-  int totlen = 0;
-  char* msgptr = msg->msg();
+  const char* msgptr = msg->msg();
+  const char* end = msgptr + msg->msg_size();
 
   InMessage tmsg;
-  while (totlen < msg->msg_size()) {
+  while (msgptr < end) {
     // Restore object name
     UInt_t nameLength;
     memcpy(&nameLength, msgptr, sizeof(nameLength));
-    string name((char*)(msgptr + sizeof(nameLength)));
-    namelist.push_back(name);
-    msgptr += (sizeof(nameLength) + nameLength);
-    totlen += (sizeof(nameLength) + nameLength);
+    msgptr += sizeof(nameLength);
+    if (msgptr >= end) B2FATAL("Buffer overrun while decoding message, check length fields!");
+
+    namelist.emplace_back(msgptr);
+    msgptr += nameLength;
+    if (msgptr >= end) B2FATAL("Buffer overrun while decoding message, check length fields!");
 
     // Restore object
     UInt_t objlen;
     memcpy(&objlen, msgptr, sizeof(objlen));
+    msgptr += sizeof(objlen);
+    if (msgptr >= end) B2FATAL("Buffer overrun while decoding message, check length fields!");
 
-    tmsg.SetBuffer(msgptr + sizeof(objlen), objlen);
+    tmsg.SetBuffer(msgptr, objlen);
     TObject* obj = static_cast<TObject*>(tmsg.ReadObjectAny(tmsg.GetClass()));
     objlist.push_back(obj);
-
-    msgptr += objlen + sizeof(objlen);
-    totlen += objlen + sizeof(objlen);
+    msgptr += objlen;
 
     tmsg.Reset();
   }

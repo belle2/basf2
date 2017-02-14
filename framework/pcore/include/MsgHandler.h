@@ -14,6 +14,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 class TObject;
 class TMessage;
@@ -67,7 +68,8 @@ namespace Belle2 {
     virtual int decode_msg(EvtMessage* msg, std::vector<TObject*>& objlist, std::vector<std::string>& namelist);
 
   private:
-    CharBuffer m_buf; /**< EvtMessage character buffer. */
+    std::unique_ptr<CharBuffer> m_buf; /**< EvtMessage character buffer for encode_msg(). */
+    std::unique_ptr<TMessage> m_msg; /**< Used for serialising objects into m_buf. */
     int m_complevel; /**< compression level, from 0 (none) to 9 (highest). */
   };
 

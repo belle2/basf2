@@ -123,7 +123,7 @@ namespace Belle2 {
     InMessage() : TMessage(), m_class(nullptr)
     {
       SetReadMode();
-      SetWhat(kMESS_ANY);
+      SetWhat(kMESS_OBJECT);
     }
 
     /** override TMessage::GetClass(), class stored there is wrong. */

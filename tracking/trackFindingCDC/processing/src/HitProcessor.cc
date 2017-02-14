@@ -199,14 +199,21 @@ void HitProcessor::removeHitsAfterSuperLayerBreak(CDCTrack& track)
   const ISuperLayer breakSLayer = forwardSLayerHoles.front();
 
   auto isInBackwardArm = [apogeeArcLength](const CDCRecoHit3D & recoHit3D) {
-    recoHit3D.getWireHit().getAutomatonCell().unsetTakenFlag();
-    return (recoHit3D.getArcLength2D() >= apogeeArcLength) or (recoHit3D.getArcLength2D() < 0);
+    if ((recoHit3D.getArcLength2D() >= apogeeArcLength) or (recoHit3D.getArcLength2D() < 0)) {
+      recoHit3D.getWireHit().getAutomatonCell().unsetTakenFlag();
+      return true;
+    }
+    return false;
   };
   boost::remove_erase_if(track, isInBackwardArm);
 
   auto isAfterSLayerBreak = [breakSLayer](const CDCRecoHit3D & recoHit3D) {
     recoHit3D.getWireHit().getAutomatonCell().unsetTakenFlag();
-    return recoHit3D.getISuperLayer() >= breakSLayer;
+    if (recoHit3D.getISuperLayer() >= breakSLayer) {
+      recoHit3D.getWireHit().getAutomatonCell().unsetTakenFlag();
+      return true;
+    }
+    return false;
   };
   boost::remove_erase_if(track, isAfterSLayerBreak);
 }

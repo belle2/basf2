@@ -40,49 +40,60 @@ namespace Belle2 {
     HopfieldNetwork(): m_omega(0.5) //InitializerList
     {}
 
-    bool doHopfield(std::vector<OverlapResolverNodeInfo>& tcs)
+    bool doHopfield(std::vector<OverlapResolverNodeInfo>& overlapResolverNodeInfos)
     {
-      unsigned int nTCs = tcs.size();
-      B2DEBUG(100, "TrackSetEvaluatorHopfieldNNDEVModule::doHopfield now with " << nTCs << " overlapping TCs");
+      //Start value for neurons if they are compatible.
+      //Each compatible connection activates a node with this value.
+      //As the sum of all the activations shall be less than one, we divide the
+      //activiation by the total number of Nodes.
+      //Incompatible Nodes get later minus one, which counteracts all activation,
+      //if the incompatible Node is active.
+      float compatibilityValue = (1.0 - m_omega) / static_cast<float>(overlapResolverNodeInfos.size() - 1);
 
-      float compatibilityValue = (1.0 - m_omega) / double(nTCs - 1); // start value for neurons if they are compatible
-
-      TMatrixD W(nTCs, nTCs);  /// weight matrix, knows compatibility between each possible pair of TCs
-      // first: set all elements to compatible:
-      for (unsigned int i = 0; i < nTCs; i++) {
-        for (unsigned int j = 0; i < nTCs; i++) {
+      //Weight matrix; knows compatibility between each possible pair of Nodes
+      TMatrixD W(overlapResolverNodeInfos.size(), overlapResolverNodeInfos.size());
+      //A): Set all elements to compatible:
+      for (unsigned int i = 0; i < overlapResolverNodeInfos.size(); i++) {
+        for (unsigned int j = 0; i < overlapResolverNodeInfos.size(); i++) {
           W(i, j) = compatibilityValue;
         }
       }
-
-      // second: inform weight matrix elements of incompatible neurons:
-      for (const auto& aTC : tcs) {
+      //B): Inform weight matrix elements of incompatible neurons:
+      for (const auto& aTC : overlapResolverNodeInfos) {
         for (unsigned int overlapIndex : aTC.overlaps) {
           W(aTC.trackIndex, overlapIndex) = -1.0;
         }
       }
 
-      TMatrixD xMatrix(1, nTCs); /// Neuron values
+      // Neuron values
+      TMatrixD xMatrix(1, overlapResolverNodeInfos.size());
       // randomize neuron values for first iteration:
-      for (unsigned int i = 0; i < nTCs; i++) {
+      for (unsigned int i = 0; i < overlapResolverNodeInfos.size(); i++) {
         xMatrix(0, i) = gRandom->Uniform(1.0); // WARNING: original does Un(0;0.1) not Un(0;1)!
       }
 
-      TMatrixD xMatrixOld(1, nTCs); /// stores results from last round
-      TMatrixD tempMatrix(1, nTCs); /// just to determine the new value for 'c'
+      //Store for results from last round:
+      TMatrixD xMatrixOld(1, overlapResolverNodeInfos.size());
+      //Just to determine the new value for 'c'....
+      TMatrixD tempMatrix(1, overlapResolverNodeInfos.size());
 
-      // order of execution for neuron values:
-      std::vector<unsigned int> sequenceVector(nTCs);
+      //Order of execution for neuron values:
+      std::vector<unsigned short> sequenceVector(overlapResolverNodeInfos.size());
+      //iota fills the vector with 0, 1, 2, ... , (size-1)
       std::iota(sequenceVector.begin(), sequenceVector.end(), 0);
-      std::string cOutPut;
-      for (unsigned entry : sequenceVector) { cOutPut += std::to_string(entry) + " "; }
-      B2DEBUG(100, "sequenceVector with length " << sequenceVector.size() <<
-              " created, entries are from begin to end: " << cOutPut);
 
-      int nIterations = 0;
-      std::array<double, 100> cValues; // protocolling all values of c
-      cValues.fill(0);
+      //The following block will be evaluated to empty, if LOG_NO_B2DEBUG is defined:
+      B2DEBUG(100, "sequenceVector with length " << sequenceVector.size());
+      B2DEBUG(100, "Entries are from begin to end:");
+      for (auto && entry : sequenceVector) {
+        B2DEBUG(100, std::to_string(entry) + ", ");
+      }
 
+      //Store all values of c for protocolling:
+      std::array<float, 100> cValues = {};
+      unsigned nIterations = 0;
+
+      //Iterate until change in weights is small:
       while (c > cmax) {
 
         std::shuffle(sequenceVector.begin(), sequenceVector.end(), TRandomWrapper());
@@ -90,10 +101,10 @@ namespace Belle2 {
         xMatrixOld = xMatrix;
 
         for (unsigned int i : sequenceVector) {
-          double aTempVal = 0.0;
-          for (unsigned int a = 0; a < nTCs; a++) { aTempVal += W(i, a) * xMatrix(0, a); } // doing it by hand...
+          float aTempVal = 0.0;
+          for (unsigned int a = 0; a < overlapResolverNodeInfos.size(); a++) { aTempVal += W(i, a) * xMatrix(0, a); }
 
-          act = aTempVal + m_omega * tcs[i].qualityIndex;
+          float act = aTempVal + m_omega * overlapResolverNodeInfos[i].qualityIndex;
 
           xMatrix(0, i) = 0.5 * (1. + tanh(act / T));
 
@@ -125,11 +136,11 @@ namespace Belle2 {
       B2DEBUG(3, "Hopfield network - found subset of TCs within " << nIterations << " iterations... with c=" << c);
 
       // update activityStates:
-      for (unsigned int i = 0; i < nTCs; i++) {
+      for (unsigned int i = 0; i < overlapResolverNodeInfos.size(); i++) {
         B2DEBUG(50, "tc " << i <<
                 " - got final neuron value: " << xMatrix(0, i) <<
-                " and quality indicator " << tcs[i].qualityIndex);
-        tcs[i].activityState = xMatrix(0, i);
+                " and quality indicator " << overlapResolverNodeInfos[i].qualityIndex);
+        overlapResolverNodeInfos[i].activityState = xMatrix(0, i);
       }
 
       return true;
@@ -141,7 +152,6 @@ namespace Belle2 {
     float Tmin = 0.1;
     float cmax = 0.01;
     float c = 1.0; // biggest difference in neuron values between two iterations
-    float act = 0.0;
 
     //--- Structs to help simplify the process ------------------------------------------------------------------------
     /** Wrap TRandom to be useable as a uniform random number generator with std algorithms like std::shuffle. */

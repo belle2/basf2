@@ -155,7 +155,7 @@ void HitProcessor::assignNewHitsToTrack(CDCTrack& track,
   const CDCTrajectory2D& trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
 
   for (const CDCWireHit* wireHit : allAxialWireHits) {
-    if (wireHit->getAutomatonCell().hasTakenFlag() or wireHit->getAutomatonCell().hasMaskedFlag()) continue;
+    if (wireHit->getAutomatonCell().hasTakenFlag()) continue;
 
     CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstructNearest(wireHit, trackTrajectory2D);
     const Vector2D& recoPos2D = recoHit3D.getRecoPos2D();

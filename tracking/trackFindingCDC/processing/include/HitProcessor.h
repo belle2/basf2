@@ -31,15 +31,6 @@ namespace Belle2 {
     class HitProcessor {
 
     public:
-      /// Static class only.
-      HitProcessor() = delete;
-
-      /// Static class only.
-      HitProcessor(const HitProcessor& copy) = delete;
-
-      /// Static class only.
-      HitProcessor& operator=(const HitProcessor&) = delete;
-
       /** update given CDCRecoHit3D with given trajectory */
       static void updateRecoHit3D(CDCTrajectory2D& trajectory2D, CDCRecoHit3D& hit);
 

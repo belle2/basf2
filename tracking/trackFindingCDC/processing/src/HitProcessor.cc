@@ -27,7 +27,7 @@ void HitProcessor::updateRecoHit3D(CDCTrajectory2D& trajectory2D, CDCRecoHit3D& 
 
   double perpS = trajectory2D.calcArcLength2D(hit.getRecoPos2D());
   if (perpS < 0.) {
-    double perimeter = fabs(trajectory2D.getGlobalCircle().perimeter()) / 2.;
+    double perimeter = fabs(trajectory2D.getGlobalCircle().perimeter());
     perpS += perimeter;
   }
   // Recalculate the perpS of the hits

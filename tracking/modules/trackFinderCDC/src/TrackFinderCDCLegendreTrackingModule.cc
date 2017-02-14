@@ -166,8 +166,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
     // Change to the next pass
     if (quadTreePassCounter.getPass() != LegendreFindingPass::FullRange) {
       quadTreePassCounter.nextPass();
-    }
-    if ((quadTreePassCounter.getPass() == LegendreFindingPass::FullRange) && (nCandsAdded == 0)) {
+    } else if ((quadTreePassCounter.getPass() == LegendreFindingPass::FullRange) && (nCandsAdded == 0)) {
       quadTreePassCounter.nextPass();
     }
 
@@ -178,12 +177,8 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
 
 void TrackFinderCDCLegendreTrackingModule::outputObjects(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
-  tracks.reserve(tracks.size() + m_tracks.size());
-  for (CDCTrack& track : m_tracks) {
-    if (track.size() > 5) {
-      tracks.push_back(std::move(track));
-    }
-  }
+  TrackProcessor::deleteShortTracks(m_tracks);
+  tracks.insert(tracks.end(), m_tracks.begin(), m_tracks.end());
 }
 
 void TrackFinderCDCLegendreTrackingModule::clearVectors()

@@ -9,7 +9,7 @@
 #ifndef EVTMESSAGE_H
 #define EVTMESSAGE_H
 
-#include <TMessage.h>
+#include <RtypesCore.h>
 
 struct timeval;
 
@@ -50,7 +50,7 @@ namespace Belle2 {
     const static unsigned int c_MaxEventSize = 200000000;
 
     /** build EvtMessage from existing buffer (no copy, but does not take ownership). */
-    explicit EvtMessage(char* buf = NULL);
+    explicit EvtMessage(char* buf = nullptr);
     /** build EvtMessage by allocating new message buffer (sobjs is copied). */
     EvtMessage(const char* sobjs, int size, RECORD_TYPE type);
     /** Copy constructor (m_data is copied). */
@@ -113,32 +113,6 @@ namespace Belle2 {
   private:
     char* m_data;         ///< Pointer to the internal EvtMessage buffer
     bool m_ownsBuffer; ///< Wether to clean up m_data in destructor
-
   };
-
-  /**  Message class derived from TMessage (for reading only) */
-  class InMessage : public TMessage {
-    TClass* m_class; /**< set in SetBuffer(). */
-  public:
-    InMessage() : TMessage(), m_class(nullptr)
-    {
-      SetReadMode();
-      SetWhat(kMESS_OBJECT);
-    }
-
-    /** override TMessage::GetClass(), class stored there is wrong. */
-    TClass* GetClass() const { return m_class; }
-
-    /** Replace buffer (doesn't take ownership). */
-    void SetBuffer(const void* ptr, UInt_t bufsize)
-    {
-      TBuffer::SetBuffer(const_cast<void*>(ptr), bufsize, false);
-      InitMap();
-      m_class = ReadClass();
-      SetBufferOffset(sizeof(UInt_t) * 2);
-      ResetMap();
-    }
-  };
-
 }
 #endif

@@ -11,6 +11,7 @@
 #define MSGHANDLER_H
 
 #include <framework/pcore/EvtMessage.h>
+#include <TMessage.h>
 
 #include <vector>
 #include <string>
@@ -49,6 +50,30 @@ namespace Belle2 {
     void clear() { m_size = 0; }
   };
 
+  /**  Message class derived from TMessage (for reading only) */
+  class InMessage : public TMessage {
+    TClass* m_class; /**< set in SetBuffer(). */
+  public:
+    InMessage() : TMessage(), m_class(nullptr)
+    {
+      SetReadMode();
+      SetWhat(kMESS_OBJECT);
+    }
+
+    /** override TMessage::GetClass(), class stored there is wrong. */
+    TClass* GetClass() const { return m_class; }
+
+    /** Replace buffer (doesn't take ownership). */
+    void SetBuffer(const void* ptr, UInt_t bufsize)
+    {
+      TBuffer::SetBuffer(const_cast<void*>(ptr), bufsize, false);
+      InitMap();
+      m_class = ReadClass();
+      SetBufferOffset(sizeof(UInt_t) * 2);
+      ResetMap();
+    }
+  };
+
   /** A class to encode/decode an EvtMessage */
   class MsgHandler {
   public:
@@ -70,6 +95,7 @@ namespace Belle2 {
   private:
     std::unique_ptr<CharBuffer> m_buf; /**< EvtMessage character buffer for encode_msg(). */
     std::unique_ptr<TMessage> m_msg; /**< Used for serialising objects into m_buf. */
+    InMessage m_inMsg; /**< Used for deserializing in decode_msg() */
     int m_complevel; /**< compression level, from 0 (none) to 9 (highest). */
   };
 

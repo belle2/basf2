@@ -16,6 +16,8 @@
 #include <vector>
 #include <string>
 
+class TList;
+
 namespace Belle2 {
   class MsgHandler;
 

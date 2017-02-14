@@ -95,7 +95,6 @@ void MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
   const char* msgptr = msg->msg();
   const char* end = msgptr + msg->msg_size();
 
-  InMessage tmsg;
   while (msgptr < end) {
     // Restore object name
     UInt_t nameLength;
@@ -113,11 +112,10 @@ void MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
     msgptr += sizeof(objlen);
     if (msgptr >= end) B2FATAL("Buffer overrun while decoding message, check length fields!");
 
-    tmsg.SetBuffer(msgptr, objlen);
-    TObject* obj = static_cast<TObject*>(tmsg.ReadObjectAny(tmsg.GetClass()));
+    m_inMsg.SetBuffer(msgptr, objlen);
+    TObject* obj = static_cast<TObject*>(m_inMsg.ReadObjectAny(m_inMsg.GetClass()));
     objlist.push_back(obj);
     msgptr += objlen;
-
-    tmsg.Reset();
+    //no need to call InMessage::Reset() here (done in SetBuffer())
   }
 }

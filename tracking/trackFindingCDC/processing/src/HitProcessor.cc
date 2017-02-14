@@ -23,15 +23,14 @@ using namespace TrackFindingCDC;
 
 void HitProcessor::updateRecoHit3D(CDCTrajectory2D& trajectory2D, CDCRecoHit3D& hit)
 {
-  hit.setRecoPos3D(hit.getRecoHit2D().getRLWireHit().reconstruct3D(trajectory2D));
+  hit.setRecoPos3D(hit.getRLWireHit().reconstruct3D(trajectory2D));
 
-  double perpS = trajectory2D.calcArcLength2D(hit.getRecoPos2D());
-  if (perpS < 0.) {
-    double perimeter = fabs(trajectory2D.getGlobalCircle().perimeter());
-    perpS += perimeter;
-  }
   // Recalculate the perpS of the hits
-  hit.setArcLength2D(perpS);
+  double arcLength2D = trajectory2D.calcArcLength2D(hit.getRecoPos2D());
+  if (arcLength2D < -trajectory2D.getArcLength2DPeriod() / 4.0) {
+    arcLength2D += trajectory2D.getArcLength2DPeriod();
+  }
+  hit.setArcLength2D(arcLength2D);
 }
 
 std::vector<const CDCWireHit*> HitProcessor::splitBack2BackTrack(CDCTrack& track)

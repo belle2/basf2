@@ -134,6 +134,7 @@ void TrackProcessor::mergeAndFinalizeTracks(std::list<CDCTrack>& cdcTrackList,
   }
 
   // Remove bad tracks
+  TrackProcessor::deleteShortTracks(cdcTrackList);
   TrackProcessor::deleteTracksWithLowFitProbability(cdcTrackList);
 
   // Perform tracks merging
@@ -151,7 +152,7 @@ void TrackProcessor::deleteTracksWithLowFitProbability(std::list<CDCTrack>& cdcT
     CDCTrajectory2D fittedTrajectory = trackFitter.fit(track);
     // Keep good fits - p-value is not really a probability,
     // but what can you do if the original author did not mind...
-    if (track.size() < 5 or not(fittedTrajectory.getPValue() >= minimal_probability_for_good_fit)) {
+    if (not(fittedTrajectory.getPValue() >= minimal_probability_for_good_fit)) {
       // Release hits
       track.forwardTakenFlag(false);
       return true;
@@ -159,4 +160,17 @@ void TrackProcessor::deleteTracksWithLowFitProbability(std::list<CDCTrack>& cdcT
     return false;
   };
   erase_remove_if(cdcTrackList, lowPValue);
+}
+
+void TrackProcessor::deleteShortTracks(std::list<CDCTrack>& cdcTrackList, double minimal_size)
+{
+  const auto isShort = [&](const CDCTrack & track) {
+    if (track.size() < minimal_size) {
+      // Release hits
+      track.forwardTakenFlag(false);
+      return true;
+    }
+    return false;
+  };
+  erase_remove_if(cdcTrackList, isShort);
 }

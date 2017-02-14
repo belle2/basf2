@@ -41,6 +41,9 @@ namespace Belle2 {
       static void deleteTracksWithLowFitProbability(std::list<CDCTrack>& cdcTrackList,
                                                     double minimal_probability_for_good_fit = 0.4);
 
+      /// Remove tracks that are shorter than the given number of hits.
+      static void deleteShortTracks(std::list<CDCTrack>& cdcTrackList, double minimal_size = 5);
+
     private:
       /// Check track quality -- currently based on number of hits only.
       static bool checkTrackQuality(const CDCTrack& track);

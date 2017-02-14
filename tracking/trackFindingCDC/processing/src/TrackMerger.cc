@@ -41,7 +41,7 @@ void TrackMerger::doTracksMerging(std::list<CDCTrack>& cdcTrackList,
     }
   }
 
-  erase_remove_if(cdcTrackList, Size() < 3u);
+  TrackProcessor::deleteShortTracks(cdcTrackList);
 }
 
 template <class ACDCTracks>

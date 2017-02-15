@@ -10,7 +10,6 @@
 
 #include <tracking/modules/qualityEstimatorVXD/MCQualityEstimatorVXDModule.h>
 #include <framework/logging/Logger.h>
-#include <exception>
 
 using namespace Belle2;
 

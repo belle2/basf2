@@ -27,7 +27,7 @@ REG_MODULE(EKLMRawPacker)
 EKLMRawPackerModule::EKLMRawPackerModule() : Module()
 {
   ///Set module properties
-  setDescription("an Example to pack data to a RawKLM object");
+  setDescription("EKLM raw data packer (creates RawKLM from EKLMDigit).");
   setPropertyFlags(c_ParallelProcessingCertified);
   ///  maximum # of events to produce( -1 : inifinite)
   addParam("MaxEventNum", max_nevt, "Maximum event number to make", -1);

@@ -26,7 +26,7 @@ REG_MODULE(EKLMUnpacker)
 
 EKLMUnpackerModule::EKLMUnpackerModule() : Module()
 {
-  setDescription("Produce EKLMDigits from RawEKLM");
+  setDescription("EKLM unpacker (creates EKLMDigit from RawKLM).");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("outputDigitsName", m_outputDigitsName,
            "Name of EKLMDigit store array", string("EKLMDigits"));

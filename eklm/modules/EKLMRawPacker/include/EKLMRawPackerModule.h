@@ -72,16 +72,16 @@ namespace Belle2 {
     bool m_useDefaultElectId;
 
     /** Number of events in a run. */
-    int max_nevt;
+    int m_MaxNEvents;
 
     /** Number of events. */
-    int n_basf2evt;
+    int m_NEvents;
 
     /** Event metadata. */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
     /** RawKLM array. */
-    StoreArray<RawKLM> rawklmarray;
+    StoreArray<RawKLM> m_RawKLMArray;
 
     /** Map of logical coordinates to hardware coordinates. */
     std::map<int, int> m_ModuleIdToelectId;

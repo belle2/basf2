@@ -30,10 +30,10 @@ EKLMRawPackerModule::EKLMRawPackerModule() : Module()
   setDescription("EKLM raw data packer (creates RawKLM from EKLMDigit).");
   setPropertyFlags(c_ParallelProcessingCertified);
   ///  maximum # of events to produce( -1 : inifinite)
-  addParam("MaxEventNum", max_nevt, "Maximum event number to make", -1);
+  addParam("MaxEventNum", m_MaxNEvents, "Maximum event number to make", -1);
   addParam("useDefaultModuleId", m_useDefaultElectId,
            "Use default elect id if not found in mapping", true);
-  n_basf2evt = 0;
+  m_NEvents = 0;
 }
 
 EKLMRawPackerModule::~EKLMRawPackerModule()
@@ -43,7 +43,7 @@ EKLMRawPackerModule::~EKLMRawPackerModule()
 void EKLMRawPackerModule::initialize()
 {
   m_eventMetaDataPtr.registerInDataStore();
-  rawklmarray.registerPersistent();
+  m_RawKLMArray.registerPersistent();
   loadMap();
 }
 
@@ -122,13 +122,13 @@ void EKLMRawPackerModule::event()
     rawcprpacker_info.exp_num = 1;
     /* Run number : 14bits, subrun number : 8bits. */
     rawcprpacker_info.run_subrun_num = 2;
-    rawcprpacker_info.eve_num = n_basf2evt;
+    rawcprpacker_info.eve_num = m_NEvents;
     rawcprpacker_info.node_id = EKLM_ID + i; //?????????????????????????????????
     rawcprpacker_info.tt_ctime = 0x7123456;
     rawcprpacker_info.tt_utime = 0xF1234567;
     rawcprpacker_info.b2l_ctime = 0x7654321;
     //one call per copper
-    RawKLM* raw_klm = rawklmarray.appendNew();
+    RawKLM* raw_klm = m_RawKLMArray.appendNew();
     int* buf1, *buf2, *buf3, *buf4;
     int nwords_1st = data_words[i][0].size();
     int nwords_2nd = data_words[i][1].size();
@@ -168,16 +168,16 @@ void EKLMRawPackerModule::event()
     delete [] buf3;
     delete [] buf4;
   }
-  B2INFO("Event # " << n_basf2evt);
+  B2INFO("Event # " << m_NEvents);
   // Monitor
-  if (max_nevt >= 0) {
-    if (n_basf2evt >= max_nevt && max_nevt > 0) {
-      B2INFO("RunStop was detected. ( Setting:  Max event # " << max_nevt <<
-             " ) Processed Event " << n_basf2evt);
+  if (m_MaxNEvents >= 0) {
+    if (m_NEvents >= m_MaxNEvents && m_MaxNEvents > 0) {
+      B2INFO("RunStop was detected. ( Setting:  Max event # " << m_MaxNEvents <<
+             " ) Processed Event " << m_NEvents);
       m_eventMetaDataPtr->setEndOfData();
     }
   }
-  n_basf2evt++;
+  m_NEvents++;
   return;
 }
 

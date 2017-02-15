@@ -69,12 +69,6 @@ namespace Belle2 {
 
     }
 
-    GeoVXDAssembly GeoVXDCreator::createHalfShellSupport(GearDir) { return GeoVXDAssembly(); }
-
-    GeoVXDAssembly GeoVXDCreator::createLayerSupport(int, GearDir) { return GeoVXDAssembly(); }
-
-    GeoVXDAssembly GeoVXDCreator::createLadderSupport(int, GearDir) { return GeoVXDAssembly(); }
-
     vector<VXDGeoPlacement> GeoVXDCreator::getSubComponents(GearDir path)
     {
       vector<VXDGeoPlacement> result;
@@ -707,34 +701,7 @@ namespace Belle2 {
       }
     }
 
-    void GeoVXDCreator::setCurrentLayer(int layer)
-    {
-      string path = (boost::format("Ladder[@layer=%1%]/") % layer).str();
-      GearDir paramsLadder(m_components, path);
-      if (!paramsLadder) {
-        B2FATAL("Could not find Ladder definition for layer " << layer);
-      }
-      m_ladder = VXDGeoLadder(
-                   layer,
-                   paramsLadder.getLength("shift") / Unit::mm,
-                   paramsLadder.getLength("radius") / Unit::mm,
-                   paramsLadder.getAngle("slantedAngle", 0),
-                   paramsLadder.getLength("slantedRadius", 0) / Unit::mm,
-                   paramsLadder.getLength("Glue/oversize", 0) / Unit::mm,
-                   paramsLadder.getString("Glue/Material", "")
-                 );
 
-      for (const GearDir& sensorInfo : paramsLadder.getNodes("Sensor")) {
-        m_ladder.addSensor(VXDGeoSensorPlacement(
-                             sensorInfo.getInt("@id"),
-                             sensorInfo.getString("@type"),
-                             sensorInfo.getLength(".") / Unit::mm,
-                             sensorInfo.getBool("@flipU", false),
-                             sensorInfo.getBool("@flipV", false),
-                             sensorInfo.getBool("@flipW", false)
-                           ));
-      }
-    }
 
     void GeoVXDCreator::readLadderComponents(int layerID, int ladderID,  GearDir content, VXDGeometryPar& vxdGeometryPar)
     {

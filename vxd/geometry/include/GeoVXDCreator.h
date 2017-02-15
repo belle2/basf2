@@ -54,33 +54,6 @@ namespace Belle2 {
       virtual ~GeoVXDCreator();
 
       /**
-       * Create support structure for VXD Half Shell, that means everything
-       * thagt does not depend on layer or sensor alignment
-       * @param support Reference to the database containing the parameters
-       */
-      virtual GeoVXDAssembly createHalfShellSupport(GearDir support);
-
-      /**
-       * Create support structure for a VXD Layer
-       * @param layer Layer ID to create the support for
-       * @param support Reference to the database containing the parameters
-       */
-      virtual GeoVXDAssembly createLayerSupport(int layer, GearDir support);
-
-      /**
-       * Create support structure for a VXD Ladder
-       * @param layer Layer ID to create the support for
-       * @param support Reference to the database containing the parameters
-       */
-      virtual GeoVXDAssembly createLadderSupport(int layer, GearDir support);
-
-      /**
-       * Read the sensor definitions from the database
-       * @param sensors Reference to the database containing the parameters
-       */
-      virtual SensorInfoBase* createSensorInfo(const GearDir& sensor) = 0;
-
-      /**
        * Read the sensor definitions from the database
        * @param sensors Reference to the database containing the parameters
        */
@@ -93,11 +66,6 @@ namespace Belle2 {
        */
       virtual SensitiveDetectorBase* createSensitiveDetector(VxdID sensorID, const VXDGeoSensor& sensor,
                                                              const VXDGeoSensorPlacement& placement) = 0;
-
-      /**
-       * Read parameters for given layer and store in m_ladder
-       */
-      virtual void setCurrentLayer(int layer);
 
       /**
        * Read parameters for given layer and store in m_ladder

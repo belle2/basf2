@@ -66,35 +66,12 @@ namespace Belle2 {
         createGeometry(*dbObj, topVolume, type);
       }
 
-
-      /**
-       * Create support structure for SVD Half Shell, that means everything
-       * thagt does not depend on layer or sensor alignment
-       * @param support Reference to the database containing the parameters
-       */
-      virtual VXD::GeoVXDAssembly createHalfShellSupport(GearDir support);
-
-      /**
-       * Create support structure for a SVD Layer
-       * @param layer Layer ID to create the support for
-       * @param support Reference to the database containing the parameters
-       */
-      virtual VXD::GeoVXDAssembly createLayerSupport(int layer, GearDir support);
-
-      /**
-       * Create support structure for a SVD Ladder
-       * @param layer Layer ID to create the support for
-       * @param support Reference to the database containing the parameters
-       */
-      virtual VXD::GeoVXDAssembly createLadderSupport(int layer, GearDir support);
-
       /**
        * Create support structure for a SVD Layer
        * @param layer Layer ID to create the support
        * @param support Reference to the database containing the parameters
        */
       virtual VXD::GeoVXDAssembly createLayerSupportFromDB(int, const SVDGeometryPar& parameters);
-
 
       /**
        * Create support structure for a SVD Ladder
@@ -103,19 +80,12 @@ namespace Belle2 {
        */
       virtual VXD::GeoVXDAssembly createLadderSupportFromDB(int, const SVDGeometryPar& parameters);
 
-
       /**
        * Create support structure for SVD Half Shell, that means everything
        * thagt does not depend on layer or sensor alignment
        * @param support Reference to the database containing the parameters
        */
       virtual VXD::GeoVXDAssembly createHalfShellSupportFromDB(const SVDGeometryPar& parameters);
-
-      /**
-       * Read the sensor definitions from the database
-       * @param sensors Reference to the database containing the parameters
-       */
-      virtual VXD::SensorInfoBase* createSensorInfo(const GearDir& sensor);
 
       /**
        * Read the sensor definitions from the database

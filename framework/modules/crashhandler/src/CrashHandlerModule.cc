@@ -167,11 +167,6 @@ void CrashHandlerModule::terminate()
 {
   FixStatisticsContext context;
 
-  //get event map and make a deep copy of the StoreEntry objects
-  //(we want to revert changes to the StoreEntry objects, but not to the arrays/objects)
-  DataStore::StoreEntryMap& persistentMap = DataStore::Instance().getStoreEntryMap(DataStore::c_Persistent);
-  DataStore::StoreEntryMap persistentMapCopy = persistentMap;
-
   if (m_rx)
     m_rx->terminate();
   if (m_tx)

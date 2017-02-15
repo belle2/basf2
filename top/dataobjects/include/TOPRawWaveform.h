@@ -236,6 +236,22 @@ namespace Belle2 {
       return m_data;
     }
 
+    /**
+     * Checks if storage windows come in the consecutive order (no gaps in between)
+     * @param storageDepth storage depth
+     * @return true, if no gaps
+     */
+    bool areWindowsInOrder(unsigned short storageDepth = 512) const
+    {
+      for (unsigned i = 1; i < m_windows.size(); i++) {
+        auto diff = m_windows[i] - m_windows[i - 1];
+        if (diff < 0) diff += storageDepth;
+        if (diff != 1) return false;
+      }
+      return true;
+    }
+
+
   private:
 
     int m_moduleID = 0;                 /**< module ID */

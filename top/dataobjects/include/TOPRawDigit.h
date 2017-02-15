@@ -304,6 +304,43 @@ namespace Belle2 {
      */
     bool isFallingEdgeValid() const {return checkEdge(m_VFall1, m_VFall0, m_VPeak);}
 
+
+    /**
+     * Checks if feature extraction points make sense
+     * @return true if consistent
+     */
+    bool isFEValid() const
+    {
+      if (m_VPeak > 0) {
+        if (m_VRise0 > m_VRise1) return false;
+        if (m_VRise1 > m_VPeak) return false;
+        if (m_VFall0 > m_VPeak) return false;
+        if (m_VFall1 > m_VFall0) return false;
+      } else {
+        if (m_VRise0 < m_VRise1) return false;
+        if (m_VRise1 < m_VPeak) return false;
+        if (m_VFall0 < m_VPeak) return false;
+        if (m_VFall1 < m_VFall0) return false;
+      }
+      return true;
+    }
+
+
+    /**
+     * Checks if feature extraction finds a pedestal jump
+     * @return true if pedestal jump
+     */
+    bool isPedestalJump() const
+    {
+      if (m_sampleRise == 0) {
+        if ((m_dSampleFall + 1) % 64 == 0) return true;
+      } else if ((m_sampleRise + 1) % 64 == 0) {
+        if (m_dSampleFall % 64 == 0) return true;
+      }
+      return false;
+    }
+
+
   private:
 
     /**

@@ -77,7 +77,6 @@ class WFDisplay(Module):
             self.c1.cd(i + 1)
             self.hist[i].Draw()
             self.graph[i].SetMarkerStyle(24)
-            self.graph[i].SetMarkerColor(2)
             self.graph[i].Draw("sameP")
         self.c1.Update()
         stat = self.wait()
@@ -106,10 +105,14 @@ class WFDisplay(Module):
             self.hist[k].Reset()
             numSamples = waveform.getSize()
             self.hist[k].SetBins(numSamples, 0.0, float(numSamples))
-            title = 'chan ' + str(chan) + ' win '
-            title += str(waveform.getStorageWindow())
+            title = 'chan ' + str(chan) + ' win'
+            for window in waveform.getReferenceWindows():
+                title += ' ' + str(window)
             self.hist[k].SetTitle(title)
             self.hist[k].SetStats(False)
+            self.hist[k].SetLineColor(4)
+            if not waveform.areWindowsInOrder():
+                self.hist[k].SetLineColor(3)
             i = 0
             for sample in wf:
                 i = i + 1
@@ -128,6 +131,12 @@ class WFDisplay(Module):
                 i += 1
                 self.graph[k].SetPoint(i, raw.getSampleFall() + 1.5, raw.getValueFall1())
                 i += 1
+                if raw.isFEValid():  # works properly only for single rawDigit!
+                    self.graph[k].SetMarkerColor(2)
+                    if raw.isPedestalJump():
+                        self.graph[k].SetMarkerColor(3)
+                else:
+                    self.graph[k].SetMarkerColor(4)
             self.graph[k].Set(i)
 
             k = k + 1

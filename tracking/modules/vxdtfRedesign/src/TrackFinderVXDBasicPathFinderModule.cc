@@ -61,7 +61,7 @@ TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Mod
   addParam("storeSubsets",
            m_PARAMstoreSubsets,
            "Regulates if every subset of sufficient length of a path shall be collected as separate path or not.",
-           bool(true));
+           bool(false));
 
 }
 

@@ -56,7 +56,7 @@ namespace Belle2 {
 
 
     /** main function does need a network fulfilling some stuff which is fulfilled by any DirectedNode*/
-    std::vector<PathPtr> findPaths(ContainerType& aNetwork, bool storeSubsets = true)
+    std::vector<PathPtr> findPaths(ContainerType& aNetwork, bool storeSubsets = false)
     {
       m_storeSubsets = storeSubsets;
 
@@ -115,7 +115,7 @@ namespace Belle2 {
     unsigned int nRecursiveCalls = 0;
 
     /** flag if subsets should be stored or not */
-    bool m_storeSubsets = true;
+    bool m_storeSubsets = false;
 
 
   protected:

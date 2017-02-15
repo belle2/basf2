@@ -33,7 +33,6 @@ EKLMRawPackerModule::EKLMRawPackerModule() : Module()
   addParam("MaxEventNum", max_nevt, "Maximum event number to make", -1);
   addParam("useDefaultModuleId", m_useDefaultElectId,
            "Use default elect id if not found in mapping", true);
-  B2INFO("EKLMRawPackerModule: Constructor done.");
   n_basf2evt = 0;
 }
 
@@ -43,10 +42,8 @@ EKLMRawPackerModule::~EKLMRawPackerModule()
 
 void EKLMRawPackerModule::initialize()
 {
-  B2INFO("EKLMRawPackerModule: initialize() started.");
   m_eventMetaDataPtr.registerInDataStore();
   rawklmarray.registerPersistent();
-  B2INFO("EKLMRawPackerModule: initialize() done.");
   loadMap();
 }
 

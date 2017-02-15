@@ -9,15 +9,15 @@ Compare a left/right LUT with a table of true left/right counts for each pattern
 """
 
 # load LUTs to evaluate
-innerLUT = np.loadtxt('innerLUT_p0.8_b0.0.coe',
+innerLUT = np.loadtxt('trg/cdc/data/innerLUT_Bkg_p0.70_b0.80.coe',
                       skiprows=2, delimiter=',', usecols=[0], comments=';')
-outerLUT = np.loadtxt('outerLUT_p0.8_b0.0.coe',
+outerLUT = np.loadtxt('trg/cdc/data/outerLUT_Bkg_p0.70_b0.80.coe',
                       skiprows=2, delimiter=',', usecols=[0], comments=';')
 
 # load table with true left/right
 # shape: [[nTrueRight, nTrueLeft, nTrueBkg], ...]
-innerTrueLRTable = np.loadtxt('innerTrueLRTable_Bkg0.0_2.dat')
-outerTrueLRTable = np.loadtxt('outerTrueLRTable_Bkg0.0_2.dat')
+innerTrueLRTable = np.loadtxt('innerTrueLRTable_Bkg1.0_5.dat')
+outerTrueLRTable = np.loadtxt('outerTrueLRTable_Bkg1.0_5.dat')
 
 
 def check(LUT, TrueLRTable):
@@ -45,12 +45,18 @@ def printFractions(checkResults):
     nBkg = nKnownBkg + nUnknownBkg
     print("  %d TS with MC hit in priority wire" % nMC)
     if nMC > 0:
-        print("    %.3f correct, %.3f wrong, %.3f unknown"
-              % (nCorrectMC / nMC, nWrongMC / nMC, nUnknownMC / nMC))
+        print("    %d correct, %d wrong, %d unknown"
+              % (nCorrectMC, nWrongMC, nUnknownMC))
+        print("    correct fraction", 100. * nCorrectMC / (nCorrectMC + nWrongMC),
+              "+-", 100. * np.sqrt(nCorrectMC * nWrongMC / (nCorrectMC + nWrongMC) ** 3))
+        print("    unknown fraction", 100. * nUnknownMC / nMC,
+              "+-", 100. * np.sqrt(nUnknownMC * (nMC - nUnknownMC) / nMC ** 3))
     print("  %d TS with Bkg hit in priority wire" % nBkg)
     if nBkg > 0:
-        print("    %.3f known, %.3f unknown"
-              % (nKnownBkg / nBkg, nUnknownBkg / nBkg))
+        print("    %d known, %d unknown"
+              % (nKnownBkg, nUnknownBkg))
+        print("    unknown fraction", 100. * nUnknownBkg / nBkg,
+              "+-", 100. * np.sqrt(nUnknownBkg * (nBkg - nUnknownBkg) / nBkg ** 3))
 
 innerCheck = check(innerLUT, innerTrueLRTable)
 outerCheck = check(outerLUT, outerTrueLRTable)

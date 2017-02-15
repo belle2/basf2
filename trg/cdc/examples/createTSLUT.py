@@ -16,16 +16,19 @@ unknown: otherwise
 
 # load table with true left/right
 # shape: [[nTrueRight, nTrueLeft, nTrueBkg], ...]
-innerTrueLRTable = np.loadtxt('innerTrueLRTable_Bkg0.0_1.dat')
-outerTrueLRTable = np.loadtxt('outerTrueLRTable_Bkg0.0_1.dat')
+innerTrueLRTable = np.loadtxt('innerTrueLRTable_Bkg1.0_1.dat')
+outerTrueLRTable = np.loadtxt('outerTrueLRTable_Bkg1.0_1.dat')
+for i in range(2, 5):
+    innerTrueLRTable += np.loadtxt('innerTrueLRTable_Bkg1.0_%d.dat' % i)
+    outerTrueLRTable += np.loadtxt('outerTrueLRTable_Bkg1.0_%d.dat' % i)
 
 # define thresholds for left/right
-b = 0.
-p = 0.8
+b = 0.8
+p = 0.7
 
 # filenames for the new LUTs
-innerLUTFilename = "innerLUT_p%.1f_b%.1f.coe" % (p, b)
-outerLUTFilename = "outerLUT_p%.1f_b%.1f.coe" % (p, b)
+innerLUTFilename = "innerLUT_Bkg_p%.2f_b%.2f.coe" % (p, b)
+outerLUTFilename = "outerLUT_Bkg_p%.2f_b%.2f.coe" % (p, b)
 
 
 def isValidInnerPattern(pattern):

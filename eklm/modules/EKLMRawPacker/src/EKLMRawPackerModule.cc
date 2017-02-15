@@ -55,7 +55,6 @@ void EKLMRawPackerModule::event()
   B2INFO("pack the event.." << endl);
   StoreArray<EKLMDigit> digits;
   vector<uint32_t> data_words[4][4];//4 copper, 16 finesse
-  data_words[4][4].clear();
   //int tot_num_hits=digits.getEntries();
   B2INFO("EKLMRawPackerModule:: entries of eklmdigits " << digits.getEntries());
   ///fill data_words

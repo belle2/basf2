@@ -68,7 +68,7 @@ void EKLMRawPackerModule::event()
     buf[1] = 0;
     EKLMDigit* digit = digits[d];
 //OBTAIN PARAMETERS OF HIT FROM MC---------------------------
-    int   iForward = digit->getEndcap();
+    int   iEndcap = digit->getEndcap();
     int   iLayer   = digit->getLayer();
     int   iSector  = digit->getSector();
     int   iPlane   = digit->getPlane();
@@ -83,11 +83,11 @@ void EKLMRawPackerModule::event()
     int electId = 1;
     int moduleId = (iSector - 1)
                    | ((iLayer - 1)   << 2)
-                   | ((iForward - 1) << 6);
+                   | ((iEndcap - 1) << 6);
 //                 | ((iPlane-1)   << 7);            //Do we need plane?
     if (m_ModuleIdToelectId.find(moduleId) == m_ModuleIdToelectId.end()) {
       B2INFO("EKLMRawPacker::can not find in mapping for moduleId " <<
-             moduleId << " isForward? " << iForward << " , layer " << iLayer <<
+             moduleId << " isForward? " << iEndcap << " , layer " << iLayer <<
              " , sector " << iSector  << endl);
       if (m_useDefaultElectId)
         electId = 17;     //Defaults: copper=1; finesse=1;
@@ -97,14 +97,14 @@ void EKLMRawPackerModule::event()
       electId = m_ModuleIdToelectId[moduleId];
     int copperId = electId & 0xF;
     int finesse = (electId >> 4) & 0xF;
-//    B2INFO("EKLMRawPacker::copperId " << copperId << " F: " << iForward << " Lay: " << iLayer << " Sect: " << iSector << " Pl: " <<
+//    B2INFO("EKLMRawPacker::copperId " << copperId << " F: " << iEndcap << " Lay: " << iLayer << " Sect: " << iSector << " Pl: " <<
 //           iPlane << " Str: " << iStrip << " Cha: " << iCharge << " T: " << fTime << endl);
 //MAKE WORDS WITH INFORMATION
     uint16_t bword1 = 0;
     uint16_t bword2 = 0;
     uint16_t bword3 = 0;
     uint16_t bword4 = 0;
-    formatData(iForward, iLayer, iSector, iPlane, iStrip, iCharge, fTime,
+    formatData(iEndcap, iLayer, iSector, iPlane, iStrip, iCharge, fTime,
                bword1, bword2, bword3, bword4);
     buf[0] |= bword2;
     buf[0] |= ((bword1 << 16));
@@ -213,8 +213,8 @@ void EKLMRawPackerModule::formatData(
 
 void EKLMRawPackerModule::loadMap()
 {
-  for (int forward = 1; forward <= 2; forward++) {
-    for (int layer = 1; layer <= 12 + (forward - 1) * 2; layer++) {
+  for (int endcap = 1; endcap <= 2; endcap++) {
+    for (int layer = 1; layer <= 12 + (endcap - 1) * 2; layer++) {
       for (int sector = 1; sector <= 4; sector++) {
         //Do we need loop over planes as well?
         int copperId = 1;
@@ -228,7 +228,7 @@ void EKLMRawPackerModule::loadMap()
         int elecid = (copperId & 0xF) | ((finesseId & 0xF) << 4);
         int moduleId = (sector - 1)
                        | ((layer - 1)   << 2)
-                       | ((forward - 1) << 6);
+                       | ((endcap - 1) << 6);
 //                        | ((plane-1) << 7);            //Do we need plane?
         m_ModuleIdToelectId[moduleId] = elecid;
 //        B2INFO(" electId: " << elecid << " modId: " << moduleId << endl);

@@ -97,7 +97,7 @@ void EKLMUnpackerModule::event()
           uint16_t plane = ((bword1 >> 7) & 1) + 1;
           uint16_t sector = ((bword1 >> 8) & 3) + 1;
           uint16_t layer = ((bword1 >> 10) & 0xF) + 1;
-          uint16_t forward = ((bword1 >> 14) & 1) + 1;
+          uint16_t endcap = ((bword1 >> 14) & 1) + 1;
           uint16_t ctime = bword2 & 0xFFFF; //full bword
           /* Unused yet? */
           //uint16_t tdc = bword3 & 0x7FF;
@@ -105,7 +105,7 @@ void EKLMUnpackerModule::event()
           B2DEBUG(1, "copper: " << copperId << " finesse: " << finesse_num);
           EKLMDigit* digit = eklmDigits.appendNew();
           digit->setTime(ctime);
-          digit->setEndcap(forward);
+          digit->setEndcap(endcap);
           digit->setLayer(layer);
           digit->setSector(sector);
           digit->setPlane(plane);

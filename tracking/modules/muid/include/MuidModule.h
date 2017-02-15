@@ -125,6 +125,9 @@ namespace Belle2 {
     //! Name of the Track collection of the reconstructed tracks to be extrapolated
     std::string m_TracksColName;
 
+    //! Name of the RecoTrack collection of the reconstructed tracks to be extrapolated
+    std::string m_RecoTracksColName;
+
     //! Name of the muid collection of the muon identification information
     std::string m_MuidsColName;
 
@@ -178,7 +181,7 @@ namespace Belle2 {
                        G4Point3D&, G4Vector3D&, G4ErrorTrajErr&);
 
     //! Add an extrapolation point for the track
-    bool createHit(G4ErrorFreeTrajState*, Track&, int);
+    bool createHit(G4ErrorFreeTrajState*, Track&, RecoTrack*, int);
 
     //! Add a KLM sensitive-volume entry/exit extHit for the track
     void createEntryExitHit(const G4ErrorFreeTrajState*, ExtHitStatus, Track&, int);
@@ -190,10 +193,10 @@ namespace Belle2 {
     bool findEndcapIntersection(const TVector3&, Point&);
 
     //! Find the matching BKLM 2D hit nearest the intersection point of the track with the crossed BKLM plane
-    bool findMatchingBarrelHit(Point&, const Track&);
+    bool findMatchingBarrelHit(Point&, const Track&, RecoTrack*);
 
     //! Find the matching EKLM 2D hit nearest the intersection point of the track with the crossed EKLM plane
-    bool findMatchingEndcapHit(Point&, const Track&);
+    bool findMatchingEndcapHit(Point&, const Track&, RecoTrack*);
 
     //! Nudge the track using the matching hit
     void adjustIntersection(Point&, const double*, const TVector3&, const TVector3&);

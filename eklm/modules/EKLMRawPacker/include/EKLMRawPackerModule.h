@@ -69,7 +69,7 @@ namespace Belle2 {
   private:
 
     /** Use default elect id, if not found in mapping file. */
-    bool m_useDefaultElectId = true;
+    bool m_useDefaultElectId;
 
     /** Number of events in a run. */
     int max_nevt;

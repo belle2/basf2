@@ -64,12 +64,6 @@ namespace Belle2 {
 
   private:
 
-    /**
-     * Length of one hit in 4 byte words. This is needed find the hits in the
-     * detector buffer
-     */
-    const int hitLength = 2;
-
     /** Name of EKLMDigit store array. */
     std::string m_outputDigitsName;
 

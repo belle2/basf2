@@ -29,9 +29,12 @@ namespace Belle2 {
     std::vector<char> m_vec; /**< data buffer. */
     size_t m_size = 0; /**< current size, <= m_vec.size() */
   public:
-    CharBuffer(size_t initial_size = 0)
+    /** Constructor, with the initial size of the buffer to allocate
+     * (in bytes). size() will remain zero until buffer is filled.
+     */
+    CharBuffer(size_t initial_capacity = 0)
     {
-      m_vec.resize(initial_size);
+      m_vec.resize(initial_capacity);
     }
     /** copy data to end of buffer. */
     void add(const void* data, size_t len)

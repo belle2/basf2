@@ -54,14 +54,6 @@ namespace Belle2 {
       virtual ~GeoVXDCreator();
 
       /**
-       * Creates the Geant4 Objects for the VXD geometry.
-       * @param content A reference to the content part of the parameter
-       *                description, which should to be used to create the Geant4
-       *                objects.
-       */
-      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
-
-      /**
        * Create support structure for VXD Half Shell, that means everything
        * thagt does not depend on layer or sensor alignment
        * @param support Reference to the database containing the parameters

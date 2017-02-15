@@ -38,6 +38,14 @@ namespace Belle2 {
       /** The destructor of the GeoPXDCreator class. */
       virtual ~GeoPXDCreator();
 
+      /** The old create member: create the configuration object(s) on the fly
+       * and call the geometry creation routine.*/
+      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override
+      {
+        PXDGeometryPar config = createConfiguration(content);
+        createGeometry(config, topVolume, type);
+      }
+
       /** Create the configuration objects and save them in the Database.  If
        * more than one object is needed adjust accordingly */
       virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov) override

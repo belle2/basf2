@@ -71,27 +71,27 @@ namespace Belle2 {
        * @param layer Layer ID to create the support
        * @param support Reference to the database containing the parameters
        */
-      virtual VXD::GeoVXDAssembly createLayerSupportFromDB(int, const PXDGeometryPar& parameters);
+      virtual VXD::GeoVXDAssembly createLayerSupport();
 
       /**
        * Create support structure for a PXD Ladder
        * @param layer Layer ID to create the support
        * @param support Reference to the database containing the parameters
        */
-      virtual VXD::GeoVXDAssembly createLadderSupportFromDB(int, const PXDGeometryPar& parameters);
+      virtual VXD::GeoVXDAssembly createLadderSupport();
 
       /**
        * Create support structure for PXD Half Shell, that means everything
        * thagt does not depend on layer or sensor alignment
        * @param support Reference to the database containing the parameters
        */
-      virtual VXD::GeoVXDAssembly createHalfShellSupportFromDB(const PXDGeometryPar& parameters);
+      virtual VXD::GeoVXDAssembly createHalfShellSupport(const PXDGeometryPar& parameters);
 
       /**
        * Read the sensor definitions from the database
        * @param sensors Reference to the database containing the parameters
        */
-      virtual VXD::SensorInfoBase* createSensorInfoFromDB(const VXDGeoSensorPar& sensor);
+      virtual VXD::SensorInfoBase* createSensorInfo(const VXDGeoSensorPar& sensor);
 
       /**
        * Read the sensor definitions from the gearbox
@@ -114,20 +114,6 @@ namespace Belle2 {
        * @param support Reference to the database containing the parameters
        */
       void readHalfShellSupport(GearDir support, PXDGeometryPar& pxdGeometryPar);
-
-      /**
-       * Create support structure for a VXD Layer
-       * @param layer Layer ID to create the support for
-       * @param support Reference to the database containing the parameters
-       */
-      void readLayerSupport(int layer, GearDir support, PXDGeometryPar& pxdGeometryPar);
-
-      /**
-       * Create support structure for a VXD Ladder
-       * @param layer Layer ID to create the support for
-       * @param support Reference to the database containing the parameters
-       */
-      void readLadderSupport(int layer, GearDir support, PXDGeometryPar& pxdGeometryPar);
 
     private:
 

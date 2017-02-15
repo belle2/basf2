@@ -57,7 +57,7 @@ namespace Belle2 {
        * Read the sensor definitions from the database
        * @param sensors Reference to the database containing the parameters
        */
-      virtual SensorInfoBase* createSensorInfoFromDB(const VXDGeoSensorPar& sensor) = 0;
+      virtual SensorInfoBase* createSensorInfo(const VXDGeoSensorPar& sensor) = 0;
 
       /**
        * Return a SensitiveDetector implementation for a given sensor
@@ -70,14 +70,14 @@ namespace Belle2 {
       /**
        * Read parameters for given layer and store in m_ladder
        */
-      virtual void setCurrentLayerFromDB(int layer, const VXDGeometryPar& parameters);
+      virtual void setCurrentLayer(int layer, const VXDGeometryPar& parameters);
 
       /**
        * Place ladder corresponding to the given ladder id into volume
        * setLayer has to be called first to set the correct layer id
        */
-      G4Transform3D placeLadderFromDB(int ladderID, double phi, G4LogicalVolume* volume, const G4Transform3D& placement,
-                                      const VXDGeometryPar& parameters);
+      G4Transform3D placeLadder(int ladderID, double phi, G4LogicalVolume* volume, const G4Transform3D& placement,
+                                const VXDGeometryPar& parameters);
 
       /**
        * Return the position where a daughter component is to be placed
@@ -93,7 +93,7 @@ namespace Belle2 {
        * @param  params Payload object
        * @return Transformation matrix for component
        */
-      G4Transform3D getAlignmentFromDB(VXDAlignmentPar params);
+      G4Transform3D getAlignment(VXDAlignmentPar params);
 
       /**
        * Place a list of subcomponents into an component.
@@ -135,12 +135,12 @@ namespace Belle2 {
                                   width2, double length, double& height, double angle = 0);
 
 
-      void createDiamondsFromDB(const VXDGeoRadiationSensorsPar& params, G4LogicalVolume& topVolume, G4LogicalVolume& envelopeVolume);
+      void createDiamonds(const VXDGeoRadiationSensorsPar& params, G4LogicalVolume& topVolume, G4LogicalVolume& envelopeVolume);
 
       /**
        * Return vector of VXDGeoPlacements with all the components defined inside a given path
        */
-      std::vector<VXDGeoPlacementPar> getSubComponentsNEW(GearDir path);
+      std::vector<VXDGeoPlacementPar> getSubComponents(GearDir path);
 
       /**
        * Read parameters for a ladder in layer with given ID from gearbox and layer

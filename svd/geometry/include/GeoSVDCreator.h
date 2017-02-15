@@ -71,27 +71,27 @@ namespace Belle2 {
        * @param layer Layer ID to create the support
        * @param support Reference to the database containing the parameters
        */
-      virtual VXD::GeoVXDAssembly createLayerSupportFromDB(int, const SVDGeometryPar& parameters);
+      virtual VXD::GeoVXDAssembly createLayerSupport(int, const SVDGeometryPar& parameters);
 
       /**
        * Create support structure for a SVD Ladder
        * @param layer Layer ID to create the support
        * @param support Reference to the database containing the parameters
        */
-      virtual VXD::GeoVXDAssembly createLadderSupportFromDB(int, const SVDGeometryPar& parameters);
+      virtual VXD::GeoVXDAssembly createLadderSupport(int, const SVDGeometryPar& parameters);
 
       /**
        * Create support structure for SVD Half Shell, that means everything
        * thagt does not depend on layer or sensor alignment
        * @param support Reference to the database containing the parameters
        */
-      virtual VXD::GeoVXDAssembly createHalfShellSupportFromDB(const SVDGeometryPar& parameters);
+      virtual VXD::GeoVXDAssembly createHalfShellSupport(const SVDGeometryPar& parameters);
 
       /**
        * Read the sensor definitions from the database
        * @param sensors Reference to the database containing the parameters
        */
-      virtual VXD::SensorInfoBase* createSensorInfoFromDB(const VXDGeoSensorPar& sensor);
+      virtual VXD::SensorInfoBase* createSensorInfo(const VXDGeoSensorPar& sensor);
 
       /**
        * Read the sensor definitions from gearbox

@@ -52,7 +52,7 @@ namespace Belle2 {
       m_SensorInfo.clear();
     }
 
-    VXD::SensorInfoBase* GeoPXDCreator::createSensorInfoFromDB(const VXDGeoSensorPar& sensor)
+    VXD::SensorInfoBase* GeoPXDCreator::createSensorInfo(const VXDGeoSensorPar& sensor)
     {
 
       const PXDSensorInfoPar& infoPar = dynamic_cast<const PXDSensorInfoPar&>(*sensor.getSensorInfo());
@@ -214,7 +214,7 @@ namespace Belle2 {
 
         PXDSensorInfoPar* pxdInfo = readSensorInfo(GearDir(paramsSensor, "Active"));
         sensor.setSensorInfo(pxdInfo);
-        sensor.setComponents(getSubComponentsNEW(paramsSensor));
+        sensor.setComponents(getSubComponents(paramsSensor));
         pxdGeometryPar.getSensorMap()[sensorTypeID] = sensor;
         pxdGeometryPar.getSensorInfos().push_back(pxdInfo);
       }
@@ -246,8 +246,6 @@ namespace Belle2 {
           int layerID = layer.getInt("@id");
 
           readLadder(layerID, components, pxdGeometryPar);
-          readLayerSupport(layerID, support, pxdGeometryPar);
-          readLadderSupport(layerID, support, pxdGeometryPar);
 
           //Loop over defined ladders
           for (const GearDir& ladder : layer.getNodes("Ladder")) {
@@ -342,14 +340,6 @@ namespace Belle2 {
       return;
     }
 
-    void GeoPXDCreator::readLayerSupport(int layer, GearDir support, PXDGeometryPar& pxdGeometryPar)
-    {
-    }
-
-    void GeoPXDCreator::readLadderSupport(int layer, GearDir support, PXDGeometryPar& pxdGeometryPar)
-    {
-    }
-
     void GeoPXDCreator::createGeometry(const PXDGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
     {
 
@@ -384,7 +374,7 @@ namespace Belle2 {
                                                                 );
         envelope = new G4LogicalVolume(envelopeCone, material, m_prefix + ".Envelope");
         setVisibility(*envelope, false);
-        physEnvelope = new G4PVPlacement(getAlignmentFromDB(parameters.getAlignment(m_prefix)), envelope, m_prefix + ".Envelope",
+        physEnvelope = new G4PVPlacement(getAlignment(parameters.getAlignment(m_prefix)), envelope, m_prefix + ".Envelope",
                                          &topVolume, false, 1);
       }
 
@@ -415,7 +405,7 @@ namespace Belle2 {
                            paramsSensor.getActivePlacement().getW(),
                            paramsSensor.getActivePlacement().getWOffset() / Unit::mm
                          ));
-        sensor.setSensorInfo(createSensorInfoFromDB(paramsSensor));
+        sensor.setSensorInfo(createSensorInfo(paramsSensor));
 
         vector<VXDGeoPlacement> subcomponents;
         for (const VXDGeoPlacementPar& component : paramsSensor.getComponents()) {
@@ -485,12 +475,12 @@ namespace Belle2 {
       }
 
       //Build all ladders including Sensors
-      VXD::GeoVXDAssembly shellSupport = createHalfShellSupportFromDB(parameters);
+      VXD::GeoVXDAssembly shellSupport = createHalfShellSupport(parameters);
 
       //const std::vector<VXDHalfShellPar>& HalfShells = parameters.getHalfShells();
       for (const VXDHalfShellPar& shell : parameters.getHalfShells()) {
         string shellName =  shell.getName();
-        G4Transform3D shellAlignment = getAlignmentFromDB(parameters.getAlignment(m_prefix + "." + shellName));
+        G4Transform3D shellAlignment = getAlignment(parameters.getAlignment(m_prefix + "." + shellName));
 
         //Place shell support
         double shellAngle = shell.getShellAngle();
@@ -502,18 +492,18 @@ namespace Belle2 {
           const std::vector<std::pair<int, double>>& Ladders = layer.second;
 
 
-          setCurrentLayerFromDB(layerID, parameters);
+          setCurrentLayer(layerID, parameters);
 
           //Place Layer support
-          VXD::GeoVXDAssembly layerSupport = createLayerSupportFromDB(layerID, parameters);
+          VXD::GeoVXDAssembly layerSupport = createLayerSupport();
           if (!m_onlyActiveMaterial) layerSupport.place(envelope, shellAlignment * G4RotateZ3D(shellAngle));
-          VXD::GeoVXDAssembly ladderSupport = createLadderSupportFromDB(layerID, parameters);
+          VXD::GeoVXDAssembly ladderSupport = createLadderSupport();
 
           //Loop over defined ladders
           for (const std::pair<int, double>& ladder : Ladders) {
             int ladderID = ladder.first;
             double phi = ladder.second;
-            G4Transform3D ladderPlacement = placeLadderFromDB(ladderID, phi, envelope, shellAlignment, parameters);
+            G4Transform3D ladderPlacement = placeLadder(ladderID, phi, envelope, shellAlignment, parameters);
             if (!m_onlyActiveMaterial) ladderSupport.place(envelope, ladderPlacement);
           }
 
@@ -533,7 +523,7 @@ namespace Belle2 {
 
       //Create diamond radiation sensors if defined and in background mode
       if (m_activeChips) {
-        createDiamondsFromDB(parameters.getRadiationSensors(), topVolume, *envelope);
+        createDiamonds(parameters.getRadiationSensors(), topVolume, *envelope);
       }
 
 
@@ -549,11 +539,11 @@ namespace Belle2 {
       return sensitive;
     }
 
-    VXD::GeoVXDAssembly GeoPXDCreator::createLayerSupportFromDB(int, const PXDGeometryPar& parameters) { return VXD::GeoVXDAssembly(); }
+    VXD::GeoVXDAssembly GeoPXDCreator::createLayerSupport() { return VXD::GeoVXDAssembly(); }
 
-    VXD::GeoVXDAssembly GeoPXDCreator::createLadderSupportFromDB(int, const PXDGeometryPar& parameters) { return VXD::GeoVXDAssembly(); }
+    VXD::GeoVXDAssembly GeoPXDCreator::createLadderSupport() { return VXD::GeoVXDAssembly(); }
 
-    VXD::GeoVXDAssembly GeoPXDCreator::createHalfShellSupportFromDB(const PXDGeometryPar& parameters)
+    VXD::GeoVXDAssembly GeoPXDCreator::createHalfShellSupport(const PXDGeometryPar& parameters)
     {
       VXD::GeoVXDAssembly supportAssembly;
 

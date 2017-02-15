@@ -167,7 +167,7 @@ namespace Belle2 {
       return assembly;
     }
 
-    G4Transform3D GeoVXDCreator::getAlignmentFromDB(VXDAlignmentPar params)
+    G4Transform3D GeoVXDCreator::getAlignment(VXDAlignmentPar params)
     {
       G4RotationMatrix rotation(params.getAlpha(), params.getBeta(), params.getBeta());
       G4ThreeVector translation(params.getDU() / Unit::mm, params.getDV() / Unit::mm, params.getDW() / Unit::mm);
@@ -204,8 +204,8 @@ namespace Belle2 {
 
 
 
-    void GeoVXDCreator::createDiamondsFromDB(const VXDGeoRadiationSensorsPar& params, G4LogicalVolume& topVolume,
-                                             G4LogicalVolume& envelopeVolume)
+    void GeoVXDCreator::createDiamonds(const VXDGeoRadiationSensorsPar& params, G4LogicalVolume& topVolume,
+                                       G4LogicalVolume& envelopeVolume)
     {
       //Set the correct top volume to either global top or detector envelope
       G4LogicalVolume* top = &topVolume;
@@ -275,14 +275,14 @@ namespace Belle2 {
       return  new G4Trap(name, hheight, 0, 0, hlength, hwidth, hwidth2, 0, hlength - offset, hwidth - offset, hwidth2 - offset, 0);
     }
 
-    G4Transform3D GeoVXDCreator::placeLadderFromDB(int ladderID, double phi, G4LogicalVolume* volume,
-                                                   const G4Transform3D& placement,
-                                                   const VXDGeometryPar& parameters)
+    G4Transform3D GeoVXDCreator::placeLadder(int ladderID, double phi, G4LogicalVolume* volume,
+                                             const G4Transform3D& placement,
+                                             const VXDGeometryPar& parameters)
     {
       VxdID ladder(m_ladder.getLayerID(), ladderID, 0);
 
       G4Translate3D ladderPos(m_ladder.getRadius(), m_ladder.getShift(), 0);
-      G4Transform3D ladderPlacement = placement * G4RotateZ3D(phi) * ladderPos * getAlignmentFromDB(parameters.getAlignment(ladder));
+      G4Transform3D ladderPlacement = placement * G4RotateZ3D(phi) * ladderPos * getAlignment(parameters.getAlignment(ladder));
 
       vector<G4Point3D> lastSensorEdge;
       for (const VXDGeoSensorPlacement& p : m_ladder.getSensors()) {
@@ -347,7 +347,7 @@ namespace Belle2 {
         if (!m_onlyActiveMaterial) assembly = createSubComponents(name, s, s.getComponents() , false, true);
 
         G4RotationMatrix rotation(0, -M_PI / 2.0, -M_PI / 2.0);
-        G4Transform3D sensorAlign = getAlignmentFromDB(parameters.getAlignment(sensorID));
+        G4Transform3D sensorAlign = getAlignment(parameters.getAlignment(sensorID));
         G4Transform3D placement = G4Rotate3D(rotation) * sensorAlign * reflection;
 
         if (s.getSlanted()) {
@@ -431,7 +431,7 @@ namespace Belle2 {
       return ladderPlacement;
     }
 
-    void GeoVXDCreator::setCurrentLayerFromDB(int layer, const VXDGeometryPar& parameters)
+    void GeoVXDCreator::setCurrentLayer(int layer, const VXDGeometryPar& parameters)
     {
       const VXDGeoLadderPar& paramsLadder = parameters.getLadder(layer);
 
@@ -553,7 +553,7 @@ namespace Belle2 {
         B2DEBUG(100, "One dimension empty, using auto resize for component");
       }
 
-      c.setSubComponents(getSubComponentsNEW(params));
+      c.setSubComponents(getSubComponents(params));
       readSubComponents(c.getSubComponents(), componentsDir, vxdGeometryPar);
 
       if (vxdGeometryPar.getGlobalParams().getActiveChips() && params.exists("activeChipID")) {
@@ -595,7 +595,7 @@ namespace Belle2 {
       }
     }
 
-    std::vector<VXDGeoPlacementPar> GeoVXDCreator::getSubComponentsNEW(GearDir path)
+    std::vector<VXDGeoPlacementPar> GeoVXDCreator::getSubComponents(GearDir path)
     {
       vector<VXDGeoPlacementPar> result;
       for (const GearDir& component : path.getNodes("Component")) {

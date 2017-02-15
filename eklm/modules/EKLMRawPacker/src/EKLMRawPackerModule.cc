@@ -47,6 +47,10 @@ void EKLMRawPackerModule::initialize()
   loadMap();
 }
 
+void EKLMRawPackerModule::beginRun()
+{
+}
+
 void EKLMRawPackerModule::event()
 {
   B2INFO("pack the event.." << endl);
@@ -206,6 +210,14 @@ void EKLMRawPackerModule::formatData(
   bword2 |= (((int)ctime) & 0x7FFF);
   //bword3 |= (TDC & 0x7FFF); //DO WE NEED TDC ????????????????
   bword4 |= (charge & 0x7FFF);
+}
+
+void EKLMRawPackerModule::endRun()
+{
+}
+
+void EKLMRawPackerModule::terminate()
+{
 }
 
 void EKLMRawPackerModule::loadMap()

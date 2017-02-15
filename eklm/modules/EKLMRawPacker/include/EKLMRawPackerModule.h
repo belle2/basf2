@@ -24,44 +24,67 @@
 
 namespace Belle2 {
 
-  /*! A class definition of an input module for Sequential ROOT I/O */
-
+  /**
+   * EKLM raw data packer.
+   */
   class EKLMRawPackerModule : public Module {
 
-    // Public functions
   public:
 
-    //! Constructor / Destructor
+    /**
+     * Constructor.
+     */
     EKLMRawPackerModule();
+
+    /**
+     * Destructor.
+     */
     virtual ~EKLMRawPackerModule();
 
-    //! Module functions to be called from main process
+    /**
+     * Initializer.
+     */
     virtual void initialize();
 
-    //! Module functions to be called from event process
+    /**
+     * Called when entering a new run.
+     */
+    virtual void beginRun();
+
+    /**
+     * This method is called for each event.
+     */
     virtual void event();
 
+    /**
+     * This method is called if the current run ends.
+     */
+    virtual void endRun();
+
+    /**
+     * This method is called at the end of the event processing.
+     */
+    virtual void terminate();
 
   private:
-    //! check data contents
-    //    virtual void checkData(RawDataBlock* raw_datablk, unsigned int* eve_copper_0);
 
-    //    StoreArray<RawFTSW> raw_ftswarray;
-
-    //! use default elect id, if not found in mapping file
+    /** Use default elect id, if not found in mapping file. */
     bool m_useDefaultElectId = true;
 
-    //! # of events in a run
+    /** Number of events in a run. */
     int max_nevt;
 
-    //! Number of events
+    /** Number of events. */
     int n_basf2evt;
 
-    //! Event Meta Data
+    /** Event metadata. */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
-    //! RawKLM array
+    /** RawKLM array. */
     StoreArray<RawKLM> rawklmarray;
+
+    /** Map of logical coordinates to hardware coordinates. */
+    std::map<int, int> m_ModuleIdToelectId;
 
     /**
      * Creation of raw data.
@@ -81,12 +104,14 @@ namespace Belle2 {
                     int charge, float ctime, uint16_t& bword1,
                     uint16_t& bword2, uint16_t& bword3, uint16_t& bword4);
 
-    //! to map logical coordinates to hardware coordinates
-    std::map<int, int> m_ModuleIdToelectId;
-    //! fill m_ModuleIdToelectId from xml file
+    /**
+     * Fill m_ModuleIdToelectId.
+     */
     void loadMap();
+
   };
 
-} // end namespace Belle2
+}
 
-#endif // MODULEHELLO_H
+#endif
+

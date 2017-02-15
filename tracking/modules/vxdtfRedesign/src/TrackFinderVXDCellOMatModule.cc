@@ -55,7 +55,12 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
 
   addParam("strictSeeding",
            m_PARAMstrictSeeding,
-           "Regulates if every subset of sufficient length of a path shall be collected as separate path or not (if true, only one path per possibility is collected, if false subsets are collected too.",
+           "Regulates if every node with enough notes below it is used as a seed or only the outermost nodes.",
+           bool(true));
+
+  addParam("storeSubsets",
+           m_PARAMstoreSubsets,
+           "Regulates if every subset of sufficient length of a path shall be collected as separate path or not.",
            bool(true));
 }
 
@@ -118,7 +123,7 @@ void TrackFinderVXDCellOMatModule::event()
 
 
   /// collect all Paths starting from a Seed:
-  auto collectedPaths = m_pathCollector.findPaths(segmentNetwork);
+  auto collectedPaths = m_pathCollector.findPaths(segmentNetwork, m_PARAMstoreSubsets);
 
 
   /// convert paths of directedNodeNetwork-nodes to paths of const SpacePoint*:

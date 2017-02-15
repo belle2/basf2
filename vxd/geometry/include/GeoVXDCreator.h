@@ -96,21 +96,6 @@ namespace Belle2 {
       G4Transform3D getAlignmentFromDB(VXDAlignmentPar params);
 
       /**
-       * Get the volume and the height representing a single sub-component
-       * The name is assumed to be unique and Volumes are cached. If a component had already
-       * been created, the pointer to the existing volume will be returned
-       * @param name Name of the component
-       * @return pair containing the TGeoVolume* of the component as well as
-       *         the height of the component
-       */
-      VXDGeoComponent getComponent(const std::string& name);
-
-      /**
-       * Return vector of VXDGeoPlacements with all the components defined inside a given path
-       */
-      std::vector<VXDGeoPlacement> getSubComponents(GearDir path);
-
-      /**
        * Place a list of subcomponents into an component.
        *
        * If the volume of the given component is NULL, a new container will be
@@ -132,7 +117,6 @@ namespace Belle2 {
       GeoVXDAssembly createSubComponents(const std::string& name, VXDGeoComponent&
                                          component, std::vector<VXDGeoPlacement> placements,
                                          bool originCenter = true, bool allowOutside = false);
-
 
       /** Create a trapezoidal solid.
        * @param width full forward width of the shape in mm

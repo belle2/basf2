@@ -69,76 +69,6 @@ namespace Belle2 {
 
     }
 
-    vector<VXDGeoPlacement> GeoVXDCreator::getSubComponents(GearDir path)
-    {
-      vector<VXDGeoPlacement> result;
-      for (const GearDir& component : path.getNodes("Component")) {
-        string type;
-        if (!component.exists("@type")) {
-          type = component.getString("@name");
-        } else {
-          type = component.getString("@type");
-        }
-        int nPos = max(component.getNumberNodes("u"), component.getNumberNodes("v"));
-        nPos = max(nPos, component.getNumberNodes("w"));
-        nPos = max(nPos, component.getNumberNodes("woffset"));
-        for (int iPos = 1; iPos <= nPos; ++iPos) {
-          string index = (boost::format("[%1%]") % iPos).str();
-          result.push_back(VXDGeoPlacement(
-                             type,
-                             component.getLength("u" + index, 0) / Unit::mm,
-                             component.getLength("v" + index, 0) / Unit::mm,
-                             component.getString("w" + index, "bottom"),
-                             component.getLength("woffset" + index, 0) / Unit::mm
-                           ));
-        }
-      }
-      return result;
-    }
-
-    VXDGeoComponent GeoVXDCreator::getComponent(const string& name)
-    {
-      //Check if component already exists
-      map<string, VXDGeoComponent>::iterator cached = m_componentCache.find(name);
-      if (cached != m_componentCache.end()) {
-        return cached->second;
-      }
-      //Not cached, so lets create a new one
-      string path = (boost::format("descendant::Component[@name='%1%']/") % name).str();
-      GearDir params(m_components, path);
-      if (!params) B2FATAL("Could not find definition for component " << name);
-
-      VXDGeoComponent c(
-        params.getString("Material", m_defaultMaterial),
-        params.getString("Color", ""),
-        params.getLength("width", 0) / Unit::mm,
-        params.getLength("width2", 0) / Unit::mm,
-        params.getLength("length", 0) / Unit::mm,
-        params.getLength("height", 0) / Unit::mm
-      );
-      double angle  = params.getAngle("angle", 0);
-
-      if (c.getWidth() <= 0 || c.getLength() <= 0 || c.getHeight() <= 0) {
-        B2DEBUG(100, "One dimension empty, using auto resize for component");
-      } else {
-        G4VSolid* solid = createTrapezoidal(m_prefix + "." + name, c.getWidth(), c.getWidth2(), c.getLength(), c.getHeight(), angle);
-        c.setVolume(new G4LogicalVolume(solid, Materials::get(c.getMaterial()), m_prefix + "." + name));
-      }
-      vector<VXDGeoPlacement> subComponents = getSubComponents(params);
-      createSubComponents(m_prefix + "." + name, c, subComponents);
-      if (m_activeChips && params.exists("activeChipID")) {
-        int chipID = params.getInt("activeChipID");
-        B2DEBUG(50, "Creating BkgSensitiveDetector for component " << name << " with chipID " <<  chipID);
-        BkgSensitiveDetector* sensitive = new BkgSensitiveDetector(m_prefix.c_str(), chipID);
-        c.getVolume()->SetSensitiveDetector(sensitive);
-        m_sensitive.push_back(sensitive);
-      }
-      m_componentCache[name] = c;
-      return c;
-    }
-
-
-
     GeoVXDAssembly GeoVXDCreator::createSubComponents(const string& name, VXDGeoComponent& component,
                                                       vector<VXDGeoPlacement> placements, bool originCenter, bool allowOutside)
     {
@@ -153,8 +83,12 @@ namespace Belle2 {
       bool heightResize = component.getHeight() <= 0;
 
       for (VXDGeoPlacement& p : placements) {
+        //Test component already exists
+        if (m_componentCache.find(p.getName()) == m_componentCache.end()) {
+          B2FATAL("A component is requested that was not created before!");
+        }
+        VXDGeoComponent sub = m_componentCache[p.getName()];
 
-        VXDGeoComponent sub = getComponent(p.getName());
         B2DEBUG(100, "SubComponent " << p.getName());
         B2DEBUG(100, boost::format("Placement: u:%1% cm, v:%2% cm, w:%3% + %4% cm") % p.getU() % p.getV() % p.getW() % p.getWOffset());
         B2DEBUG(100, boost::format("Dimensions: %1%x%2%x%3% cm") % sub.getWidth() % sub.getLength() % sub.getHeight());

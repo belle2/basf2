@@ -76,12 +76,6 @@ namespace Belle2 {
        * Place ladder corresponding to the given ladder id into volume
        * setLayer has to be called first to set the correct layer id
        */
-      G4Transform3D placeLadder(int ladderID, double phi, G4LogicalVolume* volume, const G4Transform3D& placement);
-
-      /**
-       * Place ladder corresponding to the given ladder id into volume
-       * setLayer has to be called first to set the correct layer id
-       */
       G4Transform3D placeLadderFromDB(int ladderID, double phi, G4LogicalVolume* volume, const G4Transform3D& placement,
                                       const VXDGeometryPar& parameters);
 
@@ -93,15 +87,6 @@ namespace Belle2 {
        */
       G4Transform3D getPosition(const VXDGeoComponent& mother, const VXDGeoComponent& daughter, const VXDGeoPlacement& placement,
                                 bool originCenter);
-
-
-      /**
-       * Get Alignment for given component from the database
-       * @param  component Name of the component to align
-       * @return Transformation matrix for component, identity if component
-       *         could not be found
-       */
-      G4Transform3D getAlignment(const std::string& component);
 
       /**
        * Get Alignment from paylead object

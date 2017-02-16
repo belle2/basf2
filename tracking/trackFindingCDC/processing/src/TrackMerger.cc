@@ -24,24 +24,24 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void TrackMerger::doTracksMerging(std::list<CDCTrack>& cdcTrackList,
+void TrackMerger::doTracksMerging(std::vector<CDCTrack>& axialTracks,
                                   const std::vector<const CDCWireHit*>& allAxialWireHits,
                                   double minimum_probability_to_be_merged)
 {
   // Search for best matches - cannot use range for here :(.
-  for (std::list<CDCTrack>::iterator it1 = cdcTrackList.begin(); it1 !=  cdcTrackList.end(); ++it1) {
-    CDCTrack& track = *it1;
-    auto followingTracks = asRange(std::next(it1), cdcTrackList.end());
+  for (auto itTrack = axialTracks.begin(); itTrack !=  axialTracks.end(); ++itTrack) {
+    CDCTrack& track = *itTrack;
+    auto followingTracks = asRange(std::next(itTrack), axialTracks.end());
 
     WithWeight<MayBePtr<CDCTrack> > bestTrack = calculateBestTrackToMerge(track, followingTracks);
     double fitProb = bestTrack.getWeight();
 
     if (bestTrack != nullptr and fitProb > minimum_probability_to_be_merged) {
-      mergeTracks(track, *bestTrack, allAxialWireHits, cdcTrackList);
+      mergeTracks(track, *bestTrack, allAxialWireHits);
     }
   }
 
-  erase_remove_if(cdcTrackList, Size() < 3u);
+  TrackProcessor::deleteShortTracks(axialTracks);
 }
 
 template <class ACDCTracks>
@@ -124,8 +124,7 @@ void TrackMerger::removeStrangeHits(double factor, std::vector<const CDCWireHit*
 
 void TrackMerger::mergeTracks(CDCTrack& track1,
                               CDCTrack& track2,
-                              const std::vector<const CDCWireHit*>& allAxialWireHits,
-                              std::list<CDCTrack>& cdcTrackList)
+                              const std::vector<const CDCWireHit*>& allAxialWireHits)
 {
   if (&track1 == &track2) return;
 
@@ -138,33 +137,21 @@ void TrackMerger::mergeTracks(CDCTrack& track1,
 
   TrackQualityTools::normalizeTrack(track1);
 
-  std::vector<const CDCWireHit*> splittedHits = HitProcessor::splitBack2BackTrack(track1);
+  track2 = CDCTrack(HitProcessor::splitBack2BackTrack(track1));
 
   TrackQualityTools::normalizeTrack(track1);
 
-  TrackProcessor::addCandidateFromHitsWithPostprocessing(splittedHits, allAxialWireHits, cdcTrackList);
-}
+  for (CDCRecoHit3D& recoHit3D : track2) {
+    recoHit3D.setRecoPos3D({recoHit3D.getRefPos2D(), 0});
+    recoHit3D.setRLInfo(ERightLeft::c_Unknown);
+  }
 
-void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track,
-                                                 std::list<CDCTrack>& cdcTrackList,
-                                                 const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                                 double minimum_probability_to_be_merged)
-{
-  bool have_merged_something;
-  do {
-    have_merged_something = false;
-    WithWeight<MayBePtr<CDCTrack> > bestTrack = calculateBestTrackToMerge(track, cdcTrackList);
-    double fitProb = bestTrack.getWeight();
-
-    if (bestTrack and fitProb > minimum_probability_to_be_merged) {
-      mergeTracks(track, *bestTrack, allAxialWireHits, cdcTrackList);
-      have_merged_something = true;
+  TrackQualityTools::normalizeTrack(track2);
+  bool success = TrackProcessor::postprocessTrack(track2, allAxialWireHits);
+  if (not success) {
+    for (const CDCRecoHit3D& recoHit3D : track2) {
+      recoHit3D.getWireHit()->setTakenFlag(false);
     }
-
-    erase_remove_if(cdcTrackList, Size() < 3u);
-  } while (have_merged_something);
-
-  for (CDCTrack& otherTrack : cdcTrackList) {
-    TrackQualityTools::normalizeTrack(otherTrack);
+    track2.clear();
   }
 }

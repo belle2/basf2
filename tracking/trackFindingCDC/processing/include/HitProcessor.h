@@ -13,7 +13,6 @@
 #include <tracking/trackFindingCDC/numerics/ESign.h>
 
 #include <vector>
-#include <list>
 #include <map>
 
 namespace Belle2 {
@@ -31,32 +30,11 @@ namespace Belle2 {
     class HitProcessor {
 
     public:
-      /// Static class only.
-      HitProcessor() = delete;
-
-      /// Static class only.
-      HitProcessor(const HitProcessor& copy) = delete;
-
-      /// Static class only.
-      HitProcessor& operator=(const HitProcessor&) = delete;
-
       /** update given CDCRecoHit3D with given trajectory */
-      static void updateRecoHit3D(CDCTrajectory2D& trajectory2D, CDCRecoHit3D& hit);
-
-      /** Hits reassignment */
-      static void reassignHitsFromOtherTracks(std::list<CDCTrack>& trackList);
-
-      /** Append unused hits to tracks */
-      static void appendUnusedHits(std::list<CDCTrack>& tracks, const std::vector<const CDCWireHit*>& axialWireHits);
-
-      /** Delete all hits marked as bad (MASKED) in a track. Should be called after every hit reassignment. */
-      static void deleteAllMarkedHits(CDCTrack& track);
-
-      /** Delete all hits marked as bad (MASKED) in a list. Should be called after every hit reassignment. */
-      static void deleteAllMarkedHits(std::vector<const CDCWireHit*>& wireHits);
+      static void updateRecoHit3D(const CDCTrajectory2D& trajectory2D, CDCRecoHit3D& hit);
 
       /** Tries to split back-to-back tracks into two different tracks */
-      static std::vector<const CDCWireHit*> splitBack2BackTrack(CDCTrack& track);
+      static std::vector<CDCRecoHit3D> splitBack2BackTrack(CDCTrack& track);
 
       /** Checks whether the track has hits on both arms as seen from the origin */
       static bool isBack2BackTrack(CDCTrack& track);
@@ -79,7 +57,7 @@ namespace Belle2 {
       static int getArmSignVote(const CDCTrack& track, const Vector2D& center);
 
       /// Reset all masked hits.
-      static void resetMaskedHits(std::list<CDCTrack>& trackList, std::vector<const CDCWireHit*>& wireHits);
+      static void resetMaskedHits(std::vector<CDCTrack>& axialTracks, std::vector<const CDCWireHit*>& wireHits);
 
       /// Unset the MASKED flag and set the TAKEN flag of all hits but do not touch the track flags.
       static void unmaskHitsInTrack(CDCTrack& track);
@@ -97,7 +75,7 @@ namespace Belle2 {
       /// Assign new hits to the track basing on the distance from the hit to the track.
       static void assignNewHitsToTrack(CDCTrack& track,
                                        const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                       double minimalDistance = 0.15);
+                                       double minimalDistance = 0.2);
 
       /// Searches for a break in the super layer chain and remove all hits that come after that
       static void removeHitsAfterSuperLayerBreak(CDCTrack& track);

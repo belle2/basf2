@@ -55,7 +55,7 @@ namespace Belle2 {
   private:
     /// Worker
     /// Object for holding all found cdc tracks to be passed around to the postprocessing functions.
-    std::list<TrackFindingCDC::CDCTrack> m_tracks;
+    std::vector<TrackFindingCDC::CDCTrack> m_tracks;
 
     /// List to collect all axial wire hits
     std::vector<const TrackFindingCDC::CDCWireHit*> m_allAxialWireHits;

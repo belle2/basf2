@@ -23,11 +23,11 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void TrackProcessor::addCandidateFromHitsWithPostprocessing(std::vector<const CDCWireHit*>& foundAxialWireHits,
+void TrackProcessor::addCandidateFromHitsWithPostprocessing(const std::vector<const CDCWireHit*>& foundAxialWireHits,
                                                             const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                                            std::list<CDCTrack>& cdcTrackList)
+                                                            std::vector<CDCTrack>& axialTracks)
 {
-  if (foundAxialWireHits.size() == 0) return;
+  if (foundAxialWireHits.empty()) return;
 
   // New track
   CDCTrack track;
@@ -40,7 +40,7 @@ void TrackProcessor::addCandidateFromHitsWithPostprocessing(std::vector<const CD
   // Reconstruct and add hits
   for (const CDCWireHit* wireHit : foundAxialWireHits) {
     AutomatonCell& automatonCell = wireHit->getAutomatonCell();
-    if (automatonCell.hasTakenFlag() or automatonCell.hasMaskedFlag()) continue;
+    if (automatonCell.hasTakenFlag()) continue;
 
     CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstructNearest(wireHit, trajectory2D);
     track.push_back(std::move(recoHit3D));
@@ -55,7 +55,7 @@ void TrackProcessor::addCandidateFromHitsWithPostprocessing(std::vector<const CD
     for (const CDCRecoHit3D& recoHit3D : track) {
       recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
     }
-    cdcTrackList.emplace_back(std::move(track));
+    axialTracks.emplace_back(std::move(track));
   } else {
     /// Masked bad hits
     for (const CDCRecoHit3D& recoHit3D : track) {
@@ -69,21 +69,19 @@ bool TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<const C
 {
   TrackQualityTools::normalizeTrack(track);
 
-  for (int iPass = 0; iPass < 2; ++iPass) {
-    HitProcessor::splitBack2BackTrack(track);
-    TrackQualityTools::normalizeTrack(track);
-    if (not checkTrackQuality(track)) {
-      return false;
-    }
+  HitProcessor::deleteHitsFarAwayFromTrajectory(track);
+  TrackQualityTools::normalizeTrack(track);
+  if (not checkTrackQuality(track)) {
+    return false;
+  }
 
-    HitProcessor::deleteHitsFarAwayFromTrajectory(track);
-    TrackQualityTools::normalizeTrack(track);
-    if (not checkTrackQuality(track)) {
-      return false;
-    }
+  HitProcessor::assignNewHitsToTrack(track, allAxialWireHits);
+  TrackQualityTools::normalizeTrack(track);
 
-    HitProcessor::assignNewHitsToTrack(track, allAxialWireHits);
-    TrackQualityTools::normalizeTrack(track);
+  HitProcessor::splitBack2BackTrack(track);
+  TrackQualityTools::normalizeTrack(track);
+  if (not checkTrackQuality(track)) {
+    return false;
   }
 
   HitProcessor::unmaskHitsInTrack(track);
@@ -96,109 +94,83 @@ bool TrackProcessor::checkTrackQuality(const CDCTrack& track)
 }
 
 void TrackProcessor::assignNewHits(const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                   std::list<CDCTrack>& cdcTrackList)
+                                   std::vector<CDCTrack>& axialTracks)
 {
-  erase_remove_if(cdcTrackList, Size() == 0u);
-
-  for (CDCTrack& track : cdcTrackList) {
-    if (track.size() < 4) continue;
-
-    HitProcessor::assignNewHitsToTrack(track, allAxialWireHits);
-    TrackQualityTools::normalizeTrack(track);
-
-    std::vector<const CDCWireHit*> splittedHits = HitProcessor::splitBack2BackTrack(track);
-    TrackQualityTools::normalizeTrack(track);
-
-    addCandidateFromHitsWithPostprocessing(splittedHits, allAxialWireHits, cdcTrackList);
-
+  // First release some hits
+  for (CDCTrack& track : axialTracks) {
     HitProcessor::deleteHitsFarAwayFromTrajectory(track);
     TrackQualityTools::normalizeTrack(track);
   }
 
-  // TODO: HitProcessor::reassignHitsFromOtherTracks(cdcTrackList);
-  for (CDCTrack& cand : cdcTrackList) {
-    cand.forwardTakenFlag();
+  // Now add new ones
+  for (CDCTrack& track : axialTracks) {
+    if (track.size() < 5) continue;
+    HitProcessor::assignNewHitsToTrack(track, allAxialWireHits);
+    TrackQualityTools::normalizeTrack(track);
+
+    HitProcessor::splitBack2BackTrack(track);
+    TrackQualityTools::normalizeTrack(track);
+  }
+
+  for (CDCTrack& track : axialTracks) {
+    track.forwardTakenFlag();
   }
 }
 
-void TrackProcessor::mergeAndFinalizeTracks(std::list<CDCTrack>& cdcTrackList,
+void TrackProcessor::mergeAndFinalizeTracks(std::vector<CDCTrack>& axialTracks,
                                             const std::vector<const CDCWireHit*>& allAxialWireHits)
 {
   // Check quality of the track basing on holes on the trajectory;
   // if holes exsist then track is splitted
-  for (CDCTrack& track : cdcTrackList) {
-    if (track.size() < 4) continue;
-
+  for (CDCTrack& track : axialTracks) {
+    if (track.size() < 5) continue;
     HitProcessor::removeHitsAfterSuperLayerBreak(track);
-    HitProcessor::splitBack2BackTrack(track);
-
     TrackQualityTools::normalizeTrack(track);
-    std::vector<const CDCWireHit*> hitsToSplit;
-
-    for (CDCRecoHit3D& hit : track) {
-      if (hit.getWireHit().getAutomatonCell().hasMaskedFlag()) {
-        hitsToSplit.push_back(&(hit.getWireHit()));
-      }
-    }
-
-    HitProcessor::deleteAllMarkedHits(track);
-
-    for (const CDCWireHit* hit : hitsToSplit) {
-      hit->getAutomatonCell().setMaskedFlag(false);
-      hit->getAutomatonCell().setTakenFlag(false);
-    }
-
-    TrackProcessor::addCandidateFromHitsWithPostprocessing(hitsToSplit, allAxialWireHits, cdcTrackList);
   }
 
   // Update tracks before storing to DataStore
-  for (CDCTrack& track : cdcTrackList) {
+  for (CDCTrack& track : axialTracks) {
     TrackQualityTools::normalizeTrack(track);
-  };
+  }
 
   // Remove bad tracks
-  TrackProcessor::deleteTracksWithLowFitProbability(cdcTrackList);
+  TrackProcessor::deleteShortTracks(axialTracks);
+  TrackProcessor::deleteTracksWithLowFitProbability(axialTracks);
 
   // Perform tracks merging
-  TrackMerger::doTracksMerging(cdcTrackList, allAxialWireHits);
+  TrackMerger::doTracksMerging(axialTracks, allAxialWireHits);
 
   // Assign new hits
-  TrackProcessor::assignNewHits(allAxialWireHits, cdcTrackList);
+  TrackProcessor::assignNewHits(allAxialWireHits, axialTracks);
 }
 
-void TrackProcessor::deleteTracksWithLowFitProbability(std::list<CDCTrack>& cdcTrackList, double minimal_probability_for_good_fit)
+void TrackProcessor::deleteTracksWithLowFitProbability(std::vector<CDCTrack>& axialTracks,
+                                                       double minimal_probability_for_good_fit)
 {
   const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getNoDriftVarianceFitter();
   const auto lowPValue = [&](const CDCTrack & track) {
     CDCTrajectory2D fittedTrajectory = trackFitter.fit(track);
-    return not(fittedTrajectory.getPValue() >= minimal_probability_for_good_fit);
+    // Keep good fits - p-value is not really a probability,
+    // but what can you do if the original author did not mind...
+    if (not(fittedTrajectory.getPValue() >= minimal_probability_for_good_fit)) {
+      // Release hits
+      track.forwardTakenFlag(false);
+      return true;
+    }
+    return false;
   };
-  erase_remove_if(cdcTrackList, lowPValue);
+  erase_remove_if(axialTracks, lowPValue);
 }
 
-bool TrackProcessor::isChi2InQuantiles(CDCTrack& track, double lower_quantile, double upper_quantile)
+void TrackProcessor::deleteShortTracks(std::vector<CDCTrack>& axialTracks, double minimal_size)
 {
-  double pValue = track.getStartTrajectory3D().getPValue();
-  return (lower_quantile <= pValue) and (pValue <= upper_quantile);
-}
-
-double TrackProcessor::calculateChi2ForQuantile(double alpha, double n)
-{
-  return TMath::ChisquareQuantile(alpha, n);
-  /*
-  double d;
-  if (alpha > 0.5) {
-    d = 2.0637 * pow(log(1. / (1. - alpha)) - 0.16, 0.4274) - 1.5774;
-  } else {
-    d = -2.0637 * pow(log(1. / alpha) - 0.16, 0.4274) + 1.5774;
-  }
-
-  const double A = d * pow(2., 0.5);
-  const double B = 2.*(d * d - 1.) / 3.;
-  const double C = d * (d * d - 7) / (9. * pow(2., 0.5));
-  const double D = (6.*d * d * d * d + 14 * d * d - 32) / 405.;
-  const double E = d * (9 * d * d * d * d + 256 * d * d - 433) / (4860. * pow(2., 0.5));
-
-  return n + A * pow(n, 0.5) + B + C / pow(n, 0.5) + D / n + E / (n * pow(n, 0.5));
-  */
+  const auto isShort = [&](const CDCTrack & track) {
+    if (track.size() < minimal_size) {
+      // Release hits
+      track.forwardTakenFlag(false);
+      return true;
+    }
+    return false;
+  };
+  erase_remove_if(axialTracks, isShort);
 }

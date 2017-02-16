@@ -294,7 +294,7 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<CDCWireHit>& wireHits
   leafProcessor.finalizeTracks();
 
   // Write out tracks as return value
-  const std::list<CDCTrack>& foundTracks = leafProcessor.getTracks();
+  const std::vector<CDCTrack>& foundTracks = leafProcessor.getTracks();
   tracks.insert(tracks.end(), foundTracks.begin(), foundTracks.end());
 }
 

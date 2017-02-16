@@ -19,7 +19,6 @@
 #include <tracking/trackFindingCDC/hough/baseelements/WithSharedMark.h>
 
 #include <vector>
-#include <list>
 
 namespace Belle2 {
   class ModuleParamList;
@@ -118,7 +117,7 @@ namespace Belle2 {
       std::vector<Candidate> getCandidates() const;
 
       /// Getter for the tracks
-      const std::list<CDCTrack>& getTracks() const
+      const std::vector<CDCTrack>& getTracks() const
       {
         return m_tracks;
       }
@@ -184,7 +183,7 @@ namespace Belle2 {
       */
     private:
       /// Memory for found trajectories.
-      std::list<CDCTrack> m_tracks;
+      std::vector<CDCTrack> m_tracks;
 
       /// Memory for the pool of axial wire hits to can be used in the post processing
       std::vector<const CDCWireHit*> m_axialWireHits;

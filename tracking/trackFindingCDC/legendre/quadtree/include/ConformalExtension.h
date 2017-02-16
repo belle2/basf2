@@ -15,10 +15,8 @@
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessorWithNewReferencePoint.h>
 
-#include <list>
 #include <vector>
 #include <map>
-
 
 namespace Belle2 {
   namespace TrackFindingCDC {

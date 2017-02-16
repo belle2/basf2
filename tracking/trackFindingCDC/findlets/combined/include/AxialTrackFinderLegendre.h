@@ -11,6 +11,8 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <tracking/trackFindingCDC/findlets/minimal/AxialTrackMerger.h>
+
 #include <tracking/trackFindingCDC/hough/perigee/SimpleRLTaggedWireHitHoughTree.h>
 #include <tracking/trackFindingCDC/hough/algorithms/InPhi0CurvBox.h>
 
@@ -35,6 +37,9 @@ namespace Belle2 {
       using Super = Findlet<const CDCWireHit, CDCTrack>;
 
     public:
+      /// Constructor
+      AxialTrackFinderLegendre();
+
       /// Short description of the findlet
       std::string getDescription() final;
 
@@ -137,6 +142,10 @@ namespace Belle2 {
 
       /// The rough space tree search
       std::unique_ptr<SimpleRLTaggedWireHitPhi0CurvHough> m_roughHoughTree;
+
+    private: // findlets
+      /// Findlet to merge the tracks after the legendre finder.
+      AxialTrackMerger m_axialTrackMerger;
     };
   }
 }

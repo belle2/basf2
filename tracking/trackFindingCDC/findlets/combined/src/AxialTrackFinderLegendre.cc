@@ -66,14 +66,22 @@ namespace {
 }
 #endif
 
+AxialTrackFinderLegendre::AxialTrackFinderLegendre()
+  : Super()
+{
+  addProcessingSignalListener(&m_axialTrackMerger);
+}
+
 std::string AxialTrackFinderLegendre::getDescription()
 {
-  return "Generates axial tracks from segments using a hough space over phi0 impact and curvature for the spares case.";
+  return "Generates axial tracks from hits using several increasingly relaxed hough space search over phi0 and curvature.";
 }
 
 void AxialTrackFinderLegendre::exposeParameters(ModuleParamList* moduleParamList,
                                                 const std::string& prefix)
 {
+  m_axialTrackMerger.exposeParameters(moduleParamList, prefixed("merge", prefix));
+
   // Parameters for the fine hough space
   moduleParamList->addParameter(prefixed(prefix, "fineGranularityLevel"),
                                 m_param_fineGranularityLevel,
@@ -291,12 +299,12 @@ void AxialTrackFinderLegendre::apply(const std::vector<CDCWireHit>& wireHits,
   // One step of migrating hits between the already found tracks
   leafProcessor.migrateHits();
 
-  // Do some track merging and finalization steps
-  leafProcessor.finalizeTracks();
-
   // Write out tracks as return value
   const std::vector<CDCTrack>& foundTracks = leafProcessor.getTracks();
   tracks.insert(tracks.end(), foundTracks.begin(), foundTracks.end());
+
+  // Do track merging and finalization steps
+  m_axialTrackMerger.apply(tracks, axialWireHits);
 }
 
 void AxialTrackFinderLegendre::terminate()

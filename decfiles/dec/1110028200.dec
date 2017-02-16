@@ -5,9 +5,12 @@
 # Tested: Yes
 # PhysicsWG: TDPCV
 # Responsible: Alessandro Gaz
-# Email: alessandro.gaz@pd.infn.it
+# Email: gaz@hepl.phys.nagoya-u.ac.jp
 # Cuts: None
 # Date: 20150330
+# Last change by A. Morda' (morda@pd.infn.it):
+#     added Dalitz decay model  for eta'
+#
 #
 #
 Alias      eta'sig  eta'
@@ -28,7 +31,7 @@ Enddecay
 CDecay anti-B0sig
 #
 Decay eta'sig
-1.000         etasig     pi+     pi-        PHSP;
+1.000         etasig     pi+     pi-        ETAPRIME_DALITZ -0.047 -0.069 0.0 0.073;
 Enddecay
 #
 Decay etasig

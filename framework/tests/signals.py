@@ -16,6 +16,9 @@ import tempfile
 import shutil
 from basf2 import *
 
+# unblock SIGQUIT
+print(pthread_sigmask(SIG_UNBLOCK, [signal.SIGQUIT]))
+
 # we test for stray resources later, so let's clean up first
 os.system('clear_basf2_ipc')
 
@@ -90,6 +93,7 @@ def run_test(init_signal, event_signal, abort, test_in_process):
 
         def initialize(self):
             """reimplementation of Module::initialize()."""
+
             if init_signal:
                 pid = os.getpid()
                 B2INFO("Killing %s in init (sig %d)" % (pid, init_signal))

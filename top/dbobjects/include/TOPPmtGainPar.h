@@ -35,7 +35,7 @@ namespace Belle2 {
      * Useful constructor
      * @param serialNumber serial number
      */
-    TOPPmtGainPar(const std::string& serialNumber):
+    explicit TOPPmtGainPar(const std::string& serialNumber):
       m_serialNumber(serialNumber)
     {}
 

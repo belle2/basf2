@@ -329,7 +329,7 @@ namespace Belle2 {
 
       word = array.getWord(); // word 8
       short integral_p = word & 0xFFFF;
-      short qualityFlags_p = (word >> 16) & 0xFFFF;
+      //      short qualityFlags_p = (word >> 16) & 0xFFFF;
 
       // feature-extracted data (negative signal)
       word = array.getWord(); // word 9
@@ -351,7 +351,7 @@ namespace Belle2 {
 
       word = array.getWord(); // word 14
       short integral_n = word & 0xFFFF;
-      short qualityFlags_n = (word >> 16) & 0xFFFF;
+      //      short qualityFlags_n = (word >> 16) & 0xFFFF;
 
       // magic word
       word = array.getWord(); // word 15

@@ -1,0 +1,28 @@
+# EventType: 1290000000
+# Descriptor: [B+ -> K*+ nu anti-nu ]cc
+# NickName: Bu_Kstnunubar
+# Documentation: b->s nu nubar rare process
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Mario Merola
+# Email: mario.merola@na.infn.it
+# Cuts: None
+# Date: 20170129
+#
+#
+Decay Upsilon(4S)
+0.5000 B+sig B-              VSS;
+0.5000 B-sig B+              VSS;
+Enddecay
+#
+#
+Decay B+sig
+1.0000 K*+ nu_e anti-nu_e     PHOTOS PHSP ;
+Enddecay
+CDecay B-sig
+#
+# 
+End
+
+
+

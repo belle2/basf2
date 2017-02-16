@@ -129,7 +129,8 @@ applyCuts('B0:jspiks', 'abs(DeltaT)<25.')
 
 # Before using the Flavor Tagger you need at least the default weight files. If you do not set
 # any parameter the flavorTagger downloads them automatically from the database.
-# You just have to specify the system build or revision you are using if you train by yourself!!!
+# You just have to specify the system build or revision you are using only if you train by yourself!!!
+# Otherwise the flavor tagger automatically looks for the release you set before.
 
 # Alternatively you can download them from my realease:
 # copy the folder in @login.cc.kek.jp:
@@ -158,6 +159,13 @@ flavorTagger(
 # If you want to use Belle2 MC please follow the dedicated tutorial B2A801-FlavorTagger.py
 # since you need to follow a special module order.
 #
+
+# You can apply cuts using the flavor Tagger: qrOutput(FBDT) > -2 rejects all events which do not
+# provide flavor information using the tag side
+applyCuts('B0:jspiks', 'qrOutput(FBDT) > -2')
+
+# If you applied the cut on qrOutput(FBDT) > -2 before then you can rank by highest r- factor
+rankByHighest('B0:jspiks', 'abs(qrOutput(FBDT))', 0, 'Dilution_rank')
 
 # create and fill flat Ntuple with MCTruth and kinematic information
 toolsK0 = ['EventMetaData', '^K_S0']

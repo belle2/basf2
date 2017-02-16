@@ -110,6 +110,16 @@ namespace Belle2 {
       TH1F* h_tpc_temperature[4];
       /** Counter */
       int Ctr[8];
+      /** tpc rate */
+      TH1F* h_tpc_rates;
+      /** tpc dose */
+      TH1F* h_tpc_doses[10];
+      /** tpc dose */
+      float tpc_dose[8][5];
+      /** scale factor */
+      double scFac;
+      /** tpc dose */
+      TH1F* h_tpc_Doses;
     };
 
   }

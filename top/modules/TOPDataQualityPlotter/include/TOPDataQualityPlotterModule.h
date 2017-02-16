@@ -10,6 +10,7 @@
 
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TProfile.h"
 #include "TMultiGraph.h"
 #include "TDirectory.h"
 
@@ -29,10 +30,9 @@ namespace Belle2 {
     void basicDebuggingPlots(TOPRawWaveform* rawwave);
 
   private:
-    //FIXME temporarily need to keep track of events in a file until event builder works
     int m_iEvent; // keep track of iterations within run
     TH1F* m_samples;//Plot all ADC sample values.
-    TH2F* m_hitmap;
+    std::map<int, TH2F*> m_hitmap; // one hitmap per scrod
     TH1F* m_scrod_id;
     TH1F* m_asic;
     TH1F* m_carrier;
@@ -51,8 +51,11 @@ namespace Belle2 {
     std::map<int, std::map<std::string, TMultiGraph*>> m_channels; // per board stack, per asic
     std::map<int, std::map<std::string, std::set<int>>> m_channelLabels; // per board stack, per asic
 
+    std::map<int, std::map<int, std::map<int, std::map<int, TProfile*>>>> m_waveformHists; // scrod, carrier, asic, channel
+
     bool m_DRAWWAVES;
     bool m_DEBUGGING;
+    bool m_NOISE;
 
     std::string m_histogramDirectoryName;
     TDirectory* m_directory;

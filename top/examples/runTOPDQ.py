@@ -9,6 +9,8 @@
 # avoid race conditions beetween pyroot and GUI thread
 from ROOT import PyConfig
 PyConfig.StartGuiThread = False
+from ROOT import gROOT
+gROOT.SetBatch()
 
 from basf2 import *
 import sys

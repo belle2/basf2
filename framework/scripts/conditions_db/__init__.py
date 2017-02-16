@@ -8,21 +8,13 @@ conditions_db
 Python interface to the ConditionsDB
 """
 
-from basf2 import *
+from basf2 import B2FATAL, B2ERROR, B2INFO
 import requests
 from requests.packages.urllib3.fields import RequestField
 from requests.packages.urllib3.filepost import encode_multipart_formdata
 import json
 import hashlib
-
-
-def int_if_possible(value):
-    """Convert a value to an integer if possible. Silently ignore errors and
-    return the original value in this case"""
-    try:
-        return int(value)
-    except ValueError:
-        return value
+import urllib
 
 
 def calculate_checksum(filename):
@@ -33,11 +25,20 @@ def calculate_checksum(filename):
     return md5hash.hexdigest()
 
 
+def encode_name(name):
+    """Escape name to be used in an url"""
+    return urllib.parse.quote(name, safe="")
+
+
 class ConditionsDB:
     """Class to interface conditions db REST interface"""
 
     #: base url to the conditions db to be used if no custom url is given
-    BASE_URL = "http://belle2db.hep.pnnl.gov/b2s/rest/v1/"
+    BASE_URL = "http://belle2db.hep.pnnl.gov/b2s/rest/v2/"
+
+    class RequestError(RuntimeError):
+        """Class to be thrown by request() if there is any error"""
+        pass
 
     def __init__(self, base_url=BASE_URL, max_connections=10, retries=3):
         """
@@ -59,16 +60,20 @@ class ConditionsDB:
             pool_connections=max_connections, pool_maxsize=max_connections,
             max_retries=retries, pool_block=True))
 
-    def request(self, method, url, *args, **argk):
+    def request(self, method, url, message=None, *args, **argk):
         """
         Request function, similar to requests.request but adding the base_url
 
         Args:
             method (str): GET, POST, etc.
             url (str): url for the request, base_url will be prepended
+            message (str): message to show when starting the request and if it fails
 
         All other arguments will be forwarded to requests.request.
         """
+        if message is not None:
+            B2INFO(message)
+
         try:
             req = self._session.request(method, self._base_url + url.lstrip("/"), *args, **argk)
         except requests.exceptions.ConnectionError as e:
@@ -79,122 +84,105 @@ class ConditionsDB:
             # reply containing reason and message
             try:
                 response = req.json()
-                B2WARNING("Request {method} {url} returned {code} {reason}: {message}".format(
+                error = "Request {method} {url} returned {code} {reason}: {message}".format(
                     method=method, url=url,
                     code=response["code"],
                     reason=response["reason"],
-                    message=response["message"],
-                ))
+                    message=response.get("message", ""),
+                )
             except json.JSONDecodeError:
-                # seems the reply was not even json, just print it but flag it
-                # as error
-                B2ERROR("Request {method} {url} returned non JSON response {code}: {content}".format(
+                # seems the reply was not even json
+                error = "Request {method} {url} returned non JSON response {code}: {content}".format(
                     method=method, url=url,
                     code=req.status_code,
                     content=req.content
-                ))
+                )
+
+            if message is not None:
+                raise ConditionsDB.RequestError("{} failed: {}".format(message, error))
+            else:
+                raise ConditionsDB.RequestError(error)
+
+        try:
+            req.json()
+        except json.JSONDecodeError as e:
+            B2INFO("Invalid response: {}".format(req.content))
+            raise ConditionsDB.RequestError("{method} {url} returned invalid JSON response {}"
+                                            .format(e, method=method, url=url))
         return req
 
     def get_globalTags(self):
         """Get a list of all global tags. Returns a dictionary with the global
         tag names and the corresponding ids in the database"""
 
-        req = self.request("GET", "/globalTags")
-        if req.status_code != requests.codes.ok:
-            B2ERROR("Could not get the list of global tags")
+        try:
+            req = self.request("GET", "/globalTags")
+        except ConditionsDB.RequestError as e:
+            B2ERROR("Could not get the list of global tags: {}".format(e))
             return None
 
         result = {}
         for tag in req.json():
-            result[tag["name"]] = tag["globalTagId"]
+            result[tag["name"]] = tag
 
         return result
 
-    def get_globalTagId(self, name):
-        """Get the id of the global tag with the given name. Returns either the id or None if the tag was not found"""
+    def get_globalTagInfo(self, name):
+        """Get the id of the global tag with the given name. Returns either the
+        id or None if the tag was not found"""
 
-        req = self.request("GET", "/globalTag/{globalTagName}".format(globalTagName=name))
-        if req.status_code != requests.codes.ok:
-            B2ERROR("Cannot find global tag '%s'" % name)
-            return None
-
-        return req.json()["globalTagId"]
-
-    def get_experiments(self):
-        """Get list of experiments. Will return a dictionary with the
-        experiments as keys and their ids as values."""
-
-        req = self.request("GET", "/experiments")
-        if req.status_code != requests.codes.ok:
-            B2ERROR("Could not get the list of experiments")
-            return {}
-
-        result = {}
-        for exp in req.json():
-            result[int_if_possible(exp["name"])] = exp["experimentId"]
-
-        return result
-
-    def get_runs(self, experiment):
-        """Return list of runs for a given experiment name. Returns None if no
-        such experiments exists, otherwise a dictionary with run rame and run
-        ids"""
-
-        req = self.request("GET", "/experiment/{name}/runs".format(name=experiment))
-        if req.status_code != requests.codes.ok:
-            # there could just be no runs so just return empty
-            return {}
-
-        result = {}
-        for exp in req.json():
-            result[int_if_possible(exp["name"])] = exp["runId"]
-
-        return result
-
-    def get_runId(self, experiment, run):
-        """Get the run id for a given experiment and run name. Returns None if
-        no such experiment/run can be found.
-
-        Warning: don't use this function to get the id's of many runs in an
-        experiment. It's much better to call get_runs(experiment) and just look
-        in the dictionary."""
-
-        runs = self.get_runs(experiment)
         try:
-            return runs[run]
-        except (KeyError, TypeError):
-            B2ERROR("Cannot get run id for experiment {0}, run {1}: no such run".format(experiment, run))
+            req = self.request("GET", "/globalTag/{globalTagName}".format(globalTagName=encode_name(name)))
+        except ConditionsDB.RequestError as e:
+            B2ERROR("Cannot find global tag '{}': {}".format(name, e))
             return None
+
+        return req.json()
+
+    def get_globalTagType(self, name):
+        try:
+            req = self.request("GET", "/globalTagType")
+        except ConditionsDB.RequestError as e:
+            B2ERROR("Coult not get list of valid global tag types: {}".format(e))
+            return None
+
+        types = {e["name"]: e for e in req.json()}
+
+        if name in types:
+            return types[name]
+
+        B2ERROR("Unknown global tag type: '{}', please use one of {}".format(name, ", ".join(types)))
+        return None
 
     def get_payloads(self, global_tag=None):
         """
         Get a list of all defined payloads (for the given global_tag or by default for all).
-        Returns a dictionary which maps (package, module, checksum) to the payload id.
+        Returns a dictionary which maps (module, checksum) to the payload id.
         """
 
-        if global_tag:
-            req = self.request("GET", "/globalTag/{global_tag}/payloads".format(global_tag=global_tag))
-        else:
-            req = self.request("GET", "/payloads")
-        if req.status_code != requests.codes.ok:
-            B2ERROR("Cannot get list of payloads")
+        try:
+            if global_tag:
+                req = self.request("GET", "/globalTag/{global_tag}/payloads"
+                                   .format(global_tag=encode_name(global_tag)))
+            else:
+                req = self.request("GET", "/payloads")
+        except ConditionsDB.RequestError as e:
+            B2ERROR("Cannot get list of payloads: {}".format(e))
             return {}
 
         result = {}
         for payload in req.json():
-            package = payload["basf2Module"]["basf2Package"]["name"]
             module = payload["basf2Module"]["name"]
             checksum = payload["checksum"]
-            result[(package, module, checksum)] = payload["payloadId"]
+            result[(module, checksum)] = payload["payloadId"]
 
         return result
 
-    def create_payload(self, package, module, filename, checksum=None):
+    def create_payload(self, module, filename, checksum=None):
         """
         Create a new payload
 
         Args:
-            package (str): name of the package
             module (str): name of the module
             filename (str): name of the file
             checksum (str): md5 hexdigest of the file. Will be calculated automatically if not given
@@ -223,47 +211,47 @@ class ConditionsDB:
 
         # now make the request. Note to self: if multipart/form-data would be
         # accepted this would be so much nicer here. but it works.
-        req = self.request("POST", "/package/{packageName}/module/{moduleName}/payload".format(
-            packageName=package, moduleName=module
-        ), data=post_body, headers=headers)
-
-        if req.status_code != requests.codes.ok:
-            B2ERROR("Could not create Payload")
+        try:
+            req = self.request("POST", "/package/dbstore/module/{moduleName}/payload"
+                               .format(moduleName=encode_name(module)),
+                               data=post_body, headers=headers)
+        except ConditionsDB.RequestError as e:
+            B2ERROR("Could not create Payload: {}".format(e))
             return None
 
         return req.json()["payloadId"]
 
-    def create_iov(self, globalTagId, payloadId, firstRunId, lastRunId):
+    def create_iov(self, globalTagId, payloadId, firstExp, firstRun, finalExp, finalRun):
         """
         Create an iov.
 
         Args:
             globalTagId (int): id of the global tag, obtain with get_globalTagId()
             payloadId (int): id of the payload, obtain from create_payload() or get_payloads()
-            firstRunId (int): id of the first run for which this iov is valid. Optionally a tuple of experiment/run names
-            lastRunid (int): id of the last run for which this iov is valid. Optionally a tuple of experiment/run names
+            firstExp (int): first experiment for which this iov is valid
+            firstRun (int): first run for which this iov is valid
+            finalExp (int): final experiment for which this iov is valid
+            finalRun (int): final run for which this iov is valid
 
         Returns:
             payloadIovId of the created iov, None if creation was not successful
         """
-        # check if the run is a tuple of exp/run names. If so try to get the id
-        if isinstance(firstRunId, tuple):
-            firstRunId = self.get_runId(*firstRunId)
-            if firstRunId is None:
-                return None
-
-        # and again
-        if isinstance(lastRunId, tuple):
-            lastRunId = self.get_runId(*lastRunId)
-            if lastRunId is None:
-                return None
+        try:
+            # try to convert all arguments except self to integers to make sure they are
+            # valid.
+            local_variables = locals()
+            variables = {e: int(local_variables[e]) for e in
+                         ["globalTagId", "payloadId", "firstExp", "firstRun", "finalExp", "finalRun"]}
+        except ValueError:
+            B2ERROR("create_iov: All parameters need to be integers")
+            return None
 
         # try to create the iov
-        req = self.request("POST", "/globalTagPayload/{globalTagId},{payloadId}/payloadIov/{initialRunId},{finalRunId}".format(
-            globalTagId=globalTagId, payloadId=payloadId, initialRunId=firstRunId, finalRunId=lastRunId
-        ))
-        if req.status_code != requests.codes.ok:
-            B2ERROR("Could not create IOV")
+        try:
+            req = self.request("POST", "/globalTagPayload/{globalTagId},{payloadId}"
+                               "/payloadIov/{firstExp},{firstRun},{finalExp},{finalRun}".format(**variables))
+        except ConditionsDB.RequestError as e:
+            B2ERROR("Could not create IOV: {}".format(e))
             return None
 
         return req.json()["payloadIovId"]
@@ -272,8 +260,10 @@ class ConditionsDB:
         """Return existing iovs for a given tag name. It returns a dictionary
         which maps (payloadId, first runId, final runId) to iovId"""
 
-        req = self.request("GET", "/globalTag/{globalTagName}/globalTagPayloads".format(globalTagName=globalTagName))
-        if req.status_code != requests.codes.ok:
+        try:
+            req = self.request("GET", "/globalTag/{globalTagName}/globalTagPayloads"
+                               .format(globalTagName=encode_name(globalTagName)))
+        except ConditionsDB.RequestError as e:
             # there could be just no iovs so no error
             return {}
 
@@ -282,9 +272,9 @@ class ConditionsDB:
             payloadId = payload["payloadId"]["payloadId"]
             for iov in payload["payloadIovs"]:
                 iovId = iov["payloadIovId"]
-                firstRunId = iov["initialRunId"]["runId"]
-                finalRunId = iov["finalRunId"]["runId"]
-                result[(payloadId, firstRunId, finalRunId)] = iovId
+                firstExp, firstRun = iov["expStart"], iov["runStart"]
+                finalExp, finalRun = iov["expEnd"], iov["runEnd"]
+                result[(payloadId, firstExp, firstRun, finalExp, finalRun)] = iovId
 
         return result
 

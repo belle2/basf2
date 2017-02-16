@@ -109,8 +109,11 @@ namespace Belle2 {
      * @return   True if the database could be successfully written. */
     bool writeDatabase();
 
-    /** The database file name. */
+    /** The database file name as given (will be displayed in case of parsing errors */
     std::string m_fileName;
+
+    /** The absolute database file name. */
+    std::string m_absFileName;
 
     /** The directory of payloads. */
     std::string m_payloadDir;

@@ -149,25 +149,43 @@ namespace Belle2 {
   std::istream& operator>> (std::istream& input, IntervalOfValidity& iov)
   {
     iov = IntervalOfValidity();
-    if (input.eof()) return input;
+    if (!input.good()) {
+      throw std::runtime_error("cannot read from stream");
+    }
 
     std::string str[4];
     int index = 0;
-    while (!input.eof()) {
-      char c = input.get();
-      if ((index == 0) && (c == ' ')) continue;
-      if ((index == 3) && ((c == ' ') || (c == '\n'))) break;
+    while (input.good()) {
+      auto c = input.peek();
+      if (c == EOF) break;
+      if (((c == ' ') || (c == '\n') || (c == '\t'))) {
+        //ignore whitespace in the beginning
+        if (index == 0 && str[0].empty()) {
+          input.get();
+          continue;
+        }
+        //and stop parsing otherwise
+        break;
+      }
       if (c == ',') {
         index++;
         if (index == 4) break;
       } else {
         str[index] += c;
       }
+      input.get();
     }
-    iov.m_experimentLow = stoi(str[0]);
-    iov.m_runLow = stoi(str[1]);
-    iov.m_experimentHigh = stoi(str[2]);
-    iov.m_runHigh = stoi(str[3]);
+    if (index != 3) {
+      throw std::invalid_argument("IoV needs to be four values (firstExp,firstRun,finalExp,finalRun)");
+    }
+    try {
+      iov.m_experimentLow = stoi(str[0]);
+      iov.m_runLow = stoi(str[1]);
+      iov.m_experimentHigh = stoi(str[2]);
+      iov.m_runHigh = stoi(str[3]);
+    } catch (std::invalid_argument& e) {
+      throw std::invalid_argument("experiment and run numbers must be integers");
+    }
 
     return input;
   }

@@ -110,7 +110,7 @@ ESign HitProcessor::getArmSign(const CDCRecoHit3D& hit, const Vector2D& center)
 }
 
 void HitProcessor::resetMaskedHits(std::vector<CDCTrack>& axialTracks,
-                                   std::vector<const CDCWireHit*>& allAxialWireHits)
+                                   const std::vector<const CDCWireHit*>& allAxialWireHits)
 {
   for (const CDCWireHit* wireHit : allAxialWireHits) {
     wireHit->getAutomatonCell().setMaskedFlag(false);

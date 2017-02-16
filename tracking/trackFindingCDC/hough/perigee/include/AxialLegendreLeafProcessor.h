@@ -119,6 +119,12 @@ namespace Belle2 {
         return m_tracks;
       }
 
+      /// Forget the currently stored tracks
+      void clearTracks()
+      {
+        m_tracks.clear();
+      }
+
       /// Clear the found candidates
       void clear()
       {

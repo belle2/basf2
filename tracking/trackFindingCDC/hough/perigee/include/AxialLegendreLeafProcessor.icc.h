@@ -171,7 +171,6 @@ namespace Belle2 {
     std::vector<const CDCWireHit*>
     AxialLegendreLeafProcessor<ANode>::getUnusedWireHits()
     {
-      HitProcessor::resetMaskedHits(m_tracks, m_axialWireHits);
       std::vector<const CDCWireHit*> result;
       for (const CDCWireHit* wireHit : m_axialWireHits) {
         const AutomatonCell& automatonCell = wireHit->getAutomatonCell();

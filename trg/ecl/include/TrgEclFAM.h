@@ -48,6 +48,7 @@ namespace Belle2 {
     double m_TimeAve;
     /** The method to set hit average time */
     void setTimeAve(double TimeAve) { m_TimeAve = TimeAve; }
+    void setWaveform(int wave) {_waveform = wave;}
 
 
     /** FADC  */
@@ -143,6 +144,7 @@ namespace Belle2 {
     int TCBeambkgTag[576][80];
 
 
+    int _waveform;
 
 
   };

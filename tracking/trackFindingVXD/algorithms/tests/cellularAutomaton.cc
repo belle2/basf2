@@ -127,7 +127,7 @@ namespace CellularAutomatonTests {
     unsigned int nSeeds = cellularAutomaton.findSeeds(intNetwork);
     EXPECT_EQ(8,
               nRounds); // CA starts counting with 1, not with 0, the length of the paths is the number of Cells stored in it. the last round is an empty round.
-    EXPECT_EQ(10, nSeeds);
+    EXPECT_EQ(13, nSeeds);
 
     typedef PathCollectorRecursive <
     DirectedNodeNetwork<int, CACell>,
@@ -144,8 +144,8 @@ namespace CellularAutomatonTests {
     std::string out = PathCollectorType::printPaths(paths);
     B2INFO(out);
 
-
-    EXPECT_EQ(10,
+    // changed from 10 to 13 after changing seedThreshold from 2 to 1 in  tracking/trackFindingVXD/algorithms/include/CAValidator.h
+    EXPECT_EQ(13,
               paths.size());  // there could be more paths than seeds: why? ->the pathCollectorRecursive based on the CA also adds alternative paths with the same length.
     unsigned int longestPath = 0;
     for (PathCollectorType::PathPtr& aPath : paths) {

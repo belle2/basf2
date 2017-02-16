@@ -170,19 +170,31 @@ param_vxdtf = {'sectorSetup': secSetup,
 vxdtf.param(param_vxdtf)
 
 doPXD = 1
-TrackFinderMCTruth = register_module('TrackFinderMCTruth')
-TrackFinderMCTruth.logging.log_level = LogLevel.INFO
+# Use from TB packet:
+# TrackFinderMCTruthRecoTrack = register_module('TrackFinderMCVXDTB')
+# Should be use:
+TrackFinderMCTruthRecoTrack = register_module('TrackFinderMCTruthRecoTracks')
+
+TrackFinderMCTruthRecoTrack.logging.log_level = LogLevel.INFO
+
+# TrackFinderMCTruth = register_module('TrackFinderMCTruth')
+# TrackFinderMCTruth.logging.log_level = LogLevel.INFO
 # select which detectors you would like to use
-param_TrackFinderMCTruth = {
-    'UseCDCHits': 0,
-    'UseSVDHits': 1,
-    'UsePXDHits': doPXD,
-    'MinimalNDF': 6,
-    'WhichParticles': ['primary'],
-    'GFTrackCandidatesColName': 'mcTracks',
-}
+# param_TrackFinderMCTruth = {
+#     'UseCDCHits': 0,
+#     'UseSVDHits': 1,
+#     'UsePXDHits': doPXD,
+#     'MinimalNDF': 6,
+#     'WhichParticles': ['primary'],
+#     'GFTrackCandidatesColName': 'mcTracks',
+# }
 # 'GFTrackCandidatesColName': 'mcTracks2',
-TrackFinderMCTruth.param(param_TrackFinderMCTruth)
+# TrackFinderMCTruth.param(param_TrackFinderMCTruth)
+
+# Use from TB packet:
+GenfitterVXDTB = register_module('GenFitterVXDTB')
+GenfitterVXDTB.param('GFTrackCandidatesColName', 'caTracks')
+GenfitterVXDTB.param('FilterId', 'Kalman')
 
 setupGenfit = register_module('SetupGenfitExtrapolation')
 GenFitter = register_module('GenFitter')
@@ -208,8 +220,10 @@ main.add_module(eventCounter)
 # main2.add_module('SetupGenfitExtrapolation')
 main.add_module(setupGenfit)
 main.add_module(vxdtf)
-main.add_module(TrackFinderMCTruth)
-main.add_module(GenFitter)
+main.add_module(TrackFinderMCTruthRecoTrack)
+# main.add_module(TrackFinderMCTruth)
+main.add_module(GenfitterVXDTB)
+# main.add_module(GenFitter)
 
 main.add_module(PXDApplyClShCorrection)
 

@@ -174,8 +174,6 @@ void TOPDataQualityPlotterModule::endRun()
     // All 8 channels for a given ASIC are put in the same TMultiGraph
     // Then we make one canvas of several TMultigraphs for each scrod
     // FIXME: This is going to get called at the end of the run; the mem leak I am introducing here should be fixed by somebody more patient with ROOT memory management than me.
-    //TDirectory* oldDir = gDirectory;
-    //m_directory->cd();
     for (auto scrod_it : m_waveformHists) {
       int scrodid = scrod_it.first;
       string name = string("scrod_") + to_string(scrodid);
@@ -207,29 +205,12 @@ void TOPDataQualityPlotterModule::endRun()
           c->cd(canvasPad);
           h->Draw();
           mg->Draw("P");
-          //m_directory->WriteTObject(mg);
         }
       }
       m_directory->WriteTObject(c);
     }
-    //oldDir->cd();
   }
 }
-// string gname = string("scrod_") + to_string(scrodid) + string("_carrier") + to_string(carrierNumber) + string("_asic") + to_string(asicNumber);
-//if (m_channelLabels[scrodid].find(gname) == m_channelLabels[scrodid].end()) {
-//  m_channels[scrodid].insert(make_pair(gname, new TMultiGraph(gname.c_str(), gname.c_str())));
-//}
-// The data doesn't come in order, so we need to make sure we haven't seen this particular channel, yet
-// if (m_channelLabels[scrodid][asicid].find(iChannel) != m_channelLabels[scrodid][asicid].end()) {
-//   return;
-// }
-
-//TMultiGraph* mg = graph_it.second;
-//TDirectory* oldDir = gDirectory;
-//m_directory->cd();
-// oldDir->cd();
-//}
-
 
 void TOPDataQualityPlotterModule::terminate()
 {

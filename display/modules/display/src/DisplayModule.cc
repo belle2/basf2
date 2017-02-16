@@ -6,7 +6,6 @@
 #include <display/EveGeometry.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <geometry/GeometryManager.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -17,7 +16,6 @@
 #include <genfit/GFRaveVertex.h>
 
 #include <TApplication.h>
-#include <TGeoManager.h>
 #include <TEveManager.h>
 
 using namespace Belle2;
@@ -90,17 +88,14 @@ void DisplayModule::initialize()
   StoreArray<SVDCluster>::optional();
   StoreArray<CDCHit>::optional();
   StoreArray<ARICHHit>::optional();
+  StoreArray<TOPDigit>::optional();
   StoreArray<ROIid>::optional();
-
-  if (!gGeoManager) { //TGeo geometry not initialized, do it ourselves
-    //convert geant4 geometry to TGeo geometry
-    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-    geoManager.createTGeoRepresentation();
-  }
-  if (!gGeoManager) {
-    B2ERROR("Couldn't create TGeo geometry!");
-    return;
-  }
+  StoreArray<RecoHitInformation::UsedPXDHit>::optional();
+  StoreArray<RecoHitInformation::UsedSVDHit>::optional();
+  StoreArray<RecoHitInformation::UsedCDCHit>::optional();
+  StoreArray<TrackCandidateTFInfo>::optional();
+  StoreArray<CellTFInfo>::optional();
+  StoreArray<SectorTFInfo>::optional();
 
   m_display = new DisplayUI(m_automatic);
   //pass some parameters to DisplayUI to be able to change them at run time
@@ -117,10 +112,9 @@ void DisplayModule::initialize()
   m_display->addParameter("Show candidates and rec. hits", getParam<bool>("showRecoTracks"), 0);
   m_display->addParameter("Show tracks, vertices, gammas", getParam<bool>("showTrackLevelObjects"), 0);
 
-
+  EveGeometry::addGeometry();
   m_visualizer = new EVEVisualization();
   m_visualizer->setOptions(m_options);
-  EveGeometry::addGeometry();
 
   if (!m_fullGeometry and Gearbox::getInstance().exists("Detector/Name")) {
     std::string detectorName = Gearbox::getInstance().getString("Detector/Name");
@@ -180,9 +174,7 @@ void DisplayModule::event()
     for (std::string colName : recoTrackArrays) {
       StoreArray<RecoTrack> recoTracks(colName);
       for (const RecoTrack& recoTrack : recoTracks) {
-
         m_visualizer->addTrackCandidate(colName, recoTrack);
-
       }
     }
 
@@ -263,6 +255,8 @@ void DisplayModule::event()
 
       m_visualizer->addKLMCluster(&cluster);
     }
+
+    m_visualizer->addTOPDigits(StoreArray<TOPDigit>());
   }
 
   //all hits/tracks are added, finish visual representations

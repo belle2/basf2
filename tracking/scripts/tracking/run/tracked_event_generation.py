@@ -104,14 +104,13 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                 # Track matcher
                 mc_track_matcher_module = basf2.register_module('MCRecoTracksMatcher')
 
-                tracking_coverage.pop("WhichParticles", None)
-                tracking_coverage.pop("EnergyCut", None)
-                tracking_coverage.pop("UseNLoops", None)
+                matching_coverage = {key: value for key, value in tracking_coverage.items()
+                                     if key in ('UsePXDHits', 'UseSVDHits', 'UseCDCHits')}
                 mc_track_matcher_module.param({
                     'mcRecoTracksStoreArrayName': 'MCRecoTracks',
                     'MinimalPurity': 0.66,
                     'prRecoTracksStoreArrayName': "RecoTracks",
-                    **tracking_coverage
+                    **matching_coverage
                 })
 
                 path.add_module(IfMCParticlesPresentModule(track_finder_mc_truth_module))

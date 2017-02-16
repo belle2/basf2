@@ -14,6 +14,8 @@ bool Daemon::start(const char* title,
                    int argc, char** argv,
                    int nargc, const char* msg)
 {
+  g_argc = argc;
+  g_argv = argv;
   bool isdaemon = false;
   for (int i = 1; i < argc; i++) {
     if (strcmp(argv[i], "-d") == 0) {
@@ -36,3 +38,10 @@ bool Daemon::start(const char* title,
 }
 
 
+bool Daemon::restart()
+{
+  return execv(g_argv[0], g_argv) != -1;
+}
+
+int Daemon::g_argc = 0;
+char** Daemon::g_argv = NULL;

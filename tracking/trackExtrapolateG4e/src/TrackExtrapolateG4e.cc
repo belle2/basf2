@@ -391,11 +391,14 @@ void TrackExtrapolateG4e::registerVolumes()
              name.find("TOPBarSegment2Glue") != string::npos or
              name.find("TOPMirrorSegmentGlue") != string::npos) {
       m_EnterExit->push_back(*iVol);
+    } else if (name == "ARICH.AerogelImgPlate") {
+      m_EnterExit->push_back(*iVol);
+    } else if (name.find("ARICH.HAPDWindow") != string::npos) {
+      m_EnterExit->push_back(*iVol);
     } else if (name == "ARICH.AerogelSupportPlate") {
       m_EnterExit->push_back(*iVol);
-    } else if (name == "moduleWindow") {
-      m_EnterExit->push_back(*iVol);
     }
+
     // ECL crystal
     else if (name.find("lv_barrel_crystal_") != string::npos ||
              name.find("lv_forward_crystal_") != string::npos ||
@@ -445,13 +448,17 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
     }
   }
   // ARICH has an envelope that contains modules that each contain a moduleWindow
-  else if (name == "ARICH.AerogelSupportPlate") {
+  else if (name == "ARICH.AerogelImgPlate") {
+    detID = Const::EDetector::ARICH;
+    copyID = 6789;
+  } else if (name.find("ARICH.HAPDWindow") != string::npos) {
+    detID = Const::EDetector::ARICH;
+    copyID = (touch->GetHistoryDepth() >= 2) ? touch->GetVolume(2)->GetCopyNo() : 0;
+  } else if (name == "ARICH.AerogelSupportPlate") {
     detID = Const::EDetector::ARICH;
     copyID = 12345;
-  } else if (name == "moduleWindow") {
-    detID = Const::EDetector::ARICH;
-    copyID = (touch->GetHistoryDepth() >= 1) ? touch->GetVolume(1)->GetCopyNo() : 0;
   }
+
   // ECL crystal (=sensitive) is named "lv_{barrel,forward,backward}_crystal_*"
   else if (name.find("lv_barrel_crystal_") != string::npos ||
            name.find("lv_forward_crystal_") != string::npos ||

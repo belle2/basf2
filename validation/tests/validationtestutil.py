@@ -38,3 +38,16 @@ def check_path_exists(paths, terminate_on_error=True):
             if terminate_on_error:
                 sys.exit(1)
         print("Jep !")
+
+
+def create_fake_scripts(folders, scriptname):
+    """
+    Creates a fake script inside a nested path
+    :param folders: folders to hold the script
+    :param scriptname: name of the script itself
+    :return: nothing
+    """
+    if not os.path.exists(folders):
+        os.makedirs(folders)
+    with open(os.path.join(folders, scriptname), "w") as f:
+        f.write("# not content on purpose")

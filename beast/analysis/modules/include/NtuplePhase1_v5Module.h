@@ -158,6 +158,28 @@ namespace Belle2 {
     std::vector<Double_t> m_input_LB_TPC_dose_av; /**< list of TPC LB dose */
     std::vector<Double_t> m_input_HB_TPC_dose_av; /**< list of TPC HB dose */
 
+    std::vector<Double_t> m_input_LT_TPC_angular_rate; /**< list of TPC_angular LT rate */
+    std::vector<Double_t> m_input_HT_TPC_angular_rate; /**< list of TPC_angular HT rate */
+    std::vector<Double_t> m_input_LC_TPC_angular_rate[12]; /**< list of TPC_angular LC rate */
+    std::vector<Double_t> m_input_HC_TPC_angular_rate[12]; /**< list of TPC_angular HC rate */
+    std::vector<Double_t> m_input_LB_TPC_angular_rate[12]; /**< list of TPC_angular LB rate */
+    std::vector<Double_t> m_input_HB_TPC_angular_rate[12]; /**< list of TPC_angular HB rate */
+    std::vector<Double_t> m_input_LC_TPC_angular_rate_av; /**< list of TPC_angular LC rate */
+    std::vector<Double_t> m_input_HC_TPC_angular_rate_av; /**< list of TPC_angular HC rate */
+    std::vector<Double_t> m_input_LB_TPC_angular_rate_av; /**< list of TPC_angular LB rate */
+    std::vector<Double_t> m_input_HB_TPC_angular_rate_av; /**< list of TPC_angular HB rate */
+
+    std::vector<Double_t> m_input_LT_TPC_angular_dose; /**< list of TPC_angular LT dose */
+    std::vector<Double_t> m_input_HT_TPC_angular_dose; /**< list of TPC_angular HT dose */
+    std::vector<Double_t> m_input_LC_TPC_angular_dose[12]; /**< list of TPC_angular LC dose */
+    std::vector<Double_t> m_input_HC_TPC_angular_dose[12]; /**< list of TPC_angular HC dose */
+    std::vector<Double_t> m_input_LB_TPC_angular_dose[12]; /**< list of TPC_angular LB dose */
+    std::vector<Double_t> m_input_HB_TPC_angular_dose[12]; /**< list of TPC_angular HB dose */
+    std::vector<Double_t> m_input_LC_TPC_angular_dose_av; /**< list of TPC_angular LC dose */
+    std::vector<Double_t> m_input_HC_TPC_angular_dose_av; /**< list of TPC_angular HC dose */
+    std::vector<Double_t> m_input_LB_TPC_angular_dose_av; /**< list of TPC_angular LB dose */
+    std::vector<Double_t> m_input_HB_TPC_angular_dose_av; /**< list of TPC_angular HB dose */
+
     std::vector<Double_t> m_input_LT_CSI_dose; /**< list of CSI LT dose */
     std::vector<Double_t> m_input_HT_CSI_dose; /**< list of CSI HT dose */
     std::vector<Double_t> m_input_LC_CSI_dose[12]; /**< list of CSI LC dose */

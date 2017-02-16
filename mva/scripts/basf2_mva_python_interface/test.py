@@ -15,6 +15,7 @@ class State(object):
         pass
 
     def __repr__(self):
+        """ Returns representation of this state"""
         return 'State'
 
 

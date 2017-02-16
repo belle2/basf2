@@ -10,9 +10,7 @@
 
 #include <tracking/modules/qualityEstimatorVXD/QualityEstimatorVXDCircleFitModule.h>
 #include <framework/logging/Logger.h>
-
-#include <tracking/vxdCaTracking/TrackletFilters.h>
-#include <tracking/vxdCaTracking/SharedFunctions.h> // e.g. PositionInfo
+#include <geometry/bfieldmap/BFieldMap.h>
 
 // ROOT
 #include <TVector3.h>
@@ -26,8 +24,6 @@ REG_MODULE(QualityEstimatorVXDCircleFit)
 
 QualityEstimatorVXDCircleFitModule::QualityEstimatorVXDCircleFitModule() : Module()
 {
-  InitializeCounters();
-
   //Set module properties
   setDescription("The quality estimator module for SpacePointTrackCandidates using a circleFit.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -38,6 +34,13 @@ QualityEstimatorVXDCircleFitModule::QualityEstimatorVXDCircleFitModule() : Modul
 }
 
 
+void QualityEstimatorVXDCircleFitModule::beginRun()
+{
+  InitializeCounters();
+  // now retrieving the bfield value used in this module
+  m_bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+}
+
 
 void QualityEstimatorVXDCircleFitModule::event()
 {
@@ -46,20 +49,8 @@ void QualityEstimatorVXDCircleFitModule::event()
   m_nTCsTotal += m_spacePointTrackCands.getEntries();
 
 
-  /** WARNING!
-   *  THIS IS A TEMPORARY SOLUTION!
-   * The Karimäki-circleFit used here is using the interface of the old VXDTF and it is planned to use the CDC-Version of the same fitter to reduce redundancy of implementations.
-   * Please remove this reminder as soon as this is done.
-   * Jakob Lettenbichler Feb 29th, 2016
-   *
-   * WARNING hardcoded values so far, should be passed by parameter (or be solved in a general way)!
-   * */
-
-
-  double bFieldValue = 1.5; /**< magnetic field. WARNING hardcoded! */
-
-  auto fitter = TrackletFilters();
-  fitter.resetMagneticField(bFieldValue);
+  auto fitter = QualityEstimators();
+  fitter.resetMagneticField(m_bFieldZ);
 
   unsigned nTC = 0;
   // assign a QI computed using a circleFit for each given SpacePointTrackCand

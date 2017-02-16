@@ -38,10 +38,14 @@ class CDCLegendre(TrackingValidationRun):
 
         path.add_module('TrackExporter')
 
-    tracking_coverage = {'UsePXDHits': False,
-                         'UseSVDHits': False,
-                         'UseCDCHits': True,
-                         'UseOnlyAxialCDCHits': True}
+    tracking_coverage = {
+        'UsePXDHits': False,
+        'UseSVDHits': False,
+        'UseCDCHits': True,
+        'UseOnlyAxialCDCHits': True,
+        'UseOnlyBeforeTOP': True,
+        'UseNLoops': 1
+    }
 
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE

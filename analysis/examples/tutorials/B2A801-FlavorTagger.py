@@ -75,7 +75,8 @@ buildRestOfEvent('B0:jspiks')
 
 # Before using the Flavor Tagger you need at least the default weight files. If you do not set
 # any parameter the flavorTagger downloads them automatically from the database.
-# You just have to specify the system build or revision you are using if you train by yourself!!!
+# You just have to specify the system build or revision you are using only if you train by yourself!!!
+# Otherwise the flavor tagger automatically looks for the release you set before.
 
 # Alternatively you can download them from my realease:
 # copy the folder in @login.cc.kek.jp:
@@ -150,6 +151,13 @@ flavorTagger(
 # categories=['Electron', 'Muon', 'Kaon', ... etc.])
 #
 # Another possibility is to train a combiner for a specific category combination using the default weight files
+
+# You can apply cuts using the flavor Tagger: qrOutput(FBDT) > -2 rejects all events which do not
+# provide flavor information using the tag side
+applyCuts('B0:jspiks', 'qrOutput(FBDT) > -2')
+
+# If you applied the cut on qrOutput(FBDT) > -2 before then you can rank by highest r- factor
+rankByHighest('B0:jspiks', 'abs(qrOutput(FBDT))', 0, 'Dilution_rank')
 
 # Fit Vertex of the B0 on the tag side
 TagV('B0:jspiks', 'breco', 0.001, 'standard_PXD')

@@ -47,26 +47,11 @@ namespace Belle2 {
     int putPV(chid cid, const char* val);
     int putPV(chid cid, int val);
     bool addPV(const std::string& pvname) throw();
-    RCState& getStateTarget() throw() { return m_state_target; }
-    bool isAborting() const throw() { return m_isabort; }
-    void setAborting(bool isabort) throw() { m_isabort = isabort; }
-    bool isLoading() const throw() { return m_isload; }
-    void setLoading(bool isload) throw() { m_isload = isload; }
-    void checkRCState();
-    void setState(const RCState& rcstate)
-    {
-      RCCallback::setState(rcstate);
-      if (!rcstate.isTransition()) {
-        m_rcstate = rcstate;
-      }
-    }
+    void setStateRequest(const RCState& state) throw() { m_state_req = state; }
+
   private:
-    chid m_RCRqs;
-    chid m_PSRqs;
-    bool m_isabort;
-    bool m_isload;
-    RCState m_state_target;
-    RCState m_rcstate;
+    chid m_RC_req;
+    RCState m_state_req;
     HVState m_pscstate;
 
   };

@@ -16,26 +16,15 @@ ln -sf ${B2SLC}/psql
 ln -sf ${B2SLC}/readout
 ln -sf ${B2SLC}/dqm
 ln -sf ${B2SLC}/hvcontrol
+ln -sf ${B2SLC}/pyb2daq
 ln -sf ${B2SLC}/apps
 ln -sf ${B2SLC}/tools
 cp ${B2SLC}/Makefile ${B2SLC}/Makefile.src ${B2SLC}/setenv.sh .
 cp -r ${B2SLC}/extra .
 cp -r ${B2SLC}/data .
 
-if [ ! -e ${TOP}/pgsql ]
-then
-
-mkdir -p ${TOP}/pgsql
-cd ${SRC}
-wget https://ftp.postgresql.org/pub/source/v9.3.1/postgresql-9.3.1.tar.gz
-tar zxf postgresql-9.3.1.tar.gz
-cd ${SRC}/postgresql-9.3.1
-./configure --prefix=${TOP}/pgsql
-make
-make install
-cd ${TOP}
-
-fi
+${CUR}/download.sh
+${CUR}/compile.sh
 
 cd ${SLC}
 source setenv.sh

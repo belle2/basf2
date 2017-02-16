@@ -16,6 +16,11 @@ import tempfile
 import shutil
 from basf2 import *
 
+# Tests running in Bamboo have SIGQUIT blocked via sigmask(3),
+# so let's unblock it for this test.
+# See Jira ticket BII-1948 for details
+pthread_sigmask(SIG_UNBLOCK, [signal.SIGQUIT])
+
 # we test for stray resources later, so let's clean up first
 os.system('clear_basf2_ipc')
 
@@ -90,6 +95,7 @@ def run_test(init_signal, event_signal, abort, test_in_process):
 
         def initialize(self):
             """reimplementation of Module::initialize()."""
+
             if init_signal:
                 pid = os.getpid()
                 B2INFO("Killing %s in init (sig %d)" % (pid, init_signal))

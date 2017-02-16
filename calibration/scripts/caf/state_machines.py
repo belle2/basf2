@@ -11,7 +11,7 @@ import shutil
 
 from basf2 import *
 import ROOT
-from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm
+from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm, IntervalOfValidity
 
 from .utils import method_dispatch
 from .utils import merge_local_databases
@@ -20,7 +20,13 @@ from .utils import iov_from_vector
 from .utils import IoV_Result
 from .utils import IoV
 from .utils import AlgResult
+from .utils import get_iov_from_file
+from .utils import find_absolute_file_paths
+from .utils import runs_overlapping_iov
 from .backends import Job
+from .backends import LSF
+from .backends import PBS
+from .backends import Local
 
 
 class State():
@@ -362,7 +368,7 @@ class CalibrationMachine(Machine):
     processing for them.
     """
 
-    def __init__(self, calibration, initial_state="init", iteration=0):
+    def __init__(self, calibration, iov_to_calibrate=None, initial_state="init", iteration=0):
         """
         Takes a Calibration object from the caf framework and lets you
         set the initial state
@@ -395,10 +401,14 @@ class CalibrationMachine(Machine):
         self._collector_result = None
         #: Results of each iteration for all algorithms of this calibration
         self._algorithm_results = {}
+        #: IoV to be executed, currently will loop over all runs in IoV
+        self.iov_to_calibrate = iov_to_calibrate
 
         self.add_transition("submit_collector", "init", "running_collector",
                             conditions=self.dependencies_completed,
                             before=[self._make_output_dir,
+                                    self._resolve_file_paths,
+                                    self._build_iov_dict,
                                     self._create_collector_job,
                                     self._submit_collector])
         self.add_transition("fail", "running_collector", "collector_failed")
@@ -419,6 +429,57 @@ class CalibrationMachine(Machine):
         self.add_transition("finish", "algorithms_completed", "completed",
                             conditions=self._no_require_iteration,
                             before=self._prepare_final_db)
+
+    def files_containing_iov(self, iov):
+        """
+        Lookup function that takes an IoV and returns all files from the input_files that
+        overlap with this IoV
+        """
+        # Files that contain an Exp,Run range that overlaps with given IoV
+        overlapping_files = []
+
+        for file_path, file_iov in self.calibration.files_to_iovs.items():
+            if file_iov.overlaps(iov):
+                overlapping_files.append(file_path)
+        return overlapping_files
+
+    def _iov_requested(self):
+        """
+        """
+        if self.iov_to_calibrate:
+            B2DEBUG(100, "Overall IoV {0} requested for calibration: {1}".format(str(self.iov_to_calibrate), self.calibration.name))
+            return True
+        else:
+            B2DEBUG(100, "No overall IoV requested for calibration: {0}".format(self.calibration.name))
+            return False
+
+    def _resolve_file_paths(self):
+        """
+        """
+        if isinstance(self.collector_backend, Local) or \
+           isinstance(self.collector_backend, PBS) or \
+           isinstance(self.collector_backend, LSF):
+            B2INFO("Resolving absolute paths of input files for calibration: {0}".format(self.calibration.name))
+            self.calibration.input_files = find_absolute_file_paths(self.calibration.input_files)
+
+    def _build_iov_dict(self):
+        """
+        Build IoV file dictionary for each calibration if required.
+        """
+        iov_requested = self._iov_requested()
+        if iov_requested and not self.calibration.files_to_iovs:
+            B2INFO(("Creating IoV dictionaries to map files to (Exp,Run) ranges for calibration: {0}."
+                    " Filling dictionary from input file metadata."
+                    " If this is slow, set the 'files_to_iovs' attribute of each "
+                    "calibration before running.".format(self.calibration.name)))
+
+            files_to_iovs = {}
+            for file_path in self.calibration.input_files:
+                files_to_iovs[file_path] = get_iov_from_file(file_path)
+            self.calibration.files_to_iovs = files_to_iovs
+        elif iov_requested and self.calibration.files_to_iovs:
+            B2INFO(("Using File to IoV mapping from 'files_to_iovs' attribute for calibration: {0}."
+                    "".format(self.calibration.name)))
 
     def _below_max_iterations(self):
         """
@@ -607,9 +668,17 @@ class CalibrationMachine(Machine):
         if list_dependent_databases:
             merge_local_databases(list_dependent_databases, dependent_database_dir)
         job.input_sandbox_files.append(dependent_database_dir)
-        # Define the input file list and output patterns to be returned from collector job
-        job.input_files = self.calibration.input_files
+        # Define the input file list
+        input_data_files = self.calibration.input_files
+        # Reduce the input data files to only those that overlap with the optionally requested IoV
+        if self.iov_to_calibrate:
+            iov = self.iov_to_calibrate
+            input_data_files = self.files_containing_iov(iov)
+        job.input_files = input_data_files
+
+        # Output patterns to be returned from collector job
         job.output_patterns = self.calibration.output_patterns
+        B2DEBUG(100, "Collector job for {0}:\n{1}".format(self.calibration.name, str(job)))
         self._collector_job = job
 
     def _run_algorithms(self):
@@ -628,7 +697,7 @@ class CalibrationMachine(Machine):
         for algorithm in self.calibration.algorithms:
             machine = AlgorithmMachine(algorithm, self)
             child = ctx.Process(target=CalibrationMachine._run_algorithm_over_data,
-                                args=(machine, child_conn))
+                                args=(machine, self.iov_to_calibrate, child_conn))
             child.start()
             # wait for it to finish
             child.join()
@@ -636,7 +705,7 @@ class CalibrationMachine(Machine):
             self._algorithm_results[self.iteration][machine.name] = parent_conn.recv()
 
     @staticmethod
-    def _run_algorithm_over_data(machine, child_conn):
+    def _run_algorithm_over_data(machine, iov_to_calibrate, child_conn):
         """
         Runs a single AlgorithmMachine inside a subprocess over the IoV vector from the
         input data. Should produce the best constants requested and create a list of results
@@ -644,43 +713,65 @@ class CalibrationMachine(Machine):
         """
         machine.setup_algorithm()
 
-        iov_to_execute = ROOT.vector("std::pair<int,int>")()
-        for iov in machine.all_iov:
-            iov_to_execute.push_back(iov)
+        if not iov_to_calibrate:
+            iov_to_execute = ROOT.vector("std::pair<int,int>")()
+            for iov in machine.all_iov_collected:
+                iov_to_execute.push_back(iov)
+                machine.execute_iov(vec_iov=iov_to_execute)
+                readable_iov_to_execute = iov_from_vector(iov_to_execute)
+                if machine.results[-1].result == AlgResult.ok.value:
+                    machine.success(successful_iov=iov_to_execute)
+                    try:
+                        machine.complete()
+                    except ConditionError:
+                        machine.setup_algorithm(vec_iovs=iov_to_execute)
+                elif machine.results[-1].result == AlgResult.iterate.value:
+                    machine.iteration_requested(successful_iov=iov_to_execute)
+                    try:
+                        machine.complete()
+                    except ConditionError:
+                        machine.setup_algorithm(vec_iovs=iov_to_execute)
+                elif machine.results[-1].result == AlgResult.failure.value:
+                    machine.fail()
+                elif machine.results[-1].result == AlgResult.not_enough_data.value:
+                    machine.not_enough_data()
+                    try:  # Try to include next IoV in vector and recalculate
+                        machine.merge_next_iov()
+                    except ConditionError:
+                        try:
+                            merged_iov = ROOT.vector("std::pair<int,int>")()
+                            machine.merge_previous_iov(merged_iov=merged_iov, final_iov=iov_to_execute)
+                            list_payloads = machine.algorithm.algorithm.getPayloads()
+                            list_payloads.pop_back()
+                            machine.execute_iov(vec_iov=merged_iov)
+                        except ConditionError:
+                            machine.fail()  # If there's no next or previous IoVs then there wasn't enough data in the full set
+                            return
+
+            # Commit all the payloads and send out the results
+            machine.algorithm.algorithm.commit()
+            child_conn.send(machine.results)
+        # If we were given a specific IoV to calibrate we just execute all runs in that IoV at once
+        else:
+            iov_to_execute = runs_overlapping_iov(iov_to_calibrate, machine.all_iov_collected)
             machine.execute_iov(vec_iov=iov_to_execute)
             readable_iov_to_execute = iov_from_vector(iov_to_execute)
             if machine.results[-1].result == AlgResult.ok.value:
                 machine.success(successful_iov=iov_to_execute)
-                try:
-                    machine.complete()
-                except ConditionError:
-                    machine.setup_algorithm(vec_iovs=iov_to_execute)
+                machine.complete(single_iov=True)
             elif machine.results[-1].result == AlgResult.iterate.value:
                 machine.iteration_requested(successful_iov=iov_to_execute)
-                try:
-                    machine.complete()
-                except ConditionError:
-                    machine.setup_algorithm(vec_iovs=iov_to_execute)
+                machine.complete(single_iov=True)
             elif machine.results[-1].result == AlgResult.failure.value:
                 machine.fail()
             elif machine.results[-1].result == AlgResult.not_enough_data.value:
                 machine.not_enough_data()
-                try:  # Try to include next IoV in vector and recalculate
-                    machine.merge_next_iov()
-                except ConditionError:
-                    try:
-                        merged_iov = ROOT.vector("std::pair<int,int>")()
-                        machine.merge_previous_iov(merged_iov=merged_iov, final_iov=iov_to_execute)
-                        list_payloads = machine.algorithm.algorithm.getPayloads()
-                        list_payloads.pop_back()
-                        machine.execute_iov(vec_iov=merged_iov)
-                    except ConditionError:
-                        machine.fail()  # If there's no next or previous IoVs then there wasn't enough data in the full set
-                        return
+                machine.fail()  # Since we're only doing one overall IoV and there wasn't enough data, we fail
+                return
 
-        # Commit all the payloads and send out the results
-        machine.algorithm.algorithm.commit()
-        child_conn.send(machine.results)
+            # Commit all the payloads and send out the results
+            machine.algorithm.algorithm.commit()
+            child_conn.send(machine.results)
 
     def _prepare_final_db(self):
         """
@@ -726,7 +817,7 @@ class AlgorithmMachine(Machine):
         #: Results of this iteration for this algorithm
         self.results = []
         #: Highest Exp,Run in collected data
-        self.highest_exprun = None
+        self.highest_exprun_collected = None
         #: Previous successful IoV
         self.previous_iov = None
 
@@ -800,9 +891,9 @@ class AlgorithmMachine(Machine):
         """
         """
         #: Update all IoVs in collected input data now that we have grabbed it
-        self.all_iov = self.algorithm.algorithm.getRunListFromAllData()
-        last_exprun_pair = self.all_iov.back()
-        self.highest_exprun = (last_exprun_pair.first, last_exprun_pair.second)
+        self.all_iov_collected = self.algorithm.algorithm.getRunListFromAllData()
+        last_exprun_pair = self.all_iov_collected.back()
+        self.highest_exprun_collected = (last_exprun_pair.first, last_exprun_pair.second)
 
     def _log_mergenext_attempt(self, **kwargs):
         """
@@ -831,8 +922,12 @@ class AlgorithmMachine(Machine):
     def _all_iov_executed(self, **kwargs):
         """
         """
-        last_iov = self.results[-1].iov
-        return self.highest_exprun == (last_iov.exp_high, last_iov.run_high)
+        try:
+            if kwargs["single_iov"]:
+                return True
+        except KeyError:
+            last_iov = self.results[-1].iov
+            return self.highest_exprun_collected == (last_iov.exp_high, last_iov.run_high)
 
     def _setup_database_chain(self):
         """
@@ -880,7 +975,7 @@ class AlgorithmMachine(Machine):
 
     def _pre_algorithm(self, **kwargs):
         """
-        Call the data input function and algorithm setup function to do some setup
+        Call the user defined algorithm setup function
         """
         if self.algorithm.pre_algorithm:
             # We have to re-pass in the algorithm here because an outside user has created this method.
@@ -894,7 +989,7 @@ class AlgorithmMachine(Machine):
         B2INFO("Running {0} in working directory {1}".format(self.name, os.getcwd()))
 
         vec_iov_to_execute = kwargs["vec_iov"]
-        # Add each exprun to the vector in turn
+        # Create nicer overall IoV for this execution
         iov_readable = iov_from_vector(vec_iov_to_execute)
         B2INFO("Performing execution on {0}".format(iov_readable))
 

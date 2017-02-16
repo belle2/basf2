@@ -3,6 +3,8 @@
   <Creator library="ir">BeamPipeCreator</Creator>
   <Content>
 
+    <LimitStepLength desc="select 1 to limit step length inside beam pipes to be less than 5mm">0</LimitStepLength>
+
     <Safety>
         <L1 unit="cm">0.1</L1>
     </Safety>

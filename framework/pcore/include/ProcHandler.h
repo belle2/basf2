@@ -14,20 +14,32 @@ namespace Belle2 {
   /** A class to manage processes for parallel processing. */
   class ProcHandler {
   public:
-    /** Constructor */
-    ProcHandler();
+    /** Constructor
+     *
+     * Children marked as local will not cause the parent process to die
+     * in case of anormal termination. Errors can be detected using
+     * the return value of waitForAllProcesses().
+     * Note that you probably shouldn't have multiple ProcHandlers with
+     * local children running at the same time.
+     */
+    ProcHandler(unsigned int nWorkerProc, bool markChildrenAsLocal = false);
     /** Destructor */
     ~ProcHandler();
 
     /** Fork and initialize an input process */
     void startInputProcess();
-    /** Fork and initialize 'nproc' worker processes. */
-    void startWorkerProcesses(int nproc);
+    /** Fork and initialize worker processes. */
+    void startWorkerProcesses();
     /** There is no real output process, but marks current process as output. */
     void startOutputProcess();
 
-    /** Wait until all forked processes handled by this ProcHandler are completed */
-    void waitForAllProcesses();
+    /** Wait until all forked processes handled by this ProcHandler terminate.
+     *
+     * In case the markChildrenAsLocal option was set when a process was started
+     * and this process terminated anormaly (via signal or non-zero exit code), the
+     * return value is set to false. Otherwise, true is returned.
+     */
+    bool waitForAllProcesses();
 
     /** Returns true if multiple processes have been spawned, false in single-core mode. */
     static bool parallelProcessingUsed();
@@ -61,8 +73,12 @@ namespace Belle2 {
     static std::string getProcessName();
 
   private:
-    std::set<int> m_processList;  /**< PIDs of processes controlled by this ProcHandler. */
+    /** Start a new process, adding its PID to processList, and setting s_processID = id. Returns true in child process. */
+    bool startProc(std::set<int>* processList, const std::string& procType, int id);
 
+    bool m_markChildrenAsLocal; /**< Anormal termination of child will not stop parent, waitForAllProcesses() returns status. */
+    std::set<int> m_processList;  /**< PIDs of processes controlled by this ProcHandler. */
+    unsigned int m_numWorkerProcesses; /**< Number of worker processes controlled by this ProcHandler. */
   };
 }
 

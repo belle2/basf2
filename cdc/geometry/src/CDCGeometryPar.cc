@@ -452,6 +452,10 @@ void CDCGeometryPar::openFile(std::ifstream& ifs, const std::string& fileName0) 
   std::string fileName = FileSystem::findFile(fileName1);
 
   if (fileName == "") {
+    fileName = FileSystem::findFile(fileName0);
+  }
+
+  if (fileName == "") {
     B2FATAL("CDCGeometryPar: " << fileName1 << " not exist!");
   } else {
     B2INFO("CDCGeometryPar: open " << fileName1);

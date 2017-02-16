@@ -32,6 +32,9 @@ namespace Belle2 {
       /// Default constructor for ROOT compatibility.
       CDCTrack() = default;
 
+      /// Constructor from a series of hits.
+      explicit CDCTrack(const std::vector<CDCRecoHit3D>& recoHits3D);
+
       /// Constructor from a two dimensional segment filling the thrid dimension with 0 values.
       explicit CDCTrack(const CDCSegment2D& segment);
 

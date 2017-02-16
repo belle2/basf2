@@ -193,7 +193,7 @@ namespace Belle2 {
 
     /** Print the content of the meta data object.
      *
-     *  @param option Use "all" to print everything, except steering file. Use "steering" for printing steering file.
+     *  @param option Use "all" to print everything, except steering file. Use "steering" for printing (only) steering file. "json" for machine-readable output
      */
     virtual void Print(Option_t* option = "") const override;
 

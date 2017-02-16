@@ -49,14 +49,59 @@ namespace Belle2 {
     double particlePt(const Particle* part);
 
     /**
-     * return  momentum cosine of polar angle
+     * return error of momentum
+     */
+    double particlePErr(const Particle* part);
+
+    /**
+     * return error of momentum component x
+     */
+    double particlePxErr(const Particle* part);
+
+    /**
+     * return error of momentum component y
+     */
+    double particlePyErr(const Particle* part);
+
+    /**
+     * return error of momentum component z
+     */
+    double particlePzErr(const Particle* part);
+
+    /**
+     * return error of transverse momentum
+     */
+    double particlePtErr(const Particle* part);
+
+    /**
+     * return polar angle
+     */
+    double particleTheta(const Particle* part);
+
+    /**
+     * return error of polar angle
+     */
+    double particleThetaErr(const Particle* part);
+
+    /**
+     * return momentum cosine of polar angle
      */
     double particleCosTheta(const Particle* part);
+
+    /**
+     * return error of momentum cosine of polar angle
+     */
+    double particleCosThetaErr(const Particle* part);
 
     /**
      * return momentum azimuthal angle
      */
     double particlePhi(const Particle* part);
+
+    /**
+     * return error of momentum azimuthal angle
+     */
+    double particlePhiErr(const Particle* part);
 
     /**
      * return particle's pdg code

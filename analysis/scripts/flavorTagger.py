@@ -441,24 +441,18 @@ def trackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
                                 ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
                 else:
                     B2FATAL(
-                        'Flavor Tagger: ' +
-                        particleList +
-                        ' Tracklevel was not trained. Weight file ' +
+                        'Flavor Tagger: ' + particleList + ' Tracklevel was not trained. Weight file ' +
                         identifierTrackLevel + ' was not found. Stopped')
 
             if mode == 'Sampler':
 
                 B2INFO(
-                    'flavorTagger: file ' +
-                    filesDirectory +
-                    '/' +
-                    methodPrefixTrackLevel +
-                    'sampled' +
-                    fileId +
-                    '.root will be saved.')
+                    'flavorTagger: file ' + filesDirectory + '/' +
+                    methodPrefixTrackLevel + 'sampled' + fileId + '.root will be saved.')
 
                 trackLevelPath = create_path()
                 SkipEmptyParticleList = register_module("SkimFilter")
+                SkipEmptyParticleList.set_name('SkimFilter_TrackLevel' + category)
                 SkipEmptyParticleList.param('particleLists', particleList)
                 SkipEmptyParticleList.if_true(trackLevelPath, AfterConditionPath.CONTINUE)
                 path.add_module(SkipEmptyParticleList)
@@ -488,16 +482,19 @@ def trackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
         for particleList in identifiersExtrainfosDict:
             trackLevelPath = create_path()
             SkipEmptyParticleList = register_module("SkimFilter")
+            SkipEmptyParticleList.set_name('SkimFilter_TrackLevel_' + particleList)
             SkipEmptyParticleList.param('particleLists', particleList)
             SkipEmptyParticleList.if_true(trackLevelPath, AfterConditionPath.CONTINUE)
             path.add_module(SkipEmptyParticleList)
 
-            trackLevelPath.add_module(
-                'MVAMultipleExperts',
-                listNames=[particleList],
-                extraInfoNames=[row[0] for row in identifiersExtrainfosDict[particleList]],
-                signalFraction=signalFraction,
-                identifiers=[row[1] for row in identifiersExtrainfosDict[particleList]])
+            mvaMultipleExperts = register_module('MVAMultipleExperts')
+            mvaMultipleExperts.set_name('MVAMultipleExperts_TrackLevel_' + particleList)
+            mvaMultipleExperts.param('listNames', [particleList])
+            mvaMultipleExperts.param('extraInfoNames', [row[0] for row in identifiersExtrainfosDict[particleList]])
+            mvaMultipleExperts.param('signalFraction', signalFraction)
+            mvaMultipleExperts.param('identifiers', [row[1] for row in identifiersExtrainfosDict[particleList]])
+            trackLevelPath.add_module(mvaMultipleExperts)
+
         return True
 
 
@@ -584,16 +581,12 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
             if mode == 'Sampler':
 
                 B2INFO(
-                    'flavorTagger: file ' +
-                    filesDirectory +
-                    '/' +
-                    methodPrefixEventLevel +
-                    "sampled" +
-                    fileId +
-                    '.root will be saved.')
+                    'flavorTagger: file ' + filesDirectory + '/' +
+                    methodPrefixEventLevel + "sampled" + fileId + '.root will be saved.')
 
                 eventLevelpath = create_path()
                 SkipEmptyParticleList = register_module("SkimFilter")
+                SkipEmptyParticleList.set_name('SkimFilter_EventLevel' + category)
                 SkipEmptyParticleList.param('particleLists', particleList)
                 SkipEmptyParticleList.if_true(eventLevelpath, AfterConditionPath.CONTINUE)
                 path.add_module(SkipEmptyParticleList)
@@ -630,16 +623,19 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
         for particleList in identifiersExtrainfosDict:
             eventLevelPath = create_path()
             SkipEmptyParticleList = register_module("SkimFilter")
+            SkipEmptyParticleList.set_name('SkimFilter_EventLevel_' + particleList)
             SkipEmptyParticleList.param('particleLists', particleList)
             SkipEmptyParticleList.if_true(eventLevelPath, AfterConditionPath.CONTINUE)
             path.add_module(SkipEmptyParticleList)
 
-            eventLevelPath.add_module(
-                'MVAMultipleExperts',
-                listNames=[particleList],
-                extraInfoNames=[row[0] for row in identifiersExtrainfosDict[particleList]],
-                signalFraction=signalFraction,
-                identifiers=[row[1] for row in identifiersExtrainfosDict[particleList]])
+            mvaMultipleExperts = register_module('MVAMultipleExperts')
+            mvaMultipleExperts.set_name('MVAMultipleExperts_EventLevel_' + particleList)
+            mvaMultipleExperts.param('listNames', [particleList])
+            mvaMultipleExperts.param('extraInfoNames', [row[0] for row in identifiersExtrainfosDict[particleList]])
+            mvaMultipleExperts.param('signalFraction', signalFraction)
+            mvaMultipleExperts.param('identifiers', [row[1] for row in identifiersExtrainfosDict[particleList]])
+            eventLevelPath.add_module(mvaMultipleExperts)
+
         return True
 
 
@@ -778,31 +774,36 @@ def trackAndEventLevels(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_
         for particleList in identifiersExtrainfosDict:
             trackAndEventLevelPath = create_path()
             SkipEmptyParticleList = register_module("SkimFilter")
+            SkipEmptyParticleList.set_name('SkimFilter_' + particleList)
             SkipEmptyParticleList.param('particleLists', particleList)
             SkipEmptyParticleList.if_true(trackAndEventLevelPath, AfterConditionPath.CONTINUE)
             path.add_module(SkipEmptyParticleList)
 
-            trackAndEventLevelPath.add_module(
-                'MVAMultipleExperts',
-                listNames=[particleList],
-                extraInfoNames=[row[0] for row in identifiersExtrainfosDict[particleList]],
-                signalFraction=signalFraction,
-                identifiers=[row[1] for row in identifiersExtrainfosDict[particleList]])
+            mvaMultipleExperts = register_module('MVAMultipleExperts')
+            mvaMultipleExperts.set_name('MVAMultipleExperts_' + particleList)
+            mvaMultipleExperts.param('listNames', [particleList])
+            mvaMultipleExperts.param('extraInfoNames', [row[0] for row in identifiersExtrainfosDict[particleList]])
+            mvaMultipleExperts.param('signalFraction', signalFraction)
+            mvaMultipleExperts.param('identifiers', [row[1] for row in identifiersExtrainfosDict[particleList]])
+            trackAndEventLevelPath.add_module(mvaMultipleExperts)
 
         if 'KaonPion' in [row[1] for row in eventLevelParticleLists]:
             trackAndEventLevelKaonPionPath = create_path()
             SkipEmptyParticleList = register_module("SkimFilter")
+            SkipEmptyParticleList.set_name('SkimFilter_' + 'K+:inRoe')
             SkipEmptyParticleList.param('particleLists', 'K+:inRoe')
             SkipEmptyParticleList.if_true(trackAndEventLevelKaonPionPath, AfterConditionPath.CONTINUE)
             path.add_module(SkipEmptyParticleList)
 
-            trackAndEventLevelKaonPionPath.add_module(
-                'MVAExpert',
-                listNames=['K+:inRoe'],
-                extraInfoName=identifiersExtrainfosKaonPion[0][0],
-                signalFraction=signalFraction,
-                identifier=identifiersExtrainfosKaonPion[0][1])
-        return True
+            mvaExpertKaonPion = register_module("MVAExpert")
+            mvaExpertKaonPion.set_name('MVAExpert_KaonPion_' + 'K+:inRoe')
+            mvaExpertKaonPion.param('listNames', ['K+:inRoe'])
+            mvaExpertKaonPion.param('extraInfoName', identifiersExtrainfosKaonPion[0][0])
+            mvaExpertKaonPion.param('signalFraction', signalFraction)
+            mvaExpertKaonPion.param('identifier', identifiersExtrainfosKaonPion[0][1])
+
+            trackAndEventLevelKaonPionPath.add_module(mvaExpertKaonPion)
+            return True
 
 
 def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
@@ -819,16 +820,8 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
         if not (
             os.path.isfile(
-                filesDirectory +
-                '/' +
-                methodPrefixCombinerLevel +
-                'FBDT' +
-                '_1.root') or os.path.isfile(
-                filesDirectory +
-                '/' +
-                methodPrefixCombinerLevel +
-                'FANN' +
-                '_1.root')):
+                filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + '_1.root') or os.path.isfile(
+                filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + '_1.root')):
             B2INFO('flavorTagger: Sampling Data on Combiner Level. File' +
                    methodPrefixCombinerLevel + ".root" + ' will be saved')
 
@@ -920,23 +913,16 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
                        methodPrefixCombinerLevel + 'FANN' + '_1.root')
 
                 B2INFO('flavorTagger: Apply FANNMethod on combiner level')
-                path.add_module('MVAMultipleExperts',
-                                listNames=[],
-                                extraInfoNames=[
-                                    'qrCombined' + 'FBDT',
-                                    'qrCombined' + 'FANN'],
-                                signalFraction=signalFraction,
-                                identifiers=[
-                                    filesDirectory +
-                                    '/' +
-                                    methodPrefixCombinerLevel +
-                                    'FBDT' +
-                                    "_1.root",
-                                    filesDirectory +
-                                    '/' +
-                                    methodPrefixCombinerLevel +
-                                    'FANN' +
-                                    "_1.root"])
+
+                mvaMultipleExperts = register_module('MVAMultipleExperts')
+                mvaMultipleExperts.set_name('MVAMultipleExperts_Combiners')
+                mvaMultipleExperts.param('listNames', [])
+                mvaMultipleExperts.param('extraInfoNames', ['qrCombined' + 'FBDT', 'qrCombined' + 'FANN'])
+                mvaMultipleExperts.param('signalFraction', signalFraction)
+                mvaMultipleExperts.param('identifiers', [filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + "_1.root",
+                                                         filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + "_1.root"])
+                path.add_module(mvaMultipleExperts)
+
                 return True
 
 

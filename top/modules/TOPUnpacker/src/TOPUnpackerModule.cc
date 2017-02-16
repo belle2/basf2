@@ -29,6 +29,9 @@
 #include <top/dataobjects/TOPRawWaveform.h>
 #include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPSlowData.h>
+#include <top/dataobjects/TOPInterimFEInfo.h>
+
+
 
 using namespace std;
 
@@ -90,10 +93,15 @@ namespace Belle2 {
     StoreArray<TOPSlowData> slowData;
     slowData.registerInDataStore();
 
+    StoreArray<TOPInterimFEInfo> info;
+    info.registerInDataStore(DataStore::c_DontWriteOut);
+
     StoreArray<TOPRawWaveform> waveforms(m_outputWaveformsName);
     waveforms.registerInDataStore(DataStore::c_DontWriteOut);
 
     rawDigits.registerRelationTo(waveforms, DataStore::c_Event, DataStore::c_DontWriteOut);
+    rawDigits.registerRelationTo(info, DataStore::c_Event, DataStore::c_DontWriteOut);
+    waveforms.registerRelationTo(info, DataStore::c_Event, DataStore::c_DontWriteOut);
 
     // check if front end mappings are available
     const auto& mapper = m_topgp->getFrontEndMapper();
@@ -140,10 +148,10 @@ namespace Belle2 {
             unpackType0Ver16(buffer, bufferSize, rawDigits, slowData);
             break;
           case static_cast<int>(TOP::RawDataType::c_Type2Ver1):
-            err = unpackType2or3Ver1(buffer, bufferSize, rawDigits, waveforms, false);
+            err = unpackInterimFEVer01(buffer, bufferSize, rawDigits, waveforms, false);
             break;
           case static_cast<int>(TOP::RawDataType::c_Type3Ver1):
-            err = unpackType2or3Ver1(buffer, bufferSize, rawDigits, waveforms, true);
+            err = unpackInterimFEVer01(buffer, bufferSize, rawDigits, waveforms, true);
             break;
           case static_cast<int>(TOP::RawDataType::c_Draft):
             unpackProductionDraft(buffer, bufferSize, digits);
@@ -173,7 +181,7 @@ namespace Belle2 {
                                                 StoreArray<TOPDigit>& digits)
   {
 
-    B2DEBUG(100, "Unpacking ProductionDraft to TOPDigits, dataSize = " << bufferSize);
+    B2DEBUG(200, "Unpacking ProductionDraft to TOPDigits, dataSize = " << bufferSize);
 
     unsigned short scrodID = buffer[0] & 0xFFFF;
     const auto* feemap = m_topgp->getFrontEndMapper().getMap(scrodID);
@@ -207,7 +215,7 @@ namespace Belle2 {
                                            StoreArray<TOPSlowData>& slowData)
   {
 
-    B2DEBUG(100, "Unpacking Type0Ver16 to TOPRawDigits, dataSize = " << bufferSize);
+    B2DEBUG(200, "Unpacking Type0Ver16 to TOPRawDigits, dataSize = " << bufferSize);
 
     DataArray array(buffer, bufferSize, m_swapBytes);
     unsigned word = array.getWord();
@@ -271,43 +279,58 @@ namespace Belle2 {
   }
 
 
-  int TOPUnpackerModule::unpackType2or3Ver1(const int* buffer, int bufferSize,
-                                            StoreArray<TOPRawDigit>& rawDigits,
-                                            StoreArray<TOPRawWaveform>& waveforms,
-                                            bool pedestalSubtracted)
+  int TOPUnpackerModule::unpackInterimFEVer01(const int* buffer, int bufferSize,
+                                              StoreArray<TOPRawDigit>& rawDigits,
+                                              StoreArray<TOPRawWaveform>& waveforms,
+                                              bool pedestalSubtracted)
   {
 
-    if (pedestalSubtracted) {
-      B2DEBUG(100, "Unpacking Type3Ver1 to TOPRawDigits and TOPRawWaveforms, dataSize = "
-              << bufferSize);
-    } else {
-      B2DEBUG(100, "Unpacking Type2Ver1 to TOPRawDigits and TOPRawWaveforms, dataSize = "
-              << bufferSize);
-    }
+    B2DEBUG(200, "Unpacking InterimFEVer01 to TOPRawDigits and TOPRawWaveforms, "
+            "dataSize = " << bufferSize);
+
+    StoreArray<TOPInterimFEInfo> infos;
 
     DataArray array(buffer, bufferSize, m_swapBytes);
     unsigned word = array.getWord(); // header word 0
     unsigned short scrodID = word & 0x0FFF;
+    auto* info = infos.appendNew(scrodID, bufferSize);
+
     word = array.getWord(); // header word 1 (what it contains?)
+
+    short asicChanFix = 0; // temporary fix since it's not given in FE header
 
     while (array.getRemainingWords() > 15) {
 
       unsigned header = array.getWord(); // word 0
       if (header != 0xaaaa0103 and header != 0xaaaa0100) {
         B2ERROR("TOPUnpacker: corrupted data - invalid FE header word");
+        B2DEBUG(100, "Invalid FE header word: " << std::hex << header);
+        info->setErrorFlag(TOPInterimFEInfo::c_InvalidFEHeader);
         return array.getRemainingWords();
       }
 
       word = array.getWord(); // word 1
-      unsigned short ScrodID = word >> 25;
+      unsigned short scrodID_FE = word >> 25;
       unsigned short convertedAddr = (word >> 16) & 0x1FF;
-      if (ScrodID != scrodID) {
-        B2ERROR("TOPUnpacker: corrupted data - scrodID's differ " << scrodID << " "
-                << ScrodID);
+      if (scrodID_FE != scrodID) {
+        B2ERROR("TOPUnpacker: corrupted data - different scrodID's in HLSB and FE header");
+        B2DEBUG(100, "Different scrodID's in HLSB and FE header: "
+                << scrodID << " " << scrodID_FE);
+        info->setErrorFlag(TOPInterimFEInfo::c_DifferentScrodIDs);
         return array.getRemainingWords();
       }
 
-      word = array.getWord(); // word 2 (what it contains?)
+      word = array.getWord(); // word 2
+      //      unsigned lastWrAddr = word & 0x1FF;
+      unsigned lastWrAddr = (word & 0x0FF) << 1;
+      unsigned short asicChannelFE = (word >> 9) & 0x07;
+      unsigned short asicFE = (word >> 12) & 0x03;
+      unsigned short carrierFE = (word >> 14) & 0x03;
+
+      // temporary fix since it's not given in FE
+      asicChannelFE = asicChanFix % 8;
+      asicChanFix++;
+      // end fix
 
       // feature-extracted data (positive signal)
       word = array.getWord(); // word 3
@@ -329,7 +352,7 @@ namespace Belle2 {
 
       word = array.getWord(); // word 8
       short integral_p = word & 0xFFFF;
-      short qualityFlags_p = (word >> 16) & 0xFFFF;
+      //      short qualityFlags_p = (word >> 16) & 0xFFFF;
 
       // feature-extracted data (negative signal)
       word = array.getWord(); // word 9
@@ -351,14 +374,62 @@ namespace Belle2 {
 
       word = array.getWord(); // word 14
       short integral_n = word & 0xFFFF;
-      short qualityFlags_n = (word >> 16) & 0xFFFF;
+      //      short qualityFlags_n = (word >> 16) & 0xFFFF;
 
       // magic word
       word = array.getWord(); // word 15
       if (word != 0x7473616c) {
         B2ERROR("TOPUnpacker: corrupted data - no magic word at the end of FE header");
+        B2DEBUG(100, "No magic word at the end of FE header, found: "
+                << std::hex << word);
+        info->setErrorFlag(TOPInterimFEInfo::c_InvalidMagicWord);
         return array.getRemainingWords();
       }
+
+      // store to raw digits
+      std::vector<TOPRawDigit*> digits; // needed for creating relations to waveforms
+      if (abs(valuePeak_p) != 9999) {
+        auto* digit = rawDigits.appendNew(scrodID);
+        digit->setCarrierNumber(carrierFE);
+        digit->setASICNumber(asicFE);
+        digit->setASICChannel(asicChannelFE);
+        digit->setASICWindow(convertedAddr);
+        digit->setLastWriteAddr(lastWrAddr);
+        digit->setSampleRise(sampleRise_p);
+        digit->setDeltaSamplePeak(samplePeak_p - sampleRise_p);
+        digit->setDeltaSampleFall(sampleFall_p - sampleRise_p);
+        digit->setValueRise0(valueRise0_p);
+        digit->setValueRise1(valueRise1_p);
+        digit->setValuePeak(valuePeak_p);
+        digit->setValueFall0(valueFall0_p);
+        digit->setValueFall1(valueFall1_p);
+        digit->setIntegral(integral_p);
+        //        digit->setErrorFlags(qualityFlags_p); // not good solution !
+        digit->addRelationTo(info);
+        digits.push_back(digit);
+      }
+      if (abs(valuePeak_n) != 9999) {
+        auto* digit = rawDigits.appendNew(scrodID);
+        digit->setCarrierNumber(carrierFE);
+        digit->setASICNumber(asicFE);
+        digit->setASICChannel(asicChannelFE);
+        digit->setASICWindow(convertedAddr);
+        digit->setLastWriteAddr(lastWrAddr);
+        digit->setSampleRise(sampleRise_n);
+        digit->setDeltaSamplePeak(samplePeak_n - sampleRise_n);
+        digit->setDeltaSampleFall(sampleFall_n - sampleRise_n);
+        digit->setValueRise0(valueRise0_n);
+        digit->setValueRise1(valueRise1_n);
+        digit->setValuePeak(valuePeak_n);
+        digit->setValueFall0(valueFall0_n);
+        digit->setValueFall1(valueFall1_n);
+        digit->setIntegral(integral_n);
+        //        digit->setErrorFlags(qualityFlags_n); // not good solution !
+        digit->addRelationTo(info);
+        digits.push_back(digit);
+      }
+      info->incrementFEHeadersCount();
+      if (digits.empty()) info->incrementEmptyFEHeadersCount();
 
       if (header != 0xaaaa0103) continue;
 
@@ -372,56 +443,52 @@ namespace Belle2 {
       unsigned short asic = (word >> 12) & 0x03;
       unsigned short asicChannel = (word >> 9) & 0x07;
       unsigned short window = word & 0x1FF;
-      if (window != convertedAddr)
-        B2ERROR("TOPUnpacker: Type2or3Ver1 - window numbers differ " << window <<
-                " " << convertedAddr);
+      unsigned carrierAsicChannelWindow = word;
 
-      // store to raw digits (carrier/asic/channel not available before waveform header!)
-      std::vector<TOPRawDigit*> digits; // needed for creating relations to waveforms
-      if (abs(valuePeak_p) != 9999) {
-        auto* digit = rawDigits.appendNew(scrodID);
-        digit->setCarrierNumber(carrier);
-        digit->setASICNumber(asic);
-        digit->setASICChannel(asicChannel);
-        digit->setASICWindow(window);
-        digit->setSampleRise(sampleRise_p);
-        digit->setDeltaSamplePeak(samplePeak_p - sampleRise_p);
-        digit->setDeltaSampleFall(sampleFall_p - sampleRise_p);
-        digit->setValueRise0(valueRise0_p);
-        digit->setValueRise1(valueRise1_p);
-        digit->setValuePeak(valuePeak_p);
-        digit->setValueFall0(valueFall0_p);
-        digit->setValueFall1(valueFall1_p);
-        digit->setIntegral(integral_p);
-        //        digit->setErrorFlags(qualityFlags_p); // not good solution !
-        digits.push_back(digit);
+      // checks for data corruption
+      if (carrier != carrierFE) {
+        B2ERROR("TOPUnpacker: different carrier numbers in FE and WF header");
+        B2DEBUG(100, "Different carrier numbers in FE and WF header: "
+                << carrierFE << " " << carrier);
+        info->setErrorFlag(TOPInterimFEInfo::c_DifferentCarriers);
       }
-      if (abs(valuePeak_n) != 9999) {
-        auto* digit = rawDigits.appendNew(scrodID);
-        digit->setCarrierNumber(carrier);
-        digit->setASICNumber(asic);
-        digit->setASICChannel(asicChannel);
-        digit->setASICWindow(window);
-        digit->setSampleRise(sampleRise_n);
-        digit->setDeltaSamplePeak(samplePeak_n - sampleRise_n);
-        digit->setDeltaSampleFall(sampleFall_n - sampleRise_n);
-        digit->setValueRise0(valueRise0_n);
-        digit->setValueRise1(valueRise1_n);
-        digit->setValuePeak(valuePeak_n);
-        digit->setValueFall0(valueFall0_n);
-        digit->setValueFall1(valueFall1_n);
-        digit->setIntegral(integral_n);
-        //        digit->setErrorFlags(qualityFlags_n); // not good solution !
-        digits.push_back(digit);
+      if (asic != asicFE) {
+        B2ERROR("TOPUnpacker: different ASIC numbers in FE and WF header");
+        B2DEBUG(100, "Different ASIC numbers in FE and WF header: "
+                << asicFE << " " << asic);
+        info->setErrorFlag(TOPInterimFEInfo::c_DifferentAsics);
       }
+      if (asicChannel != asicChannelFE) {
+        B2ERROR("TOPUnpacker: different ASIC channel numbers in FE and WF header");
+        B2DEBUG(100, "Different ASIC channel numbers in FE and WF header: "
+                << asicChannelFE << " " << asicChannel);
+        info->setErrorFlag(TOPInterimFEInfo::c_DifferentChannels);
+      }
+      if (window != convertedAddr) {
+        B2ERROR("TOPUnpacker: different window numbers in FE and WF header");
+        B2DEBUG(100, "Different window numbers in FE and WF header: "
+                << convertedAddr << " " << window);
+        info->setErrorFlag(TOPInterimFEInfo::c_DifferentWindows);
+      }
+
+      // reading out all four window addresses
+      // to be for correcnt alignment of individual readout windows in written waveform
+      std::vector<unsigned short> windows;
+      windows.push_back(window);
 
       word = array.getWord(); // word 20
+      windows.push_back(word & 0x1FF);
+
       word = array.getWord(); // word 21
+      windows.push_back(word & 0x1FF);
+
       word = array.getWord(); // word 22
+      windows.push_back(word & 0x1FF);
 
       int numWords = 4 * 32; // (numPoints + 1) / 2;
       if (array.getRemainingWords() < numWords) {
         B2ERROR("TOPUnpacker: too few words for waveform data, needed " << numWords);
+        info->setErrorFlag(TOPInterimFEInfo::c_InsufficientWFData);
         return array.getRemainingWords();
       }
 
@@ -443,20 +510,22 @@ namespace Belle2 {
         boardstack = feemap->getBoardstackNumber();
       } else {
         B2ERROR("TOPUnpacker: no front-end map available for SCROD ID = " << scrodID);
+        info->setErrorFlag(TOPInterimFEInfo::c_InvalidScrodID);
       }
 
       // determine hardware channel and pixelID (valid only if feemap available!)
       const auto& mapper = m_topgp->getChannelMapper();
-      unsigned channel = mapper.isValid()
-                         ? mapper.getChannel(boardstack, carrier, asic, asicChannel)
-                         : asicChannel;
+      unsigned channel = mapper.getChannel(boardstack, carrier, asic, asicChannel);
       int pixelID = mapper.getPixelID(channel);
 
       // store to raw waveforms
       auto* waveform = waveforms.appendNew(moduleID, pixelID, channel, scrodID, 0,
-                                           0, 0, window, word,
+                                           0, 0, lastWrAddr, carrierAsicChannelWindow,
+                                           windows,
                                            mapper.getType(), mapper.getName(), adcData);
       waveform->setPedestalSubtractedFlag(pedestalSubtracted);
+      waveform->addRelationTo(info);
+      info->incrementWaveformsCount();
 
       // create relations btw. raw digits and waveform
       for (auto& digit : digits) digit->addRelationTo(waveform);
@@ -472,7 +541,7 @@ namespace Belle2 {
                                               StoreArray<TOPRawWaveform>& waveforms)
   {
 
-    B2DEBUG(100, "Unpacking IRS3B to TOPRawWaveforms, dataSize = " << bufferSize);
+    B2DEBUG(200, "Unpacking IRS3B to TOPRawWaveforms, dataSize = " << bufferSize);
 
     DataArray array(buffer, bufferSize, m_swapBytes);
     unsigned word = array.getWord();
@@ -505,8 +574,8 @@ namespace Belle2 {
       for (int iseg = 0; iseg < numofSegments; iseg++) {
         unsigned segmentASIC = array.getWord();
         unsigned chan = (segmentASIC >> 9) & 0x0007;
-        unsigned asic = (segmentASIC >> 12) & 0x0003; // called also asicCol
-        unsigned carrier = (segmentASIC >> 14) & 0x0003; // called also asicRow
+        unsigned asic = (segmentASIC >> 14) & 0x0003; // called also asicCol
+        unsigned carrier = (segmentASIC >> 12) & 0x0003; // called also asicRow
         unsigned channel = mapper.getChannel(boardstack, carrier, asic, chan);
         int pixelID = mapper.getPixelID(channel);
 
@@ -521,8 +590,10 @@ namespace Belle2 {
           unsigned data = array.getWord();
           wfdata.push_back(data & 0xFFFF);
         }
+
+        std::vector<unsigned short> windows;
         waveforms.appendNew(moduleID, pixelID, channel, scrod, freezeDate,
-                            triggerType, flags, referenceASIC, segmentASIC,
+                            triggerType, flags, referenceASIC, segmentASIC, windows,
                             mapper.getType(), mapper.getName(), wfdata);
       } // iseg
     } // k
@@ -535,7 +606,7 @@ namespace Belle2 {
                                              StoreArray<TOPRawWaveform>& waveforms)
   {
 
-    B2DEBUG(100, "Unpacking GigE to TOPRawWaveforms, dataSize = " << bufferSize);
+    B2DEBUG(200, "Unpacking GigE to TOPRawWaveforms, dataSize = " << bufferSize);
 
     DataArray array(buffer, bufferSize, m_swapBytes);
     unsigned word = array.getWord();
@@ -585,8 +656,10 @@ namespace Belle2 {
           int pixelID = mapper.getPixelID(channel);
           unsigned segmentASIC = convertedAddr + (chan << 9) + (carrier << 12) +
                                  (asic << 14);
+
+          std::vector<unsigned short> windows;
           waveforms.appendNew(moduleID, pixelID, channel, scrod, 0,
-                              trigPattern, 0, lastWriteAddr, segmentASIC,
+                              trigPattern, 0, lastWriteAddr, segmentASIC, windows,
                               mapper.getType(), mapper.getName(), wfdata);
         } // chan
       } // win
@@ -607,3 +680,4 @@ namespace Belle2 {
 
 
 } // end Belle2 namespace
+

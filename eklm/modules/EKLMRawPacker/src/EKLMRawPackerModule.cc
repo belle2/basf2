@@ -27,14 +27,13 @@ REG_MODULE(EKLMRawPacker)
 EKLMRawPackerModule::EKLMRawPackerModule() : Module()
 {
   ///Set module properties
-  setDescription("an Example to pack data to a RawKLM object");
+  setDescription("EKLM raw data packer (creates RawKLM from EKLMDigit).");
   setPropertyFlags(c_ParallelProcessingCertified);
   ///  maximum # of events to produce( -1 : inifinite)
-  addParam("MaxEventNum", max_nevt, "Maximum event number to make", -1);
+  addParam("MaxEventNum", m_MaxNEvents, "Maximum event number to make", -1);
   addParam("useDefaultModuleId", m_useDefaultElectId,
            "Use default elect id if not found in mapping", true);
-  B2INFO("EKLMRawPackerModule: Constructor done.");
-  n_basf2evt = 0;
+  m_NEvents = 0;
 }
 
 EKLMRawPackerModule::~EKLMRawPackerModule()
@@ -43,11 +42,13 @@ EKLMRawPackerModule::~EKLMRawPackerModule()
 
 void EKLMRawPackerModule::initialize()
 {
-  B2INFO("EKLMRawPackerModule: initialize() started.");
   m_eventMetaDataPtr.registerInDataStore();
-  rawklmarray.registerPersistent();
-  B2INFO("EKLMRawPackerModule: initialize() done.");
+  m_RawKLMArray.registerPersistent();
   loadMap();
+}
+
+void EKLMRawPackerModule::beginRun()
+{
 }
 
 void EKLMRawPackerModule::event()
@@ -55,7 +56,6 @@ void EKLMRawPackerModule::event()
   B2INFO("pack the event.." << endl);
   StoreArray<EKLMDigit> digits;
   vector<uint32_t> data_words[4][4];//4 copper, 16 finesse
-  data_words[4][4].clear();
   //int tot_num_hits=digits.getEntries();
   B2INFO("EKLMRawPackerModule:: entries of eklmdigits " << digits.getEntries());
   ///fill data_words
@@ -69,7 +69,7 @@ void EKLMRawPackerModule::event()
     buf[1] = 0;
     EKLMDigit* digit = digits[d];
 //OBTAIN PARAMETERS OF HIT FROM MC---------------------------
-    int   iForward = digit->getEndcap();
+    int   iEndcap = digit->getEndcap();
     int   iLayer   = digit->getLayer();
     int   iSector  = digit->getSector();
     int   iPlane   = digit->getPlane();
@@ -84,11 +84,11 @@ void EKLMRawPackerModule::event()
     int electId = 1;
     int moduleId = (iSector - 1)
                    | ((iLayer - 1)   << 2)
-                   | ((iForward - 1) << 6);
+                   | ((iEndcap - 1) << 6);
 //                 | ((iPlane-1)   << 7);            //Do we need plane?
     if (m_ModuleIdToelectId.find(moduleId) == m_ModuleIdToelectId.end()) {
       B2INFO("EKLMRawPacker::can not find in mapping for moduleId " <<
-             moduleId << " isForward? " << iForward << " , layer " << iLayer <<
+             moduleId << " isForward? " << iEndcap << " , layer " << iLayer <<
              " , sector " << iSector  << endl);
       if (m_useDefaultElectId)
         electId = 17;     //Defaults: copper=1; finesse=1;
@@ -98,14 +98,14 @@ void EKLMRawPackerModule::event()
       electId = m_ModuleIdToelectId[moduleId];
     int copperId = electId & 0xF;
     int finesse = (electId >> 4) & 0xF;
-//    B2INFO("EKLMRawPacker::copperId " << copperId << " F: " << iForward << " Lay: " << iLayer << " Sect: " << iSector << " Pl: " <<
+//    B2INFO("EKLMRawPacker::copperId " << copperId << " F: " << iEndcap << " Lay: " << iLayer << " Sect: " << iSector << " Pl: " <<
 //           iPlane << " Str: " << iStrip << " Cha: " << iCharge << " T: " << fTime << endl);
 //MAKE WORDS WITH INFORMATION
     uint16_t bword1 = 0;
     uint16_t bword2 = 0;
     uint16_t bword3 = 0;
     uint16_t bword4 = 0;
-    formatData(iForward, iLayer, iSector, iPlane, iStrip, iCharge, fTime,
+    formatData(iEndcap, iLayer, iSector, iPlane, iStrip, iCharge, fTime,
                bword1, bword2, bword3, bword4);
     buf[0] |= bword2;
     buf[0] |= ((bword1 << 16));
@@ -122,13 +122,13 @@ void EKLMRawPackerModule::event()
     rawcprpacker_info.exp_num = 1;
     /* Run number : 14bits, subrun number : 8bits. */
     rawcprpacker_info.run_subrun_num = 2;
-    rawcprpacker_info.eve_num = n_basf2evt;
+    rawcprpacker_info.eve_num = m_NEvents;
     rawcprpacker_info.node_id = EKLM_ID + i; //?????????????????????????????????
     rawcprpacker_info.tt_ctime = 0x7123456;
     rawcprpacker_info.tt_utime = 0xF1234567;
     rawcprpacker_info.b2l_ctime = 0x7654321;
     //one call per copper
-    RawKLM* raw_klm = rawklmarray.appendNew();
+    RawKLM* raw_klm = m_RawKLMArray.appendNew();
     int* buf1, *buf2, *buf3, *buf4;
     int nwords_1st = data_words[i][0].size();
     int nwords_2nd = data_words[i][1].size();
@@ -168,16 +168,16 @@ void EKLMRawPackerModule::event()
     delete [] buf3;
     delete [] buf4;
   }
-  B2INFO("Event # " << n_basf2evt);
+  B2INFO("Event # " << m_NEvents);
   // Monitor
-  if (max_nevt >= 0) {
-    if (n_basf2evt >= max_nevt && max_nevt > 0) {
-      B2INFO("RunStop was detected. ( Setting:  Max event # " << max_nevt <<
-             " ) Processed Event " << n_basf2evt);
+  if (m_MaxNEvents >= 0) {
+    if (m_NEvents >= m_MaxNEvents && m_MaxNEvents > 0) {
+      B2INFO("RunStop was detected. ( Setting:  Max event # " << m_MaxNEvents <<
+             " ) Processed Event " << m_NEvents);
       m_eventMetaDataPtr->setEndOfData();
     }
   }
-  n_basf2evt++;
+  m_NEvents++;
   return;
 }
 
@@ -212,10 +212,18 @@ void EKLMRawPackerModule::formatData(
   bword4 |= (charge & 0x7FFF);
 }
 
+void EKLMRawPackerModule::endRun()
+{
+}
+
+void EKLMRawPackerModule::terminate()
+{
+}
+
 void EKLMRawPackerModule::loadMap()
 {
-  for (int forward = 1; forward <= 2; forward++) {
-    for (int layer = 1; layer <= 12 + (forward - 1) * 2; layer++) {
+  for (int endcap = 1; endcap <= 2; endcap++) {
+    for (int layer = 1; layer <= 12 + (endcap - 1) * 2; layer++) {
       for (int sector = 1; sector <= 4; sector++) {
         //Do we need loop over planes as well?
         int copperId = 1;
@@ -229,7 +237,7 @@ void EKLMRawPackerModule::loadMap()
         int elecid = (copperId & 0xF) | ((finesseId & 0xF) << 4);
         int moduleId = (sector - 1)
                        | ((layer - 1)   << 2)
-                       | ((forward - 1) << 6);
+                       | ((endcap - 1) << 6);
 //                        | ((plane-1) << 7);            //Do we need plane?
         m_ModuleIdToelectId[moduleId] = elecid;
 //        B2INFO(" electId: " << elecid << " modId: " << moduleId << endl);

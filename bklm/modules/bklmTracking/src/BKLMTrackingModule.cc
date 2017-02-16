@@ -178,39 +178,41 @@ bool BKLMTrackingModule::findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& cl
   //possible two hits in one layer?
   firstBKLMHitPosition = bklmHits[0]->getGlobalPosition();
 
-  TMatrixDSym cov;
+  TMatrixDSym cov(6);
   TVector3 pos(0, 0, 0);
   TVector3 mom(0, 0, 0);
 
   for (RecoTrack& track : recoTracks) {
-    genfit::MeasuredStateOnPlane state;
-    state = track.getMeasuredStateOnPlaneFromLastHit();
-    state.extrapolateToPoint(firstBKLMHitPosition);
-    //! Translates MeasuredStateOnPlane into 3D position, momentum and 6x6 covariance.
-    state.getPosMomCov(pos, mom, cov);
-    //pos.Print(); mom.Print();
-    const TVector3& distanceVec = firstBKLMHitPosition - pos;
-    double newDistance = distanceVec.Mag2();
-    // two points on the track, (x1,TrkParam[0]+TrkParam[1]*x1, TrkParam[2]+TrkParam[3]*x1),
-    // and (x2,TrkParam[0]+TrkParam[1]*x2, TrkParam[2]+TrkParam[3]*x2),
-    // then we got the vector (x2-x1,....), that is same with (1,TrkParam[1], TrkParam[3]).
-    TVector3 trkVec(1, bklmTrk->getTrackParam()[1], bklmTrk->getTrackParam()[3]);
-    double angle = trkVec.Angle(mom);
-    // choose closest distance or minimum open angle ?
-    // overwrite old distance
-    if (newDistance < oldDistance) {
-      oldDistance = newDistance;
-      closestTrack = &track;
-      //poca = pos;
-      oldAngle = angle;
-    }
+    try {
+      genfit::MeasuredStateOnPlane state = track.getMeasuredStateOnPlaneFromLastHit();
+      state.extrapolateToPoint(firstBKLMHitPosition);
+      //! Translates MeasuredStateOnPlane into 3D position, momentum and 6x6 covariance.
+      state.getPosMomCov(pos, mom, cov);
+      //pos.Print(); mom.Print();
+      const TVector3& distanceVec = firstBKLMHitPosition - pos;
+      double newDistance = distanceVec.Mag2();
+      // two points on the track, (x1,TrkParam[0]+TrkParam[1]*x1, TrkParam[2]+TrkParam[3]*x1),
+      // and (x2,TrkParam[0]+TrkParam[1]*x2, TrkParam[2]+TrkParam[3]*x2),
+      // then we got the vector (x2-x1,....), that is same with (1,TrkParam[1], TrkParam[3]).
+      TVector3 trkVec(1, bklmTrk->getTrackParam()[1], bklmTrk->getTrackParam()[3]);
+      double angle = trkVec.Angle(mom);
+      // choose closest distance or minimum open angle ?
+      // overwrite old distance
+      if (newDistance < oldDistance) {
+        oldDistance = newDistance;
+        closestTrack = &track;
+        //poca = pos;
+        oldAngle = angle;
+      }
 
-    /* if(angle<oldAngle)
-    {
-    oldAngle=angle;
-    closestTrack = &track;
-    }
-    */
+      /* if(angle<oldAngle)
+      {
+      oldAngle=angle;
+      closestTrack = &track;
+      }
+      */
+    } catch (genfit::Exception& e) {
+    }// try
   }
 
   // can not find matched RecoTrack

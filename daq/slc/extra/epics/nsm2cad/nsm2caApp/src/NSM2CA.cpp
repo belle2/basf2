@@ -216,6 +216,7 @@ long NSM2CA::read_data_in(aiRecord* record)
       record->val = *(const double*)buf;
     }
     record->udf = FALSE;
+    return 2;
   }
   return 0;
 }
@@ -250,6 +251,7 @@ long NSM2CA::read_data_in(longinRecord* record)
       record->val = *(const uint64*)buf;
     }
     record->udf = FALSE;
+    return 2;
   }
   LogFile::error(StringUtil::join(str, ".", 4));
   return 0;

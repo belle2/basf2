@@ -16,10 +16,7 @@ bool Belle2::EvtPDLUtil::hasAntiParticle(int pdgCode)
   TParticlePDG* particle = TDatabasePDG::Instance()->GetParticle(pdgCode);
   TParticlePDG* antiParticle = particle->AntiParticle();
 
-  if (!antiParticle)
-    return false;
-
-  return particle != antiParticle;
+  return antiParticle and (particle != antiParticle);
 }
 
 std::string Belle2::EvtPDLUtil::particleName(int pdgCode)
@@ -42,7 +39,7 @@ std::string Belle2::EvtPDLUtil::antiParticleListName(int pdgCode, std::string la
 std::string Belle2::EvtPDLUtil::particleListName(int pdgCode, std::string label)
 {
   if (label.empty())
-    return antiParticleName(pdgCode);
+    return particleName(pdgCode);
   return particleName(pdgCode) + ":" + label;
 }
 

@@ -16,7 +16,6 @@
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dbobjects/EKLMGeometry.h>
 #include <eklm/geometry/GeometryData.h>
-#include <eklm/geometry/GeoEKLMTypes.h>
 
 namespace Belle2 {
 
@@ -36,7 +35,7 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      EKLMSensitiveDetector(G4String name, enum SensitiveType type);
+      EKLMSensitiveDetector(G4String name);
 
       /**
        * Destructor.
@@ -59,9 +58,6 @@ namespace Belle2 {
        * will be dropped.
        */
       G4double m_ThresholdHitTime;
-
-      /** Sensitive detector type. */
-      enum SensitiveType m_type;
 
     };
 

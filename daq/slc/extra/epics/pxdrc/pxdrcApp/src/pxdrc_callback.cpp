@@ -76,7 +76,6 @@ void eventCallback(struct event_handler_args eha)
     const char* pvname_c = ca_name(eha.chid);
     if (pvname_c != NULL) {
       std::string pvname = StringUtil::replace(pvname_c, ":", ".");
-      RCState state_target = g_callback->getStateTarget();
       g_callback->set(pvname, pvdata);
       LogFile::debug("Event Callback: %s = %s", pvname.c_str(), pvdata);
       std::string val = pvdata;
@@ -99,6 +98,14 @@ void eventCallback(struct event_handler_args eha)
 	  g_callback->setState(RCState::UNKNOWN);
 	} else if (val == "ERROR") {
 	  g_callback->setState(RCState::ERROR_ES);
+	}
+      } else if (pvname == "B2.PXD.RC.State.req.S") {
+	if (val == "NOTREADY") {
+	  g_callback->setStateRequest(RCState::NOTREADY_S);
+	} else if (val == "READY") {
+	  g_callback->setStateRequest(RCState::READY_S);
+	} else if (val == "RUNNING") {
+	  g_callback->setStateRequest(RCState::RUNNING_S);
 	}
       }
     } else {

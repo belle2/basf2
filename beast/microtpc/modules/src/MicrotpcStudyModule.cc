@@ -76,6 +76,10 @@ MicrotpcStudyModule::~MicrotpcStudyModule()
 //This module is a histomodule. Any histogram created here will be saved by the HistoManager module
 void MicrotpcStudyModule::defineHisto()
 {
+  for (int i = 0 ; i < 6 ; i++) {
+    h_tpc_rate[i]  = new TH1F(TString::Format("h_tpc_rate_%d", i), "detector #", 8, 0., 8.);
+  }
+
   for (int i = 0 ; i < 12 ; i++) {
     h_mctpc_kinetic[i]  = new TH1F(TString::Format("h_mctpc_kinetic_%d", i), "Neutron kin. energy [GeV]", 1000, 0., 10.);
     h_mctpc_kinetic_zoom[i]  = new TH1F(TString::Format("h_mctpc_kinetic_zoom_%d", i), "Neutron kin. energy [MeV]", 1000, 0., 10.);
@@ -511,6 +515,22 @@ void MicrotpcStudyModule::event()
     int partID[7];
     partID[0] = 1; //[0] for all events
     for (int j = 0; j < 6; j++) partID[j + 1] = aTrack.getpartID()[j];
+
+    if (ORec[detNb] || CRec[detNb]  || HeRec[detNb])
+      h_tpc_rate[0]->Fill(detNb);
+    if (pRec[detNb])
+      h_tpc_rate[1]->Fill(detNb);
+    if (xRec[detNb])
+      h_tpc_rate[2]->Fill(detNb);
+
+    if (EdgeCuts) {
+      if (ORec[detNb] || CRec[detNb]  || HeRec[detNb])
+        h_tpc_rate[3]->Fill(detNb);
+      if (pRec[detNb])
+        h_tpc_rate[4]->Fill(detNb);
+      if (xRec[detNb])
+        h_tpc_rate[5]->Fill(detNb);
+    }
 
     h_evtrl[detNb]->Fill(esum, trl);
     h_tvp[detNb]->Fill(theta, phi);

@@ -1,5 +1,6 @@
 #include <display/EveGeometry.h>
 
+#include <geometry/GeometryManager.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 
@@ -22,10 +23,19 @@ namespace {
 
 void EveGeometry::addGeometry()
 {
-  if (!gGeoManager)
-    return;
-
   B2DEBUG(100, "Setting up geometry for TEve...");
+  if (!gEve)
+    B2FATAL("gEve must be set up before EveGeometry!");
+
+  if (!gGeoManager) { //TGeo geometry not initialized, do it ourselves
+    //convert geant4 geometry to TGeo geometry
+    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+    geoManager.createTGeoRepresentation();
+    if (!gGeoManager) {
+      B2ERROR("Couldn't create TGeo geometry!");
+      return;
+    }
+  }
   //set colours by atomic mass number
   gGeoManager->DefaultColors();
 
@@ -77,7 +87,7 @@ void EveGeometry::addGeometry()
   s_eveTopNode->SetVisLevel(2);
   gEve->AddGlobalElement(s_eveTopNode);
 
-  //don't show full geo unless turned on by user
+  //don't show full geo unless turned on by user (will be set by setVisualisationMode())
   bool fullgeo = false;
   s_eveTopNode->SetRnrSelfChildren(fullgeo, fullgeo);
 
@@ -122,7 +132,8 @@ void EveGeometry::addGeometry()
 void EveGeometry::setVisualisationMode(EType visMode)
 {
   bool fullgeo = (visMode == c_Full);
-  s_eveTopNode->SetRnrSelfChildren(fullgeo, fullgeo);
+  if (s_eveTopNode)
+    s_eveTopNode->SetRnrSelfChildren(fullgeo, fullgeo);
   s_simplifiedShape->SetRnrSelfChildren(false, !fullgeo);
 }
 

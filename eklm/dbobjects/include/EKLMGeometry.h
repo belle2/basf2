@@ -27,14 +27,6 @@ namespace Belle2 {
 
   public:
 
-    /** Mode of detector operation. */
-    enum DetectorMode {
-      /** Normal mode. */
-      c_DetectorNormal = 0,
-      /** Background study. */
-      c_DetectorBackground = 1,
-    };
-
     /**
      * EndcapStructure geometry parameters.
      */
@@ -1249,217 +1241,6 @@ namespace Belle2 {
     };
 
     /**
-     * Readout board geometry data.
-     */
-    class BoardGeometry : public TObject {
-
-    public:
-
-      /**
-       * Constructor.
-       */
-      BoardGeometry();
-
-      /**
-       * Get length.
-       */
-      double getLength() const;
-
-      /**
-       * Set length.
-       * @param[in] length Length.
-       */
-      void setLength(double length);
-
-      /**
-       * Get width.
-       */
-      double getWidth() const;
-
-      /**
-       * Set width.
-       * @param[in] width Width.
-       */
-      void setWidth(double width);
-
-      /**
-       * Get height.
-       */
-      double getHeight() const;
-
-      /**
-       * Set height.
-       * @param[in] height Height.
-       */
-      void setHeight(double height);
-
-      /**
-       * Get base board width.
-       */
-      double getBaseWidth() const;
-
-      /**
-       * Set base board width.
-       * @param[in] baseWidth Base board width.
-       */
-      void setBaseWidth(double baseWidth);
-
-      /**
-       * Get base board height.
-       */
-      double getBaseHeight() const;
-
-      /**
-       * Set base board height.
-       * @param[in] baseHeight Base board height.
-       */
-      void setBaseHeight(double baseHeight);
-
-      /**
-       * Get strip board length.
-       */
-      double getStripLength() const;
-
-      /**
-       * Set strip board length.
-       * @param[in] stripLength Strip board length.
-       */
-      void setStripLength(double stripLength);
-
-      /**
-       * Get strip board width.
-       */
-      double getStripWidth() const;
-
-      /**
-       * Set strip board width.
-       * @param[in] stripWidth Strip board width.
-       */
-      void setStripWidth(double stripWidth);
-
-      /**
-       * Get strip board height.
-       */
-      double getStripHeight() const;
-
-      /**
-       * Set strip board height.
-       * @param[in] stripHeight Strip board height.
-       */
-      void setStripHeight(double stripHeight);
-
-    private:
-
-      /** Length. */
-      double m_Length;
-
-      /** Width. */
-      double m_Width;
-
-      /** Height. */
-      double m_Height;
-
-      /** Width of base board. */
-      double m_BaseWidth;
-
-      /** Height of base board. */
-      double m_BaseHeight;
-
-      /** Length of strip readout board. */
-      double m_StripLength;
-
-      /** Width of strip readout board. */
-      double m_StripWidth;
-
-      /** Height of strip readout board. */
-      double m_StripHeight;
-
-      /** Makes objects storable. */
-      ClassDef(BoardGeometry, 1);
-
-    };
-
-    /**
-     * Readout board position data.
-     */
-    class BoardPosition : public TObject {
-
-    public:
-
-      /**
-       * Constructor.
-       */
-      BoardPosition();
-
-      /**
-       * Get radius.
-       */
-      double getR() const;
-
-      /**
-       * Set radius.
-       * @param[in] r Radius.
-       */
-      void setR(double r);
-
-      /**
-       * Get angle.
-       */
-      double getPhi() const;
-
-      /**
-       * Set angle.
-       * @param[in] phi Angle.
-       */
-      void setPhi(double phi);
-
-    private:
-
-      /** Radius of far edge of the board. */
-      double m_R;
-
-      /** Angle. */
-      double m_Phi;
-
-      /** Makes objects storable. */
-      ClassDef(BoardPosition, 1);
-
-    };
-
-    /**
-     * Strip readout board position data.
-     */
-    class StripBoardPosition : public TObject {
-
-    public:
-
-      /**
-       * Constructor.
-       */
-      StripBoardPosition();
-
-      /**
-       * Get X coordinate.
-       */
-      double getX() const;
-
-      /**
-       * Set X coordinate.
-       * @param[in] x X coordinate.
-       */
-      void setX(double x);
-
-    private:
-
-      /** X coordinate. */
-      double m_X;
-
-      /** Makes objects storable. */
-      ClassDef(StripBoardPosition, 1);
-
-    };
-
-    /**
      * Constructor.
      */
     EKLMGeometry();
@@ -1478,11 +1259,6 @@ namespace Belle2 {
      * Operator =.
      */
     EKLMGeometry& operator=(const EKLMGeometry& geometry);
-
-    /**
-     * Get EKLM detector mode.
-     */
-    enum DetectorMode getDetectorMode() const;
 
     /**
      * Get number of endcaps.
@@ -1529,21 +1305,6 @@ namespace Belle2 {
      * Get number of strips.
      */
     int getNStrips() const;
-
-    /**
-     * Get number of readout boards.
-     */
-    int getNBoards() const;
-
-    /**
-     * Get number of redout boards in one sector.
-     */
-    int getNBoardsSector() const;
-
-    /**
-     * Get number of strip readout boards.
-     */
-    int getNStripBoards() const;
 
     /**
      * Check if number of detector layers is correct (fatal error if not).
@@ -1652,28 +1413,7 @@ namespace Belle2 {
      */
     const ShieldGeometry* getShieldGeometry() const;
 
-    /**
-     * Get readout board geometry data.
-     */
-    const BoardGeometry* getBoardGeometry() const;
-
-    /**
-     * Get position data for readout boards.
-     * @param[in] plane   Plane number.
-     * @param[in] segment Segment number.
-     */
-    const BoardPosition* getBoardPosition(int plane, int segment) const;
-
-    /**
-     * Get position data for strip readout boards.
-     * @param[in] board Number of board.
-     */
-    const StripBoardPosition* getStripBoardPosition(int board) const;
-
   protected:
-
-    /** Detector mode. */
-    enum DetectorMode m_Mode;
 
     /** Number of endcaps. */
     int m_NEndcaps;
@@ -1701,15 +1441,6 @@ namespace Belle2 {
 
     /** Number of strips in one plane. */
     int m_NStrips;
-
-    /** Number of readout boards corresponding to one plane. */
-    int m_NBoards;
-
-    /** Number of readout boards in one sector. */
-    int m_NBoardsSector;
-
-    /** Number of strip readout boards on one segment readout board. */
-    int m_NStripBoards;
 
     /** Solenoid center Z coordinate. */
     double m_SolenoidZ;
@@ -1756,17 +1487,8 @@ namespace Belle2 {
     /** Shield layer details geometry data. */
     ShieldGeometry m_ShieldGeometry;
 
-    /** Readout board geometry data. */
-    BoardGeometry m_BoardGeometry;
-
-    /** Positions of readout boards. */
-    BoardPosition* m_BoardPosition; //[m_NBoardsSector]
-
-    /** Positions of strip readout boards. */
-    StripBoardPosition* m_StripBoardPosition; //[m_NStripBoards]
-
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMGeometry, 1);
+    ClassDef(Belle2::EKLMGeometry, 2);
 
   };
 

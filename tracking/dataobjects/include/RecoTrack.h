@@ -110,7 +110,10 @@ namespace Belle2 {
     /**
      * Convenience method which registers all relations required to fully use
      * a RecoTrack. If you create a new RecoTrack StoreArray, call this method
-     * in the initialize() method of your module.
+     * in the initialize() method of your module. Note that the BKLM and EKLM
+     * relations may not be registered because the KLM modules are loaded after
+     * tracking; in this case, a second call of this method is required after
+     * creation of the BKLM and EKLM hits store arrays.
      * @param recoTracks  Reference to the store array where the new RecoTrack list is located
      * @param cdcHitsStoreArrayName  name of the StoreArray holding the CDCHits lists
      * @param svdHitsStoreArrayName  name of the StoreArray holding the SVDClusters lists
@@ -568,6 +571,15 @@ namespace Belle2 {
       return getMeasuredStateOnPlaneFromHit(0, representation);
     }
 
+    /** Return genfit's MeasuredStateOnPlane for the first hit in a fit
+    * useful for extrapolation of measurements other locations
+    * Const version.
+    */
+    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromFirstHit(const genfit::AbsTrackRep* representation = nullptr) const
+    {
+      return getMeasuredStateOnPlaneFromHit(0, representation);
+    }
+
     /** Return genfit's MeasuredStateOnPlane for the last hit in a fit
     * useful for extrapolation of measurements other locations
     */
@@ -576,10 +588,29 @@ namespace Belle2 {
       return getMeasuredStateOnPlaneFromHit(-1, representation);
     }
 
+    /** Return genfit's MeasuredStateOnPlane for the last hit in a fit
+    * useful for extrapolation of measurements other locations
+    * Const version.
+    */
+    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation = nullptr) const
+    {
+      return getMeasuredStateOnPlaneFromHit(-1, representation);
+    }
+
     /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
     * useful for extrapolation of measurements other locations
     */
     const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr)
+    {
+      checkDirtyFlag();
+      return m_genfitTrack.getFittedState(id, representation);
+    }
+
+    /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
+    * useful for extrapolation of measurements other locations
+    * Const version.
+    */
+    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr) const
     {
       checkDirtyFlag();
       return m_genfitTrack.getFittedState(id, representation);

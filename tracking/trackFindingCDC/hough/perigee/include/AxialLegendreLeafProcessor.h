@@ -143,66 +143,6 @@ namespace Belle2 {
       /// Function to notify the leaf processor about changes in parameters before a new walk
       void beginWalk();
 
-      /// Getter for the maximal level of of splitting in the hough tree
-      int getMaxLevel() const
-      {
-        return m_param_maxLevel;
-      }
-
-      /// Setter for the maximal level of of splitting in the hough tree
-      void setMaxLevel(int maxLevel)
-      {
-        m_param_maxLevel = maxLevel;
-      }
-
-      /// Getter for the minimal weight what is need the follow the children of a node.
-      double getMinWeight() const
-      {
-        return m_param_minWeight;
-      }
-
-      /// Setter for the minimal weight what is need the follow the children of a node.
-      void setMinWeight(double minWeight)
-      {
-        m_param_minWeight = minWeight;
-      }
-
-      /// Getter for the maximal curvature to be investigated in the current walk.
-      double getMaxCurv() const
-      {
-        return m_param_maxCurv;
-      }
-
-      /// Setter for the maximal curvature to be investigated in the current walk.
-      void setMaxCurv(double curvature)
-      {
-        m_param_maxCurv = curvature;
-      }
-
-      /// Getter for the maximal number of road searches to be applied on the found leaves
-      int getNRoadSearches() const
-      {
-        return m_param_nRoadSearches;
-      }
-
-      /// Setter for the maximal number of road searches to be applied on the found leaves
-      void setNRoadSearches(int nRoadSearches)
-      {
-        m_param_nRoadSearches = nRoadSearches;
-      }
-
-      /// Getter for the node level to be used as source of hits in the road searches
-      int getRoadLevel() const
-      {
-        return m_param_roadLevel;
-      }
-
-      /// Getter for the node level to be used as source of hits in the road level
-      void setRoadLevel(int roadLevel)
-      {
-        m_param_roadLevel = roadLevel;
-      }
-
     public:
       /// Statistic: Number received node
       int m_nNodes = 0;

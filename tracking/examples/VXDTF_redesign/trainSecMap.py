@@ -16,7 +16,7 @@
 # The file name under which the trained SecMap will be stored can be
 # specified via the argument --secmap
 #
-# Usage: basf2 trainSecMap.py -- --train_sample traindata.py --secmap trainedSecMap.root
+# Usage: basf2 trainSecMap.py -- --train_sample traindata.root --secmap trainedSecMap.root
 #
 #
 # Contributors: Jonas Wagner, Felix Metzner

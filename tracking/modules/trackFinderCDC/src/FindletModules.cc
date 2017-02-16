@@ -24,23 +24,24 @@ REG_MODULE(SegmentRejecter);
 REG_MODULE(SegmentOrienter);
 REG_MODULE(SegmentCreatorMCTruth);
 
-REG_MODULE(AxialTrackCreatorHitLegendre)
-REG_MODULE(AxialTrackCreatorSegmentHough)
+REG_MODULE(AxialTrackCreatorHitLegendre);
+REG_MODULE(AxialTrackCreatorSegmentHough);
+REG_MODULE(AxialTrackCreatorMCTruth);
 
-REG_MODULE(AxialSegmentPairCreator)
-REG_MODULE(SegmentPairCreator)
-REG_MODULE(SegmentTripleCreator)
+REG_MODULE(AxialSegmentPairCreator);
+REG_MODULE(SegmentPairCreator);
+REG_MODULE(SegmentTripleCreator);
 
-REG_MODULE(TrackCreatorSegmentPairAutomaton)
-REG_MODULE(TrackCreatorSegmentTripleAutomaton)
-REG_MODULE(TrackCreatorSingleSegments)
+REG_MODULE(TrackCreatorSegmentPairAutomaton);
+REG_MODULE(TrackCreatorSegmentTripleAutomaton);
+REG_MODULE(TrackCreatorSingleSegments);
 
-REG_MODULE(TrackLinker)
-REG_MODULE(TrackCombiner)
-REG_MODULE(TrackOrienter)
-REG_MODULE(TrackFlightTimeAdjuster)
-REG_MODULE(TrackRejecter)
-REG_MODULE(TrackExporter)
+REG_MODULE(TrackLinker);
+REG_MODULE(TrackCombiner);
+REG_MODULE(TrackOrienter);
+REG_MODULE(TrackFlightTimeAdjuster);
+REG_MODULE(TrackRejecter);
+REG_MODULE(TrackExporter);
 
 REG_MODULE(SegmentFinderFacetAutomaton);
 REG_MODULE(TrackFinderSegmentPairAutomaton);

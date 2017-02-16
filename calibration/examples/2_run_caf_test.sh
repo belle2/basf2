@@ -12,6 +12,6 @@ DATA_DIR=$1
 # fail quickly if you try and re-run a script without removing the CAF output
 # of the previous process.
 
-#basf2 caf_simplest.py $DATA_DIR
-basf2 caf_multiple_options.py $DATA_DIR
+basf2 caf_simplest.py $DATA_DIR
+#basf2 caf_multiple_options.py $DATA_DIR
 #basf2 caf_vxd.py $DATA_DIR

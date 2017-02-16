@@ -9,6 +9,7 @@
  **************************************************************************/
 
 /* Belle2 headers. */
+#include <eklm/dataobjects/EKLMAlignmentHit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/EKLMHit2d.h>
 #include <eklm/modules/EKLMReconstructor/EKLMReconstructorModule.h>
@@ -61,11 +62,14 @@ EKLMReconstructorModule::~EKLMReconstructorModule()
 
 void EKLMReconstructorModule::initialize()
 {
+  StoreArray<EKLMAlignmentHit> alignmentHits;
   StoreArray<EKLMHit2d> hit2ds;
   StoreArray<EKLMDigit> digits;
   hit2ds.registerInDataStore();
+  alignmentHits.registerInDataStore();
   digits.isRequired();
   hit2ds.registerRelationTo(digits);
+  alignmentHits.registerRelationTo(hit2ds);
   m_TransformData = new EKLM::TransformData(true, false);
   m_GeoDat = &(EKLM::GeometryData::Instance());
   if (m_GeoDat->getNPlanes() != 2)
@@ -116,6 +120,7 @@ void EKLMReconstructorModule::event()
 {
   int i, n;
   double d1, d2, t, t1, t2, sd;
+  StoreArray<EKLMAlignmentHit> alignmentHits;
   StoreArray<EKLMDigit> digits;
   StoreArray<EKLMHit2d> hit2ds;
   std::vector<EKLMDigit*> digitVector;
@@ -165,6 +170,10 @@ void EKLMReconstructorModule::event()
         hit2d->setMCTime(((*it4)->getMCTime() + (*it5)->getMCTime()) / 2);
         hit2d->addRelationTo(*it4);
         hit2d->addRelationTo(*it5);
+        for (i = 0; i < 2; i++) {
+          EKLMAlignmentHit* alignmentHit = alignmentHits.appendNew(i);
+          alignmentHit->addRelationTo(hit2d);
+        }
         /* cppcheck-suppress memleak */
       }
     }

@@ -37,7 +37,7 @@ namespace Belle2 {
      *
      * Most of the provided selectors are built to match many collection items to one collector item.
      */
-    template <class ACollectorItem, class ACollectionItem, class AFilterFactory>
+    template <class ACollectorItem, class ACollectionItem, class AFilter>
     class FilterSelector :
       public Findlet<WeightedRelation<ACollectorItem, const ACollectionItem>> {
     public:
@@ -65,8 +65,8 @@ namespace Belle2 {
       void apply(std::vector<WeightedRelationItem>& weightedRelations) override
       {
         for (auto& weightedRelation : weightedRelations) {
-          Weight filterResult = m_filter({ weightedRelation.getFrom(), weightedRelation.getTo() });
-          weightedRelation.setWeight(filterResult);
+          const Weight weight = m_filter(weightedRelation);
+          weightedRelation.setWeight(weight);
         }
 
         const auto& weightIsNan = [](const WeightedRelationItem & item) {
@@ -74,17 +74,14 @@ namespace Belle2 {
         };
 
         // Erase all items with a weight of NAN
-        weightedRelations.erase(std::remove_if(weightedRelations.begin(),
-                                               weightedRelations.end(),
-                                               weightIsNan),
-                                weightedRelations.end());
+        erase_remove_if(weightedRelations, weightIsNan);
 
         std::sort(weightedRelations.begin(), weightedRelations.end());
       }
 
     private:
       /// The filter to use.
-      ChooseableFilter<AFilterFactory> m_filter;
+      AFilter m_filter;
     };
   }
 }

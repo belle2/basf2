@@ -199,6 +199,8 @@ parser.add_argument('--raw-input', dest='raw_input', action='store_const', const
                     help='Use SeqRootInput to load directly raw data files in .sroot format')
 parser.add_argument('--unpacking', dest='unpacking', action='store_const', const=True,
                     default=False, help='Add PXD and SVD unpacking modules to the path')
+parser.add_argument('--masking-path', dest='masking_path', action='store', default=None, type=str,
+                    help='Location of masking XMLs XXX_MaskFiredBasic.xml XXX_MaskFired_RunYY.xml XXX=PXD|SVD|Tel')
 parser.add_argument('--dqm', dest='dqm', action='store_const', const=True, default=False, help='Produce DQM plots')
 parser.add_argument('--display', dest='display', action='store_const', const=True, default=False, help='Show Event Display window')
 parser.add_argument('--gbl-collect', dest='gbl_collect', action='store_const', const=True,
@@ -217,6 +219,15 @@ parser.add_argument(
     const=True,
     default=False,
     help='Set log level to INFO to see all messages')
+
+parser.add_argument(
+    '--tel-finder',
+    dest='tel_finder',
+    action='store_const',
+    const=True,
+    default=False,
+    help='Add telescope track finder')
+
 args = parser.parse_args()
 
 
@@ -292,14 +303,46 @@ if args.unpacking:
 if not args.svd_only:
     if args.unpacking:
         main.add_module("PXDRawHitSorter")
-    # main.add_module('PXDDigitSorter')
+
+    if args.masking_path is not None:
+        pxd_maskBasic = args.masking_path + 'PXD_MaskFiredBasic.xml'
+        pxd_mask = args.masking_path + 'PXD_MaskFired_Run' + str(args.run) + '.xml'
+        PXDSortBasic = register_module('PXDDigitSorter')
+        PXDSortBasic.param('ignoredPixelsListName', pxd_maskBasic)
+        main.add_module(PXDSortBasic)
+        PXDSort = register_module('PXDDigitSorter')
+        PXDSort.param('ignoredPixelsListName', pxd_mask)
+        main.add_module(PXDSort)
+
     main.add_module('PXDClusterizer')
 
-main.add_module('SVDDigitSorter')  # , ignoredStripsListName='data/testbeam/vxd/SVD_Masking.xml')
+if args.masking_path is not None:
+    svd_maskBasic = args.masking_path + 'SVD_MaskFiredBasic.xml'
+    svd_mask = args.masking_path + 'SVD_MaskFired_Run' + str(args.run) + '.xml'
+    SVDSortBasic = register_module('SVDDigitSorter')
+    SVDSortBasic.param('ignoredStripsListName', svd_maskBasic)
+    main.add_module(SVDSortBasic)
+    SVDSort = register_module('SVDDigitSorter')
+    SVDSort.param('ignoredStripsListName', svd_mask)
+    main.add_module(SVDSort)
+else:
+    main.add_module('SVDDigitSorter')  # , ignoredStripsListName='data/testbeam/vxd/SVD_Masking.xml')
+
 main.add_module('SVDClusterizer')
 
 if args.tel_input:
-    main.add_module('TelDigitSorter')
+    if args.masking_path is not None:
+        tel_maskBasic = args.masking_path + 'Tel_MaskFiredBasic.xml'
+        tel_mask = args.masking_path + 'Tel_MaskFired_Run' + str(args.run) + '.xml'
+        TelSortBasic = register_module('TelDigitSorter')
+        TelSortBasic.param('ignoredPixelsListName', tel_maskBasic)
+        main.add_module(TelSortBasic)
+        TelSort = register_module('TelDigitSorter')
+        TelSort.param('ignoredPixelsListName', tel_mask)
+        main.add_module(TelSort)
+    else:
+        main.add_module('TelDigitSorter')
+
     main.add_module('TelClusterizer')
 
 if args.gbl_collect:
@@ -309,10 +352,31 @@ else:
 
 add_vxdtf(main, not args.magnet_off, args.svd_only, args.momentum)
 
+telTF = register_module('TelTrackFinder')
+# telTF.param('inputTracksName', GFTracksColName)
+telTF.param('outputTrackCandsName', 'telTrackCands')
+telTF.param('inputClustersName', '')  # name of the telescope clusters
+telTF.param('distanceCut', 10)  # distance between track and clusters in units of the fit uncertainty (same cut for u and v)
+telTF.param('minTelLayers', 3)  # minmum telescope layers required to accept a track candidate (1..6)
+telTF.logging.log_level = LogLevel.WARNING
+telTF.logging.debug_level = 1
+
+
+if args.tel_finder:
+    main.add_module('GenFitter', FilterId='Kalman')
+    main.add_module(telTF)
+
+
 if args.gbl_collect:
-    main.add_module('GBLfit')
-    # main.add_module('GBLdiagnostics', rootFile='gbl' + str(args.run) + '.root')
-    main.add_module('MillepedeCollector', minPValue=0.0000)
+    if args.tel_finder:
+        main.add_module('GBLfit', GFTrackCandidatesColName='telTrackCands', GFTracksColName='telTracks')
+        main.add_module('MillepedeCollector', minPValue=0.0000, useGblTree=True, tracks='telTracks')
+    else:
+        main.add_module('GBLfit')
+        main.add_module('MillepedeCollector', minPValue=0.0000, useGblTree=True)
+
+    main.add_module('GBLdiagnostics', rootFile='gbl' + str(args.run) + '.root', tracks="telTracks")
+
 else:
     main.add_module('GenFitter', FilterId='Kalman')
 
@@ -336,8 +400,11 @@ main.add_module('RootOutput')
 
 
 if args.display:
-    main.add_module('TrackBuilder')
-    main.add_module('Display', fullGeometry=True)
+    if args.tel_finder:
+        main.add_module('TrackBuilder', GFTrackCandidatesColName='telTrackCands', GFTracksColName='telTracks')
+    else:
+        main.add_module('TrackBuilder')
 
+    main.add_module('Display', fullGeometry=True)
 process(main)
 print(statistics)

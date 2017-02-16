@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorHitLegendre.h>
+#include <tracking/trackFindingCDC/findlets/combined/AxialTrackFinderLegendre.h>
 
 #include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.h>
 #include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.icc.h>
@@ -66,13 +66,13 @@ namespace {
 }
 #endif
 
-std::string AxialTrackCreatorHitLegendre::getDescription()
+std::string AxialTrackFinderLegendre::getDescription()
 {
   return "Generates axial tracks from segments using a hough space over phi0 impact and curvature for the spares case.";
 }
 
-void AxialTrackCreatorHitLegendre::exposeParameters(ModuleParamList* moduleParamList,
-                                                    const std::string& prefix)
+void AxialTrackFinderLegendre::exposeParameters(ModuleParamList* moduleParamList,
+                                                const std::string& prefix)
 {
   // Parameters for the fine hough space
   moduleParamList->addParameter(prefixed(prefix, "fineGranularityLevel"),
@@ -163,7 +163,7 @@ void AxialTrackCreatorHitLegendre::exposeParameters(ModuleParamList* moduleParam
                                 m_param_roughRelaxationSchedule);
 }
 
-void AxialTrackCreatorHitLegendre::initialize()
+void AxialTrackFinderLegendre::initialize()
 {
   Super::initialize();
 
@@ -244,8 +244,8 @@ void AxialTrackCreatorHitLegendre::initialize()
   }
 }
 
-void AxialTrackCreatorHitLegendre::apply(const std::vector<CDCWireHit>& wireHits,
-                                         std::vector<CDCTrack>& tracks)
+void AxialTrackFinderLegendre::apply(const std::vector<CDCWireHit>& wireHits,
+                                     std::vector<CDCTrack>& tracks)
 {
   // Acquire the axial hits
   std::vector<const CDCWireHit*> axialWireHits;
@@ -298,7 +298,7 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<CDCWireHit>& wireHits
   tracks.insert(tracks.end(), foundTracks.begin(), foundTracks.end());
 }
 
-void AxialTrackCreatorHitLegendre::terminate()
+void AxialTrackFinderLegendre::terminate()
 {
   m_fineHoughTree->raze();
   m_fineHoughTree.reset();
@@ -308,7 +308,7 @@ void AxialTrackCreatorHitLegendre::terminate()
 }
 
 std::vector<ParameterVariantMap>
-AxialTrackCreatorHitLegendre::getDefaultFineRelaxationSchedule() const
+AxialTrackFinderLegendre::getDefaultFineRelaxationSchedule() const
 {
   std::vector<ParameterVariantMap> result;
   // Relaxation schedule of the original legendre implemenation
@@ -389,7 +389,7 @@ AxialTrackCreatorHitLegendre::getDefaultFineRelaxationSchedule() const
 }
 
 std::vector<ParameterVariantMap>
-AxialTrackCreatorHitLegendre::getDefaultRoughRelaxationSchedule() const
+AxialTrackFinderLegendre::getDefaultRoughRelaxationSchedule() const
 {
   std::vector<ParameterVariantMap> result;
 
@@ -426,7 +426,7 @@ AxialTrackCreatorHitLegendre::getDefaultRoughRelaxationSchedule() const
   return result;
 }
 
-std::vector<float> AxialTrackCreatorHitLegendre::getDefaultCurvBounds(std::array<float, 2> curvSpan, int granularityLevel)
+std::vector<float> AxialTrackFinderLegendre::getDefaultCurvBounds(std::array<float, 2> curvSpan, int granularityLevel)
 {
   using BinSpan = std::array<double, 2>;
   using BinSpans = std::vector<BinSpan>;

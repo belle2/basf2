@@ -28,7 +28,7 @@ namespace Belle2 {
     class CDCTrack;
 
     /// Generates axial tracks from hit using the special leaf processing inspired by the legendre algorithm.
-    class AxialTrackCreatorHitLegendre : public Findlet<const CDCWireHit, CDCTrack> {
+    class AxialTrackFinderLegendre : public Findlet<const CDCWireHit, CDCTrack> {
 
     private:
       /// Type of the base class

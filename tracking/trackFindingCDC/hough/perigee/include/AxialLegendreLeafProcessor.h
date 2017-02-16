@@ -106,9 +106,6 @@ namespace Belle2 {
       /// Intermediate step migrating hits between the tracks as the original legendre algorithm.
       void migrateHits();
 
-      /// Finalize the tracks by some merging and additional postprocessing as the original legendre algorithm.
-      void finalizeTracks();
-
     public:
       /// Getter for the axial hits that are not yet used.
       std::vector<const CDCWireHit*> getUnusedWireHits();

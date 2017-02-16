@@ -161,15 +161,6 @@ namespace Belle2 {
     {
       TrackProcessor::assignNewHits(m_axialWireHits, m_tracks);
     }
-
-    template <class ANode>
-    void AxialLegendreLeafProcessor<ANode>::finalizeTracks()
-    {
-      TrackProcessor::mergeAndFinalizeTracks(m_tracks, m_axialWireHits);
-      HitProcessor::resetMaskedHits(m_tracks, m_axialWireHits);
-      erase_remove_if(m_tracks, Size() == 0u);
-    }
-
   }
 }
 

@@ -9,6 +9,7 @@ separate modules named cli_*.py
 """
 
 import os
+import re
 import argparse
 from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging, pretty_print_table
 from pager import Pager
@@ -19,6 +20,19 @@ from .cli_utils import ItemFilter
 # this if pylama/pylint is used to check
 from .cli_upload import command_upload  # noqa
 from .cli_download import command_download  # noqa
+
+
+def escape_ctrl_chars(name):
+    """Remove ANSI control characters from strings"""
+    # compile the regex on first use and remember it
+    if not hasattr(escape_ctrl_chars, "_regex"):
+        escape_ctrl_chars._regex = re.compile("[\x00-\x1f\x7f-\x9f]")
+
+    # escape the control characters by putting theim in as \xFF
+    def escape(match):
+        return "\\x{:02x}".format(ord(match.group(0)))
+
+    return escape_ctrl_chars._regex.sub(escape, name)
 
 
 def command_tag(args, db=None):
@@ -93,7 +107,7 @@ def command_tag_list(args, db=None):
                 table.append([
                     item["globalTagId"],
                     item["name"],
-                    item.get("description", ""),
+                    escape_ctrl_chars(item.get("description", "")),
                     item["globalTagType"]["name"],
                     item["globalTagStatus"]["name"],
                     item["payloadCount"],
@@ -112,14 +126,14 @@ def print_globaltag(info):
     results = [
         ["id", str(info["globalTagId"])],
         ["name", info["name"]],
-        ["description", info.get("description", "")],
+        ["description", escape_ctrl_chars(info.get("description", ""))],
         ["type", info["globalTagType"]["name"]],
         ["status", info["globalTagStatus"]["name"]],
         ["# payloads", info["payloadCount"]],
         # print created and modified timestamps in local time zone
         ["created", created.astimezone(tz=None).strftime("%Y-%m-%d %H:%M:%S local time")],
         ["modified", modified.astimezone(tz=None).strftime("%Y-%m-%d %H:%M:%S local time")],
-        ["modified by", info["modifiedBy"]],
+        ["modified by", escape_ctrl_chars(info["modifiedBy"])],
     ]
     pretty_print_table(results, [-40, '*'], True)
 
@@ -385,7 +399,7 @@ def command_iov(args, db):
                         # print created and modified timestamps in local time zone
                         ["payload created", payload_created.astimezone(tz=None).strftime("%Y-%m-%d %H:%M:%S local time")],
                         ["payload modified", payload_modified.astimezone(tz=None).strftime("%Y-%m-%d %H:%M:%S local time")],
-                        ["payload modified by", payload["modifiedBy"]],
+                        ["payload modified by", escape_ctrl_chars(payload["modifiedBy"])],
                     ]
                     print()
                     pretty_print_table(result, [-40, '*'], True)

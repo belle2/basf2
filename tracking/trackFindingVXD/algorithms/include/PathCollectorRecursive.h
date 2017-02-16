@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jakob Lettenbichler                                      *
+ * Contributors: Jakob Lettenbichler, Jonas Wagner                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -56,8 +56,10 @@ namespace Belle2 {
 
 
     /** main function does need a network fulfilling some stuff which is fulfilled by any DirectedNode*/
-    std::vector<PathPtr> findPaths(ContainerType& aNetwork)
+    std::vector<PathPtr> findPaths(ContainerType& aNetwork, bool storeSubsets = false)
     {
+      m_storeSubsets = storeSubsets;
+
       B2DEBUG(25, "findPaths: executing now a network of size " << aNetwork.size());
       std::vector<PathPtr> allNodePaths;
       for (NodeType* aNode : aNetwork) {
@@ -112,6 +114,9 @@ namespace Belle2 {
     /** simple counter for number of recursive calls of triggered */
     unsigned int nRecursiveCalls = 0;
 
+    /** flag if subsets should be stored or not */
+    bool m_storeSubsets = false;
+
 
   protected:
 
@@ -146,12 +151,20 @@ namespace Belle2 {
       B2DEBUG(150, "findPathsRecursive was started");
       nRecursiveCalls++;
 
+      // Test if there are viable neighbours to current node
       NeighbourContainerType viableNeighbours;
       for (size_t iNeighbour = 0; iNeighbour < innerNeighbours.size(); ++iNeighbour) {
         if (m_compatibilityChecker.areCompatible(currentPath->back(), innerNeighbours[iNeighbour])) {
           viableNeighbours.push_back(innerNeighbours[iNeighbour]);
         }
       }
+
+      // If current path will continue, optionally store the subpath up to current node
+      if (m_storeSubsets && viableNeighbours.size() > 0) {
+        PathPtr newPath = clone(currentPath); // deep copy of existing path
+        storeAcceptedPath(std::move(newPath), allNodePaths);
+      }
+
       B2DEBUG(150, "findPathsRecursive: Number of valid neighbours: " << viableNeighbours.size());
       for (size_t iNeighbour = 0; iNeighbour < viableNeighbours.size(); ++iNeighbour) {
         // the last alternative is assigned to the existing path.

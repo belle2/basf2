@@ -254,6 +254,7 @@ void AxialTrackFinderLegendre::apply(const std::vector<CDCWireHit>& wireHits,
     wireHit->unsetTemporaryFlags();
     wireHit->unsetMaskedFlag();
     if (not wireHit.isAxial()) continue;
+    if (wireHit->hasBackgroundFlag()) continue;
     axialWireHits.emplace_back(&wireHit);
   }
 

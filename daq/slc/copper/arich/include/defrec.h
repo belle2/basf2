@@ -4,7 +4,7 @@
 enum { RUNREC_ID = 1, ENDREC_ID = 2, POSREC_ID = 3, EVTREC_ID = 4,
        THRREC_ID = 5
      };
-enum { MAXDATA = 200};
+enum { MAXDATA = 500};
 
 struct RunRec {
   unsigned int id, len;

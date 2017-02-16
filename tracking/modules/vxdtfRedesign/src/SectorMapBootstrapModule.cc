@@ -79,18 +79,6 @@ SectorMapBootstrapModule::initialize()
   else
     bootstrapSectorMap();
 
-  //This file is used by the observers, at present it is created by default.
-  m_tfile = new TFile("observeTheSecMap.root", "RECREATE");
-  m_tfile->cd();
-  TTree* newTree = new TTree("twoHitsTree", "Observers");
-
-  // take care of two-hit-filters:
-//   auto outerHit = new SpacePoint();
-//   auto innerHit = new SpacePoint();
-
-  VXDTFFilters<SpacePoint>::twoHitFilter_t aFilter;
-  initializeObservers(aFilter, newTree/*, outerHit, innerHit*/);
-//   ObserverCheckMCPurity::initialize< CircleRadius<SpacePoint>, ClosedRange<double, double>>(CircleRadius<SpacePoint>(), ClosedRange<double, double>());
 }
 
 void
@@ -384,14 +372,5 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
   rootFile.Close();
 
 
-}
-
-
-void
-SectorMapBootstrapModule::terminate()
-{
-  m_tfile->Write();
-  m_tfile->Close();
-  delete m_tfile;
 }
 

@@ -14,7 +14,7 @@ protected:
   unsigned int m_rbparam;
 public:
   SA0xParamBase() {}
-  ~SA0xParamBase() {}
+  virtual ~SA0xParamBase() {}
   unsigned int param() { return m_param; }
   unsigned int rbparam() { return m_rbparam; }
   void param(unsigned int x) { m_param = x; }

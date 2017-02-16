@@ -59,6 +59,10 @@ namespace Belle2 {
     int _famMethod;
     /** Time interval */
     int _binTimeInterval;
+    /** Waveform */
+    int _waveform;
+
+
 
     /** Config. file name. */
     std::string _configFilename;

@@ -12,32 +12,50 @@ from validationscript import Script
 
 
 class TestClusterControlDrmaa(unittest.TestCase):
-
+    """
+    Test for for the DRMAA-backend of the clustercontrol
+    """
     class SessionMock():
+        """
+        Class to mock a DRMAA session
+        """
 
         class JobState(Enum):
+            """
+            Possible DRMAA Job States
+            """
+            # job done
             DONE = 1
+            # job failed
             FAILED = 2
+            # job running
             RUNNING = 3
 
+        # the job state this session mock will return
         jobStatusReturn = JobState.RUNNING
 
         def __enter__(self):
+            """ to support python with syntax"""
             return self
 
         def __exit__(self, exc, value, tb):
+            """ to support python with syntax"""
             pass
 
         def createJobTemplate(self):
+            """fake creating job template"""
             return MagicMock()
 
         def runJob(self, jt):
+            """fake job running"""
             return MagicMock()
 
         def jobStatus(self, jt):
+            """fake job status terun"""
             return self.jobStatusReturn
 
         def deleteJobTemplate(self, jt):
+            """fake job deletion"""
             return MagicMock()
 
     def test_no_drmaa(self):

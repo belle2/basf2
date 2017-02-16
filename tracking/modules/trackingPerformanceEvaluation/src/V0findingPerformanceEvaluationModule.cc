@@ -93,8 +93,8 @@ void V0findingPerformanceEvaluationModule::initialize()
   m_h1_vtxX_res = createHistogram1D("h1vtxXres", "vtxX resid", 100, -0.2, 0.2, "vtxX resid (cm)", m_histoList);
   m_h1_vtxY_res = createHistogram1D("h1vtxYres", "vtxY resid", 100, -0.2, 0.2, "vtxY resid (cm)", m_histoList);
   m_h1_vtxZ_res = createHistogram1D("h1vtxZres", "vtxZ resid", 100, -0.5, 0.5, "vtxZ resid (cm)", m_histoList);
-  m_h1_mom_res = createHistogram1D("h1momres", "mom resid", 100, -1.5, 1.5, "mom resid (GeV/c)", m_histoList);
-  m_h1_mass_res = createHistogram1D("h1massres", "mass resid", 100, -1, 1, "mass resid (GeV/c)", m_histoList);
+  m_h1_mom_res = createHistogram1D("h1momres", "mom resid", 1000, -0.5, 0.5, "mom resid (GeV/c)", m_histoList);
+  m_h1_mass_res = createHistogram1D("h1massres", "mass resid", 500, -0.3, 0.3, "mass resid (GeV/c)", m_histoList);
 
   //vertex and momentum parameters pulls
   m_h1_vtxX_pll = createHistogram1D("h1vtxXpll", "vtxX pull", 100, -5, 5, "vtxX pull", m_histoList);

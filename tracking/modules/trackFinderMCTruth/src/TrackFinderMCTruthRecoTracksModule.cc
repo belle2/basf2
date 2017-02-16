@@ -25,6 +25,7 @@
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <top/dataobjects/TOPBarHit.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/WireTrackCandHit.h>
@@ -59,7 +60,7 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
                  "Fills the created genfit::TrackCandidates with all information (start values, hit indices) needed for the fitting.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  //choose which hits to use, all hits assigned to the track candidate will be used in the fit
+  // choose which hits to use, all hits assigned to the track candidate will be used in the fit
   addParam("UsePXDHits",
            m_usePXDHits,
            "Set true if PXDHits or PXDClusters should be used",
@@ -79,10 +80,15 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
   addParam("UseNLoops",
            m_useNLoops,
            "Set the number of loops whose hits will be marked as priortiy hits. All other hits "
-           "will be marked as auxiliary and therfore not considered for efficiency computations. "
+           "will be marked as auxiliary and therfore not considered for efficiency computations "
+           "(only implemented for CDCHits)."
            "By default, all hits will be priority hits.",
            INFINITY);
-
+  addParam("UseOnlyBeforeTOP",
+           m_useOnlyBeforeTOP,
+           "Mark hits as auxiliary after the track left the CDC and touched the TOP detector "
+           "(only implemented for CDCHits).",
+           false);
 
   addParam("MinPXDHits",
            m_minPXDHits,
@@ -543,6 +549,26 @@ void TrackFinderMCTruthRecoTracksModule::event()
       }
     };
 
+    auto didParticleExitCDC = [](const CDCHit * hit) {
+      const CDCSimHit* simHit = hit->getRelated<CDCSimHit>();
+      if (not simHit) return false;
+
+      const MCParticle* mcParticle = simHit->getRelated<MCParticle>();
+      if (not mcParticle) return false;
+      if (not mcParticle->hasSeenInDetector(Const::TOP)) return false;
+
+      RelationVector<TOPBarHit> topHits = mcParticle->getRelationsWith<TOPBarHit>();
+      if (topHits.size() == 0) return false;
+
+      // Get hit with the smallest time.
+      auto lessTime = [](const TOPBarHit & lhs, const TOPBarHit & rhs) {
+        return lhs.getTime() < rhs.getTime();
+      };
+      auto itFirstTopHit = std::min_element(topHits.begin(), topHits.end(), lessTime);
+
+      return simHit->getGlobalTime() > itFirstTopHit->getTime();
+    };
+
     // create a list containing the indices to the CDCHits that belong to one track
     int nAxialHits = 0;
     int nStereoHits = 0;
@@ -558,6 +584,11 @@ void TrackFinderMCTruthRecoTracksModule::event()
 
         // Mark higher order hits as auxiliary, if m_useNLoops has been set
         if (not std::isnan(m_useNLoops) and not isWithinNLoops(cdcHit, m_useNLoops)) {
+          mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
+        }
+
+        // check if the particle left hits in TOP and add mark hits after that as auxiliary.
+        if (m_useOnlyBeforeTOP and didParticleExitCDC(cdcHit)) {
           mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
         }
 

@@ -937,150 +937,10 @@ void EKLMGeometry::ShieldGeometry::setDetailCCenter(double x, double y)
   m_DetailCCenter.setY(y);
 }
 
-/* Class EKLMGeometry::BoardGeometry. */
-
-double EKLMGeometry::BoardGeometry::getLength() const
-{
-  return m_Length;
-}
-
-void EKLMGeometry::BoardGeometry::setLength(double length)
-{
-  m_Length = length;
-}
-
-double EKLMGeometry::BoardGeometry::getWidth() const
-{
-  return m_Width;
-}
-
-void EKLMGeometry::BoardGeometry::setWidth(double width)
-{
-  m_Width = width;
-}
-
-double EKLMGeometry::BoardGeometry::getHeight() const
-{
-  return m_Height;
-}
-
-void EKLMGeometry::BoardGeometry::setHeight(double height)
-{
-  m_Height = height;
-}
-
-double EKLMGeometry::BoardGeometry::getBaseWidth() const
-{
-  return m_BaseWidth;
-}
-
-void EKLMGeometry::BoardGeometry::setBaseWidth(double baseWidth)
-{
-  m_BaseWidth = baseWidth;
-}
-
-double EKLMGeometry::BoardGeometry::getBaseHeight() const
-{
-  return m_BaseHeight;
-}
-
-void EKLMGeometry::BoardGeometry::setBaseHeight(double baseHeight)
-{
-  m_BaseHeight = baseHeight;
-}
-
-double EKLMGeometry::BoardGeometry::getStripLength() const
-{
-  return m_StripLength;
-}
-
-void EKLMGeometry::BoardGeometry::setStripLength(double stripLength)
-{
-  m_StripLength = stripLength;
-}
-
-double EKLMGeometry::BoardGeometry::getStripWidth() const
-{
-  return m_StripWidth;
-}
-
-void EKLMGeometry::BoardGeometry::setStripWidth(double stripWidth)
-{
-  m_StripWidth = stripWidth;
-}
-
-double EKLMGeometry::BoardGeometry::getStripHeight() const
-{
-  return m_StripHeight;
-}
-
-void EKLMGeometry::BoardGeometry::setStripHeight(double stripHeight)
-{
-  m_StripHeight = stripHeight;
-}
-
-EKLMGeometry::BoardGeometry::BoardGeometry()
-{
-  m_Length = 0;
-  m_Width = 0;
-  m_Height = 0;
-  m_BaseWidth = 0;
-  m_BaseHeight = 0;
-  m_StripLength = 0;
-  m_StripWidth = 0;
-  m_StripHeight = 0;
-}
-
-/* Class EKLMGeometry::BoardPosition. */
-
-EKLMGeometry::BoardPosition::BoardPosition()
-{
-  m_R = 0;
-  m_Phi = 0;
-}
-
-double EKLMGeometry::BoardPosition::getR() const
-{
-  return m_R;
-}
-
-void EKLMGeometry::BoardPosition::setR(double r)
-{
-  m_R = r;
-}
-
-double EKLMGeometry::BoardPosition::getPhi() const
-{
-  return m_Phi;
-}
-
-void EKLMGeometry::BoardPosition::setPhi(double phi)
-{
-  m_Phi = phi;
-}
-
-/* Class EKLMGeometry::StripBoardPosition. */
-
-EKLMGeometry::StripBoardPosition::StripBoardPosition()
-{
-  m_X = 0;
-}
-
-double EKLMGeometry::StripBoardPosition::getX() const
-{
-  return m_X;
-}
-
-void EKLMGeometry::StripBoardPosition::setX(double x)
-{
-  m_X = x;
-}
-
 /* Class EKLMGeometry. */
 
 EKLMGeometry::EKLMGeometry()
 {
-  m_Mode = c_DetectorNormal,
   m_NEndcaps = 0;
   m_NLayers = 0;
   m_NDetectorLayers = NULL;
@@ -1090,15 +950,10 @@ EKLMGeometry::EKLMGeometry()
   m_NSegmentSupportElementsSector = 0;
   m_NStripsSegment = 0;
   m_NStrips = 0;
-  m_NBoards = 0;
-  m_NBoardsSector = 0;
-  m_NStripBoards = 0;
   m_SolenoidZ = 0;
   m_LayerShiftZ = 0;
   m_SegmentSupportPosition = NULL;
   m_StripPosition = NULL;
-  m_BoardPosition = NULL;
-  m_StripBoardPosition = NULL;
 }
 
 EKLMGeometry::EKLMGeometry(const EKLMGeometry& geometry) :
@@ -1113,11 +968,9 @@ EKLMGeometry::EKLMGeometry(const EKLMGeometry& geometry) :
   m_PlasticSheetGeometry(*geometry.getPlasticSheetGeometry()),
   m_SegmentSupportGeometry(*geometry.getSegmentSupportGeometry()),
   m_StripGeometry(*geometry.getStripGeometry()),
-  m_ShieldGeometry(*geometry.getShieldGeometry()),
-  m_BoardGeometry(*geometry.getBoardGeometry())
+  m_ShieldGeometry(*geometry.getShieldGeometry())
 {
   int i, j;
-  m_Mode = geometry.getDetectorMode();
   m_NEndcaps = geometry.getNEndcaps();
   m_NLayers = geometry.getNLayers();
   m_NDetectorLayers = new int[m_NEndcaps];
@@ -1130,9 +983,6 @@ EKLMGeometry::EKLMGeometry(const EKLMGeometry& geometry) :
   m_NSegmentSupportElementsSector = geometry.getNSegmentSupportElementsSector();
   m_NStripsSegment = geometry.getNStripsSegment();
   m_NStrips = geometry.getNStrips();
-  m_NBoards = geometry.getNBoards();
-  m_NBoardsSector = geometry.getNBoardsSector();
-  m_NStripBoards = geometry.getNStripBoards();
   m_SolenoidZ = geometry.getSolenoidZ();
   m_LayerShiftZ = geometry.getLayerShiftZ();
   m_SegmentSupportPosition =
@@ -1146,16 +996,6 @@ EKLMGeometry::EKLMGeometry(const EKLMGeometry& geometry) :
   m_StripPosition = new ElementPosition[m_NStrips];
   for (i = 0; i < m_NStrips; i++)
     m_StripPosition[i] = *geometry.getStripPosition(i + 1);
-  m_BoardPosition = new BoardPosition[m_NBoardsSector];
-  for (i = 0; i < m_NPlanes; i++) {
-    for (j = 0; j < m_NBoards; j++) {
-      m_BoardPosition[i * m_NBoards + i] =
-        *geometry.getBoardPosition(i + 1, j + 1);
-    }
-  }
-  m_StripBoardPosition = new StripBoardPosition[m_NStripBoards];
-  for (i = 0; i < m_NStripBoards; i++)
-    m_StripBoardPosition[i] = *geometry.getStripBoardPosition(i + 1);
 }
 
 EKLMGeometry::~EKLMGeometry()
@@ -1166,10 +1006,6 @@ EKLMGeometry::~EKLMGeometry()
     delete[] m_SegmentSupportPosition;
   if (m_StripPosition != NULL)
     delete[] m_StripPosition;
-  if (m_BoardPosition != NULL)
-    delete[] m_BoardPosition;
-  if (m_StripBoardPosition != NULL)
-    delete[] m_StripBoardPosition;
 }
 
 EKLMGeometry& EKLMGeometry::operator=(const EKLMGeometry& geometry)
@@ -1177,7 +1013,6 @@ EKLMGeometry& EKLMGeometry::operator=(const EKLMGeometry& geometry)
   int i, j;
   if (&geometry == this)
     return *this;
-  m_Mode = geometry.getDetectorMode();
   m_NEndcaps = geometry.getNEndcaps();
   m_NLayers = geometry.getNLayers();
   if (m_NDetectorLayers != NULL)
@@ -1192,9 +1027,6 @@ EKLMGeometry& EKLMGeometry::operator=(const EKLMGeometry& geometry)
   m_NSegmentSupportElementsSector = geometry.getNSegmentSupportElementsSector();
   m_NStripsSegment = geometry.getNStripsSegment();
   m_NStrips = geometry.getNStrips();
-  m_NBoards = geometry.getNBoards();
-  m_NBoardsSector = geometry.getNBoardsSector();
-  m_NStripBoards = geometry.getNStripBoards();
   m_SolenoidZ = geometry.getSolenoidZ();
   m_EndcapStructureGeometry = *geometry.getEndcapStructureGeometry();
   m_EndcapPosition = *geometry.getEndcapPosition();
@@ -1223,29 +1055,7 @@ EKLMGeometry& EKLMGeometry::operator=(const EKLMGeometry& geometry)
   for (i = 0; i < m_NStrips; i++)
     m_StripPosition[i] = *geometry.getStripPosition(i + 1);
   m_ShieldGeometry = *geometry.getShieldGeometry();
-  m_BoardGeometry = *geometry.getBoardGeometry();
-  if (m_BoardPosition != NULL)
-    delete[] m_BoardPosition;
-  m_BoardPosition = new BoardPosition[m_NBoardsSector];
-  for (i = 0; i < m_NPlanes; i++) {
-    for (j = 0; j < m_NBoards; j++) {
-      m_BoardPosition[i * m_NBoards + i] =
-        *geometry.getBoardPosition(i + 1, j + 1);
-    }
-  }
-  if (m_StripBoardPosition != NULL)
-    delete[] m_StripBoardPosition;
-  m_StripBoardPosition = new StripBoardPosition[m_NStripBoards];
-  for (i = 0; i < m_NStripBoards; i++)
-    m_StripBoardPosition[i] = *geometry.getStripBoardPosition(i + 1);
   return *this;
-}
-
-/* Global settings. */
-
-EKLMGeometry::DetectorMode EKLMGeometry::getDetectorMode() const
-{
-  return m_Mode;
 }
 
 /* Numbers of geometry elements. */
@@ -1294,21 +1104,6 @@ int EKLMGeometry::getNStripsSegment() const
 int EKLMGeometry::getNStrips() const
 {
   return m_NStrips;
-}
-
-int EKLMGeometry::getNBoards() const
-{
-  return m_NBoards;
-}
-
-int EKLMGeometry::getNBoardsSector() const
-{
-  return m_NBoardsSector;
-}
-
-int EKLMGeometry::getNStripBoards() const
-{
-  return m_NStripBoards;
 }
 
 /* Element number checks. */
@@ -1432,25 +1227,5 @@ EKLMGeometry::getStripPosition(int strip) const
 const EKLMGeometry::ShieldGeometry* EKLMGeometry::getShieldGeometry() const
 {
   return &m_ShieldGeometry;
-}
-
-const EKLMGeometry::BoardGeometry* EKLMGeometry::getBoardGeometry() const
-{
-  return &m_BoardGeometry;
-}
-
-const EKLMGeometry::BoardPosition*
-EKLMGeometry::getBoardPosition(int plane, int segment) const
-{
-  checkPlane(plane);
-  checkSegment(segment);
-  return &m_BoardPosition[(plane - 1) * m_NBoards + segment - 1];
-}
-
-const EKLMGeometry::StripBoardPosition*
-EKLMGeometry::getStripBoardPosition(int board) const
-{
-  checkStripSegment(board);
-  return &m_StripBoardPosition[board - 1];
 }
 

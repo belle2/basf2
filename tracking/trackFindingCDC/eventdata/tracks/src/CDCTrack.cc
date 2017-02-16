@@ -102,6 +102,11 @@ namespace {
   }
 }
 
+CDCTrack::CDCTrack(const std::vector<CDCRecoHit3D>& recoHits3D)
+  : std::vector<CDCRecoHit3D>(recoHits3D)
+{
+}
+
 CDCTrack::CDCTrack(const CDCSegment2D& segment) :
   m_startTrajectory3D(segment.getTrajectory2D()),
   m_endTrajectory3D(segment.getTrajectory2D())

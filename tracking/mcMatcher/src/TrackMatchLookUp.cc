@@ -39,7 +39,7 @@ const RecoTrack*
 TrackMatchLookUp::getRelatedMCRecoTrack(const RecoTrack& prRecoTrack, float& purity)
 {
   assert(isPRRecoTrack(prRecoTrack));
-  std::pair<RecoTrack*, double> mcRecoTrackAndWeight =
+  std::pair<RecoTrack*, float> mcRecoTrackAndWeight =
     prRecoTrack.getRelatedToWithWeight<RecoTrack>(getMCTracksStoreArrayName());
   const RecoTrack* mcRecoTrack = mcRecoTrackAndWeight.first;
   if (mcRecoTrack) {
@@ -54,7 +54,7 @@ const RecoTrack*
 TrackMatchLookUp::getRelatedPRRecoTrack(const RecoTrack& mcRecoTrack, float& efficiency)
 {
   assert(isMCRecoTrack(mcRecoTrack));
-  std::pair<RecoTrack*, double> prRecoTrackAndWeight =
+  std::pair<RecoTrack*, float> prRecoTrackAndWeight =
     mcRecoTrack.getRelatedToWithWeight<RecoTrack>(getPRTracksStoreArrayName());
   const RecoTrack* prRecoTrack = prRecoTrackAndWeight.first;
   if (prRecoTrack) {

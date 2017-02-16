@@ -214,7 +214,10 @@ print("Collected %d tests..." % len(all_tests), flush=True)
 # now let's run them, either in multiprocessing or in a single process
 if options.nprocess > 1:
     with ThreadPoolExecutor(max_workers=options.nprocess) as pool:
-        results = pool.map(run_test, all_tests)
+        # run tests in multiple threads but consume the iterator right away to
+        # avoid a bug in python 3.5 when zipping over a futures result iterator
+        # and then exiting using sys.exit().
+        results = list(pool.map(run_test, all_tests))
 else:
     results = map(run_test, all_tests)
 

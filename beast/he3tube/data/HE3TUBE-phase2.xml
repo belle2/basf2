@@ -24,80 +24,82 @@ whitespace, comma or semi-colon -->
 <Material>HE3TUBE-Material</Material>
 <MaterialTube>StainlessSteel304</MaterialTube>
 <MaterialGas>HE3TUBE-Material</MaterialGas>
-<!--x_he3tube unit="cm">10.6249</x_he3tube-->
-<!--y_he3tube unit="cm">32.7002</y_he3tube-->
-<x_he3tube unit="cm">20.2098</x_he3tube>
-<y_he3tube unit="cm">27.8164</y_he3tube>
-<z_he3tube unit="cm">196.50000</z_he3tube>
+<x_he3tube unit="cm">25.8</x_he3tube>
+<y_he3tube unit="cm">-23.2</y_he3tube>
+<z_he3tube unit="cm">189.6</z_he3tube>
 <AngleX unit="deg">0.0</AngleX>
 <AngleY unit="deg">0.0</AngleY>
 <AngleZ unit="deg">0.0</AngleZ>
 <tube_innerRadius unit="cm">2.069</tube_innerRadius>
-<tube_outerRadius unit="cm">2.38</tube_outerRadius>
+<tube_outerRadius unit="cm">2.54</tube_outerRadius>
 <tube_hz unit="cm">10.19</tube_hz>
 <endcap_hz unit="cm">0.47</endcap_hz>
 <gas_outerRadius unit="cm">2.0</gas_outerRadius>
 <gas_hz unit="cm">7.62</gas_hz>
-<SV_offset_inZ unit="cm">-0.6096</SV_offset_inZ>
+<SV_offset_inZ unit="cm">0.6096</SV_offset_inZ>
 <wire_diameter unit="mm">0.030</wire_diameter>
 </Active>
+
 <Active>
 <Material>HE3TUBE-Material</Material>
 <MaterialTube>StainlessSteel304</MaterialTube>
 <MaterialGas>HE3TUBE-Material</MaterialGas>
-<x_he3tube unit="cm">-20.2098</x_he3tube>
-<y_he3tube unit="cm">-27.8164</y_he3tube>
-<z_he3tube unit="cm">196.50000</z_he3tube>
+<x_he3tube unit="cm">22.7</x_he3tube>
+<y_he3tube unit="cm">27.4</y_he3tube>
+<z_he3tube unit="cm">192.9</z_he3tube>
 <AngleX unit="deg">0.0</AngleX>
 <AngleY unit="deg">0.0</AngleY>
 <AngleZ unit="deg">0.0</AngleZ>
 <tube_innerRadius unit="cm">2.069</tube_innerRadius>
-<tube_outerRadius unit="cm">2.38</tube_outerRadius>
+<tube_outerRadius unit="cm">2.54</tube_outerRadius>
 <tube_hz unit="cm">10.19</tube_hz>
 <endcap_hz unit="cm">0.47</endcap_hz>
 <gas_outerRadius unit="cm">2.0</gas_outerRadius>
 <gas_hz unit="cm">7.62</gas_hz>
-<SV_offset_inZ unit="cm">-0.6096</SV_offset_inZ>
+<SV_offset_inZ unit="cm">0.6096</SV_offset_inZ>
 <wire_diameter unit="mm">0.030</wire_diameter>
 </Active>
+
 <Active>
 <Material>HE3TUBE-Material</Material>
 <MaterialTube>StainlessSteel304</MaterialTube>
 <MaterialGas>HE3TUBE-Material</MaterialGas>
-<x_he3tube unit="cm">-21.6217</x_he3tube>
-<y_he3tube unit="cm">29.7597</y_he3tube>
-<z_he3tube unit="cm">-124.3</z_he3tube>
-<AngleX unit="deg">0.0</AngleX>
+<x_he3tube unit="cm">23.6</x_he3tube>
+<y_he3tube unit="cm">32.2</y_he3tube>
+<z_he3tube unit="cm">-127.7</z_he3tube>
+<AngleX unit="deg">180.0</AngleX>
 <AngleY unit="deg">0.0</AngleY>
 <AngleZ unit="deg">0.0</AngleZ>
 <tube_innerRadius unit="cm">2.069</tube_innerRadius>
-<tube_outerRadius unit="cm">2.38</tube_outerRadius>
+<tube_outerRadius unit="cm">2.54</tube_outerRadius>
 <tube_hz unit="cm">10.19</tube_hz>
 <endcap_hz unit="cm">0.47</endcap_hz>
 <gas_outerRadius unit="cm">2.0</gas_outerRadius>
 <gas_hz unit="cm">7.62</gas_hz>
-<SV_offset_inZ unit="cm">-0.6096</SV_offset_inZ>
+<SV_offset_inZ unit="cm">0.6096</SV_offset_inZ>
 <wire_diameter unit="mm">0.030</wire_diameter>
 </Active>
+
 <Active>
 <Material>HE3TUBE-Material</Material>
 <MaterialTube>StainlessSteel304</MaterialTube>
 <MaterialGas>HE3TUBE-Material</MaterialGas>
-<x_he3tube unit="cm">21.6217</x_he3tube>
-<y_he3tube unit="cm">-29.7597</y_he3tube>
-<z_he3tube unit="cm">-124.3</z_he3tube>
-<AngleX unit="deg">0.0</AngleX>
+<x_he3tube unit="cm">-23.0</x_he3tube>
+<y_he3tube unit="cm">-32.6</y_he3tube>
+<z_he3tube unit="cm">-127.7</z_he3tube>
+<AngleX unit="deg">180.0</AngleX>
 <AngleY unit="deg">0.0</AngleY>
 <AngleZ unit="deg">0.0</AngleZ>
 <tube_innerRadius unit="cm">2.069</tube_innerRadius>
-<tube_outerRadius unit="cm">2.38</tube_outerRadius>
+<tube_outerRadius unit="cm">2.54</tube_outerRadius>
 <tube_hz unit="cm">10.19</tube_hz>
 <endcap_hz unit="cm">0.47</endcap_hz>
 <gas_outerRadius unit="cm">2.0</gas_outerRadius>
 <gas_hz unit="cm">7.62</gas_hz>
-<SV_offset_inZ unit="cm">-0.6096</SV_offset_inZ>
+<SV_offset_inZ unit="cm">0.6096</SV_offset_inZ>
 <wire_diameter unit="mm">0.030</wire_diameter>
 </Active>
+
 
 <!--Default drift data-->
 <DriftRadius unit="cm">

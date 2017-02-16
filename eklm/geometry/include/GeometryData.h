@@ -17,7 +17,6 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMElementNumbers.h>
 #include <eklm/dbobjects/EKLMGeometry.h>
-#include <eklm/geometry/GeoEKLMTypes.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/gearbox/GearDir.h>
 

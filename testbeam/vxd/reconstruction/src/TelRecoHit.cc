@@ -20,7 +20,9 @@
 #include <genfit/DetPlane.h>
 #include <TVector3.h>
 #include <TRandom.h>
+#include <alignment/GlobalLabel.h>
 
+#include <framework/logging/LogSystem.h>
 using namespace std;
 using namespace Belle2;
 
@@ -114,9 +116,9 @@ void TelRecoHit::setDetectorPlane()
   const TEL::SensorInfo& geometry = dynamic_cast<const TEL::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
 
   // Construct vectors o, u, v
-  TVector3 origin  = geometry.pointToGlobal(TVector3(0, 0, 0));
-  TVector3 uGlobal = geometry.vectorToGlobal(TVector3(1, 0, 0));
-  TVector3 vGlobal = geometry.vectorToGlobal(TVector3(0, 1, 0));
+  TVector3 origin  = geometry.pointToGlobal(TVector3(0, 0, 0), true);
+  TVector3 uGlobal = geometry.vectorToGlobal(TVector3(1, 0, 0), true);
+  TVector3 vGlobal = geometry.vectorToGlobal(TVector3(0, 1, 0), true);
 
   //Construct the detector plane
   genfit::DetPlane* p = new genfit::DetPlane(origin, uGlobal, vGlobal, new VXD::SensorPlane(m_sensorID, 20, 20));
@@ -171,17 +173,14 @@ TMatrixD TelRecoHit::derivatives(const genfit::StateOnPlane* sop)
 vector< int > TelRecoHit::labels()
 {
   VxdID vxdid(getPlaneId());
-  int sensorId = (int) vxdid;
   std::vector<int> labGlobal;
-  // sensor label = sensorID * 10, then last digit is label for global derivative for the sensor
-  int label = sensorId * 10;
 
-  labGlobal.push_back(label + 1); // du
-  labGlobal.push_back(label + 2); // dv
-  labGlobal.push_back(label + 3); // dw
-  labGlobal.push_back(label + 4); // dalpha
-  labGlobal.push_back(label + 5); // dbeta
-  labGlobal.push_back(label + 6); // dgamma
+  labGlobal.push_back(GlobalLabel(vxdid, 1)); // du
+  labGlobal.push_back(GlobalLabel(vxdid, 2)); // dv
+  labGlobal.push_back(GlobalLabel(vxdid, 3)); // dw
+  labGlobal.push_back(GlobalLabel(vxdid, 4)); // dalpha
+  labGlobal.push_back(GlobalLabel(vxdid, 5)); // dbeta
+  labGlobal.push_back(GlobalLabel(vxdid, 6)); // dgamma
 
   return labGlobal;
 }

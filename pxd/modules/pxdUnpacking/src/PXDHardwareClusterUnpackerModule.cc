@@ -7,8 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#ifndef __clang__
 // Disable stack-usage diagnostics for this file
 #pragma GCC diagnostic ignored "-Wstack-usage="
+#endif
 
 #include <pxd/modules/pxdUnpacking/PXDHardwareClusterUnpackerModule.h>
 #include <framework/datastore/DataStore.h>

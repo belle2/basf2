@@ -140,6 +140,9 @@ MuidModule::MuidModule() :
   addParam("BKLMHitsColName", m_BKLMHitsColName, "Name of collection holding the reconstructed 2D hits in barrel KLM", string(""));
   addParam("EKLMHitsColName", m_EKLMHitsColName, "Name of collection holding the reconstructed 2D hits in endcap KLM", string(""));
   addParam("TracksColName", m_TracksColName, "Name of collection holding the reconstructed tracks", string(""));
+  addParam("RecoTracksColName", m_RecoTracksColName,
+           "Name of collection holding the reconstructed tracks (RecoTrack)",
+           string(""));
   addParam("MuidsColName", m_MuidsColName, "Name of collection holding the muon identification information from the extrapolation",
            string(""));
   addParam("MuidHitsColName", m_MuidHitsColName, "Name of collection holding the muidHits from the extrapolation", string(""));
@@ -315,6 +318,7 @@ void MuidModule::initialize()
 
   // Register output and relation arrays' persistence
   StoreArray<Track> tracks(m_TracksColName);
+  StoreArray<RecoTrack> recoTracks(m_RecoTracksColName);
   StoreArray<Muid> muids(m_MuidsColName);
   StoreArray<MuidHit> muidHits(m_MuidHitsColName);
   StoreArray<BKLMHit2d> bklmHits(m_BKLMHitsColName);
@@ -335,6 +339,7 @@ void MuidModule::initialize()
   tracks.registerRelationTo(eklmHits);
   tracks.registerRelationTo(extHits);
   tracks.registerRelationTo(klmClusters);
+  RecoTrack::registerRequiredRelations(recoTracks);
   klmClusters.registerRelationTo(trackClusterSeparations);
 
   return;
@@ -439,7 +444,7 @@ void MuidModule::event()
           if (postStatus == fGeomBoundary) {
             createEntryExitHit(state, EXT_EXIT, b2track, pdgCode);
           }
-          if (createHit(state, b2track, pdgCode)) {
+          if (createHit(state, b2track, recoTrack, pdgCode)) {
             // Force geant4e to update its G4Track from the Kalman-updated state
             m_ExtMgr->GetPropagator()->SetStepN(0);
           }
@@ -757,7 +762,8 @@ void MuidModule::createEntryExitHit(const G4ErrorFreeTrajState* state, ExtHitSta
 // Write another volume-entry point on track.
 // The track state will be modified here by the Kalman fitter.
 
-bool MuidModule::createHit(G4ErrorFreeTrajState* state, Track& track, int pdgCode)
+bool MuidModule::createHit(G4ErrorFreeTrajState* state, Track& track,
+                           RecoTrack* recoTrack, int pdgCode)
 {
 
   Point point;
@@ -779,7 +785,7 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, Track& track, int pdgCod
     if (findBarrelIntersection(oldPosition, point)) {
       point.covariance.ResizeTo(6, 6);
       fromG4eToPhasespace(state, point.covariance);
-      if (findMatchingBarrelHit(point, track)) {
+      if (findMatchingBarrelHit(point, track, recoTrack)) {
         m_ExtLayerPattern |= (0x00000001 << point.layer);
         if (m_LastBarrelExtLayer < point.layer) {
           m_LastBarrelExtLayer = point.layer;
@@ -813,7 +819,7 @@ bool MuidModule::createHit(G4ErrorFreeTrajState* state, Track& track, int pdgCod
     if (findEndcapIntersection(oldPosition, point)) {
       point.covariance.ResizeTo(6, 6);
       fromG4eToPhasespace(state, point.covariance);
-      if (findMatchingEndcapHit(point, track)) {
+      if (findMatchingEndcapHit(point, track, recoTrack)) {
         m_ExtLayerPattern |= (0x00008000 << point.layer);
         if (m_LastEndcapExtLayer < point.layer) {
           m_LastEndcapExtLayer = point.layer;
@@ -938,8 +944,8 @@ bool MuidModule::findEndcapIntersection(const TVector3& oldPosition, Point& poin
 
 }
 
-bool MuidModule::findMatchingBarrelHit(Point& point, const Track&)
-
+bool MuidModule::findMatchingBarrelHit(Point& point, const Track& track,
+                                       RecoTrack* recoTrack)
 {
 
   TVector3 extPos0(point.position);
@@ -1010,22 +1016,18 @@ bool MuidModule::findMatchingBarrelHit(Point& point, const Track&)
     adjustIntersection(point, localVariance, hit->getGlobalPosition(), extPos0);
     if (point.chi2 >= 0.0) {
       hit->isOnTrack(true);
-      /*
-      * This function is commented out, because it can not be applied directly.
       track.addRelationTo(hit);
-      const TrackFitResult* tfResult = track.getTrackFitResult(Const::muon);
-      genfit::TrackCand* tc = DataStore::getRelated<genfit::TrackCand>(tfResult);
-      tc->addHit(Const::EDetector::BKLM, bestHit, 0, point.positionAtHitPlane.Mag()); // "0" for BKLM
-      */
+      recoTrack->addBKLMHit(hit, 0);
     }
   }
   return point.chi2 >= 0.0;
 
 }
 
-bool MuidModule::findMatchingEndcapHit(Point& point, const Track& track)
+bool MuidModule::findMatchingEndcapHit(Point& point, const Track& track,
+                                       RecoTrack* recoTrack)
 {
-
+  unsigned int i;
   StoreArray<EKLMHit2d> eklmHits(m_EKLMHitsColName);
   double diffBestMagSq = 1.0E60;
   int bestHit = -1;
@@ -1060,17 +1062,13 @@ bool MuidModule::findMatchingEndcapHit(Point& point, const Track& track)
     double localVariance[2] = {m_EndcapScintVariance, m_EndcapScintVariance};
     adjustIntersection(point, localVariance, hit->getPosition(), point.position);
     if (point.chi2 >= 0.0) {
+      RelationVector<EKLMAlignmentHit> eklmAlignmentHits =
+        hit->getRelationsFrom<EKLMAlignmentHit>();
       // DIVOT no such function for EKLM!
       // hit->isOnTrack(true);
       track.addRelationTo(hit);
-      /* not yet for EKLM
-      const TrackFitResult* tfResult = track->getTrackFitResult(Const::muon);
-      genfit::TrackCand* tc = DataStore::getRelated<genfit::TrackCand>(tfResult);
-      // For alignment, 2 hits per each EKLMHit2d are required
-      // (their type is EKLMAlignmentHit). Hits with their indices are added.
-      tc->addHit(Const::EDetector::EKLM, 2 * bestHit, 0, point.positionAtHitPlane.Mag());
-      tc->addHit(Const::EDetector::EKLM, 2 * bestHit + 1, 0, point.positionAtHitPlane.Mag());
-      */
+      for (i = 0; i < eklmAlignmentHits.size(); i++)
+        recoTrack->addEKLMHit(eklmAlignmentHits[i], 0);
     }
   }
   return point.chi2 >= 0.0;

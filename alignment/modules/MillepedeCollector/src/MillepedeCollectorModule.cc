@@ -390,13 +390,13 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
 
   if (bklmHits.isOptional()) {
     genfit::MeasurementProducer <RecoHitInformation::UsedBKLMHit, BKLMRecoHit>* BKLMProducer =  new genfit::MeasurementProducer
-    <RecoHitInformation::UsedBKLMHit, BKLMRecoHit> (cdcHits.getPtr());
+    <RecoHitInformation::UsedBKLMHit, BKLMRecoHit> (bklmHits.getPtr());
     genfitMeasurementFactory.addProducer(Const::BKLM, BKLMProducer);
   }
 
   if (eklmHits.isOptional()) {
     genfit::MeasurementProducer <RecoHitInformation::UsedEKLMHit, AlignableEKLMRecoHit>* EKLMProducer =  new genfit::MeasurementProducer
-    <RecoHitInformation::UsedEKLMHit, AlignableEKLMRecoHit> (cdcHits.getPtr());
+    <RecoHitInformation::UsedEKLMHit, AlignableEKLMRecoHit> (eklmHits.getPtr());
     genfitMeasurementFactory.addProducer(Const::EKLM, EKLMProducer);
   }
 

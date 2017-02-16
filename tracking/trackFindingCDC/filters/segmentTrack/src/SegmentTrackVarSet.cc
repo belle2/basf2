@@ -21,10 +21,10 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool SegmentTrackVarSet::extract(const std::pair<const CDCTrack*, const CDCSegment2D*>* testPair)
+bool SegmentTrackVarSet::extract(const BaseSegmentTrackFilter::Object* testPair)
 {
-  const CDCTrack* track = testPair->first;
-  const CDCSegment2D* segment = testPair->second;
+  const CDCTrack* track = testPair->getFrom();
+  const CDCSegment2D* segment = testPair->getTo();
 
   assert(segment);
   assert(track);

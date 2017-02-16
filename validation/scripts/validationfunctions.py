@@ -297,7 +297,7 @@ def scripts_in_dir(dirpath, log, ext='*'):
             # If the file has the requested extension, append its full paths to
             # the results
             if current_file.endswith(ext):
-                results.append(root + '/' + current_file)
+                results.append(os.path.join(root, current_file))
 
     # Return our sorted results
     return sorted(results)

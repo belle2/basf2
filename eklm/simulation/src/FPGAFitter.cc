@@ -39,7 +39,6 @@ enum EKLM::FPGAFitStatus EKLM::FPGAFitter::fit(int* amp, int threshold,
   double bg;
   float sigAmp;
   int i, ithr, ibg, sum, bgSum, max;
-  i = 0;
   sum = 0;
   bgSum = 0;
   max = -1;

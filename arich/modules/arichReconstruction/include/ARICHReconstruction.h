@@ -45,7 +45,7 @@ namespace Belle2 {
   public:
 
     //! Constructor
-    ARICHReconstruction(int storePhotons = 0);
+    explicit ARICHReconstruction(int storePhotons = 0);
 
     //! Destructor
     ~ARICHReconstruction() {};

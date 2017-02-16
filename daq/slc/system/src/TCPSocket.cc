@@ -118,7 +118,7 @@ size_t TCPSocket::read(void* buf, size_t count) throw(IOException)
         case EINTR: continue;
         case EAGAIN: continue;
         default:
-          throw (IOException("Error while reading."));
+          throw (IOException("TCPSocket::read Error while reading."));
       }
     }
     c += ret;
@@ -137,7 +137,7 @@ size_t TCPSocket::read_once(void* buf, size_t count) throw(IOException)
         case EINTR: continue;
         case EAGAIN: continue;
         default:
-          throw (IOException("Error while reading."));
+          throw (IOException("TCPSocket::read_once Error while reading."));
       }
     }
     break;

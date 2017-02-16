@@ -33,6 +33,39 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+#if 0
+namespace {
+  void saveBounds(std::vector<float> bounds, const std::string& fileName)
+  {
+    std::ofstream boundsFile;
+    boundsFile.open(fileName);
+    for (float bound : bounds) {
+      boundsFile << bound;
+      boundsFile << "\n";
+    }
+    boundsFile.close();
+  }
+
+  std::vector<float> loadBounds(const std::string& fileName)
+  {
+    std::vector<float> bounds;
+    std::ifstream boundsFile;
+    std::string boundLine;
+    boundsFile.open(fileName);
+    if (boundsFile.is_open()) {
+      while (std::getline(boundsFile, boundLine)) {
+        float bound = stof(boundLine);
+        bounds.push_back(bound);
+      }
+      boundsFile.close();
+    } else {
+      B2ERROR("Could not read bounds file");
+    }
+    return bounds;
+  }
+}
+#endif
+
 std::string AxialTrackCreatorHitLegendre::getDescription()
 {
   return "Generates axial tracks from segments using a hough space over phi0 impact and curvature for the spares case.";
@@ -413,7 +446,10 @@ std::vector<float> AxialTrackCreatorHitLegendre::getDefaultCurvBounds(std::array
       // (copied from the legendre method. Works well, but some experimentation
       //  needs to be made to know why)
       double extension = 0;
-      if ((level + 7 <= granularityLevel) or (std::fabs(middle) <= 0.005)) {
+      if ((level + 7 <= granularityLevel)
+          // or (std::fabs(middle) <= 0.007)
+          or (std::fabs(middle) <= 0.005)
+         ) {
         extension = 0;
       } else if (level + 5 < granularityLevel) {
         extension = subBinWidth / 4.0;

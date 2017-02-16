@@ -75,7 +75,7 @@ namespace Belle2 {
       CutSelector<CDCTrack, CDCSegment2D> m_selectPairsWithSharedHits;
 
       /// Reference to the chooser to be used for matching segments and tracks in the first step.
-      FilterSelector<CDCTrack, CDCSegment2D, SegmentTrackFilterFactory> m_chooseableSegmentTrackSelector;
+      FilterSelector<CDCTrack, CDCSegment2D, ChooseableFilter<SegmentTrackFilterFactory>> m_chooseableSegmentTrackSelector;
 
       /// Select only the best matching segment-track relations and remove the hits from the other ones
       SingleMatchSelector<CDCTrack, CDCSegment2D> m_singleMatchSelector;

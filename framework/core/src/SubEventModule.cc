@@ -182,7 +182,8 @@ void SubEventModule::event()
   // on the other hand, it is not allowed to be a reference to another object in the corresponding
   // StoreArray, otherwise it will crash (double free), again.
   // Therefore we create a new deletable TObject :-)
-  objectEntry.object = new TObject;
+  // cppcheck-suppress memleak
+  objectEntry.object = new TObject; //will be cleaned by DataStore.
   objectEntry.ptr = nullptr;
 
   Environment::Instance().setNoStats(noStats);

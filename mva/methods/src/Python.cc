@@ -68,6 +68,27 @@ namespace Belle2 {
     }
 
     /**
+    class which handles releasing and locking the GIL in python for multithreading
+    */
+    class ScopedGILRelease {
+
+    public:
+      inline ScopedGILRelease()
+      {
+        m_thread_state = PyEval_SaveThread();
+      }
+
+      inline ~ScopedGILRelease()
+      {
+        PyEval_RestoreThread(m_thread_state);
+        m_thread_state = NULL;
+      }
+
+    private:
+      PyThreadState* m_thread_state;
+    };
+
+    /**
     Singleton class which handles the initialization and finalization of Python
         and numpy
     */
@@ -241,8 +262,8 @@ namespace Belle2 {
         bool continue_loop = true;
         for (uint64_t iIteration = 0; (iIteration < m_specific_options.m_nIterations or m_specific_options.m_nIterations == 0)
              and continue_loop; ++iIteration) {
-
           for (uint64_t iBatch = 0; iBatch < nBatches and continue_loop; ++iBatch) {
+            ScopedGILRelease* released_GIL = new ScopedGILRelease();
             for (uint64_t iEvent = 0; iEvent < batch_size; ++iEvent) {
               training_data.loadEvent(iEvent + iBatch * batch_size + numberOfValidationEvents);
               for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
@@ -259,6 +280,7 @@ namespace Belle2 {
             auto ndarray_y = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_y, NPY_FLOAT32, y.get()));
             auto ndarray_w = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_w, NPY_FLOAT32, w.get()));
 
+            delete released_GIL;
             auto r = framework.attr("partial_fit")(state, ndarray_X, ndarray_S, ndarray_y,
                                                    ndarray_w, iIteration * nBatches + iBatch);
             boost::python::extract<bool> proxy(r);

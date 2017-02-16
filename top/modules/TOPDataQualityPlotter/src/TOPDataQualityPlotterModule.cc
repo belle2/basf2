@@ -89,7 +89,8 @@ TOPDataQualityPlotterModule::drawWaveforms(TOPRawWaveform* rawwave)
   if (scrodid == 0) {
     return;
   }
-  string gname = string("scrod_") + to_string(scrodid) + string("_carrier") + to_string(v.getASICRow()) + string("_asic") + to_string(
+  string gname = string("scrod_") + to_string(scrodid) + string("_carrier") + to_string(v.getCarrierNumber()) + string("_asic") +
+                 to_string(
                    v.getASICNumber());
   if (m_channelLabels[scrodid].find(gname) == m_channelLabels[scrodid].end()) {
     m_channels[scrodid].insert(make_pair(gname, new TMultiGraph(gname.c_str(), gname.c_str())));

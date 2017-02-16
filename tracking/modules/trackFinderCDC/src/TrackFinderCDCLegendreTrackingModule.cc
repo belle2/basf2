@@ -65,7 +65,7 @@ void TrackFinderCDCLegendreTrackingModule::initialize()
   storedTracks.registerInDataStore();
 
   B2ASSERT("Maximal level of QuadTree search is setted to be greater than lookuptable grid level! ",
-           m_param_maxLevel <= BasePrecisionFunction::getLookupGridLevel());
+           m_param_maxLevel <= PrecisionUtil::getLookupGridLevel());
 
   Super::initialize();
 }

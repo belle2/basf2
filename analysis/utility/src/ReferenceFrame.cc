@@ -64,6 +64,28 @@ TMatrixFSym RestFrame::getMomentumErrorMatrix(const Particle* particle) const
   return particle->getMomentumErrorMatrix().Similarity(lorentzrot);
 }
 
+TMatrixFSym RestFrame::getVertexErrorMatrix(const Particle* particle) const
+{
+  TMatrixD lorentzrot(4, 3);
+
+  for (int i = 0; i < 4; ++i)
+    for (int j = 0; j < 3; ++j)
+      lorentzrot(i, j) = m_lab2restframe(i, j);
+
+  auto rotated_error_matrix = particle->getVertexErrorMatrix().Similarity(lorentzrot);
+
+  TMatrixD timeshift(3, 4);
+  timeshift.Zero();
+  timeshift(0, 0) = 1;
+  timeshift(1, 1) = 1;
+  timeshift(2, 2) = 1;
+  timeshift(0, 3) = m_boost(0);
+  timeshift(1, 3) = m_boost(1);
+  timeshift(2, 3) = m_boost(2);
+
+  return rotated_error_matrix.Similarity(timeshift);
+}
+
 TVector3 LabFrame::getVertex(const Particle* particle) const
 {
   return particle->getVertex();
@@ -79,9 +101,15 @@ TMatrixFSym LabFrame::getMomentumErrorMatrix(const Particle* particle) const
   return particle->getMomentumErrorMatrix();
 }
 
+TMatrixFSym LabFrame::getVertexErrorMatrix(const Particle* particle) const
+{
+  return particle->getVertexErrorMatrix();
+}
+
 TVector3 CMSFrame::getVertex(const Particle* particle) const
 {
   // Transform Vertex from lab into cms frame:
+  // TODO 0: Substract fitted IP similar to RestFrame
   // 1. Use Lorentz Transformation to Boost Vertex vector into cms frame
   // 2. Subtract movement of vertex end due to the time difference between
   //    the former simultaneous measured vertex points (see derivation of Lorentz contraction)
@@ -99,9 +127,34 @@ TMatrixFSym CMSFrame::getMomentumErrorMatrix(const Particle* particle) const
 {
   TMatrixD lorentzrot(4, 4);
 
+  auto labToCmsFrame = m_transform.rotateLabToCms();
   for (int i = 0; i < 4; ++i)
     for (int j = 0; j < 4; ++j)
-      lorentzrot(i, j) = m_transform.rotateLabToCms()(i, j);
+      lorentzrot(i, j) = labToCmsFrame(i, j);
 
   return particle->getMomentumErrorMatrix().Similarity(lorentzrot);
+}
+
+TMatrixFSym CMSFrame::getVertexErrorMatrix(const Particle* particle) const
+{
+  TMatrixD lorentzrot(4, 3);
+
+  auto labToCmsFrame = m_transform.rotateLabToCms();
+  for (int i = 0; i < 4; ++i)
+    for (int j = 0; j < 3; ++j)
+      lorentzrot(i, j) = labToCmsFrame(i, j);
+
+  auto rotated_error_matrix = particle->getVertexErrorMatrix().Similarity(lorentzrot);
+
+  TMatrixD timeshift(3, 4);
+  timeshift.Zero();
+  auto boost_vector = m_transform.getBoostVector().BoostVector();
+  timeshift(0, 0) = 1;
+  timeshift(1, 1) = 1;
+  timeshift(2, 2) = 1;
+  timeshift(0, 3) = boost_vector(0);
+  timeshift(1, 3) = boost_vector(1);
+  timeshift(2, 3) = boost_vector(2);
+
+  return rotated_error_matrix.Similarity(timeshift);
 }

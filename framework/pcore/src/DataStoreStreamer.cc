@@ -173,14 +173,13 @@ EvtMessage* DataStoreStreamer::streamDataStore(bool addPersistentDurability, boo
       entry->object->SetBit(c_IsTransient, entry->dontWriteOut);
       entry->object->SetBit(c_IsNull, (entry->ptr == NULL));
       entry->object->SetBit(c_PersistentDurability, (durability == DataStore::c_Persistent));
-      if (m_msghandler->add(entry->object, it->first)) {
-        B2DEBUG(100, "adding item " << it->first);
+      m_msghandler->add(entry->object, it->first);
+      B2DEBUG(100, "adding item " << it->first);
 
-        if (entry->isArray)
-          narrays++;
-        else
-          nobjs++;
-      }
+      if (entry->isArray)
+        narrays++;
+      else
+        nobjs++;
 
       //reset bits (are checked to be false when streaming the object)
       entry->object->SetBit(c_IsTransient, false);
@@ -476,20 +475,17 @@ void DataStoreStreamer::setDecoderStatus(int val)
 }
 
 
-int DataStoreStreamer::restoreStreamerInfos(TList* obj)
+int DataStoreStreamer::restoreStreamerInfos(const TList* list)
 {
   //
   // Copy from TSocket::RecvStreamerInfos()
   //
 
   //      TList *list = (TList*)mess->ReadObject(TList::Class());
-  TList* list = (TList*)obj;
-  TIter next(list);
   TStreamerInfo* info;
   TObjLink* lnk = list->FirstLink();
 
   vector<string> class_name;
-  class_name.clear();
 
   // First call BuildCheck for regular class
   while (lnk) {
@@ -499,7 +495,7 @@ int DataStoreStreamer::restoreStreamerInfos(TList* obj)
     for (auto itr = class_name.begin(); itr != class_name.end(); ++itr) {
       if (strcmp((*itr).c_str(), info->GetName()) == 0) {
         ovlap = 1;
-        B2INFO("Regular Class Loop : The class " << info->GetName() << " has already appeared. Skipping...");
+        B2DEBUG(100, "Regular Class Loop : The class " << info->GetName() << " has already appeared. Skipping...");
         break;
       }
     }
@@ -532,7 +528,7 @@ int DataStoreStreamer::restoreStreamerInfos(TList* obj)
     for (auto itr = class_name.begin(); itr != class_name.end(); ++itr) {
       if (strcmp((*itr).c_str(), info->GetName()) == 0) {
         ovlap = 1;
-        B2INFO("STL Class Loop : The class " << info->GetName() << " has already appeared. Skipping...");
+        B2DEBUG(100, "STL Class Loop : The class " << info->GetName() << " has already appeared. Skipping...");
         break;
       }
     }

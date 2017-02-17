@@ -9,7 +9,7 @@
 #ifndef EVTMESSAGE_H
 #define EVTMESSAGE_H
 
-#include <TMessage.h>
+#include <RtypesCore.h>
 
 struct timeval;
 
@@ -50,7 +50,7 @@ namespace Belle2 {
     const static unsigned int c_MaxEventSize = 200000000;
 
     /** build EvtMessage from existing buffer (no copy, but does not take ownership). */
-    explicit EvtMessage(char* buf = NULL);
+    explicit EvtMessage(char* buf = nullptr);
     /** build EvtMessage by allocating new message buffer (sobjs is copied). */
     EvtMessage(const char* sobjs, int size, RECORD_TYPE type);
     /** Copy constructor (m_data is copied). */
@@ -91,7 +91,7 @@ namespace Belle2 {
     /** Get time stamp */
     struct timeval time() const;
     /** Set time stamp */
-    void time(struct timeval& time);
+    void setTime(const struct timeval& time);
 
     /** Get source IP of message */
     int   src() const;
@@ -107,24 +107,13 @@ namespace Belle2 {
     EvtHeader* header();
     /** Get pointer to message body */
     char* msg();
-    /** Copy message into newly allocated buffer */
-    void msg(const char* msg, int size, RECORD_TYPE type);
 
   private:
+    /** Copy message into newly allocated buffer */
+    void setMsg(const char* msg, int size, RECORD_TYPE type);
+
     char* m_data;         ///< Pointer to the internal EvtMessage buffer
     bool m_ownsBuffer; ///< Wether to clean up m_data in destructor
-
   };
-
-  /**  Message class derived from TMessage */
-  class InMessage : public TMessage {
-  public:
-    /** Constructor to build a message */
-    InMessage(void* buf, int len) : TMessage(buf, len)
-    {
-      this->SetBit(kIsOwner, false);
-    }
-  };
-
 }
 #endif

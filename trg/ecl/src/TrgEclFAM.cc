@@ -1569,7 +1569,7 @@ TrgEclFAM::FAMFit(int nbin_pedestal,
   int Nsmalldt = 10;
   int SmallOffset = 1;
   double IntervaldT  = fam_sampling_interval * 0.001 / Nsmalldt;
-  double EThreshold = 50; //[GeV]
+  double EThreshold = 100; //[GeV]
   int FitSleepCounter   = 100; // counter to suspend fit
   int FitSleepThreshold = 2;   // # of clk to suspend fit
   double FitE = 0;

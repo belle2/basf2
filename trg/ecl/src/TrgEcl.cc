@@ -227,10 +227,22 @@ TrgEcl::simulate(int m_nEvent)
     // // Threshold for each combination of PRS
     // //
     int NofTCHit = 0;
+    int BrNofTCHit = 0;
+    int FwdNofTCHit = 0;
+    int BwdNofTCHit = 0;
+
     for (int iTCId = 0; iTCId < 576; iTCId++) {
       for (int itime = 0; itime < 64; itime++) {
         if (HitTC[iBin][iTCId][itime] == 1) {
           NofTCHit++;
+          if (iTCId < 88) {
+            FwdNofTCHit++;
+          } else if (iTCId > 511) {
+            BwdNofTCHit++;
+          } else {
+            BrNofTCHit++;
+          }
+
         }
       }
     }
@@ -453,6 +465,9 @@ TrgEcl::simulate(int m_nEvent)
     //
     trgEcltrgArray[m_hitEneNum]->setEtot(E_tot);
     trgEcltrgArray[m_hitEneNum]->setNofTCHit(NofTCHit);
+    trgEcltrgArray[m_hitEneNum]->setBrNofTCHit(BrNofTCHit);
+    trgEcltrgArray[m_hitEneNum]->setFwdNofTCHit(FwdNofTCHit);
+    trgEcltrgArray[m_hitEneNum]->setBwdNofTCHit(BwdNofTCHit);
     //
     //
     trgEcltrgArray[m_hitEneNum]->setBhabha01(vct_bhabha[0]);

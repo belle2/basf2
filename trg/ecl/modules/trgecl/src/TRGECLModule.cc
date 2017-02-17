@@ -54,7 +54,7 @@ namespace Belle2 {
 //
   TRGECLModule::TRGECLModule()
     : Module::Module(),
-      _debugLevel(0), _Bhabha(1), _Clustering(1), _EventTiming(2)
+      _debugLevel(0), _Bhabha(1), _Clustering(0), _EventTiming(2)
   {
 
     string desc = "TRGECLModule(" + version() + ")";

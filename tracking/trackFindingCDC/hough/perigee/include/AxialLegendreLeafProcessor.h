@@ -163,8 +163,8 @@ namespace Belle2 {
       /// Memory for the tree node level which should be the source of hits for the road searches. Defaults to the top most node.
       int m_param_roadLevel = 0;
 
-      /// Memory for the name of the resolution function to be used. Valid values are 'none', 'base', 'origin', 'offOrigin'
-      std::string m_param_curvResolution = "base";
+      /// Memory for the name of the resolution function to be used. Valid values are 'none', 'const', 'basic', 'origin', 'offOrigin'
+      std::string m_param_curvResolution = "const";
 
       /*
       /// Memory for the maximum allowed distance from track to hit

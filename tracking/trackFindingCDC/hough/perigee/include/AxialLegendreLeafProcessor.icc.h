@@ -213,7 +213,7 @@ namespace Belle2 {
       moduleParamList->addParameter(prefixed(prefix, "curvResolution"),
                                     m_param_curvResolution,
                                     "The name of the resolution function to be used. "
-                                    "Valid values are 'none', 'basic', 'origin', 'nonOrigin'",
+                                    "Valid values are 'none', 'const', 'basic', 'origin', 'nonOrigin'",
                                     m_param_curvResolution);
     }
 
@@ -223,6 +223,8 @@ namespace Belle2 {
       // Setup the requested precision function
       if (m_param_curvResolution == "none") {
         m_curvResolution = [](double curv __attribute__((unused))) { return NAN; };
+      } else if (m_param_curvResolution == "const") {
+        m_curvResolution = [](double curv __attribute__((unused))) { return 0.0008; };
       } else if (m_param_curvResolution == "basic") {
         m_curvResolution = &PrecisionUtil::getBasicCurvPrecision;
       } else if (m_param_curvResolution == "origin") {

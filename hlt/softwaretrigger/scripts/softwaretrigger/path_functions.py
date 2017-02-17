@@ -175,6 +175,6 @@ def setup_softwaretrigger_database_access(software_trigger_global_tag_name=SOFTW
     """
     basf2.reset_database()
     basf2.use_database_chain()
-    basf2.use_local_database()
+    basf2.use_local_database("localdb/dbcache.txt")
     basf2.use_central_database(software_trigger_global_tag_name)
     basf2.use_central_database(production_global_tag_name)

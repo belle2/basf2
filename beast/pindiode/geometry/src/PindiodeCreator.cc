@@ -340,9 +340,9 @@ namespace Belle2 {
         G4double dz_pin = 2.65 / 2.*CLHEP::mm;
         G4double dy_pin = 0.10 / 2.*CLHEP::mm;
         if (phase == 2) {
-          dx_pin = 10.0 / 2.*CLHEP::mm;
-          dz_pin = 10.0 / 2.*CLHEP::mm;
-          dy_pin = 0.3 / 2.*CLHEP::mm;
+          dx_pin = 2.65 / 2.*CLHEP::mm;
+          dz_pin = 0.1 / 2.*CLHEP::mm;
+          dy_pin = 2.65 / 2.*CLHEP::mm;
         }
 
         G4VSolid* s_pin = new G4Box("s_pin", dx_pin, dy_pin, dz_pin);

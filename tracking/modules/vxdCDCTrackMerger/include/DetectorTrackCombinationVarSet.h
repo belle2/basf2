@@ -10,38 +10,57 @@
 #pragma once
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
-#include <tracking/vxdCDCTrackMerging/detectorTrackCombination/BaseDetectorTrackCombinationFilter.h>
+#include <tracking/modules/vxdCDCTrackMerger/BaseDetectorTrackCombinationFilter.h>
 
 namespace Belle2 {
   /// Names of the variables to be generated.
   constexpr
-  static char const* const detectorTrackCombinationTruthNames[] = {
-    "truth"
+  static char const* const detectorTrackCombinationVarNames[] = {
+    "phiCDC",
+    "phiVXD",
+    "thetaCDC",
+    "thetaVXD",
+    "pCDC",
+    "pVXD",
+    "phiAbs",
+    "phiRel",
+    "thetaAbs",
+    "thetaRel",
+    "pAbs",
+    "pRel",
+    "chargeVXD",
+    "chargeCDC",
+    "numberHitsCDC",
+    "numberHitsVXD",
+    "distance",
+    "vertex",
+    "vertexCDC",
+    "vertexVXD",
+    "chargeDif"
   };
 
   /// Vehicle class to transport the variable names
-  class DetectorTrackCombinationTruthVarNames : public TrackFindingCDC::VarNames<BaseDetectorTrackCombinationFilter::Object> {
+  class DetectorTrackCombinationVarNames : public TrackFindingCDC::VarNames<BaseDetectorTrackCombinationFilter::Object> {
 
   public:
     /// Number of variables to be generated.
-    static const size_t nVars = TrackFindingCDC::size(detectorTrackCombinationTruthNames);
+    static const size_t nVars = TrackFindingCDC::size(detectorTrackCombinationVarNames);
 
     /// Get the name of the column.
     constexpr
     static char const* getName(int iName)
     {
-      return detectorTrackCombinationTruthNames[iName];
+      return detectorTrackCombinationVarNames[iName];
     }
   };
 
   /**
-   * Var set used in the VXD-CDC-Merger for calculating the probability of a VXD-CDC-track match,
-   * which knows the truth information if two tracks belong together or not.
+   * Var set used in the VXD-CDC-Merger for calculating the probability of a VXD-CDC-track match.
    */
-  class DetectorTrackCombinationTruthVarSet : public TrackFindingCDC::VarSet<DetectorTrackCombinationTruthVarNames> {
+  class DetectorTrackCombinationVarSet : public TrackFindingCDC::VarSet<DetectorTrackCombinationVarNames> {
 
   public:
-    /// Generate and assign the variables from the pair.
+    /// Generate and assign the variables from the VXD-CDC-pair
     virtual bool extract(const BaseDetectorTrackCombinationFilter::Object* pair) override;
   };
 }

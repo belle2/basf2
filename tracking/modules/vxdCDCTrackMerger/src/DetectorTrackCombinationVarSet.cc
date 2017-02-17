@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/vxdCDCTrackMerging/detectorTrackCombination/DetectorTrackCombinationVarSet.h>
+#include <tracking/modules/vxdCDCTrackMerger/DetectorTrackCombinationVarSet.h>
 #include <tracking/trackFindingCDC/numerics/ToFinite.h>
 
 #include <TMath.h>

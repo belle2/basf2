@@ -16,13 +16,12 @@
 #include <tracking/trackFindingCDC/collectors/selectors/FilterSelector.h>
 #include <tracking/trackFindingCDC/collectors/selectors/BestMatchSelector.h>
 #include <tracking/trackFindingCDC/collectors/selectors/CutSelector.h>
-#include <tracking/vxdCDCTrackMerging/detectorTrackCombination/DetectorTrackCombinationFilterFactory.h>
-#include <tracking/vxdCDCTrackMerging/detectorTrackCombination/ExtrapolationDetectorTrackCombinationSelector.h>
-#include <tracking/vxdCDCTrackMerging/detectorTrackCombination/StoreArrayMerger.h>
-#include <tracking/vxdCDCTrackMerging/detectorTrackCombination/DetectorTrackCombinationVarSet.h>
-#include <tracking/vxdCDCTrackMerging/detectorTrackCombination/DetectorTrackCombinationTruthVarSet.h>
+#include <tracking/modules/vxdCDCTrackMerger/DetectorTrackCombinationFilterFactory.h>
+#include <tracking/modules/vxdCDCTrackMerger/ExtrapolationDetectorTrackCombinationSelector.h>
+#include <tracking/modules/vxdCDCTrackMerger/StoreArrayMerger.h>
+#include <tracking/modules/vxdCDCTrackMerger/DetectorTrackCombinationVarSet.h>
+#include <tracking/modules/vxdCDCTrackMerger/DetectorTrackCombinationTruthVarSet.h>
 #include <tracking/trackFindingCDC/collectors/adders/RelationAdder.h>
-//#include <tracking/trackFindingCDC/findlets/minimal/RelationRecorder.h>
 
 namespace Belle2 {
   /**

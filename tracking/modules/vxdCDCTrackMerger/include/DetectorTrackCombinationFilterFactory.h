@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
-#include <tracking/vxdCDCTrackMerging/detectorTrackCombination/BaseDetectorTrackCombinationFilter.h>
+#include <tracking/modules/vxdCDCTrackMerger/BaseDetectorTrackCombinationFilter.h>
 
 namespace Belle2 {
   /// Filter factory for detector track combination filters.

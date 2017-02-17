@@ -7,10 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/vxdCDCTrackMerging/detectorTrackCombination/DetectorTrackCombinationFilterFactory.h>
+#include <tracking/modules/vxdCDCTrackMerger/DetectorTrackCombinationFilterFactory.h>
 
-#include <tracking/vxdCDCTrackMerging/detectorTrackCombination/DetectorTrackCombinationVarSet.h>
-#include <tracking/vxdCDCTrackMerging/detectorTrackCombination/DetectorTrackCombinationTruthVarSet.h>
+#include <tracking/modules/vxdCDCTrackMerger/DetectorTrackCombinationVarSet.h>
+#include <tracking/modules/vxdCDCTrackMerger/DetectorTrackCombinationTruthVarSet.h>
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>

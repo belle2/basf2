@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/vxdCDCTrackMerging/detectorTrackCombination/FilterBasedVXDCDCTrackMergerFindlet.h>
+#include <tracking/modules/vxdCDCTrackMerger/FilterBasedVXDCDCTrackMergerFindlet.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 using namespace Belle2;

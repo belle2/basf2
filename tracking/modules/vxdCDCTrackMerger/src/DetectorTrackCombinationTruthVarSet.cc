@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/vxdCDCTrackMerging/detectorTrackCombination/DetectorTrackCombinationTruthVarSet.h>
+#include <tracking/modules/vxdCDCTrackMerger/DetectorTrackCombinationTruthVarSet.h>
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
 
 using namespace std;

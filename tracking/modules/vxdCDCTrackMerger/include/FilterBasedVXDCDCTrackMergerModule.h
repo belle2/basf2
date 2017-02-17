@@ -11,7 +11,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
-#include <tracking/vxdCDCTrackMerging/detectorTrackCombination/FilterBasedVXDCDCTrackMergerFindlet.h>
+#include <tracking/modules/vxdCDCTrackMerger/FilterBasedVXDCDCTrackMergerFindlet.h>
 
 namespace Belle2 {
   /// This module merges tracks which are reconstructed, separately, in the silicon (PXD+VXD) and in the CDC

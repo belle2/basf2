@@ -13,6 +13,7 @@
 #include <TTree.h>
 
 /* Belle2 headers. */
+#include <eklm/alignment/AlignmentTools.h>
 #include <eklm/dbobjects/EKLMAlignment.h>
 #include <eklm/geometry/AlignmentChecker.h>
 #include <eklm/geometry/GeometryData.h>
@@ -47,22 +48,7 @@ void EKLMAlignmentModule::generateZeroDisplacement()
 {
   IntervalOfValidity iov(0, 0, -1, -1);
   EKLMAlignment alignment;
-  EKLMAlignmentData alignmentData(0., 0., 0.);
-  int iEndcap, iLayer, iSector, iPlane, iSegment, segment;
-  for (iEndcap = 1; iEndcap <= m_GeoDat->getNEndcaps(); iEndcap++) {
-    for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
-         iLayer++) {
-      for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
-        for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
-          for (iSegment = 1; iSegment <= m_GeoDat->getNSegments(); iSegment++) {
-            segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector, iPlane,
-                                              iSegment);
-            alignment.setAlignmentData(segment, &alignmentData);
-          }
-        }
-      }
-    }
-  }
+  EKLM::fillZeroDisplacements(&alignment);
   Database::Instance().storeData("EKLMDisplacement", (TObject*)&alignment, iov);
 }
 

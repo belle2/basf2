@@ -8,6 +8,7 @@
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include <alignment/GlobalLabel.h>
 
+#include <eklm/alignment/AlignmentTools.h>
 #include <eklm/dbobjects/EKLMAlignment.h>
 
 #include <framework/dbobjects/BeamParameters.h>
@@ -177,7 +178,9 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 
   if (newEKLM.empty() && nEKLMparams) {
     B2INFO("No previous EKLMAlignment found. First update from nominal.");
-    newEKLM.insert({to_string(getIovFromData()), new EKLMAlignment()});
+    EKLMAlignment* alignment = new EKLMAlignment();
+    EKLM::fillZeroDisplacements(alignment);
+    newEKLM.insert({to_string(getIovFromData()), alignment});
   }
 
   double maxCorrectionPull = 0.;
@@ -239,7 +242,24 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     if (param.isEKLM()) {
       // Add correction to all objects
       for (auto& eklm : newEKLM) {
-        //eklm.second->add(param.getBklmID(), param.getParameterId(), correction, m_invertSign);
+        int segment = param.getEklmID().getSegmentGlobalNumber();
+        EKLMAlignmentData* alignmentData =
+          eklm.second->getAlignmentData(segment);
+        if (alignmentData == NULL)
+          B2FATAL("EKLM alignment data not found, probable error in segment "
+                  "number.");
+        switch (param.getParameterId()) {
+          case 1:
+            alignmentData->setDy(correction);
+            break;
+          case 2:
+            alignmentData->setDalpha(correction);
+            break;
+          default:
+            B2FATAL("Incorrect EKLM alignment parameter " <<
+                    param.getParameterId());
+            break;
+        }
       }
     }
 

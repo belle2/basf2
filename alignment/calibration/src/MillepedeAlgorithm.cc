@@ -8,6 +8,8 @@
 #include <alignment/dbobjects/BKLMAlignment.h>
 #include <alignment/GlobalLabel.h>
 
+#include <eklm/dbobjects/EKLMAlignment.h>
+
 #include <framework/dbobjects/BeamParameters.h>
 
 using namespace std;
@@ -95,11 +97,14 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     belle2Constants.push_back(Database::DBQuery("dbstore", "CDCCalibration"));
   if (nBKLMparams)
     belle2Constants.push_back(Database::DBQuery("dbstore", "BKLMAlignment"));
+  if (nEKLMparams)
+    belle2Constants.push_back(Database::DBQuery("dbstore", "EKLMAlignment"));
   // Maps (key is IOV of object in DB)
   std::map<string, BeamParameters*> previousBeam;
   std::map<string, VXDAlignment*> previousVXD;
   std::map<string, CDCCalibration*> previousCDC;
   std::map<string, BKLMAlignment*> previousBKLM;
+  std::map<string, EKLMAlignment*> previousEKLM;
   // Collect all distinct existing objects in DB:
   for (auto& exprun : runSet.getExpRunSet()) {
     // Ask DB for data at Event 1 in each run
@@ -118,6 +123,9 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
       if (auto bklm = dynamic_cast<BKLMAlignment*>(payload.object)) {
         previousBKLM[to_string(payload.iov)] = bklm;
       }
+      if (auto eklm = dynamic_cast<EKLMAlignment*>(payload.object)) {
+        previousEKLM[to_string(payload.iov)] = eklm;
+      }
     }
   }
   // All objects have to be re-created, with new constant values...
@@ -125,6 +133,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   std::map<string, VXDAlignment*> newVXD;
   std::map<string, CDCCalibration*> newCDC;
   std::map<string, BKLMAlignment*> newBKLM;
+  std::map<string, EKLMAlignment*> newEKLM;
 
   if (nBeamParams)
     for (auto& beam : previousBeam)
@@ -141,6 +150,10 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   if (nBKLMparams)
     for (auto& bklm : previousBKLM)
       newBKLM[bklm.first] = new BKLMAlignment(*bklm.second);
+
+  if (nEKLMparams)
+    for (auto& eklm : previousEKLM)
+      newEKLM[eklm.first] = new EKLMAlignment(*eklm.second);
 
   if (newBeam.empty() && nBeamParams) {
     B2ERROR("No previous BeamParameters found. First update from nominal. Only vertex position is filled!");
@@ -160,6 +173,11 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   if (newBKLM.empty() && nBKLMparams) {
     B2INFO("No previous BKLMAlignment found. First update from nominal.");
     newBKLM.insert({to_string(getIovFromData()), new BKLMAlignment()});
+  }
+
+  if (newEKLM.empty() && nEKLMparams) {
+    B2INFO("No previous EKLMAlignment found. First update from nominal.");
+    newEKLM.insert({to_string(getIovFromData()), new EKLMAlignment()});
   }
 
   double maxCorrectionPull = 0.;
@@ -217,6 +235,14 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
         bklm.second->add(param.getBklmID(), param.getParameterId(), correction, m_invertSign);
       }
     }
+
+    if (param.isEKLM()) {
+      // Add correction to all objects
+      for (auto& eklm : newEKLM) {
+        //eklm.second->add(param.getBklmID(), param.getParameterId(), correction, m_invertSign);
+      }
+    }
+
   }
 
   // Save (possibly updated) objects
@@ -228,6 +254,8 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     saveCalibration(cdc.second, "CDCCalibration", to_IOV(cdc.first).overlap(getIovFromData()));
   for (auto& bklm : newBKLM)
     saveCalibration(bklm.second, "BKLMAlignment", to_IOV(bklm.first).overlap(getIovFromData()));
+  for (auto& eklm : newEKLM)
+    saveCalibration(eklm.second, "EKLMAlignment", to_IOV(eklm.first).overlap(getIovFromData()));
 
   //commit();
 

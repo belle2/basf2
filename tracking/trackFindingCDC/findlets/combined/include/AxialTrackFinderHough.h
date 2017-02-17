@@ -13,6 +13,7 @@
 
 #include <tracking/trackFindingCDC/findlets/minimal/AxialTrackMerger.h>
 #include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorHitHough.h>
+#include <tracking/trackFindingCDC/findlets/minimal/AxialTrackHitMigrator.h>
 
 #include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
 
@@ -63,6 +64,9 @@ namespace Belle2 {
 
       /// Second hough search over a fine hough grid
       AxialTrackCreatorHitHough m_roughHoughSearch;
+
+      /// Findlet to exchange hits between tracks based on their proximity to the respective trajectory
+      AxialTrackHitMigrator m_axialTrackHitMigrator;
 
       /// Findlet to merge the tracks after the hough finder.
       AxialTrackMerger m_axialTrackMerger;

@@ -26,6 +26,7 @@ AxialTrackFinderHough::AxialTrackFinderHough()
 {
   addProcessingSignalListener(&m_fineHoughSearch);
   addProcessingSignalListener(&m_roughHoughSearch);
+  addProcessingSignalListener(&m_axialTrackHitMigrator);
   addProcessingSignalListener(&m_axialTrackMerger);
 
   // Set default parameters of the hough spaces
@@ -69,6 +70,7 @@ void AxialTrackFinderHough::exposeParameters(ModuleParamList* moduleParamList,
 {
   m_fineHoughSearch.exposeParameters(moduleParamList, prefixed("fine", prefix));
   m_roughHoughSearch.exposeParameters(moduleParamList, prefixed("rough", prefix));
+  m_axialTrackHitMigrator.exposeParameters(moduleParamList, prefix);
   m_axialTrackMerger.exposeParameters(moduleParamList, prefixed("merge", prefix));
 }
 
@@ -90,16 +92,20 @@ void AxialTrackFinderHough::apply(const std::vector<CDCWireHit>& wireHits,
   m_fineHoughSearch.apply(axialWireHits, tracks);
 
   // One step of migrating hits between the already found tracks
-  TrackProcessor::assignNewHits(axialWireHits, tracks);
+  m_axialTrackHitMigrator.apply(axialWireHits, tracks);
 
   // Rough hough search
   m_roughHoughSearch.apply(axialWireHits, tracks);
 
   // One step of migrating hits between the already found tracks
-  TrackProcessor::assignNewHits(axialWireHits, tracks);
+  m_axialTrackHitMigrator.apply(axialWireHits, tracks);
 
   // Do track merging and finalization steps
   m_axialTrackMerger.apply(tracks, axialWireHits);
+
+  // Last step of migrating hits between the already found tracks
+  m_axialTrackHitMigrator.apply(axialWireHits, tracks);
+
 }
 
 std::vector<ParameterVariantMap>

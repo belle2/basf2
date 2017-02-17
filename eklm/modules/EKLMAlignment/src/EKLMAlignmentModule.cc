@@ -34,7 +34,7 @@ EKLMAlignmentModule::EKLMAlignmentModule() : Module()
   setDescription("Module for generation of EKLM displacement data.");
   addParam("Mode", m_Mode, "Mode ('Zero', 'Random' or 'Limits').",
            std::string("Zero"));
-  addParam("OutputFile", m_OutputFile, "Output file (for mode 'Limits').",
+  addParam("OutputFile", m_OutputFile, "Output file.",
            std::string("EKLMDisplacement.root"));
   setPropertyFlags(c_ParallelProcessingCertified);
   m_GeoDat = NULL;
@@ -49,6 +49,7 @@ void EKLMAlignmentModule::generateZeroDisplacement()
   IntervalOfValidity iov(0, 0, -1, -1);
   EKLMAlignment alignment;
   EKLM::fillZeroDisplacements(&alignment);
+  saveDisplacement(&alignment);
   Database::Instance().storeData("EKLMDisplacement", (TObject*)&alignment, iov);
 }
 
@@ -85,6 +86,7 @@ void EKLMAlignmentModule::generateRandomDisplacement()
       }
     }
   }
+  saveDisplacement(&alignment);
   Database::Instance().storeData("EKLMDisplacement", (TObject*)&alignment, iov);
 }
 
@@ -153,6 +155,48 @@ void EKLMAlignmentModule::studyAlignmentLimits()
     }
   }
   t->Write();
+  delete f;
+}
+
+void EKLMAlignmentModule::saveDisplacement(EKLMAlignment* alignment)
+{
+  int iEndcap, iLayer, iSector, iPlane, iSegment, segment, param;
+  float value;
+  EKLMAlignmentData* alignmentData;
+  TFile* f;
+  TTree* t;
+  f = new TFile(m_OutputFile.c_str(), "recreate");
+  t = new TTree("eklm", "");
+  t->Branch("endcap", &iEndcap, "endcap/I");
+  t->Branch("layer", &iLayer, "layer/I");
+  t->Branch("sector", &iSector, "sector/I");
+  t->Branch("plane", &iPlane, "plane/I");
+  t->Branch("segment", &iSegment, "segment/I");
+  t->Branch("param", &param, "param/I");
+  t->Branch("value", &value, "value/F");
+  for (iEndcap = 1; iEndcap <= m_GeoDat->getNEndcaps(); iEndcap++) {
+    for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
+         iLayer++) {
+      for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
+        for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
+          for (iSegment = 1; iSegment <= m_GeoDat->getNSegments(); iSegment++) {
+            segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector, iPlane,
+                                              iSegment);
+            alignmentData = alignment->getAlignmentData(segment);
+            param = 1;
+            value = alignmentData->getDy();
+            t->Fill();
+            param = 2;
+            value = alignmentData->getDalpha();
+            t->Fill();
+          }
+        }
+      }
+    }
+  }
+  f->cd();
+  t->Write();
+  delete t;
   delete f;
 }
 

@@ -227,3 +227,5 @@ cdctree.Write()
 bklmtree.Write()
 eklmtree.Write()
 alignment_file.Close()
+
+algo.commit()

@@ -10,6 +10,7 @@
 
 #include <tracking/modules/qualityEstimatorVXD/MCQualityEstimatorVXDModule.h>
 #include <framework/logging/Logger.h>
+#include <algorithm>
 
 using namespace Belle2;
 
@@ -18,7 +19,7 @@ REG_MODULE(MCQualityEstimatorVXD)
 
 MCQualityEstimatorVXDModule::MCQualityEstimatorVXDModule() : Module()
 {
-  setDescription("The quality estimator module for SpacePointTrackCandidates using a MC information.");
+  setDescription("The quality estimator module for SpacePointTrackCandidates using MC information.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
 
@@ -43,6 +44,7 @@ void MCQualityEstimatorVXDModule::event()
 
   // initialize Matrix
   m_linkMatrix = Eigen::SparseMatrix<bool> (m_mcRecoTracks.getEntries(), StoreArray<SVDCluster>("").getEntries());
+  // Best guess about required size. Average should be slightly below 8 SVD clusters (2 per layer) per Track.
   m_linkMatrix.reserve(m_mcRecoTracks.getEntries() * 8);
 
   // create relation SVDClusterIndex to MCRecoTrackIndex
@@ -72,9 +74,9 @@ void MCQualityEstimatorVXDModule::fillMatrixWithMCInformation()
           m_linkMatrix.innerSize());
 }
 
-std::pair<int, int> MCQualityEstimatorVXDModule::getBestMatchToMCClusters(SpacePointTrackCand sptc)
+MCQualityEstimatorVXDModule::MatchInfo MCQualityEstimatorVXDModule::getBestMatchToMCClusters(SpacePointTrackCand& sptc)
 {
-  std::map<int, int> matches;
+  std::map<MCRecoTrackIndex, NMatches> matches;
 
   for (const SpacePoint* spacePoint : sptc.getHits()) {
     for (SVDCluster& cluster : spacePoint->getRelationsTo<SVDCluster>(m_svdClustersName)) {
@@ -82,21 +84,21 @@ std::pair<int, int> MCQualityEstimatorVXDModule::getBestMatchToMCClusters(SpaceP
 
       // Due to MCRecoTracks overlapping each SVDCluster might match to multiple MCRecoTracks
       for (Eigen::SparseMatrix<bool>::InnerIterator it(m_linkMatrix, svdClusterIndex); it; ++it) {
-        ++matches[it.row()];
+        MCRecoTrackIndex index = it.row();
+        // Increase number of matches to this RecoTrack
+        ++matches[index];
       }
 
     } // end loop SVDClusters
   } // end loop SpacePoints
 
   // select best match as the one with the most matched clusters.
-  std::pair<int, int> bestMatch(0, 0);
-  for (auto& relation : matches) {
-    if (relation.second > bestMatch.second) bestMatch = relation;
-  }
+  MatchInfo bestMatch = *std::max_element(matches.begin(), matches.end(),
+  [](MatchInfo const & lhs, MatchInfo const & rhs) {return lhs.second > rhs.second;});
   return bestMatch;
 }
 
-double MCQualityEstimatorVXDModule::calculateQualityIndex(int nClusters, std::pair<int, int> match)
+double MCQualityEstimatorVXDModule::calculateQualityIndex(int nClusters, MatchInfo& match)
 {
   double qualityIndex = 0;
   if (m_strictQualityIndex) {

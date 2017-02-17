@@ -20,7 +20,7 @@
 
 namespace Belle2 {
 
-  /** The quality estimator module for SpacePointTrackCandidates using a MC information.
+  /** The quality estimator module for SpacePointTrackCandidates using MC information.
    * WARNING: Only working for SVDClusters!
    * */
   class MCQualityEstimatorVXDModule : public Module {
@@ -31,22 +31,27 @@ namespace Belle2 {
     /** Constructor of the module. */
     MCQualityEstimatorVXDModule();
 
-    virtual void initialize()
+    void initialize()
     {
       m_spacePointTrackCands.isRequired(m_SPTCsName);
       m_mcRecoTracks.isRequired(m_mcRecoTracksName);
     }
 
-    virtual void event();
+    void event();
 
 
   protected:
 
+    // some typedefs to increase readability
+    typedef int MCRecoTrackIndex;
+    typedef int NMatches;
+    typedef std::pair<MCRecoTrackIndex, NMatches> MatchInfo;
+
     void fillMatrixWithMCInformation();
 
-    std::pair<int, int> getBestMatchToMCClusters(SpacePointTrackCand sptc);
+    MatchInfo getBestMatchToMCClusters(SpacePointTrackCand& sptc);
 
-    double calculateQualityIndex(int nClusters, std::pair<int, int> match);
+    double calculateQualityIndex(int nClusters, MatchInfo& match);
 
 
     // module parameters

@@ -26,7 +26,7 @@
 
 namespace Belle2 {
 
-  void addContinuumSuppression(const Particle* particle)
+  void addContinuumSuppression(const Particle* particle, const std::string& maskName)
   {
     // Output
     StoreArray<ContinuumSuppression> qqArray;
@@ -108,7 +108,8 @@ namespace Belle2 {
 
       // Charged tracks -> Pion
       //
-      std::vector<const Track*> roeTracks = roe->getTracks();
+      std::vector<const Track*> roeTracks = roe->getTracks(maskName);   // ADD
+//      std::vector<const Track*> roeTracks = roe->getTracks();
 
       const Const::ChargedStable charged = Const::pion;
 

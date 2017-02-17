@@ -21,16 +21,9 @@ reconstructDecay('B0   -> K_S0 pi0', '5.2 < Mbc < 5.3 and -0.3 < deltaE < 0.2', 
 matchMCTruth('B0', path=main)
 
 buildRestOfEvent('B0', path=main)
-# appendROEMask('B0', 'cleanMask', 'abs(d0) < 0.1', 'goodGamma == 1')
 
-# cleanMask = ('cleanMask', 'p > 0.1', 'p > 0.08 and clusterE9E25 > 0.9 and abs(clusterTiming) < 10', [0, 0, 1, 0, 0, 0])
-# defaultMask = ('defaultMask', '', '', [0, 0, 1, 0, 0, 0])
-# appendROEMasks('B0', [cleanMask, defaultMask], path=main)
-# appendROEMasks('B0', [cleanMask])
-
-cleanMask = ('cleanMask', 'p > 0.1', 'p > 0.08 and clusterE9E25 > 0.9 and abs(clusterTiming) < 10')
+cleanMask = ('cleanMask', 'p > 0.1', 'p > 2.08 and clusterE9E25 > 0.9 and abs(clusterTiming) < 10')
 appendROEMasks('B0', [cleanMask], path=main)
-
 
 buildContinuumSuppression('B0', 'cleanMask', path=main)
 

@@ -113,8 +113,6 @@ namespace Belle2 {
       const Const::ChargedStable charged = Const::pion;
 
       for (const Track* track : roeTracks) {
-//      for (int i = 0; i < roe->getNTracks(); i++) {
-//        const Track* track = roeTracks[i];
 
         // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
         // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
@@ -140,11 +138,9 @@ namespace Belle2 {
 
       // ECLCluster -> Gamma
       //
-      std::vector<const ECLCluster*> roeECLClusters = roe->getECLClusters();
+      std::vector<const ECLCluster*> roeECLClusters = roe->getECLClusters(maskName);
 
-      for (int i = 0; i < roe->getNECLClusters(); i++) {
-
-        const ECLCluster* cluster = roeECLClusters[i];
+      for (const ECLCluster* cluster : roeECLClusters) {
 
         if (cluster->isNeutral()) {
 

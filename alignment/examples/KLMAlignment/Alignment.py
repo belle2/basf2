@@ -100,23 +100,6 @@ algo.execute()
 
 # -----------------------------------------------------------
 
-
-# Get the payloads into handy variables
-payloads = list(algo.getPayloads())
-vxd = None
-cdc = None
-bklm = None
-for payload in payloads:
-    if payload.module == 'VXDAlignment':
-        vxd = payload.object.IsA().DynamicCast(Belle2.VXDAlignment().IsA(), payload.object, False)
-
-    if payload.module == 'CDCCalibration':
-        cdc = payload.object.IsA().DynamicCast(Belle2.CDCCalibration().IsA(), payload.object, False)
-
-    if payload.module == 'BKLMAlignment':
-        bklm = payload.object.IsA().DynamicCast(Belle2.BKLMAlignment().IsA(), payload.object, False)
-
-
 # Profile plot for all determined parameters
 profile = ROOT.TH1F(
     "profile",

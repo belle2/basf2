@@ -114,38 +114,8 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
 
   // Here starts iteration over finding passes -- in each pass slightly different conditions of track finding applied
   do {
-    HitProcessor::resetMaskedHits(m_tracks, m_allAxialWireHits);
-
-    // Create object which holds and generates parameters
-    QuadTreeParameters quadTreeParameters(m_param_maxLevel, quadTreePassCounter.getPass());
-
-    //Create quadtree processot
-    AxialHitQuadTreeProcessor qtProcessor = quadTreeParameters.constructQTProcessor();
-
-    //Prepare vector of QuadTreeHitWrapper* to provide it to the qt processor
-    std::vector<CDCConformalHit*> hitsVector;
-    for (CDCConformalHit& trackHit : m_conformalCDCWireHitList) {
-      if (trackHit.getUsedFlag() or trackHit.getMaskedFlag()) continue;
-      hitsVector.push_back(&trackHit);
-    }
-
-    qtProcessor.provideItemsSet(hitsVector);
-    //  qtProcessor.seedQuadTree(4, symmetricalKappa);
-
-    // Create object which contains interface between quadtree processor and track processor (module)
-    QuadTreeNodeProcessor quadTreeNodeProcessor(qtProcessor, quadTreeParameters.getPrecisionFunction());
-
-    // Object which operates with AxialHitQuadTreeProcessor and QuadTreeNodeProcessor and starts quadtree search
-    QuadTreeCandidateFinder quadTreeCandidateFinder;
-
     int nCandsAdded = m_tracks.size();
-
-    // Interface
-    AxialHitQuadTreeProcessor::CandidateProcessorLambda lambdaInterface =
-      quadTreeNodeProcessor.getLambdaInterface(m_allAxialWireHits, m_tracks);
-
-    // Start candidate finding
-    quadTreeCandidateFinder.doTreeTrackFinding(lambdaInterface, quadTreeParameters, qtProcessor);
+    applyPass(quadTreePassCounter.getPass());
 
     // Assign new hits to the tracks
     TrackProcessor::assignNewHits(m_allAxialWireHits, m_tracks);
@@ -168,6 +138,42 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
 
   m_axialTrackMerger.apply(m_tracks, m_allAxialWireHits);
 }
+
+void TrackFinderCDCLegendreTrackingModule::applyPass(LegendreFindingPass pass)
+{
+
+  HitProcessor::resetMaskedHits(m_tracks, m_allAxialWireHits);
+
+  // Create object which holds and generates parameters
+  QuadTreeParameters quadTreeParameters(m_param_maxLevel, pass);
+
+  //Create quadtree processot
+  AxialHitQuadTreeProcessor qtProcessor = quadTreeParameters.constructQTProcessor();
+
+  //Prepare vector of QuadTreeHitWrapper* to provide it to the qt processor
+  std::vector<CDCConformalHit*> hitsVector;
+  for (CDCConformalHit& trackHit : m_conformalCDCWireHitList) {
+    if (trackHit.getUsedFlag() or trackHit.getMaskedFlag()) continue;
+    hitsVector.push_back(&trackHit);
+  }
+
+  qtProcessor.provideItemsSet(hitsVector);
+  //  qtProcessor.seedQuadTree(4, symmetricalKappa);
+
+  // Create object which contains interface between quadtree processor and track processor (module)
+  QuadTreeNodeProcessor quadTreeNodeProcessor(qtProcessor, quadTreeParameters.getPrecisionFunction());
+
+  // Object which operates with AxialHitQuadTreeProcessor and QuadTreeNodeProcessor and starts quadtree search
+  QuadTreeCandidateFinder quadTreeCandidateFinder;
+
+  // Interface
+  AxialHitQuadTreeProcessor::CandidateProcessorLambda lambdaInterface =
+    quadTreeNodeProcessor.getLambdaInterface(m_allAxialWireHits, m_tracks);
+
+  // Start candidate finding
+  quadTreeCandidateFinder.doTreeTrackFinding(lambdaInterface, quadTreeParameters, qtProcessor);
+}
+
 
 void TrackFinderCDCLegendreTrackingModule::outputObjects(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {

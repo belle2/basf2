@@ -19,6 +19,7 @@ namespace Belle2 {
     class CDCTrack;
     class CDCConformalHit;
     class CDCWireHit;
+    enum class LegendreFindingPass;
   }
 
   /**
@@ -73,6 +74,9 @@ namespace Belle2 {
 
     /// Do the real tree track finding.
     void findTracks();
+
+    /// Execute one pass over a quad tree
+    void applyPass(TrackFindingCDC::LegendreFindingPass pass);
 
     /// Startup code before the event starts.
     void startNewEvent();

@@ -127,7 +127,7 @@ AxialTrackFinderLegendre::getDefaultFineRelaxationSchedule() const
   result.push_back(ParameterVariantMap{
     {"maxLevel", 10},
     {"minWeight", 50.0},
-    {"maxCurv", 1.0 * m_curlCurv},
+    {"maxCurv", 1.0 * 0.02},
     {"curvResolution", std::string("origin")},
     {"nRoadSearches", 1},
     {"roadLevel", 1},
@@ -136,7 +136,7 @@ AxialTrackFinderLegendre::getDefaultFineRelaxationSchedule() const
   result.push_back(ParameterVariantMap{
     {"maxLevel", 10},
     {"minWeight", 70.0},
-    {"maxCurv", 2.0 * m_curlCurv},
+    {"maxCurv", 2.0 * 0.02},
     {"curvResolution", std::string("origin")},
     {"nRoadSearches", 1},
     {"roadLevel", 1},
@@ -157,7 +157,7 @@ AxialTrackFinderLegendre::getDefaultFineRelaxationSchedule() const
   result.push_back(ParameterVariantMap{
     {"maxLevel", 8},
     {"minWeight", 50.0},
-    {"maxCurv", 1.0 * m_curlCurv},
+    {"maxCurv", 1.0 * 0.02},
     {"curvResolution", std::string("nonOrigin")},
     {"nRoadSearches", 2},
     {"roadLevel", 1},
@@ -166,7 +166,7 @@ AxialTrackFinderLegendre::getDefaultFineRelaxationSchedule() const
   result.push_back(ParameterVariantMap{
     {"maxLevel", 8},
     {"minWeight", 70.0},
-    {"maxCurv", 2.0 * m_curlCurv},
+    {"maxCurv", 2.0 * 0.02},
     {"curvResolution", std::string("nonOrigin")},
     {"nRoadSearches", 2},
     {"roadLevel", 1},
@@ -204,7 +204,7 @@ AxialTrackFinderLegendre::getDefaultRoughRelaxationSchedule() const
   result.push_back(ParameterVariantMap{
     {"maxLevel", 10},
     {"minWeight", 50.0},
-    {"maxCurv", 1.0 * m_curlCurv},
+    {"maxCurv", 1.0 * 0.02},
     {"curvResolution", std::string("nonOrigin")},
     {"nRoadSearches", 3},
     {"roadLevel", 0},
@@ -213,7 +213,7 @@ AxialTrackFinderLegendre::getDefaultRoughRelaxationSchedule() const
   result.push_back(ParameterVariantMap{
     {"maxLevel", 10},
     {"minWeight", 70.0},
-    {"maxCurv", 2.0 * m_curlCurv},
+    {"maxCurv", 2.0 * 0.02},
     {"curvResolution", std::string("nonOrigin")},
     {"nRoadSearches", 3},
     {"roadLevel", 0},

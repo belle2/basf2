@@ -57,9 +57,6 @@ namespace Belle2 {
       /// Maximal curvature acceptance of the CDC
       const double m_maxCurvAcceptance = 0.13;
 
-      /// Curvature below which particles from IP do not leave the CDC
-      const double m_curlCurv = 0.018;
-
     private: // findlets
       /// First legendre search over a fine hough grid
       AxialTrackCreatorHitLegendre m_fineLegendreSearch;

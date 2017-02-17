@@ -41,6 +41,11 @@ namespace Belle2 {
   private:
     /// The cut value to use.
     TrackFindingCDC::Weight m_param_cutValue = 2.0;
+
+    /**
+     * Radius to which the two tracks in each relation should be extrapolated.
+     * This can be for example the CDC inner wall radius.
+     **/
     double m_param_radius = 16.25;
   };
 }

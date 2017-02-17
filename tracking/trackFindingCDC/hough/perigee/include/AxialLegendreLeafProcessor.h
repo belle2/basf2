@@ -70,7 +70,8 @@ namespace Belle2 {
       bool skip(const ANode* node)
       {
         bool tooLowWeight = not(node->getWeight() >= m_param_minWeight);
-        bool tooHighCurvature = static_cast<float>(node->template getLowerBound<DiscreteCurv>()) > m_param_maxCurv;
+        bool tooHighCurvature = (static_cast<float>(node->template getLowerBound<DiscreteCurv>()) > m_param_maxCurv or
+                                 - static_cast<float>(node->template getUpperBound<DiscreteCurv>()) > m_param_maxCurv);
         return tooLowWeight or tooHighCurvature;
       }
 

@@ -23,7 +23,6 @@
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 using namespace Belle2;
@@ -35,8 +34,7 @@ REG_MODULE(TrackFinderCDCLegendreTracking);
 TrackFinderCDCLegendreTrackingModule::TrackFinderCDCLegendreTrackingModule() :
   Module()
 {
-  setDescription("Performs the pattern recognition in the CDC with the conformal finder:"
-                 "digitized CDCHits are combined to track candidates (genfit::TrackCand)");
+  setDescription("Performs the pattern recognition in the CDC with the legendre hough finder");
 
   addParam("maxLevel",
            m_param_maxLevel,
@@ -88,7 +86,6 @@ void TrackFinderCDCLegendreTrackingModule::startNewEvent()
   StoreWrappedObjPtr<std::vector<CDCWireHit> > storedWireHits("CDCWireHitVector");
   const std::vector<CDCWireHit>& wireHits = *storedWireHits;
 
-  m_conformalCDCWireHitList.reserve(wireHits.size());
   for (const CDCWireHit& wireHit : wireHits) {
     // Skip taken hits
     if (wireHit.getAutomatonCell().hasTakenFlag()) continue;
@@ -97,10 +94,9 @@ void TrackFinderCDCLegendreTrackingModule::startNewEvent()
     if (not wireHit.isAxial()) continue;
 
     m_allAxialWireHits.push_back(&wireHit);
-    m_conformalCDCWireHitList.emplace_back(&wireHit);
   }
 
-  B2DEBUG(90, "Number of hits to be used by legendre track finder: " << m_conformalCDCWireHitList.size() << " axial.");
+  B2DEBUG(90, "Number of hits to be used by legendre track finder: " << m_allAxialWireHits.size() << " axial.");
 }
 
 void TrackFinderCDCLegendreTrackingModule::findTracks()
@@ -141,10 +137,10 @@ void TrackFinderCDCLegendreTrackingModule::applyPass(LegendreFindingPass pass)
   AxialHitQuadTreeProcessor qtProcessor = quadTreeParameters.constructQTProcessor();
 
   //Prepare vector of QuadTreeHitWrapper* to provide it to the qt processor
-  std::vector<CDCConformalHit*> hitsVector;
-  for (CDCConformalHit& trackHit : m_conformalCDCWireHitList) {
-    if (trackHit.getUsedFlag() or trackHit.getMaskedFlag()) continue;
-    hitsVector.push_back(&trackHit);
+  std::vector<const CDCWireHit*> hitsVector;
+  for (const CDCWireHit* wireHit : m_allAxialWireHits) {
+    if ((*wireHit)->hasTakenFlag()) continue;
+    hitsVector.push_back(wireHit);
   }
 
   qtProcessor.provideItemsSet(hitsVector);
@@ -173,7 +169,6 @@ void TrackFinderCDCLegendreTrackingModule::outputObjects(std::vector<Belle2::Tra
 
 void TrackFinderCDCLegendreTrackingModule::clearVectors()
 {
-  m_conformalCDCWireHitList.clear();
   m_allAxialWireHits.clear();
   m_tracks.clear();
 }

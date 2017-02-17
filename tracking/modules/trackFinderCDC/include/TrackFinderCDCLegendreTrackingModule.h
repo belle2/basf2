@@ -17,7 +17,6 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
-    class CDCConformalHit;
     class CDCWireHit;
     enum class LegendreFindingPass;
   }
@@ -59,9 +58,6 @@ namespace Belle2 {
 
     /// List to collect all axial wire hits
     std::vector<const TrackFindingCDC::CDCWireHit*> m_allAxialWireHits;
-
-    /// List for holding all used conformal CDC wire hits.
-    std::vector<TrackFindingCDC::CDCConformalHit> m_conformalCDCWireHitList;
 
     /// Main method to apply the track finding.
     void generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks);

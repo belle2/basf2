@@ -50,12 +50,6 @@ namespace {
 
     this->loadPreparedEvent();
     const int numberOfPossibleTrackCandidate = m_mcTracks.size();
-    std::vector<CDCConformalHit> conformalHits(m_axialWireHits.begin(), m_axialWireHits.end());
-
-    std::vector<CDCConformalHit*> hitsVector;
-    for (CDCConformalHit& conformalHit : conformalHits) {
-      hitsVector.push_back(&conformalHit);
-    }
 
     AxialHitQuadTreeProcessor::CandidateProcessorLambda lmdProcessor =
       [&candidates](const AxialHitQuadTreeProcessor::ReturnList & hits,
@@ -63,13 +57,13 @@ namespace {
 
     auto now = std::chrono::high_resolution_clock::now();
     AxialHitQuadTreeProcessor qtProcessor1(13, ranges1, highPtPrecisionFunction);
-    qtProcessor1.provideItemsSet(hitsVector);
+    qtProcessor1.provideItemsSet(m_axialWireHits);
 
     // actual filling of the hits into the quad tree structure
     qtProcessor1.fillGivenTree(lmdProcessor, 30);
 
     AxialHitQuadTreeProcessor qtProcessor2(11, ranges2, lowPtPrecisionFunction);
-    qtProcessor2.provideItemsSet(hitsVector);
+    qtProcessor2.provideItemsSet(m_axialWireHits);
 
     // actual filling of the hits into the quad tree structure
     qtProcessor2.fillGivenTree(lmdProcessor, 30);

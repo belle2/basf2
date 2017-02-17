@@ -1,11 +1,9 @@
 #pragma once
 
-#include <framework/logging/LogMethod.h>
-
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    class CDCConformalHit;
+    class CDCWireHit;
     class CDCSegment2D;
 
     /**
@@ -36,13 +34,13 @@ namespace Belle2 {
       /**
        * Destructor
        */
-      virtual ~QuadTreeItem() = default;
+      ~QuadTreeItem() = default;
 
       /**
        * Flag is set if the item was used as a result of the quad tree search and
        * should not be used in the next quad tree search round.
        */
-      virtual bool isUsed() const
+      bool isUsed() const
       {
         return m_usedFlag;
       }
@@ -50,7 +48,7 @@ namespace Belle2 {
       /**
        * Set the used flag if you do not want that item to go into the next search round again.
        */
-      virtual void setUsedFlag(bool usedFlag = true)
+      void setUsedFlag(bool usedFlag = true)
       {
         m_usedFlag = usedFlag;
       }
@@ -58,21 +56,23 @@ namespace Belle2 {
       /**
        * Unset the used flag again if you have noticed that a previous setting was wrong.
        */
-      virtual void unsetUsedFlag() final {
+      void unsetUsedFlag()
+      {
         setUsedFlag(false);
       }
 
       /**
        * Returns a pointer to the underlying item. This function is not called in the quad tree item itself but only in the filling and postprocessing stage.
        */
-      virtual typeData* getPointer() final {
+      typeData* getPointer()
+      {
         return m_pointer;
       }
 
       /**
        * Const version of getPointer() above.
        */
-      virtual const typeData* getPointer() const final
+      const typeData* getPointer() const
       {
         return m_pointer;
       }
@@ -86,13 +86,13 @@ namespace Belle2 {
      *  As special case: the QuadTreeHitWrapper has a used flag itself
      */
     template<>
-    bool QuadTreeItem<CDCConformalHit>::isUsed() const;
+    bool QuadTreeItem<const CDCWireHit>::isUsed() const;
 
     /**
      *  As special case: the QuadTreeHitWrapper has a used flag itself
      */
     template<>
-    void QuadTreeItem<CDCConformalHit>::setUsedFlag(bool usedFlag);
+    void QuadTreeItem<const CDCWireHit>::setUsedFlag(bool usedFlag);
 
     /**
      *  As special case: the CDCSegment2D has a used flag itself

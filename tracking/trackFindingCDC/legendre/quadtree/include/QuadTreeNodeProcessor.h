@@ -22,7 +22,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCConformalHit;
+    class CDCWireHit;
 
     /**
      * Class which used as interface between QuadTree processor and TrackCreator
@@ -71,7 +71,7 @@ namespace Belle2 {
         /// NO NEGATIVE IMPACT ON THE EFFICIENCY WHEN THIS METHOD IS DISABLED ....
         //advancedProcessing(qt);
 
-        std::vector<CDCConformalHit*> candidateHits;
+        std::vector<const CDCWireHit*> candidateHits;
 
         for (AxialHitQuadTreeProcessor::ItemType* hit : qt->getItemsVector()) {
           hit->setUsedFlag(false);
@@ -147,26 +147,17 @@ namespace Belle2 {
       };
 
       /// Perform conformal extension for given set of hits and create CDCTrack object of them
-      void postprocessSingleNode(std::vector<CDCConformalHit*>& candidateHits,
+      void postprocessSingleNode(std::vector<const CDCWireHit*>& candidateHits,
                                  const std::vector<const CDCWireHit*>& allAxialWireHits,
                                  std::vector<CDCTrack>& tracks)
       {
-
-        for (CDCConformalHit* hit : candidateHits) {
-          hit->setUsedFlag(false);
+        for (const CDCWireHit* hit : candidateHits) {
+          (*hit)->setTakenFlag(false);
         }
 
         ConformalExtension conformalExtension;
-
-        std::vector<const CDCWireHit*> cdcWireHits;
-
-        for (CDCConformalHit* hit : candidateHits) {
-          cdcWireHits.push_back(hit->getWireHit());
-        }
-
-        conformalExtension.newRefPoint(cdcWireHits, allAxialWireHits, true);
-
-        TrackProcessor::addCandidateFromHitsWithPostprocessing(cdcWireHits, allAxialWireHits, tracks);
+        conformalExtension.newRefPoint(candidateHits, allAxialWireHits, true);
+        TrackProcessor::addCandidateFromHitsWithPostprocessing(candidateHits, allAxialWireHits, tracks);
       }
 
     private:

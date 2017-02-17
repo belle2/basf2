@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/PrecisionUtil.h>
@@ -34,7 +34,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /** A QuadTreeProcessor for TrackHits */
-    class AxialHitQuadTreeProcessor : public QuadTreeProcessorTemplate<unsigned long, float, CDCConformalHit, 2, 2> {
+    class AxialHitQuadTreeProcessor : public QuadTreeProcessorTemplate<unsigned long, float, const CDCWireHit, 2, 2> {
 
     public:
 
@@ -90,9 +90,8 @@ namespace Belle2 {
        * @param hit hit being checked
        * @return returns true if sinogram of the hit crosses (geometrically) borders of the node
        */
-      bool insertItemInNode(QuadTree* node, CDCConformalHit* hit) const override final
+      bool insertItemInNode(QuadTree* node, const CDCWireHit* wireHit) const override final
       {
-        const CDCWireHit* wireHit = hit->getWireHit();
         const double& l = wireHit->getRefDriftLength();
         const Vector2D& pos2D = wireHit->getRefPos2D();
         double r2 = square(wireHit->getRefCylindricalR()) - l * l;
@@ -148,7 +147,7 @@ namespace Belle2 {
         // Check the extremum
         float rHitMinExtr = thetaVecMin.cross(pos2D);
         float rHitMaxExtr = thetaVecMax.cross(pos2D);
-        if (rHitMinExtr * rHitMaxExtr < 0.) return checkExtremum(node, hit);
+        if (rHitMinExtr * rHitMaxExtr < 0.) return checkExtremum(node, wireHit);
 
         // Not contained
         return false;
@@ -352,10 +351,10 @@ namespace Belle2 {
         for (ItemType* hit : m_quadTree->getItemsVector()) {
           TF1* funct1 = new TF1("funct", "2*[0]*cos(x)/((1-sin(x))*[1]) ", -3.1415, 3.1415);
           funct1->SetLineWidth(1);
-          double r2 = (hit->getPointer()->getWireHit()->getRefPos2D().norm() + hit->getPointer()->getWireHit()->getRefDriftLength()) *
-                      (hit->getPointer()->getWireHit()->getRefPos2D().norm() - hit->getPointer()->getWireHit()->getRefDriftLength());
-          double d2 = hit->getPointer()->getWireHit()->getRefDriftLength() * hit->getPointer()->getWireHit()->getRefDriftLength();
-          double x = hit->getPointer()->getWireHit()->getRefPos2D().x();
+          double r2 = (hit->getPointer()->getRefPos2D().norm() + hit->getPointer()->getRefDriftLength()) *
+                      (hit->getPointer()->getRefPos2D().norm() - hit->getPointer()->getRefDriftLength());
+          double d2 = hit->getPointer()->getRefDriftLength() * hit->getPointer()->getRefDriftLength();
+          double x = hit->getPointer()->getRefPos2D().x();
 
           funct1->SetParameters(x, r2 - d2);
           funct1->Draw("CSAME");
@@ -379,9 +378,8 @@ namespace Belle2 {
        * @return returns false in other cases (namely negative derivative
        *
        */
-      bool checkDerivative(QuadTree* node, CDCConformalHit* hit) const
+      bool checkDerivative(QuadTree* node, const CDCWireHit* wireHit) const
       {
-        const CDCWireHit* wireHit = hit->getWireHit();
         const Vector2D& pos2D = wireHit->getRefPos2D();
 
         unsigned long thetaMin = node->getXMin();
@@ -406,9 +404,8 @@ namespace Belle2 {
        * @param hit hit to check
        * @return true or false
        */
-      bool checkExtremum(QuadTree* node, CDCConformalHit* hit) const
+      bool checkExtremum(QuadTree* node, const CDCWireHit* wireHit) const
       {
-        const CDCWireHit* wireHit = hit->getWireHit();
         const double& l = wireHit->getRefDriftLength();
         const Vector2D& pos2D = wireHit->getRefPos2D();
         double r2 = square(wireHit->getRefCylindricalR()) - l * l;

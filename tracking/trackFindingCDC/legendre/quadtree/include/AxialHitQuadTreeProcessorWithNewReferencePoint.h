@@ -26,7 +26,7 @@ namespace Belle2 {
       /**
        * Constructor.
        * @param ranges ranges of the initial QuadTree (only one instance without children created)
-       * @referencePoint reference position. Conformal transformation will be performed with respect to this point rather than to (0;0)
+       * @referencePoint reference position.
        */
       AxialHitQuadTreeProcessorWithNewReferencePoint(const ChildRanges& ranges,
                                                      std::pair<double, double> referencePoint)

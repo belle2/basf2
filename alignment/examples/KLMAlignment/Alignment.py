@@ -205,6 +205,7 @@ chi2ndf = Belle2.PyStoreObj('MillepedeCollector_chi2/ndf', 1).obj().getObject('1
 pval = Belle2.PyStoreObj('MillepedeCollector_pval', 1).obj().getObject('1.1')
 
 alignment_file.cd()
+profile.Write()
 vxdtree.Write()
 cdctree.Write()
 bklmtree.Write()

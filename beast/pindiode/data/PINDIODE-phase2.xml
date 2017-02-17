@@ -20,6 +20,10 @@
     <FanoFactor>0.1</FanoFactor>
        
     <Active>
+      <dx_pins unit="cm">1.0</dx_pins>
+      <dy_pins unit="cm">1.0</dy_pins>
+      <dz_pins unit="cm">0.03</dz_pins>
+
       <phase >2</phase>
       <Material>PINDIODE-Material</Material>
       <ThetaZ unit="deg">0.0,0.0,0.0,0.0</ThetaZ>

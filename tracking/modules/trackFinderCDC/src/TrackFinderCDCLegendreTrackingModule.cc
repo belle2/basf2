@@ -172,7 +172,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
 
   } while (quadTreePassCounter.getPass() != LegendreFindingPass::End);
 
-  TrackProcessor::mergeAndFinalizeTracks(m_tracks, m_allAxialWireHits);
+  m_axialTrackMerger.apply(m_tracks, m_allAxialWireHits);
 }
 
 void TrackFinderCDCLegendreTrackingModule::outputObjects(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)

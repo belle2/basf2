@@ -10,6 +10,8 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/findlets/minimal/AxialTrackMerger.h>
+
 #include <framework/core/Module.h>
 
 namespace Belle2 {
@@ -77,7 +79,9 @@ namespace Belle2 {
 
     /// Write the objects to the store array.
     void outputObjects(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks);
+
+  private: // findlets
+    /// Findlet to merge the tracks after the legendre finder.
+    TrackFindingCDC::AxialTrackMerger m_axialTrackMerger;
   };
 }
-
-

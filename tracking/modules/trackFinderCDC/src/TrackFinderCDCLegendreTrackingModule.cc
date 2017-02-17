@@ -43,11 +43,6 @@ TrackFinderCDCLegendreTrackingModule::TrackFinderCDCLegendreTrackingModule() :
            "Maximal level of recursive calling of FastHough algorithm",
            12);
 
-  addParam("doEarlyMerging",
-           m_param_doEarlyMerging,
-           "Set whether merging of track should be performed after each pass candidate finding; has impact on CPU time",
-           false);
-
   addParam("TracksStoreObjName",
            m_param_tracksStoreObjName,
            "Name of the output StoreObjPtr of the tracks generated within this module.",
@@ -119,11 +114,6 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
 
     // Assign new hits to the tracks
     TrackProcessor::assignNewHits(m_allAxialWireHits, m_tracks);
-
-    // Try to merge tracks
-    if (m_param_doEarlyMerging) {
-      TrackMerger::doTracksMerging(m_tracks, m_allAxialWireHits);
-    }
 
     nCandsAdded = m_tracks.size() - nCandsAdded;
 

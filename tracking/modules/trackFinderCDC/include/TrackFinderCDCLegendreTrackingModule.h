@@ -49,9 +49,6 @@ namespace Belle2 {
     /// Maximum Level of FastHough Algorithm.
     int m_param_maxLevel;
 
-    /// Defines whether early track merging will be performed.
-    bool m_param_doEarlyMerging;
-
     /// Parameter: Name of the output StoreObjPtr of the tracks generated within this module.
     std::string m_param_tracksStoreObjName = "CDCTrackVector";
 

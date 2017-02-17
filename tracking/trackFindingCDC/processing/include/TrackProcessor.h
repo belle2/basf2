@@ -29,9 +29,6 @@ namespace Belle2 {
       /// Perform all track postprocessing - return whether the track is considered good after the postprocessing
       static bool postprocessTrack(CDCTrack& track, const std::vector<const CDCWireHit*>& allAxialWireHits);
 
-      /// Assign new hits to all tracks (using the assignNewHitsToTrack(CDCTrack&) method of the HitsProcessor).
-      static void assignNewHits(const std::vector<const CDCWireHit*>& allWireHits, std::vector<CDCTrack>& axialTracks);
-
       /// Finalize the tracks after the legendre track finder is done - includes a merging step of found tracks
       static void mergeAndFinalizeTracks(std::vector<CDCTrack>& axialTracks,
                                          const std::vector<const CDCWireHit*>& allWireHits);

@@ -93,30 +93,6 @@ bool TrackProcessor::checkTrackQuality(const CDCTrack& track)
   return not(track.size() < 5);
 }
 
-void TrackProcessor::assignNewHits(const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                   std::vector<CDCTrack>& axialTracks)
-{
-  // First release some hits
-  for (CDCTrack& track : axialTracks) {
-    HitProcessor::deleteHitsFarAwayFromTrajectory(track);
-    TrackQualityTools::normalizeTrack(track);
-  }
-
-  // Now add new ones
-  for (CDCTrack& track : axialTracks) {
-    if (track.size() < 5) continue;
-    HitProcessor::assignNewHitsToTrack(track, allAxialWireHits);
-    TrackQualityTools::normalizeTrack(track);
-
-    HitProcessor::splitBack2BackTrack(track);
-    TrackQualityTools::normalizeTrack(track);
-  }
-
-  for (CDCTrack& track : axialTracks) {
-    track.forwardTakenFlag();
-  }
-}
-
 void TrackProcessor::mergeAndFinalizeTracks(std::vector<CDCTrack>& axialTracks,
                                             const std::vector<const CDCWireHit*>& allAxialWireHits)
 {
@@ -139,9 +115,6 @@ void TrackProcessor::mergeAndFinalizeTracks(std::vector<CDCTrack>& axialTracks,
 
   // Perform tracks merging
   TrackMerger::doTracksMerging(axialTracks, allAxialWireHits);
-
-  // Assign new hits
-  TrackProcessor::assignNewHits(allAxialWireHits, axialTracks);
 }
 
 void TrackProcessor::deleteTracksWithLowFitProbability(std::vector<CDCTrack>& axialTracks,

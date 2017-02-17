@@ -92,70 +92,66 @@ namespace Belle2 {
        */
       bool insertItemInNode(QuadTree* node, CDCConformalHit* hit) const override final
       {
-        using Quadlet = std::array< std::array<float, 2>, 2>;
-        Quadlet dist_1;
-        Quadlet dist_2;
+        const CDCWireHit* wireHit = hit->getWireHit();
+        const double& l = wireHit->getRefDriftLength();
+        const Vector2D& pos2D = wireHit->getRefPos2D();
+        double r2 = square(wireHit->getRefCylindricalR()) - l * l;
 
-        TrigonometricalLookupTable<>& trigonometricalLookupTable = TrigonometricalLookupTable<>::Instance();
+        using Quadlet = std::array< std::array<float, 2>, 2>;
+        Quadlet distRight{};
+        Quadlet distLeft{};
+
+        // get top and bottom borders of the node
+        float rMin = node->getYMin() * r2 / 2;
+        float rMax = node->getYMax() * r2 / 2;
 
         // get left and right borders of the node
         unsigned long thetaMin = node->getXMin();
         unsigned long thetaMax = node->getXMax();
 
-        // get top and bottom borders of the node
-        float rMin = node->getYMin();
-        float rMax = node->getYMax();
+        TrigonometricalLookupTable<>& trigonometricalLookupTable = TrigonometricalLookupTable<>::Instance();
+        const Vector2D& thetaVecMin = trigonometricalLookupTable.thetaVec(thetaMin);
+        const Vector2D& thetaVecMax = trigonometricalLookupTable.thetaVec(thetaMax);
 
-        Vector2D thetaVecMin = trigonometricalLookupTable.thetaVec(thetaMin);
-        Vector2D thetaVecMax = trigonometricalLookupTable.thetaVec(thetaMax);
-
-        float rHitMin = thetaVecMin.dot(hit->getConformalPos2D());
-        float rHitMax = thetaVecMax.dot(hit->getConformalPos2D());
+        float rHitMin = thetaVecMin.dot(pos2D);
+        float rHitMax = thetaVecMax.dot(pos2D);
 
         // compute sinograms at the left and right borders of the node
-        float rHitMin1 = rHitMin - hit->getConformalDriftLength();
-        float rHitMin2 = rHitMin + hit->getConformalDriftLength();
-        float rHitMax1 = rHitMax - hit->getConformalDriftLength();
-        float rHitMax2 = rHitMax + hit->getConformalDriftLength();
+        float rHitMinRight = rHitMin - l;
+        float rHitMaxRight = rHitMax - l;
 
-        //compute distance from the sinograms to bottom and top borders of the node
+        float rHitMinLeft = rHitMin + l;
+        float rHitMaxLeft = rHitMax + l;
 
-        // this has some explicit cppcheck suppressions to silence false-positives about
-        // array bounds
-        dist_1[0][0] = rMin - rHitMin1;
-        // cppcheck-suppress arrayIndexOutOfBounds
-        dist_1[0][1] = rMin - rHitMax1;
-        // cppcheck-suppress arrayIndexOutOfBounds
-        dist_1[1][0] = rMax - rHitMin1;
-        // cppcheck-suppress arrayIndexOutOfBounds
-        dist_1[1][1] = rMax - rHitMax1;
+        // Compute distance from the sinograms to bottom and top borders of the node
+        distRight[0][0] = rMin - rHitMinRight;
+        distRight[0][1] = rMin - rHitMaxRight;
+        distRight[1][0] = rMax - rHitMinRight;
+        distRight[1][1] = rMax - rHitMaxRight;
 
-        dist_2[0][0] = rMin - rHitMin2;
-        // cppcheck-suppress arrayIndexOutOfBounds
-        dist_2[0][1] = rMin - rHitMax2;
-        // cppcheck-suppress arrayIndexOutOfBounds
-        dist_2[1][0] = rMax - rHitMin2;
-        // cppcheck-suppress arrayIndexOutOfBounds
-        dist_2[1][1] = rMax - rHitMax2;
+        distLeft[0][0] = rMin - rHitMinLeft;
+        distLeft[0][1] = rMin - rHitMaxLeft;
+        distLeft[1][0] = rMax - rHitMinLeft;
+        distLeft[1][1] = rMax - rHitMaxLeft;
 
-        bool valueToReturn(false);
-
-        // compare distances from sinograms to the node -- basing on this information we check for the affiliation of the hit to the node
-        // cppcheck-suppress arrayIndexOutOfBounds
-        if (! sameSign(dist_1[0][0], dist_1[0][1], dist_1[1][0], dist_1[1][1])) {
-          valueToReturn = true;
-        }
-        // cppcheck-suppress arrayIndexOutOfBounds
-        else if (! sameSign(dist_2[0][0], dist_2[0][1], dist_2[1][0], dist_2[1][1])) {
-          valueToReturn = true;
-        } else {
-
-          float rHitMinExtr = thetaVecMin.cross(hit->getConformalPos2D());
-          float rHitMaxExtr = thetaVecMax.cross(hit->getConformalPos2D());
-          if (rHitMinExtr * rHitMaxExtr < 0.) valueToReturn = checkExtremum(node, hit);
+        // Compare distance signes from sinograms to the node
+        // Check right
+        if (not sameSign(distRight[0][0], distRight[0][1], distRight[1][0], distRight[1][1])) {
+          return true;
         }
 
-        return valueToReturn;
+        // Check left
+        if (not sameSign(distLeft[0][0], distLeft[0][1], distLeft[1][0], distLeft[1][1])) {
+          return true;
+        }
+
+        // Check the extremum
+        float rHitMinExtr = thetaVecMin.cross(pos2D);
+        float rHitMaxExtr = thetaVecMax.cross(pos2D);
+        if (rHitMinExtr * rHitMaxExtr < 0.) return checkExtremum(node, hit);
+
+        // Not contained
+        return false;
       }
 
       /**
@@ -385,18 +381,23 @@ namespace Belle2 {
        */
       bool checkDerivative(QuadTree* node, CDCConformalHit* hit) const
       {
+        const CDCWireHit* wireHit = hit->getWireHit();
+        const Vector2D& pos2D = wireHit->getRefPos2D();
+
+        unsigned long thetaMin = node->getXMin();
+        unsigned long thetaMax = node->getXMax();
+
         TrigonometricalLookupTable<>& trigonometricalLookupTable = TrigonometricalLookupTable<>::Instance();
+        const Vector2D& thetaVecMin = trigonometricalLookupTable.thetaVec(thetaMin);
+        const Vector2D& thetaVecMax = trigonometricalLookupTable.thetaVec(thetaMax);
 
+        float rMinD = thetaVecMin.cross(pos2D);
+        float rMaxD = thetaVecMax.cross(pos2D);
 
-        float rMinD = trigonometricalLookupTable.thetaVec(node->getXMin()).cross(hit->getConformalPos2D());
-        float rMaxD = trigonometricalLookupTable.thetaVec(node->getXMax()).cross(hit->getConformalPos2D());
-
-        // float rMean = node->getYMean();
+        // Does not really make sense...
         if ((rMinD > 0) && (rMaxD * rMinD >= 0)) return true;
         if ((rMaxD * rMinD < 0)) return true;
         return false;
-
-
       }
 
       /**
@@ -407,27 +408,34 @@ namespace Belle2 {
        */
       bool checkExtremum(QuadTree* node, CDCConformalHit* hit) const
       {
+        const CDCWireHit* wireHit = hit->getWireHit();
+        const double& l = wireHit->getRefDriftLength();
+        const Vector2D& pos2D = wireHit->getRefPos2D();
+        double r2 = square(wireHit->getRefCylindricalR()) - l * l;
 
-        double thetaExtremum = hit->getConformalPos2D().phi();
-
-        double pi = boost::math::constants::pi<double>();
-
-        //        if (thetaExtremum > pi) thetaExtremum -= pi;
-        //        if (thetaExtremum < 0.) thetaExtremum += pi;
+        // get left and right borders of the node
+        unsigned long thetaMin = node->getXMin();
+        unsigned long thetaMax = node->getXMax();
 
         TrigonometricalLookupTable<>& trigonometricalLookupTable = TrigonometricalLookupTable<>::Instance();
+        const Vector2D& thetaVecMin = trigonometricalLookupTable.thetaVec(thetaMin);
+        const Vector2D& thetaVecMax = trigonometricalLookupTable.thetaVec(thetaMax);
 
-        unsigned long thetaExtremumLookup = (thetaExtremum + pi) * trigonometricalLookupTable.getNBinsTheta() / (2.*pi) ;
+        if (not pos2D.isBetween(thetaVecMin, thetaVecMax)) return false;
 
-        if ((thetaExtremumLookup > node->getXMax()) || (thetaExtremumLookup < node->getXMin())) return false;
+        // compute sinograms at the position
+        double r = wireHit->getRefCylindricalR();
+        float rRight = r - l;
+        float rLeft = r + l;
 
-        Vector2D thetaVec = trigonometricalLookupTable.thetaVec(thetaExtremumLookup);
-        double rD = thetaVec.dot(hit->getConformalPos2D());
-        if ((rD > node->getYMin()) && (rD < node->getYMax())) return true;
+        // get top and bottom borders of the node
+        float rMin = node->getYMin() * r2 / 2;
+        float rMax = node->getYMax() * r2 / 2;
 
-        return false;
+        bool crossesRight = (rMin - rRight) * (rMax - rRight) < 0;
+        bool crossesLeft = (rMin - rLeft) * (rMax - rLeft) < 0;
+        return crossesRight or crossesLeft;
       }
-
     };
 
   }

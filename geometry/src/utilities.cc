@@ -251,5 +251,60 @@ namespace Belle2 {
       double dPhi   = params.getAngle("maxPhi", 2 * M_PI) - minPhi;
       return new G4Polycone(name, minPhi, dPhi, nPlanes, &z.front(), &rMin.front(), &rMax.front());
     }
+
+    G4Polycone* createRotationSolid(const std::string& name,
+                                    std::list< std::pair<double, double> > innerPoints,
+                                    std::list< std::pair<double, double> > outerPoints,
+                                    double minPhi, double maxPhi, double& minZ, double& maxZ)
+    {
+      //Subdivide the segments to have an x position for each z specified for
+      //either inner or outer boundary
+      subdivideSegments(innerPoints, outerPoints);
+      subdivideSegments(outerPoints, innerPoints);
+      minZ = innerPoints.front().first;
+      maxZ = outerPoints.front().first;
+
+      //Now we create the array of planes needed for the polycone
+      vector<double> z;
+      vector<double> rMin;
+      vector<double> rMax;
+
+      double innerZ{0};
+      double innerX{0};
+      double outerZ{0};
+      double outerX{0};
+      //We go through both lists until both are empty
+      while (!(innerPoints.empty() && outerPoints.empty())) {
+        bool popInner = false;
+        //We could have more than one point at the same z position for segments
+        //going directly along x. because of that we check that the z
+        //coordinates for inner and outer line are always the same, reusing one
+        //point if neccessary
+        if (!innerPoints.empty() && innerPoints.front().first <= outerPoints.front().first) {
+          boost::tie(innerZ, innerX) = innerPoints.front();
+          popInner = true;
+        }
+        if (!outerPoints.empty() && outerPoints.front().first <= innerPoints.front().first) {
+          boost::tie(outerZ, outerX) = outerPoints.front();
+          outerPoints.pop_front();
+        }
+        if (popInner) innerPoints.pop_front();
+        if (innerZ != outerZ) {
+          B2ERROR("createRotationSolid: Something is wrong, z values should be identical");
+          return 0;
+        }
+        z.push_back(innerZ / Unit::mm);
+        rMin.push_back(innerX / Unit::mm);
+        rMax.push_back(outerX / Unit::mm);
+      }
+
+      //Finally create the Polycone
+      int nPlanes = z.size();
+      double dPhi = maxPhi - minPhi;
+      return new G4Polycone(name, minPhi, dPhi, nPlanes, &z.front(), &rMin.front(), &rMax.front());
+
+    }
+
+
   }
 } //Belle2 namespace

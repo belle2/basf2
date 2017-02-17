@@ -108,14 +108,13 @@ namespace Belle2 {
 
       // Charged tracks -> Pion
       //
-      std::vector<const Track*> roeTracks = roe->getTracks(maskName);   // ADD
-//      std::vector<const Track*> roeTracks = roe->getTracks();
+      std::vector<const Track*> roeTracks = roe->getTracks(maskName);
 
       const Const::ChargedStable charged = Const::pion;
 
-      for (int i = 0; i < roe->getNTracks(); i++) {
-
-        const Track* track = roeTracks[i];
+      for (const Track* track : roeTracks) {
+//      for (int i = 0; i < roe->getNTracks(); i++) {
+//        const Track* track = roeTracks[i];
 
         // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
         // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc

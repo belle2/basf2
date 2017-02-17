@@ -109,7 +109,7 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
     applyPass(quadTreePassCounter.getPass());
 
     // Assign new hits to the tracks
-    TrackProcessor::assignNewHits(m_allAxialWireHits, m_tracks);
+    m_axialTrackHitMigrator.apply(m_allAxialWireHits, m_tracks);
 
     nCandsAdded = m_tracks.size() - nCandsAdded;
 
@@ -123,6 +123,8 @@ void TrackFinderCDCLegendreTrackingModule::findTracks()
   } while (quadTreePassCounter.getPass() != LegendreFindingPass::End);
 
   m_axialTrackMerger.apply(m_tracks, m_allAxialWireHits);
+
+  m_axialTrackHitMigrator.apply(m_allAxialWireHits, m_tracks);
 }
 
 void TrackFinderCDCLegendreTrackingModule::applyPass(LegendreFindingPass pass)

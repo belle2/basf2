@@ -11,6 +11,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/minimal/AxialTrackMerger.h>
+#include <tracking/trackFindingCDC/findlets/minimal/AxialTrackHitMigrator.h>
 
 #include <framework/core/Module.h>
 
@@ -78,6 +79,9 @@ namespace Belle2 {
     void outputObjects(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks);
 
   private: // findlets
+    /// Findlet to exchange hits between tracks based on their proximity to the respective trajectory
+    TrackFindingCDC::AxialTrackHitMigrator m_axialTrackHitMigrator;
+
     /// Findlet to merge the tracks after the legendre finder.
     TrackFindingCDC::AxialTrackMerger m_axialTrackMerger;
   };

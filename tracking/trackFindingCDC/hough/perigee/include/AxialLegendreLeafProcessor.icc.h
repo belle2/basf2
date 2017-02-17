@@ -155,31 +155,11 @@ namespace Belle2 {
 
       return hitsInPrecisionBox;
     }
-
-    template <class ANode>
-    void AxialLegendreLeafProcessor<ANode>::migrateHits()
-    {
-      TrackProcessor::assignNewHits(m_axialWireHits, m_tracks);
-    }
   }
 }
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    template <class ANode>
-    std::vector<const CDCWireHit*>
-    AxialLegendreLeafProcessor<ANode>::getUnusedWireHits()
-    {
-      std::vector<const CDCWireHit*> result;
-      for (const CDCWireHit* wireHit : m_axialWireHits) {
-        const AutomatonCell& automatonCell = wireHit->getAutomatonCell();
-        if (automatonCell.hasTakenFlag()) continue;
-        result.push_back(wireHit);
-      }
-      return result;
-    }
-
     template <class ANode>
     std::vector<typename AxialLegendreLeafProcessor<ANode>::Candidate>
     AxialLegendreLeafProcessor<ANode>::getCandidates() const

@@ -103,13 +103,7 @@ namespace Belle2 {
       std::vector<WithSharedMark<CDCRLWireHit> >
       searchRoad(const ANode& node, const CDCTrajectory2D& trajectory2D);
 
-      /// Intermediate step migrating hits between the tracks as the original legendre algorithm.
-      void migrateHits();
-
     public:
-      /// Getter for the axial hits that are not yet used.
-      std::vector<const CDCWireHit*> getUnusedWireHits();
-
       /// Getter for the candidates structure still used in some tests.
       std::vector<Candidate> getCandidates() const;
 
@@ -117,12 +111,6 @@ namespace Belle2 {
       const std::vector<CDCTrack>& getTracks() const
       {
         return m_tracks;
-      }
-
-      /// Forget the currently stored tracks
-      void clearTracks()
-      {
-        m_tracks.clear();
       }
 
       /// Clear the found candidates
@@ -133,9 +121,9 @@ namespace Belle2 {
       }
 
       /// Set the pool of all axial wire hits to be used in the postprocessing
-      void setAxialWireHits(const std::vector<const CDCWireHit*>& axialWireHits)
+      void setAxialWireHits(std::vector<const CDCWireHit*> axialWireHits)
       {
-        m_axialWireHits = axialWireHits;
+        m_axialWireHits = std::move(axialWireHits);
       }
 
     public:

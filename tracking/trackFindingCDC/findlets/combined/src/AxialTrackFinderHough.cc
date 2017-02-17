@@ -7,37 +7,25 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/findlets/combined/AxialTrackFinderLegendre.h>
-
-#include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.h>
-#include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.icc.h>
-#include <tracking/trackFindingCDC/hough/perigee/StandardBinSpec.h>
+#include <tracking/trackFindingCDC/findlets/combined/AxialTrackFinderHough.h>
 
 #include <tracking/trackFindingCDC/processing/TrackProcessor.h>
-#include <tracking/trackFindingCDC/processing/TrackMerger.h>
-#include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
-#include <tracking/trackFindingCDC/processing/HitProcessor.h>
-
-#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
-#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-AxialTrackFinderLegendre::AxialTrackFinderLegendre()
+AxialTrackFinderHough::AxialTrackFinderHough()
   : Super()
 {
-  addProcessingSignalListener(&m_fineLegendreSearch);
-  addProcessingSignalListener(&m_roughLegendreSearch);
+  addProcessingSignalListener(&m_fineHoughSearch);
+  addProcessingSignalListener(&m_roughHoughSearch);
   addProcessingSignalListener(&m_axialTrackMerger);
 
   // Set default parameters of the hough spaces
@@ -71,21 +59,21 @@ AxialTrackFinderLegendre::AxialTrackFinderLegendre()
                                                               .setDefaultValue(getDefaultRoughRelaxationSchedule());
 }
 
-std::string AxialTrackFinderLegendre::getDescription()
+std::string AxialTrackFinderHough::getDescription()
 {
   return "Generates axial tracks from hits using several increasingly relaxed hough space search over phi0 and curvature.";
 }
 
-void AxialTrackFinderLegendre::exposeParameters(ModuleParamList* moduleParamList,
-                                                const std::string& prefix)
+void AxialTrackFinderHough::exposeParameters(ModuleParamList* moduleParamList,
+                                             const std::string& prefix)
 {
-  m_fineLegendreSearch.exposeParameters(moduleParamList, prefixed("fine", prefix));
-  m_roughLegendreSearch.exposeParameters(moduleParamList, prefixed("rough", prefix));
+  m_fineHoughSearch.exposeParameters(moduleParamList, prefixed("fine", prefix));
+  m_roughHoughSearch.exposeParameters(moduleParamList, prefixed("rough", prefix));
   m_axialTrackMerger.exposeParameters(moduleParamList, prefixed("merge", prefix));
 }
 
-void AxialTrackFinderLegendre::apply(const std::vector<CDCWireHit>& wireHits,
-                                     std::vector<CDCTrack>& tracks)
+void AxialTrackFinderHough::apply(const std::vector<CDCWireHit>& wireHits,
+                                  std::vector<CDCTrack>& tracks)
 {
   // Acquire the axial hits
   std::vector<const CDCWireHit*> axialWireHits;
@@ -98,14 +86,14 @@ void AxialTrackFinderLegendre::apply(const std::vector<CDCWireHit>& wireHits,
     axialWireHits.emplace_back(&wireHit);
   }
 
-  // Fine legendre search
-  m_fineLegendreSearch.apply(axialWireHits, tracks);
+  // Fine hough search
+  m_fineHoughSearch.apply(axialWireHits, tracks);
 
   // One step of migrating hits between the already found tracks
   TrackProcessor::assignNewHits(axialWireHits, tracks);
 
-  // Rough legendre search
-  m_roughLegendreSearch.apply(axialWireHits, tracks);
+  // Rough hough search
+  m_roughHoughSearch.apply(axialWireHits, tracks);
 
   // One step of migrating hits between the already found tracks
   TrackProcessor::assignNewHits(axialWireHits, tracks);
@@ -115,10 +103,10 @@ void AxialTrackFinderLegendre::apply(const std::vector<CDCWireHit>& wireHits,
 }
 
 std::vector<ParameterVariantMap>
-AxialTrackFinderLegendre::getDefaultFineRelaxationSchedule() const
+AxialTrackFinderHough::getDefaultFineRelaxationSchedule() const
 {
   std::vector<ParameterVariantMap> result;
-  // Relaxation schedule of the original legendre implemenation
+  // Relaxation schedule of the original hough implemenation
   // Augmented by the road search parameters
   // Note: distinction between integer and double literals is essential
   // For the record: the setting seem a bit non-sensical, but work kind of well, experimentation needed.
@@ -196,7 +184,7 @@ AxialTrackFinderLegendre::getDefaultFineRelaxationSchedule() const
 }
 
 std::vector<ParameterVariantMap>
-AxialTrackFinderLegendre::getDefaultRoughRelaxationSchedule() const
+AxialTrackFinderHough::getDefaultRoughRelaxationSchedule() const
 {
   std::vector<ParameterVariantMap> result;
 

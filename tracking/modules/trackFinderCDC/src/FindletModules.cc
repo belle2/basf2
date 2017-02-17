@@ -43,6 +43,6 @@ REG_MODULE(TrackRejecter);
 REG_MODULE(TrackExporter);
 
 REG_MODULE(SegmentFinderFacetAutomaton);
-REG_MODULE(AxialTrackFinderLegendre);
+REG_MODULE(AxialTrackFinderHough);
 REG_MODULE(TrackFinderSegmentPairAutomaton);
 REG_MODULE(TrackFinderSegmentTripleAutomaton);

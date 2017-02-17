@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorHitLegendre.h>
+#include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorHitHough.h>
 
 #include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.h>
 #include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.icc.h>
@@ -57,13 +57,13 @@ namespace {
 }
 #endif
 
-std::string AxialTrackCreatorHitLegendre::getDescription()
+std::string AxialTrackCreatorHitHough::getDescription()
 {
   return "Generates axial tracks from hits using several increasingly relaxed hough space search over phi0 and curvature.";
 }
 
-void AxialTrackCreatorHitLegendre::exposeParameters(ModuleParamList* moduleParamList,
-                                                    const std::string& prefix)
+void AxialTrackCreatorHitHough::exposeParameters(ModuleParamList* moduleParamList,
+                                                 const std::string& prefix)
 {
   // Parameters for the hough space
   moduleParamList->addParameter(prefixed(prefix, "granularityLevel"),
@@ -112,7 +112,7 @@ void AxialTrackCreatorHitLegendre::exposeParameters(ModuleParamList* moduleParam
 
 }
 
-void AxialTrackCreatorHitLegendre::initialize()
+void AxialTrackCreatorHitHough::initialize()
 {
   Super::initialize();
 
@@ -149,8 +149,8 @@ void AxialTrackCreatorHitLegendre::initialize()
   m_houghTree->initialize();
 }
 
-void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& axialWireHits,
-                                         std::vector<CDCTrack>& tracks)
+void AxialTrackCreatorHitHough::apply(const std::vector<const CDCWireHit*>& axialWireHits,
+                                      std::vector<CDCTrack>& tracks)
 {
   // Reset the mask flag and select only the untaken hits
   std::vector<const CDCWireHit*> unusedAxialWireHits;
@@ -183,14 +183,14 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& a
   tracks.insert(tracks.end(), foundTracks.begin(), foundTracks.end());
 }
 
-void AxialTrackCreatorHitLegendre::terminate()
+void AxialTrackCreatorHitHough::terminate()
 {
   m_houghTree->raze();
   m_houghTree.reset();
   Super::terminate();
 }
 
-std::vector<float> AxialTrackCreatorHitLegendre::getDefaultCurvBounds(std::array<float, 2> curvSpan, int granularityLevel)
+std::vector<float> AxialTrackCreatorHitHough::getDefaultCurvBounds(std::array<float, 2> curvSpan, int granularityLevel)
 {
   using BinSpan = std::array<double, 2>;
   using BinSpans = std::vector<BinSpan>;

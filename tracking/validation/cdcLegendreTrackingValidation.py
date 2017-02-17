@@ -34,7 +34,7 @@ class CDCLegendre(TrackingValidationRun):
         if use_legendre_finder:
             path.add_module('TrackFinderCDCLegendreTracking')
         else:
-            path.add_module('AxialTrackCreatorHitLegendre')
+            path.add_module('AxialTrackCreatorHitHough')
 
         path.add_module('TrackExporter')
 

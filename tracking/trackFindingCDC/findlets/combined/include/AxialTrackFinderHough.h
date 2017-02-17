@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/AxialTrackMerger.h>
-#include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorHitLegendre.h>
+#include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorHitHough.h>
 
 #include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
 
@@ -26,8 +26,8 @@ namespace Belle2 {
     class CDCWireHit;
     class CDCTrack;
 
-    /// Generates axial tracks from hit using the special leaf processing inspired by the legendre algorithm.
-    class AxialTrackFinderLegendre : public Findlet<const CDCWireHit, CDCTrack> {
+    /// Generates axial tracks from hit using the special leaf processing inspired by the hough algorithm.
+    class AxialTrackFinderHough : public Findlet<const CDCWireHit, CDCTrack> {
 
     private:
       /// Type of the base class
@@ -35,7 +35,7 @@ namespace Belle2 {
 
     public:
       /// Constructor
-      AxialTrackFinderLegendre();
+      AxialTrackFinderHough();
 
       /// Short description of the findlet
       std::string getDescription() final;
@@ -58,13 +58,13 @@ namespace Belle2 {
       const double m_maxCurvAcceptance = 0.13;
 
     private: // findlets
-      /// First legendre search over a fine hough grid
-      AxialTrackCreatorHitLegendre m_fineLegendreSearch;
+      /// First hough search over a fine hough grid
+      AxialTrackCreatorHitHough m_fineHoughSearch;
 
-      /// Second legendre search over a fine hough grid
-      AxialTrackCreatorHitLegendre m_roughLegendreSearch;
+      /// Second hough search over a fine hough grid
+      AxialTrackCreatorHitHough m_roughHoughSearch;
 
-      /// Findlet to merge the tracks after the legendre finder.
+      /// Findlet to merge the tracks after the hough finder.
       AxialTrackMerger m_axialTrackMerger;
     };
   }

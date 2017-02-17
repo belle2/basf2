@@ -60,8 +60,8 @@ main.add_module(unpack)
 # TOP's data quality module
 histomanager = register_module("HistoManager")
 main.add_module(histomanager)
-dqm = register_module('TOPDataQualityPlotter')
-main.add_module(dqm)
+wfqp = register_module('TOPWaveformQualityPlotter')
+main.add_module(wfqp)
 
 # Print progress
 progress = register_module('Progress')

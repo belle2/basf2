@@ -1,6 +1,5 @@
 #include <framework/core/HistoModule.h>
-#include <top/modules/TOPDataQualityPlotter/TOPDataQualityPlotterModule.h>
-//#include <top/modules/TOPDataQualityPlotterModule.h>
+#include <top/modules/TOPWaveformQualityPlotter/TOPWaveformQualityPlotterModule.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/pcore/RbTuple.h>
 
@@ -13,9 +12,9 @@
 using namespace Belle2;
 using namespace std;
 
-REG_MODULE(TOPDataQualityPlotter)
+REG_MODULE(TOPWaveformQualityPlotter)
 
-TOPDataQualityPlotterModule::TOPDataQualityPlotterModule()
+TOPWaveformQualityPlotterModule::TOPWaveformQualityPlotterModule()
   : HistoModule()
   , m_iEvent(0)
 {
@@ -25,7 +24,7 @@ TOPDataQualityPlotterModule::TOPDataQualityPlotterModule()
 }
 
 
-void TOPDataQualityPlotterModule::defineHisto()
+void TOPWaveformQualityPlotterModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
   m_directory = oldDir->mkdir(m_histogramDirectoryName.c_str());
@@ -38,7 +37,6 @@ void TOPDataQualityPlotterModule::defineHisto()
   m_carrier = new TH1F("carrier", "asic col", 4, 0, 4);
   m_asic_ch = new TH1F("asicCh", "channel", 8, 0, 8);
   m_errorFlag = new TH1F("errorFlag", "errorFlag", 1000, 0, 1000);
-  m_flag = new TH1F("flag", "parser flag", 4, 0, 4);
   m_asic_win = new TH1F("window", "window", 4, 0, 4);
   m_entries = new TH1F("entries", "entries", 100, 0, 2600);
   m_moduleID = new TH1F("moduleID", "moduleID", 16, 1, 17);
@@ -47,7 +45,7 @@ void TOPDataQualityPlotterModule::defineHisto()
 }
 
 
-void TOPDataQualityPlotterModule::initialize()
+void TOPWaveformQualityPlotterModule::initialize()
 {
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM;
@@ -56,14 +54,14 @@ void TOPDataQualityPlotterModule::initialize()
 }
 
 
-void TOPDataQualityPlotterModule::beginRun()
+void TOPWaveformQualityPlotterModule::beginRun()
 {
   m_DRAWWAVES = true;
   m_DEBUGGING = true;
   m_NOISE = false;
 }
 
-void TOPDataQualityPlotterModule::basicDebuggingPlots(TOPRawWaveform* rawwave)
+void TOPWaveformQualityPlotterModule::basicDebuggingPlots(TOPRawWaveform* rawwave)
 {
   const TOPRawWaveform& v = *rawwave;
   int scrodid = v.getScrodID();
@@ -94,7 +92,7 @@ void TOPDataQualityPlotterModule::basicDebuggingPlots(TOPRawWaveform* rawwave)
 }
 
 void
-TOPDataQualityPlotterModule::drawWaveforms(TOPRawWaveform* rawwave)
+TOPWaveformQualityPlotterModule::drawWaveforms(TOPRawWaveform* rawwave)
 {
   const TOPRawWaveform& v = *rawwave;
   vector<short> waveform = v.getWaveform();
@@ -129,7 +127,7 @@ TOPDataQualityPlotterModule::drawWaveforms(TOPRawWaveform* rawwave)
 }
 
 
-void TOPDataQualityPlotterModule::event()
+void TOPWaveformQualityPlotterModule::event()
 {
   if (not m_waveform) {
     return;
@@ -166,7 +164,7 @@ void TOPDataQualityPlotterModule::event()
   return;
 }
 
-void TOPDataQualityPlotterModule::endRun()
+void TOPWaveformQualityPlotterModule::endRun()
 {
   if (m_DRAWWAVES) {
     // Each waveform was stored in a TH1F
@@ -212,6 +210,6 @@ void TOPDataQualityPlotterModule::endRun()
   }
 }
 
-void TOPDataQualityPlotterModule::terminate()
+void TOPWaveformQualityPlotterModule::terminate()
 {
 }

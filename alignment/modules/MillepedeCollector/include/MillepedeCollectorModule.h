@@ -55,7 +55,7 @@ namespace Belle2 {
      *
      * @param particles vector of Belle2::Particles to be changed in vector of genfit::Tracks
      */
-    std::vector<genfit::Track*> getParticlesTracks(std::vector<Particle*> particles);
+    std::vector<genfit::Track*> getParticlesTracks(std::vector<Particle*> particles, bool addVertexPoint = true);
 
     /** Fit given RecoTrack with GBL
      *

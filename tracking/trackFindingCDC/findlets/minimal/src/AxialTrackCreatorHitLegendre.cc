@@ -152,8 +152,12 @@ void AxialTrackCreatorHitLegendre::initialize()
 void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& axialWireHits,
                                          std::vector<CDCTrack>& tracks)
 {
+  // Reset the mask flag and select only the untaken hits
+  std::vector<const CDCWireHit*> unusedAxialWireHits;
   for (const CDCWireHit* wireHit : axialWireHits) {
     (*wireHit)->setMaskedFlag(false);
+    if ((*wireHit)->hasTakenFlag()) continue;
+    unusedAxialWireHits.push_back(wireHit);
   }
 
   // Setup the level processor and obtain its parameter list to be set.
@@ -166,7 +170,7 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& a
   leafProcessor.exposeParameters(&moduleParamList, prefix);
 
   // Find tracks with increasingly relaxed conditions in the hough grid
-  m_houghTree->seed(leafProcessor.getUnusedWireHits());
+  m_houghTree->seed(std::move(unusedAxialWireHits));
   for (const ParameterVariantMap& passParameters : m_param_relaxationSchedule) {
     AssignParameterVisitor::update(&moduleParamList, passParameters);
     leafProcessor.beginWalk();

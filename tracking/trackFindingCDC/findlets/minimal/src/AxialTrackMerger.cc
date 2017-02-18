@@ -62,8 +62,8 @@ void AxialTrackMerger::apply(std::vector<CDCTrack>& axialTracks,
   // Perform tracks merging
   this->doTracksMerging(axialTracks, allAxialWireHits);
 
-  HitProcessor::resetMaskedHits(axialTracks, allAxialWireHits);
-  erase_remove_if(axialTracks, Size() == 0u);
+  // Remove the consumed, now empty tracks.
+  TrackProcessor::deleteShortTracks(axialTracks, 0);
 }
 
 void AxialTrackMerger::doTracksMerging(std::vector<CDCTrack>& axialTracks,

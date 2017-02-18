@@ -9,31 +9,46 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 
 #include <vector>
+#include <string>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  class ModuleParamList;
 
+  namespace TrackFindingCDC {
     class CDCTrack;
     class CDCWireHit;
     class CDCTrajectory2D;
 
-    /// Utility structure implementing functionality for the axial track merging used after the legendre tree search.
-    class TrackMerger {
-    public:
-      /// Static class only.
-      TrackMerger() = delete;
+    /// Findlet implementing the merging of axial tracks found in the legendre tree search
+    class AxialTrackMerger : public Findlet<CDCTrack&, const CDCWireHit* const> {
 
+    private:
+      /// Type of the base class
+      using Super = Findlet<CDCTrack&, const CDCWireHit* const>;
+
+    public:
+      /// Short description of the findlet
+      std::string getDescription() final;
+
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+
+      /// Merge tracks together. Allows for axial hits to be added as it may see fit.
+      void apply(std::vector<CDCTrack>& axialTracks, const std::vector<const CDCWireHit*>& axialWireHits) final;
+
+    private:
       /**
        *  The track finding often finds two curling tracks, originating from the same particle.
        *  This function merges them.
        */
-      static void doTracksMerging(std::vector<CDCTrack>& axialTracks,
-                                  const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                  double minimum_probability_to_be_merged = 0.85);
+      void doTracksMerging(std::vector<CDCTrack>& axialTracks,
+                           const std::vector<const CDCWireHit*>& allAxialWireHits);
 
     private:
       /**
@@ -58,7 +73,9 @@ namespace Belle2 {
        *
        *  @param factor gives a number how far the hit is allowed to be.
        */
-      static void removeStrangeHits(double factor, std::vector<const CDCWireHit*>& wireHits, CDCTrajectory2D& trajectory);
+      static void removeStrangeHits(double factor,
+                                    std::vector<const CDCWireHit*>& wireHits,
+                                    CDCTrajectory2D& trajectory);
 
       /**
        *  Function to merge two track candidates.
@@ -69,6 +86,10 @@ namespace Belle2 {
       static void mergeTracks(CDCTrack& track1,
                               CDCTrack& track2,
                               const std::vector<const CDCWireHit*>& allAxialWireHits);
+
+    private:
+      /// Parameter : Minimal fit probability of the common fit of two tracks to be eligible for merging
+      double m_param_minFitProb = 0.85;
     };
   }
 }

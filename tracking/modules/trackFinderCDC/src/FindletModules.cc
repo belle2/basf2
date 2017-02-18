@@ -24,7 +24,6 @@ REG_MODULE(SegmentRejecter);
 REG_MODULE(SegmentOrienter);
 REG_MODULE(SegmentCreatorMCTruth);
 
-REG_MODULE(AxialTrackCreatorHitLegendre);
 REG_MODULE(AxialTrackCreatorSegmentHough);
 REG_MODULE(AxialTrackCreatorMCTruth);
 
@@ -44,5 +43,6 @@ REG_MODULE(TrackRejecter);
 REG_MODULE(TrackExporter);
 
 REG_MODULE(SegmentFinderFacetAutomaton);
+REG_MODULE(AxialTrackFinderHough);
 REG_MODULE(TrackFinderSegmentPairAutomaton);
 REG_MODULE(TrackFinderSegmentTripleAutomaton);

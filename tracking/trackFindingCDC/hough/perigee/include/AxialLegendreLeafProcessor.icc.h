@@ -11,8 +11,7 @@
 #pragma once
 #include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.h>
 
-#include <tracking/trackFindingCDC/processing/TrackProcessor.h>
-#include <tracking/trackFindingCDC/processing/HitProcessor.h>
+#include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
 
 #include <tracking/trackFindingCDC/hough/perigee/StereoHitContained.h>
 #include <tracking/trackFindingCDC/hough/perigee/OffOrigin.h>
@@ -100,7 +99,7 @@ namespace Belle2 {
         foundWireHits.push_back(&rlWireHit.getWireHit());
       }
 
-      TrackProcessor::addCandidateFromHitsWithPostprocessing(foundWireHits, m_axialWireHits, m_tracks);
+      AxialTrackUtil::addCandidateFromHitsWithPostprocessing(foundWireHits, m_axialWireHits, m_tracks);
 
       // Sync up the marks with the used hits
       for (WithSharedMark<CDCRLWireHit>& markableRLWireHit : leaf->getTree()->getTopNode()) {
@@ -155,41 +154,11 @@ namespace Belle2 {
 
       return hitsInPrecisionBox;
     }
-
-    template <class ANode>
-    void AxialLegendreLeafProcessor<ANode>::migrateHits()
-    {
-      TrackProcessor::assignNewHits(m_axialWireHits, m_tracks);
-    }
-
-    template <class ANode>
-    void AxialLegendreLeafProcessor<ANode>::finalizeTracks()
-    {
-      TrackProcessor::mergeAndFinalizeTracks(m_tracks, m_axialWireHits);
-      HitProcessor::resetMaskedHits(m_tracks, m_axialWireHits);
-      erase_remove_if(m_tracks, Size() == 0u);
-    }
-
   }
 }
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    template <class ANode>
-    std::vector<const CDCWireHit*>
-    AxialLegendreLeafProcessor<ANode>::getUnusedWireHits()
-    {
-      HitProcessor::resetMaskedHits(m_tracks, m_axialWireHits);
-      std::vector<const CDCWireHit*> result;
-      for (const CDCWireHit* wireHit : m_axialWireHits) {
-        const AutomatonCell& automatonCell = wireHit->getAutomatonCell();
-        if (automatonCell.hasTakenFlag()) continue;
-        result.push_back(wireHit);
-      }
-      return result;
-    }
-
     template <class ANode>
     std::vector<typename AxialLegendreLeafProcessor<ANode>::Candidate>
     AxialLegendreLeafProcessor<ANode>::getCandidates() const
@@ -243,7 +212,7 @@ namespace Belle2 {
       moduleParamList->addParameter(prefixed(prefix, "curvResolution"),
                                     m_param_curvResolution,
                                     "The name of the resolution function to be used. "
-                                    "Valid values are 'none', 'basic', 'origin', 'nonOrigin'",
+                                    "Valid values are 'none', 'const', 'basic', 'origin', 'nonOrigin'",
                                     m_param_curvResolution);
     }
 
@@ -253,6 +222,8 @@ namespace Belle2 {
       // Setup the requested precision function
       if (m_param_curvResolution == "none") {
         m_curvResolution = [](double curv __attribute__((unused))) { return NAN; };
+      } else if (m_param_curvResolution == "const") {
+        m_curvResolution = [](double curv __attribute__((unused))) { return 0.0008; };
       } else if (m_param_curvResolution == "basic") {
         m_curvResolution = &PrecisionUtil::getBasicCurvPrecision;
       } else if (m_param_curvResolution == "origin") {

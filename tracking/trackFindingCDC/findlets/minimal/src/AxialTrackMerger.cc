@@ -7,26 +7,65 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/processing/TrackMerger.h>
+#include <tracking/trackFindingCDC/findlets/minimal/AxialTrackMerger.h>
 
-#include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
-#include <tracking/trackFindingCDC/processing/TrackProcessor.h>
-#include <tracking/trackFindingCDC/processing/HitProcessor.h>
+#include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/utilities/Functional.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void TrackMerger::doTracksMerging(std::vector<CDCTrack>& axialTracks,
-                                  const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                  double minimum_probability_to_be_merged)
+std::string AxialTrackMerger::getDescription()
+{
+  return "Merges axial tracks found in the legendre search";
+}
+
+void AxialTrackMerger::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  moduleParamList->addParameter(prefixed(prefix, "minFitProb"),
+                                m_param_minFitProb,
+                                "Minimal fit probability of the common fit "
+                                "of two tracks to be eligible for merging",
+                                m_param_minFitProb);
+}
+
+void AxialTrackMerger::apply(std::vector<CDCTrack>& axialTracks,
+                             const std::vector<const CDCWireHit*>& allAxialWireHits)
+{
+  // Check quality of the track basing on holes on the trajectory;
+  // if holes exist then track is splitted
+  for (CDCTrack& track : axialTracks) {
+    if (track.size() < 5) continue;
+    AxialTrackUtil::removeHitsAfterSuperLayerBreak(track);
+    AxialTrackUtil::normalizeTrack(track);
+  }
+
+  // Update tracks before storing to DataStore
+  for (CDCTrack& track : axialTracks) {
+    AxialTrackUtil::normalizeTrack(track);
+  }
+
+  // Remove bad tracks
+  AxialTrackUtil::deleteShortTracks(axialTracks);
+  AxialTrackUtil::deleteTracksWithLowFitProbability(axialTracks);
+
+  // Perform tracks merging
+  this->doTracksMerging(axialTracks, allAxialWireHits);
+
+  // Remove the consumed, now empty tracks.
+  AxialTrackUtil::deleteShortTracks(axialTracks, 0);
+}
+
+void AxialTrackMerger::doTracksMerging(std::vector<CDCTrack>& axialTracks,
+                                       const std::vector<const CDCWireHit*>& allAxialWireHits)
 {
   // Search for best matches - cannot use range for here :(.
   for (auto itTrack = axialTracks.begin(); itTrack !=  axialTracks.end(); ++itTrack) {
@@ -36,16 +75,16 @@ void TrackMerger::doTracksMerging(std::vector<CDCTrack>& axialTracks,
     WithWeight<MayBePtr<CDCTrack> > bestTrack = calculateBestTrackToMerge(track, followingTracks);
     double fitProb = bestTrack.getWeight();
 
-    if (bestTrack != nullptr and fitProb > minimum_probability_to_be_merged) {
+    if (bestTrack != nullptr and fitProb > m_param_minFitProb) {
       mergeTracks(track, *bestTrack, allAxialWireHits);
     }
   }
 
-  TrackProcessor::deleteShortTracks(axialTracks);
+  AxialTrackUtil::deleteShortTracks(axialTracks);
 }
 
 template <class ACDCTracks>
-WithWeight<MayBePtr<CDCTrack> > TrackMerger::calculateBestTrackToMerge(CDCTrack& track, ACDCTracks& tracks)
+WithWeight<MayBePtr<CDCTrack> > AxialTrackMerger::calculateBestTrackToMerge(CDCTrack& track, ACDCTracks& tracks)
 {
   std::vector<WithWeight<CDCTrack*>> weightedTracks;
   for (CDCTrack& track2 : tracks) {
@@ -63,7 +102,7 @@ WithWeight<MayBePtr<CDCTrack> > TrackMerger::calculateBestTrackToMerge(CDCTrack&
   else return *bestMatch;
 }
 
-double TrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
+double AxialTrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
 {
   // Build common hit list by copying the wire hits into one large list
   // We use the wire hits here as we do not want them to bring
@@ -111,7 +150,9 @@ double TrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
   return commonTrajectory2D.getPValue();
 }
 
-void TrackMerger::removeStrangeHits(double factor, std::vector<const CDCWireHit*>& wireHits, CDCTrajectory2D& trajectory2D)
+void AxialTrackMerger::removeStrangeHits(double factor,
+                                         std::vector<const CDCWireHit*>& wireHits,
+                                         CDCTrajectory2D& trajectory2D)
 {
   auto farFromTrajectory = [&trajectory2D, &factor](const CDCWireHit * wireHit) {
     Vector2D pos2D = wireHit->getRefPos2D();
@@ -122,9 +163,9 @@ void TrackMerger::removeStrangeHits(double factor, std::vector<const CDCWireHit*
   erase_remove_if(wireHits, farFromTrajectory);
 }
 
-void TrackMerger::mergeTracks(CDCTrack& track1,
-                              CDCTrack& track2,
-                              const std::vector<const CDCWireHit*>& allAxialWireHits)
+void AxialTrackMerger::mergeTracks(CDCTrack& track1,
+                                   CDCTrack& track2,
+                                   const std::vector<const CDCWireHit*>& allAxialWireHits)
 {
   if (&track1 == &track2) return;
 
@@ -135,19 +176,19 @@ void TrackMerger::mergeTracks(CDCTrack& track1,
   }
   track2.clear();
 
-  TrackQualityTools::normalizeTrack(track1);
+  AxialTrackUtil::normalizeTrack(track1);
 
-  track2 = CDCTrack(HitProcessor::splitBack2BackTrack(track1));
+  track2 = CDCTrack(AxialTrackUtil::splitBack2BackTrack(track1));
 
-  TrackQualityTools::normalizeTrack(track1);
+  AxialTrackUtil::normalizeTrack(track1);
 
   for (CDCRecoHit3D& recoHit3D : track2) {
     recoHit3D.setRecoPos3D({recoHit3D.getRefPos2D(), 0});
     recoHit3D.setRLInfo(ERightLeft::c_Unknown);
   }
 
-  TrackQualityTools::normalizeTrack(track2);
-  bool success = TrackProcessor::postprocessTrack(track2, allAxialWireHits);
+  AxialTrackUtil::normalizeTrack(track2);
+  bool success = AxialTrackUtil::postprocessTrack(track2, allAxialWireHits);
   if (not success) {
     for (const CDCRecoHit3D& recoHit3D : track2) {
       recoHit3D.getWireHit()->setTakenFlag(false);

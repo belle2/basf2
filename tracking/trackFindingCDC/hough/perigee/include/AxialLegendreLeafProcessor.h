@@ -70,7 +70,8 @@ namespace Belle2 {
       bool skip(const ANode* node)
       {
         bool tooLowWeight = not(node->getWeight() >= m_param_minWeight);
-        bool tooHighCurvature = static_cast<float>(node->template getLowerBound<DiscreteCurv>()) > m_param_maxCurv;
+        bool tooHighCurvature = (static_cast<float>(node->template getLowerBound<DiscreteCurv>()) > m_param_maxCurv or
+                                 - static_cast<float>(node->template getUpperBound<DiscreteCurv>()) > m_param_maxCurv);
         return tooLowWeight or tooHighCurvature;
       }
 
@@ -103,16 +104,7 @@ namespace Belle2 {
       std::vector<WithSharedMark<CDCRLWireHit> >
       searchRoad(const ANode& node, const CDCTrajectory2D& trajectory2D);
 
-      /// Intermediate step migrating hits between the tracks as the original legendre algorithm.
-      void migrateHits();
-
-      /// Finalize the tracks by some merging and additional postprocessing as the original legendre algorithm.
-      void finalizeTracks();
-
     public:
-      /// Getter for the axial hits that are not yet used.
-      std::vector<const CDCWireHit*> getUnusedWireHits();
-
       /// Getter for the candidates structure still used in some tests.
       std::vector<Candidate> getCandidates() const;
 
@@ -130,9 +122,9 @@ namespace Belle2 {
       }
 
       /// Set the pool of all axial wire hits to be used in the postprocessing
-      void setAxialWireHits(const std::vector<const CDCWireHit*>& axialWireHits)
+      void setAxialWireHits(std::vector<const CDCWireHit*> axialWireHits)
       {
-        m_axialWireHits = axialWireHits;
+        m_axialWireHits = std::move(axialWireHits);
       }
 
     public:
@@ -171,8 +163,8 @@ namespace Belle2 {
       /// Memory for the tree node level which should be the source of hits for the road searches. Defaults to the top most node.
       int m_param_roadLevel = 0;
 
-      /// Memory for the name of the resolution function to be used. Valid values are 'none', 'base', 'origin', 'offOrigin'
-      std::string m_param_curvResolution = "base";
+      /// Memory for the name of the resolution function to be used. Valid values are 'none', 'const', 'basic', 'origin', 'offOrigin'
+      std::string m_param_curvResolution = "const";
 
       /*
       /// Memory for the maximum allowed distance from track to hit

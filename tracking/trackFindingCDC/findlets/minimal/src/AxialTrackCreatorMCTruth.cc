@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackStore.h>
 #include <tracking/trackFindingCDC/mclookup/CDCSimHitLookUp.h>
 
-#include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
+#include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
@@ -188,7 +188,7 @@ void AxialTrackCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHit
 
   if (m_param_reconstructedPositions) {
     for (CDCTrack& track : outputAxialTracks) {
-      TrackQualityTools::normalizeTrack(track);
+      AxialTrackUtil::normalizeTrack(track);
     }
   }
 }

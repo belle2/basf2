@@ -25,13 +25,44 @@ namespace Belle2 {
     class Vector2D;
 
     /**
-     * Class performs hit assignment, reassignment and deletion of hits to the tracks
+     * Utility structure gathering heuristic functions used during the axial track finding
      */
-    class HitProcessor {
+    struct AxialTrackUtil {
 
     public:
+      /// Create CDCTrack using CDCWireHit hits and store it in the list. Then call the postprocessing on it.
+      static void addCandidateFromHitsWithPostprocessing(const std::vector<const CDCWireHit*>& foundAxialWireHits,
+                                                         const std::vector<const CDCWireHit*>& allAxialWireHits,
+                                                         std::vector<CDCTrack>& axialTracks);
+
+      /// Perform all track postprocessing - return whether the track is considered good after the postprocessing
+      static bool postprocessTrack(CDCTrack& track, const std::vector<const CDCWireHit*>& allAxialWireHits);
+
+    private:
+      /// Check track quality -- currently based on number of hits only.
+      static bool checkTrackQuality(const CDCTrack& track);
+
+    public:
+      /// Refit and resort the track. Unmask all hits.
+      static void normalizeTrack(CDCTrack& track);
+
       /** update given CDCRecoHit3D with given trajectory */
       static void updateRecoHit3D(const CDCTrajectory2D& trajectory2D, CDCRecoHit3D& hit);
+
+      /**
+       * Postprocessing: Delete axial hits that do not "match" to the given track.
+       * This is done by checking the distance between the hits and the trajectory, which should not exceed the
+       * maximum_distance parameter.
+       *
+       * As this function used the masked flag, all hits should have their masked flag set to false before calling
+       * this function.
+       */
+      static void deleteHitsFarAwayFromTrajectory(CDCTrack& track, double maximumDistance = 0.2);
+
+      /// Assign new hits to the track basing on the distance from the hit to the track.
+      static void assignNewHitsToTrack(CDCTrack& track,
+                                       const std::vector<const CDCWireHit*>& allAxialWireHits,
+                                       double minimalDistance = 0.2);
 
       /** Tries to split back-to-back tracks into two different tracks */
       static std::vector<CDCRecoHit3D> splitBack2BackTrack(CDCTrack& track);
@@ -56,31 +87,10 @@ namespace Belle2 {
        */
       static int getArmSignVote(const CDCTrack& track, const Vector2D& center);
 
-      /// Reset all masked hits.
-      static void resetMaskedHits(std::vector<CDCTrack>& axialTracks, std::vector<const CDCWireHit*>& wireHits);
-
-      /// Unset the MASKED flag and set the TAKEN flag of all hits but do not touch the track flags.
-      static void unmaskHitsInTrack(CDCTrack& track);
-
-      /**
-       * Postprocessing: Delete axial hits that do not "match" to the given track.
-       * This is done by checking the distance between the hits and the trajectory, which should not exceed the
-       * maximum_distance parameter.
-       *
-       * As this function used the masked flag, all hits should have their masked flag set to false before calling
-       * this function.
-       */
-      static void deleteHitsFarAwayFromTrajectory(CDCTrack& track, double maximumDistance = 0.2);
-
-      /// Assign new hits to the track basing on the distance from the hit to the track.
-      static void assignNewHitsToTrack(CDCTrack& track,
-                                       const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                       double minimalDistance = 0.2);
 
       /// Searches for a break in the super layer chain and remove all hits that come after that
       static void removeHitsAfterSuperLayerBreak(CDCTrack& track);
 
-    private:
       /**
        *  Calculate whether the hits is to the right or to the left
        *  relative to the line from origin to the given center.
@@ -92,6 +102,15 @@ namespace Belle2 {
        */
       static ESign getArmSign(const CDCRecoHit3D& hit, const Vector2D& center);
 
+    public:
+      /// Check an (improper) p-values of the tracks. If they are below the given value, delete the track from the list.
+      static void deleteTracksWithLowFitProbability(std::vector<CDCTrack>& axialTracks,
+                                                    double minimal_probability_for_good_fit = 0.4);
+
+      /// Remove tracks that are shorter than the given number of hits.
+      static void deleteShortTracks(std::vector<CDCTrack>& axialTracks, double minimal_size = 5);
+
+    private:
       /** Helper function getting the empty axial! super layers that appear in the chain of super layers that is supposed to be occupied*/
       static std::vector<ISuperLayer> getSLayerHoles(const std::array<int, ISuperLayerUtil::c_N>& nHitsBySLayer);  // return 0;
 

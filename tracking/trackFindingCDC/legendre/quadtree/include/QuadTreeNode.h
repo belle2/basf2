@@ -73,31 +73,31 @@ namespace Belle2 {
       void insertItem(AItem* item)
       {
         m_items.push_back(item);
-      };
+      }
 
       /** Reserve memory for holding items */
       void reserveItems(int nItems)
       {
         m_items.reserve(nItems);
-      };
+      }
 
       /** Get items from node */
       std::vector<AItem*>& getItems()
       {
         return m_items;
-      };
+      }
 
       /** Check if the node passes threshold on number of hits */
       size_t getNItems() const
       {
         return m_items.size();
-      };
+      }
 
       /** Clear items which the node holds */
       void clearItems()
       {
         m_items.clear();
-      };
+      }
 
       /** Create vector with children of current node */
       void createChildren()
@@ -109,7 +109,7 @@ namespace Belle2 {
       Children* getChildren() const
       {
         return m_children.get();
-      };
+      }
 
       /**
        *  Clear items which the node holds and destroy all children below this node.
@@ -123,31 +123,31 @@ namespace Belle2 {
         // automatically removes all underlying objects
         m_children.reset(nullptr);
         m_filled = false;
-      };
+      }
 
       /** Returns level of the node in tree (i.e., how much ancestors the node has) */
       unsigned char getLevel() const
       {
         return m_level;
-      };
+      }
 
       /** Check whether node has been processed, i.e. children nodes has been filled */
       bool checkFilled() const
       {
         return m_filled;
-      };
+      }
 
       /** Set status of node to "filled" (children nodes has been filled) */
       void setFilled()
       {
         m_filled = true;
-      };
+      }
 
       /** Return pointer to the parent of the node */
       This* getParent() const
       {
         return m_parent;
-      };
+      }
 
       /** Get number of bins in "Theta" direction */
       constexpr int getXNbins() const
@@ -159,19 +159,19 @@ namespace Belle2 {
       AX getXMin() const
       {
         return m_xBinBounds[0];
-      };
+      }
 
       /** Get mean value of "Theta" */
       AX getXMean() const
       {
         return m_xBinBounds[1];
-      };
+      }
 
       /** Get maximal "Theta" value of the node */
       AX getXMax() const
       {
         return m_xBinBounds[2];
-      };
+      }
 
       /** Getter for the width of the iBin bin in "Theta" direction */
       AX getXBinWidth(int iBin)
@@ -183,7 +183,7 @@ namespace Belle2 {
       AX getXBinBound(int iBin) const
       {
         return m_xBinBounds[iBin];
-      };
+      }
 
       /** Get number of bins in "r" direction */
       constexpr int getYNbins() const
@@ -195,19 +195,19 @@ namespace Belle2 {
       AY getYMin() const
       {
         return m_yBinBounds[0];
-      };
+      }
 
       /** Get mean value of "r" */
       AY getYMean() const
       {
         return m_yBinBounds[1];
-      };
+      }
 
       /** Get maximal "r" value of the node */
       AY getYMax() const
       {
         return m_yBinBounds[2];
-      };
+      }
 
       /** Getter for the width of the iBin bin in "r" direction */
       AY getYBinWidth(int iBin)
@@ -219,7 +219,7 @@ namespace Belle2 {
       AY getYBinBound(int iBin) const
       {
         return m_yBinBounds[iBin];
-      };
+      }
 
     private:
       /// bins range on r

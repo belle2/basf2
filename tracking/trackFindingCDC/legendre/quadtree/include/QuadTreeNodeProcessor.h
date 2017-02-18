@@ -7,11 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/processing/TrackProcessor.h>
+#include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/ConformalExtension.h>
 
@@ -158,7 +157,7 @@ namespace Belle2 {
 
         ConformalExtension conformalExtension;
         conformalExtension.newRefPoint(candidateHits, allAxialWireHits, true);
-        TrackProcessor::addCandidateFromHitsWithPostprocessing(candidateHits, allAxialWireHits, tracks);
+        AxialTrackUtil::addCandidateFromHitsWithPostprocessing(candidateHits, allAxialWireHits, tracks);
       }
 
     private:

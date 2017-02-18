@@ -9,7 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/AxialTrackHitMigrator.h>
 
-#include <tracking/trackFindingCDC/processing/HitProcessor.h>
+#include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
@@ -46,17 +46,17 @@ void AxialTrackHitMigrator::apply(const std::vector<const CDCWireHit*>& axialWir
 {
   // First release some hits
   for (CDCTrack& track : axialTracks) {
-    HitProcessor::deleteHitsFarAwayFromTrajectory(track, m_param_dropDistance);
-    HitProcessor::normalizeTrack(track);
+    AxialTrackUtil::deleteHitsFarAwayFromTrajectory(track, m_param_dropDistance);
+    AxialTrackUtil::normalizeTrack(track);
   }
 
   // Now add new ones
   for (CDCTrack& track : axialTracks) {
     if (track.size() < 5) continue;
-    HitProcessor::assignNewHitsToTrack(track, axialWireHits, m_param_addDistance);
-    HitProcessor::normalizeTrack(track);
+    AxialTrackUtil::assignNewHitsToTrack(track, axialWireHits, m_param_addDistance);
+    AxialTrackUtil::normalizeTrack(track);
 
-    HitProcessor::splitBack2BackTrack(track);
-    HitProcessor::normalizeTrack(track);
+    AxialTrackUtil::splitBack2BackTrack(track);
+    AxialTrackUtil::normalizeTrack(track);
   }
 }

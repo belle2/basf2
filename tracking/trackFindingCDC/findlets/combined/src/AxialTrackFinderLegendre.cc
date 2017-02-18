@@ -10,7 +10,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/AxialTrackFinderLegendre.h>
 
-#include <tracking/trackFindingCDC/processing/TrackProcessor.h>
+#include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
@@ -96,5 +96,5 @@ void AxialTrackFinderLegendre::apply(const std::vector<CDCWireHit>& wireHits,
   // Assign new hits to the tracks
   m_axialTrackHitMigrator.apply(axialWireHits, tracks);
 
-  TrackProcessor::deleteShortTracks(tracks);
+  AxialTrackUtil::deleteShortTracks(tracks);
 }

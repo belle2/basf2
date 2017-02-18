@@ -9,8 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/AxialTrackMerger.h>
 
-#include <tracking/trackFindingCDC/processing/TrackProcessor.h>
-#include <tracking/trackFindingCDC/processing/HitProcessor.h>
+#include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 
@@ -45,24 +44,24 @@ void AxialTrackMerger::apply(std::vector<CDCTrack>& axialTracks,
   // if holes exist then track is splitted
   for (CDCTrack& track : axialTracks) {
     if (track.size() < 5) continue;
-    HitProcessor::removeHitsAfterSuperLayerBreak(track);
-    HitProcessor::normalizeTrack(track);
+    AxialTrackUtil::removeHitsAfterSuperLayerBreak(track);
+    AxialTrackUtil::normalizeTrack(track);
   }
 
   // Update tracks before storing to DataStore
   for (CDCTrack& track : axialTracks) {
-    HitProcessor::normalizeTrack(track);
+    AxialTrackUtil::normalizeTrack(track);
   }
 
   // Remove bad tracks
-  TrackProcessor::deleteShortTracks(axialTracks);
-  TrackProcessor::deleteTracksWithLowFitProbability(axialTracks);
+  AxialTrackUtil::deleteShortTracks(axialTracks);
+  AxialTrackUtil::deleteTracksWithLowFitProbability(axialTracks);
 
   // Perform tracks merging
   this->doTracksMerging(axialTracks, allAxialWireHits);
 
   // Remove the consumed, now empty tracks.
-  TrackProcessor::deleteShortTracks(axialTracks, 0);
+  AxialTrackUtil::deleteShortTracks(axialTracks, 0);
 }
 
 void AxialTrackMerger::doTracksMerging(std::vector<CDCTrack>& axialTracks,
@@ -81,7 +80,7 @@ void AxialTrackMerger::doTracksMerging(std::vector<CDCTrack>& axialTracks,
     }
   }
 
-  TrackProcessor::deleteShortTracks(axialTracks);
+  AxialTrackUtil::deleteShortTracks(axialTracks);
 }
 
 template <class ACDCTracks>
@@ -177,19 +176,19 @@ void AxialTrackMerger::mergeTracks(CDCTrack& track1,
   }
   track2.clear();
 
-  HitProcessor::normalizeTrack(track1);
+  AxialTrackUtil::normalizeTrack(track1);
 
-  track2 = CDCTrack(HitProcessor::splitBack2BackTrack(track1));
+  track2 = CDCTrack(AxialTrackUtil::splitBack2BackTrack(track1));
 
-  HitProcessor::normalizeTrack(track1);
+  AxialTrackUtil::normalizeTrack(track1);
 
   for (CDCRecoHit3D& recoHit3D : track2) {
     recoHit3D.setRecoPos3D({recoHit3D.getRefPos2D(), 0});
     recoHit3D.setRLInfo(ERightLeft::c_Unknown);
   }
 
-  HitProcessor::normalizeTrack(track2);
-  bool success = TrackProcessor::postprocessTrack(track2, allAxialWireHits);
+  AxialTrackUtil::normalizeTrack(track2);
+  bool success = AxialTrackUtil::postprocessTrack(track2, allAxialWireHits);
   if (not success) {
     for (const CDCRecoHit3D& recoHit3D : track2) {
       recoHit3D.getWireHit()->setTakenFlag(false);

@@ -7,9 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/processing/HitProcessor.h>
+#include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
@@ -24,7 +25,75 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void HitProcessor::normalizeTrack(CDCTrack& track)
+void AxialTrackUtil::addCandidateFromHitsWithPostprocessing(const std::vector<const CDCWireHit*>& foundAxialWireHits,
+                                                            const std::vector<const CDCWireHit*>& allAxialWireHits,
+                                                            std::vector<CDCTrack>& axialTracks)
+{
+  if (foundAxialWireHits.empty()) return;
+
+  // New track
+  CDCTrack track;
+
+  // Fit trajectory
+  const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
+  CDCTrajectory2D trajectory2D = fitter.fit(foundAxialWireHits);
+  track.setStartTrajectory3D(CDCTrajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption()));
+
+  // Reconstruct and add hits
+  for (const CDCWireHit* wireHit : foundAxialWireHits) {
+    AutomatonCell& automatonCell = wireHit->getAutomatonCell();
+    if (automatonCell.hasTakenFlag()) continue;
+
+    CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstructNearest(wireHit, trajectory2D);
+    track.push_back(std::move(recoHit3D));
+
+    automatonCell.setTakenFlag(true);
+  }
+
+  // Change everything again in the postprocessing
+  bool success = postprocessTrack(track, allAxialWireHits);
+  if (success) {
+    /// Mark hits as taken and add the new track to the track list
+    for (const CDCRecoHit3D& recoHit3D : track) {
+      recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(true);
+    }
+    axialTracks.emplace_back(std::move(track));
+  } else {
+    /// Masked bad hits
+    for (const CDCRecoHit3D& recoHit3D : track) {
+      recoHit3D.getWireHit().getAutomatonCell().setMaskedFlag(true);
+      recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(false);
+    }
+  }
+}
+
+bool AxialTrackUtil::postprocessTrack(CDCTrack& track, const std::vector<const CDCWireHit*>& allAxialWireHits)
+{
+  AxialTrackUtil::normalizeTrack(track);
+
+  AxialTrackUtil::deleteHitsFarAwayFromTrajectory(track);
+  AxialTrackUtil::normalizeTrack(track);
+  if (not checkTrackQuality(track)) {
+    return false;
+  }
+
+  AxialTrackUtil::assignNewHitsToTrack(track, allAxialWireHits);
+  AxialTrackUtil::normalizeTrack(track);
+
+  AxialTrackUtil::splitBack2BackTrack(track);
+  AxialTrackUtil::normalizeTrack(track);
+  if (not checkTrackQuality(track)) {
+    return false;
+  }
+  return true;
+}
+
+bool AxialTrackUtil::checkTrackQuality(const CDCTrack& track)
+{
+  return not(track.size() < 5);
+}
+
+void AxialTrackUtil::normalizeTrack(CDCTrack& track)
 {
   // Set the start point of the trajectory to the first hit
   if (track.size() < 5) return;
@@ -40,13 +109,13 @@ void HitProcessor::normalizeTrack(CDCTrack& track)
 
   // Arm used as a proxy for the charge of the track
   // Correct if the track originates close to the origin
-  ESign expectedCharge = HitProcessor::getMajorArmSign(track, center);
+  ESign expectedCharge = AxialTrackUtil::getMajorArmSign(track, center);
 
   if (trackTrajectory2D.getChargeSign() != expectedCharge) trackTrajectory2D.reverse();
 
   trackTrajectory2D.setLocalOrigin(trackTrajectory2D.getGlobalPerigee());
   for (CDCRecoHit3D& recoHit : track) {
-    HitProcessor::updateRecoHit3D(trackTrajectory2D, recoHit);
+    AxialTrackUtil::updateRecoHit3D(trackTrajectory2D, recoHit);
   }
 
   track.sortByArcLength2D();
@@ -55,7 +124,7 @@ void HitProcessor::normalizeTrack(CDCTrack& track)
   track.setStartTrajectory3D(trajectory3D);
 }
 
-void HitProcessor::updateRecoHit3D(const CDCTrajectory2D& trajectory2D, CDCRecoHit3D& hit)
+void AxialTrackUtil::updateRecoHit3D(const CDCTrajectory2D& trajectory2D, CDCRecoHit3D& hit)
 {
   hit = CDCRecoHit3D::reconstructNearest(&hit.getWireHit(), trajectory2D);
 
@@ -67,7 +136,75 @@ void HitProcessor::updateRecoHit3D(const CDCTrajectory2D& trajectory2D, CDCRecoH
   hit.setArcLength2D(arcLength2D);
 }
 
-std::vector<CDCRecoHit3D> HitProcessor::splitBack2BackTrack(CDCTrack& track)
+void AxialTrackUtil::deleteHitsFarAwayFromTrajectory(CDCTrack& track, double maximumDistance)
+{
+  const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
+  auto farFromTrajectory = [&trajectory2D, &maximumDistance](CDCRecoHit3D & recoHit3D) {
+    Vector2D recoPos2D = recoHit3D.getRecoPos2D();
+    if (fabs(trajectory2D.getDist2D(recoPos2D)) > maximumDistance) {
+      recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(false);
+      // This must be here as the deleted hits must not participate in the hough search again.
+      recoHit3D.getWireHit().getAutomatonCell().setMaskedFlag(true);
+      return true;
+    }
+    return false;
+  };
+  boost::remove_erase_if(track, farFromTrajectory);
+}
+
+void AxialTrackUtil::deleteTracksWithLowFitProbability(std::vector<CDCTrack>& axialTracks,
+                                                       double minimal_probability_for_good_fit)
+{
+  const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getNoDriftVarianceFitter();
+  const auto lowPValue = [&](const CDCTrack & track) {
+    CDCTrajectory2D fittedTrajectory = trackFitter.fit(track);
+    // Keep good fits - p-value is not really a probability,
+    // but what can you do if the original author did not mind...
+    if (not(fittedTrajectory.getPValue() >= minimal_probability_for_good_fit)) {
+      // Release hits
+      track.forwardTakenFlag(false);
+      return true;
+    }
+    return false;
+  };
+  erase_remove_if(axialTracks, lowPValue);
+}
+
+void AxialTrackUtil::assignNewHitsToTrack(CDCTrack& track,
+                                          const std::vector<const CDCWireHit*>& allAxialWireHits,
+                                          double minimalDistance)
+{
+  if (track.size() < 10) return;
+
+  const CDCTrajectory2D& trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
+
+  for (const CDCWireHit* wireHit : allAxialWireHits) {
+    if (wireHit->getAutomatonCell().hasTakenFlag()) continue;
+
+    CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstructNearest(wireHit, trackTrajectory2D);
+    const Vector2D& recoPos2D = recoHit3D.getRecoPos2D();
+
+    if (fabs(trackTrajectory2D.getDist2D(recoPos2D)) < minimalDistance) {
+      track.push_back(std::move(recoHit3D));
+      recoHit3D.getWireHit().getAutomatonCell().setTakenFlag();
+    }
+  }
+}
+
+void AxialTrackUtil::deleteShortTracks(std::vector<CDCTrack>& axialTracks, double minimal_size)
+{
+  const auto isShort = [&](const CDCTrack & track) {
+    if (track.size() < minimal_size) {
+      // Release hits
+      track.forwardTakenFlag(false);
+      return true;
+    }
+    return false;
+  };
+  erase_remove_if(axialTracks, isShort);
+}
+
+std::vector<CDCRecoHit3D> AxialTrackUtil::splitBack2BackTrack(CDCTrack& track)
 {
   std::vector<CDCRecoHit3D> removedHits;
 
@@ -93,7 +230,7 @@ std::vector<CDCRecoHit3D> HitProcessor::splitBack2BackTrack(CDCTrack& track)
   return removedHits;
 }
 
-bool HitProcessor::isBack2BackTrack(CDCTrack& track)
+bool AxialTrackUtil::isBack2BackTrack(CDCTrack& track)
 {
   Vector2D center = track.getStartTrajectory3D().getGlobalCenter();
   int armSignVote = getArmSignVote(track, center);
@@ -103,7 +240,7 @@ bool HitProcessor::isBack2BackTrack(CDCTrack& track)
   return false;
 }
 
-ESign HitProcessor::getMajorArmSign(const CDCTrack& track, const Vector2D& center)
+ESign AxialTrackUtil::getMajorArmSign(const CDCTrack& track, const Vector2D& center)
 {
   int armSignVote = getArmSignVote(track, center);
   if (armSignVote > 0) {
@@ -113,7 +250,7 @@ ESign HitProcessor::getMajorArmSign(const CDCTrack& track, const Vector2D& cente
   }
 }
 
-int HitProcessor::getArmSignVote(const CDCTrack& track, const Vector2D& center)
+int AxialTrackUtil::getArmSignVote(const CDCTrack& track, const Vector2D& center)
 {
   int votePos = 0;
   int voteNeg = 0;
@@ -138,49 +275,12 @@ int HitProcessor::getArmSignVote(const CDCTrack& track, const Vector2D& center)
   return armSignVote;
 }
 
-ESign HitProcessor::getArmSign(const CDCRecoHit3D& hit, const Vector2D& center)
+ESign AxialTrackUtil::getArmSign(const CDCRecoHit3D& hit, const Vector2D& center)
 {
   return sign(center.isRightOrLeftOf(hit.getRecoPos2D()));
 }
 
-void HitProcessor::deleteHitsFarAwayFromTrajectory(CDCTrack& track, double maximumDistance)
-{
-  const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
-  auto farFromTrajectory = [&trajectory2D, &maximumDistance](CDCRecoHit3D & recoHit3D) {
-    Vector2D recoPos2D = recoHit3D.getRecoPos2D();
-    if (fabs(trajectory2D.getDist2D(recoPos2D)) > maximumDistance) {
-      recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(false);
-      // This must be here as the deleted hits must not participate in the hough search again.
-      recoHit3D.getWireHit().getAutomatonCell().setMaskedFlag(true);
-      return true;
-    }
-    return false;
-  };
-  boost::remove_erase_if(track, farFromTrajectory);
-}
-
-void HitProcessor::assignNewHitsToTrack(CDCTrack& track,
-                                        const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                        double minimalDistance)
-{
-  if (track.size() < 10) return;
-
-  const CDCTrajectory2D& trackTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
-
-  for (const CDCWireHit* wireHit : allAxialWireHits) {
-    if (wireHit->getAutomatonCell().hasTakenFlag()) continue;
-
-    CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstructNearest(wireHit, trackTrajectory2D);
-    const Vector2D& recoPos2D = recoHit3D.getRecoPos2D();
-
-    if (fabs(trackTrajectory2D.getDist2D(recoPos2D)) < minimalDistance) {
-      track.push_back(std::move(recoHit3D));
-      recoHit3D.getWireHit().getAutomatonCell().setTakenFlag();
-    }
-  }
-}
-
-void HitProcessor::removeHitsAfterSuperLayerBreak(CDCTrack& track)
+void AxialTrackUtil::removeHitsAfterSuperLayerBreak(CDCTrack& track)
 {
   double apogeeArcLength = fabs(track.getStartTrajectory3D().getGlobalCircle().perimeter()) / 2.;
 
@@ -229,7 +329,7 @@ void HitProcessor::removeHitsAfterSuperLayerBreak(CDCTrack& track)
   boost::remove_erase_if(track, isAfterSLayerBreak);
 }
 
-std::vector<ISuperLayer> HitProcessor::getSLayerHoles(const std::array<int, ISuperLayerUtil::c_N>& nHitsBySLayer)
+std::vector<ISuperLayer> AxialTrackUtil::getSLayerHoles(const std::array<int, ISuperLayerUtil::c_N>& nHitsBySLayer)
 {
   std::vector<ISuperLayer> sLayerHoles;
 
@@ -249,7 +349,7 @@ std::vector<ISuperLayer> HitProcessor::getSLayerHoles(const std::array<int, ISup
   return sLayerHoles;
 }
 
-ISuperLayer HitProcessor::getFirstOccupiedISuperLayer(const std::array<int, ISuperLayerUtil::c_N>& nHitsBySLayer)
+ISuperLayer AxialTrackUtil::getFirstOccupiedISuperLayer(const std::array<int, ISuperLayerUtil::c_N>& nHitsBySLayer)
 {
   for (ISuperLayer iSLayer = 0; iSLayer < ISuperLayerUtil::c_N; ++iSLayer) {
     if (nHitsBySLayer[iSLayer] > 0) return iSLayer;
@@ -257,7 +357,7 @@ ISuperLayer HitProcessor::getFirstOccupiedISuperLayer(const std::array<int, ISup
   return ISuperLayerUtil::c_Invalid;
 }
 
-ISuperLayer HitProcessor::getLastOccupiedISuperLayer(const std::array<int, ISuperLayerUtil::c_N>& nHitsBySLayer)
+ISuperLayer AxialTrackUtil::getLastOccupiedISuperLayer(const std::array<int, ISuperLayerUtil::c_N>& nHitsBySLayer)
 {
   for (ISuperLayer iSLayer = ISuperLayerUtil::c_N - 1; iSLayer >= 0; --iSLayer) {
     if (nHitsBySLayer[iSLayer] > 0) return iSLayer;

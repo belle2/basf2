@@ -11,8 +11,7 @@
 #pragma once
 #include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.h>
 
-#include <tracking/trackFindingCDC/processing/TrackProcessor.h>
-#include <tracking/trackFindingCDC/processing/HitProcessor.h>
+#include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
 
 #include <tracking/trackFindingCDC/hough/perigee/StereoHitContained.h>
 #include <tracking/trackFindingCDC/hough/perigee/OffOrigin.h>
@@ -100,7 +99,7 @@ namespace Belle2 {
         foundWireHits.push_back(&rlWireHit.getWireHit());
       }
 
-      TrackProcessor::addCandidateFromHitsWithPostprocessing(foundWireHits, m_axialWireHits, m_tracks);
+      AxialTrackUtil::addCandidateFromHitsWithPostprocessing(foundWireHits, m_axialWireHits, m_tracks);
 
       // Sync up the marks with the used hits
       for (WithSharedMark<CDCRLWireHit>& markableRLWireHit : leaf->getTree()->getTopNode()) {

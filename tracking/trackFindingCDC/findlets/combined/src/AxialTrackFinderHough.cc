@@ -9,8 +9,6 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/AxialTrackFinderHough.h>
 
-#include <tracking/trackFindingCDC/processing/TrackProcessor.h>
-
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 

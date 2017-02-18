@@ -10,13 +10,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/AxialTrackFinderLegendre.h>
 
-#include <tracking/trackFindingCDC/legendre/quadtreetools/QuadTreePassCounter.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeCandidateFinder.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeNodeProcessor.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
-
 #include <tracking/trackFindingCDC/processing/TrackProcessor.h>
-#include <tracking/trackFindingCDC/processing/HitProcessor.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
@@ -30,6 +24,11 @@ using namespace TrackFindingCDC;
 
 AxialTrackFinderLegendre::AxialTrackFinderLegendre()
 {
+  addProcessingSignalListener(&m_nonCurlerAxialTrackCreatorHitLegendre);
+  addProcessingSignalListener(&m_nonCurlersWithIncreasingThresholdAxialTrackCreatorHitLegendre);
+  addProcessingSignalListener(&m_fullRangeAxialTrackCreatorHitLegendre);
+  addProcessingSignalListener(&m_axialTrackHitMigrator);
+  addProcessingSignalListener(&m_axialTrackMerger);
 }
 
 std::string AxialTrackFinderLegendre::getDescription()
@@ -37,18 +36,12 @@ std::string AxialTrackFinderLegendre::getDescription()
   return "Performs the pattern recognition in the CDC with the legendre hough finder";
 }
 
-void AxialTrackFinderLegendre::exposeParameters(ModuleParamList* moduleParamList __attribute__((unused)),
-                                                const std::string& prefix __attribute__((unused)))
+void AxialTrackFinderLegendre::exposeParameters(ModuleParamList* moduleParamList,
+                                                const std::string& prefix)
 {
-}
-
-
-void AxialTrackFinderLegendre::initialize()
-{
-  B2ASSERT("Maximal level of QuadTree search is setted to be greater than lookuptable grid level! ",
-           m_param_maxLevel <= PrecisionUtil::getLookupGridLevel());
-
-  Super::initialize();
+  m_axialTrackHitMigrator.exposeParameters(moduleParamList, prefix);
+  m_axialTrackMerger.exposeParameters(moduleParamList, prefixed("merge", prefix));
+  // No parameters exposed for the legendre passes
 }
 
 void AxialTrackFinderLegendre::apply(const std::vector<CDCWireHit>& wireHits,
@@ -68,13 +61,13 @@ void AxialTrackFinderLegendre::apply(const std::vector<CDCWireHit>& wireHits,
   }
 
   // First legendre pass
-  applyPass(LegendreFindingPass::NonCurlers, axialWireHits, tracks);
+  m_nonCurlerAxialTrackCreatorHitLegendre.apply(axialWireHits, tracks);
 
   // Assign new hits to the tracks
   m_axialTrackHitMigrator.apply(axialWireHits, tracks);
 
   // Second legendre pass
-  applyPass(LegendreFindingPass::NonCurlersWithIncreasingThreshold, axialWireHits, tracks);
+  m_nonCurlersWithIncreasingThresholdAxialTrackCreatorHitLegendre.apply(axialWireHits, tracks);
 
   // Assign new hits to the tracks
   m_axialTrackHitMigrator.apply(axialWireHits, tracks);
@@ -85,8 +78,8 @@ void AxialTrackFinderLegendre::apply(const std::vector<CDCWireHit>& wireHits,
   for (int iPass = 0; iPass < 20; ++iPass) {
     int nCandsAdded = tracks.size();
 
-    // Second legendre pass
-    applyPass(LegendreFindingPass::FullRange, axialWireHits, tracks);
+    // Third legendre pass
+    m_fullRangeAxialTrackCreatorHitLegendre.apply(axialWireHits, tracks);
 
     // Assign new hits to the tracks
     m_axialTrackHitMigrator.apply(axialWireHits, tracks);
@@ -104,40 +97,4 @@ void AxialTrackFinderLegendre::apply(const std::vector<CDCWireHit>& wireHits,
   m_axialTrackHitMigrator.apply(axialWireHits, tracks);
 
   TrackProcessor::deleteShortTracks(tracks);
-}
-
-void AxialTrackFinderLegendre::applyPass(LegendreFindingPass pass,
-                                         const std::vector<const CDCWireHit*>& axialWireHits,
-                                         std::vector<CDCTrack>& tracks)
-{
-  HitProcessor::resetMaskedHits(tracks, axialWireHits);
-
-  // Create object which holds and generates parameters
-  QuadTreeParameters quadTreeParameters(m_param_maxLevel, pass);
-
-  //Create quadtree processot
-  AxialHitQuadTreeProcessor qtProcessor = quadTreeParameters.constructQTProcessor();
-
-  //Prepare vector of QuadTreeHitWrapper* to provide it to the qt processor
-  std::vector<const CDCWireHit*> hitsVector;
-  for (const CDCWireHit* wireHit : axialWireHits) {
-    if ((*wireHit)->hasTakenFlag()) continue;
-    hitsVector.push_back(wireHit);
-  }
-
-  qtProcessor.provideItemsSet(hitsVector);
-  //  qtProcessor.seedQuadTree(4, symmetricalKappa);
-
-  // Create object which contains interface between quadtree processor and track processor (module)
-  QuadTreeNodeProcessor quadTreeNodeProcessor(qtProcessor, quadTreeParameters.getPrecisionFunction());
-
-  // Object which operates with AxialHitQuadTreeProcessor and QuadTreeNodeProcessor and starts quadtree search
-  QuadTreeCandidateFinder quadTreeCandidateFinder;
-
-  // Interface
-  AxialHitQuadTreeProcessor::CandidateProcessorLambda lambdaInterface =
-    quadTreeNodeProcessor.getLambdaInterface(axialWireHits, tracks);
-
-  // Start candidate finding
-  quadTreeCandidateFinder.doTreeTrackFinding(lambdaInterface, quadTreeParameters, qtProcessor);
 }

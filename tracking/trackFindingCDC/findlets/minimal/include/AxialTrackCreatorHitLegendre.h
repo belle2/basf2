@@ -12,12 +12,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/findlets/minimal/AxialTrackMerger.h>
-#include <tracking/trackFindingCDC/findlets/minimal/AxialTrackHitMigrator.h>
-#include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorHitLegendre.h>
-
-#include <vector>
-#include <string>
+#include <tracking/trackFindingCDC/legendre/quadtreetools/QuadTreePassCounter.h>
 
 namespace Belle2 {
   class ModuleParamList;
@@ -35,15 +30,18 @@ namespace Belle2 {
      * "Implementation of the Legendre Transform for track segment reconstruction in drift tube chambers"
      * by T. Alexopoulus, et al. NIM A592 456-462 (2008).
      */
-    class AxialTrackFinderLegendre : public Findlet<const CDCWireHit, CDCTrack> {
+    class AxialTrackCreatorHitLegendre : public Findlet<const CDCWireHit* const, CDCTrack> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCWireHit, CDCTrack>;
+      using Super = Findlet<const CDCWireHit* const, CDCTrack>;
 
     public:
       /// Constructor
-      AxialTrackFinderLegendre();
+      AxialTrackCreatorHitLegendre();
+
+      /// Constructor from a pass key
+      explicit AxialTrackCreatorHitLegendre(LegendreFindingPass pass);
 
       /// Short description of the findlet
       std::string getDescription() final;
@@ -51,30 +49,19 @@ namespace Belle2 {
       /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
-      /// Main method to apply the track finding.
-      void apply(const std::vector<CDCWireHit>& wireHits, std::vector<CDCTrack>& tracks);
+      /// Initialisation before the event processing starts
+      void initialize() final;
 
-    private: // findlets
-      /// Findlet for the non-curler legendre pass
-      AxialTrackCreatorHitLegendre m_nonCurlerAxialTrackCreatorHitLegendre{
-        LegendreFindingPass::NonCurlers};
+      /// Execute one pass over a quad tree
+      void apply(const std::vector<const CDCWireHit*>& axialWireHits,
+                 std::vector<CDCTrack>& tracks) final;
 
-      /// Findlet for the non-curler with increased threshold legendre pass
-      AxialTrackCreatorHitLegendre m_nonCurlersWithIncreasingThresholdAxialTrackCreatorHitLegendre{
-        LegendreFindingPass::NonCurlersWithIncreasingThreshold};
+    private: // Parameters
+      /// Maximum Level of FastHough - fixed as the behaviour for other values is not well defined
+      static const int m_param_maxLevel = 12;
 
-      /// Findlet for the full range legendre pass
-      AxialTrackCreatorHitLegendre m_fullRangeAxialTrackCreatorHitLegendre{
-        LegendreFindingPass::FullRange};
-
-      /// Findlet for the non-curler legendre pass
-      AxialTrackCreatorHitLegendre m_noCurlerAxialTrackCreatorHitLegendre;
-
-      /// Findlet to exchange hits between tracks based on their proximity to the respective trajectory
-      AxialTrackHitMigrator m_axialTrackHitMigrator;
-
-      /// Findlet to merge the tracks after the legendre finder.
-      AxialTrackMerger m_axialTrackMerger;
+      /// The pass key for lookup of the parameters for this pass
+      LegendreFindingPass m_pass = LegendreFindingPass::NonCurlers;
     };
   }
 }

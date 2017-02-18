@@ -317,11 +317,7 @@ namespace Belle2 {
         lambda(resultItems, node);
       }
 
-
-      QuadTree* m_quadTree; /**< The quad tree we work with */
-
     private:
-
       /**
        * Create a quad tree with the given parameters spans.
        */
@@ -348,10 +344,21 @@ namespace Belle2 {
         }
       }
 
-      unsigned int m_lastLevel; /**< The last level to be filled */
-      bool m_debugOutput; /**< A flag to control the creation of the debug output */
-      std::map<std::pair<AX, AY>, std::vector<Item*>> m_debugOutputMap; /**< The calculated debug map */
-      bool m_param_setUsedFlag; /**< Set the used flag after every lambda function call */
+    private:
+      /// The quad tree we work with
+      QuadTree* m_quadTree;
+
+      /// The last level to be filled
+      unsigned int m_lastLevel;
+
+      /// A flag to control the creation of the debug output
+      bool m_debugOutput;
+
+      /// The calculated debug map
+      std::map<std::pair<AX, AY>, std::vector<Item*>> m_debugOutputMap;
+
+      /// Set the used flag after every lambda function call
+      bool m_param_setUsedFlag;
     };
   }
 }

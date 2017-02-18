@@ -92,17 +92,17 @@ namespace Belle2 {
     void drawWaveforms(TOPRawWaveform* wave);
 
   private:
-    int m_iFrame = 0; /**< Number of frames within one event */
-    int m_iEvent = 0; /**< Number of events that has been processed */
-    int m_refreshCount = 0; /**< For how many events should the graphs be updated */
-    int m_framesPerEvent = 0; /**< Number of frames within one event */
-    int m_nhits = 0; /**< Number of hits within one event */
+    int m_iFrame = -1; /**< Number of frames within one event */
+    int m_iEvent = -1; /**< Number of events that has been processed */
+    int m_refreshCount = -1; /**< For how many events should the graphs be updated */
+    int m_framesPerEvent = -1; /**< Number of frames within one event */
+    int m_nhits = -1; /**< Number of hits within one event */
 
     std::map<int, std::map<int, TMultiGraph*>> m_channels; /**< map: scrod_id --> (asic_id --> TMultiGraph) */
     std::map<int, std::map<int, std::set<int>>> m_channelLabels; /**< map: scrod_id --> (asic_id --> channels within one asic) */
     std::map<int, TCanvas*> m_canvas; /**< map: scrod_id --> TCanvas */
-    TCanvas* m_canvas_nhits = NULL; /**< TCanvas for displaying waveform */
-    TH1F* m_h_nhits = NULL; /**< Histogram for number of hits within on event */
+    TCanvas* m_canvas_nhits = nullptr; /**< TCanvas for displaying waveform */
+    TH1F* m_h_nhits = nullptr; /**< Histogram for number of hits within on event */
   };
 
 } //namespace Belle2

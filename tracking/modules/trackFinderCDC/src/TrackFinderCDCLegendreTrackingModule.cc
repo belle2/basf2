@@ -27,11 +27,10 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-//ROOT macro
 REG_MODULE(TrackFinderCDCLegendreTracking);
 
-TrackFinderCDCLegendreTrackingModule::TrackFinderCDCLegendreTrackingModule() :
-  Module()
+TrackFinderCDCLegendreTrackingModule::TrackFinderCDCLegendreTrackingModule()
+  : Module()
 {
   setDescription("Performs the pattern recognition in the CDC with the legendre hough finder");
 
@@ -67,80 +66,78 @@ void TrackFinderCDCLegendreTrackingModule::event()
   // Now aquire the store vector
   StoreWrappedObjPtr<std::vector<CDCTrack>> storedTracks(m_param_tracksStoreObjName);
   storedTracks.create();
-
-  // We now let the generate-method fill or update the outputTracks
   std::vector<CDCTrack>& tracks = *storedTracks;
 
-  startNewEvent();
-  findTracks();
-  outputObjects(tracks);
-  clearVectors();
-}
 
-void TrackFinderCDCLegendreTrackingModule::startNewEvent()
-{
-  B2DEBUG(100, "**********   CDCTrackingModule  ************");
-
-  B2DEBUG(100, "Initializing hits");
   StoreWrappedObjPtr<std::vector<CDCWireHit> > storedWireHits("CDCWireHitVector");
   const std::vector<CDCWireHit>& wireHits = *storedWireHits;
 
-  for (const CDCWireHit& wireHit : wireHits) {
-    // Skip taken hits
-    if (wireHit.getAutomatonCell().hasTakenFlag()) continue;
-
-    // Only select axial hits for legendre tracking
-    if (not wireHit.isAxial()) continue;
-
-    m_allAxialWireHits.push_back(&wireHit);
-  }
-
-  B2DEBUG(90, "Number of hits to be used by legendre track finder: " << m_allAxialWireHits.size() << " axial.");
+  // We now let the generate-method fill or update the outputTracks
+  apply(wireHits, tracks);
 }
 
-void TrackFinderCDCLegendreTrackingModule::findTracks()
+
+void TrackFinderCDCLegendreTrackingModule::apply(const std::vector<CDCWireHit>& wireHits,
+                                                 std::vector<CDCTrack>& tracks)
 {
+  B2DEBUG(100, "**********   CDCTrackingModule  ************");
+
+  // Acquire the axial hits
+  std::vector<const CDCWireHit*> axialWireHits;
+  axialWireHits.reserve(wireHits.size());
+  for (const CDCWireHit& wireHit : wireHits) {
+    wireHit->unsetTemporaryFlags();
+    wireHit->unsetMaskedFlag();
+    if (not wireHit.isAxial()) continue;
+    if (wireHit->hasBackgroundFlag()) continue;
+    axialWireHits.emplace_back(&wireHit);
+  }
+
   // First legendre pass
-  applyPass(LegendreFindingPass::NonCurlers);
+  applyPass(LegendreFindingPass::NonCurlers, axialWireHits, tracks);
 
   // Assign new hits to the tracks
-  m_axialTrackHitMigrator.apply(m_allAxialWireHits, m_tracks);
+  m_axialTrackHitMigrator.apply(axialWireHits, tracks);
 
   // Second legendre pass
-  applyPass(LegendreFindingPass::NonCurlersWithIncreasingThreshold);
+  applyPass(LegendreFindingPass::NonCurlersWithIncreasingThreshold, axialWireHits, tracks);
 
   // Assign new hits to the tracks
-  m_axialTrackHitMigrator.apply(m_allAxialWireHits, m_tracks);
+  m_axialTrackHitMigrator.apply(axialWireHits, tracks);
 
   // Iterate the last finding pass until no track is found anymore
 
   // Loop counter to guard against infinit loop
-  for (int iPass = 0; iPass < 10; ++iPass) {
-    int nCandsAdded = m_tracks.size();
+  for (int iPass = 0; iPass < 20; ++iPass) {
+    int nCandsAdded = tracks.size();
 
     // Second legendre pass
-    applyPass(LegendreFindingPass::FullRange);
+    applyPass(LegendreFindingPass::FullRange, axialWireHits, tracks);
 
     // Assign new hits to the tracks
-    m_axialTrackHitMigrator.apply(m_allAxialWireHits, m_tracks);
+    m_axialTrackHitMigrator.apply(axialWireHits, tracks);
 
-    nCandsAdded = m_tracks.size() - nCandsAdded;
+    nCandsAdded = tracks.size() - nCandsAdded;
 
-    if (iPass == 9) B2WARNING("Reached maximal number of legendre search passes");
+    if (iPass == 19) B2WARNING("Reached maximal number of legendre search passes");
     if (nCandsAdded == 0) break;
   }
 
   // Merge found tracks
-  m_axialTrackMerger.apply(m_tracks, m_allAxialWireHits);
+  m_axialTrackMerger.apply(tracks, axialWireHits);
 
   // Assign new hits to the tracks
-  m_axialTrackHitMigrator.apply(m_allAxialWireHits, m_tracks);
+  m_axialTrackHitMigrator.apply(axialWireHits, tracks);
+
+  TrackProcessor::deleteShortTracks(tracks);
 }
 
-void TrackFinderCDCLegendreTrackingModule::applyPass(LegendreFindingPass pass)
+void TrackFinderCDCLegendreTrackingModule::applyPass(LegendreFindingPass pass,
+                                                     std::vector<const CDCWireHit*>& axialWireHits,
+                                                     std::vector<CDCTrack>& tracks)
 {
 
-  HitProcessor::resetMaskedHits(m_tracks, m_allAxialWireHits);
+  HitProcessor::resetMaskedHits(tracks, axialWireHits);
 
   // Create object which holds and generates parameters
   QuadTreeParameters quadTreeParameters(m_param_maxLevel, pass);
@@ -150,7 +147,7 @@ void TrackFinderCDCLegendreTrackingModule::applyPass(LegendreFindingPass pass)
 
   //Prepare vector of QuadTreeHitWrapper* to provide it to the qt processor
   std::vector<const CDCWireHit*> hitsVector;
-  for (const CDCWireHit* wireHit : m_allAxialWireHits) {
+  for (const CDCWireHit* wireHit : axialWireHits) {
     if ((*wireHit)->hasTakenFlag()) continue;
     hitsVector.push_back(wireHit);
   }
@@ -166,21 +163,8 @@ void TrackFinderCDCLegendreTrackingModule::applyPass(LegendreFindingPass pass)
 
   // Interface
   AxialHitQuadTreeProcessor::CandidateProcessorLambda lambdaInterface =
-    quadTreeNodeProcessor.getLambdaInterface(m_allAxialWireHits, m_tracks);
+    quadTreeNodeProcessor.getLambdaInterface(axialWireHits, tracks);
 
   // Start candidate finding
   quadTreeCandidateFinder.doTreeTrackFinding(lambdaInterface, quadTreeParameters, qtProcessor);
-}
-
-
-void TrackFinderCDCLegendreTrackingModule::outputObjects(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
-{
-  TrackProcessor::deleteShortTracks(m_tracks);
-  tracks.insert(tracks.end(), m_tracks.begin(), m_tracks.end());
-}
-
-void TrackFinderCDCLegendreTrackingModule::clearVectors()
-{
-  m_allAxialWireHits.clear();
-  m_tracks.clear();
 }

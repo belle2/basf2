@@ -28,7 +28,7 @@ namespace Belle2 {
      * If you want to use your own class as a quad tree item, you have to overload this processor.
      * You have provide only the two functions insertItemInNode and createChildWithParent.
      */
-    template<typename typeX, typename typeY, class typeData, int binCountX, int binCountY>
+    template<typename typeX, typename typeY, class typeData>
     class QuadTreeProcessorTemplate {
 
     public:
@@ -332,8 +332,8 @@ namespace Belle2 {
        */
       void initializeChildren(QuadTree* node, QuadTreeChildren* m_children) const
       {
-        for (unsigned int i = 0; i < binCountX; ++i) {
-          for (unsigned int j = 0; j < binCountY; ++j) {
+        for (int i = 0; i < node->getXNbins(); ++i) {
+          for (int j = 0; j < node->getYNbins(); ++j) {
             const ChildRanges& childRanges = createChildWithParent(node, i, j);
             const rangeX& rangeX = childRanges.first;
             const rangeY& rangeY = childRanges.second;

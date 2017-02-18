@@ -133,7 +133,7 @@ void TrackFinderCDCLegendreTrackingModule::apply(const std::vector<CDCWireHit>& 
 }
 
 void TrackFinderCDCLegendreTrackingModule::applyPass(LegendreFindingPass pass,
-                                                     std::vector<const CDCWireHit*>& axialWireHits,
+                                                     const std::vector<const CDCWireHit*>& axialWireHits,
                                                      std::vector<CDCTrack>& tracks)
 {
 

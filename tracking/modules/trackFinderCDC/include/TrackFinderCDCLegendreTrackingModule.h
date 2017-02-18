@@ -49,7 +49,7 @@ namespace Belle2 {
 
       /// Execute one pass over a quad tree
       void applyPass(LegendreFindingPass pass,
-                     std::vector<const CDCWireHit*>& axialWireHits,
+                     const std::vector<const CDCWireHit*>& axialWireHits,
                      std::vector<CDCTrack>& tracks);
 
     private:

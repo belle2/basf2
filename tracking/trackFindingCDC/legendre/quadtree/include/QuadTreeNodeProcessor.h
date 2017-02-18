@@ -43,11 +43,12 @@ namespace Belle2 {
        *  this lambda function will forward the found candidates to the CandidateCreate for further processing
        *  hits belonging to found candidates will be marked as used and ignored for further filling iterations
        */
-      AxialHitQuadTreeProcessor::CandidateProcessorLambda getLambdaInterface(std::vector<const CDCWireHit*>& allAxialWireHits,
+      AxialHitQuadTreeProcessor::CandidateProcessorLambda getLambdaInterface(const std::vector<const CDCWireHit*>& allAxialWireHits,
           std::vector<CDCTrack>& tracks)
       {
-        AxialHitQuadTreeProcessor::CandidateProcessorLambda lmdCandidateProcessingFinal = [&](const AxialHitQuadTreeProcessor::ReturnList &
-        hits __attribute__((unused)), AxialHitQuadTreeProcessor::QuadTree * qt) -> void {
+        AxialHitQuadTreeProcessor::CandidateProcessorLambda lmdCandidateProcessingFinal =
+          [&](const AxialHitQuadTreeProcessor::ReturnList & hits __attribute__((unused)),
+        AxialHitQuadTreeProcessor::QuadTree * qt) -> void {
           this->candidateProcessingFinal(qt, allAxialWireHits, tracks);
         };
 
@@ -58,7 +59,7 @@ namespace Belle2 {
 
       /// Gets hits from quadtree node, convert to QuadTreeHitWrapper and passes for further processing
       void candidateProcessingFinal(AxialHitQuadTreeProcessor::QuadTree* qt,
-                                    std::vector<const CDCWireHit*>& allAxialWireHits,
+                                    const std::vector<const CDCWireHit*>& allAxialWireHits,
                                     std::vector<CDCTrack>& tracks)
       {
         for (AxialHitQuadTreeProcessor::ItemType* hit : qt->getItemsVector()) {

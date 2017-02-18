@@ -11,9 +11,6 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
-#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
-
 #include <vector>
 #include <string>
 
@@ -41,6 +38,10 @@ namespace Belle2 {
 
       /// Merge tracks together. Allows for axial hits to be added as it may see fit.
       void apply(std::vector<CDCTrack>& axialTracks, const std::vector<const CDCWireHit*>& axialWireHits) final;
+
+    private:
+      /// Parameter : Minimal fit probability of the common fit of two tracks to be eligible for merging
+      double m_param_minFitProb = 0.85;
     };
   }
 }

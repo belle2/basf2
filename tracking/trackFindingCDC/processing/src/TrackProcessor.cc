@@ -93,30 +93,6 @@ bool TrackProcessor::checkTrackQuality(const CDCTrack& track)
   return not(track.size() < 5);
 }
 
-void TrackProcessor::mergeAndFinalizeTracks(std::vector<CDCTrack>& axialTracks,
-                                            const std::vector<const CDCWireHit*>& allAxialWireHits)
-{
-  // Check quality of the track basing on holes on the trajectory;
-  // if holes exsist then track is splitted
-  for (CDCTrack& track : axialTracks) {
-    if (track.size() < 5) continue;
-    HitProcessor::removeHitsAfterSuperLayerBreak(track);
-    TrackQualityTools::normalizeTrack(track);
-  }
-
-  // Update tracks before storing to DataStore
-  for (CDCTrack& track : axialTracks) {
-    TrackQualityTools::normalizeTrack(track);
-  }
-
-  // Remove bad tracks
-  TrackProcessor::deleteShortTracks(axialTracks);
-  TrackProcessor::deleteTracksWithLowFitProbability(axialTracks);
-
-  // Perform tracks merging
-  TrackMerger::doTracksMerging(axialTracks, allAxialWireHits);
-}
-
 void TrackProcessor::deleteTracksWithLowFitProbability(std::vector<CDCTrack>& axialTracks,
                                                        double minimal_probability_for_good_fit)
 {

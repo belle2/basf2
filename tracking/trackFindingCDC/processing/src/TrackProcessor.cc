@@ -81,8 +81,6 @@ bool TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<const C
   if (not checkTrackQuality(track)) {
     return false;
   }
-
-  HitProcessor::unmaskHitsInTrack(track);
   return true;
 }
 

@@ -28,7 +28,7 @@
 #include <array>
 #include <vector>
 #include <memory>
-#include <functional>
+#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -159,64 +159,76 @@ namespace Belle2 {
         return m_parent;
       };
 
-      /** Get number of bins in "r" direction */
+      /** Get number of bins in "Theta" direction */
       constexpr int getXNbins() const
       {
         return m_xBinBounds.size() - 1;
       }
 
-      /** Get minimal "r" value of the node */
+      /** Get minimal "Theta" value of the node */
       AX getXMin() const
       {
         return m_xBinBounds[0];
       };
 
-      /** Get mean value of r */
+      /** Get mean value of "Theta" */
       AX getXMean() const
       {
         return m_xBinBounds[1];
       };
 
-      /** Get maximal "r" value of the node */
+      /** Get maximal "Theta" value of the node */
       AX getXMax() const
       {
         return m_xBinBounds[2];
       };
 
-      /** Get "r" value of given bin border */
-      AX getXBinBound(int bin) const
+      /** Getter for the width of the iBin bin in "Theta" direction */
+      AX getXBinWidth(int iBin)
       {
-        return m_xBinBounds[bin];
+        return std::abs(getXBinBound(iBin + 1) - getXBinBound(iBin));
+      }
+
+      /** Get "Theta" value of given bin border */
+      AX getXBinBound(int iBin) const
+      {
+        return m_xBinBounds[iBin];
       };
 
-      /** Get number of bins in "Theta" direction */
+      /** Get number of bins in "r" direction */
       constexpr int getYNbins() const
       {
         return m_yBinBounds.size() - 1;
       }
 
-      /** Get minimal "Theta" value of the node */
+      /** Get minimal "r" value of the node */
       AY getYMin() const
       {
         return m_yBinBounds[0];
       };
 
-      /** Get mean value of theta */
+      /** Get mean value of "r" */
       AY getYMean() const
       {
         return m_yBinBounds[1];
       };
 
-      /** Get maximal "Theta" value of the node */
+      /** Get maximal "r" value of the node */
       AY getYMax() const
       {
         return m_yBinBounds[2];
       };
 
-      /** Get "r" value of given bin border */
-      AY getYBinBound(int bin) const
+      /** Getter for the width of the iBin bin in "r" direction */
+      AY getYBinWidth(int iBin)
       {
-        return m_yBinBounds[bin];
+        return std::abs(getYBinBound(iBin + 1) - getYBinBound(iBin));
+      }
+
+      /** Get "r" value of given bin border */
+      AY getYBinBound(int iBin) const
+      {
+        return m_yBinBounds[iBin];
       };
 
     private:

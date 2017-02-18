@@ -10,7 +10,6 @@
 #include <tracking/trackFindingCDC/findlets/minimal/AxialTrackMerger.h>
 
 #include <tracking/trackFindingCDC/processing/TrackProcessor.h>
-#include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/processing/HitProcessor.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
@@ -47,12 +46,12 @@ void AxialTrackMerger::apply(std::vector<CDCTrack>& axialTracks,
   for (CDCTrack& track : axialTracks) {
     if (track.size() < 5) continue;
     HitProcessor::removeHitsAfterSuperLayerBreak(track);
-    TrackQualityTools::normalizeTrack(track);
+    HitProcessor::normalizeTrack(track);
   }
 
   // Update tracks before storing to DataStore
   for (CDCTrack& track : axialTracks) {
-    TrackQualityTools::normalizeTrack(track);
+    HitProcessor::normalizeTrack(track);
   }
 
   // Remove bad tracks
@@ -178,18 +177,18 @@ void AxialTrackMerger::mergeTracks(CDCTrack& track1,
   }
   track2.clear();
 
-  TrackQualityTools::normalizeTrack(track1);
+  HitProcessor::normalizeTrack(track1);
 
   track2 = CDCTrack(HitProcessor::splitBack2BackTrack(track1));
 
-  TrackQualityTools::normalizeTrack(track1);
+  HitProcessor::normalizeTrack(track1);
 
   for (CDCRecoHit3D& recoHit3D : track2) {
     recoHit3D.setRecoPos3D({recoHit3D.getRefPos2D(), 0});
     recoHit3D.setRLInfo(ERightLeft::c_Unknown);
   }
 
-  TrackQualityTools::normalizeTrack(track2);
+  HitProcessor::normalizeTrack(track2);
   bool success = TrackProcessor::postprocessTrack(track2, allAxialWireHits);
   if (not success) {
     for (const CDCRecoHit3D& recoHit3D : track2) {

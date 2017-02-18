@@ -30,6 +30,9 @@ namespace Belle2 {
     class HitProcessor {
 
     public:
+      /// Refit and resort the track. Unmask all hits.
+      static void normalizeTrack(CDCTrack& track);
+
       /** update given CDCRecoHit3D with given trajectory */
       static void updateRecoHit3D(const CDCTrajectory2D& trajectory2D, CDCRecoHit3D& hit);
 

@@ -82,9 +82,6 @@ namespace Belle2 {
 
       /// Delete hits of the first superlayer if it is a stereo one (fitting does not work very well when starting with a stereo hit).
       static void moveToNextAxialLayer(CDCTrack& track);
-
-      /// Refit and resort the track. Unmask all hits.
-      static void normalizeTrack(CDCTrack& track);
     };
   }
 }

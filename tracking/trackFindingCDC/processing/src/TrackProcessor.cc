@@ -9,7 +9,6 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/processing/TrackProcessor.h>
 
-#include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/processing/HitProcessor.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
@@ -65,19 +64,19 @@ void TrackProcessor::addCandidateFromHitsWithPostprocessing(const std::vector<co
 
 bool TrackProcessor::postprocessTrack(CDCTrack& track, const std::vector<const CDCWireHit*>& allAxialWireHits)
 {
-  TrackQualityTools::normalizeTrack(track);
+  HitProcessor::normalizeTrack(track);
 
   HitProcessor::deleteHitsFarAwayFromTrajectory(track);
-  TrackQualityTools::normalizeTrack(track);
+  HitProcessor::normalizeTrack(track);
   if (not checkTrackQuality(track)) {
     return false;
   }
 
   HitProcessor::assignNewHitsToTrack(track, allAxialWireHits);
-  TrackQualityTools::normalizeTrack(track);
+  HitProcessor::normalizeTrack(track);
 
   HitProcessor::splitBack2BackTrack(track);
-  TrackQualityTools::normalizeTrack(track);
+  HitProcessor::normalizeTrack(track);
   if (not checkTrackQuality(track)) {
     return false;
   }

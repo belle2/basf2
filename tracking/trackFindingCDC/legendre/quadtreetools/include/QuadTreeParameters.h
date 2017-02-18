@@ -85,12 +85,11 @@ namespace Belle2 {
       }
 
       /// Create quadtree processor object
-      AxialHitQuadTreeProcessor constructQTProcessor()
+      std::unique_ptr<AxialHitQuadTreeProcessor> constructQTProcessor()
       {
-        return AxialHitQuadTreeProcessor(
-                 getMaxLevel(),
-                 getQTRanges(),
-                 getPrecisionFunction());
+        return makeUnique<AxialHitQuadTreeProcessor>(getMaxLevel(),
+                                                     getQTRanges(),
+                                                     getPrecisionFunction());
       }
 
     private:

@@ -84,90 +84,16 @@ namespace Belle2 {
       }
 
       /**
-       * Return the debug information if collected
+       * Delete all the QuadTreeItems in the tree and clear the tree.
        */
-      const std::map<std::pair<AX, AY>, std::vector<Item*>>& getDebugInformation()
+      void clear()
       {
-        return m_debugOutputMap;
-      }
-
-    protected:
-      /**
-       * Implement that function if you want to provide a new processor. It decides which node-spans the n * m children of the node should have.
-       * It is called when creating the nodes. The two indices iX and iY tell you where the new node will be created (as node.children[iX][iY]).
-       * You can check some information on the level or the x- or y-values by using the methods implemented for node.
-       * @return a XYSpan pair of a x- and a y-span that the new child should have.
-       * If you don nt want to provide custom spans, just return XYSpans(XSpan(node->getXBinBound(iX), node->getXBinBound(iX + 1)),
-       * YSpan(node->getYBinBound(iY), node->getYBinBound(iY + 1)));
-       */
-      virtual XYSpans createChildWithParent(QuadTree* node, unsigned int iX, unsigned int iY) const
-      {
-        AX xMin = node->getXBinBound(iX);
-        AX xMax = node->getXBinBound(iX + 1);
-        AY yMin = node->getYBinBound(iY);
-        AY yMax = node->getYBinBound(iY + 1);
-        return XYSpans({xMin, xMax}, {yMin, yMax});
-      }
-
-      /**
-       * Implement that function if you want to provide a new processor. It is called when filling the quad tree after creation.
-       * For every item in a node and every child node this function gets called and should decide, if the item should go into this child node or not.
-       * @param node  child node
-       * @param item  item to be filled into the child node or not
-       * @return true if this item belongs into this node.
-       */
-      virtual bool insertItemInNode(QuadTree* node, AData* item) const = 0;
-
-      /**
-       * Override that function if you want to receive debug output whenever the children of a node are filled the first time
-       * Maybe you want to make some nice plots or statistics.
-       */
-      virtual void afterFillDebugHook(QuadTreeChildren* children)
-      {
-        if (not m_debugOutput) return;
-        for (QuadTree* childNode : *children) {
-          if (childNode->getLevel() != getLastLevel()) continue; // Only write the lowest level
-          m_debugOutputMap[ {childNode->getXMean(), childNode->getYMean()}] = childNode->getItems();
+        const std::vector<Item*>& quadtreeItems = m_quadTree->getItems();
+        for (Item* item : quadtreeItems) {
+          delete item;
         }
+        m_quadTree->clearChildren();
       }
-
-      /**
-       * Before making a new search we have to clean up the items that are already used from the items list.
-       */
-      void cleanUpItems(std::vector<Item*>& items) const
-      {
-        items.erase(std::remove_if(items.begin(), items.end(),
-        [&](Item * hit) {
-          return hit->isUsed();
-        }),
-        items.end());
-      };
-
-
-    public:
-      /**
-       * Start filling the already created tree.
-       * @param lmdProcessor the lambda function to call after a node was selected
-       * @param nHitsThreshold the threshold on the number of items
-       * @param rThreshold the threshold in the y variable
-       */
-      void fillGivenTree(CandidateProcessorLambda& lmdProcessor,
-                         unsigned int nHitsThreshold, AY rThreshold)
-      {
-        fillGivenTree(m_quadTree.get(), lmdProcessor, nHitsThreshold, rThreshold, true);
-      }
-
-      /**
-       * Start filling the already created tree.
-       * @param lmdProcessor the lambda function to call after a node was selected
-       * @param nHitsThreshold the threshold on the number of items
-       */
-      void fillGivenTree(CandidateProcessorLambda& lmdProcessor,
-                         unsigned int nHitsThreshold)
-      {
-        fillGivenTree(m_quadTree.get(), lmdProcessor, nHitsThreshold, static_cast<AY>(0), false);
-      }
-
 
       /**
        * Fill in the items in the given vector. They are transformed to QuadTreeItems internally.
@@ -181,54 +107,29 @@ namespace Belle2 {
         }
       }
 
-    protected:
+    public:
       /**
-       * Return the parameter last level.
+       * Start filling the already created tree.
+       * @param lmdProcessor the lambda function to call after a node was selected
+       * @param nHitsThreshold the threshold on the number of items
+       * @param rThreshold the threshold in the y variable
        */
-      unsigned int getLastLevel() const
+      void fillGivenTree(CandidateProcessorLambda& lmdProcessor,
+                         unsigned int nHitsThreshold,
+                         AY rThreshold)
       {
-        return m_lastLevel;
+        fillGivenTree(m_quadTree.get(), lmdProcessor, nHitsThreshold, rThreshold, true);
       }
 
       /**
-       * This function is called by fillGivenTree and fills the items into the corresponding children.
-       * For this the user-defined method insertItemInNode is called.
+       * Start filling the already created tree.
+       * @param lmdProcessor the lambda function to call after a node was selected
+       * @param nHitsThreshold the threshold on the number of items
        */
-      virtual void fillChildren(QuadTree* node, std::vector<Item*>& items)
+      void fillGivenTree(CandidateProcessorLambda& lmdProcessor, unsigned int nHitsThreshold)
       {
-        const size_t neededSize = 2 * items.size();
-        for (QuadTree* child : *node->getChildren()) {
-          child->reserveItems(neededSize);
-        }
-
-        //Voting within the four bins
-        for (Item* item : items) {
-          if (item->isUsed()) continue;
-
-          for (QuadTree* child : *node->getChildren()) {
-            if (insertItemInNode(child, item->getPointer())) {
-              child->insertItem(item);
-            }
-          }
-        }
-
-        afterFillDebugHook(node->getChildren());
+        fillGivenTree(m_quadTree.get(), lmdProcessor, nHitsThreshold, static_cast<AY>(0), false);
       }
-
-      /**
-       * Function which checks if given node is leaf
-       * Implemented as virtual to keep possibility of changing lastLevel values depending on region is phase-space
-       * (i.e. setting lastLevel as a function of Y-variable)
-       */
-      virtual bool checkIfLastLevel(QuadTree* node)
-      {
-        if (node->getLevel() >= getLastLevel()) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-
 
       /**
        * Internal function to do the real quad tree search: fill the nodes, check which of the n*m bins we need to
@@ -259,7 +160,7 @@ namespace Belle2 {
 
         if (node->getChildren() == nullptr) {
           node->createChildren();
-          this->initializeChildren(node, node->getChildren());
+          this->createChildren(node, node->getChildren());
         }
 
         if (!node->checkFilled()) {
@@ -280,23 +181,50 @@ namespace Belle2 {
           children.erase(itHeaviestChild);
           // After we have processed some children we need to get rid of the already used hits in all the children,
           // because this can change the number of items drastically
-          this->cleanUpItems(heaviestChild->getItems());
+          erase_remove_if(heaviestChild->getItems(), [&](Item * hit) { return hit->isUsed(); });
           this->fillGivenTree(heaviestChild, lmdProcessor, nItemsThreshold, rThreshold, checkThreshold);
         }
       }
 
       /**
-       * Delete all the QuadTreeItems in the tree and clear the tree.
+       * Creates the sub node of a given node. This function is called by fillGivenTree.
+       * To calculate the spans of the children nodes the user-defined function createChiildWithParent is used.
        */
-      void clear()
+      void createChildren(QuadTree* node, QuadTreeChildren* m_children) const
       {
-        const std::vector<Item*>& quadtreeItems = m_quadTree->getItems();
-        for (Item* item : quadtreeItems) {
-          delete item;
+        for (int i = 0; i < node->getXNbins(); ++i) {
+          for (int j = 0; j < node->getYNbins(); ++j) {
+            const XYSpans& xySpans = createChildWithParent(node, i, j);
+            const XSpan& xSpan = xySpans.first;
+            const YSpan& ySpan = xySpans.second;
+            m_children->set(i, j, new QuadTree(xSpan, ySpan, node->getLevel() + 1, node));
+          }
         }
-        m_quadTree->clearChildren();
       }
 
+      /**
+       * This function is called by fillGivenTree and fills the items into the corresponding children.
+       * For this the user-defined method insertItemInNode is called.
+       */
+      virtual void fillChildren(QuadTree* node, std::vector<Item*>& items)
+      {
+        const size_t neededSize = 2 * items.size();
+        for (QuadTree* child : *node->getChildren()) {
+          child->reserveItems(neededSize);
+        }
+
+        //Voting within the four bins
+        for (Item* item : items) {
+          if (item->isUsed()) continue;
+
+          for (QuadTree* child : *node->getChildren()) {
+            if (insertItemInNode(child, item->getPointer())) {
+              child->insertItem(item);
+            }
+          }
+        }
+        afterFillDebugHook(node->getChildren());
+      }
 
       /**
        * When a node is accepted as a result, we extract a vector with the items (back transformed to AData*)
@@ -316,21 +244,75 @@ namespace Belle2 {
         lambda(resultItems, node);
       }
 
-    private:
+    protected: // Section of specialisable functions
       /**
-       * Creates the sub node of a given node. This function is called by fillGivenTree.
-       * To calculate the spans of the children nodes the user-defined function createChiildWithParent is used.
+       * Implement that function if you want to provide a new processor. It decides which node-spans the n * m children of the node should have.
+       * It is called when creating the nodes. The two indices iX and iY tell you where the new node will be created (as node.children[iX][iY]).
+       * You can check some information on the level or the x- or y-values by using the methods implemented for node.
+       * @return a XYSpan pair of a x- and a y-span that the new child should have.
+       * If you don nt want to provide custom spans, just return XYSpans(XSpan(node->getXBinBound(iX), node->getXBinBound(iX + 1)),
+       * YSpan(node->getYBinBound(iY), node->getYBinBound(iY + 1)));
        */
-      void initializeChildren(QuadTree* node, QuadTreeChildren* m_children) const
+      virtual XYSpans createChildWithParent(QuadTree* node, unsigned int iX, unsigned int iY) const
       {
-        for (int i = 0; i < node->getXNbins(); ++i) {
-          for (int j = 0; j < node->getYNbins(); ++j) {
-            const XYSpans& xySpans = createChildWithParent(node, i, j);
-            const XSpan& xSpan = xySpans.first;
-            const YSpan& ySpan = xySpans.second;
-            m_children->set(i, j, new QuadTree(xSpan, ySpan, node->getLevel() + 1, node));
-          }
+        AX xMin = node->getXBinBound(iX);
+        AX xMax = node->getXBinBound(iX + 1);
+        AY yMin = node->getYBinBound(iY);
+        AY yMax = node->getYBinBound(iY + 1);
+        return XYSpans({xMin, xMax}, {yMin, yMax});
+      }
+
+      /**
+       * Implement that function if you want to provide a new processor. It is called when filling the quad tree after creation.
+       * For every item in a node and every child node this function gets called and should decide, if the item should go into this child node or not.
+       * @param node  child node
+       * @param item  item to be filled into the child node or not
+       * @return true if this item belongs into this node.
+       */
+      virtual bool insertItemInNode(QuadTree* node, AData* item) const = 0;
+
+      /**
+       * Function which checks if given node is leaf
+       * Implemented as virtual to keep possibility of changing lastLevel values depending on region is phase-space
+       * (i.e. setting lastLevel as a function of Y-variable)
+       */
+      virtual bool checkIfLastLevel(QuadTree* node)
+      {
+        if (node->getLevel() >= m_lastLevel) {
+          return true;
+        } else {
+          return false;
         }
+      }
+
+      /**
+       * Return the parameter last level.
+       */
+      unsigned int getLastLevel() const
+      {
+        return m_lastLevel;
+      }
+
+    public: // debug stuff
+      /**
+       * Override that function if you want to receive debug output whenever the children of a node are filled the first time
+       * Maybe you want to make some nice plots or statistics.
+       */
+      virtual void afterFillDebugHook(QuadTreeChildren* children)
+      {
+        if (not m_debugOutput) return;
+        for (QuadTree* childNode : *children) {
+          if (childNode->getLevel() != getLastLevel()) continue; // Only write the lowest level
+          m_debugOutputMap[ {childNode->getXMean(), childNode->getYMean()}] = childNode->getItems();
+        }
+      }
+
+      /**
+       * Return the debug information if collected
+       */
+      const std::map<std::pair<AX, AY>, std::vector<Item*>>& getDebugInformation()
+      {
+        return m_debugOutputMap;
       }
 
     protected:

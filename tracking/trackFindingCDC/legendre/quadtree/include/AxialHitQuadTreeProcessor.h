@@ -301,10 +301,9 @@ namespace Belle2 {
         for (QuadTree& tree : m_seededTree) {
 //          B2INFO("NItems in the node: " << tree.getNItems());
 //          fillGivenTreeWithSegments(&tree, lmdProcessor, nHitsThreshold, rThreshold, true);
-          this->cleanUpItems(tree.getItems());
+          erase_remove_if(tree.getItems(), [&](Item * hit) { return hit->isUsed(); });
           fillGivenTree(&tree, lmdProcessor, nHitsThreshold, rThreshold, true);
         }
-
       }
 
       /// Clear vector of QuadTree instances

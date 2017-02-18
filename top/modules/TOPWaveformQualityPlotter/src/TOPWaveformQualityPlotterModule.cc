@@ -29,11 +29,13 @@ REG_MODULE(TOPWaveformQualityPlotter)
 
 TOPWaveformQualityPlotterModule::TOPWaveformQualityPlotterModule()
   : HistoModule()
-  , m_iEvent(0)
 {
   setDescription("TOP DQM histogram module");
   addParam("histogramDirectoryName", m_histogramDirectoryName,
            "histogram directory in ROOT file", string("TOP"));
+  addParam("drawWaves", m_DRAWWAVES, "option to draw waveforms", true);
+  addParam("debugHistos", m_DEBUGGING, "option to draw debug histograms", true);
+  addParam("noisemaps", m_NOISE, "option to draw noisemaps", false);
 }
 
 
@@ -67,16 +69,8 @@ void TOPWaveformQualityPlotterModule::initialize()
 }
 
 
-void TOPWaveformQualityPlotterModule::beginRun()
+void TOPWaveformQualityPlotterModule::basicDebuggingPlots(const TOPRawWaveform& v)
 {
-  m_DRAWWAVES = true;
-  m_DEBUGGING = true;
-  m_NOISE = false;
-}
-
-void TOPWaveformQualityPlotterModule::basicDebuggingPlots(TOPRawWaveform* rawwave)
-{
-  const TOPRawWaveform& v = *rawwave;
   int scrodid = v.getScrodID();
   int asicid = v.getASICNumber();
   int channelid = v.getASICChannel();
@@ -105,9 +99,8 @@ void TOPWaveformQualityPlotterModule::basicDebuggingPlots(TOPRawWaveform* rawwav
 }
 
 void
-TOPWaveformQualityPlotterModule::drawWaveforms(TOPRawWaveform* rawwave)
+TOPWaveformQualityPlotterModule::drawWaveforms(const TOPRawWaveform& v)
 {
-  const TOPRawWaveform& v = *rawwave;
   vector<short> waveform = v.getWaveform();
   if (waveform.empty()) {
     return;
@@ -145,18 +138,16 @@ void TOPWaveformQualityPlotterModule::event()
   if (not m_waveform) {
     return;
   }
-  // TODO: auto evtwave : m_waveform (C++14)
-  for (int c = 0; c < m_waveform.getEntries(); c++) {
-    TOPRawWaveform* evtwave_ptr = m_waveform[c];
+  for (auto evtwave : m_waveform) {
     if (m_DRAWWAVES) {
-      drawWaveforms(evtwave_ptr);
+      drawWaveforms(evtwave);
     }
     if (m_DEBUGGING) {
-      basicDebuggingPlots(evtwave_ptr);
+      basicDebuggingPlots(evtwave);
     }
     if (m_NOISE) {
-      auto channelID = evtwave_ptr->getChannel();
-      const vector<short> v_samples = evtwave_ptr->getWaveform();
+      auto channelID = evtwave.getChannel();
+      const vector<short> v_samples = evtwave.getWaveform();
       size_t nsamples = v_samples.size();
       if (m_channelNoiseMap.find(channelID) == m_channelNoiseMap.end()) {
         string idName = string("noise_") + to_string(channelID);
@@ -222,8 +213,4 @@ void TOPWaveformQualityPlotterModule::endRun()
       m_directory->WriteTObject(c);
     }
   }
-}
-
-void TOPWaveformQualityPlotterModule::terminate()
-{
 }

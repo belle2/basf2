@@ -51,12 +51,6 @@ namespace Belle2 {
     void initialize();
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    void beginRun();
-
-    /**
      * Event processor.
      */
     void event();
@@ -68,25 +62,19 @@ namespace Belle2 {
     void endRun();
 
     /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    void terminate();
-
-    /**
      * Draws the full waveforms onto the TProfiles
      * @param rawwave the raw waveform
      */
-    void drawWaveforms(TOPRawWaveform* rawwave);
+    void drawWaveforms(const TOPRawWaveform&);
 
     /**
      * Fills the debugging 1D histograms and hitmaps
      * @param rawwave the raw waveform
      */
-    void basicDebuggingPlots(TOPRawWaveform* rawwave);
+    void basicDebuggingPlots(const TOPRawWaveform&);
 
   private:
-    int m_iEvent = 0;              /**< keeps track of iterations within run */
+    int m_iEvent = -1;             /**< keeps track of iterations within run */
     TH1F* m_samples = 0;           /**< plot of ADC sample values */
     std::map<int, TH2F*> m_hitmap; /**< hitmaps for each SCROD */
     TH1F* m_scrod_id = 0;          /**< plot of SCROD IDs for debugging */
@@ -108,12 +96,12 @@ namespace Belle2 {
 
     std::map<int, std::map<int, std::map<int, std::map<int, TProfile*>>>> m_waveformHists; /**< scrod, carrier, asic, channel */
 
-    bool m_DRAWWAVES = true; /**< option to draw waveforms (to be promoted to a module parameter later) */
-    bool m_DEBUGGING = true; /**< option to fill debug histograms (to be promoted to a module parameter later) */
-    bool m_NOISE = false;    /**< option to draw noisemaps (to be promoted to a module parameter later) */
+    bool m_DRAWWAVES = true; /**< option to draw waveforms */
+    bool m_DEBUGGING = true; /**< option to fill debug histograms */
+    bool m_NOISE = false;    /**< option to draw noisemaps */
 
     std::string m_histogramDirectoryName; /** < the name of the directory inside the output file */
-    TDirectory* m_directory;              /** < the directory itself */
+    TDirectory* m_directory = 0;          /** < the directory itself */
 
   };
 

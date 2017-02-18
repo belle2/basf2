@@ -59,8 +59,6 @@ void TrackQualityTools::normalizeTrack(CDCTrack& track)
   // Set the start point of the trajectory to the first hit
   if (track.size() < 5) return;
 
-  HitProcessor::unmaskHitsInTrack(track);
-
   CDCObservations2D observations2D(EFitPos::c_RecoPos);
   for (const CDCRecoHit3D& item : track) {
     observations2D.append(item);
@@ -85,8 +83,6 @@ void TrackQualityTools::normalizeTrack(CDCTrack& track)
 
   CDCTrajectory3D trajectory3D(trackTrajectory2D, CDCTrajectorySZ::basicAssumption());
   track.setStartTrajectory3D(trajectory3D);
-
-  HitProcessor::unmaskHitsInTrack(track);
 }
 
 void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)

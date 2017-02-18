@@ -38,7 +38,7 @@ namespace Belle2 {
 
     public:
       /// Constructor
-      AxialHitQuadTreeProcessor(unsigned char lastLevel, const ChildRanges& ranges,
+      AxialHitQuadTreeProcessor(unsigned char lastLevel, const XYSpans& ranges,
                                 PrecisionUtil::PrecisionFunction lmdFunctLevel,
                                 bool standartBinning = false) :
         QuadTreeProcessorTemplate(lastLevel, ranges), m_standartBinning(standartBinning), m_lmdFunctLevel(lmdFunctLevel) { }
@@ -159,7 +159,7 @@ namespace Belle2 {
        * @param j rho index of the child
        * @return returns ranges of the (i;j) child
        */
-      ChildRanges createChildWithParent(QuadTree* node, unsigned int i, unsigned int j) const override final
+      XYSpans createChildWithParent(QuadTree* node, unsigned int i, unsigned int j) const override final
       {
         const int nodeLevel = node->getLevel();
         const int lastLevel = getLastLevel();
@@ -177,7 +177,7 @@ namespace Belle2 {
           long theta2 = node->getXBinBound(i + 1);
 
           // Standard bin division
-          return ChildRanges(rangeX(theta1, theta2), rangeY(r1, r2));
+          return XYSpans({theta1, theta2}, {r1, r2});
         }
 
         // Non-standard binning
@@ -198,7 +198,7 @@ namespace Belle2 {
             theta2 = TrigonometricalLookupTable<>::Instance().getNBinsTheta() - 1;
           }
 
-          return ChildRanges(rangeX(theta1, theta2), rangeY(r1, r2));
+          return XYSpans({theta1, theta2}, {r1, r2});
         } else {
           float r1 = node->getYBinBound(j) - node->getYBinWidth(j) / 8.;
           float r2 = node->getYBinBound(j + 1) + node->getYBinWidth(j) / 8.;
@@ -214,7 +214,7 @@ namespace Belle2 {
             theta2 = TrigonometricalLookupTable<>::Instance().getNBinsTheta() - 1;
           }
 
-          return ChildRanges(rangeX(theta1, theta2), rangeY(r1, r2));
+          return XYSpans({theta1, theta2}, {r1, r2});
         }
       }
 
@@ -232,31 +232,32 @@ namespace Belle2 {
 
         m_seededTree.reserve(nbins * nbins);
 
-        ChildRanges ranges = std::make_pair(rangeX(m_quadTree->getXMin(), m_quadTree->getXMax()),
-                                            rangeY(m_quadTree->getYMin(), m_quadTree->getYMax()));
+        XYSpans ranges({m_quadTree->getXMin(), m_quadTree->getXMax()},
+        {m_quadTree->getYMin(), m_quadTree->getYMax()});
 
 
-        const rangeX& x = ranges.first;
-        const rangeY& y = ranges.second;
+        const XSpan& xSpan = ranges.first;
+        const YSpan& ySpan = ranges.second;
 
-        long binSizeX = (x.second - x.first) / nbins;
-        float binSizeY = (y.second - y.first) / nbins;
+        long binSizeX = (xSpan[1] - xSpan[0]) / nbins;
+        float binSizeY = (ySpan[1] - ySpan[0]) / nbins;
 
-        std::vector<ItemType*> items = m_quadTree->getItems();
+        std::vector<Item*> items = m_quadTree->getItems();
 
         for (long xIndex = 0; xIndex < nbins; xIndex++) {
           for (long yIndex = 0; yIndex < nbins; yIndex++) {
-            long xMin = xIndex * binSizeX + x.first;
-            long xMax = (xIndex + 1) * binSizeX + x.first;
-            float yMin = yIndex * binSizeY + y.first;
-            float yMax = (yIndex + 1) * binSizeY + y.first;
+
+            long xMin = xIndex * binSizeX + xSpan[0];
+            long xMax = (xIndex + 1) * binSizeX + xSpan[0];
+            float yMin = yIndex * binSizeY + ySpan[0];
+            float yMax = (yIndex + 1) * binSizeY + ySpan[0];
 
             m_seededTree.push_back(QuadTree({xMin, xMax}, {yMin, yMax}, lvl, nullptr));
             QuadTree& newQuadTree = m_seededTree.back();
             if ((newQuadTree.getYMin() < -0.02)  && (newQuadTree.getYMax() < -0.02)) continue;
             newQuadTree.reserveItems(m_quadTree->getNItems() * 2);
 
-            for (ItemType* item : items) {
+            for (Item* item : items) {
               if (item->isUsed()) continue;
 
               if (insertItemInNode(&newQuadTree, item->getPointer())) {
@@ -319,17 +320,17 @@ namespace Belle2 {
        * @return returns pointer to QuadTree instance
        */
 
-      QuadTree* createSingleNode(const ChildRanges& ranges)
+      QuadTree* createSingleNode(const XYSpans& ranges)
       {
-        std::vector<ItemType*> hitsVector = m_quadTree->getItems();
+        std::vector<Item*> hitsVector = m_quadTree->getItems();
 
-        const rangeX& x = ranges.first;
-        const rangeY& y = ranges.second;
-        QuadTree* quadTree = new QuadTree({x.first, x.second}, {y.first, y.second}, 0, nullptr);
+        const XSpan& xSpan = ranges.first;
+        const YSpan& ySpan = ranges.second;
+        QuadTree* quadTree = new QuadTree(xSpan, ySpan, 0, nullptr);
 
-        std::vector<ItemType*>& quadtreeItems = quadTree->getItems();
+        std::vector<Item*>& quadtreeItems = quadTree->getItems();
 //        quadtreeItems.reserve(hitsVector.size());
-        for (ItemType* item : hitsVector) {
+        for (Item* item : hitsVector) {
           if (item->isUsed()) continue;
           if (insertItemInNode(quadTree, item->getPointer())) {
             quadtreeItems.push_back(item);
@@ -357,7 +358,7 @@ namespace Belle2 {
 
 
         //    int nhits = 0;
-        for (ItemType* hit : m_quadTree->getItems()) {
+        for (Item* hit : m_quadTree->getItems()) {
           TF1* funct1 = new TF1("funct", "2*[0]*cos(x)/((1-sin(x))*[1]) ", -3.1415, 3.1415);
           funct1->SetLineWidth(1);
           double r2 = (hit->getPointer()->getRefPos2D().norm() + hit->getPointer()->getRefDriftLength()) *

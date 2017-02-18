@@ -58,13 +58,13 @@ namespace Belle2 {
                                     const std::vector<const CDCWireHit*>& allAxialWireHits,
                                     std::vector<CDCTrack>& tracks)
       {
-        for (AxialHitQuadTreeProcessor::ItemType* hit : qt->getItems()) {
+        for (AxialHitQuadTreeProcessor::Item* hit : qt->getItems()) {
           hit->setUsedFlag(false);
         }
 
         std::vector<const CDCWireHit*> candidateHits;
 
-        for (AxialHitQuadTreeProcessor::ItemType* hit : qt->getItems()) {
+        for (AxialHitQuadTreeProcessor::Item* hit : qt->getItems()) {
           hit->setUsedFlag(false);
           candidateHits.push_back(hit->getPointer());
         }

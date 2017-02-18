@@ -30,19 +30,14 @@ namespace {
 
   TEST_F(TrackFindingCDCTestWithSimpleSimulation, legendre_QuadTreeTest)
   {
+    using XYSpans = AxialHitQuadTreeProcessor::XYSpans;
+    const int maxTheta = std::pow(2, PrecisionUtil::getLookupGridLevel());
     // high-pt candidate
-    AxialHitQuadTreeProcessor::ChildRanges
-    ranges1(AxialHitQuadTreeProcessor::rangeX(0,
-                                              std::pow(2, PrecisionUtil::getLookupGridLevel())),
-            AxialHitQuadTreeProcessor::rangeY(0., 0.15));
+    XYSpans ranges1({0, maxTheta}, {0., 0.15});
     PrecisionUtil::PrecisionFunction highPtPrecisionFunction = &PrecisionUtil::getOriginCurvPrecision;
 
     // low-pt candidate
-    AxialHitQuadTreeProcessor::ChildRanges
-    ranges2(AxialHitQuadTreeProcessor::rangeX(0,
-                                              std::pow(2, PrecisionUtil::getLookupGridLevel())),
-            AxialHitQuadTreeProcessor::rangeY(0., 0.30));
-
+    XYSpans ranges2({0, maxTheta}, {0., 0.30});
     PrecisionUtil::PrecisionFunction lowPtPrecisionFunction = &PrecisionUtil::getNonOriginCurvPrecision;
 
     std::vector<AxialHitQuadTreeProcessor::ReturnList> candidates;

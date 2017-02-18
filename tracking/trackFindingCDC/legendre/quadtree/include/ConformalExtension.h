@@ -42,10 +42,12 @@ namespace Belle2 {
 
         double chi2 = trackTrajectory2D.getChi2();
         Vector2D refPos = trackTrajectory2D.getGlobalPerigee();
-        double curv =
-          -1.*trackTrajectory2D.getCurvature(); //change sign of the curvature; should be the same as the charge of the candidate
-        double theta = trackTrajectory2D.getGlobalCircle().phi0() - boost::math::constants::pi<double>() /
-                       2.; //theta is an angle between x-axis and vector to the center of the track
+
+        // change sign of the curvature; should be the same as the charge of the candidate
+        double curv = -1. * trackTrajectory2D.getCurvature();
+
+        // theta is an angle between x-axis and vector to the center of the track
+        double theta = trackTrajectory2D.getGlobalCircle().phi0() - M_PI_2;
 
         for (const CDCWireHit* hit : cdcWireHits) {
           hit->getAutomatonCell().setTakenFlag(doMaskInitialHits);
@@ -94,19 +96,17 @@ namespace Belle2 {
        * @param theta angle between x-axis and vector to the center of the circle which represents trajectory
        * @return vector of CDCWireHit objects which satisfy legendre transformation with respect to the given parameters
        */
-      std::vector<const CDCWireHit*> getHitsWRTtoRefPos(Vector2D refPos, double curv, double theta,
+      std::vector<const CDCWireHit*> getHitsWRTtoRefPos(Vector2D refPos, float curv, float theta,
                                                         const std::vector<const CDCWireHit*>& allAxialWireHits)
       {
 
-        double precision_r, precision_theta;
+        float precision_r, precision_theta;
         precision_theta = 3.1415 / (pow(2., m_levelPrecision + 1));
         precision_r = 0.15 / (pow(2., m_levelPrecision));
 
-        AxialHitQuadTreeProcessorWithNewReferencePoint::ChildRanges
-        ranges(AxialHitQuadTreeProcessorWithNewReferencePoint::rangeX(static_cast<float>(theta - precision_theta),
-               static_cast<float>(theta + precision_theta)),
-               AxialHitQuadTreeProcessorWithNewReferencePoint::rangeY(static_cast<float>(curv - precision_r),
-                   static_cast<float>(curv + precision_r)));
+        using XYSpans = AxialHitQuadTreeProcessorWithNewReferencePoint::XYSpans;
+        XYSpans ranges({theta - precision_theta, theta + precision_theta},
+        {curv - precision_r, curv + precision_r});
 
         std::vector<const CDCWireHit*> hitsVector;
         for (const CDCWireHit* wireHit : allAxialWireHits) {

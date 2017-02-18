@@ -22,15 +22,15 @@ namespace Belle2 {
     class QuadTreeParameters {
 
     public:
-
       /// Constructor
-      QuadTreeParameters(int maxLevel, LegendreFindingPass& legendreFindingPass):
-        m_maxLevel(maxLevel), m_legendreFindingPass(legendreFindingPass),
-        m_rangesFine(std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, PrecisionUtil::getLookupGridLevel())),
-                                    AxialHitQuadTreeProcessor::rangeY(-0.02, 0.14))),
-        m_rangesRough(std::make_pair(AxialHitQuadTreeProcessor::rangeX(0, std::pow(2, PrecisionUtil::getLookupGridLevel())),
-                                     AxialHitQuadTreeProcessor::rangeY(0., 0.30)))
-      {};
+      QuadTreeParameters(int maxLevel, LegendreFindingPass& legendreFindingPass)
+        : m_maxLevel(maxLevel)
+        , m_legendreFindingPass(legendreFindingPass)
+        , m_maxTheta(std::pow(2, PrecisionUtil::getLookupGridLevel()))
+        , m_rangesFine( { {0, m_maxTheta}, { -0.02, 0.14}})
+      , m_rangesRough({{0, m_maxTheta}, {0.00, 0.30}})
+      {
+      }
 
       /// Get precision function for quadtree
       PrecisionUtil::PrecisionFunction getPrecisionFunction()
@@ -63,7 +63,7 @@ namespace Belle2 {
       }
 
       /// Get ranges for quadtree processor
-      AxialHitQuadTreeProcessor::ChildRanges getQTRanges()
+      AxialHitQuadTreeProcessor::XYSpans getQTRanges()
       {
         if ((m_legendreFindingPass == LegendreFindingPass::NonCurlers)
             || (m_legendreFindingPass == LegendreFindingPass::NonCurlersWithIncreasingThreshold))
@@ -97,9 +97,11 @@ namespace Belle2 {
       int m_maxLevel; /**< Maximal deepness (level) of the QuadTree */
       LegendreFindingPass& m_legendreFindingPass; /**< Reference to the current pass */
 
+      /// Maximal index in the theta range.
+      int m_maxTheta;
 
-      AxialHitQuadTreeProcessor::ChildRanges m_rangesFine; /**< Ranges which correspond to more fine binning*/
-      AxialHitQuadTreeProcessor::ChildRanges m_rangesRough; /**< Ranges which correspond to more rough binning*/
+      AxialHitQuadTreeProcessor::XYSpans m_rangesFine; /**< Ranges which correspond to more fine binning*/
+      AxialHitQuadTreeProcessor::XYSpans m_rangesRough; /**< Ranges which correspond to more rough binning*/
     };
 
   }

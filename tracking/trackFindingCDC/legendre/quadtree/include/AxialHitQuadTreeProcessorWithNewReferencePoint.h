@@ -28,7 +28,7 @@ namespace Belle2 {
        * @param ranges ranges of the initial QuadTree (only one instance without children created)
        * @referencePoint reference position.
        */
-      AxialHitQuadTreeProcessorWithNewReferencePoint(const ChildRanges& ranges,
+      AxialHitQuadTreeProcessorWithNewReferencePoint(const XYSpans& ranges,
                                                      std::pair<double, double> referencePoint)
         : QuadTreeProcessorTemplate(0, ranges),
           m_referencePoint(referencePoint.first, referencePoint.second)
@@ -50,12 +50,12 @@ namespace Belle2 {
       {
         clear();
 
-        std::vector<ItemType*>& quadtreeItemsVector = m_quadTree->getItems();
+        std::vector<Item*>& quadtreeItemsVector = m_quadTree->getItems();
         quadtreeItemsVector.reserve(itemsVector.size());
         for (const CDCWireHit* item : itemsVector) {
           if (item->getAutomatonCell().hasTakenFlag() or item->getAutomatonCell().hasMaskedFlag()) continue;
           if (insertItemInNode(m_quadTree, item)) {
-            quadtreeItemsVector.push_back(new ItemType(item));
+            quadtreeItemsVector.push_back(new Item(item));
           }
         }
       }
@@ -68,7 +68,7 @@ namespace Belle2 {
         std::vector<const CDCWireHit*> itemsToReturn;
         itemsToReturn.reserve(m_quadTree->getNItems());
 
-        for (ItemType* item : m_quadTree->getItems()) {
+        for (Item* item : m_quadTree->getItems()) {
           itemsToReturn.push_back(item->getPointer());
         }
 

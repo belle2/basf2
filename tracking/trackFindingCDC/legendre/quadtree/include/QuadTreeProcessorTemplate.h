@@ -33,40 +33,46 @@ namespace Belle2 {
 
     public:
       /// The QuadTree will only see items of this type
-      using ItemType = QuadTreeItem<AData>;
-
-      /// The type of the list of result items returned to the lambda function
-      using ReturnList = std::vector<AData*>;
+      using Item = QuadTreeItem<AData>;
 
       /// The used QuadTree
-      using QuadTree = QuadTreeNode<AX, AY, ItemType>;
+      using QuadTree = QuadTreeNode<AX, AY, Item>;
 
-      /// This lambda function can be used for postprocessing
-      using CandidateProcessorLambda = std::function<void(const ReturnList&, QuadTree*)>;
+      /// This pair describes the span in X for a node
+      using XSpan = typename QuadTree::XSpan;
+
+      /// This pair describes the span in Y for a node
+      using YSpan = typename QuadTree::YSpan;
+
+      /// This pair of spans describes the span of a node
+      using XYSpans = std::pair<XSpan, YSpan>;
 
       /// Alias for the QuadTree Children
       using QuadTreeChildren = typename QuadTree::Children;
 
-      /// This pair describes the range in X for a node
-      using rangeX = std::pair<AX, AX>;
+      /// The type of the list of result items returned to the lambda function
+      using ReturnList = std::vector<AData*>;
 
-      /// This pair describes the range in Y for a node
-      using rangeY = std::pair<AY, AY>;
-
-      /// This pair of ranges describes the range of a node
-      using ChildRanges = std::pair<rangeX, rangeY>;
+      /// This lambda function can be used for postprocessing
+      using CandidateProcessorLambda = std::function<void(const ReturnList&, QuadTree*)>;
 
     public:
       /**
        * Constructor is very simple. The QuadTree has to be constructed elsewhere.
        * @param lastLevel describing the last search level for the quad tree creation.
-       * @param ranges ranges of the QuadTree at the top level
+       * @param spans spans of the QuadTree at the top level
        * @param setUsedFlag Set the used flag after every lambda function call
        */
-      QuadTreeProcessorTemplate(unsigned char lastLevel, const ChildRanges& ranges, bool debugOutput = false, bool setUsedFlag = true) :
-        m_lastLevel(lastLevel), m_debugOutput(debugOutput), m_debugOutputMap(), m_param_setUsedFlag(setUsedFlag)
+      QuadTreeProcessorTemplate(unsigned char lastLevel,
+                                const XYSpans& xySpans,
+                                bool debugOutput = false,
+                                bool setUsedFlag = true)
+        : m_lastLevel(lastLevel)
+        , m_debugOutput(debugOutput)
+        , m_debugOutputMap()
+        , m_param_setUsedFlag(setUsedFlag)
       {
-        createQuadTree(ranges);
+        createQuadTree(xySpans);
       }
 
       /**
@@ -81,27 +87,27 @@ namespace Belle2 {
       /**
        * Return the debug information if collected
        */
-      const std::map<std::pair<AX, AY>, std::vector<ItemType*>>& getDebugInformation()
+      const std::map<std::pair<AX, AY>, std::vector<Item*>>& getDebugInformation()
       {
         return m_debugOutputMap;
       }
 
     protected:
       /**
-       * Implement that function if you want to provide a new processor. It decides which node-ranges the n * m children of the node should have.
+       * Implement that function if you want to provide a new processor. It decides which node-spans the n * m children of the node should have.
        * It is called when creating the nodes. The two indices iX and iY tell you where the new node will be created (as node.children[iX][iY]).
        * You can check some information on the level or the x- or y-values by using the methods implemented for node.
-       * @return a ChildRange pair of a x- and a y-range that the new child range should have.
-       * If you don nt want to provide custom ranges, just return ChildRanges(rangeX(node->getXBinBound(iX), node->getXBinBound(iX + 1)),
-       * rangeY(node->getYBinBound(iY), node->getYBinBound(iY + 1)));
+       * @return a XYSpan pair of a x- and a y-span that the new child should have.
+       * If you don nt want to provide custom spans, just return XYSpans(XSpan(node->getXBinBound(iX), node->getXBinBound(iX + 1)),
+       * YSpan(node->getYBinBound(iY), node->getYBinBound(iY + 1)));
        */
-      virtual ChildRanges createChildWithParent(QuadTree* node, unsigned int iX, unsigned int iY) const
+      virtual XYSpans createChildWithParent(QuadTree* node, unsigned int iX, unsigned int iY) const
       {
         AX xMin = node->getXBinBound(iX);
         AX xMax = node->getXBinBound(iX + 1);
         AY yMin = node->getYBinBound(iY);
         AY yMax = node->getYBinBound(iY + 1);
-        return ChildRanges(rangeX(xMin, xMax), rangeY(yMin, yMax));
+        return XYSpans({xMin, xMax}, {yMin, yMax});
       }
 
       /**
@@ -129,10 +135,10 @@ namespace Belle2 {
       /**
        * Before making a new search we have to clean up the items that are already used from the items list.
        */
-      void cleanUpItems(std::vector<ItemType*>& items) const
+      void cleanUpItems(std::vector<Item*>& items) const
       {
         items.erase(std::remove_if(items.begin(), items.end(),
-        [&](ItemType * hit) {
+        [&](Item * hit) {
           return hit->isUsed();
         }),
         items.end());
@@ -169,10 +175,10 @@ namespace Belle2 {
        */
       virtual void provideItemsSet(std::vector<AData*>& itemsVector)
       {
-        std::vector<ItemType*>& quadtreeItems = m_quadTree->getItems();
+        std::vector<Item*>& quadtreeItems = m_quadTree->getItems();
         quadtreeItems.reserve(itemsVector.size());
         for (AData* item : itemsVector) {
-          quadtreeItems.push_back(new ItemType(item));
+          quadtreeItems.push_back(new Item(item));
         }
       }
 
@@ -189,7 +195,7 @@ namespace Belle2 {
        * This function is called by fillGivenTree and fills the items into the corresponding children.
        * For this the user-defined method insertItemInNode is called.
        */
-      virtual void fillChildren(QuadTree* node, std::vector<ItemType*>& items)
+      virtual void fillChildren(QuadTree* node, std::vector<Item*>& items)
       {
         const size_t neededSize = 2 * items.size();
         for (QuadTree* child : *node->getChildren()) {
@@ -197,7 +203,7 @@ namespace Belle2 {
         }
 
         //Voting within the four bins
-        for (ItemType* item : items) {
+        for (Item* item : items) {
           if (item->isUsed()) continue;
 
           for (QuadTree* child : *node->getChildren()) {
@@ -285,8 +291,8 @@ namespace Belle2 {
        */
       void clear()
       {
-        const std::vector<ItemType*>& quadtreeItems = m_quadTree->getItems();
-        for (ItemType* item : quadtreeItems) {
+        const std::vector<Item*>& quadtreeItems = m_quadTree->getItems();
+        for (Item* item : quadtreeItems) {
           delete item;
         }
         m_quadTree->clearChildren();
@@ -300,10 +306,10 @@ namespace Belle2 {
       void callResultFunction(QuadTree* node, CandidateProcessorLambda& lambda) const
       {
         ReturnList resultItems;
-        const std::vector<ItemType*>& quadTreeItems = node->getItems();
+        const std::vector<Item*>& quadTreeItems = node->getItems();
         resultItems.reserve(quadTreeItems.size());
 
-        for (ItemType* quadTreeItem : quadTreeItems) {
+        for (Item* quadTreeItem : quadTreeItems) {
           quadTreeItem->setUsedFlag(m_param_setUsedFlag);
           resultItems.push_back(quadTreeItem->getPointer());
         }
@@ -317,34 +323,34 @@ namespace Belle2 {
     private:
 
       /**
-       * Create a quad tree with the given parameters ranges.
+       * Create a quad tree with the given parameters spans.
        */
-      void createQuadTree(const ChildRanges& ranges)
+      void createQuadTree(const XYSpans& xySpans)
       {
-        const rangeX& x = ranges.first;
-        const rangeY& y = ranges.second;
-        m_quadTree = new QuadTree({x.first, x.second}, {y.first, y.second}, 0, nullptr);
+        const XSpan& xSpan = xySpans.first;
+        const YSpan& ySpan = xySpans.second;
+        m_quadTree = new QuadTree(xSpan, ySpan, 0, nullptr);
       }
 
       /**
        * Creates the sub node of a given node. This function is called by fillGivenTree.
-       * To calculate the ranges of the children nodes the user-defined function createChiildWithParent is used.
+       * To calculate the spans of the children nodes the user-defined function createChiildWithParent is used.
        */
       void initializeChildren(QuadTree* node, QuadTreeChildren* m_children) const
       {
         for (int i = 0; i < node->getXNbins(); ++i) {
           for (int j = 0; j < node->getYNbins(); ++j) {
-            const ChildRanges& childRanges = createChildWithParent(node, i, j);
-            const rangeX& rangeX = childRanges.first;
-            const rangeY& rangeY = childRanges.second;
-            m_children->set(i, j, new QuadTree({rangeX.first, rangeX.second}, {rangeY.first, rangeY.second}, node->getLevel() + 1, node));
+            const XYSpans& xySpans = createChildWithParent(node, i, j);
+            const XSpan& xSpan = xySpans.first;
+            const YSpan& ySpan = xySpans.second;
+            m_children->set(i, j, new QuadTree(xSpan, ySpan, node->getLevel() + 1, node));
           }
         }
       }
 
       unsigned int m_lastLevel; /**< The last level to be filled */
       bool m_debugOutput; /**< A flag to control the creation of the debug output */
-      std::map<std::pair<AX, AY>, std::vector<ItemType*>> m_debugOutputMap; /**< The calculated debug map */
+      std::map<std::pair<AX, AY>, std::vector<Item*>> m_debugOutputMap; /**< The calculated debug map */
       bool m_param_setUsedFlag; /**< Set the used flag after every lambda function call */
     };
   }

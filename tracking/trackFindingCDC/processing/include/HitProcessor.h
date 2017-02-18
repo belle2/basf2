@@ -56,12 +56,6 @@ namespace Belle2 {
        */
       static int getArmSignVote(const CDCTrack& track, const Vector2D& center);
 
-      /// Reset all masked hits.
-      static void resetMaskedHits(std::vector<CDCTrack>& axialTracks, const std::vector<const CDCWireHit*>& wireHits);
-
-      /// Unset the MASKED flag and set the TAKEN flag of all hits but do not touch the track flags.
-      static void unmaskHitsInTrack(CDCTrack& track);
-
       /**
        * Postprocessing: Delete axial hits that do not "match" to the given track.
        * This is done by checking the distance between the hits and the trajectory, which should not exceed the

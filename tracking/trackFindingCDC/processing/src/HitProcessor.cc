@@ -109,27 +109,6 @@ ESign HitProcessor::getArmSign(const CDCRecoHit3D& hit, const Vector2D& center)
   return sign(center.isRightOrLeftOf(hit.getRecoPos2D()));
 }
 
-void HitProcessor::resetMaskedHits(std::vector<CDCTrack>& axialTracks,
-                                   const std::vector<const CDCWireHit*>& allAxialWireHits)
-{
-  for (const CDCWireHit* wireHit : allAxialWireHits) {
-    wireHit->getAutomatonCell().setMaskedFlag(false);
-    wireHit->getAutomatonCell().setTakenFlag(false);
-  }
-
-  for (const CDCTrack& track : axialTracks) {
-    track.forwardTakenFlag();
-  }
-}
-
-void HitProcessor::unmaskHitsInTrack(CDCTrack& track)
-{
-  for (const CDCRecoHit3D& hit : track) {
-    hit.getWireHit().getAutomatonCell().setTakenFlag(true);
-    hit.getWireHit().getAutomatonCell().setMaskedFlag(false);
-  }
-}
-
 void HitProcessor::deleteHitsFarAwayFromTrajectory(CDCTrack& track, double maximumDistance)
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();

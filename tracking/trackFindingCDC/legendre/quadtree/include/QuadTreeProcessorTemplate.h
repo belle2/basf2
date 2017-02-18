@@ -9,8 +9,8 @@
 **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeNode.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/QuadTree.h>
 
 #include <algorithm>
 #include <functional>
@@ -25,7 +25,7 @@ namespace Belle2 {
     /**
      * This abstract class serves as a base class for all implementations of track processors.
      * It provides some functions to create, fill, clear and postprocess a quad tree.
-     * If you want to use your own class as a quad tree item, you have to overload this processor (not the quad tree itself as it is templated).
+     * If you want to use your own class as a quad tree item, you have to overload this processor.
      * You have provide only the two functions insertItemInNode and createChildWithParent.
      */
     template<typename typeX, typename typeY, class typeData, int binCountX, int binCountY>
@@ -39,7 +39,7 @@ namespace Belle2 {
       using ReturnList = std::vector<typeData*>;
 
       /// The used QuadTree
-      using QuadTree = QuadTreeTemplate<typeX, typeY, ItemType>;
+      using QuadTree = QuadTreeNode<typeX, typeY, ItemType>;
 
       /// This lambda function can be used for postprocessing
       using CandidateProcessorLambda = std::function<void(const ReturnList&, QuadTree*)>;

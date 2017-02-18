@@ -7,16 +7,6 @@
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
-
-/*
- * Object which can store pointers to hits while processing FastHogh algorithm
- *
- * TODO: check if it's possible to store in each hit list of nodes in which we can meet it.
- *
- * Possible runtime improvements:
- * - use a specific allocator for the QuadTrees which can be wiped without calling
- *   each QuadTree constructor once the search is complete.
- */
 #pragma once
 
 #include <array>
@@ -31,7 +21,7 @@ namespace Belle2 {
      * @tparam ANode type of the QuadTree
      */
     template<typename ANode>
-    class QuadTreeChildrenTemplate {
+    class QuadTreeChildren {
     public:
       /// Number of children in X direction
       static constexpr const size_t c_nXBins = 2;
@@ -43,13 +33,13 @@ namespace Belle2 {
       using iterator = typename std::array<ANode*, c_nYBins* c_nXBins>::const_iterator;
 
       /// Constructor
-      QuadTreeChildrenTemplate()
+      QuadTreeChildren()
         : m_children{} // initialize to nullptr
       {
       }
 
       /// Destructor destroying the owned pointers
-      ~QuadTreeChildrenTemplate()
+      ~QuadTreeChildren()
       {
         for (ANode* node : m_children) {
           delete node;

@@ -7,11 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithSimpleSimulation.h>
 
-#include <tracking/trackFindingCDC/legendre/quadtree/QuadTree.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeNode.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/PrecisionUtil.h>
 

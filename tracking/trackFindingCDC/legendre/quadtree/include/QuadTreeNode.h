@@ -7,16 +7,6 @@
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
-
-/*
- * Object which can store pointers to hits while processing FastHogh algorithm
- *
- * TODO: check if it's possible to store in each hit list of nodes in which we can meet it.
- *
- * Possible runtime improvements:
- * - use a specific allocator for the QuadTrees which can be wiped without calling
- *   each QuadTree constructor once the search is complete.
- */
 #pragma once
 
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeChildren.h>
@@ -40,11 +30,11 @@ namespace Belle2 {
      * @tparam AItem type of the objects which are filled into QuadTree
      */
     template<typename AX, typename AY, class AItem>
-    class QuadTreeTemplate {
+    class QuadTreeNode {
 
     public:
       /// Type of this class
-      using This = QuadTreeTemplate<AX, AY, AItem>;
+      using This = QuadTreeNode<AX, AY, AItem>;
 
       /// Type for a span in the X direction that is covered by the tree
       using XSpan = std::array<AX, 2>;
@@ -59,7 +49,7 @@ namespace Belle2 {
       using YBinBounds = std::array<AY, 3>;
 
       /// Type of the child node structure for this node.
-      using Children = QuadTreeChildrenTemplate<This>;
+      using Children = QuadTreeChildren<This>;
 
       /**
        *  Constructor setting up the potential division points.
@@ -68,7 +58,7 @@ namespace Belle2 {
        *  however this would come at performance penalty.
        *  If somebody knows the suppression category please apply it here.
        */
-      QuadTreeTemplate(XSpan xSpan, YSpan ySpan, int level, This* parent)
+      QuadTreeNode(XSpan xSpan, YSpan ySpan, int level, This* parent)
         : m_xBinBounds( {xSpan[0], xSpan[0] + (xSpan[1] - xSpan[0]) / 2, xSpan[1]})
       , m_yBinBounds({ySpan[0], ySpan[0] + (ySpan[1] - ySpan[0]) / 2, ySpan[1]})
       , m_level(level)
@@ -123,7 +113,7 @@ namespace Belle2 {
 
       /**
        *  Clear items which the node holds and destroy all children below this node.
-       *  This method must only be called on the root node, for fast QuadTreeTemplate reusage
+       *  This method must only be called on the root node, for fast QuadTree reusage
        */
       void clearChildren()
       {

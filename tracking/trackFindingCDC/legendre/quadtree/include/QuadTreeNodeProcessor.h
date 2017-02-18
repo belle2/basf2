@@ -32,11 +32,9 @@ namespace Belle2 {
 
       ///Constructor
       QuadTreeNodeProcessor(AxialHitQuadTreeProcessor& qtProcessor,
-                            PrecisionUtil::PrecisionFunction precisionFunct) :
-        m_qtProcessor(qtProcessor), m_precisionFunct(precisionFunct)
-      {
-      };
-
+                            PrecisionUtil::PrecisionFunction precisionFunct)
+        : m_qtProcessor(qtProcessor)
+        , m_precisionFunct(precisionFunct) {};
 
       /**
        *  this lambda function will forward the found candidates to the CandidateCreate for further processing
@@ -55,7 +53,6 @@ namespace Belle2 {
 
       }
 
-
       /// Gets hits from quadtree node, convert to QuadTreeHitWrapper and passes for further processing
       void candidateProcessingFinal(AxialHitQuadTreeProcessor::QuadTree* qt,
                                     const std::vector<const CDCWireHit*>& allAxialWireHits,
@@ -65,12 +62,6 @@ namespace Belle2 {
           hit->setUsedFlag(false);
         }
 
-        /// THIS METHOD IS DISABLED BECACUSE IT CREATES INVALID TREE ITEMS
-        /// WHICH ARE IN THETA AREAS ( < 0 or > m_nbinsTheta )
-        /// WHICH IS NOT SUPPORTED BY OTHER PARTS OF THE QUAD TREE CODE
-        /// NO NEGATIVE IMPACT ON THE EFFICIENCY WHEN THIS METHOD IS DISABLED ....
-        //advancedProcessing(qt);
-
         std::vector<const CDCWireHit*> candidateHits;
 
         for (AxialHitQuadTreeProcessor::ItemType* hit : qt->getItems()) {
@@ -78,72 +69,6 @@ namespace Belle2 {
           candidateHits.push_back(hit->getPointer());
         }
         postprocessSingleNode(candidateHits, allAxialWireHits, tracks);
-      };
-
-
-      /// Trying to assing new hits from neighbouring regions of the given node.
-      /// THIS METHOD IS DISABLED BECACUSE IT CREATES INVALID TREE ITEMS
-      /// WHICH ARE IN THETA AREAS ( < 0 or > m_nbinsTheta )
-      /// WHICH IS NOT SUPPORTED BY OTHER PARTS OF THE QUAD TREE CODE
-      /// NO NEGATIVE IMPACT ON THE EFFICIENCY WHEN THIS METHOD IS DISABLED ....
-      void advancedProcessing(AxialHitQuadTreeProcessor::QuadTree* qt)
-      {
-        double rRes = m_precisionFunct(qt->getYMean());
-        unsigned long thetaRes = std::round(std::fabs(m_nbinsTheta * rRes / 0.3));
-
-        unsigned long meanTheta = qt->getXMean();
-        double meanR = qt->getYMean();
-
-
-        std::vector< AxialHitQuadTreeProcessor::QuadTree*> nodesWithPossibleCands;
-
-        for (int ii = -1; ii <= 1; ii = +2) {
-          for (int jj = -1; jj <= 1; jj = +2) {
-            const double lowerRangeX = meanTheta + (ii - 1) * thetaRes / 2.0f;
-            // make sure there are negative lower borders in x region, because only positive values can be stored
-            // in unsigned long
-            if (lowerRangeX < 0.0f)
-              continue;
-            const auto rangeX = AxialHitQuadTreeProcessor::rangeX(static_cast<unsigned long>(lowerRangeX),
-                                                                  meanTheta + static_cast<unsigned long>((ii + 1) * thetaRes / 2.0f));
-            const auto rangeY = AxialHitQuadTreeProcessor::rangeY(meanR + (jj - 1) * rRes / 2.0f,
-                                                                  meanR + (jj + 1) * rRes / 2.0f);
-
-            AxialHitQuadTreeProcessor::ChildRanges rangesTmp(rangeX, rangeY);
-            nodesWithPossibleCands.push_back(m_qtProcessor.createSingleNode(rangesTmp));
-          }
-        }
-
-        for (int ii = -1; ii <= 1; ii++) {
-          for (int jj = -1; jj <= 1; jj++) {
-            const double lowerRangeX = meanTheta + (2 * ii - 1) * thetaRes / 2.0f;
-            // make sure there are negative lower borders in x region, because only positive values can be stored
-            // in unsigned long
-            if (lowerRangeX < 0.0f)
-              continue;
-            const auto rangeX = AxialHitQuadTreeProcessor::rangeX(static_cast<unsigned long>(lowerRangeX),
-                                                                  meanTheta + static_cast<unsigned long>((2 * ii + 1) * thetaRes / 2.0f));
-            const auto rangeY = AxialHitQuadTreeProcessor::rangeY(meanR + (2 * jj - 1) * rRes / 2.0f,
-                                                                  meanR + (2 * jj + 1) * rRes / 2.0f);
-
-            AxialHitQuadTreeProcessor::ChildRanges rangesTmp(rangeX, rangeY);
-            nodesWithPossibleCands.push_back(m_qtProcessor.createSingleNode(rangesTmp));
-          }
-        }
-
-        std::sort(nodesWithPossibleCands.begin(), nodesWithPossibleCands.end(), [](const AxialHitQuadTreeProcessor::QuadTree * a,
-        const AxialHitQuadTreeProcessor::QuadTree * b) {
-          return static_cast <bool>(a->getNItems() > b->getNItems());
-        });
-
-        qt->clearItems();
-        for (AxialHitQuadTreeProcessor::ItemType* hit : nodesWithPossibleCands.front()->getItems()) {
-          qt->insertItem(hit);
-        }
-
-        for (AxialHitQuadTreeProcessor::QuadTree* node : nodesWithPossibleCands) {
-          delete node;
-        }
       };
 
       /// Perform conformal extension for given set of hits and create CDCTrack object of them
@@ -170,6 +95,4 @@ namespace Belle2 {
     };
 
   }
-
 }
-

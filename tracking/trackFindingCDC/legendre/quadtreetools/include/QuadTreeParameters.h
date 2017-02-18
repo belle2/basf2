@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
+
 #include <tracking/trackFindingCDC/legendre/quadtreetools/QuadTreePassCounter.h>
 
 namespace Belle2 {

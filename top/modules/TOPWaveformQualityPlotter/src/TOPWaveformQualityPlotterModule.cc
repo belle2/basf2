@@ -1,10 +1,23 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Jan Strube                                               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+// basf2
 #include <framework/core/HistoModule.h>
 #include <top/modules/TOPWaveformQualityPlotter/TOPWaveformQualityPlotterModule.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/pcore/RbTuple.h>
 
+// stl
 #include <utility>
 
+//ROOT
 #include "TDirectory.h"
 #include "TCanvas.h"
 #include "TGraphErrors.h"
@@ -132,6 +145,7 @@ void TOPWaveformQualityPlotterModule::event()
   if (not m_waveform) {
     return;
   }
+  // TODO: auto evtwave : m_waveform (C++14)
   for (int c = 0; c < m_waveform.getEntries(); c++) {
     TOPRawWaveform* evtwave_ptr = m_waveform[c];
     if (m_DRAWWAVES) {

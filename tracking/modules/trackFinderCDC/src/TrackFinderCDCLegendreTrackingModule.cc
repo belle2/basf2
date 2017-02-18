@@ -17,8 +17,7 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeNodeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 
-#include <tracking/trackFindingCDC/processing/TrackMerger.h>
-#include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
+#include <tracking/trackFindingCDC/processing/TrackProcessor.h>
 #include <tracking/trackFindingCDC/processing/HitProcessor.h>
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>

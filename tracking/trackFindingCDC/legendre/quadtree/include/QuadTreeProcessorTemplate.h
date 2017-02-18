@@ -28,18 +28,18 @@ namespace Belle2 {
      * If you want to use your own class as a quad tree item, you have to overload this processor.
      * You have provide only the two functions insertItemInNode and createChildWithParent.
      */
-    template<typename typeX, typename typeY, class typeData>
+    template<typename AX, typename AY, class AData>
     class QuadTreeProcessorTemplate {
 
     public:
       /// The QuadTree will only see items of this type
-      using ItemType = QuadTreeItem<typeData>;
+      using ItemType = QuadTreeItem<AData>;
 
       /// The type of the list of result items returned to the lambda function
-      using ReturnList = std::vector<typeData*>;
+      using ReturnList = std::vector<AData*>;
 
       /// The used QuadTree
-      using QuadTree = QuadTreeNode<typeX, typeY, ItemType>;
+      using QuadTree = QuadTreeNode<AX, AY, ItemType>;
 
       /// This lambda function can be used for postprocessing
       using CandidateProcessorLambda = std::function<void(const ReturnList&, QuadTree*)>;
@@ -48,10 +48,10 @@ namespace Belle2 {
       using QuadTreeChildren = typename QuadTree::Children;
 
       /// This pair describes the range in X for a node
-      using rangeX = std::pair<typeX, typeX>;
+      using rangeX = std::pair<AX, AX>;
 
       /// This pair describes the range in Y for a node
-      using rangeY = std::pair<typeY, typeY>;
+      using rangeY = std::pair<AY, AY>;
 
       /// This pair of ranges describes the range of a node
       using ChildRanges = std::pair<rangeX, rangeY>;
@@ -81,7 +81,7 @@ namespace Belle2 {
       /**
        * Return the debug information if collected
        */
-      const std::map<std::pair<typeX, typeY>, std::vector<ItemType*>>& getDebugInformation()
+      const std::map<std::pair<AX, AY>, std::vector<ItemType*>>& getDebugInformation()
       {
         return m_debugOutputMap;
       }
@@ -97,10 +97,10 @@ namespace Belle2 {
        */
       virtual ChildRanges createChildWithParent(QuadTree* node, unsigned int iX, unsigned int iY) const
       {
-        typeX xMin = node->getXBinBound(iX);
-        typeX xMax = node->getXBinBound(iX + 1);
-        typeY yMin = node->getYBinBound(iY);
-        typeY yMax = node->getYBinBound(iY + 1);
+        AX xMin = node->getXBinBound(iX);
+        AX xMax = node->getXBinBound(iX + 1);
+        AY yMin = node->getYBinBound(iY);
+        AY yMax = node->getYBinBound(iY + 1);
         return ChildRanges(rangeX(xMin, xMax), rangeY(yMin, yMax));
       }
 
@@ -111,7 +111,7 @@ namespace Belle2 {
        * @param item  item to be filled into the child node or not
        * @return true if this item belongs into this node.
        */
-      virtual bool insertItemInNode(QuadTree* node, typeData* item) const = 0;
+      virtual bool insertItemInNode(QuadTree* node, AData* item) const = 0;
 
       /**
        * Override that function if you want to receive debug output whenever the children of a node are filled the first time
@@ -147,7 +147,7 @@ namespace Belle2 {
        * @param rThreshold the threshold in the y variable
        */
       void fillGivenTree(CandidateProcessorLambda& lmdProcessor,
-                         unsigned int nHitsThreshold, typeY rThreshold)
+                         unsigned int nHitsThreshold, AY rThreshold)
       {
         fillGivenTree(m_quadTree, lmdProcessor, nHitsThreshold, rThreshold, true);
       }
@@ -160,18 +160,18 @@ namespace Belle2 {
       void fillGivenTree(CandidateProcessorLambda& lmdProcessor,
                          unsigned int nHitsThreshold)
       {
-        fillGivenTree(m_quadTree, lmdProcessor, nHitsThreshold, static_cast<typeY>(0), false);
+        fillGivenTree(m_quadTree, lmdProcessor, nHitsThreshold, static_cast<AY>(0), false);
       }
 
 
       /**
        * Fill in the items in the given vector. They are transformed to QuadTreeItems internally.
        */
-      virtual void provideItemsSet(std::vector<typeData*>& itemsVector)
+      virtual void provideItemsSet(std::vector<AData*>& itemsVector)
       {
         std::vector<ItemType*>& quadtreeItems = m_quadTree->getItems();
         quadtreeItems.reserve(itemsVector.size());
-        for (typeData* item : itemsVector) {
+        for (AData* item : itemsVector) {
           quadtreeItems.push_back(new ItemType(item));
         }
       }
@@ -232,7 +232,7 @@ namespace Belle2 {
       void fillGivenTree(QuadTree* node,
                          CandidateProcessorLambda& lmdProcessor,
                          unsigned int nItemsThreshold,
-                         typeY rThreshold,
+                         AY rThreshold,
                          bool checkThreshold)
       {
         B2DEBUG(100, "startFillingTree with " << node->getItems().size() << " hits at level " << static_cast<unsigned int>
@@ -294,7 +294,7 @@ namespace Belle2 {
 
 
       /**
-       * When a node is accepted as a result, we extract a vector with the items (back transformed to typeData*)
+       * When a node is accepted as a result, we extract a vector with the items (back transformed to AData*)
        * and pass it together with the result node to the given lambda function.
        */
       void callResultFunction(QuadTree* node, CandidateProcessorLambda& lambda) const
@@ -344,7 +344,7 @@ namespace Belle2 {
 
       unsigned int m_lastLevel; /**< The last level to be filled */
       bool m_debugOutput; /**< A flag to control the creation of the debug output */
-      std::map<std::pair<typeX, typeY>, std::vector<ItemType*>> m_debugOutputMap; /**< The calculated debug map */
+      std::map<std::pair<AX, AY>, std::vector<ItemType*>> m_debugOutputMap; /**< The calculated debug map */
       bool m_param_setUsedFlag; /**< Set the used flag after every lambda function call */
     };
   }

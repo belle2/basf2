@@ -67,12 +67,12 @@ namespace Belle2 {
                                 const XYSpans& xySpans,
                                 bool debugOutput = false,
                                 bool setUsedFlag = true)
-        : m_lastLevel(lastLevel)
+        : m_quadTree{makeUnique<QuadTree>(xySpans.first, xySpans.second, 0, nullptr)}
+        , m_lastLevel(lastLevel)
         , m_debugOutput(debugOutput)
         , m_debugOutputMap()
         , m_param_setUsedFlag(setUsedFlag)
       {
-        createQuadTree(xySpans);
       }
 
       /**
@@ -81,7 +81,6 @@ namespace Belle2 {
       virtual ~QuadTreeProcessorTemplate()
       {
         clear();
-        delete m_quadTree;
       }
 
       /**
@@ -155,7 +154,7 @@ namespace Belle2 {
       void fillGivenTree(CandidateProcessorLambda& lmdProcessor,
                          unsigned int nHitsThreshold, AY rThreshold)
       {
-        fillGivenTree(m_quadTree, lmdProcessor, nHitsThreshold, rThreshold, true);
+        fillGivenTree(m_quadTree.get(), lmdProcessor, nHitsThreshold, rThreshold, true);
       }
 
       /**
@@ -166,7 +165,7 @@ namespace Belle2 {
       void fillGivenTree(CandidateProcessorLambda& lmdProcessor,
                          unsigned int nHitsThreshold)
       {
-        fillGivenTree(m_quadTree, lmdProcessor, nHitsThreshold, static_cast<AY>(0), false);
+        fillGivenTree(m_quadTree.get(), lmdProcessor, nHitsThreshold, static_cast<AY>(0), false);
       }
 
 
@@ -319,16 +318,6 @@ namespace Belle2 {
 
     private:
       /**
-       * Create a quad tree with the given parameters spans.
-       */
-      void createQuadTree(const XYSpans& xySpans)
-      {
-        const XSpan& xSpan = xySpans.first;
-        const YSpan& ySpan = xySpans.second;
-        m_quadTree = new QuadTree(xSpan, ySpan, 0, nullptr);
-      }
-
-      /**
        * Creates the sub node of a given node. This function is called by fillGivenTree.
        * To calculate the spans of the children nodes the user-defined function createChiildWithParent is used.
        */
@@ -344,10 +333,11 @@ namespace Belle2 {
         }
       }
 
-    private:
+    protected:
       /// The quad tree we work with
-      QuadTree* m_quadTree;
+      std::unique_ptr<QuadTree> m_quadTree;
 
+    private:
       /// The last level to be filled
       unsigned int m_lastLevel;
 

@@ -54,7 +54,7 @@ namespace Belle2 {
         quadtreeItemsVector.reserve(itemsVector.size());
         for (const CDCWireHit* item : itemsVector) {
           if (item->getAutomatonCell().hasTakenFlag() or item->getAutomatonCell().hasMaskedFlag()) continue;
-          if (insertItemInNode(m_quadTree, item)) {
+          if (insertItemInNode(m_quadTree.get(), item)) {
             quadtreeItemsVector.push_back(new Item(item));
           }
         }

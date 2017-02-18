@@ -34,7 +34,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /** A QuadTreeProcessor for TrackHits */
-    class AxialHitQuadTreeProcessor : public QuadTreeProcessorTemplate<unsigned long, float, const CDCWireHit, 2, 2> {
+    class AxialHitQuadTreeProcessor : public QuadTreeProcessorTemplate<long, float, const CDCWireHit, 2, 2> {
 
     public:
 
@@ -105,8 +105,8 @@ namespace Belle2 {
         float rMax = node->getYMax() * r2 / 2;
 
         // get left and right borders of the node
-        unsigned long thetaMin = node->getXMin();
-        unsigned long thetaMax = node->getXMax();
+        long thetaMin = node->getXMin();
+        long thetaMax = node->getXMax();
 
         TrigonometricalLookupTable<>& trigonometricalLookupTable = TrigonometricalLookupTable<>::Instance();
         const Vector2D& thetaVecMin = trigonometricalLookupTable.thetaVec(thetaMin);
@@ -167,16 +167,16 @@ namespace Belle2 {
             if (node->getLevel() < (getLastLevel() - 5)) {
               float r1 = node->getYBinBound(j) - fabs(node->getYBinBound(j + 1) - node->getYBinBound(j)) / 4.;
               float r2 = node->getYBinBound(j + 1) + fabs(node->getYBinBound(j + 1) - node->getYBinBound(j)) / 4.;
-              unsigned long extension = static_cast<unsigned long>(pow(2, getLastLevel() - node->getLevel()) / 4);
+              long extension = static_cast<long>(pow(2, getLastLevel() - node->getLevel()) / 4);
 
-              unsigned long theta1 = node->getXBinBound(i);
+              long theta1 = node->getXBinBound(i);
               if (theta1 <= extension) {
                 theta1 = 0;
               } else {
                 theta1 -= extension;
               }
 
-              unsigned long theta2 = node->getXBinBound(i + 1) + extension;
+              long theta2 = node->getXBinBound(i + 1) + extension;
               if (theta2 >= TrigonometricalLookupTable<>::Instance().getNBinsTheta()) {
                 theta2 = node->getXBinBound(i + 1);
               }
@@ -185,16 +185,16 @@ namespace Belle2 {
             } else {
               float r1 = node->getYBinBound(j) - fabs(node->getYBinBound(j + 1) - node->getYBinBound(j)) / 8.;
               float r2 = node->getYBinBound(j + 1) + fabs(node->getYBinBound(j + 1) - node->getYBinBound(j))  / 8.;
-              unsigned long extension = static_cast<unsigned long>(pow(2, getLastLevel() - node->getLevel()) / 8);
+              long extension = static_cast<long>(pow(2, getLastLevel() - node->getLevel()) / 8);
 
-              unsigned long theta1 = node->getXBinBound(i);
+              long theta1 = node->getXBinBound(i);
               if (theta1 <= extension) {
                 theta1 = 0;
               } else {
                 theta1 -= extension;
               }
 
-              unsigned long theta2 = node->getXBinBound(i + 1) + extension;
+              long theta2 = node->getXBinBound(i + 1) + extension;
               if (theta2 >= TrigonometricalLookupTable<>::Instance().getNBinsTheta()) {
                 theta2 = node->getXBinBound(i + 1);
               }
@@ -219,7 +219,7 @@ namespace Belle2 {
 
         if ((m_quadTree->getYMin() * m_quadTree->getYMax()) < 0)twoSidedPhasespace = true;
 
-        unsigned long nbins = pow(2, lvl);
+        long nbins = pow(2, lvl);
 
         m_seededTree.reserve(nbins * nbins);
 
@@ -230,15 +230,15 @@ namespace Belle2 {
         const rangeX& x = ranges.first;
         const rangeY& y = ranges.second;
 
-        unsigned long binSizeX = (x.second - x.first) / nbins;
+        long binSizeX = (x.second - x.first) / nbins;
         float binSizeY = (y.second - y.first) / nbins;
 
         std::vector<ItemType*> items = m_quadTree->getItems();
 
-        for (unsigned long xIndex = 0; xIndex < nbins; xIndex++) {
-          for (unsigned long yIndex = 0; yIndex < nbins; yIndex++) {
-            unsigned long xMin = xIndex * binSizeX + x.first;
-            unsigned long xMax = (xIndex + 1) * binSizeX + x.first;
+        for (long xIndex = 0; xIndex < nbins; xIndex++) {
+          for (long yIndex = 0; yIndex < nbins; yIndex++) {
+            long xMin = xIndex * binSizeX + x.first;
+            long xMax = (xIndex + 1) * binSizeX + x.first;
             float yMin = yIndex * binSizeY + y.first;
             float yMax = (yIndex + 1) * binSizeY + y.first;
 
@@ -382,8 +382,8 @@ namespace Belle2 {
       {
         const Vector2D& pos2D = wireHit->getRefPos2D();
 
-        unsigned long thetaMin = node->getXMin();
-        unsigned long thetaMax = node->getXMax();
+        long thetaMin = node->getXMin();
+        long thetaMax = node->getXMax();
 
         TrigonometricalLookupTable<>& trigonometricalLookupTable = TrigonometricalLookupTable<>::Instance();
         const Vector2D& thetaVecMin = trigonometricalLookupTable.thetaVec(thetaMin);
@@ -411,8 +411,8 @@ namespace Belle2 {
         double r2 = square(wireHit->getRefCylindricalR()) - l * l;
 
         // get left and right borders of the node
-        unsigned long thetaMin = node->getXMin();
-        unsigned long thetaMax = node->getXMax();
+        long thetaMin = node->getXMin();
+        long thetaMax = node->getXMax();
 
         TrigonometricalLookupTable<>& trigonometricalLookupTable = TrigonometricalLookupTable<>::Instance();
         const Vector2D& thetaVecMin = trigonometricalLookupTable.thetaVec(thetaMin);

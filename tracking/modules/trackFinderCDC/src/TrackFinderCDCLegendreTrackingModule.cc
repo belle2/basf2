@@ -100,29 +100,40 @@ void TrackFinderCDCLegendreTrackingModule::startNewEvent()
 
 void TrackFinderCDCLegendreTrackingModule::findTracks()
 {
-  QuadTreePassCounter quadTreePassCounter;
+  // First legendre pass
+  applyPass(LegendreFindingPass::NonCurlers);
 
-  // Here starts iteration over finding passes -- in each pass slightly different conditions of track finding applied
-  do {
+  // Assign new hits to the tracks
+  m_axialTrackHitMigrator.apply(m_allAxialWireHits, m_tracks);
+
+  // Second legendre pass
+  applyPass(LegendreFindingPass::NonCurlersWithIncreasingThreshold);
+
+  // Assign new hits to the tracks
+  m_axialTrackHitMigrator.apply(m_allAxialWireHits, m_tracks);
+
+  // Iterate the last finding pass until no track is found anymore
+
+  // Loop counter to guard against infinit loop
+  for (int iPass = 0; iPass < 10; ++iPass) {
     int nCandsAdded = m_tracks.size();
-    applyPass(quadTreePassCounter.getPass());
+
+    // Second legendre pass
+    applyPass(LegendreFindingPass::FullRange);
 
     // Assign new hits to the tracks
     m_axialTrackHitMigrator.apply(m_allAxialWireHits, m_tracks);
 
     nCandsAdded = m_tracks.size() - nCandsAdded;
 
-    // Change to the next pass
-    if (quadTreePassCounter.getPass() != LegendreFindingPass::FullRange) {
-      quadTreePassCounter.nextPass();
-    } else if ((quadTreePassCounter.getPass() == LegendreFindingPass::FullRange) && (nCandsAdded == 0)) {
-      quadTreePassCounter.nextPass();
-    }
+    if (iPass == 9) B2WARNING("Reached maximal number of legendre search passes");
+    if (nCandsAdded == 0) break;
+  }
 
-  } while (quadTreePassCounter.getPass() != LegendreFindingPass::End);
-
+  // Merge found tracks
   m_axialTrackMerger.apply(m_tracks, m_allAxialWireHits);
 
+  // Assign new hits to the tracks
   m_axialTrackHitMigrator.apply(m_allAxialWireHits, m_tracks);
 }
 

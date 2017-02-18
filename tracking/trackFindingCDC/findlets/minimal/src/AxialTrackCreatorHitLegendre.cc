@@ -14,8 +14,6 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeNodeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 
-#include <tracking/trackFindingCDC/processing/HitProcessor.h>
-
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
@@ -43,7 +41,6 @@ void AxialTrackCreatorHitLegendre::exposeParameters(ModuleParamList* moduleParam
 {
 }
 
-
 void AxialTrackCreatorHitLegendre::initialize()
 {
   B2ASSERT("Maximal level of QuadTree search is setted to be greater than lookuptable grid level! ",
@@ -55,7 +52,14 @@ void AxialTrackCreatorHitLegendre::initialize()
 void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& axialWireHits,
                                          std::vector<CDCTrack>& tracks)
 {
-  HitProcessor::resetMaskedHits(tracks, axialWireHits);
+  // Prepare vector of unused hits provide it to the qt processor
+  // Also reset the mask flag and select only the untaken hits
+  std::vector<const CDCWireHit*> unusedAxialWireHits;
+  for (const CDCWireHit* wireHit : axialWireHits) {
+    (*wireHit)->setMaskedFlag(false);
+    if ((*wireHit)->hasTakenFlag()) continue;
+    unusedAxialWireHits.push_back(wireHit);
+  }
 
   // Create object which holds and generates parameters
   QuadTreeParameters quadTreeParameters(m_param_maxLevel, m_pass);
@@ -63,14 +67,7 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& a
   //Create quadtree processot
   AxialHitQuadTreeProcessor qtProcessor = quadTreeParameters.constructQTProcessor();
 
-  //Prepare vector of QuadTreeHitWrapper* to provide it to the qt processor
-  std::vector<const CDCWireHit*> hitsVector;
-  for (const CDCWireHit* wireHit : axialWireHits) {
-    if ((*wireHit)->hasTakenFlag()) continue;
-    hitsVector.push_back(wireHit);
-  }
-
-  qtProcessor.provideItemsSet(hitsVector);
+  qtProcessor.provideItemsSet(unusedAxialWireHits);
   //  qtProcessor.seedQuadTree(4, symmetricalKappa);
 
   // Create object which contains interface between quadtree processor and track processor (module)

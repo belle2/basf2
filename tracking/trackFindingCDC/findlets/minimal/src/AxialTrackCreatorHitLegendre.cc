@@ -95,7 +95,7 @@ void AxialTrackCreatorHitLegendre::doTreeTrackFinding(
   if (parameters.getPass() != LegendreFindingPass::FullRange) {
     qtProcessor.seedQuadTree(4);
   } else {
-    qtProcessor.seedQuadTree(0);
+    qtProcessor.seedQuadTree(1);
   }
 
   // find leavers

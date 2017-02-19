@@ -28,13 +28,6 @@
 #include <boost/iostreams/concepts.hpp>
 
 #include <TGeoManager.h>
-
-#include <vxd/geometry/GeoCache.h>
-#include <../alignment/include/Hierarchy.h>
-#include <../alignment/include/Hierarchy.h>
-#include <../alignment/include/Hierarchy.h>
-
-
 #include <TMath.h>
 
 using namespace Belle2;

@@ -110,6 +110,82 @@ namespace Belle2 {
         }
       }
 
+      /**
+       * Fill m_quadTree vector with QuadTree instances (number of instances is 4^lvl).
+       * @param lvl level to which QuadTree instances should be equal in sense of the rho-theta boundaries.
+       */
+      void seedQuadTree(int seedLevel)
+      {
+        long nSeedBins = pow(2, seedLevel);
+        m_seededTrees.reserve(nSeedBins * nSeedBins);
+
+        // Expand the first levels to for seeded sectors
+        m_seededTrees.push_back(m_quadTree.get());
+        std::vector<QuadTree*> nextSeededTrees;
+
+        for (int level = 0; level < seedLevel; ++level) {
+          for (QuadTree* node : m_seededTrees) {
+            if (node->getChildren() == nullptr) {
+              node->createChildren();
+              this->createChildren(node, node->getChildren());
+            }
+            for (QuadTree* child :  *node->getChildren()) {
+              nextSeededTrees.push_back(child);
+            }
+          }
+          std::swap(nextSeededTrees, m_seededTrees);
+          nextSeededTrees.clear();
+        }
+
+        std::vector<Item*> items = m_quadTree->getItems();
+        for (QuadTree* seededTree : m_seededTrees) {
+          seededTree->reserveItems(m_quadTree->getNItems());
+
+          for (Item* item : items) {
+            if (item->isUsed()) continue;
+            if (isInNode(seededTree, item->getPointer())) {
+              seededTree->insertItem(item);
+            }
+          }
+        }
+
+        // Sort for largest seeded tree first.
+        sortSeededTree();
+      }
+
+      /// Sort vector of seeded QuadTree instances by number of hits.
+      void sortSeededTree()
+      {
+        std::sort(m_seededTrees.begin(),
+                  m_seededTrees.end(),
+        [](QuadTree * quadTree1, QuadTree * quadTree2) {
+          return quadTree1->getNItems() > quadTree2->getNItems();
+        });
+      }
+
+      /**
+       * Fill vector of QuadTree instances with hits.
+       * @param lmdProcessor the lambda function to call after a node was selected
+       * @param nHitsThreshold the threshold on the number of items
+       * @param yLimit the threshold in the rho (curvature) variable
+       */
+      void fillSeededTree(CandidateProcessorLambda& lmdProcessor,
+                          unsigned int nHitsThreshold, float yLimit)
+      {
+        sortSeededTree();
+        for (QuadTree* tree : m_seededTrees) {
+          erase_remove_if(tree->getItems(), [](Item * hit) { return hit->isUsed(); });
+          fillGivenTree(tree, lmdProcessor, nHitsThreshold, yLimit);
+        }
+      }
+
+      /// Clear vector of QuadTree instances
+      void clearSeededTree()
+      {
+        m_seededTrees.clear();
+        m_seededTrees.shrink_to_fit();
+      }
+
     public:
       /**
        * Start filling the already created tree.
@@ -322,6 +398,13 @@ namespace Belle2 {
 
       /// Storage space for the items that are referenced by the quad tree nodes
       std::deque<Item> m_items;
+
+      /**
+       * Vector of QuadTrees
+       * QuadTree instances (which are filled in the vector) cover the whole Legendre phase-space;
+       * each instance is processes independently.
+       */
+      std::vector<QuadTree*> m_seededTrees;
 
     private:
       /// The last level to be filled

@@ -69,7 +69,7 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& a
   qtProcessor->seed(unusedAxialWireHits);
 
   // Create object which contains interface between quadtree processor and track processor (module)
-  QuadTreeNodeProcessor quadTreeNodeProcessor(*qtProcessor, quadTreeParameters.getPrecisionFunction());
+  QuadTreeNodeProcessor quadTreeNodeProcessor;
 
   // Interface
   AxialHitQuadTreeProcessor::CandidateProcessorLambda lambdaInterface =

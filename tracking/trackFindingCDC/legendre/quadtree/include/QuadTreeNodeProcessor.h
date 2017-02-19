@@ -29,12 +29,10 @@ namespace Belle2 {
     class QuadTreeNodeProcessor {
 
     public:
-
-      ///Constructor
-      QuadTreeNodeProcessor(AxialHitQuadTreeProcessor& qtProcessor,
-                            PrecisionUtil::PrecisionFunction precisionFunct)
-        : m_qtProcessor(qtProcessor)
-        , m_precisionFunct(precisionFunct) {};
+      /// Constructor
+      QuadTreeNodeProcessor()
+      {
+      }
 
       /**
        *  this lambda function will forward the found candidates to the CandidateCreate for further processing
@@ -48,9 +46,7 @@ namespace Belle2 {
         AxialHitQuadTreeProcessor::QuadTree * qt) -> void {
           this->candidateProcessingFinal(qt, allAxialWireHits, tracks);
         };
-
         return lmdCandidateProcessingFinal;
-
       }
 
       /// Gets hits from quadtree node, convert to QuadTreeHitWrapper and passes for further processing
@@ -58,41 +54,18 @@ namespace Belle2 {
                                     const std::vector<const CDCWireHit*>& allAxialWireHits,
                                     std::vector<CDCTrack>& tracks)
       {
-        for (AxialHitQuadTreeProcessor::Item* hit : qt->getItems()) {
-          hit->setUsedFlag(false);
-        }
-
         std::vector<const CDCWireHit*> candidateHits;
-
         for (AxialHitQuadTreeProcessor::Item* hit : qt->getItems()) {
-          hit->setUsedFlag(false);
-          candidateHits.push_back(hit->getPointer());
-        }
-        postprocessSingleNode(candidateHits, allAxialWireHits, tracks);
-      };
-
-      /// Perform conformal extension for given set of hits and create CDCTrack object of them
-      void postprocessSingleNode(std::vector<const CDCWireHit*>& candidateHits,
-                                 const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                 std::vector<CDCTrack>& tracks)
-      {
-        for (const CDCWireHit* hit : candidateHits) {
-          (*hit)->setTakenFlag(false);
+          const CDCWireHit* wireHit = hit->getPointer();
+          // Unset the taken flag and let the postprocessing decide
+          (*wireHit)->setTakenFlag(false);
+          candidateHits.push_back(wireHit);
         }
 
         ConformalExtension conformalExtension;
         conformalExtension.newRefPoint(candidateHits, allAxialWireHits, true);
         AxialTrackUtil::addCandidateFromHitsWithPostprocessing(candidateHits, allAxialWireHits, tracks);
       }
-
-    private:
-      AxialHitQuadTreeProcessor& m_qtProcessor; /**< Reference to the quadtree processor. */
-
-      PrecisionUtil::PrecisionFunction m_precisionFunct; /**< Quadtree precision function. */
-
-      const unsigned long m_nbinsTheta = pow(2,
-                                             TrackFindingCDC::PrecisionUtil::getLookupGridLevel()); /**< Number of theta bins.*/
     };
-
   }
 }

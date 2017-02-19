@@ -86,41 +86,29 @@ void AxialTrackCreatorHitLegendre::doTreeTrackFinding(
   AxialHitQuadTreeProcessor& qtProcessor)
 {
   // radius of the CDC
-  double rCDC = 113.;
+  const double rCDC = 113.;
 
   // Curvature for high pt particles that leave the CDC
-  double curlCurv = 2. / rCDC;
+  const double curlCurv = 2. / rCDC;
 
   // Create sectorisation level
   if (parameters.getPass() != LegendreFindingPass::FullRange) {
     qtProcessor.seedQuadTree(4);
+  } else {
+    qtProcessor.seedQuadTree(0);
   }
 
-  if (parameters.getPass() != LegendreFindingPass::FullRange) {
-    qtProcessor.fillSeededTree(lmdInterface, 50, curlCurv);
-  } else {
-    qtProcessor.fillGivenTree(lmdInterface, 50, curlCurv);
-  }
-  // qtProcessor.fillGivenTree(lmdInterface, 50, curlCurv);
+  // find leavers
+  qtProcessor.fillSeededTree(lmdInterface, 50, curlCurv);
 
-  // find curlers with diameter higher than half of radius of CDC (see calculations above)
-  if (parameters.getPass() != LegendreFindingPass::FullRange) {
-    qtProcessor.fillSeededTree(lmdInterface, 70, 2 * curlCurv);
-  } else {
-    qtProcessor.fillGivenTree(lmdInterface, 70, 2 * curlCurv);
-  }
-  // qtProcessor.fillGivenTree(lmdInterface, 70, 2 * curlCurv);
+  // find curlers with diameter higher than half of radius of CDC
+  qtProcessor.fillSeededTree(lmdInterface, 70, 2 * curlCurv);
 
   // Start relaxation loop
   int limit = parameters.getInitialHitsLimit();
   double rThreshold = parameters.getCurvThreshold();
   do {
-    if (parameters.getPass() != LegendreFindingPass::FullRange) {
-      qtProcessor.fillSeededTree(lmdInterface, limit, rThreshold);
-    } else {
-      qtProcessor.fillGivenTree(lmdInterface, limit, rThreshold);
-    }
-    // qtProcessor.fillGivenTree(lmdInterface, limit, rThreshold);
+    qtProcessor.fillSeededTree(lmdInterface, limit, rThreshold);
 
     limit = limit * m_param_stepScale;
 

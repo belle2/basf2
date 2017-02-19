@@ -229,8 +229,7 @@ namespace Belle2 {
       void seedQuadTree(int lvl)
       {
         bool twoSidedPhasespace(false);
-
-        if ((m_quadTree->getYMin() * m_quadTree->getYMax()) < 0)twoSidedPhasespace = true;
+        if ((m_quadTree->getYMin() * m_quadTree->getYMax()) < 0) twoSidedPhasespace = true;
 
         long nbins = pow(2, lvl);
 
@@ -239,14 +238,11 @@ namespace Belle2 {
         XYSpans ranges({m_quadTree->getXMin(), m_quadTree->getXMax()},
         {m_quadTree->getYMin(), m_quadTree->getYMax()});
 
-
         const XSpan& xSpan = ranges.first;
         const YSpan& ySpan = ranges.second;
 
         long binSizeX = (xSpan[1] - xSpan[0]) / nbins;
         float binSizeY = (ySpan[1] - ySpan[0]) / nbins;
-
-        std::vector<Item*> items = m_quadTree->getItems();
 
         for (long xIndex = 0; xIndex < nbins; xIndex++) {
           for (long yIndex = 0; yIndex < nbins; yIndex++) {
@@ -257,31 +253,36 @@ namespace Belle2 {
             float yMax = (yIndex + 1) * binSizeY + ySpan[0];
 
             m_seededTree.push_back(QuadTree({xMin, xMax}, {yMin, yMax}, lvl, nullptr));
-            QuadTree& newQuadTree = m_seededTree.back();
-            if ((newQuadTree.getYMin() < -0.02)  && (newQuadTree.getYMax() < -0.02)) continue;
-            newQuadTree.reserveItems(m_quadTree->getNItems() * 2);
-
-            for (Item* item : items) {
-              if (item->isUsed()) continue;
-
-              if (isInNode(&newQuadTree, item->getPointer())) {
-                if (twoSidedPhasespace && (newQuadTree.getYMin() < 0.02)  && (newQuadTree.getYMax() < 0.02)) {
-                  if (checkDerivative(&newQuadTree, item->getPointer())) {
-                    newQuadTree.insertItem(item);
-                  }
-                } else {
-                  newQuadTree.insertItem(item);
-                }
-              }
-            }
-
-            if (newQuadTree.getNItems() < 10) m_seededTree.pop_back();
-
           }
         }
 
-        sortSeededTree();
+        std::vector<Item*> items = m_quadTree->getItems();
+        for (QuadTree& newQuadTree : m_seededTree) {
+          newQuadTree.reserveItems(m_quadTree->getNItems());
 
+          for (Item* item : items) {
+            if (item->isUsed()) continue;
+            if (not isInNode(&newQuadTree, item->getPointer())) continue;
+            if (not twoSidedPhasespace) {
+              newQuadTree.insertItem(item);
+              continue;
+            }
+            if ((newQuadTree.getYMin() > 0.02) or (newQuadTree.getYMax() > 0.02)) {
+              newQuadTree.insertItem(item);
+              continue;
+            }
+            if (checkDerivative(&newQuadTree, item->getPointer())) {
+              newQuadTree.insertItem(item);
+            }
+          }
+        }
+
+        // Remove small seeded trees.
+        auto tooFewItems = [](QuadTree & quadTree) { return quadTree.getNItems() < 10; };
+        erase_remove_if(m_seededTree, tooFewItems);
+
+        // Sort for largest seeded tree first.
+        sortSeededTree();
       }
 
       /// Sort vector of seeded QuadTree instances by number of hits.
@@ -301,7 +302,7 @@ namespace Belle2 {
       {
         sortSeededTree();
         for (QuadTree& tree : m_seededTree) {
-          erase_remove_if(tree.getItems(), [&](Item * hit) { return hit->isUsed(); });
+          erase_remove_if(tree.getItems(), [](Item * hit) { return hit->isUsed(); });
           fillGivenTree(&tree, lmdProcessor, nHitsThreshold, yLimit);
         }
       }

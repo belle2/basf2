@@ -29,7 +29,7 @@ namespace Belle2 {
      * You have provide only the two functions insertItemInNode and createChildWithParent.
      */
     template<typename AX, typename AY, class AData>
-    class QuadTreeProcessorTemplate {
+    class QuadTreeProcessor {
 
     public:
       /// The QuadTree will only see items of this type
@@ -63,10 +63,10 @@ namespace Belle2 {
        * @param spans spans of the QuadTree at the top level
        * @param setUsedFlag Set the used flag after every lambda function call
        */
-      QuadTreeProcessorTemplate(unsigned char lastLevel,
-                                const XYSpans& xySpans,
-                                bool debugOutput = false,
-                                bool setUsedFlag = true)
+      QuadTreeProcessor(unsigned char lastLevel,
+                        const XYSpans& xySpans,
+                        bool debugOutput = false,
+                        bool setUsedFlag = true)
         : m_quadTree{makeUnique<QuadTree>(xySpans.first, xySpans.second, 0, nullptr)}
         , m_lastLevel(lastLevel)
         , m_debugOutput(debugOutput)
@@ -78,7 +78,7 @@ namespace Belle2 {
       /**
        * Destructor deletes the quad tree.
        */
-      virtual ~QuadTreeProcessorTemplate()
+      virtual ~QuadTreeProcessor()
       {
         clear();
       }

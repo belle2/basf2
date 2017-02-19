@@ -9,7 +9,7 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorTemplate.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessor.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
@@ -19,7 +19,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /** A QuadTreeProcessor for TrackHits */
-    class AxialHitQuadTreeProcessorWithNewReferencePoint : public QuadTreeProcessorTemplate<float, float, const CDCWireHit> {
+    class AxialHitQuadTreeProcessorWithNewReferencePoint : public QuadTreeProcessor<float, float, const CDCWireHit> {
 
     public:
 
@@ -30,8 +30,8 @@ namespace Belle2 {
        */
       AxialHitQuadTreeProcessorWithNewReferencePoint(const XYSpans& ranges,
                                                      std::pair<double, double> referencePoint)
-        : QuadTreeProcessorTemplate(0, ranges),
-          m_referencePoint(referencePoint.first, referencePoint.second)
+        : QuadTreeProcessor(0, ranges)
+        , m_referencePoint(referencePoint.first, referencePoint.second)
       {}
 
     private:

@@ -9,7 +9,7 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorTemplate.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
@@ -19,7 +19,6 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/PrecisionUtil.h>
-
 
 #include <TF1.h>
 #include <TCanvas.h>
@@ -34,14 +33,19 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /** A QuadTreeProcessor for TrackHits */
-    class AxialHitQuadTreeProcessor : public QuadTreeProcessorTemplate<long, float, const CDCWireHit> {
+    class AxialHitQuadTreeProcessor : public QuadTreeProcessor<long, float, const CDCWireHit> {
 
     public:
       /// Constructor
-      AxialHitQuadTreeProcessor(unsigned char lastLevel, const XYSpans& ranges,
+      AxialHitQuadTreeProcessor(unsigned char lastLevel,
+                                const XYSpans& ranges,
                                 PrecisionUtil::PrecisionFunction lmdFunctLevel,
-                                bool standartBinning = false) :
-        QuadTreeProcessorTemplate(lastLevel, ranges), m_standartBinning(standartBinning), m_lmdFunctLevel(lmdFunctLevel) { }
+                                bool standartBinning = false)
+        : QuadTreeProcessor(lastLevel, ranges)
+        , m_standartBinning(standartBinning)
+        , m_lmdFunctLevel(lmdFunctLevel)
+      {
+      }
 
     private:
 

@@ -72,6 +72,72 @@ namespace Belle2 {
       }
 
       /**
+       * Return the new ranges. We do not use the standard ranges for the lower levels.
+       * @param node quadtree node
+       * @param i theta index of the child
+       * @param j rho index of the child
+       * @return returns ranges of the (i;j) child
+       */
+      XYSpans createChild(QuadTree* node, unsigned int i, unsigned int j) const final
+      {
+        const int nodeLevel = node->getLevel();
+        const int lastLevel = getLastLevel();
+        float meanCurv = fabs(node->getYMean());
+
+        // Expand bins for all nodes 7 levels before the last level (for lastLevel = 12 starting at 6)
+        // but only in a curvature region higher than 0.005. Lower than that use always standard.
+        bool standardBinning =
+          m_standartBinning or (nodeLevel <= lastLevel - 7) or (meanCurv <= 0.005);
+
+        if (standardBinning) {
+          float r1 = node->getYBinBound(j);
+          float r2 = node->getYBinBound(j + 1);
+          long theta1 = node->getXBinBound(i);
+          long theta2 = node->getXBinBound(i + 1);
+
+          // Standard bin division
+          return XYSpans({theta1, theta2}, {r1, r2});
+        }
+
+        // Non-standard binning
+        // For level 6 to 7 only expand 1 / 4, for higher levels expand  1 / 8.
+        // (assuming last level == 12)
+        if (nodeLevel < lastLevel - 5) {
+          float r1 = node->getYBinBound(j) - node->getYBinWidth(j) / 4.;
+          float r2 = node->getYBinBound(j + 1) + node->getYBinWidth(j) / 4.;
+
+          // long extension = pow(2, lastLevel - nodeLevel) / 4; is same as:
+          long extension = pow(2, lastLevel - nodeLevel - 2);
+
+          long theta1 = node->getXBinBound(i) - extension;
+          if (theta1 < 0) theta1 = 0;
+
+          long theta2 = node->getXBinBound(i + 1) + extension;
+          if (theta2 >= TrigonometricalLookupTable<>::Instance().getNBinsTheta()) {
+            theta2 = TrigonometricalLookupTable<>::Instance().getNBinsTheta() - 1;
+          }
+
+          return XYSpans({theta1, theta2}, {r1, r2});
+        } else {
+          float r1 = node->getYBinBound(j) - node->getYBinWidth(j) / 8.;
+          float r2 = node->getYBinBound(j + 1) + node->getYBinWidth(j) / 8.;
+
+          // long extension = pow(2, lastLevel - nodeLevel) / 8; is same as
+          long extension = pow(2, lastLevel - nodeLevel - 3);
+
+          long theta1 = node->getXBinBound(i) - extension;
+          if (theta1 < 0) theta1 = 0;
+
+          long theta2 = node->getXBinBound(i + 1) + extension;
+          if (theta2 >= TrigonometricalLookupTable<>::Instance().getNBinsTheta()) {
+            theta2 = TrigonometricalLookupTable<>::Instance().getNBinsTheta() - 1;
+          }
+
+          return XYSpans({theta1, theta2}, {r1, r2});
+        }
+      }
+
+      /**
        * Check whether hit belongs to the quadtree node:
        * @param node quadtree node
        * @param hit hit being checked
@@ -144,72 +210,6 @@ namespace Belle2 {
 
         // Not contained
         return false;
-      }
-
-      /**
-       * Return the new ranges. We do not use the standard ranges for the lower levels.
-       * @param node quadtree node
-       * @param i theta index of the child
-       * @param j rho index of the child
-       * @return returns ranges of the (i;j) child
-       */
-      XYSpans createChild(QuadTree* node, unsigned int i, unsigned int j) const final
-      {
-        const int nodeLevel = node->getLevel();
-        const int lastLevel = getLastLevel();
-        float meanCurv = fabs(node->getYMean());
-
-        // Expand bins for all nodes 7 levels before the last level (for lastLevel = 12 starting at 6)
-        // but only in a curvature region higher than 0.005. Lower than that use always standard.
-        bool standardBinning =
-          m_standartBinning or (nodeLevel <= lastLevel - 7) or (meanCurv <= 0.005);
-
-        if (standardBinning) {
-          float r1 = node->getYBinBound(j);
-          float r2 = node->getYBinBound(j + 1);
-          long theta1 = node->getXBinBound(i);
-          long theta2 = node->getXBinBound(i + 1);
-
-          // Standard bin division
-          return XYSpans({theta1, theta2}, {r1, r2});
-        }
-
-        // Non-standard binning
-        // For level 6 to 7 only expand 1 / 4, for higher levels expand  1 / 8.
-        // (assuming last level == 12)
-        if (nodeLevel < lastLevel - 5) {
-          float r1 = node->getYBinBound(j) - node->getYBinWidth(j) / 4.;
-          float r2 = node->getYBinBound(j + 1) + node->getYBinWidth(j) / 4.;
-
-          // long extension = pow(2, lastLevel - nodeLevel) / 4; is same as:
-          long extension = pow(2, lastLevel - nodeLevel - 2);
-
-          long theta1 = node->getXBinBound(i) - extension;
-          if (theta1 < 0) theta1 = 0;
-
-          long theta2 = node->getXBinBound(i + 1) + extension;
-          if (theta2 >= TrigonometricalLookupTable<>::Instance().getNBinsTheta()) {
-            theta2 = TrigonometricalLookupTable<>::Instance().getNBinsTheta() - 1;
-          }
-
-          return XYSpans({theta1, theta2}, {r1, r2});
-        } else {
-          float r1 = node->getYBinBound(j) - node->getYBinWidth(j) / 8.;
-          float r2 = node->getYBinBound(j + 1) + node->getYBinWidth(j) / 8.;
-
-          // long extension = pow(2, lastLevel - nodeLevel) / 8; is same as
-          long extension = pow(2, lastLevel - nodeLevel - 3);
-
-          long theta1 = node->getXBinBound(i) - extension;
-          if (theta1 < 0) theta1 = 0;
-
-          long theta2 = node->getXBinBound(i + 1) + extension;
-          if (theta2 >= TrigonometricalLookupTable<>::Instance().getNBinsTheta()) {
-            theta2 = TrigonometricalLookupTable<>::Instance().getNBinsTheta() - 1;
-          }
-
-          return XYSpans({theta1, theta2}, {r1, r2});
-        }
       }
 
       /**

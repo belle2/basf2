@@ -97,10 +97,6 @@ namespace Belle2 {
           }
         }
 
-        // Remove small seeded trees.
-        auto tooFewItems = [](QuadTree & quadTree) { return quadTree.getNItems() < 10; };
-        erase_remove_if(m_seededTree, tooFewItems);
-
         // Sort for largest seeded tree first.
         sortSeededTree();
       }

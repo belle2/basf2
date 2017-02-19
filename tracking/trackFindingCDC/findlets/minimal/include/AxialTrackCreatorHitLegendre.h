@@ -12,6 +12,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtreetools/QuadTreePassCounter.h>
 
 namespace Belle2 {
@@ -21,6 +22,7 @@ namespace Belle2 {
     class CDCTrack;
     class CDCWireHit;
     enum class LegendreFindingPass;
+    class QuadTreeParameters;
 
     /**
      * Generates axial tracks from hit using special leaf postprocessing.
@@ -56,12 +58,29 @@ namespace Belle2 {
       void apply(const std::vector<const CDCWireHit*>& axialWireHits,
                  std::vector<CDCTrack>& tracks) final;
 
+    private:
+      /**
+       * Performs quadtree search
+       * @param lmdInterface lambda interface to operate with QuadTree which contains possible track
+       * @param parameters pass-dependent parameters of the QuadTree search
+       * @param qtProcessor reference to the AxialHitQuadTreeProcessor instance
+       */
+      void doTreeTrackFinding(AxialHitQuadTreeProcessor::CandidateProcessorLambda& lmdInterface,
+                              QuadTreeParameters& parameters,
+                              AxialHitQuadTreeProcessor& qtProcessor);
+
     private: // Parameters
       /// Maximum Level of FastHough - fixed as the behaviour for other values is not well defined
       static const int m_param_maxLevel = 12;
 
       /// The pass key for lookup of the parameters for this pass
       LegendreFindingPass m_pass = LegendreFindingPass::NonCurlers;
+
+      /// Parameter to define multiplier for hits threshold for the next quadtree iteration
+      const double m_param_stepScale = 0.75;
+
+      /// Parameter to define minimal threshold of hit
+      const int m_param_threshold = 10;
     };
   }
 }

@@ -10,9 +10,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorHitLegendre.h>
 
-#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeCandidateFinder.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeNodeProcessor.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
+#include <tracking/trackFindingCDC/legendre/quadtreetools/QuadTreeParameters.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
@@ -73,13 +72,61 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& a
   // Create object which contains interface between quadtree processor and track processor (module)
   QuadTreeNodeProcessor quadTreeNodeProcessor(*qtProcessor, quadTreeParameters.getPrecisionFunction());
 
-  // Object which operates with AxialHitQuadTreeProcessor and QuadTreeNodeProcessor and starts quadtree search
-  QuadTreeCandidateFinder quadTreeCandidateFinder;
-
   // Interface
   AxialHitQuadTreeProcessor::CandidateProcessorLambda lambdaInterface =
     quadTreeNodeProcessor.getLambdaInterface(axialWireHits, tracks);
 
   // Start candidate finding
-  quadTreeCandidateFinder.doTreeTrackFinding(lambdaInterface, quadTreeParameters, *qtProcessor);
+  this->doTreeTrackFinding(lambdaInterface, quadTreeParameters, *qtProcessor);
+}
+
+void AxialTrackCreatorHitLegendre::doTreeTrackFinding(
+  AxialHitQuadTreeProcessor::CandidateProcessorLambda& lmdInterface,
+  QuadTreeParameters& parameters,
+  AxialHitQuadTreeProcessor& qtProcessor)
+{
+
+  // radius of the CDC
+  double rCDC = 113.;
+
+  if (parameters.getPass() != LegendreFindingPass::FullRange) qtProcessor.seedQuadTree(4);
+
+  // find high-pt tracks (not-curlers: diameter of the track higher than radius of CDC -- 2*Rtrk >
+  // rCDC => Rtrk < 2./rCDC, r(legendre) = 1/Rtrk =>  r(legendre) < 2./rCDC)
+  if (parameters.getPass() != LegendreFindingPass::FullRange)
+    qtProcessor.fillSeededTree(lmdInterface, 50, 2. / rCDC); // fillSeededTree
+  else
+    qtProcessor.fillGivenTree(lmdInterface, 50, 2. / rCDC);
+  // qtProcessor.fillGivenTree(lmdInterface, 50, 2. / rCDC);
+
+  // find curlers with diameter higher than half of radius of CDC (see calculations above)
+  if (parameters.getPass() != LegendreFindingPass::FullRange)
+    qtProcessor.fillSeededTree(lmdInterface, 70, 4. / rCDC); // fillGivenTree
+  else
+    qtProcessor.fillGivenTree(lmdInterface, 70, 4. / rCDC);
+  // qtProcessor.fillGivenTree(lmdInterface, 70, 4. / rCDC);
+
+  // Start loop, where tracks are searched for
+  int limit = parameters.getInitialHitsLimit();
+  double rThreshold = parameters.getCurvThreshold();
+  do {
+    if (parameters.getPass() != LegendreFindingPass::FullRange)
+      qtProcessor.fillSeededTree(lmdInterface, limit, rThreshold); // fillSeededTree
+    else
+      qtProcessor.fillGivenTree(lmdInterface, limit, rThreshold);
+    // qtProcessor.fillGivenTree(lmdInterface, limit, rThreshold);
+
+    limit = limit * m_param_stepScale;
+
+    if (parameters.getPass() != LegendreFindingPass::NonCurlers) {
+      rThreshold *= 2.;
+      if (rThreshold > 0.15 /*ranges.second.second*/) rThreshold = 0.15; // ranges.second.second;
+    }
+
+    // perform search until found track has too few hits or threshold is too small and no tracks are
+    // found
+  } while (limit >= m_param_threshold);
+
+  // qtProcessor.clearSeededTree();
+
 }

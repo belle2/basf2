@@ -294,19 +294,15 @@ namespace Belle2 {
        * Fill vector of QuadTree instances with hits.
        * @param lmdProcessor the lambda function to call after a node was selected
        * @param nHitsThreshold the threshold on the number of items
-       * @param rThreshold the threshold in the rho (curvature) variable
+       * @param yLimit the threshold in the rho (curvature) variable
        */
       void fillSeededTree(CandidateProcessorLambda& lmdProcessor,
-                          unsigned int nHitsThreshold, float rThreshold)
+                          unsigned int nHitsThreshold, float yLimit)
       {
         sortSeededTree();
-//        B2INFO("Size of the tree : " << m_seededTree.size());
-
         for (QuadTree& tree : m_seededTree) {
-//          B2INFO("NItems in the node: " << tree.getNItems());
-//          fillGivenTreeWithSegments(&tree, lmdProcessor, nHitsThreshold, rThreshold, true);
           erase_remove_if(tree.getItems(), [&](Item * hit) { return hit->isUsed(); });
-          fillGivenTree(&tree, lmdProcessor, nHitsThreshold, rThreshold, true);
+          fillGivenTree(&tree, lmdProcessor, nHitsThreshold, yLimit);
         }
       }
 

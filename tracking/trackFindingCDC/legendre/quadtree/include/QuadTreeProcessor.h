@@ -112,13 +112,13 @@ namespace Belle2 {
        * Start filling the already created tree.
        * @param lmdProcessor the lambda function to call after a node was selected
        * @param nHitsThreshold the threshold on the number of items
-       * @param rThreshold the threshold in the y variable
+       * @param yLimit the threshold in the y variable
        */
       void fillGivenTree(CandidateProcessorLambda& lmdProcessor,
                          unsigned int nHitsThreshold,
-                         AY rThreshold)
+                         AY yLimit)
       {
-        fillGivenTree(m_quadTree.get(), lmdProcessor, nHitsThreshold, rThreshold, true);
+        fillGivenTree(m_quadTree.get(), lmdProcessor, nHitsThreshold, yLimit);
       }
 
       /**
@@ -128,7 +128,7 @@ namespace Belle2 {
        */
       void fillGivenTree(CandidateProcessorLambda& lmdProcessor, unsigned int nHitsThreshold)
       {
-        fillGivenTree(m_quadTree.get(), lmdProcessor, nHitsThreshold, static_cast<AY>(0), false);
+        fillGivenTree(m_quadTree.get(), lmdProcessor, nHitsThreshold, std::numeric_limits<AY>::max());
       }
 
       /**
@@ -138,19 +138,17 @@ namespace Belle2 {
       void fillGivenTree(QuadTree* node,
                          CandidateProcessorLambda& lmdProcessor,
                          unsigned int nItemsThreshold,
-                         AY rThreshold,
-                         bool checkThreshold)
+                         AY yLimit)
       {
         B2DEBUG(100, "startFillingTree with " << node->getItems().size() << " hits at level " << static_cast<unsigned int>
                 (node->getLevel()) << " (" << node->getXMean() << "/ " << node->getYMean() << ")");
+
         if (node->getItems().size() < nItemsThreshold) {
           return;
         }
-        if (checkThreshold) {
-          if ((node->getYMin() * node->getYMax() >= 0) && (std::fabs(node->getYMin()) > rThreshold) &&
-              (fabs(node->getYMax()) > rThreshold)) {
-            return;
-          }
+
+        if ((node->getYMin() > yLimit) or (-node->getYMax() > yLimit)) {
+          return;
         }
 
         if (isLeaf(node)) {
@@ -182,7 +180,7 @@ namespace Belle2 {
           // After we have processed some children we need to get rid of the already used hits in all the children,
           // because this can change the number of items drastically
           erase_remove_if(heaviestChild->getItems(), [&](Item * hit) { return hit->isUsed(); });
-          this->fillGivenTree(heaviestChild, lmdProcessor, nItemsThreshold, rThreshold, checkThreshold);
+          this->fillGivenTree(heaviestChild, lmdProcessor, nItemsThreshold, yLimit);
         }
       }
 

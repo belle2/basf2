@@ -45,6 +45,7 @@ namespace Belle2 {
         , m_standartBinning(standartBinning)
         , m_lmdFunctLevel(lmdFunctLevel)
       {
+        m_twoSidedPhaseSpace = m_quadTree->getYMin() * m_quadTree->getYMax() < 0;
       }
 
       /// Function to check whether sinogram is crossing the node (see AxialHitQuadTreeProcessor::insertItemInNode())
@@ -59,9 +60,6 @@ namespace Belle2 {
        */
       void seedQuadTree(int lvl)
       {
-        bool twoSidedPhasespace(false);
-        if ((m_quadTree->getYMin() * m_quadTree->getYMax()) < 0) twoSidedPhasespace = true;
-
         long nbins = pow(2, lvl);
 
         m_seededTree.reserve(nbins * nbins);
@@ -94,7 +92,7 @@ namespace Belle2 {
           for (Item* item : items) {
             if (item->isUsed()) continue;
             if (not isInNode(&newQuadTree, item->getPointer())) continue;
-            if (not twoSidedPhasespace) {
+            if (not m_twoSidedPhaseSpace) {
               newQuadTree.insertItem(item);
               continue;
             }
@@ -410,6 +408,12 @@ namespace Belle2 {
        *     (see AxialHitQuadTreeProcessor::createChildWithParent())
        */
       bool m_standartBinning;
+
+      /**
+       *  Indicator whether the two sided phases space insertion check should be used
+       *  This option should automatically split back to back tracks in the low curvature regions
+       */
+      bool m_twoSidedPhaseSpace;
 
       /// Lambda which holds resolution function for the quadtree
       PrecisionUtil::PrecisionFunction m_lmdFunctLevel;

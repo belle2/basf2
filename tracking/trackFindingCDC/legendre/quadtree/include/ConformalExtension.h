@@ -115,7 +115,7 @@ namespace Belle2 {
         }
 
         AxialHitQuadTreeProcessorWithNewReferencePoint qtProcessor(ranges, std::make_pair(refPos.x(), refPos.y()));
-        qtProcessor.provideItemsSet(hitsVector);
+        qtProcessor.seed(hitsVector);
 
         std::vector<const CDCWireHit*> newCdcWireHits = qtProcessor.getAssignedHits();
 

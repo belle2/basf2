@@ -100,25 +100,18 @@ namespace Belle2 {
       /**
        * Fill in the items in the given vector. They are transformed to QuadTreeItems internally.
        */
-      virtual void provideItemsSet(std::vector<AData*>& datas)
+      void seed(std::vector<AData*>& datas)
       {
+        // Create the items
         for (AData* data : datas) {
           m_items.emplace_back(data);
         }
-        seedQuadTree();
-      }
 
-    private:
-      /**
-       * Fill m_quadTree vector with QuadTree instances (number of instances is 4^lvl).
-       * @param lvl level to which QuadTree instances should be equal in sense of the rho-theta boundaries.
-       */
-      void seedQuadTree()
-      {
+        // Creating the seed level
         long nSeedBins = pow(2, m_seedLevel);
         m_seededTrees.reserve(nSeedBins * nSeedBins);
 
-        // Expand the first levels to for seeded sectors
+        // Expand the first levels to the seed sectors
         m_seededTrees.push_back(m_quadTree.get());
         std::vector<QuadTree*> nextSeededTrees;
 
@@ -136,6 +129,7 @@ namespace Belle2 {
           nextSeededTrees.clear();
         }
 
+        // Fill the seed level with the items
         for (QuadTree* seededTree : m_seededTrees) {
           seededTree->reserveItems(m_items.size());
 

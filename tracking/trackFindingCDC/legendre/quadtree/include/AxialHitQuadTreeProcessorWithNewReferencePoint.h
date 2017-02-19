@@ -42,30 +42,17 @@ namespace Belle2 {
       Vector2D m_referencePoint;
 
     public:
-      /// Provide const CDCWireHit to process.
-      void provideItemsSet(std::vector<const CDCWireHit*>& wireHits) override final
-      {
-        this->clear();
-
-        std::vector<Item*>& items = m_quadTree->getItems();
-        items.reserve(wireHits.size());
-        for (const CDCWireHit* wireHit : wireHits) {
-          if ((*wireHit)->hasTakenFlag() or (*wireHit)->hasMaskedFlag()) continue;
-          if (isInNode(m_quadTree.get(), wireHit)) {
-            items.push_back(new Item(wireHit));
-          }
-        }
-      }
-
       /**
        * @return Hits which belong to the QuadTree
        */
       std::vector<const CDCWireHit*> getAssignedHits()
       {
-        std::vector<const CDCWireHit*> result;
-        result.reserve(m_quadTree->getNItems());
+        assert(m_seededTrees.size() == 1);
 
-        for (Item* item : m_quadTree->getItems()) {
+        std::vector<const CDCWireHit*> result;
+        result.reserve(m_seededTrees[0]->getNItems());
+
+        for (Item* item : m_seededTrees[0]->getItems()) {
           result.push_back(item->getPointer());
         }
 

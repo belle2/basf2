@@ -58,41 +58,37 @@ namespace Belle2 {
        * Fill m_quadTree vector with QuadTree instances (number of instances is 4^lvl).
        * @param lvl level to which QuadTree instances should be equal in sense of the rho-theta boundaries.
        */
-      void seedQuadTree(int lvl)
+      void seedQuadTree(int seedLevel)
       {
-        long nbins = pow(2, lvl);
+        long nSeedBins = pow(2, seedLevel);
+        m_seededTrees.reserve(nSeedBins * nSeedBins);
 
-        m_seededTree.reserve(nbins * nbins);
+        // Expand the first levels to for seeded sectors
+        m_seededTrees.push_back(m_quadTree.get());
+        std::vector<QuadTree*> nextSeededTrees;
 
-        XYSpans ranges({m_quadTree->getXMin(), m_quadTree->getXMax()},
-        {m_quadTree->getYMin(), m_quadTree->getYMax()});
-
-        const XSpan& xSpan = ranges.first;
-        const YSpan& ySpan = ranges.second;
-
-        long binSizeX = (xSpan[1] - xSpan[0]) / nbins;
-        float binSizeY = (ySpan[1] - ySpan[0]) / nbins;
-
-        for (long xIndex = 0; xIndex < nbins; xIndex++) {
-          for (long yIndex = 0; yIndex < nbins; yIndex++) {
-
-            long xMin = xIndex * binSizeX + xSpan[0];
-            long xMax = (xIndex + 1) * binSizeX + xSpan[0];
-            float yMin = yIndex * binSizeY + ySpan[0];
-            float yMax = (yIndex + 1) * binSizeY + ySpan[0];
-
-            m_seededTree.push_back(QuadTree({xMin, xMax}, {yMin, yMax}, lvl, nullptr));
+        for (int level = 0; level < seedLevel; ++level) {
+          for (QuadTree* node : m_seededTrees) {
+            if (node->getChildren() == nullptr) {
+              node->createChildren();
+              this->createChildren(node, node->getChildren());
+            }
+            for (QuadTree* child :  *node->getChildren()) {
+              nextSeededTrees.push_back(child);
+            }
           }
+          std::swap(nextSeededTrees, m_seededTrees);
+          nextSeededTrees.clear();
         }
 
         std::vector<Item*> items = m_quadTree->getItems();
-        for (QuadTree& newQuadTree : m_seededTree) {
-          newQuadTree.reserveItems(m_quadTree->getNItems());
+        for (QuadTree* seededTree : m_seededTrees) {
+          seededTree->reserveItems(m_quadTree->getNItems());
 
           for (Item* item : items) {
             if (item->isUsed()) continue;
-            if (isInNode(&newQuadTree, item->getPointer())) {
-              newQuadTree.insertItem(item);
+            if (isInNode(seededTree, item->getPointer())) {
+              seededTree->insertItem(item);
             }
           }
         }
@@ -104,7 +100,11 @@ namespace Belle2 {
       /// Sort vector of seeded QuadTree instances by number of hits.
       void sortSeededTree()
       {
-        std::sort(m_seededTree.begin(), m_seededTree.end(), [](QuadTree & quadTree1, QuadTree & quadTree2) { return quadTree1.getNItems() > quadTree2.getNItems();});
+        std::sort(m_seededTrees.begin(),
+                  m_seededTrees.end(),
+        [](QuadTree * quadTree1, QuadTree * quadTree2) {
+          return quadTree1->getNItems() > quadTree2->getNItems();
+        });
       }
 
       /**
@@ -117,17 +117,17 @@ namespace Belle2 {
                           unsigned int nHitsThreshold, float yLimit)
       {
         sortSeededTree();
-        for (QuadTree& tree : m_seededTree) {
-          erase_remove_if(tree.getItems(), [](Item * hit) { return hit->isUsed(); });
-          fillGivenTree(&tree, lmdProcessor, nHitsThreshold, yLimit);
+        for (QuadTree* tree : m_seededTrees) {
+          erase_remove_if(tree->getItems(), [](Item * hit) { return hit->isUsed(); });
+          fillGivenTree(tree, lmdProcessor, nHitsThreshold, yLimit);
         }
       }
 
       /// Clear vector of QuadTree instances
       void clearSeededTree()
       {
-        m_seededTree.clear();
-        m_seededTree.shrink_to_fit();
+        m_seededTrees.clear();
+        m_seededTrees.shrink_to_fit();
       }
 
     protected:
@@ -416,7 +416,7 @@ namespace Belle2 {
        * QuadTree instances (which are filled in the vector) cover the whole Legendre phase-space;
        * each instance is processes independently.
        */
-      std::vector<QuadTree> m_seededTree;
+      std::vector<QuadTree*> m_seededTrees;
     };
   }
 }

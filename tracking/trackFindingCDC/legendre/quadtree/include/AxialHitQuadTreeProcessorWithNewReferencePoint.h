@@ -35,8 +35,7 @@ namespace Belle2 {
       {}
 
     private:
-
-      /// Function to check whether sinogram is crossing the node (see AxialHitQuadTreeProcessorWithNewReferencePoint::insertItemInNode())
+      /// Checks whether the four give doubles have the same sign
       bool sameSign(double n1, double n2, double n3, double n4) const
       {return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));};
 
@@ -44,18 +43,17 @@ namespace Belle2 {
       Vector2D m_referencePoint;
 
     public:
-
       /// Provide const CDCWireHit to process.
-      void provideItemsSet(std::vector<const CDCWireHit*>& itemsVector) override final
+      void provideItemsSet(std::vector<const CDCWireHit*>& wireHits) override final
       {
-        clear();
+        this->clear();
 
-        std::vector<Item*>& quadtreeItemsVector = m_quadTree->getItems();
-        quadtreeItemsVector.reserve(itemsVector.size());
-        for (const CDCWireHit* item : itemsVector) {
-          if (item->getAutomatonCell().hasTakenFlag() or item->getAutomatonCell().hasMaskedFlag()) continue;
-          if (insertItemInNode(m_quadTree.get(), item)) {
-            quadtreeItemsVector.push_back(new Item(item));
+        std::vector<Item*>& items = m_quadTree->getItems();
+        items.reserve(wireHits.size());
+        for (const CDCWireHit* wireHit : wireHits) {
+          if ((*wireHit)->hasTakenFlag() or (*wireHit)->hasMaskedFlag()) continue;
+          if (isInNode(m_quadTree.get(), wireHit)) {
+            items.push_back(new Item(wireHit));
           }
         }
       }
@@ -65,20 +63,20 @@ namespace Belle2 {
        */
       std::vector<const CDCWireHit*> getAssignedHits()
       {
-        std::vector<const CDCWireHit*> itemsToReturn;
-        itemsToReturn.reserve(m_quadTree->getNItems());
+        std::vector<const CDCWireHit*> result;
+        result.reserve(m_quadTree->getNItems());
 
         for (Item* item : m_quadTree->getItems()) {
-          itemsToReturn.push_back(item->getPointer());
+          result.push_back(item->getPointer());
         }
 
-        return itemsToReturn;
+        return result;
       }
 
       /**
        * Do only insert the hit into a node if sinogram calculated from this hit belongs into this node
        */
-      bool insertItemInNode(QuadTree* node, const CDCWireHit* wireHit) const override final
+      bool isInNode(QuadTree* node, const CDCWireHit* wireHit) const final
       {
         double l = wireHit->getRefDriftLength();
         Vector2D pos2D = wireHit->getRefPos2D() - m_referencePoint;

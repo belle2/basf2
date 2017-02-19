@@ -74,7 +74,7 @@ namespace Belle2 {
       /**
        * lastLevel depends on curvature of the track candidate
        */
-      bool checkIfLastLevel(QuadTree* node) override final
+      bool isLeaf(QuadTree* node) const final
       {
         if (node->getLevel() <= 6) return false;
         if (node->getLevel() >= getLastLevel()) return true;
@@ -93,7 +93,7 @@ namespace Belle2 {
        * @param hit hit being checked
        * @return returns true if sinogram of the hit crosses (geometrically) borders of the node
        */
-      bool insertItemInNode(QuadTree* node, const CDCWireHit* wireHit) const override final
+      bool isInNode(QuadTree* node, const CDCWireHit* wireHit) const final
       {
         const double& l = wireHit->getRefDriftLength();
         const Vector2D& pos2D = wireHit->getRefPos2D();
@@ -163,7 +163,7 @@ namespace Belle2 {
        * @param j rho index of the child
        * @return returns ranges of the (i;j) child
        */
-      XYSpans createChildWithParent(QuadTree* node, unsigned int i, unsigned int j) const override final
+      XYSpans createChild(QuadTree* node, unsigned int i, unsigned int j) const final
       {
         const int nodeLevel = node->getLevel();
         const int lastLevel = getLastLevel();
@@ -264,7 +264,7 @@ namespace Belle2 {
             for (Item* item : items) {
               if (item->isUsed()) continue;
 
-              if (insertItemInNode(&newQuadTree, item->getPointer())) {
+              if (isInNode(&newQuadTree, item->getPointer())) {
                 if (twoSidedPhasespace && (newQuadTree.getYMin() < 0.02)  && (newQuadTree.getYMax() < 0.02)) {
                   if (checkDerivative(&newQuadTree, item->getPointer())) {
                     newQuadTree.insertItem(item);
@@ -335,7 +335,7 @@ namespace Belle2 {
 //        quadtreeItems.reserve(hitsVector.size());
         for (Item* item : hitsVector) {
           if (item->isUsed()) continue;
-          if (insertItemInNode(quadTree, item->getPointer())) {
+          if (isInNode(quadTree, item->getPointer())) {
             quadtreeItems.push_back(item);
           }
         }

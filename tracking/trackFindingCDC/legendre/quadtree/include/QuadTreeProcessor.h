@@ -26,7 +26,7 @@ namespace Belle2 {
      * This abstract class serves as a base class for all implementations of track processors.
      * It provides some functions to create, fill, clear and postprocess a quad tree.
      * If you want to use your own class as a quad tree item, you have to overload this processor.
-     * You have provide only the two functions insertItemInNode and createChildWithParent.
+     * You have provide only the two functions isInNode and createChild.
      */
     template<typename AX, typename AY, class AData>
     class QuadTreeProcessor {
@@ -153,7 +153,7 @@ namespace Belle2 {
           }
         }
 
-        if (checkIfLastLevel(node)) {
+        if (isLeaf(node)) {
           callResultFunction(node, lmdProcessor);
           return;
         }
@@ -194,7 +194,7 @@ namespace Belle2 {
       {
         for (int i = 0; i < node->getXNbins(); ++i) {
           for (int j = 0; j < node->getYNbins(); ++j) {
-            const XYSpans& xySpans = createChildWithParent(node, i, j);
+            const XYSpans& xySpans = createChild(node, i, j);
             const XSpan& xSpan = xySpans.first;
             const YSpan& ySpan = xySpans.second;
             m_children->set(i, j, new QuadTree(xSpan, ySpan, node->getLevel() + 1, node));
@@ -204,9 +204,9 @@ namespace Belle2 {
 
       /**
        * This function is called by fillGivenTree and fills the items into the corresponding children.
-       * For this the user-defined method insertItemInNode is called.
+       * For this the user-defined method isInNode is called.
        */
-      virtual void fillChildren(QuadTree* node, std::vector<Item*>& items)
+      void fillChildren(QuadTree* node, std::vector<Item*>& items)
       {
         const size_t neededSize = 2 * items.size();
         for (QuadTree* child : *node->getChildren()) {
@@ -218,7 +218,7 @@ namespace Belle2 {
           if (item->isUsed()) continue;
 
           for (QuadTree* child : *node->getChildren()) {
-            if (insertItemInNode(child, item->getPointer())) {
+            if (isInNode(child, item->getPointer())) {
               child->insertItem(item);
             }
           }
@@ -253,7 +253,7 @@ namespace Belle2 {
        * If you don nt want to provide custom spans, just return XYSpans(XSpan(node->getXBinBound(iX), node->getXBinBound(iX + 1)),
        * YSpan(node->getYBinBound(iY), node->getYBinBound(iY + 1)));
        */
-      virtual XYSpans createChildWithParent(QuadTree* node, unsigned int iX, unsigned int iY) const
+      virtual XYSpans createChild(QuadTree* node, unsigned int iX, unsigned int iY) const
       {
         AX xMin = node->getXBinBound(iX);
         AX xMax = node->getXBinBound(iX + 1);
@@ -269,14 +269,14 @@ namespace Belle2 {
        * @param item  item to be filled into the child node or not
        * @return true if this item belongs into this node.
        */
-      virtual bool insertItemInNode(QuadTree* node, AData* item) const = 0;
+      virtual bool isInNode(QuadTree* node, AData* item) const = 0;
 
       /**
        * Function which checks if given node is leaf
        * Implemented as virtual to keep possibility of changing lastLevel values depending on region is phase-space
        * (i.e. setting lastLevel as a function of Y-variable)
        */
-      virtual bool checkIfLastLevel(QuadTree* node)
+      virtual bool isLeaf(QuadTree* node) const
       {
         if (node->getLevel() >= m_lastLevel) {
           return true;
@@ -310,7 +310,7 @@ namespace Belle2 {
       /**
        * Return the debug information if collected
        */
-      const std::map<std::pair<AX, AY>, std::vector<Item*>>& getDebugInformation()
+      const std::map<std::pair<AX, AY>, std::vector<Item*>>& getDebugInformation() const
       {
         return m_debugOutputMap;
       }

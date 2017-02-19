@@ -91,6 +91,7 @@ namespace Belle2 {
        */
       void clear()
       {
+        m_seededTrees.clear();
         m_quadTree->clearChildren();
         m_quadTree->clearItems();
         m_items.clear();
@@ -104,14 +105,10 @@ namespace Belle2 {
         for (AData* data : datas) {
           m_items.emplace_back(data);
         }
-
-        std::vector<Item*>& quadTreeItems = m_quadTree->getItems();
-        quadTreeItems.reserve(m_items.size());
-        for (Item& item : m_items) {
-          quadTreeItems.push_back(&item);
-        }
+        seedQuadTree();
       }
 
+    private:
       /**
        * Fill m_quadTree vector with QuadTree instances (number of instances is 4^lvl).
        * @param lvl level to which QuadTree instances should be equal in sense of the rho-theta boundaries.
@@ -139,14 +136,13 @@ namespace Belle2 {
           nextSeededTrees.clear();
         }
 
-        std::vector<Item*> items = m_quadTree->getItems();
         for (QuadTree* seededTree : m_seededTrees) {
-          seededTree->reserveItems(m_quadTree->getNItems());
+          seededTree->reserveItems(m_items.size());
 
-          for (Item* item : items) {
-            if (item->isUsed()) continue;
-            if (isInNode(seededTree, item->getPointer())) {
-              seededTree->insertItem(item);
+          for (Item& item : m_items) {
+            if (item.isUsed()) continue;
+            if (isInNode(seededTree, item.getPointer())) {
+              seededTree->insertItem(&item);
             }
           }
         }
@@ -165,6 +161,7 @@ namespace Belle2 {
         });
       }
 
+    public:
       /**
        * Fill vector of QuadTree instances with hits.
        * @param lmdProcessor the lambda function to call after a node was selected
@@ -181,14 +178,6 @@ namespace Belle2 {
         }
       }
 
-      /// Clear vector of QuadTree instances
-      void clearSeededTree()
-      {
-        m_seededTrees.clear();
-        m_seededTrees.shrink_to_fit();
-      }
-
-    public:
       /**
        * Start filling the already created tree.
        * @param lmdProcessor the lambda function to call after a node was selected
@@ -199,7 +188,7 @@ namespace Belle2 {
                          int nHitsThreshold,
                          AY yLimit)
       {
-        fillGivenTree(m_quadTree.get(), lmdProcessor, nHitsThreshold, yLimit);
+        fillSeededTree(lmdProcessor, nHitsThreshold, yLimit);
       }
 
       /**
@@ -209,7 +198,7 @@ namespace Belle2 {
        */
       void fillGivenTree(CandidateProcessorLambda& lmdProcessor, int nHitsThreshold)
       {
-        fillGivenTree(m_quadTree.get(), lmdProcessor, nHitsThreshold, std::numeric_limits<AY>::max());
+        fillGivenTree(lmdProcessor, nHitsThreshold, std::numeric_limits<AY>::max());
       }
 
       /**
@@ -298,7 +287,6 @@ namespace Belle2 {
           child->reserveItems(neededSize);
         }
 
-        //Voting within the four bins
         for (Item* item : items) {
           if (item->isUsed()) continue;
 

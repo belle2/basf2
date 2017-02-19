@@ -91,9 +91,6 @@ void AxialTrackCreatorHitLegendre::doTreeTrackFinding(
   // Curvature for high pt particles that leave the CDC
   const double curlCurv = 2. / rCDC;
 
-  // Fill the seed level
-  qtProcessor.seedQuadTree();
-
   // find leavers
   qtProcessor.fillSeededTree(lmdInterface, 50, curlCurv);
 

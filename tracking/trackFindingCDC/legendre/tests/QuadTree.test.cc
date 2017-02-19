@@ -32,6 +32,7 @@ namespace {
   {
     using XYSpans = AxialHitQuadTreeProcessor::XYSpans;
     const int maxTheta = std::pow(2, PrecisionUtil::getLookupGridLevel());
+
     // high-pt candidate
     XYSpans ranges1({0, maxTheta}, {0., 0.15});
     PrecisionUtil::PrecisionFunction highPtPrecisionFunction = &PrecisionUtil::getOriginCurvPrecision;
@@ -50,13 +51,13 @@ namespace {
     AxialHitQuadTreeProcessor::QuadTree*) { candidates.push_back(hits); };
 
     auto now = std::chrono::high_resolution_clock::now();
-    AxialHitQuadTreeProcessor qtProcessor1(13, 0, ranges1, highPtPrecisionFunction);
+    AxialHitQuadTreeProcessor qtProcessor1(13, 4, ranges1, highPtPrecisionFunction);
     qtProcessor1.provideItemsSet(m_axialWireHits);
 
     // actual filling of the hits into the quad tree structure
     qtProcessor1.fillGivenTree(lmdProcessor, 30);
 
-    AxialHitQuadTreeProcessor qtProcessor2(11, 0, ranges2, lowPtPrecisionFunction);
+    AxialHitQuadTreeProcessor qtProcessor2(11, 1, ranges2, lowPtPrecisionFunction);
     qtProcessor2.provideItemsSet(m_axialWireHits);
 
     // actual filling of the hits into the quad tree structure

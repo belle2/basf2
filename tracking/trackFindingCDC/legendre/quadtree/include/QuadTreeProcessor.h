@@ -148,7 +148,7 @@ namespace Belle2 {
        * @param lmdProcessor the lambda function to call after a node was selected
        * @param nHitsThreshold the threshold on the number of items
        */
-      void fill(CandidateProcessorLambda& lmdProcessor, int nHitsThreshold)
+      void fill(const CandidateProcessorLambda& lmdProcessor, int nHitsThreshold)
       {
         fill(lmdProcessor, nHitsThreshold, std::numeric_limits<AY>::max());
       }
@@ -159,7 +159,7 @@ namespace Belle2 {
        * @param nHitsThreshold the threshold on the number of items
        * @param yLimit the threshold in the rho (curvature) variable
        */
-      void fill(CandidateProcessorLambda& lmdProcessor, int nHitsThreshold, float yLimit)
+      void fill(const CandidateProcessorLambda& lmdProcessor, int nHitsThreshold, float yLimit)
       {
         std::vector<QuadTree*> quadTrees = m_seededTrees;
         std::sort(quadTrees.begin(), quadTrees.end(), [](QuadTree * quadTree1, QuadTree * quadTree2) {
@@ -178,7 +178,7 @@ namespace Belle2 {
        * process further and go one level deeper.
        */
       void fillGivenTree(QuadTree* node,
-                         CandidateProcessorLambda& lmdProcessor,
+                         const CandidateProcessorLambda& lmdProcessor,
                          int nItemsThreshold,
                          AY yLimit)
       {
@@ -275,7 +275,7 @@ namespace Belle2 {
        * When a node is accepted as a result, we extract a vector with the items (back transformed to AData*)
        * and pass it together with the result node to the given lambda function.
        */
-      void callResultFunction(QuadTree* node, CandidateProcessorLambda& lambda) const
+      void callResultFunction(QuadTree* node, const CandidateProcessorLambda& lambda) const
       {
         ReturnList resultItems;
         const std::vector<Item*>& quadTreeItems = node->getItems();

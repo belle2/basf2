@@ -65,7 +65,7 @@ namespace Belle2 {
        * @param parameters pass-dependent parameters of the QuadTree search
        * @param qtProcessor reference to the AxialHitQuadTreeProcessor instance
        */
-      void doTreeTrackFinding(AxialHitQuadTreeProcessor::CandidateProcessorLambda& lmdInterface,
+      void doTreeTrackFinding(const AxialHitQuadTreeProcessor::CandidateProcessorLambda& lmdInterface,
                               QuadTreeParameters& parameters,
                               AxialHitQuadTreeProcessor& qtProcessor);
 

@@ -80,7 +80,7 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& a
 }
 
 void AxialTrackCreatorHitLegendre::doTreeTrackFinding(
-  AxialHitQuadTreeProcessor::CandidateProcessorLambda& lmdInterface,
+  const AxialHitQuadTreeProcessor::CandidateProcessorLambda& lmdInterface,
   QuadTreeParameters& parameters,
   AxialHitQuadTreeProcessor& qtProcessor)
 {

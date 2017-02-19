@@ -16,6 +16,7 @@
 #include <functional>
 #include <map>
 #include <vector>
+#include <deque>
 #include <utility>
 #include <cmath>
 
@@ -88,22 +89,24 @@ namespace Belle2 {
        */
       void clear()
       {
-        const std::vector<Item*>& quadtreeItems = m_quadTree->getItems();
-        for (Item* item : quadtreeItems) {
-          delete item;
-        }
         m_quadTree->clearChildren();
+        m_quadTree->clearItems();
+        m_items.clear();
       }
 
       /**
        * Fill in the items in the given vector. They are transformed to QuadTreeItems internally.
        */
-      virtual void provideItemsSet(std::vector<AData*>& itemsVector)
+      virtual void provideItemsSet(std::vector<AData*>& datas)
       {
-        std::vector<Item*>& quadtreeItems = m_quadTree->getItems();
-        quadtreeItems.reserve(itemsVector.size());
-        for (AData* item : itemsVector) {
-          quadtreeItems.push_back(new Item(item));
+        for (AData* data : datas) {
+          m_items.emplace_back(data);
+        }
+
+        std::vector<Item*>& quadTreeItems = m_quadTree->getItems();
+        quadTreeItems.reserve(m_items.size());
+        for (Item& item : m_items) {
+          quadTreeItems.push_back(&item);
         }
       }
 
@@ -316,6 +319,9 @@ namespace Belle2 {
     protected:
       /// The quad tree we work with
       std::unique_ptr<QuadTree> m_quadTree;
+
+      /// Storage space for the items that are referenced by the quad tree nodes
+      std::deque<Item> m_items;
 
     private:
       /// The last level to be filled

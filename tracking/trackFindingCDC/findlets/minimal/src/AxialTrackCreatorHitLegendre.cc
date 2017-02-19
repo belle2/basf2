@@ -85,48 +85,49 @@ void AxialTrackCreatorHitLegendre::doTreeTrackFinding(
   QuadTreeParameters& parameters,
   AxialHitQuadTreeProcessor& qtProcessor)
 {
-
   // radius of the CDC
   double rCDC = 113.;
 
-  if (parameters.getPass() != LegendreFindingPass::FullRange) qtProcessor.seedQuadTree(4);
+  // Curvature for high pt particles that leave the CDC
+  double curlCurv = 2. / rCDC;
 
-  // find high-pt tracks (not-curlers: diameter of the track higher than radius of CDC -- 2*Rtrk >
-  // rCDC => Rtrk < 2./rCDC, r(legendre) = 1/Rtrk =>  r(legendre) < 2./rCDC)
-  if (parameters.getPass() != LegendreFindingPass::FullRange)
-    qtProcessor.fillSeededTree(lmdInterface, 50, 2. / rCDC); // fillSeededTree
-  else
-    qtProcessor.fillGivenTree(lmdInterface, 50, 2. / rCDC);
-  // qtProcessor.fillGivenTree(lmdInterface, 50, 2. / rCDC);
+  // Create sectorisation level
+  if (parameters.getPass() != LegendreFindingPass::FullRange) {
+    qtProcessor.seedQuadTree(4);
+  }
+
+  if (parameters.getPass() != LegendreFindingPass::FullRange) {
+    qtProcessor.fillSeededTree(lmdInterface, 50, curlCurv);
+  } else {
+    qtProcessor.fillGivenTree(lmdInterface, 50, curlCurv);
+  }
+  // qtProcessor.fillGivenTree(lmdInterface, 50, curlCurv);
 
   // find curlers with diameter higher than half of radius of CDC (see calculations above)
-  if (parameters.getPass() != LegendreFindingPass::FullRange)
-    qtProcessor.fillSeededTree(lmdInterface, 70, 4. / rCDC); // fillGivenTree
-  else
-    qtProcessor.fillGivenTree(lmdInterface, 70, 4. / rCDC);
-  // qtProcessor.fillGivenTree(lmdInterface, 70, 4. / rCDC);
+  if (parameters.getPass() != LegendreFindingPass::FullRange) {
+    qtProcessor.fillSeededTree(lmdInterface, 70, 2 * curlCurv);
+  } else {
+    qtProcessor.fillGivenTree(lmdInterface, 70, 2 * curlCurv);
+  }
+  // qtProcessor.fillGivenTree(lmdInterface, 70, 2 * curlCurv);
 
-  // Start loop, where tracks are searched for
+  // Start relaxation loop
   int limit = parameters.getInitialHitsLimit();
   double rThreshold = parameters.getCurvThreshold();
   do {
-    if (parameters.getPass() != LegendreFindingPass::FullRange)
-      qtProcessor.fillSeededTree(lmdInterface, limit, rThreshold); // fillSeededTree
-    else
+    if (parameters.getPass() != LegendreFindingPass::FullRange) {
+      qtProcessor.fillSeededTree(lmdInterface, limit, rThreshold);
+    } else {
       qtProcessor.fillGivenTree(lmdInterface, limit, rThreshold);
+    }
     // qtProcessor.fillGivenTree(lmdInterface, limit, rThreshold);
 
     limit = limit * m_param_stepScale;
 
     if (parameters.getPass() != LegendreFindingPass::NonCurlers) {
       rThreshold *= 2.;
-      if (rThreshold > 0.15 /*ranges.second.second*/) rThreshold = 0.15; // ranges.second.second;
+      if (rThreshold > 0.15) rThreshold = 0.15;
     }
 
-    // perform search until found track has too few hits or threshold is too small and no tracks are
-    // found
   } while (limit >= m_param_threshold);
-
-  // qtProcessor.clearSeededTree();
-
 }

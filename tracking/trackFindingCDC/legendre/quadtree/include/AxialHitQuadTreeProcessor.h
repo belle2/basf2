@@ -91,16 +91,7 @@ namespace Belle2 {
 
           for (Item* item : items) {
             if (item->isUsed()) continue;
-            if (not isInNode(&newQuadTree, item->getPointer())) continue;
-            if (not m_twoSidedPhaseSpace) {
-              newQuadTree.insertItem(item);
-              continue;
-            }
-            if ((newQuadTree.getYMin() > 0.02) or (newQuadTree.getYMax() > 0.02)) {
-              newQuadTree.insertItem(item);
-              continue;
-            }
-            if (checkDerivative(&newQuadTree, item->getPointer())) {
+            if (isInNode(&newQuadTree, item->getPointer())) {
               newQuadTree.insertItem(item);
             }
           }
@@ -168,6 +159,12 @@ namespace Belle2 {
        */
       bool isInNode(QuadTree* node, const CDCWireHit* wireHit) const final
       {
+        // Check whether the hit lies in the forward direction
+        if (node->getLevel() <= 4 and m_twoSidedPhaseSpace and node->getYMin() > -0.02 and
+            node->getYMax() < 0.02) {
+          if (not checkDerivative(node, wireHit)) return false;
+        }
+
         const double& l = wireHit->getRefDriftLength();
         const Vector2D& pos2D = wireHit->getRefPos2D();
         double r2 = square(wireHit->getRefCylindricalR()) - l * l;

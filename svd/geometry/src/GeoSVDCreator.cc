@@ -419,11 +419,13 @@ namespace Belle2 {
       //const std::vector<VXDHalfShellPar>& HalfShells = parameters.getHalfShells();
       for (const VXDHalfShellPar& shell : parameters.getHalfShells()) {
         string shellName =  shell.getName();
-        G4Transform3D shellAlignment = getAlignment(parameters.getAlignment(m_prefix + "." + shellName));
-
+        m_currentHalfShell = m_prefix + "." + shellName;
+        G4Transform3D shellAlignment = getAlignment(parameters.getAlignment(m_currentHalfShell));
         //Place shell support
         double shellAngle = shell.getShellAngle();
         if (!m_onlyActiveMaterial) shellSupport.place(envelope, shellAlignment * G4RotateZ3D(shellAngle));
+        VXD::GeoCache::getInstance().addHalfShellPlacement(VxdID(m_currentHalfShell),
+                                                           shellAlignment); //  * G4RotateZ3D(shellAngle) not taken into account in ladder!
 
         //const std::map< int, std::vector<std::pair<int, double>> >& Layers = shell.getLayers();
         for (const std::pair<const int, std::vector<std::pair<int, double>> >& layer : shell.getLayers()) {

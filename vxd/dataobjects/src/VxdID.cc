@@ -53,6 +53,13 @@ namespace Belle2 {
   {
     //We parse the Id from string, so set it to 0 first
     m_id.id = 0;
+
+    //Predefined special values:
+    if (sensor == std::string("PXD.Ying")) {m_id.parts.segment = 1; return;}
+    if (sensor == std::string("PXD.Yang")) {m_id.parts.segment = 2; return;}
+    if (sensor == std::string("SVD.Pat")) {m_id.parts.segment = 3; return;}
+    if (sensor == std::string("SVD.Mat")) {m_id.parts.segment = 4; return;}
+
     //create a stream from the string
     istringstream in(sensor);
     try {

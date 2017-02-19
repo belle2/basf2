@@ -13,13 +13,19 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/SensorInfoBase.h>
+#include <../framework/database/include/DBObjPtr.h>
 #include <vector>
 #include <set>
 #include <map>
 
+#include <TMath.h>
+
 #ifndef __CINT__
 #include <boost/unordered_map.hpp>
+#include <Geant4/G4Transform3D.hh>
 #endif
+
+#include <alignment/dbobjects/VXDAlignment.h>
 
 class G4VPhysicalVolume;
 
@@ -89,12 +95,93 @@ namespace Belle2 {
       /* If sensor not found, it returns a warning and the first sensor!*/
       const SensorInfoBase& getSensorInfo(Belle2::VxdID id) const;
 
+      // ------------------ Alignment constants in reconstruction + hierarchy ------------------------------
+
+      /// Retrieve stored half-shell placements into world volume
+      /// @return vector of pairs, each pair contains a VxdID for half-shell (0.0.0#1-4) and its placement
+      const std::vector<std::pair<VxdID, TGeoHMatrix>>& getHalfShellPlacements();
+
+      /// Retrieve stored ladder placements into half-shell
+      /// @return vector of pairs, each pair contains a VxdID for ladder (layer.ladder.0) and its placement
+      const std::vector<std::pair<VxdID, TGeoHMatrix>>& getLadderPlacements(VxdID halfShell);
+
+      /// Retrieve stored sensor placements into ladders
+      /// @return vector of pairs, each pair contains a VxdID for sensor and its placement
+      const std::vector<std::pair<VxdID, TGeoHMatrix>>& getSensorPlacements(VxdID ladder);
+
+      /// Remember how half-shell is placed into world volume
+      void addHalfShellPlacement(VxdID halfShell, G4Transform3D placement);
+
+      /// Remember how ladder is placed into half-shell
+      void addLadderPlacement(VxdID halfShell, VxdID ladder, G4Transform3D placement);
+
+      /// Remember how sensor is placed into ladder
+      void addSensorPlacement(VxdID ladder, VxdID sensor, G4Transform3D placement);
+
+      /// Initialize from DB for reconstruction
+      /// Updates all SensorInfo transformations for reconstruction from DB object(s)
+      /// (recalculating new global positions) and registers itself for subsequent updates
+      /// of DB objects to keep the hierarchy up-o-date.
+      void setupReconstructionTransformations();
+
+      /// Covenient function to convert G4Transform3D to TGeoHMatrix
+      static TGeoHMatrix g4Transform3DToTGeo(G4Transform3D g4);
+
+      template<class TypeName>
+      TGeoHMatrix getPlacementDBCorrection(TypeName& dbobj, VxdID id)
+      {
+        // Differential translation
+        TGeoTranslation translation;
+        // Differential rotation
+        TGeoRotation rotation;
+
+        translation.SetTranslation(
+          dbobj.get(id, TypeName::dU),
+          dbobj.get(id, TypeName::dV),
+          dbobj.get(id, TypeName::dW)
+        );
+        rotation.RotateX(- dbobj.get(id, TypeName::dAlpha) * TMath::RadToDeg());
+        rotation.RotateY(- dbobj.get(id, TypeName::dBeta)  * TMath::RadToDeg());
+        rotation.RotateZ(- dbobj.get(id, TypeName::dGamma) * TMath::RadToDeg());
+
+        // Differential trafo (trans + rot)
+        TGeoCombiTrans combi(translation, rotation);
+        TGeoHMatrix trafo;
+        trafo = trafo * combi;
+        return trafo;
+
+      }
+
+      /// Convert 6 rigid body params to corresponding TGeoHMatrix
+      /// Angles in radians, length units in centimeters
+      TGeoHMatrix getTGeoFromRigidBodyParams(double dU, double dV, double dW, double dAlpha, double dBeta, double dGamma)
+      {
+        // Differential translation
+        TGeoTranslation translation;
+        // Differential rotation
+        TGeoRotation rotation;
+
+        translation.SetTranslation(dU, dV, dW);
+        rotation.RotateX(- dAlpha * TMath::RadToDeg());
+        rotation.RotateY(- dBeta  * TMath::RadToDeg());
+        rotation.RotateZ(- dGamma * TMath::RadToDeg());
+
+        // Differential trafo (trans + rot)
+        TGeoCombiTrans combi(translation, rotation);
+        TGeoHMatrix trafo;
+        trafo = trafo * combi;
+        return trafo;
+      }
+
+      // --------------------------------------------------------------------------------------------------
+
+
       /** Return a reference to the SensorInfo of a given SensorID.
        * This function is a shorthand for GeoCache::getInstance().getSensorInfo
        */
       static const SensorInfoBase& get(Belle2::VxdID id) { return getInstance().getSensorInfo(id); }
-      /** Return a reference to the singleton instance */
 
+      /** Return a reference to the singleton instance */
       static GeoCache& getInstance();
 
     private:
@@ -122,6 +209,12 @@ namespace Belle2 {
       SensorHierachy m_ladders;
       /** Map of all Sensor IDs belonging to a given Ladder ID */
       SensorHierachy m_sensors;
+
+      std::vector<std::pair<VxdID, TGeoHMatrix>> m_halfShellPlacements {};
+      std::map<VxdID, std::vector<std::pair<VxdID, TGeoHMatrix>>> m_ladderPlacements {};
+      std::map<VxdID, std::vector<std::pair<VxdID, TGeoHMatrix>>> m_sensorPlacements {};
+
+      StoreObjPtr<VXDAlignment> m_alignmentDBObj;
 
 #ifndef __CINT__
       /** Map to find the SensorInfo for a given Sensor ID */

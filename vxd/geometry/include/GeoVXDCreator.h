@@ -211,6 +211,8 @@ namespace Belle2 {
       /** Vector of G4UserLimit pointers */
       std::vector<G4UserLimits*> m_UserLimits;
 
+      std::string m_currentHalfShell {""};
+
     }; // class GeoVXDCreator
 
   } // namespace VXD

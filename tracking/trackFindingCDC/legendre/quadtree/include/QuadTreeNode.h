@@ -65,7 +65,6 @@ namespace Belle2 {
       , m_parent(level > 0 ? parent : nullptr)
       , m_filled(false)
       {
-        // ensure the level value fits into unsigned char
         B2ASSERT("QuadTree datastructure only supports levels < 255", level < 255);
       }
 
@@ -88,7 +87,7 @@ namespace Belle2 {
       }
 
       /** Check if the node passes threshold on number of hits */
-      size_t getNItems() const
+      int getNItems() const
       {
         return m_items.size();
       }
@@ -126,7 +125,7 @@ namespace Belle2 {
       }
 
       /** Returns level of the node in tree (i.e., how much ancestors the node has) */
-      unsigned char getLevel() const
+      int getLevel() const
       {
         return m_level;
       }
@@ -229,7 +228,7 @@ namespace Belle2 {
       YBinBounds m_yBinBounds;
 
       /// Level of node in the tree
-      unsigned char m_level;
+      int m_level;
 
       /// Pointer to the parent node
       This* m_parent;

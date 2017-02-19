@@ -24,10 +24,10 @@ namespace Belle2 {
     class QuadTreeChildren {
     public:
       /// Number of children in X direction
-      static constexpr const size_t c_nXBins = 2;
+      static constexpr const int c_nXBins = 2;
 
       /// Number of children in Y direction
-      static constexpr const size_t c_nYBins = 2;
+      static constexpr const int c_nYBins = 2;
 
       /// Iterator type to iterate over the child node
       using iterator = typename std::array<ANode*, c_nYBins* c_nXBins>::const_iterator;
@@ -65,7 +65,7 @@ namespace Belle2 {
        *
        * @param qt pointer to QuadTree child to set
        */
-      void set(size_t iXBin, size_t iYBin, ANode* qt)
+      void set(int iXBin, int iYBin, ANode* qt)
       {
         // Delete owned node
         delete m_children[iXBin * c_nYBins + iYBin];
@@ -75,7 +75,7 @@ namespace Belle2 {
       }
 
       /// Get pointer to the child with indexes iXBin, iYBin
-      ANode* get(size_t iXBin, size_t iYBin)
+      ANode* get(int iXBin, int iYBin)
       {
         return m_children[iXBin * c_nYBins + iYBin];
       }

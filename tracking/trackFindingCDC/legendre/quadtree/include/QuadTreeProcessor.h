@@ -64,7 +64,7 @@ namespace Belle2 {
        * @param spans spans of the QuadTree at the top level
        * @param setUsedFlag Set the used flag after every lambda function call
        */
-      QuadTreeProcessor(unsigned char lastLevel,
+      QuadTreeProcessor(int lastLevel,
                         const XYSpans& xySpans,
                         bool debugOutput = false,
                         bool setUsedFlag = true)
@@ -170,7 +170,7 @@ namespace Belle2 {
        * @param yLimit the threshold in the rho (curvature) variable
        */
       void fillSeededTree(CandidateProcessorLambda& lmdProcessor,
-                          unsigned int nHitsThreshold, float yLimit)
+                          int nHitsThreshold, float yLimit)
       {
         sortSeededTree();
         for (QuadTree* tree : m_seededTrees) {
@@ -194,7 +194,7 @@ namespace Belle2 {
        * @param yLimit the threshold in the y variable
        */
       void fillGivenTree(CandidateProcessorLambda& lmdProcessor,
-                         unsigned int nHitsThreshold,
+                         int nHitsThreshold,
                          AY yLimit)
       {
         fillGivenTree(m_quadTree.get(), lmdProcessor, nHitsThreshold, yLimit);
@@ -205,7 +205,7 @@ namespace Belle2 {
        * @param lmdProcessor the lambda function to call after a node was selected
        * @param nHitsThreshold the threshold on the number of items
        */
-      void fillGivenTree(CandidateProcessorLambda& lmdProcessor, unsigned int nHitsThreshold)
+      void fillGivenTree(CandidateProcessorLambda& lmdProcessor, int nHitsThreshold)
       {
         fillGivenTree(m_quadTree.get(), lmdProcessor, nHitsThreshold, std::numeric_limits<AY>::max());
       }
@@ -216,11 +216,17 @@ namespace Belle2 {
        */
       void fillGivenTree(QuadTree* node,
                          CandidateProcessorLambda& lmdProcessor,
-                         unsigned int nItemsThreshold,
+                         int nItemsThreshold,
                          AY yLimit)
       {
-        B2DEBUG(100, "startFillingTree with " << node->getItems().size() << " hits at level " << static_cast<unsigned int>
-                (node->getLevel()) << " (" << node->getXMean() << "/ " << node->getYMean() << ")");
+        B2DEBUG(100,
+                "startFillingTree with " << node->getItems().size() << " hits at level "
+                << node->getLevel()
+                << " ("
+                << node->getXMean()
+                << "/ "
+                << node->getYMean()
+                << ")");
 
         if (node->getItems().size() < nItemsThreshold) {
           return;
@@ -330,7 +336,7 @@ namespace Belle2 {
        * If you don nt want to provide custom spans, just return XYSpans(XSpan(node->getXBinBound(iX), node->getXBinBound(iX + 1)),
        * YSpan(node->getYBinBound(iY), node->getYBinBound(iY + 1)));
        */
-      virtual XYSpans createChild(QuadTree* node, unsigned int iX, unsigned int iY) const
+      virtual XYSpans createChild(QuadTree* node, int iX, int iY) const
       {
         AX xMin = node->getXBinBound(iX);
         AX xMax = node->getXBinBound(iX + 1);
@@ -365,7 +371,7 @@ namespace Belle2 {
       /**
        * Return the parameter last level.
        */
-      unsigned int getLastLevel() const
+      int getLastLevel() const
       {
         return m_lastLevel;
       }
@@ -408,7 +414,7 @@ namespace Belle2 {
 
     private:
       /// The last level to be filled
-      unsigned int m_lastLevel;
+      int m_lastLevel;
 
       /// A flag to control the creation of the debug output
       bool m_debugOutput;

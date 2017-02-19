@@ -20,7 +20,7 @@ namespace Belle2 {
 
     public:
       /// Constructor
-      AxialHitQuadTreeProcessor(unsigned char lastLevel,
+      AxialHitQuadTreeProcessor(int lastLevel,
                                 const XYSpans& ranges,
                                 PrecisionUtil::PrecisionFunction lmdFunctLevel);
 
@@ -37,7 +37,7 @@ namespace Belle2 {
        * @param j rho index of the child
        * @return returns ranges of the (i;j) child
        */
-      XYSpans createChild(QuadTree* node, unsigned int i, unsigned int j) const final;
+      XYSpans createChild(QuadTree* node, int i, int j) const final;
 
       /**
        * Check whether hit belongs to the quadtree node:

@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessor.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 namespace Belle2 {

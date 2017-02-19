@@ -32,7 +32,7 @@ namespace {
   }
 }
 
-AxialHitQuadTreeProcessor::AxialHitQuadTreeProcessor(unsigned char lastLevel,
+AxialHitQuadTreeProcessor::AxialHitQuadTreeProcessor(int lastLevel,
                                                      const XYSpans& ranges,
                                                      PrecisionUtil::PrecisionFunction lmdFunctLevel)
   : QuadTreeProcessor(lastLevel, ranges)
@@ -55,7 +55,7 @@ bool AxialHitQuadTreeProcessor::isLeaf(QuadTree* node) const
 }
 
 AxialHitQuadTreeProcessor::XYSpans
-AxialHitQuadTreeProcessor::createChild(QuadTree* node, unsigned int i, unsigned int j) const
+AxialHitQuadTreeProcessor::createChild(QuadTree* node, int i, int j) const
 {
   const int nodeLevel = node->getLevel();
   const int lastLevel = getLastLevel();

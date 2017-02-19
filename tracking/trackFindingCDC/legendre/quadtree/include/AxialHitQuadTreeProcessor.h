@@ -22,8 +22,7 @@ namespace Belle2 {
       /// Constructor
       AxialHitQuadTreeProcessor(unsigned char lastLevel,
                                 const XYSpans& ranges,
-                                PrecisionUtil::PrecisionFunction lmdFunctLevel,
-                                bool standartBinning = false);
+                                PrecisionUtil::PrecisionFunction lmdFunctLevel);
 
     protected: // Section of specialized functions
       /**
@@ -74,14 +73,6 @@ namespace Belle2 {
       void drawNode();
 
     private:
-      /**
-       *  Sets whether standard splitting of bins will be used
-       *   - in case of standard binning each bin will be splitted into 4 equal bins
-       *   - in case of non-standard binning boundaries of each child will be extended
-       *     (see AxialHitQuadTreeProcessor::createChildWithParent())
-       */
-      bool m_standartBinning;
-
       /**
        *  Indicator whether the two sided phases space insertion check should be used
        *  This option should automatically split back to back tracks in the low curvature regions

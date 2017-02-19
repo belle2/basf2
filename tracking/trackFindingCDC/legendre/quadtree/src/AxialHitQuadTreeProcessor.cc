@@ -34,10 +34,8 @@ namespace {
 
 AxialHitQuadTreeProcessor::AxialHitQuadTreeProcessor(unsigned char lastLevel,
                                                      const XYSpans& ranges,
-                                                     PrecisionUtil::PrecisionFunction lmdFunctLevel,
-                                                     bool standartBinning)
+                                                     PrecisionUtil::PrecisionFunction lmdFunctLevel)
   : QuadTreeProcessor(lastLevel, ranges)
-  , m_standartBinning(standartBinning)
   , m_lmdFunctLevel(lmdFunctLevel)
 {
   m_twoSidedPhaseSpace = m_quadTree->getYMin() * m_quadTree->getYMax() < 0;
@@ -56,7 +54,8 @@ bool AxialHitQuadTreeProcessor::isLeaf(QuadTree* node) const
   return false;
 }
 
-AxialHitQuadTreeProcessor::XYSpans AxialHitQuadTreeProcessor::createChild(QuadTree* node, unsigned int i, unsigned int j) const
+AxialHitQuadTreeProcessor::XYSpans
+AxialHitQuadTreeProcessor::createChild(QuadTree* node, unsigned int i, unsigned int j) const
 {
   const int nodeLevel = node->getLevel();
   const int lastLevel = getLastLevel();
@@ -64,7 +63,7 @@ AxialHitQuadTreeProcessor::XYSpans AxialHitQuadTreeProcessor::createChild(QuadTr
 
   // Expand bins for all nodes 7 levels before the last level (for lastLevel = 12 starting at 6)
   // but only in a curvature region higher than 0.005. Lower than that use always standard.
-  bool standardBinning = m_standartBinning or (nodeLevel <= lastLevel - 7) or (meanCurv <= 0.005);
+  bool standardBinning = (nodeLevel <= lastLevel - 7) or (meanCurv <= 0.005);
 
   if (standardBinning) {
     float r1 = node->getYBinBound(j);

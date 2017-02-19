@@ -47,30 +47,105 @@ namespace Belle2 {
       {
       }
 
-    private:
-
-      /**
-       *  Sets whether standard splitting of bins will be used
-       *   - in case of standard binning each bin will be splitted into 4 equal bins
-       *   - in case of non-standard binning boundaries of each child will be extended (see AxialHitQuadTreeProcessor::createChildWithParent())
-       */
-      bool m_standartBinning;
-
-      /// Lambda which holds resolution function for the quadtree
-      PrecisionUtil::PrecisionFunction m_lmdFunctLevel;
-
       /// Function to check whether sinogram is crossing the node (see AxialHitQuadTreeProcessor::insertItemInNode())
-      bool sameSign(double n1, double n2, double n3, double n4) const
-      {return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));};
+      static bool sameSign(double n1, double n2, double n3, double n4)
+      {
+        return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));
+      };
 
       /**
-       * Vector of QuadTrees
-       * QuadTree instances (which are filled in the vector) cover the whole Legendre phase-space; each instance is processes independently.
+       * Fill m_quadTree vector with QuadTree instances (number of instances is 4^lvl).
+       * @param lvl level to which QuadTree instances should be equal in sense of the rho-theta boundaries.
        */
-      std::vector<QuadTree> m_seededTree;
+      void seedQuadTree(int lvl)
+      {
+        bool twoSidedPhasespace(false);
+        if ((m_quadTree->getYMin() * m_quadTree->getYMax()) < 0) twoSidedPhasespace = true;
 
-    public:
+        long nbins = pow(2, lvl);
 
+        m_seededTree.reserve(nbins * nbins);
+
+        XYSpans ranges({m_quadTree->getXMin(), m_quadTree->getXMax()},
+        {m_quadTree->getYMin(), m_quadTree->getYMax()});
+
+        const XSpan& xSpan = ranges.first;
+        const YSpan& ySpan = ranges.second;
+
+        long binSizeX = (xSpan[1] - xSpan[0]) / nbins;
+        float binSizeY = (ySpan[1] - ySpan[0]) / nbins;
+
+        for (long xIndex = 0; xIndex < nbins; xIndex++) {
+          for (long yIndex = 0; yIndex < nbins; yIndex++) {
+
+            long xMin = xIndex * binSizeX + xSpan[0];
+            long xMax = (xIndex + 1) * binSizeX + xSpan[0];
+            float yMin = yIndex * binSizeY + ySpan[0];
+            float yMax = (yIndex + 1) * binSizeY + ySpan[0];
+
+            m_seededTree.push_back(QuadTree({xMin, xMax}, {yMin, yMax}, lvl, nullptr));
+          }
+        }
+
+        std::vector<Item*> items = m_quadTree->getItems();
+        for (QuadTree& newQuadTree : m_seededTree) {
+          newQuadTree.reserveItems(m_quadTree->getNItems());
+
+          for (Item* item : items) {
+            if (item->isUsed()) continue;
+            if (not isInNode(&newQuadTree, item->getPointer())) continue;
+            if (not twoSidedPhasespace) {
+              newQuadTree.insertItem(item);
+              continue;
+            }
+            if ((newQuadTree.getYMin() > 0.02) or (newQuadTree.getYMax() > 0.02)) {
+              newQuadTree.insertItem(item);
+              continue;
+            }
+            if (checkDerivative(&newQuadTree, item->getPointer())) {
+              newQuadTree.insertItem(item);
+            }
+          }
+        }
+
+        // Remove small seeded trees.
+        auto tooFewItems = [](QuadTree & quadTree) { return quadTree.getNItems() < 10; };
+        erase_remove_if(m_seededTree, tooFewItems);
+
+        // Sort for largest seeded tree first.
+        sortSeededTree();
+      }
+
+      /// Sort vector of seeded QuadTree instances by number of hits.
+      void sortSeededTree()
+      {
+        std::sort(m_seededTree.begin(), m_seededTree.end(), [](QuadTree & quadTree1, QuadTree & quadTree2) { return quadTree1.getNItems() > quadTree2.getNItems();});
+      }
+
+      /**
+       * Fill vector of QuadTree instances with hits.
+       * @param lmdProcessor the lambda function to call after a node was selected
+       * @param nHitsThreshold the threshold on the number of items
+       * @param yLimit the threshold in the rho (curvature) variable
+       */
+      void fillSeededTree(CandidateProcessorLambda& lmdProcessor,
+                          unsigned int nHitsThreshold, float yLimit)
+      {
+        sortSeededTree();
+        for (QuadTree& tree : m_seededTree) {
+          erase_remove_if(tree.getItems(), [](Item * hit) { return hit->isUsed(); });
+          fillGivenTree(&tree, lmdProcessor, nHitsThreshold, yLimit);
+        }
+      }
+
+      /// Clear vector of QuadTree instances
+      void clearSeededTree()
+      {
+        m_seededTree.clear();
+        m_seededTree.shrink_to_fit();
+      }
+
+    protected:
       /**
        * lastLevel depends on curvature of the track candidate
        */
@@ -223,136 +298,6 @@ namespace Belle2 {
       }
 
       /**
-       * Fill m_quadTree vector with QuadTree instances (number of instances is 4^lvl).
-       * @param lvl level to which QuadTree instances should be equal in sense of the rho-theta boundaries.
-       */
-      void seedQuadTree(int lvl)
-      {
-        bool twoSidedPhasespace(false);
-        if ((m_quadTree->getYMin() * m_quadTree->getYMax()) < 0) twoSidedPhasespace = true;
-
-        long nbins = pow(2, lvl);
-
-        m_seededTree.reserve(nbins * nbins);
-
-        XYSpans ranges({m_quadTree->getXMin(), m_quadTree->getXMax()},
-        {m_quadTree->getYMin(), m_quadTree->getYMax()});
-
-        const XSpan& xSpan = ranges.first;
-        const YSpan& ySpan = ranges.second;
-
-        long binSizeX = (xSpan[1] - xSpan[0]) / nbins;
-        float binSizeY = (ySpan[1] - ySpan[0]) / nbins;
-
-        for (long xIndex = 0; xIndex < nbins; xIndex++) {
-          for (long yIndex = 0; yIndex < nbins; yIndex++) {
-
-            long xMin = xIndex * binSizeX + xSpan[0];
-            long xMax = (xIndex + 1) * binSizeX + xSpan[0];
-            float yMin = yIndex * binSizeY + ySpan[0];
-            float yMax = (yIndex + 1) * binSizeY + ySpan[0];
-
-            m_seededTree.push_back(QuadTree({xMin, xMax}, {yMin, yMax}, lvl, nullptr));
-          }
-        }
-
-        std::vector<Item*> items = m_quadTree->getItems();
-        for (QuadTree& newQuadTree : m_seededTree) {
-          newQuadTree.reserveItems(m_quadTree->getNItems());
-
-          for (Item* item : items) {
-            if (item->isUsed()) continue;
-            if (not isInNode(&newQuadTree, item->getPointer())) continue;
-            if (not twoSidedPhasespace) {
-              newQuadTree.insertItem(item);
-              continue;
-            }
-            if ((newQuadTree.getYMin() > 0.02) or (newQuadTree.getYMax() > 0.02)) {
-              newQuadTree.insertItem(item);
-              continue;
-            }
-            if (checkDerivative(&newQuadTree, item->getPointer())) {
-              newQuadTree.insertItem(item);
-            }
-          }
-        }
-
-        // Remove small seeded trees.
-        auto tooFewItems = [](QuadTree & quadTree) { return quadTree.getNItems() < 10; };
-        erase_remove_if(m_seededTree, tooFewItems);
-
-        // Sort for largest seeded tree first.
-        sortSeededTree();
-      }
-
-      /// Sort vector of seeded QuadTree instances by number of hits.
-      void sortSeededTree()
-      {
-        std::sort(m_seededTree.begin(), m_seededTree.end(), [](QuadTree & quadTree1, QuadTree & quadTree2) { return quadTree1.getNItems() > quadTree2.getNItems();});
-      }
-
-      /**
-       * Fill vector of QuadTree instances with hits.
-       * @param lmdProcessor the lambda function to call after a node was selected
-       * @param nHitsThreshold the threshold on the number of items
-       * @param yLimit the threshold in the rho (curvature) variable
-       */
-      void fillSeededTree(CandidateProcessorLambda& lmdProcessor,
-                          unsigned int nHitsThreshold, float yLimit)
-      {
-        sortSeededTree();
-        for (QuadTree& tree : m_seededTree) {
-          erase_remove_if(tree.getItems(), [](Item * hit) { return hit->isUsed(); });
-          fillGivenTree(&tree, lmdProcessor, nHitsThreshold, yLimit);
-        }
-      }
-
-      /// Clear vector of QuadTree instances
-      void clearSeededTree()
-      {
-        m_seededTree.clear();
-        m_seededTree.shrink_to_fit();
-      }
-
-      /// Draw QuadTree nodes
-      void drawNode()
-      {
-        static int nevent(0);
-
-        TCanvas* canv = new TCanvas("canv", "legendre transform", 0, 0, 1200, 600);
-        canv->cd(1);
-        TGraph* dummyGraph = new TGraph();
-        dummyGraph->SetPoint(1, -3.1415, 0);
-        dummyGraph->SetPoint(2, 3.1415, 0);
-        dummyGraph->Draw("AP");
-        dummyGraph->GetXaxis()->SetTitle("#theta");
-        dummyGraph->GetYaxis()->SetTitle("#rho");
-        dummyGraph->GetXaxis()->SetRangeUser(-3.1415, 3.1415);
-        dummyGraph->GetYaxis()->SetRangeUser(0, 0.15);
-
-
-        //    int nhits = 0;
-        for (Item* hit : m_quadTree->getItems()) {
-          TF1* funct1 = new TF1("funct", "2*[0]*cos(x)/((1-sin(x))*[1]) ", -3.1415, 3.1415);
-          funct1->SetLineWidth(1);
-          double r2 = (hit->getPointer()->getRefPos2D().norm() + hit->getPointer()->getRefDriftLength()) *
-                      (hit->getPointer()->getRefPos2D().norm() - hit->getPointer()->getRefDriftLength());
-          double d2 = hit->getPointer()->getRefDriftLength() * hit->getPointer()->getRefDriftLength();
-          double x = hit->getPointer()->getRefPos2D().x();
-
-          funct1->SetParameters(x, r2 - d2);
-          funct1->Draw("CSAME");
-
-        }
-        canv->Print(Form("legendreHits_%i.root", nevent));
-        canv->Print(Form("legendreHits_%i.eps", nevent));
-        canv->Print(Form("legendreHits_%i.png", nevent));
-
-
-        nevent++;
-      }
-
-      /**
        * Check derivative of the sinogram.
        * @param node QuadTree node
        * @param hit pointer to the hit to check
@@ -417,7 +362,64 @@ namespace Belle2 {
         bool crossesLeft = (rMin - rLeft) * (rMax - rLeft) < 0;
         return crossesRight or crossesLeft;
       }
-    };
 
+    private: // debug stuff
+      /// Draw QuadTree nodes
+      void drawNode()
+      {
+        static int nevent(0);
+
+        TCanvas* canv = new TCanvas("canv", "legendre transform", 0, 0, 1200, 600);
+        canv->cd(1);
+        TGraph* dummyGraph = new TGraph();
+        dummyGraph->SetPoint(1, -3.1415, 0);
+        dummyGraph->SetPoint(2, 3.1415, 0);
+        dummyGraph->Draw("AP");
+        dummyGraph->GetXaxis()->SetTitle("#theta");
+        dummyGraph->GetYaxis()->SetTitle("#rho");
+        dummyGraph->GetXaxis()->SetRangeUser(-3.1415, 3.1415);
+        dummyGraph->GetYaxis()->SetRangeUser(0, 0.15);
+
+
+        //    int nhits = 0;
+        for (Item* hit : m_quadTree->getItems()) {
+          TF1* funct1 = new TF1("funct", "2*[0]*cos(x)/((1-sin(x))*[1]) ", -3.1415, 3.1415);
+          funct1->SetLineWidth(1);
+          double r2 = (hit->getPointer()->getRefPos2D().norm() + hit->getPointer()->getRefDriftLength()) *
+                      (hit->getPointer()->getRefPos2D().norm() - hit->getPointer()->getRefDriftLength());
+          double d2 = hit->getPointer()->getRefDriftLength() * hit->getPointer()->getRefDriftLength();
+          double x = hit->getPointer()->getRefPos2D().x();
+
+          funct1->SetParameters(x, r2 - d2);
+          funct1->Draw("CSAME");
+
+        }
+        canv->Print(Form("legendreHits_%i.root", nevent));
+        canv->Print(Form("legendreHits_%i.eps", nevent));
+        canv->Print(Form("legendreHits_%i.png", nevent));
+
+
+        nevent++;
+      }
+
+    private:
+      /**
+       *  Sets whether standard splitting of bins will be used
+       *   - in case of standard binning each bin will be splitted into 4 equal bins
+       *   - in case of non-standard binning boundaries of each child will be extended
+       *     (see AxialHitQuadTreeProcessor::createChildWithParent())
+       */
+      bool m_standartBinning;
+
+      /// Lambda which holds resolution function for the quadtree
+      PrecisionUtil::PrecisionFunction m_lmdFunctLevel;
+
+      /**
+       * Vector of QuadTrees
+       * QuadTree instances (which are filled in the vector) cover the whole Legendre phase-space;
+       * each instance is processes independently.
+       */
+      std::vector<QuadTree> m_seededTree;
+    };
   }
 }

@@ -223,8 +223,8 @@ namespace Belle2 {
       std::vector<int> getElementLabels(DetectorLevelElement element)
       {
         std::vector<int> labels;
-        GlobalLabel label(0);
-        //label.construct(element.first, element.second, 0);
+        GlobalLabel label;
+        label.construct(element.first, element.second, 0);
         // TODO: constants instead of numbers
         labels.push_back(label.setParameterId(20));
 
@@ -286,8 +286,8 @@ namespace Belle2 {
       std::vector<int> getElementLabels(DetectorLevelElement element) override
       {
         std::vector<int> labels;
-        GlobalLabel label(0);
-        //label.construct(element.first, element.second, 0);
+        GlobalLabel label;
+        label.construct(element.first, element.second, 0);
         // TODO: constants instead of numbers
         labels.push_back(label.setParameterId(1));
         labels.push_back(label.setParameterId(2));

@@ -140,61 +140,39 @@ namespace Belle2 {
             }
           }
         }
-
-        // Sort for largest seeded tree first.
-        sortSeededTree();
-      }
-
-      /// Sort vector of seeded QuadTree instances by number of hits.
-      void sortSeededTree()
-      {
-        std::sort(m_seededTrees.begin(),
-                  m_seededTrees.end(),
-        [](QuadTree * quadTree1, QuadTree * quadTree2) {
-          return quadTree1->getNItems() > quadTree2->getNItems();
-        });
       }
 
     public:
+      /**
+       * Start filling the already created tree.
+       * @param lmdProcessor the lambda function to call after a node was selected
+       * @param nHitsThreshold the threshold on the number of items
+       */
+      void fill(CandidateProcessorLambda& lmdProcessor, int nHitsThreshold)
+      {
+        fill(lmdProcessor, nHitsThreshold, std::numeric_limits<AY>::max());
+      }
+
       /**
        * Fill vector of QuadTree instances with hits.
        * @param lmdProcessor the lambda function to call after a node was selected
        * @param nHitsThreshold the threshold on the number of items
        * @param yLimit the threshold in the rho (curvature) variable
        */
-      void fillSeededTree(CandidateProcessorLambda& lmdProcessor,
-                          int nHitsThreshold, float yLimit)
+      void fill(CandidateProcessorLambda& lmdProcessor, int nHitsThreshold, float yLimit)
       {
-        sortSeededTree();
-        for (QuadTree* tree : m_seededTrees) {
+        std::vector<QuadTree*> quadTrees = m_seededTrees;
+        std::sort(quadTrees.begin(), quadTrees.end(), [](QuadTree * quadTree1, QuadTree * quadTree2) {
+          return quadTree1->getNItems() > quadTree2->getNItems();
+        });
+
+        for (QuadTree* tree : quadTrees) {
           erase_remove_if(tree->getItems(), [](Item * hit) { return hit->isUsed(); });
           fillGivenTree(tree, lmdProcessor, nHitsThreshold, yLimit);
         }
       }
 
-      /**
-       * Start filling the already created tree.
-       * @param lmdProcessor the lambda function to call after a node was selected
-       * @param nHitsThreshold the threshold on the number of items
-       * @param yLimit the threshold in the y variable
-       */
-      void fillGivenTree(CandidateProcessorLambda& lmdProcessor,
-                         int nHitsThreshold,
-                         AY yLimit)
-      {
-        fillSeededTree(lmdProcessor, nHitsThreshold, yLimit);
-      }
-
-      /**
-       * Start filling the already created tree.
-       * @param lmdProcessor the lambda function to call after a node was selected
-       * @param nHitsThreshold the threshold on the number of items
-       */
-      void fillGivenTree(CandidateProcessorLambda& lmdProcessor, int nHitsThreshold)
-      {
-        fillGivenTree(lmdProcessor, nHitsThreshold, std::numeric_limits<AY>::max());
-      }
-
+    private:
       /**
        * Internal function to do the real quad tree search: fill the nodes, check which of the n*m bins we need to
        * process further and go one level deeper.

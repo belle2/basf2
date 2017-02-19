@@ -91,16 +91,16 @@ void AxialTrackCreatorHitLegendre::doTreeTrackFinding(
   const double curlCurv = 2. / rCDC;
 
   // find leavers
-  qtProcessor.fillSeededTree(lmdInterface, 50, curlCurv);
+  qtProcessor.fill(lmdInterface, 50, curlCurv);
 
   // find curlers with diameter higher than half of radius of CDC
-  qtProcessor.fillSeededTree(lmdInterface, 70, 2 * curlCurv);
+  qtProcessor.fill(lmdInterface, 70, 2 * curlCurv);
 
   // Start relaxation loop
   int limit = parameters.getInitialHitsLimit();
   double rThreshold = parameters.getCurvThreshold();
   do {
-    qtProcessor.fillSeededTree(lmdInterface, limit, rThreshold);
+    qtProcessor.fill(lmdInterface, limit, rThreshold);
 
     limit = limit * m_param_stepScale;
 

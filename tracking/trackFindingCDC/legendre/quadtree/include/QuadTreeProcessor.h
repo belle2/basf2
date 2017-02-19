@@ -65,11 +65,13 @@ namespace Belle2 {
        * @param setUsedFlag Set the used flag after every lambda function call
        */
       QuadTreeProcessor(int lastLevel,
+                        int seedLevel,
                         const XYSpans& xySpans,
                         bool debugOutput = false,
                         bool setUsedFlag = true)
         : m_quadTree{makeUnique<QuadTree>(xySpans.first, xySpans.second, 0, nullptr)}
         , m_lastLevel(lastLevel)
+        , m_seedLevel(seedLevel)
         , m_debugOutput(debugOutput)
         , m_debugOutputMap()
         , m_param_setUsedFlag(setUsedFlag)
@@ -114,16 +116,16 @@ namespace Belle2 {
        * Fill m_quadTree vector with QuadTree instances (number of instances is 4^lvl).
        * @param lvl level to which QuadTree instances should be equal in sense of the rho-theta boundaries.
        */
-      void seedQuadTree(int seedLevel)
+      void seedQuadTree()
       {
-        long nSeedBins = pow(2, seedLevel);
+        long nSeedBins = pow(2, m_seedLevel);
         m_seededTrees.reserve(nSeedBins * nSeedBins);
 
         // Expand the first levels to for seeded sectors
         m_seededTrees.push_back(m_quadTree.get());
         std::vector<QuadTree*> nextSeededTrees;
 
-        for (int level = 0; level < seedLevel; ++level) {
+        for (int level = 0; level < m_seedLevel; ++level) {
           for (QuadTree* node : m_seededTrees) {
             if (node->getChildren() == nullptr) {
               node->createChildren();
@@ -228,7 +230,7 @@ namespace Belle2 {
                 << node->getYMean()
                 << ")");
 
-        if (node->getItems().size() < nItemsThreshold) {
+        if (node->getNItems() < nItemsThreshold) {
           return;
         }
 
@@ -415,6 +417,9 @@ namespace Belle2 {
     private:
       /// The last level to be filled
       int m_lastLevel;
+
+      /// The first level to be filled, effectivelly skip forward to this higher granularity level
+      int m_seedLevel;
 
       /// A flag to control the creation of the debug output
       bool m_debugOutput;

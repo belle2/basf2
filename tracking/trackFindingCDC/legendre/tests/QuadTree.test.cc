@@ -50,13 +50,13 @@ namespace {
     AxialHitQuadTreeProcessor::QuadTree*) { candidates.push_back(hits); };
 
     auto now = std::chrono::high_resolution_clock::now();
-    AxialHitQuadTreeProcessor qtProcessor1(13, ranges1, highPtPrecisionFunction);
+    AxialHitQuadTreeProcessor qtProcessor1(13, 0, ranges1, highPtPrecisionFunction);
     qtProcessor1.provideItemsSet(m_axialWireHits);
 
     // actual filling of the hits into the quad tree structure
     qtProcessor1.fillGivenTree(lmdProcessor, 30);
 
-    AxialHitQuadTreeProcessor qtProcessor2(11, ranges2, lowPtPrecisionFunction);
+    AxialHitQuadTreeProcessor qtProcessor2(11, 0, ranges2, lowPtPrecisionFunction);
     qtProcessor2.provideItemsSet(m_axialWireHits);
 
     // actual filling of the hits into the quad tree structure

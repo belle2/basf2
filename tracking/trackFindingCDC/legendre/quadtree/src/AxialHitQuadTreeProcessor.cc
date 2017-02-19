@@ -33,9 +33,10 @@ namespace {
 }
 
 AxialHitQuadTreeProcessor::AxialHitQuadTreeProcessor(int lastLevel,
+                                                     int seedLevel,
                                                      const XYSpans& ranges,
                                                      PrecisionUtil::PrecisionFunction lmdFunctLevel)
-  : QuadTreeProcessor(lastLevel, ranges)
+  : QuadTreeProcessor(lastLevel, seedLevel, ranges)
   , m_lmdFunctLevel(lmdFunctLevel)
 {
   m_twoSidedPhaseSpace = m_quadTree->getYMin() * m_quadTree->getYMax() < 0;

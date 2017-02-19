@@ -29,7 +29,7 @@ namespace Belle2 {
        */
       AxialHitQuadTreeProcessorWithNewReferencePoint(const XYSpans& ranges,
                                                      std::pair<double, double> referencePoint)
-        : QuadTreeProcessor(0, ranges)
+        : QuadTreeProcessor(0, 0, ranges)
         , m_referencePoint(referencePoint.first, referencePoint.second)
       {}
 

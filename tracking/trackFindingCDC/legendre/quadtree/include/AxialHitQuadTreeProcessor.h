@@ -21,6 +21,7 @@ namespace Belle2 {
     public:
       /// Constructor
       AxialHitQuadTreeProcessor(int lastLevel,
+                                int seedLevel,
                                 const XYSpans& ranges,
                                 PrecisionUtil::PrecisionFunction lmdFunctLevel);
 

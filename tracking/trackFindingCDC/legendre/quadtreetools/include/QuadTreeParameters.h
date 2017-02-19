@@ -84,10 +84,21 @@ namespace Belle2 {
           return m_maxLevel - 2;
       }
 
+      /// Get the seed level of the quadtree
+      int getSeedLevel()
+      {
+        if (getPass() != LegendreFindingPass::FullRange) {
+          return 4;
+        } else {
+          return 1;
+        }
+      }
+
       /// Create quadtree processor object
       std::unique_ptr<AxialHitQuadTreeProcessor> constructQTProcessor()
       {
         return makeUnique<AxialHitQuadTreeProcessor>(getMaxLevel(),
+                                                     getSeedLevel(),
                                                      getQTRanges(),
                                                      getPrecisionFunction());
       }

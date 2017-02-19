@@ -91,12 +91,8 @@ void AxialTrackCreatorHitLegendre::doTreeTrackFinding(
   // Curvature for high pt particles that leave the CDC
   const double curlCurv = 2. / rCDC;
 
-  // Create sectorisation level
-  if (parameters.getPass() != LegendreFindingPass::FullRange) {
-    qtProcessor.seedQuadTree(4);
-  } else {
-    qtProcessor.seedQuadTree(1);
-  }
+  // Fill the seed level
+  qtProcessor.seedQuadTree();
 
   // find leavers
   qtProcessor.fillSeededTree(lmdInterface, 50, curlCurv);

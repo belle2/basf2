@@ -314,32 +314,6 @@ namespace Belle2 {
         m_seededTree.shrink_to_fit();
       }
 
-      /**
-       * Create single QuadTree node and fill it with unused hits.
-       * @param ranges ranges of the node
-       * @return returns pointer to QuadTree instance
-       */
-
-      QuadTree* createSingleNode(const XYSpans& ranges)
-      {
-        std::vector<Item*> hitsVector = m_quadTree->getItems();
-
-        const XSpan& xSpan = ranges.first;
-        const YSpan& ySpan = ranges.second;
-        QuadTree* quadTree = new QuadTree(xSpan, ySpan, 0, nullptr);
-
-        std::vector<Item*>& quadtreeItems = quadTree->getItems();
-//        quadtreeItems.reserve(hitsVector.size());
-        for (Item* item : hitsVector) {
-          if (item->isUsed()) continue;
-          if (isInNode(quadTree, item->getPointer())) {
-            quadtreeItems.push_back(item);
-          }
-        }
-
-        return quadTree;
-      }
-
       /// Draw QuadTree nodes
       void drawNode()
       {

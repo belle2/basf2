@@ -32,7 +32,7 @@ namespace Belle2 {
     /** Constructor, with the initial size of the buffer to allocate
      * (in bytes). size() will remain zero until buffer is filled.
      */
-    CharBuffer(size_t initial_capacity = 0)
+    explicit CharBuffer(size_t initial_capacity = 0)
     {
       m_vec.resize(initial_capacity);
     }

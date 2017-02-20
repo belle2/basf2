@@ -23,13 +23,14 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 namespace {
-  std::unique_ptr<AxialHitQuadTreeProcessor> constructQTProcessor(LegendreFindingPass pass)
+  using EPass = AxialTrackCreatorHitLegendre::EPass;
+  std::unique_ptr<AxialHitQuadTreeProcessor> constructQTProcessor(EPass pass)
   {
     using XYSpans = AxialHitQuadTreeProcessor::XYSpans;
     using PrecisionFunction = PrecisionUtil::PrecisionFunction;
     const int maxTheta = std::pow(2, PrecisionUtil::getLookupGridLevel());
 
-    if (pass == LegendreFindingPass::NonCurlers) {
+    if (pass == EPass::NonCurlers) {
       int maxLevel = 12;
       int seedLevel = 4;
       XYSpans xySpans({{0, maxTheta}, { -0.02, 0.14}});
@@ -37,7 +38,7 @@ namespace {
 
       return makeUnique<AxialHitQuadTreeProcessor>(maxLevel, seedLevel, xySpans, precisionFunction);
 
-    } else if (pass == LegendreFindingPass::NonCurlersWithIncreasingThreshold) {
+    } else if (pass == EPass::NonCurlersWithIncreasingThreshold) {
       int maxLevel = 10;
       int seedLevel = 4;
       XYSpans xySpans({{0, maxTheta}, { -0.02, 0.14}});
@@ -45,7 +46,7 @@ namespace {
 
       return makeUnique<AxialHitQuadTreeProcessor>(maxLevel, seedLevel, xySpans, precisionFunction);
 
-    } else if (pass == LegendreFindingPass::FullRange) {
+    } else if (pass == EPass::FullRange) {
       int maxLevel = 10;
       int seedLevel = 1;
       XYSpans xySpans({{0, maxTheta}, {0.00, 0.30}});
@@ -59,7 +60,7 @@ namespace {
 
 AxialTrackCreatorHitLegendre::AxialTrackCreatorHitLegendre() = default;
 
-AxialTrackCreatorHitLegendre::AxialTrackCreatorHitLegendre(LegendreFindingPass pass)
+AxialTrackCreatorHitLegendre::AxialTrackCreatorHitLegendre(EPass pass)
   : m_pass(pass)
 {
 }
@@ -122,14 +123,14 @@ void AxialTrackCreatorHitLegendre::doTreeTrackFinding(
   qtProcessor.fill(lmdInterface, 70, 2 * curlCurv);
 
   // Start relaxation loop
-  int minNHits = m_pass == LegendreFindingPass::FullRange ? 30 : 50;
-  double maxCurv = m_pass == LegendreFindingPass::FullRange ? 0.15 : 0.07;
+  int minNHits = m_pass == EPass::FullRange ? 30 : 50;
+  double maxCurv = m_pass == EPass::FullRange ? 0.15 : 0.07;
   do {
     qtProcessor.fill(lmdInterface, minNHits, maxCurv);
 
     minNHits = minNHits * m_param_stepScale;
 
-    if (m_pass != LegendreFindingPass::NonCurlers) {
+    if (m_pass != EPass::NonCurlers) {
       maxCurv *= 2.;
       if (maxCurv > 0.15) maxCurv = 0.15;
     }

@@ -42,6 +42,7 @@ AxialHitQuadTreeProcessor::AxialHitQuadTreeProcessor(int lastLevel,
                                                      const XYSpans& ranges,
                                                      PrecisionUtil::PrecisionFunction precisionFunction)
   : QuadTreeProcessor(lastLevel, seedLevel, ranges)
+  , m_cosSinLookupTable(&getCosSinLookupTable())
   , m_precisionFunction(precisionFunction)
 {
   m_twoSidedPhaseSpace = m_quadTree->getYMin() * m_quadTree->getYMax() < 0;
@@ -95,8 +96,8 @@ AxialHitQuadTreeProcessor::createChild(QuadTree* node, int i, int j) const
     if (theta1 < 0) theta1 = 0;
 
     long theta2 = node->getXBinBound(i + 1) + extension;
-    if (theta2 >= getCosSinLookupTable().getNPoints()) {
-      theta2 = getCosSinLookupTable().getNPoints() - 1;
+    if (theta2 >= m_cosSinLookupTable->getNPoints()) {
+      theta2 = m_cosSinLookupTable->getNPoints() - 1;
     }
 
     return XYSpans({theta1, theta2}, {r1, r2});
@@ -111,8 +112,8 @@ AxialHitQuadTreeProcessor::createChild(QuadTree* node, int i, int j) const
     if (theta1 < 0) theta1 = 0;
 
     long theta2 = node->getXBinBound(i + 1) + extension;
-    if (theta2 >= getCosSinLookupTable().getNPoints()) {
-      theta2 = getCosSinLookupTable().getNPoints() - 1;
+    if (theta2 >= m_cosSinLookupTable->getNPoints()) {
+      theta2 = m_cosSinLookupTable->getNPoints() - 1;
     }
 
     return XYSpans({theta1, theta2}, {r1, r2});
@@ -143,8 +144,8 @@ bool AxialHitQuadTreeProcessor::isInNode(QuadTree* node, const CDCWireHit* wireH
   long thetaMin = node->getXMin();
   long thetaMax = node->getXMax();
 
-  const Vector2D& thetaVecMin = getCosSinLookupTable().at(thetaMin);
-  const Vector2D& thetaVecMax = getCosSinLookupTable().at(thetaMax);
+  const Vector2D& thetaVecMin = m_cosSinLookupTable->at(thetaMin);
+  const Vector2D& thetaVecMax = m_cosSinLookupTable->at(thetaMax);
 
   float rHitMin = thetaVecMin.dot(pos2D);
   float rHitMax = thetaVecMax.dot(pos2D);
@@ -194,8 +195,8 @@ bool AxialHitQuadTreeProcessor::checkDerivative(QuadTree* node, const CDCWireHit
   long thetaMin = node->getXMin();
   long thetaMax = node->getXMax();
 
-  const Vector2D& thetaVecMin = getCosSinLookupTable().at(thetaMin);
-  const Vector2D& thetaVecMax = getCosSinLookupTable().at(thetaMax);
+  const Vector2D& thetaVecMin = m_cosSinLookupTable->at(thetaMin);
+  const Vector2D& thetaVecMax = m_cosSinLookupTable->at(thetaMax);
 
   float rMinD = thetaVecMin.cross(pos2D);
   float rMaxD = thetaVecMax.cross(pos2D);
@@ -216,8 +217,8 @@ bool AxialHitQuadTreeProcessor::checkExtremum(QuadTree* node, const CDCWireHit* 
   long thetaMin = node->getXMin();
   long thetaMax = node->getXMax();
 
-  const Vector2D& thetaVecMin = getCosSinLookupTable().at(thetaMin);
-  const Vector2D& thetaVecMax = getCosSinLookupTable().at(thetaMax);
+  const Vector2D& thetaVecMin = m_cosSinLookupTable->at(thetaMin);
+  const Vector2D& thetaVecMax = m_cosSinLookupTable->at(thetaMax);
 
   if (not pos2D.isBetween(thetaVecMin, thetaVecMax)) return false;
 

@@ -85,6 +85,9 @@ namespace Belle2 {
       void drawNode();
 
     private:
+      /// Pinned lookup table for precompute cosine and sine values
+      const LookupTable<Vector2D>* m_cosSinLookupTable;
+
       /**
        *  Indicator whether the two sided phases space insertion check should be used
        *  This option should automatically split back to back tracks in the low curvature regions

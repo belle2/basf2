@@ -49,6 +49,18 @@ AxialHitQuadTreeProcessor::AxialHitQuadTreeProcessor(int lastLevel,
   m_twoSidedPhaseSpace = m_quadTree->getYMin() * m_quadTree->getYMax() < 0;
 }
 
+AxialHitQuadTreeProcessor::AxialHitQuadTreeProcessor(const Vector2D& localOrigin,
+                                                     const YSpan& curvSpan,
+                                                     const LookupTable<Vector2D>* cosSinLookupTable)
+  : QuadTreeProcessor(0, 0, { {0, cosSinLookupTable->getNPoints() - 1}, curvSpan})
+, m_cosSinLookupTable(cosSinLookupTable)
+, m_localOrigin(localOrigin)
+{
+  // Never use two sided mode in off origin extension
+  m_twoSidedPhaseSpace = false;
+}
+
+
 bool AxialHitQuadTreeProcessor::isLeaf(QuadTree* node) const
 {
   if (node->getLevel() <= 6) return false;

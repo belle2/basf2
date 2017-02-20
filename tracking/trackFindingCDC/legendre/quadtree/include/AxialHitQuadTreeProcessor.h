@@ -36,6 +36,15 @@ namespace Belle2 {
                                 const XYSpans& ranges,
                                 PrecisionUtil::PrecisionFunction precisionFunction);
 
+      /**
+       *  Constructor for the quad tree processor used in the off-origin extension.
+       *  Currently only used in zero level mode to collect hits that are in a phase space part
+       *  with respect to the given point.
+       */
+      AxialHitQuadTreeProcessor(const Vector2D& localOrigin,
+                                const YSpan& curvSpan,
+                                const LookupTable<Vector2D>* cosSinLookupTable);
+
     protected: // Section of specialized functions
       /**
        * lastLevel depends on curvature of the track candidate

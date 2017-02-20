@@ -98,7 +98,7 @@ namespace Belle2 {
      *
      *  @param parent The LFN of the current parent file.
      */
-    void setParentLfn(std::string parent) { m_parentLfn = parent; }
+    void setParentLfn(const std::string& parent) { m_parentLfn = parent; }
 
     /** Generated Weight Setter.
      *

@@ -237,7 +237,7 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
 
         // Read and Build StreamerInfo
         if (msg->type() == MSG_STREAMERINFO) {
-          restoreStreamerInfos((TList*)obj);
+          restoreStreamerInfos(static_cast<TList*>(obj));
           return 0;
         }
 

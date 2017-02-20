@@ -117,7 +117,8 @@ namespace Belle2 {
           transform.SetDy(g4transform[13]*Unit::mm);
           transform.SetDz(g4transform[14]*Unit::mm);
           info->setTransformation(transform);
-          info->setTransformation(transform, true);
+          // This is now set by setupReconstructionTransformations()
+          //info->setTransformation(transform, true);
 
           addSensor(info);
         }
@@ -253,18 +254,16 @@ namespace Belle2 {
     void GeoCache::setupReconstructionTransformations()
     {
       DBObjPtr<VXDAlignment> vxdAlignments;
-      //       if (!vxdAlignments.isValid()) {
-      //         B2ERROR("No alignment object available. Re-loading nominal sensor positions for reconstruction...");
-      //
-      //         for (auto sensor : VXD::GeoCache::getInstance().getListOfSensors()) {
-      //           VXD::SensorInfoBase& geometry = const_cast<VXD::SensorInfoBase&>(VXD::GeoCache::getInstance().getSensorInfo(sensor));
-      //           // Copy nominal transformation to reco-transformation
-      //           geometry.setTransformation(geometry.getTransformation(false), true);
-      //         }
-      //         return;
-      //       }
 
-      B2INFO("Loading VXD alignment for reconstruction from DB objects...");
+      // So the hierarchy is as follows:
+      //             Belle 2
+      //           / |     | \
+      //      Ying  Yang Pat  Mat ... other sub-detectors
+      //      / |   / |  |  \  | \ 
+      //     ......  ladders ......
+      //    / / |   / |  |  \  | \ \
+      //   ......... sensors ........
+      //
 
       for (auto& halfShellPlacement : getHalfShellPlacements()) {
         TGeoHMatrix trafoHalfShell = halfShellPlacement.second;
@@ -305,10 +304,6 @@ namespace Belle2 {
             VXD::SensorInfoBase& geometry = const_cast<VXD::SensorInfoBase&>(getSensorInfo(sensorPlacement.first));
             geometry.setTransformation(trafoHalfShell * trafoLadder * trafoSensor, true);
 
-            B2ERROR("Transformations: Nominal and Reco for " << sensorPlacement.first);
-            geometry.getTransformation(false).Print();
-            geometry.getTransformation(true).Print();
-
           }
         }
       }
@@ -316,6 +311,7 @@ namespace Belle2 {
       vxdAlignments.addCallback(this, &VXD::GeoCache::setupReconstructionTransformations);
 
     }
+
     TGeoHMatrix GeoCache::g4Transform3DToTGeo(G4Transform3D g4)
     {
       TGeoHMatrix trafo;

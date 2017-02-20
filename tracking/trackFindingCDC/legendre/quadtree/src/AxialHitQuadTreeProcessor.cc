@@ -251,16 +251,17 @@ void AxialHitQuadTreeProcessor::drawNode()
   dummyGraph->GetXaxis()->SetRangeUser(-3.1415, 3.1415);
   dummyGraph->GetYaxis()->SetRangeUser(0, 0.15);
 
-  //    int nhits = 0;
-  for (Item* hit : m_quadTree->getItems()) {
+  for (Item* item : m_quadTree->getItems()) {
+    const CDCWireHit* wireHit = item->getPointer();
+    const double& l = wireHit->getRefDriftLength();
+    const Vector2D& pos2D = wireHit->getRefPos2D();
+
     TF1* funct1 = new TF1("funct", "2*[0]*cos(x)/((1-sin(x))*[1]) ", -3.1415, 3.1415);
     funct1->SetLineWidth(1);
-    double r2 = (hit->getPointer()->getRefPos2D().norm() + hit->getPointer()->getRefDriftLength()) *
-                (hit->getPointer()->getRefPos2D().norm() - hit->getPointer()->getRefDriftLength());
-    double d2 = hit->getPointer()->getRefDriftLength() * hit->getPointer()->getRefDriftLength();
-    double x = hit->getPointer()->getRefPos2D().x();
+    double r2 = pos2D.normSquared() - l * l;
+    double x = pos2D.x();
 
-    funct1->SetParameters(x, r2 - d2);
+    funct1->SetParameters(x, r2);
     funct1->Draw("CSAME");
   }
   canv->Print(Form("legendreHits_%i.root", nevent));

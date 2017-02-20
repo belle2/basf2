@@ -9,10 +9,7 @@
 **************************************************************************/
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 
-#include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
-
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 #include <array>
 
@@ -30,6 +27,14 @@ namespace {
   {
     return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));
   }
+}
+
+const LookupTable<Vector2D>& AxialHitQuadTreeProcessor::getCosSinLookupTable()
+{
+  static const int maxLevel = PrecisionUtil::getLookupGridLevel();
+  static const int nBins = std::pow(2, maxLevel);
+  static LookupTable<Vector2D> trigonometricLookUpTable(&Vector2D::Phi, nBins, -M_PI, M_PI);
+  return trigonometricLookUpTable;
 }
 
 AxialHitQuadTreeProcessor::AxialHitQuadTreeProcessor(int lastLevel,
@@ -90,8 +95,8 @@ AxialHitQuadTreeProcessor::createChild(QuadTree* node, int i, int j) const
     if (theta1 < 0) theta1 = 0;
 
     long theta2 = node->getXBinBound(i + 1) + extension;
-    if (theta2 >= TrigonometricalLookupTable<>::Instance().getNBinsTheta()) {
-      theta2 = TrigonometricalLookupTable<>::Instance().getNBinsTheta() - 1;
+    if (theta2 >= getCosSinLookupTable().getNPoints()) {
+      theta2 = getCosSinLookupTable().getNPoints() - 1;
     }
 
     return XYSpans({theta1, theta2}, {r1, r2});
@@ -106,8 +111,8 @@ AxialHitQuadTreeProcessor::createChild(QuadTree* node, int i, int j) const
     if (theta1 < 0) theta1 = 0;
 
     long theta2 = node->getXBinBound(i + 1) + extension;
-    if (theta2 >= TrigonometricalLookupTable<>::Instance().getNBinsTheta()) {
-      theta2 = TrigonometricalLookupTable<>::Instance().getNBinsTheta() - 1;
+    if (theta2 >= getCosSinLookupTable().getNPoints()) {
+      theta2 = getCosSinLookupTable().getNPoints() - 1;
     }
 
     return XYSpans({theta1, theta2}, {r1, r2});
@@ -138,10 +143,8 @@ bool AxialHitQuadTreeProcessor::isInNode(QuadTree* node, const CDCWireHit* wireH
   long thetaMin = node->getXMin();
   long thetaMax = node->getXMax();
 
-  TrigonometricalLookupTable<>& trigonometricalLookupTable =
-    TrigonometricalLookupTable<>::Instance();
-  const Vector2D& thetaVecMin = trigonometricalLookupTable.thetaVec(thetaMin);
-  const Vector2D& thetaVecMax = trigonometricalLookupTable.thetaVec(thetaMax);
+  const Vector2D& thetaVecMin = getCosSinLookupTable().at(thetaMin);
+  const Vector2D& thetaVecMax = getCosSinLookupTable().at(thetaMax);
 
   float rHitMin = thetaVecMin.dot(pos2D);
   float rHitMax = thetaVecMax.dot(pos2D);
@@ -191,10 +194,8 @@ bool AxialHitQuadTreeProcessor::checkDerivative(QuadTree* node, const CDCWireHit
   long thetaMin = node->getXMin();
   long thetaMax = node->getXMax();
 
-  TrigonometricalLookupTable<>& trigonometricalLookupTable =
-    TrigonometricalLookupTable<>::Instance();
-  const Vector2D& thetaVecMin = trigonometricalLookupTable.thetaVec(thetaMin);
-  const Vector2D& thetaVecMax = trigonometricalLookupTable.thetaVec(thetaMax);
+  const Vector2D& thetaVecMin = getCosSinLookupTable().at(thetaMin);
+  const Vector2D& thetaVecMax = getCosSinLookupTable().at(thetaMax);
 
   float rMinD = thetaVecMin.cross(pos2D);
   float rMaxD = thetaVecMax.cross(pos2D);
@@ -215,10 +216,8 @@ bool AxialHitQuadTreeProcessor::checkExtremum(QuadTree* node, const CDCWireHit* 
   long thetaMin = node->getXMin();
   long thetaMax = node->getXMax();
 
-  TrigonometricalLookupTable<>& trigonometricalLookupTable =
-    TrigonometricalLookupTable<>::Instance();
-  const Vector2D& thetaVecMin = trigonometricalLookupTable.thetaVec(thetaMin);
-  const Vector2D& thetaVecMax = trigonometricalLookupTable.thetaVec(thetaMax);
+  const Vector2D& thetaVecMin = getCosSinLookupTable().at(thetaMin);
+  const Vector2D& thetaVecMax = getCosSinLookupTable().at(thetaMax);
 
   if (not pos2D.isBetween(thetaVecMin, thetaVecMax)) return false;
 

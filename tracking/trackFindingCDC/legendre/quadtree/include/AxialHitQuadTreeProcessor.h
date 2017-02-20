@@ -12,11 +12,22 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/PrecisionUtil.h>
 
+#include <tracking/trackFindingCDC/numerics/LookupTable.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /** A QuadTreeProcessor for TrackHits */
     class AxialHitQuadTreeProcessor : public QuadTreeProcessor<long, float, const CDCWireHit> {
+
+    public:
+      /**
+       *  Get the standard lookup table containing equally spaces unit vectors (cos, sin)
+       *
+       *  It contains 2**16 + 1 sampling points between -pi and pi.
+       */
+      static const LookupTable<Vector2D>& getCosSinLookupTable();
 
     public:
       /// Constructor

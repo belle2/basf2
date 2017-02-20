@@ -58,10 +58,10 @@ namespace Belle2 {
         Vector2D refPos = trackTrajectory2D.getGlobalPerigee();
 
         // change sign of the curvature; should be the same as the charge of the candidate
-        double curv = -1. * trackTrajectory2D.getCurvature();
+        double curv = trackTrajectory2D.getCurvature();
 
-        // theta is an angle between x-axis and vector to the center of the track
-        double theta = trackTrajectory2D.getGlobalCircle().phi0() - M_PI_2;
+        // theta is the vector normal to the trajectory at the perigee
+        double theta = trackTrajectory2D.getGlobalCircle().phi0() + M_PI_2;
 
         for (const CDCWireHit* hit : cdcWireHits) {
           hit->getAutomatonCell().setTakenFlag(true);

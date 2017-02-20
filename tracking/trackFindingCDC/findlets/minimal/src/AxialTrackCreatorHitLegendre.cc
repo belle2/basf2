@@ -100,15 +100,14 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& a
   OffOriginExtension offOriginExtension(unusedAxialWireHits);
 
   // Start candidate finding
-  this->doTreeTrackFinding(std::ref(offOriginExtension), *qtProcessor);
+  this->executeRelaxation(std::ref(offOriginExtension), *qtProcessor);
 
   const std::vector<CDCTrack>& newTracks = offOriginExtension.getTracks();
   tracks.insert(tracks.end(), newTracks.begin(), newTracks.end());
 }
 
-void AxialTrackCreatorHitLegendre::doTreeTrackFinding(
-  const AxialHitQuadTreeProcessor::CandidateProcessorLambda& lmdInterface,
-  AxialHitQuadTreeProcessor& qtProcessor)
+void AxialTrackCreatorHitLegendre::executeRelaxation(const CandidateProcessor& candidateProcessor,
+                                                     AxialHitQuadTreeProcessor& qtProcessor)
 {
   // radius of the CDC
   const double rCDC = 113.;
@@ -117,16 +116,16 @@ void AxialTrackCreatorHitLegendre::doTreeTrackFinding(
   const double curlCurv = 2. / rCDC;
 
   // find leavers
-  qtProcessor.fill(lmdInterface, 50, curlCurv);
+  qtProcessor.fill(candidateProcessor, 50, curlCurv);
 
   // find curlers with diameter higher than half of radius of CDC
-  qtProcessor.fill(lmdInterface, 70, 2 * curlCurv);
+  qtProcessor.fill(candidateProcessor, 70, 2 * curlCurv);
 
   // Start relaxation loop
   int minNHits = m_pass == EPass::FullRange ? 30 : 50;
   double maxCurv = m_pass == EPass::FullRange ? 0.15 : 0.07;
   do {
-    qtProcessor.fill(lmdInterface, minNHits, maxCurv);
+    qtProcessor.fill(candidateProcessor, minNHits, maxCurv);
 
     minNHits = minNHits * m_param_stepScale;
 

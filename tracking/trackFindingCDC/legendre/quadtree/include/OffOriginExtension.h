@@ -37,22 +37,20 @@ namespace Belle2 {
       void operator()(const std::vector<const CDCWireHit*>& inputWireHits,
                       void* qt  __attribute__((unused)))
       {
-        std::vector<const CDCWireHit*> candidateHits = inputWireHits;
-
         // Unset the taken flag and let the postprocessing decide
-        for (const CDCWireHit* wireHit : candidateHits) {
+        for (const CDCWireHit* wireHit : inputWireHits) {
           (*wireHit)->setTakenFlag(false);
         }
 
-        roadSearch(candidateHits);
+        std::vector<const CDCWireHit*> candidateHits = roadSearch(inputWireHits);
         AxialTrackUtil::addCandidateFromHitsWithPostprocessing(candidateHits, m_allAxialWireHits, m_tracks);
       }
 
       /// Perform transformation for set of given hits; reference position taken as POCA of the fitted trajectory
-      std::vector<const CDCWireHit*> roadSearch(std::vector<const CDCWireHit*>& cdcWireHits)
+      std::vector<const CDCWireHit*> roadSearch(const std::vector<const CDCWireHit*>& wireHits)
       {
         const CDCKarimakiFitter& fitter = CDCKarimakiFitter::getNoDriftVarianceFitter();
-        CDCTrajectory2D trackTrajectory2D = fitter.fit(cdcWireHits);
+        CDCTrajectory2D trackTrajectory2D = fitter.fit(wireHits);
 
         double chi2 = trackTrajectory2D.getChi2();
         Vector2D refPos = trackTrajectory2D.getGlobalPerigee();
@@ -63,43 +61,38 @@ namespace Belle2 {
         // theta is the vector normal to the trajectory at the perigee
         double theta = trackTrajectory2D.getGlobalCircle().phi0() + M_PI_2;
 
-        for (const CDCWireHit* hit : cdcWireHits) {
+        // Hide the current hits from the road search
+        for (const CDCWireHit* hit : wireHits) {
           hit->getAutomatonCell().setTakenFlag(true);
-          hit->getAutomatonCell().setMaskedFlag(true);
-
         }
 
-        std::vector<const CDCWireHit*> newAssignedHits = getHitsWRTtoRefPos(refPos, curv, theta);
+        std::vector<const CDCWireHit*> newWireHits = getHitsWRTtoRefPos(refPos, curv, theta);
 
-        if (newAssignedHits.size() > 0) {
-
-          std::vector<const CDCWireHit*> cdcWireHitsNew;
-
-          for (const CDCWireHit* hit : cdcWireHits) {
-            cdcWireHitsNew.push_back(hit);
-          }
-
-          for (const CDCWireHit* hit : newAssignedHits) {
-            cdcWireHitsNew.push_back(hit);
-          }
-
-          CDCTrajectory2D trackTrajectory2Dtmp = fitter.fit(cdcWireHits);
-
-          double chi2New = trackTrajectory2Dtmp.getChi2();
-
-          if (chi2New < chi2 * 2.) {
-            for (const CDCWireHit* hit : newAssignedHits) {
-              cdcWireHits.push_back(hit);
-            }
-          }
-        }
-
-        for (const CDCWireHit* hit : cdcWireHits) {
+        // Unhide the current hits from the road search
+        for (const CDCWireHit* hit : wireHits) {
           hit->getAutomatonCell().setTakenFlag(false);
-          hit->getAutomatonCell().setMaskedFlag(false);
         }
 
-        return newAssignedHits;
+        if (newWireHits.size() == 0) return wireHits;
+
+        std::vector<const CDCWireHit*> combinedWireHits;
+
+        for (const CDCWireHit* hit : wireHits) {
+          combinedWireHits.push_back(hit);
+        }
+
+        for (const CDCWireHit* hit : newWireHits) {
+          combinedWireHits.push_back(hit);
+        }
+
+        CDCTrajectory2D combinedTrajectory2D = fitter.fit(wireHits);
+        double combinedChi2 = combinedTrajectory2D.getChi2();
+
+        if (combinedChi2 < chi2 * 2.) {
+          return combinedWireHits;
+        }
+
+        return wireHits;
       }
 
       /**

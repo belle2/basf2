@@ -23,8 +23,9 @@
 #include <boost/unordered_map.hpp>
 #endif
 
+#include <Geant4/G4Transform3D.hh>
+
 class G4VPhysicalVolume;
-class G4Transform3D;
 
 namespace Belle2 {
   /** Namespace to provide code needed by both Vertex Detectors, PXD and SVD, and also testbeam telescopes */

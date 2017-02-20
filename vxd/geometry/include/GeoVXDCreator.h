@@ -210,7 +210,7 @@ namespace Belle2 {
       bool m_onlyActiveMaterial {false};
       /** Vector of G4UserLimit pointers */
       std::vector<G4UserLimits*> m_UserLimits;
-
+      /// Current half-shell being processed (need to know ladder parent for hierarchy)
       std::string m_currentHalfShell {""};
 
     }; // class GeoVXDCreator

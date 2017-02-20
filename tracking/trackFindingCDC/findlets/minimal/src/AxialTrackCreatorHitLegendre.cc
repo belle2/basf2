@@ -11,7 +11,6 @@
 #include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorHitLegendre.h>
 
 #include <tracking/trackFindingCDC/legendre/quadtree/OffOriginExtension.h>
-#include <tracking/trackFindingCDC/legendre/quadtreetools/QuadTreeParameters.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
@@ -22,6 +21,41 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+namespace {
+  std::unique_ptr<AxialHitQuadTreeProcessor> constructQTProcessor(LegendreFindingPass pass)
+  {
+    using XYSpans = AxialHitQuadTreeProcessor::XYSpans;
+    using PrecisionFunction = PrecisionUtil::PrecisionFunction;
+    const int maxTheta = std::pow(2, PrecisionUtil::getLookupGridLevel());
+
+    if (pass == LegendreFindingPass::NonCurlers) {
+      int maxLevel = 12;
+      int seedLevel = 4;
+      XYSpans xySpans({{0, maxTheta}, { -0.02, 0.14}});
+      PrecisionFunction precisionFunction = &PrecisionUtil::getOriginCurvPrecision;
+
+      return makeUnique<AxialHitQuadTreeProcessor>(maxLevel, seedLevel, xySpans, precisionFunction);
+
+    } else if (pass == LegendreFindingPass::NonCurlersWithIncreasingThreshold) {
+      int maxLevel = 10;
+      int seedLevel = 4;
+      XYSpans xySpans({{0, maxTheta}, { -0.02, 0.14}});
+      PrecisionFunction precisionFunction = &PrecisionUtil::getNonOriginCurvPrecision;
+
+      return makeUnique<AxialHitQuadTreeProcessor>(maxLevel, seedLevel, xySpans, precisionFunction);
+
+    } else if (pass == LegendreFindingPass::FullRange) {
+      int maxLevel = 10;
+      int seedLevel = 1;
+      XYSpans xySpans({{0, maxTheta}, {0.00, 0.30}});
+      PrecisionFunction precisionFunction = &PrecisionUtil::getNonOriginCurvPrecision;
+
+      return makeUnique<AxialHitQuadTreeProcessor>(maxLevel, seedLevel, xySpans, precisionFunction);
+    }
+    B2FATAL("Invalid pass");
+  }
+}
 
 AxialTrackCreatorHitLegendre::AxialTrackCreatorHitLegendre() = default;
 
@@ -42,16 +76,13 @@ void AxialTrackCreatorHitLegendre::exposeParameters(ModuleParamList* moduleParam
 
 void AxialTrackCreatorHitLegendre::initialize()
 {
-  B2ASSERT("Maximal level of QuadTree search is setted to be greater than lookuptable grid level! ",
-           m_param_maxLevel <= PrecisionUtil::getLookupGridLevel());
-
   Super::initialize();
 }
 
 void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& axialWireHits,
                                          std::vector<CDCTrack>& tracks)
 {
-  // Prepare vector of unused hits provide it to the qt processor
+  // Prepare vector of unused hits to provide to the qt processor
   // Also reset the mask flag and select only the untaken hits
   std::vector<const CDCWireHit*> unusedAxialWireHits;
   for (const CDCWireHit* wireHit : axialWireHits) {
@@ -60,19 +91,15 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& a
     unusedAxialWireHits.push_back(wireHit);
   }
 
-  // Create object which holds and generates parameters
-  QuadTreeParameters quadTreeParameters(m_param_maxLevel, m_pass);
-
-  //Create quadtree processot
-  std::unique_ptr<AxialHitQuadTreeProcessor> qtProcessor{quadTreeParameters.constructQTProcessor()};
-
+  // Create quadtree processor
+  std::unique_ptr<AxialHitQuadTreeProcessor> qtProcessor = constructQTProcessor(m_pass);
   qtProcessor->seed(unusedAxialWireHits);
 
   // Create object which contains interface between quadtree processor and track processor (module)
   OffOriginExtension offOriginExtension(unusedAxialWireHits);
 
   // Start candidate finding
-  this->doTreeTrackFinding(std::ref(offOriginExtension), quadTreeParameters, *qtProcessor);
+  this->doTreeTrackFinding(std::ref(offOriginExtension), *qtProcessor);
 
   const std::vector<CDCTrack>& newTracks = offOriginExtension.getTracks();
   tracks.insert(tracks.end(), newTracks.begin(), newTracks.end());
@@ -80,7 +107,6 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& a
 
 void AxialTrackCreatorHitLegendre::doTreeTrackFinding(
   const AxialHitQuadTreeProcessor::CandidateProcessorLambda& lmdInterface,
-  QuadTreeParameters& parameters,
   AxialHitQuadTreeProcessor& qtProcessor)
 {
   // radius of the CDC
@@ -96,17 +122,17 @@ void AxialTrackCreatorHitLegendre::doTreeTrackFinding(
   qtProcessor.fill(lmdInterface, 70, 2 * curlCurv);
 
   // Start relaxation loop
-  int limit = parameters.getInitialHitsLimit();
-  double rThreshold = parameters.getCurvThreshold();
+  int minNHits = m_pass == LegendreFindingPass::FullRange ? 30 : 50;
+  double maxCurv = m_pass == LegendreFindingPass::FullRange ? 0.15 : 0.07;
   do {
-    qtProcessor.fill(lmdInterface, limit, rThreshold);
+    qtProcessor.fill(lmdInterface, minNHits, maxCurv);
 
-    limit = limit * m_param_stepScale;
+    minNHits = minNHits * m_param_stepScale;
 
-    if (parameters.getPass() != LegendreFindingPass::NonCurlers) {
-      rThreshold *= 2.;
-      if (rThreshold > 0.15) rThreshold = 0.15;
+    if (m_pass != LegendreFindingPass::NonCurlers) {
+      maxCurv *= 2.;
+      if (maxCurv > 0.15) maxCurv = 0.15;
     }
 
-  } while (limit >= m_param_threshold);
+  } while (minNHits >= m_param_minNHits);
 }

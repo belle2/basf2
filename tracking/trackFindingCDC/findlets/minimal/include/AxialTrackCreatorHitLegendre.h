@@ -22,7 +22,6 @@ namespace Belle2 {
     class CDCTrack;
     class CDCWireHit;
     enum class LegendreFindingPass;
-    class QuadTreeParameters;
 
     /**
      * Generates axial tracks from hit using special leaf postprocessing.
@@ -66,13 +65,9 @@ namespace Belle2 {
        * @param qtProcessor reference to the AxialHitQuadTreeProcessor instance
        */
       void doTreeTrackFinding(const AxialHitQuadTreeProcessor::CandidateProcessorLambda& lmdInterface,
-                              QuadTreeParameters& parameters,
                               AxialHitQuadTreeProcessor& qtProcessor);
 
     private: // Parameters
-      /// Maximum Level of FastHough - fixed as the behaviour for other values is not well defined
-      static const int m_param_maxLevel = 12;
-
       /// The pass key for lookup of the parameters for this pass
       LegendreFindingPass m_pass = LegendreFindingPass::NonCurlers;
 
@@ -80,7 +75,7 @@ namespace Belle2 {
       const double m_param_stepScale = 0.75;
 
       /// Parameter to define minimal threshold of hit
-      const int m_param_threshold = 10;
+      const int m_param_minNHits = 10;
     };
   }
 }

@@ -9,15 +9,11 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeChildren.h>
-
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <framework/logging/Logger.h>
 
-#include <array>
 #include <vector>
-#include <memory>
 #include <cmath>
 
 namespace Belle2 {
@@ -49,7 +45,7 @@ namespace Belle2 {
       using YBinBounds = std::array<AY, 3>;
 
       /// Type of the child node structure for this node.
-      using Children = QuadTreeChildren<This>;
+      using Children = std::vector<This>;
 
       /**
        *  Constructor setting up the potential division points.
@@ -98,16 +94,10 @@ namespace Belle2 {
         m_items.clear();
       }
 
-      /** Create vector with children of current node */
-      void createChildren()
-      {
-        m_children = makeUnique<Children>();
-      }
-
       /** Returns the children structure of this node */
-      Children* getChildren() const
+      Children& getChildren()
       {
-        return m_children.get();
+        return m_children;
       }
 
       /**
@@ -116,11 +106,8 @@ namespace Belle2 {
        */
       void clearChildren()
       {
-        // can only be called on root item
-        B2ASSERT("ClearTree can only be called on tree of level one", m_level == 0);
-
-        // automatically removes all underlying objects
-        m_children.reset(nullptr);
+        // automatically removes all lower level objects
+        m_children.clear();
         m_filled = false;
       }
 
@@ -237,7 +224,7 @@ namespace Belle2 {
       std::vector<AItem*> m_items;
 
       /// Pointers to the children nodes
-      std::unique_ptr<Children> m_children;
+      std::vector<This> m_children;
 
       /// Is the node has been filled with items
       bool m_filled;

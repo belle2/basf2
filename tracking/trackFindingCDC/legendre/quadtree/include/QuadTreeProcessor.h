@@ -112,12 +112,11 @@ namespace Belle2 {
 
         for (int level = 0; level < m_seedLevel; ++level) {
           for (QuadTree* node : m_seededTrees) {
-            if (node->getChildren() == nullptr) {
-              node->createChildren();
+            if (node->getChildren().empty()) {
               this->createChildren(node, node->getChildren());
             }
-            for (QuadTree* child :  *node->getChildren()) {
-              nextSeededTrees.push_back(child);
+            for (QuadTree& child :  node->getChildren()) {
+              nextSeededTrees.push_back(&child);
             }
           }
           std::swap(nextSeededTrees, m_seededTrees);
@@ -217,8 +216,7 @@ namespace Belle2 {
           return;
         }
 
-        if (node->getChildren() == nullptr) {
-          node->createChildren();
+        if (node->getChildren().empty()) {
           this->createChildren(node, node->getChildren());
         }
 
@@ -227,7 +225,10 @@ namespace Belle2 {
           node->setFilled();
         }
 
-        std::vector<QuadTree*> children(node->getChildren()->begin(), node->getChildren()->end());
+        std::vector<QuadTree*> children;
+        for (QuadTree& child : node->getChildren()) {
+          children.push_back(&child);
+        }
         const auto compareNItems = [](const QuadTree * lhs, const QuadTree * rhs) {
           return lhs->getNItems() < rhs->getNItems();
         };
@@ -249,14 +250,14 @@ namespace Belle2 {
        * Creates the sub node of a given node. This function is called by fillGivenTree.
        * To calculate the spans of the children nodes the user-defined function createChiildWithParent is used.
        */
-      void createChildren(QuadTree* node, QuadTreeChildren* m_children) const
+      void createChildren(QuadTree* node, QuadTreeChildren& m_children) const
       {
         for (int i = 0; i < node->getXNbins(); ++i) {
           for (int j = 0; j < node->getYNbins(); ++j) {
             const XYSpans& xySpans = createChild(node, i, j);
             const XSpan& xSpan = xySpans.first;
             const YSpan& ySpan = xySpans.second;
-            m_children->set(i, j, new QuadTree(xSpan, ySpan, node->getLevel() + 1, node));
+            m_children.push_back(QuadTree(xSpan, ySpan, node->getLevel() + 1, node));
           }
         }
       }
@@ -268,16 +269,16 @@ namespace Belle2 {
       void fillChildren(QuadTree* node, std::vector<Item*>& items)
       {
         const size_t neededSize = 2 * items.size();
-        for (QuadTree* child : *node->getChildren()) {
-          child->reserveItems(neededSize);
+        for (QuadTree& child : node->getChildren()) {
+          child.reserveItems(neededSize);
         }
 
         for (Item* item : items) {
           if (item->isUsed()) continue;
 
-          for (QuadTree* child : *node->getChildren()) {
-            if (isInNode(child, item->getPointer())) {
-              child->insertItem(item);
+          for (QuadTree& child : node->getChildren()) {
+            if (isInNode(&child, item->getPointer())) {
+              child.insertItem(item);
             }
           }
         }
@@ -356,12 +357,12 @@ namespace Belle2 {
        * Override that function if you want to receive debug output whenever the children of a node are filled the first time
        * Maybe you want to make some nice plots or statistics.
        */
-      virtual void afterFillDebugHook(QuadTreeChildren* children)
+      virtual void afterFillDebugHook(QuadTreeChildren& children)
       {
         if (not m_debugOutput) return;
-        for (QuadTree* childNode : *children) {
-          if (childNode->getLevel() != getLastLevel()) continue; // Only write the lowest level
-          m_debugOutputMap[ {childNode->getXMean(), childNode->getYMean()}] = childNode->getItems();
+        for (QuadTree& childNode : children) {
+          if (childNode.getLevel() != getLastLevel()) continue; // Only write the lowest level
+          m_debugOutputMap[ {childNode.getXMean(), childNode.getYMean()}] = childNode.getItems();
         }
       }
 

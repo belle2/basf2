@@ -55,7 +55,10 @@ namespace Belle2 {
     void setAlpha(int moduleID, double alpha, double errAlpha)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16.");
+        return ;
+      }
       m_alpha[module] = alpha;
       m_errAlpha[module] = errAlpha;
     }
@@ -69,7 +72,10 @@ namespace Belle2 {
     void setBeta(int moduleID, double beta, double errBeta)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16.");
+        return ;
+      }
       m_beta[module] = beta;
       m_errBeta[module] = errBeta;
     }
@@ -83,7 +89,10 @@ namespace Belle2 {
     void setGamma(int moduleID, double gamma, double errGamma)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16.");
+        return ;
+      }
       m_gamma[module] = gamma;
       m_errGamma[module] = errGamma;
     }
@@ -97,9 +106,12 @@ namespace Belle2 {
     void setX(int moduleID, double x, double errX)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
-      m_alpha[module] = x;
-      m_errAlpha[module] = errX;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16.");
+        return ;
+      }
+      m_x[module] = x;
+      m_errX[module] = errX;
     }
 
     /**
@@ -111,9 +123,12 @@ namespace Belle2 {
     void setY(int moduleID, double y, double errY)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
-      m_alpha[module] = y;
-      m_errAlpha[module] = errY;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16.");
+        return ;
+      }
+      m_y[module] = y;
+      m_errY[module] = errY;
     }
 
     /**
@@ -125,9 +140,12 @@ namespace Belle2 {
     void setZ(int moduleID, double z, double errZ)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
-      m_alpha[module] = z;
-      m_errAlpha[module] = errZ;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16.");
+        return ;
+      }
+      m_z[module] = z;
+      m_errZ[module] = errZ;
     }
 
 
@@ -136,10 +154,13 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return alpha rotation angle around x
      */
-    void getAlpha(int moduleID)
+    double getAlpha(int moduleID)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16. Returning 0.");
+        return 0. ;
+      }
       return m_alpha[module];
     }
 
@@ -148,10 +169,13 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return beta rotation angle around x
      */
-    void getBeta(int moduleID)
+    double getBeta(int moduleID)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16. Returning 0.");
+        return 0. ;
+      }
       return m_beta[module];
     }
 
@@ -160,10 +184,13 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return gamma rotation angle around x
      */
-    void getGamma(int moduleID)
+    double getGamma(int moduleID)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16. Returning 0.");
+        return 0. ;
+      }
       return m_gamma[module];
     }
 
@@ -172,10 +199,13 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return x shift along the x direction
      */
-    void getX(int moduleID)
+    double getX(int moduleID)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16. Returning 0.");
+        return 0. ;
+      }
       return m_x[module];
     }
 
@@ -184,10 +214,13 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return y shift along the y direction
      */
-    void getY(int moduleID)
+    double getY(int moduleID)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16. Returning 0.");
+        return 0. ;
+      }
       return m_y[module];
     }
 
@@ -196,10 +229,13 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return z shift along the z direction
      */
-    void getZ(int moduleID)
+    double getZ(int moduleID)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16. Returning 0.");
+        return 0. ;
+      }
       return m_z[module];
     }
 
@@ -209,10 +245,13 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return errAlpha error on the alpha angle
      */
-    void getAlphaErr(int moduleID)
+    double getAlphaErr(int moduleID)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16. Returning 0.");
+        return 0. ;
+      }
       return m_errAlpha[module];
     }
 
@@ -221,10 +260,13 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return errBeta error on the beta angle
      */
-    void getBetaErr(int moduleID)
+    double getBetaErr(int moduleID)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16. Returning 0.");
+        return 0. ;
+      }
       return m_errBeta[module];
     }
 
@@ -233,10 +275,13 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return errGamma error on the gamma angle
      */
-    void getGammaErr(int moduleID)
+    double getGammaErr(int moduleID)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16. Returning 0.");
+        return 0. ;
+      }
       return m_errGamma[module];
     }
 
@@ -245,10 +290,13 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return errX error on the x shift
      */
-    void getXErr(int moduleID)
+    double getXErr(int moduleID)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16. Returning 0.");
+        return 0. ;
+      }
       return m_errX[module];
     }
 
@@ -257,10 +305,13 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return errY error on the y shift
      */
-    void getYErr(int moduleID)
+    double getYErr(int moduleID)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16. Returning 0.");
+        return 0. ;
+      }
       return m_errY[module];
     }
 
@@ -269,10 +320,13 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return errZ error on the z shift
      */
-    void getZErr(int moduleID)
+    double getZErr(int moduleID)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16. Returning 0.");
+        return 0. ;
+      }
       return m_errZ[module];
     }
 

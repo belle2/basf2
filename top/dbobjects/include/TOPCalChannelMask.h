@@ -17,25 +17,33 @@ namespace Belle2 {
 
   /**
    * Channel status for all 512 channels of 16 modules.
-   * The CHannle condition is stored as an int with the convention:
-   * status = 1  active channel
-   * status = 0 dead channel
-   * status = -1 noisy channel.
-   * A simple method isActive has been implemented to return 0 if
-   * the channel has been masked for whatever reason and 1 if
+   * The Channel condition is stored as the enum EStatus with the convention:
+   * c_Dead = 0 dead channel
+   * c_Active = 1  active channel
+   * c_Noisy = 2 noisy channel.
+   * A simple method isActive has been implemented to return false if
+   * the channel has been masked for whatever reason and true if
    * the channel is active.
    */
   class TOPCalChannelMask: public TObject {
   public:
 
     /**
-     * Default constructor
+     * Status of the channel
+     */
+    enum EStatus {c_Dead = 0,
+                  c_Active = 1,
+                  c_Noisy = 2
+                 };
+
+    /**
+     * Default constructor. All channels are set to active
      */
     TOPCalChannelMask()
     {
       for (unsigned m = 0; m < c_numModules; m++) {
         for (unsigned c = 0; c < c_numChannels; c++) {
-          m_status[m][c] = 1;
+          m_status[m][c] = c_Active;
         }
       }
     }
@@ -46,11 +54,17 @@ namespace Belle2 {
      * @param channel hardware channel number (0-based)
      * @param status channel status (1: active 0: dead -1: noisy )
      */
-    void setStatus(int moduleID, unsigned channel, double status)
+    void setStatus(int moduleID, unsigned channel, EStatus status)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
-      if (channel >= c_numChannels) return;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16");
+        return;
+      }
+      if (channel >= c_numChannels) {
+        B2WARNING("Channel number greater than 512");
+        return;
+      }
       m_status[module][channel] = status;
     }
 
@@ -62,9 +76,15 @@ namespace Belle2 {
     void setActive(int moduleID, unsigned channel)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
-      if (channel >= c_numChannels) return;
-      m_status[module][channel] = 1;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16");
+        return;
+      }
+      if (channel >= c_numChannels) {
+        B2WARNING("Channel number greater than 512");
+        return;
+      }
+      m_status[module][channel] = c_Active;
     }
 
     /**
@@ -75,9 +95,15 @@ namespace Belle2 {
     void setDead(int moduleID, unsigned channel)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
-      if (channel >= c_numChannels) return;
-      m_status[module][channel] = 0;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16");
+        return;
+      }
+      if (channel >= c_numChannels) {
+        B2WARNING("Channel number greater than 512");
+        return;
+      }
+      m_status[module][channel] = c_Dead;
     }
 
     /**
@@ -88,11 +114,16 @@ namespace Belle2 {
     void setNoisy(int moduleID, unsigned channel)
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
-      if (channel >= c_numChannels) return;
-      m_status[module][channel] = -1;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16");
+        return;
+      }
+      if (channel >= c_numChannels) {
+        B2WARNING("Channel number greater than 512");
+        return;
+      }
+      m_status[module][channel] = c_Noisy;
     }
-
 
     /**
      * Returns the status of a single channel
@@ -100,30 +131,42 @@ namespace Belle2 {
      * @param channel hardware channel number (0-based)
      * @return status channel status (1: active 0: dead -1: noisy )
      */
-    double getStatus(int moduleID, unsigned channel) const
+    EStatus getStatus(int moduleID, unsigned channel) const
     {
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return 0;
-      if (channel >= c_numChannels) return 0;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16. Returning dead channel value");
+        return c_Dead;
+      }
+      if (channel >= c_numChannels) {
+        B2WARNING("Channel number greater than 512. Returning dead channel value");
+        return c_Dead;
+      }
       return m_status[module][channel];
     }
 
-
     /**
-     * Returns 0 if the channel is dead or noisy,
-     * and 1 is the channel is active
+     * Returns false if the channel is dead or noisy,
+     * and true is the channel is active
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
      */
-    int isActive(int moduleID, unsigned channel)
+    bool isActive(int moduleID, unsigned channel)
     {
-      unsigned activeStatus = 0;
       unsigned module = moduleID - 1;
-      if (module >= c_numModules) return;
-      if (channel >= c_numChannels) return;
-      if (m_status[module][channel] == 1) activeStatus = 1;
-      return activeStatus;
+      if (module >= c_numModules) {
+        B2WARNING("Module number greater than 16. Returning false");
+        return c_Dead;
+      }
+      if (channel >= c_numChannels) {
+        B2WARNING("Channel number greater than 512. Returning false");
+        return c_Dead;
+      }
+      if (m_status[module][channel] == c_Active) return true;
+      else return false;
     }
+
+
 
 
   private:
@@ -135,7 +178,7 @@ namespace Belle2 {
           c_numChannels = 512 /**< number of channels per module */
          };
 
-    int m_status[c_numModules][c_numChannels];    /**< channel status */
+    EStatus m_status[c_numModules][c_numChannels];    /**< channel status */
 
     ClassDef(TOPCalChannelMask, 1); /**< ClassDef */
 

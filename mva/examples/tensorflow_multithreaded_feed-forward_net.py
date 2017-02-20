@@ -13,11 +13,11 @@ import signal
 from basf2_mva_python_interface.tensorflow import State
 import pickle
 
-# Array for saving evaluation score in tensorflow summary folder
+#: Array for saving evaluation score in tensorflow summary folder
 VAL_ARRAY = []
-# Array for saving Validation samples
+#: Array for saving Validation samples
 VAL_QUEUE = []
-# Global
+#: Global
 CONTINUE_ENQUEUE = True
 
 
@@ -32,9 +32,10 @@ class save_decider():
         """
         Initialize the class
         """
-
-        # Lowest evaluation value.  Use inifinity as starting value,
+        #: Lowest evaluation value.  Use inifinity as starting value.
         self.lowest_value = np.inf
+        #: save state with the lowest evaluation score
+        self.save_state = None
 
     def check(self, value, save_state):
         """
@@ -43,7 +44,6 @@ class save_decider():
         :param save_state: name of the file which stores the tensorflow state
         """
         if self.lowest_value > value:
-            # save state with the lowest evaluation score
             self.save_state = save_state
             self.lowest_value = value
         if self.lowest_value == np.inf and value == np.nan:
@@ -55,6 +55,7 @@ class save_decider():
         """
         return self.save_state
 
+#: create instance
 SAVER_DECIDER = save_decider()
 
 
@@ -81,10 +82,9 @@ class preprocessor():
         Initialize preprocessor
         :param state: use this torestor a previous state. I.e. to use for mva expert
         """
-        if state is None:
-            # state which describes the preprocessor. Must be pickable
-            self.state = {'binning_array': [], 'number_of_bins': 0}
-        else:
+        #: state which describes the preprocessor. Must be pickable
+        self.state = {'binning_array': [], 'number_of_bins': 0}
+        if state is not None:
             self.state = state
 
     def fit(self, x, number_of_bins=100):
@@ -114,6 +114,7 @@ class preprocessor():
         """
         return self.state
 
+#: create instance
 PREPROCESSOR = preprocessor()
 
 
@@ -417,6 +418,9 @@ def apply(state, X):
 
 
 def duration(start_time, end_time):
+    """
+    Helper function which calculates time passed.
+    """
     diff = int(end_time - start_time)
     hours = diff // 3600
     minutes = (diff // 60) - hours * 60
@@ -431,6 +435,9 @@ def duration(start_time, end_time):
 
 
 def delete_all_files_in_folders(folderlist):
+    """
+    Delete all files in given folder.
+    """
     for folder in folderlist:
         for file in os.listdir(folder):
             os.remove(os.path.join(folder, file))

@@ -9,11 +9,14 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/legendre/quadtree/OffOriginExtension.h>
 
-#include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessorWithNewReferencePoint.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+
+#include <tracking/trackFindingCDC/numerics/LookupTable.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 #include <vector>
 
@@ -96,13 +99,11 @@ OffOriginExtension::getHitsWRTtoRefPos(const Vector2D& refPos, float curv, float
   float thetaPrecision = 3.1415 / (pow(2., m_levelPrecision + 1));
   float curvPrecision = 0.15 / (pow(2., m_levelPrecision));
 
-  using XYSpans = AxialHitQuadTreeProcessorWithNewReferencePoint::XYSpans;
-  XYSpans xySpans({theta - thetaPrecision, theta + thetaPrecision},
-  {curv - curvPrecision, curv + curvPrecision});
+  using YSpan = AxialHitQuadTreeProcessor::YSpan;
+  YSpan curvSpan{curv - curvPrecision, curv + curvPrecision};
+  LookupTable<Vector2D> thetaSpan(&Vector2D::Phi, 1, theta - thetaPrecision, theta + thetaPrecision);
 
-  AxialHitQuadTreeProcessorWithNewReferencePoint qtProcessor(xySpans,
-                                                             std::make_pair(refPos.x(),
-                                                                 refPos.y()));
+  AxialHitQuadTreeProcessor qtProcessor(refPos, curvSpan, &thetaSpan);
   qtProcessor.seed(m_allAxialWireHits);
 
   std::vector<const CDCWireHit*> newWireHits = qtProcessor.getAssignedItems();

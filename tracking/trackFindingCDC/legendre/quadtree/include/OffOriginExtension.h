@@ -7,15 +7,15 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessorWithNewReferencePoint.h>
+#include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
+
+#include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <vector>
-#include <map>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -23,14 +23,30 @@ namespace Belle2 {
     /**
      *  Class performs extension (adding new hits) of given candidate using conformal transformation w.r.t point on the trajectory
      */
-    class ConformalExtension {
+    class OffOriginExtension {
 
     public:
-
       /// Constructor
-      ConformalExtension(double levelPrecision = 9) : m_levelPrecision(levelPrecision)
+      OffOriginExtension(std::vector<const CDCWireHit*> allAxialWireHits, double levelPrecision = 9)
+        : m_allAxialWireHits(std::move(allAxialWireHits))
+        , m_levelPrecision(levelPrecision)
       {
-      };
+      }
+
+      /// Main entry point for the post processing call from the QuadTreeProcessor
+      void operator()(const std::vector<const CDCWireHit*>& inputWireHits,
+                      void* qt  __attribute__((unused)))
+      {
+        std::vector<const CDCWireHit*> candidateHits = inputWireHits;
+
+        // Unset the taken flag and let the postprocessing decide
+        for (const CDCWireHit* wireHit : candidateHits) {
+          (*wireHit)->setTakenFlag(false);
+        }
+
+        newRefPoint(candidateHits, m_allAxialWireHits, true);
+        AxialTrackUtil::addCandidateFromHitsWithPostprocessing(candidateHits, m_allAxialWireHits, m_tracks);
+      }
 
       /// Perform transformation for set of given hits; reference position taken as POCA of the fitted trajectory
       std::vector<const CDCWireHit*> newRefPoint(std::vector<const CDCWireHit*>& cdcWireHits,
@@ -122,14 +138,22 @@ namespace Belle2 {
         return newCdcWireHits;
       }
 
+      /// Get the collected tracks
+      const std::vector<CDCTrack>& getTracks() const
+      {
+        return m_tracks;
+      }
 
     private:
-      double m_levelPrecision;   /**< Function which defines precision of conformal transformation */
+      /// Pool of all axial hits from which the road search may select additional hits
+      std::vector<const CDCWireHit*> m_allAxialWireHits;
+
+      /// Collected tracks
+      std::vector<CDCTrack> m_tracks;
+
+      /// Precision level for the width of the off origin hough search
+      double m_levelPrecision;
       //.5 - 0.24 * exp(-4.13118 * TrackCandidate::convertRhoToPt(fabs(track_par.second)) + 2.74);
-
     };
-
   }
-
 }
-

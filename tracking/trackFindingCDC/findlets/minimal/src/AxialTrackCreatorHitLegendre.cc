@@ -10,7 +10,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorHitLegendre.h>
 
-#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeNodeProcessor.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/OffOriginExtension.h>
 #include <tracking/trackFindingCDC/legendre/quadtreetools/QuadTreeParameters.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
@@ -69,14 +69,13 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& a
   qtProcessor->seed(unusedAxialWireHits);
 
   // Create object which contains interface between quadtree processor and track processor (module)
-  QuadTreeNodeProcessor quadTreeNodeProcessor;
-
-  // Interface
-  AxialHitQuadTreeProcessor::CandidateProcessorLambda lambdaInterface =
-    quadTreeNodeProcessor.getLambdaInterface(axialWireHits, tracks);
+  OffOriginExtension offOriginExtension(unusedAxialWireHits);
 
   // Start candidate finding
-  this->doTreeTrackFinding(lambdaInterface, quadTreeParameters, *qtProcessor);
+  this->doTreeTrackFinding(std::ref(offOriginExtension), quadTreeParameters, *qtProcessor);
+
+  const std::vector<CDCTrack>& newTracks = offOriginExtension.getTracks();
+  tracks.insert(tracks.end(), newTracks.begin(), newTracks.end());
 }
 
 void AxialTrackCreatorHitLegendre::doTreeTrackFinding(

@@ -106,7 +106,8 @@ void RingBuffer::openSHM(int size)
 {
   // 1. Open shared memory
   unsigned int sizeBytes = size * sizeof(int);
-  m_shmid = shmget(m_shmkey, sizeBytes, IPC_CREAT | 0644);
+  const auto mode = IPC_CREAT | 0644;
+  m_shmid = shmget(m_shmkey, sizeBytes, mode);
   if (m_shmid < 0) {
     unsigned int maxSizeBytes = size;
     ifstream shmax("/proc/sys/kernel/shmmax");
@@ -118,9 +119,9 @@ void RingBuffer::openSHM(int size)
     size = maxSizeBytes / sizeof(int);
     sizeBytes = size * sizeof(int);
     B2WARNING("RingBuffer: shmget(" << oldSizeBytes << ") failed, limiting to system maximum: " << sizeBytes);
-    m_shmid = shmget(IPC_PRIVATE, sizeBytes, IPC_CREAT | 0600);
+    m_shmid = shmget(m_shmkey, sizeBytes, mode);
     if (m_shmid < 0) {
-      B2FATAL("RingBuffer: shmget(" << size * sizeof(int) <<
+      B2FATAL("RingBuffer: shmget(" << sizeBytes <<
               ") failed. Most likely the system doesn't allow us to reserve the needed shared memory. Try 'echo 500000000 > /proc/sys/kernel/shmmax' as root to set a higher limit (500MB).");
     }
   }

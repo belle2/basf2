@@ -29,7 +29,7 @@
 namespace Belle2 {
   class SharedMem {
   public:
-    SharedMem(char* name, int size);
+    SharedMem(const char* name, int size);
     SharedMem(int shm_id);
     ~SharedMem(void);
 

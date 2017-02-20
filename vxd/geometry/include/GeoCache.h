@@ -13,7 +13,6 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/SensorInfoBase.h>
-#include <../framework/database/include/DBObjPtr.h>
 #include <vector>
 #include <set>
 #include <map>
@@ -167,11 +166,12 @@ namespace Belle2 {
       /** Map of all Sensor IDs belonging to a given Ladder ID */
       SensorHierachy m_sensors;
 
+      /// vector of shell ids and their placements in top volume
       std::vector<std::pair<VxdID, TGeoHMatrix>> m_halfShellPlacements {};
+      /// Map of shell ids and their associated ladder ids and their placements
       std::map<VxdID, std::vector<std::pair<VxdID, TGeoHMatrix>>> m_ladderPlacements {};
+      /// Map of ladder ids and their associated sensor ids and their placements
       std::map<VxdID, std::vector<std::pair<VxdID, TGeoHMatrix>>> m_sensorPlacements {};
-
-      StoreObjPtr<VXDAlignment> m_alignmentDBObj;
 
 #ifndef __CINT__
       /** Map to find the SensorInfo for a given Sensor ID */

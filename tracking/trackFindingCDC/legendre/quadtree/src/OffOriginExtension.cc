@@ -105,6 +105,6 @@ OffOriginExtension::getHitsWRTtoRefPos(const Vector2D& refPos, float curv, float
                                                                  refPos.y()));
   qtProcessor.seed(m_allAxialWireHits);
 
-  std::vector<const CDCWireHit*> newWireHits = qtProcessor.getAssignedHits();
+  std::vector<const CDCWireHit*> newWireHits = qtProcessor.getAssignedItems();
   return newWireHits;
 }

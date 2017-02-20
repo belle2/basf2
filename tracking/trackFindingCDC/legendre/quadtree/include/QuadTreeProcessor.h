@@ -144,6 +144,24 @@ namespace Belle2 {
 
     public:
       /**
+       * Get items that have been assigned to the seed level
+       * The returned elements are unique even if items are assigned multiple times.
+       */
+      std::vector<AData*> getAssignedItems()
+      {
+        std::vector<const CDCWireHit*> result;
+        for (QuadTree* seededTree : m_seededTrees) {
+          for (Item* item : seededTree->getItems()) {
+            result.push_back(item->getPointer());
+          }
+        }
+        std::sort(result.begin(), result.end());
+        result.erase(std::unique(result.begin(), result.end()), result.end());
+        return result;
+      }
+
+    public:
+      /**
        * Start filling the already created tree.
        * @param lmdProcessor the lambda function to call after a node was selected
        * @param nHitsThreshold the threshold on the number of items

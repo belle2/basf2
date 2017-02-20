@@ -41,24 +41,7 @@ namespace Belle2 {
       /// Reference point
       Vector2D m_referencePoint;
 
-    public:
-      /**
-       * @return Hits which belong to the QuadTree
-       */
-      std::vector<const CDCWireHit*> getAssignedHits()
-      {
-        assert(m_seededTrees.size() == 1);
-
-        std::vector<const CDCWireHit*> result;
-        result.reserve(m_seededTrees[0]->getNItems());
-
-        for (Item* item : m_seededTrees[0]->getItems()) {
-          result.push_back(item->getPointer());
-        }
-
-        return result;
-      }
-
+    protected:
       /**
        * Do only insert the hit into a node if sinogram calculated from this hit belongs into this node
        */

@@ -88,6 +88,9 @@ namespace Belle2 {
       /// Pinned lookup table for precompute cosine and sine values
       const LookupTable<Vector2D>* m_cosSinLookupTable;
 
+      /// Local origin on which the phase space coordinates are centered
+      Vector2D m_localOrigin;
+
       /**
        *  Indicator whether the two sided phases space insertion check should be used
        *  This option should automatically split back to back tracks in the low curvature regions

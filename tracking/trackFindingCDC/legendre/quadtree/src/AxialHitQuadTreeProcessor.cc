@@ -43,6 +43,7 @@ AxialHitQuadTreeProcessor::AxialHitQuadTreeProcessor(int lastLevel,
                                                      PrecisionUtil::PrecisionFunction precisionFunction)
   : QuadTreeProcessor(lastLevel, seedLevel, ranges)
   , m_cosSinLookupTable(&getCosSinLookupTable())
+  , m_localOrigin(0.0, 0.0)
   , m_precisionFunction(precisionFunction)
 {
   m_twoSidedPhaseSpace = m_quadTree->getYMin() * m_quadTree->getYMax() < 0;
@@ -129,7 +130,7 @@ bool AxialHitQuadTreeProcessor::isInNode(QuadTree* node, const CDCWireHit* wireH
   }
 
   const double& l = wireHit->getRefDriftLength();
-  const Vector2D& pos2D = wireHit->getRefPos2D();
+  const Vector2D& pos2D = wireHit->getRefPos2D() - m_localOrigin;
   double r2 = pos2D.normSquared() - l * l;
 
   using Quadlet = std::array<std::array<float, 2>, 2>;
@@ -190,7 +191,7 @@ bool AxialHitQuadTreeProcessor::isInNode(QuadTree* node, const CDCWireHit* wireH
 
 bool AxialHitQuadTreeProcessor::checkDerivative(QuadTree* node, const CDCWireHit* wireHit) const
 {
-  const Vector2D& pos2D = wireHit->getRefPos2D();
+  const Vector2D& pos2D = wireHit->getRefPos2D() - m_localOrigin;
 
   long thetaMin = node->getXMin();
   long thetaMax = node->getXMax();
@@ -210,7 +211,7 @@ bool AxialHitQuadTreeProcessor::checkDerivative(QuadTree* node, const CDCWireHit
 bool AxialHitQuadTreeProcessor::checkExtremum(QuadTree* node, const CDCWireHit* wireHit) const
 {
   const double& l = wireHit->getRefDriftLength();
-  const Vector2D& pos2D = wireHit->getRefPos2D();
+  const Vector2D& pos2D = wireHit->getRefPos2D() - m_localOrigin;
   double r2 = pos2D.normSquared() - l * l;
 
   // get left and right borders of the node
@@ -254,7 +255,7 @@ void AxialHitQuadTreeProcessor::drawNode()
   for (Item* item : m_quadTree->getItems()) {
     const CDCWireHit* wireHit = item->getPointer();
     const double& l = wireHit->getRefDriftLength();
-    const Vector2D& pos2D = wireHit->getRefPos2D();
+    const Vector2D& pos2D = wireHit->getRefPos2D() - m_localOrigin;
 
     TF1* funct1 = new TF1("funct", "2*[0]*cos(x)/((1-sin(x))*[1]) ", -3.1415, 3.1415);
     funct1->SetLineWidth(1);

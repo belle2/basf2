@@ -106,7 +106,7 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& a
   tracks.insert(tracks.end(), newTracks.begin(), newTracks.end());
 }
 
-void AxialTrackCreatorHitLegendre::executeRelaxation(const CandidateProcessor& candidateProcessor,
+void AxialTrackCreatorHitLegendre::executeRelaxation(const CandidateReceiver& candidateReceiver,
                                                      AxialHitQuadTreeProcessor& qtProcessor)
 {
   // radius of the CDC
@@ -116,16 +116,16 @@ void AxialTrackCreatorHitLegendre::executeRelaxation(const CandidateProcessor& c
   const double curlCurv = 2. / rCDC;
 
   // find leavers
-  qtProcessor.fill(candidateProcessor, 50, curlCurv);
+  qtProcessor.fill(candidateReceiver, 50, curlCurv);
 
   // find curlers with diameter higher than half of radius of CDC
-  qtProcessor.fill(candidateProcessor, 70, 2 * curlCurv);
+  qtProcessor.fill(candidateReceiver, 70, 2 * curlCurv);
 
   // Start relaxation loop
   int minNHits = m_pass == EPass::FullRange ? 30 : 50;
   double maxCurv = m_pass == EPass::FullRange ? 0.15 : 0.07;
   do {
-    qtProcessor.fill(candidateProcessor, minNHits, maxCurv);
+    qtProcessor.fill(candidateReceiver, minNHits, maxCurv);
 
     minNHits = minNHits * m_param_stepScale;
 

@@ -41,27 +41,28 @@ namespace {
     XYSpans ranges2({0, maxTheta}, {0., 0.30});
     PrecisionUtil::PrecisionFunction lowPtPrecisionFunction = &PrecisionUtil::getNonOriginCurvPrecision;
 
-    std::vector<AxialHitQuadTreeProcessor::ReturnList> candidates;
+    using Candidate = std::vector<const CDCWireHit*>;
+    std::vector<Candidate> candidates;
 
     this->loadPreparedEvent();
     const int numberOfPossibleTrackCandidate = m_mcTracks.size();
 
-    AxialHitQuadTreeProcessor::CandidateProcessorLambda lmdProcessor =
-      [&candidates](const AxialHitQuadTreeProcessor::ReturnList & hits,
-    AxialHitQuadTreeProcessor::QuadTree*) { candidates.push_back(hits); };
+    auto candidateReceiver = [&candidates](const Candidate & candidate, void*) {
+      candidates.push_back(candidate);
+    };
 
     auto now = std::chrono::high_resolution_clock::now();
     AxialHitQuadTreeProcessor qtProcessor1(13, 4, ranges1, highPtPrecisionFunction);
     qtProcessor1.seed(m_axialWireHits);
 
     // actual filling of the hits into the quad tree structure
-    qtProcessor1.fill(lmdProcessor, 30);
+    qtProcessor1.fill(candidateReceiver, 30);
 
     AxialHitQuadTreeProcessor qtProcessor2(11, 1, ranges2, lowPtPrecisionFunction);
     qtProcessor2.seed(m_axialWireHits);
 
     // actual filling of the hits into the quad tree structure
-    qtProcessor2.fill(lmdProcessor, 30);
+    qtProcessor2.fill(candidateReceiver, 30);
     auto later = std::chrono::high_resolution_clock::now();
 
     ASSERT_EQ(numberOfPossibleTrackCandidate, candidates.size());

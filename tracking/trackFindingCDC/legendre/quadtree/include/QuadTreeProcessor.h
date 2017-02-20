@@ -51,11 +51,8 @@ namespace Belle2 {
       /// Alias for the QuadTree Children
       using QuadTreeChildren = typename QuadTree::Children;
 
-      /// The type of the list of result items returned to the lambda function
-      using ReturnList = std::vector<AData*>;
-
       /// This lambda function can be used for postprocessing
-      using CandidateProcessorLambda = std::function<void(const ReturnList&, QuadTree*)>;
+      using CandidateReceiver = std::function<void(const std::vector<AData*>&, QuadTree*)>;
 
     public:
       /**
@@ -163,21 +160,21 @@ namespace Belle2 {
     public:
       /**
        * Start filling the already created tree.
-       * @param lmdProcessor the lambda function to call after a node was selected
+       * @param candidateReceiver the lambda function to call after a node was selected
        * @param nHitsThreshold the threshold on the number of items
        */
-      void fill(const CandidateProcessorLambda& lmdProcessor, int nHitsThreshold)
+      void fill(const CandidateReceiver& candidateReceiver, int nHitsThreshold)
       {
-        fill(lmdProcessor, nHitsThreshold, std::numeric_limits<AY>::max());
+        fill(candidateReceiver, nHitsThreshold, std::numeric_limits<AY>::max());
       }
 
       /**
        * Fill vector of QuadTree instances with hits.
-       * @param lmdProcessor the lambda function to call after a node was selected
+       * @param candidateReceiver the lambda function to call after a node was selected
        * @param nHitsThreshold the threshold on the number of items
        * @param yLimit the threshold in the rho (curvature) variable
        */
-      void fill(const CandidateProcessorLambda& lmdProcessor, int nHitsThreshold, float yLimit)
+      void fill(const CandidateReceiver& candidateReceiver, int nHitsThreshold, float yLimit)
       {
         std::vector<QuadTree*> quadTrees = m_seededTrees;
         std::sort(quadTrees.begin(), quadTrees.end(), [](QuadTree * quadTree1, QuadTree * quadTree2) {
@@ -186,7 +183,7 @@ namespace Belle2 {
 
         for (QuadTree* tree : quadTrees) {
           erase_remove_if(tree->getItems(), [](Item * hit) { return hit->isUsed(); });
-          fillGivenTree(tree, lmdProcessor, nHitsThreshold, yLimit);
+          fillGivenTree(tree, candidateReceiver, nHitsThreshold, yLimit);
         }
       }
 
@@ -196,7 +193,7 @@ namespace Belle2 {
        * process further and go one level deeper.
        */
       void fillGivenTree(QuadTree* node,
-                         const CandidateProcessorLambda& lmdProcessor,
+                         const CandidateReceiver& candidateReceiver,
                          int nItemsThreshold,
                          AY yLimit)
       {
@@ -218,7 +215,7 @@ namespace Belle2 {
         }
 
         if (isLeaf(node)) {
-          callResultFunction(node, lmdProcessor);
+          callResultFunction(node, candidateReceiver);
           return;
         }
 
@@ -246,7 +243,7 @@ namespace Belle2 {
           // After we have processed some children we need to get rid of the already used hits in all the children,
           // because this can change the number of items drastically
           erase_remove_if(heaviestChild->getItems(), [&](Item * hit) { return hit->isUsed(); });
-          this->fillGivenTree(heaviestChild, lmdProcessor, nItemsThreshold, yLimit);
+          this->fillGivenTree(heaviestChild, candidateReceiver, nItemsThreshold, yLimit);
         }
       }
 
@@ -291,20 +288,20 @@ namespace Belle2 {
 
       /**
        * When a node is accepted as a result, we extract a vector with the items (back transformed to AData*)
-       * and pass it together with the result node to the given lambda function.
+       * and pass it together with the result node to the candidate receiver function.
        */
-      void callResultFunction(QuadTree* node, const CandidateProcessorLambda& lambda) const
+      void callResultFunction(QuadTree* node, const CandidateReceiver& candidateReceiver) const
       {
-        ReturnList resultItems;
-        const std::vector<Item*>& quadTreeItems = node->getItems();
-        resultItems.reserve(quadTreeItems.size());
+        const std::vector<Item*>& foundItems = node->getItems();
+        std::vector<AData*> candidate;
+        candidate.reserve(foundItems.size());
 
-        for (Item* quadTreeItem : quadTreeItems) {
-          quadTreeItem->setUsedFlag(m_param_setUsedFlag);
-          resultItems.push_back(quadTreeItem->getPointer());
+        for (Item* item : foundItems) {
+          item->setUsedFlag(m_param_setUsedFlag);
+          candidate.push_back(item->getPointer());
         }
 
-        lambda(resultItems, node);
+        candidateReceiver(candidate, node);
       }
 
     protected: // Section of specialisable functions

@@ -72,13 +72,13 @@ namespace Belle2 {
                  std::vector<CDCTrack>& tracks) final;
 
     private:
-      using CandidateProcessor = AxialHitQuadTreeProcessor::CandidateProcessorLambda;
+      using CandidateReceiver = AxialHitQuadTreeProcessor::CandidateReceiver;
       /**
        * Performs quadtree search
        * @param candidateProcessor lambda interface process found leaves in the legendre search
        * @param qtProcessor reference to the AxialHitQuadTreeProcessor instance
        */
-      void executeRelaxation(const CandidateProcessor& candidateProcessor,
+      void executeRelaxation(const CandidateReceiver& candidateReceiver,
                              AxialHitQuadTreeProcessor& qtProcessor);
 
     private: // Parameters

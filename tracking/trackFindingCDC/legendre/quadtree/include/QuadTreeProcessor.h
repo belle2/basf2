@@ -64,14 +64,12 @@ namespace Belle2 {
       QuadTreeProcessor(int lastLevel,
                         int seedLevel,
                         const XYSpans& xySpans,
-                        bool debugOutput = false,
-                        bool setUsedFlag = true)
+                        bool debugOutput = false)
         : m_quadTree{makeUnique<QuadTree>(xySpans.first, xySpans.second, 0, nullptr)}
         , m_lastLevel(lastLevel)
         , m_seedLevel(seedLevel)
         , m_debugOutput(debugOutput)
         , m_debugOutputMap()
-        , m_param_setUsedFlag(setUsedFlag)
       {
       }
 
@@ -297,7 +295,7 @@ namespace Belle2 {
         candidate.reserve(foundItems.size());
 
         for (Item* item : foundItems) {
-          item->setUsedFlag(m_param_setUsedFlag);
+          item->setUsedFlag();
           candidate.push_back(item->getPointer());
         }
 
@@ -401,9 +399,6 @@ namespace Belle2 {
 
       /// The calculated debug map
       std::map<std::pair<AX, AY>, std::vector<Item*>> m_debugOutputMap;
-
-      /// Set the used flag after every lambda function call
-      bool m_param_setUsedFlag;
     };
   }
 }

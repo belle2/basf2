@@ -106,6 +106,9 @@ namespace Belle2 {
        */
       bool m_twoSidedPhaseSpace;
 
+      /// The curvature above which the trajectory is considered a curler.
+      const double c_curlCurv = 0.02;
+
       /// Lambda which holds resolution function for the quadtree
       PrecisionUtil::PrecisionFunction m_precisionFunction;
     };

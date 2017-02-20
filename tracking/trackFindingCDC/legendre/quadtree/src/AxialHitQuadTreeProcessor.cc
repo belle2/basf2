@@ -136,8 +136,8 @@ AxialHitQuadTreeProcessor::createChild(QuadTree* node, int i, int j) const
 bool AxialHitQuadTreeProcessor::isInNode(QuadTree* node, const CDCWireHit* wireHit) const
 {
   // Check whether the hit lies in the forward direction
-  if (node->getLevel() <= 4 and m_twoSidedPhaseSpace and node->getYMin() > -0.02 and
-      node->getYMax() < 0.02) {
+  if (node->getLevel() <= 4 and m_twoSidedPhaseSpace and node->getYMin() > -c_curlCurv and
+      node->getYMax() < c_curlCurv) {
     if (not checkDerivative(node, wireHit)) return false;
   }
 

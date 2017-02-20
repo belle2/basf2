@@ -124,7 +124,7 @@ bool AxialHitQuadTreeProcessor::isInNode(QuadTree* node, const CDCWireHit* wireH
 
   const double& l = wireHit->getRefDriftLength();
   const Vector2D& pos2D = wireHit->getRefPos2D();
-  double r2 = square(wireHit->getRefCylindricalR()) - l * l;
+  double r2 = pos2D.normSquared() - l * l;
 
   using Quadlet = std::array<std::array<float, 2>, 2>;
   Quadlet distRight{};
@@ -209,7 +209,7 @@ bool AxialHitQuadTreeProcessor::checkExtremum(QuadTree* node, const CDCWireHit* 
 {
   const double& l = wireHit->getRefDriftLength();
   const Vector2D& pos2D = wireHit->getRefPos2D();
-  double r2 = square(wireHit->getRefCylindricalR()) - l * l;
+  double r2 = pos2D.normSquared() - l * l;
 
   // get left and right borders of the node
   long thetaMin = node->getXMin();
@@ -223,7 +223,7 @@ bool AxialHitQuadTreeProcessor::checkExtremum(QuadTree* node, const CDCWireHit* 
   if (not pos2D.isBetween(thetaVecMin, thetaVecMax)) return false;
 
   // compute sinograms at the position
-  double r = wireHit->getRefCylindricalR();
+  double r = pos2D.norm();
   float rRight = r - l;
   float rLeft = r + l;
 

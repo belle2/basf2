@@ -44,14 +44,12 @@ namespace Belle2 {
           (*wireHit)->setTakenFlag(false);
         }
 
-        newRefPoint(candidateHits, m_allAxialWireHits, true);
+        roadSearch(candidateHits);
         AxialTrackUtil::addCandidateFromHitsWithPostprocessing(candidateHits, m_allAxialWireHits, m_tracks);
       }
 
       /// Perform transformation for set of given hits; reference position taken as POCA of the fitted trajectory
-      std::vector<const CDCWireHit*> newRefPoint(std::vector<const CDCWireHit*>& cdcWireHits,
-                                                 const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                                 bool doMaskInitialHits = false)
+      std::vector<const CDCWireHit*> roadSearch(std::vector<const CDCWireHit*>& cdcWireHits)
       {
         const CDCKarimakiFitter& fitter = CDCKarimakiFitter::getNoDriftVarianceFitter();
         CDCTrajectory2D trackTrajectory2D = fitter.fit(cdcWireHits);
@@ -66,12 +64,12 @@ namespace Belle2 {
         double theta = trackTrajectory2D.getGlobalCircle().phi0() - M_PI_2;
 
         for (const CDCWireHit* hit : cdcWireHits) {
-          hit->getAutomatonCell().setTakenFlag(doMaskInitialHits);
-          hit->getAutomatonCell().setMaskedFlag(doMaskInitialHits);
+          hit->getAutomatonCell().setTakenFlag(true);
+          hit->getAutomatonCell().setMaskedFlag(true);
 
         }
 
-        std::vector<const CDCWireHit*> newAssignedHits = getHitsWRTtoRefPos(refPos, curv, theta, allAxialWireHits);
+        std::vector<const CDCWireHit*> newAssignedHits = getHitsWRTtoRefPos(refPos, curv, theta);
 
         if (newAssignedHits.size() > 0) {
 
@@ -112,30 +110,20 @@ namespace Belle2 {
        * @param theta angle between x-axis and vector to the center of the circle which represents trajectory
        * @return vector of CDCWireHit objects which satisfy legendre transformation with respect to the given parameters
        */
-      std::vector<const CDCWireHit*> getHitsWRTtoRefPos(Vector2D refPos, float curv, float theta,
-                                                        const std::vector<const CDCWireHit*>& allAxialWireHits)
+      std::vector<const CDCWireHit*> getHitsWRTtoRefPos(Vector2D refPos, float curv, float theta)
       {
-
-        float precision_r, precision_theta;
-        precision_theta = 3.1415 / (pow(2., m_levelPrecision + 1));
-        precision_r = 0.15 / (pow(2., m_levelPrecision));
+        float thetaPrecision = 3.1415 / (pow(2., m_levelPrecision + 1));
+        float curvPrecision = 0.15 / (pow(2., m_levelPrecision));
 
         using XYSpans = AxialHitQuadTreeProcessorWithNewReferencePoint::XYSpans;
-        XYSpans ranges({theta - precision_theta, theta + precision_theta},
-        {curv - precision_r, curv + precision_r});
-
-        std::vector<const CDCWireHit*> hitsVector;
-        for (const CDCWireHit* wireHit : allAxialWireHits) {
-          if (wireHit->getAutomatonCell().hasTakenFlag() or wireHit->getAutomatonCell().hasMaskedFlag()) continue;
-          hitsVector.push_back(wireHit);
-        }
+        XYSpans ranges({theta - thetaPrecision, theta + thetaPrecision},
+        {curv - curvPrecision, curv + curvPrecision});
 
         AxialHitQuadTreeProcessorWithNewReferencePoint qtProcessor(ranges, std::make_pair(refPos.x(), refPos.y()));
-        qtProcessor.seed(hitsVector);
+        qtProcessor.seed(m_allAxialWireHits);
 
-        std::vector<const CDCWireHit*> newCdcWireHits = qtProcessor.getAssignedHits();
-
-        return newCdcWireHits;
+        std::vector<const CDCWireHit*> newWireHits = qtProcessor.getAssignedHits();
+        return newWireHits;
       }
 
       /// Get the collected tracks

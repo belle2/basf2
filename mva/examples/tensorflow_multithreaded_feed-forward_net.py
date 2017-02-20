@@ -29,16 +29,30 @@ class save_decider():
     """
 
     def __init__(self):
+        """
+        Initialize the class
+        """
+
+        # Lowest evaluation value.  Use inifinity as starting value,
         self.lowest_value = np.inf
 
     def check(self, value, save_state):
+        """
+        Check if current training state is better, than the stored one.
+        :param value: evaluation score
+        :param save_state: name of the file which stores the tensorflow state
+        """
         if self.lowest_value > value:
+            # save state with the lowest evaluation score
             self.save_state = save_state
             self.lowest_value = value
         if self.lowest_value == np.inf and value == np.nan:
             self.save_state = save_state
 
     def get_savestate(self):
+        """
+        :return: the safe state with lowest evaluation score
+        """
         return self.save_state
 
 SAVER_DECIDER = save_decider()
@@ -63,24 +77,41 @@ class preprocessor():
     """
 
     def __init__(self, state=None):
+        """
+        Initialize preprocessor
+        :param state: use this torestor a previous state. I.e. to use for mva expert
+        """
         if state is None:
+            # state which describes the preprocessor. Must be pickable
             self.state = {'binning_array': [], 'number_of_bins': 0}
         else:
             self.state = state
 
     def fit(self, x, number_of_bins=100):
+        """
+        fit preprocessor on data
+        :param x: data
+        :param number_of_bins: how many bins are used for equal frequency binning
+        """
         for variable in range(len(x[0, :])):
             self.state['binning_array'].append(np.percentile(np.nan_to_num(x[:, variable]),
                                                              range(number_of_bins)))
         self.state['number_of_bins'] = number_of_bins
 
     def apply(self, x):
+        """
+        apply preprocessor on data
+        """
         for variable in range(len(x[0, :])):
             x[:, variable] = np.digitize(np.nan_to_num(x[:, variable]),
                                          self.state['binning_array'][variable]) / self.state['number_of_bins']
         return x
 
     def export_state(self):
+        """
+        export preprocessor
+        :return: pickable object which is later used as parameter state for __init__
+        """
         return self.state
 
 PREPROCESSOR = preprocessor()

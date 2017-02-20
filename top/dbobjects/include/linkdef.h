@@ -36,5 +36,8 @@
 #pragma link C++ class Belle2::TOPNominalTDC+;
 #pragma link C++ class Belle2::TOPGeometry+;
 #pragma link C++ class Belle2::TOPPmtGainPar+;
+#pragma link C++ class Belle2::TOPCalChannelMask+;
+#pragma link C++ class Belle2::TOPCalModuleAlignment+;
+#pragma link C++ class Belle2::TOPCalChannelThreshold+;
 
 #endif

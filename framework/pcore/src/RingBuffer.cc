@@ -49,7 +49,7 @@ RingBuffer::RingBuffer(int size)
 }
 
 // Constructor of Global Ringbuffer with name
-RingBuffer::RingBuffer(const std::string& name, unsigned int size)
+RingBuffer::RingBuffer(const std::string& name, unsigned int nwords)
 {
   // 0. Determine shared memory type
   if (name != "private") { // Global
@@ -75,7 +75,7 @@ RingBuffer::RingBuffer(const std::string& name, unsigned int size)
     B2INFO("[RingBuffer] Opening private ring buffer");
   }
 
-  openSHM(size);
+  openSHM(nwords);
 
   if (m_pathfd > 0) {
     B2INFO("First global RingBuffer creation: writing SHM info to file.");
@@ -98,23 +98,22 @@ RingBuffer::~RingBuffer()
   cleanup();
 }
 
-void RingBuffer::openSHM(int size)
+void RingBuffer::openSHM(int nwords)
 {
   // 1. Open shared memory
-  unsigned int sizeBytes = size * sizeof(int);
+  unsigned int sizeBytes = nwords * sizeof(int);
   const auto mode = IPC_CREAT | 0644;
   m_shmid = shmget(m_shmkey, sizeBytes, mode);
   if (m_shmid < 0) {
-    unsigned int maxSizeBytes = size;
+    unsigned int maxSizeBytes = sizeBytes;
     ifstream shmax("/proc/sys/kernel/shmmax");
     if (shmax.good())
       shmax >> maxSizeBytes;
     shmax.close();
 
-    const unsigned int oldSizeBytes = sizeBytes;
-    size = maxSizeBytes / sizeof(int);
-    sizeBytes = size * sizeof(int);
-    B2WARNING("RingBuffer: shmget(" << oldSizeBytes << ") failed, limiting to system maximum: " << sizeBytes);
+    B2WARNING("RingBuffer: shmget(" << sizeBytes << ") failed, limiting to system maximum: " << maxSizeBytes);
+    sizeBytes = maxSizeBytes;
+    nwords = maxSizeBytes / sizeof(int);
     m_shmid = shmget(m_shmkey, sizeBytes, mode);
     if (m_shmid < 0) {
       B2FATAL("RingBuffer: shmget(" << sizeBytes <<
@@ -135,7 +134,7 @@ void RingBuffer::openSHM(int size)
   SemaphoreLocker locker(m_semid); //prevent simultaneous initialization
 
   // 3. Initialize control parameters
-  m_shmsize = size;
+  m_shmsize = nwords;
   m_bufinfo = reinterpret_cast<RingBufInfo*>(m_shmadr);
   m_buftop = m_shmadr + sizeof(struct RingBufInfo);
   if (m_new) {
@@ -147,7 +146,7 @@ void RingBuffer::openSHM(int size)
     m_bufinfo->nbuf = 0;
     m_bufinfo->semid = m_semid;
     m_bufinfo->nattached = 1;
-    m_bufinfo->mode = 0;
+    m_bufinfo->errtype = 0;
     m_bufinfo->numAttachedTx = -1;
     m_bufinfo->ninsq = 0;
     m_bufinfo->nremq = 0;
@@ -214,7 +213,7 @@ int RingBuffer::insq(const int* buf, int size)
                                ") is larger than RingBuffer (size: " + std::to_string(m_bufinfo->size + 2) + ")!");
       return -1;
     }
-    m_bufinfo->mode = 0;
+    m_bufinfo->errtype = 0;
     int* wptr = m_buftop + m_bufinfo->wptr;
     *wptr = size;
     *(wptr + 1) = m_bufinfo->wptr + (size + 2);
@@ -226,20 +225,20 @@ int RingBuffer::insq(const int* buf, int size)
     m_insq_counter++;
     return size;
   } else if (m_bufinfo->wptr > m_bufinfo->rptr) {
-    if (m_bufinfo->mode != 4 &&
-        m_bufinfo->mode != 3 && m_bufinfo->mode != 0) {
-      B2ERROR("insq: Error in mode 0; current=" << m_bufinfo->mode);
+    if (m_bufinfo->errtype != 4 &&
+        m_bufinfo->errtype != 3 && m_bufinfo->errtype != 0) {
+      B2ERROR("insq: Error in errtype 0; current=" << m_bufinfo->errtype);
       return -1;
     }
-    if (m_bufinfo->mode == 3) {
-      //      printf ( "---> mode is 3, still remaining buffers\n" );
-      B2INFO("[RingBuffer] mode 3");
+    if (m_bufinfo->errtype == 3) {
+      //      printf ( "---> errtype is 3, still remaining buffers\n" );
+      B2INFO("[RingBuffer] errtype 3");
       return -1;
-    } else if (m_bufinfo->mode == 4) {
-      //      printf ( "---> mode returned to 0, wptr=%d, rptr=%d\n",
+    } else if (m_bufinfo->errtype == 4) {
+      //      printf ( "---> errtype returned to 0, wptr=%d, rptr=%d\n",
       //         m_bufinfo->wptr, m_bufinfo->rptr );
     }
-    m_bufinfo->mode = 0;
+    m_bufinfo->errtype = 0;
     if (size + 2 < m_bufinfo->size - m_bufinfo->wptr) { // normal case
       int* wptr = m_buftop + m_bufinfo->wptr;
       *wptr = size;
@@ -253,11 +252,11 @@ int RingBuffer::insq(const int* buf, int size)
       return size;
     } else {
       if (m_bufinfo->rptr >= size + 2) { // buffer full and wptr>rptr
-        if (m_bufinfo->mode != 0) {
-          B2ERROR("insq: Error in mode 1; current=" << m_bufinfo->mode);
+        if (m_bufinfo->errtype != 0) {
+          B2ERROR("insq: Error in errtype 1; current=" << m_bufinfo->errtype);
           return -1;
         }
-        m_bufinfo->mode = 1;
+        m_bufinfo->errtype = 1;
         int* wptr = m_buftop;
         memcpy(wptr + 2, buf, size * sizeof(int));
         *wptr = size;
@@ -267,7 +266,7 @@ int RingBuffer::insq(const int* buf, int size)
         *(prevptr + 1) = 0;
         m_bufinfo->prevwptr = 0;
         if (m_bufinfo->nbuf == 0) {
-          m_bufinfo->mode = 4;
+          m_bufinfo->errtype = 4;
           m_bufinfo->rptr = 0;
         }
         m_bufinfo->nbuf++;
@@ -285,12 +284,12 @@ int RingBuffer::insq(const int* buf, int size)
   } else {  // wptr < rptr
     if (m_bufinfo->wptr + size + 2 < m_bufinfo->rptr &&
         size + 2 < m_bufinfo->size - m_bufinfo->rptr) {
-      if (m_bufinfo->mode != 1 && m_bufinfo->mode != 2 &&
-          m_bufinfo->mode != 3) {
-        B2ERROR("insq: Error in mode 2; current=" << m_bufinfo->mode);
+      if (m_bufinfo->errtype != 1 && m_bufinfo->errtype != 2 &&
+          m_bufinfo->errtype != 3) {
+        B2ERROR("insq: Error in errtype 2; current=" << m_bufinfo->errtype);
         return -1;
       }
-      m_bufinfo->mode = 2;
+      m_bufinfo->errtype = 2;
       int* wptr = m_buftop + m_bufinfo->wptr;
       *wptr = size;
       *(wptr + 1) = m_bufinfo->wptr + (size + 2);
@@ -301,7 +300,7 @@ int RingBuffer::insq(const int* buf, int size)
       //      printf ( "insq: wptr<rptr and enough space below rptr; curr=%d, next=%d, rptr=%d\n", m_bufinfo->prevwptr, m_bufinfo->wptr, m_bufinfo->rptr );
       if (m_bufinfo->wptr > m_bufinfo->rptr) {
         printf("next pointer will exceed rptr.....\n");
-        m_bufinfo->mode = 3;
+        m_bufinfo->errtype = 3;
       }
       m_bufinfo->ninsq++;
       m_insq_counter++;
@@ -334,7 +333,7 @@ int RingBuffer::remq(int* buf)
     memcpy(buf, r_ptr + 2, nw * sizeof(int));
   m_bufinfo->rptr = *(r_ptr + 1);
   if (m_bufinfo->rptr == 0)
-    m_bufinfo->mode = 4;
+    m_bufinfo->errtype = 4;
   m_bufinfo->nbuf--;
   m_bufinfo->nremq++;
   m_remq_counter++;
@@ -451,7 +450,7 @@ int RingBuffer::shmid() const
   return m_shmid;
 }
 
-void RingBuffer::DumpInfo() const
+void RingBuffer::dumpInfo() const
 {
   SemaphoreLocker locker(m_semid);
 
@@ -467,7 +466,7 @@ void RingBuffer::DumpInfo() const
   printf("rptr = %d\n", m_bufinfo->rptr);
   printf("nbuf = %d\n", m_bufinfo->nbuf);
   printf("nattached = %d\n", m_bufinfo->nattached);
-  printf("mode = %d\n", m_bufinfo->mode);
+  printf("errtype = %d\n", m_bufinfo->errtype);
   printf("numAttachedTx = %d\n", m_bufinfo->numAttachedTx);
   printf("ninsq = %d\n", m_bufinfo->ninsq);
   printf("nremq = %d\n", m_bufinfo->ninsq);

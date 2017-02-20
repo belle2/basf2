@@ -35,9 +35,9 @@ namespace {
 AxialHitQuadTreeProcessor::AxialHitQuadTreeProcessor(int lastLevel,
                                                      int seedLevel,
                                                      const XYSpans& ranges,
-                                                     PrecisionUtil::PrecisionFunction lmdFunctLevel)
+                                                     PrecisionUtil::PrecisionFunction precisionFunction)
   : QuadTreeProcessor(lastLevel, seedLevel, ranges)
-  , m_lmdFunctLevel(lmdFunctLevel)
+  , m_precisionFunction(precisionFunction)
 {
   m_twoSidedPhaseSpace = m_quadTree->getYMin() * m_quadTree->getYMax() < 0;
 }
@@ -49,7 +49,7 @@ bool AxialHitQuadTreeProcessor::isLeaf(QuadTree* node) const
 
   double nodeResolution = fabs(node->getYMin() - node->getYMax());
 
-  double resolution = m_lmdFunctLevel(node->getYMean());
+  double resolution = m_precisionFunction(node->getYMean());
   if (resolution >= nodeResolution) return true;
 
   return false;

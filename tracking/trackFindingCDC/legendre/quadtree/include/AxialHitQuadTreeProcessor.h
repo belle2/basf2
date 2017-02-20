@@ -23,7 +23,7 @@ namespace Belle2 {
       AxialHitQuadTreeProcessor(int lastLevel,
                                 int seedLevel,
                                 const XYSpans& ranges,
-                                PrecisionUtil::PrecisionFunction lmdFunctLevel);
+                                PrecisionUtil::PrecisionFunction precisionFunction);
 
     protected: // Section of specialized functions
       /**
@@ -81,7 +81,7 @@ namespace Belle2 {
       bool m_twoSidedPhaseSpace;
 
       /// Lambda which holds resolution function for the quadtree
-      PrecisionUtil::PrecisionFunction m_lmdFunctLevel;
+      PrecisionUtil::PrecisionFunction m_precisionFunction;
     };
   }
 }

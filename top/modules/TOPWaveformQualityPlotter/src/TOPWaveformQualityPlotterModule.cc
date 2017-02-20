@@ -1,11 +1,23 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Jan Strube                                               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+// basf2
 #include <framework/core/HistoModule.h>
-#include <top/modules/TOPDataQualityPlotter/TOPDataQualityPlotterModule.h>
-//#include <top/modules/TOPDataQualityPlotterModule.h>
+#include <top/modules/TOPWaveformQualityPlotter/TOPWaveformQualityPlotterModule.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/pcore/RbTuple.h>
 
+// stl
 #include <utility>
 
+//ROOT
 #include "TDirectory.h"
 #include "TCanvas.h"
 #include "TGraphErrors.h"
@@ -13,19 +25,21 @@
 using namespace Belle2;
 using namespace std;
 
-REG_MODULE(TOPDataQualityPlotter)
+REG_MODULE(TOPWaveformQualityPlotter)
 
-TOPDataQualityPlotterModule::TOPDataQualityPlotterModule()
+TOPWaveformQualityPlotterModule::TOPWaveformQualityPlotterModule()
   : HistoModule()
-  , m_iEvent(0)
 {
   setDescription("TOP DQM histogram module");
   addParam("histogramDirectoryName", m_histogramDirectoryName,
            "histogram directory in ROOT file", string("TOP"));
+  addParam("drawWaves", m_DRAWWAVES, "option to draw waveforms", true);
+  addParam("debugHistos", m_DEBUGGING, "option to draw debug histograms", true);
+  addParam("noisemaps", m_NOISE, "option to draw noisemaps", false);
 }
 
 
-void TOPDataQualityPlotterModule::defineHisto()
+void TOPWaveformQualityPlotterModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
   m_directory = oldDir->mkdir(m_histogramDirectoryName.c_str());
@@ -38,7 +52,6 @@ void TOPDataQualityPlotterModule::defineHisto()
   m_carrier = new TH1F("carrier", "asic col", 4, 0, 4);
   m_asic_ch = new TH1F("asicCh", "channel", 8, 0, 8);
   m_errorFlag = new TH1F("errorFlag", "errorFlag", 1000, 0, 1000);
-  m_flag = new TH1F("flag", "parser flag", 4, 0, 4);
   m_asic_win = new TH1F("window", "window", 4, 0, 4);
   m_entries = new TH1F("entries", "entries", 100, 0, 2600);
   m_moduleID = new TH1F("moduleID", "moduleID", 16, 1, 17);
@@ -47,7 +60,7 @@ void TOPDataQualityPlotterModule::defineHisto()
 }
 
 
-void TOPDataQualityPlotterModule::initialize()
+void TOPWaveformQualityPlotterModule::initialize()
 {
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM;
@@ -56,16 +69,8 @@ void TOPDataQualityPlotterModule::initialize()
 }
 
 
-void TOPDataQualityPlotterModule::beginRun()
+void TOPWaveformQualityPlotterModule::basicDebuggingPlots(const TOPRawWaveform& v)
 {
-  m_DRAWWAVES = true;
-  m_DEBUGGING = true;
-  m_NOISE = false;
-}
-
-void TOPDataQualityPlotterModule::basicDebuggingPlots(TOPRawWaveform* rawwave)
-{
-  const TOPRawWaveform& v = *rawwave;
   int scrodid = v.getScrodID();
   int asicid = v.getASICNumber();
   int channelid = v.getASICChannel();
@@ -94,9 +99,8 @@ void TOPDataQualityPlotterModule::basicDebuggingPlots(TOPRawWaveform* rawwave)
 }
 
 void
-TOPDataQualityPlotterModule::drawWaveforms(TOPRawWaveform* rawwave)
+TOPWaveformQualityPlotterModule::drawWaveforms(const TOPRawWaveform& v)
 {
-  const TOPRawWaveform& v = *rawwave;
   vector<short> waveform = v.getWaveform();
   if (waveform.empty()) {
     return;
@@ -129,22 +133,21 @@ TOPDataQualityPlotterModule::drawWaveforms(TOPRawWaveform* rawwave)
 }
 
 
-void TOPDataQualityPlotterModule::event()
+void TOPWaveformQualityPlotterModule::event()
 {
   if (not m_waveform) {
     return;
   }
-  for (int c = 0; c < m_waveform.getEntries(); c++) {
-    TOPRawWaveform* evtwave_ptr = m_waveform[c];
+  for (auto evtwave : m_waveform) {
     if (m_DRAWWAVES) {
-      drawWaveforms(evtwave_ptr);
+      drawWaveforms(evtwave);
     }
     if (m_DEBUGGING) {
-      basicDebuggingPlots(evtwave_ptr);
+      basicDebuggingPlots(evtwave);
     }
     if (m_NOISE) {
-      auto channelID = evtwave_ptr->getChannel();
-      const vector<short> v_samples = evtwave_ptr->getWaveform();
+      auto channelID = evtwave.getChannel();
+      const vector<short> v_samples = evtwave.getWaveform();
       size_t nsamples = v_samples.size();
       if (m_channelNoiseMap.find(channelID) == m_channelNoiseMap.end()) {
         string idName = string("noise_") + to_string(channelID);
@@ -166,7 +169,7 @@ void TOPDataQualityPlotterModule::event()
   return;
 }
 
-void TOPDataQualityPlotterModule::endRun()
+void TOPWaveformQualityPlotterModule::endRun()
 {
   if (m_DRAWWAVES) {
     // Each waveform was stored in a TH1F
@@ -210,8 +213,4 @@ void TOPDataQualityPlotterModule::endRun()
       m_directory->WriteTObject(c);
     }
   }
-}
-
-void TOPDataQualityPlotterModule::terminate()
-{
 }

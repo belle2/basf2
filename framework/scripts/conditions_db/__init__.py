@@ -140,6 +140,10 @@ class ConditionsDB:
         return req.json()
 
     def get_globalTagType(self, name):
+        """
+        Get the dictionary describing the given global tag type (currently
+        one of DEV or RELEASE). Returns None if tag type was not found.
+        """
         try:
             req = self.request("GET", "/globalTagType")
         except ConditionsDB.RequestError as e:

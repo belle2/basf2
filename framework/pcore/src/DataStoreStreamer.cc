@@ -228,6 +228,8 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
     m_msghandler->decode_msg(msg, objlist, namelist);
     int nobjs = (msg->header())->nObjects;
     int narrays = (msg->header())->nArrays;
+    if (unsigned(nobjs + narrays) != objlist.size())
+      B2WARNING("restoreDataStore(): inconsistent #objects/#arrays in header");
 
     // Restore objects in DataStore
     for (int i = 0; i < nobjs + narrays; i++) {
@@ -237,7 +239,7 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
 
         // Read and Build StreamerInfo
         if (msg->type() == MSG_STREAMERINFO) {
-          restoreStreamerInfos((TList*)obj);
+          restoreStreamerInfos(static_cast<TList*>(obj));
           return 0;
         }
 

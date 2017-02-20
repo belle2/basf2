@@ -10,18 +10,11 @@
 #include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithSimpleSimulation.h>
 
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeNode.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/PrecisionUtil.h>
 
-#include <set>
-#include <cmath>
 #include <vector>
-#include <memory>
-#include <chrono>
-#include <algorithm>
+#include <cmath>
 #include <gtest/gtest.h>
-
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -34,42 +27,46 @@ namespace {
     const int maxTheta = std::pow(2, PrecisionUtil::getLookupGridLevel());
 
     // high-pt candidate
-    XYSpans ranges1({0, maxTheta}, {0., 0.15});
+    XYSpans xySpans1({0, maxTheta}, {0., 0.15});
     PrecisionUtil::PrecisionFunction highPtPrecisionFunction = &PrecisionUtil::getOriginCurvPrecision;
 
     // low-pt candidate
-    XYSpans ranges2({0, maxTheta}, {0., 0.30});
+    XYSpans xySpans2({0, maxTheta}, {0., 0.30});
     PrecisionUtil::PrecisionFunction lowPtPrecisionFunction = &PrecisionUtil::getNonOriginCurvPrecision;
 
     using Candidate = std::vector<const CDCWireHit*>;
     std::vector<Candidate> candidates;
 
     this->loadPreparedEvent();
-    const int numberOfPossibleTrackCandidate = m_mcTracks.size();
+    const int nMCTracks = m_mcTracks.size();
 
     auto candidateReceiver = [&candidates](const Candidate & candidate, void*) {
       candidates.push_back(candidate);
     };
 
-    auto now = std::chrono::high_resolution_clock::now();
-    AxialHitQuadTreeProcessor qtProcessor1(13, 4, ranges1, highPtPrecisionFunction);
-    qtProcessor1.seed(m_axialWireHits);
+    TimeItResult timeItResult = timeIt(100, true, [&]() {
+      candidates.clear();
+      for (const CDCWireHit* wireHit : m_axialWireHits) {
+        (*wireHit)->unsetTakenFlag();
+        (*wireHit)->unsetMaskedFlag();
+      }
 
-    // actual filling of the hits into the quad tree structure
-    qtProcessor1.fill(candidateReceiver, 30);
+      AxialHitQuadTreeProcessor qtProcessor1(13, 4, xySpans1, highPtPrecisionFunction);
+      qtProcessor1.seed(m_axialWireHits);
 
-    AxialHitQuadTreeProcessor qtProcessor2(11, 1, ranges2, lowPtPrecisionFunction);
-    qtProcessor2.seed(m_axialWireHits);
+      // actual filling of the hits into the quad tree structure
+      qtProcessor1.fill(candidateReceiver, 30);
 
-    // actual filling of the hits into the quad tree structure
-    qtProcessor2.fill(candidateReceiver, 30);
-    auto later = std::chrono::high_resolution_clock::now();
+      AxialHitQuadTreeProcessor qtProcessor2(11, 1, xySpans2, lowPtPrecisionFunction);
+      qtProcessor2.seed(m_axialWireHits);
 
-    ASSERT_EQ(numberOfPossibleTrackCandidate, candidates.size());
+      // actual filling of the hits into the quad tree structure
+      qtProcessor2.fill(candidateReceiver, 30);
+    });
+    timeItResult.printSummary();
 
-    std::chrono::duration<double> time_span =
-      std::chrono::duration_cast<std::chrono::duration<double>>(later - now);
-    B2INFO("QuadTree took " << time_span.count() << " seconds, found " << candidates.size() << " candidates");
+    // Check that the two tracks have been found.
+    ASSERT_EQ(nMCTracks, candidates.size());
 
     // Check for the parameters of the track candidates
     // The actual hit numbers are more than 30, but this is somewhat a lower bound

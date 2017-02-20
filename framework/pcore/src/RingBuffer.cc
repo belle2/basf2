@@ -34,7 +34,6 @@
 using namespace std;
 using namespace Belle2;
 
-
 // Constructor of Private Ringbuffer
 RingBuffer::RingBuffer(int size)
 {
@@ -56,10 +55,7 @@ RingBuffer::RingBuffer(const std::string& name, unsigned int size)
   if (name != "private") { // Global
     m_file = true;
     m_pathname = string("/tmp/") + getenv("USER") + "_RB_" + name;
-    //m_pathfd = creat ( m_pathname.c_str(), 0644 );
-    //    m_pathfd = open(m_pathname.c_str(), O_CREAT | O_EXCL, 0644);
     m_pathfd = open(m_pathname.c_str(), O_CREAT | O_EXCL | O_RDWR, 0644);
-    //m_pathfd = open ( m_pathname.c_str(), O_EXCL, 0644 );
     if (m_pathfd > 0) {   // a new shared memory file created
       B2INFO("[RingBuffer] Creating a ring buffer with key " << name);
       m_new = true;
@@ -67,7 +63,7 @@ RingBuffer::RingBuffer(const std::string& name, unsigned int size)
       B2INFO("[RingBuffer] Attaching the ring buffer with key " << name);
       m_new = false;
     } else {
-      B2FATAL("RingBuffer: error to open shm file");
+      B2FATAL("RingBuffer: error opening shm file: " << m_pathname);
     }
     m_shmkey = ftok(m_pathname.c_str(), 1);
     m_semkey = ftok(m_pathname.c_str(), 2);
@@ -202,7 +198,6 @@ void RingBuffer::dump_db()
 
 int RingBuffer::insq(const int* buf, int size)
 {
-  //  printf ( "insq: requesting : %d, nbuf = %d\n", size, m_bufinfo->nbuf );
   if (size <= 0) {
     B2FATAL("RingBuffer::insq() failed: invalid buffer size = " << size);
   }
@@ -227,8 +222,6 @@ int RingBuffer::insq(const int* buf, int size)
     m_bufinfo->prevwptr = m_bufinfo->wptr;
     m_bufinfo->wptr += (size + 2);
     m_bufinfo->nbuf++;
-    //    printf ( "insq: nbuf = 0; prev=%d, new=%d\n",
-    //       m_bufinfo->prevwptr, m_bufinfo->wptr );
     m_bufinfo->ninsq++;
     m_insq_counter++;
     return size;
@@ -255,8 +248,6 @@ int RingBuffer::insq(const int* buf, int size)
       m_bufinfo->prevwptr = m_bufinfo->wptr;
       m_bufinfo->wptr += (size + 2);
       m_bufinfo->nbuf++;
-      //      printf ( "insq: wptr>rptr and enough size; prev=%d, new=%d\n",
-      //         m_bufinfo->prevwptr, m_bufinfo->wptr );
       m_bufinfo->ninsq++;
       m_insq_counter++;
       return size;
@@ -276,7 +267,6 @@ int RingBuffer::insq(const int* buf, int size)
         *(prevptr + 1) = 0;
         m_bufinfo->prevwptr = 0;
         if (m_bufinfo->nbuf == 0) {
-          //    printf ( "===> rptr reset......\n" );
           m_bufinfo->mode = 4;
           m_bufinfo->rptr = 0;
         }
@@ -333,24 +323,19 @@ int RingBuffer::remq(int* buf)
   if (m_bufinfo->nbuf == 0) {
     return 0;
   }
-  //  printf ( "remq : nbuf = %d\n", m_bufinfo->nbuf );
   int* r_ptr = m_buftop + m_bufinfo->rptr;
   int nw = *r_ptr;
-  //  printf ( "RingBuffer : nw = %d\n", nw );
   if (nw <= 0) {
     printf("RingBuffer::remq : buffer size = %d, skipped\n", nw);
     printf("RingBuffer::remq : entries = %d\n", m_bufinfo->nbuf);
     return 0;
   }
-  //  printf ( "remq : taking buf from %d(%d)\n", m_bufinfo->rptr, nw );
   if (buf)
     memcpy(buf, r_ptr + 2, nw * sizeof(int));
   m_bufinfo->rptr = *(r_ptr + 1);
-  //  if ( *(r_ptr+1) < m_bufinfo->rptr )
   if (m_bufinfo->rptr == 0)
     m_bufinfo->mode = 4;
   m_bufinfo->nbuf--;
-  //  printf ( "remq: next buf = %d, nbuf = %d\n", m_bufinfo->rptr, m_bufinfo->nbuf );
   m_bufinfo->nremq++;
   m_remq_counter++;
   return nw;
@@ -362,10 +347,8 @@ int RingBuffer::spyq(int* buf) const
   if (m_bufinfo->nbuf <= 0) {
     return 0;
   }
-  //  printf ( "remq : nbuf = %d\n", m_bufinfo->nbuf );
   int* r_ptr = m_buftop + m_bufinfo->rptr;
   int nw = *r_ptr;
-  //  printf ( "RingBuffer : nw = %d\n", nw );
   if (nw <= 0) {
     printf("RingBuffer::spyq : buffer size = %d, skipped\n", nw);
     printf("RingBuffer::spyq : entries = %d\n", m_bufinfo->nbuf);

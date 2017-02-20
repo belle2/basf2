@@ -231,9 +231,9 @@ namespace Belle2 {
 
     void GeoCache::addHalfShellPlacement(VxdID halfShell, G4Transform3D placement) {m_halfShellPlacements.push_back(std::make_pair(halfShell, g4Transform3DToTGeo(placement)));}
 
-    const vector< pair< VxdID, TGeoHMatrix > >& GeoCache::getHalfShellPlacements() {return m_halfShellPlacements;}
+    const vector< pair< VxdID, TGeoHMatrix > >& GeoCache::getHalfShellPlacements() const {return m_halfShellPlacements;}
 
-    const vector< pair< VxdID, TGeoHMatrix > >& GeoCache::getSensorPlacements(VxdID ladder)
+    const vector< pair< VxdID, TGeoHMatrix > >& GeoCache::getSensorPlacements(VxdID ladder) const
     {
       auto placements = m_sensorPlacements.find(ladder);
       if (placements == m_sensorPlacements.end())
@@ -242,7 +242,7 @@ namespace Belle2 {
       return placements->second;
     }
 
-    const vector< pair< VxdID, TGeoHMatrix > >& GeoCache::getLadderPlacements(VxdID halfShell)
+    const vector< pair< VxdID, TGeoHMatrix > >& GeoCache::getLadderPlacements(VxdID halfShell) const
     {
       auto placements = m_ladderPlacements.find(halfShell);
       if (placements == m_ladderPlacements.end())
@@ -254,16 +254,16 @@ namespace Belle2 {
     void GeoCache::setupReconstructionTransformations()
     {
       DBObjPtr<VXDAlignment> vxdAlignments;
-
-      // So the hierarchy is as follows:
-      //             Belle 2
-      //           / |     | \
-      //      Ying  Yang Pat  Mat ... other sub-detectors
-      //      / |   / |  |  \  | \ 
-      //     ......  ladders ......
-      //    / / |   / |  |  \  | \ \
-      //   ......... sensors ........
-      //
+      /**
+      So the hierarchy is as follows:
+                  Belle 2
+                / |     | \
+           Ying  Yang Pat  Mat ... other sub-detectors
+           / |   / |  |  \  | \
+          ......  ladders ......
+         / / |   / |  |  \  | \ \
+        ......... sensors ........
+      */
 
       for (auto& halfShellPlacement : getHalfShellPlacements()) {
         TGeoHMatrix trafoHalfShell = halfShellPlacement.second;
@@ -308,6 +308,7 @@ namespace Belle2 {
         }
       }
 
+      // Add callback to itself. Callback are unique, so further calls should not change anything
       vxdAlignments.addCallback(this, &VXD::GeoCache::setupReconstructionTransformations);
 
     }
@@ -332,6 +333,25 @@ namespace Belle2 {
         }
       }
       trafo.SetRotation(rotMatrix);
+      return trafo;
+    }
+
+    TGeoHMatrix GeoCache::getTGeoFromRigidBodyParams(double dU, double dV, double dW, double dAlpha, double dBeta, double dGamma)
+    {
+      // Differential translation
+      TGeoTranslation translation;
+      // Differential rotation
+      TGeoRotation rotation;
+
+      translation.SetTranslation(dU, dV, dW);
+      rotation.RotateX(- dAlpha * TMath::RadToDeg());
+      rotation.RotateY(- dBeta  * TMath::RadToDeg());
+      rotation.RotateZ(- dGamma * TMath::RadToDeg());
+
+      // Differential trafo (trans + rot)
+      TGeoCombiTrans combi(translation, rotation);
+      TGeoHMatrix trafo;
+      trafo = trafo * combi;
       return trafo;
     }
   } //VXD namespace

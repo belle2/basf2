@@ -99,15 +99,15 @@ namespace Belle2 {
 
       /// Retrieve stored half-shell placements into world volume
       /// @return vector of pairs, each pair contains a VxdID for half-shell (0.0.0#1-4) and its placement
-      const std::vector<std::pair<VxdID, TGeoHMatrix>>& getHalfShellPlacements();
+      const std::vector<std::pair<VxdID, TGeoHMatrix>>& getHalfShellPlacements() const;
 
       /// Retrieve stored ladder placements into half-shell
       /// @return vector of pairs, each pair contains a VxdID for ladder (layer.ladder.0) and its placement
-      const std::vector<std::pair<VxdID, TGeoHMatrix>>& getLadderPlacements(VxdID halfShell);
+      const std::vector<std::pair<VxdID, TGeoHMatrix>>& getLadderPlacements(VxdID halfShell) const;
 
       /// Retrieve stored sensor placements into ladders
       /// @return vector of pairs, each pair contains a VxdID for sensor and its placement
-      const std::vector<std::pair<VxdID, TGeoHMatrix>>& getSensorPlacements(VxdID ladder);
+      const std::vector<std::pair<VxdID, TGeoHMatrix>>& getSensorPlacements(VxdID ladder) const;
 
       /// Remember how half-shell is placed into world volume
       void addHalfShellPlacement(VxdID halfShell, G4Transform3D placement);
@@ -121,60 +121,17 @@ namespace Belle2 {
       /// Initialize from DB for reconstruction
       /// Updates all SensorInfo transformations for reconstruction from DB object(s)
       /// (recalculating new global positions) and registers itself for subsequent updates
-      /// of DB objects to keep the hierarchy up-o-date.
+      /// of DB objects to keep the hierarchy up-to-date.
       void setupReconstructionTransformations();
 
       /// Covenient function to convert G4Transform3D to TGeoHMatrix
       static TGeoHMatrix g4Transform3DToTGeo(G4Transform3D g4);
 
-      template<class TypeName>
-      TGeoHMatrix getPlacementDBCorrection(TypeName& dbobj, VxdID id)
-      {
-        // Differential translation
-        TGeoTranslation translation;
-        // Differential rotation
-        TGeoRotation rotation;
-
-        translation.SetTranslation(
-          dbobj.get(id, TypeName::dU),
-          dbobj.get(id, TypeName::dV),
-          dbobj.get(id, TypeName::dW)
-        );
-        rotation.RotateX(- dbobj.get(id, TypeName::dAlpha) * TMath::RadToDeg());
-        rotation.RotateY(- dbobj.get(id, TypeName::dBeta)  * TMath::RadToDeg());
-        rotation.RotateZ(- dbobj.get(id, TypeName::dGamma) * TMath::RadToDeg());
-
-        // Differential trafo (trans + rot)
-        TGeoCombiTrans combi(translation, rotation);
-        TGeoHMatrix trafo;
-        trafo = trafo * combi;
-        return trafo;
-
-      }
-
-      /// Convert 6 rigid body params to corresponding TGeoHMatrix
-      /// Angles in radians, length units in centimeters
-      TGeoHMatrix getTGeoFromRigidBodyParams(double dU, double dV, double dW, double dAlpha, double dBeta, double dGamma)
-      {
-        // Differential translation
-        TGeoTranslation translation;
-        // Differential rotation
-        TGeoRotation rotation;
-
-        translation.SetTranslation(dU, dV, dW);
-        rotation.RotateX(- dAlpha * TMath::RadToDeg());
-        rotation.RotateY(- dBeta  * TMath::RadToDeg());
-        rotation.RotateZ(- dGamma * TMath::RadToDeg());
-
-        // Differential trafo (trans + rot)
-        TGeoCombiTrans combi(translation, rotation);
-        TGeoHMatrix trafo;
-        trafo = trafo * combi;
-        return trafo;
-      }
+      /// Convert 6 rigid body params (alignment corrections) to corresponding TGeoHMatrix
+      /// Angles in radians, length units in centimeters.
+      static TGeoHMatrix getTGeoFromRigidBodyParams(double dU, double dV, double dW, double dAlpha, double dBeta, double dGamma);
 
       // --------------------------------------------------------------------------------------------------
-
 
       /** Return a reference to the SensorInfo of a given SensorID.
        * This function is a shorthand for GeoCache::getInstance().getSensorInfo

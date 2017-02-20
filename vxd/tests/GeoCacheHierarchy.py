@@ -37,10 +37,10 @@ class CompareTransformationsModule(basf2.Module):
 
             # First rotation component
             for i in range(0, 9):
-                assert(abs(nominal.GetRotationMatrix()[i] - nominal.GetRotationMatrix()[i]) <= 1.e-14)
+                assert(abs(nominal.GetRotationMatrix()[i] - reco.GetRotationMatrix()[i]) <= 1.e-14)
             # Then translations
             for i in range(0, 3):
-                assert(abs(nominal.GetTranslation()[i] - nominal.GetTranslation()[i]) <= 1.e-14)
+                assert(abs(nominal.GetTranslation()[i] - reco.GetTranslation()[i]) <= 1.e-14)
 
 main = create_path()
 # No params for EventInfoSetter means exp=0, run=0 --> Monte Carlo, no alignment corrections

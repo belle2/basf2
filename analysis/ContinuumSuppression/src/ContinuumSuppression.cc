@@ -59,10 +59,6 @@ namespace Belle2 {
     float cosTBz   = -1;
     float R2       = -1;
 
-    // Kinematically allowed maximum momentum for mbc>5.2
-    // sqrt(5.29^2 - 5.2^2) ~ 1.0GeV
-    // 10.58/4 + 1.0/2 = 3.145
-    static const double P_MAX(3.2);
 
     // -- B Cand --------------------------------------------------------------------------
     PCmsLabTransform T;
@@ -122,7 +118,6 @@ namespace Belle2 {
         if (particle.getParticleType() == Particle::c_Track) {
           PCmsLabTransform T;
           TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
-          if (p_cms.Rho() > P_MAX) continue;
 
           p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());
@@ -147,11 +142,8 @@ namespace Belle2 {
           // Create particle from ECLCluster with gamma hypothesis
           Particle particle(cluster);
 
-          TLorentzVector p_lab = particle.get4Vector();
-          if (p_lab.Rho() < 0.05) continue;
           PCmsLabTransform T;
-          TLorentzVector p_cms = T.rotateLabToCms() * p_lab;
-          if (p_cms.Rho() > P_MAX) continue;
+          TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
           p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());
 

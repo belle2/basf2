@@ -22,7 +22,7 @@ matchMCTruth('B0', path=main)
 
 buildRestOfEvent('B0', path=main)
 
-cleanMask = ('cleanMask', 'p > 0.1', 'p > 2.08 and clusterE9E25 > 0.9 and abs(clusterTiming) < 10')
+cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
 appendROEMasks('B0', [cleanMask], path=main)
 
 buildContinuumSuppression('B0', 'cleanMask', path=main)
@@ -68,5 +68,5 @@ targetVar = ['isNotContinuumEvent']
 # Create output file.
 variablesToNTuple('B0', trainVars + targetVar, treename='tree', filename=outTuple, path=main)
 
-process(main, 100)
+process(main, 10000)
 print(statistics)

@@ -117,8 +117,6 @@ namespace Belle2 {
           transform.SetDy(g4transform[13]*Unit::mm);
           transform.SetDz(g4transform[14]*Unit::mm);
           info->setTransformation(transform);
-          // This is now set by setupReconstructionTransformations()
-          //info->setTransformation(transform, true);
 
           addSensor(info);
         }

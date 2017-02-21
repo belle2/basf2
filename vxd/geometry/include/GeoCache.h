@@ -16,12 +16,9 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <unordered_map>
 
 #include <TMath.h>
-
-#ifndef __CINT__
-#include <boost/unordered_map.hpp>
-#endif
 
 class G4VPhysicalVolume;
 // forward declaring G4Transform3D is a pain
@@ -141,10 +138,8 @@ namespace Belle2 {
       static GeoCache& getInstance();
 
     private:
-#ifndef __CINT__
       /** Hash map to store pointers to all existing SensorInfos with constant lookup complexity */
-      typedef boost::unordered_map<VxdID::baseType, SensorInfoBase*> SensorInfoMap;
-#endif
+      typedef std::unordered_map<VxdID::baseType, SensorInfoBase*> SensorInfoMap;
       /** Map to store a set of unique VxdIDs belonging to one VxdID. Like ladders belong to layers, etc. */
       typedef std::map<Belle2::VxdID, std::set<Belle2::VxdID> > SensorHierachy;
 
@@ -172,11 +167,8 @@ namespace Belle2 {
       std::map<VxdID, std::vector<std::pair<VxdID, TGeoHMatrix>>> m_ladderPlacements {};
       /// Map of ladder ids and their associated sensor ids and their placements
       std::map<VxdID, std::vector<std::pair<VxdID, TGeoHMatrix>>> m_sensorPlacements {};
-
-#ifndef __CINT__
       /** Map to find the SensorInfo for a given Sensor ID */
       SensorInfoMap m_sensorInfo;
-#endif
     };
   }
 } //Belle2 namespace

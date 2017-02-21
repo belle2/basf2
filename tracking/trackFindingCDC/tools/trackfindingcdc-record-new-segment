@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import tracking.modules as modules
 from tracking.run.event_generation import StandardEventGenerationRun
 from tracking import add_cdc_track_finding
 

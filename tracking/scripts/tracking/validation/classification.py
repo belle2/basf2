@@ -157,6 +157,20 @@ class ClassificationAnalysis(object):
                 print("Determined cut direction", 1)
                 cut_direction = +1  # reject high values
 
+        cut_abs = False
+        if cut_direction is None:
+            purity_grapherrors = ValidationPlot.convert_tprofile_to_tgrapherrors(purity_profile.plot,
+                                                                                 abs_x=True)
+            correlation = purity_grapherrors.GetCorrelationFactor()
+            if correlation > 0.1:
+                print("Determined absolute cut direction", -1)
+                cut_direction = -1  # reject low values
+                cut_abs = True
+            elif correlation < -0.1:
+                print("Determined absolute cut direction", 1)
+                cut_direction = +1  # reject high values
+                cut_abs = True
+
         # Figures of merit
         if cut_value is not None:
             fom_name = formatter.format(plot_name, subplot_name="classification_figures_of_merits")
@@ -191,6 +205,13 @@ class ClassificationAnalysis(object):
             self.fom = classification_fom
 
         if not estimate_is_binary and cut_direction is not None:
+            if cut_abs:
+                estimates = np.abs(estimates)
+                cut_x_label = "cut " + compose_axis_label("abs(" + quantity_name + ")", self.unit)
+                lower_bound = 0
+            else:
+                cut_x_label = "cut " + axis_label
+
             n_data = len(estimates)
             n_signals = scores.signal_amount(truths, estimates)
             n_bkgs = n_data - n_signals
@@ -227,7 +248,7 @@ class ClassificationAnalysis(object):
                 allow_discrete=self.allow_discrete,
             )
 
-            efficiency_by_cut_profile.xlabel = "cut " + axis_label
+            efficiency_by_cut_profile.xlabel = cut_x_label
             efficiency_by_cut_profile.ylabel = "efficiency"
 
             self.plots["efficiency_by_cut"] = efficiency_by_cut_profile
@@ -245,7 +266,7 @@ class ClassificationAnalysis(object):
                 allow_discrete=self.allow_discrete,
             )
 
-            bkg_rejection_by_cut_profile.xlabel = "cut " + axis_label
+            bkg_rejection_by_cut_profile.xlabel = cut_x_label
             bkg_rejection_by_cut_profile.ylabel = "background rejection"
 
             self.plots["bkg_rejection_by_cut"] = bkg_rejection_by_cut_profile

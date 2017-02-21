@@ -53,9 +53,9 @@ SegmentTrackFilterFactory::create(const std::string& filterName) const
   } else if (filterName == "truth") {
     return makeUnique<MCSegmentTrackFilter>();
   } else if (filterName == "mva") {
-    return makeUnique<MVASegmentTrackFilter>("tracking/data/trackfindingcdc_SegmentTrackFilterFirstStep.xml");
+    return makeUnique<MVASegmentTrackFilter>("tracking/data/trackfindingcdc_SegmentTrackFilter.xml");
   } else if (filterName == "recording") {
-    return makeUnique<RecordingSegmentTrackFilter>("SegmentTrackFilterFirstStep.root");
+    return makeUnique<RecordingSegmentTrackFilter>("SegmentTrackFilter.root");
   } else {
     return Super::create(filterName);
   }

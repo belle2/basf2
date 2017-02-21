@@ -40,7 +40,7 @@ class ClassificationAnalysis(object):
         self._contact = contact
         self.quantity_name = quantity_name
 
-        self.plots = {}
+        self.plots = collections.OrderedDict()
         self.fom = None
 
         self.cut_direction = cut_direction
@@ -105,18 +105,27 @@ class ClassificationAnalysis(object):
             cut_value = None
             cut_direction = self.cut_direction
 
+        lower_bound = self.lower_bound
+        upper_bound = self.upper_bound
+
         # Stacked histogram
         signal_bkg_histogram_name = formatter.format(plot_name, subplot_name="signal_bkg_histogram")
         signal_bkg_histogram = ValidationPlot(signal_bkg_histogram_name)
         signal_bkg_histogram.hist(
             estimates,
             stackby=truths,
-            lower_bound=self.lower_bound,
-            upper_bound=self.upper_bound,
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
             outlier_z_score=self.outlier_z_score,
             allow_discrete=self.allow_discrete,
         )
         signal_bkg_histogram.xlabel = axis_label
+
+        if lower_bound is None:
+            lower_bound = signal_bkg_histogram.lower_bound
+
+        if upper_bound is None:
+            upper_bound = signal_bkg_histogram.upper_bound
 
         self.plots['signal_bkg'] = signal_bkg_histogram
 
@@ -127,8 +136,8 @@ class ClassificationAnalysis(object):
         purity_profile.profile(
             estimates,
             truths,
-            lower_bound=self.lower_bound,
-            upper_bound=self.upper_bound,
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
             outlier_z_score=self.outlier_z_score,
             allow_discrete=self.allow_discrete,
         )
@@ -212,8 +221,8 @@ class ClassificationAnalysis(object):
             efficiency_by_cut_profile.profile(
                 sorted_estimates,
                 sorted_efficiencies,
-                lower_bound=self.lower_bound,
-                upper_bound=self.upper_bound,
+                lower_bound=lower_bound,
+                upper_bound=upper_bound,
                 outlier_z_score=self.outlier_z_score,
                 allow_discrete=self.allow_discrete,
             )
@@ -230,8 +239,8 @@ class ClassificationAnalysis(object):
             bkg_rejection_by_cut_profile.profile(
                 sorted_estimates,
                 sorted_bkg_rejections,
-                lower_bound=self.lower_bound,
-                upper_bound=self.upper_bound,
+                lower_bound=lower_bound,
+                upper_bound=upper_bound,
                 outlier_z_score=self.outlier_z_score,
                 allow_discrete=self.allow_discrete,
             )

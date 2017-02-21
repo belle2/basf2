@@ -56,24 +56,12 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
             help='Apply the fitting to the found tracks'
         )
 
-        tracking_argument_group.add_argument(
-            '-so',
-            '--simulate-only',
-            action='store_true',
-            default=self.simulate_only,
-            dest='simulate_only',
-            help='Only generate and simulate the events, but do not run any tracking or validation code')
-
         return argument_parser
 
     def create_path(self):
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
         path = super().create_path()
-
-        # early return if only a simulation run was requested
-        if self.simulate_only:
-            return path
 
         # setting up fitting is only necessary when testing
         # track finding comonenst ex-situ

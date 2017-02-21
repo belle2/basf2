@@ -39,7 +39,9 @@ class EmptyRun(object):
         #######################
         path = self.create_path()
         self.adjust_path(path)
+        self.run(path)
 
+    def run(self, path):
         # Run basf2 module path #
         #########################
         get_logger().info('Start processing')
@@ -71,12 +73,10 @@ class EmptyRun(object):
         return path
 
     def adjust_path(self, path):
-        """Hook that gives the opportunity to check the path for constistance before processing it"""
+        """Hook that gives the opportunity to check the path for consistance before processing it"""
         pass
 
-
-# Minimal run stub #
-####################
+# Minimal run stub defining some general parameters
 
 
 class MinimalRun(EmptyRun):
@@ -150,7 +150,7 @@ class MinimalRun(EmptyRun):
         environment.setNumberEventsOverride(self.n_events)
 
         # If there is no input file is the EventInfoSetter as master module
-        if self.root_input_file is None:
+        if not self.root_input_file:
             # Master module: EventInfoSetter
             path.add_module('EventInfoSetter',
                             evtNumList=[self.n_events],

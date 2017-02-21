@@ -72,10 +72,11 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
         """Create command line argument parser"""
         argument_parser = super().create_argument_parser(**kwds)
 
+        # Left over from earlier parameter settings. Overwrites the more fundamental simulation_only parameter
         argument_parser.add_argument(
             '-o',
             '--output',
-            dest='root_output_file',
+            dest='simulation_output',
             default=argparse.SUPPRESS,
             help='Output file to which the simulated events shall be written.'
         )
@@ -88,14 +89,8 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
         # based on the properties in the base class.
         path = super().create_path()
 
-        # add the validation module to the path, but only if requested
-        if not self.simulate_only:
-            self.preparePathValidation(path)
-
-        # Add the (optional) output module
-        if self.root_output_file is not None:
-            path.add_module('RootOutput',
-                            outputFileName=self.root_output_file)
+        # add the validation module to the path
+        self.preparePathValidation(path)
 
         return path
 

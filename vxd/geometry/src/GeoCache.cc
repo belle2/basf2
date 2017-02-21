@@ -23,6 +23,7 @@
 #include <G4LogicalVolume.hh>
 #include <G4VPhysicalVolume.hh>
 #include <G4NavigationHistory.hh>
+#include <G4Transform3D.hh>
 
 using namespace std;
 
@@ -209,7 +210,7 @@ namespace Belle2 {
       return *instance;
     }
 
-    void GeoCache::addSensorPlacement(VxdID ladder, VxdID sensor, G4Transform3D placement)
+    void GeoCache::addSensorPlacement(VxdID ladder, VxdID sensor, const G4Transform3D& placement)
     {
       auto sensorsPlacements = m_sensorPlacements.find(ladder);
       if (sensorsPlacements == m_sensorPlacements.end())
@@ -218,7 +219,7 @@ namespace Belle2 {
       m_sensorPlacements[ladder].push_back(std::make_pair(sensor, g4Transform3DToTGeo(placement)));
     }
 
-    void GeoCache::addLadderPlacement(VxdID halfShell, VxdID ladder, G4Transform3D placement)
+    void GeoCache::addLadderPlacement(VxdID halfShell, VxdID ladder, const G4Transform3D& placement)
     {
       auto laddersPlacements = m_ladderPlacements.find(halfShell);
       if (laddersPlacements == m_ladderPlacements.end())
@@ -227,7 +228,7 @@ namespace Belle2 {
       m_ladderPlacements[halfShell].push_back(std::make_pair(ladder, g4Transform3DToTGeo(placement)));
     }
 
-    void GeoCache::addHalfShellPlacement(VxdID halfShell, G4Transform3D placement) {m_halfShellPlacements.push_back(std::make_pair(halfShell, g4Transform3DToTGeo(placement)));}
+    void GeoCache::addHalfShellPlacement(VxdID halfShell, const G4Transform3D& placement) {m_halfShellPlacements.push_back(std::make_pair(halfShell, g4Transform3DToTGeo(placement)));}
 
     const vector< pair< VxdID, TGeoHMatrix > >& GeoCache::getHalfShellPlacements() const {return m_halfShellPlacements;}
 
@@ -311,7 +312,7 @@ namespace Belle2 {
 
     }
 
-    TGeoHMatrix GeoCache::g4Transform3DToTGeo(G4Transform3D g4)
+    TGeoHMatrix GeoCache::g4Transform3DToTGeo(const G4Transform3D& g4)
     {
       TGeoHMatrix trafo;
       // Differential translation

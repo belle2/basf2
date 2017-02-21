@@ -23,9 +23,10 @@
 #include <boost/unordered_map.hpp>
 #endif
 
-#include <Geant4/G4Transform3D.hh>
-
 class G4VPhysicalVolume;
+// forward declaring G4Transform3D is a pain
+namespace HepGeom { class Transform3D; }
+typedef HepGeom::Transform3D G4Transform3D;
 
 namespace Belle2 {
   /** Namespace to provide code needed by both Vertex Detectors, PXD and SVD, and also testbeam telescopes */
@@ -108,13 +109,13 @@ namespace Belle2 {
       const std::vector<std::pair<VxdID, TGeoHMatrix>>& getSensorPlacements(VxdID ladder) const;
 
       /// Remember how half-shell is placed into world volume
-      void addHalfShellPlacement(VxdID halfShell, G4Transform3D placement);
+      void addHalfShellPlacement(VxdID halfShell, const G4Transform3D& placement);
 
       /// Remember how ladder is placed into half-shell
-      void addLadderPlacement(VxdID halfShell, VxdID ladder, G4Transform3D placement);
+      void addLadderPlacement(VxdID halfShell, VxdID ladder, const G4Transform3D& placement);
 
       /// Remember how sensor is placed into ladder
-      void addSensorPlacement(VxdID ladder, VxdID sensor, G4Transform3D placement);
+      void addSensorPlacement(VxdID ladder, VxdID sensor, const G4Transform3D& placement);
 
       /// Initialize from DB for reconstruction
       /// Updates all SensorInfo transformations for reconstruction from DB object(s)
@@ -123,7 +124,7 @@ namespace Belle2 {
       void setupReconstructionTransformations();
 
       /// Covenient function to convert G4Transform3D to TGeoHMatrix
-      static TGeoHMatrix g4Transform3DToTGeo(G4Transform3D g4);
+      static TGeoHMatrix g4Transform3DToTGeo(const G4Transform3D& g4);
 
       /// Convert 6 rigid body params (alignment corrections) to corresponding TGeoHMatrix
       /// Angles in radians, length units in centimeters.

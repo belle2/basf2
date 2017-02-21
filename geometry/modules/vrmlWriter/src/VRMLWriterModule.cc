@@ -37,6 +37,8 @@
 #include <G4ReflectedSolid.hh>
 #include <G4Polyhedron.hh>
 
+#include <iomanip>
+
 using namespace Belle2;
 
 REG_MODULE(VRMLWriter);

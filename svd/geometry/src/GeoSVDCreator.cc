@@ -71,9 +71,12 @@ namespace Belle2 {
       info->setSensorParams(
         infoPar.getDepletionVoltage(),
         infoPar.getBiasVoltage(),
-        infoPar.getBackplaneCapacitance() * unit_pF,
-        infoPar.getInterstripCapacitance() * unit_pF,
-        infoPar.getCouplingCapacitance() * unit_pF,
+        infoPar.getBackplaneCapacitanceU() * unit_pF,
+        infoPar.getInterstripCapacitanceU() * unit_pF,
+        infoPar.getCouplingCapacitanceU() * unit_pF,
+        infoPar.getBackplaneCapacitanceV() * unit_pF,
+        infoPar.getInterstripCapacitanceV() * unit_pF,
+        infoPar.getCouplingCapacitanceV() * unit_pF,
         infoPar.getElectronicNoiseU(),
         infoPar.getElectronicNoiseV()
       );
@@ -84,6 +87,7 @@ namespace Belle2 {
     SVDSensorInfoPar* GeoSVDCreator::readSensorInfo(const GearDir& sensor)
     {
 
+      const double unit_pF = 1000 * Unit::fC / Unit::V; // picofarad
       SVDSensorInfoPar* info = new SVDSensorInfoPar(
         VxdID(0, 0, 0),
         sensor.getLength("width"),

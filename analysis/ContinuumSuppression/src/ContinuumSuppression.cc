@@ -69,29 +69,30 @@ namespace Belle2 {
     et[0] = et[1] = 0;
 
     // -- SIG A --- Use B primary daughters - (Belle: use_finalstate_for_sig == 0) --------
-    std::vector<Belle2::Particle*> sigDau = particle->getDaughters();
+    std::vector<Belle2::Particle*> signalDaughters = particle->getDaughters();
 
-    for (unsigned i = 0; i < sigDau.size(); i++) {
+    for (const Belle2::Particle* sigFS0 : signalDaughters) {
       PCmsLabTransform T;
-      TLorentzVector p_cms = T.rotateLabToCms() * sigDau[i]->get4Vector();
+      TLorentzVector p_cms = T.rotateLabToCms() * sigFS0->get4Vector();
 
-      p3_cms_q_sigA.push_back({p_cms.Vect(), sigDau[i]->getCharge()});
+      p3_cms_q_sigA.push_back({p_cms.Vect(), sigFS0->getCharge()});
 
       p_cms_missA -= p_cms;
       et[0] += p_cms.Perp();
     }
 
     // -- SIG B --- Use B final-state daughters - (Belle: use_finalstate_for_sig == 1) ----
-    std::vector<const Belle2::Particle*> sigFsp = particle->getFinalStateDaughters();
+    std::vector<const Belle2::Particle*> signalFSParticles = particle->getFinalStateDaughters();
 
-    for (unsigned i = 0; i < sigFsp.size(); i++) {
+    for (const Belle2::Particle* sigFS1 : signalFSParticles) {
+
       PCmsLabTransform T;
-      TLorentzVector p_cms = T.rotateLabToCms() * sigFsp[i]->get4Vector();
+      TLorentzVector p_cms = T.rotateLabToCms() * sigFS1->get4Vector();
 
       p3_cms_all.push_back(p_cms.Vect());
       p3_cms_sigB.push_back(p_cms.Vect());
 
-      p3_cms_q_sigB.push_back({p_cms.Vect(), sigFsp[i]->getCharge()});
+      p3_cms_q_sigB.push_back({p_cms.Vect(), sigFS1->getCharge()});
 
       p_cms_missB -= p_cms;
       et[1] += p_cms.Perp();

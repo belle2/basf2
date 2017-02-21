@@ -22,7 +22,8 @@ matchMCTruth('B0', path=main)
 
 buildRestOfEvent('B0', path=main)
 
-cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
+# cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
+cleanMask = ('cleanMask', '', '')
 appendROEMasks('B0', [cleanMask], path=main)
 
 buildContinuumSuppression('B0', 'cleanMask', path=main)
@@ -30,6 +31,7 @@ buildContinuumSuppression('B0', 'cleanMask', path=main)
 
 # Define the variables for training.
 trainVars = [
+    'R2EventLevel',
     'R2',
     'thrustBm',
     'thrustOm',

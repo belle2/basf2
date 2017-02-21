@@ -15,6 +15,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/ReferenceFrame.h>
+#include <analysis/ContinuumSuppression/FoxWolfram.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
@@ -23,6 +24,9 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
 
 #include <TLorentzVector.h>
 #include <TVectorF.h>
@@ -35,6 +39,39 @@
 
 namespace Belle2 {
   namespace Variable {
+
+    double R2EventLevel(const Particle*)
+    {
+      std::vector<TVector3> p3_all;
+
+      StoreArray<Track> tracks;
+      for (int i = 0; i < tracks.getEntries(); ++i) {
+        const TrackFitResult* iTrack = tracks[i]->getTrackFitResult(tracks[i]->getRelated<PIDLikelihood>()->getMostLikely());
+        if (iTrack == nullptr) continue;
+        if (iTrack->getChargeSign() != 0) {
+          Particle particle(tracks[i], Const::pion);
+          PCmsLabTransform T;
+          TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
+          p3_all.push_back(p_cms.Vect());
+        }
+      }
+
+      StoreArray<ECLCluster> eclClusters;
+      for (int i = 0; i < eclClusters.getEntries(); ++i) {
+        TLorentzVector momECLCluster = eclClusters[i] -> get4Vector();
+        if (momECLCluster == momECLCluster) {
+          if (eclClusters[i]->isNeutral()) {
+            Particle particle(eclClusters[i]);
+            PCmsLabTransform T;
+            TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
+            p3_all.push_back(p_cms.Vect());
+          }
+        }
+      }
+
+      FoxWolfram FW(p3_all);
+      return FW.R(2);
+    }
 
     double R2(const Particle* particle)
     {
@@ -183,11 +220,12 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("Continuum Suppression");
-    REGISTER_VARIABLE("R2"       , R2      , "Reduced Fox-Wolfram moment R2");
-    REGISTER_VARIABLE("thrustBm" , thrustBm, "Magnitude of the B thrust axis");
-    REGISTER_VARIABLE("thrustOm" , thrustOm, "Magnitude of the ROE thrust axis");
-    REGISTER_VARIABLE("cosTBTO"  , cosTBTO , "Cosine of angle between thrust axis of B and thrust axis of ROE");
-    REGISTER_VARIABLE("cosTBz"   , cosTBz  , "Cosine of angle between thrust axis of B and z-axis");
+    REGISTER_VARIABLE("R2EventLevel", R2EventLevel, "Event-Level Reduced Fox-Wolfram moment R2");
+    REGISTER_VARIABLE("R2"          , R2          , "Reduced Fox-Wolfram moment R2");
+    REGISTER_VARIABLE("thrustBm"    , thrustBm    , "Magnitude of the B thrust axis");
+    REGISTER_VARIABLE("thrustOm"    , thrustOm    , "Magnitude of the ROE thrust axis");
+    REGISTER_VARIABLE("cosTBTO"     , cosTBTO     , "Cosine of angle between thrust axis of B and thrust axis of ROE");
+    REGISTER_VARIABLE("cosTBz"      , cosTBz      , "Cosine of angle between thrust axis of B and z-axis");
     REGISTER_VARIABLE("KSFWVariables(variable,finalState)", KSFWVariables,
                       "Returns et, mm2, or one of the 16 KSFW moments. If only the variable is specified, the KSFW moment calculated from the B primary daughters is returned. If finalState is set to FS1, the KSFW moment calculated from the B final state daughters is returned.");
     REGISTER_VARIABLE("CleoCone(integer i)", CleoCones,

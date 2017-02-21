@@ -4,13 +4,8 @@ env['LIBS'] = [
     'CLHEP',
     '$ROOT_LIBS',
     '$GEANT4_LIBS',
-    'framework',
-    'genfit2',
-    'simulation',
-    'tracking_dataobjects',
-    'bklm', 'bklm_dataobjects',
-    'eklm', 'eklm_dataobjects', 'eklm_dbobjects',
-    'mdst_dataobjects',
+    'tracking',
+    'framework'
     ]
 
 Return('env')

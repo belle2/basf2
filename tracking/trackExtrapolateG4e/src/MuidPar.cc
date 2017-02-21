@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/muid/MuidPar.h>
+#include <tracking/trackExtrapolateG4e/MuidPar.h>
 #include <tracking/dataobjects/Muid.h>
 
 #include <fstream>

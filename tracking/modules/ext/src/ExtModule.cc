@@ -10,52 +10,16 @@
 
 #include <tracking/modules/ext/ExtModule.h>
 #include <tracking/trackExtrapolateG4e/TrackExtrapolateG4e.h>
-#include <tracking/dataobjects/ExtHit.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <genfit/Track.h>
-#include <genfit/DetPlane.h>
-#include <genfit/FieldManager.h>
-#include <genfit/TrackPoint.h>
-#include <genfit/AbsFitterInfo.h>
-#include <genfit/Exception.h>
-#include <simulation/kernel/RunManager.h>
 #include <simulation/kernel/ExtManager.h>
-#include <simulation/kernel/ExtCylSurfaceTarget.h>
-#include <ecl/geometry/ECLGeometryPar.h>
 
-#include <cmath>
 #include <vector>
-#include <algorithm>
-#include <iostream>
-
-#include <TMatrixD.h>
-#include <TVectorD.h>
-#include <TVector3.h>
 
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
-#include <CLHEP/Geometry/Point3D.h>
-#include <CLHEP/Matrix/Vector.h>
-#include <CLHEP/Vector/ThreeVector.h>
-#include <CLHEP/Matrix/Matrix.h>
 
 #include <globals.hh>
-#include <G4PhysicalVolumeStore.hh>
-#include <G4VPhysicalVolume.hh>
-#include <G4ParticleTable.hh>
-#include <G4ErrorPropagatorData.hh>
-#include <G4ErrorTrajErr.hh>
-#include <G4ErrorFreeTrajState.hh>
-#include <G4StateManager.hh>
 #include <G4UImanager.hh>
-
-#define TWOPI (2.0*M_PI)
 
 using namespace std;
 using namespace Belle2;
@@ -63,15 +27,30 @@ using namespace Belle2;
 REG_MODULE(Ext)
 
 ExtModule::ExtModule() :
-  Module()
+  Module(),
+  m_TracksColName(""),
+  m_RecoTracksColName(""),
+  m_ExtHitsColName(""),
+  m_MinPt(0.0),
+  m_MinKE(0.0),
+  m_MaxStep(0.0),
+  m_Cosmic(0),
+  m_TrackingVerbosity(0),
+  m_EnableVisualization(false),
+  m_MagneticFieldStepperName(""),
+  m_MagneticCacheDistance(0.0),
+  m_DeltaChordInMagneticField(0.0)
 {
-  m_Extrapolator = TrackExtrapolateG4e::GetInstance();
+  m_Extrapolator = TrackExtrapolateG4e::getInstance();
   m_PDGCodes.clear();
+  m_Hypotheses.clear();
+  m_UICommands.clear();
   setDescription("Extrapolates tracks from CDC to outer detectors using geant4e");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("pdgCodes", m_PDGCodes, "Positive-charge PDG codes for extrapolation hypotheses", m_PDGCodes);
-  addParam("TracksColName", m_TracksColName, "Name of collection holding the reconstructed tracks", string("Tracks"));
-  addParam("ExtHitsColName", m_ExtHitsColName, "Name of collection holding the ExtHits from the extrapolation", string("ExtHits"));
+  addParam("TracksColName", m_TracksColName, "Name of collection holding the reconstructed tracks", string(""));
+  addParam("RecoTracksColName", m_RecoTracksColName, "Name of collection holding the reconstructed tracks (RecoTrack)", string(""));
+  addParam("ExtHitsColName", m_ExtHitsColName, "Name of collection holding the ExtHits from the extrapolation", string(""));
   addParam("MinPt", m_MinPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated.", double(0.0));
   addParam("MinKE", m_MinKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation.", double(0.002));
   addParam("MaxStep", m_MaxStep, "[cm] Maximum step size during extrapolation (use 0 for infinity).", double(25.0));
@@ -100,15 +79,63 @@ ExtModule::~ExtModule()
 
 void ExtModule::initialize()
 {
-  m_Extrapolator->initialize(m_PDGCodes, m_TracksColName, m_ExtHitsColName, m_MinPt, m_MinKE,
-                             m_MaxStep, m_Cosmic, m_TrackingVerbosity, m_EnableVisualization,
-                             m_MagneticFieldStepperName, m_MagneticCacheDistance, m_DeltaChordInMagneticField,
-                             m_UICommands);
+  // Initialize the (singleton) extrapolation manager.  It will check
+  // whether it will run with or without FullSimModule and with or without
+  // Muid (or any other geant4e-based extrapolation module).
+  Simulation::ExtManager* extMgr = Simulation::ExtManager::GetManager();
+  extMgr->Initialize("Ext", m_MagneticFieldStepperName, m_MagneticCacheDistance, m_DeltaChordInMagneticField,
+                     m_EnableVisualization, m_TrackingVerbosity, m_UICommands);
+
+  // Redefine geant4e step length, magnetic field step limitation (fraction of local curvature radius),
+  // and kinetic energy loss limitation (maximum fractional energy loss) by communicating with
+  // the geant4 UI.  (Commands were defined in ExtMessenger when physics list was set up.)
+  // *NOTE* If module muid runs after this, its G4UImanager commands will override these.
+  m_MaxStep = ((m_MaxStep == 0.0) ? 10.0 : std::min(10.0, m_MaxStep)) * CLHEP::cm;
+  char stepSize[80];
+  std::sprintf(stepSize, "/geant4e/limits/stepLength %8.2f mm", m_MaxStep);
+  G4UImanager::GetUIpointer()->ApplyCommand(stepSize);
+  G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/magField 0.001");
+  G4UImanager::GetUIpointer()->ApplyCommand("/geant4e/limits/energyLoss 0.05");
+
+  // Hypotheses for EXT extrapolation (default is every particle in
+  // Const::chargedStableSet, i.e., electron, muon, pion, kaon, proton, deuteron)
+  m_Hypotheses.clear();
+  if (m_PDGCodes.empty()) {
+    for (const Const::ChargedStable& pdgIter : Const::chargedStableSet) {
+      m_Hypotheses.push_back(pdgIter);
+    }
+  } else { // user defined
+    std::vector<Const::ChargedStable> stack;
+    for (const Const::ChargedStable& pdgIter : Const::chargedStableSet) {
+      stack.push_back(pdgIter);
+    }
+    for (unsigned int i = 0; i < m_PDGCodes.size(); ++i) {
+      for (unsigned int k = 0; k < stack.size(); ++k) {
+        if (abs(m_PDGCodes[i]) == stack[k].getPDGCode()) {
+          m_Hypotheses.push_back(stack[k]);
+          stack.erase(stack.begin() + k);
+          --k;
+        }
+      }
+    }
+    if (m_Hypotheses.empty()) B2ERROR("No valid PDG codes for extrapolation");
+  }
+
+  for (unsigned int i = 0; i < m_Hypotheses.size(); ++i) {
+    B2INFO("Ext hypothesis for PDG code " << m_Hypotheses[i].getPDGCode() << " and its antiparticle will be extrapolated");
+  }
+
+  // Initialize the extrapolator engine for EXT (vs MUID)
+  // *NOTE* that MinPt, MinKE, TracksColName, RecoTracksColName and ExtHitsColName are shared by MUID and EXT; only last caller wins
+  m_Extrapolator->setTracksColName(m_TracksColName);
+  m_Extrapolator->setRecoTracksColName(m_RecoTracksColName);
+  m_Extrapolator->setExtHitsColName(m_ExtHitsColName);
+  m_Extrapolator->initialize(m_MinPt, m_MinKE, m_Cosmic, m_Hypotheses);
 }
 
 void ExtModule::beginRun()
 {
-  m_Extrapolator->beginRun();
+  m_Extrapolator->beginRun(false);
 }
 
 void ExtModule::event()
@@ -118,10 +145,10 @@ void ExtModule::event()
 
 void ExtModule::endRun()
 {
-  m_Extrapolator->endRun();
+  m_Extrapolator->endRun(false);
 }
 
 void ExtModule::terminate()
 {
-  m_Extrapolator->terminate();
+  m_Extrapolator->terminate(false);
 }

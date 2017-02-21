@@ -88,8 +88,7 @@ namespace Belle2 {
         auto childUID = std::make_pair(ChildDBObjectType::getGlobalUniqueID(), child);
         auto parentUID = std::make_pair(MotherDBObjectType::getGlobalUniqueID(), mother);
 
-        auto iterator_inserted = m_lookup.insert(std::make_pair(childUID, std::make_pair(parentUID, childToMotherParamTransform)));
-        if (iterator_inserted.second) {
+        if (m_lookup.insert(std::make_pair(childUID, std::make_pair(parentUID, childToMotherParamTransform))).second) {
           // Just inserted an child element (so each child is inserted exactly once)
           // Try to insert parent with empty vect (does nothing if parent already in map)
           m_hierarchy.insert(std::make_pair(parentUID, std::vector<DetectorLevelElement>()));
@@ -97,7 +96,7 @@ namespace Belle2 {
           m_hierarchy[parentUID].push_back(childUID);
         } else {
           // Update element transformation if inserted again
-          iterator_inserted.first.second = childToMotherParamTransform;
+          m_lookup[childUID].second = childToMotherParamTransform;
         }
       }
 

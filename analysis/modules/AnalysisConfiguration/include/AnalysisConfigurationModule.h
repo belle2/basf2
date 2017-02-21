@@ -40,14 +40,17 @@ namespace Belle2 {
 
 
   protected:
-    std::string m_tupleStyle; /**< Style of variables in nTuple
-                              Possible styles on example of PX variable of pi0 from D
-                              in decay B->(D->pi0 pi) pi0:
-                              'default': B_D_pi0_PX
-                              'semilaconic': D_pi0_PX
-                              'laconic': pi01_PX"
+    std::string m_tupleStyle; /* Style of naming of variables in nTuple configured by user.
+                              Possible values are listd in m_style.
+                              If user gives wrong style name, it is switchd to "default"
                               */
-    std::set<std::string> m_styles = {"default", "laconic", "semilaconic" };
+    std::set<std::string> m_styles = {"default", "laconic", "semilaconic" };/**< List of possible styles of variables in nTuple
+                                                                            Possible styles on example of PX variable of pi0 from D
+                                                                            in decay B->(D->pi0 pi) pi0:
+                                                                            'default': B_D_pi0_PX
+                                                                            'semilaconic': D_pi0_PX
+                                                                            'laconic': pi01_PX"
+                                                                            */
 
     std::string m_mcMatchingVersion; /**< specifies the version of MC matching algorithm to be used */
   };

@@ -28,7 +28,7 @@ AnalysisConfigurationModule::AnalysisConfigurationModule() : Module()
   Possible styles on example of PX variable of pi0 from D in decay B->(D->pi0 pi) pi0:\n
   'default': B_D_pi0_PX\n
   'semilaconic': D_pi0_PX\n
-  'laconic': pi01_PX\n)DOCSTRING", std::string("Default"));
+  'laconic': pi01_PX\n)DOCSTRING", std::string("default"));
 
   addParam("mcMatchingVersion", m_mcMatchingVersion, "Specifies what version of mc matching algorithm is going to be used. \n"
            "Possibilities are: BelleII (default) and Belle. The latter should be used when analysing Belle MC.\n"

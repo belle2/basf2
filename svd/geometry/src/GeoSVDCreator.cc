@@ -444,7 +444,7 @@ namespace Belle2 {
             double phi = ladder.second;
 
             // Remember shell coordinate system (into which ladders are inserted)
-            VXD::GeoCache::getInstance().addHalfShellPlacement(VxdID(m_currentHalfShell),
+            VXD::GeoCache::getInstance().addHalfShellPlacement(m_halfShellVxdIDs[m_currentHalfShell],
                                                                shellAlignment); //  * G4RotateZ3D(shellAngle) not taken into account in ladder!
 
             G4Transform3D ladderPlacement = placeLadder(ladderID, phi, envelope, shellAlignment, parameters);

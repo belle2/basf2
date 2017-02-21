@@ -18,16 +18,16 @@ namespace Belle2 {
     /// Enumeration for the variance information to be used.
     enum class EFitVariance {
       /// Use an equal variance of 1 for all observations
-      c_Unit,
+      c_Unit = 0,
 
       /// Use the drift length as variance.
-      c_DriftLength,
+      c_DriftLength = 1,
 
       /// Use the square of the drift length as variance.
-      c_Pseudo,
+      c_Pseudo = 2,
 
       /// Use the drift length variance
-      c_Proper,
+      c_Proper = 3,
     };
 
     /**

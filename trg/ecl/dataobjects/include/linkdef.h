@@ -12,5 +12,9 @@
 #pragma link C++ class Belle2::TRGECLDigi0MC+;
 #pragma link C++ class Belle2::TRGECLHitMC+;
 #pragma link C++ class Belle2::TRGECLCluster+;
+//#pragma link C++ class Belle2::TRGECLUnpacker+;
+//#pragma link C++ class Belle2::TRGECLUnpackerAna+;
+//#pragma link C++ class Belle2::TRGECLUnpackerEVT+;
+#pragma link C++ class Belle2::TRGECLWaveform+;
 
 #endif

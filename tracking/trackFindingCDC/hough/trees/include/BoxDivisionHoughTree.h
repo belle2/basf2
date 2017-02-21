@@ -105,8 +105,10 @@ namespace Belle2 {
                           Width<I> nBinOverlap = 0,
                           Width<I> nBinWidth = 0)
       {
+        static_assert(std::is_integral<Width<I> >::value, "Method only applicable to discrete axes");
         const size_t division = getDivision(I);
-        const size_t nBins = std::pow(division, m_maxLevel + m_sectorLevelSkip);
+        const int granularityLevel = m_maxLevel + m_sectorLevelSkip;
+        const size_t nBins = std::pow(division, granularityLevel);
 
         if (nBinWidth == 0) {
           nBinWidth = nBinOverlap + 1;
@@ -122,11 +124,30 @@ namespace Belle2 {
 
       /// Provide an externally constructed array by coordinate index
       template <size_t I>
-      void
-      assignArray(Array<I> array, Width<I> overlap = 0)
+      void assignArray(Array<I> array, Width<I> overlap = 0)
       {
         std::get<I>(m_arrays) = std::move(array);
         std::get<I>(m_overlaps) = overlap;
+
+        // In case of a discrete axes, check whether the size of the array is sensible
+        // such that the bin width at the highest granularity level is a whole number given the overlap.
+        if (std::is_integral<Width<I> >::value) {
+          const int division = getDivision(I);
+          const int granularityLevel = m_maxLevel + m_sectorLevelSkip;
+          const long int nBins = std::pow(division, granularityLevel);
+          const long int nPositions = std::get<I>(m_arrays).size();
+          const long int nWidthTimeNBins = nPositions - 1 + (nBins - 1) * overlap;
+
+          B2ASSERT("Not enough positions in array to cover all bins.\n"
+                   "Expected: positions = " << nBins - (nBins - 1) * overlap + 1 << " at least.\n"
+                   "Actual:   positions = " << nPositions << " (overlap = " << overlap << ", bins = " << nBins << ")\n",
+                   nWidthTimeNBins >= nBins);
+
+          B2ASSERT("Number of positions in array introduces inhomogeneous width at the highest granularity level.\n"
+                   "Expected: positions = 'width * bins - (bins - 1) * overlap + 1'\n"
+                   "Actual:   positions = " << nPositions << " (overlap = " << overlap << ", bins = " << nBins << ")\n",
+                   nWidthTimeNBins % nBins == 0);
+        }
       }
 
       /// Provide an externally constructed array by coordinate type
@@ -134,8 +155,7 @@ namespace Belle2 {
       EnableIf< HasType<T>::value, void>
       assignArray(Array<TypeIndex<T>::value > array, Width<TypeIndex<T>::value > overlap = 0)
       {
-        std::get<TypeIndex<T>::value >(m_arrays) = std::move(array);
-        std::get<TypeIndex<T>::value >(m_overlaps) = overlap;
+        assignArray<TypeIndex<T>::value>(std::move(array), overlap);
       }
 
     public:
@@ -152,7 +172,7 @@ namespace Belle2 {
       template <class AItemPtrs>
       void seed(const AItemPtrs& items)
       {
-        if (not m_houghTree) { initialize(); }
+        if (not m_houghTree) initialize();
         m_houghTree->seed(items);
       }
 

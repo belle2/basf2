@@ -75,9 +75,9 @@ namespace Belle2 {
       /** number of detectors. Read from DOSI.xml*/
       int nDOSI = 8;
       /** Energy threshold */
-      double m_Threshold[8];
+      //double m_Threshold[8];
       /** Energy range */
-      double m_Range[8];
+      //double m_Range[8];
       /** Energy resolution factor */
       double m_EnergyResolutionFactor[8];
       /** Energy resolution constant */

@@ -89,18 +89,6 @@ main.add_module(evtgenInput)
 
 
 # ---------------------------------------------------------------------------------------
-# Gearbox to access stuff from the data folders, and Geometry:
-# TODO: Is this outdated?
-gearbox = register_module('Gearbox')
-main.add_module(gearbox)
-
-geometry = register_module('Geometry')
-geometry.param('components', ['BeamPipe',
-                              'MagneticFieldConstant4LimitedRSVD',  # TODO: Check this comment: Important: look at B field!
-                              'PXD',
-                              'SVD',
-                              'CDC'])
-main.add_module(geometry)
 
 # Detector Simulation:
 add_simulation(path=main,
@@ -120,7 +108,7 @@ mctrackfinder.param('UsePXDHits', False)
 mctrackfinder.param('Smearing', False)
 mctrackfinder.param('MinimalNDF', 6)
 mctrackfinder.param('WhichParticles', ['primary'])
-mctrackfinder.param('RecoTracksStoreArrayName', 'mcTracks')
+mctrackfinder.param('RecoTracksStoreArrayName', 'MCRecoTracks')
 main.add_module(mctrackfinder)
 
 

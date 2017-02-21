@@ -98,7 +98,7 @@ void FacetCreator::createFacets(const CDCWireHitCluster& wireHits,
   for (const CDCWireHit* ptrMiddleWireHit : wireHits) {
     if (not ptrMiddleWireHit) continue;
     const CDCWireHit& middleWireHit = *ptrMiddleWireHit;
-    if (middleWireHit.getAutomatonCell().hasTakenFlag()) continue;
+    if (middleWireHit->hasTakenFlag()) continue;
 
     const auto neighbors = neighborhood.equal_range(ptrMiddleWireHit);
     for (const WeightedRelation<const CDCWireHit>& startWireHitRelation : neighbors) {
@@ -106,14 +106,14 @@ void FacetCreator::createFacets(const CDCWireHitCluster& wireHits,
 
       if (not ptrStartWireHit) continue;
       const CDCWireHit& startWireHit = *ptrStartWireHit;
-      if (startWireHit.getAutomatonCell().hasTakenFlag()) continue;
+      if (startWireHit->hasTakenFlag()) continue;
 
       for (const WeightedRelation<const CDCWireHit>& endWireHitRelation : neighbors) {
         const CDCWireHit* ptrEndWireHit(endWireHitRelation.getTo());
 
         if (not ptrEndWireHit) continue;
         const CDCWireHit& endWireHit = *ptrEndWireHit;
-        if (endWireHit.getAutomatonCell().hasTakenFlag()) continue;
+        if (endWireHit->hasTakenFlag()) continue;
 
         // Skip combinations where the facet starts and ends on the same wire
         if (not(ptrStartWireHit->getWire() == ptrEndWireHit->getWire())) {
@@ -130,9 +130,9 @@ void FacetCreator::createFacetsForHitTriple(const CDCWireHit& startWireHit,
                                             std::vector<CDCFacet>& facets)
 {
   /// Prepare a facet - without fitted tangent lines.
-  CDCRLWireHit startRLWireHit(&startWireHit, ERightLeft::c_Left, startWireHit->getRefDriftLength());
-  CDCRLWireHit middleRLWireHit(&middleWireHit, ERightLeft::c_Left, middleWireHit->getRefDriftLength());
-  CDCRLWireHit endRLWireHit(&endWireHit, ERightLeft::c_Left, endWireHit->getRefDriftLength());
+  CDCRLWireHit startRLWireHit(&startWireHit, ERightLeft::c_Left, startWireHit.getRefDriftLength());
+  CDCRLWireHit middleRLWireHit(&middleWireHit, ERightLeft::c_Left, middleWireHit.getRefDriftLength());
+  CDCRLWireHit endRLWireHit(&endWireHit, ERightLeft::c_Left, endWireHit.getRefDriftLength());
   CDCFacet facet(startRLWireHit, middleRLWireHit, endRLWireHit, UncertainParameterLine2D());
 
   for (ERightLeft startRLInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {

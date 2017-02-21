@@ -59,6 +59,8 @@ RT2SPTCConverterModule::RT2SPTCConverterModule() :
 
   addParam("useSingleClusterSP", m_useSingleClusterSP, "Set to true if these SpacePoints should be used as fallback.", false);
 
+  addParam("markRecoTracks", m_markRecoTracks, "If True RecoTracks where conversion problems occurred are marked dirty.", false);
+
   initializeCounters();
 }
 
@@ -125,9 +127,12 @@ void RT2SPTCConverterModule::event()
       continue; /**< skip this recoTrack */
     }
 
-    if (spacePointStatePair.second.test(c_undefinedError) && !m_skipProblematicCluster) {
-      m_undefinedErrorCtr++;
-      continue; /**< skip this recoTrack */
+    if (spacePointStatePair.second.test(c_undefinedError)) {
+      if (!m_skipProblematicCluster) {
+        m_undefinedErrorCtr++;
+        continue;  /**< skip this recoTrack */
+      }
+      if (m_markRecoTracks) recoTrack.setDirtyFlag();
     }
 
     SpacePointTrackCand spacePointTC;
@@ -144,6 +149,7 @@ void RT2SPTCConverterModule::event()
     if (spacePointStatePair.second.test(c_singleCluster)) {
       m_singleClusterUseCtr++;
       spacePointTC.addRefereeStatus(SpacePointTrackCand::c_singleClustersSPs);
+      if (m_markRecoTracks) recoTrack.setDirtyFlag();
     }
 
     // convert momentum and position seed into a single 6D seed
@@ -160,7 +166,10 @@ void RT2SPTCConverterModule::event()
     spacePointTC.set6DSeed(seed6D);
     spacePointTC.setCovSeed(recoTrack.getSeedCovariance());
 
-    if (spacePointStatePair.second == ConversionState(0)) m_noFailCtr++;
+    if (spacePointStatePair.second == ConversionState(0)) {
+      m_noFailCtr++;
+      if (m_markRecoTracks) recoTrack.setDirtyFlag(false);
+    }
 
     spacePointTrackCands.appendNew(spacePointTC)->addRelationTo(&recoTrack);
   } // end RecoTrack loop

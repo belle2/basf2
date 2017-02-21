@@ -52,7 +52,8 @@ namespace Belle2 {
           return false;
         for (unsigned int i = 0; i < node1.daughters.size(); ++i) {
           if (node1.daughters[i] != node2.daughters[i])
-            return false;
+            if (node1.daughters[i] != 0 and node2.daughters[i] != 0)
+              return false;
         }
       }
       return true;

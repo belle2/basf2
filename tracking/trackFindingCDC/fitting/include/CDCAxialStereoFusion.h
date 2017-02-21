@@ -37,6 +37,11 @@ namespace Belle2 {
        */
       void reconstructFuseTrajectories(const CDCSegmentPair& segmentPair);
 
+      /**
+       *  Fit the given segment pair using the preliminary helix fit without proper covariance matrix.
+       *
+       *  Updates the contained trajectory.
+       */
       void fusePreliminary(const CDCSegmentPair& segmentPair);
 
       /**
@@ -45,6 +50,11 @@ namespace Belle2 {
       CDCTrajectory3D reconstructFuseTrajectories(const CDCSegment2D& fromSegment2D,
                                                   const CDCSegment2D& toSegment2D);
 
+      /**
+       *  Fit the two given segments together using the preliminary helix fit without proper covariance matrix.
+       *
+       *  The fit is used as the expansion point for the least square fuse fit with proper covariance.
+       */
       CDCTrajectory3D fusePreliminary(const CDCSegment2D& fromSegment2D,
                                       const CDCSegment2D& toSegment2D);
 

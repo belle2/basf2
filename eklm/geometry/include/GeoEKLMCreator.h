@@ -32,7 +32,6 @@
 #include <eklm/simulation/EKLMSensitiveDetector.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/G4TriangularPrism.h>
-#include <eklm/geometry/GeoEKLMTypes.h>
 #include <eklm/geometry/TransformData.h>
 
 /**
@@ -101,26 +100,11 @@ namespace Belle2 {
      * @var Solids::psheet
      * Plastic sheets (combined).
      *
-     * @var Solids::stripvol
-     * Strip volumes.
-     *
      * @var Solids::strip
      * Strips.
      *
      * @var Solids::groove
      * Strip grooves.
-     *
-     * @var Solids::sipm
-     * SiPM.
-     *
-     * @var Solids::board
-     * Readout board.
-     *
-     * @var Solids::baseboard
-     * Readout board base.
-     *
-     * @var Solids::stripboard
-     * Readout board for 1 strip.
      *
      * @var Solids::subtractionBox
      * Box used for subtractions.
@@ -137,13 +121,8 @@ namespace Belle2 {
       G4VSolid** stripSegment;
       G4VSolid** plasticSheetElement;
       G4VSolid** psheet;
-      G4VSolid** stripvol;
       G4VSolid** strip;
       G4VSolid** groove;
-      G4VSolid* sipm;
-      G4VSolid* board;
-      G4VSolid* baseboard;
-      G4VSolid* stripboard;
       G4Box* subtractionBox;
       struct SectorSupportSolids sectorsup;
     };
@@ -166,9 +145,6 @@ namespace Belle2 {
      *
      * @var LogicalVolumes::stripSegment
      * Strip segments.
-     *
-     * @var LogicalVolumes::stripvol
-     * Strip volumes.
      *
      * @var LogicalVolumes::strip
      * Strips.
@@ -197,7 +173,6 @@ namespace Belle2 {
       G4LogicalVolume* cover;
       G4LogicalVolume** segment;
       G4LogicalVolume** stripSegment;
-      G4LogicalVolume** stripvol;
       G4LogicalVolume** strip;
       G4LogicalVolume** groove;
       G4LogicalVolume** scint;
@@ -231,7 +206,6 @@ namespace Belle2 {
       int plane;   /**< Plane. */
       int segment; /**< Segment. */
       int strip;   /**< Strip. */
-      int board;   /**< Board. */
     };
 
     /**
@@ -422,14 +396,6 @@ namespace Belle2 {
         double x, double y, double ang);
 
       /**
-       * Subtract board solids from planes.
-       * @param[in] plane Plane solid without boards subtracted.
-       * @param[in] n     Number of plane, from 0 to 1.
-       */
-      G4SubtractionSolid* subtractBoardSolids(G4SubtractionSolid* plane,
-                                              int n);
-
-      /**
        * Create plane solid.
        * @param[in] n Number of plane, from 0 to 1.
        */
@@ -469,12 +435,6 @@ namespace Belle2 {
        * @param[in] iSegment Number of segment (0-based).
        */
       void createSegmentLogicalVolume(int iSegment);
-
-      /**
-       * Create strip volume logical volume.
-       * @param[in] iStrip Number of strip in length-based array.
-       */
-      void createStripVolumeLogicalVolume(int iStrip);
 
       /**
        * Create strip logical volume.
@@ -605,27 +565,6 @@ namespace Belle2 {
       G4LogicalVolume* createPlane(G4LogicalVolume* sector) const;
 
       /**
-       * Create segment readout board.
-       * @param[in] sector Sector logical volume.
-       * @return Segment readout board logical volume.
-       */
-      G4LogicalVolume* createSegmentReadoutBoard(G4LogicalVolume* sector) const;
-
-      /**
-       * Create base board of segment readout board.
-       * @param[in] segmentReadoutBoard Segment readout board logical volume.
-       */
-      void createBaseBoard(G4LogicalVolume* segmentReadoutBoard) const;
-
-      /**
-       * Create strip readout board.
-       * @param[in] iBoard              Number of board.
-       * @param[in] segmentReadoutBoard Segment readout board logical volume.
-       */
-      void createStripBoard(int iBoard,
-                            G4LogicalVolume* segmentReadoutBoard) const;
-
-      /**
        * Create segment support.
        * @param[in] iSegmentSupport Number of segment support.
        * @param[in] plane           Plane logical volume.
@@ -653,22 +592,10 @@ namespace Belle2 {
       void createSegment(G4LogicalVolume* plane) const;
 
       /**
-       * Create strip volume.
-       * @param[in] segment Segment logical volume.
-       */
-      void createStripVolume(G4LogicalVolume* segment) const;
-
-      /**
-       * Create strip (version for normal mode).
+       * Create strip.
        * @param[in] segment Segment logical volume.
        */
       void createStrip(G4LogicalVolume* segment) const;
-
-      /**
-       * Create strip (version for background study mode).
-       * @param[in] iStrip Number of strip in the length-based array.
-       */
-      void createStrip(int iStrip) const;
 
       /**
        * Create strip groove.
@@ -683,12 +610,6 @@ namespace Belle2 {
       void createScintillator(int iStrip) const;
 
       /**
-       * Create silicon cube in the place of SiPM for radiation study.
-       * @param[in] iStrip Number of strip in the length-based array.
-       */
-      void createSiPM(int iStrip) const;
-
-      /**
        * Create shield.
        * @param[in] sector Sector logical volume.
        */
@@ -698,11 +619,6 @@ namespace Belle2 {
        * Create new volumes.
        */
       void newVolumes();
-
-      /**
-       * Create new transformations.
-       */
-      void newTransforms();
 
       /**
        * Create new sensitive detectors.
@@ -715,11 +631,6 @@ namespace Belle2 {
       void deleteVolumes();
 
       /**
-       * Delete transformations.
-       */
-      void deleteTransforms();
-
-      /**
        * Delete sensitive detectors.
        */
       void deleteSensitive();
@@ -729,11 +640,6 @@ namespace Belle2 {
        * @return Angle.
        */
       double getSectorSupportCornerAngle();
-
-      /**
-       * Calculate board transformations.
-       */
-      void calcBoardTransform();
 
       /**
        * Creation of the detector geometry.
@@ -759,11 +665,8 @@ namespace Belle2 {
       /** Geometry data. */
       const GeometryData* m_GeoDat;
 
-      /** Transformations of boards from sector reference frame. */
-      G4Transform3D* m_BoardTransform[2];
-
-      /** Sensitive detectors. */
-      EKLMSensitiveDetector* m_Sensitive[3];
+      /** Sensitive detector. */
+      EKLMSensitiveDetector* m_Sensitive;
 
     };
 

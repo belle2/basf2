@@ -1,0 +1,30 @@
+# EventType: 4110840005
+# Descriptor: [Upsilon6S_piZb10650_piY3Sll]
+# NickName: Upsilon6S_piZb10650_piY3Sll 
+# Cuts: None
+# Documentation: Decay for Y(6S) physics
+# PhysicsWG: Bottomonium
+# Tested: Yes
+# Responsible: Bryan Fulsom
+# Email: bryan.fulsom@pnnl.gov
+# Date: 20161101
+
+Decay Upsilon(6S)
+0.5 pi+ Zb(10650)- PHSP;
+0.5 pi- Zb(10650)+ PHSP;
+Enddecay
+
+Decay Zb(10650)-
+1.0 pi- Upsilon(3S) PHSP;
+Enddecay
+
+Decay Zb(10650)+
+1.0 pi+ Upsilon(3S) PHSP;
+Enddecay
+
+Decay Upsilon(3S)
+1.000 e+ e- PHOTOS VLL; #[was 0.0181 - setting this equal to mumu]
+1.000 mu+ mu- PHOTOS VLL; #[Reconstructed PDG2014]
+Enddecay
+
+End

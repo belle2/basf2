@@ -32,6 +32,9 @@ namespace Belle2 {
     /// Type for discrete curv values
     using DiscreteCurv = DiscreteValue<float, CurvTag>;
 
+    /// Type to have explicit curv values
+    using ContinuousCurv = ContinuousValue<double, CurvTag>;
+
     /**
      *  Class representing a curvature value that also caches two dimensional arc length
      *  to each layer in the CDC
@@ -43,16 +46,21 @@ namespace Belle2 {
 
       /// Unpack the curvature
       explicit operator float() const
-      { return m_curv; }
+      {
+        return m_curv;
+      }
 
       /// Return the two dimensional arc length to the given layer id
       float getArcLength2D(ILayer iCLayer, bool secondArm = false) const
-      { return secondArm ? m_secondaryArcLength2DByICLayer[iCLayer] : m_arcLength2DByICLayer[iCLayer]; }
+      {
+        return secondArm ? m_secondaryArcLength2DByICLayer[iCLayer] : m_arcLength2DByICLayer[iCLayer];
+      }
 
       /// Output operator for debugging
-      friend std::ostream& operator<<(std::ostream& output,
-                                      const CurvWithArcLength2DCache& value)
-      { return output << value.m_curv; }
+      friend std::ostream& operator<<(std::ostream& output, const CurvWithArcLength2DCache& value)
+      {
+        return output << value.m_curv;
+      }
 
     private:
       /// Memory for the curvature

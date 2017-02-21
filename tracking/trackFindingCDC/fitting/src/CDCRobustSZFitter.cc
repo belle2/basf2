@@ -15,6 +15,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 
+#include <tracking/trackFindingCDC/numerics/Median.h>
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
@@ -23,47 +24,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace Eigen;
-
-namespace {
-  double median(std::vector<double> values)
-  {
-    auto notfinite = [](double v) { return not std::isfinite(v); };
-    erase_remove_if(values, notfinite);
-
-    int n = values.size();
-    if (n == 0) return NAN;
-    std::nth_element(values.begin(), values.begin() + n / 2, values.end());
-    if (n % 2) {
-      // For an even number of values the median is the average of the two central values.
-      double upper = values[n / 2];
-      double lower = *std::max_element(values.begin(), values.begin() + n / 2);
-      return (lower + upper) / 2;
-    } else {
-      return values[n / 2];
-    }
-  }
-
-  double weightedMedian(std::vector<WithWeight<double> > weightedValues)
-  {
-    auto notfinite = [](const WithWeight<double>& weightedValue) {
-      return not std::isfinite(weightedValue) or not std::isfinite(weightedValue.getWeight());
-    };
-    erase_remove_if(weightedValues, notfinite);
-
-    if (weightedValues.empty()) return NAN;
-
-    std::sort(weightedValues.begin(), weightedValues.end());
-
-    /// Accumulate the weight overall sorted values
-    Weight totalWeight = 0;
-    for (WithWeight<double>& weightedValue : weightedValues) {
-      totalWeight += weightedValue.getWeight();
-      weightedValue.setWeight(totalWeight);
-    }
-    auto it = std::upper_bound(weightedValues.begin(), weightedValues.end(), totalWeight / 2);
-    return it == weightedValues.end() ? weightedValues.back() : *it;
-  }
-}
 
 CDCTrajectorySZ CDCRobustSZFitter::fitUsingSimplifiedTheilSen(const CDCSZObservations& observationsSZ) const
 {

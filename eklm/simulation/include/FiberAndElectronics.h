@@ -30,8 +30,9 @@ namespace Belle2 {
 
       /** Photoelectron data. */
       struct Photoelectron {
-        int bin;        /**< Hit time bin in ADC output histogram */
-        double expTime; /**< exp(-m_DigPar->PEAttenuationFreq * (-time)) */
+        int bin;          /**< Hit time bin in ADC output histogram */
+        double expTime;   /**< exp(-m_DigPar->PEAttenuationFreq * (-time)) */
+        bool isReflected; /**< Direct (false) or reflected (true). */
       };
 
       /**
@@ -56,9 +57,9 @@ namespace Belle2 {
       void processEntry();
 
       /**
-       * Get fit results.
+       * Get fit data.
        */
-      struct FPGAFitParams* getFitResults();
+      EKLMFPGAFit* getFPGAFit();
 
       /**
        * Get fit status.
@@ -85,18 +86,24 @@ namespace Belle2 {
                        std::multimap<int, EKLMSimHit*>::iterator& end);
 
       /**
-       * Fill SiPM output.
+       * Generate photoelectrons.
        * @param[in]     stripLen    Strip length.
        * @param[in]     distSiPM    Distance from hit to SiPM.
        * @param[in]     nPE         Number of photons to be simulated.
        * @param[in]     timeShift   Time of hit.
        * @param[in]     isReflected Whether the hits are reflected or not.
-       * @param[in,out] hist        Output histogram (signal is added to it).
-       * @param[out]    gnpe        Number of generated photoelectrons.
        */
-      void fillSiPMOutput(double stripLen, double distSiPM, int nPhotons,
-                          double timeShift, bool isReflected, float* hist,
-                          int* gnpe);
+      void generatePhotoelectrons(double stripLen, double distSiPM,
+                                  int nPhotons, double timeShift,
+                                  bool isReflected);
+
+      /**
+       * Fill SiPM output.
+       * @param[in,out] hist         Output histogram (signal is added to it).
+       * @param[in]     useDirect    Use direct photons.
+       * @param[in]     useReflected Use reflected photons.
+       */
+      void fillSiPMOutput(float* hist, bool useDirect, bool useReflected);
 
     private:
 
@@ -148,8 +155,8 @@ namespace Belle2 {
       /** FPGA fit status. */
       enum FPGAFitStatus m_FPGAStat;
 
-      /** FPGA fit results. */
-      struct FPGAFitParams m_FPGAParams;
+      /** FPGA fit data. */
+      EKLMFPGAFit m_FPGAFit;
 
       /** Number of photoelectrons (generated). */
       int m_npe;

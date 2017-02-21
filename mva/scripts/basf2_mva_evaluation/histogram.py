@@ -21,7 +21,7 @@ def poisson_error(n_tot):
     """
     use poisson error, except for 0 we use an 68% CL upper limit
     """
-    return numpy.where(n_tot > 0, numpy.sqrt(n_tot), numpy.log(1.0/(1-0.6827)))
+    return numpy.where(n_tot > 0, numpy.sqrt(n_tot), numpy.log(1.0 / (1 - 0.6827)))
 
 
 class Histograms(object):
@@ -43,7 +43,7 @@ class Histograms(object):
     #: Dictionary of histograms for the given masks
     hists = None
 
-    def __init__(self, data, column, masks=dict(), weight_column=None, bins=100):
+    def __init__(self, data, column, masks=dict(), weight_column=None, bins=100, equal_frequency=True):
         """
         Creates a common binning of the given column of the given pandas.Dataframe,
         and stores for each given mask the histogram of the column
@@ -53,8 +53,11 @@ class Histograms(object):
                      used for the creation of histograms with these names
         @param weight_column identifiying the column in the pandas.DataFrame which is used as weight
         @param bins use given bins instead of default 100
+        @param equal_frequency perform an equal_frequency binning
         """
         isfinite = numpy.isfinite(data[column])
+        if equal_frequency:
+            bins = numpy.percentile(data[column][isfinite], q=range(bins + 1))
         self.hist, self.bins = numpy.histogram(data[column][isfinite], bins=bins,
                                                weights=None if weight_column is None else data[weight_column])
         self.bin_centers = (self.bins + numpy.roll(self.bins, 1))[1:] / 2.0
@@ -62,8 +65,8 @@ class Histograms(object):
         self.bin_widths = (self.bins - numpy.roll(self.bins, 1))[1:] - 0.00001
         self.hists = dict()
         for name, mask in masks.items():
-            self.hists[name] = numpy.histogram(data[column][mask], bins=self.bins,
-                                               weights=None if weight_column is None else data[weight_column][mask])[0]
+            self.hists[name] = numpy.histogram(data[column][mask & isfinite], bins=self.bins,
+                                               weights=None if weight_column is None else data[weight_column][mask & isfinite])[0]
 
     def get_hist(self, name=None):
         """
@@ -98,6 +101,28 @@ class Histograms(object):
         efficiency = cumsignal / signal.sum()
         efficiency_error = binom_error(cumsignal, signal.sum())
         return efficiency, efficiency_error
+
+    def get_true_positives(self, signal_names):
+        """
+        Return the cumulative true positives in each bin of the sum of the histograms with the given names.
+        @param names names of the histograms
+        @return numpy.array with hist data, numpy.array with corresponding binomial errors
+        """
+        signal, _ = self.get_summed_hist(signal_names)
+        cumsignal = (signal.sum() - signal.cumsum()).astype('float')
+        signal_error = poisson_error(cumsignal)
+        return cumsignal, signal_error
+
+    def get_false_positives(self, bckgrd_names):
+        """
+        Return the cumulative false positives in each bin of the sum of the histograms with the given names.
+        @param names names of the histograms
+        @return numpy.array with hist data, numpy.array with corresponding binomial errors
+        """
+        background, _ = self.get_summed_hist(bckgrd_names)
+        cumbackground = (background.sum() - background.cumsum()).astype('float')
+        background_error = poisson_error(cumbackground)
+        return cumbackground, background_error
 
     def get_purity(self, signal_names, bckgrd_names):
         """

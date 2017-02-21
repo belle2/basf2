@@ -41,10 +41,10 @@ void SegmentRejecter::apply(std::vector<CDCSegment2D>& segment2Ds)
 {
   auto reject = [this](CDCSegment2D & segment2D) {
     double filterWeight = m_segmentFilter(segment2D);
-    segment2D.getAutomatonCell().setCellWeight(filterWeight);
+    segment2D->setCellWeight(filterWeight);
     if (std::isnan(filterWeight)) {
-      segment2D.getAutomatonCell().setBackgroundFlag();
-      segment2D.getAutomatonCell().setTakenFlag();
+      segment2D->setBackgroundFlag();
+      segment2D->setTakenFlag();
       return true;
     } else {
       return false;

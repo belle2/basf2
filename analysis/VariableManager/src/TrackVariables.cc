@@ -78,6 +78,32 @@ namespace Belle2 {
       return trackNPXDHits(part) + trackNSVDHits(part);
     }
 
+    double trackFirstSVDLayer(const Particle* part)
+    {
+      const Track* track = part->getTrack();
+      if (!track) {
+        return 0.0;
+      }
+      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
+      if (!trackFit) {
+        return 0.0;
+      }
+      return trackFit->getHitPatternVXD().getFirstSVDLayer();
+    }
+
+    double trackFirstPXDLayer(const Particle* part)
+    {
+      const Track* track = part->getTrack();
+      if (!track) {
+        return 0.0;
+      }
+      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
+      if (!trackFit) {
+        return 0.0;
+      }
+      return trackFit->getHitPatternVXD().getFirstPXDLayer(HitPatternVXD::PXDMode::normal);
+    }
+
     double trackD0(const Particle* part)
     {
       const Track* track = part->getTrack();
@@ -89,6 +115,28 @@ namespace Belle2 {
       return trackFit->getD0();
     }
 
+    double trackPhi0(const Particle* part)
+    {
+      const Track* track = part->getTrack();
+      if (!track) return 0.0;
+
+      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
+      if (!trackFit) return 0.0;
+
+      return trackFit->getPhi0();
+    }
+
+    double trackOmega(const Particle* part)
+    {
+      const Track* track = part->getTrack();
+      if (!track) return 0.0;
+
+      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
+      if (!trackFit) return 0.0;
+
+      return trackFit->getOmega();
+    }
+
     double trackZ0(const Particle* part)
     {
       const Track* track = part->getTrack();
@@ -98,6 +146,17 @@ namespace Belle2 {
       if (!trackFit) return 0.0;
 
       return trackFit->getZ0();
+    }
+
+    double trackTanLambda(const Particle* part)
+    {
+      const Track* track = part->getTrack();
+      if (!track) return 0.0;
+
+      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
+      if (!trackFit) return 0.0;
+
+      return trackFit->getTanLambda();
     }
 
     double trackD0Error(const Particle* part)
@@ -115,6 +174,36 @@ namespace Belle2 {
         return 0.0;
     }
 
+    double trackPhi0Error(const Particle* part)
+    {
+      const Track* track = part->getTrack();
+      if (!track) return 0.0;
+
+      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
+      if (!trackFit) return 0.0;
+
+      double errorSquared = trackFit->getCovariance5()[1][1];
+      if (errorSquared > 0.0)
+        return sqrt(errorSquared);
+      else
+        return 0.0;
+    }
+
+    double trackOmegaError(const Particle* part)
+    {
+      const Track* track = part->getTrack();
+      if (!track) return 0.0;
+
+      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
+      if (!trackFit) return 0.0;
+
+      double errorSquared = trackFit->getCovariance5()[2][2];
+      if (errorSquared > 0.0)
+        return sqrt(errorSquared);
+      else
+        return 0.0;
+    }
+
     double trackZ0Error(const Particle* part)
     {
       const Track* track = part->getTrack();
@@ -124,6 +213,21 @@ namespace Belle2 {
       if (!trackFit) return 0.0;
 
       double errorSquared = trackFit->getCovariance5()[3][3];
+      if (errorSquared > 0.0)
+        return sqrt(errorSquared);
+      else
+        return 0.0;
+    }
+
+    double trackTanLambdaError(const Particle* part)
+    {
+      const Track* track = part->getTrack();
+      if (!track) return 0.0;
+
+      const TrackFitResult* trackFit = track->getTrackFitResult(Const::ChargedStable(abs(part->getPDGCode())));
+      if (!trackFit) return 0.0;
+
+      double errorSquared = trackFit->getCovariance5()[4][4];
       if (errorSquared > 0.0)
         return sqrt(errorSquared);
       else
@@ -147,11 +251,19 @@ namespace Belle2 {
     REGISTER_VARIABLE("nSVDHits", trackNSVDHits,     "Number of SVD hits associated to the track");
     REGISTER_VARIABLE("nPXDHits", trackNPXDHits,     "Number of PXD hits associated to the track");
     REGISTER_VARIABLE("nVXDHits", trackNVXDHits,     "Number of PXD and SVD hits associated to the track");
+    REGISTER_VARIABLE("firstSVDLayer", trackFirstSVDLayer,     "First activated SVD layer associated to the track");
+    REGISTER_VARIABLE("firstPXDLayer", trackFirstPXDLayer,     "First activated PXD layer associated to the track");
 
-    REGISTER_VARIABLE("d0",     trackD0,     "Signed distance to the POCA in the r-phi plane");
-    REGISTER_VARIABLE("z0",     trackZ0,     "z coordinate of the POCA");
-    REGISTER_VARIABLE("d0Err",  trackD0Error,     "Error of signed distance to the POCA in the r-phi plane");
-    REGISTER_VARIABLE("z0Err",  trackZ0Error,     "Error of z coordinate of the POCA");
+    REGISTER_VARIABLE("d0",        trackD0,        "Signed distance to the POCA in the r-phi plane");
+    REGISTER_VARIABLE("phi0",      trackPhi0,      "Angle of the transverse momentum in the r-phi plane");
+    REGISTER_VARIABLE("omega",     trackOmega,     "Curvature of the track");
+    REGISTER_VARIABLE("z0",        trackZ0,        "z coordinate of the POCA");
+    REGISTER_VARIABLE("tanlambda", trackTanLambda, "Slope of the track in the r-z plane");
+    REGISTER_VARIABLE("d0Err",        trackD0Error,        "Error of signed distance to the POCA in the r-phi plane");
+    REGISTER_VARIABLE("phi0Err",      trackPhi0Error,      "Error of angle of the transverse momentum in the r-phi plane");
+    REGISTER_VARIABLE("omegaErr",     trackOmegaError,     "Error of curvature of the track");
+    REGISTER_VARIABLE("z0Err",        trackZ0Error,        "Error of z coordinate of the POCA");
+    REGISTER_VARIABLE("tanlambdaErr", trackTanLambdaError, "Error of slope of the track in the r-z plane");
     REGISTER_VARIABLE("pValue", trackPValue, "chi2 probalility of the track fit");
 
   }

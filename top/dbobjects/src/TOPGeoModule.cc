@@ -10,11 +10,40 @@
 
 #include <top/dbobjects/TOPGeoModule.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
 #include <math.h>
 #include <iostream>
 
 using namespace std;
 using namespace Belle2;
+
+void TOPGeoModule::setBrokenGlue(int glueID, double fraction, double angle,
+                                 const std::string& material)
+{
+  switch (glueID) {
+    case 1:
+      m_mirror.setGlueDelamination(fraction, angle, material);
+      break;
+    case 2:
+      m_bar1.setGlueDelamination(fraction, angle, material);
+      break;
+    case 3:
+      m_bar2.setGlueDelamination(fraction, angle, material);
+      break;
+    default:
+      B2ERROR("TOPGeoModule::setBrokenGlue: invalid glue ID " << glueID);
+  }
+}
+
+
+void TOPGeoModule::setPeelOffRegions(double thickness, const std::string& material)
+{
+  double size = 2 * m_pmtArray.getDx();
+  double offset = (m_pmtArray.getX(1) + m_pmtArray.getX(2)) / 2 +
+                  m_arrayDisplacement.getX();
+  m_prism.setPeelOffRegions(size, offset, thickness, material);
+}
+
 
 TVector3 TOPGeoModule::pointToGlobal(const TVector3& point) const
 {
@@ -67,23 +96,32 @@ bool TOPGeoModule::isConsistent() const
 }
 
 
-void TOPGeoModule::print(const std::string& title) const
+void TOPGeoModule::print(const std::string&) const
 {
-  TOPGeoBase::print(title);
+  cout << "Slot " << getModuleID() << " geometry parameters:" << endl;
+  cout << "---------------------------" << endl;
+  cout << " name: " << m_name << endl;
+  cout << " moduleID = " << getModuleID();
+  cout << ", radius = " << getRadius() << " " << s_unitName;
+  cout << ", phi = " << getPhi() / Unit::deg << " deg";
+  cout << ", backward z = " << getBackwardZ() << " " << s_unitName;
+  cout << ", construction number = " << getModuleCNumber() << endl;
+  cout << endl;
 
-  cout << " moduleID: " << getModuleID();
-  cout << " radius: " << getRadius() << " " << s_unitName;
-  cout << " phi: " << getPhi();
-  cout << " backwardZ: " << getBackwardZ() << " " << s_unitName;
-  cout << " CNumber: " << getModuleCNumber() << endl;
-
-  m_bar1.print("Bar segment 1 geometry parameters");
-  m_bar2.print("Bar segment 2 geometry parameters");
-  m_mirror.print();
   m_prism.print();
+  cout << endl;
+  m_bar2.print("Bar segment 2 (backward) geometry parameters");
+  cout << endl;
+  m_bar1.print("Bar segment 1 (forward) geometry parameters");
+  cout << endl;
+  m_mirror.print();
+  cout << endl;
   m_pmtArray.print();
+  cout << endl;
   m_arrayDisplacement.print();
+  cout << endl;
   m_moduleDisplacement.print();
+  cout << endl;
 
 }
 

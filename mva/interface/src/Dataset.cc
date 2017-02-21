@@ -24,6 +24,7 @@ namespace Belle2 {
     Dataset::Dataset(const GeneralOptions& general_options) : m_general_options(general_options)
     {
       m_input.resize(m_general_options.m_variables.size(), 0);
+      m_spectators.resize(m_general_options.m_spectators.size(), 0);
       m_target = 0.0;
       m_weight = 1.0;
       m_isSignal = false;
@@ -51,6 +52,18 @@ namespace Belle2 {
       for (unsigned int iEvent = 0; iEvent < getNumberOfEvents(); ++iEvent) {
         loadEvent(iEvent);
         result[iEvent] = m_input[iFeature];
+      }
+      return result;
+
+    }
+
+    std::vector<float> Dataset::getSpectator(unsigned int iSpectator)
+    {
+
+      std::vector<float> result(getNumberOfEvents());
+      for (unsigned int iEvent = 0; iEvent < getNumberOfEvents(); ++iEvent) {
+        loadEvent(iEvent);
+        result[iEvent] = m_spectators[iSpectator];
       }
       return result;
 
@@ -93,17 +106,20 @@ namespace Belle2 {
     }
 
 
-    SingleDataset::SingleDataset(const GeneralOptions& general_options, const std::vector<float>& input,
-                                 float target) : Dataset(general_options)
+    SingleDataset::SingleDataset(const GeneralOptions& general_options, const std::vector<float>& input, float target,
+                                 const std::vector<float>& spectators) : Dataset(general_options)
     {
       m_input = input;
+      m_spectators = spectators;
       m_target = target;
       m_weight = 1.0;
       m_isSignal = std::lround(target) == m_general_options.m_signal_class;
     }
 
-    MultiDataset::MultiDataset(const GeneralOptions& general_options, const std::vector<std::vector<float>>& matrix,
-                               const std::vector<float>& targets, const std::vector<float>& weights) : Dataset(general_options),  m_matrix(matrix),
+    MultiDataset::MultiDataset(const GeneralOptions& general_options, const std::vector<std::vector<float>>& input,
+                               const std::vector<std::vector<float>>& spectators,
+                               const std::vector<float>& targets, const std::vector<float>& weights) : Dataset(general_options),  m_matrix(input),
+      m_spectator_matrix(spectators),
       m_targets(targets), m_weights(weights)
     {
 
@@ -115,12 +131,18 @@ namespace Belle2 {
         B2ERROR("Feature matrix and weight vector need same number of elements in MultiDataset, got " << m_weights.size() << " and " <<
                 m_matrix.size());
       }
+      if (m_spectator_matrix.size() > 0 and m_matrix.size() != m_spectator_matrix.size()) {
+        B2ERROR("Feature matrix and spectator matrix need same number of elements in MultiDataset, got " << m_spectator_matrix.size() <<
+                " and " <<
+                m_matrix.size());
+      }
     }
 
 
     void MultiDataset::loadEvent(unsigned int iEvent)
     {
       m_input = m_matrix[iEvent];
+      m_spectators = m_spectator_matrix[iEvent];
 
       if (m_targets.size() > 0) {
         m_target = m_targets[iEvent];
@@ -143,6 +165,15 @@ namespace Belle2 {
           throw std::runtime_error("Couldn't find variable " + v + " in GeneralOptions");
         }
         m_feature_indices.push_back(it - m_dataset.m_general_options.m_variables.begin());
+      }
+
+      for (auto& v : m_general_options.m_spectators) {
+        auto it = std::find(m_dataset.m_general_options.m_spectators.begin(), m_dataset.m_general_options.m_spectators.end(), v);
+        if (it == m_dataset.m_general_options.m_spectators.end()) {
+          B2ERROR("Couldn't find spectator " << v << " in GeneralOptions");
+          throw std::runtime_error("Couldn't find spectator " + v + " in GeneralOptions");
+        }
+        m_spectator_indices.push_back(it - m_dataset.m_general_options.m_spectators.begin());
       }
 
       if (events.size() > 0)
@@ -176,12 +207,30 @@ namespace Belle2 {
         m_input[iFeature] = m_dataset.m_input[m_feature_indices[iFeature]];
       }
 
+      for (unsigned int iSpectator = 0; iSpectator < m_spectators.size(); ++iSpectator) {
+        m_spectators[iSpectator] = m_dataset.m_spectators[m_spectator_indices[iSpectator]];
+      }
+
     }
 
     std::vector<float> SubDataset::getFeature(unsigned int iFeature)
     {
 
       auto v = m_dataset.getFeature(m_feature_indices[iFeature]);
+      if (not m_use_event_indices)
+        return v;
+      std::vector<float> result(m_event_indices.size());
+      for (unsigned int iEvent = 0; iEvent < getNumberOfEvents(); ++iEvent) {
+        result[iEvent] = v[m_event_indices[iEvent]];
+      }
+      return result;
+
+    }
+
+    std::vector<float> SubDataset::getSpectator(unsigned int iSpectator)
+    {
+
+      auto v = m_dataset.getSpectator(m_spectator_indices[iSpectator]);
       if (not m_use_event_indices)
         return v;
       std::vector<float> result(m_event_indices.size());
@@ -240,6 +289,25 @@ namespace Belle2 {
     std::vector<float> ROOTDataset::getFeature(unsigned int iFeature)
     {
       std::string branchName = Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]);
+      int nentries = getNumberOfEvents();
+      std::vector<float> values(nentries);
+
+      float object;
+      m_tree->SetBranchStatus("*", 0);
+      m_tree->SetBranchStatus(branchName.c_str(), 1);
+      m_tree->SetBranchAddress(branchName.c_str(), &object);
+      for (int i = 0; i < nentries; ++i) {
+        m_tree->GetEvent(i);
+        values[i] = object;
+      }
+      m_tree->SetBranchStatus("*", 1);
+      setBranchAddresses();
+      return values;
+    }
+
+    std::vector<float> ROOTDataset::getSpectator(unsigned int iSpectator)
+    {
+      std::string branchName = Belle2::makeROOTCompatible(m_general_options.m_spectators[iSpectator]);
       int nentries = getNumberOfEvents();
       std::vector<float> values(nentries);
 
@@ -318,6 +386,20 @@ namespace Belle2 {
             B2ERROR("Couldn't find given feature variable named " << m_general_options.m_variables[i] <<
                     " (I tried also using makeROOTCompatible)");
             throw std::runtime_error("Couldn't find given feature variable named " + m_general_options.m_variables[i] +
+                                     " (I tried also using makeROOTCompatible)");
+          }
+        }
+
+      for (unsigned int i = 0; i < m_general_options.m_spectators.size(); ++i)
+        if (checkForBranch(m_tree, m_general_options.m_spectators[i])) {
+          m_tree->SetBranchAddress(m_general_options.m_spectators[i].c_str(), &m_spectators[i]);
+        } else {
+          if (checkForBranch(m_tree, Belle2::makeROOTCompatible(m_general_options.m_spectators[i]))) {
+            m_tree->SetBranchAddress(Belle2::makeROOTCompatible(m_general_options.m_spectators[i]).c_str(), &m_spectators[i]);
+          } else {
+            B2ERROR("Couldn't find given spectator variable named " << m_general_options.m_spectators[i] <<
+                    " (I tried also using makeROOTCompatible)");
+            throw std::runtime_error("Couldn't find given spectator variable named " + m_general_options.m_spectators[i] +
                                      " (I tried also using makeROOTCompatible)");
           }
         }

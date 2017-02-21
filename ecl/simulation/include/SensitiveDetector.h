@@ -12,6 +12,7 @@
 #define ECLSENSITIVEDETECTOR_H_
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
+#include <simulation/dataobjects/BeamBackHit.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <ecl/dataobjects/ECLSimHit.h>
@@ -87,6 +88,28 @@ namespace Belle2 {
       std::vector<hit_t> m_hits;
       std::vector<int> m_cells;
       StoreArray<ECLHit> m_eclHits;         /**< ECLHit array */
+    };
+
+    /** Class for ECL Sensitive Detector for neutron background study*/
+    class BkgSensitiveDiode: public Simulation::SensitiveDetectorBase {
+    public:
+      /** Constructor */
+      explicit BkgSensitiveDiode(const G4String&);
+
+      /** Process each step and calculate variables defined in ECLHit */
+      bool step(G4Step* aStep, G4TouchableHistory* history);
+    private:
+      int m_trackID;          /**< track id */
+      TVector3 m_startPos;    /**< particle position at the entrance in volume */
+      TVector3 m_startMom;    /**< particle momentum at the entrance in volume */
+      double m_startTime;     /**< global time */
+      double m_startEnergy;   /**< particle energy at the entrance in volume */
+      double m_energyDeposit; /**< energy deposited in volume */
+      double m_trackLength;   /**< length of the track in the volume */
+      ECLGeometryPar* m_eclp; /**< pointer to ECLGeometryPar */
+      StoreArray<MCParticle> m_mcParticles;     /**< MCParticle array */
+      StoreArray<BeamBackHit> m_eclBeamBkgHits; /**< BeamBackHit array */
+      RelationArray m_eclBeamBkgHitRel;         /**< MCParticle to BeamBackHit relation array */
     };
   } // end of namespace ecl
 } // end of namespace Belle2

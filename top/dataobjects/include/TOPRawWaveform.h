@@ -41,6 +41,7 @@ namespace Belle2 {
      * @param flags event flags
      * @param referenceASIC reference ASIC window number
      * @param segmentASIC segment ASIC window number (storage window)
+     * @param windows storage windows of waveform segments
      * @param electronicType electronic type (see ChannelMapper::EType)
      * @param electronicName electronic name (e.g. "IRS3B", "IRSX", etc.)
      * @param data waveform ADC values (samples)
@@ -54,6 +55,7 @@ namespace Belle2 {
                    unsigned flags,
                    unsigned referenceASIC,
                    unsigned segmentASIC,
+                   std::vector<unsigned short> windows,
                    unsigned electronicType,
                    std::string electronicName,
                    const std::vector<short>& data):
@@ -69,6 +71,7 @@ namespace Belle2 {
       m_flags = flags;
       m_referenceASIC = referenceASIC;
       m_segmentASIC = segmentASIC;
+      m_windows = windows;
       m_electronicType = electronicType;
     }
 
@@ -164,6 +167,13 @@ namespace Belle2 {
     unsigned getReferenceWindow() const { return m_referenceASIC; }
 
     /**
+     * This corresponds to the last window in the analog memory sampled.
+     * All timing is a "look-back" from this window.
+     * @return reference window number
+     */
+    const std::vector<unsigned short>& getReferenceWindows() const { return m_windows; }
+
+    /**
      * Returns IRS analog storage window this waveform was taken from.
      * @return segment window number
      */
@@ -179,25 +189,13 @@ namespace Belle2 {
      * Returns ASIC number
      * @return ASIC number
      */
-    unsigned getASICNumber() const { return ((m_segmentASIC >> 14) & 0x0003);}
+    unsigned getASICNumber() const { return ((m_segmentASIC >> 12) & 0x0003);}
 
     /**
      * Returns carrier board number
      * @return carrier number
      */
-    unsigned getCarrierNumber() const { return ((m_segmentASIC >> 12) & 0x0003);}
-
-    /**
-     * Returns ASIC row (IRS3B naming convention)
-     * @return row number
-     */
-    unsigned getASICRow() const { return getCarrierNumber();}
-
-    /**
-     * Returns ASIC column (IRS3B naming convention)
-     * @return column number
-     */
-    unsigned getASICCol() const { return getASICNumber();}
+    unsigned getCarrierNumber() const { return ((m_segmentASIC >> 14) & 0x0003);}
 
     /**
      * Returns type of electronic used to measure this waveform
@@ -226,6 +224,22 @@ namespace Belle2 {
       return m_data;
     }
 
+    /**
+     * Checks if storage windows come in the consecutive order (no gaps in between)
+     * @param storageDepth storage depth
+     * @return true, if no gaps
+     */
+    bool areWindowsInOrder(unsigned short storageDepth = 512) const
+    {
+      for (unsigned i = 1; i < m_windows.size(); i++) {
+        auto diff = m_windows[i] - m_windows[i - 1];
+        if (diff < 0) diff += storageDepth;
+        if (diff != 1) return false;
+      }
+      return true;
+    }
+
+
   private:
 
     int m_moduleID = 0;                 /**< module ID */
@@ -238,15 +252,15 @@ namespace Belle2 {
     unsigned short m_flags = 0;         /**< event flags (bits 0:7) */
     unsigned short m_referenceASIC = 0; /**< reference ASIC window */
     unsigned short m_segmentASIC = 0;   /**< segment ASIC window (storage window) */
+    std::vector<unsigned short> m_windows; /**< storage windows of ASIC waveform segments */
     std::vector<short> m_data;  /**< waveform ADC values */
     unsigned m_electronicType = 0;      /**< electronic type (see ChannelMapper::EType) */
     std::string m_electronicName;   /**< electronic name */
     bool m_pedestalSubtracted = false; /**< true, if pedestal already subtracted */
 
-    ClassDef(TOPRawWaveform, 5); /**< ClassDef */
+    ClassDef(TOPRawWaveform, 6); /**< ClassDef */
 
   };
 
 
 } // end namespace Belle2
-

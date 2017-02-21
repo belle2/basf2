@@ -12,6 +12,14 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+const ISuperLayer ISuperLayerUtil::c_N;
+
+const ISuperLayer ISuperLayerUtil::c_InnerVolume;
+
+const ISuperLayer ISuperLayerUtil::c_OuterVolume;
+
+const ISuperLayer ISuperLayerUtil::c_Invalid;
+
 bool ISuperLayerUtil::isAxial(ISuperLayer iSuperLayer)
 {
   return isInCDC(iSuperLayer) and (iSuperLayer % 2) == 0;

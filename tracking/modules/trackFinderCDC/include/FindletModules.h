@@ -24,8 +24,8 @@
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentRejecter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentCreatorMCTruth.h>
 
-#include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorHitLegendre.h>
 #include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorSegmentHough.h>
+#include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorMCTruth.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/AxialSegmentPairCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentPairCreator.h>
@@ -186,22 +186,6 @@ namespace Belle2 {
     };
 
     /**
-     * Module implementation using the AxialTrackCreatorHitLegendreModule
-     */
-    class AxialTrackCreatorHitLegendreModule : public FindletModule<AxialTrackCreatorHitLegendre> {
-
-      /// Type of the base class
-      using Super = FindletModule<AxialTrackCreatorHitLegendre>;
-
-    public:
-      /// Constructor setting the default store vector names
-      AxialTrackCreatorHitLegendreModule()
-        : Super( {"CDCWireHitVector", "CDCTrackVector"})
-      {
-      }
-    };
-
-    /**
      * Module implementation using the AxialTrackCreatorSegmentHoughModule
      */
     class AxialTrackCreatorSegmentHoughModule : public FindletModule<AxialTrackCreatorSegmentHough> {
@@ -213,6 +197,22 @@ namespace Belle2 {
       /// Constructor setting the default store vector names
       AxialTrackCreatorSegmentHoughModule()
         : Super( {"CDCSegment2DVector", "CDCTrackVector"})
+      {
+      }
+    };
+
+    /**
+     * Module implementation using the AxialTrackCreatorMCTruth
+     */
+    class AxialTrackCreatorMCTruthModule : public FindletModule<AxialTrackCreatorMCTruth> {
+
+      /// Type of the base class
+      using Super = FindletModule<AxialTrackCreatorMCTruth>;
+
+    public:
+      /// Constructor setting the default store vector names
+      AxialTrackCreatorMCTruthModule()
+        : Super( {"CDCWireHitVector", "CDCTrackVector"})
       {
       }
     };
@@ -375,12 +375,13 @@ namespace Belle2 {
 
 /******* Combined Findlets **********/
 #include <tracking/trackFindingCDC/findlets/combined/SegmentFinderFacetAutomaton.h>
+#include <tracking/trackFindingCDC/findlets/combined/AxialTrackFinderHough.h>
 #include <tracking/trackFindingCDC/findlets/combined/TrackFinderSegmentPairAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/combined/TrackFinderSegmentTripleAutomaton.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /*
+    /**
      * Combined Module using a combination of filters for segments
      */
     class SegmentFinderFacetAutomatonModule : public FindletModule<SegmentFinderFacetAutomaton> {
@@ -396,7 +397,23 @@ namespace Belle2 {
       }
     };
 
-    /*
+    /**
+     * Module implementation using the AxialTrackFinderHoughModule
+     */
+    class AxialTrackFinderHoughModule : public FindletModule<AxialTrackFinderHough> {
+
+      /// Type of the base class
+      using Super = FindletModule<AxialTrackFinderHough>;
+
+    public:
+      /// Constructor setting the default store vector names
+      AxialTrackFinderHoughModule()
+        : Super( {"CDCWireHitVector", "CDCTrackVector"})
+      {
+      }
+    };
+
+    /**
      * Combined Module using a combination of filters on segment pairs
      */
     class TrackFinderSegmentPairAutomatonModule : public FindletModule<TrackFinderSegmentPairAutomaton> {
@@ -412,7 +429,7 @@ namespace Belle2 {
       }
     };
 
-    /*
+    /**
      * Combined Module using a combination of filters on segment triples
      */
     class TrackFinderSegmentTripleAutomatonModule : public FindletModule<TrackFinderSegmentTripleAutomaton> {

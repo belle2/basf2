@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFitting/fitter/base/TrackFitter.h>
-
 #include <framework/core/Module.h>
 #include <string>
 
@@ -54,18 +52,26 @@ namespace Belle2 {
   private:
     /** StoreArray name of the input and output reco tracks. */
     std::string m_param_recoTracksStoreArrayName = "RecoTracks";
-    /** StoreArray name of the CDC hits. */
-    std::string m_param_cdcHitsStoreArrayName = "";
-    /** StoreArray name of the SVD hits. */
-    std::string m_param_svdHitsStoreArrayName = "";
     /** StoreArray name of the PXD hits. */
     std::string m_param_pxdHitsStoreArrayName = "";
+    /** StoreArray name of the SVD hits. */
+    std::string m_param_svdHitsStoreArrayName = "";
+    /** StoreArray name of the CDC hits. */
+    std::string m_param_cdcHitsStoreArrayName = "";
+    /** StoreArray name of the BKLM hits. */
+    std::string m_param_bklmHitsStoreArrayName = "";
+    /** StoreArray name of the EKLM hits. */
+    std::string m_param_eklmHitsStoreArrayName = "";
     /** Use these particle hypotheses for fitting. Please use positive pdg codes only. */
     std::vector<unsigned int> m_param_pdgCodesToUseForFitting = {211};
     /** Resort the hits while fitting. */
     bool m_param_resortHits = false;
     /** FIXME: Temporary fix for the cosmics data. */
     bool m_param_cosmicsTemporaryFix = false;
+    /** Configures whether the CDC Translators should be initialized by the FitterModule
+     * especially useful for VXD-only beamtest. In the future this could be changed to check
+     * implicitly if the cdc is available in the geometry.*/
+    bool m_param_initializeCDCTranslators = true;
   };
 }
 

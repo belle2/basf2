@@ -54,7 +54,7 @@ namespace Belle2 {
 //
   TRGECLModule::TRGECLModule()
     : Module::Module(),
-      _debugLevel(0)
+      _debugLevel(0), _Bhabha(1), _Clustering(0), _EventTiming(2)
   {
 
     string desc = "TRGECLModule(" + version() + ")";
@@ -62,6 +62,12 @@ namespace Belle2 {
     //   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
     addParam("DebugLevel", _debugLevel, "TRGECL debug level", _debugLevel);
+    addParam("Bhabha", _Bhabha, "TRGECL Bhabha method  0 : Belle I, 1 :belle II(defult)", _Bhabha);
+    addParam("Clustering", _Clustering, "TRGECL Clustering method  0 : use only ICN, 1 : ICN + Energy(Defult)", _Clustering);
+    addParam("EventTiming", _EventTiming,
+             "TRGECL EventTiming method  0 : Belle I, 1 : Energetic TC, 2 : Energy Weighted timing (defult)", _EventTiming);
+
+
 
     if (TRGDebug::level()) {
       std::cout << "TRGECLModule ... created" << std::endl;
@@ -98,6 +104,7 @@ namespace Belle2 {
     m_nEvent = 0 ;
     m_hitNum = 0;
     m_hitTCNum = 0;
+
     StoreArray<TRGECLDigi>::registerPersistent();
     StoreArray<TRGECLDigi0>::registerPersistent();
     StoreArray<TRGECLHit>::registerPersistent();
@@ -137,6 +144,9 @@ namespace Belle2 {
     TrgEcl* _ecl = new TrgEcl();
 
     _ecl->initialize(m_nEvent);
+    _ecl-> setClusterMethod(_Clustering);
+    _ecl-> setBhabhaMethod(_Bhabha);
+    _ecl-> setEventTimingMethod(_EventTiming);
     _ecl->simulate(m_nEvent);
     printf("TRGECLModule> bitECLtoGDL = %i \n", _ecl->getECLtoGDL());
     //

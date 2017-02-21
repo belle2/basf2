@@ -13,16 +13,17 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool SegmentTrackTruthVarSet::extract(const std::pair<const CDCSegment2D*, const CDCTrack*>* testPair)
+bool SegmentTrackTruthVarSet::extract(const BaseSegmentTrackFilter::Object* testPair)
 {
   if (not testPair) return false;
 
-  const CDCSegment2D* segment = testPair->first;
-  const CDCTrack* track = testPair->second;
+  const CDCTrack* track = testPair->getFrom();
+  const CDCSegment2D* segment = testPair->getTo();
 
   var<named("belongs_to_same_track_truth")>() = 0.0;
 
@@ -41,7 +42,7 @@ bool SegmentTrackTruthVarSet::extract(const std::pair<const CDCSegment2D*, const
 
     double numberOfCorrectHits = 0;
     for (const CDCRecoHit3D& recoHit : *track) {
-      if (mcHitLookup.getMCTrackId(recoHit->getWireHit()->getHit()) == segmentMCMatch) {
+      if (mcHitLookup.getMCTrackId(recoHit.getWireHit().getHit()) == segmentMCMatch) {
         numberOfCorrectHits++;
       }
     }

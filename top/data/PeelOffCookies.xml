@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<PeelOffCookies descr="definition of peel-off cookies">
+
+  <!-- Region corresponds to 2 x 2 PMT's, ID = 1, 2, ... 8 -->
+  
+  <SwitchON descr="set to 1 to enable">0</SwitchON>
+
+  <material descr="material to simulate peel-off region">TOPPeelOffCookie</material>
+  <thickness descr="thickness of peel-off region" unit="mm">0.1</thickness>
+
+  <Slot ID="2">
+    <Region ID="1">
+      <fraction>0.7</fraction>
+      <angle unit="deg">230</angle>
+    </Region>
+    <Region ID="4">
+      <fraction>0.3</fraction>
+      <angle unit="deg">30</angle>
+    </Region>
+    <Region ID="8">
+      <fraction>0.5</fraction>
+      <angle unit="deg">0</angle>
+    </Region>
+  </Slot>
+
+  <Slot ID="5">
+    <Region ID="3">
+      <fraction>0.4</fraction>
+      <angle unit="deg">120</angle>
+    </Region>
+  </Slot>
+
+</PeelOffCookies>

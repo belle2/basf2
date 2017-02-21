@@ -27,19 +27,20 @@ using namespace Belle2;
 namespace fs = boost::filesystem;
 
 void LocalDatabase::createInstance(const std::string& fileName, const std::string& payloadDir, bool readOnly,
-                                   LogConfig::ELogLevel logLevel)
+                                   LogConfig::ELogLevel logLevel, bool invertLogging)
 {
   LocalDatabase* database = new LocalDatabase(fileName, payloadDir, readOnly);
-  database->setLogLevel(logLevel);
+  database->setLogLevel(logLevel, invertLogging);
   Database::setInstance(database);
 }
 
-LocalDatabase::LocalDatabase(const std::string& fileName,
-                             const std::string& payloadDir,
-                             bool readOnly): m_fileName(fs::absolute(fileName).string()), m_payloadDir(payloadDir), m_readOnly(readOnly)
+LocalDatabase::LocalDatabase(const std::string& fileName, const std::string& payloadDir, bool readOnly):
+  m_fileName(fileName), m_absFileName(fs::absolute(m_fileName).string()), m_payloadDir(payloadDir), m_readOnly(readOnly)
 {
   if (m_payloadDir.empty()) {
-    m_payloadDir = fs::path(m_fileName).parent_path().string();
+    m_payloadDir = fs::path(m_absFileName).parent_path().string();
+  } else {
+    m_payloadDir = fs::absolute(m_payloadDir).string();
   }
   readDatabase();
 }
@@ -49,34 +50,66 @@ bool LocalDatabase::readDatabase()
 {
   m_database.clear();
 
-  if (!fs::exists(m_fileName)) return true;
+  if (!fs::exists(m_absFileName)) return true;
 
   // get lock for read access to database file
-  FileSystem::Lock lock(m_fileName, true);
+  FileSystem::Lock lock(m_absFileName, true);
   if (!m_readOnly && !lock.lock()) {
     B2ERROR("Locking of database file " << m_fileName << " failed.");
     return false;
   }
 
   // read and parse the database content
-  std::ifstream file(m_fileName.c_str());
+  std::ifstream file(m_absFileName.c_str());
   if (!file.is_open()) {
     B2ERROR("Opening of database file " << m_fileName << " failed.");
     return false;
   }
+  int lineno{0};
   try {
     while (!file.eof()) {
+      // read the file line by line
+      string line;
+      std::getline(file, line);
+      ++lineno;
+      // and remove comments from the line
+      size_t commentChar = line.find('#');
+      if (commentChar != std::string::npos) {
+        line = line.substr(0, commentChar);
+      }
+      // trim whitespace on each side
+      boost::algorithm::trim(line);
+      // if nothing is left skip the line
+      if (line.empty()) continue;
+      // otherwise read name, revision and iov from the line
       string name;
-      int revision;
+      string revisionStr;
       IntervalOfValidity iov;
-      file >> name >> revision >> iov;
-      int pos = name.find("/");
+      try {
+        std::stringstream(line) >> name >> revisionStr >> iov;
+      } catch (std::runtime_error& e) {
+        throw std::runtime_error("line must be of the form 'dbstore/<payloadname> <revision> <firstExp>,<firstRun>,<finalExp>,<finalRun>'");
+      }
+      int revision{ -1};
+      try {
+        revision = stoi(revisionStr);
+      } catch (std::invalid_argument& e) {
+        throw std::runtime_error("revision must be an integer");
+      }
+      // parse name
+      size_t pos = name.find("/");
+      if (pos == std::string::npos) {
+        throw std::runtime_error("payload name must be of the form dbstore/<payloadname>");
+      }
       string package = name.substr(0, pos);
       string module = name.substr(pos + 1, name.length());
+      // and add to map of payloads
+      B2DEBUG(100, m_fileName << ":" << lineno << ": found payload " << boost::io::quoted(module)
+              << ", revision " << revision << ", iov " << iov);
       m_database[package][module].push_back(make_pair(revision, iov));
     }
   } catch (std::exception& e) {
-    B2ERROR("Errors occured while reading " << m_fileName << ". (Error details: " << e.what() << ")");
+    B2ERROR(m_fileName << ":" << lineno << " error: " << e.what());
     return false;
   }
 
@@ -93,10 +126,14 @@ pair<TObject*, IntervalOfValidity> LocalDatabase::tryDefault(const std::string& 
     result.first = readPayload(defaultName, module);
     if (!result.first) return result;
     result.second = IntervalOfValidity(0, -1, -1, -1);
+    if (m_invertLogging)
+      B2LOG(m_logLevel, 0, "Obtained " << module << " from " << defaultName << ". IoV="
+            << result.second);
     return result;
   }
 
-  B2LOG(m_logLevel, 0, "Failed to get " << package << "/" << module << " from local database " << m_fileName << ".");
+  if (!m_invertLogging)
+    B2LOG(m_logLevel, 0, "Failed to get " << module << " from local database " << m_fileName << ".");
   return result;
 }
 
@@ -119,12 +156,16 @@ pair<TObject*, IntervalOfValidity> LocalDatabase::getData(const EventMetaData& e
       result.first = readPayload(payloadFileName(m_payloadDir, package, module, revision), module);
       if (!result.first) return result;
       result.second = entry.second;
+      if (m_invertLogging)
+        B2LOG(m_logLevel, 0, "Obtained " << module << " from local database " << m_fileName <<
+              ". IoV=" << result.second);
       return result;
     }
   }
 
-  B2LOG(m_logLevel, 0, "Failed to get " << package << "/" << module << " from local database " << m_fileName <<
-        ". No matching entry for experiment/run " << event.getExperiment() << "/" << event.getRun() << " found.");
+  if (!m_invertLogging)
+    B2LOG(m_logLevel, 0, "Failed to get " << module << " from local database " << m_fileName <<
+          ". No matching entry for experiment/run " << event.getExperiment() << "/" << event.getRun() << " found.");
   return result;
 }
 
@@ -141,7 +182,7 @@ bool LocalDatabase::storeData(const std::string& package, const std::string& mod
     fs::create_directories(m_payloadDir);
   }
   // get lock for write access to database file
-  FileSystem::Lock lock(m_fileName);
+  FileSystem::Lock lock(m_absFileName);
   if (!lock.lock()) {
     B2ERROR("Locking of database file " << m_fileName << " failed.");
     return false;
@@ -156,7 +197,7 @@ bool LocalDatabase::storeData(const std::string& package, const std::string& mod
 
   // add to database and update database file
   m_database[package][module].push_back(make_pair(revision, iov));
-  std::ofstream file(m_fileName.c_str(), std::ios::app);
+  std::ofstream file(m_absFileName.c_str(), std::ios::app);
   if (!file.is_open()) return false;
   file << package << "/" << module << " " << revision << " " << iov << endl;
 
@@ -171,14 +212,15 @@ bool LocalDatabase::addPayload(const std::string& package, const std::string& mo
     return false;
   }
 
-  if (!fs::exists(m_payloadDir)) {
-    fs::create_directories(m_payloadDir);
-  }
   // get lock for write access to database file
-  FileSystem::Lock lock(m_fileName);
+  FileSystem::Lock lock(m_absFileName);
   if (!lock.lock()) {
     B2ERROR("Locking of database file " << m_fileName << " failed.");
     return false;
+  }
+
+  if (!fs::exists(m_payloadDir)) {
+    fs::create_directories(m_payloadDir);
   }
 
   // get revision number
@@ -190,7 +232,7 @@ bool LocalDatabase::addPayload(const std::string& package, const std::string& mo
 
   // add to database and update database file
   m_database[package][module].push_back(make_pair(revision, iov));
-  std::ofstream file(m_fileName.c_str(), std::ios::app);
+  std::ofstream file(m_absFileName.c_str(), std::ios::app);
   if (!file.is_open()) return false;
   file << package << "/" << module << " " << revision << " " << iov << endl;
 

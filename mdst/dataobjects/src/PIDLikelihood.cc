@@ -11,6 +11,10 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <framework/logging/Logger.h>
 
+#include <TROOT.h>
+#include <TColor.h>
+#include <TParticlePDG.h>
+
 #include <cmath>
 #include <iostream>
 #include <iomanip>
@@ -216,7 +220,43 @@ std::string PIDLikelihood::getInfoHTML() const
 
   std::stringstream stream;
   stream << std::setprecision(4);
-  stream << "<b>Likelihoods</b><br>";
+
+  //colors from event display
+  std::string colour[Const::ChargedStable::c_SetSize];
+  colour[0] = gROOT->GetColor(kAzure)->AsHexString();
+  colour[1] = gROOT->GetColor(kCyan + 1)->AsHexString();
+  colour[2] = gROOT->GetColor(kGray + 1)->AsHexString();
+  colour[3] = gROOT->GetColor(kRed + 1)->AsHexString();
+  colour[4] = gROOT->GetColor(kOrange - 2)->AsHexString();
+  colour[5] = gROOT->GetColor(kMagenta)->AsHexString();
+
+  stream << "<b>Probabilities</b><br>";
+  stream << "<table border=0 width=100%>";
+  stream << "<tr><td>All</td><td>";
+  stream << "<table cellspacing=1 border=0 width=100%><tr>";
+  for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {
+    double p = getProbability(Const::chargedStableSet.at(i));
+    stream << "<td bgcolor=\"" << colour[i] << "\" width=" << p * 100 << "%></td>";
+  }
+  stream << "</tr></table></td></tr>";
+
+  for (unsigned k = 0; k < Const::PIDDetectors::c_size; k++) {
+    auto det = Const::PIDDetectorSet::set()[k];
+    stream << "<tr><td>" << detectorName[k] << "</td><td>";
+    if (!isAvailable(det)) {
+      stream << "</td></tr>";
+      continue;
+    }
+    stream << "<table cellspacing=1 border=0 width=100%><tr>";
+    for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {
+      double p = getProbability(Const::chargedStableSet.at(i), 0, det);
+      stream << "<td bgcolor=\"" << colour[i] << "\" width=" << p * 100 << "%></td>";
+    }
+    stream << "</tr></table></td></tr>";
+  }
+  stream << "</table>\n";
+
+  stream << "<b>Log-Likelihoods</b><br>";
   stream << "<table>";
   stream << "<tr><th>PID / Detector</th>";
   for (unsigned k = 0; k < Const::PIDDetectors::c_size; k++)
@@ -224,7 +264,7 @@ std::string PIDLikelihood::getInfoHTML() const
   stream << "</tr>";
   for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {
     stream << "<tr>";
-    stream << "<td>" << Const::chargedStableSet.at(i).getPDGCode() << "</td>";
+    stream << "<td bgcolor=\"" << colour[i] << "\">" << Const::chargedStableSet.at(i).getParticlePDG()->GetName() << "</td>";
     for (unsigned k = 0; k < Const::PIDDetectors::c_size; k++) {
       stream << "<td>" << m_logl[k][i] << "</td>";
     }

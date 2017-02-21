@@ -28,6 +28,7 @@ namespace {
     EXPECT_EQ(general_options.m_datafiles.size(), 0);
     EXPECT_EQ(general_options.m_treename, "ntuple");
     EXPECT_EQ(general_options.m_variables.size(), 0);
+    EXPECT_EQ(general_options.m_spectators.size(), 0);
     EXPECT_EQ(general_options.m_signal_class, 1);
     EXPECT_EQ(general_options.m_target_variable, "isSignal");
     EXPECT_EQ(general_options.m_weight_variable, "__weight__");
@@ -38,6 +39,7 @@ namespace {
     general_options.m_datafiles = {"Datafile"};
     general_options.m_treename = "Tree";
     general_options.m_variables = {"v", "a", "r", "s"};
+    general_options.m_spectators = {"x", "M"};
     general_options.m_signal_class = 2;
     general_options.m_max_events = 100;
     general_options.m_target_variable = "Target";
@@ -59,6 +61,9 @@ namespace {
     EXPECT_EQ(pt.get<std::string>("variable1"), "a");
     EXPECT_EQ(pt.get<std::string>("variable2"), "r");
     EXPECT_EQ(pt.get<std::string>("variable3"), "s");
+    EXPECT_EQ(pt.get<unsigned int>("number_spectator_variables"), 2);
+    EXPECT_EQ(pt.get<std::string>("spectator0"), "x");
+    EXPECT_EQ(pt.get<std::string>("spectator1"), "M");
 
     MVA::GeneralOptions general_options2;
     general_options2.load(pt);
@@ -73,6 +78,9 @@ namespace {
     EXPECT_EQ(general_options2.m_variables[1], "a");
     EXPECT_EQ(general_options2.m_variables[2], "r");
     EXPECT_EQ(general_options2.m_variables[3], "s");
+    EXPECT_EQ(general_options2.m_spectators.size(), 2);
+    EXPECT_EQ(general_options2.m_spectators[0], "x");
+    EXPECT_EQ(general_options2.m_spectators[1], "M");
     EXPECT_EQ(general_options2.m_signal_class, 2);
     EXPECT_EQ(general_options2.m_max_events, 100u);
     EXPECT_EQ(general_options2.m_target_variable, "Target");
@@ -80,7 +88,7 @@ namespace {
 
     // Test if po::options_description is created without crashing
     auto description = general_options.getDescription();
-    EXPECT_EQ(description.options().size(), 10);
+    EXPECT_EQ(description.options().size(), 11);
   }
 
   TEST(OptionsTest, MetaOptions)

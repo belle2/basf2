@@ -26,5 +26,5 @@ def add_cdc_trigger(path):
     path.add_module(hough)
     # neurotrigger
     neuro = register_module('NeuroTrigger')
-    neuro.param('filename', Belle2.FileSystem.findFile("data/trg/cdc/Neuro20161207.root"))
+    neuro.param('filename', Belle2.FileSystem.findFile("data/trg/cdc/Neuro20170109.root"))
     path.add_module(neuro)

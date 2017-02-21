@@ -18,6 +18,9 @@
 #include <framework/core/RandomNumbers.h>
 #include <framework/database/Database.h>
 
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
+
 #include <TClonesArray.h>
 
 #include <ctime>
@@ -101,7 +104,18 @@ void RootOutputModule::initialize()
   TDirectory* dir = gDirectory;
   m_file = new TFile(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
   if (m_file->IsZombie()) {
-    B2FATAL("Couldn't open file '" << m_outputFileName << "' for writing!");
+    //try creating necessary directories
+    boost::filesystem::path dirpath(m_outputFileName);
+    dirpath.remove_filename();
+
+    if (boost::filesystem::create_directories(dirpath)) {
+      B2WARNING("Created missing directory " << dirpath << ".");
+      //try again
+      m_file = new TFile(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
+    }
+
+    if (m_file->IsZombie())
+      B2FATAL("Couldn't open file '" << m_outputFileName << "' for writing!");
   }
   m_file->SetCompressionLevel(m_compressionLevel);
 
@@ -140,9 +154,7 @@ void RootOutputModule::initialize()
       //HasDictionary() is a new function in root 6
       //using it instead of GetClassInfo() avoids  having to parse header files (and
       //the associated memory cost)
-      //
-      //it also is missing a 'const', hopefully this will be fixed at some point
-      if (!const_cast<TClass*>(entryClass)->HasDictionary()) {
+      if (!entryClass->HasDictionary()) {
         B2WARNING("No dictionary found for class " << entryClass->GetName() << ", branch '" << branchName <<
                   "' will not be saved. (This is probably an obsolete class that is still present in the input file.)");
         continue;

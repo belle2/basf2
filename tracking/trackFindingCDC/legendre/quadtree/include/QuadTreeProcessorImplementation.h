@@ -30,8 +30,7 @@ namespace Belle2 {
        * Insert only if the sinogram of the front or the back part of the segment goes through the node.
        * Also we can intersect the sinograms of the front and the back and get an intersection point, which should lay in the node also.
        */
-      bool insertItemInNode(QuadTree* node, CDCSegment2D* recoItem, unsigned int /*t_index*/,
-                            unsigned int /*r_index*/) const override final;
+      bool insertItemInNode(QuadTree* node, CDCSegment2D* recoItem) const override final;
     private:
       Vector2D m_origin; /**< The origin of the conformal transformation */
 

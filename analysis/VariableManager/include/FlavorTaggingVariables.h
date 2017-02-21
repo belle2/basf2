@@ -212,5 +212,17 @@ namespace Belle2 {
      */
     Manager::FunctionPtr isTrueCategory(const std::vector<std::string>& arguments);
 
+    /**
+     * Returns function which returns the output of the flavorTagger for the given combinerMethod.
+     * This is a Flavor Tagging variable for general use.
+     */
+    Manager::FunctionPtr qrOutput(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the flavor tag q output of the flavorTagger for the given combinerMethod.
+     * This is a Flavor Tagging variable for general use.
+     */
+    Manager::FunctionPtr qOutput(const std::vector<std::string>& arguments);
+
   }
 }

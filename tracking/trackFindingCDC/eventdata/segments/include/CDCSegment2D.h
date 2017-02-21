@@ -10,10 +10,12 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
-
 #include <tracking/trackFindingCDC/eventdata/segments/CDCFacetSegment.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
+
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -89,6 +91,12 @@ namespace Belle2 {
       AutomatonCell& getAutomatonCell() const
       {
         return m_automatonCell;
+      }
+
+      /// Indirection to the automaton cell for easier access to the flags
+      AutomatonCell* operator->() const
+      {
+        return &m_automatonCell;
       }
 
       /// Unset the masked flag of the automaton cell of this segment

@@ -4,11 +4,14 @@
 Import('env')
 
 env['LIBS'] = [
+    'alignment',
     'tracking_dataobjects',
     'pxd', 'pxd_dataobjects',
     'svd', 'svd_dataobjects',
     'vxd', 'vxd_dataobjects',
     'cdc', 'cdc_dataobjects',
+    'bklm', 'bklm_dataobjects', 'bklm_dbobjects',
+    'eklm', 'eklm_dataobjects', 'eklm_dbobjects',
     'ecl',
     'mdst_dataobjects',
     'framework',

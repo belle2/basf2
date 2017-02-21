@@ -181,8 +181,8 @@ class TrackingValidationModule(basf2.Module):
             return
 
         for trackCand in trackCands:
-            is_matched = trackMatchLookUp.isMatchedPRTrackCand(trackCand)
-            is_clone = trackMatchLookUp.isClonePRTrackCand(trackCand)
+            is_matched = trackMatchLookUp.isMatchedPRRecoTrack(trackCand)
+            is_clone = trackMatchLookUp.isClonePRRecoTrack(trackCand)
 
             pt_truth = float('nan')
             omega_truth = float('nan')
@@ -236,7 +236,8 @@ class TrackingValidationModule(basf2.Module):
             # this information can we used when plotting fake tracks, for example
             seed_position = trackCand.getPositionSeed()
             seed_momentum = trackCand.getMomentumSeed()
-            seed_tan_lambda = np.divide(1.0, math.tan(seed_momentum.Theta()))  # Avoid zero division exception
+            # Avoid zero division exception
+            seed_tan_lambda = np.divide(1.0, math.tan(seed_momentum.Theta()))
             seed_phi = seed_position.Phi()
             seed_theta = seed_position.Theta()
 
@@ -300,7 +301,7 @@ class TrackingValidationModule(basf2.Module):
         multiplicity = mcTrackCands.getEntries()
 
         for mcTrackCand in mcTrackCands:
-            is_matched = trackMatchLookUp.isMatchedMCTrackCand(mcTrackCand)
+            is_matched = trackMatchLookUp.isMatchedMCRecoTrack(mcTrackCand)
 
             hit_efficiency = trackMatchLookUp.getRelatedEfficiency(mcTrackCand)
 

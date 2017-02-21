@@ -51,7 +51,7 @@ void Ds2RbufModule::initialize()
 {
 
   //  m_rbuf = new RingBuffer(m_rbufname.c_str(), RBUFSIZE);
-  m_rbuf = new RingBuffer(m_rbufname.c_str());
+  m_rbuf = new RingBuffer(m_rbufname);
   m_streamer = new DataStoreStreamer(m_compressionLevel);
   m_streamer->setStreamingObjects(m_saveobjs);
 

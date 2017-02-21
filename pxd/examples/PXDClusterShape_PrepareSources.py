@@ -294,6 +294,7 @@ output.param('outputFileName', outputFileName)
 # Select subdetectors to be built
 # geometry.param('Components', ['PXD','SVD'])
 geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
+# geometry.param('components', ['MagneticField', 'PXD', 'SVD', 'CDC'])
 
 # PXDDIGI.param('SimpleDriftModel', False)
 # PXDDIGI.param('statisticsFilename', 'PXDDiags.root')
@@ -359,18 +360,30 @@ param_vxdtf = {'sectorSetup': secSetup,
 vxdtf.param(param_vxdtf)
 
 doPXD = 1
-TrackFinderMCTruth = register_module('TrackFinderMCTruth')
-TrackFinderMCTruth.logging.log_level = LogLevel.INFO
+# Use from TB packet:
+# TrackFinderMCTruthRecoTrack = register_module('TrackFinderMCVXDTB')
+# Should be use:
+TrackFinderMCTruthRecoTrack = register_module('TrackFinderMCTruthRecoTracks')
+
+TrackFinderMCTruthRecoTrack.logging.log_level = LogLevel.INFO
+# Out of day:
+# TrackFinderMCTruth = register_module('TrackFinderMCTruth')
+# TrackFinderMCTruth.logging.log_level = LogLevel.INFO
 # select which detectors you would like to use
-param_TrackFinderMCTruth = {
-    'UseCDCHits': 0,
-    'UseSVDHits': 1,
-    'UsePXDHits': doPXD,
-    'MinimalNDF': 6,
-    'WhichParticles': ['primary'],
-    'GFTrackCandidatesColName': 'mcTracks',
-}
-TrackFinderMCTruth.param(param_TrackFinderMCTruth)
+# param_TrackFinderMCTruth = {
+#     'UseCDCHits': 0,
+#     'UseSVDHits': 1,
+#     'UsePXDHits': doPXD,
+#     'MinimalNDF': 6,
+#     'WhichParticles': ['primary'],
+#     'GFTrackCandidatesColName': 'mcTracks',
+# }
+# TrackFinderMCTruth.param(param_TrackFinderMCTruth)
+
+# Use from TB packet:
+GenfitterVXDTB = register_module('GenFitterVXDTB')
+GenfitterVXDTB.param('GFTrackCandidatesColName', 'caTracks')
+GenfitterVXDTB.param('FilterId', 'Kalman')
 
 setupGenfit = register_module('SetupGenfitExtrapolation')
 GenFitter = register_module('GenFitter')
@@ -401,8 +414,10 @@ if (UseTracks is True):
     main.add_module(SVDCLUST)
     main.add_module(eventCounter)
     main.add_module(vxdtf)
-    main.add_module(TrackFinderMCTruth)
-    main.add_module(GenFitter)
+    main.add_module(TrackFinderMCTruthRecoTrack)
+    # main.add_module(TrackFinderMCTruth)
+    main.add_module(GenfitterVXDTB)
+    # main.add_module(GenFitter)
 main.add_module(PXDSHCAL)
 
 main.add_module("PrintCollections")

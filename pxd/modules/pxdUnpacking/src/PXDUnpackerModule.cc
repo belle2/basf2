@@ -689,6 +689,7 @@ PXDUnpackerModule::PXDUnpackerModule() :
   addParam("RemapFlag", m_RemapFlag, "Set to one if DHP data should be remapped according to Belle II node 10", false);
   addParam("DESY16_TrgOff", m_DESY16_FixTrigOffset, "Set to -1 in order to fix trigger missmatch", 0);
   addParam("IgnoreFrameCount", m_ignore_headernrframes, "Ignore Frame count in DHC End Frame", false);
+  addParam("IgnoreSorFlag", m_ignoreSorFlag, "Ignore start of row word - HOT FIX for gradient", false);
 }
 
 static int error_block[ONSEN_MAX_TYPE_ERR];
@@ -869,8 +870,10 @@ void PXDUnpackerModule::event()
   }
 }
 
+#ifndef __clang__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstack-usage="
+#endif
 void PXDUnpackerModule::unpack_event(RawPXD& px)
 {
   int Frames_in_event;
@@ -952,7 +955,9 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
   }
 
 }
+#ifndef __clang__
 #pragma GCC diagnostic pop
+#endif
 
 void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsigned int dhe_ID, unsigned dhe_DHPport, VxdID vxd_id)
 {
@@ -1058,7 +1063,7 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   unsigned int second_dhp_dhe_id = 0;
   unsigned int dhp_dhp_id       = 0;
 
-  unsigned int dhp_row = 0, dhp_col = 0, dhp_adc = 0, dhp_cm = 0;
+  unsigned int dhp_row = 0, dhp_col = 0, dhp_adc = 0, dhp_cm = 0, sorPreWord = 0;
   unsigned int v_cellID = 0, u_cellID = 0;
   unsigned int dhp_offset = 0;
   bool rowflag = false;
@@ -1141,71 +1146,77 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
       } else {
 //         v_cellID = dhp_row;
 //         u_cellID = dhp_col;
-        if (!rowflag) {
+        if ((!rowflag) && !(m_ignoreSorFlag)) {//HOT FIX GRADIENT
           B2ERROR("DHP Unpacking: Pix without Row!!! skip dhp data ");
           m_errorMask |= ONSEN_ERR_FLAG_DHP_PIX_WO_ROW;
 //           dhp_pixel_error++;
           return;
         } else {
-          dhp_row = (dhp_row & 0xFFE) | ((dhp_pix[i] & 0x4000) >> 14);
-          dhp_col = ((dhp_pix[i]  & 0x3F00) >> 8);
-          ///  remapping flag
-//           if (dhe_reformat == 0) dhp_col ^= 0x3C ; /// 0->60 61 62 63 4->56 57 58 59 ..
+          if (!rowflag) { //HOT FIX GRADIENT
+            sorPreWord = dhp_pix[i];
+            B2ERROR("DHP Unpacking: Word before Start of Row : $" << hex << dhp_pix[i]);//HOT FIX GRADIENT
+          }//HOT FIX GRADIENT
+          if (rowflag) { //HOT FIX GRADIENT
+            dhp_row = (dhp_row & 0xFFE) | ((dhp_pix[i] & 0x4000) >> 14);
+            dhp_col = ((dhp_pix[i]  & 0x3F00) >> 8);
+            ///  remapping flag
+            //           if (dhe_reformat == 0) dhp_col ^= 0x3C ; /// 0->60 61 62 63 4->56 57 58 59 ..
 
-          if (m_RemapFlag) {
-            if ((dhe_reformat == 0) && (IFOB_flag == 1)) {
-//               B2INFO("Remap inner forward or outer backward ... with DHP_row :: " << dhp_row << " and DHP_col :: " << dhp_col << " DHE_ID $" <<
-//                      dhe_ID << " DHP_ID $" << dhp_dhp_id);
-              v_cellID = PXDUnpackerModule::remap_row_IF_OB(dhp_row, dhp_col, dhp_dhp_id, dhe_ID);
-              u_cellID = PXDUnpackerModule::remap_col_IF_OB(dhp_row, dhp_col, dhp_dhp_id);
-//                     B2INFO("Remapped :: ROW_GEO " << v_cellID << " COL_GEO " << u_cellID);
+            if (m_RemapFlag) {
+              if ((dhe_reformat == 0) && (IFOB_flag == 1)) {
+                //               B2INFO("Remap inner forward or outer backward ... with DHP_row :: " << dhp_row << " and DHP_col :: " << dhp_col << " DHE_ID $" <<
+                //                      dhe_ID << " DHP_ID $" << dhp_dhp_id);
+                v_cellID = PXDUnpackerModule::remap_row_IF_OB(dhp_row, dhp_col, dhp_dhp_id, dhe_ID);
+                u_cellID = PXDUnpackerModule::remap_col_IF_OB(dhp_row, dhp_col, dhp_dhp_id);
+                //                     B2INFO("Remapped :: ROW_GEO " << v_cellID << " COL_GEO " << u_cellID);
+              }
+
+              if ((dhe_reformat == 0) && (IBOF_flag == 1)) {
+                //               B2INFO("Remap inner backward or outer forward ... with DHP_row :: " << dhp_row << " and DHP_col :: " << dhp_col << " DHE_ID $" <<
+                //                      dhe_ID << " DHP_ID $" << dhp_dhp_id);
+                v_cellID = PXDUnpackerModule::remap_row_IB_OF(dhp_row, dhp_col, dhp_dhp_id, dhe_ID);
+                u_cellID = PXDUnpackerModule::remap_col_IB_OF(dhp_row, dhp_col, dhp_dhp_id);
+                //                       B2INFO("Remapped :: ROW_GEO " << v_cellID << " COL_GEO " << u_cellID);
+              }
+            }
+            //           B2INFO("ROW :: " << dhp_row << "COL :: " << dhp_col );
+            dhp_col += dhp_offset;
+            //           B2INFO("ROW :: " << dhp_row << "COL after dhp_offset :: " << dhp_col );
+            dhp_adc = dhp_pix[i] & 0xFF;
+
+            if (!m_RemapFlag) {
+              if (IFOB_flag == 1) {
+                //              if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 768 - dhp_row ;} //if inner module
+                //              if (((dhe_ID >> 5) & 0x1) == 1) {v_cellID = /*1 +*/ dhp_row ;} //if outer module
+                v_cellID = /*1 +*/ dhp_row ;
+                u_cellID = /*1 +*/ dhp_col;
+              }
+              if (IBOF_flag == 1) {
+                //              if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 768 - dhp_row ;} //if inner module
+                //              if (((dhe_ID >> 5) & 0x1) == 1) {v_cellID = /*1 +*/ dhp_row ;} //if outer module
+                v_cellID = /*1 +*/ dhp_row ;
+                u_cellID = /*250 - */dhp_col;
+              }
+              B2INFO("NOT REMAPPED coords :: row " << v_cellID << " col " << u_cellID << " dhe ID " << dhe_ID << "chip ID" << dhp_dhp_id);
             }
 
-            if ((dhe_reformat == 0) && (IBOF_flag == 1)) {
-//               B2INFO("Remap inner backward or outer forward ... with DHP_row :: " << dhp_row << " and DHP_col :: " << dhp_col << " DHE_ID $" <<
-//                      dhe_ID << " DHP_ID $" << dhp_dhp_id);
-              v_cellID = PXDUnpackerModule::remap_row_IB_OF(dhp_row, dhp_col, dhp_dhp_id, dhe_ID);
-              u_cellID = PXDUnpackerModule::remap_col_IB_OF(dhp_row, dhp_col, dhp_dhp_id);
-//                       B2INFO("Remapped :: ROW_GEO " << v_cellID << " COL_GEO " << u_cellID);
-            }
-          }
-//           B2INFO("ROW :: " << dhp_row << "COL :: " << dhp_col );
-          dhp_col += dhp_offset;
-//           B2INFO("ROW :: " << dhp_row << "COL after dhp_offset :: " << dhp_col );
-          dhp_adc = dhp_pix[i] & 0xFF;
-
-          if (!m_RemapFlag) {
-            if (IFOB_flag == 1) {
-//              if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 768 - dhp_row ;} //if inner module
-//              if (((dhe_ID >> 5) & 0x1) == 1) {v_cellID = /*1 +*/ dhp_row ;} //if outer module
-              v_cellID = /*1 +*/ dhp_row ;
-              u_cellID = /*1 +*/ dhp_col;
-            }
-            if (IBOF_flag == 1) {
-//              if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 768 - dhp_row ;} //if inner module
-//              if (((dhe_ID >> 5) & 0x1) == 1) {v_cellID = /*1 +*/ dhp_row ;} //if outer module
-              v_cellID = /*1 +*/ dhp_row ;
-              u_cellID = /*250 - */dhp_col;
-            }
-            B2INFO("NOT REMAPPED coords :: row " << v_cellID << " col " << u_cellID << " dhe ID " << dhe_ID << "chip ID" << dhp_dhp_id);
-          }
-
-          if (printflag)
-            B2INFO("SetPix: Row " << hex << v_cellID << " Col " << hex << u_cellID << " ADC " << hex << dhp_adc
-                   << " CM " << hex << dhp_cm);
+            if (printflag)
+              B2INFO("SetPix: Row " << hex << v_cellID << " Col " << hex << u_cellID << " ADC " << hex << dhp_adc
+                     << " CM " << hex << dhp_cm);
 
 
-          /*if (verbose) {
-            B2INFO("raw    |   " << hex << d[i]);
-            B2INFO("row " << hex << ((d[i] >> 20) & 0xFFF) << "(" << ((d[i] >> 20) & 0xFFF) << ")" << " col " << "(" << hex << ((d[i] >> 8) & 0xFFF) << ((d[i] >> 8) & 0xFFF)
-                   << " adc " << "(" << hex << (d[i] & 0xFF) << (d[i] & 0xFF) << ")");
-            B2INFO("dhe_ID " << dhe_ID);
-            B2INFO("start-Frame-Nr " << dec << dhe_first_readout_frame_id_lo);
-            B2INFO("toffset " << toffset);
-          };*/
-          if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
-                                                        toffset, (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F, dhp_cm
-                                                       );
+            /*if (verbose) {
+              B2INFO("raw    |   " << hex << d[i]);
+              B2INFO("row " << hex << ((d[i] >> 20) & 0xFFF) << "(" << ((d[i] >> 20) & 0xFFF) << ")" << " col " << "(" << hex << ((d[i] >> 8) & 0xFFF) << ((d[i] >> 8) & 0xFFF)
+                     << " adc " << "(" << hex << (d[i] & 0xFF) << (d[i] & 0xFF) << ")");
+              B2INFO("dhe_ID " << dhe_ID);
+              B2INFO("start-Frame-Nr " << dec << dhe_first_readout_frame_id_lo);
+              B2INFO("toffset " << toffset);
+            };*/
+            if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
+                                                          toffset, (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F, dhp_cm, sorPreWord
+                                                         );
+          }//HOT FIX GRADIENT
         }
       }
     }

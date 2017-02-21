@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ErrorMessageDiagnosis>
+    <Error>
+        <ID></ID>
+        <Type>COPPER_ROPC</Type>
+        <Message>[FATAL] CORRUPTED DATA: No COPPER blocks in RawDataBlock.</Message>
+        <Diagnosis>I have no idea. Abort and try again. If the same error occurs, contact with DAQ(copper/ROPC) experts.</Diagnosis>
+    </Error>
+    <Error>
+        <ID></ID>
+        <Type>COPPER_ROPC</Type>
+        <Message>[FATAL] hostname</Message>
+        <Diagnosis>/etc/hosts may not be prepared on ROPC. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
+    </Error>
+    <Error>
+        <ID></ID>
+        <Type>COPPER_ROPC</Type>
+        <Message>[FATAL] Failed to bind.</Message>
+        <Diagnosis>The process in prev. run remains. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(slow control) experts</Diagnosis>
+    </Error>
+    <Error>
+        <ID></ID>
+        <Type>COPPER_ROPC</Type>
+        <Message>[FATAL] Failed to accept</Message>
+        <Diagnosis>I have no idea. Abort and try again. If the same error occurs, contact with DAQ(copper/ROPC) experts.</Diagnosis>
+    </Error>
+    <Error>
+        <ID></ID>
+        <Type>COPPER_ROPC</Type>
+        <Message>[FATAL] Failed to set TIMEOUT.</Message>
+        <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
+    </Error>
+    <Error>
+        <ID></ID>
+        <Type>COPPER_ROPC</Type>
+        <Message>[FATAL] EAGAIN return in the middle of an event</Message>
+        <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
+    </Error>
+    <Error>
+        <ID></ID>
+        <Type>COPPER_ROPC</Type>
+        <Message>[FATAL] Failed to read data from COPPER.</Message>
+        <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
+    </Error>
+    <Error>
+        <ID></ID>
+        <Type>COPPER_ROPC</Type>
+        <Message>[FATAL] CORRUPTED DATA: Read less bytes</Message>
+        <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
+    </Error>
+    <Error>
+        <ID></ID>
+        <Type>COPPER_ROPC</Type>
+        <Message>[FATAL] CORRUPTED DATA: Read more than data size.</Message>
+        <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
+    </Error>
+    <Error>
+        <ID></ID>
+        <Type>COPPER_ROPC</Type>
+        <Message>[FATAL] Slot is not specified.</Message>
+        <Diagnosis>Maybe HSLB slot is not properly specified in a script. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(slow control) experts</Diagnosis>
+    </Error>
+    <Error>
+        <ID></ID>
+        <Type>COPPER_ROPC</Type>
+        <Message>[FATAL] Failed to open /dev/copper/copper.</Message>
+        <Diagnosis>COPPER driver is not loaded or COPPER is broken. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
+    </Error>
+    <Error>
+        <ID></ID>
+        <Type>COPPER_ROPC</Type>
+        <Message>[FATAL] Return due to EAGAIN in the middle of an event.</Message>
+        <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
+    </Error>
+    <Error>
+        <ID></ID>
+        <Type>COPPER_ROPC</Type>
+        <Message>[FATAL] Failed to read data from COPPER.</Message>
+        <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
+    </Error>
+    <Error>
+        <ID></ID>
+        <Type>COPPER_ROPC</Type>
+        <Message>[FATAL] CORRUPTED DATA: Different # of events or nodes in SendBlocks</Message>
+        <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
+    </Error>
+    <Error>
+        <ID></ID>
+        <Type>COPPER_ROPC</Type>
+        <Message>[FATAL] CORRUPTED DATA: Inconsistent SendHeader value.</Message>
+        <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
+    </Error>
+    <Error>
+        <ID></ID>
+        <Type>COPPER_ROPC</Type>
+        <Message>[FATAL] CORRUPTED DATA: Event or Time record mismatch.</Message>
+        <Diagnosis>Corrupted data in belle2linke header are found. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
+    </Error>
+    <Error>
+        <ID></ID>
+        <Type>COPPER_ROPC</Type>
+        <Message>[FATAL] CORRUPTED DATA: Estimations of reduced event size are inconsistent.</Message>
+        <Diagnosis>I have no idea. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
+    </Error>
+    <Error>
+        <ID></ID>
+        <Type>COPPER_ROPC</Type>
+        <Message>Failed to bind.(Address already in use) Maybe other programs have already occupied this port</Message>
+        <Diagnosis>DAQ process maybe in the prev. run remains on COPPER, abort and try again. If the same error occurs, contact with DAQ(SLC) experts.</Diagnosis>
+    </Error>
+</ErrorMessageDiagnosis>

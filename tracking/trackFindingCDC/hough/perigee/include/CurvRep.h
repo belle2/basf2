@@ -10,10 +10,8 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/axes/StandardAxes.h>
-#include <tracking/trackFindingCDC/utilities/CallIfApplicable.h>
-#include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/EnableIf.h>
-#include <array>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -21,7 +19,8 @@ namespace Belle2 {
     /// Strategy to construct discrete curv points from discrete overlap specifications.
     class CurvBinsSpec {
     public:
-      /** Constructs a specification for equally spaced discrete curvature values
+      /**
+       *  Constructs a specification for equally spaced discrete curvature values
        *  with discrete overlap specification
        *
        *  @param lowerBound Lower bound of the value range
@@ -32,11 +31,7 @@ namespace Belle2 {
        *  @param nOverlap   Number of discrete values that overlapping bins have in common
        *                    (counted semi open [start, stop)).
        */
-      CurvBinsSpec(double lowerBound,
-                   double upperBound,
-                   size_t nBins,
-                   size_t nOverlap,
-                   size_t nWidth);
+      CurvBinsSpec(double lowerBound, double upperBound, long nBins, int nOverlap, int nWidth);
 
       /// Constuct the array of discrete curv positions
       DiscreteCurv::Array constructArray() const
@@ -52,19 +47,25 @@ namespace Belle2 {
       DiscreteCurvWithArcLength2DCache::Array constructCacheArray() const;
 
       /// Getter for the number of bounds
-      size_t getNPositions() const;
+      long getNPositions() const;
 
-      /** Getter for the bin width in real curv to investigate the value
-       *  that results from the discrete overlap specification*/
+      /**
+       *  Getter for the bin width in real curv to investigate the value
+       *  that results from the discrete overlap specification.
+       */
       double getBinWidth() const;
 
-      /** Getter for the overlap in real curv to investigate the value
-       *  that results from the discrete overlap specification*/
+      /**
+       *  Getter for the overlap in real curv to investigate the value
+       *  that results from the discrete overlap specification
+       */
       double getOverlap() const;
 
       /// Getter for the overlap in discrete number of positions
-      size_t getNOverlap() const
-      { return m_nOverlap; }
+      int getNOverlap() const
+      {
+        return m_nOverlap;
+      }
 
     private:
       /// Lower bound of the binning range
@@ -74,46 +75,67 @@ namespace Belle2 {
       double m_upperBound;
 
       /// Number of accessable bins
-      size_t m_nBins;
+      long m_nBins;
 
       /// Overlap of the leaves in curv counted in number of discrete values.
-      size_t m_nOverlap = 1;
+      int m_nOverlap = 1;
 
       /// Width of the leaves at the maximal level in curv counted in number of discrete values.
-      size_t m_nWidth = 3;
+      int m_nWidth = 3;
     };
 
     /// Functor to get the lower curvature bound of a hough box.
     struct GetLowerCurv {
-      /// Getter function for the lower curvature bound of a hough box.
-      template<class AHoughBox>
-      EnableIf<AHoughBox::template HasType<DiscreteCurv>::value, float>
-      operator()(const AHoughBox& houghBox)
-      { return static_cast<float>(houghBox.template getLowerBound<DiscreteCurv>()); }
+      /// Getter function for the lower curvature bound of a hough box - discrete version
+      template <class AHoughBox, class SFINAE = EnableIf<AHoughBox::template HasType<DiscreteCurv>::value > >
+      float operator()(const AHoughBox& houghBox) const
+      {
+        return static_cast<float>(houghBox.template getLowerBound<DiscreteCurv>());
+      }
+
+      /// Getter function for the lower curvature bound of a hough box - continuous version
+      template <class AHoughBox, class SFINAE = EnableIf<AHoughBox::template HasType<ContinuousCurv>::value > >
+      double operator()(const AHoughBox& houghBox) const
+      {
+        return static_cast<float>(houghBox.template getLowerBound<ContinuousCurv>());
+      }
     };
 
     /// Functor to get the upper curvature bound of a hough box.
     struct GetUpperCurv {
-      /// Getter function for the upper curvature bound of a hough box.
-      template<class AHoughBox>
-      EnableIf<AHoughBox::template HasType<DiscreteCurv>::value, float>
-      operator()(const AHoughBox& houghBox)
-      { return static_cast<float>(houghBox.template getUpperBound<DiscreteCurv>()); }
+      /// Getter function for the upper curvature bound of a hough box - discrete version
+      template <class AHoughBox, class SFINAE = EnableIf<AHoughBox::template HasType<DiscreteCurv>::value> >
+      float operator()(const AHoughBox& houghBox) const
+      {
+        return static_cast<float>(houghBox.template getUpperBound<DiscreteCurv>());
+      }
+
+      /// Getter function for the upper curvature bound of a hough box - continuous version
+      template <class AHoughBox, class SFINAE = EnableIf<AHoughBox::template HasType<ContinuousCurv>::value> >
+      double operator()(const AHoughBox& houghBox) const
+      {
+        return static_cast<float>(houghBox.template getUpperBound<ContinuousCurv>());
+      }
     };
 
-    /** Function to get the lower curvature bound of box.
-     *  Returns 0 fo boxes that do not have a curvature coordinate */
-    template<class AHoughBox>
+    /**
+     *  Function to get the lower curvature bound of box.
+     *  Returns 0 fo boxes that do not have a curvature coordinate.
+     */
+    template <class AHoughBox>
     float getLowerCurv(const AHoughBox& houghBox)
-    //{ return GetLowerCurv()(houghBox); }
-    { return getIfApplicable<float>(GetLowerCurv(), houghBox, 0.0); }
+    {
+      return getIfApplicable<float>(GetLowerCurv(), houghBox, 0.0);
+    }
 
-    /** Function to get the upper curvature bound of box.
-     *  Returns 0 fo boxes that do not have a curvature coordinate */
-    template<class AHoughBox>
+    /**
+     *  Function to get the upper curvature bound of box.
+     *  Returns 0 fo boxes that do not have a curvature coordinate
+     */
+    template <class AHoughBox>
     float getUpperCurv(const AHoughBox& houghBox)
-    //{ return GetUpperCurv()(houghBox); }
-    { return getIfApplicable<float>(GetUpperCurv(), houghBox, 0.0); }
-
+    {
+      return getIfApplicable<float>(GetUpperCurv(), houghBox, 0.0);
+    }
   }
 }

@@ -391,7 +391,7 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
   eclWFData.getWaveformParArray(MP.data());
 
   // shape function parameters
-  int iff = 14;   //Alex Bobrov for correct chi square
+  int iff = 1 << 14;   //Alex Bobrov for correct chi square
 
   int ia = 1 << eclWFAlgo.getka();
   int ib = 1 << eclWFAlgo.getkb();
@@ -460,8 +460,9 @@ void ECLDigitizerModule::getfitparams(const ECLWaveformData& eclWFData, const EC
     }
 
     //first approximation without time correction
-    int jk = 24 - ((k + 3) >> 2);
-    if (jk >= 0 && jk < 24 && (k + 3) % 4 == 0) {
+    int jk = 23 + ((48 - k) >> 2);
+    if (jk >= 0 && jk < 24 && (48 - k) % 4 == 0) {
+
       double igg1 = 1 / a11;
       // to fixed point
       for (int i = 0; i < 16; i++) {

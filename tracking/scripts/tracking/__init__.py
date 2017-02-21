@@ -242,7 +242,6 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
 
     # Improve the quality of the axial tracks
     path.add_module("TrackQualityAsserterCDC",
-                    TracksStoreObjNameIsInput=True,
                     corrections=["B2B"])
 
     # Find the stereo hits to those axial tracks
@@ -250,15 +249,13 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
 
     # Combine segments with axial tracks
     path.add_module('SegmentTrackCombiner',
-                    TracksStoreObjNameIsInput=True,
-                    SegmentTrackFilter="mva",
-                    SegmentTrackFilterParameters={"cut": 0.75},
-                    TrackFilter="mva",
-                    TrackFilterParameters={"cut": 0.1})
+                    segmentTrackFilter="mva",
+                    segmentTrackFilterParameters={"cut": 0.75},
+                    trackFilter="mva",
+                    trackFilterParameters={"cut": 0.1})
 
     # Improve the quality of all tracks and output
     path.add_module("TrackQualityAsserterCDC",
-                    TracksStoreObjNameIsInput=True,
                     corrections=["LayerBreak", "LargeBreak2", "OneSuperlayer", "Small"])
 
     # Export CDCTracks to RecoTracks representation
@@ -309,7 +306,6 @@ def add_cdc_cr_track_finding(path,
 
     # Improve the quality of the axial tracks
     path.add_module("TrackQualityAsserterCDC",
-                    TracksStoreObjNameIsInput=True,
                     corrections=["B2B"])
 
     # Find the stereo hits to those axial tracks
@@ -317,15 +313,13 @@ def add_cdc_cr_track_finding(path,
 
     # Combine segments with axial tracks
     path.add_module('SegmentTrackCombiner',
-                    TracksStoreObjNameIsInput=True,
-                    SegmentTrackFilter="mva",
-                    SegmentTrackFilterParameters={"cut": 0.75},
-                    TrackFilter="mva",
-                    TrackFilterParameters={"cut": 0.1})
+                    segmentTrackFilter="mva",
+                    segmentTrackFilterParameters={"cut": 0.75},
+                    trackFilter="mva",
+                    trackFilterParameters={"cut": 0.1})
 
     # Improve the quality of all tracks and output
     path.add_module("TrackQualityAsserterCDC",
-                    TracksStoreObjNameIsInput=True,
                     corrections=["LayerBreak", "LargeBreak2", "OneSuperlayer", "Small"],
                     )
 

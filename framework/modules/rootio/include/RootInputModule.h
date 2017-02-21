@@ -22,6 +22,7 @@
 #include <set>
 
 #include <TChain.h>
+#include <TFile.h>
 
 
 namespace Belle2 {
@@ -111,8 +112,7 @@ namespace Belle2 {
      */
     std::vector<std::string> m_entrySequences;
 
-    /** Ignore filename override from command line
-     */
+    /** Ignore filename override from command line */
     bool m_ignoreCommandLineOverride;
 
     /** Array for names of branches, that shall be written out. */
@@ -134,6 +134,9 @@ namespace Belle2 {
 
     /** Level of parent files to be read. */
     int m_parentLevel;
+
+    /** Collect statistics on amount of data read and print statistics (seperate for input & parent files) after processing. */
+    bool m_collectStatistics;
 
 
     //then those for purely internal use:
@@ -166,6 +169,39 @@ namespace Belle2 {
 
     /** experiment, run, event number of first event to load */
     std::vector<int> m_skipToEvent;
+
+    /** for collecting statistics over multiple files. */
+    struct ReadStats {
+      long calls{0}; /**< number of read calls. */
+      long bytesRead{0}; /**< total number of bytes read. */
+      long bytesReadExtra{0}; /**< what TFile thinks was the overhead. */
+      /** add other stats object. */
+      void add(const ReadStats& b)
+      {
+        calls += b.calls;
+        bytesRead += b.bytesRead;
+        bytesReadExtra += b.bytesReadExtra;
+      }
+      /** add current statistics from TFile object. */
+      void addFromFile(const TFile* f)
+      {
+        calls += f->GetReadCalls();
+        bytesRead += f->GetBytesRead();
+        bytesReadExtra += f->GetBytesReadExtra();
+      }
+      /** string suitable for printing. */
+      std::string getString() const
+      {
+        std::string s;
+        s += "read: " + std::to_string(bytesRead) + " Bytes";
+        s += ", overhead: " + std::to_string(bytesReadExtra) + " Bytes";
+        s += ", Read() calls: " + std::to_string(calls);
+        return s;
+      }
+    };
+
+    /** some statistics for all files read so far. */
+    ReadStats m_readStats;
   };
 } // end namespace Belle2
 

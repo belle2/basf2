@@ -17,17 +17,17 @@ check_04_access passed
 running check_05_release: Check that it fails if the releases are different
 [INFO] Steering file: steering-test1.root.py
 [INFO] Steering file: steering-test2.root.py
-[ERROR] Release in test2.root differs from previous files: SomeOtherRelease != SomeRelease
+[ERROR] Release in "test2.root" differs from previous files: SomeOtherRelease != SomeRelease
 check_05_release passed
 running check_06_steering: Check that merging fails if the steering file is different
 [INFO] Steering file: steering-test1.root.py
 [INFO] Steering file: steering-test2.root.py
-[ERROR] Steering file for test2.root differs from previous files.
+[ERROR] Steering file for "test2.root" differs from previous files.
 check_06_steering passed
 running check_07_globaltag: Check that merging fails if the global tag is different
 [INFO] Steering file: steering-test1.root.py
 [INFO] Steering file: steering-test2.root.py
-[ERROR] Database globalTag in test2.root differs from previous files: OtherGlobalTag != GlobalTag
+[ERROR] Database globalTag in "test2.root" differs from previous files: OtherGlobalTag != GlobalTag
 check_07_globaltag passed
 running check_08_branches: Check that merging fails if the branches in the event tree are different
 [INFO] Steering file: steering-test1.root.py

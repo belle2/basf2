@@ -122,7 +122,10 @@ for ipar in range(0, algo.result().getNoParameters()):
         ew = algo.result().getEigenVectorElement(0, ipar)  # + algo.result().getEigenVectorElement(1, ipar)
         pos = Belle2.VXD.GeoCache.getInstance().get(label.getVxdID()).pointToGlobal(ROOT.TVector3(0, 0, 0))
 
-        value[0] = vxd.get(sid, pid)
+        if vxd:
+            value[0] = vxd.get(sid, pid)
+        else:
+            value[0] = 0.
         corrections.set(sid, pid, correction[0])
         errors.set(sid, pid, error[0])
         eigenweights.set(sid, pid, ew)
@@ -150,8 +153,8 @@ if condition:
     print("Condition number of the matrix: ", condition)
 
 # Example how to access collected data (but you need exp and run number)
-chi2ndf = Belle2.PyStoreObj('MillepedeCollector_chi2/ndf', 1).obj().getObject('1.1')
-pval = Belle2.PyStoreObj('MillepedeCollector_pval', 1).obj().getObject('1.1')
+chi2ndf = Belle2.PyStoreObj('MillepedeCollector_chi2/ndf', 1).obj().getObject('3.1')
+pval = Belle2.PyStoreObj('MillepedeCollector_pval', 1).obj().getObject('3.1')
 
 # Skip into interactive environment
 # You can draw something in the trees or the profile

@@ -120,6 +120,35 @@ namespace Belle2 {
     }
 
     /**
+     * Sets glue to be broken (delaminated)
+     * @param glueID glue ID: bar-mirror (1), bar-bar (2), prism-bar (3)
+     * @param fraction fraction of the delaminated surface
+     * @param angle angle of the delaminated surface
+     * @param material material name to simulate the delaminated glue
+     */
+    void setBrokenGlue(int glueID, double fraction, double angle,
+                       const std::string& material);
+
+    /**
+     * Sets parameters of the peel-off cookie volumes
+     * @param thickness volume thickness
+     * @param material material name
+     */
+    void setPeelOffRegions(double thickness, const std::string& material);
+
+    /**
+     * Appends peel-off cookie region
+     * @param ID region ID (1-based)
+     * @param fraction fraction of the area
+     * @param angle angle of the area
+     */
+    void appendPeelOffRegion(unsigned ID, double fraction, double angle)
+    {
+      m_prism.appendPeelOffRegion(ID, fraction, angle);
+    }
+
+
+    /**
      * Sets PMT array displacement
      * @param displ PMT array displacement parameters
      */

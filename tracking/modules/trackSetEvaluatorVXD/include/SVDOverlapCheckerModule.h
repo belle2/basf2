@@ -44,7 +44,7 @@ namespace Belle2 {
       m_spacePointTrackCands.isRequired(m_nameSpacePointTrackCands);
       m_svdClusters.isRequired();
 
-      m_overlapNetwork.registerInDataStore();
+      m_overlapNetwork.registerInDataStore(DataStore::c_DontWriteOut);
     }
 
     /** Checks for overlaps and fills the OverlapNetwork. */

@@ -35,5 +35,6 @@
 #pragma link C++ class Belle2::TOPNominalTTS+;
 #pragma link C++ class Belle2::TOPNominalTDC+;
 #pragma link C++ class Belle2::TOPGeometry+;
+#pragma link C++ class Belle2::TOPPmtGainPar+;
 
 #endif

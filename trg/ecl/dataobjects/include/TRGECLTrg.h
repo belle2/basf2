@@ -105,10 +105,22 @@ namespace Belle2 {
     int m_BeamBkgVeto;
     //! max TC Id
     int m_maxTCId;
+    //! The number of TC Hit
+    int m_NofTCHit;
+    //! The number of TC Hit in Barrel
+    int m_BrNofTCHit;
+    //! The number of TC Hit in Forward Endcap
+    int m_FwdNofTCHit;
+    //! The number of TC Hit in Backward Endcap
+    int m_BwdNofTCHit;
+
+
+
     //! max TC Energy
     double m_maxTCEnergy;
     //! max TC Timing
     double m_eventtiming;
+
 
     //! Set event id
     void setEventId(int eventId) { m_eventId = eventId; }
@@ -193,6 +205,13 @@ namespace Belle2 {
     //!
     void setMaxTCEnergy(double maxTCEnergy) { m_maxTCEnergy = maxTCEnergy; }
     //!
+    void setNofTCHit(double NofTCHit) { m_NofTCHit = NofTCHit; }
+    //!
+    void setBrNofTCHit(double BrNofTCHit) { m_BrNofTCHit = BrNofTCHit; }
+    //!
+    void setFwdNofTCHit(double FwdNofTCHit) { m_FwdNofTCHit = FwdNofTCHit; }
+    //!
+    void setBwdNofTCHit(double BwdNofTCHit) { m_BwdNofTCHit = BwdNofTCHit; }
 
 
 
@@ -246,6 +265,10 @@ namespace Belle2 {
       m_itimebin = 0;
       m_maxTCId = 0;
       m_maxTCEnergy = 0;
+      m_NofTCHit = 0;
+      m_BrNofTCHit = 0;
+      m_FwdNofTCHit = 0;
+      m_BwdNofTCHit = 0;
 
 
 

@@ -15,7 +15,6 @@
 #include <top/geometry/FrontEndMapper.h>
 #include <top/geometry/ChannelMapper.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/gearbox/Unit.h>
 #include <string>
 
 namespace Belle2 {
@@ -88,12 +87,6 @@ namespace Belle2 {
         }
       }
 
-      /**
-       * Returns broken glue joint fraction
-       * @return broken glue joint fraction
-       */
-      double getBrokenFraction() const {return m_brokenFraction;}
-
 
     private:
 
@@ -131,8 +124,6 @@ namespace Belle2 {
       ChannelMapper m_channelMapperIRSX;  /**< channel-pixel mapper */
 
       // Other
-
-      double m_brokenFraction = 0;    /**< broken glue joint fraction */
 
       static TOPGeometryPar* s_instance;  /**< Pointer to the class instance */
 

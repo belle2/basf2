@@ -20,10 +20,10 @@ using namespace std;
 using namespace Belle2;
 
 
-void DatabaseChain::createInstance(bool resetIoVs, LogConfig::ELogLevel logLevel)
+void DatabaseChain::createInstance(bool resetIoVs, LogConfig::ELogLevel logLevel, bool invertLogging)
 {
   DatabaseChain* database = new DatabaseChain(resetIoVs);
-  database->setLogLevel(logLevel);
+  database->setLogLevel(logLevel, invertLogging);
   Database::setInstance(database);
 }
 
@@ -59,13 +59,15 @@ pair<TObject*, IntervalOfValidity> DatabaseChain::getData(const EventMetaData& e
       if (m_resetIoVs && (i > 0)) {
         result.second = IntervalOfValidity(event.getExperiment(), event.getRun(), event.getExperiment(), event.getRun());
       }
+      if (m_invertLogging)
+        B2LOG(m_logLevel, 0, "Obtained " << package << "/" << module << " from database chain. IoV=" << result.second);
       return result;
     }
   }
 
-  B2LOG(m_logLevel, 0, "Failed to get " << package << "/" << module << " from database chain. No matching entry for experiment/run "
-        << event.getExperiment() << "/" <<
-        event.getRun() << " found.");
+  if (!m_invertLogging)
+    B2LOG(m_logLevel, 0, "Failed to get " << package << "/" << module << " from database chain. "
+          "No matching entry for experiment/run " << event.getExperiment() << "/" << event.getRun() << " found.");
   return result;
 }
 

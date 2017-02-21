@@ -10,12 +10,13 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCRLWireHit;
     class CDCTrack;
     /// Base filter for stereo hit - track relations.
-    using BaseStereoHitFilter = Filter<std::pair<const CDCTrack*, const CDCRLWireHit*>>;
+    using BaseStereoHitFilter = Filter<WeightedRelation<CDCTrack, const CDCRLWireHit>>;
   }
 }

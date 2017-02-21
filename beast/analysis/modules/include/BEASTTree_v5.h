@@ -179,6 +179,20 @@ namespace Belle2 {
       std::vector<float> DOSI;/** */
       std::vector<float> DOSI_av;/** */
 
+      //std::vector<float> TPC_rate_av[2][5];/** */
+      //std::vector<float> TPC_rate[2][5];/** */
+      float TPC_rate_av[2][5];/** */
+      float TPC_rate[2][5];/** */
+      //float TPC_dose_av[2][5];/** */
+      //float TPC_dose[2][5];/** */
+      std::vector<float> TPC_dose;/** */
+      std::vector<float> TPC_dose_av;/** */
+
+      float TPC_angular_rate_av[2][9][18];/** */
+      float TPC_angular_rate[2][9][18];/** */
+      float TPC_angular_dose_av[2][9][18];/** */
+      float TPC_angular_dose[2][9][18];/** */
+
       /**
        *.clear the structure: set elements to zero
        */
@@ -260,6 +274,26 @@ namespace Belle2 {
         PIN_dose_av.clear();
         BGO_energy_av.clear();
         HE3_rate_av.clear();
+        TPC_dose_av.clear();
+        TPC_dose.clear();
+        for (int i = 0; i < 2; i ++) {
+          for (int j = 0; j < 5; j ++) {
+            //TPC_rate_av[i][j].clear();
+            //TPC_rate[i][j].clear();
+            TPC_rate_av[i][j] = 0;
+            TPC_rate[i][j] = 0;
+            //TPC_dose_av[i][j] = 0;
+            //TPC_dose[i][j] = 0;
+          }
+          for (int j = 0; j < 9; j ++) {
+            for (int k = 0; k < 18; k ++) {
+              TPC_angular_rate[i][j][k] = 0;
+              TPC_angular_dose[i][j][k] = 0;
+              TPC_angular_rate_av[i][j][k] = 0;
+              TPC_angular_dose_av[i][j][k] = 0;
+            }
+          }
+        }
         CLAWS_rate_av.clear();
         QCSS_rate_av.clear();
         CSI_sumE_av.clear();

@@ -25,42 +25,42 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 namespace {
-  // const size_t maxLevel = 7;
-  // const size_t phi0Divisions = 7;
-  // const size_t tanLDivisions = 3;
+  // const int maxLevel = 7;
+  // const int phi0Divisions = 7;
+  // const int tanLDivisions = 3;
 
-  // const size_t maxLevel = 5;
-  // const size_t phi0Divisions = 7;
-  // const size_t tanLDivisions = 6;
+  // const int maxLevel = 5;
+  // const int phi0Divisions = 7;
+  // const int tanLDivisions = 6;
 
-  // const size_t maxLevel = 9;
-  // const size_t phi0Divisions = 3;
-  // const size_t tanLDivisions = 2;
+  // const int maxLevel = 9;
+  // const int phi0Divisions = 3;
+  // const int tanLDivisions = 2;
 
 
-  // const size_t maxLevel = 13;
-  // const size_t phi0Divisions = 2;
-  // const size_t tanLDivisions = 2;
+  // const int maxLevel = 13;
+  // const int phi0Divisions = 2;
+  // const int tanLDivisions = 2;
 
-  // const size_t maxLevel = 8;
-  // const size_t phi0Divisions = 3;
-  // const size_t tanLDivisions = 3;
+  // const int maxLevel = 8;
+  // const int phi0Divisions = 3;
+  // const int tanLDivisions = 3;
 
-  // const size_t maxLevel = 7;
-  // const size_t phi0Divisions = 4;
-  // const size_t tanLDivisions = 3;
+  // const int maxLevel = 7;
+  // const int phi0Divisions = 4;
+  // const int tanLDivisions = 3;
 
-  // const size_t discretePhi0Overlap = 4;
-  // const size_t discretePhi0Width = 5;
+  // const int discretePhi0Overlap = 4;
+  // const int discretePhi0Width = 5;
 
-  const size_t maxLevel = 13;
-  const size_t phi0Divisions = 2;
-  const size_t tanLDivisions = 2;
+  const int maxLevel = 13;
+  const int phi0Divisions = 2;
+  const int tanLDivisions = 2;
 
-  const size_t discretePhi0Overlap = 4;
-  const size_t discretePhi0Width = 5;
+  const int discretePhi0Overlap = 4;
+  const int discretePhi0Width = 5;
 
-  const size_t nPhi0Bins = std::pow(phi0Divisions, maxLevel);
+  const int nPhi0Bins = std::pow(phi0Divisions, maxLevel);
   Phi0BinsSpec phi0BinsSpec(nPhi0Bins,
                             discretePhi0Overlap,
                             discretePhi0Width);
@@ -68,9 +68,9 @@ namespace {
   const double maxTanL = 3.27;
   const double minTanL = -1.73;
 
-  const size_t discreteTanLOverlap = 1;
-  const size_t discreteTanLWidth = 2;
-  const size_t nTanLBins = std::pow(tanLDivisions, maxLevel);
+  const int discreteTanLOverlap = 1;
+  const int discreteTanLWidth = 2;
+  const int nTanLBins = std::pow(tanLDivisions, maxLevel);
   ImpactBinsSpec tanLBinsSpec(minTanL,
                               maxTanL,
                               nTanLBins,
@@ -138,7 +138,7 @@ namespace {
     houghTree.raze();
 
 
-    size_t iColor = 0;
+    int iColor = 0;
     for (std::pair<HoughBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
       const HoughBox& houghBox = candidate.first;
       const std::vector<CDCRLWireHit>& taggedHits = candidate.second;
@@ -155,7 +155,7 @@ namespace {
       for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {
         B2DEBUG(100, "    " <<
                 "rl = " << static_cast<int>(rlTaggedWireHit.getRLInfo()) << " " <<
-                "dl = " << rlTaggedWireHit->getRefDriftLength());
+                "dl = " << rlTaggedWireHit.getRefDriftLength());
       }
 
       for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {
@@ -226,7 +226,7 @@ namespace {
     houghTree.fell();
     houghTree.raze();
 
-    size_t iColor = 0;
+    int iColor = 0;
     for (std::pair<HoughBox, std::vector<const CDCSegment2D*> >& candidate : candidates) {
       const HoughBox& houghBox = candidate.first;
       const std::vector<const CDCSegment2D*>& segments = candidate.second;

@@ -27,8 +27,6 @@ SPTC2RTConverterModule::SPTC2RTConverterModule() : Module()
 
   addParam("recoHitInformationStoreArrayName", m_param_recoHitInformationStoreArrayName,
            "StoreArray name of the output RecoHitInformation.", std::string(""));
-  addParam("cdcHitsStoreArrayName", m_param_cdcHitsStoreArrayName, "StoreArray name of the related cdc hits.",
-           std::string(""));
   addParam("pxdHitsStoreArrayName", m_param_pxdHitsStoreArrayName, "StoreArray name of the related pxd hits.",
            std::string(""));
   addParam("svdHitsStoreArrayName", m_param_svdHitsStoreArrayName, "StoreArray name of the related svd hits.",
@@ -55,10 +53,12 @@ void SPTC2RTConverterModule::initialize()
   m_recoTracks = StoreArray<RecoTrack>(m_param_recoTracksStoreArrayName);
   m_recoTracks.registerInDataStore();
   RecoTrack::registerRequiredRelations(m_recoTracks,
-                                       m_param_recoHitInformationStoreArrayName,
-                                       m_param_pxdHitsStoreArrayName,
+                                       "",
                                        m_param_svdHitsStoreArrayName,
-                                       m_param_cdcHitsStoreArrayName);
+                                       m_param_pxdHitsStoreArrayName,
+                                       "",
+                                       "",
+                                       m_param_recoHitInformationStoreArrayName);
   m_recoTracks.registerRelationTo(m_spacePointTCs);
 
   StoreArray<PXDCluster>::required(m_param_pxdClustersName);
@@ -71,7 +71,7 @@ void SPTC2RTConverterModule::event()
 
   for (const SpacePointTrackCand& spacePointTC : m_spacePointTCs) {
     m_SPTCCtr++;
-    if (spacePointTC.getRefereeStatus() < 2048) {
+    if (spacePointTC.getRefereeStatus() < SpacePointTrackCand::c_isActive) {
       B2DEBUG(1, "SPTC2RTConverter::event: SpacePointTrackCandidate not active or reserved. RefereeStatus: " <<
               spacePointTC.getRefereeStatus());
       continue; // Ignore SpacePointTrackCandidate
@@ -96,20 +96,22 @@ void SPTC2RTConverterModule::createRecoTrack(const SpacePointTrackCand& spacePoi
 
   // Create and append new RecoTrack
   RecoTrack* newRecoTrack = m_recoTracks.appendNew(position, momentum, charge,
-                                                   m_param_cdcHitsStoreArrayName, m_param_svdHitsStoreArrayName,
-                                                   m_param_pxdHitsStoreArrayName, m_param_recoHitInformationStoreArrayName);
+                                                   "", m_param_svdHitsStoreArrayName,
+                                                   m_param_pxdHitsStoreArrayName, "", "", m_param_recoHitInformationStoreArrayName);
 
   // Set information not required by constructor
   newRecoTrack->setSeedCovariance(covSeed);
 
   // Add individual Hits/Clusters
   unsigned int sortingParameter = 0; // Recreate sorting since there are two cluster per SVD hit.
-  for (auto spacePoint : spacePointTC.getHits()) {
+  for (auto spacePoint : spacePointTC.getSortedHits()) {
+    B2DEBUG(10, "SPTC2RTConverter::event: Converting spacepoint: " << spacePoint->getArrayIndex());
 
     int detID = spacePoint->getType();
 
     if (detID == VXD::SensorInfoBase::PXD) {
       RelationVector<PXDCluster> relatedClusters = spacePoint->getRelationsTo<PXDCluster>(m_param_pxdClustersName);
+      B2DEBUG(10, "SPTC2RTConverter::event: Number of related PXD Clusters: " << relatedClusters.size());
       // relatedClusters should only contain 1 cluster for pxdHits. Loop over them to be robust against missing relations.
       for (const PXDCluster& cluster : relatedClusters) {
         newRecoTrack->addPXDHit(&cluster, sortingParameter, Belle2::RecoHitInformation::c_VXDTrackFinder);
@@ -117,14 +119,15 @@ void SPTC2RTConverterModule::createRecoTrack(const SpacePointTrackCand& spacePoi
       }
     } else if (detID == VXD::SensorInfoBase::SVD) {
       RelationVector<SVDCluster> relatedClusters = spacePoint->getRelationsTo<SVDCluster>(m_param_svdClustersName);
+      B2DEBUG(10, "SPTC2RTConverter::event: Number of related SVD Clusters: " << relatedClusters.size());
       // relatedClusters should contain 2 clusters for svdHits. Loop over them to be robust against missing relations.
       for (const SVDCluster& cluster : relatedClusters) {
         newRecoTrack->addSVDHit(&cluster, sortingParameter, Belle2::RecoHitInformation::c_VXDTrackFinder);
         sortingParameter++;
       }
     } else {
-      B2FATAL("SPTC2RTConverter::event: SpacePointTrackCandidate containing SpacePoint of unrecognised detector ID: " << detID <<
-              ". Created RecoTrack doesn't contain this SpacePoints!");
+      B2WARNING("SPTC2RTConverter::event: SpacePointTrackCandidate containing SpacePoint of unrecognised detector ID: " << detID <<
+                ". Created RecoTrack doesn't contain these SpacePoints!");
     }
   }
 

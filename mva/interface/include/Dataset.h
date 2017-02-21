@@ -48,6 +48,11 @@ namespace Belle2 {
       virtual unsigned int getNumberOfFeatures() const = 0;
 
       /**
+       * Returns the number of spectators in this dataset
+       */
+      virtual unsigned int getNumberOfSpectators() const = 0;
+
+      /**
        * Returns the number of events in this dataset
        */
       virtual unsigned int getNumberOfEvents() const = 0;
@@ -70,6 +75,12 @@ namespace Belle2 {
       virtual std::vector<float> getFeature(unsigned int iFeature);
 
       /**
+       * Returns all values of one spectator in a std::vector<float>
+       * @param iSpectator the position of the feature to return
+       */
+      virtual std::vector<float> getSpectator(unsigned int iSpectator);
+
+      /**
        * Returns all weights
        */
       virtual std::vector<float> getWeights();
@@ -86,6 +97,7 @@ namespace Belle2 {
 
       GeneralOptions m_general_options; /**< GeneralOptions passed to this dataset */
       std::vector<float> m_input; /**< Contains all feature values of the currently loaded event */
+      std::vector<float> m_spectators; /**< Contains all spectators values of the currently loaded event */
       float m_weight; /**< Contains the weight of the currently loaded event */
       float m_target; /**< Contains the target value of the currently loaded event */
       bool m_isSignal; /**< Defines if the currently loaded event is signal or background */
@@ -103,14 +115,21 @@ namespace Belle2 {
        * Constructs a new SingleDataset
        * @param general_options which defines e.g. number of variables
        * @param input feature values of the single event
+       * @param spectators spectator values of the single event
        * @param target target value of the single event (defaults to 1, because often this is not known if one wants to apply an expert)
        */
-      SingleDataset(const GeneralOptions& general_options, const std::vector<float>& input, float target = 1.0);
+      SingleDataset(const GeneralOptions& general_options, const std::vector<float>& input, float target = 1.0,
+                    const std::vector<float>& spectators = std::vector<float>());
 
       /**
        * Returns the number of features in this dataset
        */
       virtual unsigned int getNumberOfFeatures() const override { return m_input.size(); }
+
+      /**
+       * Returns the number of features in this dataset
+       */
+      virtual unsigned int getNumberOfSpectators() const override { return m_spectators.size(); }
 
       /**
        * Returns the number of events in this dataset which is always one
@@ -128,6 +147,12 @@ namespace Belle2 {
        */
       virtual std::vector<float> getFeature(unsigned int iFeature) override { return std::vector<float> {m_input[iFeature]}; }
 
+      /**
+       * Returns all values (in this case only one) of one spectator in a std::vector<float>
+       * @param iSpectator the position of the spectator to return
+       */
+      virtual std::vector<float> getSpectator(unsigned int iSpectator) override { return std::vector<float> {m_spectators[iSpectator]}; }
+
     };
 
     /**
@@ -141,15 +166,22 @@ namespace Belle2 {
        * Constructs a new MultiDataset
        * @param general_options which defines e.g. number of variables
        * @param input feature values of the single event
+       * @param spectators spectator values of the single event
        * @param target target value of the single event (defaults to 1, because often this is not known if one wants to apply an expert)
        */
-      MultiDataset(const GeneralOptions& general_options, const std::vector<std::vector<float>>& matrix,
+      MultiDataset(const GeneralOptions& general_options, const std::vector<std::vector<float>>& input,
+                   const std::vector<std::vector<float>>& spectators,
                    const std::vector<float>& targets = {}, const std::vector<float>& weights = {});
 
       /**
        * Returns the number of features in this dataset
        */
       virtual unsigned int getNumberOfFeatures() const override { return m_input.size(); }
+
+      /**
+       * Returns the number of spectators in this dataset
+       */
+      virtual unsigned int getNumberOfSpectators() const override { return m_spectators.size(); }
 
       /**
        * Returns the number of events in this dataset which is always one
@@ -164,6 +196,7 @@ namespace Belle2 {
 
     private:
       std::vector<std::vector<float>> m_matrix; /**< Feature matrix */
+      std::vector<std::vector<float>> m_spectator_matrix; /**< Spectator matrix */
       std::vector<float> m_targets; /**< target vector */
       std::vector<float> m_weights; /**< weight vector */
 
@@ -179,7 +212,6 @@ namespace Belle2 {
       /**
        * Constructs a new SubDataset holding a reference to the wrapped Dataset
        * @param general_options which defines e.g. a subset of variables of the original dataset
-       * @param variables subset of variables which are provided by this Dataset
        * @param events subset of events which are provided by this Dataset
        * @param dataset reference to the wrapped Dataset
        */
@@ -189,6 +221,11 @@ namespace Belle2 {
        * Returns the number of features in this dataset, so the size of the given subset of the variables
        */
       virtual unsigned int getNumberOfFeatures() const override { return m_feature_indices.size(); }
+
+      /**
+       * Returns the number of spectators in this dataset, so the size of the given subset of the spectators
+       */
+      virtual unsigned int getNumberOfSpectators() const override { return m_spectator_indices.size(); }
 
       /**
        * Returns the number of events in the wrapped dataset
@@ -207,10 +244,18 @@ namespace Belle2 {
        */
       virtual std::vector<float> getFeature(unsigned int iFeature) override;
 
+      /**
+       * Returns all values of one spectator in a std::vector<float> of the wrapped dataset
+       * @param iSpectator the position of the spectator to return in the given subset
+       */
+      virtual std::vector<float> getSpectator(unsigned int iSpectator) override;
+
     private:
       bool m_use_event_indices = false; /**< Use only a subset of the wrapped dataset events */
       std::vector<unsigned int>
       m_feature_indices; /**< Mapping from the position of a feature in the given subset to its position in the wrapped dataset */
+      std::vector<unsigned int>
+      m_spectator_indices; /**< Mapping from the position of a spectator in the given subset to its position in the wrapped dataset */
       std::vector<unsigned int>
       m_event_indices; /**< Mapping from the position of a event in the given subset to its position in the wrapped dataset */
       Dataset& m_dataset; /**< Reference to the wrapped dataset */
@@ -237,6 +282,11 @@ namespace Belle2 {
       virtual unsigned int getNumberOfFeatures() const override { return m_input.size(); }
 
       /**
+       * Returns the number of features in this dataset
+       */
+      virtual unsigned int getNumberOfSpectators() const override { return m_spectators.size(); }
+
+      /**
        * Returns the number of events in this dataset
        */
       virtual unsigned int getNumberOfEvents() const override
@@ -255,6 +305,12 @@ namespace Belle2 {
        * @param iFeature the position of the feature to return
        */
       virtual std::vector<float> getFeature(unsigned int iFeature) override;
+
+      /**
+       * Returns all values of one spectator in a std::vector<float>
+       * @param iSpectator the position of the spectator to return
+       */
+      virtual std::vector<float> getSpectator(unsigned int iSpectator) override;
 
       /**
        * Virtual destructor

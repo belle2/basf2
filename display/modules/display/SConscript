@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['$ROOT_LIBS', 'display', 'framework', 'geometry',
+env['LIBS'] = ['$ROOT_LIBS', 'display', 'framework',
                'tracking', 'vxd',
                'bklm_dataobjects', 'mdst_dataobjects', 'eklm_dataobjects',
                'pxd_dataobjects', 'svd_dataobjects', 'cdc_dataobjects',

@@ -20,6 +20,7 @@ def setup_VXDTF2(path=None,
                  use_svd=True,
                  filter_overlapping=True,
                  use_segment_network_filters=True,
+                 observerType=0,
                  quality_estimator='circleFit',
                  overlap_filter='greedy',
                  secmap_name=None,
@@ -35,6 +36,7 @@ def setup_VXDTF2(path=None,
     :param quality_estimator: which fit to use to determine track quality. Options 'circle', 'random'. Default 'circle'.
     :param filter_overlapping: if true overlapping tracks are reduced to a single track using the qualitiy indicator.
     :param use_segment_network_filters: if true use filters for segmentMap training. Default True.
+    :param observe_network_filters: FOR DEBUG ONLY! If true results for FilterVariables are stored to a root file. Default False.
     :param overlap_filter: which filter network to use. Options 'hopfield', 'greedy'. Default 'hopfield'.
     :param log_level: LogLevel of all modules in the chain
     :param debug_level: debug level of all modules in the chain.
@@ -85,6 +87,7 @@ def setup_VXDTF2(path=None,
     segNetProducer.param('SpacePointsArrayNames', ['SpacePoints'])
     segNetProducer.param('printNetworks', False)
     segNetProducer.param('addVirtualIP', False)
+    segNetProducer.param('observerType', observerType)
     segNetProducer.logging.log_level = log_level
     segNetProducer.logging.debug_level = debug_level
     modules.append(segNetProducer)
@@ -96,6 +99,7 @@ def setup_VXDTF2(path=None,
 
     cellOmat = register_module('TrackFinderVXDCellOMat')
     cellOmat.param('NetworkName', 'test2Hits')
+    cellOmat.param('printNetworks', False)
     cellOmat.param('strictSeeding', True)
     cellOmat.logging.log_level = log_level
     cellOmat.logging.debug_level = debug_level
@@ -105,11 +109,6 @@ def setup_VXDTF2(path=None,
     # VXDTF2 Step 3
     # Analyzer
     #################
-
-    momSeedRetriever = register_module('SPTCmomentumSeedRetriever')
-    momSeedRetriever.logging.log_level = log_level
-    momSeedRetriever.logging.debug_level = debug_level
-    modules.append(momSeedRetriever)
 
     # Quality
 
@@ -159,6 +158,10 @@ def setup_VXDTF2(path=None,
     # VXDTF2 Step 5
     # Converter
     #################
+    momSeedRetriever = register_module('SPTCmomentumSeedRetriever')
+    momSeedRetriever.logging.log_level = log_level
+    momSeedRetriever.logging.debug_level = debug_level
+    modules.append(momSeedRetriever)
 
     converter = register_module('SPTC2RTConverter')
     converter.logging.log_level = log_level
@@ -239,8 +242,9 @@ def setup_RTCtoSPTCConverters(
     recoTrackCandConverter.param('RecoTracksName', RTCinput)
     recoTrackCandConverter.param('SpacePointTCName', 'SPTracks')
     recoTrackCandConverter.param('SVDDoubleClusterSP', svdSPs)
-    recoTrackCandConverter.param('useTrueHits', False)
+    recoTrackCandConverter.param('useTrueHits', True)
     recoTrackCandConverter.param('useSingleClusterSP', False)
+    recoTrackCandConverter.param('minSP', 3)
     recoTrackCandConverter.param('skipProblematicCluster', False)
 
     # SpacePointTrackCand referee
@@ -249,12 +253,12 @@ def setup_RTCtoSPTCConverters(
     sptcReferee.param('sptcName', 'SPTracks')
     sptcReferee.param('newArrayName', sptcOutput)
     sptcReferee.param('storeNewArray', True)
-    sptcReferee.param('checkCurling', False)
+    sptcReferee.param('checkCurling', True)
     sptcReferee.param('splitCurlers', True)
     sptcReferee.param('keepOnlyFirstPart', True)
     sptcReferee.param('kickSpacePoint', True)
     sptcReferee.param('checkSameSensor', True)
-    sptcReferee.param('useMCInfo', False)
+    sptcReferee.param('useMCInfo', True)
 
     if path is 0:
         return [sp2thConnector, recoTrackCandConverter, sptcReferee]

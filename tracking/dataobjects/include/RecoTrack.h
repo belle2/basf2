@@ -110,7 +110,10 @@ namespace Belle2 {
     /**
      * Convenience method which registers all relations required to fully use
      * a RecoTrack. If you create a new RecoTrack StoreArray, call this method
-     * in the initialize() method of your module.
+     * in the initialize() method of your module. Note that the BKLM and EKLM
+     * relations may not be registered because the KLM modules are loaded after
+     * tracking; in this case, a second call of this method is required after
+     * creation of the BKLM and EKLM hits store arrays.
      * @param recoTracks  Reference to the store array where the new RecoTrack list is located
      * @param cdcHitsStoreArrayName  name of the StoreArray holding the CDCHits lists
      * @param svdHitsStoreArrayName  name of the StoreArray holding the SVDClusters lists
@@ -121,9 +124,9 @@ namespace Belle2 {
      */
     static void registerRequiredRelations(
       StoreArray<RecoTrack>& recoTracks,
-      std::string cdcHitsStoreArrayName = "",
-      std::string svdHitsStoreArrayName = "",
       std::string pxdHitsStoreArrayName = "",
+      std::string svdHitsStoreArrayName = "",
+      std::string cdcHitsStoreArrayName = "",
       std::string bklmHitsStoreArrayName = "",
       std::string eklmHitsStoreArrayName = "",
       std::string recoHitInformationStoreArrayName = "")
@@ -265,9 +268,9 @@ namespace Belle2 {
 
     /**
      * Adds a svd hit with the given information to the reco track.
-     * You only have to provide the hit and the arc length, all other parameters have default value.
+     * You only have to provide the hit and the sorting parameter, all other parameters have default value.
      * @param svdHit The pointer to a stored SVDHit in the store array you provided earlier, which you want to add.
-     * @param sortingParameter The arc length of the hit. The arc length is - by our definition - between -pi and pi.
+     * @param sortingParameter The index of the hit. It starts with 0 with the first hit.
      * @param foundByTrackFinder Which track finder has found the hit?
      * @return True if the hit was not already added to the track.
      */
@@ -279,9 +282,9 @@ namespace Belle2 {
 
     /**
      * Adds a bklm hit with the given information to the reco track.
-     * You only have to provide the hit and the arc length, all other parameters have default value.
+     * You only have to provide the hit and the sorting parameter, all other parameters have default value.
      * @param bklmHit The pointer to a stored BKLMHit in the store array you provided earlier, which you want to add.
-     * @param sortingParameter The arc length of the hit. The arc length is - by our definition - between -pi and pi.
+     * @param sortingParameter The index of the hit. It starts with 0 with the first hit.
      * @param foundByTrackFinder Which track finder has found the hit?
      * @return True if the hit was not already added to the track.
      */
@@ -293,9 +296,9 @@ namespace Belle2 {
 
     /**
      * Adds an eklm hit with the given information to the reco track.
-     * You only have to provide the hit and the arc length, all other parameters have default value.
+     * You only have to provide the hit and the sorting parameter, all other parameters have default value.
      * @param bklmHit The pointer to a stored BKLMHit in the store array you provided earlier, which you want to add.
-     * @param sortingParameter The arc length of the hit. The arc length is - by our definition - between -pi and pi.
+     * @param sortingParameter The index of the hit. It starts with 0 with the first hit.
      * @param foundByTrackFinder Which track finder has found the hit?
      * @return True if the hit was not already added to the track.
      */
@@ -525,6 +528,9 @@ namespace Belle2 {
     /// Set the covariance of the seed. ATTENTION: This is not the fitted covariance.
     void setSeedCovariance(const TMatrixDSym& seedCovariance) { m_genfitTrack.setCovSeed(seedCovariance); }
 
+    /// Set the tracking seed by using the fitted state at the first measurement. Will fail if the state is not present.
+    void copyStateFromSeed();
+
     // Fitting
     /// Returns true if the last fit with the given representation was successful.
     bool wasFitSuccessful(const genfit::AbsTrackRep* representation = nullptr) const;
@@ -565,6 +571,15 @@ namespace Belle2 {
       return getMeasuredStateOnPlaneFromHit(0, representation);
     }
 
+    /** Return genfit's MeasuredStateOnPlane for the first hit in a fit
+    * useful for extrapolation of measurements other locations
+    * Const version.
+    */
+    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromFirstHit(const genfit::AbsTrackRep* representation = nullptr) const
+    {
+      return getMeasuredStateOnPlaneFromHit(0, representation);
+    }
+
     /** Return genfit's MeasuredStateOnPlane for the last hit in a fit
     * useful for extrapolation of measurements other locations
     */
@@ -573,10 +588,29 @@ namespace Belle2 {
       return getMeasuredStateOnPlaneFromHit(-1, representation);
     }
 
+    /** Return genfit's MeasuredStateOnPlane for the last hit in a fit
+    * useful for extrapolation of measurements other locations
+    * Const version.
+    */
+    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation = nullptr) const
+    {
+      return getMeasuredStateOnPlaneFromHit(-1, representation);
+    }
+
     /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
     * useful for extrapolation of measurements other locations
     */
     const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr)
+    {
+      checkDirtyFlag();
+      return m_genfitTrack.getFittedState(id, representation);
+    }
+
+    /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
+    * useful for extrapolation of measurements other locations
+    * Const version.
+    */
+    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr) const
     {
       checkDirtyFlag();
       return m_genfitTrack.getFittedState(id, representation);

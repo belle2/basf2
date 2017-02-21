@@ -52,24 +52,13 @@ SpacePointTrackCand::SpacePointTrackCand(const std::vector<const Belle2::SpacePo
   m_q = charge;
   m_MCTrackID = mcTrackID;
 
+  double index = 0; /**< default sorting parameters */
   for (const SpacePoint* spacePoint : spacePoints) {
     m_trackSpacePoints.push_back(spacePoint);
-    m_trackSpacePointIndices.push_back(spacePoint->getArrayIndex());
+    m_sortingParameters.push_back(index);
+    index++;
   }
 }
-
-// destructor
-// TODO: get segmentation fault here at the moment!
-// removing code seems to work, but I have no idea why
-SpacePointTrackCand::~SpacePointTrackCand()
-{
-//   for (unsigned int i=0; i<m_trackSpacePoints.size(); ++i) {
-// //     std::cout << i << " of " << m_trackSpacePoints.size() << std::endl;
-//     delete m_trackSpacePoints[i];
-//   }
-//   m_trackSpacePoints.clear();
-}
-
 
 bool SpacePointTrackCand::checkOverlap(const SpacePointTrackCand& rhs, bool compareSPs)
 {
@@ -134,21 +123,19 @@ bool SpacePointTrackCand::operator== (const SpacePointTrackCand& rhs)
 }
 
 // get SpacePoints in range
-const std::vector<const Belle2::SpacePoint*> SpacePointTrackCand::getHitsInRange(int firstInd, int lastInd) const
+const std::vector<const Belle2::SpacePoint*> SpacePointTrackCand::getHitsInRange(int firstIndex, int lastIndex) const
 {
-  if (lastInd < firstInd) { // exchange ranges if they are in wrong order
-    int tmp = firstInd;
-    firstInd = lastInd;
-    lastInd = tmp;
+  if (lastIndex < firstIndex) { // exchange ranges if they are in wrong order
+    int tmp = firstIndex;
+    firstIndex = lastIndex;
+    lastIndex = tmp;
   }
   // check if the indices are in range!
-  if (firstInd < 0 || uint(lastInd) > m_trackSpacePoints.size() || uint(firstInd) > m_trackSpacePoints.size() || lastInd < 0) {
+  if (firstIndex < 0 || uint(lastIndex) > m_trackSpacePoints.size() || uint(firstIndex) > m_trackSpacePoints.size()
+      || lastIndex < 0) {
     throw SPTCIndexOutOfBounds();
   }
-  std::vector<const SpacePoint*> spacePoints;
-  for (int iSP = firstInd; iSP < lastInd; ++iSP) {
-    spacePoints.push_back(m_trackSpacePoints.at(iSP));
-  }
+  const std::vector<const SpacePoint*> spacePoints(m_trackSpacePoints.begin() + firstIndex, m_trackSpacePoints.begin() + lastIndex);
   return spacePoints;
 }
 
@@ -161,15 +148,36 @@ const std::vector<double> SpacePointTrackCand::getSortingParametersInRange(int f
     lastIndex = tmp;
   }
   // check if the indices are in range!
-  if (firstIndex < 0 || uint(lastIndex) > m_trackSpacePoints.size() || uint(firstIndex) > m_trackSpacePoints.size()
+  if (firstIndex < 0 || uint(lastIndex) > m_sortingParameters.size() || uint(firstIndex) > m_sortingParameters.size()
       || lastIndex < 0) {
     throw SPTCIndexOutOfBounds();
   }
-  std::vector<double> sortingParams;
-  for (int iSP = firstIndex; iSP < lastIndex; ++iSP) {
-    sortingParams.push_back(m_sortingParameters.at(iSP));
-  }
+  const std::vector<double> sortingParams(m_sortingParameters.begin() + firstIndex, m_sortingParameters.begin() + lastIndex);
   return sortingParams;
+}
+
+// get sorted hits
+const std::vector<const SpacePoint*> SpacePointTrackCand::getSortedHits() const
+{
+  std::vector<std::pair<const SpacePoint*, double>> sortVector;
+  sortVector.reserve(m_trackSpacePoints.size());
+  for (unsigned int index = 0; index < m_trackSpacePoints.size(); ++index) {
+    sortVector.push_back(std::make_pair(m_trackSpacePoints.at(index), m_sortingParameters.at(index)));
+  }
+
+  std::sort(sortVector.begin(), sortVector.end(), [](const std::pair<const SpacePoint*, double>& a,
+  const std::pair<const SpacePoint*, double>& b) {
+    return a.second < b.second;
+  });
+
+
+  std::vector<const SpacePoint*> sortedSpacePoints;
+  //sortedSpacePoints.reserve(m_trackSpacePoints.size());
+  for (auto pair : sortVector) {
+    sortedSpacePoints.push_back(pair.first);
+  }
+
+  return sortedSpacePoints;
 }
 
 // more or less copy pasted from genfit::TrackCand
@@ -183,7 +191,11 @@ void SpacePointTrackCand::setPdgCode(int pdgCode)
 // set sorting parameters
 void SpacePointTrackCand::setSortingParameters(const std::vector<double>& sortParams)
 {
-  for (auto aValue : sortParams) { m_sortingParameters.push_back(aValue); }
+  if (sortParams.size() != m_sortingParameters.size())
+    throw SPTCSortingParameterSizeInvalid();
+  for (size_t iSP = 0; iSP < sortParams.size(); ++iSP) {
+    m_sortingParameters.at(iSP) = sortParams.at(iSP);
+  }
 }
 
 // remove a SpacePoint by index
@@ -194,7 +206,7 @@ void SpacePointTrackCand::removeSpacePoint(int indexInTrackCand)
 
   // erase the entry from vector
   m_trackSpacePoints.erase(m_trackSpacePoints.begin() + indexInTrackCand);
-  if (uint(indexInTrackCand) < m_sortingParameters.size()) { m_sortingParameters.erase(m_sortingParameters.begin() + indexInTrackCand); } // only remove if possible
+  m_sortingParameters.erase(m_sortingParameters.begin() + indexInTrackCand);
 }
 
 // genfit::TrackCand prints to stdout, as does the Print method from ROOT TVectorD (which is invoked here).
@@ -221,14 +233,6 @@ void SpacePointTrackCand::print(int debuglevel, const Option_t* option) const
   output << "q = " << m_q << "\n";
   output << "pdgCode = " << m_pdg << "\n";
   output << ", QI = " << m_qualityIndex << "\n";
-
-//   for (unsigned int i = 0; i < m_trackSpacePoints.size(); ++i) {
-//
-//     const SpacePoint* spacePoint = m_trackSpacePoints[i];
-//     // COULDDO: implement a print method for SpacePoints
-//     output << "SpacePoint " << i << " has Index " << spacePoint->getArrayIndex() << " in StoreArray " << spacePoint->getArrayName() <<
-//            ". Sorting Parameter: " << m_sortingParameters[i] << "\n";
-//   }
 
   unsigned nSP = 0;
   for (const SpacePoint* spacePoint : getHits()) {

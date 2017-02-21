@@ -30,6 +30,7 @@ namespace Belle2 {
     struct Event {
       float time;   /**< Time. */
       float dist;   /**< Distance. */
+      float npe;    /**< Number of photoelectrons. */
     };
 
     /**

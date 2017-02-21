@@ -12,12 +12,12 @@
 
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/utilities/HTML.h>
+#include <framework/utilities/KeyValuePrinter.h>
 
 #include <boost/algorithm/string.hpp>
 
 #include <iostream>
 #include <fstream>
-
 
 using namespace std;
 using namespace Belle2;
@@ -69,32 +69,44 @@ void FileMetaData::exposePythonAPI()
   .def("set_lfn", &FileMetaData::setLfn);
 }
 
+
 void FileMetaData::Print(Option_t* option) const
 {
-  if (option && (strcmp(option, "steering") == 0)) {
+  if (option && (option == std::string("steering"))) {
     cout << m_steering << endl;
     return;
   }
-
-  const bool all = (option && (strcmp(option, "all") == 0));
-  cout << "FileMetaData" << endl;
-  cout << "  LFN    : " << m_lfn << endl;
-  cout << "  #event : " << m_nEvents << endl;
-  cout << "  range  : " << m_experimentLow << "/" << m_runLow << "/" << m_eventLow
-       << " - "  << m_experimentHigh << "/" << m_runHigh << "/" << m_eventHigh << endl;
-  cout << "  parents:";
-  for (std::string parent : m_parentLfns)
-    cout << " " << parent;
-  cout << endl;
-  if (all) {
-    cout << "  date   : " << m_date << endl;
-    cout << "  site   : " << m_site << endl;
-    cout << "  user   : " << m_user << endl;
-    cout << "  seed   : " << m_randomSeed << endl;
-    cout << "  release: " << m_release << endl;
-    cout << "  #MC    : " << m_mcEvents << endl;
-    cout << "globalTag: " << m_databaseGlobalTag << endl;
+  const bool use_json = (option && option == std::string("json"));
+  const bool all = use_json || (option && option == std::string("all"));
+  KeyValuePrinter printer(use_json);
+  printer.put("LFN", m_lfn);
+  printer.put("nEvents", m_nEvents);
+  if (use_json) {
+    printer.put("experimentLow", m_experimentLow);
+    printer.put("runLow", m_runLow);
+    printer.put("eventLow", m_eventLow);
+    printer.put("experimentHigh", m_experimentHigh);
+    printer.put("runHigh", m_runHigh);
+    printer.put("eventHigh", m_eventHigh);
+  } else {
+    printer.put("range", std::to_string(m_experimentLow) + "/" + std::to_string(m_runLow) + "/" + std::to_string(m_eventLow)
+                + " - "  + std::to_string(m_experimentHigh) + "/" + std::to_string(m_runHigh) + "/" + std::to_string(m_eventHigh));
   }
+  printer.put("parents", m_parentLfns);
+  if (all) {
+    printer.put("date", m_date);
+    printer.put("site", m_site);
+    printer.put("user", m_user);
+    printer.put("randomSeed", m_randomSeed);
+    printer.put("release", m_release);
+    printer.put("mcEvents", m_mcEvents);
+    printer.put("globalTag", m_databaseGlobalTag);
+  }
+  if (use_json)
+    printer.put("steering", m_steering);
+  if (!use_json)
+    std::cout << "=== FileMetaData ===\n";
+  std::cout << printer.string();
 }
 
 bool FileMetaData::read(std::istream& input, std::string& physicalFileName)
@@ -145,7 +157,7 @@ bool FileMetaData::read(std::istream& input, std::string& physicalFileName)
   return false;
 }
 
-bool FileMetaData::write(std::ostream& output, std::string physicalFileName)
+bool FileMetaData::write(std::ostream& output, std::string physicalFileName) const
 {
   output << "  <File>\n";
   output << "    <LFN>" << HTML::escape(m_lfn) << "</LFN>\n";

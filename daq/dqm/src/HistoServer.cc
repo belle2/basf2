@@ -73,7 +73,7 @@ int HistoServer::server()
           EvtMessage* hmsg = new EvtMessage(buffer);
           vector<TObject*> objlist;
           vector<string> strlist;
-          int ds = msghdl.decode_msg(hmsg, objlist, strlist);
+          msghdl.decode_msg(hmsg, objlist, strlist);
           int nobjs = (hmsg->header())->reserved[1];
           int narys = (hmsg->header())->reserved[2];
           //    string subdir = "ROOT";

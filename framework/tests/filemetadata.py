@@ -3,6 +3,8 @@
 
 import os
 import tempfile
+import subprocess
+import json
 from basf2 import *
 
 set_random_seed("something important")
@@ -69,4 +71,19 @@ assert 0 == os.system('addmetadata --lfn /logical/file/name ' + testFile.name)
 
 assert 0 == os.system('showmetadata ' + testFile.name)
 
+# Check JSON output (contains steering file, so we cannotuse .out)
+metadata_output = subprocess.check_output(['showmetadata', '--json', testFile.name])
+m = json.loads(metadata_output.decode('utf-8'))
+assert 7 == m['experimentLow']
+assert 1 == m['runLow']
+assert 1 == m['eventLow']
+assert 7 == m['experimentHigh']
+assert 15 == m['runHigh']
+assert 1 == m['eventHigh']
+assert 'something important' == m['randomSeed']
+assert 10 == m['nEvents']
+assert isinstance(m['nEvents'], int)
+assert '/logical/file/name' == m['LFN']
+
+# steering file is in metadata, so we check for existence of this string:
 # dummystring

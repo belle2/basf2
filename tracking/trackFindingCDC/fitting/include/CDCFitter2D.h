@@ -23,12 +23,7 @@ namespace Belle2 {
 
     public:
       /// Empty constructor
-      CDCFitter2D() :
-        AFitMethod(),
-        m_usePosition(true),
-        m_useOrientation(false),
-        m_doUseDriftVariance(true)
-      {}
+      CDCFitter2D() = default;
 
       /// Fits a collection of observation drift circles.
       CDCTrajectory2D fit(CDCObservations2D observations2D) const
@@ -88,11 +83,7 @@ namespace Belle2 {
       void update(CDCTrajectory2D& trajectory2D, const AStartHits& startHits, const AEndHits& endHits) const
       {
         CDCObservations2D observations2D;
-        if (m_doUseDriftVariance) {
-          observations2D.setFitVariance(EFitVariance::c_Proper);
-        } else {
-          observations2D.setFitVariance(EFitVariance::c_DriftLength);
-        }
+        observations2D.setFitVariance(m_fitVariance);
 
         if (m_usePosition) {
           observations2D.setFitPos(EFitPos::c_RecoPos);
@@ -127,11 +118,7 @@ namespace Belle2 {
       void update(CDCTrajectory2D& trajectory2D, const AHits& hits) const
       {
         CDCObservations2D observations2D;
-        if (m_doUseDriftVariance) {
-          observations2D.setFitVariance(EFitVariance::c_Proper);
-        } else {
-          observations2D.setFitVariance(EFitVariance::c_DriftLength);
-        }
+        observations2D.setFitVariance(m_fitVariance);
 
         if (m_usePosition) {
           observations2D.setFitPos(EFitPos::c_RecoPos);
@@ -159,28 +146,41 @@ namespace Belle2 {
       //useOnlyPosition is standard
 
       /// Setup the fitter to use only the reconstructed positions of the hits
-      void useOnlyPosition() { m_usePosition = true; m_useOrientation = false;}
+      void useOnlyPosition()
+      {
+        m_usePosition = true;
+        m_useOrientation = false;
+      }
 
       /// Setup the fitter to use only reference position and the drift length with right left orientation
-      void useOnlyOrientation() { m_usePosition = false; m_useOrientation = true;}
+      void useOnlyOrientation()
+      {
+        m_usePosition = false;
+        m_useOrientation = true;
+      }
 
       /// Setup the fitter to use both the reconstructed position and the reference position and the drift length with right left orientation.
-      void usePositionAndOrientation() { m_usePosition = true; m_useOrientation = true;}
+      void usePositionAndOrientation()
+      {
+        m_usePosition = true;
+        m_useOrientation = true;
+      }
 
-      /// Setup the fitter to not use the drift length variance.
-      void setNotUseDriftVariance() { m_doUseDriftVariance = false; }
+      /// Setup the fitter to use the given variance measure by default.
+      void setFitVariance(EFitVariance fitVariance)
+      {
+        m_fitVariance = fitVariance;
+      }
 
     private:
       /// Flag indicating the reconstructed position shall be used in the fit.
-      bool m_usePosition;
+      bool m_usePosition = true;
 
       /// Flag indicating the reference position and drift length with right left orientation shall be used in the fit.
-      bool m_useOrientation;
+      bool m_useOrientation = false;
 
-      /// Flag which indicates to only use the reco position and the 1/drift length as a weight.
-      bool m_doUseDriftVariance;
-
+      /// Default variance to be used in the fit.
+      EFitVariance m_fitVariance = EFitVariance::c_Proper;
     };
-
   }
 }

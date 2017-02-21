@@ -90,7 +90,7 @@ namespace {
       for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {
         B2DEBUG(100, "    " <<
                 "rl = " << static_cast<int>(rlTaggedWireHit.getRLInfo()) << " " <<
-                "dl = " << rlTaggedWireHit->getRefDriftLength());
+                "dl = " << rlTaggedWireHit.getRefDriftLength());
       }
 
       for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {
@@ -215,8 +215,12 @@ namespace {
     const double minWeight = 30.0;
     using Node = typename SimpleRLTaggedWireHitPhi0CurvHough::Node;
     AxialLegendreLeafProcessor<Node> leafProcessor(maxLevel);
-    leafProcessor.setMinWeight(minWeight);
-    leafProcessor.setMaxCurv(maxCurvAcceptance);
+
+    ModuleParamList moduleParamList;
+    const std::string prefix = "";
+    leafProcessor.exposeParameters(&moduleParamList, prefix);
+    moduleParamList.getParameter<double>("minWeight").setDefaultValue(minWeight);
+    moduleParamList.getParameter<double>("maxCurv").setDefaultValue(maxCurvAcceptance);
 
     // Execute the finding a couple of time to find a stable execution time.
     std::vector< std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit> > > candidates;
@@ -224,19 +228,28 @@ namespace {
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = this->timeIt(100, true, [&]() {
       houghTree.fell();
+
+      for (const CDCWireHit* wireHit : m_axialWireHits) {
+        AutomatonCell& automatonCell = wireHit->getAutomatonCell();
+        automatonCell.unsetTakenFlag();
+        automatonCell.unsetTemporaryFlags();
+      }
+
       houghTree.seed(m_axialWireHits);
 
       leafProcessor.clear();
 
       // Make two passes - one with more restrictive curvature
-      leafProcessor.setMaxCurv(curlCurv);
-      leafProcessor.setNRoadSearches(2);
-      leafProcessor.setRoadLevel(4);
+      moduleParamList.getParameter<double>("maxCurv").setDefaultValue(curlCurv);
+      moduleParamList.getParameter<int>("nRoadSearches").setDefaultValue(2);
+      moduleParamList.getParameter<int>("roadLevel").setDefaultValue(4);
+      leafProcessor.beginWalk();
       houghTree.findUsing(leafProcessor);
 
-      leafProcessor.setMaxCurv(maxCurvAcceptance);
-      leafProcessor.setNRoadSearches(3);
-      leafProcessor.setRoadLevel(0);
+      moduleParamList.getParameter<double>("maxCurv").setDefaultValue(maxCurvAcceptance);
+      moduleParamList.getParameter<int>("nRoadSearches").setDefaultValue(3);
+      moduleParamList.getParameter<int>("roadLevel").setDefaultValue(0);
+      leafProcessor.beginWalk();
       houghTree.findUsing(leafProcessor);
 
       candidates = leafProcessor.getCandidates();
@@ -270,7 +283,7 @@ namespace {
 
       for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {
         B2DEBUG(100, "    rl = " << static_cast<int>(rlTaggedWireHit.getRLInfo()) <<
-                " dl = " << rlTaggedWireHit->getRefDriftLength());
+                " dl = " << rlTaggedWireHit.getRefDriftLength());
       }
 
       for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {
@@ -312,8 +325,12 @@ namespace {
     const double minWeight = 30.0;
     using Node = typename SimpleRLTaggedWireHitPhi0CurvHough::Node;
     AxialLegendreLeafProcessor<Node> leafProcessor(maxLevel);
-    leafProcessor.setMinWeight(minWeight);
-    leafProcessor.setMaxCurv(maxCurvAcceptance);
+
+    ModuleParamList moduleParamList;
+    const std::string prefix = "";
+    leafProcessor.exposeParameters(&moduleParamList, prefix);
+    moduleParamList.getParameter<double>("minWeight").setDefaultValue(minWeight);
+    moduleParamList.getParameter<double>("maxCurv").setDefaultValue(maxCurvAcceptance);
 
     // Execute the finding a couple of time to find a stable execution time.
     std::vector< std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit> > > candidates;
@@ -322,19 +339,28 @@ namespace {
     TimeItResult timeItResult = timeIt(100, true, [&]() {
       // Exclude the timing of the resource release for comparision with the legendre test.
       houghTree.fell();
+
+      for (const CDCWireHit* wireHit : m_axialWireHits) {
+        AutomatonCell& automatonCell = wireHit->getAutomatonCell();
+        automatonCell.unsetTakenFlag();
+        automatonCell.unsetTemporaryFlags();
+      }
+
       houghTree.seed(m_axialWireHits);
 
       leafProcessor.clear();
 
       // Make two passes - one with more restrictive curvature
-      leafProcessor.setMaxCurv(curlCurv);
-      leafProcessor.setNRoadSearches(2);
-      leafProcessor.setRoadLevel(4);
+      moduleParamList.getParameter<double>("maxCurv").setDefaultValue(curlCurv);
+      moduleParamList.getParameter<int>("nRoadSearches").setDefaultValue(2);
+      moduleParamList.getParameter<int>("roadLevel").setDefaultValue(4);
+      leafProcessor.beginWalk();
       houghTree.findUsing(leafProcessor);
 
-      leafProcessor.setMaxCurv(maxCurvAcceptance);
-      leafProcessor.setNRoadSearches(3);
-      leafProcessor.setRoadLevel(0);
+      moduleParamList.getParameter<double>("maxCurv").setDefaultValue(maxCurvAcceptance);
+      moduleParamList.getParameter<int>("nRoadSearches").setDefaultValue(3);
+      moduleParamList.getParameter<int>("roadLevel").setDefaultValue(0);
+      leafProcessor.beginWalk();
       houghTree.findUsing(leafProcessor);
 
       candidates = leafProcessor.getCandidates();
@@ -368,7 +394,7 @@ namespace {
 
       for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {
         B2DEBUG(100, "    rl = " << static_cast<int>(rlTaggedWireHit.getRLInfo()) <<
-                " dl = " << rlTaggedWireHit->getRefDriftLength());
+                " dl = " << rlTaggedWireHit.getRefDriftLength());
       }
 
       for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {
@@ -448,7 +474,7 @@ namespace {
 
       for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {
         B2DEBUG(100, "    rl = " << static_cast<int>(rlTaggedWireHit.getRLInfo()) <<
-                " dl = " << rlTaggedWireHit->getRefDriftLength());
+                " dl = " << rlTaggedWireHit.getRefDriftLength());
       }
 
       for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {

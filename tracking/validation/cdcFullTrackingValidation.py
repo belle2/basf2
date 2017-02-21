@@ -43,7 +43,6 @@ class CDCFull(TrackingValidationRun):
         # "UseNLoops" : 1,
         # 'EnergyCut': 0.1,
     }
-    fit_geometry = None
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE
 

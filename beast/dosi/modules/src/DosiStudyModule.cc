@@ -161,11 +161,12 @@ void DosiStudyModule::event()
   StoreArray<SADMetaHit> MetaHits;
 
   //Look at the meta data to extract IR rate and scattering ring section
-  double rate = 0;
+
+  //double rate = 0;
   int ring_section = -1;
   int section_ordering[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
   for (const auto& MetaHit : MetaHits) {
-    rate = MetaHit.getrate();
+    //rate = MetaHit.getrate();
     double sad_ssraw = MetaHit.getssraw();
     double ssraw = 0;
     if (sad_ssraw >= 0) ssraw = sad_ssraw / 100.;

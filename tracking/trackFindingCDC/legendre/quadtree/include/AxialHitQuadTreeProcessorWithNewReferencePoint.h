@@ -7,30 +7,26 @@
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
-
-
 #pragma once
-#include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorTemplate.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /** A QuadTreeProcessor for TrackHits */
-    class AxialHitQuadTreeProcessorWithNewReferencePoint : public QuadTreeProcessorTemplate<float, float, CDCConformalHit, 2, 2> {
+    class AxialHitQuadTreeProcessorWithNewReferencePoint : public QuadTreeProcessorTemplate<float, float, const CDCWireHit, 2, 2> {
 
     public:
 
       /**
        * Constructor.
        * @param ranges ranges of the initial QuadTree (only one instance without children created)
-       * @referencePoint reference position. Conformal transformation will be performed with respect to this point rather than to (0;0)
+       * @referencePoint reference position.
        */
       AxialHitQuadTreeProcessorWithNewReferencePoint(const ChildRanges& ranges,
                                                      std::pair<double, double> referencePoint)
@@ -49,26 +45,27 @@ namespace Belle2 {
 
     public:
 
-      /// Provide CDCConformalHit to process.
-      void provideItemsSet(std::vector<CDCConformalHit*>& itemsVector) override final
+      /// Provide const CDCWireHit to process.
+      void provideItemsSet(std::vector<const CDCWireHit*>& itemsVector) override final
       {
         clear();
 
         std::vector<ItemType*>& quadtreeItemsVector = m_quadTree->getItemsVector();
         quadtreeItemsVector.reserve(itemsVector.size());
-        for (CDCConformalHit* item : itemsVector) {
-          if (item->getUsedFlag()) continue;
-          if (insertItemInNode(m_quadTree, item, 0, 0))
+        for (const CDCWireHit* item : itemsVector) {
+          if (item->getAutomatonCell().hasTakenFlag() or item->getAutomatonCell().hasMaskedFlag()) continue;
+          if (insertItemInNode(m_quadTree, item)) {
             quadtreeItemsVector.push_back(new ItemType(item));
+          }
         }
       }
 
       /**
        * @return Hits which belong to the QuadTree
        */
-      std::vector<CDCConformalHit*> getAssignedHits()
+      std::vector<const CDCWireHit*> getAssignedHits()
       {
-        std::vector<CDCConformalHit*> itemsToReturn;
+        std::vector<const CDCWireHit*> itemsToReturn;
         itemsToReturn.reserve(m_quadTree->getNItems());
 
         for (ItemType* item : m_quadTree->getItemsVector()) {
@@ -81,43 +78,59 @@ namespace Belle2 {
       /**
        * Do only insert the hit into a node if sinogram calculated from this hit belongs into this node
        */
-      bool insertItemInNode(QuadTree* node, CDCConformalHit* hit, unsigned int /*t_index*/,
-                            unsigned int /*r_index*/) const override final
+      bool insertItemInNode(QuadTree* node, const CDCWireHit* wireHit) const override final
       {
-        float dist_1[2][2];
-        float dist_2[2][2];
+        double l = wireHit->getRefDriftLength();
+        Vector2D pos2D = wireHit->getRefPos2D() - m_referencePoint;
+        double r2 = pos2D.normSquared() - l * l;
 
-        std::tuple<Vector2D, double> confCoords = hit->performConformalTransformWithRespectToPoint(m_referencePoint);
-        Vector2D min_n12 = Vector2D::Phi(node->getXMin());
-        Vector2D max_n12 = Vector2D::Phi(node->getXMax());
+        using Quadlet = std::array< std::array<float, 2>, 2>;
+        Quadlet distRight{};
+        Quadlet distLeft{};
 
-        float r_temp_min = std::get<0>(confCoords).dot(min_n12);
-        float r_temp_max = std::get<0>(confCoords).dot(max_n12);
+        // get top and bottom borders of the node
+        float rMin = node->getYMin() * r2 / 2;
+        float rMax = node->getYMax() * r2 / 2;
 
-        float r_min1 = r_temp_min - std::get<1>(confCoords);
-        float r_min2 = r_temp_min + std::get<1>(confCoords);
-        float r_max1 = r_temp_max - std::get<1>(confCoords);
-        float r_max2 = r_temp_max + std::get<1>(confCoords);
+        // get left and right borders of the node
+        const Vector2D& thetaVecMin = Vector2D::Phi(node->getXMin());
+        const Vector2D& thetaVecMax = Vector2D::Phi(node->getXMax());
 
-        float m_rMin = node->getYMin();
-        float m_rMax = node->getYMax();
+        float rHitMin = thetaVecMin.dot(pos2D);
+        float rHitMax = thetaVecMax.dot(pos2D);
 
-        dist_1[0][0] = m_rMin - r_min1;
-        dist_1[0][1] = m_rMin - r_max1;
-        dist_1[1][0] = m_rMax - r_min1;
-        dist_1[1][1] = m_rMax - r_max1;
+        // compute sinograms at the left and right borders of the node
+        float rHitMinRight = rHitMin - l;
+        float rHitMaxRight = rHitMax - l;
 
-        dist_2[0][0] = m_rMin - r_min2;
-        dist_2[0][1] = m_rMin - r_max2;
-        dist_2[1][0] = m_rMax - r_min2;
-        dist_2[1][1] = m_rMax - r_max2;
+        float rHitMinLeft = rHitMin + l;
+        float rHitMaxLeft = rHitMax + l;
 
+        // Compute distance from the sinograms to bottom and top borders of the node
+        distRight[0][0] = rMin - rHitMinRight;
+        distRight[0][1] = rMin - rHitMaxRight;
+        distRight[1][0] = rMax - rHitMinRight;
+        distRight[1][1] = rMax - rHitMaxRight;
 
-        return (! sameSign(dist_1[0][0], dist_1[0][1], dist_1[1][0], dist_1[1][1]) or
-                ! sameSign(dist_2[0][0], dist_2[0][1], dist_2[1][0], dist_2[1][1]));
+        distLeft[0][0] = rMin - rHitMinLeft;
+        distLeft[0][1] = rMin - rHitMaxLeft;
+        distLeft[1][0] = rMax - rHitMinLeft;
+        distLeft[1][1] = rMax - rHitMaxLeft;
+
+        // Compare distance signes from sinograms to the node
+        // Check right
+        if (not sameSign(distRight[0][0], distRight[0][1], distRight[1][0], distRight[1][1])) {
+          return true;
+        }
+
+        // Check left
+        if (not sameSign(distLeft[0][0], distLeft[0][1], distLeft[1][0], distLeft[1][1])) {
+          return true;
+        }
+
+        // Not contained
+        return false;
       }
-
     };
-
   }
 }

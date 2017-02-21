@@ -231,6 +231,12 @@ namespace Belle2 {
     */
     FlavorTaggerInfoMap* getMethodMap(std::string method);
 
+    /** checks if the given method method is used for the FlavorTagger with a corresponding FlavorTaggerInfoMap
+    * @param method "TMVA" or "FANN".
+    * @return True if the given method is in the FlavorTaggerInfo
+    */
+    bool isMethodInMap(std::string method);
+
     /**
     * Get all the tracks
     * @return vector of tracks

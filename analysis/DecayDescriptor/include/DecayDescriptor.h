@@ -41,6 +41,8 @@ namespace Belle2 {
     bool m_isInclusive;
     /** Is this the NULL object? */
     bool m_isNULL;
+    /** Is laconic naming scheme for particles in tuple required? */
+    bool m_isLaconic;
     /** Internally called by match(Particle*) and match(MCParticle*) function. */
     template <class T>
     int match(const T* p, int iDaughter_p);

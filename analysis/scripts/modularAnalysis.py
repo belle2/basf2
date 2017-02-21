@@ -307,6 +307,40 @@ def copyList(
     copyLists(outputListName, [inputListName], writeOut, path)
 
 
+def fsrCorrection(
+    outputListName,
+    leptonListName,
+    gammaListName,
+    thetaThreshold=5.0,
+    energyThreshold=1.0,
+    writeOut=False,
+    path=analysis_main,
+):
+    """
+    Takes the particles from the given lepton list copies them to the output list and adds the
+    4-vector of the closest photon (considered as radiative) to the lepton, if the given
+    criterias are fulfilled.
+
+    @param outputListName The corrected lepton list which should already exists.
+    @param leptonListName Lepton list which should already exists
+    @param gammaListName The list containing the gammas which are considered as possibly radiative gammas.
+    @param thetaThreshold The maximal accepted angle between the lepton and the gamma to be accepted to be radiative.
+    @param energyThreshold The maximum energy of the gamma to be accepted.
+    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param path          modules are added to this path
+    """
+
+    fsrcorrector = register_module('FSRCorrection')
+    fsrcorrector.set_name('FSRCorrection_' + outputListName)
+    fsrcorrector.param('leptonListName', leptonListName)
+    fsrcorrector.param('outputListName', outputListName)
+    fsrcorrector.param('gammaListName', gammaListName)
+    fsrcorrector.param('thetaThreshold', thetaThreshold)
+    fsrcorrector.param('energyThreshold', energyThreshold)
+    fsrcorrector.param('writeOut', writeOut)
+    path.add_module(fsrcorrector)
+
+
 def copyLists(
     outputListName,
     inputListNames,

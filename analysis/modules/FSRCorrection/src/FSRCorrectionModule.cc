@@ -73,7 +73,7 @@ namespace Belle2 {
     // check the validity of output ParticleList name
     bool valid = m_decaydescriptor.init(m_outputListName);
     if (!valid)
-      B2ERROR("FSRCorrectionModule::initialize Invalid output ParticleList name: " << m_outputListName);
+      B2ERROR("[FSRCorrectionModule] Invalid output ParticleList name: " << m_outputListName);
 
     // output particle
     const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
@@ -82,15 +82,15 @@ namespace Belle2 {
 
     // get exiting particle lists
     if (m_inputListName == m_outputListName) {
-      B2ERROR("FSRCorrectionModule::initialize Input and output list names " << m_inputListName << " are the same.");
+      B2ERROR("[FSRCorrectionModule] Input and output particle list names are the same: " << m_inputListName);
     } else if (!m_decaydescriptor.init(m_inputListName)) {
-      B2ERROR("FSRCorrectionModule::initialize Invalid input ParticleList name: " << m_inputListName);
+      B2ERROR("[FSRCorrectionModule] Invalid input particle list name: " << m_inputListName);
     } else {
       StoreObjPtr<ParticleList>::required(m_inputListName);
     }
 
     if (!m_decaydescriptorGamma.init(m_gammaListName)) {
-      B2ERROR("FSRCorrectionModule::initialize Invalid input ParticleList name: " << m_gammaListName);
+      B2ERROR("[FSRCorrectionModule] Invalid gamma particle list name: " << m_gammaListName);
     } else {
       StoreObjPtr<ParticleList>::required(m_gammaListName);
     }
@@ -112,7 +112,7 @@ namespace Belle2 {
 
     double cos_max = -1.0;
     double cos_limit = cos(m_angleThres * M_PI / 180.0);
-    const StoreArray<Particle> particles;
+    StoreArray<Particle> particles;
 
     const StoreObjPtr<ParticleList> inputList(m_inputListName);
     const StoreObjPtr<ParticleList> gammaList(m_gammaListName);
@@ -170,7 +170,7 @@ namespace Belle2 {
       // make new lepton
       TLorentzVector new4Vec;
       if (foundGamma) {
-        B2INFO("FSRCorrectionModule::event Found a radiative gamma and added its 4-vector to the lepton");
+        B2INFO("[FSRCorrectionModule] Found a radiative gamma and added its 4-vector to the lepton");
         new4Vec = lepton4Vector + gamma4Vector;
         daughterIndices.push_back(lepton->getMdstArrayIndex());
         daughterIndices.push_back(gammaMdstIndex);
@@ -188,11 +188,14 @@ namespace Belle2 {
       newLepton.setMomentumVertexErrorMatrix(lepton->getMomentumVertexErrorMatrix());
       newLepton.setPValue(lepton->getPValue());
       newLepton.updateMass(lepton->getPDGCode()); //no sure about that one
-      newLepton.addExtraInfo("fsrCor", float(foundGamma));
+      newLepton.addExtraInfo("fsrCorrected", float(foundGamma));
       // fixme not sure about the relation to the tracks (necessary?)
 
-      // add new particle
-      outputList->addParticle(&newLepton);
+      // add new particlei
+      Particle* newParticle = particles.appendNew(newLepton);
+      int iparticle = particles.getEntries() - 1;
+
+      outputList->addParticle(iparticle, newParticle->getPDGCode(), newParticle->getFlavorType());
 
     }
   }

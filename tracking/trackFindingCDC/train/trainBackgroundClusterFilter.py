@@ -4,15 +4,12 @@
 import os
 import sys
 import os.path
-import basf2
 
 from tracking.run.event_generation import ReadOrGenerateEventsRun
-from tracking.run.mixins import PostProcessingRunMixin
-
-import subprocess
+from trackfindingcdc.run.training import TrainingRunMixin
 
 
-class BackgroundClusterFilterTrainingRun(PostProcessingRunMixin, ReadOrGenerateEventsRun):
+class BackgroundClusterFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEventsRun):
     """Run to record clusters encountered at the ClusterBackgroundDetector and retrain its mva method"""
     n_events = 1000
     generator_module = "generic"
@@ -24,28 +21,35 @@ class BackgroundClusterFilterTrainingRun(PostProcessingRunMixin, ReadOrGenerateE
         path.add_module("WireHitPreparer",
                         flightTimeEstimation="outwards")
 
+        if self.task == "train":
+            varSets = [
+                "basic",
+                "bkg_truth",
+            ]
+
+        elif self.task == "eval":
+            varSets = [
+                "filter(mva_bkg)",
+                "bkg_truth",
+            ]
+
+        elif self.task == "explore":
+            # Change me.
+            varSets = [
+                "basic",
+                "bkg_truth",
+                "filter(mva_bkg)",
+            ]
+
         path.add_module("SegmentFinderCDCFacetAutomaton",
                         ClusterFilter="unionrecording",
                         ClusterFilterParameters={
-                            "rootFileName": "BackgroundClusterFilter.root",
-                            "varSets": ["basic", "bkg_truth", ]
+                            "rootFileName": self.sample_file_name,
+                            "varSets": varSets,
                         },
                         FacetFilter="none",
                         FacetRelationFilter="none")
         return path
-
-    def postprocess(self):
-        """Run the training as post-processing job
-
-        To run only the training run with --postprocess-only
-        """
-        super().postprocess()
-        cmd = [
-            "trackfindingcdc_teacher",
-            "--identifier", "trackfindingcdc_BackgroundClusterFilter",
-            "BackgroundClusterFilter.root",
-        ]
-        subprocess.call(cmd)
 
 
 def main():

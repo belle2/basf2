@@ -165,9 +165,6 @@ namespace Belle2 {
       cosTBz   = fabs(thrustB.CosTheta());
 
       // Cleo Cones
-      // TODO: make the following option configurable:
-      //       calculate the momentum flow for all particles in the event
-      //       vs only those in the roe.
       CleoCones cc(p3_cms_all, p3_cms_roe, thrustB, true, true);
       cleoConesAll = cc.cleo_cone_with_all();
       cleoConesROE = cc.cleo_cone_with_roe();

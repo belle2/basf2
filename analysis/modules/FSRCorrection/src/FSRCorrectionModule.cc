@@ -50,59 +50,52 @@ namespace Belle2 {
     // set module description (e.g. insert text)
     setDescription("Adds radiative photons to lepton");
     // fixme: no clue here
-//    setPropertyFlags(c_ParallelProcessingCertified);
+    // setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("leptonListName", m_leptonListName, "The initial lepton list which should already exists.");
-    addParam("outputListName", m_outputListName, "The corrected lepton list which should already exists.");
-    addParam("gammaListName", m_gammaListName, "The list containing the gammas which are considered as possibly radiative gammas");
-    addParam("thetaThreshold", m_thetaThres,
-             "The maximal accepted angle between the lepton and the gamma to be accepted to be radiative", 5.0);
-    // fixme is unit of energy really gev?
-    addParam("energyThreshold", m_energyThres, "The maximum energy of the gamma to be accepted.", 1.0);
+    addParam("inputListName", m_inputListName, "The initial lepton list containing the leptons to correct, should already exists.");
+    addParam("outputListName", m_outputListName, "The output lepton list containing the corrected leptons.");
+    addParam("gammaListName", m_gammaListName, "The gammas list containing possibly radiative gammas, should already exist.");
+    addParam("angleThreshold", m_angleThres,
+             "The maximal accepted angle (in degrees) between the lepton and the (radiative) gamma to be accepted", 5.0);
+    addParam("energyThreshold", m_energyThres, "The maximum energy of the (radiative) gamma to be accepted.", 1.0);
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 
-    // initializing the rest of private memebers
+    // initializing the rest of private members
     m_pdgCode   = 0;
-
-    // original code can be found here: /sw/belle/belle/b20090127_0910/src/anal/eid/eid/eid.h /sw/belle/belle/b20090127_0910/src/anal/eid/src/eid.cc
   }
 
   void FSRCorrectionModule::initialize()
   {
-    // 1) fixme clear everything
     m_pdgCode = 0;
 
     // check the validity of output ParticleList name
     bool valid = m_decaydescriptor.init(m_outputListName);
     if (!valid)
-      B2ERROR("ParticleListManipulatorModule::initialize Invalid output ParticleList name: " << m_outputListName);
+      B2ERROR("FSRCorrectionModule::initialize Invalid output ParticleList name: " << m_outputListName);
 
-    //Output particle
+    // output particle
     const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
     m_pdgCode  = mother->getPDGCode();
     m_outputAntiListName = ParticleListName::antiParticleListName(m_outputListName);
 
-    B2INFO(" pdg code in initilize " << m_pdgCode);
-
-    // 2) get exiting particle lists
-    if (m_leptonListName == m_outputListName) {
-      B2ERROR("FSRCorrection: input and output list names " << m_leptonListName << " are the same.");
-    } else if (!m_decaydescriptor.init(m_leptonListName)) {
-      B2ERROR("Invalid input ParticleList name: " << m_leptonListName);
+    // get exiting particle lists
+    if (m_inputListName == m_outputListName) {
+      B2ERROR("FSRCorrectionModule::initialize Input and output list names " << m_inputListName << " are the same.");
+    } else if (!m_decaydescriptor.init(m_inputListName)) {
+      B2ERROR("FSRCorrectionModule::initialize Invalid input ParticleList name: " << m_inputListName);
     } else {
-      StoreObjPtr<ParticleList>::required(m_leptonListName);
+      StoreObjPtr<ParticleList>::required(m_inputListName);
     }
 
-    // fixme maybe I should check more (e.g. pdgoflist == gamma, no input nor outputlist, etc)
     if (!m_decaydescriptorGamma.init(m_gammaListName)) {
-      B2ERROR("Invalid input ParticleList name: " << m_gammaListName);
+      B2ERROR("FSRCorrectionModule::initialize Invalid input ParticleList name: " << m_gammaListName);
     } else {
       StoreObjPtr<ParticleList>::required(m_gammaListName);
     }
 
-    // 3) make a new list
+    // make output list
     StoreObjPtr<ParticleList> particleList(m_outputListName);
     DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
     particleList.registerInDataStore(flags);
@@ -115,13 +108,11 @@ namespace Belle2 {
   {
 
     // clear the list
-    // fixme more to clear?
     m_particlesInTheList.clear();
     m_usedGammas.clear();
 
     double cos_max = -1.;
-    double cos_limit = cos(m_thetaThres * M_PI / 180.0);
-    B2INFO("COS LIM " << cos_limit);
+    double cos_limit = cos(m_angleThres * M_PI / 180.0);
     const StoreArray<Particle> particles;
     StoreObjPtr<ParticleList> plist(m_outputListName);
     StoreObjPtr<ParticleList> gammaList(m_gammaListName);
@@ -130,9 +121,7 @@ namespace Belle2 {
     if (!existingList) {
       // new particle list: create it
       plist.create();
-      B2INFO(" plist init pdg " << m_pdgCode);
       plist->initialize(m_pdgCode, m_outputListName);
-      B2INFO(" plist after init  pdg " << plist->getPDGCode());
 
       StoreObjPtr<ParticleList> antiPlist(m_outputAntiListName);
       antiPlist.create();
@@ -153,24 +142,20 @@ namespace Belle2 {
     }
 
 
-    // copy all particles from input lists into plist
-
-    const StoreObjPtr<ParticleList> inPList(m_leptonListName);
-
+    // copy all particles from input lists into plist and add a radiative gamma if found
+    const StoreObjPtr<ParticleList> inPList(m_inputListName);
     std::vector<int> fsParticles     = inPList->getList(ParticleList::EParticleType::c_FlavorSpecificParticle, false);
     const std::vector<int>& fsAntiParticles = inPList->getList(ParticleList::EParticleType::c_FlavorSpecificParticle, true);
 
     fsParticles.insert(fsParticles.end(), fsAntiParticles.begin(), fsAntiParticles.end());
 
-    B2INFO("electon list size " <<  fsParticles.size());
+    // loop over lepton list
     for (unsigned i = 0; i < fsParticles.size(); i++) {
-      B2INFO("at electecton number " << i);
       Particle* lepton = particles[fsParticles[i]];
       TLorentzVector lepton4Vector = lepton->get4Vector();
       TLorentzVector gamma4Vector;
       bool foundGamma = false;
       int gammaMdstIndex = -999;
-
 
 
       // loop over gamma list
@@ -186,12 +171,11 @@ namespace Belle2 {
         if (gammaUsed) continue;
 
         // get angle
-        // fixme get the angles in the right planes and make proper checks
-        // fixme warum das mit dem frame
+        // todo use a more advanced angle
+        // fixme do I use the correct frame
         const auto& frame = ReferenceFrame::GetCurrent();
         TVector3 pi = frame.getMomentum(lepton).Vect();
         TVector3 pj = frame.getMomentum(gamma).Vect();
-        // fixme gibt das den cosine zurueck?
         auto cos_angle = cos(pi.Angle(pj));
 
         if (cos_angle > cos_max) {
@@ -205,43 +189,25 @@ namespace Belle2 {
         }
       }
 
-      // add 4vector
+      // add 4-vector
       if (foundGamma) {
-
-        B2INFO("COS LIM " << cos_limit);
-        B2INFO("COSmax of this gamma " << cos_max);
-        B2INFO("Found a radiative gamma and add the 4 Vector to the lepton");
-        B2INFO("pdg before " << lepton->getPDGCode());
-        B2INFO("4vector before " << lepton->get4Vector().Px() << " " <<  lepton->get4Vector().Py() << " " <<  lepton->get4Vector().Pz() <<
-               " " <<  lepton->get4Vector().Energy());
+        B2INFO("FSRCorrectionModule::event Found a radiative gamma and added its 4-vector to the lepton");
         m_usedGammas.push_back(gammaMdstIndex);
         lepton->set4Vector(lepton4Vector + gamma4Vector);
-        B2INFO("4vector after " << lepton->get4Vector().Px() << " " <<  lepton->get4Vector().Py() << " " <<  lepton->get4Vector().Pz() <<
-               " " <<  lepton->get4Vector().Energy());
-        B2INFO("pdg after " << lepton->getPDGCode());
       }
 
-      B2INFO("still at electecton number " << i);
       std::vector<int> idSeq;
       fillUniqueIdentifier(lepton, idSeq);
       bool uniqueSeq = isUnique(idSeq);
 
       if (uniqueSeq) {
-        B2INFO("addiding electontr " << i);
-        B2INFO("pdg lepton " << lepton->getPDGCode());
-        B2INFO("pdg list " << plist->getPDGCode());
-        B2INFO("4vector when adding " << lepton->get4Vector().Px() << " " <<  lepton->get4Vector().Py() << " " <<  lepton->get4Vector().Pz()
-               << " " <<  lepton->get4Vector().Energy());
         plist->addParticle(lepton);
-
-        B2INFO("currecnt list size " <<  plist->getListSize());
         m_particlesInTheList.push_back(idSeq);
       }
     }
-    B2INFO("AD|FTER electon list size " <<  plist->getListSize());
   }
 
-// fixme klaeren mit den funcktionene (wann kann einen list schon exitieren?)
+
   void FSRCorrectionModule::fillUniqueIdentifier(const Particle* p, std::vector<int>& idSequence)
   {
     idSequence.push_back(p->getPDGCode());
@@ -255,6 +221,7 @@ namespace Belle2 {
         fillUniqueIdentifier(p->getDaughter(i), idSequence);
     }
   }
+
 
   bool FSRCorrectionModule::isUnique(const std::vector<int>& idSeqOUT)
   {

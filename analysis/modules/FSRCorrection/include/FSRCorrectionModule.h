@@ -67,12 +67,12 @@ namespace Belle2 {
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of the lepton decay */
     DecayDescriptor m_decaydescriptorGamma; /**< Decay descriptor of the decay being reconstructed */
 
-    std::string m_leptonListName; /**< input ParticleList names */
+    std::string m_inputListName; /**< input ParticleList names */
     std::string m_gammaListName; /**< input ParticleList names */
     std::string m_outputListName; /**< output ParticleList name */
     std::string m_outputAntiListName;   /**< output anti-particle list name */
 
-    double m_thetaThres; /**< max angle to be accepted */
+    double m_angleThres; /**< max angle to be accepted */
     double m_energyThres; /**< max energy of gamma to be accepted */
 
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */

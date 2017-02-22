@@ -108,57 +108,36 @@ namespace Belle2 {
   {
 
     // clear the list
-    m_particlesInTheList.clear();
     m_usedGammas.clear();
 
-    double cos_max = -1.;
+    double cos_max = -1.0;
     double cos_limit = cos(m_angleThres * M_PI / 180.0);
     const StoreArray<Particle> particles;
-    StoreObjPtr<ParticleList> plist(m_outputListName);
-    StoreObjPtr<ParticleList> gammaList(m_gammaListName);
-    bool existingList = plist.isValid();
 
-    if (!existingList) {
-      // new particle list: create it
-      plist.create();
-      plist->initialize(m_pdgCode, m_outputListName);
+    const StoreObjPtr<ParticleList> inputList(m_inputListName);
+    const StoreObjPtr<ParticleList> gammaList(m_gammaListName);
 
-      StoreObjPtr<ParticleList> antiPlist(m_outputAntiListName);
-      antiPlist.create();
-      antiPlist->initialize(-1 * m_pdgCode, m_outputAntiListName);
-      antiPlist->bindAntiParticleList(*(plist));
+    // new particle list
+    StoreObjPtr<ParticleList> outputList(m_outputListName);
+    outputList.create();
+    outputList->initialize(m_pdgCode, m_outputListName);
 
-    } else  {
-      // output list already contains Particles
-      // fill m_particlesInTheList with unique
-      // identifiers of particles already in
-      for (unsigned i = 0; i < plist->getListSize(); i++) {
-        const Particle* particle = plist->getParticle(i);
+    StoreObjPtr<ParticleList> outputAntiList(m_outputAntiListName);
+    outputAntiList.create();
+    outputAntiList->initialize(-1 * m_pdgCode, m_outputAntiListName);
+    outputAntiList->bindAntiParticleList(*(outputList));
 
-        std::vector<int> idSeq;
-        fillUniqueIdentifier(particle, idSeq);
-        m_particlesInTheList.push_back(idSeq);
-      }
-    }
+    //fixme check if antiparticles are included
 
-
-    // copy all particles from input lists into plist and add a radiative gamma if found
-    const StoreObjPtr<ParticleList> inPList(m_inputListName);
-    std::vector<int> fsParticles     = inPList->getList(ParticleList::EParticleType::c_FlavorSpecificParticle, false);
-    const std::vector<int>& fsAntiParticles = inPList->getList(ParticleList::EParticleType::c_FlavorSpecificParticle, true);
-
-    fsParticles.insert(fsParticles.end(), fsAntiParticles.begin(), fsAntiParticles.end());
-
-    // loop over lepton list
-    for (unsigned i = 0; i < fsParticles.size(); i++) {
-      Particle* lepton = particles[fsParticles[i]];
+    // look for a possible fsr gamma
+    for (unsigned i = 0; i < inputList->getListSize(); i++) {
+      Particle* lepton = inputList->getParticle(i);
       TLorentzVector lepton4Vector = lepton->get4Vector();
       TLorentzVector gamma4Vector;
       bool foundGamma = false;
       int gammaMdstIndex = -999;
+      std::vector<int> daughterIndices;
 
-
-      // loop over gamma list
       for (unsigned j = 0; j < gammaList->getListSize(); j++) {
         Particle* gamma = gammaList->getParticle(j);
 
@@ -184,57 +163,40 @@ namespace Belle2 {
             foundGamma = true;
             gammaMdstIndex = gamma->getMdstArrayIndex();
             gamma4Vector = gamma->get4Vector();
-
           }
         }
       }
 
-      // add 4-vector
+      // make new lepton
+      TLorentzVector new4Vec;
       if (foundGamma) {
         B2INFO("FSRCorrectionModule::event Found a radiative gamma and added its 4-vector to the lepton");
+        new4Vec = lepton4Vector + gamma4Vector;
+        daughterIndices.push_back(lepton->getMdstArrayIndex());
+        daughterIndices.push_back(gammaMdstIndex);
         m_usedGammas.push_back(gammaMdstIndex);
-        lepton->set4Vector(lepton4Vector + gamma4Vector);
+
+      } else {
+        new4Vec = lepton4Vector;
+        daughterIndices.push_back(lepton->getMdstArrayIndex());
       }
 
-      std::vector<int> idSeq;
-      fillUniqueIdentifier(lepton, idSeq);
-      bool uniqueSeq = isUnique(idSeq);
+      // fixme not sure what else to set
+      // fixme m_particleArray - his this correct?
+      Particle newLepton = Particle(new4Vec, lepton->getPDGCode(), Particle::c_Flavored, daughterIndices, lepton->getArrayPointer());
+      newLepton.setVertex(lepton->getVertex());
+      newLepton.setMomentumVertexErrorMatrix(lepton->getMomentumVertexErrorMatrix());
+      newLepton.setPValue(lepton->getPValue());
+      newLepton.updateMass(lepton->getPDGCode()); //no sure about that one
+      newLepton.addExtraInfo("fsrCor", float(foundGamma));
+      // fixme not sure about the relation to the tracks (necessary?)
 
-      if (uniqueSeq) {
-        plist->addParticle(lepton);
-        m_particlesInTheList.push_back(idSeq);
-      }
+      // add new particle
+      outputList->addParticle(&newLepton);
+
     }
   }
 
-
-  void FSRCorrectionModule::fillUniqueIdentifier(const Particle* p, std::vector<int>& idSequence)
-  {
-    idSequence.push_back(p->getPDGCode());
-
-    if (p->getNDaughters() == 0) {
-      idSequence.push_back(p->getMdstArrayIndex());
-    } else {
-      idSequence.push_back(p->getNDaughters());
-      // this is not FSP (go one level down)
-      for (unsigned i = 0; i < p->getNDaughters(); i++)
-        fillUniqueIdentifier(p->getDaughter(i), idSequence);
-    }
-  }
-
-
-  bool FSRCorrectionModule::isUnique(const std::vector<int>& idSeqOUT)
-  {
-    for (unsigned i = 0; i < m_particlesInTheList.size(); i++) {
-      std::vector<int> idSeqIN = m_particlesInTheList[i];
-
-      bool sameSeq = (idSeqIN == idSeqOUT);
-      if (sameSeq)
-        return false;
-    }
-
-    return true;
-  }
 
 } // end Belle2 namespace
 

@@ -15,7 +15,7 @@
 
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/ParticleList.h>
-
+#include <analysis/dataobjects/Particle.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -82,7 +82,6 @@ namespace Belle2 {
      * that are already included in the ParticleList. It is used to prevent
      * adding one or more copies of a Particle to the list that is already in.
      */
-    std::vector<std::vector<int>> m_particlesInTheList;
     std::vector<int> m_usedGammas;
 
     /**

@@ -270,8 +270,12 @@ void CDCCRTestModule::event()
     if (m_MakeHitDist) {
       getHitDistInTrackCand(track);
     }
+    if (!track->hasTrackFitStatus()) {
+      m_hNTracks->Fill("Track not fitted", 1.0);
+      continue;
+    }
     if (!track->getTrackFitStatus()->isFitted()) {
-      m_hNTracks->Fill("TrackCand, but no Track", 1.0);
+      m_hNTracks->Fill("Track not fitted", 1.0);
       continue;
     }
     const genfit::FitStatus* fs = track->getTrackFitStatus();

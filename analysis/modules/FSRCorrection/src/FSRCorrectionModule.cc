@@ -11,6 +11,7 @@
 // Own include
 #include <analysis/modules/FSRCorrection/FSRCorrectionModule.h>
 
+
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
@@ -25,7 +26,7 @@
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
-
+#include <math.h>
 #include <algorithm>
 
 using namespace std;
@@ -73,6 +74,18 @@ namespace Belle2 {
     // 1) fixme clear everything
     m_pdgCode = 0;
 
+    // check the validity of output ParticleList name
+    bool valid = m_decaydescriptor.init(m_outputListName);
+    if (!valid)
+      B2ERROR("ParticleListManipulatorModule::initialize Invalid output ParticleList name: " << m_outputListName);
+
+    //Output particle
+    const DecayDescriptorParticle* mother = m_decaydescriptor.getMother();
+    m_pdgCode  = mother->getPDGCode();
+    m_outputAntiListName = ParticleListName::antiParticleListName(m_outputListName);
+
+    B2INFO(" pdg code in initilize " << m_pdgCode);
+
     // 2) get exiting particle lists
     if (m_leptonListName == m_outputListName) {
       B2ERROR("FSRCorrection: input and output list names " << m_leptonListName << " are the same.");
@@ -107,8 +120,8 @@ namespace Belle2 {
     m_usedGammas.clear();
 
     double cos_max = -1.;
-    double cos_limit = cos(m_thetaThres);
-
+    double cos_limit = cos(m_thetaThres * M_PI / 180.0);
+    B2INFO("COS LIM " << cos_limit);
     const StoreArray<Particle> particles;
     StoreObjPtr<ParticleList> plist(m_outputListName);
     StoreObjPtr<ParticleList> gammaList(m_gammaListName);
@@ -117,7 +130,9 @@ namespace Belle2 {
     if (!existingList) {
       // new particle list: create it
       plist.create();
+      B2INFO(" plist init pdg " << m_pdgCode);
       plist->initialize(m_pdgCode, m_outputListName);
+      B2INFO(" plist after init  pdg " << plist->getPDGCode());
 
       StoreObjPtr<ParticleList> antiPlist(m_outputAntiListName);
       antiPlist.create();
@@ -147,7 +162,9 @@ namespace Belle2 {
 
     fsParticles.insert(fsParticles.end(), fsAntiParticles.begin(), fsAntiParticles.end());
 
+    B2INFO("electon list size " <<  fsParticles.size());
     for (unsigned i = 0; i < fsParticles.size(); i++) {
+      B2INFO("at electecton number " << i);
       Particle* lepton = particles[fsParticles[i]];
       TLorentzVector lepton4Vector = lepton->get4Vector();
       TLorentzVector gamma4Vector;
@@ -190,20 +207,38 @@ namespace Belle2 {
 
       // add 4vector
       if (foundGamma) {
+
+        B2INFO("COS LIM " << cos_limit);
+        B2INFO("COSmax of this gamma " << cos_max);
+        B2INFO("Found a radiative gamma and add the 4 Vector to the lepton");
+        B2INFO("pdg before " << lepton->getPDGCode());
+        B2INFO("4vector before " << lepton->get4Vector().Px() << " " <<  lepton->get4Vector().Py() << " " <<  lepton->get4Vector().Pz() <<
+               " " <<  lepton->get4Vector().Energy());
         m_usedGammas.push_back(gammaMdstIndex);
         lepton->set4Vector(lepton4Vector + gamma4Vector);
+        B2INFO("4vector after " << lepton->get4Vector().Px() << " " <<  lepton->get4Vector().Py() << " " <<  lepton->get4Vector().Pz() <<
+               " " <<  lepton->get4Vector().Energy());
+        B2INFO("pdg after " << lepton->getPDGCode());
       }
 
+      B2INFO("still at electecton number " << i);
       std::vector<int> idSeq;
       fillUniqueIdentifier(lepton, idSeq);
       bool uniqueSeq = isUnique(idSeq);
 
       if (uniqueSeq) {
+        B2INFO("addiding electontr " << i);
+        B2INFO("pdg lepton " << lepton->getPDGCode());
+        B2INFO("pdg list " << plist->getPDGCode());
+        B2INFO("4vector when adding " << lepton->get4Vector().Px() << " " <<  lepton->get4Vector().Py() << " " <<  lepton->get4Vector().Pz()
+               << " " <<  lepton->get4Vector().Energy());
         plist->addParticle(lepton);
+
+        B2INFO("currecnt list size " <<  plist->getListSize());
         m_particlesInTheList.push_back(idSeq);
       }
     }
-
+    B2INFO("AD|FTER electon list size " <<  plist->getListSize());
   }
 
 // fixme klaeren mit den funcktionene (wann kann einen list schon exitieren?)

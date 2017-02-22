@@ -177,17 +177,30 @@ namespace Belle2 {
       }
     }
 
-    double CleoCones(const Particle* particle, const std::vector<double>& cone)
+    Manager::FunctionPtr CleoCones(const std::vector<std::string>& arguments)
     {
-      if (!particle)
-        return -999;
+      if (arguments.size() == 1 || arguments.size() == 2) {
+        bool useROE = false;
+        auto coneNumber = arguments[0];
+        if (arguments.size() == 2) {
+          if (arguments[1] == "ROE") {
+            useROE = true;
+          } else {
+            B2FATAL("Second argument in CleoCones can only be 'ROE' to use the CleoCones calculated from the ROE only! Do not include a second argument to use the default CleoCones calculated from all final state particles.");
+          }
+        }
 
-      const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
-      if (!qq)
-        return -999;
-
-      const auto& cleoCones = qq->getCleoCones();
-      return cleoCones.at(cone[0] - 1);
+        auto func = [coneNumber, useROE](const Particle * particle) -> double {
+          const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+          std::vector<float> cleoCones = qq->getCleoConesALL();
+          if (useROE)
+            cleoCones = qq->getCleoConesROE();
+          return cleoCones.at(stoi(coneNumber) - 1);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for CleoCones function. It only takes one or two arguments. The first argument must be the cone number and the second can either be left blank or must 'ROE' to use the CleoCones calculated from all final state particles.");
+      }
     }
 
     Manager::FunctionPtr transformedNetworkOutput(const std::vector<std::string>& arguments)
@@ -226,10 +239,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("thrustOm"    , thrustOm    , "Magnitude of the ROE thrust axis");
     REGISTER_VARIABLE("cosTBTO"     , cosTBTO     , "Cosine of angle between thrust axis of B and thrust axis of ROE");
     REGISTER_VARIABLE("cosTBz"      , cosTBz      , "Cosine of angle between thrust axis of B and z-axis");
-    REGISTER_VARIABLE("KSFWVariables(variable,finalState)", KSFWVariables,
-                      "Returns et, mm2, or one of the 16 KSFW moments. If only the variable is specified, the KSFW moment calculated from the B primary daughters is returned. If finalState is set to FS1, the KSFW moment calculated from the B final state daughters is returned.");
-    REGISTER_VARIABLE("CleoCone(integer i)", CleoCones,
-                      "Returns i-th cleo cones.\n"
+    REGISTER_VARIABLE("KSFWVariables(variable,string)", KSFWVariables,
+                      "Returns variable et, mm2, or one of the 16 KSFW moments. If only the variable is specified, the KSFW moment calculated from the B primary daughters is returned. If string is set to FS1, the KSFW moment calculated from the B final state daughters is returned.");
+    REGISTER_VARIABLE("CleoCone(integer,string)", CleoCones,
+                      "Returns i-th cleo cones. If only the variable is specified, the CleoCones are calculated from all final state particles. If string is set to 'ROE', the CleoCones are calculated only from ROE particles.\n"
                       "Useful for ContinuumSuppression.\n"
                       "Given particle needs a related ContinuumSuppression object (built using the ContinuumSuppressionBuilder).\n"
                       "Returns -999 if particle is nullptr or if particle has no related ContinuumSuppression object.");

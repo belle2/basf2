@@ -1,5 +1,4 @@
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
+/* BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
@@ -46,7 +45,7 @@ namespace Belle2 {
     std::vector<float> ksfwFS1;
 
     std::vector<float> cleoConesAll;
-    //std::vector<float> cleoConesRoe;
+    std::vector<float> cleoConesROE;
 
     double et[2];
 
@@ -171,7 +170,7 @@ namespace Belle2 {
       //       vs only those in the roe.
       CleoCones cc(p3_cms_all, p3_cms_roe, thrustB, true, true);
       cleoConesAll = cc.cleo_cone_with_all();
-      //cleoConesRoe = cc.cleo_cone_with_roe();
+      cleoConesROE = cc.cleo_cone_with_roe();
 
       // Fox-Wolfram Moments: Uses all final-state tracks (= sigB + ROE)
       FoxWolfram FW(p3_cms_all);
@@ -243,7 +242,7 @@ namespace Belle2 {
     qqVars->addR2(R2);
     qqVars->addKsfwFS0(ksfwFS0);
     qqVars->addKsfwFS1(ksfwFS1);
-    qqVars->addCleoCones(cleoConesAll);
-    // TODO: add cleo cones calculated from roe only.
+    qqVars->addCleoConesALL(cleoConesAll);
+    qqVars->addCleoConesROE(cleoConesROE);
   }
 }

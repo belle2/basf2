@@ -22,12 +22,12 @@ matchMCTruth('B0', path=main)
 
 buildRestOfEvent('B0', path=main)
 
-# cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
-cleanMask = ('cleanMask', '', '')
+cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
+# cleanMask = ('cleanMask', '', '')
 appendROEMasks('B0', [cleanMask], path=main)
 
 buildContinuumSuppression('B0', 'cleanMask', path=main)
-
+# buildContinuumSuppression('B0', '', path=main)
 
 # Define the variables for training.
 trainVars = [
@@ -61,7 +61,16 @@ trainVars = [
     'CleoCone(6)',
     'CleoCone(7)',
     'CleoCone(8)',
-    'CleoCone(9)'
+    'CleoCone(9)',
+    'CleoCone(1,ROE)',
+    'CleoCone(2,ROE)',
+    'CleoCone(3,ROE)',
+    'CleoCone(4,ROE)',
+    'CleoCone(5,ROE)',
+    'CleoCone(6,ROE)',
+    'CleoCone(7,ROE)',
+    'CleoCone(8,ROE)',
+    'CleoCone(9,ROE)'
 ]
 
 # Save target variable necessary for training.
@@ -70,5 +79,10 @@ targetVar = ['isNotContinuumEvent']
 # Create output file.
 variablesToNTuple('B0', trainVars + targetVar, treename='tree', filename=outTuple, path=main)
 
-process(main, 10000)
+# toolsB = ['ContinuumSuppression[KsfwFS1CcROE]', '^B0']
+# toolsB += ['ContinuumSuppression', '^B0']
+# ntupleFile('nTupleTools.root', path=main)
+# ntupleTree('ntupB0', 'B0', toolsB, path=main)
+
+process(main, 1000)
 print(statistics)

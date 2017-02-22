@@ -16,53 +16,54 @@
 namespace Belle2 {
 
   /**
-   * Value of the threshold (in ADC counts) used for the pulse identification,
-   * for all 512 channels of 16 modules.
+   * Class to store the threshold efficiency (i.e. the efficiency for the
+   * pulse identification, function of the threshold being used in the CFD
+   * or template fit algorithm ) for all 512 channels of 16 modules.
    * From laser scans.
    */
-  class TOPCalChannelThreshold: public TObject {
+  class TOPCalChannelThresholdEff: public TObject {
   public:
 
     /**
      * Default constructor.
-     * Thresholds are set to 0 ADC counts by default.
+     * Threshold efficiencies are set to 0 by default.
      */
-    TOPCalChannelThreshold()
+    TOPCalChannelThresholdEff()
     {
       for (unsigned m = 0; m < c_numModules; m++) {
         for (unsigned c = 0; c < c_numChannels; c++) {
-          m_Thr[m][c] = 0;
+          m_ThrEff[m][c] = 0;
         }
       }
     }
 
     /**
-     * Sets the threshold (in ADC counts) for a single channel
+     * Sets the threshold efficiency for a single channel
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
-     * @param Thr channel threshold
+     * @param ThrEff channel threshold efficiency
      */
-    void setThr(int moduleID, unsigned channel, short Thr)
+    void setThrEff(int moduleID, unsigned channel, float ThrEff)
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
-        B2WARNING("Module number greater than 16.");
+        B2WARNING("Module number greater than 16");
         return;
       }
       if (channel >= c_numChannels) {
-        B2WARNING("Channel number greater than 511.");
+        B2WARNING("Channel number greater than 511");
         return;
       }
-      m_Thr[module][channel] = Thr;
+      m_ThrEff[module][channel] = ThrEff;
     }
 
     /**
-     * Returns the threshold (in ADC counts) of a single channel
+     * Returns the threshold efficiency of a single channel
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
-     * @return Thr
+     * @return ThrEff
      */
-    short getThr(int moduleID, unsigned channel) const
+    float getThrEff(int moduleID, unsigned channel) const
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
@@ -73,7 +74,7 @@ namespace Belle2 {
         B2WARNING("Channel number greater than 511. Returning 0.");
         return 0;
       }
-      return m_Thr[module][channel];
+      return m_ThrEff[module][channel];
     }
 
 
@@ -86,9 +87,10 @@ namespace Belle2 {
           c_numChannels = 512 /**< number of channels per module */
          };
 
-    short m_Thr[c_numModules][c_numChannels];    /**< threshold value in ADC counts*/
 
-    ClassDef(TOPCalChannelThreshold, 1); /**< ClassDef */
+    float m_ThrEff[c_numModules][c_numChannels];    /**< threshold efficiency value */
+
+    ClassDef(TOPCalChannelThresholdEff, 1); /**< ClassDef */
 
   };
 

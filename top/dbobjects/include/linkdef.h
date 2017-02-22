@@ -39,5 +39,6 @@
 #pragma link C++ class Belle2::TOPCalChannelMask+;
 #pragma link C++ class Belle2::TOPCalModuleAlignment+;
 #pragma link C++ class Belle2::TOPCalChannelThreshold+;
+#pragma link C++ class Belle2::TOPCalChannelThresholdEff+;
 
 #endif

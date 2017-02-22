@@ -62,7 +62,7 @@ namespace Belle2 {
         return;
       }
       if (channel >= c_numChannels) {
-        B2WARNING("Channel number greater than 512");
+        B2WARNING("Channel number greater than 511");
         return;
       }
       m_status[module][channel] = status;
@@ -81,7 +81,7 @@ namespace Belle2 {
         return;
       }
       if (channel >= c_numChannels) {
-        B2WARNING("Channel number greater than 512");
+        B2WARNING("Channel number greater than 511");
         return;
       }
       m_status[module][channel] = c_Active;
@@ -100,7 +100,7 @@ namespace Belle2 {
         return;
       }
       if (channel >= c_numChannels) {
-        B2WARNING("Channel number greater than 512");
+        B2WARNING("Channel number greater than 511");
         return;
       }
       m_status[module][channel] = c_Dead;
@@ -119,7 +119,7 @@ namespace Belle2 {
         return;
       }
       if (channel >= c_numChannels) {
-        B2WARNING("Channel number greater than 512");
+        B2WARNING("Channel number greater than 511");
         return;
       }
       m_status[module][channel] = c_Noisy;
@@ -139,7 +139,7 @@ namespace Belle2 {
         return c_Dead;
       }
       if (channel >= c_numChannels) {
-        B2WARNING("Channel number greater than 512. Returning dead channel value");
+        B2WARNING("Channel number greater than 511. Returning dead channel value");
         return c_Dead;
       }
       return m_status[module][channel];
@@ -151,19 +151,18 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
      */
-    bool isActive(int moduleID, unsigned channel)
+    bool isActive(int moduleID, unsigned channel) const
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
         B2WARNING("Module number greater than 16. Returning false");
-        return c_Dead;
+        return false;
       }
       if (channel >= c_numChannels) {
-        B2WARNING("Channel number greater than 512. Returning false");
-        return c_Dead;
+        B2WARNING("Channel number greater than 511. Returning false");
+        return false;
       }
-      if (m_status[module][channel] == c_Active) return true;
-      else return false;
+      return (m_status[module][channel] == c_Active);
     }
 
 

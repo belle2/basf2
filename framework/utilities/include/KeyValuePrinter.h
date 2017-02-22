@@ -14,6 +14,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <map>
 
 namespace Belle2 {
   /** create human-readable or JSON output for key value pairs.
@@ -31,8 +32,9 @@ namespace Belle2 {
       // ccccccc:    [string, abc]
       \endcode
    *
-   * std::string, numeric types and std::vector<SUPPORTED TYPE>
-   * are supported as value types for put().
+   * std::string, numeric types, std::vector<SUPPORTED TYPE>, and
+   * std::map<std::string, SUPPORTED TYPE> * are supported as value
+   * types for put().
    *
    * JSON output is suitable for reading via e.g. json.loads() in Python,
    * and performs the necessary escaping for strings.
@@ -64,10 +66,26 @@ namespace Belle2 {
     /** Add one key-value pair. */
     template <class T> void put(const std::string& key, const T& value)
     {
-      if (m_json)
+      if (m_json) {
         m_stream << m_delim << "\t" << escape(key) << ": " << escape(value) << "";
-      else
+      } else {
         m_stream << std::left << std::setw(m_maxpad) << key + ": " << escape(value) << "\n";
+      }
+      m_delim = ",\n";
+    }
+    /** Specialization for map<> */
+    template <class T> void put(const std::string& key, const std::map<std::string, T>& value)
+    {
+      if (m_json) {
+        m_stream << m_delim << "\t" << escape(key) << ": " << escape(value) << "";
+      } else {
+        m_stream << "\n" << key << "\n";
+        for (char unused : key) {
+          (void)unused;
+          m_stream << '-';
+        }
+        m_stream << "\n" << escape(value) << "\n";
+      }
       m_delim = ",\n";
     }
   private:
@@ -93,6 +111,15 @@ namespace Belle2 {
       }
       s += "]";
       return s;
+    }
+    /** escape map<string, T>. */
+    template <class T> std::string escape(const std::map<std::string, T>& value) const
+    {
+      //well, it's valid json, but not pretty
+      KeyValuePrinter printer(m_json, m_maxpad - 2);
+      for (auto pair : value)
+        printer.put(pair.first, pair.second);
+      return printer.string();
     }
   };
 }

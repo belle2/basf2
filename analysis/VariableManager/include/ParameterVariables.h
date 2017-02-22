@@ -24,6 +24,23 @@ namespace Belle2 {
     double NumberOfMCParticlesInEvent(const Particle*, const std::vector<double>& pdg);
 
     /**
+     * Returns a positive integer if daughter at position particle->daughter(i)->daughter(j)... is an ancestor of the related MC particle, 0 otherwise.
+     * Positive integer represents the number of steps needed to get from final MC daughter to ancestor.
+     * If any particle or MCparticle is a nullptr, -999 is returned. If MC relations of any particle doesn't exist, -1.0 is returned.
+     */
+    double isAncestorOf(const Particle* part, const std::vector<double>& daughterIDs);
+
+    /**
+     * Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.
+     */
+    double genNthMotherPDG(const Particle* part, const std::vector<double>& daughterIDs);
+
+    /**
+     * Check the array index of a particle n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.
+     */
+    double genNthMotherIndex(const Particle* part, const std::vector<double>& daughterIDs);
+
+    /**
      * return cosine of the angle between the mother momentum vector and the direction of the i-th daughter in the mother's rest frame
      */
     double particleDecayAngle(const Particle* particle, const std::vector<double>& daughters);

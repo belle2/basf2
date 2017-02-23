@@ -10,27 +10,44 @@ import basf2
 
 from tracking import add_cdc_track_finding
 from tracking.run.event_generation import ReadOrGenerateEventsRun
-from tracking.run.mixins import PostProcessingRunMixin
+from trackfindingcdc.run.training import TrainingRunMixin
 from tracking.adjustments import adjust_module
 
-import subprocess
 
-
-class SegmentTrackFilterTrainingRun(PostProcessingRunMixin, ReadOrGenerateEventsRun):
+class SegmentTrackFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEventsRun):
     """Run to record segment track combinations encountered at the SegmentTrackSelector and retrain its mva method"""
     n_events = 2000
     generator_module = "generic"
     bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
+
+    truth = "truth"
+
+    @property
+    def identifier(self):
+        """Database identifier of the filter being trained"""
+        return "trackfindingcdc_SegmentTrackFilter.xml"
 
     def create_path(self):
         """Setup the recording path after the simulation"""
         path = super().create_path()
 
         add_cdc_track_finding(path)
+
+        if self.task == "train":
+            filterName = "recording"
+
+        elif self.task == "eval":
+            filterName = "eval"
+            self.truth = "truth_accepted"
+
+        elif self.task == "explore":
+            # Change me.
+            filterName = "recording"
+
         adjust_module(path, "SegmentTrackCombiner",
-                      segmentTrackFilter="recording",
+                      segmentTrackFilter=filterName,
                       segmentTrackFilterParameters={
-                          "rootFileName": "SegmentTrackFilter.root",
+                          "rootFileName": self.sample_file_name,
                       },
                       trackFilter="all",
                       trackFilterParameters={})
@@ -38,21 +55,9 @@ class SegmentTrackFilterTrainingRun(PostProcessingRunMixin, ReadOrGenerateEvents
         return path
 
     def postprocess(self):
-        """Run the training as post-processing job
-
-        To run only the training run with --postprocess-only
-        """
+        if self.task == "eval":
+            self.truth = "truth_accept"
         super().postprocess()
-        cmd = [
-            "trackfindingcdc_teacher",
-            "--identifier", "trackfindingcdc_SegmentTrackFilter.xml",
-            "SegmentTrackFilter.root",
-        ]
-        subprocess.call(cmd)
-
-        # Move training file to the right location
-        tracking_data_dir_path = os.path.join(os.environ["BELLE2_LOCAL_DIR"], "tracking", "data")
-        shutil.copy("trackfindingcdc_SegmentTrackFilter.xml", tracking_data_dir_path)
 
 
 def main():

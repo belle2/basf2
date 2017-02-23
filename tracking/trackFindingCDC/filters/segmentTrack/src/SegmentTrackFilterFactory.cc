@@ -54,7 +54,7 @@ SegmentTrackFilterFactory::create(const std::string& filterName) const
   } else if (filterName == "truth") {
     return makeUnique<MCSegmentTrackFilter>();
   } else if (filterName == "mva") {
-    return makeUnique<MVASegmentTrackFilter>("tracking/data/trackfindingcdc_SegmentTrackFilter.xml");
+    return makeUnique<MVASegmentTrackFilter>("tracking/data/trackfindingcdc_SegmentTrackFilter.xml", 0.74);
   } else if (filterName == "eval") {
     auto recordedVarSets = makeUnique<UnionVarSet<BaseSegmentTrackFilter::Object>>();
     using TrackFilterVarSet = FilterVarSet<BaseSegmentTrackFilter>;

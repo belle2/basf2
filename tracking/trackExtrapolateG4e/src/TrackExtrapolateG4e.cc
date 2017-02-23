@@ -475,7 +475,7 @@ void TrackExtrapolateG4e::event(bool byMuid)
               // Force geant4e to update its G4Track from the Kalman-updated state
               m_ExtMgr->GetPropagator()->SetStepN(0);
             }
-            for (int c = 0; c < trackClusterSeparations->getEntries(); ++c) {
+            for (int c = 0; c < klmClusters->getEntries(); ++c) {
               G4ThreeVector clusterToTrack = clusterPositions[c] - pos;
               double distance = clusterToTrack.mag();
               if (clusterToTrack.mag() < (*trackClusterSeparations)[c]->getDistance()) {

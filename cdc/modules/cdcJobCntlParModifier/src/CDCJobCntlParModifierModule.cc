@@ -31,7 +31,7 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
 {
   //  B2INFO("CDCJobCntlParModifierModule::constructor called.");
   // Set description
-  setDescription("Change Job contorol parameters.");
+  setDescription("Change job contorol parameters. Please put this module in the path (before Geometry module) with specified input parameters when you want to change them.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //N.B. The following default values must be identical to the ones in xxControlPar objects.

@@ -45,8 +45,12 @@ namespace Belle2 {
     using DBAccessorBase::operator bool;
     using DBAccessorBase::hasChanged;
 
-    /** Return the object */
-    const TObject* obj() const { return isValid() ? *m_object : nullptr; }
+    /** Return the object.
+     * Sadly the const in the return value is lost in python so this is a
+     * protected method and we add a pure python method to wrap the object in
+     * something to guarantee constness in framework/scripts/basf2.py
+     */
+    const TObject* _obj() const { return isValid() ? *m_object : nullptr; }
   private:
     /** Pointer to the actual object */
     TObject** m_object;

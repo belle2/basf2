@@ -12,8 +12,6 @@
 
 #include <framework/database/DBAccessorBase.h>
 
-#include <TCollection.h> //for TIter
-
 class TClonesArray;
 class TClass;
 class TObject;
@@ -49,14 +47,15 @@ namespace Belle2 {
     using DBAccessorBase::operator bool;
     using DBAccessorBase::hasChanged;
 
-    /** Element access */
-    const TObject* operator [](int i) const;
+    /** Element access.
+     * Sadly the const in the return value is lost in python so this is a
+     * protected method and we add a pure python method to wrap the object in
+     * something to guarantee constness in framework/scripts/basf2.py */
+    const TObject* _get(int i) const;
     /** Get the number of entries */
     int getEntries() const;
     /** Get the number of entries in a pythonic way to enable len(array) */
     int __len__() const { return getEntries(); }
-    /** Make the array iterable in python */
-    TIter __iter__() const;
   private:
     /** Pointer to the actual array */
     TClonesArray** m_array;

@@ -419,8 +419,8 @@ namespace Belle2 {
       //const std::vector<VXDHalfShellPar>& HalfShells = parameters.getHalfShells();
       for (const VXDHalfShellPar& shell : parameters.getHalfShells()) {
         string shellName =  shell.getName();
-        G4Transform3D shellAlignment = getAlignment(parameters.getAlignment(m_prefix + "." + shellName));
-
+        m_currentHalfShell = m_prefix + "." + shellName;
+        G4Transform3D shellAlignment = getAlignment(parameters.getAlignment(m_currentHalfShell));
         //Place shell support
         double shellAngle = shell.getShellAngle();
         if (!m_onlyActiveMaterial) shellSupport.place(envelope, shellAlignment * G4RotateZ3D(shellAngle));
@@ -442,6 +442,11 @@ namespace Belle2 {
           for (const std::pair<int, double>& ladder : Ladders) {
             int ladderID = ladder.first;
             double phi = ladder.second;
+
+            // Remember shell coordinate system (into which ladders are inserted)
+            VXD::GeoCache::getInstance().addHalfShellPlacement(m_halfShellVxdIDs[m_currentHalfShell],
+                                                               shellAlignment); //  * G4RotateZ3D(shellAngle) not taken into account in ladder!
+
             G4Transform3D ladderPlacement = placeLadder(ladderID, phi, envelope, shellAlignment, parameters);
             if (!m_onlyActiveMaterial) ladderSupport.place(envelope, ladderPlacement);
           }

@@ -283,6 +283,9 @@ namespace Belle2 {
 
       G4Translate3D ladderPos(m_ladder.getRadius(), m_ladder.getShift(), 0);
       G4Transform3D ladderPlacement = placement * G4RotateZ3D(phi) * ladderPos * getAlignment(parameters.getAlignment(ladder));
+      // The actuall coordinate system of ladder (w still points to Z, there is only phi rotation + move to correct radius + shift)
+      VXD::GeoCache::getInstance().addLadderPlacement(m_halfShellVxdIDs[m_currentHalfShell], ladder, ladderPlacement);
+
 
       vector<G4Point3D> lastSensorEdge;
       for (const VXDGeoSensorPlacement& p : m_ladder.getSensors()) {
@@ -354,8 +357,10 @@ namespace Belle2 {
           placement = G4TranslateX3D(m_ladder.getSlantedRadius() - m_ladder.getRadius()) * G4RotateY3D(
                         -m_ladder.getSlantedAngle()) * placement;
         }
-        placement = ladderPlacement * G4Translate3D(0.0, 0.0, p.getZ()) * placement;
-
+        placement = G4Translate3D(0.0, 0.0, p.getZ()) * placement;
+        // Remember the placement of sensor into ladder
+        VXD::GeoCache::getInstance().addSensorPlacement(ladder, sensorID, placement * activePosition * reflection);
+        placement = ladderPlacement * placement;
 
         assembly.add(s.getVolume());
         assembly.place(volume, placement);

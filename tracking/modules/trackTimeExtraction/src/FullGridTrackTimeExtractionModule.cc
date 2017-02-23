@@ -177,7 +177,7 @@ void FullGridTrackTimeExtractionModule::event()
 
     const double extractedTime = minimalChi2->m_extractedT0;
     // The uncertainty was calculated using a test MC sample
-    m_eventT0->addEventT0(extractedTime, 5.1, Const::EDetector::CDC);
+    m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
   } else {
     // If not, start with the lowest extracted chi2 and do another two iteration steps. If it converges then,
     // use this. Else, use the next best guess.

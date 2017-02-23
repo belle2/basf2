@@ -11,7 +11,7 @@ import numpy
 set_random_seed(321)
 set_log_level(LogLevel.INFO)
 # use_central_database("test_bklm", LogLevel.INFO)
-use_central_database("test_bklm")
+use_central_database("production")
 
 
 class PackerUnpackerTest(Module):
@@ -65,15 +65,18 @@ class PackerUnpackerTest(Module):
 
             # check the content of the digit
             # the following content is not consistent due to incomplete mapping file,  data/geometry/BKLMElectronicsMapping.xml
-            # assert digit.getSector() == digitUnpacked.getSector()
-            # assert digit.getLayer() == digitUnpacked.getLayer()
-            # assert digit.getStrip() == digitUnpacked.getStrip()
-            # assert digit.getCTime() == digitUnpacked.getCTime()
-            # assert digit.getTime() == digitUnpacked.getTime()
+            assert digit.isForward() == digitUnpacked.isForward()
+            assert digit.getSector() == digitUnpacked.getSector()
+            assert digit.getLayer() == digitUnpacked.getLayer()
+            assert digit.getStrip() == digitUnpacked.getStrip()
+            assert digit.isPhiReadout() == digitUnpacked.isPhiReadout()
+            assert digit.inRPC() == digitUnpacked.inRPC()
+            assert digit.isForward() == digitUnpacked.isForward()
+            assert digit.getCTime() == digitUnpacked.getCTime()
+            assert digit.isAboveThreshold() == digitUnpacked.isAboveThreshold()
             # assert digit.getModuleID() == digitUnpacked.getModuleID()
-            # assert digit.isPhiReadout() == digitUnpacked.isPhiReadout()
-            # assert digit.inRPC() == digitUnpacked.inRPC()
-            # assert digit.isForward() == digitUnpacked.isForward()
+            # assert digit.getTime() == digitUnpacked.getTime()
+            # assert digit.getNPixel() == digitUnpacked.getNPixel()
             # assert digit.getEDep() == digitUnpacked.getEDep()
 
 
@@ -97,7 +100,7 @@ main.add_module(Packer)
 
 unPacker = register_module('BKLMUnpacker')
 unPacker.param('outputDigitsName', 'BKLMDigitsUnpacked')
-unPacker.param("useDefaultModuleId", 1)
+# unPacker.param("useDefaultModuleId", 1)
 unPacker.param("loadMapFromDB", 1)
 main.add_module(unPacker)
 

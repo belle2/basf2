@@ -47,9 +47,9 @@ geobuilder = register_module('Geometry')
 geobuilder.log_level = LogLevel.INFO
 geobuilder.param('components', ['BKLM'])
 bklmUnpack = register_module('BKLMUnpacker')
-# bklmUnpack.param("keepEvenPackages",1);
+# bklmUnpack.param("keepEvenPackages",1)
 bklmUnpack.param("useDefaultModuleId", 1)
-bklmUnpack.param('loadMapFromDB', 1)
+bklmUnpack.param('loadMapFromDB', 0)
 bklmreco = register_module('BKLMReconstructor')
 # bklmreco.log_level = LogLevel.INFO
 

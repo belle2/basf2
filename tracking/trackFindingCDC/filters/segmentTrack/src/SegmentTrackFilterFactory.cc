@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackTruthVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackVarSet.h>
 
+#include <tracking/trackFindingCDC/filters/base/FilterVarSet.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
@@ -54,6 +55,12 @@ SegmentTrackFilterFactory::create(const std::string& filterName) const
     return makeUnique<MCSegmentTrackFilter>();
   } else if (filterName == "mva") {
     return makeUnique<MVASegmentTrackFilter>("tracking/data/trackfindingcdc_SegmentTrackFilter.xml");
+  } else if (filterName == "eval") {
+    auto recordedVarSets = makeUnique<UnionVarSet<BaseSegmentTrackFilter::Object>>();
+    using TrackFilterVarSet = FilterVarSet<BaseSegmentTrackFilter>;
+    recordedVarSets->push_back(makeUnique<TrackFilterVarSet>("mva", create("mva")));
+    recordedVarSets->push_back(makeUnique<TrackFilterVarSet>("truth", create("truth")));
+    return makeUnique<Recording<BaseSegmentTrackFilter>>(std::move(recordedVarSets), "SegmentTrackFilter_eval.root");
   } else if (filterName == "recording") {
     return makeUnique<RecordingSegmentTrackFilter>("SegmentTrackFilter.root");
   } else {

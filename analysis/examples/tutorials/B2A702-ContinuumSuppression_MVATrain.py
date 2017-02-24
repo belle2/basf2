@@ -34,6 +34,9 @@ if __name__ == "__main__":
 
     # Define the variables for training.
     #  For details, please see: https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
+    #  Note that KSFWVariables takes the optional additional argument FS1, to return the variables calculated from the
+    #  signal-B final state particles.
+    #  CleoCone also takes the optional additional argument ROE, to return the cones calculated from ROE particles only.
     trainVars = [
         'R2',
         'thrustBm',

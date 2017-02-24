@@ -57,6 +57,8 @@ reconstructDecay('B0   -> K_S0 pi0', '5.2 < Mbc < 5.3 and -0.3 < deltaE < 0.2', 
 matchMCTruth('B0', path=main)
 buildRestOfEvent('B0', path=main)
 
+# The momentum cuts used to be hard-coded in the continuum suppression module. They can now be applied
+# via this mask. The nCDCHits requirement is new, and is recommended to remove VXD-only fake tracks.
 cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
 appendROEMasks('B0', [cleanMask], path=main)
 
@@ -64,6 +66,9 @@ buildContinuumSuppression('B0', 'cleanMask', path=main)
 
 # Define the variables for training.
 #  For details, please see: https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
+#  Note that KSFWVariables takes the optional additional argument FS1, to return the variables calculated from the
+#  signal-B final state particles.
+#  CleoCone also takes the optional additional argument ROE, to return the cones calculated from ROE particles only.
 trainVars = [
     'R2',
     'thrustBm',

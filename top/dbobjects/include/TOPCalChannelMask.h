@@ -37,16 +37,9 @@ namespace Belle2 {
                  };
 
     /**
-     * Default constructor. All channels are set to active
+     * Default constructor.
      */
-    TOPCalChannelMask()
-    {
-      for (unsigned m = 0; m < c_numModules; m++) {
-        for (unsigned c = 0; c < c_numChannels; c++) {
-          m_status[m][c] = c_Active;
-        }
-      }
-    }
+    TOPCalChannelMask() {}
 
     /**
      * Sets the status for a single channel
@@ -177,7 +170,7 @@ namespace Belle2 {
           c_numChannels = 512 /**< number of channels per module */
          };
 
-    EStatus m_status[c_numModules][c_numChannels];    /**< channel status */
+    EStatus m_status[c_numModules][c_numChannels] = {{c_Active}};    /**< channel status. c_Active by default.*/
 
     ClassDef(TOPCalChannelMask, 1); /**< ClassDef */
 

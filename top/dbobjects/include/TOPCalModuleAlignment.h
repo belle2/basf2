@@ -28,23 +28,7 @@ namespace Belle2 {
      * Default constructor
      * All the calibrations constants and the related errors are set to zero
      */
-    TOPCalModuleAlignment()
-    {
-      for (unsigned m = 0; m < c_numModules; m++) {
-        m_alpha[m] = 0;
-        m_beta[m] = 0;
-        m_gamma[m] = 0;
-        m_x[m] = 0;
-        m_y[m] = 0;
-        m_z[m] = 0;
-        m_errAlpha[m] = 0;
-        m_errBeta[m] = 0;
-        m_errGamma[m] = 0;
-        m_errX[m] = 0;
-        m_errY[m] = 0;
-        m_errZ[m] = 0;
-      }
-    }
+    TOPCalModuleAlignment() {}
 
     /**
      * Sets the angle alpha on a single module
@@ -154,7 +138,7 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return alpha rotation angle around x
      */
-    double getAlpha(int moduleID)
+    double getAlpha(int moduleID) const
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
@@ -169,7 +153,7 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return beta rotation angle around x
      */
-    double getBeta(int moduleID)
+    double getBeta(int moduleID) const
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
@@ -184,7 +168,7 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return gamma rotation angle around x
      */
-    double getGamma(int moduleID)
+    double getGamma(int moduleID) const
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
@@ -199,7 +183,7 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return x shift along the x direction
      */
-    double getX(int moduleID)
+    double getX(int moduleID) const
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
@@ -214,7 +198,7 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return y shift along the y direction
      */
-    double getY(int moduleID)
+    double getY(int moduleID) const
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
@@ -229,7 +213,7 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return z shift along the z direction
      */
-    double getZ(int moduleID)
+    double getZ(int moduleID) const
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
@@ -245,7 +229,7 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return errAlpha error on the alpha angle
      */
-    double getAlphaErr(int moduleID)
+    double getAlphaErr(int moduleID) const
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
@@ -260,7 +244,7 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return errBeta error on the beta angle
      */
-    double getBetaErr(int moduleID)
+    double getBetaErr(int moduleID) const
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
@@ -275,7 +259,7 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return errGamma error on the gamma angle
      */
-    double getGammaErr(int moduleID)
+    double getGammaErr(int moduleID) const
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
@@ -290,7 +274,7 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return errX error on the x shift
      */
-    double getXErr(int moduleID)
+    double getXErr(int moduleID) const
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
@@ -305,7 +289,7 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return errY error on the y shift
      */
-    double getYErr(int moduleID)
+    double getYErr(int moduleID) const
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
@@ -320,7 +304,7 @@ namespace Belle2 {
      * @param moduleID module ID (1-based)
      * @return errZ error on the z shift
      */
-    double getZErr(int moduleID)
+    double getZErr(int moduleID) const
     {
       unsigned module = moduleID - 1;
       if (module >= c_numModules) {
@@ -341,19 +325,19 @@ namespace Belle2 {
     enum {c_numModules = 16,  /**< number of modules */
          };
 
-    float m_alpha[c_numModules];    /**< rotation angle around the x axis */
-    float m_beta[c_numModules]; /**< rotation angle around the y axis  */
-    float m_gamma[c_numModules]; /**< rotation angle around the z axis */
-    float m_x[c_numModules];    /**< displacement along the x axis */
-    float m_y[c_numModules]; /**< displacement along the y axis */
-    float m_z[c_numModules]; /**< displacement along the z axis */
+    float m_alpha[c_numModules] = {0};    /**< rotation angle around the x axis. 0 by default. */
+    float m_beta[c_numModules] = {0}; /**< rotation angle around the y axis. 0 by default.  */
+    float m_gamma[c_numModules] = {0}; /**< rotation angle around the z axis. 0 by default. */
+    float m_x[c_numModules] = {0};    /**< displacement along the x axis. 0 by default. */
+    float m_y[c_numModules] = {0}; /**< displacement along the y axis. 0 by default. */
+    float m_z[c_numModules] = {0}; /**< displacement along the z axis. 0 by default. */
 
-    float m_errAlpha[c_numModules];    /**< error on alpha */
-    float m_errBeta[c_numModules]; /**< error on beta */
-    float m_errGamma[c_numModules]; /**< error on gamma */
-    float m_errX[c_numModules];    /**< error on the x displacement */
-    float m_errY[c_numModules]; /**< error on the y displacement */
-    float m_errZ[c_numModules]; /**< error on the z displacement */
+    float m_errAlpha[c_numModules] = {0};    /**< error on alpha. 0 by default. */
+    float m_errBeta[c_numModules] = {0}; /**< error on beta. 0 by default. */
+    float m_errGamma[c_numModules] = {0}; /**< error on gamma. 0 by default. */
+    float m_errX[c_numModules] = {0};    /**< error on the x displacement. 0 by default. */
+    float m_errY[c_numModules] = {0}; /**< error on the y displacement. 0 by default. */
+    float m_errZ[c_numModules] = {0}; /**< error on the z displacement. 0 by default. */
 
 
     ClassDef(TOPCalModuleAlignment, 1); /**< ClassDef */

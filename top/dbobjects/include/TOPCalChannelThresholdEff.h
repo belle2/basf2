@@ -28,14 +28,7 @@ namespace Belle2 {
      * Default constructor.
      * Threshold efficiencies are set to 0 by default.
      */
-    TOPCalChannelThresholdEff()
-    {
-      for (unsigned m = 0; m < c_numModules; m++) {
-        for (unsigned c = 0; c < c_numChannels; c++) {
-          m_ThrEff[m][c] = 0;
-        }
-      }
-    }
+    TOPCalChannelThresholdEff() {}
 
     /**
      * Sets the threshold efficiency for a single channel
@@ -88,7 +81,7 @@ namespace Belle2 {
          };
 
 
-    float m_ThrEff[c_numModules][c_numChannels];    /**< threshold efficiency value */
+    float m_ThrEff[c_numModules][c_numChannels] = {{0}};    /**< threshold efficiency value. 0 by default. */
 
     ClassDef(TOPCalChannelThresholdEff, 1); /**< ClassDef */
 

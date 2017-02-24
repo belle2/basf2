@@ -25,16 +25,8 @@ namespace Belle2 {
 
     /**
      * Default constructor.
-     * Thresholds are set to 0 ADC counts by default.
      */
-    TOPCalChannelThreshold()
-    {
-      for (unsigned m = 0; m < c_numModules; m++) {
-        for (unsigned c = 0; c < c_numChannels; c++) {
-          m_Thr[m][c] = 0;
-        }
-      }
-    }
+    TOPCalChannelThreshold() {}
 
     /**
      * Sets the threshold (in ADC counts) for a single channel
@@ -86,7 +78,7 @@ namespace Belle2 {
           c_numChannels = 512 /**< number of channels per module */
          };
 
-    short m_Thr[c_numModules][c_numChannels];    /**< threshold value in ADC counts*/
+    short m_Thr[c_numModules][c_numChannels] = {{0}};    /**< threshold value in ADC counts. 0 by default*/
 
     ClassDef(TOPCalChannelThreshold, 1); /**< ClassDef */
 

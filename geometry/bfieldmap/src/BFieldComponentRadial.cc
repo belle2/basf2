@@ -65,15 +65,17 @@ void BFieldComponentRadial::initialize()
   B2DEBUG(10, "... loaded " << m_mapSize[0] << "x" << m_mapSize[1] << " (r,z) elements.");
 }
 
-inline BFieldComponentRadial::BFieldPoint operator*(const BFieldComponentRadial::BFieldPoint& v, double a)
-{
-  return {v.r * a, v.z * a};
-}
+namespace Belle2 {
+  inline BFieldComponentRadial::BFieldPoint operator*(const BFieldComponentRadial::BFieldPoint& v, double a)
+  {
+    return {v.r * a, v.z * a};
+  }
 
-inline BFieldComponentRadial::BFieldPoint operator+(const BFieldComponentRadial::BFieldPoint& u,
-                                                    const BFieldComponentRadial::BFieldPoint& v)
-{
-  return {u.r + v.r, u.z + v.z};
+  inline BFieldComponentRadial::BFieldPoint operator+(const BFieldComponentRadial::BFieldPoint& u,
+                                                      const BFieldComponentRadial::BFieldPoint& v)
+  {
+    return {u.r + v.r, u.z + v.z};
+  }
 }
 
 B2Vector3D BFieldComponentRadial::calculate(const B2Vector3D& point) const

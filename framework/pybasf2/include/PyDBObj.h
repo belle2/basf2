@@ -17,18 +17,31 @@ class TObject;
 
 namespace Belle2 {
   /** Class to access a DBObjPtr from Python. In contrast to the C++
-   * DBObjPtr<T> we don't have templates but python will handle the typing
+   * DBObjPtr we don't have templates but python will handle the typing
    * dynamically.
    *
    * \code{.py}
      from ROOT import Belle2
      beamparams = Belle2.PyDBObj('BeamParameters')
-     # Alternative: beamparams = Belle2.PyDBObj(Belle2.BeamParameters.Class())
-     print(beamparams.obj().getMass(), beamparams.obj().getEnergy())
+     # alternative: beamparams = Belle2.PyDBObj(Belle2.BeamParameters.Class())
+     # Or with name and type: beamparams = Belle2.PyDBObj("BeamParameters", Belle2.BeamParameters.Class())
+     print(beamparams.getMass(), beamparams.getEnergy())
+     # alternative: beamparams.obj().getMass()
      \endcode
    *
-   * \warning Be aware that PyDBObj are only usable during event flow, that
-   * is in the initialize() or event() calls of a module.
+   * Most of the time you can just use the `PyDBObj` instance like an constant
+   * instance of the class it represents, i.e. call all the members. The only
+   * exceptions are if the class has members which are also present in
+   * `PyDBObj` (for example isValid() or hasChanged()). In this case you need
+   * to use the obj() member to obtain a reference to the real object first as
+   * shown in the example.
+   *
+   * \warning Be aware that `PyDBObj` objects are only usable during event
+   * flow, that is in the `initialize()` or `event()` calls of a module as
+   * there is no Conditions data available otherwise.
+   *
+   * \see the array version PyDBArray as well as the interface classes to the
+   * DataStore, PyStoreArray and PyStoreObj
    */
   class PyDBObj: private DBAccessorBase {
   public:

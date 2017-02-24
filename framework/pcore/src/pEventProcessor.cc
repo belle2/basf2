@@ -291,7 +291,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 void pEventProcessor::analyzePath(const PathPtr& path)
 {
   //modules that can be parallelised, but should not go into a parallel section by themselves
-  std::set<std::string> uselessParallelModules({"Gearbox", "Geometry"});
+  std::set<std::string> uselessParallelModules({"HistoManager", "Gearbox", "Geometry"});
 
   PathPtr inpath(new Path);
   PathPtr mainpath(new Path);

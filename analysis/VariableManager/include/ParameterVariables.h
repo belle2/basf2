@@ -31,6 +31,14 @@ namespace Belle2 {
     double isAncestorOf(const Particle* part, const std::vector<double>& daughterIDs);
 
     /**
+     * Returns a positive integer if an ancestor with the given PDG code is found, 0 otherwise.
+     * The integer is the level where the ancestor was found, 1: first mother, 2: grandmother, etc.
+     * Second argument is optional, 1 means that the sign of the PDG code is taken into account, default is 0.
+     * If there is no MC relations found, -1 is returned. In case of nullptr particle, -999 is returned.
+     */
+    double hasAncestor(const Particle* part, const std::vector<double>& args);
+
+    /**
      * Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.
      */
     double genNthMotherPDG(const Particle* part, const std::vector<double>& daughterIDs);

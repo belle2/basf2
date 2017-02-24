@@ -1177,6 +1177,18 @@ namespace Belle2 {
       return result;
     }
 
+    double particleDeltaTErr(const Particle* particle)
+    {
+      double result = -1111.0;
+
+      Vertex* vert = particle->getRelatedTo<Vertex>();
+
+      if (vert)
+        result = vert->getDeltaTErr();
+
+      return result;
+    }
+
     double particleMCDeltaT(const Particle* particle)
     {
       double result = -1111.0;
@@ -1934,6 +1946,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("TagVy", particleTagVy, "Tag vertex Y");
     REGISTER_VARIABLE("TagVz", particleTagVz, "Tag vertex Z");
     REGISTER_VARIABLE("DeltaT", particleDeltaT, "Delta T(Brec - Btag) in ps");
+    REGISTER_VARIABLE("DeltaTErr", particleDeltaTErr, "Delta T error in ps");
     REGISTER_VARIABLE("MCDeltaT", particleMCDeltaT,
                       "Generated Delta T(Brec - Btag) in ps");
     REGISTER_VARIABLE("DeltaZ", particleDeltaZ, "Z(Brec) - Z(Btag)");

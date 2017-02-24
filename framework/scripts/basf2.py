@@ -686,6 +686,9 @@ dbarray_scope = cppyy._backend.CreateScopeProxy("Belle2::PyDBArray")
 dbarray_scope.__getitem__ = lambda self, i: _make_tobject_const(self._get(i))
 # and supply an iterator
 dbarray_scope.__iter__ = _PyDBArray__iter__
+# also add indirection to PyStoreObj
+cppyy._backend.CreateScopeProxy("Belle2::PyStoreObj").__getattr__ = \
+    lambda self, name: getattr(self.obj(), name)
 
 
 def serialize_value(module, parameter):

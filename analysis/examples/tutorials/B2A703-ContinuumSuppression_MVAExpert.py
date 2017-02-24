@@ -55,9 +55,14 @@ reconstructDecay('B0   -> K_S0 pi0', '5.2 < Mbc < 5.3 and -0.3 < deltaE < 0.2', 
 
 matchMCTruth('B0', path=main)
 buildRestOfEvent('B0', path=main)
-buildContinuumSuppression('B0', path=main)
 
-# Variables used in training.
+cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
+appendROEMasks('B0', [cleanMask], path=main)
+
+buildContinuumSuppression('B0', 'cleanMask', path=main)
+
+# Define the variables for training.
+#  For details, please see: https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
 trainVars = [
     'R2',
     'thrustBm',

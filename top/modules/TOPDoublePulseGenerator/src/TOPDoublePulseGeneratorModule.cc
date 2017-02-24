@@ -54,18 +54,22 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("moduleID", m_moduleID, "slot ID (0 means all slots)", 0);
-    addParam("asicChannel", m_asicChannel,
-             "calibration ASIC channel (8 means all channels)", (unsigned) 0);
+    addParam("moduleIDs", m_moduleIDs,
+             "list of slots for which to generate cal pulse, empty list means all slots.",
+             m_moduleIDs);
+    m_asicChannels.push_back(0);
+    addParam("asicChannels", m_asicChannels,
+             "ASIC calibration channels (0 - 7), empty list means all channels.",
+             m_asicChannels);
     addParam("timeDifference", m_timeDifference,
-             "time difference between first and second pulse [ns]", 21.87);
+             "time difference between first and second pulse [ns].", 21.87);
     addParam("timeResolution", m_timeResolution,
-             "sigma of time difference [ns]", 40.0e-3);
+             "sigma of time difference [ns].", 40.0e-3);
     addParam("sampleTimeIntervals", m_sampleTimeIntervals,
              "vector of 256 sample time intervals to construct sample times. "
-             "If empty, equidistant intervals will be used", m_sampleTimeIntervals);
+             "If empty, equidistant intervals will be used.", m_sampleTimeIntervals);
     addParam("useDatabase", m_useDatabase,
-             "if true, use sample times from database instead of sampleTimeIntervals",
+             "if true, use sample times from database instead of sampleTimeIntervals.",
              false);
 
   }
@@ -86,20 +90,24 @@ namespace Belle2 {
 
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
-    if (m_moduleID == 0) {
+    if (m_moduleIDs.empty()) {
       for (const auto& module : geo->getModules()) {
         m_moduleIDs.push_back(module.getModuleID());
       }
-    } else if (geo->isModuleIDValid(m_moduleID)) {
-      m_moduleIDs.push_back(m_moduleID);
     } else {
-      B2ERROR("Invalid moduleID");
+      for (auto moduleID : m_moduleIDs) {
+        if (!geo->isModuleIDValid(moduleID))
+          B2ERROR("Invalid module ID found in input list: " << moduleID);
+      }
     }
 
-    if (m_asicChannel < 8) {
-      m_asicChannels.push_back(m_asicChannel);
-    } else {
+    if (m_asicChannels.empty()) {
       for (unsigned ch = 0; ch < 8; ch++) m_asicChannels.push_back(ch);
+    } else {
+      for (unsigned ch : m_asicChannels) {
+        if (ch > 7)
+          B2ERROR("Invalid ASIC channel found in input list: " << ch);
+      }
     }
 
     // set sample times

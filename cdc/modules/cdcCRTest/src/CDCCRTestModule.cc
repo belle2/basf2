@@ -174,7 +174,10 @@ void CDCCRTestModule::defineHisto()
   }
   int sl;
   for (int i = 0; i < 56; ++i) {
-    std::string title, name;
+    if (m_hitEfficiency) {
+      m_hHitEff_soft[i] = getHistProfile(Form("hHitEff_soft_L%d", i),
+                                         Form("hit efficiency(soft) of Layer %d ;Drift distance;Software Efficiency", i), 200, -1, 1);
+    }
     if (m_MakeHitDist) {
       if (i < 8) {sl = 0;} else { sl = floor((i - 8) / 6) + 1;}
       m_hHitDistInCDCHit[i] = getHist(Form("hHitDistInCDCHit_layer%d", i), Form("Hit Dist. ICLayer_%d;WireID;#Hits", i),
@@ -188,6 +191,7 @@ void CDCCRTestModule::defineHisto()
     }
     const double normResRange = 20;
     const double residualRange = 0.3;
+    std::string title, name;
     if (m_plotResidual) {
       name = (boost::format("hist_ResidualsU%1%") % i).str();
       title = (boost::format("unnormalized, unbiased residuals in layer %1%;cm;Tracks") % i).str();
@@ -266,6 +270,7 @@ void CDCCRTestModule::event()
 
   for (int i = 0; i < nTr; ++i) {
     RecoTrack* track = recoTracks[i];
+    if (track->getDirtyFlag()) {B2INFO("Dirty flag was set for track: " << track->getPositionSeed().Y()); continue;}
     m_hNHits_trackcand->Fill(track->getNumberOfCDCHits());
     if (m_MakeHitDist) {
       getHitDistInTrackCand(track);
@@ -313,7 +318,9 @@ void CDCCRTestModule::event()
     m_hPval->Fill(TrPval);
     m_hNDF->Fill(ndf);
     m_hChi2->Fill(Chi2);
-
+    if (m_hitEfficiency && track->getNumberOfCDCHits() > 30 && TrPval > 0.001) {
+      HitEfficiency(track);
+    }
     if (m_fillExpertHistos) {
       m_hNDFChi2->Fill(ndf, fs->getChi2());
       m_hNDFPval->Fill(ndf, TrPval);
@@ -354,11 +361,6 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
                   && fabs(m_trigHitPos.Z() - m_TriggerPos[2]) < m_TriggerSize[1] / 2) ? true : false;
   if (hittrig) {trighit = 1;}
   else {trighit = 0;}
-  /*
-  if (m_hitEfficiency) {
-    if (ndf > 12 && TrPval > 0.001) {HitEfficiency(h);}
-  }
-  */
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   m_hNHits->Fill(track->getNumberOfCDCHits());
 
@@ -438,7 +440,7 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
           z = pocaOnWire.Z();
           TVector3 m_backWirePos = cdcgeo.wireBackwardPosition(wireid, CDCGeometryPar::c_Aligned);
           z_prop = z - m_backWirePos.Z();
-          B2DEBUG(99, "z_prop = " << z_prop << " |z " << z << " |back wire poss: " << m_backWirePos.Z());
+          B2DEBUG(199, "z_prop = " << z_prop << " |z " << z << " |back wire poss: " << m_backWirePos.Z());
           dt_prop = z_prop * cdcgeo.getPropSpeedInv(lay);
           if (z_prop < 240 && m_ToP) {t -= dt_prop;}
 
@@ -523,11 +525,9 @@ TVector3 CDCCRTestModule::getTriggerHitPosition(RecoTrack* track)
   }
   return pos;
 }
-void CDCCRTestModule::HitEfficiency(const Helix h)
+void CDCCRTestModule::HitEfficiency(const Belle2::RecoTrack* track)
 {
-  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
-  const double* rinnerlayer = cdcgeo.innerRadiusWireLayer();
-  const double* routerlayer = cdcgeo.outerRadiusWireLayer();
+  /*  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   for (int i = 0; i < 56; ++i) {
     double  rcell = (rinnerlayer[i] + routerlayer[i]) / 2;
     double arcL = h.getArcLength2DAtCylindricalR(rcell);
@@ -535,10 +535,42 @@ void CDCCRTestModule::HitEfficiency(const Helix h)
     int cellID = cdcgeo.cellId(i, hitpos);
     B2INFO("Hit at LayerID - CellID: " << i << "-" << cellID);
   }
+  */
+  ////
+  BOOST_FOREACH(const RecoHitInformation::UsedCDCHit * cdchit, track->getCDCHitList()) {
+    WireID Wid = WireID(cdchit->getID());
+    const genfit::TrackPoint* tp = track->getRecoHitInformation(cdchit)->getCreatedTrackPoint();
+    //some hit didn't take account in fitting, so I use left/right info frm track finding results.
+    int RLInfo = 0;
+    RecoHitInformation::RightLeftInformation rightLeftHitInformation = track->getRecoHitInformation(cdchit)->getRightLeftInformation();
+    if (rightLeftHitInformation == RecoHitInformation::RightLeftInformation::c_left) {
+      RLInfo = -1;
+    } else if (rightLeftHitInformation == RecoHitInformation::RightLeftInformation::c_right) {
+      RLInfo = 1;
+    } else continue;
+
+    if (!tp->hasRawMeasurements())
+      continue;
+    const genfit::KalmanFitterInfo* kfi = tp->getKalmanFitterInfo();
+    if (!kfi) continue;
+
+    //    double max = std::max_element(kfi->getWeights(),kfi->getNumMeasurements());
+    double max = 0.;
+    unsigned short imea = 0;
+    for (unsigned int iMeas = 0; iMeas < kfi->getNumMeasurements(); ++iMeas) {
+      double ww = kfi->getWeights().at(iMeas);
+      if (ww > max) {max = ww; imea = iMeas;}
+    }
+    double xx = kfi->getMeasurementOnPlane(imea)->getState()(0);
+    m_hHitEff_soft[Wid.getICLayer()]->Fill(std::copysign(xx, RLInfo), max);
+  }
+  ////
 }
 
 void CDCCRTestModule::getResidualOfUnFittedLayer(Belle2::RecoTrack* track)
 {
+  B2INFO("Start estimate residual for un-fitted layer");
+  B2INFO("position seed" << track->getPositionSeed().Y());
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   static CDC::RealisticTDCCountTranslator* tdcTrans = new RealisticTDCCountTranslator(true);
   const genfit::AbsTrackRep* trackRepresentation = track->getCardinalRepresentation();
@@ -549,32 +581,42 @@ void CDCCRTestModule::getResidualOfUnFittedLayer(Belle2::RecoTrack* track)
   tdc = 0; adc = 0; lay = 0; IWire = 0;
   //  ndf =0; Pval=0; numhits=0; trigHitPos_x= 0; trigHitPos_z=0;
   //  trighit=1; lr=-1;
-
+  B2INFO("number of cdchit" << track->getCDCHitList().size());
+  B2INFO("number of point use int fit" << ndf + 4);
   BOOST_FOREACH(const RecoHitInformation::UsedCDCHit * cdchit, track->getCDCHitList()) {
     RecoHitInformation* recoHitInfo = track->getRecoHitInformation(cdchit);
-    if (recoHitInfo->useInFit()) continue;
-
-    unsigned int hitID = track->getRecoHitInformation(cdchit)->getSortingParameter();
+    //    if (recoHitInfo->useInFit()) continue;
+    if ((recoHitInfo->getCreatedTrackPoint())) continue;
+    B2DEBUG(99, "HitID use in fit" << recoHitInfo->useInFit());
+    int hitID = track->getRecoHitInformation(cdchit)->getSortingParameter();
     int hitID4extr = 0;
-
-    //find closest hit to hit with is do not fit
-    if (hitID < track->getNumberOfCDCHits() / 2) { //case for first part of track, searching forward, stop at first choice
-      BOOST_FOREACH(const RecoHitInformation::UsedCDCHit * hit, track->getCDCHitList()) {
-        if (track->getRecoHitInformation(hit)->useInFit()) { //may be should check fit status of that hit, do it later.
-          hitID4extr = track->getRecoHitInformation(hit)->getSortingParameter();
-          break;
-        }
+    int fsID = 0;
+    int bsID = 0;
+    //find closest hit to hit which do not fit
+    //    if (hitID < track->getNumberOfCDCHits() / 2) { //case for first part of track, searching forward, stop at first choice
+    BOOST_FOREACH(const RecoHitInformation::UsedCDCHit * hit, track->getCDCHitList()) {
+      if (track->getRecoHitInformation(hit)->useInFit()) { //may be should check fit status of that hit, do it later.
+        fsID = track->getRecoHitInformation(hit)->getSortingParameter();
+        break;
       }
     }
-    if (hitID > track->getNumberOfCDCHits() / 2) { //case for last part of track, searching backward, and stop at the first choice
-      BOOST_REVERSE_FOREACH(const RecoHitInformation::UsedCDCHit * hit, track->getCDCHitList()) {
-        if (track->getRecoHitInformation(hit)->useInFit()) {
-          //    hitID4extr=sortid;
-          hitID4extr = track->getRecoHitInformation(hit)->getSortingParameter();
-          break;
-        }
+    //}
+    //    if (hitID > track->getNumberOfCDCHits() / 2) { //case for last part of track, searching backward, and stop at the first choice
+    BOOST_REVERSE_FOREACH(const RecoHitInformation::UsedCDCHit * hit, track->getCDCHitList()) {
+      if (track->getRecoHitInformation(hit)->useInFit()) {
+        //    hitID4extr=sortid;
+        bsID = track->getRecoHitInformation(hit)->getSortingParameter();
+        break;
       }
     }
+    B2DEBUG(99, "forward ID: " << fsID << "  |bkwID = " << bsID);
+    if (std::fabs(fsID - hitID) < std::fabs(bsID - hitID)) {
+      hitID4extr = fsID;
+    } else {
+      hitID4extr = bsID;
+    }
+    //}
+    B2DEBUG(99, "hitID for extrpolate to " << hitID << " is " << hitID4extr);
 
     genfit::MeasuredStateOnPlane meaOnPlane = track->getMeasuredStateOnPlaneFromHit(hitID4extr, trackRepresentation);
     //start to extrapolation

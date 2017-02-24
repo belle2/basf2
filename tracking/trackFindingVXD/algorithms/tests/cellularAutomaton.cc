@@ -155,6 +155,10 @@ namespace CellularAutomatonTests {
     EXPECT_EQ(7, longestPath);  // TODO: fix
     EXPECT_EQ(nRounds, longestPath +
               1); // CA starts counting with 1, not with 0, the length of the paths is the number of Cells stored in it.
+
+    // also collect subpaths
+    paths = pathCollector.findPaths(intNetwork, true);
+    EXPECT_EQ(44, paths.size()); // Out of the 13 paths one gets 31 subpaths -> 44 in total
   }
 
 } // end namespace

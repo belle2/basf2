@@ -47,15 +47,20 @@ namespace Belle2 {
     class LookupTable {
 
     public:
-      /// Constructor
+      /**
+       *  Constructs a look up table for the given function
+       *  The function is sampled at n + 1 equally spaced points
+       *  between the given bound, such that the distance
+       *  between consecutive sampling points is (upper - lower) / nBins.
+       */
       LookupTable(const std::function<T(double)>& map,
-                  std::size_t n,
+                  std::size_t nBins,
                   double lowerBound,
                   double upperBound)
         : m_lowerBound(lowerBound)
         , m_upperBound(upperBound)
-        , m_binWidth((m_upperBound - m_lowerBound) / n)
-        , m_values(linspace(lowerBound, upperBound, n + 1, map))
+        , m_binWidth((m_upperBound - m_lowerBound) / nBins)
+        , m_values(linspace(lowerBound, upperBound, nBins + 1, map))
       {
         // Add a sentinal at the back.
         m_values.push_back(map(NAN));
@@ -83,11 +88,23 @@ namespace Belle2 {
       }
 
       /// Return the value at the given index
-      const T& at(int i)
+      const T& at(int i) const
       {
         const int iMax =  m_values.size() - 2; // Subtracting sentinal index
         i = boost::algorithm::clamp(i, 0, iMax);
         return m_values[i];
+      }
+
+      /// Return the number of bins in this lookup table
+      int getNBins() const
+      {
+        return m_values.size() - 2;
+      }
+
+      /// Return the number of finite sampling points in this lookup table
+      int getNPoints() const
+      {
+        return m_values.size() - 1;
       }
 
     private:

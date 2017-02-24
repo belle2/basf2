@@ -100,13 +100,18 @@ void BKLMRawPackerModule::event()
     int iLayer = digit->getLayer();
     int iSector = digit->getSector();
     int isForward = digit->isForward();
-    int iTdc = digit->getTime();
-    int icharge = digit->getNPixel();
-    int iCTime = digit->getCTime();
+    float iTdc = digit->getTime();
+    float icharge = digit->getNPixel();
+    short iCTime = digit->getCTime();
+    bool isRPC = digit->inRPC();
+    bool isAboveThresh = digit->isAboveThreshold();
     int moduleId = (isForward ? BKLM_END_MASK : 0)
                    | ((iSector - 1) << BKLM_SECTOR_BIT)
                    | ((iLayer - 1) << BKLM_LAYER_BIT)
                    | ((iAx) << BKLM_PLANE_BIT);
+    B2DEBUG(1, "BKLMRawPackerModule:: digi before packer: sector: " << iSector << " isforward: " << isForward << " layer: " << iLayer <<
+            " plane: " << iAx << " icharge " << icharge << " tdc " << iTdc << " ctime " << iCTime << " isAboveThresh " << isAboveThresh <<
+            " isRPC " << isRPC << " " << moduleId << digit->getModuleID());
 
     int electId = 0;
     if (m_ModuleIdToelectId.find(moduleId) == m_ModuleIdToelectId.end()) {
@@ -135,7 +140,11 @@ void BKLMRawPackerModule::event()
     unsigned short bword2 = 0;
     unsigned short bword3 = 0;
     unsigned short bword4 = 0;
-    formatData(iChannelNr, plane, lane, iTdc, icharge, iCTime, bword1, bword2, bword3, bword4);
+    int flag;
+    if (isRPC) flag = 2; //010
+    else flag = 4; //100
+    if (isRPC) lane = lane + 5;
+    formatData(flag, iChannelNr, plane, lane, iTdc, icharge, iCTime, bword1, bword2, bword3, bword4);
     buf[0] |= bword2;
     buf[0] |= ((bword1 << 16));
     buf[1] |= bword4;
@@ -234,7 +243,8 @@ void BKLMRawPackerModule::event()
 
 
 
-void BKLMRawPackerModule::formatData(int channel, int axis, int lane, int tdc, int charge, int ctime, unsigned short& bword1,
+void BKLMRawPackerModule::formatData(int flag, int channel, int axis, int lane, int tdc, int charge, int ctime,
+                                     unsigned short& bword1,
                                      unsigned short& bword2, unsigned short& bword3, unsigned short& bword4)
 {
 
@@ -245,8 +255,9 @@ void BKLMRawPackerModule::formatData(int channel, int axis, int lane, int tdc, i
   bword1 |= (channel & 0x7F);
   bword1 |= ((axis & 1) << 7);
   bword1 |= ((lane & 0x1F) << 8);
+  bword1 |= ((flag & 0x7) << 13);
   bword2 |= (ctime & 0xFFFF);
-  bword3 |= (tdc & 0x07FF);
+  bword3 |= (tdc & 0x7FF);
   bword4 |= (charge & 0xFFF);
 
 }

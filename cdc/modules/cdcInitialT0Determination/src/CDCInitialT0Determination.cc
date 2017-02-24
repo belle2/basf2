@@ -6,6 +6,8 @@
 #include "TF1.h"
 #include "TDirectory.h"
 #include "TFile.h"
+#include "TGraphErrors.h"
+#include "vector"
 
 using namespace std;
 using namespace Belle2;
@@ -25,6 +27,7 @@ CDCInitialT0DeterminationModule::CDCInitialT0DeterminationModule() : Module()
   addParam("ADCCut", m_adcMin, "threshold of ADC", m_adcMin);
   addParam("StoreFittedHisto", m_storeFittedHisto, "Store fitted histogram for each channel or not", true);
   addParam("HistoFileName", m_histoFileName, "file contain TDC histo", std::string("TDC.root"));
+  addParam("MinEntries", m_minEntries, "minimum entries per channel", m_minEntries);
 }
 
 CDCInitialT0DeterminationModule::~CDCInitialT0DeterminationModule()
@@ -37,17 +40,18 @@ void CDCInitialT0DeterminationModule::initialize()
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   for (int il = 0; il < 56; ++il) {
     for (unsigned short w = 0; w < cdcgeo.nWiresInLayer(il); ++w) {
-      m_hTDC[il][w] = new TH1D(Form("h_Lay%d_ch%d", il, w), "tdc", m_tdcMax - m_tdcMin, m_tdcMin, m_tdcMax);
+      m_hTDC[il][w] = new TH1D(Form("hLay%d_ch%d", il, w), "tdc", m_tdcMax - m_tdcMin, m_tdcMin, m_tdcMax);
     }
   }
   for (int ib = 0; ib < 300; ++ib) {
-    m_hT0b[ib] = new TH1D(Form("hT0b%d", ib), "", 8500, 0, 8500);
+    m_hTDCBoard[ib] = new TH1D(Form("hTDCBoard%d", ib), "",  m_tdcMax - m_tdcMin, m_tdcMin, m_tdcMax);
   }
   m_hT0All = new TH1D("hT0All", "", 8500, 0, 8500);
 
 }
 void CDCInitialT0DeterminationModule::event()
 {
+  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   StoreArray<CDCHit> cdcHits;
   for (const auto& hit : cdcHits) {
     WireID wireid(hit.getID());
@@ -55,64 +59,99 @@ void CDCInitialT0DeterminationModule::event()
     unsigned short w = wireid.getIWire();
     if (hit.getADCCount() > m_adcMin) {
       m_hTDC[lay][w]->Fill(hit.getTDCCount());
+      m_hTDCBoard[cdcgeo.getBoardID(WireID(lay, w))]->Fill(hit.getTDCCount());
     }
   }
 }
 void CDCInitialT0DeterminationModule::terminate()
 {
+  std::vector<double> sb;
+  std::vector<double> dsb;
+  std::vector<double> t0b;
+  std::vector<double> dt0b;
+  std::vector<double> b;
+  std::vector<double> db;
+
+  TH1D* hs = new TH1D("hs", "sigma", 100, 0, 20);
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   TF1* f1 = new TF1("f1", "[0]+[1]*(exp([2]*(x-[3]))/(1+exp(-([4]-x)/[5])))", m_tdcMin, m_tdcMax);
   f1->SetParLimits(0, 0., 1000.);
   f1->SetLineColor(kRed);
   double tdcBinWidth = cdcgeo.getTdcBinWidth();
+  double bflag[300];
+  for (int ib = 1; ib < 300; ++ib) {
+    if (m_hTDCBoard[ib]->GetEntries() < m_minEntries) {
+      B2DEBUG(99, "Warning: this board low statistic: " << m_hTDCBoard[ib]->GetEntries());
+      bflag[ib] = 0;
+      continue;
+    }
+    double p3 = m_hTDCBoard[ib]->GetXaxis()->GetBinCenter(m_hTDCBoard[ib]->GetMaximumBin());
+    f1->SetParameters(0, m_hTDCBoard[ib]->GetMaximum(), -0.001, p3, m_initT0, 2.5);
+    m_hTDCBoard[ib]->Fit("f1", "QM", "", m_initT0 - 60, m_initT0 + 60);
+    B2DEBUG(99, "prob of fit : " << f1->GetProb());
+    if ((f1->GetProb() < 1E-15) || (fabs(f1->GetParameter(4) - m_initT0) > 100) || (f1->GetParameter(5) < 0.01)
+        || (f1->GetParameter(5) > 16)) {
+      bflag[ib] = 0;
+      continue;
+    }
+    bflag[ib] = 1;
+    m_t0b[ib] = f1->GetParameter(4) * tdcBinWidth;
+    sb.push_back(f1->GetParameter(5));
+    dsb.push_back(f1->GetParError(5));
+    t0b.push_back(f1->GetParameter(4));
+    dt0b.push_back(f1->GetParError(4));
+
+    b.push_back(ib);
+    db.push_back(0);
+  }
 
   for (int il = 0; il < 56; ++il) {
     for (unsigned short w = 0; w < cdcgeo.nWiresInLayer(il); ++w) {
       B2DEBUG(99, "fitting for channel: " << il << " - " << w);
       B2DEBUG(99, "number of entries" << m_hTDC[il][w]->GetEntries());
-      if (m_hTDC[il][w]->GetEntries() < 30) {
+      int bid = cdcgeo.getBoardID(WireID(il, w));
+      if (m_hTDC[il][w]->GetEntries() < m_minEntries) {
         B2DEBUG(99, "Warning: low statistic channel: " << m_hTDC[il][w]->GetEntries());
-        m_flag[il][w] = 0;
-        continue;
+        if (bflag[bid] != 0) {
+          m_t0[il][w] = m_t0b[bid];
+          m_flag[il][w] = 1;
+        } else {m_flag[il][w] = 0;}
+      } else {
+        double p3 = m_hTDC[il][w]->GetXaxis()->GetBinCenter(m_hTDC[il][w]->GetMaximumBin());
+        f1->SetParameters(0, m_hTDC[il][w]->GetMaximum(), -0.001, p3, m_initT0, 2.5);
+        m_hTDC[il][w]->Fit("f1", "QM", "", m_initT0 - 60, m_initT0 + 60);
+        B2DEBUG(99, "prob of fit : " << f1->GetProb());
+        if ((f1->GetProb() < 1E-15) || (fabs(f1->GetParameter(4) - m_initT0) > 100) || (f1->GetParameter(5) < 0.1)
+            || (f1->GetParameter(5) > 20)) {
+          if (bflag[bid] != 0) {
+            m_t0[il][w] = m_t0b[bid];
+            m_flag[il][w] = 1;
+          } else {m_flag[il][w] = 0;}
+        } else {
+          m_t0[il][w] = f1->GetParameter(4) * tdcBinWidth;
+          hs->Fill(f1->GetParameter(5));
+          m_flag[il][w] = 1;
+        }
       }
-      double p3 = m_hTDC[il][w]->GetXaxis()->GetBinCenter(m_hTDC[il][w]->GetMaximumBin());
-      f1->SetParameters(0, m_hTDC[il][w]->GetMaximum(), -0.001, p3, m_initT0, 2.5);
-      m_hTDC[il][w]->Fit("f1", "QM", "", m_initT0 - 60, m_initT0 + 40);
-      B2DEBUG(99, "prob of fit : " << f1->GetProb());
-      if (f1->GetProb() < 1E-10) {
-        m_flag[il][w] = 0;
-        continue;
-      }
-
-      m_t0[il][w] = f1->GetParameter(4) * tdcBinWidth;
       B2DEBUG(99, "P4 = " << m_t0[il][w]);
       if (m_cosmic && cdcgeo.wireBackwardPosition(il, w).Y() > 0) {
-        //        m_t0[il][w] -= cdcgeo.senseWireR(il) / 29.8;
         m_t0[il][w] -= cdcgeo.senseWireR(il) / Const::speedOfLight;
       } else {
-        //        m_t0[il][w] += cdcgeo.senseWireR(il) / 29.8;
         m_t0[il][w] += cdcgeo.senseWireR(il) / Const::speedOfLight;
       }
       m_t0[il][w] += (m_zOffset - cdcgeo.wireBackwardPosition(il, w).Z()) / 27.25;
       m_t0[il][w] += 6.122;
-
-      m_hT0b[cdcgeo.getBoardID(WireID(il, w))]->Fill(m_t0[il][w]);
       m_hT0All->Fill(m_t0[il][w]);
-      m_flag[il][w] = 1;
+      //      m_hT0b[cdcgeo.getBoardID(WireID(il, w))]->Fill(m_t0[il][w]);
     }
   }
+
   //check t0, and add t0 for low static channel
   ofstream ofs(m_outputFileName.c_str());
   for (int il = 0; il < 56; ++il) {
     for (unsigned short w = 0; w < cdcgeo.nWiresInLayer(il); ++w) {
       if (m_flag[il][w] != 1) {
-        B2DEBUG(99, "this channel bad fit or low statistic");
-        int boardID = cdcgeo.getBoardID(WireID(il, w));
-        if (m_hT0b[boardID]->GetEntries() > 3) { //if t0 of this board exists
-          m_t0[il][w] = m_hT0b[boardID]->GetMean();
-        } else {
-          m_t0[il][w] = m_hT0All->GetMean();
-        } //use mean of all t0
+        m_t0[il][w] = m_hT0All->GetMean();
       }
       ofs << il << "\t" << w << "\t" << m_t0[il][w] << endl;
     }
@@ -121,14 +160,36 @@ void CDCInitialT0DeterminationModule::terminate()
   if (m_storeFittedHisto) {
     TFile* fhist = new TFile(m_histoFileName.c_str(), "recreate");
     fhist->cd();
+    TDirectory* top = gDirectory;
+    TDirectory* Direct[56];
     for (int il = 0; il < 56; ++il) {
+      top->cd();
+      Direct[il] = gDirectory->mkdir(Form("lay_%d", il));
+      Direct[il]->cd();
       for (unsigned short w = 0; w < cdcgeo.nWiresInLayer(il); ++w) {
         if (m_flag[il][w] == 1) {
           m_hTDC[il][w]->Write();
         }
       }
     }
+    top->cd();
+    TDirectory* board = gDirectory->mkdir("board");
+    board->cd();
+    for (int ib = 0; ib < 300; ++ib) {
+      if (bflag[ib] == 1) {
+        m_hTDCBoard[ib]->Write();
+      }
+    }
+    top->cd();
     m_hT0All->Write();
+    hs->Write();
+    TGraphErrors* gr = new TGraphErrors(b.size(), &b.at(0), &sb.at(0), &db.at(0), &dsb.at(0));
+    gr->SetName("reso");
+    gr->Write();
+    TGraphErrors* grT0b = new TGraphErrors(b.size(), &b.at(0), &t0b.at(0), &db.at(0), &dt0b.at(0));
+    grT0b->SetName("T0Board");
+    grT0b->Write();
+
     fhist->Close();
   }
 }

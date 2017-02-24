@@ -24,14 +24,14 @@ class TestClusterControlDrmaa(unittest.TestCase):
             """
             Possible DRMAA Job States
             """
-            # job done
+            #: job done
             DONE = 1
-            # job failed
+            #: job failed
             FAILED = 2
-            # job running
+            #: job running
             RUNNING = 3
 
-        # the job state this session mock will return
+        #: the job state this session mock will return
         jobStatusReturn = JobState.RUNNING
 
         def __enter__(self):

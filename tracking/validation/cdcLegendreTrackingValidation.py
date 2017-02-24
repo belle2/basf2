@@ -24,6 +24,8 @@ from tracking.validation.run import TrackingValidationRun
 
 class CDCLegendre(TrackingValidationRun):
     n_events = N_EVENTS
+    #: Generator to be used in the simulation (-so)
+    generator_module = 'generic'
     root_input_file = '../EvtGenSimNoBkg.root'
 
     @staticmethod
@@ -34,7 +36,7 @@ class CDCLegendre(TrackingValidationRun):
         if use_legendre_finder:
             path.add_module('TrackFinderCDCLegendreTracking')
         else:
-            path.add_module('AxialTrackCreatorHitLegendre')
+            path.add_module('AxialTrackCreatorHitHough')
 
         path.add_module('TrackExporter')
 

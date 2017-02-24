@@ -112,8 +112,9 @@ B2Vector3D BFieldComponentKlm1::calculate(const B2Vector3D& point) const
     if (d >= 0.0) {
       int layer = static_cast<int>(floor(d / m_dLayer));
 
-      if (layer > m_nBarrelLayers) return bField;
-      if (layer >= m_nBarrelLayers) {
+      // make sure layer is in a valid range
+      if (layer < 0 || layer > m_nBarrelLayers) return bField;
+      if (layer == m_nBarrelLayers) {
         layer = m_nBarrelLayers - 1;
         d = layer * m_dLayer; // for extra-thick outermost iron plate
       }
@@ -137,8 +138,8 @@ B2Vector3D BFieldComponentKlm1::calculate(const B2Vector3D& point) const
 
     double dz = absZ - (m_endcapZMin - m_endcapGapHeight);
     int layer = static_cast<int>(floor(dz / m_dLayer));
-    // nk
-    if (layer > m_nEndcapLayers) return bField;
+    // make sure layer is in a valid range
+    if (layer < 0 || layer >= m_nEndcapLayers) return bField;
 
     int GapIron = 0;      // in gap
     if ((dz - m_dLayer * layer) > m_endcapGapHeight) GapIron = 1;      // in Iron plate?

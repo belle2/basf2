@@ -13,8 +13,7 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
-#include <tracking/trackFindingCDC/legendre/precisionFunctions/OriginPrecisionFunction.h>
-#include <tracking/trackFindingCDC/legendre/precisionFunctions/NonOriginPrecisionFunction.h>
+#include <tracking/trackFindingCDC/legendre/precisionFunctions/PrecisionUtil.h>
 
 #include <set>
 #include <cmath>
@@ -35,31 +34,22 @@ namespace {
     // high-pt candidate
     AxialHitQuadTreeProcessor::ChildRanges
     ranges1(AxialHitQuadTreeProcessor::rangeX(0,
-                                              std::pow(2, BasePrecisionFunction::getLookupGridLevel())),
+                                              std::pow(2, PrecisionUtil::getLookupGridLevel())),
             AxialHitQuadTreeProcessor::rangeY(0., 0.15));
-    OriginPrecisionFunction originPrecisionFunction;
-    BasePrecisionFunction::PrecisionFunction highPtPrecisionFunction = originPrecisionFunction.getFunction();
+    PrecisionUtil::PrecisionFunction highPtPrecisionFunction = &PrecisionUtil::getOriginCurvPrecision;
 
     // low-pt candidate
     AxialHitQuadTreeProcessor::ChildRanges
     ranges2(AxialHitQuadTreeProcessor::rangeX(0,
-                                              std::pow(2, BasePrecisionFunction::getLookupGridLevel())),
+                                              std::pow(2, PrecisionUtil::getLookupGridLevel())),
             AxialHitQuadTreeProcessor::rangeY(0., 0.30));
 
-    NonOriginPrecisionFunction nonOriginPrecisionFunction;
-    BasePrecisionFunction::PrecisionFunction lowPtPrecisionFunction =
-      nonOriginPrecisionFunction.getFunction();
+    PrecisionUtil::PrecisionFunction lowPtPrecisionFunction = &PrecisionUtil::getNonOriginCurvPrecision;
 
     std::vector<AxialHitQuadTreeProcessor::ReturnList> candidates;
 
     this->loadPreparedEvent();
     const int numberOfPossibleTrackCandidate = m_mcTracks.size();
-    std::vector<CDCConformalHit> conformalHits(m_axialWireHits.begin(), m_axialWireHits.end());
-
-    std::vector<CDCConformalHit*> hitsVector;
-    for (CDCConformalHit& conformalHit : conformalHits) {
-      hitsVector.push_back(&conformalHit);
-    }
 
     AxialHitQuadTreeProcessor::CandidateProcessorLambda lmdProcessor =
       [&candidates](const AxialHitQuadTreeProcessor::ReturnList & hits,
@@ -67,13 +57,13 @@ namespace {
 
     auto now = std::chrono::high_resolution_clock::now();
     AxialHitQuadTreeProcessor qtProcessor1(13, ranges1, highPtPrecisionFunction);
-    qtProcessor1.provideItemsSet(hitsVector);
+    qtProcessor1.provideItemsSet(m_axialWireHits);
 
     // actual filling of the hits into the quad tree structure
     qtProcessor1.fillGivenTree(lmdProcessor, 30);
 
     AxialHitQuadTreeProcessor qtProcessor2(11, ranges2, lowPtPrecisionFunction);
-    qtProcessor2.provideItemsSet(hitsVector);
+    qtProcessor2.provideItemsSet(m_axialWireHits);
 
     // actual filling of the hits into the quad tree structure
     qtProcessor2.fillGivenTree(lmdProcessor, 30);

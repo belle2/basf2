@@ -11,14 +11,11 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/processing/TrackProcessor.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessorWithNewReferencePoint.h>
 
-#include <list>
 #include <vector>
 #include <map>
-
 
 namespace Belle2 {
   namespace TrackFindingCDC {

@@ -11,18 +11,13 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/processing/TrackProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeNodeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessorWithNewReferencePoint.h>
-#include <tracking/trackFindingCDC/legendre/precisionFunctions/OriginPrecisionFunction.h>
-#include <tracking/trackFindingCDC/legendre/precisionFunctions/NonOriginPrecisionFunction.h>
 #include <tracking/trackFindingCDC/legendre/quadtreetools/QuadTreeParameters.h>
 
-#include <list>
 #include <vector>
 #include <map>
-
 
 namespace Belle2 {
   namespace TrackFindingCDC {

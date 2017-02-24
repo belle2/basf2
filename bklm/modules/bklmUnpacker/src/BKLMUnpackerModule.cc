@@ -47,6 +47,8 @@ BKLMUnpackerModule::BKLMUnpackerModule() : Module()
   addParam("keepEvenPackages", m_keepEvenPackages, "keep packages that have even length normally indicating that data was corrupted ",
            false);
   addParam("outputDigitsName", m_outputDigitsName, "name of BKLMDigit store array", string("BKLMDigits"));
+  addParam("SciThreshold", m_scintThreshold, "scintillator strip hits with charge (~NPE) lower this value will be marked as bad",
+           double(7.0));
   addParam("loadMapFromDB", m_loadMapFromDB, "whether load electronic map from DataBase", true);
 }
 
@@ -181,11 +183,11 @@ void BKLMUnpackerModule::event()
         int numDetNwords = rawKLM[i]->GetDetectorNwords(j, finesse_num);
         int numHits = numDetNwords / hitLength;
         int* buf_slot = rawKLM[i]->GetDetectorBuffer(j, finesse_num);
-        ////        cout << "data in finesse num: " << finesse_num << "( " << rawKLM[i]->GetDetectorNwords(j,             finesse_num) << " words, " << numHits << " hits)" << endl;
+        //// cout << "data in finesse num: " << finesse_num << "( " << rawKLM[i]->GetDetectorNwords(j,             finesse_num) << " words, " << numHits << " hits)" << endl;
         //if (numDetNwords > 0)
         //  cout << "word counter is: " << ((buf_slot[numDetNwords - 1] >> 16) & 0xFFFF) << endl;
-        ////        cout << "trigger tag is " << rawKLM[i]->GetTRGType(j) << endl;
-        ////        cout << "ctime is : " << rawKLM[i]->GetTTCtime(j) << endl << endl;
+        //// cout << "trigger tag is " << rawKLM[i]->GetTRGType(j) << endl;
+        //// cout << "ctime is : " << rawKLM[i]->GetTTCtime(j) << endl << endl;
         //we should get two words of 32 bits...
 
         for (int k = 0; k < numDetNwords; k++) {
@@ -195,17 +197,17 @@ void BKLMUnpackerModule::event()
           B2DEBUG(1, buffer);
 
           //Brandon uses 4 16 bit words
-          //          int firstBrandonWord;
-          //          int secondBrandonWord;
+          // int firstBrandonWord;
+          // int secondBrandonWord;
           char buffer1[100] = "";
           char buffer2[100] = "";
 
           sprintf(buffer1, "%.4x\n", item & 0xffff);
           sprintf(buffer2, "%.4x\n", (item >> 16) & 0xffff);
 
-          ////          cout << buffer2 << buffer1;
+          ////cout << buffer2 << buffer1;
 
-          //          printf("%.8x\n", buf_slot[k]);
+          //  printf("%.8x\n", buf_slot[k]);
 
           //in Brandon's documenation a word is 16 bit, however the basf2 word seems to be 32 bit
           //first word
@@ -255,17 +257,15 @@ void BKLMUnpackerModule::event()
           unsigned short charge = bword4 & 0xFFF;
           int layer = lane;
           if (flag == 1) layer = lane - 5;
-          channel = getChannel(layer, axis, channel);
+          //channel = getChannel(layer, axis, channel);//for data
 
 
-          if ((1 == layer || 2 == layer)  && fabs(charge - m_scintADCOffset) < m_scintThreshold)
-            continue;
+          //if ((1 == layer || 2 == layer)  && fabs(charge - m_scintADCOffset) < m_scintThreshold) continue;
 
-          //    cout <<"copperID: "<< copperId<<endl;
           B2DEBUG(1, "copper: " << copperId << " finesse: " << finesse_num);
-          //          B2DEBUG(1, "Unpacker channel: " << channel << ", axi: " << axis << " lane: " << lane << " ctime: " << ctime << " tdc: " << tdc << " charge: " << charge)
-          ////          cout << "Unpacker channel: " << channel << ", axi: " << axis << " lane: " << lane << " ctime: " << ctime << " tdc: " << tdc <<
-          ////               " charge: " << charge << endl;
+          //  B2DEBUG(1, "Unpacker channel: " << channel << ", axi: " << axis << " lane: " << lane << " ctime: " << ctime << " tdc: " << tdc << " charge: " << charge)
+          //  cout << "Unpacker channel: " << channel << ", axi: " << axis << " lane: " << lane << " ctime: " << ctime << " tdc: " << tdc <<
+          //  " charge: " << charge << endl;
 
           int electId = electCooToInt(copperId, finesse_num + 1, layer, axis);
           int moduleId = 0;
@@ -275,34 +275,33 @@ void BKLMUnpackerModule::event()
                       " in mapping");
               continue;
             } else {
-              //        cout <<"calling default with axis: " << axis <<endl;
+              //cout <<"calling default with axis: " << axis <<endl;
               moduleId = getDefaultModuleId(layer, axis);
-              //        cout <<"could not find copperid %d, finesse %d, lane %d, axis %d in mapping " <<  copperId  <<" fin: "<<  finesse_num + 1 <<" lane: " <<  lane <<" axis: "<< axis <<endl;
-              //      cout <<" Using lane: "<< lane <<" layer: "<< layer <<endl;
             }
           } else { //found moduleId in the mapping
             moduleId = m_electIdToModuleId[electId];
             B2DEBUG(1, " electid: " << electId << " module: " << moduleId);
 
-            layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
-            //      cout <<" looking at lane: "<< lane <<" layer: "<< layer <<endl;
-            //plane should already be set
             //moduleId counts are zero based
+            layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
+            //plane should already be set
 
             //only channel and inrpc flag is not set yet
           }
-          if (layer > 15)
-            continue;
+
+          if (layer > 14) { B2WARNING("BKLMUnpackerModule:: strange that the layer number is larger than 14 " << layer); continue;}
           //still have to add the channel and axis
-          if (layer > 2)
-            moduleId |= BKLM_INRPC_MASK;
+          if (layer > 1) moduleId |= BKLM_INRPC_MASK;
           moduleId |= (((channel - 1) & BKLM_STRIP_MASK) << BKLM_STRIP_BIT) | (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
 
-          //(copperId,finesse_num,lane,channel,axis);
-
           BKLMDigit digit(moduleId, ctime, tdc, charge);
-          if (layer < 3) digit.isAboveThreshold(true);
-          //  Digit.setModuleID();
+          if (layer < 2 && !(charge < m_scintThreshold))  digit.isAboveThreshold(true);
+
+          B2DEBUG(1, "BKLMUnpackerModule:: digi after Unpacker: sector: " << digit.getSector() << " isforward: " << digit.isForward() <<
+                  " layer: " << digit.getLayer() << " isPhi: " << digit.isPhiReadout());
+          B2DEBUG(1, "BKLMUnpackerModule:: charge " << digit.getNPixel() << " tdc" << digit.getTime() << " ctime " << ctime <<
+                  " isAboveThresh " << digit.isAboveThreshold() << " isRPC " << digit.inRPC() << " moduleId " << digit.getModuleID());
+
           bklmDigits.appendNew(digit);
 
           B2DEBUG(1, "from digit:sector " << digit.getSector() << " layer: " << digit.getLayer() << " strip: " << digit.getStrip() << ", " <<

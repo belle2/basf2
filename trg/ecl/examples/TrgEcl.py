@@ -48,7 +48,7 @@ trgeclfam = register_module("TRGECLFAM")
 trgeclfam.param('TCWaveform', 0)  # Output TC Waveform (0 : no save, 1 : save)
 
 trgecl = register_module("TRGECL")
-trgecl.param('Clustering', 1)  # Output Clustering method(0 : Use only ICN , 1 : ICN + Max TC )
+trgecl.param('Clustering', 0)  # Output Clustering method(0 : Use only ICN , 1 : ICN + Max TC )
 trgecl.param('EventTiming', 2)  # Output EventTiming method(0 : Belle  , 1 : Most energetic TC timing , 2 : Energy weighted Timing)
 
 # trgeclMC = register_module("MCMatcherTRGECL")

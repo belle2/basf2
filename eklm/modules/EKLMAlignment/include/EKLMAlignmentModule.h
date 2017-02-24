@@ -87,6 +87,12 @@ namespace Belle2 {
      */
     void studyAlignmentLimits();
 
+    /**
+     * Save displacements to a ROOT file.
+     * @param[in] alignment Displacements.
+     */
+    void saveDisplacement(EKLMAlignment* alignment);
+
   };
 
 }

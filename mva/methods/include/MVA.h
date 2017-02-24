@@ -18,7 +18,6 @@
  */
 
 #include <mva/methods/FastBDT.h>
-#include <mva/methods/NeuroBayes.h>
 #include <mva/methods/TMVA.h>
 #include <mva/methods/Python.h>
 #include <mva/methods/FANN.h>

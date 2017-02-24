@@ -1662,6 +1662,37 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr rBinBelle(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string combinerMethod = arguments[0];
+        auto func = [combinerMethod](const Particle * particle) -> double {
+
+          int output = -2;
+          FlavorTaggerInfo* flavorTaggerInfo = particle -> getRelatedTo<FlavorTaggerInfo>();
+
+          if (flavorTaggerInfo != nullptr)
+          {
+            if (Variable::hasRestOfEventTracks(particle) > 0) {
+              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+              double r = std::abs(flavorTaggerInfo->getMethodMap(combinerMethod)->getQrCombined());
+              if (r < 0.1) output = 0;
+              if (r > 0.1 && r < 0.25) output = 1;
+              if (r > 0.25 && r < 0.5) output = 2;
+              if (r > 0.5 && r < 0.625) output = 3;
+              if (r > 0.625 && r < 0.75) output = 4;
+              if (r > 0.75 && r < 0.875) output = 5;
+              if (r > 0.875 && r < 1.10) output = 6;
+            }
+          }
+          return output;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function rBin");
+      }
+    }
+
     VARIABLE_GROUP("Flavor Tagger Variables");
 
     REGISTER_VARIABLE("pMissTag", momentumMissingTagSide,  "Calculates the missing Momentum for a given particle on the tag side.");
@@ -1736,6 +1767,7 @@ namespace Belle2 {
                       "Returns the output of the flavorTagger for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.")
     REGISTER_VARIABLE("qOutput(combinerMethod)", qOutput,
                       "Returns the flavor tag q output of the flavorTagger for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.")
-
+    REGISTER_VARIABLE("rBinBelle(combinerMethod)", rBinBelle,
+                      "Returns the corresponding r (dilution) bin according to the Belle binning for the given combinerMethod. The default methods are 'FBDT' or 'FANN'.")
   }
 }

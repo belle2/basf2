@@ -7,17 +7,13 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/processing/TrackProcessor.h>
+#include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/ConformalExtension.h>
-#include <tracking/trackFindingCDC/legendre/precisionFunctions/OriginPrecisionFunction.h>
-#include <tracking/trackFindingCDC/legendre/precisionFunctions/NonOriginPrecisionFunction.h>
 
-#include <list>
 #include <vector>
 #include <map>
 #include <cmath>
@@ -25,7 +21,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCConformalHit;
+    class CDCWireHit;
 
     /**
      * Class which used as interface between QuadTree processor and TrackCreator
@@ -36,7 +32,7 @@ namespace Belle2 {
 
       ///Constructor
       QuadTreeNodeProcessor(AxialHitQuadTreeProcessor& qtProcessor,
-                            BasePrecisionFunction::PrecisionFunction& precisionFunct) :
+                            PrecisionUtil::PrecisionFunction precisionFunct) :
         m_qtProcessor(qtProcessor), m_precisionFunct(precisionFunct)
       {
       };
@@ -46,11 +42,12 @@ namespace Belle2 {
        *  this lambda function will forward the found candidates to the CandidateCreate for further processing
        *  hits belonging to found candidates will be marked as used and ignored for further filling iterations
        */
-      AxialHitQuadTreeProcessor::CandidateProcessorLambda getLambdaInterface(std::vector<const CDCWireHit*>& allAxialWireHits,
-          std::list<CDCTrack>& tracks)
+      AxialHitQuadTreeProcessor::CandidateProcessorLambda getLambdaInterface(const std::vector<const CDCWireHit*>& allAxialWireHits,
+          std::vector<CDCTrack>& tracks)
       {
-        AxialHitQuadTreeProcessor::CandidateProcessorLambda lmdCandidateProcessingFinal = [&](const AxialHitQuadTreeProcessor::ReturnList &
-        hits __attribute__((unused)), AxialHitQuadTreeProcessor::QuadTree * qt) -> void {
+        AxialHitQuadTreeProcessor::CandidateProcessorLambda lmdCandidateProcessingFinal =
+          [&](const AxialHitQuadTreeProcessor::ReturnList & hits __attribute__((unused)),
+        AxialHitQuadTreeProcessor::QuadTree * qt) -> void {
           this->candidateProcessingFinal(qt, allAxialWireHits, tracks);
         };
 
@@ -61,8 +58,8 @@ namespace Belle2 {
 
       /// Gets hits from quadtree node, convert to QuadTreeHitWrapper and passes for further processing
       void candidateProcessingFinal(AxialHitQuadTreeProcessor::QuadTree* qt,
-                                    std::vector<const CDCWireHit*>& allAxialWireHits,
-                                    std::list<CDCTrack>& tracks)
+                                    const std::vector<const CDCWireHit*>& allAxialWireHits,
+                                    std::vector<CDCTrack>& tracks)
       {
         for (AxialHitQuadTreeProcessor::ItemType* hit : qt->getItemsVector()) {
           hit->setUsedFlag(false);
@@ -74,7 +71,7 @@ namespace Belle2 {
         /// NO NEGATIVE IMPACT ON THE EFFICIENCY WHEN THIS METHOD IS DISABLED ....
         //advancedProcessing(qt);
 
-        std::vector<CDCConformalHit*> candidateHits;
+        std::vector<const CDCWireHit*> candidateHits;
 
         for (AxialHitQuadTreeProcessor::ItemType* hit : qt->getItemsVector()) {
           hit->setUsedFlag(false);
@@ -150,35 +147,26 @@ namespace Belle2 {
       };
 
       /// Perform conformal extension for given set of hits and create CDCTrack object of them
-      void postprocessSingleNode(std::vector<CDCConformalHit*>& candidateHits,
+      void postprocessSingleNode(std::vector<const CDCWireHit*>& candidateHits,
                                  const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                 std::list<CDCTrack>& tracks)
+                                 std::vector<CDCTrack>& tracks)
       {
-
-        for (CDCConformalHit* hit : candidateHits) {
-          hit->setUsedFlag(false);
+        for (const CDCWireHit* hit : candidateHits) {
+          (*hit)->setTakenFlag(false);
         }
 
         ConformalExtension conformalExtension;
-
-        std::vector<const CDCWireHit*> cdcWireHits;
-
-        for (CDCConformalHit* hit : candidateHits) {
-          cdcWireHits.push_back(hit->getWireHit());
-        }
-
-        conformalExtension.newRefPoint(cdcWireHits, allAxialWireHits, true);
-
-        TrackProcessor::addCandidateFromHitsWithPostprocessing(cdcWireHits, allAxialWireHits, tracks);
+        conformalExtension.newRefPoint(candidateHits, allAxialWireHits, true);
+        AxialTrackUtil::addCandidateFromHitsWithPostprocessing(candidateHits, allAxialWireHits, tracks);
       }
 
     private:
       AxialHitQuadTreeProcessor& m_qtProcessor; /**< Reference to the quadtree processor. */
 
-      BasePrecisionFunction::PrecisionFunction m_precisionFunct; /**< Quadtree precision function. */
+      PrecisionUtil::PrecisionFunction m_precisionFunct; /**< Quadtree precision function. */
 
       const unsigned long m_nbinsTheta = pow(2,
-                                             TrackFindingCDC::BasePrecisionFunction::getLookupGridLevel()); /**< Number of theta bins.*/
+                                             TrackFindingCDC::PrecisionUtil::getLookupGridLevel()); /**< Number of theta bins.*/
     };
 
   }

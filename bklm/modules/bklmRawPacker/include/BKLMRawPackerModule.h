@@ -95,7 +95,8 @@ namespace Belle2 {
     //! @param[out] bword2 second 16bit word
     //! @param[out] bword3 third 16bit word
     //! @param[out] bword4 forth 16bit word
-    void formatData(int channel, int axis, int lane, int tdc, int charge, int ctime, unsigned short& bword1, unsigned short& bword2,
+    void formatData(int flag, int channel, int axis, int lane, int tdc, int charge, int ctime, unsigned short& bword1,
+                    unsigned short& bword2,
                     unsigned short& bword3, unsigned short& bword4);
 
     //    //! put datapackets for a track together

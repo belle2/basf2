@@ -21,9 +21,9 @@ namespace Belle2 {
     int nbuf; /**< Number of entries in ring buffer. */
     int semid; /**< Semaphore ID. */
     int nattached; /**< Number of RingBuffer instances currently attached to this buffer. */
-    int redzone; /**< Unused. */
-    int readbuf; /**< Unused. */
-    int mode; /**< Error state? 0: Normal, 1: buffer full and wptr>rptr, others are complicated. */
+    int __redzone; /**< Unused. */
+    int __readbuf; /**< Unused. */
+    int errtype; /**< Error state? 0: Normal, 1: buffer full and wptr>rptr, others are complicated. */
     int numAttachedTx; /**< # attached sending processes. 0: Processes reading from this buffer should terminate once it's empty. -1: attach pending (initial state) */
     int ninsq; /**< Count insq() calls for this buffer. */
     int nremq; /**< Count remq() calls for this buffer. */
@@ -37,17 +37,15 @@ namespace Belle2 {
 
     /** Constructor to create a new shared memory in private space.
      *
-     * @param size Ring buffer size in integers (!)
+     * @param nwords Ring buffer size in integers
      */
-    explicit RingBuffer(int size = c_DefaultSize);
+    explicit RingBuffer(int nwords = c_DefaultSize);
     /** Constructor to create/attach named shared memory in global space */
-    RingBuffer(const std::string& name, unsigned int size = 0);     // Create / Attach Ring buffer
-    /** Constructor by attaching to an existing shared memory */
-    //    RingBuffer(int shmid);              // Attach Ring Buffer
+    RingBuffer(const std::string& name, unsigned int nwords = 0);     // Create / Attach Ring buffer
     /** Destructor */
     ~RingBuffer();
     /** open shared memory */
-    void openSHM(int size);
+    void openSHM(int nwords);
     /** Function to detach and remove shared memory*/
     void cleanup();
 
@@ -94,8 +92,8 @@ namespace Belle2 {
     /** Return number of remq() calls. */
     int remq_counter() const;
 
-    /** Dump buffer info */
-    void DumpInfo() const;
+    /** Dump contents of RingBufInfo metadata */
+    void dumpInfo() const;
 
   private:
     bool m_new; /**< True if we created the ring buffer ourselves (and need to clean it). */

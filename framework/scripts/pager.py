@@ -26,12 +26,19 @@ class Pager(object):
     @param prompt a string argument allows overriding
                   the description provided by ``less``. Special characters may need
                   escaping. By default, the temporary filename is shown.
+    @param quit_if_one_screen a bool indicating whether the Pager should quit
+        automatically if the content fits on one screen. This implies that the
+        content stays visible on pager exit. True is similar to the behavior of
+        git diff, False is similar to git --help
     """
 
-    def __init__(self, prompt=None):
-        """ ctor """
+    def __init__(self, prompt=None, quit_if_one_screen=False):
+        """ constructor just remembering the arguments """
         #: prompt string
         self.prompt = prompt
+        #: flag indicating whether the pager should automatically exit if the
+        # content fits on one screen
+        self.quit_if_one_screen = quit_if_one_screen
 
     def __enter__(self):
         """ entering context """
@@ -46,7 +53,10 @@ class Pager(object):
         if self.prompt is None:
             self.prompt = '%f'  # same as default prompt
         self.prompt += ' (press h for help or q to quit)'
-        p = subprocess.Popen(['less', '-R', '-Ps' + self.prompt, self.tmp_file.name])
+        less = ['less', '-R', '-Ps' + self.prompt]
+        if self.quit_if_one_screen:
+            less += ['-F', '-X']
+        p = subprocess.Popen(less + [self.tmp_file.name])
         p.communicate()
         self.tmp_file.close()
         sys.stdout = sys.__stdout__

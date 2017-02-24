@@ -142,6 +142,29 @@ namespace Belle2 {
       return func;
     }
 
+
+    Manager::FunctionPtr particleRelatedToCurrentROE(const std::vector<std::string>& arguments)
+    {
+      std::string listName;
+
+      if (arguments.size() != 1)
+        B2FATAL("Wrong number of arguments (1 required) for meta function particleRelatedToCurrentROE");
+
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+      auto func = [var](const Particle*) -> double {
+
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+
+        if (not roe.isValid())
+          return -999;
+
+        Particle* particle = roe->getRelatedTo<Particle>();
+        return var->function(particle);
+
+      };
+      return func;
+    }
+
     double nRemainingTracksInRestOfEvent(const Particle* particle)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
@@ -1587,6 +1610,10 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("nROEKLMClusters", nROEKLMClusters,
                       "Returns number of all remaining KLM clusters in the related RestOfEvent object.");
+
+    REGISTER_VARIABLE("particleRelatedToCurrentROE(var)", particleRelatedToCurrentROE,
+                      "[EventBased] Returns variable applied to the particle which is related to the current RestOfEvent object"
+                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
     REGISTER_VARIABLE("mcROE_E", mcROEEnergy,
                       "Returns true energy of unused tracks and clusters in ROE");

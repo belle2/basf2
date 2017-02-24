@@ -53,11 +53,8 @@ std::pair<TVector3, int> QualityEstimators::calcMomentumSeed(bool useBackwards, 
   hitC = hitC.Orthogonal();
 
   std::pair<double, TVector3> fitResults;
-  fitResults = riemannHelixFit(m_hits);
-  B2WARNING("Riemann CircleFit rho = " << fitResults.first << std::endl);
   try {
     fitResults = helixFit(m_hits, useBackwards, setMomentumMagnitude);
-    B2WARNING("Jakob CircleFit rho = " << fitResults.first << std::endl);
   } catch (FilterExceptions::Straight_Line& anException) {
     B2DEBUG(1, "Exception caught: QualityEstimators::calcMomentumSeed - helixFit said: " << anException.what());
     try {
@@ -424,7 +421,10 @@ std::pair<double, TVector3> QualityEstimators::riemannHelixFit(const std::vector
 
   Eigen::Matrix<Precision, Eigen::Dynamic, Eigen::Dynamic> W = Eigen::Matrix<Precision, Eigen::Dynamic, Eigen::Dynamic>::Zero(nHits,
       nHits);
+  Eigen::Matrix<Precision, Eigen::Dynamic, Eigen::Dynamic> Wz = Eigen::Matrix<Precision, Eigen::Dynamic, Eigen::Dynamic>::Zero(nHits,
+      nHits);
   Eigen::Matrix<Precision, Eigen::Dynamic, 3> X = Eigen::Matrix<Precision, Eigen::Dynamic, 3>::Zero(nHits, 3);
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> Z = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Zero(nHits, 1);
   Precision traceOfW = 0.;
 
   short index = 0;
@@ -450,6 +450,10 @@ std::pair<double, TVector3> QualityEstimators::riemannHelixFit(const std::vector
     X(index, 1) = y;
     X(index, 2) = r2;
 
+    // Values for z line fit for extrended Riemann fit
+    Wz(index, index) = 1. / sigmaZ;
+    Z(index, 0) = z;
+
     index++;
   }
 
@@ -461,7 +465,7 @@ std::pair<double, TVector3> QualityEstimators::riemannHelixFit(const std::vector
   Eigen::Matrix<Precision, 3, 1> eigenvalues = eigencollection.eigenvalues().real();
   Eigen::Matrix<std::complex<Precision>, 3, 3> eigenvectors = eigencollection.eigenvectors();
   Eigen::Matrix<Precision, 3, 1>::Index minRow, minCol;
-  auto val = eigenvalues.minCoeff(&minRow, &minCol);
+  eigenvalues.minCoeff(&minRow, &minCol);
 
   Eigen::Matrix<Precision, 3, 1> n = eigenvectors.col(minRow).real();
 
@@ -475,6 +479,7 @@ std::pair<double, TVector3> QualityEstimators::riemannHelixFit(const std::vector
   // Calculation of 3 different versions of a distance d for Chi Squared calculation
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> d = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits, 1) * c + X * n;
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> d_trans = (d + d.cwiseProduct(X.col(2))) / sqrt(1 - n(2) * n(2));
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> d_r_phi = d_trans.cwiseQuotient((0.5 * X.col(2) / rho).array().asin().cos().matrix());
 
   // Calculate Chi Squared for circle fit
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> d_over_sigma = W * d_trans;
@@ -482,12 +487,71 @@ std::pair<double, TVector3> QualityEstimators::riemannHelixFit(const std::vector
                    1).transpose() * (d_over_sigma.cwiseProduct(d_over_sigma));
   std::cout << "Chi Squared of Riemann Circle fit = " << chi2 << std::endl;
 
+
   // Line Fit for extension to Helix Fit
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> a = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits, 1) * c + n(2) * X.col(2);
+  Precision b = n(0) * n(0) + n(1) * n(1);
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> underRoot = b * X.col(2) - a.cwiseProduct(a);
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> root = underRoot.cwiseSqrt();
 
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> x_pos = (- n(0) * a + n(1) * root) / b;
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> x_neg = (- n(0) * a - n(1) * root) / b;
 
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> y_pos = (- n(1) * a - n(0) * root) / b;
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> y_neg = (- n(1) * a + n(0) * root) / b;
 
+  // find the correct intersection point (TODO: There might be room for simplification here, because the
+  // selection does not have to be coefficientwise!)
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> dist_pos = (x_pos - X.col(0)).cwiseProduct(x_pos - X.col(0)) + (y_pos - X.col(
+                                                           1)).cwiseProduct(y_pos - X.col(1));
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> dist_neg = (x_neg - X.col(0)).cwiseProduct(x_neg - X.col(0)) + (y_neg - X.col(
+                                                           1)).cwiseProduct(y_neg - X.col(1));
 
-  return std::make_pair(rho, TVector3(1.0, 1.0, 1.0));
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> x_s = (dist_pos.cwiseEqual(dist_pos.cwiseMin(dist_neg))).select(x_pos, x_neg);
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> y_s = (dist_pos.cwiseEqual(dist_pos.cwiseMin(dist_neg))).select(y_pos, y_neg);
+
+  // Arc length calculation
+  Precision x_first = X.col(0)(0) - x0;
+  Precision y_first = X.col(1)(0) - y0;
+  Precision r_mag_first = sqrt(x_first * x_first + y_first * y_first);
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> x0s = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits, 1) * x0;
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> y0s = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits, 1) * y0;
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> r_mags = ((X.col(0) - x0s).cwiseProduct(X.col(0) - x0s) + (X.col(1) - y0s).cwiseProduct(
+                                                          X.col(1) - y0s)).cwiseSqrt();
+
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> arc_angles = (x_first * (X.col(0) - x0s) + y_first * (X.col(1) - y0s)).cwiseQuotient(
+                                                             r_mags) / r_mag_first;
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> arc_lengths = rho * arc_angles.array().acos().matrix();
+
+  Eigen::Matrix<Precision, Eigen::Dynamic, 2> A = Eigen::Matrix<Precision, Eigen::Dynamic, 2>::Ones(nHits, 2);
+  arc_lengths(0) = 0.;
+  A.col(1) = arc_lengths;
+
+  // Linear regression of z on arg_lengths with weight matrix Wz
+  Eigen::Matrix<Precision, 2, 1> p = (A.transpose() * Wz * A).inverse() * A.transpose() * Wz * Z;
+
+  // Construction of momentum vector with innermost hit and reconstructed circle center
+  Eigen::Matrix<Precision, 3, 1> momVec = Eigen::Matrix<Precision, 3, 1>::Zero();
+  momVec(0) = y0 - X.col(1)(nHits - 1);
+  momVec(1) = - (x0 - X.col(0)(nHits - 1));
+
+  Precision pT = Precision(calcPt(rho));
+  momVec = pT * momVec.normalized();
+
+  Eigen::Matrix<Precision, 3, 1> vec01 = X.row(nHits - 2) - X.row(nHits - 1);
+  vec01(2) = Z(nHits - 2) - Z(nHits - 1);
+  Precision angle01 = std::acos(vec01.dot(momVec) / momVec.norm() / vec01.norm());
+  if (angle01 > 0.5 * M_PI) { momVec *= -1.; }
+
+  // Calculation of a chi2 distributed quantity for the quality of fit of the z component fit.
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> ones = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits, 1);
+  Precision chi2_z = ((Z - p(0) * ones - p(1) * arc_lengths).cwiseQuotient(Wz * ones)).transpose() * ((Z - p(0) * ones - p(
+                       1) * arc_lengths).cwiseQuotient(Wz * ones));
+
+  Precision pZ = pT * p(1);
+  momVec(2) = - pZ;
+
+  return std::make_pair(rho, TVector3(momVec(0), momVec(1), momVec(2)));
 }
 
 
@@ -848,6 +912,7 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
   if (std::isnan(rho) == true or lambdaCheckVector4NAN(pVector) == true) {
     throw FilterExceptions::Invalid_result_Nan();
   }
+
   return std::make_pair(rho, pVector);
 }
 

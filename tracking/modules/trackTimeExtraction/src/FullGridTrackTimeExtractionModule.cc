@@ -90,11 +90,14 @@ namespace {
 
         const bool finished = derivatives_pair.second > 2.7122 and chi2 < 1.739;
 
+        // subtract the initial seed time from the extracted time
+        const double extracted_time_subtract = extracted_time - initialValue;
+
         if (finished) {
-          convergedTries.emplace_back(extracted_time, chi2);
+          convergedTries.emplace_back(extracted_time_subtract, chi2);
           break;
         } else {
-          tries.emplace_back(extracted_time, chi2);
+          tries.emplace_back(extracted_time_subtract, chi2);
         }
       }
     }

@@ -214,7 +214,8 @@ namespace Belle2 {
         digit->setHitQuality(TOPDigit::c_Junk);
       const auto* waveform = rawDigit.getRelated<TOPRawWaveform>();
       if (waveform) {
-        if (!waveform->areWindowsInOrder()) digit->setHitQuality(TOPDigit::c_Junk);
+        if (!waveform->areWindowsInOrder(rawDigit.getSampleFall() + 1))
+          digit->setHitQuality(TOPDigit::c_Junk);
       }
     }
 

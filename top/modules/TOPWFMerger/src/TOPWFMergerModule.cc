@@ -210,7 +210,7 @@ namespace Belle2 {
       const auto& hits = waveform.getHits();
       for (const auto& hit : hits) {
         int tdc = int(hit.time * m_sampleDivisions);
-        float time = sampleTimes->getTimeDifference(firstWindow, hit.time);
+        float time = sampleTimes->getTime(firstWindow, hit.time);
         auto* digit = digits.appendNew(moduleID, pixelID, tdc);
         digit->setTime(time + t0);
         digit->setTimeError(hit.timeErr);  // TODO: convert to [ns]

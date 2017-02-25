@@ -116,11 +116,11 @@ void PXDClusterRescueROIModule::event()
               ROIids.appendNew(ROI);
             }
           }
-          pxdSensorsIterator++;
+          ++pxdSensorsIterator;
         }
-        pxdLaddersIterator++;
+        ++pxdLaddersIterator;
       }
-      pxdLayersIterator++;
+      ++pxdLayersIterator;
     }
   }
 }

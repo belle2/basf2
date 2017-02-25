@@ -16,36 +16,36 @@
 using namespace std;
 
 void asciiToRoot(const char* filenameIn="ahist.txt",const char* filenameOut = "teacherHistos.root", int verbose = 0)
-{  
+{
 
   float nbins,nbinsx,xmin,xmax,nbinsy,ymin,ymax;
   float underflow,overflow;
-  int i,j,counter;
   float histId,histType;
 
   std::cout<<"asciiToRoot: converting "<<filenameIn<<" to Root format ";
   FILE*teacherHistos = fopen(filenameIn,"r");
 
-  if(teacherHistos) {  
+  if(teacherHistos) {
 
     // open the output file
     TFile* root_file = new TFile(filenameOut,"RECREATE");
 
-    counter = 0;
+    unsigned counter = 0;
+    int i,j;
 
     while(fscanf(teacherHistos,"%f %f", &histId,&histType) != EOF){
       counter++;
 
-      if (verbose>1) 
+      if (verbose>1)
         std::cerr<<"histId \t"<<histId<<"\t type \t"<<histType<<std::endl;
 
       root_file->cd();
-     
+
       if ( verbose > 0)
 	std::cerr << "Extracting hist " << (int)histId << " of type " << (int)histType;
-	  
+
       if((int)histType == 1 || (int)histType == 11)    {// 1-dim histogram
-	
+
 	fscanf(teacherHistos,"%f %f %f", &nbins,&xmin,&xmax);
 
 	if ( verbose > 0)
@@ -89,7 +89,7 @@ void asciiToRoot(const char* filenameIn="ahist.txt",const char* filenameOut = "t
       }
       else if((int)histType == 2 || (int)histType == 12)  {// 2-dim histogram
 	fscanf(teacherHistos,"%f %f %f", &nbinsx,&xmin,&xmax);
-	fscanf(teacherHistos,"%f %f %f", &nbinsy,&ymin,&ymax);	
+	fscanf(teacherHistos,"%f %f %f", &nbinsy,&ymin,&ymax);
 	if ( verbose > 0)
 	  std::cerr << " with " << (int)nbinsx << " bins in x and " << (int)nbinsy << " bins in y"<< std::endl;
 	char hName[80];
@@ -134,7 +134,7 @@ void asciiToRoot(const char* filenameIn="ahist.txt",const char* filenameOut = "t
       else if((int)histType == 3)  {// variable bin size histogram
 
 	float nbinstmp;
-	
+
 	bool allNulls = true;
 	fscanf(teacherHistos,"%f", &nbinstmp);
 	char hName[80];
@@ -144,7 +144,7 @@ void asciiToRoot(const char* filenameIn="ahist.txt",const char* filenameOut = "t
 	if ( verbose > 0)
 	  std::cerr << " with " << nbinsvar-1 << " bins " << std::endl;
 	auto binedge = std::vector<float>(nbinsvar);
-	
+
 	sprintf(hName,"h%i",(int)histId);
 	j=0;
 	while(j<nbinsvar) {
@@ -170,12 +170,12 @@ void asciiToRoot(const char* filenameIn="ahist.txt",const char* filenameOut = "t
 	if(allNulls && underflow!=0) allNulls = false;
 	histo1xbin->SetBinContent((int)nbins+1,overflow);
 	if(allNulls && overflow!=0) allNulls = false;
-	
+
 	if(allNulls) histo1xbin->SetEntries(0);
 	histo1xbin->Write();
-	
+
 	delete histo1xbin;
-	
+
       }
     }
     // close the output file

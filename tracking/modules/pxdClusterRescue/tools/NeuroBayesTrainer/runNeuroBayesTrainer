@@ -1,1 +1,0 @@
-./NeuroBayesTrainer ../../data/PXDClusterGetNNData_signal.data ../../data/PXDClusterGetNNData_background.data ../../data/PXDClusterNeuroBayes.nb ../../data/PXDClusterNeuroBayes.log

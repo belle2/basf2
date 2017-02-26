@@ -19,16 +19,19 @@
 #include <alignment/GlobalLabel.h>
 
 #include <genfit/StateOnPlane.h>
-#include <../vxd/geometry/include/GeoCache.h>
 
 
 namespace Belle2 {
   namespace alignment {
+    /// pair of the global unique id from object with constants and element representing some rigid body in hierarchy
     typedef std::pair<unsigned short, unsigned short> DetectorLevelElement;
+    /// pair with global labels and matrix with coresponding global derivatives
     typedef std::pair<std::vector<int>, TMatrixD> GlobalDerivativeSet;
+    /// A (null) constraint, vector of pairs of global label and its factor in the constraint
     typedef std::vector<std::pair<int, double>> Constraint;
+    /// vector of constraints
     typedef std::map<int, Constraint> Constraints;
-    //! Class for alignment/calibration parameter hierarchy
+    /// Class for alignment/calibration parameter hierarchy & constraints
     class GlobalDerivativesHierarchy {
 
     public:
@@ -38,7 +41,7 @@ namespace Belle2 {
       //! Destructor (virtual)
       virtual ~GlobalDerivativesHierarchy() {}
 
-
+      /// Adds constraints from current hierarchy to a constraints vector
       void buildConstraints(Constraints& constraints)
       {
         for (auto& parent_childs : m_hierarchy) {
@@ -64,6 +67,7 @@ namespace Belle2 {
         }
       }
 
+      /// Recursive function which adds labels and derivatives until top element in hierarchy is found
       GlobalDerivativeSet buildGlobalDerivativesHierarchy(TMatrixD matrixChain, DetectorLevelElement child)
       {
         auto loc2glo = getChildToMotherTransform(child);
@@ -82,6 +86,11 @@ namespace Belle2 {
         return retVal;
       }
 
+      /// Template function to add relation between two elements (possibly in different objects with constants)
+      /// First object is the child object, second its hierarchy parent
+      /// @param child is the lement numeric id in child obj
+      /// @param mother is the parent object
+      /// @param childToMotherParamTransform is the transformation matrix (placement from geometry of the detector)
       template<class ChildDBObjectType, class MotherDBObjectType>
       void insert(unsigned short child, unsigned short mother, TMatrixD childToMotherParamTransform)
       {
@@ -100,6 +109,8 @@ namespace Belle2 {
         }
       }
 
+      /// Merge additional set into main set of global labels and derivatives
+      ///TODO: move to some utilities
       static void mergeGlobals(GlobalDerivativeSet& main, GlobalDerivativeSet additional)
       {
         if (additional.first.empty())
@@ -120,6 +131,7 @@ namespace Belle2 {
 
       }
 
+      /// print the lookup map
       void printHierarchy()
       {
         for (auto& entry : m_lookup) {
@@ -129,8 +141,11 @@ namespace Belle2 {
         }
       }
 
+      /// The only function to implement: what are the global labels for the element?
       virtual std::vector<int> getElementLabels(DetectorLevelElement element) = 0;
+
     private:
+      /// Find the transformation in the lookup
       std::pair<DetectorLevelElement, TMatrixD> getChildToMotherTransform(DetectorLevelElement child)
       {
         auto entry = m_lookup.find(child);
@@ -146,85 +161,14 @@ namespace Belle2 {
       std::map<DetectorLevelElement, std::vector<DetectorLevelElement>> m_hierarchy;
     };
 
-    /**
-    class GlobalDerivativesBase {
-      virtual GlobalDerivativeSet getGlobalDerivatives() = 0;
-    };
-
-    template<class DBObjType>
-    class GlobalDerivatives : public GlobalDerivativesBase {
-      GlobalDerivativeSet getGlobalDerivatives(const genfit::StateOnPlane* sop) {
-        std::vector<int> labels;
-        GlobalLabel label;
-        label.construct<DBObjType>(getElementID(), 0);
-        for (auto paramID : getElementParameterIDs())
-          labels.push_back(label.setParameterId(paramID));
-
-        return {labels, getElementDerivatives()};
-      }
-      unsigned short getElementID() = 0;
-      std::vector<unsigned short> getElementParameterIDs() = 0;
-      TMatrixD getElementDerivatives() = 0;
-    };
-
-    template<class DBObjType>
-    class RigidBodyDerivatives : public GlobalDerivatives<DBObjType> {
-      std::vector<int> getElementParameterIDs() {
-        return {1,2,3,4,5,6};
-      }
-      TMatrixD getElementDerivatives(const genfit::StateOnPlane* sop) {
-        TMatrixD derGlobal(2, 6);
-
-        // track u-slope in local sensor system
-        double uSlope = sop->getState()[1];
-        // track v-slope in local sensor system
-        double vSlope = sop->getState()[2];
-        // Predicted track u-position in local sensor system
-        double uPos = sop->getState()[3];
-        // Predicted track v-position in local sensor system
-        double vPos = sop->getState()[4];
-
-        //Global derivatives for alignment in sensor local coordinates
-
-        derGlobal(0, 0) = 1.0;
-        derGlobal(0, 1) = 0.0;
-        derGlobal(0, 2) = - uSlope;
-        derGlobal(0, 3) = vPos * uSlope;
-        derGlobal(0, 4) = -uPos * uSlope;
-        derGlobal(0, 5) = vPos;
-
-        derGlobal(1, 0) = 0.0;
-        derGlobal(1, 1) = 1.0;
-        derGlobal(1, 2) = - vSlope;
-        derGlobal(1, 3) = vPos * vSlope;
-        derGlobal(1, 4) = -uPos * vSlope;
-        derGlobal(1, 5) = -uPos;
-
-        return derGlobal;
-      }
-    };
-
-    template<class VXDRecoHitType, class DBObjType>
-    class VXDRigidBodyDerivatives : public RigidBodyDerivatives<DBObjType> {
-      VXDRigidBodyDerivatives(VXDRecoHitType* recoHit) : m_elementID(recoHit->getSensorID().getID()) {}
-      unsigned short getElementID() {
-        return m_elementID;
-      }
-      unsigned short m_elementID;
-    };
-
-
-    VXDRigidBodyDerivatives<PXDRecoHit, PXDSensorAlignment> pxdDerivs(this);
-    VXDRigidBodyDerivatives<SVDRecoHit, SVDSensorAlignment> svdDerivs(this);
-    VXDRigidBodyDerivatives<SVDRecoHit2D, SVDSensorAlignment> svd2dDerivs(this);
-    CDCTímeZeroDerivatives<CDCRecoHit, CDCTimeZeros> cdcTimeZeroDerivs(this);
-    VXDLorentzAngleDerivatives<PXDRecoHit, PXDLorentzAngles> las(this);
-    **/
+    /// 1D Hierarchy for Lorentz shift correction
     class LorentShiftHierarchy : public GlobalDerivativesHierarchy {
     public:
+      /// Constructor
       LorentShiftHierarchy() : GlobalDerivativesHierarchy() {};
-      std::vector<int> getElementLabels(DetectorLevelElement element)
-      {
+
+      /// Label for lorentz shift parameter
+      std::vector<int> getElementLabels(DetectorLevelElement element) final {
         std::vector<int> labels;
         GlobalLabel label;
         label.construct(element.first, element.second, 0);
@@ -233,6 +177,8 @@ namespace Belle2 {
 
         return labels;
       }
+
+      /// Template function to get globals for given db object and its element (and the rest of hierarchy)
       template<class LowestLevelDBObject>
       GlobalDerivativeSet getGlobalDerivatives(unsigned short sensor, const genfit::StateOnPlane* sop, TVector3 bField)
       {
@@ -245,6 +191,8 @@ namespace Belle2 {
         mergeGlobals(sensorDerivs, buildGlobalDerivativesHierarchy(getLorentzShiftDerivatives(sop, bField), elementUID));
         return sensorDerivs;
       }
+
+      /// Derivatives for Lorentz shift in sensor plane
       TMatrixD getLorentzShiftDerivatives(const genfit::StateOnPlane* sop, TVector3 bField)
       {
         // values for global derivatives
@@ -267,6 +215,7 @@ namespace Belle2 {
         return derGlobal;
       }
 
+      /// Template function to insert hierarchy relation bewteen two DB objects and their elements
       template<class ChildDBObjectType, class MotherDBObjectType>
       void insertRelation(unsigned short child, unsigned short mother)
       {
@@ -276,6 +225,7 @@ namespace Belle2 {
     private:
     };
 
+    /// 6D Hierarchy of rigid bodies
     class RigidBodyHierarchy : public GlobalDerivativesHierarchy {
 
     public:
@@ -286,6 +236,7 @@ namespace Belle2 {
       // Destructor
       ~RigidBodyHierarchy() {}
 
+      /// Rigid body labels
       std::vector<int> getElementLabels(DetectorLevelElement element) override
       {
         std::vector<int> labels;
@@ -302,6 +253,7 @@ namespace Belle2 {
         return labels;
       }
 
+      /// Get globals for given db object (and the rest of hierarchy) and its element at StateOnPlane
       template<class LowestLevelDBObject>
       GlobalDerivativeSet getGlobalDerivatives(unsigned short sensor, const genfit::StateOnPlane* sop)
       {
@@ -312,12 +264,14 @@ namespace Belle2 {
         return sensorDerivs;
       }
 
+      /// Insert hierarchy relation
       template<class ChildDBObjectType, class MotherDBObjectType>
       void insertG4Transform(unsigned short child, unsigned short mother, G4Transform3D childToMother)
       {
         insert<ChildDBObjectType, MotherDBObjectType>(child, mother, convertG4ToRigidBodyTransformation(childToMother));
       }
 
+      /// 2x6 matrix of rigid body derivatives
       TMatrixD getRigidBodyDerivatives(const genfit::StateOnPlane* sop)
       {
         TMatrixD derGlobal(2, 6);
@@ -350,6 +304,7 @@ namespace Belle2 {
         return derGlobal;
       }
 
+      /// Conversion from G4Transform3D to 6D rigid body transformation parametrization
       TMatrixD convertG4ToRigidBodyTransformation(G4Transform3D g4transform)
       {
         TMatrixD rotationT(3, 3);
@@ -385,7 +340,8 @@ namespace Belle2 {
 
     };
 
-    class GlobalParamSetBase {
+    /**
+    class GlobalParamSetAccess {
     public:
       virtual unsigned short getGlobalUniqueID() = 0;
       virtual double getGlobalParam(unsigned short, unsigned short) = 0;
@@ -396,7 +352,7 @@ namespace Belle2 {
     };
 
     template<class DBObjType>
-    class GlobalParamSet : public GlobalParamSetBase {
+    class GlobalParamSet : public GlobalParamSetAccess {
     public:
       GlobalParamSet() {}
       ~GlobalParamSet() {m_object.reset();}
@@ -411,51 +367,40 @@ namespace Belle2 {
       std::shared_ptr<DBObjType> m_object {};
       void ensureConstructed() {if (!m_object) construct();}
     };
+    **/
 
-    class Belle2Alignment {
+    /// Set with no parameters, terminates hierarchy etc.
+    class EmptyGlobaParamSet {
     public:
-      static unsigned short getGlobalUniqueID() {return 1;}
+      /// Get global unique id = 0
+      static unsigned short getGlobalUniqueID() {return 0;}
+      /// There no params stored here, returns always 0.
       double getGlobalParam(unsigned short, unsigned short) {return 0.;}
+      /// No parameters to set. Does nothing
       void setGlobalParam(double, unsigned short, unsigned short) {}
+      /// No parameters, returns empty vector
       std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {};}
     };
 
+    /// Class to hold hierarchy of whole Belle2
     class HierarchyManager {
 
     public:
+      /// Destructor
       ~HierarchyManager() {}
 
+      /// Get instance of the manager
       static HierarchyManager& getInstance()
       {
         static std::unique_ptr<HierarchyManager> instance(new HierarchyManager());
         return *instance;
       }
 
+      /// Get the rigid body alignment hierarchy
       RigidBodyHierarchy& getAlignmentHierarchy() { return *m_alignment; }
+
+      /// Get the Lorentz shift hierarchy
       LorentShiftHierarchy& getLorentzShiftHierarchy() { return *m_lorentzShift; }
-
-      bool initialize()
-      {
-        /**
-        auto & geo = VXD::GeoCache::getInstance();
-        for (auto layer : geo.getLayers(Belle2::VXD::SensorInfoBase::PXD))
-          for (auto ladder : geo.getLadders(layer))
-            for (auto sensor : geo.getSensors(ladder))
-              m_alignment->insertG4Transform<PXDSensorAlignment, Belle2Alignment>(sensor.getID(), 0, geo.get(sensor).getTransformation());
-
-        for (auto layer : geo.getLayers(Belle2::VXD::SensorInfoBase::SVD))
-          for (auto ladder : geo.getLadders(layer))
-            for (auto sensor : geo.getSensors(ladder))
-              m_alignment->insertG4Transform<SVDSensorAlignment, Belle2Alignment>(sensor.getID(), 0, geo.get(sensor).getTransformation());
-
-            **/
-        return true;
-      }
-
-      void initializeGlobalVector()
-      {
-        m_globalVector.emplace_back(new GlobalParamSet<Belle2Alignment>());
-      }
 
     private:
       /** Singleton class, hidden constructor */
@@ -465,10 +410,13 @@ namespace Belle2 {
       /** Singleton class, hidden assignment operator */
       HierarchyManager& operator=(const HierarchyManager&);
 
+      /// The alignment hierarchy
       std::unique_ptr<RigidBodyHierarchy> m_alignment {new RigidBodyHierarchy()};
+      /// Hierarchy for Lorentz shift corrections
       std::unique_ptr<LorentShiftHierarchy> m_lorentzShift {new LorentShiftHierarchy()};
 
-      std::vector<std::shared_ptr<GlobalParamSetBase>> m_globalVector {};
+
+      //std::vector<std::shared_ptr<GlobalParamSetAccess>> m_globalVector {};
 
     };
   }

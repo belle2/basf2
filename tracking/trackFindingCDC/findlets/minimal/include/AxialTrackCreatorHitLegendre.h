@@ -12,7 +12,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/legendre/quadtreetools/QuadTreePassCounter.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 
 namespace Belle2 {
   class ModuleParamList;
@@ -20,7 +20,6 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
     class CDCWireHit;
-    enum class LegendreFindingPass;
 
     /**
      * Generates axial tracks from hit using special leaf postprocessing.
@@ -37,11 +36,27 @@ namespace Belle2 {
       using Super = Findlet<const CDCWireHit* const, CDCTrack>;
 
     public:
+      /**
+       *  Pass keys for the different sets of predefined parameters for a pass if legendre search
+       *  Note: Naming copied from original location. Does not actually match with the associated
+       *  parameters.
+       */
+      enum class EPass {
+        /// Pass corresponds to High-pt track finding and more deeper quadtree
+        NonCurlers,
+        /// Pass corresponds to High-pt track finding and more rough quadtree
+        NonCurlersWithIncreasingThreshold,
+        /// Pass corresponds to full pt range and even more rough quadtree
+        /// (non-ip tracks, tracks with energy losses etc)
+        FullRange
+      };
+
+    public:
       /// Constructor
       AxialTrackCreatorHitLegendre();
 
       /// Constructor from a pass key
-      explicit AxialTrackCreatorHitLegendre(LegendreFindingPass pass);
+      explicit AxialTrackCreatorHitLegendre(EPass pass);
 
       /// Short description of the findlet
       std::string getDescription() final;
@@ -56,12 +71,25 @@ namespace Belle2 {
       void apply(const std::vector<const CDCWireHit*>& axialWireHits,
                  std::vector<CDCTrack>& tracks) final;
 
-    private: // Parameters
-      /// Maximum Level of FastHough - fixed as the behaviour for other values is not well defined
-      static const int m_param_maxLevel = 12;
+    private:
+      using CandidateReceiver = AxialHitQuadTreeProcessor::CandidateReceiver;
+      /**
+       * Performs quadtree search
+       * @param candidateProcessor lambda interface process found leaves in the legendre search
+       * @param qtProcessor reference to the AxialHitQuadTreeProcessor instance
+       */
+      void executeRelaxation(const CandidateReceiver& candidateReceiver,
+                             AxialHitQuadTreeProcessor& qtProcessor);
 
+    private: // Parameters
       /// The pass key for lookup of the parameters for this pass
-      LegendreFindingPass m_pass = LegendreFindingPass::NonCurlers;
+      EPass m_pass = EPass::NonCurlers;
+
+      /// Parameter to define multiplier for hits threshold for the next quadtree iteration
+      const double m_param_stepScale = 0.75;
+
+      /// Parameter to define minimal threshold of hit
+      const int m_param_minNHits = 10;
     };
   }
 }

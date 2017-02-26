@@ -55,20 +55,17 @@ namespace Belle2 {
       void apply(const std::vector<CDCWireHit>& wireHits, std::vector<CDCTrack>& tracks);
 
     private: // findlets
+      using EPass = AxialTrackCreatorHitLegendre::EPass;
+
       /// Findlet for the non-curler legendre pass
-      AxialTrackCreatorHitLegendre m_nonCurlerAxialTrackCreatorHitLegendre{
-        LegendreFindingPass::NonCurlers};
+      AxialTrackCreatorHitLegendre m_nonCurlerAxialTrackCreatorHitLegendre{EPass::NonCurlers};
 
       /// Findlet for the non-curler with increased threshold legendre pass
       AxialTrackCreatorHitLegendre m_nonCurlersWithIncreasingThresholdAxialTrackCreatorHitLegendre{
-        LegendreFindingPass::NonCurlersWithIncreasingThreshold};
+        EPass::NonCurlersWithIncreasingThreshold};
 
       /// Findlet for the full range legendre pass
-      AxialTrackCreatorHitLegendre m_fullRangeAxialTrackCreatorHitLegendre{
-        LegendreFindingPass::FullRange};
-
-      /// Findlet for the non-curler legendre pass
-      AxialTrackCreatorHitLegendre m_noCurlerAxialTrackCreatorHitLegendre;
+      AxialTrackCreatorHitLegendre m_fullRangeAxialTrackCreatorHitLegendre{EPass::FullRange};
 
       /// Findlet to exchange hits between tracks based on their proximity to the respective trajectory
       AxialTrackHitMigrator m_axialTrackHitMigrator;

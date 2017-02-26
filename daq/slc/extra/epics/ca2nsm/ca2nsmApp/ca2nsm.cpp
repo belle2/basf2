@@ -13,9 +13,11 @@
 #include "ca2nsm.h"
 #include "ca2nsm_callback.h"
 
+#include "daq/slc/system/Daemon.h"
+
 int main(int argc, char **argv)
 {
-  if (argc > 1) {
+  if (Belle2::Daemon::start(argv[1], argc, argv, 1, "<config>")) {
     init_ca2nsm(argv[1]);
     while (1) {
       //SEVCHK(
@@ -23,8 +25,6 @@ int main(int argc, char **argv)
       //,"ca_pend_event");
       add_PVs();
     }
-  } else {
-    printf("Usage %s : <config>\n", argv[0]);
   }
   return 0;
 }

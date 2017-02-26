@@ -334,7 +334,7 @@ void TrackingPerformanceEvaluationModule::event()
     //1. retrieve all the Tracks related to the MCParticle
 
     //1.0 check if there is an MCTrackCand
-    RelationVector<genfit::TrackCand> MCTrackCands_fromMCParticle = DataStore::getRelationsToObj<genfit::TrackCand>(&mcParticle,
+    RelationVector<genfit::TrackCand> MCTrackCands_fromMCParticle = DataStore::getRelationsWithObj<genfit::TrackCand>(&mcParticle,
         m_MCTrackCandsName);
     if (MCTrackCands_fromMCParticle.size() > 0) {
       m_h3_MCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
@@ -348,8 +348,8 @@ void TrackingPerformanceEvaluationModule::event()
     }
 
     //1.a retrieve all TrackCands related to the MCParticle
-    //    RelationVector<genfit::TrackCand> TrackCands_fromMCParticle = DataStore::getRelationsToObj<genfit::TrackCand>(&mcParticle);
-    RelationVector<Track> Tracks_fromMCParticle = DataStore::getRelationsToObj<Track>(&mcParticle);
+    //    RelationVector<genfit::TrackCand> TrackCands_fromMCParticle = DataStore::getRelationsWithObj<genfit::TrackCand>(&mcParticle);
+    RelationVector<Track> Tracks_fromMCParticle = DataStore::getRelationsWithObj<Track>(&mcParticle);
 
     //    B2DEBUG(99,TrackCands_fromMCParticle.size()<<" TrackCands related to this MCParticle");
     B2DEBUG(99, Tracks_fromMCParticle.size() << " Tracks related to this MCParticle");
@@ -357,8 +357,8 @@ void TrackingPerformanceEvaluationModule::event()
     //    for (int tc = 0; tc < (int)TrackCands_fromMCParticle.size(); tc++) {
 
     //1.b retrieve all Tracks related to the TrackCand
-    //      RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsFromObj<genfit::Track>(TrackCands_fromMCParticle[tc]);
-    //      RelationVector<Track> Tracks_fromTrackCand = DataStore::getRelationsToObj<Track>(TrackCands_fromMCParticle[tc]);
+    //      RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsWithObj<genfit::Track>(TrackCands_fromMCParticle[tc]);
+    //      RelationVector<Track> Tracks_fromTrackCand = DataStore::getRelationsWithObj<Track>(TrackCands_fromMCParticle[tc]);
 
     //      B2DEBUG(99,"   "<<Tracks_fromTrackCand.size()<<" Track related to this TrackCand");
 
@@ -436,7 +436,7 @@ void TrackingPerformanceEvaluationModule::event()
 
     //check if the track has been fitted
     const TrackFitResult* fitResult = track.getTrackFitResult(Const::ChargedStable(211));
-    //    const TrackFitResult* fitResult = DataStore::getRelatedFromObj<TrackFitResult>(&track);
+    //    const TrackFitResult* fitResult = DataStore::getRelated<TrackFitResult>(&track);
     if (fitResult == NULL)
       continue;
 
@@ -448,8 +448,8 @@ void TrackingPerformanceEvaluationModule::event()
 
     fillTrackErrParams2DHistograms(fitResult);
 
-    //    const TrackFitResult* fitResult = DataStore::getRelatedFromObj<TrackFitResult>(&track);
-    const genfit::Track* gfTrack = DataStore::getRelatedToObj<genfit::Track>(&track);
+    //    const TrackFitResult* fitResult = DataStore::getRelated<TrackFitResult>(&track);
+    const genfit::Track* gfTrack = DataStore::getRelated<genfit::Track>(&track);
     if (!gfTrack)
       continue;
     else
@@ -476,12 +476,12 @@ void TrackingPerformanceEvaluationModule::event()
 
 
     //2.a retrieve all TrackCands related to the Track
-    RelationVector<genfit::TrackCand> TrackCands_fromTrack = DataStore::getRelationsToObj<genfit::TrackCand>(&track);
+    RelationVector<genfit::TrackCand> TrackCands_fromTrack = DataStore::getRelationsWithObj<genfit::TrackCand>(&track);
 
     for (int tc = 0; tc < (int)TrackCands_fromTrack.size(); tc++) {
 
       //2.b retrieve all MCParticles related to the TrackCand
-      RelationVector<MCParticle> MCParticles_fromTrackCand = DataStore::getRelationsFromObj<MCParticle>(TrackCands_fromTrack[tc]);
+      RelationVector<MCParticle> MCParticles_fromTrackCand = DataStore::getRelationsWithObj<MCParticle>(TrackCands_fromTrack[tc]);
 
       for (int mcp = 0; mcp < (int)MCParticles_fromTrackCand.size(); mcp++)
         if (isTraceable(*MCParticles_fromTrackCand[mcp])) {
@@ -510,17 +510,17 @@ void TrackingPerformanceEvaluationModule::event()
     hasTrackCand = false;
 
     //3.a retrieve the trackcand
-    RelationVector<genfit::TrackCand> TrackCands_fromMCTrackCand = DataStore::getRelationsFromObj<genfit::TrackCand>(&mcTrackCand);
+    RelationVector<genfit::TrackCand> TrackCands_fromMCTrackCand = DataStore::getRelationsWithObj<genfit::TrackCand>(&mcTrackCand);
     B2DEBUG(99, "~ " << TrackCands_fromMCTrackCand.size() << " TrackCands related to this MCTrackCand");
 
     //3.a retrieve the MCParticle
-    RelationVector<MCParticle> MCParticles_fromMCTrackCand = DataStore::getRelationsFromObj<MCParticle>(&mcTrackCand);
+    RelationVector<MCParticle> MCParticles_fromMCTrackCand = DataStore::getRelationsWithObj<MCParticle>(&mcTrackCand);
 
     B2DEBUG(99, "~~~ " << MCParticles_fromMCTrackCand.size() << " MCParticles related to this MCTrackCand");
     for (int mcp = 0; mcp < (int)MCParticles_fromMCTrackCand.size(); mcp++) {
 
       //3.b retrieve all TrackCands related to the MCTrackCand
-      RelationVector<genfit::TrackCand> TrackCands_fromMCParticle = DataStore::getRelationsToObj<genfit::TrackCand>
+      RelationVector<genfit::TrackCand> TrackCands_fromMCParticle = DataStore::getRelationsWithObj<genfit::TrackCand>
           (MCParticles_fromMCTrackCand[mcp]);
 
       B2DEBUG(99, "~~~~~ " << TrackCands_fromMCParticle.size() << " TrackCands related to this MCParticle");
@@ -580,13 +580,13 @@ void TrackingPerformanceEvaluationModule::event()
     int nMCTrackCand = 0;
 
     //4.a retrieve the MCParticle
-    RelationVector<MCParticle> MCParticles_fromTrackCand = DataStore::getRelationsFromObj<MCParticle>(&trackCand);
+    RelationVector<MCParticle> MCParticles_fromTrackCand = DataStore::getRelationsWithObj<MCParticle>(&trackCand);
 
     B2DEBUG(99, "~~~ " << MCParticles_fromTrackCand.size() << " MCParticles related to this TrackCand");
     for (int mcp = 0; mcp < (int)MCParticles_fromTrackCand.size(); mcp++) {
 
       //4.b retrieve all MCTrackCands related to the TrackCand
-      RelationVector<genfit::TrackCand> mcTrackCands_fromMCParticle = DataStore::getRelationsToObj<genfit::TrackCand>
+      RelationVector<genfit::TrackCand> mcTrackCands_fromMCParticle = DataStore::getRelationsWithObj<genfit::TrackCand>
           (MCParticles_fromTrackCand[mcp], m_MCTrackCandsName);
 
       B2DEBUG(99, "~~~~~ " << mcTrackCands_fromMCParticle.size() << " MCTrackCands related to this MCParticle");
@@ -782,8 +782,8 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
   double z0_err = -999;
   double pt = -999;
 
-  //  const TrackFitResult* fitResult = DataStore::getRelatedFromObj<TrackFitResult>(&track);
-  const Track* theTrack = DataStore::getRelatedFromObj<Track>(&track);
+  //  const TrackFitResult* fitResult = DataStore::getRelated<TrackFitResult>(&track);
+  const Track* theTrack = DataStore::getRelated<Track>(&track);
   if (! theTrack)
     return;
 

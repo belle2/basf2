@@ -215,7 +215,7 @@ void TBAnalysisModule::event()
   if (offlinetracks.getEntries() == 0)
     return;
 
-  const TrackFitResult* fitResult = DataStore::getRelatedFromObj<TrackFitResult>(offlinetracks[0], "offlineTrackFitResults");
+  const TrackFitResult* fitResult = DataStore::getRelated<TrackFitResult>(offlinetracks[0], "offlineTrackFitResults");
   if (fitResult == NULL)
     return;
 
@@ -227,7 +227,7 @@ void TBAnalysisModule::event()
   BOOST_FOREACH(genfit::Track & track, tracks) {
 
 
-    const TrackFitResult* fitResult = DataStore::getRelatedFromObj<TrackFitResult>(&track, m_TrackFitResultName);
+    const TrackFitResult* fitResult = DataStore::getRelated<TrackFitResult>(&track, m_TrackFitResultName);
 
     if (fitResult != NULL) {
       m_h1_pValue->Fill(fitResult->getPValue());
@@ -237,7 +237,7 @@ void TBAnalysisModule::event()
     if (fitResult->getPValue() < 0.01)
       continue;
 
-    RelationVector<PXDIntercept> PXDIntercept_fromTrack = DataStore::getRelationsFromObj<PXDIntercept>(&track, m_PXDInterceptName);
+    RelationVector<PXDIntercept> PXDIntercept_fromTrack = DataStore::getRelationsWithObj<PXDIntercept>(&track, m_PXDInterceptName);
 
     if (PXDIntercept_fromTrack.size() == 0)
       continue;
@@ -292,7 +292,7 @@ void TBAnalysisModule::event()
       m_h2_Intercepts_L2->Fill(L2vInter, L2uInter);
 
 
-    RelationVector<genfit::TrackCand> TrackCands_fromTrack = DataStore::getRelationsToObj<genfit::TrackCand>(&track,
+    RelationVector<genfit::TrackCand> TrackCands_fromTrack = DataStore::getRelationsWithObj<genfit::TrackCand>(&track,
                                                              m_TrackCandName);
 
     genfit::TrackCandHit* thehitTC = 0;

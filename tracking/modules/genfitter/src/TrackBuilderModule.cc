@@ -112,7 +112,7 @@ void TrackBuilderModule::event()
     assert(gfTracks[iGFTrack]);
     const genfit::Track* gfTrack = gfTracks[iGFTrack];
 
-    const genfit::TrackCand* trackCand = DataStore::getRelatedToObj<genfit::TrackCand>(gfTrack, m_gfTrackCandsColName);
+    const genfit::TrackCand* trackCand = DataStore::getRelated<genfit::TrackCand>(gfTrack, m_gfTrackCandsColName);
     if (!trackCand) {
       B2ERROR("No genfit::TrackCand for genfit::Track");
       continue;

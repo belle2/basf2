@@ -13,6 +13,9 @@ class TrainingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin):
     #: Recording / training task selected
     task = "train"
 
+    #: Input variable for the training or the classification analysis. Default use all variables
+    variables = None
+
     #: Truth variable name
     truth = "truth"
 
@@ -51,10 +54,18 @@ class TrainingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin):
         if self.task == "train":
             cmd = [
                 "trackfindingcdc_teacher",
+            ]
+
+            if self.variables:
+                cmd += ["--variables"]
+                cmd += self.variables
+
+            cmd += [
                 "--identifier=" + self.identifier,
                 "--truth=" + self.truth,
                 self.sample_file_name,
             ]
+            print("Running", cmd)
             subprocess.call(cmd)
 
             # Move training file to the right location
@@ -65,9 +76,17 @@ class TrainingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin):
         else:
             cmd = [
                 "trackfindingcdc-classification-overview",
+            ]
+
+            if self.variables:
+                cmd += ["-v"]
+                cmd += self.variables
+
+            cmd += [
                 "--truth=" + self.truth,
                 self.sample_file_name,
             ]
+            print("Running", cmd)
             subprocess.call(cmd)
             # Set file name for the TBrowser to show if demanded
             self.output_file_name = self.sample_file_name[:-len(".root")] + ".overview.root"

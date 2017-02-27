@@ -69,7 +69,6 @@ namespace Belle2 {
   void FSRCorrectionModule::initialize()
   {
     m_pdgCode = 0;
-
     // check the validity of output ParticleList name
     bool valid = m_decaydescriptor.init(m_outputListName);
     if (!valid)
@@ -101,23 +100,19 @@ namespace Belle2 {
     particleList.registerInDataStore(flags);
     StoreObjPtr<ParticleList> antiParticleList(m_outputAntiListName);
     antiParticleList.registerInDataStore(flags);
+    m_maxAngle = cos(m_angleThres * M_PI / 180.0);
   }
 
 
   void FSRCorrectionModule::event()
   {
-
-    // clear the list
     m_usedGammas.clear();
 
-    double cos_max = -1.0;
-    double cos_limit = cos(m_angleThres * M_PI / 180.0);
     StoreArray<Particle> particles;
-
     const StoreObjPtr<ParticleList> inputList(m_inputListName);
     const StoreObjPtr<ParticleList> gammaList(m_gammaListName);
 
-    // new particle list
+    // new output particle list
     StoreObjPtr<ParticleList> outputList(m_outputListName);
     outputList.create();
     outputList->initialize(m_pdgCode, m_outputListName);
@@ -127,16 +122,17 @@ namespace Belle2 {
     outputAntiList->initialize(-1 * m_pdgCode, m_outputAntiListName);
     outputAntiList->bindAntiParticleList(*(outputList));
 
-    TLorentzVector new4Vec;
-
-    B2INFO("Entries in input list" << inputList->getListSize());
+    // loop over leptons, correct them and add them to the output list
     for (unsigned i = 0; i < inputList->getListSize(); i++) {
       Particle* lepton = inputList->getParticle(i);
+      Particle* fsrGamma = nullptr;
+
       TLorentzVector lepton4Vector = lepton->get4Vector();
-      TLorentzVector gamma4Vector;
-      bool foundGamma = false;
-      int gammaMdstIndex = -999;
-      std::vector<int> daughterIndices;
+      TLorentzVector fsrGamma4Vector;
+      TLorentzVector new4Vec = lepton->get4Vector();
+
+      double cos_max = -1.0;
+      bool fsrGammaFound = false;
 
       // look for a possible fsr gamma
       for (unsigned j = 0; j < gammaList->getListSize(); j++) {
@@ -146,55 +142,44 @@ namespace Belle2 {
         if (gamma->getEnergy() > m_energyThres) continue;
 
         // check if gamma was already used
-        int currentGamma = gamma->getMdstArrayIndex();
-        bool gammaUsed = std::find(m_usedGammas.begin(), m_usedGammas.end(), currentGamma) != m_usedGammas.end();
+        bool gammaUsed = std::find(m_usedGammas.begin(), m_usedGammas.end(), gamma->getMdstArrayIndex()) != m_usedGammas.end();
         if (gammaUsed) continue;
 
-        // get angle
+        // get angle (in lab system)
+        TVector3 pi = lepton->getMomentum();
+        TVector3 pj = gamma->getMomentum();
         // todo use a more advanced angle
-        // fixme do I use the correct frame
-        const auto& frame = ReferenceFrame::GetCurrent();
-        TVector3 pi = frame.getMomentum(lepton).Vect();
-        TVector3 pj = frame.getMomentum(gamma).Vect();
-        auto cos_angle = cos(pi.Angle(pj));
+        double cos_angle = cos(pi.Angle(pj));
 
         if (cos_angle > cos_max) {
           cos_max = cos_angle;
-          if (cos_max > cos_limit) {
-            foundGamma = true;
-            gammaMdstIndex = gamma->getMdstArrayIndex();
-            gamma4Vector = gamma->get4Vector();
+          if (cos_max > m_maxAngle) {
+            fsrGammaFound = true;
+            fsrGamma4Vector = gamma->get4Vector();
+            fsrGamma = gamma;
           }
         }
       }
 
+      Particle correctedLepton(new4Vec, lepton->getPDGCode());
+      correctedLepton.appendDaughter(lepton);
 
-      if (foundGamma) {
+      if (fsrGammaFound) {
+        new4Vec = lepton4Vector + fsrGamma4Vector;
+        correctedLepton.appendDaughter(fsrGamma);
         B2INFO("[FSRCorrectionModule] Found a radiative gamma and added its 4-vector to the lepton");
-        new4Vec = lepton4Vector + gamma4Vector;
-        daughterIndices.push_back(lepton->getMdstArrayIndex());
-        daughterIndices.push_back(gammaMdstIndex);
       }
 
-      Particle* newParticle = nullptr;
-      B2INFO("Add a particle, entries in StoreArray before adding " << particles.getEntries());
-      if (foundGamma)
-        newParticle = particles.appendNew(new4Vec, lepton->getPDGCode(), Particle::c_Flavored, daughterIndices);
-      else
-        newParticle = particles.appendNew(lepton4Vector, lepton->getPDGCode(), Particle::c_Flavored, lepton->getParticleType(),
-                                          lepton->getMdstArrayIndex());
+      // add the info from original lepton to the new lepton
+      correctedLepton.setMomentumVertexErrorMatrix(lepton->getMomentumVertexErrorMatrix());
+      correctedLepton.setVertex(lepton->getVertex());
+      correctedLepton.setPValue(lepton->getPValue());
 
-      newParticle->updateMass(lepton->getPDGCode());
-      newParticle->setMomentumVertexErrorMatrix(lepton->getMomentumVertexErrorMatrix());
-      newParticle->setVertex(lepton->getVertex());
-      newParticle->setPValue(lepton->getPValue());
-      newParticle->addExtraInfo("fsrCorrected", float(foundGamma));
+      correctedLepton.addExtraInfo("fsrCorrected", float(fsrGammaFound));
 
-      int iparticle = particles.getEntries() - 1;
-      B2INFO("Add a particle, entries in outputlist before adding" << outputList->getListSize());
-      outputList->addParticle(iparticle, newParticle->getPDGCode(), newParticle->getFlavorType());
-      B2INFO("Add a particle, entries in outputlist after adding " << outputList->getListSize());
-      B2INFO(" Entries in StoreArray after adding " <<  particles.getEntries());
+      Particle* newLepton = particles.appendNew(correctedLepton);
+      outputList->addParticle(newLepton);
+
     }
   }
 

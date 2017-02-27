@@ -72,7 +72,7 @@ namespace Belle2 {
     std::string m_outputListName; /**< output ParticleList name */
     std::string m_outputAntiListName;   /**< output anti-particle list name */
 
-    double m_angleThres; /**< max angle to be accepted */
+    double m_angleThres; /**< Input max angle to be accepted (in degree) */
     double m_energyThres; /**< max energy of gamma to be accepted */
 
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
@@ -84,28 +84,7 @@ namespace Belle2 {
      */
     std::vector<int> m_usedGammas;
 
-    /**
-     * Fills unique identifier for the input particle.
-     * The unique identifier is a sequence of pairs (PDG code of the particle,
-     * number of daughters if composite or mdstArrayIndex if final state particle)
-     * for all particles in the decay chain.
-     *
-     * Example: B+ -> (anti-D0 -> K+ pi-) pi+
-     * idSequence: (521, 2, -421, 2, 321, K+ mdstArrayIndex, -211, pi- mdstArrayIndex, 211, pi+ mdstArrayIndex)
-     */
-    void fillUniqueIdentifier(const Particle* p, std::vector<int>& idSequence);
-
-    /**
-     * Compares input idSequence to all sequences already included in the list.
-     * If sequence is not found in the list a sequence is found to be unique.
-     */
-    bool isUnique(const std::vector<int>& idSequence);
-
-
-
-    // fixme make an individual check (probably outside of this module
-
-
+    double m_maxAngle; /** max angle */
 
   };
 

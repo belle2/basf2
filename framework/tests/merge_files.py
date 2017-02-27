@@ -320,7 +320,7 @@ def check_XX_filemetaversion():
     """Check that the Version of the FileMetaData hasn't changed.
     If this check fails please check that the changes to FileMetaData don't
     affect merge_basf2_files and adapt the correct version number here."""
-    return FileMetaData.Class().GetClassVersion() == 8
+    return FileMetaData.Class().GetClassVersion() == 9
 
 
 if __name__ == "__main__":

@@ -48,6 +48,7 @@ bool FileMetaData::containsEvent(int experiment, int run, unsigned int event) co
 
 void FileMetaData::exposePythonAPI()
 {
+  //Note: these can only be used with update_file_metadata(), PyROOT is the more common interface
   class_<FileMetaData>("FileMetaData")
   .def("get_lfn", &FileMetaData::getLfn, return_value_policy<copy_const_reference>())
   .def("get_nevents", &FileMetaData::getNEvents)
@@ -67,6 +68,7 @@ void FileMetaData::exposePythonAPI()
   .def("get_steering", &FileMetaData::getSteering, return_value_policy<copy_const_reference>())
   .def("get_mc_events", &FileMetaData::getMcEvents)
   .def("get_global_tag", &FileMetaData::getDatabaseGlobalTag, return_value_policy<copy_const_reference>())
+  .def("get_data_description", &FileMetaData::getDataDescription, return_value_policy<copy_const_reference>())
   .def("set_lfn", &FileMetaData::setLfn);
 }
 

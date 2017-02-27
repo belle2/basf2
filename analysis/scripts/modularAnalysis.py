@@ -307,7 +307,7 @@ def copyList(
     copyLists(outputListName, [inputListName], writeOut, path)
 
 
-def fsrCorrection(
+def correctFSR(
     outputListName,
     inputListName,
     gammaListName,
@@ -319,7 +319,7 @@ def fsrCorrection(
     """
     Takes the particles from the given lepton list copies them to the output list and adds the
     4-vector of the closest photon (considered as radiative) to the lepton, if the given
-    criterias are fulfilled.
+    criteria are fulfilled.
 
     @param outputListName The output lepton list containing the corrected leptons.
     @param inputListName The initial lepton list containing the leptons to correct, should already exists.

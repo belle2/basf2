@@ -77,13 +77,6 @@ namespace Belle2 {
 
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
 
-    /**
-     * This vector holds unique identifiers (vector of ints) of all particles
-     * that are already included in the ParticleList. It is used to prevent
-     * adding one or more copies of a Particle to the list that is already in.
-     */
-    std::vector<int> m_usedGammas;
-
     double m_maxAngle; /** max angle */
 
   };

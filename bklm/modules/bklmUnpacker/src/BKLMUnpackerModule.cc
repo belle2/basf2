@@ -171,6 +171,7 @@ void BKLMUnpackerModule::event()
       //is this the same as get1stDetectorBuffer??
       ///   int* data=rawKLM[i]->Get1stFINESSEBuffer(j);
       unsigned int copperId = rawKLM[i]->GetNodeID(j);
+      if (copperId < BKLM_ID || copperId > BKLM_ID + 3) continue;
       //                copperId=1;
       //cout <<"uint copperId " <<copperId<<endl;
       //short sCopperId = rawKLM[i]->GetCOPPERNodeId(j);

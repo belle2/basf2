@@ -215,10 +215,15 @@ void DBStore::addConstantOverride(const std::string& package, const std::string&
   DBEntry& dbEntry = m_dbEntries[package][module];
   dbEntry.package = package;
   dbEntry.module = module;
-  dbEntry.objClass = obj->IsA();
-  if (!dbEntry.intraRunDependency) delete dbEntry.object;
+  // delete the object if it is not identical to the new one
+  if (!dbEntry.intraRunDependency && dbEntry.object != obj) delete dbEntry.object;
   dbEntry.object = obj;
   dbEntry.isArray = dynamic_cast<TClonesArray*>(obj) != nullptr;
+  if (dbEntry.isArray) {
+    dbEntry.objClass = dynamic_cast<TClonesArray*>(obj)->GetClass();
+  } else {
+    dbEntry.objClass = obj->IsA();
+  }
   dbEntry.iov = IntervalOfValidity(0, 0, -1, -1);
   if (oneRun) {
     const int exp = m_event->getExperiment();

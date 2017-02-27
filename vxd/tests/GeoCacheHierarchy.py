@@ -54,12 +54,12 @@ class CompareTransformationsModule(basf2.Module):
 
         original_global_sensor_z = cache.get(Belle2.VxdID("1.1.1")).pointToGlobal(ROOT.TVector3(0, 0, 0), True)[2]
 
-        # Now move ladder...
-        alignment = Belle2.PyDBObj("VXDAlignment").obj()
+        # Now move ladder... we need a copy of the current alignment
+        alignment = Belle2.PyDBObj("VXDAlignment").obj().Clone()
         # Set the ladder here, not the sensor
         alignment.set(Belle2.VxdID("1.1.0").getID(), Belle2.VXDAlignment.dW, self.test_shift_z)
-        # Re-calculate sensor position
-        cache.setupReconstructionTransformations()
+        # and add the object to the database store. This will run the callback
+        Belle2.DBStore.Instance().addConstantOverride("VXDAlignment", alignment)
 
         new_global_sensor_z = cache.get(Belle2.VxdID("1.1.1")).pointToGlobal(ROOT.TVector3(0, 0, 0), True)[2]
 

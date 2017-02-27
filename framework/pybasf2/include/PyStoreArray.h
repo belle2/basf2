@@ -50,7 +50,7 @@ namespace Belle2 {
   * You can check the runtime type information of the returned objects by
   * using Python's built-in type() function.
   *
-  * \sa PyStoreObj
+  * \sa PyStoreObj and the Conditions Data interface classes PyDBObj and PyDBArray
   */
   class PyStoreArray {
   public:

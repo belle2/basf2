@@ -36,6 +36,8 @@ namespace Belle2 {
     /// Correction of Lorentz shift w.r.t. common per layer
     static const baseType dLayerLorentzAngle = 12;
 
+    static unsigned short getGlobalUniqueID() {return 1;}
+
     /// Constructor
     VXDAlignment() : DBObjCalibrationConstMapBase() {}
     /// Destructor

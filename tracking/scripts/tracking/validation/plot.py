@@ -594,10 +594,9 @@ class ValidationPlot(object):
         hist_upper_bound = xaxis.GetBinUpEdge(n_bins)
 
         if z_score is not None:
-            plot = self.plot
-
             mean = histogram.GetMean()
             std = histogram.GetStdDev()
+
             if lower_bound is None:
                 lower_bound = mean - z_score * std
 
@@ -606,27 +605,25 @@ class ValidationPlot(object):
 
         # Setup the plotting range of the function to match the histogram
         if isinstance(formula, ROOT.TF1):
-            fit_tf1 = formula.Clone()
-            fit_tf1.SetRange(hist_lower_bound, hist_lower_bound)
+            fit_tf1 = formula
+            fit_tf1.SetRange(hist_lower_bound, hist_upper_bound)
         else:
             fit_tf1 = ROOT.TF1("Fit",
                                formula,
                                hist_lower_bound,
                                hist_upper_bound)
-
         get_logger().info('Fitting with %s', fit_tf1.GetExpFormula())
 
         # Determine fit range
         if lower_bound is None or lower_bound < hist_lower_bound:
             lower_bound = hist_lower_bound
-
         if upper_bound is None or upper_bound > hist_upper_bound:
             upper_bound = hist_upper_bound
 
         # Make sure the fitted function is not automatically added since we want to do that one our own.
         # Look for the documentation of TH1::Fit() for details of the options.
-        # if 'N' not in options:
-        #     options += 'N'
+        if 'N' not in options:
+            options += 'N'
 
         fit_res = histogram.Fit(fit_tf1, options + "S", "", lower_bound, upper_bound)
 

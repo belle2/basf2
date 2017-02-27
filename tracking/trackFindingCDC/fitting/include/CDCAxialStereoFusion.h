@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/eventdata/utils/DriftLengthEstimator.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
@@ -76,6 +77,8 @@ namespace Belle2 {
       /// Swtich to reestimate the  drift length.
       bool m_reestimateDriftLength;
 
+      /// Helper object to carry out the drift length estimation
+      DriftLengthEstimator m_driftLengthEstimator;
     };
   }
 }

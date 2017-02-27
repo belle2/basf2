@@ -260,7 +260,8 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
 
     # Export CDCTracks to RecoTracks representation
     path.add_module("TrackExporter",
-                    RecoTracksStoreArrayName=reco_tracks)
+                    RecoTracksStoreArrayName=reco_tracks,
+                    discardCovarianceMatrix=True)
 
     # Correct time seed (only necessary for the CDC tracks)
     path.add_module("IPTrackTimeEstimator",
@@ -339,6 +340,7 @@ def add_cdc_cr_track_finding(path,
     path.add_module("TrackExporter",
                     inputTracks="OrientedCDCTrackVector",
                     RecoTracksStoreArrayName=reco_tracks,
+                    discardCovarianceMatrix=True,
                     )
 
 

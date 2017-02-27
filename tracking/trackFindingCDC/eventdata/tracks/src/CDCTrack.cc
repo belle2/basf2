@@ -290,13 +290,13 @@ CDCTrack CDCTrack::condense(const Path<const CDCSegmentPair>& segmentPairPath)
   return track;
 }
 
-bool CDCTrack::storeInto(StoreArray<RecoTrack>& recoTracks) const
+RecoTrack* CDCTrack::storeInto(StoreArray<RecoTrack>& recoTracks) const
 {
   RecoTrack* newRecoTrack = getStartTrajectory3D().storeInto(recoTracks);
-  if (newRecoTrack) {
-    RecoTrackUtil::fill(*this, *newRecoTrack);
-  }
-  return true;
+  if (not newRecoTrack) return nullptr;
+
+  RecoTrackUtil::fill(*this, *newRecoTrack);
+  return newRecoTrack;
 }
 
 std::vector<CDCSegment3D> CDCTrack::splitIntoSegments() const

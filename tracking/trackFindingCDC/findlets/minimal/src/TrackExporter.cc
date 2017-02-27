@@ -47,6 +47,11 @@ void TrackExporter::exposeParameters(ModuleParamList* moduleParamList, const std
                                 m_param_exportTracksInto,
                                 "Name of the output StoreArray of RecoTracks.",
                                 m_param_exportTracksInto);
+
+  moduleParamList->addParameter(prefixed(prefix, "discardCovarianceMatrix"),
+                                m_param_discardCovarianceMatrix,
+                                "Discard covariance matrix in favour of a hand written one.",
+                                m_param_discardCovarianceMatrix);
 }
 
 void TrackExporter::initialize()
@@ -62,11 +67,22 @@ void TrackExporter::initialize()
 
 void TrackExporter::apply(std::vector<CDCTrack>& tracks)
 {
+  TMatrixDSym defaultCovSeed(6);
+  defaultCovSeed(0, 0) = 1e-3;
+  defaultCovSeed(1, 1) = 1e-3;
+  defaultCovSeed(2, 2) = 4e-3;
+  defaultCovSeed(3, 3) = 0.01e-3;
+  defaultCovSeed(4, 4) = 0.01e-3;
+  defaultCovSeed(5, 5) = 0.04e-3;
+
   // Put code to generate gf track cands here if requested.
   if (m_param_exportTracks) {
     StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
     for (const CDCTrack& track : tracks) {
-      track.storeInto(storedRecoTracks);
+      RecoTrack* newRecoTrack = track.storeInto(storedRecoTracks);
+      if (newRecoTrack and m_param_discardCovarianceMatrix) {
+        newRecoTrack->setSeedCovariance(defaultCovSeed);
+      }
     }
   }
 }

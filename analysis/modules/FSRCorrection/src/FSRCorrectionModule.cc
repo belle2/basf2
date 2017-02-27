@@ -11,14 +11,12 @@
 // Own include
 #include <analysis/modules/FSRCorrection/FSRCorrectionModule.h>
 
-
 // framework aux
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
-
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
@@ -46,7 +44,7 @@ namespace Belle2 {
 
   {
     // set module description (e.g. insert text)
-    setDescription("Takes the particles from the given lepton list copies them to the output list and adds the 4-vector of the closest photon (considered as radiative) to the lepton, if the given criteria are fulfilled. See scripts/modularAnalysis.py");
+    setDescription("Takes the particles from the given lepton list copies them to the output list and adds the 4-vector of the closest photon (considered as radiative) to the lepton, if the given criteria for maximum angle and energy are fulfilled.");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
@@ -54,7 +52,7 @@ namespace Belle2 {
     addParam("outputListName", m_outputListName, "The output lepton list containing the corrected leptons.");
     addParam("gammaListName", m_gammaListName, "The gammas list containing possibly radiative gammas, should already exist.");
     addParam("angleThreshold", m_angleThres,
-             "The maximal accepted angle (in degrees) between the lepton and the (radiative) gamma to be accepted", 5.0);
+             "The maximum angle (in degrees) between the lepton and the (radiative) gamma to be accepted.", 5.0);
     addParam("energyThreshold", m_energyThres, "The maximum energy of the (radiative) gamma to be accepted.", 1.0);
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);

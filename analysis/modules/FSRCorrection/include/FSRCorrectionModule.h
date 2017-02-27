@@ -33,7 +33,7 @@ namespace Belle2 {
 
   /**
    * Final state radiation correction module
-   * This module adds the 4 Vector of the (closest) radiative gamma to the 4Vector of a lepton if the specified criterias are fulfilled.
+   * This module adds the 4 Vector of the (closest) radiative gamma to the 4Vector of a lepton if the specified criteria are fulfilled.
    * It is intended to be used for electrons.
    */
   class FSRCorrectionModule : public Module {
@@ -72,7 +72,7 @@ namespace Belle2 {
     std::string m_outputListName; /**< output ParticleList name */
     std::string m_outputAntiListName;   /**< output anti-particle list name */
 
-    double m_angleThres; /**< Input max angle to be accepted (in degree) */
+    double m_angleThres; /**< input max angle to be accepted (in degree) */
     double m_energyThres; /**< max energy of gamma to be accepted */
 
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */

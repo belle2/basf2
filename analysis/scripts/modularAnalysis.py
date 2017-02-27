@@ -319,12 +319,12 @@ def correctFSR(
     """
     Takes the particles from the given lepton list copies them to the output list and adds the
     4-vector of the closest photon (considered as radiative) to the lepton, if the given
-    criteria are fulfilled.
+    criteria for maximal angle and energy are fulfilled.
 
     @param outputListName The output lepton list containing the corrected leptons.
     @param inputListName The initial lepton list containing the leptons to correct, should already exists.
     @param gammaListName The gammas list containing possibly radiative gammas, should already exist..
-    @param angleThreshold The maximal accepted angle (in degrees) between the lepton and the (radiative) gamma to be accepted.
+    @param angleThreshold The maximum angle (in degrees) between the lepton and the (radiative) gamma to be accepted.
     @param energyThreshold The maximum energy of the (radiative) gamma to be accepted.
     @param writeOut      wether RootOutput module should save the created ParticleList
     @param path          modules are added to this path

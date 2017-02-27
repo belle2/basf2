@@ -173,20 +173,15 @@ void BKLMRawPackerModule::event()
     //one call per copper
     RawKLM* raw_klm = rawklmarray.appendNew();
 
-    int* buf1, *buf2, *buf3, *buf4;
     int nwords_1st = data_words[i][0].size();
     int nwords_2nd = data_words[i][1].size();
     int nwords_3rd = data_words[i][2].size();
     int nwords_4th = data_words[i][3].size();
 
-    buf1 = NULL;
-    buf2 = NULL;
-    buf3 = NULL;
-    buf4 = NULL;
-    buf1 = new int[ nwords_1st + 1];
-    buf2 = new int[ nwords_2nd + 1];
-    buf3 = new int[ nwords_3rd + 1];
-    buf4 = new int[ nwords_4th + 1];
+    int* buf1 = new int[ nwords_1st + 1];
+    int* buf2 = new int[ nwords_2nd + 1];
+    int* buf3 = new int[ nwords_3rd + 1];
+    int* buf4 = new int[ nwords_4th + 1];
 
     for (int j = 0; j < nwords_1st; j++) {
       buf1[j] = data_words[i][0][j];

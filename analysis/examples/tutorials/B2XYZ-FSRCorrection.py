@@ -22,7 +22,10 @@
 ######################################################
 
 from basf2 import *
+from modularAnalysis import *
 
+# set the log level
+set_log_level(LogLevel.WARNING)
 
 # Bd_JpsiKL_ee Signal MC 7 file (each containing 2*10^6 generated events)
 inputFile = "/ghi/fs01/belle2/bdata/MC/release-00-07-02/DBxxxxxxxx/MC7/" \
@@ -41,28 +44,28 @@ correctFSR('e+:corrected', 'e+:uncorrected', 'gamma:all', 5.0, 1.0, False)
 # keep only candidates with dM<0.11
 
 # uncorrected
-reconstructDecay('J/psi:uncorrected -> e+:uncorrected e-:uncorrected', 'dM<0.11')
-applyCuts('J/psi:uncorrected', '3.07 < M < 3.11')
+reconstructDecay('J/psi:uncorrected -> e+:uncorrected e-:uncorrected', '')
 
 # corrected
-reconstructDecay('J/psi:corrected -> e+:corrected e-:corrected', 'dM<0.11')
-applyCuts('J/psi:corrected', '3.07 < M < 3.11')
+reconstructDecay('J/psi:corrected -> e+:corrected e-:corrected', '')
 
 # perform MC matching (MC truth asociation)
-matchMCTruth('J/psi:uncorrcted')
-matchMCTruth('J/psi:corrcted')
+matchMCTruth('J/psi:uncorrected')
+matchMCTruth('J/psi:corrected')
 
 # write out ntuples
 var0 = ['p',
         'E',
+        'isSignal',
         'extraInfo(fsrCorrected)']
 var1 = ['M',
         'p',
         'E',
-        'daugher(0, p)',
-        'daugher(1, p)',
-        'daugher(0, extraInfo(fsrCorrected))',
-        'daugher(1, extraInfo(fsrCorrected))']
+        'isSignal',
+        'daughter(0, p)',
+        'daughter(1, p)',
+        'daughter(0, extraInfo(fsrCorrected))',
+        'daughter(1, extraInfo(fsrCorrected))']
 
 variablesToNTuple('e+:uncorrected', var0, filename='e_uncorrected.root')
 variablesToNTuple('e+:corrected', var0, filename='e_corrected.root')

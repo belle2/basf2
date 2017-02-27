@@ -51,17 +51,14 @@ void PedestalModule::initialize()
       m_out_ped_file->Close();
     }
   }
+  StoreObjPtr<topFileMetaData> metadata_ptr;
+  metadata_ptr.isRequired();
+  m_experiment = m_metadata_ptr->getExperiment();
+  m_run = m_metadata_ptr->getRun();
 }
 
 void PedestalModule::beginRun()
 {
-  StoreObjPtr<topFileMetaData> metadata_ptr;
-  metadata_ptr.isRequired();
-
-  if (metadata_ptr) {
-    m_experiment = metadata_ptr->getExperiment();
-    m_run = metadata_ptr->getRun();
-  }
 
   if (m_mode == 1) { // read pedestals
     TList* list;

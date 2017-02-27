@@ -15,7 +15,6 @@
 #include <map>
 #include <Geant4/G4Transform3D.hh>
 #include <root/TMatrixD.h>
-#include <alignment/GlobalLabel.h>
 #include <genfit/StateOnPlane.h>
 
 namespace Belle2 {
@@ -223,6 +222,9 @@ namespace Belle2 {
 
       /// Get the Lorentz shift hierarchy
       LorentShiftHierarchy& getLorentzShiftHierarchy() { return *m_lorentzShift; }
+
+      /// Write-out complete hierarchy to a text file
+      void writeConstraints(std::string txtFilename);
 
     private:
       /** Singleton class, hidden constructor */

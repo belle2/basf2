@@ -17,7 +17,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <alignment/dbobjects/VXDAlignment.h>
-#include "../include/Hierarchy.h"
+#include <alignment/Hierarchy.h>
+#include <TMath.h>
 
 
 
@@ -25,50 +26,34 @@ using namespace std;
 using namespace Belle2;
 using namespace alignment;
 
-namespace Belle2 {
-  class PXDSensorAlignment {
+namespace {
+  /// Test class for hierarchy parameter storage
+  class TestTopLevelDBObj {
   public:
-    static unsigned short getGlobalUniqueID() { return 21; }
-  };
-  class PXDLadderAlignment {
-  public:
-    static unsigned short getGlobalUniqueID() { return 22; }
-  };
-  class PXDLayerAlignment {
-  public:
-    static unsigned short getGlobalUniqueID() { return 23; }
-  };
-  class PXDAlignment {
-  public:
-    static unsigned short getGlobalUniqueID() { return 24; }
+    static unsigned short getGlobalUniqueID() { return 10; }
   };
 
-  class FullVXDAlignment {
+  /// Test class for hierarchy parameter storage
+  class TestLevelDBObj {
   public:
-    static unsigned short getGlobalUniqueID() { return 24; }
+    static unsigned short getGlobalUniqueID() { return 20; }
   };
 
-  class Belle2Alignment {
-  public:
-    static unsigned short getGlobalUniqueID() { return 1; }
-  };
-
-  class SVDSensorAlignment {
-  public:
-    static unsigned short getGlobalUniqueID() { return 21; }
-  };
-  class SVDLadderAlignment {
-  public:
-    static unsigned short getGlobalUniqueID() { return 22; }
-  };
-
-  /// Test fixture.
+  /// Test fixture.for hierarchy
   class HierarchyTest : public ::testing::Test {
   protected:
+    unsigned short topElement {1};
+    unsigned short element1 = {1};
+    unsigned short element2 = {2};
 
-    /// init
+    /// init - fill hierarchy
     virtual void SetUp()
     {
+      auto& hierarchy = HierarchyManager::getInstance().getAlignmentHierarchy();
+
+      G4Transform3D unitTrafo;
+      hierarchy.insertG4Transform<TestLevelDBObj, TestTopLevelDBObj>(element1, topElement, unitTrafo);
+      hierarchy.insertG4Transform<TestLevelDBObj, TestTopLevelDBObj>(element2, topElement, unitTrafo);
     }
 
     /// cleanup
@@ -79,62 +64,49 @@ namespace Belle2 {
 
   };
 
-  ///
-  TEST_F(HierarchyTest, HierarchyTree)
+  /// Test calculation of global derivatives
+  TEST_F(HierarchyTest, HierarchyDerivatives)
   {
     auto& hierarchy = HierarchyManager::getInstance().getAlignmentHierarchy();
 
-    VxdID sensorPXD(1, 1, 1);
-    VxdID sensorPXD2(1, 1, 2);
-    VxdID ladderPXD(1, 1, 0);
-    VxdID layerPXD(1, 0, 0);
-
-    VxdID sensorSVD(3, 1, 1);
-    VxdID ladderSVD(3, 1, 0);
-    VxdID layerSVD(3, 0, 0);
-
-    VxdID pxd(7, 0, 1);
-    VxdID svd(7, 0, 2);
-    VxdID vxd(7, 1, 1);
-
-    hierarchy.insertG4Transform<PXDSensorAlignment, PXDLadderAlignment>(sensorPXD, ladderPXD, G4Transform3D());
-    hierarchy.insertG4Transform<PXDLadderAlignment, PXDLayerAlignment>(ladderPXD, layerPXD, G4Transform3D());
-    hierarchy.insertG4Transform<PXDLayerAlignment, PXDAlignment>(layerPXD, pxd, G4Transform3D());
-    hierarchy.insertG4Transform<PXDAlignment, Belle2Alignment>(pxd, 0, G4Transform3D());
-
-    hierarchy.insertG4Transform<PXDSensorAlignment, PXDLadderAlignment>(sensorPXD2, ladderPXD, G4Transform3D());
-
-
-    hierarchy.insertG4Transform<SVDSensorAlignment, SVDLadderAlignment>(sensorSVD, ladderSVD, G4Transform3D());
-    hierarchy.insertG4Transform<SVDLadderAlignment, Belle2Alignment>(ladderSVD, 0, G4Transform3D());
-
-    // hierarchyPXD.printHierarchy();
-    // hierarchySVD.printHierarchy();
-
     auto sop = new genfit::StateOnPlane(nullptr);
     TVectorD state(5);
-    state[0] = 0.;
-    state[1] = 0.;
-    state[2] = 0.;
-    state[3] = 0.;
-    state[4] = 0.;
+    state[0] = 1.;
+    state[1] = 1.;
+    state[2] = 1.;
+    state[3] = 1.;
+    state[4] = 1.;
     sop->setState(state);
-    hierarchy.getGlobalDerivatives<PXDSensorAlignment>(sensorPXD, sop).second.Print();
-    Constraints constr;
-    hierarchy.buildConstraints(constr);
 
-    std::map<std::string, int> Map;
-    for (unsigned int i = 0; i < 200000; ++i) {
-      Map.insert({std::to_string(i), i});
-    }
-    for (unsigned int i = 0; i < 200000; ++i) {
-      Map.find(std::to_string(i));
-    }
+    // The du/dU derivative should be one everywhere (when we move along X, we incerase residual in X by same amount)
+    EXPECT_EQ(hierarchy.getGlobalDerivatives<TestLevelDBObj>(element1, sop).second(0, 0), 1.);
+
   }
 
+  /// Test constraint generation
+  TEST_F(HierarchyTest, HierarchyConstraints)
+  {
+    auto& hierarchy = HierarchyManager::getInstance().getAlignmentHierarchy();
 
+    Constraints constraints;
+    hierarchy.buildConstraints(constraints);
 
+    // We should have 6 constraints - one per each top level parameter
+    EXPECT_EQ(constraints.size(), 6);
 
+    int id = 100000101;
 
+    // Constraints are named by mother (here top) level parameters
+    EXPECT_TRUE(constraints.find(id) != constraints.end());
+
+    // Here each child parameter exactly corresponds to mother parameter
+    // we have two childs, so there should be two entries in constraint coefficients
+    EXPECT_EQ(constraints[id].size(), 2);
+    // ... and the coefficients should be just ones
+    EXPECT_EQ(fabs(constraints[id][0].second), 1.);
+
+    //HierarchyManager::getInstance().writeConstraints("constraints.txt");
+
+  }
 
 }  // namespace

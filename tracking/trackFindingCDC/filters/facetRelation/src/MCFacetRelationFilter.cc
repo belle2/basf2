@@ -30,6 +30,13 @@ Weight MCFacetRelationFilter::operator()(const CDCFacet& fromFacet,
   Weight fromFacetWeight = m_mcFacetFilter(fromFacet);
   Weight toFacetWeight = m_mcFacetFilter(toFacet);
 
-  bool mcDecision = (not std::isnan(fromFacetWeight)) and (not std::isnan(toFacetWeight));
-  return mcDecision ? 2.0 : NAN;
+  if ((fromFacetWeight > 0) and (toFacetWeight > 0)) {
+    return 2;
+  }
+
+  if (getAllowReverse() and (fromFacetWeight < 0) and (toFacetWeight < 0)) {
+    return -2;
+  }
+
+  return NAN;
 }

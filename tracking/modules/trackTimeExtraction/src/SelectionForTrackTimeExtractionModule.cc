@@ -78,7 +78,7 @@ void SelectionForTrackTimeExtractionModule::event()
                                                                   maximumPtRecoTrack->getMomentumSeed(),
                                                                   maximumPtRecoTrack->getChargeSeed());
 
-      // retain the seed time of the original track. Import for t0 extraction
+      // retain the seed time of the original track. Important for t0 extraction.
       selectedRecoTrack->setTimeSeed(maximumPtRecoTrack->getTimeSeed());
       selectedRecoTrack->addHitsFromRecoTrack(maximumPtRecoTrack);
     }

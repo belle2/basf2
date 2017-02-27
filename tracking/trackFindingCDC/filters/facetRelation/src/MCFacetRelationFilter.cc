@@ -31,11 +31,5 @@ Weight MCFacetRelationFilter::operator()(const CDCFacet& fromFacet,
   Weight toFacetWeight = m_mcFacetFilter(toFacet);
 
   bool mcDecision = (not std::isnan(fromFacetWeight)) and (not std::isnan(toFacetWeight));
-
-  // the weight must be -2 because the overlap of the facets is two points
-  // so the amount of two facets is 4 points hence the cellular automat
-  // must calculate 3 + (-2) + 3 = 4 as cellstate
-  // this can of course be adjusted for a more realistic information measure
-  // ( together with the facet creator filter)
-  return mcDecision ? -2.0 : NAN;
+  return mcDecision ? 2.0 : NAN;
 }

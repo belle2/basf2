@@ -296,13 +296,24 @@ void DisplayUI::selectionHandler(TEveElement* eveObj)
 void DisplayUI::handleEvent(Event_t* event)
 {
   if (event->fType == kGKeyPress) {
-    //B2DEBUG(100, "event type " << event->fType << ", code: " << event->fCode);
+    //B2DEBUG(100, "event type " << event->fType << ", code: " << event->fCode << ", state: " << event->fState);
     switch (event->fCode) {
       case 117: //Page Down
         next();
         break;
       case 112: //Page Up
         prev();
+        break;
+      case 65: //Space bar
+        togglePlayPause();
+        break;
+      case 47: // Ctrl + s
+        if (event->fState & kKeyControlMask)
+          saveHiResPicture();
+        break;
+      case 53: //Ctrl + q
+        if (event->fState & kKeyControlMask)
+          exit();
         break;
     }
   }

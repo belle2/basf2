@@ -43,7 +43,7 @@ namespace Belle2 {
       /////////////////////////////////////////////////////////////////////////
       CDCKarimakiFitter fitter;
       // CDCRiemannFitter fitter;
-      // fitter.setFitVariance(EFitVariance::c_Unit);
+      // fitter.setFitVariance(EFitVariance::c_Nominal);
       fitter.setFitVariance(EFitVariance::c_DriftLength); // Best one of the eight combinations of fitters..
       // fitter.setFitVariance(EFitVariance::c_Pseudo);
       // fitter.setFitVariance(EFitVariance::c_Proper);

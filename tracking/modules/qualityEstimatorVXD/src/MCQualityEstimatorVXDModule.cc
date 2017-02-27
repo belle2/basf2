@@ -94,7 +94,7 @@ MCQualityEstimatorVXDModule::MatchInfo MCQualityEstimatorVXDModule::getBestMatch
 
   // select best match as the one with the most matched clusters.
   MatchInfo bestMatch = *std::max_element(matches.begin(), matches.end(),
-  [](MatchInfo const & lhs, MatchInfo const & rhs) {return lhs.second > rhs.second;});
+  [](MatchInfo const & lhs, MatchInfo const & rhs) {return lhs.second < rhs.second;});
   return bestMatch;
 }
 

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Script to make sure the ConditionsService interface is behaving as expected.
+Script to make sure the conditions database interface is behaving as expected.
 
 We do this by creating a local http server which acts as a mock database for
 getting the payload information and payloads and then we run through different scenarios:
@@ -31,20 +31,6 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
     test the interface: get a list of payloads for the current run and download
     a payloadfile. It will return different payloads for the experiments to
     check for different error conditions"""
-
-    #: json string containing information for one payload, old api
-    example_payload_v1 = """[{{
-        "payload": {{
-            "payloadId":1,
-            "checksum":"{checksum}",
-            "revision":{revision},
-            "payloadUrl":"dbstore_BeamParameters_rev_{revision}.root",
-            "basf2Module": {{ "name":"BeamParameters", "basf2Package": {{ "name":"dbstore" }} }}
-        }}, "payloadIov": {{
-            "initialRunId": {{ "name":"%(run)s", "experiment": {{ "name": "%(exp)s" }} }},
-            "finalRunId": {{ "name":"%(run)s", "experiment": {{ "name": "%(exp)s" }} }}
-        }}
-        }}]"""
 
     #: json string containing information for one payload
     example_payload = """[{{
@@ -83,26 +69,6 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
              example_payload.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="3")[1:],
     }
 
-    #: map payload information to be returned for different experiments, old api
-    payloads_v1 = {
-        # let's start with empty information
-        "0": "[]",
-        # or one child but the wrong one
-        "1": '[{ "foo": { } }]',
-        # or let's have some invalid XML
-        "2": '[{ "foo',
-        # let's provide one correct payload
-        "3": example_payload_v1.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="1"),
-        # same payload but checksum mismatch
-        "4": example_payload_v1.format(checksum="[wrong checksum]", revision="1"),
-        # non existing payload file
-        "5": example_payload_v1.format(checksum="missing", revision="2"),
-        # duplicate payload, or in this case triple
-        "6": example_payload_v1.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="2")[:-1] + "," +
-             example_payload_v1.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="1")[1:-1] + "," +
-             example_payload_v1.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="3")[1:],
-    }
-
     def reply(self, xml):
         """Return a given xml string"""
         self.send_response(200)
@@ -123,23 +89,15 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
         params = parse_qs(url.query)
         # return mock payload info
         if url.path.endswith("/iovPayloads/"):
-            if "expName" in params:
-                exp = params["expName"][0]
-                run = params["runName"][0]
-            else:
-                exp = params["expNumber"][0]
-                run = params["runNumber"][0]
+            exp = params["expNumber"][0]
+            run = params["runNumber"][0]
 
-            if url.path.startswith("/v2"):
-                if int(run) > 1:
-                    exp = None
-                payloads = self.payloads
-            else:
-                payloads = self.payloads_v1
+            if int(run) > 1:
+                exp = None
 
-            if exp in payloads:
+            if exp in self.payloads:
                 baseurl = "http://%s:%s" % self.server.socket.getsockname()
-                return self.reply(payloads[exp] % dict(exp=exp, run=run, baseurl=baseurl))
+                return self.reply(self.payloads[exp] % dict(exp=exp, run=run, baseurl=baseurl))
         else:
             # check if a fallback payload file exists in the data/framework directory
             filename = os.path.basename(url.path)

@@ -86,19 +86,6 @@ namespace Belle2 {
     /** Return the global tag */
     std::string getGlobalTag() const { return m_globalTag; }
 
-    /** set a mapping from experiment name to experiment number.
-     * The experiment numbers and names need to be unique as we have to
-     * transform the mapping in both directions. So a experiment number cannot
-     * have multiple names different experiment numbers cannot have the same
-     * name.
-     *
-     * @param experiment experiment number as used in the EventMetaData
-     * @param name       name of that experiment in the ConditionsDB
-     * @return           true if the mapping could be added, false if there's a
-     *                   conflict with an existing entry.
-     */
-    bool addExperimentName(int experiment, const std::string& name);
-
     /** Set the base of the url used for REST requests to the central server */
     void setRESTBase(const std::string& restBase);
 

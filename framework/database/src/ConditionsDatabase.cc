@@ -153,11 +153,6 @@ bool ConditionsDatabase::addPayload(__attribute((unused)) const std::string& pac
   return false; // not implemented yet
 }
 
-bool ConditionsDatabase::addExperimentName(int experiment, const std::string& name)
-{
-  return m_downloader->addExperimentName(experiment, name);
-}
-
 void ConditionsDatabase::setRESTBase(const std::string& restBase)
 {
   m_downloader->setRESTBase(restBase);

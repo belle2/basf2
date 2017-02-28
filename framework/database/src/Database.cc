@@ -156,25 +156,9 @@ bool Database::writePayload(const std::string& fileName, const std::string& modu
 }
 
 namespace {
-  void Database_addExperimentName(int experiment, const std::string& name)
+  void Database_addExperimentName(int, const std::string&)
   {
-    B2INFO("Map Experiment " << experiment << " to '" << name << "'");
-    std::vector<Database*> databases{&Database::Instance()};
-    DatabaseChain* chain = dynamic_cast<DatabaseChain*>(databases[0]);
-    if (chain) {
-      databases = chain->getDatabases();
-    }
-    bool found{false};
-    for (Database* db : databases) {
-      ConditionsDatabase* cond = dynamic_cast<ConditionsDatabase*>(db);
-      if (cond) {
-        cond->addExperimentName(experiment, name);
-        found = true;
-      }
-    }
-    if (!found) {
-      B2WARNING("No central database configured, experiment name ignored");
-    }
+    B2WARNING("set_experiment_name is deprecated: setting experiment names is no longer possible and will be ignored");
   }
 }
 
@@ -212,21 +196,10 @@ void Database::exposePythonAPI()
 
   def("set_experiment_name", &Database_addExperimentName, args("experiment", "name"), R"DOCSTRING(
 Set a name for the given experiment number when looking up payloads in the
-central database. A central database needs to be set up before using `use_central_database`.
-
-The experiment and numbers and names need to be unique because the mapping
-needs to be performed in both directions so different experiment numbers cannot
-be mapped to the same name or vice versa.
-
-Example:
-    >>> set_experiment_name(4, "BELLE_exp4")
-
-:param int experiment: Experiment number from EventMetaData
-:param str name: name of the experiment when looking up payloads
-)DOCSTRING");
+central database. Thisf function is deprecated and any calls to it are ignored.)DOCSTRING");
   def("reset_database", &Database::reset, "Reset the database setup to have no database sources");
   def("use_database_chain", &DatabaseChain::createInstance,
-      (bp::arg("resetIoVs")=true, bp::arg("loglevel")=LogConfig::c_Warning, bp::arg("invertLogging")=false),
+      (bp::arg("resetIoVs") = true, bp::arg("loglevel") = LogConfig::c_Warning, bp::arg("invertLogging") = false),
       R"DOCSTRING(
 Use a database chain: Multiple database sources are used on a first found
 basis: If the payload is not found in one source try the next and so on.

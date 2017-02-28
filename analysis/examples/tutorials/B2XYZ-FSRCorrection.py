@@ -36,7 +36,8 @@ inputMdstList('default', inputFile)
 # fill particleLists
 fillParticleList('e+:uncorrected', 'eid > 0.2 and d0 < 2 and abs(z0) < 4')
 fillParticleList('gamma:all', 'E < 1.0', False)
-
+matchMCTruth('e+:uncorrected')
+matchMCTruth('gamma:all')
 # fsr correction
 correctFSR('e+:corrected', 'e+:uncorrected', 'gamma:all', 5.0, 1.0, False)
 
@@ -49,6 +50,14 @@ reconstructDecay('J/psi:uncorrected -> e+:uncorrected e-:uncorrected', '')
 # corrected
 reconstructDecay('J/psi:corrected -> e+:corrected e-:corrected', '')
 
+# vertex fit
+# vertexRave('J/psi:uncorrected', 0.0)
+# vertexRave('J/psi:corrected', 0.0)
+
+# perform mass constrained vertex fit
+massVertexRave('J/psi:uncorrected', 0.0)
+massVertexRave('J/psi:corrected', 0.0)
+
 # perform MC matching (MC truth asociation)
 matchMCTruth('J/psi:uncorrected')
 matchMCTruth('J/psi:corrected')
@@ -60,11 +69,14 @@ fillParticleListFromMC('J/psi:MC', '', False, False)
 var0 = ['p',
         'E',
         'isSignal',
+        'mcErrors',
         'extraInfo(fsrCorrected)']
 var1 = ['M',
         'p',
         'E',
+        'x', 'y', 'z',
         'isSignal',
+        'mcErrors',
         'daughter(0, p)',
         'daughter(1, p)',
         'daughter(0, extraInfo(fsrCorrected))',

@@ -246,7 +246,7 @@ std::vector<short int> ECLNeighbours::getPhiIdsInBetweenC(const short int phi0, 
   if (phi0 == phi1) return phiList; // could be that there is only one crystal in this theta ring definition
 
   short int loop = decreasePhiId(phi0, theta, corners); // start at -n corners
-  if (loop == stop) return phiList; // there will be no neighbours left in this phi ring after removing the first corners
+  if (loop == phi1) return phiList; // there will be no neighbours left in this phi ring after removing the first corners
 
   short int stop = increasePhiId(phi1, theta, corners); //stop at +n corners
 

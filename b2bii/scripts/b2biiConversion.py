@@ -43,16 +43,6 @@ def setupB2BIIDatabase(isMC=False, setExperimentNames=True):
     # unless they are already found locally
     if isMC:
         use_local_database("%s/dbcache.txt" % payloaddir, payloaddir, False, LogLevel.WARNING)
-    # and we need to map the experiment numbers to names for now. So let's
-    # temporarily disable the logging output
-    previous_loglevel = logging.log_level
-    logging.log_level = LogLevel.WARNING
-    # set all the names, doesn't matter if some don't exist so we just set 0-99
-    if setExperimentNames:
-        for exp in range(100):
-            set_experiment_name(exp, "BELLE_exp%d" % exp)
-    # and restore the logging output
-    logging.log_level = previous_loglevel
 
 
 def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True, path=analysis_main):

@@ -28,7 +28,6 @@ reset_database()
 use_database_chain()
 use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
 use_central_database("cdc_cr_test1", LogLevel.WARNING)
-set_experiment_name(0, "cdc_crt_e000000")
 
 globalPhiRotation = 1.875
 

@@ -86,7 +86,7 @@ def merge_files(*args, output="output.root", filter_modified=False):
     # do we want to filter the modified release warning?
     if filter_modified:
         # if so replace them using regular expression
-        process.stdout = re.sub(b"^\[WARNING\] File \"(.*?)\" created with modified software [a-zA-Z0-9\-+].*: "
+        process.stdout = re.sub(b"^\[WARNING\] File \"(.*?)\" created with modified software ([a-zA-Z0-9\-+]*?): "
                                 b"cannot verify that files are compatible\\n", b"", process.stdout, flags=re.MULTILINE)
 
     # in any case print output

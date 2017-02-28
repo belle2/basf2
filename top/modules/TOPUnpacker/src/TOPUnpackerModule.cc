@@ -379,9 +379,9 @@ namespace Belle2 {
       // magic word
       word = array.getWord(); // word 15
       if (word != 0x7473616c) {
-        B2ERROR("TOPUnpacker: corrupted data - no magic word at the end of FE header");
-        B2DEBUG(100, "No magic word at the end of FE header, found: "
-                << std::hex << word);
+        //B2ERROR("TOPUnpacker: corrupted data - no magic word at the end of FE header");
+        //B2DEBUG(100, "No magic word at the end of FE header, found: "
+        //<< std::hex << word);
         info->setErrorFlag(TOPInterimFEInfo::c_InvalidMagicWord);
         //return array.getRemainingWords(); do not abort event for now as footer is invalid in current debugging version of firmware
       }

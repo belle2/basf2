@@ -9,7 +9,12 @@
 
 # G. Caria
 
-# import modules here...
+from basf2 import *
+
+import b2biiConversion
+import ROOT
+from ROOT import Belle2
+ROOT.Belle2.BFieldManager.getInstance().setConstantOverride(0, 0, 1.5 * ROOT.Belle2.Unit.T)
 
 # ------- Arguments sorting
 if len(sys.argv) != 8:

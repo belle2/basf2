@@ -51,14 +51,14 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
 {
   //..ranges of various fit parameters, and tolerance to determine that fit is at the limit
   double limitTol = 0.00001;
-  double peakMin(3200.), peakMax(4400.);
-  double peakTol = limitTol * (peakMax - peakMin);
-  double effSigMin(150.), effSigMax(450.);
+  double peakMin(3200.), peakMax(4400.); /*< range for peak of measured energy distribution */
+  double peakTol = limitTol * (peakMax - peakMin); /*< fit is at limit if it is within peakTol of min or max */
+  double effSigMin(150.), effSigMax(450.); /*< range for effective sigma of measured energy distribution */
   double effSigTol = limitTol * (effSigMax - effSigMin);
-  double etaMin(-1.5), etaMax(1.);
+  double etaMin(-1.5), etaMax(1.); /*< Novosibirsk tail parameter range */
   double etaTol = limitTol * (etaMax - etaMin);
-  double constMin(0.), constMax(10.);
-  double constTol = limitTol * constMax;
+  double constMin(0.), constMax(10.); /*< constant term in energy distribution */
+  double constTol = limitTol * constMax; /*< if constant is less than constTol, it will be fixed to 0 */
 
   //..Keep track of the fit results on the preceeding crystal as a measure of the true uncertainty
   double previousPeak(0.), previousUnc(0.);

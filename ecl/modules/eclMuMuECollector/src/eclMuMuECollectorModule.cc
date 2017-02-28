@@ -10,7 +10,6 @@
 
 #include <ecl/modules/eclMuMuECollector/eclMuMuECollectorModule.h>
 #include <framework/datastore/StoreArray.h>
-#include <ecl/dataobjects/ECLDigit.h>
 #include <mdst/dataobjects/Track.h>
 #include <framework/datastore/RelationVector.h>
 #include <tracking/dataobjects/ExtHit.h>
@@ -19,6 +18,7 @@
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/utility/PCmsLabTransform.h>
+#include <framework/gearbox/Const.h>
 
 
 #include <TH2F.h>
@@ -45,9 +45,9 @@ eclMuMuECollectorModule::eclMuMuECollectorModule() : CalibrationCollectorModule(
   // Set module properties
   setDescription("Calibration Collector Module for ECL single crystal energy calibration using muons");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("minPairMass", m_minPairMass, "minimum invariant mass of the muon pair", 9.0);
-  addParam("minTrackLength", m_minTrackLength, "minimum extrapolated track length in the crystal", 30.);
-  addParam("MaxNeighborAmp", m_MaxNeighborAmp, "maximum signal allowed in a neighboring crystal", 200.);
+  addParam("minPairMass", m_minPairMass, "minimum invariant mass of the muon pair (GeV/c^2)", 9.0);
+  addParam("minTrackLength", m_minTrackLength, "minimum extrapolated track length in the crystal (cm)", 30.);
+  addParam("MaxNeighborAmp", m_MaxNeighborAmp, "maximum signal allowed in a neighboring crystal (adc counts)", 200.);
   addParam("thetaLabMinDeg", m_thetaLabMinDeg, "miniumum muon theta in lab (degrees)", 24.);
   addParam("thetaLabMaxDeg", m_thetaLabMaxDeg, "maximum muon theta in lab (degrees)", 134.);
   addParam("useTrueEnergy", m_useTrueEnergy, "store MC true deposited energy", false);
@@ -66,87 +66,17 @@ void eclMuMuECollectorModule::prepare()
   registerObject<TH1F>("MuonLabPvsCellID0", MuonLabPvsCellID0);
 
   //------------------------------------------------------------------------
-  //..ECL geometry. Need to find all immediate neighbors of each crystal. Does not include crystal itself.
-  //  Crystals on the corners are neighbors only in the endcaps
-  ECLGeometryPar* eclp = ECLGeometryPar::Instance();
-  const int nThetaRings = 69; // number of theta rings in the ECL
-  const short nCrystalsPerRing[nThetaRings] = {
-    48, 48, 64, 64, 64, 96, 96, 96, 96, 96, 96, 144, 144, // Forward 0--12
-    144, 144, 144, 144, 144, 144, 144,  // Barrel 13--58
-    144, 144, 144, 144, 144, 144, 144, 144, 144, 144,
-    144, 144, 144, 144, 144, 144, 144, 144, 144, 144,
-    144, 144, 144, 144, 144, 144, 144, 144, 144, 144,
-    144, 144, 144, 144, 144, 144, 144, 144, 144,
-    144, 144, 96, 96, 96, 96, 96, 64, 64, 64 // Backward 59--68
-  };
-
-  for (int it = 0; it < nThetaRings; it++) {
-    for (int ip = 0; ip < nCrystalsPerRing[it]; ip++) {
-
-      //..cellID from 0, position, and phi of this crystal
-      int ID0 = eclp->GetCellID(it, ip);
-      TVector3 position = eclp->GetCrystalPos(ID0);
-      float phi0 = position.Phi();
-      int nc = 0; // number of neighbors for this crystal
-
-      //..Theta ring range containing the neighbors
-      int itlow = it - 1;
-      if (itlow < 0) { itlow = 0;}
-      int ithigh = it + 1;
-      if (ithigh > 68) {ithigh = 68;}
-      for (int nt = itlow; nt <= ithigh; nt++) {
-
-        //..Neighbors in the same theta ring just have phiID +/- 1
-        if (nt == it) {
-          for (int dp = -1; dp < 2; dp += 2) {
-            int np = ip + dp;
-            if (np < 0) {np += nCrystalsPerRing[nt];}
-            if (np >= nCrystalsPerRing[nt]) {np = np - nCrystalsPerRing[nt];}
-            ListOfNeighbors[ID0][nc] = eclp->GetCellID(nt, np);
-            nc++;
-          }
-
-          //..Adjacent theta ring in the region where all rings have 144 crystals. Neighbor has
-          //  the same phi ID as the central crystal
-        } else if (it >= 12 && it <= 59) {
-          ListOfNeighbors[ID0][nc] = eclp->GetCellID(nt, ip);
-          nc++;
-
-          //..Adjacent theta ring in the encaps. Closest crystal in phi, plus one on either side
-        } else {
-          int npc = ip;
-          float dphiMin = 99.;
-          for (int kp = 0; kp < nCrystalsPerRing[nt]; kp++) {
-            int IDk = eclp->GetCellID(nt, kp);
-            TVector3 temppos =  eclp->GetCrystalPos(IDk);
-            float phik = temppos.Phi();
-            float dphi = abs(phi0 - phik);
-            if (dphi > TMath::Pi()) {dphi = 2 * TMath::Pi() - dphi; }
-            if (dphi < dphiMin) {
-              dphiMin = dphi;
-              npc = kp;
-            }
-          }
-
-          //..found the closest crystal in phi, now add neighbors to the list
-          for (int dp = -1; dp < 2; dp++) {
-            int np = npc + dp;
-            if (np < 0) {np += nCrystalsPerRing[nt];}
-            if (np >= nCrystalsPerRing[nt]) {np = np - nCrystalsPerRing[nt];}
-            ListOfNeighbors[ID0][nc] = eclp->GetCellID(nt, np);
-            nc++;
-          }
-        }
-      }
-      nNeighbors[ID0] = nc;
-    }
-  }
+  //..Four or ~eight nearest neighbors, plus crystal itself. cellID starts from 1 in ECLNeighbours
+  myNeighbours4 = new ECLNeighbours("NC", 1);
+  myNeighbours8 = new ECLNeighbours("N", 1);
 
   //------------------------------------------------------------------------
   //..Find the nominal (beam-energy) muon momentum for each crystal in the lab frame
+  ECLGeometryPar* eclp = ECLGeometryPar::Instance();
   PCmsLabTransform boostrotate;
   double beamE = 0.5 * boostrotate.getCMSEnergy();
-  double muonP = sqrt(beamE * beamE - 0.0111637); // number is muon mass squared
+  double muonP = sqrt(beamE * beamE - Const::muonMass * Const::muonMass);
+  MuPlab.resize(8736);
 
   for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
     TVector3 CellPosition = eclp->GetCrystalPos(iECLCell);
@@ -165,8 +95,7 @@ void eclMuMuECollectorModule::prepare()
     TLorentzVector MuonLab = boostrotate.rotateCmsToLab() * CellCOM;
     MuPlab[iECLCell] = MuonLab.Rho();
 
-    int itemp = iECLCell / 1000;
-    if (iECLCell == 1000 * itemp) {
+    if (iECLCell % 1000 == 0) {
       B2DEBUG(1, "ECLGeom: " << iECLCell << " " << CellLab.Theta() << " " << CellLab.Phi() << " " << CellLab.M() << " " << CellLab.E());
       B2DEBUG(1, "     " << CellCOM.Theta() << " " << CellCOM.Phi() << " " << CellCOM.M() << " " << CellCOM.E());
       B2DEBUG(1, "     " << MuonLab.Theta() << " " << MuonLab.Phi() << " " << MuonLab.M() << " " << MuonLab.E() << " "  << MuonLab.Rho());
@@ -183,12 +112,27 @@ void eclMuMuECollectorModule::prepare()
   B2INFO("thetaLabMinDeg: " << m_thetaLabMinDeg);
   B2INFO("thetaLabMaxDeg: " << m_thetaLabMaxDeg);
   B2INFO("useTrueEnergy: " << m_useTrueEnergy);
-  double thetaLabMin = m_thetaLabMinDeg * TMath::Pi() / 180.;
-  cotThetaLabMax = 1. / tan(thetaLabMin);
-  double thetaLabMax = m_thetaLabMaxDeg * TMath::Pi() / 180.;
-  cotThetaLabMin = 1. / tan(thetaLabMax);
+  if (m_thetaLabMinDeg < 1.) {
+    cotThetaLabMax = 9999.;
+  } else if (m_thetaLabMinDeg > 179.) {
+    cotThetaLabMax = -9999.;
+  } else {
+    double thetaLabMin = m_thetaLabMinDeg * TMath::Pi() / 180.;
+    cotThetaLabMax = 1. / tan(thetaLabMin);
+  }
+  if (m_thetaLabMaxDeg < 1.) {
+    cotThetaLabMin = 9999.;
+  } else if (m_thetaLabMaxDeg > 179.) {
+    cotThetaLabMin = -9999.;
+  } else {
+    double thetaLabMax = m_thetaLabMaxDeg * TMath::Pi() / 180.;
+    cotThetaLabMin = 1. / tan(thetaLabMax);
+  }
 
+  //..Resize vectors
+  EnergyPerCell.resize(8736);
 }
+
 
 //-----------------------------------------------------------------------------------------------------
 void eclMuMuECollectorModule::collect()
@@ -201,9 +145,8 @@ void eclMuMuECollectorModule::collect()
       getObject<TH1F>("MuonLabPvsCellID0").SetBinError(iECLCell + 1, 0);
     }
   }
+  if (iEvent % 10000 == 0) {B2INFO("eclMuMuECollector: iEvent = " << iEvent);}
   iEvent++;
-  int n10000 = iEvent / 10000;
-  if (10000 * n10000 == iEvent) {B2INFO("eclMuMuECollector: iEvent = " << iEvent);}
 
   //------------------------------------------------------------------------
   //..Event selection. First, require at least two tracks
@@ -287,8 +230,8 @@ void eclMuMuECollectorModule::collect()
   }
 
   //------------------------------------------------------------------------
-  //..Store ECL digit amplitude as a function of cellID0
-  float EnergyPerCell[8736] = {};
+  //..Record ECL digit amplitude as a function of cellID0
+  memset(&EnergyPerCell[0], 0, EnergyPerCell.size()*sizeof EnergyPerCell[0]);
   StoreArray<ECLDigit> eclDigitArray;
   for (auto& eclDigit : eclDigitArray) {
     int tempID0 = eclDigit.getCellId() - 1;
@@ -297,13 +240,18 @@ void eclMuMuECollectorModule::collect()
 
   //..Require that the energy in immediately adjacent crystals is below threshold
   for (int imu = 0; imu < 2; imu++) {
-    if (extCellID0[imu] > -1) {
+    int ID0 = extCellID0[imu];
+    if (ID0 > -1) {
 
       bool noNeighborSignal = true;
-      for (int in = 0; in < nNeighbors[extCellID0[imu]]; in++) {
-        int tempID0 = ListOfNeighbors[extCellID0[imu]][in];
-        float tempAmp = EnergyPerCell[tempID0];
-        if (tempAmp > m_MaxNeighborAmp) {noNeighborSignal = false; break;}
+      if (ID0 >= firstID0N4 && ID0 <= lastID0N4) {
+        for (const auto& tempID1 : myNeighbours4->getNeighbours(ID0 + 1)) {
+          if (tempID1 - 1 != ID0 && EnergyPerCell[tempID1 - 1] > m_MaxNeighborAmp) {noNeighborSignal = false; break;}
+        }
+      } else {
+        for (const auto& tempID1 : myNeighbours8->getNeighbours(ID0 + 1)) {
+          if (tempID1 - 1 != ID0 && EnergyPerCell[tempID1 - 1] > m_MaxNeighborAmp) {noNeighborSignal = false; break;}
+        }
       }
 
       //..Fill the histogram if no significant signal in a neighboring crystal

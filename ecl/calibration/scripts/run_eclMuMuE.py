@@ -1,8 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Energy calibration of ecl barrel plus one theta ring of each endcap using muon pairs.
+# -----------------------------------------------------------
+# BASF2 (Belle Analysis Framework 2)
+# Copyright(C) 2017  Belle II Collaboration
+#
+# Author: The Belle II Collaboration
+# Contributors: Christopher Hearty
+#
+# This software is provided "as is" without any warranty.
+# -----------------------------------------------------------
+
+# Usage: basf2 run_eclMuMuE.py
+# Energy calibration of (part of) the ecl using muon pairs.
 # Runs within the CAF framework.
+# Calls both collector and algorithm stages of the calibration;
+# run_eclMuMuE_collector.py and run_eclMuMuE_algorithm.py run the two stages as separate jobs for
+# debugging purposes.
+# Input file should be e+e- --> mu+mu- including ecl digits and track extrapolation.
+# Production version (but not this version) should call required reconstruction modules.
+# Primary output is a histogram of calibration constant vs cellID0;
+# output file RootOutput.root contains many additional diagnostic histograms.
+
 from basf2 import *
 set_log_level(LogLevel.INFO)
 
@@ -23,6 +42,7 @@ eclMuMuE.param('MaxNeighborAmp', 200.)
 # 3 axial SL = [24,134];  4 axial SL = [30,126]
 eclMuMuE.param('thetaLabMinDeg', 24.)
 eclMuMuE.param('thetaLabMaxDeg', 134.)
+# Can fill histograms with MC true deposited energy if eclCalDigits have been stored
 eclMuMuE.param('useTrueEnergy', False)
 
 # Set up the modules needed for geometry and track extrapolation by the collector module

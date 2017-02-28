@@ -14,9 +14,11 @@
 // framework aux
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/datastore/RelationArray.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
@@ -101,6 +103,10 @@ namespace Belle2 {
   void FSRCorrectionModule::event()
   {
     StoreArray<Particle> particles;
+    StoreArray<MCParticle> mcParticles;
+
+    RelationArray particlesToMCParticles(particles, mcParticles);
+
     const StoreObjPtr<ParticleList> inputList(m_inputListName);
     const StoreObjPtr<ParticleList> gammaList(m_gammaListName);
 
@@ -170,7 +176,10 @@ namespace Belle2 {
 
       correctedLepton.addExtraInfo("fsrCorrected", float(fsrGammaFound));
 
+      // add the mc relation
       Particle* newLepton = particles.appendNew(correctedLepton);
+      const MCParticle* mcLepton = lepton->getRelated<MCParticle>();
+      if (mcLepton != nullptr) newLepton->addRelationTo(mcLepton);
       outputList->addParticle(newLepton);
 
     }

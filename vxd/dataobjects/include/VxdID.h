@@ -111,6 +111,9 @@ namespace Belle2 {
     /** Set the sensor segment */
     void setSegmentNumber(baseType segment) { m_id.parts.segment = segment; }
 
+    /** make this type printable in python with print(vxd_id) */
+    std::string __str__() const { return (std::string)(*this); }
+
   private:
 
     union {

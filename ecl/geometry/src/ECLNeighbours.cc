@@ -246,10 +246,13 @@ std::vector<short int> ECLNeighbours::getPhiIdsInBetweenC(const short int phi0, 
   short int loop = decreasePhiId(phi0, theta, corners); //start at -1
   short int stop = increasePhiId(phi1, theta, corners); //stop at +1
 
-  while (1) {
-    phiList.push_back(loop);
-    if (loop == stop) break;
-    loop = decreasePhiId(loop, theta, 1);
+  if (loop == stop) return phiList;
+  else {
+    while (1) {
+      phiList.push_back(loop);
+      if (loop == stop) break;
+      loop = decreasePhiId(loop, theta, 1);
+    }
   }
 
   return phiList;

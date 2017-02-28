@@ -383,7 +383,7 @@ namespace Belle2 {
         B2DEBUG(100, "No magic word at the end of FE header, found: "
                 << std::hex << word);
         info->setErrorFlag(TOPInterimFEInfo::c_InvalidMagicWord);
-        return array.getRemainingWords();
+        //return array.getRemainingWords(); do not abort event for now as footer is invalid in current debugging version of firmware
       }
 
       // store to raw digits

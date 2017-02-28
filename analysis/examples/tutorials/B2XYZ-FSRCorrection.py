@@ -53,6 +53,9 @@ reconstructDecay('J/psi:corrected -> e+:corrected e-:corrected', '')
 matchMCTruth('J/psi:uncorrected')
 matchMCTruth('J/psi:corrected')
 
+# get all MC particles
+fillParticleListFromMC('J/psi:MC', '', False, False)
+
 # write out ntuples
 var0 = ['p',
         'E',
@@ -71,6 +74,7 @@ variablesToNTuple('e+:uncorrected', var0, filename='e_uncorrected.root')
 variablesToNTuple('e+:corrected', var0, filename='e_corrected.root')
 variablesToNTuple('J/psi:uncorrected', var1, filename='Jpsi_uncorrected.root')
 variablesToNTuple('J/psi:corrected', var1, filename='Jpsi_corrected.root')
+variablesToNTuple('J/psi:MC', var1, filename='Jpsi_MC.root')
 
 # Process the events
 process(analysis_main)

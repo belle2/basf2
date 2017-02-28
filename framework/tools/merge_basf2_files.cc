@@ -183,6 +183,8 @@ The following restrictions apply:
   // set of all branch names in the event tree to compare against to make sure
   // that they're the same in all files
   std::set<std::string> allEventBranches;
+  // Release version to compare against. Same as FileMetaData::getRelease() but with the optional -modified removed
+  std::string outputRelease;
 
   // so let's loop over all files and create FileMetaData and merge persistent
   // objects if they inherit from Mergeable, bail if there's something else in
@@ -326,15 +328,26 @@ The following restrictions apply:
         B2ERROR("No BackgroundInfo in file " << boost::io::quoted(input));
     }
 
+    std::string release = fileMetaData->getRelease();
+    if(release == "") {
+        B2ERROR("Cannot determine release used to create " <<  boost::io::quoted(input));
+        continue;
+    }else if(boost::algorithm::ends_with(fileMetaData->getRelease(), "-modified")){
+        B2WARNING("File " << boost::io::quoted(input) << " created with modified software " <<  fileMetaData->getRelease()
+                  << ": cannot verify that files are compatible");
+        release = release.substr(0, release.size() - std::string("-modified").size());
+    }
+
     // so, event tree looks good too. Now we merge the FileMetaData
     if (!outputMetaData) {
       // first input file, just take the event metadata
       outputMetaData = new FileMetaData(*fileMetaData);
+      outputRelease = release;
       lowEvt = EventInfo{fileMetaData->getExperimentLow(), fileMetaData->getRunLow(), fileMetaData->getEventLow()};
       highEvt = EventInfo{fileMetaData->getExperimentHigh(), fileMetaData->getRunHigh(), fileMetaData->getEventHigh()};
     } else {
       // check meta data for consistency, we could move this into FileMetaData...
-      if(fileMetaData->getRelease() != outputMetaData->getRelease()){
+      if(release != outputRelease) {
         B2ERROR("Release in " << boost::io::quoted(input) << " differs from previous files: " <<
                 fileMetaData->getRelease() << " != " << outputMetaData->getRelease());
       }

@@ -5,7 +5,7 @@
 <header>
   <input>Bd_Kstgamma_GENSIMRECtoDST.dst.root</input>
   <output>Bd_Kstgamma.ntup.root</output>
-  <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
+  <contact>Jorge Martinez-Ortega; jmartinez@fis.cinvestav.mx</contact>
 </header>
 """
 
@@ -20,7 +20,7 @@ inputMdst('default', '../Bd_Kstgamma_GENSIMRECtoDST.dst.root')
 loadStdCharged()
 loadStdPhoton()
 
-reconstructDecay('K*0 -> K+:std pi-:all', '0.6 < M < 1.2')
+reconstructDecay('K*0 -> K+:all pi-:all', '0.6 < M < 1.2')
 matchMCTruth('K*0')
 
 # Prepare the B candidates

@@ -19,13 +19,13 @@ namespace Belle2 {
   /** Namespace to provide code needed by both Vertex Detectors, PXD and SVD */
 
 
-  /** Base class to provide Sensor Information for PXD and SVD.
-   * This class is meant to provide the basic services like length/thickness
-   * parameters, pixel/stip ID and position calculation and coordinate transformation.
+  /** Data containter to carry Sensor Information for PXD and SVD to/from the database..
+   * The data are sensor type, sensor id, width/length/thickness, number of cells.
    */
   class VXDSensorInfoBasePar : public TObject {
   public:
     /** Enum specifing the type of sensor the SensorInfo represents */
+    // FIXME: This is repeated, would be good to have only one instance.
     enum SensorType {
       PXD = 0,  /**< PXD Sensor */
       SVD = 1,  /**< SVD Sensor */
@@ -42,7 +42,7 @@ namespace Belle2 {
      * positions and ids. it can accomodate rectangular and trapezoidal
      * shapes and also has the possibility to segment the strip/pixelsize
      * once in v, thus having two different pixel sizes in one sensor: vcells
-     * pixels from start to splitlength and vcells2 pixels from splitlength
+     * pixels from start to splitLength and vcells2 pixels from splitLength
      * to length.
      *
      * @param type Type of the Sensor, one of PXD or SVD
@@ -58,151 +58,29 @@ namespace Belle2 {
      * @param vCells2 Number of pixels in v direction after split length.
      */
     VXDSensorInfoBasePar(SensorType type, VxdID id, double width, double length, double thickness,
-                         int uCells, int vCells, double width2 = -1, double splitLength = -1, int vCells2 = 0):
+                         int uCells, int vCells, double width2 = 0, double splitLength = -1, int vCells2 = 0):
       m_type(type), m_id(id), m_width(width), m_length(length), m_thickness(thickness),
-      m_deltaWidth(0), m_splitLength(0), m_uCells(uCells), m_vCells(vCells), m_vCells2(vCells2)
-    {
-      if (width2 > 0) m_deltaWidth = width2 - width;
-      if (splitLength > 0) m_splitLength = splitLength / length;
-    }
+      m_width2(width2), m_splitLength(splitLength), m_uCells(uCells), m_vCells(vCells), m_vCells2(vCells2)
+    {}
 
-
-    /** Default constructor to make class polymorph */
+    /** Virtual destructor to make class polymorph */
     virtual ~VXDSensorInfoBasePar() {}
 
+    // Getters: exactly 1 for each data member and nothing more.
     /** Return the Type of the Sensor */
     SensorType getType() const { return m_type; }
     /** Return the ID of the Sensor */
     VxdID getID() const { return m_id; }
-
-    double getWidth2() const
-    {
-      return m_deltaWidth + m_width;
-    }
-
-    /** Return the width of the sensor
-     * @param v v-coordinate where to determine the width, ignored for recangular sensors
-     * @return width of the Sensor
-     */
-    double getWidth(double v = 0) const
-    {
-      if (m_deltaWidth == 0) return m_width;
-      return m_width + (v / m_length + 0.5) * m_deltaWidth;
-    }
-
-    /** Convinience Wrapper to return width at backward side.
-     * @return width of the sensor at the backward side
-     */
-    double getBackwardWidth() const
-    {
-      return getWidth(-0.5 * m_length);
-    }
-
-    /** Convinience Wrapper to return width at forward side.
-     * @return width of the sensor at the forward side
-     */
-    double getForwardWidth() const
-    {
-      return getWidth(0.5 * m_length);
-    }
-
-    /** Return the length of the sensor
-     * @return length of the sensor
-     */
+    /** Return forward width for a slanted sensor */
+    double getWidth2() const { return m_width2; }
+    /** Return the (backward) width of the sensor */
+    double getWidth() const { return m_width; }
+    /** Return the length of the sensor */
     double getLength() const { return m_length; }
-
-    /** Return the splitlength of the sensor
-     * @return length of the sensor
-     */
-    double getSplitLength() const { return m_splitLength * m_length; }
-
-    /** Return the thickness of the sensor
-     * @return thickness of the sensor
-     */
+    /** Return the splitLength of the sensor */
+    double getSplitLength() const { return m_splitLength; }
+    /** Return the thickness of the sensor */
     double getThickness() const { return m_thickness; }
-
-    /** Return the width of the sensor
-     * @param v v-coordinate where to determine the width, ignored for recangular sensors
-     * @return width of the Sensor
-     */
-    double getUSize(double v = 0) const { return getWidth(v); }
-
-    /** Return the length of the sensor
-     * @return length of the sensor
-     */
-    double getVSize() const { return getLength(); }
-
-    /** Return the thickness of the sensor
-     * @return thickness of the sensor
-     */
-    double getWSize() const { return getThickness(); }
-
-    /** Return the pitch of the sensor
-     * @param v v-coordinate where to determine the pitch, ignored for rectangular sensors
-     * @return Pixel/Strip size in u direction
-     */
-    double getUPitch(double v = 0) const { return getWidth(v) / m_uCells; }
-
-    /** Return the pitch of the sensor
-     * @param v v-coordinate where to determine the pitch, only used for
-     * sensors with two different pixel sizes along v
-     * @return Pixel/Strip size in v direction
-     */
-    double getVPitch(double v = 0) const
-    {
-      if (m_splitLength <= 0) return m_length / m_vCells;
-      if (v / m_length + 0.5 >= m_splitLength) return m_length * (1 - m_splitLength) / m_vCells2;
-      return m_length * m_splitLength / m_vCells;
-    }
-
-    /** Return the position of a specific strip/pixel in u direction
-     * @param uID id of the strip/pixel in u coordinates
-     * @param vID id of the strip/pixel in v coordinates, ignored for rectangular sensors
-     * @return Pixel/Strip position in u direction
-     */
-    double getUCellPosition(int uID, int vID = -1) const
-    {
-      if (m_deltaWidth == 0) return ((uID + 0.5) / m_uCells - 0.5) * m_width;
-      double v = 0;
-      if (vID >= 0) v = getVCellPosition(vID);
-      return ((uID + 0.5) / m_uCells - 0.5) * getWidth(v);
-    }
-
-    /** Return the position of a specific strip/pixel in v direction
-     * @param vID id of the strip/pixel in v coordinates
-     * @return Pixel/Strip position in v direction
-     */
-    double getVCellPosition(int vID) const
-    {
-      if (m_splitLength <= 0) return ((vID + 0.5) / m_vCells - 0.5) * m_length;
-      if (vID >= m_vCells) return ((vID - m_vCells + 0.5) / m_vCells2 * (1 - m_splitLength) - 0.5 + m_splitLength) * m_length;
-      return ((vID + 0.5) / m_vCells * m_splitLength - 0.5) * m_length;
-    }
-
-    /** Return the corresponding pixel/strip ID of a given u coordinate
-     * @param u u coordinate of the pixel/strip
-     * @param v v coordinate of the pixel/strip, ignored for rectangular sensors
-     * @return ID of the pixel/strip covering the given coordinate
-     */
-    int getUCellID(double u, double v = 0, bool clamp = false) const
-    {
-      if (clamp) return std::min(getUCells() - 1, std::max(0, getUCellID(u, v, false)));
-      return static_cast<int>((u / getWidth(v) + 0.5) * m_uCells);
-    }
-
-    /** Return the corresponding pixel/strip ID of a given v coordinate
-     * @param v v coordinate of the pixel/strip
-     * @return ID of the pixel/strip covering the given coordinate
-     */
-    int getVCellID(double v, bool clamp = false) const
-    {
-      if (clamp) return std::min(getVCells() - 1, std::max(0, getVCellID(v, false)));
-      double nv = v / m_length + 0.5;
-      if (m_splitLength <= 0) return static_cast<int>(nv * m_vCells);
-      if (nv >= m_splitLength) return static_cast<int>((nv - m_splitLength) / (1 - m_splitLength) * m_vCells2) + m_vCells;
-      return static_cast<int>(nv / m_splitLength * m_vCells);
-    }
-
     /** Return number of pixel/strips in u direction */
     int getUCells() const { return m_uCells; }
     /** Return number of pixel/strips in v direction */
@@ -213,62 +91,20 @@ namespace Belle2 {
     int getVCells2() const { return m_vCells2; }
 
 
-    /** Check wether a given point is inside the active area.
-     * Optionally, one can specify a tolerance which should be added to the
-     * sensor edges to still be considered inside
-     * @param u u coordinate to check, supply 0 if not interested
-     * @param v v coordinate to check, supply 0 if not interested
-     * @param uTolerance tolerance to be added on each side of the sensor in u direction
-     * @param vTolerance tolerance to be added on each side of the sensor in u direction
-     * @return true if inside active area, false otherwise
-     */
-    bool inside(double u, double v, double uTolerance = DBL_EPSILON, double vTolerance = DBL_EPSILON) const
-    {
-      double nu = u / (getWidth(v) + 2 * uTolerance) + 0.5;
-      double nv = v / (getLength() + 2 * vTolerance) + 0.5;
-      return 0 <= nu && nu <= 1 && 0 <= nv && nv <= 1;
-    }
-
-    /** Check wether a given point is inside the active area
-     * @param local point in local coordinates
-     * @return true if inside active area, false otherwise
-     */
-    /*
-    bool inside(const TVector3& local) const
-    {
-      double nw = local.z() / getThickness() + 0.5;
-      return inside(local.x(), local.y()) && 0 <= nw && nw <= 1;
-    }
-    */
-
-    /** Force a position to be inside the active area
-     * @param u u coordinate to be forced inside
-     * @param v v coordinate to be forced inside
-     */
-    void forceInside(double& u, double& v) const
-    {
-      double length = getLength() / 2.0;
-      v = std::min(length, std::max(-length, v));
-      double width = getWidth(v) / 2.0;
-      u = std::min(width, std::max(-width, u));
-    }
-
-
-
   protected:
     /** Type of the Sensor */
     SensorType m_type;
     /** ID of the Sensor */
     unsigned short m_id;
-    /** Width of the sensor */
+    /** Width of the sensor, backward width for wedge sensors */
     double m_width;
     /** Length of the Sensor */
     double m_length;
     /** Thickness of the Sensor */
     double m_thickness;
-    /** Difference between backward and forward width, 0 for rectangular sensors */
-    double m_deltaWidth;
-    /** Relative length at which second pixel size starts, 0 for only one pixel size */
+    /** Forward width for wedge sensors, 0 for rectangular sensors */
+    double m_width2;
+    /** Length at which second pixel size starts, 0 for only one pixel size */
     double m_splitLength;
     /** Number of strips/pixels in u direction */
     int m_uCells;
@@ -278,7 +114,7 @@ namespace Belle2 {
     int m_vCells2;
 
 
-    ClassDef(VXDSensorInfoBasePar, 5);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(VXDSensorInfoBasePar, 6);  /**< ClassDef, must be the last term before the closing {}*/
   };
 
 } //Belle2 namespace

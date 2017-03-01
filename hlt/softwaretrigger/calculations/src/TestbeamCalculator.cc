@@ -24,7 +24,7 @@ namespace Belle2 {
     void TestbeamCalculator::doCalculation(SoftwareTriggerObject& calculationResult) const
     {
       // output the number of SVD Clusters
-      calculationResult["nSVDCluster"] = m_svdClusters.getEntries();
+      calculationResult["nSVDClusters"] = m_svdClusters.getEntries();
 
       // find track with the largest pt
       double ptMax = 0.00;

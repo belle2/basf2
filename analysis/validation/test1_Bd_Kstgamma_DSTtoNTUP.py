@@ -5,7 +5,7 @@
 <header>
   <input>Bd_Kstgamma_GENSIMRECtoDST.dst.root</input>
   <output>Bd_Kstgamma.ntup.root</output>
-  <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
+  <contact>Jorge Martinez-Ortega; jmartinez@fis.cinvestav.mx</contact>
 </header>
 """
 

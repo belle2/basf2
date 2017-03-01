@@ -40,6 +40,8 @@ namespace Belle2 {
       // store the track with the largest pt of all found tracks
       calculationResult["SVDTrackMaxPt"] = ptMax;
 
+      // store the number of tracks
+      calculationResult["nSVDTracks"] = m_svdTracks.getEntries();
     }
   }
 }

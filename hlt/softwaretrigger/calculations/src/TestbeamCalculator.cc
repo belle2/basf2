@@ -38,7 +38,8 @@ namespace Belle2 {
       }
 
       // store the track with the largest pt of all found tracks
-      calculationResult["nSVDTrackMaxPt"] = ptMax;
+      calculationResult["SVDTrackMaxPt"] = ptMax;
+
     }
   }
 }

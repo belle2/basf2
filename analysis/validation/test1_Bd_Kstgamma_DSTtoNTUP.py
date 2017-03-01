@@ -20,7 +20,7 @@ inputMdst('default', '../Bd_Kstgamma_GENSIMRECtoDST.dst.root')
 loadStdCharged()
 loadStdPhoton()
 
-reconstructDecay('K*0 -> K+:std pi-:all', '0.6 < M < 1.2')
+reconstructDecay('K*0 -> K+:all pi-:all', '0.6 < M < 1.2')
 matchMCTruth('K*0')
 
 # Prepare the B candidates

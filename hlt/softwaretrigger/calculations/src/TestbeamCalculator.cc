@@ -27,7 +27,7 @@ namespace Belle2 {
       calculationResult["nSVDClusters"] = m_svdClusters.getEntries();
 
       // find track with the largest pt
-      double ptMax = 0.00;
+      double ptMax = 0.0f;
       for (auto const& t : m_svdTracks) {
         // check for correct fit
         if (t.getNumberOfFittedHypotheses() == 0)

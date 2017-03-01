@@ -25,21 +25,21 @@
 #endif
 
 namespace Belle2_TRGCDC {
-    extern Belle2::TRGCDCDisplayHough * H0;
-    extern Belle2::TRGCDCDisplayHough * H1;
+  extern Belle2::TRGCDCDisplayHough* H0;
+  extern Belle2::TRGCDCDisplayHough* H1;
 }
 
 namespace Belle2 {
 
-class TRGCDCDisplay;
-class TRGCDCWireHit;
+  class TRGCDCDisplay;
+  class TRGCDCWireHit;
 
 /// A class to display CDC trigger information.
-class TRGCDCDisplayRphi : public TRGCDCDisplay {
-    
+  class TRGCDCDisplayRphi : public TRGCDCDisplay {
+
   public:
     /// Default constructor
-    TRGCDCDisplayRphi(const std::string & name = "TRGCDCDisplayRphi",
+    TRGCDCDisplayRphi(const std::string& name = "TRGCDCDisplayRphi",
                       double innerR = 160,
                       double outerR = 1137,
                       int size = 600);
@@ -72,7 +72,7 @@ class TRGCDCDisplayRphi : public TRGCDCDisplay {
   public: // Access to drawing area.
 
     /// returns drawing area.
-    virtual TRGCDCDisplayDrawingAreaRphi & area(void);
+    virtual TRGCDCDisplayDrawingAreaRphi& area(void);
 
   private: // GTK stuff
     bool _axial;
@@ -83,40 +83,45 @@ class TRGCDCDisplayRphi : public TRGCDCDisplay {
     Gtk::CheckButton _buttonAxial;
     Gtk::CheckButton _buttonStereo;
     Gtk::CheckButton _buttonBelleCDC;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-TRGCDCDisplayDrawingAreaRphi &
-TRGCDCDisplayRphi::area(void) {
+  inline
+  TRGCDCDisplayDrawingAreaRphi&
+  TRGCDCDisplayRphi::area(void)
+  {
     return _w;
-}
+  }
 
-inline
-bool
-TRGCDCDisplayRphi::axial(void) const {
+  inline
+  bool
+  TRGCDCDisplayRphi::axial(void) const
+  {
     return _axial;
-}
+  }
 
-inline
-bool
-TRGCDCDisplayRphi::stereo(void) const {
+  inline
+  bool
+  TRGCDCDisplayRphi::stereo(void) const
+  {
     return _stereo;
-}
+  }
 
-inline
-double
-TRGCDCDisplayRphi::scale(void) const {
+  inline
+  double
+  TRGCDCDisplayRphi::scale(void) const
+  {
     return _scaler.get_value();
-}
+  }
 
-inline
-double
-TRGCDCDisplayRphi::scale(double a) {
+  inline
+  double
+  TRGCDCDisplayRphi::scale(double a)
+  {
     _scaler.set_value(a);
     return _scaler.get_value();
-}
+  }
 
 } // namespace Belle2
 

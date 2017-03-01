@@ -24,15 +24,15 @@
 #include "trg/trg/SignalBundle.h"
 
 namespace HepGeom {
-template <class T> class Point3D;
+  template <class T> class Point3D;
 }
 
 namespace Belle2 {
 
-class TRGTime;
-class TRGClock;
-class TRGLink;
-class TRGGDL;
+  class TRGTime;
+  class TRGClock;
+  class TRGLink;
+  class TRGGDL;
 
 ///  The instance of TRGGDL is a singleton. 'TRGGDL::getTRGGDL()'
 ///  gives you a pointer to access the TRGGDL. Geometrical information
@@ -40,27 +40,27 @@ class TRGGDL;
 ///  user has to call 'update()' to initialize hit information event
 ///  by event.
 
-class TRGGDL {
+  class TRGGDL {
 
   public:
 
     /// returns TRGGDL object with specific configuration.
-    static TRGGDL * getTRGGDL(const std::string & configFile,
-			      unsigned simulationMode = 0,
-			      unsigned fastSimulationMode = 0,
-			      unsigned firmwareSimulationMode = 0);
-    
+    static TRGGDL* getTRGGDL(const std::string& configFile,
+                             unsigned simulationMode = 0,
+                             unsigned fastSimulationMode = 0,
+                             unsigned firmwareSimulationMode = 0);
+
     /// returns TRGGDL object. TRGGDL should be created with specific
     /// configuration before calling this function.
-    static TRGGDL * getTRGGDL(void);
+    static TRGGDL* getTRGGDL(void);
 
   private:
 
     /// Constructor
-    TRGGDL(const std::string & configFile,
-	   unsigned simulationMode,
-	   unsigned fastSimulationMode,
-	   unsigned firmwareSimulationMode);
+    TRGGDL(const std::string& configFile,
+           unsigned simulationMode,
+           unsigned fastSimulationMode,
+           unsigned firmwareSimulationMode);
 
     /// Destructor
     virtual ~TRGGDL();
@@ -98,7 +98,7 @@ class TRGGDL {
     unsigned firmwareSimulationMode(void) const;
 
     /// dumps debug information.
-    void dump(const std::string & message) const;
+    void dump(const std::string& message) const;
 
     /// returns debug level.
     int debugLevel(void) const;
@@ -122,21 +122,21 @@ class TRGGDL {
   public:// TRG information
 
     /// returns the system clock.
-    const TRGClock & systemClock(void) const;
+    const TRGClock& systemClock(void) const;
 
     /// returns the system offset in MC.
     double systemOffsetMC(void) const;
 
     /// Makes bit pattern(state) using input bit pattern(state).
-    static TRGState decision(const TRGState & input);
+    static TRGState decision(const TRGState& input);
 
     /// Function to simulate final trigger decision.
-    static void (* _ftd)(bool * out, bool * in);
+    static void (* _ftd)(bool* out, bool* in);
 
     /// Makes timing decision.
-    static TRGState timingDecision(const TRGState & input,
-                                   TRGState & registers,
-                                   bool & logicStillActive);
+    static TRGState timingDecision(const TRGState& input,
+                                   TRGState& registers,
+                                   bool& logicStillActive);
 
   private:
 
@@ -150,18 +150,18 @@ class TRGGDL {
     void firmwareSimulation(void);
 
     /// Read input data definition.
-    void getInput(std::ifstream & ifs);
+    void getInput(std::ifstream& ifs);
 
     /// Read output data definition.
-    void getOutput(std::ifstream & ifs);
+    void getOutput(std::ifstream& ifs);
 
     /// Read algorithm data definition.
-    void getAlgorithm(std::ifstream & ifs);
+    void getAlgorithm(std::ifstream& ifs);
 
   private:
 
     /// GDL singleton.
-    static TRGGDL * _gdl;
+    static TRGGDL* _gdl;
 
     /// Debug level.
     mutable int _debugLevel;
@@ -179,13 +179,13 @@ class TRGGDL {
     unsigned _firmwareSimulationMode;
 
     /// GDL trigger system clock.
-    const TRGClock & _clock;
+    const TRGClock& _clock;
 
     /// Timing offset of GDL.
     const double _offset;
 
     /// All serial links.
-    std::vector<TRGLink *> _links;
+    std::vector<TRGLink*> _links;
 
     /// Input names.
     std::vector<std::string> _input;
@@ -197,57 +197,63 @@ class TRGGDL {
     std::vector<std::string> _algorithm;
 
     /// Input signal bundle.
-    TRGSignalBundle * _isb;
+    TRGSignalBundle* _isb;
 
     /// Output signal bundle.
-    TRGSignalBundle * _osb;
+    TRGSignalBundle* _osb;
 
     /// Timing input signal bundle.
-    TRGSignalBundle * _tsb;
+    TRGSignalBundle* _tsb;
 
     /// Timing output signal bundle.
-    TRGSignalBundle * _tosb;
+    TRGSignalBundle* _tosb;
 
     friend class TRGGDLModule;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-int
-TRGGDL::debugLevel(void) const {
+  inline
+  int
+  TRGGDL::debugLevel(void) const
+  {
     return _debugLevel;
-}
+  }
 
-inline
-int
-TRGGDL::debugLevel(int a) const {
+  inline
+  int
+  TRGGDL::debugLevel(int a) const
+  {
     return _debugLevel = a;
-}
+  }
 
-inline
-const TRGClock &
-TRGGDL::systemClock(void) const {
+  inline
+  const TRGClock&
+  TRGGDL::systemClock(void) const
+  {
     return _clock;
-}
+  }
 
-inline
-double
-TRGGDL::systemOffsetMC(void) const {
+  inline
+  double
+  TRGGDL::systemOffsetMC(void) const
+  {
     return _offset;
-}
+  }
 
-inline
-unsigned
-TRGGDL::firmwareSimulationMode(void) const {
+  inline
+  unsigned
+  TRGGDL::firmwareSimulationMode(void) const
+  {
     return _firmwareSimulationMode;
-}
+  }
 
-inline
-std::string
-TRGGDL::configFile(void) const {
+  inline
+  std::string
+  TRGGDL::configFile(void) const
+  {
     return _configFilename;
-}
+  }
 
 
 } // namespace Belle2

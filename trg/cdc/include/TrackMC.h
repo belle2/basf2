@@ -26,11 +26,11 @@
 namespace Belle2 {
 
 /// A class to represent a GEN_HEPEVT particle in tracking.
-class TRGCDCTrackMC {
+  class TRGCDCTrackMC {
 
   public:
     /// returns a list of TRGCDCTrackMC's.
-    static std::vector<const TRGCDCTrackMC *> list(void);
+    static std::vector<const TRGCDCTrackMC*> list(void);
 
   private:
     /// updates information.
@@ -58,23 +58,23 @@ class TRGCDCTrackMC {
     int pType(void) const;
 
     /// returns a pointer to a mother.
-    const TRGCDCTrackMC * mother(void) const;
+    const TRGCDCTrackMC* mother(void) const;
 
     /// returns a pointer to i'th child.
-    const TRGCDCTrackMC * child(unsigned i) const;
+    const TRGCDCTrackMC* child(unsigned i) const;
 
     /// returns momentum vector.
-    const CLHEP::HepLorentzVector & p(void) const;
+    const CLHEP::HepLorentzVector& p(void) const;
 
     /// returns position vector.
-    const CLHEP::Hep3Vector & v(void) const;
+    const CLHEP::Hep3Vector& v(void) const;
 
     /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-              const std::string & prefix = std::string("")) const;
+    void dump(const std::string& message = std::string(""),
+              const std::string& prefix = std::string("")) const;
 
     /// returns a list of TRGCDCWireHitMC.
-    std::vector<const TRGCDCWireHitMC *> hits(void) const;
+    std::vector<const TRGCDCWireHitMC*> hits(void) const;
 
     /// returns a pointer to gen_hepevt.
 //cnv    const struct gen_hepevt * gen(void) const;
@@ -82,74 +82,82 @@ class TRGCDCTrackMC {
   public:
 
     /// Dummy particle.
-    static TRGCDCTrackMC * _undefined;
+    static TRGCDCTrackMC* _undefined;
 
   private:
 //    const struct gen_hepevt * _hep;
-    TRGCDCTrackMC * _mother;
-    std::vector<TRGCDCTrackMC *> _children;
+    TRGCDCTrackMC* _mother;
+    std::vector<TRGCDCTrackMC*> _children;
     const CLHEP::HepLorentzVector _p;
     const CLHEP::Hep3Vector _v;
-    std::vector<TRGCDCWireHitMC *> _hits;
+    std::vector<TRGCDCWireHitMC*> _hits;
 
   private:// static members
-    static std::vector<const TRGCDCTrackMC *> _list;
+    static std::vector<const TRGCDCTrackMC*> _list;
 
     friend class TRGCDC;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-unsigned
-TRGCDCTrackMC::id(void) const {
+  inline
+  unsigned
+  TRGCDCTrackMC::id(void) const
+  {
 //cnv    return _hep->m_ID - 1;
     return 0;
-}
+  }
 
-inline
-int
-TRGCDCTrackMC::status(void) const {
+  inline
+  int
+  TRGCDCTrackMC::status(void) const
+  {
 //cnv    return _hep->m_isthep;
     return 0;
-}
+  }
 
-inline
-int
-TRGCDCTrackMC::pType(void) const {
+  inline
+  int
+  TRGCDCTrackMC::pType(void) const
+  {
 //    return _hep->m_idhep;
     return 0;
-}
+  }
 
-inline
-const TRGCDCTrackMC *
-TRGCDCTrackMC::mother(void) const {
+  inline
+  const TRGCDCTrackMC*
+  TRGCDCTrackMC::mother(void) const
+  {
     return _mother;
-}
+  }
 
-inline
-const TRGCDCTrackMC *
-TRGCDCTrackMC::child(unsigned i) const {
+  inline
+  const TRGCDCTrackMC*
+  TRGCDCTrackMC::child(unsigned i) const
+  {
     return _children[i];
-}
+  }
 
-inline
-const CLHEP::HepLorentzVector &
-TRGCDCTrackMC::p(void) const {
+  inline
+  const CLHEP::HepLorentzVector&
+  TRGCDCTrackMC::p(void) const
+  {
     return _p;
-}
+  }
 
-inline
-const CLHEP::Hep3Vector &
-TRGCDCTrackMC::v(void) const {
+  inline
+  const CLHEP::Hep3Vector&
+  TRGCDCTrackMC::v(void) const
+  {
     return _v;
-}
+  }
 
-inline
-std::string
-TRGCDCTrackMC::name(void) const {
+  inline
+  std::string
+  TRGCDCTrackMC::name(void) const
+  {
     return "mc" + TRGUtilities::itostring(id());
-}
+  }
 
 } // namespace Belle2
 

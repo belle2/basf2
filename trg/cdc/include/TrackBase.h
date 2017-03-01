@@ -31,20 +31,20 @@
 
 namespace Belle2 {
 
-class TRGCDCLink;
-class TRGCDCFitter;
-class TRGCDCRelation;
+  class TRGCDCLink;
+  class TRGCDCFitter;
+  class TRGCDCRelation;
 
 /// A class to represent a track object in TRGCDC.
-class TRGCDCTrackBase {
+  class TRGCDCTrackBase {
 
   public:
 
     /// Copy constructor
-    TRGCDCTrackBase(const TRGCDCTrackBase &);
+    TRGCDCTrackBase(const TRGCDCTrackBase&);
 
     /// Constructor
-    TRGCDCTrackBase(const std::string & name, double charge);
+    TRGCDCTrackBase(const std::string& name, double charge);
 
     /// Destructor
     virtual ~TRGCDCTrackBase();
@@ -61,23 +61,23 @@ class TRGCDCTrackBase {
     double charge(void) const;
 
     /// returns momentum vector.
-    virtual const CLHEP::Hep3Vector & p(void) const;
+    virtual const CLHEP::Hep3Vector& p(void) const;
 
     /// returns Pt.
     virtual double pt(void) const;
 
     /// returns position vector.
-    virtual const CLHEP::Hep3Vector & x(void) const;
+    virtual const CLHEP::Hep3Vector& x(void) const;
 
     /// dumps debug information.
-    virtual void dump(const std::string & message = std::string(""),
-                      const std::string & prefix = std::string("")) const;
+    virtual void dump(const std::string& message = std::string(""),
+                      const std::string& prefix = std::string("")) const;
 
     /// returns a vector to track segments.
-    const std::vector<TRGCDCLink *> & links(void) const;
+    const std::vector<TRGCDCLink*>& links(void) const;
 
     /// returns a vector to track segments.
-    const std::vector<TRGCDCLink *> & links(unsigned layerId) const;
+    const std::vector<TRGCDCLink*>& links(unsigned layerId) const;
 
     /// returns true if fitted.
     bool fitted(void) const;
@@ -95,7 +95,7 @@ class TRGCDCTrackBase {
     virtual unsigned objectType(void) const;
 
     /// returns a pointer to a default fitter.
-    const TRGCDCFitter * fitter(void) const;
+    const TRGCDCFitter* fitter(void) const;
 
     /// returns MC information. False will be returned if no MC
     /// info. available.
@@ -110,13 +110,13 @@ class TRGCDCTrackBase {
   public: // Modifiers
 
     /// sets and returns name.
-    std::string name(const std::string & newName);
+    std::string name(const std::string& newName);
 
     /// appends a link.
-    void append(TRGCDCLink *);
+    void append(TRGCDCLink*);
 
     /// appends links.
-    void append(const std::vector<TRGCDCLink *> & links);
+    void append(const std::vector<TRGCDCLink*>& links);
 
     /// sets and returns charge.
     double charge(double c);
@@ -125,12 +125,12 @@ class TRGCDCTrackBase {
     virtual int fit(void);
 
     /// sets a default fitter.
-    const TRGCDCFitter * fitter(const TRGCDCFitter *);
+    const TRGCDCFitter* fitter(const TRGCDCFitter*);
 
   public: // Utility functions
 
     /// calculate closest approach. Error was happened if return value is not zero.
-    virtual int approach2D(TRGCDCLink &) const;
+    virtual int approach2D(TRGCDCLink&) const;
 
   private:
 
@@ -150,16 +150,16 @@ class TRGCDCTrackBase {
     CLHEP::Hep3Vector _x;
 
     /// Links for each super layer
-    std::vector<TRGCDCLink *> * _ts;
+    std::vector<TRGCDCLink*>* _ts;
 
     /// Links for all super layers
-    std::vector<TRGCDCLink *> _tsAll;
+    std::vector<TRGCDCLink*> _tsAll;
 
     /// Size of _ts.
     const unsigned _nTs;
 
     /// Fitter.
-    const TRGCDCFitter * _fitter;
+    const TRGCDCFitter* _fitter;
 
     /// Fitting status.
     mutable bool _fitted;
@@ -172,100 +172,115 @@ class TRGCDCTrackBase {
     friend class TRGCDCHelixFitter;
     friend class TRGCDCCircle;
     friend class TRGCDCTrack;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-std::string
-TRGCDCTrackBase::name(void) const {
+  inline
+  std::string
+  TRGCDCTrackBase::name(void) const
+  {
     return _name;
-}
+  }
 
-inline
-std::string
-TRGCDCTrackBase::name(const std::string & a) {
+  inline
+  std::string
+  TRGCDCTrackBase::name(const std::string& a)
+  {
     return _name = a;
-}
+  }
 
-inline
-int
-TRGCDCTrackBase::status(void) const {
+  inline
+  int
+  TRGCDCTrackBase::status(void) const
+  {
     return _status;
-}
+  }
 
-inline
-const CLHEP::Hep3Vector &
-TRGCDCTrackBase::p(void) const {
+  inline
+  const CLHEP::Hep3Vector&
+  TRGCDCTrackBase::p(void) const
+  {
     return _p;
-}
+  }
 
-inline
-const CLHEP::Hep3Vector &
-TRGCDCTrackBase::x(void) const {
+  inline
+  const CLHEP::Hep3Vector&
+  TRGCDCTrackBase::x(void) const
+  {
     return _x;
-}
+  }
 
-inline
-double
-TRGCDCTrackBase::pt(void) const {
+  inline
+  double
+  TRGCDCTrackBase::pt(void) const
+  {
     return _p.perp();
-}
+  }
 
-inline
-bool
-TRGCDCTrackBase::fitted(void) const {
+  inline
+  bool
+  TRGCDCTrackBase::fitted(void) const
+  {
     return _fitted;
-}
+  }
 
-inline
-void
-TRGCDCTrackBase::setFitted(bool fitted){
-  _fitted = fitted;
-}
+  inline
+  void
+  TRGCDCTrackBase::setFitted(bool fitted)
+  {
+    _fitted = fitted;
+  }
 
-inline
-unsigned
-TRGCDCTrackBase::objectType(void) const {
+  inline
+  unsigned
+  TRGCDCTrackBase::objectType(void) const
+  {
     return TRGCDCTrackBaseType;
-}
+  }
 
-inline
-double
-TRGCDCTrackBase::charge(void) const {
+  inline
+  double
+  TRGCDCTrackBase::charge(void) const
+  {
     return _charge;
-}
+  }
 
-inline
-double
-TRGCDCTrackBase::charge(double a) {
+  inline
+  double
+  TRGCDCTrackBase::charge(double a)
+  {
     return _charge = a;
-}
+  }
 
-inline
-const TRGCDCFitter *
-TRGCDCTrackBase::fitter(void) const {
+  inline
+  const TRGCDCFitter*
+  TRGCDCTrackBase::fitter(void) const
+  {
     return _fitter;
-}
+  }
 
-inline
-const TRGCDCFitter *
-TRGCDCTrackBase::fitter(const TRGCDCFitter * a) {
+  inline
+  const TRGCDCFitter*
+  TRGCDCTrackBase::fitter(const TRGCDCFitter* a)
+  {
     _fitted = false;
     return _fitter = a;
-}
+  }
 
-inline
-void 
-TRGCDCTrackBase::setTrackID(int trackID) {
-  m_trackID = trackID;
-}
+  inline
+  void
+  TRGCDCTrackBase::setTrackID(int trackID)
+  {
+    m_trackID = trackID;
+  }
 
-inline
-int
-TRGCDCTrackBase::getTrackID() {
-  return m_trackID;
-}
+  inline
+  int
+  TRGCDCTrackBase::getTrackID()
+  {
+    return m_trackID;
+  }
 
 } // namespace Belle2
 

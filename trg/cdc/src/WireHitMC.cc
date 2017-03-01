@@ -15,14 +15,16 @@
 
 namespace Belle2 {
 
-TRGCDCWireHitMC::TRGCDCWireHitMC(const TRGCDCWire * w,
-                             const TRGCDCWireHit * wh)
-: _wire(w),
-  _hit(wh) {
-}
+  TRGCDCWireHitMC::TRGCDCWireHitMC(const TRGCDCWire* w,
+                                   const TRGCDCWireHit* wh)
+    : _wire(w),
+      _hit(wh)
+  {
+  }
 
-TRGCDCWireHitMC::~TRGCDCWireHitMC() {
-}
+  TRGCDCWireHitMC::~TRGCDCWireHitMC()
+  {
+  }
 
 } // namespace Belle2
 

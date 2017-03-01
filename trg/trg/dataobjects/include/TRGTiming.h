@@ -38,7 +38,8 @@ namespace Belle2 {
 
     /*! constructor: xxx */
     TRGTiming(unsigned int ID,
-              unsigned int timing) {
+              unsigned int timing)
+    {
       m_ID = ID;
       m_timing = timing;
     }
@@ -55,14 +56,16 @@ namespace Belle2 {
     /*! get trigger bit ID
      * @return     trigger bit ID
      */
-    unsigned int getID() const {
+    unsigned int getID() const
+    {
       return m_ID;
     }
 
     /*! get trigger timing
      * @return    trigger timing
      */
-    unsigned int getTiming() const {
+    unsigned int getTiming() const
+    {
       return m_timing;
     }
 

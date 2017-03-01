@@ -43,9 +43,9 @@ NeuroTriggerModule::NeuroTriggerModule() : Module()
            "Switch to turn on fixed point arithmetic for FPGA simulation.",
            false);
   addParam("precision", m_precision,
-           "fixed point precision in bit after radix point (for track curvature, "
-           "track phi, crossing angle, reference id, scaling factor, MLP nodes, "
-           "MLP weights, MLP activation function)", {14, 12, 12, 8, 8, 12, 10, 10});
+           "fixed point precision in bit after radix point (for track phi, "
+           "scaling factor, reference id, MLP nodes, MLP weights, "
+           "MLP activation function)", {12, 8, 8, 12, 10, 10});
 }
 
 

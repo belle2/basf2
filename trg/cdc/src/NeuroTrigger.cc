@@ -346,20 +346,19 @@ NeuroTrigger::updateTrack(const CDCTriggerTrack& track)
 void
 NeuroTrigger::updateTrackFix(const CDCTriggerTrack& track)
 {
-  unsigned precisionOmega = m_precision[0];
-  unsigned precisionPhi = m_precision[1];
-  unsigned precisionAlpha = m_precision[2];
-  unsigned precisionId = m_precision[3];
-  unsigned precisionScale = m_precision[4];
+  unsigned precisionPhi = m_precision[0];
+  unsigned precisionAlpha = m_precision[0];
+  unsigned precisionScale = m_precision[1];
+  unsigned precisionId = m_precision[2];
 
-  long omega = round(track.getOmega() * (1 << precisionOmega));
+  double omega = track.getOmega();
   long phi = round(track.getPhi0() * (1 << precisionPhi));
   for (int iSL = 0; iSL < 9; ++iSL) {
     for (int priority = 0; priority < 2; ++priority) {
       // LUT, calculated on the fly here
       m_alpha[iSL][priority] =
-        (m_radius[iSL][priority] * abs(omega) < (2 << precisionOmega)) ?
-        round(asin(m_radius[iSL][priority] * omega / (2 << precisionOmega)) * (1 << precisionAlpha)) :
+        (m_radius[iSL][priority] * abs(omega) < 2) ?
+        round(asin(m_radius[iSL][priority] * omega / 2) * (1 << precisionAlpha)) :
         round(M_PI_2 * (1 << precisionAlpha));
       long dphi = (precisionAlpha >= precisionPhi) ?
                   phi - (long(m_alpha[iSL][priority]) >> (precisionAlpha - precisionPhi)) :
@@ -630,10 +629,10 @@ NeuroTrigger::runMLP(unsigned isector, vector<float> input)
 vector<float>
 NeuroTrigger::runMLPFix(unsigned isector, vector<float> input)
 {
-  unsigned precisionInput = m_precision[5];
-  unsigned precisionWeights = m_precision[6];
-  unsigned precisionLUT = m_precision[7];
-  unsigned precisionTanh = m_precision[5];
+  unsigned precisionInput = m_precision[3];
+  unsigned precisionWeights = m_precision[4];
+  unsigned precisionLUT = m_precision[5];
+  unsigned precisionTanh = m_precision[3];
   unsigned dp = precisionInput + precisionWeights - precisionLUT;
 
   const CDCTriggerMLP& expert = m_MLPs[isector];

@@ -340,7 +340,7 @@ namespace Belle2 {
       return;
     }
 
-    void GeoPXDCreator::createGeometry(const PXDGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
+    void GeoPXDCreator::createGeometry(const PXDGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes)
     {
 
       m_activeStepSize = parameters.getGlobalParams().getActiveStepSize() / Unit::mm;

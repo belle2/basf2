@@ -104,8 +104,6 @@ B2Vector3D BFieldComponentRadial::calculate(const B2Vector3D& point) const
   int ir = static_cast<int>(wr);
   int iz = static_cast<int>(wz);
 
-#define NEWEKLMINTERPOLATION
-#ifdef NEWEKLMINTERPOLATION
   double za = z - m_mapOffset;
   double dz_eklm = abs(za) - (m_endyokeZMin - m_gapHeight);
   if (dz_eklm > 0 && r > m_slotRMin) {
@@ -132,7 +130,6 @@ B2Vector3D BFieldComponentRadial::calculate(const B2Vector3D& point) const
       iz += (za > 0) ? idz : -idz;
     }
   }
-#endif
 
   //Bring the index values within the range
   ir = min(m_mapSize[0] - 2, ir);
@@ -140,23 +137,6 @@ B2Vector3D BFieldComponentRadial::calculate(const B2Vector3D& point) const
 
   wr -= ir;
   wz -= iz;
-
-#ifndef NEWEKLMINTERPOLATION
-  double za = z - m_mapOffset;
-  double dz_eklm = abs(za) - (m_endyokeZMin - m_gapHeight);
-  if (r > m_slotRMin && dz_eklm > 0 && wz != 0 && wz != 1) {
-    int layer = static_cast<int>(dz_eklm * m_iLayer);
-    if (layer <= 14) {
-      double ddz = dz_eklm - m_Layer * layer;
-      if (r - m_slotRMin < m_gridPitchR && ddz < m_gapHeight) wr = 1;
-      if (ddz < m_gridPitchZ || (ddz >= m_gapHeight && ddz - m_gapHeight < m_gridPitchZ)) {
-        wz = z > 0;
-      } else if (m_Layer - ddz < m_gridPitchZ || (ddz < m_gapHeight && m_gapHeight - ddz < m_gridPitchZ)) {
-        wz = z < 0;
-      }
-    }
-  }
-#endif
 
   double wz0 = 1 - wz, wr0 = 1 - wr;
   //Calculate the linear approx. of the magnetic field vector

@@ -279,7 +279,7 @@ namespace Belle2 {
       return svdGeometryPar;
     }
 
-    void GeoSVDCreator::createGeometry(const SVDGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
+    void GeoSVDCreator::createGeometry(const SVDGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes)
     {
 
       m_activeStepSize = parameters.getGlobalParams().getActiveStepSize() / Unit::mm;

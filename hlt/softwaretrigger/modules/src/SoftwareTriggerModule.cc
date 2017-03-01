@@ -116,6 +116,8 @@ void SoftwareTriggerModule::initializeCalculation()
     m_calculation.reset(new FastRecoCalculator());
   } else if (m_param_baseIdentifier == "hlt") {
     m_calculation.reset(new HLTCalculator());
+  } else if (m_param_baseIdentifier == "testbeam") {
+    m_calculation.reset(new TestbeamCalculator());
   } else if (m_param_baseIdentifier == "calib") {
     m_calculation.reset(new CalibSampleCalculator(m_particlename, m_extrainfoname));
   } else {

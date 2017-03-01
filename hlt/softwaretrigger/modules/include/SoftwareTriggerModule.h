@@ -5,6 +5,7 @@
 #include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
 #include <hlt/softwaretrigger/calculations/FastRecoCalculator.h>
 #include <hlt/softwaretrigger/calculations/HLTCalculator.h>
+#include <hlt/softwaretrigger/calculations/TestbeamCalculator.h>
 #include <hlt/softwaretrigger/calculations/CalibSampleCalculator.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>

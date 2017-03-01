@@ -1502,7 +1502,7 @@ def printROEInfo(
     path.add_module(printMask)
 
 
-def buildContinuumSuppression(list_name, path=analysis_main):
+def buildContinuumSuppression(list_name, roe_mask, path=analysis_main):
     """
     Creates for each Particle in the given ParticleList a ContinuumSuppression
     dataobject and makes BASF2 relation between them.
@@ -1514,6 +1514,7 @@ def buildContinuumSuppression(list_name, path=analysis_main):
     qqBuilder = register_module('ContinuumSuppressionBuilder')
     qqBuilder.set_name('QQBuilder_' + list_name)
     qqBuilder.param('particleList', list_name)
+    qqBuilder.param('ROEMask', roe_mask)
     path.add_module(qqBuilder)
 
 

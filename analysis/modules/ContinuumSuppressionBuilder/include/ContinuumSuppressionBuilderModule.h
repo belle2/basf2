@@ -13,6 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/RestOfEvent.h>
 
 #include <string>
 #include <vector>
@@ -42,9 +43,7 @@ namespace Belle2 {
   private:
 
     std::string m_particleList;  /**< Name of the ParticleList */
-
-    // TODO: add a parameter to select use_finalstate_for_sig==0 or ==1.
-    // std::vector<std::string> m_finalStateForSignalSelection;
+    std::string m_ROEMask;  /**< ROE mask */
 
     /**
      * for debugging purposes

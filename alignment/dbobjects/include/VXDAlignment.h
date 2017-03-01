@@ -11,7 +11,6 @@
 #pragma once
 
 #include <calibration/DBObjCalibrationConstMapBase.h>
-#include <vxd/dataobjects/VxdID.h>
 
 namespace Belle2 {
   /// VXD alignment (and maybe some calibration) parameters

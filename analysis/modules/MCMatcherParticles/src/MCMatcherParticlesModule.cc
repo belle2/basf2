@@ -152,6 +152,17 @@ namespace Belle2 {
     }
                         );
 
+    // No common mother found, all daughters have no associated MC Particle
+    if (commonMother == std::end(motherCount)) {
+      Particle* thisParticle = particles[particle->getArrayIndex()];
+      thisParticle->addExtraInfo("looseMCMotherPDG",   -1);
+      thisParticle->addExtraInfo("looseMCMotherIndex", -1);
+      thisParticle->addExtraInfo("looseMCWrongDaughterN", -1);
+      thisParticle->addExtraInfo("looseMCWrongDaughterPDG", -1);
+      thisParticle->addExtraInfo("looseMCWrongDaughterBiB", -1);
+      return;
+    }
+
     const MCParticle* mcMother = mcParticles[commonMother->first - 1];
 
     Particle* thisParticle = particles[particle->getArrayIndex()];

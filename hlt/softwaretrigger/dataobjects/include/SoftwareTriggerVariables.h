@@ -39,6 +39,18 @@ namespace Belle2 {
         return m_results;
       }
 
+      /// Get just one value from the map.
+      double getVariable(std::string identifier) const
+      {
+        return m_results.at(identifier);
+      }
+
+      /// Returns true if indentifier is in the map of trigger variables
+      bool has(std::string identifier) const
+      {
+        return m_results.count(identifier) > 0;
+      }
+
       /// Clear all results.
       void clear()
       {

@@ -71,16 +71,16 @@ namespace {
 
           TString name = "Experiment ";
           name += experiment;
-          query.push_back(Database::DBQuery("dbstore", "TNamed", new TNamed(name, name), iov));
+          query.push_back(Database::DBQuery("TNamed", new TNamed(name, name), iov));
 
           new(array[experiment - 1]) TObject;
           array[experiment - 1]->SetUniqueID(experiment);
-          Database::Instance().storeData("dbstore", "TObjects", &array, iov);
+          Database::Instance().storeData("TObjects", &array, iov);
 
           FILE* f = fopen("file.xml", "w");
           fprintf(f, "Experiment %d\n", experiment);
           fclose(f);
-          Database::Instance().addPayload("dbstore", "file.xml", "file.xml", iov);
+          Database::Instance().addPayload("file.xml", "file.xml", iov);
         }
         if (m_dbType != c_chain) {
           Database::Instance().storeData(query);
@@ -90,9 +90,9 @@ namespace {
         intraRunDep.add(10, new TNamed("B", "B"));
         intraRunDep.add(50, new TNamed("C", "C"));
         IntervalOfValidity iov1(1, 1, 1, 1);
-        Database::Instance().storeData("dbstore", "IntraRun", &intraRunDep, iov1);
+        Database::Instance().storeData("IntraRun", &intraRunDep, iov1);
         IntervalOfValidity iov2(1, 2, 1, -1);
-        Database::Instance().storeData("dbstore", "IntraRun", new TNamed("X", "X"), iov2);
+        Database::Instance().storeData("IntraRun", new TNamed("X", "X"), iov2);
       }
     }
 

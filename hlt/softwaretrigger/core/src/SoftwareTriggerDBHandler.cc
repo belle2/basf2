@@ -20,8 +20,8 @@ namespace Belle2 {
       for (auto& databaseCutEntry : m_databaseObjects) {
         if (databaseCutEntry.hasChanged()) {
           B2ASSERT("The name of the database entry changed! This is not handled properly by the module.",
-                   m_cutsWithIdentifier.find(databaseCutEntry.getModule()) != m_cutsWithIdentifier.end());
-          m_cutsWithIdentifier[databaseCutEntry.getModule()] = databaseCutEntry->getCut();
+                   m_cutsWithIdentifier.find(databaseCutEntry.getName()) != m_cutsWithIdentifier.end());
+          m_cutsWithIdentifier[databaseCutEntry.getName()] = databaseCutEntry->getCut();
         }
       }
     }

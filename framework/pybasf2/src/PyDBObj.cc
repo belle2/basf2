@@ -37,7 +37,7 @@ PyDBObj::PyDBObj(const std::string& name): PyDBObj(name, getDefaultClass(name)) 
 
 PyDBObj::PyDBObj(const TClass* objClass): PyDBObj(DataStore::defaultObjectName(objClass), objClass) {}
 
-PyDBObj::PyDBObj(const std::string& name, const TClass* objClass): DBAccessorBase("dbstore", name, objClass, false)
+PyDBObj::PyDBObj(const std::string& name, const TClass* objClass): DBAccessorBase(name, objClass, false)
 {
   m_object = reinterpret_cast<TObject**>(&m_entry->object);
 }

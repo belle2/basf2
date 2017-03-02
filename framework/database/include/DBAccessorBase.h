@@ -18,9 +18,7 @@ class TClass;
 
 namespace Belle2 {
 
-  /**
-   * Base class for DBObjPtr and DBArray for easier common treatment.
-   */
+  /** Base class for DBObjPtr and DBArray for easier common treatment. */
   class DBAccessorBase {
   public:
 
@@ -30,12 +28,11 @@ namespace Belle2 {
      * @param objClass   The type of the object.
      * @param isArray    Flag that indicates whether this is a single object or a TClonesArray.
      */
-    DBAccessorBase(const std::string& package,
-                   const std::string& module,
+    DBAccessorBase(const std::string& name,
                    const TClass* objClass,
                    bool isArray) : m_ptr(0)
     {
-      m_entry = DBStore::Instance().getEntry(package, module, objClass, isArray);
+      m_entry = DBStore::Instance().getEntry(name, objClass, isArray);
       m_iov = m_entry->iov;
     };
 
@@ -45,20 +42,8 @@ namespace Belle2 {
      */
     virtual ~DBAccessorBase() {};
 
-    /**
-     * Return package name under which the object is saved in the DBStore.
-     */
-    const std::string& getPackage() const { return m_entry->package; }
-
-    /**
-     * Return module name under which the object is saved in the DBStore.
-     */
-    const std::string& getModule() const { return m_entry->module; }
-
-    /**
-     * Return package + module name under which the object is saved in the DBStore.
-     */
-    std::string getName() const { return getPackage() + "/" + getModule(); }
+    /** Return name under which the object is saved in the DBStore. */
+    const std::string& getName() const { return m_entry->name; }
 
     /**
      * Check whether a valid object was obtained from the database.
@@ -68,25 +53,19 @@ namespace Belle2 {
 
     inline operator bool()  const {return isValid();}   /**< Imitate pointer functionality. */
 
-    /**
-     * Check if two store accessors point to the same object/array.
-     */
+    /** Check if two store accessors point to the same object/array. */
     virtual bool operator==(const DBAccessorBase& other) const
     {
-      return getPackage() == other.getPackage() && getModule() == other.getModule();
+      return getName() == other.getName();
     }
 
-    /**
-     * Check if two store accessors point to a different object/array.
-     */
+    /** Check if two store accessors point to a different object/array. */
     virtual bool operator!=(const DBAccessorBase& other) const
     {
       return !(*this == other);
     }
 
-    /**
-     * Check whether the object has changed since the last call to hasChanged  of the accessor).
-     */
+    /** Check whether the object has changed since the last call to hasChanged  of the accessor). */
     bool hasChanged()
     {
       bool result = ((m_iov != m_entry->iov) || (m_ptr != m_entry->object));
@@ -103,7 +82,7 @@ namespace Belle2 {
      */
     void addCallback(void(*callback)())
     {
-      DBStore::Instance().addCallback(m_entry->package, m_entry->module, callback, std::make_pair(reinterpret_cast<void*>(callback),
+      DBStore::Instance().addCallback(m_entry->name, callback, std::make_pair(reinterpret_cast<void*>(callback),
                                       nullptr));
     }
 
@@ -118,7 +97,7 @@ namespace Belle2 {
     {
       union {void(T::*callback)(); void* pointer;} tmp;
       tmp.callback = callback;
-      DBStore::Instance().addCallback(m_entry->package, m_entry->module, std::bind(std::mem_fn(callback), object),
+      DBStore::Instance().addCallback(m_entry->name, std::bind(std::mem_fn(callback), object),
                                       std::make_pair(tmp.pointer, object));
     }
 

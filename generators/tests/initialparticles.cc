@@ -54,7 +54,7 @@ namespace {
   TEST_F(InitialParticleGenerationTests, TestCMSGeneration)
   {
     beamparams.setGenerationFlags(BeamParameters::c_generateCMS);
-    DBStore::Instance().addConstantOverride("dbstore", "BeamParameters", new BeamParameters(beamparams));
+    DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
     auto initialCMS = generator.generate();
     // transformation should be identity
     EXPECT_EQ(initialCMS.getLabToCMS(), TLorentzRotation());
@@ -69,7 +69,7 @@ namespace {
 
     // and now compare it to generation in Lab
     beamparams.setGenerationFlags(0);
-    DBStore::Instance().addConstantOverride("dbstore", "BeamParameters", new BeamParameters(beamparams));
+    DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
     auto initialLAB = generator.generate();
     // same invariant mass
     EXPECT_EQ(initialLAB.getMass(), beamparams.getMass());
@@ -90,7 +90,7 @@ namespace {
     beamparams.setHER(10, 0, {0.01});
     beamparams.setLER(10, M_PI, {0});
     beamparams.setGenerationFlags(BeamParameters::c_smearBeamEnergy);
-    DBStore::Instance().addConstantOverride("dbstore", "BeamParameters", new BeamParameters(beamparams));
+    DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
 
     // so let's generate events with this and store all invariant masses
     {
@@ -108,7 +108,7 @@ namespace {
     // uncertainty on both so result should be sqrt(a^2 + b^2) = sqrt(2) * 0.1
     beamparams.setLER(10, M_PI, {0.01});
     beamparams.setGenerationFlags(BeamParameters::c_smearBeamEnergy);
-    DBStore::Instance().addConstantOverride("dbstore", "BeamParameters", new BeamParameters(beamparams));
+    DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
     {
       CalcMeanCov<1> mean;
       for (int i = 0; i < 100000; ++i) {
@@ -128,7 +128,7 @@ namespace {
   TEST_F(InitialParticleGenerationTests, TestVertexSmear)
   {
     beamparams.setGenerationFlags(BeamParameters::c_smearVertex);
-    DBStore::Instance().addConstantOverride("dbstore", "BeamParameters", new BeamParameters(beamparams));
+    DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
 
     CalcMeanCov<3> mean;
     for (int i = 0; i < 100000; ++i) {
@@ -159,7 +159,7 @@ namespace {
     for (int flag = 0; flag <= BeamParameters::c_smearALL; ++flag) {
       // set the flag and overwrite dbstore
       beamparams.setGenerationFlags(flag);
-      DBStore::Instance().addConstantOverride("dbstore", "BeamParameters", new BeamParameters(beamparams));
+      DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
       // rememeber last event and set it to the settings for initialization
       MCInitialParticles last = beamparams;
       // no generate a few events and check everything

@@ -81,7 +81,7 @@ Database::~Database() {}
 void Database::getData(const EventMetaData& event, std::list<DBQuery>& query)
 {
   for (auto& entry : query) {
-    auto objectIov = getData(event, entry.package, entry.module);
+    auto objectIov = getData(event, entry.name);
     entry.object = objectIov.first;
     entry.iov = objectIov.second;
   }
@@ -91,27 +91,27 @@ bool Database::storeData(std::list<DBQuery>& query)
 {
   bool result = true;
   for (auto& entry : query) {
-    result = result && storeData(entry.package, entry.module, entry.object, entry.iov);
+    result = result && storeData(entry.name, entry.object, entry.iov);
   }
   return result;
 }
 
 
-std::string Database::payloadFileName(const std::string& path, const std::string& package, const std::string& module,
+std::string Database::payloadFileName(const std::string& path, const std::string& name,
                                       int revision) const
 {
-  std::string result = package + "_" + module;
+  std::string result = "dbstore_" + name;
   if (revision > 0) result += "_rev_" + std::to_string(revision);
   result += ".root";
   if (!path.empty()) result = path + "/" + result;
   return result;
 }
 
-TObject* Database::readPayload(const std::string& fileName, const std::string& module) const
+TObject* Database::readPayload(const std::string& fileName, const std::string& name) const
 {
   TObject* result = 0;
 
-  if (module.find(".") != std::string::npos) {
+  if (name.find(".") != std::string::npos) {
     return new PayloadFile(fileName);
   }
 
@@ -124,16 +124,16 @@ TObject* Database::readPayload(const std::string& fileName, const std::string& m
     return result;
   }
 
-  result = file->Get(module.c_str());
+  result = file->Get(name.c_str());
   delete file;
   if (!result) {
-    B2ERROR("Failed to get " << module  << " from payload file" << fileName << ".");
+    B2ERROR("Failed to get " << name << " from payload file" << fileName << ".");
   }
 
   return result;
 }
 
-bool Database::writePayload(const std::string& fileName, const std::string& module, const TObject* object,
+bool Database::writePayload(const std::string& fileName, const std::string& name, const TObject* object,
                             const IntervalOfValidity* iov) const
 {
   TDirectory* saveDir = gDirectory;
@@ -145,7 +145,7 @@ bool Database::writePayload(const std::string& fileName, const std::string& modu
     return false;
   }
 
-  object->Write(module.c_str(), TObject::kSingleKey);
+  object->Write(name.c_str(), TObject::kSingleKey);
   if (iov) file->WriteObject(iov, "IoV");
 
   file->Close();

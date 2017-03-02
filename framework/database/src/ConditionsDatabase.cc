@@ -65,8 +65,7 @@ ConditionsDatabase::ConditionsDatabase(const std::string& globalTag, const std::
 ConditionsDatabase::~ConditionsDatabase() {}
 
 
-pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaData& event, const string& package,
-    const std::string& module)
+pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaData& event, const string& name)
 {
   //create session to reuse connection if there is none
   ConditionsPayloadDownloader::SessionGuard session(*m_downloader);
@@ -80,27 +79,27 @@ pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaDa
     m_downloader->update(m_globalTag, m_currentExperiment, m_currentRun);
   }
 
-  if (!m_downloader->exists(module)) {
+  if (!m_downloader->exists(name)) {
     if (!m_invertLogging)
-      B2LOG(m_logLevel, 0, "No payload " << module << " found in the conditions database for global tag "
+      B2LOG(m_logLevel, 0, "No payload " << name << " found in the conditions database for global tag "
             << m_globalTag << ".");
     return result;
   }
 
-  const auto& info = m_downloader->get(module);
+  const auto& info = m_downloader->get(name);
 
   if (info.filename.empty()) {
-    B2ERROR("Failed to get " << module << " from conditions database.");
+    B2ERROR("Failed to get " << name << " from conditions database.");
     return result;
   }
 
-  result.first = readPayload(info.filename, module);
+  result.first = readPayload(info.filename, name);
   if (!result.first) return result;
 
   result.second = info.iov;
 
   if (m_invertLogging)
-    B2LOG(m_logLevel, 0, "payload " << module << " found in the conditions database for global tag "
+    B2LOG(m_logLevel, 0, "payload " << name << " found in the conditions database for global tag "
           << m_globalTag << ". IoV=" << info.iov);
 
   // Update database local cache file but only if payload is found in m_payloadDir
@@ -109,7 +108,7 @@ pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaDa
   }
 
   std::stringstream buffer;
-  buffer << package << "/" << module << " " << info.revision << " " << result.second;
+  buffer << "dbstore/" << name << " " << info.revision << " " << result.second;
   std::string entry = buffer.str();
   std::string cacheFile = m_payloadDir + "/dbcache.txt";
 
@@ -137,16 +136,14 @@ pair<TObject*, IntervalOfValidity> ConditionsDatabase::getData(const EventMetaDa
   return result;
 }
 
-bool ConditionsDatabase::storeData(__attribute((unused)) const std::string& package,
-                                   __attribute((unused)) const std::string& module,
+bool ConditionsDatabase::storeData(__attribute((unused)) const std::string& name,
                                    __attribute((unused)) TObject* object,
                                    __attribute((unused)) const IntervalOfValidity& iov)
 {
   return false; // not implemented yet
 }
 
-bool ConditionsDatabase::addPayload(__attribute((unused)) const std::string& package,
-                                    __attribute((unused)) const std::string& module,
+bool ConditionsDatabase::addPayload(__attribute((unused)) const std::string& name,
                                     __attribute((unused)) const std::string& fileName,
                                     __attribute((unused)) const IntervalOfValidity&)
 {

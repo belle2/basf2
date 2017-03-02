@@ -15,7 +15,8 @@ dataType = 'on_resonance'
 belleLevel = 'caseB'
 
 yourWorkingDirectoryPath = '.'
-subLogDir = '/analysisLog/'
+subLogDir = yourWorkingDirectoryPath + '/analysisLog/'
+lookUpTablePath = yourWorkingDirectoryPath + '/belleMClookUpTable.txt'
 
 # the job we are submitting
 myCmd = yourWorkingDirectoryPath + '/analysisJob.sh'
@@ -24,11 +25,9 @@ myCmd = yourWorkingDirectoryPath + '/analysisJob.sh'
 
 for eventType in ['evtgen-charged', 'evtgen-mixed']:
 
-    # =================================== Log files ================================
-
     print('Cleaning log dir ..')
     # path where we want to store the log files
-    logDir = yourWorkingDirectoryPath + subLogDir + eventType
+    logDir = subLogDir + eventType
 
     if os.path.exists(logDir):
         # clean up log dir before jobs, so only relevant files are saved
@@ -38,12 +37,8 @@ for eventType in ['evtgen-charged', 'evtgen-mixed']:
 # ================================= Submit jobs ! ==============================
 print('Jobs submission ..')
 
-# look up table path
-txtFile =\
-    yourWorkingDirectoryPath + '/belleMClookUpTable.txt'
-
 # open look up table
-with open(txtFile) as f:
+with open(lookUpTablePath) as f:
     reader = csv.reader(f, delimiter='\t')
 
     # for each line of the txt file submit a job

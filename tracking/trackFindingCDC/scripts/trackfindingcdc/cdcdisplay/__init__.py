@@ -834,7 +834,7 @@ class CDCSVGDisplayModule(basf2.Module):
         # Draw the RecoTracks
         if self.draw_recotracks:
             if self.use_cpp:
-                cppplotter.drawRecoTracks(self.reco_tracks_store_array_name, 'ListColors', '')
+                cppplotter.drawRecoTracks(self.reco_tracks_store_array_name, '', '')
             if self.use_python:
                 styleDict = {'stroke': attributemaps.listColors}
                 plotter.draw_storearray(self.reco_tracks_store_array_name, **styleDict)

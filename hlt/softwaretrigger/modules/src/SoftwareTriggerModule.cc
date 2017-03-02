@@ -62,7 +62,8 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPo
   addParam("calibParticleListName", m_particlename, "the name list of particle for the calibration and dqm",
            std::vector<std::string>());
 
-  addParam("calibExtraInfoName", m_extrainfoname, "the variable name list that attched to the particles", std::vector<std::string>());
+  addParam("calibExtraInfoName", m_extrainfoname, "the variable name list that attached to the particles",
+           std::vector<std::string>());
 }
 
 void SoftwareTriggerModule::initialize()

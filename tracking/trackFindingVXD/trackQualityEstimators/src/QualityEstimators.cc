@@ -54,7 +54,8 @@ std::pair<TVector3, int> QualityEstimators::calcMomentumSeed(bool useBackwards, 
 
   std::pair<double, TVector3> fitResults;
   try {
-    fitResults = helixFit(m_hits, useBackwards, setMomentumMagnitude);
+    fitResults = riemannHelixFit(m_hits);
+    // fitResults = helixFit(m_hits, useBackwards, setMomentumMagnitude);
   } catch (FilterExceptions::Straight_Line& anException) {
     B2DEBUG(1, "Exception caught: QualityEstimators::calcMomentumSeed - helixFit said: " << anException.what());
     try {
@@ -548,6 +549,8 @@ std::pair<double, TVector3> QualityEstimators::riemannHelixFit(const std::vector
   Precision chi2_z = ((Z - p(0) * ones - p(1) * arc_lengths).cwiseQuotient(Wz * ones)).transpose() * ((Z - p(0) * ones - p(
                        1) * arc_lengths).cwiseQuotient(Wz * ones));
 
+  std::cout << "Chi Squared of Riemann z-component fit = " << chi2_z << std::endl;
+
   Precision pZ = pT * p(1);
   momVec(2) = - pZ;
 
@@ -855,14 +858,6 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
 
   TMatrixD p = AtGAInv * AtG * zValues; // fitted z value in the first point, tan(lambda)
   if (lambdaCheckMatrix4NAN(p) == true) { B2DEBUG(10, "helixFit: p got 'nan'-entries!"); }
-
-  TMatrixD TAtG = AtG;
-  TAtG.T();
-  TMatrixD zValuesT = zValues;
-  zValuesT.T();
-
-  TMatrixD sigma2M = zValuesT * (TAtG * AtGAInv * AtG) * zValues;
-  double sigma2 = sigma2M(0, 0) / (nHits - 2);
 
   double thetaVal = (M_PI * 0.5 - atan(p(1, 0)));
 

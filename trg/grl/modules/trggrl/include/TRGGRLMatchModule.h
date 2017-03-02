@@ -52,7 +52,7 @@ namespace Belle2 {
     virtual void terminate();
 
     /**calculate dr and dz between track and cluster*/
-    void calculationdistance(CDCTriggerTrack* track, TRGECLCluster* cluster, int _match3D);
+    void calculationdistance(CDCTriggerTrack* track, TRGECLCluster* cluster, double* ds, int _match3D);
 
   private:
     /**max value of dr to be identified as match*/
@@ -66,9 +66,9 @@ namespace Belle2 {
     /**the ecl cluster list*/
     std::string m_clusterlist;
     /**the distance in phi direction between track and cluster*/
-    double m_dr;
+    //double m_dr;
     /**the distance in z direction between track and cluster*/
-    double m_dz;
+    //double m_dz;
     /**the matched 2d track list*/
     std::string m_2dmatch_tracklist;
     /**the matched 3d track list*/

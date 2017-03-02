@@ -77,16 +77,18 @@ void TRGGRLMatchModule::initialize()
   clusterslist.isRequired();
   clusterslist.registerRelationTo(track2Dlist);
   clusterslist.registerRelationTo(track3Dlist);
+  track2Dlist.registerRelationTo(clusterslist);
+  track3Dlist.registerRelationTo(clusterslist);
 
   StoreArray<TRGGRLMATCH>::registerPersistent(m_2dmatch_tracklist);
   StoreArray<TRGGRLMATCH>::registerPersistent(m_3dmatch_tracklist);
 
-  StoreArray<TRGGRLMATCH> MatchArray2D(m_2dmatch_tracklist);
-  MatchArray2D.registerRelationTo(clusterslist);
-  MatchArray2D.registerRelationTo(track2Dlist);
-  StoreArray<TRGGRLMATCH> MatchArray3D(m_3dmatch_tracklist);
-  MatchArray3D.registerRelationTo(clusterslist);
-  MatchArray3D.registerRelationTo(track3Dlist);
+  StoreArray<TRGGRLMATCH> track2Dmatch(m_2dmatch_tracklist);
+  track2Dmatch.registerRelationTo(clusterslist);
+  track2Dmatch.registerRelationTo(track2Dlist);
+  StoreArray<TRGGRLMATCH> track3Dmatch(m_3dmatch_tracklist);
+  track3Dmatch.registerRelationTo(clusterslist);
+  track3Dmatch.registerRelationTo(track3Dlist);
 
 
 
@@ -110,15 +112,16 @@ void TRGGRLMatchModule::event()
 
     double dr_tmp = 99999.;
     int cluster_ind = -1;
-    for (int j = 0; j < clusterlist; j++) {
-      calculationdistance(track2Dlist[i], clusterlist[j], 0);
-      if (dr_tmp < m_dr) {
-        dr_tmp = m_dr;
+    for (int j = 0; j < clusterlist.getEntries(); j++) {
+      double ds_ct[2] = {99999., 99999.};
+      calculationdistance(track2Dlist[i], clusterlist[j], ds_ct, 0);
+      if (dr_tmp > ds_ct[0]) {
+        dr_tmp = ds_ct[0];
         cluster_ind = j;
       }
     }
 
-    if (dr_tmp < m_dr_threshold) {
+    if (dr_tmp < m_dr_threshold && cluster_ind != -1) {
       TRGGRLMATCH* mat2d = track2Dmatch.appendNew();
       mat2d->setDeltaR(dr_tmp);
       mat2d->addRelationTo(track2Dlist[i]);
@@ -134,17 +137,18 @@ void TRGGRLMatchModule::event()
 
     double dr_tmp = 99999.;
     double dz_tmp = 99999.;
-    int cluster_ind;
-    for (unsigned int j = 0; j < clusterlist; j++) {
-      calculationdistance(track3Dlist[i], clusterlist[j], 1);
-      if (dr_tmp < m_dr) {
-        dr_tmp = m_dr;
-        dz_tmp = m_dz;
+    int cluster_ind = -1;
+    for (int j = 0; j < clusterlist.getEntries(); j++) {
+      double ds_ct[2] = {99999., 99999.};
+      calculationdistance(track3Dlist[i], clusterlist[j], ds_ct, 1);
+      if (dr_tmp > ds_ct[0]) {
+        dr_tmp = ds_ct[0];
+        dz_tmp = ds_ct[1];
         cluster_ind = j;
       }
     }
 
-    if (dr_tmp < m_dr_threshold && dz_tmp < m_dz_threshold) {
+    if (dr_tmp < m_dr_threshold && dz_tmp < m_dz_threshold && cluster_ind != -1) {
       TRGGRLMATCH* mat3d = track3Dmatch.appendNew();
       mat3d->setDeltaR(dr_tmp);
       mat3d->setDeltaZ(dz_tmp);
@@ -168,7 +172,7 @@ void TRGGRLMatchModule::terminate()
 }
 
 
-void TRGGRLMatchModule::calculationdistance(CDCTriggerTrack* _track, TRGECLCluster* _cluster, int _match3D)
+void TRGGRLMatchModule::calculationdistance(CDCTriggerTrack* _track, TRGECLCluster* _cluster, double* ds, int _match3D)
 {
 
 //double    _pt = _track->getTransverseMomentum(1.5);
@@ -185,7 +189,7 @@ void TRGGRLMatchModule::calculationdistance(CDCTriggerTrack* _track, TRGECLClust
 
   //-- calculation
   if (_R > (2 * _r)) {
-    m_dr = 99999.;
+    ds[0] = 99999.;
   } else {
     //  double theta0 = acos(_R/(2*_r)) + _phi;
     double theta0 = asin(_R / (2 * _r)) + _phi;
@@ -195,14 +199,14 @@ void TRGGRLMatchModule::calculationdistance(CDCTriggerTrack* _track, TRGECLClust
     double dr0 = sqrt((ex_x0 - _cluster_x) * (ex_x0 - _cluster_x) + (ex_y0 - _cluster_y) * (ex_y0 - _cluster_y));
     double dr1 = sqrt((ex_x1 - _cluster_x) * (ex_x1 - _cluster_x) + (ex_y1 - _cluster_y) * (ex_y1 - _cluster_y));
 
-    m_dr = (dr0 < dr1) ? dr0 : dr1;
+    ds[0] = (dr0 < dr1) ? dr0 : dr1;
   }
   //z information
   if (_match3D == 1) {
     double      _z0 = _track->getZ0();
     double      _slope = _track->getCotTheta();
     double      _ex_z = _z0 + _slope * _R;
-    m_dz = fabs(_cluster_z - _ex_z);
+    ds[1] = fabs(_cluster_z - _ex_z);
 
   }
 

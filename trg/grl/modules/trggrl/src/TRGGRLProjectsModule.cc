@@ -213,7 +213,8 @@ namespace Belle2 {
     int nclus[3] = {0, 0, 0};
     for (unsigned int i = 0; i < clustersinwindow.size(); i++) {
       double energy_clu = clustersinwindow[i]->getEnergyDep();
-      if (energy_clu > m_energythreshold[0]) nclus[0]++;
+      //if (energy_clu > m_energythreshold[0]) nclus[0]++;
+      if (!clustersinwindow[i]->getRelatedTo<CDCTriggerTrack>()) nclus[0]++;
       if (energy_clu > m_energythreshold[1]) nclus[1]++;
       if (energy_clu > m_energythreshold[2]) {
         double  x1 = clustersinwindow[i]->getPositionX();
@@ -225,9 +226,10 @@ namespace Belle2 {
       }
 
     }
-    trgInfo->setNhighcluster1(nclus[0]);
-    trgInfo->setNhighcluster2(nclus[1]);
-    trgInfo->setNneucluster(nclus[2]);
+    trgInfo->setNhighcluster1(nclus[1]);
+    trgInfo->setNhighcluster2(nclus[2]);
+    trgInfo->setNneucluster(nclus[0]);
+    trgInfo->setNcluster(clustersinwindow.size());
 
     //Bhabha----------------begin
     int bhabha_bit = 0;
@@ -241,10 +243,10 @@ namespace Belle2 {
         double tanLam1 = cdctrk1->getTanLambda();
         double theta1 = acos(tanLam1 / sqrt(1. + tanLam1 * tanLam1)) * Unit::deg;
 
-        for (int j = i; j < ntrk_mat3d; j++) {
+        for (int j = i + 1; j < ntrk_mat3d; j++) {
           const TRGECLCluster* eclcluster2 = tracks3Dmatch[j]->getRelatedTo<TRGECLCluster>();
           const CDCTriggerTrack* cdctrk2 = tracks3Dmatch[j]->getRelatedTo<CDCTriggerTrack>();
-          if (eclcluster2 == nullptr || cdctrk2 == nullptr) continue;
+          // if (eclcluster2 == nullptr || cdctrk2 == nullptr) continue;
           double e2 = eclcluster2->getEnergyDep();
           double phi2 = cdctrk2->getPhi0() * Unit::deg;
           double tanLam2 = cdctrk2->getTanLambda();
@@ -276,7 +278,7 @@ namespace Belle2 {
         TVector3 vec1(x1, y1, z1);
         double  theta1 = vec1.Theta() * Unit::deg;
         double  phi1 = vec1.Phi() * Unit::deg;
-        for (unsigned j = i; j < clustersinwindow.size(); j++) {
+        for (unsigned j = i + 1; j < clustersinwindow.size(); j++) {
           TRGECLCluster* cluster2 = clustersinwindow[j];
           double e2 = cluster2->getEnergyDep();
           double  x2 = cluster2->getPositionX();

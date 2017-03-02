@@ -47,7 +47,7 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPo
 
   addParam("storeDebugOutputToROOTFile", m_param_storeDebugOutputToROOTFile, "Flag to save the results of the calculations leading "
            "to the trigger decisions into a ROOT file. The file path and name of this file can be handled by the "
-           "debugOutputFileName parameter.", m_param_storeDebugOutputToROOTFile);
+           "debugOutputFileName parameter. Not supported during parallel processing.", m_param_storeDebugOutputToROOTFile);
 
   addParam("preScaleStoreDebugOutputToDataStore", m_param_preScaleStoreDebugOutputToDataStore,
            "Prescale with which to save the results of the calculations leading "

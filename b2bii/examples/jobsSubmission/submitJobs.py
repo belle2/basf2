@@ -15,15 +15,12 @@ dataType = 'on_resonance'
 belleLevel = 'caseB'
 
 yourWorkingDirectoryPath = '.'
+subLogDir = '/analysisLog/'
 
 # the job we are submitting
 myCmd = yourWorkingDirectoryPath + '/analysisJob.sh'
 
 # a bit of clean-up before job submission
-# NOTE: assuming these sub-directories exist in yourWorkingDirectoryPath
-#       analysisLog/belle/evtgen-charged (and evtgen-mixed)
-#       analysisOutput/belle/evtgen-charged (and evtgen-mixed)
-# they will be used to store the jobs log files
 
 for eventType in ['evtgen-charged', 'evtgen-mixed']:
 
@@ -31,19 +28,13 @@ for eventType in ['evtgen-charged', 'evtgen-mixed']:
 
     print('Cleaning log dir ..')
     # path where we want to store the log files
-    logDir = yourWorkingDirectoryPath + '/analysisLog/belle/' + eventType
+    logDir = yourWorkingDirectoryPath + subLogDir + eventType
 
-    # clean up log dir before jobs, so only relevant files are saved
-    os.system("rm -rf " + logDir + '/*')
-
-    # =================================== Output files  ================================
-    print('Cleaning output dir ..')
-    # path where we want to store the output files
-    outDir = yourWorkingDirectoryPath + '/analysisOutput/belle/' + eventType
-
-    # clean up log dir before jobs, so only relevant files are saved
-    os.system('rm -rf ' + outDir + '/*')
-
+    if os.path.exists(logDir):
+        # clean up log dir before jobs, so only relevant files are saved
+        os.system("rm -rf " + logDir + '/*')
+    else:
+        os.makedirs(logDir)
 # ================================= Submit jobs ! ==============================
 print('Jobs submission ..')
 

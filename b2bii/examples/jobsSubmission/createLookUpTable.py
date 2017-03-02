@@ -31,7 +31,7 @@ def countEventsInUrl(link):
     return nEvents
 
 
-def getBelleUrl(expNo, startRun, endRun, eventType, dataType, belleLevel, streamNo):
+def getBelleMCUrl(expNo, startRun, endRun, eventType, dataType, belleLevel, streamNo):
 
     header = 'http://bweb3/montecarlo.php?'
 
@@ -88,8 +88,8 @@ for eventType in ['evtgen-charged', 'evtgen-mixed']:
 
                 maxRunNo = minRunNo + add
 
-                thisUrl = getBelleUrl(expNo, minRunNo, maxRunNo,
-                                      eventType, dataType, belleLevel, streamNo)
+                thisUrl = getBelleMCUrl(expNo, minRunNo, maxRunNo,
+                                        eventType, dataType, belleLevel, streamNo)
 
                 thisUrlCount = countEventsInUrl(thisUrl)
 

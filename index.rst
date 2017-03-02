@@ -11,8 +11,8 @@ For information on how to add to or modify this documentation for your package c
    :maxdepth: 5
    :glob:
 
-   framework
-   build/packages/*
+   framework/framework
+   */sphinx_*
 
 
 

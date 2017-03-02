@@ -59,7 +59,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'basf2'
-copyright = '2010-2016, basf2 authors'
+copyright = '2010-2017, Belle II Collaboration'
 author = 'basf2 authors'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -343,7 +343,7 @@ def improve_docstring(obj):
     # if tclass:
     #    pyclass.__doc__ += '\n' + tclass.GetTitle()
 
-    doxygen_url = 'https://belle2.cc.kek.jp/internal/software/development/class'
+    doxygen_url = 'https://b2-master.belle2.org/software/development/class'
     doxygen_url += '_1_1'.join(classname.split('::'))
     doxygen_url += '.html'
     pyclass.__doc__ += '\n`Doxygen page for %s <%s>`_' % (classname, doxygen_url)
@@ -408,30 +408,3 @@ def setup(app):
     app.connect('autodoc-process-signature', process_sig)
     app.connect('autodoc-process-docstring', process_docstring)
     app.connect('autodoc-skip-member', skipmember)
-
-
-other_rst = 'build/packages/'
-
-
-def copy_rst(base):
-    """
-    copy rst files in other packages into other_rst
-    """
-    filelist = []
-    for rstfile in glob.iglob(base + "/*/**/sphinx_*.rst", recursive=True):
-        commonpref = os.path.commonprefix([rstfile, base + '/framework'])
-        if commonpref.startswith(base + '/framework'):
-            # ignore framework things
-            continue
-
-        basename = os.path.basename(rstfile)
-        if basename in filelist:
-            print('File "%s" found twice! Please use unique names!' % (basename))
-            sys.exit(1)
-        filelist.append(basename)
-        shutil.copy(rstfile, other_rst)
-
-
-shutil.rmtree(other_rst, ignore_errors=True)
-os.mkdir(other_rst)
-copy_rst(os.getenv('BELLE2_LOCAL_DIR'))

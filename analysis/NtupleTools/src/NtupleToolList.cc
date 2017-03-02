@@ -25,6 +25,7 @@
 #include <analysis/NtupleTools/NtupleMCVertexTool.h>
 #include <analysis/NtupleTools/NtupleCustomFloatsTool.h>
 #include <analysis/NtupleTools/NtupleROEMultiplicitiesTool.h>
+#include <analysis/NtupleTools/NtupleROEGammasTool.h>
 #include <analysis/NtupleTools/NtupleRecoilKinematicsTool.h>
 #include <analysis/NtupleTools/NtupleExtraEnergyTool.h>
 #include <analysis/NtupleTools/NtupleTagVertexTool.h>
@@ -34,10 +35,10 @@
 #include <analysis/NtupleTools/NtupleContinuumSuppressionTool.h>
 #include <analysis/NtupleTools/NtupleFlavorTaggingTool.h>
 #include <analysis/NtupleTools/NtupleFlavorTagInfoTool.h>
+#include <analysis/NtupleTools/NtupleMCDecayStringTool.h>
 #include <analysis/NtupleTools/NtupleFlightInfoTool.h>
 #include <analysis/NtupleTools/NtupleMCFlightInfoTool.h>
 #include <analysis/NtupleTools/NtupleMomentumVectorDeviationTool.h>
-#include <analysis/NtupleTools/NtupleParentRestKinematicsTool.h>
 #include <analysis/NtupleTools/NtupleDalitzTool.h>
 #include <analysis/NtupleTools/NtupleVVAnglesTool.h>
 #include <analysis/NtupleTools/NtupleHelicityTool.h>
@@ -49,8 +50,6 @@
 #include <analysis/NtupleTools/NtupleLEECLTool.h>
 #include <analysis/NtupleTools/NtupleLEKLMTool.h>
 #include <analysis/NtupleTools/NtupleHLTTagTool.h>
-#include <analysis/NtupleTools/NtupleMCGenKinematicsTool.h>
-#include <analysis/NtupleTools/NtupleMCGenCMSKinematicsTool.h>
 
 using namespace Belle2;
 using namespace std;
@@ -89,7 +88,6 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
 
   if (strToolName == "Kinematics") return new NtupleKinematicsTool(tree, d);
   else if (strToolName == "CMSKinematics") return new NtupleCMSKinematicsTool(tree, d);
-  else if (strToolName == "ParentRestKinematics") return new NtupleParentRestKinematicsTool(tree, d);
   else if (strToolName == "MomentumUncertainty") return new NtupleMomentumUncertaintyTool(tree, d);
   else if (strToolName == "InvMass") return new NtupleInvMassTool(tree, d, strOption);
   else if (strToolName == "MassBeforeFit") return new NtupleMassBeforeFitTool(tree, d);
@@ -113,6 +111,7 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "MCVertex") return new NtupleMCVertexTool(tree, d);
   else if (strToolName == "CustomFloats") return new NtupleCustomFloatsTool(tree, d, strOption);
   else if (strToolName == "ROEMultiplicities") return new NtupleROEMultiplicitiesTool(tree, d);
+  else if (strToolName == "ROEGammas") return new NtupleROEGammasTool(tree, d);
   else if (strToolName == "RecoilKinematics") return new NtupleRecoilKinematicsTool(tree, d);
   else if (strToolName == "ExtraEnergy") return new NtupleExtraEnergyTool(tree, d);
   else if (strToolName == "TagVertex") return new NtupleTagVertexTool(tree, d);
@@ -122,6 +121,7 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "ContinuumSuppression") return new NtupleContinuumSuppressionTool(tree, d, strOption);
   else if (strToolName == "FlavorTagging") return new NtupleFlavorTaggingTool(tree, d, strOption);
   else if (strToolName == "FlavorTagInfo") return new NtupleFlavorTagInfoTool(tree, d);
+  else if (strToolName == "MCDecayString") return new NtupleMCDecayStringTool(tree, d);
   else if (strToolName == "FlightInfo") return new NtupleFlightInfoTool(tree, d);
   else if (strToolName == "MCFlightInfo") return new NtupleMCFlightInfoTool(tree, d);
   else if (strToolName == "MomentumVectorDeviation") return new NtupleMomentumVectorDeviationTool(tree, d);
@@ -136,8 +136,6 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
   else if (strToolName == "LEECL")  return new NtupleLEECLTool(tree, d);
   else if (strToolName == "LEKLM")  return new NtupleLEKLMTool(tree, d);
   else if (strToolName == "HLTTag")  return new NtupleHLTTagTool(tree, d);
-  else if (strToolName == "MCGenKinematics") return new NtupleMCGenKinematicsTool(tree, d, strOption);
-  else if (strToolName == "MCGenCMSKinematics") return new NtupleMCGenCMSKinematicsTool(tree, d, strOption);
   B2WARNING("NtupleTool " << strToolName << " is not available!");
   return NULL;
 }

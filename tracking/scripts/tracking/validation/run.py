@@ -9,6 +9,7 @@ import argparse
 from tracking.run.tracked_event_generation import ReadOrGenerateTrackedEventsRun
 from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
 from tracking.validation.hit_module import ExpertTrackingValidationModule
+from tracking.harvesting_validation.combined_module import CombinedTrackingValidationModule
 
 #: Current location of the tracking mailing list
 TRACKING_MAILING_LIST = 'software-tracking@belle2.org'
@@ -45,6 +46,9 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
     #: Do not fit the tracks but access the fit information for pulls etc.
     use_fit_information = False
 
+    #: Switch to use the extended harvesting validation instead
+    extended = False
+
     def preparePathValidation(self, path):
         """The default way to add the validation module to the path.
 
@@ -52,20 +56,27 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
         or add more than one validation steps.
         """
 
-        # Validation module generating plots
-        trackingValidationModule = ExpertTrackingValidationModule(
-            self.name,
-            contact=self.contact,
-            fit=self.use_fit_information or self.fit_tracks,
-            pulls=self.pulls,
-            resolution=self.resolution,
-            output_file_name=self.output_file_name,
-            use_expert_folder=self.use_expert_folder,
-            exclude_profile_mc_parameter=self.exclude_profile_mc_parameter,
-            exclude_profile_pr_parameter=self.exclude_profile_pr_parameter
-        )
+        if self.extended:
+            trackingValidationModule = CombinedTrackingValidationModule(
+                name=self.name,
+                contact=self.contact,
+                output_file_name=self.output_file_name,
+                )
+        else:
+            # Validation module generating plots
+            trackingValidationModule = ExpertTrackingValidationModule(
+                self.name,
+                contact=self.contact,
+                fit=self.use_fit_information or self.fit_tracks,
+                pulls=self.pulls,
+                resolution=self.resolution,
+                output_file_name=self.output_file_name,
+                use_expert_folder=self.use_expert_folder,
+                exclude_profile_mc_parameter=self.exclude_profile_mc_parameter,
+                exclude_profile_pr_parameter=self.exclude_profile_pr_parameter
+                )
+            trackingValidationModule.trackCandidatesColumnName = "RecoTracks"
 
-        trackingValidationModule.trackCandidatesColumnName = "RecoTracks"
         path.add_module(trackingValidationModule)
 
     def create_argument_parser(self, **kwds):
@@ -79,6 +90,15 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
             dest='simulation_output',
             default=argparse.SUPPRESS,
             help='Output file to which the simulated events shall be written.'
+        )
+
+        argument_parser.add_argument(
+            '-e',
+            '--extended',
+            dest='extended',
+            action='store_true',
+            default=argparse.SUPPRESS,
+            help='Use the extended validation with more plots and whistles'
         )
 
         return argument_parser

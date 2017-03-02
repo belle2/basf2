@@ -4,6 +4,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/pcore/Mergeable.h>
 #include <framework/core/FileCatalog.h>
+#include <framework/utilities/KeyValuePrinter.h>
 #include <background/dataobjects/BackgroundInfo.h>
 
 #include <boost/program_options.hpp>
@@ -345,6 +346,16 @@ The following restrictions apply:
       if(fileMetaData->getDatabaseGlobalTag() != outputMetaData->getDatabaseGlobalTag()){
         B2ERROR("Database globalTag in " << boost::io::quoted(input) << " differs from previous files: " <<
                 fileMetaData->getDatabaseGlobalTag() << " != " << outputMetaData->getDatabaseGlobalTag());
+      }
+      if(fileMetaData->getDataDescription() != outputMetaData->getDataDescription()){
+        KeyValuePrinter cur(true);
+        for (auto descrPair : outputMetaData->getDataDescription())
+          cur.put(descrPair.first, descrPair.second);
+        KeyValuePrinter prev(true);
+        for (auto descrPair : fileMetaData->getDataDescription())
+          prev.put(descrPair.first, descrPair.second);
+
+        B2ERROR("dataDescription in " << boost::io::quoted(input) << " differs from previous files:\n" << cur.string() << " vs.\n" << prev.string());
       }
       // update event numbers ...
       outputMetaData->setMcEvents(outputMetaData->getMcEvents() + fileMetaData->getMcEvents());

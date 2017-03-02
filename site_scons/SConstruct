@@ -300,7 +300,8 @@ if len(global_env['TEST_FILES']) > 0:
 if explicit_package_targets:
     print "Performing a quick build for given packages. Note that any removed targets " \
         "(e.g. modules, include files) will remain until you run a full build without any explicit target packages."
-else:
+elif not global_env.GetOption('help'):
+    # make sure we don't do cleanup on --help
     global_env.RemoveNonTargets(global_env["INCDIR"])
     global_env.RemoveNonTargets(global_env["MODDIR"])
     global_env.RemoveNonTargets(global_env["LIBDIR"])

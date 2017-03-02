@@ -42,6 +42,9 @@ namespace Belle2 {
       /// Create a new module instance and set the parameters.
       SoftwareTriggerModule();
 
+      /// default virtaual constructor because this is a derived class using virtual methods
+      virtual ~SoftwareTriggerModule() = default;
+
       /// Initialize/Require the DB object pointers and any needed store arrays.
       void initialize() override;
 

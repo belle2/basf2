@@ -67,7 +67,7 @@ namespace Belle2 {
     //!module id from the lane and the axis. Sector etc are set to 0
     //! @param lane the lane number, giving for the rpcs the slot number in the crate
     //! @param axis z or phi
-    int getDefaultModuleId(int lane, int axis);
+    int getDefaultModuleId(int copperId, int finesse, int lane, int axis);
 
     //! To be used to map electronics address to module id
     //! @param copperId id of the copper board
@@ -77,7 +77,10 @@ namespace Belle2 {
     int electCooToInt(int copper, int finesse, int lane, int axis);
 
     //! remap the channel ID for scitilators and RPCs
-    unsigned short getChannel(int layer,  unsigned short axis,  unsigned short channel);
+    unsigned short getChannel(int sector, int layer,  int plane,  unsigned short channel);
+
+    //! handle 0-->max max-->0 channel number flip between software and detector
+    unsigned short flipChannel(int isForward, int sector, int layer, int plane, unsigned short channel, bool& isOutRange);
 
     //    void intToElectCoo(int id, int& copper, int& finesse, int& lane);
     //! to map hardware coordinates to logical coordinates
@@ -99,6 +102,9 @@ namespace Belle2 {
 
     //! threshold for the scintillator ADC after subtracting the offset
     double m_scintThreshold = 7;
+
+    //! is this real data (true) or MC data (false)
+    bool m_rawdata;
 
     //! name of BKLMDigit store array
     std::string m_outputDigitsName;

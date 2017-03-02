@@ -50,6 +50,7 @@ BKLMUnpackerModule::BKLMUnpackerModule() : Module()
   addParam("SciThreshold", m_scintThreshold, "scintillator strip hits with charge (~NPE) lower this value will be marked as bad",
            double(7.0));
   addParam("loadMapFromDB", m_loadMapFromDB, "whether load electronic map from DataBase", true);
+  addParam("rawdata", m_rawdata, "is this real rawdata (true) or MC data (false)", false);
 }
 
 
@@ -85,7 +86,7 @@ void BKLMUnpackerModule::loadMapFromDB()
     int isForward = element.getIsForward();
     int layer = element.getLayer();
     int plane =  element.getPlane();
-    int elecId = electCooToInt(copperId, slotId, laneId, axisId);
+    int elecId = electCooToInt(copperId - BKLM_ID, slotId, laneId, axisId);
     int moduleId = 0;
     B2DEBUG(1, "reading Data Base...");
     moduleId = (isForward ? BKLM_END_MASK : 0)
@@ -118,7 +119,7 @@ void BKLMUnpackerModule::loadMap()
           int isForward = axis.getInt("IsForward");
           int layer = axis.getInt("Layer");
           int plane = axis.getInt("Plane");
-          int elecId = electCooToInt(copperId, slotId, laneId, axisId);
+          int elecId = electCooToInt(copperId - BKLM_ID, slotId, laneId, axisId);
           int moduleId = 0;
 
 
@@ -171,11 +172,9 @@ void BKLMUnpackerModule::event()
       //is this the same as get1stDetectorBuffer??
       ///   int* data=rawKLM[i]->Get1stFINESSEBuffer(j);
       unsigned int copperId = rawKLM[i]->GetNodeID(j);
-      if (copperId < BKLM_ID || copperId > BKLM_ID + 3) continue;
-      //                copperId=1;
-      //cout <<"uint copperId " <<copperId<<endl;
+      //old 117440512 - 117440515 , new Data: 117440513 -- 117440516
+      if (copperId < BKLM_ID  || copperId > BKLM_ID + 4) continue;
       //short sCopperId = rawKLM[i]->GetCOPPERNodeId(j);
-      //  cout <<"s copperid: "<< sCopperId <<endl;
 
 
       rawKLM[i]->GetBuffer(j);
@@ -257,7 +256,12 @@ void BKLMUnpackerModule::event()
           unsigned short tdc = bword3 & 0x7FF;
           unsigned short charge = bword4 & 0xFFF;
           int layer = lane;
-          if (flag == 1) layer = lane - 5;
+          if (flag == 1) layer = lane - 5; //layer 1-based
+          if (m_rawdata && layer < 3) { // z phi plane of sci. is flipped, may be tentative
+            if (axis == 0) axis = 1;
+            else if (axis == 1) axis = 0;
+            else B2WARNING("BKLMUnpackerModule:: axis bit of scintillator is abnormal " << axis);
+          }
           //channel = getChannel(layer, axis, channel);//for data
 
 
@@ -268,29 +272,39 @@ void BKLMUnpackerModule::event()
           //  cout << "Unpacker channel: " << channel << ", axi: " << axis << " lane: " << lane << " ctime: " << ctime << " tdc: " << tdc <<
           //  " charge: " << charge << endl;
 
-          int electId = electCooToInt(copperId, finesse_num + 1, layer, axis);
+          int electId = electCooToInt(copperId - BKLM_ID, finesse_num + 1, layer, axis);
           int moduleId = 0;
+          int sector = -1;
+          int isForward = -1;
+          int plane = -1;
           if (m_electIdToModuleId.find(electId) == m_electIdToModuleId.end()) {
             if (!m_useDefaultModuleId) {
-              B2DEBUG(1, "could not find copperid " << copperId << ", finesse " << finesse_num + 1 << ", lane " << lane << ", axis " << axis <<
-                      " in mapping");
+              B2WARNING("could not find copperid " << copperId << ", finesse " << finesse_num + 1 << ", lane " << lane << ", axis " << axis <<
+                        " in mapping");
               continue;
             } else {
-              //cout <<"calling default with axis: " << axis <<endl;
-              moduleId = getDefaultModuleId(layer, axis);
+              moduleId = getDefaultModuleId(copperId, finesse_num, layer, axis);
             }
           } else { //found moduleId in the mapping
             moduleId = m_electIdToModuleId[electId];
             B2DEBUG(1, " electid: " << electId << " module: " << moduleId);
 
-            //moduleId counts are zero based
-            layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
-            //plane should already be set
-
             //only channel and inrpc flag is not set yet
           }
+          //moduleId counts are zero based
+          layer = (moduleId & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT;
+          sector = (moduleId & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT;
+          isForward = (moduleId & BKLM_END_MASK) >> BKLM_END_BIT;
+          plane = (moduleId & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT;
 
           if (layer > 14) { B2WARNING("BKLMUnpackerModule:: strange that the layer number is larger than 14 " << layer); continue;}
+
+          //handle the flipped channels and out-of-range channels. This way is not good at all, but do this for a while before data format is fixed
+          if (m_rawdata) channel = getChannel(sector + 1, layer + 1, plane, channel);
+          bool outRange = false;
+          if (m_rawdata) channel = flipChannel(isForward, sector + 1, layer + 1, plane, channel, outRange);
+          if (outRange) { B2WARNING("BKLMUnpackerModule:: channel number is out of range " << channel); continue; }
+
           //still have to add the channel and axis
           if (layer > 1) moduleId |= BKLM_INRPC_MASK;
           moduleId |= (((channel - 1) & BKLM_STRIP_MASK) << BKLM_STRIP_BIT) | (((channel - 1) & BKLM_MAXSTRIP_MASK) << BKLM_MAXSTRIP_BIT);
@@ -363,20 +377,27 @@ void BKLMUnpackerModule::terminate()
 }
 
 
-int BKLMUnpackerModule::getDefaultModuleId(int lane, int axis)
+int BKLMUnpackerModule::getDefaultModuleId(int copperId, int finesse, int lane, int axis)
 {
 
-  //attention: lane is zero based, so do not subtract 1
-  int  moduleId = (0)
-                  | ((0) << BKLM_SECTOR_BIT)
-                  | ((lane - 1) << BKLM_LAYER_BIT)
-                  | ((axis) << BKLM_PLANE_BIT);
+  int sector = 0;
+  int isForward = 0;
+  if (copperId == 117440513 || copperId == 117440514) isForward = 1;
+  if (copperId == 117440515 || copperId == 117440516) isForward = 0;
+  if (copperId == 117440513 || copperId == 117440515) sector = finesse + 3;
+  if (copperId == 117440514 || copperId == 117440516) sector = (finesse + 7 > 8) ? finesse - 1 : finesse + 7;
+
+  //attention: moduleId counts are zero based
+  int moduleId = (isForward ? BKLM_END_MASK : 0)
+                 | ((sector - 1) << BKLM_SECTOR_BIT)
+                 | ((lane - 1) << BKLM_LAYER_BIT)
+                 | ((axis) << BKLM_PLANE_BIT);
 
   return moduleId;
 
 }
 
-unsigned short BKLMUnpackerModule::getChannel(int layer, unsigned short axis, unsigned short channel)
+unsigned short BKLMUnpackerModule::getChannel(int sector, int layer, int axis, unsigned short channel)
 {
 
   if (layer == 1) {
@@ -411,7 +432,37 @@ unsigned short BKLMUnpackerModule::getChannel(int layer, unsigned short axis, un
   }
 
 
-  if (layer > 2) channel = channel + 1;
+  //if (layer > 2) channel = channel + 1;
+  if (sector == 3 && layer > 2 && layer < 16) channel = channel + 1;
+  if (sector == 7 && layer > 2 && layer < 16) channel = channel;
+
+  return channel;
+}
+
+unsigned short BKLMUnpackerModule::flipChannel(int isForward, int sector, int layer, int plane, unsigned short channel,
+                                               bool& isOutRange)
+{
+
+  isOutRange = false;
+  int MaxiChannel = 0;
+
+  if (!isForward && sector == 3 && plane == 0) {
+    if (plane == 0 && layer < 3) MaxiChannel = 38;
+    if (plane == 0 && layer > 2) MaxiChannel = 34;
+  } else {
+    if (layer == 1 && plane == 1) MaxiChannel = 37;
+    if (layer == 2 && plane == 1) MaxiChannel = 42;
+    if (layer > 2 && layer < 7 && plane == 1) MaxiChannel = 36;
+    if (layer > 6 && plane == 1) MaxiChannel = 48;
+//z plane
+    if (layer == 1 && plane == 0) MaxiChannel = 54;
+    if (layer == 2 && plane == 0) MaxiChannel = 54;
+    if (layer > 2 && plane == 0) MaxiChannel = 48;
+  }
+
+  if (!(isForward && sector == 7 && layer > 2 && plane == 1)) channel = MaxiChannel - channel + 1;
+
+  if (channel < 1 || channel > MaxiChannel) isOutRange = true;
 
   return channel;
 }

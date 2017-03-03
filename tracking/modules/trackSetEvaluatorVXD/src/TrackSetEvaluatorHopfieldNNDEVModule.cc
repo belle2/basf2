@@ -29,10 +29,12 @@ TrackSetEvaluatorHopfieldNNDEVModule::TrackSetEvaluatorHopfieldNNDEVModule() : M
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("tcArrayName", m_PARAMtcArrayName, " sets the name of expected StoreArray with SpacePointTrackCand in it",
+  addParam("tcArrayName", m_PARAMtcArrayName, "Sets the name of expected StoreArray with SpacePointTrackCand in it.",
            std::string(""));
-  addParam("tcNetworkName", m_PARAMtcNetworkName, " sets the name of expected StoreArray<OverlapNetwork>",
+  addParam("tcNetworkName", m_PARAMtcNetworkName, "Sets the name of expected StoreArray<OverlapNetwork>.",
            std::string(""));
+  addParam("minActivityState", m_minActivityState, "Sets the minimal value of activity (Neuron Value) for acceptance.",
+           float(0.7));
 }
 
 
@@ -66,7 +68,7 @@ void TrackSetEvaluatorHopfieldNNDEVModule::event()
   //Update tcs and kill those which were rejected by the Hopfield algorithm
   unsigned int nSurvivors = 0;
   for (const auto& overlapResolverNodeInfo : overlapResolverNodeInfos) {
-    if (overlapResolverNodeInfo.activityState > 0.7) {
+    if (overlapResolverNodeInfo.activityState > m_minActivityState) {
       nSurvivors++;
       continue;
     }

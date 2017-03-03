@@ -124,12 +124,12 @@ namespace Belle2 {
      */
     static void registerRequiredRelations(
       StoreArray<RecoTrack>& recoTracks,
-      std::string pxdHitsStoreArrayName = "",
-      std::string svdHitsStoreArrayName = "",
-      std::string cdcHitsStoreArrayName = "",
-      std::string bklmHitsStoreArrayName = "",
-      std::string eklmHitsStoreArrayName = "",
-      std::string recoHitInformationStoreArrayName = "")
+      std::string const& pxdHitsStoreArrayName = "",
+      std::string const& svdHitsStoreArrayName = "",
+      std::string const& cdcHitsStoreArrayName = "",
+      std::string const& bklmHitsStoreArrayName = "",
+      std::string const& eklmHitsStoreArrayName = "",
+      std::string const& recoHitInformationStoreArrayName = "")
     {
       StoreArray<RecoHitInformation> recoHitInformations(recoHitInformationStoreArrayName);
       recoHitInformations.registerInDataStore();
@@ -691,8 +691,8 @@ namespace Belle2 {
      */
     template<class HitType>
     void mapOnHits(const std::string& storeArrayNameOfHits,
-                   std::function<void(RecoHitInformation&, HitType*)> mapFunction,
-                   std::function<bool(const RecoHitInformation&, const HitType*)> pickFunction)
+                   std::function<void(RecoHitInformation&, HitType*)> const&   mapFunction,
+                   std::function<bool(const RecoHitInformation&, const HitType*)> const& pickFunction)
     {
       RelationVector<RecoHitInformation> relatedHitInformation = getRelationsTo<RecoHitInformation>
                                                                  (m_storeArrayNameOfRecoHitInformation);
@@ -713,8 +713,8 @@ namespace Belle2 {
      */
     template<class HitType>
     void mapOnHits(const std::string& storeArrayNameOfHits,
-                   std::function<void(const RecoHitInformation&, const HitType*)> mapFunction,
-                   std::function<bool(const RecoHitInformation&, const HitType*)> pickFunction) const
+                   std::function<void(const RecoHitInformation&, const HitType*)> const& mapFunction,
+                   std::function<bool(const RecoHitInformation&, const HitType*)> const& pickFunction) const
     {
       RelationVector<RecoHitInformation> relatedHitInformation = getRelationsTo<RecoHitInformation>
                                                                  (m_storeArrayNameOfRecoHitInformation);
@@ -734,7 +734,7 @@ namespace Belle2 {
      */
     template<class HitType>
     void mapOnHits(const std::string& storeArrayNameOfHits,
-                   std::function<void(RecoHitInformation&, HitType*)> mapFunction)
+                   std::function<void(RecoHitInformation&, HitType*)> const& mapFunction)
     {
       mapOnHits<HitType>(storeArrayNameOfHits, mapFunction, [](const RecoHitInformation&, const HitType*) -> bool { return true; });
     }
@@ -746,7 +746,7 @@ namespace Belle2 {
      */
     template<class HitType>
     void mapOnHits(const std::string& storeArrayNameOfHits,
-                   std::function<void(const RecoHitInformation&, const HitType*)> mapFunction) const
+                   std::function<void(const RecoHitInformation&, const HitType*)> const&   mapFunction) const
     {
       mapOnHits<HitType>(storeArrayNameOfHits, mapFunction, [](const RecoHitInformation&, const HitType*) -> bool { return true; });
     }

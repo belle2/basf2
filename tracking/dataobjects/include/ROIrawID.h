@@ -43,7 +43,7 @@ namespace Belle2 {
     };
 
 
-    ROIrawID(baseType id = 0)
+    explicit ROIrawID(baseType id = 0)
     {
       m_rawID.id = id;
     }; /**< constructor setting the id */

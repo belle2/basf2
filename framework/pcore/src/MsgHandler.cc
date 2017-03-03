@@ -100,21 +100,22 @@ void MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
     UInt_t nameLength;
     memcpy(&nameLength, msgptr, sizeof(nameLength));
     msgptr += sizeof(nameLength);
-    if (msgptr >= end) B2FATAL("Buffer overrun while decoding message, check length fields!");
+    if (nameLength == 0 || std::distance(msgptr, end) < nameLength)
+      B2FATAL("Buffer overrun while decoding object name, check length fields!");
 
-    namelist.emplace_back(msgptr);
+    // read full string but omit final 0-byte. This safeguards against strings containing 0-bytes
+    namelist.emplace_back(msgptr, nameLength - 1);
     msgptr += nameLength;
-    if (msgptr >= end) B2FATAL("Buffer overrun while decoding message, check length fields!");
 
     // Restore object
     UInt_t objlen;
     memcpy(&objlen, msgptr, sizeof(objlen));
     msgptr += sizeof(objlen);
-    if (msgptr >= end) B2FATAL("Buffer overrun while decoding message, check length fields!");
+    if (objlen == 0 || std::distance(msgptr, end) < objlen)
+      B2FATAL("Buffer overrun while decoding object, check length fields!");
 
     m_inMsg.SetBuffer(msgptr, objlen);
-    TObject* obj = static_cast<TObject*>(m_inMsg.ReadObjectAny(m_inMsg.GetClass()));
-    objlist.push_back(obj);
+    objlist.push_back(m_inMsg.readTObject());
     msgptr += objlen;
     //no need to call InMessage::Reset() here (done in SetBuffer())
   }

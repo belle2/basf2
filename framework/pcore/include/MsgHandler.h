@@ -53,28 +53,31 @@ namespace Belle2 {
     void clear() { m_size = 0; }
   };
 
-  /**  Message class derived from TMessage (for reading only) */
+  /** Reusable Message class derived from TMessage (for reading only) */
   class InMessage : public TMessage {
-    TClass* m_class; /**< set in SetBuffer(). */
   public:
-    InMessage() : TMessage(), m_class(nullptr)
+    InMessage() : TMessage()
     {
       SetReadMode();
       SetWhat(kMESS_OBJECT);
     }
 
-    /** override TMessage::GetClass(), class stored there is wrong. */
-    TClass* GetClass() const { return m_class; }
-
     /** Replace buffer (doesn't take ownership). */
     void SetBuffer(const void* ptr, UInt_t bufsize)
     {
       TBuffer::SetBuffer(const_cast<void*>(ptr), bufsize, false);
-      InitMap();
-      m_class = ReadClass();
+      // TMessage has an extra header of two ints: a reserved size field and a
+      // fWhat pointer indicating the type of the message.  We force the message
+      // to be MESS_OBJECT so we don't care. Let's put the buffer where we need
+      // it to be. The original constructor has a ReadClass() here but we skip
+      // it since we read everything as TObject.
       SetBufferOffset(sizeof(UInt_t) * 2);
+      // and reset the map of objects/classes seen so far
       ResetMap();
     }
+
+    /** Read one object from the message assuming it inherits from TObject */
+    TObject* readTObject() { return static_cast<TObject*>(ReadObjectAny(TObject::Class())); }
   };
 
   /** A class to encode/decode an EvtMessage */

@@ -187,7 +187,7 @@ bool DataStore::checkType(const StoreEntry& entry, const StoreAccessorBase& acce
 
 
 bool DataStore::registerEntry(const std::string& name, EDurability durability,
-                              const TClass* objClass, bool array, EStoreFlags storeFlags)
+                              TClass* objClass, bool array, EStoreFlags storeFlags)
 {
   const StoreAccessorBase accessor(name, durability, objClass, array);
   // Check whether this method is called in the initialization phase

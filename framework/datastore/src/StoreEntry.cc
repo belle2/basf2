@@ -6,7 +6,7 @@
 
 using namespace Belle2;
 
-StoreEntry::StoreEntry(bool isArray, const TClass* cl, const std::string& name, bool dontWriteOut):
+StoreEntry::StoreEntry(bool isArray, TClass* cl, const std::string& name, bool dontWriteOut):
   isArray(isArray),
   dontWriteOut(dontWriteOut),
   objClass(cl),

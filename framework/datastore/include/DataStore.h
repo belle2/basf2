@@ -201,7 +201,7 @@ namespace Belle2 {
      *  @sa DependencyMap
      */
     bool registerEntry(const std::string& name, EDurability durability,
-                       const TClass* objClass, bool array, EStoreFlags storeFlags);
+                       TClass* objClass, bool array, EStoreFlags storeFlags);
 
     /** Register a relation in the DataStore map.
      *

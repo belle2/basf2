@@ -348,8 +348,8 @@ class TrackingValidationModule(basf2.Module):
         else:
             clone_rate = float('nan')
 
-        mc_found_primaries = np.multiply(self.mc_primaries, np.greater(self.mc_hit_efficiencies, 0))
-        hit_efficiency = np.average(self.mc_hit_efficiencies, weights=mc_found_primaries)
+        mc_matched_primaries = np.logical_and(self.mc_primaries, self.mc_matches)
+        hit_efficiency = np.average(self.mc_hit_efficiencies, weights=mc_matched_primaries)
 
         figures_of_merit = ValidationFiguresOfMerit('%s_figures_of_merit'
                                                     % name)
@@ -396,7 +396,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         ##################
         plots = self.profiles_by_mc_parameters(self.mc_hit_efficiencies,
                                                'hit efficiency with matched tracks',
-                                               weights=mc_found_primaries)
+                                               weights=mc_matched_primaries)
         validation_plots.extend(plots)
 
         # Fit quality #

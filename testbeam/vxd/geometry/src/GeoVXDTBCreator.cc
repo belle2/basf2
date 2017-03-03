@@ -263,18 +263,22 @@ namespace Belle2 {
                                    content.getInt("stripsU"),//!!! exchanged
                                    content.getInt("stripsV"),//!!! exchanged
                                    content.getLength("width2", 0));
-        const double unit_pF = 1000 * Unit::fC / Unit::V; // picofarad
+        const double unit_pFcm = 1000 * Unit::fC / Unit::V / Unit::cm;
         sensorInfo.setSensorParams(
+          content.getWithUnit("stripEdgeU"),
+          content.getWithUnit("stripEdgeV"),
           content.getWithUnit("DepletionVoltage"),
-          content.getWithUnit("BiasVoltage"), // Unit::V,
-          content.getDouble("BackplaneCapacitanceU")* unit_pF,
-          content.getDouble("InterstripCapacitanceU")* unit_pF,
-          content.getDouble("CouplingCapacitanceU")* unit_pF,
-          content.getDouble("BackplaneCapacitanceV")* unit_pF,
-          content.getDouble("InterstripCapacitanceV")* unit_pF,
-          content.getDouble("CouplingCapacitanceV")* unit_pF,
+          content.getWithUnit("BiasVoltage"),
+          content.getDouble("BackplaneCapacitanceU") * unit_pFcm,
+          content.getDouble("InterstripCapacitanceU") * unit_pFcm,
+          content.getDouble("CouplingCapacitanceU") * unit_pFcm,
+          content.getDouble("BackplaneCapacitanceV") * unit_pFcm,
+          content.getDouble("InterstripCapacitanceV") * unit_pFcm,
+          content.getDouble("CouplingCapacitanceV") * unit_pFcm,
           content.getWithUnit("ElectronicNoiseU"),
-          content.getWithUnit("ElectronicNoiseV")
+          content.getWithUnit("ElectronicNoiseV"),
+          content.getWithUnit("ElectronicNoiseSbwU", 0),
+          content.getWithUnit("ElectronicNoiseSbwV", 0)
         );
 
         SVD::SensorInfo* newInfo = new SVD::SensorInfo(sensorInfo);

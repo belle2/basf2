@@ -47,22 +47,24 @@ particlegun.param({
 
 # Override backplane capacitances in gearbox:
 
-base_params = {
-    'Barrel': {'U': 1.4, 'V': 2.3},
-    'Layer3': {'U': 1.0, 'V': 1.0},
-    'Slanted': {'U': 1.4, 'V': 2.0}
-}
-
 factor = 2.0
 
-gearbox.param({
-    "overridePrefix": "//DetectorComponent[@name='SVD']//Components/",
-    "override": [
-        (('Sensor' if sensor == 'Layer3' else 'SensorBase') + '[@type=\"' + sensor + '\"]/Active/BackplaneCapacitance' + coordinate,
-         str(factor * value), 'pF')
-        for (sensor, vals) in base_params.items() for (coordinate, value) in vals.items()
-    ],
-})
+if (factor != 1.0):
+    base_params = {
+        'Barrel': {'U': 0.12, 'V': 0.39},
+        'Layer3': {'U': 0.08, 'V': 0.26},
+        'Slanted': {'U': 0.11, 'V': 0.42}
+    }
+
+    gearbox.param({
+        "overridePrefix": "//DetectorComponent[@name='SVD']//Components/",
+        "override": [
+            (('Sensor' if sensor == 'Layer3' else 'SensorBase') +
+                '[@type=\"' + sensor + '\"]/Active/BackplaneCapacitance' + coordinate,
+             str(factor * value), 'pF')
+            for (sensor, vals) in base_params.items() for (coordinate, value) in vals.items()
+        ],
+    })
 
 # Select subdetectors to be built
 geometry.param('components', ['SVD'])

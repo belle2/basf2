@@ -503,22 +503,21 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
     stripCharges.push_back(0);
   }
   // Cross-talk
-  // FIXME: Removed crosstalk between readout strips to have clear
-  // charge loss on floating strips.
-  double Cc = (have_electrons) ? info.getCouplingCapacitanceU() :
-              info.getCouplingCapacitanceV();
-  double Ci = (have_electrons) ? info.getInterstripCapacitanceU() :
-              info.getInterstripCapacitanceV();
-  double Cb = (have_electrons) ? info.getBackplaneCapacitanceU() :
-              info.getBackplaneCapacitanceV();
-
-  double cNeighbour2 = 0.0; // 0.5*Ci/(Ci+Cb);
-  double cNeighbour1 = Ci / (2 * Ci + Cb);
-  double cSelf = 3 * Cc / (3 * Cc + Ci + 3 * Cb);
-
   std::deque<double> readoutCharges;
   std::deque<int> readoutStrips;
   for (std::size_t index = 2; index <  strips.size() - 2; index += 2) {
+    int currentStrip = static_cast<int>(strips[index]);
+    double Cc = (have_electrons) ? info.getCouplingCapacitanceU(currentStrip) :
+                info.getCouplingCapacitanceV(currentStrip);
+    double Ci = (have_electrons) ? info.getInterstripCapacitanceU(currentStrip) :
+                info.getInterstripCapacitanceV(currentStrip);
+    double Cb = (have_electrons) ? info.getBackplaneCapacitanceU(currentStrip) :
+                info.getBackplaneCapacitanceV(currentStrip);
+
+    double cNeighbour2 = 0.5 * Ci / (Ci + Cb + Cc);
+    double cNeighbour1 = Ci / (Ci + Cb);
+    double cSelf = Cc / (Ci + Cb + Cc);
+
     readoutCharges.push_back(cSelf * (
                                cNeighbour2 * stripCharges[index - 2]
                                + cNeighbour1 * stripCharges[index - 1]
@@ -526,7 +525,7 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
                                + cNeighbour1 * stripCharges[index + 1]
                                + cNeighbour2 * stripCharges[index + 2]
                              ));
-    readoutStrips.push_back(static_cast<int>(strips[index]));
+    readoutStrips.push_back(currentStrip);
   }
   // Trim at sensor edges
   double tail = 0;

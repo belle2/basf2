@@ -67,18 +67,21 @@ namespace Belle2 {
         infoPar.getVCells(),
         infoPar.getWidth2()
       );
-      const double unit_pF = 1000 * Unit::fC / Unit::V; // picofarad
       info->setSensorParams(
+        infoPar.getStripEdgeU(),
+        infoPar.getStripEdgeV(),
         infoPar.getDepletionVoltage(),
         infoPar.getBiasVoltage(),
-        infoPar.getBackplaneCapacitanceU() * unit_pF,
-        infoPar.getInterstripCapacitanceU() * unit_pF,
-        infoPar.getCouplingCapacitanceU() * unit_pF,
-        infoPar.getBackplaneCapacitanceV() * unit_pF,
-        infoPar.getInterstripCapacitanceV() * unit_pF,
-        infoPar.getCouplingCapacitanceV() * unit_pF,
+        infoPar.getBackplaneCapacitanceU(),
+        infoPar.getInterstripCapacitanceU(),
+        infoPar.getCouplingCapacitanceU(),
+        infoPar.getBackplaneCapacitanceV(),
+        infoPar.getInterstripCapacitanceV(),
+        infoPar.getCouplingCapacitanceV(),
         infoPar.getElectronicNoiseU(),
-        infoPar.getElectronicNoiseV()
+        infoPar.getElectronicNoiseV(),
+        infoPar.getElectronicNoiseSbwU(),
+        infoPar.getElectronicNoiseSbwV()
       );
       m_SensorInfo.push_back(info);
       return info;
@@ -87,7 +90,9 @@ namespace Belle2 {
     SVDSensorInfoPar* GeoSVDCreator::readSensorInfo(const GearDir& sensor)
     {
 
-      const double unit_pF = 1000 * Unit::fC / Unit::V; // picofarad
+      const double unit_pFcm = 1;
+      // This was 1000 * Unit::fC / Unit::V / Unit::cm; // pF/cm.
+      // We only use ratios of capacities, and this gives nicer numbers.
       SVDSensorInfoPar* info = new SVDSensorInfoPar(
         VxdID(0, 0, 0),
         sensor.getLength("width"),
@@ -99,16 +104,20 @@ namespace Belle2 {
       );
 
       info->setSensorParams(
+        sensor.getWithUnit("stripEdgeU"),
+        sensor.getWithUnit("stripEdgeV"),
         sensor.getWithUnit("DepletionVoltage"),
         sensor.getWithUnit("BiasVoltage"),
-        sensor.getDouble("BackplaneCapacitanceU") * unit_pF,
-        sensor.getDouble("InterstripCapacitanceU") * unit_pF,
-        sensor.getDouble("CouplingCapacitanceU") * unit_pF,
-        sensor.getDouble("BackplaneCapacitanceV") * unit_pF,
-        sensor.getDouble("InterstripCapacitanceV") * unit_pF,
-        sensor.getDouble("CouplingCapacitanceV") * unit_pF,
+        sensor.getDouble("BackplaneCapacitanceU") * unit_pFcm,
+        sensor.getDouble("InterstripCapacitanceU") * unit_pFcm,
+        sensor.getDouble("CouplingCapacitanceU") * unit_pFcm,
+        sensor.getDouble("BackplaneCapacitanceV") * unit_pFcm,
+        sensor.getDouble("InterstripCapacitanceV") * unit_pFcm,
+        sensor.getDouble("CouplingCapacitanceV") * unit_pFcm,
         sensor.getWithUnit("ElectronicNoiseU"),
-        sensor.getWithUnit("ElectronicNoiseV")
+        sensor.getWithUnit("ElectronicNoiseV"),
+        sensor.getWithUnit("ElectronicNoiseSbwU", 0),
+        sensor.getWithUnit("ElectronicNoiseSbwV", 0)
       );
 
       return info;

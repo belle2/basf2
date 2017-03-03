@@ -31,6 +31,7 @@ class Cosmics(TrackingValidationRun):
     components = None
     finder_module = 'TrackFinderCDCCosmics'
     tracking_coverage = {
+        'WhichParticles': ['CDC'],  # Include all particles seen in CDC, also secondaries
         'UsePXDHits': False,
         'UseSVDHits': False,
         'UseCDCHits': True,

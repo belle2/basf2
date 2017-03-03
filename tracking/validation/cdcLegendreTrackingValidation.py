@@ -41,6 +41,7 @@ class CDCLegendre(TrackingValidationRun):
         path.add_module('TrackExporter')
 
     tracking_coverage = {
+        'WhichParticles': ['CDC'],  # Include all particles seen in CDC, also secondaries
         'UsePXDHits': False,
         'UseSVDHits': False,
         'UseCDCHits': True,

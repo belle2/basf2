@@ -30,6 +30,7 @@ class Full(TrackingValidationRun):
     root_input_file = '../EvtGenSimNoBkg.root'
     finder_module = staticmethod(tracking.add_tracking_reconstruction)
     tracking_coverage = {
+        # 'WhichParticles': [], # Include all particles, also secondaries
         'UsePXDHits': True,
         'UseSVDHits': True,
         'UseCDCHits': True,

@@ -37,11 +37,11 @@ class CDCFull(TrackingValidationRun):
         #               UseNLoops=1)
 
     tracking_coverage = {
+        'WhichParticles': ['CDC'],  # Include all particles seen in CDC, also secondaries
         'UsePXDHits': False,
         'UseSVDHits': False,
         'UseCDCHits': True,
         'UseOnlyAxialCDCHits': False,
-        # 'WhichParticles': ['CDC'], # Uncomment to count also secondary tracks
         # "UseNLoops" : 1,
         # 'EnergyCut': 0.1,
     }

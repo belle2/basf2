@@ -45,6 +45,7 @@ class VXD(TrackingValidationRun):
 
     #: use only hits from the VXD detectors
     tracking_coverage = {
+        'WhichParticles': ['SVD'],  # Include all particles seen in the SVD detector, also secondaries
         'UsePXDHits': True,
         'UseSVDHits': True,
         'UseCDCHits': False,

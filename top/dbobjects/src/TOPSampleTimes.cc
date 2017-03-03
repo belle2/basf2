@@ -39,19 +39,49 @@ void TOPSampleTimes::setTimeAxis(const std::vector<double>& sampleTimes,
 }
 
 
-double TOPSampleTimes::getTime(unsigned window, double sample) const
+double TOPSampleTimes::getFullTime(unsigned window, double sample) const
 {
 
   int sampleNum = int(sample);
+  if (sample < 0) sampleNum--;
   double frac = sample - sampleNum;
 
-  sampleNum += window * c_WindowSize; // counted from window 0
+  sampleNum += (int)(window * c_WindowSize);  // counted from window 0
   int n = sampleNum / c_TimeAxisSize;
   int k = sampleNum % c_TimeAxisSize;
+  if (k < 0) {
+    n--;
+    k += c_TimeAxisSize;
+  }
+
   double time = n * getTimeRange() + m_timeAxis[k]; // from sample 0 window 0
   time += (m_timeAxis[k + 1] - m_timeAxis[k]) * frac; // add fraction
 
   return time;
+}
+
+
+double TOPSampleTimes::getSample(unsigned window, double time) const
+{
+  time += getFullTime(window, 0);
+  int n = int(time / getTimeRange());
+  if (time < 0) n--;
+
+  double t = time - getTimeRange() * n;
+  int i1 = 0;
+  int i2 = c_TimeAxisSize;
+  while (i2 - i1 > 1) {
+    int i = (i1 + i2) / 2;
+    if (t > m_timeAxis[i]) {
+      i1 = i;
+    } else {
+      i2 = i;
+    }
+  }
+
+  return (n * (int) c_TimeAxisSize - (int)(window * c_WindowSize) + i1 +
+          (t - m_timeAxis[i1]) / (m_timeAxis[i2] - m_timeAxis[i1]));
+
 }
 
 

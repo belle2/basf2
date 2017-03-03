@@ -3,7 +3,7 @@
 
 ################################################################################
 #
-# This tutorial runs over flat NTuples of reconstructed ed B->KsPi0 decays,
+# This tutorial runs over flat NTuples of reconstructed B->KsPi0 decays,
 # which were created running B2A701. The training and test datasets consist of
 # a mixture of reconstructed Bd->KsPi0 and qqbqr MC. The apply datasets are
 # pure signal and qqbar for running the expert as explained below.
@@ -32,7 +32,11 @@ if __name__ == "__main__":
     apply_signal_data = path + 'apply_signal.root'
     apply_qqbar_data = path + 'apply_qqbar.root'
 
-    # Variables for training.
+    # Define the variables for training.
+    #  For details, please see: https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
+    #  Note that KSFWVariables takes the optional additional argument FS1, to return the variables calculated from the
+    #  signal-B final state particles.
+    #  CleoCone also takes the optional additional argument ROE, to return the cones calculated from ROE particles only.
     trainVars = [
         'R2',
         'thrustBm',
@@ -63,7 +67,8 @@ if __name__ == "__main__":
         'CleoCone(6)',
         'CleoCone(7)',
         'CleoCone(8)',
-        'CleoCone(9)']
+        'CleoCone(9)'
+    ]
 
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector(train_data)

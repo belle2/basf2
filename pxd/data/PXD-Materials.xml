@@ -9,6 +9,20 @@
   </Material>
 
   <!--
+    The ceramic caps on the switcher balcony are assumed to consist of Bariumtitanate BaTiO3
+  -->
+  <Material name="BaTiO3">
+    <state>Solid</state>
+    <density unit="g/cm3">5.85</density>
+    <temperature>263.15</temperature>
+    <Components>
+      <Material fraction="0.588901">Ba</Material>
+      <Material fraction="0.205268">Ti</Material>
+      <Material fraction="0.205831">O</Material>
+    </Components>
+  </Material>
+
+  <!--
     There are some trenches in the PXD sensors left and right to the sensitive
     area to reduce material. These are modelled by using a mixture of Air and
     silicon. The fractions were calculated using the CAD models of the Sensor,
@@ -93,6 +107,13 @@
     <state>Solid</state>
     <Components>
       <Material>PXD-Switcher</Material>
+    </Components>
+  </Material>
+
+  <Material name="PXD-Groove">
+    <state>Solid</state>
+    <Components>
+      <Material>ColdAir</Material>
     </Components>
   </Material>
 </Materials>

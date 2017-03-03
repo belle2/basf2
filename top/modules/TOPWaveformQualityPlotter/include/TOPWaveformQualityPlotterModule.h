@@ -33,7 +33,7 @@ namespace Belle2 {
    * Plots and histograms of waveforms and feature extracted parameters
    */
   class TOPWaveformQualityPlotterModule : public HistoModule {
-    typedef unsigned long long top_channel_id_t;
+    typedef unsigned long long top_channel_id_t; /**< topcaf channel ID (deprecated?) */
   public:
     /**
      * Constructor
@@ -87,12 +87,12 @@ namespace Belle2 {
     TH1F* m_moduleID = 0;          /**< plot of module ID */
     TH1F* m_pixelID = 0;           /**< plot of pixel ID for debugging */
 
-    StoreArray<TOPRawWaveform> m_waveform; /** < the raw waveforms */
+    StoreArray<TOPRawWaveform> m_waveform; /**< the raw waveforms */
     std::map<top_channel_id_t, TH1F*> m_channelNoiseMap; /**< histogram of the values after correction */
     std::map<top_channel_id_t, int> m_channelEventMap; /**< to find in which chunk a given channel is */
 
     std::map<int, std::map<std::string, TMultiGraph*>> m_channels; /**< per board stack, per asic */
-    std::map<int, std::map<std::string, std::set<int>>> m_channelLabels; // per board stack, per asic
+    std::map<int, std::map<std::string, std::set<int>>> m_channelLabels; /**< per board stack, per asic */
 
     std::map<int, std::map<int, std::map<int, std::map<int, TProfile*>>>> m_waveformHists; /**< scrod, carrier, asic, channel */
 
@@ -100,8 +100,8 @@ namespace Belle2 {
     bool m_DEBUGGING = true; /**< option to fill debug histograms */
     bool m_NOISE = false;    /**< option to draw noisemaps */
 
-    std::string m_histogramDirectoryName; /** < the name of the directory inside the output file */
-    TDirectory* m_directory = 0;          /** < the directory itself */
+    std::string m_histogramDirectoryName; /**< the name of the directory inside the output file */
+    TDirectory* m_directory = 0;          /**< the directory itself */
 
   };
 

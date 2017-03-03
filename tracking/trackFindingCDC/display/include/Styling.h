@@ -140,7 +140,7 @@ namespace Belle2 {
       void set(const std::string& key, std::unique_ptr<ObjectMapping> mapping)
       {
         if (mapping) {
-          m_mappingsByKey.emplace(key, std::move(mapping));
+          m_mappingsByKey[key] = std::move(mapping);
         }
       }
 

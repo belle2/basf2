@@ -26,19 +26,6 @@ namespace Belle2 {
   class SVDSensorInfoPar: public VXDSensorInfoBasePar {
 
   public:
-    /** Enum for parametric access to sensor coordinates. */
-    enum Coordinate {
-      u = 0,
-      v = 1
-    };
-    /**
-    * Enum to flag charge carriers.
-    */
-    enum CarrierType {
-      electron = -1, /** electrons */
-      hole = +1      /** holes */
-    };
-
     /** Constructor which automatically sets the SensorType to SensorInfo::SVD.
      * @param id VXD ID of the sensor.
      * @width Width of the sensor.
@@ -116,19 +103,6 @@ namespace Belle2 {
     double getElectronicNoiseV() const {return m_electronicNoiseV; }
 
 
-    /** Return Hall factor for the corresponding carrier type.
-     * @param carrier electron or hole, SVDSensorInfoPar::CarrierType
-     * @return The Hall factor for the actual sensor temperature.
-     */
-    double getHallFactor(CarrierType carrier) const
-    {
-      if (carrier == electron)
-        return (1.13 + 0.0008 * (m_temperature - 273));
-      else
-        return (0.72 - 0.0005 * (m_temperature - 273));
-    }
-
-
   private:
     /** Sensor temperature*/
     double m_temperature;
@@ -153,7 +127,7 @@ namespace Belle2 {
     /** The electronic noise for V (long, p-side) strips. */
     double m_electronicNoiseV;
 
-    ClassDef(SVDSensorInfoPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(SVDSensorInfoPar, 6);  /**< ClassDef, must be the last term before the closing {}*/
   };
 } // end of namespace Belle2
 

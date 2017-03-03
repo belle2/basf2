@@ -20,14 +20,17 @@ namespace Belle2 {
       /// Use an equal variance of 1 for all observations
       c_Unit = 0,
 
+      /// Use the fixed nominal drift length variance for all observations
+      c_Nominal = 1,
+
       /// Use the drift length as variance.
-      c_DriftLength = 1,
+      c_DriftLength = 2,
 
       /// Use the square of the drift length as variance.
-      c_Pseudo = 2,
+      c_Pseudo = 3,
 
       /// Use the drift length variance
-      c_Proper = 3,
+      c_Proper = 4,
     };
 
     /**
@@ -38,6 +41,8 @@ namespace Belle2 {
     {
       if (fitVarianceString == std::string("unit")) {
         return EFitVariance::c_Unit;
+      } else if (fitVarianceString == std::string("nominal")) {
+        return EFitVariance::c_Nominal;
       } else if (fitVarianceString == std::string("driftLength")) {
         return EFitVariance::c_DriftLength;
       } else if (fitVarianceString == std::string("pseudo")) {

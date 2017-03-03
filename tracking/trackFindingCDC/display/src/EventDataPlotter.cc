@@ -31,6 +31,7 @@
 #include <framework/logging/Logger.h>
 
 #include <cdc/dataobjects/CDCRecoHit.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <cmath>
 #include <exception>
@@ -639,6 +640,17 @@ void EventDataPlotter::draw(const RecoTrack& recoTrack, const AttributeMap& attr
     }
   }
   primitivePlotter.endGroup();
+}
+
+void EventDataPlotter::drawTrajectory(const MCParticle& mcParticle, const AttributeMap& attributeMap)
+{
+  if (not mcParticle.isPrimaryParticle()) return;
+  Vector3D pos(mcParticle.getVertex());
+  Vector3D mom(mcParticle.getMomentum());
+  double charge = mcParticle.getCharge();
+  double time = mcParticle.getProductionTime();
+  CDCTrajectory2D trajectory2D(pos.xy(), time, mom.xy(), charge);
+  draw(trajectory2D, attributeMap);
 }
 
 void EventDataPlotter::drawTrajectory(const CDCSegment2D& segment,

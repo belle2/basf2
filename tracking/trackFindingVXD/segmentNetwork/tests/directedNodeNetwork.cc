@@ -27,6 +27,7 @@
 
 #include <array>
 #include <iostream>
+#include <deque>
 
 using namespace std;
 using namespace Belle2;

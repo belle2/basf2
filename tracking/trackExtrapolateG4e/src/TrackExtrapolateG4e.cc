@@ -375,23 +375,16 @@ void TrackExtrapolateG4e::event(bool byMuid)
   }
 
   std::vector<G4ThreeVector> clusterPositions;
-  StoreArray<Muid>* muids = NULL;
-  StoreArray<TrackClusterSeparation>* trackClusterSeparations = NULL;
-  StoreArray<KLMCluster>* klmClusters = NULL;
   if (byMuid) {
-    StoreArray<Muid> _muids(*m_MuidsColName);
-    muids = &_muids;
-    StoreArray<TrackClusterSeparation> _trackClusterSeparations(*m_TrackClusterSeparationsColName);
-    trackClusterSeparations = &_trackClusterSeparations;
-    StoreArray<KLMCluster> _klmClusters(*m_KLMClustersColName);
-    klmClusters = &_klmClusters;
+    StoreArray<TrackClusterSeparation> trackClusterSeparations(*m_TrackClusterSeparationsColName);
+    StoreArray<KLMCluster> klmClusters(*m_KLMClustersColName);
     // one-to-one indexing correlation among clusterPositions, klmClusters, and trackClusterSeparations
-    for (int c = 0; c < klmClusters->getEntries(); ++c) {
-      TrackClusterSeparation* trackClusterSeparation = trackClusterSeparations->appendNew(); // initializes to HUGE distance
-      (*klmClusters)[c]->addRelationTo(trackClusterSeparation);
-      clusterPositions.push_back(G4ThreeVector((*klmClusters)[c]->getClusterPosition().X(),
-                                               (*klmClusters)[c]->getClusterPosition().Y(),
-                                               (*klmClusters)[c]->getClusterPosition().Z()) * CLHEP::cm);
+    for (int c = 0; c < klmClusters.getEntries(); ++c) {
+      TrackClusterSeparation* trackClusterSeparation = trackClusterSeparations.appendNew(); // initializes to HUGE distance
+      klmClusters[c]->addRelationTo(trackClusterSeparation);
+      clusterPositions.push_back(G4ThreeVector(klmClusters[c]->getClusterPosition().X(),
+                                               klmClusters[c]->getClusterPosition().Y(),
+                                               klmClusters[c]->getClusterPosition().Z()) * CLHEP::cm);
     }
   }
 
@@ -432,7 +425,8 @@ void TrackExtrapolateG4e::event(bool byMuid)
       if (target->GetDistanceFromPoint(positionG4e) < 0.0) continue;
       Muid* muid = NULL;
       if (byMuid) {
-        muid = muids->appendNew(pdgCode); // rest of this object will be filled later
+        StoreArray<Muid> muids(*m_MuidsColName);
+        muid = muids.appendNew(pdgCode); // rest of this object will be filled later
         b2track.addRelationTo(muid);
         muid->setMomentum(momentumG4e.x(), momentumG4e.y(), momentumG4e.z());
       }
@@ -475,18 +469,20 @@ void TrackExtrapolateG4e::event(bool byMuid)
               // Force geant4e to update its G4Track from the Kalman-updated state
               m_ExtMgr->GetPropagator()->SetStepN(0);
             }
-            for (int c = 0; c < trackClusterSeparations->getEntries(); ++c) {
+            StoreArray<KLMCluster> klmClusters(*m_KLMClustersColName);
+            StoreArray<TrackClusterSeparation> trackClusterSeparations(*m_TrackClusterSeparationsColName);
+            for (int c = 0; c < trackClusterSeparations.getEntries(); ++c) {
               G4ThreeVector clusterToTrack = clusterPositions[c] - pos;
               double distance = clusterToTrack.mag();
-              if (clusterToTrack.mag() < (*trackClusterSeparations)[c]->getDistance()) {
-                (*trackClusterSeparations)[c]->setTrackIndex(trackIndex); // DEPRECATED - use Relation
-                (*trackClusterSeparations)[c]->setDistance(distance);
+              if (clusterToTrack.mag() < trackClusterSeparations[c]->getDistance()) {
+                trackClusterSeparations[c]->setTrackIndex(trackIndex); // DEPRECATED - use Relation
+                trackClusterSeparations[c]->setDistance(distance);
                 G4ThreeVector dir(clusterToTrack.unit());
-                (*trackClusterSeparations)[c]->setDirection(dir);
-                (*trackClusterSeparations)[c]->setTrackClusterAngle(mom.angle(dir));
-                (*trackClusterSeparations)[c]->setTrackClusterInitialSeparationAngle(clusterPositions[c].angle(directionAtIP));
-                (*trackClusterSeparations)[c]->setTrackClusterSeparationAngle(clusterPositions[c].angle(mom));
-                (*trackClusterSeparations)[c]->setTrackRotationAngle(mom.angle(directionAtIP));
+                trackClusterSeparations[c]->setDirection(dir);
+                trackClusterSeparations[c]->setTrackClusterAngle(mom.angle(dir));
+                trackClusterSeparations[c]->setTrackClusterInitialSeparationAngle(clusterPositions[c].angle(directionAtIP));
+                trackClusterSeparations[c]->setTrackClusterSeparationAngle(clusterPositions[c].angle(mom));
+                trackClusterSeparations[c]->setTrackRotationAngle(mom.angle(directionAtIP));
               }
             }
           }
@@ -514,10 +510,12 @@ void TrackExtrapolateG4e::event(bool byMuid)
       if (byMuid) {
         finishTrack(extState, muid, charge);
         // Find the matching KLMCluster(s)
-        for (unsigned int c = 0; c < clusterPositions.size(); ++c) {
-          if ((*trackClusterSeparations)[c]->getTrackIndex() == int(trackIndex)) {
+        StoreArray<KLMCluster> klmClusters(*m_KLMClustersColName);
+        StoreArray<TrackClusterSeparation> trackClusterSeparations(*m_TrackClusterSeparationsColName);
+        for (int c = 0; c < trackClusterSeparations.getEntries(); ++c) {
+          if (trackClusterSeparations[c]->getTrackIndex() == int(trackIndex)) {
             if (positionG4e.angle(clusterPositions[c]) < m_MaxClusterTrackConeAngle) {
-              b2track.addRelationTo((*klmClusters)[c]);
+              b2track.addRelationTo(klmClusters[c]);
               break;
             }
           }

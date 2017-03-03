@@ -13,6 +13,7 @@
 #include <framework/datastore/RelationsObject.h>
 #include <vector>
 #include <string>
+#include <algorithm>
 
 namespace Belle2 {
 
@@ -23,6 +24,12 @@ namespace Belle2 {
    */
   class TOPRawWaveform : public RelationsObject {
   public:
+
+    /**
+     * Various constants
+     */
+    enum {c_WindowSize = 64 /**< number of samples per window */
+         };
 
     /**
      * Default constructor
@@ -225,13 +232,18 @@ namespace Belle2 {
     }
 
     /**
-     * Checks if storage windows come in the consecutive order (no gaps in between)
+     * Checks if storage windows come in the consecutive order before the last sample
+     * (no gaps in between before the last sample)
+     * @param lastSample last sample
      * @param storageDepth storage depth
-     * @return true, if no gaps
+     * @return true, if no gaps before the last sample
      */
-    bool areWindowsInOrder(unsigned short storageDepth = 512) const
+    bool areWindowsInOrder(unsigned lastSample = 0xFFFFFFFF,
+                           unsigned short storageDepth = 512) const
     {
-      for (unsigned i = 1; i < m_windows.size(); i++) {
+      unsigned last = lastSample / c_WindowSize + 1;
+      unsigned size = m_windows.size();
+      for (unsigned i = 1; i < std::min(last, size); i++) {
         auto diff = m_windows[i] - m_windows[i - 1];
         if (diff < 0) diff += storageDepth;
         if (diff != 1) return false;

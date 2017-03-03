@@ -33,14 +33,14 @@ namespace {
   }
 }
 
+const TObject* PyDBArray::_get(int i) const
+{
+  return (**m_array)[i];
+}
+
 int PyDBArray::getEntries() const
 {
   return isValid() ? ((*m_array)->GetEntriesFast()) : 0;
-}
-
-TIter PyDBArray::__iter__() const
-{
-  return TIter(isValid() ? *m_array : nullptr);
 }
 
 PyDBArray::PyDBArray(const std::string& name): PyDBArray(name, getDefaultClass(name)) {}

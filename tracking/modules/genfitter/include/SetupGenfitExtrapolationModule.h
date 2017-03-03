@@ -15,8 +15,10 @@
 
 #include <string>
 
-namespace Belle2 {
+#include <Geant4/G4Transform3D.hh>
+#include <root/TGeoMatrix.h>
 
+namespace Belle2 {
   /** Setup material handling and magnetic fields for use by genfit's extrapolation code
    *  (RKTrackRep).  This should be one of the first modules on any path working with tracks.
    */
@@ -54,9 +56,6 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
-    /** Re-initialize alignment corrections in VXD from database
-     */
-    void updateVXDAlignment();
 
     std::string m_geometry;       /**< choice of geometry representation: 'TGeo' or 'Geant4'.  */
 

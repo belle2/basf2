@@ -546,6 +546,14 @@ namespace Belle2 {
     bool hasTrackFitStatus(const genfit::AbsTrackRep* representation = nullptr) const
     {
       checkDirtyFlag();
+
+      // there might be the case, where the genfit track has no trackreps, even not the cardinal
+      // one because no fit attempt was performed. In this case, the "hasFitStatus" call to genfit
+      // will fail with access violation. To prevent that, check for the number of reps here before
+      // actually calling genfit's hasFitStatus(...)
+      if (m_genfitTrack.getNumReps() == 0)
+        return false;
+
       return m_genfitTrack.hasFitStatus(representation);
     }
 

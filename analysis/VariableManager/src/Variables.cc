@@ -10,6 +10,7 @@
 
 // Own include
 #include <analysis/VariableManager/Variables.h>
+#include <analysis/VariableManager/ParameterVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
@@ -931,16 +932,8 @@ namespace Belle2 {
 
     double genMotherPDG(const Particle* part)
     {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return 0.0;
-
-      const MCParticle* mcmother = mcparticle->getMother();
-      if (mcmother == nullptr)
-        return 0.0;
-
-      int m_pdg = mcmother->getPDG();
-      return m_pdg;
+      const std::vector<double> args = {};
+      return genNthMotherPDG(part, args);
     }
 
     double genMotherP(const Particle* part)
@@ -959,16 +952,8 @@ namespace Belle2 {
 
     double genMotherIndex(const Particle* part)
     {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (!mcparticle)
-        return -1.0;
-
-      const MCParticle* mcmother = mcparticle->getMother();
-      if (!mcmother)
-        return -2.0;
-
-      double m_ID = mcmother->getArrayIndex();
-      return m_ID;
+      const std::vector<double> args = {};
+      return genNthMotherIndex(part, args);
     }
 
     double genParticleIndex(const Particle* part)
@@ -1188,6 +1173,18 @@ namespace Belle2 {
 
       if (vert)
         result = vert->getDeltaT();
+
+      return result;
+    }
+
+    double particleDeltaTErr(const Particle* particle)
+    {
+      double result = -1111.0;
+
+      Vertex* vert = particle->getRelatedTo<Vertex>();
+
+      if (vert)
+        result = vert->getDeltaTErr();
 
       return result;
     }
@@ -1889,7 +1886,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("genMotherPDG", genMotherPDG,
                       "Check the PDG code of a particles MC mother particle");
     REGISTER_VARIABLE("genMotherID", genMotherIndex,
-                      "Check the array index of a particle's generated mother");
+                      "Check the array index of a particles generated mother");
     REGISTER_VARIABLE("genMotherP", genMotherP,
                       "Generated momentum of a particles MC mother particle");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,
@@ -1949,6 +1946,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("TagVy", particleTagVy, "Tag vertex Y");
     REGISTER_VARIABLE("TagVz", particleTagVz, "Tag vertex Z");
     REGISTER_VARIABLE("DeltaT", particleDeltaT, "Delta T(Brec - Btag) in ps");
+    REGISTER_VARIABLE("DeltaTErr", particleDeltaTErr, "Delta T error in ps");
     REGISTER_VARIABLE("MCDeltaT", particleMCDeltaT,
                       "Generated Delta T(Brec - Btag) in ps");
     REGISTER_VARIABLE("DeltaZ", particleDeltaZ, "Z(Brec) - Z(Btag)");

@@ -39,6 +39,7 @@ RingBuffer::RingBuffer(int size)
 {
   m_file = false;
   m_new = true;
+  m_procIsBusy = false;
   m_pathname = "";
   m_shmkey = IPC_PRIVATE;
   m_semkey = IPC_PRIVATE;
@@ -51,6 +52,7 @@ RingBuffer::RingBuffer(int size)
 // Constructor of Global Ringbuffer with name
 RingBuffer::RingBuffer(const std::string& name, unsigned int nwords)
 {
+  m_procIsBusy = false;
   // 0. Determine shared memory type
   if (name != "private") { // Global
     m_file = true;
@@ -146,6 +148,7 @@ void RingBuffer::openSHM(int nwords)
     m_bufinfo->nbuf = 0;
     m_bufinfo->semid = m_semid;
     m_bufinfo->nattached = 1;
+    m_bufinfo->nbusy = 0;
     m_bufinfo->errtype = 0;
     m_bufinfo->numAttachedTx = -1;
     m_bufinfo->ninsq = 0;
@@ -176,6 +179,12 @@ void RingBuffer::openSHM(int nwords)
 
 void RingBuffer::cleanup()
 {
+  if (m_procIsBusy) {
+    SemaphoreLocker locker(m_semid);
+    m_bufinfo->nbusy--;
+    m_procIsBusy = false;
+  }
+
   shmdt(m_shmadr);
   B2INFO("RingBuffer: Cleaning up IPC");
   if (m_new) {
@@ -320,6 +329,10 @@ int RingBuffer::remq(int* buf)
     throw std::runtime_error("[RingBuffer::remq ()] number of entries is negative: " + std::to_string(m_bufinfo->nbuf));
   }
   if (m_bufinfo->nbuf == 0) {
+    if (m_procIsBusy) {
+      m_bufinfo->nbusy--;
+      m_procIsBusy = false;
+    }
     return 0;
   }
   int* r_ptr = m_buftop + m_bufinfo->rptr;
@@ -327,6 +340,10 @@ int RingBuffer::remq(int* buf)
   if (nw <= 0) {
     printf("RingBuffer::remq : buffer size = %d, skipped\n", nw);
     printf("RingBuffer::remq : entries = %d\n", m_bufinfo->nbuf);
+    if (m_procIsBusy) {
+      m_bufinfo->nbusy--;
+      m_procIsBusy = false;
+    }
     return 0;
   }
   if (buf)
@@ -337,6 +354,11 @@ int RingBuffer::remq(int* buf)
   m_bufinfo->nbuf--;
   m_bufinfo->nremq++;
   m_remq_counter++;
+
+  if (not m_procIsBusy) {
+    m_bufinfo->nbusy++;
+    m_procIsBusy = true;
+  }
   return nw;
 }
 
@@ -386,11 +408,16 @@ void RingBuffer::kill()
   m_bufinfo->numAttachedTx = 0;
   m_bufinfo->nbuf = 0;
 }
-bool RingBuffer::continueReadingData() const
+bool RingBuffer::isDead() const
 {
   SemaphoreLocker locker(m_semid);
   //NOTE: numAttachedTx == -1 also means we should read data (i.e. initialization pending)
-  return (m_bufinfo->numAttachedTx != 0) or (m_bufinfo->nbuf > 0);
+  return (m_bufinfo->numAttachedTx == 0) and (m_bufinfo->nbuf <= 0);
+}
+bool RingBuffer::allRxWaiting() const
+{
+  SemaphoreLocker locker(m_semid);
+  return (m_bufinfo->nbusy == 0) and (m_bufinfo->nbuf == 0);
 }
 
 int RingBuffer::ninsq() const
@@ -466,6 +493,7 @@ void RingBuffer::dumpInfo() const
   printf("rptr = %d\n", m_bufinfo->rptr);
   printf("nbuf = %d\n", m_bufinfo->nbuf);
   printf("nattached = %d\n", m_bufinfo->nattached);
+  printf("nbusy = %d\n", m_bufinfo->nbusy);
   printf("errtype = %d\n", m_bufinfo->errtype);
   printf("numAttachedTx = %d\n", m_bufinfo->numAttachedTx);
   printf("ninsq = %d\n", m_bufinfo->ninsq);

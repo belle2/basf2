@@ -453,6 +453,13 @@ namespace Belle2 {
     double particleDeltaT(const Particle* particle);
 
     /**
+     * return Delta T error in ps
+     *
+     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
+     */
+    double particleDeltaTErr(const Particle* particle);
+
+    /**
      * return generated Delta T (Brec - Btag) in ps
      *
      * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)

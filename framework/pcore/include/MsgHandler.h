@@ -23,7 +23,8 @@ class TMessage;
 namespace Belle2 {
   /** dynamic character buffer that knows its size.
    *
-   * compared with std::vector<char> this saves some allocations if reused.
+   * compared with std::vector<char> this saves unnecessary calls to memset()
+   * when adding a block. (resize() initialises memory to null bytes)
    */
   class CharBuffer {
     std::vector<char> m_vec; /**< data buffer. */

@@ -295,6 +295,7 @@ if global_env.GetOption("sphinx"):
     for sphinx_target in sphinx_targets:
         sphinx = global_env.Command('build/%s' % sphinx_target, 'index.rst', 'sphinx-build -b %s -c site_scons/sphinx -d build/doctrees . $TARGET' % sphinx_target)
         global_env.Depends(sphinx, ['scripts', 'lib', 'bin'])
+        global_env.SideEffect('PreventParallelSphinxBuilds', sphinx)
         global_env.AlwaysBuild(sphinx)
         global_env.Alias(sphinx_target, sphinx)
 

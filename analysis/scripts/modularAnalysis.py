@@ -159,7 +159,7 @@ def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main)
 
 def skimOutputUdst(skimname, skimParticleLists=[], outputParticleLists=[], includeArrays=[], path=analysis_main):
     """
-    Create a new path for events that contain a non-empty particle list.
+    Create a new path for events that contain a non-empty particle list specified via skimParticleLists.
     Write the accepted events as a udst file, saving only particles from skimParticleLists
     and from outputParticleLists.
     Additional Store Arrays and Relations to be stored can be specified via includeArrays

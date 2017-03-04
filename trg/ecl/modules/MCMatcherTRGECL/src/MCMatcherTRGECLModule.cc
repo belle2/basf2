@@ -432,7 +432,7 @@ void MCMatcherTRGECLModule::event()
   for (int ii = 0; ii < NofTCHit; ii++) {
 
     TRGECLHit* aTRGECLHit = trgeclHitArray[ii];
-    TCIdHit[ii]         = (aTRGECLHit->getCellId() - 1);
+    TCIdHit[ii]         = (aTRGECLHit->getTCId() - 1);
     TCHitTiming[ii]    = aTRGECLHit ->getTimeAve();
     TCHitEnergy[ii] =  aTRGECLHit -> getEnergyDep();
     int itimeindex = (int)(TCHitTiming[ii] / 100 + 40);

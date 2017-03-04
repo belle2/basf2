@@ -25,8 +25,10 @@
 //trg package headers
 #include "trg/trg/Debug.h"
 #include "trg/ecl/modules/trgecl/TRGECLFAMModule.h"
-#include "trg/ecl/TrgEclFAM.h"
-#include "trg/ecl/dataobjects/TRGECLDigi.h"
+#include "trg/ecl/TrgEclDigitizer.h"
+#include "trg/ecl/TrgEclFAMFit.h"
+
+#include "trg/ecl/dataobjects/TRGECLFAMAna.h"
 #include "trg/ecl/dataobjects/TRGECLDigi0.h"
 #include "trg/ecl/dataobjects/TRGECLHit.h"
 #include "trg/ecl/dataobjects/TRGECLWaveform.h"
@@ -56,8 +58,11 @@ namespace Belle2 {
     : Module::Module(),
       _debugLevel(0),
       _famMethod(1),
-      _binTimeInterval(100),
-      _waveform(0)
+      _binTimeInterval(125),
+      _waveform(0),
+      _beambkgtag(0),
+      _famana(0),
+      _threshold(100.0)
 
   {
 
@@ -68,8 +73,16 @@ namespace Belle2 {
     addParam("FAMFitMethod", _famMethod, "TRGECLFAM fit method", _famMethod);
     addParam("FAMBinTimeInterval", _binTimeInterval, "TRGECLFAM binTimeInterval",
              _binTimeInterval);
-    addParam("TCWaveform", _waveform, "TRGECLFAM Output the TC waveform ",
+    addParam("TCWaveform", _waveform, "Output the TC waveform ",
              _waveform);
+    addParam("FAMAnaTable", _famana, "Save FAM ana table ",
+             _famana);
+    addParam("BeamBkgTag", _beambkgtag, "Save beambackground tag in TRGECLHit table ",
+             _beambkgtag);
+    addParam("TCThreshold", _threshold, "Set FAM TC threshold ",
+             _threshold);
+
+
 
 
     if (TRGDebug::level()) {
@@ -115,10 +128,10 @@ namespace Belle2 {
     m_nRun   = 0;
     m_nEvent = 1;
 
-    StoreArray<TRGECLDigi>::registerPersistent();
     StoreArray<TRGECLDigi0>::registerPersistent();
-    StoreArray<TRGECLHit>::registerPersistent();
     StoreArray<TRGECLWaveform>::registerPersistent();
+    StoreArray<TRGECLHit>::registerPersistent();
+    StoreArray<TRGECLFAMAna>::registerPersistent();
 
   }
 //
@@ -151,20 +164,40 @@ namespace Belle2 {
     else if (m_nEvent < 1e4) {if (m_nEvent %  1000 == 0) {printf("TRGECLFAMModule::event> evtno=%10i\n", m_nEvent);}}
     else if (m_nEvent < 1e5) {if (m_nEvent % 10000 == 0) {printf("TRGECLFAMModule::event> evtno=%10i\n", m_nEvent);}}
     else if (m_nEvent < 1e6) {if (m_nEvent % 100000 == 0) {printf("TRGECLFAMModule::event> evtno=%10i\n", m_nEvent);}}
-    //
-    //
-    //
-    // FAM simulation
-    TrgEclFAM* obj_trgeclfam = new TrgEclFAM();
 
-    obj_trgeclfam-> setWaveform(_waveform);
-    obj_trgeclfam->setup(m_nEvent, _famMethod);
+
+    //
+    //
+    //
+    // FAM Digitizer
+    TrgEclDigitizer* obj_trgeclDigi = new TrgEclDigitizer();
+    obj_trgeclDigi-> setWaveform(_waveform);
+    obj_trgeclDigi-> setup(m_nEvent);
+
+    if (_famMethod == 2 || _famMethod == 1) {obj_trgeclDigi->  digitization01(TCDigiE, TCDigiT); } // no-fit method = backup method 1
+    else if (_famMethod == 3) { obj_trgeclDigi-> digitization02(TCDigiE, TCDigiT); } // orignal method = backup method 2
+    //    obj_trgeclDigi-> save(m_nEvent);
+
+    // FAM Fitter
+    TrgEclFAMFit* obj_trgeclfit = new TrgEclFAMFit();
+    obj_trgeclfit-> SetBeamBkgTagFlag(_beambkgtag);
+    obj_trgeclfit-> SetAnaTagFlag(_famana);
+    obj_trgeclfit-> SetThreshold(_threshold);
+    obj_trgeclfit-> setup(m_nEvent);
+
+    if (_famMethod == 1) {obj_trgeclfit->  FAMFit01(TCDigiE, TCDigiT); } // fitting method
+    else if (_famMethod == 2) {obj_trgeclfit->  FAMFit02(TCDigiE, TCDigiT); } // no-fit method = backup method 1
+    else if (_famMethod == 3) { obj_trgeclfit-> FAMFit03(TCDigiE, TCDigiT); } // orignal method = backup method 2
+    obj_trgeclfit-> save(m_nEvent);
+
+
+
     //
     //
     //
     m_nEvent++;
-    delete obj_trgeclfam;
-
+    delete obj_trgeclDigi;
+    delete obj_trgeclfit;
     //
     //
     //

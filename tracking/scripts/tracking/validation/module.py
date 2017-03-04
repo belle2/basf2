@@ -641,6 +641,19 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
                 is_expert = not(parameter_name in non_expert_parameters)
 
+                # Apply some boundaries for the maximal tracking acceptance
+                # such that the plots look more instructive
+                print("**** Encountered ****", root_save_name(parameter_name))
+                if root_save_name(parameter_name) == 'tan_lambda':
+                    lower_bound = -1.73
+                    upper_bound = 3.27
+                elif root_save_name(parameter_name) == 'theta':
+                    lower_bound = 17 * math.pi / 180
+                    upper_bound = 150 * math.pi / 180
+                else:
+                    lower_bound = None
+                    upper_bound = None
+
                 profile_plot_name = plot_name_prefix + '_by_' \
                     + root_save_name(parameter_name)
                 profile_plot = ValidationPlot(profile_plot_name)
@@ -648,6 +661,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                                      xs,
                                      weights=weights,
                                      outlier_z_score=10.0,
+                                     lower_bound=lower_bound,
+                                     upper_bound=upper_bound,
                                      is_expert=is_expert)
 
                 profile_plot.xlabel = compose_axis_label(parameter_name)

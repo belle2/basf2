@@ -1,12 +1,12 @@
 # Relation betw. wireID and frontend electronicsID
-- - - 
+
 Format: super layerID (0-8), layerID in the super-layer (0-), wireID(0-), boardID (0-299), channelID (0-47).
 
 * ch_map.dat: coded by Yamada (DAQ group).
 
 
 # xt-relation in new format
-- - - 
+
 * change wrt old format file 
  - add incident angle bin info. at the top of a file in old format.
  - add xt parameterization mode and no. of params. after that. 
@@ -20,7 +20,7 @@ Format: super layerID (0-8), layerID in the super-layer (0-), wireID(0-), boardI
 * xt_noB_v1.dat   : created from xt_noB_v0.3. 
 
 # xt-relation in old format
-- - - 
+
 Format: lyr#  theta  alpha phi left/right 0th 1st 2nd 3rd 4th 5th cut-off slope
 lyr#: layerID (0-55);
 theta: polar angle of the incident track (18-149deg.);
@@ -53,7 +53,7 @@ Unit: cm and microsec.
                              xt(theta = 149) = xt(theta = 130).
 
 # sigma in new format
-- - - 
+
 * change wrt old format file 
  - add incident angle bin info. at the top of a file in old format.
  - add sigma parameterization mode and no. of params. after that. 
@@ -64,7 +64,7 @@ Unit: cm and microsec.
 
 
 # sigma in old format
-- - - 
+
 The file contains intrinsic space resolution^2 of CDC.
 
 sigma^2 = sigma^2(layer, driftL) [cm^2].
@@ -84,7 +84,7 @@ See CDCGeometryPar::getSigma() for detail.
                     the code previously).
 
 # propagation speed
-- - - 
+
 The file contains propagation speed of electric signal along a sense wire.
 
 Format: layerID, speed [cm/ns]
@@ -93,7 +93,7 @@ Format: layerID, speed [cm/ns]
 
 
 # t0
-- - - 
+
 The file contains the constants related to trigger-signal delay (or event time).
 
 Format: layerID (0-55), wireID(0-), t0 [ns]
@@ -101,7 +101,7 @@ Format: layerID (0-55), wireID(0-), t0 [ns]
 * t0.dat: Set t0=8192 ns for all wires.
 
 # badwire
-- - - 
+
 The file contains a list of bad wires.
 
 Format: layerID (0-55), wireID(0-)
@@ -112,7 +112,7 @@ Format: layerID (0-55), wireID(0-)
 * badwire_v2.dat    : contains bad wires known as of Feburary, 2017.
 
 # time-walk
-- - - 
+
 The file contains coefficients for time-walk (p.h.-dependent timing shift).
 
 Parametrization: time-walk = A/sqrt(ADCcount).
@@ -123,7 +123,7 @@ Format: frontend electronics boardID (0-299), A [ns/sqrt(ADCcount)]
 * tw_crudevalues.dat: Crude As obtained from the beam test in '13. Modified for use in Monte Carlo.
 
 # (mis)alignment
-- - - 
+
 The file contains (mis)alignment parameters w.r.t. displaced geometry (=design+displacement geometry). Misalignment params. are used in digitization; alignment ones in reconstruction.
 
 Format: layerID (0-55), wireID (0-), shift (dx,dy,dz) of sense wire at backward end-plate [cm], (dx,dy,dz) of sense wire at forward end-plate [cm], tension [grW]
@@ -138,7 +138,7 @@ Format: layerID (0-55), wireID (0-), shift (dx,dy,dz) of sense wire at backward 
 * alignment_v2.dat:  : = misalignment_v2.dat
 
 # tentative correction for the difference betw. old design and final design
-- - - 
+
 Only apply to sense wire z-positions.
 To be eliminated when the final design is implemented in geometry in future.
 
@@ -147,7 +147,7 @@ Format: layer  backward-deltaz (cm)  forward-deltaz (cm)
 deltaz.dat: obsolete (no longer needed).
 
 # displacement  w.r.t. final design
-- - - 
+
 Only apply to sense wire positions.
 
 Format: layerID (0-55), wireID (0-), displacement (dx,dy,dz) of sense wire at backward end-plate [cm], ibid. at forward end-plate [cm]

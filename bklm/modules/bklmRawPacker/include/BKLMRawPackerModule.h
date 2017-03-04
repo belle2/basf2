@@ -118,7 +118,7 @@ namespace Belle2 {
     //! TO be used to map electronics address to module id
     int electCooToInt(int copper, int finesse, int lane, int axis);
 
-    //get the default electronic Id
+    //! get the default electronic Id
     int getDefaultElectId(int isForward, int sector, int layer, int axis);
 
   };

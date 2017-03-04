@@ -434,7 +434,7 @@ unsigned short BKLMUnpackerModule::getChannel(int sector, int layer, int axis, u
 
   //if (layer > 2) channel = channel + 1;
   if (sector == 3 && layer > 2 && layer < 16) channel = channel + 1;
-  if (sector == 7 && layer > 2 && layer < 16) channel = channel;
+  //if (sector == 7 && layer > 2 && layer < 16) channel = channel;
 
   return channel;
 }

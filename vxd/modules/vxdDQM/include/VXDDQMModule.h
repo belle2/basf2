@@ -1,11 +1,11 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Peter Kodys                                              *
  *                                                                        *
- * Prepared for Combined TB DESY 2016                                     *
+ * Prepared for Belle II geometry                                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -29,37 +29,10 @@
 
 namespace Belle2 {
 
-  /** Map of all signals in one sensor. */
-//  typedef std::map<short int, SVDSignal> StripSignals;
-
-  /** Signals of u- and v- strips in one sensor. */
-//  typedef std::pair<StripSignals, StripSignals> Sensor;
-
-  /** Map of all signals in all sensors */
-//  typedef std::map<VxdID, Sensor> Sensors;
-
-
   /** SVD DQM Module */
   class VXDDQMModule : public HistoModule {  // <- derived from HistoModule class
 
   public:
-
-    /** Number of SVD planes and their numbers.
-     * The actual (layer, ladder, sensor numbers are (i,1,i), i = 3,4,5,6
-     */
-//    enum {
-//      c_nSVDLayers = 4,
-//      c_firstSVDLayer = 3,
-//      c_lastSVDLayer = 6,
-//      c_MaxSensorsInSVDLayer = 5,
-//      c_nPXDLayers = 2,
-//      c_firstPXDLayer = 1,
-//      c_lastPXDLayer = 2,
-//      c_MaxSensorsInPXDLayer = 2,
-//      c_nVXDLayers = 6,
-//      c_firstVXDLayer = 1,
-//      c_lastVXDLayer = 6,
-//    };
 
     /** Constructor */
     VXDDQMModule();
@@ -81,68 +54,7 @@ namespace Belle2 {
 
   private:
 
-    /** Structure containing signals in all existing sensors */
-//    Sensors m_sensors;
-    /** Utility functions to convert indices to plane numbers and v.v.,
-     * and to protect against range errors.
-     */
-//    inline int indexToLayer(int index) const
-//    {
-//      return c_firstSVDLayer + index;
-//    }
-//    inline int planeToIndex(int iLayer) const
-//    {
-//      return iLayer - c_firstSVDLayer;
-//    }
-//    inline int indexToLayerPXD(int indexPXD) const
-//    {
-//      return c_firstPXDLayer + indexPXD;
-//    }
-//    inline int planeToIndexPXD(int iLayerPXD) const
-//    {
-//      return iLayerPXD - c_firstPXDLayer;
-//    }
-//    inline int indexToLayerVXD(int indexVXD) const
-//    {
-//      return c_firstVXDLayer + indexVXD;
-//    }
-//    inline int planeToIndexVXD(int iLayerVXD) const
-//    {
-//      return iLayerVXD - c_firstVXDLayer;
-//    }
-
-    /** This is a shortcut to getting SVD::SensorInfo from the GeoCache.
-     * @param index Index of the sensor (0,1,2,3), _not_ layer number!
-     * @param sensor Number of the sensor (1,.. - depend of layer)!
-     * @return SensorInfo object for the desired plane.
-     */
-//    inline const SVD::SensorInfo& getInfo(int index, int sensor) const;
-
-    /** This is a shortcut to getting PXD::SensorInfo from the GeoCache.
-     * @param index Index of the sensor (0,1), _not_ layer number!
-     * @param sensor Number of the sensor (1,2)!
-     * @return SensorInfo object for the desired plane.
-     */
-//    inline const PXD::SensorInfo& getInfoPXD(int index, int sensor) const;
-
-    /** This is a shortcut to getting number of sensors for PXD and SVD layers.
-    * @param layer Index of sensor layer (1,6)
-    * @return Number of sensors in layer.
-    */
-//    inline int getSensorsInLayer(int layer) const
-//    {
-//      int nSensors = 0;
-//      if ((layer >= 1) && (layer <= 3)) nSensors = 2;
-//      if (layer == 4) nSensors = 3;
-//      if (layer == 5) nSensors = 4;
-//      if (layer == 6) nSensors = 5;
-    //if (layer == 1) nSensors = 1;  // TODO very special case for TB2016
-    //if (layer == 2) nSensors = 1;  // TODO very special case for TB2016
-//      return nSensors;
-//    }
-
-    int m_UseDigits =
-      1;                   /**< flag <0,1> for using digits only, no cluster information will be required, default = 0 */
+    int m_UseDigits = 0;                   /**< flag <0,1> for using digits only, no clusters will be required, default = 0 */
     int m_Reduce1DCorrelHistos = 0;        /**< flag <0,1> for removing of 1D correlation plots from output */
     int m_Reduce2DCorrelHistos = 0;        /**< flag <0,1> for removing of 2D correlation plots from output */
     int m_Only23LayersHistos = 0;          /**< flag <0,1> for create only correlation plots for layer 2-3 (PXD-SVD) */

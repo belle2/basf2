@@ -27,16 +27,9 @@
 
 #include <vxd/geometry/SensorInfoBase.h>
 
-#include <set>
-#include "../../../../pxd/geometry/include/SensorInfo.h"
-#include "../../../../pxd/dataobjects/include/PXDDigit.h"
-#include "../../../dataobjects/include/VxdID.h"
-#include "../../../../svd/dataobjects/include/SVDDigit.h"
-#include "../../../../../basf2/vxd/geometry/include/SensorInfoBase.h"
+//#include <set>
 #include <boost/format.hpp>
 
-#include "TH1F.h"
-#include "TH2F.h"
 #include "TVector3.h"
 #include "TDirectory.h"
 

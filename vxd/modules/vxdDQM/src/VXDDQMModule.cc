@@ -642,16 +642,16 @@ void VXDDQMModule::initialize()
   //Register collections
   StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
   StoreArray<SVDDigit> storeSVDDigits(m_storeSVDDigitsName);
-  if (!m_UseDigits) {
-    StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
-    StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
-    RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits);
-    RelationArray relSVDClusterDigits(storeSVDClusters, storeSVDDigits);
-    m_storePXDClustersName = storePXDClusters.getName();
-    m_relPXDClusterDigitName = relPXDClusterDigits.getName();
-    m_storeSVDClustersName = storeSVDClusters.getName();
-    m_relSVDClusterDigitName = relSVDClusterDigits.getName();
-  }
+//  if (!m_UseDigits) {
+  StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
+  StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
+  RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits);
+  RelationArray relSVDClusterDigits(storeSVDClusters, storeSVDDigits);
+  m_storePXDClustersName = storePXDClusters.getName();
+  m_relPXDClusterDigitName = relPXDClusterDigits.getName();
+  m_storeSVDClustersName = storeSVDClusters.getName();
+  m_relSVDClusterDigitName = relSVDClusterDigits.getName();
+//  }
 
   //Store names to speed up creation later
   m_storePXDDigitsName = storePXDDigits.getName();

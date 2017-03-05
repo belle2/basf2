@@ -14,6 +14,7 @@
 #include "arich/geometry/ARICHBtestGeometryPar.h"
 #include "arich/dataobjects/ARICHHit.h"
 #include "arich/dataobjects/ARICHTrack.h"
+#include "arich/dataobjects/ARICHPhoton.h"
 
 // DataStore
 #include <framework/datastore/DataStore.h>
@@ -440,7 +441,10 @@ namespace Belle2 {
     //#####################################################
 
 
-    double ebgri = m_bkgLevel * padArea;
+
+    double ebgrii = m_bkgLevel * padArea;
+    double ebgri[6] = {ebgrii, ebgrii, ebgrii, ebgrii, ebgrii, ebgrii};
+
     TVector3 track_at_detector = getTrackPositionAtZ(arichTrack, m_zaero[m_nAerogelLayers + 1]);
 
     // the id numbers of mirrors from which the photons could possibly reflect are calculated
@@ -501,8 +505,9 @@ namespace Belle2 {
           // skip photons with irrelevantly large Cherenkov angle
           if (th_cer > 0.5) continue;
 
-          // add photon to ARICHTrack
-          if (m_storePhot) arichTrackGlob.addPhoton(th_cer, fi_cer, iAerogel, mirrors[mirr]);
+          // make ARICHPhoton
+          ARICHPhoton phot(iPhoton, th_cer, fi_cer, iAerogel, mirrors[mirr]);
+
 
           if (fi_cer < 0) fi_cer += 2 * M_PI;
           double fii = fi_cer;
@@ -510,6 +515,8 @@ namespace Belle2 {
             double fi_mir = m_arichgp->getMirrors().getNormVector(mirrors[mirr]).XYvector().Phi();
             fii = 2 * fi_mir - fi_cer - M_PI;
           }
+
+          double sigExpArr[c_noOfHypotheses] = {0.0};
 
           // loop over all particle hypotheses
           for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
@@ -550,9 +557,17 @@ namespace Belle2 {
               double integral = SquareInt(padSizemm, pad_fi, dx / Unit::mm, detector_sigma * 10.) / sqrt(2.);
               // expected number of signal photons in each pixel
               esigi[iHyp] += normalizacija * integral;
+              sigExpArr[iHyp] = normalizacija * integral;
             } // if (dr>0 && thetaCh[iHyp][iAerogel])
 
           }// for (int iHyp=0;iHyp< c_noOfHypotheses; iHyp++)
+
+          if (m_storePhot) {
+            phot.setBkgExp(ebgri[2], ebgri[3]);
+            phot.setSigExp(sigExpArr[2], sigExpArr[3]);
+            arichTrackGlob.addPhoton(phot);
+          }
+
 
         }// for (int mirr = 0; mirr < refl; mirr++)
 
@@ -563,7 +578,7 @@ namespace Belle2 {
       //*******************************************
 
       for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
-        double expected = esigi[iHyp] + ebgri;
+        double expected = esigi[iHyp] + ebgri[iHyp];
         logL[iHyp] += expected + log(1 - exp(-expected));
       }
 

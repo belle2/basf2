@@ -10,6 +10,7 @@
 #pragma link C++ class Belle2::ARICHDigit+;
 #pragma link C++ class Belle2::ARICHLikelihood+;
 #pragma link C++ class Belle2::ARICHTrack+;
+#pragma link C++ class Belle2::ARICHPhoton+;
 #pragma link C++ class Belle2::ARICHHit+;
 
 #endif

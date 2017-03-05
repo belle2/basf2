@@ -127,8 +127,8 @@ void plotEfficiency(){
   
   TH1F* h_chK = new TH1F("h_chK","Cherenkov angle distribution for kaons/pions;#theta_{ch}", 200,0,0.5);
   TH1F* h_chPi = new TH1F("h_chPi","Cherenkov angle distribution for kaons/pions;#theta_{ch}", 200,0,0.5);
-  ch->Draw("photons[][0]>>h_chPi","abs(mcHit.PDG)==211 && photons[][2]==0 && photons[][3]==0 && primary==1  && " + momCut);
-  ch->Draw("photons[][0]>>h_chK","abs(mcHit.PDG)==321 && photons[][2]==0 && photons[][3]==0 && primary==1 && " + momCut);
+  ch->Draw("photons.m_thetaCer>>h_chPi","abs(mcHit.PDG)==211 && photons.m_aerogel==0 && photons.m_mirror==0 && primary==1  && " + momCut);
+  ch->Draw("photons.m_thetaCer>>h_chK","abs(mcHit.PDG)==321 && photons.m_aerogel==0 && photons.m_mirror==0 && primary==1 && " + momCut);
   //--------------------------------------
   
   TLegend* leg = new TLegend(0.1,0.75,0.48,0.9);

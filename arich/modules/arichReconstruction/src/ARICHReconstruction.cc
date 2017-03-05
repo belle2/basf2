@@ -182,16 +182,17 @@ namespace Belle2 {
       section[0] = int(angle / dangle) + 1;
       if (r.Mag() > (r - 2 * m_arichgp->getMirrors().getPoint(section[0])).Mag()) {
         refl = true;
-        for (int k = 0; k < 2; k++) {
+        int nrefl = 2;
+        if (section[0] == section[1]) nrefl = 1;
+        for (int k = 0; k < nrefl; k++) {
+
+          if (!HitsMirror(r0, dirf, section[k])) continue;
+
           TVector3 mirpoint = m_arichgp->getMirrors().getPoint(section[k]);
-          mirpoint.SetZ(mirpoint.Z());
           TVector3 mirnorm = m_arichgp->getMirrors().getNormVector(section[k]);
           double s = dirf * mirnorm;
           double s1 = (mirpoint - r0) * mirnorm;
           r = r0 + s1 / s * dirf;
-          if (r.Z() < m_arichgp->getMirrors().getZPosition() - m_arichgp->getMirrors().getPlateWidth() / 2. ||
-              r.Z() > m_arichgp->getMirrors().getZPosition() + m_arichgp->getMirrors().getPlateWidth() / 2.) return TVector3();
-          if (fabs(r.XYvector().DeltaPhi(mirpoint.XYvector())) > double(M_PI / nmir)) { r = r0; continue;}
           dirf = dirf - 2 * (dirf * mirnorm) * mirnorm;
           path = (z[a] - r.z()) / dirf.z();
           r += dirf * path;
@@ -200,6 +201,7 @@ namespace Belle2 {
         }
       }
     }
+
     if (!reflok && refl) return TVector3();
     return r;
   }
@@ -214,9 +216,26 @@ namespace Belle2 {
   }
 
 
+  bool ARICHReconstruction::HitsMirror(const TVector3& pos, const TVector3& dir, int mirrorID)
+  {
+
+    TVector3 mirnorm = m_arichgp->getMirrors().getNormVector(mirrorID);
+    TVector3 mirpoint = m_arichgp->getMirrors().getPoint(mirrorID);
+    TRotation rot = TransformToFixed(mirnorm);
+    TVector3 dirTr = rot * dir;
+    if (dirTr.Z() < 0) return 0; // comes from outter side
+    TVector3 posTr =  rot * (pos - mirpoint);
+    TVector3 pointOnMirr = posTr - (posTr.Z() / dirTr.Z()) * dirTr;
+    if (fabs(pointOnMirr.Y()) < m_arichgp->getMirrors().getPlateLength() / 2.
+        && fabs(pointOnMirr.X()) < m_arichgp->getMirrors().getPlateWidth() / 2.) return 1;
+
+    return 0;
+  }
+
+
   int ARICHReconstruction::CherenkovPhoton(TVector3 r, TVector3 rh,
                                            TVector3& rf, TVector3& dirf,
-                                           double* refractiveInd, double* z, int n)
+                                           double* refractiveInd, double* z, int n, int mirrorID)
   {
     //
     // Description:
@@ -298,6 +317,12 @@ namespace Belle2 {
       double d2 = (rf0[1].x() - x1) * (rf0[1].x() - x1) + (rf0[1].y() - y1) * (rf0[1].y() - y1);
 
       if ((d2 < dmin) && (iter)) {
+
+        // if mirror hypothesis check if reflection point lies on mirror plate
+        if (mirrorID) {
+          if (!HitsMirror(rf0[n], dirf0[n], mirrorID)) return -1;
+        }
+
         rf = rf0[1];
         dirf = dirf0[0];
         return iter;
@@ -466,7 +491,7 @@ namespace Belle2 {
           // (not reconstructing hits with irrelevantly large Cherenkov angle)
           if ((track_at_detector - virthitpos).Mag() > 15.0) continue;
           if (CherenkovPhoton(epoint, virthitpos, initialrf, photonDirection, &m_refractiveInd[iAerogel], &m_zaero[iAerogel],
-                              m_nAerogelLayers - iAerogel) < 0)  continue;
+                              m_nAerogelLayers - iAerogel, mirrors[mirr]) < 0)  continue;
 
 
           TVector3 dirch = TransformToFixed(edir) * photonDirection;
@@ -477,7 +502,7 @@ namespace Belle2 {
           if (th_cer > 0.5) continue;
 
           // add photon to ARICHTrack
-          if (m_storePhot) arichTrackGlob.addPhoton(th_cer, fi_cer, iAerogel, mirr);
+          if (m_storePhot) arichTrackGlob.addPhoton(th_cer, fi_cer, iAerogel, mirrors[mirr]);
 
           if (fi_cer < 0) fi_cer += 2 * M_PI;
           double fii = fi_cer;

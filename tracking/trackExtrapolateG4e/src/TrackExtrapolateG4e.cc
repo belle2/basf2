@@ -682,9 +682,12 @@ void TrackExtrapolateG4e::registerVolumes()
       // ARICH volumes
     } else if (name == "ARICH.AerogelSupportPlate") {
       (*m_EnterExit)[*iVol] = VOLTYPE_ARICH1;
-    } else if (name == "moduleWindow") {
+    } else if (name == "ARICH.AerogelImgPlate") {
       (*m_EnterExit)[*iVol] = VOLTYPE_ARICH2;
+    } else if (name.find("ARICH.HAPDWindow") != string::npos) {
+      (*m_EnterExit)[*iVol] = VOLTYPE_ARICH3;
     }
+
     // ECL crystal
     else if (name.find("lv_barrel_crystal_") != string::npos ||
              name.find("lv_forward_crystal_") != string::npos ||
@@ -747,7 +750,11 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
       return;
     case VOLTYPE_ARICH2:
       detID = Const::EDetector::ARICH;
-      if (touch->GetHistoryDepth() >= 1) copyID = touch->GetVolume(1)->GetCopyNo();
+      copyID = 6789;
+      return;
+    case VOLTYPE_ARICH3:
+      detID = Const::EDetector::ARICH;
+      if (touch->GetHistoryDepth() >= 2) copyID = touch->GetVolume(2)->GetCopyNo();
       return;
     case VOLTYPE_ECL:
       detID = Const::EDetector::ECL;

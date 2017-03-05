@@ -55,8 +55,10 @@ namespace Belle2 {
     VOLTYPE_TOP3,
     //! ARICH aerogel
     VOLTYPE_ARICH1,
-    //! ARICH window
+    //! ARICH Img plate
     VOLTYPE_ARICH2,
+    //! ARICH HAPD window
+    VOLTYPE_ARICH3,
     //! ECL
     VOLTYPE_ECL,
     //! BKLM RPC

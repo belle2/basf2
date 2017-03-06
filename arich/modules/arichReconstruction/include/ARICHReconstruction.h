@@ -56,6 +56,9 @@ namespace Belle2 {
     //! Smeares track parameters ("simulate" the uncertainties of tracking).
     int smearTrack(ARICHTrack& arichTrack);
 
+    //! Transforms track parameters from global Belle2 to ARICH local frame
+    void transformTrackToLocal(ARICHTrack& arichTrack, bool align);
+
     //! Computes the value of identity likelihood function for different particle hypotheses.
     int likelihood2(ARICHTrack& arichTrack, StoreArray<ARICHHit>& arichHits, ARICHLikelihood& arichLikelihood);
     //! Sets detector background level (photon hits / m^2)

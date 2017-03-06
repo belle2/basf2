@@ -333,17 +333,13 @@ namespace Belle2 {
   }
 
 
-  int ARICHReconstruction::likelihood2(ARICHTrack& arichTrackGlob, StoreArray<ARICHHit>& arichHits, ARICHLikelihood& arichLikelihood)
+  int ARICHReconstruction::likelihood2(ARICHTrack& arichTrack, StoreArray<ARICHHit>& arichHits, ARICHLikelihood& arichLikelihood)
   {
 
     const unsigned int nPhotonHits = arichHits.getEntries(); // number of detected photons
 
     if (m_nAerogelLayers + 1 > c_noOfAerogels) B2ERROR("ARICHReconstrucion: number of aerogel layers defined in the xml file exceeds "
                                                          << c_noOfAerogels);
-
-    // tranform track to local frame
-    ARICHTrack arichTrack(m_arichgp->getMasterVolume().pointToLocal(arichTrackGlob.getPosition()),
-                          arichTrackGlob.getMomentum()*arichTrackGlob.getDirection());
 
     double  logL[c_noOfHypotheses] = {0.0};
     double  nBgr[c_noOfHypotheses] = {0.0};
@@ -565,7 +561,7 @@ namespace Belle2 {
           if (m_storePhot) {
             phot.setBkgExp(ebgri[2], ebgri[3]);
             phot.setSigExp(sigExpArr[2], sigExpArr[3]);
-            arichTrackGlob.addPhoton(phot);
+            arichTrack.addPhoton(phot);
           }
 
 
@@ -653,5 +649,24 @@ namespace Belle2 {
     double path = (zout - pos.Z()) / dir.Z();
     return pos + dir * path;
   }
+
+  void ARICHReconstruction::transformTrackToLocal(ARICHTrack& arichTrack, bool align)
+  {
+    // tranform track from BelleII to local ARICH frame
+    TVector3 locPos = m_arichgp->getMasterVolume().pointToLocal(arichTrack.getPosition());
+    TVector3 locDir = m_arichgp->getMasterVolume().momentumToLocal(arichTrack.getDirection());
+
+    /*if(align && m_alignp.isValid()){
+      // apply global alignment correction
+      //   locPos = m_alignp->pointToLocal(locPos);
+      //locDir = m_alignp->momentumToLocal(locDir);
+    } */
+
+    // set parameters and return
+    // is it needed to extrapolate to z of aerogel in local frame?? tabun
+    arichTrack.setReconstructedValues(locPos, locDir, arichTrack.getMomentum());
+    return;
+  }
+
 
 }

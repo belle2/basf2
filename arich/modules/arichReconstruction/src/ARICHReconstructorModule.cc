@@ -74,6 +74,7 @@ namespace Belle2 {
     addParam("aerogelMerit", m_aerogelMerit, "Aerogel figure of merit", defMerit);
     addParam("inputTrackType", m_inputTrackType, "Input tracks switch: tracking (0), from AeroHits - MC info (1)", 0);
     addParam("storePhotons", m_storePhot, "Set to 1 to store reconstructed photon information (Ch. angle,...)", 0);
+    addParam("useAlignment", m_align, "Use ARICH position alignment constatns", false);
   }
 
   ARICHReconstructorModule::~ARICHReconstructorModule()
@@ -186,7 +187,8 @@ namespace Belle2 {
 
         // skip if track has no extHit in ARICH
         if (!arichTrack) continue;
-
+        // transform track parameters to ARICH local frame
+        m_ana->transformTrackToLocal(*arichTrack, m_align);
         // make new ARICHLikelihood
         ARICHLikelihood* like = arichLikelihoods.appendNew();
         // calculate and set likelihood values
@@ -215,6 +217,8 @@ namespace Belle2 {
         ARICHTrack* arichTrack = arichTracks.appendNew(aeroHit);
         // smearing of track parameters (to mimic tracking system resolutions)
         m_ana->smearTrack(*arichTrack);
+        // transform track parameters to ARICH local frame
+        m_ana->transformTrackToLocal(*arichTrack, m_align);
         // make associated ARICHLikelihood
         ARICHLikelihood* like = arichLikelihoods.appendNew();
         // calculate and set likelihood values

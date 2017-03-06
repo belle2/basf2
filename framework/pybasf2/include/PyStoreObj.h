@@ -40,8 +40,16 @@ namespace Belle2 {
     if not evtmetadata:
       B2ERROR("No EventMetaData found");
     else:
-      event = evtmetadata.obj().getEvent()
+      event = evtmetadata.getEvent()
+      # alternatively: evtmetadata.obj().getEvent()
     \endcode
+
+  * Most of the time you can just use the `PyStoreObj` instance like an
+  * instance of the class it represents, i.e. call all the members. The only
+  * exceptions are if the class has members which are also present in
+  * `PyStoreObj` (for example isValid() or isRequired()). In this case you need
+  * to use the obj() member to obtain a reference to the real object first as
+  * shown in the example.
   *
   * <h1>Creating objects</h1>
   * You can also create new objects in your Python basf2 module, using
@@ -53,7 +61,7 @@ namespace Belle2 {
   *
   * See display/examples/displaydata.py for a concrete example.
   *
-  * \sa PyStoreArray
+  * \sa PyStoreArray and the Conditions Data interface classes PyDBObj and PyDBArray
   */
   class PyStoreObj {
   public:

@@ -1,4 +1,0 @@
-export PHIT_LICENCE_SERVER=ekpplusctl.physik.uni-karlsruhe.de:16820
-export NEUROBAYES_LIB=/home/belle2/externals/v00-05-03/lib/Linux_x86_64/opt/
-export NEUROBAYES_INC=/home/belle2/externals/v00-05-03/include/neurobayes/
-source /usr/users/phit/neurobayes/setup_neurobayes.sh

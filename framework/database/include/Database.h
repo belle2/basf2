@@ -75,7 +75,7 @@ namespace Belle2 {
        * @param aName  The identifier of the object
        */
       DBQuery(const std::string& aPackage, const std::string& aModule, TObject* aObject = 0,
-              IntervalOfValidity aIov = 0): package(aPackage), module(aModule), object(aObject), iov(aIov) {};
+              const IntervalOfValidity& aIov = 0): package(aPackage), module(aModule), object(aObject), iov(aIov) {};
       std::string        package; /**< First part of identifier of the object */
       std::string        module; /**< Second part of identifier of the object */
       TObject*           object; /**< Pointer to the object */

@@ -11,6 +11,7 @@
 #pragma once
 
 #include <TTree.h>
+#include "arich/dataobjects/ARICHPhoton.h"
 
 namespace Belle2 {
   namespace ARICH {
@@ -101,7 +102,9 @@ namespace Belle2 {
       TrackHit recHit;  /**< extrapolated Track hit */
       TrackHit mcHit;  /**< related MC particle hit */
       Int_t nRec; /**< number of reconstructed photons */
-      Float_t  photons[200][4]; /**< array of reconstructed photons information (cherenkov angle,...) */
+      std::vector<Belle2::ARICHPhoton>  photons; /** vector of reconstructed photons */
+      Float_t winHit[2];                         /** track hit on hapd window (x,y coordinates) */
+
 
       /**
        * Default constructor
@@ -143,13 +146,9 @@ namespace Belle2 {
 
         recHit.clear();
         mcHit.clear();
+        photons.clear();
 
-        for (int i = 0; i < 200; i++) {
-          for (int j = 0; j < 4; j++) {
-            photons[i][j] = 0;
-          }
-        }
-
+        winHit[0] = 0.; winHit[1] = 0.;
       }
     };
 

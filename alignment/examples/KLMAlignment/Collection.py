@@ -17,11 +17,11 @@ geometry = register_module('Geometry', components=['MagneticField2d', 'BeamPipe'
 main.add_module(geometry)
 
 main.add_module('SetupGenfitExtrapolation', whichGeometry='TGeo', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
-main.add_module('MillepedeCollector')
+main.add_module('MillepedeCollector', useGblTree=False)
 
 main.add_module('Progress')
 # main.add_module('GBLdiagnostics')
-main.add_module('RootOutput', outputFileName=sys.argv[2])
+main.add_module('RootOutput', outputFileName=sys.argv[2], branchNames=['EventMetaData'])
 process(main)
 
 # Print call statistics

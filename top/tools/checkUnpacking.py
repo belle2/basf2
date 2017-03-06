@@ -2,11 +2,19 @@
 # -*- coding: utf-8 -*-
 
 # ---------------------------------------------------------------------------------------
-# Checks the unpacking of raw data given in Interim FE format v2.1
-# Usage: basf2 checkUnpacking.py -i <file_name.sroot>
+# Checks the unpacking of raw data given in Interim FE format
+# Usage: basf2 checkUnpacking.py -i <file_name.sroot> [<debug_level>]
+#   debug_level 100: to print additional information on errors
+#   debug_level 200: to print buffer sizes and additional information on errors
 # ---------------------------------------------------------------------------------------
 
 from basf2 import *
+import sys
+
+debuglevel = 0
+argvs = sys.argv
+if len(argvs) > 1:
+    debuglevel = int(argvs[1])
 
 # Create path
 main = create_path()
@@ -33,6 +41,8 @@ main.add_module(geometry)
 unpack = register_module('TOPUnpacker')
 unpack.param('swapBytes', True)
 unpack.param('dataFormat', 0x0301)
+unpack.logging.log_level = LogLevel.DEBUG
+unpack.logging.debug_level = debuglevel
 main.add_module(unpack)
 
 # Print progress

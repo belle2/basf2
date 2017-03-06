@@ -318,6 +318,13 @@ namespace Belle2 {
     bool isInitial() const;
 
     /**
+     * Check if particle is a primary particle which was created
+     * by the generator (and not, for example material interaction)
+     *
+     */
+    bool isPrimaryParticle() const;
+
+    /**
      * Set PDG code of the particle.
      * @param pdg The PDG code of the MonteCarlo particle.
      */
@@ -566,6 +573,10 @@ namespace Belle2 {
     return hasStatus(c_Initial);
   }
 
+  inline bool MCParticle::isPrimaryParticle() const
+  {
+    return hasStatus(c_PrimaryParticle);
+  }
 
   inline MCParticle* MCParticle::getMother() const
   {

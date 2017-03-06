@@ -98,6 +98,24 @@ namespace Belle2 {
      * Add constant override payload.
      * This payload will be valid for all possible iov and will be used instead of values from the database.
      *
+     * @param module Module name under which the object will be accessible
+     * @param obj Pointer to the object to be used. Ownership will be transfered
+     *            to the DBStore.
+     * @param oneRun if true the override will only be in effect for this one run,
+     *               not for any other runs
+     * @warning don't use this if you do not know exactly what you are doing.
+     *          This is meant mainly for beamparameters
+     */
+    void addConstantOverride(const std::string& module, TObject* obj, bool oneRun = false)
+    {
+
+      addConstantOverride("dbstore", module, obj, oneRun);
+    }
+
+    /**
+     * Add constant override payload.
+     * This payload will be valid for all possible iov and will be used instead of values from the database.
+     *
      * @param package Package name under which the object will be accessible
      * @param module Module name under which the object will be accessible
      * @param obj Pointer to the object to be used. Ownership will be transfered

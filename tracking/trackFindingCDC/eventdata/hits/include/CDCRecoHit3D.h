@@ -237,7 +237,7 @@ namespace Belle2 {
       { return getRLWireHit().getRLInfo(); }
 
       /// Setter the right left passage information.
-      void setRLInfo(ERightLeft& rlInfo)
+      void setRLInfo(ERightLeft rlInfo)
       { m_rlWireHit.setRLInfo(rlInfo); }
 
       /// Getter for the reference position of the wire.

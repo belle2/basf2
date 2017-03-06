@@ -175,7 +175,7 @@ void MillepedeCollectorModule::collect()
   for (auto listName : m_particles) {
     StoreObjPtr<ParticleList> list(listName);
     for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
-      for (auto& track : getParticlesTracks({list->getParticle(iParticle)})) {
+      for (auto& track : getParticlesTracks({list->getParticle(iParticle)}, false)) {
         auto gblfs = dynamic_cast<genfit::GblFitStatus*>(track->getFitStatus());
 
         getObject<TH1F>("chi2/ndf").Fill(gblfs->getChi2() / gblfs->getNdf());
@@ -390,13 +390,13 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
 
   if (bklmHits.isOptional()) {
     genfit::MeasurementProducer <RecoHitInformation::UsedBKLMHit, BKLMRecoHit>* BKLMProducer =  new genfit::MeasurementProducer
-    <RecoHitInformation::UsedBKLMHit, BKLMRecoHit> (cdcHits.getPtr());
+    <RecoHitInformation::UsedBKLMHit, BKLMRecoHit> (bklmHits.getPtr());
     genfitMeasurementFactory.addProducer(Const::BKLM, BKLMProducer);
   }
 
   if (eklmHits.isOptional()) {
     genfit::MeasurementProducer <RecoHitInformation::UsedEKLMHit, AlignableEKLMRecoHit>* EKLMProducer =  new genfit::MeasurementProducer
-    <RecoHitInformation::UsedEKLMHit, AlignableEKLMRecoHit> (cdcHits.getPtr());
+    <RecoHitInformation::UsedEKLMHit, AlignableEKLMRecoHit> (eklmHits.getPtr());
     genfitMeasurementFactory.addProducer(Const::EKLM, EKLMProducer);
   }
 
@@ -490,7 +490,7 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
 }
 
 
-std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::vector<Particle*> particles)
+std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::vector<Particle*> particles, bool addVertexPoint)
 {
   std::vector< genfit::Track* > tracks;
   for (auto particle : particles) {
@@ -513,7 +513,7 @@ std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::
     }
     auto& track = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
 
-    fitRecoTrack(*recoTrack, particle);
+    fitRecoTrack(*recoTrack, (addVertexPoint) ? particle : nullptr);
 
     if (!track.hasFitStatus()) {
       B2INFO("Track has no fit status");

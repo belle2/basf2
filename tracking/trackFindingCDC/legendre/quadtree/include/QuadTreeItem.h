@@ -1,98 +1,88 @@
+/**************************************************************************
+* BASF2 (Belle Analysis Framework 2)                                     *
+* Copyright(C) 2014 - Belle II Collaboration                             *
+*                                                                        *
+* Author: The Belle II Collaboration                                     *
+* Contributors: Viktor Trusov, Thomas Hauth                              *
+*                                                                        *
+* This software is provided "as is" without any warranty.                *
+**************************************************************************/
 #pragma once
-
-#include <framework/logging/LogMethod.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    class CDCConformalHit;
+    class CDCWireHit;
     class CDCSegment2D;
 
     /**
      * This class serves as a wrapper around all things that should go into a QuadTree.
      * For usage in the QuadTree we need to provide a used flag.
-     * If your typeData-class does provide a used flag itself, just spezialize this template as done for the TrackHit below.
+     * If your AData-class does provide a used flag itself,
+     * just spezialize this template as done for the CDCWireHit and CDCSegment2D below.
      */
-    template<class typeData>
+    template<class AData>
     class QuadTreeItem {
     public:
-
-      /// Import contained data type
-      using TypeData = typeData;
-
       /// Constructor
-      explicit QuadTreeItem(typeData* data) : m_usedFlag(false), m_pointer(data) {};
+      explicit QuadTreeItem(AData* data)
+        : m_data(data)
+        , m_usedFlag(false) {};
 
-      /**
-       * Do not copy!
-       */
+    private:
+      /// Do not copy!
       QuadTreeItem(const QuadTreeItem& copy) = delete;
 
-      /**
-       * Do not copy!
-       */
+      /// Do not copy!
       QuadTreeItem& operator=(QuadTreeItem const& copy) = delete;
 
-      /**
-       * Destructor
-       */
-      virtual ~QuadTreeItem() = default;
+    public:
+      /// Returns the underlying data.
+      AData* getPointer() const
+      {
+        return m_data;
+      }
 
       /**
        * Flag is set if the item was used as a result of the quad tree search and
        * should not be used in the next quad tree search round.
        */
-      virtual bool isUsed() const
+      bool isUsed() const
       {
         return m_usedFlag;
       }
 
-      /**
-       * Set the used flag if you do not want that item to go into the next search round again.
-       */
-      virtual void setUsedFlag(bool usedFlag = true)
+      /// Set the used flag if you do not want that item to go into the next search round again.
+      void setUsedFlag(bool usedFlag = true)
       {
         m_usedFlag = usedFlag;
       }
 
-      /**
-       * Unset the used flag again if you have noticed that a previous setting was wrong.
-       */
-      virtual void unsetUsedFlag() final {
+      /// Unset the used flag again if you have noticed that a previous setting was wrong.
+      void unsetUsedFlag()
+      {
         setUsedFlag(false);
       }
 
-      /**
-       * Returns a pointer to the underlying item. This function is not called in the quad tree item itself but only in the filling and postprocessing stage.
-       */
-      virtual typeData* getPointer() final {
-        return m_pointer;
-      }
-
-      /**
-       * Const version of getPointer() above.
-       */
-      virtual const typeData* getPointer() const final
-      {
-        return m_pointer;
-      }
-
     private:
-      bool m_usedFlag;        /**< This flag can be set to not use the item in the next quad tree search round */
-      typeData* m_pointer;    /**< A pointer to the underlying event */
+      /// A pointer to the underlying item data
+      AData* m_data;
+
+      /// This flag can be set to not use the item in the next quad tree search round
+      bool m_usedFlag;
     };
 
     /**
      *  As special case: the QuadTreeHitWrapper has a used flag itself
      */
     template<>
-    bool QuadTreeItem<CDCConformalHit>::isUsed() const;
+    bool QuadTreeItem<const CDCWireHit>::isUsed() const;
 
     /**
      *  As special case: the QuadTreeHitWrapper has a used flag itself
      */
     template<>
-    void QuadTreeItem<CDCConformalHit>::setUsedFlag(bool usedFlag);
+    void QuadTreeItem<const CDCWireHit>::setUsedFlag(bool usedFlag);
 
     /**
      *  As special case: the CDCSegment2D has a used flag itself
@@ -105,7 +95,5 @@ namespace Belle2 {
      */
     template<>
     void QuadTreeItem<CDCSegment2D>::setUsedFlag(bool usedFlag);
-
   }
-
 }

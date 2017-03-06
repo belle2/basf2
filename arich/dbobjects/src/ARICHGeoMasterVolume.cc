@@ -52,7 +52,7 @@ void ARICHGeoMasterVolume::setPlacement(double x, double y, double z, double rx,
   m_rotation->RotateZ(rz);
 
   m_rotationInverse = new TRotation(m_rotation->Inverse());
-  m_translation = new TVector3((*m_rotation) * translation);
+  m_translation = new TVector3(x, y, z);
 
 }
 

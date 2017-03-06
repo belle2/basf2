@@ -102,6 +102,11 @@ namespace {
   }
 }
 
+CDCTrack::CDCTrack(const std::vector<CDCRecoHit3D>& recoHits3D)
+  : std::vector<CDCRecoHit3D>(recoHits3D)
+{
+}
+
 CDCTrack::CDCTrack(const CDCSegment2D& segment) :
   m_startTrajectory3D(segment.getTrajectory2D()),
   m_endTrajectory3D(segment.getTrajectory2D())
@@ -285,13 +290,13 @@ CDCTrack CDCTrack::condense(const Path<const CDCSegmentPair>& segmentPairPath)
   return track;
 }
 
-bool CDCTrack::storeInto(StoreArray<RecoTrack>& recoTracks) const
+RecoTrack* CDCTrack::storeInto(StoreArray<RecoTrack>& recoTracks) const
 {
   RecoTrack* newRecoTrack = getStartTrajectory3D().storeInto(recoTracks);
-  if (newRecoTrack) {
-    RecoTrackUtil::fill(*this, *newRecoTrack);
-  }
-  return true;
+  if (not newRecoTrack) return nullptr;
+
+  RecoTrackUtil::fill(*this, *newRecoTrack);
+  return newRecoTrack;
 }
 
 std::vector<CDCSegment3D> CDCTrack::splitIntoSegments() const

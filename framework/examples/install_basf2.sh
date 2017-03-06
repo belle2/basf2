@@ -77,7 +77,7 @@ then
       BINARY_OPTIONS=""
       ARCH=`uname -m`
       if [ "$ARCH" == "x86_64" ]; then
-        BINARY_OPTIONS="sl5 sl6 ubuntu1404 ubuntu1604"
+        BINARY_OPTIONS="sl6 el7 ubuntu1404 ubuntu1604"
       elif [ "$ARCH" == "i686" ] || [ "$ARCH" == "i386" ]; then
         BINARY_OPTIONS="sl5_32bit ubuntu1404_32bit"
       fi

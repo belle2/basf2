@@ -42,6 +42,10 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
         pdg_code = mc_particle.getPDG()
         is_primary = bool(mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle))
 
+        decay_vertex = mc_particle.getDecayVertex()
+        number_of_daughters = mc_particle.getNDaughters()
+        status = mc_particle.getStatus()
+
         return dict(
             # At origin assuming perfect magnetic field
             d0_truth=helix.getD0(),
@@ -58,6 +62,14 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
             x_truth=vertex.X(),
             y_truth=vertex.Y(),
             z_truth=vertex.Z(),
+
+            decay_vertex_radius_truth=decay_vertex.Mag(),
+            decay_vertex_x_truth=decay_vertex.X(),
+            decay_vertex_y_truth=decay_vertex.Y(),
+            decay_vertex_z_truth=decay_vertex.Z(),
+            number_of_daughters_truth=number_of_daughters,
+            status_truth=status,
+
 
             # MC Particle information
             charge_truth=charge,

@@ -22,7 +22,8 @@ namespace Belle2 {
   class NtupleContinuumSuppressionTool : public NtupleFlatTool {
   private:
 
-    bool m_useFS1;    /**< Flag to calculate KSFW moments using B final state particles (FS1). Default is set to calculate from B daughters (FS0). */
+    bool m_useKsfwFS1;  /**< Flag to calculate KSFW moments using B final state particles (FS1). Default is set to calculate from B daughters (FS0). */
+    bool m_useCcROE;    /**< Flag to calculate CleoCones using ROE particles only. Default is set to calculate from all final state particles. */
 
     float m_fThrustB; /**< Magnitude of B thrust axis */
     float m_fThrustO; /**< Magnitude of ROE thrust axis */
@@ -68,7 +69,8 @@ namespace Belle2 {
     NtupleContinuumSuppressionTool(TTree* tree, DecayDescriptor& decaydescriptor, const std::string& strOptions) : NtupleFlatTool(tree,
           decaydescriptor, strOptions)
     {
-      m_useFS1 = false;
+      m_useKsfwFS1 = false;
+      m_useCcROE = false;
       setupTree();
     }
     /** Set branch variables to properties of the provided Particle. */

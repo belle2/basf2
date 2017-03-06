@@ -134,7 +134,7 @@ namespace Belle2 {
         return AssignFinite<Float_t>(m_variables[I]);
       }
 
-    public:
+    private:
       /// Memory for nVars floating point values.
       FixedSizeNamedFloatTuple<AVarNames> m_variables;
     };

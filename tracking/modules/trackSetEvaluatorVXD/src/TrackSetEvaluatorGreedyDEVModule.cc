@@ -10,10 +10,8 @@
 
 #include "tracking/modules/trackSetEvaluatorVXD/TrackSetEvaluatorGreedyDEVModule.h"
 
-//The following include is from Jakob's original Greedy, which employs a
-//recursive greedy algorithm, that might be faster...
-//#include <tracking/spacePointCreation/sptcNetwork/TrackSetEvaluatorGreedy.h>
 #include <tracking/trackFindingVXD/trackSetEvaluator/Scrooge.h>
+#include <tracking/trackFindingVXD/trackSetEvaluator/OverlapResolverNodeInfo.h>
 
 #include <vector>
 
@@ -40,7 +38,7 @@ void TrackSetEvaluatorGreedyDEVModule::event()
 {
   //Create an empty object of the type,
   //that needs to be given to Scrooge.
-  vector<Scrooge::QITrackOverlap> qiTrackOverlap;
+  vector<OverlapResolverNodeInfo> qiTrackOverlap;
   unsigned int const nSpacePointTrackCands = m_spacePointTrackCands.getEntries();
   qiTrackOverlap.reserve(nSpacePointTrackCands);
 
@@ -65,11 +63,10 @@ void TrackSetEvaluatorGreedyDEVModule::event()
   }
 
   for (auto && track : qiTrackOverlap) {
-    if (track.isActive) {
+    if (track.activityState > 0.75) {
       cout << "Array Index: " << track.trackIndex  << ", QI: " << track.qualityIndex << endl;
     }
   }
-
 
   //-----------------------------------------------------------------------------------------------
 }

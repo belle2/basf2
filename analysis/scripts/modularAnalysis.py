@@ -157,10 +157,11 @@ def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main)
                                    additionalBranches=partBranches)
 
 
-def skimOutputUdst(skimname, particleLists=[], includeArrays=[], path=analysis_main):
+def skimOutputUdst(skimname, skimParticleLists=[], outputParticleLists=[], includeArrays=[], path=analysis_main):
     """
-    Create a new path for events that contain a non-empty particle list.
-    Write the accepted events as a udst file, saving only necessary particles.
+    Create a new path for events that contain a non-empty particle list specified via skimParticleLists.
+    Write the accepted events as a udst file, saving only particles from skimParticleLists
+    and from outputParticleLists.
     Additional Store Arrays and Relations to be stored can be specified via includeArrays
     list argument.
 
@@ -170,15 +171,16 @@ def skimOutputUdst(skimname, particleLists=[], includeArrays=[], path=analysis_m
 
     skimfilter = register_module('SkimFilter')
     skimfilter.set_name('SkimFilter_' + skimname)
-    skimfilter.param('particleLists', particleLists)
+    skimfilter.param('particleLists', skimParticleLists)
     path.add_module(skimfilter)
     filter_path = create_path()
     skimfilter.if_value('=1', filter_path, AfterConditionPath.CONTINUE)
 
     # add_independent_path() is rather expensive, only do this for skimmed events
     skim_path = create_path()
-    removeParticlesNotInLists(particleLists, path=skim_path)
-    outputUdst(skimname + '.udst.root', particleLists, includeArrays, path=skim_path)
+    saveParticleLists = skimParticleLists + outputParticleLists
+    removeParticlesNotInLists(saveParticleLists, path=skim_path)
+    outputUdst(skimname + '.udst.root', saveParticleLists, includeArrays, path=skim_path)
     outputMdst(skimname + '.mdst.root', path=skim_path)
     filter_path.add_independent_path(skim_path, "skim_" + skimname)
 
@@ -1502,7 +1504,7 @@ def printROEInfo(
     path.add_module(printMask)
 
 
-def buildContinuumSuppression(list_name, path=analysis_main):
+def buildContinuumSuppression(list_name, roe_mask, path=analysis_main):
     """
     Creates for each Particle in the given ParticleList a ContinuumSuppression
     dataobject and makes BASF2 relation between them.
@@ -1514,6 +1516,7 @@ def buildContinuumSuppression(list_name, path=analysis_main):
     qqBuilder = register_module('ContinuumSuppressionBuilder')
     qqBuilder.set_name('QQBuilder_' + list_name)
     qqBuilder.param('particleList', list_name)
+    qqBuilder.param('ROEMask', roe_mask)
     path.add_module(qqBuilder)
 
 

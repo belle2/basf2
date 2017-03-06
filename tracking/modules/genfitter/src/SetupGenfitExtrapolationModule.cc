@@ -28,9 +28,6 @@
 #include <boost/iostreams/concepts.hpp>
 
 #include <TGeoManager.h>
-
-#include <vxd/geometry/GeoCache.h>
-
 #include <TMath.h>
 
 using namespace Belle2;
@@ -158,21 +155,10 @@ void SetupGenfitExtrapolationModule::initialize()
 
 void SetupGenfitExtrapolationModule::beginRun()
 {
-  // Ideally, we perform the update already at beginRun
-  if (m_useVXDAlignment) {
-    if (m_vxdAlignment.hasChanged())
-      updateVXDAlignment();
-
-    if (!m_vxdAlignment.isValid())
-      B2ERROR("No VXD alignment available in DB. Using nominal VXD sensor positions for reconstruction.");
-  }
 }
 
 void SetupGenfitExtrapolationModule::event()
 {
-  // In case of IntraRunDependency, we need to observe also event-by-event changes
-  if (m_useVXDAlignment && m_vxdAlignment.hasChanged())
-    updateVXDAlignment();
 }
 
 void SetupGenfitExtrapolationModule::endRun()
@@ -181,65 +167,5 @@ void SetupGenfitExtrapolationModule::endRun()
 
 void SetupGenfitExtrapolationModule::terminate()
 {
-}
-
-void SetupGenfitExtrapolationModule::updateVXDAlignment()
-{
-  // If no alignment is available, use nominal positions again
-  //NOTE: If the alignment was not available from start, nominal positions are already loaded
-  // during geometry construction
-  if (!m_vxdAlignment.isValid()) {
-    B2INFO("Re-loading nominal sensor positions for reconstruction...");
-
-    for (auto sensor : VXD::GeoCache::getInstance().getListOfSensors()) {
-      VXD::SensorInfoBase& geometry = const_cast<VXD::SensorInfoBase&>(VXD::GeoCache::getInstance().getSensorInfo(sensor));
-      // Copy nominal transformation to reco-transformation
-      geometry.setTransformation(geometry.getTransformation(false), true);
-    }
-    return;
-  }
-
-  B2INFO("Updating VXD alignment from DB object...");
-
-  // For the time being, let's check that we use non-zero alignment
-  bool nonZero(false);
-
-  for (auto sensor : VXD::GeoCache::getInstance().getListOfSensors()) {
-    double du = m_vxdAlignment->get(sensor, VXDAlignment::dU);
-    double dv = m_vxdAlignment->get(sensor, VXDAlignment::dV);
-    double dw = m_vxdAlignment->get(sensor, VXDAlignment::dW);
-    double dalpha = m_vxdAlignment->get(sensor, VXDAlignment::dAlpha);
-    double dbeta = m_vxdAlignment->get(sensor, VXDAlignment::dBeta);
-    double dgamma = m_vxdAlignment->get(sensor, VXDAlignment::dGamma);
-
-    if (du != 0. || dv != 0. || dw != 0. || dalpha != 0. || dbeta != 0. || dgamma != 0.) nonZero = true;
-
-    VXD::SensorInfoBase& geometry = const_cast<VXD::SensorInfoBase&>(VXD::GeoCache::getInstance().getSensorInfo(sensor));
-
-    // Take nominal trafo from geometry
-    TGeoHMatrix trafo(geometry.getTransformation(false));
-    TGeoTranslation translation;
-    TGeoRotation rotation;
-
-    translation.SetTranslation(du, dv, dw);
-    // Unfortunatelly we want to use different angle definition than TGeoRotation
-    // for alignment. TGeo is using Euler angles in zx'z'' convention, where we want
-    // xy'z''
-    // Note the order of matrix multiplication is R(Z, gamma)R(Y, beta)R(X, alpha)
-    rotation.RotateX(- dalpha * TMath::RadToDeg());
-    rotation.RotateY(- dbeta  * TMath::RadToDeg());
-    rotation.RotateZ(- dgamma * TMath::RadToDeg());
-
-    // Correct nominal position with alignment
-    TGeoCombiTrans correction(translation, rotation);
-    trafo = trafo * correction;
-
-    // Store new reco-transformation
-    geometry.setTransformation(trafo, true);
-  }
-
-  // Let's warn people they are not using nominal geometry for reconstruction
-  if (nonZero)
-    B2WARNING("Using non-zero alignment in reconstruction.");
 }
 

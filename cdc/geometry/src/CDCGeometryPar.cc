@@ -121,7 +121,8 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
   } else {
     //    std::cout <<"readcalled" << std::endl;
     //    read();
-    B2FATAL("CDCGeometryPar: Strange that readFromDB is not called !");
+    //    B2FATAL("CDCGeometryPar: Strange that readFromDB is not called !");
+    B2WARNING("CDCGeometryPar: Strange that readFromDB is not called! Please make sure that CDC is included in Geometry.");
   }
 }
 
@@ -450,6 +451,10 @@ void CDCGeometryPar::openFile(std::ifstream& ifs, const std::string& fileName0) 
 {
   std::string fileName1 = "/cdc/data/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName1);
+
+  if (fileName == "") {
+    fileName = FileSystem::findFile(fileName0);
+  }
 
   if (fileName == "") {
     B2FATAL("CDCGeometryPar: " << fileName1 << " not exist!");

@@ -188,6 +188,13 @@ namespace Belle2 {
                                      const std::string& stroke,
                                      const std::string& strokeWidth);
 
+      /**
+       * Draw MCParticles.
+       * @param storeArrayName The name of the StoreArray containing the RecoTracks.
+       */
+      void drawMCParticleTrajectories(const std::string& storeArrayName,
+                                      const std::string& stroke,
+                                      const std::string& strokeWidth);
 
     public:
       /* *** Section with some more complex operations *** */

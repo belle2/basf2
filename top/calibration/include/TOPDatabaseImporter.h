@@ -45,10 +45,17 @@ namespace Belle2 {
 
     /**
      * Import sample time calibration constants to database
-     * Kichimi-san data, one text file per module - for format see function code
+     * Kichimi-san data, root files
      * @param fileNames file names separated by space (since vector doesn't work!)
      */
     void importSampleTimeCalibrationKichimi(std::string fileNames);
+
+    /**
+     * Import channel T0 calibration constants to database
+     * Kichimi-san data, root files
+     * @param fileNames file names separated by space (since vector doesn't work!)
+     */
+    void importChannelT0CalibrationKichimi(std::string fileNames);
 
     /**
      * Print sample time calibration constants stored in database

@@ -11,7 +11,98 @@ import enum
 import shutil
 
 import ROOT
-from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm
+from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm, IntervalOfValidity
+
+
+class IoV():
+    """
+    Python class to more easily manipulate an IoV and compare against others.
+    Uses the C++ framework IntervalOfValidity internally to do various comparisons.
+    """
+    def __init__(self, exp_low=-1, run_low=-1, exp_high=-1, run_high=-1):
+        """
+        """
+        self._exp_low = exp_low
+        self._exp_high = exp_high
+        self._run_low = run_low
+        self._run_high = run_high
+        self._set_cpp_iov()
+
+    def _set_cpp_iov(self):
+        """
+        Creates and sets the internal C++ IntervalOfValidity variable to the current range.
+        """
+        self._cpp_iov = IntervalOfValidity(self.exp_low, self.run_low, self.exp_high, self.run_high)
+
+    @property
+    def exp_low(self):
+        """
+        """
+        return self._exp_low
+
+    @exp_low.setter
+    def exp_low(self, exp_low):
+        """
+        """
+        self._exp_low = exp_low
+        self._set_cpp_iov()
+
+    @property
+    def exp_high(self):
+        """
+        """
+        return self._exp_high
+
+    @exp_high.setter
+    def exp_high(self, exp_high):
+        """
+        """
+        self._exp_high = exp_high
+        self._set_cpp_iov()
+
+    @property
+    def run_low(self):
+        """
+        """
+        return self._run_low
+
+    @run_low.setter
+    def run_low(self, run_low):
+        """
+        """
+        self._run_low = run_low
+        self._set_cpp_iov()
+
+    @property
+    def run_high(self):
+        """
+        """
+        return self._run_high
+
+    @run_high.setter
+    def run_high(self, run_high):
+        """
+        """
+        self._run_high = run_high
+        self._set_cpp_iov()
+
+    def contains(self, iov):
+        """
+        Check if this IoV contains another one that is passed in.
+        """
+        return self._cpp_iov.contains(iov._cpp_iov)
+
+    def overlaps(self, iov):
+        """
+        Check if this IoV overlaps another one that is passed in.
+        """
+        return self._cpp_iov.overlaps(iov._cpp_iov)
+
+    def __repr__(self):
+        return "IoV("+(",".join(["exp_low="+str(self.exp_low),
+                                 "run_low="+str(self.run_low),
+                                 "exp_high="+str(self.exp_high),
+                                 "run_high="+str(self.run_high)]))+")"
 
 
 @enum.unique
@@ -30,8 +121,21 @@ class AlgResult(enum.Enum):
     #: failure Return code
     failure = CalibrationAlgorithm.c_Failure
 
-IoV = namedtuple('IoV', ['exp_low', 'run_low', 'exp_high', 'run_high'])
 IoV_Result = namedtuple('IoV_Result', ['iov', 'result'])
+
+
+def runs_overlapping_iov(iov, vector_of_runs):
+    """
+    Takes an overall IoV() object and a vector of runs vector<pair<int,int>>
+    and returns a vector containing only those runs that overlap
+    with the IoV range.
+    """
+    overlapping_runs = ROOT.vector('std::pair<int,int>')()
+    for run in vector_of_runs:
+        run_iov = IoV(run.first, run.second, run.first, run.second)
+        if run_iov.overlaps(iov):
+            overlapping_runs.push_back(run)
+    return overlapping_runs
 
 
 def iov_from_vector(iov_vector):
@@ -309,15 +413,9 @@ def get_iov_from_file(file_path):
     Uses the showmetadata basf2 tool.
     """
     import subprocess
-    metadata_output = subprocess.check_output(['showmetadata', file_path], universal_newlines=True)
-    for line in metadata_output.split("\n"):
-        if "range" in line:
-            words = line.split()
-            low_range = words[2]
-            high_range = words[4]
-            exp_low, run_low, event_low = low_range.split('/')
-            exp_high, run_high, event_high = high_range.split('/')
-    return IoV(exp_low, run_low, exp_high, run_high)
+    metadata_output = subprocess.check_output(['showmetadata', '--json', file_path])
+    m = json.loads(metadata_output.decode('utf-8'))
+    return IoV(m['experimentLow'], m['runLow'], m['experimentHigh'], m['runHigh'])
 
 
 def find_absolute_file_paths(file_path_patterns):

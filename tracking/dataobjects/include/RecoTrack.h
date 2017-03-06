@@ -110,7 +110,10 @@ namespace Belle2 {
     /**
      * Convenience method which registers all relations required to fully use
      * a RecoTrack. If you create a new RecoTrack StoreArray, call this method
-     * in the initialize() method of your module.
+     * in the initialize() method of your module. Note that the BKLM and EKLM
+     * relations may not be registered because the KLM modules are loaded after
+     * tracking; in this case, a second call of this method is required after
+     * creation of the BKLM and EKLM hits store arrays.
      * @param recoTracks  Reference to the store array where the new RecoTrack list is located
      * @param cdcHitsStoreArrayName  name of the StoreArray holding the CDCHits lists
      * @param svdHitsStoreArrayName  name of the StoreArray holding the SVDClusters lists
@@ -121,12 +124,12 @@ namespace Belle2 {
      */
     static void registerRequiredRelations(
       StoreArray<RecoTrack>& recoTracks,
-      std::string pxdHitsStoreArrayName = "",
-      std::string svdHitsStoreArrayName = "",
-      std::string cdcHitsStoreArrayName = "",
-      std::string bklmHitsStoreArrayName = "",
-      std::string eklmHitsStoreArrayName = "",
-      std::string recoHitInformationStoreArrayName = "")
+      std::string const& pxdHitsStoreArrayName = "",
+      std::string const& svdHitsStoreArrayName = "",
+      std::string const& cdcHitsStoreArrayName = "",
+      std::string const& bklmHitsStoreArrayName = "",
+      std::string const& eklmHitsStoreArrayName = "",
+      std::string const& recoHitInformationStoreArrayName = "")
     {
       StoreArray<RecoHitInformation> recoHitInformations(recoHitInformationStoreArrayName);
       recoHitInformations.registerInDataStore();
@@ -543,6 +546,14 @@ namespace Belle2 {
     bool hasTrackFitStatus(const genfit::AbsTrackRep* representation = nullptr) const
     {
       checkDirtyFlag();
+
+      // there might be the case, where the genfit track has no trackreps, even not the cardinal
+      // one because no fit attempt was performed. In this case, the "hasFitStatus" call to genfit
+      // will fail with access violation. To prevent that, check for the number of reps here before
+      // actually calling genfit's hasFitStatus(...)
+      if (m_genfitTrack.getNumReps() == 0)
+        return false;
+
       return m_genfitTrack.hasFitStatus(representation);
     }
 
@@ -680,8 +691,8 @@ namespace Belle2 {
      */
     template<class HitType>
     void mapOnHits(const std::string& storeArrayNameOfHits,
-                   std::function<void(RecoHitInformation&, HitType*)> mapFunction,
-                   std::function<bool(const RecoHitInformation&, const HitType*)> pickFunction)
+                   std::function<void(RecoHitInformation&, HitType*)> const&   mapFunction,
+                   std::function<bool(const RecoHitInformation&, const HitType*)> const& pickFunction)
     {
       RelationVector<RecoHitInformation> relatedHitInformation = getRelationsTo<RecoHitInformation>
                                                                  (m_storeArrayNameOfRecoHitInformation);
@@ -702,8 +713,8 @@ namespace Belle2 {
      */
     template<class HitType>
     void mapOnHits(const std::string& storeArrayNameOfHits,
-                   std::function<void(const RecoHitInformation&, const HitType*)> mapFunction,
-                   std::function<bool(const RecoHitInformation&, const HitType*)> pickFunction) const
+                   std::function<void(const RecoHitInformation&, const HitType*)> const& mapFunction,
+                   std::function<bool(const RecoHitInformation&, const HitType*)> const& pickFunction) const
     {
       RelationVector<RecoHitInformation> relatedHitInformation = getRelationsTo<RecoHitInformation>
                                                                  (m_storeArrayNameOfRecoHitInformation);
@@ -723,7 +734,7 @@ namespace Belle2 {
      */
     template<class HitType>
     void mapOnHits(const std::string& storeArrayNameOfHits,
-                   std::function<void(RecoHitInformation&, HitType*)> mapFunction)
+                   std::function<void(RecoHitInformation&, HitType*)> const& mapFunction)
     {
       mapOnHits<HitType>(storeArrayNameOfHits, mapFunction, [](const RecoHitInformation&, const HitType*) -> bool { return true; });
     }
@@ -735,7 +746,7 @@ namespace Belle2 {
      */
     template<class HitType>
     void mapOnHits(const std::string& storeArrayNameOfHits,
-                   std::function<void(const RecoHitInformation&, const HitType*)> mapFunction) const
+                   std::function<void(const RecoHitInformation&, const HitType*)> const&   mapFunction) const
     {
       mapOnHits<HitType>(storeArrayNameOfHits, mapFunction, [](const RecoHitInformation&, const HitType*) -> bool { return true; });
     }

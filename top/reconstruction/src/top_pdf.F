@@ -580,12 +580,17 @@ c--   calculate PDF parameters
 
       NUMCH=NCH(0)+NCH(1)
       S=0.
-      DO I=0,NUMCH-1
-         S=S+PIK_DXCH(I)*PIK_DYCH(I)*CH_EFFI(I,M)
+      DO ICH=0,NUMCH-1
+         IF(CH_MASK(ICH,M)) THEN
+            PIK_BGR(ICH)=PIK_DXCH(ICH)*PIK_DYCH(ICH)*CH_EFFI(ICH,M)
+            S=S+PIK_BGR(ICH)
+         ELSE
+            PIK_BGR(ICH)=0.
+         ENDIF
       ENDDO
-      IF(S.EQ.0) S=1.
-      DO I=0,NUMCH-1
-         PIK_BGR(I)=PIK_DXCH(I)*PIK_DYCH(I)*CH_EFFI(I,M)/S/T_MAX
+      IF(S.EQ.0) RETURN
+      DO ICH=0,NUMCH-1
+         PIK_BGR(ICH)=PIK_BGR(ICH)/S/T_MAX
       ENDDO
 
       END

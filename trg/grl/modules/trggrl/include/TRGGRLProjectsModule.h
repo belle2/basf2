@@ -100,6 +100,8 @@ namespace Belle2 {
     /**ecl cluster time window to suppress beam induced background*/
     double m_eclClusterTimeWindow;
 
+    /**convert the unit of angle from rad to degree*/
+    double m_RtD;
 
   };
 

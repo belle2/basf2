@@ -14,8 +14,6 @@
 #ifndef TRGGRLMATCH_H
 #define TRGGRLMATCH_H
 
-#include <TObject.h>
-#include <TVector3.h>
 #include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {

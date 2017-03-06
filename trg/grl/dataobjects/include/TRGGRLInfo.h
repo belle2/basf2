@@ -14,10 +14,9 @@
 #pragma once
 #include <TObject.h>
 #include <TVector3.h>
-#include <framework/datastore/RelationsObject.h>
 namespace Belle2 {
 
-  class TRGGRLInfo : public RelationsObject {
+  class TRGGRLInfo : public TObject {
   public:
 
     TRGGRLInfo() {}
@@ -37,7 +36,7 @@ namespace Belle2 {
     //get the number of 3D matched tracks
     int getN3Dmatchtrk() const {return m_n_3dmatch_track;}
     //get the number of 3D NN tracks
-    int getNNNmatchtrk() const {return m_n_NNmatch_track;}
+    //int getNNNmatchtrk() const {return m_n_NNmatch_track;}
     //get the number of eclcluster
     int getNcluster() const {return m_n_cluster;}
     //get the number of eclclusters >300MeV
@@ -80,7 +79,7 @@ namespace Belle2 {
     //set the number of 3D matched tracks
     void setN3Dmatchtrk(int N3Dmatchtrk)  {m_n_3dmatch_track = N3Dmatchtrk;}
     //set the number of NN tracks
-    void setNNNmatchtrk(int NNNmatchtrk)  {m_n_NNmatch_track = NNNmatchtrk;}
+    //void setNNNmatchtrk(int NNNmatchtrk)  {m_n_NNmatch_track = NNNmatchtrk;}
     //set the number of clusters
     void setNcluster(int Ncluster)  {m_n_cluster = Ncluster;}
     //set the number of cluster >300 MeV
@@ -125,7 +124,7 @@ namespace Belle2 {
     /**#3D matched NN tracks*/
     int m_n_3dmatch_track;
     /**#3D NN tracks*/
-    int m_n_NNmatch_track;
+    //int m_n_NNmatch_track;
     /**# ecl clusers (default energy threshold ~100Mev) */
     int m_n_cluster;
     /**# ecl clusers without associated track */
@@ -154,6 +153,7 @@ namespace Belle2 {
     int m_gg_accept1;
     /**gamma gamma accept, gg:1, non-gg:0*/
     int m_gg_accept2;
+
 
     //! The Class title
     ClassDef(TRGGRLInfo, 1); /*< the class title */

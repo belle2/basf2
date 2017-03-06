@@ -77,15 +77,16 @@ void TRGGRLMatchModule::initialize()
   clusterslist.isRequired();
   clusterslist.registerRelationTo(track2Dlist);
   clusterslist.registerRelationTo(track3Dlist);
-  track2Dlist.registerRelationTo(clusterslist);
-  track3Dlist.registerRelationTo(clusterslist);
+//  track2Dlist.registerRelationTo(clusterslist);
+// track3Dlist.registerRelationTo(clusterslist);
 
   StoreArray<TRGGRLMATCH>::registerPersistent(m_2dmatch_tracklist);
+//  StoreArray<TRGGRLMATCH>::register(m_2dmatch_tracklist);
   StoreArray<TRGGRLMATCH>::registerPersistent(m_3dmatch_tracklist);
 
   StoreArray<TRGGRLMATCH> track2Dmatch(m_2dmatch_tracklist);
-  track2Dmatch.registerRelationTo(clusterslist);
   track2Dmatch.registerRelationTo(track2Dlist);
+  track2Dmatch.registerRelationTo(clusterslist);
   StoreArray<TRGGRLMATCH> track3Dmatch(m_3dmatch_tracklist);
   track3Dmatch.registerRelationTo(clusterslist);
   track3Dmatch.registerRelationTo(track3Dlist);
@@ -126,7 +127,7 @@ void TRGGRLMatchModule::event()
       mat2d->setDeltaR(dr_tmp);
       mat2d->addRelationTo(track2Dlist[i]);
       mat2d->addRelationTo(clusterlist[cluster_ind]);
-      track2Dlist[i]->addRelationTo(clusterlist[cluster_ind]);
+      //   track2Dlist[i]->addRelationTo(clusterlist[cluster_ind]);
       clusterlist[cluster_ind]->addRelationTo(track2Dlist[i]);
     }
   }
@@ -147,15 +148,18 @@ void TRGGRLMatchModule::event()
         cluster_ind = j;
       }
     }
-
     if (dr_tmp < m_dr_threshold && dz_tmp < m_dz_threshold && cluster_ind != -1) {
       TRGGRLMATCH* mat3d = track3Dmatch.appendNew();
       mat3d->setDeltaR(dr_tmp);
       mat3d->setDeltaZ(dz_tmp);
       mat3d->addRelationTo(track3Dlist[i]);
       mat3d->addRelationTo(clusterlist[cluster_ind]);
-      track3Dlist[i]->addRelationTo(clusterlist[cluster_ind]);
+      // if(mat3d->getRelatedTo<CDCTriggerTrack>())std::cout<<"get match-track3D" <<std::endl;
+      //  track3Dlist[i]->addRelationTo(clusterlist[cluster_ind]);
+      // if(track3Dlist[i]->getRelatedTo<TRGECLCluster>())std::cout<<"get trk-cluster" <<std::endl;
       clusterlist[cluster_ind]->addRelationTo(track3Dlist[i]);
+      //if(clusterlist[cluster_ind]->getRelatedTo<CDCTriggerTrack>())std::cout<<"get cluster-trk" <<std::endl;
+      //if(track3Dlist[i]->getRelatedFrom<TRGECLCluster>())std::cout<<"from trk-cluster" <<std::endl;
     }
   }
 

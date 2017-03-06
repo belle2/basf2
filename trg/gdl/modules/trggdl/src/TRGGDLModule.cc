@@ -96,7 +96,7 @@ namespace Belle2 {
       cout << TRGDebug::tab(4) << "debug level = " << TRGDebug::level()
            << endl;
     }
-    StoreArray<TRGGDLResults>::registerPersistent();
+    StoreObjPtr<TRGGDLResults>::registerPersistent();
   }
 
   void

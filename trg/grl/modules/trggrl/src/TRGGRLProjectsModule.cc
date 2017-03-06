@@ -28,6 +28,10 @@
 #include <trg/klm/dataobjects/KLMTriggerHit.h>
 #include <trg/klm/dataobjects/KLMTriggerTrack.h>
 
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+
 using namespace std;
 
 namespace Belle2 {
@@ -136,7 +140,9 @@ namespace Belle2 {
     StoreArray<KLMTriggerHit>::required();
     StoreArray<KLMTriggerTrack>::required();
 
-    StoreArray<TRGGRLInfo>::registerPersistent();
+    StoreObjPtr<TRGGRLInfo>::registerPersistent();
+
+    m_RtD = 180. / 3.1415926;
 
   }
 
@@ -177,8 +183,8 @@ namespace Belle2 {
     int n_klmhit = klmhit.getEntries();
     //number of ecl clusters without time requirement
     // int ncluster_ori = eclclusters.getEntries();
-    StoreArray<TRGGRLInfo> trgInfos;
-    TRGGRLInfo* trgInfo = trgInfos.appendNew();
+    StoreObjPtr<TRGGRLInfo> trgInfo;
+    trgInfo.create();
     trgInfo->setN2Dfindertrk(ntrk_2dfinder);
     trgInfo->setN2Dfittertrk(ntrk_2dfitter);
     trgInfo->setN3Dfittertrk(ntrk_3dfitter);
@@ -195,11 +201,11 @@ namespace Belle2 {
     std::vector<TRGECLCluster*> clustersinwindow;
     ///get event time for ECL firstly
     double eventtime = -999999.;
-    double energytot = 9999.;
+    double energytot = -9999.;
     for (int i = 0; i < ecltrgs.getEntries(); i++) {
       double evt_time = ecltrgs[i]->m_eventtiming;
       double evt_energy = ecltrgs[i]->m_etot;
-      if (energytot > evt_energy) {
+      if (energytot < evt_energy) {
         energytot = evt_energy;
         eventtime = evt_time;
       }
@@ -214,14 +220,14 @@ namespace Belle2 {
     for (unsigned int i = 0; i < clustersinwindow.size(); i++) {
       double energy_clu = clustersinwindow[i]->getEnergyDep();
       //if (energy_clu > m_energythreshold[0]) nclus[0]++;
-      if (!clustersinwindow[i]->getRelatedTo<CDCTriggerTrack>()) nclus[0]++;
+      if (!clustersinwindow[i]->getRelatedTo<CDCTriggerTrack>(m_NNCollectionName)) nclus[0]++;
       if (energy_clu > m_energythreshold[1]) nclus[1]++;
       if (energy_clu > m_energythreshold[2]) {
         double  x1 = clustersinwindow[i]->getPositionX();
         double  y1 = clustersinwindow[i]->getPositionY();
         double  z1 = clustersinwindow[i]->getPositionZ();
         TVector3 vec1(x1, y1, z1);
-        double  theta1 = vec1.Theta() * Unit::deg;
+        double  theta1 = vec1.Theta() * m_RtD;
         if (theta1 > 30. && theta1 < 140.)nclus[2]++;
       }
 
@@ -236,22 +242,23 @@ namespace Belle2 {
     if (ntrk_mat3d >= 2) {
       for (int i = 0; i < ntrk_mat3d - 1; i++) {
         const TRGECLCluster* eclcluster1 = tracks3Dmatch[i]->getRelatedTo<TRGECLCluster>();
-        const CDCTriggerTrack* cdctrk1 = tracks3Dmatch[i]->getRelatedTo<CDCTriggerTrack>();
+        const CDCTriggerTrack* cdctrk1 = tracks3Dmatch[i]->getRelatedTo<CDCTriggerTrack>(m_NNCollectionName);
         if (eclcluster1 == nullptr || cdctrk1 == nullptr) continue;
         double e1 = eclcluster1->getEnergyDep();
-        double phi1 = cdctrk1->getPhi0() * Unit::deg;
+        double phi1 = cdctrk1->getPhi0() * m_RtD;
+        if (phi1 < 0) phi1 += 360.;
         double tanLam1 = cdctrk1->getTanLambda();
-        double theta1 = acos(tanLam1 / sqrt(1. + tanLam1 * tanLam1)) * Unit::deg;
+        double theta1 = acos(tanLam1 / sqrt(1. + tanLam1 * tanLam1)) * m_RtD;
 
         for (int j = i + 1; j < ntrk_mat3d; j++) {
           const TRGECLCluster* eclcluster2 = tracks3Dmatch[j]->getRelatedTo<TRGECLCluster>();
-          const CDCTriggerTrack* cdctrk2 = tracks3Dmatch[j]->getRelatedTo<CDCTriggerTrack>();
-          // if (eclcluster2 == nullptr || cdctrk2 == nullptr) continue;
+          const CDCTriggerTrack* cdctrk2 = tracks3Dmatch[j]->getRelatedTo<CDCTriggerTrack>(m_NNCollectionName);
+          if (eclcluster2 == nullptr || cdctrk2 == nullptr) continue;
           double e2 = eclcluster2->getEnergyDep();
-          double phi2 = cdctrk2->getPhi0() * Unit::deg;
+          double phi2 = cdctrk2->getPhi0() * m_RtD;
+          if (phi2 < 0) phi2 += 360.;
           double tanLam2 = cdctrk2->getTanLambda();
-          double theta2 = acos(tanLam2 / sqrt(1. + tanLam2 * tanLam2)) * Unit::deg;
-
+          double theta2 = acos(tanLam2 / sqrt(1. + tanLam2 * tanLam2)) * m_RtD;
           double deltphi = fabs(fabs(phi1 - phi2) - 180.);
           double delttheta = fabs(theta1 + theta2 - 180.);
           bool ang = (deltphi < 20. && delttheta > 10. && deltphi < 50.);
@@ -267,7 +274,7 @@ namespace Belle2 {
 //count the back-to-back cluster pair here as well
     int eclbhabha_bit = 0;
     int nbb_cluster = 0;
-    if (clustersinwindow.size() >= 2) {
+    if (clustersinwindow.size() == 2) {
       for (unsigned i = 0; i < clustersinwindow.size() - 1; i++) {
 
         TRGECLCluster* cluster1 = clustersinwindow[i];
@@ -276,8 +283,9 @@ namespace Belle2 {
         double  y1 = cluster1->getPositionY();
         double  z1 = cluster1->getPositionZ();
         TVector3 vec1(x1, y1, z1);
-        double  theta1 = vec1.Theta() * Unit::deg;
-        double  phi1 = vec1.Phi() * Unit::deg;
+        double  theta1 = vec1.Theta() * m_RtD;
+        double  phi1 = vec1.Phi() * m_RtD;
+        if (phi1 < 0) phi1 += 360.;
         for (unsigned j = i + 1; j < clustersinwindow.size(); j++) {
           TRGECLCluster* cluster2 = clustersinwindow[j];
           double e2 = cluster2->getEnergyDep();
@@ -285,8 +293,9 @@ namespace Belle2 {
           double  y2 = cluster2->getPositionY();
           double  z2 = cluster2->getPositionZ();
           TVector3 vec2(x2, y2, z2);
-          double  theta2 = vec2.Theta() * Unit::deg;
-          double  phi2 = vec2.Phi() * Unit::deg;
+          double  theta2 = vec2.Theta() * m_RtD;
+          double  phi2 = vec2.Phi() * m_RtD;
+          if (phi1 < 0) phi1 += 360.;
 
           double etot = e1 + e2;
           double deltphi = fabs(fabs(phi1 - phi2) - 180);
@@ -307,10 +316,10 @@ namespace Belle2 {
     int sbhabha_bit = 0;
     for (int i = 0; i < ntrk_mat3d; i++) {
       const TRGECLCluster* eclcluster1 = tracks3Dmatch[i]->getRelatedTo<TRGECLCluster>();
-      const CDCTriggerTrack* cdctrk1 = tracks3Dmatch[i]->getRelatedTo<CDCTriggerTrack>();
+      const CDCTriggerTrack* cdctrk1 = tracks3Dmatch[i]->getRelatedTo<CDCTriggerTrack>(m_NNCollectionName);
       if (eclcluster1 == nullptr || cdctrk1 == nullptr) continue;
       double e1 = eclcluster1->getEnergyDep();
-      if (e1 > 1.0 && eclbhabha_bit == 1)sbhabha_bit = 1;
+      if (ntrk_2dfinder == 1 && e1 > 1.0 && eclbhabha_bit == 1)sbhabha_bit = 1;
     }
     trgInfo->setsBhabhaVeto(sbhabha_bit);
 //single track bahbhaveto-------end
@@ -319,7 +328,7 @@ namespace Belle2 {
     int nneu_cluster = 0;
     if (!clustersinwindow.empty()) {
       for (unsigned int i = 0; i < clustersinwindow.size(); i++) {
-        if (clustersinwindow[i]->getRelatedTo<CDCTriggerTrack>()) continue;
+        if (clustersinwindow[i]->getRelatedTo<CDCTriggerTrack>(m_NNCollectionName)) continue;
         else nneu_cluster++;
       }
     }

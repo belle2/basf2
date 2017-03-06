@@ -13,7 +13,6 @@
 #include <framework/pcore/EvtMessage.h>
 #include <TMessage.h>
 
-#include <vector>
 #include <string>
 #include <memory>
 
@@ -23,34 +22,48 @@ class TMessage;
 namespace Belle2 {
   /** dynamic character buffer that knows its size.
    *
-   * compared with std::vector<char> this saves some allocations if reused.
+   * This is similar to std::vector<char> but compared to std::vector we are
+   * not initializing the memory area before using it which saves some time.
    */
   class CharBuffer {
-    std::vector<char> m_vec; /**< data buffer. */
-    size_t m_size = 0; /**< current size, <= m_vec.size() */
+    std::unique_ptr<char[]> m_data; /**< data buffer. */
+    size_t m_capacity{0}; /**< allocated size */
+    size_t m_size{0}; /**< current size, <= m_vec.size() */
   public:
     /** Constructor, with the initial size of the buffer to allocate
      * (in bytes). size() will remain zero until buffer is filled.
      */
-    explicit CharBuffer(size_t initial_capacity = 0)
-    {
-      m_vec.resize(initial_capacity);
-    }
+    explicit CharBuffer(size_t initial_capacity = 0): m_data{initial_capacity > 0 ? new char[initial_capacity] : nullptr}
+    {}
     /** copy data to end of buffer. */
     void add(const void* data, size_t len)
     {
-      if (m_size + len > m_vec.size()) {
-        m_vec.resize(m_size + len);
-      }
-      memcpy(m_vec.data() + m_size, data, len);
-      m_size += len;
+      auto old_size = m_size;
+      resize(m_size + len);
+      memcpy(m_data.get() + old_size, data, len);
     }
     /** return raw pointer. */
-    char* data() { return m_vec.data(); }
+    char* data() { return m_data.get(); }
     /** return buffer size (do not access data() beyond this) */
     size_t size() const { return m_size; }
     /** reset (without deallocating) */
     void clear() { m_size = 0; }
+    /** resize, similar to std::vector<char>::resize in that it will copy the
+     * existing buffer to a new, larger buffer if needed but it will not
+     * initialize any elements beyond this point */
+    void resize(size_t size)
+    {
+      if (size > m_capacity) {
+        // grow by basically doubling each time, except if the size we need to
+        // grow to is even more than that
+        m_capacity = std::max(size, m_capacity * 2);
+        //c++14: auto newbuf = std::make_unique<char[]>(m_capacity);
+        std::unique_ptr<char[]> newbuf{new char[m_capacity]};
+        memcpy(newbuf.get(), m_data.get(), m_size);
+        std::swap(m_data, newbuf);
+      }
+      m_size = size;
+    }
   };
 
   /** Reusable Message class derived from TMessage (for reading only) */

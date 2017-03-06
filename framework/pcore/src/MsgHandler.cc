@@ -12,6 +12,7 @@
 
 #include <TObject.h>
 #include <TMessage.h>
+#include <RZip.h>
 
 #include <stdlib.h>
 
@@ -25,20 +26,16 @@ namespace {
 }
 
 MsgHandler::MsgHandler(int complevel):
-  m_buf(new CharBuffer(100000)),
+  m_buf(100000),
+  m_compBuf(0),
   m_msg(new TMessage(kMESS_OBJECT))
 {
-  if (complevel != 0) {
-    B2FATAL("Compression support disabled because of https://sft.its.cern.ch/jira/browse/ROOT-4550 . You can enable it manually by removing this check in MsgHandler, but be aware of huge memory leaks.");
-  }
   m_complevel = complevel;
 
   //Schema evolution is needed to stream genfit tracks
   //If disabled, streamers will crash when reading data.
   TMessage::EnableSchemaEvolutionForAll();
-
   m_msg->SetWriteMode();
-  m_msg->SetCompressionLevel(complevel);
 }
 
 MsgHandler::~MsgHandler()
@@ -47,32 +44,28 @@ MsgHandler::~MsgHandler()
 
 void MsgHandler::clear()
 {
-  m_buf->clear();
+  m_buf.clear();
+  m_compBuf.clear();
 }
 
 void MsgHandler::add(const TObject* obj, const string& name)
 {
   m_msg->WriteObject(obj);
-  m_msg->Compress(); //no effect if m_complevel == 0
 
   int len = m_msg->Length();
   char* buf = m_msg->Buffer();
-  if (m_msg->CompBuffer()) { // Compression ON
-    len = m_msg->CompLength();
-    buf = m_msg->CompBuffer();
-  }
 
   if (len > c_maxObjectSizeBytes) {
     B2WARNING("MsgHandler: Object " << name << " is very large (" << len  << " bytes), parallel processing may be slow.");
   }
 
-  // Put name of object in output buffer
+  // Put name of object in output buffer including a final 0-byte
   UInt_t nameLength = name.size() + 1;
-  m_buf->add(&nameLength, sizeof(nameLength));
-  m_buf->add(name.c_str(), nameLength);
+  m_buf.add(&nameLength, sizeof(nameLength));
+  m_buf.add(name.c_str(), nameLength);
   // Copy object into buffer
-  m_buf->add(&len, sizeof(len));
-  m_buf->add(buf, len);
+  m_buf.add(&len, sizeof(len));
+  m_buf.add(buf, len);
   m_msg->Reset();
 }
 
@@ -83,7 +76,32 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
     return eod;
   }
 
-  EvtMessage* evtmsg = new EvtMessage(m_buf->data(), m_buf->size(), rectype);
+  // which buffer to send? defaults to uncompressed
+  auto buf = &m_buf;
+  // but if we have compression enabled then please compress.
+  if (m_complevel > 0) {
+    // make sure buffer for the compression is big enough. We make it equal to
+    // the original size but add one int to be able to have a distuingishing
+    // header.
+    m_compBuf.resize(m_buf.size() + sizeof(UInt_t));
+    // And call the root compression function
+    const int algorithm = m_complevel / 100;
+    const int level = m_complevel % 100;
+    int irep{0}, nin{(int)m_buf.size()}, nout{nin};
+    R__zipMultipleAlgorithm(level, &nin, m_buf.data(), &nout, m_compBuf.data() + sizeof(int), &irep, algorithm);
+    // it returns the number of bytes of the output in irep. If that is zero or
+    // to big compression failed and we transmit uncompressed.
+    if (irep > 0 && irep <= nin) {
+      //set correct size of compressed message
+      m_compBuf.resize(irep + sizeof(UInt_t));
+      // and set pointer to correct buffer for creating message
+      buf = &m_compBuf;
+    }
+    // Ok, now let's make sure the first 4 bytes are completely zero to be able to transparently handle decompression
+    memset(m_compBuf.data(), 0, sizeof(UInt_t));
+  }
+
+  EvtMessage* evtmsg = new EvtMessage(buf->data(), buf->size(), rectype);
   clear();
 
   return evtmsg;
@@ -94,6 +112,43 @@ void MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
 {
   const char* msgptr = msg->msg();
   const char* end = msgptr + msg->msg_size();
+
+  //Normally each message starts with the size of the member name and if that
+  //is zero something is wrong. Unless the message is compressed in which case
+  //we make sure it is zero.
+  UInt_t nameLength;
+  memcpy(&nameLength, msgptr, sizeof(nameLength));
+  if (nameLength == 0) {
+    // apparently message is compressed, let's decompress
+    m_compBuf.clear();
+    int nzip{0}, nout{0};
+    // compressed message after the first 4 bytes
+    unsigned char* zipptr = (unsigned char*) msgptr + sizeof(UInt_t);
+    while (zipptr < (unsigned char*)end) {
+      // first get a header of the next block so we know how big the output will be
+      if (R__unzip_header(&nzip, zipptr, &nout) != 0) {
+        B2FATAL("Cannot uncompress message header");
+        break;
+      }
+      // no more output? fine
+      if (!nout) break;
+      // otherwise make sure output buffer is large enough
+      int old_size = m_compBuf.size();
+      m_compBuf.resize(old_size + nout);
+      // and uncompress, the amount of bytes will be returned as irep
+      int irep{0};
+      R__unzip(&nzip, zipptr, &nout, (unsigned char*)(m_compBuf.data() + old_size), &irep);
+      // if that is not positive an error happend, bail
+      if (irep <= 0) {
+        B2FATAL("Cannot uncompress message");
+      }
+      // otherwise advance pointer by the amount of bytes compressed bytes in the block
+      zipptr += nzip;
+    }
+    // ok, decompressed succesfully, set msg pointer to the correct area
+    msgptr = m_compBuf.data();
+    end = msgptr + m_compBuf.size();
+  }
 
   while (msgptr < end) {
     // Restore object name

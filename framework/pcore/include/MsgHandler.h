@@ -96,7 +96,14 @@ namespace Belle2 {
   /** A class to encode/decode an EvtMessage */
   class MsgHandler {
   public:
-    /** Constructor */
+    /** Constructor
+     * @param complevel Compression level and algorithm: algorithm*100 + level where algorithm can be one of
+     *   0: default root system algorithm (usually zlib)
+     *   1: zlib
+     *   2: lzma
+     *   3: old root compression code
+     *   and level can be between 1 and 9 (0 disables compression)
+     */
     explicit MsgHandler(int complevel = 0);
     /** Destructor */
     virtual ~MsgHandler();
@@ -112,7 +119,8 @@ namespace Belle2 {
     virtual void decode_msg(EvtMessage* msg, std::vector<TObject*>& objlist, std::vector<std::string>& namelist);
 
   private:
-    std::unique_ptr<CharBuffer> m_buf; /**< EvtMessage character buffer for encode_msg(). */
+    CharBuffer m_buf; /**< EvtMessage character buffer for encode_msg(). */
+    CharBuffer m_compBuf; /**< EvtMessage character buffer for compressing/decompressing. */
     std::unique_ptr<TMessage> m_msg; /**< Used for serialising objects into m_buf. */
     InMessage m_inMsg; /**< Used for deserializing in decode_msg() */
     int m_complevel; /**< compression level, from 0 (none) to 9 (highest). */

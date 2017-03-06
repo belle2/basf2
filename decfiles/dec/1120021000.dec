@@ -1,4 +1,4 @@
-# EventType: 1110001000
+# EventType: 1120021000
 # Descriptor: [B0 -> omega gamma]cc
 # NickName: Bd_omegagamma
 # Documentation: Rare b->d gamma process
@@ -8,6 +8,7 @@
 # Email: purquijo@unimelb.edu.au
 # Cuts: None
 # Date: 20150109
+# Comments: update EventType (S.Sandilya, 2017.03.02)
 #
 #
 Decay Upsilon(4S)

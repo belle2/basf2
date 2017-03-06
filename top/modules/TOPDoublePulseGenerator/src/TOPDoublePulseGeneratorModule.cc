@@ -71,6 +71,8 @@ namespace Belle2 {
     addParam("useDatabase", m_useDatabase,
              "if true, use sample times from database instead of sampleTimeIntervals.",
              false);
+    addParam("storageWindows", m_storageWindows,
+             "number of storage windows (old FW used 64 out of 512)", (unsigned) 512);
 
   }
 
@@ -179,7 +181,7 @@ namespace Belle2 {
 
           // first calpulse
           double time = gRandom->Rndm() * sampleTimes->getTimeRange();
-          unsigned window = gRandom->Rndm() * 512;
+          unsigned window = gRandom->Rndm() * m_storageWindows;
           double sample = sampleTimes->getSample(window, time);
           int tdc = int(sample * m_sampleDivisions);
           auto* digit = digits.appendNew(moduleID, pixelID, tdc);

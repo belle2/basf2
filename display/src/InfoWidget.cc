@@ -277,9 +277,13 @@ TString InfoWidget::getRelatedInfo(const TObject* obj)
 {
   TString info;
   info += "<h4>Related Objects</h4>";
+
+  StoreEntry* storeEntry = nullptr;
+  int index = -1;
   {
     //relations from this
-    const RelationVector<TObject>& relatedObjects = DataStore::getRelationsWithObj<TObject>(obj, "ALL");
+    const RelationVector<TObject> relatedObjects(DataStore::Instance().getRelationsWith(DataStore::c_ToSide, obj, storeEntry, index,
+                                                 TObject::Class(), "ALL"));
     const TString pref = "this <b>-&gt;</b> ";
     for (size_t i = 0; i < relatedObjects.size(); i++) {
       const TObject* relObj = relatedObjects.object(i);
@@ -297,7 +301,9 @@ TString InfoWidget::getRelatedInfo(const TObject* obj)
   info += " <br>"; //extra space needed!
   {
     //relations to this
-    const RelationVector<TObject>& relatedObjects = DataStore::getRelationsWithObj<TObject>(obj, "ALL");
+    const RelationVector<TObject> relatedObjects(DataStore::Instance().getRelationsWith(DataStore::c_FromSide, obj, storeEntry, index,
+                                                 TObject::Class(), "ALL"));
+
     const TString pref = "this <b>&lt;-</b> ";
     for (size_t i = 0; i < relatedObjects.size(); i++) {
       const TObject* relObj = relatedObjects.object(i);

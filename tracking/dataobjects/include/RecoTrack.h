@@ -205,7 +205,7 @@ namespace Belle2 {
      * @param storeArrayNameOfBKLMHits The name of the store array where the related bklm hits are stored.
      * @param storeArrayNameOfEKLMHits The name of the store array where the related eklm hits are stored.
      * @param storeArrayNameOfRecoHitInformation The name of the store array where the related hit information are stored.
-     * @param recreateSortingParameters The VXDTF dos not set the sorting parameters correctly (they are all 0).
+     * @param recreateSortingParameters The VXDTF does not set the sorting parameters correctly (they are all 0).
      *        This flag can be used to recover the parameters.
      * @return The newly created reco track.
      * @todo Let the track finders determine the cov seed.

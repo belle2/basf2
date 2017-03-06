@@ -148,11 +148,18 @@ namespace Belle2 {
       void print() const;
 
     private:
+
       /**
        * Number of TOP modules (number of physical ones can be less),
        * number of electronic modules (SCROD's) per TOP module
        */
       enum {c_numModules = 16, c_numColumns = 4};
+
+      /**
+       * copy constructor
+       */
+      FrontEndMapper(const FrontEndMapper&)
+      {}
 
       /**
        * Clear

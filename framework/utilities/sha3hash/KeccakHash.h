@@ -25,11 +25,13 @@ typedef unsigned char BitSequence;
 typedef size_t DataLength;
 typedef enum { SUCCESS = 0, FAIL = 1, BAD_HASHLEN = 2 } HashReturn;
 
+// @cond doxygen_ignore
 typedef struct {
   KeccakWidth1600_SpongeInstance sponge;
   unsigned int fixedOutputLength;
   unsigned char delimitedSuffix;
 } Keccak_HashInstance;
+// @endcond
 
 /**
   * Function to initialize the Keccak[r, c] sponge function instance used in sequential hashing mode.

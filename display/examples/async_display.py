@@ -14,26 +14,15 @@ from reconstruction import add_reconstruction
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [5000])
 
-# create geometry
-gearbox = register_module('Gearbox')
-geometry = register_module('Geometry')
-
-
-# EvtGen to provide generic BB events
-evtgeninput = register_module('EvtGenInput')
-# create paths
 main = create_path()
 
 # add modules to paths
 main.add_module(eventinfosetter)
 main.add_module('ProgressBar')
 
-main.add_module(evtgeninput)
-main.add_module(gearbox)
-main.add_module(geometry)
+main.add_module('EvtGenInput')
 
-
-# detecor simulation
+# (no ECL because of unsupported solids)
 components = [
     'MagneticField',
     'BeamPipe',
@@ -44,7 +33,6 @@ components = [
     'ARICH',
     'EKLM',
     'BKLM',
-    'ECL',
 ]
 add_simulation(main, components)
 

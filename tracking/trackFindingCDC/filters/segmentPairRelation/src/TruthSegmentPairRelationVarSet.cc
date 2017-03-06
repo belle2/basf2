@@ -9,10 +9,10 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/TruthSegmentPairRelationVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
-
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackStore.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -29,11 +29,11 @@ bool TruthSegmentPairRelationVarSet::extract(const Relation<const CDCSegmentPair
   const CDCSegmentPair& fromSegmentPair = *ptrFromSegmentPair;
   const CDCSegmentPair& toSegmentPair = *ptrToSegmentPair;
 
-  const CDCRecoSegment2D& startSegment = *fromSegmentPair.getFromSegment();
-  const CDCRecoSegment2D& middleSegment = *fromSegmentPair.getToSegment();
-  const CDCRecoSegment2D& endSegment = *toSegmentPair.getToSegment();
+  const CDCSegment2D& startSegment = *fromSegmentPair.getFromSegment();
+  const CDCSegment2D& middleSegment = *fromSegmentPair.getToSegment();
+  const CDCSegment2D& endSegment = *toSegmentPair.getToSegment();
 
-  const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
   const CDCMCTrackStore& mcTrackStore = CDCMCTrackStore::getInstance();
   const std::map<ITrackType, CDCMCTrackStore::CDCHitVector>& mcTracks =
     mcTrackStore.getMCTracksByMCParticleIdx();

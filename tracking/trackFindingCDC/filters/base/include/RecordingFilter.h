@@ -75,32 +75,11 @@ namespace Belle2 {
       /// Initialize the recorder before event processing.
       void initialize() override
       {
+        if (m_skimFilter) this->addProcessingSignalListener(m_skimFilter.get());
         Super::initialize();
-        if (m_skimFilter) m_skimFilter->initialize();
         m_recorder.reset(new Recorder(Super::getVarSet().getNamedVariables(),
                                       m_param_rootFileName,
                                       m_param_treeName));
-      }
-
-      /// Signal the beginning of a new run to the skimming filter and the varset
-      void beginRun() override
-      {
-        if (m_skimFilter) m_skimFilter->beginRun();
-        Super::beginRun();
-      }
-
-      /// Signal the beginning of a new event to the skimming filter and the varset
-      void beginEvent() override
-      {
-        if (m_skimFilter) m_skimFilter->beginEvent();
-        Super::beginEvent();
-      }
-
-      /// Signal the end of a new run to the skimming filter and the varset
-      void endRun() override
-      {
-        Super::endRun();
-        if (m_skimFilter) m_skimFilter->endRun();
       }
 
       /// Initialize the recorder after event processing.
@@ -108,7 +87,6 @@ namespace Belle2 {
       {
         m_recorder->write();
         m_recorder.reset();
-        if (m_skimFilter) m_skimFilter->terminate();
         Super::terminate();
       }
 
@@ -130,14 +108,18 @@ namespace Belle2 {
         return m_param_returnWeight;
       }
 
-    public:
+    protected:
       /// Getter for the skim filter to select objects to be recorded
       MayBePtr<AFilter> getSkimFilter() const
-      { return m_skimFilter.get(); }
+      {
+        return m_skimFilter.get();
+      }
 
       /// Setter for the skim filter to select objects to be recorded
       void setSkimFilter(std::unique_ptr<AFilter> skimFilter)
-      { m_skimFilter = std::move(skimFilter); }
+      {
+        m_skimFilter = std::move(skimFilter);
+      }
 
     private:
       /// Recorder to write all variable sets of the encountered objects.

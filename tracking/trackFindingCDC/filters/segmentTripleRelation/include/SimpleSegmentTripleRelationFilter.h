@@ -22,10 +22,6 @@ namespace Belle2 {
       using Super = BaseSegmentTripleRelationFilter;
 
     public:
-      /// Importing all overloads from the super class
-      using Super::operator();
-
-    public:
       /// Implementation currently accepts all combinations
       Weight operator()(const CDCSegmentTriple& fromSegmentTriple,
                         const CDCSegmentTriple& toSegmentTriple) final;

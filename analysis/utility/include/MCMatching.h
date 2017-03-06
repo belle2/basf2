@@ -18,9 +18,9 @@ namespace Belle2 {
    *
    * Different MCErrorFlags flags can be queried using getMCErrors(), or the associated 'mcErrors' variable (available via VariablesToNtuple, the MCTruth ntuple tool, etc.). For checking if a Particle is correctly reconstructed, the 'isSignal' variable can be used.
    */
-  namespace MCMatching {
+  struct MCMatching {
     /** Name of extra-info field stored in Particle. */
-    extern const std::string c_extraInfoMCErrors;
+    static const std::string c_extraInfoMCErrors;
 
     /** Flags that describe different reconstruction errors. */
     enum MCErrorFlags {
@@ -48,7 +48,7 @@ namespace Belle2 {
         print(Belle2.MCMatching.explainFlags(123))
        \endcode
      */
-    std::string explainFlags(unsigned int flags);
+    static std::string explainFlags(unsigned int flags);
 
     /**
      * This is the main function of MC matching algorithm. When executed the algorithm
@@ -61,7 +61,7 @@ namespace Belle2 {
      *
      * @return returns true if relation is set and false otherwise
      */
-    bool setMCTruth(const Belle2::Particle* particle);
+    static bool setMCTruth(const Belle2::Particle* particle);
 
     /**
      * Returns quality indicator of the match as a bit pattern
@@ -78,13 +78,13 @@ namespace Belle2 {
      *
      * @return ORed combination of MCErrorFlags describing differences between reconstructed particle and MC truth.
      */
-    int getMCErrors(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle = nullptr);
+    static int getMCErrors(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle = nullptr);
 
     /** Sets error flags in extra-info (also returns it).
      *
      * Users should use getMCErrors(), which only calculates this information when necessary.
      */
-    int setMCErrorsExtraInfo(Belle2::Particle* particle, const Belle2::MCParticle* mcParticle);
+    static int setMCErrorsExtraInfo(Belle2::Particle* particle, const Belle2::MCParticle* mcParticle);
 
     /**
      * Fills vector with array (1-based) indices of all generator ancestors of given MCParticle.
@@ -92,7 +92,7 @@ namespace Belle2 {
      * @param pointer to the MCParticle
      * @param reference to the vector of integers to hold the results
      */
-    void fillGenMothers(const Belle2::MCParticle* mcP, std::vector<int>& genMCPMothers);
+    static void fillGenMothers(const Belle2::MCParticle* mcP, std::vector<int>& genMCPMothers);
 
     /**
      * Finds a mother of mcP that is in firstMothers, from [lastMother,  end]
@@ -107,18 +107,31 @@ namespace Belle2 {
      *
      * @return index of the first common mother in firstMothers (!), or -1 if not found.
      */
-    int findCommonMother(const Belle2::MCParticle* mcP, const std::vector<int>& firstMothers, int lastMother);
+    static int findCommonMother(const Belle2::MCParticle* mcP, const std::vector<int>& firstMothers, int lastMother);
 
     /**
      * Returns true if given PDG code indicates a FSP.
      */
-    bool isFSP(int pdg);
+    static bool isFSP(int pdg);
+
+    /**
+     * Returns true if given MCParticle is a final state radiation (FSR) photon based on MCParticle::c_IsFSRPhoton.
+     * Assumes PDG code of p is 22.
+     */
+    static bool isFSR(const Belle2::MCParticle* p);
 
     /**
      * Returns true if given MCParticle is a final state radiation (FSR) photon.
+     * This is a legacy version of isFSR(const Belle2::MCParticle* p) function that works on MC samples
+     * without MCParticle::c_IsFSRPhoton and MCParticle::c_IsPHOTOSPhoton properly set (for example Belle MC).
+     */
+    static bool isFSRLegacy(const Belle2::MCParticle* p);
+
+    /**
+     * Returns true if given MCParticle is a radiative photon.
      * Assumes PDG code of p is 22.
      */
-    bool isFSR(const Belle2::MCParticle* p);
+    static bool isRadiativePhoton(const Belle2::MCParticle* p);
 
     /**
      * Determines which daughters of 'mcParticle' are not reconstructed by any daughter of
@@ -126,7 +139,7 @@ namespace Belle2 {
      *
      * @returns ORed combination of MCErrorFlags flags for missing particles.
      */
-    int getMissingParticleFlags(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle);
+    static int getMissingParticleFlags(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle);
 
     /**
      * Determines the number of daughter particles which are not neutrinos.
@@ -134,6 +147,6 @@ namespace Belle2 {
      * @param mcParticle
      * @return number of daughters which are not neutrinos
      */
-    int getNumberOfDaughtersWithoutNeutrinos(const MCParticle* mcParticle);
-  }
+    static int getNumberOfDaughtersWithoutNeutrinos(const MCParticle* mcParticle);
+  };
 }

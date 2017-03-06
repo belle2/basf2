@@ -42,8 +42,8 @@ class PrintMCMatchingRelation(Module):
             print('Number of pattern recognition tracks',
                   trackCands.getEntries())
 
-            for (iTrackCand, trackCand) in enumerate(trackCands):
-                isMatched = trackMatchLookUp.isMatchedPRTrackCand(trackCand)
+            for iTrackCand, trackCand in enumerate(trackCands):
+                isMatched = trackMatchLookUp.isMatchedPRRecoTrack(trackCand)
                 self.isMatchedPRTracks.append(isMatched)
 
         mcTrackCands = Belle2.PyStoreArray('MCTrackCands')
@@ -51,7 +51,7 @@ class PrintMCMatchingRelation(Module):
             print('Number of Monte Carlo tracks', mcTrackCands.getEntries())
 
             for mcTrackCand in mcTrackCands:
-                isMatched = trackMatchLookUp.isMatchedMCTrackCand(mcTrackCand)
+                isMatched = trackMatchLookUp.isMatchedMCRecoTrack(mcTrackCand)
                 self.isMatchedMCTracks.append(isMatched)
 
                 mcParticle = trackMatchLookUp.getRelatedMCParticle(mcTrackCand)
@@ -61,25 +61,19 @@ class PrintMCMatchingRelation(Module):
 
     def terminate(self):
         """Print the results."""
-        track_finding_efficiency = 1.0 * sum(self.isMatchedMCTracks) \
-            / len(self.isMatchedMCTracks)
+        track_finding_efficiency = 1.0 * sum(self.isMatchedMCTracks) / len(self.isMatchedMCTracks)
         print('Track finding efficiency: ', track_finding_efficiency)
 
-        fake_rate = 1.0 - 1.0 * sum(self.isMatchedPRTracks) \
-            / len(self.isMatchedPRTracks)
-        print('Fake rate (% unmatched pattern recognition tracks) : ',
-              fake_rate)
+        fake_rate = 1.0 - 1.0 * sum(self.isMatchedPRTracks) / len(self.isMatchedPRTracks)
+        print('Fake rate (% unmatched pattern recognition tracks) : ', fake_rate)
 
         import numpy as np
         mcAbsTransversMomentums = np.array(self.mcAbsTransversMomentums)
         isMatchedMCTracks = np.array(self.isMatchedMCTracks)
-        (binned_total_counts, bins) = np.histogram(mcAbsTransversMomentums,
-                                                   bins=50)
+        binned_total_counts, bins = np.histogram(mcAbsTransversMomentums, bins=50)
 
-        (binned_match_counts, bins) = \
-            np.histogram(mcAbsTransversMomentums[isMatchedMCTracks], bins=bins)
-        binned_finding_efficiency = 1.0 * binned_match_counts \
-            / binned_total_counts
+        binned_match_counts, bins = np.histogram(mcAbsTransversMomentums[isMatchedMCTracks], bins=bins)
+        binned_finding_efficiency = 1.0 * binned_match_counts / binned_total_counts
 
         bin_centers = (bins[:-1] + bins[1:]) / 2.0
         upper_x_errors = bins[1:] - bin_centers
@@ -132,7 +126,6 @@ mcTrackMatcherModule.param({
     'UsePXDHits': False,
     'mcRecoTracksStoreArrayName': 'MCRecoTracks',
     'MinimalPurity': 0.66,
-    'RelateClonesToMCParticles': True,
 })
 
 # ######## Create paths and add modules  ########
@@ -140,8 +133,8 @@ main = create_path()
 main.add_module(eventInfoSetterModule)
 main.add_module(particleGunModule)
 
-components = ['MagneticFieldConstant4LimitedRCDC', 'BeamPipe', 'PXD', 'SVD',
-              'CDC']
+components = ['MagneticFieldConstant4LimitedRCDC', 'BeamPipe', 'PXD', 'SVD', 'CDC']
+
 simulation.add_simulation(main, components=components)
 
 tracking.add_cdc_track_finding(main)

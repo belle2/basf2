@@ -10,19 +10,20 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
-#include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
+
 #include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
 
+#include <tracking/trackFindingCDC/utilities/Named.h>
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+
+#include <framework/logging/Logger.h>
+
 #include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /**
-     *  Filter adapter to make a filter work on a set of variables
-     *  Used as base for ChooseableVarialbe, TMVA and RecordingFilters
-     */
+    /// Filter adapter to make a filter work on a set of variables
     template<class AFilter>
     class OnVarSet : public AFilter {
 
@@ -40,48 +41,18 @@ namespace Belle2 {
 
     public:
       /// Constructor from the variable set the filter should use
-      OnVarSet(std::unique_ptr<AVarSet> varSet)
+      explicit OnVarSet(std::unique_ptr<AVarSet> varSet)
         : m_varSet(std::move(varSet))
       {
         B2ASSERT("Varset initialised as nullptr", m_varSet);
       }
 
-      /// Initialize the filter before event processing.
+      // No reassignment of variable set possible for now
       void initialize() override
       {
+        this->addProcessingSignalListener(m_varSet.get());
         Super::initialize();
-        if (not m_varSet) B2ERROR("Variable set ot setup");
-        m_varSet->initialize();
       }
-
-      /// Allow setup work to take place at beginning of new run
-      void beginRun() override
-      {
-        Super::beginRun();
-        m_varSet->beginRun();
-      }
-
-      /// Allow setup work to take place at beginning of new event
-      void beginEvent() override
-      {
-        Super::beginEvent();
-        m_varSet->beginEvent();
-      }
-
-      /// Allow clean up to take place at end of run
-      void endRun() override
-      {
-        m_varSet->endRun();
-        Super::endRun();
-      }
-
-      /// Initialize the filter after event processing.
-      void terminate() override
-      {
-        m_varSet->terminate();
-        Super::terminate();
-      }
-
       /// Checks if any variables need Monte Carlo information.
       bool needsTruthInformation() override
       {
@@ -109,22 +80,26 @@ namespace Belle2 {
 
     public:
       /// Steal the set of variables form this filter - filter becomes disfunctional afterwards
-      std::unique_ptr<AVarSet> releaseVarSet()&&
-      { return std::move(m_varSet); }
+      std::unique_ptr<AVarSet> releaseVarSet()&& {
+        return std::move(m_varSet);
+      }
 
     protected:
       /// Getter for the set of variables
       AVarSet& getVarSet()
-      { return *m_varSet; }
+      {
+        return *m_varSet;
+      }
 
       /// Setter for the set of variables
       void setVarSet(std::unique_ptr<AVarSet> varSet)
-      { m_varSet = std::move(varSet); }
+      {
+        m_varSet = std::move(varSet);
+      }
 
     private:
       /// Instance of the variable set to be used in the filter.
       std::unique_ptr<AVarSet> m_varSet;
-
     };
 
     /// Convience template to create a filter operating on a specific set of variables.

@@ -72,14 +72,6 @@ namespace Belle2 {
                       const G4double speed,
                       const G4double hitWeight);
 
-      //! Save CDCEBSimHit into datastore
-      void saveEBSimHit(const G4int layerId,
-                        const G4double phi,
-                        const G4int trackID,
-                        const G4int pid,
-                        const G4double edep,
-                        const G4ThreeVector& mom);
-
       //void AddbgOne(bool doit);
 
     private:
@@ -279,7 +271,6 @@ namespace Belle2 {
       G4double m_minTrackLength; /**< Min. track length (mm) required for saving in MCParticle. */
 
       int m_hitNumber; /**< The current number of created hits in an event. Used to fill the DataStore CDC array.*/
-      int m_EBhitNumber; /**< The current number of created hits in an event. Used to fill the DataStore CDC EB array.*/
 
       std::multimap<unsigned short, CDCSimHit*>
       m_hitWithPosWeight; /**< Map containing hits with positive weight. Map may be replaced by vector, which may make the job speed faster... Try later. */
@@ -291,6 +282,15 @@ namespace Belle2 {
       //      std::vector<std::multimap<unsigned short, CDCSimHit*>::iterator> m_posWeightMapItEnd; /**< Iterator showing end of positive hit map*/
 
       //      int m_nPosHits, m_nNegHits;
+
+      const signed short CCW = 1; ///< Constant for counterclockwise orientation
+      const signed short CW  = -1; ///< Constant for clockwise orientation
+      const signed short CW_OUT_NEIGHBOR  = 1; ///< Constant for clockwise outwards
+      const signed short CW_NEIGHBOR      = 3; ///< Constant for clockwise
+      const signed short CW_IN_NEIGHBOR   = 5; ///< Constant for clockwise inwards
+      const signed short CCW_IN_NEIGHBOR  = 7; ///< Constant for counterclockwise inwards
+      const signed short CCW_NEIGHBOR     = 9; ///< Constant for counterclockwise
+      const signed short CCW_OUT_NEIGHBOR = 11; ///< Constant for counterclockwise outwards
     };
   }
 } // end of namespace Belle2

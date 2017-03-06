@@ -5,6 +5,7 @@
 #include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
 #include <hlt/softwaretrigger/calculations/FastRecoCalculator.h>
 #include <hlt/softwaretrigger/calculations/HLTCalculator.h>
+#include <hlt/softwaretrigger/calculations/TestbeamCalculator.h>
 #include <hlt/softwaretrigger/calculations/CalibSampleCalculator.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>
@@ -40,6 +41,9 @@ namespace Belle2 {
     public:
       /// Create a new module instance and set the parameters.
       SoftwareTriggerModule();
+
+      /// default virtaual constructor because this is a derived class using virtual methods
+      virtual ~SoftwareTriggerModule() = default;
 
       /// Initialize/Require the DB object pointers and any needed store arrays.
       void initialize() override;
@@ -99,6 +103,13 @@ namespace Belle2 {
 
       /// Helper function to store the calculated variables from the calculation either in the TTree or in the data store.
       void makeDebugOutput();
+
+      /// the name list of particles for the calibration and dqm
+      std::vector<std::string> m_particlename;
+
+      /// the extra info name attached to the particles
+      std::vector<std::string> m_extrainfoname;
+
     };
   }
 }

@@ -55,6 +55,9 @@ namespace Belle2 {
       }
       \endcode
    *
+   *  \note Remember to use references or pointers when iterating,
+   *        otherwise accessing, e.g., relations will not work.
+   *
    *  Objects linked together using relations can also be obtained by querying
    *  the objects themselves, since they should derive from RelationsObject
    *  (See class documentation for usage examples.)

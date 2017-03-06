@@ -18,15 +18,15 @@ namespace Belle2 {
   class ModuleParamList;
 
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
     class CDCWireHit;
 
     /// Findlet that generates segments from wire hits using the mc truth information.
-    class SegmentCreatorMCTruth : public Findlet<const CDCWireHit, CDCRecoSegment2D> {
+    class SegmentCreatorMCTruth : public Findlet<const CDCWireHit, CDCSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCWireHit, CDCRecoSegment2D>;
+      using Super = Findlet<const CDCWireHit, CDCSegment2D>;
 
     public:
       /// Expose the parameters to a module
@@ -43,7 +43,7 @@ namespace Belle2 {
 
       /// Main function of the segment finding by the cellular automaton.
       void apply(const std::vector<CDCWireHit>& inputWireHits,
-                 std::vector<CDCRecoSegment2D>& outputSegments) final;
+                 std::vector<CDCSegment2D>& outputSegments) final;
 
     private:
       /// Parameter : Setup the drift length as it can be estimated from two dimensional information

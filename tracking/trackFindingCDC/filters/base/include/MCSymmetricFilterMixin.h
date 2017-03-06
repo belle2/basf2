@@ -48,26 +48,24 @@ namespace Belle2 {
 
       }
 
-
       /// Initialize the before event processing.
       void initialize() override
       {
-        if (needsTruthInformation()) {
-          CDCMCManager::getInstance().requireTruthInformation();
-        }
+        CDCMCManager::getInstance().requireTruthInformation();
+        Super::initialize();
       }
 
       /// Signal the beginning of a new event
       void beginEvent() override
       {
-        if (needsTruthInformation()) {
-          CDCMCManager::getInstance().fill();
-        }
+        CDCMCManager::getInstance().fill();
+        Super::beginEvent();
       }
 
       /// Indicates that the filter requires Monte Carlo information.
-      bool needsTruthInformation() final
-      { return true; }
+      bool needsTruthInformation() final {
+        return true;
+      }
 
     public:
       /// Setter for the allow reverse parameter
@@ -81,8 +79,6 @@ namespace Belle2 {
     private:
       /// Switch to indicate if the reversed version of the object shall also be accepted (default is true).
       bool m_param_allowReverse;
-
     };
-
   }
 }

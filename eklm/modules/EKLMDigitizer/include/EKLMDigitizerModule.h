@@ -94,6 +94,9 @@ namespace Belle2 {
     /** Initial digitization time. */
     double m_DigitizationInitialTime;
 
+    /** Save FPGA fit data (EKLMFPGAFit). */
+    bool m_SaveFPGAFit;
+
     /** Use debug mode in EKLM::FiberAndElectronics or not. */
     bool m_Debug;
 

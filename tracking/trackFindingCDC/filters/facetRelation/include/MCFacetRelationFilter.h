@@ -9,43 +9,29 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/facet/MCFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facetRelation/BaseFacetRelationFilter.h>
+
+#include <tracking/trackFindingCDC/filters/facet/MCFacetFilter.h>
+
 #include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCFacet;
 
     /// Class filtering the neighborhood of facets with monte carlo information
-    class MCFacetRelationFilter : public MCSymmetricFilterMixin<BaseFacetRelationFilter > {
+    class MCFacetRelationFilter : public MCSymmetricFilterMixin<BaseFacetRelationFilter> {
 
     private:
       /// Type of the super class
-      using Super = MCSymmetricFilterMixin<BaseFacetRelationFilter >;
-
-    public:
-      /// Importing all overloads from the super class
-      using Super::operator();
+      using Super = MCSymmetricFilterMixin<BaseFacetRelationFilter>;
 
     public:
       /**
        *  Constructor also setting the switch if the reversed version of a facet
        *  (in comparision to MC truth) shall be accepted.
        */
-      MCFacetRelationFilter(bool allowReverse = false)
-        : Super(allowReverse),
-          m_mcFacetFilter(allowReverse)
-      {}
-
-    public:
-      /// Used to prepare the Monte Carlo information for this event.
-      void beginEvent() final;
-
-      /// Forwards the modules initialize to the filter
-      void initialize() final;
-
-      /// Forwards the modules initialize to the filter
-      void terminate() final;
+      MCFacetRelationFilter(bool allowReverse = false);
 
     public:
       /**
@@ -65,7 +51,6 @@ namespace Belle2 {
     private:
       /// Monte Carlo cell filter to reject neighborhoods have false cells
       MCFacetFilter m_mcFacetFilter;
-
     };
   }
 }

@@ -121,29 +121,25 @@ bool NSMVHandlerHSLBFirmware::handleSetText(const std::string& firmware)
   return false;
 }
 
-bool NSMVHandlerHSLBBoot::handleSetInt(int val)
+bool NSMVHandlerHSLBBoot::handleSetText(const std::string& val)
 {
-  if (val > 0) {
-    std::string vname = StringUtil::replace(getName(), ".boot", ".firm");
-    std::string firmware;
-    m_callback.get(vname, firmware);
-    if (File::exist(firmware)) {
-      LogFile::info("Loading HSLB firmware: " + firmware);
-      try {
-        std::string cmd = StringUtil::form("booths -%c ", ('a' + m_hslb)) + firmware;
-        system(cmd.c_str());
-        //m_callback.getHSLB(m_hslb).bootfpga(firmware);
-        cmd = StringUtil::form("tesths -%c ", ('a' + m_hslb));
-        system(cmd.c_str());
-        m_callback.log(LogFile::INFO, "Loeded HSLB firm " + firmware);
-        return true;
-      } catch (const HSLBHandlerException& e) {
-        m_callback.log(LogFile::ERROR, "Failed to load HSLB firm " + firmware);
-      }
-    } else {
-      m_callback.log(LogFile::ERROR, "HSLB firmware %s not exists",
-                     firmware.c_str());
+  std::string firmware = val;
+  if (File::exist(firmware)) {
+    LogFile::info("Loading HSLB firmware: " + firmware);
+    try {
+      std::string cmd = StringUtil::form("booths -%c ", ('a' + m_hslb)) + firmware;
+      system(cmd.c_str());
+      //m_callback.getHSLB(m_hslb).bootfpga(firmware);
+      cmd = StringUtil::form("tesths -%c ", ('a' + m_hslb));
+      system(cmd.c_str());
+      m_callback.log(LogFile::INFO, "Loeded HSLB firm " + firmware);
+      return true;
+    } catch (const HSLBHandlerException& e) {
+      m_callback.log(LogFile::ERROR, "Failed to load HSLB firm " + firmware);
     }
+  } else {
+    m_callback.log(LogFile::ERROR, "HSLB firmware %s not exists",
+                   firmware.c_str());
   }
   return false;
 }
@@ -165,15 +161,15 @@ bool NSMVHandlerFEEStream::handleSetText(const std::string& stream)
   return false;
 }
 
-bool NSMVHandlerFEEBoot::handleSetInt(int val)
+bool NSMVHandlerFEEBoot::handleSetText(const std::string& val)
 {
   DBObject& obj(m_callback.getDBObject());
   m_callback.get(obj);
-  if (val > 0 && m_callback.getFEE(m_hslb)) {
+  if (val == "on" && m_callback.getFEE(m_hslb)) {
     FEE& fee(*m_callback.getFEE(m_hslb));
     HSLB& hslb(m_callback.getHSLB(m_hslb));
     try {
-      fee.boot(m_callback, hslb, obj("fee", m_hslb));
+      fee.boot(m_callback, hslb, m_callback.getFEEDB(m_hslb));
       return true;
     } catch (const IOException& e) {
       LogFile::error(e.what());
@@ -182,15 +178,16 @@ bool NSMVHandlerFEEBoot::handleSetInt(int val)
   return false;
 }
 
-bool NSMVHandlerFEELoad::handleSetInt(int val)
+bool NSMVHandlerFEELoad::handleSetText(const std::string& val)
 {
   DBObject& obj(m_callback.getDBObject());
   m_callback.get(obj);
-  if (val > 0 && m_callback.getFEE(m_hslb)) {
+  LogFile::debug("load fee");
+  if (val == "on" && m_callback.getFEE(m_hslb)) {
     FEE& fee(*m_callback.getFEE(m_hslb));
     HSLB& hslb(m_callback.getHSLB(m_hslb));
     try {
-      fee.load(m_callback, hslb, obj("fee", m_hslb));
+      fee.load(m_callback, hslb, m_callback.getFEEDB(m_hslb));
       return true;
     } catch (const IOException& e) {
       LogFile::error(e.what());
@@ -304,6 +301,29 @@ bool NSMVHandlerHSLBTest::handleGetText(std::string& val)
     LogFile::error("Failed to Test HSLB:%c", m_hslb + 'a');
   }
   return false;
+}
+
+bool NSMVHandlerHSLBUsed::handleSetInt(int val)
+{
+  NSMVHandlerInt::handleSetInt(val);
+  try {
+    int used = 0;
+    val = 0;
+    for (int i = 0; i < 4; i++) {
+      std::string vname = StringUtil::form("hslb[%d].used", i);
+      m_callback.get(vname, used);
+      val += (used << i);
+    }
+    m_callback.getTTRX().write(0x130, val);
+  } catch (const std::exception& e) {
+    LogFile::error(e.what());
+  }
+  return true;
+}
+
+bool NSMVHandlerHSLBUsed::handleGetInt(int& val)
+{
+  return NSMVHandlerInt::handleGetInt(val);
 }
 
 /*

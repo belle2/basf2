@@ -255,7 +255,7 @@ NeuroTrigger::selectMLP(const CDCTriggerTrack& track)
   }
 
   float phi0 = track.getPhi0();
-  float invpt = track.getKappa();
+  float invpt = track.getKappa(1.5);
   float theta = atan2(1., track.getCotTheta());
 
   // find sector
@@ -302,7 +302,7 @@ NeuroTrigger::selectMLPs(const CDCTriggerTrack& track,
   }
 
   float phi0 = track.getPhi0();
-  float invpt = track.getKappa();
+  float invpt = track.getKappa(1.5);
   float theta = atan2(1., track.getCotTheta());
 
   if (selectByMC) {

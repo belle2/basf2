@@ -491,7 +491,10 @@ namespace Belle2 {
       }
 
     private:
+      /// Helper method to calculate the arc length to a point at distance  delta to the perigee and dr to circle.
       double arcLengthAtDeltaLength(double delta, double dr) const;
+
+      /// Helper method to calculate the arc length between to points on the circle from a given direct secant length
       double arcLengthAtSecantLength(double secantLength) const;
 
     private:

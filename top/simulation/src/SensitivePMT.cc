@@ -82,8 +82,8 @@ namespace Belle2 {
       }
 
       // pmt and module ID
-      int pmtID = photon.GetTouchableHandle()->GetReplicaNumber(2);
-      int moduleID = photon.GetTouchableHandle()->GetReplicaNumber(5);
+      int pmtID = photon.GetTouchableHandle()->GetReplicaNumber(m_pmtReplicaDepth);
+      int moduleID = photon.GetTouchableHandle()->GetReplicaNumber(m_moduleReplicaDepth);
 
       // photon at detection
       const G4ThreeVector& g_detPoint = photon.GetPosition();

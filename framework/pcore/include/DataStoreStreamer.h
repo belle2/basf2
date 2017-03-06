@@ -16,6 +16,8 @@
 #include <vector>
 #include <string>
 
+class TList;
+
 namespace Belle2 {
   class MsgHandler;
 
@@ -103,7 +105,7 @@ namespace Belle2 {
   private:
 
     /** restore StreamerInfo from data in a file */
-    int restoreStreamerInfos(TList* obj);
+    int restoreStreamerInfos(const TList* list);
 
     /** bits to store in TObject.
      *

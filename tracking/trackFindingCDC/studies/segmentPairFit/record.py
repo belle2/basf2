@@ -163,7 +163,7 @@ class SegmentPairFitValidationRun(HarvestingRun):
                             )
 
             path.add_module("SegmentFitter",
-                            inputSegments="CDCRecoSegment2DVector",
+                            inputSegments="CDCSegment2DVector",
                             updateDriftLength=True,
                             useAlphaInDriftLength=True,
                             )
@@ -177,7 +177,7 @@ class SegmentPairFitValidationRun(HarvestingRun):
                             )
 
             path.add_module("SegmentFitter",
-                            inputSegments="CDCRecoSegment2DVector",
+                            inputSegments="CDCSegment2DVector",
                             updateDriftLength=True,
                             useAlphaInDriftLength=True,
                             )
@@ -192,7 +192,7 @@ class SegmentPairFitValidationRun(HarvestingRun):
                             )
 
             path.add_module("SegmentFitter",
-                            inputSegments="CDCRecoSegment2DVector",
+                            inputSegments="CDCSegment2DVector",
                             updateDriftLength=False,
                             # useAlphaInDriftLength=True,
                             )
@@ -203,12 +203,12 @@ class SegmentPairFitValidationRun(HarvestingRun):
         path.add_module("SegmentOrienter",
                         SegmentOrientation="outwards",
                         # SegmentOrientation="none",
-                        inputSegments="CDCRecoSegment2DVector",
-                        segments="CDCRecoSegment2DVectorOriented"
+                        inputSegments="CDCSegment2DVector",
+                        segments="CDCSegment2DVectorOriented"
                         )
 
         path.add_module("TrackFinderSegmentPairAutomaton",
-                        inputSegments="CDCRecoSegment2DVectorOriented",
+                        inputSegments="CDCSegment2DVectorOriented",
                         WriteSegmentPairs=True,
                         SegmentPairFilter="truth",
                         SegmentPairFilterParameters={"allowReverse": True},
@@ -232,7 +232,7 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
         self.mc_segment_lookup = None
 
     def initialize(self):
-        self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
+        self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
         super(SegmentPairFitValidationModule, self).initialize()
 
     def prepare(self):

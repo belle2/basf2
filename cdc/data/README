@@ -10,6 +10,8 @@ xt-relation in new format
 * change wrt old format file 
  - add incident angle bin info. at the top of a file in old format.
  - add xt parameterization mode and no. of params. after that. 
+   mode=0: normal    polynomial;
+       =1: Chebyshev polynomial.
  - shift alpha points: -80 - 90deg --> -85 - 85deg.
  - sort in order of alpha
  (- Unit: cm and nsec).
@@ -56,6 +58,9 @@ sigma in new format
 * change wrt old format file 
  - add incident angle bin info. at the top of a file in old format.
  - add sigma parameterization mode and no. of params. after that. 
+   mode=0: default;
+       =1: add 2 params. to describe sigma better near a cell boundary;
+       =2: similar to mode=1 but slightly-different parameterization.
 * sigma_v1.dat       : created from sigma_v0.1.dat.
 
 sigma in old format
@@ -109,7 +114,7 @@ Format: layerID (0-55), wireID(0-)
 * badwire_sample.dat: Just a sample file. <- obsolete
 * badwire_off.dat   : Empty file; the file for turning-off badwire effect.
 * badwire_v1.dat    : contains bad wires known as of Oct.21 2016.
-
+* badwire_v2.dat    : contains bad wires known as of Feburary, 2017.
 
 
 time-walk

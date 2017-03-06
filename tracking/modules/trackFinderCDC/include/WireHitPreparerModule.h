@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 #include <tracking/trackFindingCDC/findlets/combined/WireHitPreparer.h>
+#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 
 namespace Belle2 {

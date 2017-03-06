@@ -22,6 +22,8 @@ from vertex import *
 from modularAnalysis import *
 from reconstruction import *
 
+set_log_level(LogLevel.ERROR)
+
 # load input ROOT file
 inputMdst('default', '../mdst-jpsiks.root')
 
@@ -30,23 +32,23 @@ inputMdst('default', '../mdst-jpsiks.root')
 # --------------------------------------------------
 
 # reconstruct everything as muons, use truth in analysis
-fillParticleList('mu-:std', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4')
-fillParticleList('e-:std', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4')
-fillParticleList('pi-:std', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4')
+fillParticleList('mu-:all', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4')
+fillParticleList('e-:all', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4')
+fillParticleList('pi-:all', 'chiProb > 0.001')
 
 # --------------------------------------------------
 # Reconstruct B->J/psi(->ee,mumu) Ks and truth match
 # --------------------------------------------------
 
-reconstructDecay('J/psi:mu -> mu-:std mu+:std', '2.8 < M < 3.3', 1)
+reconstructDecay('J/psi:mu -> mu-:all mu+:all', '2.8 < M < 3.3', 1)
 vertexRave('J/psi:mu', 0.0)
 matchMCTruth('J/psi:mu')
-reconstructDecay('J/psi:e  -> e-:std  e+:std', ' 2.8 < M < 3.3', 2)
+reconstructDecay('J/psi:e  -> e-:all  e+:all', ' 2.8 < M < 3.3', 2)
 vertexRave('J/psi:e', 0.0)
 matchMCTruth('J/psi:e')
 # copyLists('J/psi:lept',['J/psi:mu','J/psi:e'])
 
-reconstructDecay('K_S0 -> pi-:std pi+:std', '0.4 < M < 0.6')
+reconstructDecay('K_S0 -> pi-:all pi+:all', '0.4 < M < 0.6')
 vertexRave('K_S0', 0.0)
 matchMCTruth('K_S0')
 

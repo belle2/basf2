@@ -20,8 +20,8 @@ namespace Belle2 {
   class RecoTrack;
 
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
-    class CDCRecoSegment3D;
+    class CDCSegment2D;
+    class CDCSegment3D;
     class CDCSegmentPair;
     class CDCSegmentTriple;
 
@@ -30,10 +30,13 @@ namespace Belle2 {
     public:
 
       /// Default constructor for ROOT compatibility.
-      CDCTrack() {}
+      CDCTrack() = default;
+
+      /// Constructor from a series of hits.
+      explicit CDCTrack(const std::vector<CDCRecoHit3D>& recoHits3D);
 
       /// Constructor from a two dimensional segment filling the thrid dimension with 0 values.
-      explicit CDCTrack(const CDCRecoSegment2D& segment);
+      explicit CDCTrack(const CDCSegment2D& segment);
 
       /// Concats several tracks from a path
       static CDCTrack condense(const Path<const CDCTrack>& trackPath);
@@ -44,15 +47,18 @@ namespace Belle2 {
       /// Reconstructs the hit content of the axial stereo segment pair path to a CDCTrack averaging overlapping parts.
       static CDCTrack condense(const Path<const CDCSegmentPair>& segmentPairPath);
 
-      /// Copies the hit content of the hit vector track to the CDCTrack. Do not use any taken or masked hits.
-      void appendNotTaken(const std::vector<const CDCWireHit*>& hits);
+      /// Comparision of track - no particular order has been defined so far, all tracks are equivalent
+      bool operator<(const CDCTrack& track __attribute__((unused))) const
+      {
+        return false;
+      }
 
       /// Copies the hit and trajectory content of this track to a new RecoTrack and store it into the store array.
-      bool storeInto(StoreArray<RecoTrack>& recoTracks) const;
+      RecoTrack* storeInto(StoreArray<RecoTrack>& recoTracks) const;
 
       /** Splits the track into segments.
        *  Note : No trajectory information is copied*/
-      std::vector<CDCRecoSegment3D> splitIntoSegments() const;
+      std::vector<CDCSegment3D> splitIntoSegments() const;
 
       /// Getter for the superlayer id the track starts from.
       ISuperLayer getStartISuperLayer() const
@@ -70,32 +76,45 @@ namespace Belle2 {
       const Vector3D& getEndRecoPos3D() const
       { return back().getRecoPos3D(); }
 
-      /// Setter for the two dimensional trajectory. The trajectory should start at the start of the track and follow its direction.
+      /// Setter for the two dimensional trajectory. The trajectory should start at the start of the
+      /// track and follow its direction.
       void setStartTrajectory3D(const CDCTrajectory3D& startTrajectory3D)
-      { m_startTrajectory3D = startTrajectory3D; }
+      {
+        m_startTrajectory3D = startTrajectory3D;
+      }
 
-      /// Setter for the three dimensional trajectory. The trajectory should start at the END of the track and *follow* its direction.
+      /// Setter for the three dimensional trajectory. The trajectory should start at the END of the
+      /// track and *follow* its direction.
       void setEndTrajectory3D(const CDCTrajectory3D& endTrajectory3D)
-      { m_endTrajectory3D = endTrajectory3D; }
+      {
+        m_endTrajectory3D = endTrajectory3D;
+      }
 
-
-      /// Getter for the two dimensional trajectory. The trajectory should start at the start of the track and follow its direction.
+      /// Getter for the two dimensional trajectory. The trajectory should start at the start of the
+      /// track and follow its direction.
       const CDCTrajectory3D& getStartTrajectory3D() const
-      { return m_startTrajectory3D; }
+      {
+        return m_startTrajectory3D;
+      }
 
-      /// Getter for the three dimensional trajectory. The trajectory should start at the END of the track and follow its direction.
+      /// Getter for the three dimensional trajectory. The trajectory should start at the END of the
+      /// track and follow its direction.
       const CDCTrajectory3D& getEndTrajectory3D() const
-      { return m_endTrajectory3D; }
+      {
+        return m_endTrajectory3D;
+      }
 
+      /// Mutable getter for the automaton cell.
+      AutomatonCell& getAutomatonCell() const
+      {
+        return m_automatonCell;
+      }
 
-      /// Getter for the automaton cell.
-      AutomatonCell& getAutomatonCell()
-      { return m_automatonCell; }
-
-      /// Constant getter for the automaton cell.
-      const AutomatonCell& getAutomatonCell() const
-      { return m_automatonCell; }
-
+      /// Indirection to the automaton cell for easier access to the flags
+      AutomatonCell* operator->() const
+      {
+        return &m_automatonCell;
+      }
 
       /// Unset the masked flag of the automaton cell of this segment and of all contained wire hits.
       void unsetAndForwardMaskedFlag() const;
@@ -111,23 +130,13 @@ namespace Belle2 {
        */
       void receiveMaskedFlag() const;
 
-
-      /** Remove all hits from the track which have an assigned flag */
-      void removeAllAssignedMarkedHits();
-
       /** Set the taken flag of all hits belonging to this track to the given value (default true),
        * but do not touch the flag of the track itself. */
       void forwardTakenFlag(bool takenFlag = true) const;
 
 
       /// Sort the recoHits according to their perpS information
-      void sortByArcLength2D()
-      {
-        std::stable_sort(begin(), end(),
-        [](const CDCRecoHit3D & recoHit, const CDCRecoHit3D & otherRecoHit) {
-          return recoHit.getArcLength2D() < otherRecoHit.getArcLength2D();
-        });
-      }
+      void sortByArcLength2D();
 
       /// Set all arcLengths to have positive values by shifting them by pi*radius if they are negative.
       /// This can only be done if the radius is not infinity (for example cosmics).
@@ -139,6 +148,9 @@ namespace Belle2 {
 
       /// Return a reversed copy of the track.
       CDCTrack reversed() const;
+
+      /// Finds the first CDCRecoHit3D that is based on the given wire hit - nullptr if none
+      MayBePtr<const CDCRecoHit3D> find(const CDCWireHit& wireHit) const;
 
       /// Set the flag which indicates that the track has a matching segment (probably only used in the SegmentTrackCombiner).
       void setHasMatchingSegment(bool hasMatchingSegment = true)
@@ -157,7 +169,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the automaton cell.
-      AutomatonCell m_automatonCell;
+      mutable AutomatonCell m_automatonCell;
 
       /// Memory for the three dimensional trajectory at the start of the track
       CDCTrajectory3D m_startTrajectory3D;

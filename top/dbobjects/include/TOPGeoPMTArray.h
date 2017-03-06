@@ -12,6 +12,7 @@
 
 #include <top/dbobjects/TOPGeoBase.h>
 #include <top/dbobjects/TOPGeoPMT.h>
+#include <vector>
 
 namespace Belle2 {
 
@@ -49,6 +50,24 @@ namespace Belle2 {
       m_dx += pmt.getSizeX() * s_unit;
       m_dy += pmt.getSizeY() * s_unit;
     }
+
+    /**
+     * Sets air gap for optically decoupled PMT's
+     * @param gap gap thickness
+     */
+    void setAirGap(double gap) {m_airGap = gap;}
+
+    /**
+     * Sets PMT as optically decoupled
+     * @param pmtID ID of PMT to be set as decoupled (1-based)
+     */
+    void setDecoupledPMT(unsigned pmtID) {m_decoupledPMTs.push_back(pmtID);}
+
+    /**
+     * Generate randomly a fraction of PMT's to be optically decoupled
+     * @param fraction decoupled fraction
+     */
+    void generateDecoupledPMTs(double fraction);
 
     /**
      * Returns number of array columns
@@ -123,6 +142,12 @@ namespace Belle2 {
     double getSizeY() const {return m_numRows * getDy();}
 
     /**
+     * Returns array volume dimension in z
+     * @return size in z
+     */
+    double getSizeZ() const {return m_pmt.getSizeZ() + getAirGap();}
+
+    /**
      * Returns x coordinate of column center
      * @param col valid column number (1-based)
      * @return x coordinate of column center
@@ -186,6 +211,24 @@ namespace Belle2 {
     int getPixelID(double x, double y, unsigned pmtID) const;
 
     /**
+     * Returns air gap
+     * @return gap thickness
+     */
+    double getAirGap() const {return m_airGap / s_unit;}
+
+    /**
+     * Returns ID's of optically decoupled PMT's
+     * @return PMT ID (1-based)
+     */
+    const std::vector<unsigned>& getDecoupledPMTs() const {return m_decoupledPMTs;}
+
+    /**
+     * Checks if PMT is optically decoupled
+     * @return true if decoupled
+     */
+    bool isPMTDecoupled(unsigned pmtID) const;
+
+    /**
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
@@ -207,8 +250,10 @@ namespace Belle2 {
     float m_gy = 0; /**< gap between PMT's  in y */
     std::string m_material; /**< material name into which PMT's are inserted */
     TOPGeoPMT m_pmt; /**< PMT geometry parameters */
+    float m_airGap = 0; /**< air gap thickness for decoupled PMT's */
+    std::vector<unsigned> m_decoupledPMTs; /**< ID's of decoupled PMT's */
 
-    ClassDef(TOPGeoPMTArray, 1); /**< ClassDef */
+    ClassDef(TOPGeoPMTArray, 2); /**< ClassDef */
 
   };
 

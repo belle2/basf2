@@ -9,12 +9,13 @@
  **************************************************************************/
 #pragma once
 #include <tracking/trackFindingCDC/filters/trackRelation/BaseTrackRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
-
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
 #include <tracking/trackFindingCDC/filters/trackRelation/BasicTrackRelationVarSet.h>
 #include <tracking/trackFindingCDC/filters/trackRelation/HitGapTrackRelationVarSet.h>
+
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
+
+#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -27,14 +28,11 @@ namespace Belle2 {
       using Super = MVA<BaseTrackRelationFilter>;
 
       /// Type of the VarSet the filter is working on
-      using VarSet = VariadicUnionVarSet <
-                     BasicTrackRelationVarSet,
-                     HitGapTrackRelationVarSet >;
+      using VarSet = VariadicUnionVarSet<BasicTrackRelationVarSet, HitGapTrackRelationVarSet>;
 
     public:
       /// Constructor initialising the MVAFilter with standard training name for this filter.
       MVAFeasibleTrackRelationFilter();
-
     };
   }
 }

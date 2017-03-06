@@ -9,9 +9,10 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/eventdata/utils/DriftLengthEstimator.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 namespace Belle2 {
@@ -37,20 +38,30 @@ namespace Belle2 {
        */
       void reconstructFuseTrajectories(const CDCSegmentPair& segmentPair);
 
+      /**
+       *  Fit the given segment pair using the preliminary helix fit without proper covariance matrix.
+       *
+       *  Updates the contained trajectory.
+       */
       void fusePreliminary(const CDCSegmentPair& segmentPair);
 
       /**
        * Combine the trajectories of the two given segments to a full helix trajectory
        */
-      CDCTrajectory3D reconstructFuseTrajectories(const CDCRecoSegment2D& fromSegment2D,
-                                                  const CDCRecoSegment2D& toSegment2D);
+      CDCTrajectory3D reconstructFuseTrajectories(const CDCSegment2D& fromSegment2D,
+                                                  const CDCSegment2D& toSegment2D);
 
-      CDCTrajectory3D fusePreliminary(const CDCRecoSegment2D& fromSegment2D,
-                                      const CDCRecoSegment2D& toSegment2D);
+      /**
+       *  Fit the two given segments together using the preliminary helix fit without proper covariance matrix.
+       *
+       *  The fit is used as the expansion point for the least square fuse fit with proper covariance.
+       */
+      CDCTrajectory3D fusePreliminary(const CDCSegment2D& fromSegment2D,
+                                      const CDCSegment2D& toSegment2D);
 
       /// Combine the two segments given a prelimiary reference trajectory to which a creation is applied
-      CDCTrajectory3D reconstructFuseTrajectories(const CDCRecoSegment2D& fromSegment2D,
-                                                  const CDCRecoSegment2D& toSegment2D,
+      CDCTrajectory3D reconstructFuseTrajectories(const CDCSegment2D& fromSegment2D,
+                                                  const CDCSegment2D& toSegment2D,
                                                   const CDCTrajectory3D& preliminaryTrajectory3D);
 
     public:
@@ -58,7 +69,7 @@ namespace Belle2 {
        *  Calculate the ambiguity of the helix parameters relative to the three circle
        *  parameters given the hit content of the segment and their stereo displacement.
        */
-      JacobianMatrix<3, 5> calcAmbiguity(const CDCRecoSegment3D& recoSegment3D,
+      JacobianMatrix<3, 5> calcAmbiguity(const CDCSegment3D& segment3D,
                                          const CDCTrajectory2D& trajectory2D);
 
 
@@ -66,6 +77,8 @@ namespace Belle2 {
       /// Swtich to reestimate the  drift length.
       bool m_reestimateDriftLength;
 
+      /// Helper object to carry out the drift length estimation
+      DriftLengthEstimator m_driftLengthEstimator;
     };
   }
 }

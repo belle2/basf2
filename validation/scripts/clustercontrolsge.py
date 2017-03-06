@@ -5,6 +5,8 @@ import logging
 import os
 import subprocess
 import stat
+import shutil
+import validationfunctions
 
 
 class Cluster:
@@ -15,6 +17,27 @@ class Cluster:
         has finished execution
     - execute(job): Takes a job and executes it by sending it to the cluster
     """
+
+    @staticmethod
+    def is_supported():
+        """
+        Check if qsub is available
+        """
+        return shutil.which("qsub") is not None
+
+    @staticmethod
+    def name():
+        """
+        Returns name of this job contol
+        """
+        return "cluster-sge"
+
+    @staticmethod
+    def description():
+        """
+        Returns description of this job control
+        """
+        return "Batch submission via command line to Grid Engine"
 
     def __init__(self):
         """!
@@ -30,15 +53,15 @@ class Cluster:
         self.submit_command = ('qsub -cwd -l h_vmem={requirement_vmem}G,h_fsize={requirement_storage}G '
                                '-o {logfile} -e {logfile} -q {queuename} -V')
 
-        # required vmem by the job in GB, required on DESY NAF, otherwise jobs get killed due
+        #: required vmem by the job in GB, required on DESY NAF, otherwise jobs get killed due
         # to memory consumption
         self.requirement_vmem = 4
 
-        # the storage IO in GB which can be performed by each job. By default, this is 3GB at
+        #: the storage IO in GB which can be performed by each job. By default, this is 3GB at
         # DESY which is to small for some validation scripts
         self.requirement_storage = 50
 
-        # Queue best suitable for execution at DESY NAF
+        #: Queue best suitable for execution at DESY NAF
         self.queuename = "short.q"
 
         #: The path, where the help files are being created
@@ -139,7 +162,8 @@ class Cluster:
         else:
             # .py files are executed with basf2
             # 'options' contains an option-string for basf2, e.g. '-n 100'
-            command = 'basf2 {0} {1}'.format(job.path, options)
+            params = validationfunctions.basf2_command_builder(job.path, options.split())
+            command = subprocess.list2cmdline(params)
 
         # Create a helpfile-shellscript, which contains all the commands that
         # need to be executed by the cluster.
@@ -221,3 +245,9 @@ class Cluster:
         # If no such file exists, the job has not yet finished
         else:
             return [False, 0]
+
+    def terminate(self, job):
+        """!
+        Terminate a running job, not support with this backend so ignore the call
+        """
+        pass

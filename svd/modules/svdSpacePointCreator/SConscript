@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = [ 'svd', 'tracking' ]
+env['LIBS'] = [ 'framework', 'tracking', 'svd_dataobjects', 'vxd_dataobjects' ]
 
 Return('env')

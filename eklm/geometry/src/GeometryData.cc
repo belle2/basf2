@@ -472,14 +472,10 @@ void EKLM::GeometryData::readEndcapStructureGeometry(const GearDir& gd)
 
 void EKLM::GeometryData::initializeFromGearbox()
 {
-  int i, j, k, mode;
+  int i, j, k;
   std::string name;
   ShieldDetailGeometry shieldDetailGeometry;
   GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
-  mode = gd.getInt("Mode");
-  if (mode < 0 || mode > 1)
-    B2FATAL("EKLM started with unknown geometry mode " << mode << ".");
-  m_Mode = (enum DetectorMode)mode;
   /* Numbers of elements. */
   m_NEndcaps = gd.getInt("NEndcaps");
   checkEndcap(m_NEndcaps);
@@ -502,10 +498,6 @@ void EKLM::GeometryData::initializeFromGearbox()
   m_NStripsSegment = gd.getInt("NStripsSegment");
   m_NStrips = gd.getInt("NStrips");
   checkStrip(m_NStrips);
-  m_NBoards = gd.getInt("NBoards");
-  checkSegment(m_NBoards);
-  m_NBoardsSector = m_NBoards * m_NPlanes;
-  m_NStripBoards = gd.getInt("NStripBoards");
   /* Geometry parameters. */
   m_SolenoidZ = gd.getLength("SolenoidZ") * CLHEP::cm;
   readEndcapStructureGeometry(gd);
@@ -592,44 +584,6 @@ void EKLM::GeometryData::initializeFromGearbox()
   shieldDetailD.append("/Detail[@id=\"D\"]");
   readShieldDetailGeometry(&shieldDetailGeometry, &shieldDetailD);
   m_ShieldGeometry.setDetailD(shieldDetailGeometry);
-  GearDir board(gd);
-  board.append("/Board");
-  m_BoardGeometry.setLength(board.getLength("Length") * CLHEP::cm);
-  m_BoardGeometry.setWidth(board.getLength("Width") * CLHEP::cm);
-  m_BoardGeometry.setHeight(board.getLength("Height") * CLHEP::cm);
-  m_BoardGeometry.setBaseWidth(board.getLength("BaseWidth") * CLHEP::cm);
-  m_BoardGeometry.setBaseHeight(board.getLength("BaseHeight") * CLHEP::cm);
-  m_BoardGeometry.setStripLength(board.getLength("StripLength") * CLHEP::cm);
-  m_BoardGeometry.setStripWidth(board.getLength("StripWidth") * CLHEP::cm);
-  m_BoardGeometry.setStripHeight(board.getLength("StripHeight") * CLHEP::cm);
-  try {
-    m_BoardPosition = new BoardPosition[m_NBoardsSector];
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(c_MemErr);
-  }
-  for (j = 0; j < m_NPlanes; j++) {
-    for (i = 0; i < m_NBoards; i++) {
-      k = j * m_NBoards + i;
-      GearDir board2(board);
-      name = "/BoardPlane[" + std::to_string(j + 1) + "]";
-      board2.append(name.c_str());
-      name = "/Board[" + std::to_string(i + 1) + "]";
-      board2.append(name.c_str());
-      m_BoardPosition[k].setPhi(board2.getLength("Phi") * CLHEP::rad);
-      m_BoardPosition[k].setR(board2.getLength("Radius") * CLHEP::cm);
-    }
-  }
-  try {
-    m_StripBoardPosition = new StripBoardPosition[m_NStripBoards];
-  } catch (std::bad_alloc& ba) {
-    B2FATAL(c_MemErr);
-  }
-  for (i = 0; i < m_NStripBoards; i++) {
-    GearDir stripBoard(board);
-    name = "/StripBoard/Board[" + std::to_string(i + 1) + "]";
-    stripBoard.append(name.c_str());
-    m_StripBoardPosition[i].setX(stripBoard.getLength("X") * CLHEP::cm);
-  }
   m_Geometry = new EKLMGeometry(*this);
 }
 

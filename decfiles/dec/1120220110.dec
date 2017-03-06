@@ -1,0 +1,23 @@
+# EventType: 1120220110
+# Descriptor: [B0 -> K0 e+e-] cc
+# NickName: Bd_K0ee
+# Documentation: Rare b->s l+ l- process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Saurabh Sandilya
+# Email: saurabhsandilya@gmail.com
+# Cuts: None 
+# Date: 20170301
+#
+#
+#
+Decay Upsilon(4S)
+1.000 B0sig  anti-B0sig B0 anti-B0  VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+1.000 K0     e+     e-                             PHOTOS BTOSLLBALL;
+Enddecay
+CDecay anti-B0sig
+#
+End

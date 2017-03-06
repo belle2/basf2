@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <vector>
+#include <string>
 
 namespace Belle2 {
   class ModuleParamList;

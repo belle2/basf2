@@ -9,23 +9,18 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
-#include <tracking/trackFindingCDC/ca/Relation.h>
 
-#include <vector>
-#include <string>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Forward declaration of the CDCFacet.
     class CDCFacet;
 
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
-    static char const* const facetRelationFitVarNames[] = {
+    static char const* const fitFacetRelationVarNames[] = {
       "cos_delta",
       "from_middle_cos_delta",
       "to_middle_cos_delta",
@@ -71,32 +66,27 @@ namespace Belle2 {
       "abs_curv_proper",
     };
 
-    /**
-     *  Class that specifies the names of the variables
-     *  that should be generated from a facet relation
-     */
-    class FitFacetRelationVarNames : public VarNames<Relation<const CDCFacet>> {
+    /// Vehicle class to transport the variable names
+    struct FitFacetRelationVarNames : public VarNames<Relation<const CDCFacet>> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(facetRelationFitVarNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(fitFacetRelationVarNames);
 
-      /// Getter for the name a the given index
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
-        return facetRelationFitVarNames[iName];
+        return fitFacetRelationVarNames[iName];
       }
     };
 
     /**
-     *  Class that computes floating point variables from a facet relation.
-     *  that can be forwarded to a flat TNtuple or a TMVA method
+     *  Class to compute floating point variables from a facet relation
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class FitFacetRelationVarSet : public VarSet<FitFacetRelationVarNames> {
 
     public:
-      /// Generate and assign the variables from the facet relation
+      /// Generate and assign the contained variables
       bool extract(const Relation<const CDCFacet>* ptrFacetRelation) final;
     };
   }

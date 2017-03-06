@@ -24,14 +24,12 @@ namespace Belle2 {
   public:
 
 
-    //! The cell id of this hit.
+    //! The TC id of this hit.
     int m_eventId;
 
-    //! The cell id of this hit.
-    int m_cellId;
+    //! The TC id of this hit.
+    int m_TCId;
 
-    //! The # of output of TC.
-    int m_noutput;
     //
     int m_beambkgtag;
     //! Deposited energy of this hit.
@@ -43,12 +41,10 @@ namespace Belle2 {
     //! The method to set event id
     void setEventId(int eventId) { m_eventId = eventId; }
 
-    //! The method to set cell id
-    void setTCId(int cellId) { m_cellId = cellId; }
+    //! The method to set TC id
+    void setTCId(int TCId) { m_TCId = TCId; }
 
-    //! The method to set # of output per TC
-    void setTCOutput(int noutput) { m_noutput = noutput; }
-
+    //! The method to set Beam Background tag
     void setBeamBkgTag(int beambkgtag) { m_beambkgtag = beambkgtag; }
 
     //! The method to set deposited energy
@@ -60,14 +56,15 @@ namespace Belle2 {
     //! The method to get event id
     int getEventId() const { return m_eventId; }
 
-    //! The method to get cell id
-    int getCellId() const { return m_cellId; }
+    //! The method to get TC id
+    int getTCId() const { return m_TCId; }
 
     //! The method to get deposited energy
     double getEnergyDep() const { return m_edep; }
 
     //! The method to get hit average time
     double getTimeAve() const {return m_TimeAve;}
+    //! The method to get Beam Background tag
     int getBeamBkgTag() const {return m_beambkgtag; }
 
 
@@ -76,27 +73,24 @@ namespace Belle2 {
     TRGECLHit()
     {
       m_eventId = 0;
-      m_cellId  = 0;
+      m_TCId  = 0;
       m_edep    = 0;
       m_TimeAve = 0;
-      m_noutput = 0;
       m_beambkgtag = 0;
     }
 
     //! Useful Constructor
     TRGECLHit(
       int eventId,
-      int cellId,
-      int noutput,
+      int TCId,
       double edep,
       double TimeAve
     )
     {
       m_eventId = eventId;
-      m_cellId = cellId;
+      m_TCId = TCId;
       m_edep = edep;
       m_TimeAve = TimeAve;
-      m_noutput = noutput;
     }
     ClassDef(TRGECLHit, 1); /*< the class title */
 

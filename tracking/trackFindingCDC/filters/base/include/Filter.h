@@ -9,20 +9,24 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/ProcessingSignalListener.h>
+#include <tracking/trackFindingCDC/utilities/CompositeProcessingSignalListener.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
-#include <framework/core/ModuleParamList.h>
-#include <framework/logging/Logger.h>
+// #include <framework/core/ModuleParamList.h>
+// #include <framework/logging/Logger.h>
+
 #include <string>
 #include <map>
+#include <cmath>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
 
     /// Base class for filters on a generic object type.
     template<class AObject>
-    class Filter : public ProcessingSignalListener {
+    class Filter : public CompositeProcessingSignalListener {
 
     public:
       /// Type of the object to be analysed.

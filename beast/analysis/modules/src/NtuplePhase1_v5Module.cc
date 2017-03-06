@@ -75,8 +75,10 @@ namespace Belle2 {
     addParam("input_P_HER", m_input_P_HER, "HER pressure");
     addParam("input_P_LER", m_input_P_LER, "LER pressure");
 
-    addParam("input_sigma_HER", m_input_sigma_HER, "HER beam size");
-    addParam("input_sigma_LER", m_input_sigma_LER, "LER beam size");
+    addParam("input_sigma_x_HER", m_input_sigma_x_HER, "HER beam size");
+    addParam("input_sigma_x_LER", m_input_sigma_x_LER, "LER beam size");
+    addParam("input_sigma_y_HER", m_input_sigma_y_HER, "HER beam size");
+    addParam("input_sigma_y_LER", m_input_sigma_y_LER, "LER beam size");
 
     addParam("input_bunchNb_HER", m_input_bunchNb_HER, "HER bunch number");
     addParam("input_bunchNb_LER", m_input_bunchNb_LER, "LER bunch number");
@@ -85,12 +87,23 @@ namespace Belle2 {
     addParam("input_data_bunchNb_LER", m_input_data_bunchNb_LER, "LER bunch number");
     addParam("input_data_SingleBeam", m_input_data_SingleBeam, "LER/HER/Both");
 
-    addParam("input_LT_SAD_lifetime", m_input_LT_SAD_lifetime, "List of LT SAD lifetime ");
-    addParam("input_HT_SAD_lifetime", m_input_HT_SAD_lifetime, "List of HT SAD lifetime ");
-    addParam("input_LB_SAD_lifetime", m_input_LB_SAD_lifetime, "List of LB SAD lifetime ");
-    addParam("input_HB_SAD_lifetime", m_input_HB_SAD_lifetime, "List of HB SAD lifetime ");
-    addParam("input_LC_SAD_lifetime", m_input_LC_SAD_lifetime, "List of LC SAD lifetime ");
-    addParam("input_HC_SAD_lifetime", m_input_HC_SAD_lifetime, "List of HC SAD lifetime ");
+    addParam("input_LT_SAD_RLR", m_input_LT_SAD_RLR, "SAD Low Ring Loss Rate");
+    addParam("input_HT_SAD_RLR", m_input_HT_SAD_RLR, "SAD High Ring Loss Rate");
+    addParam("input_LC_SAD_RLR", m_input_LC_SAD_RLR, "SAD Low Ring Loss Rate");
+    addParam("input_HC_SAD_RLR", m_input_HC_SAD_RLR, "SAD High Ring Loss Rate");
+    addParam("input_LB_SAD_RLR", m_input_LB_SAD_RLR, "SAD Low Ring Loss Rate");
+    addParam("input_HB_SAD_RLR", m_input_HB_SAD_RLR, "SAD High Ring Loss Rate");
+    addParam("input_LC_SAD_RLR_av", m_input_LC_SAD_RLR_av, "SAD Low Ring Loss Rate");
+    addParam("input_HC_SAD_RLR_av", m_input_HC_SAD_RLR_av, "SAD High Ring Loss Rate");
+    addParam("input_LB_SAD_RLR_av", m_input_LB_SAD_RLR_av, "SAD Low Ring Loss Rate");
+    addParam("input_HB_SAD_RLR_av", m_input_HB_SAD_RLR_av, "SAD High Ring Loss Rate");
+
+    addParam("input_BGSol", m_input_BGSol, "BG solution 0 or 1");
+    addParam("input_ToSol", m_input_ToSol, "To solution 0 or 1");
+
+    addParam("input_Z", m_input_Z, "Z number");
+
+    addParam("input_GasCorrection", m_input_GasCorrection, "GasCorrection");
 
     addParam("inputHistoFileNames", m_inputHistoFileNames,
              "List of root files with histograms");
@@ -130,6 +143,19 @@ namespace Belle2 {
       B2FATAL("No valid files specified!");
     }
 
+    fctRate_HB = new TF1("fctRate_HB", "[0] * x*x * log([1] / TMath::Power(x,1./3.) + [2])", 1.0, 19.0);
+    fctRate_LB = new TF1("fctRate_LB", "[0] * x*x * log([1] / TMath::Power(x,1./3.) + [2])", 1.0, 19.0);
+    fctRate_HC = new TF1("fctRate_HC", "[0] * x*x / TMath::Power( ([1] / TMath::Power(x,1./3.) + [2]), 2.)", 1.0, 19.0);
+    fctRate_LC = new TF1("fctRate_LC", "[0] * x*x / TMath::Power( ([1] / TMath::Power(x,1./3.) + [2]), 2.)", 1.0, 19.0);
+    fctRate_HB->SetParameters(0.183373, 0.117173, 1.23431);
+    fctRate_LB->SetParameters(0.900838, 0.0455552, 1.10098);
+    fctRate_HC->SetParameters(1.80992, -0.000115401, 8.4047);
+    fctRate_LC->SetParameters(0.210872, -4.50637e-06, 1.64209);
+    m_input_Z_scaling[0] = fctRate_HC->Eval(m_input_Z[0]) / fctRate_HC->Eval(7);
+    m_input_Z_scaling[1] = fctRate_LC->Eval(m_input_Z[1]) / fctRate_LC->Eval(7);
+    m_input_Z_scaling[2] = fctRate_HB->Eval(m_input_Z[2]) / fctRate_HB->Eval(7);
+    m_input_Z_scaling[3] = fctRate_LB->Eval(m_input_Z[3]) / fctRate_LB->Eval(7);
+
     double volume = 0.;
     double rho = 0.;
     double mass = 0.;
@@ -150,36 +176,61 @@ namespace Belle2 {
           for (int i = 0; i < h1D->GetNbinsX(); i++) {
             double counts = h1D->GetBinContent(i + 1);
             double rate = counts / m_input_Time_eqv;
-            /*if (HistoRateName.Contains("csi")) {
-            cout << fileName << " rate " <<  rate << " counts " << counts << " m_input_Time_eqv " << m_input_Time_eqv << endl;
-            }*/
+
+            if (fileName.Contains("Coulomb")) {
+              if (fileName.Contains("HER")) rate *= m_input_Z_scaling[0];
+              if (fileName.Contains("LER")) rate *= m_input_Z_scaling[1];
+            }
+            if (fileName.Contains("Brems")) {
+              if (fileName.Contains("HER")) rate *= m_input_Z_scaling[2];
+              if (fileName.Contains("LER")) rate *= m_input_Z_scaling[3];
+            }
+
             if (fileName.Contains("HER")) {
               if (HistoRateName.Contains("qcss") && fileName.Contains("Touschek")) m_input_HT_QCSS_rate.push_back(rate); //Hz
               if (HistoRateName.Contains("claws") && fileName.Contains("Touschek")) m_input_HT_CLAWS_rate.push_back(rate); //Hz
               if (HistoRateName.Contains("csi") && fileName.Contains("Touschek")) m_input_HT_CSI_rate.push_back(rate); //Hz
               if (HistoRateName.Contains("Def") && fileName.Contains("Touschek")) m_input_HT_HE3_rate.push_back(rate); //Hz
+              if (HistoRateName.Contains("tpc_rate") && fileName.Contains("Touschek")) m_input_HT_TPC_rate.push_back(rate); //Hz
+              if (HistoRateName.Contains("tpc_angular_rate") && fileName.Contains("Touschek")) m_input_HT_TPC_angular_rate.push_back(rate); //Hz
+              if (HistoRateName.Contains("tpc_angular_dose") && fileName.Contains("Touschek")) m_input_HT_TPC_angular_dose.push_back(rate); //Hz
               if (HistoRateName.Contains("qcss") && fileName.Contains("Brems")) m_input_HB_QCSS_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("claws") && fileName.Contains("Brems")) m_input_HB_CLAWS_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("csi") && fileName.Contains("Brems")) m_input_HB_CSI_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("Def") && fileName.Contains("Brems")) m_input_HB_HE3_rate_av.push_back(rate); //Hz
+              if (HistoRateName.Contains("tpc_rate") && fileName.Contains("Brems")) m_input_HB_TPC_rate_av.push_back(rate); //Hz
+              if (HistoRateName.Contains("tpc_angular_rate") && fileName.Contains("Brems")) m_input_HB_TPC_angular_rate_av.push_back(rate); //Hz
+              if (HistoRateName.Contains("tpc_angular_dose") && fileName.Contains("Brems")) m_input_HB_TPC_angular_dose_av.push_back(rate); //Hz
               if (HistoRateName.Contains("qcss") && fileName.Contains("Coulomb")) m_input_HC_QCSS_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("claws") && fileName.Contains("Coulomb")) m_input_HC_CLAWS_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("csi") && fileName.Contains("Coulomb")) m_input_HC_CSI_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("Def") && fileName.Contains("Coulomb")) m_input_HC_HE3_rate_av.push_back(rate); //Hz
+              if (HistoRateName.Contains("tpc_rate") && fileName.Contains("Coulomb")) m_input_HC_TPC_rate_av.push_back(rate); //Hz
+              if (HistoRateName.Contains("tpc_angular_rate") && fileName.Contains("Coulomb")) m_input_HC_TPC_angular_rate_av.push_back(rate); //Hz
+              if (HistoRateName.Contains("tpc_angular_dose") && fileName.Contains("Coulomb")) m_input_HC_TPC_angular_dose_av.push_back(rate); //Hz
             }
             if (fileName.Contains("LER")) {
               if (HistoRateName.Contains("qcss") && fileName.Contains("Touschek")) m_input_LT_QCSS_rate.push_back(rate); //Hz
               if (HistoRateName.Contains("claws") && fileName.Contains("Touschek")) m_input_LT_CLAWS_rate.push_back(rate); //Hz
               if (HistoRateName.Contains("csi") && fileName.Contains("Touschek")) m_input_LT_CSI_rate.push_back(rate); //Hz
               if (HistoRateName.Contains("Def") && fileName.Contains("Touschek")) m_input_LT_HE3_rate.push_back(rate); //Hz
+              if (HistoRateName.Contains("tpc_rate") && fileName.Contains("Touschek")) m_input_LT_TPC_rate.push_back(rate); //Hz
+              if (HistoRateName.Contains("tpc_angular_rate") && fileName.Contains("Touschek")) m_input_LT_TPC_angular_rate.push_back(rate); //Hz
+              if (HistoRateName.Contains("tpc_angular_dose") && fileName.Contains("Touschek")) m_input_LT_TPC_angular_dose.push_back(rate); //Hz
               if (HistoRateName.Contains("qcss") && fileName.Contains("Brems")) m_input_LB_QCSS_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("claws") && fileName.Contains("Brems")) m_input_LB_CLAWS_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("csi") && fileName.Contains("Brems")) m_input_LB_CSI_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("Def") && fileName.Contains("Brems")) m_input_LB_HE3_rate_av.push_back(rate); //Hz
+              if (HistoRateName.Contains("tpc_rate") && fileName.Contains("Brems")) m_input_LB_TPC_rate_av.push_back(rate); //Hz
+              if (HistoRateName.Contains("tpc_angular_rate") && fileName.Contains("Brems")) m_input_LB_TPC_angular_rate_av.push_back(rate); //Hz
+              if (HistoRateName.Contains("tpc_angular_dose") && fileName.Contains("Brems")) m_input_LB_TPC_angular_dose_av.push_back(rate); //Hz
               if (HistoRateName.Contains("qcss") && fileName.Contains("Coulomb")) m_input_LC_QCSS_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("claws") && fileName.Contains("Coulomb")) m_input_LC_CLAWS_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("csi") && fileName.Contains("Coulomb")) m_input_LC_CSI_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("Def") && fileName.Contains("Coulomb")) m_input_LC_HE3_rate_av.push_back(rate); //Hz
+              if (HistoRateName.Contains("tpc_rate") && fileName.Contains("Coulomb")) m_input_LC_TPC_rate_av.push_back(rate); //Hz
+              if (HistoRateName.Contains("tpc_angular_rate") && fileName.Contains("Coulomb")) m_input_LC_TPC_angular_rate_av.push_back(rate); //Hz
+              if (HistoRateName.Contains("tpc_angular_dose") && fileName.Contains("Coulomb")) m_input_LC_TPC_angular_dose_av.push_back(rate); //Hz
             }
           }
           delete h1D;
@@ -200,25 +251,49 @@ namespace Belle2 {
             rho = 3.53; //g/cm^3
             mass = rho * volume * 1e-3; //g to kg
           }
+          if (HistoDoseName.Contains("dosi")) {
+            imax = 4;
+            volume = 0.265 * 0.265 * 0.01; //cm^3
+            rho = 2.32; //g/cm^3
+            mass = rho * volume * 1e-3; //g to kg
+          }
+          if (HistoDoseName.Contains("tpc")) {
+            imax = 2;
+            volume = 10.8537 * 2.0 * 1.68; //cm^3
+            rho = 0.00066908; //g/cm^3
+            mass = rho * volume * 1e-3; //g to kg
+          }
           for (int i = 0; i < imax; i++) {
             TH1F* he = (TH1F*)fh[iter]->Get(TString::Format("%s_%d", HistoDoseName.Data(), i));
+            //double step = ((double)he->GetXaxis()->GetXmax() - (double)he->GetXaxis()->GetXmin()) / ((double)he->GetNbinsX());
             double esum = 0;
             for (int j = 0; j < he->GetNbinsX(); j++) {
               double co = he->GetBinContent(j + 1);
               double va = he->GetXaxis()->GetBinCenter(j + 1);
+              double esumbin = va * co;
+
+              if (fileName.Contains("Coulomb")) {
+                if (fileName.Contains("HER")) esumbin *= m_input_Z_scaling[0];
+                if (fileName.Contains("LER")) esumbin *= m_input_Z_scaling[1];
+              }
+              if (fileName.Contains("Brems")) {
+                if (fileName.Contains("HER")) esumbin *= m_input_Z_scaling[2];
+                if (fileName.Contains("LER")) esumbin *= m_input_Z_scaling[3];
+              }
+
+              esum += esumbin;// / step;
               if (HistoDoseName.Contains("csi_energy")) {
                 if (fileName.Contains("HER")) {
-                  if (fileName.Contains("Touschek")) m_input_HT_CSI_dose_binE.push_back(va * co / m_input_Time_eqv * 1e-3); //MeV to GeV
-                  if (fileName.Contains("Coulomb")) m_input_HC_CSI_dose_binE_av.push_back(va * co / m_input_Time_eqv * 1e-3); //MeV to GeV
-                  if (fileName.Contains("Brems")) m_input_HB_CSI_dose_binE_av.push_back(va * co / m_input_Time_eqv * 1e-3); //MeV to GeV
+                  if (fileName.Contains("Touschek")) m_input_HT_CSI_dose_binE.push_back(esumbin / m_input_Time_eqv * 1e-3); //MeV to GeV
+                  if (fileName.Contains("Coulomb")) m_input_HC_CSI_dose_binE_av.push_back(esumbin / m_input_Time_eqv * 1e-3); //MeV to GeV
+                  if (fileName.Contains("Brems")) m_input_HB_CSI_dose_binE_av.push_back(esumbin / m_input_Time_eqv * 1e-3); //MeV to GeV
                 }
                 if (fileName.Contains("LER")) {
-                  if (fileName.Contains("Touschek")) m_input_LT_CSI_dose_binE.push_back(va * co / m_input_Time_eqv * 1e-3); //MeV to GeV
-                  if (fileName.Contains("Coulomb")) m_input_LC_CSI_dose_binE_av.push_back(va * co / m_input_Time_eqv * 1e-3); //MeV to GeV
-                  if (fileName.Contains("Brems")) m_input_LB_CSI_dose_binE_av.push_back(va * co / m_input_Time_eqv * 1e-3); //MeV to GeV
+                  if (fileName.Contains("Touschek")) m_input_LT_CSI_dose_binE.push_back(esumbin / m_input_Time_eqv * 1e-3); //MeV to GeV
+                  if (fileName.Contains("Coulomb")) m_input_LC_CSI_dose_binE_av.push_back(esumbin / m_input_Time_eqv * 1e-3); //MeV to GeV
+                  if (fileName.Contains("Brems")) m_input_LB_CSI_dose_binE_av.push_back(esumbin / m_input_Time_eqv * 1e-3); //MeV to GeV
                 }
               }
-              esum += va * co;
             }
             if (fileName.Contains("HER")) {
               if (HistoDoseName.Contains("csi") && HistoDoseName.Contains("edep")
@@ -227,6 +302,13 @@ namespace Belle2 {
                   && fileName.Contains("Touschek")) m_input_HT_BGO_dose.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
               if (HistoDoseName.Contains("pin")
                   && fileName.Contains("Touschek")) m_input_HT_PIN_dose.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+              if (HistoDoseName.Contains("dosi")
+                  && fileName.Contains("Touschek")) m_input_HT_DOSI.push_back(esum / m_input_Time_eqv / mass / RadConv);
+              if (HistoDoseName.Contains("tpc_dose")
+                  && fileName.Contains("Touschek")) m_input_HT_TPC_dose.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+              /*if (HistoDoseName.Contains("tpc_angular_dose")
+                  && fileName.Contains("Touschek")) m_input_HT_TPC_angular_dose.push_back(esum / m_input_Time_eqv / mass / RadConv *
+              1e-3); //keV to MeV*/
               if (HistoDoseName.Contains("dia")
                   && fileName.Contains("Touschek")) m_input_HT_DIA_dose.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
               if (HistoDoseName.Contains("csi") && HistoDoseName.Contains("edep")
@@ -235,6 +317,13 @@ namespace Belle2 {
                   && fileName.Contains("Brems")) m_input_HB_BGO_dose_av.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
               if (HistoDoseName.Contains("pin")
                   && fileName.Contains("Brems")) m_input_HB_PIN_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+              if (HistoDoseName.Contains("dosi")
+                  && fileName.Contains("Brems")) m_input_HB_DOSI_av.push_back(esum / m_input_Time_eqv / mass / RadConv);
+              if (HistoDoseName.Contains("tpc_dose")
+                  && fileName.Contains("Brems")) m_input_HB_TPC_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+              /*if (HistoDoseName.Contains("tpc_angular_dose")
+                  && fileName.Contains("Brems")) m_input_HB_TPC_angular_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv *
+              1e-3); //keV to MeV*/
               if (HistoDoseName.Contains("dia")
                   && fileName.Contains("Brems")) m_input_HB_DIA_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
               if (HistoDoseName.Contains("csi") && HistoDoseName.Contains("edep")
@@ -243,6 +332,13 @@ namespace Belle2 {
                   && fileName.Contains("Coulomb")) m_input_HC_BGO_dose_av.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
               if (HistoDoseName.Contains("pin")
                   && fileName.Contains("Coulomb")) m_input_HC_PIN_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+              if (HistoDoseName.Contains("dosi")
+                  && fileName.Contains("Coulomb")) m_input_HC_DOSI_av.push_back(esum / m_input_Time_eqv / mass / RadConv);
+              if (HistoDoseName.Contains("tpc_dose")
+                  && fileName.Contains("Coulomb")) m_input_HC_TPC_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+              /*if (HistoDoseName.Contains("tpc_angular_dose")
+                  && fileName.Contains("Coulomb")) m_input_HC_TPC_angular_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv *
+              1e-3); //keV to MeV*/
               if (HistoDoseName.Contains("dia")
                   && fileName.Contains("Coulomb")) m_input_HC_DIA_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
             }
@@ -253,6 +349,13 @@ namespace Belle2 {
                   && fileName.Contains("Touschek")) m_input_LT_BGO_dose.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
               if (HistoDoseName.Contains("pin")
                   && fileName.Contains("Touschek")) m_input_LT_PIN_dose.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+              if (HistoDoseName.Contains("dosi")
+                  && fileName.Contains("Touschek")) m_input_LT_DOSI.push_back(esum / m_input_Time_eqv / mass / RadConv);
+              if (HistoDoseName.Contains("tpc_dose")
+                  && fileName.Contains("Touschek")) m_input_LT_TPC_dose.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+              /*if (HistoDoseName.Contains("tpc_angular_dose")
+                  && fileName.Contains("Touschek")) m_input_LT_TPC_angular_dose.push_back(esum / m_input_Time_eqv / mass / RadConv *
+              1e-3); //keV to MeV*/
               if (HistoDoseName.Contains("dia")
                   && fileName.Contains("Touschek")) m_input_LT_DIA_dose.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
               if (HistoDoseName.Contains("csi") && HistoDoseName.Contains("edep")
@@ -261,6 +364,13 @@ namespace Belle2 {
                   && fileName.Contains("Brems")) m_input_LB_BGO_dose_av.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
               if (HistoDoseName.Contains("pin")
                   && fileName.Contains("Brems")) m_input_LB_PIN_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+              if (HistoDoseName.Contains("dosi")
+                  && fileName.Contains("Brems")) m_input_LB_DOSI_av.push_back(esum / m_input_Time_eqv / mass / RadConv);
+              if (HistoDoseName.Contains("tpc_dose")
+                  && fileName.Contains("Brems")) m_input_LB_TPC_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+              /*if (HistoDoseName.Contains("tpc_angular_dose")
+                  && fileName.Contains("Brems")) m_input_LB_TPC_angular_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv *
+              1e-3); //keV to MeV*/
               if (HistoDoseName.Contains("dia")
                   && fileName.Contains("Brems")) m_input_LB_DIA_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
               if (HistoDoseName.Contains("csi") && HistoDoseName.Contains("edep")
@@ -269,6 +379,13 @@ namespace Belle2 {
                   && fileName.Contains("Coulomb")) m_input_LC_BGO_dose_av.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
               if (HistoDoseName.Contains("pin")
                   && fileName.Contains("Coulomb")) m_input_LC_PIN_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+              if (HistoDoseName.Contains("dosi")
+                  && fileName.Contains("Coulomb")) m_input_LC_DOSI_av.push_back(esum / m_input_Time_eqv / mass / RadConv);
+              if (HistoDoseName.Contains("tpc_dose")
+                  && fileName.Contains("Coulomb")) m_input_LC_TPC_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+              /*if (HistoDoseName.Contains("tpc_angular_dose")
+                  && fileName.Contains("Coulomb")) m_input_LC_TPC_angular_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv *
+              1e-3); //keV to MeV*/
               if (HistoDoseName.Contains("dia")
                   && fileName.Contains("Coulomb")) m_input_LC_DIA_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
             }
@@ -283,29 +400,51 @@ namespace Belle2 {
             for (int i = 0; i < h2D->GetNbinsX(); i++) {
               double counts = h2D->GetBinContent(i + 1, k + 1);
               double rate = counts / m_input_Time_eqv;
+
+              if (fileName.Contains("Coulomb")) {
+                if (fileName.Contains("HER")) rate *= m_input_Z_scaling[0];
+                if (fileName.Contains("LER")) rate *= m_input_Z_scaling[1];
+              }
+              if (fileName.Contains("Brems")) {
+                if (fileName.Contains("HER")) rate *= m_input_Z_scaling[2];
+                if (fileName.Contains("LER")) rate *= m_input_Z_scaling[3];
+              }
+
               if (fileName.Contains("Coulomb_HER")) {
                 if (HistoRateName.Contains("qcss")) m_input_HC_QCSS_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("claws")) m_input_HC_CLAWS_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("csi")) m_input_HC_CSI_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("Def")) m_input_HC_HE3_rate[k].push_back(rate); //Hz
+                if (HistoRateName.Contains("tpc_rate")) m_input_HC_TPC_rate[k].push_back(rate); //Hz
+                if (HistoRateName.Contains("tpc_angular_rate")) m_input_HC_TPC_angular_rate[k].push_back(rate); //Hz
+                if (HistoRateName.Contains("tpc_angular_dose")) m_input_HC_TPC_angular_dose[k].push_back(rate); //Hz
               }
               if (fileName.Contains("Coulomb_LER")) {
                 if (HistoRateName.Contains("qcss")) m_input_LC_QCSS_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("claws")) m_input_LC_CLAWS_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("csi")) m_input_LC_CSI_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("Def")) m_input_LC_HE3_rate[k].push_back(rate); //Hz
+                if (HistoRateName.Contains("tpc_rate")) m_input_LC_TPC_rate[k].push_back(rate); //Hz
+                if (HistoRateName.Contains("tpc_angular_rate")) m_input_LC_TPC_angular_rate[k].push_back(rate); //Hz
+                if (HistoRateName.Contains("tpc_angular_dose")) m_input_LC_TPC_angular_dose[k].push_back(rate); //Hz
               }
               if (fileName.Contains("Brems_HER")) {
                 if (HistoRateName.Contains("qcss")) m_input_HB_QCSS_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("claws")) m_input_HB_CLAWS_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("csi")) m_input_HB_CSI_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("Def")) m_input_HB_HE3_rate[k].push_back(rate); //Hz
+                if (HistoRateName.Contains("tpc_rate")) m_input_HB_TPC_rate[k].push_back(rate); //Hz
+                if (HistoRateName.Contains("tpc_angular_rate")) m_input_HB_TPC_angular_rate[k].push_back(rate); //Hz
+                if (HistoRateName.Contains("tpc_angular_dose")) m_input_HB_TPC_angular_dose[k].push_back(rate); //Hz
               }
               if (fileName.Contains("Brems_LER")) {
                 if (HistoRateName.Contains("qcss")) m_input_LB_QCSS_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("claws")) m_input_LB_CLAWS_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("csi")) m_input_LB_CSI_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("Def")) m_input_LB_HE3_rate[k].push_back(rate); //Hz
+                if (HistoRateName.Contains("tpc_rate")) m_input_LB_TPC_rate[k].push_back(rate); //Hz
+                if (HistoRateName.Contains("tpc_angular_rate")) m_input_LB_TPC_angular_rate[k].push_back(rate); //Hz
+                if (HistoRateName.Contains("tpc_angular_dose")) m_input_LB_TPC_angular_dose[k].push_back(rate); //Hz
               }
             }
           }
@@ -328,24 +467,48 @@ namespace Belle2 {
             rho = 3.53; //g/cm^3
             mass = rho * volume * 1e-3; //g to kg
           }
+          if (HistoDoseName.Contains("dosi")) {
+            imax = 4;
+            volume = 0.265 * 0.265 * 0.01; //cm^3
+            rho = 2.32; //g/cm^3
+            mass = rho * volume * 1e-3; //g to kg
+          }
+          if (HistoDoseName.Contains("tpc")) {
+            imax = 2;
+            volume = 10.8537 * 2.0 * 1.68; //cm^3
+            rho = 0.00066908; //g/cm^3
+            mass = rho * volume * 1e-3; //g to kg
+          }
           for (int i = 0; i < imax; i++) {
             TH2F* he = (TH2F*)fh[iter]->Get(TString::Format("%s_%d", HistoDoseName.Data(), i));
+            //double step = ((double)he->GetXaxis()->GetXmax() - (double)he->GetXaxis()->GetXmin()) / ((double)he->GetNbinsX());
             for (int k = 0; k < he->GetNbinsY(); k++) {
               double esum = 0;
               for (int j = 0; j < he->GetNbinsX(); j++) {
                 double co = he->GetBinContent(j + 1, k + 1);
                 double va = he->GetXaxis()->GetBinCenter(j + 1);
+                double esumbin = va * co;
+
+                if (fileName.Contains("Coulomb")) {
+                  if (fileName.Contains("HER")) esumbin *= m_input_Z_scaling[0];
+                  if (fileName.Contains("LER")) esumbin *= m_input_Z_scaling[1];
+                }
+                if (fileName.Contains("Brems")) {
+                  if (fileName.Contains("HER")) esumbin *= m_input_Z_scaling[2];
+                  if (fileName.Contains("LER")) esumbin *= m_input_Z_scaling[3];
+                }
+
+                esum += esumbin;// / step;
                 if (HistoDoseName.Contains("csi_energy")) {
                   if (fileName.Contains("HER")) {
-                    if (fileName.Contains("Coulomb")) m_input_HC_CSI_dose_binE[k].push_back(va * co / m_input_Time_eqv * 1e-3); //MeV to GeV
-                    if (fileName.Contains("Brems")) m_input_HB_CSI_dose_binE[k].push_back(va * co / m_input_Time_eqv * 1e-3); //MeV to GeV
+                    if (fileName.Contains("Coulomb")) m_input_HC_CSI_dose_binE[k].push_back(esumbin / m_input_Time_eqv * 1e-3); //MeV to GeV
+                    if (fileName.Contains("Brems")) m_input_HB_CSI_dose_binE[k].push_back(esumbin / m_input_Time_eqv * 1e-3); //MeV to GeV
                   }
                   if (fileName.Contains("LER")) {
-                    if (fileName.Contains("Coulomb")) m_input_LC_CSI_dose_binE[k].push_back(va * co / m_input_Time_eqv * 1e-3); //MeV to GeV
-                    if (fileName.Contains("Brems")) m_input_LB_CSI_dose_binE[k].push_back(va * co / m_input_Time_eqv * 1e-3); //MeV to GeV
+                    if (fileName.Contains("Coulomb")) m_input_LC_CSI_dose_binE[k].push_back(esumbin / m_input_Time_eqv * 1e-3); //MeV to GeV
+                    if (fileName.Contains("Brems")) m_input_LB_CSI_dose_binE[k].push_back(esumbin / m_input_Time_eqv * 1e-3); //MeV to GeV
                   }
                 }
-                esum += va * co;
               }
 
               if (fileName.Contains("Coulomb_HER")) {
@@ -353,6 +516,11 @@ namespace Belle2 {
                     && HistoDoseName.Contains("edep")) m_input_HC_CSI_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
                 if (HistoDoseName.Contains("bgo")) m_input_HC_BGO_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
                 if (HistoDoseName.Contains("pin")) m_input_HC_PIN_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+                if (HistoDoseName.Contains("dosi")) m_input_HC_DOSI[k].push_back(esum / m_input_Time_eqv / mass / RadConv);
+                if (HistoDoseName.Contains("tpc_dose")) m_input_HC_TPC_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv *
+                      1e-3); //keV to MeV
+                /*if (HistoDoseName.Contains("tpc_angular_dose")) m_input_HC_TPC_angular_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv *
+                1e-3); //keV to MeV*/
                 if (HistoDoseName.Contains("dia")) m_input_HC_DIA_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
               }
               if (fileName.Contains("Coulomb_LER")) {
@@ -360,6 +528,11 @@ namespace Belle2 {
                     && HistoDoseName.Contains("edep")) m_input_LC_CSI_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
                 if (HistoDoseName.Contains("bgo")) m_input_LC_BGO_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
                 if (HistoDoseName.Contains("pin")) m_input_LC_PIN_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+                if (HistoDoseName.Contains("dosi")) m_input_LC_DOSI[k].push_back(esum / m_input_Time_eqv / mass / RadConv);
+                if (HistoDoseName.Contains("tpc_dose")) m_input_LC_TPC_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv *
+                      1e-3); //keV to MeV
+                /*if (HistoDoseName.Contains("tpc_angular_dose")) m_input_LC_TPC_angular_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv *
+                1e-3); //keV to MeV*/
                 if (HistoDoseName.Contains("dia")) m_input_LC_DIA_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
               }
               if (fileName.Contains("Brems_HER")) {
@@ -367,6 +540,11 @@ namespace Belle2 {
                     && HistoDoseName.Contains("edep")) m_input_HB_CSI_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
                 if (HistoDoseName.Contains("bgo")) m_input_HB_BGO_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
                 if (HistoDoseName.Contains("pin")) m_input_HB_PIN_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+                if (HistoDoseName.Contains("dosi")) m_input_HB_DOSI[k].push_back(esum / m_input_Time_eqv / mass / RadConv);
+                if (HistoDoseName.Contains("tpc_dose")) m_input_HB_TPC_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv *
+                      1e-3); //keV to MeV
+                /*if (HistoDoseName.Contains("tpc_angular_dose")) m_input_HB_TPC_angular_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv *
+                1e-3); //keV to MeV*/
                 if (HistoDoseName.Contains("dia")) m_input_HB_DIA_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
               }
               if (fileName.Contains("Brems_LER")) {
@@ -374,6 +552,11 @@ namespace Belle2 {
                     && HistoDoseName.Contains("edep")) m_input_LB_CSI_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
                 if (HistoDoseName.Contains("bgo")) m_input_LB_BGO_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
                 if (HistoDoseName.Contains("pin")) m_input_LB_PIN_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+                if (HistoDoseName.Contains("dosi")) m_input_LB_DOSI[k].push_back(esum / m_input_Time_eqv / mass / RadConv);
+                if (HistoDoseName.Contains("tpc_dose")) m_input_LB_TPC_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv *
+                      1e-3); //keV to MeV
+                /*if (HistoDoseName.Contains("tpc_angular_dose")) m_input_LB_TPC_angular_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv *
+                1e-3); //keV to MeV*/
                 if (HistoDoseName.Contains("dia")) m_input_LB_DIA_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
               }
             }
@@ -385,7 +568,6 @@ namespace Belle2 {
       iter++;
     }
     dirh->cd();
-
 
     // expand possible wildcards
     m_inputFileNames = expandWordExpansions(m_inputFileNames);
@@ -420,6 +602,12 @@ namespace Belle2 {
     m_tree->SetBranchAddress("subrun", &(m_beast.subrun));
     m_tree->SetBranchAddress("SKB_HER_injectionFlag", &(m_beast.SKB_HER_injectionFlag));
     m_tree->SetBranchAddress("SKB_LER_injectionFlag", &(m_beast.SKB_LER_injectionFlag));
+    m_tree->SetBranchAddress("SKB_HER_injectionFlag_safe", &(m_beast.SKB_HER_injectionFlag_safe));
+    m_tree->SetBranchAddress("SKB_LER_injectionFlag_safe", &(m_beast.SKB_LER_injectionFlag_safe));
+    m_tree->SetBranchAddress("SKB_HER_abortFlag", &(m_beast.SKB_HER_abortFlag));
+    m_tree->SetBranchAddress("SKB_LER_abortFlag", &(m_beast.SKB_LER_abortFlag));
+    m_tree->SetBranchAddress("SKB_HER_abortFlag_safe", &(m_beast.SKB_HER_abortFlag_safe));
+    m_tree->SetBranchAddress("SKB_LER_abortFlag_safe", &(m_beast.SKB_LER_abortFlag_safe));
     m_tree->SetBranchAddress("SKB_Status", &(m_beast.SKB_Status));
     m_tree->SetBranchAddress("SKB_HER_injectionRate", &(m_beast.SKB_HER_injectionRate));
     m_tree->SetBranchAddress("SKB_LER_injectionRate", &(m_beast.SKB_LER_injectionRate));
@@ -454,10 +642,10 @@ namespace Belle2 {
     m_tree->SetBranchAddress("SKB_LER_collimatorPositions_fromBeam", &(m_beast.SKB_LER_collimatorPositions_fromBeam));
     m_tree->SetBranchAddress("SKB_HER_beamSize_xray_X", &(m_beast.SKB_HER_beamSize_xray_X));
     m_tree->SetBranchAddress("SKB_HER_beamSize_xray_Y", &(m_beast.SKB_HER_beamSize_xray_Y));
-    m_tree->SetBranchAddress("SKB_HER_correctedbeamSize_xray_Y", &(m_beast.SKB_HER_correctedbeamSize_xray_Y));
+    m_tree->SetBranchAddress("SKB_HER_correctedBeamSize_xray_Y", &(m_beast.SKB_HER_correctedBeamSize_xray_Y));
     m_tree->SetBranchAddress("SKB_LER_beamSize_xray_X", &(m_beast.SKB_LER_beamSize_xray_X));
     m_tree->SetBranchAddress("SKB_LER_beamSize_xray_Y", &(m_beast.SKB_LER_beamSize_xray_Y));
-    m_tree->SetBranchAddress("SKB_LER_correctedbeamSize_xray_Y", &(m_beast.SKB_LER_correctedbeamSize_xray_Y));
+    m_tree->SetBranchAddress("SKB_LER_correctedBeamSize_xray_Y", &(m_beast.SKB_LER_correctedBeamSize_xray_Y));
     m_tree->SetBranchAddress("SKB_LER_beamSize_SR_X", &(m_beast.SKB_LER_beamSize_SR_X));
     m_tree->SetBranchAddress("SKB_LER_beamSize_SR_Y", &(m_beast.SKB_LER_beamSize_SR_Y));
     m_tree->SetBranchAddress("SKB_HER_beamSize_SR_X", &(m_beast.SKB_HER_beamSize_SR_X));
@@ -467,6 +655,8 @@ namespace Belle2 {
     m_tree->SetBranchAddress("SKB_LER_partialPressures_D06", &(m_beast.SKB_LER_partialPressures_D06));
     m_tree->SetBranchAddress("SKB_LER_partialPressures_D02", &(m_beast.SKB_LER_partialPressures_D02));
     m_tree->SetBranchAddress("SKB_LER_pressures_local", &(m_beast.SKB_LER_pressures_local));
+    m_tree->SetBranchAddress("SKB_LER_Zeff_D02", &(m_beast.SKB_LER_Zeff_D02));
+    m_tree->SetBranchAddress("SKB_LER_Zeff_D06", &(m_beast.SKB_LER_Zeff_D06));
 
     m_numEntries = m_tree->GetEntries();
     cout << "m_numEntries " << m_numEntries << endl;
@@ -481,10 +671,20 @@ namespace Belle2 {
     m_treeTruth = new TTree("truth", "Truth table (simulation)");
 
     m_treeBEAST = new TTree("tout", "BEAST data tree (simulation)");
+
     m_treeBEAST->Branch("ts", &(m_beast.ts));
+    m_treeBEAST->Branch("event", &(m_beast.event));
+    m_treeBEAST->Branch("run", &(m_beast.run));
+    m_treeBEAST->Branch("subrun", &(m_beast.subrun));
 
     m_treeBEAST->Branch("SKB_HER_injectionFlag", &(m_beast.SKB_HER_injectionFlag));
     m_treeBEAST->Branch("SKB_LER_injectionFlag", &(m_beast.SKB_LER_injectionFlag));
+    m_treeBEAST->Branch("SKB_HER_injectionFlag_safe", &(m_beast.SKB_HER_injectionFlag_safe));
+    m_treeBEAST->Branch("SKB_LER_injectionFlag_safe", &(m_beast.SKB_LER_injectionFlag_safe));
+    m_treeBEAST->Branch("SKB_HER_abortFlag", &(m_beast.SKB_HER_abortFlag));
+    m_treeBEAST->Branch("SKB_LER_abortFlag", &(m_beast.SKB_LER_abortFlag));
+    m_treeBEAST->Branch("SKB_HER_abortFlag_safe", &(m_beast.SKB_HER_abortFlag_safe));
+    m_treeBEAST->Branch("SKB_LER_abortFlag_safe", &(m_beast.SKB_LER_abortFlag_safe));
     m_treeBEAST->Branch("SKB_Status", &(m_beast.SKB_Status));
     m_treeBEAST->Branch("SKB_HER_injectionRate", &(m_beast.SKB_HER_injectionRate));
     m_treeBEAST->Branch("SKB_LER_injectionRate", &(m_beast.SKB_LER_injectionRate));
@@ -519,10 +719,10 @@ namespace Belle2 {
     m_treeBEAST->Branch("SKB_LER_collimatorPositions_fromBeam", &(m_beast.SKB_LER_collimatorPositions_fromBeam));
     m_treeBEAST->Branch("SKB_HER_beamSize_xray_X", &(m_beast.SKB_HER_beamSize_xray_X));
     m_treeBEAST->Branch("SKB_HER_beamSize_xray_Y", &(m_beast.SKB_HER_beamSize_xray_Y));
-    m_treeBEAST->Branch("SKB_HER_correctedbeamSize_xray_Y", &(m_beast.SKB_HER_correctedbeamSize_xray_Y));
+    m_treeBEAST->Branch("SKB_HER_correctedBeamSize_xray_Y", &(m_beast.SKB_HER_correctedBeamSize_xray_Y));
     m_treeBEAST->Branch("SKB_LER_beamSize_xray_X", &(m_beast.SKB_LER_beamSize_xray_X));
     m_treeBEAST->Branch("SKB_LER_beamSize_xray_Y", &(m_beast.SKB_LER_beamSize_xray_Y));
-    m_treeBEAST->Branch("SKB_LER_correctedbeamSize_xray_Y", &(m_beast.SKB_LER_correctedbeamSize_xray_Y));
+    m_treeBEAST->Branch("SKB_LER_correctedBeamSize_xray_Y", &(m_beast.SKB_LER_correctedBeamSize_xray_Y));
     m_treeBEAST->Branch("SKB_LER_beamSize_SR_X", &(m_beast.SKB_LER_beamSize_SR_X));
     m_treeBEAST->Branch("SKB_LER_beamSize_SR_Y", &(m_beast.SKB_LER_beamSize_SR_Y));
     m_treeBEAST->Branch("SKB_HER_beamSize_SR_X", &(m_beast.SKB_HER_beamSize_SR_X));
@@ -532,9 +732,15 @@ namespace Belle2 {
     m_treeBEAST->Branch("SKB_LER_partialPressures_D06", &(m_beast.SKB_LER_partialPressures_D06));
     m_treeBEAST->Branch("SKB_LER_partialPressures_D02", &(m_beast.SKB_LER_partialPressures_D02));
     m_treeBEAST->Branch("SKB_LER_pressures_local", &(m_beast.SKB_LER_pressures_local));
+    m_treeBEAST->Branch("SKB_LER_Zeff_D02", &(m_beast.SKB_LER_Zeff_D02));
+    m_treeBEAST->Branch("SKB_LER_Zeff_D06", &(m_beast.SKB_LER_Zeff_D06));
     m_treeBEAST->Branch("PIN_dose", &(m_beast.PIN_dose));
     m_treeBEAST->Branch("BGO_energy", &(m_beast.BGO_energy));
     m_treeBEAST->Branch("HE3_rate", &(m_beast.HE3_rate));
+    //m_treeBEAST->Branch("TPC_rate", &(m_beast.TPC_rate), "TPC_rate[2][5]/F");
+    //m_treeBEAST->Branch("TPC_dose", &(m_beast.TPC_dose), "TPC_dose[2][5]/F");
+    //m_treeBEAST->Branch("TPC_angular_rate", &(m_beast.TPC_angular_rate), "TPC_angular_rate[2][9][18]/F");
+    //m_treeBEAST->Branch("TPC_angular_dose", &(m_beast.TPC_angular_dose), "TPC_angular_dose[2][9][18]/F");
     m_treeBEAST->Branch("CSI_sumE", &(m_beast.CSI_sumE));
     m_treeBEAST->Branch("CSI_Ebin", &(m_beast.CSI_Ebin));
     m_treeBEAST->Branch("CSI_hitRate", &(m_beast.CSI_hitRate));
@@ -542,9 +748,16 @@ namespace Belle2 {
     m_treeBEAST->Branch("CLAWS_rate", &(m_beast.CLAWS_rate));
     m_treeBEAST->Branch("QCSS_rate", &(m_beast.QCSS_rate));
 
+    m_treeBEAST->Branch("DOSI_av", &(m_beast.DOSI_av));
+    m_treeBEAST->Branch("DOSI", &(m_beast.DOSI));
     m_treeBEAST->Branch("PIN_dose_av", &(m_beast.PIN_dose_av));
     m_treeBEAST->Branch("BGO_energy_av", &(m_beast.BGO_energy_av));
     m_treeBEAST->Branch("HE3_rate_av", &(m_beast.HE3_rate_av));
+    m_treeBEAST->Branch("TPC_rate_av", &(m_beast.TPC_rate_av), "TPC_rate_av[2][5]/F");
+    //m_treeBEAST->Branch("TPC_dose_av", &(m_beast.TPC_dose_av), "TPC_dose_av[2][5]/F");
+    m_treeBEAST->Branch("TPC_dose_av", &(m_beast.TPC_dose_av));
+    m_treeBEAST->Branch("TPC_angular_rate_av", &(m_beast.TPC_angular_rate_av), "TPC_angular_rate_av[2][9][18]/F");
+    m_treeBEAST->Branch("TPC_angular_dose_av", &(m_beast.TPC_angular_dose_av), "TPC_angular_dose_av[2][9][18]/F");
     m_treeBEAST->Branch("CSI_sumE_av", &(m_beast.CSI_sumE_av));
     m_treeBEAST->Branch("CSI_Ebin_av", &(m_beast.CSI_Ebin_av));
     m_treeBEAST->Branch("CSI_hitRate_av", &(m_beast.CSI_hitRate_av));
@@ -556,6 +769,12 @@ namespace Belle2 {
     m_treeBEAST->Branch("SAD_LER_lifetime", &(m_beast.SAD_LER_lifetime));
     m_treeBEAST->Branch("SAD_HER_lifetime_av", &(m_beast.SAD_HER_lifetime_av));
     m_treeBEAST->Branch("SAD_LER_lifetime_av", &(m_beast.SAD_LER_lifetime_av));
+    m_treeBEAST->Branch("SAD_HER_RLR", &(m_beast.SAD_HER_RLR));
+    m_treeBEAST->Branch("SAD_LER_RLR", &(m_beast.SAD_LER_RLR));
+    m_treeBEAST->Branch("SKB_HER_RLR", &(m_beast.SKB_HER_RLR));
+    m_treeBEAST->Branch("SKB_LER_RLR", &(m_beast.SKB_LER_RLR));
+    m_treeBEAST->Branch("SAD_HER_RLR_av", &(m_beast.SAD_HER_RLR_av));
+    m_treeBEAST->Branch("SAD_LER_RLR_av", &(m_beast.SAD_LER_RLR_av));
     /*
     m_treeBEAST->Branch("TPC_neutrons_N", &(m_beast.TPC_neutrons_N));
     m_treeBEAST->Branch("TPC_neutrons_tracks_E", &(m_beast.TPC_neutrons_tracks_E));
@@ -573,17 +792,12 @@ namespace Belle2 {
     m_treeTruth->Branch("SAD_I_LER", &(m_input_I_LER));
     m_treeTruth->Branch("SAD_P_HER", &(m_input_P_HER));
     m_treeTruth->Branch("SAD_P_LER", &(m_input_P_LER));
-    m_treeTruth->Branch("SAD_sigma_HER", &(m_input_sigma_HER));
-    m_treeTruth->Branch("SAD_sigma_LER", &(m_input_sigma_LER));
+    m_treeTruth->Branch("SAD_sigma_x_HER", &(m_input_sigma_x_HER));
+    m_treeTruth->Branch("SAD_sigma_x_LER", &(m_input_sigma_x_LER));
+    m_treeTruth->Branch("SAD_sigma_y_HER", &(m_input_sigma_y_HER));
+    m_treeTruth->Branch("SAD_sigma_y_LER", &(m_input_sigma_y_LER));
     m_treeTruth->Branch("SAD_bunchNb_HER", &(m_input_bunchNb_HER));
     m_treeTruth->Branch("SAD_bunchNb_LER", &(m_input_bunchNb_LER));
-
-    m_treeTruth->Branch("LT_SAD_lifetime", &(m_input_LT_SAD_lifetime));
-    m_treeTruth->Branch("HT_SAD_lifetime", &(m_input_HT_SAD_lifetime));
-    m_treeTruth->Branch("LC_SAD_lifetime", &(m_input_LC_SAD_lifetime));
-    m_treeTruth->Branch("HC_SAD_lifetime", &(m_input_HC_SAD_lifetime));
-    m_treeTruth->Branch("LB_SAD_lifetime", &(m_input_LB_SAD_lifetime));
-    m_treeTruth->Branch("HB_SAD_lifetime", &(m_input_HB_SAD_lifetime));
 
     for (int i = 0; i < 12; i ++) {
       m_treeTruth->Branch(TString::Format("MC_LC_DIA_dose_%d", i), &(m_input_LC_DIA_dose[i]));
@@ -605,6 +819,26 @@ namespace Belle2 {
       m_treeTruth->Branch(TString::Format("MC_HC_HE3_rate_%d", i), &(m_input_HC_HE3_rate[i]));
       m_treeTruth->Branch(TString::Format("MC_LB_HE3_rate_%d", i), &(m_input_LB_HE3_rate[i]));
       m_treeTruth->Branch(TString::Format("MC_HB_HE3_rate_%d", i), &(m_input_HB_HE3_rate[i]));
+
+      //m_treeTruth->Branch(TString::Format("MC_LC_TPC_rate_%d", i), &(m_input_LC_TPC_rate[i]));
+      //m_treeTruth->Branch(TString::Format("MC_HC_TPC_rate_%d", i), &(m_input_HC_TPC_rate[i]));
+      //m_treeTruth->Branch(TString::Format("MC_LB_TPC_rate_%d", i), &(m_input_LB_TPC_rate[i]));
+      //m_treeTruth->Branch(TString::Format("MC_HB_TPC_rate_%d", i), &(m_input_HB_TPC_rate[i]));
+
+      //m_treeTruth->Branch(TString::Format("MC_LC_TPC_dose_%d", i), &(m_input_LC_TPC_dose[i]));
+      //m_treeTruth->Branch(TString::Format("MC_HC_TPC_dose_%d", i), &(m_input_HC_TPC_dose[i]));
+      //m_treeTruth->Branch(TString::Format("MC_LB_TPC_dose_%d", i), &(m_input_LB_TPC_dose[i]));
+      //m_treeTruth->Branch(TString::Format("MC_HB_TPC_dose_%d", i), &(m_input_HB_TPC_dose[i]));
+
+      //m_treeTruth->Branch(TString::Format("MC_LC_TPC_angular_rate_%d", i), &(m_input_LC_TPC_angular_rate[i]));
+      //m_treeTruth->Branch(TString::Format("MC_HC_TPC_angular_rate_%d", i), &(m_input_HC_TPC_angular_rate[i]));
+      //m_treeTruth->Branch(TString::Format("MC_LB_TPC_angular_rate_%d", i), &(m_input_LB_TPC_angular_rate[i]));
+      //m_treeTruth->Branch(TString::Format("MC_HB_TPC_angular_rate_%d", i), &(m_input_HB_TPC_angular_rate[i]));
+
+      //m_treeTruth->Branch(TString::Format("MC_LC_TPC_angular_dose_%d", i), &(m_input_LC_TPC_angular_dose[i]));
+      //m_treeTruth->Branch(TString::Format("MC_HC_TPC_angular_dose_%d", i), &(m_input_HC_TPC_angular_dose[i]));
+      //m_treeTruth->Branch(TString::Format("MC_LB_TPC_angular_dose_%d", i), &(m_input_LB_TPC_angular_dose[i]));
+      //m_treeTruth->Branch(TString::Format("MC_HB_TPC_angular_dose_%d", i), &(m_input_HB_TPC_angular_dose[i]));
 
       m_treeTruth->Branch(TString::Format("MC_LC_CSI_rate_%d", i), &(m_input_LC_CSI_rate[i]));
       m_treeTruth->Branch(TString::Format("MC_HC_CSI_rate_%d", i), &(m_input_HC_CSI_rate[i]));
@@ -654,6 +888,34 @@ namespace Belle2 {
     m_treeTruth->Branch("MC_HC_HE3_rate_av", &(m_input_HC_HE3_rate_av));
     m_treeTruth->Branch("MC_LB_HE3_rate_av", &(m_input_LB_HE3_rate_av));
     m_treeTruth->Branch("MC_HB_HE3_rate_av", &(m_input_HB_HE3_rate_av));
+
+    //m_treeTruth->Branch("MC_LT_TPC_rate", &(m_input_LT_TPC_rate));
+    //m_treeTruth->Branch("MC_HT_TPC_rate", &(m_input_HT_TPC_rate));
+    m_treeTruth->Branch("MC_LC_TPC_rate_av", &(m_input_LC_TPC_rate_av));
+    m_treeTruth->Branch("MC_HC_TPC_rate_av", &(m_input_HC_TPC_rate_av));
+    m_treeTruth->Branch("MC_LB_TPC_rate_av", &(m_input_LB_TPC_rate_av));
+    m_treeTruth->Branch("MC_HB_TPC_rate_av", &(m_input_HB_TPC_rate_av));
+
+    //m_treeTruth->Branch("MC_LT_TPC_dose", &(m_input_LT_TPC_dose));
+    //m_treeTruth->Branch("MC_HT_TPC_dose", &(m_input_HT_TPC_dose));
+    m_treeTruth->Branch("MC_LC_TPC_dose_av", &(m_input_LC_TPC_dose_av));
+    m_treeTruth->Branch("MC_HC_TPC_dose_av", &(m_input_HC_TPC_dose_av));
+    m_treeTruth->Branch("MC_LB_TPC_dose_av", &(m_input_LB_TPC_dose_av));
+    m_treeTruth->Branch("MC_HB_TPC_dose_av", &(m_input_HB_TPC_dose_av));
+
+    //m_treeTruth->Branch("MC_LT_TPC_angular_rate", &(m_input_LT_TPC_angular_rate));
+    //m_treeTruth->Branch("MC_HT_TPC_angular_rate", &(m_input_HT_TPC_angular_rate));
+    m_treeTruth->Branch("MC_LC_TPC_angular_rate_av", &(m_input_LC_TPC_angular_rate_av));
+    m_treeTruth->Branch("MC_HC_TPC_angular_rate_av", &(m_input_HC_TPC_angular_rate_av));
+    m_treeTruth->Branch("MC_LB_TPC_angular_rate_av", &(m_input_LB_TPC_angular_rate_av));
+    m_treeTruth->Branch("MC_HB_TPC_angular_rate_av", &(m_input_HB_TPC_angular_rate_av));
+
+    //m_treeTruth->Branch("MC_LT_TPC_angular_dose", &(m_input_LT_TPC_angular_dose));
+    //m_treeTruth->Branch("MC_HT_TPC_angular_dose", &(m_input_HT_TPC_angular_dose));
+    m_treeTruth->Branch("MC_LC_TPC_angular_dose_av", &(m_input_LC_TPC_angular_dose_av));
+    m_treeTruth->Branch("MC_HC_TPC_angular_dose_av", &(m_input_HC_TPC_angular_dose_av));
+    m_treeTruth->Branch("MC_LB_TPC_angular_dose_av", &(m_input_LB_TPC_angular_dose_av));
+    m_treeTruth->Branch("MC_HB_TPC_angular_dose_av", &(m_input_HB_TPC_angular_dose_av));
 
     m_treeTruth->Branch("MC_LT_CSI_rate", &(m_input_LT_CSI_rate));
     m_treeTruth->Branch("MC_HT_CSI_rate", &(m_input_HT_CSI_rate));
@@ -708,36 +970,77 @@ namespace Belle2 {
     m_tree->GetEntry(m_eventCount);
 
     double I_HER = 0;
-    if (m_beast.SKB_HER_current != 0) I_HER = m_beast.SKB_HER_current->at(0);
+    if (m_beast.SKB_HER_current != 0 && m_beast.SKB_HER_current->size() > 0) I_HER = m_beast.SKB_HER_current->at(0);
     if (m_input_I_HER[1] > 0) I_HER += gRandom->Gaus(0, m_input_I_HER[1]);
     double I_LER = 0;
-    if (m_beast.SKB_LER_current != 0) I_LER = m_beast.SKB_LER_current->at(0);
+    if (m_beast.SKB_LER_current != 0 && m_beast.SKB_LER_current->size() > 0) I_LER = m_beast.SKB_LER_current->at(0);
     if (m_input_I_LER[1] > 0) I_LER += gRandom->Gaus(0, m_input_I_LER[1]);
     double P_HER = 0;
-    if (m_beast.SKB_HER_pressure_average != 0) P_HER = m_beast.SKB_HER_pressure_average->at(0) * 0.00750062 * 1e9;
+    if (m_beast.SKB_HER_pressure_average != 0
+        && m_beast.SKB_HER_pressure_average->size() > 0) P_HER = m_beast.SKB_HER_pressure_average->at(
+                0) * 0.00750062 * 1e9 * m_input_GasCorrection[0];
     if (m_input_P_HER[1] > 0) P_HER += gRandom->Gaus(0, m_input_P_HER[1]);
     double P_LER = 0;
-    if (m_beast.SKB_LER_pressure_average != 0) P_LER = m_beast.SKB_LER_pressure_average->at(0) * 0.00750062 * 1e9;
+    if (m_beast.SKB_LER_pressure_average != 0
+        && m_beast.SKB_LER_pressure_average->size() > 0) P_LER = m_beast.SKB_LER_pressure_average->at(
+                0) * 0.00750062 * 1e9 * m_input_GasCorrection[1];
     if (m_input_P_LER[1] > 0) P_LER += gRandom->Gaus(0, m_input_P_LER[1]);
     double sigma_y_HER = 0;
-    if (m_beast.SKB_HER_correctedbeamSize_xray_Y != 0) sigma_y_HER = m_beast.SKB_HER_correctedbeamSize_xray_Y->at(0);
-    if (m_input_sigma_HER[1] > 0) sigma_y_HER += gRandom->Gaus(0, m_input_sigma_HER[1]);
+    double sigma_x_HER = 0;
+    if (m_beast.SKB_HER_correctedBeamSize_xray_Y != 0
+        && m_beast.SKB_HER_beamSize_xray_Y != 0
+        && m_beast.SKB_HER_correctedBeamSize_xray_Y->size() > 0) {
+      sigma_y_HER = m_beast.SKB_HER_correctedBeamSize_xray_Y->at(0);
+
+      if (m_beast.SKB_HER_beamSize_SR_X != 0 && m_beast.SKB_HER_beamSize_SR_Y
+          && m_beast.SKB_HER_beamSize_SR_X->size() > 0
+          && m_beast.SKB_HER_beamSize_SR_Y->size() > 0)
+        sigma_x_HER = m_beast.SKB_HER_correctedBeamSize_xray_Y->at(0) *  m_beast.SKB_HER_beamSize_SR_X->at(
+                        0) /  m_beast.SKB_HER_beamSize_SR_Y->at(0);
+    }
+    /*
+    if (m_beast.SKB_HER_beamSize_xray_Y != 0
+        && m_beast.SKB_HER_beamSize_xray_Y != 0
+        && m_beast.SKB_HER_beamSize_xray_Y->size() > 0) sigma_y_HER = m_beast.SKB_HER_beamSize_xray_Y->at(0);
+    */
+    if (m_input_sigma_x_HER[1] > 0) sigma_x_HER += gRandom->Gaus(0, m_input_sigma_x_HER[1]);
+    if (m_input_sigma_y_HER[1] > 0) sigma_y_HER += gRandom->Gaus(0, m_input_sigma_y_HER[1]);
     double sigma_y_LER = 0;
-    if (m_beast.SKB_LER_correctedbeamSize_xray_Y != 0) sigma_y_LER = m_beast.SKB_LER_correctedbeamSize_xray_Y->at(0);
-    if (m_input_sigma_LER[1] > 0) sigma_y_LER += gRandom->Gaus(0, m_input_sigma_LER[1]);
+    double sigma_x_LER = 0;
+    if (m_beast.SKB_LER_correctedBeamSize_xray_Y != 0
+        && m_beast.SKB_LER_beamSize_xray_Y != 0
+        && m_beast.SKB_LER_correctedBeamSize_xray_Y->size() > 0) {
+      sigma_y_LER = m_beast.SKB_LER_correctedBeamSize_xray_Y->at(0);
+
+      if (m_beast.SKB_LER_beamSize_SR_X != 0 && m_beast.SKB_LER_beamSize_SR_Y
+          && m_beast.SKB_LER_beamSize_SR_X->size() > 0
+          && m_beast.SKB_LER_beamSize_SR_Y->size() > 0)
+        sigma_x_LER = m_beast.SKB_LER_correctedBeamSize_xray_Y->at(0) *  m_beast.SKB_LER_beamSize_SR_X->at(
+                        0) /  m_beast.SKB_LER_beamSize_SR_Y->at(0);
+    }
+    /*
+    if (m_beast.SKB_LER_beamSize_xray_Y != 0
+        && m_beast.SKB_LER_beamSize_xray_Y != 0
+        && m_beast.SKB_LER_beamSize_xray_Y->size() > 0) sigma_y_LER = m_beast.SKB_LER_beamSize_xray_Y->at(0);
+    */
+    if (m_input_sigma_x_LER[1] > 0) sigma_x_LER += gRandom->Gaus(0, m_input_sigma_x_LER[1]);
+    if (m_input_sigma_y_LER[1] > 0) sigma_y_LER += gRandom->Gaus(0, m_input_sigma_y_LER[1]);
     double bunch_nb_HER = 0;
-    if (m_beast.SKB_HER_injectionNumberOfBunches != 0) bunch_nb_HER = m_beast.SKB_HER_injectionNumberOfBunches->at(0);
+    if (m_beast.SKB_HER_injectionNumberOfBunches != 0
+        && m_beast.SKB_HER_injectionNumberOfBunches->size() > 0) bunch_nb_HER = m_beast.SKB_HER_injectionNumberOfBunches->at(0);
     if (bunch_nb_HER == 0) bunch_nb_HER = m_input_data_bunchNb_HER;
     if (m_input_bunchNb_HER[1] > 0) bunch_nb_HER += gRandom->Gaus(0, m_input_bunchNb_HER[1]);
     double bunch_nb_LER = 0;
-    if (m_beast.SKB_LER_injectionNumberOfBunches != 0) bunch_nb_LER = m_beast.SKB_LER_injectionNumberOfBunches->at(0);
+    if (m_beast.SKB_LER_injectionNumberOfBunches != 0
+        && m_beast.SKB_LER_injectionNumberOfBunches->size() > 0) bunch_nb_LER = m_beast.SKB_LER_injectionNumberOfBunches->at(0);
     if (bunch_nb_LER == 0) bunch_nb_LER = m_input_data_bunchNb_LER;
     if (m_input_bunchNb_LER[1] > 0) bunch_nb_LER += gRandom->Gaus(0, m_input_bunchNb_LER[1]);
+
     /*
-    cout << " I_HER = " << I_HER << " P_HER = " << P_HER << " sigma_y_HER = " << sigma_y_HER << " bunch_nb_HER = " << bunch_nb_HER <<
-         endl;
-    cout << " I_LER = " << I_LER << " P_LER = " << P_LER << " sigma_y_LER = " << sigma_y_LER << " bunch_nb_LER = " << bunch_nb_LER <<
-         endl;
+    if (I_HER < 0 || I_HER > 2100.) I_HER = 0;
+    if (I_LER < 0 || I_LER > 2100.) I_LER = 0;
+    if (P_HER < 0 || P_HER > 760.) P_HER = 0;
+    if (P_LER < 0 || P_LER > 760.) P_LER = 0;
     */
     if (I_HER < 0) I_HER = 0;
     if (I_LER < 0) I_LER = 0;
@@ -752,70 +1055,143 @@ namespace Belle2 {
       P_LER = 0;
     }
 
-    //Calculate Beam Gas scaling factor: Beam Gas \propo I x P => (IP)^data / (IP)^simu
+    double Ib_HER = 0;
+    if (bunch_nb_HER > 0) Ib_HER = I_HER / bunch_nb_HER * 1e-3; // mA -> A
+    double Ib_LER = 0;
+    if (bunch_nb_LER > 0) Ib_LER = I_LER / bunch_nb_LER * 1e-3; // mA -> A
+
+    double Nb_HER = 0;
+    if (Ib_HER > 0) Nb_HER = Ib_HER * 3000. / TMath::C() / (1.6e-19);
+    double Nb_LER = 0;
+    if (Ib_LER > 0) Nb_LER = Ib_LER * 3000. / TMath::C() / (1.6e-19);
+
+    double RLR_HER = 0;
+    if (m_beast.SKB_HER_lifetime != 0 && m_beast.SKB_HER_lifetime->size() > 0 && Nb_HER > 0) {
+      RLR_HER = Nb_HER / (m_beast.SKB_HER_lifetime->at(0) * 60.) * 1e-9 * bunch_nb_HER;
+      m_beast.SKB_HER_RLR.push_back(RLR_HER);
+    }
+    double RLR_LER = 0;
+    if (m_beast.SKB_LER_lifetime != 0 && m_beast.SKB_LER_lifetime->size() > 0 && Nb_LER > 0) {
+      RLR_LER = Nb_LER / (m_beast.SKB_LER_lifetime->at(0) * 60.) * 1e-9 * bunch_nb_LER;
+      m_beast.SKB_LER_RLR.push_back(RLR_LER);
+    }
+
+    //Calculate Beam Gas scaling factor:
+    //                       solution 0: Beam Gas \propo I x P => (IP)^data / (IP)^simu
+    //                       solution 1: Beam Gas \propo I x P => (I_bP)^data / (I_bP)^simu where I_b = current / #bunch
     double ScaleFacBGav_HER = 0;
     double ScaleFacBGav_LER = 0;
-    if (I_LER > 0 && P_LER > 0)
-      ScaleFacBGav_LER = I_LER * P_LER / (m_input_I_LER[0] * m_input_P_LER[0]); // bunch_nb_LER / m_input_bunchNb_LER[0];
-    if (I_HER > 0 && P_HER > 0)
-      ScaleFacBGav_HER = I_HER * P_HER / (m_input_I_HER[0] * m_input_P_HER[0]); // bunch_nb_HER / m_input_bunchNb_HER[0];
+    if (I_LER > 0 && P_LER > 0) {
+      if (m_input_BGSol == 0
+          && bunch_nb_LER > 0) ScaleFacBGav_LER = I_LER * P_LER / (m_input_I_LER[0] * m_input_P_LER[0]) / bunch_nb_LER *
+                                                    m_input_bunchNb_LER[0];
+      if (m_input_BGSol == 1 && bunch_nb_LER > 0) ScaleFacBGav_LER = I_LER * P_LER / (m_input_I_LER[0] * m_input_P_LER[0]);
+    }
+    if (I_HER > 0 && P_HER > 0) {
+      if (m_input_BGSol == 0
+          && bunch_nb_HER > 0) ScaleFacBGav_HER = I_HER * P_HER / (m_input_I_HER[0] * m_input_P_HER[0]) / bunch_nb_HER *
+                                                    m_input_bunchNb_HER[0];
+      if (m_input_BGSol == 1 && bunch_nb_HER > 0) ScaleFacBGav_HER = I_HER * P_HER / (m_input_I_HER[0] * m_input_P_HER[0]);
+    }
 
     //Calculate Beam Gas scaling factor: Beam Gas \propo I x P => (IP)^data / (IP)^simu
     double ScaleFacBG_HER[12];
     double ScaleFacBG_LER[12];
-    for (int i = 0; i < 12; i++) {
-      ScaleFacBG_HER[i] = 0;
-      ScaleFacBG_LER[i] = 0;
-      double iP_HER = 0;
-      if (m_beast.SKB_HER_pressures != 0) iP_HER = m_beast.SKB_HER_pressures->at(i) * 0.00750062 * 1e9;
-      if (m_input_P_HER[1] > 0) iP_HER += gRandom->Gaus(0, m_input_P_HER[1]);
-      double iP_LER = 0;
-      if (m_beast.SKB_LER_pressures != 0) iP_LER = m_beast.SKB_LER_pressures->at(i) * 0.00750062 * 1e9;
-      if (m_input_P_LER[1] > 0) iP_LER += gRandom->Gaus(0, m_input_P_LER[1]);
-      if (iP_HER < 0) iP_HER = 0;
-      if (iP_LER < 0) iP_LER = 0;
-      if (I_LER > 0 && iP_LER > 0)
-        ScaleFacBG_LER[i] = I_LER * iP_LER / (m_input_I_LER[0] * m_input_P_LER[0]); // bunch_nb_LER / m_input_bunchNb_LER[0];
-      if (I_HER > 0 && iP_HER > 0)
-        ScaleFacBG_HER[i] = I_HER * iP_HER / (m_input_I_HER[0] * m_input_P_HER[0]); // bunch_nb_HER / m_input_bunchNb_HER[0];
+    if (m_beast.SKB_HER_pressures != 0) {
+      for (int i = 0; i < (int)m_beast.SKB_HER_pressures->size(); i++) {
+        ScaleFacBG_HER[i] = 0;
+        double iP_HER = 0;
+        iP_HER = m_beast.SKB_HER_pressures->at(i) * 0.00750062 * 1e9 * m_input_GasCorrection[0];
+        if (m_input_P_HER[1] > 0) iP_HER += gRandom->Gaus(0, m_input_P_HER[1]);
+        if (iP_HER < 0 || iP_HER > 260.) iP_HER = 0;
+        if (I_HER > 0 && iP_HER > 0) {
+          if (m_input_BGSol == 0
+              && bunch_nb_HER > 0) ScaleFacBG_HER[i] = I_HER * iP_HER / (m_input_I_HER[0] * m_input_P_HER[0]) / bunch_nb_HER *
+                                                         m_input_bunchNb_HER[0];
+          if (m_input_BGSol == 1 && bunch_nb_HER > 0) ScaleFacBG_HER[i] = I_HER * iP_HER / (m_input_I_HER[0] * m_input_P_HER[0]);
+        }
+      }
     }
+    if (m_beast.SKB_LER_pressures != 0) {
+      for (int i = 0; i < (int)m_beast.SKB_LER_pressures->size(); i++) {
+        ScaleFacBG_LER[i] = 0;
+        double iP_LER = 0;
+        iP_LER = m_beast.SKB_LER_pressures->at(i) * 0.00750062 * 1e9 * m_input_GasCorrection[1];
+        if (m_input_P_LER[1] > 0) iP_LER += gRandom->Gaus(0, m_input_P_LER[1]);
+        if (iP_LER < 0 || iP_LER > 260.) iP_LER = 0;
+        if (I_LER > 0 && iP_LER > 0) {
+          if (m_input_BGSol == 0
+              && bunch_nb_LER > 0) ScaleFacBG_LER[i] = I_LER * iP_LER / (m_input_I_LER[0] * m_input_P_LER[0]) / bunch_nb_LER *
+                                                         m_input_bunchNb_LER[0];
+          if (m_input_BGSol == 1 && bunch_nb_LER > 0) ScaleFacBG_LER[i] = I_LER * iP_LER / (m_input_I_LER[0] * m_input_P_LER[0]);
+        }
+      }
+    }
+
     //Calculate Touschek scaling factor: Touschek \propo I^2 / (bunch_nb x sigma_y) => (I^2/(bunch_nb x sigma_y))^data / (I^2/(bunch_nb x sigma_y))^simu
     double ScaleFacTo_HER = 0;
     double ScaleFacTo_LER = 0;
-    if (bunch_nb_LER > 0 && sigma_y_LER > 0 && I_LER > 0)
-      ScaleFacTo_LER = TMath::Power(I_LER / m_input_I_LER[0],
-                                    2) / (bunch_nb_LER / m_input_bunchNb_LER[0]) / (sigma_y_LER / m_input_sigma_LER[0]);
-    if (bunch_nb_HER > 0 && sigma_y_HER > 0 && I_HER > 0)
-      ScaleFacTo_HER = TMath::Power(I_HER / m_input_I_HER[0],
-                                    2) / (bunch_nb_HER / m_input_bunchNb_HER[0]) / (sigma_y_HER / m_input_sigma_HER[0]);
-
-    //cout << " factor BG LER " << ScaleFacBG_LER << " Toushek LER " << ScaleFacTo_LER << endl;
-    //cout << " factor BG HER " << ScaleFacBG_HER << " Toushek HER " << ScaleFacTo_HER << endl;
-
-    //Scale LER SAD lifetime
-    for (int i = 0; i < (int)m_input_LT_SAD_lifetime.size(); i++) {
-      float LBG = 1. / m_input_LB_SAD_lifetime[i] + 1. / m_input_LC_SAD_lifetime[i];
-      float BG = LBG * ScaleFacBGav_LER;
-      float To = ScaleFacTo_LER * 1. / m_input_LT_SAD_lifetime[i];
-      m_beast.SAD_LER_lifetime_av.push_back(1. / (BG + To));
-      BG = 0;
-      for (int j = 0; j < 12; j++) {
-        BG += LBG / 12. * ScaleFacBG_LER[j];
-      }
-      m_beast.SAD_LER_lifetime.push_back(1. / (BG + To));
+    if (bunch_nb_LER > 0 && sigma_y_LER > 0 && I_LER > 0) {
+      if (m_input_ToSol == 0) ScaleFacTo_LER = TMath::Power(I_LER / m_input_I_LER[0],
+                                                              2) / (bunch_nb_LER / m_input_bunchNb_LER[0]) / (sigma_y_LER / m_input_sigma_y_LER[0]);
+      else if (m_input_ToSol == 1) ScaleFacTo_LER = TMath::Power(I_LER / m_input_I_LER[0],
+                                                                   2) / (bunch_nb_LER / m_input_bunchNb_LER[0]) /
+                                                      (sqrt(sigma_y_LER * sigma_x_LER / m_input_sigma_y_LER[0] / m_input_sigma_x_LER[0]));
+    }
+    if (bunch_nb_HER > 0 && sigma_y_HER > 0 && I_HER > 0) {
+      if (m_input_ToSol == 0) ScaleFacTo_HER = TMath::Power(I_HER / m_input_I_HER[0],
+                                                              2) / (bunch_nb_HER / m_input_bunchNb_HER[0]) / (sigma_y_HER / m_input_sigma_y_HER[0]);
+      else if (m_input_ToSol == 1) ScaleFacTo_HER = TMath::Power(I_HER / m_input_I_HER[0],
+                                                                   2) / (bunch_nb_HER / m_input_bunchNb_HER[0]) /
+                                                      (sqrt(sigma_y_HER * sigma_x_HER / m_input_sigma_y_HER[0] / m_input_sigma_x_HER[0]));
     }
 
-    //Scale HER SAD lifetime
-    for (int i = 0; i < (int)m_input_HT_SAD_lifetime.size(); i++) {
-      float HBG = 1. / m_input_HB_SAD_lifetime[i] + 1. / m_input_HC_SAD_lifetime[i];
-      float BG = HBG * ScaleFacBGav_HER;
-      float To = ScaleFacTo_HER * 1. / m_input_HT_SAD_lifetime[i];
-      m_beast.SAD_HER_lifetime_av.push_back(1. / (BG + To));
+    //Scale LER SAD RLR
+    for (int i = 0; i < (int)m_input_LT_SAD_RLR.size(); i++) {
+      float LBG = m_input_LB_SAD_RLR_av[i] + m_input_LC_SAD_RLR_av[i];
+      float BG = LBG * ScaleFacBGav_LER;
+      float To = ScaleFacTo_LER * m_input_LT_SAD_RLR[i];
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
+      m_beast.SAD_LER_RLR_av.push_back(BG + To);
+      m_beast.SAD_LER_lifetime_av.push_back(Nb_LER / (BG + To) * 1e-9 / 60. * bunch_nb_LER);
       BG = 0;
+      LBG = 0;
       for (int j = 0; j < 12; j++) {
-        BG += HBG / 12. * ScaleFacBG_HER[j];
+        LBG = 0;
+        if (m_input_LB_SAD_RLR.size() > 0) {
+          LBG = m_input_LB_SAD_RLR[j] + m_input_LC_SAD_RLR[j];
+          BG += LBG * ScaleFacBG_LER[j];
+        }
       }
-      m_beast.SAD_HER_lifetime.push_back(1. / (BG + To));
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
+      m_beast.SAD_LER_RLR.push_back(BG + To);
+      m_beast.SAD_LER_lifetime.push_back(Nb_LER / (BG + To) * 1e-9 / 60. * bunch_nb_LER);
+    }
+
+    //Scale HER SAD RLR
+    for (int i = 0; i < (int)m_input_HT_SAD_RLR.size(); i++) {
+      float HBG = m_input_HB_SAD_RLR_av[i] + m_input_HC_SAD_RLR_av[i];
+      float BG = HBG * ScaleFacBGav_HER;
+      float To = ScaleFacTo_HER * m_input_HT_SAD_RLR[i];
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
+      m_beast.SAD_HER_RLR_av.push_back(BG + To);
+      m_beast.SAD_HER_lifetime_av.push_back(Nb_HER / (BG + To) * 1e-9 / 60. * bunch_nb_HER);
+      BG = 0;
+      HBG = 0;
+      for (int j = 0; j < 12; j++) {
+        HBG = 0;
+        if (m_input_HB_SAD_RLR.size() > 0) {
+          HBG = m_input_HB_SAD_RLR[j] + m_input_HC_SAD_RLR[j];
+          BG += HBG * ScaleFacBG_HER[j];
+        }
+      }
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
+      m_beast.SAD_HER_RLR.push_back(BG + To);
+      m_beast.SAD_HER_lifetime.push_back(Nb_HER / (BG + To) * 1e-9 / 60. * bunch_nb_HER);
     }
 
     //Scale DIA
@@ -824,18 +1200,28 @@ namespace Belle2 {
       double HBG = m_input_HB_DIA_dose_av[i] + m_input_HC_DIA_dose_av[i];
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_DIA_dose[i] + ScaleFacTo_HER * m_input_HT_DIA_dose[i];
+      /*cout << "ch # " << i
+           << " av LB " << m_input_LB_DIA_dose_av[i] << " LC " <<  m_input_LC_DIA_dose_av[i]
+           << " HB " << m_input_HB_DIA_dose_av[i] << " HC " <<  m_input_HC_DIA_dose_av[i]
+           << " LT " << m_input_LT_DIA_dose[i] << " HT " <<  m_input_HT_DIA_dose[i]
+           << endl;*/
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
       m_beast.DIA_dose_av.push_back(BG + To);
-    }
-    for (int i = 0; i < (int)m_input_LT_DIA_dose.size(); i++) {
-      double BG = 0;
+      BG = 0; LBG = 0; HBG = 0;
       for (int j = 0; j < 12; j++) {
+        LBG = 0; HBG = 0;
         if (m_input_LB_DIA_dose[j].size() > 0) {
-          double LBG = m_input_LB_DIA_dose[j][i] + m_input_LC_DIA_dose[j][i];
-          double HBG = m_input_HB_DIA_dose[j][i] + m_input_HC_DIA_dose[j][i];
+          LBG = m_input_LB_DIA_dose[j][i] + m_input_LC_DIA_dose[j][i];
+          HBG = m_input_HB_DIA_dose[j][i] + m_input_HC_DIA_dose[j][i];
+          /*cout << "section " << j
+               << " LB " << m_input_LB_DIA_dose[j][i] << " LC " << m_input_LC_DIA_dose[j][i] << " HB " <<  m_input_HB_DIA_dose[j][i] << " HC " <<
+               m_input_HC_DIA_dose[j][i] << endl;*/
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
-      double To = ScaleFacTo_LER * m_input_LT_DIA_dose[i] + ScaleFacTo_HER * m_input_HT_DIA_dose[i];
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
       m_beast.DIA_dose.push_back(BG + To);
     }
 
@@ -845,19 +1231,47 @@ namespace Belle2 {
       double HBG = m_input_HB_PIN_dose_av[i] + m_input_HC_PIN_dose_av[i];
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_PIN_dose[i] + ScaleFacTo_HER * m_input_HT_PIN_dose[i];
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
       m_beast.PIN_dose_av.push_back(BG + To);
-    }
-    for (int i = 0; i < (int)m_input_LT_PIN_dose.size(); i++) {
-      double BG = 0;
+      BG = 0; LBG = 0; HBG = 0;
       for (int j = 0; j < 12; j++) {
+        LBG = 0; HBG = 0;
         if (m_input_LB_PIN_dose[j].size() > 0) {
-          double LBG = m_input_LB_PIN_dose[j][i] + m_input_LC_PIN_dose[j][i];
-          double HBG = m_input_HB_PIN_dose[j][i] + m_input_HC_PIN_dose[j][i];
+          LBG = m_input_LB_PIN_dose[j][i] + m_input_LC_PIN_dose[j][i];
+          HBG = m_input_HB_PIN_dose[j][i] + m_input_HC_PIN_dose[j][i];
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
-      double To = ScaleFacTo_LER * m_input_LT_PIN_dose[i] + ScaleFacTo_HER * m_input_HT_PIN_dose[i];
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
       m_beast.PIN_dose.push_back(BG + To);
+    }
+
+    //Scale DOSI
+    for (int i = 0; i < (int)m_input_LT_DOSI.size(); i++) {
+      //cout << "LB : " << m_input_LB_DOSI_av[i] << " LC " << m_input_LC_DOSI_av[i] << endl;
+      //cout << "HB : " << m_input_HB_DOSI_av[i] << " HC " << m_input_HC_DOSI_av[i] << endl;
+      //cout << "HT : " << m_input_HT_DOSI[i] << " LT " << m_input_LT_DOSI[i] << endl;
+      double LBG = m_input_LB_DOSI_av[i] + m_input_LC_DOSI_av[i];
+      double HBG = m_input_HB_DOSI_av[i] + m_input_HC_DOSI_av[i];
+      double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
+      double To = ScaleFacTo_LER * m_input_LT_DOSI[i] + ScaleFacTo_HER * m_input_HT_DOSI[i];
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
+      m_beast.DOSI_av.push_back(BG + To);
+      BG = 0; LBG = 0; HBG = 0;
+      for (int j = 0; j < 12; j++) {
+        LBG = 0; HBG = 0;
+        if (m_input_LB_DOSI[j].size() > 0) {
+          LBG = m_input_LB_DOSI[j][i] + m_input_LC_DOSI[j][i];
+          HBG = m_input_HB_DOSI[j][i] + m_input_HC_DOSI[j][i];
+          BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
+        }
+      }
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
+      m_beast.DOSI.push_back(BG + To);
     }
 
     //Scale BGO
@@ -866,18 +1280,20 @@ namespace Belle2 {
       double HBG = m_input_HB_BGO_dose_av[i] + m_input_HC_BGO_dose_av[i];
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_BGO_dose[i] + ScaleFacTo_HER * m_input_HT_BGO_dose[i];
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
       m_beast.BGO_energy_av.push_back(BG + To);
-    }
-    for (int i = 0; i < (int)m_input_LT_BGO_dose.size(); i++) {
-      double BG = 0;
+      BG = 0; LBG = 0; HBG = 0;
       for (int j = 0; j < 12; j++) {
+        LBG = 0; HBG = 0;
         if (m_input_LB_BGO_dose[j].size() > 0) {
-          double LBG = m_input_LB_BGO_dose[j][i] + m_input_LC_BGO_dose[j][i];
-          double HBG = m_input_HB_BGO_dose[j][i] + m_input_HC_BGO_dose[j][i];
+          LBG = m_input_LB_BGO_dose[j][i] + m_input_LC_BGO_dose[j][i];
+          HBG = m_input_HB_BGO_dose[j][i] + m_input_HC_BGO_dose[j][i];
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
-      double To = ScaleFacTo_LER * m_input_LT_BGO_dose[i] + ScaleFacTo_HER * m_input_HT_BGO_dose[i];
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
       m_beast.BGO_energy.push_back(BG + To);
     }
 
@@ -887,20 +1303,113 @@ namespace Belle2 {
       double HBG = m_input_HB_HE3_rate_av[i] + m_input_HC_HE3_rate_av[i];
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_HE3_rate[i] + ScaleFacTo_HER * m_input_HT_HE3_rate[i];
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
       m_beast.HE3_rate_av.push_back(BG + To);
-    }
-    for (int i = 0; i < (int)m_input_LT_HE3_rate.size(); i++) {
-      double BG = 0;
+      BG = 0; LBG = 0; HBG = 0;
       for (int j = 0; j < 12; j++) {
+        LBG = 0; HBG = 0;
         if (m_input_LB_HE3_rate[j].size() > 0) {
-          double LBG = m_input_LB_HE3_rate[j][i] + m_input_LC_HE3_rate[j][i];
-          double HBG = m_input_HB_HE3_rate[j][i] + m_input_HC_HE3_rate[j][i];
+          LBG = m_input_LB_HE3_rate[j][i] + m_input_LC_HE3_rate[j][i];
+          HBG = m_input_HB_HE3_rate[j][i] + m_input_HC_HE3_rate[j][i];
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
-      double To = ScaleFacTo_LER * m_input_LT_HE3_rate[i] + ScaleFacTo_HER * m_input_HT_HE3_rate[i];
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
       m_beast.HE3_rate.push_back(BG + To);
     }
+
+    //Scale TPC
+    for (int i = 0; i < (int)m_input_LT_TPC_rate.size(); i++) {
+      double LBG = m_input_LB_TPC_rate_av[i] + m_input_LC_TPC_rate_av[i];
+      double HBG = m_input_HB_TPC_rate_av[i] + m_input_HC_TPC_rate_av[i];
+      double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
+      double To = ScaleFacTo_LER * m_input_LT_TPC_rate[i] + ScaleFacTo_HER * m_input_HT_TPC_rate[i];
+      int tpc_ch = (int)(i / 5);
+      int n_type = i - 5 * tpc_ch;
+      m_beast.TPC_rate_av[tpc_ch][n_type] = (BG + To);
+      BG = 0; LBG = 0; HBG = 0;
+      for (int j = 0; j < 12; j++) {
+        LBG = 0; HBG = 0;
+        if (m_input_LB_TPC_rate[j].size() > 0) {
+          LBG = m_input_LB_TPC_rate[j][i] + m_input_LC_TPC_rate[j][i];
+          HBG = m_input_HB_TPC_rate[j][i] + m_input_HC_TPC_rate[j][i];
+          BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
+        }
+      }
+      //m_beast.TPC_rate[tpc_ch][n_type] = (BG + To);
+    }
+
+
+    //Scale TPC_dose
+    for (int i = 0; i < (int)m_input_LT_TPC_dose.size(); i++) {
+      double LBG = m_input_LB_TPC_dose_av[i] + m_input_LC_TPC_dose_av[i];
+      double HBG = m_input_HB_TPC_dose_av[i] + m_input_HC_TPC_dose_av[i];
+      double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
+      double To = ScaleFacTo_LER * m_input_LT_TPC_dose[i] + ScaleFacTo_HER * m_input_HT_TPC_dose[i];
+      //int tpc_ch = (int)(i / 5);
+      //int n_type = i - 5 * tpc_ch;
+      //m_beast.TPC_dose_av[tpc_ch][n_type] = (BG + To);
+      m_beast.TPC_dose_av.push_back(BG + To);
+      BG = 0; LBG = 0; HBG = 0;
+      for (int j = 0; j < 12; j++) {
+        LBG = 0; HBG = 0;
+        if (m_input_LB_TPC_dose[j].size() > 0) {
+          LBG = m_input_LB_TPC_dose[j][i] + m_input_LC_TPC_dose[j][i];
+          HBG = m_input_HB_TPC_dose[j][i] + m_input_HC_TPC_dose[j][i];
+          BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
+        }
+      }
+      //m_beast.TPC_dose[tpc_ch][n_type] = (BG + To);
+    }
+
+    //Scale TPC_angular
+    for (int i = 0; i < (int)m_input_LT_TPC_angular_rate.size(); i++) {
+      double LBG = m_input_LB_TPC_angular_rate_av[i] + m_input_LC_TPC_angular_rate_av[i];
+      double HBG = m_input_HB_TPC_angular_rate_av[i] + m_input_HC_TPC_angular_rate_av[i];
+      double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
+      double To = ScaleFacTo_LER * m_input_LT_TPC_angular_rate[i] + ScaleFacTo_HER * m_input_HT_TPC_angular_rate[i];
+      int tpc_ch = (int)(i / (9 * 18));
+      int angle = i - (9 * 18) * tpc_ch;
+      int i_theta = (int)(angle / 18);
+      int i_phi = angle - 9 * i_theta;
+      m_beast.TPC_angular_rate_av[tpc_ch][i_theta][i_phi] = (BG + To);
+      BG = 0; LBG = 0; HBG = 0;
+      for (int j = 0; j < 12; j++) {
+        LBG = 0; HBG = 0;
+        if (m_input_LB_TPC_angular_rate[j].size() > 0) {
+          LBG = m_input_LB_TPC_angular_rate[j][i] + m_input_LC_TPC_angular_rate[j][i];
+          HBG = m_input_HB_TPC_angular_rate[j][i] + m_input_HC_TPC_angular_rate[j][i];
+          BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
+        }
+      }
+      //m_beast.TPC_angular_rate[tpc_ch][n_type] = (BG + To);
+    }
+
+    //Scale TPC_angular_dose
+    for (int i = 0; i < (int)m_input_LT_TPC_angular_dose.size(); i++) {
+      double LBG = m_input_LB_TPC_angular_dose_av[i] + m_input_LC_TPC_angular_dose_av[i];
+      double HBG = m_input_HB_TPC_angular_dose_av[i] + m_input_HC_TPC_angular_dose_av[i];
+      double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
+      double To = ScaleFacTo_LER * m_input_LT_TPC_angular_dose[i] + ScaleFacTo_HER * m_input_HT_TPC_angular_dose[i];
+      int tpc_ch = (int)(i / (9 * 18));
+      int angle = i - (9 * 18) * tpc_ch;
+      int i_theta = (int)(angle / 18);
+      int i_phi = angle - 9 * i_theta;
+      m_beast.TPC_angular_dose_av[tpc_ch][i_theta][i_phi] = (BG + To);
+      BG = 0; LBG = 0; HBG = 0;
+      for (int j = 0; j < 12; j++) {
+        LBG = 0; HBG = 0;
+        if (m_input_LB_TPC_angular_dose[j].size() > 0) {
+          LBG = m_input_LB_TPC_angular_dose[j][i] + m_input_LC_TPC_angular_dose[j][i];
+          HBG = m_input_HB_TPC_angular_dose[j][i] + m_input_HC_TPC_angular_dose[j][i];
+          BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
+        }
+      }
+      //m_beast.TPC_angular_dose[tpc_ch][n_type] = (BG + To);
+    }
+
 
     //Scale CLAWS
     for (int i = 0; i < (int)m_input_LT_CLAWS_rate.size(); i++) {
@@ -908,18 +1417,20 @@ namespace Belle2 {
       double HBG = m_input_HB_CLAWS_rate_av[i] + m_input_HC_CLAWS_rate_av[i];
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_CLAWS_rate[i] + ScaleFacTo_HER * m_input_HT_CLAWS_rate[i];
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
       m_beast.CLAWS_rate_av.push_back(BG + To);
-    }
-    for (int i = 0; i < (int)m_input_LT_CLAWS_rate.size(); i++) {
-      double BG = 0;
+      BG = 0; LBG = 0; HBG = 0;
       for (int j = 0; j < 12; j++) {
+        LBG = 0; HBG = 0;
         if (m_input_LB_CLAWS_rate[j].size() > 0) {
-          double LBG = m_input_LB_CLAWS_rate[j][i] + m_input_LC_CLAWS_rate[j][i];
-          double HBG = m_input_HB_CLAWS_rate[j][i] + m_input_HC_CLAWS_rate[j][i];
+          LBG = m_input_LB_CLAWS_rate[j][i] + m_input_LC_CLAWS_rate[j][i];
+          HBG = m_input_HB_CLAWS_rate[j][i] + m_input_HC_CLAWS_rate[j][i];
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
-      double To = ScaleFacTo_LER * m_input_LT_CLAWS_rate[i] + ScaleFacTo_HER * m_input_HT_CLAWS_rate[i];
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
       m_beast.CLAWS_rate.push_back(BG + To);
     }
 
@@ -929,18 +1440,20 @@ namespace Belle2 {
       double HBG = m_input_HB_QCSS_rate_av[i] + m_input_HC_QCSS_rate_av[i];
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_QCSS_rate[i] + ScaleFacTo_HER * m_input_HT_QCSS_rate[i];
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
       m_beast.QCSS_rate_av.push_back(BG + To);
-    }
-    for (int i = 0; i < (int)m_input_LT_QCSS_rate.size(); i++) {
-      double BG = 0;
+      BG = 0; LBG = 0; HBG = 0;
       for (int j = 0; j < 12; j++) {
+        LBG = 0; HBG = 0;
         if (m_input_LB_QCSS_rate[j].size() > 0) {
-          double LBG = m_input_LB_QCSS_rate[j][i] + m_input_LC_QCSS_rate[j][i];
-          double HBG = m_input_HB_QCSS_rate[j][i] + m_input_HC_QCSS_rate[j][i];
+          LBG = m_input_LB_QCSS_rate[j][i] + m_input_LC_QCSS_rate[j][i];
+          HBG = m_input_HB_QCSS_rate[j][i] + m_input_HC_QCSS_rate[j][i];
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
-      double To = ScaleFacTo_LER * m_input_LT_QCSS_rate[i] + ScaleFacTo_HER * m_input_HT_QCSS_rate[i];
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
       m_beast.QCSS_rate.push_back(BG + To);
     }
 
@@ -950,56 +1463,62 @@ namespace Belle2 {
       double HBG = m_input_HB_CSI_dose_av[i] + m_input_HC_CSI_dose_av[i];
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_CSI_dose[i] + ScaleFacTo_HER * m_input_HT_CSI_dose[i];
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
       m_beast.CSI_sumE_av.push_back(BG + To);
+      BG = 0; LBG = 0; HBG = 0;
+      for (int j = 0; j < 12; j++) {
+        LBG = 0; HBG = 0;
+        if (m_input_LB_CSI_dose[j].size() > 0) {
+          LBG = m_input_LB_CSI_dose[j][i] + m_input_LC_CSI_dose[j][i];
+          HBG = m_input_HB_CSI_dose[j][i] + m_input_HC_CSI_dose[j][i];
+          BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
+        }
+      }
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
+      m_beast.CSI_sumE.push_back(BG + To);
     }
     for (int i = 0; i < (int)m_input_LT_CSI_dose_binE.size(); i++) {
       double LBG = m_input_LB_CSI_dose_binE_av[i] + m_input_LC_CSI_dose_binE_av[i];
       double HBG = m_input_HB_CSI_dose_binE_av[i] + m_input_HC_CSI_dose_binE_av[i];
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_CSI_dose_binE[i] + ScaleFacTo_HER * m_input_HT_CSI_dose_binE[i];
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
       m_beast.CSI_Ebin_av.push_back(BG + To);
+      BG = 0; LBG = 0; HBG = 0;
+      for (int j = 0; j < 12; j++) {
+        LBG = 0; HBG = 0;
+        if (m_input_LB_CSI_dose_binE[j].size() > 0) {
+          LBG = m_input_LB_CSI_dose_binE[j][i] + m_input_LC_CSI_dose_binE[j][i];
+          HBG = m_input_HB_CSI_dose_binE[j][i] + m_input_HC_CSI_dose_binE[j][i];
+          BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
+        }
+      }
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
+      m_beast.CSI_Ebin.push_back(BG + To);
     }
     for (int i = 0; i < (int)m_input_LT_CSI_rate.size(); i++) {
       double LBG = m_input_LB_CSI_rate_av[i] + m_input_LC_CSI_rate_av[i];
       double HBG = m_input_HB_CSI_rate_av[i] + m_input_HC_CSI_rate_av[i];
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_CSI_rate[i] + ScaleFacTo_HER * m_input_HT_CSI_rate[i];
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
       m_beast.CSI_hitRate_av.push_back(BG + To);
-    }
-    for (int i = 0; i < (int)m_input_LT_CSI_dose.size(); i++) {
-      double BG = 0;
+      BG = 0; LBG = 0; HBG = 0;
       for (int j = 0; j < 12; j++) {
-        if (m_input_LB_CSI_dose[j].size() > 0) {
-          double LBG = m_input_LB_CSI_dose[j][i] + m_input_LC_CSI_dose[j][i];
-          double HBG = m_input_HB_CSI_dose[j][i] + m_input_HC_CSI_dose[j][i];
-          BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
-        }
-      }
-      double To = ScaleFacTo_LER * m_input_LT_CSI_dose[i] + ScaleFacTo_HER * m_input_HT_CSI_dose[i];
-      m_beast.CSI_sumE.push_back(BG + To);
-    }
-    for (int i = 0; i < (int)m_input_LT_CSI_dose_binE.size(); i++) {
-      double BG = 0;
-      for (int j = 0; j < 12; j++) {
-        if (m_input_LB_CSI_dose_binE[j].size() > 0) {
-          double LBG = m_input_LB_CSI_dose_binE[j][i] + m_input_LC_CSI_dose_binE[j][i];
-          double HBG = m_input_HB_CSI_dose_binE[j][i] + m_input_HC_CSI_dose_binE[j][i];
-          BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
-        }
-      }
-      double To = ScaleFacTo_LER * m_input_LT_CSI_dose_binE[i] + ScaleFacTo_HER * m_input_HT_CSI_dose_binE[i];
-      m_beast.CSI_Ebin.push_back(BG + To);
-    }
-    for (int i = 0; i < (int)m_input_LT_CSI_rate.size(); i++) {
-      double BG = 0;
-      for (int j = 0; j < 12; j++) {
+        LBG = 0; HBG = 0;
         if (m_input_LB_CSI_rate[j].size() > 0) {
-          double LBG = m_input_LB_CSI_rate[j][i] + m_input_LC_CSI_rate[j][i];
-          double HBG = m_input_HB_CSI_rate[j][i] + m_input_HC_CSI_rate[j][i];
+          LBG = m_input_LB_CSI_rate[j][i] + m_input_LC_CSI_rate[j][i];
+          HBG = m_input_HB_CSI_rate[j][i] + m_input_HC_CSI_rate[j][i];
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
-      double To = ScaleFacTo_LER * m_input_LT_CSI_rate[i] + ScaleFacTo_HER * m_input_HT_CSI_rate[i];
+      //if (TMath::IsNaN(To)) To = 0;
+      //if (TMath::IsNaN(BG)) BG = 0;
       m_beast.CSI_hitRate.push_back(BG + To);
     }
 
@@ -1033,4 +1552,3 @@ namespace Belle2 {
   }
 
 } // end Belle2 namespace
-

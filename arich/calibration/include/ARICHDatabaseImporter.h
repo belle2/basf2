@@ -37,8 +37,6 @@ namespace Belle2 {
     /**
      * Constructor
      */
-//    ARICHDatabaseImporter(std::vector<std::string> inputFilesHapdQA, std::vector<std::string> inputFilesAsicRoot,
-//                          std::vector<std::string> inputFilesAsicTxt, std::vector<std::string> inputFilesHapdQE);
     ARICHDatabaseImporter(std::vector<std::string> inputFilesHapdQA, std::vector<std::string> inputFilesAsicRoot,
                           std::vector<std::string> inputFilesAsicTxt, std::vector<std::string> inputFilesHapdQE, std::vector<std::string> inputFilesFebTest);
 
@@ -47,241 +45,6 @@ namespace Belle2 {
      */
     virtual ~ARICHDatabaseImporter() {};
 
-    /**
-     * Import ARICH aerogel data in the database.
-     */
-    void importAerogelInfo();
-
-    /**
-     * Export ARICH aerogel data from the database.
-     */
-    void exportAerogelInfo();
-
-    /**
-     * Import intrarun dependant ARICH aerogel data in the database. -> Example for intrarun dependat data!
-     */
-    void importAerogelInfoEventDep();
-
-    /**
-     * Export intrarun dependant ARICH aerogel data from the database. -> Example for intrarun dependat data!
-     */
-    void exportAerogelInfoEventDep();
-
-    /**
-     * Import ARICH HAPD QA data in the database.
-     */
-    void importHapdQA();
-
-    /**
-     * Export ARICH HAPD QA data from the database.
-     */
-    void exportHapdQA();
-
-    /**
-     * Import ARICH ASICs data in the database.
-     */
-    void importAsicInfo();
-
-    /**
-     * Import ARICH ASICs data in the database.
-     */
-    void importAsicInfoRoot();
-
-    /**
-     * Export ARICH ASICs data from the database.
-     */
-    void exportAsicInfo();
-
-    /**
-     * Convert date (ASICs) to TTimeStamp.
-     * @param enddate - time as string
-     */
-    TTimeStamp timedate(std::string enddate);
-
-    /**
-     * Get date for ASIC measurement.
-     * @param asicSerial - serial number of asic
-     * @param type - gain or offset
-     */
-    TTimeStamp getAsicDate(std::string asicSerial, std::string type);
-
-    /**
-     * Get lists of problematic ASIC channels.
-     */
-    std::vector<int> channelsList(std::string badCH);
-
-    /**
-     * Import ARICH FEB test data in the database.
-     */
-    void importFebTest();
-    void importFebTestRoot();
-
-    /**
-     * Returns data from low voltage test
-     */
-    std::tuple<std::string, float, float, float> getFebLVtestData(int serial, int lvRun);
-
-    /**
-     * Returns data from high voltage test
-     */
-    std::tuple<std::string, float> getFebHVtestData(int serial, int hvRun);
-
-    /**
-     * Returns list of dead channels on FEB
-     */
-    std::vector<int> getDeadChFEB(std::string dna);
-
-    /**
-     * Convert date (FEB) to TTimeStamp.
-     * @param time - time as string
-     */
-    TTimeStamp timedate2(std::string time);
-
-    /**
-     * Returns lists of slopes (fine & rough)
-     */
-    std::pair<std::vector<float>, std::vector<float>> getSlopes(int serialNum, std::string runSCAN);
-
-    /**
-     * Returns lists of FWHM values&sigmas
-     */
-    std::vector<std::pair<float, float>> getFwhm(int serialNum, std::string runSCAN);
-
-    /**
-     * Returns TH3F histograms - offset settings
-     */
-    std::vector<TH3F*> getFebTestHistograms(std::string dna, std::string run, int febposition);
-
-    /**
-     * Returns TH2F histogram of pulse test
-     */
-    TH2F* getFebTestPulse(std::string dna, std::string run, int febposition);
-
-    /**
-     * Export ARICH FEB test data from the database.
-     */
-    void exportFebTest();
-
-    /**
-     * Import ARICH HAPD chip data in the database.
-     */
-    void importHapdChipInfo();
-
-    /**
-     * Export ARICH HAPD chip data from the database.
-     */
-    void exportHapdChipInfo();
-
-    /**
-     * Import ARICH HAPD data in the database.
-     */
-    void importHapdInfo();
-
-    /**
-     * Get lists of problematic HAPD channels.
-     */
-    std::vector<int> channelsListHapd(std::string chlist, int channelDelay);
-
-    /**
-     * Get position of channel on HAPD.
-     * @param XY - choose X/Y coordinate
-     * @param chip_2d - chip label
-     * @param chipnum - channel number
-     */
-    int getChannelPosition(std::string XY, std::string chip_2d, int chipnum);
-
-    /**
-     * Get graphs for bombardment and avalanche gain and current.
-     * @param bomb_val - bombardment or avalanche
-     * @param g_i - gain or current
-     * @param chip_label - chip label
-     * @param i - number of entries
-     * @param HV - voltage
-     * @param gain_current - gain/current
-     */
-    TGraph* getGraphGainCurrent(std::string bomb_aval, std::string g_i, std::string chip_label, int i, float* HV, float* gain_current);
-
-    /**
-     * Get histograms for bias voltage and current.
-     * @param chip_2d - chip label
-     * @param voltage_current - voltage or current
-     * @param chipnum - channel number
-     * @param bias_v_i - bias voltage/current
-     */
-    TH2F* getBiasGraph(std::string chip_2d, std::string voltage_current, int* chipnum, float* bias_v_i);
-
-    /**
-     * Export ARICH HAPD info and chip info data from the database.
-     */
-    void exportHapdInfo();
-
-    /**
-     * Import HAPD quantum efficiency in the database.
-     */
-    void importHapdQE();
-
-    /**
-     * Export HAPD quantum efficiency from the database.
-     */
-    void exportHapdQE();
-
-    /**
-     * Export ARICH HAPD chip info data from the database and calculate bias voltages for one HAPD.
-     * @param HAPD serial number
-     */
-    void getBiasVoltagesForHapdChip(std::string serialNumber);
-
-    /**
-     * Example that shows how to use data from the database
-     * @param aerogel serial number
-     */
-    void getMyParams(std::string aeroSerialNumber);
-
-    /**
-     * Function that returns refractive index, thickness and transmission length of aerogel
-     * @param aerogel serial number
-     */
-    std::map<std::string, float> getAerogelParams(std::string aeroSerialNumber);
-
-    /**
-     * Import module test results
-     */
-    void importFEBoardInfo();
-
-    /**
-     * Export module test results
-     */
-    void exportFEBoardInfo();
-
-    /**
-     * Import module test results
-     */
-    void importModuleTest(std::string mypath, std::string HVtest);
-
-    /**
-     * Export module test results
-     */
-    void exportModuleTest(std::string HVtest);
-
-    /**
-     * Import module sensor info classes
-     */
-    void importSensorModuleInfo();
-
-    /**
-     * Import module sensor map classes
-     */
-    void importSensorModuleMap();
-
-    /**
-     * Export module sensor map and info classes from database
-     */
-    void exportSensorModuleMap();
-
-    /**
-     * Export all the data
-     */
-    void exportAll();
 
     // classes used in simulation/reconstruction software
 
@@ -307,6 +70,11 @@ namespace Belle2 {
      * Print HAPD modules info from the database (lightweight class for sim/rec=)
      */
     void printModulesInfo();
+
+    /**
+     *  Example function for importing HAPD QE to database class (ARICHModulesInfo)
+     */
+    void setHAPDQE(unsigned modID, double qe = 0.27, bool import = false);
 
     /**
      * Import channel mask for all HAPD modules from the database (list of dead channels)
@@ -366,6 +134,260 @@ namespace Belle2 {
     void importCosmicTestGeometry();
 
     void importGeometryConfig();
+
+
+    // classes used in conditions DB
+
+    /**
+     * Import ARICH aerogel data in the database.
+     */
+    void importAerogelInfo();
+
+    /**
+     * Export ARICH aerogel data from the database.
+     */
+    void exportAerogelInfo();
+
+    /**
+     * Import intrarun dependant ARICH aerogel data in the database. -> Example for intrarun dependat data!
+     */
+    void importAerogelInfoEventDep();
+
+    /**
+     * Export intrarun dependant ARICH aerogel data from the database. -> Example for intrarun dependat data!
+     */
+    void exportAerogelInfoEventDep();
+
+    /**
+     * Import ARICH HAPD QA data in the database.
+     */
+    void importHapdQA();
+
+    /**
+     * Export ARICH HAPD QA data from the database.
+     */
+    void exportHapdQA();
+
+    /**
+     * Import ARICH ASICs data in the database.
+     */
+    void importAsicInfo();
+
+    /**
+     * Import large histograms from ARICH ASICs data in the database.
+     */
+    void importAsicInfoRoot();
+
+    /**
+     * Export ARICH ASICs data from the database.
+     */
+    void exportAsicInfo();
+
+    /**
+     * Convert date (ASICs) to TTimeStamp.
+     * @param enddate - time as string
+     */
+    TTimeStamp timedate(std::string enddate);
+
+    /**
+     * Get date for ASIC measurement.
+     * @param asicSerial - serial number of asic
+     * @param type - gain or offset
+     */
+    TTimeStamp getAsicDate(const std::string& asicSerial, const std::string& type);
+
+    /**
+     * Get lists of problematic ASIC channels.
+     */
+    std::vector<int> channelsList(std::string badCH);
+
+    /**
+     * Import ARICH FEB test data in the database.
+     */
+    void importFebTest();
+
+    /**
+     * Import large histograms from ARICH FEB test data in the database.
+     */
+    void importFebTestRoot();
+
+    /**
+     * Returns data from low voltage test
+     */
+    std::tuple<std::string, float, float, float> getFebLVtestData(int serial, int lvRun);
+
+    /**
+     * Returns data from high voltage test
+     */
+    std::tuple<std::string, float> getFebHVtestData(int serial, int hvRun);
+
+    /**
+     * Returns list of dead channels on FEB
+     */
+    std::vector<int> getDeadChFEB(const std::string& dna);
+
+    /**
+     * Convert date (FEB) to TTimeStamp.
+     * @param time - time as string
+     */
+    TTimeStamp timedate2(std::string time);
+
+    /**
+     * Returns lists of slopes (fine & rough)
+     */
+    std::pair<std::vector<float>, std::vector<float>> getSlopes(int serialNum, const std::string& runSCAN);
+
+    /**
+     * Returns lists of FWHM values&sigmas
+     */
+    std::vector<std::pair<float, float>> getFwhm(int serialNum, const std::string& runSCAN);
+
+    /**
+     * Returns TH3F histograms - offset settings
+     */
+    std::vector<TH3F*> getFebTestHistograms(const std::string& dna, const std::string& run, int febposition);
+
+    /**
+     * Returns TH2F histogram of pulse test
+     */
+    TH2F* getFebTestPulse(const std::string& dna, const std::string& run, int febposition);
+
+    /**
+     * Export ARICH FEB test data from the database.
+     */
+    void exportFebTest();
+
+    /**
+     * Import ARICH HAPD chip data in the database.
+     */
+    void importHapdChipInfo();
+
+    /**
+     * Export ARICH HAPD chip data from the database.
+     */
+    void exportHapdChipInfo();
+
+    /**
+     * Import ARICH HAPD data in the database.
+     */
+    void importHapdInfo();
+
+    /**
+     * Get lists of problematic HAPD channels.
+     */
+    std::vector<int> channelsListHapd(std::string chlist, int channelDelay);
+
+    /**
+     * Get position of channel on HAPD.
+     * @param XY - choose X/Y coordinate
+     * @param chip_2d - chip label
+     * @param chipnum - channel number
+     */
+    int getChannelPosition(const std::string& XY, const std::string& chip_2d, int chipnum);
+
+    /**
+     * Get graphs for bombardment and avalanche gain and current.
+     * @param bomb_val - bombardment or avalanche
+     * @param g_i - gain or current
+     * @param chip_label - chip label
+     * @param i - number of entries
+     * @param HV - voltage
+     * @param gain_current - gain/current
+     */
+    TGraph* getGraphGainCurrent(const std::string& bomb_aval, const std::string& g_i, const std::string& chip_label, int i, float* HV,
+                                float* gain_current);
+
+    /**
+     * Get histograms for bias voltage and current.
+     * @param chip_2d - chip label
+     * @param voltage_current - voltage or current
+     * @param chipnum - channel number
+     * @param bias_v_i - bias voltage/current
+     */
+    TH2F* getBiasGraph(const std::string& chip_2d, const std::string& voltage_current, int* chipnum, float* bias_v_i);
+
+    /**
+     * Export ARICH HAPD info and chip info data from the database.
+     */
+    void exportHapdInfo();
+
+    /**
+     * Import HAPD quantum efficiency in the database.
+     */
+    void importHapdQE();
+
+    /**
+     * Export HAPD quantum efficiency from the database.
+     */
+    void exportHapdQE();
+
+    /**
+     * Export ARICH HAPD chip info data from the database and calculate bias voltages for one HAPD.
+     * @param HAPD serial number
+     */
+    void getBiasVoltagesForHapdChip(const std::string& serialNumber);
+
+    /**
+     * Example that shows how to use data from the database
+     * @param aerogel serial number
+     */
+    void getMyParams(const std::string& aeroSerialNumber);
+
+    /**
+     * Function that returns refractive index, thickness and transmission length of aerogel
+     * @param aerogel serial number
+     */
+    std::map<std::string, float> getAerogelParams(const std::string& aeroSerialNumber);
+
+    /**
+     * Import module test results
+     */
+    void importFEBoardInfo();
+
+    /**
+     * Export module test results
+     */
+    void exportFEBoardInfo();
+
+    /**
+     * Import module test results
+     */
+    void importModuleTest(const std::string& mypath, const std::string& HVtest);
+
+    /**
+     * Export module test results
+     */
+    void exportModuleTest(const std::string& HVtest);
+
+    /**
+     * Import module sensor info classes
+     */
+    void importSensorModuleInfo();
+
+    /**
+     * Import module sensor map classes
+     */
+    void importSensorModuleMap();
+
+    /**
+     * Export module sensor map and info classes from database
+     */
+    void exportSensorModuleMap();
+
+    /**
+     * Import results of magnet test
+     */
+    void importMagnetTest();
+
+    /**
+     * Export results of magnet test
+     */
+    void exportMagnetTest();
+
+    /**
+     * Export all the data
+     */
+    void exportAll();
 
 
   private:

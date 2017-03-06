@@ -25,6 +25,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 
 //
 #include <analysis/utility/PCmsLabTransform.h>
@@ -34,6 +35,9 @@
 
 #include <TLorentzVector.h>
 #include <TVector3.h>
+
+#include <functional>
+#include <string>
 
 namespace Belle2 {
   namespace Variable {
@@ -47,19 +51,25 @@ namespace Belle2 {
 
     double isContinuumEvent(const Particle*)
     {
-      StoreArray<MCParticle> mcParticles;
-      for (int i = 0; i < mcParticles.getEntries(); ++i) {
-        if (mcParticles[i]->getPDG() == 300553)
-          return 0.0;
-      }
-      return 1.0;
+      return (isNotContinuumEvent(nullptr) == 1.0 ? 0.0 : 1.0);
     }
 
     double isNotContinuumEvent(const Particle*)
     {
       StoreArray<MCParticle> mcParticles;
-      for (int i = 0; i < mcParticles.getEntries(); ++i) {
-        if (mcParticles[i]->getPDG() == 300553)
+      if (!mcParticles) {
+        B2ERROR("Cannot find MCParticles array.");
+        return 0.0;
+      }
+      for (const MCParticle& mcp : mcParticles) {
+        int pdg_no = mcp.getPDG();
+        if (mcp.getMother() == nullptr &&
+            ((pdg_no == 553) ||
+             (pdg_no == 100553) ||
+             (pdg_no == 200553) ||
+             (pdg_no == 300553) ||
+             (pdg_no == 9000553) ||
+             (pdg_no == 9010553)))
           return 1.0;
       }
       return 0.0;
@@ -101,6 +111,77 @@ namespace Belle2 {
         result += klmClusters[i]->getMomentum().Energy();
       }
       return result;
+    }
+
+    double missingEnergy(const Particle*)
+    {
+      PCmsLabTransform T;
+      TLorentzVector totalMomChargedtracks; //Momentum of charged X tracks in CMS-System
+      TLorentzVector totalMomChargedclusters; //Momentum of charged X clusters in CMS-System
+      TLorentzVector momNeutralClusters; //Momentum of neutral X clusters in CMS-System
+      double ECMS = T.getCMSEnergy();
+
+      StoreArray<Track> tracks;
+      for (int i = 0; i < tracks.getEntries(); ++i) {
+        const TrackFitResult* iTrack = tracks[i]->getTrackFitResult(tracks[i]->getRelated<PIDLikelihood>()->getMostLikely());
+        if (iTrack == nullptr) continue;
+        TLorentzVector momtrack(iTrack->getMomentum(), 0);
+        if (momtrack == momtrack) totalMomChargedtracks += momtrack;
+      }
+      StoreArray<ECLCluster> eclClusters;
+      for (int i = 0; i < eclClusters.getEntries(); ++i) {
+        TLorentzVector iMomECLCluster = eclClusters[i] -> get4Vector();
+        if (iMomECLCluster == iMomECLCluster) {
+          if (eclClusters[i]->isNeutral()) momNeutralClusters += iMomECLCluster;
+          else if (!(eclClusters[i]->isNeutral())) totalMomChargedclusters += iMomECLCluster;
+        }
+      }
+      StoreArray<KLMCluster> klmClusters;
+      for (int i = 0; i < klmClusters.getEntries(); ++i) {
+        TLorentzVector iMomKLMCluster = klmClusters[i] -> getMomentum();
+        if (iMomKLMCluster == iMomKLMCluster) {
+          if (!(klmClusters[i] -> getAssociatedTrackFlag()) && !(klmClusters[i] -> getAssociatedEclClusterFlag())) {
+            momNeutralClusters += iMomKLMCluster;
+          }
+        }
+      }
+      TLorentzVector totalMomCharged(totalMomChargedtracks.Vect(), totalMomChargedclusters.E());
+      TLorentzVector totalMom = T.rotateLabToCms() * (totalMomCharged + momNeutralClusters);
+
+      return totalMom.E() - ECMS;
+    }
+
+    double uniqueEventID(const Particle*)
+    {
+
+      // We want to construct a quantity which is different for each event
+      // even if the experiment and run are all 0 (which
+      // happens for Belle II MC).
+      std::hash<std::string> m_hasher;
+
+      std::string to_hash;
+      to_hash = std::to_string(expNum(nullptr));
+      to_hash += std::to_string(evtNum(nullptr));
+      to_hash += std::to_string(runNum(nullptr));
+      to_hash += std::to_string(productionIdentifier(nullptr));
+      to_hash += std::to_string(nECLClusters(nullptr));
+      to_hash += std::to_string(nKLMClusters(nullptr));
+      to_hash += std::to_string(nTracks(nullptr));
+      to_hash += std::to_string(ECLEnergy(nullptr));
+      to_hash += std::to_string(KLMEnergy(nullptr));
+
+      // Convert unsigned int decay hash into a float keeping the same bit pattern
+      assert(sizeof(float) == sizeof(uint32_t));
+
+      union convert {
+        uint32_t i;
+        float f;
+      };
+      convert bitconverter;
+
+      bitconverter.i = m_hasher(to_hash);
+      return bitconverter.f;
+
     }
 
     double expNum(const Particle*)
@@ -212,6 +293,14 @@ namespace Belle2 {
                       "[Eventbased] total energy in ECL in the event");
     REGISTER_VARIABLE("KLMEnergy", KLMEnergy,
                       "[Eventbased] total energy in KLM in the event");
+    REGISTER_VARIABLE("missingEnergy", missingEnergy,
+                      "[Eventbased] difference between the total energy of tracks and clusters in CMS and the beam energy");
+
+    REGISTER_VARIABLE("uniqueEventID", uniqueEventID,
+                      "[Eventbased] In some MC the expNum and runNum are 0, hence it is difficult to distinguish"
+                      " if candidates are reconstructed from the same or a different event. This variable constructs"
+                      " a hash from expNum, runNum, evtNum and other event-based variables, to create a unique identifier"
+                      " for each event. Consider using the eventCached MetaVariable if you write out this quantity for each candidate.");
 
     REGISTER_VARIABLE("expNum", expNum, "[Eventbased] experiment number");
     REGISTER_VARIABLE("evtNum", evtNum, "[Eventbased] event number");

@@ -26,6 +26,8 @@ from tracking.validation.run import TrackingValidationRun
 
 class CosmicsAxialHough(TrackingValidationRun):
     n_events = N_EVENTS
+    #: Generator to be used in the simulation (-so)
+    generator_module = 'Cosmics'
     root_input_file = '../CosmicsSimNoBkg.root'
     components = None
 
@@ -50,7 +52,6 @@ class CosmicsAxialHough(TrackingValidationRun):
         'UseOnlyAxialCDCHits': True
     }
 
-    fit_geometry = None
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE
 

@@ -8,6 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facetRelation/BendFacetRelationVarSet.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+
 #include <cassert>
 
 using namespace Belle2;
@@ -75,13 +78,13 @@ bool BendFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRe
   const double deltaCurv = toCurv - fromCurv;
 
   const double dPhiA = 1 / sAB;
-  const double dPhiB = 1 / sAB - 2 / sBC;
-  const double dPhiC = 1 / sCD - 2 / sBC;
+  const double dPhiB = 1 / sAB + 2 / sBC;
+  const double dPhiC = 1 / sCD + 2 / sBC;
   const double dPhiD = 1 / sCD;
 
   const double dCurvA = 2 / sAC / sAB;
-  const double dCurvB = 2 / sAC / sAB - (2 / sAC + 2 / sBD) / sBC;
-  const double dCurvC = 2 / sBD / sCD - (2 / sAC + 2 / sBD) / sBC;
+  const double dCurvB = 2 / sAC / sAB + (2 / sAC + 2 / sBD) / sBC;
+  const double dCurvC = 2 / sBD / sCD + (2 / sAC + 2 / sBD) / sBC;
   const double dCurvD = 2 / sBD / sCD;
 
   const double varLA = fromStartVarL;

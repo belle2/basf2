@@ -105,7 +105,7 @@ namespace Belle2 {
 
     /**
      * Constructor from a Lorentz vector and PDG code.
-     * All other private members are set to their defalt values (0).
+     * All other private members are set to their default values (0).
      * @param momentum Lorentz vector
      * @param pdgCode PDG code
      */
@@ -128,18 +128,18 @@ namespace Belle2 {
 
     /**
      * Constructor for composite particles.
-     * All other private members are set to their defalt values (0).
+     * All other private members are set to their default values (0).
      * @param momentum Lorentz vector
      * @param pdgCode PDG code
      * @param flavorType decay flavor type
-     * @param daughterIndices vector of daughter indices
+     * @param daughterIndices indices of daughters in StoreArray<Particle>
      * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
      */
     Particle(const TLorentzVector& momentum,
              const int pdgCode,
              EFlavorType flavorType,
              const std::vector<int>& daughterIndices,
-             TClonesArray* arrayPointer = 0);
+             TClonesArray* arrayPointer = nullptr);
 
     /**
      * Constructor from a reconstructed track (mdst object Track);
@@ -244,6 +244,12 @@ namespace Belle2 {
     }
 
     /**
+     * Updates particle mass with the mass of the particle corresponding to the given PDG.
+     * @param pdgCode PDG code of the particle with the desired mass
+     */
+    void updateMass(const int pdgCode);
+
+    /**
      * Appends index of daughter to daughters index array
      * @param daughter pointer to the daughter particle
      */
@@ -251,7 +257,7 @@ namespace Belle2 {
 
     /**
      * Appends index of daughter to daughters index array
-     * @param particleIndex daughter particle store array index
+     * @param particleIndex index of daughter in StoreArray<Particle>
      */
     void appendDaughter(int particleIndex)
     {
@@ -639,7 +645,10 @@ namespace Belle2 {
      */
     void addExtraInfo(const std::string& name, float value);
 
-    /** Returns the pointer to the store array which holds the daughter particles */
+    /** Returns the pointer to the store array which holds the daughter particles
+     *
+     *  \warning TClonesArray is dangerously easy to misuse, please avoid.
+     */
     TClonesArray* getArrayPointer() const
     {
       if (!m_arrayPointer)

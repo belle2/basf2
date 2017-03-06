@@ -88,9 +88,15 @@ DBObject DBObjectLoader::load(DBInterface& db,
   StringList list = DBObjectLoader::getDBlist(db, tablename, configname);
   if (list.size() == 0) return obj;
   std::stringstream ss;
+  /*
   ss << "select * from " << tablename << " p where p.path like '" << rootnode << "._%%' and not exists "
      << "(select * from (select * from " << tablename << " where path like '" << rootnode << "._%%') c where c.path "
      << "like p.path || '_%%') order by id";
+  db.execute(ss.str());
+  */
+  ss << "select * from " << tablename << " p where p.path like '" << rootnode << "._%%' and "
+     << "not (value_b is null and value_c is null and value_s is null and value_i is null and "
+     << "value_f is null and value_d is null and value_t is null and value_o is null) order by id";
   db.execute(ss.str());
   DBRecordList record_v(db.loadRecords());
   if (record_v.size() == 0) {

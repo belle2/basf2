@@ -112,6 +112,9 @@ TOPCAFDigitCalib::TOPCAFDigitCalib(const EventWaveformPacket* in_wp)
   m_ref_max_bin = 0;
   m_ref_time = 0;
   m_risetime = 0;
+  m_ref_T1 = 0;
+  m_ref_A1 = 0;
+  m_ref_A2 = 0;
 }
 
 void TOPCAFDigitCalib::SetHitValues(topcaf_hit_t& mydigit)

@@ -193,12 +193,18 @@ namespace Belle2 {
       double m_depletionVoltage;
       /** The bias voltage on the sensor */
       double m_biasVoltage;
-      /** The backplane capacitance wrt. the strips. */
-      double m_backplaneCapacitance;
-      /** The interstrip capacitance for the sensor. */
-      double m_interstripCapacitance;
-      /** The coupling capacitance for the sensor. */
-      double m_couplingCapacitance;
+      /** The backplane capacitanceU wrt. the strips. */
+      double m_backplaneCapacitanceU;
+      /** The interstrip capacitanceU for the sensor. */
+      double m_interstripCapacitanceU;
+      /** The coupling capacitanceU for the sensor. */
+      double m_couplingCapacitanceU;
+      /** The backplane capacitanceV wrt. the strips. */
+      double m_backplaneCapacitanceV;
+      /** The interstrip capacitanceV for the sensor. */
+      double m_interstripCapacitanceV;
+      /** The coupling capacitanceV for the sensor. */
+      double m_couplingCapacitanceV;
       /** Electronic noise for u-strips. */
       double m_elNoiseU;
       /** Electronic noise for v-strips. */

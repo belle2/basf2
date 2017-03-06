@@ -31,6 +31,7 @@
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 
+#include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/Track.h>
 #include <genfit/TrackCand.h>
 #include <genfit/TrackCandHit.h>
@@ -64,7 +65,7 @@ TrackingPerformanceEvaluationModule::TrackingPerformanceEvaluationModule() :
 
   addParam("outputFileName", m_rootFileName, "Name of output root file.",
            std::string("TrackingPerformanceEvaluation_output.root"));
-  addParam("TracksName", m_TracksName, "Name of genfit Track collection.", std::string(""));
+  addParam("TracksName", m_TracksName, "Name of genfit Track collection.", std::string("GF2Tracks"));
   addParam("TrackCandsName", m_TrackCandsName, "Name of genfit TrackCand collection.", std::string(""));
   addParam("MCTrackCandsName", m_MCTrackCandsName, "Name of MC TrackCand collection.", std::string("MCGFTrackCands"));
   addParam("MCParticlesName", m_MCParticlesName, "Name of MC Particle collection.", std::string(""));
@@ -228,6 +229,10 @@ void TrackingPerformanceEvaluationModule::initialize()
                                                        "entry per Track connected to a MCParticle",
                                                        m_h3_MCParticle /*, m_histoList*/);
 
+  m_h3_TrackswPXDHitsPerMCParticle = (TH3F*)duplicateHistogram("h3TrackswPXDHitsPerMCParticle",
+                                     "entry per Track with PXD hits connected to a MCParticle",
+                                     m_h3_MCParticle /*, m_histoList*/);
+
   m_h3_MCTrackCand = (TH3F*)duplicateHistogram("h3MCTrackCand",
                                                "entry per MCTrackCand connected to the MCParticle",
                                                m_h3_MCParticle /*, m_histoList*/);
@@ -235,9 +240,8 @@ void TrackingPerformanceEvaluationModule::initialize()
   m_h3_TracksPerMCTrackCand = (TH3F*)duplicateHistogram("h3TracksPerMCTrackCand",
                                                         "entry per Track connected to an MCTrackCand",
                                                         m_h3_MCParticle /*, m_histoList*/);
-
   //plus
-  m_h3_MCParticle_plus = (TH3F*)duplicateHistogram("h3MCParticlee_plus", "entry per positive MCParticle",
+  m_h3_MCParticle_plus = (TH3F*)duplicateHistogram("h3MCParticle_plus", "entry per positive MCParticle",
                                                    m_h3_MCParticle /*, m_histoList*/);
 
   m_h3_TracksPerMCParticle_plus = (TH3F*)duplicateHistogram("h3TracksPerMCParticle_plus",
@@ -311,6 +315,7 @@ void TrackingPerformanceEvaluationModule::event()
 
     int nFittedTracksMCTC = 0;
     int nFittedTracks = 0;
+    int nFittedTrackswPXDHits = 0;
     int nTracks = 0;
 
     MCParticleInfo mcParticleInfo(mcParticle, magField);
@@ -329,7 +334,7 @@ void TrackingPerformanceEvaluationModule::event()
     //1. retrieve all the Tracks related to the MCParticle
 
     //1.0 check if there is an MCTrackCand
-    RelationVector<genfit::TrackCand> MCTrackCands_fromMCParticle = DataStore::getRelationsToObj<genfit::TrackCand>(&mcParticle,
+    RelationVector<genfit::TrackCand> MCTrackCands_fromMCParticle = DataStore::getRelationsWithObj<genfit::TrackCand>(&mcParticle,
         m_MCTrackCandsName);
     if (MCTrackCands_fromMCParticle.size() > 0) {
       m_h3_MCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
@@ -343,59 +348,72 @@ void TrackingPerformanceEvaluationModule::event()
     }
 
     //1.a retrieve all TrackCands related to the MCParticle
-    RelationVector<genfit::TrackCand> TrackCands_fromMCParticle = DataStore::getRelationsToObj<genfit::TrackCand>(&mcParticle);
+    //    RelationVector<genfit::TrackCand> TrackCands_fromMCParticle = DataStore::getRelationsWithObj<genfit::TrackCand>(&mcParticle);
+    RelationVector<Track> Tracks_fromMCParticle = DataStore::getRelationsWithObj<Track>(&mcParticle);
 
     //    B2DEBUG(99,TrackCands_fromMCParticle.size()<<" TrackCands related to this MCParticle");
+    B2DEBUG(99, Tracks_fromMCParticle.size() << " Tracks related to this MCParticle");
 
-    for (int tc = 0; tc < (int)TrackCands_fromMCParticle.size(); tc++) {
+    //    for (int tc = 0; tc < (int)TrackCands_fromMCParticle.size(); tc++) {
 
-      //1.b retrieve all Tracks related to the TrackCand
-      RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsFromObj<genfit::Track>(TrackCands_fromMCParticle[tc]);
+    //1.b retrieve all Tracks related to the TrackCand
+    //      RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsWithObj<genfit::Track>(TrackCands_fromMCParticle[tc]);
+    //      RelationVector<Track> Tracks_fromTrackCand = DataStore::getRelationsWithObj<Track>(TrackCands_fromMCParticle[tc]);
 
-      //      B2DEBUG(99,"   "<<Tracks_fromTrackCand.size()<<" Track related to this TrackCand");
+    //      B2DEBUG(99,"   "<<Tracks_fromTrackCand.size()<<" Track related to this TrackCand");
 
-      for (int trk = 0; trk < (int)Tracks_fromTrackCand.size(); trk++) {
+    //      for (int trk = 0; trk < (int)Tracks_fromTrackCand.size(); trk++) {
+    for (int trk = 0; trk < (int)Tracks_fromMCParticle.size(); trk++) {
 
-        nTracks++;
+      nTracks++;
 
-        const TrackFitResult* fitResult = DataStore::getRelatedFromObj<TrackFitResult>(Tracks_fromTrackCand[trk]);
+      //        const TrackFitResult* fitResult = Tracks_fromTrackCand[trk]->getTrackFitResult(Const::ChargedStable(211));
+      const TrackFitResult* fitResult = Tracks_fromMCParticle[trk]->getTrackFitResult(Const::ChargedStable(211));
 
-        if (fitResult != NULL) { // valid TrackFitResult found
+      if (fitResult == NULL)
+        B2DEBUG(99, " the TrackFitResult is not found!");
 
-          if (!hasTrack) {
+      else { // valid TrackFitResult found
 
-            hasTrack = true;
+        if (!hasTrack) {
 
-            nFittedTracks++;
+          hasTrack = true;
 
-            m_h3_TracksPerMCParticle->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
+          nFittedTracks++;
+
+          if (fitResult->getHitPatternVXD().getNPXDHits() > 0) {
+            m_h3_TrackswPXDHitsPerMCParticle->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
+            nFittedTrackswPXDHits++;
+          }
+
+          m_h3_TracksPerMCParticle->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
+          if (mcParticleInfo.getCharge() > 0)
+            m_h3_TracksPerMCParticle_plus->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
+          else if (mcParticleInfo.getCharge() < 0)
+            m_h3_TracksPerMCParticle_minus->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
+          else
+            continue;
+
+          if (MCTrackCands_fromMCParticle.size() > 0) {
+            nFittedTracksMCTC++;
+            m_h3_TracksPerMCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
             if (mcParticleInfo.getCharge() > 0)
-              m_h3_TracksPerMCParticle_plus->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
+              m_h3_TracksPerMCTrackCand_plus->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
             else if (mcParticleInfo.getCharge() < 0)
-              m_h3_TracksPerMCParticle_minus->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
+              m_h3_TracksPerMCTrackCand_minus->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
             else
               continue;
-
-            if (MCTrackCands_fromMCParticle.size() > 0) {
-              nFittedTracksMCTC++;
-              m_h3_TracksPerMCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
-              if (mcParticleInfo.getCharge() > 0)
-                m_h3_TracksPerMCTrackCand_plus->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
-              else if (mcParticleInfo.getCharge() < 0)
-                m_h3_TracksPerMCTrackCand_minus->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
-              else
-                continue;
-            }
-
-
           }
 
 
-          fillTrackParams1DHistograms(fitResult, mcParticleInfo);
-
         }
+
+
+        fillTrackParams1DHistograms(fitResult, mcParticleInfo);
+
       }
     }
+    //  }
 
     m_multiplicityTracks->Fill(nTracks);
     m_multiplicityFittedTracks->Fill(nFittedTracks);
@@ -408,14 +426,17 @@ void TrackingPerformanceEvaluationModule::event()
   B2DEBUG(99, "+++++ 2. loop on Tracks");
 
   //2. retrieve all the MCParticles related to the Tracks
-  StoreArray<genfit::Track> tracks(m_TracksName);
+  //  StoreArray<genfit::Track> tracks(m_TracksName);
+  StoreArray<Track> tracks;//(m_TracksName);
 
-  BOOST_FOREACH(genfit::Track & track, tracks) {
+  //  BOOST_FOREACH(genfit::Track & track, tracks) {
+  BOOST_FOREACH(Track & track, tracks) {
 
     int nMCParticles = 0;
 
     //check if the track has been fitted
-    const TrackFitResult* fitResult = DataStore::getRelatedFromObj<TrackFitResult>(&track);
+    const TrackFitResult* fitResult = track.getTrackFitResult(Const::ChargedStable(211));
+    //    const TrackFitResult* fitResult = DataStore::getRelated<TrackFitResult>(&track);
     if (fitResult == NULL)
       continue;
 
@@ -427,7 +448,14 @@ void TrackingPerformanceEvaluationModule::event()
 
     fillTrackErrParams2DHistograms(fitResult);
 
-    fillHitsUsedInTrackFitHistograms(track);
+    //    const TrackFitResult* fitResult = DataStore::getRelated<TrackFitResult>(&track);
+    const genfit::Track* gfTrack = DataStore::getRelated<genfit::Track>(&track);
+    if (!gfTrack)
+      continue;
+    else
+      B2INFO("found a ggenfit track related!");
+
+    fillHitsUsedInTrackFitHistograms(*gfTrack);
 
     for (int layer = 0; layer < 56; layer++) {
       if (fitResult->getHitPatternCDC().hasLayer(layer))
@@ -448,12 +476,12 @@ void TrackingPerformanceEvaluationModule::event()
 
 
     //2.a retrieve all TrackCands related to the Track
-    RelationVector<genfit::TrackCand> TrackCands_fromTrack = DataStore::getRelationsToObj<genfit::TrackCand>(&track);
+    RelationVector<genfit::TrackCand> TrackCands_fromTrack = DataStore::getRelationsWithObj<genfit::TrackCand>(&track);
 
     for (int tc = 0; tc < (int)TrackCands_fromTrack.size(); tc++) {
 
       //2.b retrieve all MCParticles related to the TrackCand
-      RelationVector<MCParticle> MCParticles_fromTrackCand = DataStore::getRelationsFromObj<MCParticle>(TrackCands_fromTrack[tc]);
+      RelationVector<MCParticle> MCParticles_fromTrackCand = DataStore::getRelationsWithObj<MCParticle>(TrackCands_fromTrack[tc]);
 
       for (int mcp = 0; mcp < (int)MCParticles_fromTrackCand.size(); mcp++)
         if (isTraceable(*MCParticles_fromTrackCand[mcp])) {
@@ -482,17 +510,17 @@ void TrackingPerformanceEvaluationModule::event()
     hasTrackCand = false;
 
     //3.a retrieve the trackcand
-    RelationVector<genfit::TrackCand> TrackCands_fromMCTrackCand = DataStore::getRelationsFromObj<genfit::TrackCand>(&mcTrackCand);
+    RelationVector<genfit::TrackCand> TrackCands_fromMCTrackCand = DataStore::getRelationsWithObj<genfit::TrackCand>(&mcTrackCand);
     B2DEBUG(99, "~ " << TrackCands_fromMCTrackCand.size() << " TrackCands related to this MCTrackCand");
 
     //3.a retrieve the MCParticle
-    RelationVector<MCParticle> MCParticles_fromMCTrackCand = DataStore::getRelationsFromObj<MCParticle>(&mcTrackCand);
+    RelationVector<MCParticle> MCParticles_fromMCTrackCand = DataStore::getRelationsWithObj<MCParticle>(&mcTrackCand);
 
     B2DEBUG(99, "~~~ " << MCParticles_fromMCTrackCand.size() << " MCParticles related to this MCTrackCand");
     for (int mcp = 0; mcp < (int)MCParticles_fromMCTrackCand.size(); mcp++) {
 
       //3.b retrieve all TrackCands related to the MCTrackCand
-      RelationVector<genfit::TrackCand> TrackCands_fromMCParticle = DataStore::getRelationsToObj<genfit::TrackCand>
+      RelationVector<genfit::TrackCand> TrackCands_fromMCParticle = DataStore::getRelationsWithObj<genfit::TrackCand>
           (MCParticles_fromMCTrackCand[mcp]);
 
       B2DEBUG(99, "~~~~~ " << TrackCands_fromMCParticle.size() << " TrackCands related to this MCParticle");
@@ -552,13 +580,13 @@ void TrackingPerformanceEvaluationModule::event()
     int nMCTrackCand = 0;
 
     //4.a retrieve the MCParticle
-    RelationVector<MCParticle> MCParticles_fromTrackCand = DataStore::getRelationsFromObj<MCParticle>(&trackCand);
+    RelationVector<MCParticle> MCParticles_fromTrackCand = DataStore::getRelationsWithObj<MCParticle>(&trackCand);
 
     B2DEBUG(99, "~~~ " << MCParticles_fromTrackCand.size() << " MCParticles related to this TrackCand");
     for (int mcp = 0; mcp < (int)MCParticles_fromTrackCand.size(); mcp++) {
 
       //4.b retrieve all MCTrackCands related to the TrackCand
-      RelationVector<genfit::TrackCand> mcTrackCands_fromMCParticle = DataStore::getRelationsToObj<genfit::TrackCand>
+      RelationVector<genfit::TrackCand> mcTrackCands_fromMCParticle = DataStore::getRelationsWithObj<genfit::TrackCand>
           (MCParticles_fromTrackCand[mcp], m_MCTrackCandsName);
 
       B2DEBUG(99, "~~~~~ " << mcTrackCands_fromMCParticle.size() << " MCTrackCands related to this MCParticle");
@@ -753,7 +781,13 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
   double d0_err = -999;
   double z0_err = -999;
   double pt = -999;
-  const TrackFitResult* fitResult = DataStore::getRelatedFromObj<TrackFitResult>(&track);
+
+  //  const TrackFitResult* fitResult = DataStore::getRelated<TrackFitResult>(&track);
+  const Track* theTrack = DataStore::getRelated<Track>(&track);
+  if (! theTrack)
+    return;
+
+  const TrackFitResult* fitResult = theTrack->getTrackFitResult(Const::ChargedStable(211));
 
   if (fitResult != NULL) { // valid TrackFitResult found
     d0_err = sqrt((fitResult->getCovariance5())[0][0]);
@@ -763,6 +797,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
   bool hasCDChit[56] = { false };
 
+  B2INFO("number of hits: " << nHits);
   for (int i = 0; i < nHits; i++) {
     genfit::TrackPoint* tp = track.getPointWithMeasurement(i);
 
@@ -920,6 +955,10 @@ void TrackingPerformanceEvaluationModule::addMoreEfficiencyPlots(TList* histoLis
 {
 
 
+  TH1F* h_wPXDhits_pt = createHistogramsRatio("hPXDhitspt", "fraction of tracks with PXD hits VS pt",
+                                              m_h3_TrackswPXDHitsPerMCParticle,
+                                              m_h3_TracksPerMCParticle, true, 0);
+  histoList->Add(h_wPXDhits_pt);
 
   //normalized to MCParticles
   TH1F* h_eff_pt = createHistogramsRatio("heffpt", "efficiency VS pt, normalized to MCParticles",  m_h3_TracksPerMCParticle,

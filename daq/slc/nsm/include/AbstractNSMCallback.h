@@ -28,6 +28,7 @@ namespace Belle2 {
     virtual ~AbstractNSMCallback() throw() {}
 
   public:
+    int addDB(const DBObject& obj);
     bool get(const NSMNode& node, const std::string& name, int& val, int timeout = 5) throw(IOException);
     bool get(const NSMNode& node, const std::string& name, float& val, int timeout = 5) throw(IOException);
     bool get(const NSMNode& node, const std::string& name, std::string& val, int timeout = 5) throw(IOException);

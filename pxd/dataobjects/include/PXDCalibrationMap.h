@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <TObject.h>
 #include <tuple>
 #include <unordered_map>
 #include <boost/functional/hash.hpp>
@@ -28,6 +29,9 @@ namespace Belle2 {
      * incidence angle in v (perpendicular = 0), in steps from -9 to 8
      */
     typedef std::tuple<short, short, short, short, short> key_type;
+
+    /** Clear map */
+    void clear() { m_map.clear(); }
 
     /** Virtual destructor */
     virtual ~PXDCalibrationMap() {}

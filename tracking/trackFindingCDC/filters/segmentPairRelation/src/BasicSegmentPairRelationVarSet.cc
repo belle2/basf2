@@ -20,7 +20,7 @@ bool BasicSegmentPairRelationVarSet::extract(const Relation<const CDCSegmentPair
 
   const CDCSegmentPair* fromSegmentPair = ptrSegmentPairRelation->first;
   const CDCSegmentPair* toSegmentPair   = ptrSegmentPairRelation->second;
-  const CDCRecoSegment2D* middleSegment = fromSegmentPair->getToSegment();
+  const CDCSegment2D* middleSegment = fromSegmentPair->getToSegment();
 
   var<named("middle_sl_id")>() = middleSegment->getISuperLayer();
   var<named("middle_is_axial")>() = middleSegment->isAxial();

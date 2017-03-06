@@ -115,7 +115,7 @@ namespace Belle2 {
       double getModuleMiddleRadius(int layer) const;
 
       //! Get the radial midpoint of the detector module's active volume of specified layer
-      double getActiveMiddleRadius(int layer) const;
+      double getActiveMiddleRadius(int fb, int sector, int layer) const;
 
       //! Get the flip (180-degrees about z axis) of a particular BKLM module
       bool getModuleFlip(int fb, int sector, int layer) const { return m_IsFlipped[fb - 1][sector - 1][layer - 1]; }

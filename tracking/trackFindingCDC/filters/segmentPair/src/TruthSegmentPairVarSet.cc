@@ -8,13 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPair/TruthSegmentPairVarSet.h>
-#include <assert.h>
-
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackStore.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -25,14 +24,14 @@ bool TruthSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 
   const CDCSegmentPair& segmentPair = *ptrSegmentPair;
 
-  const CDCRecoSegment2D* ptrFromSegment = segmentPair.getFromSegment();
-  const CDCRecoSegment2D* ptrToSegment = segmentPair.getToSegment();
+  const CDCSegment2D* ptrFromSegment = segmentPair.getFromSegment();
+  const CDCSegment2D* ptrToSegment = segmentPair.getToSegment();
 
-  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
-  const CDCRecoSegment2D& toSegment = *ptrToSegment;
+  const CDCSegment2D& fromSegment = *ptrFromSegment;
+  const CDCSegment2D& toSegment = *ptrToSegment;
 
   const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
-  const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
   const CDCMCTrackStore& mcTrackStore = CDCMCTrackStore::getInstance();
   const std::map<ITrackType, CDCMCTrackStore::CDCHitVector>& mcTracks =
     mcTrackStore.getMCTracksByMCParticleIdx();
@@ -55,6 +54,8 @@ bool TruthSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
     var<named("truth_to_alpha")>() = truthToAlpha;
     var<named("truth_delta_alpha")>() = AngleUtil::normalised(truthToAlpha - truthFromAlpha);
   } else {
+    var<named("truth_from_alpha")>() = NAN;
+    var<named("truth_to_alpha")>() = NAN;
     var<named("truth_delta_alpha")>() = NAN;
   }
 

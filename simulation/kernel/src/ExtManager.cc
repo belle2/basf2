@@ -116,8 +116,6 @@ ExtManager::~ExtManager()
 {
   delete m_StepExceptionHandler;
   if (m_Propagator) { delete m_Propagator; m_Propagator = NULL; }
-  // not needed if (m_helper) delete m_helper;
-  if (m_Manager) { delete m_Manager; m_Manager = NULL; }
 }
 
 void ExtManager::InitTrackPropagation()

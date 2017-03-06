@@ -22,6 +22,55 @@ AbstractNSMCallback::AbstractNSMCallback(int timeout) throw()
   m_timeout = timeout;
 }
 
+int AbstractNSMCallback::addDB(const DBObject& obj)
+{
+  DBObject::NameValueList list;
+  obj.search(list, "", true);
+  int id = 0;
+  for (DBObject::NameValueList::iterator it = list.begin();
+       it != list.end(); it++) {
+    const std::string& name(it->name);
+    if (name.size() == 0 || name.at(0) == '$') continue;
+    switch (it->type) {
+      case DBField::BOOL:
+        id = Callback::add(new NSMVHandlerInt("", name, true, true, (int) * ((bool*)it->buf)));
+        set(name, (int) * ((bool*)it->buf));
+        break;
+      case DBField::CHAR:
+        id = Callback::add(new NSMVHandlerInt("", name, true, true, (int) * ((char*)it->buf)));
+        set(name, (int) * ((char*)it->buf));
+        break;
+      case DBField::SHORT:
+        id = Callback::add(new NSMVHandlerInt("", name, true, true, (int) * ((short*)it->buf)));
+        set(name, (int) * ((short*)it->buf));
+        break;
+      case DBField::INT:
+        id = Callback::add(new NSMVHandlerInt("", name, true, true, *((int*)it->buf)));
+        set(name, (int) * ((int*)it->buf));
+        break;
+      case DBField::LONG:
+        id = Callback::add(new NSMVHandlerInt("", name, true, true, (int) * ((long long*)it->buf)));
+        set(name, (int) * ((long long*)it->buf));
+        break;
+      case DBField::FLOAT:
+        id = Callback::add(new NSMVHandlerFloat("", name, true, true, *((float*)it->buf)));
+        set(name, * ((float*)it->buf));
+        break;
+      case DBField::DOUBLE:
+        id = Callback::add(new NSMVHandlerFloat("", name, true, true, (float) * ((double*)it->buf)));
+        set(name, (float) * ((double*)it->buf));
+        break;
+      case DBField::TEXT:
+        id = Callback::add(new NSMVHandlerText("", name, true, true, *((std::string*)it->buf)));
+        set(name, *((std::string*)it->buf));
+        break;
+      default:
+        break;
+    }
+  }
+  return id;
+}
+
 NSMCommunicator& AbstractNSMCallback::wait(const NSMNode& node,
                                            const NSMCommand& cmd,
                                            double timeout) throw(IOException)
@@ -134,7 +183,8 @@ bool AbstractNSMCallback::get(const NSMNode& node, NSMVar& var,
       NSMMessage msg = com.getMessage();
       NSMCommand cmd(msg.getRequestName());
       if (cmd == NSMCommand::VSET) {
-        if (node.getName() == msg.getData() &&
+        if (msg.getLength() > 0 && msg.getData() != NULL &&
+            node.getName() == msg.getData() &&
             var.getName() == (msg.getData() + msg.getParam(2) + 1)) {
           readVar(msg, var);
           NSMVHandler* handler = getHandler_p(node.getName(), var.getName());

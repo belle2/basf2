@@ -100,23 +100,6 @@ algo.execute()
 
 # -----------------------------------------------------------
 
-
-# Get the payloads into handy variables
-payloads = list(algo.getPayloads())
-vxd = None
-cdc = None
-bklm = None
-for payload in payloads:
-    if payload.module == 'VXDAlignment':
-        vxd = payload.object.IsA().DynamicCast(Belle2.VXDAlignment().IsA(), payload.object, False)
-
-    if payload.module == 'CDCCalibration':
-        cdc = payload.object.IsA().DynamicCast(Belle2.CDCCalibration().IsA(), payload.object, False)
-
-    if payload.module == 'BKLMAlignment':
-        bklm = payload.object.IsA().DynamicCast(Belle2.BKLMAlignment().IsA(), payload.object, False)
-
-
 # Profile plot for all determined parameters
 profile = ROOT.TH1F(
     "profile",
@@ -127,8 +110,8 @@ profile = ROOT.TH1F(
 
 # Define some branch variables
 param = np.zeros(1, dtype=int)
-value = np.zeros(1, dtype=float)
-error = np.zeros(1, dtype=float)
+value = np.zeros(1, dtype=np.float32)
+error = np.zeros(1, dtype=np.float32)
 layer = np.zeros(1, dtype=int)
 ladder = np.zeros(1, dtype=int)
 sector = np.zeros(1, dtype=int)
@@ -145,22 +128,22 @@ vxdtree.Branch('layer', layer, 'layer/I')
 vxdtree.Branch('ladder', ladder, 'ladder/I')
 vxdtree.Branch('sensor', sensor, 'sensor/I')
 vxdtree.Branch('param', param, 'param/I')
-vxdtree.Branch('value', value, 'value/D')
-vxdtree.Branch('error', error, 'error/D')
+vxdtree.Branch('value', value, 'value/F')
+vxdtree.Branch('error', error, 'error/F')
 # Tree with CDC data
 cdctree = ROOT.TTree('cdc', 'CDC data')
 cdctree.Branch('layer', layer, 'layer/I')
 cdctree.Branch('param', param, 'param/I')
-cdctree.Branch('value', value, 'value/D')
-cdctree.Branch('error', error, 'error/D')
+cdctree.Branch('value', value, 'value/F')
+cdctree.Branch('error', error, 'error/F')
 # Tree with BKLM data
 bklmtree = ROOT.TTree('bklm', 'BKLM data')
 bklmtree.Branch('layer', layer, 'layer/I')
 bklmtree.Branch('sector', sector, 'sector/I')
 bklmtree.Branch('forward', forward, 'forward/I')
 bklmtree.Branch('param', param, 'param/I')
-bklmtree.Branch('value', value, 'value/D')
-bklmtree.Branch('error', error, 'error/D')
+bklmtree.Branch('value', value, 'value/F')
+bklmtree.Branch('error', error, 'error/F')
 # Tree with EKLM data.
 eklmtree = ROOT.TTree('eklm', 'EKLM data')
 eklmtree.Branch('endcap', endcap, 'endcap/I')
@@ -169,8 +152,8 @@ eklmtree.Branch('sector', sector, 'sector/I')
 eklmtree.Branch('plane', plane, 'plane/I')
 eklmtree.Branch('segment', segment, 'segment/I')
 eklmtree.Branch('param', param, 'param/I')
-eklmtree.Branch('value', value, 'value/D')
-eklmtree.Branch('error', error, 'error/D')
+eklmtree.Branch('value', value, 'value/F')
+eklmtree.Branch('error', error, 'error/F')
 
 # Index of determined param
 ibin = 0
@@ -222,8 +205,11 @@ chi2ndf = Belle2.PyStoreObj('MillepedeCollector_chi2/ndf', 1).obj().getObject('1
 pval = Belle2.PyStoreObj('MillepedeCollector_pval', 1).obj().getObject('1.1')
 
 alignment_file.cd()
+profile.Write()
 vxdtree.Write()
 cdctree.Write()
 bklmtree.Write()
 eklmtree.Write()
 alignment_file.Close()
+
+algo.commit()

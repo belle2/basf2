@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
-#include <tracking/trackFindingCDC/ca/Relation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 #include <boost/range/iterator_range.hpp>
 
@@ -35,7 +35,7 @@ namespace Belle2 {
                            const ACDCSegmentTripleIterator& itEnd)
       {
 
-        const CDCAxialRecoSegment2D* endSegment = triple.getEndSegment();
+        const CDCAxialSegment2D* endSegment = triple.getEndSegment();
         std::pair<ACDCSegmentTripleIterator,  ACDCSegmentTripleIterator> itPairPossibleNeighbors = std::equal_range(itBegin, itEnd,
             endSegment);
         return boost::iterator_range<ACDCSegmentTripleIterator>(itPairPossibleNeighbors.first, itPairPossibleNeighbors.second);
@@ -52,16 +52,13 @@ namespace Belle2 {
       /** Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.*/
-      Weight operator()(const Relation<const CDCSegmentTriple>& relation) final {
-        const CDCSegmentTriple * ptrFrom(relation.first);
-        const CDCSegmentTriple * ptrTo(relation.second);
-        if (not ptrFrom or not ptrTo) return NAN;
+      Weight operator()(const Relation<const CDCSegmentTriple>& relation) override
+      {
+        const CDCSegmentTriple* ptrFrom(relation.first);
+        const CDCSegmentTriple* ptrTo(relation.second);
+        if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
         return operator()(*ptrFrom, *ptrTo);
       }
-
-
     };
-
   }
 }
-

@@ -7,39 +7,41 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/filters/segmentPair/MCSegmentPairFilter.h>
 
-#include <framework/logging/Logger.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
-
-#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+MCSegmentPairFilter::MCSegmentPairFilter(bool allowReverse)
+  : Super(allowReverse)
+{
+}
 
 Weight MCSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 {
-  const CDCRecoSegment2D* ptrFromSegment = segmentPair.getFromSegment();
-  const CDCRecoSegment2D* ptrToSegment = segmentPair.getToSegment();
+  const CDCSegment2D* ptrFromSegment = segmentPair.getFromSegment();
+  const CDCSegment2D* ptrToSegment = segmentPair.getToSegment();
 
   assert(ptrFromSegment);
   assert(ptrToSegment);
 
-  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
-  const CDCRecoSegment2D& toSegment = *ptrToSegment;
+  const CDCSegment2D& fromSegment = *ptrFromSegment;
+  const CDCSegment2D& toSegment = *ptrToSegment;
 
   if (fromSegment.size() < 4 or toSegment.size() < 4) return NAN;
 
-  const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
 
   // Check if the segments are aligned correctly along the Monte Carlo track
   EForwardBackward pairFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrFromSegment, ptrToSegment);
   if (pairFBInfo == EForwardBackward::c_Invalid) return NAN;
 
-  if (pairFBInfo == EForwardBackward::c_Forward or (getAllowReverse() and pairFBInfo == EForwardBackward::c_Backward)) {
+  if (pairFBInfo == EForwardBackward::c_Forward or
+      (getAllowReverse() and pairFBInfo == EForwardBackward::c_Backward)) {
     // Final check for the distance between the segment
     Index fromNPassedSuperLayers = mcSegmentLookUp.getLastNPassedSuperLayers(ptrFromSegment);
     if (fromNPassedSuperLayers == c_InvalidIndex) return NAN;

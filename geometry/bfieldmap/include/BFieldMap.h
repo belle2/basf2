@@ -13,7 +13,8 @@
 
 #include <geometry/bfieldmap/BFieldComponentAbs.h>
 
-#include <TVector3.h>
+#include <framework/geometry/B2Vector3.h>
+#include <framework/logging/Logger.h>
 
 #include <string>
 #include <list>
@@ -22,8 +23,6 @@
 namespace Belle2 {
 
   /**
-   * The BFieldMap class.
-   *
    * This class represents the magnetic field of the Belle II detector.
    * Its main method is getBField() which returns the Bfield vector at the
    * specified space point.
@@ -48,7 +47,7 @@ namespace Belle2 {
      * @param point The space point in Cartesian coordinates.
      * @return A three vector of the magnetic field in [T] at the specified space point.
      */
-    const TVector3 getBField(const TVector3& point);
+    B2Vector3D getBField(const B2Vector3D& point) const;
 
     /**
      * Adds a new BField component to the Belle II magnetic field.
@@ -56,6 +55,9 @@ namespace Belle2 {
      * @return A reference to the added magnetic field component.
      */
     template<class BFIELDCOMP> BFIELDCOMP& addBFieldComponent();
+
+    /** Initialize the magnetic field after adding all components */
+    void initialize();
 
     /**
      * Clear the existing components
@@ -96,6 +98,22 @@ namespace Belle2 {
     BFIELDCOMP* newComponent = new BFIELDCOMP;
     m_components.push_back(newComponent);
     return *newComponent;
+  }
+
+
+  inline B2Vector3D BFieldMap::getBField(const B2Vector3D& point) const
+  {
+    B2Vector3D magFieldVec(0.0, 0.0, 0.0);
+    //Check that the point makes sense
+    if (std::isnan(point.X()) || std::isnan(point.Y()) || std::isnan(point.Z())) {
+      B2ERROR("Bfield requested for a position containing NaN, returning field 0");
+      return magFieldVec;
+    }
+    //Loop over all magnetic field components and add their magnetic field vectors
+    for (const BFieldComponentAbs* comp : m_components) {
+      magFieldVec += comp->calculate(point);
+    }
+    return magFieldVec;
   }
 
 

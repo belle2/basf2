@@ -87,6 +87,8 @@ namespace Belle2 {
       unsigned long m_meta_experiment;
       /** For DESY TB data */
       int m_DESY16_FixTrigOffset;
+      /**< Set to one if Start of row flag should be ignored - HOT FIX for gradient */
+      bool m_ignoreSorFlag;
 
       /** Event counter */
       unsigned int m_unpackedEventsCount;

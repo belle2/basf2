@@ -20,13 +20,21 @@ bool BasicSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 
   CDCSegmentPair segmentPair = *ptrSegmentPair;
 
-  var<named("axial_first")>() = segmentPair.getFromSegment()->isAxial();
+  const CDCSegment2D* fromSegment = segmentPair.getFromSegment();
+  const CDCSegment2D* toSegment = segmentPair.getToSegment();
 
-  var<named("axial_size")>() = segmentPair.getAxialSegment()->size();
-  var<named("stereo_size")>() = segmentPair.getStereoSegment()->size();
+  const CDCSegment2D* axialSegment = segmentPair.getAxialSegment();
+  const CDCSegment2D* stereoSegment = segmentPair.getStereoSegment();
 
-  ISuperLayer fromISuperLayer = segmentPair.getFromISuperLayer();
-  ISuperLayer toISuperLayer = segmentPair.getToISuperLayer();
+  if (fromSegment->empty()) return false;
+  if (toSegment->empty()) return false;
+
+  var<named("axial_first")>() = fromSegment->back().isAxial();
+  var<named("axial_size")>() = axialSegment->size();
+  var<named("stereo_size")>() = stereoSegment->size();
+
+  ISuperLayer fromISuperLayer = fromSegment->back().getISuperLayer();
+  ISuperLayer toISuperLayer = toSegment->front().getISuperLayer();
 
   std::pair<int, int> superLayerIdPair = std::minmax(fromISuperLayer, toISuperLayer);
   var<named("sl_id_pair")>() = superLayerIdPair.second * 10 + superLayerIdPair.first;

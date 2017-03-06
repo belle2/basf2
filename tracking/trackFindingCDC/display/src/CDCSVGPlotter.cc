@@ -17,12 +17,12 @@
 #include <tracking/trackFindingCDC/filters/segmentPair/MCSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentTriple/MCSegmentTripleFilter.h>
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
@@ -203,18 +203,18 @@ void CDCSVGPlotter::drawSegments(const std::string& storeObjName,
   ChooseableSegmentStyling styling;
   if (stroke != "") styling.setStroke(stroke);
   if (strokeWidth != "") styling.setStrokeWidth(strokeWidth);
-  drawStoreVector<const CDCRecoSegment2D>(storeObjName, styling);
+  drawStoreVector<const CDCSegment2D>(storeObjName, styling);
 }
 
 void CDCSVGPlotter::drawSegmentTrajectories(const std::string& storeObjName,
                                             const std::string& stroke,
                                             const std::string& strokeWidth)
 {
-  FixedStyling<const CDCRecoSegment2D> styling;
+  FixedStyling<const CDCSegment2D> styling;
   if (stroke != "") styling.setStroke(stroke);
   if (strokeWidth != "") styling.setStrokeWidth(strokeWidth);
   const bool drawTrajectories = true;
-  drawStoreVector<const CDCRecoSegment2D, drawTrajectories>(storeObjName, styling);
+  drawStoreVector<const CDCSegment2D, drawTrajectories>(storeObjName, styling);
 }
 
 void CDCSVGPlotter::drawAxialSegmentPairs(const std::string& storeObjName,
@@ -300,6 +300,17 @@ void CDCSVGPlotter::drawRecoTrackTrajectories(const std::string& storeArrayName,
   drawStoreArray<const RecoTrack, drawTrajectories>(storeArrayName, styling);
 }
 
+void CDCSVGPlotter::drawMCParticleTrajectories(const std::string& storeArrayName,
+                                               const std::string& stroke,
+                                               const std::string& strokeWidth)
+{
+  DefaultColorCycleStyling<const MCParticle> styling;
+  if (stroke != "") styling.setStroke(stroke);
+  if (strokeWidth != "") styling.setStrokeWidth(strokeWidth);
+  const bool drawTrajectories = true;
+  drawStoreArray<const MCParticle, drawTrajectories>(storeArrayName, styling);
+}
+
 void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& simHitStoreArrayName,
                                             const std::string& stroke,
                                             const std::string& strokeWidth)
@@ -375,25 +386,25 @@ void CDCSVGPlotter::drawMCAxialSegmentPairs(const std::string& segmentsStoreObjN
                                             const std::string& strokeWidth)
 {
   B2INFO("Draw axial to axial segment pairs");
-  StoreWrappedObjPtr<std::vector<CDCRecoSegment2D>> storedSegments(segmentsStoreObjName);
+  StoreWrappedObjPtr<std::vector<CDCSegment2D>> storedSegments(segmentsStoreObjName);
   if (not storedSegments) {
     B2WARNING(segmentsStoreObjName << "does not exist in current DataStore");
     printDataStoreContent();
     return;
   }
 
-  std::vector<CDCRecoSegment2D>& segments = *storedSegments;
+  std::vector<CDCSegment2D>& segments = *storedSegments;
   B2INFO("#Segments: " << segments.size());
 
-  std::vector<const CDCAxialRecoSegment2D*> axialSegments;
-  for (const CDCAxialRecoSegment2D& segment : segments) {
+  std::vector<const CDCAxialSegment2D*> axialSegments;
+  for (const CDCAxialSegment2D& segment : segments) {
     if (segment.isAxial()) axialSegments.push_back(&segment);
   }
 
   MCAxialSegmentPairFilter mcAxialSegmentPairFilter;
   std::vector<CDCAxialSegmentPair> mcAxialSegmentPairs;
-  for (const CDCAxialRecoSegment2D* fromSegment : axialSegments) {
-    for (const CDCAxialRecoSegment2D* toSegment : axialSegments) {
+  for (const CDCAxialSegment2D* fromSegment : axialSegments) {
+    for (const CDCAxialSegment2D* toSegment : axialSegments) {
       if (fromSegment == toSegment) continue;
       mcAxialSegmentPairs.emplace_back(fromSegment, toSegment);
       Weight mcWeight = mcAxialSegmentPairFilter(mcAxialSegmentPairs.back());
@@ -415,19 +426,19 @@ void CDCSVGPlotter::drawMCSegmentPairs(const std::string& segmentsStoreObjName,
                                        const std::string& strokeWidth)
 {
   B2INFO("Draw axial to stero segment pairs");
-  StoreWrappedObjPtr<std::vector<CDCRecoSegment2D>> storedSegments(segmentsStoreObjName);
+  StoreWrappedObjPtr<std::vector<CDCSegment2D>> storedSegments(segmentsStoreObjName);
   if (not storedSegments) {
     B2WARNING(segmentsStoreObjName << "does not exist in current DataStore");
     printDataStoreContent();
     return;
   }
 
-  std::vector<CDCRecoSegment2D>& segments = *storedSegments;
+  std::vector<CDCSegment2D>& segments = *storedSegments;
   B2INFO("#Segments: " << segments.size());
 
-  std::vector<const CDCAxialRecoSegment2D*> axialSegments;
-  std::vector<const CDCStereoRecoSegment2D*> stereoSegments;
-  for (const CDCAxialRecoSegment2D& segment : segments) {
+  std::vector<const CDCAxialSegment2D*> axialSegments;
+  std::vector<const CDCStereoSegment2D*> stereoSegments;
+  for (const CDCAxialSegment2D& segment : segments) {
     if (segment.isAxial()) {
       axialSegments.push_back(&segment);
     } else {
@@ -437,8 +448,8 @@ void CDCSVGPlotter::drawMCSegmentPairs(const std::string& segmentsStoreObjName,
 
   MCSegmentPairFilter mcSegmentPairFilter;
   std::vector<CDCSegmentPair> mcSegmentPairs;
-  for (const CDCAxialRecoSegment2D* axialSegment : axialSegments) {
-    for (const CDCStereoRecoSegment2D* stereoSegment : stereoSegments) {
+  for (const CDCAxialSegment2D* axialSegment : axialSegments) {
+    for (const CDCStereoSegment2D* stereoSegment : stereoSegments) {
       // Axial first
       {
         mcSegmentPairs.emplace_back(axialSegment, stereoSegment);
@@ -471,19 +482,19 @@ void CDCSVGPlotter::drawMCSegmentTriples(const std::string& segmentsStoreObjName
                                          const std::string& strokeWidth)
 {
   B2INFO("Draw segment triples");
-  StoreWrappedObjPtr<std::vector<CDCRecoSegment2D>> storedRecoSegments(segmentsStoreObjName);
-  if (not storedRecoSegments) {
+  StoreWrappedObjPtr<std::vector<CDCSegment2D>> storedSegments(segmentsStoreObjName);
+  if (not storedSegments) {
     B2WARNING(segmentsStoreObjName << "does not exist in current DataStore");
     printDataStoreContent();
     return;
   }
 
-  std::vector<CDCRecoSegment2D>& recoSegments = *storedRecoSegments;
-  B2INFO("#Segment " << recoSegments.size());
+  std::vector<CDCSegment2D>& segments = *storedSegments;
+  B2INFO("#Segment " << segments.size());
 
-  std::vector<const CDCAxialRecoSegment2D*> axialSegments;
-  std::vector<const CDCStereoRecoSegment2D*> stereoSegments;
-  for (const CDCRecoSegment2D& segment : recoSegments) {
+  std::vector<const CDCAxialSegment2D*> axialSegments;
+  std::vector<const CDCStereoSegment2D*> stereoSegments;
+  for (const CDCSegment2D& segment : segments) {
     if (segment.isAxial()) {
       axialSegments.push_back(&segment);
     } else {
@@ -493,9 +504,9 @@ void CDCSVGPlotter::drawMCSegmentTriples(const std::string& segmentsStoreObjName
 
   MCSegmentTripleFilter mcSegmentTripleFilter;
   std::vector<CDCSegmentTriple> mcSegmentTriples;
-  for (const CDCAxialRecoSegment2D* startSegment : axialSegments) {
-    for (const CDCStereoRecoSegment2D* middleSegment : stereoSegments) {
-      for (const CDCAxialRecoSegment2D* endSegment : axialSegments) {
+  for (const CDCAxialSegment2D* startSegment : axialSegments) {
+    for (const CDCStereoSegment2D* middleSegment : stereoSegments) {
+      for (const CDCAxialSegment2D* endSegment : axialSegments) {
         if (startSegment == endSegment) continue;
         mcSegmentTriples.emplace_back(startSegment, middleSegment, endSegment);
         Weight mcWeight = mcSegmentTripleFilter(mcSegmentTriples.back());

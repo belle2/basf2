@@ -6,9 +6,13 @@ from ROOT import Belle2
 
 import simulation
 
-cdc_mapping_file = Belle2.FileSystem.findFile("data/cdc/ch_map.dat")
-if not cdc_mapping_file:
-    B2FATAL("Cannot find cdc mapping file")
+# cdc_mapping_file = Belle2.FileSystem.findFile("data/cdc/ch_map.dat")
+# if not cdc_mapping_file:
+#    B2FATAL("Cannot find cdc mapping file")
+
+# use_database_chain()
+# use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
+
 cdc_hits = "CDCHits"
 cdc_hits_pack_unpack_collection = "CDCHits_test_output"
 set_random_seed(42)
@@ -85,14 +89,12 @@ simulation.add_simulation(main, components=['CDC'])
 
 # add the packer which packs the CDCHits resulting from the simulation
 cdc_packer = register_module('CDCPacker')
-cdc_packer.param('xmlMapFileName', cdc_mapping_file)
 cdc_packer.param('cdcHitName', "CDCHits")
 main.add_module(cdc_packer)
 
 # add the unpacker which unpacks the RawCDC hits and stores
 # them in the dedicated store array "cdcHit_test_output"
 cdc_unpacker = register_module('CDCUnpacker')
-cdc_unpacker.param('xmlMapFileName', cdc_mapping_file)
 cdc_unpacker.param('cdcHitName', cdc_hits_pack_unpack_collection)
 cdc_unpacker.param('enablePrintOut', False)
 main.add_module(cdc_unpacker)

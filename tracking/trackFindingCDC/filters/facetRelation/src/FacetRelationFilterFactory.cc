@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/filters/facetRelation/SimpleFacetRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/facetRelation/Chi2FacetRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/facetRelation/UnionRecordingFacetRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/facetRelation/TMVAFacetRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/MVAFacetRelationFilter.h>
 
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
@@ -47,7 +47,7 @@ FacetRelationFilterFactory::getValidFilterNamesAndDescriptions() const
     {"simple", "mc free with simple criteria"},
     {"chi2", "mc free based on chi2 fitting"},
     {"unionrecording", "record multiple choosable variable sets"},
-    {"tmva", "filter facets with a tmva method"},
+    {"mva", "filter facets with a mva method"},
   };
 }
 
@@ -66,8 +66,8 @@ FacetRelationFilterFactory::create(const std::string& filterName) const
     return makeUnique<Chi2FacetRelationFilter>();
   } else if (filterName == "unionrecording") {
     return makeUnique<UnionRecordingFacetRelationFilter>();
-  } else if (filterName == "tmva") {
-    return makeUnique<TMVAFacetRelationFilter>();
+  } else if (filterName == "mva") {
+    return makeUnique<MVAFacetRelationFilter>();
   } else {
     return Super::create(filterName);
   }

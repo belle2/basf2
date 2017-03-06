@@ -12,20 +12,16 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
+#include <tracking/trackFindingCDC/filters/segmentTrack/BaseSegmentTrackFilter.h>
 
-#include <vector>
-#include <string>
-#include <cassert>
-
+#include <utility>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Forward declaration of the CDCWireHitCluster.
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
     class CDCTrack;
 
-
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
     static char const* const segmentTrackVarNames[] = {
       "is_stereo",
@@ -51,34 +47,31 @@ namespace Belle2 {
       "segment_super_layer",
       "phi_between_track_and_segment",
       "perp_s_of_front",
-      "perp_s_of_back"
+      "perp_s_of_back",
     };
 
-    /** Class that specifies the names of the variables
-     *  that should be generated from a wire hits cluster.
-     */
-    class SegmentTrackVarNames : public VarNames<std::pair<const CDCRecoSegment2D*, const CDCTrack*>> {
+    /// Vehicle class to transport the variable names
+    struct SegmentTrackVarNames : public VarNames<BaseSegmentTrackFilter::Object> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(segmentTrackVarNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(segmentTrackVarNames);
 
-      /// Get the name of the corresponding column.
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
         return segmentTrackVarNames[iName];
       }
     };
 
-    /** Class that computes floating point variables from a pair of track and segment.
-     *  that can be forwarded to a flat TNTuple or a TMVA method
+    /**
+     *  Class to compute floating point variables from a segment to track match
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class SegmentTrackVarSet : public VarSet<SegmentTrackVarNames> {
 
     public:
-      /// Generate and assign the variables from the pair
-      bool extract(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>* testPair) final;
+      /// Generate and assign the contained variables
+      bool extract(const BaseSegmentTrackFilter::Object* testPair) final;
     };
   }
 }

@@ -110,9 +110,9 @@ void ECLCRFinderModule::initialize()
     B2FATAL("ECLCRFinderModule::initialize(): m_energyCut[2] must be smaller than m_energyCutBkgd[2].");
 
   // Initialize neighbour maps.
-  for (int i = 0; i < 2; i++) {
-    m_neighbourMaps[i] = new ECLNeighbours(m_mapType[i], m_mapPar[i]);
-  }
+  m_neighbourMaps.resize(2);
+  m_neighbourMaps[0] = new ECLNeighbours(m_mapType[0], m_mapPar[0]);
+  m_neighbourMaps[1] = new ECLNeighbours(m_mapType[1], m_mapPar[1]);
 
   // Initialize the modified energy cuts (that could depend on event-by-event backgrounds later).
   for (int i = 0; i < 3; i++) {
@@ -297,6 +297,9 @@ void ECLCRFinderModule::endRun()
 void ECLCRFinderModule::terminate()
 {
   B2DEBUG(200, "ECLCRFinderModule::terminate()");
+  for (unsigned int i = 0; i < m_neighbourMaps.size(); i++) {
+    if (m_neighbourMaps[i]) delete m_neighbourMaps[i];
+  }
 
 }
 

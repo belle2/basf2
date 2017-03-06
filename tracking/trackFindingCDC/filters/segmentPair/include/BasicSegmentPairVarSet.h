@@ -14,10 +14,9 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Forward declaration
     class CDCSegmentPair;
 
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
     static char const* const basicSegmentPairVarNames[] = {
       "axial_first",
@@ -26,32 +25,28 @@ namespace Belle2 {
       "sl_id_pair",
     };
 
-    /**
-     *  Class that specifies the names of the variables
-     *  that should be generated from a segment pair
-     */
-    class BasicSegmentPairVarNames : public VarNames<CDCSegmentPair> {
+    /// Vehicle class to transport the variable names
+    struct BasicSegmentPairVarNames : public VarNames<CDCSegmentPair> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(basicSegmentPairVarNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(basicSegmentPairVarNames);
 
-      /// Getter for the name a the given index
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
         return basicSegmentPairVarNames[iName];
       }
     };
 
     /**
-     *  Class that computes floating point variables from a segment relation.
+     *  Class to compute floating point variables from an axial stereo segment pair
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class BasicSegmentPairVarSet : public VarSet<BasicSegmentPairVarNames> {
 
     public:
-      /// Generate and assign the variables from the segment pair
-      bool extract(const CDCSegmentPair* ptrSegmentPair) override;
+      /// Generate and assign the contained variables
+      bool extract(const CDCSegmentPair* ptrSegmentPair) final;
     };
   }
 }

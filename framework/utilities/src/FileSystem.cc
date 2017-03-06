@@ -100,7 +100,7 @@ FileSystem::Lock::~Lock()
   if (m_file >= 0) close(m_file);
 }
 
-bool FileSystem::Lock::lock(int timeout)
+bool FileSystem::Lock::lock(int timeout, bool ignoreErrors)
 {
   if (m_file < 0) return false;
 
@@ -127,9 +127,10 @@ bool FileSystem::Lock::lock(int timeout)
       return true;
     else if (std::chrono::steady_clock::now() > maxtime)
       break;
+    if (errno != EAGAIN && errno != EACCES && errno != EINTR) break;
     usleep(uniform(random) * 1000);
   }
-  B2ERROR("Locking failed: " << strerror(errno));
+  if (!ignoreErrors) B2ERROR("Locking failed: " << strerror(errno));
   return false;
 }
 
@@ -139,7 +140,7 @@ FileSystem::TemporaryFile::TemporaryFile(std::ios_base::openmode mode): std::fst
   m_filename = filename.native();
   open(m_filename.c_str(), mode);
   if (!is_open()) {
-    B2ERROR("Cannot create temporary file:" << strerror(errno));
+    B2ERROR("Cannot create temporary file: " << strerror(errno));
   }
 }
 

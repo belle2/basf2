@@ -9,21 +9,19 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentRelation/FitSegmentRelationVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
-#include <tracking/trackFindingCDC/numerics/Angle.h>
-#include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool FitSegmentRelationVarSet::extract(const Relation<const CDCRecoSegment2D>* ptrSegmentRelation)
+bool FitSegmentRelationVarSet::extract(const Relation<const CDCSegment2D>* ptrSegmentRelation)
 {
   if (not ptrSegmentRelation) return false;
 
-  const CDCRecoSegment2D* fromSegment = ptrSegmentRelation->first;
-  const CDCRecoSegment2D* toSegment   = ptrSegmentRelation->second;
+  const CDCSegment2D* fromSegment = ptrSegmentRelation->first;
+  const CDCSegment2D* toSegment   = ptrSegmentRelation->second;
 
   const CDCRiemannFitter& riemannFitter = CDCRiemannFitter::getFitter();
 

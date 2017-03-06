@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/track/TrackFilter.h>
+#include <tracking/trackFindingCDC/filters/track/BaseTrackFilter.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
 
 namespace Belle2 {
@@ -24,7 +24,7 @@ namespace Belle2 {
 
     public:
       /// Constructor forwarding the default filter name
-      TrackFilterFactory(const std::string& defaultFilterName = "all");
+      TrackFilterFactory(const std::string& defaultFilterName = "mva");
 
       /// Getter for a short identifier for the factory
       std::string getIdentifier() const override;

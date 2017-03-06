@@ -1,0 +1,136 @@
+#------------------------------------------------------------
+# EventType:1163300000
+# Descriptor: B -> D* tau nu (emu) against semileptonic Btag
+# NickName: Bd_Dsttaunu_emu
+# Documentation: decay mode for sensitivity studies
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Romulus Godang
+# Email: godang@southalabama.edu
+# Cuts: None
+# Date: 20161214
+# Changes: added more D, D0 decay modes, update of D* tau nu decay model; date: 20170219; author: Romulus Godang
+# Changes: use of aliases defined in DECAY.DEC; date: 20170220; author: Mario Merola
+#-----------------------------------------------------------
+#
+#
+#
+Alias MyK0 K0
+Alias Myanti-K0 anti-K0
+#
+Alias MyKs K_S0
+#
+#
+Decay Upsilon(4S)
+1.000 B0 anti-B0 B0sig anti-B0sig          VSS_BMIX dm;
+Enddecay
+#
+## Force Btag B decays to D* ell nu_ell
+#
+Decay anti-B0
+0.0501   D*+sig    e-   anti-nu_e          PHOTOS HQET 0.77 1.33 0.92;
+0.0217   D+sig     e-   anti-nu_e          PHOTOS ISGW2;
+0.0501   D*+sig    mu-  anti-nu_mu         PHOTOS HQET 0.77 1.33 0.92;
+0.0217   D+sig     mu-  anti-nu_mu         PHOTOS ISGW2;
+Enddecay
+#
+Decay B0
+0.0501   D*-sig    e+   nu_e               PHOTOS HQET 0.77 1.33 0.92;
+0.0217   D-sig     e+   nu_e               PHOTOS ISGW2;
+0.0501   D*-sig    mu+  nu_mu              PHOTOS HQET 0.77 1.33 0.92;
+0.0217   D-sig     mu+  nu_mu              PHOTOS ISGW2;
+Enddecay
+#
+# Force Bsig decays to D* tau nu_tau (tau->e/mu)
+# Central values from HFAG average
+Decay B0sig
+1.0000 D*-sig     tau+sig nu_tau            PHOTOS HQET3 0.920 1.205 1.21 1.404 0.854;
+Enddecay
+#
+Decay anti-B0sig
+1.0000 D*+sig     tau-sig anti-nu_tau       PHOTOS HQET3 0.920 1.205 1.21 1.404 0.854;
+Enddecay
+#
+Decay tau+sig
+0.50    e+      nu_e    anti-nu_tau       PHOTOS  TAULNUNU;
+0.50    mu+     nu_mu   anti-nu_tau       PHOTOS  TAULNUNU;
+Enddecay
+#
+Decay tau-sig
+0.50    e-      anti-nu_e       nu_tau    PHOTOS  TAULNUNU;
+0.50    mu-     anti-nu_mu      nu_tau    PHOTOS  TAULNUNU;
+Enddecay
+#
+Decay D*+sig 
+0.6770    D0sig  pi+                         VSS;
+0.3070    D+sig  pi0                         VSS;
+0.0160    D+sig  gamma                       VSP_PWAVE;
+Enddecay
+#
+Decay D*-sig
+0.6770    anti-D0sig pi-                   VSS;
+0.3070    D-sig  pi0                       VSS;
+0.0160    D-sig  gamma                     VSP_PWAVE;
+Enddecay
+#
+Decay D+sig
+0.0940   K-  pi+  pi+                     D_DALITZ;
+0.0847   K-  pi+  pi+   pi0           	  PHSP;
+0.0102   Myanti-K0   pi+              	  PHSP;
+0.0484   Myanti-K0   pi+  pi0         	  D_DALITZ;
+0.0216   Myanti-K0   pi+  pi+   pi-       PHSP;
+0.0020   Myanti-K0   K+			  PHSP;
+0.0095   K+   K-  pi+                 	  PHSP;
+Enddecay
+#
+Decay D-sig
+0.0940   K+  pi-  pi-                     D_DALITZ;
+0.0847   K+  pi-  pi-   pi0               PHSP;
+0.0102   MyK0  pi-                        PHSP;
+0.0484   MyK0  pi-  pi0                   D_DALITZ;
+0.0216   MyK0  pi-  pi-   pi+             PHSP;
+0.0020   MyK0  K-			  PHSP;
+0.0095   K-   K+  pi-                     PHSP;
+Enddecay
+#
+Decay D0sig
+0.0389   K-  pi+                          PHSP;
+0.1390   K-  pi+  pi0                     D_DALITZ;
+0.0133   K-  pi+  pi+   pi-               PHSP;
+0.0195   Myanti-K0   pi+  pi-             D_DALITZ;
+0.0360   Myanti-K0   pi+  pi-   pi0       PHSP;
+0.0420   K-  pi+  pi+   pi-   pi0         PHSP;
+0.0082   Myanti-K0  pi0                   PHSP;
+0.0040   K- K+                            PHSP;
+0.0014   pi+     pi-                      PHSP;
+0.0012   pi+     pi-     pi0              PHSP;
+0.0047   MyKs    K+      K-               PHSP; 
+Enddecay
+#
+Decay anti-D0sig
+0.0389   K+  pi-                          PHSP;
+0.1390   K+  pi-  pi0                     D_DALITZ;
+0.0133   K+  pi-  pi+   pi-               PHSP;
+0.0195   MyK0  pi+  pi-                   D_DALITZ;
+0.0360   MyK0  pi+  pi-   pi0             PHSP;
+0.0420   K+  pi-  pi-   pi+   pi0         PHSP;
+0.0082   MyK0  pi0		          PHSP;
+0.0040   K+ K-                            PHSP;
+0.0014   pi+     pi-                      PHSP;
+0.0012   pi+     pi-     pi0              PHSP; 
+0.0047   MyKs    K+      K-               PHSP;
+Enddecay
+#
+Decay MyKs
+1.000     pi+ pi-                         PHSP;
+Enddecay
+#
+Decay MyK0
+1.000     MyKs                            PHSP;
+Enddecay
+#
+Decay Myanti-K0
+1.000     MyKs                            PHSP;
+Enddecay
+#
+End

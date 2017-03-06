@@ -476,13 +476,13 @@ void CKFCdcToVxdModule::event()
     B2DEBUG(110, "<---> Processing next track " << nOutTracks << " <--->");
     nTotalTracks++;
 
-    RelationVector<MCParticle> MCParticles_fromTrack = DataStore::getRelationsFromObj<MCParticle>(&crnt);
+    RelationVector<MCParticle> MCParticles_fromTrack = DataStore::getRelationsWithObj<MCParticle>(&crnt);
     if (cdcHitsFromMC) delete cdcHitsFromMC;
-    cdcHitsFromMC = new RelationVector<CDCHit>(DataStore::getRelationsFromObj<CDCHit>(MCParticles_fromTrack[0]));
+    cdcHitsFromMC = new RelationVector<CDCHit>(DataStore::getRelationsWithObj<CDCHit>(MCParticles_fromTrack[0]));
     if (svdClustersFromMC) delete svdClustersFromMC;
-    svdClustersFromMC =  new RelationVector<SVDCluster>(DataStore::getRelationsToObj<SVDCluster>(MCParticles_fromTrack[0]));
+    svdClustersFromMC =  new RelationVector<SVDCluster>(DataStore::getRelationsWithObj<SVDCluster>(MCParticles_fromTrack[0]));
     if (pxdClustersFromMC) delete pxdClustersFromMC;
-    pxdClustersFromMC =  new RelationVector<PXDCluster>(DataStore::getRelationsToObj<PXDCluster>(MCParticles_fromTrack[0]));
+    pxdClustersFromMC =  new RelationVector<PXDCluster>(DataStore::getRelationsWithObj<PXDCluster>(MCParticles_fromTrack[0]));
     B2DEBUG(100, "--- Number of related MC particles: " << MCParticles_fromTrack.size() << " npxd " << pxdClustersFromMC->size() <<
             " nsvd " << svdClustersFromMC->size() << " ncdc " << cdcHitsFromMC->size());
 

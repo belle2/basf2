@@ -109,16 +109,16 @@ namespace Belle2 {
 
         // Prepare the monte carlo segments
         for (const CDCTrack& mcTrack : m_mcTracks) {
-          std::vector<CDCRecoSegment3D> recoSegment3DsInTrack = mcTrack.splitIntoSegments();
-          for (const CDCRecoSegment3D& recoSegment3D :  recoSegment3DsInTrack) {
-            m_mcSegment2Ds.push_back(recoSegment3D.stereoProjectToRef());
+          std::vector<CDCSegment3D> segment3DsInTrack = mcTrack.splitIntoSegments();
+          for (const CDCSegment3D& segment3D :  segment3DsInTrack) {
+            m_mcSegment2Ds.push_back(segment3D.stereoProjectToRef());
           }
         }
 
         // Filter the axial segments
-        for (const CDCRecoSegment2D& recoSegment2D : m_mcSegment2Ds) {
-          if (recoSegment2D.getStereoKind() == EStereoKind::c_Axial) {
-            m_mcAxialSegment2Ds.push_back(&recoSegment2D);
+        for (const CDCSegment2D& segment2D : m_mcSegment2Ds) {
+          if (segment2D.getStereoKind() == EStereoKind::c_Axial) {
+            m_mcAxialSegment2Ds.push_back(&segment2D);
           }
         }
 
@@ -230,10 +230,10 @@ namespace Belle2 {
       std::vector<CDCTrack> m_mcTracks;
 
       /// Memory for the Monte Carlo segments of the current event.
-      std::vector<CDCRecoSegment2D> m_mcSegment2Ds;
+      std::vector<CDCSegment2D> m_mcSegment2Ds;
 
       /// Memory for the axial Monte Carlo segments of the current event.
-      std::vector<const CDCRecoSegment2D*> m_mcAxialSegment2Ds;
+      std::vector<const CDCSegment2D*> m_mcAxialSegment2Ds;
 
       /// Memory for the axial hits of the current event.
       std::vector<const CDCWireHit*> m_axialWireHits;

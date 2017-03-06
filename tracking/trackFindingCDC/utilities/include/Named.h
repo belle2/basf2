@@ -9,7 +9,7 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Ptr.h>
+#include <tracking/trackFindingCDC/utilities/Scalar.h>
 
 #include <string>
 
@@ -18,11 +18,11 @@ namespace Belle2 {
 
     /// A mixin class to attach a name to an object.
     template<class T>
-    class Named : public StarToPtr<T> {
+    class Named : public ScalarToClass<T> {
 
     private:
       /// Type of the base class
-      using Super = StarToPtr<T>;
+      using Super = ScalarToClass<T>;
 
     public:
       /// Make the constructor of the base type available
@@ -32,7 +32,8 @@ namespace Belle2 {
       Named(const std::string& name, T t)
         : Super(std::move(t))
         , m_name(name)
-      {}
+      {
+      }
 
       /// Comparison operator establishing an ordering considering the name and the object
       bool operator<(const Named<T>& other) const
@@ -57,7 +58,6 @@ namespace Belle2 {
     private:
       /// Memory for the name.
       std::string m_name = "";
-
     };
   }
 }

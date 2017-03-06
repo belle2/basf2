@@ -7,25 +7,23 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/filters/segmentPair/FitlessSegmentPairFilter.h>
 
-#include <framework/logging/Logger.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
 Weight FitlessSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 {
-  const CDCRecoSegment2D* ptrStartSegment = segmentPair.getFromSegment();
-  const CDCRecoSegment2D* ptrEndSegment = segmentPair.getToSegment();
+  const CDCSegment2D* ptrStartSegment = segmentPair.getFromSegment();
+  const CDCSegment2D* ptrEndSegment = segmentPair.getToSegment();
 
   assert(ptrStartSegment);
   assert(ptrEndSegment);
 
-  const CDCRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCRecoSegment2D& endSegment = *ptrEndSegment;
+  const CDCSegment2D& startSegment = *ptrStartSegment;
+  const CDCSegment2D& endSegment = *ptrEndSegment;
 
   double weight = startSegment.size() + endSegment.size();
   return Super::operator()(segmentPair) * weight;

@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/filters/wireHitRelation/SecondaryWireHitRelationFilter.h>
 
 #include <vector>
+#include <string>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

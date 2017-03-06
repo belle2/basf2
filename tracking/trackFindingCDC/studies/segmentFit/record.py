@@ -34,7 +34,9 @@ CONTACT = "oliver.frost@desy.de"
 
 class SegmentFitValidationRun(HarvestingRun):
     n_events = 10000
-    generator_module = "simple_gun"  # Rather high momentum tracks should make the tracks rather straight.
+    generator_module = "low_gun"  # Rather high momentum tracks should make the tracks rather straight.
+    root_input_file = "low_gun.root"
+
     monte_carlo = "no"
     karimaki_fit = False
     flight_time_estimation = "none"
@@ -155,19 +157,25 @@ class SegmentFitValidationRun(HarvestingRun):
 
         path.add_module("WireHitPreparer",
                         flightTimeEstimation=self.flight_time_estimation,
-                        UseNLoops=0.5)
+                        UseNLoops=1
+                        )
 
         if self.monte_carlo == "no":
             # MC free - default
-            path.add_module("SegmentFinderCDCFacetAutomaton",
-                            SegmentOrientation="outwards")
+            path.add_module(
+                "SegmentFinderCDCFacetAutomaton",
+                # investigate=[],
+                SegmentOrientation="none",
+            )
 
         elif self.monte_carlo == "medium":
             # Medium MC - proper generation logic, but true facets and facet relations
             path.add_module("SegmentFinderCDCFacetAutomaton",
                             FacetFilter="truth",
                             FacetRelationFilter="truth",
-                            SegmentOrientation="outwards")
+                            SegmentOrientation="none",
+                            # SegmentOrientation="outwards"
+                            )
 
         elif self.monte_carlo == "full":
             # Only true monte carlo segments, but make the positions realistic
@@ -179,7 +187,7 @@ class SegmentFitValidationRun(HarvestingRun):
             raise ValueError("Invalid degree of Monte Carlo information")
 
         path.add_module("SegmentFitter",
-                        inputSegments="CDCRecoSegment2DVector",
+                        inputSegments="CDCSegment2DVector",
                         karimakiFit=self.karimaki_fit,
                         fitPos=self.fit_positions,
                         fitVariance=self.fit_variance,
@@ -196,14 +204,15 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
     compose validation plots on terminate."""
 
     def __init__(self, output_file_name):
-        super().__init__(foreach='CDCRecoSegment2DVector',
+        super().__init__(foreach='CDCSegment2DVector',
                          output_file_name=output_file_name)
 
         self.mc_segment_lookup = None
 
     def initialize(self):
         super().initialize()
-        self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
+        self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
+        self.mc_hit_lookup = Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance()
 
     def prepare(self):
         Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
@@ -217,6 +226,7 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
 
     def peel(self, segment):
         mc_segment_lookup = self.mc_segment_lookup
+        mc_hit_lookup = self.mc_hit_lookup
 
         segment_crops = cdc_peelers.peel_segment2d(segment)
 
@@ -227,6 +237,7 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         curvature_truth = fit3d_truth.getCurvatureXY()
 
         reconstructed_backward = mc_segment_lookup.isForwardOrBackwardToMCTrack(segment)
+        is_fake = mc_segment_lookup.getMCTrackId(segment) < 0
 
         if reconstructed_backward != 1:
             curvature_truth = -curvature_truth
@@ -234,24 +245,77 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         truth_crops = dict(
             tan_lambda_truth=fit3d_truth.getTanLambda(),
             curvature_truth=curvature_truth,
+            abs_curvature_truth=abs(curvature_truth),
             curvature_residual=segment_crops["curvature_estimate"] - curvature_truth,
             curvature_pull=(segment_crops["curvature_estimate"] - curvature_truth) / segment_crops["curvature_variance"],
             reconstructed_backward=reconstructed_backward,
+            is_fake=is_fake
+        )
+
+        rl_sum = 0
+        n_correct = 0
+        n_total = segment.size()
+        first_i_incorrect = float("nan")
+        last_i_incorrect = float("nan")
+        first_l_incorrect = 0
+        last_l_incorrect = 0
+
+        n_rl_switch = 0
+        last_rl_info = 0
+        for i, reco_hit2d in enumerate(segment):
+            rl_info = reco_hit2d.getRLInfo()
+            hit = reco_hit2d.getWireHit().getHit()
+            true_rl_info = mc_hit_lookup.getRLInfo(hit)
+
+            if rl_info != last_rl_info:
+                n_rl_switch += 1
+                last_rl_info = rl_info
+
+            if true_rl_info == rl_info:
+                n_correct += 1
+            else:
+                if first_i_incorrect != first_i_incorrect:
+                    first_i_incorrect = i
+                    first_l_incorrect = reco_hit2d.getRefDriftLength()
+                last_i_incorrect = i
+                last_l_incorrect = reco_hit2d.getRefDriftLength()
+            if rl_info == 1:
+                rl_sum += 1
+            elif rl_info == -1 or rl_info == 65535:  # <- The root interface mistakes the signed enum value for an unsigned value
+                rl_sum -= 1
+
+        alias_score = segment.getAliasScore()
+
+        rl_crops = dict(
+            n_total=n_total,
+            n_correct=n_correct,
+            n_incorrect=n_total - n_correct,
+            rl_purity=n_correct / n_total,
+            first_incorrect_location=first_i_incorrect / (n_total - 1),
+            first_l_incorrect=first_l_incorrect,
+            last_incorrect_location=last_i_incorrect / (n_total - 1),
+            last_l_incorrect=last_l_incorrect,
+            n_rl_switch=n_rl_switch,
+            n_rl_asymmetry=rl_sum / n_total,
+            n_abs_rl_asymmetry=abs(rl_sum) / n_total,
+            may_alias=alias_score == 0,
+            alias_score=alias_score
         )
 
         segment_crops.update(truth_crops)
         segment_crops.update(mc_particle_crops)
+        segment_crops.update(rl_crops)
         return segment_crops
 
     # Refiners to be executed at the end of the harvesting / termination of the module
-    # save_histograms = refiners.save_histograms(outlier_z_score=5.0, allow_discrete=True)
+    save_histograms = refiners.save_histograms(outlier_z_score=5.0, allow_discrete=True)
     save_tree = refiners.save_tree()
 
     save_curvature_pull = refiners.save_pull_analysis(
         part_name="curvature",
         unit="1/cm",
         absolute=False,
-        aux_names=["tan_lambda_truth", "curvature_truth"],
+        aux_names=["tan_lambda_truth", "abs_curvature_truth"],
         groupby=[
             "stereo_kind",
             "superlayer_id"
@@ -259,11 +323,27 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         outlier_z_score=4.0,
         title_postfix="")
 
+    save_curvature_pull_rl_pure = refiners.save_pull_analysis(
+        part_name="curvature",
+        unit="1/cm",
+        absolute=True,
+        filter_on="rl_purity",
+        filter=lambda rl_purity: rl_purity > 0.5,
+        aux_names=["tan_lambda_truth", "abs_curvature_truth"],
+        groupby=[
+            "stereo_kind",
+            "superlayer_id"
+        ],
+        outlier_z_score=4.0,
+        title_postfix="",
+        folder_name="rl_pure/{groupby_addition}"
+    )
+
     save_absolute_curvature_pull = refiners.save_pull_analysis(
         part_name="curvature",
         unit="1/cm",
         absolute=True,
-        aux_names=["tan_lambda_truth", "curvature_truth"],
+        aux_names=["tan_lambda_truth", "abs_curvature_truth"],
         groupby=[
             "stereo_kind",
             "superlayer_id"

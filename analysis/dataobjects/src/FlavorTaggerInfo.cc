@@ -165,9 +165,19 @@ FlavorTaggerInfoMap* FlavorTaggerInfo::getMethodMap(std::string method)
 {
   auto it = m_methodMap.find(method);
   if (it == m_methodMap.end()) {
-    B2FATAL("Method  " << method << " does not exist. Please add it before.");
+    B2FATAL("Method  " << method << " does not exist in the FlavorTaggerInfoMap. Please add it before to combinerMethods.");
   } else {
     return it -> second;
+  }
+}
+
+bool FlavorTaggerInfo::isMethodInMap(std::string method)
+{
+  auto it = m_methodMap.find(method);
+  if (it == m_methodMap.end()) {
+    return false;
+  } else {
+    return true;
   }
 }
 

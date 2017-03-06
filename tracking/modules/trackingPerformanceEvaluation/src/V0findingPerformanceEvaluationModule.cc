@@ -93,8 +93,8 @@ void V0findingPerformanceEvaluationModule::initialize()
   m_h1_vtxX_res = createHistogram1D("h1vtxXres", "vtxX resid", 100, -0.2, 0.2, "vtxX resid (cm)", m_histoList);
   m_h1_vtxY_res = createHistogram1D("h1vtxYres", "vtxY resid", 100, -0.2, 0.2, "vtxY resid (cm)", m_histoList);
   m_h1_vtxZ_res = createHistogram1D("h1vtxZres", "vtxZ resid", 100, -0.5, 0.5, "vtxZ resid (cm)", m_histoList);
-  m_h1_mom_res = createHistogram1D("h1momres", "mom resid", 100, -1.5, 1.5, "mom resid (GeV/c)", m_histoList);
-  m_h1_mass_res = createHistogram1D("h1massres", "mass resid", 100, -1, 1, "mass resid (GeV/c)", m_histoList);
+  m_h1_mom_res = createHistogram1D("h1momres", "mom resid", 1000, -0.5, 0.5, "mom resid (GeV/c)", m_histoList);
+  m_h1_mass_res = createHistogram1D("h1massres", "mass resid", 500, -0.3, 0.3, "mass resid (GeV/c)", m_histoList);
 
   //vertex and momentum parameters pulls
   m_h1_vtxX_pll = createHistogram1D("h1vtxXpll", "vtxX pull", 100, -5, 5, "vtxX pull", m_histoList);
@@ -194,7 +194,7 @@ void V0findingPerformanceEvaluationModule::event()
 
     //1.0 check if there is a V0
     RelationVector<V0ValidationVertex> V0s_toMCParticle =
-      DataStore::getRelationsToObj<V0ValidationVertex>(&mcParticle, m_V0sName);
+      DataStore::getRelationsWithObj<V0ValidationVertex>(&mcParticle, m_V0sName);
 
     if (V0s_toMCParticle.size() > 0)
       m_h3_V0sPerMCParticle->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
@@ -250,7 +250,7 @@ void V0findingPerformanceEvaluationModule::event()
 
     //check if the track has been fitted
     RelationVector<MCParticle> MCParticles_fromV0 =
-      DataStore::getRelationsFromObj<MCParticle>(&v0, m_MCParticlesName);
+      DataStore::getRelationsWithObj<MCParticle>(&v0, m_MCParticlesName);
 
     nMCParticles = MCParticles_fromV0.size();
 
@@ -379,20 +379,20 @@ int V0findingPerformanceEvaluationModule::nMatchedDaughters(const MCParticle& th
   bool first = false;
   bool second = false;
 
-  RelationVector<genfit::TrackCand> TrackCands_fromMCParticle_0 = DataStore::getRelationsToObj<genfit::TrackCand>(MCPart_dau[0]);
+  RelationVector<genfit::TrackCand> TrackCands_fromMCParticle_0 = DataStore::getRelationsWithObj<genfit::TrackCand>(MCPart_dau[0]);
 
   for (int tc = 0; tc < (int)TrackCands_fromMCParticle_0.size(); tc++)
     if (TrackCands_fromMCParticle_0.weight(tc) > 0.66) {
-      RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsFromObj<genfit::Track>(TrackCands_fromMCParticle_0[tc]);
+      RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsWithObj<genfit::Track>(TrackCands_fromMCParticle_0[tc]);
       if (Tracks_fromTrackCand.size() > 0)
         first = true;
     }
 
-  RelationVector<genfit::TrackCand> TrackCands_fromMCParticle_1 = DataStore::getRelationsToObj<genfit::TrackCand>(MCPart_dau[1]);
+  RelationVector<genfit::TrackCand> TrackCands_fromMCParticle_1 = DataStore::getRelationsWithObj<genfit::TrackCand>(MCPart_dau[1]);
 
   for (int tc = 0; tc < (int)TrackCands_fromMCParticle_1.size(); tc++)
     if (TrackCands_fromMCParticle_1.weight(tc) > 0.66) {
-      RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsFromObj<genfit::Track>(TrackCands_fromMCParticle_1[tc]);
+      RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsWithObj<genfit::Track>(TrackCands_fromMCParticle_1[tc]);
       if (Tracks_fromTrackCand.size() > 0)
         second = true;
     }

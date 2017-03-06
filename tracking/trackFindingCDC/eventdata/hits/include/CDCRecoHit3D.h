@@ -237,7 +237,7 @@ namespace Belle2 {
       { return getRLWireHit().getRLInfo(); }
 
       /// Setter the right left passage information.
-      void setRLInfo(ERightLeft& rlInfo)
+      void setRLInfo(ERightLeft rlInfo)
       { m_rlWireHit.setRLInfo(rlInfo); }
 
       /// Getter for the reference position of the wire.
@@ -333,16 +333,6 @@ namespace Belle2 {
       bool isInCellZBounds(const double factor = 1) const
       { return getWire().isInCellZBounds(getRecoPos3D(), factor); }
 
-      /**
-       *  Access the object methods and methods from a pointer in the same way.
-       *  In situations where the type is not known to be a pointer or a reference there is no way to tell
-       *  if one should use the dot '.' or operator '->' for method look up.
-       *  So this function defines the -> operator for the object.
-       *  No matter you have a pointer or an object access is given with '->'.
-       */
-      const CDCRecoHit3D* operator->() const
-      { return this; }
-
     private:
       /// Memory for the oriented wire hit reference.
       CDCRLWireHit m_rlWireHit;
@@ -351,8 +341,7 @@ namespace Belle2 {
       Vector3D m_recoPos3D;
 
       /// Memory for the travel distance as see in the xy projection.
-      double m_arcLength2D;
-
+      double m_arcLength2D = 0;
     };
   }
 }

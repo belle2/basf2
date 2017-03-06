@@ -19,12 +19,23 @@ basf2.set_random_seed(1337)
 
 import logging
 import tracking
+import validationtools
+
+try:
+    bg = validationtools.get_background_files()
+except:
+    print("No background files available. Please set $BELLE2_BACKGROUND_DIR to a proper value")
+    bg = []
 
 from tracking.validation.run import TrackingValidationRun
 
 
-class Full(TrackingValidationRun):
+class FullBkg(TrackingValidationRun):
     n_events = N_EVENTS
+    #: Generator to be used in the simulation (-so)
+    generator_module = 'generic'
+    #: Use back ground in the simulation (-so)
+    bkg_files = bg
     root_input_file = '../EvtGenSim.root'
     finder_module = staticmethod(tracking.add_tracking_reconstruction)
     tracking_coverage = {
@@ -32,17 +43,18 @@ class Full(TrackingValidationRun):
         'UseSVDHits': True,
         'UseCDCHits': True,
     }
-    fit_geometry = "default"
     # tracks will be already fitted by
     # add_tracking_reconstruction finder module set above
     fit_tracks = False
+    # But we need to tell the validation module to use the fit information
+    use_fit_information = True
     pulls = True
     resolution = True
     output_file_name = VALIDATION_OUTPUT_FILE
 
 
 def main():
-    validation_run = Full()
+    validation_run = FullBkg()
     validation_run.configure_and_execute_from_commandline()
 
 

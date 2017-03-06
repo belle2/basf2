@@ -12,7 +12,6 @@
 
 #include <framework/core/ModuleManager.h>
 #include <framework/core/ProcessStatistics.h>
-#include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/RxModule.h>
 #include <framework/pcore/TxModule.h>
@@ -64,7 +63,8 @@ namespace {
 
 CrashHandlerModule::CrashHandlerModule():
   Module(),
-  EventProcessor()
+  EventProcessor(),
+  m_procHandler(1, true)
 {
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
   setDescription("Internal module for graceful crash handling. If any of the wrapped modules abort, crash, etc., execution will continue after this module. The return value of this module is set to 0(false) in case of aborts (the DataStore will not contain any output from the wrapped modules); and to 1(true) if all modules executed normally. \nThis is a stopgap measure to avoid stopping the HLT because of software errors. It does not absolve you of the responsibility to fix your software.");
@@ -128,17 +128,11 @@ void CrashHandlerModule::event()
 
   FixStatisticsContext context;
 
-  if (ProcHandler::isWorkerProcess() or ProcHandler::isInputProcess()) {
-    //uninstall signal handler before nested forking (input & worker processes are forked)
-    EventProcessor::installSignalHandler(SIGCHLD, SIG_DFL);
-  }
-
-  ProcHandler procHandler;
   auto loglevel = getLogConfig().getLogLevel();
   getLogConfig().setLogLevel(LogConfig::c_Warning); //silence 'worker process forked' messages
-  procHandler.startWorkerProcesses(1);
+  m_procHandler.startWorkerProcesses();
   getLogConfig().setLogLevel(loglevel);
-  if (procHandler.processList().empty()) { //child process
+  if (m_procHandler.processList().empty()) { //child process
     //reset stats to handle merges correctly
     StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
     processStatistics->clear();
@@ -155,19 +149,7 @@ void CrashHandlerModule::event()
     _exit(0);
   } else { //monitoring process
     B2DEBUG(100, "In monitoring process");
-    pid_t pid = *(procHandler.processList().begin());
-    int status = 0;
-    while (waitpid(pid, &status, 0) <= 0) {
-      if (errno == EINTR)
-        continue;
-
-      B2ERROR("waitpid() failed: " << strerror(errno) << ". Please report this to christian.pulvermacher@kek.jp ");
-      //Unsure what could cause this.
-      break;
-    }
-    B2DEBUG(100, "waitpid() completed, status = " << status);
-
-    bool ok = WIFEXITED(status) and WEXITSTATUS(status) == 0;
+    bool ok = m_procHandler.waitForAllProcesses();
     setReturnValue(ok);
     m_nEvents++;
     if (ok) {
@@ -184,11 +166,6 @@ void CrashHandlerModule::event()
 void CrashHandlerModule::terminate()
 {
   FixStatisticsContext context;
-
-  //get event map and make a deep copy of the StoreEntry objects
-  //(we want to revert changes to the StoreEntry objects, but not to the arrays/objects)
-  DataStore::StoreEntryMap& persistentMap = DataStore::Instance().getStoreEntryMap(DataStore::c_Persistent);
-  DataStore::StoreEntryMap persistentMapCopy = persistentMap;
 
   if (m_rx)
     m_rx->terminate();

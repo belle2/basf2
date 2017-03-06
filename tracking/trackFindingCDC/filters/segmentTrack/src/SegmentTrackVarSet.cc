@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/numerics/ToFinite.h>
@@ -21,10 +21,10 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>* testPair)
+bool SegmentTrackVarSet::extract(const BaseSegmentTrackFilter::Object* testPair)
 {
-  const CDCRecoSegment2D* segment = testPair->first;
-  const CDCTrack* track = testPair->second;
+  const CDCTrack* track = testPair->getFrom();
+  const CDCSegment2D* segment = testPair->getTo();
 
   assert(segment);
   assert(track);

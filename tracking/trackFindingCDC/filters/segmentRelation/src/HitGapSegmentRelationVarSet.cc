@@ -9,20 +9,22 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentRelation/HitGapSegmentRelationVarSet.h>
 
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool HitGapSegmentRelationVarSet::extract(const Relation<const CDCRecoSegment2D>* ptrSegmentRelation)
+bool HitGapSegmentRelationVarSet::extract(const Relation<const CDCSegment2D>* ptrSegmentRelation)
 {
   if (not ptrSegmentRelation) return false;
 
-  const Relation<const CDCRecoSegment2D>& segmentPair = *ptrSegmentRelation;
+  const Relation<const CDCSegment2D>& segmentPair = *ptrSegmentRelation;
 
-  const CDCRecoSegment2D* ptrFromSegment = segmentPair.getFrom();
-  const CDCRecoSegment2D* ptrToSegment = segmentPair.getTo();
+  const CDCSegment2D* ptrFromSegment = segmentPair.getFrom();
+  const CDCSegment2D* ptrToSegment = segmentPair.getTo();
 
-  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
-  const CDCRecoSegment2D& toSegment = *ptrToSegment;
+  const CDCSegment2D& fromSegment = *ptrFromSegment;
+  const CDCSegment2D& toSegment = *ptrToSegment;
 
   const CDCRecoHit2D& fromFirstHit = fromSegment.front();
   const CDCRecoHit2D& fromLastHit = fromSegment.back();

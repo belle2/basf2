@@ -45,6 +45,8 @@ genfit::TrackPoint* BaseMeasurementCreatorFromHit<HitType, detector>::createTrac
 template class Belle2::BaseMeasurementCreatorFromHit<RecoHitInformation::UsedCDCHit, Const::CDC>;
 template class Belle2::BaseMeasurementCreatorFromHit<RecoHitInformation::UsedSVDHit, Const::SVD>;
 template class Belle2::BaseMeasurementCreatorFromHit<RecoHitInformation::UsedPXDHit, Const::PXD>;
+template class Belle2::BaseMeasurementCreatorFromHit<RecoHitInformation::UsedBKLMHit, Const::BKLM>;
+template class Belle2::BaseMeasurementCreatorFromHit<RecoHitInformation::UsedEKLMHit, Const::EKLM>;
 
 template<>
 genfit::AbsMeasurement* CDCBaseMeasurementCreator::createCoordinateMeasurement(RecoHitInformation::UsedCDCHit* cdcHit,

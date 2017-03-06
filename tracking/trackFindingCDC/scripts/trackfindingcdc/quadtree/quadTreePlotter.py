@@ -172,7 +172,7 @@ class SegmentQuadTreePlotter(QuadTreePlotter):
         ------
         f: function
         """
-        items = Belle2.PyStoreObj("CDCRecoSegment2DVector")
+        items = Belle2.PyStoreObj("CDCSegment2DVector")
         wrapped_vector = items.obj()
         vector = wrapped_vector.get()
 

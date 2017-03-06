@@ -23,40 +23,40 @@ namespace Belle2 {
     struct BEASTTree_v2 {
 
       /**Beast PVs **/
-      UInt_t ts; /** */
-      UInt_t event; /** */
-      UInt_t run; /** */
-      UInt_t subrun; /** */
-      std::vector<double>*  SKB_HER_current;/** */
-      std::vector<double>*  SKB_LER_current;/** */
-      std::vector<double>*  SKB_HER_lifetime;/** */
-      std::vector<double>*  SKB_LER_lifetime;/** */
-      std::vector<double>*  SKB_HER_integratedCurrent;/** */
-      std::vector<double>*  SKB_LER_integratedCurrent;
-      std::vector<double>*  SKB_HER_injectionFlag;/** */
-      std::vector<double>*  SKB_LER_injectionFlag;/** */
-      std::vector<double>*  SKB_HER_injectionRate;/** */
-      std::vector<double>*  SKB_LER_injectionRate;/** */
-      std::vector<double>*  SKB_HER_injectionEfficiency;/** */
-      std::vector<double>*  SKB_LER_injectionEfficiency;/** */
-      std::vector<double>*  SKB_HER_injectionCharge;/** */
-      std::vector<double>*  SKB_LER_injectionCharge;/** */
-      std::vector<double>*  SKB_HER_injectionRepetitionRate;/** */
-      std::vector<double>*  SKB_LER_injectionRepetitionRate;/** */
-      std::vector<double>*  SKB_HER_injectionNumberOfBunches;/** */
-      std::vector<double>*  SKB_LER_injectionNumberOfBunches;/** */
-      std::vector<double>*  SKB_HER_beamSize_xray_X;/** */
-      std::vector<double>*  SKB_HER_beamSize_xray_Y;/** */
-      std::vector<double>*  SKB_LER_beamSize_xray_X;/** */
-      std::vector<double>*  SKB_LER_beamSize_xray_Y;/** */
-      std::vector<double>*  SKB_HER_beamSize_SR_Y;/** */
-      std::vector<double>*  SKB_LER_beamSize_SR_Y;/** */
-      std::vector<double>*  SKB_HER_beamSize_SR_X;/** */
-      std::vector<double>*  SKB_LER_beamSize_SR_X;/** */
-      std::vector<double>*  SKB_beamLoss_nearCollimators;/** */
-      std::vector<double>*  SKB_beamLoss_aroundMasks;/** */
-      std::vector<double>*  SKB_HER_pressure_average;/** */
-      std::vector<double>*  SKB_LER_pressure_average;/** */
+      UInt_t ts; /** ts */
+      UInt_t event; /** event */
+      UInt_t run; /** run */
+      UInt_t subrun; /** subrun */
+      std::vector<double>*  SKB_HER_current;/**SKB_HER_current; */
+      std::vector<double>*  SKB_LER_current;/**SKB_LER_current */
+      std::vector<double>*  SKB_HER_lifetime;/**SKB_HER_lifetime */
+      std::vector<double>*  SKB_LER_lifetime;/**SKB_LER_lifetime */
+      std::vector<double>*  SKB_HER_integratedCurrent;/**SKB_HER_integratedCurrent */
+      std::vector<double>*  SKB_LER_integratedCurrent;/**SKB_LER_integratedCurrent */
+      std::vector<double>*  SKB_HER_injectionFlag;/**SKB_HER_injectionFlag */
+      std::vector<double>*  SKB_LER_injectionFlag;/**SKB_LER_injectionFlag */
+      std::vector<double>*  SKB_HER_injectionRate;/**SKB_HER_injectionRate */
+      std::vector<double>*  SKB_LER_injectionRate;/**SKB_LER_injectionRate */
+      std::vector<double>*  SKB_HER_injectionEfficiency;/**SKB_HER_injectionEfficiency */
+      std::vector<double>*  SKB_LER_injectionEfficiency;/**SKB_LER_injectionEfficiency */
+      std::vector<double>*  SKB_HER_injectionCharge;/** SKB_HER_injectionCharge */
+      std::vector<double>*  SKB_LER_injectionCharge;/**SKB_LER_injectionCharge */
+      std::vector<double>*  SKB_HER_injectionRepetitionRate;/**SKB_HER_injectionRepetitionRate */
+      std::vector<double>*  SKB_LER_injectionRepetitionRate;/**SKB_LER_injectionRepetitionRate */
+      std::vector<double>*  SKB_HER_injectionNumberOfBunches;/**SKB_HER_injectionNumberOfBunches */
+      std::vector<double>*  SKB_LER_injectionNumberOfBunches;/**SKB_LER_injectionNumberOfBunches */
+      std::vector<double>*  SKB_HER_beamSize_xray_X;/*SKB_HER_beamSize_xray_X */
+      std::vector<double>*  SKB_HER_beamSize_xray_Y;/**SKB_HER_beamSize_xray_Y */
+      std::vector<double>*  SKB_LER_beamSize_xray_X;/**SKB_LER_beamSize_xray_X */
+      std::vector<double>*  SKB_LER_beamSize_xray_Y;/**SKB_LER_beamSize_xray_Y */
+      std::vector<double>*  SKB_HER_beamSize_SR_Y;/**SKB_HER_beamSize_SR_Y */
+      std::vector<double>*  SKB_LER_beamSize_SR_Y;/**SKB_LER_beamSize_SR_Y */
+      std::vector<double>*  SKB_HER_beamSize_SR_X;/**SKB_HER_beamSize_SR_X */
+      std::vector<double>*  SKB_LER_beamSize_SR_X;/**SKB_LER_beamSize_SR_X */
+      std::vector<double>*  SKB_beamLoss_nearCollimators;/**SKB_beamLoss_nearCollimators */
+      std::vector<double>*  SKB_beamLoss_aroundMasks;/**SKB_beamLoss_aroundMasks */
+      std::vector<double>*  SKB_HER_pressure_average;/**SKB_HER_pressure_average */
+      std::vector<double>*  SKB_LER_pressure_average;/**SKB_LER_pressure_average */
       std::vector<float>*   SKB_HER_pressures;/** */
       std::vector<float>*   SKB_LER_pressures;/** */
       std::vector<float>*   SKB_LER_pressures_local;/** */

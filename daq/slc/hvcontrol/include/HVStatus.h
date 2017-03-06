@@ -12,11 +12,16 @@ namespace Belle2 {
 
   public:
     enum State {
-      OFF = 0,
-      ON = 1,
-      OVP = 2,
-      OCP = 3,
-      ERR = 11
+      OFF = 0, // power off,
+      ON,      // power on without error
+      OCP,     // trip due to over current
+      OVP,     // trip due to over voltage
+      ERR,     // another error
+      RAMPUP,  // ramping up voltage
+      RAMPDOWN, // ramping down voltage
+      TRIP,     // Trip due to current trip
+      ETRIP,    // External trip
+      INTERLOCK // Inter lock
     };
 
   public:

@@ -37,7 +37,7 @@
   <xi:include href="../geometry/MagneticFieldConstant4LimitedRCDC.xml"/>
   <xi:include href="../geometry/MagneticFieldConstantBelle.xml"/>
   <xi:include href="../geometry/MagneticField2d.xml"/>
-  <xi:include href="../geometry/MagneticField3d.xml"/>
+  <xi:include href="../geometry/MagneticField3dQuadBeamline.xml"/>
   <xi:include href="../geometry/MagneticField3dTotalVolume.xml"/>
 
   <!-- Accelerator -->

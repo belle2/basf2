@@ -28,17 +28,17 @@ namespace Belle2 {
      *  This object template provides the memory and the names of the float values.
      *  The filling from the complex object is specialised in the derived class
      *
-     *  As a template parameter it takes class with three containing parameters.
-     *  Object - The class of the complex object from which to extract the variable.
-     *  nNames - Number of variables that will be extracted from the complex object.
-     *  names - Array of names which contain the nNames names of the float values.
+     *  @tparam AVarNames Class with three containing parameters.
+     *  Object          - The class of the complex object from which to extract the variable.
+     *  nVars           - Number of variables that will be extracted from the complex object.
+     *  getName(int)    - Function to get the name of the variable at the given index
      */
-    template<class AObjectVarNames>
-    class VarSet : public BaseVarSet<typename AObjectVarNames::Object> {
+    template<class AVarNames>
+    class VarSet : public BaseVarSet<typename AVarNames::Object> {
 
     private:
       /// Type of the super class
-      using Super = BaseVarSet<typename AObjectVarNames::Object>;
+      using Super = BaseVarSet<typename AVarNames::Object>;
 
     public:
       /// Type from which variables should be extracted
@@ -46,7 +46,7 @@ namespace Belle2 {
 
     private:
       /// Number of floating point values represented by this class.
-      static const size_t nVars = AObjectVarNames::nNames;
+      static const size_t nVars = AVarNames::nVars;
 
     public:
       /**
@@ -78,7 +78,7 @@ namespace Belle2 {
        */
       constexpr static int named(const char* name)
       {
-        return index<nVars>(AObjectVarNames::getName, name);
+        return index<nVars>(AVarNames::getName, name);
       }
 
       /// Getter for the value of the ith variable. Static version.
@@ -134,9 +134,9 @@ namespace Belle2 {
         return AssignFinite<Float_t>(m_variables[I]);
       }
 
-    public:
-      /// Memory for nNames floating point values.
-      FixedSizeNamedFloatTuple<AObjectVarNames> m_variables;
+    private:
+      /// Memory for nVars floating point values.
+      FixedSizeNamedFloatTuple<AVarNames> m_variables;
     };
   }
 }

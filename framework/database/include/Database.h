@@ -75,7 +75,7 @@ namespace Belle2 {
        * @param aName  The identifier of the object
        */
       DBQuery(const std::string& aPackage, const std::string& aModule, TObject* aObject = 0,
-              IntervalOfValidity aIov = 0): package(aPackage), module(aModule), object(aObject), iov(aIov) {};
+              const IntervalOfValidity& aIov = 0): package(aPackage), module(aModule), object(aObject), iov(aIov) {};
       std::string        package; /**< First part of identifier of the object */
       std::string        module; /**< Second part of identifier of the object */
       TObject*           object; /**< Pointer to the object */
@@ -165,16 +165,30 @@ namespace Belle2 {
     static void exposePythonAPI();
 
     /**
+     * Return the global tag used by the database. If no conditions database is
+     * configured return an empty string. If more then once database is
+     * configured return all global tags concatenated by ','
+     */
+    static std::string getGlobalTag();
+
+    /**
      * Set level of log messages about not-found payloads.
      *
      * @param logLevel  The level of log messages about not-found payloads.
+     * @param invertLogging  If true log messages will be created when a
+     *                  payload is found. This is intended for the local
+     *                  database to notify the user that a non-standard payload
+     *                  from a local directory is used.
      */
-    void setLogLevel(LogConfig::ELogLevel logLevel = LogConfig::c_Warning) {m_logLevel = logLevel;};
-
+    void setLogLevel(LogConfig::ELogLevel logLevel = LogConfig::c_Warning, bool invertLogging = false)
+    {
+      m_logLevel = logLevel;
+      m_invertLogging = invertLogging;
+    }
 
   protected:
     /** Pointer to the database instance. */
-    static Database* s_instance;
+    static std::unique_ptr<Database> s_instance;
 
     /** Hidden constructor, as it is a singleton. */
     Database() : m_logLevel(LogConfig::c_Warning) {};
@@ -194,5 +208,8 @@ namespace Belle2 {
 
     /** Level of log messages about not found objects. */
     LogConfig::ELogLevel m_logLevel;
+
+    /** If true logging should be inverted: i.e. show messages if a payload was found, not if it wasn't */
+    bool m_invertLogging{false};
   };
 } // namespace Belle2

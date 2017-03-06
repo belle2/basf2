@@ -12,7 +12,10 @@
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -20,6 +23,9 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+namespace {
+}
 
 void DriftLengthEstimator::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
@@ -108,9 +114,64 @@ void DriftLengthEstimator::updateDriftLength(CDCFacet& facet)
   // facet.getEndRLWireHit().setRefDriftLength(endDriftLength);
 }
 
-void DriftLengthEstimator::updateDriftLength(CDCRecoSegment2D& segment)
+void DriftLengthEstimator::updateDriftLength(CDCSegment2D& segment)
 {
   for (CDCRecoHit2D& recoHit2D : segment) {
     updateDriftLength(recoHit2D);
+  }
+}
+
+double DriftLengthEstimator::updateDriftLength(CDCRecoHit3D& recoHit3D,
+                                               double tanLambda)
+{
+  CDC::RealisticTDCCountTranslator tdcCountTranslator;
+  const FlightTimeEstimator& flightTimeEstimator = FlightTimeEstimator::instance();
+
+  Vector2D flightDirection = recoHit3D.getFlightDirection2D();
+  const Vector3D& recoPos3D = recoHit3D.getRecoPos3D();
+  const Vector2D& recoPos2D = recoPos3D.xy();
+  double alpha = recoPos2D.angleWith(flightDirection);
+  const double beta = 1;
+  double flightTimeEstimate = flightTimeEstimator.getFlightTime2D(recoPos2D, alpha, beta);
+
+  if (std::isnan(tanLambda)) {
+    tanLambda = recoPos3D.z() / recoPos3D.cylindricalR();
+  }
+  const double theta = M_PI / 2 - std::atan(tanLambda);
+  flightTimeEstimate *= hypot2(1, tanLambda);
+
+  const CDCWire& wire = recoHit3D.getWire();
+  const CDCHit* hit = recoHit3D.getWireHit().getHit();
+  const bool rl = recoHit3D.getRLInfo() == ERightLeft::c_Right;
+  double driftLength =
+    tdcCountTranslator.getDriftLength(hit->getTDCCount(),
+                                      wire.getWireID(),
+                                      flightTimeEstimate,
+                                      rl,
+                                      recoPos3D.z(),
+                                      alpha,
+                                      theta,
+                                      hit->getADCCount());
+  if (driftLength > -2) {
+    bool snapRecoPos = true;
+    recoHit3D.setRecoDriftLength(driftLength, snapRecoPos);
+  }
+  return driftLength;
+}
+
+
+void DriftLengthEstimator::updateDriftLength(CDCSegment3D& segment3D,
+                                             const double tanLambda)
+{
+  for (CDCRecoHit3D& recoHit3D : segment3D) {
+    updateDriftLength(recoHit3D, tanLambda);
+  }
+}
+
+void DriftLengthEstimator::updateDriftLength(CDCTrack& track,
+                                             const double tanLambda)
+{
+  for (CDCRecoHit3D& recoHit3D : track) {
+    updateDriftLength(recoHit3D, tanLambda);
   }
 }

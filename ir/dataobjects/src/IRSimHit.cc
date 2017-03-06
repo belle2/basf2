@@ -13,8 +13,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(IRSimHit)
-
 IRSimHit::~IRSimHit()
 {
 }

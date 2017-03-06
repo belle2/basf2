@@ -13,10 +13,9 @@
 #include <tracking/trackFindingCDC/filters/segmentTriple/MCSegmentTripleFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
 
-
 namespace Belle2 {
   namespace TrackFindingCDC {
-    ///Class filtering the neighborhood of segment triples with monte carlo information
+    /// Class filtering the neighborhood of segment triples with monte carlo information
     class MCSegmentTripleRelationFilter:
       public MCSymmetricFilterMixin<BaseSegmentTripleRelationFilter > {
 
@@ -25,21 +24,8 @@ namespace Belle2 {
       using Super = MCSymmetricFilterMixin<BaseSegmentTripleRelationFilter >;
 
     public:
-      /// Importing all overloads from the super class
-      using Super::operator();
-
-    public:
       /** Constructor. */
       MCSegmentTripleRelationFilter(bool allowReverse = true);
-
-      /// Used to prepare the Monte Carlo information for this event.
-      void beginEvent() final;
-
-      /// Forwards the initialize method from the module
-      void initialize() final;
-
-      /// Forwards the terminate method from the module
-      void terminate() final;
 
       /** Main filter method returning the weight of the neighborhood relation.
        *  Return NAN if relation shall be rejected.*/
@@ -56,9 +42,6 @@ namespace Belle2 {
     private:
       /// Instance of the Monte Carlo segment triple filter for rejection of false cells.
       MCSegmentTripleFilter m_mcSegmentTripleFilter;
-
     };
-
-
   }
 }

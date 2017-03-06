@@ -4,6 +4,7 @@
 """
 <header>
   <contact>tkuhr</contact>
+  <output>EvtGenSimRecLarge.root</output>
   <description>This steering file produces 10000 generic BBbar events with EvtGen,
   runs the detector simulation with mixed in background, and performs the standard reconstruction.
   It will only be run for release validation in order to test the software on a larger set of events to
@@ -16,7 +17,7 @@ from basf2 import *
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from beamparameters import add_beamparameters
-import glob
+import validationtools
 
 set_random_seed(12345)
 
@@ -39,9 +40,7 @@ evtgeninput = register_module('EvtGenInput')
 main.add_module(evtgeninput)
 
 # detector simulation
-bg = None
-if 'BELLE2_BACKGROUND_DIR' in os.environ:
-    bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+bg = validationtools.get_background_files()
 add_simulation(main, bkgfiles=bg)
 
 # reconstruction

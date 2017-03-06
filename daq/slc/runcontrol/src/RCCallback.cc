@@ -71,6 +71,7 @@ RCCallback::RCCallback(int timeout) throw()
 
 void RCCallback::init(NSMCommunicator&) throw()
 {
+  LogFile::debug("init");
   NSMNode& node(getNode());
   reset();
   add(new NSMVHandlerText("dbtable", true, false, m_table));
@@ -108,7 +109,7 @@ void RCCallback::init(NSMCommunicator&) throw()
     }
   }
   add(new RCConfigHandler(*this, "rcconfig", m_obj.getName()));
-  add(m_obj);
+  addDB(m_obj);
   try {
     initialize(m_obj);
   } catch (const RCHandlerException& e) {
@@ -116,6 +117,7 @@ void RCCallback::init(NSMCommunicator&) throw()
     term();
     exit(1);
   }
+  LogFile::debug("init done");
 }
 
 bool RCCallback::perform(NSMCommunicator& com) throw()
@@ -149,9 +151,10 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
     if (tstate != Enum::UNKNOWN) {
       setState(tstate);
       if (cmd == RCCommand::CONFIGURE) {
-        const NSMMessage& msg(com.getMessage());
+        //const NSMMessage& msg(com.getMessage());
         try {
           abort();
+          LogFile::info(msg.getData());
           dbload(msg.getLength(), msg.getData());
         } catch (const IOException& e) {
           throw (RCHandlerException(e.what()));
@@ -256,9 +259,66 @@ void RCCallback::setState(const RCState& state) throw()
   reply(NSMMessage(NSMCommand::OK, state.getLabel()));
 }
 
+DBObject RCCallback::dbload(const std::string& path)
+{
+  DBObject obj;
+  std::string pathin, table, config;
+  LogFile::debug(path);
+  if (path.find("db://") != std::string::npos) {
+    pathin = StringUtil::replace(path, "db://", "");
+    StringList s = StringUtil::split(pathin, '/');
+    LogFile::debug(pathin);
+    if (s.size() > 1) {
+      table = s[0];
+      config = s[1];
+    } else {
+      table = m_table;
+      config = s[0];
+    }
+    LogFile::debug(table);
+    LogFile::debug(config);
+    set("rcconfig", config);
+    set("table", table);
+  } else if (path.find("file://") != std::string::npos) {
+    pathin = StringUtil::replace(path, "file:/", "");
+    obj = DBObjectLoader::load(pathin);
+    return obj;
+  }
+  if (table.size() > 0 && config.size() > 0) {
+    if (getDB()) {
+      DBInterface& db(*getDB());
+      try {
+        obj = DBObjectLoader::load(db, table, config, false);
+        db.close();
+        //obj.print(false);
+      } catch (const DBHandlerException& e) {
+        db.close();
+        throw (e);
+      }
+    } else if (m_provider_host.size() > 0 && m_provider_port > 0) {
+      TCPSocket socket(m_provider_host, m_provider_port);
+      try {
+        socket.connect();
+        TCPSocketWriter writer(socket);
+        writer.writeInt(1);
+        writer.writeString(table + "/" + config);
+        TCPSocketReader reader(socket);
+        obj.readObject(reader);
+        //obj.print(false);
+      } catch (const IOException& e) {
+        socket.close();
+        throw (IOException("Socket connection error : %s ", e.what()));
+      }
+      socket.close();
+    }
+  }
+  return obj;
+}
+
 void RCCallback::dbload(int length, const char* data)
 throw(IOException)
 {
+  LogFile::info(data);
   if (length > 0 && strlen(data) > 0) {
     remove(m_obj);
     StringList s = StringUtil::split(data, '/');
@@ -267,17 +327,21 @@ throw(IOException)
     }
     const std::string table = (s.size() > 1) ? s[0] : m_table;
     std::string config = (s.size() > 1) ? s[1] : s[0];
+    LogFile::info(config);
     if (table.size() == 0) {
       throw (DBHandlerException("Empty DB table name"));
     }
     if (config.size() == 0) {
       throw (DBHandlerException("Empty config name"));
     }
-    if (!StringUtil::find(config, "@")) {
-      config = getNode().getName() + "@" + config;
+    LogFile::info(config);
+    if (!StringUtil::find(config, "@RC:")) {
+      config = getNode().getName() + "@RC:" + config;
     }
+    LogFile::info(config);
     m_table = table;
     m_rcconfig = config;
+    set("rcconfig", m_rcconfig);
     set("dbtable", m_table);
   }
   if (m_table.size() > 0 && m_rcconfig.size() > 0) {
@@ -286,7 +350,7 @@ throw(IOException)
       try {
         m_obj = DBObjectLoader::load(db, m_table, m_rcconfig, m_showall);
         db.close();
-        m_obj.print(m_showall);
+        //m_obj.print(m_showall);
       } catch (const DBHandlerException& e) {
         db.close();
         throw (e);
@@ -300,7 +364,7 @@ throw(IOException)
         writer.writeString(m_table + "/" + m_rcconfig);
         TCPSocketReader reader(socket);
         m_obj.readObject(reader);
-        m_obj.print(m_showall);
+        //m_obj.print(m_showall);
       } catch (const IOException& e) {
         socket.close();
         throw (IOException("Socket connection error : %s ", e.what()));
@@ -310,7 +374,7 @@ throw(IOException)
   } else {
     LogFile::warning("No DB objects was loaded");
   }
-  add(m_obj);
+  addDB(m_obj);
 }
 
 void RCCallback::dbrecord(DBObject obj, int expno, int runno, bool isstart)

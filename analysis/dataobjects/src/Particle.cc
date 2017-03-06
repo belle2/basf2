@@ -37,7 +37,7 @@ using namespace Belle2;
 Particle::Particle() :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(0)
+  m_arrayPointer(nullptr)
 {
   resetErrorMatrix();
 }
@@ -45,7 +45,7 @@ Particle::Particle() :
 Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
   m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(0)
+  m_arrayPointer(nullptr)
 {
   setFlavorType();
   set4Vector(momentum);
@@ -59,7 +59,7 @@ Particle::Particle(const TLorentzVector& momentum,
                    const unsigned mdstIndex) :
   m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(flavorType), m_particleType(type), m_mdstIndex(mdstIndex),
-  m_arrayPointer(0)
+  m_arrayPointer(nullptr)
 {
   if (flavorType == c_Unflavored and pdgCode < 0)
     m_pdgCode = -pdgCode;
@@ -99,7 +99,7 @@ Particle::Particle(const Track* track,
                    const Const::ChargedStable& chargedStable) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(0)
+  m_arrayPointer(nullptr)
 {
   if (!track) return;
   const TrackFitResult* trackFit = track->getTrackFitResult(chargedStable);
@@ -130,7 +130,7 @@ Particle::Particle(const int trackArrayIndex,
                    const Const::ChargedStable& chargedStable) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(0)
+  m_arrayPointer(nullptr)
 {
   if (!trackFit) return;
 
@@ -156,7 +156,7 @@ Particle::Particle(const int trackArrayIndex,
 Particle::Particle(const ECLCluster* eclCluster) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(0)
+  m_arrayPointer(nullptr)
 {
   if (!eclCluster) return;
 
@@ -187,7 +187,7 @@ Particle::Particle(const ECLCluster* eclCluster) :
 Particle::Particle(const KLMCluster* klmCluster) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(0)
+  m_arrayPointer(nullptr)
 {
   if (!klmCluster) return;
 
@@ -213,7 +213,7 @@ Particle::Particle(const KLMCluster* klmCluster) :
 Particle::Particle(const MCParticle* mcParticle) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
-  m_arrayPointer(0)
+  m_arrayPointer(nullptr)
 {
   if (!mcParticle) return;
 
@@ -321,6 +321,13 @@ float Particle::getMassError(void) const
   return TMath::Sqrt(result);
 }
 */
+
+void Particle::updateMass(const int pdgCode)
+{
+  if (TDatabasePDG::Instance()->GetParticle(pdgCode) == NULL)
+    B2FATAL("PDG=" << pdgCode << " ***code unknown to TDatabasePDG");
+  m_mass = TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass() ;
+}
 
 float Particle::getPDGMass(void) const
 {

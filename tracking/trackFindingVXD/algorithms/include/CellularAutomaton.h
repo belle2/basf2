@@ -40,6 +40,7 @@ namespace Belle2 {
     unsigned int stopInRound = BaseClass::m_validator.nMaxIterations + 2;
 
     /** actual algorithm of Cellular Automaton, returns number of rounds needed to finish or -1 if CA was aborted */
+    // TODO: Check where the -1 is returned, for bad cases as described above.
     int apply(ContainerType& aNetworkContainer) override
     {
       /** REDESIGNCOMMENT CELLULARAUTOMATON:

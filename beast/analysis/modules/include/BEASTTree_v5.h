@@ -31,10 +31,20 @@ namespace Belle2 {
       std::vector<double>*  SKB_LER_current;/** */
       std::vector<double>*  SKB_HER_lifetime;/** */
       std::vector<double>*  SKB_LER_lifetime;/** */
+      std::vector<float>* SKB_LER_Zeff_D02;/** */
+      std::vector<float>* SKB_LER_Zeff_D06;/** */
+      std::vector<double>  SKB_HER_RLR;/** */
+      std::vector<double>  SKB_LER_RLR;/** */
       std::vector<double>*  SKB_HER_integratedCurrent;/** */
       std::vector<double>*  SKB_LER_integratedCurrent;
       std::vector<double>*  SKB_HER_injectionFlag;/** */
       std::vector<double>*  SKB_LER_injectionFlag;/** */
+      std::vector<double>*  SKB_HER_injectionFlag_safe;/** */
+      std::vector<double>*  SKB_LER_injectionFlag_safe;/** */
+      std::vector<double>*  SKB_HER_abortFlag;/** */
+      std::vector<double>*  SKB_LER_abortFlag;/** */
+      std::vector<double>*  SKB_HER_abortFlag_safe;/** */
+      std::vector<double>*  SKB_LER_abortFlag_safe;/** */
       std::vector<double>*  SKB_HER_injectionRate;/** */
       std::vector<double>*  SKB_LER_injectionRate;/** */
       std::vector<double>*  SKB_HER_injectionEfficiency;/** */
@@ -47,10 +57,10 @@ namespace Belle2 {
       std::vector<double>*  SKB_LER_injectionNumberOfBunches;/** */
       std::vector<double>*  SKB_HER_beamSize_xray_X;/** */
       std::vector<double>*  SKB_HER_beamSize_xray_Y;/** */
-      std::vector<double>*  SKB_HER_correctedbeamSize_xray_Y;/** */
+      std::vector<double>*  SKB_HER_correctedBeamSize_xray_Y;/** */
       std::vector<double>*  SKB_LER_beamSize_xray_X;/** */
       std::vector<double>*  SKB_LER_beamSize_xray_Y;/** */
-      std::vector<double>*  SKB_LER_correctedbeamSize_xray_Y;/** */
+      std::vector<double>*  SKB_LER_correctedBeamSize_xray_Y;/** */
       std::vector<double>*  SKB_HER_beamSize_SR_Y;/** */
       std::vector<double>*  SKB_LER_beamSize_SR_Y;/** */
       std::vector<double>*  SKB_HER_beamSize_SR_X;/** */
@@ -161,6 +171,28 @@ namespace Belle2 {
       std::vector<double> SAD_LER_lifetime;/** */
       std::vector<double> SAD_HER_lifetime_av;/** */
       std::vector<double> SAD_LER_lifetime_av;/** */
+      std::vector<double> SAD_HER_RLR;/** */
+      std::vector<double> SAD_LER_RLR;/** */
+      std::vector<double> SAD_HER_RLR_av;/** */
+      std::vector<double> SAD_LER_RLR_av;/** */
+
+      std::vector<float> DOSI;/** */
+      std::vector<float> DOSI_av;/** */
+
+      //std::vector<float> TPC_rate_av[2][5];/** */
+      //std::vector<float> TPC_rate[2][5];/** */
+      float TPC_rate_av[2][5];/** */
+      float TPC_rate[2][5];/** */
+      //float TPC_dose_av[2][5];/** */
+      //float TPC_dose[2][5];/** */
+      std::vector<float> TPC_dose;/** */
+      std::vector<float> TPC_dose_av;/** */
+
+      float TPC_angular_rate_av[2][9][18];/** */
+      float TPC_angular_rate[2][9][18];/** */
+      float TPC_angular_dose_av[2][9][18];/** */
+      float TPC_angular_dose[2][9][18];/** */
+
       /**
        *.clear the structure: set elements to zero
        */
@@ -172,6 +204,12 @@ namespace Belle2 {
         subrun = 0;
         SKB_HER_injectionFlag = 0;
         SKB_LER_injectionFlag = 0;
+        SKB_HER_injectionFlag_safe = 0;
+        SKB_LER_injectionFlag_safe = 0;
+        SKB_HER_abortFlag = 0;
+        SKB_LER_abortFlag = 0;
+        SKB_HER_abortFlag_safe = 0;
+        SKB_LER_abortFlag_safe = 0;
         SKB_Status = 0;
         SKB_HER_injectionRate = 0;
         SKB_LER_injectionRate = 0;
@@ -207,10 +245,10 @@ namespace Belle2 {
         SKB_LER_collimatorPositions_fromBeam = 0;
         SKB_HER_beamSize_xray_X = 0;
         SKB_HER_beamSize_xray_Y = 0;
-        SKB_HER_correctedbeamSize_xray_Y = 0;
+        SKB_HER_correctedBeamSize_xray_Y = 0;
         SKB_LER_beamSize_xray_X = 0;
         SKB_LER_beamSize_xray_Y = 0;
-        SKB_LER_correctedbeamSize_xray_Y = 0;
+        SKB_LER_correctedBeamSize_xray_Y = 0;
         SKB_LER_beamSize_SR_X = 0;
         SKB_LER_beamSize_SR_Y = 0;
         SKB_HER_beamSize_SR_X = 0;
@@ -220,6 +258,8 @@ namespace Belle2 {
         SKB_LER_partialPressures_D06 = 0;
         SKB_LER_partialPressures_D02 = 0;
         SKB_LER_pressures_local = 0;
+        SKB_LER_Zeff_D02 = 0;
+        SKB_LER_Zeff_D06 = 0;
 
         PIN_dose.clear();
         BGO_energy.clear();
@@ -234,6 +274,26 @@ namespace Belle2 {
         PIN_dose_av.clear();
         BGO_energy_av.clear();
         HE3_rate_av.clear();
+        TPC_dose_av.clear();
+        TPC_dose.clear();
+        for (int i = 0; i < 2; i ++) {
+          for (int j = 0; j < 5; j ++) {
+            //TPC_rate_av[i][j].clear();
+            //TPC_rate[i][j].clear();
+            TPC_rate_av[i][j] = 0;
+            TPC_rate[i][j] = 0;
+            //TPC_dose_av[i][j] = 0;
+            //TPC_dose[i][j] = 0;
+          }
+          for (int j = 0; j < 9; j ++) {
+            for (int k = 0; k < 18; k ++) {
+              TPC_angular_rate[i][j][k] = 0;
+              TPC_angular_dose[i][j][k] = 0;
+              TPC_angular_rate_av[i][j][k] = 0;
+              TPC_angular_dose_av[i][j][k] = 0;
+            }
+          }
+        }
         CLAWS_rate_av.clear();
         QCSS_rate_av.clear();
         CSI_sumE_av.clear();
@@ -243,8 +303,17 @@ namespace Belle2 {
 
         SAD_HER_lifetime.clear();
         SAD_LER_lifetime.clear();
+        SKB_HER_RLR.clear();
+        SKB_LER_RLR.clear();
+        SAD_HER_RLR.clear();
+        SAD_LER_RLR.clear();
+        SAD_HER_RLR_av.clear();
+        SAD_LER_RLR_av.clear();
         SAD_HER_lifetime_av.clear();
         SAD_LER_lifetime_av.clear();
+
+        DOSI.clear();
+        DOSI_av.clear();
       }
 
     };

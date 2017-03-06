@@ -35,7 +35,7 @@ namespace Belle2 {
 
     public:
       /// Constructor setting up the minimal length / energy cut off.
-      explicit MultipassCellularPathFinder(CellState minStateToFollow = -std::numeric_limits<CellState>::infinity())
+      explicit MultipassCellularPathFinder(Weight minStateToFollow = -std::numeric_limits<Weight>::infinity())
         : m_minStateToFollow(minStateToFollow)
       {}
 
@@ -91,17 +91,13 @@ namespace Belle2 {
 
     private:
       /// The minimal path length / energy to be followed.
-      CellState m_minStateToFollow;
+      Weight m_minStateToFollow;
 
       /// The cellular automaton to be used.
       CellularAutomaton<ACellHolder> m_cellularAutomaton;
 
       /// The path follower used to extract the path from the graph processed by the cellular automaton.
       CellularPathFollower<ACellHolder> m_cellularPathFollower;
-
     };
-
   }
-
 }
-

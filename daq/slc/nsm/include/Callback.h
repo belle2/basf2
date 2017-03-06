@@ -30,7 +30,6 @@ namespace Belle2 {
   public:
     virtual void notify(const NSMVar& var) throw() = 0;
     int reset();
-    int add(const DBObject& obj);
     int add(NSMVHandler* handler);
     void remove(const std::string& node, const std::string& name);
     void remove(const std::string& name) { remove("", name); }

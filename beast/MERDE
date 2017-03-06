@@ -1,2 +1,0 @@
-[INFO] Steering file: CheckGeometry.py
-[FATAL] The given filename and/or path is not valid: CheckGeometry.py  { module:  function: void {anonymous}::executePythonFile(const string&) }

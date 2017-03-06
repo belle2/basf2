@@ -20,7 +20,7 @@ namespace Belle2 {
     {
       G4ReflectionFactory& reflection = *G4ReflectionFactory::Instance();
       int numberOfDaughters = mother->GetNoDaughters();
-      BOOST_FOREACH(Placement & p, m_volumes) {
+      for (Placement& p : m_volumes) {
         reflection.Place(transform * p.second, p.first->GetName(), p.first,
                          mother, false, ++numberOfDaughters, false);
       }

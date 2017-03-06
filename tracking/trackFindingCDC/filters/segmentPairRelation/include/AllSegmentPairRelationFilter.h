@@ -15,22 +15,15 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Relation filter that lets all possible combinations pass.
-    class AllSegmentPairRelationFilter :
-      public BaseSegmentPairRelationFilter  {
+    class AllSegmentPairRelationFilter : public BaseSegmentPairRelationFilter {
 
     private:
       /// Type of the super class
       using Super = BaseSegmentPairRelationFilter;
 
     public:
-      /// Importing all overloads from the super class
-      using Super::operator();
-
-    public:
       /// Implementation accepting all possible neighbors. Weight subtracts the overlap penalty.
-
-      Weight
-      operator()(const CDCSegmentPair& fromSegmentPair, const CDCSegmentPair& toSegmentPair) final;
+      Weight operator()(const CDCSegmentPair& fromSegmentPair, const CDCSegmentPair& toSegmentPair) final;
     };
   }
 }

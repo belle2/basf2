@@ -10,9 +10,10 @@
 #include <tracking/trackFindingCDC/filters/segment/TruthSegmentVarSet.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
@@ -20,12 +21,24 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool TruthSegmentVarSet::extract(const CDCRecoSegment2D* segment)
+void TruthSegmentVarSet::initialize()
+{
+  CDCMCManager::getInstance().requireTruthInformation();
+  Super::initialize();
+}
+
+void TruthSegmentVarSet::beginEvent()
+{
+  CDCMCManager::getInstance().fill();
+  Super::beginEvent();
+}
+
+bool TruthSegmentVarSet::extract(const CDCSegment2D* segment)
 {
   if (not segment) return false;
 
   // Find the track with the highest number of hits in the segment
-  const CDCMCSegmentLookUp& mcSegmentLookup = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment2DLookUp& mcSegmentLookup = CDCMCSegment2DLookUp::getInstance();
   const CDCMCHitLookUp& hitLookup = CDCMCHitLookUp::getInstance();
 
   ITrackType segmentMCMatch = mcSegmentLookup.getMCTrackId(segment);
@@ -39,7 +52,7 @@ bool TruthSegmentVarSet::extract(const CDCRecoSegment2D* segment)
   } else {
     unsigned int numberOfCorrectHits = 0;
     for (const CDCRecoHit2D& recoHit : *segment) {
-      if (hitLookup.getMCTrackId(recoHit->getWireHit().getHit()) == segmentMCMatch) {
+      if (hitLookup.getMCTrackId(recoHit.getWireHit().getHit()) == segmentMCMatch) {
         numberOfCorrectHits++;
       }
     }
@@ -62,7 +75,7 @@ bool TruthSegmentVarSet::extract(const CDCRecoSegment2D* segment)
     for (const CDCWireHit& wireHit : wireHits) {
       if (hitLookup.getMCTrackId(wireHit.getHit()) == segmentMCMatch) {
         numberOfHitsInThisTrack++;
-        if (wireHit->getAutomatonCell().hasTakenFlag()) {
+        if (wireHit.getAutomatonCell().hasTakenFlag()) {
           numberOfTakenHitsInThisTrack++;
         }
       }

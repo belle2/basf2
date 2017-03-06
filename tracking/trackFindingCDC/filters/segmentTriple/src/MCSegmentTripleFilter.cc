@@ -7,12 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/filters/segmentTriple/MCSegmentTripleFilter.h>
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
-
 
 #include <framework/logging/Logger.h>
 
@@ -25,42 +23,18 @@ MCSegmentTripleFilter::MCSegmentTripleFilter(bool allowReverse) :
   Super(allowReverse),
   m_mcAxialSegmentPairFilter(allowReverse)
 {
+  this->addProcessingSignalListener(&m_mcAxialSegmentPairFilter);
 }
-
-
-void MCSegmentTripleFilter::beginEvent()
-{
-  m_mcAxialSegmentPairFilter.beginEvent();
-  Super::beginEvent();
-}
-
-
-
-void MCSegmentTripleFilter::initialize()
-{
-  Super::initialize();
-  m_mcAxialSegmentPairFilter.initialize();
-}
-
-
-
-void MCSegmentTripleFilter::terminate()
-{
-  m_mcAxialSegmentPairFilter.terminate();
-  Super::terminate();
-}
-
-
 
 Weight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStartSegment();
-  const CDCStereoRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddleSegment();
-  const CDCAxialRecoSegment2D* ptrEndSegment = segmentTriple.getEndSegment();
+  const CDCAxialSegment2D* ptrStartSegment = segmentTriple.getStartSegment();
+  const CDCStereoSegment2D* ptrMiddleSegment = segmentTriple.getMiddleSegment();
+  const CDCAxialSegment2D* ptrEndSegment = segmentTriple.getEndSegment();
 
-  const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCAxialRecoSegment2D& middleSegment = *ptrMiddleSegment;
-  const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
+  const CDCAxialSegment2D& startSegment = *ptrStartSegment;
+  const CDCAxialSegment2D& middleSegment = *ptrMiddleSegment;
+  const CDCAxialSegment2D& endSegment = *ptrEndSegment;
 
   /// Recheck the axial axial compatability
   Weight pairWeight =
@@ -68,7 +42,7 @@ Weight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
 
   if (std::isnan(pairWeight)) return NAN;
 
-  const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
 
   // Check if the segments are aligned correctly along the Monte Carlo track
   EForwardBackward startToMiddleFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrStartSegment, ptrMiddleSegment);
@@ -87,9 +61,8 @@ Weight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
     // Do fits
     setTrajectoryOf(segmentTriple);
 
-    CellState cellWeight = startSegment.size() + middleSegment.size() + endSegment.size();
+    Weight cellWeight = startSegment.size() + middleSegment.size() + endSegment.size();
     return cellWeight;
-
   }
 
   return NAN;
@@ -105,13 +78,13 @@ void MCSegmentTripleFilter::setTrajectoryOf(const CDCSegmentTriple& segmentTripl
     return;
   }
 
-  const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStartSegment();
+  const CDCAxialSegment2D* ptrStartSegment = segmentTriple.getStartSegment();
   if (not ptrStartSegment) {
     B2WARNING("Start segment of segmentTriple is nullptr. Could not set fits.");
     return;
   }
 
-  const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
 
   CDCTrajectory3D trajectory3D = mcSegmentLookUp.getTrajectory3D(ptrStartSegment);
   segmentTriple.setTrajectory3D(trajectory3D);

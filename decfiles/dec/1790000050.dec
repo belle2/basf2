@@ -1,0 +1,20 @@
+# EventType: 1790000050
+# Descriptor: [Upsilon6S_omegachib1P]
+# NickName: Upsilon6S_omegachib1P 
+# Cuts: None
+# Documentation: Decay for Y(6S) physics
+# PhysicsWG: Bottomonium
+# Tested: Yes
+# Responsible: Bryan Fulsom
+# Email: bryan.fulsom@pnnl.gov
+# Date: 20161101
+
+Decay Upsilon(6S)
+1.0 omega chi_b1 PHSP;
+Enddecay
+
+Decay chi_b1
+1.0 gamma Upsilon HELAMP 1. 0. 1. 0. -1. 0. -1. 0.;
+Enddecay
+
+End

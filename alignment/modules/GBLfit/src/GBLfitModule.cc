@@ -124,6 +124,9 @@ GBLfitModule::GBLfitModule() :
   addParam("GFTrackCandidatesColName", m_gfTrackCandsColName,
            "Name of collection holding the genfit::TrackCandidates (should be created by the pattern recognition or MCTrackFinderModule)",
            string(""));
+  addParam("GFTracksColName", m_gfTracksColName,
+           "Name of collection holding the genfit::Tracks (output)",
+           string(""));
   addParam("CDCHitsColName", m_cdcHitsColName, "CDCHits collection", string(""));
   addParam("SVDHitsColName", m_svdHitsColName, "SVDHits collection", string(""));
   addParam("PXDHitsColName", m_pxdHitsColName, "PXDHits collection", string(""));
@@ -231,25 +234,22 @@ void GBLfitModule::initialize()
 
   StoreArray<Track> tracks;
   StoreArray<TrackFitResult> trackfitresults;
-  StoreArray < genfit::Track > gf2tracks;
+  StoreArray < genfit::Track > gf2tracks(m_gfTracksColName);
+  gf2tracks.registerInDataStore();
+  B2RESULT(gf2tracks.getName());
+
   StoreArray < genfit::TrackCand > trackcands(m_gfTrackCandsColName);
   StoreArray<MCParticle> mcparticles;
-  StoreArray<EKLMHit2d> eklmHit2ds;
-  StoreArray<EKLMAlignmentHit> eklmAlignmentHits;
-
-  eklmAlignmentHits.registerInDataStore();
-  eklmAlignmentHits.registerRelationTo(eklmHit2ds);
 
   trackcands.isRequired();
 
-  gf2tracks.registerPersistent();
-  trackcands.registerPersistent();
+  //trackcands.registerPersistent();
   gf2tracks.registerRelationTo(mcparticles);
   trackcands.registerRelationTo(gf2tracks);
 
   if (m_buildBelle2Tracks) {
-    tracks.registerPersistent();
-    trackfitresults.registerPersistent();
+    tracks.registerInDataStore();
+    trackfitresults.registerInDataStore();
 
     mcparticles.registerRelationTo(tracks);
     gf2tracks.registerRelationTo(trackfitresults);
@@ -383,15 +383,6 @@ void GBLfitModule::event()
 
   //Create a relation between the gftracks and their most probable 'mother' MC particle
   RelationArray gfTracksToMCPart(gfTracks, mcParticles);
-
-  // Fill array of EKLMAlignmentHit (1 hit for each EKLMHit2d and plane)
-  StoreArray<EKLMAlignmentHit> eklmAlignmentHits;
-  for (int i = 0; i < eklmHits.getEntries(); i++) {
-    for (int j = 0; j < 2; j++) {
-      EKLMAlignmentHit* alignmentHit = eklmAlignmentHits.appendNew(j);
-      alignmentHit->addRelationTo(eklmHits[i]);
-    }
-  }
 
   //counter for fitted tracks, the number of fitted tracks may differ from the number of trackCandidates if the fit fails for some of them
   int trackCounter = -1;
@@ -540,6 +531,7 @@ void GBLfitModule::event()
         BKLMProducer =  new genfit::MeasurementProducer <BKLMHit2d, BKLMRecoHit> (bklmHits.getPtr());
         factory.addProducer(Const::BKLM, BKLMProducer);
       }
+      StoreArray<EKLMAlignmentHit> eklmAlignmentHits;
       if (eklmAlignmentHits.getEntries()) {
         genfit::MeasurementProducer<EKLMAlignmentHit, AlignableEKLMRecoHit>* eklmProducer = NULL;
         eklmProducer = new genfit::MeasurementProducer<EKLMAlignmentHit, AlignableEKLMRecoHit>(eklmAlignmentHits.getPtr());

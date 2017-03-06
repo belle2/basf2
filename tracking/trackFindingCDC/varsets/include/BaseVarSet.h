@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/utilities/ProcessingSignalListener.h>
 
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
@@ -27,7 +28,7 @@ namespace Belle2 {
      *  Base class defining the interface for various different implementation of sets of variables.
      */
     template<class AObject>
-    class BaseVarSet {
+    class BaseVarSet : public ProcessingSignalListener {
 
     public:
       /// Object type from which variables shall be extracted.
@@ -36,37 +37,6 @@ namespace Belle2 {
     public:
       /// Making destructor virtual
       virtual ~BaseVarSet() = default;
-
-      /**
-       *  Initialize the variable set before event processing.
-       *  Can be specialised if the derived variable set has setup work to do.
-       */
-      virtual void initialize()
-      {
-      }
-
-      /// Allow setup work to take place at beginning of new run
-      virtual void beginRun()
-      {
-      }
-
-      /// Allow setup work to take place at beginning of new event
-      virtual void beginEvent()
-      {
-      }
-
-      /// Allow clean up to take place at end of run
-      virtual void endRun()
-      {
-      }
-
-      /**
-       *  Terminate the variable set after event processing.
-       *  Can be specialised if the derived variable set has to tear down aquired resources.
-       */
-      virtual void terminate()
-      {
-      }
 
       /**
        *  Main method that extracts the variable values from the complex object.

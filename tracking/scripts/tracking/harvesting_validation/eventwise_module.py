@@ -74,9 +74,9 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
             mc_reco_track_det_hit_ids = utilities.get_det_hit_ids(mc_reco_track)
             all_mc_tracks_det_hit_ids.update(mc_reco_track_det_hit_ids)
 
-            is_matched = track_match_look_up.isMatchedMCTrackCand(mc_reco_track)
-            is_merged = track_match_look_up.isMergedMCTrackCand(mc_reco_track)
-            is_missing = track_match_look_up.isMissingMCTrackCand(mc_reco_track)
+            is_matched = track_match_look_up.isMatchedMCRecoTrack(mc_reco_track)
+            is_merged = track_match_look_up.isMergedMCRecoTrack(mc_reco_track)
+            is_missing = track_match_look_up.isMissingMCRecoTrack(mc_reco_track)
 
             if is_matched:
                 n_matched_mc_reco_tracks += 1
@@ -94,10 +94,10 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
         all_tracks_det_hit_ids = set()
         n_matched_hits = 0
         for reco_track in reco_tracks:
-            is_matched = track_match_look_up.isMatchedPRTrackCand(reco_track)
-            is_clone = track_match_look_up.isClonePRTrackCand(reco_track)
-            is_background = track_match_look_up.isBackgroundPRTrackCand(reco_track)
-            is_ghost = track_match_look_up.isGhostPRTrackCand(reco_track)
+            is_matched = track_match_look_up.isMatchedPRRecoTrack(reco_track)
+            is_clone = track_match_look_up.isClonePRRecoTrack(reco_track)
+            is_background = track_match_look_up.isBackgroundPRRecoTrack(reco_track)
+            is_ghost = track_match_look_up.isGhostPRRecoTrack(reco_track)
 
             if is_matched:
                 n_matched_reco_tracks += 1
@@ -112,7 +112,7 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
 
             all_tracks_det_hit_ids.update(reco_track_det_hit_ids)
             if is_matched or is_clone:
-                mc_reco_track = self.track_match_look_up.getRelatedMCTrackCand(reco_track)
+                mc_reco_track = self.track_match_look_up.getRelatedMCRecoTrack(reco_track)
 
                 mc_reco_track_det_hit_ids = utilities.get_det_hit_ids(mc_reco_track)
                 n_matched_hits += len(reco_track_det_hit_ids & mc_reco_track_det_hit_ids)

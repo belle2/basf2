@@ -27,6 +27,7 @@ from b2biiMonitors import addConvertedPhotonConversionMonitors
 from b2biiMonitors import addLambda0ConversionMonitors
 from b2biiMonitors import addNeutralsConversionMonitors
 from b2biiMonitors import addMCParticlesConversionMonitors
+from b2biiMonitors import addKlongConversionMonitors
 
 if len(sys.argv) != 3:
     sys.exit('Must provide two input parameters: [mc|data] [input_Belle_MDST_file].\n'
@@ -59,6 +60,7 @@ loadGearbox()
 addBeamParamsConversionMonitors()
 addTrackConversionMonitors()
 addKshortConversionMonitors()
+addKlongConversionMonitors()
 addLambda0ConversionMonitors()
 addConvertedPhotonConversionMonitors()
 addNeutralsConversionMonitors()

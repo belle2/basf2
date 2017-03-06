@@ -7,5 +7,7 @@
 
 #pragma link C++ class Belle2::PyStoreArray-;
 #pragma link C++ class Belle2::PyStoreObj-;
+#pragma link C++ class Belle2::PyDBArray-;
+#pragma link C++ class Belle2::PyDBObj-;
 
 #endif

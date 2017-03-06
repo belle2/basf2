@@ -8,56 +8,68 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
+
+#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
+#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
+
+#include <string>
 #include <vector>
 
 namespace Belle2 {
 
   namespace TrackFindingCDC {
     class CDCTrack;
-  }
 
-  /**
-   * This module applies configurable correction functions to all found tracks.
-   *
-   * Typical correction functions include:
-   *   - Removal of hits after long breaks
-   *   - Removal of hits on the wrong side of the detector
-   *   - Splitting of curling tracks into two halves
-   *   - etc.
-   *
-   * See the TrackQualityTools for details on the specific functions.
-   *
-   * Mainly the corrections are applied to remove fakes and to make the tracks fitable with genfit (which fails mainly for low-momentum tracks).
-   * WARNING: Not all of the correction functions work well and the finding efficiency may be reduced strongly even when applying the correctly working
-   * functions! Handle with care ;-)
-   */
-  class TrackQualityAsserterCDCModule: public TrackFinderCDCBaseModule {
-
-  public:
-    TrackQualityAsserterCDCModule() : TrackFinderCDCBaseModule()
-    {
-      setDescription("Many tracks in the CDC can not be fitted. For fitting them, we remove parts of the hits or maybe the whole track.");
-
-      addParam("corrections", m_param_corrections,
-               "The list of corrections to apply. Choose from LayerBreak, LargeAngle, LargeBreak2, OneSuperlayer, Small, B2B, MoveToNextAxial, None, Split, and ArcLength2D.",
-      {std::string("LayerBreak"), std::string("LargeAngle"), std::string("OneSuperlayer"), std::string("Small")});
-
-      addParam("onlyNotFittedTracks", m_param_onlyNotFittedTracks,
-               "Flag to apply the corrections only to not fitted tracks.", false);
-    }
-
-  private:
     /**
-     * Go through all tracks and correct them to be better fitable.
+     * This module applies configurable correction functions to all found tracks.
+     *
+     * Typical correction functions include:
+     *   - Removal of hits after long breaks
+     *   - Removal of hits on the wrong side of the detector
+     *   - Splitting of curling tracks into two halves
+     *   - etc.
+     *
+     * See the TrackQualityTools for details on the specific functions.
+     *
+     * Mainly the corrections are applied to remove fakes and to make the tracks fitable with genfit
+     * (which fails mainly for low-momentum tracks).
+     * WARNING: Not all of the correction functions work well and the finding efficiency may be
+     * reduced strongly even when applying the correctly working
+     * functions! Handle with care ;-)
      */
-    void generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) override;
+    class TrackQualityAsserter: public Findlet<CDCTrack&> {
 
-    /// The corrections to use.
-    std::vector<std::string> m_param_corrections;
+      /// Type of the base class
+      using Super = Findlet<CDCTrack&>;
 
-    /// Flag to use the corrections only for not fitted tracks.
-    bool m_param_onlyNotFittedTracks = false;
-  };
+    public:
+      /// Get the description of the findlet
+      std::string getDescription() override;
 
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+
+      /// Main function to clean up the tracks
+      void apply(std::vector<CDCTrack>& tracks) final;
+
+    private:
+      /// Parameter : The corrections to use.
+      std::vector<std::string> m_param_corrections;
+
+      /// Parameter : Flag to use the corrections only for not fitted tracks.
+      bool m_param_onlyNotFittedTracks = false;
+    };
+
+    /// Module for the TrackQualityAsserter
+    class TrackQualityAsserterCDCModule: public FindletModule<TrackQualityAsserter> {
+      /// The base class
+      using Super = FindletModule<TrackQualityAsserter>;
+
+    public:
+      /// Setup the findlet with module with standard StoreArray names
+      TrackQualityAsserterCDCModule();
+    };
+  }
 }

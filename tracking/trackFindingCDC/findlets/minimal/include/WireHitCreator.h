@@ -18,8 +18,8 @@
 #include <cdc/dataobjects/ADCCountTranslatorBase.h>
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
 
-#include <tuple>
 #include <vector>
+#include <tuple>
 #include <string>
 
 namespace Belle2 {

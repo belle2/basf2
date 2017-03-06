@@ -22,6 +22,31 @@ namespace Belle2 {
      */
     double klmClusterTiming(const Particle* particle);
 
+    /**
+     * return KLM cluster's x position
+     */
+    double klmClusterPositionX(const Particle* particle);
+
+    /**
+     * return KLM cluster's y position
+     */
+    double klmClusterPositionY(const Particle* particle);
+
+    /**
+     * return KLM cluster's z position
+     */
+    double klmClusterPositionZ(const Particle* particle);
+
+    /**
+     * return KLM cluster's number of the innermost layer with hits
+     */
+    double klmClusterInnermostLayer(const Particle* particle);
+
+    /**
+     * return KLM cluster's number of layers with hits
+     */
+    double klmClusterLayers(const Particle* particle);
+
   }
 } // Belle2 namespace
 

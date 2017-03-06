@@ -21,7 +21,7 @@ namespace Belle2 {
   class COPPERCallback : public RCCallback {
 
   public:
-    COPPERCallback(FEE* fee[4], bool dummymode);
+    COPPERCallback(FEE* fee[4], bool dummymode, bool disablefeconf);
     virtual ~COPPERCallback() throw();
 
   public:
@@ -46,6 +46,7 @@ namespace Belle2 {
     ProcessController& getProcess() { return m_con; }
     virtual bool feeload();
     void getfee(HSLB& hslb, int& hwtype, int& serial, int& fwtype, int& fwver)  throw(HSLBHandlerException);
+    DBObject& getFEEDB(int hslb) { return m_o_fee[hslb]; }
 
   private:
     ProcessController m_con;
@@ -59,6 +60,8 @@ namespace Belle2 {
     std::string m_hslb_firm;
     bool m_iserr;
     SharedMemory m_memory;
+    bool m_disablefeconf;
+    DBObject m_o_fee[4];
 
   private:
     void bootBasf2(const DBObject& obj) throw(RCHandlerException);

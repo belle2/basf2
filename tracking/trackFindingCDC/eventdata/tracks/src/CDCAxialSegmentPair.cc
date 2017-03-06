@@ -22,8 +22,8 @@ CDCAxialSegmentPair::CDCAxialSegmentPair() :
 
 
 
-CDCAxialSegmentPair::CDCAxialSegmentPair(const CDCAxialRecoSegment2D* startSegment,
-                                         const CDCAxialRecoSegment2D* endSegment) :
+CDCAxialSegmentPair::CDCAxialSegmentPair(const CDCAxialSegment2D* startSegment,
+                                         const CDCAxialSegment2D* endSegment) :
   m_startSegment(startSegment), m_endSegment(endSegment)
 {
   B2ASSERT("CDCAxialSegmentPair initialized with nullptr as start segment", startSegment);
@@ -32,8 +32,8 @@ CDCAxialSegmentPair::CDCAxialSegmentPair(const CDCAxialRecoSegment2D* startSegme
 
 
 
-CDCAxialSegmentPair::CDCAxialSegmentPair(const CDCAxialRecoSegment2D* startSegment,
-                                         const CDCAxialRecoSegment2D* endSegment,
+CDCAxialSegmentPair::CDCAxialSegmentPair(const CDCAxialSegment2D* startSegment,
+                                         const CDCAxialSegment2D* endSegment,
                                          const CDCTrajectory2D& trajectory2D) :
   m_startSegment(startSegment),
   m_endSegment(endSegment),

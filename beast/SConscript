@@ -2,7 +2,7 @@ Import('env')
 
 #These are the libraries the awesome package has to be linked against
 env['LIBS'] = [
-    'framework', 'simulation', 'simulation_dataobjects', 'mdst_dataobjects',
+    'framework', 'simulation', 'mdst_dataobjects',
     'geometry', '$ROOT_LIBS', 'beast_microtpc_dataobjects',
     'beast_bgo_dataobjects', 'beast_ph1bpipe_dataobjects',
     'beast_cave_dataobjects', 'beast_ph1sustr_dataobjects',
@@ -10,7 +10,8 @@ env['LIBS'] = [
     'beast_pindiode_dataobjects', 'beast_csi_dataobjects',
     'beast_beamabort_dataobjects', 'beast_plume_dataobjects',
     'beast_claw_dataobjects', 'beast_qcsmonitor_dataobjects',
-    'beast_claws_dataobjects', 'beast_fangs_dataobjects'
+    'beast_claws_dataobjects', 'beast_fangs_dataobjects',
+    'beast_dosi_dataobjects'
 ]
 
 Return('env')

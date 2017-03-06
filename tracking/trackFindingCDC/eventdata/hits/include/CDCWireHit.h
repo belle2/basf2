@@ -93,8 +93,8 @@ namespace Belle2 {
       bool operator<(const CDCWireHit& rhs) const
       {
         return
-          std::make_pair(getWireID(), getRefDriftLength()) <
-          std::make_pair(rhs.getWireID(), rhs.getRefDriftLength());
+          std::make_pair(getWireID().getEWire(), getRefDriftLength()) <
+          std::make_pair(rhs.getWireID().getEWire(), rhs.getRefDriftLength());
       }
 
       /// Defines CDCWires and CDCWireHits to be coaligned on the wire on which they are based.
@@ -158,24 +158,6 @@ namespace Belle2 {
         return wireSuperLayer.getISuperLayer() < wireHit.getISuperLayer();
       }
 
-      /**
-       *  @name Mimic pointer
-       *
-       *  Access the object methods and methods from a pointer in the same way.
-       *  In situations where the type is not known to be a pointer or a reference
-       *  there is no way to tell if one should use the dot '.' or operator '->' for method look up.
-       *  So this function defines the -> operator for the object.
-       *  No matter you have a pointer or an object access is given with '->'
-       *  The object is effectively equal to a pointer to itself.
-       *
-       *  @{
-       */
-      const CDCWireHit* operator->() const
-      {
-        return this;
-      }
-      /// @}
-
       /// Getter for the CDCHit pointer into the StoreArray.
       const CDCHit* getHit() const
       {
@@ -189,7 +171,21 @@ namespace Belle2 {
       }
 
       /// Getter for the CDCWire the hit is located on.
-      const CDCWire& getWire() const;
+      const CDCWire& getWire() const
+      {
+        // if (not m_wire) return attachWire();
+        if (not m_wire) return attachWire();
+        return *m_wire;
+      }
+
+      /**
+       *  Reestablishes the pointer of the hit to the wire and returns it
+       *  Since the DataStore only transport the event data and not
+       *  "static" geometry information the wire is lost whenever the
+       *  DataStore is stream across an interprocess boundary or to file.
+       *  In this case this method can be called to lookup the wire again.
+       */
+      const CDCWire& attachWire() const;
 
       /// Getter for the WireID of the wire the hit is located on.
       const WireID& getWireID() const
@@ -302,16 +298,16 @@ namespace Belle2 {
                << ", drift length=" << wirehit.getRefDriftLength() << ")";
       }
 
-      /// Getter for the automaton cell.
-      AutomatonCell& getAutomatonCell()
+      /// Mutable getter for the automaton cell.
+      AutomatonCell& getAutomatonCell() const
       {
         return m_automatonCell;
       }
 
-      /// Constant getter for the automaton cell.
-      const AutomatonCell& getAutomatonCell() const
+      /// Indirection to the automaton cell for easier access to the flags
+      AutomatonCell* operator->() const
       {
-        return m_automatonCell;
+        return &m_automatonCell;
       }
 
       /// Getter for the super cluster id
@@ -327,8 +323,14 @@ namespace Belle2 {
       }
 
     private:
+      /// Memory for the WireID.
+      WireID m_wireID;
+
+      /// Memory for the CDCWire pointer - Trailing comment indicates to not stream this member
+      mutable CDCWire const* m_wire = nullptr; //!
+
       /// Memory for the automaton cell.
-      AutomatonCell m_automatonCell;
+      mutable AutomatonCell m_automatonCell{1};
 
       /// Memory for the drift length at the wire reference point.
       double m_refDriftLength = 0;
@@ -339,19 +341,30 @@ namespace Belle2 {
       /// Memory for the charge induced by the energy deposit in the drift cell.
       double m_refChargeDeposit = 0.0;
 
-      /// Memory for the WireID.
-      WireID m_wireID;
-
-      /// Memory for the CDCWire pointer.
-      mutable CDCWire const* m_wire = nullptr; //!
-
-      /// Memory for the CDCHit pointer.
-      const CDCHit* m_hit = nullptr;
-
       /// Memory for the super cluster id
       int m_iSuperCluster = -1;
 
+      /// Memory for the CDCHit pointer.
+      const CDCHit* m_hit = nullptr;
     };
 
+    /// Generic functor to get the wire hit from an object.
+    struct GetWireHit {
+      /// Marker function for the isFunctor test
+      operator FunctorTag();
+
+      /// Returns the wire hit of an object.
+      template<class T, class SFINAE = decltype(&T::getWireHit)>
+      const CDCWireHit & operator()(const T& t) const
+      {
+        return t.getWireHit();
+      }
+
+      /// If given a wire hit return it unchanged.
+      const CDCWireHit& operator()(const CDCWireHit& wireHit) const
+      {
+        return wireHit;
+      }
+    };
   }
 }

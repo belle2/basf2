@@ -238,12 +238,18 @@ namespace Belle2 {
     // characteristics of the system. e.g. we will always
     // have only one forward and one backward shield.
     //
+    //! Number of ECL shields in Belle2
     static const int NECLSHIELDS = 2;
+    //! Index corresponding to the forward shield
     static const int FWD_ECLSHIELD = 0;
+    //! Index corresponding to the backward shield
     static const int BWD_ECLSHIELD = 1;
 
+    //! Number of pole pieces in Belle2
     static const int NPOLEPIECES = 2;
+    //! Index corresponding to the forward pole piece
     static const int FWD_POLEPIECE = 0;
+    //! Index corresponding to the backward pole piece
     static const int BWD_POLEPIECE = 1;
 
 
@@ -292,19 +298,19 @@ namespace Belle2 {
     //
 
     //! Material of each of the pole pieces
-    std::string m_PoleMaterial[NECLSHIELDS];
+    std::string m_PoleMaterial[NPOLEPIECES];
 
     //! Number of polycone planes in each pole piece
-    int m_PoleNPlanes[NECLSHIELDS];
+    int m_PoleNPlanes[NPOLEPIECES];
 
     //! Z-position of each plane (w.r.t. IP)
-    std::vector<double> m_PolePlaneZ[NECLSHIELDS];
+    std::vector<double> m_PolePlaneZ[NPOLEPIECES];
 
     //! Inner radii of the planes
-    std::vector<double> m_PolePlaneInnerRadius[NECLSHIELDS];
+    std::vector<double> m_PolePlaneInnerRadius[NPOLEPIECES];
 
     //! Outer radii of the planes
-    std::vector<double> m_PolePlaneOuterRadius[NECLSHIELDS];
+    std::vector<double> m_PolePlaneOuterRadius[NPOLEPIECES];
 
 
 

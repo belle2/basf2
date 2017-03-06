@@ -14,8 +14,6 @@
 // Own include
 #include <arich/modules/arichNtuple/ARICHNtupleModule.h>
 
-
-
 // Hit classes
 #include <framework/dataobjects/EventMetaData.h>
 #include <mdst/dataobjects/Track.h>
@@ -106,8 +104,9 @@ namespace Belle2 {
 
     m_tree->Branch("recHit",  &m_arich.recHit,  "PDG/I:x/F:y:z:p:theta:phi");
     m_tree->Branch("mcHit",  &m_arich.mcHit,  "PDG/I:x/F:y:z:p:theta:phi");
+    m_tree->Branch("winHit",  &m_arich.winHit,  "x/F:y");
     m_tree->Branch("nrec", &m_arich.nRec, "nRec/I");
-    m_tree->Branch("photons", &m_arich.photons, "photons[nRec][4]/F");
+    m_tree->Branch("photons", "std::vector<Belle2::ARICHPhoton>", &m_arich.photons);
 
     // input
     StoreArray<ARICHTrack>::required();
@@ -139,6 +138,13 @@ namespace Belle2 {
       if (lkh->getFlag() != 1) continue;
 
       m_arich.clear();
+
+      // set hapd window hit if available
+      if (arichTrack.hitsWindow()) {
+        TVector2 winHit = arichTrack.windowHitPosition();
+        m_arich.winHit[0] = winHit.X();
+        m_arich.winHit[1] = winHit.Y();
+      }
 
       m_arich.logL.e = lkh->getLogL(Const::electron);
       m_arich.logL.mu = lkh->getLogL(Const::muon);
@@ -194,10 +200,7 @@ namespace Belle2 {
       int nphot = 0;
       for (auto it = photons.begin(); it != photons.end(); ++it) {
         ARICHPhoton iph = *it;
-        m_arich.photons[nphot][0] = iph.thetaCer;
-        m_arich.photons[nphot][1] = iph.phiCer;
-        m_arich.photons[nphot][2] = iph.aerogel;
-        m_arich.photons[nphot][3] = iph.mirrorId;
+        m_arich.photons.push_back(iph);
         nphot++;
         if (nphot == 200) break;
       }

@@ -76,14 +76,25 @@ namespace Belle2 {
       return 8 + (getISuperLayer() - 1) * 6 + getILayer();
     }
 
+    /** Getter for fwd x-position. */
     float getXFwd() const {return m_fwd.X();}
+
+    /** Getter for fwd y-position. */
     float getYFwd() const {return m_fwd.Y();}
+
+    /** Getter for fwd z-position. */
     float getZFwd() const {return m_fwd.Z();}
 
+    /** Getter for bwd x-position. */
     float getXBwd() const {return m_bwd.X();}
+
+    /** Getter for bwd y-position. */
     float getYBwd() const {return m_bwd.Y();}
+
+    /** Getter for bwd z-position. */
     float getZBwd() const {return m_bwd.Z();}
 
+    /** Getter for wire tension. */
     float getTension() const {return m_tension;}
 
   private:

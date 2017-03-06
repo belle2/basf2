@@ -18,7 +18,7 @@ namespace Belle2 {
   class Module;
 
   /** The conditionsPayload structure holds the information related to payloads. */
-  struct conditionsPayload {
+  struct [[deprecated("Please switch to DBObjPtr/DBArray")]] conditionsPayload {
 
     /** The package name. */
     std::string package;
@@ -62,12 +62,13 @@ namespace Belle2 {
    *          an example algorithm version.  This service is currently
    *          implemented as a singleton.
    */
-  class ConditionsService {
+  class [[deprecated("Please switch to DBObjPtr/DBArray")]] ConditionsService {
 
   public:
 
     /** Get a pointer to the ConditionsService instance */
-    static ConditionsService* getInstance();
+    [[deprecated("Please switch to DBObjPtr/DBArray")]]
+    static ConditionsService*  getInstance();
 
 
 
@@ -76,6 +77,7 @@ namespace Belle2 {
      *
      *  @return Nothing yet
      */
+    [[deprecated("Please switch to DBObjPtr/DBArray")]]
     void getPayloads(std::string GlobalTag, std::string ExperimentName, std::string RunName);
 
     /** Sets the base name for the REST services.  Example is http://belle2db.hep.pnnl.gov/b2s/rest/v1/.
@@ -83,6 +85,7 @@ namespace Belle2 {
      *
      *  @return Nothing yet
      */
+    [[deprecated("Please switch to DBObjPtr/DBArray")]]
     void setRESTbasename(std::string RESTBaseName) {m_RESTbase = RESTBaseName;};
 
     /** Sets the base name for the conditions files.  Example is http://belle2db.hep.pnnl.gov/.
@@ -90,6 +93,7 @@ namespace Belle2 {
      *
      *  @return Nothing yet
      */
+    [[deprecated("Please switch to DBObjPtr/DBArray")]]
     void setFILEbasename(std::string FILEBaseName) {m_FILEbase = FILEBaseName;};
 
     /** Sets the local directory name for copies of the conditions files.  Example is /tmp/.
@@ -97,6 +101,7 @@ namespace Belle2 {
      *
      *  @return Nothing yet
      */
+    [[deprecated("Please switch to DBObjPtr/DBArray")]]
     void setFILEbaselocal(std::string FILEBaseLocal) {m_FILElocal = FILEBaseLocal;};
 
 
@@ -105,6 +110,7 @@ namespace Belle2 {
      *
      *  @return true if payload exists, false if not.
      */
+    [[deprecated("Please switch to DBObjPtr/DBArray")]]
     bool payloadExists(std::string PackageModuleName) const {return (m_payloads.find(PackageModuleName) != m_payloads.end());}
 
     /** Adds a payload to the payload map.
@@ -113,6 +119,7 @@ namespace Belle2 {
      *
      *  @return Nothing yet
      */
+    [[deprecated("Please switch to DBObjPtr/DBArray")]]
     void addPayloadInfo(std::string PackageModuleName, conditionsPayload payload) {m_payloads[PackageModuleName] = payload;};
 
     /** Get payload information from the payload map.
@@ -122,6 +129,7 @@ namespace Belle2 {
      *
      *  @return conditionsPayload The payload information data structure. NULL if payload not found.
      */
+    [[deprecated("Please switch to DBObjPtr/DBArray")]]
     conditionsPayload getPayloadInfo(std::string packageName,
                                      std::string moduleName) {return getPayloadInfo(packageName + moduleName);};
 
@@ -130,6 +138,7 @@ namespace Belle2 {
      *
      *  @return conditionsPayload The payload information data structure. NULL if payload not found.
      */
+    [[deprecated("Please switch to DBObjPtr/DBArray")]]
     conditionsPayload getPayloadInfo(std::string PackageModuleName);
 
     /** Get payload information map.
@@ -137,6 +146,7 @@ namespace Belle2 {
      *
      *  @return std::map<std::string, conditionsPayload> The payload information map.  The key is the concatenation of package and module.  NULL if payload not found.
      */
+    [[deprecated("Please switch to DBObjPtr/DBArray")]]
     std::map<std::string, conditionsPayload> getPayloadInfoMap(void) {return m_payloads;};
 
     /** Adds a payload file to the conditions database.
@@ -145,6 +155,7 @@ namespace Belle2 {
      *
      *  @return Nothing yet
      */
+    [[deprecated("Please switch to DBObjPtr/DBArray")]]
     void writePayloadFile(std::string payloadFileName, const Module* module);
 
     /** Adds a string to the buffer (for REST returns.)
@@ -152,6 +163,7 @@ namespace Belle2 {
      *
      *  @return Nothing yet
      */
+    [[deprecated("Please switch to DBObjPtr/DBArray")]]
     void addReturn(const std::string& buffer) {m_buffer += buffer;};
 
     /** Adds a payload file to the conditions database.
@@ -161,6 +173,7 @@ namespace Belle2 {
      *
      *  @return Nothing yet
      */
+    [[deprecated("Please switch to DBObjPtr/DBArray")]]
     void writePayloadFile(std::string payloadFileName,
                           std::string packageName,
                           std::string moduleName);
@@ -169,6 +182,7 @@ namespace Belle2 {
      *
      *  @return Returns a string with the payload URL.
      */
+    [[deprecated("Please switch to DBObjPtr/DBArray")]]
     std::string getPayloadFileURL(const Module* module);
 
     /** Gets payload URL from run generated map and downloads conditions file if needed.
@@ -177,6 +191,7 @@ namespace Belle2 {
      *
      *  @return Returns a string with the payload URL.
      */
+    [[deprecated("Please switch to DBObjPtr/DBArray")]]
     std::string getPayloadFileURL(std::string packageName, std::string moduleName);
 
 

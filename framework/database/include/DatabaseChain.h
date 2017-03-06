@@ -30,7 +30,8 @@ namespace Belle2 {
      * @param resetIoVs   A flag to indicate whether IoVs from non-primary databases should be set to the current run
      * @param logLevel    The level of log messages about not-found payloads.
      */
-    static void createInstance(bool resetIoVs = false, LogConfig::ELogLevel logLevel = LogConfig::c_Warning);
+    static void createInstance(bool resetIoVs = false, LogConfig::ELogLevel logLevel = LogConfig::c_Warning,
+                               bool invertLogging = false);
 
     /**
      * Add a database backend. It is added before any existing backends.

@@ -47,15 +47,6 @@ namespace Belle2 {
                            const StoreArray<RecoTrack>& trackList,
                            RelationArray* recoTrackToPXDIntercepts);
 
-    /**
-     * Set the nuber of iterations of the Kalman Filter to numIterKalmanFilter
-     */
-    void setNumIterKalmanFilter(int numIterKalmanFilter)
-    {
-      m_kalmanFilter.setMinIterations(numIterKalmanFilter);
-    };
-
-
   private:
 
     const float m_pxdLayerRadius[2] = {1.42854, 2.21218}; /**< mean PXD layer radius for both layers */

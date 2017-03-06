@@ -3,45 +3,45 @@
 
 """
 <header>
-  <output>../Belle_pi+_validation.root</output>
-  <output>../Belle_mu+_validation.root</output>
-  <output>../Belle_e+_validation.root</output>
-  <output>../Belle_K+_validation.root</output>
-  <output>../Belle_gamma_validation.root</output>
-  <output>../Belle_K_S0_validation.root</output>
-  <output>../Belle_pi0_validation.root</output>
-  <output>../MC6x1_pi+_validation.root</output>
-  <output>../MC6x1_mu+_validation.root</output>
-  <output>../MC6x1_e+_validation.root</output>
-  <output>../MC6x1_K+_validation.root</output>
-  <output>../MC6x1_gamma_validation.root</output>
-  <output>../MC6x1_K_S0_validation.root</output>
-  <output>../MC6x1_K_L0_validation.root</output>
-  <output>../MC6x1_pi0_validation.root</output>
-  <output>../MC6x0_pi+_validation.root</output>
-  <output>../MC6x0_mu+_validation.root</output>
-  <output>../MC6x0_e+_validation.root</output>
-  <output>../MC6x0_K+_validation.root</output>
-  <output>../MC6x0_gamma_validation.root</output>
-  <output>../MC6x0_K_S0_validation.root</output>
-  <output>../MC6x0_K_L0_validation.root</output>
-  <output>../MC6x0_pi0_validation.root</output>
-  <output>../MC5x0_pi+_validation.root</output>
-  <output>../MC5x0_mu+_validation.root</output>
-  <output>../MC5x0_e+_validation.root</output>
-  <output>../MC5x0_K+_validation.root</output>
-  <output>../MC5x0_gamma_validation.root</output>
-  <output>../MC5x0_K_S0_validation.root</output>
-  <output>../MC5x0_K_L0_validation.root</output>
-  <output>../MC5x0_pi0_validation.root</output>
-  <output>../MC5x1_pi+_validation.root</output>
-  <output>../MC5x1_mu+_validation.root</output>
-  <output>../MC5x1_e+_validation.root</output>
-  <output>../MC5x1_K+_validation.root</output>
-  <output>../MC5x1_gamma_validation.root</output>
-  <output>../MC5x1_K_S0_validation.root</output>
-  <output>../MC5x1_K_L0_validation.root</output>
-  <output>../MC5x1_pi0_validation.root</output>
+  <output>Belle_pi+_validation.root</output>
+  <output>Belle_mu+_validation.root</output>
+  <output>Belle_e+_validation.root</output>
+  <output>Belle_K+_validation.root</output>
+  <output>Belle_gamma_validation.root</output>
+  <output>Belle_K_S0_validation.root</output>
+  <output>Belle_pi0_validation.root</output>
+  <output>MC6x1_pi+_validation.root</output>
+  <output>MC6x1_mu+_validation.root</output>
+  <output>MC6x1_e+_validation.root</output>
+  <output>MC6x1_K+_validation.root</output>
+  <output>MC6x1_gamma_validation.root</output>
+  <output>MC6x1_K_S0_validation.root</output>
+  <output>MC6x1_K_L0_validation.root</output>
+  <output>MC6x1_pi0_validation.root</output>
+  <output>MC6x0_pi+_validation.root</output>
+  <output>MC6x0_mu+_validation.root</output>
+  <output>MC6x0_e+_validation.root</output>
+  <output>MC6x0_K+_validation.root</output>
+  <output>MC6x0_gamma_validation.root</output>
+  <output>MC6x0_K_S0_validation.root</output>
+  <output>MC6x0_K_L0_validation.root</output>
+  <output>MC6x0_pi0_validation.root</output>
+  <output>MC5x0_pi+_validation.root</output>
+  <output>MC5x0_mu+_validation.root</output>
+  <output>MC5x0_e+_validation.root</output>
+  <output>MC5x0_K+_validation.root</output>
+  <output>MC5x0_gamma_validation.root</output>
+  <output>MC5x0_K_S0_validation.root</output>
+  <output>MC5x0_K_L0_validation.root</output>
+  <output>MC5x0_pi0_validation.root</output>
+  <output>MC5x1_pi+_validation.root</output>
+  <output>MC5x1_mu+_validation.root</output>
+  <output>MC5x1_e+_validation.root</output>
+  <output>MC5x1_K+_validation.root</output>
+  <output>MC5x1_gamma_validation.root</output>
+  <output>MC5x1_K_S0_validation.root</output>
+  <output>MC5x1_K_L0_validation.root</output>
+  <output>MC5x1_pi0_validation.root</output>
   <contact>Thomas Keck; thomas.keck2@kit.edu</contact>
 </header>
 """
@@ -123,8 +123,8 @@ for mc, files in mc_files:
         path.add_module('TagUniqueSignal', particleList=fsp, target='isPrimarySignal', extraInfoName='uniquePrimarySignal')
         path.add_module('TagUniqueSignal', particleList=fsp + ':mc', target='isPrimarySignal', extraInfoName='uniquePrimarySignal')
 
-        outputfile = mc + '_' + fsp + '.root'
-        outputfile_mc = mc + '_' + fsp + '_mc.root'
+        outputfile = '../' + mc + '_' + fsp + '.root'
+        outputfile_mc = '../' + mc + '_' + fsp + '_mc.root'
         common_variables = [
             'E',
             'pt_mc',
@@ -158,8 +158,8 @@ for mc, files in mc_files:
     for fsp in fsps:
         if mc == 'Belle' and fsp == 'K_L0':
             continue
-        filename = mc + '_' + fsp + '.root'
-        filename_mc = mc + '_' + fsp + '_mc.root'
+        filename = '../' + mc + '_' + fsp + '.root'
+        filename_mc = '../' + mc + '_' + fsp + '_mc.root'
         tfile = ROOT.TFile.Open(filename)
         tfile_mc = ROOT.TFile.Open(filename_mc)
         ttree = tfile.Get("variables")
@@ -170,7 +170,7 @@ for mc, files in mc_files:
         histname_pur = mc + '_' + fsp + '_pur'
         histname_mc = mc + '_' + fsp + '_mc'
 
-        tfile_validation = ROOT.TFile.Open('../' + mc + '_' + fsp + '_validation.root', "RECREATE")
+        tfile_validation = ROOT.TFile.Open(mc + '_' + fsp + '_validation.root', "RECREATE")
 
         if fsp == 'gamma':
             thist_eff = ROOT.TH1F(histname_eff, fsp + " efficiency on " + mc, 200, 0.0, 5.0)

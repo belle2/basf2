@@ -24,20 +24,31 @@ from tracking.validation.run import TrackingValidationRun
 
 class CDCLegendre(TrackingValidationRun):
     n_events = N_EVENTS
+    #: Generator to be used in the simulation (-so)
+    generator_module = 'generic'
     root_input_file = '../EvtGenSimNoBkg.root'
 
     @staticmethod
     def finder_module(path):
         path.add_module('WireHitPreparer')
-        path.add_module('TrackFinderCDCLegendreTracking')
+
+        use_legendre_finder = True
+        if use_legendre_finder:
+            path.add_module('TrackFinderCDCLegendreTracking')
+        else:
+            path.add_module('AxialTrackCreatorHitHough')
+
         path.add_module('TrackExporter')
 
-    tracking_coverage = {'UsePXDHits': False,
-                         'UseSVDHits': False,
-                         'UseCDCHits': True,
-                         'UseOnlyAxialCDCHits': True}
+    tracking_coverage = {
+        'UsePXDHits': False,
+        'UseSVDHits': False,
+        'UseCDCHits': True,
+        'UseOnlyAxialCDCHits': True,
+        'UseOnlyBeforeTOP': True,
+        'UseNLoops': 1
+    }
 
-    fit_geometry = None
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE
 

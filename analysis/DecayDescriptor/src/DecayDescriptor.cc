@@ -5,6 +5,8 @@
 #include <analysis/utility/EvtPDLUtil.h>
 #include <analysis/dataobjects/Particle.h>
 
+#include <analysis/utility/AnalysisConfiguration.h>
+
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/logging/Logger.h>
@@ -315,6 +317,14 @@ vector<string> DecayDescriptor::getSelectionNames()
     vector<string> strDaughterNames = i->getSelectionNames();
     int nDaughters = strDaughterNames.size();
     for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
+      //Checking variable naming scheme from AnalysisConfiguratin
+      //For example, effect of possible schemes for PX variable
+      //of pi0 from D in decay B->(D->pi0 pi) pi0:
+      //default: B_D_pi0_PX
+      //semidefault: D_pi0_PX
+      //laconic: pi01_PX
+      if (AnalysisConfiguration::instance()->getTupleStyle() == "laconic") continue;
+      if ((AnalysisConfiguration::instance()->getTupleStyle() == "semilaconic") && (iDaughter == nDaughters)) continue;
       strDaughterNames[iDaughter] = m_mother.getNameSimple() + "_" + strDaughterNames[iDaughter];
     }
     strNames.insert(strNames.end(), strDaughterNames.begin(), strDaughterNames.end());

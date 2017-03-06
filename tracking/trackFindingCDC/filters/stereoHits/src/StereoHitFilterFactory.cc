@@ -9,8 +9,33 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/stereoHits/StereoHitFilterFactory.h>
 
+#include <tracking/trackFindingCDC/filters/stereoHits/StereoHitTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/stereoHits/StereoHitVarSet.h>
+
+#include <tracking/trackFindingCDC/filters/base/AllFilter.h>
+#include <tracking/trackFindingCDC/filters/base/RandomFilter.h>
+#include <tracking/trackFindingCDC/filters/base/NamedChoosableVarSetFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MCFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
+
+#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+namespace {
+  using AllStereoHitFilter = AllFilter<BaseStereoHitFilter>;
+  using RandomStereoHitFilter = RandomFilter<BaseStereoHitFilter>;
+  using MCStereoHitFilter = MCFilter<VariadicUnionVarSet<StereoHitTruthVarSet, StereoHitVarSet>>;
+  using SimpleStereoHitFilter = NamedChoosableVarSetFilter<StereoHitVarSet>;
+  using RecordingStereoHitFilter =
+    RecordingFilter<VariadicUnionVarSet<StereoHitTruthVarSet, StereoHitVarSet>>;
+  using MVAStereoHitFilter = MVAFilter<StereoHitVarSet>;
+}
 
 StereoHitFilterFactory::StereoHitFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
@@ -37,7 +62,7 @@ StereoHitFilterFactory::getValidFilterNamesAndDescriptions() const
     {"truth", "monte carlo truth."},
     {"simple", "give back a weight based on very simple variables you can give as a parameter."},
     {"recording", "record variables to a TTree."},
-    {"tmva", "use the trained BDT."},
+    {"mva", "use the trained BDT."},
   };
 }
 
@@ -55,9 +80,9 @@ StereoHitFilterFactory::create(const std::string& filterName) const
   } else if (filterName == "truth") {
     return makeUnique<MCStereoHitFilter>();
   } else if (filterName == "recording") {
-    return makeUnique<RecordingStereoHitFilter>("StereoHit.root");
-  } else if (filterName == "tmva") {
-    return makeUnique<TMVAStereoHitFilter>("StereoHit");
+    return makeUnique<RecordingStereoHitFilter>("StereoHitFilter.root");
+  } else if (filterName == "mva") {
+    return makeUnique<MVAStereoHitFilter>("tracking/data/trackfindingcdc_StereoHitFilter.xml");
   } else {
     return Super::create(filterName);
   }

@@ -13,20 +13,20 @@
 #include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
 
 #include <vector>
+#include <string>
 
 namespace Belle2 {
   class ModuleParamList;
 
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
 
     /// Fixes the orientation of segments by a simple heuristic
-    class SegmentOrienter:
-      public Findlet<const CDCRecoSegment2D, CDCRecoSegment2D> {
+    class SegmentOrienter: public Findlet<const CDCSegment2D, CDCSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCRecoSegment2D, CDCRecoSegment2D>;
+      using Super = Findlet<const CDCSegment2D, CDCSegment2D>;
 
     public:
       /// Short description of the findlet
@@ -38,26 +38,9 @@ namespace Belle2 {
       /// Signals the beginning of the event processing
       void initialize() final;
 
-    public:
-      /**
-       *  Set the default output orientation of the segments.
-       *  * EPreferredDirection::c_None does not modify the orientation from the concret algorithm.
-       *  * EPreferredDirection::c_Outwards flips the orientation of the segment such that they point away from the interaction point.
-       *  * EPreferredDirection::c_Downwards flips the orientation of the segment such that they point downwards.
-       *  * EPreferredDirection::c_Symmetric makes two copies of each segment with forward and backward to the original orientation.
-       *  * EPreferredDirection::c_Curling makes two copies for segments that are likely curlers, fix others to outwards
-       *
-       *  This properties can also be overridden by the user by the module parameter.
-       */
-      void setSegmentOrientation(const EPreferredDirection& segmentOrientation);
-
-      /// Get the current output orientation of the segments.
-      EPreferredDirection getSegmentOrientation() const;
-
-    public:
       /// Main algorithm applying the adjustment of the orientation.
-      void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
-                 std::vector<CDCRecoSegment2D>& outputSegments) final;
+      void apply(const std::vector<CDCSegment2D>& inputSegments,
+                 std::vector<CDCSegment2D>& outputSegments) final;
 
     private:
       /**

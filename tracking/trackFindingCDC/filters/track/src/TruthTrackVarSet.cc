@@ -12,9 +12,22 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+void TruthTrackVarSet::initialize()
+{
+  CDCMCManager::getInstance().requireTruthInformation();
+  Super::initialize();
+}
+
+void TruthTrackVarSet::beginEvent()
+{
+  CDCMCManager::getInstance().fill();
+  Super::beginEvent();
+}
 
 bool TruthTrackVarSet::extract(const CDCTrack* track)
 {
@@ -33,7 +46,7 @@ bool TruthTrackVarSet::extract(const CDCTrack* track)
 
     unsigned int numberOfCorrectHits = 0;
     for (const CDCRecoHit3D& recoHit : *track) {
-      if (hitLookup.getMCTrackId(recoHit->getWireHit().getHit()) == trackMCMatch) {
+      if (hitLookup.getMCTrackId(recoHit.getWireHit().getHit()) == trackMCMatch) {
         numberOfCorrectHits++;
       }
     }

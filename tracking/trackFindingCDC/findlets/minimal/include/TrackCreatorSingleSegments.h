@@ -21,7 +21,7 @@ namespace Belle2 {
   class ModuleParamList;
 
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
     class CDCTrack;
 
     /**
@@ -30,11 +30,11 @@ namespace Belle2 {
      *  This number can be set differently for each super layer
      *  Usually only the segments of the inner most super layer might be interesting to be treated as tracks.
      */
-    class TrackCreatorSingleSegments : public Findlet<const CDCRecoSegment2D, CDCTrack> {
+    class TrackCreatorSingleSegments : public Findlet<const CDCSegment2D, CDCTrack> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCRecoSegment2D, CDCTrack>;
+      using Super = Findlet<const CDCSegment2D, CDCTrack>;
 
     public:
       /// Short description of the findlet
@@ -46,7 +46,7 @@ namespace Belle2 {
     public:
       /// Main algorithm
       void
-      apply(const std::vector<CDCRecoSegment2D>& segments, std::vector<CDCTrack>& tracks) final;
+      apply(const std::vector<CDCSegment2D>& segments, std::vector<CDCTrack>& tracks) final;
 
     private:
       /**
@@ -56,7 +56,7 @@ namespace Belle2 {
        *
        *  Defaults to empty map, meaning no segments are promoted.
        */
-      std::map<ISuperLayer, size_t> m_param_minimalHitsForSingleSegmentTrackBySuperLayerId{};
+      std::map<ISuperLayer, size_t> m_param_minimalHitsBySuperLayerId;
     };
   }
 }

@@ -37,8 +37,8 @@ namespace Belle2 {
 
     public:
       /**
-       *  Constructor taking the variable set the filter should work on and the  default name of the
-       * variable to be used.
+       *  Constructor taking the variable set the filter should work on and the default name of the
+       *  variable to be used.
        */
       ChooseableFromVarSet(std::unique_ptr<AVarSet> varSet, std::string varName = "")
         : Super(std::move(varSet))
@@ -53,17 +53,17 @@ namespace Belle2 {
 
         if (m_param_varName == "") {
           // Make a forced parameter if no default variable name is present
-          parameterList
-          ->addParameter(prefixed(prefix, "chosenVariable"),
-                         m_param_varName,
-                         "Choose the name of the variable that will be put out as a weight.");
+          parameterList->addParameter(prefixed(prefix, "chosenVariable"),
+                                      m_param_varName,
+                                      "Choose the name of the variable "
+                                      "that will be put out as a weight.");
         } else {
           // Normal unforced parameter if default name is present
-          parameterList
-          ->addParameter(prefixed(prefix, "chosenVariable"),
-                         m_param_varName,
-                         "Choose the name of the variable that will be put out as a weight.",
-                         m_param_varName);
+          parameterList->addParameter(prefixed(prefix, "chosenVariable"),
+                                      m_param_varName,
+                                      "Choose the name of the variable "
+                                      "that will be put out as a weight.",
+                                      m_param_varName);
         }
       }
 

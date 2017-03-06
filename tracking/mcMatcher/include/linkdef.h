@@ -4,5 +4,4 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::TrackMatchLookUp+;
-
+#pragma link C++ class Belle2::TrackMatchLookUp-;

@@ -38,6 +38,11 @@ float Vertex::getDeltaT()
   return m_deltaT;
 }
 
+float Vertex::getDeltaTErr()
+{
+  return m_deltaTErr;
+}
+
 TVector3 Vertex::getMCTagVertex()
 {
   return m_MCtagV;
@@ -72,6 +77,11 @@ void Vertex::setTagVertexPval(float TagVertexPval)
 void Vertex::setDeltaT(float DeltaT)
 {
   m_deltaT = DeltaT;
+}
+
+void Vertex::setDeltaTErr(float DeltaTErr)
+{
+  m_deltaTErr = DeltaTErr;
 }
 
 void Vertex::setMCTagVertex(TVector3 MCTagVertex)

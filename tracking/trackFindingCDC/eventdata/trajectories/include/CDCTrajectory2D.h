@@ -289,6 +289,10 @@ namespace Belle2 {
       Vector2D getGlobalPerigee() const
       { return getLocalCircle()->closest(-m_localOrigin) + m_localOrigin; }
 
+      /// Getter for the center of the trajectory in global coordinates
+      Vector2D getGlobalCenter() const
+      { return getLocalCircle()->center() + m_localOrigin; }
+
       /**
        *  Calculates the point where the trajectory meets the outer wall of the CDC.
        *  This method returns the first point in forward flight direction from the start

@@ -3,6 +3,8 @@
   <Creator library="ir">FarBeamLineCreator</Creator>
   <Content>
 
+    <LimitStepLength desc="select 1 to limit step length inside beam pipes to be less than 5mm">0</LimitStepLength>
+
          <!--
          Following data is defined to Geant4 coordinates (z axis = Belle Solenoid), not for GxGy coordinates.
          Therefore we do not need to rotate all beamline gemetry.   

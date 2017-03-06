@@ -35,23 +35,19 @@ namespace Belle2 {
      * Default constructor
      */
     ARICHFebTest(): m_serial(0), m_dna(""), m_runSlowC(""), m_timeSlowC(), m_tmon0(0.0), m_tmon1(0.0), m_vdd(0.0), m_v2p(0.0),
-      m_v2n(0.0), m_vss(0.0),
-      m_vth1(0.0), m_vth2(0.0), m_vcc12(0.0), m_vcc15(0.0), m_vcc25(0.0), m_v38p(0.0), m_runLV(""), m_timeLV(), m_currentV20p(0.0),
-      m_currentV21n(0.0),
-      m_currentV38p(0.0), m_runHV(""), m_timeHV(), m_currentV99p(0.0), m_deadChannel(), m_testPulse(NULL), m_offsetRough(NULL),
-      m_offsetFine(NULL),
-      m_slopesRough(), m_slopesFine(), m_fwhm(), m_comment("") {};
+      m_v2n(0.0), m_vss(0.0), m_vth1(0.0), m_vth2(0.0), m_vcc12(0.0), m_vcc15(0.0), m_vcc25(0.0), m_v38p(0.0), m_runLV(""), m_timeLV(),
+      m_currentV20p(0.0), m_currentV21n(0.0), m_currentV38p(0.0), m_runHV(""), m_timeHV(), m_currentV99p(0.0), m_deadChannel(),
+      m_testPulse(NULL), m_offsetRough(NULL),  m_offsetFine(NULL),  m_slopesRough(), m_slopesFine(), m_fwhm(), m_comment("") {};
 
 
     /**
      * Constructor
      */
     explicit ARICHFebTest(int serial): m_serial(serial), m_dna(""), m_runSlowC(""), m_timeSlowC(), m_tmon0(0.0), m_tmon1(0.0),
-      m_vdd(0.0), m_v2p(0.0),
-      m_v2n(0.0), m_vss(0.0), m_vth1(0.0), m_vth2(0.0), m_vcc12(0.0), m_vcc15(0.0), m_vcc25(0.0), m_v38p(0.0), m_runLV(""), m_timeLV(),
-      m_currentV20p(0.0), m_currentV21n(0.0), m_currentV38p(0.0), m_runHV(""), m_timeHV(), m_currentV99p(0.0), m_deadChannel(),
-      m_testPulse(NULL),
-      m_offsetRough(NULL), m_offsetFine(NULL), m_slopesRough(), m_slopesFine(), m_fwhm(), m_comment("") {};
+      m_vdd(0.0), m_v2p(0.0), m_v2n(0.0), m_vss(0.0), m_vth1(0.0), m_vth2(0.0), m_vcc12(0.0), m_vcc15(0.0), m_vcc25(0.0), m_v38p(0.0),
+      m_runLV(""), m_timeLV(), m_currentV20p(0.0), m_currentV21n(0.0), m_currentV38p(0.0), m_runHV(""), m_timeHV(), m_currentV99p(0.0),
+      m_deadChannel(), m_testPulse(NULL), m_offsetRough(NULL), m_offsetFine(NULL), m_slopesRough(), m_slopesFine(), m_fwhm(),
+      m_comment("") {};
 
     /**
      * Destructor

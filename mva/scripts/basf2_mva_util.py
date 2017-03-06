@@ -24,12 +24,19 @@ def tree2dict(tree, tree_columns, dict_columns=None):
     @param tree_columns the column (or branch) names in the tree
     @param dict_columns the corresponding column names in the dictionary
     """
+    if len(tree_columns) == 0:
+        return dict()
     if dict_columns is None:
         dict_columns = tree_columns
-    d = {column: np.zeros((tree.GetEntries(),)) for column in dict_columns}
-    for iEvent, event in enumerate(tree):
-        for dict_column, tree_column in zip(dict_columns, tree_columns):
-            d[dict_column][iEvent] = getattr(event, tree_column)
+    try:
+        import root_numpy
+        d = root_numpy.tree2array(tree, branches=tree_columns)
+        d.dtype.names = dict_columns
+    except ImportError:
+        d = {column: np.zeros((tree.GetEntries(),)) for column in dict_columns}
+        for iEvent, event in enumerate(tree):
+            for dict_column, tree_column in zip(dict_columns, tree_columns):
+                d[dict_column][iEvent] = getattr(event, tree_column)
     return d
 
 
@@ -54,6 +61,7 @@ class Method(object):
     It loads the Options, can apply the expert and train new ones using the current as a prototype.
     This class is used by the basf_mva_evaluation tools
     """
+
     def __init__(self, identifier):
         """
         Load a method stored under the given identifier
@@ -81,8 +89,6 @@ class Method(object):
         self.specific_options = None
         if self.general_options.m_method == "FastBDT":
             self.specific_options = basf2_mva.FastBDTOptions()
-        elif self.general_options.m_method == "NeuroBayes":
-            self.specific_options = basf2_mva.NeuroBayesOptions()
         elif self.general_options.m_method == "TMVAClassification":
             self.specific_options = basf2_mva.TMVAOptionsClassification()
         elif self.general_options.m_method == "TMVARegression":
@@ -109,12 +115,16 @@ class Method(object):
         self.importances = {k: importances[k] for k in variables}
         #: List of variables sorted by their importance
         self.variables = list(sorted(variables, key=lambda v: self.importances.get(v, 0.0)))
-        #: Dictionary of the variable importances calculated by the method, but with the root compatible variable names
+        #: List of the variable importances calculated by the method, but with the root compatible variable names
         self.root_variables = [Belle2.makeROOTCompatible(v) for v in self.variables]
-        #: List of the variables sorted by their importance but with root compatoble variable names
+        #: Dictionary of the variables sorted by their importance but with root compatoble variable names
         self.root_importances = {k: importances[k] for k in self.root_variables}
         #: Description of the method as a xml string returned by basf2_mva.info
         self.description = str(basf2_mva.info(self.identifier))
+        #: List of spectators
+        self.spectators = [str(v) for v in self.general_options.m_spectators]
+        #: List of spectators with root compatible names
+        self.root_spectators = [Belle2.makeROOTCompatible(v) for v in self.spectators]
 
     def train_teacher(self, datafiles, treename, general_options=None, specific_options=None):
         """

@@ -11,7 +11,7 @@
 
 namespace Belle2 {
 
-  /** A structure to manage ring buffer. Placed on top of the shared memory. */
+  /** Internal metadata structure for RingBuffer. Placed on top of the shared memory. */
   struct RingBufInfo {
     int size; /**< ring buffer size (integers), minus this header. */
     int remain; /**< Unsure, always equal to size. */
@@ -21,9 +21,9 @@ namespace Belle2 {
     int nbuf; /**< Number of entries in ring buffer. */
     int semid; /**< Semaphore ID. */
     int nattached; /**< Number of RingBuffer instances currently attached to this buffer. */
-    int redzone; /**< Unused. */
-    int readbuf; /**< Unused. */
-    int mode; /**< Error state? 0: Normal, 1: buffer full and wptr>rptr, others are complicated. */
+    int nbusy; /**< Number of attached _reading_ processes currently processing events. */
+    int __readbuf; /**< Unused. */
+    int errtype; /**< Error state? 0: Normal, 1: buffer full and wptr>rptr, others are complicated. */
     int numAttachedTx; /**< # attached sending processes. 0: Processes reading from this buffer should terminate once it's empty. -1: attach pending (initial state) */
     int ninsq; /**< Count insq() calls for this buffer. */
     int nremq; /**< Count remq() calls for this buffer. */
@@ -32,22 +32,20 @@ namespace Belle2 {
   /** Class to manage a Ring Buffer placed in an IPC shared memory */
   class RingBuffer {
   public:
-    /** Standard size of buffer, in integers (~40MB). */
-    const static int c_DefaultSize = 10000000;
+    /** Standard size of buffer, in integers (~60MB). Needs to be large enough to contain any event, but adds to total memory use of basf2. */
+    const static int c_DefaultSize = 15000000;
 
     /** Constructor to create a new shared memory in private space.
      *
-     * @param size Ring buffer size in integers (!)
+     * @param nwords Ring buffer size in integers
      */
-    explicit RingBuffer(int size = c_DefaultSize);
+    explicit RingBuffer(int nwords = c_DefaultSize);
     /** Constructor to create/attach named shared memory in global space */
-    RingBuffer(const std::string& name, unsigned int size = 0);     // Create / Attach Ring buffer
-    /** Constructor by attaching to an existing shared memory */
-    //    RingBuffer(int shmid);              // Attach Ring Buffer
+    RingBuffer(const std::string& name, unsigned int nwords = 0);     // Create / Attach Ring buffer
     /** Destructor */
     ~RingBuffer();
     /** open shared memory */
-    void openSHM(int size);
+    void openSHM(int nwords);
     /** Function to detach and remove shared memory*/
     void cleanup();
 
@@ -64,11 +62,16 @@ namespace Belle2 {
     void txAttached();
     /** Decrease #attached Tx counter. */
     void txDetached();
-    /** Cause termination of reading processes (if they use continueReadingData()). Assumed to be atomic. */
+    /** Cause termination of reading processes (if they use isDead()). Assumed to be atomic. */
     void kill();
 
-    /** If false, the ring buffer is empty and has no attached Tx modules (i.e. no new data is going to be added). Processes should then stop. */
-    bool continueReadingData() const;
+    /** If True, the ring buffer is empty and has no attached Tx modules (i.e. no new data is going to be added). Processes should then stop. */
+    bool isDead() const;
+    /** True if and only if buffer is empty and nbusy == 0.
+     *
+     * Called in Tx to see if all events of the current run
+     * have been processed */
+    bool allRxWaiting() const;
 
     /** Clear the RingBuffer */
     int clear();
@@ -94,8 +97,8 @@ namespace Belle2 {
     /** Return number of remq() calls. */
     int remq_counter() const;
 
-    /** Dump buffer info */
-    void DumpInfo() const;
+    /** Dump contents of RingBufInfo metadata */
+    void dumpInfo() const;
 
   private:
     bool m_new; /**< True if we created the ring buffer ourselves (and need to clean it). */
@@ -106,6 +109,13 @@ namespace Belle2 {
     key_t m_semkey; /**< Semaphore key, see semget(2). */
     /** file path containing ids of shm and sema for private shared mem, used for easier cleanup if we fail to do things properly */
     std::string m_semshmFileName;
+
+    /** Is this process currently processing events from this RingBuffer?
+     *
+     * set during remq() with value depending on wether data was returned.
+     * Always false for a process that is only using insq().
+     */
+    bool m_procIsBusy;
 
     int  m_shmid; /**< ID of shared memory segment. (See shmget(2)) */
     int* m_shmadr; /**< Address of attached shared memory segment. (See shmat(2)) */

@@ -882,7 +882,7 @@ namespace Belle2 {
   {
     Belle2::ECLCrystalsShapeAndPosition crystals = loadCrystalsShapeAndPosition();
     vector<cplacement_t> bp = load_placements(&crystals, ECLParts::forward);
-    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); it++) {
+    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); ++it) {
       const cplacement_t& t = *it;
       cout << t.nshape << " " << t.Rphi1 << " " << t.Rtheta << " " << t.Rphi2 << " " << t.Pr << " " << t.Ptheta << " " << t.Pphi << endl;
     }

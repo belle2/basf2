@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPair/FitlessSegmentPairVarSet.h>
 
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -18,17 +20,17 @@ bool FitlessSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 
   const CDCSegmentPair& segmentPair = *ptrSegmentPair;
 
-  const CDCRecoSegment2D* ptrFromSegment = segmentPair.getFromSegment();
-  const CDCRecoSegment2D* ptrToSegment = segmentPair.getToSegment();
+  const CDCSegment2D* ptrFromSegment = segmentPair.getFromSegment();
+  const CDCSegment2D* ptrToSegment = segmentPair.getToSegment();
 
-  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
-  const CDCRecoSegment2D& toSegment = *ptrToSegment;
+  const CDCSegment2D& fromSegment = *ptrFromSegment;
+  const CDCSegment2D& toSegment = *ptrToSegment;
 
-  const CDCRecoSegment2D* ptrAxialSegment = segmentPair.getAxialSegment();
-  const CDCRecoSegment2D& axialSegment = *ptrAxialSegment;
+  const CDCSegment2D* ptrAxialSegment = segmentPair.getAxialSegment();
+  const CDCSegment2D& axialSegment = *ptrAxialSegment;
 
-  const CDCRecoSegment2D* ptrStereoSegment = segmentPair.getStereoSegment();
-  const CDCRecoSegment2D& stereoSegment = *ptrStereoSegment;
+  const CDCSegment2D* ptrStereoSegment = segmentPair.getStereoSegment();
+  const CDCSegment2D& stereoSegment = *ptrStereoSegment;
 
   // Segment fit should have been done at this point
   const CDCTrajectory2D& fromFit = fromSegment.getTrajectory2D();

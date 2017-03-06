@@ -22,14 +22,14 @@ namespace Belle2 {
   class ModuleParamList;
 
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
 
     /// Resolves between the potential alias versions of the segments and contained hits
-    class SegmentAliasResolver : public Findlet<CDCRecoSegment2D&> {
+    class SegmentAliasResolver : public Findlet<CDCSegment2D&> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCRecoSegment2D&>;
+      using Super = Findlet<CDCSegment2D&>;
 
     public:
       /// Short description of the findlet
@@ -43,15 +43,15 @@ namespace Belle2 {
 
     public:
       /// Main algorithm applying the fit to each segment
-      void apply(std::vector<CDCRecoSegment2D>& outputSegments) override;
+      void apply(std::vector<CDCSegment2D>& outputSegments) override;
 
     private:
       /// Fit the alias segment
-      void refit(CDCRecoSegment2D& segment, bool reestimate);
+      void refit(CDCSegment2D& segment, bool reestimate);
 
     private:
       /// Parameter : Which alias resolutions should be applied
-      std::vector<std::string> m_param_investigate = {"full", "borders", /*"middle"*/};
+      std::vector<std::string> m_param_investigateAlias = { "full", "borders", /*"middle"*/};
 
       /// Switch whether the complete segment should be aliased.
       bool m_fullAlias = false; // Activated by the parameter

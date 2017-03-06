@@ -13,7 +13,7 @@ using namespace std;
 
 // Constructor / Destructor
 
-SharedMem::SharedMem(char* name, int size)
+SharedMem::SharedMem(const char* name, int size)
 {
   // 0. Determine shared memory type
   if (strcmp(name, "private") != 0) {      // Global

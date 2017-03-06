@@ -30,8 +30,8 @@ namespace Belle2 {
     class CDCRecoHit2D;
     class CDCRecoHit3D;
     class CDCWireHitSegment;
-    class CDCRecoSegment2D;
-    class CDCRecoSegment3D;
+    class CDCSegment2D;
+    class CDCSegment3D;
     class CDCAxialSegmentPair;
     class CDCTrack;
 
@@ -209,13 +209,13 @@ namespace Belle2 {
        *  Appends all reconstructed hits from the two dimensional segment.
        *  @return  Number of added hits
        */
-      std::size_t appendRange(const CDCRecoSegment2D& recoSegment2D);
+      std::size_t appendRange(const CDCSegment2D& segment2D);
 
       /**
        *  Appends all reconstructed hits from the three dimensional segment.
        *  @return  Number of added hits
        */
-      std::size_t appendRange(const CDCRecoSegment3D& recoSegment3D);
+      std::size_t appendRange(const CDCSegment3D& segment3D);
 
       /**
        *  Appends all reconstructed hits from the two axial segments,

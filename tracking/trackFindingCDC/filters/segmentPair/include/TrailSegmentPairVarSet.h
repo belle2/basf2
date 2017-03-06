@@ -8,17 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Forward declaration
     class CDCSegmentPair;
 
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
     static char const* const trailSegmentPairVarNames[] = {
       "from_rl_asym",
@@ -28,31 +26,28 @@ namespace Belle2 {
       "to_rl_switches",
     };
 
-    /** Class that specifies the names of the variables
-     *  that should be generated from a segment
-     */
-    class TrailSegmentPairVarNames : public VarNames<CDCSegmentPair> {
+    /// Vehicle class to transport the variable names
+    struct TrailSegmentPairVarNames : public VarNames<CDCSegmentPair> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(trailSegmentPairVarNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(trailSegmentPairVarNames);
 
-      /// Getter for the name a the given index
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
         return trailSegmentPairVarNames[iName];
       }
     };
 
-    /** Class that computes floating point variables from a segment pair.
-     *  that can be forwarded to a flat TNtuple or a TMVA method
+    /**
+     *  Class to compute floating point variables from an axial stereo segment pair
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class TrailSegmentPairVarSet : public VarSet<TrailSegmentPairVarNames> {
 
     public:
-      /// Generate and assign the variables from the segment pair
-      bool extract(const CDCSegmentPair* ptrSegmentPair) override;
+      /// Generate and assign the contained variables
+      bool extract(const CDCSegmentPair* ptrSegmentPair) final;
     };
   }
 }

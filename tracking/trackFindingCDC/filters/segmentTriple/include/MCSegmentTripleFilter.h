@@ -30,15 +30,6 @@ namespace Belle2 {
       explicit MCSegmentTripleFilter(bool allowReverse = true);
 
     public:
-      /// Used to prepare the Monte Carlo information for this event.
-      void beginEvent() final;
-
-      /// Forwards the modules initialize to the filter
-      void initialize() final;
-
-      /// Forwards the modules initialize to the filter
-      void terminate() final;
-
       /// Check if the segment triple is aligned in the Monte Carlo track. Signals NAN if not.
       Weight operator()(const CDCSegmentTriple& segmentTriple) final;
 

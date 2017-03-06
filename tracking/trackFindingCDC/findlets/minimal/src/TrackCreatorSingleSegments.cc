@@ -10,7 +10,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCreatorSingleSegments.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -26,21 +26,21 @@ std::string TrackCreatorSingleSegments::getDescription()
 
 void TrackCreatorSingleSegments::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(prefixed(prefix, "MinimalHitsForSingleSegmentTrackBySuperLayerId"),
-                                m_param_minimalHitsForSingleSegmentTrackBySuperLayerId,
+  moduleParamList->addParameter(prefixed(prefix, "MinimalHitsBySuperLayerId"),
+                                m_param_minimalHitsBySuperLayerId,
                                 "Map of super layer ids to minimum hit number, "
                                 "for which left over segments shall be forwarded as tracks, "
                                 "if the exceed the minimal hit requirement. Default empty.",
-                                m_param_minimalHitsForSingleSegmentTrackBySuperLayerId);
+                                m_param_minimalHitsBySuperLayerId);
 }
 
-void TrackCreatorSingleSegments::apply(const std::vector<CDCRecoSegment2D>& segments,
+void TrackCreatorSingleSegments::apply(const std::vector<CDCSegment2D>& segments,
                                        std::vector<CDCTrack>& tracks)
 {
   // Create tracks from left over segments
   // First figure out which segments do not share any hits with any of the given tracks
   // (if the tracks vector is empty this is the case for all segments)
-  for (const CDCRecoSegment2D& segment : segments) {
+  for (const CDCSegment2D& segment : segments) {
     segment.unsetAndForwardMaskedFlag();
   }
 
@@ -48,22 +48,22 @@ void TrackCreatorSingleSegments::apply(const std::vector<CDCRecoSegment2D>& segm
     track.unsetAndForwardMaskedFlag();
   }
 
-  for (const CDCRecoSegment2D& segment : segments) {
+  for (const CDCSegment2D& segment : segments) {
     segment.receiveMaskedFlag();
   }
 
-  if (not m_param_minimalHitsForSingleSegmentTrackBySuperLayerId.empty()) {
-    for (const CDCRecoSegment2D& segment : segments) {
-      if (segment.getAutomatonCell().hasMaskedFlag()) continue;
+  if (not m_param_minimalHitsBySuperLayerId.empty()) {
+    for (const CDCSegment2D& segment : segments) {
+      if (segment->hasMaskedFlag()) continue;
 
       ISuperLayer iSuperLayer = segment.getISuperLayer();
-      if (m_param_minimalHitsForSingleSegmentTrackBySuperLayerId.count(iSuperLayer) and
-          segment.size() >= m_param_minimalHitsForSingleSegmentTrackBySuperLayerId[iSuperLayer]) {
+      if (m_param_minimalHitsBySuperLayerId.count(iSuperLayer) and
+          segment.size() >= m_param_minimalHitsBySuperLayerId[iSuperLayer]) {
 
         if (segment.getTrajectory2D().isFitted()) {
           tracks.push_back(CDCTrack(segment));
           segment.setAndForwardMaskedFlag();
-          for (const CDCRecoSegment2D& otherSegment : segments) {
+          for (const CDCSegment2D& otherSegment : segments) {
             otherSegment.receiveMaskedFlag();
           }
         }

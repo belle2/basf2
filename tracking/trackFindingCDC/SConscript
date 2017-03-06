@@ -8,14 +8,13 @@ env.Dictionary()['SUBLIB'] = True
 # Additional libraries
 env['LIBS'] = [
     'tracking_dataobjects',
-    'mva_dataobjects',
     'geometry',
     'cdc', 'cdc_dataobjects',
-    "mva",
+    "mva", 'mva_dataobjects',
+    'mdst_dataobjects',
     'framework',
     'genfit2',
     '$ROOT_LIBS',
-    'TMVA',
     ]
 
 env.Append(CXXFLAGS=['-Wshadow'])

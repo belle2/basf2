@@ -9,12 +9,12 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segment/BasicSegmentVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool BasicSegmentVarSet::extract(const CDCRecoSegment2D* ptrSegment2D)
+bool BasicSegmentVarSet::extract(const CDCSegment2D* ptrSegment2D)
 {
   if (not ptrSegment2D) return false;
 

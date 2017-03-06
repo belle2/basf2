@@ -26,7 +26,8 @@ eventinfoprinter = register_module('EventInfoPrinter')
 
 # create geometry
 gearbox = register_module('Gearbox')
-geometry = register_module('Geometry')
+components = ['MagneticField', 'BeamPipe', 'PXD', 'SVD', 'CDC', 'EKLM', 'BKLM']
+geometry = register_module('Geometry', components=components)
 
 # simulate only tracking detectors to simulate the whole detector included in
 # BelleII.xml:
@@ -47,11 +48,11 @@ g4sim.logging.log_level = LogLevel.ERROR
 cdcDigitizer = register_module('CDCDigitizer')
 
 # find MCTracks
-track_finder_mc_truth = register_module('TrackFinderMCTruth')
+track_finder_mc_truth = register_module('TrackFinderMCTruthRecoTracks')
 
 # fitting
-fitting = register_module('GBLfit')
-fitting.param('BuildBelle2Tracks', True)
+fitting = register_module('MillepedeCollector')
+
 # output
 output = register_module('RootOutput')
 output.param('outputFileName', 'MCFittingOutput.root')
@@ -72,10 +73,10 @@ main.add_module('SVDDigitizer')
 main.add_module('PXDClusterizer')
 main.add_module('SVDClusterizer')
 main.add_module(cdcDigitizer)
-main.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
+main.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False, whichGeometry='TGeo')
 main.add_module(track_finder_mc_truth)
 main.add_module(fitting)
-main.add_module('Display')
+main.add_module('Display', showRecoTracks=True)
 main.add_module(output)
 
 # Process events

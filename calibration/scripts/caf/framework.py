@@ -15,6 +15,7 @@ import shutil
 from pprint import PrettyPrinter
 from datetime import datetime
 from collections import OrderedDict
+from collections import defaultdict
 from collections import deque
 import pickle
 from time import sleep
@@ -147,6 +148,8 @@ class Calibration():
         #: OrderedDictionary of dependencies of calibration objects, where value is the calibrations
         #: that the key depends on.
         self.dependencies = []
+        #: File:Iov dictionary, should be key=absolute_file_path:value=IoV for file (see utils.IoV())
+        self.files_to_iovs = dict()
 
     def is_valid(self):
         """A full calibration consists of a collector AND an associated algorithm AND input_files.
@@ -512,7 +515,7 @@ class CAF():
         # We should also patch in all of the implicit dependencies for the calibrations
         return order
 
-    def check_backend(self):
+    def _check_backend(self):
         """
         Makes sure that the CAF has a valid backend setup. If one isn't set by the user (or if the
         one that is stored isn't a valid Backend object) we should create a default Local backend.
@@ -525,12 +528,14 @@ class CAF():
         else:
             self._algorithm_backend = caf.backends.Local()
 
-    def run(self):
+    def run(self, iov=None):
         """
         - Runs the overall calibration job, saves the outputs to the output_dir directory,
         and creates database payloads.
         - Upload of final databases is not done to give the option of monitoring output
         before committing to conditions database.
+        - the iov argument will eventually tell the CAF which IoV to calibrate over (using the
+        input files). Currently not implemented and it will calibrate over ALL data by default.
         """
         # Checks whether the dependencies we've added will give a valid order
         order = self._order_calibrations()
@@ -538,7 +543,7 @@ class CAF():
             B2FATAL("Couldn't order the calibrations properly. Probably a cyclic dependency.")
 
         # Check that a backend has been set and use default Local() one if not
-        self.check_backend()
+        self._check_backend()
 
         # Creates the overall output directory and reset the attribute to use an absolute path to it.
         self.output_dir = self._make_output_dir()
@@ -547,7 +552,7 @@ class CAF():
             runners = []
             # Create Runners to spawn threads for each calibration
             for calibration_name, calibration in self.calibrations.items():
-                machine = CalibrationMachine(calibration)
+                machine = CalibrationMachine(calibration, iov)
                 machine.collector_backend = self.backend
                 runner = CalibrationRunner(machine, heartbeat=self.heartbeat)
                 runners.append(runner)

@@ -25,6 +25,8 @@ from tracking.validation.run import TrackingValidationRun
 
 class Cosmics(TrackingValidationRun):
     n_events = N_EVENTS
+    #: Generator to be used in the simulation (-so)
+    generator_module = 'Cosmics'
     root_input_file = '../CosmicsSimNoBkg.root'
     components = None
     finder_module = 'TrackFinderCDCCosmics'
@@ -33,8 +35,7 @@ class Cosmics(TrackingValidationRun):
         'UseSVDHits': False,
         'UseCDCHits': True,
         'UseOnlyAxialCDCHits': False
-        }
-    fit_geometry = None
+    }
     pulls = True
     contact = CONTACT
     output_file_name = VALIDATION_OUTPUT_FILE

@@ -8,8 +8,7 @@ import reconstruction
 from softwaretrigger import add_fast_reco_software_trigger, add_hlt_software_trigger, \
     add_calibration_software_trigger
 
-RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs",
-                         "EKLMDigits"]
+RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs"]
 ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*"]
 
 
@@ -29,9 +28,6 @@ def add_packers(path):
     # Exclude PXD
     rawdata.add_packers(path, components=["SVD", "CDC", "ECL", "TOP", "ARICH", "BKLM", "EKLM"])
 
-    # TODO: EKLMPacker
-    basf2.B2WARNING("The EKLM raw data is not handled properly, because of missing (Un)packer modules!")
-
 
 def add_unpackers(path):
     """
@@ -48,9 +44,6 @@ def add_unpackers(path):
 
     # Exclude PXD
     rawdata.add_unpackers(path, components=["SVD", "CDC", "ECL", "TOP", "ARICH", "BKLM", "EKLM"])
-
-    # TODO: EKLMUnpacker
-    basf2.B2WARNING("The EKLM raw data is not handled properly, because of missing (Un)packer modules!")
 
     # add clusterizer
     path.add_module("SVDClusterizer")
@@ -182,6 +175,6 @@ def setup_softwaretrigger_database_access(software_trigger_global_tag_name=SOFTW
     """
     basf2.reset_database()
     basf2.use_database_chain()
-    basf2.use_local_database()
+    basf2.use_local_database("localdb/dbcache.txt")
     basf2.use_central_database(software_trigger_global_tag_name)
     basf2.use_central_database(production_global_tag_name)

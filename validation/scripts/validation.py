@@ -33,11 +33,18 @@ pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 from validationscript import Script, ScriptStatus
 from validationfunctions import get_start_time, get_validation_folders, scripts_in_dir, \
     find_creator, parse_cmd_line_arguments
+import validationfunctions
 
 import validationserver
 import validationplots
 import validationscript
 import validationpath
+
+# local and cluster control backends
+import localcontrol
+import clustercontrol
+import clustercontrolsge
+import clustercontroldrmaa
 
 
 def statistics_plots(
@@ -434,6 +441,41 @@ class Validation:
         # If this is set, dependencies will be ignored.
         self.ignore_dependencies = False
 
+        #: reporting time (in minutes)
+        # the time in minutes when there will be there first logoutput if a script
+        # is still not complete
+        # This prints every 30 minutes which scripts are still running
+        self.running_script_reporting_interval = 30
+
+        # The maximum time before a script is skipped, if it does not terminate
+        # The curren limit is 10h
+        self.script_max_runtime_in_minutes = 720
+
+    def get_useable_basepath(self):
+        """
+        Checks if a local path is available. If only a central release is available, return the path
+        to this central release
+        """
+        if self.basepaths["local"]:
+            return self.basepaths["local"]
+        else:
+            return self.basepaths["central"]
+
+    @staticmethod
+    def get_available_job_control():
+        """
+        insert the possible backend controls, they will be checed via their
+        is_supported method if they actually can be executed in the current environment
+        """
+        return [localcontrol.Local,
+                clustercontrol.Cluster,
+                clustercontrolsge.Cluster,
+                clustercontroldrmaa.Cluster]
+
+    @staticmethod
+    def get_available_job_control_names():
+        return [c.name() for c in Validation.get_available_job_control()]
+
     def build_dependencies(self):
         """!
         This method loops over all Script objects in self.list_of_scripts and
@@ -765,8 +807,9 @@ class Validation:
                 if dep_script.status == ScriptStatus.cached:
                     script.dependencies.remove(dep_script)
 
-    def store_run_results_json(self):
+    def store_run_results_json(self, git_hash):
 
+        # retrieve the git hash which was used for executing this validation scripts
         json_package = []
         for p in self.list_of_packages:
             this_package_scrits = [s for s in self.list_of_scripts if s.package == p]
@@ -777,7 +820,11 @@ class Validation:
             json_package.append(json_objects.Package(p, scriptfiles=json_scripts, fail_count=fail_count))
 
         # todo: assign correct color here
-        rev = json_objects.Revision(self.tag, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), packages=json_package)
+        rev = json_objects.Revision(label=self.tag,
+                                    creation_date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                                    creation_timezone=validationfunctions.get_timezone(),
+                                    packages=json_package,
+                                    git_hash=git_hash)
         json_objects.dump(validationpath.get_results_tag_revision_file(self.work_folder, self.tag), rev)
 
     def add_script(self, script):
@@ -810,14 +857,26 @@ class Validation:
 
         # Depending on the selected mode, load either the controls for the
         # cluster or for local multi-processing
-        if self.mode == 'cluster':
-            import clustercontrol
-            control = clustercontrol.Cluster()
-        elif self.mode == 'cluster-sge':
-            import clustercontrolsge
-            control = clustercontrolsge.Cluster()
-        else:
-            control = local_control
+
+        selected_control = [(c.name(), c.description(), c) for c in self.get_available_job_control() if c.name() == self.mode]
+
+        if not len(selected_control) == 1:
+            print("Selected mode {} does not exist".format(self.mode))
+            sys.exit(1)
+
+        self.log.note(selected_control[0][1])
+        if not selected_control[0][2].is_supported():
+            print("Selected mode {} is not supported on your system".format(self.mode))
+            sys.exit(1)
+
+        # instantiate the selected job control backend
+        control = selected_control[0][2]()
+
+        # read the git hash which is used to produce this validation
+        src_basepath = self.get_useable_basepath()
+        git_hash = validationfunctions.get_compact_git_hash(src_basepath)
+        self.log.note("Git hash of repository located at {} is {}".format(src_basepath,
+                                                                          git_hash))
 
         # If we do have runtime data, then read them
         if os.path.exists("./runtimes.dat") and os.stat("./runtimes.dat").st_size:
@@ -903,6 +962,29 @@ class Validation:
                                 len(waiting), len(running),
                                 script_object.path,
                                 script_object.status))
+                    else:
+
+                        if (time.time() - script_object.last_report_time) / 60.0 > self.running_script_reporting_interval:
+                            print(
+                                "Script {} running since {} seconds".format(
+                                    script_object.name_not_sanitized,
+                                    time.time() - script_object.start_time))
+                            # explicit flush so this will show up in log file right away
+                            sys.stdout.flush()
+
+                            # not finished yet, log time
+                            script_object.last_report_time = time.time()
+
+                        # check for the maximum time a script is allow to run and terminate if exceeded
+                        total_runtime_in_minutes = (time.time() - script_object.start_time) / 60.0
+                        if total_runtime_in_minutes > self.script_max_runtime_in_minutes:
+                            script_object.status = ScriptStatus.failed
+                            self.log.warning('Script {0} did not finish after {1} minutes, skipping '
+                                             .format(script_object.path, total_runtime_in_minutes))
+                            # kill the running process
+                            script_object.control.terminate(script_object)
+                            # Skip all dependent scripts
+                            self.skip_script(script_object)
 
                 # Otherwise (the script is waiting) and if it is ready to be
                 # executed
@@ -933,8 +1015,10 @@ class Validation:
                         script_object.control.execute(script_object,
                                                       self.basf2_options,
                                                       self.dry, self.tag)
+
                         # Log the script execution start time
                         script_object.start_time = time.time()
+                        script_object.last_report_time = time.time()
 
                         # Some printout in quiet mode
                         if self.quiet:
@@ -969,7 +1053,7 @@ class Validation:
             runtimes.close()
         print()
 
-        self.store_run_results_json()
+        self.store_run_results_json(git_hash)
         # todo: update list of available revisions with the current run
 
     def create_plots(self):
@@ -1014,7 +1098,8 @@ def execute(tag=None, isTest=None):
 
         # Now we process the command line arguments.
         # First of all, we read them in:
-        cmd_arguments = parse_cmd_line_arguments(tag=tag, isTest=isTest)
+        cmd_arguments = parse_cmd_line_arguments(tag=tag, isTest=isTest,
+                                                 modes=Validation.get_available_job_control_names())
 
         # overwrite with default settings with parameters give in method
         # call
@@ -1049,16 +1134,7 @@ def execute(tag=None, isTest=None):
                                 .format(validation.basf2_options))
 
         # Check if we are using the cluster or local multiprocessing:
-        if cmd_arguments.mode and cmd_arguments.mode in ['local', 'cluster', 'cluster-sge']:
-            validation.mode = cmd_arguments.mode
-        else:
-            validation.mode = 'local'
-        if validation.mode == 'local':
-            validation.log.note('Validation will use local multi-processing.')
-        elif validation.mode == 'cluster-sge':
-            validation.log.note('Validation will use the SunGridEngine cluster.')
-        elif validation.mode == 'cluster':
-            validation.log.note('Validation will use the cluster.')
+        validation.mode = cmd_arguments.mode
 
         # Set if we have a limit on the maximum number of local processes
         validation.parallel = cmd_arguments.parallel

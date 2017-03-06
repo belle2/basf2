@@ -145,12 +145,8 @@ namespace Belle2 {
     template<typename T>
     ModuleParam<T>& getParameter(const std::string& name) const;
 
-    /**
-     * Returns true if unset parameters exist which the user has to set in the steering file.
-     *
-     * @return True if unset parameters exist which the user has to set in the steering file.
-     */
-    bool hasUnsetForcedParams() const;
+    /** Returns list of unset parameters (if they are required to have a value. */
+    std::vector<std::string> getUnsetForcedParams() const;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //                   Python API

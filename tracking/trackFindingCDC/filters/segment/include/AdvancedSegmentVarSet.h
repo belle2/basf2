@@ -14,10 +14,9 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
 
-
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
     static char const* const advancedSegmentVarNames[] = {
       "is_stereo",
@@ -47,33 +46,28 @@ namespace Belle2 {
       "fitted_d0",
     };
 
-    /**
-     *  Class that specifies the names of the variables
-     *  that should be generated from a segment.
-     */
-    class AdvancedSegmentVarNames : public VarNames<CDCRecoSegment2D> {
+    /// Vehicle class to transport the variable names
+    struct AdvancedSegmentVarNames : public VarNames<CDCSegment2D> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(advancedSegmentVarNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(advancedSegmentVarNames);
 
-      /// Get the name of the corresponding column.
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
         return advancedSegmentVarNames[iName];
       }
     };
 
     /**
-     *  Class that computes floating point variables from the segments.
-     *  that can be forwarded to a flat TNTuple or a TMVA method
+     *  Class to compute floating point variables from a segment
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class AdvancedSegmentVarSet : public VarSet<AdvancedSegmentVarNames> {
 
     public:
-      /// Generate and assign the variables from the pair
-      bool extract(const CDCRecoSegment2D* segment) final;
+      /// Generate and assign the contained variables
+      bool extract(const CDCSegment2D* segment) final;
     };
   }
 }

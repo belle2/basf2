@@ -15,6 +15,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 
+#include <signal.h>
+
 #include <cstdio>
 #include <iostream>
 #include <unordered_map>
@@ -87,6 +89,11 @@ bool LogSystem::sendMessage(LogMessage message)
   if (logLevel >= m_logConfig.getAbortLevel()) {
     printErrorSummary();
     DataStore::Instance().reset(); // ensure we are executed before ROOT's exit handlers
+
+    //in good tradition, ROOT signal handlers are unsafe.
+    //this avoids a problem seen in ROOT's atexit() handler, which might crash
+    //and then deadlock the process in the SIGSEGV handler...
+    signal(SIGSEGV, nullptr);
     exit(1);
   }
 

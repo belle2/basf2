@@ -35,7 +35,8 @@ namespace Belle2 {
      * @param title title
      * @param type type
      */
-    ARICHChannelHist(const char* name, const char* title, int type = 0);
+    ARICHChannelHist(const char* name, const char* title, int type = 0,
+                     const std::vector<unsigned>& moduleIDs = std::vector<unsigned>());
 
     /**
      * Add entry to bin corresponding to hapd hapdID and channel chID

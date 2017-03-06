@@ -26,7 +26,7 @@ from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
 from stdFSParticles import stdHighEPhoton
-from stdLooseFSParticles import stdLoosePi
+from stdCharged import stdLoosePi
 
 # Run this tutorial either over signal MC or background MC (K*gamma)
 # Add 10 signal MC files (each containing 1000 generated events)

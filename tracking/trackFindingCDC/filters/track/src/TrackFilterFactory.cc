@@ -9,8 +9,26 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/track/TrackFilterFactory.h>
 
+#include <tracking/trackFindingCDC/filters/track/TruthTrackVarSet.h>
+#include <tracking/trackFindingCDC/filters/track/BasicTrackVarSet.h>
+
+#include <tracking/trackFindingCDC/filters/base/FilterVarSet.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MCFilter.h>
+#include <tracking/trackFindingCDC/filters/base/AllFilter.h>
+
+#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+namespace {
+  using AllTrackFilter = AllFilter<BaseTrackFilter>;
+  using MCTrackFilter = MCFilter<VariadicUnionVarSet<TruthTrackVarSet, BasicTrackVarSet>>;
+  using RecordingTrackFilter = RecordingFilter<VariadicUnionVarSet<TruthTrackVarSet, BasicTrackVarSet>>;
+  using MVATrackFilter = MVAFilter<BasicTrackVarSet>;
+}
 
 TrackFilterFactory::TrackFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
@@ -35,7 +53,8 @@ TrackFilterFactory::getValidFilterNamesAndDescriptions() const
     {"all", "set all tracks as good"},
     {"truth", "monte carlo truth"},
     {"recording", "record variables to a TTree"},
-    {"tmva", "test with a tmva method"}
+    {"eval", "record truth and the mva response for insitu comparision"},
+    {"mva", "test with a mva method"}
   };
 }
 
@@ -50,8 +69,14 @@ TrackFilterFactory::create(const std::string& filterName) const
     return makeUnique<MCTrackFilter>();
   } else if (filterName == "recording") {
     return makeUnique<RecordingTrackFilter>("TrackFilter.root");
-  } else if (filterName == "tmva") {
-    return makeUnique<TMVATrackFilter>("TrackFilter");
+  } else if (filterName == "eval") {
+    auto recordedVarSets = makeUnique<UnionVarSet<CDCTrack>>();
+    using TrackFilterVarSet = FilterVarSet<BaseTrackFilter>;
+    recordedVarSets->push_back(makeUnique<TrackFilterVarSet>("mva", create("mva")));
+    recordedVarSets->push_back(makeUnique<TrackFilterVarSet>("truth", create("truth")));
+    return makeUnique<Recording<BaseTrackFilter>>(std::move(recordedVarSets), "TrackFilter_eval.root");
+  } else if (filterName == "mva") {
+    return makeUnique<MVATrackFilter>("tracking/data/trackfindingcdc_TrackFilter.xml", 0.10);
   } else {
     return Super::create(filterName);
   }

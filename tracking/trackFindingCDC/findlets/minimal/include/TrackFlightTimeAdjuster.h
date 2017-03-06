@@ -11,9 +11,8 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <vector>
-#include <tuple>
+#include <string>
 
 namespace Belle2 {
   class ModuleParamList;

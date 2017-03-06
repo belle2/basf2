@@ -64,6 +64,8 @@ namespace Belle2 {
     double m_param_maximalT0Shift = 30;
     /// Module Parameter: Whether to replace an existing time estimation or not.
     bool m_param_overwriteExistingEstimation = true;
+    /// Module Parameter: Use this as sigma t0.
+    double m_param_t0Uncertainty = 5.1;
 
     /// Pointer to the storage of the eventwise T0 estimation in the data store.
     StoreObjPtr<EventT0> m_eventT0;

@@ -51,6 +51,9 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
   bool b_boards = 1;
   bool b_cover = 1;
 
+  b_connectors &= b_support_structure_15;
+  b_boards &= b_support_structure_15;
+
   int overlap = m_overlap;
   const double th0 = 13.12, th1 = 32.98;
   const double ZT = 437, ZI = 434, RI = 431, RIp = 532.2, RC = 1200.4, RT = 1415;
@@ -229,7 +232,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
       wrapped_crystals.push_back(wrapped_crystal(s, "forward", 0.20 - 0.02));
     }
 
-    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); it++) {
+    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); ++it) {
       const cplacement_t& t = *it;
       auto s = find_if(cryst.begin(), cryst.end(), [&t](const shape_t* shape) {return shape->nshape == t.nshape;});
       if (s == cryst.end()) continue;
@@ -242,7 +245,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
   }
 
   if (b_preamplifier) {
-    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); it++) {
+    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); ++it) {
       G4Transform3D twc = G4Translate3D(0, 0, 3) * get_transform(*it);
       int indx = it - bp.begin();
       auto pv = new G4PVPlacement(twc * G4TranslateZ3D(300 / 2 + 0.20 + get_pa_box_height() / 2)*G4RotateZ3D(-M_PI / 2), get_preamp(),
@@ -441,8 +444,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     acs->AddPlacedVolume(lsolid1_p7, tsolid1_p7);
     //      new G4PVPlacement(tsolid1_p7, lsolid1_p7, "psolid1_p7", crystalSectorLogical, false, 0, overlaps);
 
-    int sol2count = 0;
-    double obj2_dz = Z0 - 95;
+    //    int sol2count = 0;
     auto get_bracket = [&](double L, double ang, G4Transform3D & lt) {
       double thick = 3;
       double dL = (ang > 0) ? 0 : thick * abs(tan(ang));
@@ -460,13 +462,14 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
 
       return solid2_p4;
     };
-    auto place_solid2 = [&](double L, double ang, double phi, double mx, double dy) {
+    double obj2_dz = Z0 - 95;
+    auto place_solid2 = [&](double obj2_dz, double L, double ang, double phi, double mx, double dy) {
       G4Transform3D lt;
       G4LogicalVolume* lsolid2 = new G4LogicalVolume(get_bracket(L, ang, lt), Materials::get("A5052"), "lsolid2", 0, 0, 0);
       lsolid2->SetVisAttributes(att("alum"));
 
       G4Transform3D tsolid2_p1(G4RotateZ3D(phi)*G4Translate3D(mx, dy, obj2_dz)*lt);
-      string pname("psolid2_p"); pname += to_string(++sol2count);
+      //  string pname("psolid2_p"); pname += to_string(++sol2count);
       acs->AddPlacedVolume(lsolid2, tsolid2_p1);
       //  new G4PVPlacement(tsolid2_p1, lsolid2, pname.c_str(), crystalSectorLogical, false, 0, overlaps);
     };
@@ -476,7 +479,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
       lsolid2->SetVisAttributes(att("alum"));
 
       G4Transform3D tsolid2_p1(t * lt);
-      string pname("psolid2_p"); pname += to_string(++sol2count);
+      //  string pname("psolid2_p"); pname += to_string(++sol2count);
       acs->AddPlacedVolume(lsolid2, tsolid2_p1);
       //  new G4PVPlacement(tsolid2_p1, lsolid2, pname.c_str(), crystalSectorLogical, false, 0, overlaps);
     };
@@ -485,11 +488,11 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
 
     aa = tsolid1_p1 * G4Point3D(-50 + 15, 15, 0);
     bb = tsolid1_p2 * G4Point3D(-50 + 15, -15, 0);
-    place_solid2((aa - bb).mag(), -M_PI / 48, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
+    place_solid2(obj2_dz, (aa - bb).mag(), -M_PI / 48, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
 
     aa = tsolid1_p1 * G4Point3D(50 - 15, 15, 0);
     bb = tsolid1_p2 * G4Point3D(50 - 15, -15, 0);
-    place_solid2((aa - bb).mag(), M_PI / 48, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
+    place_solid2(obj2_dz, (aa - bb).mag(), M_PI / 48, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
 
     G4Point3D r0(0, 40 / cos(M_PI / 16), 0);
     G4Vector3D np(sin(M_PI / 16), cos(M_PI / 16), 0), mid;
@@ -542,38 +545,38 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
 
     aa = tsolid1_p3 * G4Point3D(-50 + 15, 15, 0);
     bb = tsolid1_p4 * G4Point3D(-50 + 15, -15, 0);
-    place_solid2((aa - bb).mag(), -M_PI / 48, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
+    place_solid2(obj2_dz, (aa - bb).mag(), -M_PI / 48, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
 
     aa = tsolid1_p3 * G4Point3D(50 - 15, 15, 0);
     bb = tsolid1_p4 * G4Point3D(50 - 15, -15, 0);
-    place_solid2((aa - bb).mag(), M_PI / 48, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
+    place_solid2(obj2_dz, (aa - bb).mag(), M_PI / 48, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
 
 
     aa = tsolid1_p5 * G4Point3D(-50 + 15, 15, 0);
     bb = tsolid1_p6 * G4Point3D(-50 + 15, -15, 0);
-    place_solid2((aa - bb).mag(), -M_PI / 48, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
+    place_solid2(obj2_dz, (aa - bb).mag(), -M_PI / 48, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
 
     aa = tsolid1_p5 * G4Point3D(50 - 15, 15, 0);
     bb = tsolid1_p6 * G4Point3D(50 - 15, -15, 0);
-    place_solid2((aa - bb).mag(), M_PI / 48, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
+    place_solid2(obj2_dz, (aa - bb).mag(), M_PI / 48, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
 
 
     obj2_dz = Z0 - 100;
     aa = tsolid1_p8 * G4Point3D(-50 + 15, 15, 0);
     bb = tsolid1_p9 * G4Point3D(-50 + 15, -15, 0);
-    place_solid2((aa - bb).mag(), -M_PI / 72, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
+    place_solid2(obj2_dz, (aa - bb).mag(), -M_PI / 72, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
 
     aa = tsolid1_p8 * G4Point3D(50 - 15, 15, 0);
     bb = tsolid1_p9 * G4Point3D(50 - 15, -15, 0);
-    place_solid2((aa - bb).mag(), M_PI / 72, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
+    place_solid2(obj2_dz, (aa - bb).mag(), M_PI / 72, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
 
     aa = tsolid1_p9 * G4Point3D(-50 + 15, 15, 0);
     bb = tsolid1_p10 * G4Point3D(-50 + 15, -15, 0);
-    place_solid2((aa - bb).mag(), -M_PI / 72, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
+    place_solid2(obj2_dz, (aa - bb).mag(), -M_PI / 72, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
 
     aa = tsolid1_p9 * G4Point3D(50 - 15, 15, 0);
     bb = tsolid1_p10 * G4Point3D(50 - 15, -15, 0);
-    place_solid2((aa - bb).mag(), M_PI / 72, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
+    place_solid2(obj2_dz, (aa - bb).mag(), M_PI / 72, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
 
     phi_uu = (tsolid1_p8 * G4Vector3D(1, 0, 0)).angle(tsolid1_p11 * G4Vector3D(1, 0, 0));
     r0 = tsolid1_p11 * G4Point3D(-50 + 15, 5, 0);
@@ -617,19 +620,19 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     obj2_dz = Z0 - 75;
     aa = tsolid1_p12 * G4Point3D(-43 + 15, -5, 0);
     bb = tsolid1_p13 * G4Point3D(-43 + 15, 5, 0);
-    place_solid2((aa - bb).mag(), -M_PI / 48, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
+    place_solid2(obj2_dz, (aa - bb).mag(), -M_PI / 48, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
 
     aa = tsolid1_p12 * G4Point3D(43 - 15, -5, 0);
     bb = tsolid1_p13 * G4Point3D(43 - 15, 5, 0);
-    place_solid2((aa - bb).mag(), M_PI / 48, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
+    place_solid2(obj2_dz, (aa - bb).mag(), M_PI / 48, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
 
     aa = tsolid1_p12 * G4Point3D(-43 + 15, 5, 0);
     bb = tsolid1_p14 * G4Point3D(-43 + 15, -5, 0);
-    place_solid2((aa - bb).mag(), -M_PI / 48, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
+    place_solid2(obj2_dz, (aa - bb).mag(), -M_PI / 48, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
 
     aa = tsolid1_p12 * G4Point3D(43 - 15, 5, 0);
     bb = tsolid1_p14 * G4Point3D(43 - 15, -5, 0);
-    place_solid2((aa - bb).mag(), M_PI / 48, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
+    place_solid2(obj2_dz, (aa - bb).mag(), M_PI / 48, (aa + bb).phi(), (aa + bb).rho() / 2, 0);
 
     G4VSolid* solid11_p1 = new G4Box("fwd_solid11_p1", 80. / 2, 30. / 2, 40. / 2);
     G4VSolid* solid11_p2 = new G4Box("fwd_solid11_p2", 81. / 2, 30. / 2, 40. / 2);
@@ -821,7 +824,6 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
       acs->AddPlacedVolume(lsolid_connector, tsolid_connector);
       //      new G4PVPlacement(tsolid_connector, lsolid_connector, "psolid20", crystalSectorLogical, false, 0, overlap);
 
-      const G4VisAttributes* asolid20 = att("iron");
       auto lvolume = [&](int part, double dx, double dy, double dz) {
         ostringstream ost(""); ost << "solid20_p" << part;
         G4VSolid* sv = new G4Box(ost.str().c_str(), dx / 2, dy / 2, dz / 2);
@@ -859,17 +861,15 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
       place(lv6, G4Translate3D(0, 250 / 2 - 7. / 2, -h20 / 2 + t / 2 + t), 0);
       place(lv6, G4Translate3D(0, -250 / 2 + 7. / 2, -h20 / 2 + t / 2 + t), 1);
 
-      asolid20 = att("alum");
       G4LogicalVolume* lv7 = lvolume(7, 110, 250, t);
       place(lv7, G4Translate3D(0, 0, -h20 / 2 + t / 2), 0);
 
-      asolid20 = att("alum2");
       //      G4LogicalVolume *lv8 = lvolume(8, 90, 10, 30);
       G4VSolid* p8_1 = new G4Box("fwd_solid20_p8_1", 90. / 2, 10. / 2, 30. / 2);
       G4VSolid* p8_2 = new G4Box("fwd_solid20_p8_2", 88. / 2, 8. / 2, 30. / 2);
       G4VSolid* sp8 = new G4SubtractionSolid("fwd_solid20_p8", p8_1, p8_2, G4TranslateZ3D(-1));
       G4LogicalVolume* lv8 = new G4LogicalVolume(sp8, Materials::get("A5052"), "lsolid20_p8", 0, 0, 0);
-      lv8->SetVisAttributes(asolid20);
+      lv8->SetVisAttributes(att("alum2"));
       for (int i = 0; i < 10; i++) place(lv8, G4Translate3D(0, 25 * (i - 4.5), -h20 / 2 + t + 30 / 2), i);
     }
 

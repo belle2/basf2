@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/hough/perigee/SimpleHitBasedHoughTree.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -18,7 +18,7 @@ namespace Belle2 {
     /// A simple hough tree taking segments as smallest units.
     template<class AInBox, size_t ... divisions>
     using SimpleSegmentHoughTree =
-      SimpleHitBasedHoughTree<const CDCRecoSegment2D*, AInBox, divisions ... >;
+      SimpleHitBasedHoughTree<const CDCSegment2D*, AInBox, divisions ... >;
 
   }
 }

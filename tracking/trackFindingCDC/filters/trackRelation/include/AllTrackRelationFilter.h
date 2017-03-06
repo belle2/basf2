@@ -22,10 +22,6 @@ namespace Belle2 {
       using Super = BaseTrackRelationFilter;
 
     public:
-      /// Importing all overloads from the super class
-      using Super::operator();
-
-    public:
       /// Implementation accepting all possible neighbors.
       Weight operator()(const CDCTrack& fromTrack, const CDCTrack& toTrack) final;
     };

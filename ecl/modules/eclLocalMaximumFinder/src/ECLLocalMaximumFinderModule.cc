@@ -354,6 +354,8 @@ void ECLLocalMaximumFinderModule::terminate()
     delete m_outfile;
   }
 
+  if (m_neighbourMap) delete m_neighbourMap;
+
 }
 
 void ECLLocalMaximumFinderModule::makeLocalMaximum(const ECLConnectedRegion& aCR, const int cellId, const int lmId)

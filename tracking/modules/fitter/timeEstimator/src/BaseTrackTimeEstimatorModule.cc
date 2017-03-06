@@ -93,7 +93,12 @@ void BaseTrackTimeEstimatorModule::event()
   for (auto& recoTrack : recoTracks) {
     double timeSeed;
     if (m_param_useFittedInformation) {
-      timeSeed = estimateTimeSeedUsingFittedInformation(recoTrack, particleHypothesis);
+      try {
+        timeSeed = estimateTimeSeedUsingFittedInformation(recoTrack, particleHypothesis);
+      } catch (genfit::Exception& e) {
+        B2WARNING("Time extraction from fitted state failed because of " << e.what());
+        timeSeed = -9999;
+      }
     } else {
       timeSeed = estimateTimeSeedUsingSeedInformation(recoTrack, particleHypothesis);
     }

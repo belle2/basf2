@@ -38,7 +38,7 @@ namespace Belle2 {
     public:
       /// Constructor using the given maximal level setting the maximal values.
       Z0TanLambdaLegendre()
-        : Super(140, std::tan(75.0 * M_PI / 180.0), 0.5, 0.5)
+        : Super(140, std::tan(75.0 * M_PI / 180.0), 1, 1)
       {
       }
     };

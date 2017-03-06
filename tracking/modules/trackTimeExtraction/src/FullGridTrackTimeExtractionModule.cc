@@ -90,11 +90,14 @@ namespace {
 
         const bool finished = derivatives_pair.second > 2.7122 and chi2 < 1.739;
 
+        // subtract the initial seed time from the extracted time
+        const double extracted_time_subtract = extracted_time - initialValue;
+
         if (finished) {
-          convergedTries.emplace_back(extracted_time, chi2);
+          convergedTries.emplace_back(extracted_time_subtract, chi2);
           break;
         } else {
-          tries.emplace_back(extracted_time, chi2);
+          tries.emplace_back(extracted_time_subtract, chi2);
         }
       }
     }
@@ -118,6 +121,9 @@ FullGridTrackTimeExtractionModule::FullGridTrackTimeExtractionModule() : Module(
            m_param_minimalT0Shift);
   addParam("maximalT0Shift", m_param_maximalT0Shift, "Maximal shift of the event time which is allowed.",
            m_param_maximalT0Shift);
+
+  addParam("t0Uncertainty", m_param_t0Uncertainty, "Use this as sigma t0.",
+           m_param_t0Uncertainty);
 
   addParam("overwriteExistingEstimation", m_param_overwriteExistingEstimation,
            "Whether to replace an existing time estimation or not.",
@@ -173,7 +179,8 @@ void FullGridTrackTimeExtractionModule::event()
     const auto& minimalChi2 = std::min_element(convergedTries.begin(), convergedTries.end());
 
     const double extractedTime = minimalChi2->m_extractedT0;
-    m_eventT0->setEventT0(extractedTime, Const::EDetector::CDC);
+    // The uncertainty was calculated using a test MC sample
+    m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
   } else {
     // If not, start with the lowest extracted chi2 and do another two iteration steps. If it converges then,
     // use this. Else, use the next best guess.
@@ -183,7 +190,8 @@ void FullGridTrackTimeExtractionModule::event()
       extractTrackTimeFrom(recoTrack, tryOut.m_extractedT0, 2, tries, convergedTries, m_param_minimalT0Shift, m_param_maximalT0Shift);
       if (not convergedTries.empty()) {
         const double extractedTime = convergedTries.back().m_extractedT0;
-        m_eventT0->setEventT0(extractedTime, Const::EDetector::CDC);
+        // The uncertainty was calculated using a test MC sample
+        m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
         break;
       }
     }

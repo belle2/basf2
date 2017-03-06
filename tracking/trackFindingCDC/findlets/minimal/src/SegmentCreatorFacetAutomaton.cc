@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
@@ -31,10 +31,10 @@ std::string SegmentCreatorFacetAutomaton::getDescription()
 void SegmentCreatorFacetAutomaton::apply(
   const std::vector<CDCFacet>& inputFacets,
   const std::vector<WeightedRelation<const CDCFacet>>& inputFacetRelations,
-  std::vector<CDCRecoSegment2D>& outputSegments)
+  std::vector<CDCSegment2D>& outputSegments)
 {
   std::vector<ConstVectorRange<CDCFacet>> facetsByICluster =
-                                         adjacent_groupby(inputFacets.begin(), inputFacets.end(), std::mem_fun_ref(&CDCFacet::getICluster));
+                                         adjacent_groupby(inputFacets.begin(), inputFacets.end(), std::mem_fn(&CDCFacet::getICluster));
 
   for (const ConstVectorRange<CDCFacet>& facetsInCluster : facetsByICluster) {
     if (facetsInCluster.empty()) continue;
@@ -64,7 +64,7 @@ void SegmentCreatorFacetAutomaton::apply(
 
     outputSegments.reserve(outputSegments.size() + m_facetPaths.size());
     for (const std::vector<const CDCFacet*>& facetPath : m_facetPaths) {
-      outputSegments.push_back(CDCRecoSegment2D::condense(facetPath));
+      outputSegments.push_back(CDCSegment2D::condense(facetPath));
     }
   }
 }

@@ -17,7 +17,7 @@
 #include <tracking/trackFindingCDC/filters/facet/RealisticFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/Chi2FacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/UnionRecordingFacetFilter.h>
-#include <tracking/trackFindingCDC/filters/facet/TMVAFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/facet/MVAFacetFilter.h>
 
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
@@ -39,8 +39,7 @@ std::string FacetFilterFactory::getFilterPurpose() const
   return "Facet filter to construct of a facet network";
 }
 
-std::map<std::string, std::string>
-FacetFilterFactory::getValidFilterNamesAndDescriptions() const
+std::map<std::string, std::string> FacetFilterFactory::getValidFilterNamesAndDescriptions() const
 {
   return {
     {"none", "no facet is valid, stop at cluster generation."},
@@ -52,12 +51,11 @@ FacetFilterFactory::getValidFilterNamesAndDescriptions() const
     {"realistic_loss", "mc with realistice criteria but losser cut"},
     {"chi2", "mc free based on chi2 fitting"},
     {"unionrecording", "record many multiple choosable variable set"},
-    {"tmva", "filter facets with a tmva method"},
+    {"mva", "filter facets with a mva method"},
   };
 }
 
-std::unique_ptr<Filter<CDCFacet> >
-FacetFilterFactory::create(const std::string& filterName) const
+std::unique_ptr<BaseFacetFilter> FacetFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
     return makeUnique<BaseFacetFilter>();
@@ -77,8 +75,8 @@ FacetFilterFactory::create(const std::string& filterName) const
     return makeUnique<Chi2FacetFilter>();
   } else if (filterName == "unionrecording") {
     return makeUnique<UnionRecordingFacetFilter>();
-  } else if (filterName == "tmva") {
-    return makeUnique<TMVAFacetFilter>();
+  } else if (filterName == "mva") {
+    return makeUnique<MVAFacetFilter>();
   } else {
     return Super::create(filterName);
   }

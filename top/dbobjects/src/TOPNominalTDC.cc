@@ -91,7 +91,7 @@ bool TOPNominalTDC::isConsistent() const
 
 void TOPNominalTDC::print(const std::string& title) const
 {
-  TOPGeoBase::print(title);
+  TOPGeoBase::printUnderlined(title);
   cout << " range: [" << getTimeMin() << ", " << getTimeMax() << "] ns" << endl;
   cout << " offset: " << getOffset() << " ns" << endl;
   cout << " number of bits: " << getNumBits() << endl;

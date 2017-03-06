@@ -112,6 +112,9 @@ namespace Belle2 {
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
         int phase = activeParams.getInt("phase");
+        G4double dx_pins = activeParams.getLength("dx_pins") / 2.*CLHEP::cm;
+        G4double dy_pins = activeParams.getLength("dy_pins") / 2.*CLHEP::cm;
+        G4double dz_pins = activeParams.getLength("dz_pins") / 2.*CLHEP::cm;
         //Positioned PIN diodes
         double x_pos[100];
         double y_pos[100];
@@ -163,13 +166,13 @@ namespace Belle2 {
             dimThetaY++;
           }
         }
+        int dimPhi = 0;
         if (phase == 2) {
           for (int i = 0; i < 100; i++) {
             x_pos[i] = 0;
             y_pos[i] = 0;
             z_pos[i] = 0;
           }
-          int dimPhi = 0;
           for (double Phi : activeParams.getArray("Phi", {0})) {
             phi[dimPhi] = Phi  - 90. * CLHEP::deg;
             dimPhi++;
@@ -245,11 +248,13 @@ namespace Belle2 {
         l_base->SetVisAttributes(yellow);
         G4Transform3D transform;
         for (int i = 0; i < dimz; i++) {
-          if (phase == 1) transform = G4Translate3D(x_pos[i], y_pos[i],
-                                                      z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]);
-          if (phase == 2) transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]);
-          new G4PVPlacement(transform, l_base, TString::Format("p_pin_base_%d", i).Data(), &topVolume, false, 0);
-          B2INFO("PIN base-" << (int)i / 4 << "-" << iTheta[i - ((int)i / 4) * 4] << " placed at: " << transform.getTranslation() << " mm ");
+          if (phase == 1) {
+            transform = G4Translate3D(x_pos[i], y_pos[i],
+                                      z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]);
+            //if (phase == 2) transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]);
+            new G4PVPlacement(transform, l_base, TString::Format("p_pin_base_%d", i).Data(), &topVolume, false, 0);
+            B2INFO("PIN base-" << (int)i / 4 << "-" << iTheta[i - ((int)i / 4) * 4] << " placed at: " << transform.getTranslation() << " mm ");
+          }
         }
         /*
         for (int i = 0; i < dimz; i++) {
@@ -279,12 +284,14 @@ namespace Belle2 {
         G4LogicalVolume* l_cover1 = new G4LogicalVolume(s_cover1, G4Material::GetMaterial("Al6061"), "l_cover1");
         l_cover1->SetVisAttributes(yellow);
         for (int i = 0; i < dimz; i++) {
-          if (phase == 1) transform = G4Translate3D(x_pos[i], y_pos[i],
-                                                      z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]) *
-                                        G4Translate3D(0., dy_base + dy_cover1, (dz_cover1 - dz_base) - dy_cover1 * 2.);
-          if (phase == 2) transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]) *
-                                        G4Translate3D(0., dy_base + dy_cover1, (dz_cover1 - dz_base) - dy_cover1 * 2.);
-          new G4PVPlacement(transform, l_cover1, TString::Format("p_pin_cover1_%d", i).Data(), &topVolume, false, 0);
+          if (phase == 1) {
+            transform = G4Translate3D(x_pos[i], y_pos[i],
+                                      z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]) *
+                        G4Translate3D(0., dy_base + dy_cover1, (dz_cover1 - dz_base) - dy_cover1 * 2.);
+            //if (phase == 2) transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]) *
+            //                            G4Translate3D(0., dy_base + dy_cover1, (dz_cover1 - dz_base) - dy_cover1 * 2.);
+            new G4PVPlacement(transform, l_cover1, TString::Format("p_pin_cover1_%d", i).Data(), &topVolume, false, 0);
+          }
         }
         /*
         for (int i = 0; i < dimz; i++) {
@@ -300,12 +307,14 @@ namespace Belle2 {
         G4LogicalVolume* l_cover2 = new G4LogicalVolume(s_cover2, G4Material::GetMaterial("Al6061"), "l_cover2");
         l_cover2->SetVisAttributes(yellow);
         for (int i = 0; i < dimz; i++) {
-          if (phase == 1) transform = G4Translate3D(x_pos[i], y_pos[i],
-                                                      z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]) *
-                                        G4Translate3D(0., -2.*dy_cover1, - dz_base - dz_cover2);
-          if (phase == 2) transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]) *
-                                        G4Translate3D(0., -2.*dy_cover1, - dz_base - dz_cover2);
-          new G4PVPlacement(transform, l_cover2, TString::Format("p_pin_cover2_%d", i).Data(), &topVolume, false, 0);
+          if (phase == 1) {
+            transform = G4Translate3D(x_pos[i], y_pos[i],
+                                      z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]) *
+                        G4Translate3D(0., -2.*dy_cover1, - dz_base - dz_cover2);
+            //if (phase == 2) transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]) *
+            //G4Translate3D(0., -2.*dy_cover1, - dz_base - dz_cover2);
+            new G4PVPlacement(transform, l_cover2, TString::Format("p_pin_cover2_%d", i).Data(), &topVolume, false, 0);
+          }
         }
         /*
         for (int i = 0; i < dimz; i++) {
@@ -333,11 +342,17 @@ namespace Belle2 {
         G4double dx_pin = 2.65 / 2.*CLHEP::mm;
         G4double dz_pin = 2.65 / 2.*CLHEP::mm;
         G4double dy_pin = 0.10 / 2.*CLHEP::mm;
+        if (phase == 2) {
+          dx_pin = dx_pins;
+          dz_pin = dz_pins;
+          dy_pin = dy_pins;
+        }
 
         G4VSolid* s_pin = new G4Box("s_pin", dx_pin, dy_pin, dz_pin);
         G4LogicalVolume* l_pin = new G4LogicalVolume(s_pin, geometry::Materials::get("G4_SILICON_DIOXIDE"), "l_pin", 0, m_sensitive);
         l_pin->SetVisAttributes(yellow);
         l_pin->SetUserLimits(new G4UserLimits(stepSize));
+        int detID = 0;
         for (int i = 0; i < dimz; i++) {
           int detID1 = 2 * i;
           int detID2 = 2 * i + 1;
@@ -345,24 +360,41 @@ namespace Belle2 {
             detID1 = ch_wAu[i];
             detID2 = ch_woAu[i];
           }
-          if (phase == 1) transform = G4Translate3D(x_pos[i], y_pos[i],
-                                                      z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]) *
-                                        G4Translate3D((0.5 - 0.392) * InchtoCm + dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
-                                                      (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - 0. - dz_pin);
-          if (phase == 2) transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]) *
-                                        G4Translate3D((0.5 - 0.392) * InchtoCm + dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
-                                                      (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - 0. - dz_pin);
-          new G4PVPlacement(transform, l_pin, TString::Format("p_pin_1_%d", i).Data(), &topVolume, false, detID1);
-          B2INFO("With Au PIN-" << detID1 << " placed at: " << transform.getTranslation() << " mm");
-          if (phase == 1) transform = G4Translate3D(x_pos[i], y_pos[i],
-                                                      z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]) *
-                                        G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
-                                                      (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
-          if (phase == 2) transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]) *
-                                        G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
-                                                      (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
-          new G4PVPlacement(transform, l_pin, TString::Format("p_pin_2_%d", i).Data(), &topVolume, false, detID2);
-          B2INFO("        PIN-" << detID2 << " placed at: " << transform.getTranslation() << " mm");
+          if (phase == 1) {
+            transform = G4Translate3D(x_pos[i], y_pos[i],
+                                      z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]) *
+                        G4Translate3D((0.5 - 0.392) * InchtoCm + dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
+                                      (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - 0. - dz_pin);
+            /*
+              if (phase == 2) transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]) *
+              G4Translate3D((0.5 - 0.392) * InchtoCm + dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
+              (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - 0. - dz_pin);
+            */
+            new G4PVPlacement(transform, l_pin, TString::Format("p_pin_1_%d", i).Data(), &topVolume, false, detID1);
+            B2INFO("With Au PIN-" << detID1 << " placed at: " << transform.getTranslation() << " mm");
+          }
+          if (phase == 1) {
+            transform = G4Translate3D(x_pos[i], y_pos[i],
+                                      z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]) *
+                        G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
+                                      (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
+            new G4PVPlacement(transform, l_pin, TString::Format("p_pin_2_%d", i).Data(), &topVolume, false, detID1);
+            B2INFO("        PIN-" << detID2 << " placed at: " << transform.getTranslation() << " mm");
+          }
+          /*
+            if (phase == 2) transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]) *
+            G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
+            (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
+          */
+
+          if (phase == 2) {
+            for (int j = 0; j < dimPhi; j++) {
+              transform = G4RotateZ3D(phi[j]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[j]);
+              new G4PVPlacement(transform, l_pin, TString::Format("p_pin_%d", i).Data(), &topVolume, false, detID);
+              B2INFO("PIN-" << detID << " placed at: " << transform.getTranslation() << " mm");
+              detID ++;
+            }
+          }
         }
         /*
               for (int i = 0; i < dimz; i++) {
@@ -400,14 +432,16 @@ namespace Belle2 {
         G4LogicalVolume* l_layer1 = new G4LogicalVolume(s_layer1, geometry::Materials::get("G4_Au"), "l_layer1");
         l_layer1->SetVisAttributes(red);
         for (int i = 0; i < dimz; i++) {
-          if (phase == 1) transform = G4Translate3D(x_pos[i], y_pos[i],
-                                                      z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]) *
-                                        G4Translate3D((0.5 - 0.392) * InchtoCm + dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_layer1 + 2.* dy_pin,
-                                                      (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
-          if (phase == 2) transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]) *
-                                        G4Translate3D((0.5 - 0.392) * InchtoCm + dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_layer1 + 2.* dy_pin,
-                                                      (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
-          new G4PVPlacement(transform, l_layer1, TString::Format("p_pin_layer1_%d", i).Data(), &topVolume, false, 0);
+          if (phase == 1) {
+            transform = G4Translate3D(x_pos[i], y_pos[i],
+                                      z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]) *
+                        G4Translate3D((0.5 - 0.392) * InchtoCm + dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_layer1 + 2.* dy_pin,
+                                      (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
+            //if (phase == 2) transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]) *
+            //G4Translate3D((0.5 - 0.392) * InchtoCm + dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_layer1 + 2.* dy_pin,
+            //(0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
+            new G4PVPlacement(transform, l_layer1, TString::Format("p_pin_layer1_%d", i).Data(), &topVolume, false, 0);
+          }
         }
         /*
         for (int i = 0; i < dimz; i++) {
@@ -428,14 +462,16 @@ namespace Belle2 {
         G4LogicalVolume* l_layer2 = new G4LogicalVolume(s_layer2, geometry::Materials::get("Al"), "l_layer2");
         l_layer2->SetVisAttributes(green);
         for (int i = 0; i < dimz; i++) {
-          if (phase == 1) transform = G4Translate3D(x_pos[i], y_pos[i],
-                                                      z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]) *
-                                        G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_layer2 + 2. * dy_pin,
-                                                      (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
-          if (phase == 2) transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]) *
-                                        G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_layer2 + 2. * dy_pin,
-                                                      (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
-          new G4PVPlacement(transform, l_layer2, TString::Format("p_pin_layer2_%d", i).Data(), &topVolume, false, 0);
+          if (phase == 1) {
+            transform = G4Translate3D(x_pos[i], y_pos[i],
+                                      z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]) *
+                        G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_layer2 + 2. * dy_pin,
+                                      (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
+            //if (phase == 2) transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]) *
+            //G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_layer2 + 2. * dy_pin,
+            //(0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
+            new G4PVPlacement(transform, l_layer2, TString::Format("p_pin_layer2_%d", i).Data(), &topVolume, false, 0);
+          }
         }
         /*
         for (int i = 0; i < dimz; i++) {

@@ -10,8 +10,8 @@
 #include <tracking/trackFindingCDC/display/SegmentColorMapping.h>
 
 #include <tracking/trackFindingCDC/display/Colors.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
 #include <sstream>
 
@@ -40,9 +40,9 @@ SegmentMCTrackIdColorMap::SegmentMCTrackIdColorMap()
 }
 
 std::string SegmentMCTrackIdColorMap::map(int index __attribute__((unused)),
-                                          const CDCRecoSegment2D& segment)
+                                          const CDCSegment2D& segment)
 {
-  const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
   ITrackType mcTrackId = mcSegmentLookUp.getMCTrackId(&segment);
 
   if (mcTrackId < 0) {
@@ -54,9 +54,9 @@ std::string SegmentMCTrackIdColorMap::map(int index __attribute__((unused)),
 }
 
 std::string SegmentFBInfoColorMap::map(int index __attribute__((unused)),
-                                       const CDCRecoSegment2D& segment)
+                                       const CDCSegment2D& segment)
 {
-  const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
   ITrackType mcTrackId = mcSegmentLookUp.getMCTrackId(&segment);
 
   if (mcTrackId < 0) return c_bkgSegmentColor;
@@ -72,9 +72,9 @@ std::string SegmentFBInfoColorMap::map(int index __attribute__((unused)),
 }
 
 std::string SegmentFirstInTrackIdColorMap::map(int index __attribute__((unused)),
-                                               const CDCRecoSegment2D& segment)
+                                               const CDCSegment2D& segment)
 {
-  const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
   Index firstInTrackId = mcSegmentLookUp.getFirstInTrackId(&segment);
 
   if (firstInTrackId < 0) return c_bkgSegmentColor;
@@ -82,9 +82,9 @@ std::string SegmentFirstInTrackIdColorMap::map(int index __attribute__((unused))
 }
 
 std::string SegmentLastInTrackIdColorMap::map(int index __attribute__((unused)),
-                                              const CDCRecoSegment2D& segment)
+                                              const CDCSegment2D& segment)
 {
-  const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
   Index lastInTrackId = mcSegmentLookUp.getLastInTrackId(&segment);
 
   if (lastInTrackId < 0) return c_bkgSegmentColor;
@@ -92,9 +92,9 @@ std::string SegmentLastInTrackIdColorMap::map(int index __attribute__((unused)),
 }
 
 std::string SegmentFirstNPassedSuperLayersColorMap::map(int index __attribute__((unused)),
-                                                        const CDCRecoSegment2D& segment)
+                                                        const CDCSegment2D& segment)
 {
-  const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
   Index firstNPassedSuperLayers = mcSegmentLookUp.getFirstNPassedSuperLayers(&segment);
 
   if (firstNPassedSuperLayers < 0) return c_bkgSegmentColor;
@@ -102,9 +102,9 @@ std::string SegmentFirstNPassedSuperLayersColorMap::map(int index __attribute__(
 }
 
 std::string SegmentLastNPassedSuperLayersColorMap::map(int index __attribute__((unused)),
-                                                       const CDCRecoSegment2D& segment)
+                                                       const CDCSegment2D& segment)
 {
-  const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
   Index lastNPassedSuperLayers = mcSegmentLookUp.getLastNPassedSuperLayers(&segment);
 
   if (lastNPassedSuperLayers < 0) return c_bkgSegmentColor;

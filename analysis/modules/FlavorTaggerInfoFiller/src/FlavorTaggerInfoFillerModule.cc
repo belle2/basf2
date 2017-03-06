@@ -27,7 +27,7 @@ REG_MODULE(FlavorTaggerInfoFiller)
 FlavorTaggerInfoFillerModule::FlavorTaggerInfoFillerModule() : Module()
 {
   //Set module properties
-  setDescription("Filter based on ParticleLists, by setting return value to true if at least one of the given lists is not empty.");
+  setDescription("Creates a new flavorTaggerInfoMap DataObject for the specific methods. Saves there all the relevant information of the flavorTagger.");
   setPropertyFlags(c_ParallelProcessingCertified);
   //Parameter definition
   addParam("trackLevelParticleLists", m_trackLevelParticleLists, "Used Flavor Tagger trackLevel Categories of the lists ",

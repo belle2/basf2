@@ -16,7 +16,8 @@
 #include <tracking/trackFindingCDC/mclookup/CDCSimHitLookUp.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment3DLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
 
 namespace Belle2 {
@@ -46,9 +47,13 @@ namespace Belle2 {
       static const CDCMCHitLookUp& getMCHitLookUp()
       { return getInstance().m_mcHitLookUp; }
 
-      /// Getter for the singletone instance of the CDCMCSegmentLookUp
-      static const CDCMCSegmentLookUp& getMCSegmentLookUp()
-      { return getInstance().m_mcSegmentLookUp; }
+      /// Getter for the singletone instance of the CDCMCSegment2DLookUp
+      static const CDCMCSegment2DLookUp& getMCSegment2DLookUp()
+      { return getInstance().m_mcSegment2DLookUp; }
+
+      /// Getter for the singletone instance of the CDCMCSegment3DLookUp
+      static const CDCMCSegment3DLookUp& getMCSegment3DLookUp()
+      { return getInstance().m_mcSegment3DLookUp; }
 
       /// Getter for the singletone instance of the CDCMCTrackLookUp
       static const CDCMCTrackLookUp& getMCTrackLookUp()
@@ -85,7 +90,10 @@ namespace Belle2 {
       CDCMCHitLookUp m_mcHitLookUp;
 
       /// Memory for the singletone CDCMCSegmentLookUp
-      CDCMCSegmentLookUp m_mcSegmentLookUp;
+      CDCMCSegment2DLookUp m_mcSegment2DLookUp;
+
+      /// Memory for the singletone CDCMCSegmentLookUp
+      CDCMCSegment3DLookUp m_mcSegment3DLookUp;
 
       /// Memory for the singletone CDCMCTrackLookUp
       CDCMCTrackLookUp m_mcTrackLookUp;

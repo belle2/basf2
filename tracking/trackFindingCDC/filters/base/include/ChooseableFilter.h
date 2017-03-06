@@ -10,36 +10,15 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
+#include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <framework/core/ModuleParamList.h>
-#include <boost/variant.hpp>
 #include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// A helper class to unpack a boost::variant parameter value and set it in the parameter list.
-    struct AssignParameterVisitor : public boost::static_visitor<> {
-
-      /// Type of allowed filter parameters
-      using FilterParamVariant =
-        boost::variant<bool, int, double, std::string, std::vector<std::string>>;
-
-      /// Constructor taking the module parameter list and the name of the parameter to be set from the boost::variant.
-      AssignParameterVisitor(ModuleParamList* moduleParamList, const std::string& paramName);
-
-      /// Function call that receives the parameter value from the boost::variant with the correct type.
-      template <class T>
-      void operator()(const T& t) const;
-
-    private:
-      /// Parameter list which contains the parameter to be set
-      ModuleParamList* m_moduleParamList;
-
-      /// Name of the parameter to be set.
-      std::string m_paramName;
-    };
 
     /// Filter can delegate to a filter chosen and set up at run time by parameters
     template <class AFilter>
@@ -55,7 +34,7 @@ namespace Belle2 {
 
     public:
       /// Type of allowed filter parameters
-      using FilterParamVariant = AssignParameterVisitor::FilterParamVariant;
+      using FilterParamVariant = boost::variant<bool, int, double, std::string, std::vector<std::string> >;
 
     public:
       /// Setup the chooseable filter with available choices from the factory
@@ -110,13 +89,8 @@ namespace Belle2 {
         ModuleParamList moduleParamList;
         const std::string prefix = "";
         m_filter->exposeParameters(&moduleParamList, prefix);
-        for (auto& nameAndValue : m_param_filterParameters) {
-          const std::string& name = nameAndValue.first;
-          const FilterParamVariant& value = nameAndValue.second;
-          AssignParameterVisitor visitor(&moduleParamList, name);
-          boost::apply_visitor(visitor, value);
-        }
-        m_filter->initialize();
+        AssignParameterVisitor::update(&moduleParamList, m_param_filterParameters);
+        this->addProcessingSignalListener(m_filter.get());
         Super::initialize();
       }
 
@@ -124,34 +98,6 @@ namespace Belle2 {
       bool needsTruthInformation() override
       {
         return m_filter->needsTruthInformation();
-      }
-
-      /// Signal the beginning of a new run
-      void beginRun() override
-      {
-        m_filter->beginRun();
-        Super::beginRun();
-      }
-
-      /// Signal the beginning of a new event
-      void beginEvent() override
-      {
-        m_filter->beginEvent();
-        Super::beginEvent();
-      }
-
-      /// Signal the end of a run
-      void endRun() override
-      {
-        Super::endRun();
-        m_filter->endRun();
-      }
-
-      /// Initialize the recorder after event processing.
-      void terminate() override
-      {
-        Super::terminate();
-        m_filter->terminate();
       }
 
       /**
@@ -165,8 +111,6 @@ namespace Belle2 {
       Weight operator()(const Object& object) final {
         return (*m_filter)(object);
       }
-
-    private:
 
     private:
       /// Parameters : Name of the selected filter

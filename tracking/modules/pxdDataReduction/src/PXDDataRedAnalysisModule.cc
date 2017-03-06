@@ -533,7 +533,7 @@ void PXDDataRedAnalysisModule::event()
 
     // continue only if MCParticle has a related PXDDigit and RecoTrack
     RelationVector<PXDDigit> pxdDigits_MCParticle = aMcParticle->getRelationsFrom<PXDDigit>();
-    RelationVector<RecoTrack> recoTracks_MCParticle = DataStore::getRelationsToObj<RecoTrack>(aMcParticle);
+    RelationVector<RecoTrack> recoTracks_MCParticle = aMcParticle->getRelationsWith<RecoTrack>();
 
     m_h1DigitsPerParticle->Fill(pxdDigits_MCParticle.size());
     if (pxdDigits_MCParticle.size() == 0)

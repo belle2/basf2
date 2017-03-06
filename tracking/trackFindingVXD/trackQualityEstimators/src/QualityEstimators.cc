@@ -53,9 +53,10 @@ std::pair<TVector3, int> QualityEstimators::calcMomentumSeed(bool useBackwards, 
   hitC = hitC.Orthogonal();
 
   std::pair<double, TVector3> fitResults;
+
   try {
-    fitResults = riemannHelixFit(m_hits);
     // fitResults = helixFit(m_hits, useBackwards, setMomentumMagnitude);
+    fitResults = riemannHelixFit(m_hits);
   } catch (FilterExceptions::Straight_Line& anException) {
     B2DEBUG(1, "Exception caught: QualityEstimators::calcMomentumSeed - helixFit said: " << anException.what());
     try {

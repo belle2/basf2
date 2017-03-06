@@ -115,12 +115,13 @@ void plotEfficiency(){
   //
   // For one photon hit the Cherenkov angle is reconstructed multiple times, using different hypotheses for aerogel layer of 
   // emission point and hypotheses of possible reflections from mirror plates.
-  // Therefore, in ntuple, the reconstructed Cherenkov angle is stored as 2D array with dimension [nPhotons]x[4]
-  // Content of the array is:
-  // photons[][0]  -  reconstructed Cherenkov theta angle  
-  // photons[][1]  -  reconstructed Cherenkov phi angle  
-  // photons[][2]  -  aerogel layer hypothesis (0 - 1st layer, 1 - 2nd layer)
-  // photons[][3]  -  mirror plate hypothesis (0 - no reflection, 1 - , 2 - two plates closest to the track)
+  // In ntuple information of reconstructed angles is stored in a vector of ARICHPhoton objects 
+  // (check arich/dataobjects/include/ARICHPhoton.h for members list)
+  // To plot cherenkov angle distribution the following members are relevant:
+  // photons.m_thetaCer  -  reconstructed Cherenkov theta angle  
+  // photons.m_phiCer  -  reconstructed Cherenkov phi angle  
+  // photons.m_aerogel  -  aerogel layer hypothesis (0 - 1st layer, 1 - 2nd layer)
+  // photons.m_mirror  -  mirror plate hypothesis (0 - no reflection, 1 - , 2 - two plates closest to the track)  
   
   // lets plot Cherenkov theta angle for pi,K tracks, assuming photons were emitted from the 1st aerogel layer
   // and not reflected from mirrors

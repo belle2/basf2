@@ -168,22 +168,30 @@ namespace Belle2 {
 
         RelationVector<ExtHit> extHits = DataStore::getRelationsWithObj<ExtHit>(track);
         ARICHTrack* arichTrack = NULL;
-        const ExtHit* arichExtHit = NULL;
+
+        //const ExtHit* arich1stHit = NULL;
+        const ExtHit* arich2ndHit = NULL;
+        const ExtHit* arichWinHit = NULL;
+
         for (unsigned i = 0; i < extHits.size(); i++) {
           const ExtHit* extHit = extHits[i];
           if (abs(extHit->getPdgCode()) != pdgCode) continue;
           if (extHit->getDetectorID() != myDetID) continue;
-          if (extHit->getCopyID() != 12345) continue; // aerogel Al support plate
           if (extHit->getStatus() != EXT_EXIT) continue; // particles registered at the EXIT of the Al plate
           if (extHit->getMomentum().Z() < 0.0) continue; // track passes in backward
+          //if (extHit->getCopyID() == 12345) { arich1stHit = extHit; continue;}
+          if (extHit->getCopyID() == 6789) {  arich2ndHit = extHit; continue;}
+          arichWinHit = extHit;
+        }
+
+        if (arich2ndHit) {
           // if aeroHit cannot be found using MCParticle check if it was already related to the extHit (by ARICHRelate module)
-          if (!aeroHit) aeroHit = extHit->getRelated<ARICHAeroHit>();
+          if (!aeroHit) aeroHit = arich2ndHit->getRelated<ARICHAeroHit>();
 
           // make new ARICHTrack
-          arichTrack = arichTracks.appendNew(extHit);
-          arichExtHit = extHit;
-          break;
-        } // extHits loop
+          arichTrack = arichTracks.appendNew(arich2ndHit);
+          if (arichWinHit) arichTrack->setHapdWindowHit(arichWinHit);
+        }
 
         // skip if track has no extHit in ARICH
         if (!arichTrack) continue;
@@ -196,7 +204,7 @@ namespace Belle2 {
         // make relations
         track->addRelationTo(like);
         arichTrack->addRelationTo(like);
-        like->addRelationTo(arichExtHit);
+        like->addRelationTo(arich2ndHit);
         if (aeroHit) like->addRelationTo(aeroHit);
 
       } // Tracks loop

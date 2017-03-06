@@ -409,15 +409,21 @@ namespace Belle2 {
       string supportMat = aeroGeo.getSupportMaterial();
       G4Material* supportMaterial = Materials::get(supportMat);
       G4Material* gapMaterial = Materials::get("Air"); // Air without refractive index (to kill photons, to mimic black paper around tile)
-
+      G4Material* imgMaterial = Materials::get("ARICH_Air");
       // master volume
-      G4Tubs* aerogelTube = new G4Tubs("aerogelTube", rin, rout, (thick + wallHeight) / 2., 0, 2 * M_PI);
+      G4Tubs* aerogelTube = new G4Tubs("aerogelTube", rin, rout, (thick + wallHeight + 0.5) / 2., 0, 2 * M_PI);
       G4LogicalVolume* aerogelPlaneLV = new G4LogicalVolume(aerogelTube, gapMaterial, "ARICH.AaerogelPlane");
 
       // support plate
       G4Tubs* supportTube = new G4Tubs("aeroSupportTube", rin, rout, thick / 2., 0, 2 * M_PI);
       G4LogicalVolume*  supportTubeLV = new G4LogicalVolume(supportTube, supportMaterial, "ARICH.AerogelSupportPlate");
-      supportTubeLV->SetSensitiveDetector(m_sensitiveAero);
+      //supportTubeLV->SetSensitiveDetector(m_sensitiveAero);
+
+      // imaginary tube after aerogel layers (used as volume to which tracks are extrapolated by ext module)
+      G4Tubs* imgTube = new G4Tubs("imgTube", rin, rout, 0.5 / 2., 0, 2 * M_PI);
+      G4LogicalVolume*  imgTubeLV = new G4LogicalVolume(imgTube, imgMaterial, "ARICH.AerogelImgPlate");
+      imgTubeLV->SetSensitiveDetector(m_sensitiveAero);
+
 
       // read radiuses of aerogel slot aluminum walls
       std::vector<double> wallR;
@@ -484,7 +490,10 @@ namespace Belle2 {
         }
       }
 
-      new G4PVPlacement(G4Translate3D(0., 0., -wallHeight / 2.), supportTubeLV, "ARICH.AerogelSupportPlate", aerogelPlaneLV, false, 1);
+      new G4PVPlacement(G4Translate3D(0., 0., -(wallHeight + 0.5) / 2.), supportTubeLV, "ARICH.AerogelSupportPlate", aerogelPlaneLV,
+                        false, 1);
+
+      new G4PVPlacement(G4Translate3D(0., 0., (wallHeight + thick) / 2.), imgTubeLV, "ARICH.AerogelImgPlate", aerogelPlaneLV, false, 1);
 
       return aerogelPlaneLV;
 
@@ -538,7 +547,7 @@ namespace Belle2 {
       G4SubtractionSolid* moduleWall = new G4SubtractionSolid("Box-tempBox", hapdBox, tempBox2);
       G4LogicalVolume* lmoduleWall = new G4LogicalVolume(moduleWall, wallMaterial, "ARICH.HAPDWall");
       setColor(*lmoduleWall, "rgb(1.0,0.0,0.0,1.0)");
-      new G4PVPlacement(G4Transform3D(), lmoduleWall, "hapdWall", lhapdBox, false, 1);
+      new G4PVPlacement(G4Transform3D(), lmoduleWall, "ARICH.HAPDWall", lhapdBox, false, 1);
 
       // build HAPD window
       G4Box* winBox = new G4Box("winBox", hapdSizeX / 2. - wallThick, hapdSizeY / 2. - wallThick, winThick / 2.);
@@ -546,14 +555,14 @@ namespace Belle2 {
       setColor(*lmoduleWin, "rgb(0.7,0.7,0.7,1.0)");
       lmoduleWin->SetSensitiveDetector(m_sensitive);
       G4Transform3D transform = G4Translate3D(0., 0., (-hapdSizeZ + winThick) / 2.);
-      new G4PVPlacement(transform, lmoduleWin, "hapdWindow", lhapdBox, false, 1);
+      new G4PVPlacement(transform, lmoduleWin, "ARICH.HAPDWindow", lhapdBox, false, 1);
 
       // build module bottom
       G4Box* botBox = new G4Box("botBox", hapdSizeX / 2. - wallThick, hapdSizeY / 2. - wallThick, botThick / 2.);
       G4LogicalVolume* lmoduleBot = new G4LogicalVolume(botBox, wallMaterial, "ARICH.HAPDBottom");
       setColor(*lmoduleBot, "rgb(0.0,1.0,0.0,1.0)");
       G4Transform3D transform1 = G4Translate3D(0., 0., (hapdSizeZ - botThick) / 2.);
-      new G4PVPlacement(transform1, lmoduleBot, "hapdBottom", lhapdBox, false, 1);
+      new G4PVPlacement(transform1, lmoduleBot, "ARICH.HAPDBottom", lhapdBox, false, 1);
 
       // build apd
       G4Box* apdBox = new G4Box("apdBox", apdSizeX / 2., apdSizeY / 2., apdSizeZ / 2.);
@@ -567,7 +576,7 @@ namespace Belle2 {
 
       new G4LogicalSkinSurface("apdSurface", lApd, optSurf);
       G4Transform3D transform2 = G4Translate3D(0., 0., (hapdSizeZ - apdSizeZ) / 2. - botThick);
-      new G4PVPlacement(transform2, lApd, "HAPDApd", lhapdBox, false, 1);
+      new G4PVPlacement(transform2, lApd, "ARICH.HAPDApd", lhapdBox, false, 1);
 
       // build FEB
       double febSizeX = hapdGeo.getFEBSizeX();
@@ -578,9 +587,9 @@ namespace Belle2 {
       if (m_isBeamBkgStudy) lfeb->SetSensitiveDetector(new BkgSensitiveDetector("ARICH"));
       setColor(*lfeb, "rgb(0.0,0.6,0.0,1.0)");
       G4Transform3D transform3 = G4Translate3D(0., 0., (modHeight - febSizeZ) / 2.);
-      new G4PVPlacement(transform3, lfeb, "HAPDFEB", lmoduleBox, false, 1);
+      new G4PVPlacement(transform3, lfeb, "ARICH.HAPDFeb", lmoduleBox, false, 1);
       G4Transform3D transform4 = G4Translate3D(0., 0., - (modHeight - hapdSizeZ) / 2.);
-      new G4PVPlacement(transform4, lhapdBox, "HAPD", lmoduleBox, false, 1);
+      new G4PVPlacement(transform4, lhapdBox, "ARICH.HAPD", lmoduleBox, false, 1);
 
       return lmoduleBox;
 
@@ -608,7 +617,7 @@ namespace Belle2 {
         G4RotationMatrix Ra;
         Ra.rotateZ(phi);
         G4ThreeVector trans1(r * cos(phi), r * sin(phi), 0.0);
-        new G4PVPlacement(G4Transform3D(Ra, trans1),  hapdLV, "hapd", detPlaneLV, false, iSlot);
+        new G4PVPlacement(G4Transform3D(Ra, trans1),  hapdLV, "ARICH.HAPDModule", detPlaneLV, false, iSlot);
       }
 
       return detPlaneLV;

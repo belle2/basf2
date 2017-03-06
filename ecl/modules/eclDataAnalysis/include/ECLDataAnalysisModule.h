@@ -68,6 +68,7 @@ namespace Belle2 {
     bool m_doTracking; /**< if true, info on tracking will be stored, job will fail if doTracking==1 and the tracking modules are not enabled at phyton level */
     bool m_doPureCsIStudy; /**< if true, info on pureCsI upgrade is stored*/
     bool m_doSimulation; /**< if true, info on Hits and SimHits is stored*/
+    bool m_doMC; /**< if true, MC info is stored*/
     std::string m_pure_clusters; /**< Pure CsI clusters StoreArray name*/
     std::string m_pure_digits; /**< Pure CsI digits StoreArray name*/
     std::string m_pure_cal_digits; /**< Pure CsI cal digits StoreArray name*/
@@ -124,15 +125,16 @@ namespace Belle2 {
     std::vector<double>* m_eclCalDigitTimeFit;  /**< ECLCalDigit timing */
     std::vector<int>* m_eclCalDigitFitQuality;  /**< ECLCalDigit fit quality */
     std::vector<int>* m_eclCalDigitToCR; /**< Index of CR related to that ECLCalDigit */
+    std::vector<int>* m_eclCalDigitToLM; /**< Index of LM related to that ECLCalDigit */
 
-    std::vector<int>* m_eclCRIdx; /**< Connected Region ID */
-    std::vector<bool>* m_eclCRIsTrack;  /**< Int for Connected Region - Track Match*/
+    std::vector<int>*    m_eclCRIdx; /**< Connected Region ID */
+    std::vector<int>*    m_eclCRIsTrack;  /**< Int for Connected Region - Track Match*/
     std::vector<double>* m_eclCRLikelihoodMIPNGamma;  /**< Connected Region MIP Likelihood */
-    std::vector<double>* m_eclCRLikelihoodChargedHadron;  /**< Connected Region Charged Hadron Likelihood */
-    std::vector<double>* m_eclCRLikelihoodElectronNGamma;  /**< Connected Region Electron Likelihood */
-    std::vector<double>* m_eclCRLikelihoodNGamma;  /**< Connected Region Gamma Likelihood */
-    std::vector<double>* m_eclCRLikelihoodNeutralHadron;  /**< Connected Region Neutral Hadron Likelihood*/
-    std::vector<double>* m_eclCRLikelihoodMergedPi0  /**< Connected Region Merged Pi0 Likelihood */;
+    std::vector<double>*    m_eclCRLikelihoodChargedHadron;  /**< Connected Region Charged Hadron Likelihood */
+    std::vector<double>*    m_eclCRLikelihoodElectronNGamma;  /**< Connected Region Electron Likelihood */
+    std::vector<double>*    m_eclCRLikelihoodNGamma;  /**< Connected Region Gamma Likelihood */
+    std::vector<double>*    m_eclCRLikelihoodNeutralHadron;  /**< Connected Region Neutral Hadron Likelihood*/
+    std::vector<double>*    m_eclCRLikelihoodMergedPi0  /**< Connected Region Merged Pi0 Likelihood */;
     //std::vector<double>*    m_eclCRToCalDigit;
 
     int m_eclSimHitMultip;  /**< Number of ECLSimHits per event */
@@ -141,7 +143,7 @@ namespace Belle2 {
     std::vector<int>* m_eclSimHitCellId; /**< ECLSimHit CellId */
     std::vector<int>* m_eclSimHitPdg; /**< PDG code of MCParticle associted to that ECLDigit */
     std::vector<double>* m_eclSimHitEnergyDep; /**< Energy deposition of ECLSimHit */
-    std::vector<double>* m_eclSimHitFlightTime; /**< ??? */
+    std::vector<double>* m_eclSimHitFlightTime; /**< ECLSimhit Flight Time */
     std::vector<double>* m_eclSimHitX; /**< ECLSimHit X position */
     std::vector<double>* m_eclSimHitY; /**< ECLSimHit Y position */
     std::vector<double>* m_eclSimHitZ; /**< ECLSimHit Z position */
@@ -203,7 +205,7 @@ namespace Belle2 {
     std::vector<double>* m_eclClusterPz;  /**< Reconstructed momentum along Z */
     std::vector<bool>* m_eclClusterIsTrack; /**< Flag for charged clusters */
     std::vector<double>* m_eclClusterClosestTrackDist; /**< Flag for charged clusters */
-    std::vector<double>* m_eclClusterDeltaL; /**< DeltaL */
+    std::vector<double>* m_eclClusterDeltaL; /**< Reconstructed Cluster DeltaL */
     std::vector<double>* m_eclClusterAbsZernike40; /**< Reconstructed Abs Zernike40 */
     std::vector<double>* m_eclClusterAbsZernike51; /**< Reconstructed Abs Zernike51 */
     std::vector<double>* m_eclClusterZernikeMVA; /**< Zernike MVA */
@@ -246,7 +248,7 @@ namespace Belle2 {
     std::vector<double>* m_eclPureClusterPy;  /**< Reconstructed momentum along Y */
     std::vector<double>* m_eclPureClusterPz;  /**< Reconstructed momentum along Z */
     std::vector<bool>* m_eclPureClusterIsTrack; /**< Flag for charged clusters */
-    std::vector<double>* m_eclPureClusterDeltaL; /**< Pure Cluster DeltaL */
+    std::vector<double>* m_eclPureClusterDeltaL; /**< Reconstructed Cluster DeltaL */
 
     /*
     int m_eclGammaMultip;
@@ -280,20 +282,45 @@ namespace Belle2 {
     std::vector<int>* m_eclShowerToMC1; /**< Index of first MCParticle related to ECLShower */
     std::vector<double>* m_eclShowerToMCWeight1; /**< Energy contribution of first MCParticle related to ECLShower */
     std::vector<int>* m_eclShowerToMC1PDG; /**< PDG code of first MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC1Moth; /**< Mother index of first MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC1MothPDG; /**< PDG code of parent of first MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC1GMoth; /**< GMother index of first MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC1GMothPDG; /**< PDG code of Gparent of first MCParticle related to ECLShower */
     std::vector<int>* m_eclShowerToMC2; /**< Index of second MCParticle related to ECLShower */
     std::vector<double>* m_eclShowerToMCWeight2; /**< Energy contribution of second MCParticle related to ECLShower */
     std::vector<int>* m_eclShowerToMC2PDG; /**< PDG code of second MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC2Moth; /**< Mother index of first MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC2MothPDG; /**< PDG code of parent of first MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC2GMoth; /**< GMother index of second MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC2GMothPDG; /**< PDG code of Gparent of second MCParticle related to ECLShower */
     std::vector<int>* m_eclShowerToMC3; /**< Index of third MCParticle related to ECLShower */
     std::vector<double>* m_eclShowerToMCWeight3; /**< Energy contribution of third MCParticle related to ECLShower */
     std::vector<int>* m_eclShowerToMC3PDG; /**< PDG code of third MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC3Moth; /**< Mother index of first MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC3MothPDG; /**< PDG code of parent of first MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC3GMoth; /**< GMother index of third MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC3GMothPDG; /**< PDG code of Gparent of third MCParticle related to ECLShower */
     std::vector<int>* m_eclShowerToMC4; /**< Index of fourth MCParticle related to ECLShower */
     std::vector<double>* m_eclShowerToMCWeight4; /**< Energy contribution of fourth MCParticle related to ECLShower */
     std::vector<int>* m_eclShowerToMC4PDG; /**< PDG code of fourth MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC4Moth; /**< Mother index of fourth MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC4MothPDG; /**< PDG code of parent of fourth MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC4GMoth; /**< GMother index of fourth MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC4GMothPDG; /**< PDG code of Gparent of fourth MCParticle related to ECLShower */
     std::vector<int>* m_eclShowerToMC5; /**< Index of fifth MCParticle related to ECLShower */
     std::vector<double>* m_eclShowerToMCWeight5; /**< Energy contribution of fifth MCParticle related to ECLShower */
     std::vector<int>* m_eclShowerToMC5PDG; /**< PDG code of fifth MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC5Moth; /**< Mother index of fifth MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC5MothPDG; /**< PDG code of parent of fifth MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC5GMoth; /**< GMother index of fifth MCParticle related to ECLShower */
+    std::vector<int>* m_eclShowerToMC5GMothPDG; /**< PDG code of Gparent of fifth MCParticle related to ECLShower */
     std::vector<double>*
     m_eclShowerToBkgWeight; /**< Remaining energy contribution not associated to first five MCParticles related to ECLShower */
+    std::vector<int>* m_eclShowerToLM1; /**< Index of first maximum related to ECLShower */
+    std::vector<int>* m_eclShowerToLM2; /**< Index of 2nd maximum related to ECLShower */
+    std::vector<int>* m_eclShowerToLM3; /**< Index of 3rd maximum related to ECLShower */
+    std::vector<int>* m_eclShowerToLM4; /**< Index of 4th maximum related to ECLShower */
+    std::vector<int>* m_eclShowerToLM5; /**< Index of 5th maximum related to ECLShower */
     std::vector<double>* m_eclShowerSimHitSum; /**< Full energy contribution related to ECLShower */
     std::vector<double>* m_eclShowerUncEnergy; /**< Shower bare energy */
     std::vector<double>* m_eclShowerEnergy; /**< Shower Energy */
@@ -303,7 +330,8 @@ namespace Belle2 {
     std::vector<double>* m_eclShowerNHits; /**< Shower NHits */
     std::vector<double>* m_eclShowerE9oE21; /**< Shower E9oE21 */
     std::vector<double>* m_eclShowerTime;  /**< Shower Timing */
-    std::vector<int>* m_eclShowerConnectedRegionId; /**< Matched Connetcted Region Idx */
+    std::vector<double>* m_eclShowerT99;  /**< Shower T99 */
+    std::vector<double>* m_eclShowerConnectedRegionId; /**< Matched Connetcted Region Idx */
     std::vector<int>* m_eclShowerHypothesisId; /**< Shower Particle Hypothesis ID */
     std::vector<int>* m_eclShowerCentralCellId; /**< Cell ID for most energetic crystal */
     std::vector<double>* m_eclShowerEnergyError; /**< Shower Energy Error */
@@ -323,7 +351,8 @@ namespace Belle2 {
     std::vector<int>* m_eclShowerIsTrack; /**< Shower Track Match */
     std::vector<bool>* m_eclShowerIsCluster; /**< Shower Cluster Match */
     std::vector<int>*   m_eclShowerMCVtxInEcl; /**< Int, 1 if particle decays (interacts) in ECL, 0 otherwise*/
-    std::vector<double>*   m_eclShowerHighestE1mE2; /**< Energy difference for 2 highest deposits in shower*/
+    std::vector<int>*   m_eclShowerMCFlightMatch; /**< Int, 1 if particle flight direction is "well" reconstructed in ECL, 0 otherwise*/
+    std::vector<double>*   m_eclShowerHighestE1mE2; /**< Energy difference for 2 highest energy deposits in shower*/
 
 
     int m_mcMultip; /**< Multiplicity of MCParticles */
@@ -354,9 +383,9 @@ namespace Belle2 {
     std::vector<double>* m_trkP; /**< Track momentum */
     std::vector<double>* m_trkTheta; /**< Track polar direction */
     std::vector<double>* m_trkPhi; /**< Track azimuthal direction */
-    std::vector<double>* m_trkX; /**< Track DOCA X */
-    std::vector<double>* m_trkY; /**< Track DOCA Y */
-    std::vector<double>* m_trkZ; /**< Track DOCA Z */
+    std::vector<double>* m_trkX; /**< Track DOCA X (?) */
+    std::vector<double>* m_trkY; /**< Track DOCA Y (?) */
+    std::vector<double>* m_trkZ; /**< Track DOCA Z (?) */
 
     std::vector<int>* m_eclpidtrkIdx; /**< PID track index */
     std::vector<double>* m_eclpidEnergy; /**< PID track energy */

@@ -42,6 +42,12 @@ def main():
         )
 
     argument_parser.add_argument(
+        "--variables",
+        default=None,
+        help="Name of the column containing the variables to be used."
+        )
+
+    argument_parser.add_argument(
         "--method",
         type=str,
         default="FastBDT",
@@ -49,7 +55,7 @@ def main():
         )
 
     argument_parser.add_argument(
-        "-e",	
+        "-e",
         "--evaluate",
         action="store_true",
         help="Evaluate the method after the training is finished"
@@ -59,11 +65,13 @@ def main():
 
     records_file_path = arguments.records_file_path
     treename = arguments.treename
+    feature_names = arguments.variables
 
     # Figure out feature variables
-    with root_utils.root_open(records_file_path) as records_tfile:
-        input_tree = records_tfile.Get(treename)
-        feature_names = [leave.GetName() for leave in input_tree.GetListOfLeaves()]
+    if feature_names is None:
+        with root_utils.root_open(records_file_path) as records_tfile:
+            input_tree = records_tfile.Get(treename)
+            feature_names = [leave.GetName() for leave in input_tree.GetListOfLeaves()]
 
     truth = arguments.truth
     method = arguments.method

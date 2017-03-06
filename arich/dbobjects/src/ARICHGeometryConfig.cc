@@ -38,7 +38,10 @@ void ARICHGeometryConfig::read(const GearDir& content)
   GearDir envParams(content, "Envelope");
   m_masterVolume.setVolume(envParams.getLength("innerRadius"), envParams.getLength("outerRadius"), envParams.getLength("length"),
                            std::string("ARICH_Air"));
-  m_masterVolume.setPlacement(0.0, 0.0, envParams.getLength("zPosition") + envParams.getLength("length") / 2., 0.0, 0.0, 0.0);
+  m_masterVolume.setPlacement(envParams.getLength("xPosition"), envParams.getLength("yPosition"),
+                              envParams.getLength("zPosition") + envParams.getLength("length") / 2., envParams.getAngle("xRotation"),
+                              envParams.getAngle("yRotation"), envParams.getAngle("zRotation"));
+
   auto& materials = geometry::Materials::getInstance();
 
   GearDir detParams(content, "Detector/Module");

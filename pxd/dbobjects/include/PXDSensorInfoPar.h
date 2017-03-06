@@ -30,30 +30,14 @@ namespace Belle2 {
     PXDSensorInfoPar(VxdID id = 0, float width = 0, float length = 0, float thickness = 0, int uCells = 0, int vCells = 0,
                      float splitLength = 0, int vCells2 = 0):
       VXDSensorInfoBasePar(PXDSensorInfoPar::PXD, id, width, length, thickness, uCells, vCells, 0, splitLength, vCells2),
-      m_temperature(300),
       m_bulkDoping(0), m_backVoltage(0), m_topVoltage(0), m_sourceBorderSmallPitch(0), m_clearBorderSmallPitch(0),
       m_drainBorderSmallPitch(0), m_sourceBorderLargePitch(0), m_clearBorderLargePitch(0), m_drainBorderLargePitch(0),
       m_gateDepth(0), m_doublePixel(true), m_chargeThreshold(0), m_noiseFraction(0), m_integrationStart(0), m_integrationEnd(0)
     {
-      m_hallFactor = (1.13 + 0.0008 * (m_temperature - 273));
     }
 
     /** Change the SensorID, useful to copy the SensorInfo from one sensor and use it for another */
     void setID(VxdID id) { m_id = id; }
-
-    /** Flip the Pitch segmentation along v.
-     * If there are two different pixel sizes than mirror the segmentation
-     * along v.
-     */
-    void flipVSegmentation()
-    {
-      if (m_splitLength <= 0) return;
-      std::swap(m_vCells, m_vCells2);
-      std::swap(m_sourceBorderSmallPitch, m_sourceBorderLargePitch);
-      std::swap(m_clearBorderSmallPitch, m_clearBorderLargePitch);
-      std::swap(m_drainBorderSmallPitch, m_drainBorderLargePitch);
-      m_splitLength = (1 - m_splitLength);
-    }
 
     /** Set operation parameters like voltages */
     void setDEPFETParams(double bulkDoping, double backVoltage, double topVoltage,
@@ -83,43 +67,24 @@ namespace Belle2 {
       m_integrationEnd = end;
     }
 
-    /** Return the temperature of the sensor */
-    double getTemperature() const {return m_temperature;}
     /** Return the bulk doping of the Silicon sensor */
     double getBulkDoping() const { return m_bulkDoping; }
     /** Return the voltage at the backside of the sensor */
     double getBackVoltage() const { return m_backVoltage; }
     /** Return the voltage at the top of the sensor */
     double getTopVoltage() const { return m_topVoltage; }
-
+    /** Return the distance along v between the source side of a large pixel and the start of the internal gate*/
     double getSourceBorderLargePitch() const {return m_sourceBorderLargePitch;}
+    /** Return the distance along v between the source side of a small pixel and the start of the internal gate*/
     double getSourceBorderSmallPitch() const {return m_sourceBorderSmallPitch;}
+    /** Return the distance along u between the clear side of a large pixel and the start of the internal gate*/
     double getClearBorderLargePitch() const {return m_clearBorderLargePitch;}
+    /** Return the distance along u between the clear side of a small pixel and the start of the internal gate*/
     double getClearBorderSmallPitch() const {return m_clearBorderSmallPitch;}
+    /** Return the distance along v between the drain side of a large pixel and the start of the internal gate*/
     double getDrainBorderLargePitch() const {return m_drainBorderLargePitch;}
+    /** Return the distance along v between the drain side of a small pixel and the start of the internal gate*/
     double getDrainBorderSmallPitch() const {return m_drainBorderSmallPitch;}
-
-
-    /** Return the distance between the source side of the pixel and the start of the Gate for a pixel at v.
-     * For these functions to work, the small pitch and large pitch values have to be correctly swapped with
-     * the flipVSegmentation method. FIXME: flip... is never called! */
-    double getSourceBorder(double v) const
-    {
-      if (v / m_length + 0.5 >= m_splitLength) return m_sourceBorderSmallPitch;
-      return m_sourceBorderLargePitch;
-    }
-    /** Return the distance between the clear side of the pixel and the start of the Gate for a pixel at v */
-    double getClearBorder(double v) const
-    {
-      if (v / m_length + 0.5 >= m_splitLength) return m_clearBorderSmallPitch;
-      return m_clearBorderLargePitch;
-    }
-    /** Return the distance between the drain side of the pixel and the start of the Gate for a pixel at v */
-    double getDrainBorder(double v) const
-    {
-      if (v / m_length + 0.5 >= m_splitLength) return m_drainBorderSmallPitch;
-      return m_drainBorderLargePitch;
-    }
     /** Return the gate depth for the sensor */
     double getGateDepth() const { return m_gateDepth; }
     /** Return true if the Sensor is a double pixel structure: every other pixel is mirrored along v */
@@ -132,48 +97,41 @@ namespace Belle2 {
     double getIntegrationStart() const { return m_integrationStart; }
     /** Return the end of the integration window, the timeframe the PXD is sensitive */
     double getIntegrationEnd() const { return m_integrationEnd; }
-    /** Return the Hall factor for electrons at sensor temperature.*/
-    double getHallFactor() const { return m_hallFactor; }
 
   private:
 
-    /** The temperature of the sensor */
-    double m_temperature;
-    /** The bulk doping of the Silicon sensor */
-    double m_hallFactor;
     /** Doping concentration of the silicon bulk */
     double m_bulkDoping;
     /** The voltage at the backside of the sensor */
     double m_backVoltage;
     /** The voltate at the top of the sensor */
     double m_topVoltage;
-    /** The distance between the source side of the pixel and the start of the Gate, small pitch area */
+    /** The distance along v between the source side of a small pixel and the start of the internal gate*/
     double m_sourceBorderSmallPitch;
-    /** The distance between the clear side of the pixel and the start of the Gate, small pitch area  */
+    /** The distance along u between the clear side of a small pixel and the start of the internal gate*/
     double m_clearBorderSmallPitch;
-    /** The distance between the drain side of the pixel and the start of the Gate, small pitch area  */
+    /** The distance along v between the drain side of a small pixel and the start of the internal gate*/
     double m_drainBorderSmallPitch;
-    /** The distance between the source side of the pixel and the start of the Gate, large pitch area */
+    /** The distance along v between the source side of a large pixel and the start of the internal gate*/
     double m_sourceBorderLargePitch;
-    /** The distance between the clear side of the pixel and the start of the Gate, large pitch area  */
+    /** The distance along u between the clear side of a large pixel and the start of the internal gate*/
     double m_clearBorderLargePitch;
-    /** The distance between the drain side of the pixel and the start of the Gate, large pitch area  */
+    /** The distance along u between the drain side of a large pixel and the start of the internal gate*/
     double m_drainBorderLargePitch;
     /** Return depth of the surface where the electrons will be collected */
     double m_gateDepth;
     /** True if the Sensor is a double pixel structure: every other pixel is mirrored along v */
-    bool   m_doublePixel;
+    bool  m_doublePixel;
     /** Charge threshold */
     double m_chargeThreshold;
     /** Fixed noise fraction */
     double m_noiseFraction;
-
     /** The start of the integration window, the timeframe the PXD is sensitive */
     double m_integrationStart;
     /** The end of the integration window, the timeframe the PXD is sensitive */
     double m_integrationEnd;
 
-    ClassDef(PXDSensorInfoPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(PXDSensorInfoPar, 6);  /**< ClassDef, must be the last term before the closing {}*/
   };
 } // end of namespace Belle2
 

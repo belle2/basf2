@@ -89,6 +89,7 @@ main.add_module(simulation)
 
 # ARICH digitization module
 arichDIGI = register_module('ARICHDigitizer')
+arichDIGI.param('BackgroundHits', 0)
 main.add_module(arichDIGI)
 
 # fill ARICHHits from ARICHDigits

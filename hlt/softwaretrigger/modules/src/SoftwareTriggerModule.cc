@@ -47,7 +47,7 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPo
 
   addParam("storeDebugOutputToROOTFile", m_param_storeDebugOutputToROOTFile, "Flag to save the results of the calculations leading "
            "to the trigger decisions into a ROOT file. The file path and name of this file can be handled by the "
-           "debugOutputFileName parameter.", m_param_storeDebugOutputToROOTFile);
+           "debugOutputFileName parameter. Not supported during parallel processing.", m_param_storeDebugOutputToROOTFile);
 
   addParam("preScaleStoreDebugOutputToDataStore", m_param_preScaleStoreDebugOutputToDataStore,
            "Prescale with which to save the results of the calculations leading "
@@ -62,7 +62,8 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPo
   addParam("calibParticleListName", m_particlename, "the name list of particle for the calibration and dqm",
            std::vector<std::string>());
 
-  addParam("calibExtraInfoName", m_extrainfoname, "the variable name list that attched to the particles", std::vector<std::string>());
+  addParam("calibExtraInfoName", m_extrainfoname, "the variable name list that attached to the particles",
+           std::vector<std::string>());
 }
 
 void SoftwareTriggerModule::initialize()
@@ -116,6 +117,8 @@ void SoftwareTriggerModule::initializeCalculation()
     m_calculation.reset(new FastRecoCalculator());
   } else if (m_param_baseIdentifier == "hlt") {
     m_calculation.reset(new HLTCalculator());
+  } else if (m_param_baseIdentifier == "testbeam") {
+    m_calculation.reset(new TestbeamCalculator());
   } else if (m_param_baseIdentifier == "calib") {
     m_calculation.reset(new CalibSampleCalculator(m_particlename, m_extrainfoname));
   } else {

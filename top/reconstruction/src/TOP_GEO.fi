@@ -8,7 +8,7 @@ c        3 cylindrical mirror
 c        4 spherical mirror
 
       integer NSIZ_MOD
-      PARAMETER (NSIZ_MOD=100)
+      PARAMETER (NSIZ_MOD=16)
 
       LOGICAL TOP_INI           ! flag: initialization done
       REAL B_FIELD              ! magnetic field [T]
@@ -22,7 +22,7 @@ c        4 spherical mirror
       REAL QBAR_REDG            ! Q-bar edge sharpness (radius of) [cm]
       LOGICAL LIN_OPT           ! linear/exact optics simulated
 
-      INTEGER NUM_MOD                  ! number of Q-bars
+      INTEGER NUM_MOD                  ! number of modules
       REAL QBAR_A(0:NSIZ_MOD-1)        ! Q-bar width a [cm]
       REAL QBAR_B(0:NSIZ_MOD-1)        ! Q-bar thickness b [cm]
       REAL QBAR_C(0:NSIZ_MOD-1)        ! Q-bar length c [cm]

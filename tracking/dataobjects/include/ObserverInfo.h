@@ -32,7 +32,7 @@ namespace Belle2 {
       m_mainPurity = 0;
     };
 
-    FilterInfo getFilterInfo(std::string  key)
+    FilterInfo getFilterInfo(std::string const&   key)
     {
       for (int i = 0; i < (int) m_filterInfos.size(); i++)
         if (m_filterInfos.at(i).getName() == key) return m_filterInfos.at(i);
@@ -46,15 +46,15 @@ namespace Belle2 {
       return (0 <= i && i < (int)m_filterInfos.size()) ? m_filterInfos[i].getName() : std::string("");
     }
 
-    double getFilterResult(std::string key)
+    double getFilterResult(std::string const& key)
     {
       return getFilterInfo(key).getResult();
     }
-    bool getFilterAccepted(std::string key)
+    bool getFilterAccepted(std::string const& key)
     {
       return getFilterInfo(key).getWasAccepted();
     }
-    double getFilterUsed(std::string key)
+    double getFilterUsed(std::string const& key)
     {
       return getFilterInfo(key).getWasUsed();
     }

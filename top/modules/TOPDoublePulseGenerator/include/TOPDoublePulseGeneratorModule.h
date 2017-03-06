@@ -76,6 +76,7 @@ namespace Belle2 {
     double m_timeResolution = 0; /**< sigma of time difference */
     std::vector<double> m_sampleTimeIntervals; /**< sample time intervals */
     bool m_useDatabase = false;  /**< if true, use sample times from database */
+    unsigned m_storageWindows = 0; /**< number of storage windows */
 
     // other
     TOPSampleTimes m_sampleTimes; /**< sample times from steering input */

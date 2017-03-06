@@ -11,12 +11,11 @@
 
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 
-#include <tracking/trackFindingCDC/filters/facet/FitFacetVarSet.h>
-#include <tracking/trackFindingCDC/filters/facet/BendFacetVarSet.h>
-#include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
 #include <tracking/trackFindingCDC/filters/facet/BasicFacetVarSet.h>
+#include <tracking/trackFindingCDC/filters/facet/Chi2FacetFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/FilterVarSet.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
@@ -26,9 +25,7 @@ namespace Belle2 {
 
     /// Variable set used in the application of mva methods for facet filtering
     using MVAFacetVarSet = VariadicUnionVarSet<BasicFacetVarSet,
-          FitlessFacetVarSet,
-          BendFacetVarSet,
-          FitFacetVarSet>;
+          FilterVarSet<Chi2FacetFilter>>;
 
     /// Background facet detection based on MVA.
     class MVAFacetFilter: public MVA<BaseFacetFilter> {

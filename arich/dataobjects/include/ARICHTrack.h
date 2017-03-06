@@ -99,6 +99,32 @@ namespace Belle2 {
       m_dz = (float) mom.Z();
     }
 
+
+    /**
+     * Set information about hit on HAPD window
+     * @param extHit extrapolated ExtHit to HAPD plane
+     */
+    void setHapdWindowHit(const ExtHit* extHit)
+    {
+      TVector3 pos = extHit->getPosition();
+      m_winX = (float) pos.X();
+      m_winY = (float) pos.Y();
+      m_hitWin = true;
+    }
+
+    /**
+     * Set information about hit on HAPD window
+     * @param x x position of hit
+     * @param y y position of hit
+     */
+    void setHapdWindowHit(double x, double y)
+    {
+      m_winX = (float) x;
+      m_winY = (float) y;
+      m_hitWin = true;
+    }
+
+
     /**
      * returns track position vector
      * @return track position vector
@@ -116,6 +142,19 @@ namespace Belle2 {
      * @return track momentum
      */
     double getMomentum() const { return double(m_momentum);}
+
+    /**
+     * Returns true if track hits HAPD window
+     * @return true if track hits HAPD window
+     */
+    bool hitsWindow() const { return m_hitWin;}
+
+    /**
+     * Get HAPD window hit position
+     * @return HAPD window hit position
+     */
+    TVector2 windowHitPosition() const {return TVector2(m_winX, m_winY);}
+
 
     /**
      * Sets the reconstructed value of track parameters.
@@ -136,14 +175,10 @@ namespace Belle2 {
 
     /**
      * Add ARICHPhoton to collection of photons
-     * @param thc        reconstruced cherenkov angle theta
-     * @param phic       reconstruced cherenkov angle phi
-     * @param aerogel    ID of aerogel layer assumption (assumed emmision point)
-     * @param mirror     ID of mirror plane assumption (assumed reflection from ID mirror)
      */
-    void addPhoton(float thc, float phic, int aerogel, int mirror)
+    void addPhoton(ARICHPhoton photon)
     {
-      m_photons.emplace_back(thc, phic, aerogel, mirror);
+      m_photons.emplace_back(photon);
     }
 
     /**
@@ -162,9 +197,14 @@ namespace Belle2 {
     float m_dz = 0;   /**< Reconstructed direction. */
     float m_momentum;        /**< Reconstructed momentum. */
 
+    bool m_hitWin = 0;    /**< true if track hits HAPD window */
+    float m_winX = 0;     /**< x position of track extrapolated to HAPD plane */
+    float m_winY = 0;     /**< y position of track extrapolated to HAPD plane  */
+
+
     std::vector<ARICHPhoton> m_photons; /**< collection of ARICHPhotons associated with the track */
 
-    ClassDef(ARICHTrack, 1); /**< the class title */
+    ClassDef(ARICHTrack, 2); /**< the class title */
 
   };
 } // namespace Belle2

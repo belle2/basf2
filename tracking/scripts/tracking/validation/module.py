@@ -304,6 +304,8 @@ class TrackingValidationModule(basf2.Module):
             is_matched = trackMatchLookUp.isMatchedMCRecoTrack(mcTrackCand)
 
             hit_efficiency = trackMatchLookUp.getRelatedEfficiency(mcTrackCand)
+            if math.isnan(hit_efficiency):
+                hit_efficiency = 0
 
             mcParticle = trackMatchLookUp.getRelatedMCParticle(mcTrackCand)
             mcHelix = getHelixFromMCParticle(mcParticle)
@@ -346,7 +348,8 @@ class TrackingValidationModule(basf2.Module):
         else:
             clone_rate = float('nan')
 
-        hit_efficiency = np.nanmean(self.mc_hit_efficiencies)
+        mc_found_primaries = np.multiply(self.mc_primaries, np.greater(self.mc_hit_efficiencies, 0))
+        hit_efficiency = np.average(self.mc_hit_efficiencies, weights=mc_found_primaries)
 
         figures_of_merit = ValidationFiguresOfMerit('%s_figures_of_merit'
                                                     % name)
@@ -393,7 +396,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         ##################
         plots = self.profiles_by_mc_parameters(self.mc_hit_efficiencies,
                                                'hit efficiency with matched tracks',
-                                               weights=self.mc_primaries)
+                                               weights=mc_found_primaries)
         validation_plots.extend(plots)
 
         # Fit quality #

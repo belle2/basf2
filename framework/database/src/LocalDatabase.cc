@@ -50,7 +50,7 @@ bool LocalDatabase::readDatabase()
 {
   m_database.clear();
 
-  if (!fs::exists(m_absFileName)) return true;
+  if (!fs::is_regular_file(m_absFileName)) return true;
 
   // get lock for read access to database file
   FileSystem::Lock lock(m_absFileName, true);

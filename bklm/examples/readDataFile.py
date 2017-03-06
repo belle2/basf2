@@ -15,6 +15,7 @@
 # Experiment 73, Run 30, 3 Events
 #
 # Example steering file - 2011 Belle II Collaboration
+# useage basf2 readDataFile.py -i srootfilename -o outputfilename
 ######################################################
 
 from basf2 import *
@@ -31,8 +32,8 @@ use_local_database("localdb/database.txt", "localdb")
 # input = register_module('RootInput')
 input = register_module('SeqRootInput')
 conversion = register_module('Convert2RawDet')
-filelist = '/group/belle/users/guanyh/belle2klm/CosmicData/161022_BF2aux_trig_RO_rcl10.sroot'
-input.param('inputFileName', filelist)
+# filelist = 'root_out_170217_003.sroot'
+# input.param('inputFileName', filelist)
 
 # EventInfoSetter - generate event meta data
 eventinfosetter = register_module('EventInfoSetter')
@@ -50,17 +51,19 @@ bklmUnpack = register_module('BKLMUnpacker')
 # bklmUnpack.param("keepEvenPackages",1)
 bklmUnpack.param("useDefaultModuleId", 1)
 bklmUnpack.param('loadMapFromDB', 0)
+bklmUnpack.param('rawdata', 1)
 bklmreco = register_module('BKLMReconstructor')
 # bklmreco.log_level = LogLevel.INFO
 
 # efficiencies...
-bklmEff = register_module('BKLMEffnRadio')
+# bklmEff = register_module('BKLMEffnRadio')
+
+# bklm tracking
+bklmtrk = register_module('BKLMTracking')
 
 print('backend set ')
 # gearbox.param('fileName', 'Belle2_red.xml')
 # gearbox.param('InputFileXML','Belle2.xml')
-
-# Create main path
 
 # output
 # output = register_module('PrintDataTemplate')
@@ -77,14 +80,21 @@ main.add_module(geobuilder)
 
 main.add_module(bklmUnpack)
 main.add_module(bklmreco)
-main.add_module(bklmEff)
-bklmStaTracking = register_module('BKLMTracking')
-main.add_module(bklmStaTracking)
-# bklmDiagnosis=register_module('BKLMDiagnosis')
-# bklmDiagnosis.param('filename','diagno.root')
-# main.add_module(bklmDiagnosis)
+main.add_module(bklmtrk)
+# main.add_module(bklmEff)
 
-# main.add_module(output)
+# output
+output = register_module('RootOutput')
+output.param('branchNames', ['BKLMDigits', 'BKLMHit2ds'])
+# output.param('outputFileName', 'bklm_mdst.root')
+main.add_module(output)
+
+# Print progress
+progress = register_module('Progress')
+main.add_module(progress)
 
 # Process all events
 process(main)
+
+# Print statistics
+print(statistics)

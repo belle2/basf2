@@ -2,12 +2,11 @@ import argparse
 import pickle
 
 from tracking.run.event_generation import StandardEventGenerationRun
-from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
+from tracking.run.mixins import BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin
 
 
-class HarvestingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
+class HarvestingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin):
     output_file_name = None
-    refiners_only = False
 
     def harvesting_module(self, path=None):
         raise RuntimeError("Override the harvesting_module method")
@@ -24,13 +23,6 @@ class HarvestingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
             help="File name for the harvest products"
         )
 
-        harvesting_argument_group.add_argument(
-            "-ro",
-            "--refiners-only",
-            action="store_true",
-            help="Skip the creation of the crops and only rerun the refiners on the previously collected ones"
-        )
-
         return argument_parser
 
     def pickle_crops(self, harvesting_module, crops, **kwds):
@@ -43,8 +35,8 @@ class HarvestingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
         with open(self.output_file_name + ".pickle", "rb") as pickle_file:
             return pickle.load(pickle_file)
 
-    def execute(self):
-        if self.refiners_only:
+    def postprocess(self):
+        if self.postprocess_only:
             harvesting_module = self.harvesting_module()
             if self.output_file_name:
                 harvesting_module.output_file_name = self.output_file_name
@@ -55,9 +47,8 @@ class HarvestingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
             else:
                 harvesting_module.show_results = self.show_results
                 harvesting_module.refine(crops)
-                return
 
-        super().execute()
+        super().postprocess()
 
     def adjust_path(self, path):
         super().adjust_path(path)
@@ -67,3 +58,7 @@ class HarvestingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
         harvesting_module.refiners.append(self.pickle_crops)
         path.add_module(harvesting_module)
         return path
+
+
+class HarvestingRun(HarvestingRunMixin, StandardEventGenerationRun):
+    pass

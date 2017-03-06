@@ -33,6 +33,12 @@ namespace Belle2 {
 
       m_databaseObjects.reserve(cutIdentifiers.size());
 
+      B2DEBUG(100, "Initializing SoftwareTrigger DB with baseIdentifier " << baseIdentifier << " and " << cutIdentifiers.size() <<
+              " cutIdentifiers");
+      for (auto const& ci : cutIdentifiers) {
+        B2DEBUG(100, "-> with CutIndentifier " << ci);
+      }
+
       for (const std::string& cutIdentifier : cutIdentifiers) {
         const std::string& fullIdentifier = makeFullCutName(baseIdentifier, cutIdentifier);
         m_databaseObjects.emplace_back(fullIdentifier);

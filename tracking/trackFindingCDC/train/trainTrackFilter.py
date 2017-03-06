@@ -1,0 +1,69 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import os
+import sys
+import os.path
+import shutil
+
+import basf2
+
+from tracking import add_cdc_track_finding
+from tracking.run.event_generation import ReadOrGenerateEventsRun
+from trackfindingcdc.run.training import TrainingRunMixin
+from tracking.adjustments import adjust_module
+
+
+class TrackFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEventsRun):
+    """Run to record tracks encountered at the TrackRejecter and retrain its mva method"""
+    n_events = 3000
+    generator_module = "generic"
+    bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
+
+    truth = "truth"
+
+    @property
+    def identifier(self):
+        """Database identifier of the filter being trained"""
+        return "trackfindingcdc_TrackFilter.xml"
+
+    def create_path(self):
+        """Setup the recording path after the simulation"""
+        path = super().create_path()
+
+        add_cdc_track_finding(path)
+
+        if self.task == "train":
+            filterName = "recording"
+
+        elif self.task == "eval":
+            filterName = "eval"
+            self.truth = "truth_accepted"
+
+        elif self.task == "explore":
+            # Change me.
+            filterName = "recording"
+
+        adjust_module(path, "SegmentTrackCombiner",
+                      trackFilter=filterName,
+                      trackFilterParameters={
+                          "rootFileName": self.sample_file_name,
+                      })
+
+        return path
+
+    def postprocess(self):
+        if self.task == "eval":
+            self.truth = "truth_accept"
+        super().postprocess()
+
+
+def main():
+    run = TrackFilterTrainingRun()
+    run.configure_and_execute_from_commandline()
+
+
+if __name__ == "__main__":
+    import logging
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')
+    main()

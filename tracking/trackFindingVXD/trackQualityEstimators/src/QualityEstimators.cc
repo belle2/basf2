@@ -488,8 +488,6 @@ std::pair<double, TVector3> QualityEstimators::riemannHelixFit(const std::vector
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> d_over_sigma = W * d_trans;
   Precision chi2 = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits,
                    1).transpose() * (d_over_sigma.cwiseProduct(d_over_sigma));
-  std::cout << "Chi Squared of Riemann Circle fit = " << chi2 << std::endl;
-
 
   // Line Fit for extension to Helix Fit
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> a = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits, 1) * c + n(2) * X.col(2);
@@ -551,10 +549,9 @@ std::pair<double, TVector3> QualityEstimators::riemannHelixFit(const std::vector
   Precision chi2_z = ((Z - p(0) * ones - p(1) * arc_lengths).cwiseQuotient(Wz * ones)).transpose() * ((Z - p(0) * ones - p(
                        1) * arc_lengths).cwiseQuotient(Wz * ones));
 
-  std::cout << "Chi Squared of Riemann z-component fit = " << chi2_z << std::endl;
   // Adding chi2 and chi2_z, thus creating a chi2 distribution with (n-3) + (n-2) = 2n-5 degrees of freedom
   Precision chi2_total = chi2 + chi2_z;
-  std::cout << "Chi Squared of extended Riemann = " << chi2_total << std::endl;
+  B2DEBUG(75, "Chi Squared of extended Riemann = " << chi2_total << std::endl);
 
   Precision pZ = pT * p(1);
   momVec(2) = - pZ;

@@ -18,16 +18,14 @@ def setupBelleMagneticField(path=analysis_main):
               'The Belle magnetic field is now being set via the settings in inputMdst(List) fucntion.')
 
 
-def setupB2BIIDatabase(isMC=False, setExperimentNames=True):
+def setupB2BIIDatabase(isMC=False):
     """
-    Setup the database for B2BII
+    Setup the database for B2BII.
 
-    This automatically chooses the correct global tag and sets the experiment names accordingly
+    This automatically chooses the correct global tag and sets up a database suitable for B2BII conversion.
 
     Args:
-        mc (bool): should be True for MC data and False for real data
-        setExperimentNames (bool): if you want to add further databases
-                                   this has to be false and you have to add the names yourself!
+        isMC (bool): should be True for MC data and False for real data
     """
     # we only want the central database with the B2BII content
     tagname = "B2BII%s" % ("_MC" if isMC else "")

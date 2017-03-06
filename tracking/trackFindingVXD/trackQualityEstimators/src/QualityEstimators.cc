@@ -480,7 +480,7 @@ std::pair<double, TVector3> QualityEstimators::riemannHelixFit(const std::vector
   // Calculation of 3 different versions of a distance d for Chi Squared calculation
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> d = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits, 1) * c + X * n;
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> d_trans = (d + d.cwiseProduct(X.col(2))) / sqrt(1 - n(2) * n(2));
-  Eigen::Matrix<Precision, Eigen::Dynamic, 1> d_r_phi = d_trans.cwiseQuotient((0.5 * X.col(2) / rho).array().asin().cos().matrix());
+  // Eigen::Matrix<Precision, Eigen::Dynamic, 1> d_r_phi = d_trans.cwiseQuotient((0.5 * X.col(2) / rho).array().asin().cos().matrix());
 
   // Calculate Chi Squared for circle fit
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> d_over_sigma = W * d_trans;
@@ -550,6 +550,9 @@ std::pair<double, TVector3> QualityEstimators::riemannHelixFit(const std::vector
                        1) * arc_lengths).cwiseQuotient(Wz * ones));
 
   std::cout << "Chi Squared of Riemann z-component fit = " << chi2_z << std::endl;
+  // Adding chi2 and chi2_z, thus creating a chi2 distribution with (n-3) + (n-2) = 2n-5 degrees of freedom
+  Precision chi2_total = chi2 + chi2_z;
+  std::cout << "Chi Squared of extended Riemann = " << chi2_total << std::endl;
 
   Precision pZ = pT * p(1);
   momVec(2) = - pZ;

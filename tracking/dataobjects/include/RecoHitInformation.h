@@ -245,7 +245,7 @@ namespace Belle2 {
     }
 
     /** Get a pointer to the TrackPoint that was created from this hit. Can be a nullptr if no measurement was already created.
-     * Please be aware that refitting may or may not recreate the track points and older pointers can be invalid then.
+     * Please be aware that refitting may or may not recreate the track points and older pointers can be invalidated.
      * Also, pruning a RecoTrack will also delete most of the TrackPoints. */
     const genfit::TrackPoint* getCreatedTrackPoint() const
     {

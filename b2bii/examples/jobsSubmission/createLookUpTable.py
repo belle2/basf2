@@ -110,7 +110,10 @@ eventTypeList = ['evtgen-charged', 'evtgen-mixed']
 dataType = 'on_resonance'
 belleLevel = 'caseB'
 
-f = open('belleMClookUpTable.txt', 'w')
+# open table and write in it
+# table name contains threshold for events number of each job
+tableName = 'belleMClookUpTable_' + str(int(thresholdEventsNo/1000)) + 'k.txt'
+f = open(tableName, 'w')
 
 # write one line for each job will submit
 # grouping the smallest set of runs that has more than Nthreshold events

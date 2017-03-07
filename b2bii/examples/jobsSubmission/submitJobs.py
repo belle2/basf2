@@ -10,13 +10,16 @@ import os
 import sys
 import csv
 
+if len(sys.argv) == 1:
+    sys.exit('Need one argument: path of look up table !')
+
 # assuming interest only in this type of events
 dataType = 'on_resonance'
 belleLevel = 'caseB'
 
 yourWorkingDirectoryPath = '.'
 subLogDir = yourWorkingDirectoryPath + '/analysisLog/'
-lookUpTablePath = yourWorkingDirectoryPath + '/belleMClookUpTable.txt'
+lookUpTablePath = yourWorkingDirectoryPath + sys.argv[1]
 
 # the job we are submitting
 myCmd = yourWorkingDirectoryPath + '/analysisJob.sh'

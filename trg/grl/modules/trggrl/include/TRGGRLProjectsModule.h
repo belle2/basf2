@@ -63,18 +63,18 @@ namespace Belle2 {
     int _debugLevel;
 
     /// Config. file name.
-    std::string _configFilename;
+    std::string m_configFilename;
 
     /// Mode for TRGGRL simulation. 0th bit : fast simulation switch,
     /// 1st bit : firmware simulation switch.
-    int _simulationMode;
+    int m_simulationMode;
 
     /// Switch for the fast simulation. 0:do everything, 1:stop after
     /// the track segment simulation. Default is 0.
-    int _fastSimulationMode;
+    int m_fastSimulationMode;
 
     /// Switch for the firmware simulation. 0:do nothing, 1:do everything
-    int _firmwareSimulationMode;
+    int m_firmwareSimulationMode;
 
     /** Name of the StoreArray holding the matched 2D tracks */
     std::string m_2DmatchCollectionName;

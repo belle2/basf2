@@ -195,14 +195,14 @@ namespace Belle2 {
 
     TRGDebug::leaveStage("TRGGDL fastSim");
 
-    StoreObjPtr<TRGGDLResults> GRLResult("TrgGDLResults");
-    if (GRLResult) {
+    StoreObjPtr<TRGGDLResults> GDLResult;
+    if (GDLResult) {
       B2WARNING("TRGGDLResults exist already, check it!!!!");
       return;
     } else {
-      //TRGGDLResults* GRLResult = L1TrgResults.appendNew();
-      GRLResult.create();
-      StoreObjPtr<TRGGRLInfo> grlinfo;
+      //TRGGDLResults* GDLResult = L1TrgResults.appendNew();
+      GDLResult.create();
+      StoreObjPtr<TRGGRLInfo> grlinfo("TRGGRLObjects");
       if (!grlinfo) {
         B2WARNING("TRGGRLInfo doesn't exist!!!!");
         return;
@@ -229,7 +229,7 @@ namespace Belle2 {
         int bitval = trgres[i];
         L1Summary = L1Summary | (bitval << i);
       }
-      GRLResult->setL1TriggerRsults(L1Summary);
+      GDLResult->setL1TriggerRsults(L1Summary);
 
     }
   }

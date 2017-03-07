@@ -4,25 +4,16 @@
 from basf2 import *
 
 
-def grl_match(path):
-    """
-    the match module in grl
-    """
-    match = register_module('TRGGRLMatch')
-    path.add_module(match)
-
-
-def grl_objects(path):
-    """
-    produce the objecst used in trigger logics
-    """
-    objects = register_module('TRGGRLProjects')
-    path.add_module(objects)
-
-
-def add_grl_trigger(path):
+def add_grl_trigger(path, SimulationMode=1):
     """
     do match and produce the objects on grl
+    @path modules are added to this path
+    @SimulationMode 0: fast simulation 1:full simulation
     """
-    grl_match(path)
-    grl_objects(path)
+    match = register_module('TRGGRLMatch')
+    match.param('SimulationMode', SimulationMode)
+    path.add_module(match)
+
+    objects = register_module('TRGGRLProjects')
+    objects.param('SimulationMode', SimulationMode)
+    path.add_module(objects)

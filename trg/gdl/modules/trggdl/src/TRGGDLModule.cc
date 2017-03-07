@@ -96,7 +96,8 @@ namespace Belle2 {
       cout << TRGDebug::tab(4) << "debug level = " << TRGDebug::level()
            << endl;
     }
-    StoreObjPtr<TRGGDLResults>::registerPersistent("TrgGDLResults");
+    StoreObjPtr<TRGGRLInfo>::required("TRGGRLObjects");
+    StoreObjPtr<TRGGDLResults>::registerPersistent();
   }
 
   void
@@ -129,12 +130,19 @@ namespace Belle2 {
   TRGGDLModule::event()
   {
     TRGDebug::enterStage("TRGGDLModule event");
-
     //...GDL simulation...
     _gdl->update(true);
     _gdl->simulate();
 
+    int result_summary = 0;
+    StoreObjPtr<TRGGDLResults> gdlResult;
+    if (gdlResult)
+      result_summary = gdlResult->getL1TriggerResults();
+
+    setReturnValue(result_summary);
+
     TRGDebug::leaveStage("TRGGDLModule event");
+
   }
 
   void

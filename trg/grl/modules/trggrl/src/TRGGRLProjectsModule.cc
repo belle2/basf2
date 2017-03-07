@@ -58,21 +58,21 @@ namespace Belle2 {
 
     addParam("DebugLevel", _debugLevel, "TRGGRL debug level", _debugLevel);
     addParam("ConfigFile",
-             _configFilename,
+             m_configFilename,
              "The filename of CDC trigger config file",
-             _configFilename);
+             m_configFilename);
     addParam("SimulationMode",
-             _simulationMode,
+             m_simulationMode,
              "TRGGRL simulation switch",
              1);
     addParam("FastSimulationMode",
-             _fastSimulationMode,
+             m_fastSimulationMode,
              "TRGGRL fast simulation mode",
-             _fastSimulationMode);
+             m_fastSimulationMode);
     addParam("FirmwareSimulationMode",
-             _firmwareSimulationMode,
+             m_firmwareSimulationMode,
              "TRGGRL firmware simulation mode",
-             _firmwareSimulationMode);
+             m_firmwareSimulationMode);
     addParam("2DfinderCollection", m_2DfinderCollectionName,
              "Name of the StoreArray holding the tracks made by the 2D finder to be used as input.",
              string("TRG2DFinderTracks"));
@@ -155,7 +155,7 @@ namespace Belle2 {
   {
 
     //...GDL config. name...
-    string cfn = _configFilename;
+    string cfn = m_configFilename;
 
 
     if (TRGDebug::level()) {

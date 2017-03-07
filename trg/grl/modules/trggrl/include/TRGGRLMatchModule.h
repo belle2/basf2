@@ -55,6 +55,18 @@ namespace Belle2 {
     void calculationdistance(CDCTriggerTrack* track, TRGECLCluster* cluster, double* ds, int _match3D);
 
   private:
+
+    /// Mode for TRGGRL simulation. 0th bit : fast simulation switch,
+    /// 1st bit : firmware simulation switch.
+    int m_simulationMode;
+
+    /// Switch for the fast simulation. 0:do everything, 1:stop after
+    /// the track segment simulation. Default is 0.
+    int m_fastSimulationMode;
+
+    /// Switch for the firmware simulation. 0:do nothing, 1:do everything
+    int m_firmwareSimulationMode;
+
     /**max value of dr to be identified as match*/
     double m_dr_threshold;
     /**max value of dz to be identified as match */

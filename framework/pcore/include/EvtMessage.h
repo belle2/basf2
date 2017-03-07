@@ -23,17 +23,25 @@ namespace Belle2 {
 
   /** Header structure of streamed object list */
   struct EvtHeader {
+    EvtHeader(UInt_t aSize, RECORD_TYPE aRectype): size(aSize), rectype(aRectype) {}
     UInt_t size; /**< Number of words in this record. */
     RECORD_TYPE rectype; /**< Type of message. */
-    Long64_t time_sec; /**< seconds part of timeval. */
-    Long64_t time_usec; /**< seconds part of timeval. */
-    UInt_t src; /**< source IP. */
-    UInt_t dest; /**< destination IP. */
-    UInt_t flags; /**< flags concerning the content of the message. Usually 0
-                   but can be any combination of of EvtMessage::EMessageFlags. */
-    UInt_t nObjects; /**< #objects in message. */
-    UInt_t nArrays; /**< #objects in message. */
-    UInt_t reserved[7]; /**< Reserved for future use. Don't ever use these directly. */
+    Long64_t time_sec{0}; /**< seconds part of timeval. */
+    Long64_t time_usec{0}; /**< micro seconds part of timeval. */
+    UInt_t src{(UInt_t) - 1}; /**< source IP. */
+    UInt_t dest{(UInt_t) - 1}; /**< destination IP. */
+    UInt_t flags{0}; /**< flags concerning the content of the message. Usually 0
+                      but can be any combination of of EvtMessage::EMessageFlags. */
+    UInt_t nObjects{0}; /**< #objects in message. */
+    UInt_t nArrays{0}; /**< #objects in message. */
+    UInt_t reserved[6] {0}; /**< Reserved for future use. Don't ever use these directly. */
+    /** version field. Previously the reserved fields were not initialized
+     * properly so they could contain random garbage which makes it very hard
+     * to check for anything. Now we send 0xBEEFED + 8bit version to indicate
+     * that yes, this is indeed a valid version and not just random garbage.
+     * Chance of collision is low but there is nothing else we can do except
+     * breaking compatibility with old files. */
+    UInt_t version{0xBEEFED01};
   };
 
   /** Class to manage streamed object.
@@ -91,14 +99,16 @@ namespace Belle2 {
     /** Get size of message body */
     int   msg_size() const;
 
+    /** get version of the header. Returns 0 for no valid version information */
+    unsigned int getVersion() const { return ((getHeader()->version & 0xFFFFFF00) == 0xBEEFED00) ? (getHeader()->version & 0xFF) : 0;}
     /** Get flags of the  message */
-    unsigned int getMsgFlags() const;
+    unsigned int getMsgFlags() const { return getVersion() > 0 ? getHeader()->flags : 0; }
     /** Set flags for the message */
     void setMsgFlags(unsigned int flags) { header()->flags = flags;}
     /** Add flags to the  message */
     void addMsgFlags(unsigned int flags) { header()->flags |= flags;}
     /** Check if the message has the given flags */
-    bool hasMsgFlags(unsigned int flags) { return (header()->flags & flags) == flags; }
+    bool hasMsgFlags(unsigned int flags) { return (getMsgFlags() & flags) == flags; }
 
     /** Get record type */
     RECORD_TYPE type() const;
@@ -122,6 +132,8 @@ namespace Belle2 {
 
     /** Get pointer to EvtHeader */
     EvtHeader* header();
+    /** Get pointer to EvtHeader */
+    const EvtHeader* getHeader() const;
     /** Get pointer to message body */
     char* msg();
 

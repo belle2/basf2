@@ -21,19 +21,19 @@ namespace Belle2 {
    *
    *    *
    */
-  class TOPDeadChannelMaskerModule : public Module {
+  class TOPChannelMaskerModule : public Module {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    TOPDeadChannelMaskerModule();
+    TOPChannelMaskerModule();
 
     /**
      * Destructor
      */
-    virtual ~TOPDeadChannelMaskerModule();
+    virtual ~TOPChannelMaskerModule();
 
     /**
      * FIXME add doc

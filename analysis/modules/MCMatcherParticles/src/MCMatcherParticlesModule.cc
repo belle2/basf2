@@ -22,9 +22,9 @@
 #include <analysis/utility/AnalysisConfiguration.h>
 
 // map
-#include <map>
+#include <unordered_map>
 #include <algorithm>
-typedef std::map<unsigned int, unsigned int> CounterMap;
+typedef std::unordered_map<unsigned int, unsigned int> CounterMap;
 
 using namespace std;
 
@@ -143,12 +143,18 @@ namespace Belle2 {
       }
     }
 
-    // find most common mother
+    // find first most common mother
     auto commonMother = std::max_element
                         (
                           std::begin(motherCount), std::end(motherCount),
     [](std::pair <unsigned int, unsigned int> p1, std::pair <unsigned int, unsigned int> p2) {
-      return p1.second < p2.second;
+      bool returnValue = false;
+      if (p1.second < p2.second)
+        returnValue = true;
+      else if (p1.second == p2.second)
+        returnValue = p2.first > p1.first;
+
+      return returnValue;
     }
                         );
 

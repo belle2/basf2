@@ -9,9 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef FRAMEWORK_GEOMETRY_BFIELDCOMPONENT_H
-#define FRAMEWORK_GEOMETRY_BFIELDCOMPONENT_H
-
 #include <framework/geometry/B2Vector3.h>
 
 namespace Belle2 {
@@ -26,13 +23,13 @@ namespace Belle2 {
    * the first exclusive component where the point is inside the range will be
    * used as the full field.
    */
-  class BFieldComponent {
+  class MagneticFieldComponent {
   public:
     /** Constructor
      * @param exclusive if set to true this component will be exclusive and the
      * field of other components will not be added
      */
-    explicit BFieldComponent(bool exclusive): m_exclusive(exclusive) {}
+    explicit MagneticFieldComponent(bool exclusive): m_exclusive(exclusive) {}
     /** returns whether the field is set to exclusive mode */
     bool exclusive() const { return m_exclusive; }
     /** check whether the point pos is inside the volume covered by the component */
@@ -40,10 +37,12 @@ namespace Belle2 {
     /** return the field at point pos */
     virtual B2Vector3D getField(const B2Vector3D& pos) = 0;
     /** destructor */
-    virtual ~BFieldComponent() {}
+    virtual ~MagneticFieldComponent() {}
+
+    /** ROOT Dictionary */
+    ClassDef(MagneticFieldComponent, 1);
   private:
     /** whether or not the component is exclusive */
     bool m_exclusive{false};
   };
 }
-#endif // FRAMEWORK_GEOMETRY_BFIELDCOMPONENT_H

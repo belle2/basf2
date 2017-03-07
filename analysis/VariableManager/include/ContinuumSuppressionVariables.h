@@ -21,27 +21,32 @@ namespace Belle2 {
   namespace Variable {
 
     /**
-     * Returns the reduced Fox-Wolfram moment R2
+     * Returns the reduced Fox-Wolfram moment R2, calculated at the event level.
+     */
+    double R2EventLevel(const Particle* particle);
+
+    /**
+     * Returns the reduced Fox-Wolfram moment R2, calculated at the analysis level.
      */
     double R2(const Particle* particle);
 
     /**
-     * Returns the magnitude of the B thrust axis
+     * Returns the magnitude of the B thrust axis.
      */
     double thrustBm(const Particle* particle);
 
     /**
-     * Returns the magnitude of the ROE thrust axis
+     * Returns the magnitude of the ROE thrust axis.
      */
     double thrustOm(const Particle* particle);
 
     /**
-     * Returns the cosine of angle between thrust axis of B and thrust axis of ROE
+     * Returns the cosine of angle between thrust axis of B and thrust axis of ROE.
      */
     double cosTBTO(const Particle* particle);
 
     /**
-     * Returns the cosine of angle between thrust axis of B and z-axis
+     * Returns the cosine of angle between thrust axis of B and z-axis.
      */
     double cosTBz(const Particle* particle);
 
@@ -51,9 +56,9 @@ namespace Belle2 {
     Manager::FunctionPtr KSFWVariables(const std::vector<std::string>& arguments);
 
     /**
-     * Returns the i-th Cleo Cone
+     * Returns the i-th Cleo Cone.
      */
-    double CleoCones(const Particle* particle, const std::vector<double>& cone);
+    Manager::FunctionPtr CleoCones(const std::vector<std::string>& arguments);
 
     /**
      * Returns a function which gives the transformed network output C->C' via: C'=log((C-low)/(high-C)).

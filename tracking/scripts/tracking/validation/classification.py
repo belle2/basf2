@@ -40,7 +40,7 @@ class ClassificationAnalysis(object):
         self._contact = contact
         self.quantity_name = quantity_name
 
-        self.plots = {}
+        self.plots = collections.OrderedDict()
         self.fom = None
 
         self.cut_direction = cut_direction
@@ -105,18 +105,27 @@ class ClassificationAnalysis(object):
             cut_value = None
             cut_direction = self.cut_direction
 
+        lower_bound = self.lower_bound
+        upper_bound = self.upper_bound
+
         # Stacked histogram
         signal_bkg_histogram_name = formatter.format(plot_name, subplot_name="signal_bkg_histogram")
         signal_bkg_histogram = ValidationPlot(signal_bkg_histogram_name)
         signal_bkg_histogram.hist(
             estimates,
             stackby=truths,
-            lower_bound=self.lower_bound,
-            upper_bound=self.upper_bound,
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
             outlier_z_score=self.outlier_z_score,
             allow_discrete=self.allow_discrete,
         )
         signal_bkg_histogram.xlabel = axis_label
+
+        if lower_bound is None:
+            lower_bound = signal_bkg_histogram.lower_bound
+
+        if upper_bound is None:
+            upper_bound = signal_bkg_histogram.upper_bound
 
         self.plots['signal_bkg'] = signal_bkg_histogram
 
@@ -127,8 +136,8 @@ class ClassificationAnalysis(object):
         purity_profile.profile(
             estimates,
             truths,
-            lower_bound=self.lower_bound,
-            upper_bound=self.upper_bound,
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
             outlier_z_score=self.outlier_z_score,
             allow_discrete=self.allow_discrete,
         )
@@ -147,6 +156,20 @@ class ClassificationAnalysis(object):
             elif correlation < -0.1:
                 print("Determined cut direction", 1)
                 cut_direction = +1  # reject high values
+
+        cut_abs = False
+        if cut_direction is None:
+            purity_grapherrors = ValidationPlot.convert_tprofile_to_tgrapherrors(purity_profile.plot,
+                                                                                 abs_x=True)
+            correlation = purity_grapherrors.GetCorrelationFactor()
+            if correlation > 0.1:
+                print("Determined absolute cut direction", -1)
+                cut_direction = -1  # reject low values
+                cut_abs = True
+            elif correlation < -0.1:
+                print("Determined absolute cut direction", 1)
+                cut_direction = +1  # reject high values
+                cut_abs = True
 
         # Figures of merit
         if cut_value is not None:
@@ -182,6 +205,13 @@ class ClassificationAnalysis(object):
             self.fom = classification_fom
 
         if not estimate_is_binary and cut_direction is not None:
+            if cut_abs:
+                estimates = np.abs(estimates)
+                cut_x_label = "cut " + compose_axis_label("abs(" + quantity_name + ")", self.unit)
+                lower_bound = 0
+            else:
+                cut_x_label = "cut " + axis_label
+
             n_data = len(estimates)
             n_signals = scores.signal_amount(truths, estimates)
             n_bkgs = n_data - n_signals
@@ -212,13 +242,13 @@ class ClassificationAnalysis(object):
             efficiency_by_cut_profile.profile(
                 sorted_estimates,
                 sorted_efficiencies,
-                lower_bound=self.lower_bound,
-                upper_bound=self.upper_bound,
+                lower_bound=lower_bound,
+                upper_bound=upper_bound,
                 outlier_z_score=self.outlier_z_score,
                 allow_discrete=self.allow_discrete,
             )
 
-            efficiency_by_cut_profile.xlabel = "cut " + axis_label
+            efficiency_by_cut_profile.xlabel = cut_x_label
             efficiency_by_cut_profile.ylabel = "efficiency"
 
             self.plots["efficiency_by_cut"] = efficiency_by_cut_profile
@@ -230,13 +260,13 @@ class ClassificationAnalysis(object):
             bkg_rejection_by_cut_profile.profile(
                 sorted_estimates,
                 sorted_bkg_rejections,
-                lower_bound=self.lower_bound,
-                upper_bound=self.upper_bound,
+                lower_bound=lower_bound,
+                upper_bound=upper_bound,
                 outlier_z_score=self.outlier_z_score,
                 allow_discrete=self.allow_discrete,
             )
 
-            bkg_rejection_by_cut_profile.xlabel = "cut " + axis_label
+            bkg_rejection_by_cut_profile.xlabel = cut_x_label
             bkg_rejection_by_cut_profile.ylabel = "background rejection"
 
             self.plots["bkg_rejection_by_cut"] = bkg_rejection_by_cut_profile

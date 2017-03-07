@@ -60,15 +60,21 @@
 			<width2 unit="mm">38.420</width2>
 			<length unit="mm">122.760</length>
 			<height unit="um"> 300</height>
+                        <stripEdgeU unit="um">100</stripEdgeU>
+                        <stripEdgeV unit="um">100</stripEdgeV>
 			<stepSize unit="um">5</stepSize>
+
 			<!-- Sensor operation parameters. -->
-			<DepletionVoltage unit="V">60.0</DepletionVoltage>
-			<BiasVoltage unit="V">150</BiasVoltage>
-			<BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
-			<InterstripCapacitance unit="pF">6</InterstripCapacitance>
-                        <CouplingCapacitance unit="pF">120</CouplingCapacitance>
-                        <ElectronicNoiseU unit="e">1100</ElectronicNoiseU>
-                        <ElectronicNoiseV unit="e">650</ElectronicNoiseV>
+			<DepletionVoltage unit="V">40.0</DepletionVoltage>
+			<BiasVoltage unit="V">100</BiasVoltage>
+			<BackplaneCapacitanceU unit="pF/cm">0.11</BackplaneCapacitanceU>
+			<InterstripCapacitanceU unit="pF/cm">0.85</InterstripCapacitanceU>
+                        <CouplingCapacitanceU unit="pF/cm">15</CouplingCapacitanceU>
+			<BackplaneCapacitanceV unit="pF/cm">0.42</BackplaneCapacitanceV>
+			<InterstripCapacitanceV unit="pF/cm">0.65</InterstripCapacitanceV>
+                        <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
+                        <ElectronicNoiseU unit="e">900</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">700</ElectronicNoiseV>
 		</Active>
 	</SensorBase>
 
@@ -86,16 +92,24 @@
 			<width  unit="mm">57.720</width>
 			<length unit="mm">122.900</length>
 			<height unit="um"> 320</height>
+                        <stripEdgeU unit="um">100</stripEdgeU>
+                        <stripEdgeV unit="um">100</stripEdgeV>
 			<stepSize unit="um">5</stepSize>
 		
 			<!-- Sensor operation parameters. -->
 			<DepletionVoltage unit="V">60.0</DepletionVoltage>
-			<BiasVoltage unit="V">150</BiasVoltage>
-			<BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
-			<InterstripCapacitance unit="pF">6</InterstripCapacitance>
-			<CouplingCapacitance unit="pF">120</CouplingCapacitance>
+			<BiasVoltage unit="V">100</BiasVoltage>
+                        <BackplaneCapacitanceU unit="pF/cm">0.12</BackplaneCapacitanceU>
+			<InterstripCapacitanceU unit="pF/cm">0.75</InterstripCapacitanceU>
+			<CouplingCapacitanceU unit="pF/cm">15</CouplingCapacitanceU>
+                        <BackplaneCapacitanceV unit="pF/cm">0.39</BackplaneCapacitanceV>
+			<InterstripCapacitanceV unit="pF/cm">0.65</InterstripCapacitanceV>
+                        <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
+                        <!-- All except backward sensors are on Origami -->
                         <ElectronicNoiseU unit="e">1100</ElectronicNoiseU>
                         <ElectronicNoiseV unit="e">650</ElectronicNoiseV>
+                        <ElectronicNoiseSbwU unit="e">950</ElectronicNoiseSbwU>
+                        <ElectronicNoiseSbwV unit="e">750</ElectronicNoiseSbwV>
 		</Active>
 	</SensorBase>
 
@@ -113,16 +127,21 @@
 			<width  unit="mm">38.520</width>
 			<length unit="mm">122.900</length>
 			<height unit="um">320.000</height>
+                        <stripEdgeU unit="um">100</stripEdgeU>
+                        <stripEdgeV unit="um">100</stripEdgeV>
 			<stepSize unit="um">5</stepSize>
 			
 			<!-- Sensor operation parameters. -->
 			<DepletionVoltage unit="V">60.0</DepletionVoltage>
-			<BiasVoltage unit="V">150</BiasVoltage>
-			<BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
-			<InterstripCapacitance unit="pF">6</InterstripCapacitance>
-			<CouplingCapacitance unit="pF">120</CouplingCapacitance>
-                        <ElectronicNoiseU unit="e">850</ElectronicNoiseU>
-                        <ElectronicNoiseV unit="e">480</ElectronicNoiseV>
+			<BiasVoltage unit="V">100</BiasVoltage>
+			<BackplaneCapacitanceU unit="pF/cm">0.08</BackplaneCapacitanceU>
+			<InterstripCapacitanceU unit="pF/cm">0.92</InterstripCapacitanceU>
+			<CouplingCapacitanceU unit="pF/cm">15</CouplingCapacitanceU>
+			<BackplaneCapacitanceV unit="pF/cm">0.26</BackplaneCapacitanceV>
+	        	<InterstripCapacitanceV unit="pF/cm">0.75</InterstripCapacitanceV>
+                        <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
+                        <ElectronicNoiseU unit="e">1100</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">800</ElectronicNoiseV>
 		</Active>
 		<!-- For now, layer 3 only has a flex on top -->
 		<Component name="KaptonLayer3">
@@ -134,7 +153,6 @@
 			<height unit="mm">0.100</height>
 		</Component>
 	</Sensor>
-
 
 	<!-- Most Slanted Sensor only have the pitch adapter flex on top -->
 	<Sensor type="Slanted1" slanted="true">

@@ -194,7 +194,7 @@ namespace Belle2 {
         }
       }
       auto window = rawDigit.getASICWindow();
-      double time = sampleTimes->getTimeDifference(window, rawTime); // time in [ns]
+      double time = sampleTimes->getTime(window, rawTime); // time in [ns]
       if (m_useChannelT0Calibration) time -= (*m_channelT0)->getT0(moduleID, channel);
       if (m_useModuleT0Calibration) time -= (*m_moduleT0)->getT0(moduleID);
       if (m_useCommonT0Calibration) time -= (*m_commonT0)->getT0();
@@ -214,7 +214,8 @@ namespace Belle2 {
         digit->setHitQuality(TOPDigit::c_Junk);
       const auto* waveform = rawDigit.getRelated<TOPRawWaveform>();
       if (waveform) {
-        if (!waveform->areWindowsInOrder()) digit->setHitQuality(TOPDigit::c_Junk);
+        if (!waveform->areWindowsInOrder(rawDigit.getSampleFall() + 1))
+          digit->setHitQuality(TOPDigit::c_Junk);
       }
     }
 

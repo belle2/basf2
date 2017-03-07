@@ -32,7 +32,7 @@ SeqFile::SeqFile(const std::string& filename, const std::string& rwflag):
   }
   bool readonly = rwflag.find('w') == std::string::npos;
   // is the file already compressed?
-  m_compressed = filename.compare(filename.size() - 3, 3, ".gz") == 0;
+  m_compressed = filename.size() > 3 and filename.compare(filename.size() - 3, 3, ".gz") == 0;
   // strip .gz suffix to add it at the end automatically and correctly for subsequent files
   if (m_compressed) {
     m_filename = filename.substr(0, filename.size() - 3);

@@ -48,15 +48,15 @@ bool BasicFacetVarSet::extract(const CDCFacet* ptrFacet)
 
   var<named("superlayer_id")>() = superlayerID;
 
-  var<named("start_layer_id")>() = facet.getStartWire().getILayer();
+  // var<named("start_layer_id")>() = facet.getStartWire().getILayer();
   var<named("start_drift_length")>() = startDriftLength;
   var<named("start_drift_length_sigma")>() = startDriftLengthSigma;
 
-  var<named("middle_layer_id")>() = facet.getMiddleWire().getILayer();
+  // var<named("middle_layer_id")>() = facet.getMiddleWire().getILayer();
   var<named("middle_drift_length")>() = middleDriftLength;
   var<named("middle_drift_length_sigma")>() = middleDriftLengthSigma;
 
-  var<named("end_layer_id")>() = facet.getEndWire().getILayer();
+  // var<named("end_layer_id")>() = facet.getEndWire().getILayer();
   var<named("end_drift_length")>() = endDriftLength;
   var<named("end_drift_length_sigma")>() = endDriftLengthSigma;
 

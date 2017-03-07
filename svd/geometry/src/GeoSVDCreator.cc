@@ -67,15 +67,21 @@ namespace Belle2 {
         infoPar.getVCells(),
         infoPar.getWidth2()
       );
-      const double unit_pF = 1000 * Unit::fC / Unit::V; // picofarad
       info->setSensorParams(
+        infoPar.getStripEdgeU(),
+        infoPar.getStripEdgeV(),
         infoPar.getDepletionVoltage(),
         infoPar.getBiasVoltage(),
-        infoPar.getBackplaneCapacitance() * unit_pF,
-        infoPar.getInterstripCapacitance() * unit_pF,
-        infoPar.getCouplingCapacitance() * unit_pF,
+        infoPar.getBackplaneCapacitanceU(),
+        infoPar.getInterstripCapacitanceU(),
+        infoPar.getCouplingCapacitanceU(),
+        infoPar.getBackplaneCapacitanceV(),
+        infoPar.getInterstripCapacitanceV(),
+        infoPar.getCouplingCapacitanceV(),
         infoPar.getElectronicNoiseU(),
-        infoPar.getElectronicNoiseV()
+        infoPar.getElectronicNoiseV(),
+        infoPar.getElectronicNoiseSbwU(),
+        infoPar.getElectronicNoiseSbwV()
       );
       m_SensorInfo.push_back(info);
       return info;
@@ -84,6 +90,9 @@ namespace Belle2 {
     SVDSensorInfoPar* GeoSVDCreator::readSensorInfo(const GearDir& sensor)
     {
 
+      const double unit_pFcm = 1;
+      // This was 1000 * Unit::fC / Unit::V / Unit::cm; // pF/cm.
+      // We only use ratios of capacities, and this gives nicer numbers.
       SVDSensorInfoPar* info = new SVDSensorInfoPar(
         VxdID(0, 0, 0),
         sensor.getLength("width"),
@@ -95,13 +104,20 @@ namespace Belle2 {
       );
 
       info->setSensorParams(
+        sensor.getWithUnit("stripEdgeU"),
+        sensor.getWithUnit("stripEdgeV"),
         sensor.getWithUnit("DepletionVoltage"),
         sensor.getWithUnit("BiasVoltage"),
-        sensor.getDouble("BackplaneCapacitance") ,
-        sensor.getDouble("InterstripCapacitance") ,
-        sensor.getDouble("CouplingCapacitance") ,
+        sensor.getDouble("BackplaneCapacitanceU") * unit_pFcm,
+        sensor.getDouble("InterstripCapacitanceU") * unit_pFcm,
+        sensor.getDouble("CouplingCapacitanceU") * unit_pFcm,
+        sensor.getDouble("BackplaneCapacitanceV") * unit_pFcm,
+        sensor.getDouble("InterstripCapacitanceV") * unit_pFcm,
+        sensor.getDouble("CouplingCapacitanceV") * unit_pFcm,
         sensor.getWithUnit("ElectronicNoiseU"),
-        sensor.getWithUnit("ElectronicNoiseV")
+        sensor.getWithUnit("ElectronicNoiseV"),
+        sensor.getWithUnit("ElectronicNoiseSbwU", 0),
+        sensor.getWithUnit("ElectronicNoiseSbwV", 0)
       );
 
       return info;
@@ -279,7 +295,7 @@ namespace Belle2 {
       return svdGeometryPar;
     }
 
-    void GeoSVDCreator::createGeometry(const SVDGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
+    void GeoSVDCreator::createGeometry(const SVDGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes)
     {
 
       m_activeStepSize = parameters.getGlobalParams().getActiveStepSize() / Unit::mm;
@@ -419,8 +435,8 @@ namespace Belle2 {
       //const std::vector<VXDHalfShellPar>& HalfShells = parameters.getHalfShells();
       for (const VXDHalfShellPar& shell : parameters.getHalfShells()) {
         string shellName =  shell.getName();
-        G4Transform3D shellAlignment = getAlignment(parameters.getAlignment(m_prefix + "." + shellName));
-
+        m_currentHalfShell = m_prefix + "." + shellName;
+        G4Transform3D shellAlignment = getAlignment(parameters.getAlignment(m_currentHalfShell));
         //Place shell support
         double shellAngle = shell.getShellAngle();
         if (!m_onlyActiveMaterial) shellSupport.place(envelope, shellAlignment * G4RotateZ3D(shellAngle));
@@ -442,6 +458,11 @@ namespace Belle2 {
           for (const std::pair<int, double>& ladder : Ladders) {
             int ladderID = ladder.first;
             double phi = ladder.second;
+
+            // Remember shell coordinate system (into which ladders are inserted)
+            VXD::GeoCache::getInstance().addHalfShellPlacement(m_halfShellVxdIDs[m_currentHalfShell],
+                                                               shellAlignment); //  * G4RotateZ3D(shellAngle) not taken into account in ladder!
+
             G4Transform3D ladderPlacement = placeLadder(ladderID, phi, envelope, shellAlignment, parameters);
             if (!m_onlyActiveMaterial) ladderSupport.place(envelope, ladderPlacement);
           }

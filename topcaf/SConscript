@@ -1,5 +1,4 @@
 Import('env')
-
 env['LIBS'] = ['framework','$ROOT_LIBS']
-	
+env['CONTINUE'] = False	
 Return('env')

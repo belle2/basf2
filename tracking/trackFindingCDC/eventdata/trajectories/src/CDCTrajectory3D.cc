@@ -294,15 +294,8 @@ RecoTrack* CDCTrajectory3D::storeInto(StoreArray<RecoTrack>& recoTracks, const d
     newRecoTrack->setTimeSeed(getFlightTime());
   }
 
-  // TODO: This does not work properly! - It does! Only the input is wrong, since tracks from the LegendreFinder are not fitter properly
-  //const TMatrixDSym& cov6 = calculateCovarianceMatrix(getLocalHelix(), momentum, charge, bZ);
-  TMatrixDSym covSeed(6);
-  covSeed(0, 0) = 1e-3;
-  covSeed(1, 1) = 1e-3;
-  covSeed(2, 2) = 4e-3;
-  covSeed(3, 3) = 0.01e-3;
-  covSeed(4, 4) = 0.01e-3;
-  covSeed(5, 5) = 0.04e-3;
+  const CovarianceMatrix<6>& cov6 = calculateCovarianceMatrix(getLocalHelix(), momentum, charge, bZ);
+  TMatrixDSym covSeed = CovarianceMatrixUtil::toTMatrix(cov6);
   newRecoTrack->setSeedCovariance(covSeed);
   return newRecoTrack;
 }

@@ -200,7 +200,7 @@ void NonRootDataExportModule::event()
                 " and hasStatusPrimary (0 = true) " << isPrimary);
 
         if ((m_PARAMExportTrueHits == "real" and isPrimary != 0) or (m_PARAMExportTrueHits == "background" and isPrimary != 1)
-            or (m_PARAMExportTrueHits == "all" and isPrimary == -1)) {
+            or ((m_PARAMExportTrueHits == "all") and (isPrimary == -1))) {
           isPrimary = 1;
           particleID = -1;
           B2DEBUG(10, " PXD hit " << i << " neglected");
@@ -245,7 +245,7 @@ void NonRootDataExportModule::event()
                 " and hasStatusPrimary (0 = true) " << isPrimary);
 
         if ((m_PARAMExportTrueHits == "real" and isPrimary != 0) or (m_PARAMExportTrueHits == "background" and isPrimary != 1)
-            or (m_PARAMExportTrueHits == "all" and isPrimary == -1)) {
+            or ((m_PARAMExportTrueHits == "all") and (isPrimary == -1))) {
           isPrimary = 1;
           particleID = -1;
           B2DEBUG(10, " SVD hit " << i << " neglected");

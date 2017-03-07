@@ -15,7 +15,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 MVAFacetFilter::MVAFacetFilter()
-  : Super(makeUnique<MVAFacetVarSet>(), "FacetFilter", 2.82)
+  : Super(makeUnique<MVAFacetVarSet>(), "tracking/data/trackfindingcdc_FacetFilter.xml", 2.805)
 {
 }
 

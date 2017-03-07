@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <boost/python/class.hpp>
+#include <boost/python/copy_const_reference.hpp>
 
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/utilities/HTML.h>
@@ -47,8 +48,9 @@ bool FileMetaData::containsEvent(int experiment, int run, unsigned int event) co
 
 void FileMetaData::exposePythonAPI()
 {
+  //Note: these can only be used with update_file_metadata(), PyROOT is the more common interface
   class_<FileMetaData>("FileMetaData")
-  .def("get_lfn", &FileMetaData::getLfn)
+  .def("get_lfn", &FileMetaData::getLfn, return_value_policy<copy_const_reference>())
   .def("get_nevents", &FileMetaData::getNEvents)
   .def("get_experiment_low", &FileMetaData::getExperimentLow)
   .def("get_run_low", &FileMetaData::getRunLow)
@@ -57,15 +59,16 @@ void FileMetaData::exposePythonAPI()
   .def("get_run_high", &FileMetaData::getRunHigh)
   .def("get_event_high", &FileMetaData::getEventHigh)
   .def("get_n_parents", &FileMetaData::getNParents)
-  .def("get_parent", &FileMetaData::getParent)
-  .def("get_date", &FileMetaData::getDate)
-  .def("get_site", &FileMetaData::getSite)
-  .def("get_user", &FileMetaData::getUser)
-  .def("get_random_seed", &FileMetaData::getRandomSeed)
-  .def("get_release", &FileMetaData::getRelease)
-  .def("get_steering", &FileMetaData::getSteering)
+  .def("get_parent", &FileMetaData::getParent, return_value_policy<copy_const_reference>())
+  .def("get_date", &FileMetaData::getDate, return_value_policy<copy_const_reference>())
+  .def("get_site", &FileMetaData::getSite, return_value_policy<copy_const_reference>())
+  .def("get_user", &FileMetaData::getUser, return_value_policy<copy_const_reference>())
+  .def("get_random_seed", &FileMetaData::getRandomSeed, return_value_policy<copy_const_reference>())
+  .def("get_release", &FileMetaData::getRelease, return_value_policy<copy_const_reference>())
+  .def("get_steering", &FileMetaData::getSteering, return_value_policy<copy_const_reference>())
   .def("get_mc_events", &FileMetaData::getMcEvents)
-  .def("get_global_tag", &FileMetaData::getDatabaseGlobalTag)
+  .def("get_global_tag", &FileMetaData::getDatabaseGlobalTag, return_value_policy<copy_const_reference>())
+  .def("get_data_description", &FileMetaData::getDataDescription, return_value_policy<copy_const_reference>())
   .def("set_lfn", &FileMetaData::setLfn);
 }
 
@@ -101,6 +104,7 @@ void FileMetaData::Print(Option_t* option) const
     printer.put("release", m_release);
     printer.put("mcEvents", m_mcEvents);
     printer.put("globalTag", m_databaseGlobalTag);
+    printer.put("dataDescription", m_dataDescription);
   }
   if (use_json)
     printer.put("steering", m_steering);
@@ -157,7 +161,7 @@ bool FileMetaData::read(std::istream& input, std::string& physicalFileName)
   return false;
 }
 
-bool FileMetaData::write(std::ostream& output, std::string physicalFileName) const
+bool FileMetaData::write(std::ostream& output, const std::string& physicalFileName) const
 {
   output << "  <File>\n";
   output << "    <LFN>" << HTML::escape(m_lfn) << "</LFN>\n";

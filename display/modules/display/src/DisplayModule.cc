@@ -190,6 +190,10 @@ void DisplayModule::event()
     StoreArray<ROIid> ROIs;
     for (int i = 0 ; i < ROIs.getEntries(); i++)
       m_visualizer->addROI(ROIs[i]);
+    //well, non-standard names are used for testbeams?
+    StoreArray<ROIid> testbeamROIs("ROIs");
+    for (int i = 0 ; i < testbeamROIs.getEntries(); i++)
+      m_visualizer->addROI(testbeamROIs[i]);
 
     //special VXDTF objects
     StoreArray<TrackCandidateTFInfo> tfcandTFInfo;

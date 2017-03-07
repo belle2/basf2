@@ -300,6 +300,17 @@ void CDCSVGPlotter::drawRecoTrackTrajectories(const std::string& storeArrayName,
   drawStoreArray<const RecoTrack, drawTrajectories>(storeArrayName, styling);
 }
 
+void CDCSVGPlotter::drawMCParticleTrajectories(const std::string& storeArrayName,
+                                               const std::string& stroke,
+                                               const std::string& strokeWidth)
+{
+  DefaultColorCycleStyling<const MCParticle> styling;
+  if (stroke != "") styling.setStroke(stroke);
+  if (strokeWidth != "") styling.setStrokeWidth(strokeWidth);
+  const bool drawTrajectories = true;
+  drawStoreArray<const MCParticle, drawTrajectories>(storeArrayName, styling);
+}
+
 void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& simHitStoreArrayName,
                                             const std::string& stroke,
                                             const std::string& strokeWidth)

@@ -74,75 +74,78 @@
 	</Snippet>	
 	
 	<Snippet name="PXD_sensor">
-		<Color>#006699</Color>
-		<Material>Si</Material>
-		<Shape>Box</Shape>
-		
-		<DX unit="mm">0</DX>
-		<DY unit="mm">0</DY>
-		<DZ unit="mm">0</DZ>
-		<Theta unit="deg">0</Theta>
-		<Phi unit="deg">0</Phi>
-		<Psi unit="deg">0</Psi>
-		
-		<HalfX unit="mm">22.400</HalfX>
-		<HalfY unit="mm">6.250</HalfY>
-		<HalfZ unit="um">37.25</HalfZ>
+          <Color>#006699</Color>
+          <Material>Si</Material>
+          <Shape>Box</Shape>
+          
+          <DX unit="mm">0</DX>
+          <DY unit="mm">0</DY>
+          <DZ unit="mm">0</DZ>
+          <Theta unit="deg">0</Theta>
+          <Phi unit="deg">0</Phi>
+          <Psi unit="deg">0</Psi>
+          
+          <HalfX unit="mm">22.400</HalfX>
+          <HalfY unit="mm">6.250</HalfY>
+          <HalfZ unit="um">37.25</HalfZ>
 		
 	</Snippet>	
 	<Snippet name="SVD_sensor">
-		<Color>#006699</Color>
-		<Material>Si</Material>
-		<Shape>Box</Shape>
-		
-		<DX unit="mm">0</DX>
-		<DY unit="mm">0</DY>
-		<DZ unit="mm">0</DZ>
-		<Theta unit="deg">0</Theta>
-		<Phi unit="deg">0</Phi>
-		<Psi unit="deg">0</Psi>
-		
-		<HalfX unit="mm">61.450</HalfX>
-		<HalfY unit="mm">28.860</HalfY>
-		<HalfZ unit="um">160</HalfZ>
-		
+          <Color>#006699</Color>
+          <Material>Si</Material>
+          <Shape>Box</Shape>
+          
+          <DX unit="mm">0</DX>
+          <DY unit="mm">0</DY>
+          <DZ unit="mm">0</DZ>
+          <Theta unit="deg">0</Theta>
+          <Phi unit="deg">0</Phi>
+          <Psi unit="deg">0</Psi>
+          
+          <HalfX unit="mm">61.450</HalfX>
+          <HalfY unit="mm">28.860</HalfY>
+          <HalfZ unit="um">160</HalfZ>
+          
 	</Snippet>		
 	
 	<Snippet name="PXD_active">
-		<DetectorType>PXD</DetectorType>
-		
-		<stepSize unit="um">5</stepSize>
-		<!-- define the number of pixels in rphi direction -->
-		<pixelsR>250</pixelsR>
-		<!-- define the number of pixels in z direction. There are two values since we have two different pixel sizes inside of one module: Larger pixels in the outer area, smaller pixels in the middle -->
-		<pixelsZ>512</pixelsZ>
-		<pixelsZ>0</pixelsZ>
-		<!-- splitLength defines the position inside the active area (starting at the outside) where the pixel size changes. Pixel size is calculated automatically from the size of the active area and the number of pixels -->
-		<splitLength unit="mm">0.0</splitLength>
-		<!-- Parameters describing the physical attributes of the sensor needed for digitization. The voltages might be time dependent and than should be placed somewhere else -->
-		<BulkDoping unit="1/um^3">10.0</BulkDoping>
-		<BackVoltage unit="V">-60.0</BackVoltage>
-		<TopVoltage unit="V">0.0</TopVoltage>
-		<SourceBorder unit="um">3.0</SourceBorder>
-		<ClearBorder unit="um">8.0</ClearBorder>
-		<DrainBorder unit="um">8.0</DrainBorder>
-		<GateDepth unit="um">22</GateDepth>
-		<DoublePixel>true</DoublePixel>
-		<!-- Define the integration window to be 20µs. This probably should go somewhere else -->
-		<IntegrationStart unit="us">-10.0</IntegrationStart>
-		<IntegrationEnd   unit="us"> 10.0</IntegrationEnd>				 
+          <DetectorType>PXD</DetectorType>
+          
+          <stepSize unit="um">5</stepSize>
+          <!-- define the number of pixels in rphi direction -->
+          <pixelsR>250</pixelsR>
+          <!-- define the number of pixels in z direction. There are two values since we have two different pixel sizes inside of one module: Larger pixels in the outer area, smaller pixels in the middle -->
+          <pixelsZ>512</pixelsZ>
+          <pixelsZ>0</pixelsZ>
+          <!-- splitLength defines the position inside the active area (starting at the outside) where the pixel size changes. Pixel size is calculated automatically from the size of the active area and the number of pixels -->
+          <splitLength unit="mm">0.0</splitLength>
+          <!-- Parameters describing the physical attributes of the sensor needed for digitization. The voltages might be time dependent and than should be placed somewhere else -->
+          <BulkDoping unit="1/um^3">10.0</BulkDoping>
+          <BackVoltage unit="V">-60.0</BackVoltage>
+          <TopVoltage unit="V">0.0</TopVoltage>
+          <SourceBorder unit="um">3.0</SourceBorder>
+          <ClearBorder unit="um">8.0</ClearBorder>
+          <DrainBorder unit="um">8.0</DrainBorder>
+          <GateDepth unit="um">22</GateDepth>
+          <DoublePixel>true</DoublePixel>
+          <!-- Define the integration window to be 20µs. This probably should go somewhere else -->
+          <IntegrationStart unit="us">-10.0</IntegrationStart>
+          <IntegrationEnd   unit="us"> 10.0</IntegrationEnd>				 
 	</Snippet>	
 	<Snippet name="SVD_active">
-		<DetectorType>SVD</DetectorType>
-		<stepSize unit="um">5</stepSize>
-		<stripsU>768</stripsU>
-		<stripsV>512</stripsV>
-		<!-- Sensor operation parameters. -->
-		<DepletionVoltage unit="V">60.0</DepletionVoltage>
-		<BiasVoltage unit="V">150</BiasVoltage>
-		<BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
-		<InterstripCapacitance unit="pF">6</InterstripCapacitance>
-		<CouplingCapacitance unit="pF">120</CouplingCapacitance>				
+          <DetectorType>SVD</DetectorType>
+          <stepSize unit="um">5</stepSize>
+          <stripsU>768</stripsU>
+          <stripsV>512</stripsV>
+          <!-- Sensor operation parameters. -->
+          <DepletionVoltage unit="V">60.0</DepletionVoltage>
+          <BiasVoltage unit="V">150</BiasVoltage>
+          <BackplaneCapacitanceU unit="pF">1.4</BackplaneCapacitanceU>
+          <InterstripCapacitanceU unit="pF">9</InterstripCapacitanceU>
+          <CouplingCapacitanceU unit="pF">180</CouplingCapacitanceU>
+          <BackplaneCapacitanceV unit="pF">2.3</BackplaneCapacitanceV>
+          <InterstripCapacitanceV unit="pF">3.9</InterstripCapacitanceV>
+          <CouplingCapacitanceV unit="pF">180</CouplingCapacitanceV>
 	</Snippet>		
 	
 	

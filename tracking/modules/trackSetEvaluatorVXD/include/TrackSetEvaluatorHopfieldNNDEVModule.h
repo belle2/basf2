@@ -73,6 +73,9 @@ namespace Belle2 {
 
     /** ************************************** Member variables ************************************************ */
 
+    /** Minimum of activityState ("Neuron Value") required to be accepted by the algorithm. */
+    float m_minActivityState;
+
     /** the storeArray for SpacePointTrackCands as member, is faster than recreating link for each event. */
     StoreArray<SpacePointTrackCand> m_spacePointTrackCands;
 

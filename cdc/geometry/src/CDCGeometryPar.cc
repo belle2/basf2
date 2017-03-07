@@ -121,7 +121,8 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
   } else {
     //    std::cout <<"readcalled" << std::endl;
     //    read();
-    B2FATAL("CDCGeometryPar: Strange that readFromDB is not called !");
+    //    B2FATAL("CDCGeometryPar: Strange that readFromDB is not called !");
+    B2WARNING("CDCGeometryPar: Strange that readFromDB is not called! Please make sure that CDC is included in Geometry.");
   }
 }
 

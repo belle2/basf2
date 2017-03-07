@@ -210,6 +210,15 @@ namespace Belle2 {
       bool m_onlyActiveMaterial {false};
       /** Vector of G4UserLimit pointers */
       std::vector<G4UserLimits*> m_UserLimits;
+      /// Current half-shell being processed (need to know ladder parent for hierarchy)
+      std::string m_currentHalfShell {""};
+      /// Used for translation of half-shell name into a VxdID to consitently handle it in hierarchy
+      std::map<std::string, Belle2::VxdID> m_halfShellVxdIDs {
+        {{"PXD.Ying"}, {Belle2::VxdID(1, 0, 0, 1)}},
+        {{"PXD.Yang"}, {Belle2::VxdID(1, 0, 0, 2)}},
+        {{"SVD.Pat"}, {Belle2::VxdID(3, 0, 0, 1)}},
+        {{"SVD.Mat"}, {Belle2::VxdID(3, 0, 0, 2)}}
+      };
 
     }; // class GeoVXDCreator
 

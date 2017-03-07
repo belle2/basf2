@@ -26,6 +26,9 @@
 #include <TMatrixD.h>
 #include <TVector3.h>
 
+// USHRT_MAX
+#include <climits>
+
 namespace Belle2 {
 
   /** The SpacePointTrackCand class.

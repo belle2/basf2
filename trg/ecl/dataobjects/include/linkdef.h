@@ -6,7 +6,7 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::TRGECLHit+;
-#pragma link C++ class Belle2::TRGECLDigi+;
+#pragma link C++ class Belle2::TRGECLFAMAna+;
 #pragma link C++ class Belle2::TRGECLDigi0+;
 #pragma link C++ class Belle2::TRGECLTrg+;
 #pragma link C++ class Belle2::TRGECLDigi0MC+;

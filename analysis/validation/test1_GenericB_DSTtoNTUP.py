@@ -5,7 +5,7 @@
 <header>
   <input>GenericB_GENSIMRECtoDST.dst.root</input>
   <output>GenericB.ntup.root</output>
-  <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
+  <contact>Jorge Martinez-Ortega; jmartinez@fis.cinvestav.mx</contact>
 </header>
 """
 

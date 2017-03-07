@@ -29,6 +29,10 @@ namespace Belle2 {
    * use_final_state_for_sig==0 (FS0) or ==1 (FS1). For FS0 the moments are calculated
    * using the B primary daughters, while for FS1 they are calculated using the B final state daughters.
    *
+   * The CleoCones are stored in separate vectors depending on whether they are calculated
+   * using all final state particles (default method), or whether they are calculated using only particles
+   * from the ROE.
+   *
    * The ContinuumSuppression object is created for given existing Particle object by the
    * ContinuumSuppressionBuilder module and are related between each other with a BASF2 relation.
    *
@@ -103,11 +107,18 @@ namespace Belle2 {
     void addKsfwFS1(std::vector<float> ksfwFS1);
 
     /**
-     * Add vector of Cleo Cones
+     * Add vector of Cleo Cones constructed of all final state particles
      *
-     * @param vector of Cleo Cones
+     * @param vector of Cleo Cones constructed of all final state particles
      */
-    void addCleoCones(std::vector<float> cleoCones);
+    void addCleoConesALL(std::vector<float> cleoConesALL);
+
+    /**
+     * Add vector of Cleo Cones constructed of only ROE particles
+     *
+     * @param vector of Cleo Cones constructed of only ROE particles
+     */
+    void addCleoConesROE(std::vector<float> cleoConesROE);
 
     // getters
     /**
@@ -115,7 +126,8 @@ namespace Belle2 {
      *
      * @return TVector3 ROE thrust axis
      */
-    TVector3 getThrustO(void) const {
+    TVector3 getThrustO(void) const
+    {
       return m_thrustO;
     }
 
@@ -124,7 +136,8 @@ namespace Belle2 {
      *
      * @return Float magnitude of B thrust axis
      */
-    float getThrustBm(void) const {
+    float getThrustBm(void) const
+    {
       return m_thrustBm;
     }
 
@@ -133,7 +146,8 @@ namespace Belle2 {
      *
      * @return Float magnitude of ROE thrust axis
      */
-    float getThrustOm(void) const {
+    float getThrustOm(void) const
+    {
       return m_thrustOm;
     }
 
@@ -142,7 +156,8 @@ namespace Belle2 {
      *
      * @return Float cosine of the angle between the thrust axis of the B and the thrust axis of the ROE
      */
-    float getCosTBTO(void) const {
+    float getCosTBTO(void) const
+    {
       return m_cosTBTO;
     }
 
@@ -151,7 +166,8 @@ namespace Belle2 {
      *
      * @return Float cosine of the angle between the thrust axis of the B and the z-axis
      */
-    float getCosTBz(void) const {
+    float getCosTBz(void) const
+    {
       return m_cosTBz;
     }
 
@@ -160,7 +176,8 @@ namespace Belle2 {
      *
      * @return Float reduced Fox-Wolfram moment R2
      */
-    float getR2(void) const {
+    float getR2(void) const
+    {
       return m_R2;
     }
 
@@ -169,7 +186,8 @@ namespace Belle2 {
      *
      * @return vector of KSFW moments, Et, and mm2 for final state = 0
      */
-    std::vector<float> getKsfwFS0(void) const {
+    std::vector<float> getKsfwFS0(void) const
+    {
       return m_ksfwFS0;
     }
 
@@ -178,18 +196,31 @@ namespace Belle2 {
      *
      * @return vector of KSFW moments, Et, and mm2 for final state = 1
      */
-    std::vector<float> getKsfwFS1(void) const {
+    std::vector<float> getKsfwFS1(void) const
+    {
       return m_ksfwFS1;
     }
 
     /**
-     * Get vector of Cleo Cones.
+     * Get vector of Cleo Cones constructed of all final state particles.
      *
-     * @return vector of Cleo Cones
+     * @return vector of Cleo Cones constructed of all final state particles
      */
-    std::vector<float> getCleoCones(void) const {
-      return m_cleoCones;
+    std::vector<float> getCleoConesALL(void) const
+    {
+      return m_cleoConesALL;
     }
+
+    /**
+     * Get vector of Cleo Cones constructed of only ROE particles.
+     *
+     * @return vector of Cleo Cones constructed of only ROE particles
+     */
+    std::vector<float> getCleoConesROE(void) const
+    {
+      return m_cleoConesROE;
+    }
+
 
   private:
 
@@ -205,7 +236,8 @@ namespace Belle2 {
     std::vector<float> m_ksfwFS0;  /**< vector of KSFW moments, Et, and mm2 for final state = 0 */
     std::vector<float> m_ksfwFS1;  /**< vector of KSFW moments, Et, and mm2 for final state = 1 */
 
-    std::vector<float> m_cleoCones;  /**< vector of Cleo Cones */
+    std::vector<float> m_cleoConesALL;  /**< vector of Cleo Cones constructed from all final state particles */
+    std::vector<float> m_cleoConesROE;  /**< vector of Cleo Cones constructed from only ROE particles */
 
     ClassDef(ContinuumSuppression, 1) /**< class definition */
 

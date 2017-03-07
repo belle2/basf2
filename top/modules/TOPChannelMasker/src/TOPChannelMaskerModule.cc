@@ -9,7 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <top/modules/TOPDeadChannelMasker/TOPDeadChannelMaskerModule.h>
+#include <top/modules/TOPChannelMasker/TOPChannelMaskerModule.h>
 
 
 using namespace Belle2;
@@ -17,13 +17,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TOPDeadChannelMasker)
+REG_MODULE(TOPChannelMasker)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-TOPDeadChannelMaskerModule::TOPDeadChannelMaskerModule() : Module()
+TOPChannelMaskerModule::TOPChannelMaskerModule() : Module()
 {
   // Set module properties
   setDescription("Masks dead PMs from the reconstruction");
@@ -32,27 +32,27 @@ TOPDeadChannelMaskerModule::TOPDeadChannelMaskerModule() : Module()
 
 }
 
-TOPDeadChannelMaskerModule::~TOPDeadChannelMaskerModule()
+TOPChannelMaskerModule::~TOPChannelMaskerModule()
 {
 }
 
-void TOPDeadChannelMaskerModule::initialize()
+void TOPChannelMaskerModule::initialize()
 {
 }
 
-void TOPDeadChannelMaskerModule::beginRun()
+void TOPChannelMaskerModule::beginRun()
 {
 }
 
-void TOPDeadChannelMaskerModule::event()
+void TOPChannelMaskerModule::event()
 {
 }
 
-void TOPDeadChannelMaskerModule::endRun()
+void TOPChannelMaskerModule::endRun()
 {
 }
 
-void TOPDeadChannelMaskerModule::terminate()
+void TOPChannelMaskerModule::terminate()
 {
 }
 

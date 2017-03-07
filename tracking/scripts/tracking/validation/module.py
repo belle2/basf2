@@ -643,7 +643,6 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
                 # Apply some boundaries for the maximal tracking acceptance
                 # such that the plots look more instructive
-                print("**** Encountered ****", root_save_name(parameter_name))
                 if root_save_name(parameter_name) == 'tan_lambda':
                     lower_bound = -1.73
                     upper_bound = 3.27
@@ -663,6 +662,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                                      outlier_z_score=10.0,
                                      lower_bound=lower_bound,
                                      upper_bound=upper_bound,
+                                     y_binary=True,
                                      is_expert=is_expert)
 
                 profile_plot.xlabel = compose_axis_label(parameter_name)

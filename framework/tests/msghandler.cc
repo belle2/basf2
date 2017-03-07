@@ -51,7 +51,7 @@ namespace {
 
   TEST(MsgHandlerTest, compression)
   {
-    TClonesArray longarray("Belle2::MCParticle");
+    TClonesArray longarray("Belle2::EventMetaData");
     longarray.ExpandCreate(1000);
     for (int algo : {0, 1, 2}) {
       for (int level = 0; level < 10; ++level) {
@@ -66,6 +66,7 @@ namespace {
           ASSERT_EQ(1, objs.size());
           ASSERT_EQ(1, names.size());
           ASSERT_EQ(names[0], "mcparticles");
+          for (auto o : objs) delete o;
         }
       }
     }

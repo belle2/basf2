@@ -195,7 +195,7 @@ namespace Belle2 {
 
     TRGDebug::leaveStage("TRGGDL fastSim");
 
-    StoreObjPtr<TRGGDLResults> GRLResult;
+    StoreObjPtr<TRGGDLResults> GRLResult("TrgGDLResults");
     if (GRLResult) {
       B2WARNING("TRGGDLResults exist already, check it!!!!");
       return;
@@ -210,15 +210,17 @@ namespace Belle2 {
 
       //get the objects defined in GRL, the name have to be unified to the name in TriggerMenufile
       std::vector<int> obj;
-      obj.push_back(grlinfo->getN2Dfindertrk());
-      obj.push_back(grlinfo->getNcluster());
-      obj.push_back(grlinfo->getNhighcluster1());
-      obj.push_back(grlinfo->getNhighcluster2());
-      obj.push_back(grlinfo->getNneucluster());
-      obj.push_back(grlinfo->getNbbCluster());
-      obj.push_back(grlinfo->getBhabhaVeto());
-      obj.push_back(grlinfo->geteclBhabhaVeto());
-      obj.push_back(grlinfo->getsBhabhaVeto());
+      obj.push_back(grlinfo->getN2Dfindertrk()); //0
+      obj.push_back(grlinfo->getNcluster());//1
+      obj.push_back(grlinfo->getNhighcluster1());//2
+      obj.push_back(grlinfo->getNhighcluster2());//3
+      obj.push_back(grlinfo->getNhighcluster3());//4
+      obj.push_back(grlinfo->getNneucluster());//5
+      obj.push_back(grlinfo->getNbbCluster());//6
+      obj.push_back(grlinfo->getNbbTrkCluster());//7
+      obj.push_back(grlinfo->getBhabhaVeto());//8
+      obj.push_back(grlinfo->geteclBhabhaVeto());//9
+      obj.push_back(grlinfo->getsBhabhaVeto());//10
 
       int L1Summary = 0;
       std::vector<int> trgres;

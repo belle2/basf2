@@ -63,6 +63,12 @@ namespace Belle2 {
     //! Total number of processed events and found tracks
     int m_nEvents;
     int m_nTracks;
+
+    /**name of StoreArray Tracks*/
+    std::string m_klmtrackCollectionName;
+    /**name of StoreArray Hits*/
+    std::string m_klmhitCollectionName;
+
   };
 
 } // namespace Belle2

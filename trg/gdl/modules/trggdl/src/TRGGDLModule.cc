@@ -44,7 +44,7 @@ namespace Belle2 {
     : Module::Module(),
       _debugLevel(0),
       _configFilename("TRGGDLConfig.dat"),
-      _simulationMode(2),
+      _simulationMode(1),
       _fastSimulationMode(0),
       _firmwareSimulationMode(0)
   {
@@ -96,7 +96,7 @@ namespace Belle2 {
       cout << TRGDebug::tab(4) << "debug level = " << TRGDebug::level()
            << endl;
     }
-    StoreObjPtr<TRGGDLResults>::registerPersistent();
+    StoreObjPtr<TRGGDLResults>::registerPersistent("TrgGDLResults");
   }
 
   void

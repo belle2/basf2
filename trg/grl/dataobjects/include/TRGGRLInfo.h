@@ -43,6 +43,8 @@ namespace Belle2 {
     int getNhighcluster1() const {return m_n_high_300_cluster;}
     //get the number of eclcluster >1GeV
     int getNhighcluster2() const {return m_n_high_1000_cluster;}
+    //get the number of eclcluster >2GeV
+    int getNhighcluster3() const {return m_n_high_2000_cluster;}
     //get the number of eclclusters without associated tracks
     int getNneucluster() const {return m_n_neutral_cluster;}
     //get the number of klm tracks
@@ -65,6 +67,8 @@ namespace Belle2 {
     int getggAccept2() const  {return m_gg_accept2;}
     //get the number of back to back cluster pairs
     int getNbbCluster() const  {return m_nbbc;}
+    //get the number of back to back cdc track and ecl cluster pairs
+    int getNbbTrkCluster() const  {return m_nbbtc;}
 
     //set the number of 2D tracks
     void setN2Dfindertrk(int N2Dfindertrk)  {m_n_2dfinder_track = N2Dfindertrk;}
@@ -86,6 +90,8 @@ namespace Belle2 {
     void setNhighcluster1(int Nclusterh1)  {m_n_high_300_cluster = Nclusterh1;}
     //set the number of cluster >1 GeV
     void setNhighcluster2(int Nclusterh2)  {m_n_high_1000_cluster = Nclusterh2;}
+    //set the number of cluster >2 GeV
+    void setNhighcluster3(int Nclusterh3)  {m_n_high_2000_cluster = Nclusterh3;}
     //set the number of cluster w/o associated tracks
     void setNneucluster(int Nneucluster)  {m_n_neutral_cluster = Nneucluster;}
     //set the number of klm tracks
@@ -108,6 +114,8 @@ namespace Belle2 {
     void setggAccept2(int gga2)  {m_gg_accept2 = gga2;}
     //set the number of back to back eclcluster pairs
     void setNbbCluster(int nbbc)  {m_nbbc = nbbc;}
+    //set the number of back to back track and eclcluster pairs
+    void setNbbTrkCluster(int nbbtc)  {m_nbbtc = nbbtc;}
 
 
   private:
@@ -133,8 +141,13 @@ namespace Belle2 {
     int m_n_high_300_cluster;
     /**# ecl clusers with energy threshold 1GeV, TC ID 1,2,17 is exlcuded for dedicated single photon trigger */
     int m_n_high_1000_cluster;
+    /**# ecl clusers with energy threshold 2GeV */
+    int m_n_high_2000_cluster;
     /**# back to back ecl cluser pairs */
     int m_nbbc;
+    /**# back to back cdc track and ecl clsuter*/
+    int m_nbbtc;
+
     /**# klm track*/
     int m_n_klm_track;
     /**# klm hit*/

@@ -95,6 +95,10 @@ namespace Belle2 {
     std::string m_TrgECLClusterName;
     /** Name of the StoreArray holding the ecl trg result*/
     std::string m_TrgECLTrgsName;
+    /**the collection of klm hits*/
+    std::string m_KLMHitName;
+    /**the collection of klm tracks*/
+    std::string m_KLMTrackName;
     /**the collection of energy threshold used in the projects*/
     std::vector<double> m_energythreshold;
     /**ecl cluster time window to suppress beam induced background*/
@@ -102,6 +106,7 @@ namespace Belle2 {
 
     /**convert the unit of angle from rad to degree*/
     double m_RtD;
+
 
   };
 

@@ -53,11 +53,11 @@ TRGGRLMatchModule::TRGGRLMatchModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("DrMatch", m_dr_threshold, "the threshold of dr between track and cluster if they are matched successfully", 25.);
   addParam("DzMatch", m_dz_threshold, "the threshold of dz between track and cluster if they are matched successfully", 30.);
-  addParam("2DtrackCollection", m_2d_tracklist, "the 2d track list used in the match", std::string("Trg2DFinderTracks"));
-  addParam("3DtrackCollection", m_3d_tracklist, "the 3d track list used in the match", std::string("TrgNNTracks"));
+  addParam("2DtrackCollection", m_2d_tracklist, "the 2d track list used in the match", std::string("TRG2DFinderTracks"));
+  addParam("3DtrackCollection", m_3d_tracklist, "the 3d track list used in the match", std::string("TRGNNTracks"));
   addParam("TRGECLClusterCollection", m_clusterlist, "the cluster list used in the match", std::string("TRGECLClusters"));
-  addParam("2DmatchCollection", m_2dmatch_tracklist, "the 2d tracklist with associated cluster", std::string("Trg2DMatchTracks"));
-  addParam("3DmatchCollection", m_3dmatch_tracklist, "the 3d NN tracklist with associated cluster", std::string("Trg3DMatchTracks"));
+  addParam("2DmatchCollection", m_2dmatch_tracklist, "the 2d tracklist with associated cluster", std::string("TRG2DMatchTracks"));
+  addParam("3DmatchCollection", m_3dmatch_tracklist, "the 3d NN tracklist with associated cluster", std::string("TRG3DMatchTracks"));
 
 
 }

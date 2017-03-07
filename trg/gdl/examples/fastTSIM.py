@@ -16,25 +16,27 @@ from ecltrigger import add_ecl_trigger
 from grltrigger import *
 from gdltrigger import add_gdl_trigger
 from klmtrigger import add_klm_trigger
+from modularAnalysis import *
 
 import glob
 
 main = create_path()
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
-main.add_module(eventinfosetter)
+# main.add_module(eventinfosetter)
 
 babayaganlo = register_module('BabayagaNLOInput')
 babayaganlo.param('FMax', 7.5e4)
 babayaganlo.param('FinalState', 'ee')
 babayaganlo.param('MaxAcollinearity', 180.0)
-babayaganlo.param('ScatteringAngleRange', [10.0, 165.0])
+babayaganlo.param('ScatteringAngleRange', [15.0, 165.0])
 # babayaganlo.param('VacuumPolarization', 'hadr5')
 babayaganlo.param('VacuumPolarization', 'hlmnt')
 babayaganlo.param('SearchMax', 10000)
 babayaganlo.param('VPUncertainty', True)
-main.add_module(babayaganlo)
+# main.add_module(babayaganlo)
 
+generateY4S(10, "mixed.dec", main)
 
 add_simulation(main)
 
@@ -48,7 +50,7 @@ add_gdl_trigger(main)
 
 # output
 rootoutput = register_module('RootOutput')
-rootoutput.param('outputFileName', "test.root")
+rootoutput.param('outputFileName', "BBmixed.root")
 main.add_module(rootoutput)
 
 

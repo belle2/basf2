@@ -32,6 +32,10 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
+
+
+
+
 using namespace std;
 
 namespace Belle2 {
@@ -60,7 +64,7 @@ namespace Belle2 {
     addParam("SimulationMode",
              _simulationMode,
              "TRGGRL simulation switch",
-             _simulationMode);
+             1);
     addParam("FastSimulationMode",
              _fastSimulationMode,
              "TRGGRL fast simulation mode",
@@ -71,42 +75,41 @@ namespace Belle2 {
              _firmwareSimulationMode);
     addParam("2DfinderCollection", m_2DfinderCollectionName,
              "Name of the StoreArray holding the tracks made by the 2D finder to be used as input.",
-             string("Trg2DFinderTracks"));
+             string("TRG2DFinderTracks"));
     addParam("2DfitterCollection", m_2DfitterCollectionName,
              "Name of the StoreArray holding the tracks made by the 2D fitter to be used as input.",
-             string("Trg2DFitterTracks"));
+             string("TRG2DFitterTracks"));
     addParam("3DfitterCollection", m_3DfitterCollectionName,
              "Name of the StoreArray holding the tracks made by the 3D fitter to be used as input.",
-             string("Trg3DFitterTracks"));
+             string("TRG3DFitterTracks"));
     addParam("NNCollection", m_NNCollectionName,
              "Name of the StoreArray holding the tracks made by the neural network (NN).",
-             string("TrgNNTracks"));
+             string("TRGNNTracks"));
     addParam("2DmatchCollection", m_2DmatchCollectionName,
              "Name of the StoreArray holding the macthed tracks and clusters made by the 2D fitter.",
-             string("Trg2DMatchTracks"));
+             string("TRG2DMatchTracks"));
     addParam("3DmatchCollection", m_3DmatchCollectionName,
              "Name of the StoreArray holding the matched 3D NN tracks and clusters made",
-             string("Trg3DMatchTracks"));
+             string("TRG3DMatchTracks"));
     addParam("TrgGrlInformation", m_TrgGrlInformationName,
              "Name of the StoreArray holding the information of tracks and clusters from cdc ecl klm.",
-             string("TrgGrlInformation"));
+             string("TRGGRLObjects"));
     addParam("TRGECLClusters", m_TrgECLClusterName,
              "Name of the StoreArray holding the information of trigger ecl clusters ",
              string("TRGECLClusters"));
     addParam("TRGECLTrgs", m_TrgECLTrgsName,
              "Name of the StoreArray holding the information of ecl trigger",
              string("TRGECLTrgs"));
-//    addParam("KLM", m_KLM,
-//             "Name of the StoreArray holding the information of trigger ecl clusters ",
-//            string("KLMHits"));
+    addParam("TrgKLMTracks", m_KLMTrackName,
+             "Name of the StoreArray holding the information of klm track ",
+             string("TRGKLMTracks"));
+    addParam("TrgKLMHits", m_KLMHitName,
+             "Name of the StoreArray holding the information of klm hit",
+             string("TRGKLMHits"));
     addParam("ECLClusterTimeWindow", m_eclClusterTimeWindow,
              "The time window of the signal eclclusters",
              100.0);
-    std::vector<double> thre;
-    thre.push_back(0.1);
-    thre.push_back(0.3);
-    thre.push_back(1.0);
-    addParam("ClusEngThreshold", m_energythreshold, "The energy threshold of clusters", thre);
+    addParam("ClusEngThreshold", m_energythreshold, "The energy threshold of clusters", {0.1, 0.3, 1.0, 2.0});
 
     if (TRGDebug::level())
       cout << "TRGGRLProjectsModule ... created" << endl;
@@ -137,12 +140,13 @@ namespace Belle2 {
     StoreArray<TRGECLCluster>::required(m_TrgECLClusterName);
     StoreArray<TRGECLTrg>::required(m_TrgECLTrgsName);
 
-    StoreArray<KLMTriggerHit>::required();
-    StoreArray<KLMTriggerTrack>::required();
+    StoreArray<KLMTriggerHit>::required(m_KLMHitName);
+    StoreArray<KLMTriggerTrack>::required(m_KLMTrackName);
 
-    StoreObjPtr<TRGGRLInfo>::registerPersistent();
+    StoreObjPtr<TRGGRLInfo>::registerPersistent(m_TrgGrlInformationName);
 
     m_RtD = 180. / 3.1415926;
+
 
   }
 
@@ -152,6 +156,7 @@ namespace Belle2 {
 
     //...GDL config. name...
     string cfn = _configFilename;
+
 
     if (TRGDebug::level()) {
       cout << "TRGGDLModule ... beginRun called " << endl;
@@ -183,7 +188,7 @@ namespace Belle2 {
     int n_klmhit = klmhit.getEntries();
     //number of ecl clusters without time requirement
     // int ncluster_ori = eclclusters.getEntries();
-    StoreObjPtr<TRGGRLInfo> trgInfo;
+    StoreObjPtr<TRGGRLInfo> trgInfo(m_TrgGrlInformationName);
     trgInfo.create();
     trgInfo->setN2Dfindertrk(ntrk_2dfinder);
     trgInfo->setN2Dfittertrk(ntrk_2dfitter);
@@ -216,7 +221,7 @@ namespace Belle2 {
       if (fabs(ctime) < m_eclClusterTimeWindow) clustersinwindow.push_back(eclclusters[i]);
     }
     //get the number of clusers with specific threshold in the time window
-    int nclus[3] = {0, 0, 0};
+    int nclus[4] = {0, 0, 0, 0};
     for (unsigned int i = 0; i < clustersinwindow.size(); i++) {
       double energy_clu = clustersinwindow[i]->getEnergyDep();
       //if (energy_clu > m_energythreshold[0]) nclus[0]++;
@@ -230,16 +235,18 @@ namespace Belle2 {
         double  theta1 = vec1.Theta() * m_RtD;
         if (theta1 > 30. && theta1 < 140.)nclus[2]++;
       }
+      if (energy_clu > m_energythreshold[3]) nclus[3]++;
 
     }
     trgInfo->setNhighcluster1(nclus[1]);
     trgInfo->setNhighcluster2(nclus[2]);
+    trgInfo->setNhighcluster3(nclus[3]);
     trgInfo->setNneucluster(nclus[0]);
     trgInfo->setNcluster(clustersinwindow.size());
 
     //Bhabha----------------begin
     int bhabha_bit = 0;
-    if (ntrk_mat3d >= 2) {
+    if (ntrk_mat3d == 2 && ntrk_2dfinder) {
       for (int i = 0; i < ntrk_mat3d - 1; i++) {
         const TRGECLCluster* eclcluster1 = tracks3Dmatch[i]->getRelatedTo<TRGECLCluster>();
         const CDCTriggerTrack* cdctrk1 = tracks3Dmatch[i]->getRelatedTo<CDCTriggerTrack>(m_NNCollectionName);
@@ -274,9 +281,8 @@ namespace Belle2 {
 //count the back-to-back cluster pair here as well
     int eclbhabha_bit = 0;
     int nbb_cluster = 0;
-    if (clustersinwindow.size() == 2) {
+    if (clustersinwindow.size() >= 2) {
       for (unsigned i = 0; i < clustersinwindow.size() - 1; i++) {
-
         TRGECLCluster* cluster1 = clustersinwindow[i];
         double e1 = cluster1->getEnergyDep();
         double  x1 = cluster1->getPositionX();
@@ -286,6 +292,7 @@ namespace Belle2 {
         double  theta1 = vec1.Theta() * m_RtD;
         double  phi1 = vec1.Phi() * m_RtD;
         if (phi1 < 0) phi1 += 360.;
+
         for (unsigned j = i + 1; j < clustersinwindow.size(); j++) {
           TRGECLCluster* cluster2 = clustersinwindow[j];
           double e2 = cluster2->getEnergyDep();
@@ -324,6 +331,33 @@ namespace Belle2 {
     trgInfo->setsBhabhaVeto(sbhabha_bit);
 //single track bahbhaveto-------end
 
+
+//the back to back track and ecl cluster pair -----begin
+    int npair_tc = 0;
+    for (int i = 0; i < tracksNN.getEntries(); i++) {
+      double phi = tracksNN[i]->getPhi0() * m_RtD;
+      if (phi < 0) phi += 360.;
+      double tanLam = tracksNN[i]->getTanLambda();
+      double theta = acos(tanLam / sqrt(1. + tanLam * tanLam)) * m_RtD;
+      for (unsigned j = 0; j < clustersinwindow.size(); j++) {
+        TRGECLCluster* cluster = clustersinwindow[j];
+        double  x = cluster->getPositionX();
+        double  y = cluster->getPositionY();
+        double  z = cluster->getPositionZ();
+        TVector3 vec(x, y, z);
+        double  theta2 = vec.Theta() * m_RtD;
+        double  phi2 = vec.Phi() * m_RtD;
+        if (phi2 < 0) phi2 += 360.;
+        double deltphi = fabs(fabs(phi - phi2) - 180);
+        double delttheta = fabs(fabs(theta + theta2) - 180);
+        if (deltphi < 60. && delttheta < 60.) npair_tc++;
+      }
+    }
+    trgInfo->setNbbTrkCluster(npair_tc);
+//the back to back track and ecl cluster pair -----end
+
+
+
 //the neutral cluster counting
     int nneu_cluster = 0;
     if (!clustersinwindow.empty()) {
@@ -334,10 +368,6 @@ namespace Belle2 {
     }
     trgInfo->setNneucluster(nneu_cluster);
 
-//bhabha accept 1
-//bhabha accept 2
-//gg accept 1
-//gg accept 2
 
 
   }

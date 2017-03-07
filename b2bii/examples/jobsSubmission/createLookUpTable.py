@@ -13,28 +13,22 @@ import os
 import sys
 import re
 import urllib.request
+import configparser
 
 
 def countEventsInUrl(link):
-
     f = urllib.request.urlopen(link)
-
     # put webpage content into string format
     myfile = str(f.read(), 'utf-8')
-
     # get everything after 'Total events' string
     nEventsStr = myfile.split("Total events: ")[1].split()[0]
-
     # get the actual number of events
     nEvents = int(re.search(r'\d+', nEventsStr).group())
-
     return nEvents
 
 
 def getBelleMCUrl(expNo, startRun, endRun, eventType, dataType, belleLevel, streamNo):
-
     header = 'http://bweb3/montecarlo.php?'
-
     return header +\
         'ex=' + str(expNo) +\
         '&rs=' + str(startRun) +\
@@ -45,6 +39,17 @@ def getBelleMCUrl(expNo, startRun, endRun, eventType, dataType, belleLevel, stre
         '&st=' + str(streamNo)
 
 
+def getBelleDataUrl(expNo, startRun, endRun, skimType, dataType, belleLevel):
+    header = 'http://bweb3/mdst.php?'
+    return header +\
+        'ex=' + str(expNo) +\
+        '&rs=' + str(startRun) +\
+        '&re=' + str(endRun) +\
+        '&skm=' + skimType +\
+        '&dt=' + dataType +\
+        '&bl=' + belleLevel
+
+
 def addLine(aList):
     writeStr = ''
     for el in aList:
@@ -53,50 +58,102 @@ def addLine(aList):
     f.write(writeStr)
     print('Added line to table: ' + writeStr)
 
+
+def getMaxRunNo(expNo):
+
+    maxRunNoDict = {
+        65: 900,
+        63: 800,
+        61: 1300,
+        55: 1800,
+        51: 1900,
+        49: 1000,
+        47: 900,
+        45: 500,
+        43: 1200,
+        41: 1300,
+        39: 1400,
+        37: 2000,
+        35: 700,
+        33: 900,
+        31: 1800,
+        27: 1700,
+        25: 2200,
+        23: 700,
+        21: 400,
+        19: 1800,
+        17: 1000,
+        15: 1500,
+        13: 1700,
+        11: 1400,
+        9: 1300,
+        7: 2900}
+
+    return int(maxRunNoDict.get(expNo))
+
 # --------------------------- main function ---------------------------
+# print debug messages ?
+debug = False
 
-# change min number of events per job here
-if len(sys.argv) > 1:
-    thresholdEventsNo = int(sys.argv[1])
-else:
-    thresholdEventsNo = 150000
+if len(sys.argv) == 1:
+    sys.exit('Need one argument: path of config file with job parameters !')
 
+# read jobs parameters from config file
+config = configparser.ConfigParser()
+config.read(sys.argv[1])
+thresholdEventsNo = int(config['Config']['thresholdEventsNo'])
+expNoList = list(map(int, config['Config']['expNo'].split(',')))
+
+eventTypeList = ['evtgen-charged', 'evtgen-mixed']
 # assuming interest only in this type of events
-# otherwise can define ranges and then loop on them
-expNo = 65
+# otherwise can define lists and then loop on them
 dataType = 'on_resonance'
 belleLevel = 'caseB'
-
-# max for run number for exp number 65
-# can define dictionary (expNo: maxRunNo) for all exp numbers
-absMaxRunNo = 850
 
 f = open('belleMClookUpTable.txt', 'w')
 
 # write one line for each job will submit
-# grouping the smallest set of runs that has more than N events
-for eventType in ['evtgen-charged', 'evtgen-mixed']:
-    for streamNo in range(0, 10):
+# grouping the smallest set of runs that has more than Nthreshold events
+for expNo in expNoList:
 
-        minRunNo = 1
-        while minRunNo < absMaxRunNo:  # stop searching for runs after maxRunNo
+    absMaxRunNo = getMaxRunNo(expNo)
+    if absMaxRunNo is None:
+        sys.exit('ExpNo ' + str(expNo) + ' not found. Does it exist ?')
 
-            maxRunNo = minRunNo + 1
+    if debug:
+        print('For expNo ' + str(expNo) + ' max runNo is ' + str(absMaxRunNo))
 
-            # create the smallest set of runs that has more than N events
-            for add in range(1, 1000):
+    if expNo in range(7, 28):
+        streamNoList = range(10, 20)
+    elif expNo in range(31, 66):
+        streamNoList = range(0, 10)
 
-                maxRunNo = minRunNo + add
+    for eventType in eventTypeList:
+        for streamNo in streamNoList:
 
-                thisUrl = getBelleMCUrl(expNo, minRunNo, maxRunNo,
-                                        eventType, dataType, belleLevel, streamNo)
+            minRunNo = 1
+            while minRunNo < absMaxRunNo:  # stop searching for runs after maxRunNo
 
-                thisUrlCount = countEventsInUrl(thisUrl)
+                maxRunNo = minRunNo + 1
 
-                if maxRunNo > absMaxRunNo or thisUrlCount > thresholdEventsNo:
-                    break
+                # create the smallest set of runs that has more than Nthreshold events
+                for add in range(1, 1000):
 
-            addLine([expNo, streamNo, eventType, minRunNo, maxRunNo])
+                    maxRunNo = minRunNo + add
 
-            minRunNo = maxRunNo + 1
+                    thisUrl = getBelleMCUrl(expNo, minRunNo, maxRunNo,
+                                            eventType, dataType, belleLevel, streamNo)
+                    if debug:
+                        print('checking up url: ' + thisUrl)
+
+                    thisUrlCount = countEventsInUrl(thisUrl)
+                    if debug:
+                        print('count is up to: ' + str(thisUrlCount))
+
+                    if maxRunNo > absMaxRunNo or thisUrlCount > thresholdEventsNo:
+                        break
+
+                addLine([expNo, streamNo, eventType, minRunNo, maxRunNo])
+
+                minRunNo = maxRunNo + 1
 f.close()

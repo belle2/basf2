@@ -49,17 +49,6 @@
 #pragma link C++ class std::vector<SpacePointInfo>+;
 #pragma link C++ class Belle2::ObserverInfo+;
 
-// #pragma link C++ class Belle2::BaseTFInfo+;
-// #pragma link C++ class Belle2::CellTFInfo+;
-// #pragma link C++ class Belle2::SectorTFInfo+;
-// #pragma link C++ class Belle2::HitTFInfo+;
-// #pragma link C++ class Belle2::CollectorTFInfo+;
-// #pragma link C++ class Belle2::AnalizerCollectorTFInfo+;
-// #pragma link C++ class Belle2::TrackCandidateTFInfo+;
-// #pragma link C++ class Belle2::ClusterTFInfo+;
-// #pragma link C++ class Belle2::RootSectorMap+;
 #pragma link C++ namespace Belle2::VXDTFRawSecMapTypedef+; //implicit
 #pragma link C++ namespace Belle2::VXDTFSecMapTypedef+; //implicit
 
-// #pragma link C++ namespace Belle2::VXDTFRawSecMapTypedef+;
-// #pragma link C++ namespace Belle2::VXDTFSecMapTypedef+;

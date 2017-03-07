@@ -182,7 +182,7 @@ namespace Belle2 {
       /**
        * Cal Hit eff.
        */
-      void HitEfficiency(const Belle2::Helix h);
+      void HitEfficiency(const Belle2::RecoTrack* track);
 
       /**
        * Convert slayer and ilayer to iclayer.
@@ -227,6 +227,7 @@ namespace Belle2 {
       TH1* m_hNormalizedResidualU[56];        /**< Residual distribution normalized with tracking error.  */
       TH2* m_hNDFNormalizedResidualU[56];     /**< Normalized residual vs. ndf. */
       TH2* m_hDxDt[56];                       /**< Unbiased x_fit vs. drift time. */
+      TProfile* m_hHitEff_soft[56];           /**< Hit efficience of each layer, software */
       TH2* m_h2DHitDistInCDCHit;              /**< 2D Hit Dist.(ICLay vs IWire) from CDCHit. */
       TH2* m_h2DHitDistInTrCand;              /**< 2D Hit Dist.(ICLay vs IWire) of Track candidates. */
       TH2* m_h2DHitDistInTrack;               /**< 2D Hit Dist..(ICLay vs IWire) have weight>0.5 after fit with DAF */

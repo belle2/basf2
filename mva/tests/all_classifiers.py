@@ -28,13 +28,12 @@ if __name__ == "__main__":
     general_options.m_target_variable = "isSignal"
 
     methods = [
-            ('Trivial.xml', basf2_mva.TrivialOptions()),
-            ('Python.xml', basf2_mva.PythonOptions()),
-            # ('NeuroBayes.xml', basf2_mva.NeuroBayesOptions()),
-            ('FastBDT.xml', basf2_mva.FastBDTOptions()),
-            ('TMVAClassification.xml', basf2_mva.TMVAOptionsClassification()),
-            ('FANN.xml', basf2_mva.FANNOptions()),
-            ]
+        ('Trivial.xml', basf2_mva.TrivialOptions()),
+        ('Python.xml', basf2_mva.PythonOptions()),
+        ('FastBDT.xml', basf2_mva.FastBDTOptions()),
+        ('TMVAClassification.xml', basf2_mva.TMVAOptionsClassification()),
+        ('FANN.xml', basf2_mva.FANNOptions()),
+    ]
 
     olddir = os.getcwd()
     with tempfile.TemporaryDirectory() as tempdir:

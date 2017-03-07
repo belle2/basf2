@@ -96,6 +96,9 @@ class CDCSVGDisplayModule(basf2.Module):
         #: Switch to draw the MCParticle::hasStatus(c_PrimaryParticle) property. Default: inactive
         self.draw_mcparticle_primary = False
 
+        #: Switch to draw the ideal trajectory of the MCParticle. Default: inactive
+        self.draw_mcparticle_trajectories = False
+
         #: Switch to draw the CDCSimHits with momentum information. Default: inactive
         self.draw_simhits = False
 
@@ -248,6 +251,7 @@ class CDCSVGDisplayModule(basf2.Module):
             'draw_mcparticle_id',
             'draw_mcparticle_pdgcode',
             'draw_mcparticle_primary',
+            'draw_mcparticle_trajectories',
             'draw_mcsegments',
             'draw_simhits',
             'draw_simhit_tof',
@@ -830,7 +834,7 @@ class CDCSVGDisplayModule(basf2.Module):
         # Draw the RecoTracks
         if self.draw_recotracks:
             if self.use_cpp:
-                cppplotter.drawRecoTracks(self.reco_tracks_store_array_name, 'ListColors', '')
+                cppplotter.drawRecoTracks(self.reco_tracks_store_array_name, '', '')
             if self.use_python:
                 styleDict = {'stroke': attributemaps.listColors}
                 plotter.draw_storearray(self.reco_tracks_store_array_name, **styleDict)
@@ -858,6 +862,13 @@ class CDCSVGDisplayModule(basf2.Module):
                 styleDict = {'stroke': 'black'}
                 plotter.draw_outer_cdc_wall(**styleDict)
                 plotter.draw_inner_cdc_wall(**styleDict)
+
+        # Draw the trajectories of the reco tracks
+        if self.draw_mcparticle_trajectories:
+            if self.use_cpp:
+                cppplotter.drawMCParticleTrajectories("MCParticles", 'black', '')
+            if self.use_python:
+                print("Python backend can not draw mc particles")
 
         # Draw the fits to the segments
         if self.draw_segment_trajectories:

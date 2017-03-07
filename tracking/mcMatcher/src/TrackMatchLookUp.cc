@@ -25,18 +25,18 @@ TrackMatchLookUp::TrackMatchLookUp(const std::string& mcRecoTrackStoreArrayName,
   }
 }
 
-bool TrackMatchLookUp::isMCRecoTrack(const RecoTrack& recoTrack)
+bool TrackMatchLookUp::isMCRecoTrack(const RecoTrack& recoTrack) const
 {
   return recoTrack.getArrayName() == getMCTracksStoreArrayName();
 }
 
-bool TrackMatchLookUp::isPRRecoTrack(const RecoTrack& recoTrack)
+bool TrackMatchLookUp::isPRRecoTrack(const RecoTrack& recoTrack) const
 {
   return recoTrack.getArrayName() == getPRTracksStoreArrayName();
 }
 
 const RecoTrack*
-TrackMatchLookUp::getRelatedMCRecoTrack(const RecoTrack& prRecoTrack, float& purity)
+TrackMatchLookUp::getRelatedMCRecoTrack(const RecoTrack& prRecoTrack, float& purity) const
 {
   assert(isPRRecoTrack(prRecoTrack));
   std::pair<RecoTrack*, float> mcRecoTrackAndWeight =
@@ -51,7 +51,7 @@ TrackMatchLookUp::getRelatedMCRecoTrack(const RecoTrack& prRecoTrack, float& pur
 }
 
 const RecoTrack*
-TrackMatchLookUp::getRelatedPRRecoTrack(const RecoTrack& mcRecoTrack, float& efficiency)
+TrackMatchLookUp::getRelatedPRRecoTrack(const RecoTrack& mcRecoTrack, float& efficiency) const
 {
   assert(isMCRecoTrack(mcRecoTrack));
   std::pair<RecoTrack*, float> prRecoTrackAndWeight =
@@ -68,7 +68,7 @@ TrackMatchLookUp::getRelatedPRRecoTrack(const RecoTrack& mcRecoTrack, float& eff
 TrackMatchLookUp::MCToPRMatchInfo
 TrackMatchLookUp::extractMCToPRMatchInfo(const RecoTrack& mcRecoTrack,
                                          const RecoTrack* prRecoTrack,
-                                         const float& efficiency)
+                                         const float& efficiency) const
 {
   if (not prRecoTrack) return MCToPRMatchInfo::c_Missing;
   if (std::isnan(efficiency)) return MCToPRMatchInfo::c_Invalid;
@@ -88,7 +88,7 @@ TrackMatchLookUp::extractMCToPRMatchInfo(const RecoTrack& mcRecoTrack,
 TrackMatchLookUp::PRToMCMatchInfo
 TrackMatchLookUp::extractPRToMCMatchInfo(const RecoTrack& prRecoTrack,
                                          const RecoTrack* mcRecoTrack,
-                                         const float& purity __attribute__((unused)))
+                                         const float& purity __attribute__((unused))) const
 {
   assert(isPRRecoTrack(prRecoTrack));
   const RecoTrack::MatchingStatus matchingStatus = prRecoTrack.getMatchingStatus();
@@ -109,19 +109,19 @@ TrackMatchLookUp::extractPRToMCMatchInfo(const RecoTrack& prRecoTrack,
   return PRToMCMatchInfo::c_Invalid;
 }
 
-const MCParticle* TrackMatchLookUp::getRelatedMCParticle(const RecoTrack& recoTrack)
+const MCParticle* TrackMatchLookUp::getRelatedMCParticle(const RecoTrack& recoTrack) const
 {
   return recoTrack.getRelatedTo<MCParticle>();
 }
 
-const RecoTrack* TrackMatchLookUp::getRelatedMCRecoTrack(const RecoTrack& prRecoTrack)
+const RecoTrack* TrackMatchLookUp::getRelatedMCRecoTrack(const RecoTrack& prRecoTrack) const
 {
   assert(isPRRecoTrack(prRecoTrack));
   return prRecoTrack.getRelatedTo<RecoTrack>(getMCTracksStoreArrayName());
 }
 
 const TrackFitResult* TrackMatchLookUp::getRelatedTrackFitResult(const RecoTrack& prRecoTrack,
-    Const::ChargedStable chargedStable)
+    Const::ChargedStable chargedStable) const
 {
   assert(isPRRecoTrack(prRecoTrack));
   Belle2::Track* b2track = prRecoTrack.getRelatedFrom<Belle2::Track>();
@@ -133,13 +133,13 @@ const TrackFitResult* TrackMatchLookUp::getRelatedTrackFitResult(const RecoTrack
   }
 }
 
-const RecoTrack* TrackMatchLookUp::getRelatedPRRecoTrack(const RecoTrack& mcRecoTrack)
+const RecoTrack* TrackMatchLookUp::getRelatedPRRecoTrack(const RecoTrack& mcRecoTrack) const
 {
   assert(isMCRecoTrack(mcRecoTrack));
   return mcRecoTrack.getRelatedTo<RecoTrack>(getPRTracksStoreArrayName());
 }
 
-float TrackMatchLookUp::getRelatedPurity(const RecoTrack& prRecoTrack)
+float TrackMatchLookUp::getRelatedPurity(const RecoTrack& prRecoTrack) const
 {
   assert(isPRRecoTrack(prRecoTrack));
   float purity = NAN;
@@ -147,7 +147,7 @@ float TrackMatchLookUp::getRelatedPurity(const RecoTrack& prRecoTrack)
   return std::fabs(purity);
 }
 
-float TrackMatchLookUp::getRelatedEfficiency(const RecoTrack& mcRecoTrack)
+float TrackMatchLookUp::getRelatedEfficiency(const RecoTrack& mcRecoTrack) const
 {
   assert(isMCRecoTrack(mcRecoTrack));
   float efficiency = NAN;
@@ -155,7 +155,7 @@ float TrackMatchLookUp::getRelatedEfficiency(const RecoTrack& mcRecoTrack)
   return std::fabs(efficiency);
 }
 
-const RecoTrack* TrackMatchLookUp::getMatchedMCRecoTrack(const RecoTrack& prRecoTrack)
+const RecoTrack* TrackMatchLookUp::getMatchedMCRecoTrack(const RecoTrack& prRecoTrack) const
 {
   assert(isPRRecoTrack(prRecoTrack));
 
@@ -169,7 +169,7 @@ const RecoTrack* TrackMatchLookUp::getMatchedMCRecoTrack(const RecoTrack& prReco
   }
 }
 
-const RecoTrack* TrackMatchLookUp::getMatchedPRRecoTrack(const RecoTrack& mcRecoTrack)
+const RecoTrack* TrackMatchLookUp::getMatchedPRRecoTrack(const RecoTrack& mcRecoTrack) const
 {
   assert(isMCRecoTrack(mcRecoTrack));
 
@@ -183,7 +183,7 @@ const RecoTrack* TrackMatchLookUp::getMatchedPRRecoTrack(const RecoTrack& mcReco
   }
 }
 
-float TrackMatchLookUp::getMatchedPurity(const RecoTrack& recoTrack)
+float TrackMatchLookUp::getMatchedPurity(const RecoTrack& recoTrack) const
 {
   if (isMCRecoTrack(recoTrack)) {
     const RecoTrack& mcRecoTrack = recoTrack;
@@ -205,7 +205,7 @@ float TrackMatchLookUp::getMatchedPurity(const RecoTrack& recoTrack)
   }
 }
 
-float TrackMatchLookUp::getMatchedEfficiency(const RecoTrack& recoTrack)
+float TrackMatchLookUp::getMatchedEfficiency(const RecoTrack& recoTrack) const
 {
   if (isPRRecoTrack(recoTrack)) {
     const RecoTrack& prRecoTrack = recoTrack;

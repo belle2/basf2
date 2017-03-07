@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-#include "trg/ecl/TrgEclFAM.h"
+//#include "trg/ecl/TrgEclFAM.h"
 #include "trg/ecl/TrgEclMapping.h"
 #include "TVector3.h"
 //
@@ -43,13 +43,20 @@ namespace Belle2 {
   public:
 
     /** set ICN for each part(Fw,Br,Bw) */
-    void setICN(int HitTC[][64], int);
+    void setICN(std::vector<int> , std::vector<double>, std::vector<double>);
+    /** Save Cluster information in TRGECLCluster Table */
+    void save(int);
     /**  calculate ICN in Barrel */
-    int setBarrelICN(int HitTC[][64], int);
+    int setBarrelICN(int);
     /**  calculate ICN in Foward endcap */
-    int setForwardICN(int HitTC[][64], int);
+    int setForwardICN(int);
     /** calculate ICN in Backward endcap */
-    int setBackwardICN(int HitTC[][64], int);
+    int setBackwardICN(int);
+    /** Set EventId */
+    void setEventId(int eventId) {_EventId = eventId; }
+    /** Set */
+    void setClusteringMethod(int method) {_Method = method; }
+
     //
     //
     /** get ICN in Barrel and Forward */
@@ -63,8 +70,6 @@ namespace Belle2 {
      * FwBrBwId = 0(Fw),1(Br),2(Bw)
      * QuadrantId = 0,1,2,3
      */
-    /** get ICN in QuadrantId in Fw or Br or Bw. */
-    int getICNQuadrant(int FwBrBwId, int QuadrantId);
     /** */
     int getBrICNCluster(int ICNId, int);///0 : center , 1; upper , 2: right , 3: lower , 4: lower right
     /** */
@@ -73,24 +78,13 @@ namespace Belle2 {
     int getFwICNCluster(int ICNId, int);///0 : center , 1; upper , 2: right , 3: lower , 4: lower right
     /** Output # of cluster */
     int getNofCluster() {return _BRICN + _FWDICN + _BWDICN;}
-    /** Ouput # of TC in Cluster */
-    int getNofTCinCluster(int icluster) {return NofTCinCluster[icluster];}
 
-    /** Output cluster Energy  */
-    double getClusterEnergy(int icluster) {return ClusterEnergy[icluster];}
-    /**Output cluster timing  */
-    double getClusterTiming(int icluster) {return ClusterTiming[icluster];}
-    /** Output cluster position */
-    TVector3 getClusterPosition(int icluster) {return TVector3(ClusterPositionX[icluster], ClusterPositionY[icluster], ClusterPositionZ[icluster]);}/// Output cluster position
-    /** Output maximum contribution TC Id in Cluster  */
-    int getMaxTCId(int icluster) {return MaxTCId[icluster];}
 
     //
     //
     /*! get Beam bkg veto flag.
      * On = true, Off = false.
      */
-    bool getBeamBkgVeto(void);///get Beam bkg veto flag
   private:
     //
 
@@ -101,39 +95,47 @@ namespace Belle2 {
     int _FWDICN;
     /** ICN in Backward Endcap */
     int _BWDICN;
+    /** event number */
+    int _EventId;
+    /** Clustering method */
+    int _Method;
 
-    /** 4 region along r phi plane  */
-    int _icnquadrant[3][4];
     /** icn  */
-    int _icnfwbrbw[3];
-    /**  cluster in barrel */
-    int _BrCluster[20][9];
-    /**  cluster in forward endcap */
-    int _FwCluster[20][9];
-    /**  cluster in backward endcap */
-    int _BwCluster[20][9];
-    /**  # of TC in cluster */
-    int NofTCinCluster[100];
+    std::vector<int> _icnfwbrbw;
 
+    /**  TC Id */
+    std::vector<int> TCId;
     /**  TC timing */
-    double Timing[576][64];
+    std::vector<double> Timing;
     /** TC energy  */
-    double Energy[576][64];
+    std::vector<double> Energy;
+
+
+    /**  cluster in barrel */
+    std::vector<std::vector<int>> _BrCluster;
+    /**  cluster in forward endcap */
+    std::vector<std::vector<int>> _FwCluster;
+    /**  cluster in backward endcap */
+    std::vector<std::vector<int>> _BwCluster;
+
+
 
     /** Cluster timing */
-    double ClusterTiming[100];
+    std::vector<std::vector<double>> ClusterTiming;
     /**Cluster enrgy  */
-    double ClusterEnergy[100];
+    std::vector<std::vector<double>> ClusterEnergy;
     /**  Cluster position in X-axis */
-    double ClusterPositionX[100];
+    std::vector<std::vector<double>> ClusterPositionX;
     /** Cluster position in Y-axis */
-    double ClusterPositionY[100];
+    std::vector<std::vector<double>> ClusterPositionY;
     /**  Cluster position in Z-axis */
-    double ClusterPositionZ[100];
+    std::vector<std::vector<double>> ClusterPositionZ;
+    /** N of TC in Cluster  */
+    std::vector<std::vector<int>> NofTCinCluster;
     /** Maximum contribution TC Id in Cluster */
-    int MaxTCId[100];
+    std::vector<std::vector<int>>  MaxTCId;
     /** Temporal Cluster **/
-    int TempCluster[9];
+    std::vector<int>  TempCluster;
     /** Object of TC Mapping */
     TrgEclMapping* _TCMap;
 

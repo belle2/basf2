@@ -29,6 +29,9 @@
 #include <memory>
 
 namespace Belle2 {
+  class MCParticle;
+  class RecoTrack;
+
   namespace TrackFindingCDC {
     class Circle2D;
 
@@ -227,6 +230,9 @@ namespace Belle2 {
 
       /// Draws the hit content of the RecoTrack.
       void draw(const RecoTrack& recoTrack, const AttributeMap& attributeMap = AttributeMap());
+
+      /// Draws the trajectory that is represented by the MC particle
+      void drawTrajectory(const MCParticle& mcParticle, const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws trajectory of the CDCSegment2D
       void drawTrajectory(const CDCSegment2D& segment, const AttributeMap& attributeMap = AttributeMap());

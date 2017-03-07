@@ -15,7 +15,6 @@
 
 #include <vxd/dbobjects/VXDSensorInfoBasePar.h>
 
-
 namespace Belle2 {
 
 
@@ -26,112 +25,138 @@ namespace Belle2 {
   class SVDSensorInfoPar: public VXDSensorInfoBasePar {
 
   public:
-    /** Enum for parametric access to sensor coordinates. */
-    enum Coordinate {
-      u = 0,
-      v = 1
-    };
-    /**
-    * Enum to flag charge carriers.
-    */
-    enum CarrierType {
-      electron = -1, /** electrons */
-      hole = +1      /** holes */
-    };
-
     /** Constructor which automatically sets the SensorType to SensorInfo::SVD.
      * @param id VXD ID of the sensor.
-     * @width Width of the sensor.
-     * @length Length of the sensor.
-     * @thickness Thickness of the senosr.
-     * @uCells Number of strips in u dirrection.
-     * @vCells Number of strips in v direction.
-     * @width2 For wedge sensors, width is the width at 0, width2 is the width at maximum u.
+     * @param width Width of the sensor.
+     * @param length Length of the sensor.
+     * @param thickness Thickness of the senosr.
+     * @param uCells Number of strips in u dirrection.
+     * @param vCells Number of strips in v direction.
+     * @param width2 For wedge sensors, width is the width at 0, width2 is the width at maximum u.
      */
     SVDSensorInfoPar(VxdID id = 0, float width = 0, float length = 0, float thickness = 0,
                      int uCells = 0, int vCells = 0, float width2 = 0):
-      VXDSensorInfoBasePar(SVDSensorInfoPar::SVD, id, width, length, thickness, uCells, vCells, width2, -1, 0),
-      m_temperature(300), m_depletionVoltage(0), m_biasVoltage(0),
-      m_backplaneCapacitance(0), m_interstripCapacitance(0),
-      m_couplingCapacitance(0), m_electronicNoiseU(0), m_electronicNoiseV(0)
-    { }
+      VXDSensorInfoBasePar(SVDSensorInfoPar::SVD, id, width, length, thickness, uCells, vCells,
+                           width2, -1, 0),
+      m_temperature(300), m_stripEdgeU(0), m_stripEdgeV(0),
+      m_depletionVoltage(0), m_biasVoltage(0),
+      m_backplaneCapacitanceU(0), m_interstripCapacitanceU(0), m_couplingCapacitanceU(0),
+      m_backplaneCapacitanceV(0), m_interstripCapacitanceV(0), m_couplingCapacitanceV(0),
+      m_electronicNoiseU(0), m_electronicNoiseV(0),
+      m_electronicNoiseSbwU(0), m_electronicNoiseSbwV(0)
+    {}
 
-
-    /** Change the SensorID. Useful to copy the SensorInfo from one sensor and use it for another.
+    /** Change the SensorID. Useful to copy the SensorInfo from one sensor and use it
+     * for another.
      * @param id VxdID to be assigned to current sensor.
      */
     void setID(VxdID id) { m_id = id; }
 
     /** Set sensor operation parameters.
+     * @param stripEdgeU Distance from end of strip to edge of active area.
+     * @param stripEdgeV Distance from end of strip to edge of active area.
      * @param depletionVoltage Depletion voltage of the sensor.
      * @param biasVoltage Bias voltage on the sensor.
-     * @param backplaneCapacitance Backplane capacitance wrt. the strips.
-     * @param interstripCapacitance Interstrip capacitance for the sensor.
-     * @param coupling capacitance Coupling capacitance for the strips.
+     * @param backplaneCapacitanceU Backplane capacitance/cm for U strips.
+     * @param interstripCapacitanceU Interstrip capacitance/cm for U strips..
+     * @param coupling capacitanceU Coupling capacitance/cm for U strips.
+     * @param backplaneCapacitanceV Backplane capacitance/cm for V strips.
+     * @param interstripCapacitanceV Interstrip capacitance/cm for V strips.
+     * @param coupling capacitanceV Coupling capacitance/cm for V strips,
+     * @param electronicNoiseU Noise on U-strips; for barrels the value for Origami,
+     * @param electronicNoiseV Noise on V-strips, for barrels the value for Origami,
+     * @param electronicNoiseSbwU Noise on U strips of backward barrel senosrs,
+     * @param electronicNoiseSbwV Noise on V strips of backward barrel sensors
      */
-    void setSensorParams(double depletionVoltage, double biasVoltage,
-                         double backplaneCapacitance, double interstripCapacitance, double couplingCapacitance, double electronicNoiseU,
-                         double electronicNoiseV)
+    void setSensorParams(double stripEdgeU, double stripEdgeV,
+                         double depletionVoltage, double biasVoltage,
+                         double backplaneCapacitanceU, double interstripCapacitanceU,
+                         double couplingCapacitanceU,
+                         double backplaneCapacitanceV, double interstripCapacitanceV,
+                         double couplingCapacitanceV,
+                         double electronicNoiseU, double electronicNoiseV,
+                         double electronicNoiseSbwU, double electronicNoiseSbwV)
     {
+      m_stripEdgeU = stripEdgeU,
+      m_stripEdgeV = stripEdgeV,
       m_depletionVoltage = depletionVoltage;
       m_biasVoltage = biasVoltage;
-      m_backplaneCapacitance = backplaneCapacitance;
-      m_interstripCapacitance = interstripCapacitance;
-      m_couplingCapacitance = couplingCapacitance;
+      m_backplaneCapacitanceU = backplaneCapacitanceU;
+      m_interstripCapacitanceU = interstripCapacitanceU;
+      m_couplingCapacitanceU = couplingCapacitanceU;
+      m_backplaneCapacitanceV = backplaneCapacitanceV;
+      m_interstripCapacitanceV = interstripCapacitanceV;
+      m_couplingCapacitanceV = couplingCapacitanceV;
       m_electronicNoiseU = electronicNoiseU;
       m_electronicNoiseV = electronicNoiseV;
+      m_electronicNoiseSbwU = electronicNoiseSbwU;
+      m_electronicNoiseSbwV = electronicNoiseSbwV;
     }
 
     /** Return the sensor temperature.*/
     double getTemperature() const {return m_temperature; }
+    /** Return the distance between end of strip and edge of active area.*/
+    double getStripEdgeU() const {return m_stripEdgeU; }
+    /** Return the distance between end of strip and edge of active area.*/
+    double getStripEdgeV() const {return m_stripEdgeV; }
     /** Return the depletion voltage of the sensor. */
     double getDepletionVoltage() const { return m_depletionVoltage; }
     /** Return the bias voltage on the sensor. */
     double getBiasVoltage() const { return m_biasVoltage; }
-    /** Return the backplane capacitance for the sensor. */
-    double getBackplaneCapacitance() const { return m_backplaneCapacitance; }
-    /** Return the interstrip capacitance for the sensor. */
-    double getInterstripCapacitance() const { return m_interstripCapacitance; }
-    /** Return the coupling capacitance of the sensor strips */
-    double getCouplingCapacitance() const { return m_couplingCapacitance; }
+    /** Return the backplane capacitance/cm for U-side strips. */
+    double getBackplaneCapacitanceU() const { return m_backplaneCapacitanceU; }
+    /** Return the interstrip capacitance/cm for U-side strips. */
+    double getInterstripCapacitanceU() const { return m_interstripCapacitanceU; }
+    /** Return the coupling capacitance/cm for U-side strips*/
+    double getCouplingCapacitanceU() const { return m_couplingCapacitanceU; }
+    /** Return the backplane capacitance/cm for V-side strips. */
+    double getBackplaneCapacitanceV() const { return m_backplaneCapacitanceV; }
+    /** Return the interstrip capacitance/cm for V-side strips. */
+    double getInterstripCapacitanceV() const { return m_interstripCapacitanceV; }
+    /** Return the coupling capacitance/cm for V-side strips*/
+    double getCouplingCapacitanceV() const { return m_couplingCapacitanceV; }
     /** Return electronic noise in e- for u (short) strips */
     double getElectronicNoiseU() const {return m_electronicNoiseU; }
     /** Return electronic noise in e- for v (long) strips */
     double getElectronicNoiseV() const {return m_electronicNoiseV; }
-
-
-    /** Return Hall factor for the corresponding carrier type.
-     * @param carrier electron or hole, SVDSensorInfoPar::CarrierType
-     * @return The Hall factor for the actual sensor temperature.
-     */
-    double getHallFactor(CarrierType carrier) const
-    {
-      if (carrier == electron)
-        return (1.13 + 0.0008 * (m_temperature - 273));
-      else
-        return (0.72 - 0.0005 * (m_temperature - 273));
-    }
-
+    /** Return electronic noise in e- for u (short) strips in bw barrel sensors */
+    double getElectronicNoiseSbwU() const {return m_electronicNoiseSbwU; }
+    /** Return electronic noise in e- for v (long) strips in bw barrel sensors */
+    double getElectronicNoiseSbwV() const {return m_electronicNoiseSbwV; }
 
   private:
     /** Sensor temperature*/
     double m_temperature;
+    /** The distance between end of strips and edge of active area */
+    double m_stripEdgeU;
+    /** The distance between end of strips and edge of active area */
+    double m_stripEdgeV;
     /** The depletion voltage of the Silicon sensor */
     double m_depletionVoltage;
     /** The bias voltage on the sensor */
     double m_biasVoltage;
-    /** The backplane capacitance wrt. the strips. */
-    double m_backplaneCapacitance;
-    /** The interstrip capacitance for the sensor. */
-    double m_interstripCapacitance;
-    /** The coupling capacitance for the sensor. */
-    double m_couplingCapacitance;
-    /** The electronic noise for u (short, n-side) strips. */
+    /** The backplane capacitance/cm for/g U-side strips */
+    double m_backplaneCapacitanceU;
+    /** The interstrip capacitance/cm for/g U-side strips. */
+    double m_interstripCapacitanceU;
+    /** The coupling capacitance/cm for/g U-side strips. */
+    double m_couplingCapacitanceU;
+    /** The backplane capacitance/cm for/g V-side strips. */
+    double m_backplaneCapacitanceV;
+    /** The interstrip capacitance/cm for/g V-side strips. */
+    double m_interstripCapacitanceV;
+    /** The coupling capacitance/cm for/g V-side strips. */
+    double m_couplingCapacitanceV;
+    /** The electronic noise for U (short, n-side) strips. */
     double m_electronicNoiseU;
-    /** The electronic noise for v (long, p-side) strips. */
+    /** The electronic noise for V (long, p-side) strips. */
     double m_electronicNoiseV;
+    /** The electronic noise for U strips in bw barrel (non-Origami) sensors. */
+    double m_electronicNoiseSbwU;
+    /** The electronic noise for V strips in bw barrel (non-Origami) sensors. */
+    double m_electronicNoiseSbwV;
 
-    ClassDef(SVDSensorInfoPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(SVDSensorInfoPar, 6);  /**< ClassDef, must be the last term before the closing {}*/
   };
 } // end of namespace Belle2
 

@@ -94,6 +94,7 @@ namespace Belle2 {
     std::vector<double> m_aerogelMerit; /**< Vector of aerogel layer figures of merit. */
     int m_inputTrackType;            /**< Input tracks from the tracking (0) or from MCParticles>AeroHits (1). */
     int    m_storePhot;              /**< If == 1 individual reconstruced photon information (cherenkov angle,...) is stored in ARICHTrack */
+    bool m_align;                    /** If==1 alignment constants are used for global->local track transformation */
   };
 
 } // Belle2 namespace

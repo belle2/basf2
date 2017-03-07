@@ -16,7 +16,10 @@ namespace Belle2 {
 
     class CDCFacet;
     class CDCRecoHit2D;
+    class CDCRecoHit3D;
     class CDCSegment2D;
+    class CDCSegment3D;
+    class CDCTrack;
 
     /// Helper construct implementing the (re)estimation of the drift length for various hit objects
     struct DriftLengthEstimator {
@@ -27,6 +30,9 @@ namespace Belle2 {
       /// Update the drift length of the reconstructed hit in place.
       double updateDriftLength(CDCRecoHit2D& recoHit2D);
 
+      /// Update the drift length of the reconstructed hit in place.
+      double updateDriftLength(CDCRecoHit3D& recoHit3D, double tanLambda);
+
       /**
        *  Reestimate the drift length of all three contained drift circles.
        *  Using the additional flight direction information the accuracy of the drift length
@@ -36,6 +42,12 @@ namespace Belle2 {
 
       /// Update the drift length of the contained reconstructed hit in place.
       void updateDriftLength(CDCSegment2D& segment);
+
+      /// Update the drift length of the contained reconstructed hit in place.
+      void updateDriftLength(CDCSegment3D& segment, double tanLambda);
+
+      /// Update the drift length of the contained reconstructed hit in place.
+      void updateDriftLength(CDCTrack& track, double tanLambda);
 
       /// Parameter : Switch to serve the alpha angle to the drift length translator.
       bool m_param_useAlphaInDriftLength = true;

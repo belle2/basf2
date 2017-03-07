@@ -54,14 +54,15 @@ namespace Belle2 {
 
   private:
     TH1D* m_hTDC[56][400]; /**< TDC distribution histo. */
-    TH1D* m_hT0b[300];     /**< T0 distribution of each board. */
+    TH1D* m_hTDCBoard[300];     /**< T0 distribution of each board. */
     TH1D* m_hT0All;        /**< T0 distribution of all channel. */
-
+    double m_t0b[300];    /**< T0 for each board*/
     double m_t0[56][400]; /**< T0 of each channel*/
     double m_flag[56][400]; /**< flag =1 for good, =0 for low statistic or bad fit */
     unsigned short m_tdcMin = 0; /**< Lower boundary TDC histogram. */
     unsigned short m_tdcMax = 8400; /**< Upper boundary TDC histogram. */
     unsigned short m_adcMin = 0;    /**< ADC cut to reject noise. */
+    unsigned short m_minEntries = 100; /**< min entries per histo. */
     double m_initT0 = 3579;          /**< initial t0, use int fitting */
     double m_zOffset;               /**< z offset for calculate prop time, it is position of trigger counter, */
     bool m_cosmic;     /**< for cosmic case, tof of upper sector will be negative*/

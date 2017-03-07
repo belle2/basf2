@@ -154,9 +154,4 @@ namespace Belle2 {
   };
 }
 
-
-#ifdef __MAKECINT__
-#pragma link C++ class topcaf_hit_t+;
-#endif
-
 #endif

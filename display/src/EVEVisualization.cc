@@ -1422,7 +1422,12 @@ void EVEVisualization::addCDCHit(const CDCHit* hit)
   TGeoCombiTrans det_trans(midPoint(0), midPoint(1), midPoint(2), &det_rot);
   cov_shape->SetTransMatrix(det_trans);
 
-  cov_shape->SetMainColor(kOrange - 3);
+  if (hit->getISuperLayer() % 2 == 0) {
+    cov_shape->SetMainColor(kCyan);
+  } else {
+    cov_shape->SetMainColor(kPink + 7);
+  }
+
   cov_shape->SetMainTransparency(50);
   cov_shape->SetName(ObjectInfo::getIdentifier(hit));
   cov_shape->SetTitle(ObjectInfo::getInfo(hit) + TString::Format("\nWire ID: %d\nADC: %d\nTDC: %d",

@@ -124,12 +124,12 @@ namespace Belle2 {
      */
     static void registerRequiredRelations(
       StoreArray<RecoTrack>& recoTracks,
-      std::string pxdHitsStoreArrayName = "",
-      std::string svdHitsStoreArrayName = "",
-      std::string cdcHitsStoreArrayName = "",
-      std::string bklmHitsStoreArrayName = "",
-      std::string eklmHitsStoreArrayName = "",
-      std::string recoHitInformationStoreArrayName = "")
+      std::string const& pxdHitsStoreArrayName = "",
+      std::string const& svdHitsStoreArrayName = "",
+      std::string const& cdcHitsStoreArrayName = "",
+      std::string const& bklmHitsStoreArrayName = "",
+      std::string const& eklmHitsStoreArrayName = "",
+      std::string const& recoHitInformationStoreArrayName = "")
     {
       StoreArray<RecoHitInformation> recoHitInformations(recoHitInformationStoreArrayName);
       recoHitInformations.registerInDataStore();
@@ -205,7 +205,7 @@ namespace Belle2 {
      * @param storeArrayNameOfBKLMHits The name of the store array where the related bklm hits are stored.
      * @param storeArrayNameOfEKLMHits The name of the store array where the related eklm hits are stored.
      * @param storeArrayNameOfRecoHitInformation The name of the store array where the related hit information are stored.
-     * @param recreateSortingParameters The VXDTF dos not set the sorting parameters correctly (they are all 0).
+     * @param recreateSortingParameters The VXDTF does not set the sorting parameters correctly (they are all 0).
      *        This flag can be used to recover the parameters.
      * @return The newly created reco track.
      * @todo Let the track finders determine the cov seed.
@@ -546,6 +546,14 @@ namespace Belle2 {
     bool hasTrackFitStatus(const genfit::AbsTrackRep* representation = nullptr) const
     {
       checkDirtyFlag();
+
+      // there might be the case, where the genfit track has no trackreps, even not the cardinal
+      // one because no fit attempt was performed. In this case, the "hasFitStatus" call to genfit
+      // will fail with access violation. To prevent that, check for the number of reps here before
+      // actually calling genfit's hasFitStatus(...)
+      if (m_genfitTrack.getNumReps() == 0)
+        return false;
+
       return m_genfitTrack.hasFitStatus(representation);
     }
 
@@ -564,7 +572,7 @@ namespace Belle2 {
     }
 
     /** Return genfit's MeasuredStateOnPlane for the first hit in a fit
-    * useful for extrapolation of measurements other locations
+    * useful for extrapolation of measurements to other locations
     */
     const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromFirstHit(const genfit::AbsTrackRep* representation = nullptr)
     {
@@ -572,7 +580,7 @@ namespace Belle2 {
     }
 
     /** Return genfit's MeasuredStateOnPlane for the first hit in a fit
-    * useful for extrapolation of measurements other locations
+    * useful for extrapolation of measurements to other locations
     * Const version.
     */
     genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromFirstHit(const genfit::AbsTrackRep* representation = nullptr) const
@@ -581,7 +589,7 @@ namespace Belle2 {
     }
 
     /** Return genfit's MeasuredStateOnPlane for the last hit in a fit
-    * useful for extrapolation of measurements other locations
+    * useful for extrapolation of measurements to other locations
     */
     const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation = nullptr)
     {
@@ -589,7 +597,7 @@ namespace Belle2 {
     }
 
     /** Return genfit's MeasuredStateOnPlane for the last hit in a fit
-    * useful for extrapolation of measurements other locations
+    * useful for extrapolation of measurements to other locations
     * Const version.
     */
     genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation = nullptr) const
@@ -598,7 +606,7 @@ namespace Belle2 {
     }
 
     /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
-    * useful for extrapolation of measurements other locations
+    * useful for extrapolation of measurements to other locations
     */
     const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr)
     {
@@ -683,8 +691,8 @@ namespace Belle2 {
      */
     template<class HitType>
     void mapOnHits(const std::string& storeArrayNameOfHits,
-                   std::function<void(RecoHitInformation&, HitType*)> mapFunction,
-                   std::function<bool(const RecoHitInformation&, const HitType*)> pickFunction)
+                   std::function<void(RecoHitInformation&, HitType*)> const&   mapFunction,
+                   std::function<bool(const RecoHitInformation&, const HitType*)> const& pickFunction)
     {
       RelationVector<RecoHitInformation> relatedHitInformation = getRelationsTo<RecoHitInformation>
                                                                  (m_storeArrayNameOfRecoHitInformation);
@@ -705,8 +713,8 @@ namespace Belle2 {
      */
     template<class HitType>
     void mapOnHits(const std::string& storeArrayNameOfHits,
-                   std::function<void(const RecoHitInformation&, const HitType*)> mapFunction,
-                   std::function<bool(const RecoHitInformation&, const HitType*)> pickFunction) const
+                   std::function<void(const RecoHitInformation&, const HitType*)> const& mapFunction,
+                   std::function<bool(const RecoHitInformation&, const HitType*)> const& pickFunction) const
     {
       RelationVector<RecoHitInformation> relatedHitInformation = getRelationsTo<RecoHitInformation>
                                                                  (m_storeArrayNameOfRecoHitInformation);
@@ -726,7 +734,7 @@ namespace Belle2 {
      */
     template<class HitType>
     void mapOnHits(const std::string& storeArrayNameOfHits,
-                   std::function<void(RecoHitInformation&, HitType*)> mapFunction)
+                   std::function<void(RecoHitInformation&, HitType*)> const& mapFunction)
     {
       mapOnHits<HitType>(storeArrayNameOfHits, mapFunction, [](const RecoHitInformation&, const HitType*) -> bool { return true; });
     }
@@ -738,7 +746,7 @@ namespace Belle2 {
      */
     template<class HitType>
     void mapOnHits(const std::string& storeArrayNameOfHits,
-                   std::function<void(const RecoHitInformation&, const HitType*)> mapFunction) const
+                   std::function<void(const RecoHitInformation&, const HitType*)> const&   mapFunction) const
     {
       mapOnHits<HitType>(storeArrayNameOfHits, mapFunction, [](const RecoHitInformation&, const HitType*) -> bool { return true; });
     }

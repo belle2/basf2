@@ -46,10 +46,21 @@ rootinput1.param('inputFileName', f_in_root)
 # TRGECL
 trgeclfam = register_module("TRGECLFAM")
 trgeclfam.param('TCWaveform', 0)  # Output TC Waveform (0 : no save, 1 : save)
+trgeclfam.param('FAMFitMethod', 1)  # FAM method of TC E&T measurement  (1 : Fitting(default), 2 : backup 1, 3 : backup 2 (belle))
+trgeclfam.param('TCThreshold', 100)  # TC Threshold (Default is 100 MeV )
+# Save beam background tag of TC in TRGECLHit table (0: no save, 1:
+# save(It would be slower than 0 becaused of  comparison process btw
+# TRGECLHit and TRGECLDigi ))
+trgeclfam.param('BeamBkgTag', 0)
+
 
 trgecl = register_module("TRGECL")
 trgecl.param('Clustering', 0)  # Output Clustering method(0 : Use only ICN , 1 : ICN + Max TC )
 trgecl.param('EventTiming', 2)  # Output EventTiming method(0 : Belle  , 1 : Most energetic TC timing , 2 : Energy weighted Timing)
+trgecl.param('Bhabha', 0)  # Bhabha tagging method(0 : Belle 1: Belle II(but not supported yet))
+# trgecl.param('NofTopTC',3)  # The # of Considered TC in  the caculation of eventtiming method 2(Default is 3).
+# trgecl.param('TimeWindow',250) # Trigger decision time window size (ns)
+# trgecl.param('OverlapWindow',125) # TRGECL Trigger decision Time Window (ns)
 
 # trgeclMC = register_module("MCMatcherTRGECL")
 
@@ -84,5 +95,5 @@ process(main)
 ###
 ###
 ###
-# print statistics
+print(statistics)
 # ===<END>

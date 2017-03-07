@@ -40,9 +40,6 @@ b2biiConversion.setupB2BIIDatabase(True, False)
 url = getBelleUrl(expNo, minRunNo, maxRunNo,
                   eventType, dataType, belleLevel, streamNo)
 
-# setup database
-use_central_database('production', LogLevel.WARNING, 'feiFiles/fei_database')
-use_local_database('')
 use_local_database(filename=os.path.join(mc_beamparams, 'B2BII_MC_database/dbcache.txt'),
                    directory=os.path.join(mc_beamparams, 'B2BII_MC_database'),
                    readonly=False, loglevel=LogLevel.INFO)

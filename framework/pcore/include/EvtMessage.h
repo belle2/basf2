@@ -29,7 +29,8 @@ namespace Belle2 {
     Long64_t time_usec; /**< seconds part of timeval. */
     UInt_t src; /**< source IP. */
     UInt_t dest; /**< destination IP. */
-    UInt_t alsoReserved; /**< obsolete member removed, can be replaced with something else. */
+    UInt_t flags; /**< flags concerning the content of the message. Usually 0
+                   but can be any combination of of EvtMessage::EMessageFlags. */
     UInt_t nObjects; /**< #objects in message. */
     UInt_t nArrays; /**< #objects in message. */
     UInt_t reserved[7]; /**< Reserved for future use. Don't ever use these directly. */
@@ -48,6 +49,13 @@ namespace Belle2 {
   public:
     /** maximal EvtMessage size, in bytes (200MB). */
     const static unsigned int c_MaxEventSize = 200000000;
+
+    /** Flags for the message */
+    enum EMessageFlags {
+      /** indicates that the message body is compressed and should be
+       * uncompressed using ROOT R__unzip_header and R__unzip before use */
+      c_MsgCompressed = 1
+    };
 
     /** build EvtMessage from existing buffer (no copy, but does not take ownership). */
     explicit EvtMessage(char* buf = nullptr);
@@ -82,6 +90,15 @@ namespace Belle2 {
     int   paddedSize() const;
     /** Get size of message body */
     int   msg_size() const;
+
+    /** Get flags of the  message */
+    unsigned int getMsgFlags() const;
+    /** Set flags for the message */
+    void setMsgFlags(unsigned int flags) { header()->flags = flags;}
+    /** Add flags to the  message */
+    void addMsgFlags(unsigned int flags) { header()->flags |= flags;}
+    /** Check if the message has the given flags */
+    bool hasMsgFlags(unsigned int flags) { return (header()->flags & flags) == flags; }
 
     /** Get record type */
     RECORD_TYPE type() const;

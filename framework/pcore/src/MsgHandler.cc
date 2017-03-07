@@ -78,30 +78,32 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
 
   // which buffer to send? defaults to uncompressed
   auto buf = &m_buf;
+  unsigned int flags = 0;
   // but if we have compression enabled then please compress.
   if (m_complevel > 0) {
     // make sure buffer for the compression is big enough. We make it equal to
     // the original size but add one int to be able to have a distuingishing
     // header.
-    m_compBuf.resize(m_buf.size() + sizeof(UInt_t));
+    m_compBuf.resize(m_buf.size());
     // And call the root compression function
     const int algorithm = m_complevel / 100;
     const int level = m_complevel % 100;
     int irep{0}, nin{(int)m_buf.size()}, nout{nin};
-    R__zipMultipleAlgorithm(level, &nin, m_buf.data(), &nout, m_compBuf.data() + sizeof(int), &irep, algorithm);
+    R__zipMultipleAlgorithm(level, &nin, m_buf.data(), &nout, m_compBuf.data(), &irep, algorithm);
     // it returns the number of bytes of the output in irep. If that is zero or
     // to big compression failed and we transmit uncompressed.
     if (irep > 0 && irep <= nin) {
       //set correct size of compressed message
-      m_compBuf.resize(irep + sizeof(UInt_t));
+      m_compBuf.resize(irep);
       // and set pointer to correct buffer for creating message
       buf = &m_compBuf;
+      // also add a flag indicating it's compressed
+      flags = EvtMessage::c_MsgCompressed;
     }
-    // Ok, now let's make sure the first 4 bytes are completely zero to be able to transparently handle decompression
-    memset(m_compBuf.data(), 0, sizeof(UInt_t));
   }
 
   EvtMessage* evtmsg = new EvtMessage(buf->data(), buf->size(), rectype);
+  evtmsg->setMsgFlags(flags);
   clear();
 
   return evtmsg;
@@ -113,17 +115,13 @@ void MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
   const char* msgptr = msg->msg();
   const char* end = msgptr + msg->msg_size();
 
-  //Normally each message starts with the size of the member name and if that
-  //is zero something is wrong. Unless the message is compressed in which case
-  //we make sure it is zero.
-  UInt_t nameLength;
-  memcpy(&nameLength, msgptr, sizeof(nameLength));
-  if (nameLength == 0) {
+  if (msg->hasMsgFlags(EvtMessage::c_MsgCompressed)) {
     // apparently message is compressed, let's decompress
     m_compBuf.clear();
     int nzip{0}, nout{0};
-    // compressed message after the first 4 bytes
-    unsigned char* zipptr = (unsigned char*) msgptr + sizeof(UInt_t);
+    // ROOT wants unsigned char so make a new pointer to the data
+    unsigned char* zipptr = (unsigned char*) msgptr;
+    // and uncompress everything
     while (zipptr < (unsigned char*)end) {
       // first get a header of the next block so we know how big the output will be
       if (R__unzip_header(&nzip, zipptr, &nout) != 0) {
@@ -132,6 +130,9 @@ void MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
       }
       // no more output? fine
       if (!nout) break;
+      if (std::distance(zipptr, (unsigned char*) end) > nzip) {
+        B2FATAL("Not enough bytes left to uncompress");
+      }
       // otherwise make sure output buffer is large enough
       int old_size = m_compBuf.size();
       m_compBuf.resize(old_size + nout);

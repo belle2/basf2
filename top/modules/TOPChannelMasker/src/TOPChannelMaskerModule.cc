@@ -3,14 +3,18 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jan Strube, Sam Cunliffe                                 *
- * (jan.strube@pnnl.gov samuel.cunliffe@pnnl.gov)                         *
+ * Contributors:                                                          *
+ *    Jan Strube (jan.strube@pnnl.gov)                                    *
+ *    Sam Cunliffe (samuel.cunliffe@pnnl.gov)                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <top/modules/TOPChannelMasker/TOPChannelMaskerModule.h>
 
+#include <top/dataobjects/TOPDigit.h>       // data Cherenkov hits
+#include <framework/datastore/StoreArray.h> // data store framework
+#include <top/reconstruction/TOPreco.h>     // reconstruction wrapper
 
 using namespace Belle2;
 
@@ -27,33 +31,26 @@ TOPChannelMaskerModule::TOPChannelMaskerModule() : Module()
 {
   // Set module properties
   setDescription("Masks dead PMs from the reconstruction");
-
-  // Parameter definitions
-
-}
-
-TOPChannelMaskerModule::~TOPChannelMaskerModule()
-{
-}
-
-void TOPChannelMaskerModule::initialize()
-{
-}
-
-void TOPChannelMaskerModule::beginRun()
-{
 }
 
 void TOPChannelMaskerModule::event()
 {
+  // are masks are available?
+  if (!m_channelMask.isValid()) {
+    B2ERROR("channel mask not available, not masking any channels");
+    return;
+  }
+
+  // if channel masks have changed then pass the masking to the FORTRAN
+  // reconstruction code to exclude from the pdf
+  if (m_channelMask.hasChanged()) {
+    TOP::TOPreco::setChannelMask(m_channelMask);
+  }
+
+  // now flag actual data Cherenkov hits as coming from bad channels
+  StoreArray<TOPDigit> digits;
+  for (auto& digit : digits) {
+    if (!m_channelMask->isActive(digit.getModuleID(), digit.getChannel()))
+      digit.setHitQuality(TOPDigit::c_Junk);
+  }
 }
-
-void TOPChannelMaskerModule::endRun()
-{
-}
-
-void TOPChannelMaskerModule::terminate()
-{
-}
-
-

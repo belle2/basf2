@@ -34,13 +34,14 @@ namespace {
 
 void StoreArrayMerger::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  // input
+  // CDC input tracks
   moduleParamList->addParameter("CDCRecoTrackStoreArrayName", m_param_cdcRecoTrackStoreArrayName,
                                 "StoreArray name of the CDC Track Store Array", m_param_cdcRecoTrackStoreArrayName);
+  // VXD input tracks
   moduleParamList->addParameter("VXDRecoTrackStoreArrayName", m_param_vxdRecoTrackStoreArrayName,
                                 "StoreArray name of the VXD Track Store Array", m_param_vxdRecoTrackStoreArrayName);
 
-  // output
+  // combinde output tracks
   moduleParamList->addParameter("MergedRecoTrackStoreArrayName", m_param_mergedRecoTrackStoreArrayName,
                                 "StoreArray name of the merged Track Store Array", m_param_mergedRecoTrackStoreArrayName);
 

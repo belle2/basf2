@@ -177,12 +177,22 @@ void LogSystem::printErrorSummary()
   if (numLines == 0)
     return; //nothing to do
 
+  // save configuration
   const LogConfig oldConfig = m_logConfig;
-  m_logConfig.setAbortLevel(LogConfig::c_Default); //prevent calling printErrorSummary() again when printing
+  // and make sure module configuration is bypassed, otherwise changing the settings in m_logConfig would be ignored
+  const LogConfig* oldModuleConfig {nullptr};
+  std::swap(m_moduleLogConfig, oldModuleConfig);
+  // similar for package configuration
+  map<string, LogConfig> oldPackageConfig;
+  std::swap(m_packageLogConfigs, oldPackageConfig);
+  //prevent calling printErrorSummary() again when printing
+  m_logConfig.setAbortLevel(LogConfig::c_Default);
 
   // only show level & message
+  m_logConfig.setLogInfo(LogConfig::c_Info, LogConfig::c_Level | LogConfig::c_Message);
   m_logConfig.setLogInfo(LogConfig::c_Warning, LogConfig::c_Level | LogConfig::c_Message);
   m_logConfig.setLogInfo(LogConfig::c_Error, LogConfig::c_Level | LogConfig::c_Message);
+  m_logConfig.setLogInfo(LogConfig::c_Fatal, LogConfig::c_Level | LogConfig::c_Message);
   m_logConfig.setLogLevel(LogConfig::c_Info);
 
   B2INFO("================================================================================");
@@ -218,7 +228,10 @@ void LogSystem::printErrorSummary()
     B2WARNING("Note: The error log was truncated to " << c_errorSummaryMaxLines << " messages");
   }
 
+  // retore old configuration
   m_logConfig = oldConfig;
+  std::swap(m_moduleLogConfig, oldModuleConfig);
+  std::swap(m_packageLogConfigs, oldPackageConfig);
 }
 
 LogSystem::~LogSystem()

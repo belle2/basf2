@@ -108,7 +108,7 @@ namespace Belle2 {
     /** Add flags to the  message */
     void addMsgFlags(unsigned int flags) { header()->flags |= flags;}
     /** Check if the message has the given flags */
-    bool hasMsgFlags(unsigned int flags) { return (getMsgFlags() & flags) == flags; }
+    bool hasMsgFlags(unsigned int flags) const { return (getMsgFlags() & flags) == flags; }
 
     /** Get record type */
     RECORD_TYPE type() const;

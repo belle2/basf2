@@ -41,7 +41,7 @@ void StoreArrayMerger::exposeParameters(ModuleParamList* moduleParamList, const 
   moduleParamList->addParameter("VXDRecoTrackStoreArrayName", m_param_vxdRecoTrackStoreArrayName,
                                 "StoreArray name of the VXD Track Store Array", m_param_vxdRecoTrackStoreArrayName);
 
-  // combinde output tracks
+  // combined output tracks
   moduleParamList->addParameter("MergedRecoTrackStoreArrayName", m_param_mergedRecoTrackStoreArrayName,
                                 "StoreArray name of the merged Track Store Array", m_param_mergedRecoTrackStoreArrayName);
 

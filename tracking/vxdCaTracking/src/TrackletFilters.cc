@@ -745,7 +745,6 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
   zValuesT.T();
 
   TMatrixD sigma2M = zValuesT * (Diag * TAtG * AtGAInv * AtG) * zValues;
-  double sigma2 = sigma2M(0, 0) / (nHits - 2);
 
   double thetaVal = (M_PI * 0.5 - atan(p(1,
                                          0))); // WARNING: was M_PI*0.5 - atan(p(1,0)), but values were wrong! double-WARNING: but + atan was wrong too!

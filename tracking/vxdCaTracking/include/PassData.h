@@ -89,7 +89,8 @@ namespace Belle2 {
 
       MapOfSectors::iterator centerSectorKey = this->sectorMap.find(this->centerSector);
       if (centerSectorKey == this->sectorMap.end()) {
-        throw Bad_Sector();
+        // cleanPass() is applied on an empty pass the centerSector cannot be found, so the exception makes no sense
+        if (this->sectorMap.size() != 0) throw Bad_Sector();
       } else {
         centerSectorKey->second->resetSector(); // doing the same for the virtual sector which is not in the operation sequence
       }

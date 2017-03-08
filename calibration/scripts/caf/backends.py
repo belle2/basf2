@@ -52,7 +52,7 @@ class Job:
         """
         Representation of Job class (what happens when you print a Job() instance)
         """
-        return self.name
+        return "\n".join([self.name, str(self.input_sandbox_files), str(self.input_files)])
 
 
 class Backend():

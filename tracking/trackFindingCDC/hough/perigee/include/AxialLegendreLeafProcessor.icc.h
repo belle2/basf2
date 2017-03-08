@@ -11,8 +11,7 @@
 #pragma once
 #include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.h>
 
-#include <tracking/trackFindingCDC/processing/TrackProcessor.h>
-#include <tracking/trackFindingCDC/processing/HitProcessor.h>
+#include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
 
 #include <tracking/trackFindingCDC/hough/perigee/StereoHitContained.h>
 #include <tracking/trackFindingCDC/hough/perigee/OffOrigin.h>
@@ -26,9 +25,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
 
-#include <tracking/trackFindingCDC/legendre/precisionFunctions/BasePrecisionFunction.h>
-#include <tracking/trackFindingCDC/legendre/precisionFunctions/OriginPrecisionFunction.h>
-#include <tracking/trackFindingCDC/legendre/precisionFunctions/NonOriginPrecisionFunction.h>
+#include <tracking/trackFindingCDC/legendre/precisionFunctions/PrecisionUtil.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -40,28 +37,13 @@ namespace Belle2 {
     template <class ANode>
     void AxialLegendreLeafProcessor<ANode>::processLeaf(ANode* leaf)
     {
-      // No special post processing version
-      // std::array<DiscreteCurv, 2> curvs = leaf->template getBounds<DiscreteCurv>();
-      // float lowerCurv = *(curvs[0]);
-      // float upperCurv = *(curvs[1]);
-
-      // std::array<DiscretePhi0, 2> phi0Vecs = leaf->template getBounds<DiscretePhi0>();
-      // Vector2D lowerPhi0Vec = *(phi0Vecs[0]);
-      // Vector2D upperPhi0Vec = *(phi0Vecs[1]);
-      // for (WithSharedMark<CDCRLWireHit>& markableRLTaggedWireHit : *leaf) {
-      //   markableRLTaggedWireHit.mark();
-      // }
-      // m_candidates.emplace_back(CDCTrajectory2D(PerigeeCircle(lowerCurv, lowerPhi0Vec, 0)),
-      //                           std::vector<CDCRLWireHit>(leaf->begin(), leaf->end()));
-      // return;
-
       // Special post processing looking for more hits
       // Start off by fitting the items of the leaf with a general trajectory
       // that may have a distinct impact != 0
       /////////////////////////////////////////////////////////////////////////
       CDCKarimakiFitter fitter;
       // CDCRiemannFitter fitter;
-      // fitter.setFitVariance(EFitVariance::c_Unit);
+      // fitter.setFitVariance(EFitVariance::c_Nominal);
       fitter.setFitVariance(EFitVariance::c_DriftLength); // Best one of the eight combinations of fitters..
       // fitter.setFitVariance(EFitVariance::c_Pseudo);
       // fitter.setFitVariance(EFitVariance::c_Proper);
@@ -91,51 +73,21 @@ namespace Belle2 {
           roadNode = roadNode->getParent();
         }
 
-        // Make sure that all hits we have used somewhere else are removed from the available hits.
-        auto isMarked = [](const WithSharedMark<CDCRLWireHit>& item) -> bool {
-          return item.isMarked();
-        };
-        roadNode->eraseIf(isMarked);
-
         for (int iRoadSearch = 0; iRoadSearch < m_param_nRoadSearches; ++iRoadSearch) {
-          // Use a road search to find new hits from the
-          {
-            // hits = this->searchRoad(*roadNode, trajectory2D); // In case you only want the road hits
-            int nHitsBefore = hits.size();
-            std::vector<WithSharedMark<CDCRLWireHit>> roadHits = this->searchRoad(*roadNode, trajectory2D);
-            std::sort(roadHits.begin(), roadHits.end());
-            hits.insert(hits.end(), roadHits.begin(), roadHits.end());
-            std::inplace_merge(hits.begin(), hits.begin() + nHitsBefore, hits.end());
-            hits.erase(std::unique(hits.begin(), hits.end()), hits.end());
-            trajectory2D = fitter.fit(hits);
-          }
-          /*
-          // Remove hits far away
-          {
-            auto isFarAway = [this, &trajectory2D](const CDCRLWireHit& rlWireHit) -> bool {
-              double absWireDist2D = std::fabs(trajectory2D.getDist2D(rlWireHit.getRefPos2D()));
-              double driftLength = rlWireHit.getRefDriftLength();
-              return std::fabs(absWireDist2D - driftLength) > this->m_param_maxDistance;
-            };
-            erase_remove_if(hits, isFarAway);
-            trajectory2D = fitter.fit(hits);
-          }
+          // Use a road search to find new hits from the trajectory
+          // hits = this->searchRoad(*roadNode, trajectory2D); // In case you only want the road hits
+          // if (hits.size() < 5) return;
 
-          // Add new close hits
-          {
-            int nHitsBefore = hits.size();
-            auto isClose = [this, &trajectory2D](const CDCRLWireHit& rlWireHit) -> bool {
-              double absWireDist2D = std::fabs(trajectory2D.getDist2D(rlWireHit.getRefPos2D()));
-              double driftLength = rlWireHit.getRefDriftLength();
-              return std::fabs(absWireDist2D - driftLength) < this->m_param_newHitDistance;
-            };
-            std::copy_if(roadNode->begin(), roadNode->end(), std::back_inserter(hits), isClose);
-            std::inplace_merge(hits.begin(),hits.begin() + nHitsBefore, hits.end());
-            hits.erase(std::unique(hits.begin(), hits.end()), hits.end());
-            trajectory2D = fitter.fit(hits);
-          }
-          */
-          if (hits.size() < 5) return;
+          // Second version always holding on to the originally found hits
+          int nHitsBefore = hits.size();
+          std::vector<WithSharedMark<CDCRLWireHit>> roadHits = this->searchRoad(*roadNode, trajectory2D);
+          std::sort(roadHits.begin(), roadHits.end());
+          hits.insert(hits.end(), roadHits.begin(), roadHits.end());
+          std::inplace_merge(hits.begin(), hits.begin() + nHitsBefore, hits.end());
+          hits.erase(std::unique(hits.begin(), hits.end()), hits.end());
+
+          // Update the current fit
+          trajectory2D = fitter.fit(hits);
           trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
         }
       }
@@ -147,7 +99,7 @@ namespace Belle2 {
         foundWireHits.push_back(&rlWireHit.getWireHit());
       }
 
-      TrackProcessor::addCandidateFromHitsWithPostprocessing(foundWireHits, m_axialWireHits, m_tracks);
+      AxialTrackUtil::addCandidateFromHitsWithPostprocessing(foundWireHits, m_axialWireHits, m_tracks);
 
       // Sync up the marks with the used hits
       for (WithSharedMark<CDCRLWireHit>& markableRLWireHit : leaf->getTree()->getTopNode()) {
@@ -178,7 +130,7 @@ namespace Belle2 {
       // Spread in the impact parameter is made available here but is not activated yet.
       const float levelPrecision = 9.0;
       // Earlier version
-      // const float levelPrecision = 10.5 - 0.24 * exp(-4.13118 * BasePrecisionFunction::convertRhoToPt(curv) + 2.74);
+      // const float levelPrecision = 10.5 - 0.24 * exp(-4.13118 * PrecisionUtil::convertRhoToPt(curv) + 2.74);
       const float phi0Precision = 3.1415 / std::pow(2.0, levelPrecision + 1.0);
       const float impactPrecision = 0.0 * std::sqrt(CDCWireHit::c_simpleDriftLengthVariance);
       const float curvPrecision = 0.15 / std::pow(2.0, levelPrecision);
@@ -190,12 +142,11 @@ namespace Belle2 {
                                         ContinuousImpact::getRange(impactBounds),
                                         DiscreteCurv::getRange(curvBounds));
 
-      // HoughBox precisionPhi0CurvBox = *leaf;
       std::vector<WithSharedMark<CDCRLWireHit>> hitsInPrecisionBox;
 
       // Explicitly making a copy here to ensure that we do not change the node content
       for (WithSharedMark<CDCRLWireHit> markableRLWireHit : node) {
-        // Remove marked hits
+        // Skip marked hits
         if (markableRLWireHit.isMarked()) continue;
         Weight weight = hitInPhi0CurvBox(markableRLWireHit, &precisionPhi0CurvBox);
         if (not std::isnan(weight)) hitsInPrecisionBox.push_back(markableRLWireHit);
@@ -203,41 +154,11 @@ namespace Belle2 {
 
       return hitsInPrecisionBox;
     }
-
-    template <class ANode>
-    void AxialLegendreLeafProcessor<ANode>::migrateHits()
-    {
-      TrackProcessor::assignNewHits(m_axialWireHits, m_tracks);
-    }
-
-    template <class ANode>
-    void AxialLegendreLeafProcessor<ANode>::finalizeTracks()
-    {
-      TrackProcessor::mergeAndFinalizeTracks(m_tracks, m_axialWireHits);
-      HitProcessor::resetMaskedHits(m_tracks, m_axialWireHits);
-      erase_remove_if(m_tracks, Size() == 0u);
-    }
-
   }
 }
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    template <class ANode>
-    std::vector<const CDCWireHit*>
-    AxialLegendreLeafProcessor<ANode>::getUnusedWireHits()
-    {
-      HitProcessor::resetMaskedHits(m_tracks, m_axialWireHits);
-      std::vector<const CDCWireHit*> result;
-      for (const CDCWireHit* wireHit : m_axialWireHits) {
-        const AutomatonCell& automatonCell = wireHit->getAutomatonCell();
-        if (automatonCell.hasTakenFlag()) continue;
-        result.push_back(wireHit);
-      }
-      return result;
-    }
-
     template <class ANode>
     std::vector<typename AxialLegendreLeafProcessor<ANode>::Candidate>
     AxialLegendreLeafProcessor<ANode>::getCandidates() const
@@ -291,7 +212,7 @@ namespace Belle2 {
       moduleParamList->addParameter(prefixed(prefix, "curvResolution"),
                                     m_param_curvResolution,
                                     "The name of the resolution function to be used. "
-                                    "Valid values are 'none', 'base', 'origin', 'nonOrigin'",
+                                    "Valid values are 'none', 'const', 'basic', 'origin', 'nonOrigin'",
                                     m_param_curvResolution);
     }
 
@@ -301,15 +222,17 @@ namespace Belle2 {
       // Setup the requested precision function
       if (m_param_curvResolution == "none") {
         m_curvResolution = [](double curv __attribute__((unused))) { return NAN; };
-      } else if (m_param_curvResolution == "base") {
-        m_curvResolution = BasePrecisionFunction().getFunction();
+      } else if (m_param_curvResolution == "const") {
+        m_curvResolution = [](double curv __attribute__((unused))) { return 0.0008; };
+      } else if (m_param_curvResolution == "basic") {
+        m_curvResolution = &PrecisionUtil::getBasicCurvPrecision;
       } else if (m_param_curvResolution == "origin") {
-        m_curvResolution = OriginPrecisionFunction().getFunction();
+        m_curvResolution = &PrecisionUtil::getOriginCurvPrecision;
       } else if (m_param_curvResolution == "nonOrigin") {
-        m_curvResolution = NonOriginPrecisionFunction().getFunction();
+        m_curvResolution = &PrecisionUtil::getNonOriginCurvPrecision;
       } else {
         B2WARNING("Unknown curvature resolution function " << m_param_curvResolution);
-        m_curvResolution = BasePrecisionFunction().getFunction();
+        m_curvResolution = [](double curv __attribute__((unused))) { return NAN; };
       }
     }
   }

@@ -2,6 +2,8 @@
 
 #include <daq/slc/nsm/NSMCommunicator.h>
 
+#include <daq/slc/database/DBHandlerException.h>
+
 #include <daq/slc/system/PThread.h>
 #include <daq/slc/system/Mutex.h>
 #include <daq/slc/system/LogFile.h>
@@ -10,12 +12,20 @@
 #include <daq/slc/base/Date.h>
 
 #define STATFT_NSM
+#define USE_LINUX_VME_UNIVERSE 1
 
 #include <ftprogs/ftsw.h>
 #include <ftprogs/ftstat.h>
 #include <ftprogs/pocket_ttd.h>
 #include <ftprogs/pocket_ttd_fast.h>
 #include <ftprogs/ft2u067.h>
+
+#ifndef D
+#define D(a,b,c) (((a)>>(c))&((1<<((b)+1-(c)))-1))
+#define B(a,b)   D(a,b,b)
+#define Bs(a,b,s)   (B(a,b)?(s):"")
+#define Ds(a,b,c,s)   (D(a,b,c)?(s):"")
+#endif
 
 #include <unistd.h>
 #include <sys/time.h>
@@ -384,17 +394,50 @@ void TTDACallback::configure(const DBObject& obj) throw(RCHandlerException)
   add(new NSMVHandlerMaxTimeFT(*this, "maxtime"));
   add(new NSMVHandlerMaxTrigFT(*this, "maxtrig"));
   add(new NSMVHandlerCmdFT(*this, "cmdft"));
-  for (int i = 0; i < 4; i++) {
-    int enable = obj("port")("cpr", i).getBool("enable");
-    add(new NSMVHandlerPortFT(*this, StringUtil::form("port.cpr[%d].enable", i), enable));
+
+  const DBObject& o_port(obj("port"));
+  if (o_port.hasObject("fee")) {
+    const DBObjectList& o_fees(o_port.getObjects("fee"));
+    add(new NSMVHandlerInt("nfees", true, false, (int)o_fees.size()));
+    for (unsigned int i = 0; i < o_fees.size(); i++) {
+      int enable = obj("port")("fee", i).getBool("enable");
+      add(new NSMVHandlerPortFT(*this, StringUtil::form("port.fee[%d].enable", i), enable));
+      enable = obj("jtag")("fee", i).getBool("enable");
+      add(new NSMVHandlerJTAGFT(*this, StringUtil::form("jtag.fee[%d].enable", i), enable));
+      std::string vname = StringUtil::form("link.o[%d].", i);
+      add(new NSMVHandlerInt(vname + "linkup", true, false, 0));
+      add(new NSMVHandlerInt(vname + "mask", true, false, 0));
+      add(new NSMVHandlerInt(vname + "ttlost", true, false, 0));
+      add(new NSMVHandlerInt(vname + "ttldn", true, false, 0));
+      add(new NSMVHandlerInt(vname + "b2lost", true, false, 0));
+      add(new NSMVHandlerInt(vname + "b2ldn", true, false, 0));
+      add(new NSMVHandlerInt(vname + "tagerr", true, false, 0));
+      add(new NSMVHandlerInt(vname + "fifoerr", true, false, 0));
+      add(new NSMVHandlerInt(vname + "seu", true, false, 0));
+    }
+  } else {
+    add(new NSMVHandlerInt("nfees", true, false, 0));
   }
-  for (int i = 0; i < 8; i++) {
-    int enable = obj("port")("fee", i).getBool("enable");
-    add(new NSMVHandlerPortFT(*this, StringUtil::form("port.fee[%d].enable", i), enable));
-  }
-  for (int i = 0; i < 8; i++) {
-    int enable = obj("jtag")("fee", i).getBool("enable");
-    add(new NSMVHandlerJTAGFT(*this, StringUtil::form("jtag.fee[%d].enable", i), enable));
+  if (o_port.hasObject("cpr")) {
+    const DBObjectList& o_cprs(o_port.getObjects("cpr"));
+    add(new NSMVHandlerInt("ncprs", true, false, (int)o_cprs.size()));
+    for (unsigned int i = 0; i < o_cprs.size(); i++) {
+      int enable = o_cprs[i].getBool("enable");
+      add(new NSMVHandlerPortFT(*this, StringUtil::form("port.cpr[%d].enable", i), enable));
+      std::string vname = StringUtil::form("link.x[%d].", i);
+      add(new NSMVHandlerInt(vname + "linkup", true, false, 0));
+      add(new NSMVHandlerInt(vname + "mask", true, false, 0));
+      add(new NSMVHandlerInt(vname + "err", true, false, 0));
+      for (int j = 0; j < 4; j++) {
+        std::string vname = StringUtil::form("link.x[%d].%c.", i, j + 'a');
+        add(new NSMVHandlerInt(vname + "enable", true, false, 0));
+        add(new NSMVHandlerInt(vname + "empty", true, false, 0));
+        add(new NSMVHandlerInt(vname + "full", true, false, 0));
+        add(new NSMVHandlerInt(vname + "err", true, false, 0));
+      }
+    }
+  } else {
+    add(new NSMVHandlerInt("ncprs", true, false, 0));
   }
   set("ftsw", obj.getInt("ftsw"));
   set("dummy_rate", obj.getInt("dummy_rate"));
@@ -459,11 +502,90 @@ void TTDACallback::monitor() throw(RCHandlerException)
           set("tstart", (int)g_ftstat.tstart);
           set("trun", (int)g_ftstat.trun);
           set("ftstate", g_ftstat.state);
+          const DBObject& o_port(getDBObject()("port"));
+          if (o_port.hasObject("fee")) {
+            const DBObjectList& o_fees(o_port.getObjects("fee"));
+            for (unsigned int i = 0; i < o_fees.size(); i++) {
+              std::string vname = StringUtil::form("link.o[%d].", i);
+              int up = B(f->linkup, i);
+              set(vname + "linkup", up);
+              if (up) {
+                set(vname + "mask", (int)B(s->omask, i));
+                if (B(f->odata[i], 1)) {
+                  set(vname + "ttlost", (int)B(f->odata[i], 10));
+                  set(vname + "ttldn", 0);
+                } else {
+                  set(vname + "ttlost", 0);
+                  set(vname + "ttldn", 1);
+                }
+                if (B(f->odata[i], 3)) {
+                  set(vname + "b2lost", (int)B(f->odata[i], 10));
+                  set(vname + "b2ldn", 0);
+                } else {
+                  set(vname + "b2lost", 0);
+                  set(vname + "b2ldn", 1);
+                }
+                set(vname + "tagerr", (int)B(f->odata[i], 8));
+                set(vname + "fifoerr", (int)D(f->odata[i], 7, 6));
+                set(vname + "seu", (int)D(f->odata[i], 7, 6));
+              } else {
+                set(vname + "mask", 1);
+                set(vname + "ttldn", 0);
+                set(vname + "ttlost", 0);
+                set(vname + "b2lost", 0);
+                set(vname + "b2ldn", 0);
+                set(vname + "tagerr", 0);
+                set(vname + "fifoerr", 0);
+                set(vname + "seu", 0);
+              }
+            }
+            if (o_port.hasObject("cpr")) {
+              const DBObjectList& o_cprs(o_port.getObjects("cpr"));
+              for (unsigned int i = 0; i < o_cprs.size(); i++) {
+                std::string vname = StringUtil::form("link.x[%d].", i);
+                int up = B(f->linkup, i + 8);
+                set(vname + "linkup", up);
+                if (up) {
+                  set(vname + "mask", (int)(!D(f->xdata[i], 31, 28)));
+                  set(vname + "err", (int)D(f->xdata[i], 27, 24));
+                  set(vname + "a.enable", (int)B(f->xdata[i], 28));
+                  set(vname + "b.enable", (int)B(f->xdata[i], 29));
+                  set(vname + "c.enable", (int)B(f->xdata[i], 30));
+                  set(vname + "d.enable", (int)B(f->xdata[i], 31));
+                  set(vname + "a.empty", (int)B(f->xdata[i], 16));
+                  set(vname + "b.empty", (int)B(f->xdata[i], 17));
+                  set(vname + "c.empty", (int)B(f->xdata[i], 18));
+                  set(vname + "d.empty", (int)B(f->xdata[i], 19));
+                  set(vname + "a.full", (int)B(f->xdata[i], 20));
+                  set(vname + "b.full", (int)B(f->xdata[i], 21));
+                  set(vname + "c.full", (int)B(f->xdata[i], 22));
+                  set(vname + "d.full", (int)B(f->xdata[i], 23));
+                  set(vname + "a.err", (int)B(f->xdata[i], 24));
+                  set(vname + "b.err", (int)B(f->xdata[i], 25));
+                  set(vname + "c.err", (int)B(f->xdata[i], 26));
+                  set(vname + "d.err", (int)B(f->xdata[i], 27));
+                } else {
+                  for (int i = 0; i < 4; i++) {
+                    set(vname + "mask", 1);
+                    set(vname + "err", 0);
+                    for (int j = 0; j < 4; j++) {
+                      std::string vname = StringUtil::form("link.x[%d].%c.", i, j + 'a');
+                      set(vname + "enable", 0);
+                      set(vname + "empty", 0);
+                      set(vname + "full", 0);
+                      set(vname + "err", 0);
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
         prev_u = f->utime;
         prev_c = f->ctime;
       }
-    } catch (const NSMHandlerException& e) {}
+    } catch (const NSMHandlerException& e) {
+    }
   } else {
     try {
       //stat2u067(g_ftsw, m_ftswid);

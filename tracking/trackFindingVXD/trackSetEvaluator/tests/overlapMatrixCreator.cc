@@ -27,11 +27,28 @@ protected:
   vector<vector <unsigned short> > smallOverlapTestMatrix =
     //track 0   1                2       3       4   5             6   7             8       9
   {{1, 5, 7}, {0, 2, 3, 5, 9}, {1, 3}, {1, 2}, {}, {0, 1, 7, 9}, {}, {0, 5, 8, 9}, {7, 9}, {1, 5, 7, 8}};
+
+  //Another hitRelatedTracks matrix with multiple double overlaps:
+  vector<vector <unsigned short> > hitRelatedTracks2 =
+  {{0, 1, 2, 3}, {1, 2, 3}, {3, 4, 5, 6}, {2, 4}, {3, 5}};
+  vector<vector <unsigned short> > allowOneOverlapTestMatrix =
+  {{}, {2, 3}, {1, 3}, {1, 2, 5}, {}, {3}, {}};
+
+  //This time, we want to check for double overlaps
+  vector<vector <unsigned short> > hitRelatedTracks3 =
+  {{0, 1, 2, 3}, {1, 2, 3}, {3, 4, 5, 6}, {2, 3, 4}, {3, 5}};
+  vector<vector <unsigned short> > allowTwoOverlapTestMatrix =
+  {{}, {}, {3}, {2}, {}, {}, {}};
 };
 
 TEST_F(OverlapMatrixCreatorTest, TestGetter)
 {
   OverlapMatrixCreator overlapMatrixCreator(hitRelatedTracks, 10);
   EXPECT_EQ(smallOverlapTestMatrix, overlapMatrixCreator.getOverlapMatrix());
-}
 
+  OverlapMatrixCreator overlapMatrixCreator2(hitRelatedTracks2, 7);
+  EXPECT_EQ(allowOneOverlapTestMatrix, overlapMatrixCreator2.getOverlapMatrix(1));
+
+  OverlapMatrixCreator overlapMatrixCreator3(hitRelatedTracks3, 7);
+  EXPECT_EQ(allowTwoOverlapTestMatrix, overlapMatrixCreator3.getOverlapMatrix(2));
+}

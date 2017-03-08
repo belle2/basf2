@@ -32,8 +32,8 @@ namespace Belle2 {
       m_charge(0) ,
       m_startRow(0),
       m_frameNr(0),
-      m_sorPreWord(0),
-      m_commonMode(0) {};
+      m_commonMode(0),
+      m_sorPreWord(0) {};
 
 
     /**

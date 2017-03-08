@@ -12,6 +12,8 @@
 #pragma once
 
 #include <top/reconstruction/TOPtrack.h>
+#include <top/dbobjects/TOPCalChannelMask.h>
+#include <framework/database/DBObjPtr.h>
 
 extern "C" {
   void set_beta_rq_(float*);
@@ -19,7 +21,8 @@ extern "C" {
   void set_pdf_opt_(int*);
   float get_logl_(float*, float*, float*);
   int data_getnum_();
-
+  void set_channel_mask_(int*, int*, int*);
+  void set_channel_effi_(int*, int*, float*);
 }
 
 namespace Belle2 {
@@ -51,6 +54,12 @@ namespace Belle2 {
        * @param ScaleN0 scale factor to scale N0
        */
       TOPreco(int NumHyp, double Masses[], double BkgPerModule = 0, double ScaleN0 = 1);
+
+      /**
+       * Set channel mask
+       * @param mask channel mask
+       */
+      static void setChannelMask(const DBObjPtr<TOPCalChannelMask>& mask);
 
       /**
        * Set hypothesis internal code: 1=e, 2=mu, 3=pi, 4=K, 5=p, 0=other

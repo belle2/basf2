@@ -194,7 +194,7 @@ void V0findingPerformanceEvaluationModule::event()
 
     //1.0 check if there is a V0
     RelationVector<V0ValidationVertex> V0s_toMCParticle =
-      DataStore::getRelationsToObj<V0ValidationVertex>(&mcParticle, m_V0sName);
+      DataStore::getRelationsWithObj<V0ValidationVertex>(&mcParticle, m_V0sName);
 
     if (V0s_toMCParticle.size() > 0)
       m_h3_V0sPerMCParticle->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
@@ -250,7 +250,7 @@ void V0findingPerformanceEvaluationModule::event()
 
     //check if the track has been fitted
     RelationVector<MCParticle> MCParticles_fromV0 =
-      DataStore::getRelationsFromObj<MCParticle>(&v0, m_MCParticlesName);
+      DataStore::getRelationsWithObj<MCParticle>(&v0, m_MCParticlesName);
 
     nMCParticles = MCParticles_fromV0.size();
 
@@ -379,20 +379,20 @@ int V0findingPerformanceEvaluationModule::nMatchedDaughters(const MCParticle& th
   bool first = false;
   bool second = false;
 
-  RelationVector<genfit::TrackCand> TrackCands_fromMCParticle_0 = DataStore::getRelationsToObj<genfit::TrackCand>(MCPart_dau[0]);
+  RelationVector<genfit::TrackCand> TrackCands_fromMCParticle_0 = DataStore::getRelationsWithObj<genfit::TrackCand>(MCPart_dau[0]);
 
   for (int tc = 0; tc < (int)TrackCands_fromMCParticle_0.size(); tc++)
     if (TrackCands_fromMCParticle_0.weight(tc) > 0.66) {
-      RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsFromObj<genfit::Track>(TrackCands_fromMCParticle_0[tc]);
+      RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsWithObj<genfit::Track>(TrackCands_fromMCParticle_0[tc]);
       if (Tracks_fromTrackCand.size() > 0)
         first = true;
     }
 
-  RelationVector<genfit::TrackCand> TrackCands_fromMCParticle_1 = DataStore::getRelationsToObj<genfit::TrackCand>(MCPart_dau[1]);
+  RelationVector<genfit::TrackCand> TrackCands_fromMCParticle_1 = DataStore::getRelationsWithObj<genfit::TrackCand>(MCPart_dau[1]);
 
   for (int tc = 0; tc < (int)TrackCands_fromMCParticle_1.size(); tc++)
     if (TrackCands_fromMCParticle_1.weight(tc) > 0.66) {
-      RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsFromObj<genfit::Track>(TrackCands_fromMCParticle_1[tc]);
+      RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsWithObj<genfit::Track>(TrackCands_fromMCParticle_1[tc]);
       if (Tracks_fromTrackCand.size() > 0)
         second = true;
     }

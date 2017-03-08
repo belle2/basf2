@@ -21,7 +21,7 @@ namespace Belle2 {
      * Storable object for the variables calculated in the SoftwareTriggerModule. The module
      * will write out instances of this class to the data store if you turn on the debug feature.
      *
-     * This class is more or loess only a wrapper around an std::map<string, double> where the strings
+     * This class is more or less only a wrapper around an std::map<string, double> where the strings
      * are the identifier of the variables (prefixed with the base_identifier) and the double are the
      * variables' values.
      */
@@ -37,6 +37,18 @@ namespace Belle2 {
       const std::map<std::string, double>& get() const
       {
         return m_results;
+      }
+
+      /// Get just one value from the map.
+      double getVariable(std::string identifier) const
+      {
+        return m_results.at(identifier);
+      }
+
+      /// Returns true if indentifier is in the map of trigger variables
+      bool has(std::string identifier) const
+      {
+        return m_results.count(identifier) > 0;
       }
 
       /// Clear all results.

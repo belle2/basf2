@@ -9,6 +9,7 @@ PERFORMED CHECKS:
 - File contains event and persistent tree (contains_tree, contains_persistent)
 - Event tree contains event meta data (eventmetadata_readable)
 - Persistent tree contains file metadata (filemetadata_readable)
+- All entries in persistent and event trees readable (all_entries_readable)
 - Number of entries in event tree == number of events in file metadata (entries_eq_filemetedata)
 - Number of entries in event tree == expected_no_of_events, if given (entries_eq_expectation)
 - Number of MC events generated == expected_no_of_mcevents, if given (mcevents_eq_expectation)

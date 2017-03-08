@@ -338,7 +338,7 @@ namespace Belle2 {
 
     /** Add a relation from an object in a store array to another object in a store array.
      *
-     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching. Currently this should only be necessary for genfit objects.
+     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching. Currently this should only be necessary if fromObject is of type genfit::...
      *
      *  @sa RelationsObject::addRelationTo
      *  @param fromObject     Pointer to the object from which the relation points.
@@ -354,49 +354,11 @@ namespace Belle2 {
       Instance().addRelation(fromObject, fromEntry, fromIndex, toObject, toEntry, toIndex, weight);
     }
 
-    /** Get the relations from an object to other objects in a store array.
-     *
-     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching.
-     *
-     *  @sa RelationsObject::getRelationsTo
-     *  @param fromObject     Pointer to the object from which the relations point.
-     *  @tparam TO            Class of the objects to which the relations point.
-     *  @param toName         The name of the store array to which the relations point.
-     *                        If empty the default store array name for toClass will be used.
-     *                        If the special name "ALL" is given all store arrays containing objects of type TO are considered.
-     *  @return               Vector of relation entry objects.
-     */
-    template <class TO> static RelationVector<TO> getRelationsFromObj(const TObject* fromObject, const std::string& toName = "")
-    {
-      StoreEntry* storeEntry = nullptr;
-      int index = -1;
-      return RelationVector<TO>(Instance().getRelationsWith(c_ToSide, fromObject, storeEntry, index, TO::Class(), toName));
-    }
-
-    /** Get the relations to an object from other objects in a store array.
-     *
-     *  @note If at all possible, use RelationsObject members instead, as they allow more efficent caching.
-     *
-     *  @sa RelationsObject::getRelationsFrom
-     *  @param toObject       Pointer to the object to which the relations point.
-     *  @tparam FROM          Class of the objects from which the relations point.
-     *  @param fromName       The name of the store array from which the relations point.
-     *                        If empty the default store array name for fromClass will be used.
-     *                        If the special name "ALL" is given all store arrays containing objects of type FROM are considered.
-     *  @return               Vector of relation entry objects.
-     */
-    template <class FROM> static RelationVector<FROM> getRelationsToObj(const TObject* toObject, const std::string& fromName = "")
-    {
-      StoreEntry* storeEntry = nullptr;
-      int index = -1;
-      return RelationVector<FROM>(Instance().getRelationsWith(c_FromSide, toObject, storeEntry, index, FROM::Class(), fromName));
-    }
-
     /** Get the relations between an object and other objects in a store array.
      *
      *  Relations in both directions are returned.
      *
-     *  @note Using this function should only be necessary for genfit objects. If possible, use RelationsObject members instead, as they allow more efficent caching.
+     *  @note Using this function should only be necessary if type(object) == genfit::.... If possible, use RelationsObject members instead, as they allow more efficent caching.
      *
      *  @sa RelationsObject::getRelationsWith
      *  @param object         Pointer to the object from or to which the relations point.
@@ -413,50 +375,9 @@ namespace Belle2 {
       return RelationVector<T>(Instance().getRelationsWith(c_BothSides, object, storeEntry, index, T::Class(), name));
     }
 
-    /** Get the object to which another object has a relation.
-     *
-     *  @note Using this function should only be necessary for genfit objects. If possible, use RelationsObject members instead, as they allow more efficent caching.
-     *  @warning Note that the naming is not consistent with similar member functions of RelationsObject (exactly switched around). Method will be removed at some point.
-     *
-     *  @param fromObject  Pointer to the object from which the relation points.
-     *  @tparam TO     The class of objects to which the relation points.
-     *  @param toName  The name of the store array to which the relation points.
-     *                 If empty the default store array name for class TO will be used.
-     *                 If the special name "ALL" is given all store arrays containing objects of type TO are considered.
-     *  @return        The related object or a null pointer.
-     */
-    template <class TO> static TO* getRelatedFromObj(const TObject* fromObject, const std::string& toName = "")
-    {
-      if (!fromObject) return nullptr;
-      StoreEntry* storeEntry = nullptr;
-      int index = -1;
-      return static_cast<TO*>(DataStore::Instance().getRelationWith(c_ToSide, fromObject, storeEntry, index, TO::Class(), toName).object);
-    }
-
-    /** Get the object from which another object has a relation.
-     *
-     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching. Currently this should only be necessary for genfit objects.
-     *  @warning Note that the naming is not consistent with similar member functions of RelationsObject (exactly switched around). Method will be removed at some point.
-     *
-     *  @param toObject Pointer to the object to which the relation points.
-     *  @tparam FROM    The class of objects from which the relation points.
-     *  @param fromName The name of the store array from which the relation points.
-     *                  If empty the default store array name for class FROM will be used.
-     *                  If the special name "ALL" is given all store arrays containing objects of type FROM are considered.
-     *  @return         The related object or a null pointer.
-     */
-    template <class FROM> static FROM* getRelatedToObj(const TObject* toObject, const std::string& fromName = "")
-    {
-      if (!toObject) return nullptr;
-      StoreEntry* storeEntry = nullptr;
-      int index = -1;
-      return static_cast<FROM*>(DataStore::Instance().getRelationWith(c_FromSide, toObject, storeEntry, index, FROM::Class(),
-                                fromName).object);
-    }
-
     /** Get the object to or from which another object has a relation.
      *
-     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching. Currently this should only be necessary for genfit objects.
+     *  @note If possible, use RelationsObject members instead, as they allow more efficent caching. Currently this should only be necessary if type(object) == genfit::..
      *
      *  @param object  Pointer to the object to or from which the relation points.
      *  @tparam T      The class of objects to or from which the relation points.
@@ -479,20 +400,10 @@ namespace Belle2 {
      * @{
      * Define versions without template arguments, only available from python modules.
      */
-    static RelationVector<TObject> getRelationsToObj(const TObject* toObject, const std::string& name)
-    {
-      return getRelationsToObj<TObject>(toObject, name);
-    }
-    static RelationVector<TObject> getRelationsFromObj(const TObject* fromObject, const std::string& name)
-    {
-      return getRelationsFromObj<TObject>(fromObject, name);
-    }
     static RelationVector<TObject> getRelationsWithObj(const TObject* object, const std::string& name)
     {
       return getRelationsWithObj<TObject>(object, name);
     }
-    static TObject* getRelatedToObj(const TObject* toObject, const std::string& name) { return getRelatedToObj<TObject>(toObject, name); }
-    static TObject* getRelatedFromObj(const TObject* fromObject, const std::string& name) { return getRelatedFromObj<TObject>(fromObject, name); }
     static TObject* getRelated(const TObject* object, const std::string& name) { return getRelated<TObject>(object, name); }
     /** @} */
 #endif
@@ -600,7 +511,7 @@ namespace Belle2 {
 
     /** For an array containing RelationsObjects, update index and entry cache for entire contents.
      *
-     * You must ensure the array actually contains objects inheriting from RelationObject!
+     * You must ensure the array actually contains objects inheriting from RelationsObject!
      */
     static void updateRelationsObjectCache(StoreEntry& entry);
 

@@ -56,24 +56,12 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
             help='Apply the fitting to the found tracks'
         )
 
-        tracking_argument_group.add_argument(
-            '-so',
-            '--simulate-only',
-            action='store_true',
-            default=self.simulate_only,
-            dest='simulate_only',
-            help='Only generate and simulate the events, but do not run any tracking or validation code')
-
         return argument_parser
 
     def create_path(self):
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
         path = super().create_path()
-
-        # early return if only a simulation run was requested
-        if self.simulate_only:
-            return path
 
         # setting up fitting is only necessary when testing
         # track finding comonenst ex-situ
@@ -104,14 +92,13 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                 # Track matcher
                 mc_track_matcher_module = basf2.register_module('MCRecoTracksMatcher')
 
-                tracking_coverage.pop("WhichParticles", None)
-                tracking_coverage.pop("EnergyCut", None)
-                tracking_coverage.pop("UseNLoops", None)
+                matching_coverage = {key: value for key, value in tracking_coverage.items()
+                                     if key in ('UsePXDHits', 'UseSVDHits', 'UseCDCHits')}
                 mc_track_matcher_module.param({
                     'mcRecoTracksStoreArrayName': 'MCRecoTracks',
                     'MinimalPurity': 0.66,
                     'prRecoTracksStoreArrayName': "RecoTracks",
-                    **tracking_coverage
+                    **matching_coverage
                 })
 
                 path.add_module(IfMCParticlesPresentModule(track_finder_mc_truth_module))
@@ -160,13 +147,15 @@ finder_modules_by_short_name = {
     'TrackFinderCDC': tracking.add_cdc_track_finding,
     'TrackFinderVXD': tracking.add_vxd_track_finding,
     'TrackFinderCDCLegendre': lambda path: (path.add_module('WireHitPreparer'),
-                                            path.add_module('TrackFinderCDCLegendreTracking')),
+                                            path.add_module('TrackFinderCDCLegendreTracking'),
+                                            path.add_module('TrackExporter')),
     'SegmentFinderCDC': lambda path: (path.add_module('WireHitPreparer'),
                                       path.add_module('SegmentFinderCDCFacetAutomaton'),
                                       path.add_module('TrackCreatorSingleSegments',
                                                       MinimalHitsBySuperLayerId={sl_id: 0 for sl_id in range(9)}),
                                       path.add_module('TrackExporter'),
                                       ),
+    'FirstLoop': lambda path: path.add_module('WireHitTopologyPreparer', UseNLoops=1.0),
 }
 
 

@@ -1,3 +1,18 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2011 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Program for calculation some parameters that needs for                 *
+ * covariance matrices calculation                                        *
+ *                                                                        *
+ * Contributors: Alexander Bobrov (a.v.bobrov@inp.nsk.su) ,               *
+ * Guglielmo De Nardo                                                     *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+
 #include <TFile.h>
 #include <TChain.h>
 #include <TH2.h>

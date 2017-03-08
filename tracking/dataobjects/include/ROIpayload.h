@@ -28,7 +28,7 @@ namespace Belle2 {
 
     /** Default constructor.
      */
-    ROIpayload(int rois = 0);
+    explicit ROIpayload(int rois = 0);
 
     /**
      * destructor.

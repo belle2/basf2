@@ -509,34 +509,33 @@ class ValidationPlot(object):
         title = "gaus"
         formula = "gaus"
 
-        if z_score is None:
-            lower_bound = None
-            upper_bound = None
-        else:
-            plot = self.plot
-            if plot is None:
-                raise RuntimeError('Validation plot must be filled before it can be fitted.')
+        plot = self.plot
+        if plot is None:
+            raise RuntimeError('Validation plot must be filled before it can be fitted.')
 
-            if not isinstance(plot, ROOT.TH1D):
-                raise RuntimeError('Fitting is currently implemented / tested for one dimensional, non stacked validation plots.')
+        if not isinstance(plot, ROOT.TH1D):
+            raise RuntimeError('Fitting is currently implemented / tested for one dimensional, non stacked validation plots.')
 
-            histogram = plot
-
-            mean = histogram.GetMean()
-            std = histogram.GetStdDev()
-            lower_bound = mean - z_score * std
-            upper_bound = mean + z_score * std
+        histogram = plot
 
         fit_tf1 = ROOT.TF1("Fit", formula)
         fit_tf1.SetTitle(title)
         fit_tf1.SetParName(0, "n")
         fit_tf1.SetParName(1, "mean")
         fit_tf1.SetParName(2, "std")
+
+        n = histogram.GetSumOfWeights()
+        mean = histogram.GetMean()
+        std = histogram.GetStdDev()
+
+        fit_tf1.SetParameter(0, n)
+        fit_tf1.SetParameter(1, mean)
+        fit_tf1.SetParameter(2, std)
+
         fit_options = "LM"
         return self.fit(fit_tf1,
                         fit_options,
-                        lower_bound=lower_bound,
-                        upper_bound=upper_bound)
+                        z_score=z_score)
 
     def fit_line(self):
         """Fit a general line to a one dimensional histogram"""
@@ -566,7 +565,7 @@ class ValidationPlot(object):
         fit_tf1.SetParName(0, "slope")
         self.fit(fit_tf1, 'M')
 
-    def fit(self, formula, options, lower_bound=None, upper_bound=None):
+    def fit(self, formula, options, lower_bound=None, upper_bound=None, z_score=None):
         """Fit a user defined function to a one dimensional histogram
 
         Parameters
@@ -594,6 +593,16 @@ class ValidationPlot(object):
         hist_lower_bound = xaxis.GetBinLowEdge(1)
         hist_upper_bound = xaxis.GetBinUpEdge(n_bins)
 
+        if z_score is not None:
+            mean = histogram.GetMean()
+            std = histogram.GetStdDev()
+
+            if lower_bound is None:
+                lower_bound = mean - z_score * std
+
+            if upper_bound is None:
+                upper_bound = mean + z_score * std
+
         # Setup the plotting range of the function to match the histogram
         if isinstance(formula, ROOT.TF1):
             fit_tf1 = formula
@@ -606,9 +615,9 @@ class ValidationPlot(object):
         get_logger().info('Fitting with %s', fit_tf1.GetExpFormula())
 
         # Determine fit range
-        if lower_bound is None:
+        if lower_bound is None or lower_bound < hist_lower_bound:
             lower_bound = hist_lower_bound
-        if upper_bound is None:
+        if upper_bound is None or upper_bound > hist_upper_bound:
             upper_bound = hist_upper_bound
 
         # Make sure the fitted function is not automatically added since we want to do that one our own.
@@ -2122,7 +2131,7 @@ class ValidationPlot(object):
             belle2_validation_tstyle.SetOptStat(opt_stat)
             ROOT.gROOT.SetStyle(belle2_validation_style_name)
 
-            belle2_validation_tstyle.SetLineStyleString(cls.very_sparse_dots_line_style_index, "4 2000")
+            # belle2_validation_tstyle.SetLineStyleString(cls.very_sparse_dots_line_style_index, "4 2000")
 
         else:
             belle2_validation_tstyle.cd()

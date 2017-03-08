@@ -26,7 +26,6 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     class CDCWireHit;
-    class CDCConformalHit;
     class CDCWireHitCluster;
     class CDCFacet;
     class CDCSegment2D;
@@ -45,18 +44,6 @@ namespace Belle2 {
     inline std::string getClassMnemomicParameterDescription(const CDCWireHit* dispatchTag __attribute__((unused)))
     {
       return "wire hit";
-    }
-
-    /// Returns a short name for class CDCConformalHit to be used in names of parameters.
-    inline std::string getClassMnemomicParameterName(const CDCConformalHit* dispatchTag __attribute__((unused)))
-    {
-      return "conformalHit";
-    }
-
-    /// Returns a short description for class CDCConformalHit to be used in descriptions of parameters.
-    inline std::string getClassMnemomicParameterDescription(const CDCConformalHit* dispatchTag __attribute__((unused)))
-    {
-      return "conformal hit";
     }
 
     /// Returns a short name for class CDCWireHitCluster to be used in names of parameters.

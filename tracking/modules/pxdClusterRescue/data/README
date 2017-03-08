@@ -1,2 +1,0 @@
-These files are needed to run the PXDClusterRescueNN module. The file PXDClusterNeuroBayes.nb is the expertise for the network, which is trained on cluster charge, size and global coordinates (see PXDClusterRescueNN or analysis.pdf).
-

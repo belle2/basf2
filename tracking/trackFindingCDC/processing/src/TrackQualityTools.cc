@@ -1,8 +1,5 @@
 #include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
-#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
-#include <tracking/trackFindingCDC/processing/HitProcessor.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
@@ -52,41 +49,6 @@ void TrackQualityTools::splitSecondHalfOfTrack(CDCTrack& track, std::vector<CDCT
   if (splittedCDCTrack.size() > 0) {
     tracks.push_back(splittedCDCTrack);
   }
-}
-
-void TrackQualityTools::normalizeTrack(CDCTrack& track)
-{
-  // Set the start point of the trajectory to the first hit
-  if (track.size() < 5) return;
-
-  HitProcessor::unmaskHitsInTrack(track);
-
-  CDCObservations2D observations2D(EFitPos::c_RecoPos);
-  for (const CDCRecoHit3D& item : track) {
-    observations2D.append(item);
-  }
-
-  const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
-  CDCTrajectory2D trackTrajectory2D = fitter.fit(observations2D);
-  Vector2D center = trackTrajectory2D.getGlobalCenter();
-
-  // Arm used as a proxy for the charge of the track
-  // Correct if the track originates close to the origin
-  ESign expectedCharge = HitProcessor::getMajorArmSign(track, center);
-
-  if (trackTrajectory2D.getChargeSign() != expectedCharge) trackTrajectory2D.reverse();
-
-  trackTrajectory2D.setLocalOrigin(trackTrajectory2D.getGlobalPerigee());
-  for (CDCRecoHit3D& recoHit : track) {
-    HitProcessor::updateRecoHit3D(trackTrajectory2D, recoHit);
-  }
-
-  track.sortByArcLength2D();
-
-  CDCTrajectory3D trajectory3D(trackTrajectory2D, CDCTrajectorySZ::basicAssumption());
-  track.setStartTrajectory3D(trajectory3D);
-
-  HitProcessor::unmaskHitsInTrack(track);
 }
 
 void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)

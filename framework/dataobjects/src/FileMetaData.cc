@@ -9,15 +9,16 @@
  **************************************************************************/
 
 #include <boost/python/class.hpp>
+#include <boost/python/copy_const_reference.hpp>
 
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/utilities/HTML.h>
+#include <framework/utilities/KeyValuePrinter.h>
 
 #include <boost/algorithm/string.hpp>
 
 #include <iostream>
 #include <fstream>
-
 
 using namespace std;
 using namespace Belle2;
@@ -47,8 +48,9 @@ bool FileMetaData::containsEvent(int experiment, int run, unsigned int event) co
 
 void FileMetaData::exposePythonAPI()
 {
+  //Note: these can only be used with update_file_metadata(), PyROOT is the more common interface
   class_<FileMetaData>("FileMetaData")
-  .def("get_lfn", &FileMetaData::getLfn)
+  .def("get_lfn", &FileMetaData::getLfn, return_value_policy<copy_const_reference>())
   .def("get_nevents", &FileMetaData::getNEvents)
   .def("get_experiment_low", &FileMetaData::getExperimentLow)
   .def("get_run_low", &FileMetaData::getRunLow)
@@ -57,44 +59,58 @@ void FileMetaData::exposePythonAPI()
   .def("get_run_high", &FileMetaData::getRunHigh)
   .def("get_event_high", &FileMetaData::getEventHigh)
   .def("get_n_parents", &FileMetaData::getNParents)
-  .def("get_parent", &FileMetaData::getParent)
-  .def("get_date", &FileMetaData::getDate)
-  .def("get_site", &FileMetaData::getSite)
-  .def("get_user", &FileMetaData::getUser)
-  .def("get_random_seed", &FileMetaData::getRandomSeed)
-  .def("get_release", &FileMetaData::getRelease)
-  .def("get_steering", &FileMetaData::getSteering)
+  .def("get_parent", &FileMetaData::getParent, return_value_policy<copy_const_reference>())
+  .def("get_date", &FileMetaData::getDate, return_value_policy<copy_const_reference>())
+  .def("get_site", &FileMetaData::getSite, return_value_policy<copy_const_reference>())
+  .def("get_user", &FileMetaData::getUser, return_value_policy<copy_const_reference>())
+  .def("get_random_seed", &FileMetaData::getRandomSeed, return_value_policy<copy_const_reference>())
+  .def("get_release", &FileMetaData::getRelease, return_value_policy<copy_const_reference>())
+  .def("get_steering", &FileMetaData::getSteering, return_value_policy<copy_const_reference>())
   .def("get_mc_events", &FileMetaData::getMcEvents)
-  .def("get_global_tag", &FileMetaData::getDatabaseGlobalTag)
+  .def("get_global_tag", &FileMetaData::getDatabaseGlobalTag, return_value_policy<copy_const_reference>())
+  .def("get_data_description", &FileMetaData::getDataDescription, return_value_policy<copy_const_reference>())
   .def("set_lfn", &FileMetaData::setLfn);
 }
 
+
 void FileMetaData::Print(Option_t* option) const
 {
-  if (option && (strcmp(option, "steering") == 0)) {
+  if (option && (option == std::string("steering"))) {
     cout << m_steering << endl;
     return;
   }
-
-  const bool all = (option && (strcmp(option, "all") == 0));
-  cout << "FileMetaData" << endl;
-  cout << "  LFN    : " << m_lfn << endl;
-  cout << "  #event : " << m_nEvents << endl;
-  cout << "  range  : " << m_experimentLow << "/" << m_runLow << "/" << m_eventLow
-       << " - "  << m_experimentHigh << "/" << m_runHigh << "/" << m_eventHigh << endl;
-  cout << "  parents:";
-  for (std::string parent : m_parentLfns)
-    cout << " " << parent;
-  cout << endl;
-  if (all) {
-    cout << "  date   : " << m_date << endl;
-    cout << "  site   : " << m_site << endl;
-    cout << "  user   : " << m_user << endl;
-    cout << "  seed   : " << m_randomSeed << endl;
-    cout << "  release: " << m_release << endl;
-    cout << "  #MC    : " << m_mcEvents << endl;
-    cout << "globalTag: " << m_databaseGlobalTag << endl;
+  const bool use_json = (option && option == std::string("json"));
+  const bool all = use_json || (option && option == std::string("all"));
+  KeyValuePrinter printer(use_json);
+  printer.put("LFN", m_lfn);
+  printer.put("nEvents", m_nEvents);
+  if (use_json) {
+    printer.put("experimentLow", m_experimentLow);
+    printer.put("runLow", m_runLow);
+    printer.put("eventLow", m_eventLow);
+    printer.put("experimentHigh", m_experimentHigh);
+    printer.put("runHigh", m_runHigh);
+    printer.put("eventHigh", m_eventHigh);
+  } else {
+    printer.put("range", std::to_string(m_experimentLow) + "/" + std::to_string(m_runLow) + "/" + std::to_string(m_eventLow)
+                + " - "  + std::to_string(m_experimentHigh) + "/" + std::to_string(m_runHigh) + "/" + std::to_string(m_eventHigh));
   }
+  printer.put("parents", m_parentLfns);
+  if (all) {
+    printer.put("date", m_date);
+    printer.put("site", m_site);
+    printer.put("user", m_user);
+    printer.put("randomSeed", m_randomSeed);
+    printer.put("release", m_release);
+    printer.put("mcEvents", m_mcEvents);
+    printer.put("globalTag", m_databaseGlobalTag);
+    printer.put("dataDescription", m_dataDescription);
+  }
+  if (use_json)
+    printer.put("steering", m_steering);
+  if (!use_json)
+    std::cout << "=== FileMetaData ===\n";
+  std::cout << printer.string();
 }
 
 bool FileMetaData::read(std::istream& input, std::string& physicalFileName)
@@ -145,7 +161,7 @@ bool FileMetaData::read(std::istream& input, std::string& physicalFileName)
   return false;
 }
 
-bool FileMetaData::write(std::ostream& output, std::string physicalFileName) const
+bool FileMetaData::write(std::ostream& output, const std::string& physicalFileName) const
 {
   output << "  <File>\n";
   output << "    <LFN>" << HTML::escape(m_lfn) << "</LFN>\n";

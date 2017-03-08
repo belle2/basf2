@@ -22,9 +22,9 @@
 #include <analysis/utility/AnalysisConfiguration.h>
 
 // map
-#include <map>
+#include <unordered_map>
 #include <algorithm>
-typedef std::map<unsigned int, unsigned int> CounterMap;
+typedef std::unordered_map<unsigned int, unsigned int> CounterMap;
 
 using namespace std;
 
@@ -143,14 +143,31 @@ namespace Belle2 {
       }
     }
 
-    // find most common mother
+    // find first most common mother
     auto commonMother = std::max_element
                         (
                           std::begin(motherCount), std::end(motherCount),
     [](std::pair <unsigned int, unsigned int> p1, std::pair <unsigned int, unsigned int> p2) {
-      return p1.second < p2.second;
+      bool returnValue = false;
+      if (p1.second < p2.second)
+        returnValue = true;
+      else if (p1.second == p2.second)
+        returnValue = p2.first > p1.first;
+
+      return returnValue;
     }
                         );
+
+    // No common mother found, all daughters have no associated MC Particle
+    if (commonMother == std::end(motherCount)) {
+      Particle* thisParticle = particles[particle->getArrayIndex()];
+      thisParticle->addExtraInfo("looseMCMotherPDG",   -1);
+      thisParticle->addExtraInfo("looseMCMotherIndex", -1);
+      thisParticle->addExtraInfo("looseMCWrongDaughterN", -1);
+      thisParticle->addExtraInfo("looseMCWrongDaughterPDG", -1);
+      thisParticle->addExtraInfo("looseMCWrongDaughterBiB", -1);
+      return;
+    }
 
     const MCParticle* mcMother = mcParticles[commonMother->first - 1];
 

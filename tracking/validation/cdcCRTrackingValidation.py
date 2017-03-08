@@ -27,6 +27,8 @@ from tracking.validation.run import TrackingValidationRun
 
 class CDCCR(TrackingValidationRun):
     n_events = N_EVENTS
+    #: Generator to be used in the simulation (-so)
+    generator_module = 'Cosmics'
     root_input_file = '../CosmicsSimNoBkg.root'
     components = None
 
@@ -43,11 +45,12 @@ class CDCCR(TrackingValidationRun):
                         )
 
     tracking_coverage = {
+        'WhichParticles': ['CDC'],  # Include all particles seen in CDC, also secondaries
         'UsePXDHits': False,
         'UseSVDHits': False,
         'UseCDCHits': True,
         'UseOnlyAxialCDCHits': False
-        }
+    }
 
     fit_tracks = True
     pulls = True

@@ -20,30 +20,56 @@
 
 namespace Belle2 {
 
-  //!Unpacker for the KLM
+  /**
+   * EKLM unpacker.
+   */
   class EKLMUnpackerModule : public Module {
+
   public:
-    //! Constructor
+
+    /**
+     * Constructor.
+     */
     EKLMUnpackerModule();
-    //! Destructor
+
+    /**
+     * Destructor.
+     */
     virtual ~EKLMUnpackerModule();
-    //! Initialize at start of job
+
+    /**
+     * Initializer.
+     */
     virtual void initialize();
-    //! begin run stuff
+
+    /**
+     * Called when entering a new run.
+     */
     virtual void beginRun();
-    //! Unpack one event and create digits
+
+    /**
+     * This method is called for each event.
+     */
     virtual void event();
-    //! end run stuff
+
+    /**
+     * This method is called if the current run ends.
+     */
     virtual void endRun();
-    //! Terminate at the end of job
+
+    /**
+     * This method is called at the end of the event processing.
+     */
     virtual void terminate();
 
   private:
-    //! length of one hit in 4 byte words. This is needed find the hits in the detector buffer
-    const int hitLength = 2;
-    //! name of EKLMDigit store array
+
+    /** Name of EKLMDigit store array. */
     std::string m_outputDigitsName;
+
   };
 
 }
+
 #endif
+

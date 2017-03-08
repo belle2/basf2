@@ -63,6 +63,161 @@ namespace Belle2 {
       return counter;
     }
 
+    double isAncestorOf(const Particle* part, const std::vector<double>& daughterIDs)
+    {
+      if (part == nullptr)
+        return -999;
+
+      // If particle has no MC relation, MC chain doesn't exist
+      const MCParticle* mcpart = part->getRelatedTo<MCParticle>();
+      if (mcpart == nullptr)
+        return -1.0;
+
+      if (daughterIDs.empty())
+        B2FATAL("Wrong number of arguments for parameter function isAncestorOf. At least one needed!");
+
+      // Get to the daughter of interest
+      const Particle* curParticle = part;
+      double isAncestor = 0.0;
+
+      for (unsigned int i = 0; i < daughterIDs.size(); i++) {
+        int nCurDaughters = curParticle->getNDaughters();
+        if (nCurDaughters == 0)
+          B2FATAL("Assumed mother of particle at argument " << i << " has no daughters!");
+        if (daughterIDs[i] >= nCurDaughters)
+          B2FATAL("Assumed mother of particle at argument " << i << " has only " << nCurDaughters
+                  << " daughters, but daughter at position " << daughterIDs[i] << " expected!");
+        const Particle* curDaughter = curParticle->getDaughter(daughterIDs[i]);
+        if (curDaughter == nullptr)
+          return -999;
+        curParticle = curDaughter;
+      }
+
+      // Daughter obtained, get MC particle of daughter
+      const MCParticle* finalMCDaughter = curParticle->getRelatedTo<MCParticle>();
+      if (finalMCDaughter == nullptr)
+        return -1.0;
+
+      // Go up the MC chain, check for ancestor
+      const MCParticle* curMCParticle = finalMCDaughter;
+
+      while (curMCParticle != nullptr) {
+        const MCParticle* curMCMother = curMCParticle->getMother();
+        if (curMCMother == nullptr)
+          return 0.0;
+        else {
+          if (curMCMother->getArrayIndex() == mcpart->getArrayIndex()) {
+            isAncestor++;
+            break;
+          } else {
+            curMCParticle = curMCMother;
+            isAncestor++;
+          }
+        }
+      }
+      return isAncestor;
+    }
+
+    double hasAncestor(const Particle* part, const std::vector<double>& args)
+    {
+      if (part == nullptr)
+        return -999;
+
+      // If particle has no MC relation, MC chain doesn't exist
+      const MCParticle* mcpart = part->getRelatedTo<MCParticle>();
+      if (mcpart == nullptr)
+        return -1.0;
+
+      int m_PDG, m_sign = 0;
+
+      if (args.empty())
+        B2FATAL("Wrong number of arguments for variable hasAncestor!");
+      else if (args.size() == 1) {
+        if (args[0] == 0)
+          B2FATAL("PDG code in variable hasAncestor is 0!");
+        else
+          m_PDG = args[0];
+      } else if (args.size() == 2) {
+        if (args[0] == 0 or (args[1] != 0 and args[1] != 1))
+          B2FATAL("PDG code in variable hasAncestor is 0 or second argument is not 0 or 1!");
+        else {
+          m_PDG = args[0];
+          m_sign = args[1];
+        }
+      } else {
+        B2FATAL("Too many arguments for variable hasAncestor!");
+      }
+
+      unsigned int nLevels = 0;
+
+      const MCParticle* curMCParticle = mcpart;
+
+      while (curMCParticle != nullptr) {
+        const MCParticle* curMCMother = curMCParticle->getMother();
+        if (curMCMother == nullptr)
+          return 0;
+
+        int pdg = curMCMother->getPDG();
+        if (m_sign == 0)
+          pdg = abs(pdg);
+
+        if (pdg == m_PDG) {
+          ++nLevels;
+          break;
+        } else {
+          ++nLevels;
+          curMCParticle = curMCMother;
+        }
+      }
+      return nLevels;
+    }
+
+    double genNthMotherPDG(const Particle* part, const std::vector<double>& args)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      unsigned int nLevels;
+      if (args.empty())
+        nLevels = 0;
+      else
+        nLevels = args[0];
+
+      const MCParticle* curMCParticle = mcparticle;
+      for (unsigned int i = 0; i <= nLevels; i++) {
+        const MCParticle* curMCMother = curMCParticle->getMother();
+        if (curMCMother == nullptr)
+          return 0.0;
+        curMCParticle = curMCMother;
+      }
+      int m_pdg = curMCParticle->getPDG();
+      return m_pdg;
+    }
+
+    double genNthMotherIndex(const Particle* part, const std::vector<double>& args)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      unsigned int nLevels;
+      if (args.empty())
+        nLevels = 0;
+      else
+        nLevels = args[0];
+
+      const MCParticle* curMCParticle = mcparticle;
+      for (unsigned int i = 0; i <= nLevels; i++) {
+        const MCParticle* curMCMother = curMCParticle->getMother();
+        if (curMCMother == nullptr)
+          return 0.0;
+        curMCParticle = curMCMother;
+      }
+      int m_id = curMCParticle->getArrayIndex();
+      return m_id;
+    }
+
     double daughterInvariantMass(const Particle* particle, const std::vector<double>& daughter_indexes)
     {
       if (!particle)
@@ -269,6 +424,19 @@ namespace Belle2 {
                       "Returns number of MC Particles (including anti-particles) with the given pdgcode in the event.\n"
                       "Used in the FEI to determine to calculate reconstruction efficiencies.\n"
                       "The variable is event-based and does not need a valid particle pointer as input.");
+    REGISTER_VARIABLE("isAncestorOf(i, j, ...)", isAncestorOf,
+                      "Returns a positive integer if daughter at position particle->daughter(i)->daughter(j)... is an ancestor of the related MC particle, 0 otherwise.\n"
+                      "Positive integer represents the number of steps needed to get from final MC daughter to ancestor."
+                      "If any particle or MCparticle is a nullptr, -999 is returned. If MC relations of any particle doesn't exist, -1.0 is returned.");
+    REGISTER_VARIABLE("hasAncestor(PDG, abs)", hasAncestor,
+                      "Returns a positive integer if an ancestor with the given PDG code is found, 0 otherwise.\n"
+                      "The integer is the level where the ancestor was found, 1: first mother, 2: grandmother, etc.\n"
+                      "Second argument is optional, 1 means that the sign of the PDG code is taken into account, default is 0.\n"
+                      "If there is no MC relations found, -1 is returned. In case of nullptr particle, -999 is returned.");
+    REGISTER_VARIABLE("genMotherPDG(i)", genNthMotherPDG,
+                      "Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.");
+    REGISTER_VARIABLE("genMotherID(i)", genNthMotherIndex,
+                      "Check the array index of a particle n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.");
     REGISTER_VARIABLE("daughterInvariantMass(i, j, ...)", daughterInvariantMass ,
                       "Returns invariant mass of the given daughter particles.\n"
                       "E.g. daughterInvariantMass(0, 1) returns the invariant mass of the first and second daughter.\n"

@@ -304,6 +304,8 @@ class TrackingValidationModule(basf2.Module):
             is_matched = trackMatchLookUp.isMatchedMCRecoTrack(mcTrackCand)
 
             hit_efficiency = trackMatchLookUp.getRelatedEfficiency(mcTrackCand)
+            if math.isnan(hit_efficiency):
+                hit_efficiency = 0
 
             mcParticle = trackMatchLookUp.getRelatedMCParticle(mcTrackCand)
             mcHelix = getHelixFromMCParticle(mcParticle)
@@ -346,7 +348,8 @@ class TrackingValidationModule(basf2.Module):
         else:
             clone_rate = float('nan')
 
-        hit_efficiency = np.nanmean(self.mc_hit_efficiencies)
+        mc_matched_primaries = np.logical_and(self.mc_primaries, self.mc_matches)
+        hit_efficiency = np.average(self.mc_hit_efficiencies, weights=mc_matched_primaries)
 
         figures_of_merit = ValidationFiguresOfMerit('%s_figures_of_merit'
                                                     % name)
@@ -393,7 +396,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         ##################
         plots = self.profiles_by_mc_parameters(self.mc_hit_efficiencies,
                                                'hit efficiency with matched tracks',
-                                               weights=self.mc_primaries)
+                                               weights=mc_matched_primaries)
         validation_plots.extend(plots)
 
         # Fit quality #
@@ -638,6 +641,18 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
                 is_expert = not(parameter_name in non_expert_parameters)
 
+                # Apply some boundaries for the maximal tracking acceptance
+                # such that the plots look more instructive
+                if root_save_name(parameter_name) == 'tan_lambda':
+                    lower_bound = -1.73
+                    upper_bound = 3.27
+                elif root_save_name(parameter_name) == 'theta':
+                    lower_bound = 17 * math.pi / 180
+                    upper_bound = 150 * math.pi / 180
+                else:
+                    lower_bound = None
+                    upper_bound = None
+
                 profile_plot_name = plot_name_prefix + '_by_' \
                     + root_save_name(parameter_name)
                 profile_plot = ValidationPlot(profile_plot_name)
@@ -645,6 +660,9 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                                      xs,
                                      weights=weights,
                                      outlier_z_score=10.0,
+                                     lower_bound=lower_bound,
+                                     upper_bound=upper_bound,
+                                     y_binary=True,
                                      is_expert=is_expert)
 
                 profile_plot.xlabel = compose_axis_label(parameter_name)

@@ -17,6 +17,7 @@
 #include <boost/regex.hpp>
 
 #include <stdexcept>
+#include <string>
 
 using namespace Belle2;
 using namespace std;
@@ -33,9 +34,11 @@ void NtupleCustomFloatsTool::setupTree()
 
   int nVars = m_strVarNames.size();
   for (int iVar = 0; iVar < nVars; iVar++) {
-    const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(m_strVarNames[iVar]);
+    // dropping possible aliases
+    string varName = m_strVarNames[iVar].substr(0, m_strVarNames[iVar].find("{", 0));
+    const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(varName);
     if (!var) {
-      B2ERROR("Variable '" << m_strVarNames[iVar] << "' is not available in Variable::Manager!");
+      B2ERROR("Variable '" << varName << "' is not available in Variable::Manager!");
     } else {
       m_functions.push_back(var->function);
     }
@@ -49,40 +52,50 @@ void NtupleCustomFloatsTool::setupTree()
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
     for (int iVar = 0; iVar < nVars; iVar++) {
       int iPos = iVar * nDecayProducts + iProduct;
-      string varName = makeROOTCompatible(m_strVarNames[iVar]);
+      string varName;
 
-      // extraInfoVariableName -> VariableName
-      boost::erase_all(varName, "extraInfo");
+      if (m_strVarNames[iVar].find("{", 0) > 0) {
+        varName = m_strVarNames[iVar].substr(m_strVarNames[iVar].find("{", 0) + 1, m_strVarNames[iVar].find("}",
+                                             0) - m_strVarNames[iVar].find("{", 0) - 1);
+        varName = makeROOTCompatible(varName);
+        varName = (strNames[iProduct] + "_" + varName);
+      } else {
+        varName = makeROOTCompatible(m_strVarNames[iVar]);
 
-      // daughter0VariableName -> d0_VariableName
-      boost::regex re("daughter([0-9])");
-      varName = boost::regex_replace(varName, re, "d$1_");
+        // extraInfoVariableName -> VariableName
+        boost::erase_all(varName, "extraInfo");
 
-      // daughterInvariantMass01 -> d01_M
-      re = boost::regex("daughterInvariantMass(\\d+)");
-      varName = boost::regex_replace(varName, re, "d$1_M");
+        // daughter0VariableName -> d0_VariableName
+        boost::regex re("daughter([0-9])");
+        varName = boost::regex_replace(varName, re, "d$1_");
 
-      // decayAngle0 -> d0_decayAngle
-      re = boost::regex("decayAngle([0-9])");
-      varName = boost::regex_replace(varName, re, "d$1_decayAngle");
+        // daughterInvariantMass01 -> d01_M
+        re = boost::regex("daughterInvariantMass(\\d+)");
+        varName = boost::regex_replace(varName, re, "d$1_M");
 
-      // daughterAngle01 -> d01_angle
-      re = boost::regex("daughterAngle(\\d+)");
-      varName = boost::regex_replace(varName, re, "d$1_angle");
+        // decayAngle0 -> d0_decayAngle
+        re = boost::regex("decayAngle([0-9])");
+        varName = boost::regex_replace(varName, re, "d$1_decayAngle");
 
-      // massDifference0 -> DeltaM0
-      re = boost::regex("massDifference([0-9])");
-      varName = boost::regex_replace(varName, re, "DeltaM$1");
+        // daughterAngle01 -> d01_angle
+        re = boost::regex("daughterAngle(\\d+)");
+        varName = boost::regex_replace(varName, re, "d$1_angle");
 
-      // massDifferenceError0 -> ErrDeltaM0
-      re = boost::regex("massDifferenceError([0-9])");
-      varName = boost::regex_replace(varName, re, "ErrDeltaM$1");
+        // massDifference0 -> DeltaM0
+        re = boost::regex("massDifference([0-9])");
+        varName = boost::regex_replace(varName, re, "DeltaM$1");
 
-      // massDifferenceSignificance0 -> SigDeltaM0
-      re = boost::regex("massDifferenceSignificance([0-9])");
-      varName = boost::regex_replace(varName, re, "SigDeltaM$1");
+        // massDifferenceError0 -> ErrDeltaM0
+        re = boost::regex("massDifferenceError([0-9])");
+        varName = boost::regex_replace(varName, re, "ErrDeltaM$1");
 
-      varName = (strNames[iProduct] + "__" + varName);
+        // massDifferenceSignificance0 -> SigDeltaM0
+        re = boost::regex("massDifferenceSignificance([0-9])");
+        varName = boost::regex_replace(varName, re, "SigDeltaM$1");
+
+        varName = (strNames[iProduct] + "__" + varName);
+      }
+
       m_tree->Branch(varName.c_str(), &m_fVars[iPos], (varName + "/F").c_str());
 
       B2INFO("   " << iPos << ") " << m_strVarNames[iVar] << " -> " << varName);

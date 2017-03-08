@@ -10,6 +10,7 @@
 
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/DataStoreStreamer.h>
+#include <framework/pcore/ProcHandler.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/core/Environment.h>
 
@@ -56,7 +57,16 @@ void TxModule::initialize()
 
 void TxModule::beginRun()
 {
-  B2DEBUG(100, "beginRun called.");
+  if (ProcHandler::isInputProcess()) {
+    //NOTE: only needs to be done in input process, that way the parallel processes
+    //      will never see runs out of order
+    B2DEBUG(100, "beginRun called (will wait for reading processes to finish processing previous run...).");
+    //wait until RB is both empty and all attached reading processes have finished..
+    while (!m_rbuf->isDead() and !m_rbuf->allRxWaiting()) {
+      usleep(500);
+    }
+  }
+  B2DEBUG(100, "beginRun done.");
 }
 
 

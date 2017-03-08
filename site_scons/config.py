@@ -60,10 +60,7 @@ def CheckLibrary(conf, lib):
     process = subprocess.Popen(['ldd', lib], stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
     output = process.communicate()[0]
-    if process.returncode == 0 and 'not found' not in output:
-        result = 1
-    else:
-        result = 0
+    result = process.returncode == 0 and 'not found' not in output
     conf.Result(result)
     return result
 
@@ -74,7 +71,7 @@ def configure_belle2(conf):
     # Belle II environment setup
     if not conf.CheckEnvVar('BELLE2_TOOLS', 'Belle II environment setup'):
         print 'Belle II software environment is not set up.'
-        print '-> Source "setup_belle2.sh" (for bash) or "setup_belle2.csh" (for csh).'
+        print '-> Source "setup_belle2" from the tools/ directory.'
         return False
 
     # local Belle II release setup
@@ -90,12 +87,7 @@ def configure_belle2(conf):
 def configure_system(conf):
     """configure the system packages"""
 
-    # xml
-    if not conf.CheckConfigTool('xml2-config'):
-        print 'XML configuration tool missing'
-        print '-> install the libxml2 development package'
-        return False
-
+    # xml (in externals)
     conf.env.ParseConfig('xml2-config --cflags')
     xml_env = Environment(ENV=os.environ)
     xml_env.ParseConfig('xml2-config --libs')

@@ -90,11 +90,14 @@ namespace {
 
         const bool finished = derivatives_pair.second > 2.7122 and chi2 < 1.739;
 
+        // subtract the initial seed time from the extracted time
+        const double extracted_time_subtract = extracted_time - initialValue;
+
         if (finished) {
-          convergedTries.emplace_back(extracted_time, chi2);
+          convergedTries.emplace_back(extracted_time_subtract, chi2);
           break;
         } else {
-          tries.emplace_back(extracted_time, chi2);
+          tries.emplace_back(extracted_time_subtract, chi2);
         }
       }
     }
@@ -177,7 +180,7 @@ void FullGridTrackTimeExtractionModule::event()
 
     const double extractedTime = minimalChi2->m_extractedT0;
     // The uncertainty was calculated using a test MC sample
-    m_eventT0->addEventT0(extractedTime, 5.1, Const::EDetector::CDC);
+    m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
   } else {
     // If not, start with the lowest extracted chi2 and do another two iteration steps. If it converges then,
     // use this. Else, use the next best guess.

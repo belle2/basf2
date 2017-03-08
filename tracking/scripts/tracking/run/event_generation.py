@@ -30,7 +30,7 @@ class ReadOrGenerateEventsRun(MinimalRun):
     bkg_files = []
     components = None
     disable_deltas = False
-    simulate_only = False
+    simulation_output = None
 
     def create_argument_parser(self, **kwds):
         argument_parser = super().create_argument_parser(**kwds)
@@ -86,7 +86,32 @@ class ReadOrGenerateEventsRun(MinimalRun):
             help='Disable the generation of delta rays in the simulation'
         )
 
+        simulation_argument_group.add_argument(
+            '-so',
+            '--simulation-output',
+            nargs='?',
+            default=self.simulation_output,
+            const=self.root_input_file,
+            dest='simulation_output',
+            help='Only generate and simulate the events and write them to the given output file. Skip rest of the path.'
+        )
+
         return argument_parser
+
+    def configure(self, arguments):
+        super().configure(arguments)
+        if self.simulation_output:
+            get_logger().info("Requested to simulation run. Deactivate input file")
+            self.root_input_file = None
+
+    def execute(self):
+        if not self.simulation_output:
+            super().execute()
+            return
+
+        # Run only simulation
+        path = ReadOrGenerateEventsRun.create_path(self)
+        self.run(path)
 
     def create_path(self):
         path = super().create_path()
@@ -132,6 +157,14 @@ class ReadOrGenerateEventsRun(MinimalRun):
             if not bkg_file_paths and self.generator_module is None:
                 raise RuntimeError('Need at least one of root_input_file,'
                                    ' generator_module or bkg_files specified.')
+        else:
+            if not os.path.exists(self.root_input_file):
+                raise RuntimeError("Could not find file " + str(self.root_input_file) + ". Generate it with -- -so?")
+
+        # early write out if simulation output was requested
+        if self.simulation_output:
+            root_output_module = path.add_module('RootOutput',
+                                                 outputFileName=self.simulation_output)
 
         return path
 

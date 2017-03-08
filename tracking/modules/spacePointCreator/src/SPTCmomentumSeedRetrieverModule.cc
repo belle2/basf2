@@ -29,8 +29,6 @@ SPTCmomentumSeedRetrieverModule::SPTCmomentumSeedRetrieverModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("tcArrayName", m_PARAMtcArrayName, " sets the name of expected StoreArray with SpacePointTrackCand in it.", string(""));
-
-  addParam("stdPDGCode", m_PARAMstdPDGCode, " sets default PDG code for all track candidate in this module.", int(211));
 }
 
 
@@ -79,12 +77,6 @@ bool SPTCmomentumSeedRetrieverModule::createSPTCmomentumSeed(SpacePointTrackCand
   auto seedGenerator = QualityEstimators();
   seedGenerator.resetMagneticField(m_bFieldZ);
 
-  int chargeSignFactor = 0; /**< == 1 if pdg code is for a lepton, -1 if not. */
-  int tempPDG = (m_PARAMstdPDGCode > 0 ? m_PARAMstdPDGCode : -m_PARAMstdPDGCode);
-  if (tempPDG > 10 and tempPDG < 18) {
-    // in this case, its a lepton. since leptons with positive sign have got negative codes, this must be taken into account
-    chargeSignFactor = -1;
-  } else { chargeSignFactor = 1; }
   TVectorD stateSeed(6); //(x,y,z,px,py,pz)
   TMatrixDSym covSeed(6);
   covSeed(0, 0) = 0.01 ; covSeed(1, 1) = 0.01 ; covSeed(2, 2) = 0.04 ; // 0.01 = 0.1^2 = dx*dx =dy*dy. 0.04 = 0.2^2 = dz*dz
@@ -119,15 +111,14 @@ bool SPTCmomentumSeedRetrieverModule::createSPTCmomentumSeed(SpacePointTrackCand
   seedValue = seedGenerator.calcMomentumSeed(false,
                                              0); // ATTENTION: can throw an exception, therefore TODO: catche exception and return false if thrown, ATTENTION 2: check and verify that the seed is generated from the _innermost_ SP of the TC!
 
-  int pdgCode = seedValue.second * m_PARAMstdPDGCode * chargeSignFactor; // improved one for curved tracks
 
   stateSeed(0) = (aTC.getHits().front()->X()); stateSeed(1) = (aTC.getHits().front()->Y());
   stateSeed(2) = (aTC.getHits().front()->Z());
   stateSeed(3) = seedValue.first[0]; stateSeed(4) = seedValue.first[1]; stateSeed(5) = seedValue.first[2];
 
   aTC.set6DSeed(stateSeed);
-  aTC.setPdgCode(pdgCode);
   aTC.setCovSeed(covSeed);
+  aTC.setChargeSeed(seedValue.second);
 
   return true; // TODO: define cases for which a negative value shall be returned (e.g. seed creation failed)
 }

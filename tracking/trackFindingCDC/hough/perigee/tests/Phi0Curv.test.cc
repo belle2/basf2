@@ -215,8 +215,12 @@ namespace {
     const double minWeight = 30.0;
     using Node = typename SimpleRLTaggedWireHitPhi0CurvHough::Node;
     AxialLegendreLeafProcessor<Node> leafProcessor(maxLevel);
-    leafProcessor.setMinWeight(minWeight);
-    leafProcessor.setMaxCurv(maxCurvAcceptance);
+
+    ModuleParamList moduleParamList;
+    const std::string prefix = "";
+    leafProcessor.exposeParameters(&moduleParamList, prefix);
+    moduleParamList.getParameter<double>("minWeight").setDefaultValue(minWeight);
+    moduleParamList.getParameter<double>("maxCurv").setDefaultValue(maxCurvAcceptance);
 
     // Execute the finding a couple of time to find a stable execution time.
     std::vector< std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit> > > candidates;
@@ -236,15 +240,15 @@ namespace {
       leafProcessor.clear();
 
       // Make two passes - one with more restrictive curvature
-      leafProcessor.setMaxCurv(curlCurv);
-      leafProcessor.setNRoadSearches(2);
-      leafProcessor.setRoadLevel(4);
+      moduleParamList.getParameter<double>("maxCurv").setDefaultValue(curlCurv);
+      moduleParamList.getParameter<int>("nRoadSearches").setDefaultValue(2);
+      moduleParamList.getParameter<int>("roadLevel").setDefaultValue(4);
       leafProcessor.beginWalk();
       houghTree.findUsing(leafProcessor);
 
-      leafProcessor.setMaxCurv(maxCurvAcceptance);
-      leafProcessor.setNRoadSearches(3);
-      leafProcessor.setRoadLevel(0);
+      moduleParamList.getParameter<double>("maxCurv").setDefaultValue(maxCurvAcceptance);
+      moduleParamList.getParameter<int>("nRoadSearches").setDefaultValue(3);
+      moduleParamList.getParameter<int>("roadLevel").setDefaultValue(0);
       leafProcessor.beginWalk();
       houghTree.findUsing(leafProcessor);
 
@@ -321,8 +325,12 @@ namespace {
     const double minWeight = 30.0;
     using Node = typename SimpleRLTaggedWireHitPhi0CurvHough::Node;
     AxialLegendreLeafProcessor<Node> leafProcessor(maxLevel);
-    leafProcessor.setMinWeight(minWeight);
-    leafProcessor.setMaxCurv(maxCurvAcceptance);
+
+    ModuleParamList moduleParamList;
+    const std::string prefix = "";
+    leafProcessor.exposeParameters(&moduleParamList, prefix);
+    moduleParamList.getParameter<double>("minWeight").setDefaultValue(minWeight);
+    moduleParamList.getParameter<double>("maxCurv").setDefaultValue(maxCurvAcceptance);
 
     // Execute the finding a couple of time to find a stable execution time.
     std::vector< std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit> > > candidates;
@@ -343,15 +351,15 @@ namespace {
       leafProcessor.clear();
 
       // Make two passes - one with more restrictive curvature
-      leafProcessor.setMaxCurv(curlCurv);
-      leafProcessor.setNRoadSearches(2);
-      leafProcessor.setRoadLevel(4);
+      moduleParamList.getParameter<double>("maxCurv").setDefaultValue(curlCurv);
+      moduleParamList.getParameter<int>("nRoadSearches").setDefaultValue(2);
+      moduleParamList.getParameter<int>("roadLevel").setDefaultValue(4);
       leafProcessor.beginWalk();
       houghTree.findUsing(leafProcessor);
 
-      leafProcessor.setMaxCurv(maxCurvAcceptance);
-      leafProcessor.setNRoadSearches(3);
-      leafProcessor.setRoadLevel(0);
+      moduleParamList.getParameter<double>("maxCurv").setDefaultValue(maxCurvAcceptance);
+      moduleParamList.getParameter<int>("nRoadSearches").setDefaultValue(3);
+      moduleParamList.getParameter<int>("roadLevel").setDefaultValue(0);
       leafProcessor.beginWalk();
       houghTree.findUsing(leafProcessor);
 

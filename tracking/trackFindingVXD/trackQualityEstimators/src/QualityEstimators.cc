@@ -38,15 +38,6 @@ std::pair<TVector3, int> QualityEstimators::calcMomentumSeed(bool useBackwards, 
     B2ERROR("calcInitialValues4TCs: currentTC got " << m_numHits <<
             " hits! At this point only tcs having at least 3 hits should exist!");
   }
-  //     hitA = (*hits)[2]->hitPosition;
-  TVector3 hitB = (*m_hits)[1]->hitPosition;
-  TVector3 hitC = (*m_hits)[0]->hitPosition; // outermost hit and initial value for genfit::TrackCandidate
-
-  hitC -= hitB; // recycling TVector3s, this is segmentBC
-  hitB -= (*m_hits)[2]->hitPosition; // this is segmentAB
-  hitC.SetZ(0.);
-  hitB.SetZ(0.);
-  hitC = hitC.Orthogonal();
 
   std::pair<double, TVector3> fitResults;
 
@@ -94,8 +85,18 @@ std::pair<TVector3, int> QualityEstimators::calcMomentumSeed(bool useBackwards, 
   }
   B2DEBUG(10, "calcMomentumSeed: return values of Fit: first(radius): " << fitResults.first << ", second.Mag(): " <<
           fitResults.second.Mag());
-  int signValue = boost::math::sign(hitC *
-                                    hitB); // sign of curvature: is > 0 if angle between vectors is < 90°, < 0 else (rule of scalar product)
+
+
+  // Calculate curvature sign out of the three innermost hits:
+  // Point A is the innermost hit, points B and C the following ones.
+  // WARNING: Sign calculation not influenced by 'useBackwards'!
+  int nHits = m_hits->size();
+  TVector3 vectorAB = (*m_hits).at(nHits - 2)->hitPosition - (*m_hits).at(nHits - 1)->hitPosition;
+  TVector3 vectorBC = (*m_hits).at(nHits - 3)->hitPosition - (*m_hits).at(nHits - 2)->hitPosition;
+  vectorAB.SetZ(0.);
+  vectorBC.SetZ(0.);
+  // Orthogonal represents clockwise rotation around Z-Axis by 90 degrees in this case
+  int signValue = boost::math::sign(vectorAB.Orthogonal() * vectorBC);
   if (signValue == 0) {
     // means that 3 hits are completely in a line, if magnetic field is off, this can occur and therefore does not need to produce an error
     signValue = 1;
@@ -712,7 +713,6 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
   zValuesT.T();
 
   TMatrixD sigma2M = zValuesT * (TAtG * AtGAInv * AtG) * zValues;
-  double sigma2 = sigma2M(0, 0) / (nHits - 2);
 
   double thetaVal = (M_PI * 0.5 - atan(p(1, 0)));
 

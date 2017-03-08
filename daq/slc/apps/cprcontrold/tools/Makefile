@@ -5,6 +5,8 @@ CP      = cp -f
 
 BELLE2_LIB = $(BELLE2_DAQ_SLC)/lib
 BELLE2_INC = $(BELLE2_DAQ_SLC)/include
+BELLE2EX_LIB = $(BELLE2_EXTERNAL_LOCAL_DIR)/lib/$(shell echo `uname -s`_`uname -m`)/opt
+BELLE2EX_INC = $(BELLE2_EXTERNAL_LOCAL_DIR)/include
 
 BINDIR  = $(BELLE2_DAQ_SLC)/bin
 SRCDIR  = $(BELLE2_DAQ_SLC)/src
@@ -23,8 +25,7 @@ LIBS    += -lnsm2_corelib -lnsm2_b2lib
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT
 CFLAGS  += -I$(BELLE2_DAQ_SLC)/include -I.
-CFLAGS  += -I$(BELLE2_DAQ_SLC)/externals/python/include/python3.5m 
-CFLAGS  += -I$(BELLE2_DAQ_SLC)/externals/boost/include
+CFLAGS  += -I$(BELLE2_INC) -I$(BELLE2_DAQ_SLC)/externals/python/include/python3.5m -I$(BELLE2_DAQ_SLC)/externals/boost/include
 
 MAINS   = $(wildcard *.cc)
 TARGETS = $(MAINS:%.cc=$(BINDIR)/%)

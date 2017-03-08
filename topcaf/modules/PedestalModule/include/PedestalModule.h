@@ -2,6 +2,8 @@
 #define PedestalTool_H
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 #include <map>
 #include <string>
 #include <TH1D.h>
@@ -10,6 +12,7 @@
 #include <TProfile.h>
 #include <topcaf/dataobjects/EventWaveformPacket.h>
 #include <topcaf/dataobjects/EventHeaderPacket.h>
+#include <topcaf/dataobjects/topFileMetaData.h>
 
 namespace Belle2 {
   class PedestalModule : public Module {
@@ -50,6 +53,9 @@ namespace Belle2 {
 
     std::string m_payload_tag, m_experiment, m_run;
     std::string m_initial_run, m_final_run;
+    StoreObjPtr<topFileMetaData> m_metadata_ptr;
+    StoreObjPtr<EventHeaderPacket> m_evthead_ptr;
+    StoreArray<EventWaveformPacket> m_evtwaves_ptr;
   };
 }
 #endif

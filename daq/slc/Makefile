@@ -41,8 +41,8 @@ copyinc:
 	@ make -C extra/hsprogs -f Makefile.lib
 	@ mkdir -p include/ttrx
 	@ make -C extra/ttrx 
-	@ mkdir -p include/ecldaq
-	@ make -C extra/ecldaq 
+#	@ mkdir -p include/ecldaq
+#	@ make -C extra/ecldaq 
 	@ ln -sf $(PGSQL_INC_PATH) include/pgsql
 
 $(SUBPACKAGES): %:

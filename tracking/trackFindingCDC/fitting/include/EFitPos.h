@@ -18,13 +18,13 @@ namespace Belle2 {
     /// Enumeration for the positional information to be used.
     enum class EFitPos {
       /// Use the wire position as positional information.
-      c_WirePos,
+      c_WirePos = 0,
 
       /// Use the right left signed dirft circle
-      c_RLDriftCircle,
+      c_RLDriftCircle = 1,
 
       /// Use the reconstructed position as positional information
-      c_RecoPos
+      c_RecoPos = 2
     };
 
     /**

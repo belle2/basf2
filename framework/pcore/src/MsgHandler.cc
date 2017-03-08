@@ -81,9 +81,7 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
   unsigned int flags = 0;
   // but if we have compression enabled then please compress.
   if (m_complevel > 0) {
-    // make sure buffer for the compression is big enough. We make it equal to
-    // the original size but add one int to be able to have a distuingishing
-    // header.
+    // make sure buffer for the compression is big enough.
     m_compBuf.resize(m_buf.size());
     // And call the root compression function
     const int algorithm = m_complevel / 100;
@@ -126,7 +124,6 @@ void MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
       // first get a header of the next block so we know how big the output will be
       if (R__unzip_header(&nzip, zipptr, &nout) != 0) {
         B2FATAL("Cannot uncompress message header");
-        break;
       }
       // no more output? fine
       if (!nout) break;

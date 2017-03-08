@@ -219,8 +219,8 @@ namespace Belle2 {
       obj.push_back(grlinfo->getNbbCluster());//6
       obj.push_back(grlinfo->getNbbTrkCluster());//7
       obj.push_back(grlinfo->getBhabhaVeto());//8
-      obj.push_back(grlinfo->geteclBhabhaVeto());//9
-      obj.push_back(grlinfo->getsBhabhaVeto());//10
+      obj.push_back(grlinfo->getsBhabhaVeto());//9
+      obj.push_back(grlinfo->geteclBhabhaVeto());//10
 
       int L1Summary = 0;
       std::vector<int> trgres;

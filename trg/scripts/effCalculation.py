@@ -6,10 +6,9 @@ from ROOT import Belle2
 
 
 class EffModule(Module):
-    Ntrg = 11
     Ntot_event = 0
     Ntrg_event = 0
-    Nsubtrg_event = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    Nsubtrg_event = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
     def event(self):
         self.Ntot_event += 1
@@ -37,7 +36,7 @@ class EffModule(Module):
                   'n_high_c2>=1&&eclBhabhaVeto==0', 'n_c>=2', 'n_2d_finder>=1', 'n_high_c2>1',
                   'eclbhabha', 'n_2d_finder>=1&&n_high_c3>=1&&n_bbtc>=1', 'n_high_c3>=1&&n_2d_finder==0']
         if self.Ntot_event != 0:
-            for i in range(11):
+            for i in range(ntrg):
                 eff = self.Nsubtrg_event[i] / self.Ntot_event
                 print('T%3d                %4d              %6.2f          %s ' % (i, prescale[i], eff, trglog[i]))
 

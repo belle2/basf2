@@ -41,7 +41,7 @@ add_tsim(main)
 
 # output
 rootoutput = register_module('RootOutput')
-rootoutput.param('outputFileName', "BBmixed.root")
+rootoutput.param('outputFileName', "test.root")
 main.add_module(rootoutput)
 
 

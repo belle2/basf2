@@ -185,7 +185,7 @@ void LogSystem::printErrorSummary()
   // similar for package configuration
   map<string, LogConfig> oldPackageConfig;
   std::swap(m_packageLogConfigs, oldPackageConfig);
-  //prevent calling printErrorSummary() again when printing
+  // prevent calling printErrorSummary() again when printing
   m_logConfig.setAbortLevel(LogConfig::c_Default);
 
   // only show level & message
@@ -199,18 +199,18 @@ void LogSystem::printErrorSummary()
   B2INFO("Error summary: " << numLogError << " errors and " << numLogWarn << " warnings occurred.");
 
 
-  //start with 100 entries in hash map
+  // start with 100 entries in hash map
   std::function<size_t (const LogMessage&)> hashFunction = &hash;
   std::unordered_map<LogMessage, int, decltype(hashFunction)> errorCount(100, hashFunction);
 
-  //log in chronological order, with repetitions removed
+  // log in chronological order, with repetitions removed
   std::vector<LogMessage> uniqueLog;
   uniqueLog.reserve(100);
 
   for (const LogMessage& msg : m_errorLog) {
     int count = errorCount[msg]++;
 
-    if (count == 0) //this is the first time we see this message
+    if (count == 0) // this is the first time we see this message
       uniqueLog.push_back(msg);
   }
   m_errorLog.clear(); // only do this once (e.g. not again when used through python)
@@ -228,7 +228,7 @@ void LogSystem::printErrorSummary()
     B2WARNING("Note: The error log was truncated to " << c_errorSummaryMaxLines << " messages");
   }
 
-  // retore old configuration
+  // restore old configuration
   m_logConfig = oldConfig;
   std::swap(m_moduleLogConfig, oldModuleConfig);
   std::swap(m_packageLogConfigs, oldPackageConfig);

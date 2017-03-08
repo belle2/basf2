@@ -442,13 +442,13 @@ class CreateLogics(Module):
     tgrl.Branch('ncluster', ncluster_t, 'ncluster/i')
     tgrl.Branch('ncluster_neutral', ncluster_neutral_t, 'ncluster_neutral/i')
     tgrl.Branch('max_cluster_neutral', max_cluster_neutral_t, 'max_cluster_neutral[3]/f')
-    tgrl.Branch('max_cms_cluster_neutral', max_cms_cluster_neutral_t, 'max_cms_cluster_neutral[3]/f')
+    # tgrl.Branch('max_cms_cluster_neutral', max_cms_cluster_neutral_t, 'max_cms_cluster_neutral[3]/f')
     tgrl.Branch('max_cluster', max_cluster_t, 'max_cluster[3]/f')
-    tgrl.Branch('max_cms_cluster', max_cms_cluster_t, 'max_cms_cluster[3]/f')
+    # tgrl.Branch('max_cms_cluster', max_cms_cluster_t, 'max_cms_cluster[3]/f')
     tgrl.Branch('smax_cluster_neutral', smax_cluster_neutral_t, 'smax_cluster_neutral[3]/f')
-    tgrl.Branch('smax_cms_cluster_neutral', smax_cms_cluster_neutral_t, 'smax_cms_cluster_neutral[3]/f')
+    # tgrl.Branch('smax_cms_cluster_neutral', smax_cms_cluster_neutral_t, 'smax_cms_cluster_neutral[3]/f')
     tgrl.Branch('smax_cluster', smax_cluster_t, 'smax_cluster[3]/f')
-    tgrl.Branch('smax_cms_cluster', smax_cms_cluster_t, 'smax_cms_cluster[3]/f')
+    # tgrl.Branch('smax_cms_cluster', smax_cms_cluster_t, 'smax_cms_cluster[3]/f')
     tgrl.Branch('max_deltphi_cluster', max_deltphi_cluster_t, 'max_deltphi_cluster/f')
     tgrl.Branch('time_cluster', time_cluster_t, 'time_cluster[100]/f')
 
@@ -541,21 +541,21 @@ class CreateLogics(Module):
         self.ncluster_neutral_t[0] = len(neutral_clusters)
         max_cluster_neu = Max_Cluster(neutral_clusters, False, 0)
         max_cluster = Max_Cluster(clusters, False, 0)
-        max_cms_cluster_neu = Max_Cluster(neutral_clusters, False, 0)
-        max_cms_cluster = Max_Cluster(clusters, False, 0)
+        # max_cms_cluster_neu = Max_Cluster(neutral_clusters, False, 0)
+        # max_cms_cluster = Max_Cluster(clusters, False, 0)
         smax_cluster_neu = Max_Cluster(neutral_clusters, False, 1)
         smax_cluster = Max_Cluster(clusters, False, 1)
-        smax_cms_cluster_neu = Max_Cluster(neutral_clusters, False, 1)
-        smax_cms_cluster = Max_Cluster(clusters, False, 1)
+        # smax_cms_cluster_neu = Max_Cluster(neutral_clusters, False, 1)
+        # smax_cms_cluster = Max_Cluster(clusters, False, 1)
         for i in range(self.ncomp_clu):
             self.max_cluster_neutral_t[i] = max_cluster_neu[i]
-            self.max_cms_cluster_neutral_t[i] = max_cms_cluster_neu[i]
+            # self.max_cms_cluster_neutral_t[i] = max_cms_cluster_neu[i]
             self.max_cluster_t[i] = max_cluster[i]
-            self.max_cms_cluster_t[i] = max_cms_cluster[i]
+            # self.max_cms_cluster_t[i] = max_cms_cluster[i]
             self.smax_cluster_neutral_t[i] = smax_cluster_neu[i]
-            self.smax_cms_cluster_neutral_t[i] = smax_cms_cluster_neu[i]
+            # self.smax_cms_cluster_neutral_t[i] = smax_cms_cluster_neu[i]
             self.smax_cluster_t[i] = smax_cluster[i]
-            self.smax_cms_cluster_t[i] = smax_cms_cluster[i]
+            # self.smax_cms_cluster_t[i] = smax_cms_cluster[i]
 
         self.etot_t[0] = Etot_Cluster(clusters)
 

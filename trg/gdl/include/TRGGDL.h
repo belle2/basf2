@@ -3,8 +3,8 @@
 //-----------------------------------------------------------------------------
 // Filename : TRGGDL.h
 // Section  : TRG GDL
-// Owner    : Yoshihito Iwasaki
-// Email    : yoshihito.iwasaki@kek.jp
+// Owner    : Yoshihito Iwasaki, Chunhua Li
+// Email    : yoshihito.iwasaki@kek.jp, chunhua.li@unimelb.edu.au
 //-----------------------------------------------------------------------------
 // Description : A class to represent GDL.
 //-----------------------------------------------------------------------------

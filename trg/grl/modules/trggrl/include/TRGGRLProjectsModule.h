@@ -3,12 +3,12 @@
 //-----------------------------------------------------------------------------
 // Filename : TRGGRLProjectsModule.h
 // Section  : TRG GRL
-// Owner    : Yoshihito Iwasaki
-// Email    : yoshihito.iwasaki@kek.jp
+// Owner    : Chunhua Li
+// Email    : chunhua.li@unimelb.edu.au
 //-----------------------------------------------------------------------------
 // Description : A trigger module for GRL
 //-----------------------------------------------------------------------------
-// 0.00 : 2013/12/13 : First version
+// 0.00 : 2017/03/01 : First version
 //-----------------------------------------------------------------------------
 
 #ifndef TRGGRLProjectsModule_H

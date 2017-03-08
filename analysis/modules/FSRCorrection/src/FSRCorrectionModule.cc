@@ -26,6 +26,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <TMatrixFSym.h>
 
 using namespace std;
 
@@ -168,9 +169,30 @@ namespace Belle2 {
 
       Particle correctedLepton(new4Vec, lepton->getPDGCode());
       correctedLepton.appendDaughter(lepton);
-      if (fsrGammaFound) correctedLepton.appendDaughter(fsrGamma);
+      if (fsrGammaFound) {
+        correctedLepton.appendDaughter(fsrGamma);
+        // update error matrix
+        const TMatrixFSym& lepErrorMatrix = lepton->getMomentumVertexErrorMatrix();
+        const TMatrixFSym& fsrErrorMatrix = fsrGamma->getMomentumVertexErrorMatrix();
+        // todo add check
+        TMatrixFSym corLepMatrix(c_DimMatrix);
+
+        for (int irow = 0; irow < c_DimMatrix; irow++) {
+          for (int icol = irow; icol < c_DimMatrix; icol++) {
+            if (irow > 3 || icol > 3) {
+              corLepMatrix(irow, icol) = lepErrorMatrix(irow, icol);
+            } else {
+              corLepMatrix(irow, icol) = lepErrorMatrix(irow, icol) + fsrErrorMatrix(irow, icol);
+            }
+          }
+        }
+        correctedLepton.setMomentumVertexErrorMatrix(corLepMatrix);
+      } else {
+        correctedLepton.setMomentumVertexErrorMatrix(lepton->getMomentumVertexErrorMatrix());
+      }
+
+
       // add the info from original lepton to the new lepton
-      correctedLepton.setMomentumVertexErrorMatrix(lepton->getMomentumVertexErrorMatrix());
       correctedLepton.setVertex(lepton->getVertex());
       correctedLepton.setPValue(lepton->getPValue());
 

@@ -56,6 +56,7 @@ namespace Belle2 {
      */
     virtual void event() override;
 
+    enum {c_DimMatrix = 7};
 
   private:
 

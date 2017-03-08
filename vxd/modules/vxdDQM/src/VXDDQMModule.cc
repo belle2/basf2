@@ -27,6 +27,8 @@
 
 #include <vxd/geometry/SensorInfoBase.h>
 
+#include <TMath.h>
+
 //#include <set>
 #include <boost/format.hpp>
 
@@ -129,62 +131,6 @@ void VXDDQMModule::defineHisto()
       break;
     }
   }
-//  printf("--> kuk  PXD_L %i PXD_S %i SVD_L %i SVD_S %i \n",
-//    c_MaxLaddersInPXDLayer, c_MaxSensorsInPXDLayer, c_MaxLaddersInSVDLayer, c_MaxSensorsInSVDLayer);
-  /*
-    for (VxdID layer : geo.getLayers()) {
-      for (VxdID ladder : geo.getLadders(layer)) {
-        printf("    --> kuk  l %i ldmax %i smax %i \n",
-          layer.getLayerNumber(), geo.getLadders(layer).size(), geo.getSensors(ladder).size());
-        for (VxdID sensor : geo.getSensors(ladder)) {
-   //       printf("    --> kuk go thrue all sensors: l %i ld %i s %i \n",
-   //         layer.getLayerNumber(), ladder.getLadderNumber(), sensor.getSensorNumber());
-        }
-        break;
-      }
-    }
-  */
-  /*
-    VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
-    set< VxdID > layers = aGeometry.getLayers();
-    for (VxdID layer : layers) {
-      bool isPXD = false, isSVD = false;
-      if (layer.getLayerNumber() >= c_nInnermostPXDLayer and layer.getLayerNumber() < c_nInnermostPXDLayer + c_nPXDLayers) {
-        isPXD = true;
-        pos = layer.getLayerNumber() - c_nInnermostPXDLayer;
-      }
-      if (layer.getLayerNumber() >= c_nInnermostSVDLayer and layer.getLayerNumber() < c_nInnermostSVDLayer + c_nSVDLayers) {
-        isSVD = true;
-        pos = layer.getLayerNumber() - c_nInnermostSVDLayer;
-      }
-
-      if (isPXD == false and isSVD == false) { nUnknownLayers++; } else { knownLayers++; }
-      if (isPXD == true and isSVD == true) { B2ERROR("eventCounterModule: found layer which is SVD and PXD sensor at the same time! LayerNumbe: " << layer.getLayerNumber()); }
-
-      const set<VxdID>& ladders = aGeometry.getLadders(layer);
-      for (VxdID ladder : ladders) {
-        const set<VxdID>& sensors = aGeometry.getSensors(ladder);
-
-        if (isPXD == false and isSVD == false) { nUnknownLadders++; } else { knownLadders++; }
-        for (VxdID sensor : sensors) {
-          const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-
-          if (isPXD == false and isSVD == false) { nUnknownSensors++; continue; } else { knownSensors++; }
-
-          // nPixels@Sensor uPixels x vPixels. nStrips@Sensor uStrips + vStrips:
-          if (isPXD == true) {
-            m_countedPixelsAndStrips.m_pxdPixelCounter.at(pos) += (aSensorInfo.getUCells() * aSensorInfo.getVCells());
-          }
-          if (isSVD == true) {
-            m_countedPixelsAndStrips.m_svdStripCounter4U.at(pos) += aSensorInfo.getUCells();
-            m_countedPixelsAndStrips.m_svdStripCounter4V.at(pos) += aSensorInfo.getVCells();
-            m_countedPixelsAndStrips.m_svdStripCounterTotal.at(pos) += (aSensorInfo.getUCells() + aSensorInfo.getVCells());
-          }
-          B2DEBUG(1, " sensor " << sensor << " has got " << aSensorInfo.getUCells() << "/" << aSensorInfo.getVCells() << " u/v-pixels/strips")
-        }
-      }
-    }
-  */
 
   // 1D histograms in global coordinates - save a size but not so clear:
   TDirectory* DirVXDCorrels1D_23 = NULL;
@@ -217,237 +163,6 @@ void VXDDQMModule::defineHisto()
       }
     }
   }
-  /*
-    // PXD sensor status 1D+2D histograms
-  //  TDirectory* DirPXDDetailBasic = oldDir->mkdir("PXD_Detail_Basic");
-
-    // SVD sensor status 1D histograms
-  //  TDirectory* DirSVDDetailBasic = oldDir->mkdir("SVD_Detail_Basic");
-    DirPXDDetailBasic->cd();
-
-    for (int i = 0; i < c_nPXDLayers * c_MaxSensorsInPXDLayer; i++) {
-      m_firedPxdSen[i] = NULL;
-      m_clustersPxdSen[i] = NULL;
-      m_hitMapPxdSen[i] = NULL;
-      m_chargePxdSen[i] = NULL;
-      m_seedPxdSen[i] = NULL;
-      m_sizePxdSen[i] = NULL;
-      m_sizeUPxdSen[i] = NULL;
-      m_sizeVPxdSen[i] = NULL;
-    }
-
-    for (int i = 0; i < c_nPXDLayers; i++) {
-      int iLayer = indexToLayerPXD(i);
-      int iLadder = 1;  // hardcoded only for TB TODO: use standard way on BelleII
-      for (int iS = 0; iS < c_MaxSensorsInPXDLayer; iS++) {
-        string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % (iS + 1));
-        //----------------------------------------------------------------
-        // Number of fired pixels per frame : hFired[U/V][LayerNo]
-        //----------------------------------------------------------------
-        // Fired pixel counts
-        if (iS >= getSensorsInLayer(c_firstPXDLayer + i)) continue;
-        string name = str(format("PXD_%1%_Fired") % sensorDescr);
-        string title = str(format("TB2017 PXD Sensor %1% Fired pixels") % sensorDescr);
-        m_firedPxdSen[iS * c_nPXDLayers + i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
-        m_firedPxdSen[iS * c_nPXDLayers + i]->GetXaxis()->SetTitle("# of fired pixels");
-        m_firedPxdSen[iS * c_nPXDLayers + i]->GetYaxis()->SetTitle("count");
-        //----------------------------------------------------------------
-        // Number of clusters per frame : hClusters[U/V][LayerNo]
-        //----------------------------------------------------------------
-        // Number of clusters
-        name = str(format("PXD_%1%_Clusters") % sensorDescr);
-        title = str(format("TB2017 PXD Sensor %1% Number of clusters") % sensorDescr);
-        m_clustersPxdSen[iS * c_nPXDLayers + i] = new TH1F(name.c_str(), title.c_str(), 20, 0, 20);
-        m_clustersPxdSen[iS * c_nPXDLayers + i]->GetXaxis()->SetTitle("# of clusters");
-        m_clustersPxdSen[iS * c_nPXDLayers + i]->GetYaxis()->SetTitle("count");
-        //----------------------------------------------------------------
-        // Hitmaps: Number of clusters by coordinate : hHitmap[U/V][LayerNo]
-        //----------------------------------------------------------------
-        // Hitmaps
-        name = str(format("PXD_%1%_Hitmap") % sensorDescr);
-        title = str(format("TB2017 PXD Sensor %1% Hitmap") % sensorDescr);
-        int nStripsU = getInfoPXD(i, 1 + 1).getUCells();  // TODO - very special for TB2017
-        int nStripsV = getInfoPXD(i, 1 + 1).getVCells();  // TODO - very special for TB2017
-        m_hitMapPxdSen[iS * c_nPXDLayers + i] = new TH2F(name.c_str(), title.c_str(), nStripsU, 0, nStripsU, nStripsV, 0, nStripsV);
-        m_hitMapPxdSen[iS * c_nPXDLayers + i]->GetXaxis()->SetTitle("u position [pitch units]");
-        m_hitMapPxdSen[iS * c_nPXDLayers + i]->GetYaxis()->SetTitle("v position [pitch units]");
-        m_hitMapPxdSen[iS * c_nPXDLayers + i]->GetZaxis()->SetTitle("hits");
-        //----------------------------------------------------------------
-        // Charge of clusters : hClusterCharge[U/V][LayerNo]
-        //----------------------------------------------------------------
-        // charge by plane
-        name = str(format("PXD_%1%_ClusterCharge") % sensorDescr);
-        title = str(format("TB2017 PXD Sensor %1% Cluster charge") % sensorDescr);
-        m_chargePxdSen[iS * c_nPXDLayers + i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 200);
-        m_chargePxdSen[iS * c_nPXDLayers + i]->GetXaxis()->SetTitle("charge of clusters [ADU]");
-        m_chargePxdSen[iS * c_nPXDLayers + i]->GetYaxis()->SetTitle("count");
-        //----------------------------------------------------------------
-        // Cluster seed charge distribution : hSeedCharge[U/V][LayerNo]
-        //----------------------------------------------------------------
-        // seed by plane
-        name = str(format("PXD_%1%_Seed") % sensorDescr);
-        title = str(format("TB2017 PXD Sensor %1% Seed charge") % sensorDescr);
-        m_seedPxdSen[iS * c_nPXDLayers + i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 200);
-        m_seedPxdSen[iS * c_nPXDLayers + i]->GetXaxis()->SetTitle("seed charge of clusters [ADU]");
-        m_seedPxdSen[iS * c_nPXDLayers + i]->GetYaxis()->SetTitle("count");
-        //----------------------------------------------------------------
-        // Cluster size distribution : hClusterSize[U/V][LayerNo]
-        //----------------------------------------------------------------
-        // cluster size by plane
-        name = str(format("PXD_%1%_ClusterSize") % sensorDescr);
-        title = str(format("TB2017 PXD Sensor %1% Cluster size") % sensorDescr);
-        m_sizePxdSen[iS * c_nPXDLayers + i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
-        m_sizePxdSen[iS * c_nPXDLayers + i]->GetXaxis()->SetTitle("size of u clusters");
-        m_sizePxdSen[iS * c_nPXDLayers + i]->GetYaxis()->SetTitle("count");
-        // u size by plane
-        name = str(format("PXD_%1%_ClusterSizeU") % sensorDescr);
-        title = str(format("TB2017 PXD Sensor %1% Cluster size in U") % sensorDescr);
-        m_sizeUPxdSen[iS * c_nPXDLayers + i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
-        m_sizeUPxdSen[iS * c_nPXDLayers + i]->GetXaxis()->SetTitle("size of u clusters");
-        m_sizeUPxdSen[iS * c_nPXDLayers + i]->GetYaxis()->SetTitle("count");
-        // v size by plane
-        name = str(format("PXD_%1%_ClusterSizeV") % sensorDescr);
-        title = str(format("TB2017 PXD Sensor %1% Cluster size in V") % sensorDescr);
-        m_sizeVPxdSen[iS * c_nPXDLayers + i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
-        m_sizeVPxdSen[iS * c_nPXDLayers + i]->GetXaxis()->SetTitle("size of v clusters");
-        m_sizeVPxdSen[iS * c_nPXDLayers + i]->GetYaxis()->SetTitle("count");
-      }
-    }
-
-    DirSVDDetailBasic->cd();
-
-    for (int i = 0; i < c_nSVDLayers * c_MaxSensorsInSVDLayer; i++) {
-      m_firedUSen[i] = NULL;
-      m_firedVSen[i] = NULL;
-      m_clustersUSen[i] = NULL;
-      m_clustersVSen[i] = NULL;
-      m_hitMapUSen[i] = NULL;
-      m_hitMapVSen[i] = NULL;
-      m_chargeUSen[i] = NULL;
-      m_chargeVSen[i] = NULL;
-      m_seedUSen[i] = NULL;
-      m_seedVSen[i] = NULL;
-      m_sizeUSen[i] = NULL;
-      m_sizeVSen[i] = NULL;
-      m_timeUSen[i] = NULL;
-      m_timeVSen[i] = NULL;
-    }
-    for (int i = 0; i < c_nSVDLayers; i++) {
-      int iLayer = indexToLayer(i);
-      int iLadder = 1;  // hardcoded only for TB TODO: use standard way on BelleII
-      for (int iS = 0; iS < c_MaxSensorsInSVDLayer; iS++) {
-        string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % (iS + 1));
-        //----------------------------------------------------------------
-        // Number of fired strips per frame : hFired[U/V][LayerNo]
-        //----------------------------------------------------------------
-        // Fired strip counts U
-        if (iS >= getSensorsInLayer(c_firstSVDLayer + i)) continue;
-        string name = str(format("SVD_%1%_FiredU") % sensorDescr);
-        string title = str(format("TB2017 SVD Sensor %1% Fired pixels in U") % sensorDescr);
-        m_firedUSen[iS * c_nSVDLayers + i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
-        m_firedUSen[iS * c_nSVDLayers + i]->GetXaxis()->SetTitle("# of fired u strips");
-        m_firedUSen[iS * c_nSVDLayers + i]->GetYaxis()->SetTitle("count");
-        // Fired strip counts V
-        name = str(format("SVD_%1%_FiredV") % sensorDescr);
-        title = str(format("TB2017 SVD Sensor %1% Fired pixels in V") % sensorDescr);
-        m_firedVSen[iS * c_nSVDLayers + i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
-        m_firedVSen[iS * c_nSVDLayers + i]->GetXaxis()->SetTitle("# of fired v strips");
-        m_firedVSen[iS * c_nSVDLayers + i]->GetYaxis()->SetTitle("count");
-        //----------------------------------------------------------------
-        // Number of clusters per frame : hClusters[U/V][LayerNo]
-        //----------------------------------------------------------------
-        // Number of clusters U
-        name = str(format("SVD_%1%_ClustersU") % sensorDescr);
-        title = str(format("TB2017 SVD Sensor %1% Number of clusters in U") % sensorDescr);
-        m_clustersUSen[iS * c_nSVDLayers + i] = new TH1F(name.c_str(), title.c_str(), 20, 0, 20);
-        m_clustersUSen[iS * c_nSVDLayers + i]->GetXaxis()->SetTitle("# of u clusters");
-        m_clustersUSen[iS * c_nSVDLayers + i]->GetYaxis()->SetTitle("count");
-        // Number of clusters V
-        name = str(format("SVD_%1%_ClustersV") % sensorDescr);
-        title = str(format("TB2017 SVD Sensor %1% Number of clusters in V") % sensorDescr);
-        m_clustersVSen[iS * c_nSVDLayers + i] = new TH1F(name.c_str(), title.c_str(), 20, 0, 20);
-        m_clustersVSen[iS * c_nSVDLayers + i]->GetXaxis()->SetTitle("# of v clusters");
-        m_clustersVSen[iS * c_nSVDLayers + i]->GetYaxis()->SetTitle("count");
-        //----------------------------------------------------------------
-        // Hitmaps: Number of clusters by coordinate : hHitmap[U/V][LayerNo]
-        //----------------------------------------------------------------
-        // Hitmaps in U
-        name = str(format("SVD_%1%_HitmapU") % sensorDescr);
-        title = str(format("TB2017 SVD Sensor %1% Hitmap in U") % sensorDescr);
-        int nStrips = getInfo(i, iS + 1).getUCells();
-        m_hitMapUSen[iS * c_nSVDLayers + i] = new TH1F(name.c_str(), title.c_str(), nStrips, 0, nStrips);
-        m_hitMapUSen[iS * c_nSVDLayers + i]->GetXaxis()->SetTitle("u position [pitch units]");
-        m_hitMapUSen[iS * c_nSVDLayers + i]->GetYaxis()->SetTitle("hits");
-        // Hitmaps in V
-        name = str(format("SVD_%1%_HitmapV") % sensorDescr);
-        title = str(format("TB2017 SVD Sensor %1% Hitmap in V") % sensorDescr);
-        nStrips = getInfo(i, iS + 1).getVCells();
-        m_hitMapVSen[iS * c_nSVDLayers + i] = new TH1F(name.c_str(), title.c_str(), nStrips, 0, nStrips);
-        m_hitMapVSen[iS * c_nSVDLayers + i]->GetXaxis()->SetTitle("v position [pitch units]");
-        m_hitMapVSen[iS * c_nSVDLayers + i]->GetYaxis()->SetTitle("hits");
-        //----------------------------------------------------------------
-        // Charge of clusters : hClusterCharge[U/V][LayerNo]
-        //----------------------------------------------------------------
-        // u charge by plane
-        name = str(format("SVD_%1%_ClusterChargeU") % sensorDescr);
-        title = str(format("TB2017 SVD Sensor %1% Cluster charge in U") % sensorDescr);
-        m_chargeUSen[iS * c_nSVDLayers + i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 200);
-        m_chargeUSen[iS * c_nSVDLayers + i]->GetXaxis()->SetTitle("charge of u clusters [ADU]");
-        m_chargeUSen[iS * c_nSVDLayers + i]->GetYaxis()->SetTitle("count");
-        // v charge by plane
-        name = str(format("SVD_%1%_ClusterChargeV") % sensorDescr);
-        title = str(format("TB2017 SVD Sensor %1% Cluster charge in V") % sensorDescr);
-        m_chargeVSen[iS * c_nSVDLayers + i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 200);
-        m_chargeVSen[iS * c_nSVDLayers + i]->GetXaxis()->SetTitle("charge of v clusters [ADU]");
-        m_chargeVSen[iS * c_nSVDLayers + i]->GetYaxis()->SetTitle("count");
-        //----------------------------------------------------------------
-        // Cluster seed charge distribution : hSeedCharge[U/V][LayerNo]
-        //----------------------------------------------------------------
-        // u seed by plane
-        name = str(format("SVD_%1%_SeedU") % sensorDescr);
-        title = str(format("TB2017 SVD Sensor %1% Seed charge in U") % sensorDescr);
-        m_seedUSen[iS * c_nSVDLayers + i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 200);
-        m_seedUSen[iS * c_nSVDLayers + i]->GetXaxis()->SetTitle("seed charge of u clusters [ADU]");
-        m_seedUSen[iS * c_nSVDLayers + i]->GetYaxis()->SetTitle("count");
-        // v seed by plane
-        name = str(format("SVD_%1%_SeedV") % sensorDescr);
-        title = str(format("TB2017 SVD Sensor %1% Seed charge in V") % sensorDescr);
-        m_seedVSen[iS * c_nSVDLayers + i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 200);
-        m_seedVSen[iS * c_nSVDLayers + i]->GetXaxis()->SetTitle("seed charge of v clusters [ADU]");
-        m_seedVSen[iS * c_nSVDLayers + i]->GetYaxis()->SetTitle("count");
-        //----------------------------------------------------------------
-        // Cluster size distribution : hClusterSize[U/V][LayerNo]
-        //----------------------------------------------------------------
-        // u size by plane
-        name = str(format("SVD_%1%_ClusterSizeU") % sensorDescr);
-        title = str(format("TB2017 SVD Sensor %1% Cluster size in U") % sensorDescr);
-        m_sizeUSen[iS * c_nSVDLayers + i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
-        m_sizeUSen[iS * c_nSVDLayers + i]->GetXaxis()->SetTitle("size of u clusters");
-        m_sizeUSen[iS * c_nSVDLayers + i]->GetYaxis()->SetTitle("count");
-        // v size by plane
-        name = str(format("SVD_%1%_ClusterSizeV") % sensorDescr);
-        title = str(format("TB2017 SVD Sensor %1% Cluster size in V") % sensorDescr);
-        m_sizeVSen[iS * c_nSVDLayers + i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
-        m_sizeVSen[iS * c_nSVDLayers + i]->GetXaxis()->SetTitle("size of v clusters");
-        m_sizeVSen[iS * c_nSVDLayers + i]->GetYaxis()->SetTitle("count");
-        //----------------------------------------------------------------
-        // Cluster time distribution : hClusterTime[U/V][LayerNo]
-        //----------------------------------------------------------------
-        // u time by plane
-        name = str(format("SVD_%1%_ClusterTimeU") % sensorDescr);
-        title = str(format("TB2017 SVD Sensor %1% Cluster time in U") % sensorDescr);
-        m_timeUSen[iS * c_nSVDLayers + i] = new TH1F(name.c_str(), title.c_str(), 50, -50, 150);
-        m_timeUSen[iS * c_nSVDLayers + i]->GetXaxis()->SetTitle("time of u clusters [ns]");
-        m_timeUSen[iS * c_nSVDLayers + i]->GetYaxis()->SetTitle("count");
-        // v time by plane
-        name = str(format("SVD_%1%_ClusterTimeV") % sensorDescr);
-        title = str(format("TB2017 SVD Sensor %1% Cluster time in V") % sensorDescr);
-        m_timeVSen[iS * c_nSVDLayers + i] = new TH1F(name.c_str(), title.c_str(), 50, -50, 150);
-        m_timeVSen[iS * c_nSVDLayers + i]->GetXaxis()->SetTitle("time of v clusters [ns]");
-        m_timeVSen[iS * c_nSVDLayers + i]->GetYaxis()->SetTitle("count");
-      }
-    }
-  */
 
   m_correlationsSP = (TH2F**) new TH2F*[c_nVXDLayers * c_nVXDLayers];
   m_correlationsSP1DPhi = (TH1F**) new TH1F*[c_nVXDLayers * c_nVXDLayers];
@@ -642,7 +357,6 @@ void VXDDQMModule::initialize()
   //Register collections
   StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
   StoreArray<SVDDigit> storeSVDDigits(m_storeSVDDigitsName);
-//  if (!m_UseDigits) {
   StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
   StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
   RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits);
@@ -651,7 +365,6 @@ void VXDDQMModule::initialize()
   m_relPXDClusterDigitName = relPXDClusterDigits.getName();
   m_storeSVDClustersName = storeSVDClusters.getName();
   m_relSVDClusterDigitName = relSVDClusterDigits.getName();
-//  }
 
   //Store names to speed up creation later
   m_storePXDDigitsName = storePXDDigits.getName();
@@ -668,39 +381,6 @@ void VXDDQMModule::beginRun()
       if (m_correlationsSP1DTheta[c_nVXDLayers * j + i] != NULL) m_correlationsSP1DTheta[c_nVXDLayers * j + i]->Reset();
     }
   }
-  /*
-    for (int i = 0; i < c_nVXDLayers; i++) {
-      for (int j = 0; j < c_nVXDLayers; j++) {
-        if (i == j) {  // hit maps
-          if ((!m_Reduce2DCorrelHistos) && (!m_Only23LayersHistos)) {
-            m_correlationsSP[c_nVXDLayers * j + i]->Reset();
-          }
-          if ((!m_Reduce1DCorrelHistos) && (!m_Only23LayersHistos)) {
-            m_correlationsSP1DPhi[c_nVXDLayers * j + i]->Reset();
-            m_correlationsSP1DTheta[c_nVXDLayers * j + i]->Reset();
-          }
-        } else if (i < j) { // correlations for Phi
-          if ((!m_SaveOtherHistos) && (abs(i - j) > 1)) continue;
-          if (!m_Reduce2DCorrelHistos) {
-            m_correlationsSP[c_nVXDLayers * j + i]->Reset();
-          }
-          if (!m_Reduce1DCorrelHistos) {
-            m_correlationsSP1DPhi[c_nVXDLayers * j + i]->Reset();
-
-          }
-        } else {       // correlations for Theta
-          if ((!m_SaveOtherHistos) && (abs(i - j) > 1)) continue;
-          if (!m_Reduce2DCorrelHistos) {
-            m_correlationsSP[c_nVXDLayers * j + i]->Reset();
-          }
-          if (!m_Reduce1DCorrelHistos) {
-            m_correlationsSP1DTheta[c_nVXDLayers * j + i]->Reset();
-          }
-        }
-      }
-    }
-  */
-
 }
 
 
@@ -710,138 +390,11 @@ void VXDDQMModule::event()
   const StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
   const StoreArray<SVDDigit> storeSVDDigits(m_storeSVDDigitsName);
 
-//  if (!m_UseDigits) {
   const StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
   const StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
 
   const RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits, m_relPXDClusterDigitName);
   const RelationArray relSVDClusterDigits(storeSVDClusters, storeSVDDigits, m_relSVDClusterDigitName);
-//  }
-  // PXD basic histograms:
-  // Fired strips
-  vector< set<int> > uStripsSenp(c_nPXDLayers * c_MaxSensorsInPXDLayer); // sets to eliminate multiple samples per strip
-  //vector< set<int> > vStripsSenp(c_nPXDLayers * c_MaxSensorsInPXDLayer);
-  /*
-    for (const PXDDigit& digit : storePXDDigits) {
-      int iLayer = digit.getSensorID().getLayerNumber();
-      if ((iLayer < c_firstPXDLayer) || (iLayer > c_lastPXDLayer)) continue;
-      int indexSen = (digit.getSensorID().getSensorNumber() - 1) * c_nPXDLayers + iLayer - c_firstPXDLayer;
-      uStripsSenp.at(indexSen).insert(digit.getUCellID());
-      //vStripsSen.at(indexSen).insert(digit.getVCellID());
-    }
-
-    for (int i = 0; i < c_nPXDLayers; i++) {
-      for (int iS = 0; iS < c_MaxSensorsInPXDLayer; iS++) {
-        if (iS >= getSensorsInLayer(c_firstPXDLayer + i)) continue;
-        m_firedPxdSen[iS * c_nPXDLayers + i]->Fill(0.1667 * uStripsSenp[i].size());
-        //m_firedVSen[iS * c_nPXDLayers + i]->Fill(0.1667 * vStripsSen[i].size());
-      }
-    }
-
-    int countsSen[c_nPXDLayers * c_MaxSensorsInPXDLayer];
-    for (int i = 0; i < c_nPXDLayers; i++) {
-      for (int iS = 0; iS < c_MaxSensorsInPXDLayer; iS++) {
-        countsSen[iS * c_nPXDLayers + i] = 0;
-      }
-    }
-    for (const PXDCluster& cluster : storePXDClusters) {
-      int iLayer = cluster.getSensorID().getLayerNumber();
-      if ((iLayer < c_firstPXDLayer) || (iLayer > c_lastPXDLayer)) continue;
-      int indexSen = (cluster.getSensorID().getSensorNumber() - 1) * c_nPXDLayers + planeToIndex(iLayer);
-      countsSen[indexSen]++;
-    }
-    for (int i = 0; i < c_nPXDLayers; i++) {
-      for (int iS = 0; iS < c_MaxSensorsInPXDLayer; iS++) {
-        if (iS >= getSensorsInLayer(c_firstPXDLayer + i)) continue;
-        m_clustersPxdSen[iS * c_nPXDLayers + i]->Fill(countsSen[iS * c_nPXDLayers + i]);
-      }
-    }
-
-    // Hitmaps, Charge, Seed, Size
-    for (const PXDCluster& cluster : storePXDClusters) {
-      int iLayer = cluster.getSensorID().getLayerNumber();
-      if ((iLayer < c_firstPXDLayer) || (iLayer > c_lastPXDLayer)) continue;
-      int indexSen = (cluster.getSensorID().getSensorNumber() - 1) * c_nPXDLayers + planeToIndexPXD(iLayer);
-      m_hitMapPxdSen[indexSen]->Fill(getInfoPXD(planeToIndexPXD(iLayer),
-                                                cluster.getSensorID().getSensorNumber()).getUCellID(cluster.getU()),
-                                     getInfoPXD(planeToIndexPXD(iLayer), cluster.getSensorID().getSensorNumber()).getVCellID(cluster.getV())
-                                    );
-      m_chargePxdSen[indexSen]->Fill(cluster.getCharge());
-      m_seedPxdSen[indexSen]->Fill(cluster.getSeedCharge());
-      m_sizePxdSen[indexSen]->Fill(cluster.getSize());
-      m_sizeUPxdSen[indexSen]->Fill(cluster.getUSize());
-      m_sizeVPxdSen[indexSen]->Fill(cluster.getVSize());
-    }
-
-    // SVD basic histograms:
-    // Fired strips
-    vector< set<int> > uStripsSen(c_nSVDLayers * c_MaxSensorsInSVDLayer); // sets to eliminate multiple samples per strip
-    vector< set<int> > vStripsSen(c_nSVDLayers * c_MaxSensorsInSVDLayer);
-    for (const SVDDigit& digit : storeDigits) {
-      int iLayer = digit.getSensorID().getLayerNumber();
-      if ((iLayer < c_firstSVDLayer) || (iLayer > c_lastSVDLayer)) continue;
-      int indexSen = (digit.getSensorID().getSensorNumber() - 1) * c_nSVDLayers + planeToIndex(iLayer);
-      if (digit.isUStrip()) {
-        uStripsSen.at(indexSen).insert(digit.getCellID());
-      } else {
-        vStripsSen.at(indexSen).insert(digit.getCellID());
-      }
-    }
-    for (int i = 0; i < c_nSVDLayers; i++) {
-      for (int iS = 0; iS < c_MaxSensorsInSVDLayer; iS++) {
-        if (iS >= getSensorsInLayer(c_firstSVDLayer + i)) continue;
-        m_firedUSen[iS * c_nSVDLayers + i]->Fill(0.1667 * uStripsSen[i].size());
-        m_firedVSen[iS * c_nSVDLayers + i]->Fill(0.1667 * vStripsSen[i].size());
-      }
-    }
-
-    int countsUSen[c_nSVDLayers * c_MaxSensorsInSVDLayer];
-    int countsVSen[c_nSVDLayers * c_MaxSensorsInSVDLayer];
-    for (int i = 0; i < c_nSVDLayers; i++) {
-      for (int iS = 0; iS < c_MaxSensorsInSVDLayer; iS++) {
-        countsUSen[iS * c_nSVDLayers + i] = 0; countsVSen[iS * c_nSVDLayers + i] = 0;
-      }
-    }
-    for (const SVDCluster& cluster : storeSVDClusters) {
-      int iLayer = cluster.getSensorID().getLayerNumber();
-      if ((iLayer < c_firstSVDLayer) || (iLayer > c_lastSVDLayer)) continue;
-      int indexSen = (cluster.getSensorID().getSensorNumber() - 1) * c_nSVDLayers + planeToIndex(iLayer);
-      if (cluster.isUCluster()) {
-        countsUSen[indexSen]++;
-      } else {
-        countsVSen[indexSen]++;
-      }
-    }
-    for (int i = 0; i < c_nSVDLayers; i++) {
-      for (int iS = 0; iS < c_MaxSensorsInSVDLayer; iS++) {
-        if (iS >= getSensorsInLayer(c_firstSVDLayer + i)) continue;
-        m_clustersUSen[iS * c_nSVDLayers + i]->Fill(countsUSen[iS * c_nSVDLayers + i]);
-        m_clustersVSen[iS * c_nSVDLayers + i]->Fill(countsVSen[iS * c_nSVDLayers + i]);
-      }
-    }
-
-    // Hitmaps, Charge, Seed, Size, Time
-    for (const SVDCluster& cluster : storeSVDClusters) {
-      int iLayer = cluster.getSensorID().getLayerNumber();
-      if ((iLayer < c_firstSVDLayer) || (iLayer > c_lastSVDLayer)) continue;
-      int indexSen = (cluster.getSensorID().getSensorNumber() - 1) * c_nSVDLayers + planeToIndex(iLayer);
-      if (cluster.isUCluster()) {
-        m_hitMapUSen[indexSen]->Fill(getInfo(planeToIndex(iLayer),
-                                             cluster.getSensorID().getSensorNumber()).getUCellID(cluster.getPosition()));
-        m_chargeUSen[indexSen]->Fill(cluster.getCharge());
-        m_seedUSen[indexSen]->Fill(cluster.getSeedCharge());
-        m_sizeUSen[indexSen]->Fill(cluster.getSize());
-        m_timeUSen[indexSen]->Fill(cluster.getClsTime());
-      } else {
-        m_hitMapVSen[indexSen]->Fill(getInfo(planeToIndex(iLayer),
-                                             cluster.getSensorID().getSensorNumber()).getVCellID(cluster.getPosition()));
-        m_chargeVSen[indexSen]->Fill(cluster.getCharge());
-        m_seedVSen[indexSen]->Fill(cluster.getSeedCharge());
-        m_sizeVSen[indexSen]->Fill(cluster.getSize());
-        m_timeVSen[indexSen]->Fill(cluster.getClsTime());
-      }
-    }
-  */
 
   // Correlations for space point coordinates
   int MaxHits = 0;

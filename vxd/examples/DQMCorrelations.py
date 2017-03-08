@@ -40,8 +40,8 @@ parser.add_argument(
     default=False,
     help='Turn off magnetic field')
 
-parser.add_argument('--add-pxd-svd', dest='AddPXDSVD', action='store_const', const=True, default=False,
-                    help='Add also PXD and SVD DQM, default = False')
+parser.add_argument('--add-pxd-svd', dest='AddPXDSVD', action='store_const', const=True, default=True,
+                    help='Add also PXD and SVD DQM, default = True')
 parser.add_argument('--data-output', dest='DataOutput', action='store_const', const=True, default=False,
                     help='Save data to output file, default = False')
 parser.add_argument('--correlation-granulation', dest='CorrelationGranulation', action='store', default=1.0, type=float,
@@ -63,9 +63,9 @@ parser.add_argument('--reduce-2d-correl-histos', dest='Reduce2DCorrelHistos', ac
                     help='flag <0,1> for removing of 2D correlation plots from output, default = 0')
 parser.add_argument('--only-23-layers-histos', dest='Only23LayersHistos', action='store', default=0, type=int,
                     help='flag <0,1> for to keep only correlation plots between layer 2 and 3 (between PXD and SVD), default = 0')
-parser.add_argument('--save-other-histos', dest='SaveOtherHistos', action='store', default=0, type=int,
+parser.add_argument('--save-other-histos', dest='SaveOtherHistos', action='store', default=1, type=int,
                     help='flag <0,1> for creation of correlation plots for non-neighboar layers, default = 0')
-parser.add_argument('--use-real-data', dest='UseRealdata', action='store_const', const=True,
+parser.add_argument('--use-real-data', dest='UseRealdata', action='store_const', const=False,
                     default=False, help='Use real data, need set imput file, unpacking')
 parser.add_argument('--unpacking', dest='unpacking', action='store_const', const=True,
                     default=False, help='Add PXD and SVD unpacking modules to the path')
@@ -120,7 +120,12 @@ else:
 
 if (args.AddPXDSVD is True):
     pxddqm = register_module('PXDDQM')
+    pxddqm.param('UseDigits', args.UseDigits)
+    pxddqm.param('SaveOtherHistos', args.SaveOtherHistos)
+
     svddqm = register_module('SVDDQM')
+    svddqm.param('UseDigits', args.UseDigits)
+    svddqm.param('SaveOtherHistos', args.SaveOtherHistos)
 
 vxddqm = register_module('VXDDQM')
 vxddqm.param('CorrelationGranulation', args.CorrelationGranulation)
@@ -140,7 +145,8 @@ eventCounter.logging.log_level = LogLevel.INFO
 eventCounter.param('stepSize', 25)
 
 main = create_path()
-main.add_module(eventinfosetter)
+if (args.UseRealdata is False):
+    main.add_module(eventinfosetter)
 main.add_module(progress)
 main.add_module(gearbox)
 main.add_module(geometry)
@@ -153,10 +159,10 @@ if (args.UseRealdata is True):
     main.add_module(rootinput)
 else:
     # generate simple particle gun events:
-    # main.add_module(particlegun)
+    main.add_module(particlegun)
 
     # generate BBbar events:
-    main.add_module('EvtGenInput')
+    # main.add_module('EvtGenInput')
 
     main.add_module(simulation)
 

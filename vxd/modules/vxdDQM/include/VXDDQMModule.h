@@ -69,37 +69,6 @@ namespace Belle2 {
     std::string m_relPXDClusterDigitName;  /**< PXDClustersToPXDDigits RelationArray name */
     std::string m_relSVDClusterDigitName;  /**< SVDClustersToSVDDigits RelationArray name */
 
-    // DQM for every PXD sensor:
-//    TH1F* m_firedPxdSen[c_nPXDLayers * c_MaxSensorsInPXDLayer];      /**< Fired pixels per event by plane */
-//    TH1F* m_clustersPxdSen[c_nPXDLayers * c_MaxSensorsInPXDLayer];   /**< Pixels per event by plane */
-//    TH2F* m_hitMapPxdSen[c_nPXDLayers * c_MaxSensorsInPXDLayer];     /**< Hitmaps for pixels by plane */
-//    TH1F* m_chargePxdSen[c_nPXDLayers * c_MaxSensorsInPXDLayer];     /**< Charge by plane */
-//    TH1F* m_seedPxdSen[c_nPXDLayers * c_MaxSensorsInPXDLayer];       /**< Seed by plane */
-//    TH1F* m_sizePxdSen[c_nPXDLayers * c_MaxSensorsInPXDLayer];       /**< Cluster size by plane */
-//    TH1F* m_sizeUPxdSen[c_nPXDLayers * c_MaxSensorsInPXDLayer];      /**< u cluster size by plane */
-//    TH1F* m_sizeVPxdSen[c_nPXDLayers * c_MaxSensorsInPXDLayer];      /**< v cluster size by plane */
-
-    // DQM for every SVD sensor:
-//    TH1F* m_firedUSen[c_nSVDLayers * c_MaxSensorsInSVDLayer];         /**< Fired u strips per event by plane */
-//    TH1F* m_firedVSen[c_nSVDLayers * c_MaxSensorsInSVDLayer];         /**< Fired v strips per event by plane */
-//    TH1F* m_clustersUSen[c_nSVDLayers * c_MaxSensorsInSVDLayer];      /**< u clusters per event by plane */
-//    TH1F* m_clustersVSen[c_nSVDLayers * c_MaxSensorsInSVDLayer];      /**< v clusters per event by plane */
-//    TH1F* m_hitMapUSen[c_nSVDLayers * c_MaxSensorsInSVDLayer];        /**< Hitmaps for u-strips by plane */
-//    TH1F* m_hitMapVSen[c_nSVDLayers * c_MaxSensorsInSVDLayer];        /**< Hitmaps for v-strips by plane */
-//    TH1F* m_chargeUSen[c_nSVDLayers * c_MaxSensorsInSVDLayer];        /**< u charge by plane */
-//    TH1F* m_chargeVSen[c_nSVDLayers * c_MaxSensorsInSVDLayer];        /**< v charge by plane */
-//    TH1F* m_seedUSen[c_nSVDLayers * c_MaxSensorsInSVDLayer];          /**< u seed by plane */
-//    TH1F* m_seedVSen[c_nSVDLayers * c_MaxSensorsInSVDLayer];          /**< v seed by plane */
-//    TH1F* m_sizeUSen[c_nSVDLayers * c_MaxSensorsInSVDLayer];          /**< u size by plane */
-//    TH1F* m_sizeVSen[c_nSVDLayers * c_MaxSensorsInSVDLayer];          /**< v size by plane */
-//    TH1F* m_timeUSen[c_nSVDLayers * c_MaxSensorsInSVDLayer];          /**< u time by plane */
-//    TH1F* m_timeVSen[c_nSVDLayers * c_MaxSensorsInSVDLayer];          /**< v time by plane */
-
-    // DQM for correlations for VXD layers:
-    //TH2F* m_hitMapPxd[c_nPXDLayers * c_MaxSensorsInPXDLayer];      /**< Hitmaps for pixels by plane */
-    //TH1F* m_hitMapSvdU[c_nSVDLayers * c_MaxSensorsInSVDLayer];        /**< Hitmaps for u-strips by plane */
-    //TH1F* m_hitMapSvdV[c_nSVDLayers * c_MaxSensorsInSVDLayer];        /**< Hitmaps for v-strips by plane */
-
     int c_nVXDLayers;                /**< Number of VXD layers on Belle II */
     int c_nPXDLayers;                /**< Number of PXD layers on Belle II */
     int c_nSVDLayers;                /**< Number of SVD layers on Belle II */

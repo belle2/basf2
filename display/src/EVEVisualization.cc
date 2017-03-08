@@ -29,7 +29,6 @@
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <arich/dbobjects/ARICHGeometryConfig.h>
-#include <geometry/bfieldmap/BFieldMap.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <top/geometry/TOPGeometryPar.h>
 
@@ -39,15 +38,10 @@
 #include <genfit/WireMeasurement.h>
 #include <genfit/WireMeasurementNew.h>
 #include <genfit/WirePointMeasurement.h>
-#include <genfit/AbsTrackRep.h>
 #include <genfit/DetPlane.h>
 #include <genfit/Exception.h>
 #include <genfit/KalmanFitterInfo.h>
-#include <genfit/AbsKalmanFitter.h>
-#include <genfit/KalmanFitter.h>
-#include <genfit/DAF.h>
-#include <genfit/KalmanFitterRefTrack.h>
-#include <genfit/GblFitter.h>
+#include <genfit/GblFitterInfo.h>
 
 #include <framework/dataobjects/DisplayData.h>
 #include <framework/logging/Logger.h>

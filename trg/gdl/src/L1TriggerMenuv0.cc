@@ -5,10 +5,10 @@
 //1 1 n_2d_finder==2&&BhabhaVeto==0
 //2 1 n_2d_finder>=1&&n_gc>=1&&BhabahVeto==0&&SBhabhaVeto==0
 //3 1 n_c>=3&&n_high_c1>=1&&eclBhabhaVeto==0
-//4 1 n_c>=2&&bbc>=1&&eclBhabhaVeto==0
+//4 1 n_c>=2&&n_bbc>=1&&eclBhabhaVeto==0
 //5 1 n_high_c2>=1&&eclBhabhaVeto==0
-//6 2000 n_c>=2
-//7 2000 n_2d_finder>=1
+//6 2000 n_c>=2&&n_bbc>=1
+//7 2000 n_2d_finder>=1&&n_gc>=1
 //8 2000 n_high_c2>1
 //9 1000 eclbhabha
 //10 1000 n_2d_finder>=1&&n_high_c3>=1&&n_bbtc>=1
@@ -65,10 +65,10 @@ namespace Belle2 {
     if (objects[3] >= 1 && objects[10] == 0) trgres.push_back(doprescale(scalef[5]));
     else trgres.push_back(0);
 //line 6
-    if (objects[1] >= 1) trgres.push_back(doprescale(scalef[6]));
+    if (objects[1] >= 2 && objects[6] >= 1) trgres.push_back(doprescale(scalef[6]));
     else trgres.push_back(0);
 //line 7
-    if (objects[0] >= 1) trgres.push_back(doprescale(scalef[7]));
+    if (objects[0] >= 1 && objects[5] >= 1) trgres.push_back(doprescale(scalef[7]));
     else trgres.push_back(0);
 //line 8
     if (objects[3] >= 1) trgres.push_back(doprescale(scalef[8]));

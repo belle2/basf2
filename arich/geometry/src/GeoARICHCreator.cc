@@ -420,7 +420,8 @@ namespace Belle2 {
       //supportTubeLV->SetSensitiveDetector(m_sensitiveAero);
 
       // imaginary tube after aerogel layers (used as volume to which tracks are extrapolated by ext module)
-      G4Tubs* imgTube = new G4Tubs("imgTube", rin, rout, 0.5 / 2., 0, 2 * M_PI);
+      double imgTubeLen = 0.5;
+      G4Tubs* imgTube = new G4Tubs("imgTube", rin, rout, imgTubeLen / 2., 0, 2 * M_PI);
       G4LogicalVolume*  imgTubeLV = new G4LogicalVolume(imgTube, imgMaterial, "ARICH.AerogelImgPlate");
       imgTubeLV->SetSensitiveDetector(m_sensitiveAero);
 
@@ -434,7 +435,7 @@ namespace Belle2 {
 
       unsigned nLayer = aeroGeo.getNLayers();
       double tileGap = aeroGeo.getTileGap();
-      G4Transform3D transform = G4Translate3D(0., 0., thick / 2.);
+      G4Transform3D transform = G4Translate3D(0., 0., (thick - imgTubeLen) / 2.);
 
       for (unsigned iRing = 0; iRing < nRing; iRing++) {
 
@@ -474,14 +475,14 @@ namespace Belle2 {
           G4LogicalVolume* tileLV = new G4LogicalVolume(tileShape, aeroMaterial, string("ARICH.") + tileName.str());
 
           while (iphi < 2 * M_PI - 0.0001) {
-            G4ThreeVector trans(r * cos(iphi), r * sin(iphi), thick / 2.);
+            G4ThreeVector trans(r * cos(iphi), r * sin(iphi), (thick - imgTubeLen) / 2.);
             G4RotationMatrix Ra;
             Ra.rotateZ(iphi);
 
             if (iLayer == 1) new G4PVPlacement(G4Transform3D(Ra, trans), wallLV, string("ARICH.") + wallName.str(), aerogelPlaneLV, false,
                                                  iSlot);
 
-            G4ThreeVector transTile(0, 0, (thick + layerThick - wallHeight) / 2. + zLayer);
+            G4ThreeVector transTile(0, 0, (thick + layerThick - wallHeight - imgTubeLen) / 2. + zLayer);
             new G4PVPlacement(G4Transform3D(Ra, transTile), tileLV, string("ARICH.") + tileName.str(), aerogelPlaneLV, false, iSlot);
             iphi += dphi;
             iSlot++;
@@ -490,7 +491,8 @@ namespace Belle2 {
         }
       }
 
-      new G4PVPlacement(G4Translate3D(0., 0., -(wallHeight + 0.5) / 2.), supportTubeLV, "ARICH.AerogelSupportPlate", aerogelPlaneLV,
+      new G4PVPlacement(G4Translate3D(0., 0., -(wallHeight + imgTubeLen) / 2.), supportTubeLV, "ARICH.AerogelSupportPlate",
+                        aerogelPlaneLV,
                         false, 1);
 
       new G4PVPlacement(G4Translate3D(0., 0., (wallHeight + thick) / 2.), imgTubeLV, "ARICH.AerogelImgPlate", aerogelPlaneLV, false, 1);

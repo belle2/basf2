@@ -300,6 +300,8 @@ namespace {
 
   TEST(ROEVariablesTest, Variable)
   {
+
+    StoreObjPtr<ParticleList> pi0ParticleList("pi0:vartest");
     DataStore::Instance().setInitializeActive(true);
     StoreArray<ECLCluster>::registerPersistent();
     StoreArray<KLMCluster>::registerPersistent();
@@ -308,6 +310,7 @@ namespace {
     StoreArray<PIDLikelihood>::registerPersistent();
     StoreArray<Particle>::registerPersistent();
     StoreArray<RestOfEvent>::registerPersistent();
+    pi0ParticleList.registerInDataStore(DataStore::c_DontWriteOut);
     StoreArray<ECLCluster> myECLClusters;
     StoreArray<KLMCluster> myKLMClusters;
     StoreArray<TrackFitResult> myTFRs;
@@ -318,6 +321,9 @@ namespace {
     myParticles.registerRelationTo(myROEs);
     myTracks.registerRelationTo(myPIDLikelihoods);
     DataStore::Instance().setInitializeActive(false);
+
+    pi0ParticleList.create();
+    pi0ParticleList->initialize(111, "pi0:vartest");
 
     // Neutral ECLCluster on reconstructed side
     ECLCluster myECL;
@@ -489,15 +495,7 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 0.0);
 
-    var = Manager::Instance().getVariable("nROEPi0s()");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 0.0);
-
-    var = Manager::Instance().getVariable("nROEPi0s(0 < M < 1.5)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 0.0);
-
-    var = Manager::Instance().getVariable("nROEPi0s(mask2, 0 < M < 1.5)");
+    var = Manager::Instance().getVariable("nROEPi0(vartest)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 0.0);
 

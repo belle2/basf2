@@ -15,6 +15,7 @@ import multiprocessing
 
 set_random_seed("something important")
 # simplify logging output to just the type and the message
+logging.enable_summary(False)
 for level in LogLevel.values.values():
     logging.set_info(level, LogInfo.LEVEL | LogInfo.MESSAGE)
 

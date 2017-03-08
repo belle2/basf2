@@ -10,6 +10,25 @@ import requests
 import http
 
 
+def setupBelleDatabaseServer():
+    """
+    Sets the Belle DB server to the one recommended in /sw/belle/local/var/belle_postgres_server.
+
+    If the user does not have the access rights to the above file, the can01 server is set by default.
+    """
+    belleDBServerFile = '/sw/belle/local/var/belle_postgres_server'
+    belleDBServer = 'can01'
+
+    try:
+        with open(belleDBServerFile) as f:
+            belleDBServer = (f.read()).strip()
+    except IOError:
+        pass
+
+    B2INFO('Belle DB server is set to: ' + belleDBServer)
+    os.environ['BELLE_POSTGRES_SERVER'] = belleDBServer
+
+
 def setupBelleMagneticField(path=analysis_main):
     """
     This function set the Belle Magnetic field (constant).
@@ -48,6 +67,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True, pa
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
     """
+
+    setupBelleDatabaseServer()
 
     setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
 

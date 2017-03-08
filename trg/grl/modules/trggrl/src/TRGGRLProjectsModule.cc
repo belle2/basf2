@@ -302,7 +302,7 @@ namespace Belle2 {
           TVector3 vec2(x2, y2, z2);
           double  theta2 = vec2.Theta() * m_RtD;
           double  phi2 = vec2.Phi() * m_RtD;
-          if (phi1 < 0) phi1 += 360.;
+          if (phi2 < 0) phi2 += 360.;
 
           double etot = e1 + e2;
           double deltphi = fabs(fabs(phi1 - phi2) - 180);

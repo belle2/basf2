@@ -426,6 +426,7 @@ void DeSerializerPCModule::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int* d
   int num_nodes_in_sendblock = 0;
 
   if (m_start_flag == 0) B2INFO("DeSerializerPC: Reading the 1st packet from eb0...");
+
   int* temp_buf = recvData(delete_flag, &total_buf_nwords, &num_events_in_sendblock,
                            &num_nodes_in_sendblock);
   if (m_start_flag == 0) {
@@ -434,7 +435,11 @@ void DeSerializerPCModule::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int* d
   }
   m_totbytes += total_buf_nwords * sizeof(int);
 
-  temp_raw_datablk->SetBuffer((int*)temp_buf, total_buf_nwords, *delete_flag,
+  // Fixed for glibc error at Jan. 2017, reported in "Re: data taking with the new firmware".
+  // for temp_raw_datablk, delete_flag should be 0. raw_datablk will take care of deleting buffer
+  //  temp_raw_datablk->SetBuffer((int*)temp_buf, total_buf_nwords, *delete_flag,
+  temp_raw_datablk->SetBuffer((int*)temp_buf, total_buf_nwords, 0,
+
                               num_events_in_sendblock, num_nodes_in_sendblock);
 
   //
@@ -714,11 +719,10 @@ void DeSerializerPCModule::event()
     //
     // Set buffer to the RawData class stored in DataStore
     //
-    int delete_flag_from = 0, delete_flag_to = 0;
+    int delete_flag = 0;
     RawDataBlock temp_rawdatablk;
     try {
-      setRecvdBuffer(&temp_rawdatablk, &delete_flag_from);
-      //    temp_rawdatablk.PrintData( temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords() );
+      setRecvdBuffer(&temp_rawdatablk, &delete_flag);
       checkData(&temp_rawdatablk, &exp_copper_0, &run_copper_0, &subrun_copper_0, &eve_copper_0, &error_bit_flag);
     } catch (string err_str) {
 #ifdef NONSTOP
@@ -731,53 +735,11 @@ void DeSerializerPCModule::event()
       print_err.PrintError((char*)err_str.c_str(), __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(1);
     }
-#ifndef USE_DESERIALIZER_PREPC
-    PreRawCOPPERFormat_latest pre_rawcopper_latest;
-    pre_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
-                                   0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
-    buf_rc = temp_rawdatablk.GetWholeBuffer();
-
-
-
-#ifdef REDUCED_RAWCOPPER
-    //
-    // Copy reduced buffer
-    //
-    int* buf_to = getNewBuffer(m_pre_rawcpr.CalcReducedDataSize(&temp_rawdatablk),
-                               &delete_flag_to);
-    m_pre_rawcpr.CopyReducedData(&temp_rawdatablk, buf_to, delete_flag_from);
-
-#else
-    delete_flag_to = delete_flag_from;
-#endif
-
-#else
-    delete_flag_to = delete_flag_from;
-#endif
-
 
     RawDataBlock* raw_datablk = raw_datablkarray.appendNew();
-    raw_datablk->SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
-                           delete_flag_to, temp_rawdatablk.GetNumEvents(),
-                           temp_rawdatablk.GetNumNodes());
+    raw_datablk->SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(), delete_flag,
+                           temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
     buf_rc = temp_rawdatablk.GetWholeBuffer();
-
-#ifndef USE_DESERIALIZER_PREPC
-    Do not use this option..
-#ifdef REDUCED_RAWCOPPER
-    PostRawCOPPERFormat_latest post_rawcopper_latest;
-    post_rawcopper_latest.SetBuffer((int*)temp_rawdatablk.GetWholeBuffer(), temp_rawdatablk.TotalBufNwords(),
-                                    0, temp_rawdatablk.GetNumEvents(), temp_rawdatablk.GetNumNodes());
-    buf_rc = temp_rawdatablk.GetWholeBuffer();
-    for (int i_finesse_num = 0; i_finesse_num < 4; i_finesse_num ++) {
-      int block_num = 0;
-      if (post_rawcopper_latest.GetFINESSENwords(block_num, i_finesse_num) > 0) {
-        post_rawcopper_latest.CheckCRC16(block_num, i_finesse_num);
-      }
-    }
-#endif
-
-#endif
   }
   if (buf_rc != NULL) {
     g_status.copyEventHeader(buf_rc);

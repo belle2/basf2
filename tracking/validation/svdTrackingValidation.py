@@ -43,6 +43,7 @@ class SVD4Layer(TrackingValidationRun):
 
     #: use only the svd hits when computing efficiencies
     tracking_coverage = {
+        'WhichParticles': ['SVD'],  # Include all particles seen in the SVD detector, also secondaries
         'UsePXDHits': False,
         'UseSVDHits': True,
         'UseCDCHits': False,

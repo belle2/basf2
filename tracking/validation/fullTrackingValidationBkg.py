@@ -39,9 +39,12 @@ class FullBkg(TrackingValidationRun):
     root_input_file = '../EvtGenSim.root'
     finder_module = staticmethod(tracking.add_tracking_reconstruction)
     tracking_coverage = {
+        'WhichParticles': [],  # Include all particles, also secondaries
         'UsePXDHits': True,
         'UseSVDHits': True,
         'UseCDCHits': True,
+        'UseOnlyBeforeTOP': True,
+        'UseNLoops': 1
     }
     # tracks will be already fitted by
     # add_tracking_reconstruction finder module set above

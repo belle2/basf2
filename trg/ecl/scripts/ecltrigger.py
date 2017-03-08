@@ -13,4 +13,6 @@ def add_ecl_trigger(path):
     path.add_module(trgeclfam)
 
     trgecl = register_module("TRGECL")
+    # Output Clustering method(0: Use only ICN, 1: ICN + Max TC)
+    trgecl.param('Clustering', 0)
     path.add_module(trgecl)

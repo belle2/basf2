@@ -11,7 +11,7 @@
 import os
 from basf2 import *
 from simulation import add_simulation
-from gdltrigger import add_tsim
+from L1trigger import add_tsim
 from modularAnalysis import *
 
 import glob

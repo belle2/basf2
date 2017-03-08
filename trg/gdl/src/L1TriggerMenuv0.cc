@@ -31,7 +31,7 @@ namespace Belle2 {
 
 //set the total number of trigger lines and prescalefactor
   const int ntrgline = 12;
-  double scalef[ntrgline] = {1, 1, 1, 1, 1, 1, 2000, 1000, 1000, 1000, 1000, 1000};
+  double scalef[ntrgline] = {1, 1, 1, 1, 1, 1, 2000, 2000, 2000, 1000, 1000, 1000};
 
   int doprescale(int f)
   {

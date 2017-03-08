@@ -1,0 +1,653 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Torben Ferber                                            *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+#include <sstream>
+#define SSTR( x ) dynamic_cast< std::ostringstream & >(( std::ostringstream() << std::dec << x ) ).str()
+
+// kinfitter
+#include <analysis/modules/ParticleKinematicFitter/ParticleKinematicFitterModule.h>
+#include <analysis/OrcaKinFit/PxPyPzMFitObject.h>
+#include <analysis/OrcaKinFit/JetFitObject.h>
+#include <analysis/OrcaKinFit/TextTracer.h>
+#include <analysis/OrcaKinFit/RootTracer.h>
+#include <analysis/OrcaKinFit/BaseFitter.h>
+#include <analysis/OrcaKinFit/BaseFitObject.h>
+
+// framework datastore
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+
+// framework utilities
+#include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
+
+// analysis dataobjects
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
+
+// analysis utilities
+#include <analysis/utility/PCmsLabTransform.h>
+
+// extrainfo
+#include <analysis/dataobjects/EventExtraInfo.h>
+
+// others
+#include <TMath.h>
+#include <TMatrixD.h>
+
+// CLHEP
+#include <CLHEP/Matrix/Matrix.h>
+#include <CLHEP/Matrix/SymMatrix.h>
+#include <CLHEP/Vector/ThreeVector.h>
+#include <CLHEP/Vector/LorentzVector.h>
+#include <CLHEP/Geometry/Point3D.h>
+using namespace CLHEP;
+using namespace std;
+
+namespace Belle2 {
+
+  //-----------------------------------------------------------------
+  //                 Register module
+  //-----------------------------------------------------------------
+
+  REG_MODULE(ParticleKinematicFitter)
+
+  //-----------------------------------------------------------------
+  //                 Implementation
+  //-----------------------------------------------------------------
+
+  ParticleKinematicFitterModule::ParticleKinematicFitterModule() : Module()
+  {
+    // set module description (e.g. insert text)
+    setDescription("Kinematic fitter for modular analysis");
+//     setPropertyFlags(c_ParallelProcessingCertified);
+
+    // Add parameters
+    addParam("listName", m_listName, "name of particle list", string(""));
+    addParam("kinematicFitter", m_kinematicFitter, "currently available: OrcaKinFit", string("OrcaKinFit"));
+    addParam("orcaFitterEngine", m_orcaFitterEngine, "OrcaKinFit engine: NewFitterGSL, NewtonFitterGSL, OPALFitterGSL", string("OPALFitterGSL"));
+    addParam("orcaTracer", m_orcaTracer, "OrcaKinFit tracer: None, Text, ROOT", string("None"));
+    addParam("orcaConstraint", m_orcaConstraint, "OrcaKinFit constraint: HardBeam, SoftBeam, VerySoftBeam", string("HardBeam"));
+    addParam("debugFitter", m_debugFitter, "Switch on/off internal debugging output if available", false);
+    addParam("debugFitterLevel", m_debugFitterLevel, "Internal debugging output level if available", 10);
+    addParam("confidenceLevel", m_confidenceLevel, "Minimum confidence level of fit to keep particles in the list (failed fit result in -1)",  -1.5);
+    addParam("addUnmeasuredPhoton", m_addUnmeasuredPhoton, "Add one unmeasured photon (-3C)", false);
+    //    addParam("addUnmeasuredISRPhoton", m_addUnmeasuredISRPhoton, "Add one unmeasured ISR photon (-3C)", false);
+    addParam("decayString", m_decayString, "specifies which daughter particles are included in the kinematic fit", string(""));
+  }
+
+
+  void ParticleKinematicFitterModule::initialize()
+  {
+    StoreObjPtr<EventExtraInfo>::registerPersistent("", DataStore::c_Event, false);
+
+    if (m_decayString != "")
+      m_decaydescriptor.init(m_decayString);
+
+    if (m_decayString != "")
+      B2INFO("ParticleKinematicFitter: Using specified decay string: " << m_decayString);
+
+  }
+
+
+  void ParticleKinematicFitterModule::beginRun()
+  {
+
+  }
+
+
+  void ParticleKinematicFitterModule::event()
+  {
+
+    StoreObjPtr<ParticleList> plist(m_listName);
+    if (!plist) {
+      B2ERROR("ParticleList " << m_listName << " not found");
+      return;
+    }
+
+    std::vector<unsigned int> toRemove;
+    unsigned int n = plist->getListSize();
+    for (unsigned i = 0; i < n; i++) {
+      Particle* particle = plist->getParticle(i);
+
+      bool ok = doKinematicFit(particle);
+
+      if (!ok) particle->setPValue(-1.);
+      if (particle->getPValue() < m_confidenceLevel)
+      {
+	B2INFO("ParticleKinematicFitterModule: Removing fitted particle with index " << particle->getArrayIndex() << " from the particle list, p= " << particle->getPValue());
+        toRemove.push_back(particle->getArrayIndex());
+      }
+    }
+    plist->removeParticles(toRemove);
+
+  }
+
+
+  bool ParticleKinematicFitterModule::doKinematicFit(Particle* mother)
+  {
+
+    bool ok = false;
+    
+    // fitting with OrcaKinFit
+    if (m_kinematicFitter == "OrcaKinFit") {
+
+      // select subset of particles for the fit
+      if (m_decayString != "") {
+        B2FATAL("ParticleKinematicFitterModule: OrcaKinFit does not support yet selection of daughters via decay string!") ;
+      }
+
+      // check requested fit engine
+      if ( !(m_orcaFitterEngine == "OPALFitterGSL" || m_orcaFitterEngine == "NewtonFitterGSL" || m_orcaFitterEngine == "NewFitterGSL") )
+      {
+        B2FATAL("ParticleKinematicFitterModule:  " << m_orcaFitterEngine << " is an invalid OrcaKinFit fitter engine!");
+      }
+
+      // check requested constraint
+      if ( !(m_orcaConstraint == "HardBeam" || m_orcaConstraint == "SoftBeam" || m_orcaConstraint == "VerySoftBeam") )
+      {
+        B2FATAL("ParticleKinematicFitterModule:  " << m_orcaConstraint << " is an invalid OrcaKinFit constraint!");
+      }
+
+      // basic check is good, go to fitting routine
+      // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      ok = doOrcaKinFitFit(mother);
+      // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+      // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+      // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    }
+    // invalid fitter
+    else if (m_kinematicFitter != "OrcaKinFit")
+    {
+      B2FATAL("ParticleKinematicFitter: " << m_kinematicFitter << " is an invalid kinematic fitter!");
+    }
+
+    if (!ok) return false;
+
+    return true;
+
+  }
+
+//==========================================================================
+  bool ParticleKinematicFitterModule::doOrcaKinFitFit(Particle* mother)
+  {
+    if (mother->getNDaughters() < 1)
+    {
+      B2WARNING("ParticleKinematicFitterModule: Cannot fit with " << mother->getNDaughters() << " daughters.");
+      return false;
+    }
+
+    // fill particles
+    std::vector<const Particle*> particleChildren;
+    bool validChildren = fillFitParticles(mother, particleChildren);
+
+    if (!validChildren)
+    {
+      B2WARNING("ParticleKinematicFitterModule: Cannot find valid children for the fit.");
+      return false;
+    }
+
+    // set fit engine
+    BaseFitter *pfitter;
+    int debugfitter = 0;
+    if(m_debugFitter) debugfitter = m_debugFitterLevel;
+
+    if (m_orcaFitterEngine == "OPALFitterGSL") {
+      pfitter = new OPALFitterGSL();
+//       if(debugfitter>0) B2INFO("ParticleKinematicFitterModule: No debug mode available for OPALFitterGSL");
+    }
+    else if (m_orcaFitterEngine == "NewtonFitterGSL") {
+      pfitter = new NewtonFitterGSL();
+      (dynamic_cast<NewtonFitterGSL*>(pfitter))->setDebug (debugfitter);
+    }
+    else if (m_orcaFitterEngine == "NewFitterGSL") {
+      pfitter = new NewFitterGSL();
+      (dynamic_cast<NewFitterGSL*>(pfitter))->setDebug (debugfitter);
+    }
+    else {
+      B2FATAL("ParticleKinematicFitterModule:  " << m_orcaFitterEngine << " is an invalid OrcaKinFit fitter engine!");
+    }
+    BaseFitter &fitter = *pfitter;
+    
+    // reset fitter
+    resetFitter(fitter);
+
+    // set constraints (not connected to a fitter or particles at this point!)
+    setConstraints();
+
+    // add fit particles from particle list to the fitter and to all constraints
+    for (unsigned iChild = 0; iChild < particleChildren.size(); iChild++)
+    {
+      addParticleToOrcaKinFit(fitter, particleChildren[iChild], iChild);
+    }
+    
+    // add unmeasured particles to the fitter and to all constraints
+    if ( m_addUnmeasuredPhoton ) addUnmeasuredGammaToOrcaKinFit(fitter);
+       
+    // add constraints to the fitter
+    addConstraintsToFitter(fitter);
+    
+    // add tracers to the fitter
+    addTracerToFitter(fitter);
+
+    //store information before the fit
+    storeOrcaKinFitParticles("Measured", fitter, particleChildren, mother);
+
+	
+    double prob   = fitter.fit();
+    double chi2   = fitter.getChi2();
+    int niter     = fitter.getIterations();
+    int ndof      = fitter.getDoF();
+    int errorcode = fitter.getError();
+    
+    B2INFO("ParticleKinematicFitterModule: -------------------------------------------");
+    B2INFO("ParticleKinematicFitterModule: Fit result of OrcaKinFit using " << m_orcaFitterEngine);
+    B2INFO("ParticleKinematicFitterModule:   prob              " << prob);
+    B2INFO("ParticleKinematicFitterModule:   chi2              " << chi2);
+    B2INFO("ParticleKinematicFitterModule:   iterations        " << niter);
+    B2INFO("ParticleKinematicFitterModule:   ndf               " << ndof);
+    B2INFO("ParticleKinematicFitterModule:   errorcode         " << errorcode);
+    B2INFO("ParticleKinematicFitterModule: -------------------------------------------");
+
+    // update mother information
+    updateOrcaKinFitMother(fitter, particleChildren, mother);
+
+    // store information after the fit
+    storeOrcaKinFitParticles("Fitted", fitter, particleChildren, mother);
+
+    //store general fit results
+    mother->addExtraInfo("OrcaKinFitProb", prob);
+    mother->addExtraInfo("OrcaKinFitChi2", chi2);
+    mother->addExtraInfo("OrcaKinFitErrorCode", errorcode);
+
+//     if(fitter) delete fitter;
+    if(pfitter) delete pfitter;
+  }
+
+  bool ParticleKinematicFitterModule::fillFitParticles(const Particle* mother, std::vector<const Particle*>& particleChildren)
+  {
+    for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
+      const Particle* child = mother->getDaughter(ichild);
+
+//       std::cout << child->getName() << std::endl;
+
+      if (child->getPValue() < 0) {
+        B2WARNING("Daughter with PDG code " << child->getPDGCode() << " does not have a valid error matrix.");
+        return false; // error matrix not valid
+      }
+
+      particleChildren.push_back(child);
+    }
+
+    return true;
+  }
+
+
+  void ParticleKinematicFitterModule::addParticleToOrcaKinFit(BaseFitter& fitter, const Particle* particle, const int index)
+  {
+    B2INFO("ParticleVertexFitterModule: adding a particle to the fitter!");
+
+    // four vector
+    CLHEP::HepLorentzVector clheplorentzvector = getCLHEPLorentzVector(particle);
+
+
+    // error matrix
+    CLHEP::HepSymMatrix clhepmomentumerrormatrix = getCLHEPMomentumErrorMatrix(particle);
+    CLHEP::HepSymMatrix clhepmomentumvertexerrormatrix = getCLHEPMomentumVertexErrorMatrix(particle);                                                                                                                            
+    //testing matrix inversion
+    TMatrixFSym abc = particle->getMomentumErrorMatrix();
+    abc.Print();
+
+    abc.SetTol(1.e-23);
+    TMatrixFSym abcinv = abc.Invert();
+    abcinv.Print();
+   
+
+    // create the fit object (ParticleFitObject is the base class)
+    ParticleFitObject *pfitobject;
+    pfitobject  = new PxPyPzMFitObject (clheplorentzvector, clhepmomentumerrormatrix);
+    std::string fitObjectName = "particle_" + SSTR(index);
+    pfitobject->setName(fitObjectName.c_str());
+    ParticleFitObject &fitobject = *pfitobject;
+
+    // add this fit object (=particle) to the constraints
+    addFitObjectToConstraints(fitobject);
+
+    // add fit particle to the fitter
+    fitter.addFitObject(fitobject);
+
+    return;
+  }
+
+
+  CLHEP::HepSymMatrix ParticleKinematicFitterModule::getCLHEPMomentumErrorMatrix(const Particle* particle)
+  {
+    CLHEP::HepSymMatrix covMatrix(4);
+    TMatrixFSym errMatrix = particle->getMomentumErrorMatrix();
+
+    errMatrix.Print();
+
+    for (int i = 0; i < 4; i++) {
+      for (int j = 0; j < 4; j++) {
+	//	for (int j = i; j < 4; j++) {
+
+        covMatrix[i][j] = errMatrix[i][j];
+      }
+    }
+
+    return covMatrix;
+  }
+
+
+  CLHEP::HepSymMatrix ParticleKinematicFitterModule::getCLHEPMomentumVertexErrorMatrix(const Particle* particle)
+  {
+    CLHEP::HepSymMatrix covMatrix(7);
+    TMatrixFSym errMatrix = particle->getMomentumVertexErrorMatrix();
+
+    errMatrix.Print();
+
+    for (int i = 0; i < 7; i++) {
+      for (int j = 0; j < 7; j++) {
+	//	for (int j = i; j < 7; j++) {
+        covMatrix[i][j] = errMatrix[i][j];
+      }
+    }
+
+    return covMatrix;
+  }
+
+
+  CLHEP::HepLorentzVector ParticleKinematicFitterModule::getCLHEPLorentzVector(const Particle* particle)
+  {
+    CLHEP::HepLorentzVector mom(particle->getPx(), particle->getPy(), particle->getPz(), particle->getEnergy());
+    return mom;
+  }
+
+
+  TLorentzVector ParticleKinematicFitterModule::getTLorentzVector(const ParticleFitObject* fitobject)
+  {
+    TLorentzVector mom(fitobject->getPx(), fitobject->getPy(), fitobject->getPz(), fitobject->getE());
+    return mom;
+  }
+
+
+  TMatrixFSym ParticleKinematicFitterModule::getTMatrixFSymMomentumErrorMatrix(const ParticleFitObject* fitobject)
+  {
+    TMatrixFSym errMatrix(4);
+
+    for (int i = 0; i < 4; i++) {
+      for (int j = i; j < 4; j++) {
+        errMatrix[i][j] = 0.0;
+      }
+    }
+
+    return errMatrix;
+  }
+
+  TMatrixFSym ParticleKinematicFitterModule::getTMatrixFSymMomentumVertexErrorMatrix(const ParticleFitObject* fitobject)
+  {
+    TMatrixFSym errMatrix(7);
+
+    for (int i = 0; i < 7; i++) {
+      for (int j = i; j < 7; j++) {
+        errMatrix[i][j] = 0.0;
+      }
+    }
+
+    return errMatrix;
+  }
+
+  TLorentzVector ParticleKinematicFitterModule::getTLorentzVectorConstraints()
+  {
+
+    if ( m_orcaConstraint == "HardBeam" ) {
+      TLorentzVector constraints4vector(m_hardConstraintPx.getValue(),
+				      m_hardConstraintPy.getValue(),
+				      m_hardConstraintPz.getValue(),
+				      m_hardConstraintE.getValue());
+      return constraints4vector;
+    }
+    else if ( m_orcaConstraint == "SoftBeam" ) {
+      B2FATAL("ParticleKinematicFitterModule:  " << m_orcaConstraint << " is an no implement as OrcaKinFit constraint yet!");
+    }
+    else if ( m_orcaConstraint == "VerySoftBeam" ) {
+      B2FATAL("ParticleKinematicFitterModule:  " << m_orcaConstraint << " is an no implement as OrcaKinFit constraint yet!");
+    }
+    else {
+      B2FATAL("ParticleKinematicFitterModule:  " << m_orcaConstraint << " is an invalid OrcaKinFit constraint!");
+    }
+    
+    // should not reach this point...
+    return TLorentzVector(0.,0.,0.,0.);
+  }
+
+  void ParticleKinematicFitterModule::setConstraints()
+  {
+
+    if ( m_orcaConstraint == "HardBeam" ) {
+      PCmsLabTransform T;
+      const TLorentzVector boost = T.getBoostVector();
+
+      m_hardConstraintPx = MomentumConstraint(0, 1, 0, 0, boost.Px());
+      m_hardConstraintPy = MomentumConstraint(0, 0, 1, 0, boost.Py());
+      m_hardConstraintPz = MomentumConstraint(0, 0, 0, 1, boost.Pz());
+      m_hardConstraintE  = MomentumConstraint(1, 0, 0, 0, boost.E());
+
+      m_hardConstraintPx.resetFOList();
+      m_hardConstraintPy.resetFOList();
+      m_hardConstraintPz.resetFOList();
+      m_hardConstraintE.resetFOList();
+
+      m_hardConstraintPx.setName("Sum(p_x) [hard]");
+      m_hardConstraintPy.setName("Sum(p_y) [hard]");
+      m_hardConstraintPz.setName("Sum(p_z) [hard]");
+      m_hardConstraintE.setName("Sum(E) [hard]");
+
+    }
+    else if ( m_orcaConstraint == "SoftBeam" ) {
+      B2FATAL("ParticleKinematicFitterModule:  " << m_orcaConstraint << " is an no implement as OrcaKinFit constraint yet!");
+    }
+    else if ( m_orcaConstraint == "VerySoftBeam" ) {
+      B2FATAL("ParticleKinematicFitterModule:  " << m_orcaConstraint << " is an no implement as OrcaKinFit constraint yet!");
+    }
+    else {
+      B2FATAL("ParticleKinematicFitterModule:  " << m_orcaConstraint << " is an invalid OrcaKinFit constraint!");
+    }
+  }
+
+
+  void ParticleKinematicFitterModule::resetFitter(BaseFitter& fitter)
+  {
+    B2INFO("ParticleKinematicFitterModule: Resetting the fitter");
+    fitter.reset();
+//     m_particleFitObjects.clear();
+  }
+
+
+  void ParticleKinematicFitterModule::addFitObjectToConstraints(ParticleFitObject& fitobject)
+  {
+
+    if ( m_orcaConstraint == "HardBeam" ) {
+      m_hardConstraintPx.addToFOList(fitobject);
+      m_hardConstraintPy.addToFOList(fitobject);
+      m_hardConstraintPz.addToFOList(fitobject);
+      m_hardConstraintE.addToFOList(fitobject);
+    }
+    else if ( m_orcaConstraint == "SoftBeam" ) {
+      B2FATAL("ParticleKinematicFitterModule:  " << m_orcaConstraint << " is an no implement as OrcaKinFit constraint yet!");
+    }
+    else if ( m_orcaConstraint == "VerySoftBeam" ) {
+      B2FATAL("ParticleKinematicFitterModule:  " << m_orcaConstraint << " is an no implement as OrcaKinFit constraint yet!");
+    }
+    else {
+      B2FATAL("ParticleKinematicFitterModule:  " << m_orcaConstraint << " is an invalid OrcaKinFit constraint!");
+    }
+
+  }
+
+
+  void ParticleKinematicFitterModule::addConstraintsToFitter(BaseFitter& fitter)
+  {
+    if ( m_orcaConstraint == "HardBeam" ) {
+      fitter.addConstraint(m_hardConstraintPx);
+      fitter.addConstraint(m_hardConstraintPy);
+      fitter.addConstraint(m_hardConstraintPz);
+      fitter.addConstraint(m_hardConstraintE);
+    }
+    else if ( m_orcaConstraint == "SoftBeam" ) {
+      B2FATAL("ParticleKinematicFitterModule:  " << m_orcaConstraint << " is an no implement as OrcaKinFit constraint yet!");
+    }
+    else if ( m_orcaConstraint == "VerySoftBeam" ) {
+      B2FATAL("ParticleKinematicFitterModule:  " << m_orcaConstraint << " is an no implement as OrcaKinFit constraint yet!");
+    }
+    else {
+      B2FATAL("ParticleKinematicFitterModule:  " << m_orcaConstraint << " is an invalid OrcaKinFit constraint!");
+    }
+  }
+  
+  
+  void ParticleKinematicFitterModule::addTracerToFitter(BaseFitter& fitter)
+  {
+    if ( m_orcaTracer == "Text" ) {
+      m_textTracer = new TextTracer(std::cout);
+      fitter.setTracer (m_textTracer);
+    }
+    else if ( m_orcaTracer == "ROOT" ) {
+      m_rootTracer = new RootTracer("tracer.root", "RECREATE");
+      fitter.setTracer (m_rootTracer);
+    }
+    else if ( m_orcaTracer != "None" ) {
+      B2FATAL("ParticleKinematicFitterModule:  " << m_orcaTracer << " is an invalid OrcaKinFit tracer!");
+    }
+  }
+
+  void ParticleKinematicFitterModule::addUnmeasuredISRGammaToOrcaKinFit(BaseFitter& fitter)
+  {
+
+  }
+
+
+  void ParticleKinematicFitterModule::addUnmeasuredGammaToOrcaKinFit(BaseFitter& fitter)
+  {
+    // initialize starting values constraints FIXME this will not work because its not massless right now...
+    double deltapx = m_hardConstraintPx.getValue();
+    double deltapy = m_hardConstraintPy.getValue();
+    double deltapz = m_hardConstraintPz.getValue();
+    double deltaE = m_hardConstraintE.getValue();
+    TLorentzVector tlv(deltapx, deltapy, deltapz, deltaE);
+
+    double startingE = tlv.E();
+    double startingPhi = tlv.Phi();
+    double startingTheta = tlv.Theta();
+//     getMissingEPhiTheta(startingE, startingPhi,startingTheta);
+
+    // create a fit object
+    ParticleFitObject *pfitobject;
+    pfitobject  = new JetFitObject (startingE, startingPhi, startingTheta, 0.0, 0.0, 0.0, 0.);
+    pfitobject->setParam (0, startingE, false, false);
+    pfitobject->setParam (1, startingPhi, false, false);
+    pfitobject->setParam (2, startingTheta, false, false);
+
+    std::string fitObjectName = "gamma";
+    pfitobject->setName(fitObjectName.c_str());
+    ParticleFitObject &fitobject = *pfitobject;
+
+    // add this fit object (=particle) to the constraints
+    addFitObjectToConstraints(fitobject);
+
+    // add fit particle to the fitter
+    fitter.addFitObject(fitobject);
+
+    return;
+  }
+
+
+  bool ParticleKinematicFitterModule::updateOrcaKinFitMother(BaseFitter& fitter, std::vector<const Particle*>& particleChildren, Particle* mother)
+  {
+    // get old values
+    TLorentzVector mom    = mother->get4Vector();
+    TVector3 pos          = mother->getVertex();
+    TMatrixFSym errMatrix = mother->getMomentumVertexErrorMatrix();
+    float pvalue          = mother->getPValue();
+
+    // update momentum vector
+    TLorentzVector momnew(0., 0., 0., 0.);
+
+    std::vector <BaseFitObject*> *fitObjectContainer = fitter.getFitObjects();
+    for (unsigned iChild = 0; iChild < particleChildren.size(); iChild++)
+    {
+      BaseFitObject *fo = fitObjectContainer->at(iChild);
+      ParticleFitObject *fitobject = (ParticleFitObject*) fo;
+      TLorentzVector tlv = getTLorentzVector(fitobject);
+      momnew += tlv;
+    }
+
+    // set
+    mother->updateMomentum(momnew, pos, errMatrix, pvalue);
+  }
+
+
+  bool ParticleKinematicFitterModule::storeOrcaKinFitParticles(std::string prefix, BaseFitter& fitter, std::vector<const Particle*>& particleChildren, Particle* mother)
+  {
+    bool updated = false;
+    std::vector <BaseFitObject*> *fitObjectContainer = fitter.getFitObjects();
+
+    for (unsigned iChild = 0; iChild < particleChildren.size(); iChild++)
+    {
+      BaseFitObject *fo = fitObjectContainer->at(iChild);
+      ParticleFitObject *fitobject = (ParticleFitObject*) fo;
+      TLorentzVector tlv = getTLorentzVector(fitobject);
+
+      // name of extra variables
+      std::string extraVariableParticlePx    = "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_Px";
+      std::string extraVariableParticlePy    = "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_Py";
+      std::string extraVariableParticlePz    = "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_Pz";
+      std::string extraVariableParticleE     = "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_E";
+      std::string extraVariableParticlePxErr = "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_PxErr";
+      std::string extraVariableParticlePyErr = "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_PyErr";
+      std::string extraVariableParticlePzErr = "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_PzErr";
+      std::string extraVariableParticleEErr  = "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_EErr";
+
+      mother->addExtraInfo(extraVariableParticlePx, tlv.Px());
+      mother->addExtraInfo(extraVariableParticlePy, tlv.Py());
+      mother->addExtraInfo(extraVariableParticlePz, tlv.Pz());
+      mother->addExtraInfo(extraVariableParticleE, tlv.E());
+      mother->addExtraInfo(extraVariableParticlePxErr, getFitObjectError(fitobject, 0));
+      mother->addExtraInfo(extraVariableParticlePyErr, getFitObjectError(fitobject, 1));
+      mother->addExtraInfo(extraVariableParticlePzErr, getFitObjectError(fitobject, 2));
+      mother->addExtraInfo(extraVariableParticleEErr, -1.0);
+      
+       std::cout << "Px: " << tlv.Px() << " =/- " << getFitObjectError(fitobject, 0) << std::endl;
+       std::cout << "Py: " << tlv.Py() << " =/- " << getFitObjectError(fitobject, 1) << std::endl;
+       std::cout << "Pz: " << tlv.Pz() << " =/- " << getFitObjectError(fitobject, 2) << std::endl;
+       //       std::cout << "E : " << tlv.E() << " =/- " << getFitObjectError(fitobject, 3) << std::endl;
+
+    }
+    
+    return updated;
+  }
+
+  float ParticleKinematicFitterModule::getFitObjectError(const ParticleFitObject* fitobject, int ilocal)
+  {
+    //check if it is a PxPyPzMFitObject 
+    PxPyPzMFitObject *pxpypzmfitobject = (PxPyPzMFitObject*) fitobject;
+    if (pxpypzmfitobject) {
+      return fitobject->getError(ilocal);
+    }
+    else {
+      B2FATAL("ParticleKinematicFitterModule: not implemented yet");
+    }
+  }
+
+} // end Belle2 namespace
+

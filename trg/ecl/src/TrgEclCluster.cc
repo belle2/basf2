@@ -130,6 +130,7 @@ TrgEclCluster::setICN(std::vector<int> tcid, std::vector<double> tcenergy, std::
   _icnfwbrbw[0] = setForwardICN(_Method);
   _icnfwbrbw[2] = setBackwardICN(_Method);
 
+
   save(_EventId);
 
   return;
@@ -138,12 +139,6 @@ void
 TrgEclCluster::save(int m_nEvent)
 {
   int m_hitNum = 0;
-  // int NofFwdCluster = ClusterEnergy[0].size();
-  // int NofBrCluster = ClusterEnergy[1].size();
-  // int NofBwdCluster = ClusterEnergy[2].size();
-  //  int NofCluster =  getNofCluster();
-
-  //  for(int icluster =0; icluster< NofCluster; icluster++){
   int clusterId = 0;
   for (int iposition = 0; iposition < 3 ; iposition ++) {
     const int Ncluster = ClusterEnergy[iposition].size();
@@ -189,8 +184,6 @@ TrgEclCluster::setBarrelICN(int Method)
   TCFireEnergy.resize(432, 0.);
   TCFireTiming.resize(432, 0.);
   TCFirePosition.resize(432, std::vector<double>(3, 0.));
-
-
 
   const int  hit_size  = TCId.size();
   for (int ihit = 0 ; ihit < hit_size ; ihit++) {
@@ -527,7 +520,11 @@ TrgEclCluster::setForwardICN(int Method)
 
 
   for (int iii = 0 ; iii < 96 ; iii++) {
-
+    if (iii < 32) {
+      if (iii % 2 == 1) {
+        continue;
+      }
+    }
     for (int iinit = 0; iinit < 9; iinit ++) {TempCluster[iinit] = 0;}
     if (TCFire[iii] == 0) { continue; }
     if (iii < 32) { // most inner
@@ -656,7 +653,7 @@ TrgEclCluster::setForwardICN(int Method)
 
     }
     if (!(TempCluster[1] != 0 || TempCluster[7] != 0)) {
-      if ((TempCluster[5] != 0 && TempCluster[6] != 0)) {
+      if (!(TempCluster[5] != 0 && TempCluster[6] != 0)) {
         if (Method == 1) { //for cluster method2
           int maxTCid = 0;
           double maxTCEnergy = 0;
@@ -802,6 +799,16 @@ TrgEclCluster::setForwardICN(int Method)
           }
 
         }
+
+        for (int iNearTC = 1; iNearTC < 9; iNearTC ++) {
+          for (int jNearTC = 1; jNearTC < 9; jNearTC ++) {
+            if (iNearTC == jNearTC)continue;
+            if (TempCluster[iNearTC] == TempCluster[jNearTC]) {
+              TempCluster[jNearTC] = 0;
+            }
+          }
+        }
+
         double maxTC = 0;
         int maxTCId = 999;
         double clusterenergy = 0;

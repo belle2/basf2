@@ -31,11 +31,13 @@
 // DB objects
 #include <top/dbobjects/TOPCalTimebase.h>
 #include <top/dbobjects/TOPCalChannelT0.h>
+#include <top/dbobjects/TOPCalChannelMask.h>
 #include <top/dbobjects/TOPPmtGainPar.h>
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <random>
 
 #include "TFile.h"
 
@@ -309,6 +311,58 @@ void TOPDatabaseImporter::printSampleTimeCalibration()
     cout << endl;
   }
 
+}
+
+
+
+void TOPDatabaseImporter::generateFakeChannelMask(double fractionDead, double fractionHot)
+{
+  // declare db object to be imported -- and construct it
+  DBImportObjPtr<TOPCalChannelMask> channelMask;
+  channelMask.construct();
+
+  // set up for loop channel maper and random number generator
+  auto& chMapper = TOP::TOPGeometryPar::Instance()->getChannelMapper();
+  const size_t nModules = TOP::TOPGeometryPar::Instance()->getGeometry()->getNumModules();
+  // http://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution
+  std::random_device rd;
+  std::mt19937 gen(rd());  // std generator
+  std::uniform_real_distribution<> dist(0, 1);
+  unsigned ncall = 0;
+  unsigned nall = 0;
+
+  // loop over module (1-based)
+  for (size_t moduleID = 1; moduleID <= nModules; moduleID++) {
+
+    // loop over boardStack*carrierBoard*assic*channel to get channel (0 to 512)
+    // TODO: get these loop limits from some sensible enum somewhere
+    for (int boardStack = 0; boardStack < 4; boardStack++) {
+      for (int carrierBoard = 0; carrierBoard < 4; carrierBoard++) {
+        for (int asic = 0; asic < 4; asic++) {
+          for (int chan = 0; chan < 8; chan++) {
+            auto channel = chMapper.getChannel(boardStack, carrierBoard, asic, chan);
+            nall++;
+            if (dist(gen) < fractionDead) {
+              channelMask->setDead(moduleID, channel);
+              ncall++;
+            }
+            if (dist(gen) < fractionHot) {
+              channelMask->setNoisy(moduleID, channel);
+              ncall++;
+            }
+          }
+        }
+      }
+    }
+  } // module
+
+  // declare interval of validity
+  IntervalOfValidity iov(0, 0, -1, -1); // all experiments and runs
+  channelMask.import(iov);
+
+  B2WARNING("Generated and imported a fake channel mask to database for testing: "
+            << ncall << "/" << nall);
+  return;
 }
 
 

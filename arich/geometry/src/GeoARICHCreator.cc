@@ -160,7 +160,8 @@ namespace Belle2 {
                                          m_config.getDetectorPlane().getSupportZPosition() + zShift);
 
       G4ThreeVector transAeroPlane(m_config.getAerogelPlane().getPosition().X(), m_config.getAerogelPlane().getPosition().Y(),
-                                   m_config.getAerogelPlane().getPosition().Z() + zShift);
+                                   m_config.getAerogelPlane().getPosition().Z() + zShift +
+                                   0.25); // 0.25 shift for volume extended in z for 0.5mm, for "imaginary" tube for track extrapolation // implement properly!
 
       new G4PVPlacement(G4Transform3D(rotDetPlane, transDetPlane), detPlaneLV, "ARICH.detPlane", masterLV, false, 1);
       new G4PVPlacement(G4Transform3D(rotDetPlane, transDetSupportPlate), detSupportPlateLV, "ARICH.detSupportPlane", masterLV, false, 1);
@@ -411,7 +412,9 @@ namespace Belle2 {
       G4Material* gapMaterial = Materials::get("Air"); // Air without refractive index (to kill photons, to mimic black paper around tile)
       G4Material* imgMaterial = Materials::get("ARICH_Air");
       // master volume
-      G4Tubs* aerogelTube = new G4Tubs("aerogelTube", rin, rout, (thick + wallHeight + 0.5) / 2., 0, 2 * M_PI);
+
+      double imgTubeLen = 0.5; // if changed, change position of aerogel plane also in main function!!
+      G4Tubs* aerogelTube = new G4Tubs("aerogelTube", rin, rout, (thick + wallHeight + imgTubeLen) / 2., 0, 2 * M_PI);
       G4LogicalVolume* aerogelPlaneLV = new G4LogicalVolume(aerogelTube, gapMaterial, "ARICH.AaerogelPlane");
 
       // support plate
@@ -420,7 +423,6 @@ namespace Belle2 {
       //supportTubeLV->SetSensitiveDetector(m_sensitiveAero);
 
       // imaginary tube after aerogel layers (used as volume to which tracks are extrapolated by ext module)
-      double imgTubeLen = 0.5;
       G4Tubs* imgTube = new G4Tubs("imgTube", rin, rout, imgTubeLen / 2., 0, 2 * M_PI);
       G4LogicalVolume*  imgTubeLV = new G4LogicalVolume(imgTube, imgMaterial, "ARICH.AerogelImgPlate");
       imgTubeLV->SetSensitiveDetector(m_sensitiveAero);

@@ -73,7 +73,7 @@ parser.add_argument('--input-file', dest='input_file', action='store', default=N
                     help='Name of imput file')
 parser.add_argument('--filename-histos', dest='histo_file_name', action='store',
                     default='VXD_DQM_Histograms.root', type=str,
-                    help='Name of output file with histograms is dqm option is used')
+                    help='Name of output file with histograms in dqm option is used')
 parser.add_argument('--dqm', dest='dqm', action='store_const', const=True, default=True, help='Produce DQM plots')
 
 args = parser.parse_args()

@@ -16,7 +16,11 @@ using namespace std;
 
 
 ROIDetPlane::ROIDetPlane(const VxdID& sensorInfo)
-  : m_sensorInfo(sensorInfo)
+  : m_sensorPhiMin(0)
+  , m_sensorPhiMax(2 * M_PI)
+  , m_sensorZMin(-10)
+  , m_sensorZMax(10)
+  , m_sensorInfo(sensorInfo)
 {
 
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();

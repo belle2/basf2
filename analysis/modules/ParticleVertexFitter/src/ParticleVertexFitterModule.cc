@@ -131,9 +131,7 @@ namespace Belle2 {
     unsigned int n = plist->getListSize();
     for (unsigned i = 0; i < n; i++) {
       Particle* particle = plist->getParticle(i);
-//      cout << "ParticleVertexFitterModule::event, the Pvalue of the mother is  " << particle->getPValue() << endl;  \\ added by huyu
 
-      //particle->print();
       if (m_updateDaughters == true) {
         if (m_decayString.empty()) ParticleCopy::copyDaughters(particle);
         else B2ERROR("Daughters update works only when all daughters are selected. Daughters will not be updated");
@@ -145,9 +143,7 @@ namespace Belle2 {
       }
 
 
-//     cout << "ParticleVertexFitterModule::event, before fit  " << i << "  particle " << endl;   //added by huyu
       bool ok = doVertexFit(particle);
-//     cout << "ParticleVertexFitterModule::event, after fit  " << i << "  particle, is ok? " << ok << endl;   \\added by huyu
       if (!ok) particle->setPValue(-1);
       if (m_confidenceLevel == 0. && particle->getPValue() == 0.) {
         toRemove.push_back(particle->getArrayIndex());
@@ -505,14 +501,12 @@ namespace Belle2 {
   bool ParticleVertexFitterModule::doKMassFit(Particle* mother)
   {
     if (mother->getNDaughters() < 2) return false;
-//    cout << "In ParticleVertexFitterModule::doKMassFit  have " << mother->getNDaughters() << " child" << endl; //add by huyu
 
     analysis::MassFitKFit km;
     km.setMagneticField(m_Bfield);
 
     for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
       const Particle* child = mother->getDaughter(ichild);
-//      cout << "In ParticleVertexFitterModule::doKMassFit child's PValue() " << child->getPValue() << endl; //add by huyu
 
       if (child->getPValue() < 0) return false; // error matrix not valid
 
@@ -534,7 +528,6 @@ namespace Belle2 {
   bool ParticleVertexFitterModule::doKFourCFit(Particle* mother)
   {
     if (mother->getNDaughters() < 2) return false;
-    //  cout << "In ParticleVertexFitterModule::doKFourCFit  have " << mother->getNDaughters() << " child" << endl; //add by huyu
 
     analysis::FourCFitKFit kf;
     kf.setMagneticField(m_Bfield);
@@ -542,9 +535,8 @@ namespace Belle2 {
     for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
       const Particle* child = mother->getDaughter(ichild);
 
-//      cout << "In ParticleVertexFitterModule::doKFourCFit child's PValue() " << child->getPValue() << " has " << child->getNDaughters() <<  " daughters " << endl; //add by huyu
       if (child->getNDaughters() > 0) {
-        bool err = addchildofparticletoKfitter(kf, child);
+        bool err = addChildofParticletoKfitter(kf, child);
         if (!err) return false;
       } else {
         if (child->getPValue() < 0) return false; // error matrix not valid
@@ -557,7 +549,6 @@ namespace Belle2 {
     kf.setFourMomentum(m_beamParams->getHER() + m_beamParams->getLER());
 
     int err = kf.doFit();
-//    cout << "In ParticleVertexFitterModule::doKFourCFit, err= " << err << endl;    \\added by huyu
 
     if (err != 0) return false;
 
@@ -903,21 +894,14 @@ namespace Belle2 {
       for (unsigned ichild = 0; ichild < nd; ichild++) {
         const Particle* daughter = mother->getDaughter(ichild);
         if (daughter->getNDaughters() > 0) {
-          updatelink(u[ichild], l, daughter);
+          updateMapofTrackandDaughter(u[ichild], l, daughter);
         } else {
           u[ichild].push_back(l);
           l++;
         }
       }
-//    for(unsigned i=0;i<nd;i++){
-//        cout<<endl<<i<<endl;
-//        for(unsigned j=0;j<u[i].size();j++){
-//            cout<<u[i][j]<<"\t";
-//        }
-//    }
 
       unsigned n = kf.getTrackCount();
-//      if (daughters.size() != n)
       if (l != n)
         return false;
 
@@ -956,11 +940,11 @@ namespace Belle2 {
     return true;
   }
 
-  void ParticleVertexFitterModule::updatelink(std::vector<unsigned>& ui, unsigned& l, const Particle* daughter)
+  void ParticleVertexFitterModule::updateMapofTrackandDaughter(std::vector<unsigned>& ui, unsigned& l, const Particle* daughter)
   {
     for (unsigned ichild = 0; ichild < daughter->getNDaughters(); ichild++) {
       const Particle* child = daughter->getDaughter(ichild);
-      if (child->getNDaughters() > 0) updatelink(ui, l, child);
+      if (child->getNDaughters() > 0) updateMapofTrackandDaughter(ui, l, child);
       else  ui.push_back(l);
       l++;
     }
@@ -1190,11 +1174,11 @@ namespace Belle2 {
     kf.addTrack(mom, pos, err, particle->getCharge());
   }
 
-  bool ParticleVertexFitterModule::addchildofparticletoKfitter(analysis::FourCFitKFit& kf, const Particle* particle)
+  bool ParticleVertexFitterModule::addChildofParticletoKfitter(analysis::FourCFitKFit& kf, const Particle* particle)
   {
     for (unsigned ichild = 0; ichild < particle->getNDaughters(); ichild++) {
       const Particle* child = particle->getDaughter(ichild);
-      if (child->getNDaughters() > 0) addchildofparticletoKfitter(kf, child);
+      if (child->getNDaughters() > 0) addChildofParticletoKfitter(kf, child);
       else {
         if (child->getPValue() < 0) return false; // error matrix not valid
 

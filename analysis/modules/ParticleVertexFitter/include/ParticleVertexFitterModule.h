@@ -80,7 +80,6 @@ namespace Belle2 {
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
     DBObjPtr<BeamParameters> m_beamParams;/**< Beam parameters */
-//  std::string m_extraInfoName; /**< Name under which the SignalProbability is stored in the extraInfo of the Particle object. */
 
     /**
      * Main steering routine
@@ -152,9 +151,12 @@ namespace Belle2 {
     bool makeKFourCMother(analysis::FourCFitKFit& kv, Particle* p);
 
     /**
-     * update the link of daughter to tracks
+    * update the map of daughter and tracks, find out wich tracks belong to each daugther.
+    * @param ui store the tracks ID of each daughter
+    * @param l represent the tracks ID
+    * @param p pointer to particle
      */
-    void updatelink(std::vector<unsigned>& ui, unsigned& l, const Particle* daughter);
+    void updateMapofTrackandDaughter(std::vector<unsigned>& ui, unsigned& l, const Particle* daughter);
 
     /**
      * Adds given particle to the VertexFitKFit.
@@ -189,7 +191,7 @@ namespace Belle2 {
      * @param kv reference to Kfitter FourCFit object
      * @param particle pointer to particle
      */
-    bool addchildofparticletoKfitter(analysis::FourCFitKFit& kv, const Particle* particle);
+    bool addChildofParticletoKfitter(analysis::FourCFitKFit& kv, const Particle* particle);
 
 
     /**

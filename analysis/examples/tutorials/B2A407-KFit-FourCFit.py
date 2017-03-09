@@ -5,9 +5,9 @@
 # This tutorial demonstrates how to perform four momentum constraint
 # fit with the KFit. In this example the following decay chain:
 #
-# Upsilon(4S) -> eta          Upsilon
-#                 |              |
-#                 +->pi+ pi-     +-> u+ u-
+# Upsilon(4S) -> eta               Upsilon
+#                 |                  |
+#                 +->gamma gamma     +-> u+ u-
 #
 # is reconstructed. The four momentum constraint fit is performed on
 # all final states, and the total four momentum is set at that of cms
@@ -34,20 +34,19 @@ stdPhotons('loose')
 fillParticleList('mu+:pid', 'muid>0.1')
 
 
-# Reconstructs eta -> pi+ pi-
+# Reconstructs eta -> gamma gamma
 reconstructDecay("eta:gg -> gamma:loose gamma:loose", "")
 # Reconstructs Upsilon -> u+ u-
 reconstructDecay("Upsilon:uu -> mu+:pid mu-:pid", "M>2.")
 
-
-# Reconstructs Upsilon(4S) -> Upsilon pi+ pi-
+# Reconstructs Upsilon(4S) -> Upsilon eta
 reconstructDecay("Upsilon(4S) -> eta:gg Upsilon:uu", "")
 
-# perform four momentum constraint fit using KFit
+# Perform four momentum constraint fit using KFit
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
 fourCKFit("Upsilon(4S)", 0.0)
 
-# perform four momentum constraint fit using KFit and update the Daughters
+# Perform four momentum constraint fit using KFit and update the Daughters
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
 # fourCKFitDaughtersUpdate("Upsilon(4S)", 0.0)
 

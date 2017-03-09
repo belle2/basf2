@@ -63,6 +63,13 @@ namespace Belle2 {
     void printSampleTimeCalibration();
 
     /**
+     * Generate and import a (random, fake) channel mask for testing
+     * @param fractionDead the fraction of dead PMs to randomly assign
+     * @param fractionHot the fraction of noisy PMs to randomly assign
+     */
+    void generateFakeChannelMask(double fractionDead, double fractionHot);
+
+    /**
      * for testing purposes only! - will be removed ...
      */
     void importTest(int runNumber, double syncTimeBase);

@@ -9,7 +9,7 @@
 //5 1 n_high_c2>=1&&eclBhabhaVeto==0
 //6 2000 n_c>=2&&n_bbc>=1
 //7 2000 n_2d_finder>=1&&n_gc>=1
-//8 2000 n_high_c2>1
+//8 2000 n_high_c2>=1
 //9 1000 eclbhabha
 //10 1000 n_2d_finder>=1&&n_high_c3>=1&&n_bbtc>=1
 //11 1000 n_high_c3>=1&&n_2d_finder==0

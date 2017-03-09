@@ -33,7 +33,7 @@ class EffModule(Module):
         trglog = ['n_2d_finder>=3', 'n_2d_finder==2&&BhabhaVeto==0',
                   'n_2d_finder>=1&&n_gc>=1&&BhabahVeto==0&&SBhabhaVeto==0',
                   'n_c>=3&&n_high_c1>=1&&eclBhabhaVeto==0', 'n_c>=2&&bbc>=1&&eclBhabhaVeto==0',
-                  'n_high_c2>=1&&eclBhabhaVeto==0', 'n_c>=2', 'n_2d_finder>=1', 'n_high_c2>1',
+                  'n_high_c2>=1&&eclBhabhaVeto==0', 'n_c>=2&&n_bbc>=1', 'n_2d_finder>=1&&n_gc>=1', 'n_high_c2>=1',
                   'eclbhabha', 'n_2d_finder>=1&&n_high_c3>=1&&n_bbtc>=1', 'n_high_c3>=1&&n_2d_finder==0']
         if self.Ntot_event != 0:
             for i in range(ntrg):

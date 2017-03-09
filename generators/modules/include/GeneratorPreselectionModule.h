@@ -13,6 +13,8 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/MCInitialParticles.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <string>
@@ -54,6 +56,7 @@ namespace Belle2 {
     bool m_onlyPrimaries;       /**< Print only primary particles. */
     int m_maxLevel;             /**< Show only up to specified depth level. */
     StoreArray<MCParticle> m_mcparticles; /**< store array for the MCParticles */
+    StoreObjPtr<MCInitialParticles> m_initial; /**< pointer to the actual beam parameters */
 
   private:
 
@@ -67,6 +70,8 @@ namespace Belle2 {
     double m_MinChargedPt; /**< minimum pT for each charged particle. */
     double m_MinChargedTheta; /**< minimum theta for each charged particle. */
     double m_MaxChargedTheta; /**< maximum theta for each charged particle. */
+    bool m_applyInCMS{false}; /**< if true apply the selection criteria for
+                                   charged in the center of mass system */
 
     /**number of photons*/
     double m_nPhoton; /**< number of photons (counted per event). */

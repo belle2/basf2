@@ -199,7 +199,7 @@ def SBhabhaVeto(matchtrks):
         cluster1 = matchtrk1.getRelatedTo('TRGECLClusters')
         if cdctrk1 and cluster1:
             e1 = cluster1.getEnergyDep()
-            Elist.append(e1)
+            Elist.append([e1])
     if len(Elist) >= 1:
         return Elist
     else:
@@ -212,8 +212,6 @@ def eclBhabhaVeto(eclclusters):
         if i == len(eclclusters) - 1:
             continue
         e1 = cluster1.getEnergyDep()
-        if e1 < 1.0:
-            continue
         x1 = cluster1.getPositionX()
         y1 = cluster1.getPositionY()
         z1 = cluster1.getPositionZ()
@@ -226,8 +224,6 @@ def eclBhabhaVeto(eclclusters):
             e2 = cluster2.getEnergyDep()
             if j <= i:
                 continue
-            if e2 < 1.0:
-                continue
             x2 = cluster2.getPositionX()
             y2 = cluster2.getPositionY()
             z2 = cluster2.getPositionZ()
@@ -236,8 +232,8 @@ def eclBhabhaVeto(eclclusters):
             phi2 = vec2.Phi()
             if phi2 < 0.0:
                 phi2 += 2 * PI
-            delt_theta = math.fabs((theta1 + theta2) * 180.0 / 3.1415926 - 180.0)
-            delt_phi = math.fabs(phi1 - phi2) * 180.0 / 3.1415926 - 180.0
+            delt_theta = math.fabs((theta1 + theta2) * Fac - 180.0)
+            delt_phi = math.fabs(phi1 - phi2) * Fac - 180.0
             if theta1 < theta2:
                 efr = e1
                 ebr = e2
@@ -365,6 +361,8 @@ def PrintBranchDef():
     print('nhit_klm     : # KLM hit', '\n')
 
     print('ncluster:                 # ecl cluster')
+    print('ncluster_1000b:           # ecl cluster with threshold >1.0GeV, exclude TC ID 1,2, 17')
+    print('ncluster_2000e:           # ecl cluster with threshold >2.0GeV in TC ID 1, 17')
     print('max_cluster[3]:           [energy, theta, phi] of the largest energetic ecl cluster')
     print('smax_cluster[3]:          [energy, theta, phi] of the secondary energetic ecl cluster')
     print('ncluster_neutral:         # ecl cluster w/o associated cdc track')
@@ -400,6 +398,8 @@ class CreateLogics(Module):
 
     ncomp_clu = 3
     etot_t = array('f', [0.0])
+    ncluster_1000b_t = array('i', [-1])
+    ncluster_2000e_t = array('i', [-1])
     ncluster_t = array('i', [-1])
     ncluster_neutral_t = array('i', [-1])
     max_cluster_neutral_t = array('f', ncomp_clu * [0.0])
@@ -420,9 +420,9 @@ class CreateLogics(Module):
     npair_cc_t = array('i', [-1])
 
     nbha_var = 5
-    bhabha_t = array('f', [0.0])
-    sbhabha_t = array('f', [0.0])
-    eclbhabha_t = array('f', [0.0])
+    bhabha_t = array('i', [0])
+    sbhabha_t = array('i', [0])
+    eclbhabha_t = array('i', [0])
     bhabha_var_t = array('f', nbha_var * [0.0])
     eclbhabha_var_t = array('f', nbha_var * [0.0])
 
@@ -440,6 +440,8 @@ class CreateLogics(Module):
     # cluster
     tgrl.Branch('etot', etot_t, 'etot/f')
     tgrl.Branch('ncluster', ncluster_t, 'ncluster/i')
+    tgrl.Branch('ncluster_1000b', ncluster_1000b_t, 'ncluster_1000b/i')
+    tgrl.Branch('ncluster_2000e', ncluster_2000e_t, 'ncluster_2000e/i')
     tgrl.Branch('ncluster_neutral', ncluster_neutral_t, 'ncluster_neutral/i')
     tgrl.Branch('max_cluster_neutral', max_cluster_neutral_t, 'max_cluster_neutral[3]/f')
     # tgrl.Branch('max_cms_cluster_neutral', max_cms_cluster_neutral_t, 'max_cms_cluster_neutral[3]/f')
@@ -457,9 +459,9 @@ class CreateLogics(Module):
     tgrl.Branch('nhit_klm', nhit_klm_t, 'nhit_klm/i')
 
     # bhabha
-    tgrl.Branch('bhabha', bhabha_t, 'bhabha/f')
-    tgrl.Branch('sbhabha', sbhabha_t, 'sbhabha/f')
-    tgrl.Branch('eclbhabha', eclbhabha_t, 'eclbhabha/f')
+    tgrl.Branch('bhabha', bhabha_t, 'bhabha/i')
+    tgrl.Branch('sbhabha', sbhabha_t, 'sbhabha/i')
+    tgrl.Branch('eclbhabha', eclbhabha_t, 'eclbhabha/i')
     tgrl.Branch('bhabha_var', bhabha_var_t, 'bhabha_var[5]/f')
     tgrl.Branch('eclbhabha_var', eclbhabha_var_t, 'eclbhabha_var[5]/f')
 
@@ -534,7 +536,8 @@ class CreateLogics(Module):
         trginfo = Belle2.PyStoreObj('TRGGRLObjects')
         self.npair_tc_t[0] = trginfo.getNbbTrkCluster()
         self.npair_cc_t[0] = trginfo.getNbbCluster()
-
+        self.ncluster_1000b_t[0] = trginfo.getNhighcluster2()
+        self.ncluster_2000e_t[0] = trginfo.getNhighcluster4()
         self.max_deltphi_2dfinder_t[0] = Max_DeltPhi_trk(trk_2d_finder)
 
         neutral_clusters = NeutralCluster(clusters)
@@ -563,10 +566,10 @@ class CreateLogics(Module):
         bhabhaveto_1 = BhabhaVeto1(matchlist)
         bha_logic = 0
         for bha in bhabhaveto_1:
-            if math.fabs(bha[0]) < 50 and math.fabs(bha[0]) > 10 and math.fabs(bha[1] < 20):
+            if math.fabs(bha[0]) < 50 and math.fabs(bha[0]) > 10 and math.fabs(bha[1]) < 20:
                 if bha[2] > 2.0 and bha[3] > 2.0 and bha[4] > 6.0:
                     if bha[2] > 3.0 or bha[3] > 3.0:
-                        if trk_2d_finder == 2:
+                        if len(trk_2d_finder) == 2:
                             bha_logic = 1
         self.bhabha_t[0] = bha_logic
 
@@ -578,18 +581,19 @@ class CreateLogics(Module):
         eclbhabhaveto = eclBhabhaVeto(clusters)
         eclbha_logic = 0
         for eclbha in eclbhabhaveto:
-            if math.fabs(eclbha[0]) < 50 and math.fabs(eclbha[1] < 50):
-                if eclbha[2] > 3.0 and eclbha[3] > 2.0 and eclbha[4] > 6.0:
-                    eclbha_logic = 1
+            if math.fabs(eclbha[0]) < 50 and math.fabs(eclbha[1]) < 50:
+                if eclbha[2] > 2.0 and eclbha[3] > 2.0 and eclbha[4] > 6.0:
+                    if eclbha[2] > 3.0 or eclbha[3] > 3.0:
+                        eclbha_logic = 1
         self.eclbhabha_t[0] = eclbha_logic
 
         # sbhahba
         sbha_logic = 0
-        if trk_2d_finder == 1:
+        if len(trk_2d_finder) == 1:
             if eclbha_logic == 1:
                 ecol = SBhabhaVeto(matchlist)
-                for i, etr in ecl:
-                    if ecol[i] > 1.0:
+                for i, etr in ecol:
+                    if etr[i] > 1.0:
                         sbha_logic = 1
         self.sbhabha_t[0] = sbha_logic
 

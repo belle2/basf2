@@ -221,28 +221,28 @@ namespace Belle2 {
       if (fabs(ctime) < m_eclClusterTimeWindow) clustersinwindow.push_back(eclclusters[i]);
     }
     //get the number of clusers with specific threshold in the time window
-    int nclus[4] = {0, 0, 0, 0};
+    int nclus[5] = {0, 0, 0, 0, 0};
     if (!clustersinwindow.empty()) {
       for (unsigned int i = 0; i < clustersinwindow.size(); i++) {
         double energy_clu = clustersinwindow[i]->getEnergyDep();
         //if (energy_clu > m_energythreshold[0]) nclus[0]++;
         if (!clustersinwindow[i]->getRelatedTo<CDCTriggerTrack>(m_NNCollectionName)) nclus[0]++;
         if (energy_clu > m_energythreshold[1]) nclus[1]++;
-        if (energy_clu > m_energythreshold[2]) {
-          double  x1 = clustersinwindow[i]->getPositionX();
-          double  y1 = clustersinwindow[i]->getPositionY();
-          double  z1 = clustersinwindow[i]->getPositionZ();
-          TVector3 vec1(x1, y1, z1);
-          double  theta1 = vec1.Theta() * m_RtD;
-          if (theta1 > 30. && theta1 < 140.)nclus[2]++;
-        }
+        double  x1 = clustersinwindow[i]->getPositionX();
+        double  y1 = clustersinwindow[i]->getPositionY();
+        double  z1 = clustersinwindow[i]->getPositionZ();
+        TVector3 vec1(x1, y1, z1);
+        double  theta1 = vec1.Theta() * m_RtD;
+        if (energy_clu > m_energythreshold[2] && theta1 > 30. && theta1 < 140.)nclus[2]++;
         if (energy_clu > m_energythreshold[3]) nclus[3]++;
+        if (energy_clu > m_energythreshold[3] && (theta1 < 20. || theta1 > 140.)) nclus[4]++;
 
       }
     }
     trgInfo->setNhighcluster1(nclus[1]);
     trgInfo->setNhighcluster2(nclus[2]);
     trgInfo->setNhighcluster3(nclus[3]);
+    trgInfo->setNhighcluster4(nclus[4]);
     trgInfo->setNneucluster(nclus[0]);
     trgInfo->setNcluster(clustersinwindow.size());
 

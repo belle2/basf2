@@ -41,10 +41,12 @@ namespace Belle2 {
     int getNcluster() const {return m_n_cluster;}
     //get the number of eclclusters >300MeV
     int getNhighcluster1() const {return m_n_high_300_cluster;}
-    //get the number of eclcluster >1GeV
+    //get the number of eclcluster >1GeV, exclude TCID 1,2,17
     int getNhighcluster2() const {return m_n_high_1000_cluster;}
     //get the number of eclcluster >2GeV
     int getNhighcluster3() const {return m_n_high_2000_cluster;}
+    //get the number of eclcluster >2GeV in TCID 1 and 17
+    int getNhighcluster4() const {return m_n_high_2000_endcap_cluster;}
     //get the number of eclclusters without associated tracks
     int getNneucluster() const {return m_n_neutral_cluster;}
     //get the number of klm tracks
@@ -88,10 +90,12 @@ namespace Belle2 {
     void setNcluster(int Ncluster)  {m_n_cluster = Ncluster;}
     //set the number of cluster >300 MeV
     void setNhighcluster1(int Nclusterh1)  {m_n_high_300_cluster = Nclusterh1;}
-    //set the number of cluster >1 GeV
+    //set the number of cluster >1 GeV exclude TCID 1,2,17
     void setNhighcluster2(int Nclusterh2)  {m_n_high_1000_cluster = Nclusterh2;}
     //set the number of cluster >2 GeV
     void setNhighcluster3(int Nclusterh3)  {m_n_high_2000_cluster = Nclusterh3;}
+    //set the number of cluster >2 GeV in TCID 1, 17
+    void setNhighcluster4(int Nclusterh4)  {m_n_high_2000_endcap_cluster = Nclusterh4;}
     //set the number of cluster w/o associated tracks
     void setNneucluster(int Nneucluster)  {m_n_neutral_cluster = Nneucluster;}
     //set the number of klm tracks
@@ -143,6 +147,8 @@ namespace Belle2 {
     int m_n_high_1000_cluster;
     /**# ecl clusers with energy threshold 2GeV */
     int m_n_high_2000_cluster;
+    /**# ecl clusers with energy threshold 2GeV in TC ID 1 and 17 */
+    int m_n_high_2000_endcap_cluster;
     /**# back to back ecl cluser pairs */
     int m_nbbc;
     /**# back to back cdc track and ecl clsuter*/

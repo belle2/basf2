@@ -215,12 +215,13 @@ namespace Belle2 {
       obj.push_back(grlinfo->getNhighcluster1());//2
       obj.push_back(grlinfo->getNhighcluster2());//3
       obj.push_back(grlinfo->getNhighcluster3());//4
-      obj.push_back(grlinfo->getNneucluster());//5
-      obj.push_back(grlinfo->getNbbCluster());//6
-      obj.push_back(grlinfo->getNbbTrkCluster());//7
-      obj.push_back(grlinfo->getBhabhaVeto());//8
-      obj.push_back(grlinfo->getsBhabhaVeto());//9
-      obj.push_back(grlinfo->geteclBhabhaVeto());//10
+      obj.push_back(grlinfo->getNhighcluster4());//5
+      obj.push_back(grlinfo->getNneucluster());//6
+      obj.push_back(grlinfo->getNbbCluster());//7
+      obj.push_back(grlinfo->getNbbTrkCluster());//8
+      obj.push_back(grlinfo->getBhabhaVeto());//9
+      obj.push_back(grlinfo->getsBhabhaVeto());//10
+      obj.push_back(grlinfo->geteclBhabhaVeto());//11
 
       int L1Summary = 0;
       std::vector<int> trgres;

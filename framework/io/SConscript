@@ -28,16 +28,21 @@ release_dir_vars = ['BELLE2_LOCAL_DIR', 'BELLE2_RELEASE_DIR']
 for var in release_dir_vars:
     if var not in os.environ:
         continue
+    reldir = os.environ[var]
     with open(os.devnull, 'w') as devnull:
-        proc = subprocess.Popen(['git', '-C', os.environ[var], 'rev-parse', 'HEAD'], stdout=subprocess.PIPE, stderr=devnull)
+        proc = subprocess.Popen(['git', '-C', reldir, 'rev-parse', 'HEAD'], stdout=subprocess.PIPE, stderr=devnull)
         head_commitid[var] = proc.communicate()[0].strip()
         if proc.returncode != 0 or len(head_commitid[var]) != 40:
             # release dir is set, but we couldn't get a commit id -> not tracked
-            identifier = ""
+            # shouldn't happen for local dirs, but is OK for central (we'll use release_version there)
+            if var == 'BELLE2_LOCAL_DIR' or release_version == 'HEAD':
+                identifier = ""
+            else:
+                head_commitid[var] = release_version
             continue
 
         # check for modifications, ignoring untracked files
-        proc = subprocess.Popen(['git', '-C', os.environ[var], 'status', '-uno', '--porcelain'], stdout=subprocess.PIPE, stderr=devnull)
+        proc = subprocess.Popen(['git', '-C', reldir, 'status', '-uno', '--porcelain'], stdout=subprocess.PIPE, stderr=devnull)
         changes = proc.communicate()[0].strip()
         if len(changes) != 0:
             modifications = True
@@ -45,7 +50,7 @@ for var in release_dir_vars:
         # get hash for release_version (if set)
         if release_commit is not None or release_version == 'HEAD':
             continue
-        proc = subprocess.Popen(['git', '-C', os.environ[var], 'rev-parse', release_version], stdout=subprocess.PIPE, stderr=devnull)
+        proc = subprocess.Popen(['git', '-C', reldir, 'rev-parse', release_version], stdout=subprocess.PIPE, stderr=devnull)
         release_commit = proc.communicate()[0].strip()
         if proc.returncode != 0 or len(release_commit) != 40:
             # unsure why this would fail, but whatever

@@ -297,7 +297,7 @@ void B2BIIConvertMdstModule::event()
       B2FATAL("Cannot reliably override the Database content in parallel processing "
               "mode, please run the conversion in single processing mode");
     }
-    DBStore::Instance().addConstantOverride("dbstore", "BeamParameters", new BeamParameters(m_beamParams), true);
+    DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(m_beamParams), true);
   }
 
   // 1. Convert MC information

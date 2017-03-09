@@ -23,13 +23,9 @@ namespace Belle2 {
 
     /**
      * Constructor
-     * @param module  Name under which the object will be stored in the database
-     * @param package Package name
+     * @param name  Name under which the object will be stored in the database
      */
-    DBImportBase(const std::string& module, const std::string& package):
-      m_module(module),
-      m_package(package)
-    {}
+    DBImportBase(const std::string& name): m_name(name) {}
 
     /**
      * Destructor
@@ -40,13 +36,7 @@ namespace Belle2 {
      * Returns the name under which the object will be stored in the database
      * @return name
      */
-    const std::string& getName() const {return m_module;}
-
-    /**
-     * Returns the package name under which the object will be stored in the database
-     * @return package name
-     */
-    const std::string& getPackage() const {return m_package;}
+    const std::string& getName() const {return m_name;}
 
     /**
      * add event dependency
@@ -104,8 +94,7 @@ namespace Belle2 {
      */
     void addIntraRunDependency(unsigned long long int tag, EIntraRunDependency type);
 
-    std::string m_module;      /**< object or array name in database */
-    std::string m_package;     /**< package name */
+    std::string m_name;      /**< object or array name in database */
     TObject* m_object = 0;     /**< pointer to allocated object or array */
 
   private:

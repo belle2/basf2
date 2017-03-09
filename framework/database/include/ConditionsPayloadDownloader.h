@@ -18,7 +18,6 @@
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/EConditionsDirectoryStructure.h>
 
-#include <boost/bimap.hpp>
 
 namespace Belle2 {
   /** Forward declare internal curl session pointer to limit exposure to curl headers
@@ -126,19 +125,6 @@ namespace Belle2 {
      */
     const PayloadInfo& get(const std::string& name);
 
-    /** set a mapping from experiment name to experiment number.
-     * The experiment numbers and names need to be unique as we have to
-     * transform the mapping in both directions. So a experiment number cannot
-     * have multiple names different experiment numbers cannot have the same
-     * name.
-     *
-     * @param experiment experiment number as used in the EventMetaData
-     * @param name       name of that experiment in the ConditionsDB
-     * @return           true if the mapping could be added, false if there's a
-     *                   conflict with an existing entry.
-     */
-    bool addExperimentName(int experiment, const std::string& name);
-
   private:
 
     /** get an url and save the content to stream
@@ -211,8 +197,5 @@ namespace Belle2 {
     std::map<std::string, std::unique_ptr<FileSystem::TemporaryFile>> m_tempfiles;
     /** Map of all existing payloads */
     std::map<std::string, PayloadInfo> m_payloads;
-    /** bidirectional mapping from experiment number to name in the central
-     * database, only used for v1 api, will go away soon */
-    boost::bimap<int, std::string> m_mapping;
   };
 }

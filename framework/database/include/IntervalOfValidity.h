@@ -22,15 +22,17 @@ namespace Belle2 {
    */
   class IntervalOfValidity final {
   public:
+    /** Default constructor which will create an empty iov */
+    IntervalOfValidity(): IntervalOfValidity(-1, -1, -1, -1) {}
 
     /**
-     * Constructor. By default an empty validity interval is created where low and high experiment numbers are -1.
+     * Construct a new iov.
      * @param experimentLow   lowest experiment number of the validity range, -1 means no bound
      * @param runLow          lowest run number in the experiment with number experimentLow of the validity range, -1 means no bound
      * @param experimentHigh  highest experiment number of the validity range, -1 means no bound
      * @param runHigh         highest run number in the experiment with number experimentHigh of the validity range, -1 means no bound
      */
-    IntervalOfValidity(int experimentLow = -1, int runLow = -1, int experimentHigh = -1, int runHigh = -1);
+    IntervalOfValidity(int experimentLow, int runLow, int experimentHigh , int runHigh);
 
     /**
      * Destructor.

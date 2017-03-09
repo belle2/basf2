@@ -18,16 +18,14 @@ def setupBelleMagneticField(path=analysis_main):
               'The Belle magnetic field is now being set via the settings in inputMdst(List) fucntion.')
 
 
-def setupB2BIIDatabase(isMC=False, setExperimentNames=True):
+def setupB2BIIDatabase(isMC=False):
     """
-    Setup the database for B2BII
+    Setup the database for B2BII.
 
-    This automatically chooses the correct global tag and sets the experiment names accordingly
+    This automatically chooses the correct global tag and sets up a database suitable for B2BII conversion.
 
     Args:
-        mc (bool): should be True for MC data and False for real data
-        setExperimentNames (bool): if you want to add further databases
-                                   this has to be false and you have to add the names yourself!
+        isMC (bool): should be True for MC data and False for real data
     """
     # we only want the central database with the B2BII content
     tagname = "B2BII%s" % ("_MC" if isMC else "")
@@ -43,16 +41,6 @@ def setupB2BIIDatabase(isMC=False, setExperimentNames=True):
     # unless they are already found locally
     if isMC:
         use_local_database("%s/dbcache.txt" % payloaddir, payloaddir, False, LogLevel.WARNING)
-    # and we need to map the experiment numbers to names for now. So let's
-    # temporarily disable the logging output
-    previous_loglevel = logging.log_level
-    logging.log_level = LogLevel.WARNING
-    # set all the names, doesn't matter if some don't exist so we just set 0-99
-    if setExperimentNames:
-        for exp in range(100):
-            set_experiment_name(exp, "BELLE_exp%d" % exp)
-    # and restore the logging output
-    logging.log_level = previous_loglevel
 
 
 def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True, path=analysis_main):

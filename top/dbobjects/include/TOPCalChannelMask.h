@@ -49,7 +49,7 @@ namespace Belle2 {
      */
     void setStatus(int moduleID, unsigned channel, EStatus status)
     {
-      unsigned module = moduleID - 1;
+      int module = moduleID - 1;
       if (module >= c_numModules) {
         B2WARNING("Module number greater than 16");
         return;
@@ -68,7 +68,7 @@ namespace Belle2 {
      */
     void setActive(int moduleID, unsigned channel)
     {
-      unsigned module = moduleID - 1;
+      int module = moduleID - 1;
       if (module >= c_numModules) {
         B2WARNING("Module number greater than 16");
         return;
@@ -87,7 +87,7 @@ namespace Belle2 {
      */
     void setDead(int moduleID, unsigned channel)
     {
-      unsigned module = moduleID - 1;
+      int module = moduleID - 1;
       if (module >= c_numModules) {
         B2WARNING("Module number greater than 16");
         return;
@@ -106,7 +106,7 @@ namespace Belle2 {
      */
     void setNoisy(int moduleID, unsigned channel)
     {
-      unsigned module = moduleID - 1;
+      int module = moduleID - 1;
       if (module >= c_numModules) {
         B2WARNING("Module number greater than 16");
         return;
@@ -126,7 +126,7 @@ namespace Belle2 {
      */
     EStatus getStatus(int moduleID, unsigned channel) const
     {
-      unsigned module = moduleID - 1;
+      int module = moduleID - 1;
       if (module >= c_numModules) {
         B2WARNING("Module number greater than 16. Returning dead channel value");
         return c_Dead;
@@ -146,7 +146,7 @@ namespace Belle2 {
      */
     bool isActive(int moduleID, unsigned channel) const
     {
-      unsigned module = moduleID - 1;
+      int module = moduleID - 1;
       if (module >= c_numModules) {
         B2WARNING("Module number greater than 16. Returning false");
         return false;

@@ -33,7 +33,7 @@ namespace Belle2 {
      *  @param name       Name under which the object is stored in the DataStore.
      *  @param durability Decides durability map used for getting the accessed object.
      */
-    StoreAccessorBase(const std::string& name, DataStore::EDurability durability, const TClass* objClass, bool isArray):
+    StoreAccessorBase(const std::string& name, DataStore::EDurability durability, TClass* objClass, bool isArray):
       m_name(name), m_durability(durability), m_class(objClass), m_isArray(isArray) {};
 
     /** Destructor.
@@ -145,7 +145,7 @@ namespace Belle2 {
     }
 
     /** The underlying object's type. */
-    const TClass* getClass() const { return m_class; }
+    TClass* getClass() const { return m_class; }
 
     /** Is this an accessor for an array? */
     bool isArray() const { return m_isArray; }
@@ -168,7 +168,7 @@ namespace Belle2 {
     DataStore::EDurability m_durability;
 
     /** The underlying object's type. */
-    const TClass* m_class;
+    TClass* m_class;
 
     /** Is this an accessor for an array? */
     bool m_isArray;

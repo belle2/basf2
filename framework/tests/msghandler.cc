@@ -1,6 +1,7 @@
 #include <framework/pcore/MsgHandler.h>
 
 #include <TVector3.h>
+#include <TClonesArray.h>
 #include <TNamed.h>
 
 #include <fstream>
@@ -46,5 +47,28 @@ namespace {
       EXPECT_TRUE(std::string(c2->GetTitle()) == c.GetTitle());
     }
     delete msg;
+  }
+
+  TEST(MsgHandlerTest, compression)
+  {
+    TClonesArray longarray("Belle2::EventMetaData");
+    longarray.ExpandCreate(1000);
+    for (int algo : {0, 1, 2}) {
+      for (int level = 0; level < 10; ++level) {
+        MsgHandler handler(algo * 100 + level);
+        handler.add(&longarray, "mcparticles");
+        EvtMessage* msg = handler.encode_msg(MSG_EVENT);
+        {
+          MsgHandler handler2;
+          vector<TObject*> objs;
+          vector<string> names;
+          handler2.decode_msg(msg, objs, names);
+          ASSERT_EQ(1, objs.size());
+          ASSERT_EQ(1, names.size());
+          ASSERT_EQ(names[0], "mcparticles");
+          for (auto o : objs) delete o;
+        }
+      }
+    }
   }
 }  // namespace

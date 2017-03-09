@@ -187,8 +187,8 @@ namespace Belle2 {
 
 
     //------------------------ Imitate pointer functionality -----------------------------------------------
-    inline T& operator *()  const {ensureAttached(); return **m_storeObjPtr;}  /**< Imitate pointer functionality. */
-    inline T* operator ->() const {ensureAttached(); return *m_storeObjPtr;}   /**< Imitate pointer functionality. */
+    inline T& operator *()  const {ensureAttached(); return *static_cast<T*>(*m_storeObjPtr);}  /**< Imitate pointer functionality. */
+    inline T* operator ->() const {ensureAttached(); return static_cast<T*>(*m_storeObjPtr);}   /**< Imitate pointer functionality. */
     inline operator bool()  const {return isValid();}   /**< Imitate pointer functionality. */
 
   private:
@@ -196,11 +196,11 @@ namespace Belle2 {
     inline void ensureAttached() const
     {
       if (!m_storeObjPtr) {
-        const_cast<StoreObjPtr*>(this)->m_storeObjPtr = reinterpret_cast<T**>(DataStore::Instance().getObject(*this));
+        const_cast<StoreObjPtr*>(this)->m_storeObjPtr = DataStore::Instance().getObject(*this);
       }
     }
-    /** Store of actual pointer. */
-    T** m_storeObjPtr;
+    /** Store of actual pointer. Don't make this a T** as this might cause problems with multiple inheritance objects */
+    TObject** m_storeObjPtr;
   };
 } // end namespace Belle2
 

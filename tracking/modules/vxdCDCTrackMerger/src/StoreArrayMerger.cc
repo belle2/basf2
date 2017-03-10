@@ -32,7 +32,7 @@ namespace {
   }
 }
 
-void StoreArrayMerger::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void StoreArrayMerger::exposeParameters(ModuleParamList* moduleParamList, const std::string&)
 {
   // CDC input tracks
   moduleParamList->addParameter("CDCRecoTrackStoreArrayName", m_param_cdcRecoTrackStoreArrayName,

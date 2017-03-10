@@ -2,6 +2,7 @@
 ! TOP counter for Belle: initialization/interface of TOP_PAR, TOP_CONS
 ! M. Staric, mar-2009, 
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
+! mar-2017: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE SET_TOP_PAR(BKG_PER_QBAR,SCALE_N0)

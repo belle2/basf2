@@ -2,6 +2,7 @@
 ! TOP counter for Belle: Reconstruction
 ! M. Staric, oct-2008, may-2009, feb-2010, oct-2011
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
+! mar-2017: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE TOP_RECO

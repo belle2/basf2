@@ -2,6 +2,7 @@
 ! TOP counter for Belle: initialization/interface of TOP_MASK
 ! M. Staric, mar-2017, 
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
+! mar-2017: change in some commons
 !----------------------------------------------------------------------
 
       SUBROUTINE SET_CHANNEL_MASK(MDN, ICH, FLAG)

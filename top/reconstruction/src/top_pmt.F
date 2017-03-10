@@ -2,6 +2,7 @@
 ! TOP counter for Belle: initialization of/interface to TOP_PMT, TOP_QEFF
 ! M. Staric, mar-2009, sept-2011, 
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
+! mar-2017: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE SET_PMT(A,B,AA,BB,NX,NY,TTS)

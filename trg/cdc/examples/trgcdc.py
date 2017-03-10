@@ -45,11 +45,10 @@ neuro = register_module('NeuroTrigger')
 # Module settings
 
 # ...Global settings...
-simulatedComponents = ['MagneticField', 'CDC'
-,'PXD', 'SVD', 'BeamPipe'
-]
+simulatedComponents = ['MagneticField', 'CDC', 'PXD', 'SVD', 'BeamPipe'
+                       ]
 # To speed things up but not precise.
-# simulatedComponents = ['MagneticFieldConstant4LimitedRCDC', 'CDC', 
+# simulatedComponents = ['MagneticFieldConstant4LimitedRCDC', 'CDC',
 # ]
 
 # ...EventInfoSetter...

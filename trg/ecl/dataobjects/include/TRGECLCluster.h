@@ -10,17 +10,17 @@
 //-----------------------------------------------------------
 // $Log$
 //-----------------------------------------------------------
-#ifndef TRGECLCluster_H
-#define TRGECLCluster_H
 
-
+#pragma once
 #include <TObject.h>
 #include <TVector3.h>
+#include <framework/datastore/RelationsObject.h>
+
 
 namespace Belle2 {
 
   //! Example Detector
-  class TRGECLCluster : public TObject {
+  class TRGECLCluster : public RelationsObject {
   public:
 
 
@@ -151,10 +151,10 @@ namespace Belle2 {
 
     }
     //! The Class title
-    ClassDef(TRGECLCluster, 1); /*< the class title */
+    ClassDef(TRGECLCluster, 2); /*< the class title */
 
   };
 
 } // end namespace Belle2
 
-#endif
+//#endif

@@ -29,23 +29,26 @@ using namespace std;
 
 namespace Belle2 {
 
-TRGCDCWire::TRGCDCWire(unsigned id,
-                       unsigned localId,
-                       const TCLayer & l,
-                       const P3D & fp,
-                       const P3D & bp,
-		       const TRGClock & clock)
+  TRGCDCWire::TRGCDCWire(unsigned id,
+                         unsigned localId,
+                         const TCLayer& l,
+                         const P3D& fp,
+                         const P3D& bp,
+                         const TRGClock& clock)
     : TCCell(id, localId, l, fp, bp),
       _mcHits(),
-      _signal(clock) {
+      _signal(clock)
+  {
     _signal.name(name());
-}
+  }
 
-TRGCDCWire::~TRGCDCWire() {
-}
+  TRGCDCWire::~TRGCDCWire()
+  {
+  }
 
-void
-TRGCDCWire::dump(const string & msg, const string & pre) const {
+  void
+  TRGCDCWire::dump(const string& msg, const string& pre) const
+  {
     cout << pre;
     cout << "w " << id();
     cout << ",local " << localId();
@@ -54,25 +57,26 @@ TRGCDCWire::dump(const string & msg, const string & pre) const {
     cout << ",local layer " << localLayerId();
     cout << endl;
     if (msg.find("neighbor") != string::npos) {
-        for (unsigned i = 0; i < 7; i++)
-            if (neighbor(i))
-                neighbor(i)->dump("", pre + TRGUtil::itostring(i) + "   ");
+      for (unsigned i = 0; i < 7; i++)
+        if (neighbor(i))
+          neighbor(i)->dump("", pre + TRGUtil::itostring(i) + "   ");
     }
     if (msg.find("trigger") != string::npos ||
         msg.find("detail") != string::npos) {
-	signal().dump(msg, pre + "    ");
-    }    
-}
-  
-const TRGCDCWire *
-TRGCDCWire::neighbor(unsigned i) const {
+      signal().dump(msg, pre + "    ");
+    }
+  }
+
+  const TRGCDCWire*
+  TRGCDCWire::neighbor(unsigned i) const
+  {
     static bool first = false;
     if (first)
-        cout << "TRGCDCWire::neighbor !!! "
-                  << "this function is not tested yet"
-                  << endl;
+      cout << "TRGCDCWire::neighbor !!! "
+           << "this function is not tested yet"
+           << endl;
 
-    const TRGCDC & cdc = * TRGCDC::getTRGCDC();
+    const TRGCDC& cdc = * TRGCDC::getTRGCDC();
     const unsigned layerId = layer().id();
     const unsigned superLayerId = layer().superLayerId();
     const unsigned localLayerId = layer().localLayerId();
@@ -80,45 +84,41 @@ TRGCDCWire::neighbor(unsigned i) const {
     const int local = int(localId());
 
     if (i == WireInnerLeft || i == WireInnerRight) {
-        if (localLayerId == 0)
-            return 0;
-        if (layer().offset() != 0) {
-            if (i == WireInnerLeft)
-                return cdc.wire(layerId - 1, local);
-            else
-                return cdc.wire(layerId - 1, local + 1);
-        }
-        else {
-            if (i == WireInnerLeft)
-                return cdc.wire(layerId - 1, local - 1);
-            else
-                return cdc.wire(layerId - 1, local);
-        }
-    }
-    else if (i == WireLeft || i == WireRight) {
-        if (i == WireLeft)
-            return cdc.wire(layerId, local - 1);
+      if (localLayerId == 0)
+        return 0;
+      if (layer().offset() != 0) {
+        if (i == WireInnerLeft)
+          return cdc.wire(layerId - 1, local);
         else
-            return cdc.wire(layerId, local + 1);
-    }
-    else if (i == WireOuterLeft || i == WireOuterRight) {
-        if (localLayerId == (nLayers - 1))
-            return 0;
-        if (layer().offset() != 0) {
-            if (i == WireOuterLeft)
-                return cdc.wire(layerId + 1, local);
-            else
-                return cdc.wire(layerId + 1, local + 1);
-        }
-        else {
-            if (i == WireOuterLeft)
-                return cdc.wire(layerId + 1, local - 1);
-            else
-                return cdc.wire(layerId + 1, local);
-        }
+          return cdc.wire(layerId - 1, local + 1);
+      } else {
+        if (i == WireInnerLeft)
+          return cdc.wire(layerId - 1, local - 1);
+        else
+          return cdc.wire(layerId - 1, local);
+      }
+    } else if (i == WireLeft || i == WireRight) {
+      if (i == WireLeft)
+        return cdc.wire(layerId, local - 1);
+      else
+        return cdc.wire(layerId, local + 1);
+    } else if (i == WireOuterLeft || i == WireOuterRight) {
+      if (localLayerId == (nLayers - 1))
+        return 0;
+      if (layer().offset() != 0) {
+        if (i == WireOuterLeft)
+          return cdc.wire(layerId + 1, local);
+        else
+          return cdc.wire(layerId + 1, local + 1);
+      } else {
+        if (i == WireOuterLeft)
+          return cdc.wire(layerId + 1, local - 1);
+        else
+          return cdc.wire(layerId + 1, local);
+      }
     }
     return 0;
-}
+  }
 
 // int
 // TRGCDCWire::localIdForPlus(void) const {
@@ -162,7 +162,7 @@ TRGCDCWire::neighbor(unsigned i) const {
 //       return -1;
 //     else return _localId;
 //   }
-  
+
 //   if(li >= 15 && li <= 17){
 //     if(_localId == 127)
 //       return -1;
@@ -180,13 +180,13 @@ TRGCDCWire::neighbor(unsigned i) const {
 //       return -1;
 //     else return _localId;
 //   }
-  
+
 //   if(li >= 27 && li <= 31){
 //     if(_localId == 191)
 //       return -1;
 //     else return _localId;
 //   }
-  
+
 //   if(li >= 32 && li <= 35){
 //     if(_localId == 207)
 //       return -1;
@@ -211,7 +211,7 @@ TRGCDCWire::neighbor(unsigned i) const {
 //     else return _localId;
 //   }
 // #endif
-  
+
 //   return -1;
 // }
 
@@ -257,7 +257,7 @@ TRGCDCWire::neighbor(unsigned i) const {
 //       return 96;
 //     else return _localId;
 //   }
-  
+
 //   if(li >= 15 && li <= 17){
 //     if(_localId == 0)
 //       return 128;
@@ -275,13 +275,13 @@ TRGCDCWire::neighbor(unsigned i) const {
 //       return 160;
 //     else return _localId;
 //   }
-  
+
 //   if(li >= 27 && li <= 31){
 //     if(_localId == 0)
 //       return 192;
 //     else return _localId;
 //   }
-  
+
 //   if(li >= 32 && li <= 35){
 //     if(_localId == 0)
 //       return 208;
@@ -306,7 +306,7 @@ TRGCDCWire::neighbor(unsigned i) const {
 //     else return _localId;
 //   }
 // #endif
-  
+
 //   return -1;
 // }
 
@@ -348,7 +348,7 @@ TRGCDCWire::neighbor(unsigned i) const {
 //       return;
 //     }
 //     calcdc_sag3_(& wireID, & z, wirePosition, & dydz, & ybSag, & yfSag);
-    
+
 //     //...Wire position...
 //     xy.setX((double) wirePosition[0]);
 //     xy.setY((double) wirePosition[1]);
@@ -362,29 +362,31 @@ TRGCDCWire::neighbor(unsigned i) const {
 //     return;
 // }
 
-void
-TRGCDCWire::clear(void) {
+  void
+  TRGCDCWire::clear(void)
+  {
     TCCell::clear();
 
     for (unsigned i = 0; i < _mcHits.size(); i++)
-        delete _mcHits[i];
+      delete _mcHits[i];
     _mcHits.clear();
 
     _signal.clear();
-}
+  }
 
-string
-TRGCDCWire::name(void) const {
+  string
+  TRGCDCWire::name(void) const
+  {
     if (axial())
-        return string("w") +
-            TRGUtil::itostring(layerId()) +
-            string("-") +
-            TRGUtil::itostring(localId());
-    return string("w") + 
-        TRGUtil::itostring(layerId()) +
-        string("=") +
-        TRGUtil::itostring(localId());
-}
+      return string("w") +
+             TRGUtil::itostring(layerId()) +
+             string("-") +
+             TRGUtil::itostring(localId());
+    return string("w") +
+           TRGUtil::itostring(layerId()) +
+           string("=") +
+           TRGUtil::itostring(localId());
+  }
 
 } // namespace Belle2
 

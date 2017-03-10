@@ -33,30 +33,31 @@ namespace Belle2 {
   class TRGCDCSegmentHit;
   class TRGCDCMerger;
 
-  class TRGCDCTrackSegmentFinder 
-      : public TRGBoard,
-	public std::vector <const TRGCDCMerger *>{
+  class TRGCDCTrackSegmentFinder
+    : public TRGBoard,
+      public std::vector <const TRGCDCMerger*> {
 
-    public:
-	enum boardType{
-	  innerType = 0,
-	  outerType = 1,
-	  unknown   = 999};
+  public:
+    enum boardType {
+      innerType = 0,
+      outerType = 1,
+      unknown   = 999
+    };
 
     // Constructor.
-    TRGCDCTrackSegmentFinder(const TRGCDC &,
+    TRGCDCTrackSegmentFinder(const TRGCDC&,
                              bool makeRootFile,
                              bool logicLUTFlag);
 
     // Constructor.
-    TRGCDCTrackSegmentFinder(const  TRGCDC &,
-			     const std::string & name,
-		 	     boardType type,
-			     const TRGClock & systemClock,
-			     const TRGClock & dataClock,
-			     const TRGClock & userClockInput,
-			     const TRGClock & userClockOutput,
-			     std::vector<TRGCDCSegment *> & tsSL);
+    TRGCDCTrackSegmentFinder(const  TRGCDC&,
+                             const std::string& name,
+                             boardType type,
+                             const TRGClock& systemClock,
+                             const TRGClock& dataClock,
+                             const TRGClock& userClockInput,
+                             const TRGClock& userClockOutput,
+                             std::vector<TRGCDCSegment*>& tsSL);
 
     // Destructor.
     ~TRGCDCTrackSegmentFinder();
@@ -111,7 +112,7 @@ namespace Belle2 {
 //
 //    /// Make bit pattern for Outer Tracker
 //    static TRGState packerOuterTracker(const TRGState & input);
-//    
+//
 //    /// Make bit pattern for Inner-most EvtTime & Low Pt Tracker
 //    static TRGState packerInnerEvt(const TRGState & input);
 //
@@ -119,110 +120,110 @@ namespace Belle2 {
 //    static TRGState packerOuterEvt(const TRGState & input);
 
     /// Use LUT for find TSHit
-    vector<TRGSignalVector*> findTSHit(TRGSignalVector * eachInput, int);
-  
+    vector<TRGSignalVector*> findTSHit(TRGSignalVector* eachInput, int);
+
     /// Packing output for tracker
-    TRGSignalVector * packerOuterTracker(vector<TRGSignalVector *> &,
-                                       vector<int> &,
-                                       const unsigned);
+    TRGSignalVector* packerOuterTracker(vector<TRGSignalVector*>&,
+                                        vector<int>&,
+                                        const unsigned);
 
     /// Packing output for evtTime & Low pT
     TRGSignalVector* packerOuterEvt(vector<TRGSignalVector*>, vector<int>, int);
     ///
     boardType type(void) const;
 
-    TRGSignalBundle * outputE(void) {return _tosbE;};
-    TRGSignalBundle * outputT(void) {return _tosbT;};
+    TRGSignalBundle* outputE(void) {return _tosbE;};
+    TRGSignalBundle* outputT(void) {return _tosbT;};
 
-    void push_back(const TRGCDCMerger *);
+    void push_back(const TRGCDCMerger*);
 
     /// firmware simulation.
     void simulateBoard(void);
 
-      /// Firmware simulation. yi
-      void simulate(void);
+    /// Firmware simulation. yi
+    void simulate(void);
 
-      /// Firmware simulation. Unified version of inner and outer : yi
-      void simulate2(void);
+    /// Firmware simulation. Unified version of inner and outer : yi
+    void simulate2(void);
 
-      /// Creates the hit maps for the inner.
-      void hitMapInner(void);
+    /// Creates the hit maps for the inner.
+    void hitMapInner(void);
 
-      /// Creates the hit maps for the outer.
-      void hitMapOuter(void);
+    /// Creates the hit maps for the outer.
+    void hitMapOuter(void);
 
-      /// Creates input signals to TSF for the inner.
-      void inputInner(const unsigned id,
-                      const unsigned nTSF,
-                      TRGSignalVector * s);
+    /// Creates input signals to TSF for the inner.
+    void inputInner(const unsigned id,
+                    const unsigned nTSF,
+                    TRGSignalVector* s);
 
-      /// Creates input signals to TSF for the outer.
-      void inputOuter(const unsigned id,
-                      const unsigned nTSF,
-                      TRGSignalVector * s);
+    /// Creates input signals to TSF for the outer.
+    void inputOuter(const unsigned id,
+                    const unsigned nTSF,
+                    TRGSignalVector* s);
 
-      /// Simulate TSF response for the inner
-      vector<TRGSignalVector *> simulateInner(TRGSignalVector & in,
-                                              unsigned id);
-  
-      /// Simulate TSF response for the inner
-      vector<TRGSignalVector *> simulateOuter(TRGSignalVector * in,
-                                              unsigned id);
+    /// Simulate TSF response for the inner
+    vector<TRGSignalVector*> simulateInner(TRGSignalVector& in,
+                                           unsigned id);
 
-      /// Simulate TSF response (unified version)
-      vector<TRGSignalVector *> simulateTSFOld(TRGSignalVector * in,
-                                               unsigned id);
+    /// Simulate TSF response for the inner
+    vector<TRGSignalVector*> simulateOuter(TRGSignalVector* in,
+                                           unsigned id);
 
-      /// Simulate TSF response (unified version, 2016/07/12)
-      vector<TRGSignalVector *> simulateTSF(TRGSignalVector * in,
+    /// Simulate TSF response (unified version)
+    vector<TRGSignalVector*> simulateTSFOld(TRGSignalVector* in,
                                             unsigned id);
 
-      /// Simulate TSF response (unified version, state machine)
-      vector<TRGSignalVector *> simulateTSF2(TRGSignalVector * in,
-                                             unsigned id);
+    /// Simulate TSF response (unified version, 2016/07/12)
+    vector<TRGSignalVector*> simulateTSF(TRGSignalVector* in,
+                                         unsigned id);
 
-      /// Output packer for tracker
-      TRGSignalVector * packerForTracker(vector<TRGSignalVector *> &,
-                                         vector<int> &,
-                                         const unsigned);
+    /// Simulate TSF response (unified version, state machine)
+    vector<TRGSignalVector*> simulateTSF2(TRGSignalVector* in,
+                                          unsigned id);
 
-      /// Output packer for ETF.
-      TRGSignalVector * packerForETF(vector<TRGSignalVector *> &,
-                                     vector<int> &,
-                                     const unsigned);
+    /// Output packer for tracker
+    TRGSignalVector* packerForTracker(vector<TRGSignalVector*>&,
+                                      vector<int>&,
+                                      const unsigned);
 
-    double mkint(TRGState );
+    /// Output packer for ETF.
+    TRGSignalVector* packerForETF(vector<TRGSignalVector*>&,
+                                  vector<int>&,
+                                  const unsigned);
+
+    double mkint(TRGState);
 
     vector<bool> mkbool(int, int);
 
   private:
 
-      /// Firmware simulation for the outers. yi
-      void simulateInner(void);
+    /// Firmware simulation for the outers. yi
+    void simulateInner(void);
 
-      /// Firmware simulation for the outers. yi
-      void simulateOuter(void);
+    /// Firmware simulation for the outers. yi
+    void simulateOuter(void);
 
-      /// Make TRGSignals for the priority timing bits.
-      void priorityTiming(unsigned tsfID,
-                          const unsigned nTSF,
-                          TRGSignalVector & s,
-                          const TRGSignal & center,
-                          const TRGSignal & right,
-                          const TRGSignal & left) const;
+    /// Make TRGSignals for the priority timing bits.
+    void priorityTiming(unsigned tsfID,
+                        const unsigned nTSF,
+                        TRGSignalVector& s,
+                        const TRGSignal& center,
+                        const TRGSignal& right,
+                        const TRGSignal& left) const;
 
-      /// Make TRGSignals for the fastest timing bits.
-      void fastestTimingInner(unsigned tsfID,
-                              const unsigned nTSF,
-                              TRGSignalVector & s) const;
+    /// Make TRGSignals for the fastest timing bits.
+    void fastestTimingInner(unsigned tsfID,
+                            const unsigned nTSF,
+                            TRGSignalVector& s) const;
 
-      /// Make TRGSignals for the fastest timing bits.
-      void fastestTimingOuter(unsigned tsfID,
-                              const unsigned nTSF,
-                              TRGSignalVector & s) const;
+    /// Make TRGSignals for the fastest timing bits.
+    void fastestTimingOuter(unsigned tsfID,
+                            const unsigned nTSF,
+                            TRGSignalVector& s) const;
 
-      /// Add TSF ID to timing signal vector for the output.
-      static void addID(TRGSignalVector & s, unsigned id);
+    /// Add TSF ID to timing signal vector for the output.
+    static void addID(TRGSignalVector& s, unsigned id);
 
   private:
 
@@ -233,46 +234,46 @@ namespace Belle2 {
     //TRGSignalBundle * _tisb;
 
     /// Output signal bundle.
-    TRGSignalBundle * _tosbE;
-    TRGSignalBundle * _tosbT;
-    std::vector<TCSegment *> _tsSL;
+    TRGSignalBundle* _tosbE;
+    TRGSignalBundle* _tosbT;
+    std::vector<TCSegment*> _tsSL;
 
     /// TSF input storage
-    std::vector<TRGSignalVector *> _tsfIn;
+    std::vector<TRGSignalVector*> _tsfIn;
 
     /// TSF response storeage
-    std::vector<TRGSignalVector *> _tsfOut;
+    std::vector<TRGSignalVector*> _tsfOut;
 
     /// One time info. to be deleted in next event;
-    std::vector<TRGSignalVector *> _toBeDeleted;
+    std::vector<TRGSignalVector*> _toBeDeleted;
 
     /// Internal data of wire hit map.
-    std::vector<TRGSignal * > _hitMap[5];
+    std::vector<TRGSignal* > _hitMap[5];
 
     /// Internal data of the priority hit timing.
-    std::vector<TRGSignal * > _priMap;
+    std::vector<TRGSignal* > _priMap;
 
     /// Internal data of the fastest hit timing.
-    std::vector<TRGSignal * > _fasMap;
+    std::vector<TRGSignal* > _fasMap;
 
     /// Internal data of the priority cell hit position flag.
-    std::vector<TRGSignal * > _secMap;
+    std::vector<TRGSignal* > _secMap;
 
     /// Internal data of the edge timing information.
-    std::vector<TRGSignal * > _edg0Map;
+    std::vector<TRGSignal* > _edg0Map;
 
     /// Internal data of the edge timing information.
-    std::vector<TRGSignal * > _edg1Map;
+    std::vector<TRGSignal* > _edg1Map;
 
     /// Internal data of the edge timing information.
-    std::vector<TRGSignal * > _edg2Map;
+    std::vector<TRGSignal* > _edg2Map;
 
     /// Internal data of the edge timing information.
-    std::vector<TRGSignal * > _edg3Map;
+    std::vector<TRGSignal* > _edg3Map;
 
     /// Internal data of the edge timing information.
-    std::vector<TRGSignal * > _edg4Map;
-};
+    std::vector<TRGSignal* > _edg4Map;
+  };
 
 } // namespace Belle2
 

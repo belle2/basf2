@@ -179,7 +179,7 @@ namespace Belle2 {
           if (extHit->getDetectorID() != myDetID) continue;
           if (extHit->getStatus() != EXT_EXIT) continue; // particles registered at the EXIT of the Al plate
           if (extHit->getMomentum().Z() < 0.0) continue; // track passes in backward
-          //if (extHit->getCopyID() == 12345) { arich1stHit = extHit; continue;}
+          if (extHit->getCopyID() == 12345) { continue;}
           if (extHit->getCopyID() == 6789) {  arich2ndHit = extHit; continue;}
           arichWinHit = extHit;
         }

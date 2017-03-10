@@ -110,7 +110,7 @@ namespace Belle2 {
         const ExtHit* extHit = extHits[i];
         if (abs(extHit->getPdgCode()) != pdg) continue;
         if (extHit->getDetectorID() != myDetID) continue;
-        if (extHit->getCopyID() != 12345) continue; // aerogel Al support plate
+        if (extHit->getCopyID() != 6789) continue; // aerogel Al support plate
         if (extHit->getStatus() != EXT_EXIT) continue; // particles registered at the EXIT of the Al plate
         extHit->addRelationTo(aeroHit);
         break;

@@ -29,8 +29,6 @@ use_database_chain()
 use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
 use_central_database("cdc_cr_test1", LogLevel.WARNING)
 
-globalPhiRotation = 1.875
-
 
 def main(input, output):
     main_path = basf2.create_path()
@@ -41,6 +39,8 @@ def main(input, output):
 
     # Set the peiod of data taking.
     data_period = getDataPeriod(run_number)
+
+    globalPhiRotation = getPhiRotation()
 
     if os.path.exists(data_period) is False:
         os.mkdir(data_period)
@@ -70,6 +70,7 @@ def main(input, output):
     main_path.add_module('CDCCosmicAnalysis',
                          Output=output)
 
+    # main_path.add_module("RootOutput", outputFileName=output)
     basf2.print_path(main_path)
     basf2.process(main_path)
     print(basf2.statistics)

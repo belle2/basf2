@@ -11,7 +11,6 @@
 #include <string>
 
 #include <daq/rfarm/manager/SharedMem.h>
-#include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/EvtMessage.h>
 
 #include "TMemFile.h"
@@ -28,6 +27,7 @@
 #define MEMFILESIZE 128000000
 
 namespace Belle2 {
+  class MsgHandler;
 
   class DqmMemFile {
   public:

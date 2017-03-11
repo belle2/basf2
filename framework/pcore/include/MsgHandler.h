@@ -17,7 +17,6 @@
 #include <memory>
 
 class TObject;
-class TMessage;
 
 namespace Belle2 {
   /** dynamic character buffer that knows its size.
@@ -121,7 +120,7 @@ namespace Belle2 {
     virtual void add(const TObject*, const std::string& name);
 
     /** Stream object list into an EvtMessage. Caller is responsible for deletion. */
-    virtual EvtMessage* encode_msg(RECORD_TYPE rectype);
+    virtual EvtMessage* encode_msg(ERecordType rectype);
     /** Decode an EvtMessage into a vector list of objects with names */
     virtual void decode_msg(EvtMessage* msg, std::vector<TObject*>& objlist, std::vector<std::string>& namelist);
 

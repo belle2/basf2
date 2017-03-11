@@ -35,7 +35,7 @@ EvtMessage::EvtMessage(char* data):
 /// @brief Constructor of EvtMessage allocating new buffer
 /// @param msg  data
 /// @param size Length of the data (TMessage)
-EvtMessage::EvtMessage(const char* sobjs, int size, RECORD_TYPE type = MSG_EVENT)
+EvtMessage::EvtMessage(const char* sobjs, int size, ERecordType type = MSG_EVENT)
 {
   int fullsize = size + sizeof(EvtHeader);
   int bufsize = roundToNearestInt(fullsize);
@@ -112,12 +112,12 @@ int EvtMessage::msg_size() const
 }
 
 // Record type
-RECORD_TYPE EvtMessage::type() const
+ERecordType EvtMessage::type() const
 {
   return ((reinterpret_cast<EvtHeader*>(m_data))->rectype);
 }
 
-void EvtMessage::type(RECORD_TYPE type)
+void EvtMessage::type(ERecordType type)
 {
   (reinterpret_cast<EvtHeader*>(m_data))->rectype = type;
 }
@@ -177,7 +177,7 @@ char* EvtMessage::msg()
 
 // set_message
 
-void EvtMessage::setMsg(char const* msgin, int size, RECORD_TYPE type)
+void EvtMessage::setMsg(char const* msgin, int size, ERecordType type)
 {
   //initialize message header properly
   new(m_data) EvtHeader(size + sizeof(EvtHeader), type);

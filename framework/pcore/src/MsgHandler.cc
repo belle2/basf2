@@ -69,7 +69,7 @@ void MsgHandler::add(const TObject* obj, const string& name)
   m_msg->Reset();
 }
 
-EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
+EvtMessage* MsgHandler::encode_msg(ERecordType rectype)
 {
   if (rectype == MSG_TERMINATE) {
     EvtMessage* eod = new EvtMessage(NULL, 0, rectype);

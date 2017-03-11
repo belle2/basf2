@@ -19,13 +19,14 @@ namespace Belle2 {
    *
    * Note: for parallel processing, the only type that can work is MSG_EVENT. Other messages would need to be sent once to each process, which would result in all kinds of race conditions.
    */
-  enum RECORD_TYPE { MSG_EVENT, MSG_BEGIN_RUN, MSG_END_RUN, MSG_TERMINATE, MSG_NORECORD, MSG_STREAMERINFO };
+  enum ERecordType { MSG_EVENT, MSG_BEGIN_RUN, MSG_END_RUN, MSG_TERMINATE, MSG_NORECORD, MSG_STREAMERINFO };
 
   /** Header structure of streamed object list */
   struct EvtHeader {
-    EvtHeader(UInt_t aSize, RECORD_TYPE aRectype): size(aSize), rectype(aRectype) {}
+    /** set number of words and record type. */
+    EvtHeader(UInt_t aSize, ERecordType aRectype): size(aSize), rectype(aRectype) {}
     UInt_t size; /**< Number of words in this record. */
-    RECORD_TYPE rectype; /**< Type of message. */
+    ERecordType rectype; /**< Type of message. */
     Long64_t time_sec{0}; /**< seconds part of timeval. */
     Long64_t time_usec{0}; /**< micro seconds part of timeval. */
     UInt_t src{(UInt_t) - 1}; /**< source IP. */
@@ -68,7 +69,7 @@ namespace Belle2 {
     /** build EvtMessage from existing buffer (no copy, but does not take ownership). */
     explicit EvtMessage(char* buf = nullptr);
     /** build EvtMessage by allocating new message buffer (sobjs is copied). */
-    EvtMessage(const char* sobjs, int size, RECORD_TYPE type);
+    EvtMessage(const char* sobjs, int size, ERecordType type);
     /** Copy constructor (m_data is copied). */
     EvtMessage(const EvtMessage& evtmsg);
     /** Destructor */
@@ -111,9 +112,9 @@ namespace Belle2 {
     bool hasMsgFlags(unsigned int flags) const { return (getMsgFlags() & flags) == flags; }
 
     /** Get record type */
-    RECORD_TYPE type() const;
+    ERecordType type() const;
     /** Set record type */
-    void type(RECORD_TYPE);
+    void type(ERecordType);
 
     /** Get time stamp */
     struct timeval time() const;
@@ -139,7 +140,7 @@ namespace Belle2 {
 
   private:
     /** Copy message into newly allocated buffer */
-    void setMsg(const char* msg, int size, RECORD_TYPE type);
+    void setMsg(const char* msg, int size, ERecordType type);
 
     char* m_data;         ///< Pointer to the internal EvtMessage buffer
     bool m_ownsBuffer; ///< Wether to clean up m_data in destructor

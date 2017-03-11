@@ -100,10 +100,10 @@ void SensitiveDetector::EndOfEvent(G4HCofThisEvent*)
 
   for (const ECLSimHit& t : m_eclSimHits) {
     double tof = t.getFlightTime();
-    if (tof >= 8000 || tof < 0) continue;
-    int TimeIndex = tof * (1. / 100);
+    if (tof >= 8000.0 || tof < -8000.0) continue;
+    int TimeIndex = (tof + 8000.0) * (1. / 100);
     int cellId = t.getCellId() - 1;
-    int key = cellId * 80 + TimeIndex;
+    int key = cellId * 160 + TimeIndex;
     double edep = t.getEnergyDep();
     double tsen = tof + eclp->time2sensor(cellId, t.getPosition()); // flight time to diode sensor
 
@@ -122,7 +122,7 @@ void SensitiveDetector::EndOfEvent(G4HCofThisEvent*)
   int hitNum = m_eclHits.getEntries();
   //  assert(hitNum == 0);
   for (const pair<int, hit_t>&  t : a) {
-    int key = t.first, cellId = key / 80;
+    int key = t.first, cellId = key / 160;
     for (const thit_t& s : tr)
       if (s.hid == key) m_eclHitRel.add(s.tid, hitNum);
     const hit_t& h = t.second;
@@ -222,6 +222,7 @@ void SensitiveDiode::EndOfEvent(G4HCofThisEvent*)
   struct dep_t {double e, t;};
   vector<dep_t> v;
   for (int cellId : m_cells) {
+    v.clear();
     for (const hit_t& h : m_hits) {
       if (cellId == h.cellId) v.push_back({h.e, h.t});
     }

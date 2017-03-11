@@ -361,10 +361,11 @@ void SVDDQMModule::beginRun()
 void SVDDQMModule::event()
 {
   const StoreArray<SVDDigit> storeSVDDigits(m_storeSVDDigitsName);
-
   const StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
-
   const RelationArray relSVDClusterDigits(storeSVDClusters, storeSVDDigits, m_relSVDClusterDigitName);
+
+  // If there are no digits, leave
+  if (!storeSVDDigits || !storeSVDDigits.getEntries()) return;
 
   // SVD basic histograms:
   // Fired strips
@@ -382,12 +383,14 @@ void SVDDQMModule::event()
       uStrips.at(index).insert(digit.getCellID());
       if (m_chargeUSt[index] != NULL) m_chargeUSt[index]->Fill(digit.getCharge());
       if ((m_hitMapU[index] != NULL) && (digit.getCharge() > m_CutSVDCharge))
-        m_hitMapU[index]->Fill(SensorInfo.getUCellID(digit.getCellPosition()), digit.getIndex());
+        m_hitMapU[index]->Fill(digit.getCellID(), digit.getIndex());
+//        m_hitMapU[index]->Fill(SensorInfo.getUCellID(digit.getCellPosition()), digit.getIndex());
     } else {
       vStrips.at(index).insert(digit.getCellID());
       if (m_chargeVSt[index] != NULL) m_chargeVSt[index]->Fill(digit.getCharge());
       if ((m_hitMapV[index] != NULL) && (digit.getCharge() > m_CutSVDCharge))
-        m_hitMapV[index]->Fill(SensorInfo.getVCellID(digit.getCellPosition()), digit.getIndex());
+        m_hitMapV[index]->Fill(digit.getCellID(), digit.getIndex());
+//        m_hitMapV[index]->Fill(SensorInfo.getVCellID(digit.getCellPosition()), digit.getIndex());
     }
   }
   for (int i = 0; i < c_nSVDSensors; i++) {

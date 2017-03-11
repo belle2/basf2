@@ -359,14 +359,11 @@ void PXDDQMModule::beginRun()
 void PXDDQMModule::event()
 {
   const StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
-
   const StoreArray<PXDCluster> storePXDClusters(m_storePXDClustersName);
-
   const RelationArray relPXDClusterDigits(storePXDClusters, storePXDDigits, m_relPXDClusterDigitName);
-
   const StoreArray<PXDFrame> storeFrames(m_storeFramesName);
 
-  // If there are no pixels, leave
+  // If there are no digits, leave
   if (!storePXDDigits || !storePXDDigits.getEntries()) return;
 
   // PXD basic histograms:
@@ -383,12 +380,11 @@ void PXDDQMModule::event()
     Pixels.at(index).insert(digit.getUniqueChannelID());
     if (m_chargePix[index] != NULL) m_chargePix[index]->Fill(digit.getCharge());
     if ((m_hitMapU[index] != NULL) && (digit.getCharge() > m_CutPXDCharge))
-      m_hitMapU[index]->Fill(SensorInfo.getUCellID(digit.getUCellPosition()));
+      m_hitMapU[index]->Fill(digit.getUCellID());
     if ((m_hitMapV[index] != NULL) && (digit.getCharge() > m_CutPXDCharge))
-      m_hitMapV[index]->Fill(SensorInfo.getVCellID(digit.getVCellPosition()));
+      m_hitMapV[index]->Fill(digit.getVCellID());
     if ((m_hitMap[index] != NULL) && (digit.getCharge() > m_CutPXDCharge))
-      m_hitMap[index]->Fill(SensorInfo.getUCellID(digit.getUCellPosition()),
-                            SensorInfo.getVCellID(digit.getVCellPosition()));
+      m_hitMap[index]->Fill(digit.getUCellID(), digit.getVCellID());
   }
   for (int i = 0; i < c_nPXDSensors; i++) {
     if ((m_fired[i] != NULL) && (Pixels[i].size() > 0)) m_fired[i]->Fill(Pixels[i].size());

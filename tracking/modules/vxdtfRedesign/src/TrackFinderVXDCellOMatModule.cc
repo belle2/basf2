@@ -108,7 +108,7 @@ void TrackFinderVXDCellOMatModule::event()
 
   if (m_PARAMprintNetworks) {
     std::string fileName = m_PARAMsecMapName + "_CA_Ev" + std::to_string(m_eventCounter);
-    DNN::printCANetwork<Segment< Belle2::TrackNode>>(segmentNetwork, fileName);
+    //DNN::printCANetwork<Segment< Belle2::TrackNode>>(segmentNetwork, fileName);
   }
 
 

@@ -63,7 +63,8 @@ namespace Belle2 {
 
         /// CAstep:
         // compare cells with inner neighbours:
-        for (auto* aNode : aNetworkContainer) {
+        for (auto& aNodeIter : aNetworkContainer.getNodes()) {
+          auto aNode = aNodeIter.second;
           auto& currentCell = aNode->getMetaInfo();
           if (currentCell.isActivated() == false) { continue; }
           goodNeighbours = 0;
@@ -90,7 +91,8 @@ namespace Belle2 {
                 " dead cells so far");
 
         /// Updatestep:
-        for (auto* aNode : aNetworkContainer) {
+        for (auto& aNodeIter : aNetworkContainer.getNodes()) {
+          auto aNode = aNodeIter.second;
           auto& currentCell = aNode->getMetaInfo();
           if (currentCell.isActivated() == false or currentCell.isUpgradeAllowed() == false) { continue; }
 
@@ -135,7 +137,8 @@ namespace Belle2 {
     unsigned int findSeeds(ContainerType& aNetworkContainer,  bool strictSeeding = false) override
     {
       unsigned int nSeeds = 0;
-      for (auto* aNode : aNetworkContainer) {
+      for (auto& aNodeIter : aNetworkContainer.getNodes()) {
+        auto aNode = aNodeIter.second;
         if (strictSeeding && !(aNode->getOuterNodes().empty())) continue;
 
         if (BaseClass::m_validator.checkSeed(aNode->getMetaInfo()) == true) {
@@ -166,7 +169,8 @@ namespace Belle2 {
 
       unsigned int nRound = 0;
       while (nRound < nRounds) {
-        for (auto* aNode : aNetworkContainer) {
+        for (auto& aNodeIter : aNetworkContainer.getNodes()) {
+          auto aNode = aNodeIter.second;
           if (aNode->getMetaInfo().getState() == nRound) { nCellsOfState.at(nRound) += 1; }
           B2DEBUG(100, " got cell of state " << aNode->getMetaInfo().getState());
         }

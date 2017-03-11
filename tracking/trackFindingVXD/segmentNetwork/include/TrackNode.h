@@ -33,6 +33,8 @@ namespace Belle2 {
     /** pointer to spacePoint */
     SpacePoint* spacePoint;
 
+    std::string m_ID;
+
     /** overloaded '=='-operator
      * TODO JKL: pretty ugly operator overload, should be fixed ASAP! (solution for null-ptr-issue needed)
      * WARNING TODO write a test for that one!
@@ -89,6 +91,11 @@ namespace Belle2 {
       return *spacePoint;
     }
 
+    std::string getID() const
+    {
+      return m_ID;
+    }
+
 
 //  /** returns pointer to hit of the tracknode if set, returns nullptr if not. */
 //  const SpacePoint* getHit() const
@@ -113,7 +120,7 @@ namespace Belle2 {
 
 
     /** constructor WARNING: sector-pointing has still to be decided! */
-    TrackNode() : sector(nullptr), spacePoint(nullptr) {}
+    TrackNode(short index) : sector(nullptr), spacePoint(nullptr), m_ID(std::to_string(index)) {}
 
 
     /** destructor */

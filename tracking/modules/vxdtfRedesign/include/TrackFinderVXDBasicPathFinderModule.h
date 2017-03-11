@@ -112,10 +112,6 @@ namespace Belle2 {
 
 /// member variables
 
-    /** CA algorithm */
-    CellularAutomaton<Belle2::DirectedNodeNetwork< Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >, Belle2::CAValidator<Belle2::CACell>, Belle2::CALogger>
-    m_cellularAutomaton;
-
     /** algorithm for finding paths of segments */
     PathCollectorRecursive <
     Belle2::DirectedNodeNetwork< Belle2::Segment<Belle2::TrackNode>, Belle2::CACell >,

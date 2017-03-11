@@ -131,7 +131,7 @@ def add_cdc_cr_simulation(path, empty_path):
     path.add_module('CDCDigitizer')
 
 
-def add_cdc_cr_reconstruction(path):
+def add_cdc_cr_reconstruction(path, eventTimingExtraction=False):
 
     # Add cdc track finder
     add_cdc_cr_track_finding(path)
@@ -162,6 +162,17 @@ def add_cdc_cr_reconstruction(path):
                     # probCut=0.00001,
                     pdgCodesToUseForFitting=13,
                     )
+    if eventTimingExtraction is True:
+        # Select the tracks for the time extraction.
+        path.add_module("SelectionForTrackTimeExtraction")
+
+        # Extract the time: either with the TrackTimeExtraction or the FullGridTrackTimeExtraction module.
+        path.add_module("FullGridTrackTimeExtraction")
+
+        path.add_module("DAFRecoFitter",
+                        # probCut=0.00001,
+                        pdgCodesToUseForFitting=13,
+                        )
     path.add_module('TrackCreator',
                     defaultPDGCode=13,
                     useClosestHitToIP=True

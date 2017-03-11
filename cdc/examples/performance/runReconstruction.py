@@ -63,7 +63,7 @@ def main(input, output):
     set_cdc_cr_parameters(data_period)
 
     # Add CDC CR reconstruction.
-    add_cdc_cr_reconstruction(main_path)
+    add_cdc_cr_reconstruction(main_path, eventTimingExtraction=False)
 
     # Simple analysi module.
     output = "/".join([data_period, output])

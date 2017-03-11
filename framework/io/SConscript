@@ -31,7 +31,7 @@ for var in release_dir_vars:
                    head_commitid[var] = os.environ['BELLE2_RELEASE']
                 else:
                    head_commitid[var] = reldir
-            if head_commitid[var].lower() == 'head':
+            if var == 'BELLE2_LOCAL_DIR' or head_commitid[var].lower() == 'head':
                 head_commitid[var] = ''
 
         # check for modifications, ignoring untracked files

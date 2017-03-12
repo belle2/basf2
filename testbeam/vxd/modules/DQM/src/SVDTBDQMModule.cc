@@ -1,4 +1,4 @@
-#include "testbeam/vxd/modules/DQM/SVDDQMModule.h"
+#include "testbeam/vxd/modules/DQM/SVDTBDQMModule.h"
 
 #include <framework/core/HistoModule.h>
 
@@ -28,24 +28,24 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(SVDDQM)
+REG_MODULE(SVDTBDQM)
 
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-SVDDQMModule::SVDDQMModule() : HistoModule()
+SVDTBDQMModule::SVDTBDQMModule() : HistoModule()
 {
   //Set module properties
-  setDescription("SVD DQM module");
+  setDescription("SVD DQM module for Testbeams");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("svd"));
 }
 
 
-SVDDQMModule::~SVDDQMModule()
+SVDTBDQMModule::~SVDTBDQMModule()
 {
 }
 
@@ -53,7 +53,7 @@ SVDDQMModule::~SVDDQMModule()
 // Function to define histograms
 //-----------------------------------------------------------------
 
-void SVDDQMModule::defineHisto()
+void SVDTBDQMModule::defineHisto()
 {
   // Create a separate histogram directory and cd into it.
   TDirectory* oldDir = gDirectory;
@@ -307,7 +307,7 @@ void SVDDQMModule::defineHisto()
 }
 
 
-void SVDDQMModule::initialize()
+void SVDTBDQMModule::initialize()
 {
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
@@ -328,7 +328,7 @@ void SVDDQMModule::initialize()
   m_relClusterDigitName = relClusterDigits.getName();
 }
 
-void SVDDQMModule::beginRun()
+void SVDTBDQMModule::beginRun()
 {
   //auto geo = VXD::GeoCache::getInstance();
   //VXD::GeoCache& geo = VXD::GeoCache::getInstance();
@@ -357,7 +357,7 @@ void SVDDQMModule::beginRun()
 }
 
 
-void SVDDQMModule::event()
+void SVDTBDQMModule::event()
 {
 
   const StoreArray<SVDDigit> storeDigits(m_storeDigitsName);
@@ -659,11 +659,11 @@ void SVDDQMModule::event()
 }
 
 
-void SVDDQMModule::endRun()
+void SVDTBDQMModule::endRun()
 {
 }
 
 
-void SVDDQMModule::terminate()
+void SVDTBDQMModule::terminate()
 {
 }

@@ -1,5 +1,5 @@
-#ifndef SVDDQMMODULE_H_
-#define SVDDQMMODULE_H_
+#ifndef SVDTBDQMMODULE_H_
+#define SVDTBDQMMODULE_H_
 
 #undef DQM
 #ifndef DQM
@@ -18,7 +18,7 @@
 namespace Belle2 {
 
   /** SVD DQM Module */
-  class SVDDQMModule : public HistoModule {  // <- derived from HistoModule class
+  class SVDTBDQMModule : public HistoModule {  // <- derived from HistoModule class
 
   public:
 
@@ -38,9 +38,9 @@ namespace Belle2 {
     };
 
     /** Constructor */
-    SVDDQMModule();
+    SVDTBDQMModule();
     /* Destructor */
-    virtual ~SVDDQMModule();
+    virtual ~SVDTBDQMModule();
 
     /** Module functions */
     virtual void initialize();
@@ -119,7 +119,7 @@ namespace Belle2 {
     TH2F* m_correlationsHitMapsSP[c_nVXDPlanes * c_nVXDPlanes]; /**< Correlations and hit maps from space points */
   };
 
-  inline const SVD::SensorInfo& SVDDQMModule::getInfo(int index) const  // TODO for TB 2016 this macro must be revrite correct
+  inline const SVD::SensorInfo& SVDTBDQMModule::getInfo(int index) const  // TODO for TB 2016 this macro must be revrite correct
   {
     int iPlane = indexToPlane(index);
 //    VxdID sensorID(iPlane, 1, iPlane);
@@ -127,7 +127,7 @@ namespace Belle2 {
     return dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
   }
 
-  inline const PXD::SensorInfo& SVDDQMModule::getInfoPXD(int index) const  // TODO for TB 2016 this macro must be revrite correct
+  inline const PXD::SensorInfo& SVDTBDQMModule::getInfoPXD(int index) const  // TODO for TB 2016 this macro must be revrite correct
   {
     int iPlane = indexToPlanePXD(index);
 //    VxdID sensorID(iPlane, 1, iPlane);

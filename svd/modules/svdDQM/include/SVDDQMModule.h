@@ -10,8 +10,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDDQMMODULE_H_
-#define PXDDQMMODULE_H_
+#ifndef SVDDQMMODULE_H_
+#define SVDDQMMODULE_H_
 
 #undef DQM
 #ifndef DQM
@@ -20,7 +20,7 @@
 #include <daq/dqm/modules/DqmHistoManagerModule.h>
 #endif
 #include <vxd/dataobjects/VxdID.h>
-#include <pxd/geometry/SensorInfo.h>
+#include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vector>
 #include "TH1F.h"
@@ -28,15 +28,15 @@
 
 namespace Belle2 {
 
-  /** PXD DQM Module */
-  class PXDDQMModule : public HistoModule {  // <- derived from HistoModule class
+  /** SVD DQM Module */
+  class SVDDQMModule : public HistoModule {  // <- derived from HistoModule class
 
   public:
 
     /** Constructor */
-    PXDDQMModule();
+    SVDDQMModule();
     /* Destructor */
-    virtual ~PXDDQMModule();
+    virtual ~SVDDQMModule();
 
     /** Module functions */
     virtual void initialize();
@@ -53,32 +53,32 @@ namespace Belle2 {
 
   private:
 
-    float m_CutPXDCharge = 0.0;            /**< cut for accepting to hitmap histogram, using strips only, default = 0 */
-    int m_UsePixels = 0;                   /**< flag <0,1> for using pixels only, no clusters will be required, default = 0 */
+    float m_CutSVDCharge = 22.0;           /**< cut for accepting to hitmap histogram, using strips only, default = 22 */
+    int m_UseStrips = 0;                   /**< flag <0,1> for using strips only, no clusters will be required, default = 0 */
     int m_SaveOtherHistos = 1;             /**< flag <0,1> for creation of more plots for experts mostly, default = 1 */
 
-    std::string m_storePXDDigitsName;      /**< PXDDigits StoreArray name */
-    std::string m_storePXDClustersName;    /**< PXDClusters StoreArray name */
-    std::string m_relPXDClusterDigitName;  /**< PXDClustersToPXDDigits RelationArray name */
-    std::string m_storeFramesName;         /**< Frames StoreArray name */
+    std::string m_storeSVDDigitsName;      /**< SVDDigits StoreArray name */
+    std::string m_storeSVDClustersName;    /**< SVDClusters StoreArray name */
+    std::string m_relSVDClusterDigitName;  /**< SVDClustersToSVDDigits RelationArray name */
 
-    TH1F** m_fired;          /**< Fired pixels per event */
-    TH1F** m_clusters;       /**< Clusters per event */
-    TH1F** m_hitMapU;        /**< Hitmaps pixels for u */
-    TH1F** m_hitMapV;        /**< Hitmaps pixels for v */
-    TH2F** m_hitMap;         /**< Hitmaps pixels */
+    TH1F** m_firedU;         /**< Fired u strips per event */
+    TH1F** m_firedV;         /**< Fired v strips per event */
+    TH1F** m_clustersU;      /**< u clusters per event */
+    TH1F** m_clustersV;      /**< v clusters per event */
+    TH2F** m_hitMapU;        /**< Hitmaps strips for u */
+    TH2F** m_hitMapV;        /**< Hitmaps strips for v */
     TH1F** m_hitMapUCl;      /**< Hitmaps clusters for u */
     TH1F** m_hitMapVCl;      /**< Hitmaps clusters for v */
-    TH2F** m_hitMapCl;       /**< Hitmaps clusters */
-    TH1F** m_charge;         /**< Charge of clusters */
-    TH1F** m_chargePix;      /**< Charge of pixels */
-    TH1F** m_seed;           /**< Seed */
-    TH1F** m_sizeU;          /**< u cluster size */
-    TH1F** m_sizeV;          /**< v cluster size */
-    TH1F** m_size;           /**< Cluster size */
-    TH1F** m_startRow;       /**< Start row distribution */
-    TH1F** m_chargStartRow;  /**< Cluster seed charge by distance from the start row */
-    TH1F** m_StartRowCount;  /**< counter for Cluster seed charge by distance from the start row */
+    TH1F** m_chargeU;        /**< u charge of clusters */
+    TH1F** m_chargeV;        /**< v charge of clusters */
+    TH1F** m_chargeUSt;      /**< u charge of strips */
+    TH1F** m_chargeVSt;      /**< v charge of strips */
+    TH1F** m_seedU;          /**< u seed */
+    TH1F** m_seedV;          /**< v seed */
+    TH1F** m_sizeU;          /**< u size */
+    TH1F** m_sizeV;          /**< v size */
+    TH1F** m_timeU;          /**< u time */
+    TH1F** m_timeV;          /**< v time */
 
     int c_nVXDLayers;                /**< Number of VXD layers on Belle II */
     int c_nPXDLayers;                /**< Number of PXD layers on Belle II */
@@ -89,7 +89,7 @@ namespace Belle2 {
     int c_lastPXDLayer;              /**< Last PXD layer on Belle II */
     int c_firstSVDLayer;             /**< First SVD layer on Belle II */
     int c_lastSVDLayer;              /**< Last SVD layer on Belle II */
-    int c_nPXDSensors;               /**< Number of PXD sensors on Belle II */
+    int c_nSVDSensors;               /**< Number of SVD sensors on Belle II */
 
     /**< Function return index of sensor in plots.
        * @param Layer Layer position of sensor

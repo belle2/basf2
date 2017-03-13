@@ -43,7 +43,7 @@ namespace Belle2 {
       }
     }
 
-    double Interface::getDouble(const string& path) const throw(PathEmptyError, ConversionError)
+    double Interface::getDouble(const string& path) const noexcept(false)
     {
       string value = getString(path);
       try {
@@ -53,7 +53,7 @@ namespace Belle2 {
       }
     }
 
-    double Interface::getDouble(const string& path, double defaultValue) const throw(ConversionError)
+    double Interface::getDouble(const string& path, double defaultValue) const noexcept(false)
     {
       try {
         return getDouble(path);
@@ -62,7 +62,7 @@ namespace Belle2 {
       }
     }
 
-    int Interface::getInt(const string& path) const throw(PathEmptyError, ConversionError)
+    int Interface::getInt(const string& path) const noexcept(false)
     {
       string value = getString(path);
       try {
@@ -82,7 +82,7 @@ namespace Belle2 {
       }
     }
 
-    int Interface::getInt(const string& path, int defaultValue) const throw(ConversionError)
+    int Interface::getInt(const string& path, int defaultValue) const noexcept(false)
     {
       try {
         return getInt(path);
@@ -91,7 +91,7 @@ namespace Belle2 {
       }
     }
 
-    bool Interface::getBool(const string& path) const throw(PathEmptyError)
+    bool Interface::getBool(const string& path) const noexcept(false)
     {
       string value = getString(path);
       boost::to_lower(value);
@@ -108,7 +108,7 @@ namespace Belle2 {
       }
     }
 
-    double Interface::getWithUnit(const string& path) const throw(PathEmptyError, ConversionError)
+    double Interface::getWithUnit(const string& path) const noexcept(false)
     {
       pair<string, string> value = getStringWithUnit(path);
       double numValue(0);
@@ -125,7 +125,7 @@ namespace Belle2 {
       return numValue;
     }
 
-    double Interface::getWithUnit(const string& path, double defaultValue) const throw(ConversionError)
+    double Interface::getWithUnit(const string& path, double defaultValue) const noexcept(false)
     {
       try {
         return getWithUnit(path);
@@ -134,7 +134,7 @@ namespace Belle2 {
       }
     }
 
-    vector<double> Interface::getArray(const string& path) const throw(PathEmptyError, ConversionError)
+    vector<double> Interface::getArray(const string& path) const noexcept(false)
     {
       typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
       boost::char_separator<char> sep(",; \t\n\r");
@@ -157,7 +157,7 @@ namespace Belle2 {
       return result;
     }
 
-    vector<double> Interface::getArray(const string& path, const vector<double>& defaultValue) const throw(ConversionError)
+    vector<double> Interface::getArray(const string& path, const vector<double>& defaultValue) const noexcept(false)
     {
       try {
         return getArray(path);

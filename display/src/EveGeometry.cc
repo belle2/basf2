@@ -34,7 +34,7 @@ void EveGeometry::addGeometry()
     geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
     geoManager.createTGeoRepresentation();
     if (!gGeoManager) {
-      B2ERROR("Couldn't create TGeo geometry!");
+      B2FATAL("Couldn't create TGeo geometry! Please make sure you add the Geometry module before Display");
       return;
     }
   }

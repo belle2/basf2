@@ -307,9 +307,8 @@ void DisplayUI::handleEvent(Event_t* event)
       case 65: //Space bar
         togglePlayPause();
         break;
-      case 47: // Ctrl + s
-        if (event->fState & kKeyControlMask)
-          saveHiResPicture();
+      case 47: // s
+        saveHiResPicture();
         break;
       case 53: //Ctrl + q
         if (event->fState & kKeyControlMask)

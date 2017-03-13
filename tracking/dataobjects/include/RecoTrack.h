@@ -640,6 +640,9 @@ namespace Belle2 {
       }
 
       const auto hitTrackPoint = recoHitInfo->getCreatedTrackPoint();
+      if (hitTrackPoint == nullptr) {
+        B2FATAL("TrackPoint was requested which has not been created");
+      }
       return hitTrackPoint->getFitterInfo(representation)->getFittedState();
     }
 

@@ -45,6 +45,7 @@
 
 #include <framework/dataobjects/DisplayData.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/ColorPalette.h>
 
 #include <TEveArrow.h>
 #include <TEveBox.h>
@@ -82,6 +83,7 @@
 #include <cmath>
 
 using namespace Belle2;
+using namespace Belle2::TangoPalette;
 
 namespace {
   /** Destroys 'el', zeroes pointer. Supposed to also remove el from global lists, which 'delete el' would not. */
@@ -111,6 +113,13 @@ namespace {
       gGeoManager->GetListOfShapes()->Remove(s);
   }
 }
+
+const int EVEVisualization::c_recoHitColor = getTColorID("Orange", 1);
+const int EVEVisualization::c_unassignedHitColor = getTColorID("Plum", 1);
+const int EVEVisualization::c_trackColor = getTColorID("Sky Blue", 2);
+const int EVEVisualization::c_recoTrackColor = getTColorID("Sky Blue", 1);
+const int EVEVisualization::c_trackMarkerColor = getTColorID("Chameleon", 3);
+const int EVEVisualization::c_klmClusterColor = getTColorID("Chameleon", 1);
 
 EVEVisualization::EVEVisualization():
   m_assignToPrimaries(false),

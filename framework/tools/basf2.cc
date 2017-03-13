@@ -178,7 +178,7 @@ int main(int argc, char* argv[])
       cout << cmdlineOptions << endl;
       return 0;
     } else if (varMap.count("version")) {
-      pythonFile = "version.py";
+      pythonFile = "basf2_version.py";
     } else if (varMap.count("info")) {
       pythonFile = "info.py";
     } else if (varMap.count("modules")) {

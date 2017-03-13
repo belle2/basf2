@@ -25,7 +25,6 @@ def setupBelleDatabaseServer():
     except IOError:
         pass
 
-    B2INFO('Belle DB server is set to: ' + belleDBServer)
     os.environ['BELLE_POSTGRES_SERVER'] = belleDBServer
 
 
@@ -62,13 +61,19 @@ def setupB2BIIDatabase(isMC=False):
         use_local_database("%s/dbcache.txt" % payloaddir, payloaddir, False, LogLevel.WARNING)
 
 
-def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True, path=analysis_main):
+def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
+                                  useBelleDBServer=None, path=analysis_main):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
     """
 
-    setupBelleDatabaseServer()
+    if useBelleDBServer is None:
+        setupBelleDatabaseServer()
+    else:
+        os.environ['BELLE_POSTGRES_SERVER'] = useBelleDBServer
+
+    B2INFO('Belle DB server is set to: ' + os.environ['BELLE_POSTGRES_SERVER'])
 
     setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
 

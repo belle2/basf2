@@ -48,14 +48,7 @@
 using namespace Belle2;
 
 DisplayUI::DisplayUI(bool automatic):
-  m_currentEntry(0),
-  m_guiInitialized(false),
-  m_reshowCurrentEvent(false),
-  m_automatic(automatic),
-  m_cumulative(false),
-  m_prevButton(0),
-  m_nextButton(0),
-  m_timer(0)
+  m_automatic(automatic)
 {
   //ensure GUI thread goes away when parent dies. (root UI loves deadlocks)
   prctl(PR_SET_PDEATHSIG, SIGHUP);
@@ -120,6 +113,20 @@ void DisplayUI::setTitle(const std::string& fileName)
   TEveBrowser* browser = gEve->GetBrowser();
   browser->SetWindowName(title.c_str());
 }
+void DisplayUI::allowFlaggingEvents(const std::string& description)
+{
+  std::string label = "Flag this Event";
+  if (!description.empty())
+    label += " for " + description;
+
+  m_flagEvent = new TGCheckButton(nullptr, label.c_str());
+}
+
+/** Return value for current event, only makes sense if allowFlaggingEvents()  was called. */
+bool DisplayUI::getReturnValue() const
+{
+  return m_flagEvent && (m_flagEvent->GetState() == kButtonDown);
+}
 
 void DisplayUI::updateUI()
 {
@@ -139,6 +146,9 @@ void DisplayUI::updateUI()
     //reached last file entry in play mode, stop
     togglePlayPause();
   }
+  if (m_flagEvent)
+    m_flagEvent->SetState(kButtonUp);
+
   StoreObjPtr<EventMetaData> eventMetaData;
   m_eventLabel->SetTextColor(gROOT->GetColor(kBlack));
   if (!eventMetaData) {
@@ -480,6 +490,15 @@ void DisplayUI::makeGui()
 
     m_eventLabel = new TGLabel(event_frame);
     event_frame->AddFrame(m_eventLabel, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, margin, margin, margin, margin));
+
+    if (m_flagEvent) {
+      TString descr = m_flagEvent->GetString();
+      delete m_flagEvent;
+      m_flagEvent = new TGCheckButton(event_frame, descr);
+      m_flagEvent->SetToolTipText("Set return value to true for this event");
+      m_flagEvent->SetState(kButtonUp);
+      event_frame->AddFrame(m_flagEvent, new TGLayoutHints(kLHintsCenterX | kLHintsCenterY, margin, margin, margin, margin));
+    }
   }
   frmMain->AddFrame(event_frame, new TGLayoutHints(kLHintsExpandX, 0, 0, 0, 0));
 

@@ -26,12 +26,12 @@ namespace Belle2 {
    *
    * As a result of this module, the EventT0 StoreObjPtr is set to the extracted time.
    *
-   * All the extraction is done using the one RecoTrack stored in the given StoreArray.
+   * All the extraction is done using the RecoTracks stored in the given StoreArray.
    *
    * The module works in the following way:
    * * Use 4 definied event time seeds between T0 min and T0 max. Set the event time to this seed and extract the event
    *   time using the derivatives of chi^2 calculated in the TimeExtractionUtils after arXiv:0810.2241.
-   *   This shift in event time is then applied to the reco track and the time is extracted again.
+   *   This shift in event time is then applied to the reco tracks and the time is extracted again.
    *   One extracted time is called "converged" or "finished", if the second derivatve of chi^2 to the event time is
    *   large (which means that the measurement uncertainty on the event time is small) and the chi^2 is small too.
    *   If the fit which is needed in each step fails, do not use this extracted time.
@@ -56,7 +56,7 @@ namespace Belle2 {
 
   private:
     /// StoreArray name from which to read the reco tracks.
-    std::string m_param_recoTracksStoreArrayName = "__SelectedRecoTracks";
+    std::string m_param_recoTracksStoreArrayName = "RecoTracks";
 
     /// Module Parameter: Minimal shift which is allowed.
     double m_param_minimalT0Shift = -30;

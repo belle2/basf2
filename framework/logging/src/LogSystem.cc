@@ -15,6 +15,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 
+#include <TROOT.h>
 #include <signal.h>
 
 #include <cstdio>
@@ -94,6 +95,9 @@ bool LogSystem::sendMessage(LogMessage message)
     //this avoids a problem seen in ROOT's atexit() handler, which might crash
     //and then deadlock the process in the SIGSEGV handler...
     signal(SIGSEGV, nullptr);
+
+    //ROOT will also try to do this, but doesn't get the order right.
+    gROOT->CloseFiles();
     exit(1);
   }
 

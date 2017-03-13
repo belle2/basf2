@@ -38,6 +38,6 @@ namespace Belle2 {
     /// Flag to delete the not selected RecoTracks from the input StoreArray.
     bool m_param_deleteOtherRecoTracks = true;
     /// How many reco tracks should be copied over.
-    unsigned long m_param_maximalNumberOfTracks = 1;
+    unsigned long m_param_maximalNumberOfTracks = 2;
   };
 }

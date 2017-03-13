@@ -56,7 +56,7 @@ namespace Belle2 {
 
   private:
     /// StoreArray name from which to read the reco tracks.
-    std::string m_param_recoTracksStoreArrayName = "RecoTracks";
+    std::string m_param_recoTracksStoreArrayName = "__SelectedRecoTracks";
 
     /// Module Parameter: Minimal shift which is allowed.
     double m_param_minimalT0Shift = -30;

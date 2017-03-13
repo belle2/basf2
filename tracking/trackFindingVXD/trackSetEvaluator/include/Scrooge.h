@@ -23,28 +23,22 @@ namespace Belle2 {
    */
   class Scrooge {
   public:
-
-    /** Make a new Scrooge for every set, you want to evaluate.*/
-    Scrooge(std::vector <OverlapResolverNodeInfo>& overlapResolverNodeInfo) :
-      m_overlapResolverNodeInfo(overlapResolverNodeInfo)
-    {}
-
     /** Sets the isActive flag in m_qiTrackOverlap to false, for killed tracks.
      *
      *  Sorts the "tracks" according to quality, loops from the top and kills
      *  overlapping tracks of all tracks, that are still active.
      */
-    void performSelection()
+    void performSelection(std::vector <OverlapResolverNodeInfo>& overlapResolverNodeInfo)
     {
       //sort the vector according to the QI supplied.
-      std::sort(m_overlapResolverNodeInfo.begin(), m_overlapResolverNodeInfo.end(),
+      std::sort(overlapResolverNodeInfo.begin(), overlapResolverNodeInfo.end(),
       [](OverlapResolverNodeInfo const & lhs, OverlapResolverNodeInfo const & rhs) -> bool {
         return lhs.qualityIndex > rhs.qualityIndex;
       });
 
       //kill all tracks, that have overlaps and lower QI:
-      auto endOfOverlapResolverNodeInfo   = m_overlapResolverNodeInfo.cend();
-      for (auto trackIter = m_overlapResolverNodeInfo.begin(); trackIter != endOfOverlapResolverNodeInfo; trackIter++) {
+      auto endOfOverlapResolverNodeInfo   = overlapResolverNodeInfo.cend();
+      for (auto trackIter = overlapResolverNodeInfo.begin(); trackIter != endOfOverlapResolverNodeInfo; trackIter++) {
         if (!trackIter->activityState) continue;
         for (auto testTrackIter = trackIter; testTrackIter != endOfOverlapResolverNodeInfo; testTrackIter++) {
           if (std::find(trackIter->overlaps.begin(), trackIter->overlaps.end(), testTrackIter->trackIndex) !=
@@ -54,8 +48,5 @@ namespace Belle2 {
         }
       }
     }
-
-  private:
-    std::vector <OverlapResolverNodeInfo>& m_overlapResolverNodeInfo;///<Data structure, on which algorithm is performed.
   };
 }

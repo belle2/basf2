@@ -150,7 +150,7 @@ void DisplayUI::updateUI()
     if (secondsSinceEpoch == 0)
       strcpy(date, "");
     else if (auto gmt = gmtime(&secondsSinceEpoch))
-      strftime(date, 30, "<%Y-%m-%d %H:%M:%S>", gmt);
+      strftime(date, 30, "<%Y-%m-%d %H:%M:%S UTC>", gmt);
     m_eventLabel->SetText(TString::Format("Event: \t\t%u\nRun: \t\t%d\nExperiment: \t%d\n\n%s",
                                           eventMetaData->getEvent(),
                                           eventMetaData->getRun(), eventMetaData->getExperiment(),

@@ -282,7 +282,7 @@ namespace Belle2 {
      *
      *  @param byX           X displacement by which the origin of the coordinate system should be moved.
      *  @param byY           Y displacement by which the origin of the coordinate system should be moved.
-     *  @param jacobian[out] The jacobian matrix containing the derivatives of the five helix parameters
+     *  @param[out] jacobian The jacobian matrix containing the derivatives of the five helix parameters
      *                       after the move relative the orignal parameters.
      *  @param expandBelowChi Control parameter below, which absolute value of chi an expansion of
      *                        divergent terms shall be used. This parameter exists for testing the
@@ -340,8 +340,8 @@ namespace Belle2 {
      *
      *  @param x                   X coordinate of the point to which to extrapolate
      *  @param y                   Y coordinate of the point to which to extrapolate
-     *  @param arcLength2D[out]    The two dimensional arc length from the perigee at which the closest approach is reached
-     *  @param dr[out]             Signed distance of the point to circle in the xy projection.
+     *  @param[out] arcLength2D    The two dimensional arc length from the perigee at which the closest approach is reached
+     *  @param[out] dr             Signed distance of the point to circle in the xy projection.
      */
     void calcArcLength2DAndDrAtXY(const double& x, const double& y, double& arcLength2D, double& dr) const;
 

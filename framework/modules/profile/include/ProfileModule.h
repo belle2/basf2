@@ -117,7 +117,7 @@ namespace Belle2 {
      * Stores the memory usage of the application over time in plots.
      * @param name The name used to store the memory plot in the data store
      * @param title The title displayed on the memory plot
-     * @param yAxisName Text displayed on the y-axis. Depending on the plotted quantitiy,
+     * @param xAxisName Text displayed on the y-axis. Depending on the plotted quantitiy,
      *                  either vsize or rss, this can vary.
      * @param imgOutput If this string is not empty a plot of the memory consumption over
      *                  time is also written to disk using imgOutput as file name (must include

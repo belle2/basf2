@@ -72,11 +72,11 @@ namespace Belle2 {
     };
 
     /** Create a new payload downloader
-     * @param restURL base url for rest requests
      * @param localDir output directory for payloads that need to be downloaded
+     * @param restUrl base url for rest requests
      * @param timeout timeout to wait for lock on file when another process is
-     * already downloading a payload. After that time the payload will be
-     * loaded into a temporary file.
+     *    already downloading a payload. After that time the payload will be
+     *    loaded into a temporary file.
      */
     ConditionsPayloadDownloader(const std::string& localDir = "centraldb",
                                 const std::string& restUrl = "http://belle2db.hep.pnnl.gov/b2s/rest/",
@@ -161,7 +161,7 @@ namespace Belle2 {
 
     /** obtain the filename of a payload in a given directory entry
      * @param dir directory where the payload should be
-     * @param stucture storage structure of the directory
+     * @param structure storage structure of the directory
      * @param payload payload information
      * @returns filename of the payload honoring the selected directory structure
      */

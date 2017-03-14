@@ -29,6 +29,7 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
         'UseCDCHits': True,
         'UseOnlyAxialCDCHits': False,
         'UseOnlyBeforeTOP': True,
+        'UseReassignedHits': True,
         'UseNLoops': 1,
         'WhichParticles': [],
     }

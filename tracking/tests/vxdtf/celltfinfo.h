@@ -5,11 +5,7 @@
 // #include <RKTrackRep.h>
 #include <gtest/gtest.h>
 
-using namespace std;
-
 namespace Belle2 {
-
-
 
   /** Set up a few arrays and objects in the datastore */
   class CellTFInfoTest : public ::testing::Test {
@@ -125,8 +121,8 @@ namespace Belle2 {
 
     CellTFInfo aCell = CellTFInfo();
 
-    aCell.push_back_UsedParticles(make_pair(11, 0.5));
-    aCell.push_back_UsedParticles(make_pair(13, 0.4));
+    aCell.push_back_UsedParticles(std::make_pair(11, 0.5));
+    aCell.push_back_UsedParticles(std::make_pair(13, 0.4));
 
     aCell.setIsReal(1);
 
@@ -180,8 +176,8 @@ namespace Belle2 {
     aCell.push_back_AssignedHits(1, outerHit);
     aCell.push_back_AssignedHits(2, innerHit);
 
-    aCell.push_back_UsedParticles(make_pair(11, 0.5));
-    aCell.push_back_UsedParticles(make_pair(13, 0.4));
+    aCell.push_back_UsedParticles(std::make_pair(11, 0.5));
+    aCell.push_back_UsedParticles(std::make_pair(13, 0.4));
 
     std::vector<TVector3> allPosistions = aCell.getCoordinates();
 

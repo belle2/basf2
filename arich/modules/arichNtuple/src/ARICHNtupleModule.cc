@@ -83,11 +83,14 @@ namespace Belle2 {
     m_tree->Branch("run", &m_arich.run, "run/I");
 
     m_tree->Branch("pValue", &m_arich.pValue, "pValue/F");
+    m_tree->Branch("d0", &m_arich.z0, "pValue/F");
+    m_tree->Branch("z0", &m_arich.d0, "pValue/F");
 
     m_tree->Branch("PDG", &m_arich.PDG, "PDG/I");
     m_tree->Branch("motherPDG", &m_arich.motherPDG, "motherPDG/I");
     m_tree->Branch("primary", &m_arich.primary, "primary/S");
     m_tree->Branch("seen", &m_arich.seen, "seen/S");
+    m_tree->Branch("scatter", &m_arich.scatter, "scatter/I");
 
     m_tree->Branch("rhoProd", &m_arich.rhoProd, "rhoProd/F");
     m_tree->Branch("zProd",   &m_arich.zProd,   "zProd/F");
@@ -173,7 +176,12 @@ namespace Belle2 {
       const Track* mdstTrack = lkh->getRelated<Track>();
       if (mdstTrack) {
         const TrackFitResult* fitResult = mdstTrack->getTrackFitResult(Const::pion);
-        if (fitResult) m_arich.pValue = fitResult->getPValue();
+        if (fitResult) {
+          m_arich.pValue = fitResult->getPValue();
+          TVector3 trkPos = fitResult->getPosition();
+          m_arich.z0 = trkPos.Z();
+          m_arich.d0 = (trkPos.XYvector()).Mod();
+        }
         m_arich.status += 10;
 
         particle = mdstTrack->getRelated<MCParticle>();
@@ -191,8 +199,14 @@ namespace Belle2 {
           m_arich.rhoDec = decVertex.Perp();
           m_arich.zDec = decVertex.Z();
           m_arich.phiDec = decVertex.Phi();
+
+          std::vector<Belle2::MCParticle*> daughs =  particle->getDaughters();
+          for (const auto daugh : daughs) {
+            if (daugh->getPDG() == particle->getPDG()) m_arich.scatter = 1;
+          }
         }
       }
+
 
       // get reconstructed photons associated with track
       const std::vector<ARICHPhoton>& photons = arichTrack.getPhotons();
@@ -246,6 +260,11 @@ namespace Belle2 {
             m_arich.rhoDec = decVertex.Perp();
             m_arich.zDec = decVertex.Z();
             m_arich.phiDec = decVertex.Phi();
+
+            std::vector<Belle2::MCParticle*> daughs =  particle->getDaughters();
+            for (const auto daugh : daughs) {
+              if (daugh->getPDG() == particle->getPDG()) m_arich.scatter = 1;
+            }
           }
         }
       }

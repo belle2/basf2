@@ -86,6 +86,7 @@ namespace Belle2 {
     int m_minSVDHits;                                           /**< Minimum number of SVD hits per track to allow track candidate creation*/
     int m_minCDCAxialHits;                                      /**< Minimum number of CDC hits from axial wires per track to allow track candidate creation*/
     int m_minCDCStereoHits;                                     /**< Minimum number of CDC hits from stereo wires per track to allow track candidate creation*/
+    bool m_allowFirstCDCSuperLayerOnly;                         /**< Boolean to allow tracks to pass the stereo hit requirement if they touched only the first (axial) CDC layer */
     int m_minimalNdf;                                           /**< Minimum number of total hits per track to allow track candidate creation. 2D hits are counted as 2*/
     std::vector<int>
     m_fromPdgCodes;                            /**< if size() is not 0, only for particles having an ancestor (mother or mother of mother etc) with PDG codes same as in this vector a track candidate be created*/

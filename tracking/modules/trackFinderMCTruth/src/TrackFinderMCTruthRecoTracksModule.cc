@@ -110,6 +110,11 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            m_minCDCStereoHits,
            "Minimum number of CDC hits form a stereo wire needed to allow the created of a track candidate",
            0);
+  addParam("AllowFirstCDCSuperLayerOnly",
+           m_allowFirstCDCSuperLayerOnly,
+           "Allow tracks to pass the stereo hit requirement if they touched only the first (axial) CDC layer",
+           false);
+
   addParam("MinimalNDF",
            m_minimalNdf,
            "Minimum number of total hits needed to allow the creation of a track candidate. "
@@ -629,22 +634,38 @@ void TrackFinderMCTruthRecoTracksModule::event()
           hitsWithTimeAndDetectorInformation.emplace_back(time, cdcHit->getArrayIndex(), mcFinder, Const::CDC);
           ndf += 1;
           ++nAxialHits;
+          ++nHitsBySuperLayerId[superLayerId];
         } else {
           if (not m_useOnlyAxialCDCHits) {
             hitsWithTimeAndDetectorInformation.emplace_back(time, cdcHit->getArrayIndex(), mcFinder, Const::CDC);
             ndf += 1;
             ++nStereoHits;
+            ++nHitsBySuperLayerId[superLayerId];
           }
         }
       }
 
       B2DEBUG(100, "    added " << nAxialHits << " axial and " << nStereoHits << " stereo CDCHits");
     }
-    if (nAxialHits < m_minCDCAxialHits or (not m_useOnlyAxialCDCHits and nStereoHits < m_minCDCStereoHits)) {
+
+    if (nAxialHits < m_minCDCAxialHits) {
+      // Not enough axial hits. Next MCParticle.
       ++m_notEnoughtHitsCounter;
-      continue; //goto next mcParticle, do not make track candidate
+      continue;
     }
 
+    if (not m_useOnlyAxialCDCHits and (nStereoHits < m_minCDCStereoHits)) {
+      if (m_allowFirstCDCSuperLayerOnly and
+          nHitsBySuperLayerId[0] == nAxialHits and
+          (nAxialHits + nStereoHits >= m_minCDCAxialHits + m_minCDCStereoHits)) {
+        // Special rule for low momentum tracks that only touch the first axial superlayer
+        // If there still enough hits combined from the axial and stereo hit limit -> keep the track.
+      } else {
+        // Not enough stereo hits. Next MCParticle.
+        ++m_notEnoughtHitsCounter;
+        continue;
+      }
+    }
 
     if (m_initialCov(0, 0) > 0.0) { //using a user set initial cov and corresponding smearing of inital state adds information
       ndf += 5;

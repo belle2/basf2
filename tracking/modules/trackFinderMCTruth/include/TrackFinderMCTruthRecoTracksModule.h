@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Heck, Oksana Brovchenko, Moritz Nadler,           *
- *               Thomas Hauth                                             *
+ *               Thomas Hauth, Oliver Frost                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -63,7 +63,7 @@ namespace Belle2 {
     bool m_useOnlyAxialCDCHits;                                 /**< Boolean to select if only axial CDCHits should be used*/
     bool m_useOnlyBeforeTOP;                                    /**< Boolean to select if CDC hits after TOP detector are discarded*/
     float m_useNLoops;                                          /**< Number of loops to include in the MC tracks - effects only CDC.*/
-
+    bool m_useReassignedHits;                                   /**< Boolean to select the inclusion of hits form discarded secondary daughters*/
 
     bool m_enforceTrueHit;                                      /**< If set true only cluster hits that have a relation to a TrueHit will be included in the track candidate */
     std::vector<std::string>

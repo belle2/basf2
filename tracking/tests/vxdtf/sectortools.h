@@ -12,8 +12,6 @@
 #include <TVector3.h>
 
 
-using namespace std;
-
 namespace Belle2 {
 
 
@@ -30,10 +28,10 @@ namespace Belle2 {
 /// logic = VXDTFModule
   unsigned short searchSector4Hit(TVector3 localHit,
                                   TVector3 sensorSize,
-                                  vector<double>& uConfig,
-                                  vector<double>& vConfig)
+                                  std::vector<double>& uConfig,
+                                  std::vector<double>& vConfig)
   {
-    unsigned short aSecID = numeric_limits<unsigned short>::max();;
+    unsigned short aSecID = std::numeric_limits<unsigned short>::max();;
 
     for (int j = 0; j != int(uConfig.size() - 1); ++j) {
 

@@ -42,6 +42,7 @@ class CDCFull(TrackingValidationRun):
         'UseSVDHits': False,
         'UseCDCHits': True,
         'UseOnlyAxialCDCHits': False,
+        "UseReassignedHits": True,
         "UseNLoops": 1,
         "UseOnlyBeforeTOP": True,
         # 'EnergyCut': 0.1,

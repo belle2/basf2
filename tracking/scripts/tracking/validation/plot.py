@@ -278,10 +278,10 @@ class ValidationPlot(object):
 
             for histogram in self.histograms:
                 histogram.SetMinimum(0)
-                histogram.SetMaximum(1)
+                histogram.SetMaximum(1.05)
 
             self.plot.SetMinimum(0)
-            self.plot.SetMaximum(1)
+            self.plot.SetMaximum(1.05)
 
         return self
 

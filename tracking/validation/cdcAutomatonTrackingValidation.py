@@ -43,8 +43,7 @@ class CDCAutomaton(TrackingValidationRun):
         'UseSVDHits': False,
         'UseCDCHits': True,
         'UseOnlyAxialCDCHits': False,
-        "UseReassignedHits": True,
-        "UseNLoops": 1.0
+        "UseNLoops": 1,
         "UseOnlyBeforeTOP": True,
         # "UseNLoops" : 1,
         # 'EnergyCut': 0.1,

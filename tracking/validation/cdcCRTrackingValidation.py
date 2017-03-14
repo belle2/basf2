@@ -49,8 +49,7 @@ class CDCCR(TrackingValidationRun):
         'UsePXDHits': False,
         'UseSVDHits': False,
         'UseCDCHits': True,
-        'UseOnlyAxialCDCHits': False,
-        "UseReassignedHits": True,
+        'UseOnlyAxialCDCHits': False
     }
 
     fit_tracks = True

@@ -55,7 +55,6 @@ class CosmicsHough(TrackingValidationRun):
         'UseSVDHits': False,
         'UseCDCHits': True,
         'UseOnlyAxialCDCHits': False,
-        "UseReassignedHits": True,
     }
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE

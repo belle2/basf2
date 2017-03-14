@@ -35,8 +35,7 @@ class Cosmics(TrackingValidationRun):
         'UsePXDHits': False,
         'UseSVDHits': False,
         'UseCDCHits': True,
-        'UseOnlyAxialCDCHits': False,
-        "UseReassignedHits": True,
+        'UseOnlyAxialCDCHits': False
     }
     pulls = True
     contact = CONTACT

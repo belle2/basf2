@@ -46,7 +46,6 @@ class CDCLegendre(TrackingValidationRun):
         'UseSVDHits': False,
         'UseCDCHits': True,
         'UseOnlyAxialCDCHits': True,
-        "UseReassignedHits": True,
         'UseOnlyBeforeTOP': True,
         'UseNLoops': 1
     }

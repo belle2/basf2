@@ -34,7 +34,6 @@ class Full(TrackingValidationRun):
         'UsePXDHits': True,
         'UseSVDHits': True,
         'UseCDCHits': True,
-        "UseReassignedHits": True,
         'UseOnlyBeforeTOP': True,
         'UseNLoops': 1
     }

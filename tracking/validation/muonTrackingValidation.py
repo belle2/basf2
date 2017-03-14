@@ -34,9 +34,8 @@ class Muon(TrackingValidationRun):
         'UsePXDHits': True,
         'UseSVDHits': True,
         'UseCDCHits': True,
-        "UseReassignedHits": True,
         'UseOnlyBeforeTOP': True,
-        'UseNLoops': 1,
+        'UseNLoops': 1
     }
     # tracks will be already fitted by
     # add_tracking_reconstruction finder module set above

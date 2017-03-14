@@ -45,10 +45,7 @@ class CDCFull(TrackingValidationRun):
         "UseReassignedHits": True,
         "UseNLoops": 1,
         "UseOnlyBeforeTOP": True,
-        'MinCDCAxialHits': 8,
-        'MinCDCStereoHits': 6,
-        "AllowFirstCDCSuperLayerOnly": True,
-        'EnergyCut': 0,
+        # 'EnergyCut': 0.1,
     }
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE

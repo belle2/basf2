@@ -176,7 +176,7 @@ namespace Belle2 {
 
     if (_famMethod == 2 || _famMethod == 1) {obj_trgeclDigi->  digitization01(TCDigiE, TCDigiT); } // no-fit method = backup method 1
     else if (_famMethod == 3) { obj_trgeclDigi-> digitization02(TCDigiE, TCDigiT); } // orignal method = backup method 2
-    //    obj_trgeclDigi-> save(m_nEvent);
+    obj_trgeclDigi-> save(m_nEvent);
 
     // FAM Fitter
     TrgEclFAMFit* obj_trgeclfit = new TrgEclFAMFit();

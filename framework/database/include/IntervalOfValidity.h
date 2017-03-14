@@ -101,14 +101,14 @@ namespace Belle2 {
     /** Input stream operator for reading IoV data from a text file.
      *
      *  @param input The input stream.
-     *  @param metaData The InervalOfValidity object.
+     *  @param iov The InervalOfValidity object.
      */
     friend std::istream& operator>> (std::istream& input, IntervalOfValidity& iov);
 
     /** Output stream operator for writing IoV data to a text file.
      *
      *  @param output The output stream.
-     *  @param metaData The IntervalOfValidity object.
+     *  @param iov The IntervalOfValidity object.
      */
     friend std::ostream& operator<< (std::ostream& output, const IntervalOfValidity& iov);
 
@@ -132,17 +132,21 @@ namespace Belle2 {
 
     /**
      * Helper function to check whether a given experiment/run number is above or below the lower bound of the interval of validity.
-     * @param experiement   the experiment number
-     * @param run           the run number
-     * @return              0 if the given experiment/run number is equal to the lower bound, -1 if it is below the lower bound, 1 if it is above the lower bound.
+     * @param experiment   the experiment number
+     * @param run          the run number
+     * @return             0 if the given experiment/run number is equal to the
+     *                     lower bound, -1 if it is below the lower bound, 1 if
+     *                     it is above the lower bound.
      */
     int checkLowerBound(int experiment, int run) const;
 
     /**
      * Helper function to check whether a given experiment/run number is above or below the upper bound of the interval of validity.
-     * @param experiement   the experiment number
-     * @param run           the run number
-     * @return              0 if the given experiment/run number is equal to the upper bound, -1 if it is below the upper bound, 1 if it is above the upper bound.
+     * @param experiment   the experiment number
+     * @param run          the run number
+     * @return             0 if the given experiment/run number is equal to the
+     *                     upper bound, -1 if it is below the upper bound, 1 if
+     *                     it is above the upper bound.
      */
     int checkUpperBound(int experiment, int run) const;
 

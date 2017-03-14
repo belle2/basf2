@@ -27,7 +27,6 @@ namespace Belle2 {
      * @param globalTag   The name of the global tag
      * @param logLevel    The level of log messages about not-found payloads.
      * @param payloadDir  Directory for local copies of the payloads
-     * @return            A pointer to the created database instance
      */
     static void createDefaultInstance(const std::string& globalTag, LogConfig::ELogLevel logLevel = LogConfig::c_Warning,
                                       const std::string& payloadDir = "centraldb");
@@ -44,7 +43,6 @@ namespace Belle2 {
      *                       payload is found. This is intended for override
      *                       setups where a few payloads are taken from non
      *                       standard locations
-     * @return               A pointer to the created database instance
      */
     static void createInstance(const std::string& globalTag, const std::string& restBaseName, const std::string& fileBaseName,
                                const std::string& fileBaseLocal, LogConfig::ELogLevel logLevel = LogConfig::c_Warning,
@@ -89,7 +87,7 @@ namespace Belle2 {
 
     /** Add a directory to the list of directories to look for payloads before
      * downloading them.
-     * @param directory path to the directory to add to the list
+     * @param localDir path to the directory to add to the list
      * @param structure indicate how the payloads are stored in this directory
      */
     void addLocalDirectory(const std::string& localDir, EConditionsDirectoryStructure structure);
@@ -100,7 +98,6 @@ namespace Belle2 {
      *
      * @param globalTag      The name of the global tag
      * @param payloadDir     The name of the directory in which the payloads are atored.
-     * @param restBaseName   Base name for REST services
      */
     explicit ConditionsDatabase(const std::string& globalTag, const std::string& payloadDir = "");
 

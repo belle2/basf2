@@ -35,7 +35,6 @@ namespace Belle2 {
      * @param invertLogging  If true log messages will be created when a payload is
      *                   found. This is intended for override setups where a
      *                   few payloads are taken from non standard locations
-     * @return           A pointer to the created database instance
      */
     static void createInstance(const std::string& fileName = "database.txt", const std::string& payloadDir = "",
                                bool readOnly = false, LogConfig::ELogLevel logLevel = LogConfig::c_Warning,
@@ -94,9 +93,6 @@ namespace Belle2 {
      * Otherwise return a null pointer if empty IoV
      *
      * @param name       Name that identifies the object in the database.
-     * @param object     The object that should be stored in the database.
-     * @param iov        The interval of validity of the the object.
-     * @return           True if the storage of the object succeeded.
      */
     std::pair<TObject*, IntervalOfValidity> tryDefault(const std::string& name);
 

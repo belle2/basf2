@@ -378,7 +378,7 @@ namespace Belle2 {
     /**
      * Writes content of a boost::variant to a python object.
      *
-     * @param var The variant whose content should be stored in a python object.
+     * @param variant The variant whose content should be stored in a python object.
      * @return The python object where the the content of the map is stored.
      */
     template<typename... Types>
@@ -395,11 +395,11 @@ namespace Belle2 {
      * Reads a scalar type (int, double, string, bool) from a python object.
      *
      * @param pyObject Python object which stores the scalar type.
-     * @param Scalar dummy allows the compiler to infer the correct template.
+     * @param dummy allows the compiler to infer the correct template.
      * @return Scalar type, which holds the value from the python object
      */
     template<typename Scalar>
-    Scalar convertPythonObject(const boost::python::object& pyObject, Scalar)
+    Scalar convertPythonObject(const boost::python::object& pyObject, __attribute((unused)) Scalar dummy)
     {
 
       Scalar tmpValue;
@@ -419,11 +419,11 @@ namespace Belle2 {
      * If the python object isn't a list, a std::vector with the given object as single entry is returned.
      *
      * @param pyObject Python object which stores the vector.
-     * @param std::vector<Value> dummy allows the compiler to infer the correct template.
+     * @param dummy allows the compiler to infer the correct template.
      * @return Vector, which holds the vector from the python object
      */
     template<typename Value>
-    std::vector<Value> convertPythonObject(const boost::python::object& pyObject, std::vector<Value>)
+    std::vector<Value> convertPythonObject(const boost::python::object& pyObject, __attribute((unused)) std::vector<Value> dummy)
     {
 
       std::vector<Value> tmpVector;
@@ -499,11 +499,11 @@ namespace Belle2 {
      * Reads std::tuple from a python object.
      *
      * @param pyObject Python object which stores the map.
-     * @param std::tuple<Types... > dummy allows the compiler to infer the correct template.
+     * @param dummy allows the compiler to infer the correct template.
      * @return std::tuple<Types...>, which holds the map from the python object
      */
     template<typename... Types>
-    std::tuple<Types...> convertPythonObject(const boost::python::object& pyObject, std::tuple<Types...>)
+    std::tuple<Types...> convertPythonObject(const boost::python::object& pyObject, __attribute((unused)) std::tuple<Types...> dummy)
     {
       std::tuple<Types...> tmpTuple;
       const boost::python::tuple& pyTuple = static_cast<const boost::python::tuple&>(pyObject);
@@ -548,12 +548,12 @@ namespace Belle2 {
      * Reads boost::variant from a python object.
      *
      * @param pyObject Python object which stores the value.
-     * @param boost::variant<Types... > dummy allows the compiler to infer the correct template.
+     * @param dummy allows the compiler to infer the correct template.
      * @return boost::variant<Types...>, which holds the value from the python object
      */
     template<typename... Types>
     boost::variant<Types...> convertPythonObject(const boost::python::object& pyObject,
-                                                 boost::variant<Types...>)
+                                                 __attribute((unused)) boost::variant<Types...> dummy)
     {
       boost::variant<Types...> tmpVariant;
       SetVariant(tmpVariant, pyObject, SizeT<sizeof...(Types)>());

@@ -70,7 +70,9 @@ namespace Belle2 {
     struct DBQuery {
       /**
        * Constructor
-       * @param name  The identifier of the object
+       * @param aName  The identifier of the object
+       * @param aObject Pointer to the object
+       * @param aIov Iov of the object
        */
       DBQuery(const std::string& aName, TObject* aObject = 0,
               const IntervalOfValidity& aIov = IntervalOfValidity()): name(aName), object(aObject), iov(aIov) {};
@@ -100,7 +102,7 @@ namespace Belle2 {
     /**
      * Store an ClonesArray in the database with the default name.
      *
-     * @param object     The object that should be stored in the database.
+     * @param array      The object that should be stored in the database.
      * @param iov        The interval of validity of the the object.
      * @return           True if the storage of the object succeeded.
      */

@@ -85,7 +85,7 @@ const map<string, string>& ModuleManager::getAvailableModules() const
 }
 
 
-ModulePtr ModuleManager::registerModule(const string& moduleName, const std::string& sharedLibPath) throw(ModuleNotCreatedError)
+ModulePtr ModuleManager::registerModule(const string& moduleName, const std::string& sharedLibPath) noexcept(false)
 {
   map<string, ModuleProxyBase*>::iterator moduleIter =  m_registeredProxyMap.find(moduleName);
 

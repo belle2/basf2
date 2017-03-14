@@ -126,7 +126,7 @@ namespace Belle2 {
     /**
      * Check whether the given entry and the requested class match.
      *
-     * @param entry      The existing DBStore entry.
+     * @param dbEntry    The existing DBStore entry.
      * @param objClass   The class of the object.
      * @param array      Whether it is a TClonesArray or not.
      * @return           True if both types match.
@@ -136,7 +136,7 @@ namespace Belle2 {
     /**
      * Check whether the given entry and the type of the object match.
      *
-     * @param entry      The existing DBStore entry.
+     * @param dbEntry    The existing DBStore entry.
      * @param object     The object whose type is to be checked.
      * @return           True if both types match.
      */

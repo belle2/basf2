@@ -3,6 +3,7 @@ import basf2
 from simulation import add_simulation
 import os
 
+from rawdata import add_raw_seqoutput
 
 from softwaretrigger.path_functions import (
     setup_softwaretrigger_database_access,
@@ -45,7 +46,7 @@ if __name__ == '__main__':
         add_unpackers(main_path, components=components)
         add_softwaretrigger_reconstruction(main_path, store_array_debug_prescale=1, components=components)
 
-        main_path.add_module("RootOutput", outputFileName="output.root")
+        add_raw_seqoutput(main_path, additionalObjects=["SoftwareTriggerResults", "SoftwareTriggerVariables"])
 
     basf2.print_path(main_path)
     basf2.process(main_path)

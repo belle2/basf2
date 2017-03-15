@@ -259,7 +259,7 @@ namespace Belle2 {
       bool finish();
     private:
       const std::string m_name;
-      std::string m_indent{" | "};
+      std::string m_indent;
       LogConfig::ELogLevel m_stdoutLevel;
       LogConfig::ELogLevel m_stderrLevel;
       int m_stdoutDebugLevel;

@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # Usage:
-# basf2 run_hlt.py -i inputfilename.sroot -o outputfilename.sroot
-# you can take the output file of rawdata_simulation.py as the input file
+# basf2 rawdata_simulation.py -o outputfilename.sroot
+
 
 import basf2
 
@@ -14,8 +14,8 @@ from rawdata import add_raw_seqoutput
 
 from softwaretrigger.path_functions import (
     setup_softwaretrigger_database_access,
-    add_unpackers,
-    add_softwaretrigger_reconstruction,
+    add_packers,
+    RAW_SAVE_STORE_ARRAYS,
     DEFAULT_HLT_COMPONENTS,
 )
 
@@ -24,18 +24,20 @@ setup_softwaretrigger_database_access()
 
 # You could use your own components here or just use the default for the HLT (everything except PXD)
 # e.g. without SVD
-#     components = ["CDC", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
+# components = ["CDC", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
 # if you leave out the components in all calls, the default will be used
 components = DEFAULT_HLT_COMPONENTS
 
 main_path = basf2.create_path()
 
-main_path.add_module("SeqRootInput")
+main_path.add_module("EventInfoSetter", evtNumList=[10])
+main_path.add_module("EvtGenInput")
 
-add_unpackers(main_path, components=components)
-add_softwaretrigger_reconstruction(main_path, store_array_debug_prescale=1, components=components)
+add_simulation(main_path, components)
+add_packers(main_path, components=components)
 
-add_raw_seqoutput(main_path, additionalObjects=["SoftwareTriggerResults", "SoftwareTriggerVariables"])
+main_path.add_module("SeqRootOutput",
+                     saveObjs=["EventMetaData"] + RAW_SAVE_STORE_ARRAYS)
 
 basf2.print_path(main_path)
 basf2.process(main_path)

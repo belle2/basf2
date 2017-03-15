@@ -43,10 +43,13 @@ class CDCAutomaton(TrackingValidationRun):
         'UseSVDHits': False,
         'UseCDCHits': True,
         'UseOnlyAxialCDCHits': False,
-        "UseNLoops": 1,
+        "UseReassignedHits": True,
+        "UseNLoops": 1.0
         "UseOnlyBeforeTOP": True,
-        # "UseNLoops" : 1,
-        # 'EnergyCut': 0.1,
+        'MinCDCAxialHits': 8,
+        'MinCDCStereoHits': 6,
+        "AllowFirstCDCSuperLayerOnly": True,
+        'EnergyCut': 0,
     }
     pulls = True
     contact = CONTACT

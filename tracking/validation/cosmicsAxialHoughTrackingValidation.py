@@ -50,7 +50,8 @@ class CosmicsAxialHough(TrackingValidationRun):
         'UsePXDHits': False,
         'UseSVDHits': False,
         'UseCDCHits': True,
-        'UseOnlyAxialCDCHits': True
+        'UseOnlyAxialCDCHits': True,
+        "UseReassignedHits": True,
     }
 
     pulls = True

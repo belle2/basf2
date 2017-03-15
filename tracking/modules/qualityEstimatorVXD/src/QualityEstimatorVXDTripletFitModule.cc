@@ -81,7 +81,6 @@ void QualityEstimatorVXDTripletFitModule::event()
     if (chi2 < 0) { B2WARNING("QualityEstimatorVXDTripletFitModule: event " << m_eventCounter << ": chi2 is reset to 0! (before: " << chi2 << ")"); chi2 = 0; }
 
     // Calculating a probaility from the Chi2 value which considers the degrees of freedom
-    // TODO: check degrees of freedom!
     double probability = TMath::Prob(chi2, 2 * nHits - 5);
 
     B2DEBUG(1, "QualityEstimatorVXDTripletFitModule: event " << m_eventCounter

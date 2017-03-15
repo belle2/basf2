@@ -258,11 +258,17 @@ namespace Belle2 {
       /** Finish the capture and emit the message if output has appeard on stdout or stderr */
       bool finish();
     private:
+      /** Name of the output producing tool/library */
       const std::string m_name;
+      /** Identation to add to the beginning of each line of output. defaults to "${m_name}: " */
       std::string m_indent;
+      /** severity of the log message to be emitted for output on stdout */
       LogConfig::ELogLevel m_stdoutLevel;
+      /** severity of the log message to be emitted for output on stderr */
       LogConfig::ELogLevel m_stderrLevel;
+      /** debug level for the log message to be emitted for output on stdout if m_stdoutLevel is c_Debug */
       int m_stdoutDebugLevel;
+      /** debug level for the log message to be emitted for output on stderr if m_stderrLevel is c_Debug */
       int m_stderrDebugLevel;
     };
   }

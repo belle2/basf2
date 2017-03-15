@@ -10,8 +10,6 @@
 import basf2
 
 from simulation import add_simulation
-import os
-
 
 from softwaretrigger.path_functions import (
     setup_softwaretrigger_database_access,

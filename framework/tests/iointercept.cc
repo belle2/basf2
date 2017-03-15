@@ -10,14 +10,154 @@
 
 #include <iostream>
 #include <framework/utilities/IOIntercept.h>
+#include <framework/logging/LogSystem.h>
+#include <framework/logging/LogConnectionIOStream.h>
 #include <gtest/gtest.h>
 
 using namespace std;
 using namespace Belle2;
 
 namespace {
+  /** intercept log messages and store them in a given vector */
+  class LogInterceptor final: public LogConnectionBase {
+    /** reference to where they should be stored */
+    std::vector<LogMessage>& m_messages;
+  public:
+    /** remember where to put the messages */
+    LogInterceptor(std::vector<LogMessage>& messages): m_messages(messages) {}
+    /** always connected */
+    bool isConnected() { return true; }
+    /** and always sucessful in storing into buffer */
+    bool sendMessage(const LogMessage& message) { m_messages.emplace_back(message); return true; }
+  };
+
+  /** params for testing */
+  typedef std::tuple<LogConfig::ELogLevel, std::string, std::string, bool, bool> logconvert_params_t;
+
+  /** Fixture class to intercept log messages which is needed for some tests */
+  class IOInterceptTest: public ::testing::Test {
+  protected:
+    /** list of log messages */
+    std::vector<LogMessage> m_messages;
+
+    /** Add a log message interceptor */
+    void SetUp()
+    {
+      m_messages.clear();
+      LogSystem::Instance().resetLogConnections();
+      LogSystem::Instance().addLogConnection(new LogInterceptor(m_messages));
+    }
+
+    /** And try to reset logging system to default */
+    void TearDown()
+    {
+      LogSystem::Instance().resetLogConnections();
+      bool useColor = LogConnectionIOStream::terminalSupportsColors();
+      LogSystem::Instance().addLogConnection(new LogConnectionIOStream(std::cout, useColor));
+      LogSystem::Instance().resetMessageCounter();
+    }
+  };
+
+  /** Typedef to allow the death test sharing the fixture */
+  typedef IOInterceptTest IOInterceptDeathTest;
+
+  /** Derive a parametrized fixture to test conversion to log messages */
+  class IOInterceptParamTest: public IOInterceptTest, public ::testing::WithParamInterface<logconvert_params_t> {};
+
+  /** Test if output is converted to a log message correctly */
+  TEST_P(IOInterceptParamTest, ConvertToLogMessage)
+  {
+    // first let's get the parameters
+    LogConfig::ELogLevel level;
+    std::string raw_message, formatted_message;
+    bool useStdout, generateMessage;
+    std::tie(level, raw_message, formatted_message, useStdout, generateMessage) = GetParam();
+    // now create some output and convert it to log messages
+    IOIntercept::OutputToLogMessages capture("capture_name", level, level);
+    capture.start();
+    (useStdout ? std::cout : std::cerr) << raw_message;
+    capture.finish();
+    // check that the amount of log messages is correct
+    ASSERT_EQ(m_messages.size(), generateMessage ? 1 : 0);
+    if (!generateMessage) return;
+    // and also check the message level and content
+    LogMessage& msg = m_messages.front();
+    ASSERT_EQ(msg.getLogLevel(), level);
+    ASSERT_EQ(msg.getMessage(), "Output from capture_name:\ncapture_name: " + formatted_message);
+  }
+
+  /** all the parameter combinations we want to test for conversion
+   * the fields are: log level, raw message, formatted message, use stdout?, should message be generated?
+   */
+  logconvert_params_t logconvert_params[] = {
+    // test info message for stdout and stderr
+    {LogConfig::c_Info, "foo" , "foo", false, true},
+    {LogConfig::c_Info, "foo" , "foo", true, true},
+    // also for error
+    {LogConfig::c_Error, "foo" , "foo", false, true},
+    {LogConfig::c_Error, "foo" , "foo", true, true},
+    // ok, test the other levels only for stdout
+    {LogConfig::c_Warning, "foo" , "foo", false, true},
+    {LogConfig::c_Result, "foo" , "foo", false, true},
+    // test that empty message gets removed
+    {LogConfig::c_Info, "" , "", false, false},
+    // also with whitespace
+    {LogConfig::c_Info, " " , "", false, false},
+    {LogConfig::c_Info, " \t " , "", false, false},
+    {LogConfig::c_Info, " \n " , "", false, false},
+    // trim space at end
+    {LogConfig::c_Info, "message\n\n   \t\r\n" , "message", false, true},
+    // trim space at beginning
+    {LogConfig::c_Info, "   \n\t\nmessage" , "message", false, true},
+    // but not the spaces in the first line which also contains text to not break alignment of formatted output
+    {LogConfig::c_Info, "   \n\tmessage" , "\tmessage", false, true},
+    {LogConfig::c_Info, "   \n  message" , "  message", false, true},
+
+  };
+
+  /** instantiate tests for all the parameters */
+  INSTANTIATE_TEST_CASE_P(Params, IOInterceptParamTest, ::testing::ValuesIn(logconvert_params));
+
+  /** check that the indentation is applied for all lines */
+  TEST_F(IOInterceptTest, ConvertCheckIndent)
+  {
+    IOIntercept::OutputToLogMessages capture("indent");
+    capture.start();
+    std::cout << "this is\na multi line message";
+    capture.finish();
+    ASSERT_EQ(m_messages.size(), 1);
+    LogMessage& msg = m_messages.front();
+    ASSERT_EQ(msg.getMessage(), "Output from indent:\nindent: this is\nindent: a multi line message");
+  }
+
+  /** and that it can be set correctly */
+  TEST_F(IOInterceptTest, ConvertSetIndent)
+  {
+    IOIntercept::OutputToLogMessages capture("indent");
+    capture.start();
+    std::cout << "this is\na multi line message";
+    capture.setIndent("--->");
+    capture.finish();
+    ASSERT_EQ(m_messages.size(), 1);
+    LogMessage& msg = m_messages.front();
+    ASSERT_EQ(msg.getMessage(), "Output from indent:\n--->this is\n--->a multi line message");
+  }
+
+  /** empty indentation should work too */
+  TEST_F(IOInterceptTest, ConvertEmptyIndent)
+  {
+    IOIntercept::OutputToLogMessages capture("indent");
+    capture.start();
+    capture.setIndent("");
+    std::cout << "this is\na multi line message";
+    capture.finish();
+    ASSERT_EQ(m_messages.size(), 1);
+    LogMessage& msg = m_messages.front();
+    ASSERT_EQ(msg.getMessage(), "Output from indent:\nthis is\na multi line message");
+  }
+
   /** test that capturing stdout works */
-  TEST(IOIntercept, CaptureStdOut)
+  TEST_F(IOInterceptTest, CaptureStdOut)
   {
     IOIntercept::CaptureStdOut capture;
     ASSERT_FALSE(capture.finish());
@@ -35,8 +175,9 @@ namespace {
     ASSERT_TRUE(capture.finish());
     ASSERT_EQ(capture.getStdOut(), "this is a test");
   }
+
   /** test that capturing stderr works */
-  TEST(IOIntercept, CaptureStdErr)
+  TEST_F(IOInterceptTest, CaptureStdErr)
   {
     IOIntercept::CaptureStdErr capture;
     ASSERT_FALSE(capture.finish());
@@ -57,7 +198,7 @@ namespace {
   }
 
   /** test if capturing large output works as expected */
-  TEST(IOIntercept, CaptureLargeOutput)
+  TEST_F(IOInterceptTest, CaptureLargeOutput)
   {
     IOIntercept::CaptureStdOut capture;
     ASSERT_TRUE(capture.start());
@@ -108,7 +249,7 @@ namespace {
   }
 
   /** test discarding output */
-  TEST(IOInterceptDeathTest, DiscardStdOut)
+  TEST_F(IOInterceptDeathTest, DiscardStdOut)
   {
     IOIntercept::DiscardStdOutStdErr discard;
     ASSERT_FALSE(discard.finish());

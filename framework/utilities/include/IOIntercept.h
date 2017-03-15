@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <string>
+#include <framework/logging/LogConfig.h>
 
 namespace Belle2 {
   /** Encapsulate all classes needed to intercept stdout and stderr */
@@ -55,6 +56,10 @@ namespace Belle2 {
        */
       static void readFD(int fd, std::string& out);
     private:
+      /** Replace the file descriptor of m_fileObject with the one passed
+       * @param fileDescriptor file descriptor to be set for m_fileObject using dup2()
+       */
+      bool replaceFD(int fileDescriptor);
       /** C++ stream object, only needed to flush before replacement */
       std::ostream& m_stream;
       /** File object of the file we want to replace, needed to obtain file descriptor and to flush */
@@ -65,11 +70,6 @@ namespace Belle2 {
       int m_replacementFD{ -1};
       /** Check whether we are already capturing */
       bool m_capturing{false};
-
-      /** Replace the file descriptor of m_fileObject with the one passed
-       * @param fileDescriptor file descriptor to be set for m_fileObject using dup2()
-       */
-      bool replaceFD(int fileDescriptor);
     };
 
     /** Dummy class which keeps the stream unmodified */
@@ -121,7 +121,6 @@ namespace Belle2 {
       int m_pipeReadFD{ -1};
       /** string with the output, only filled after finish() */
       std::string m_outputStr;
-
     };
 
 
@@ -132,11 +131,12 @@ namespace Belle2 {
      * \code{.cc}
        IOIntercept::InterceptOutput<IOIntercept::CaptureStream, IOIntercept::DiscardStream> capture;
        capture.start();
-       // here all will be intercepted. Output to stdout will be buffered while
+       // here all output will be intercepted. Output to stdout will be buffered while
        // output to stderr will be discarded immediately.
        capture.finish();
        // output restored to normal. Buffered stdout can now be retrieved
        std::cout << "Output was: " << capture.getStdOut() << std::endl;
+       \endcode
      *
      * Shorthand classes are defined for all use cases, so in the above example
      * we could have just used IOIntercept::CaptureStdOutDiscardStdErr;
@@ -194,5 +194,76 @@ namespace Belle2 {
     using CaptureStdOutDiscardStdErr = InterceptOutput<CaptureStream, DiscardStream>;
     /** Capture stderr and discard stdout */
     using DiscardStdOutCaptureStdErr = InterceptOutput<DiscardStream, CaptureStream>;
+
+    /** Capture stdout and stderr and convert into log messages.
+     * This class can be used to convert output by a third party library into basf2 log messages.
+     *
+     * For example
+     * \code{.cc}
+       IOIntercept::OutputToLogMessages capture("external_library");
+       capture.start();
+       // here all output will be intercepted. the call to finish will convert
+       // any output to stdout to a B2INFO message and any output to stderr to
+       // a B2ERROR message
+       std::cerr << "this is my error"
+       capture.finish();
+       \endcode
+     *
+     * this will emit an ERROR message of the form
+     *
+     *    [ERROR] Output from external_library:
+     *    external_library: this is my error
+     *
+     * The leading indentation defaults to the name supplied on construction
+     * plus a colon and can be changed using the setIndent() member.
+     *
+     * \warning to NOT use this class for big periods of time. It is intended
+     *   to be used around short calls to external software which produces
+     *   output that cannot be converted to log messages otherwise. Don't try
+     *   to just enable it the whole time. Not only will this cut off ouput
+     *   that is longer then 64kB, it will also generate long and meaningless
+     *   messages and will intercept normal log messages emitted while capture
+     *   is active as well.
+     */
+    class OutputToLogMessages: public CaptureStdOutStdErr {
+    public:
+      /** Full constructor to choose the log levels and debug levels for both stdout and stderr
+       * @param name name of the code causing the output, for example "ROOT", "Rave", ...
+       * @param stdoutLevel severity of the log message to be emitted for output on stdout
+       * @param stderrLevel severity of the log message to be emitted for output on stderr
+       * @param stdoutDebugLevel debug level for the log message to be emitted for output on stdout if stdoutLevel is c_Debug
+       * @param stderrDebugLevel debug level for the log message to be emitted for output on stderr if stderrLevel is c_Debug
+       */
+      OutputToLogMessages(const std::string& name, LogConfig::ELogLevel stdoutLevel, LogConfig::ELogLevel stderrLevel,
+                          int stdoutDebugLevel, int stderrDebugLevel):
+        m_name(name), m_indent(name + ": "), m_stdoutLevel(stdoutLevel), m_stderrLevel(stderrLevel),
+        m_stdoutDebugLevel(stdoutDebugLevel), m_stderrDebugLevel(stderrDebugLevel)
+      {}
+      /** Constructor to choose the log levels both stdout and stderr.
+       * If the level is set to c_Debug a debug level of 100 is used.
+       * @param name name of the code causing the output, for example "ROOT", "Rave", ...
+       * @param stdoutLevel severity of the log message to be emitted for output on stdout
+       * @param stderrLevel severity of the log message to be emitted for output on stderr
+       */
+      OutputToLogMessages(const std::string& name, LogConfig::ELogLevel stdoutLevel, LogConfig::ELogLevel stderrLevel):
+        OutputToLogMessages(name, stdoutLevel, stderrLevel, 100, 100)
+      {}
+      /** Simple constructor which uses c_Info for output on stdout and c_Error for output on stderr
+       * @param name name of the code causing the output, for example "ROOT", "Rave", ...
+       */
+      OutputToLogMessages(const std::string& name): OutputToLogMessages(name, LogConfig::c_Info, LogConfig::c_Error)
+      {}
+      /** Set the indent for each line of the output, default is the supplied name + `": "` */
+      void setIndent(const std::string& indent) { m_indent = indent; }
+      /** Finish the capture and emit the message if output has appeard on stdout or stderr */
+      bool finish();
+    private:
+      const std::string m_name;
+      std::string m_indent{" | "};
+      LogConfig::ELogLevel m_stdoutLevel;
+      LogConfig::ELogLevel m_stderrLevel;
+      int m_stdoutDebugLevel;
+      int m_stderrDebugLevel;
+    };
   }
 }

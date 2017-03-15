@@ -14,6 +14,7 @@
 #include <cstring>
 #include <unistd.h>
 #include <fcntl.h>
+#include <boost/algorithm/string.hpp>
 
 namespace Belle2 {
   namespace IOIntercept {
@@ -100,6 +101,54 @@ namespace Belle2 {
     {
       // no need to close the write part, done by base class
       if (m_pipeReadFD >= 0) close(m_pipeReadFD);
+    }
+
+    namespace {
+      /** small helper function to format output into a nice error message:
+       *  - do nothing if message is empty
+       *  - trim white space from message
+       *  - replace all newlines and add an indentation marker to distuingish
+       *    that this is sill part of the message
+       *
+       *  @param logLevel log level of the message
+       *  @param debugLevel debug level in case logLevel is c_Debug
+       *  @param name name of the thing causing the output, e.g. Geant4
+       *  @param string to add to the beginning of each line of the message
+       *  @param message actuall message to output
+       */
+      void sendLogMessage(LogConfig::ELogLevel logLevel, int debugLevel, const std::string& name, const std::string& indent,
+                          std::string message)
+      {
+        // avoid formatting if message will not be shown anyway
+        if (!LogSystem::Instance().isLevelEnabled(logLevel, debugLevel)) return;
+        // remove trailing whitespace and end of lines
+        boost::algorithm::trim_right(message);
+        // remove empty lines but keep white space in non empty first line
+        while (!message.empty()) {
+          std::string new_message = boost::algorithm::trim_left_copy_if(message, boost::algorithm::is_any_of(" \t\r"));
+          if (new_message.empty()) {
+            message = new_message;
+          } else if (new_message[0] == '\n') {
+            message = new_message.substr(1, std::string::npos);
+            continue;
+          }
+          break;
+        }
+        // is the message empty?
+        if (message.empty()) return;
+        // add indentation
+        boost::algorithm::replace_all(message, "\n", "\n" + indent);
+        // fine, show message
+        B2LOG(logLevel, debugLevel, "Output from " << name << ":\n" << indent << message);
+      }
+    }
+
+    bool OutputToLogMessages::finish()
+    {
+      bool result = CaptureStdOutStdErr::finish();
+      sendLogMessage(m_stdoutLevel, m_stdoutDebugLevel, m_name, m_indent, getStdOut());
+      sendLogMessage(m_stderrLevel, m_stderrDebugLevel, m_name, m_indent, getStdErr());
+      return result;
     }
   }
 }

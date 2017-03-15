@@ -10,15 +10,17 @@ input_dir = '/home/benjamin/Desktop/BG/'
 output_dir = '/home/benjamin/Desktop/BG/output'
 
 components = []
-components.append(('Coulomb_HER', 100))
-components.append(('Coulomb_LER', 100))
-components.append(('RBB_HER', 100))
-components.append(('RBB_LER', 100))
-components.append(('Touschek_HER', 100))
-components.append(('Touschek_LER', 100))
-components.append(('twoPhoton', 200))
+# components.append(('Coulomb_HER', 100))
+# components.append(('Coulomb_LER', 100))
+# components.append(('RBB_HER', 100))
+# components.append(('RBB_LER', 100))
+components.append(('Touschek_HER', 1))
+# components.append(('Touschek_LER', 100))
+# components.append(('twoPhoton', 200))
 
 files = [input_dir + s + '_' + str(t) + 'us.root' for (s, t) in components]
+
+files = [input_dir + 'output_Touschek_HER_study_1.root']
 
 
 pxd_branches = ['MCParticles', 'MCParticlesToPXDSimHits',
@@ -26,7 +28,7 @@ pxd_branches = ['MCParticles', 'MCParticlesToPXDSimHits',
 
 input = register_module('RootInput')
 input.param('inputFileNames', files)
-# input.param('branchNames', svd_branches)
+# input.param('branchNames', pxd_branches)
 
 # Histogram manager immediately after master module
 histo = register_module('HistoManager')
@@ -48,11 +50,13 @@ pxdDigi = register_module('PXDDigitizer')
 # PXD clusterizer
 pxdClust = register_module('PXDClusterizer')
 
-# SVD beam background
+# PXD beam background
 pxdBkg = register_module('PXDBackground')
-pxdBkg.param('componentNames', [s for (s, t) in components])
-pxdBkg.param('componentTimes', [t for (s, t) in components])
-svdBkg.param('outputDirectory', output_dir)
+# pxdBkg.param('componentNames', [s for (s, t) in components])
+# pxdBkg.param('componentTimes', [t for (s, t) in components])
+pxdBkg.param('componentName', 'Touschek_HER')
+pxdBkg.param('componentTime', 1.0)
+pxdBkg.param('outputDirectory', output_dir)
 
 pxdBkg.set_log_level(LogLevel.DEBUG)
 pxdBkg.set_debug_level(10)

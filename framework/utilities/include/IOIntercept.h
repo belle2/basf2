@@ -25,7 +25,6 @@ namespace Belle2 {
        *
        * @param stream C++ ostream which is associated with the file descriptor we want to intercept
        * @param fileObject file object which is associated with the file descriptor we want to intercept
-       * @param replacementFD file descriptor to use as replacement while capturing
        */
       StreamInterceptor(std::ostream& stream, FILE* fileObject);
       /** close file descriptors */

@@ -39,13 +39,13 @@ namespace Belle2 {
       static std::unique_ptr<char[]> buffer(new char[1024]);
       // so then, read everything
       while (true) {
-        int size = read(fd, buffer.get(), 1024);
+        ssize_t size = read(fd, buffer.get(), 1024);
         if (size < 0) {
           // in case we get interrupted by signal, try again
           if (errno == EINTR)  continue;
           break;
         }
-        out.append(buffer.get(), size);
+        out.append(buffer.get(), static_cast<size_t>(size));
       }
     }
 
@@ -65,13 +65,11 @@ namespace Belle2 {
         return false;
       }
       while (dup2(fileDescriptor, currentFD) < 0) {
-        if (errno == EINTR || errno == EBUSY) {
-          //sleep and repeat
-        } else {
+        if (errno != EINTR && errno != EBUSY) {
           B2ERROR("Error in dup2(), cannot replace file descriptor: " << std::strerror(errno));
           return false;
-          break;
         }
+        // interrupted or busy, let's try again
       }
       return true;
     }

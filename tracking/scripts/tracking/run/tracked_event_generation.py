@@ -28,8 +28,10 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
         'UseSVDHits': True,
         'UseCDCHits': True,
         'UseOnlyAxialCDCHits': False,
-        'WhichParticles': ['primary'],
-        'EnergyCut': 0.1,
+        'UseOnlyBeforeTOP': True,
+        'UseReassignedHits': True,
+        'UseNLoops': 1,
+        'WhichParticles': [],
     }
 
     #: Add the track fitting to the execution

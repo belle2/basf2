@@ -334,8 +334,8 @@ std::pair<double, TVector3> QualityEstimators::tripletFit(std::vector<PositionIn
     const double d12 = sqrt(d12sq);
     const double d02 = sqrt(d02sq);
 
-    const double z01 = std::abs(hit1.Z() - hit0.Z());
-    const double z12 = std::abs(hit2.Z() - hit1.Z());
+    const double z01 = hit1.Z() - hit0.Z();
+    const double z12 = hit2.Z() - hit1.Z();
 
     const double R_C = (d01 * d12 * d02) / sqrt(-d01sq * d01sq - d12sq * d12sq - d02sq * d02sq + 2 * d01sq * d12sq + 2 * d12sq * d02sq +
                                                 2 *
@@ -374,7 +374,7 @@ std::pair<double, TVector3> QualityEstimators::tripletFit(std::vector<PositionIn
     double R3D = - (eta * PhiTilde * sin(theta) * sin(theta) + beta * ThetaTilde);
     R3D *= 1. / (eta * eta * sin(theta) * sin(theta) + beta * beta);
     const double b = 4.5 / bField * sqrt(XoverX0);
-    const double sigmaMS = b / R3D;
+    const double sigmaMS = 50. * b / R3D;
 
     double sigmaR3DSquared = pow(sigmaMS, 2) / (pow(eta * sin(theta), 2) + pow(beta, 2));
 
@@ -486,8 +486,60 @@ std::pair<double, TVector3> QualityEstimators::riemannHelixFit(const std::vector
 
   // Calculate Chi Squared for circle fit
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> d_over_sigma = W * d_trans;
-  Precision chi2 = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits,
-                   1).transpose() * (d_over_sigma.cwiseProduct(d_over_sigma));
+  Precision chi2 = d_over_sigma.transpose() * d_over_sigma;
+
+  // Temporary alternative calculation of chi2 for circle fit using Karimaeki circle fit
+  Precision divisor = 1. / traceOfW;
+  Eigen::Matrix<Precision, Eigen::Dynamic, 1> unitvec = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits, 1);
+  Precision meanX = unitvec.transpose() * W * X.col(0);
+  meanX *= divisor;
+  Precision meanY = unitvec.transpose() * W * X.col(1);
+  meanY *= divisor;
+  Precision meanXY = unitvec.transpose() * W * (X.col(0).cwiseProduct(X.col(1)));
+  meanXY *= divisor;
+  Precision meanX2 = unitvec.transpose() * W * (X.col(0).cwiseProduct(X.col(0)));
+  meanX2 *= divisor;
+  Precision meanY2 = unitvec.transpose() * W * (X.col(1).cwiseProduct(X.col(1)));
+  meanY2 *= divisor;
+  Precision meanXR2 = unitvec.transpose() * W * (X.col(0).cwiseProduct(X.col(2)));
+  meanXR2 *= divisor;
+  Precision meanYR2 = unitvec.transpose() * W * (X.col(1).cwiseProduct(X.col(2)));
+  meanYR2 *= divisor;
+  Precision meanR2 = unitvec.transpose() * W * X.col(2);
+  meanR2 *= divisor;
+  Precision meanR4 = unitvec.transpose() * W * (X.col(2).cwiseProduct(X.col(2)));
+  meanR4 *= divisor;
+
+  // covariances:
+  Precision covXX = meanX2 - meanX * meanX;
+  Precision covXY = meanXY - meanX * meanY;
+  Precision covYY = meanY2 - meanY * meanY;
+  Precision covXR2 = meanXR2 - meanX * meanR2;
+  Precision covYR2 = meanYR2 - meanY * meanR2;
+  Precision covR2R2 = meanR4 - meanR2 * meanR2;
+
+  // q1, q2: helping variables, to make the code more readable
+  Precision q1 = covR2R2 * covXY - covXR2 * covYR2;
+  Precision q2 = covR2R2 * (covXX - covYY) - covXR2 * covXR2 + covYR2 * covYR2;
+
+  Precision pocaPhi = 0.5 * atan2(2. * q1, q2);
+
+  Precision sinPhi = sin(pocaPhi);
+  Precision cosPhi = cos(pocaPhi);
+  Precision kappa = (sinPhi * covXR2 - cosPhi * covYR2) / covR2R2;
+  Precision delta = -kappa * meanR2 + sinPhi * meanX - cosPhi * meanY;
+  Precision rootTerm = sqrt(1. - 4.*delta * kappa);
+  Precision curvature = 2.*kappa / (rootTerm);
+  Precision pocaD = 2.*delta / (1. + rootTerm);
+
+  if ((curvature < 0 && CalcCurvature()) || (curvature > 0 && !CalcCurvature())) {
+    curvature = -curvature;
+    pocaPhi = pocaPhi + M_PI;
+    pocaD = -pocaD;
+  }
+
+  chi2 = traceOfW * (1. + pocaD / rho) * (1. + curvature * pocaD) *
+         (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY + cosPhi * cosPhi * covYY - kappa * kappa * covR2R2);
 
   // Line Fit for extension to Helix Fit
   Eigen::Matrix<Precision, Eigen::Dynamic, 1> a = Eigen::Matrix<Precision, Eigen::Dynamic, 1>::Ones(nHits, 1) * c + n(2) * X.col(2);
@@ -556,7 +608,7 @@ std::pair<double, TVector3> QualityEstimators::riemannHelixFit(const std::vector
   Precision pZ = pT * p(1);
   momVec(2) = - pZ;
 
-  return std::make_pair(rho, TVector3(momVec(0), momVec(1), momVec(2)));
+  return std::make_pair(chi2_total, TVector3(momVec(0), momVec(1), momVec(2)));
 }
 
 

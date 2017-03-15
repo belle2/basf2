@@ -141,7 +141,13 @@ namespace Belle2 {
     std::pair<double, TVector3> tripletFit() { return tripletFit(m_hits); }
 
 
+    /** Performs a extended Riemann Helix Fit and returns a chi2 value and the momentum Vector **/
     std::pair<double, TVector3> riemannHelixFit(const std::vector<PositionInfo*>* hits);
+
+
+    /** Performs riemannHelixFit with current SPTC **/
+    std::pair<double, TVector3> riemannHelixFit() { return riemannHelixFit(m_hits); };
+
 
     /** does a complete helixFit of the given hits */
     std::pair<double, TVector3> helixFit(std::vector<PositionInfo*> const* hits, bool useBackwards = false,

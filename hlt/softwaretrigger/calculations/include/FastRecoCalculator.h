@@ -46,6 +46,9 @@ namespace Belle2 {
     private:
       /// Internal storage of the cdc reco tracks.
       StoreArray <RecoTrack> m_cdcRecoTracks;
+      /// Internal storage of the all reco tracks, in case we ran without SVD,
+      /// where the cdc reco tracks are stored into the "normal" reco tracks store array
+      StoreArray <RecoTrack> m_recoTracks;
       /// Internal storage of the ecl clusters.
       StoreArray <ECLCluster> m_eclClusters;
       /// Cached transformation object to be used in each calculation (we cache it because of the slow database fetch).

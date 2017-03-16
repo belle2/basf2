@@ -51,10 +51,13 @@ namespace Belle2 {
 
     private:
       /// Parameter : Which alias resolutions should be applied
-      std::vector<std::string> m_param_investigateAlias = { "full", "borders", /*"middle"*/};
+      std::vector<std::string> m_param_investigateAlias = { "full", "cross", "borders", /*"middle"*/};
 
       /// Switch whether the complete segment should be aliased.
       bool m_fullAlias = false; // Activated by the parameter
+
+      /// Switch whether the segment should be aliased at the waist where an rl side switch was missed.
+      bool m_crossAliases = false; // Activated by the parameter
 
       /// Switch whether the border hits at the beginning and the end should be aliased.
       bool m_borderAliases = false; // Activated by the parameter

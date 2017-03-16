@@ -2292,7 +2292,7 @@ namespace Belle2 {
       const TCTrack* track3D = _trackList3D[itr];
       if (!track3D->fitted()) continue;
       double phi0 = remainder(track3D->helix().phi0() + M_PI_2, 2. * M_PI);
-      double omega = track3D->charge() / track3D->helix().radius();
+      double omega = 1. / track3D->helix().radius();
       double chi2 = track3D->get2DFitChi2();
       double z = track3D->helix().dz();
       double cot = track3D->helix().tanl();

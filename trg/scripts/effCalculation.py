@@ -23,6 +23,8 @@ class EffModule(Module):
                 self.Nsubtrg_event[i] += 1
 
     def terminate(self):
+        if self.Ntot_event == 0:
+            return
         sp = ' '
         print('\n')
         eff_tot = self.Ntrg_event / self.Ntot_event * 100.0

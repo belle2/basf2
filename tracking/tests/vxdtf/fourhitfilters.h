@@ -26,11 +26,7 @@
 //Eigen
 #include <Eigen/Dense>
 
-using namespace std;
-
 namespace Belle2 {
-
-
 
   /** Set up a few arrays and objects in the datastore */
   class FourHitFiltersTest : public ::testing::Test {

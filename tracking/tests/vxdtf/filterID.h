@@ -6,8 +6,6 @@
 // #include <RKTrackRep.h>
 #include <gtest/gtest.h>
 
-using namespace std;
-
 namespace Belle2 {
 
 

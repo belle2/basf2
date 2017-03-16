@@ -7,24 +7,19 @@
 
 #include <TRandom3.h>
 
-using namespace std;
-
-
 namespace Belle2 {
-
-
 
   /** Set up a few arrays and objects in the datastore */
   class VXDTFRawSecMapTest : public ::testing::Test {
 
   public:
 
-    typedef pair<double, double> PairDouble; /**< shortcut for a pair of double */
+    typedef std::pair<double, double> PairDouble; /**< shortcut for a pair of double */
 
 // member-functions are defined within this file after the tests
     /** initilizes most needed values for the tests */
-    void initializeRawMap(PairDouble quantiles = make_pair(0, 1),
-                          PairDouble smallQuantiles = make_pair(0, 1),
+    void initializeRawMap(PairDouble quantiles = std::make_pair(0, 1),
+                          PairDouble smallQuantiles = std::make_pair(0, 1),
                           double minSampleThreshold = 1,
                           double smallSampleThreshold = 10,
                           double smallStretchFactor = 0,
@@ -42,7 +37,7 @@ namespace Belle2 {
 
     /** expects a sorted sample and a pair of quantiles (.first is the smaller one) between 0 and 1 */
     PairDouble findQuantilesInSample(VXDTFRawSecMap::CutoffValues& sample,
-                                     PairDouble quantiles = make_pair(0, 1));
+                                     PairDouble quantiles = std::make_pair(0, 1));
 
 
     /** the map which shall be tested */
@@ -76,7 +71,7 @@ namespace Belle2 {
     EXPECT_EQ(biggestValue, myResult.second);
 
     // extra check for test-member:
-    PairDouble foundQuantiles = findQuantilesInSample(aSample, make_pair(0, 1));
+    PairDouble foundQuantiles = findQuantilesInSample(aSample, std::make_pair(0, 1));
     EXPECT_EQ(smallestValue, foundQuantiles.first);
     EXPECT_EQ(biggestValue, foundQuantiles.second);
 
@@ -90,7 +85,7 @@ namespace Belle2 {
     EXPECT_EQ(biggestValue, mySmallResult.second);
 
     // extra check for test-member:
-    PairDouble foundQuantiles2 = findQuantilesInSample(aSmallSample, make_pair(0, 1));
+    PairDouble foundQuantiles2 = findQuantilesInSample(aSmallSample, std::make_pair(0, 1));
     EXPECT_EQ(smallestValue, foundQuantiles2.first);
     EXPECT_EQ(biggestValue, foundQuantiles2.second);
   }
@@ -107,8 +102,8 @@ namespace Belle2 {
            sigmaValue = 0.4, // small but possible probability of negative numbers for big sampleSize
            smallestValue = std::numeric_limits<int>::max(), // no typo, will be replaces by smallest value of sample
            biggestValue = std::numeric_limits<int>::min();  // no typo, will be replaces by biggest value of sample
-    PairDouble quantiles = make_pair(0.02, 0.91),
-               smallQuantiles = make_pair(0.02, 0.91);
+    PairDouble quantiles = std::make_pair(0.02, 0.91),
+               smallQuantiles = std::make_pair(0.02, 0.91);
     initializeRawMap(
       quantiles, // quantiles
       smallQuantiles, // smallQuantiles
@@ -216,6 +211,6 @@ namespace Belle2 {
 
     B2INFO("findQuantilesInSample: sampleSize: " << sampleSize << ", quantiles: " << quantiles.first << "/" << quantiles.second <<
            ", found indices: " << lowerIndex << "/" << higherIndex << ", found values: " << *lowerIter << "/" << *higherIter);
-    return make_pair(*lowerIter, *higherIter);
+    return std::make_pair(*lowerIter, *higherIter);
   }
 }

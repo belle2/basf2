@@ -5,12 +5,7 @@
 // #include <RKTrackRep.h>
 #include <gtest/gtest.h>
 
-using namespace std;
-
 namespace Belle2 {
-
-
-
 
   /** Set up a few arrays and objects in the datastore */
   class HitTFInfoTest : public ::testing::Test {
@@ -109,8 +104,8 @@ namespace Belle2 {
     HitTFInfo aHit = HitTFInfo();
     aHit.setSectorID(12);
 
-    aHit.push_back_UsedParticles(make_pair(11, 0.5));
-    aHit.push_back_UsedParticles(make_pair(13, 0.4));
+    aHit.push_back_UsedParticles(std::make_pair(11, 0.5));
+    aHit.push_back_UsedParticles(std::make_pair(13, 0.4));
 
     aHit.containsParticle(11);
 

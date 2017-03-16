@@ -5,13 +5,7 @@
 
 #include <math.h> // sqrt, atan, isinf, ...
 
-using namespace std;
-
 namespace Belle2 {
-
-
-
-
 
   /** should behave differently for different verbosity-levels given - class*/
   template <int Verbosity> class VerbosityClass {
@@ -53,7 +47,7 @@ namespace Belle2 {
   public:
 
     /** just a small dummy-function to test the expected behavior */
-    bool doStuffHere(vector<double> testVector = { 42})
+    bool doStuffHere(std::vector<double> testVector = { 42})
     {
       if (testVector[0] == 42) return true;
       return false;

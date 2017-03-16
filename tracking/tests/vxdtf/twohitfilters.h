@@ -5,11 +5,7 @@
 // #include <RKTrackRep.h>
 #include <gtest/gtest.h>
 
-using namespace std;
-
 namespace Belle2 {
-
-
 
   /** Set up a few arrays and objects in the datastore */
   class TwoHitFiltersTest : public ::testing::Test {

@@ -6,11 +6,7 @@
 #include <tracking/dataobjects/FullSecID.h>
 #include <tracking/trackFindingVXD/sectorMapTools/Sector.h>
 
-using namespace std;
-
 namespace Belle2 {
-
-
 
   /** Set up a few arrays and objects in the datastore */
   class SectorTest : public ::testing::Test {

@@ -23,8 +23,6 @@
 //Eigen
 #include <Eigen/Dense>
 
-using namespace std;
-
 namespace Belle2 {
 
 
@@ -49,9 +47,9 @@ namespace Belle2 {
 //     LittleHelper hBox = LittleHelper(); // smears hits using smearValueGauss(double low, double high, double mean, double sigma)
 //     double sigma = 0.001, scalePhi = 11.9, scaleZ = 88., t90 = M_PI * 0.5, radius = 11.;
 //     double aVal = 0.0001, bVal = 0.006, cVal = 0.007, dVal = 0.011, eVal = 0.0124, fVal = 0.018, gVal = 0.0202, hVal = 0.039, iVal = 0.042, jVal = 0.052, kVal = 0.055, lVal = 0.068, mVal = 0.0715;
-//     vector<TVector3> highPtMini, highPtMaxi; // carry hitPositions;
-//     vector<PositionInfo> tempMiniStuff, tempMaxiStuff, tempTestStuff; // tempVectors to be able to keep PositionInfo
-//     vector<PositionInfo*> miniStuff, maxiStuff, testStuff; // carry positionInfo (TrackletFilters expects pointers)
+//     std::vector<TVector3> highPtMini, highPtMaxi; // carry hitPositions;
+//     std::vector<PositionInfo> tempMiniStuff, tempMaxiStuff, tempTestStuff; // tempVectors to be able to keep PositionInfo
+//     std::vector<PositionInfo*> miniStuff, maxiStuff, testStuff; // carry positionInfo (TrackletFilters expects pointers)
 //
 //     //phi does not have to be smeared to simulate the realistic situation, some hits will be positioned pretty near next to each other
 //     a.SetMagThetaPhi(hBox.smearValueGauss(-1111., 1111., radius, sigma), t90, aVal * scalePhi),
@@ -108,7 +106,7 @@ namespace Belle2 {
 //     TVector3 testd = TVector3(2., 0., 0);
 //     TVector3 teste = TVector3(1., -1., 0);
 //     TVector3 moveSmall = TVector3(0.1, 0.0, 0.);
-//     vector<TVector3> testVector;
+//     std::vector<TVector3> testVector;
 //     testVector.push_back(testa += moveSmall); testVector.push_back(testb += moveSmall); testVector.push_back(testc += moveSmall); testVector.push_back(testd += moveSmall); testVector.push_back(teste += moveSmall);
 //
 //     for (TVector3 & hit : testVector) {
@@ -159,13 +157,13 @@ namespace Belle2 {
 //     hitC.SetMagThetaPhi(gRandom->Gaus(radius, sigma) , gRandom->Gaus(M_PI * 0.5, sigma), dVal * scalePhi); hitC += moveCircle;
 //     hitD.SetMagThetaPhi(gRandom->Gaus(radius, sigma) , gRandom->Gaus(M_PI * 0.5, sigma), eVal * scalePhi); hitD += moveCircle;
 //     hitE.SetMagThetaPhi(gRandom->Gaus(radius, sigma) , gRandom->Gaus(M_PI * 0.5, sigma), fVal * scalePhi); hitE += moveCircle;
-//     vector<TVector3> hits;
+//     std::vector<TVector3> hits;
 //     hits.push_back(hitA), hits.push_back(hitB), hits.push_back(hitC), hits.push_back(hitD), hits.push_back(hitE);
 //
 //     f3h.resetValues(hitA, hitB, hitC);
 //
-//     vector<PositionInfo*> compareVec;
-//     vector<PositionInfo> tempCompareVec;
+//     std::vector<PositionInfo*> compareVec;
+//     std::vector<PositionInfo> tempCompareVec;
 //
 //  /// optional fileOutput, uncomment if needed!
 // //     ofstream myfile;
@@ -202,7 +200,7 @@ namespace Belle2 {
 //
 // //    B2WARNING("after comparison-test, chi2 is " << chi2 << ", pocaPtPhi,pocaR,estimatedRadius is: " << pocaPtPhi << "," << pocaR << "," << estimatedRadius)
 //
-//     pair<double, TVector3> returnValues = aFilter.helixFit();
+//     std::pair<double, TVector3> returnValues = aFilter.helixFit();
 //
 //     EXPECT_NEAR(14.511622, returnValues.first, 0.15); // one percent deviation should be enough
 //
@@ -300,8 +298,8 @@ namespace Belle2 {
   TEST_F(TrackletFiltersTest, helixFitterTest)
   {
     TrackletFilters aFilter = TrackletFilters();
-    vector<PositionInfo*> badVec1, badVec2, badVec3, badVec4, badVec5;
-    vector<PositionInfo> tbadVec1, tbadVec2, tbadVec3, tbadVec4, tbadVec5;
+    std::vector<PositionInfo*> badVec1, badVec2, badVec3, badVec4, badVec5;
+    std::vector<PositionInfo> tbadVec1, tbadVec2, tbadVec3, tbadVec4, tbadVec5;
     double pocaPtPhi, pocaR, estimatedCurvature;
 
 //     stringstream HitInfos;
@@ -346,7 +344,7 @@ namespace Belle2 {
     aFilter.resetValues(&badVec1);
     aFilter.resetMagneticField(0.976);
 
-    pair<double, TVector3> returnValues = aFilter.helixFit();
+    std::pair<double, TVector3> returnValues = aFilter.helixFit();
 //    EXPECT_FLOAT_EQ(15.0808, returnValues.second.Mag());
 
     aFilter.circleFit(pocaPtPhi, pocaR, estimatedCurvature);
@@ -578,7 +576,7 @@ namespace Belle2 {
     TrackletFilters aFilter = TrackletFilters();
     PositionInfo hit1, hit2, hit3;
 
-    vector<PositionInfo*> v1;
+    std::vector<PositionInfo*> v1;
 
     hit1.hitPosition = TVector3(-6.516, -0.930059, -0.153305);  hit1.hitSigma = TVector3(.1, .1, .1);
     hit2.hitPosition = TVector3(-3.516, -0.862418, -0.143971);  hit2.hitSigma = TVector3(.1, .1, .1);
@@ -606,7 +604,7 @@ namespace Belle2 {
     hit1, hit2, hit3, hit4, hit5, hit6, hit7,
           hit11, hit12, hit13, hit14, hit15;
 
-    vector<PositionInfo*> v1, v2, v3;
+    std::vector<PositionInfo*> v1, v2, v3;
 
     hit1.hitPosition = TVector3(1., 1., 0.);  hit1.hitSigma = TVector3(.1, .1, .1);
     hit2.hitPosition = TVector3(2., 2., 0.);  hit2.hitSigma = TVector3(.1, .1, .1);
@@ -702,7 +700,7 @@ namespace Belle2 {
     PositionInfo
     hit1, hit2, hit3;
 
-    vector<PositionInfo*> v;
+    std::vector<PositionInfo*> v;
 
     hit1.hitPosition = TVector3(4. - 4.5, 6., 0.);
     hit1.hitSigma = TVector3(.1, .1, .1);
@@ -737,7 +735,7 @@ namespace Belle2 {
           hit41, hit42, hit43, hit44,
           hit51, hit52, hit53;
 
-    vector<PositionInfo*> v1, v4, v5, v6;
+    std::vector<PositionInfo*> v1, v4, v5, v6;
 
     hit1.hitPosition = TVector3(0., 0., 0.);
     hit1.hitSigma = TVector3(.1, .1, .1); //hits 1 2 4 and 1 2 5 are circles with radius 1 and m=(1,0) in (x,y)
@@ -1022,7 +1020,7 @@ namespace Belle2 {
     hit2.hitPosition = TVector3(0., 2., 0.);  hit2.hitSigma = TVector3(.1, .1, .1);
     hit3.hitPosition = TVector3(0., 3., 0.);  hit3.hitSigma = TVector3(.1, .1, .1); // problematic for y=kx+d
 
-    vector<PositionInfo*> v1, v2;
+    std::vector<PositionInfo*> v1, v2;
 
     v1.push_back(&hit1);
     v1.push_back(&hit2);
@@ -1050,9 +1048,9 @@ namespace Belle2 {
   /** testing straight line fit for different cases*/
   TEST_F(TrackletFiltersTest, straightLineFitterTest)
   {
-    TrackletFilters aFilter = TrackletFilters(); // simpleLineFit3D(const std::vector<PositionInfo*>* hits, useBackwards, )
+    TrackletFilters aFilter = TrackletFilters(); // simpleLineFit3D(const std::std::vector<PositionInfo*>* hits, useBackwards, )
 
-    vector<PositionInfo>
+    std::vector<PositionInfo>
     tLine1, // short line (3 hits, smeared in y,z)
     tLine2, // long line (6 hits, smeared in y,z)
     tLine3, // medium line (5 hits, smeared in x, z)
@@ -1060,7 +1058,8 @@ namespace Belle2 {
     tLine5, // same as line1, but y & z values switched
     tLine6; // same as line2, but y & z values switched
 
-    vector<PositionInfo*>  line1(3), line2(6), line3(5), line4(5), line5(3), line6(6); // pointer to upper entries (needed for filter)
+    std::vector<PositionInfo*>  line1(3), line2(6), line3(5), line4(5), line5(3),
+        line6(6); // pointer to upper entries (needed for filter)
 
     //http://stackoverflow.com/questions/9835560/c-vector-of-set-gives-segmentation-fault-after-performing-push-back
     //When you push_back into your vector you invalidate all references to elements in it in the case the vector needs to allocate more memory.
@@ -1083,8 +1082,8 @@ namespace Belle2 {
     std::array<double, 6> xValues { { -7.7, -4.5, -2.3, 0., 1.3, 2.8} }; // carries xValues
     PositionInfo thisPos;
     thisPos.hitSigma.SetXYZ(sigmaY, sigmaY, sigmaZ);
-    pair<double, TVector3> chi2AndDirection;
-    vector<double> estFitParams;
+    std::pair<double, TVector3> chi2AndDirection;
+    std::vector<double> estFitParams;
 
 
     // doing  small lambdas for better readability: calcVal, clearVecs and fillValues
@@ -1279,7 +1278,7 @@ namespace Belle2 {
     hit3.hitPosition = TVector3(3 * (1 - 1 / sqrt(2)), (1 + 3. / sqrt(2)), 0.); hit3.hitSigma = TVector3(.01, .01, .01);
     hit4.hitPosition = TVector3(2.999998, 3.999999, 0.);  hit4.hitSigma = TVector3(.01, .01, .01);
 
-    vector<PositionInfo*> v1;
+    std::vector<PositionInfo*> v1;
 
     v1.push_back(&hit1);
     v1.push_back(&hit2);
@@ -1331,7 +1330,7 @@ namespace Belle2 {
 //     hit3.hitPosition=TVector3(3*(1-1/sqrt(2)), (1+3./sqrt(2)), 0.);  hit3.hitSigma=TVector3(.01, .01, .01);
 //     hit4.hitPosition=TVector3(2.999998, 3.999999, 0.); hit4.hitSigma=TVector3(.01, .01, .01);
 
-    vector<PositionInfo*> v2, v3;
+    std::vector<PositionInfo*> v2, v3;
 
     v2.push_back(&hit1);
     v2.push_back(&hit2);
@@ -1341,7 +1340,7 @@ namespace Belle2 {
     aFilter.circleFit(phiVal, pocaR, curvature);
     aFilter.resetValues(&v2);       //hits 1 2 3 4
 
-    pair<double, TVector3> results = aFilter.circleFit();
+    std::pair<double, TVector3> results = aFilter.circleFit();
     EXPECT_NEAR(0, results.first, somewherenear); // Returns Chi^2
     EXPECT_NEAR(aFilter.calcPt(-1. / curvature), results.second.Mag(), somewherenear);
     EXPECT_NEAR(aFilter.calcPt(-1. / curvature), results.second.Perp(), somewherenear);
@@ -1357,7 +1356,7 @@ namespace Belle2 {
     aFilter.circleFit(phiVal, pocaR, curvature);
     aFilter.resetValues(&v3);       //hits 1 2 3 4
 
-    pair<double, TVector3> resultsReverse = aFilter.circleFit();
+    std::pair<double, TVector3> resultsReverse = aFilter.circleFit();
     EXPECT_NEAR(0, resultsReverse.first, somewherenear); // Returns Chi^2
     EXPECT_NEAR(aFilter.calcPt(1. / curvature), resultsReverse.second.Mag(), somewherenear);
     EXPECT_NEAR(aFilter.calcPt(1. / curvature), resultsReverse.second.Perp(), somewherenear);
@@ -1429,7 +1428,7 @@ namespace Belle2 {
     hit3.hitPosition = TVector3(201,  200,  2.);
 
     //for(int r=2;i<22;i++){
-    vector<PositionInfo*> v;
+    std::vector<PositionInfo*> v;
 
 //     ofstream raus("HelixNansOverXY.out");
 //       raus<<"r"<<"\t"<<"n"<<endl;
@@ -1471,10 +1470,10 @@ namespace Belle2 {
   {
     // initial definitions:
     using namespace boost::assign; // allows adding more than one entry at once for vectors
-    typedef pair<double, TVector3> FitResult;
+    typedef std::pair<double, TVector3> FitResult;
 
     struct CircleCollection {
-      vector <pair<vector<PositionInfo*> , TrackletFilters> > myQuadrantsAndFilters;
+      std::vector <std::pair<std::vector<PositionInfo*> , TrackletFilters> > myQuadrantsAndFilters;
       float clockwise; // 1 if clockwise, -1 if not
       float rightHanded; // 1 if right handed, -1 if left handed
       TVector3 center;
@@ -1485,12 +1484,12 @@ namespace Belle2 {
     // hits of four different circles for that case sharing the same point of closest approach, Cc = circleCenter, POCA = point of closest approach, will use hits of quadrant I & IV for circle1 and hits of quadrant II & III
     TVector3 Cc2(4, 2, 0), POCA12(-2, -1, 0), Cc1(-8, -4, 0);
     TVector3 Cc3(-4, 2, 0), POCA34(2, -1, 0), Cc4(8, -4, 0);
-    vector<TVector3> circleCenters = {Cc1, Cc2, Cc3, Cc4 };
-    vector<TVector3> circlePocas = {POCA12, POCA12, POCA34, POCA34 };
-    vector<double> quadrants = {0, M_PI * 0.5, M_PI, M_PI * 1.5};
-    vector<double> phiPusher = {0.001, 0.2, 0.5, 1., 1.5};
-    vector<double> clockwisers = {1, 1, 1, 1};
-    vector<double> rightHanders = {1, 1, -1, -1};
+    std::vector<TVector3> circleCenters = {Cc1, Cc2, Cc3, Cc4 };
+    std::vector<TVector3> circlePocas = {POCA12, POCA12, POCA34, POCA34 };
+    std::vector<double> quadrants = {0, M_PI * 0.5, M_PI, M_PI * 1.5};
+    std::vector<double> phiPusher = {0.001, 0.2, 0.5, 1., 1.5};
+    std::vector<double> clockwisers = {1, 1, 1, 1};
+    std::vector<double> rightHanders = {1, 1, -1, -1};
     double radius4All = 6.708203932;
     double manuallyCalculatedPt = 0.03015773701; // only valid for B = 1.5T (which is standard setting)
     double near = 1e-15;      //used for EXPECT_NEAR(val1, val2, abs_error);
@@ -1500,7 +1499,7 @@ namespace Belle2 {
 
 
     /**< WARNING Main test function: test the trackletFilters-results */
-    auto testStuff = [&](pair<vector<PositionInfo*>, TrackletFilters>& aQuadrantFilterCombi,
+    auto testStuff = [&](std::pair<std::vector<PositionInfo*>, TrackletFilters>& aQuadrantFilterCombi,
     CircleCollection & aCircle) { /// c++11 lambda function...
       aQuadrantFilterCombi.second.resetValues(&aQuadrantFilterCombi.first);
       EXPECT_THROW(aQuadrantFilterCombi.second.calcPt(near), FilterExceptions::Circle_too_small);
@@ -1578,19 +1577,19 @@ namespace Belle2 {
     // hits for quadrant 1 - 4:
 //    PositionInfo q11, q12, q13, q14, q15, q21, q22, q23, q24, q25, q31, q32, q33, q34, q35, q41, q42, q43, q44, q45;
     // circle segment of a quadrant
-//    vector<PositionInfo*> q1, q2, q3, q4, rq1, rq2, rq3, rq4;
+//    std::vector<PositionInfo*> q1, q2, q3, q4, rq1, rq2, rq3, rq4;
     // circle 3 & 4:
 //    PositionInfo q51, q52, q53, q54, q55, q61, q62, q63, q64, q65, q71, q72, q73, q34, q75, q81, q82, q83, q84, q85;
-//    vector<PositionInfo*> q5, q6, q7, q8, rq5, rq6, rq7, rq8;
-//    vector< vector<PositionInfo*>*> allVectors; // for faster filling of sigmaValue
+//    std::vector<PositionInfo*> q5, q6, q7, q8, rq5, rq6, rq7, rq8;
+//    std::vector< std::vector<PositionInfo*>*> allVectors; // for faster filling of sigmaValue
 //    allVectors += &q1, &q2, &q3, &q4, &rq1, &rq2, &rq3, &rq4, &q5, &q6, &q7, &q8, &rq5, &rq6, &rq7, &rq8;
 
     // fill circles with hits
-    vector < CircleCollection >  allCircles, allReversedCircles;
+    std::vector < CircleCollection >  allCircles, allReversedCircles;
     for (uint i = 0 ; i < circleCenters.size(); ++i) { // add circles
       CircleCollection aCircle, aReversedCircle;
       for (uint j = 0 ; j < quadrants.size() ; ++j) { // add quadrants
-        vector<PositionInfo*> aQuadrant, reversedQuadrant;
+        std::vector<PositionInfo*> aQuadrant, reversedQuadrant;
         for (uint k = 0 ; k < phiPusher.size() ; ++k) { // add hits
           PositionInfo* aHit = new PositionInfo();
           aHit->hitPosition.SetMagThetaPhi(radius4All, M_PI * 0.5, quadrants.at(j) + phiPusher.at(k));
@@ -1701,7 +1700,7 @@ namespace Belle2 {
     PositionInfo
     hit1, hit2, hit3;
 
-    vector<PositionInfo*> v;
+    std::vector<PositionInfo*> v;
 
     double ClapPhi, ClapR, rho;
     double near = 1e-10;
@@ -1815,7 +1814,7 @@ namespace Belle2 {
     PositionInfo
     hit1, hit2, hit3, hit4, hit5;
 
-    vector<PositionInfo*> v;
+    std::vector<PositionInfo*> v;
 
     hit1.hitPosition = TVector3(1. - 2., 0., 0.); hit1.hitSigma = TVector3(.1, .1, .1); //hits are clockwise circles of radius 2
     hit2.hitPosition = TVector3(1., 2., 1.);  hit2.hitSigma = TVector3(.1, .1, .1);

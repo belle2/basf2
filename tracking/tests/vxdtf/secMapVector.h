@@ -28,8 +28,6 @@
 #include "TKey.h"
 #include "TCollection.h"
 
-using namespace std;
-
 namespace Belle2 {
 
 //   VXDTFRawSecMapTypedef::CutoffValues cutValues; /**< list containing all values calculated during run */
@@ -107,11 +105,11 @@ namespace Belle2 {
   /** Filling and reading SecMapVector in/from root file */
   TEST_F(SecMapVectorTest, readAndWriteTObjectToRootFile)
   {
-    string fName = "demo.root";
+    std::string fName = "demo.root";
     unsigned nCuts = 50, nFilters = 2, nFriends = 5, nSectors = 10;
 
     /// create SecMapVector, fill with some fake VXDTFTemporarySecMaps (setting only the name to check whether everything went fine or not)
-    string aSecMapName = "aSecMap";
+    std::string aSecMapName = "aSecMap";
     SecMapVector aSecMapVector;
     VXDTFRawSecMap aSecMap;
     aSecMap.setMapName(aSecMapName);
@@ -152,7 +150,7 @@ namespace Belle2 {
 
     /// repeat first step to check, whether files can be filled repeatedly
     nCuts++; nSectors++;
-    string aThirdSecMapName = "aThirdSecMap";
+    std::string aThirdSecMapName = "aThirdSecMap";
     SecMapVector aSecMapVector2;
     VXDTFRawSecMap aThirdSecMap;
     aThirdSecMap.setMapName(aThirdSecMapName);
@@ -166,7 +164,7 @@ namespace Belle2 {
            aThirdSecMap.getNumOfValues());
 
     nCuts++; nSectors++;
-    string aFourthSecMapName = "aFourthSecMap";
+    std::string aFourthSecMapName = "aFourthSecMap";
     VXDTFRawSecMap aFourthSecMap;
     aFourthSecMap.setMapName(aFourthSecMapName);
     aFourthSecMap.setLowerMomentumThreshold(0.23);
@@ -199,7 +197,7 @@ namespace Belle2 {
 
         try {
           retrievedVector = static_cast<SecMapVector*>(key->ReadObj());
-        } catch (exception& e) {
+        } catch (std::exception& e) {
           B2WARNING("Key was not a SecMapVector, therefore error message: " << e.what() << "\n Skipping this key...");
           continue;
         }
@@ -216,7 +214,7 @@ namespace Belle2 {
     }
 
     /// delete file from disk
-    if (remove(fName.c_str()) != 0)
+    if (std::remove(fName.c_str()) != 0)
     { B2ERROR("could not delete file!"); }
     else
     { B2INFO("File successfully deleted"); }

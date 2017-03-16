@@ -5,16 +5,10 @@
 // #include <RKTrackRep.h>
 #include <gtest/gtest.h>
 
-using namespace std;
-
 namespace Belle2 {
-
-
-
 
   /** Set up a few arrays and objects in the datastore */
   class CollectorTFInfoTest : public ::testing::Test {
-
 
     /**
      * Documentation Comment Jakob Lettenbichler:
@@ -120,7 +114,7 @@ namespace Belle2 {
 
     m_collector.initPersistent();
     m_collector.intEvent();
-    // m_collector.initSectors (sectors_display_all_pass, vector<double>(), vector<double>());
+    // m_collector.initSectors (sectors_display_all_pass, std::vector<double>(), std::vector<double>());
 
   }
 
@@ -134,7 +128,7 @@ namespace Belle2 {
 
     for (uint i = 0; i <  anz_clusters_svd; i++) {
       // importCluster (int pass_index, std::string died_at, int accepted, int rejected, int detector_type)
-      /*int akt_id =*/ m_collector.importCluster(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), Const::SVD, i);
+      /*int akt_id =*/ m_collector.importCluster(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), Const::SVD, i);
 
 //      B2INFO ("AKT ID SVD: " << akt_id);
 
@@ -142,7 +136,7 @@ namespace Belle2 {
 
     for (uint i = 0; i <  anz_clusters_pxd; i++) {
       // importCluster (int pass_index, std::string died_at, int accepted, int rejected, int detector_type)
-      /*int akt_id = */m_collector.importCluster(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), Const::PXD, i);
+      /*int akt_id = */m_collector.importCluster(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), Const::PXD, i);
 
 //      B2INFO ("AKT ID PXD: " << akt_id);
     }
@@ -192,7 +186,7 @@ namespace Belle2 {
 
     m_collector.initPersistent();
     m_collector.intEvent();
-    //  m_collector.initSectors (sectors_display_all_pass, vector<double>(), vector<double>());
+    //  m_collector.initSectors (sectors_display_all_pass, std::vector<double>(), std::vector<double>());
 
   }
 
@@ -207,7 +201,7 @@ namespace Belle2 {
 
       for (uint i = 0; i <  anz_clusters_svd; i++) {
         // importCluster (int pass_index, std::string died_at, int accepted, int rejected, int detector_type)
-        /*int akt_id =*/ m_collector.importCluster(index, "", -1, vector<int>(), vector<int>(), Const::SVD, i);
+        /*int akt_id =*/ m_collector.importCluster(index, "", -1, std::vector<int>(), std::vector<int>(), Const::SVD, i);
 
 //      B2INFO ("AKT ID SVD: " << akt_id);
 
@@ -215,7 +209,7 @@ namespace Belle2 {
 
       for (uint i = 0; i <  anz_clusters_pxd; i++) {
         // importCluster (int pass_index, std::string died_at, int accepted, int rejected, int detector_type)
-        /*int akt_id =*/ m_collector.importCluster(index, "", -1, vector<int>(), vector<int>(), Const::PXD, i);
+        /*int akt_id =*/ m_collector.importCluster(index, "", -1, std::vector<int>(), std::vector<int>(), Const::PXD, i);
 
 //      B2INFO ("AKT ID PXD: " << akt_id);
       }
@@ -237,35 +231,55 @@ namespace Belle2 {
     // ID 0 - 4
     // Sector Overlap => Hitid 3,4
     // Cluster Overlap => Hitid 7,8
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({1, 2, 3}), 0, TVector3(),
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({1, 2, 3}), 0,
+                          TVector3(),
                           TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({4}), 2, TVector3(), TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({7}), 4, TVector3(), TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({9}), 5, TVector3(), TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({10}), 5, TVector3(), TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({4}), 2, TVector3(),
+                          TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({7}), 4, TVector3(),
+                          TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({9}), 5, TVector3(),
+                          TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({10}), 5, TVector3(),
+                          TVector3());
 
     // ID 5 - 9
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({11, 12, 13}), 6, TVector3(),
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({11, 12, 13}), 6,
+                          TVector3(),
                           TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({14, 15}), 7, TVector3(),
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({14, 15}), 7,
+                          TVector3(),
                           TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({17}), 8, TVector3(), TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({17}), 9, TVector3(), TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({18}), 1, TVector3(), TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({17}), 8, TVector3(),
+                          TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({17}), 9, TVector3(),
+                          TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({18}), 1, TVector3(),
+                          TVector3());
 
     // ID 10 - 14
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>(), -1, TVector3(), TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>(), -1, TVector3(), TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>(), -1, TVector3(), TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>(), -1, TVector3(), TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>(), -1, TVector3(), TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), -1, TVector3(),
+                          TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), -1, TVector3(),
+                          TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), -1, TVector3(),
+                          TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), -1, TVector3(),
+                          TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), -1, TVector3(),
+                          TVector3());
 
     // ID 15 - 19
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>(), 19, TVector3(), TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>(), 20, TVector3(), TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>(), 21, TVector3(), TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>(), 22, TVector3(), TVector3());
-    m_collector.importHit(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>(), 23, TVector3(), TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), 19, TVector3(),
+                          TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), 20, TVector3(),
+                          TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), 21, TVector3(),
+                          TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), 22, TVector3(),
+                          TVector3());
+    m_collector.importHit(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), 23, TVector3(),
+                          TVector3());
 
   }
 
@@ -276,7 +290,7 @@ namespace Belle2 {
 
     uint anz_hits = 10;
 
-    // vector<int> clusters = {7, 8, 9};
+    // std::vector<int> clusters = {7, 8, 9};
 
     for (uint index = 0; index < pass_sector_ids.size(); index++) {
 
@@ -284,7 +298,8 @@ namespace Belle2 {
 
         //     virtual int importHit (int pass_index, std::string died_at, std::vector<int> accepted, std::vector<int> rejected, std::vector<int> assigned_Cluster_IDs, int sec_id, TVector3 hit_position); // Hit import_clusters
 
-        /*int akt_id =*/ m_collector.importHit(index, "", -1, vector<int>(), vector<int>(), vector<int>(), 1, TVector3(), TVector3());
+        /*int akt_id =*/ m_collector.importHit(index, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>(), 1, TVector3(),
+                                               TVector3());
 
 //      B2INFO ("HIT ID: " << akt_id);
       }
@@ -301,16 +316,16 @@ namespace Belle2 {
     // Not allowed overlap => Cellid 7, 8 (other hit)
 
     // Cellid 1 => overlapped Sector
-    m_collector.importCell(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({1, 2}));
-    m_collector.importCell(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({4, 5}));
-    m_collector.importCell(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({11, 9}));
-    m_collector.importCell(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({9, 10}));
-    m_collector.importCell(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>());
-    m_collector.importCell(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>());
-    m_collector.importCell(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>());
-    m_collector.importCell(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({15, 16}));
-    m_collector.importCell(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>({16, 17}));
-    m_collector.importCell(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), vector<int>());
+    m_collector.importCell(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({1, 2}));
+    m_collector.importCell(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({4, 5}));
+    m_collector.importCell(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({11, 9}));
+    m_collector.importCell(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({9, 10}));
+    m_collector.importCell(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>());
+    m_collector.importCell(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>());
+    m_collector.importCell(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>());
+    m_collector.importCell(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({15, 16}));
+    m_collector.importCell(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>({16, 17}));
+    m_collector.importCell(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), std::vector<int>());
 
     //     virtual int importCell (int pass_index, std::string died_at, std::vector<int> accepted, std::vector<int> rejected, std::vector<int> assigned_Hit_IDs); // Cell Import
 
@@ -322,7 +337,7 @@ namespace Belle2 {
 
     uint anz_cell = 10;
 
-    vector<int> hits = {1, 2, 3};
+    std::vector<int> hits = {1, 2, 3};
 
     for (uint index = 0; index < pass_sector_ids.size(); index++) {
 
@@ -330,7 +345,7 @@ namespace Belle2 {
 
         //     virtual int importCell (int pass_index, std::string died_at, std::vector<int> accepted, std::vector<int> rejected, std::vector<int> assigned_Hit_IDs); // Cell Import
 
-        /*int akt_id =*/ m_collector.importCell(index, "", -1, vector<int>(), vector<int>(), hits);
+        /*int akt_id =*/ m_collector.importCell(index, "", -1, std::vector<int>(), std::vector<int>(), hits);
 
 //      B2INFO ("Cell ID: " << akt_id);
       }
@@ -341,26 +356,31 @@ namespace Belle2 {
   {
 
 
-    std::vector<std::pair<int, unsigned int>>  cells0 = {make_pair(0, 0)};
-    std::vector<std::pair<int, unsigned int>>  cells1 = {make_pair(1, 1)};
-    std::vector<std::pair<int, unsigned int>>  cells23 = {make_pair(2, 2), make_pair(3, 3)};
-    std::vector<std::pair<int, unsigned int>>  cells79 = {make_pair(7, 7), make_pair(9, 9)};
-    std::vector<std::pair<int, unsigned int>>  cells8 = {make_pair(8, 8)};
+    std::vector<std::pair<int, unsigned int>>  cells0 = {std::make_pair(0, 0)};
+    std::vector<std::pair<int, unsigned int>>  cells1 = {std::make_pair(1, 1)};
+    std::vector<std::pair<int, unsigned int>>  cells23 = {std::make_pair(2, 2), std::make_pair(3, 3)};
+    std::vector<std::pair<int, unsigned int>>  cells79 = {std::make_pair(7, 7), std::make_pair(9, 9)};
+    std::vector<std::pair<int, unsigned int>>  cells8 = {std::make_pair(8, 8)};
 
     // ID 1 = Sector overlapped
     // ID 2 = allowed overlapping (Cells)
     // ID 3, 4 = not allowed overlapping (Cells)
-    m_collector.importTC(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), cells0);
-    m_collector.importTC(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), cells1);
-    m_collector.importTC(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), cells23);
-    m_collector.importTC(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), cells79);
-    m_collector.importTC(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), cells8);
+    m_collector.importTC(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), cells0);
+    m_collector.importTC(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), cells1);
+    m_collector.importTC(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), cells23);
+    m_collector.importTC(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), cells79);
+    m_collector.importTC(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(), cells8);
 
-    m_collector.importTC(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), std::vector<std::pair<int, unsigned int>>({}));
-    m_collector.importTC(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), std::vector<std::pair<int, unsigned int>>({}));
-    m_collector.importTC(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), std::vector<std::pair<int, unsigned int>>({}));
-    m_collector.importTC(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), std::vector<std::pair<int, unsigned int>>({}));
-    m_collector.importTC(pass_sector_id_single, "", -1, vector<int>(), vector<int>(), std::vector<std::pair<int, unsigned int>>({}));
+    m_collector.importTC(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(),
+                         std::vector<std::pair<int, unsigned int>>({}));
+    m_collector.importTC(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(),
+                         std::vector<std::pair<int, unsigned int>>({}));
+    m_collector.importTC(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(),
+                         std::vector<std::pair<int, unsigned int>>({}));
+    m_collector.importTC(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(),
+                         std::vector<std::pair<int, unsigned int>>({}));
+    m_collector.importTC(pass_sector_id_single, "", -1, std::vector<int>(), std::vector<int>(),
+                         std::vector<std::pair<int, unsigned int>>({}));
 
 
   }
@@ -370,7 +390,7 @@ namespace Belle2 {
   {
 
     uint anz_tfc = 10;
-    std::vector<std::pair<int, unsigned int>>  cells = {make_pair(1, 1), make_pair(2, 2), make_pair(3, 3)};
+    std::vector<std::pair<int, unsigned int>>  cells = {std::make_pair(1, 1), std::make_pair(2, 2), std::make_pair(3, 3)};
 
 
     for (uint index = 0; index < pass_sector_ids.size(); index++) {
@@ -380,7 +400,7 @@ namespace Belle2 {
         // int passIndex, std::string diedAt, int diedId, std::vector<int> accepted, std::vector<int> rejected, const std::vector<std::pair<int, unsigned int>> assignedCellIDs
         // TC Import
 
-        /*int akt_id =*/ m_collector.importTC(index, "", -1, vector<int>(), vector<int>(), cells);
+        /*int akt_id =*/ m_collector.importTC(index, "", -1, std::vector<int>(), std::vector<int>(), cells);
 
 //     B2INFO ("TC ID: " << akt_id);
       }
@@ -616,23 +636,23 @@ namespace Belle2 {
 
     import_clusters_loop();
 
-    m_collector.updateSectors(4, 1, "geloescht", 0, vector<int>(), vector<int>(), 0);
+    m_collector.updateSectors(4, 1, "geloescht", 0, std::vector<int>(), std::vector<int>(), 0);
 
-    m_collector.updateClusters(3, "geloescht", 0, vector<int>(), vector<int>(), 0);
+    m_collector.updateClusters(3, "geloescht", 0, std::vector<int>(), std::vector<int>(), 0);
 
     ASSERT_EQ("geloescht", m_collector.m_clustersTF[3].getDiedAt());
     ASSERT_EQ(false_item, m_collector.m_clustersTF[3].getActive());
 
     import_hit_loop();
 
-    m_collector.updateHit(1, "geloescht", 0, vector<int>(), vector<int>(), -1, -1, vector<int>());
+    m_collector.updateHit(1, "geloescht", 0, std::vector<int>(), std::vector<int>(), -1, -1, std::vector<int>());
 
     ASSERT_EQ("geloescht", m_collector.m_hitTF[1].getDiedAt());
     ASSERT_EQ(false_item, m_collector.m_hitTF[1].getActive());
     ASSERT_EQ(true_item, m_collector.m_hitTF[2].getActive());
 
     import_cell_loop();
-    m_collector.updateCell(3, "geloescht", 2, vector<int>(), vector<int>(), -1, -1, 0, vector<int>());
+    m_collector.updateCell(3, "geloescht", 2, std::vector<int>(), std::vector<int>(), -1, -1, 0, std::vector<int>());
 
     ASSERT_EQ("geloescht", m_collector.m_cellTF[3].getDiedAt());
     ASSERT_EQ(false_item, m_collector.m_cellTF[3].getActive());
@@ -640,7 +660,7 @@ namespace Belle2 {
 
     import_tfc_loop();
 
-    m_collector.updateTC(2, "geloescht", 4, vector<int>(), vector<int>());
+    m_collector.updateTC(2, "geloescht", 4, std::vector<int>(), std::vector<int>());
 
     ASSERT_EQ("geloescht", m_collector.m_tfCandTF[2].getDiedAt());
     ASSERT_EQ(false_item, m_collector.m_tfCandTF[2].getActive());

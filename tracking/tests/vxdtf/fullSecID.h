@@ -7,11 +7,7 @@
 #include <gtest/gtest.h>
 #include <vector>
 
-using namespace std;
-
 namespace Belle2 {
-
-
 
   /** Testing everything from FullSecID */
   class FullSecIDTest : public ::testing::Test {
@@ -59,7 +55,7 @@ namespace Belle2 {
     EXPECT_EQ(aFullSecID.getFullSecID(), anotherFullSecID.getFullSecID());
 
     // now we are using the third constructor using an encoded fullSecID (string) as input:
-    stringstream aSecIDString;
+    std::stringstream aSecIDString;
     aSecIDString << aFullSecID.getLayerID() << aFullSecID.getSubLayerID() << "_" << int(aFullSecID.getVxdID()) << "_" <<
                  aFullSecID.getSecID();
 
@@ -80,7 +76,7 @@ namespace Belle2 {
     EXPECT_EQ(aSecIDString.str(), aThirdFullSecID.getFullSecString());
 
     // now we are using the third constructor again using an encoded short fullSecID (string, used by filterCalculator) as input:
-    stringstream aSecIDString2;
+    std::stringstream aSecIDString2;
     aSecIDString2 << aFullSecID.getLayerID() << "_" << int(aFullSecID.getVxdID()) << "_" << aFullSecID.getSecID();
 
     FullSecID aFourthFullSecID = FullSecID(aSecIDString2.str());
@@ -99,7 +95,7 @@ namespace Belle2 {
 
 
     // testing copy constructor (and C++11 range based for-loops):
-    vector<FullSecID> testVector;
+    std::vector<FullSecID> testVector;
     for (int i = 0; i < 5; ++i) {
       testVector.push_back(aFullSecID);
     }
@@ -117,7 +113,7 @@ namespace Belle2 {
     bool subLayerID = true;
     unsigned short sectorID = 15;
     FullSecID aFullSecID = FullSecID(vxdID, subLayerID, sectorID);
-    stringstream aSecIDString;
+    std::stringstream aSecIDString;
     aSecIDString << aFullSecID.getLayerID() << aFullSecID.getSubLayerID() << "_" << int(aFullSecID.getVxdID()) << "_" <<
                  aFullSecID.getSecID();
 
@@ -126,12 +122,12 @@ namespace Belle2 {
     // now the checks:
     EXPECT_EQ(static_cast<unsigned int>(aFullSecID), aFullSecID2);  // directly comparing to an int
 
-    EXPECT_EQ(aSecIDString.str(), string(aFullSecID2)); // directly comparing to an string - testing string cast
+    EXPECT_EQ(aSecIDString.str(), std::string(aFullSecID2)); // directly comparing to an string - testing string cast
 
     EXPECT_EQ(aFullSecID, aFullSecID2); // direct comparison
 
 
-    stringstream aSecIDStream, aSecIDStream2;
+    std::stringstream aSecIDStream, aSecIDStream2;
     aSecIDStream << aFullSecID2;
     aSecIDStream2 << aSecIDString.str();
 

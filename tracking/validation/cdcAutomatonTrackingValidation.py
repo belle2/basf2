@@ -44,7 +44,7 @@ class CDCAutomaton(TrackingValidationRun):
         'UseCDCHits': True,
         'UseOnlyAxialCDCHits': False,
         "UseReassignedHits": True,
-        "UseNLoops": 1.0
+        "UseNLoops": 1.0,
         "UseOnlyBeforeTOP": True,
         'MinCDCAxialHits': 8,
         'MinCDCStereoHits': 6,

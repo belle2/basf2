@@ -35,6 +35,13 @@ CDCTrigger2DFitterModule::CDCTrigger2DFitterModule() : Module::Module()
   addParam("minHits", m_minHits,
            "Minimal number of hits required for the fitting.",
            unsigned(5));
+  addParam("xtSimple", m_xtSimple,
+           "If true, use nominal drift velocity, otherwise use table "
+           "for non-linear xt.",
+           false);
+  addParam("useDriftTime", m_useDriftTime,
+           "If true, use drift time, otherwise only wire position.",
+           true);
 }
 
 void
@@ -50,6 +57,27 @@ CDCTrigger2DFitterModule::initialize()
   StoreArray<CDCTriggerSegmentHit> segmentHits;
   fitterTracks.registerRelationTo(finderTracks);
   fitterTracks.registerRelationTo(segmentHits);
+
+  // get geometry constants for first priority layers
+  CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
+  // TODO: avoid hard coding the priority layers here
+  vector<unsigned> iL = {3, 16, 28, 40, 52};
+  for (int iAx = 0; iAx < 5; ++iAx) {
+    nWires.push_back(cdc.nWiresInLayer(iL[iAx]));
+    rr.push_back(cdc.senseWireR(iL[iAx]));
+    vector<double> xt(512);
+    for (unsigned iTick = 0; iTick < xt.size(); ++iTick) {
+      double t = iTick * 2 * cdc.getTdcBinWidth();
+      if (m_xtSimple) {
+        xt[iTick] = cdc.getNominalDriftV() * t;
+      } else {
+        double driftLength_0 = cdc.getDriftLength(t, iL[iAx], 0);
+        double driftLength_1 = cdc.getDriftLength(t, iL[iAx], 1);
+        xt[iTick] = (driftLength_0 + driftLength_1) / 2;
+      }
+    }
+    xtTables.push_back(xt);
+  }
 }
 
 void
@@ -59,20 +87,18 @@ CDCTrigger2DFitterModule::event()
   StoreArray<CDCTriggerTrack> fitterTracks(m_outputCollectionName);
   StoreObjPtr<TRGTiming> eventTime("CDCTriggerEventTime");
   int T0 = eventTime->getTiming();
-  CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
 
-  // TODO: check these values
-  vector<double> wirePhi2DError({0.0085106,
-                                 0.0039841,
-                                 0.0025806,
-                                 0.0019084,
-                                 0.001514
+  vector<double> wirePhi2DError({0.00085106,
+                                 0.00039841,
+                                 0.00025806,
+                                 0.00019084,
+                                 0.0001514
                                 });
-  vector<double> driftPhi2DError({0.0085106,
-                                  0.0039841,
-                                  0.0025806,
-                                  0.0019084,
-                                  0.001514
+  vector<double> driftPhi2DError({0.00085106,
+                                  0.00039841,
+                                  0.00025806,
+                                  0.00019084,
+                                  0.0001514
                                  });
 
   for (int itrack = 0; itrack < finderTracks.getEntries(); ++itrack) {
@@ -80,11 +106,13 @@ CDCTrigger2DFitterModule::event()
     RelationVector<CDCTriggerSegmentHit> hits =
       finderTracks[itrack]->getRelationsTo<CDCTriggerSegmentHit>();
     unsigned nHits = 0;
+    vector<double> tsId(5, -1.);
     vector<double> wirePhi(5, 0.);
+    vector<int> driftTime(5, 0);
     vector<double> driftLength(5, 0.);
     vector<unsigned> LR(5, 0);
-    vector<double> rr(5, 0.);
     vector<int> hitIds(5, -1);
+    vector<double> useSL(5, 0.);
     for (unsigned ihit = 0; ihit < hits.size(); ++ihit) {
       if (hits.weight(ihit) > 0) {
         // use only first priority hits
@@ -92,16 +120,25 @@ CDCTrigger2DFitterModule::event()
         unsigned iSL = hits[ihit]->getISuperLayer();
         // skip stereo hits (should not be related, but check anyway)
         if (iSL % 2) continue;
-        nHits += 1;
+        // the track finder should have selected a single hit per super layer
+        // if that is not the case, select the fastest hit
+        if (hitIds[iSL / 2] != -1) {
+          B2WARNING("got multiple hits for SL " << iSL);
+          if (hits[ihit]->priorityTime() > driftTime[iSL / 2])
+            continue;
+        } else {
+          nHits += 1;
+        }
+        useSL[iSL / 2] = 1.;
         hitIds[iSL / 2] = ihit;
-        unsigned iL = WireID(hits[ihit]->getID()).getICLayer();
-        wirePhi[iSL / 2] = hits[ihit]->getIWire() * 2. * M_PI / cdc.nWiresInLayer(iL);
+        tsId[iSL / 2] = hits[ihit]->getIWire();
+        wirePhi[iSL / 2] = hits[ihit]->getIWire() * 2. * M_PI / nWires[iSL / 2];
         LR[iSL / 2] = hits[ihit]->getLeftRight();
-        // TODO: nonlinear x-t table
-        driftLength[iSL / 2] = (hits[ihit]->priorityTime() - T0)
-                               * 2. * cdc.getTdcBinWidth()
-                               * cdc.getNominalDriftV();
-        rr[iSL / 2] = cdc.senseWireR(iL);
+        driftTime[iSL / 2] = hits[ihit]->priorityTime();
+        int t = hits[ihit]->priorityTime() - T0;
+        if (t < 0) t = 0;
+        if (t > 511) t = 511;
+        driftLength[iSL / 2] = xtTables[iSL / 2][t];
       }
     }
     if (nHits < m_minHits) {
@@ -122,7 +159,7 @@ CDCTrigger2DFitterModule::event()
     vector<double> phi2D(5, 0.);
     for (unsigned iAx = 0; iAx < 5; ++iAx) {
       if (hitIds[iAx] < 0) continue;
-      if (T0 == 9999)
+      if (T0 == 9999 || !m_useDriftTime)
         phi2D[iAx] = wirePhi[iAx];
       else
         phi2D[iAx] = Fitter3DUtility::calPhi(wirePhi[iAx], driftLength[iAx], rr[iAx], LR[iAx]);
@@ -132,14 +169,23 @@ CDCTrigger2DFitterModule::event()
     double phi0 = 0;
     double chi2 = 0;
     Fitter3DUtility::rPhiFitter(&rr[0], &phi2D[0], &phi2DInvError[0], rho, phi0, chi2);
-    // TODO: determine charge from fitted track
-    short charge = finderTracks[itrack]->getChargeSign();
-    double omega = charge / rho;
-    B2INFO("phi0 " << phi0 << " rho " << rho);
+    double charge = finderTracks[itrack]->getChargeSign();
+    double chargeFit = 0;
+    Fitter3DUtility::chargeFinder(&nWires[0], &tsId[0], &useSL[0], phi0,
+                                  charge, chargeFit);
+    // direct conversion of r to rho
+    double omega = chargeFit / rho;
+    // convert to pt and back as in old fitter
+    // needed for direct comparison with old version
+    // TODO: remove this
+    /*double pt = 0.3 * 1.5 * rho / 100;
+    double kappa = chargeFit / pt;
+    double r = 222.376063 / kappa;
+    omega = 1. / r;*/
 
     // save track
     CDCTriggerTrack* fittedTrack =
-      fitterTracks.appendNew(remainder(phi0 + charge * M_PI_2, 2. * M_PI),
+      fitterTracks.appendNew(remainder(phi0 + chargeFit * M_PI_2, 2. * M_PI),
                              omega, chi2);
     // make relation to finder track
     fittedTrack->addRelationTo(finderTracks[itrack]);

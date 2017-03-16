@@ -3,6 +3,7 @@
 
 #include "framework/core/Module.h"
 #include <string>
+#include <vector>
 
 namespace Belle2 {
 
@@ -30,8 +31,15 @@ namespace Belle2 {
     std::string m_outputCollectionName;
     /** Minimal number of hits required for fitting. */
     unsigned m_minHits;
+    /** Switch between nominal drift velocity and xt table */
+    bool m_xtSimple;
+    /** Switch between drift time and wire position for phi */
+    bool m_useDriftTime;
 
   private:
+    std::vector<double> nWires = {};
+    std::vector<double> rr = {};
+    std::vector<std::vector<double>> xtTables = {};
   };
 
 } // namespace Belle2

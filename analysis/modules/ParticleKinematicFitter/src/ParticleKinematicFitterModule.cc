@@ -369,7 +369,8 @@ namespace Belle2 {
       Particle* child = const_cast<Particle*>(mother->getDaughter(ichild));
 
       if (child->getPValue() < 0) {
-        B2ERROR("Daughter with PDG code " << child->getPDGCode() << " does not have a valid error matrix. " << child->getEnergy());
+        B2ERROR("Daughter with PDG code " << child->getPDGCode() << " does not have a valid p-value: p=" << child->getPValue() << ", E=" <<
+                child->getEnergy() << " GeV");
         return false; // error matrix not valid
       }
 

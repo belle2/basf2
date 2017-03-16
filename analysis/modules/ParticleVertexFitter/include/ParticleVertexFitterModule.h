@@ -23,6 +23,7 @@
 
 // kfitter
 #include <analysis/KFit/MassFitKFit.h>
+#include <analysis/KFit/FourCFitKFit.h>
 #include <analysis/KFit/MassVertexFitKFit.h>
 #include <analysis/KFit/VertexFitKFit.h>
 #include <analysis/KFit/MakeMotherKFit.h>
@@ -109,6 +110,13 @@ namespace Belle2 {
     bool doKMassFit(Particle* p);
 
     /**
+     * FourC fit using Kfitter
+     * @param p pointer to particle
+     * @return true for successfull fit
+     */
+    bool doKFourCFit(Particle* p);
+
+    /**
      * Update mother particle after unconstrained vertex fit using Kfitter
      * @param kv reference to Kfitter VertexFit object
      * @param p pointer to particle
@@ -135,6 +143,22 @@ namespace Belle2 {
     bool makeKMassMother(analysis::MassFitKFit& kv, Particle* p);
 
     /**
+     * Update mother particle after FourC fit using Kfitter
+     * @param kv reference to Kfitter MassFit object
+     * @param p pointer to particle
+     * @return true for successfull construction of mother
+     */
+    bool makeKFourCMother(analysis::FourCFitKFit& kv, Particle* p);
+
+    /**
+    * update the map of daughter and tracks, find out wich tracks belong to each daugther.
+    * @param ui store the tracks ID of each daughter
+    * @param l represent the tracks ID
+    * @param p pointer to particle
+     */
+    void updateMapofTrackandDaughter(std::vector<unsigned>& ui, unsigned& l, const Particle* daughter);
+
+    /**
      * Adds given particle to the VertexFitKFit.
      * @param kv reference to Kfitter VertexFit object
      * @param particle pointer to particle
@@ -154,6 +178,21 @@ namespace Belle2 {
      * @param particle pointer to particle
      */
     void addParticleToKfitter(analysis::MassFitKFit& kv, const Particle* particle);
+
+    /**
+     * Adds given particle to the FourCFitKFit.
+     * @param kv reference to Kfitter FourCFit object
+     * @param particle pointer to particle
+     */
+    void addParticleToKfitter(analysis::FourCFitKFit& kv, const Particle* particle);
+
+    /**
+     * Adds given particle's child to the FourCFitKFit.
+     * @param kv reference to Kfitter FourCFit object
+     * @param particle pointer to particle
+     */
+    bool addChildofParticletoKfitter(analysis::FourCFitKFit& kv, const Particle* particle);
+
 
     /**
      * Returns particle's 4-momentum as a HepLorentzVector

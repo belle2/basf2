@@ -12,7 +12,7 @@ from reconstruction import add_mdst_output
 from modularAnalysis import *
 from ROOT import Belle2
 
-generateY4S(10000, Belle2.FileSystem.findFile('decfiles/dec/Bd_rho0gamma.dec'))
+generateY4S(10000, Belle2.FileSystem.findFile('decfiles/dec/1110021000.dec'))
 loadGearbox()
 
 ntupleFile('../Validate_B2Vgamma.root')

@@ -18,23 +18,21 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
-using namespace std;
-
 namespace Belle2 {
   namespace gearbox {
 
-    vector<GearDir> Interface::getNodes(const string& path) const
+    std::vector<GearDir> Interface::getNodes(const std::string& path) const
     {
       int size = getNumberNodes(path);
-      vector<GearDir> result;
+      std::vector<GearDir> result;
       result.reserve(size);
       for (int i = 1; i <= size; ++i) {
-        result.push_back(GearDir(*this, path, i));
+        result.emplace_back(*this, path, i);
       }
       return result;
     }
 
-    string Interface::getString(const string& path, const string& defaultValue) const
+    std::string Interface::getString(const std::string& path, const std::string& defaultValue) const
     {
       try {
         return getString(path);
@@ -43,9 +41,9 @@ namespace Belle2 {
       }
     }
 
-    double Interface::getDouble(const string& path) const noexcept(false)
+    double Interface::getDouble(const std::string& path) const noexcept(false)
     {
-      string value = getString(path);
+      std::string value = getString(path);
       try {
         return boost::lexical_cast<double>(value);
       } catch (boost::bad_lexical_cast) {
@@ -53,7 +51,7 @@ namespace Belle2 {
       }
     }
 
-    double Interface::getDouble(const string& path, double defaultValue) const noexcept(false)
+    double Interface::getDouble(const std::string& path, double defaultValue) const noexcept(false)
     {
       try {
         return getDouble(path);
@@ -62,27 +60,18 @@ namespace Belle2 {
       }
     }
 
-    int Interface::getInt(const string& path) const noexcept(false)
+    int Interface::getInt(const std::string& path) const noexcept(false)
     {
-      string value = getString(path);
+      std::string value = getString(path);
       try {
         //hide spurious warning in boost
-#if !defined(__GNUG__) || defined(__clang__) || defined(__ICC)
-#else
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
         return boost::lexical_cast<int>(value);
-#if !defined(__GNUG__) || defined(__clang__) || defined(__ICC)
-#else
-#pragma GCC diagnostic pop
-#endif
       } catch (boost::bad_lexical_cast) {
         throw ConversionError() << path << value;
       }
     }
 
-    int Interface::getInt(const string& path, int defaultValue) const noexcept(false)
+    int Interface::getInt(const std::string& path, int defaultValue) const noexcept(false)
     {
       try {
         return getInt(path);
@@ -91,15 +80,15 @@ namespace Belle2 {
       }
     }
 
-    bool Interface::getBool(const string& path) const noexcept(false)
+    bool Interface::getBool(const std::string& path) const noexcept(false)
     {
-      string value = getString(path);
+      std::string value = getString(path);
       boost::to_lower(value);
       if (value.empty() || value == "false" || value == "off" || value == "0") return false;
       return true;
     }
 
-    bool Interface::getBool(const string& path, bool defaultValue) const
+    bool Interface::getBool(const std::string& path, bool defaultValue) const
     {
       try {
         return getBool(path);
@@ -108,9 +97,9 @@ namespace Belle2 {
       }
     }
 
-    double Interface::getWithUnit(const string& path) const noexcept(false)
+    double Interface::getWithUnit(const std::string& path) const noexcept(false)
     {
-      pair<string, string> value = getStringWithUnit(path);
+      std::pair<std::string, std::string> value = getStringWithUnit(path);
       double numValue(0);
       try {
         numValue = boost::lexical_cast<double>(value.first);
@@ -125,7 +114,7 @@ namespace Belle2 {
       return numValue;
     }
 
-    double Interface::getWithUnit(const string& path, double defaultValue) const noexcept(false)
+    double Interface::getWithUnit(const std::string& path, double defaultValue) const noexcept(false)
     {
       try {
         return getWithUnit(path);
@@ -134,16 +123,16 @@ namespace Belle2 {
       }
     }
 
-    vector<double> Interface::getArray(const string& path) const noexcept(false)
+    std::vector<double> Interface::getArray(const std::string& path) const noexcept(false)
     {
       typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
       boost::char_separator<char> sep(",; \t\n\r");
 
-      pair<string, string> value = getStringWithUnit(path);
+      std::pair<std::string, std::string> value = getStringWithUnit(path);
       tokenizer tokens(value.first, sep);
-      vector<double> result;
+      std::vector<double> result;
       double numValue(0);
-      for (const string& tok : tokens) {
+      for (const std::string& tok : tokens) {
         try {
           numValue = boost::lexical_cast<double>(tok);
         } catch (boost::bad_lexical_cast&) {
@@ -157,7 +146,7 @@ namespace Belle2 {
       return result;
     }
 
-    vector<double> Interface::getArray(const string& path, const vector<double>& defaultValue) const noexcept(false)
+    std::vector<double> Interface::getArray(const std::string& path, const std::vector<double>& defaultValue) const noexcept(false)
     {
       try {
         return getArray(path);
@@ -167,23 +156,23 @@ namespace Belle2 {
     }
 
 
-    string Interface::ensureNode(const string& path) const
+    std::string Interface::ensureNode(const std::string& path) const
     {
       return boost::trim_right_copy_if(path, boost::is_any_of("/"));
     }
 
-    string Interface::ensurePath(const string& path) const
+    std::string Interface::ensurePath(const std::string& path) const
     {
       return ensureNode(path) + '/';
     }
 
-    string Interface::addIndex(const string& path, int index) const
+    std::string Interface::addIndex(const std::string& path, int index) const
     {
       static boost::format index_fmt("%1%[%2%]");
       return (index_fmt % ensureNode(path) % index).str();
     }
 
-    string Interface::joinPath(const string& path, const string& subpath) const
+    std::string Interface::joinPath(const std::string& path, const std::string& subpath) const
     {
       return ensurePath(path) + boost::trim_left_copy_if(subpath, boost::is_any_of("/"));
     }

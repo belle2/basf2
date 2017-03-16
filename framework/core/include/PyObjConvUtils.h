@@ -449,11 +449,11 @@ namespace Belle2 {
      * Reads std::map from a python object.
      *
      * @param pyObject Python object which stores the map.
-     * @param std::map<Key,Value> dummy allows the compiler to infer the correct template.
+     * @param dummy allows the compiler to infer the correct template.
      * @return Map, which holds the map from the python object
      */
     template<typename Key, typename Value>
-    std::map<Key, Value> convertPythonObject(const boost::python::object& pyObject, std::map<Key, Value>)
+    std::map<Key, Value> convertPythonObject(const boost::python::object& pyObject, __attribute((unused)) std::map<Key, Value> dummy)
     {
       std::map<Key, Value> tmpMap;
       const boost::python::dict& pyDict = static_cast<const boost::python::dict&>(pyObject);

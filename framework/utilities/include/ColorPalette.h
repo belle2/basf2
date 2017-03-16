@@ -10,9 +10,9 @@ namespace Belle2 {
    * Invalid names/id produce an exception.
    */
   namespace TangoPalette {
-    /** Get six-digit hex code (#abcdef) for given name in tango colour palette.
+    /** Get six-digit hex code (\#abcdef) for given name in tango colour palette.
      *
-     * e.g. getHex("Aluminium", 3) returns "#eeeeec".
+     * e.g. getHex("Aluminium", 3) returns "\#eeeeec".
      * */
     const char* getHex(const std::string& tangoName, int tangoId = 1);
 

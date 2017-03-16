@@ -35,14 +35,15 @@ EvtMessage::EvtMessage(char* data):
 /// @brief Constructor of EvtMessage allocating new buffer
 /// @param msg  data
 /// @param size Length of the data (TMessage)
-EvtMessage::EvtMessage(const char* sobjs, int size, ERecordType type = MSG_EVENT)
+/// @param type type of the message
+EvtMessage::EvtMessage(const char* msg, int size, ERecordType type = MSG_EVENT)
 {
   int fullsize = size + sizeof(EvtHeader);
   int bufsize = roundToNearestInt(fullsize);
   m_data = new char[bufsize]; // Allocate new buffer
   // zero extra bytes
   memset(m_data + fullsize, 0, bufsize - fullsize);
-  setMsg(sobjs, size, type);
+  setMsg(msg, size, type);
   m_ownsBuffer = true;
 }
 

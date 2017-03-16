@@ -112,7 +112,8 @@ namespace Belle2 {
      * The given function will be called whenever there is a new database entry for the given name.
      *
      * @param name Name under which the object is stored in the database (and in the DBStore).
-     * @param callback   The callback function.
+     * @param callback The callback function.
+     * @param id unique identifier of this callback function
      */
     void addCallback(const std::string& name, DBCallback callback, DBCallbackId id);
 

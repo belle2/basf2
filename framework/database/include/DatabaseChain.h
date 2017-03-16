@@ -27,8 +27,11 @@ namespace Belle2 {
     /**
      * Method to set the database instance to a local database.
      *
-     * @param resetIoVs   A flag to indicate whether IoVs from non-primary databases should be set to the current run
-     * @param logLevel    The level of log messages about not-found payloads.
+     * @param resetIoVs A flag to indicate whether IoVs from non-primary databases should be set to the current run
+     * @param logLevel The level of log messages about not-found payloads.
+     * @param invertLogging If true log messages will be created when a
+     *   payload is found. This is intended for the local database to notify
+     *   the user that a non-standard payload from a local directory is used.
      */
     static void createInstance(bool resetIoVs = false, LogConfig::ELogLevel logLevel = LogConfig::c_Warning,
                                bool invertLogging = false);

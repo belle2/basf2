@@ -33,8 +33,8 @@ namespace Belle2 {
     UInt_t dest{(UInt_t) - 1}; /**< destination IP. */
     UInt_t flags{0}; /**< flags concerning the content of the message. Usually 0
                       but can be any combination of of EvtMessage::EMessageFlags. */
-    UInt_t nObjects{0}; /**< #objects in message. */
-    UInt_t nArrays{0}; /**< #objects in message. */
+    UInt_t nObjects{0}; /**< number of objects in message. */
+    UInt_t nArrays{0}; /**< number of objects in message. */
     UInt_t reserved[6] {0}; /**< Reserved for future use. Don't ever use these directly. */
     /** version field. Previously the reserved fields were not initialized
      * properly so they could contain random garbage which makes it very hard
@@ -69,7 +69,7 @@ namespace Belle2 {
     /** build EvtMessage from existing buffer (no copy, but does not take ownership). */
     explicit EvtMessage(char* buf = nullptr);
     /** build EvtMessage by allocating new message buffer (sobjs is copied). */
-    EvtMessage(const char* sobjs, int size, ERecordType type);
+    EvtMessage(const char* msg, int size, ERecordType type);
     /** Copy constructor (m_data is copied). */
     EvtMessage(const EvtMessage& evtmsg);
     /** Destructor */

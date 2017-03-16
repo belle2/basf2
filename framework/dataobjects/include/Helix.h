@@ -36,13 +36,13 @@ namespace Belle2 {
   /** This class represents an ideal helix in perigee parameterization.
    *  The used perigee parameters are:
    *
-   *  1. **@f$ d_0 @f$** - the signed distance from the origin to the perigee. The sign is positive (negative),
+   *  1. @f$ d_0 @f$ - the signed distance from the origin to the perigee. The sign is positive (negative),
    *                       if the angle from the xy perigee position vector to the transverse momentum vector is +pi/2 (-pi/2).
-   *                       @f$d_0@F$ has the same sign as `getPerigee().Cross(getMomentum()).Z()`.
-   *  2. **@f$ \phi_0 @f$** - the angle in the xy projection between the transverse momentum and the x axis, which is in [-pi, pi]
-   *  3. **@f$ \omega @f$** - the signed curvature of the track where the sign is given by the charge of the particle
-   *  4. **@f$ z_0 @f$** - z coordinate of the perigee
-   *  5. **@f$ \tan \lambda @f$** - the slope of the track in the sz plane (dz/ds)
+   *                       @f$d_0@f$ has the same sign as `getPerigee().Cross(getMomentum()).Z()`.
+   *  2. @f$ \phi_0 @f$ - the angle in the xy projection between the transverse momentum and the x axis, which is in [-pi, pi]
+   *  3. @f$ \omega @f$ - the signed curvature of the track where the sign is given by the charge of the particle
+   *  4. @f$ z_0 @f$ - z coordinate of the perigee
+   *  5. @f$ \tan \lambda @f$ - the slope of the track in the sz plane (dz/ds)
    *
    *  in that exact order.
    *

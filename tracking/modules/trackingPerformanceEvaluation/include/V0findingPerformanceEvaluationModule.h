@@ -26,9 +26,8 @@
 #include <tracking/dataobjects/V0ValidationVertex.h>
 
 // forward declarations
-namespace genfit { class Track; }
-
 namespace Belle2 {
+
   class MCParticle;
   class V0;
 
@@ -71,6 +70,7 @@ namespace Belle2 {
 
     TH1F* m_multiplicityV0s; /**< number of V0s per MCParticles*/
     TH1F* m_multiplicityMCParticles;  /**< number of MCParticles per fitted Track*/
+    TH1F* m_MCParticlePDGcode;  /**< MCParticle PDG code*/
 
     //error on track parameters
     TH1F* m_h1_vtxX_err; /**< vtx error*/

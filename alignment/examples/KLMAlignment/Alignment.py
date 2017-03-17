@@ -11,13 +11,17 @@ main = create_path()
 
 input = register_module('RootInput')
 input.param('inputFileName', sys.argv[1])
-input.initialize()
 
 gear = register_module('Gearbox')
-gear.initialize()
+
 geom = register_module('Geometry')
 geom.param('components', ['PXD', 'SVD'])
-geom.initialize()
+
+main = create_path()
+main.add_module(input)
+main.add_module(gear)
+main.add_module(geom)
+process(main)
 
 # Create the algorithm
 algo = Belle2.MillepedeAlgorithm()

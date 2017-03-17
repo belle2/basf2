@@ -53,18 +53,9 @@ void TrackSetEvaluatorGreedyDEVModule::event()
   Scrooge scrooge;
   scrooge.performSelection(qiTrackOverlap);
 
-  //-----------------------------------------------------------------------------------------------
-  //TMPTMPTMP:::
-  for (auto && track : m_spacePointTrackCands) {
-    if (track.getRefereeStatus(SpacePointTrackCand::c_isActive)) {
-      cout << track.getRefereeStatusString() << ", Array Index: " << track.getArrayIndex()
-           << ", QI: " << track.getQualityIndex() << endl;
-    }
-  }
-
   for (auto && track : qiTrackOverlap) {
-    if (track.activityState > 0.75) {
-      cout << "Array Index: " << track.trackIndex  << ", QI: " << track.qualityIndex << endl;
+    if (track.activityState < 0.75) {
+      m_spacePointTrackCands[track.trackIndex]->removeRefereeStatus(SpacePointTrackCand::c_isActive);
     }
   }
 

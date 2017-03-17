@@ -15,12 +15,6 @@
 
 #include <vector>
 
-//------------------------------------------------------------------------------------------------
-//TMPTMPTMP:::
-#include <iostream>
-//------------------------------------------------------------------------------------------------
-
-using namespace std;
 using namespace Belle2;
 
 
@@ -31,14 +25,14 @@ TrackSetEvaluatorGreedyDEVModule::TrackSetEvaluatorGreedyDEVModule() : Module()
   setDescription("Expects a container of SpacePointTrackCandidates,\
  selects a subset of non-overlapping TCs using the Greedy algorithm.");
 
-  addParam("NameSpacePointTrackCands", m_nameSpacePointTrackCands, "Name of expected StoreArray.", string(""));
+  addParam("NameSpacePointTrackCands", m_nameSpacePointTrackCands, "Name of expected StoreArray.", std::string(""));
 }
 
 void TrackSetEvaluatorGreedyDEVModule::event()
 {
   //Create an empty object of the type,
   //that needs to be given to Scrooge.
-  vector<OverlapResolverNodeInfo> qiTrackOverlap;
+  std::vector<OverlapResolverNodeInfo> qiTrackOverlap;
   unsigned int const nSpacePointTrackCands = m_spacePointTrackCands.getEntries();
   qiTrackOverlap.reserve(nSpacePointTrackCands);
 

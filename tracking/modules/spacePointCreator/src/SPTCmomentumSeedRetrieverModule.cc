@@ -16,7 +16,7 @@
 #include <TVector3.h>
 #include <TMath.h>
 
-using namespace std;
+// using namespace std;
 using namespace Belle2;
 
 
@@ -28,7 +28,8 @@ SPTCmomentumSeedRetrieverModule::SPTCmomentumSeedRetrieverModule() : Module()
   setDescription("A module for creating momentum seeds for spacepoint track candidates.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("tcArrayName", m_PARAMtcArrayName, " sets the name of expected StoreArray with SpacePointTrackCand in it.", string(""));
+  addParam("tcArrayName", m_PARAMtcArrayName, " sets the name of expected StoreArray with SpacePointTrackCand in it.",
+           std::string(""));
 }
 
 
@@ -70,7 +71,6 @@ void SPTCmomentumSeedRetrieverModule::endRun()
 }
 
 
-//    unsigned int createSPTCmomentumSeeds(SPTCContainerType& tcContainer, std::vector<std::vector<const SpacePoint*> > allPaths)
 bool SPTCmomentumSeedRetrieverModule::createSPTCmomentumSeed(SpacePointTrackCand& aTC)
 {
   // create tool for generating the momentum seed:

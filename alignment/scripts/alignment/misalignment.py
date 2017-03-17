@@ -96,7 +96,7 @@ class CreateMisalignmentModule(Module):
     def initialize(self):
         alignment = Belle2.VXDAlignment()
         txt = open('generated_misalignment.txt', 'w')
-        txt.write('layer ladder sensor R_orig Phi_orig Z_orig R Phi Z u v w\n')
+        txt.write('layer ladder sensor x_orig y_orig z_orig x y z u v w\n')
 
         for sensor in Belle2.VXD.GeoCache.getInstance().getListOfSensors():
             info = Belle2.VXD.GeoCache.getInstance().get(sensor)
@@ -112,7 +112,6 @@ class CreateMisalignmentModule(Module):
                     delta += deformation(global_pos)
 
             new_global_pos = global_pos + delta
-            delta.Print()
             new_local_pos = info.pointToLocal(new_global_pos)
 
             if self.random_misalignments is not None:
@@ -128,10 +127,10 @@ class CreateMisalignmentModule(Module):
 
                 alignment.set(sensor.getID(), i + 1, new_local_pos[i])
 
-            helper = GlobalDeformation(0.)
+            # helper = GlobalDeformation(0.)
 
-            global_pos = helper._xyz_to_rphiz(global_pos)
-            new_global_pos = helper._xyz_to_rphiz(new_global_pos)
+            # global_pos = helper._xyz_to_rphiz(global_pos)
+            # new_global_pos = helper._xyz_to_rphiz(new_global_pos)
 
             txt.write(
                 '{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} \n'.format(

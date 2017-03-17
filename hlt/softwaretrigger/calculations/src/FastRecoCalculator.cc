@@ -17,17 +17,27 @@ namespace Belle2 {
   namespace SoftwareTrigger {
     void FastRecoCalculator::requireStoreArrays()
     {
-      m_cdcRecoTracks.isRequired();
+      // The CDC reco tracks should either be in the store array "CDCRecoTracks" or in the normal "RecoTracks".
+      if (not m_cdcRecoTracks.isOptional()) {
+        m_recoTracks.isRequired();
+      }
       m_eclClusters.isRequired();
     };
 
     void FastRecoCalculator::doCalculation(SoftwareTriggerObject& calculationResult) const
     {
+      StoreArray<RecoTrack> recoTracks;
+      if (m_cdcRecoTracks.isValid()) {
+        recoTracks = m_cdcRecoTracks;
+      } else {
+        recoTracks = m_recoTracks;
+      }
+
       // Prepare some cache objects.
       std::vector<TVector3> momenta;
-      momenta.reserve(static_cast<unsigned long>(m_cdcRecoTracks.getEntries()));
+      momenta.reserve(static_cast<unsigned long>(recoTracks.getEntries()));
 
-      for (const RecoTrack& cdcRecoTrack : m_cdcRecoTracks) {
+      for (const RecoTrack& cdcRecoTrack : recoTracks) {
         momenta.push_back(cdcRecoTrack.getMomentumSeed());
       }
 
@@ -42,7 +52,7 @@ namespace Belle2 {
 
       // TODO: Do only return the first (we do not need more).
       const std::vector<double>& sortedRhoECLEnergyList = getSortedEnergiesFrom(m_eclClusters, m_transformer);
-      const std::vector<double>& sortedRhoCDCEnergyList = getSortedEnergiesFrom(m_cdcRecoTracks, m_transformer);
+      const std::vector<double>& sortedRhoCDCEnergyList = getSortedEnergiesFrom(recoTracks, m_transformer);
 
       // Calculate the visible energy
       double visibleEnergy = 0;

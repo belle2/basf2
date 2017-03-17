@@ -29,12 +29,12 @@ namespace Belle2 {
 //class TRGCDCJSignal;
 
 /// A class to use LUTs for TRGCDC
-class TRGCDCJLUT {
+  class TRGCDCJLUT {
 
   public:
 
     /// Contructor.
-    TRGCDCJLUT(const std::string & name="no_name");
+    TRGCDCJLUT(const std::string& name = "no_name");
 
     /// Copy constructor.
     TRGCDCJLUT(const TRGCDCJLUT& in);
@@ -54,16 +54,16 @@ class TRGCDCJLUT {
     std::string version(void) const;
 
     /// set LookUpTable(LUT) data.
-    void setData(int inputBitsize, int outputBitSize, const std::string & filename, bool twoscomplement=0);
+    void setData(int inputBitsize, int outputBitSize, const std::string& filename, bool twoscomplement = 0);
 
     /// set LUT function directly using int values.
     void setFunction(std::function<int(int)> function);
 
     /// set LUT function using JSignals.
     int setFloatFunction(std::function<double(double)> function,
-                          TRGCDCJSignal const & input,
-                          TRGCDCJSignal const & minInv, TRGCDCJSignal const & maxInv, double outputToReal,
-                          int lutInputBitwidth, int lutOutputBitwidth);
+                         TRGCDCJSignal const& input,
+                         TRGCDCJSignal const& minInv, TRGCDCJSignal const& maxInv, double outputToReal,
+                         int lutInputBitwidth, int lutOutputBitwidth);
 
     /// set output flag.
     void setOutputFlag(int outputFlag);
@@ -79,7 +79,7 @@ class TRGCDCJLUT {
 
     /// get LUT filename
     std::string getFileName() const;
-    
+
     /// get input bitsize
     int getInputBitsize() const;
 
@@ -108,7 +108,7 @@ class TRGCDCJLUT {
     void dump();
 
     /// make COE file.
-    void makeCOE(std::string="");
+    void makeCOE(std::string = "");
 
     /// Storage for values used in function.
     std::vector<double> m_const;
@@ -117,13 +117,13 @@ class TRGCDCJLUT {
     std::string operate(std::string out, std::string in, std::map<std::string, std::map<std::string, double>* >& m_intStorage);
 
     /// Returns LUT value. Out is LUT value + offset. (LUT value + offset do not obey addition bitsize rules.)
-    TRGCDCJSignal const operate(TRGCDCJSignal const& in, TRGCDCJSignal & out);
+    TRGCDCJSignal const operate(TRGCDCJSignal const& in, TRGCDCJSignal& out);
 
-    /// Output is LUT Out + offset. Input is non offset input. 
-    void operateNoOffset(TRGCDCJSignal const& in, TRGCDCJSignal & out) const;
+    /// Output is LUT Out + offset. Input is non offset input.
+    void operateNoOffset(TRGCDCJSignal const& in, TRGCDCJSignal& out) const;
 
     /// Creates vhdlCode for lut.
-    std::string const lutVhdlCode(std::string const & shiftOffsetInput) const;
+    std::string const lutVhdlCode(std::string const& shiftOffsetInput) const;
 
   private:
 
@@ -193,15 +193,16 @@ class TRGCDCJLUT {
     /// The bt shifted offset signal of input.
     TRGCDCJSignal m_shiftOffsetInput;
 
-};
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-std::string
-TRGCDCJLUT::name(void) const {
+  inline
+  std::string
+  TRGCDCJLUT::name(void) const
+  {
     return m_name;
-}
+  }
 
 
 } // namespace Belle2

@@ -283,7 +283,7 @@ void CDCSVGPlotter::drawRecoTracks(const std::string& storeArrayName,
                                    const std::string& stroke,
                                    const std::string& strokeWidth)
 {
-  DefaultColorCycleStyling<const RecoTrack> styling;
+  ChooseableRecoTrackStyling styling;
   if (stroke != "") styling.setStroke(stroke);
   if (strokeWidth != "") styling.setStrokeWidth(strokeWidth);
   drawStoreArray<const RecoTrack>(storeArrayName, styling);

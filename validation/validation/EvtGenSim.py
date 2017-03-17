@@ -13,6 +13,7 @@
 
 from basf2 import *
 from simulation import add_simulation
+from L1trigger import add_tsim
 from beamparameters import add_beamparameters
 import validationtools
 
@@ -37,6 +38,9 @@ main.add_module(evtgeninput)
 
 bg = validationtools.get_background_files()
 add_simulation(main, bkgfiles=bg)
+
+# trigger simulation
+add_tsim(main)
 
 # memory profile
 main.add_module(register_module('Profile'))

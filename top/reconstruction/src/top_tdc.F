@@ -2,6 +2,7 @@
 ! TOP counter for Belle: initialization of/interface to TOP_TDC
 ! M. Staric, mar-2009, sept-2013
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
+! mar-2017: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE SET_TDC(NBIT,CHWID,OFFSET)

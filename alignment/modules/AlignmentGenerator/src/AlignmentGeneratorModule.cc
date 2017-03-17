@@ -94,7 +94,7 @@ void AlignmentGeneratorModule::initialize()
   std::string name = (m_payloadName == "") ? DBStore::objectName<VXDAlignment>("") : m_payloadName;
 
   B2WARNING("Overriding VXDAlignment in DBStore with new object. This will affect reconstruction if done in this job.");
-  DBStore::Instance().addConstantOverride("dbstore", name, new VXDAlignment(*data));
+  DBStore::Instance().addConstantOverride(name, new VXDAlignment(*data));
 
   if (m_createPayload) {
     if (m_payloadIov.size() != 4)

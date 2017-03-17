@@ -10,6 +10,7 @@
 #include <framework/datastore/RelationVector.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/HTML.h>
+#include <framework/utilities/ColorPalette.h>
 
 #include <utility>
 
@@ -208,9 +209,9 @@ TString InfoWidget::getHeader(const URI& uri) const
 
   TString col;
   if (uri.object and VisualRepMap::getInstance()->isVisualized(uri.object))
-    col = "d2ede4";
+    col = "#d2ede4"; //needs to be lighter than purple/blue used for links
   else
-    col = "eeeeee";
+    col = TangoPalette::getHex("Aluminium", 1);
   TString info;
   info += "<table border=0 width=100% bgcolor=" + col + "><tr>";
   //breadcrumbs

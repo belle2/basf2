@@ -16,18 +16,19 @@
 
 namespace Belle2 {
 
-TRGCDCTrackMC *
-TRGCDCTrackMC::_undefined = new TRGCDCTrackMC();
+  TRGCDCTrackMC*
+  TRGCDCTrackMC::_undefined = new TRGCDCTrackMC();
 
-std::vector<const TRGCDCTrackMC *>
-TRGCDCTrackMC::_list = std::vector<const TRGCDCTrackMC *>();
+  std::vector<const TRGCDCTrackMC*>
+  TRGCDCTrackMC::_list = std::vector<const TRGCDCTrackMC*>();
 
-void
-TRGCDCTrackMC::update(void) {
+  void
+  TRGCDCTrackMC::update(void)
+  {
     if (_list.size()) {
-        for (unsigned i = 0; i < _list.size(); i++)
-            delete _list[i];
-        _list.clear();
+      for (unsigned i = 0; i < _list.size(); i++)
+        delete _list[i];
+      _list.clear();
     }
 
 //    unsigned n = 0;
@@ -47,7 +48,7 @@ TRGCDCTrackMC::update(void) {
 // //             std::cout << std::endl;
 // //         }
 //     }
-}
+  }
 
 // TRGCDCTrackMC::TRGCDCTrackMC(const struct gen_hepevt * h)
 // : _hep(h),
@@ -60,19 +61,22 @@ TRGCDCTrackMC::update(void) {
 //     }
 // }
 
-TRGCDCTrackMC::TRGCDCTrackMC() {
-}
+  TRGCDCTrackMC::TRGCDCTrackMC()
+  {
+  }
 
-TRGCDCTrackMC::~TRGCDCTrackMC() {
+  TRGCDCTrackMC::~TRGCDCTrackMC()
+  {
     if (_list.size()) {
-        for (unsigned i = 0; i < _list.size(); i++)
-            delete _list[i];
-        _list.clear();
+      for (unsigned i = 0; i < _list.size(); i++)
+        delete _list[i];
+      _list.clear();
     }
-}
+  }
 
-void
-TRGCDCTrackMC::dump(const std::string &, const std::string & pre) const {
+  void
+  TRGCDCTrackMC::dump(const std::string&, const std::string& pre) const
+  {
     std::cout << pre;
     std::cout << id() << ":";
     std::cout << pType() << ":";
@@ -81,20 +85,22 @@ TRGCDCTrackMC::dump(const std::string &, const std::string & pre) const {
     std::cout << ":";
     std::cout << _p << ":" << _v;
     std::cout << std::endl;
-}
+  }
 
-std::vector<const TRGCDCTrackMC *>
-TRGCDCTrackMC::list(void) {
-    std::vector<const TRGCDCTrackMC *> t;
+  std::vector<const TRGCDCTrackMC*>
+  TRGCDCTrackMC::list(void)
+  {
+    std::vector<const TRGCDCTrackMC*> t;
     t.assign(_list.begin(), _list.end());
     return t;
-}
+  }
 
-std::vector<const TRGCDCWireHitMC *>
-TRGCDCTrackMC::hits(void) const {
-    std::vector<const TRGCDCWireHitMC *> t;
+  std::vector<const TRGCDCWireHitMC*>
+  TRGCDCTrackMC::hits(void) const
+  {
+    std::vector<const TRGCDCWireHitMC*> t;
     t.assign(_hits.begin(), _hits.end());
     return t;
-}
+  }
 
 } // namespace Belle2

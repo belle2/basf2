@@ -1,12 +1,13 @@
 #include <framework/datastore/StoreEntry.h>
 #include <framework/dataobjects/RelationContainer.h>
+#include <framework/logging/Logger.h>
 
 #include <TClass.h>
 #include <TClonesArray.h>
 
 using namespace Belle2;
 
-StoreEntry::StoreEntry(bool isArray, const TClass* cl, const std::string& name, bool dontWriteOut):
+StoreEntry::StoreEntry(bool isArray, TClass* cl, const std::string& name, bool dontWriteOut):
   isArray(isArray),
   dontWriteOut(dontWriteOut),
   objClass(cl),
@@ -24,7 +25,21 @@ void StoreEntry::recoverFromNullObject()
   if (isArray) {
     object = new TClonesArray(objClass);
   } else {
-    object = static_cast<TObject*>(objClass->New());
+    // Oh dear, where to begin. So we want to create a new object of the class
+    // we have and we require this class to be inheriting from TObject. Fine,
+    // but there could be classes with multiple inheritance where the TObject
+    // is not the first base class. In this case the memory layout puts the
+    // TObject not at the beginning of the instance but at an offset. The
+    // compiler knows this so a static_cast<> or c-style cast from one to the
+    // other will correctly modify the pointing address to point to the start
+    // of TObject, but TClass::New() gives us a void* pointer so the compiler
+    // doesn't know about that. So to be on the safe side we have to manually
+    // fix the pointer address using the BaseClassOffset from TClass. And since
+    // pointer arithmetic on void* is forbidden we have to go to char* first.
+    char* rawPtr = reinterpret_cast<char*>(objClass->New());
+    int offset = objClass->GetBaseClassOffset(TObject::Class());
+    if (offset < 0) B2FATAL("Class " << objClass->GetName() << " does not inherit from TObject");
+    object = reinterpret_cast<TObject*>(rawPtr + offset);
   }
 }
 

@@ -11,6 +11,7 @@ class TEveBox;
 class TEveElement;
 class TEveElementList;
 class TGButton;
+class TGCheckButton;
 class TGPictureButton;
 class TGLabel;
 class TGNumberEntry;
@@ -93,6 +94,12 @@ namespace Belle2 {
     /** Set title of Eve window. Add fileName, if given. */
     void setTitle(const std::string& fileName = "");
 
+    /** Show control for flagging events (to set module return value). Needs to be called in initialize(). */
+    void allowFlaggingEvents(const std::string& description = "");
+
+    /** Return value for current event, only makes sense if allowFlaggingEvents(true)  was called. */
+    bool getReturnValue() const;
+
     /** hide objects with the given names. */
     void hideObjects(const std::vector<std::string>& names) { m_hideObjects = names; }
 
@@ -162,62 +169,61 @@ namespace Belle2 {
     void updateUI();
 
     /** Current entry id */
-    long m_currentEntry;
-
-    /** Rescale errors with this factor to ensure visibility. */
-    double fErrorScale;
+    long m_currentEntry{0};
 
     /** Was GUI already built? */
-    bool m_guiInitialized;
+    bool m_guiInitialized{false};
 
     /** Show current event again after startDisplay() returns? */
-    bool m_reshowCurrentEvent;
+    bool m_reshowCurrentEvent{false};
 
     /** If true, disable interactive control and call automaticEvent() instead. */
-    bool m_automatic;
+    bool m_automatic{false};
 
     /** If true, DisplayModule shouldn't clear previous data (i.e. we want to show multiple events) */
-    bool m_cumulative;
+    bool m_cumulative{false};
 
     /** List of run time configurable module parameters. */
     std::vector<Parameter> m_paramList;
 
     /** Button to switch to previous event. */
-    TGButton* m_prevButton;
+    TGButton* m_prevButton{nullptr};
 
     /** Button to switch to next event. */
-    TGButton* m_nextButton;
+    TGButton* m_nextButton{nullptr};
 
     /** Event switcher with numeric entry. */
-    TGNumberEntry* m_eventNumberWidget;
+    TGNumberEntry* m_eventNumberWidget{nullptr};
 
     /** Delay for automatic advance, in seconds. */
-    TGNumberEntry* m_autoAdvanceDelay;
+    TGNumberEntry* m_autoAdvanceDelay{nullptr};
 
     /** Play / Pause button. */
-    TGPictureButton* m_playPauseButton;
+    TGPictureButton* m_playPauseButton{nullptr};
+
+    /** Show control for flagging events (to set module return value). */
+    TGCheckButton* m_flagEvent{nullptr};
 
     /** show event/run/exp number for current event. */
-    TGLabel* m_eventLabel;
+    TGLabel* m_eventLabel{nullptr};
 
     /** File name prefix (prefix + #event + "_" + projection + ".png"). */
-    TGTextEntry* m_autoFileNamePrefix;
+    TGTextEntry* m_autoFileNamePrefix{nullptr};
 
     /** width of saved PNGs. */
-    TGNumberEntry* m_autoPictureWidth;
+    TGNumberEntry* m_autoPictureWidth{nullptr};
 
     /** List of event data, including projections. */
-    TEveElementList* m_eventData;
+    TEveElementList* m_eventData{nullptr};
 
     /** pointer to right-side pane with viewers. */
-    SplitGLView* m_viewPane;
+    SplitGLView* m_viewPane{nullptr};
 
     /** Polling/auto-advance timer. */
-    TTimer* m_timer;
+    TTimer* m_timer{nullptr};
 
     /** objects which are to be hidden (can be manually re-enabled in tree view). Names correspond to the object names in the 'Event Scene'. */
     std::vector<std::string> m_hideObjects;
-
 
     /** Dictionary needed for signal/slot mechanism (0 to disable I/O). */
     ClassDef(DisplayUI, 0)

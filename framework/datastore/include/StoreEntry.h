@@ -12,7 +12,7 @@ namespace Belle2 {
     StoreEntry() : isArray(false), dontWriteOut(false), objClass(nullptr), object(nullptr), ptr(nullptr), name() {};
 
     /** useful constructor, creates 'object', but leaves 'ptr' NULL. */
-    StoreEntry(bool isArray, const TClass* cl, const std::string& name, bool dontWriteOut);
+    StoreEntry(bool isArray, TClass* cl, const std::string& name, bool dontWriteOut);
 
     /** invalidate entry for next event. (ptr will be null afterwards, memory may be reused.) */
     void invalidate();
@@ -27,7 +27,7 @@ namespace Belle2 {
 
     bool isArray;     /**< Flag that indicates whether the object is a TClonesArray **/
     bool dontWriteOut; /**< Flag that indicates whether the object should be written to the output by default **/
-    const TClass* objClass; /**< class of object. If isArray==true, class of array objects */
+    TClass* objClass; /**< class of object. If isArray==true, class of array objects */
 
     /** The pointer to the actual object.
      *

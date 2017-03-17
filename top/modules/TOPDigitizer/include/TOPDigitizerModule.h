@@ -71,6 +71,13 @@ namespace Belle2 {
     double m_darkNoise = 0;            /**< uniform dark noise (hits per bar) */
     double m_trigT0Sigma = 0;          /**< trigger T0 resolution */
     double m_bunchTimeSep = 0;         /**< time between two bunches */
+    double m_ADCx0 = 0; /**< pulse height distribution parameter [ADC counts] */
+    double m_ADCp1 = 0; /**< pulse height distribution parameter, must be non-negative */
+    double m_ADCp2 = 0; /**< pulse height distribution parameter, must be positive */
+    double m_ADCmax = 0; /**< pulse height upper bound of range [ADC counts] */
+    double m_pedestalRMS = 0; /**< r.m.s of pedestals [ADC counts]*/
+    short m_threshold = 0; /**< pulse height threshold [ADC counts] */
+    short m_thresholdCount = 0; /**< minimal number of samples above threshold */
 
   };
 

@@ -28,114 +28,122 @@ using namespace std;
 
 namespace Belle2 {
 
-TRGCDCCellHit::TRGCDCCellHit(const TRGCDCCell & w,
-			     unsigned indexCDCHit,
-			     unsigned indexCDCSimHit,
-			     unsigned indexMCParticle,
-			     float driftLeft,
-			     float driftLeftError,
-			     float driftRight,
-			     float driftRightError,
-			     int mcLRflag,
-			     float fudgeFactor)
+  TRGCDCCellHit::TRGCDCCellHit(const TRGCDCCell& w,
+                               unsigned indexCDCHit,
+                               unsigned indexCDCSimHit,
+                               unsigned indexMCParticle,
+                               float driftLeft,
+                               float driftLeftError,
+                               float driftRight,
+                               float driftRightError,
+                               int mcLRflag,
+                               float fudgeFactor)
     :  _state(0),
        _cell(w),
        _xyPosition(w.xyPosition()),
        _track(0),
        _iCDCHit(indexCDCHit),
        _iCDCSimHit(indexCDCSimHit),
-       _iMCParticle(indexMCParticle) {
+       _iMCParticle(indexMCParticle)
+  {
 //  w.hit(this); // set by TRGCDC
-    _mcLR=mcLRflag;
+    _mcLR = mcLRflag;
     _drift[0] = driftLeft;
     _drift[1] = driftRight;
     _driftError[0] = driftLeftError * fudgeFactor;
     _driftError[1] = driftRightError * fudgeFactor;
     if (w.axial()) _state |= CellHitAxial;
     else           _state |= CellHitStereo;
-}
+  }
 
-TRGCDCCellHit::~TRGCDCCellHit() {
-}
+  TRGCDCCellHit::~TRGCDCCellHit()
+  {
+  }
 
 // [FIXME] Crashes when there is no MC information
-void
-TRGCDCCellHit::dump(const std::string & msg,
-		    const std::string & pre) const {
+  void
+  TRGCDCCellHit::dump(const std::string& msg,
+                      const std::string& pre) const
+  {
     std::cout << pre;
     std::cout << _cell.name();
     if (msg.find("state") != std::string::npos ||
         msg.find("detail") != std::string::npos) {
-        std::cout << ",state";
-        TRGUtil::bitDisplay(_state);
-        if (track()) std::cout << ",trk ";
+      std::cout << ",state";
+      TRGUtil::bitDisplay(_state);
+      if (track()) std::cout << ",trk ";
     }
     if (msg.find("position") != std::string::npos ||
         msg.find("detail") != std::string::npos) {
-	cout << ",xy=" << _xyPosition;
+      cout << ",xy=" << _xyPosition;
     }
     if (msg.find("drift") != std::string::npos ||
         msg.find("detail") != std::string::npos) {
-        if (_state & CellHitLeftMask) std::cout << ", L";
-        if (_state & CellHitRightMask) std::cout << ", R";
-        std::cout << ",dl " << _drift[0] << "+-" << _driftError[0];
-        std::cout << ",dr " << _drift[1] << "+-" << _driftError[1];
+      if (_state & CellHitLeftMask) std::cout << ", L";
+      if (_state & CellHitRightMask) std::cout << ", R";
+      std::cout << ",dl " << _drift[0] << "+-" << _driftError[0];
+      std::cout << ",dr " << _drift[1] << "+-" << _driftError[1];
     }
     if (msg.find("mc") != std::string::npos ||
         msg.find("detail") != std::string::npos) {
-        cout << ",mcpart=" << iMCParticle();
-	cout << ",flightTime=" << simHit()->getFlightTime();
-	cout << ",driftLength=" << simHit()->getDriftLength() << endl;
-	_cell.signal().dump("detail", pre + "    ");
+      cout << ",mcpart=" << iMCParticle();
+      cout << ",flightTime=" << simHit()->getFlightTime();
+      cout << ",driftLength=" << simHit()->getDriftLength() << endl;
+      _cell.signal().dump("detail", pre + "    ");
     }
     std::cout << std::endl;
-}
+  }
 
-Point3D
-TRGCDCCellHit::position(unsigned lr) const {
+  Point3D
+  TRGCDCCellHit::position(unsigned lr) const
+  {
     static const HepGeom::Vector3D<double> HepXHat(1.0, 0.0, 0.0);
     static const HepGeom::Vector3D<double> HepYHat(0.0, 1.0, 0.0);
     static const HepGeom::Vector3D<double> HepZHat(0.0, 0.0, 1.0);
 
     //...Left...
     if (lr == CellHitLeft) {
-        return _xyPosition
-            - _drift[CellHitLeft] * HepZHat.cross(_xyPosition.unit());
+      return _xyPosition
+             - _drift[CellHitLeft] * HepZHat.cross(_xyPosition.unit());
     }
 
     //...Right case...
     else {
-        return _xyPosition
-            + _drift[CellHitRight] * HepZHat.cross(_xyPosition.unit());
+      return _xyPosition
+             + _drift[CellHitRight] * HepZHat.cross(_xyPosition.unit());
     }
-}
+  }
 
-int
-TRGCDCCellHit::sortById(const TRGCDCCellHit ** a, const TRGCDCCellHit ** b) {
+  int
+  TRGCDCCellHit::sortById(const TRGCDCCellHit** a, const TRGCDCCellHit** b)
+  {
     if ((* a)->_cell.id() > (* b)->_cell.id())
-        return 1;
+      return 1;
     else if ((* a)->_cell.id() == (* b)->_cell.id())
-        return 0;
+      return 0;
     else
-        return -1;
-}
+      return -1;
+  }
 
-const CDCHit *
-TRGCDCCellHit::hit(void) const {
+  const CDCHit*
+  TRGCDCCellHit::hit(void) const
+  {
     StoreArray<CDCHit> CDCHits("CDCHits");
     return CDCHits[_iCDCHit];
-}
+  }
 
-const CDCSimHit *
-TRGCDCCellHit::simHit(void) const {
+  const CDCSimHit*
+  TRGCDCCellHit::simHit(void) const
+  {
     StoreArray<CDCSimHit> CDCHits("CDCSimHits");
     return CDCHits[_iCDCSimHit];
-}
+  }
 
-const MCParticle *
-TRGCDCCellHit::mcParticle(void) const {
+  const MCParticle*
+  TRGCDCCellHit::mcParticle(void) const
+  {
     StoreArray<MCParticle> mcParticles("MCParticles");
     return mcParticles[_iMCParticle];
-}
+  }
 
 } // namespace Belle2

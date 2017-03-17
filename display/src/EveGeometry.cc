@@ -3,6 +3,7 @@
 #include <geometry/GeometryManager.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/utilities/ColorPalette.h>
 
 #include <TGeoManager.h>
 #include <TPRegexp.h>
@@ -15,6 +16,7 @@
 #include <cassert>
 
 using namespace Belle2;
+using namespace Belle2::TangoPalette;
 
 namespace {
   static TEveGeoTopNode* s_eveTopNode = nullptr;
@@ -32,7 +34,7 @@ void EveGeometry::addGeometry()
     geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
     geoManager.createTGeoRepresentation();
     if (!gGeoManager) {
-      B2ERROR("Couldn't create TGeo geometry!");
+      B2FATAL("Couldn't create TGeo geometry! Please make sure you add the Geometry module before Display");
       return;
     }
   }
@@ -73,12 +75,12 @@ void EveGeometry::addGeometry()
   */
 
   //set some nicer colors (at top level only)
-  setVolumeColor("PXD.Envelope", kGreen + 3);
-  setVolumeColor("SVD.Envelope", kOrange + 8);
-  setVolumeColor("logical_ecl", kOrange - 3);
-  setVolumeColor("BKLM.EnvelopeLogical", kGreen + 3);
-  setVolumeColor("Endcap_1", kGreen + 3);
-  setVolumeColor("Endcap_2", kGreen + 3);
+  setVolumeColor("PXD.Envelope", getTColorID("Chameleon", 2));
+  setVolumeColor("SVD.Envelope", getTColorID("Orange", 3));
+  setVolumeColor("logical_ecl", getTColorID("Orange", 1));
+  setVolumeColor("BKLM.EnvelopeLogical", getTColorID("Chameleon", 1));
+  setVolumeColor("Endcap_1", getTColorID("Chameleon", 1));
+  setVolumeColor("Endcap_2", getTColorID("Chameleon", 1));
 
   TGeoNode* top_node = gGeoManager->GetTopNode();
   assert(top_node != NULL);

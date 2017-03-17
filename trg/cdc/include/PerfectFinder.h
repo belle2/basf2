@@ -22,18 +22,18 @@
 
 namespace Belle2 {
 
-class TRGCDC;
-class TRGCDCTrack;
-class TRGCDCLink;
+  class TRGCDC;
+  class TRGCDCTrack;
+  class TRGCDCLink;
 
 /// A class to find 2D tracks using MC information
-class TRGCDCPerfectFinder {
+  class TRGCDCPerfectFinder {
 
   public:
 
     /// Contructor.
-    TRGCDCPerfectFinder(const std::string & name,
-			const TRGCDC &);
+    TRGCDCPerfectFinder(const std::string& name,
+                        const TRGCDC&);
 
     /// Destructor
     virtual ~TRGCDCPerfectFinder();
@@ -47,18 +47,18 @@ class TRGCDCPerfectFinder {
     std::string version(void) const;
 
     /// do track finding.
-    int doit(std::vector<TRGCDCTrack*> & trackListClone, std::vector<TRGCDCTrack *> & trackList);
+    int doit(std::vector<TRGCDCTrack*>& trackListClone, std::vector<TRGCDCTrack*>& trackList);
 
     /// returns MC track list which contributes to CDC hits.
-    const std::vector<int> & trackListMC(void) const;
+    const std::vector<int>& trackListMC(void) const;
 
   private:
 
     /// do perfect finding.
-    int doitPerfectly(std::vector<TRGCDCTrack *> & trackList);
+    int doitPerfectly(std::vector<TRGCDCTrack*>& trackList);
 
     /// do perfect finding (for single-track events).
-    int doitPerfectlySingleTrack(std::vector<TRGCDCTrack *> & trackList);
+    int doitPerfectlySingleTrack(std::vector<TRGCDCTrack*>& trackList);
 
   private:
 
@@ -66,25 +66,27 @@ class TRGCDCPerfectFinder {
     const std::string _name;
 
     /// CDCTRG
-    const TRGCDC & _cdc;
+    const TRGCDC& _cdc;
 
     /// MC track ID list
     std::vector<int> _mcList;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-std::string
-TRGCDCPerfectFinder::name(void) const {
+  inline
+  std::string
+  TRGCDCPerfectFinder::name(void) const
+  {
     return _name;
-}
+  }
 
-inline
-const std::vector<int> &
-TRGCDCPerfectFinder::trackListMC(void) const {
+  inline
+  const std::vector<int>&
+  TRGCDCPerfectFinder::trackListMC(void) const
+  {
     return _mcList;
-}
+  }
 
 } // namespace Belle2
 

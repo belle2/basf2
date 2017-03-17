@@ -239,7 +239,7 @@ namespace Belle2 {
 
     Weightfile Weightfile::loadFromDatabase(const std::string& identifier, const Belle2::EventMetaData& emd)
     {
-      auto pair = Belle2::Database::Instance().getData(emd, "dbstore", identifier);
+      auto pair = Belle2::Database::Instance().getData(emd, identifier);
 
       if (pair.first == 0) {
         throw std::runtime_error("Given identifier cannot be loaded from the database: " + identifier);

@@ -22,8 +22,6 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 
-using namespace genfit;
-
 namespace Belle2 {
   /** VXDCDCTrackMergerModule a module to merge VXD and CDC tracks
    *

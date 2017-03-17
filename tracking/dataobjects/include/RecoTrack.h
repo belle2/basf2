@@ -549,7 +549,7 @@ namespace Belle2 {
 
       // there might be the case, where the genfit track has no trackreps, even not the cardinal
       // one because no fit attempt was performed. In this case, the "hasFitStatus" call to genfit
-      // will fail with access violation. To prevent that, check for the number of reps here before
+      // will fail with an access violation. To prevent that, check for the number of reps here before
       // actually calling genfit's hasFitStatus(...)
       if (m_genfitTrack.getNumReps() == 0)
         return false;

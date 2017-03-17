@@ -81,6 +81,8 @@ namespace Belle2 {
       Int_t run; /**< run number */
 
       Float_t pValue; /**< p-value of Track fit */
+      Float_t z0;     /**< track z0 */
+      Float_t d0;     /**< track d0 */
 
       Int_t PDG;       /**< PDG code of related MCParticle */
       Int_t motherPDG; /**< PDG code of related mother MCParticle */
@@ -93,6 +95,7 @@ namespace Belle2 {
       Float_t rhoDec;  /**< decay vertex (cylindrical coordinate r) of MCParticle */
       Float_t zDec;    /**< decay vertex (cylindrical coordinate z) of MCParticle */
       Float_t phiDec;  /**< decay vertex (cylindrical coordinate phi) of MCParticle */
+      Int_t scatter;     /**< 1 if particle scattered (i.e. has daughter with same PDG) */
 
       ParticlesArray detPhot;      /**< number of detected photons */
       ParticlesArray numBkg;       /**< number of expected background photons */
@@ -109,9 +112,9 @@ namespace Belle2 {
       /**
        * Default constructor
        */
-      ARICHTree(): evt(0), run(0), pValue(0), PDG(0), motherPDG(0),
+      ARICHTree(): evt(0), run(0), pValue(0), z0(0), d0(0), PDG(0), motherPDG(0),
         status(0), primary(0), seen(0), rhoProd(0), zProd(0), phiProd(0), rhoDec(0), zDec(0),
-        phiDec(0), nRec(0)
+        phiDec(0), scatter(0), nRec(0)
       {
 
       }
@@ -125,6 +128,8 @@ namespace Belle2 {
         run = 0;
 
         pValue = 0;
+        z0 = 0;
+        d0 = 0;
 
         PDG = 0;
         motherPDG = 0;
@@ -137,6 +142,7 @@ namespace Belle2 {
         rhoDec = 0;
         zDec = 0;
         phiDec = 0;
+        scatter = 0;
         nRec = 0;
 
         detPhot.clear();

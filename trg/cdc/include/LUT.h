@@ -23,11 +23,11 @@
 
 namespace Belle2 {
 
-class TRGCDC;
-class TRGCDCTrack;
+  class TRGCDC;
+  class TRGCDCTrack;
 
 /// A class to use LUTs for TRGCDC
-class TRGCDCLUT {
+  class TRGCDCLUT {
 
   public:
 
@@ -46,7 +46,7 @@ class TRGCDCLUT {
     std::string version(void) const;
 
     /// set LUT data.
-    void setDataFile(const std::string &filename, int);
+    void setDataFile(const std::string& filename, int);
 
     /// get LUT Values
     double getValue(double) const;
@@ -59,21 +59,22 @@ class TRGCDCLUT {
     std::vector<int> m_data;
 
     /// Input bit size
-    int m_bitsize; 
+    int m_bitsize;
 
     /// LUT name.
     std::string m_name;
 
 
-};
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-std::string
-TRGCDCLUT::name(void)const{
-	return m_name;
-}
+  inline
+  std::string
+  TRGCDCLUT::name(void)const
+  {
+    return m_name;
+  }
 
 } // namespace Belle2
 

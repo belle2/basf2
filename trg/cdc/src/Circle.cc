@@ -25,55 +25,60 @@ using namespace std;
 
 namespace Belle2 {
 
-const TRGCDCCircleFitter
-TRGCDCCircle::_fitter = TRGCDCCircleFitter("TRGCDCCircle Default Fitter");
+  const TRGCDCCircleFitter
+  TRGCDCCircle::_fitter = TRGCDCCircleFitter("TRGCDCCircle Default Fitter");
 
-TRGCDCCircle::TRGCDCCircle(const std::vector<TCLink *> & links)
+  TRGCDCCircle::TRGCDCCircle(const std::vector<TCLink*>& links)
     : TCTBase("UnknownCircle", 0),
       _center(ORIGIN),
       _radius(0),
-      _plane(0) {
+      _plane(0)
+  {
     fitter(& _fitter);
     append(links);
-}
+  }
 
-TRGCDCCircle::TRGCDCCircle(double r,
-                           double phi,
-                           double charge,
-                           const TCHPlane & plane)
+  TRGCDCCircle::TRGCDCCircle(double r,
+                             double phi,
+                             double charge,
+                             const TCHPlane& plane)
     : TCTBase("unknown", charge),
       _center(r * cos(phi), r * sin(phi)),
       _radius(r),
-      _plane(& plane) {
+      _plane(& plane)
+  {
     fitter(& _fitter);
-}
+  }
 
-TRGCDCCircle::~TRGCDCCircle() {
-}
+  TRGCDCCircle::~TRGCDCCircle()
+  {
+  }
 
-void
-TRGCDCCircle::dump(const string & cmd, const string & pre) const {
+  void
+  TRGCDCCircle::dump(const string& cmd, const string& pre) const
+  {
     cout << pre;
     cout << "c=" << _center;
     cout << ":r=" << _radius;
     if (_plane) cout << ":hp=" << _plane->name();
     cout << endl;
     if (cmd.find("detail") != string::npos)
-        TRGCDCTrackBase::dump(cmd, pre);
-}
+      TRGCDCTrackBase::dump(cmd, pre);
+  }
 
-int
-TRGCDCCircle::approach2D(TCLink & l) const {
+  int
+  TRGCDCCircle::approach2D(TCLink& l) const
+  {
     HepGeom::Point3D<double> xw = l.cell()->xyPosition();
     HepGeom::Point3D<double> xc(_center.x(), _center.y(), 0.);
 
     xw.setZ(0.);
     const HepGeom::Point3D<double> xv
-	= _charge * _radius * (xw - xc).unit() + xc;
+      = _charge * _radius * (xw - xc).unit() + xc;
     l.positionOnTrack(xv);
     l.positionOnWire(xw);
     l.dPhi(0.);
     return 0;
-}
+  }
 
 } // namespace Belle2

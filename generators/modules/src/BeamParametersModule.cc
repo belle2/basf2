@@ -86,7 +86,7 @@ void BeamParametersModule::initialize()
   m_beamParams.setGenerationFlags(flags);
 
   // Now make sure the database interface always returns the values we just set
-  DBStore::Instance().addConstantOverride("dbstore", "BeamParameters", new BeamParameters(m_beamParams));
+  DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(m_beamParams));
 
   if (m_createPayload) {
     IntervalOfValidity iov(m_payloadIov[0], m_payloadIov[1], m_payloadIov[2], m_payloadIov[3]);

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+import basf2_version
 
 import os
 import sys
@@ -48,7 +49,7 @@ for line in logo.splitlines():
 print('')
 print(basf2label.center(48))
 print(basf2copyright.center(48))
-print(('Version ' + basf2version).center(48))
+print(('Version ' + basf2_version.version).center(48))
 print('')
 print('-' * 48)
 for var in ["RELEASE", "RELEASE_DIR", "LOCAL_DIR", "SUBDIR", "EXTERNALS_VERSION", "ARCH"]:

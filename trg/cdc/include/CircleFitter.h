@@ -23,32 +23,32 @@
 
 namespace Belle2 {
 
-class TLink;
-class TRGCDCCircle;
+  class TLink;
+  class TRGCDCCircle;
 
 /// A class to fit a TTrackBase object to a circle.
-class TRGCDCCircleFitter : public TRGCDCFitter {
+  class TRGCDCCircleFitter : public TRGCDCFitter {
 
   public:
     /// Constructor.
-    TRGCDCCircleFitter(const std::string & name);
+    TRGCDCCircleFitter(const std::string& name);
 
     /// Destructor
     virtual ~TRGCDCCircleFitter();
 
   public:// Selectors
     /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+    void dump(const std::string& message = std::string(""),
+              const std::string& prefix = std::string("")) const;
 
   public:// Modifiers
-    virtual int fit(TRGCDCTrackBase &) const;
+    virtual int fit(TRGCDCTrackBase&) const;
 
   private:
     mutable double _charge;
     mutable double _radius;
     mutable HepGeom::Point3D<double> _center;
-};
+  };
 
 //-----------------------------------------------------------------------------
 

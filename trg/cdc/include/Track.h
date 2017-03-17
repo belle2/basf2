@@ -30,10 +30,10 @@
 
 namespace Belle2 {
 
-class TRGCDCCircle;
+  class TRGCDCCircle;
 
 /// A class to represent a reconstructed charged track in TRGCDC.
-class TRGCDCTrack : public TRGCDCTrackBase {
+  class TRGCDCTrack : public TRGCDCTrackBase {
 
   public:
     /// Enum for returnValue types
@@ -41,38 +41,38 @@ class TRGCDCTrack : public TRGCDCTrackBase {
                            find3D = 1 << 4,
                            fit3D = 1 << 5,
                            any = fit2D | find3D | fit3D
-                          };
+                         };
 
 
     /// returns a list of TRGCDCTrack's.
-    static std::vector<const TRGCDCTrack *> list(void);
+    static std::vector<const TRGCDCTrack*> list(void);
 
     /// Constructor
     TRGCDCTrack();
 
     /// Constructor from a Circle.
-    TRGCDCTrack(const TRGCDCCircle &);
+    TRGCDCTrack(const TRGCDCCircle&);
 
     /// Destructor
     virtual ~TRGCDCTrack();
 
     /// returns helix parameter.
-    const TRGCDCHelix & helix(void) const;
+    const TRGCDCHelix& helix(void) const;
 
     /// Set helix parameter
-    void setHelix(TRGCDCHelix &helix);
+    void setHelix(TRGCDCHelix& helix);
 
     /// calculates the closest approach to a wire in real space. Results are stored in TLink. Return value is negative if error happened.
-    int approach(TRGCDCLink &, bool sagCorrection = false) const;
-    
+    int approach(TRGCDCLink&, bool sagCorrection = false) const;
+
     /// returns momentum vector.
-    virtual const CLHEP::Hep3Vector & p(void) const;
+    virtual const CLHEP::Hep3Vector& p(void) const;
 
     /// returns Pt.
     virtual double pt(void) const;
 
     /// returns position vector.
-    virtual const CLHEP::Hep3Vector & x(void) const;
+    virtual const CLHEP::Hep3Vector& x(void) const;
 
     /// Set 2D fit chi2
     void set2DFitChi2(double);
@@ -87,10 +87,10 @@ class TRGCDCTrack : public TRGCDCTrackBase {
     double get3DFitChi2(void) const;
 
     /// Set debug value
-    void setDebugValue(EDebugValueType const & moduleName, bool flag);
+    void setDebugValue(EDebugValueType const& moduleName, bool flag);
 
     /// Get debug value
-    int getDebugValue(EDebugValueType const & moduleName) const;
+    int getDebugValue(EDebugValueType const& moduleName) const;
 
   public:
 
@@ -100,7 +100,7 @@ class TRGCDCTrack : public TRGCDCTrackBase {
   private:// static members
 
     /// a vector to keep all TRGCDCTrack objects.
-    static std::vector<const TRGCDCTrack *> _list;
+    static std::vector<const TRGCDCTrack*> _list;
 
   private:
 
@@ -121,7 +121,7 @@ class TRGCDCTrack : public TRGCDCTrackBase {
 
     /// Debugging variable
     int m_debugValue;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
@@ -136,69 +136,80 @@ class TRGCDCTrack : public TRGCDCTrackBase {
 //     return 999;
 // }
 
-inline
-const TRGCDCHelix &
-TRGCDCTrack::helix(void) const {
+  inline
+  const TRGCDCHelix&
+  TRGCDCTrack::helix(void) const
+  {
     return _helix;
-}
+  }
 
-inline
-void
-TRGCDCTrack::setHelix(TRGCDCHelix &helix){
-  _helix=helix;
-}
+  inline
+  void
+  TRGCDCTrack::setHelix(TRGCDCHelix& helix)
+  {
+    _helix = helix;
+  }
 
-inline
-const CLHEP::Hep3Vector &
-TRGCDCTrack::p(void) const {
+  inline
+  const CLHEP::Hep3Vector&
+  TRGCDCTrack::p(void) const
+  {
     _p = _helix.momentum();
     return _p;
-}
+  }
 
-inline
-double
-TRGCDCTrack::pt(void) const {
+  inline
+  double
+  TRGCDCTrack::pt(void) const
+  {
     _p = _helix.momentum();
     return _p.perp();
-}
+  }
 
-inline
-const CLHEP::Hep3Vector &
-TRGCDCTrack::x(void) const {
+  inline
+  const CLHEP::Hep3Vector&
+  TRGCDCTrack::x(void) const
+  {
     _x = _helix.x();
     return _x;
-}
+  }
 
-inline
-void TRGCDCTrack::set2DFitChi2(double in2DFitChi2) {
-     m_2DFitChi2 = in2DFitChi2;
-}
+  inline
+  void TRGCDCTrack::set2DFitChi2(double in2DFitChi2)
+  {
+    m_2DFitChi2 = in2DFitChi2;
+  }
 
-inline
-double TRGCDCTrack::get2DFitChi2(void) const {
-     return m_2DFitChi2;
-}
+  inline
+  double TRGCDCTrack::get2DFitChi2(void) const
+  {
+    return m_2DFitChi2;
+  }
 
-inline
-void TRGCDCTrack::set3DFitChi2(double in3DFitChi2) {
-     m_3DFitChi2 = in3DFitChi2;
-}
+  inline
+  void TRGCDCTrack::set3DFitChi2(double in3DFitChi2)
+  {
+    m_3DFitChi2 = in3DFitChi2;
+  }
 
-inline
-double TRGCDCTrack::get3DFitChi2(void) const {
-     return m_3DFitChi2;
-}
+  inline
+  double TRGCDCTrack::get3DFitChi2(void) const
+  {
+    return m_3DFitChi2;
+  }
 
-inline
-void TRGCDCTrack::setDebugValue(EDebugValueType const & moduleName, bool flag) {
+  inline
+  void TRGCDCTrack::setDebugValue(EDebugValueType const& moduleName, bool flag)
+  {
     if (flag) m_debugValue |= moduleName;
     else m_debugValue &= ~moduleName;
-}
+  }
 
-inline
-int TRGCDCTrack::getDebugValue(EDebugValueType const & moduleName) const {
+  inline
+  int TRGCDCTrack::getDebugValue(EDebugValueType const& moduleName) const
+  {
     return m_debugValue & moduleName;
-}
+  }
 
 
 

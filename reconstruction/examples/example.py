@@ -15,6 +15,7 @@
 
 from basf2 import *
 from simulation import add_simulation
+from L1trigger import add_tsim
 from reconstruction import add_reconstruction, add_mdst_output
 from HLTTrigger import add_HLT_Y4S
 
@@ -32,6 +33,9 @@ main.add_module('EvtGenInput')
 # detector simulation
 add_simulation(main)
 # or add_simulation(main, components) to simulate a selection of detectors
+
+# trigger simulation
+add_tsim(main)
 
 # HLT L3 simulation
 main.add_module('Level3')

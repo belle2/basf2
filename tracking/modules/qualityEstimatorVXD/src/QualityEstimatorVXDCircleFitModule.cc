@@ -58,6 +58,13 @@ void QualityEstimatorVXDCircleFitModule::event()
 
     unsigned nHits = aTC.size();
 
+    if (nHits == 3) {
+      aTC.setQualityIndex(0.2);
+      nTC++;
+      continue;
+    }
+
+
     // prepare interface-container for TrackletFilters:
     std::vector<PositionInfo> convertedPathrawData;
     convertedPathrawData.reserve(nHits);

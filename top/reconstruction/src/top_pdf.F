@@ -4,6 +4,7 @@
 ! mar-2017
 !
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
+! mar-2017: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE TOP_SET_PDF(MASS,T0)

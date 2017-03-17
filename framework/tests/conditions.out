@@ -7,8 +7,7 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=1
 [WARNING] No payload BeamParameters found in the conditions database for global tag localtest.
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=2 HTTP/1.1" 404 -
 [WARNING] Could not get 'http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=2': The requested URL returned error: 404 Not Found
-[WARNING] Could not get list of payloads from database, trying legacy v1 api
-MockConditionsDB: "GET /v1/iovPayloads/?gtName=localtest&expName=0&runName=2 HTTP/1.1" 200 -
+[WARNING] Could not get list of payloads from database
 [WARNING] No payload BeamParameters found in the conditions database for global tag localtest.
 [RESULT] Starting event processing, random seed is set to 'something important'
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=1&runNumber=0 HTTP/1.1" 200 -
@@ -19,9 +18,7 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=1&runNumber=1
 [WARNING] No payload BeamParameters found in the conditions database for global tag localtest.
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=1&runNumber=2 HTTP/1.1" 404 -
 [WARNING] Could not get 'http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=1&runNumber=2': The requested URL returned error: 404 Not Found
-[WARNING] Could not get list of payloads from database, trying legacy v1 api
-MockConditionsDB: "GET /v1/iovPayloads/?gtName=localtest&expName=1&runName=2 HTTP/1.1" 200 -
-[WARNING] Cannot parse database payload information: No such node (payload)
+[WARNING] Could not get list of payloads from database
 [WARNING] No payload BeamParameters found in the conditions database for global tag localtest.
 [RESULT] Starting event processing, random seed is set to 'something important'
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=2&runNumber=0 HTTP/1.1" 200 -
@@ -32,9 +29,7 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=2&runNumber=1
 [WARNING] No payload BeamParameters found in the conditions database for global tag localtest.
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=2&runNumber=2 HTTP/1.1" 404 -
 [WARNING] Could not get 'http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=2&runNumber=2': The requested URL returned error: 404 Not Found
-[WARNING] Could not get list of payloads from database, trying legacy v1 api
-MockConditionsDB: "GET /v1/iovPayloads/?gtName=localtest&expName=2&runName=2 HTTP/1.1" 200 -
-[WARNING] Cannot parse database payload information: <unspecified file>(1): unterminated string
+[WARNING] Could not get list of payloads from database
 [WARNING] No payload BeamParameters found in the conditions database for global tag localtest.
 [RESULT] Starting event processing, random seed is set to 'something important'
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=0 HTTP/1.1" 200 -
@@ -58,16 +53,8 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=1
    CovVTX=[(4.10916e-07, 0, -2.64802e-06), (0, 1.7405e-11, 0), (-2.64802e-06, 0, 0.000237962)]
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=2 HTTP/1.1" 404 -
 [WARNING] Could not get 'http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=3&runNumber=2': The requested URL returned error: 404 Not Found
-[WARNING] Could not get list of payloads from database, trying legacy v1 api
-MockConditionsDB: "GET /v1/iovPayloads/?gtName=localtest&expName=3&runName=2 HTTP/1.1" 200 -
-[INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
-   HER=(0.290583, 0, 6.99797, 7.004), 
-   LER=(0.166035, 0, -3.99855, 4.002), 
-   CMS=(0.456618, 0, 2.99942, 11.006), 
-   VTX=(0, 0, 0), 
-   CovHER=diag(2.63169e-05, 0, 0)
-   CovLER=diag(5.64063e-06, 0, 0)
-   CovVTX=[(4.10916e-07, 0, -2.64802e-06), (0, 1.7405e-11, 0), (-2.64802e-06, 0, 0.000237962)]
+[WARNING] Could not get list of payloads from database
+[WARNING] No payload BeamParameters found in the conditions database for global tag localtest.
 [RESULT] Starting event processing, random seed is set to 'something important'
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=4&runNumber=0 HTTP/1.1" 200 -
 MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
@@ -112,60 +99,34 @@ MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=1
    CovVTX=[(4.10916e-07, 0, -2.64802e-06), (0, 1.7405e-11, 0), (-2.64802e-06, 0, 0.000237962)]
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=2 HTTP/1.1" 404 -
 [WARNING] Could not get 'http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=6&runNumber=2': The requested URL returned error: 404 Not Found
-[WARNING] Could not get list of payloads from database, trying legacy v1 api
-MockConditionsDB: "GET /v1/iovPayloads/?gtName=localtest&expName=6&runName=2 HTTP/1.1" 200 -
-[INFO] Found more then one payload for the following keys: BeamParameters
-[INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
-   HER=(0.290583, 0, 6.99797, 7.004), 
-   LER=(0.166035, 0, -3.99855, 4.002), 
-   CMS=(0.456618, 0, 2.99942, 11.006), 
-   VTX=(0, 0, 0), 
-   CovHER=diag(2.63169e-05, 0, 0)
-   CovLER=diag(5.64063e-06, 0, 0)
-   CovVTX=[(4.10916e-07, 0, -2.64802e-06), (0, 1.7405e-11, 0), (-2.64802e-06, 0, 0.000237962)]
+[WARNING] Could not get list of payloads from database
+[WARNING] No payload BeamParameters found in the conditions database for global tag localtest.
 [RESULT] Starting event processing, random seed is set to 'something important'
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=0 HTTP/1.1" 404 -
 [WARNING] Could not get 'http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=0': The requested URL returned error: 404 Not Found
-[WARNING] Could not get list of payloads from database, trying legacy v1 api
-MockConditionsDB: "GET /v1/iovPayloads/?gtName=localtest&expName=7&runName=0 HTTP/1.1" 404 -
-[WARNING] Could not get 'http://localhost:12701/v1/iovPayloads/?gtName=localtest&expName=7&runName=0': The requested URL returned error: 404 Not Found
-[WARNING] Could not get list of payloads with legacy api either, giving up
+[WARNING] Could not get list of payloads from database
 [WARNING] No payload BeamParameters found in the conditions database for global tag localtest.
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=1 HTTP/1.1" 404 -
 [WARNING] Could not get 'http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=1': The requested URL returned error: 404 Not Found
-[WARNING] Could not get list of payloads from database, trying legacy v1 api
-MockConditionsDB: "GET /v1/iovPayloads/?gtName=localtest&expName=7&runName=1 HTTP/1.1" 404 -
-[WARNING] Could not get 'http://localhost:12701/v1/iovPayloads/?gtName=localtest&expName=7&runName=1': The requested URL returned error: 404 Not Found
-[WARNING] Could not get list of payloads with legacy api either, giving up
+[WARNING] Could not get list of payloads from database
 [WARNING] No payload BeamParameters found in the conditions database for global tag localtest.
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=2 HTTP/1.1" 404 -
 [WARNING] Could not get 'http://localhost:12701/v2/iovPayloads/?gtName=localtest&expNumber=7&runNumber=2': The requested URL returned error: 404 Not Found
-[WARNING] Could not get list of payloads from database, trying legacy v1 api
-MockConditionsDB: "GET /v1/iovPayloads/?gtName=localtest&expName=7&runName=2 HTTP/1.1" 404 -
-[WARNING] Could not get 'http://localhost:12701/v1/iovPayloads/?gtName=localtest&expName=7&runName=2': The requested URL returned error: 404 Not Found
-[WARNING] Could not get list of payloads with legacy api either, giving up
+[WARNING] Could not get list of payloads from database
 [WARNING] No payload BeamParameters found in the conditions database for global tag localtest.
 [RESULT] Starting event processing, random seed is set to 'something important'
 [WARNING] Could not get 'http://localhost:0/v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=0': Failed to connect to localhost port 0: Connection refused
-[WARNING] Could not get list of payloads from database, trying legacy v1 api
-[WARNING] Could not get 'http://localhost:0/v1/iovPayloads/?gtName=localtest&expName=0&runName=0': Failed to connect to localhost port 0: Connection refused
-[WARNING] Could not get list of payloads with legacy api either, giving up
+[WARNING] Could not get list of payloads from database
 [WARNING] No payload BeamParameters found in the conditions database for global tag localtest.
 [RESULT] Starting event processing, random seed is set to 'something important'
 [WARNING] Could not get 'http://nosuchurl/v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=0': Couldn't resolve host 'nosuchurl'
-[WARNING] Could not get list of payloads from database, trying legacy v1 api
-[WARNING] Could not get 'http://nosuchurl/v1/iovPayloads/?gtName=localtest&expName=0&runName=0': Couldn't resolve host 'nosuchurl'
-[WARNING] Could not get list of payloads with legacy api either, giving up
+[WARNING] Could not get list of payloads from database
 [WARNING] No payload BeamParameters found in the conditions database for global tag localtest.
 [RESULT] Starting event processing, random seed is set to 'something important'
 [WARNING] Could not get 'nosuchproto://nosuchurl/v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=0': Protocol "nosuchproto" not supported or disabled in libcurl
-[WARNING] Could not get list of payloads from database, trying legacy v1 api
-[WARNING] Could not get 'nosuchproto://nosuchurl/v1/iovPayloads/?gtName=localtest&expName=0&runName=0': Protocol "nosuchproto" not supported or disabled in libcurl
-[WARNING] Could not get list of payloads with legacy api either, giving up
+[WARNING] Could not get list of payloads from database
 [WARNING] No payload BeamParameters found in the conditions database for global tag localtest.
 [RESULT] Starting event processing, random seed is set to 'something important'
 [WARNING] Could not get 'h͌̉e̳̞̞͆ͨ̏͋̕ ͍͚̱̰̀͡c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢!̋̽̍̈͐ͫ͏̠̹̺̜̬͍ͅ/v2/iovPayloads/?gtName=localtest&expNumber=0&runNumber=0': Couldn't resolve host 'h͌̉e̳̞̞͆ͨ̏͋̕ ͍͚̱̰̀͡c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢!̋̽̍̈͐ͫ͏̠̹̺̜̬͍ͅ'
-[WARNING] Could not get list of payloads from database, trying legacy v1 api
-[WARNING] Could not get 'h͌̉e̳̞̞͆ͨ̏͋̕ ͍͚̱̰̀͡c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢!̋̽̍̈͐ͫ͏̠̹̺̜̬͍ͅ/v1/iovPayloads/?gtName=localtest&expName=0&runName=0': Couldn't resolve host 'h͌̉e̳̞̞͆ͨ̏͋̕ ͍͚̱̰̀͡c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜!̱̞̻̈̿̒̀͢!̋̽̍̈͐ͫ͏̠̹̺̜̬͍ͅ'
-[WARNING] Could not get list of payloads with legacy api either, giving up
+[WARNING] Could not get list of payloads from database
 [WARNING] No payload BeamParameters found in the conditions database for global tag localtest.

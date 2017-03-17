@@ -282,7 +282,7 @@ namespace Belle2 {
     return value;
   }
 
-  const TObject* Gearbox::getTObject(const std::string& path) const throw(gearbox::PathEmptyError, gearbox::TObjectConversionError)
+  const TObject* Gearbox::getTObject(const std::string& path) const noexcept(false)
   {
     //do we already have an object for this path?
     std::map<std::string, TObject*>::const_iterator it = m_ownedObjects.find(path);

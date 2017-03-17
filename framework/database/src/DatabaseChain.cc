@@ -46,32 +46,31 @@ void DatabaseChain::addDatabase(Database* database)
 }
 
 
-pair<TObject*, IntervalOfValidity> DatabaseChain::getData(const EventMetaData& event, const string& package,
-                                                          const std::string& module)
+pair<TObject*, IntervalOfValidity> DatabaseChain::getData(const EventMetaData& event, const string& name)
 {
   pair<TObject*, IntervalOfValidity> result;
   result.first = 0;
 
   // loop over database backends and try to find a matching payload
   for (unsigned int i = 0; i < m_databases.size(); i++) {
-    result = m_databases[i]->getData(event, package, module);
+    result = m_databases[i]->getData(event, name);
     if (result.first) {
       if (m_resetIoVs && (i > 0)) {
         result.second = IntervalOfValidity(event.getExperiment(), event.getRun(), event.getExperiment(), event.getRun());
       }
       if (m_invertLogging)
-        B2LOG(m_logLevel, 0, "Obtained " << package << "/" << module << " from database chain. IoV=" << result.second);
+        B2LOG(m_logLevel, 0, "Obtained " << name << " from database chain. IoV=" << result.second);
       return result;
     }
   }
 
   if (!m_invertLogging)
-    B2LOG(m_logLevel, 0, "Failed to get " << package << "/" << module << " from database chain. "
+    B2LOG(m_logLevel, 0, "Failed to get " << name << " from database chain. "
           "No matching entry for experiment/run " << event.getExperiment() << "/" << event.getRun() << " found.");
   return result;
 }
 
-bool DatabaseChain::storeData(const std::string& package, const std::string& module, TObject* object,
+bool DatabaseChain::storeData(const std::string& name, TObject* object,
                               const IntervalOfValidity& iov)
 {
   if (m_databases.empty()) {
@@ -79,10 +78,10 @@ bool DatabaseChain::storeData(const std::string& package, const std::string& mod
     return false;
   }
 
-  return m_databases[0]->storeData(package, module, object, iov);
+  return m_databases[0]->storeData(name, object, iov);
 }
 
-bool DatabaseChain::addPayload(const std::string& package, const std::string& module, const std::string& fileName,
+bool DatabaseChain::addPayload(const std::string& name, const std::string& fileName,
                                const IntervalOfValidity& iov)
 {
   if (m_databases.empty()) {
@@ -90,5 +89,5 @@ bool DatabaseChain::addPayload(const std::string& package, const std::string& mo
     return false;
   }
 
-  return m_databases[0]->addPayload(package, module, fileName, iov);
+  return m_databases[0]->addPayload(name, fileName, iov);
 }

@@ -63,19 +63,18 @@ namespace Belle2 {
     ~DBStore();
 
     /**
-     * Returns the entry with the requested package and module name in the DBStore.
+     * Returns the entry with the requested name in the DBStore.
      * If the DBStore entry does not exist yet it is added to the map.
      *
      * If the DBStore map already contains an object under the key
      * with a DIFFERENT type than the given type one, an error will be reported. <br>
      *
-     * @param package    Package name under which the object is stored in the database (and in the DBStore).
-     * @param module     Module name under which the object is stored in the database (and in the DBStore).
+     * @param name       Name under which the object is stored in the database (and in the DBStore).
      * @param objClass   The class of the object.
      * @param array      Whether it is a TClonesArray or not.
      * @return           DBEntry, or NULL if the requested type does not match the one in the DBStore
      */
-    DBEntry* getEntry(const std::string& package, const std::string& module, const TClass* objClass, bool array);
+    DBEntry* getEntry(const std::string& name, const TClass* objClass, bool array);
 
     /**
      * Updates all objects that are outside their interval of validity.
@@ -98,7 +97,7 @@ namespace Belle2 {
      * Add constant override payload.
      * This payload will be valid for all possible iov and will be used instead of values from the database.
      *
-     * @param module Module name under which the object will be accessible
+     * @param name Name under which the object will be accessible
      * @param obj Pointer to the object to be used. Ownership will be transfered
      *            to the DBStore.
      * @param oneRun if true the override will only be in effect for this one run,
@@ -106,36 +105,17 @@ namespace Belle2 {
      * @warning don't use this if you do not know exactly what you are doing.
      *          This is meant mainly for beamparameters
      */
-    void addConstantOverride(const std::string& module, TObject* obj, bool oneRun = false)
-    {
-
-      addConstantOverride("dbstore", module, obj, oneRun);
-    }
-
-    /**
-     * Add constant override payload.
-     * This payload will be valid for all possible iov and will be used instead of values from the database.
-     *
-     * @param package Package name under which the object will be accessible
-     * @param module Module name under which the object will be accessible
-     * @param obj Pointer to the object to be used. Ownership will be transfered
-     *            to the DBStore.
-     * @param oneRun if true the override will only be in effect for this one run,
-     *               not for any other runs
-     * @warning don't use this if you do not know exactly what you are doing.
-     *          This is meant mainly for beamparameters
-     */
-    void addConstantOverride(const std::string& package, const std::string& module, TObject* obj, bool oneRun = false);
+    void addConstantOverride(const std::string& name, TObject* obj, bool oneRun = false);
 
     /**
      * Add a callback function.
-     * The given function will be called whenever there is a new database entry for the given package/module.
+     * The given function will be called whenever there is a new database entry for the given name.
      *
-     * @param package    Package name under which the object is stored in the database (and in the DBStore).
-     * @param module     Module name under which the object is stored in the database (and in the DBStore).
-     * @param callback   The callback function.
+     * @param name Name under which the object is stored in the database (and in the DBStore).
+     * @param callback The callback function.
+     * @param id unique identifier of this callback function
      */
-    void addCallback(const std::string& package, const std::string& module, DBCallback callback, DBCallbackId id);
+    void addCallback(const std::string& name, DBCallback callback, DBCallbackId id);
 
   private:
     /** Hidden constructor, as it is a singleton.*/
@@ -147,7 +127,7 @@ namespace Belle2 {
     /**
      * Check whether the given entry and the requested class match.
      *
-     * @param entry      The existing DBStore entry.
+     * @param dbEntry    The existing DBStore entry.
      * @param objClass   The class of the object.
      * @param array      Whether it is a TClonesArray or not.
      * @return           True if both types match.
@@ -157,7 +137,7 @@ namespace Belle2 {
     /**
      * Check whether the given entry and the type of the object match.
      *
-     * @param entry      The existing DBStore entry.
+     * @param dbEntry    The existing DBStore entry.
      * @param object     The object whose type is to be checked.
      * @return           True if both types match.
      */
@@ -171,8 +151,8 @@ namespace Belle2 {
      */
     void updateEntry(DBEntry& dbEntry, const std::pair<TObject*, IntervalOfValidity>& objectIov);
 
-    /** Map of package and module names to DBEntry objects. */
-    std::map<std::string, std::map<std::string, DBEntry>> m_dbEntries;
+    /** Map names to DBEntry objects. */
+    std::map<std::string, DBEntry> m_dbEntries;
 
     /** Vector of intra-run dependent conditions. */
     std::vector<DBEntry*> m_intraRunDependencies;

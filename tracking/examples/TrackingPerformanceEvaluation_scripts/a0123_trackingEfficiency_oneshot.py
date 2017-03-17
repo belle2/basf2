@@ -97,10 +97,8 @@ add_tracking_reconstruction(
     pruneTracks=False,
     mcTrackFinding=mcTrackFinding,
     trigger_mode="all",
-    skipGeometryAdding=False)
-
-if not mcTrackFinding:
-    add_mc_matcher(path)
+    skipGeometryAdding=False
+)
 
 modList = path.modules()
 for modItem in modList:

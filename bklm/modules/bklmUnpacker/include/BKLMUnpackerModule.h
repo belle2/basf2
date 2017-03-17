@@ -25,7 +25,6 @@
 #include <iostream>
 
 
-using namespace std;
 
 namespace Belle2 {
 
@@ -84,7 +83,7 @@ namespace Belle2 {
 
     //    void intToElectCoo(int id, int& copper, int& finesse, int& lane);
     //! to map hardware coordinates to logical coordinates
-    map<int, int> m_electIdToModuleId;
+    std::map<int, int> m_electIdToModuleId;
 
     //! length of one hit in 4 byte words. This is needed find the hits in the detector buffer
     const int hitLength = 2;

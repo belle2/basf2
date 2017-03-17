@@ -29,8 +29,6 @@
 #include <iostream>
 #include <set>
 
-using namespace std;
-using namespace CLHEP;
 
 namespace Belle2 {
   namespace bklm {
@@ -91,7 +89,7 @@ namespace Belle2 {
     //! fit track to the given points
     //! @param[in] points the points used
     //! @param[out] params the fitted track parameters
-    void trackFit(vector<SimplePoint*>& points, TrackParams& params);
+    void trackFit(std::vector<SimplePoint*>& points, TrackParams& params);
     //! is this a valid track candidate?
     //! @param[in] firstHit the first seed
     //! @param[in] secondHit the second seed hit
@@ -100,7 +98,7 @@ namespace Belle2 {
     //! @param[in] refMod The reference module that defines the coordinate system used for the track
     //! @param[in] effLayer The layer of which we want to determine the efficiency, which is excluded from the tracking
     //! @return true if this is a valid candidate
-    bool validTrackCandidate(int firstHit, int secondHit,  StoreArray<BKLMHit2d>& hits2D, vector<SimplePoint*>& points,
+    bool validTrackCandidate(int firstHit, int secondHit,  StoreArray<BKLMHit2d>& hits2D, std::vector<SimplePoint*>& points,
                              const Belle2::bklm::Module* refMod, int effLayer);
     //! seet the plot style
     void set_plot_style();
@@ -142,7 +140,7 @@ namespace Belle2 {
     //! TFile to save everything
     TFile* m_file;
     //! filename for the root file
-    string m_filename;
+    std::string m_filename;
 
     //! number of hits for each strip. Don't think that moving average is necessary here...
     int***** m_stripHits;
@@ -155,7 +153,7 @@ namespace Belle2 {
     //! geometry object
     bklm::GeometryPar* m_GeoPar;
     //! to keep track which 2D hits where already used for tracks...
-    set<int> m_pointIndices;
+    std::set<int> m_pointIndices;
     //! min seed layer distance
     int minSeedLayerDistance = 3;
 

@@ -22,7 +22,6 @@
 #include <map>
 #include <iostream>
 
-using namespace std;
 namespace Belle2 {
 
   class BKLMSimHit;
@@ -120,7 +119,7 @@ namespace Belle2 {
     //! TFile to save everything
     TFile* m_file;
     //! filename for the root file
-    string m_filename;
+    std::string m_filename;
     //! time this simulation corrsponds to
     float m_realTime;
     //! weight for each event (inverse of the realTime)

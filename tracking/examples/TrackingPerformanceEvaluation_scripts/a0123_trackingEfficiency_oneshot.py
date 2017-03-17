@@ -32,6 +32,8 @@ from modularAnalysis import *
 
 set_random_seed(123 + int(sys.argv[1]))
 
+particleGun = False
+
 release = sys.argv[2]
 
 roi = sys.argv[3]
@@ -85,7 +87,21 @@ create_plots_V0 = register_module('V0findingPerformanceEvaluation')
 create_plots_V0.param('outputFileName', root_file_name_V0)
 create_plots_V0.logging.log_level = LogLevel.INFO
 
-generateY4S(100, None, path)
+if particleGun:
+    particleGunModule = register_module('ParticleGun')
+    particleGunModule.param({
+        'pdgCodes': [211, -211],
+        'nTracks': 1,
+        'varyNTracks': False,
+        'momentumGeneration': 'uniformpt',
+        'momentumParams': [0.5, 1.],
+        'thetaGeneration': 'uniform',
+        'thetaParams': [60., 60.],
+    })
+    path.add_module('EventInfoSetter')
+    path.add_module(particleGunModule)
+else:
+    generateY4S(100, None, path)
 
 path.add_module(progress)
 

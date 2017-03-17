@@ -262,6 +262,10 @@ BkgSensitiveDiode::BkgSensitiveDiode(const G4String& name):
   m_mcParticles.registerRelationTo(m_eclBeamBkgHits);
 
   m_eclp = ECLGeometryPar::Instance();
+  m_energyDeposit = 0;
+  m_startEnergy = 0;
+  m_startTime = 0;
+  m_trackLength = 0;
   m_trackID = -1;
 }
 

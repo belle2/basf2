@@ -9,7 +9,8 @@
 from basf2 import *
 import sys
 import re
-from plotInterimFEDataNtuple import plotInterimFEDataNtuple
+from plotInterimFEDataNtuple import plotInterimFEDataNtupleSummary
+from plotInterimFEDataNtuple import plotInterimFEDataNtupleAdvanced
 
 args = sys.argv
 if len(args) < 2:
@@ -80,4 +81,5 @@ process(main)
 # Print statistics
 print(statistics)
 
-plotInterimFEDataNtuple(output_root)
+plotInterimFEDataNtupleSummary(output_root)
+plotInterimFEDataNtupleAdvanced(output_root)

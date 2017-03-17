@@ -4,6 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Maeda Yosuke                                             *
+ *               Umberto Tamponi                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,7 +20,9 @@
 namespace Belle2 {
 
   /**
-   * Module to produce ntuple from TOPDigits and TOPRawDigits
+   * Module to produce an ntuple of smaller size respect to the data starting from TOPDigits and TOPRawDigits.
+   * Most of the braches of the tree are actual copies of the most relevant data members of TOPDigits and TOPRawDigits, except for few values with are slighty modified to make the analysis more immediate and easy (see the documentation of the single data members for more informations)
+   * The module is intended to provide a fast way to assest the quality of the TOP data before the calibration.
    */
   class TOPInterimFENtupleModule : public HistoModule {
 
@@ -93,10 +96,19 @@ namespace Belle2 {
     float m_width[c_NMaxHit] = {0}; /**< "m_pulseWidth" in TOPDigit, full width at half maximum of the pulse */
     short m_nPixelInRawDigit = 0; /**< # of pixels with hits in TOPRawDigits */
 
+    unsigned short m_carrier[c_NMaxHit] = {0}; /**< carrier board number, copy from TOPRawDigit */
+    unsigned short m_asic[c_NMaxHit] = {0};    /**< ASIC number, copy from TOPRawDigit */
+    unsigned short m_channel[c_NMaxHit] = {0};  /**< ASIC channel number,  copy from TOPRawDigit. */
+    unsigned short m_TFine[c_NMaxHit] = {0}; /**< fine timing for 50% CFD (within two samples), copied from TOPRawDigit */
+    unsigned short m_sampleRise[c_NMaxHit] = {0};  /**< sample number just before 50% CFD crossing, copied from in TOPRawDigit */
+    unsigned short m_samplePeak[c_NMaxHit] = {0}; /**< sample number of the peak position, calculated as TOPRawDigits.m_sampleRise + TOPRawDigits.m_dSamplePeak */
+    unsigned short m_sampleFall[c_NMaxHit] = {0}; /**< sample number of the peak position, calculated as TOPRawDigits.m_sampleRise + TOPRawDigits.m_dSampleFall */
+
     short m_nFEHeader = 0; /**< m_FEHeaders in TOPInterimFEInfo, the total # of FE headers found */
     short m_nEmptyFEHeader = 0; /**< m_emptyFEHeaders in TOPInterimFEInfo, the total # of empty FE headers */
     short m_nWaveform = 0; /**< m_waveforms in TOPInterimFEInfo, # of waveformes */
     unsigned m_errorFlag = 0; /**< m_errorFlags in TOPInterimFEInfo, defined in the TOPInterimFEInfo.h */
+
   };
 
 }  //namespace Belle2

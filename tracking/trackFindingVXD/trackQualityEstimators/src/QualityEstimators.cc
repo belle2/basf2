@@ -133,24 +133,22 @@ double QualityEstimators::circleFit(double& pocaPhi, double& pocaD, double& curv
 
   double stopper = 0.000000001; /// WARNING hardcoded values!
   double meanX = 0, meanY = 0, meanX2 = 0, meanY2 = 0, meanR2 = 0, meanR4 = 0, meanXR2 = 0, meanYR2 = 0, meanXY = 0; //mean values
-  double r2 = 0, x = 0, y = 0, x2 = 0, y2 = 0; // coords
-  double weight;// weight of each hit, so far no difference in hit quality
   double sumWeights = 0, divisor/*, weightNormalizer = 0*/; // sumWeights is sum of weights, divisor is 1/sumWeights;
   double tuningParameter =
     1.; //0.02; // this parameter is for internal tuning of the weights, since at the moment, the error seams highly overestimated at the moment. 1 means no influence of parameter.
 
   // looping over all hits and do the division afterwards
   for (PositionInfo* hit : *m_hits) {
-    weight = 1. / (sqrt(hit->hitSigma.X() * hit->hitSigma.X() + hit->hitSigma.Y() * hit->hitSigma.Y()) * tuningParameter);
+    double weight = 1. / (sqrt(hit->hitSigma.X() * hit->hitSigma.X() + hit->hitSigma.Y() * hit->hitSigma.Y()) * tuningParameter);
     B2DEBUG(100, " current hitSigmaU/V/X/Y: " << hit->sigmaU << "/" << hit->sigmaV << "/" << hit->hitSigma.X() << "/" <<
             hit->hitSigma.Y() << ", weight: " << weight);
     sumWeights += weight;
     if (std::isnan(weight) or std::isinf(weight) == true) { B2ERROR("QualityEstimators::circleFit, chosen sigma is 'nan': " << weight << ", setting arbitrary error: " << stopper << ")"); weight = stopper; }
-    x = hit->hitPosition.X();
-    y = hit->hitPosition.Y();
-    x2 = x * x;
-    y2 = y * y;
-    r2 = x2 + y2;
+    double x = hit->hitPosition.X();
+    double y = hit->hitPosition.Y();
+    double x2 = x * x;
+    double y2 = y * y;
+    double r2 = x2 + y2;
     meanX += x * weight;
     meanY += y * weight;
     meanXY += x * y * weight;
@@ -534,7 +532,7 @@ std::pair<double, TVector3> QualityEstimators::riemannHelixFit(const std::vector
 
   if ((curvature < 0 && CalcCurvature()) || (curvature > 0 && !CalcCurvature())) {
     curvature = -curvature;
-    pocaPhi = pocaPhi + M_PI;
+    // pocaPhi = pocaPhi + M_PI; //
     pocaD = -pocaD;
   }
 
@@ -634,13 +632,7 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
    * - detailed check whether results are okay
    * */
 
-  double  x = 0,
-          y = 0,
-          z = 0,
-          invVarZ = 0, // inverse variance of Z
-          r2 = 0, // radius^2
-          sumWeights = 0, // the sum of the weightsXY
-          inverseVarianceXY = 0; // current inverse of varianceXY
+  double sumWeights = 0;
 
   TMatrixD inverseCovMatrix(nHits, nHits); // carries inverse of the variances for the circle fit in its diagonal elements
   TMatrixD X(nHits, 3); // carries mapped hits, column 0 = x variables, column 1 = y variables, col 2 = r2 variables
@@ -657,18 +649,18 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
   if (useBackwards == false) { seedHit = (*hits).at(nHits - 1)->hitPosition; secondHit = (*hits).at(nHits - 2)->hitPosition; } // want innermost hit
 
   for (PositionInfo* hit : *hits) {
-    x = hit->hitPosition.X();
-    y = hit->hitPosition.Y();
-    z = hit->hitPosition.Z();
-    invVarZ = 1. / hit->hitSigma.Z();
+    double x = hit->hitPosition.X();
+    double y = hit->hitPosition.Y();
+    double z = hit->hitPosition.Z();
+    double invVarZ = 1. / hit->hitSigma.Z();
     if (std::isnan(invVarZ) == true or std::isinf(invVarZ) == true) { B2ERROR("QualityEstimators::helixFit, chosen varZ is 'nan': " << invVarZ << ", setting arbitrary error: " << 0.000001 << ")"); invVarZ = 0.000001; }
     invVarZvalues(index, 0) = invVarZ;
     B2DEBUG(75, "helixFit: hit.X(): " << hit->hitPosition.X() << ", hit.Y(): " << hit->hitPosition.Y() << ", hit.Z(): " <<
             hit->hitPosition.Z() << ", hit.sigmaU: " << hit->sigmaU << ", hit.sigmaV: " << hit->sigmaV << ", hit.hitSigma X/Y/Z: " <<
             hit->hitSigma.X() << "/" << hit->hitSigma.Y() << "/" << hit->hitSigma.Z());
 
-    r2 = x * x + y * y;
-    inverseVarianceXY = 1. / sqrt(hit->hitSigma.X() * hit->hitSigma.X() + hit->hitSigma.Y() * hit->hitSigma.Y());
+    double r2 = x * x + y * y;
+    double inverseVarianceXY = 1. / sqrt(hit->hitSigma.X() * hit->hitSigma.X() + hit->hitSigma.Y() * hit->hitSigma.Y());
     if (std::isnan(inverseVarianceXY) == true or std::isinf(inverseVarianceXY) == true) { B2ERROR("QualityEstimators::helixFit, chosen inverseVarianceXY is 'nan': " << inverseVarianceXY << ", setting arbitrary error: " << 0.000001 << ")"); inverseVarianceXY = 0.000001; }
     sumWeights += inverseVarianceXY;
     inverseCovMatrix(index, index) = inverseVarianceXY;
@@ -887,10 +879,10 @@ std::pair<double, TVector3> QualityEstimators::helixFit(const std::vector<Positi
   TMatrixD AtGA(2, 2);
   TMatrixD AtG(2, nHits);
   TMatrixD Diag(nHits, nHits);
-  double sumWi = 0, sumWiSi = 0, sumWiSi2 = 0, sw = 0;
+  double sumWi = 0, sumWiSi = 0, sumWiSi2 = 0;
   for (int i = 0; i < nHits; ++i) {
     sumWi += invVarZvalues(i, 0);
-    sw = invVarZvalues(i, 0) * s(i, 0);
+    double sw = invVarZvalues(i, 0) * s(i, 0);
     sumWiSi += sw;
     sumWiSi2 += invVarZvalues(i, 0) * s(i, 0) * s(i, 0);
     AtG(0, i) = invVarZvalues(i, 0);
@@ -1005,9 +997,7 @@ std::pair<double, TVector3> QualityEstimators::simpleLineFit3D(const std::vector
    * */
 
   TVector3 directionVector;
-  double Wyi = 0, // weight for Yi
-         Wzi = 0, // weight for Zi
-         sumWyi = 0, // sum of weights for Yi
+  double sumWyi = 0, // sum of weights for Yi
          sumWzi = 0, // sum of weights for Zi
          sumWyiXi = 0, // sum of (y-weights times x-values)
          sumWziXi = 0, // sum of (z-weights times x-values)
@@ -1027,8 +1017,8 @@ std::pair<double, TVector3> QualityEstimators::simpleLineFit3D(const std::vector
 
   // NOTE: this approach is not optimal. Maybe can be optimized for less redundancy
   for (const PositionInfo* aHit : *hits) {
-    Wyi = (1. / (aHit->hitSigma.Y() * aHit->hitSigma.Y()));
-    Wzi = (1. / (aHit->hitSigma.Z() * aHit->hitSigma.Z()));
+    double Wyi = (1. / (aHit->hitSigma.Y() * aHit->hitSigma.Y()));
+    double Wzi = (1. / (aHit->hitSigma.Z() * aHit->hitSigma.Z()));
 
     sumWyi += Wyi;
     sumWzi += Wzi;

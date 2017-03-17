@@ -1,5 +1,5 @@
-#ifndef _TNiel_
-#define _TNiel_
+#ifndef _VXD_TNiel_
+#define _VXD_TNiel_
 
 #include <string>
 

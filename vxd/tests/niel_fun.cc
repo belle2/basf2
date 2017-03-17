@@ -1,4 +1,4 @@
-#include <svd/background/niel_fun.h>
+#include <vxd/background/niel_fun.h>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <string>
@@ -15,7 +15,7 @@ namespace Belle2 {
     TEST(TNiel, output)
     {
       // First create a niel function and load it with data.
-      TNiel niel("svd/tests/niel_test.csv");
+      TNiel niel("vxd/tests/niel_test.csv");
       // Value from within the range
       EXPECT_EQ(niel.getNielFactor(3.0), 3.126E-2);
       // Underflow value

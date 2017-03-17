@@ -650,7 +650,7 @@ namespace Belle2 {
     return pos + dir * path;
   }
 
-  void ARICHReconstruction::transformTrackToLocal(ARICHTrack& arichTrack, bool align)
+  void ARICHReconstruction::transformTrackToLocal(ARICHTrack& arichTrack, bool)
   {
     // tranform track from BelleII to local ARICH frame
     TVector3 locPos = m_arichgp->getMasterVolume().pointToLocal(arichTrack.getPosition());

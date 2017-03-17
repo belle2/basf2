@@ -159,6 +159,13 @@ finder_modules_by_short_name = {
                                                       MinimalHitsBySuperLayerId={sl_id: 0 for sl_id in range(9)}),
                                       path.add_module('TrackExporter'),
                                       ),
+    'MCSegmentFinderCDC': lambda path: (path.add_module('WireHitPreparer',
+                                                        flightTimeEstimation="outwards"),
+                                        path.add_module('SegmentCreatorMCTruth'),
+                                        path.add_module('TrackCreatorSingleSegments',
+                                                        MinimalHitsBySuperLayerId={sl_id: 0 for sl_id in range(9)}),
+                                        path.add_module('TrackExporter'),
+                                        ),
     'FirstLoop': lambda path: path.add_module('WireHitTopologyPreparer', UseNLoops=1.0),
 }
 

@@ -31,11 +31,14 @@ namespace Belle2 {
       enum ECellFlag : unsigned int {
         c_Assigned = 1,
         c_Start = 2,
-        c_Cycle = 4,
-        c_Masked = 8,
+        c_PriorityPath = 4,
+        c_Cycle = 8,
 
-        c_Taken = 16,
-        c_Background = 32,
+        c_Masked = 16,
+
+        c_Taken = 32,
+        c_Background = 64,
+        c_Priority = 128,
       };
 
       /// Type for an ored combination of the status flags of cells in the cellular automata
@@ -44,6 +47,7 @@ namespace Belle2 {
       /// Constant summing all possible cell flags
       static const ECellFlags c_AllFlags = ECellFlags(ECellFlag::c_Assigned +
                                                       ECellFlag::c_Start +
+                                                      ECellFlag::c_PriorityPath +
                                                       ECellFlag::c_Cycle +
                                                       ECellFlag::c_Masked +
                                                       ECellFlag::c_Taken +
@@ -53,6 +57,7 @@ namespace Belle2 {
       /// Flage that are reset at the start of each run of the cellular automaton
       static const ECellFlags c_TemporaryFlags = ECellFlags(ECellFlag::c_Assigned +
                                                             ECellFlag::c_Start +
+                                                            ECellFlag::c_PriorityPath +
                                                             ECellFlag::c_Cycle);
 
     public:
@@ -148,6 +153,24 @@ namespace Belle2 {
         return hasAnyFlags(ECellFlag::c_Start);
       }
 
+      /// Sets the priority path marker flag to the given value. Default value true.
+      void setPriorityPathFlag(bool setTo = true)
+      {
+        setFlags<ECellFlag::c_PriorityPath>(setTo);
+      }
+
+      /// Resets the priority path marker flag to false.
+      void unsetPriorityPathFlag()
+      {
+        setFlags<ECellFlag::c_PriorityPath>(false);
+      }
+
+      /// Gets the current state of the priority path marker flag.
+      bool hasPriorityPathFlag() const
+      {
+        return hasAnyFlags(ECellFlag::c_PriorityPath);
+      }
+
       /// Sets the cycle marker flag to the given value. Default value true.
       void setCycleFlag(bool setTo = true)
       {
@@ -226,6 +249,24 @@ namespace Belle2 {
         return hasAnyFlags(ECellFlag::c_Background);
       }
 
+      /// Sets the priority flag to the given value. Default value true.
+      void setPriorityFlag(bool setTo = true)
+      {
+        setFlags<ECellFlag::c_Priority>(setTo);
+      }
+
+      /// Resets the priority flag to false.
+      void unsetPriorityFlag()
+      {
+        setFlags<ECellFlag::c_Priority>(false);
+      }
+
+      /// Gets the current state of the do not use flag marker flag.
+      bool hasPriorityFlag() const
+      {
+        return hasAnyFlags(ECellFlag::c_Priority);
+      }
+
       /// Setting accessing the flag by tag.
       template<ECellFlags cellFlag>
       void setFlags(bool setTo)
@@ -237,15 +278,9 @@ namespace Belle2 {
         }
       }
 
-      /** Getter for the ored combination of the cell flags to mark some status of the cell.
+      /**
+       *  Getter for the ored combination of the cell flags to mark some status of the cell.
        *  Give the ored combination of all cell flags, therefore providing a bit pattern. \n
-       *  Cell flags can be \n
-       *  const ECellFlag::c_Assigned = 1; \n
-       *  const ECellFlag::c_Start = 2; \n
-       *  const ECellFlag::c_Cycle = 4; \n
-       *  const ECellFlag::c_Masked = 8; \n
-       *  const ECellFlag::c_Taken = 16; \n
-       *  const ECellFlag::c_Background = 32; \n
        *  Use rather hasAnyFlags() to retrieve stats even for single state values.
        */
       const ECellFlags& getFlags() const

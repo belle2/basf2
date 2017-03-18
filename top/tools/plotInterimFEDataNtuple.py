@@ -27,7 +27,7 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=5):
     gStyle.SetStatStyle(0)
     gStyle.SetOptStat(112210)
     gStyle.SetOptFit(1110)
-    canvas = TCanvas("cv1", "cv1", 1000, 1000)
+    canvas = TCanvas("cv1", "cv1", 800, 800)
     canvas.SetFillStyle(0)
 
     f = TFile(root_output)
@@ -159,12 +159,12 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=5):
 
     canvas.Print(pdf_output)
 
-    time.sleep(15)
+#    time.sleep(15)
 
 
 def plotInterimFEDataNtupleAdvanced(root_output, FitWidth=5):
 
-    pdf_output = root_output[0:root_output.rfind(".root")] + "_Advanced.pdf"
+    pdf_output = root_output[0:root_output.rfind(".root")] + "_Advanced.png"
     root_out = root_output[0:root_output.rfind(".root")] + "_Advanced.root"
 
     print(root_output + " --> " + pdf_output)
@@ -176,7 +176,7 @@ def plotInterimFEDataNtupleAdvanced(root_output, FitWidth=5):
     gStyle.SetStatStyle(0)
     gStyle.SetOptStat(112210)
     gStyle.SetOptFit(1110)
-    canvas = TCanvas("cv2", "cv2", 1000, 1000)
+    canvas = TCanvas("cv2", "cv2", 800, 800)
     canvas.SetFillStyle(0)
 
     f = TFile(root_output)
@@ -186,18 +186,20 @@ def plotInterimFEDataNtupleAdvanced(root_output, FitWidth=5):
     canvas.cd(1)
     gPad.SetFrameFillStyle(0)
     gPad.SetFillStyle(0)
-    tr.Draw("rawTdc-refTdc:winNum>>hTimeVSWin(512, 0, 512, 500, -200, -100)", "refTdc>0 && !isCalCh", "colz")
+    tr.Draw("rawTdc-refTdc:winNum>>hTimeVSWin(512, 0, 512, 60, -160, -130)", "refTdc>0 && !isCalCh", "colz")
     hTimeVSWin = gROOT.FindObject("hTimeVSWin")
+    hTimeVSWin.GetXaxis().SetTitle("hit first window")
+    hTimeVSWin.GetYaxis().SetTitle("hit time - ref. time [sample]")
     hTimeVSWin.SetStats(False)
-    hTimeVSWin.SetTitle(root_output + " - laser time VS window number.")
+    hTimeVSWin.SetTitle(root_output + " hit time - ref time  VS window number.")
 
     canvas.cd(2)
     gPad.SetFrameFillStyle(0)
     gPad.SetFillStyle(0)
-    tr.Draw("rawTdc-refTdc:rawTdc>>hTimeVSSample(2560, 0, 256, 500, -200, -100)", "refTdc>0 && !isCalCh", "colz")
+    tr.Draw("rawTdc-refTdc:sample>>hTimeVSSample(2560, 0, 256, 60, -160, -130)", "refTdc>0 && !isCalCh", "colz")
     hTimeVSSample = gROOT.FindObject("hTimeVSSample")
     hTimeVSSample.SetStats(False)
-    hTimeVSSample.GetXaxis().SetTitle("hit time [sample]")
+    hTimeVSSample.GetXaxis().SetTitle("hit sample [sample]")
     hTimeVSSample.GetYaxis().SetTitle("hit time - ref. time [sample]")
     hTimeVSSample.SetTitle("hit time - ref time VS hit time.")
     gPad.Update()
@@ -205,7 +207,7 @@ def plotInterimFEDataNtupleAdvanced(root_output, FitWidth=5):
     canvas.cd(3)
     gPad.SetFrameFillStyle(0)
     gPad.SetFillStyle(0)
-    tr.Draw("rawTdc-refTdc:pixelId>>hTimeVSPixel(512, 0, 512, 500, -200, -100 )", "refTdc>0 && !isCalCh", "colz")
+    tr.Draw("rawTdc-refTdc:pixelId>>hTimeVSPixel(512, 0, 512, 60, -160, -130 )", "refTdc>0 && !isCalCh", "colz")
     hTimeVSPixel = gROOT.FindObject("hTimeVSPixel")
     hTimeVSPixel.SetStats(False)
     hTimeVSPixel.GetXaxis().SetTitle("pixel ID")
@@ -216,10 +218,10 @@ def plotInterimFEDataNtupleAdvanced(root_output, FitWidth=5):
     canvas.cd(4)
     gPad.SetFrameFillStyle(0)
     gPad.SetFillStyle(0)
-    tr.Draw("height:rawTdc>>hHeightVSSample(256, 0, 256, 300, 0, 1000)", "", "colz")
+    tr.Draw("height:sample>>hHeightVSSample(256, 0, 256, 200, 0, 1000)", "", "colz")
     hHeightVSSample = gROOT.FindObject("hHeightVSSample")
     hHeightVSSample.SetStats(False)
-    hHeightVSSample.GetXaxis().SetTitle("hit time [sample]")
+    hHeightVSSample.GetXaxis().SetTitle("hit sample [sample]")
     hHeightVSSample.GetYaxis().SetTitle("hit amplitude [ADC] ")
     hHeightVSSample.SetTitle("amplitude VS hit time (incl calpulse).")
     gPad.SetLogz()
@@ -228,12 +230,12 @@ def plotInterimFEDataNtupleAdvanced(root_output, FitWidth=5):
     canvas.cd(5)
     gPad.SetFrameFillStyle(0)
     gPad.SetFillStyle(0)
-    tr.Draw("rawTdc>>hHitTime(400, -50, 350)")
+    tr.Draw("sample>>hHitTime(400, -50, 350)")
     hHitTime = gROOT.FindObject("hHitTime")
     hHitTime.SetStats(False)
-    hHitTime.GetXaxis().SetTitle("hit time [sample]")
-    hHitTime.GetYaxis().SetTitle(" entries / 1 sample ")
-    hHitTime.SetTitle("hit raw time (incl calpulse).")
+    hHitTime.GetXaxis().SetTitle("hit sample [sample]")
+    hHitTime.GetYaxis().SetTitle("entries / 1 sample ")
+    hHitTime.SetTitle("hit sample (incl calpulse).")
     gPad.Update()
 
     canvas.cd(6)
@@ -261,7 +263,7 @@ def plotInterimFEDataNtupleAdvanced(root_output, FitWidth=5):
     hHitEff.Write()
 
     root_plot_out.Close()
-    time.sleep(15)
+#    time.sleep(15)
 
 
 if __name__ == '__main__':

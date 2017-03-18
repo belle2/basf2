@@ -84,12 +84,17 @@ void TOPInterimFENtupleModule::defineHisto()
   m_tree->Branch("samplePeak", m_samplePeak, "samplePeak[nHit]/S");
   m_tree->Branch("sampleFall", m_sampleFall, "sampleFall[nHit]/S");
 
+  m_tree->Branch("quality", &m_quality, "quality[nHit]/S");
+  m_tree->Branch("sample", &m_sample, "sample[nHit]/S");
+
   m_tree->Branch("nPixelRawInRawDigit", &m_nPixelInRawDigit, "nPixelInRawDigit/S");
 
   m_tree->Branch("nFEHeader", &m_nFEHeader, "nFEHeader/S");
   m_tree->Branch("nEmptyFEHeader", &m_nEmptyFEHeader, "nEmptyFEHeader/S");
   m_tree->Branch("nWaveform", &m_nWaveform, "nWaveform/S");
   m_tree->Branch("errorFlag", &m_errorFlag, "errorFlag/i");
+
+
 }
 
 void TOPInterimFENtupleModule::beginRun() {}
@@ -122,7 +127,8 @@ void TOPInterimFENtupleModule::event()
     m_height[m_nHit] = digit.getADC();
     m_q[m_nHit] = digit.getIntegral();
     m_width[m_nHit] = digit.getPulseWidth();
-
+    m_sample[m_nHit] = (digit.getTDC() / 16 + digit.getFirstWindow() * 64) % 256;
+    m_quality[m_nHit] = digit.getHitQuality();
     const auto* rawDigit = digit.getRelated<TOPRawDigit>();
     if (rawDigit) {
       m_carrier[m_nHit] = rawDigit->getCarrierNumber();
@@ -146,7 +152,8 @@ void TOPInterimFENtupleModule::event()
     short reducedPixelId = (m_pixelId[iHit] - 1) / 8;
     if (refTdcMap.count(reducedPixelId) > 0)
       m_refTdc[iHit] = refTdcMap[reducedPixelId];
-    else m_refTdc[iHit] = -99999;
+    else
+      m_refTdc[iHit] = -99999;
   }
 
   for (const auto& rawDigit : rawDigits) {

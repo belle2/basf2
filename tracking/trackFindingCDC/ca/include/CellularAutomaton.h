@@ -44,9 +44,6 @@ namespace Belle2 {
         // Set all cell states to -inf and the non permanent flags to unset.
         prepareCellFlags(cellHolders);
 
-        ACellHolder* ptrHighestCellHolder = nullptr;
-        Weight highestCellState = NAN;
-
         for (ACellHolder& cellHolder : cellHolders) {
           if (cellHolder.getAutomatonCell().hasMaskedFlag()) continue;
           if (cellHolder.getAutomatonCell().hasCycleFlag()) continue;
@@ -59,12 +56,8 @@ namespace Belle2 {
           }
 
           try {
-            Weight cellState = getFinalCellState(cellHolder, cellHolderNeighborhood);
-            if (std::isnan(highestCellState) or highestCellState < cellState) {
-              // We have a new best start point.
-              ptrHighestCellHolder = &cellHolder;
-              highestCellState = cellState;
-            }
+            // Assignes flags and the cell state
+            getFinalCellState(cellHolder, cellHolderNeighborhood);
           } catch (CycleException) {
             // TODO: Come up with some handeling for cycles.
             // For now we continue to look for long paths in the graph
@@ -76,7 +69,18 @@ namespace Belle2 {
             // But can we actually distinguish the two situations?
           }
         }
-        return ptrHighestCellHolder;
+
+        auto lessStartCellState = [](ACellHolder & lhs, ACellHolder & rhs) {
+          return (std::make_pair(lhs.getAutomatonCell().hasStartFlag(),
+                                 lhs.getAutomatonCell().getCellState()) <
+                  std::make_pair(rhs.getAutomatonCell().hasStartFlag(),
+                                 rhs.getAutomatonCell().getCellState()));
+        };
+
+        auto itStartCellHolder = std::max_element(cellHolders.begin(), cellHolders.end(), lessStartCellState);
+        if (itStartCellHolder == cellHolders.end()) return nullptr;
+        if (not itStartCellHolder->getAutomatonCell().hasStartFlag()) return nullptr;
+        return &*itStartCellHolder;
       }
 
     private:

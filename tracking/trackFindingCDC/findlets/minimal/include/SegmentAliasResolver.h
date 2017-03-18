@@ -33,17 +33,17 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      std::string getDescription() override;
+      std::string getDescription() final;
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Signals the beginning of the event processing
-      void initialize() override;
+      void initialize() final;
 
     public:
       /// Main algorithm applying the fit to each segment
-      void apply(std::vector<CDCSegment2D>& outputSegments) override;
+      void apply(std::vector<CDCSegment2D>& outputSegments) final;
 
     private:
       /// Fit the alias segment
@@ -51,7 +51,7 @@ namespace Belle2 {
 
     private:
       /// Parameter : Which alias resolutions should be applied
-      std::vector<std::string> m_param_investigateAlias = { "full", "cross", "borders", /*"middle"*/};
+      std::vector<std::string> m_param_investigateAlias = { /*"full",*/ "cross", "borders", /*"middle"*/};
 
       /// Switch whether the complete segment should be aliased.
       bool m_fullAlias = false; // Activated by the parameter

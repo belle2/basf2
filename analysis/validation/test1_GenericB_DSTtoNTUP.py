@@ -23,6 +23,7 @@ inputMdst('default', '../GenericB_GENSIMRECtoDST.dst.root')
 loadStdCharged()
 loadStdPhoton()
 loadStdPi0()
+loadStdLoosePi0()
 loadStdKS()
 loadStdLightMesons()
 

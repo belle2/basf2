@@ -65,9 +65,10 @@ double DriftLengthEstimator::updateDriftLength(CDCRecoHit2D& recoHit2D)
                                                          rl,
                                                          wire.getRefZ(),
                                                          alpha);
-
-  bool snapRecoPos = true;
-  recoHit2D.setRefDriftLength(driftLength, snapRecoPos);
+  if (driftLength > -2 and driftLength < 16) {
+    bool snapRecoPos = true;
+    recoHit2D.setRefDriftLength(driftLength, snapRecoPos);
+  }
   return driftLength;
 }
 
@@ -152,7 +153,7 @@ double DriftLengthEstimator::updateDriftLength(CDCRecoHit3D& recoHit3D,
                                       alpha,
                                       theta,
                                       hit->getADCCount());
-  if (driftLength > -2) {
+  if (driftLength > -2 and driftLength < 16) {
     bool snapRecoPos = true;
     recoHit3D.setRecoDriftLength(driftLength, snapRecoPos);
   }

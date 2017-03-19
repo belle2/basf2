@@ -362,9 +362,9 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
 // we fake the framenr and startframenr until we find some better solution
 
   if (dhp_active != 0) { /// is there any hardware switched on?
-    const int ladder_min_row = 0; /// get them from database
+    // const int ladder_min_row = 0; Hardware counts from 0, only include if it does not.
     const int ladder_max_row = 768 - 1;
-    const int ladder_min_col = 0;
+    // const int ladder_min_col = 0;
     const int ladder_max_col = 250 - 1;
 
     /// clear pixelmap
@@ -398,7 +398,7 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
           unsigned int row, col;
           row = it->getVCellID();// hardware starts counting at 0!
           col = it->getUCellID();// U/V cell ID DO NOT follow Belle2 Note yet, TODO add -1 if this has been implemented!
-          if (row < ladder_min_row || row > ladder_max_row || col < ladder_min_col || col > ladder_max_col) {
+          if (row > ladder_max_row || col > ladder_max_col) {
             B2ERROR("ROW/COL out of range col: " << col << " row: " << row);
           } else {
             // fill ADC ... convert float to unsigned char, clamp to 0 - 255 , no scaling ... and how about common mode?
@@ -432,7 +432,8 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
   add_frame_to_payload();
 }
 
-void PXDPackerModule::do_the_reverse_mapping(unsigned int& row, unsigned int& col, unsigned short layer, unsigned short sensor)
+void PXDPackerModule::do_the_reverse_mapping(unsigned int& /*row*/, unsigned int& /*col*/, unsigned short /*layer*/,
+                                             unsigned short /*sensor*/)
 {
   // work to be done
 }

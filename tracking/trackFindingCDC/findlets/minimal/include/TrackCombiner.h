@@ -11,6 +11,11 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+
+#include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
+#include <tracking/trackFindingCDC/ca/Path.h>
+
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <vector>
@@ -30,9 +35,6 @@ namespace Belle2 {
       using Super = Findlet<CDCTrack&, CDCTrack&, CDCTrack>;
 
     public:
-      /// Constructor adding the filter as a subordinary processing signal listener.
-      TrackCombiner();
-
       /// Short description of the findlet
       std::string getDescription() final;
 
@@ -45,6 +47,10 @@ namespace Belle2 {
                  const std::vector<CDCTrack>& secondInputTracks,
                  std::vector<CDCTrack>& tracks) final;
 
+
+    private:
+      /// Instance of the cellular automaton path finder
+      MultipassCellularPathFinder<const CDCSegment3D> m_cellularPathFinder;
     };
   }
 }

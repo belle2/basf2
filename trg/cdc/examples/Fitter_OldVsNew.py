@@ -10,7 +10,7 @@ from ROOT import gROOT, Belle2
 gROOT.ProcessLine("gErrorIgnoreLevel = 4000;")  # ignore endless root errors for background files...
 
 """
-Compare the CDCTriggerTSFModule output with the old TRGCDCModule,
+Compare the CDCTrigger2DFitterModule output with the old TRGCDCModule,
 to confirm that the behaviour of the new code is correct.
 """
 

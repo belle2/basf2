@@ -356,7 +356,7 @@ int main(int argc, char* argv[])
   if (!pythonFile.empty()) {
     //Search in local or central lib/ if this isn't a direct path
     if (!boost::filesystem::exists(pythonFile)) {
-      std::string libFile = FileSystem::findFile((libPath / pythonFile).string());
+      std::string libFile = FileSystem::findFile((libPath / pythonFile).string(), true);
       if (!libFile.empty())
         pythonFile = libFile;
     }

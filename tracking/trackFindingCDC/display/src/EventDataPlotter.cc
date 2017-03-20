@@ -686,11 +686,13 @@ void EventDataPlotter::drawTrajectory(const RecoTrack& recoTrack, const Attribut
     TVector3 mom;
     TMatrixDSym cov;
     size_t nHits = recoTrack.getHitPointsWithMeasurement().size();
-    // const cast to access the  measurements along the track
-    RecoTrack& vRecoTrack = const_cast<RecoTrack&>(recoTrack);
-    for (size_t iHit = 0; iHit < nHits; ++iHit) {
+
+    for (auto recoHit : recoTrack.getRecoHitInformations()) {
+      // skip for reco hits which have not been used in the fit (and therefore have no fitted information on the plane
+      if (!recoHit->useInFit())
+        continue;
       try {
-        const genfit::MeasuredStateOnPlane& state = vRecoTrack.getMeasuredStateOnPlaneFromHit(iHit);
+        const genfit::MeasuredStateOnPlane& state = recoTrack.getMeasuredStateOnPlaneFromRecoHit(recoHit);
         state.getPosMomCov(pos, mom, cov);
       } catch (genfit::Exception) {
         continue;

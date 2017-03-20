@@ -58,10 +58,7 @@ namespace Belle2 {
       static CDCSegment2D reconstructUsingFacets(const CDCRLWireHitSegment& rlWireHitSegment);
 
       /// Comparision of segments up to the super cluster id keeping them close together on sort
-      bool operator<(const CDCSegment2D& segment2D) const
-      {
-        return this->getISuperCluster() < segment2D.getISuperCluster();
-      }
+      bool operator<(const CDCSegment2D& segment2D) const;
 
       /// Getter for the vector of wires the hits of this segment are based on in the same order.
       std::vector<const CDCWire*> getWireSegment() const;

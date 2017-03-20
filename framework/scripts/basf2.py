@@ -85,13 +85,8 @@ def get_terminal_width():
     """
     Returns width of terminal in characters, or 80 if unknown.
     """
-    from subprocess import Popen, PIPE
-
-    try:
-        pipe = Popen('stty size', shell=True, stdout=PIPE, stderr=PIPE)
-        return int(pipe.stdout.read().split()[1])
-    except:
-        return 80
+    from shutil import get_terminal_size
+    return get_terminal_size(fallback=(80, 24)).columns
 
 
 def pretty_print_table(table, column_widths, first_row_is_heading=True):
@@ -373,7 +368,6 @@ def print_all_modules(moduleList, package=''):
     register them and print their information
     """
 
-    term_width = get_terminal_width()
     fail = False
 
     modules = []

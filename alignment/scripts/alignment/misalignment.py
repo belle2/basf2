@@ -7,6 +7,9 @@ from basf2 import *
 import ROOT
 from ROOT import Belle2
 
+import math
+import numpy
+
 
 class GlobalDeformation:
     """
@@ -18,9 +21,8 @@ class GlobalDeformation:
         self.scale = scale
 
     def __call__(self, xyz):
-        """ Return the difference in global position induced by the deformation,
-        given the original x,y,z position as either TVector3 or a list with length of 3.
-        Returns list of 3 values - differential vector in global coordinates x, y, z
+        """ Return TVector3 with difference in global position induced by the deformation,
+        given the original x,y,z position as TVector3 or a list with length of 3.
         """
 
         rphiz = self._xyz_to_rphiz(xyz)
@@ -76,6 +78,55 @@ class Curl(GlobalDeformation):
         return [0., self.scale * r + self.scale2 * 1. / r, 0.]
 
 
+class Telescope(GlobalDeformation):
+
+    def __init__(self, scale):
+        super().__init__(scale)
+
+    def _transform(self, r, phi, z):
+        return [0., 0., self.scale * r]
+
+
+class Elliptical(GlobalDeformation):
+
+    def __init__(self, scale):
+        super().__init__(scale)
+
+    def _transform(self, r, phi, z):
+        import math
+        return [self.scale * 1. / 2. * math.cos(2 * phi) * r, 0., 0.]
+
+
+class Clamshell(GlobalDeformation):
+
+    def __init__(self, scale):
+        super().__init__(scale)
+
+    def _transform(self, r, phi, z):
+        import math
+        import numpy
+
+        return [0., self.scale * math.sin(phi) * numpy.sign(math.tan(phi)), 0.]
+
+
+class Skew(GlobalDeformation):
+
+    def __init__(self, scale):
+        super().__init__(scale)
+
+    def _transform(self, r, phi, z):
+        return [0., 0., self.scale * math.cos(phi) * r]
+
+
+class Bowing(GlobalDeformation):
+
+    def __init__(self, scale):
+        super().__init__(scale)
+
+    def _transform(self, r, phi, z):
+        return [self.scale * z, 0., 0.]
+
+
 class Twist(GlobalDeformation):
 
     def __init__(self, scale):
@@ -83,6 +134,15 @@ class Twist(GlobalDeformation):
 
     def _transform(self, r, phi, z):
         return [0., self.scale * z / r, 0.]
+
+
+class ZExpansion(GlobalDeformation):
+
+    def __init__(self, scale):
+        super().__init__(scale)
+
+    def _transform(self, r, phi, z):
+        return [0., 0., self.scale * z]
 
 
 class CreateMisalignmentModule(Module):
@@ -133,7 +193,7 @@ class CreateMisalignmentModule(Module):
             # new_global_pos = helper._xyz_to_rphiz(new_global_pos)
 
             txt.write(
-                '{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} \n'.format(
+                '{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11}\n'.format(
                     str(sensor.getLayerNumber()),
                     str(sensor.getLadderNumber()),
                     str(sensor.getSensorNumber()),

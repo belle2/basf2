@@ -63,7 +63,7 @@ def plotInterimFEDataNtupleSummary(root_output, FitWidth=5):
     gPad.SetFillStyle(0)
     tr.Draw("rawTdc-refTdc>>hLaserTime(250,-245,5)", "refTdc>0 && !isCalCh")
     hLaserTime = gROOT.FindObject("hLaserTime")
-    hLaserTime.GetXaxis().SetTitle("hit time - ref. time [sample]")
+    hLaserTime.GetXaxis().SetTitle("hit time - ref. time [ns]")
     BinWidth = hLaserTime.GetXaxis().GetBinUpEdge(1) - hLaserTime.GetXaxis().GetBinLowEdge(1)
     ytitle = "Entries[/(" + str(BinWidth) + " sample)]"
     hLaserTime.GetYaxis().SetTitle(ytitle)
@@ -176,7 +176,7 @@ def plotInterimFEDataNtupleAdvanced(root_output, FitWidth=5):
     gStyle.SetStatStyle(0)
     gStyle.SetOptStat(112210)
     gStyle.SetOptFit(1110)
-    canvas = TCanvas("cv2", "cv2", 800, 800)
+    canvas = TCanvas("cv2", "cv2", 1600, 1600)
     canvas.SetFillStyle(0)
 
     f = TFile(root_output)
@@ -189,7 +189,7 @@ def plotInterimFEDataNtupleAdvanced(root_output, FitWidth=5):
     tr.Draw("rawTdc-refTdc:winNum>>hTimeVSWin(512, 0, 512, 60, -160, -130)", "refTdc>0 && !isCalCh", "colz")
     hTimeVSWin = gROOT.FindObject("hTimeVSWin")
     hTimeVSWin.GetXaxis().SetTitle("hit first window")
-    hTimeVSWin.GetYaxis().SetTitle("hit time - ref. time [sample]")
+    hTimeVSWin.GetYaxis().SetTitle("hit time - ref. time [ns]")
     hTimeVSWin.SetStats(False)
     hTimeVSWin.SetTitle(root_output + " hit time - ref time  VS window number.")
 
@@ -200,7 +200,7 @@ def plotInterimFEDataNtupleAdvanced(root_output, FitWidth=5):
     hTimeVSSample = gROOT.FindObject("hTimeVSSample")
     hTimeVSSample.SetStats(False)
     hTimeVSSample.GetXaxis().SetTitle("hit sample [sample]")
-    hTimeVSSample.GetYaxis().SetTitle("hit time - ref. time [sample]")
+    hTimeVSSample.GetYaxis().SetTitle("hit time - ref. time [ns]")
     hTimeVSSample.SetTitle("hit time - ref time VS hit time.")
     gPad.Update()
 
@@ -211,7 +211,7 @@ def plotInterimFEDataNtupleAdvanced(root_output, FitWidth=5):
     hTimeVSPixel = gROOT.FindObject("hTimeVSPixel")
     hTimeVSPixel.SetStats(False)
     hTimeVSPixel.GetXaxis().SetTitle("pixel ID")
-    hTimeVSPixel.GetYaxis().SetTitle("hit time - ref. time [sample]")
+    hTimeVSPixel.GetYaxis().SetTitle("hit time - ref. time [ns]")
     hTimeVSPixel.SetTitle("hit time - ref time VS pixel ID.")
     gPad.Update()
 

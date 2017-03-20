@@ -21,10 +21,17 @@ import signal
 from pybasf2 import *
 # inspect is also used by LogPythonInterface. Do not remove!
 import inspect
-# we need to patch PyDBObj so lets import the ROOT cpp backend and the constant
-# we need
-from ROOT import kIsConstMethod as ROOT_kIsConstMethod, kIsStatic as ROOT_kIsStatic
+# we need to patch PyDBObj so lets import the ROOT cpp backend.
 import cppyy
+# However importing ROOT.kIsConstMethod and kIsStatic is a bad idea
+# here since it triggers final setup of ROOT and thus starts a gui thread
+# (probably) and consumes command lines if not disabled *sigh*. So we take them
+# as literal values from TDictionary.h
+
+#: EProperty::kIsStatic value from TDictionary.h
+ROOT_kIsStatic = 0x00004000
+#: EProperty::kIsConstMethod value from TDictionary.h
+ROOT_kIsConstMethod = 0x10000000
 
 
 def _avoidPyRootHang():

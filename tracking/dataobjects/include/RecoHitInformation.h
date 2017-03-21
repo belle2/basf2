@@ -85,6 +85,7 @@ namespace Belle2 {
       c_LocalTrackFinder,
       c_SegmentTrackCombiner,
       c_VXDTrackFinder,
+      // Belle I's track finder
       c_Trasan,
       c_other
     };

@@ -32,7 +32,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCTrack&, CDCTrack&, CDCTrack>;
+      using Super = Findlet<const CDCTrack, const CDCTrack, CDCTrack>;
 
     public:
       /// Short description of the findlet
@@ -47,6 +47,9 @@ namespace Belle2 {
                  const std::vector<CDCTrack>& secondInputTracks,
                  std::vector<CDCTrack>& tracks) final;
 
+    private:
+      /// Parameter : Activate the identification of common segments
+      bool m_param_identifyCommonSegments = false;
 
     private:
       /// Instance of the cellular automaton path finder

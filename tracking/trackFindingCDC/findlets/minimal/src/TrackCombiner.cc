@@ -14,6 +14,9 @@
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
 #include <tracking/trackFindingCDC/utilities/Range.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
+#include <framework/core/ModuleParamList.h>
 
 #include <boost/range/adaptor/map.hpp>
 #include <map>
@@ -45,6 +48,31 @@ namespace {
     }
     return result;
   }
+
+  std::vector<CDCRLWireHit> getRLWireHitSegment(const CDCSegment3D& segment3D)
+  {
+    std::vector<CDCRLWireHit> result;
+    for (const CDCRecoHit3D& recoHit3D : segment3D) {
+      result.push_back(recoHit3D.getRLWireHit());
+    }
+    return result;
+  }
+
+  std::vector<std::pair<std::pair<Index, Index>, CDCRLWireHit>> getCommonRLWireHits(const std::vector<CDCRLWireHit>& rlWireHits1,
+                                                             const std::vector<CDCRLWireHit>& rlWireHits2)
+  {
+    std::vector<std::pair<std::pair<Index, Index>, CDCRLWireHit>> result;
+    Index index1 = -1;
+    for (const CDCRLWireHit& rlWireHit : rlWireHits1) {
+      ++index1;
+      auto itRLWireHits2 = std::find(rlWireHits2.begin(), rlWireHits2.end(), rlWireHit);
+      if (itRLWireHits2 == rlWireHits2.end()) continue;
+      Index index2 = std::distance(rlWireHits2.begin(), itRLWireHits2);
+      assert(index2 >= 0);
+      result.push_back({{index1, index2}, rlWireHit});
+    }
+    return result;
+  }
 }
 
 std::string TrackCombiner::getDescription()
@@ -52,9 +80,13 @@ std::string TrackCombiner::getDescription()
   return "Combines two sets of tracks to one final set by merging tracks that have large overlaps.";
 }
 
-void TrackCombiner::exposeParameters(ModuleParamList* moduleParamList __attribute__((unused)),
-                                     const std::string& prefix __attribute__((unused)))
+void TrackCombiner::exposeParameters(ModuleParamList* moduleParamList,
+                                     const std::string& prefix)
 {
+  moduleParamList->addParameter(prefixed(prefix, "identifyCommonSegments"),
+                                m_param_identifyCommonSegments,
+                                "Activate the identification of common segments",
+                                m_param_identifyCommonSegments);
 }
 
 void TrackCombiner::apply(const std::vector<CDCTrack>& inputTracks,
@@ -106,6 +138,9 @@ void TrackCombiner::apply(const std::vector<CDCTrack>& inputTracks,
 
   // Memory for the relations between tracks to be followed on linking
   std::vector<WeightedRelation<const CDCSegment3D>> segmentRelations;
+
+  // Also keep a record to which of the tracks the segment
+  std::map<const CDCSegment3D*, InTracks> inTracksBySegment;
 
   // Split tracks into segments - break segment such that there will be matching pieces with the other tracks
   for (const std::pair<std::pair<int, size_t>, const CDCTrack*>  rankedTrack : rankedTracks) {
@@ -161,9 +196,11 @@ void TrackCombiner::apply(const std::vector<CDCTrack>& inputTracks,
     // Push segments to the common pool
     const CDCSegment3D* lastSegment = nullptr;
     for (std::pair<InTracks, CDCSegment3D>& segmentInTrack : segmentsInTrack) {
+      const InTracks& inTracks = segmentInTrack.first;
       const CDCSegment3D& segment = segmentInTrack.second;
       segment->setCellWeight(segment.size());
       segments.push_back(std::move(segment));
+      inTracksBySegment[&segments.back()] = inTracks;
       if (lastSegment != nullptr) {
         segmentRelations.push_back({lastSegment, 0, &segments.back()});
       }
@@ -174,11 +211,81 @@ void TrackCombiner::apply(const std::vector<CDCTrack>& inputTracks,
   // Sort the relations for the lookup
   std::sort(segmentRelations.begin(), segmentRelations.end());
 
-  // Identify common segments and check orientation of tracks
+  // Identify common segments, also checking whether they have the same orientation
+  if (m_param_identifyCommonSegments) {
+    std::vector<std::pair<const CDCSegment3D*, const CDCSegment3D*>> segmentContainmentRelation;
+    for (auto itSegment1 = segments.begin(); itSegment1 != segments.end(); ++itSegment1) {
+      const CDCSegment3D& segment1 = *itSegment1;
+      std::vector<CDCRLWireHit> rlWireHits1 = getRLWireHitSegment(segment1);
+      ISuperLayer iSL1 = segment1.getISuperLayer();
+      InTracks inTracks1 = inTracksBySegment[&segment1];
+      for (auto itSegment2 = itSegment1 + 1; itSegment2 != segments.end(); ++itSegment2) {
+        const CDCSegment3D& segment2 = *itSegment2;
 
-  // Create edges
+        // Should not happen - here for safety reasons
+        if (&segment1 == &segment2) continue;
 
-  // Analyse branches and add additional links where there is no contention between alternatives
+        ISuperLayer iSL2 = segment2.getISuperLayer();
+        if (iSL1 != iSL2) continue;
+
+        InTracks inTracks2 = inTracksBySegment[&segment2];
+        if (inTracks1 != inTracks2) continue;
+
+        // Now answering the question if segment 1 is contained in segment 2
+        std::vector<CDCRLWireHit> rlWireHits2 = getRLWireHitSegment(segment2);
+        std::vector<std::pair<std::pair<int, int>, CDCRLWireHit>> commonRLWireHits =
+                                                                 getCommonRLWireHits(rlWireHits1, rlWireHits2);
+
+        // Check for containment, requiring that the majority of the wire hits of one is in two
+        // However also require that the two is not too much larger compared to the first one
+        bool contains = commonRLWireHits.size() > 2 and
+                        commonRLWireHits.size() > rlWireHits1.size() * 0.8 and
+                        commonRLWireHits.size() > rlWireHits2.size() * 0.8;
+        if (not contains) continue;
+
+        // Now finally check whether both segments point in the same direction
+        double n = commonRLWireHits.size();
+        double prod11 = 0;
+        double prod12 = 0;
+        double prod22 = 0;
+        double sum1 = 0;
+        double sum2 = 0;
+        for (const std::pair<int, int>& indices : commonRLWireHits | boost::adaptors::map_keys) {
+          prod11 += indices.first * indices.first;
+          prod12 += indices.first * indices.second;
+          prod22 += indices.second * indices.second;
+          ;
+          sum1 += indices.first;
+          sum2 += indices.second;
+        }
+        double var1 = (prod11 - sum1 * sum1 / n);
+        double var2 = (prod22 - sum2 * sum2 / n);
+        double cov12 = (prod12 - sum1 * sum2 / n);
+        double cor = cov12 / std::sqrt(var1 * var2);
+        if (not(cor > 0.75)) continue;
+
+        segmentContainmentRelation.push_back({&segment1, &segment2});
+      }
+    }
+
+    // Create additional edges
+    std::vector<WeightedRelation<const CDCSegment3D>> additionalSegmentRelations;
+    for (std::pair<const CDCSegment3D*, const CDCSegment3D*>& rel : segmentContainmentRelation) {
+      for (WeightedRelation<const CDCSegment3D> rel1 :
+           asRange(std::equal_range(segmentRelations.begin(), segmentRelations.end(), rel.first))) {
+        additionalSegmentRelations.push_back({rel.second, 0, rel1.getTo()});
+      }
+
+      for (WeightedRelation<const CDCSegment3D> rel2 : asRange(
+             std::equal_range(segmentRelations.begin(), segmentRelations.end(), rel.second))) {
+        additionalSegmentRelations.push_back({rel.first, 0, rel2.getFrom()});
+      }
+    }
+    segmentRelations.insert(segmentRelations.end(),
+                            additionalSegmentRelations.begin(),
+                            additionalSegmentRelations.end());
+    std::sort(segmentRelations.begin(), segmentRelations.end());
+  }
 
   // Extract paths
   // Memory for the track paths generated from the graph.
@@ -193,26 +300,25 @@ void TrackCombiner::apply(const std::vector<CDCTrack>& inputTracks,
     if (segmentPath.size() < 2) continue;
     outputTracks.push_back(condense(segmentPath));
   }
-  return;
 
+  // Simple approach
   // Incoporate the second input tracks in to the first input tracks by looking for large overlaps
   // Very simple approach use the first tracks and add the ones from the second tracks with no overlap to the first
-  outputTracks.insert(outputTracks.end(), inputTracks.begin(), inputTracks.end());
-
-  for (const CDCTrack& secondTrack : secondInputTracks) {
-    std::map<const CDCTrack*, int> overlappingTracks;
-    for (const CDCRecoHit3D& recoHit3D : secondTrack) {
-      const CDCWireHit& wireHit = recoHit3D.getWireHit();
-      inTracksByWireHit.equal_range(&recoHit3D.getWireHit());
-      auto tracksForWireHit = asRange(inTracksByWireHit.equal_range(&wireHit));
-      for (const std::pair<const CDCWireHit*, InTracks>& trackForWireHit : inTracksByWireHit) {
-        const CDCTrack* track = trackForWireHit.second[0];
-        if (not track) continue;
-        overlappingTracks[track]++;
-      }
-    }
-    if (overlappingTracks.size() == 0) {
-      outputTracks.push_back(secondTrack);
-    }
-  }
+  // outputTracks.insert(outputTracks.end(), inputTracks.begin(), inputTracks.end());
+  // for (const CDCTrack& secondTrack : secondInputTracks) {
+  //   std::map<const CDCTrack*, int> overlappingTracks;
+  //   for (const CDCRecoHit3D& recoHit3D : secondTrack) {
+  //     const CDCWireHit& wireHit = recoHit3D.getWireHit();
+  //     inTracksByWireHit.equal_range(&recoHit3D.getWireHit());
+  //     auto tracksForWireHit = asRange(inTracksByWireHit.equal_range(&wireHit));
+  //     for (const std::pair<const CDCWireHit*, InTracks>& trackForWireHit : inTracksByWireHit) {
+  //       const CDCTrack* track = trackForWireHit.second[0];
+  //       if (not track) continue;
+  //       overlappingTracks[track]++;
+  //     }
+  //   }
+  //   if (overlappingTracks.size() == 0) {
+  //     outputTracks.push_back(secondTrack);
+  //   }
+  // }
 }

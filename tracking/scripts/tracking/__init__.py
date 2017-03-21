@@ -259,7 +259,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
                         tracks="CDCTrackVector2")
 
         # Overwrites the origin CDCTrackVector
-        path.add_module("TrackCombiner",
+        path.add_module("TFCDC_TrackCombiner",
                         inputTracks="CDCTrackVector",
                         secondaryInputTracks="CDCTrackVector2",
                         tracks="CDCTrackVector")

@@ -17,9 +17,6 @@
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentRejecter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentCreatorMCTruth.h>
 
-#include <tracking/trackFindingCDC/findlets/minimal/TrackLinker.h>
-#include <tracking/trackFindingCDC/findlets/minimal/TrackCombiner.h>
-
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 
@@ -97,18 +94,6 @@ namespace Belle2 {
         : Super( {"CDCWireHitVector", "CDCSegment2DVector"})
       {
       }
-    };
-
-    /**
-     * Module implementation using the TrackLinker
-     */
-    class TrackLinkerModule : public FindletModule<TrackLinker> {
-    };
-
-    /**
-     * Module implementation using the TrackCombiner
-     */
-    class TrackCombinerModule : public FindletModule<TrackCombiner> {
     };
   }
 }

@@ -7,17 +7,20 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/modules/trackFinderCDC/FindletModules.h>
+#include <tracking/modules/trackFinderCDC/TrackMergerModules.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-REG_MODULE(FacetCreator);
-REG_MODULE(SegmentCreatorFacetAutomaton);
-REG_MODULE(SegmentLinker);
-REG_MODULE(SegmentFitter);
-REG_MODULE(SegmentRejecter);
-REG_MODULE(SegmentOrienter);
-REG_MODULE(SegmentCreatorMCTruth);
+REG_MODULE(TFCDC_TrackLinker);
+REG_MODULE(TFCDC_TrackCombiner);
 
-REG_MODULE(SegmentFinderFacetAutomaton);
+TFCDC_TrackLinkerModule::TFCDC_TrackLinkerModule()
+  : Super( {"CDCTrackVector"})
+{
+}
+
+TFCDC_TrackCombinerModule::TFCDC_TrackCombinerModule()
+  : Super( {"" /*to be set externally*/, "" /*to be set externally*/, ""  /*to be set externally*/})
+{
+}

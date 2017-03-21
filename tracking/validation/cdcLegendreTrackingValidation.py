@@ -30,7 +30,7 @@ class CDCLegendre(TrackingValidationRun):
 
     @staticmethod
     def finder_module(path):
-        path.add_module('WireHitPreparer')
+        path.add_module('TFCDC_WireHitPreparer')
 
         use_legendre_finder = True
         if use_legendre_finder:

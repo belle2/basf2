@@ -32,7 +32,7 @@ class CosmicsHough(TrackingValidationRun):
     components = None
 
     def finder_module(self, path):
-        path.add_module('WireHitPreparer')
+        path.add_module('TFCDC_WireHitPreparer')
         path.add_module('SegmentFinderCDCFacetAutomaton',
                         SegmentOrientation="downwards")
         path.add_module('TFCDC_AxialTrackCreatorSegmentHough',

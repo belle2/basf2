@@ -18,7 +18,7 @@ class BackgroundClusterFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEventsR
     def create_path(self):
         """Setup the recording path after the simulation"""
         path = super().create_path()
-        path.add_module("WireHitPreparer",
+        path.add_module("TFCDC_WireHitPreparer",
                         flightTimeEstimation="outwards")
 
         if self.task == "train":

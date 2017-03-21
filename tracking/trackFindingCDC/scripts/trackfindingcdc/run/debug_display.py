@@ -21,8 +21,8 @@ class CDCDebugDisplayRun(CDCDisplayRun):
     #     "FacetRelationFilter": "none",
     # })
 
-    finder_module = ["WireHitPreparer", finder_module, "PrintCollections"]
-    finder_module = basf2.register_module("WireHitPreparer")
+    finder_module = ["TFCDC_WireHitPreparer", finder_module, "PrintCollections"]
+    finder_module = basf2.register_module("TFCDC_WireHitPreparer")
 
     show_all_drawoptions = True
     # Also show draw options that are related to the cellular automaton track finder

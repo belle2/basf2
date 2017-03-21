@@ -22,7 +22,7 @@ class RealisticSegmentPairFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEven
         path = super().create_path()
 
         # In contrast to other training use only the first *half* loop for more aggressive training
-        path.add_module("WireHitPreparer",
+        path.add_module("TFCDC_WireHitPreparer",
                         flightTimeEstimation="outwards",
                         UseNLoops=1.0)
 

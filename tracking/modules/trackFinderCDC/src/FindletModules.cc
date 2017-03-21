@@ -12,7 +12,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-REG_MODULE(WireHitCreator);
 REG_MODULE(SuperClusterCreator);
 REG_MODULE(ClusterRefiner);
 REG_MODULE(ClusterBackgroundDetector);

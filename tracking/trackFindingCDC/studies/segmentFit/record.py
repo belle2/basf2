@@ -155,7 +155,7 @@ class SegmentFitValidationRun(HarvestingRun):
         # based on the properties in the base class.
         path = super().create_path()
 
-        path.add_module("WireHitPreparer",
+        path.add_module("TFCDC_WireHitPreparer",
                         flightTimeEstimation=self.flight_time_estimation,
                         UseNLoops=1
                         )

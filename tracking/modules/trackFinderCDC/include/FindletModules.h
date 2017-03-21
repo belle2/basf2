@@ -9,13 +9,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/minimal/WireHitCreator.h>
-#include <tracking/trackFindingCDC/findlets/minimal/WireHitMCMultiLoopBlocker.h>
-#include <tracking/trackFindingCDC/findlets/minimal/WireHitBackgroundBlocker.h>
-
 #include <tracking/trackFindingCDC/findlets/minimal/SuperClusterCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/ClusterBackgroundDetector.h>
 #include <tracking/trackFindingCDC/findlets/minimal/ClusterRefiner.h>
+
 #include <tracking/trackFindingCDC/findlets/minimal/FacetCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentCreatorFacetAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentLinker.h>
@@ -46,22 +43,6 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /**
-     * Module implementation using the WireHitCreator
-     */
-    class WireHitCreatorModule : public FindletModule<WireHitCreator> {
-
-      /// Type of the base class
-      using Super = FindletModule<WireHitCreator>;
-
-    public:
-      /// Constructor setting the default store vector names
-      WireHitCreatorModule()
-        : Super( {"CDCWireHitVector"})
-      {
-      }
-    };
-
     /**
      * Module implementation using the SuperClusterCreator
      */

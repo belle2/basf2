@@ -53,7 +53,7 @@ class LegendreBinningValidationRun(HarvestingRun):
         # based on the properties in the base class.
         path = super().create_path()
 
-        path.add_module("WireHitPreparer",
+        path.add_module("TFCDC_WireHitPreparer",
                         logLevel=8,
                         flightTimeEstimation="outwards",
                         UseNLoops=1)

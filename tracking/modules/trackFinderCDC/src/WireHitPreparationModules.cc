@@ -7,26 +7,20 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/modules/trackFinderCDC/WireHitPreparerModule.h>
+#include <tracking/modules/trackFinderCDC/WireHitPreparationModules.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-REG_MODULE(WireHitPreparer);
+REG_MODULE(TFCDC_WireHitPreparer);
+REG_MODULE(TFCDC_WireHitCreator);
 
-// Deprecated alias
-REG_MODULE(WireHitTopologyPreparer);
-
-WireHitPreparerModule::WireHitPreparerModule()
+TFCDC_WireHitPreparerModule::TFCDC_WireHitPreparerModule()
   : Super( {"CDCWireHitVector"})
 {
-  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
-void WireHitTopologyPreparerModule::initialize()
+TFCDC_WireHitCreatorModule::TFCDC_WireHitCreatorModule()
+  : Super( {"CDCWireHitVector"})
 {
-  // Super call
-  WireHitPreparerModule::initialize();
-  B2WARNING("WireHitPreparerTopologyModule is a deprecated alias for WireHitPreparerModule. "
-            "Please adjust your steering file: WireHitTopologyPreparer -> WireHitPreparer");
 }

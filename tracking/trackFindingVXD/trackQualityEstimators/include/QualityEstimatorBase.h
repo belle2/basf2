@@ -12,7 +12,7 @@
 
 #include <boost/optional.hpp>
 #include <TVector3.h>
-
+#include <math.h>
 
 namespace Belle2 {
 
@@ -28,7 +28,7 @@ namespace Belle2 {
    * chiSquared is always computed, all other values are optional, depending on the implementation.
    */
   struct QualityEstimationResults {
-    float chiSquared = 0;
+    float chiSquared;
     boost::optional<short> curvatureSign;
     boost::optional<float> pt;
     boost::optional<float> pt_sigma;
@@ -67,7 +67,6 @@ namespace Belle2 {
     virtual QualityEstimationResults calcCompleteResults(std::vector<Measurement> const& measurements)
     {
       m_results = QualityEstimationResults();
-      m_results.curvatureSign = calcCurvatureSign(measurements);
       m_results.chiSquared = calcChiSquared(measurements);
       return m_results;
     }
@@ -85,6 +84,7 @@ namespace Belle2 {
      */
     short calcCurvatureSign(std::vector<Measurement> const& measurements)
     {
+      if (measurements.size() < 3) return 0;
       float sumOfCurvature = 0.;
       for (unsigned int i = 0; i < measurements.size() - 2; ++i) {
         TVector3 ab = measurements.at(i).position - measurements.at(i + 1).position;

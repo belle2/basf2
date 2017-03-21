@@ -17,6 +17,8 @@ float QualityEstimatorTripletFit::calcChiSquared(std::vector<Measurement> const&
 {
   const int nTriplets = measurements.size() - 2;
 
+  if (nTriplets < 1) return NAN;
+
   double combinedChi2 = 0.;
 
   // values required for pt calculation
@@ -135,6 +137,9 @@ QualityEstimationResults QualityEstimatorTripletFit::calcCompleteResults(std::ve
 {
   // calculate and store chiSquared(calcChiSquared) and curvature(calcCurvature) in m_reuslts.
   QualityEstimatorBase::calcCompleteResults(measurements);
+  if (measurements.size() < 3) return m_results;
+
+  m_results.curvatureSign = calcCurvatureSign(measurements);
 
   // calculate pt and pt_sigma
   double averageThetaPrime = 0;

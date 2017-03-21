@@ -28,8 +28,22 @@ namespace Belle2 {
     std::string m_inputCollectionName;
     /** Name of the StoreArray containing the resulting 3D tracks. */
     std::string m_outputCollectionName;
+    /** Switch between nominal drift velocity and xt table */
+    bool m_xtSimple;
 
   private:
+    /** geometry constants: number of wires per super layer */
+    std::vector<double> nWires = {};
+    /** geometry constants: radius of priority layers */
+    std::vector<double> rr = {};
+    /** geometry constants: backward z of priority layers */
+    std::vector<double> zToStraw = {};
+    /** geometry constants: wire shift of stereo layers */
+    std::vector<int> nShift = {};
+    /** geometry constants: stereo angle */
+    std::vector<double> angleSt = {};
+    /** geometry constants: drift length - drift time relation */
+    std::vector<std::vector<double>> xtTables = {};
   };
 
 } // namespace Belle2

@@ -243,7 +243,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
                     corrections=["B2B"])
 
     # Find the stereo hits to those axial tracks
-    path.add_module('StereoHitFinderCDCLegendreHistogramming')
+    path.add_module('TFCDC_StereoHitFinder')
 
     # Combine segments with axial tracks
     path.add_module('SegmentTrackCombiner',
@@ -319,7 +319,7 @@ def add_cdc_cr_track_finding(path,
                     corrections=["B2B"])
 
     # Find the stereo hits to those axial tracks
-    path.add_module('StereoHitFinderCDCLegendreHistogramming')
+    path.add_module('TFCDC_StereoHitFinder')
 
     # Combine segments with axial tracks
     path.add_module('SegmentTrackCombiner',

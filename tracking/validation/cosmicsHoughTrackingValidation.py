@@ -37,7 +37,7 @@ class CosmicsHough(TrackingValidationRun):
                         SegmentOrientation="downwards")
         path.add_module('TFCDC_AxialTrackCreatorSegmentHough',
                         tracks="CDCAxialTrackVector")
-        path.add_module('StereoHitFinderCDCLegendreHistogramming',
+        path.add_module('TFCDC_StereoHitFinder',
                         inputTracks="CDCAxialTrackVector")
         path.add_module('TFCDC_TrackExporter',
                         inputTracks="CDCAxialTrackVector")

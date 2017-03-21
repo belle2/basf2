@@ -1,8 +1,17 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Nils Braun                                               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 #include <tracking/trackFindingCDC/findlets/combined/StereoHitFinder.h>
 
+#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 
 namespace Belle2 {
@@ -25,14 +34,14 @@ namespace Belle2 {
      *   - Smarter Handling of segments (which is worse in the moment but should be better in general)
      *   - Make the precuts on the hits more transparent
      *  */
-    class StereoHitFinderCDCLegendreHistogrammingModule : public FindletModule<StereoHitFinder> {
+    class TFCDC_StereoHitFinderModule : public FindletModule<StereoHitFinder> {
 
       /// The base class
       using Super = FindletModule<StereoHitFinder>;
 
     public:
       /** Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree. */
-      StereoHitFinderCDCLegendreHistogrammingModule();
+      TFCDC_StereoHitFinderModule();
     };
   }
 }

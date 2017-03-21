@@ -216,6 +216,36 @@ namespace Belle2 {
       return loc2glo;
     }
 
+    TMatrixD RigidBodyHierarchy::convertTGeoToRigidBodyTransformation(TGeoHMatrix tgeo)
+    {
+      TMatrixD rotationT(3, 3);
+      TMatrixD offset(3, 3);
+      for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+          rotationT(i, j) = tgeo.GetRotationMatrix()[i * 3 + j];
+          // or transposed???? have to check
+        }
+      }
+      double xDet = tgeo.GetTranslation()[0];
+      double yDet = tgeo.GetTranslation()[1];
+      double zDet = tgeo.GetTranslation()[2];
+      offset.Zero();
+      offset(0, 1) = - zDet;
+      offset(0, 2) = yDet;
+      offset(1, 0) = zDet;
+      offset(1, 2) = - xDet;
+      offset(2, 0) = - yDet;
+      offset(2, 1) = xDet;
+
+      TMatrixD loc2glo(6, 6);
+      loc2glo.Zero();
+      loc2glo.SetSub(0, 0, rotationT);
+      loc2glo.SetSub(0, 3, -1. * offset * rotationT);
+      loc2glo.SetSub(3, 3, rotationT);
+
+      return loc2glo;
+    }
+
     // ------------------ HierarchyManager ----------------------------
 
     HierarchyManager::~HierarchyManager() {}

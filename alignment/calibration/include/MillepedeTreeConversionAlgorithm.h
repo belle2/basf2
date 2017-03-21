@@ -18,7 +18,7 @@ namespace Belle2 {
 
   /**
    * Creation of a plain TTree with residual and global derivative values
-   * from GBL data saved to a ROOT file. This conversion is indended for
+   * from GBL data saved to a ROOT file. This conversion is intended for
    * debugging.
    */
   class MillepedeTreeConversionAlgorithm : public CalibrationAlgorithm {

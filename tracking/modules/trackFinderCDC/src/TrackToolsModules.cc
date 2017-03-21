@@ -15,11 +15,17 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 REG_MODULE(TFCDC_TrackRejecter);
+REG_MODULE(TFCDC_TrackQualityAsserter);
 REG_MODULE(TFCDC_TrackOrienter);
 REG_MODULE(TFCDC_TrackFlightTimeAdjuster);
 REG_MODULE(TFCDC_TrackExporter);
 
 TFCDC_TrackRejecterModule::TFCDC_TrackRejecterModule()
+  : Super( {"CDCTrackVector"})
+{
+}
+
+TFCDC_TrackQualityAsserterModule::TFCDC_TrackQualityAsserterModule()
   : Super( {"CDCTrackVector"})
 {
 }

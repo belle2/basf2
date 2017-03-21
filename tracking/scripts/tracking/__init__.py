@@ -241,7 +241,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
     path.add_module("TFCDC_AxialTrackFinderLegendre")
 
     # Improve the quality of the axial tracks
-    path.add_module("TrackQualityAsserterCDC",
+    path.add_module("TFCDC_TrackQualityAsserter",
                     corrections=["B2B"])
 
     # Find the stereo hits to those axial tracks
@@ -265,7 +265,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
                         tracks="CDCTrackVector")
 
     # Improve the quality of all tracks and output
-    path.add_module("TrackQualityAsserterCDC",
+    path.add_module("TFCDC_TrackQualityAsserter",
                     corrections=[
                         "LayerBreak",
                         "LargeBreak2",
@@ -320,7 +320,7 @@ def add_cdc_cr_track_finding(path,
     path.add_module("TFCDC_AxialTrackFinderLegendre")
 
     # Improve the quality of the axial tracks
-    path.add_module("TrackQualityAsserterCDC",
+    path.add_module("TFCDC_TrackQualityAsserter",
                     corrections=["B2B"])
 
     # Find the stereo hits to those axial tracks
@@ -334,7 +334,7 @@ def add_cdc_cr_track_finding(path,
                     trackFilterParameters={"cut": 0.1})
 
     # Improve the quality of all tracks and output
-    path.add_module("TrackQualityAsserterCDC",
+    path.add_module("TFCDC_TrackQualityAsserter",
                     corrections=["LayerBreak", "LargeBreak2", "OneSuperlayer", "Small"],
                     )
 

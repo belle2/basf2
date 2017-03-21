@@ -9,10 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-
-#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 
 #include <string>
 #include <vector>
@@ -60,16 +57,6 @@ namespace Belle2 {
 
       /// Parameter : Flag to use the corrections only for not fitted tracks.
       bool m_param_onlyNotFittedTracks = false;
-    };
-
-    /// Module for the TrackQualityAsserter
-    class TrackQualityAsserterCDCModule: public FindletModule<TrackQualityAsserter> {
-      /// The base class
-      using Super = FindletModule<TrackQualityAsserter>;
-
-    public:
-      /// Setup the findlet with module with standard StoreArray names
-      TrackQualityAsserterCDCModule();
     };
   }
 }

@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
+#include <tracking/trackFindingCDC/findlets/minimal/TrackQualityAsserter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackOrienter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackFlightTimeAdjuster.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackExporter.h>
@@ -31,6 +32,20 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       TFCDC_TrackRejecterModule();
+    };
+
+    /**
+     * Module implementation using the TrackQualityAsserter
+     */
+    class TFCDC_TrackQualityAsserterModule: public FindletModule<TrackQualityAsserter> {
+
+    private:
+      /// Type of the base class
+      using Super = FindletModule<TrackQualityAsserter>;
+
+    public:
+      /// Constructor setting the default store vector names
+      TFCDC_TrackQualityAsserterModule();
     };
 
     /**

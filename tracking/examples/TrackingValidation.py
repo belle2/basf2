@@ -77,7 +77,7 @@ def main():
         '--module',
         type=str,
         choices=[
-            'TrackFinderCDCAutomaton',
+            'TFCDC_TrackFinderAutomaton',
             'TrackFinderCDC'
             'Reconstruction'],
         default='Reconstruction',

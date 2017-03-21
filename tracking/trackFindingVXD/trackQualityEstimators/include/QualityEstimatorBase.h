@@ -29,7 +29,7 @@ namespace Belle2 {
    */
   struct QualityEstimationResults {
     float chiSquared = 0;
-    boost::optional<short> curvature;
+    boost::optional<short> curvatureSign;
     boost::optional<float> pt;
     boost::optional<float> pt_sigma;
     boost::optional<TVector3> p;
@@ -52,12 +52,22 @@ namespace Belle2 {
 
     virtual ~QualityEstimatorBase() = default;
 
+    /** Minimal implementation of the quality estimation
+     * Calculates only chi2
+     *
+     * measurements - std::vector<Measurement> ordered from innermost to outermost measurement
+     */
     virtual float calcChiSquared(std::vector<Measurement> const& measurements) = 0;
 
+    /** Quality estimation providing additional quantities
+     * Calculates chi2, curvatureSign , pt, pt_sigma
+     *
+     * measurements - std::vector<Measurement> ordered from innermost to outermost measurement
+     */
     virtual QualityEstimationResults calcCompleteResults(std::vector<Measurement> const& measurements)
     {
       m_results = QualityEstimationResults();
-      m_results.curvature = calcCurvature(measurements);
+      m_results.curvatureSign = calcCurvatureSign(measurements);
       m_results.chiSquared = calcChiSquared(measurements);
       return m_results;
     }
@@ -73,7 +83,7 @@ namespace Belle2 {
      *  Ignores uncertainties.
      *  Returns -1,0,1 depending on the sum of all triplets.
      */
-    short calcCurvature(std::vector<Measurement> const& measurements)
+    short calcCurvatureSign(std::vector<Measurement> const& measurements)
     {
       float sumOfCurvature = 0.;
       for (unsigned int i = 0; i < measurements.size() - 2; ++i) {

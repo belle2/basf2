@@ -31,10 +31,6 @@
 
 #include <tracking/trackFindingCDC/findlets/minimal/TrackLinker.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCombiner.h>
-#include <tracking/trackFindingCDC/findlets/minimal/TrackOrienter.h>
-#include <tracking/trackFindingCDC/findlets/minimal/TrackFlightTimeAdjuster.h>
-#include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
-#include <tracking/trackFindingCDC/findlets/minimal/TrackExporter.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
@@ -269,52 +265,6 @@ namespace Belle2 {
      * Module implementation using the TrackCombiner
      */
     class TrackCombinerModule : public FindletModule<TrackCombiner> {
-    };
-
-    /**
-     * Module implementation using the TrackOrienter
-     */
-    class TrackOrienterModule : public FindletModule<TrackOrienter> {
-    };
-
-    /**
-     * Module implementation using the TrackFitter
-     */
-    class TrackFlightTimeAdjusterModule : public FindletModule<TrackFlightTimeAdjuster> {
-    };
-
-    /**
-     * Module implementation using the TrackRejecter
-     */
-    class TrackRejecterModule : public FindletModule<TrackRejecter> {
-
-    private:
-      /// Type of the base class
-      using Super = FindletModule<TrackRejecter>;
-
-    public:
-      /// Constructor setting the default store vector names
-      TrackRejecterModule()
-        : Super( {"CDCTrackVector"})
-      {
-      }
-    };
-
-    /**
-     * Module implementation using the TrackExporter
-     */
-    class TrackExporterModule : public FindletModule<TrackExporter> {
-
-    private:
-      /// Type of the base class
-      using Super = FindletModule<TrackExporter>;
-
-    public:
-      /// Constructor setting the default store vector names
-      TrackExporterModule()
-        : Super( {"CDCTrackVector"})
-      {
-      }
     };
   }
 }

@@ -33,10 +33,6 @@ REG_MODULE(TrackCreatorSingleSegments);
 
 REG_MODULE(TrackLinker);
 REG_MODULE(TrackCombiner);
-REG_MODULE(TrackOrienter);
-REG_MODULE(TrackFlightTimeAdjuster);
-REG_MODULE(TrackRejecter);
-REG_MODULE(TrackExporter);
 
 REG_MODULE(SegmentFinderFacetAutomaton);
 REG_MODULE(TrackFinderSegmentPairAutomaton);

@@ -38,7 +38,7 @@ class CDCLegendre(TrackingValidationRun):
         else:
             path.add_module('TFCDC_AxialTrackFinderHough')
 
-        path.add_module('TrackExporter')
+        path.add_module('TFCDC_TrackExporter')
 
     tracking_coverage = {
         'WhichParticles': ['CDC'],  # Include all particles seen in CDC, also secondaries

@@ -36,7 +36,7 @@ class CosmicsAxialHough(TrackingValidationRun):
         path.add_module('SegmentFinderCDCFacetAutomaton',
                         SegmentOrientation="downwards")
         path.add_module('TFCDC_AxialTrackCreatorSegmentHough')
-        path.add_module('TrackExporter')
+        path.add_module('TFCDC_TrackExporter')
 
         interactive_display = False
         if interactive_display:

@@ -39,7 +39,7 @@ class CosmicsHough(TrackingValidationRun):
                         tracks="CDCAxialTrackVector")
         path.add_module('StereoHitFinderCDCLegendreHistogramming',
                         inputTracks="CDCAxialTrackVector")
-        path.add_module('TrackExporter',
+        path.add_module('TFCDC_TrackExporter',
                         inputTracks="CDCAxialTrackVector")
 
         interactive_display = False

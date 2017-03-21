@@ -274,7 +274,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
                     ])
 
     # Export CDCTracks to RecoTracks representation
-    path.add_module("TrackExporter",
+    path.add_module("TFCDC_TrackExporter",
                     RecoTracksStoreArrayName=reco_tracks)
 
     # Correct time seed (only necessary for the CDC tracks)
@@ -339,19 +339,19 @@ def add_cdc_cr_track_finding(path,
                     )
 
     # Flip track orientation to always point downwards
-    path.add_module("TrackOrienter",
+    path.add_module("TFCDC_TrackOrienter",
                     inputTracks="CDCTrackVector",
                     tracks="OrientedCDCTrackVector",
                     TrackOrientation="downwards",
                     )
 
     # Correct time seed - assumes velocity near light speed
-    path.add_module("TrackFlightTimeAdjuster",
+    path.add_module("TFCDC_TrackFlightTimeAdjuster",
                     inputTracks="OrientedCDCTrackVector",
                     )
 
     # Export CDCTracks to RecoTracks representation
-    path.add_module("TrackExporter",
+    path.add_module("TFCDC_TrackExporter",
                     inputTracks="OrientedCDCTrackVector",
                     RecoTracksStoreArrayName=reco_tracks)
 

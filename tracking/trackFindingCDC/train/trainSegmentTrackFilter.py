@@ -44,7 +44,7 @@ class SegmentTrackFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEventsRun):
             # Change me.
             filterName = "recording"
 
-        adjust_module(path, "SegmentTrackCombiner",
+        adjust_module(path, "TFCDC_SegmentTrackCombiner",
                       segmentTrackFilter=filterName,
                       segmentTrackFilterParameters={
                           "rootFileName": self.sample_file_name,

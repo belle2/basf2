@@ -246,7 +246,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
     path.add_module('TFCDC_StereoHitFinder')
 
     # Combine segments with axial tracks
-    path.add_module('SegmentTrackCombiner',
+    path.add_module('TFCDC_SegmentTrackCombiner',
                     segmentTrackFilter="mva",
                     segmentTrackFilterParameters={"cut": 0.74},
                     trackFilter="mva",
@@ -322,7 +322,7 @@ def add_cdc_cr_track_finding(path,
     path.add_module('TFCDC_StereoHitFinder')
 
     # Combine segments with axial tracks
-    path.add_module('SegmentTrackCombiner',
+    path.add_module('TFCDC_SegmentTrackCombiner',
                     segmentTrackFilter="mva",
                     segmentTrackFilterParameters={"cut": 0.74},
                     trackFilter="mva",

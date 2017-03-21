@@ -8,59 +8,50 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef DEDXCALIBRATIONWIRE_H
-#define DEDXCALIBRATIONWIRE_H
+#pragma once
+
 #include <TObject.h>
 
 namespace Belle2 {
 
   /**
-   *   dE/dx calibration constants per CDC wire
+   *   dE/dx wire gain calibration constants
    */
 
-  class DedxCalibrationWire: public TObject {
+  class CDCDedxCosine: public TObject {
+
   public:
 
     /**
      * Default constructor
      */
-    DedxCalibrationWire(): m_wireID(0), m_gain(0) {};
+    CDCDedxCosine(): m_nbins(30), m_costh(m_nbins, 0), m_means(m_nbins, 0) {};
 
     /**
      * Constructor
      */
-    DedxCalibrationWire(int wireID, float gain): m_wireID(wireID), m_gain(gain) {};
+    CDCDedxCosine(int nbins, std::vector<float> costh, std::vector<float> means): m_nbins(nbins), m_costh(costh), m_means(means) {};
 
     /**
      * Destructor
      */
-    ~DedxCalibrationWire() {};
+    ~CDCDedxCosine() {};
 
-    /** Return wire ID
-     * @return wire ID
+    /** Return cos(theta)
+     * @return cos(theta)
      */
-    float getWireID() const {return m_wireID; };
+    float getCosTheta(int bin) const {return m_costh[bin]; };
 
-    /** Return wire gain
-     * @return wire gain
+    /** Return dE/dx mean value
+     * @return dE/dx mean value
      */
-    float getWireGain() const {return m_gain; };
-
-    /** Set wire ID
-     * @param wire ID
-     */
-    void setWireID(int wireID) {m_wireID = wireID; };
-
-    /** Set wire gain
-     * @param wire gain
-     */
-    void setConstant(float gain) {m_gain = gain; };
+    float getCosine(int bin) const {return m_means[bin]; };
 
   private:
-    int m_wireID;       /**< CDC wire ID */
-    float m_gain;       /**< CDC wire gain */
+    int m_nbins; /**< number of cos(theta) bins for electron saturation correction */
+    std::vector<float> m_costh; /**< central bin values for cos(theta) bins */
+    std::vector<float> m_means; /**< dE/dx means in bins of cos(theta) */
 
-    ClassDef(DedxCalibrationWire, 1); /**< ClassDef */
+    ClassDef(CDCDedxCosine, 1); /**< ClassDef */
   };
 } // end namespace Belle2
-#endif

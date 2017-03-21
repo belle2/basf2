@@ -8,35 +8,23 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <reconstruction/modules/CDCElectronCollector/CDCElectronCollectorModule.h>
-
-#include <framework/pcore/ProcHandler.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreArray.h>
-
-#include <reconstruction/dataobjects/CDCDedxTrack.h>
-
-#include <TH1F.h>
-#include <TTree.h>
-#include <TFile.h>
-#include <TRandom.h>
-
+#include <reconstruction/modules/CDCDedxWireGainCollector/CDCDedxWireGainCollectorModule.h>
 
 using namespace Belle2;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCElectronCollector)
+REG_MODULE(CDCDedxWireGainCollector)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-CDCElectronCollectorModule::CDCElectronCollectorModule() : CalibrationCollectorModule()
+CDCDedxWireGainCollectorModule::CDCDedxWireGainCollectorModule() : CalibrationCollectorModule()
 {
   // Set module properties
-  setDescription("A collector module for CDC dE/dx electron calibration");
+  setDescription("A collector module for CDC dE/dx wire gain calibration");
 
   // Parameter definitions
 
@@ -46,21 +34,27 @@ CDCElectronCollectorModule::CDCElectronCollectorModule() : CalibrationCollectorM
 //                 Create ROOT objects
 //-----------------------------------------------------------------
 
-void CDCElectronCollectorModule::prepare()
+void CDCDedxWireGainCollectorModule::prepare()
 {
   StoreObjPtr<EventMetaData>::required();
   StoreArray<CDCDedxTrack>::required();
 
   // Data object creation
-  auto gains = new TH1F("gains", "Run gains", 200, 0.0, 200.0);
-  auto ttree = new TTree("eventData", "Tree with event meta data");
+  auto ttree = new TTree("dedxTree", "Tree with dE/dx information");
   ttree->Branch<int>("event", &m_evt);
   ttree->Branch<int>("run", &m_run);
   ttree->Branch<int>("exp", &m_exp);
   ttree->Branch<int>("pid", &m_procId);
 
+  ttree->Branch<double>("dedx", &m_dedx);
+  ttree->Branch<double>("costh", &m_costh);
+  ttree->Branch<int>("nhits", &m_nhits);
+
+  ttree->Branch("wire", m_wire, "wire[nhits]/I");
+  ttree->Branch("layer", m_layer, "layer[nhits]/I");
+  ttree->Branch("dedxhit", m_dedxhit, "dedxhit[nhits]/D");
+
   // Data object registration
-  registerObject<TH1F>("gains", gains);
   registerObject<TTree>("tree", ttree);
 }
 
@@ -68,9 +62,8 @@ void CDCElectronCollectorModule::prepare()
 //                 Fill ROOT objects
 //-----------------------------------------------------------------
 
-void CDCElectronCollectorModule::collect()
+void CDCDedxWireGainCollectorModule::collect()
 {
-  static int nevents = 0;
   StoreObjPtr<EventMetaData> emd;
   StoreArray<CDCDedxTrack> tracks;
 
@@ -81,11 +74,17 @@ void CDCElectronCollectorModule::collect()
 
   for (auto track : tracks) {
     m_dedx = track.getTruncatedMean();
-    getObject<TH1F>("gains").Fill(m_dedx);
+    m_costh = track.getCosTheta();
+    m_nhits = track.getNLayerHits();
+
+    if (m_nhits >= 100) continue;
+    for (int i = 0; i < m_nhits; ++i) {
+      m_wire[i] = track.getWire(i);
+      m_layer[i] = track.getLayer(i);
+      m_dedxhit[i] = track.getDedx(i);
+    }
+
+    // Data object access and filling
+    getObject<TTree>("tree").Fill();
   }
-
-  // Data object access and filling
-  getObject<TTree>("tree").Fill();
-
-  ++nevents;
 }

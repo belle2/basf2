@@ -14,45 +14,52 @@
 
 namespace Belle2 {
 
-  //! dE/dx database importer.
-  /*!
-    This module writes data from e.g. a ROOT histogram to database.
-  */
-  class DedxDatabaseImporter {
+  /**
+   *   dE/dx run gain calibration constants
+   */
 
+  class CDCDedxRunGain: public TObject {
   public:
+
+    /**
+     * Default constructor
+     */
+    CDCDedxRunGain(): m_run(0), m_gain(0) {};
 
     /**
      * Constructor
      */
-    DedxDatabaseImporter(std::vector<std::string> inputFileNames, std::string m_name);
+    CDCDedxRunGain(int run, float gain): m_run(run), m_gain(gain) {};
 
     /**
      * Destructor
      */
-    virtual ~DedxDatabaseImporter() {};
+    ~CDCDedxRunGain() {};
 
-    /**
-     * Import CDC wire gain calibration constants to the database
+    /** Return run number
+     * @return run number
      */
-    void importWireGainCalibration();
+    float getRun() const {return m_run; };
 
-    /**
-     * Import CDC run gain calibration constants to the database
+    /** Return run gain
+     * @return run gain
      */
-    void importRunGainCalibration();
+    float getRunGain() const {return m_gain; };
 
-    /**
-     * Import CDC electron saturation calibration constants to the database
+    /** Set run number
+     * @param run number
      */
-    void importCosineCalibration();
+    void setRun(int run) {m_run = run; };
+
+    /** Set run gain
+     * @param run gain
+     */
+    void setRunGain(float gain) {m_gain = gain; };
 
   private:
+    int m_run;          /**< Run number */
+    float m_gain;       /**< Run gain */
 
-    std::vector<std::string> m_inputFileNames; /**< Name of input ROOT files */
-    std::string m_name; /**< Name of database ROOT file */
-
-    ClassDef(DedxDatabaseImporter, 1); /**< ClassDef */
+    ClassDef(CDCDedxRunGain, 1); /**< ClassDef */
   };
-
-} // Belle2 namespace
+} // end namespace Belle2

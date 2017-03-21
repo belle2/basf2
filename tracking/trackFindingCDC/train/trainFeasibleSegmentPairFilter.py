@@ -57,7 +57,7 @@ class FeasibleSegmentPairFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEvent
             raise ValueError("Unknown task " + self.task)
 
         # Also fix the segment orientation to outwards to make training additionally aggressive
-        path.add_module("TrackFinderCDCAutomaton",
+        path.add_module("TFCDC_TrackFinderAutomaton",
                         SegmentOrientation="outwards",
                         SegmentPairFilter="unionrecording",
                         SegmentPairFilterParameters={

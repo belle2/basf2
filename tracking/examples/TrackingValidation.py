@@ -78,10 +78,10 @@ def main():
         type=str,
         choices=[
             'TrackFinderCDCAutomaton',
-            'TFCDC_AxialTrackFinderLegendre'
-            'FullReco'],
-        default='FullReco',
-        help='Track finding module or FullReco for the full reconstruction chain.')
+            'TrackFinderCDC'
+            'Reconstruction'],
+        default='Reconstruction',
+        help='Short name of track finding module or Reconstruction for the full reconstruction chain.')
 
     arguments = argument_parser.parse_args()
 

@@ -9,19 +9,14 @@
  **************************************************************************/
 #pragma once
 
-//#define LOG_NO_B2DEBUG
-
-// Base track finder module
+#include <tracking/trackFindingCDC/findlets/complete/TrackFinderAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
-#include <tracking/trackFindingCDC/findlets/complete/TrackFinderCosmics.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Module for the cellular automaton tracking for the CDC on cosmic events
-    class TrackFinderCDCCosmicsModule
-      : public FindletModule<TrackFinderCosmics> {
-    }; // end class
+    /// Module for the cellular automaton tracking for the CDC on regular events
+    class TFCDC_TrackFinderAutomatonModule : public FindletModule<TrackFinderAutomaton> {
+    };
   }
-} // end namespace Belle2
-
+}

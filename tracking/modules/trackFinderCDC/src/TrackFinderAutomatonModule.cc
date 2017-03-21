@@ -7,10 +7,9 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#include <tracking/modules/trackFinderCDC/TrackFinderCDCCosmicsModule.h>
+#include <tracking/modules/trackFinderCDC/TrackFinderAutomatonModule.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-REG_MODULE(TrackFinderCDCCosmics);
+REG_MODULE(TFCDC_TrackFinderAutomaton);

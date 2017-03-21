@@ -46,7 +46,7 @@ class FeasibleTrackRelationFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEve
         else:
             raise ValueError("Unknown task " + self.task)
 
-        path.add_module("TrackFinderCDCAutomaton",
+        path.add_module("TFCDC_TrackFinderAutomaton",
                         TrackRelationFilter="unionrecording",
                         TrackRelationFilterParameters={
                             "rootFileName": self.sample_file_name,

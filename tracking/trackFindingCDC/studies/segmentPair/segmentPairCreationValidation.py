@@ -39,7 +39,7 @@ class SegmentPairCreationValidationRun(BrowseTFileOnTerminateRunMixin, StandardE
     segment_finder_module = basf2.register_module("SegmentFinderCDCMCTruth")
     segment_finder_module.param({"MinCDCHits": 4})
 
-    segment_pair_finder_module = basf2.register_module("TrackFinderCDCSegmentPairAutomaton")
+    segment_pair_finder_module = basf2.register_module("TFCDC_TrackFinderSegmentPairAutomaton")
     segment_pair_finder_module.param({
         "WriteSegmentPairs": True,
         "SegmentPairFilter": "all",

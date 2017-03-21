@@ -20,17 +20,7 @@ REG_MODULE(SegmentRejecter);
 REG_MODULE(SegmentOrienter);
 REG_MODULE(SegmentCreatorMCTruth);
 
-REG_MODULE(AxialSegmentPairCreator);
-REG_MODULE(SegmentPairCreator);
-REG_MODULE(SegmentTripleCreator);
-
-REG_MODULE(TrackCreatorSegmentPairAutomaton);
-REG_MODULE(TrackCreatorSegmentTripleAutomaton);
-REG_MODULE(TrackCreatorSingleSegments);
-
 REG_MODULE(TrackLinker);
 REG_MODULE(TrackCombiner);
 
 REG_MODULE(SegmentFinderFacetAutomaton);
-REG_MODULE(TrackFinderSegmentPairAutomaton);
-REG_MODULE(TrackFinderSegmentTripleAutomaton);

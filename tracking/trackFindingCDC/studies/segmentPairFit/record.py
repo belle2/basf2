@@ -207,7 +207,7 @@ class SegmentPairFitValidationRun(HarvestingRun):
                         segments="CDCSegment2DVectorOriented"
                         )
 
-        path.add_module("TrackFinderSegmentPairAutomaton",
+        path.add_module("TFCDC_TrackFinderSegmentPairAutomaton",
                         inputSegments="CDCSegment2DVectorOriented",
                         WriteSegmentPairs=True,
                         SegmentPairFilter="truth",

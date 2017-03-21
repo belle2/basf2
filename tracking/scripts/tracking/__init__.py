@@ -255,7 +255,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
                     trackFilterParameters={"cut": 0.1})
 
     if with_ca:
-        path.add_module("TrackFinderSegmentPairAutomaton",
+        path.add_module("TFCDC_TrackFinderSegmentPairAutomaton",
                         tracks="CDCTrackVector2")
 
         # Overwrites the origin CDCTrackVector

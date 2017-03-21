@@ -49,7 +49,7 @@ CDCTrigger3DFitterModule::initialize()
   StoreArray<CDCTriggerTrack> tracks2D(m_inputCollectionName);
   StoreArray<CDCTriggerTrack> tracks3D(m_outputCollectionName);
   StoreArray<CDCTriggerSegmentHit> segmentHits;
-  tracks3D.registerRelationTo(tracks2D);
+  tracks2D.registerRelationTo(tracks3D);
   tracks3D.registerRelationTo(segmentHits);
 
   // get geometry constants for first priority layers
@@ -230,7 +230,7 @@ CDCTrigger3DFitterModule::event()
                          tracks2D[itrack]->getChi2D(),
                          z0, cot, zChi2);
     // make relation to 2D track
-    fittedTrack->addRelationTo(tracks2D[itrack]);
+    tracks2D[itrack]->addRelationTo(fittedTrack);
     // make relation to hits
     for (unsigned iSt = 0; iSt < 4; ++iSt) {
       if (bestTSIndex[iSt] != -1)

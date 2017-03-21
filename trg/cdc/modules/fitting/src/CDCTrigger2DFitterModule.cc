@@ -55,7 +55,7 @@ CDCTrigger2DFitterModule::initialize()
   StoreArray<CDCTriggerTrack> finderTracks(m_inputCollectionName);
   StoreArray<CDCTriggerTrack> fitterTracks(m_outputCollectionName);
   StoreArray<CDCTriggerSegmentHit> segmentHits;
-  fitterTracks.registerRelationTo(finderTracks);
+  finderTracks.registerRelationTo(fitterTracks);
   fitterTracks.registerRelationTo(segmentHits);
 
   // get geometry constants for first priority layers
@@ -180,7 +180,7 @@ CDCTrigger2DFitterModule::event()
       fitterTracks.appendNew(remainder(phi0 + chargeFit * M_PI_2, 2. * M_PI),
                              omega, chi2);
     // make relation to finder track
-    fittedTrack->addRelationTo(finderTracks[itrack]);
+    finderTracks[itrack]->addRelationTo(fittedTrack);
     // make relation to hits
     for (unsigned iAx = 0; iAx < 5; ++iAx) {
       if (hitIds[iAx] >= 0)

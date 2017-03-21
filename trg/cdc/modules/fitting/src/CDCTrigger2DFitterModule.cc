@@ -173,15 +173,7 @@ CDCTrigger2DFitterModule::event()
     double chargeFit = 0;
     Fitter3DUtility::chargeFinder(&nWires[0], &tsId[0], &useSL[0], phi0,
                                   charge, chargeFit);
-    // direct conversion of r to rho
     double omega = chargeFit / rho;
-    // convert to pt and back as in old fitter
-    // needed for direct comparison with old version
-    // TODO: remove this
-    /*double pt = 0.3 * 1.5 * rho / 100;
-    double kappa = chargeFit / pt;
-    double r = 222.376063 / kappa;
-    omega = 1. / r;*/
 
     // save track
     CDCTriggerTrack* fittedTrack =

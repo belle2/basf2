@@ -150,7 +150,7 @@ finder_modules_by_short_name = {
     'TrackFinderVXD': tracking.add_vxd_track_finding,
     'TrackFinderCDCLegendre': lambda path: (path.add_module('WireHitPreparer',
                                                             flightTimeEstimation="outwards"),
-                                            path.add_module('TrackFinderCDCLegendreTracking'),
+                                            path.add_module('TFCDC_AxialTrackFinderLegendre'),
                                             path.add_module('TrackExporter')),
     'SegmentFinderCDC': lambda path: (path.add_module('WireHitPreparer',
                                                       flightTimeEstimation="outwards"),

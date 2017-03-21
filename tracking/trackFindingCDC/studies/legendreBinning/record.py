@@ -58,7 +58,7 @@ class LegendreBinningValidationRun(HarvestingRun):
                         flightTimeEstimation="outwards",
                         UseNLoops=1)
 
-        path.add_module('AxialTrackCreatorMCTruth',
+        path.add_module('TFCDC_AxialTrackCreatorMCTruth',
                         logLevel=8,
                         useOnlyBeforeTOP=True,
                         fit=True,

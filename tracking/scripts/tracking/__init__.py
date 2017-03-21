@@ -238,7 +238,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
                     FacetFilter="chi2")
 
     # Find axial tracks
-    path.add_module("TrackFinderCDCLegendreTracking")
+    path.add_module("TFCDC_AxialTrackFinderLegendre")
 
     # Improve the quality of the axial tracks
     path.add_module("TrackQualityAsserterCDC",
@@ -317,7 +317,7 @@ def add_cdc_cr_track_finding(path,
                     )
 
     # Find axial tracks
-    path.add_module("TrackFinderCDCLegendreTracking")
+    path.add_module("TFCDC_AxialTrackFinderLegendre")
 
     # Improve the quality of the axial tracks
     path.add_module("TrackQualityAsserterCDC",

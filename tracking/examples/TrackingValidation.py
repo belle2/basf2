@@ -78,7 +78,7 @@ def main():
         type=str,
         choices=[
             'TrackFinderCDCAutomaton',
-            'TrackFinderCDCLegendreTracking',
+            'TFCDC_AxialTrackFinderLegendre'
             'FullReco'],
         default='FullReco',
         help='Track finding module or FullReco for the full reconstruction chain.')

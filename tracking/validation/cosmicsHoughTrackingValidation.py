@@ -35,7 +35,7 @@ class CosmicsHough(TrackingValidationRun):
         path.add_module('WireHitPreparer')
         path.add_module('SegmentFinderCDCFacetAutomaton',
                         SegmentOrientation="downwards")
-        path.add_module('AxialTrackCreatorSegmentHough',
+        path.add_module('TFCDC_AxialTrackCreatorSegmentHough',
                         tracks="CDCAxialTrackVector")
         path.add_module('StereoHitFinderCDCLegendreHistogramming',
                         inputTracks="CDCAxialTrackVector")

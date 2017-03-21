@@ -37,8 +37,11 @@ namespace Belle2 {
     bool m_useDriftTime;
 
   private:
+    /** geometry constants: number of wires per super layer */
     std::vector<double> nWires = {};
+    /** geometry constants: radius of priority layers */
     std::vector<double> rr = {};
+    /** geometry constants: drift length - drift time relation */
     std::vector<std::vector<double>> xtTables = {};
   };
 

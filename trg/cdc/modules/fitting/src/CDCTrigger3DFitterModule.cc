@@ -84,139 +84,22 @@ CDCTrigger3DFitterModule::event()
   StoreArray<CDCTriggerTrack> tracks2D(m_inputCollectionName);
   StoreArray<CDCTriggerTrack> tracks3D(m_outputCollectionName);
   StoreArray<CDCTriggerSegmentHit> hits;
-  StoreObjPtr<TRGTiming> eventTime("CDCTriggerEventTime");
-  int T0 = eventTime->getTiming();
 
   for (int itrack = 0; itrack < tracks2D.getEntries(); ++itrack) {
-    // select stereo hits
     int charge = tracks2D[itrack]->getChargeSign();
     double rho = 1. / abs(tracks2D[itrack]->getOmega());
-    double fitPhi0 = tracks2D[itrack]->getPhi0() - charge * M_PI_2;
-    vector<double> stAxPhi(4);
-    for (int iSt = 0; iSt < 4; ++iSt) {
-      stAxPhi[iSt] = Fitter3DUtility::calStAxPhi(charge, angleSt[iSt], zToStraw[iSt],
-                                                 rr[iSt], rho, fitPhi0);
-    }
-    // get candidates
-    vector<vector<int>> candidatesIndex(4, vector<int>());
-    vector<vector<double>> candidatesPhi(4, vector<double>());
-    vector<vector<double>> candidatesDiffStWires(4, vector<double>());
-    for (int ihit = 0; ihit < hits.getEntries(); ++ihit) {
-      // Reject second priority TSs.
-      if (hits[ihit]->getPriorityPosition() != 3) continue;
-      // only stereo hits
-      unsigned iSL = hits[ihit]->getISuperLayer();
-      if (iSL % 2 == 0) continue;
-      // skip hits with too large radius
-      if (2 * rho < rr[iSL / 2]) continue;
-      // Find number of wire difference
-      double wirePhi = hits[ihit]->getIWire() * 2. * M_PI / nWires[iSL / 2];
-      double tsDiffSt = stAxPhi[iSL / 2] - wirePhi;
-      if (tsDiffSt > M_PI) tsDiffSt -= 2 * M_PI;
-      if (tsDiffSt < -M_PI) tsDiffSt += 2 * M_PI;
-      tsDiffSt = tsDiffSt / 2 / M_PI * nWires[iSL / 2];
-      // Save index if condition is in 10 wires
-      if ((iSL / 2) % 2 == 0) {
-        if (tsDiffSt > 0 && tsDiffSt <= 10) {
-          candidatesIndex[iSL / 2].push_back(ihit);
-          candidatesPhi[iSL / 2].push_back(wirePhi);
-          candidatesDiffStWires[iSL / 2].push_back(tsDiffSt);
-        }
-      } else {
-        if (tsDiffSt < 0 && tsDiffSt >= -10) {
-          candidatesIndex[iSL / 2].push_back(ihit);
-          candidatesPhi[iSL / 2].push_back(wirePhi);
-          candidatesDiffStWires[iSL / 2].push_back(tsDiffSt);
-        }
-      } // End of saving index
-    } // Candidate loop
+    double phi = tracks2D[itrack]->getPhi0() - charge * M_PI_2;
 
-    // Pick middle candidate if multiple candidates
-    // mean wire diff
-    double meanWireDiff[4] = { 3.68186, 3.3542, 3.9099, 4.48263 };
+    // select stereo hits
     vector<int> bestTSIndex(4, -1);
     vector<double> bestTSPhi(4, 9999);
-    unsigned nHits = 0;
-    for (int iSt = 0; iSt < 4; ++iSt) {
-      double bestDiff = 9999;
-      for (int iTS = 0; iTS < int(candidatesIndex[iSt].size()); ++iTS) {
-        double diff = abs(abs(candidatesDiffStWires[iSt][iTS]) - meanWireDiff[iSt]);
-        // Pick the better TS
-        if (diff < bestDiff) {
-          if (bestTSIndex[iSt] == -1) {
-            nHits += 1;
-          }
-          bestDiff = diff;
-          bestTSPhi[iSt] = candidatesPhi[iSt][iTS];
-          bestTSIndex[iSt] = candidatesIndex[iSt][iTS];
-        }
-      } // TS loop
-    } // Layer loop
+    finder(charge, rho, phi, bestTSIndex, bestTSPhi);
 
     // do the fit and create a new track
-
-    // Fill information for stereo layers
-    vector<double> wirePhi(4, 9999);
-    vector<unsigned> LR(4, 0);
-    vector<int> driftTime(4, 9999);
-    for (unsigned iSt = 0; iSt < 4; ++iSt) {
-      if (bestTSIndex[iSt] != -1) {
-        //m_mVector["tsId"][iSt * 2 + 1] = t_segment->localId();
-        wirePhi[iSt] = bestTSPhi[iSt];
-        LR[iSt] = hits[bestTSIndex[iSt]]->getLeftRight();
-        driftTime[iSt] = hits[bestTSIndex[iSt]]->priorityTime();
-      }
-    } // End superlayer loop
-
-    // Calculate phi3D.
-    vector<double> phi3D(4, 9999);
-    if (T0 == 9999) {
-      for (unsigned iSt = 0; iSt < 4; iSt++) {
-        phi3D[iSt] = wirePhi[iSt];
-      }
-    } else {
-      for (unsigned iSt = 0; iSt < 4; iSt++) {
-        if (bestTSIndex[iSt] != -1) {
-          // Get drift length from table.
-          int t = driftTime[iSt] - T0;
-          if (t < 0) t = 0;
-          if (t > 511) t = 511;
-          double driftLength = xtTables[iSt][t];
-          phi3D[iSt] = Fitter3DUtility::calPhi(wirePhi[iSt], driftLength, rr[iSt], LR[iSt]);
-        }
-      }
-    }
-    // Get zerror for 3D fit
-    vector<double> driftZError({0.7676, 0.9753, 1.029, 1.372});
-    vector<double> wireZError({0.7676, 0.9753, 1.029, 1.372});
-    vector<double> zError(4, 9999);
-    vector<double> invZError2(4, 0);
-    for (unsigned iSt = 0; iSt < 4; ++iSt) {
-      if (bestTSIndex[iSt] != -1) {
-        // Check LR and eventTime
-        if (LR[iSt] != 3 && T0 != 9999) zError[iSt] = driftZError[iSt];
-        else zError[iSt] = wireZError[iSt];
-        // Get inverse zerror ^ 2
-        invZError2[iSt] = 1 / pow(zError[iSt], 2);
-      }
-    }
-
-    // Calculate zz and arcS
-    vector<double> zz(4, 0);
-    vector<double> arcS(4, 0);
-    for (unsigned iSt = 0; iSt < 4; iSt++) {
-      if (bestTSIndex[iSt] != -1) {
-        zz[iSt] = Fitter3DUtility::calZ(charge, angleSt[iSt], zToStraw[iSt],
-                                        rr[iSt], phi3D[iSt], rho, fitPhi0);
-        arcS[iSt] = Fitter3DUtility::calS(rho, rr[iSt]);
-      }
-    }
-
-    // Fit3D
     double z0 = 0;
     double cot = 0;
-    double zChi2 = 0;
-    Fitter3DUtility::rSFit(&invZError2[0], &arcS[0], &zz[0], z0, cot, zChi2);
+    double chi2 = 0;
+    fitter(bestTSIndex, bestTSPhi, charge, rho, phi, z0, cot, chi2);
 
     // For failed fits. When cot is 0 or nan.
     if (cot == 0 || std::isnan(cot)) {
@@ -228,7 +111,7 @@ CDCTrigger3DFitterModule::event()
     CDCTriggerTrack* fittedTrack =
       tracks3D.appendNew(tracks2D[itrack]->getPhi0(), tracks2D[itrack]->getOmega(),
                          tracks2D[itrack]->getChi2D(),
-                         z0, cot, zChi2);
+                         z0, cot, chi2);
     // make relation to 2D track
     tracks2D[itrack]->addRelationTo(fittedTrack);
     // make relation to hits
@@ -243,4 +126,139 @@ CDCTrigger3DFitterModule::event()
       fittedTrack->addRelationTo(axialHits[ihit]);
     }
   }
+}
+
+void
+CDCTrigger3DFitterModule::finder(int charge, double rho, double phi,
+                                 vector<int>& bestTSIndex, vector<double>& bestTSPhi)
+{
+  StoreArray<CDCTriggerSegmentHit> hits;
+
+  vector<double> stAxPhi(4);
+  for (int iSt = 0; iSt < 4; ++iSt) {
+    stAxPhi[iSt] = Fitter3DUtility::calStAxPhi(charge, angleSt[iSt], zToStraw[iSt],
+                                               rr[iSt], rho, phi);
+  }
+  // get candidates
+  vector<vector<int>> candidatesIndex(4, vector<int>());
+  vector<vector<double>> candidatesPhi(4, vector<double>());
+  vector<vector<double>> candidatesDiffStWires(4, vector<double>());
+  for (int ihit = 0; ihit < hits.getEntries(); ++ihit) {
+    // Reject second priority TSs.
+    if (hits[ihit]->getPriorityPosition() != 3) continue;
+    // only stereo hits
+    unsigned iSL = hits[ihit]->getISuperLayer();
+    if (iSL % 2 == 0) continue;
+    // skip hits with too large radius
+    if (2 * rho < rr[iSL / 2]) continue;
+    // Find number of wire difference
+    double wirePhi = hits[ihit]->getIWire() * 2. * M_PI / nWires[iSL / 2];
+    double tsDiffSt = stAxPhi[iSL / 2] - wirePhi;
+    if (tsDiffSt > M_PI) tsDiffSt -= 2 * M_PI;
+    if (tsDiffSt < -M_PI) tsDiffSt += 2 * M_PI;
+    tsDiffSt = tsDiffSt / 2 / M_PI * nWires[iSL / 2];
+    // Save index if condition is in 10 wires
+    if ((iSL / 2) % 2 == 0) {
+      if (tsDiffSt > 0 && tsDiffSt <= 10) {
+        candidatesIndex[iSL / 2].push_back(ihit);
+        candidatesPhi[iSL / 2].push_back(wirePhi);
+        candidatesDiffStWires[iSL / 2].push_back(tsDiffSt);
+      }
+    } else {
+      if (tsDiffSt < 0 && tsDiffSt >= -10) {
+        candidatesIndex[iSL / 2].push_back(ihit);
+        candidatesPhi[iSL / 2].push_back(wirePhi);
+        candidatesDiffStWires[iSL / 2].push_back(tsDiffSt);
+      }
+    } // End of saving index
+  } // Candidate loop
+
+  // Pick middle candidate if multiple candidates
+  // mean wire diff
+  double meanWireDiff[4] = { 3.68186, 3.3542, 3.9099, 4.48263 };
+  unsigned nHits = 0;
+  for (int iSt = 0; iSt < 4; ++iSt) {
+    double bestDiff = 9999;
+    for (int iTS = 0; iTS < int(candidatesIndex[iSt].size()); ++iTS) {
+      double diff = abs(abs(candidatesDiffStWires[iSt][iTS]) - meanWireDiff[iSt]);
+      // Pick the better TS
+      if (diff < bestDiff) {
+        if (bestTSIndex[iSt] == -1) {
+          nHits += 1;
+        }
+        bestDiff = diff;
+        bestTSPhi[iSt] = candidatesPhi[iSt][iTS];
+        bestTSIndex[iSt] = candidatesIndex[iSt][iTS];
+      }
+    } // TS loop
+  } // Layer loop
+}
+
+void
+CDCTrigger3DFitterModule::fitter(vector<int>& bestTSIndex, vector<double>& bestTSPhi,
+                                 int charge, double rho, double phi,
+                                 double& z0, double& cot, double& chi2)
+{
+  StoreArray<CDCTriggerSegmentHit> hits;
+  StoreObjPtr<TRGTiming> eventTime("CDCTriggerEventTime");
+  int T0 = eventTime->getTiming();
+
+  // Fill information for stereo layers
+  vector<double> wirePhi(4, 9999);
+  vector<unsigned> LR(4, 0);
+  vector<int> driftTime(4, 9999);
+  for (unsigned iSt = 0; iSt < 4; ++iSt) {
+    if (bestTSIndex[iSt] != -1) {
+      wirePhi[iSt] = bestTSPhi[iSt];
+      LR[iSt] = hits[bestTSIndex[iSt]]->getLeftRight();
+      driftTime[iSt] = hits[bestTSIndex[iSt]]->priorityTime();
+    }
+  } // End superlayer loop
+
+  // Calculate phi3D.
+  vector<double> phi3D(4, 9999);
+  if (T0 == 9999) {
+    for (unsigned iSt = 0; iSt < 4; iSt++) {
+      phi3D[iSt] = wirePhi[iSt];
+    }
+  } else {
+    for (unsigned iSt = 0; iSt < 4; iSt++) {
+      if (bestTSIndex[iSt] != -1) {
+        // Get drift length from table.
+        int t = driftTime[iSt] - T0;
+        if (t < 0) t = 0;
+        if (t > 511) t = 511;
+        double driftLength = xtTables[iSt][t];
+        phi3D[iSt] = Fitter3DUtility::calPhi(wirePhi[iSt], driftLength, rr[iSt], LR[iSt]);
+      }
+    }
+  }
+  // Get zerror for 3D fit
+  vector<double> driftZError({0.7676, 0.9753, 1.029, 1.372});
+  vector<double> wireZError({0.7676, 0.9753, 1.029, 1.372});
+  vector<double> zError(4, 9999);
+  vector<double> invZError2(4, 0);
+  for (unsigned iSt = 0; iSt < 4; ++iSt) {
+    if (bestTSIndex[iSt] != -1) {
+      // Check LR and eventTime
+      if (LR[iSt] != 3 && T0 != 9999) zError[iSt] = driftZError[iSt];
+      else zError[iSt] = wireZError[iSt];
+      // Get inverse zerror ^ 2
+      invZError2[iSt] = 1 / pow(zError[iSt], 2);
+    }
+  }
+
+  // Calculate zz and arcS
+  vector<double> zz(4, 0);
+  vector<double> arcS(4, 0);
+  for (unsigned iSt = 0; iSt < 4; iSt++) {
+    if (bestTSIndex[iSt] != -1) {
+      zz[iSt] = Fitter3DUtility::calZ(charge, angleSt[iSt], zToStraw[iSt],
+                                      rr[iSt], phi3D[iSt], rho, phi);
+      arcS[iSt] = Fitter3DUtility::calS(rho, rr[iSt]);
+    }
+  }
+
+  // Fit3D
+  Fitter3DUtility::rSFit(&invZError2[0], &arcS[0], &zz[0], z0, cot, chi2);
 }

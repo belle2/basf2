@@ -24,6 +24,29 @@ namespace Belle2 {
     virtual void event();
 
   protected:
+    /** Select stereo hits.
+     * @param charge      charge of 2D track
+     * @param rho         radius of 2D track
+     * @param phi         angle to circle center of 2D track
+     * @param bestTSIndex will contain the selected hit indices
+     * @param bestTSPhi   will contain the wire phi of selected hits
+     */
+    void finder(int charge, double rho, double phi,
+                std::vector<int>& bestTSIndex, std::vector<double>& bestTSPhi);
+    /** Perform the 3D fit.
+     * @param bestTSIndex list of selected hit indices
+     * @param bestTSPhi   list of wire phi for selected hits
+     * @param charge      charge of 2D track
+     * @param rho         radius of 2D track
+     * @param phi         angle to circle center of 2D track
+     * @param z0          will contain the fitted z-vertex
+     * @param cot         will contain the fitted cot(theta)
+     * @param chi2        will contain the chi2 value for the fit
+     */
+    void fitter(std::vector<int>& bestTSIndex, std::vector<double>& bestTSPhi,
+                int charge, double rho, double phi,
+                double& z0, double& cot, double& chi2);
+
     /** Name of the StoreArray containing the input tracks from the 2D fitter. */
     std::string m_inputCollectionName;
     /** Name of the StoreArray containing the resulting 3D tracks. */

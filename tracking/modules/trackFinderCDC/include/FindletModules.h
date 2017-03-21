@@ -9,10 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/minimal/SuperClusterCreator.h>
-#include <tracking/trackFindingCDC/findlets/minimal/ClusterBackgroundDetector.h>
-#include <tracking/trackFindingCDC/findlets/minimal/ClusterRefiner.h>
-
 #include <tracking/trackFindingCDC/findlets/minimal/FacetCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentCreatorFacetAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentLinker.h>
@@ -39,54 +35,6 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /**
-     * Module implementation using the SuperClusterCreator
-     */
-    class SuperClusterCreatorModule : public FindletModule<SuperClusterCreator> {
-
-      /// Type of the base class
-      using Super = FindletModule<SuperClusterCreator>;
-
-    public:
-      /// Constructor setting the default store vector names
-      SuperClusterCreatorModule()
-        : Super( {"CDCWireHitVector", "CDCWireHitSuperClusterVector"})
-      {
-      }
-    };
-
-    /**
-     * Module implementation using the ClusterRefiner
-     */
-    class ClusterRefinerModule : public FindletModule<ClusterRefiner<BridgingWireHitRelationFilter>> {
-
-      /// Type of the base class
-      using Super = FindletModule<ClusterRefiner<BridgingWireHitRelationFilter>>;
-
-    public:
-      /// Constructor setting the default store vector names
-      ClusterRefinerModule()
-        : Super( {"CDCWireHitSuperClusterVector", "CDCWireHitClusterVector"})
-      {
-      }
-    };
-
-    /**
-     * Module implementation using the ClusterBackgroundDetector
-     */
-    class ClusterBackgroundDetectorModule : public FindletModule<ClusterBackgroundDetector> {
-
-      /// Type of the base class
-      using Super = FindletModule<ClusterBackgroundDetector>;
-
-    public:
-      /// Constructor setting the default store vector names
-      ClusterBackgroundDetectorModule()
-        : Super( {"CDCWireHitClusterVector"})
-      {
-      }
-    };
-
     /**
      * Module implementation using the ChooseableFacetFilter
      */

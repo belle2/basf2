@@ -73,6 +73,9 @@ main.add_module(cdcdigitizer)
 # CDC trigger #
 # ----------- #
 
+xtsimple = False
+fitdrift = True
+
 trgcdc = basf2.register_module('TRGCDC')
 simMode = 0  # 0: full trigger, 1: only TSF
 if clock:
@@ -86,17 +89,21 @@ trgcdc_params = {
     'HoughFinderMappingFileMinus': Belle2.FileSystem.findFile("data/trg/cdc/HoughMappingMinus20160223.dat"),
     'HoughFinderMappingFilePlus': Belle2.FileSystem.findFile("data/trg/cdc/HoughMappingPlus20160223.dat"),
     'DebugLevel': 0,
-    'Fitter3Ds2DFitDrift': True,
-    'Fitter3DsXtSimple': False}
+    'Fitter3Ds2DFitDrift': fitdrift,
+    'Fitter3DsXtSimple': xtsimple}
 trgcdc.param(trgcdc_params)
 if clock:
     trgcdc.param('inputCollection', 'CDCHits4Trg')
 main.add_module(trgcdc, logLevel=basf2.LogLevel.INFO)
 
-# fitter
+# fitters
 main.add_module('CDCTrigger2DFitter', logLevel=basf2.LogLevel.INFO,
-                minHits=2, useDriftTime=True, xtSimple=False,
+                minHits=2, useDriftTime=fitdrift, xtSimple=xtsimple,
                 outputCollection='FitterTracks')  # to distinguish from old output
+main.add_module('CDCTrigger3DFitter', logLevel=basf2.LogLevel.INFO,
+                xtSimple=xtsimple,
+                inputCollection='FitterTracks',
+                outputCollection='Fitter3DTracks')  # to distinguish from old output
 
 
 # ----------- #
@@ -114,29 +121,34 @@ class TestModule(basf2.Module):
         """
         phiMC = Belle2.PyStoreArray("MCParticles")[0].getMomentum().Phi()
         oldTracks = Belle2.PyStoreArray("Trg3DFitterTracks")
-        newTracks = Belle2.PyStoreArray("FitterTracks")
+        newTracks = Belle2.PyStoreArray("Fitter3DTracks")
         if oldTracks.getEntries() == newTracks.getEntries():
             basf2.B2INFO("%d tracks" % oldTracks.getEntries())
         else:
             basf2.B2WARNING("old version: %d, new version: %d" %
                             (oldTracks.getEntries(), newTracks.getEntries()))
-            basf2.B2WARNING("relations: %d" % len(newTracks[0].getRelationsWith("CDCTriggerSegmentHits")))
-            basf2.B2WARNING("relations: %d" % len(newTracks[1].getRelationsWith("CDCTriggerSegmentHits")))
         for i in range(max(oldTracks.getEntries(), newTracks.getEntries())):
             if i < oldTracks.getEntries():
-                oldString = "phi %.3f pt %.3f charge %d chi2 %.3f" % \
+                ptfactor = 0.3 * 1.5 / 100 * 222.376063
+                oldString = "phi %.3f pt %.3f charge %d chi2 %.3f z %.3f cot %.3f chi2 %.3f" % \
                             (oldTracks[i].getPhi0() * 180. / np.pi,
-                             oldTracks[i].getTransverseMomentum(),
+                             oldTracks[i].getTransverseMomentum() / ptfactor,
                              oldTracks[i].getChargeSign(),
-                             oldTracks[i].getChi2D())
+                             oldTracks[i].getChi2D(),
+                             oldTracks[i].getZ0(),
+                             oldTracks[i].getCotTheta(),
+                             oldTracks[i].getChi3D())
             else:
                 oldString = "no track"
             if i < newTracks.getEntries():
-                newString = "phi %.3f pt %.3f charge %d chi2 %.3f" % \
+                newString = "phi %.3f pt %.3f charge %d chi2 %.3f z %.3f cot %.3f chi2 %.3f" % \
                             (newTracks[i].getPhi0() * 180. / np.pi,
                              newTracks[i].getTransverseMomentum(),
                              newTracks[i].getChargeSign(),
-                             newTracks[i].getChi2D())
+                             newTracks[i].getChi2D(),
+                             newTracks[i].getZ0(),
+                             newTracks[i].getCotTheta(),
+                             newTracks[i].getChi3D())
             else:
                 newString = "no track"
             if oldString == newString:

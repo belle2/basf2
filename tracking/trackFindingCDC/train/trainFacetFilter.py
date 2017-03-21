@@ -112,7 +112,7 @@ class FacetFilterTrainingRun(TrainingRunMixin, StandardEventGenerationRun):
                                             flightTimeEstimation="outwards",
                                             UseNLoops=1.0)
 
-        path.add_module("SegmentFinderCDCFacetAutomaton",
+        path.add_module("TFCDC_SegmentFinderFacetAutomaton",
                         FacetUpdateDriftLength=self.flight_time_reestimation,
                         FacetLeastSquareFit=self.facet_least_square_fit,
                         FacetFilter="unionrecording",

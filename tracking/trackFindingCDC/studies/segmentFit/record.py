@@ -163,14 +163,14 @@ class SegmentFitValidationRun(HarvestingRun):
         if self.monte_carlo == "no":
             # MC free - default
             path.add_module(
-                "SegmentFinderCDCFacetAutomaton",
+                "TFCDC_SegmentFinderFacetAutomaton",
                 # investigate=[],
                 SegmentOrientation="none",
             )
 
         elif self.monte_carlo == "medium":
             # Medium MC - proper generation logic, but true facets and facet relations
-            path.add_module("SegmentFinderCDCFacetAutomaton",
+            path.add_module("TFCDC_SegmentFinderFacetAutomaton",
                             FacetFilter="truth",
                             FacetRelationFilter="truth",
                             SegmentOrientation="none",
@@ -179,14 +179,14 @@ class SegmentFitValidationRun(HarvestingRun):
 
         elif self.monte_carlo == "full":
             # Only true monte carlo segments, but make the positions realistic
-            path.add_module("SegmentCreatorMCTruth",
+            path.add_module("TFCDC_SegmentCreatorMCTruth",
                             reconstructedDriftLength=False,
                             reconstructedPositions=True)
 
         else:
             raise ValueError("Invalid degree of Monte Carlo information")
 
-        path.add_module("SegmentFitter",
+        path.add_module("TFCDC_SegmentFitter",
                         inputSegments="CDCSegment2DVector",
                         karimakiFit=self.karimaki_fit,
                         fitPos=self.fit_positions,

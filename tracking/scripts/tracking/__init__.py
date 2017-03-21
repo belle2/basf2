@@ -231,11 +231,9 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
                     )
 
     # Find segments and reduce background hits
-    path.add_module("SegmentFinderCDCFacetAutomaton",
+    path.add_module("TFCDC_SegmentFinderFacetAutomaton",
                     ClusterFilter="mva_bkg",
-                    ClusterFilterParameters={"cut": 0.2},
-                    FacetUpdateDriftLength=True,
-                    FacetFilter="chi2")
+                    ClusterFilterParameters={"cut": 0.2})
 
     # Find axial tracks
     path.add_module("TFCDC_AxialTrackFinderLegendre")
@@ -308,13 +306,10 @@ def add_cdc_cr_track_finding(path,
                     )
 
     # Find segments and reduce background hits
-    path.add_module("SegmentFinderCDCFacetAutomaton",
+    path.add_module("TFCDC_SegmentFinderFacetAutomaton",
                     ClusterFilter="mva_bkg",
                     ClusterFilterParameters={"cut": 0.2},
-                    FacetUpdateDriftLength=False,
-                    FacetFilter="chi2",
-                    SegmentOrientation="downwards",
-                    )
+                    SegmentOrientation="downwards")
 
     # Find axial tracks
     path.add_module("TFCDC_AxialTrackFinderLegendre")

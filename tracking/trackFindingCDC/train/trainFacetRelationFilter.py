@@ -120,7 +120,7 @@ class FacetRelationFilterTrainingRun(TrainingRunMixin, StandardEventGenerationRu
                         flightTimeEstimation="outwards",
                         UseNLoops=1.0)
 
-        path.add_module("SegmentFinderCDCFacetAutomaton",
+        path.add_module("TFCDC_SegmentFinderFacetAutomaton",
                         FacetRelationFilter="unionrecording",
                         FacetRelationFilterParameters={
                             "rootFileName": self.sample_file_name,

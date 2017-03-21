@@ -51,7 +51,7 @@ class RealisticSegmentRelationFilterTrainingRun(TrainingRunMixin, ReadOrGenerate
         else:
             raise ValueError("Unknown task " + self.task)
 
-        path.add_module("SegmentFinderCDCFacetAutomaton",
+        path.add_module("TFCDC_SegmentFinderFacetAutomaton",
                         SegmentRelationFilter="unionrecording",
                         SegmentRelationFilterParameters={
                             "rootFileName": self.sample_file_name,

@@ -18,7 +18,4 @@ REG_MODULE(SegmentFinderCDCFacetAutomaton);
 SegmentFinderCDCFacetAutomatonModule::SegmentFinderCDCFacetAutomatonModule()
   : Super{{{"CDCWireHitVector", "CDCSegment2DVector"}}}
 {
-  ModuleParamList moduleParamList = this->getParamList();
-  moduleParamList.getParameter<std::string>("SegmentOrientation").setDefaultValue("curling");
-  this->setParamList(moduleParamList);
 }

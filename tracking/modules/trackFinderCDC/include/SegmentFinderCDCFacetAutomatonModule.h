@@ -26,7 +26,6 @@ namespace Belle2 {
     public:
       /// Default constructor initialising the filters with the default settings
       SegmentFinderCDCFacetAutomatonModule();
-
-    }; // end class SegmentFinderCDCFacetAutomatonModule
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

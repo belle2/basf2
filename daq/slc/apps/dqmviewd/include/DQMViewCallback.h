@@ -3,11 +3,9 @@
 
 #include <daq/slc/nsm/NSMCallback.h>
 
-#include <daq/slc/system/Cond.h>
-
 #include <daq/slc/base/ConfigFile.h>
 
-#include <daq/dqm/DqmMemFile.h>
+#include <daq/slc/apps/dqmviewd/HistSender.h>
 
 #include <vector>
 
@@ -24,20 +22,12 @@ namespace Belle2 {
     virtual void timeout(NSMCommunicator& com) throw();
 
   public:
-    std::vector<TH1*>& getHists() { return m_hist; }
-    void notify() { m_cond.broadcast(); }
-    void wait() { m_cond.wait(m_mutex); }
-    void lock() { m_mutex.lock(); }
-    void unlock() { m_mutex.unlock(); }
-    void update() throw();
+    std::vector<HistSender>& getSenders() { return m_senders; }
+    const std::vector<HistSender>& getSenders() const { return m_senders; }
+    void addSender(const HistSender& sender) { m_senders.push_back(sender); }
 
   private:
-    ConfigFile& m_config;
-    Mutex m_mutex;
-    Cond m_cond;
-    int m_count;
-    std::vector<DqmMemFile*> m_memory;
-    std::vector<TH1*> m_hist;
+    std::vector<HistSender> m_senders;
 
   };
 

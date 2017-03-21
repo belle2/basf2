@@ -1,5 +1,7 @@
 #include <daq/slc/apps/dqmviewd/SocketAcceptor.h>
 
+#include <daq/slc/apps/dqmviewd/DQMViewCallback.h>
+
 #include <daq/slc/apps/dqmviewd/HistSender.h>
 
 #include <daq/slc/system/TCPServerSocket.h>
@@ -15,8 +17,7 @@ void SocketAcceptor::run()
   LogFile::debug("open socket (%s:%d)", m_ip.c_str(), m_port);
   while (true) {
     TCPSocket socket = server_socket.accept();
-    LogFile::debug("new connection accepted (%s:%d)",
-                   m_ip.c_str(), m_port);
-    PThread(new HistSender(socket, m_callback));
+    LogFile::debug("new connection accepted (%s:%d)", m_ip.c_str(), m_port);
+    m_callback->addSender(HistSender(socket, m_callback));
   }
 }

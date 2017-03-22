@@ -18,6 +18,8 @@
 #include <genfit/StateOnPlane.h>
 #include <root/TGeoMatrix.h>
 
+#include <framework/logging/Logger.h>
+
 namespace Belle2 {
   namespace alignment {
     /// pair of the global unique id from object with constants and element representing some rigid body in hierarchy
@@ -175,7 +177,7 @@ namespace Belle2 {
 
     };
 
-    /**
+
     class GlobalParamSetAccess {
     public:
       virtual unsigned short getGlobalUniqueID() = 0;
@@ -202,7 +204,44 @@ namespace Belle2 {
       std::shared_ptr<DBObjType> m_object {};
       void ensureConstructed() {if (!m_object) construct();}
     };
-    **/
+
+    class GlobalParamVector {
+    public:
+      void setGlobalParam(double value, unsigned short uniqueID, unsigned short element, unsigned short param)
+      {
+        auto dbObj = m_vector.find(uniqueID);
+        if (dbObj != m_vector.end()) {
+          dbObj->second->setGlobalParam(value, element, param);
+        } else {
+          B2WARNING("Did not found DB object with unique id " << uniqueID << " in global vector. Cannot set value");
+        }
+      }
+
+      double getGlobalParam(unsigned short uniqueID, unsigned short element, unsigned short param)
+      {
+        auto dbObj = m_vector.find(uniqueID);
+        if (dbObj != m_vector.end()) {
+          return dbObj->second->getGlobalParam(element, param);
+        } else {
+          B2WARNING("Did not found DB object with unique id " << uniqueID << " in global vector. Returning 0.");
+          return 0.;
+        }
+      }
+
+      std::vector<std::tuple<unsigned short, unsigned short, unsigned short>> listGlobalParams()
+      {
+        std::vector<std::tuple<unsigned short, unsigned short, unsigned short>> params;
+        for (auto uID_DBObj : m_vector) {
+          for (auto element_param : uID_DBObj.second->listGlobalParams()) {
+            params.push_back(std::make_tuple(uID_DBObj.first, element_param.first, element_param.second))   ;
+          }
+        }
+        return params;
+      }
+    private:
+      std::map<unsigned short, std::shared_ptr<GlobalParamSetAccess>> m_vector {};
+    };
+
 
     /// Set with no parameters, terminates hierarchy etc.
     class EmptyGlobaParamSet {

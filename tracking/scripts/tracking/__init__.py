@@ -271,6 +271,11 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
                         "Small",
                     ])
 
+    if with_ca:
+        # Add curlers in the axial inner most superlayer
+        path.add_module("TFCDC_TrackCreatorSingleSegments",
+                        MinimalHitsBySuperLayerId={0: 15})
+
     # Export CDCTracks to RecoTracks representation
     path.add_module("TFCDC_TrackExporter",
                     RecoTracksStoreArrayName=reco_tracks)

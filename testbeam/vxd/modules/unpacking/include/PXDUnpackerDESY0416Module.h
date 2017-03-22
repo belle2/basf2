@@ -174,7 +174,7 @@ namespace Belle2 {
       /** counter for send unfiltered */
       unsigned int m_sendunfiltered{0};
       /** flag send unfiltered */
-      bool m_event_unfiltered{false};
+      // Commented out - not used! bool m_event_unfiltered{false};
 
     public:
       // The following helper functions do not need the class object

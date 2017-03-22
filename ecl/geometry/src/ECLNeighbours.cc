@@ -33,7 +33,7 @@ ECLNeighbours::ECLNeighbours(const std::string& neighbourDef, const double par)
   fakeneighbours.push_back(0); // insert one fake to avoid the "0" entry
   m_neighbourMap.push_back(fakeneighbours);
 
-  int parToInt = TMath::Nint(par);
+  int parToInt = int(par);
 
   // fixed number of neighbours:
   if (neighbourDef == "N") {
@@ -137,9 +137,9 @@ void ECLNeighbours::initializeN(int n)
     for (int theta = tid - n; theta <= tid + n; theta++) {
       if ((theta > 68) || (theta < 0)) continue;     // valid theta ids are 0..68 (69 in total)
 
-      short int thisPhiInc = TMath::Nint(fractionalPhiInc * m_crystalsPerRing [ theta ]);
+      short int thisPhiInc = std::lround(fractionalPhiInc * m_crystalsPerRing [ theta ]);
 
-      short int thisPhiDec = TMath::Nint(fractionalPhiDec * m_crystalsPerRing [ theta ]);
+      short int thisPhiDec = std::lround(fractionalPhiDec * m_crystalsPerRing [ theta ]);
       if (thisPhiDec == m_crystalsPerRing [ theta ]) thisPhiDec = 0;
 
       const std::vector<short int> phiList = getPhiIdsInBetween(thisPhiInc, thisPhiDec, theta);
@@ -183,9 +183,9 @@ void ECLNeighbours::initializeNC(const int n, const int corners)
     for (int theta = tid - n; theta <= tid + n; theta++) {
       if ((theta > 68) || (theta < 0)) continue;     // valid theta ids are 0..68 (69 in total)
 
-      short int thisPhiInc = TMath::Nint(fractionalPhiInc * m_crystalsPerRing [ theta ]);
+      short int thisPhiInc = std::lround(fractionalPhiInc * m_crystalsPerRing [ theta ]);
 
-      short int thisPhiDec = TMath::Nint(fractionalPhiDec * m_crystalsPerRing [ theta ]);
+      short int thisPhiDec = std::lround(fractionalPhiDec * m_crystalsPerRing [ theta ]);
       if (thisPhiDec == m_crystalsPerRing [ theta ]) thisPhiDec = 0;
 
       std::vector<short int> phiList;
@@ -243,8 +243,12 @@ std::vector<short int> ECLNeighbours::getPhiIdsInBetweenC(const short int phi0, 
                                                           const int corners)
 {
   std::vector<short int> phiList;
-  short int loop = decreasePhiId(phi0, theta, corners); //start at -1
-  short int stop = increasePhiId(phi1, theta, corners); //stop at +1
+  if (phi0 == phi1) return phiList; // could be that there is only one crystal in this theta ring definition
+
+  short int loop = decreasePhiId(phi0, theta, corners); // start at -n corners
+  if (loop == phi1) return phiList; // there will be no neighbours left in this phi ring after removing the first corners
+
+  short int stop = increasePhiId(phi1, theta, corners); //stop at +n corners
 
   while (1) {
     phiList.push_back(loop);

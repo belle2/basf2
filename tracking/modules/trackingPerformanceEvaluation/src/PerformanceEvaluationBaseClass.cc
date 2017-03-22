@@ -227,6 +227,7 @@ TH1F*  PerformanceEvaluationBaseClass::createHistogramsRatio(const char* name, c
         nBins++;
 
       }
+
     double eff = 0;
     double err = 0;
 

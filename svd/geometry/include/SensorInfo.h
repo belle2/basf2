@@ -50,52 +50,109 @@ namespace Belle2 {
       SensorInfo(VxdID id = 0, float width = 0, float length = 0, float thickness = 0,
                  int uCells = 0, int vCells = 0, float width2 = 0):
         VXD::SensorInfoBase(SensorInfo::SVD, id, width, length, thickness, uCells, vCells, width2, -1, 0),
-        m_temperature(300), m_depletionVoltage(0), m_biasVoltage(0),
-        m_backplaneCapacitance(0), m_interstripCapacitance(0),
-        m_couplingCapacitance(0), m_electronicNoiseU(0), m_electronicNoiseV(0)
-      { }
+        m_temperature(300), m_stripEdgeU(0), m_stripEdgeV(0),
+        m_depletionVoltage(0), m_biasVoltage(0),
+        m_backplaneCapacitanceU(0), m_interstripCapacitanceU(0),
+        m_couplingCapacitanceU(0), m_backplaneCapacitanceV(0),
+        m_interstripCapacitanceV(0), m_couplingCapacitanceV(0),
+        m_electronicNoiseU(0), m_electronicNoiseV(0), m_electronicNoiseSbwU(0), m_electronicNoiseSbwV(0),
+        m_isBackward(false)
+      {
+        setIsBackward(id);
+      }
+
+      /** Determine if this is a backward side barrel sensor.
+       * We have special noise settings for these snesors.
+       * We need to cheat here, since we don't want to ask the GeoCache.
+       * @ param id VxdID of this sensor
+       */
+      void setIsBackward(VxdID id)
+      {
+        static const unsigned short layerSensors[] = {0, 0, 0, 2, 3, 4, 5};
+        m_isBackward =
+          (id.getLayerNumber() > 3)
+          && (id.getSensorNumber() == layerSensors[id.getLayerNumber()]);
+      }
 
       /** Change the SensorID. Useful to copy the SensorInfo from one sensor and use it for another.
        * @param id VxdID to be assigned to current sensor.
        */
-      void setID(VxdID id) { m_id = id; }
+      void setID(VxdID id)
+      {
+        m_id = id;
+        setIsBackward(id);
+      }
 
       /** Set sensor operation parameters.
+       * @param stripEdgeU distance from end of strip to edge of active area.
+       * @param stripEdgeV distance from end of strip to edge of active area.
        * @param depletionVoltage Depletion voltage of the sensor.
        * @param biasVoltage Bias voltage on the sensor.
        * @param backplaneCapacitance Backplane capacitance wrt. the strips.
        * @param interstripCapacitance Interstrip capacitance for the sensor.
        * @param coupling capacitance Coupling capacitance for the strips.
        */
-      void setSensorParams(double depletionVoltage, double biasVoltage,
-                           double backplaneCapacitance, double interstripCapacitance, double couplingCapacitance, double electronicNoiseU,
-                           double electronicNoiseV)
+      void setSensorParams(double stripEdgeU, double stripEdgeV,
+                           double depletionVoltage, double biasVoltage,
+                           double backplaneCapacitanceU,
+                           double interstripCapacitanceU,
+                           double couplingCapacitanceU,
+                           double backplaneCapacitanceV,
+                           double interstripCapacitanceV,
+                           double couplingCapacitanceV,
+                           double electronicNoiseU,
+                           double electronicNoiseV,
+                           double electronicNoiseSbwU,
+                           double electronicNoiseSbwV)
       {
+        m_stripEdgeU = stripEdgeU,
+        m_stripEdgeV = stripEdgeV,
         m_depletionVoltage = depletionVoltage;
         m_biasVoltage = biasVoltage;
-        m_backplaneCapacitance = backplaneCapacitance;
-        m_interstripCapacitance = interstripCapacitance;
-        m_couplingCapacitance = couplingCapacitance;
+        m_backplaneCapacitanceU = backplaneCapacitanceU;
+        m_interstripCapacitanceU = interstripCapacitanceU;
+        m_couplingCapacitanceU = couplingCapacitanceU;
+        m_backplaneCapacitanceV = backplaneCapacitanceV;
+        m_interstripCapacitanceV = interstripCapacitanceV;
+        m_couplingCapacitanceV = couplingCapacitanceV;
         m_electronicNoiseU = electronicNoiseU;
         m_electronicNoiseV = electronicNoiseV;
+        m_electronicNoiseSbwU = electronicNoiseSbwU;
+        m_electronicNoiseSbwV = electronicNoiseSbwV;
       }
 
       /** Return the sensor temperature.*/
       double getTemperature() const {return m_temperature; }
+      /** Return u-strip length.
+       * @param uID number of the strip (ignored for rectangular sensors)
+       * @return length of the u-strip.
+       */
+      double getStripLengthU(int uID = 0) const;
+      /** Return v-strip length.
+       * @param vID number of the strip (ignored for rectangular sensors)
+       * @return length of the v-strip.
+       */
+      double getStripLengthV(int vID = 0) const;
       /** Return the depletion voltage of the sensor. */
       double getDepletionVoltage() const { return m_depletionVoltage; }
       /** Return the bias voltage on the sensor. */
       double getBiasVoltage() const { return m_biasVoltage; }
-      /** Return the backplane capacitance for the sensor. */
-      double getBackplaneCapacitance() const { return m_backplaneCapacitance; }
-      /** Return the interstrip capacitance for the sensor. */
-      double getInterstripCapacitance() const { return m_interstripCapacitance; }
-      /** Return the coupling capacitance of the sensor strips */
-      double getCouplingCapacitance() const { return m_couplingCapacitance; }
+      /** Return the backplane capacitanceU for the sensor. */
+      double getBackplaneCapacitanceU(int uID = 0) const;
+      /** Return the interstrip capacitanceU for the sensor. */
+      double getInterstripCapacitanceU(int uID = 0) const;
+      /** Return the coupling capacitanceU of the sensor strips */
+      double getCouplingCapacitanceU(int uID = 0) const;
+      /** Return the backplane capacitanceV for the sensor. */
+      double getBackplaneCapacitanceV(int vID = 0) const;
+      /** Return the interstrip capacitanceV for the sensor. */
+      double getInterstripCapacitanceV(int vID = 0) const;
+      /** Return the coupling capacitanceV of the sensor strips */
+      double getCouplingCapacitanceV(int vID = 0) const;
       /** Return electronic noise in e- for u (short) strips */
-      double getElectronicNoiseU() const {return m_electronicNoiseU; }
+      double getElectronicNoiseU() const;
       /** Return electronic noise in e- for v (long) strips */
-      double getElectronicNoiseV() const {return m_electronicNoiseV; }
+      double getElectronicNoiseV() const;
       /** Calculate electron mobility at a given electric field.
        * Based on C. Canali et al., IEEE, ED-22, (1975) 1045
        * @param eField Electric field, V/cm
@@ -159,23 +216,103 @@ namespace Belle2 {
       double getLorentzShift(bool uCoordinate, double position) const;
 
     protected:
-      /** Sensor temperature*/
+      /** Sensor temperature */
       double m_temperature;
+      /** The distance between end of strips and edge of active area */
+      double m_stripEdgeU;
+      /** The distance between end of strips and edge of active area */
+      double m_stripEdgeV;
       /** The depletion voltage of the Silicon sensor */
       double m_depletionVoltage;
       /** The bias voltage on the sensor */
       double m_biasVoltage;
-      /** The backplane capacitance wrt. the strips. */
-      double m_backplaneCapacitance;
-      /** The interstrip capacitance for the sensor. */
-      double m_interstripCapacitance;
-      /** The coupling capacitance for the sensor. */
-      double m_couplingCapacitance;
+      /** The backplane capacitance/cm for the sensor */
+      double m_backplaneCapacitanceU;
+      /** The interstrip capacitance/cm for the sensor. */
+      double m_interstripCapacitanceU;
+      /** The coupling capacitance/cm for the sensor. */
+      double m_couplingCapacitanceU;
+      /** The backplane capacitance/cm for the sensor. */
+      double m_backplaneCapacitanceV;
+      /** The interstrip capacitance/cm for the sensor. */
+      double m_interstripCapacitanceV;
+      /** The coupling capacitance/cm for the sensor. */
+      double m_couplingCapacitanceV;
       /** The electronic noise for u (short, n-side) strips. */
       double m_electronicNoiseU;
       /** The electronic noise for v (long, p-side) strips. */
       double m_electronicNoiseV;
+      /** The electronic noise for U trips in bw barrel (non-Origami) sensors. */
+      double m_electronicNoiseSbwU;
+      /** The electronic noise for V trips in bw barrel (non-Origami) sensors. */
+      double m_electronicNoiseSbwV;
+      /** Is this a backward barrel sensor? */
+      bool m_isBackward;
     }; // Class SVD::SensorInfo
+
+    inline double SensorInfo::getStripLengthU(int uID) const
+    {
+      // if this is a rectangular sensor, just return the default
+      if (m_deltaWidth == 0.0)
+        return (m_length - 2.0 * m_stripEdgeU);
+      else {
+        // calculate for a wedge sensor
+        double dw = (1.0 * uID / m_uCells - 0.5) * m_deltaWidth;
+        return (sqrt(dw * dw + m_length * m_length) - 2.0 * m_stripEdgeU);
+      }
+    }
+
+    inline double SensorInfo::getStripLengthV(int vID) const
+    {
+      return (getWidth(getVCellPosition(vID)) - 2.0 * m_stripEdgeV);
+    }
+
+    inline double SensorInfo::getBackplaneCapacitanceU(int uID) const
+    {
+      return (m_backplaneCapacitanceU * getStripLengthU(uID));
+    }
+
+    inline double SensorInfo::getInterstripCapacitanceU(int uID) const
+    {
+      return (m_interstripCapacitanceU * getStripLengthU(uID));
+    }
+
+    inline double SensorInfo::getCouplingCapacitanceU(int uID) const
+    {
+      return (m_couplingCapacitanceU * getStripLengthU(uID));
+    }
+
+    inline double SensorInfo::getBackplaneCapacitanceV(int vID) const
+    {
+      return (m_backplaneCapacitanceV * getStripLengthV(vID));
+    }
+
+    inline double SensorInfo::getInterstripCapacitanceV(int vID) const
+    {
+      return (m_interstripCapacitanceV * getStripLengthV(vID));
+    }
+
+    inline double SensorInfo::getCouplingCapacitanceV(int vID) const
+    {
+      return (m_couplingCapacitanceV * getStripLengthV(vID));
+    }
+
+    inline double SensorInfo::getElectronicNoiseU() const
+    {
+      if (m_isBackward)
+        return m_electronicNoiseSbwU;
+      else
+        return m_electronicNoiseU;
+    }
+
+    inline double SensorInfo::getElectronicNoiseV() const
+    {
+      if (m_isBackward)
+        return m_electronicNoiseSbwV;
+      else
+        return m_electronicNoiseV;
+    }
+
 
   } // SVD namespace
 } //Belle2 namespace

@@ -16,12 +16,14 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <unordered_map>
 
-#ifndef __CINT__
-#include <boost/unordered_map.hpp>
-#endif
+#include <TMath.h>
 
 class G4VPhysicalVolume;
+// forward declaring G4Transform3D is a pain
+namespace HepGeom { class Transform3D; }
+typedef HepGeom::Transform3D G4Transform3D;
 
 namespace Belle2 {
   /** Namespace to provide code needed by both Vertex Detectors, PXD and SVD, and also testbeam telescopes */
@@ -89,19 +91,55 @@ namespace Belle2 {
       /* If sensor not found, it returns a warning and the first sensor!*/
       const SensorInfoBase& getSensorInfo(Belle2::VxdID id) const;
 
+      // ------------------ Alignment constants in reconstruction + hierarchy ------------------------------
+
+      /// Retrieve stored half-shell placements into world volume
+      /// @return vector of pairs, each pair contains a VxdID for half-shell (0.0.0#1-4) and its placement
+      const std::vector<std::pair<VxdID, TGeoHMatrix>>& getHalfShellPlacements() const;
+
+      /// Retrieve stored ladder placements into half-shell
+      /// @return vector of pairs, each pair contains a VxdID for ladder (layer.ladder.0) and its placement
+      const std::vector<std::pair<VxdID, TGeoHMatrix>>& getLadderPlacements(VxdID halfShell) const;
+
+      /// Retrieve stored sensor placements into ladders
+      /// @return vector of pairs, each pair contains a VxdID for sensor and its placement
+      const std::vector<std::pair<VxdID, TGeoHMatrix>>& getSensorPlacements(VxdID ladder) const;
+
+      /// Remember how half-shell is placed into world volume
+      void addHalfShellPlacement(VxdID halfShell, const G4Transform3D& placement);
+
+      /// Remember how ladder is placed into half-shell
+      void addLadderPlacement(VxdID halfShell, VxdID ladder, const G4Transform3D& placement);
+
+      /// Remember how sensor is placed into ladder
+      void addSensorPlacement(VxdID ladder, VxdID sensor, const G4Transform3D& placement);
+
+      /// Initialize from DB for reconstruction
+      /// Updates all SensorInfo transformations for reconstruction from DB object(s)
+      /// (recalculating new global positions) and registers itself for subsequent updates
+      /// of DB objects to keep the hierarchy up-to-date.
+      void setupReconstructionTransformations();
+
+      /// Covenient function to convert G4Transform3D to TGeoHMatrix
+      static TGeoHMatrix g4Transform3DToTGeo(const G4Transform3D& g4);
+
+      /// Convert 6 rigid body params (alignment corrections) to corresponding TGeoHMatrix
+      /// Angles in radians, length units in centimeters.
+      static TGeoHMatrix getTGeoFromRigidBodyParams(double dU, double dV, double dW, double dAlpha, double dBeta, double dGamma);
+
+      // --------------------------------------------------------------------------------------------------
+
       /** Return a reference to the SensorInfo of a given SensorID.
        * This function is a shorthand for GeoCache::getInstance().getSensorInfo
        */
       static const SensorInfoBase& get(Belle2::VxdID id) { return getInstance().getSensorInfo(id); }
-      /** Return a reference to the singleton instance */
 
+      /** Return a reference to the singleton instance */
       static GeoCache& getInstance();
 
     private:
-#ifndef __CINT__
       /** Hash map to store pointers to all existing SensorInfos with constant lookup complexity */
-      typedef boost::unordered_map<VxdID::baseType, SensorInfoBase*> SensorInfoMap;
-#endif
+      typedef std::unordered_map<VxdID::baseType, SensorInfoBase*> SensorInfoMap;
       /** Map to store a set of unique VxdIDs belonging to one VxdID. Like ladders belong to layers, etc. */
       typedef std::map<Belle2::VxdID, std::set<Belle2::VxdID> > SensorHierachy;
 
@@ -123,10 +161,14 @@ namespace Belle2 {
       /** Map of all Sensor IDs belonging to a given Ladder ID */
       SensorHierachy m_sensors;
 
-#ifndef __CINT__
+      /// vector of shell ids and their placements in top volume
+      std::vector<std::pair<VxdID, TGeoHMatrix>> m_halfShellPlacements {};
+      /// Map of shell ids and their associated ladder ids and their placements
+      std::map<VxdID, std::vector<std::pair<VxdID, TGeoHMatrix>>> m_ladderPlacements {};
+      /// Map of ladder ids and their associated sensor ids and their placements
+      std::map<VxdID, std::vector<std::pair<VxdID, TGeoHMatrix>>> m_sensorPlacements {};
       /** Map to find the SensorInfo for a given Sensor ID */
       SensorInfoMap m_sensorInfo;
-#endif
     };
   }
 } //Belle2 namespace

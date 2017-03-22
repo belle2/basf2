@@ -19,16 +19,18 @@ using namespace std;
 
 namespace Belle2 {
 
-TRGChannel::TRGChannel(const std::string & name,
-		       const TRGBoard & sender,
-		       const TRGBoard & receiver)
+  TRGChannel::TRGChannel(const std::string& name,
+                         const TRGBoard& sender,
+                         const TRGBoard& receiver)
     : _name(name),
       _sender(sender),
       _receiver(receiver),
-      _data(0) {
-}
+      _data(0)
+  {
+  }
 
-TRGChannel::~TRGChannel() {
-}
+  TRGChannel::~TRGChannel()
+  {
+  }
 
 } // namespace Belle2

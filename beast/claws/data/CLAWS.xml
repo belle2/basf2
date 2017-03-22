@@ -1,8 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <DetectorComponent name="CLAWS">
   <Creator library="beast">CLAWSCreator</Creator>
+  
+  
+
   <Content>
     <Ethres>0.05</Ethres>
+
+    <ScintCell>16</ScintCell>
+    <TimeStep>0.8</TimeStep>
+    <MinTime>0.0</MinTime>
+    <MaxTime>600.0</MaxTime>
+    <PEthres>1.0</PEthres>
+    <Ethres>0.05</Ethres>
+    <C_keV_to_MIP>805.5</C_keV_to_MIP>
+    <C_MIP_to_PE>15</C_MIP_to_PE>
+
+
+
     <stepLength unit="um">50</stepLength>
     <shape name="CLAWS" type="box">
       <length unit="mm">200</length>

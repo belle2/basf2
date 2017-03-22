@@ -17,6 +17,10 @@
 #pragma link C++ class Belle2::PXDRawCluster+;
 #pragma link C++ class Belle2::PXDHardwareCluster+;
 
+#pragma link C++ class Belle2::PXDEnergyDepositionEvent+;
+#pragma link C++ class Belle2::PXDNeutronFluxEvent+;
+#pragma link C++ class Belle2::PXDOccupancyEvent+;
+
 #pragma link C++ class Belle2::PXDCalibrationMap+;
 #pragma link C++ struct Belle2::PXDCalibrationMap::key_hash+;
 #pragma link C++ struct Belle2::PXDCalibrationMap::key_equal+;

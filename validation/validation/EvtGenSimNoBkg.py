@@ -13,6 +13,7 @@
 
 from basf2 import *
 from simulation import add_simulation
+from L1trigger import add_tsim
 from beamparameters import add_beamparameters
 import glob
 
@@ -37,6 +38,9 @@ main.add_module(evtgeninput)
 
 # detector simulation, no background files
 add_simulation(main)
+
+# trigger simulation
+add_tsim(main)
 
 # memory profile
 main.add_module(register_module('Profile'))

@@ -1,0 +1,28 @@
+#------------------------------------------------------------
+# EventType:1163300003 
+# Descriptor: B0--> D*+ tau- nu with generic Btag decay
+# NickName: Bd_Dsttaunu
+# Documentation: B to D* tau nu study
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Racha Cheaib
+# Email: rcheaib@olemiss.edu
+# Cuts: None
+# Date: 20170210
+#-----------------------------------------------------------
+#
+#
+Decay Upsilon(4S)
+1.000 B0sig anti-B0sig B0 anti-B0     VSS_BMIX  dm; 
+Enddecay
+#
+#
+Decay B0sig
+1.00 D*- tau+ nu_tau  ISGW2;
+Enddecay
+#
+Decay anti-B0sig
+1.00 D*+ tau- anti-nu_tau   ISGW2;
+Enddecay
+#
+End

@@ -21,12 +21,10 @@
 #include <framework/logging/Logger.h>
 
 #include <G4RunManager.hh>
-#include "trg/ecl/TrgEcl.h"
+#include "trg/ecl/TrgEclMaster.h"
 //trg package headers
 #include "trg/trg/Debug.h"
 #include "trg/ecl/modules/trgecl/TRGECLModule.h"
-#include "trg/ecl/dataobjects/TRGECLDigi.h"
-#include "trg/ecl/dataobjects/TRGECLDigi0.h"
 #include "trg/ecl/dataobjects/TRGECLHit.h"
 #include "trg/ecl/dataobjects/TRGECLTrg.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
@@ -54,7 +52,8 @@ namespace Belle2 {
 //
   TRGECLModule::TRGECLModule()
     : Module::Module(),
-      _debugLevel(0)
+      _debugLevel(0), _Bhabha(0), _Clustering(1), _EventTiming(2), _TimeWindow(250.0), _OverlapWindow(125.0), _NofTopTC(3),
+      _SelectEvent(1)
   {
 
     string desc = "TRGECLModule(" + version() + ")";
@@ -62,6 +61,17 @@ namespace Belle2 {
     //   setPropertyFlags(c_ParallelProcessingCertified | c_InitializeInProcess);
 
     addParam("DebugLevel", _debugLevel, "TRGECL debug level", _debugLevel);
+    addParam("Bhabha", _Bhabha, "TRGECL Bhabha method  0 : Belle I, 1 :belle II(defult)", _Bhabha);
+    addParam("Clustering", _Clustering, "TRGECL Clustering method  0 : use only ICN, 1 : ICN + Energy(Defult)", _Clustering);
+    addParam("EventTiming", _EventTiming,
+             "TRGECL EventTiming method  0 : Belle I, 1 : Energetic TC, 2 : Energy Weighted timing (defult)", _EventTiming);
+    addParam("NofTopTC", _NofTopTC, "TRGECL # of considered TC in energy weighted Timing method(Only work for EvenTiming Method 2)",
+             _NofTopTC);
+
+    addParam("TimeWindow", _TimeWindow, "TRGECL Trigger decision Time Window", _TimeWindow);
+    addParam("OverlapWindow", _OverlapWindow, "TRGECL Trigger decision Time Window", _OverlapWindow);
+    addParam("EventSelect", _SelectEvent, "TRGECL Select one trigger window for logic study", _SelectEvent);
+
 
     if (TRGDebug::level()) {
       std::cout << "TRGECLModule ... created" << std::endl;
@@ -75,6 +85,7 @@ namespace Belle2 {
 
     if (TRGDebug::level()) {
       std::cout << "TRGECLModule ... destructed " << std::endl;
+
     }
   }
 //
@@ -98,8 +109,7 @@ namespace Belle2 {
     m_nEvent = 0 ;
     m_hitNum = 0;
     m_hitTCNum = 0;
-    StoreArray<TRGECLDigi>::registerPersistent();
-    StoreArray<TRGECLDigi0>::registerPersistent();
+
     StoreArray<TRGECLHit>::registerPersistent();
     StoreArray<TRGECLTrg>::registerPersistent();
     StoreArray<TRGECLCluster>::registerPersistent();
@@ -134,12 +144,24 @@ namespace Belle2 {
     //
     // simulation
     //
-    TrgEcl* _ecl = new TrgEcl();
+    TrgEclMaster* _ecl = new TrgEclMaster();
 
-    _ecl->initialize(m_nEvent);
-    _ecl->simulate(m_nEvent);
-    printf("TRGECLModule> bitECLtoGDL = %i \n", _ecl->getECLtoGDL());
+    _ecl-> initialize(m_nEvent);
+    _ecl-> setClusterMethod(_Clustering);
+    _ecl-> setBhabhaMethod(_Bhabha);
+    _ecl-> setEventTimingMethod(_EventTiming);
+    _ecl -> setTimeWindow(_TimeWindow);
+    _ecl -> setOverlapWindow(_OverlapWindow);
+    _ecl -> setNofTopTC(_NofTopTC);
+    if (_SelectEvent == 0) {
+      _ecl->simulate01(m_nEvent);
+    } else if (_SelectEvent == 1) {
+      _ecl->simulate02(m_nEvent);
+    }
+    // printf("TRGECLModule> eventId = %d \n", m_nEvent);
+
     //
+
     //
     //
     m_nEvent++;

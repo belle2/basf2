@@ -25,15 +25,19 @@ from tracking.validation.run import TrackingValidationRun
 
 class Cosmics(TrackingValidationRun):
     n_events = N_EVENTS
+    #: Generator to be used in the simulation (-so)
+    generator_module = 'Cosmics'
     root_input_file = '../CosmicsSimNoBkg.root'
     components = None
     finder_module = 'TrackFinderCDCCosmics'
     tracking_coverage = {
+        'WhichParticles': ['CDC'],  # Include all particles seen in CDC, also secondaries
         'UsePXDHits': False,
         'UseSVDHits': False,
         'UseCDCHits': True,
-        'UseOnlyAxialCDCHits': False
-        }
+        'UseOnlyAxialCDCHits': False,
+        "UseReassignedHits": True,
+    }
     pulls = True
     contact = CONTACT
     output_file_name = VALIDATION_OUTPUT_FILE

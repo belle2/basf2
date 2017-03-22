@@ -20,6 +20,7 @@ namespace Belle2 {
   public:
     /** Constructor.
      *
+     * @param filename name of the file to open
      * @param rwflag should probably be r or rw
      */
     SeqFile(const std::string& filename, const std::string& rwflag);

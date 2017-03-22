@@ -13,8 +13,9 @@
 
 from basf2 import *
 from simulation import add_simulation
+from L1trigger import add_tsim
 from beamparameters import add_beamparameters
-import glob
+import validationtools
 
 set_random_seed(12345)
 
@@ -35,14 +36,11 @@ beamparameters = add_beamparameters(main, "Y4S")
 evtgeninput = register_module('EvtGenInput')
 main.add_module(evtgeninput)
 
-# detector simulation
-bg = None
-if 'BELLE2_BACKGROUND_DIR' in os.environ:
-    bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
-
-assert bg
-
+bg = validationtools.get_background_files()
 add_simulation(main, bkgfiles=bg)
+
+# trigger simulation
+add_tsim(main)
 
 # memory profile
 main.add_module(register_module('Profile'))

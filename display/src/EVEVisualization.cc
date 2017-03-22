@@ -19,38 +19,33 @@
 */
 #include <display/EVEVisualization.h>
 
-#include <framework/dataobjects/DisplayData.h>
 #include <display/VisualRepMap.h>
 #include <display/EveGeometry.h>
 #include <display/EveVisBField.h>
 
-#include <framework/logging/Logger.h>
 #include <vxd/geometry/GeoCache.h>
 #include <bklm/dataobjects/BKLMSimHitPosition.h>
 #include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <arich/dbobjects/ARICHGeometryConfig.h>
-#include <geometry/bfieldmap/BFieldMap.h>
-
 #include <svd/reconstruction/SVDRecoHit.h>
+#include <top/geometry/TOPGeometryPar.h>
+
 #include <genfit/AbsMeasurement.h>
 #include <genfit/PlanarMeasurement.h>
 #include <genfit/SpacepointMeasurement.h>
 #include <genfit/WireMeasurement.h>
 #include <genfit/WireMeasurementNew.h>
 #include <genfit/WirePointMeasurement.h>
-#include <genfit/AbsTrackRep.h>
 #include <genfit/DetPlane.h>
 #include <genfit/Exception.h>
 #include <genfit/KalmanFitterInfo.h>
+#include <genfit/GblFitterInfo.h>
 
-#include <genfit/AbsKalmanFitter.h>
-#include <genfit/KalmanFitter.h>
-#include <genfit/DAF.h>
-#include <genfit/KalmanFitterRefTrack.h>
-#include <genfit/GblFitter.h>
-
-#include <cdc/dataobjects/CDCRecoHit.h>
+#include <framework/dataobjects/DisplayData.h>
+#include <framework/logging/Logger.h>
+#include <framework/utilities/ColorPalette.h>
 
 #include <TEveArrow.h>
 #include <TEveBox.h>
@@ -87,8 +82,8 @@
 #include <cassert>
 #include <cmath>
 
-
 using namespace Belle2;
+using namespace Belle2::TangoPalette;
 
 namespace {
   /** Destroys 'el', zeroes pointer. Supposed to also remove el from global lists, which 'delete el' would not. */
@@ -118,6 +113,13 @@ namespace {
       gGeoManager->GetListOfShapes()->Remove(s);
   }
 }
+
+const int EVEVisualization::c_recoHitColor = getTColorID("Orange", 1);
+const int EVEVisualization::c_unassignedHitColor = getTColorID("Plum", 1);
+const int EVEVisualization::c_trackColor = getTColorID("Sky Blue", 2);
+const int EVEVisualization::c_recoTrackColor = getTColorID("Sky Blue", 1);
+const int EVEVisualization::c_trackMarkerColor = getTColorID("Chameleon", 3);
+const int EVEVisualization::c_klmClusterColor = getTColorID("Chameleon", 1);
 
 EVEVisualization::EVEVisualization():
   m_assignToPrimaries(false),
@@ -1423,7 +1425,12 @@ void EVEVisualization::addCDCHit(const CDCHit* hit)
   TGeoCombiTrans det_trans(midPoint(0), midPoint(1), midPoint(2), &det_rot);
   cov_shape->SetTransMatrix(det_trans);
 
-  cov_shape->SetMainColor(kOrange - 3);
+  if (hit->getISuperLayer() % 2 == 0) {
+    cov_shape->SetMainColor(kCyan);
+  } else {
+    cov_shape->SetMainColor(kPink + 7);
+  }
+
   cov_shape->SetMainTransparency(50);
   cov_shape->SetName(ObjectInfo::getIdentifier(hit));
   cov_shape->SetTitle(ObjectInfo::getInfo(hit) + TString::Format("\nWire ID: %d\nADC: %d\nTDC: %d",
@@ -1452,6 +1459,50 @@ void EVEVisualization::addARICHHit(const ARICHHit* hit)
 
   addToGroup("ARICHHits", arichbox);
   addObject(hit, arichbox);
+}
+
+void EVEVisualization::addTOPDigits(const StoreArray<TOPDigit>& digits)
+{
+  /** TOP module ID -> #digits */
+  std::map<int, int> m_topSummary;
+  for (const TOPDigit& hit : digits) {
+    int mod = hit.getModuleID();
+    ++m_topSummary[mod];
+  }
+  int maxcount = 0;
+  for (auto modCountPair : m_topSummary) {
+    if (modCountPair.second > maxcount)
+      maxcount = modCountPair.second;
+  }
+  for (auto modCountPair : m_topSummary) {
+    const auto& topmod = TOP::TOPGeometryPar::Instance()->getGeometry()->getModule(modCountPair.first);
+    double phi = topmod.getPhi();
+    double r_center = topmod.getRadius();
+    double z = topmod.getZc();
+
+    TVector3 centerPos3D;
+    centerPos3D.SetMagThetaPhi(r_center, M_PI / 2, phi);
+    centerPos3D.SetZ(z);
+
+    TVector3 channelX(1, 0, 0);    channelX.RotateZ(phi);
+    TVector3 channelY(0, 1, 0);    channelY.RotateZ(phi);
+
+    //bar is a bit thicker so we can mouse over without getting the geometry
+    auto* moduleBox = boxCreator(centerPos3D, channelX, channelY,
+                                 3.0 * topmod.getBarThickness(), topmod.getBarWidth() , topmod.getBarLength());
+    moduleBox->SetMainColor(kAzure + 10);
+    double weight = double(modCountPair.second) / maxcount;
+    moduleBox->SetMainTransparency(90 - weight * 50);
+    moduleBox->SetName(("TOP module " + std::to_string(modCountPair.first)).c_str());
+    moduleBox->SetTitle(TString::Format("#TOPDigits: %d ", modCountPair.second));
+
+    addToGroup("TOP Modules", moduleBox);
+    //associate all TOPDigits with this module.
+    for (const TOPDigit& hit : digits) {
+      if (modCountPair.first == hit.getModuleID())
+        addObject(&hit, moduleBox);
+    }
+  }
 }
 
 

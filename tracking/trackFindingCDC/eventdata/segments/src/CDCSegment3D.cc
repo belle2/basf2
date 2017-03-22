@@ -15,6 +15,17 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+CDCSegment3D CDCSegment3D::reconstruct(const CDCSegment2D& segment2D,
+                                       const CDCTrajectory2D& trajectory2D)
+{
+  CDCSegment3D segment3D;
+  for (const CDCRecoHit2D& recoHit2D : segment2D) {
+    CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit2D, trajectory2D);
+    segment3D.push_back(recoHit3D);
+  }
+  segment3D.setAliasScore(segment2D.getAliasScore());
+  return segment3D;
+}
 
 CDCSegment2D CDCSegment3D::stereoProjectToRef() const
 {
@@ -26,14 +37,42 @@ CDCSegment2D CDCSegment3D::stereoProjectToRef() const
   return result;
 }
 
-CDCSegment3D CDCSegment3D::reconstruct(const CDCSegment2D& segment2D,
-                                       const CDCTrajectory2D& trajectory2D)
+void CDCSegment3D::unsetAndForwardMaskedFlag(bool toHits) const
 {
-  CDCSegment3D segment3D;
-  for (const CDCRecoHit2D& recoHit2D : segment2D) {
-    CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit2D, trajectory2D);
-    segment3D.push_back(recoHit3D);
+  getAutomatonCell().unsetMaskedFlag();
+  if (not toHits) return;
+  for (const CDCRecoHit3D& recoHit3D : *this) {
+    const CDCWireHit& wireHit = recoHit3D.getWireHit();
+    wireHit.getAutomatonCell().unsetMaskedFlag();
   }
-  segment3D.setAliasScore(segment2D.getAliasScore());
-  return segment3D;
+}
+
+void CDCSegment3D::setAndForwardMaskedFlag(bool toHits) const
+{
+  getAutomatonCell().setMaskedFlag();
+  if (not toHits) return;
+  for (const CDCRecoHit3D& recoHit3D : *this) {
+    const CDCWireHit& wireHit = recoHit3D.getWireHit();
+    wireHit.getAutomatonCell().setMaskedFlag();
+  }
+}
+
+void CDCSegment3D::receiveMaskedFlag(bool fromHits) const
+{
+  if (not fromHits) return;
+  int nMasked = 0 ;
+  int nNotMasked = 0;
+  for (const CDCRecoHit3D& recoHit3D : *this) {
+    const CDCWireHit& wireHit = recoHit3D.getWireHit();
+    if (wireHit.getAutomatonCell().hasMaskedFlag()) {
+      ++nMasked;
+    } else {
+      ++nNotMasked;
+    }
+  }
+
+  const int nTolerance = 2;
+  if (nMasked > nNotMasked or nMasked >= nTolerance) {
+    getAutomatonCell().setMaskedFlag();
+  }
 }

@@ -24,12 +24,10 @@ namespace Belle2 {
     /**
      * Constructor:
      * the object itself is not allocated here, but in construct(...) function.
-     * @param module  Name under which the object will be stored in the database
-     * @param package Package name
+     * @param name  Name under which the object will be stored in the database
      */
-    explicit DBImportObjPtr(const std::string& module = "",
-                            const std::string& package = "dbstore"):
-      DBImportBase(DBStore::objectName<T>(module), package)
+    explicit DBImportObjPtr(const std::string& name = ""):
+      DBImportBase(DBStore::objectName<T>(name))
     {}
 
     /**
@@ -57,7 +55,7 @@ namespace Belle2 {
     {
       if (!m_object)
         throw std::out_of_range("DBImportObjPtr::operator ->, for "
-                                + m_package + "/" + m_module + ", "
+                                + getName() + ", "
                                 "object does not exist or is invisible");
       return static_cast<T*>(m_object);
     }

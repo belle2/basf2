@@ -24,8 +24,8 @@ namespace Belle2 {
   class BaseAngle {
   public:
     /** Constructor
-     * @param angle
-     * @param error
+     * @param angle angle to compare
+     * @param error error on the angle
      */
     BaseAngle(double angle, double error) : m_angle(angle), m_error(error) {};
 
@@ -33,34 +33,30 @@ namespace Belle2 {
     virtual ~BaseAngle() {};
 
     /** Getter for the angle.
-     * @return
      */
     double getAngle() const { return m_angle; }
 
     /** Getter for the error of the angle.
-    * @return
     */
     double getError() const { return m_error; }
 
     /** Getter for angle in degrees.
-     * @return
      */
     double getAngleInDeg() const { return m_angle * TMath::RadToDeg(); }
 
     /** Getter for the error of the angle in degrees.
-     * @return
      * */
     double getErrorInDeg() const { return m_error * TMath::RadToDeg(); }
 
-    /** Getter for the lower interval bound: angle-sigme*error.
-     * @param sigma
-     * @return
+    /** Getter for the lower interval bound: angle-sigma*error.
+     * @param sigma width of the error interval in standard deviations
+     * @return angle - sigma * error
      */
     double getLowerIntervalBoundary(double sigma = 1) const { return m_angle - sigma * m_error; }
 
     /** Getter for the upper interval bound: angle+sigma*error
-     * @param sigma
-     * @return
+     * @param sigma width of the error interval in standard deviations
+     * @return angle + sigma * error
      */
     double getUpperIntervalBoundary(double sigma = 1) const { return m_angle + sigma * m_error; }
 
@@ -73,9 +69,9 @@ namespace Belle2 {
     /**
      * Checks if the intervals overlap at some point.
      * If comparing phi angles, be sure to have the interval in a way this function can handle it, meaning always between [0, 2pi).
-     * @param x
-     * @param y
-     * @return
+     * @param x_interval first interval to check
+     * @param y_interval second interval
+     * @return true if x and y overlap
      */
     bool intervalsCompatible(const Interval& x_interval, const Interval& y_interval) const
     {
@@ -111,8 +107,8 @@ namespace Belle2 {
     /**
      * Constructor using radian units.
      * Theta in [0, Pi)
-     * @param angle
-     * @param error
+     * @param angle theta angle to use
+     * @param error error on the angle
      */
     ThetaAngle(double angle, double error) : BaseAngle(angle, error)
     {
@@ -120,8 +116,8 @@ namespace Belle2 {
     }
 
     /** Check if two angles are compatible.
-     * @param angle
-     * @return
+     * @param angle second angle to compare to
+     * @return true if within one standard deviation
      */
     bool contains(const ThetaAngle& angle) const
     {
@@ -129,9 +125,9 @@ namespace Belle2 {
     }
 
     /** Check if two angles are compatible.
-     * @param angle
-     * @param sigma
-     * @return
+     * @param angle second angle to compare to
+     * @param sigma width of the error band in standard deviations
+     * @return true if within sigma standard deviations
      */
     bool containsIn(const ThetaAngle& angle, double sigma) const
     {
@@ -154,8 +150,8 @@ namespace Belle2 {
     /**
      * Constructor using radian units.
      * Phi in [0, 2pi]
-     * @param angle
-     * @param error
+     * @param angle phi angle
+     * @param error error on the phi angle
      */
     PhiAngle(double angle, double error) : BaseAngle(angle, error)
     {
@@ -163,8 +159,8 @@ namespace Belle2 {
     }
 
     /** Check if two angles are compatible.
-     * @param angle
-     * @return
+     * @param angle second angle to compare
+     * @return true if within one standard deviation
      */
     bool contains(const PhiAngle& angle) const
     {
@@ -172,9 +168,9 @@ namespace Belle2 {
     }
 
     /** Check if two angles are compatible.
-     * @param angle
-     * @param sigma
-     * @return
+     * @param angle second angle to compare to
+     * @param sigma width of the error band in standard deviations
+     * @return true if within sigma standard deviations
      */
     bool containsIn(const PhiAngle& angle, double sigma) const
     {

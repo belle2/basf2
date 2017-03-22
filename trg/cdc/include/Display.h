@@ -23,20 +23,20 @@
 #endif
 
 namespace Belle2 {
-    class TRGCDCDisplayDrawingArea;
-    class TRGCDCDisplayRphi;
-    class TRGCDCDisplayHough;
+  class TRGCDCDisplayDrawingArea;
+  class TRGCDCDisplayRphi;
+  class TRGCDCDisplayHough;
 }
 
 namespace Belle2 {
 
 /// A class to display CDC trigger information.
-class TRGCDCDisplay : public Gtk::Window {
-    
+  class TRGCDCDisplay : public Gtk::Window {
+
   public:
 
     /// Default constructor
-    TRGCDCDisplay(const std::string & name,
+    TRGCDCDisplay(const std::string& name,
                   int sizeWindow = 600,
                   int sizeMax = 600);
 
@@ -72,21 +72,21 @@ class TRGCDCDisplay : public Gtk::Window {
   public: // Status
 
     /// sets present stage of display.
-    void stage(const std::string & stage);
+    void stage(const std::string& stage);
 
     /// sets information of present stage.
-    void information(const std::string & information);
+    void information(const std::string& information);
 
   public: // Access to drawing area.
 
     /// returns drawing area.
-    virtual TRGCDCDisplayDrawingArea & area(void) = 0;
+    virtual TRGCDCDisplayDrawingArea& area(void) = 0;
 
     /// links R/phi display.
-    void link(TRGCDCDisplayRphi &);
+    void link(TRGCDCDisplayRphi&);
 
     /// returns R/phi display.
-    TRGCDCDisplayRphi * rphi(void);
+    TRGCDCDisplayRphi* rphi(void);
 
   private: // Actions
 
@@ -176,70 +176,79 @@ class TRGCDCDisplay : public Gtk::Window {
     friend class TRGCDCDisplayHough;
 
     /// Rphi display.
-    TRGCDCDisplayRphi * _rphi;
-};
+    TRGCDCDisplayRphi* _rphi;
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-void
-TRGCDCDisplay::stage(const std::string & a) {
+  inline
+  void
+  TRGCDCDisplay::stage(const std::string& a)
+  {
     _stage = a;
     Glib::ustring s = "Stage : " + _stage + "\nInformation : " + _info;
     _label.set_label(s);
-}
+  }
 
-inline
-void
-TRGCDCDisplay::information(const std::string & a) {
+  inline
+  void
+  TRGCDCDisplay::information(const std::string& a)
+  {
 //  _info += a;
     _info = a;
     Glib::ustring s = "Stage : " + _stage + "\nInformation : " + _info;
     _label.set_label(s);
-}
+  }
 
-inline
-bool
-TRGCDCDisplay::skip(void) const {
+  inline
+  bool
+  TRGCDCDisplay::skip(void) const
+  {
     return _skip;
-}
+  }
 
-inline
-bool
-TRGCDCDisplay::skip(bool a) {
+  inline
+  bool
+  TRGCDCDisplay::skip(bool a)
+  {
     return _skip = a;
-}
+  }
 
-inline
-bool
-TRGCDCDisplay::wireName(void) const {
+  inline
+  bool
+  TRGCDCDisplay::wireName(void) const
+  {
     return _wireName;
-}
+  }
 
-inline
-void
-TRGCDCDisplay::beginningOfEvent(void) {
+  inline
+  void
+  TRGCDCDisplay::beginningOfEvent(void)
+  {
     _skipEvent = false;
     _endOfEvent = false;
-}
+  }
 
-inline
-void
-TRGCDCDisplay::endOfEvent(void) {
+  inline
+  void
+  TRGCDCDisplay::endOfEvent(void)
+  {
     _endOfEvent = true;
-}
+  }
 
-inline
-void
-TRGCDCDisplay::link(TRGCDCDisplayRphi & a) {
+  inline
+  void
+  TRGCDCDisplay::link(TRGCDCDisplayRphi& a)
+  {
     _rphi = & a;
-}
+  }
 
-inline
-TRGCDCDisplayRphi *
-TRGCDCDisplay::rphi(void) {
+  inline
+  TRGCDCDisplayRphi*
+  TRGCDCDisplay::rphi(void)
+  {
     return _rphi;
-}
+  }
 
 } // namespace Belle2
 

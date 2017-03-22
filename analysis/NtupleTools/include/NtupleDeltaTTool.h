@@ -24,6 +24,8 @@ namespace Belle2 {
   private:
     /** Delta T : TBrec - TBtag. */
     float m_fDeltaT;
+    /** Delta T Error */
+    float m_fDeltaTErr;
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
   public:

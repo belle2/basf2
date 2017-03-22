@@ -8,24 +8,24 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "vxdtf/trackletFilters.cc"
-#include "vxdtf/sector.cc"
-#include "vxdtf/secMapVector.cc"
-#include "vxdtf/hittfinfo.cc"
-#include "vxdtf/filterID.cc"
+#include "vxdtf/trackletFilters.h"
+#include "vxdtf/sector.h"
+#include "vxdtf/secMapVector.h"
+#include "vxdtf/hittfinfo.h"
+#include "vxdtf/filterID.h"
 // #include "vxdtf/filters.cc"
-#include "vxdtf/collectortfinfo.cc"
-#include "vxdtf/twohitfilters.cc"
-#include "vxdtf/trackcandidatetfinfo.cc"
-#include "vxdtf/threehitfilters.cc"
-#include "vxdtf/sectortools.cc"
-#include "vxdtf/sectortfinfo.cc"
-#include "vxdtf/fullSecID.cc"
-#include "vxdtf/fourhitfilters.cc"
-#include "vxdtf/basetfinfo.cc"
-#include "vxdtf/clustertfinfo.cc"
-#include "vxdtf/celltfinfo.cc"
-#include "vxdtf/vXDTFRawSecMap.cc"
+#include "vxdtf/collectortfinfo.h"
+#include "vxdtf/twohitfilters.h"
+#include "vxdtf/trackcandidatetfinfo.h"
+#include "vxdtf/threehitfilters.h"
+#include "vxdtf/sectortools.h"
+#include "vxdtf/sectortfinfo.h"
+#include "vxdtf/fullSecID.h"
+#include "vxdtf/fourhitfilters.h"
+#include "vxdtf/basetfinfo.h"
+#include "vxdtf/clustertfinfo.h"
+#include "vxdtf/celltfinfo.h"
+#include "vxdtf/vXDTFRawSecMap.h"
 
 /// for the redesign:
 // #include "vxdtfRedesign/observers.cc"
@@ -34,4 +34,4 @@
 
 
 /// for testing:
-#include "vxdtf/sandBox4Testing.cc"
+#include "vxdtf/sandBox4Testing.h"

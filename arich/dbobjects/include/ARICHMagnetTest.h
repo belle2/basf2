@@ -23,7 +23,7 @@ namespace Belle2 {
      * Default constructor
      */
     ARICHMagnetTest(): m_serial(""), m_deadTime(), m_dead_lowerA(-1.), m_dead_lowerB(-1.), m_dead_lowerC(-1.), m_dead_lowerD(-1.),
-      m_comment("") {}
+      m_getter(false), m_comment("") {}
 
     /**
      * Destructor

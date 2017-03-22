@@ -14,8 +14,6 @@
 // Own include
 #include <arich/modules/arichNtuple/ARICHNtupleModule.h>
 
-
-
 // Hit classes
 #include <framework/dataobjects/EventMetaData.h>
 #include <mdst/dataobjects/Track.h>
@@ -85,11 +83,14 @@ namespace Belle2 {
     m_tree->Branch("run", &m_arich.run, "run/I");
 
     m_tree->Branch("pValue", &m_arich.pValue, "pValue/F");
+    m_tree->Branch("d0", &m_arich.z0, "pValue/F");
+    m_tree->Branch("z0", &m_arich.d0, "pValue/F");
 
     m_tree->Branch("PDG", &m_arich.PDG, "PDG/I");
     m_tree->Branch("motherPDG", &m_arich.motherPDG, "motherPDG/I");
     m_tree->Branch("primary", &m_arich.primary, "primary/S");
     m_tree->Branch("seen", &m_arich.seen, "seen/S");
+    m_tree->Branch("scatter", &m_arich.scatter, "scatter/I");
 
     m_tree->Branch("rhoProd", &m_arich.rhoProd, "rhoProd/F");
     m_tree->Branch("zProd",   &m_arich.zProd,   "zProd/F");
@@ -106,8 +107,9 @@ namespace Belle2 {
 
     m_tree->Branch("recHit",  &m_arich.recHit,  "PDG/I:x/F:y:z:p:theta:phi");
     m_tree->Branch("mcHit",  &m_arich.mcHit,  "PDG/I:x/F:y:z:p:theta:phi");
+    m_tree->Branch("winHit",  &m_arich.winHit,  "x/F:y");
     m_tree->Branch("nrec", &m_arich.nRec, "nRec/I");
-    m_tree->Branch("photons", &m_arich.photons, "photons[nRec][4]/F");
+    m_tree->Branch("photons", "std::vector<Belle2::ARICHPhoton>", &m_arich.photons);
 
     // input
     StoreArray<ARICHTrack>::required();
@@ -140,6 +142,13 @@ namespace Belle2 {
 
       m_arich.clear();
 
+      // set hapd window hit if available
+      if (arichTrack.hitsWindow()) {
+        TVector2 winHit = arichTrack.windowHitPosition();
+        m_arich.winHit[0] = winHit.X();
+        m_arich.winHit[1] = winHit.Y();
+      }
+
       m_arich.logL.e = lkh->getLogL(Const::electron);
       m_arich.logL.mu = lkh->getLogL(Const::muon);
       m_arich.logL.pi = lkh->getLogL(Const::pion);
@@ -167,7 +176,12 @@ namespace Belle2 {
       const Track* mdstTrack = lkh->getRelated<Track>();
       if (mdstTrack) {
         const TrackFitResult* fitResult = mdstTrack->getTrackFitResult(Const::pion);
-        if (fitResult) m_arich.pValue = fitResult->getPValue();
+        if (fitResult) {
+          m_arich.pValue = fitResult->getPValue();
+          TVector3 trkPos = fitResult->getPosition();
+          m_arich.z0 = trkPos.Z();
+          m_arich.d0 = (trkPos.XYvector()).Mod();
+        }
         m_arich.status += 10;
 
         particle = mdstTrack->getRelated<MCParticle>();
@@ -185,8 +199,14 @@ namespace Belle2 {
           m_arich.rhoDec = decVertex.Perp();
           m_arich.zDec = decVertex.Z();
           m_arich.phiDec = decVertex.Phi();
+
+          std::vector<Belle2::MCParticle*> daughs =  particle->getDaughters();
+          for (const auto daugh : daughs) {
+            if (daugh->getPDG() == particle->getPDG()) m_arich.scatter = 1;
+          }
         }
       }
+
 
       // get reconstructed photons associated with track
       const std::vector<ARICHPhoton>& photons = arichTrack.getPhotons();
@@ -194,10 +214,7 @@ namespace Belle2 {
       int nphot = 0;
       for (auto it = photons.begin(); it != photons.end(); ++it) {
         ARICHPhoton iph = *it;
-        m_arich.photons[nphot][0] = iph.thetaCer;
-        m_arich.photons[nphot][1] = iph.phiCer;
-        m_arich.photons[nphot][2] = iph.aerogel;
-        m_arich.photons[nphot][3] = iph.mirrorId;
+        m_arich.photons.push_back(iph);
         nphot++;
         if (nphot == 200) break;
       }
@@ -243,6 +260,11 @@ namespace Belle2 {
             m_arich.rhoDec = decVertex.Perp();
             m_arich.zDec = decVertex.Z();
             m_arich.phiDec = decVertex.Phi();
+
+            std::vector<Belle2::MCParticle*> daughs =  particle->getDaughters();
+            for (const auto daugh : daughs) {
+              if (daugh->getPDG() == particle->getPDG()) m_arich.scatter = 1;
+            }
           }
         }
       }

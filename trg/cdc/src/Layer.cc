@@ -23,61 +23,65 @@ using namespace std;
 
 namespace Belle2 {
 
-const TRGCDCLayer * TRGCDCUndefinedLayer = new TRGCDCLayer(9999,
-							   9999,
-							   9999,
-							   9999,
-							   9999,
-							   0,
-							   0,
-							   9999,
-							   9999,
-							   0,
-							   0);
+  const TRGCDCLayer* TRGCDCUndefinedLayer = new TRGCDCLayer(9999,
+                                                            9999,
+                                                            9999,
+                                                            9999,
+                                                            9999,
+                                                            0,
+                                                            0,
+                                                            9999,
+                                                            9999,
+                                                            0,
+                                                            0);
 
-TRGCDCLayer::TRGCDCLayer(unsigned id,
-			 unsigned superLayerId,
-			 unsigned localLayerId,
-			 unsigned axialStereoLayerId,
-			 unsigned axialStereoSuperLayerId,
-			 float offset,
-			 int nShifts,
-			 float cellSize,
-			 unsigned nCells,
-			 float innerRadius,
-			 float outerRadius)
-:  _name("unknown"),
-   _id(id),
-   _superLayerId(superLayerId),
-   _localLayerId(localLayerId),
-   _axialStereoLayerId(axialStereoLayerId),
-   _axialStereoSuperLayerId(axialStereoSuperLayerId),
-   _offset(offset),
-   _nShifts(nShifts),
-   _cellSize(cellSize),
-   _nCells(nCells),
-   _innerRadius(innerRadius),
-   _outerRadius(outerRadius) {
-}
+  TRGCDCLayer::TRGCDCLayer(unsigned id,
+                           unsigned superLayerId,
+                           unsigned localLayerId,
+                           unsigned axialStereoLayerId,
+                           unsigned axialStereoSuperLayerId,
+                           float offset,
+                           int nShifts,
+                           float cellSize,
+                           unsigned nCells,
+                           float innerRadius,
+                           float outerRadius)
+    :  _name("unknown"),
+       _id(id),
+       _superLayerId(superLayerId),
+       _localLayerId(localLayerId),
+       _axialStereoLayerId(axialStereoLayerId),
+       _axialStereoSuperLayerId(axialStereoSuperLayerId),
+       _offset(offset),
+       _nShifts(nShifts),
+       _cellSize(cellSize),
+       _nCells(nCells),
+       _innerRadius(innerRadius),
+       _outerRadius(outerRadius)
+  {
+  }
 
-TRGCDCLayer::TRGCDCLayer(unsigned id,
-			 const TRGCDCCell & w)
-:  _id(id),
-   _superLayerId(w.superLayerId()),
-   _localLayerId(0),
-   _axialStereoLayerId(0),
-   _axialStereoSuperLayerId(0),
-   _offset(w.layer().offset()),
-   _nShifts(w.layer().nShifts()),
-   _cellSize(w.cellSize()),
-   _nCells(w.layer().nCells()) {
-}
+  TRGCDCLayer::TRGCDCLayer(unsigned id,
+                           const TRGCDCCell& w)
+    :  _id(id),
+       _superLayerId(w.superLayerId()),
+       _localLayerId(0),
+       _axialStereoLayerId(0),
+       _axialStereoSuperLayerId(0),
+       _offset(w.layer().offset()),
+       _nShifts(w.layer().nShifts()),
+       _cellSize(w.cellSize()),
+       _nCells(w.layer().nCells())
+  {
+  }
 
-TRGCDCLayer::~TRGCDCLayer() {
-}
+  TRGCDCLayer::~TRGCDCLayer()
+  {
+  }
 
-void
-TRGCDCLayer::dump(const string &, const string & pre) const {
+  void
+  TRGCDCLayer::dump(const string&, const string& pre) const
+  {
     cout << pre;
     cout << "layer " << _id;
     cout << ", " << stereoType();
@@ -92,24 +96,25 @@ TRGCDCLayer::dump(const string &, const string & pre) const {
     cout << ", " << _nCells << " wires";
     cout << endl;
     //    for (int i=0;i<_nCells;++i) wire(i)->dump(pre);
-}
+  }
 
-const TRGCDCCell &
-TRGCDCLayer::cell(int id) const {
+  const TRGCDCCell&
+  TRGCDCLayer::cell(int id) const
+  {
     if (_nCells == 0) {
-	cout << "TRGCDCLayer !!! This has no cell member : " << name() << endl;
-	return * (TRGCDCCell *)(TRGCDCUndefinedLayer);
+      cout << "TRGCDCLayer !!! This has no cell member : " << name() << endl;
+      return * (TRGCDCCell*)(TRGCDCUndefinedLayer);
     }
 
     if (id < 0)
-        while (id < 0)
-            id += _nCells;
+      while (id < 0)
+        id += _nCells;
 
     if (id >= (int) _nCells)
-        id %= (int) _nCells;
+      id %= (int) _nCells;
 
     return * (* this)[id];
-}
+  }
 
 } // namespace Belle2
 

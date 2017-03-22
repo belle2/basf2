@@ -88,6 +88,20 @@ namespace Belle2 {
     double m_bhabha10;
     //! Bhabha cobibation 11
     double m_bhabha11;
+    //! Bhabha cobibation 12
+    double m_bhabha12;
+    //! Bhabha cobibation 13
+    double m_bhabha13;
+    //! Bhabha cobibation 14
+    double m_bhabha14;
+    //! Bhabha cobibation 15
+    double m_bhabha15;
+    //! Bhabha cobibation 16
+    double m_bhabha16;
+    //! Bhabha cobibation 17
+    double m_bhabha17;
+    //! Bhabha cobibation 18
+    double m_bhabha18;
     //! ICN
     //! Total ICN
     int m_icn;
@@ -103,12 +117,26 @@ namespace Belle2 {
     int  m_itimebin;
     //! beambkf veto
     int m_BeamBkgVeto;
+    //! bhabha veto
+    int m_BhabhaVeto;
     //! max TC Id
     int m_maxTCId;
+    //! The number of TC Hit
+    int m_NofTCHit;
+    //! The number of TC Hit in Barrel
+    int m_BrNofTCHit;
+    //! The number of TC Hit in Forward Endcap
+    int m_FwdNofTCHit;
+    //! The number of TC Hit in Backward Endcap
+    int m_BwdNofTCHit;
+
+
+
     //! max TC Energy
     double m_maxTCEnergy;
     //! max TC Timing
     double m_eventtiming;
+
 
     //! Set event id
     void setEventId(int eventId) { m_eventId = eventId; }
@@ -170,6 +198,20 @@ namespace Belle2 {
     void setBhabha10(double bhabha10) { m_bhabha10 = bhabha10; }
     //!
     void setBhabha11(double bhabha11) { m_bhabha11 = bhabha11; }
+    //!
+    void setBhabha12(double bhabha12) { m_bhabha12 = bhabha12; }
+    //!
+    void setBhabha13(double bhabha13) { m_bhabha13 = bhabha13; }
+    //!
+    void setBhabha14(double bhabha14) { m_bhabha14 = bhabha14; }
+    //!
+    void setBhabha15(double bhabha15) { m_bhabha15 = bhabha15; }
+    //!
+    void setBhabha16(double bhabha16) { m_bhabha16 = bhabha16; }
+    //!
+    void setBhabha17(double bhabha17) { m_bhabha17 = bhabha17; }
+    //!
+    void setBhabha18(double bhabha18) { m_bhabha18 = bhabha18; }
     //! Set ICN
     void setICN(int icn) { m_icn = icn; }
     //!
@@ -187,12 +229,21 @@ namespace Belle2 {
     //!
     void setBeamBkgVeto(int BeamBkgVeto) { m_BeamBkgVeto = BeamBkgVeto; }
     //!
+    void setBhabhaVeto(int bhabhaveto) { m_BhabhaVeto = bhabhaveto; }
+    //!
     void setEventTiming(double eventtiming) { m_eventtiming = eventtiming; }
     //!
     void setMaxTCId(int maxTCId) { m_maxTCId = maxTCId; }
     //!
     void setMaxTCEnergy(double maxTCEnergy) { m_maxTCEnergy = maxTCEnergy; }
     //!
+    void setNofTCHit(double NofTCHit) { m_NofTCHit = NofTCHit; }
+    //!
+    void setBrNofTCHit(double BrNofTCHit) { m_BrNofTCHit = BrNofTCHit; }
+    //!
+    void setFwdNofTCHit(double FwdNofTCHit) { m_FwdNofTCHit = FwdNofTCHit; }
+    //!
+    void setBwdNofTCHit(double BwdNofTCHit) { m_BwdNofTCHit = BwdNofTCHit; }
 
 
 
@@ -234,6 +285,13 @@ namespace Belle2 {
       m_bhabha09 = 0;
       m_bhabha10 = 0;
       m_bhabha11 = 0;
+      m_bhabha12 = 0;
+      m_bhabha13 = 0;
+      m_bhabha14 = 0;
+      m_bhabha15 = 0;
+      m_bhabha16 = 0;
+      m_bhabha17 = 0;
+      m_bhabha18 = 0;
       //!
       m_icn = 0;
       m_icn_br = 0;
@@ -242,13 +300,15 @@ namespace Belle2 {
       //!
       m_bitECLtoGDL = 0;
       m_BeamBkgVeto = 0;
+      m_BhabhaVeto = 0;
       m_eventtiming = 0;
       m_itimebin = 0;
       m_maxTCId = 0;
       m_maxTCEnergy = 0;
-
-
-
+      m_NofTCHit = 0;
+      m_BrNofTCHit = 0;
+      m_FwdNofTCHit = 0;
+      m_BwdNofTCHit = 0;
 
     }
 

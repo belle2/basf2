@@ -25,23 +25,23 @@
 
 namespace Belle2 {
 
-class TRGCDC;
-class TRGCDCSegment;
-class TRGCDCSegmentHit;
-class TRGCDCTrackSegmentFinder;
+  class TRGCDC;
+  class TRGCDCSegment;
+  class TRGCDCSegmentHit;
+  class TRGCDCTrackSegmentFinder;
 
-class TRGCDCEventTimeFinder
+  class TRGCDCEventTimeFinder
     : public TRGBoard,
-      public std::vector <const TRGCDCTrackSegmentFinder *> {
+      public std::vector <const TRGCDCTrackSegmentFinder*> {
 
   public:
 
     // Constructor.
-    TRGCDCEventTimeFinder(const std::string & name,
-                          const TRGClock & systemClock,
-                          const TRGClock & dataClock,
-                          const TRGClock & userClockInput,
-                          const TRGClock & userClockOutput);
+    TRGCDCEventTimeFinder(const std::string& name,
+                          const TRGClock& systemClock,
+                          const TRGClock& dataClock,
+                          const TRGClock& userClockInput,
+                          const TRGClock& userClockOutput);
 
     // Destructor.
     ~TRGCDCEventTimeFinder();
@@ -51,15 +51,15 @@ class TRGCDCEventTimeFinder
     /// return version
     static std::string version(void);
 
-    void push_back(const TRGCDCTrackSegmentFinder *);
+    void push_back(const TRGCDCTrackSegmentFinder*);
 
     /// Firmware simulation. yi
     void simulate(void);
 
     /// Output packer for tracker
-    TRGSignalVector * packerForTracker(vector<TRGSignalVector *> &,
-                                       vector<int> &,
-                                       const unsigned);
+    TRGSignalVector* packerForTracker(vector<TRGSignalVector*>&,
+                                      vector<int>&,
+                                      const unsigned);
 
   private:
 
@@ -67,7 +67,7 @@ class TRGCDCEventTimeFinder
     //TRGSignalBundle * _tisb;
 
     /// Output signal bundle.
-};
+  };
 
 } // namespace Belle2
 

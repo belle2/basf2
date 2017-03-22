@@ -213,7 +213,7 @@ def add_mc_track_finding(path, components=None):
                         UseCDCHits=is_cdc_used(components))
 
 
-def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
+def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
     """
     Convenience function for adding all cdc track finder modules
     to the path.
@@ -250,13 +250,28 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
     # Combine segments with axial tracks
     path.add_module('SegmentTrackCombiner',
                     segmentTrackFilter="mva",
-                    segmentTrackFilterParameters={"cut": 0.75},
+                    segmentTrackFilterParameters={"cut": 0.74},
                     trackFilter="mva",
                     trackFilterParameters={"cut": 0.1})
 
+    if with_ca:
+        path.add_module("TrackFinderSegmentPairAutomaton",
+                        tracks="CDCTrackVector2")
+
+        # Overwrites the origin CDCTrackVector
+        path.add_module("TrackCombiner",
+                        inputTracks="CDCTrackVector",
+                        secondaryInputTracks="CDCTrackVector2",
+                        tracks="CDCTrackVector")
+
     # Improve the quality of all tracks and output
     path.add_module("TrackQualityAsserterCDC",
-                    corrections=["LayerBreak", "LargeBreak2", "OneSuperlayer", "Small"])
+                    corrections=[
+                        "LayerBreak",
+                        "LargeBreak2",
+                        "OneSuperlayer",
+                        "Small",
+                    ])
 
     # Export CDCTracks to RecoTracks representation
     path.add_module("TrackExporter",
@@ -314,7 +329,7 @@ def add_cdc_cr_track_finding(path,
     # Combine segments with axial tracks
     path.add_module('SegmentTrackCombiner',
                     segmentTrackFilter="mva",
-                    segmentTrackFilterParameters={"cut": 0.75},
+                    segmentTrackFilterParameters={"cut": 0.74},
                     trackFilter="mva",
                     trackFilterParameters={"cut": 0.1})
 
@@ -338,8 +353,7 @@ def add_cdc_cr_track_finding(path,
     # Export CDCTracks to RecoTracks representation
     path.add_module("TrackExporter",
                     inputTracks="OrientedCDCTrackVector",
-                    RecoTracksStoreArrayName=reco_tracks,
-                    )
+                    RecoTracksStoreArrayName=reco_tracks)
 
 
 def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None):

@@ -37,6 +37,24 @@ namespace Belle2 {
       setBeta(0); // use default: beta from momentum and mass
     }
 
+
+    void TOPreco::setChannelMask(const DBObjPtr<TOPCalChannelMask>& mask)
+    {
+      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+      const auto& mapper = TOPGeometryPar::Instance()->getChannelMapper();
+      int numModules = geo->getNumModules();
+      for (int moduleID = 1; moduleID <= numModules; moduleID++) {
+        unsigned numPixels = geo->getModule(moduleID).getPMTArray().getNumPixels();
+        for (unsigned channel = 0; channel < numPixels; channel++) {
+          int mdn = moduleID - 1;
+          int ich = mapper.getPixelID(channel) - 1;
+          int flag = mask->isActive(moduleID, channel);
+          set_channel_mask_(&mdn, &ich, &flag);
+        }
+      }
+    }
+
+
     void TOPreco::setHypID(int NumHyp, int HypID[])
     {
       rtra_set_hypid_(&NumHyp, HypID);

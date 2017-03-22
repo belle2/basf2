@@ -243,6 +243,13 @@ namespace Belle2 {
 
     ROOTDataset::ROOTDataset(const GeneralOptions& general_options) : Dataset(general_options)
     {
+      for (auto variable : general_options.m_variables)
+        for (auto spectator : general_options.m_spectators)
+          if (variable == spectator or variable == general_options.m_target_variable or spectator == general_options.m_target_variable) {
+            B2ERROR("Interface doesn't support variable more then one time in either spectators, variables or target variable");
+            throw std::runtime_error("Interface doesn't support variable more then one time in either spectators, variables or target variable");
+          }
+
       auto filenames = RootIOUtilities::expandWordExpansions(m_general_options.m_datafiles);
       if (filenames.empty()) {
         B2ERROR("Found no valid filenames in GeneralOptions");

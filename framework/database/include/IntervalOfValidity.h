@@ -22,15 +22,17 @@ namespace Belle2 {
    */
   class IntervalOfValidity final {
   public:
+    /** Default constructor which will create an empty iov */
+    IntervalOfValidity(): IntervalOfValidity(-1, -1, -1, -1) {}
 
     /**
-     * Constructor. By default an empty validity interval is created where low and high experiment numbers are -1.
+     * Construct a new iov.
      * @param experimentLow   lowest experiment number of the validity range, -1 means no bound
      * @param runLow          lowest run number in the experiment with number experimentLow of the validity range, -1 means no bound
      * @param experimentHigh  highest experiment number of the validity range, -1 means no bound
      * @param runHigh         highest run number in the experiment with number experimentHigh of the validity range, -1 means no bound
      */
-    IntervalOfValidity(int experimentLow = -1, int runLow = -1, int experimentHigh = -1, int runHigh = -1);
+    IntervalOfValidity(int experimentLow, int runLow, int experimentHigh , int runHigh);
 
     /**
      * Destructor.
@@ -99,14 +101,14 @@ namespace Belle2 {
     /** Input stream operator for reading IoV data from a text file.
      *
      *  @param input The input stream.
-     *  @param metaData The InervalOfValidity object.
+     *  @param iov The InervalOfValidity object.
      */
     friend std::istream& operator>> (std::istream& input, IntervalOfValidity& iov);
 
     /** Output stream operator for writing IoV data to a text file.
      *
      *  @param output The output stream.
-     *  @param metaData The IntervalOfValidity object.
+     *  @param iov The IntervalOfValidity object.
      */
     friend std::ostream& operator<< (std::ostream& output, const IntervalOfValidity& iov);
 
@@ -130,17 +132,21 @@ namespace Belle2 {
 
     /**
      * Helper function to check whether a given experiment/run number is above or below the lower bound of the interval of validity.
-     * @param experiement   the experiment number
-     * @param run           the run number
-     * @return              0 if the given experiment/run number is equal to the lower bound, -1 if it is below the lower bound, 1 if it is above the lower bound.
+     * @param experiment   the experiment number
+     * @param run          the run number
+     * @return             0 if the given experiment/run number is equal to the
+     *                     lower bound, -1 if it is below the lower bound, 1 if
+     *                     it is above the lower bound.
      */
     int checkLowerBound(int experiment, int run) const;
 
     /**
      * Helper function to check whether a given experiment/run number is above or below the upper bound of the interval of validity.
-     * @param experiement   the experiment number
-     * @param run           the run number
-     * @return              0 if the given experiment/run number is equal to the upper bound, -1 if it is below the upper bound, 1 if it is above the upper bound.
+     * @param experiment   the experiment number
+     * @param run          the run number
+     * @return             0 if the given experiment/run number is equal to the
+     *                     upper bound, -1 if it is below the upper bound, 1 if
+     *                     it is above the upper bound.
      */
     int checkUpperBound(int experiment, int run) const;
 

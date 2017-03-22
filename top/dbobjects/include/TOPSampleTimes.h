@@ -58,51 +58,51 @@ namespace Belle2 {
     }
 
     /**
-     * Set equidistant time axis.
+     * Sets equidistant time axis.
      * @param syncTimeBase sinchronization time base (width of 2 ASIC windows)
      */
     void setTimeAxis(double syncTimeBase);
 
     /**
-     * Set time axis from calibration data.
+     * Sets time axis from calibration data.
      * @param sampleTimes vector of 256 elements of sample times
      * @param syncTimeBase sinchronization time base (width of 2 ASIC windows)
      */
     void setTimeAxis(const std::vector<double>& sampleTimes, double syncTimeBase);
 
     /**
-     * Return scrod ID
+     * Returns scrod ID
      * @return scrod ID
      */
     unsigned getScrodID() const {return m_scrodID;}
 
     /**
-     * Return hardware channel number
+     * Returns hardware channel number
      * @return channel number
      */
     unsigned getChannel() const {return m_channel;}
 
     /**
-     * Return time axis range (time interval corresponding to 4 asic windows)
+     * Returns time axis range (time interval corresponding to 4 asic windows)
      * @return time axis range
      */
     double getTimeRange() const {return m_timeAxis[c_TimeAxisSize];}
 
     /**
-     * Return time axis (sample times)
+     * Returns time axis (sample times)
      * @return vector of sample times
      */
     std::vector<double> getTimeAxis() const
     {
       std::vector<double> timeAxis;
-      for (unsigned i = 0; i < c_TimeAxisSize; i++) {
+      for (unsigned i = 0; i < c_TimeAxisSize + 1; i++) {
         timeAxis.push_back(m_timeAxis[i]);
       }
       return timeAxis;
     }
 
     /**
-     * Return time in respect to sample 0 of window 0
+     * Returns time in respect to sample 0 of window 0
      *
      * Note: sample is float - digits that follow the decimal point are used to
      * interpolate the time  btw. two samples
@@ -110,10 +110,10 @@ namespace Belle2 {
      * @param sample sample counted from the first one in the specified ASIC window
      * @return time in [ns]
      */
-    double getTime(unsigned window, double sample) const;
+    double getFullTime(unsigned window, double sample) const;
 
     /**
-     * Return time in respect to sample 0 of the specified ASIC window.
+     * Returns time in respect to sample 0 of the specified ASIC window.
      *
      * Note: sample is float - digits that follow the decimal point are used to
      * interpolate the time  btw. two samples
@@ -121,13 +121,13 @@ namespace Belle2 {
      * @param sample sample counted from the first one in the specified ASIC window
      * @return time in [ns]
      */
-    double getTimeDifference(unsigned window, double sample) const
+    double getTime(unsigned window, double sample) const
     {
-      return getTime(window, sample) - getTime(window, 0);
+      return getFullTime(window, sample) - getFullTime(window, 0);
     }
 
     /**
-     * Return time difference between sample2 and sample1
+     * Returns time difference between sample2 and sample1
      *
      * Note: sample is float - digits that follow the decimal point are used to
      * interpolate the time  btw. two samples
@@ -138,8 +138,20 @@ namespace Belle2 {
      */
     double getDeltaTime(unsigned window, double sample2, double sample1) const
     {
-      return getTime(window, sample2) - getTime(window, sample1);
+      return getFullTime(window, sample2) - getFullTime(window, sample1);
     }
+
+    /**
+     * Returns sample in respect to sample 0 of the specified ASIC window
+     * (inverse of getTime).
+     *
+     * Note: sample is float - digits that follow the decimal point are used to
+     * interpolate the time  btw. two samples
+     * @param window ASIC window number
+     * @param time time in respect to time of sample 0 of the specified ASIC window
+     * @return sample
+     */
+    double getSample(unsigned window, double time) const;
 
     /**
      * Is time axis calibrated or equidistant

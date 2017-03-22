@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework','topcaf_dataobjects', '$ROOT_LIBS']
+env['LIBS'] = ['framework','topcaf_dataobjects','topcaf', '$ROOT_LIBS']
 
 Return('env')

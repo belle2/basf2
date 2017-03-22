@@ -18,16 +18,19 @@ namespace Belle2 {
     /// Enumeration for the variance information to be used.
     enum class EFitVariance {
       /// Use an equal variance of 1 for all observations
-      c_Unit,
+      c_Unit = 0,
+
+      /// Use the fixed nominal drift length variance for all observations
+      c_Nominal = 1,
 
       /// Use the drift length as variance.
-      c_DriftLength,
+      c_DriftLength = 2,
 
       /// Use the square of the drift length as variance.
-      c_Pseudo,
+      c_Pseudo = 3,
 
       /// Use the drift length variance
-      c_Proper,
+      c_Proper = 4,
     };
 
     /**
@@ -38,6 +41,8 @@ namespace Belle2 {
     {
       if (fitVarianceString == std::string("unit")) {
         return EFitVariance::c_Unit;
+      } else if (fitVarianceString == std::string("nominal")) {
+        return EFitVariance::c_Nominal;
       } else if (fitVarianceString == std::string("driftLength")) {
         return EFitVariance::c_DriftLength;
       } else if (fitVarianceString == std::string("pseudo")) {

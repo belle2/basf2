@@ -25,6 +25,7 @@ void HVControlDaemon::run()
   m_callback->getNode().setName(nodename);
   m_callback->setDB(config.get("hv.tablename"), &db);
   m_callback->setTimeout(config.getInt("hv.interval"));
+  LogFile::info("config.standby : " + config.get("hv.config.standby"));
   m_callback->setStandbyConfig(config.get("hv.config.standby"));
   m_callback->setShoulderConfig(config.get("hv.config.shoulder"));
   m_callback->setPeakConfig(config.get("hv.config.peak"));

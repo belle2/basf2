@@ -17,18 +17,16 @@
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
+#include <simulation/kernel/SensitiveDetectorBase.h>
 
 class G4LogicalVolume;
 
 namespace Belle2 {
 
   struct shape_t;
-  class BkgSensitiveDetector;
   class ECLCrystalsShapeAndPosition;
   namespace ECL {
 
-    class SensitiveDetector;
-    class SensitiveDiode;
 
     //!  The GeoECLCreator class.
     /*!
@@ -67,10 +65,6 @@ namespace Belle2 {
        */
       virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov);
 
-    protected:
-      /** isBeamBkgStudy for neutron flux  */
-      int isBeamBkgStudy;
-
     private:
 
       /** Make the ECL barrel and then place elements inside it */
@@ -96,10 +90,9 @@ namespace Belle2 {
       ECLCrystalsShapeAndPosition* m_sap;
 
       /** Sensitive detector */
-      SensitiveDetector* m_sensitive;
-      SensitiveDiode* m_sensediode;
+      Simulation::SensitiveDetectorBase* m_sensitive;
+      Simulation::SensitiveDetectorBase* m_sensediode;
       /** Vector of background-Sensitive detectors */
-      std::vector<BkgSensitiveDetector*> m_bkgsensitive;
       std::map<std::string, G4VisAttributes*> m_atts;
       int m_overlap;
     };

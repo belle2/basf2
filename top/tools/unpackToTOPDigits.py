@@ -45,7 +45,11 @@ main.add_module(converter)
 
 # output
 output = register_module('RootOutput')
-output.param('branchNames', ['TOPDigits', 'TOPRawDigits'])
+output.param('branchNames', ['TOPDigits', 'TOPRawDigits', 'TOPInterimFEInfos',
+                             'TOPRawDigitsToTOPInterimFEInfos',
+                             #                             'TOPRawWaveforms', 'TOPRawWaveformsToTOPInterimFEInfos',
+                             #                             'TOPRawDigitsToTOPRawWaveforms',
+                             ])
 main.add_module(output)
 
 # Print progress

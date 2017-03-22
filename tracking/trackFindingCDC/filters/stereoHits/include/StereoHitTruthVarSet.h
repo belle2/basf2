@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
+#include <tracking/trackFindingCDC/filters/stereoHits/BaseStereoHitFilter.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 namespace Belle2 {
@@ -28,7 +29,7 @@ namespace Belle2 {
     };
 
     /// Vehicle class to transport the variable names
-    struct StereoHitTruthVarNames : public VarNames<std::pair<const CDCTrack*, const CDCRLWireHit*>> {
+    struct StereoHitTruthVarNames : public VarNames<BaseStereoHitFilter::Object> {
 
       /// Number of variables to be generated
       static const size_t nVars = size(stereoHitTruthVarNames);
@@ -48,7 +49,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the contained variables
-      bool extract(const std::pair<const CDCTrack*, const CDCRLWireHit*>* testPair) override;
+      bool extract(const BaseStereoHitFilter::Object* testPair) override;
 
       void initialize() override
       {

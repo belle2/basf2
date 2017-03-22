@@ -17,14 +17,8 @@ using namespace Belle2;
 
 StoragerCallback::StoragerCallback()
 {
-  setAutoReply(false);
+  // setAutoReply(false);
   setTimeout(1);
-  /*
-  system("killall storagein");
-  system("killall storagerecord");
-  system("killall storageout");
-  system("killall basf2");
-  */
   m_eb_stat = NULL;
   m_errcount = 0;
   m_expno = -1;
@@ -87,8 +81,6 @@ void StoragerCallback::configure(const DBObject& obj) throw(RCHandlerException)
     add(new NSMVHandlerFloat(vname + "total_byte", true, false, 0));
     add(new NSMVHandlerFloat(vname + "flowrate", true, false, 0));
     add(new NSMVHandlerFloat(vname + "nqueue", true, false, 0));
-    //add(new NSMVHandlerFloat(vname + "nevent", true, false, 0));
-    //add(new NSMVHandlerFloat(vname + "evtrate", true, false, 0));
     m_nsenders++;
   }
   std::string vname = StringUtil::form("stat.out.");
@@ -99,8 +91,6 @@ void StoragerCallback::configure(const DBObject& obj) throw(RCHandlerException)
   add(new NSMVHandlerInt(vname + "event", true, false, 0));
   add(new NSMVHandlerFloat(vname + "total_byte", true, false, 0));
   add(new NSMVHandlerFloat(vname + "flowrate", true, false, 0));
-  //add(new NSMVHandlerFloat(vname + "nevent", true, false, 0));
-  //add(new NSMVHandlerFloat(vname + "evtrate", true, false, 0));
 }
 
 void StoragerCallback::term() throw()
@@ -196,49 +186,6 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     try_wait();
   }
 
-  /*
-  while(m_eb_stat && obj.hasObject("eb2rx") && obj("eb2rx").getBool("used")) {
-    std::string vname = StringUtil::form("stat.out.");
-    set(vname + "addr", (int)m_eb_stat->down(0).event);
-    set(vname + "port", (int)m_eb_stat->down(0).port);
-    bool connected = (int)m_eb_stat->down(0).port > 0;
-    LogFile::info("downstream %s", (connected?"connected":"disconnected"));
-    bool connected_all = true;
-    connected_all &= connected;
-    set(vname + "connection", connected);
-    const DBObject& eb2rx(obj("eb2rx"));
-    const DBObjectList& sender(eb2rx.getObjects("sender"));
-    for (int i = 0; i < m_nsenders; i++) {
-      if (sender[i].getBool("used")) {
-  std::string vname = StringUtil::form("stat.in[%d].", i);
-  set(vname + "addr", (int)m_eb_stat->up(i).event);
-  set(vname + "port", (int)m_eb_stat->up(i).port);
-  bool connected = (int)m_eb_stat->up(i).port > 0;
-  LogFile::info("upstream[%d] %s", i, (connected?"connected":"disconnected"));
-  set(vname + "connection", connected);
-  connected_all &= connected;
-      }
-    }
-    LogFile::info("all %s", (connected_all?"connected":"disconnected"));
-    if (connected_all) break;
-    try {
-      NSMCommunicator& com(wait(NSMNode(), RCCommand::UNKNOWN, 1));
-      NSMMessage msg = com.getMessage();
-      RCCommand cmd2(msg.getRequestName());
-      if (cmd2 == RCCommand::ABORT) {
-  setState(RCState::ABORTING_RS);
-  abort();
-  return;
-      } else {
-  perform(com);
-      }
-    } catch (const TimeoutException& e) {
-    } catch (const IOException& e) {
-      log(LogFile::ERROR, "IOError %s", e.what());
-      return;
-    }
-  }
-  */
   if (!m_con[1].isAlive()) {
     m_con[1].clearArguments();
     m_con[1].setExecutable("storagerecord");

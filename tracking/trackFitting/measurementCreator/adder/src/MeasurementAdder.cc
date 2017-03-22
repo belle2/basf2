@@ -43,19 +43,24 @@ MeasurementAdder::MeasurementAdder(
   const std::string& storeArrayNameOfCDCHits,
   const std::string& storeArrayNameOfBKLMHits,
   const std::string& storeArrayNameOfEKLMHits,
-  const bool& cosmicsTemporaryFix) :
+  const bool& cosmicsTemporaryFix,
+  const bool initializeCDCTranslators) :
   m_param_storeArrayNameOfPXDHits(storeArrayNameOfPXDHits),
   m_param_storeArrayNameOfSVDHits(storeArrayNameOfSVDHits),
   m_param_storeArrayNameOfCDCHits(storeArrayNameOfCDCHits),
   m_param_storeArrayNameOfBKLMHits(storeArrayNameOfBKLMHits),
   m_param_storeArrayNameOfEKLMHits(storeArrayNameOfEKLMHits)
 {
-  // Create new Translators and give them to the CDCRecoHits.
-  CDCRecoHit::setTranslators(new CDC::LinearGlobalADCCountTranslator(),
-                             new CDC::RealisticCDCGeometryTranslator(true),
-                             new CDC::RealisticTDCCountTranslator(true),
-                             true, cosmicsTemporaryFix);
-
+  /** Configures whether the CDC Translators should be initialized by the FitterModule
+   * especially useful for VXD-only beamtest. In the future this could be changed to check
+   * implicitly if the cdc is available in the geometry.*/
+  if (initializeCDCTranslators) {
+    // Create new Translators and give them to the CDCRecoHits.
+    CDCRecoHit::setTranslators(new CDC::LinearGlobalADCCountTranslator(),
+                               new CDC::RealisticCDCGeometryTranslator(true),
+                               new CDC::RealisticTDCCountTranslator(true),
+                               true, cosmicsTemporaryFix);
+  }
   createGenfitMeasurementFactory();
   resetMeasurementCreatorsToDefaultSettings();
 }

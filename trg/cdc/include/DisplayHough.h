@@ -25,20 +25,20 @@
 #endif
 
 namespace Belle2_TRGCDC {
-    extern Belle2::TRGCDCDisplayRphi * D;
+  extern Belle2::TRGCDCDisplayRphi* D;
 }
 
 namespace Belle2 {
 
-class TRGCDCDisplayRphi;
+  class TRGCDCDisplayRphi;
 
 /// A class to display CDC trigger information.
-class TRGCDCDisplayHough : public TRGCDCDisplay {
-    
+  class TRGCDCDisplayHough : public TRGCDCDisplay {
+
   public:
 
     /// Default constructor
-    TRGCDCDisplayHough(const std::string & name = "TRGCDCDisplayHough",
+    TRGCDCDisplayHough(const std::string& name = "TRGCDCDisplayHough",
                        int size = 600);
 
     /// Destructor
@@ -63,35 +63,38 @@ class TRGCDCDisplayHough : public TRGCDCDisplay {
   public: // Access to drawing area.
 
     /// returns drawing area.
-    TRGCDCDisplayDrawingAreaHough & area(void);
+    TRGCDCDisplayDrawingAreaHough& area(void);
 
   private: // GTK stuff
     TRGCDCDisplayDrawingAreaHough _w;
     Gtk::Adjustment _adjustment;
     Gtk::HScale _scaler;
 
-};
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-TRGCDCDisplayDrawingAreaHough &
-TRGCDCDisplayHough::area(void) {
+  inline
+  TRGCDCDisplayDrawingAreaHough&
+  TRGCDCDisplayHough::area(void)
+  {
     return _w;
-}
+  }
 
-inline
-double
-TRGCDCDisplayHough::scale(void) const {
+  inline
+  double
+  TRGCDCDisplayHough::scale(void) const
+  {
     return _scaler.get_value();
-}
+  }
 
-inline
-double
-TRGCDCDisplayHough::scale(double a) {
+  inline
+  double
+  TRGCDCDisplayHough::scale(double a)
+  {
     _scaler.set_value(a);
     return _scaler.get_value();
-}
+  }
 
 } // namespace Belle2
 

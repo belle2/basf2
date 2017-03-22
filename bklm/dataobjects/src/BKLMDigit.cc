@@ -95,7 +95,7 @@ BKLMDigit::BKLMDigit(const BKLMDigit& digit) :
 
 DigitBase::EAppendStatus BKLMDigit::addBGDigit(const DigitBase* bg)
 {
-  const BKLMDigit* bgDigit = (BKLMDigit*)bg;
+  const BKLMDigit* bgDigit = static_cast<const BKLMDigit*>(bg);
 
   //the below is copied from the EKLMDigits (minus the stuff we don't have..)
 

@@ -20,8 +20,8 @@ namespace Belle2 {
       for (auto& databaseCutEntry : m_databaseObjects) {
         if (databaseCutEntry.hasChanged()) {
           B2ASSERT("The name of the database entry changed! This is not handled properly by the module.",
-                   m_cutsWithIdentifier.find(databaseCutEntry.getModule()) != m_cutsWithIdentifier.end());
-          m_cutsWithIdentifier[databaseCutEntry.getModule()] = databaseCutEntry->getCut();
+                   m_cutsWithIdentifier.find(databaseCutEntry.getName()) != m_cutsWithIdentifier.end());
+          m_cutsWithIdentifier[databaseCutEntry.getName()] = databaseCutEntry->getCut();
         }
       }
     }
@@ -32,6 +32,12 @@ namespace Belle2 {
       m_cutsWithIdentifier.clear();
 
       m_databaseObjects.reserve(cutIdentifiers.size());
+
+      B2DEBUG(100, "Initializing SoftwareTrigger DB with baseIdentifier " << baseIdentifier << " and " << cutIdentifiers.size() <<
+              " cutIdentifiers");
+      for (auto const& ci : cutIdentifiers) {
+        B2DEBUG(100, "-> with CutIndentifier " << ci);
+      }
 
       for (const std::string& cutIdentifier : cutIdentifiers) {
         const std::string& fullIdentifier = makeFullCutName(baseIdentifier, cutIdentifier);

@@ -21,13 +21,18 @@
 namespace Belle2 {
   /** Bfield manager to obtain the magnetic field at any point.
    * This class is implemented as singleton, there can only be one magnetic
-   * field. It has static members to get the field at a given point
+   * field. It has static members to get the field at a given point.
+   *
+   * @note For internal use in the simulation, there is also a BFieldMap class
+   * in the geometry package with similar behaviour. To ensure consistent
+   * output, the BFieldFrameworkInterface component provides a wrapper around
+   * BFieldMap and is used by default.
    */
   class BFieldManager {
   public:
     /** return the magnetic field at a given position.
      * @param[in] pos position, needs to be of at least size 3
-     * @param[out] magnetic field field value at position pos
+     * @param[out] field magnetic field field value at position pos
      */
     static void getField(const double* pos, double* field);
     /** return the magnetic field at a given position.

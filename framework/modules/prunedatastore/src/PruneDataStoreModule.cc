@@ -44,7 +44,7 @@ void PruneDataStoreModule::event()
 {
   auto& storemap = DataStore::Instance().getStoreEntryMap(DataStore::c_Event);
 
-  // iterate through all StoreEntries and check the Regex expression for each eintry
+  // iterate through all StoreEntries and check the Regex expression for each entry
   for (auto& datastore_item : storemap) {
     std::string const& datastore_key = datastore_item.first;
 

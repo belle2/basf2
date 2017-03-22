@@ -10,6 +10,7 @@
 
 // Own include
 #include <analysis/VariableManager/Variables.h>
+#include <analysis/VariableManager/ParameterVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
@@ -112,6 +113,95 @@ namespace Belle2 {
       return part->getMomentumVertexErrorMatrix()(elementI, elementJ);
     }
 
+    double particlePErr(const Particle* part)
+    {
+      TMatrixD jacobianRot(3, 3);
+      jacobianRot.Zero();
+
+      double cosPhi = cos(particlePhi(part));
+      double sinPhi = sin(particlePhi(part));
+      double cosTheta = particleCosTheta(part);
+      double sinTheta = sin(acos(cosTheta));
+      double p = particleP(part);
+
+      jacobianRot(0, 0) = sinTheta * cosPhi;
+      jacobianRot(0, 1) = sinTheta * sinPhi;
+      jacobianRot(1, 0) = cosTheta * cosPhi / p;
+      jacobianRot(1, 1) = cosTheta * sinPhi / p;
+      jacobianRot(0, 2) = cosTheta;
+      jacobianRot(2, 0) = -sinPhi / sinTheta / p;
+      jacobianRot(1, 2) = -sinTheta / p;
+      jacobianRot(2, 1) = cosPhi / sinTheta / p;
+
+      const auto& frame = ReferenceFrame::GetCurrent();
+
+      double errorSquared = frame.getMomentumErrorMatrix(part).GetSub(0, 2, 0, 2, " ").Similarity(jacobianRot)(0, 0);
+
+      if (errorSquared > 0.0)
+        return sqrt(errorSquared);
+      else
+        return 0.0;
+    }
+
+    double particlePxErr(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+
+      double errorSquared = frame.getMomentumErrorMatrix(part)(0, 0);
+
+      if (errorSquared > 0.0)
+        return sqrt(errorSquared);
+      else
+        return 0.0;
+    }
+
+    double particlePyErr(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      double errorSquared = frame.getMomentumErrorMatrix(part)(1, 1);
+
+      if (errorSquared > 0.0)
+        return sqrt(errorSquared);
+      else
+        return 0.0;
+    }
+
+    double particlePzErr(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      double errorSquared = frame.getMomentumErrorMatrix(part)(2, 2);
+
+      if (errorSquared > 0.0)
+        return sqrt(errorSquared);
+      else
+        return 0.0;
+    }
+
+    double particlePtErr(const Particle* part)
+    {
+      TMatrixD jacobianRot(3, 3);
+      jacobianRot.Zero();
+
+      double px = particlePx(part);
+      double py = particlePy(part);
+      double pt = particlePt(part);
+
+      jacobianRot(0, 0) = px / pt;
+      jacobianRot(0, 1) = py / pt;
+      jacobianRot(1, 0) = -py / (pt * pt);
+      jacobianRot(1, 1) = px / (pt * pt);
+      jacobianRot(2, 2) = 1;
+
+      const auto& frame = ReferenceFrame::GetCurrent();
+      double errorSquared = frame.getMomentumErrorMatrix(part).GetSub(0, 2, 0, 2, " ").Similarity(jacobianRot)(0, 0);
+
+      if (errorSquared > 0.0)
+        return sqrt(errorSquared);
+      else
+        return 0.0;
+
+    }
+
     double momentumDeviationChi2(const Particle* part)
     {
       double result = 1e6;
@@ -133,16 +223,80 @@ namespace Belle2 {
       return result;
     }
 
+    double particleTheta(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return acos(frame.getMomentum(part).CosTheta());
+    }
+
+    double particleThetaErr(const Particle* part)
+    {
+      TMatrixD jacobianRot(3, 3);
+      jacobianRot.Zero();
+
+      double cosPhi = cos(particlePhi(part));
+      double sinPhi = sin(particlePhi(part));
+      double cosTheta = particleCosTheta(part);
+      double sinTheta = sin(acos(cosTheta));
+      double p = particleP(part);
+
+      jacobianRot(0, 0) = sinTheta * cosPhi;
+      jacobianRot(0, 1) = sinTheta * sinPhi;
+      jacobianRot(1, 0) = cosTheta * cosPhi / p;
+      jacobianRot(1, 1) = cosTheta * sinPhi / p;
+      jacobianRot(0, 2) = cosTheta;
+      jacobianRot(2, 0) = -sinPhi / sinTheta / p;
+      jacobianRot(1, 2) = -sinTheta / p;
+      jacobianRot(2, 1) = cosPhi / sinTheta / p;
+
+      const auto& frame = ReferenceFrame::GetCurrent();
+      double errorSquared = frame.getMomentumErrorMatrix(part).GetSub(0, 2, 0, 2, " ").Similarity(jacobianRot)(1, 1);
+
+      if (errorSquared > 0.0)
+        return sqrt(errorSquared);
+      else
+        return 0.0;
+    }
+
     double particleCosTheta(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getMomentum(part).CosTheta();
     }
 
+    double particleCosThetaErr(const Particle* part)
+    {
+      return fabs(particleThetaErr(part) * sin(particleTheta(part)));
+    }
+
     double particlePhi(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
       return frame.getMomentum(part).Phi();
+    }
+
+    double particlePhiErr(const Particle* part)
+    {
+      TMatrixD jacobianRot(3, 3);
+      jacobianRot.Zero();
+
+      double px = particlePx(part);
+      double py = particlePy(part);
+      double pt = particlePt(part);
+
+      jacobianRot(0, 0) = px / pt;
+      jacobianRot(0, 1) = py / pt;
+      jacobianRot(1, 0) = -py / (pt * pt);
+      jacobianRot(1, 1) = px / (pt * pt);
+      jacobianRot(2, 2) = 1;
+
+      const auto& frame = ReferenceFrame::GetCurrent();
+      double errorSquared = frame.getMomentumErrorMatrix(part).GetSub(0, 2, 0, 2, " ").Similarity(jacobianRot)(1, 1);
+
+      if (errorSquared > 0.0)
+        return sqrt(errorSquared);
+      else
+        return 0.0;
     }
 
     double particlePDGCode(const Particle* part)
@@ -778,16 +932,8 @@ namespace Belle2 {
 
     double genMotherPDG(const Particle* part)
     {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return 0.0;
-
-      const MCParticle* mcmother = mcparticle->getMother();
-      if (mcmother == nullptr)
-        return 0.0;
-
-      int m_pdg = mcmother->getPDG();
-      return m_pdg;
+      const std::vector<double> args = {};
+      return genNthMotherPDG(part, args);
     }
 
     double genMotherP(const Particle* part)
@@ -806,16 +952,8 @@ namespace Belle2 {
 
     double genMotherIndex(const Particle* part)
     {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (!mcparticle)
-        return -1.0;
-
-      const MCParticle* mcmother = mcparticle->getMother();
-      if (!mcmother)
-        return -2.0;
-
-      double m_ID = mcmother->getArrayIndex();
-      return m_ID;
+      const std::vector<double> args = {};
+      return genNthMotherIndex(part, args);
     }
 
     double genParticleIndex(const Particle* part)
@@ -868,11 +1006,10 @@ namespace Belle2 {
 
     double particleMCMatchWeight(const Particle* particle)
     {
-      std::pair<MCParticle*, double> relation = particle->getRelatedToWithWeight <
-                                                MCParticle > ();
+      auto relWithWeight = particle->getRelatedToWithWeight<MCParticle>();
 
-      if (relation.first) {
-        return relation.second;
+      if (relWithWeight.first) {
+        return relWithWeight.second;
       } else {
         return 0.0;
       }
@@ -1036,6 +1173,18 @@ namespace Belle2 {
 
       if (vert)
         result = vert->getDeltaT();
+
+      return result;
+    }
+
+    double particleDeltaTErr(const Particle* particle)
+    {
+      double result = -1111.0;
+
+      Vertex* vert = particle->getRelatedTo<Vertex>();
+
+      if (vert)
+        result = vert->getDeltaTErr();
 
       return result;
     }
@@ -1645,6 +1794,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("py", particlePy, "momentum component y");
     REGISTER_VARIABLE("pz", particlePz, "momentum component z");
     REGISTER_VARIABLE("pt", particlePt, "transverse momentum");
+    REGISTER_VARIABLE("pErr", particlePErr, "error of momentum magnitude");
+    REGISTER_VARIABLE("pxErr", particlePxErr, "error of momentum component x");
+    REGISTER_VARIABLE("pyErr", particlePyErr, "error of momentum component y");
+    REGISTER_VARIABLE("pzErr", particlePzErr, "error of momentum component z");
+    REGISTER_VARIABLE("ptErr", particlePtErr, "error of transverse momentum");
     REGISTER_VARIABLE("momVertCovM(i,j)", covMatrixElement,
                       "returns the (i,j)-th element of the MomentumVertex Covariance Matrix (7x7).\n"
                       "Order of elements in the covariance matrix is: px, py, pz, E, x, y, z.");
@@ -1652,9 +1806,12 @@ namespace Belle2 {
                       "momentum deviation chi^2 value calculated as"
                       "chi^2 = sum_i (p_i - mc(p_i))^2/sigma(p_i)^2, where sum runs over i = px, py, pz and"
                       "mc(p_i) is the mc truth value and sigma(p_i) is the estimated error of i-th component of momentum vector")
-    REGISTER_VARIABLE("cosTheta", particleCosTheta,
-                      "momentum cosine of polar angle");
+    REGISTER_VARIABLE("Theta", particleTheta, "polar angle");
+    REGISTER_VARIABLE("ThetaErr", particleThetaErr, "error of polar angle");
+    REGISTER_VARIABLE("cosTheta", particleCosTheta, "momentum cosine of polar angle");
+    REGISTER_VARIABLE("cosThetaErr", particleCosThetaErr, "error of momentum cosine of polar angle");
     REGISTER_VARIABLE("phi", particlePhi, "momentum azimuthal angle in degrees");
+    REGISTER_VARIABLE("phiErr", particlePhiErr, "error of momentum azimuthal angle in degrees");
     REGISTER_VARIABLE("PDG", particlePDGCode, "PDG code");
 
     REGISTER_VARIABLE("cosAngleBetweenMomentumAndVertexVector",
@@ -1729,7 +1886,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("genMotherPDG", genMotherPDG,
                       "Check the PDG code of a particles MC mother particle");
     REGISTER_VARIABLE("genMotherID", genMotherIndex,
-                      "Check the array index of a particle's generated mother");
+                      "Check the array index of a particles generated mother");
     REGISTER_VARIABLE("genMotherP", genMotherP,
                       "Generated momentum of a particles MC mother particle");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,
@@ -1789,6 +1946,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("TagVy", particleTagVy, "Tag vertex Y");
     REGISTER_VARIABLE("TagVz", particleTagVz, "Tag vertex Z");
     REGISTER_VARIABLE("DeltaT", particleDeltaT, "Delta T(Brec - Btag) in ps");
+    REGISTER_VARIABLE("DeltaTErr", particleDeltaTErr, "Delta T error in ps");
     REGISTER_VARIABLE("MCDeltaT", particleMCDeltaT,
                       "Generated Delta T(Brec - Btag) in ps");
     REGISTER_VARIABLE("DeltaZ", particleDeltaZ, "Z(Brec) - Z(Btag)");

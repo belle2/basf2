@@ -32,6 +32,9 @@ namespace Belle2 {
       /// Default constructor for ROOT compatibility.
       CDCTrack() = default;
 
+      /// Constructor from a series of hits.
+      explicit CDCTrack(const std::vector<CDCRecoHit3D>& recoHits3D);
+
       /// Constructor from a two dimensional segment filling the thrid dimension with 0 values.
       explicit CDCTrack(const CDCSegment2D& segment);
 
@@ -51,7 +54,7 @@ namespace Belle2 {
       }
 
       /// Copies the hit and trajectory content of this track to a new RecoTrack and store it into the store array.
-      bool storeInto(StoreArray<RecoTrack>& recoTracks) const;
+      RecoTrack* storeInto(StoreArray<RecoTrack>& recoTracks) const;
 
       /** Splits the track into segments.
        *  Note : No trajectory information is copied*/

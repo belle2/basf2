@@ -19,7 +19,6 @@ int main(int argc, char** argv)
     DQMViewCallback callback(node, config);
     if (node.getName().size() == 0) {
       while (true) {
-        callback.update();
         sleep(5);
       }
     } else {

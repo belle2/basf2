@@ -23,8 +23,6 @@
 namespace Belle2 {
 
   /**
-   * The BFieldMap class.
-   *
    * This class represents the magnetic field of the Belle II detector.
    * Its main method is getBField() which returns the Bfield vector at the
    * specified space point.
@@ -49,7 +47,7 @@ namespace Belle2 {
      * @param point The space point in Cartesian coordinates.
      * @return A three vector of the magnetic field in [T] at the specified space point.
      */
-    const B2Vector3D getBField(const B2Vector3D& point);
+    B2Vector3D getBField(const B2Vector3D& point) const;
 
     /**
      * Adds a new BField component to the Belle II magnetic field.
@@ -103,7 +101,7 @@ namespace Belle2 {
   }
 
 
-  inline const B2Vector3D BFieldMap::getBField(const B2Vector3D& point)
+  inline B2Vector3D BFieldMap::getBField(const B2Vector3D& point) const
   {
     B2Vector3D magFieldVec(0.0, 0.0, 0.0);
     //Check that the point makes sense
@@ -112,7 +110,7 @@ namespace Belle2 {
       return magFieldVec;
     }
     //Loop over all magnetic field components and add their magnetic field vectors
-    for (BFieldComponentAbs* comp : m_components) {
+    for (const BFieldComponentAbs* comp : m_components) {
       magFieldVec += comp->calculate(point);
     }
     return magFieldVec;

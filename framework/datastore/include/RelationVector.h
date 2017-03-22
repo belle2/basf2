@@ -45,9 +45,9 @@ namespace Belle2 {
 
   /** Class for type safe access to objects that are referred to in relations.
    *
-   *  This class is supposed to be used by the RelationsInterface to provide
-   *  type safe access to the objects in a vector of relations returned by
-   *  the data store.
+   * Objects of this class are returned by RelationsObject functinons to provide
+   * type safe access to the objects in a vector of relations returned by
+   * the data store.
    *
    * Besides accessing objects/weights directly using operator[](int) and weight(int),
    * you can also iterate over the objects directly:
@@ -57,7 +57,11 @@ namespace Belle2 {
         //do things with simhit
       }
       \endcode
-   * If you want to modify the related objects, you can use a non-const reference instead.
+   * If you want to modify the related objects in the loop body, you can use a
+   * non-const reference instead.
+   *
+   * Use setWeight() to modify the weight of a single relation.
+   * Use remove() to delete a relation.
    */
   template <class T> class RelationVector : protected RelationVectorBase {
   public:
@@ -104,7 +108,13 @@ namespace Belle2 {
      */
     float weight(int index) const {return m_relations[index].weight;}
 
-    /** Remove relation at given index. (Will decrease size() by one) */
+    /** Remove relation at given index.
+     *
+     * This will decrease size() by one. Iterators pointing beyond given
+     * index will be invalidated when calling this function.
+     *
+     * @note May be slow if done frequently.
+     */
     void remove(int index)
     {
       apply(index, [](std::vector<unsigned int>& indices, std::vector<float>& weights,

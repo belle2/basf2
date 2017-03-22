@@ -25,12 +25,18 @@ from tracking.validation.run import TrackingValidationRun
 
 class Full(TrackingValidationRun):
     n_events = N_EVENTS
+    #: Generator to be used in the simulation (-so)
+    generator_module = 'generic'
     root_input_file = '../EvtGenSimNoBkg.root'
     finder_module = staticmethod(tracking.add_tracking_reconstruction)
     tracking_coverage = {
+        'WhichParticles': [],  # Include all particles, also secondaries
         'UsePXDHits': True,
         'UseSVDHits': True,
         'UseCDCHits': True,
+        "UseReassignedHits": True,
+        'UseOnlyBeforeTOP': True,
+        'UseNLoops': 1
     }
     # tracks will be already fitted by
     # add_tracking_reconstruction finder module set above

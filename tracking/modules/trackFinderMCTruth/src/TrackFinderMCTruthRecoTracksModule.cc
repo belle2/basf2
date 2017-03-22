@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Heck, Oksana Brovchenko, Moritz Nadler,           *
- *               Thomas Hauth                                             *
+ *               Thomas Hauth, Oliver Frost                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -25,6 +25,7 @@
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <top/dataobjects/TOPBarHit.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/WireTrackCandHit.h>
@@ -59,7 +60,7 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
                  "Fills the created genfit::TrackCandidates with all information (start values, hit indices) needed for the fitting.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  //choose which hits to use, all hits assigned to the track candidate will be used in the fit
+  // choose which hits to use, all hits assigned to the track candidate will be used in the fit
   addParam("UsePXDHits",
            m_usePXDHits,
            "Set true if PXDHits or PXDClusters should be used",
@@ -79,10 +80,19 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
   addParam("UseNLoops",
            m_useNLoops,
            "Set the number of loops whose hits will be marked as priortiy hits. All other hits "
-           "will be marked as auxiliary and therfore not considered for efficiency computations. "
+           "will be marked as auxiliary and therfore not considered for efficiency computations "
+           "(only implemented for CDCHits)."
            "By default, all hits will be priority hits.",
            INFINITY);
-
+  addParam("UseOnlyBeforeTOP",
+           m_useOnlyBeforeTOP,
+           "Mark hits as auxiliary after the track left the CDC and touched the TOP detector "
+           "(only implemented for CDCHits).",
+           false);
+  addParam("UseReassignedHits",
+           m_useReassignedHits,
+           "Include hits reassigned from discarded seconardy daughters in the tracks.",
+           false);
 
   addParam("MinPXDHits",
            m_minPXDHits,
@@ -100,6 +110,11 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            m_minCDCStereoHits,
            "Minimum number of CDC hits form a stereo wire needed to allow the created of a track candidate",
            0);
+  addParam("AllowFirstCDCSuperLayerOnly",
+           m_allowFirstCDCSuperLayerOnly,
+           "Allow tracks to pass the stereo hit requirement if they touched only the first (axial) CDC layer",
+           false);
+
   addParam("MinimalNDF",
            m_minimalNdf,
            "Minimum number of total hits needed to allow the creation of a track candidate. "
@@ -435,11 +450,17 @@ void TrackFinderMCTruthRecoTracksModule::event()
       const RelationVector<PXDCluster>& relatedClusters = aMcParticlePtr->getRelationsFrom<PXDCluster>();
 
       for (size_t i = 0; i < relatedClusters.size(); ++i) {
-        if (relatedClusters.weight(i) < 0) continue;  // skip hits from secondary particles
+        bool isReassigned = relatedClusters.weight(i) < 0;
+        if (!m_useReassignedHits && isReassigned) continue;  // skip hits from secondary particles
 
         // currently only priority Hits for PXD
         auto mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderPriorityHit;
 
+        // Reassigned hits are auxiliary
+        if (isReassigned) {
+          mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
+
+        }
         const PXDCluster* pxdCluster = relatedClusters.object(i);
         const RelationVector<PXDTrueHit>& relatedTrueHits = pxdCluster->getRelationsTo<PXDTrueHit>();
 
@@ -480,10 +501,15 @@ void TrackFinderMCTruthRecoTracksModule::event()
       const RelationVector<SVDCluster>& relatedClusters = aMcParticlePtr->getRelationsFrom<SVDCluster>();
 
       for (size_t i = 0; i < relatedClusters.size(); ++i) {
-        if (relatedClusters.weight(i) < 0) continue;  // skip hits from secondary particles
+        bool isReassigned = relatedClusters.weight(i) < 0;
+        if (!m_useReassignedHits && isReassigned) continue;  // skip hits from secondary particles
 
-        // currently only priority Hits for SVD
         auto mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderPriorityHit;
+
+        // Reassigned hits are auxiliary
+        if (isReassigned) {
+          mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
+        }
 
         const SVDCluster* svdCluster = relatedClusters.object(i);
         const RelationVector<SVDTrueHit>& relatedTrueHits = svdCluster->getRelationsTo<SVDTrueHit>();
@@ -543,21 +569,53 @@ void TrackFinderMCTruthRecoTracksModule::event()
       }
     };
 
+    auto didParticleExitCDC = [](const CDCHit * hit) {
+      const CDCSimHit* simHit = hit->getRelated<CDCSimHit>();
+      if (not simHit) return false;
+
+      const MCParticle* mcParticle = simHit->getRelated<MCParticle>();
+      if (not mcParticle) return false;
+      if (not mcParticle->hasSeenInDetector(Const::TOP)) return false;
+
+      RelationVector<TOPBarHit> topHits = mcParticle->getRelationsWith<TOPBarHit>();
+      if (topHits.size() == 0) return false;
+
+      // Get hit with the smallest time.
+      auto lessTime = [](const TOPBarHit & lhs, const TOPBarHit & rhs) {
+        return lhs.getTime() < rhs.getTime();
+      };
+      auto itFirstTopHit = std::min_element(topHits.begin(), topHits.end(), lessTime);
+
+      return simHit->getGlobalTime() > itFirstTopHit->getTime();
+    };
+
     // create a list containing the indices to the CDCHits that belong to one track
     int nAxialHits = 0;
     int nStereoHits = 0;
+    std::array<int, 9> nHitsBySuperLayerId{};
     if (m_useCDCHits) {
       const RelationVector<CDCHit>& relatedHits = aMcParticlePtr->getRelationsTo<CDCHit>();
 
       for (size_t i = 0; i < relatedHits.size(); ++i) {
-        if (relatedHits.weight(i) < 0) continue;  // skip hits from secondary particles
+        bool isReassigned = relatedHits.weight(i) < 0;
+        if (!m_useReassignedHits && isReassigned) continue;  // skip hits from secondary particles
 
         const CDCHit* cdcHit = relatedHits.object(i);
 
         auto mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderPriorityHit;
 
+        // Reassigned hits are auxiliary
+        if (isReassigned) {
+          mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
+        }
+
         // Mark higher order hits as auxiliary, if m_useNLoops has been set
         if (not std::isnan(m_useNLoops) and not isWithinNLoops(cdcHit, m_useNLoops)) {
+          mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
+        }
+
+        // check if the particle left hits in TOP and add mark hits after that as auxiliary.
+        if (m_useOnlyBeforeTOP and didParticleExitCDC(cdcHit)) {
           mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
         }
 
@@ -576,22 +634,38 @@ void TrackFinderMCTruthRecoTracksModule::event()
           hitsWithTimeAndDetectorInformation.emplace_back(time, cdcHit->getArrayIndex(), mcFinder, Const::CDC);
           ndf += 1;
           ++nAxialHits;
+          ++nHitsBySuperLayerId[superLayerId];
         } else {
           if (not m_useOnlyAxialCDCHits) {
             hitsWithTimeAndDetectorInformation.emplace_back(time, cdcHit->getArrayIndex(), mcFinder, Const::CDC);
             ndf += 1;
             ++nStereoHits;
+            ++nHitsBySuperLayerId[superLayerId];
           }
         }
       }
 
       B2DEBUG(100, "    added " << nAxialHits << " axial and " << nStereoHits << " stereo CDCHits");
     }
-    if (nAxialHits < m_minCDCAxialHits or (not m_useOnlyAxialCDCHits and nStereoHits < m_minCDCStereoHits)) {
+
+    if (nAxialHits < m_minCDCAxialHits) {
+      // Not enough axial hits. Next MCParticle.
       ++m_notEnoughtHitsCounter;
-      continue; //goto next mcParticle, do not make track candidate
+      continue;
     }
 
+    if (not m_useOnlyAxialCDCHits and (nStereoHits < m_minCDCStereoHits)) {
+      if (m_allowFirstCDCSuperLayerOnly and
+          nHitsBySuperLayerId[0] == nAxialHits and
+          (nAxialHits + nStereoHits >= m_minCDCAxialHits + m_minCDCStereoHits)) {
+        // Special rule for low momentum tracks that only touch the first axial superlayer
+        // If there still enough hits combined from the axial and stereo hit limit -> keep the track.
+      } else {
+        // Not enough stereo hits. Next MCParticle.
+        ++m_notEnoughtHitsCounter;
+        continue;
+      }
+    }
 
     if (m_initialCov(0, 0) > 0.0) { //using a user set initial cov and corresponding smearing of inital state adds information
       ndf += 5;

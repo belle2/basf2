@@ -178,7 +178,7 @@ int main(int argc, char* argv[])
       cout << cmdlineOptions << endl;
       return 0;
     } else if (varMap.count("version")) {
-      pythonFile = "version.py";
+      pythonFile = "basf2_version.py";
     } else if (varMap.count("info")) {
       pythonFile = "info.py";
     } else if (varMap.count("modules")) {
@@ -356,7 +356,7 @@ int main(int argc, char* argv[])
   if (!pythonFile.empty()) {
     //Search in local or central lib/ if this isn't a direct path
     if (!boost::filesystem::exists(pythonFile)) {
-      std::string libFile = FileSystem::findFile((libPath / pythonFile).string());
+      std::string libFile = FileSystem::findFile((libPath / pythonFile).string(), true);
       if (!libFile.empty())
         pythonFile = libFile;
     }

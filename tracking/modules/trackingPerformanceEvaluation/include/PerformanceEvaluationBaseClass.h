@@ -11,6 +11,8 @@
 #define PERFORMANCEEVALUATIONBASECLASS_H_
 
 #include <framework/core/Module.h>
+#include <TDirectory.h>
+#include <TCollection.h>
 #include <TTree.h>
 #include <TFile.h>
 #include <TList.h>
@@ -50,6 +52,16 @@ namespace Belle2 {
     virtual void terminate();
     */
     TList* m_histoList;
+
+    TList* m_histoList_multiplicity;
+    TList* m_histoList_evtCharacterization;
+    TList* m_histoList_trkQuality;
+    TList* m_histoList_firstHit;
+    TList* m_histoList_pr;
+    TList* m_histoList_fit;
+    TList* m_histoList_efficiency;
+    TList* m_histoList_purity;
+    TList* m_histoList_others;
 
     //list of functions to create histograms:
     TH1F* createHistogram1D(const char* name, const char* title,

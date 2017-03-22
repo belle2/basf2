@@ -24,17 +24,17 @@
 
 namespace Belle2 {
 
-class TRGCDCDisplay;
-class TRGCDCHoughPlane;
+  class TRGCDCDisplay;
+  class TRGCDCHoughPlane;
 
 /// Actual class to display trigger objects
-class TRGCDCDisplayDrawingAreaHough : public TRGCDCDisplayDrawingArea {
+  class TRGCDCDisplayDrawingAreaHough : public TRGCDCDisplayDrawingArea {
 
   public:
 
     /// Default constructor
-    TRGCDCDisplayDrawingAreaHough(TRGCDCDisplay &, int size);
-    
+    TRGCDCDisplayDrawingAreaHough(TRGCDCDisplay&, int size);
+
     /// Destructor
     virtual ~TRGCDCDisplayDrawingAreaHough();
 
@@ -48,10 +48,10 @@ class TRGCDCDisplayDrawingAreaHough : public TRGCDCDisplayDrawingArea {
 
     void clear(void);
 
-    virtual bool on_expose_event(GdkEventExpose *);
-    virtual bool on_button_press_event(GdkEventButton *);
+    virtual bool on_expose_event(GdkEventExpose*);
+    virtual bool on_button_press_event(GdkEventButton*);
 
-    void append(const TRGCDCHoughPlane * const);
+    void append(const TRGCDCHoughPlane* const);
 
   private:
     virtual void on_realize();
@@ -70,7 +70,7 @@ class TRGCDCDisplayDrawingAreaHough : public TRGCDCDisplayDrawingArea {
     int drawCell(unsigned xCell, unsigned yCell);
 
     /// Draws a region.
-    int drawRegion(const std::vector<unsigned> & region);
+    int drawRegion(const std::vector<unsigned>& region);
 
   private:
     double _scale;
@@ -79,7 +79,7 @@ class TRGCDCDisplayDrawingAreaHough : public TRGCDCDisplayDrawingArea {
     bool _wireName;
     bool _oldCDC;
     double _x, _y;
-    const TRGCDCHoughPlane * _hp;
+    const TRGCDCHoughPlane* _hp;
 
     Glib::RefPtr<Gdk::Window> _window;
     int _winx, _winy, _winw, _winh, _wind;
@@ -87,52 +87,59 @@ class TRGCDCDisplayDrawingAreaHough : public TRGCDCDisplayDrawingArea {
     Glib::RefPtr<Gdk::GC> _gc;
     Gdk::Color _blue, _red, _green, _black, _white, _gray, _yellow;
     Gdk::Color _gray0, _gray1, _gray2, _gray3;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-double
-TRGCDCDisplayDrawingAreaHough::scale(double a) {
+  inline
+  double
+  TRGCDCDisplayDrawingAreaHough::scale(double a)
+  {
     return _scale = a;
-}
+  }
 
-inline
-double
-TRGCDCDisplayDrawingAreaHough::scale(void) const {
+  inline
+  double
+  TRGCDCDisplayDrawingAreaHough::scale(void) const
+  {
     return _scale;
-}
+  }
 
-inline
-bool
-TRGCDCDisplayDrawingAreaHough::wireName(void) const {
+  inline
+  bool
+  TRGCDCDisplayDrawingAreaHough::wireName(void) const
+  {
     return _wireName;
-}
+  }
 
-inline
-bool
-TRGCDCDisplayDrawingAreaHough::wireName(bool a) {
+  inline
+  bool
+  TRGCDCDisplayDrawingAreaHough::wireName(bool a)
+  {
     return _wireName = a;
-}
+  }
 
-inline
-int
-TRGCDCDisplayDrawingAreaHough::toY(int a) const {
+  inline
+  int
+  TRGCDCDisplayDrawingAreaHough::toY(int a) const
+  {
     return - a + _winh;
-}
+  }
 
-inline
-void
-TRGCDCDisplayDrawingAreaHough::clear(void) {
+  inline
+  void
+  TRGCDCDisplayDrawingAreaHough::clear(void)
+  {
     _hp = 0;
-}
+  }
 
-inline
-void
-TRGCDCDisplayDrawingAreaHough::append(const TRGCDCHoughPlane * const hp) {
+  inline
+  void
+  TRGCDCDisplayDrawingAreaHough::append(const TRGCDCHoughPlane* const hp)
+  {
     _hp = hp;
-    on_expose_event((GdkEventExpose *) NULL);
-}
+    on_expose_event((GdkEventExpose*) NULL);
+  }
 
 } // namespace Belle2
 

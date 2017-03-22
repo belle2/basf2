@@ -1,3 +1,0 @@
-GenerateSimulationData: A single steering file for generating simulation data with signal only.
-NeuroBayesTrainer: Trainer for neural network cluster rescue mechanism. Uses data from the PXDClusterGetNNData module as input and returns NeuroBayes expertise for PXDClusterRescueNN module.
-NeuroBayesAnalysis: Slightly enhanced NeuroBayes analysis tools. analysisROC.C gives a (kind of) ROC graph of backgroud reduction rate vs cluster rescue rate. Includes a steering file for a complete neural network training analysis. ahist.txt and correl_signi.txt have to be placed in this folder (see steering script).

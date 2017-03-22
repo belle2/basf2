@@ -26,7 +26,7 @@ using namespace std;
 
 namespace Belle2 {
 
-TRGCDCTrackBase::TRGCDCTrackBase(const TRGCDCTrackBase & t)
+  TRGCDCTrackBase::TRGCDCTrackBase(const TRGCDCTrackBase& t)
     : _name("CopyOf" + t._name),
       _status(t._status),
       _charge(t._charge),
@@ -35,13 +35,14 @@ TRGCDCTrackBase::TRGCDCTrackBase(const TRGCDCTrackBase & t)
       _nTs(t._nTs),
       _fitter(t._fitter),
       _fitted(t._fitted),
-      m_trackID(t.m_trackID) {
-    _ts = new vector<TCLink *>[_nTs];
+      m_trackID(t.m_trackID)
+  {
+    _ts = new vector<TCLink*>[_nTs];
     for (unsigned i = 0; i < _nTs; i++)
-	_ts[i].assign(t._ts[i].begin(), t._ts[i].end());
-}
+      _ts[i].assign(t._ts[i].begin(), t._ts[i].end());
+  }
 
-TRGCDCTrackBase::TRGCDCTrackBase(const string & name, double charge)
+  TRGCDCTrackBase::TRGCDCTrackBase(const string& name, double charge)
     : _name(name),
       _status(0),
       _charge(charge),
@@ -49,15 +50,18 @@ TRGCDCTrackBase::TRGCDCTrackBase(const string & name, double charge)
       _nTs(TRGCDC::getTRGCDC()->nSuperLayers()),
       _fitter(0),
       _fitted(false),
-      m_trackID(9999){
-    _ts = new vector<TCLink *>[_nTs];
-}
+      m_trackID(9999)
+  {
+    _ts = new vector<TCLink*>[_nTs];
+  }
 
-TRGCDCTrackBase::~TRGCDCTrackBase() {
-}
+  TRGCDCTrackBase::~TRGCDCTrackBase()
+  {
+  }
 
-void
-TRGCDCTrackBase::dump(const string & , const string & pre) const {
+  void
+  TRGCDCTrackBase::dump(const string&, const string& pre) const
+  {
 //  bool detail = (cmd.find("detail") != string::npos);
 
     string tab = TRGDebug::tab() + pre;
@@ -65,197 +69,205 @@ TRGCDCTrackBase::dump(const string & , const string & pre) const {
     tab += "    ";
 
     cout << tab << "status=" << status() << ":p=" << p() << ":x=" << x()
-	 << endl;
+         << endl;
     cout << tab;
     for (unsigned i = 0; i < _nTs; i++) {
-	cout << i << ":" << _ts[i].size();
-        for (unsigned j = 0; j < _ts[i].size(); j++) {
-            if (j == 0)
-		cout << "(";
-            else
-		cout << ",";
-	    const TCLink & l = * _ts[i][j];
-	    cout << l.cell()->name();
-        }
-        if (_ts[i].size())
-            cout << "),";
+      cout << i << ":" << _ts[i].size();
+      for (unsigned j = 0; j < _ts[i].size(); j++) {
+        if (j == 0)
+          cout << "(";
+        else
+          cout << ",";
+        const TCLink& l = * _ts[i][j];
+        cout << l.cell()->name();
+      }
+      if (_ts[i].size())
+        cout << "),";
     }
 //     if (detail) {
 
 //     }
     cout << endl;
-}
+  }
 
 
-int
-TRGCDCTrackBase::fit(void) {
+  int
+  TRGCDCTrackBase::fit(void)
+  {
     if (_fitter) {
-	return _fitter->fit(* this);
+      return _fitter->fit(* this);
+    } else {
+      cout << "TRGCDCTrackBase !!! no fitter available" << endl;
+      return -1;
     }
-    else {
-	cout << "TRGCDCTrackBase !!! no fitter available" << endl;
-	return -1;
-    }
-}
+  }
 
-void
-TRGCDCTrackBase::append(TCLink * a) {
+  void
+  TRGCDCTrackBase::append(TCLink* a)
+  {
     _ts[a->cell()->superLayerId()].push_back(a);
     _tsAll.push_back(a);
-}
+  }
 
-void
-TRGCDCTrackBase::append(const vector<TCLink *> & links) {
+  void
+  TRGCDCTrackBase::append(const vector<TCLink*>& links)
+  {
     for (unsigned i = 0; i < links.size(); i++) {
-	append(links[i]);
+      append(links[i]);
     }
-}
+  }
 
-const std::vector<TCLink *> &
-TRGCDCTrackBase::links(void) const {
+  const std::vector<TCLink*>&
+  TRGCDCTrackBase::links(void) const
+  {
     return _tsAll;
-}
+  }
 
-const std::vector<TCLink *> &
-TRGCDCTrackBase::links(unsigned layerId) const {
+  const std::vector<TCLink*>&
+  TRGCDCTrackBase::links(unsigned layerId) const
+  {
     return _ts[layerId];
-}
+  }
 
-int
-TRGCDCTrackBase::approach2D(TCLink &) const {
+  int
+  TRGCDCTrackBase::approach2D(TCLink&) const
+  {
     cout << "TRGCDCTrackBase::approach2D !!! not implemented" << endl;
     return -1;
-}
+  }
 
-const TRGCDCRelation
-TRGCDCTrackBase::relation(void) const {
+  const TRGCDCRelation
+  TRGCDCTrackBase::relation(void) const
+  {
+
+    TRGDebug::enterStage("MCInfo");
+
+    map<unsigned, unsigned> relations;
+    for (unsigned i = 0; i < _tsAll.size(); i++) {
+
+      const TCCell& cell = * _tsAll[i]->cell();
+      const TCCHit& hit = * cell.hit();
+      const unsigned iMCParticle = hit.iMCParticle();
+
+      map<unsigned, unsigned>::iterator it = relations.find(iMCParticle);
+      if (it != relations.end())
+        ++it->second;
+      else
+        relations[iMCParticle] = 1;
+
+      if (TRGDebug::level()) {
+        cout << TRGDebug::tab() << cell.name() << ",MCParticle="
+             << iMCParticle << endl;
+      }
+    }
+
+    if (TRGDebug::level()) {
+      map<unsigned, unsigned>::const_iterator it = relations.begin();
+      while (it != relations.end()) {
+        cout << TRGDebug::tab()
+             << it->first << ","
+             << it->second << endl;
+        ++it;
+      }
+    }
+
+    TRGDebug::leaveStage("MCInfo");
+
+    return TCRelation(* this, relations);
+  }
+
+  const TRGCDCRelation
+  TRGCDCTrackBase::relation2D(void) const
+  {
 
     TRGDebug::enterStage("MCInfo");
 
     map<unsigned, unsigned> relations;
     for (unsigned i = 0; i < _tsAll.size(); i++) {
 
-	const TCCell & cell = * _tsAll[i]->cell();
-	const TCCHit & hit = * cell.hit();
-	const unsigned iMCParticle = hit.iMCParticle();
-	
-	map<unsigned, unsigned>::iterator it = relations.find(iMCParticle);
-	if (it != relations.end())
-	    ++it->second;
-	else
-	    relations[iMCParticle] = 1;
 
-	if (TRGDebug::level()) {
-	    cout << TRGDebug::tab() << cell.name() << ",MCParticle="
-		 << iMCParticle << endl;
-	}
+      const TCCell& cell = * _tsAll[i]->cell();
+
+      // Ignore stereo layers
+      if (cell.superLayerId() % 2 == 1) continue;
+
+      const TCCHit& hit = * cell.hit();
+      const unsigned iMCParticle = hit.iMCParticle();
+
+      map<unsigned, unsigned>::iterator it = relations.find(iMCParticle);
+      if (it != relations.end())
+        ++it->second;
+      else
+        relations[iMCParticle] = 1;
+
+      if (TRGDebug::level()) {
+        cout << TRGDebug::tab() << cell.name() << ",MCParticle="
+             << iMCParticle << endl;
+      }
     }
 
     if (TRGDebug::level()) {
-	map<unsigned, unsigned>::const_iterator it = relations.begin();
-	while (it != relations.end()) {
-	    cout << TRGDebug::tab()
-		 << it->first << ","
-		 << it->second << endl;
-	    ++it;
-	}
+      map<unsigned, unsigned>::const_iterator it = relations.begin();
+      while (it != relations.end()) {
+        cout << TRGDebug::tab()
+             << it->first << ","
+             << it->second << endl;
+        ++it;
+      }
     }
 
     TRGDebug::leaveStage("MCInfo");
 
     return TCRelation(* this, relations);
-}
+  }
 
-const TRGCDCRelation
-TRGCDCTrackBase::relation2D(void) const {
+
+
+
+
+
+  const TRGCDCRelation
+  TRGCDCTrackBase::relation3D(void) const
+  {
 
     TRGDebug::enterStage("MCInfo");
 
     map<unsigned, unsigned> relations;
     for (unsigned i = 0; i < _tsAll.size(); i++) {
-  
 
-	const TCCell & cell = * _tsAll[i]->cell();
+      const TCCell& cell = * _tsAll[i]->cell();
 
-  // Ignore stereo layers
-  if(cell.superLayerId()%2==1) continue;
+      // Ignore axial layers
+      if (cell.superLayerId() % 2 == 0) continue;
 
-	const TCCHit & hit = * cell.hit();
-	const unsigned iMCParticle = hit.iMCParticle();
-	
-	map<unsigned, unsigned>::iterator it = relations.find(iMCParticle);
-	if (it != relations.end())
-	    ++it->second;
-	else
-	    relations[iMCParticle] = 1;
+      const TCCHit& hit = * cell.hit();
+      const unsigned iMCParticle = hit.iMCParticle();
 
-	if (TRGDebug::level()) {
-	    cout << TRGDebug::tab() << cell.name() << ",MCParticle="
-		 << iMCParticle << endl;
-	}
+      map<unsigned, unsigned>::iterator it = relations.find(iMCParticle);
+      if (it != relations.end())
+        ++it->second;
+      else
+        relations[iMCParticle] = 1;
+
+      if (TRGDebug::level()) {
+        cout << TRGDebug::tab() << cell.name() << ",MCParticle="
+             << iMCParticle << endl;
+      }
     }
 
     if (TRGDebug::level()) {
-	map<unsigned, unsigned>::const_iterator it = relations.begin();
-	while (it != relations.end()) {
-	    cout << TRGDebug::tab()
-		 << it->first << ","
-		 << it->second << endl;
-	    ++it;
-	}
+      map<unsigned, unsigned>::const_iterator it = relations.begin();
+      while (it != relations.end()) {
+        cout << TRGDebug::tab()
+             << it->first << ","
+             << it->second << endl;
+        ++it;
+      }
     }
 
     TRGDebug::leaveStage("MCInfo");
 
     return TCRelation(* this, relations);
-}
-
-
-
-
-
-
-const TRGCDCRelation
-TRGCDCTrackBase::relation3D(void) const {
-
-    TRGDebug::enterStage("MCInfo");
-
-    map<unsigned, unsigned> relations;
-    for (unsigned i = 0; i < _tsAll.size(); i++) {
-  
-	const TCCell & cell = * _tsAll[i]->cell();
-
-  // Ignore axial layers
-  if(cell.superLayerId()%2==0) continue;
-
-	const TCCHit & hit = * cell.hit();
-	const unsigned iMCParticle = hit.iMCParticle();
-	
-	map<unsigned, unsigned>::iterator it = relations.find(iMCParticle);
-	if (it != relations.end())
-	    ++it->second;
-	else
-	    relations[iMCParticle] = 1;
-
-	if (TRGDebug::level()) {
-	    cout << TRGDebug::tab() << cell.name() << ",MCParticle="
-		 << iMCParticle << endl;
-	}
-    }
-
-    if (TRGDebug::level()) {
-	map<unsigned, unsigned>::const_iterator it = relations.begin();
-	while (it != relations.end()) {
-	    cout << TRGDebug::tab()
-		 << it->first << ","
-		 << it->second << endl;
-	    ++it;
-	}
-    }
-
-    TRGDebug::leaveStage("MCInfo");
-
-    return TCRelation(* this, relations);
-}
+  }
 
 } // namespace Belle2

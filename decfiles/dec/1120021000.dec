@@ -1,0 +1,24 @@
+# EventType: 1120021000
+# Descriptor: [B0 -> omega gamma]cc
+# NickName: Bd_omegagamma
+# Documentation: Rare b->d gamma process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Phillip Urquijo
+# Email: purquijo@unimelb.edu.au
+# Cuts: None
+# Date: 20150109
+# Comments: update EventType (S.Sandilya, 2017.03.02)
+#
+#
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0	VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+1.000 omega gamma SVP_HELAMP 1.0 0.0 1.0 0.0;
+Enddecay
+CDecay anti-B0sig
+
+#
+End

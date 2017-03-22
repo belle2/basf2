@@ -81,6 +81,9 @@ global_env = Environment(
     SHLINK='g++',
     CCFLAGS=['-Wall', '-isystem$EXTINCDIR'],
     CXXFLAGS=['-std=c++11'],
+    # disable warnings when compiling dictionaries, too much root problems
+    # involved
+    ROOTCLING_EXTRA_CCFLAGS=["-w"],
     CPPDEFINES={'_PACKAGE_': '\\"$PACKAGE\\"'},
     CPPPATH=['include'],
     LIBPATH=['$LIBDIR', '$EXTLIBDIR', os.path.join(os.environ['ROOTSYS'], 'lib')],
@@ -162,9 +165,10 @@ elif option == 'clang':
     # So we compile c files with gcc and only c++ with clang for now
     # global_env['CC'] = 'clang'
     global_env['CXX'] = 'clang++'
-    # Disable the missing braces warning, because it can lead
+    # enable a few extra warnings warnings but disable the missing braces warning, because it can lead
     # to false positives in conjuction with std::array : https://llvm.org/bugs/show_bug.cgi?id=21629
-    global_env.Append(CCFLAGS=['-O2', "-Wno-missing-braces"])
+    global_env.Append(CCFLAGS=["-O2", "-Wno-missing-braces"],
+                      CXXFLAGS=["-Wheader-hygiene"])
     # make sure clang uses the correct paths to the gcc std c++ and not the
     # system ones. First we disable the default c++ include path
     global_env.Append(CXXFLAGS=["-nostdinc++"])
@@ -288,6 +292,17 @@ if len(global_env['TEST_FILES']) > 0:
     global_env.Alias('test_all', test)
     global_env.Alias('tests', test)
 
+# build sphinx documentation if the --sphinx option is used
+AddOption("--sphinx", dest="sphinx", action="store_true", default=False, help="if given sphinx documentation will be generated")
+if global_env.GetOption("sphinx"):
+    sphinx_targets = ['html', 'latex']
+    for sphinx_target in sphinx_targets:
+        sphinx = global_env.Command('build/%s' % sphinx_target, 'index.rst', 'sphinx-build -b %s -c site_scons/sphinx -d build/doctrees . $TARGET' % sphinx_target)
+        global_env.Depends(sphinx, ['scripts', 'data', 'lib', 'bin'])
+        global_env.SideEffect('PreventParallelSphinxBuilds', sphinx)
+        global_env.AlwaysBuild(sphinx)
+        global_env.Alias(sphinx_target, sphinx)
+
 # auto clean include and modules dir
 #
 # If one renames header files, scons will install the new header but leave the
@@ -300,7 +315,8 @@ if len(global_env['TEST_FILES']) > 0:
 if explicit_package_targets:
     print "Performing a quick build for given packages. Note that any removed targets " \
         "(e.g. modules, include files) will remain until you run a full build without any explicit target packages."
-else:
+elif not global_env.GetOption('help'):
+    # make sure we don't do cleanup on --help
     global_env.RemoveNonTargets(global_env["INCDIR"])
     global_env.RemoveNonTargets(global_env["MODDIR"])
     global_env.RemoveNonTargets(global_env["LIBDIR"])

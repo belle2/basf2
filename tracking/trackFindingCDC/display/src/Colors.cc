@@ -18,16 +18,22 @@ std::vector<std::string> Colors::getList()
     "red",
     "blue",
     "green",
-    "orange",
+    "orangered",
     "cyan",
     "olive",
-    "lime",
     "maroon",
-    "tomato",
     "turquoise",
-    "mediumspringgreen",
+    "lime",
+    "teal",
     "darkgreen",
     "indigo",
+    "darkolivegreen",
+    "orange",
+    "darkmagenta",
+    "seagreen",
+    "magenta",
+    "midnightblue",
+    "darkgoldenrod"
   };
 }
 

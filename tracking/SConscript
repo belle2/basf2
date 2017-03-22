@@ -10,6 +10,8 @@ env['LIBS'] = [
     'svd', 'svd_dataobjects',
     'vxd', 'vxd_dataobjects',
     'cdc', 'cdc_dataobjects',
+    'bklm', 'bklm_dataobjects', 'bklm_dbobjects',
+    'eklm', 'eklm_dataobjects', 'eklm_dbobjects',
     'ecl',
     'mdst_dataobjects',
     'framework',

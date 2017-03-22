@@ -96,6 +96,9 @@ class CDCSVGDisplayModule(basf2.Module):
         #: Switch to draw the MCParticle::hasStatus(c_PrimaryParticle) property. Default: inactive
         self.draw_mcparticle_primary = False
 
+        #: Switch to draw the ideal trajectory of the MCParticle. Default: inactive
+        self.draw_mcparticle_trajectories = False
+
         #: Switch to draw the CDCSimHits with momentum information. Default: inactive
         self.draw_simhits = False
 
@@ -203,6 +206,15 @@ class CDCSVGDisplayModule(basf2.Module):
         #: Draw the output RecoTracks
         self.draw_recotracks = False
 
+        #: Draw the MC reference RecoTracks
+        self.draw_mcrecotracks = False
+
+        #: Draw the output RecoTracks pattern recognition matching status
+        self.draw_recotrack_matching = False
+
+        #: Draw the MC reference RecoTracks pattern recognition matching status
+        self.draw_mcrecotrack_matching = False
+
         #: Draw the output Genfit track trajectories
         self.draw_recotrack_trajectories = False
 
@@ -217,6 +229,9 @@ class CDCSVGDisplayModule(basf2.Module):
 
         #: Name of the RecoTracks store array
         self.reco_tracks_store_array_name = "RecoTracks"
+
+        #: Name of the Monte Carlo reference RecoTracks store array
+        self.mc_reco_tracks_store_array_name = "MCRecoTracks"
 
         #: Name of the CDC Wire Hit Clusters
         self.cdc_wire_hit_cluster_store_obj_name = "CDCWireHitClusterVector"
@@ -248,6 +263,7 @@ class CDCSVGDisplayModule(basf2.Module):
             'draw_mcparticle_id',
             'draw_mcparticle_pdgcode',
             'draw_mcparticle_primary',
+            'draw_mcparticle_trajectories',
             'draw_mcsegments',
             'draw_simhits',
             'draw_simhit_tof',
@@ -259,6 +275,9 @@ class CDCSVGDisplayModule(basf2.Module):
             'draw_rlinfo',
             'draw_reassigned',
             'draw_recotracks',
+            'draw_mcrecotracks',
+            'draw_recotrack_matching',
+            'draw_mcrecotrack_matching',
             'draw_recotrack_trajectories',
             # Specialised options to be used in the CDC local tracking context
             # obtain them from the all_drawoptions property
@@ -791,7 +810,7 @@ class CDCSVGDisplayModule(basf2.Module):
         # Draw Tracks
         if self.draw_tracks:
             if self.use_cpp:
-                cppplotter.drawTracks('CDCTrackVector', 'ListColors', '')
+                cppplotter.drawTracks('CDCTrackVector', '', '')
             if self.use_python:
                 styleDict = {'stroke': attributemaps.listColors}
                 plotter.draw_storevector('CDCTrackVector', **styleDict)
@@ -835,6 +854,28 @@ class CDCSVGDisplayModule(basf2.Module):
                 styleDict = {'stroke': attributemaps.listColors}
                 plotter.draw_storearray(self.reco_tracks_store_array_name, **styleDict)
 
+        # Draw the MCRecoTracks
+        if self.draw_mcrecotracks:
+            if self.use_cpp:
+                cppplotter.drawRecoTracks(self.mc_reco_tracks_store_array_name, 'ListColors', '')
+            if self.use_python:
+                styleDict = {'stroke': attributemaps.listColors}
+                plotter.draw_storearray(self.mc_reco_tracks_store_array_name, **styleDict)
+
+        # Draw the RecoTracks matching status
+        if self.draw_recotrack_matching:
+            if self.use_cpp:
+                cppplotter.drawRecoTracks(self.reco_tracks_store_array_name, 'MatchingStatus', '')
+            if self.use_python:
+                print('No Python-function defined')
+
+        # Draw the Monte Carlo reference RecoTracks matching status
+        if self.draw_mcrecotrack_matching:
+            if self.use_cpp:
+                cppplotter.drawRecoTracks(self.mc_reco_tracks_store_array_name, 'MCMatchingStatus', '')
+            if self.use_python:
+                print('No Python-function defined')
+
         # Draw interaction point
         if self.draw_interaction_point:
             if self.use_cpp:
@@ -858,6 +899,13 @@ class CDCSVGDisplayModule(basf2.Module):
                 styleDict = {'stroke': 'black'}
                 plotter.draw_outer_cdc_wall(**styleDict)
                 plotter.draw_inner_cdc_wall(**styleDict)
+
+        # Draw the trajectories of the reco tracks
+        if self.draw_mcparticle_trajectories:
+            if self.use_cpp:
+                cppplotter.drawMCParticleTrajectories("MCParticles", 'black', '')
+            if self.use_python:
+                print("Python backend can not draw mc particles")
 
         # Draw the fits to the segments
         if self.draw_segment_trajectories:

@@ -7,6 +7,7 @@ struct hvinfo {
   int slot;
   int channel;
   int switchon;
+  float vdemand;
   float vmon;
   float cmon;
 };

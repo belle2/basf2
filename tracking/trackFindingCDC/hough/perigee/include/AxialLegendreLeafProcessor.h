@@ -19,7 +19,6 @@
 #include <tracking/trackFindingCDC/hough/baseelements/WithSharedMark.h>
 
 #include <vector>
-#include <list>
 
 namespace Belle2 {
   class ModuleParamList;
@@ -71,7 +70,8 @@ namespace Belle2 {
       bool skip(const ANode* node)
       {
         bool tooLowWeight = not(node->getWeight() >= m_param_minWeight);
-        bool tooHighCurvature = static_cast<float>(node->template getLowerBound<DiscreteCurv>()) > m_param_maxCurv;
+        bool tooHighCurvature = (static_cast<float>(node->template getLowerBound<DiscreteCurv>()) > m_param_maxCurv or
+                                 - static_cast<float>(node->template getUpperBound<DiscreteCurv>()) > m_param_maxCurv);
         return tooLowWeight or tooHighCurvature;
       }
 
@@ -104,21 +104,12 @@ namespace Belle2 {
       std::vector<WithSharedMark<CDCRLWireHit> >
       searchRoad(const ANode& node, const CDCTrajectory2D& trajectory2D);
 
-      /// Intermediate step migrating hits between the tracks as the original legendre algorithm.
-      void migrateHits();
-
-      /// Finalize the tracks by some merging and additional postprocessing as the original legendre algorithm.
-      void finalizeTracks();
-
     public:
-      /// Getter for the axial hits that are not yet used.
-      std::vector<const CDCWireHit*> getUnusedWireHits();
-
       /// Getter for the candidates structure still used in some tests.
       std::vector<Candidate> getCandidates() const;
 
       /// Getter for the tracks
-      const std::list<CDCTrack>& getTracks() const
+      const std::vector<CDCTrack>& getTracks() const
       {
         return m_tracks;
       }
@@ -131,9 +122,9 @@ namespace Belle2 {
       }
 
       /// Set the pool of all axial wire hits to be used in the postprocessing
-      void setAxialWireHits(const std::vector<const CDCWireHit*>& axialWireHits)
+      void setAxialWireHits(std::vector<const CDCWireHit*> axialWireHits)
       {
-        m_axialWireHits = axialWireHits;
+        m_axialWireHits = std::move(axialWireHits);
       }
 
     public:
@@ -142,66 +133,6 @@ namespace Belle2 {
 
       /// Function to notify the leaf processor about changes in parameters before a new walk
       void beginWalk();
-
-      /// Getter for the maximal level of of splitting in the hough tree
-      int getMaxLevel() const
-      {
-        return m_param_maxLevel;
-      }
-
-      /// Setter for the maximal level of of splitting in the hough tree
-      void setMaxLevel(int maxLevel)
-      {
-        m_param_maxLevel = maxLevel;
-      }
-
-      /// Getter for the minimal weight what is need the follow the children of a node.
-      double getMinWeight() const
-      {
-        return m_param_minWeight;
-      }
-
-      /// Setter for the minimal weight what is need the follow the children of a node.
-      void setMinWeight(double minWeight)
-      {
-        m_param_minWeight = minWeight;
-      }
-
-      /// Getter for the maximal curvature to be investigated in the current walk.
-      double getMaxCurv() const
-      {
-        return m_param_maxCurv;
-      }
-
-      /// Setter for the maximal curvature to be investigated in the current walk.
-      void setMaxCurv(double curvature)
-      {
-        m_param_maxCurv = curvature;
-      }
-
-      /// Getter for the maximal number of road searches to be applied on the found leaves
-      int getNRoadSearches() const
-      {
-        return m_param_nRoadSearches;
-      }
-
-      /// Setter for the maximal number of road searches to be applied on the found leaves
-      void setNRoadSearches(int nRoadSearches)
-      {
-        m_param_nRoadSearches = nRoadSearches;
-      }
-
-      /// Getter for the node level to be used as source of hits in the road searches
-      int getRoadLevel() const
-      {
-        return m_param_roadLevel;
-      }
-
-      /// Getter for the node level to be used as source of hits in the road level
-      void setRoadLevel(int roadLevel)
-      {
-        m_param_roadLevel = roadLevel;
-      }
 
     public:
       /// Statistic: Number received node
@@ -232,8 +163,8 @@ namespace Belle2 {
       /// Memory for the tree node level which should be the source of hits for the road searches. Defaults to the top most node.
       int m_param_roadLevel = 0;
 
-      /// Memory for the name of the resolution function to be used. Valid values are 'none', 'base', 'origin', 'offOrigin'
-      std::string m_param_curvResolution = "base";
+      /// Memory for the name of the resolution function to be used. Valid values are 'none', 'const', 'basic', 'origin', 'offOrigin'
+      std::string m_param_curvResolution = "const";
 
       /*
       /// Memory for the maximum allowed distance from track to hit
@@ -244,7 +175,7 @@ namespace Belle2 {
       */
     private:
       /// Memory for found trajectories.
-      std::list<CDCTrack> m_tracks;
+      std::vector<CDCTrack> m_tracks;
 
       /// Memory for the pool of axial wire hits to can be used in the post processing
       std::vector<const CDCWireHit*> m_axialWireHits;

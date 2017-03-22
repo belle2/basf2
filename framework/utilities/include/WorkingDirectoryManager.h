@@ -18,7 +18,7 @@ namespace Belle2 {
   public:
     /**
      * Change ROOT working directory to given directory
-     * @param workingDirectory
+     * @param workingDirectory new working directory to change into
      */
     explicit WorkingDirectoryManager(std::string workingDirectory) : oldDirectory(gSystem->WorkingDirectory())
     {

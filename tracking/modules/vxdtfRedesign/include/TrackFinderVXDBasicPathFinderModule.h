@@ -104,10 +104,11 @@ namespace Belle2 {
     bool m_PARAMprintNetworks;
 
 
-    /** Regulates if every subset of sufficient length of a path shall be collected as separate path or not.
-     *
-     * if true, only one path per possibility is collected, if false subsets are collected too. */
+    /** Regulates if every node with enough notes below it is used as a seed or only the outermost nodes. */
     bool m_PARAMstrictSeeding;
+
+    /** Regulates if every subset of sufficient length of a path shall be collected as separate path or not. */
+    bool m_PARAMstoreSubsets;
 
 /// member variables
 

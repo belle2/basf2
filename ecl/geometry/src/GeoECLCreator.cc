@@ -24,6 +24,7 @@
 #include <geometry/Materials.h>
 #include <framework/gearbox/GearDir.h>
 #include "ecl/dbobjects/ECLCrystalsShapeAndPosition.h"
+#include "ecl/dbobjects/ECLBeamBackgroundStudy.h"
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>
@@ -46,24 +47,30 @@ namespace Belle2 {
 //-----------------------------------------------------------------
 
 
-    GeoECLCreator::GeoECLCreator(): isBeamBkgStudy(0), m_sap(0), m_overlap(0)
+    GeoECLCreator::GeoECLCreator(): m_sap(0), m_overlap(0)
     {
+      m_sensediode = NULL;
       m_sensitive  = new SensitiveDetector("ECLSensitiveDetector", (2 * 24)*CLHEP::eV, 10 * CLHEP::MeV);
-      m_sensediode = new SensitiveDiode("ECLSensitiveDiode");
       G4SDManager::GetSDMpointer()->AddNewDetector(m_sensitive);
-      G4SDManager::GetSDMpointer()->AddNewDetector(m_sensediode);
       defineVisAttributes();
     }
 
 
     GeoECLCreator::~GeoECLCreator()
     {
-      for (BkgSensitiveDetector* sensitive : m_bkgsensitive) delete sensitive;
       for (auto a : m_atts) delete a.second;
     }
 
     void GeoECLCreator::createFromDB(const std::string&, G4LogicalVolume& topVolume, geometry::GeometryTypes)
     {
+      DBObjPtr<ECLBeamBackgroundStudy> study;
+      if (study.isValid() && (*study).getBeamBackgroundStudy()) {
+        m_sensediode = new BkgSensitiveDiode("ECLBkgSensitiveDiode");
+      } else {
+        m_sensediode = new SensitiveDiode("ECLSensitiveDiode");
+        G4SDManager::GetSDMpointer()->AddNewDetector(m_sensediode);
+      }
+
       DBObjPtr<ECLCrystalsShapeAndPosition> crystals;
       if (!crystals.isValid()) B2FATAL("No crystal's data in the database.");
       m_sap = &(*crystals);
@@ -73,15 +80,25 @@ namespace Belle2 {
       backward(topVolume);
     }
 
-    void GeoECLCreator::createPayloads(const GearDir&, const IntervalOfValidity& iov)
+    void GeoECLCreator::createPayloads(const GearDir& content, const IntervalOfValidity& iov)
     {
       ECLCrystalsShapeAndPosition crystals = loadCrystalsShapeAndPosition();
       Database::Instance().storeData<ECLCrystalsShapeAndPosition>(&crystals, iov);
+
+      ECLBeamBackgroundStudy study;
+      study.setBeamBackgroundStudy(content.getInt("BeamBackgroundStudy"));
+      Database::Instance().storeData<ECLBeamBackgroundStudy>(&study, iov);
     }
 
     void GeoECLCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes)
     {
-      isBeamBkgStudy = content.getInt("BeamBackgroundStudy");
+      bool isBeamBkgStudy = content.getInt("BeamBackgroundStudy");
+      if (isBeamBkgStudy) {
+        m_sensediode = new BkgSensitiveDiode("ECLBkgSensitiveDiode");
+      } else {
+        m_sensediode = new SensitiveDiode("ECLSensitiveDiode");
+        G4SDManager::GetSDMpointer()->AddNewDetector(m_sensediode);
+      }
 
       ECLCrystalsShapeAndPosition crystals = loadCrystalsShapeAndPosition();
       m_sap = &crystals;

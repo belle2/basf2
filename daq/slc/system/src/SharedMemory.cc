@@ -58,6 +58,7 @@ bool SharedMemory::open()
 void SharedMemory::close()
 {
   if (m_fd > 0) {
+    if (m_addr != NULL) munmap(m_addr, m_size);
     ::close(m_fd);
     m_fd = 0;
   }
@@ -88,6 +89,7 @@ void* SharedMemory::map(size_t offset, size_t size)
     addr = NULL;
   }
   m_addr = addr;
+  m_size = size;
   return addr;
 }
 

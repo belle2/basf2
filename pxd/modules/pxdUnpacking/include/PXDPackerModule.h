@@ -116,6 +116,8 @@ namespace Belle2 {
       void append_int32(unsigned int w);//! cat 32value value to frame
       void add_frame_to_payload(void);//! Add Frame to Event payload
 
+      void do_the_reverse_mapping(unsigned int& row, unsigned int& col, unsigned short layer, unsigned short sensor);
+
       /** Store start of Vxd Detector related digits */
       std::map <VxdID , int> startOfVxdID;
 

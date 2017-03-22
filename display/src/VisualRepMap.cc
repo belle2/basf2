@@ -109,7 +109,7 @@ void VisualRepMap::selectRelated(TEveElement* eveObj) const
   if (representedObject) {
     //representedObject->Dump();
 
-    const RelationVector<TObject>& relatedObjects = DataStore::Instance().getRelationsWithObj<TObject>(representedObject, "ALL");
+    const RelationVector<TObject>& relatedObjects = DataStore::getRelationsWithObj<TObject>(representedObject, "ALL");
     for (const TObject& relObj : relatedObjects) {
       select(&relObj);
     }

@@ -3,7 +3,8 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Oliver Frost                                             *
+ * Contributors: Bastian Kronenbitter, Thomas Hauth, Viktor Trusov,       *
+ *               Nils Braun, Oliver Frost                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,132 +12,84 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/hough/perigee/SimpleRLTaggedWireHitHoughTree.h>
-#include <tracking/trackFindingCDC/hough/algorithms/InPhi0CurvBox.h>
-
-#include <tracking/trackFindingCDC/utilities/ParameterVariant.h>
-
-#include <vector>
-#include <map>
-#include <string>
+#include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 
 namespace Belle2 {
   class ModuleParamList;
 
   namespace TrackFindingCDC {
-    class CDCWireHit;
     class CDCTrack;
+    class CDCWireHit;
 
-    /// Generates axial tracks from hit using the special leaf processing inspired by the legendre algorithm.
-    class AxialTrackCreatorHitLegendre : public Findlet<const CDCWireHit, CDCTrack> {
+    /**
+     * Generates axial tracks from hit using special leaf postprocessing.
+     *
+     * Implements Legendre transformation of the drift time circles.
+     * This is a module, performing tracking in the CDC. It is based on the paper
+     * "Implementation of the Legendre Transform for track segment reconstruction in drift tube chambers"
+     * by T. Alexopoulus, et al. NIM A592 456-462 (2008).
+     */
+    class AxialTrackCreatorHitLegendre : public Findlet<const CDCWireHit* const, CDCTrack> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCWireHit, CDCTrack>;
+      using Super = Findlet<const CDCWireHit* const, CDCTrack>;
 
     public:
+      /**
+       *  Pass keys for the different sets of predefined parameters for a pass if legendre search
+       *  Note: Naming copied from original location. Does not actually match with the associated
+       *  parameters.
+       */
+      enum class EPass {
+        /// Pass corresponds to High-pt track finding and more deeper quadtree
+        NonCurlers,
+        /// Pass corresponds to High-pt track finding and more rough quadtree
+        NonCurlersWithIncreasingThreshold,
+        /// Pass corresponds to full pt range and even more rough quadtree
+        /// (non-ip tracks, tracks with energy losses etc)
+        FullRange
+      };
+
+    public:
+      /// Constructor
+      AxialTrackCreatorHitLegendre();
+
+      /// Constructor from a pass key
+      explicit AxialTrackCreatorHitLegendre(EPass pass);
+
       /// Short description of the findlet
       std::string getDescription() final;
 
       /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
-      /// Initialize the findlet before event processing
+      /// Initialisation before the event processing starts
       void initialize() final;
 
-      /// Generates the tracks from the given segments into the output argument.
-      void apply(const std::vector<CDCWireHit>& wireHits, std::vector<CDCTrack>& tracks) final;
-
-      /// Cleanup the findlet after event processing
-      void terminate() final;
-
-    public:
-      /// Get a series of parameters to be set for each pass over the fine hough space
-      std::vector<ParameterVariantMap> getDefaultFineRelaxationSchedule() const;
-
-      /// Get a series of parameters to be set for each pass over the rough hough space
-      std::vector<ParameterVariantMap> getDefaultRoughRelaxationSchedule() const;
-
-      /// Get a series of parameters to be set for each pass over the rough hough space
-      static std::vector<float> getDefaultCurvBounds(std::array<float, 2> curvSpan, int granularityLevel);
+      /// Execute one pass over a quad tree
+      void apply(const std::vector<const CDCWireHit*>& axialWireHits,
+                 std::vector<CDCTrack>& tracks) final;
 
     private:
-      /// Maximal curvature acceptance of the CDC
-      const double m_maxCurvAcceptance = 0.13;
+      using CandidateReceiver = AxialHitQuadTreeProcessor::CandidateReceiver;
+      /**
+       * Performs quadtree search
+       * @param candidateProcessor lambda interface process found leaves in the legendre search
+       * @param qtProcessor reference to the AxialHitQuadTreeProcessor instance
+       */
+      void executeRelaxation(const CandidateReceiver& candidateReceiver,
+                             AxialHitQuadTreeProcessor& qtProcessor);
 
-      /// Curvature below which particles from IP do not leave the CDC
-      const double m_curlCurv = 0.018;
+    private: // Parameters
+      /// The pass key for lookup of the parameters for this pass
+      EPass m_pass = EPass::NonCurlers;
 
-    private:
-      // Fine hough space
-      /// Parameter: Level of divisions in the fine hough space.
-      int m_param_fineGranularityLevel = 12;
+      /// Parameter to define multiplier for hits threshold for the next quadtree iteration
+      const double m_param_stepScale = 0.75;
 
-      /// Parameter: Number of levels to be skipped in the fine hough space on the first level to form sectors
-      int m_param_fineSectorLevelSkip = 2;
-
-      // Parameter: Fine hough bounds.
-      // std::vector<float> m_param_fineCurvBounds{{ -0.018, 0.75}};
-
-      /// Parameter: Fine hough bounds.
-      std::vector<float> m_param_fineCurvBounds{{ -0.02, 0.14}};
-
-      /// Parameter: Width of the phi0 bins at the highest level of the fine hough space.
-      int m_param_fineDiscretePhi0Width = 19;
-
-      /// Parameter: Overlap of the phi0 bins at the highest level of the fine hough space.
-      int m_param_fineDiscretePhi0Overlap = 5;
-
-      /// Parameter: Width of the curvature bins at the highest level of the fine hough space.
-      int m_param_fineDiscreteCurvWidth = 1;
-
-      /// Parameter: Overlap of the curvature bins at the highest level of the fine hough space.
-      int m_param_fineDiscreteCurvOverlap = -1;
-
-      /// Parameter: Relaxation schedule for the leaf processor in the fine hough tree
-      std::vector<ParameterVariantMap> m_param_fineRelaxationSchedule;
-
-      // Rough hough space
-      /// Parameter: Level of divisions in the rough hough space.
-      int m_param_roughGranularityLevel = 10;
-
-      /// Parameter: Number of levels to be skipped in the rough hough space on the first level to form sectors
-      int m_param_roughSectorLevelSkip = 0;
-
-      /// Parameter: Rough hough bounds.
-      std::vector<float> m_param_roughCurvBounds{{ 0.00, 0.30}};
-
-      /// Parameter: Width of the phi0 bins at the highest level of the rough hough space.
-      int m_param_roughDiscretePhi0Width = 19;
-
-      /// Parameter: Overlap of the phi0 bins at the highest level of the rough hough space.
-      int m_param_roughDiscretePhi0Overlap = 5;
-
-      /// Parameter: Width of the curvature bins at the highest level of the rough hough space.
-      int m_param_roughDiscreteCurvWidth = 1;
-
-      /// Parameter: Overlap of the curvature bins at the highest level of the rough hough space.
-      int m_param_roughDiscreteCurvOverlap = -1;
-
-      /// Parameter: Relaxation schedule for the leaf processor in the rough hough tree
-      std::vector<ParameterVariantMap> m_param_roughRelaxationSchedule;
-
-      /// Fixed parameter: Number of divisions in the phi0 direction
-      static const int c_phi0Divisions = 2;
-
-      /// Fixed parameter: Number of divisions in the curv direction
-      static const int c_curvDivisions = 2;
-
-    private:
-      /// Type of the hough space tree search
-      using SimpleRLTaggedWireHitPhi0CurvHough =
-        SimpleRLTaggedWireHitHoughTree<InPhi0CurvBox, c_phi0Divisions, c_curvDivisions>;
-
-      /// The fine hough space tree search
-      std::unique_ptr<SimpleRLTaggedWireHitPhi0CurvHough> m_fineHoughTree;
-
-      /// The rough space tree search
-      std::unique_ptr<SimpleRLTaggedWireHitPhi0CurvHough> m_roughHoughTree;
+      /// Parameter to define minimal threshold of hit
+      const int m_param_minNHits = 10;
     };
   }
 }

@@ -9,6 +9,8 @@
  **************************************************************************/
 
 #include <string>
+#include <algorithm>
+#include <set>
 #include <analysis/modules/AnalysisConfiguration/AnalysisConfigurationModule.h>
 #include <analysis/utility/AnalysisConfiguration.h>
 
@@ -22,10 +24,11 @@ REG_MODULE(AnalysisConfiguration)
 AnalysisConfigurationModule::AnalysisConfigurationModule() : Module()
 {
   setDescription("This is a supplimentary module designed to configure other modules");
-  addParam("tupleStyle", m_tupleStyle, R"DOCSTRING(Style of the tuples. \n
+  addParam("tupleStyle", m_tupleStyle, R"DOCSTRING(This parameter defines style of variables written by all other ntuples tools. \n
   Possible styles on example of PX variable of pi0 from D in decay B->(D->pi0 pi) pi0:\n
-  'Default': B_D_pi0_PX\n
-  'Laconic': pi01_PX)DOCSTRING", std::string("Default"));
+  'default': B_D_pi0_PX\n
+  'semilaconic': D_pi0_PX\n
+  'laconic': pi01_PX\n)DOCSTRING", std::string("default"));
 
   addParam("mcMatchingVersion", m_mcMatchingVersion, "Specifies what version of mc matching algorithm is going to be used. \n"
            "Possibilities are: BelleII (default) and Belle. The latter should be used when analysing Belle MC.\n"
@@ -36,6 +39,9 @@ AnalysisConfigurationModule::AnalysisConfigurationModule() : Module()
 
 void AnalysisConfigurationModule::initialize()
 {
+  if (m_styles.find(m_tupleStyle) == m_styles.end()) {
+    B2WARNING("Chosen tuple style '" << m_tupleStyle << "' is not defined. Using default tuple style.");
+  }
   AnalysisConfiguration::instance()->setTupleStyle(m_tupleStyle);
 
   if (m_mcMatchingVersion == "BelleII")

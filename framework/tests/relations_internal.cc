@@ -292,7 +292,7 @@ namespace {
   void RelationsInternal::findRelationsCheckContents()
   {
     const EventMetaData* fromObj = (evtData)[0];
-    RelationVector<ProfileInfo> toRels = DataStore::getRelationsFromObj<ProfileInfo>(fromObj);
+    RelationVector<ProfileInfo> toRels = DataStore::getRelationsWithObj<ProfileInfo>(fromObj);
     EXPECT_EQ(toRels.size(), 3u);
     //this is assuming stable order, correct?
     EXPECT_DOUBLE_EQ(toRels.weight(0), 1.0);
@@ -312,16 +312,14 @@ namespace {
     EXPECT_EQ(i, 3);
 
     const ProfileInfo* toObj = (profileData)[2];
-    RelationVector<EventMetaData> fromRels = DataStore::getRelationsToObj<EventMetaData>(toObj);
+    RelationVector<EventMetaData> fromRels = DataStore::getRelationsWithObj<EventMetaData>(toObj);
     EXPECT_EQ(fromRels.size(), 1u);
     EXPECT_DOUBLE_EQ(fromRels.weight(0), -3.0);
     EXPECT_TRUE(fromRels.object(0) == fromObj);
     EXPECT_TRUE(fromRels[0] == fromObj);
 
     //some things that shouldn't return anything
-    EXPECT_EQ(DataStore::getRelationsFromObj<EventMetaData>(fromObj).size(), 0u);
-    EXPECT_EQ(DataStore::getRelationsToObj<ProfileInfo>(fromObj).size(), 0u);
-    EXPECT_EQ(DataStore::getRelationsToObj<EventMetaData>(fromObj).size(), 0u);
+    EXPECT_EQ(DataStore::getRelationsWithObj<EventMetaData>(fromObj).size(), 0u);
   }
 
   /** Test DataStore members for finding relations. */
@@ -333,16 +331,16 @@ namespace {
 
     //check non-existing relations (registered)
     const EventMetaData* fromObj = (evtData)[0];
-    RelationVector<ProfileInfo> toRels = DataStore::getRelationsFromObj<ProfileInfo>(fromObj);
+    RelationVector<ProfileInfo> toRels = DataStore::getRelationsWithObj<ProfileInfo>(fromObj);
     EXPECT_EQ(toRels.size(), 0u);
     const ProfileInfo* toObj = (profileData)[2];
-    RelationVector<EventMetaData> fromRels = DataStore::getRelationsToObj<EventMetaData>(toObj);
+    RelationVector<EventMetaData> fromRels = DataStore::getRelationsWithObj<EventMetaData>(toObj);
     EXPECT_EQ(fromRels.size(), 0u);
 
     //check non-existing relations (unregistered)
-    RelationVector<EventMetaData> toRels2 = DataStore::getRelationsFromObj<EventMetaData>(fromObj);
+    RelationVector<EventMetaData> toRels2 = DataStore::getRelationsWithObj<EventMetaData>(fromObj);
     EXPECT_EQ(toRels2.size(), 0u);
-    RelationVector<ProfileInfo> fromRels2 = DataStore::getRelationsToObj<ProfileInfo>(toObj);
+    RelationVector<ProfileInfo> fromRels2 = DataStore::getRelationsWithObj<ProfileInfo>(toObj);
     EXPECT_EQ(fromRels2.size(), 0u);
 
     RelationArray relation(evtData, profileData);
@@ -384,14 +382,14 @@ namespace {
     DataStore::Instance().addRelationFromTo((evtData)[0], (profileData)[2], 3.0);
 
     //some objects with no relations to given type
-    EXPECT_EQ(DataStore::Instance().getRelationsWithObj<EventMetaData>((evtData)[0]).size(), 0u);
-    EXPECT_EQ(DataStore::Instance().getRelationsWithObj<EventMetaData>((profileData)[3]).size(), 0u);
+    EXPECT_EQ(DataStore::getRelationsWithObj<EventMetaData>((evtData)[0]).size(), 0u);
+    EXPECT_EQ(DataStore::getRelationsWithObj<EventMetaData>((profileData)[3]).size(), 0u);
 
-    RelationVector<ProfileInfo> profRels = DataStore::Instance().getRelationsWithObj<ProfileInfo>((evtData)[0]);
+    RelationVector<ProfileInfo> profRels = DataStore::getRelationsWithObj<ProfileInfo>((evtData)[0]);
     EXPECT_EQ(profRels.size(), 3u);
     EXPECT_EQ(profRels.weight(0), 1.0); //should be positive
 
-    RelationVector<EventMetaData> eventRels = DataStore::Instance().getRelationsWithObj<EventMetaData>((profileData)[0]);
+    RelationVector<EventMetaData> eventRels = DataStore::getRelationsWithObj<EventMetaData>((profileData)[0]);
     EXPECT_EQ(eventRels.size(), 1u);
     EXPECT_EQ(eventRels.weight(0), 1.0); //points to given object, same weight
   }
@@ -421,7 +419,7 @@ namespace {
 
     //actually test "ALL" option
     const EventMetaData* fromObj = (evtData)[0];
-    RelationVector<ProfileInfo> toRels = DataStore::getRelationsFromObj<ProfileInfo>(fromObj, "ALL");
+    RelationVector<ProfileInfo> toRels = DataStore::getRelationsWithObj<ProfileInfo>(fromObj, "ALL");
     EXPECT_EQ(toRels.size(), 4u);
     //order might be anything, check sum of weights
     double sum = 0.0;
@@ -431,24 +429,24 @@ namespace {
     EXPECT_DOUBLE_EQ(sum, 42.0 + 1 + 2 - 3);
 
     //finding with default TO name
-    EXPECT_EQ(DataStore::getRelationsFromObj<ProfileInfo>(fromObj, profileData.getName()).size(), 3u);
+    EXPECT_EQ(DataStore::getRelationsWithObj<ProfileInfo>(fromObj, profileData.getName()).size(), 3u);
     //finding with TO name of 2nd array
-    EXPECT_EQ(DataStore::getRelationsFromObj<ProfileInfo>(fromObj, profileData2.getName()).size(), 1u);
+    EXPECT_EQ(DataStore::getRelationsWithObj<ProfileInfo>(fromObj, profileData2.getName()).size(), 1u);
     //and something that doesn't exist
-    EXPECT_EQ(DataStore::getRelationsFromObj<ProfileInfo>(fromObj, "DoesntExist").size(), 0u);
+    EXPECT_EQ(DataStore::getRelationsWithObj<ProfileInfo>(fromObj, "DoesntExist").size(), 0u);
 
     const ProfileInfo* toObj = profileData2[0];
     //object should also be found without specifying the name
-    EXPECT_EQ(DataStore::getRelationsToObj<EventMetaData>(toObj).size(), 1u);
+    EXPECT_EQ(DataStore::getRelationsWithObj<EventMetaData>(toObj).size(), 1u);
     //or with 'ALL"
-    EXPECT_EQ(DataStore::getRelationsToObj<EventMetaData>(toObj, "ALL").size(), 1u);
+    EXPECT_EQ(DataStore::getRelationsWithObj<EventMetaData>(toObj, "ALL").size(), 1u);
     //and using a base class
-    EXPECT_EQ(DataStore::getRelationsToObj<TObject>(toObj, "ALL").size(), 1u);
+    EXPECT_EQ(DataStore::getRelationsWithObj<TObject>(toObj, "ALL").size(), 1u);
 
     //no relations to this type
-    EXPECT_EQ(DataStore::getRelationsFromObj<EventMetaData>(fromObj, "ALL").size(), 0u);
+    EXPECT_EQ(DataStore::getRelationsWithObj<EventMetaData>(fromObj, "ALL").size(), 0u);
     //should work again
-    EXPECT_EQ(DataStore::getRelationsFromObj<TObject>(fromObj, "ALL").size(), 4u);
+    EXPECT_EQ(DataStore::getRelationsWithObj<TObject>(fromObj, "ALL").size(), 4u);
 
   }
 
@@ -492,7 +490,7 @@ namespace {
     evtData.clear();
     profileData.clear();
 
-    EXPECT_EQ(DataStore::getRelationsFromObj<ProfileInfo>(relObjData[1]).size(), 0u);
-    EXPECT_EQ(DataStore::getRelationsToObj<EventMetaData>(relObjData[0]).size(), 0u);
+    EXPECT_EQ(DataStore::getRelationsWithObj<ProfileInfo>(relObjData[1]).size(), 0u);
+    EXPECT_EQ(DataStore::getRelationsWithObj<EventMetaData>(relObjData[0]).size(), 0u);
   }
 }  // namespace

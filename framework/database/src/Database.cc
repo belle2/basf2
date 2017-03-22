@@ -81,7 +81,7 @@ Database::~Database() {}
 void Database::getData(const EventMetaData& event, std::list<DBQuery>& query)
 {
   for (auto& entry : query) {
-    auto objectIov = getData(event, entry.package, entry.module);
+    auto objectIov = getData(event, entry.name);
     entry.object = objectIov.first;
     entry.iov = objectIov.second;
   }
@@ -91,27 +91,27 @@ bool Database::storeData(std::list<DBQuery>& query)
 {
   bool result = true;
   for (auto& entry : query) {
-    result = result && storeData(entry.package, entry.module, entry.object, entry.iov);
+    result = result && storeData(entry.name, entry.object, entry.iov);
   }
   return result;
 }
 
 
-std::string Database::payloadFileName(const std::string& path, const std::string& package, const std::string& module,
+std::string Database::payloadFileName(const std::string& path, const std::string& name,
                                       int revision) const
 {
-  std::string result = package + "_" + module;
+  std::string result = "dbstore_" + name;
   if (revision > 0) result += "_rev_" + std::to_string(revision);
   result += ".root";
   if (!path.empty()) result = path + "/" + result;
   return result;
 }
 
-TObject* Database::readPayload(const std::string& fileName, const std::string& module) const
+TObject* Database::readPayload(const std::string& fileName, const std::string& name) const
 {
   TObject* result = 0;
 
-  if (module.find(".") != std::string::npos) {
+  if (name.find(".") != std::string::npos) {
     return new PayloadFile(fileName);
   }
 
@@ -124,16 +124,16 @@ TObject* Database::readPayload(const std::string& fileName, const std::string& m
     return result;
   }
 
-  result = file->Get(module.c_str());
+  result = file->Get(name.c_str());
   delete file;
   if (!result) {
-    B2ERROR("Failed to get " << module  << " from payload file" << fileName << ".");
+    B2ERROR("Failed to get " << name << " from payload file" << fileName << ".");
   }
 
   return result;
 }
 
-bool Database::writePayload(const std::string& fileName, const std::string& module, const TObject* object,
+bool Database::writePayload(const std::string& fileName, const std::string& name, const TObject* object,
                             const IntervalOfValidity* iov) const
 {
   TDirectory* saveDir = gDirectory;
@@ -145,7 +145,7 @@ bool Database::writePayload(const std::string& fileName, const std::string& modu
     return false;
   }
 
-  object->Write(module.c_str(), TObject::kSingleKey);
+  object->Write(name.c_str(), TObject::kSingleKey);
   if (iov) file->WriteObject(iov, "IoV");
 
   file->Close();
@@ -156,25 +156,9 @@ bool Database::writePayload(const std::string& fileName, const std::string& modu
 }
 
 namespace {
-  void Database_addExperimentName(int experiment, const std::string& name)
+  void Database_addExperimentName(int, const std::string&)
   {
-    B2INFO("Map Experiment " << experiment << " to '" << name << "'");
-    std::vector<Database*> databases{&Database::Instance()};
-    DatabaseChain* chain = dynamic_cast<DatabaseChain*>(databases[0]);
-    if (chain) {
-      databases = chain->getDatabases();
-    }
-    bool found{false};
-    for (Database* db : databases) {
-      ConditionsDatabase* cond = dynamic_cast<ConditionsDatabase*>(db);
-      if (cond) {
-        cond->addExperimentName(experiment, name);
-        found = true;
-      }
-    }
-    if (!found) {
-      B2WARNING("No central database configured, experiment name ignored");
-    }
+    B2WARNING("set_experiment_name is deprecated: setting experiment names is no longer possible and will be ignored");
   }
 }
 
@@ -212,21 +196,10 @@ void Database::exposePythonAPI()
 
   def("set_experiment_name", &Database_addExperimentName, args("experiment", "name"), R"DOCSTRING(
 Set a name for the given experiment number when looking up payloads in the
-central database. A central database needs to be set up before using `use_central_database`.
-
-The experiment and numbers and names need to be unique because the mapping
-needs to be performed in both directions so different experiment numbers cannot
-be mapped to the same name or vice versa.
-
-Example:
-    >>> set_experiment_name(4, "BELLE_exp4")
-
-:param int experiment: Experiment number from EventMetaData
-:param str name: name of the experiment when looking up payloads
-)DOCSTRING");
+central database. Thisf function is deprecated and any calls to it are ignored.)DOCSTRING");
   def("reset_database", &Database::reset, "Reset the database setup to have no database sources");
   def("use_database_chain", &DatabaseChain::createInstance,
-      (bp::arg("resetIoVs")=true, bp::arg("loglevel")=LogConfig::c_Warning, bp::arg("invertLogging")=false),
+      (bp::arg("resetIoVs") = true, bp::arg("loglevel") = LogConfig::c_Warning, bp::arg("invertLogging") = false),
       R"DOCSTRING(
 Use a database chain: Multiple database sources are used on a first found
 basis: If the payload is not found in one source try the next and so on.

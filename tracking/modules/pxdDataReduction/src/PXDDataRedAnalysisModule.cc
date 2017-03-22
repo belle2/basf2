@@ -84,16 +84,6 @@ PXDDataRedAnalysisModule::PXDDataRedAnalysisModule() : Module()
   , m_h1INtrack1_pVal(NULL)
   , m_h1INtrack1_nSVDhits(NULL)
   , m_h1INtrack1_nCDChits(NULL)
-  //
-  , m_h1notINtrack2(NULL)
-  , m_h1notINtrack2_pt(NULL)
-  , m_h1notINtrack2_phi(NULL)
-  , m_h1notINtrack2_lambda(NULL)
-  , m_h1notINtrack2_Theta(NULL)
-  , m_h1notINtrack2_cosTheta(NULL)
-  , m_h1notINtrack2_pVal(NULL)
-  , m_h1notINtrack2_nSVDhits(NULL)
-  , m_h1notINtrack2_nCDChits(NULL)
   //tracks with no intercept
   , m_h1notINtrack5(NULL)
   , m_h1notINtrack5_pt(NULL)
@@ -355,15 +345,15 @@ void PXDDataRedAnalysisModule::initialize()
   m_h2MaplocL2_out5 = new TH2F("h2MaplocL2_out5", "L2 local u v ID", 1535, -767.5, 767.5, 250, -0.5, 249.5);
 
 
-  m_h1redFactor = new TH1F("hRedFactor", "reduction factor", 1000, 0, 1);
-  m_h1redFactor_L1 = new TH1F("hRedFactor_L1", "L1 reduction factor", 1000, 0, 1);
-  m_h1redFactor_L2 = new TH1F("hRedFactor_L2", "L2 reduction factor", 1000, 0, 1);
+  m_h1redFactor = new TH1F("hRedFactor", "L1+L2reduction factor", 1000, 0, 1);
+  m_h1redFactor_L1 = new TH1F("hRedFactor_L1", "L1-only reduction factor", 1000, 0, 1);
+  m_h1redFactor_L2 = new TH1F("hRedFactor_L2", "L2-only reduction factor", 1000, 0, 1);
 
-  m_h1totROIs = new TH1F("h1TotNROIs", "number of all ROIs", 100, 0, 100);
-  m_h1okROIs = new TH1F("h1OkNROIs", "number of all ROIs containing a PXDDigit", 100, 0, 100);
+  m_h1totROIs = new TH1F("h1TotNROIs", "number of all ROIs", 110, 0, 110);
+  m_h1okROIs = new TH1F("h1OkNROIs", "number of all ROIs containing a PXDDigit", 110, 0, 110);
 
-  m_h1totArea = new TH1F("h1TotArea", "Area of all ROIs", 100, 0, 500000);
-  m_h1okArea = new TH1F("h1OkArea", "Area of ROIs containing a PXDDigit", 100, 0, 10000);
+  m_h1totArea = new TH1F("h1TotArea", "Area of all ROIs", 100, 0, 2500000);
+  m_h1okArea = new TH1F("h1OkArea", "Area of ROIs containing a PXDDigit", 100, 0, 75000);
 
 
 
@@ -474,10 +464,6 @@ void PXDDataRedAnalysisModule::beginRun()
 void PXDDataRedAnalysisModule::event()
 {
 
-  B2RESULT("number of sensors on L1 = " << m_nSensorsL1 << ", and on L2 = " << m_nSensorsL2);
-
-
-
   typedef RelationIndex < RecoTrack, PXDIntercept>::range_from PXDInterceptsFromRecoTracks;
   typedef RelationIndex < RecoTrack, PXDIntercept>::iterator_from PXDInterceptIteratorType;
   typedef RelationIndex < PXDDigit, PXDTrueHit>::range_from PXDTrueHitFromPXDDigit;
@@ -497,8 +483,10 @@ void PXDDataRedAnalysisModule::event()
   B2DEBUG(1, "  ++++++++++++++ PXDDataRedAnalysisModule");
 
   int nROIs = 0;
-  int totArea_L1 = 0;
-  int totArea_L2 = 0;
+  int okArea_L1 = 0;
+  int okArea_L2 = 0;
+  int totArea_L1  = 0;
+  int totArea_L2  = 0;
 
   //ROIs general
   StoreArray<ROIid> ROIList(m_ROIListName);
@@ -507,8 +495,20 @@ void PXDDataRedAnalysisModule::event()
     m_h2ROItopRight->Fill(ROIList[i]->getMaxUid(), ROIList[i]->getMaxVid());
     m_h2ROIuMinMax->Fill(ROIList[i]->getMinUid(), ROIList[i]->getMaxUid());
     m_h2ROIvMinMax->Fill(ROIList[i]->getMinVid(), ROIList[i]->getMaxVid());
-
+    int tmpArea = (ROIList[i]->getMaxUid() - ROIList[i]->getMinUid()) * (ROIList[i]->getMaxVid() - ROIList[i]->getMinVid());
+    if ((ROIList[i]->getSensorID()).getLayerNumber() == 1)
+      totArea_L1 += tmpArea;
+    else
+      totArea_L2 += tmpArea;
   }
+
+  m_h1totArea->Fill(totArea_L1 + totArea_L2);
+  double redFactor_L1 = totArea_L1 / 768. / 250. / m_nSensorsL1; //16
+  double redFactor_L2 = totArea_L2 / 768. / 250. / m_nSensorsL2; //24
+  m_h1redFactor->Fill((double)(totArea_L1 + totArea_L2) / 768. / 250. / (m_nSensorsL1 + m_nSensorsL2));
+  m_h1redFactor_L1->Fill((double) redFactor_L1);
+  m_h1redFactor_L2->Fill((double) redFactor_L2);
+
   m_h1totROIs->Fill(ROIList.getEntries());
   n_rois += ROIList.getEntries();
 
@@ -533,7 +533,7 @@ void PXDDataRedAnalysisModule::event()
 
     // continue only if MCParticle has a related PXDDigit and RecoTrack
     RelationVector<PXDDigit> pxdDigits_MCParticle = aMcParticle->getRelationsFrom<PXDDigit>();
-    RelationVector<RecoTrack> recoTracks_MCParticle = DataStore::getRelationsToObj<RecoTrack>(aMcParticle);
+    RelationVector<RecoTrack> recoTracks_MCParticle = aMcParticle->getRelationsWith<RecoTrack>();
 
     m_h1DigitsPerParticle->Fill(pxdDigits_MCParticle.size());
     if (pxdDigits_MCParticle.size() == 0)
@@ -700,9 +700,9 @@ void PXDDataRedAnalysisModule::event()
 
                   m_h1okArea->Fill(tmpArea);
                   if (VxdID(m_vxdIDmc).getLayerNumber() == 1) //L1
-                    totArea_L1 = totArea_L1 + tmpArea;
+                    okArea_L1 = okArea_L1 + tmpArea;
                   if (VxdID(m_vxdIDmc).getLayerNumber() == 2) //L2
-                    totArea_L2 = totArea_L2 + tmpArea;
+                    okArea_L2 = okArea_L2 + tmpArea;
 
                   nROIs++;
 
@@ -904,12 +904,6 @@ void PXDDataRedAnalysisModule::event()
   n_tracksWithDigitsInROI += NtrackHit;
 
   m_rootEvent++;
-  m_h1totArea->Fill(totArea_L1 + totArea_L2);
-  double redFactor_L1 = totArea_L1 / 768. / 250. / (m_nSensorsL1 + m_nSensorsL2); //18
-  double redFactor_L2 = totArea_L2 / 768. / 250. / (m_nSensorsL1 + m_nSensorsL2); //22
-  m_h1redFactor->Fill((double) redFactor_L1 + redFactor_L2);
-  m_h1redFactor_L1->Fill((double) redFactor_L1);
-  m_h1redFactor_L2->Fill((double) redFactor_L2);
   B2RESULT(" o  PXDDataReduction ANALYSIS: redFactor L1 = " << redFactor_L1 << ", redFactor L2 = " << redFactor_L2);
   B2RESULT(" o                           : NtrackHit/Ntrack = " << NtrackHit << "/ " << Ntrack << " = " <<
            (double)NtrackHit / Ntrack);
@@ -954,16 +948,22 @@ void PXDDataRedAnalysisModule::terminate()
 
   B2RESULT("     ROI Analysis Summary     ");
   B2RESULT("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-  B2RESULT("~ Numbers ~");
+  B2RESULT("");
+  B2RESULT(" number of tracks = " << n_tracks);
+  B2RESULT(" number of Intercepts = " << n_intercepts);
   B2RESULT(" number of ROIs = " << n_rois);
-  B2RESULT(" number of Intercepts = " << n_intercepts << "\n");
-  B2RESULT("~ Efficiency estimated from  ~");
-  B2RESULT("      tracks : " << n_tracks);
+  B2RESULT("");
+  B2RESULT("          average number of ROIs = " << m_h1totROIs->GetMean() << ", average area " << m_h1totArea->GetMean() <<
+           " (not excluding overlaps!)");
+  B2RESULT(" average number of ROIs w digits = " << m_h1okROIs->GetMean() << ", average tot area " << m_h1okArea->GetMean());
+  B2RESULT("");
+  B2RESULT(" red Factor = " << m_h1redFactor->GetMean()  << ", RMS = " << m_h1redFactor->GetRMS());
+  B2RESULT("");
   B2RESULT("tracks w digits: " << n_tracksWithDigits);
   B2RESULT("tracks w digits in ROI: " << n_tracksWithDigitsInROI);
-  B2RESULT("efficiency 2 : " << epsilon2Tot << " +/- " << sqrt(epsilon2Tot * (1 - epsilon2Tot) / n_tracksWithDigits));
+  B2RESULT("efficiency PTD : " << epsilon2Tot << " +/- " << sqrt(epsilon2Tot * (1 - epsilon2Tot) / n_tracksWithDigits));
 
-  Int_t totTrackOneDigiIn = 0;
+  Int_t totTrackOneDigiIn = 0; //not used for the moment, added to double check
   Int_t totnnotINtrack2 = 0;
   Int_t totnnotINtrack3 = 0;
   Int_t totnnotINtrack4 = 0;
@@ -982,15 +982,16 @@ void PXDDataRedAnalysisModule::terminate()
                     j + 1) + m_h1nnotINtrack2->GetBinContent(j + 1) + m_h1TrackOneDigiIn->GetBinContent(j + 1);
   }
 
-  B2RESULT("   tracks hit = " << totTrackOneDigiIn);
-  B2RESULT("      out ROI = " << totnnotINtrack2 << ", no ROI =  " << totnnotINtrack3);
-  B2RESULT("  wrongVxdID  = " << totnnotINtrack4 << ", no Inter = " << totnnotINtrack5);
+  B2RESULT("      out ROI = " << totnnotINtrack2);
+  B2RESULT("       no ROI = " << totnnotINtrack3);
+  B2RESULT("  wrongVxdID  = " << totnnotINtrack4);
+  B2RESULT("     no Inter = " << totnnotINtrack5);
   B2RESULT("");
 
   B2RESULT("    pxdDigit : " << n_pxdDigit);
   B2RESULT("  pxdDigitIn : " << n_pxdDigitInROI);
 
-  B2RESULT("  efficiency : " << epsilonTot << " +/- " << sqrt(epsilonTot * (1 - epsilonTot) / n_pxdDigit));
+  B2RESULT("        eff DGT: " << epsilonTot << " +/- " << sqrt(epsilonTot * (1 - epsilonTot) / n_pxdDigit));
   B2RESULT("  inefficiency (PXDDigits): ");
   B2RESULT("         out ROI: " << n_notINdigit2);
   B2RESULT("          no ROI: " << n_notINdigit3);

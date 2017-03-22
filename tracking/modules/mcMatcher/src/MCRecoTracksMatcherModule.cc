@@ -28,6 +28,16 @@
 
 #include <Eigen/Dense>
 
+/* disables the false positive warning of Intel icc about iter_pair_range::epmty() being unused
+tracking/modules/mcMatcher/src/MCRecoTracksMatcherModule.cc:55: warning #177: function
+"::iter_pair_range::empty [with Iter=std::_Rb_tree_const_iterator::DetId={Belle2::Const::EDetector},
+::HitId={int}>, ::WeightedRecoTrackId>>]" was declared but never referenced
+bool empty() const
+*/
+#ifdef __INTEL_COMPILER
+#pragma warning disable 177
+#endif
+
 using namespace Belle2;
 
 REG_MODULE(MCRecoTracksMatcher);
@@ -100,20 +110,27 @@ namespace {
     for (const RecoTrack& recoTrack : storedRecoTracks) {
       ++recoTrackId;
 
+      using OriginTrackFinder = RecoHitInformation::OriginTrackFinder;
+      const OriginTrackFinder c_MCTrackFinderAuxiliaryHit =
+        OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
+
       for (const RecoHitInformation::UsedCDCHit* cdcHit : recoTrack.getCDCHitList()) {
-        double weight = 1;
+        OriginTrackFinder originFinder = recoTrack.getFoundByTrackFinder(cdcHit);
+        double weight = originFinder == c_MCTrackFinderAuxiliaryHit ? 0 : 1;
         itInsertHint =
           recoTrackID_by_hitID.insert(itInsertHint,
         {{Const::CDC, cdcHit->getArrayIndex()}, {recoTrackId, weight}});
       }
       for (const RecoHitInformation::UsedSVDHit* svdHit : recoTrack.getSVDHitList()) {
-        double weight = 1;
+        OriginTrackFinder originFinder = recoTrack.getFoundByTrackFinder(svdHit);
+        double weight = originFinder == c_MCTrackFinderAuxiliaryHit ? 0 : 1;
         itInsertHint =
           recoTrackID_by_hitID.insert(itInsertHint,
         {{Const::SVD, svdHit->getArrayIndex()}, {recoTrackId, weight}});
       }
       for (const RecoHitInformation::UsedPXDHit* pxdHit : recoTrack.getPXDHitList()) {
-        double weight = 1;
+        OriginTrackFinder originFinder = recoTrack.getFoundByTrackFinder(pxdHit);
+        double weight = originFinder == c_MCTrackFinderAuxiliaryHit ? 0 : 1;
         itInsertHint =
           recoTrackID_by_hitID.insert(itInsertHint,
         {{Const::PXD, pxdHit->getArrayIndex()}, {recoTrackId, weight}});

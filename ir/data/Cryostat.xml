@@ -2,6 +2,9 @@
 <DetectorComponent name="Cryostat" xmlns:xi="http://www.w3.org/2001/XInclude">
   <Creator library="ir">CryostatCreator</Creator>
   <Content>
+
+    <LimitStepLength desc="select 1 to limit step length inside beam pipes to be less than 5mm">0</LimitStepLength>
+
 	<TubeR>
 		<N desc="Number of planes">4</N>
 

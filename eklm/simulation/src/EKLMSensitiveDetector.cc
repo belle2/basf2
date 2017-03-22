@@ -24,14 +24,13 @@
 using namespace Belle2;
 
 EKLM::EKLMSensitiveDetector::
-EKLMSensitiveDetector(G4String name, enum SensitiveType type)
+EKLMSensitiveDetector(G4String name)
   : Simulation::SensitiveDetectorBase(name, Const::KLM)
 {
   DBObjPtr<EKLMSimulationParameters> simPar;
   if (!simPar.isValid())
     B2FATAL("EKLM simulation parameters are not available.");
   m_GeoDat = &(EKLM::GeometryData::Instance());
-  m_type = type;
   m_ThresholdHitTime = simPar->getHitTimeThreshold();
   StoreArray<EKLMSimHit> simHits;
   StoreArray<MCParticle> particles;
@@ -43,15 +42,14 @@ EKLMSensitiveDetector(G4String name, enum SensitiveType type)
 
 bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
 {
-  int stripLevel = 1;
+  const int stripLevel = 1;
   HepGeom::Point3D<double> gpos, lpos;
   G4TouchableHandle hist = aStep->GetPreStepPoint()->GetTouchableHandle();
   const G4double eDep = aStep->GetTotalEnergyDeposit();
   const G4Track& track = * aStep->GetTrack();
   const G4double hitTime = track.GetGlobalTime();
   /* No time cut for background studies. */
-  if (hitTime > m_ThresholdHitTime &&
-      m_GeoDat->getDetectorMode() == EKLMGeometry::c_DetectorNormal) {
+  if (hitTime > m_ThresholdHitTime) {
     B2INFO("EKLMSensitiveDetector: "
            " ALL HITS WITH TIME > hitTimeThreshold ARE DROPPED!!");
     return false;
@@ -77,43 +75,15 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   hit->setEDep(eDep);
   hit->setPDG(track.GetDefinition()->GetPDGEncoding());
   hit->setTime(hitTime);
-  if (m_GeoDat->getDetectorMode() == EKLMGeometry::c_DetectorBackground)
-    stripLevel = 2;
   /* Get information on mother volumes and store them to the hit. */
-  switch (m_type) {
-    case c_SensitiveStrip:
-      hit->setStrip(hist->GetVolume(stripLevel)->GetCopyNo());
-      hit->setPlane(hist->GetVolume(stripLevel + 3)->GetCopyNo());
-      hit->setSector(hist->GetVolume(stripLevel + 4)->GetCopyNo());
-      hit->setLayer(hist->GetVolume(stripLevel + 5)->GetCopyNo());
-      hit->setEndcap(hist->GetVolume(stripLevel + 6)->GetCopyNo());
-      hit->setVolumeID(m_GeoDat->stripNumber(hit->getEndcap(), hit->getLayer(),
-                                             hit->getSector(), hit->getPlane(),
-                                             hit->getStrip()));
-      break;
-    case c_SensitiveSiPM:
-      hit->setStrip(hist->GetVolume(1)->GetCopyNo());
-      hit->setPlane(hist->GetVolume(4)->GetCopyNo());
-      hit->setSector(hist->GetVolume(5)->GetCopyNo());
-      hit->setLayer(hist->GetVolume(6)->GetCopyNo());
-      hit->setEndcap(hist->GetVolume(7)->GetCopyNo());
-      hit->setVolumeID(m_GeoDat->stripNumber(hit->getEndcap(), hit->getLayer(),
-                                             hit->getSector(), hit->getPlane(),
-                                             hit->getStrip()) + 100000);
-      break;
-    case c_SensitiveBoard:
-      int brd = hist->GetVolume(1)->GetCopyNo() - 1;
-      hit->setStrip((brd - 1) % 5 + 1); /* Board number, not strip. */
-      hit->setPlane((brd - 1) / 5 + 1);
-      hit->setSector(hist->GetVolume(2)->GetCopyNo());
-      hit->setLayer(hist->GetVolume(3)->GetCopyNo());
-      hit->setEndcap(hist->GetVolume(4)->GetCopyNo());
-      hit->setVolumeID(
-        m_GeoDat->segmentNumber(hit->getEndcap(), hit->getLayer(),
-                                hit->getSector(), hit->getPlane(),
-                                hit->getStrip()) + 200000);
-      break;
-  }
+  hit->setStrip(hist->GetVolume(stripLevel)->GetCopyNo());
+  hit->setPlane(hist->GetVolume(stripLevel + 3)->GetCopyNo());
+  hit->setSector(hist->GetVolume(stripLevel + 4)->GetCopyNo());
+  hit->setLayer(hist->GetVolume(stripLevel + 5)->GetCopyNo());
+  hit->setEndcap(hist->GetVolume(stripLevel + 6)->GetCopyNo());
+  hit->setVolumeID(m_GeoDat->stripNumber(hit->getEndcap(), hit->getLayer(),
+                                         hit->getSector(), hit->getPlane(),
+                                         hit->getStrip()));
   /* Relation. */
   StoreArray<MCParticle> particles;
   RelationArray particleToSimHits(particles, simHits);

@@ -243,7 +243,7 @@ void MCTrackCandClassifierModule::event()
     B2DEBUG(1, " a NEW MCTrackCand ");
 
     //1.b retrieve the MCParticle
-    RelationVector<MCParticle> MCParticles_fromMCTrackCand = DataStore::getRelationsFromObj<MCParticle>(&mcTrackCand);
+    RelationVector<MCParticle> MCParticles_fromMCTrackCand = DataStore::getRelationsWithObj<MCParticle>(&mcTrackCand);
 
     B2DEBUG(1, "~~~ " << MCParticles_fromMCTrackCand.size() << " MCParticles related to this MCTrackCand");
     for (int mcp = 0; mcp < (int)MCParticles_fromMCTrackCand.size(); mcp++) { //should be ONE
@@ -307,7 +307,7 @@ void MCTrackCandClassifierModule::event()
         if (detId == Const::PXD && m_usePXD) {
 
           PXDCluster* aPXDCluster = pxdClusters[hitId];
-          RelationVector<PXDTrueHit> PXDTrueHit_fromPXDCluster = DataStore::getRelationsFromObj<PXDTrueHit>(aPXDCluster);
+          RelationVector<PXDTrueHit> PXDTrueHit_fromPXDCluster = aPXDCluster->getRelationsWith<PXDTrueHit>();
           if (PXDTrueHit_fromPXDCluster.size() == 0) {
             B2WARNING("What's happening?!? no True Hit associated to the PXD Cluster");
             hasTrueHit = false;
@@ -331,7 +331,7 @@ void MCTrackCandClassifierModule::event()
           hasPXDCluster = true;
         } else if (detId == Const::SVD) {
           SVDCluster* aSVDCluster = svdClusters[hitId];
-          RelationVector<SVDTrueHit> SVDTrueHit_fromSVDCluster = DataStore::getRelationsFromObj<SVDTrueHit>(aSVDCluster);
+          RelationVector<SVDTrueHit> SVDTrueHit_fromSVDCluster = aSVDCluster->getRelationsWith<SVDTrueHit>();
           if (SVDTrueHit_fromSVDCluster.size() == 0) {
             B2WARNING("What's happening?!? no True Hit associated to the SVD Cluster");
             hasTrueHit = false;

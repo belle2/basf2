@@ -10,6 +10,7 @@
 #include <framework/datastore/RelationVector.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/HTML.h>
+#include <framework/utilities/ColorPalette.h>
 
 #include <utility>
 
@@ -208,9 +209,9 @@ TString InfoWidget::getHeader(const URI& uri) const
 
   TString col;
   if (uri.object and VisualRepMap::getInstance()->isVisualized(uri.object))
-    col = "d2ede4";
+    col = "#d2ede4"; //needs to be lighter than purple/blue used for links
   else
-    col = "eeeeee";
+    col = TangoPalette::getHex("Aluminium", 1);
   TString info;
   info += "<table border=0 width=100% bgcolor=" + col + "><tr>";
   //breadcrumbs
@@ -277,9 +278,13 @@ TString InfoWidget::getRelatedInfo(const TObject* obj)
 {
   TString info;
   info += "<h4>Related Objects</h4>";
+
+  StoreEntry* storeEntry = nullptr;
+  int index = -1;
   {
     //relations from this
-    const RelationVector<TObject>& relatedObjects = DataStore::Instance().getRelationsFromObj<TObject>(obj, "ALL");
+    const RelationVector<TObject> relatedObjects(DataStore::Instance().getRelationsWith(DataStore::c_ToSide, obj, storeEntry, index,
+                                                 TObject::Class(), "ALL"));
     const TString pref = "this <b>-&gt;</b> ";
     for (size_t i = 0; i < relatedObjects.size(); i++) {
       const TObject* relObj = relatedObjects.object(i);
@@ -297,7 +302,9 @@ TString InfoWidget::getRelatedInfo(const TObject* obj)
   info += " <br>"; //extra space needed!
   {
     //relations to this
-    const RelationVector<TObject>& relatedObjects = DataStore::Instance().getRelationsToObj<TObject>(obj, "ALL");
+    const RelationVector<TObject> relatedObjects(DataStore::Instance().getRelationsWith(DataStore::c_FromSide, obj, storeEntry, index,
+                                                 TObject::Class(), "ALL"));
+
     const TString pref = "this <b>&lt;-</b> ";
     for (size_t i = 0; i < relatedObjects.size(); i++) {
       const TObject* relObj = relatedObjects.object(i);

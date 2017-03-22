@@ -61,6 +61,7 @@ class Method(object):
     It loads the Options, can apply the expert and train new ones using the current as a prototype.
     This class is used by the basf_mva_evaluation tools
     """
+
     def __init__(self, identifier):
         """
         Load a method stored under the given identifier
@@ -88,8 +89,6 @@ class Method(object):
         self.specific_options = None
         if self.general_options.m_method == "FastBDT":
             self.specific_options = basf2_mva.FastBDTOptions()
-        elif self.general_options.m_method == "NeuroBayes":
-            self.specific_options = basf2_mva.NeuroBayesOptions()
         elif self.general_options.m_method == "TMVAClassification":
             self.specific_options = basf2_mva.TMVAOptionsClassification()
         elif self.general_options.m_method == "TMVARegression":

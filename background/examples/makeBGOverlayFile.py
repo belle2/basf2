@@ -37,7 +37,7 @@ add_simulation(main, bkgfiles=bg)
 # Output: digits and clusters only
 output = register_module('RootOutput')
 output.param('outputFileName', 'BGforOverlay.root')
-output.param('branchNames', ['PXDClusters', 'SVDClusters', 'CDCHits', 'TOPDigits',
+output.param('branchNames', ['PXDDigits', 'SVDDigits', 'CDCHits', 'TOPDigits',
                              'ARICHDigits', 'ECLDigits', 'BKLMDigits', 'EKLMDigits'])
 main.add_module(output)
 

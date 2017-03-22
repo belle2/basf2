@@ -20,7 +20,7 @@
 namespace Belle2 {
 
 /// A class for debugging of TSIM
-class TRGDebug {
+  class TRGDebug {
 
   public:
 
@@ -31,10 +31,10 @@ class TRGDebug {
     static int level(int newLevel, bool thisStageOnly = false);
 
     /// Declare that you enter new stage.
-    static void enterStage(const std::string & stageName);
+    static void enterStage(const std::string& stageName);
 
-    /// Declare that you leave a stage. 
-    static void leaveStage(const std::string & stageName);
+    /// Declare that you leave a stage.
+    static void leaveStage(const std::string& stageName);
 
     /// returns tab spaces.
     static std::string tab(void);
@@ -49,7 +49,7 @@ class TRGDebug {
 
     /// Debug level. 0:do nothing, 1:show you flow, 2:show you detail, 10:show you very detail
     static int _level;
-};
+  };
 
 //-----------------------------------------------------------------------------
 

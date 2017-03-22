@@ -62,8 +62,8 @@ namespace Belle2 {
       _waveform(0),
       _beambkgtag(0),
       _famana(0),
-      _threshold(100.0)
-
+      _threshold(100.0),
+      _FADC(1)
   {
 
     string desc = "TRGECLFAMModule(" + version() + ")";
@@ -81,6 +81,8 @@ namespace Belle2 {
              _beambkgtag);
     addParam("TCThreshold", _threshold, "Set FAM TC threshold ",
              _threshold);
+    addParam("ShapingFunction", _FADC, "Set function of shaper ",
+             _FADC);
 
 
 
@@ -172,11 +174,12 @@ namespace Belle2 {
     // FAM Digitizer
     TrgEclDigitizer* obj_trgeclDigi = new TrgEclDigitizer();
     obj_trgeclDigi-> setWaveform(_waveform);
+    obj_trgeclDigi-> setFADC(_FADC);
     obj_trgeclDigi-> setup(m_nEvent);
 
     if (_famMethod == 2 || _famMethod == 1) {obj_trgeclDigi->  digitization01(TCDigiE, TCDigiT); } // no-fit method = backup method 1
     else if (_famMethod == 3) { obj_trgeclDigi-> digitization02(TCDigiE, TCDigiT); } // orignal method = backup method 2
-    obj_trgeclDigi-> save(m_nEvent);
+    //    obj_trgeclDigi-> save(m_nEvent);
 
     // FAM Fitter
     TrgEclFAMFit* obj_trgeclfit = new TrgEclFAMFit();

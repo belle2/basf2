@@ -40,7 +40,7 @@ using namespace Belle2;
 //
 //
 //
-TrgEclDigitizer::TrgEclDigitizer(): TimeRange(0), _waveform(0)//, bin(0)
+TrgEclDigitizer::TrgEclDigitizer(): TimeRange(0), _waveform(0), _FADC(1), _BeambkgTag(0)//, bin(0)
 {
 
   MatrixParallel.clear();
@@ -136,16 +136,16 @@ TrgEclDigitizer::getTCHit(int TableFlag)
       float aveT     = aECLHit->getTimeAve(); // ns :time from  IP  to PD
       if (aveT < - TimeRange || aveT > TimeRange) {continue;} //Choose - TimeRange ~ TimeTange
       int  TimeIndex = (int)((aveT + TimeRange) / 100); //Binning : -4000 = 1st bin ~  4000 80th bin.
-      for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-        if (hitCellId == iECLCell) {
+      //   for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
+      // if (hitCellId == iECLCell) {
 
-          E_cell[iECLCell][TimeIndex]  = E_cell[iECLCell][TimeIndex] + hitE;
-          T_ave[iECLCell][TimeIndex]   = T_ave[iECLCell][TimeIndex] + hitE * aveT;
+      E_cell[hitCellId][TimeIndex]  = E_cell[hitCellId][TimeIndex] + hitE;
+      T_ave[hitCellId][TimeIndex]   = T_ave[hitCellId][TimeIndex] + hitE * aveT;
 
-          beambkg_tag[iECLCell][TimeIndex] = beambkg ;
+      beambkg_tag[hitCellId][TimeIndex] = beambkg ;
 
-        }
-      }
+      //        }
+      //      }
 
     }
     for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
@@ -176,22 +176,22 @@ TrgEclDigitizer::getTCHit(int TableFlag)
 
       G4ThreeVector t = aECLSimHit->getPosIn(); // [cm], Hit position in Xtal (based on from IP)
       TVector3 HitInPos(t.x(), t.y(), t.z()); // = aECLSimHit->getPosIn(); // [cm], Hit position in Xtal (based on from IP)
-      TVector3 PosCell  = eclp->GetCrystalPos(hitCellId); // [cm], Xtal position (based on from IP)
+      TVector3 PosCell  = eclp->GetCrystalPos(hitCellId);// [cm], Xtal position (based on from IP)
       TVector3 VecCell  = eclp->GetCrystalVec(hitCellId);
-      // "local_pos_r" = Distance between track hit in Xtal and
-      // rear surface(max=30, min=0) of the Xtal.
+      //      "local_pos_r" = Distance between track hit in Xtal and
+      //  rear surface(max=30, min=0) of the Xtal.
       float local_pos_r = (15.0 - (HitInPos - PosCell) * VecCell);
       if (hitTOF < - TimeRange || hitTOF >  TimeRange) {continue;}
       int TimeIndex = (int)((hitTOF + TimeRange) / 100);
-      for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-        if (hitCellId == iECLCell && hitTOF < 8000) {
-          // time interval is (0.5, 0.1, 0.05us) => (16, 80, 160bins) between T=0-8us.
-          //int TimeIndex = (int) (hitTOF / 100);
-          E_cell[iECLCell][TimeIndex]  = E_cell[iECLCell][TimeIndex]  + hitE;
-          T_ave[iECLCell][TimeIndex]   = T_ave[iECLCell][TimeIndex]   + hitE * local_pos_r;
-          Tof_ave[iECLCell][TimeIndex] = Tof_ave[iECLCell][TimeIndex] + hitE * hitTOF;
-        }
-      } // End loop crsyal 8736
+      //  for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
+      //        if (hitCellId == iECLCell && hitTOF < 8000) {
+      // time interval is (0.5, 0.1, 0.05us) => (16, 80, 160bins) between T=0-8us.
+      //int TimeIndex = (int) (hitTOF / 100);
+      E_cell[hitCellId][TimeIndex]  = E_cell[hitCellId][TimeIndex]  + hitE;
+      T_ave[hitCellId][TimeIndex]   = T_ave[hitCellId][TimeIndex]   + hitE * local_pos_r;
+      Tof_ave[hitCellId][TimeIndex] = Tof_ave[hitCellId][TimeIndex] + hitE * hitTOF;
+      //        }
+      //      } // End loop crsyal 8736
     }
     //
     //
@@ -210,6 +210,7 @@ TrgEclDigitizer::getTCHit(int TableFlag)
           0.0749  * T_ave[iECLCell][TimeIndex] -
           0.00112 * T_ave[iECLCell][TimeIndex] * T_ave[iECLCell][TimeIndex];
         Tof_ave[iECLCell][TimeIndex] = Tof_ave[iECLCell][TimeIndex] / E_cell[iECLCell][TimeIndex];
+
       } // 40bins,  Time interval = 200ns
     }
     //
@@ -237,20 +238,23 @@ TrgEclDigitizer::getTCHit(int TableFlag)
       int maxbkgtag = 0;
       if (TCEnergy[iTCIdm][iTime] < 1e-9) {continue;}  // 0.01MeV cut
       TCTiming[iTCIdm][iTime] /= TCEnergy[iTCIdm][iTime];
-      if (TCBkgContribution[iTCIdm][iTime] < TCSigContribution[iTCIdm][iTime]) {
-        TCBeambkgTag[iTCIdm][iTime] = 0; //signal Tag : 0
-      } else {
-        for (int iXtalIdm = 0; iXtalIdm < 8736; iXtalIdm++) {
-          int iTCId = _TCMap->getTCIdFromXtalId(iXtalIdm + 1) - 1;
-          if (iTCIdm != iTCId) {continue;}
-          if (maxbkgE < E_cell[iXtalIdm][iTime]) {
-            maxbkgE = E_cell[iXtalIdm][iTime];
-            maxbkgtag =  beambkg_tag[iXtalIdm][iTime];
+      if (_BeambkgTag == 1) {
+        if (TCBkgContribution[iTCIdm][iTime] < TCSigContribution[iTCIdm][iTime]) {
+          TCBeambkgTag[iTCIdm][iTime] = 0; //signal Tag : 0
+        } else {
+          for (int iXtalIdm = 0; iXtalIdm < 8736; iXtalIdm++) {
+            int iTCId = _TCMap->getTCIdFromXtalId(iXtalIdm + 1) - 1;
+            if (iTCIdm != iTCId) {continue;}
+            if (maxbkgE < E_cell[iXtalIdm][iTime]) {
+              maxbkgE = E_cell[iXtalIdm][iTime];
+              maxbkgtag =  beambkg_tag[iXtalIdm][iTime];
+            }
           }
+          TCBeambkgTag[iTCIdm][iTime] = maxbkgtag;
         }
-        TCBeambkgTag[iTCIdm][iTime] = maxbkgtag;
       }
     }
+
   }
 
   //--------------------------
@@ -315,7 +319,12 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE, std::
           = (-TCTiming[iTCIdm][iTimeBin] - TimeRange + (-nbin_pedestal + iSampling) * fam_sampling_interval) * 0.001;
         inputTiming += random_sampling_correction * 0.001;
         if (inputTiming > 0) {
-          TCDigiE[iTCIdm][iSampling] += SimplifiedFADC(0, inputTiming) * TCEnergy[iTCIdm][iTimeBin];
+          if (_FADC == 1) {
+
+            TCDigiE[iTCIdm][iSampling] += interFADC(inputTiming) * TCEnergy[iTCIdm][iTimeBin];
+          } else {
+            TCDigiE[iTCIdm][iSampling] += SimplifiedFADC(0, inputTiming) * TCEnergy[iTCIdm][iTimeBin];
+          }
         }
       }
       for (int iSampling = 0; iSampling < NSampling; iSampling++) {
@@ -539,6 +548,7 @@ TrgEclDigitizer::save(int m_nEvent)
       TCDigiArray[m_hitNum]->setiBinTime(iBinTime);
       TCDigiArray[m_hitNum]->setRawEnergy(TCEnergy[iTCIdm][iBinTime]);
       TCDigiArray[m_hitNum]->setRawTiming(TCTiming[iTCIdm][iBinTime]);
+
       TCDigiArray[m_hitNum]->setBeamBkgTag(TCBeambkgTag[iTCIdm][iBinTime]);
 
     }
@@ -559,6 +569,42 @@ TrgEclDigitizer::save(int m_nEvent)
 
 
   return;
+}
+double
+TrgEclDigitizer::interFADC(double timing)
+{
+
+  std::vector<double> SignalAmp;
+  std::vector<double> SignalTime;
+
+  SignalAmp.clear();
+  SignalTime.clear();
+
+  timing = timing * 1000;
+  int startbin = (int)(timing) / 12;
+  int endbin = startbin + 1;
+
+
+  SignalAmp = { 0, 3.47505e-06, 0.000133173, 0.000939532, 0.00337321, 0.00845977, 0.0170396, 0.0296601, 0.0465713, 0.0677693, 0.0930545, 0.122086, 0.154429, 0.189595, 0.227068, 0.266331, 0.306882, 0.348243, 0.389971, 0.431664, 0.472959, 0.513539, 0.553127, 0.59149, 0.628431, 0.663791, 0.697445, 0.729297, 0.759281, 0.787354, 0.813494, 0.837698, 0.859982, 0.880372, 0.898908, 0.915639, 0.930622, 0.943919, 0.955598, 0.965731, 0.97439, 0.98165, 0.987587, 0.992275, 0.995788, 0.9982, 0.999581, 1, 0.999525, 0.998219, 0.996143, 0.993356, 0.989846, 0.985364, 0.979439, 0.971558, 0.961304, 0.948421, 0.932809, 0.914509, 0.893664, 0.870494, 0.845267, 0.818279, 0.789837, 0.76025, 0.729815, 0.698815, 0.667511, 0.636141, 0.604919, 0.574035, 0.543654, 0.513915, 0.484939, 0.456822, 0.429643, 0.403462, 0.378324, 0.354259, 0.331286, 0.309412, 0.288633, 0.26894, 0.250316, 0.232736, 0.216174, 0.200597, 0.185972, 0.172262, 0.159428, 0.147431, 0.136232, 0.12579, 0.116067, 0.107022, 0.0986191, 0.0908193, 0.0835871, 0.0768874, 0.0706867, 0.0649528, 0.0596551, 0.0547641, 0.0502523, 0.0460932, 0.042262, 0.0387353, 0.0354909, 0.0325082, 0.0297677, 0.0272511, 0.0249416, 0.0228232, 0.020881, 0.0191014, 0.0174714, 0.0159792, 0.0146138, 0.0133649, 0.012223, 0.0111793, 0.0102258, 0.00935504, 0.00856, 0.00783438, 0.00717232, 0.00656842, 0.00601773, 0.00551567, 0.00505807, 0.00464106, 0.00426114, 0.00391506, 0.00359985, 0.0033128, 0.00305143, 0.00281346, 0.00259681, 0.00239957, 0.00222002, 0.00205655, 0.00190773, 0.00177223, 0.00164885, 0.00153648, 0.00143413, 0.00134087, 0.00125589, 0.00117842, 0.00110777, 0.00104332, 0.000984488, 0.000930766, 0.000881678, 0.000836798, 0.000795734, 0.000758134, 0.000723677, 0.00069207, 0.000663051, 0.000636377, 0.000611832, 0.000589219, 0.000568358, 0.000549086, 0.000531258, 0.000514738, 0.000499407, 0.000485156, 0.000471884, 0.000459502, 0.00044793, 0.000437092, 0.000426923, 0.000417363, 0.000408356, 0.000399853, 0.000391811, 0.000384187, 0.000376946, 0.000370055, 0.000363483, 0.000357203, 0.000351192, 0.000345426, 0.000339886, 0.000334554, 0.000329413, 0.000324448, 0.000319645, 0.000314993, 0.000310481, 0.000306098, 0.000301836, 0.000297686, 0.00029364, 0.000289693, 0.000285837, 0.000282068, 0.00027838, 0.000274768, 0.000271229, 0.000267759, 0.000264354, 0.000261011, 0.000257727, 0.000254499, 0.000251326, 0.000248204, 0.000245132, 0.000242108, 0.000239131, 0.000236198, 0.000233308, 0.00023046, 0.000227653, 0.000224885, 0.000222155, 0.000219463, 0.000216807, 0.000214187, 0.000211602, 0.00020905, 0.000206532, 0.000204046, 0.000201593, 0.00019917, 0.000196779, 0.000194417, 0.000192085, 0.000189782, 0.000187508, 0.000185262, 0.000183044, 0.000180853, 0.000178689, 0.000176552, 0.000174441, 0.000172355, 0.000170295, 0.00016826, 0.000166249, 0.000164263, 0.000162301,  };
+
+  SignalTime = { 0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120, 132, 144, 156, 168, 180, 192, 204, 216, 228, 240, 252, 264, 276, 288, 300, 312, 324, 336, 348, 360, 372, 384, 396, 408, 420, 432, 444, 456, 468, 480, 492, 504, 516, 528, 540, 552, 564, 576, 588, 600, 612, 624, 636, 648, 660, 672, 684, 696, 708, 720, 732, 744, 756, 768, 780, 792, 804, 816, 828, 840, 852, 864, 876, 888, 900, 912, 924, 936, 948, 960, 972, 984, 996, 1008, 1020, 1032, 1044, 1056, 1068, 1080, 1092, 1104, 1116, 1128, 1140, 1152, 1164, 1176, 1188, 1200, 1212, 1224, 1236, 1248, 1260, 1272, 1284, 1296, 1308, 1320, 1332, 1344, 1356, 1368, 1380, 1392, 1404, 1416, 1428, 1440, 1452, 1464, 1476, 1488, 1500, 1512, 1524, 1536, 1548, 1560, 1572, 1584, 1596, 1608, 1620, 1632, 1644, 1656, 1668, 1680, 1692, 1704, 1716, 1728, 1740, 1752, 1764, 1776, 1788, 1800, 1812, 1824, 1836, 1848, 1860, 1872, 1884, 1896, 1908, 1920, 1932, 1944, 1956, 1968, 1980, 1992, 2004, 2016, 2028, 2040, 2052, 2064, 2076, 2088, 2100, 2112, 2124, 2136, 2148, 2160, 2172, 2184, 2196, 2208, 2220, 2232, 2244, 2256, 2268, 2280, 2292, 2304, 2316, 2328, 2340, 2352, 2364, 2376, 2388, 2400, 2412, 2424, 2436, 2448, 2460, 2472, 2484, 2496, 2508, 2520, 2532, 2544, 2556, 2568, 2580, 2592, 2604, 2616, 2628, 2640, 2652, 2664, 2676, 2688, 2700, 2712, 2724, 2736, 2748, 2760, 2772, 2784, 2796, 2808, 2820, 2832, 2844, 2856, 2868, 2880, 2892, 2904, 2916, 2928,  };
+
+
+  double E_out = 0;
+  if (timing < 0 || timing > 2928) {return E_out;}
+
+  if (timing > SignalTime[startbin] && timing < SignalTime[endbin]) {
+    E_out = (((SignalAmp[endbin] - SignalAmp[startbin])) / (SignalTime[endbin] - SignalTime[startbin])) *
+            (timing - SignalTime[startbin]) +  SignalAmp[startbin];
+    return E_out;
+  } else {
+    E_out = 0;
+  }
+
+  //  cout << timing << " "  << E_out << endl;
+
+  return E_out;
+
 }
 //
 //

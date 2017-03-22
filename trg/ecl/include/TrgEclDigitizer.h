@@ -44,12 +44,17 @@ namespace Belle2 {
     void save(int);
     /** Set flag of waveform table*/
     void setWaveform(int wave) {_waveform = wave;}
+    /** Set flag of waveform table*/
+    void setFADC(int fadc) {_FADC = fadc;}
+
 
 
     /** FADC  */
     double FADC(int, double);///FADC
     /** Faster FADC */
     double SimplifiedFADC(int, double);
+    /** Faster FADC using interpolation */
+    double interFADC(double);
     /** return shape using  FADC function  */
     double ShapeF(double, double, double, double, double, double, double);
     /** Return shape using Simplified FADC */
@@ -98,7 +103,10 @@ namespace Belle2 {
     int _waveform;
     /** TC Energy converted from Xtarl Energy [GeV] */
     double WaveForm[576][64];
-
+    /** Flag of the method of waveform generation function*/
+    int _FADC;
+    /** Flag of saving beam background tag  or not*/
+    int _BeambkgTag;
 
   };
 } // end namespace Belle2

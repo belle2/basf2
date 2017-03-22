@@ -9,24 +9,40 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/combined/SegmentFinderFacetAutomaton.h>
+#include <tracking/trackFindingCDC/findlets/minimal/TrackLinker.h>
+#include <tracking/trackFindingCDC/findlets/minimal/TrackCombiner.h>
+
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 
+/******* Minimal Findlets **********/
+
 namespace Belle2 {
   namespace TrackFindingCDC {
+    /**
+     * Module implementation using the TrackLinker
+     */
+    class TFCDC_TrackLinkerModule : public FindletModule<TrackLinker> {
 
-    /// Generates segments from hits using a cellular automaton build from hit triples (facets).
-    class SegmentFinderCDCFacetAutomatonModule : public FindletModule<SegmentFinderFacetAutomaton> {
-
-    private:
       /// Type of the base class
-      using Super = FindletModule<SegmentFinderFacetAutomaton>;
+      using Super = FindletModule<TrackLinker>;
 
     public:
-      /// Default constructor initialising the filters with the default settings
-      SegmentFinderCDCFacetAutomatonModule();
+      /// Constructor setting the default store vector names
+      TFCDC_TrackLinkerModule();
+    };
 
-    }; // end class SegmentFinderCDCFacetAutomatonModule
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    /**
+     * Module implementation using the TrackCombiner
+     */
+    class TFCDC_TrackCombinerModule : public FindletModule<TrackCombiner> {
+
+      /// Type of the base class
+      using Super = FindletModule<TrackCombiner>;
+
+    public:
+      /// Constructor setting the default store vector names
+      TFCDC_TrackCombinerModule();
+    };
+  }
+}

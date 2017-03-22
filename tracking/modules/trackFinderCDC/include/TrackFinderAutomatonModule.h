@@ -7,10 +7,16 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#include <tracking/modules/trackFinderCDC/TrackFinderCDCCosmicsModule.h>
+#include <tracking/trackFindingCDC/findlets/complete/TrackFinderAutomaton.h>
+#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 
-using namespace Belle2;
-using namespace TrackFindingCDC;
+namespace Belle2 {
+  namespace TrackFindingCDC {
 
-REG_MODULE(TrackFinderCDCCosmics);
+    /// Module for the cellular automaton tracking for the CDC on regular events
+    class TFCDC_TrackFinderAutomatonModule : public FindletModule<TrackFinderAutomaton> {
+    };
+  }
+}

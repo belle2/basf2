@@ -181,7 +181,7 @@ def main():
                                       trigger_point=(0.3744, 0, -1.284),
                                       )
 
-    # path.add_module("TrackFinderCDCCosmics")
+    # path.add_module("TFCDC_TrackFinderCosmics")
     # tracking.add_cdc_track_finding(path)
     # path.add_module("TrackFinderMCTruthRecoTracks")
 

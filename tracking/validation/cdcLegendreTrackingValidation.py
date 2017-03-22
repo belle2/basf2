@@ -30,15 +30,15 @@ class CDCLegendre(TrackingValidationRun):
 
     @staticmethod
     def finder_module(path):
-        path.add_module('WireHitPreparer')
+        path.add_module('TFCDC_WireHitPreparer')
 
         use_legendre_finder = True
         if use_legendre_finder:
-            path.add_module('TrackFinderCDCLegendreTracking')
+            path.add_module('TFCDC_AxialTrackFinderLegendre')
         else:
-            path.add_module('AxialTrackCreatorHitHough')
+            path.add_module('TFCDC_AxialTrackFinderHough')
 
-        path.add_module('TrackExporter')
+        path.add_module('TFCDC_TrackExporter')
 
     tracking_coverage = {
         'WhichParticles': ['CDC'],  # Include all particles seen in CDC, also secondaries

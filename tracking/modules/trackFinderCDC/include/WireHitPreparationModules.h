@@ -8,7 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+
 #include <tracking/trackFindingCDC/findlets/combined/WireHitPreparer.h>
+
+#include <tracking/trackFindingCDC/findlets/minimal/WireHitCreator.h>
+#include <tracking/trackFindingCDC/findlets/minimal/WireHitMCMultiLoopBlocker.h>
+#include <tracking/trackFindingCDC/findlets/minimal/WireHitBackgroundBlocker.h>
+
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 
@@ -24,21 +30,28 @@ namespace Belle2 {
      * Please keep in mind that the taken flag is propagated to all modules. So if you set/unset the taken flag of one hit, this will be used by *all*
      * following modules. Also, in your own module, check for the taken flag/background flag and do not use already taken hits twice.
      */
-    class WireHitPreparerModule : public FindletModule<WireHitPreparer> {
+    class TFCDC_WireHitPreparerModule : public FindletModule<WireHitPreparer> {
 
       /// Type of the base class
       using Super = FindletModule<WireHitPreparer>;
 
     public:
       // Constructor
-      WireHitPreparerModule();
+      TFCDC_WireHitPreparerModule();
     };
 
-    /// Deprecated alias xfor the WireHitPreparerModule.
-    class WireHitTopologyPreparerModule : public WireHitPreparerModule {
+    /********** Minimal modules **********/
+    /**
+     * Module implementation using the WireHitCreator
+     */
+    class TFCDC_WireHitCreatorModule : public FindletModule<WireHitCreator> {
+
+      /// Type of the base class
+      using Super = FindletModule<WireHitCreator>;
+
     public:
-      /// Signal the start of the event processing
-      void initialize() override;
+      /// Constructor setting the default store vector names
+      TFCDC_WireHitCreatorModule();
     };
   }
 }

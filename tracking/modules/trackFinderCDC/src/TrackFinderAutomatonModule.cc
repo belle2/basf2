@@ -7,18 +7,9 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-#include <tracking/modules/trackFinderCDC/SegmentFinderCDCFacetAutomatonModule.h>
+#include <tracking/modules/trackFinderCDC/TrackFinderAutomatonModule.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-REG_MODULE(SegmentFinderCDCFacetAutomaton);
-
-SegmentFinderCDCFacetAutomatonModule::SegmentFinderCDCFacetAutomatonModule()
-  : Super{{{"CDCWireHitVector", "CDCSegment2DVector"}}}
-{
-  ModuleParamList moduleParamList = this->getParamList();
-  moduleParamList.getParameter<std::string>("SegmentOrientation").setDefaultValue("curling");
-  this->setParamList(moduleParamList);
-}
+REG_MODULE(TFCDC_TrackFinderAutomaton);

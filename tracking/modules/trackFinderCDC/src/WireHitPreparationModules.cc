@@ -3,23 +3,24 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Oliver Frost                                             *
+ * Contributors: Nils Braun, Oliver Frost                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
+#include <tracking/modules/trackFinderCDC/WireHitPreparationModules.h>
 
-//#define LOG_NO_B2DEBUG
+using namespace Belle2;
+using namespace TrackFindingCDC;
 
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
-#include <tracking/trackFindingCDC/findlets/complete/TrackFinderAutomaton.h>
+REG_MODULE(TFCDC_WireHitPreparer);
+REG_MODULE(TFCDC_WireHitCreator);
 
-namespace Belle2 {
-  namespace TrackFindingCDC {
-    /// Module for the cellular automaton tracking for the CDC on regular events
-    class TrackFinderCDCAutomatonModule
-      : public FindletModule<TrackFinderAutomaton> {
-    }; // end class
-  }
-} // end namespace Belle2
+TFCDC_WireHitPreparerModule::TFCDC_WireHitPreparerModule()
+  : Super( {"CDCWireHitVector"})
+{
+}
 
+TFCDC_WireHitCreatorModule::TFCDC_WireHitCreatorModule()
+  : Super( {"CDCWireHitVector"})
+{
+}

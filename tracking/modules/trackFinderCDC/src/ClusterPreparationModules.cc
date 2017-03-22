@@ -7,21 +7,26 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
+#include <tracking/modules/trackFinderCDC/ClusterPreparationModules.h>
 
-//#define LOG_NO_B2DEBUG
+using namespace Belle2;
+using namespace TrackFindingCDC;
 
-// Base track finder module
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
-#include <tracking/trackFindingCDC/findlets/complete/TrackFinderCosmics.h>
+REG_MODULE(TFCDC_SuperClusterCreator);
+REG_MODULE(TFCDC_ClusterRefiner);
+REG_MODULE(TFCDC_ClusterBackgroundDetector);
 
-namespace Belle2 {
-  namespace TrackFindingCDC {
+TFCDC_SuperClusterCreatorModule::TFCDC_SuperClusterCreatorModule()
+  : Super( {"CDCWireHitVector", "CDCWireHitSuperClusterVector"})
+{
+}
 
-    /// Module for the cellular automaton tracking for the CDC on cosmic events
-    class TrackFinderCDCCosmicsModule
-      : public FindletModule<TrackFinderCosmics> {
-    }; // end class
-  }
-} // end namespace Belle2
+TFCDC_ClusterRefinerModule::TFCDC_ClusterRefinerModule()
+  : Super( {"CDCWireHitSuperClusterVector", "CDCWireHitClusterVector"})
+{
+}
 
+TFCDC_ClusterBackgroundDetectorModule::TFCDC_ClusterBackgroundDetectorModule()
+  : Super( {"CDCWireHitClusterVector"})
+{
+}

@@ -1,4 +1,13 @@
-#include <tracking/modules/trackFinderCDC/TrackQualityAsserterCDCModule.h>
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Nils Braun                                               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+#include <tracking/trackFindingCDC/findlets/minimal/TrackQualityAsserter.h>
 
 #include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
@@ -6,12 +15,12 @@
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-#include <tracking/dataobjects/RecoTrack.h>
+// #include <tracking/dataobjects/RecoTrack.h>
+
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-REG_MODULE(TrackQualityAsserterCDC);
 
 std::string TrackQualityAsserter::getDescription()
 {
@@ -127,9 +136,4 @@ void TrackQualityAsserter::apply(std::vector<CDCTrack>& tracks)
   for (const CDCTrack& splittedTrack : splittedTracks) {
     tracks.push_back(splittedTrack);
   }
-}
-
-TrackQualityAsserterCDCModule::TrackQualityAsserterCDCModule()
-  : Super( {"CDCTrackVector"})
-{
 }

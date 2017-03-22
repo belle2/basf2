@@ -22,66 +22,14 @@
 
 #include <TClonesArray.h>
 #include <TEventList.h>
-#include <TEntryListArray.h>
 #include <TObjArray.h>
 #include <TChainElement.h>
-
-#include <iostream>
 
 using namespace std;
 using namespace Belle2;
 using namespace RootIOUtilities;
 
 REG_MODULE(RootInput)
-
-void RootInputModule::addEventListForIndexFile()
-{
-  static bool first = true;
-  if (!first)
-    return;
-  first = false;
-  //TODO
-  //suspect this should be done in readParentTrees() so we can detect changed files
-  //TODO
-  //entrylist vs eventlist. both ok with cache?
-  B2INFO("Index file detected, scanning to generate event list.");
-  const bool eventlist = false;
-  TEventList* elist;
-  TEntryListArray* entlist;
-  if (eventlist)
-    elist = new TEventList("parent_entrylist");
-  else
-    entlist = new TEntryListArray();
-
-  TBranch* branch = m_tree->GetBranch("EventMetaData");
-  auto* address = branch->GetAddress();
-  EventMetaData* eventMetaData = 0;
-  branch->SetAddress(&eventMetaData);
-  long nEntries = m_tree->GetEntries();
-  TTree* tree = nullptr;
-  for (long i = m_nextEntry; i < nEntries; i++) {
-    branch->GetEntry(i);
-    int experiment = eventMetaData->getExperiment();
-    int run = eventMetaData->getRun();
-    unsigned int event = eventMetaData->getEvent();
-    std::string parentLfn = eventMetaData->getParentLfn();
-    //TODO stop if parent changes
-
-    tree = m_parentTrees[parentLfn];
-    long entry = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, event, run, experiment);
-    if (eventlist)
-      elist->Enter(entry);
-    else
-      entlist->Enter(entry);
-
-  }
-  branch->SetAddress(address);
-
-  if (eventlist)
-    tree->SetEventList(elist);
-  else
-    tree->SetEntryList(entlist);
-}
 
 RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentEntry(-1), m_tree(0), m_persistent(0)
 {
@@ -144,6 +92,7 @@ void RootInputModule::initialize()
 
   m_nextEntry = m_skipNEvents;
   m_lastPersistentEntry = -1;
+  m_lastParentFileLFN = "";
 
   loadDictionaries();
 
@@ -597,9 +546,49 @@ bool RootInputModule::readParentTrees()
   }
 
   if (m_parentLevel > 0 and m_storeEntries.size() == 1)
-    addEventListForIndexFile();
+    addEventListForIndexFile(parentLfn);
 
   return true;
+}
+
+void RootInputModule::addEventListForIndexFile(const std::string& parentLfn)
+{
+  if (parentLfn == m_lastParentFileLFN)
+    return;
+  m_lastParentFileLFN = parentLfn;
+
+  B2INFO("Index file detected, scanning to generate event list.");
+  TTree* tree = m_parentTrees.at(parentLfn);
+
+  //both types of list work, TEventList seems to result in slightly less data being read.
+  TEventList* elist = new TEventList("parent_entrylist");
+  //TEntryListArray* elist = new TEntryListArray();
+
+  TBranch* branch = m_tree->GetBranch("EventMetaData");
+  auto* address = branch->GetAddress();
+  EventMetaData* eventMetaData = 0;
+  branch->SetAddress(&eventMetaData);
+  long nEntries = m_tree->GetEntries();
+  for (long i = m_nextEntry; i < nEntries; i++) {
+    branch->GetEntry(i);
+    int experiment = eventMetaData->getExperiment();
+    int run = eventMetaData->getRun();
+    unsigned int event = eventMetaData->getEvent();
+    const std::string& newParentLfn = eventMetaData->getParentLfn();
+
+    if (parentLfn != newParentLfn) {
+      //parent file changed, stopping for now
+      break;
+    }
+    long entry = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, event, run, experiment);
+    elist->Enter(entry);
+  }
+  branch->SetAddress(address);
+
+  if (tree) {
+    tree->SetEventList(elist);
+    //tree->SetEntryList(elist);
+  }
 }
 
 void RootInputModule::entryNotFound(std::string entryOrigin, std::string name, bool fileChanged)

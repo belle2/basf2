@@ -3,10 +3,15 @@
 //---------------------------------------------------------------
 // Filename : TRGECLFAMModule.cc
 // Section  : TRG ECL
-// Owner    : InSu Lee/Yuuji Unno
+// Owner    : InSoo Lee/Yuuji Unno
 // Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
 //---------------------------------------------------------------
 // Description : A trigger module for TRG ECL
+// The FAM module of ECL Trigger simulation
+// This odule convert crystal Hits to TC Hit and shape the signal,
+// then measure TC energy and timing.
+// Raw TC Hit information is saved on TRGECHDigi0 table(before shaping).
+// Measured TC Hit information is save on TRGECLHit table.
 //---------------------------------------------------------------
 // 1.00 : 2012/05/24 : First version
 //---------------------------------------------------------------
@@ -176,10 +181,9 @@ namespace Belle2 {
     obj_trgeclDigi-> setWaveform(_waveform);
     obj_trgeclDigi-> setFADC(_FADC);
     obj_trgeclDigi-> setup(m_nEvent);
-
     if (_famMethod == 2 || _famMethod == 1) {obj_trgeclDigi->  digitization01(TCDigiE, TCDigiT); } // no-fit method = backup method 1
     else if (_famMethod == 3) { obj_trgeclDigi-> digitization02(TCDigiE, TCDigiT); } // orignal method = backup method 2
-    //    obj_trgeclDigi-> save(m_nEvent);
+    obj_trgeclDigi-> save(m_nEvent);
 
     // FAM Fitter
     TrgEclFAMFit* obj_trgeclfit = new TrgEclFAMFit();

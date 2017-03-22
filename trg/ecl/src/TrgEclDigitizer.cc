@@ -24,9 +24,7 @@
 #include "trg/ecl/TrgEclDigitizer.h"
 
 
-//#include "trg/ecl/dataobjects/TRGECLDigi.h"
 #include "trg//ecl/dataobjects/TRGECLDigi0.h"
-//#include "trg/ecl/dataobjects/TRGECLHit.h"
 #include "trg/ecl/dataobjects/TRGECLWaveform.h" // by shebalin 
 
 #include <stdlib.h>
@@ -40,7 +38,7 @@ using namespace Belle2;
 //
 //
 //
-TrgEclDigitizer::TrgEclDigitizer(): TimeRange(0), _waveform(0), _FADC(1), _BeambkgTag(0)//, bin(0)
+TrgEclDigitizer::TrgEclDigitizer(): TimeRange(0), _waveform(0), _FADC(1), _BeambkgTag(0)
 {
 
   MatrixParallel.clear();
@@ -136,16 +134,10 @@ TrgEclDigitizer::getTCHit(int TableFlag)
       float aveT     = aECLHit->getTimeAve(); // ns :time from  IP  to PD
       if (aveT < - TimeRange || aveT > TimeRange) {continue;} //Choose - TimeRange ~ TimeTange
       int  TimeIndex = (int)((aveT + TimeRange) / 100); //Binning : -4000 = 1st bin ~  4000 80th bin.
-      //   for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-      // if (hitCellId == iECLCell) {
 
       E_cell[hitCellId][TimeIndex]  = E_cell[hitCellId][TimeIndex] + hitE;
       T_ave[hitCellId][TimeIndex]   = T_ave[hitCellId][TimeIndex] + hitE * aveT;
-
       beambkg_tag[hitCellId][TimeIndex] = beambkg ;
-
-      //        }
-      //      }
 
     }
     for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
@@ -178,20 +170,12 @@ TrgEclDigitizer::getTCHit(int TableFlag)
       TVector3 HitInPos(t.x(), t.y(), t.z()); // = aECLSimHit->getPosIn(); // [cm], Hit position in Xtal (based on from IP)
       TVector3 PosCell  = eclp->GetCrystalPos(hitCellId);// [cm], Xtal position (based on from IP)
       TVector3 VecCell  = eclp->GetCrystalVec(hitCellId);
-      //      "local_pos_r" = Distance between track hit in Xtal and
-      //  rear surface(max=30, min=0) of the Xtal.
       float local_pos_r = (15.0 - (HitInPos - PosCell) * VecCell);
       if (hitTOF < - TimeRange || hitTOF >  TimeRange) {continue;}
       int TimeIndex = (int)((hitTOF + TimeRange) / 100);
-      //  for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-      //        if (hitCellId == iECLCell && hitTOF < 8000) {
-      // time interval is (0.5, 0.1, 0.05us) => (16, 80, 160bins) between T=0-8us.
-      //int TimeIndex = (int) (hitTOF / 100);
       E_cell[hitCellId][TimeIndex]  = E_cell[hitCellId][TimeIndex]  + hitE;
       T_ave[hitCellId][TimeIndex]   = T_ave[hitCellId][TimeIndex]   + hitE * local_pos_r;
       Tof_ave[hitCellId][TimeIndex] = Tof_ave[hitCellId][TimeIndex] + hitE * hitTOF;
-      //        }
-      //      } // End loop crsyal 8736
     }
     //
     //
@@ -270,12 +254,6 @@ TrgEclDigitizer::getTCHit(int TableFlag)
   }
 
 
-
-  //
-  // delete [] beambkg_tag;
-  // delete [] E_cell;
-  // delete [] T_ave;
-  // delete [] Tof_ave;
   return;
 }
 //
@@ -352,8 +330,6 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE, std::
   //==================
   // (01)noise embedding
   //==================
-  //  double tmin_noise = -nbin_pedestal * fam_sampling_interval * 0.001; // [us]
-  //double tgen = NSampling * fam_sampling_interval * 0.001 - tmin_noise; // [us]
   double  tmin_noise = -4; // orignal
   double tgen = 10.3;   // orignal
   int bkg_level = 1030;
@@ -557,8 +533,7 @@ TrgEclDigitizer::save(int m_nEvent)
   if (_waveform == 1) {
     StoreArray<TRGECLWaveform> TCWaveformArray;
     for (int iTCIdm = 0; iTCIdm < 576;  iTCIdm++) {
-      if (iTCIdm == 80) iTCIdm =
-          512; // skip barrel
+      if (iTCIdm == 80) iTCIdm =  512; // skip barrel
       int tc_phi_id = _TCMap->getTCPhiIdFromTCId(iTCIdm + 1);
       int tc_theta_id   = _TCMap->getTCThetaIdFromTCId(iTCIdm + 1);
       TRGECLWaveform* newWf = TCWaveformArray.appendNew(iTCIdm + 1, WaveForm[iTCIdm]);
@@ -601,7 +576,6 @@ TrgEclDigitizer::interFADC(double timing)
     E_out = 0;
   }
 
-  //  cout << timing << " "  << E_out << endl;
 
   return E_out;
 
@@ -818,8 +792,6 @@ TrgEclDigitizer::SimplifiedFADC(int flag_gen,
   //
   //--------------------------------------
   double tsh, dd;
-//   static double tc, fm, fff, tt, dt, tc2, tm, tsc, tris;
-//   static double amp, td, t1, t2, ts, dft, as;
   static double tc, tc2, tsc, tris;
   static double amp, td, t1, t2,  dft, as;
 
@@ -946,9 +918,6 @@ double TrgEclDigitizer::ShapeF(double t00, double ts1)
   b2 = 0.0333222;
   c1 = 10;
 
-  // das0 =  269.91;
-  //dac0 = -0.1941;
-  // das1 =  262.136;
   if (ts1 == 1) {
     c2 = 1;
     dsn0s =  -29.9897;

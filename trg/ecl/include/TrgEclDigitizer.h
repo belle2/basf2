@@ -103,7 +103,7 @@ namespace Belle2 {
     int _waveform;
     /** TC Energy converted from Xtarl Energy [GeV] */
     double WaveForm[576][64];
-    /** Flag of the method of waveform generation function*/
+    /** Flag of choosing the method of waveform generation function 0: use simplifiedFADC, 1: use interFADC(interpolation) */
     int _FADC;
     /** Flag of saving beam background tag  or not*/
     int _BeambkgTag;

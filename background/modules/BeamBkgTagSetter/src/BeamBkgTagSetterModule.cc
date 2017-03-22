@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Yuri Solovier, Igal Jaegle                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -32,6 +32,17 @@
 #include <ecl/dataobjects/ECLHit.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
+
+// BEAST SimHits
+#include <beast/beamabort/dataobjects/BeamabortSimHit.h>
+#include <beast/claw/dataobjects/ClawSimHit.h>
+#include <beast/claws/dataobjects/CLAWSSimHit.h>
+#include <beast/fangs/dataobjects/FANGSSimHit.h>
+#include <beast/plume/dataobjects/PlumeSimHit.h>
+#include <beast/pindiode/dataobjects/PindiodeSimHit.h>
+#include <beast/he3tube/dataobjects/He3tubeSimHit.h>
+#include <beast/microtpc/dataobjects/MicrotpcSimHit.h>
+#include <beast/qcsmonitor/dataobjects/QcsmonitorSimHit.h>
 
 // MetaData
 #include <framework/dataobjects/EventMetaData.h>
@@ -74,6 +85,8 @@ namespace Belle2 {
     addParam("specialFor", m_specialFor,
              "tag ordinary file (default) or additional file ('ECL' or 'PXD')",
              string(""));
+    addParam("Phase", m_phase,
+             "specify the phase: 1 for phase 1, 2 for phase 2, 3 for physics run or phase 3");
 
   }
 
@@ -116,6 +129,17 @@ namespace Belle2 {
     StoreArray<ECLHit>::optional();
     StoreArray<BKLMSimHit>::optional();
     StoreArray<EKLMSimHit>::optional();
+
+    // BEAST StoreArray
+    StoreArray<BeamabortSimHit>::optional();
+    StoreArray<CLAWSSimHit>::optional();
+    StoreArray<ClawSimHit>::optional();
+    StoreArray<FANGSSimHit>::optional();
+    StoreArray<PlumeSimHit>::optional();
+    StoreArray<PindiodeSimHit>::optional();
+    StoreArray<He3tubeSimHit>::optional();
+    StoreArray<MicrotpcSimHit>::optional();
+    StoreArray<QcsmonitorSimHit>::optional();
   }
 
   void BeamBkgTagSetterModule::beginRun()
@@ -134,15 +158,44 @@ namespace Belle2 {
     StoreArray<BKLMSimHit> bklmSimHits;
     StoreArray<EKLMSimHit> eklmSimHits;
 
-    int n = setBackgroundTag(pxdSimHits);
-    n += setBackgroundTag(svdSimHits);
-    n += setBackgroundTag(cdcSimHits);
-    n += setBackgroundTag(topSimHits);
-    n += setBackgroundTag(arichSimHits);
-    n += setBackgroundTag(eclSimHits);
-    n += setBackgroundTag(eclHits);
-    n += setBackgroundTag(bklmSimHits);
-    n += setBackgroundTag(eklmSimHits);
+    // BEAST addition
+    StoreArray<BeamabortSimHit> diaSimHits;
+    StoreArray<CLAWSSimHit> clw2SimHits;
+    StoreArray<ClawSimHit> clw1SimHits;
+    StoreArray<FANGSSimHit> fngSimHits;
+    StoreArray<PlumeSimHit> plmSimHits;
+    StoreArray<PindiodeSimHit> pinSimHits;
+    StoreArray<He3tubeSimHit> he3SimHits;
+    StoreArray<MicrotpcSimHit> tpcSimHits;
+    StoreArray<QcsmonitorSimHit> sciSimHits;
+
+    int n = 0;
+    if (m_phase == 2 || m_phase == 3) {
+      n += setBackgroundTag(pxdSimHits);
+      n += setBackgroundTag(svdSimHits);
+      n += setBackgroundTag(cdcSimHits);
+      n += setBackgroundTag(topSimHits);
+      n += setBackgroundTag(arichSimHits);
+      n += setBackgroundTag(eclSimHits);
+      n += setBackgroundTag(eclHits);
+      n += setBackgroundTag(bklmSimHits);
+      n += setBackgroundTag(eklmSimHits);
+    }
+    // BEAST addition
+    if (m_phase == 1 || m_phase == 2) {
+      n += setBackgroundTag(diaSimHits);
+      if (m_phase == 1)
+        n += setBackgroundTag(clw1SimHits);
+      if (m_phase == 2) {
+        n += setBackgroundTag(clw2SimHits);
+        n += setBackgroundTag(fngSimHits);
+        n += setBackgroundTag(plmSimHits);
+      }
+      n += setBackgroundTag(pinSimHits);
+      n += setBackgroundTag(he3SimHits);
+      n += setBackgroundTag(tpcSimHits);
+      n += setBackgroundTag(sciSimHits);
+    }
 
     if (m_fileType == BackgroundMetaData::c_ECL) n = eclHits.getEntries();
     if (m_fileType == BackgroundMetaData::c_PXD) n = pxdSimHits.getEntries();

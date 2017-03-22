@@ -22,8 +22,8 @@ const int HistSender::FLAG_UPDATE = 3;
 
 HistSender::~HistSender()
 {
-  m_socket.close();
-  LogFile::debug("GUI disconnected.");
+  // m_socket.close();
+  // LogFile::debug("GUI disconnected.");
 }
 
 bool HistSender::update(std::vector<TH1*>& hist)
@@ -39,11 +39,14 @@ bool HistSender::update(std::vector<TH1*>& hist)
         TH1* h = hist[n];
         std::string name = h->GetName();
         StringList str_v = StringUtil::split(name, '/');
+        //LogFile::info(name);
         std::string dirname = "";
         if (str_v.size() > 1) {
           dirname = str_v[0];
           name = str_v[1];
         }
+        //LogFile::info(dirname);
+        //LogFile::info(name);
         TString class_name = h->ClassName();
         writer.writeString(class_name.Data());
         writer.writeString(dirname);
@@ -113,6 +116,7 @@ bool HistSender::update(std::vector<TH1*>& hist)
     writer.writeInt(0x7FFF);
     count++;
   } catch (const IOException& e) {
+    LogFile::warning("hist sender : %s", e.what());
     m_socket.close();
     return false;
   }

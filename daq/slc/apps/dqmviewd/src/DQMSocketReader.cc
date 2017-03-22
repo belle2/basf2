@@ -42,14 +42,18 @@ void DQMSocketReader::run()
     std::map<std::string, TH1*> hist_m;
     try {
       socket = server.accept();
+      LogFile::info("Accepted new connection for data");
     } catch (const IOException& e) {
       LogFile::fatal(e.what());
       exit(1);
     }
     try {
       while (true) {
-        socket.read(buf, sizeof(int));
-        socket.read(buf + 4, *(int*)buf);
+        int size;
+        socket.read(&size, sizeof(int));
+        size = ntohl(size);
+        //LogFile::info("size=%d", size);
+        socket.read(buf, size);
         EvtMessage hmsg(buf);
         std::vector<TObject*> objlist;
         std::vector<std::string> strlist;
@@ -74,6 +78,7 @@ void DQMSocketReader::run()
               if (dir.size() > 0) name = dir + "/" + name;
               if (hist_m.find(name) == hist_m.end()) {
                 std::string vname = StringUtil::form("hist[%d].", nhist);
+                LogFile::info("new hist: " + name);
                 m_callback->add(new NSMVHandlerText(vname + "path", true, false, name));
                 hist_m.insert(std::pair<std::string, TH1*>(name, h));
                 nhist++;

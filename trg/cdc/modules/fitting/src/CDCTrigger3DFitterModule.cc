@@ -116,8 +116,8 @@ CDCTrigger3DFitterModule::event()
     double chi2 = 0;
     fitter(bestTSIndex, bestTSPhi, charge, rho, phi, z0, cot, chi2);
 
-    // For failed fits. When cot is 0 or nan.
-    if (cot == 0 || std::isnan(cot)) {
+    // check if fit results are valid
+    if (isnan(z0) || isnan(cot) || isnan(chi2)) {
       B2INFO("3D fit failed");
       continue;
     }

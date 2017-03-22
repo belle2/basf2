@@ -498,14 +498,13 @@ bool RootInputModule::createParentStoreEntries()
   int run = eventMetaData->getRun();
   unsigned int event = eventMetaData->getEvent();
   std::string parentLfn = eventMetaData->getParentLfn();
-  std::string parentPfn = FileCatalog::Instance().getPhysicalFileName(parentLfn);
   branch->SetAddress(address);
 
   // loop over parents and get their metadata
   for (int level = 0; level < m_parentLevel; level++) {
-
     // open the parent file
     TDirectory* dir = gDirectory;
+    const std::string parentPfn = FileCatalog::Instance().getPhysicalFileName(parentLfn);
     TFile* file = TFile::Open(parentPfn.c_str(), "READ");
     dir->cd();
     if (!file || !file->IsOpen()) {
@@ -532,7 +531,7 @@ bool RootInputModule::createParentStoreEntries()
     connectBranches(persistent, DataStore::c_Persistent, 0);
 
     // get parent LFN of parent
-    EventMetaData* metaData = 0;
+    EventMetaData* metaData = nullptr;
     tree->SetBranchAddress("EventMetaData", &metaData);
     long entry = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, event, run, experiment);
     tree->GetBranch("EventMetaData")->GetEntry(entry);
@@ -551,11 +550,11 @@ bool RootInputModule::readParentTrees()
   unsigned int event = eventMetaData->getEvent();
 
   std::string parentLfn = eventMetaData->getParentLfn();
-  std::string parentPfn = FileCatalog::Instance().getPhysicalFileName(parentLfn);
   for (int level = 0; level < m_parentLevel; level++) {
+    const std::string& parentPfn = FileCatalog::Instance().getPhysicalFileName(parentLfn);
 
     // Open the parent file if we haven't done this already
-    TTree* tree = 0;
+    TTree* tree = nullptr;
     if (m_parentTrees.find(parentLfn) == m_parentTrees.end()) {
       TDirectory* dir = gDirectory;
       B2DEBUG(50, "Opening parent file: " << parentPfn);
@@ -586,7 +585,7 @@ bool RootInputModule::readParentTrees()
     }
 
     // read the tree and mark the data read in the data store
-    EventMetaData* parentMetaData = 0;
+    EventMetaData* parentMetaData = nullptr;
     tree->SetBranchAddress("EventMetaData", &parentMetaData);
     tree->GetEntry(entry);
     for (auto entry : m_parentStoreEntries[level]) {

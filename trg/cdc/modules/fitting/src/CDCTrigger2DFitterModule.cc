@@ -124,7 +124,7 @@ CDCTrigger2DFitterModule::event()
         // if that is not the case, select the fastest hit
         if (hitIds[iSL / 2] != -1) {
           B2WARNING("got multiple hits for SL " << iSL);
-          if (hits[ihit]->priorityTime() > driftTime[iSL / 2])
+          if (hits[ihit]->priorityTime() >= driftTime[iSL / 2])
             continue;
         } else {
           nHits += 1;

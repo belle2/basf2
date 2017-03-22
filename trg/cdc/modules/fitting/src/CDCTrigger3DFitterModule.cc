@@ -32,6 +32,9 @@ CDCTrigger3DFitterModule::CDCTrigger3DFitterModule() : Module::Module()
   addParam("outputCollection", m_outputCollectionName,
            "Name of the StoreArray holding the 3D output tracks.",
            string("Trg3DFitterTracks"));
+  addParam("minHits", m_minHits,
+           "Minimal number of hits required for the fitting.",
+           unsigned(2));
   addParam("xtSimple", m_xtSimple,
            "If true, use nominal drift velocity, otherwise use table "
            "for non-linear xt.",
@@ -94,6 +97,18 @@ CDCTrigger3DFitterModule::event()
     vector<int> bestTSIndex(4, -1);
     vector<double> bestTSPhi(4, 9999);
     finder(charge, rho, phi, bestTSIndex, bestTSPhi);
+
+    // count the number of selected hits
+    unsigned nHits = 0;
+    for (unsigned iSt = 0; iSt < 4; ++iSt) {
+      if (bestTSIndex[iSt] != -1) {
+        nHits += 1;
+      }
+    }
+    if (nHits < m_minHits) {
+      B2INFO("Not enough hits to do 3D fit (" << m_minHits << " needed, got " << nHits << ")");
+      continue;
+    }
 
     // do the fit and create a new track
     double z0 = 0;
@@ -176,16 +191,12 @@ CDCTrigger3DFitterModule::finder(int charge, double rho, double phi,
   // Pick middle candidate if multiple candidates
   // mean wire diff
   double meanWireDiff[4] = { 3.68186, 3.3542, 3.9099, 4.48263 };
-  unsigned nHits = 0;
   for (int iSt = 0; iSt < 4; ++iSt) {
     double bestDiff = 9999;
     for (int iTS = 0; iTS < int(candidatesIndex[iSt].size()); ++iTS) {
       double diff = abs(abs(candidatesDiffStWires[iSt][iTS]) - meanWireDiff[iSt]);
       // Pick the better TS
       if (diff < bestDiff) {
-        if (bestTSIndex[iSt] == -1) {
-          nHits += 1;
-        }
         bestDiff = diff;
         bestTSPhi[iSt] = candidatesPhi[iSt][iTS];
         bestTSIndex[iSt] = candidatesIndex[iSt][iTS];

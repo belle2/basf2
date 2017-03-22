@@ -34,7 +34,7 @@ CDCTrigger2DFitterModule::CDCTrigger2DFitterModule() : Module::Module()
            string("Trg2DFitterTracks"));
   addParam("minHits", m_minHits,
            "Minimal number of hits required for the fitting.",
-           unsigned(5));
+           unsigned(2));
   addParam("xtSimple", m_xtSimple,
            "If true, use nominal drift velocity, otherwise use table "
            "for non-linear xt.",

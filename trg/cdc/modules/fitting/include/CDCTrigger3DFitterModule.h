@@ -51,6 +51,8 @@ namespace Belle2 {
     std::string m_inputCollectionName;
     /** Name of the StoreArray containing the resulting 3D tracks. */
     std::string m_outputCollectionName;
+    /** Minimal number of hits required for fitting. */
+    unsigned m_minHits;
     /** Switch between nominal drift velocity and xt table */
     bool m_xtSimple;
 

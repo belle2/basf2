@@ -30,7 +30,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDedxCosine(int nbins, std::vector<float> costh, std::vector<float> means): m_nbins(nbins), m_costh(costh), m_means(means) {};
+    CDCDedxCosine(int nbins, std::vector<float>& costh, std::vector<float>& means): m_nbins(nbins), m_costh(costh), m_means(means) {};
 
     /**
      * Destructor

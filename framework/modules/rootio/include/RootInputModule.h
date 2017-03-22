@@ -28,7 +28,7 @@
 namespace Belle2 {
   /** Module to read TTree data from file into the data store.
    *
-   *  For more information consult the TWiki basf2 Software Portal.
+   *  For more information consult the basf2 Software Portal.
    *  You can specify different TTrees for different durabilities, and specify
    *  if only specific branches should be read (branchNames), or if some should
    *  be excluded (excludeBranchNames).
@@ -36,7 +36,7 @@ namespace Belle2 {
    *  The module supports reading from multiple files using TChain, entries will
    *  be read in the order the files are specified.
    *
-   *  @sa EDurability
+   *  @sa DataStore::EDurability
   */
   class RootInputModule : public Module {
   public:

@@ -399,7 +399,7 @@ void RootInputModule::readTree()
     }
     // file changed, read the FileMetaData object from the persistent tree and update the parent file metadata
     readPersistentEntry(treeNum);
-    B2INFO("Loading new input file with LFN:" << FileCatalog::Instance().getPhysicalFileName(fileMetaData->getLfn()));
+    B2INFO("Loading new input file with physical path:" << FileCatalog::Instance().getPhysicalFileName(fileMetaData->getLfn()));
   }
 
   for (auto entry : m_storeEntries) {

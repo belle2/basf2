@@ -98,9 +98,6 @@ namespace Belle2 {
     /// appends a pointer to TRGCDCWireHitMC.
     const TRGCDCWireHitMC* hit(TRGCDCWireHitMC*);
 
-    /// set signal |= newSignal
-    void addSignal(TRGSignal& newSignal);
-
   public:// TRG
 
     /// returns an input to the trigger. This is sync'ed to 1GHz clock.
@@ -141,13 +138,6 @@ namespace Belle2 {
   {
     _mcHits.push_back(a);
     return a;
-  }
-
-  inline
-  void
-  TRGCDCWire::addSignal(TRGSignal& newSignal)
-  {
-    _signal |= newSignal;
   }
 
   inline

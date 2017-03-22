@@ -31,6 +31,7 @@
 #include <framework/logging/Logger.h>
 
 #include <cdc/dataobjects/CDCRecoHit.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <cmath>
 #include <exception>
@@ -641,6 +642,17 @@ void EventDataPlotter::draw(const RecoTrack& recoTrack, const AttributeMap& attr
   primitivePlotter.endGroup();
 }
 
+void EventDataPlotter::drawTrajectory(const MCParticle& mcParticle, const AttributeMap& attributeMap)
+{
+  if (not mcParticle.isPrimaryParticle()) return;
+  Vector3D pos(mcParticle.getVertex());
+  Vector3D mom(mcParticle.getMomentum());
+  double charge = mcParticle.getCharge();
+  double time = mcParticle.getProductionTime();
+  CDCTrajectory2D trajectory2D(pos.xy(), time, mom.xy(), charge);
+  draw(trajectory2D, attributeMap);
+}
+
 void EventDataPlotter::drawTrajectory(const CDCSegment2D& segment,
                                       const AttributeMap& attributeMap)
 {
@@ -674,11 +686,13 @@ void EventDataPlotter::drawTrajectory(const RecoTrack& recoTrack, const Attribut
     TVector3 mom;
     TMatrixDSym cov;
     size_t nHits = recoTrack.getHitPointsWithMeasurement().size();
-    // const cast to access the  measurements along the track
-    RecoTrack& vRecoTrack = const_cast<RecoTrack&>(recoTrack);
-    for (size_t iHit = 0; iHit < nHits; ++iHit) {
+
+    for (auto recoHit : recoTrack.getRecoHitInformations()) {
+      // skip for reco hits which have not been used in the fit (and therefore have no fitted information on the plane
+      if (!recoHit->useInFit())
+        continue;
       try {
-        const genfit::MeasuredStateOnPlane& state = vRecoTrack.getMeasuredStateOnPlaneFromHit(iHit);
+        const genfit::MeasuredStateOnPlane& state = recoTrack.getMeasuredStateOnPlaneFromRecoHit(recoHit);
         state.getPosMomCov(pos, mom, cov);
       } catch (genfit::Exception) {
         continue;

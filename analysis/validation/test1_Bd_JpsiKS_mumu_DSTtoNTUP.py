@@ -5,7 +5,7 @@
 <header>
   <input>Bd_JpsiKS_mumu_GENSIMRECtoDST.dst.root</input>
   <output>Bd_JpsiKS_mumu.ntup.root</output>
-  <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
+  <contact>Jorge Martinez-Ortega; jmartinez@fis.cinvestav.mx</contact>
 </header>
 """
 

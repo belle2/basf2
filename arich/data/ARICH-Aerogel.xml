@@ -20,13 +20,13 @@
       <material>Aerogel1</material>
       <thickness desc="Thickness of aerogel layer (tiles)" unit="mm">20</thickness>
       <refIndex desc="Refractive index of aerogel">1.045</refIndex>
-      <trLength desc="Transmission length of aerogel" unit="mm">43.5906</trLength>
+      <trLength desc="Transmission length of aerogel" unit="mm">45</trLength>
     </Layer>
     <Layer id="2">
       <material>Aerogel2</material>
       <thickness desc="Thickness of aerogel tiles" unit="mm">20</thickness>
       <refIndex desc="Refractive index of aerogel">1.055</refIndex>
-      <trLength desc="Transmission length of aerogel" unit="mm">32.6929</trLength>
+      <trLength desc="Transmission length of aerogel" unit="mm">35</trLength>
     </Layer>
   </Layers>
 

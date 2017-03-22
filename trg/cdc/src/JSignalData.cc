@@ -29,153 +29,171 @@
 
 using namespace std;
 
-namespace Belle2{
+namespace Belle2 {
 
-  TRGCDCJSignalData::TRGCDCJSignalData(){
+  TRGCDCJSignalData::TRGCDCJSignalData()
+  {
     m_vhdlOutputFile = "vhdlOutput";
     m_vhdlEntry = "";
     m_vhdlDefine = "";
     m_vhdlInProcess = "";
     m_vhdlOutProcess = "";
-    m_printVhdl=0;
-    m_printedToFile=0;
+    m_printVhdl = 0;
+    m_printedToFile = 0;
   }
 
-  void TRGCDCJSignalData::setVhdlOutputFile(string vhdlOutputFile){
+  void TRGCDCJSignalData::setVhdlOutputFile(string vhdlOutputFile)
+  {
     m_vhdlOutputFile = vhdlOutputFile;
   }
 
-  void TRGCDCJSignalData::setPrintVhdl(bool printVhdl){
+  void TRGCDCJSignalData::setPrintVhdl(bool printVhdl)
+  {
     m_printVhdl = printVhdl;
   }
 
-  void TRGCDCJSignalData::setPrintedToFile(bool printedToFile){
+  void TRGCDCJSignalData::setPrintedToFile(bool printedToFile)
+  {
     m_printedToFile = printedToFile;
   }
 
-  void TRGCDCJSignalData::setVhdlInProcess(std::string vhdlInProcess) {
+  void TRGCDCJSignalData::setVhdlInProcess(std::string vhdlInProcess)
+  {
     m_vhdlInProcess = vhdlInProcess;
   }
 
-  void TRGCDCJSignalData::setVhdlOutProcess(std::string vhdlOutProcess){
+  void TRGCDCJSignalData::setVhdlOutProcess(std::string vhdlOutProcess)
+  {
     m_vhdlOutProcess = vhdlOutProcess;
   }
 
-  std::string TRGCDCJSignalData::getVhdlOutputFile() const{
+  std::string TRGCDCJSignalData::getVhdlOutputFile() const
+  {
     return m_vhdlOutputFile;
   }
 
-  bool TRGCDCJSignalData::getPrintVhdl() const {
+  bool TRGCDCJSignalData::getPrintVhdl() const
+  {
     return m_printVhdl;
   }
 
-  bool TRGCDCJSignalData::getPrintedToFile() const {
+  bool TRGCDCJSignalData::getPrintedToFile() const
+  {
     return m_printedToFile;
   }
 
-  std::string TRGCDCJSignalData::getVhdlInProcess() const {
+  std::string TRGCDCJSignalData::getVhdlInProcess() const
+  {
     return m_vhdlInProcess;
   }
 
-  std::string TRGCDCJSignalData::getVhdlOutProcess() const {
+  std::string TRGCDCJSignalData::getVhdlOutProcess() const
+  {
     return m_vhdlOutProcess;
   }
 
-  std::string TRGCDCJSignalData::getVhdlDefine() const {
+  std::string TRGCDCJSignalData::getVhdlDefine() const
+  {
     return m_vhdlDefine;
   }
 
-  std::map<std::string, std::vector<int> > const & TRGCDCJSignalData::getSignals() const{
+  std::map<std::string, std::vector<int> > const& TRGCDCJSignalData::getSignals() const
+  {
     return m_signals;
   }
 
 
-  void TRGCDCJSignalData::printToFile(){
+  void TRGCDCJSignalData::printToFile()
+  {
     // Write to file.
     ofstream outFile;
     outFile.open(m_vhdlOutputFile);
-    if(outFile.is_open()){
-      outFile<<"library IEEE;"<<endl;
-      outFile<<"use ieee.std_logic_1164.all;"<<endl;
-      outFile<<"use ieee.numeric_std.all;"<<endl;
-      outFile<<endl;
-      outFile<<"entity Firmware is"<<endl;
-      outFile<<"  PORT ( CLKIN   : in STD_LOGIC;"<<endl;
-      outFile<<"         INPUT   : in std_logic_vector(0 downto 0);"<<endl;
-      outFile<<"         OUTPUT   : in std_logic_vector(0 downto 0)"<<endl;
-      outFile<<");"<<endl;
-      outFile<<endl;
-      outFile<<m_vhdlEntry<<endl;
-      outFile<<endl;
-      outFile<<"end Firmware;"<<endl;
-      outFile<<endl;
-      outFile<<"architecture Behavioral of Firmware is"<<endl;
-      outFile<<endl;
-      outFile<<m_vhdlDefine<<endl;
-      outFile<<endl;
-      outFile<<"begin"<<endl;
-      outFile<<endl;
-      outFile<<"-- Main algorithm"<<endl;
-      outFile<<"logic: process (CLKIN) is"<<endl;
-      outFile<<"begin"<<endl;
-      outFile<<"  if CLKIN'event and CLKIN='1' then"<<endl;
-      outFile<<endl;
-      outFile<<m_vhdlInProcess<<endl;
-      outFile<<endl;
-      outFile<<"  end if;"<<endl;
-      outFile<<"end process;"<<endl;
-      outFile<<endl;
-      outFile<<m_vhdlOutProcess<<endl;
-      outFile<<endl;
-      outFile<<"end Behavioral;"<<endl;
+    if (outFile.is_open()) {
+      outFile << "library IEEE;" << endl;
+      outFile << "use ieee.std_logic_1164.all;" << endl;
+      outFile << "use ieee.numeric_std.all;" << endl;
+      outFile << endl;
+      outFile << "entity Firmware is" << endl;
+      outFile << "  PORT ( CLKIN   : in STD_LOGIC;" << endl;
+      outFile << "         INPUT   : in std_logic_vector(0 downto 0);" << endl;
+      outFile << "         OUTPUT   : in std_logic_vector(0 downto 0)" << endl;
+      outFile << ");" << endl;
+      outFile << endl;
+      outFile << m_vhdlEntry << endl;
+      outFile << endl;
+      outFile << "end Firmware;" << endl;
+      outFile << endl;
+      outFile << "architecture Behavioral of Firmware is" << endl;
+      outFile << endl;
+      outFile << m_vhdlDefine << endl;
+      outFile << endl;
+      outFile << "begin" << endl;
+      outFile << endl;
+      outFile << "-- Main algorithm" << endl;
+      outFile << "logic: process (CLKIN) is" << endl;
+      outFile << "begin" << endl;
+      outFile << "  if CLKIN'event and CLKIN='1' then" << endl;
+      outFile << endl;
+      outFile << m_vhdlInProcess << endl;
+      outFile << endl;
+      outFile << "  end if;" << endl;
+      outFile << "end process;" << endl;
+      outFile << endl;
+      outFile << m_vhdlOutProcess << endl;
+      outFile << endl;
+      outFile << "end Behavioral;" << endl;
       outFile.close();
-      m_printedToFile=1;
+      m_printedToFile = 1;
     }
   }
 
-  void TRGCDCJSignalData::buffersVhdlCode() {
+  void TRGCDCJSignalData::buffersVhdlCode()
+  {
     // Define.
-    for(map<string,vector<int> >::const_iterator it = m_buffers.begin(); it!=m_buffers.end(); ++it){
-      string const & name = it->first;
-      int const & type = it->second[0];
-      int const & bitwidth = it->second[1];
-      int const & buffer = it->second[2];
-      string arrayName = (type == 1 ? "U" : "S" ) + to_string(bitwidth) + "D" + to_string(buffer+1) + "Array";
-      if(m_arrayType.find(arrayName)==m_arrayType.end()) {
-        m_vhdlDefine += "type " + arrayName + " is array(" + to_string(buffer) + " downto 0) of " + (type == 1 ? "unsigned" : "signed" ) + "(" + to_string(bitwidth-1) + " downto 0);\n";
-        m_arrayType[arrayName]=1;
+    for (map<string, vector<int> >::const_iterator it = m_buffers.begin(); it != m_buffers.end(); ++it) {
+      string const& name = it->first;
+      int const& type = it->second[0];
+      int const& bitwidth = it->second[1];
+      int const& buffer = it->second[2];
+      string arrayName = (type == 1 ? "U" : "S") + to_string(bitwidth) + "D" + to_string(buffer + 1) + "Array";
+      if (m_arrayType.find(arrayName) == m_arrayType.end()) {
+        m_vhdlDefine += "type " + arrayName + " is array(" + to_string(buffer) + " downto 0) of " + (type == 1 ? "unsigned" : "signed") +
+                        "(" + to_string(bitwidth - 1) + " downto 0);\n";
+        m_arrayType[arrayName] = 1;
       }
       m_vhdlDefine += "signal " + name + "_b : " + arrayName + " := (others=>(others=>'0'));\n";
     }
     // Process.
-    for(map<string,vector<int> >::const_iterator it = m_buffers.begin(); it!=m_buffers.end(); ++it){
-      string const & name = it->first;
-      int const & buffer = it->second[2];
+    for (map<string, vector<int> >::const_iterator it = m_buffers.begin(); it != m_buffers.end(); ++it) {
+      string const& name = it->first;
+      int const& buffer = it->second[2];
       m_vhdlInProcess += name + "_b(" + to_string(0) + ") <= " + name + ";\n";
-      for(int iBuffer=0; iBuffer<buffer; iBuffer++){
-        m_vhdlInProcess += name + "_b(" + to_string(iBuffer+1) + ") <= " + name + "_b(" + to_string(iBuffer) + ");\n";
+      for (int iBuffer = 0; iBuffer < buffer; iBuffer++) {
+        m_vhdlInProcess += name + "_b(" + to_string(iBuffer + 1) + ") <= " + name + "_b(" + to_string(iBuffer) + ");\n";
       }
     }
-    
+
   }
 
-  void TRGCDCJSignalData::signalsVhdlCode() {
-    for(map<string,vector<int> >::const_iterator it = m_signals.begin(); it!=m_signals.end(); ++it){
-      string const & name = it->first;
-      int const & type = it->second[0];
-      int const & bitwidth = it->second[1];
+  void TRGCDCJSignalData::signalsVhdlCode()
+  {
+    for (map<string, vector<int> >::const_iterator it = m_signals.begin(); it != m_signals.end(); ++it) {
+      string const& name = it->first;
+      int const& type = it->second[0];
+      int const& bitwidth = it->second[1];
       string typeName;
-      if(type==1) typeName="unsigned";
-      else if(type==-1) typeName="signed";
-      else if(type==2) typeName="std_logic_vector";
+      if (type == 1) typeName = "unsigned";
+      else if (type == -1) typeName = "signed";
+      else if (type == 2) typeName = "std_logic_vector";
       else {
-        cout<<"[Error] TRGCDCJSignalData::signalsVhdlCode() => signal type is unknown."<<endl;
+        cout << "[Error] TRGCDCJSignalData::signalsVhdlCode() => signal type is unknown." << endl;
       }
-      m_vhdlDefine += "signal " + name + " : " + typeName + "(" + to_string(bitwidth-1) + " downto 0) := (others=>'0');\n";
+      m_vhdlDefine += "signal " + name + " : " + typeName + "(" + to_string(bitwidth - 1) + " downto 0) := (others=>'0');\n";
     }
   }
 
-  void TRGCDCJSignalData::entryVhdlCode() {
+  void TRGCDCJSignalData::entryVhdlCode()
+  {
     m_vhdlEntry += "function decimal_string_to_unsigned(decimal_string: string; wanted_bitwidth: integer) return unsigned is\n";
     m_vhdlEntry += "  variable tmp_unsigned: unsigned(wanted_bitwidth-1 downto 0) := (others => '0');\n";
     m_vhdlEntry += "  variable character_value: integer;\n";

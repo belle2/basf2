@@ -13,7 +13,13 @@ from .plot import ValidationPlot, compose_axis_label
 from .pull import PullAnalysis
 from .resolution import ResolutionAnalysis
 from .fom import ValidationFiguresOfMerit
-from .utilities import getHelixFromMCParticle, getSeedTrackFitResult
+from .utilities import (
+    getHelixFromMCParticle,
+    getSeedTrackFitResult,
+    is_primary,
+    get_det_hit_ids,
+    calc_ndf_from_det_hit_ids
+    )
 
 import basf2
 
@@ -152,6 +158,7 @@ class TrackingValidationModule(basf2.Module):
         self.pr_bining_pt = collections.deque()
 
         self.mc_matches = collections.deque()
+        self.mc_primaries = collections.deque()
         self.mc_d0s = collections.deque()
         self.mc_tan_lambdas = collections.deque()
         # direction of the track in theta
@@ -161,6 +168,7 @@ class TrackingValidationModule(basf2.Module):
         self.mc_pts = collections.deque()
         self.mc_hit_efficiencies = collections.deque()
         self.mc_multiplicities = collections.deque()
+        self.mc_ndf = collections.deque()
 
     def event(self):
         """Event method"""
@@ -180,8 +188,8 @@ class TrackingValidationModule(basf2.Module):
             return
 
         for trackCand in trackCands:
-            is_matched = trackMatchLookUp.isMatchedPRTrackCand(trackCand)
-            is_clone = trackMatchLookUp.isClonePRTrackCand(trackCand)
+            is_matched = trackMatchLookUp.isMatchedPRRecoTrack(trackCand)
+            is_clone = trackMatchLookUp.isClonePRRecoTrack(trackCand)
 
             pt_truth = float('nan')
             omega_truth = float('nan')
@@ -235,7 +243,8 @@ class TrackingValidationModule(basf2.Module):
             # this information can we used when plotting fake tracks, for example
             seed_position = trackCand.getPositionSeed()
             seed_momentum = trackCand.getMomentumSeed()
-            seed_tan_lambda = np.divide(1.0, math.tan(seed_momentum.Theta()))  # Avoid zero division exception
+            # Avoid zero division exception
+            seed_tan_lambda = np.divide(1.0, math.tan(seed_momentum.Theta()))
             seed_phi = seed_position.Phi()
             seed_theta = seed_position.Theta()
 
@@ -299,9 +308,11 @@ class TrackingValidationModule(basf2.Module):
         multiplicity = mcTrackCands.getEntries()
 
         for mcTrackCand in mcTrackCands:
-            is_matched = trackMatchLookUp.isMatchedMCTrackCand(mcTrackCand)
+            is_matched = trackMatchLookUp.isMatchedMCRecoTrack(mcTrackCand)
 
             hit_efficiency = trackMatchLookUp.getRelatedEfficiency(mcTrackCand)
+            if math.isnan(hit_efficiency):
+                hit_efficiency = 0
 
             mcParticle = trackMatchLookUp.getRelatedMCParticle(mcTrackCand)
             mcHelix = getHelixFromMCParticle(mcParticle)
@@ -318,8 +329,11 @@ class TrackingValidationModule(basf2.Module):
             pt = momentum.Perp()
             tan_lambda = np.divide(1.0, math.tan(momentum.Theta()))  # Avoid zero division exception
             d0 = mcHelix.getD0()
+            det_hit_ids = get_det_hit_ids(mcTrackCand)
+            ndf = calc_ndf_from_det_hit_ids(det_hit_ids)
 
             self.mc_matches.append(is_matched)
+            self.mc_primaries.append(is_primary(mcParticle))
             self.mc_hit_efficiencies.append(hit_efficiency)
             self.mc_pts.append(pt)
             self.mc_d0s.append(d0)
@@ -327,6 +341,7 @@ class TrackingValidationModule(basf2.Module):
             self.mc_multiplicities.append(multiplicity)
             self.mc_theta.append(momentum.Theta())
             self.mc_phi.append(momentum.Phi())
+            self.mc_ndf.append(ndf)
 
     def terminate(self):
         name = self.validation_name
@@ -334,7 +349,7 @@ class TrackingValidationModule(basf2.Module):
 
         # Overall figures of merit #
         ############################
-        track_finding_efficiency = np.mean(self.mc_matches)
+        finding_efficiency = np.average(self.mc_matches, weights=self.mc_primaries)
         fake_rate = 1.0 - np.mean(self.pr_clones_and_matches)
         # can only be computed if there are entries
         if len(self.pr_clones_and_matches) > 0 and sum(self.pr_clones_and_matches) > 0:
@@ -343,11 +358,12 @@ class TrackingValidationModule(basf2.Module):
         else:
             clone_rate = float('nan')
 
-        hit_efficiency = np.nanmean(self.mc_hit_efficiencies)
+        mc_matched_primaries = np.logical_and(self.mc_primaries, self.mc_matches)
+        hit_efficiency = np.average(self.mc_hit_efficiencies, weights=mc_matched_primaries)
 
         figures_of_merit = ValidationFiguresOfMerit('%s_figures_of_merit'
                                                     % name)
-        figures_of_merit['finding_efficiency'] = track_finding_efficiency
+        figures_of_merit['finding_efficiency'] = finding_efficiency
         figures_of_merit['fake_rate'] = fake_rate
         figures_of_merit['clone_rate'] = clone_rate
         figures_of_merit['hit_efficiency'] = hit_efficiency
@@ -359,7 +375,7 @@ fake_rate - ratio of pattern recognition tracks that are not related to a partic
             (background, ghost) to all pattern recognition tracks <br/>
 clone_rate - ratio of clones divided the number of tracks that are related to a particle (clones and matches) <br/>
 """
-        figures_of_merit.check = 'Compare for degradations with respect to the reference line'
+        figures_of_merit.check = 'Compare for degradations with respect to the reference'
         figures_of_merit.contact = contact
         print(figures_of_merit)
 
@@ -371,7 +387,10 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         # Finding efficiency #
         ######################
         plots = self.profiles_by_mc_parameters(self.mc_matches,
-                                               'finding efficiency', make_hist=False)
+                                               'finding efficiency',
+                                               make_hist=False,
+                                               weights=self.mc_primaries)
+
         validation_plots.extend(plots)
 
         # Fake rate (all tracks not matched or clone            #
@@ -386,7 +405,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         # Hit efficiency #
         ##################
         plots = self.profiles_by_mc_parameters(self.mc_hit_efficiencies,
-                                               'hit efficiency with matched tracks')
+                                               'hit efficiency with matched tracks',
+                                               weights=mc_matched_primaries)
         validation_plots.extend(plots)
 
         # Fit quality #
@@ -536,9 +556,11 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             'multiplicity',
             'phi',
             'theta',
+            'ndf',
         ],
         non_expert_parameters=['p_{t}'],
         make_hist=True,
+        weights=None
     ):
 
         # apply exclusion list
@@ -553,6 +575,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             '#phi': self.mc_phi,
             '#theta': self.mc_theta,
             'multiplicity': self.mc_multiplicities,
+            'ndf': self.mc_ndf,
         }
 
         return self.profiles_by_parameters_base(
@@ -562,7 +585,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             profile_parameters,
             unit,
             make_hist,
-            non_expert_parameters=non_expert_parameters
+            non_expert_parameters=non_expert_parameters,
+            weights=weights
         )
 
     def profiles_by_pr_parameters(
@@ -600,7 +624,8 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         profile_parameters,
         unit,
         make_hist,
-        non_expert_parameters=[]
+        non_expert_parameters=[],
+        weights=None,
     ):
 
         contact = self.contact
@@ -612,7 +637,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         if make_hist:
             # Histogram of the quantity
             histogram = ValidationPlot(plot_name_prefix)
-            histogram.hist(xs)
+            histogram.hist(xs, weights=weights)
 
             histogram.xlabel = quantity_name
             histogram.description = 'Not a serious plot yet.'
@@ -628,10 +653,32 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
                 is_expert = not(parameter_name in non_expert_parameters)
 
+                # Apply some boundaries for the maximal tracking acceptance
+                # such that the plots look more instructive
+                if root_save_name(parameter_name) == 'tan_lambda':
+                    lower_bound = -1.73
+                    upper_bound = 3.27
+                elif root_save_name(parameter_name) == 'theta':
+                    lower_bound = 17 * math.pi / 180
+                    upper_bound = 150 * math.pi / 180
+                elif root_save_name(parameter_name) == 'ndf':
+                    lower_bound = 0
+                    upper_bound = min(200, np.max(parameter_values))
+                else:
+                    lower_bound = None
+                    upper_bound = None
+
                 profile_plot_name = plot_name_prefix + '_by_' \
                     + root_save_name(parameter_name)
                 profile_plot = ValidationPlot(profile_plot_name)
-                profile_plot.profile(parameter_values, xs, outlier_z_score=10.0, is_expert=is_expert)
+                profile_plot.profile(parameter_values,
+                                     xs,
+                                     weights=weights,
+                                     outlier_z_score=10.0,
+                                     lower_bound=lower_bound,
+                                     upper_bound=upper_bound,
+                                     y_binary=True,
+                                     is_expert=is_expert)
 
                 profile_plot.xlabel = compose_axis_label(parameter_name)
                 profile_plot.ylabel = compose_axis_label(quantity_name, unit)

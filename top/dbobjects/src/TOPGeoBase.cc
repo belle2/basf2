@@ -27,6 +27,15 @@ void TOPGeoBase::print(const std::string& title) const
 }
 
 
+void TOPGeoBase::printUnderlined(const std::string& title) const
+{
+  cout << title << ":" << endl;
+  for (size_t i = 0; i <= title.length(); i++) cout << "-";
+  cout << endl;
+  cout << " name: " << m_name << endl;
+}
+
+
 void TOPGeoBase::printSurface(const GeoOpticalSurface& surface) const
 {
   cout << " Optical surface: ";

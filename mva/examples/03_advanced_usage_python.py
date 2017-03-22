@@ -7,12 +7,16 @@ import basf2_mva
 
 if __name__ == "__main__":
 
+    variables = ['M', 'p', 'pz', 'daughter(0, p)', 'daughter(0, pz)', 'daughter(1, p)', 'daughter(1, pz)',
+                 'chiProb', 'dr', 'dz', 'daughter(0, dr)', 'daughter(1, dr)', 'daughter(0, chiProb)', 'daughter(1, chiProb)',
+                 'daughter(0, Kid)', 'daughter(0, piid)', 'daughterAngle(0, 1)']
+
     # Perform an sPlot training
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_identifier = "MVAFull"
     general_options.m_treename = "tree"
-    general_options.m_variables = basf2_mva.vector('M', 'p', 'pz', 'daughter(0, Kid)')
+    general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
     fastbdt_options = basf2_mva.FastBDTOptions()
@@ -23,7 +27,7 @@ if __name__ == "__main__":
     basf2_mva.teacher(general_options, fastbdt_options)
 
     general_options.m_identifier = "MVAOrdinary"
-    general_options.m_variables = basf2_mva.vector('p', 'pz', 'daughter(0, Kid)')
+    general_options.m_variables = basf2_mva.vector(*variables[1:])
     basf2_mva.teacher(general_options, fastbdt_options)
 
     meta_options = basf2_mva.MetaOptions()

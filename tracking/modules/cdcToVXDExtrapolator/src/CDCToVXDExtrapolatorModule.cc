@@ -566,7 +566,10 @@ bool CDCToVXDExtrapolatorModule::extrapolateToLayer(genfit::Track* track, int se
         fitter->setMultipleMeasurementHandling(genfit::unweightedClosestToPredictionWire);
         fitter->setMaxFailedHits(5);
         try {
-          if (!track->checkConsistency()) {
+          try {
+            track->checkConsistency();
+          } catch (genfit::Exception& e) {
+            B2DEBUG(50, e.getExcString());
             B2DEBUG(50, "Inconsistent track found, attempting to sort!");
             bool sorted = track->sort();
             if (!sorted) {
@@ -708,7 +711,10 @@ bool CDCToVXDExtrapolatorModule::refitTrack(genfit::Track* track)
     fitter->setMaxFailedHits(5);
   }
   try {
-    if (!track->checkConsistency()) {
+    try {
+      track->checkConsistency();
+    } catch (genfit::Exception& e) {
+      B2DEBUG(50, e.getExcString());
       B2DEBUG(50, "Inconsistent track found, attempting to sort!");
       bool sorted = track->sort();
       if (!sorted) {
@@ -717,6 +723,7 @@ bool CDCToVXDExtrapolatorModule::refitTrack(genfit::Track* track)
         B2DEBUG(50, "Track points SORTED!! Hopefully this works now!");
       }
     }
+
     fitter->processTrack(track);
 
     genfit::FitStatus* fs = 0;
@@ -874,7 +881,7 @@ void CDCToVXDExtrapolatorModule::event()
       trkInfo.cdconly = true;
     }
 
-    RelationVector<MCParticle> MCParticles_fromTrack = DataStore::getRelationsFromObj<MCParticle>(&crnt);
+    RelationVector<MCParticle> MCParticles_fromTrack = DataStore::getRelationsWithObj<MCParticle>(&crnt);
     B2DEBUG(110, "--- Number of related MC particles: " << MCParticles_fromTrack.size());
 
     genfit::Track* mcTrk = 0;
@@ -899,9 +906,9 @@ void CDCToVXDExtrapolatorModule::event()
         if (cdcHitsFromMC) delete cdcHitsFromMC;
         if (svdClustersFromMC) delete svdClustersFromMC;
         if (pxdClustersFromMC) delete pxdClustersFromMC;
-        cdcHitsFromMC = new RelationVector<CDCHit>(DataStore::getRelationsFromObj<CDCHit>(MCParticles_fromTrack[0]));
-        svdClustersFromMC = new RelationVector<SVDCluster>(DataStore::getRelationsToObj<SVDCluster>(MCParticles_fromTrack[0]));
-        pxdClustersFromMC = new RelationVector<PXDCluster>(DataStore::getRelationsToObj<PXDCluster>(MCParticles_fromTrack[0]));
+        cdcHitsFromMC = new RelationVector<CDCHit>(DataStore::getRelationsWithObj<CDCHit>(MCParticles_fromTrack[0]));
+        svdClustersFromMC = new RelationVector<SVDCluster>(DataStore::getRelationsWithObj<SVDCluster>(MCParticles_fromTrack[0]));
+        pxdClustersFromMC = new RelationVector<PXDCluster>(DataStore::getRelationsWithObj<PXDCluster>(MCParticles_fromTrack[0]));
 
         nCdcMcHits = cdcHitsFromMC->size();
         nSvdMcClusters = svdClustersFromMC->size();

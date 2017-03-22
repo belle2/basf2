@@ -30,7 +30,7 @@ from basf2 import *
 # The FlavorTagger already imports  modularAnalysis
 from flavorTagger import *
 from stdFSParticles import *
-from stdLooseFSParticles import *
+from stdCharged import *
 
 # Add 10 signal MC files (each containing 1000 generated events)
 filelistSIG = \
@@ -75,7 +75,8 @@ buildRestOfEvent('B0:jspiks')
 
 # Before using the Flavor Tagger you need at least the default weight files. If you do not set
 # any parameter the flavorTagger downloads them automatically from the database.
-# You just have to specify the system build or revision you are using if you train by yourself!!!
+# You just have to specify the system build or revision you are using only if you train by yourself!!!
+# Otherwise the flavor tagger automatically looks for the release you set before.
 
 # Alternatively you can download them from my realease:
 # copy the folder in @login.cc.kek.jp:
@@ -90,12 +91,10 @@ buildRestOfEvent('B0:jspiks')
 #
 # Flavor Tagging Function. Default Expert mode to use the default weight files for the B2JpsiKs_mu channel.
 flavorTagger(
-    particleList='B0:jspiks',
-    combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
-    workingDirectory=os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data',
-    belleOrBelle2='Belle2')
+    particleLists=['B0:jspiks'],
+    workingDirectory=os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data')
 #
-# By default the FlavorTagger trains and applies two methods, 'TMVA-FBDT' and 'FANN-MLP', for the combiner.
+# By default the flavorTagger trains and applies two methods, 'TMVA-FBDT' and 'FANN-MLP', for the combiner.
 # If you want to train or test the Flavor Tagger only for one of them you have to specify it like:
 #
 # combinerMethods=['TMVA-FBDT']
@@ -109,7 +108,13 @@ flavorTagger(
 # If you want to train the Flavor Tagger by yourself you have to specify the name of the weight files and the categories
 # you want to use like:
 #
-# FlavorTagger(particleList='B0:jspiks', mode = 'Teacher', weightFiles='B2JpsiKs_mu',
+# flavorTagger(particleLists=['B0:jspiks'], mode = 'Sampler', weightFiles='B2JpsiKs_mu',
+# categories=['Electron', 'Muon', 'Kaon', ... etc.]
+# )
+#
+# After the Sampling process:
+#
+# flavorTagger(particleLists=['B0:jspiks'], mode = 'Teacher', weightFiles='B2JpsiKs_mu',
 # categories=['Electron', 'Muon', 'Kaon', ... etc.]
 # )
 #
@@ -132,17 +137,27 @@ flavorTagger(
 # 'MaximumPstar',
 # 'KaonPion']
 #
-# If you train by yourself you need to run this file 3 times (in order to train track, event and combiner levels)
-# with 3 different samples of 500k events.
+# If you train by yourself you need to run this file 6 times alternating between "Sampler" and "Teacher" modes
+# in order to train track, event and combiner levels.
+# with 3 different samples of 500k events (one for each sampler).
 # Three different 500k events samples are needed in order to avoid biases between levels.
-# You can also train track and event level for all categories (1st and 2nd runs) and then train the combiner
-# for a specific combination (3rd run).
+# We mean 500k of correctly corrected and MC matched neutral Bs. (isSignal > 0)
+# You can also train track and event level for all categories (1st to 4th runs) and then train the combiner
+# for a specific combination (las two runs).
 # It is also possible to train different combiners consecutively using the same weightFiles name.
 # You just need always to specify the desired category combination while using the expert mode as:
 #
-# FlavorTagger(mode = 'Expert', weightFiles='B2JpsiKs_mu', categories=['Electron', 'Muon', 'Kaon', ... etc.])
+# flavorTagger(particleLists=['B0:jspiks'], mode = 'Expert', weightFiles='B2JpsiKs_mu',
+# categories=['Electron', 'Muon', 'Kaon', ... etc.])
 #
 # Another possibility is to train a combiner for a specific category combination using the default weight files
+
+# You can apply cuts using the flavor Tagger: qrOutput(FBDT) > -2 rejects all events which do not
+# provide flavor information using the tag side
+applyCuts('B0:jspiks', 'qrOutput(FBDT) > -2')
+
+# If you applied the cut on qrOutput(FBDT) > -2 before then you can rank by highest r- factor
+rankByHighest('B0:jspiks', 'abs(qrOutput(FBDT))', 0, 'Dilution_rank')
 
 # Fit Vertex of the B0 on the tag side
 TagV('B0:jspiks', 'breco', 0.001, 'standard_PXD')

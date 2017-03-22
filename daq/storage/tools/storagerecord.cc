@@ -21,6 +21,9 @@
 
 #include <daq/slc/psql/PostgreSQLInterface.h>
 
+#include <daq/slc/database/DBObject.h>
+#include <daq/slc/database/DBObjectLoader.h>
+
 #include <daq/slc/readout/RunInfoBuffer.h>
 
 #include <daq/slc/system/TCPSocket.h>
@@ -45,9 +48,9 @@
 
 using namespace Belle2;
 
-const unsigned long long GB = 1024 * 1024 * 1024;
+const unsigned long long GB = 1000 * 1024 * 1024;
 const unsigned long long MAX_FILE_SIZE = 2 * GB;
-const char* g_table = "fileinfo";
+const char* g_table = "datafile";
 
 std::string popen(const std::string& cmd)
 {
@@ -76,6 +79,8 @@ public:
   {
     m_file = -1;
     m_filesize = 0;
+    m_fileid = 0;
+    m_diskid = 1;
   }
   ~FileHandler() throw()
   {
@@ -88,26 +93,17 @@ public:
 public:
   int open(const std::string& dir, int ndisks, int expno, int runno)
   {
-    m_fileid = 0;
-    m_diskid = 1;
     try {
       m_db.connect();
-      m_db.execute("select fileid, diskid from %s where expno = %d and runno = %d "
-                   "and path_sroot like '%s:_%s' and runtype='%s' order by id desc;",
-                   g_table, expno, runno, m_host.c_str(), "%%", m_runtype.c_str());
-      DBRecordList record_v(m_db.loadRecords());
-      if (record_v.size() > 0) {
-        DBRecord& record(record_v[0]);
-        m_fileid = (record.hasField("fileid")) ? record.getInt("fileid") + 1 : 0;
-        m_diskid = (record.hasField("diskid")) ? record.getInt("diskid") : 1;
-        std::cout << "db: fileid: " << m_fileid << std::endl;
+      DBObject obj = DBObjectLoader::load(m_db, g_table, m_host + ":");
+      if (obj.hasValue("fileid")) {
+        m_fileid = (obj.hasValue("fileid")) ? obj.getInt("fileid") + 1 : 0;
+        m_diskid = (obj.hasValue("diskid")) ? obj.getInt("diskid") : 1;
       }
       m_db.close();
     } catch (const DBHandlerException& e) {
-      LogFile::error("Failed to access db for read: %s", e.what());
-      return -1;
+      LogFile::warning("Failed to access db for read: %s", e.what());
     }
-    std::cout << "fileid: " << m_fileid << std::endl;
     char filename[1024];
     bool available = false;
     for (int i = 0; i < ndisks; i++) {
@@ -120,7 +116,7 @@ public:
         std::ifstream fin(filename);
         int flag = 0;
         fin >> flag;
-        if (/*fin.eof() || */flag != 1) {
+        if (flag != 1) {
           available = true;
           B2INFO("disk : " << m_diskid << " is available");
           break;
@@ -150,35 +146,24 @@ public:
     if (m_file < 0) {
       B2ERROR("Failed to open file : " << filename);
       exit(1);
-    } else {
-      const char* belle2lib = getenv("BELLE2_LOCAL_DIR");
-      int rev = atoi(StringUtil::split(popen(StringUtil::form("svn info %s | grep Revision", belle2lib)), ':')[1].c_str());
-      int rev_daq = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/daq | grep Revision", belle2lib)), ':')[1].c_str());
-      int rev_rawdata = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/rawdata | grep Revision", belle2lib)),
-                                               ':')[1].c_str());
-      int rev_svd = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/svd | grep Revision", belle2lib)), ':')[1].c_str());
-      int rev_pxd = atoi(StringUtil::split(popen(StringUtil::form("svn info %s/pxd | grep Revision", belle2lib)), ':')[1].c_str());
-      char sql[1000];
-      sprintf(sql,
-              "insert into %s (path_sroot, runtype, expno, runno, fileid, diskid, rev, rev_daq, rev_rawdata, rev_svd, rev_pxd, time_create)"
-              " values ('%s:%s', '%s', %d, %d, %d, %d,  %d, %d, %d, %d, %d, current_timestamp) returning id;",
-              g_table, m_host.c_str(), filename, m_runtype.c_str(), expno, runno, m_fileid, m_diskid, rev, rev_daq, rev_rawdata, rev_svd,
-              rev_pxd);
-      try {
-        m_db.connect();
-        m_db.execute(sql);
-        DBRecordList record_v(m_db.loadRecords());
-        m_id = (record_v.size() > 0) ? record_v[0].getInt("id") : 0;
-        m_db.close();
-      } catch (const DBHandlerException& e) {
-        LogFile::error("Failed to access db for read: %s", e.what());
-        std::ofstream fout(m_dbtmp.c_str(), std::ios::app);
-        fout << sql << std::endl;
-        fout.close();
-        return -1;
-      }
     }
     B2INFO("New file " << filename << " is opened");
+    DBObject obj;
+    m_configname = m_host + StringUtil::form("%s:%04d:%06d:%04d", m_runtype.c_str(), expno, runno, m_fileid);
+    obj.setName(m_configname);
+    obj.addText("host", m_host);
+    obj.addText("path", filename);
+    obj.addText("runtype", m_runtype);
+    obj.addInt("expno", expno);
+    obj.addInt("runno", runno);
+    obj.addInt("fileid", m_fileid);
+    obj.addInt("diskid", m_diskid);
+    obj.addInt("time_create", Date().get());
+    obj.addInt("time_close", 0);
+    obj.addInt("time_runend", 0);
+    obj.addInt("time_copy", 0);
+    obj.addInt("time_delete", 0);
+    DBObjectLoader::createDB(m_db, g_table, m_configname);
     return m_id;
   }
 
@@ -186,17 +171,17 @@ public:
   {
     if (m_file > 0) {
       ::close(m_file);
-      char sql[1000];
-      sprintf(sql, "update %s set time_close = current_timestamp, "
-              "filesize = %u where id = %d", g_table, m_filesize, m_id);
+      std::stringstream ss;
       try {
         m_db.connect();
-        m_db.execute(sql);
+        ss << "update " << g_table << " set value_i = " << Date().get() << " "
+           << "where path = '." << m_configname << ".time_close.';";
+        m_db.execute(ss.str());
         m_db.close();
       } catch (const DBHandlerException& e) {
         B2ERROR("Failed to access db for update: " << e.what());
         std::ofstream fout(m_dbtmp.c_str(), std::ios::app);
-        fout << sql << std::endl;
+        fout << ss.str() << std::endl;
         fout.close();
       }
     }
@@ -225,6 +210,7 @@ private:
   int m_fileid;
   int m_file;
   unsigned int m_filesize;
+  std::string m_configname;
 
 };
 
@@ -240,7 +226,7 @@ int main(int argc, char** argv)
 {
   if (argc < 8) {
     printf("%s : <ibufname> <ibufsize> <hostname> <runtype> <path> <ndisk> "
-           "<filepath_dbtmp> [ <obufname> <obufsize> nodename, nodeid]\n", argv[0]);
+           "<filepath_dbtmp> [<obufname> <obufsize> nodename, nodeid]\n", argv[0]);
     return 1;
   }
   const unsigned interval = 1;
@@ -316,20 +302,17 @@ int main(int argc, char** argv)
       file.open(path, ndisks, expno, runno);
       if (expno_tmp > 0 || runno_tmp > 0) {
         std::stringstream ss;
-        ss << "update " << g_table << " set time_runend = current_timestamp where expno = " << expno_tmp << " and runno = " << runno_tmp <<
-           " and time_runend is null;";
         try {
           db.connect();
+          std::string configname = StringUtil::form("%s:%s:%04d:%06d:0000", hostname, runtype, expno, runno);
+          ss << "update " << g_table << " set value_i = " << Date().get() << " "
+             << "where path = '." << configname << ".time_runend.';";
           db.execute(ss.str().c_str());
           db.close();
         } catch (const DBHandlerException& e) {
           LogFile::error("Failed to update : %s", e.what());
           return 1;
         }
-        //std::string cmd = StringUtil::form("submit_filejob -e %d -r %d", expno_tmp, runno_tmp);
-        std::string cmd = StringUtil::form("submit_filejob -all");
-        system(cmd.c_str());
-        std::cout << "[INFO] " << cmd << std::endl;;
       }
     }
     if (use_info) {

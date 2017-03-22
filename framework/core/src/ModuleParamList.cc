@@ -32,12 +32,14 @@ ModuleParamList::~ModuleParamList()
 }
 
 
-bool ModuleParamList::hasUnsetForcedParams() const
+std::vector<std::string> ModuleParamList::getUnsetForcedParams() const
 {
-  return any_of(m_paramMap.begin(), m_paramMap.end(),
-  [](const pair<string, ModuleParamPtr>& mapEntry) {
-    return mapEntry.second->isForcedInSteering() && !mapEntry.second->isSetInSteering();
-  });
+  vector<string> missingParam;
+  for (const pair<string, ModuleParamPtr>& mapEntry : m_paramMap) {
+    if (mapEntry.second->isForcedInSteering() && !mapEntry.second->isSetInSteering())
+      missingParam.push_back(mapEntry.first);
+  }
+  return missingParam;
 }
 
 boost::shared_ptr<boost::python::list> ModuleParamList::getParamInfoListPython() const

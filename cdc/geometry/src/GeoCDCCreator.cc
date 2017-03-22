@@ -140,6 +140,9 @@ namespace Belle2 {
         cdcMedGas->AddMaterial(medEthane, denEthane / density);
       }
 
+      if (gcp.getPrintMaterialTable()) {
+        G4cout << *(G4Material::GetMaterialTable());
+      }
 
       const auto& mother = geo.getMotherVolume();
       const auto& motherRmin = mother.getRmin();

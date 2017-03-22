@@ -18,60 +18,66 @@ using namespace std;
 
 namespace Belle2 {
 
-vector<string> TRGDebug::_stages;
-int TRGDebug::_level = 0;
+  vector<string> TRGDebug::_stages;
+  int TRGDebug::_level = 0;
 
-void
-TRGDebug::enterStage(const string & name) {
+  void
+  TRGDebug::enterStage(const string& name)
+  {
     if (_level)
-        cout << tab() << "--> ";
+      cout << tab() << "--> ";
     _stages.push_back(name);
     if (_level)
-        cout << name << endl;
-}
+      cout << name << endl;
+  }
 
-void
-TRGDebug::leaveStage(const string & name) {
+  void
+  TRGDebug::leaveStage(const string& name)
+  {
     if (name != _stages.back()) {
-        cout << "TRGDebug !!! given stage name(" << name << ") doesn't match"
-             << " to expected stage name(" << _stages.back() << endl;
-        return;
+      cout << "TRGDebug !!! given stage name(" << name << ") doesn't match"
+           << " to expected stage name(" << _stages.back() << endl;
+      return;
     }
     _stages.pop_back();
     if (_level)
-        cout << tab() << "<-- " << name << endl;
-}
+      cout << tab() << "<-- " << name << endl;
+  }
 
-string
-TRGDebug::tab(void) {
+  string
+  TRGDebug::tab(void)
+  {
     string t;
     const unsigned n = _stages.size();
     for (unsigned i = 0; i < n; i++)
-        t += "    ";
+      t += "    ";
     return t;
-}
+  }
 
-string
-TRGDebug::tab(int extra) {
+  string
+  TRGDebug::tab(int extra)
+  {
     string t = tab();
     if (extra > 0)
-        for (unsigned i = 0; i < unsigned(extra); i++)
-            t += " ";
+      for (unsigned i = 0; i < unsigned(extra); i++)
+        t += " ";
     return t;
-}
+  }
 
-int
-TRGDebug::level(void) {
+  int
+  TRGDebug::level(void)
+  {
     return _level;
-}
+  }
 
-int
-TRGDebug::level(int a, bool b) {
+  int
+  TRGDebug::level(int a, bool b)
+  {
     if (! b)
-	return _level = a;
+      return _level = a;
     else
-	return _level = a;
-}
+      return _level = a;
+  }
 
 } // namespace Belle2
 

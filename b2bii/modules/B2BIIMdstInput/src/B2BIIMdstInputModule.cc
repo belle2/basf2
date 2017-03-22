@@ -20,6 +20,7 @@
 
 // Belle II dataobjects
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/utilities/NumberSequence.h>
 
 #include <cstdlib>
 #include <algorithm>
@@ -66,12 +67,19 @@ B2BIIMdstInputModule::B2BIIMdstInputModule() : Module()
   setPropertyFlags(c_Input);
 
   m_nevt = -1;
+  m_current_file_position = -1;
 
   //Parameter definition
   addParam("inputFileName", m_inputFileName, "Belle MDST input file name. "
            "For more than one file use inputFileNames", std::string(""));
   addParam("inputFileNames"  , m_inputFileNames, "Belle MDST input file names.",
            m_inputFileNames);
+
+  std::vector<std::string> emptyvector;
+  addParam("entrySequences", m_entrySequences,
+           "The number sequences (e.g. 23:42,101) defining the entries which are processed for each inputFileName."
+           "Must be specified exactly once for each file to be opened."
+           "The first event has the number 0.", emptyvector);
 }
 
 
@@ -95,10 +103,20 @@ void B2BIIMdstInputModule::initialize()
 {
   m_inputFileNames = globbing(getInputFiles());
 
+  auto entrySequencesOverride = Environment::Instance().getEntrySequencesOverride();
+  if (entrySequencesOverride.size() > 0)
+    m_entrySequences = entrySequencesOverride;
+
   //Check if there is at least one filename provided
   if (m_inputFileNames.empty()) {
     B2FATAL("Empty list of files supplied, cannot continue");
   }
+
+  if (m_entrySequences.size() > 0 and m_inputFileNames.size() != m_entrySequences.size()) {
+    B2FATAL("Number of provided filenames does not match the number of given entrySequences parameters: len(inputFileNames) = "
+            << m_inputFileNames.size() << " len(entrySequences) = " << m_entrySequences.size());
+  }
+
   //Ok we have files. Since vectors can only remove efficiently from the back
   //we reverse the order and read the files from back to front.
   std::reverse(m_inputFileNames.begin(), m_inputFileNames.end());
@@ -164,25 +182,38 @@ bool B2BIIMdstInputModule::openNextFile()
     B2FATAL("Couldn't read file '" << name << "'!");
   }
   m_nevt++;
+  m_current_file_position++;
+  m_current_file_entry = -1;
+
+  if (m_entrySequences.size() > 0)
+    m_valid_entries_in_current_file = generate_number_sequence(m_entrySequences[m_current_file_position]);
+
   return true;
 }
 
 bool B2BIIMdstInputModule::readNextEvent()
 {
-  // read event
-  int rectype = -1;
-  while (rectype < 0 && rectype != -2) {
-    //clear all previous event data before reading!
-    BsClrTab(BBS_CLEAR);
-    rectype = m_fd->read();
-    if (rectype == -1) {
-      B2ERROR("Error while reading panther tables! Record skipped.");
+
+  do {
+    m_current_file_entry++;
+    // read event
+    int rectype = -1;
+    while (rectype < 0 && rectype != -2) {
+      //clear all previous event data before reading!
+      BsClrTab(BBS_CLEAR);
+      rectype = m_fd->read();
+      if (rectype == -1) {
+        B2ERROR("Error while reading panther tables! Record skipped.");
+      }
     }
-  }
-  if (rectype == -2) { // EoF detected
-    B2DEBUG(99, "[B2BIIMdstInputModule::Conversion] Conversion stopped at event #" << m_nevt << ". EOF detected!");
-    return false;
-  }
+    if (rectype == -2) { // EoF detected
+      B2DEBUG(99, "[B2BIIMdstInputModule::Conversion] Conversion stopped at event #" << m_nevt << ". EOF detected!");
+      return false;
+    }
+
+  } while (m_entrySequences.size() > 0
+           and m_valid_entries_in_current_file.find(m_current_file_entry) == m_valid_entries_in_current_file.end());
+
   return true;
 }
 
@@ -209,6 +240,49 @@ void B2BIIMdstInputModule::event()
   // Get Belle_event_Manager
   Belle::Belle_event_Manager& evman = Belle::Belle_event_Manager::get_manager();
   Belle::Belle_event& evt = evman[0];
+
+  // Check if RUNHEAD is available if not create one using the event.
+  // Basf did something similar in Record::convert_to_begin_run.
+  // Some files are missing the RUNHEAD for unknown reasons.
+  Belle::Belle_runhead_Manager& rhdmgr = Belle::Belle_runhead_Manager::get_manager();
+  Belle::Belle_runhead_Manager::const_iterator belleevt = rhdmgr.begin();
+
+  B2DEBUG(90, "Event number " << m_nevt);
+  if (belleevt == rhdmgr.end() || not(*belleevt)) {
+    B2WARNING("Missing RUNHEAD: Creating RUNHEAD from Event. This is as far as we know fine and handled correctly.");
+
+    Belle::Belle_runhead& bgr = rhdmgr.add();
+    bgr.ExpMC(evt.ExpMC());
+    bgr.ExpNo(evt.ExpNo());
+    bgr.RunNo(evt.RunNo());
+    bgr.Time(evt.Time());
+    bgr.Date(evt.Date());
+    bgr.Field(evt.MagFieldID());
+    bgr.MaxField(evt.BField());
+    bgr.Type(0); // basf used 0, and the debug output below of valid entries returned 0 as well
+    bgr.ELER(evt.ELER());
+    bgr.EHER(evt.EHER());
+
+    // In basf the BELLE_RUNHEAD which is created like this is not cleared anymore
+    // m_fd->non_clear("BELLE_RUNHEAD");
+    // However, I think in this case we are going to miss reinitializing the BELLE_RUNHEAD
+    // at the beginning of a new run without a BELLE_RUNHEAD, I'm not sure how this was handled
+    // in basf. I think it is safest to recreate the BELLE_RUNHEAD for each event which is missing
+    // the BELLE_RUNHEAD
+
+  } else {
+    Belle::Belle_runhead& bgr = rhdmgr[0];
+    B2DEBUG(90, "ExpMC " << bgr.ExpMC() << " " << evt.ExpMC());
+    B2DEBUG(90, "ExpNo " << bgr.ExpNo() << " " << evt.ExpNo());
+    B2DEBUG(90, "RunNo " << bgr.RunNo() << " " << evt.RunNo());
+    B2DEBUG(90, "Time " << bgr.Time() << " " << evt.Time());
+    B2DEBUG(90, "Date " << bgr.Date() << " " << evt.Date());
+    B2DEBUG(90, "Field " << bgr.Field() << " " << evt.MagFieldID());
+    B2DEBUG(90, "MaxField " << bgr.MaxField() << " " << evt.BField());
+    B2DEBUG(90, "Type " << bgr.Type());
+    B2DEBUG(90, "ELER " << bgr.ELER() << " " << evt.ELER());
+    B2DEBUG(90, "EHER " << bgr.EHER() << " " << evt.EHER());
+  }
 
   // set exp/run/evt numbers
   evtmetadata->setExperiment(evt.ExpNo());

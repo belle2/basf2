@@ -14,6 +14,41 @@ from vertex import *
 from analysisPath import *
 
 
+def setAnalysisConfigParams(configParametersAndValues, path=analysis_main):
+    """
+    Sets analysis configuration parameters.
+
+    These are:
+
+    - 'tupleStyle': 'Default' (default) or 'Laconic'
+      o) defines the style of the branch name in the ntuple
+
+    - 'mcMatchingVersion': 'BelleII' (default), 'MC5' and 'Belle'
+      o) Specifies what version of mc matching algorithm is going to be used
+         Use 'MC5' for analysis of BelleII MC5, 'Belle' for analaysis of Belle MC and 'BelleII' for the rest.
+
+    @param configParametersAndValues dictionary of parameters and their values of the form {param1: value, param2: value, ...)
+    @param modules are added to this path
+    """
+
+    conf = register_module('AnalysisConfiguration')
+
+    allParameters = ['tupleStyle', 'mcMatchingVersion']
+
+    keys = configParametersAndValues.keys()
+    for key in keys:
+        if key not in allParameters:
+            allParametersString = ', '.join(allParameters)
+            B2ERROR('Invalid analysis configuration parameter: ' + key + '.\n'
+                    'Please use one of the following: ' + allParametersString)
+
+    for param in allParameters:
+        if param in configParametersAndValues:
+            conf.param(param, configParametersAndValues.get(param))
+
+    path.add_module(conf)
+
+
 def inputMdst(environmentType, filename, path=analysis_main):
     """
     Loads the specified ROOT (DST/mDST/muDST) file with the RootInput module.
@@ -80,6 +115,12 @@ def inputMdstList(environmentType, filelist, path=analysis_main):
         environments += 'None.'
         B2FATAL('Incorrect environment type provided: ' + environmentType + '! Please use one of the following: ' + environments)
 
+    # set the correct MCMatching algorithm for MC5 and Belle MC
+    if environmentType is 'Belle':
+        setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
+    if environmentType is 'MC5':
+        setAnalysisConfigParams({'mcMatchingVersion': 'MC5'}, path)
+
 
 def outputMdst(filename, path=analysis_main):
     """
@@ -116,10 +157,11 @@ def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main)
                                    additionalBranches=partBranches)
 
 
-def skimOutputUdst(skimname, particleLists=[], includeArrays=[], path=analysis_main):
+def skimOutputUdst(skimname, skimParticleLists=[], outputParticleLists=[], includeArrays=[], path=analysis_main):
     """
-    Create a new path for events that contain a non-empty particle list.
-    Write the accepted events as a udst file, saving only necessary particles.
+    Create a new path for events that contain a non-empty particle list specified via skimParticleLists.
+    Write the accepted events as a udst file, saving only particles from skimParticleLists
+    and from outputParticleLists.
     Additional Store Arrays and Relations to be stored can be specified via includeArrays
     list argument.
 
@@ -129,15 +171,16 @@ def skimOutputUdst(skimname, particleLists=[], includeArrays=[], path=analysis_m
 
     skimfilter = register_module('SkimFilter')
     skimfilter.set_name('SkimFilter_' + skimname)
-    skimfilter.param('particleLists', particleLists)
+    skimfilter.param('particleLists', skimParticleLists)
     path.add_module(skimfilter)
     filter_path = create_path()
     skimfilter.if_value('=1', filter_path, AfterConditionPath.CONTINUE)
 
     # add_independent_path() is rather expensive, only do this for skimmed events
     skim_path = create_path()
-    removeParticlesNotInLists(particleLists, path=skim_path)
-    outputUdst(skimname + '.udst.root', particleLists, includeArrays, path=skim_path)
+    saveParticleLists = skimParticleLists + outputParticleLists
+    removeParticlesNotInLists(saveParticleLists, path=skim_path)
+    outputUdst(skimname + '.udst.root', saveParticleLists, includeArrays, path=skim_path)
     outputMdst(skimname + '.mdst.root', path=skim_path)
     filter_path.add_independent_path(skim_path, "skim_" + skimname)
 
@@ -264,6 +307,40 @@ def copyList(
     """
 
     copyLists(outputListName, [inputListName], writeOut, path)
+
+
+def correctFSR(
+    outputListName,
+    inputListName,
+    gammaListName,
+    angleThreshold=5.0,
+    energyThreshold=1.0,
+    writeOut=False,
+    path=analysis_main,
+):
+    """
+    Takes the particles from the given lepton list copies them to the output list and adds the
+    4-vector of the closest photon (considered as radiative) to the lepton, if the given
+    criteria for maximal angle and energy are fulfilled.
+
+    @param outputListName The output lepton list containing the corrected leptons.
+    @param inputListName The initial lepton list containing the leptons to correct, should already exists.
+    @param gammaListName The gammas list containing possibly radiative gammas, should already exist..
+    @param angleThreshold The maximum angle (in degrees) between the lepton and the (radiative) gamma to be accepted.
+    @param energyThreshold The maximum energy of the (radiative) gamma to be accepted.
+    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param path          modules are added to this path
+    """
+
+    fsrcorrector = register_module('FSRCorrection')
+    fsrcorrector.set_name('FSRCorrection_' + outputListName)
+    fsrcorrector.param('inputListName', inputListName)
+    fsrcorrector.param('outputListName', outputListName)
+    fsrcorrector.param('gammaListName', gammaListName)
+    fsrcorrector.param('angleThreshold', angleThreshold)
+    fsrcorrector.param('energyThreshold', energyThreshold)
+    fsrcorrector.param('writeOut', writeOut)
+    path.add_module(fsrcorrector)
 
 
 def copyLists(
@@ -997,7 +1074,34 @@ def signalSideParticleFilter(
     """
     mod = register_module('SignalSideParticleFilter')
     mod.set_name('SigSideParticleFilter_' + particleList)
-    mod.param('particleListName', particleList)
+    mod.param('particleLists', [particleList])
+    mod.param('selection', selection)
+    roe_path.add_module(mod)
+    mod.if_false(deadEndPath)
+
+
+def signalSideParticleListsFilter(
+    particleLists,
+    selection,
+    roe_path,
+    deadEndPath
+):
+    """
+    Checks if the current ROE object in the for_each roe path (argument roe_path) is related
+    to the particle from the input ParticleList. Additional selection criteria can be applied.
+    If ROE is not related to any of the Particles from ParticleList or the Particle doesn't
+    meet the selection criteria the execution of deadEndPath is started. This path, as the name
+    sugest should be empty and its purpose is to end the execution of for_each roe path for
+    the current ROE object.
+
+    @param particleLists  The input ParticleLists
+    @param selection Selection criteria that Particle needs meet in order for for_each ROE path to continue
+    @param for_each roe path in which this filter is executed
+    @param deadEndPath empty path that ends execution of or_each roe path for the current ROE object.
+    """
+    mod = register_module('SignalSideParticleFilter')
+    mod.set_name('SigSideParticleFilter_' + particleLists[0])
+    mod.param('particleLists', particleLists)
     mod.param('selection', selection)
     roe_path.add_module(mod)
     mod.if_false(deadEndPath)
@@ -1047,6 +1151,36 @@ def matchMCTruth(list_name, path=analysis_main):
     mcMatch = register_module('MCMatcherParticles')
     mcMatch.set_name('MCMatch_' + list_name)
     mcMatch.param('listName', list_name)
+    path.add_module(mcMatch)
+
+
+def looseMCTruth(list_name, path=analysis_main):
+    """
+    Performs loose MC matching for all particles in the specified
+    ParticleList.
+    The difference between loose and normal mc matching algorithm is that
+    the loose agorithm will find the common mother of the majority of daughter
+    particles while the normal algorithm finds the common mother of all daughters.
+    The results of loose mc matching algorithm are stored to the following extraInfo
+    items:
+      - looseMCMotherPDG: PDG code of most common mother
+      - looseMCMotherIndex: 1-based StoreArray<MCParticle> index of most common mother
+      - looseMCWrongDaughterN: number of daughters that don't originate from the most
+                               common mother
+      - looseMCWrongDaughterPDG: PDG code of the daughter that doesn't orginate from
+                                 the most common mother
+                                 (only if looseMCWrongDaughterN = 1)
+      - looseMCWrongDaughterBiB: 1 if the wrong daughter is Beam Induced Background
+                                 Particle
+
+    @param list_name name of the input ParticleList
+    @param path      modules are added to this path
+    """
+
+    mcMatch = register_module('MCMatcherParticles')
+    mcMatch.set_name('LooseMCMatch_' + list_name)
+    mcMatch.param('listName', list_name)
+    mcMatch.param('looseMCMatching', True)
     path.add_module(mcMatch)
 
 
@@ -1404,7 +1538,7 @@ def printROEInfo(
     path.add_module(printMask)
 
 
-def buildContinuumSuppression(list_name, path=analysis_main):
+def buildContinuumSuppression(list_name, roe_mask, path=analysis_main):
     """
     Creates for each Particle in the given ParticleList a ContinuumSuppression
     dataobject and makes BASF2 relation between them.
@@ -1416,6 +1550,7 @@ def buildContinuumSuppression(list_name, path=analysis_main):
     qqBuilder = register_module('ContinuumSuppressionBuilder')
     qqBuilder.set_name('QQBuilder_' + list_name)
     qqBuilder.param('particleList', list_name)
+    qqBuilder.param('ROEMask', roe_mask)
     path.add_module(qqBuilder)
 
 

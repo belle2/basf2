@@ -65,7 +65,7 @@ namespace Belle2 {
      * @param path Path of the parameter to get
      * @return value of the parameter
      */
-    virtual std::string getString(const std::string& path = "") const throw(gearbox::PathEmptyError)
+    virtual std::string getString(const std::string& path = "") const noexcept(false)
     {
       return Gearbox::getInstance().getString(ensurePath(m_path) + path);
     }
@@ -94,7 +94,7 @@ namespace Belle2 {
      * @param path Path of the parameter to get
      * @return value of the parameter
      */
-    virtual std::pair<std::string, std::string> getStringWithUnit(const std::string& path = "") const throw(gearbox::PathEmptyError)
+    virtual std::pair<std::string, std::string> getStringWithUnit(const std::string& path = "") const noexcept(false)
     {
       return Gearbox::getInstance().getStringWithUnit(ensurePath(m_path) + path);
     }
@@ -108,7 +108,7 @@ namespace Belle2 {
      *         be deleted once it is no longer valid (e.g. after the current
      *         run if it belongs to this run)
      */
-    virtual const TObject* getTObject(const std::string& path) const throw(gearbox::PathEmptyError, gearbox::TObjectConversionError)
+    virtual const TObject* getTObject(const std::string& path) const noexcept(false)
     {
       return Gearbox::getInstance().getTObject(ensurePath(m_path) + path);
     }

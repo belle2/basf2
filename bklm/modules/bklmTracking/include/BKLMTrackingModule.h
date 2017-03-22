@@ -16,6 +16,7 @@
 #include <bklm/dataobjects/BKLMTrack.h>
 #include <bklm/modules/bklmTracking/BKLMTrackFinder.h>
 #include <bklm/geometry/Module.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
 
@@ -48,6 +49,10 @@ namespace Belle2 {
     //! Judge if two hits come from the same sector
     bool sameSector(BKLMHit2d* hit1, BKLMHit2d* hit2);
 
+    //! find the closest RecoTrack, match BKLMTrack to RecoTrack, if the matched RecoTrack is found, return true
+    bool findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& closestTrack);
+
+
   protected:
 
     //! Mean hit - trigger time (ns)
@@ -56,7 +61,16 @@ namespace Belle2 {
     //! Coincidence window half-width for in-time KLM hits (ns)
     double m_MaxDt;
 
+    //! whether match BKLMTrack to RecoTrack
+    bool m_MatchToRecoTrack;
+
+    //! angle required between RecoTrack and BKLMTrack, if openangle is larger than m_maxAngleRequired, they don't match
+    double m_maxAngleRequired = 10;
+
   private:
+
+    //! my defined sort function using layer number
+    static bool sortByLayer(BKLMHit2d* hit1, BKLMHit2d* hit2);
 
 
   };

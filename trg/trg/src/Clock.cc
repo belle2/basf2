@@ -91,12 +91,11 @@ namespace Belle2 {
   {
     cout << pre << _name;
     if (_source) {
-        cout << ":sync'd to " << _source->name() << endl;
-        cout << pre << "    multiplication factor=" << _multi << endl;
-        cout << pre << "    division factor      =" << _div << endl;
-    }
-    else {
-        cout << endl;
+      cout << ":sync'd to " << _source->name() << endl;
+      cout << pre << "    multiplication factor=" << _multi << endl;
+      cout << pre << "    division factor      =" << _div << endl;
+    } else {
+      cout << endl;
     }
 
     cout << pre << "    offset   :" << _offset << endl

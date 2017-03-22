@@ -28,8 +28,8 @@ inputMdstList('MC5', filelist)
 loadStdCharged()
 loadStdPhoton()
 loadStdPi0()
-loadStdLightMesons(True)
 loadStdKS()
+loadStdLightMesons(True)
 loadStdDiLeptons(True)
 
 # TCPV Skim

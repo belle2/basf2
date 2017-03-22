@@ -22,3 +22,20 @@ CDCHit::CDCHit(unsigned short tdcCount, unsigned short charge,
   setTDCCount2ndHit(tdcCount2ndHit);
   setStatus(status);
 }
+
+
+DigitBase::EAppendStatus CDCHit::addBGDigit(const DigitBase* bg)
+{
+  const auto* bgDigit = static_cast<const CDCHit*>(bg);
+
+  int diff  = static_cast<int>(m_tdcCount) - static_cast<int>(bgDigit->getTDCCount());
+
+  // If the BG hit is faster than the true hit, the TDC count is replaced.
+  // ADC counts are summed up.
+  if (diff < 0) {
+    m_tdcCount = bgDigit->getTDCCount();
+  }
+  m_adcCount += bgDigit->getADCCount();
+  return DigitBase::c_DontAppend;
+
+}

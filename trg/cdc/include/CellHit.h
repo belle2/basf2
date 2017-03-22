@@ -62,27 +62,27 @@
 
 namespace Belle2 {
 
-class CDCHit;
-class CDCSimHit;
-class MCParticle;
-class TRGCDCCell;
+  class CDCHit;
+  class CDCSimHit;
+  class MCParticle;
+  class TRGCDCCell;
 
 /// A class to represent a wire hit in CDC.
-class TRGCDCCellHit {
+  class TRGCDCCellHit {
 
   public:
 
     /// Constructor.
-    TRGCDCCellHit(const TRGCDCCell &,
-		  unsigned indexCDCHit = 0,
-		  unsigned indexCDCSimHit = 0,
-		  unsigned indexMCParticle = 0,
-		  float driftLeft = 0,
-		  float driftLeftError = 0,
-		  float driftRight = 0,
-		  float driftRightError = 0,
-		  int mcLRflag=0,
-		  float fudgeFacgtor = 1);
+    TRGCDCCellHit(const TRGCDCCell&,
+                  unsigned indexCDCHit = 0,
+                  unsigned indexCDCSimHit = 0,
+                  unsigned indexMCParticle = 0,
+                  float driftLeft = 0,
+                  float driftLeftError = 0,
+                  float driftRight = 0,
+                  float driftRightError = 0,
+                  int mcLRflag = 0,
+                  float fudgeFacgtor = 1);
 
     /// Destructor
     virtual ~TRGCDCCellHit();
@@ -90,14 +90,14 @@ class TRGCDCCellHit {
   public:// Selectors
 
     /// dumps debug information.
-    virtual void dump(const std::string & message = std::string(""),
-		      const std::string & prefix = std::string("")) const;
+    virtual void dump(const std::string& message = std::string(""),
+                      const std::string& prefix = std::string("")) const;
 
     /// returns mc left/right information
     int mcLR(void) const;
 
     /// returns a pointer to a TRGCDCWire.
-    virtual const TRGCDCCell & cell(void) const;
+    virtual const TRGCDCCell& cell(void) const;
 
     /// returns state.
     unsigned state(void) const;
@@ -115,13 +115,13 @@ class TRGCDCCellHit {
     float dDrift(void) const;
 
     /// returns position in the middle of wire. z is always zero, however.
-    const HepGeom::Point3D<double>  & xyPosition(void) const;
+    const HepGeom::Point3D<double>&   xyPosition(void) const;
 
     /// returns left position. z is always zero.
     HepGeom::Point3D<double>  position(unsigned) const;
 
     /// assigns a pointer to a TTrack.
-    const void * track(void) const;
+    const void* track(void) const;
 
     /// returns sequential Length in one segment : this parameter is
     /// used in TCurlFinder now.
@@ -137,13 +137,13 @@ class TRGCDCCellHit {
     unsigned iMCParticle(void) const;
 
     /// Access to CDCHit.
-    const CDCHit * hit(void) const;
+    const CDCHit* hit(void) const;
 
     /// Access to CDCSimHit.
-    const CDCSimHit * simHit(void) const;
+    const CDCSimHit* simHit(void) const;
 
     /// Access to MCParticle.
-    const MCParticle * mcParticle(void) const;
+    const MCParticle* mcParticle(void) const;
 
   public:// Modifiers
     /// sets state. Meaning of bits are written below.
@@ -153,10 +153,10 @@ class TRGCDCCellHit {
     unsigned state(unsigned newState) const;
 
     /// assigns a pointer to a TTrack.
-    const void * track(const void *);
+    const void* track(const void*);
 
     /// assigns a pointer to a TTrack. (tmp)
-    const void * track(const void *) const;
+    const void* track(const void*) const;
 
     /// sets sequential length in one segment : this parameter is used in TCurlFinder now.
     unsigned sequence(unsigned) const;
@@ -167,7 +167,7 @@ class TRGCDCCellHit {
   public:// Static utility functions
 
     /// Sort function.
-    static int sortById(const TRGCDCCellHit ** a, const TRGCDCCellHit ** b);
+    static int sortById(const TRGCDCCellHit** a, const TRGCDCCellHit** b);
 
   private:
 
@@ -176,9 +176,9 @@ class TRGCDCCellHit {
     mutable unsigned _state;
     float _drift[2];         // 0:left, 1:right
     float _driftError[2];
-    const TRGCDCCell & _cell;
-    const HepGeom::Point3D<double>  & _xyPosition;
-    mutable const void * _track;
+    const TRGCDCCell& _cell;
+    const HepGeom::Point3D<double>&   _xyPosition;
+    mutable const void* _track;
     mutable unsigned _sequentialLength;
 
     /// Index to CDCHit array
@@ -190,161 +190,180 @@ class TRGCDCCellHit {
     /// Index to MCParticle array
     unsigned _iMCParticle;
 
-   // _state bit definition
+    // _state bit definition
 
-   // Pre-detemined
-   //   20 : drift time valid
-   //   21 : charge(dE/dx) valid
-   //   22 : valid for finding
-   //   30 : valid for fit
-   //    3 : axial hit
-   // 4, 5 : stereo hit
+    // Pre-detemined
+    //   20 : drift time valid
+    //   21 : charge(dE/dx) valid
+    //   22 : valid for finding
+    //   30 : valid for fit
+    //    3 : axial hit
+    // 4, 5 : stereo hit
 
-   // Hit pattern
-   //    8 : hit pattern left
-   //    9 : hit pattern right
-   //   10 : isolated hit pattern
-   //   11 : continuous hit pattern
-   //   12 : neighbor hit 0
-   //   13 : neighbor hit 1
-   //   14 : neighbor hit 2
-   //   15 : neighbor hit 3
-   //   16 : neighbor hit 4
-   //   17 : neighbor hit 5
-   //   18 : neighbor hit 6
+    // Hit pattern
+    //    8 : hit pattern left
+    //    9 : hit pattern right
+    //   10 : isolated hit pattern
+    //   11 : continuous hit pattern
+    //   12 : neighbor hit 0
+    //   13 : neighbor hit 1
+    //   14 : neighbor hit 2
+    //   15 : neighbor hit 3
+    //   16 : neighbor hit 4
+    //   17 : neighbor hit 5
+    //   18 : neighbor hit 6
 
-   // Tracking results
-   //    7 : locked
-   //    6 : used for tracking
-   //    0 : left hit
-   //    1 : right hit
-   //   23 : shared by multi-track
-   //   24 : found by conforaml finder
-   //   25 : found by curl finder
-   //   26 : found by clust finder
-   //   27 : found by track manager
-   //   28 : NOT valid for fitting
+    // Tracking results
+    //    7 : locked
+    //    6 : used for tracking
+    //    0 : left hit
+    //    1 : right hit
+    //   23 : shared by multi-track
+    //   24 : found by conforaml finder
+    //   25 : found by curl finder
+    //   26 : found by clust finder
+    //   27 : found by track manager
+    //   28 : NOT valid for fitting
 
-   // Fitting results
-};
+    // Fitting results
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-int TRGCDCCellHit::mcLR(void) const {
+  inline
+  int TRGCDCCellHit::mcLR(void) const
+  {
     return _mcLR;
-}
+  }
 
-inline
-const TRGCDCCell &
-TRGCDCCellHit::cell(void) const {
+  inline
+  const TRGCDCCell&
+  TRGCDCCellHit::cell(void) const
+  {
     return _cell;
-}
+  }
 
-inline
-unsigned
-TRGCDCCellHit::state(void) const {
+  inline
+  unsigned
+  TRGCDCCellHit::state(void) const
+  {
     return _state;
-}
+  }
 
-inline
-float
-TRGCDCCellHit::drift(unsigned i) const {
+  inline
+  float
+  TRGCDCCellHit::drift(unsigned i) const
+  {
     if (i) return _drift[1];
     return _drift[0];
-}
+  }
 
-inline
-float
-TRGCDCCellHit::dDrift(unsigned i) const {
+  inline
+  float
+  TRGCDCCellHit::dDrift(unsigned i) const
+  {
     if (i) return _driftError[1];
     return _driftError[0];
-}
+  }
 
-inline
-float
-TRGCDCCellHit::drift(void) const {
+  inline
+  float
+  TRGCDCCellHit::drift(void) const
+  {
     return (_drift[0] + _drift[1]) / 2.;
-}
+  }
 
-inline
-float
-TRGCDCCellHit::dDrift(void) const {
+  inline
+  float
+  TRGCDCCellHit::dDrift(void) const
+  {
     return (_driftError[0] + _driftError[1]) / 2.;
-}
+  }
 
-inline
-const HepGeom::Point3D<double>  &
-TRGCDCCellHit::xyPosition(void) const {
+  inline
+  const HepGeom::Point3D<double>&
+  TRGCDCCellHit::xyPosition(void) const
+  {
     return _xyPosition;
-}
+  }
 
-inline
-unsigned
-TRGCDCCellHit::state(unsigned i) {
+  inline
+  unsigned
+  TRGCDCCellHit::state(unsigned i)
+  {
     return _state = i;
-}
+  }
 
-inline
-unsigned
-TRGCDCCellHit::state(unsigned i) const {
+  inline
+  unsigned
+  TRGCDCCellHit::state(unsigned i) const
+  {
     return _state = i;
-}
+  }
 
-inline
-const void *
-TRGCDCCellHit::track(void) const {
+  inline
+  const void*
+  TRGCDCCellHit::track(void) const
+  {
     return _track;
-}
+  }
 
-inline
-const void *
-TRGCDCCellHit::track(const void * a) {
+  inline
+  const void*
+  TRGCDCCellHit::track(const void* a)
+  {
     return _track = a;
-}
+  }
 
-inline
-const void *
-TRGCDCCellHit::track(const void * a) const {
+  inline
+  const void*
+  TRGCDCCellHit::track(const void* a) const
+  {
     return _track = a;
-}
+  }
 
-inline
-unsigned
-TRGCDCCellHit::sequence(void) const {
+  inline
+  unsigned
+  TRGCDCCellHit::sequence(void) const
+  {
     return _sequentialLength;
-}
+  }
 
-inline
-unsigned
-TRGCDCCellHit::sequence(unsigned a) const {
+  inline
+  unsigned
+  TRGCDCCellHit::sequence(unsigned a) const
+  {
     return _sequentialLength = a;
-}
+  }
 
-inline
-void
-TRGCDCCellHit::setDriftTime(double driftTime, unsigned i) {
-  if(i) _drift[1] = driftTime;
-  else _drift[0] = driftTime;
-}
+  inline
+  void
+  TRGCDCCellHit::setDriftTime(double driftTime, unsigned i)
+  {
+    if (i) _drift[1] = driftTime;
+    else _drift[0] = driftTime;
+  }
 
-inline
-unsigned
-TRGCDCCellHit::iCDCHit(void) const {
+  inline
+  unsigned
+  TRGCDCCellHit::iCDCHit(void) const
+  {
     return _iCDCHit;
-}
+  }
 
-inline
-unsigned
-TRGCDCCellHit::iCDCSimHit(void) const {
+  inline
+  unsigned
+  TRGCDCCellHit::iCDCSimHit(void) const
+  {
     return _iCDCSimHit;
-}
+  }
 
-inline
-unsigned
-TRGCDCCellHit::iMCParticle(void) const {
+  inline
+  unsigned
+  TRGCDCCellHit::iMCParticle(void) const
+  {
     return _iMCParticle;
-}
+  }
 
 } // namespace Belle2
 

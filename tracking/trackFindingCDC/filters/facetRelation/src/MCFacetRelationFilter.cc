@@ -23,21 +23,20 @@ Weight MCFacetRelationFilter::operator()(const CDCFacet& fromFacet,
                                          const CDCFacet& toFacet)
 {
   // the last wire of the neighbor should not be the same as the start wire of the facet
-  if (fromFacet.getStartWire() == toFacet.getEndWire()) {
-    return NAN;
-  }
+  if (fromFacet.getStartWire() == toFacet.getEndWire()) return NAN;
 
   // Despite of that two facets are neighbors if both are true facets
   // That also implies the correct tof alignment of the hits not common to both facets
   Weight fromFacetWeight = m_mcFacetFilter(fromFacet);
   Weight toFacetWeight = m_mcFacetFilter(toFacet);
 
-  bool mcDecision = (not std::isnan(fromFacetWeight)) and (not std::isnan(toFacetWeight));
+  if ((fromFacetWeight > 0) and (toFacetWeight > 0)) {
+    return 2;
+  }
 
-  // the weight must be -2 because the overlap of the facets is two points
-  // so the amount of two facets is 4 points hence the cellular automat
-  // must calculate 3 + (-2) + 3 = 4 as cellstate
-  // this can of course be adjusted for a more realistic information measure
-  // ( together with the facet creator filter)
-  return mcDecision ? -2.0 : NAN;
+  if (getAllowReverse() and (fromFacetWeight < 0) and (toFacetWeight < 0)) {
+    return -2;
+  }
+
+  return NAN;
 }

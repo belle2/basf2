@@ -9,12 +9,12 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
     class CDCSegment2D;
 
     /// A segment consisting of three dimensional reconstructed hits.
@@ -31,6 +31,59 @@ namespace Belle2 {
        */
       CDCSegment2D stereoProjectToRef() const;
 
+      /// Mutable getter for the automaton cell.
+      AutomatonCell& getAutomatonCell() const
+      {
+        return m_automatonCell;
+      }
+
+      /// Indirection to the automaton cell for easier access to the flags
+      AutomatonCell* operator->() const
+      {
+        return &m_automatonCell;
+      }
+
+      /**
+       *  Unset the masked flag of the automaton cell of this segment
+       *  and of all contained wire hits.
+       */
+      void unsetAndForwardMaskedFlag(bool toHits = true) const;
+
+      /**
+       *  Set the masked flag of the automaton cell of this segment
+       *  and forward the masked flag to all contained wire hits.
+       */
+      void setAndForwardMaskedFlag(bool toHits = true) const;
+
+      /**
+       *  Check all contained wire hits if one has the masked flag.
+       *  Set the masked flag of this segment in case at least one of
+       *  the contained wire hits is flagged as masked.
+       */
+      void receiveMaskedFlag(bool fromHits = true) const;
+
+      /// Getter for the two dimensional trajectory fitted to the segment
+      CDCTrajectory3D& getTrajectory3D() const
+      {
+        return m_trajectory3D;
+      }
+
+      /// Setter for the two dimensional trajectory fitted to the segment
+      void setTrajectory3D(const CDCTrajectory3D& trajectory3D) const
+      {
+        m_trajectory3D = trajectory3D;
+      }
+
+    private:
+      /**
+       *  Memory for the automaton cell.
+       *  It is declared mutable because it can vary
+       *  rather freely despite of the hit content might be required fixed.
+       */
+      mutable AutomatonCell m_automatonCell;
+
+      /// Memory for the three dimensional trajectory fitted to this segment
+      mutable CDCTrajectory3D m_trajectory3D;
     };
   }
 }

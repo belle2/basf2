@@ -23,7 +23,7 @@
 namespace Belle2 {
 
 /// A class to provide TRG utility functions
-class TRGUtilities {
+  class TRGUtilities {
 
   public: // Utility functions
 
@@ -34,10 +34,10 @@ class TRGUtilities {
     static std::string dtostring(double d, unsigned int precision);
 
     /// CERNLIB car.
-    static std::string carstring(const std::string &s);
+    static std::string carstring(const std::string& s);
 
     /// CERNLIB cdr.
-    static std::string cdrstring(const std::string &s);
+    static std::string cdrstring(const std::string& s);
 
     /// returns date string.
     static std::string dateString(void);
@@ -58,10 +58,10 @@ class TRGUtilities {
 
     /// Dumps bit stream in string.
     static std::string streamDisplay(unsigned,
-				     unsigned firstDigit,
-				     unsigned lastDigit);
+                                     unsigned firstDigit,
+                                     unsigned lastDigit);
 
-};
+  };
 
 //-----------------------------------------------------------------------------
 

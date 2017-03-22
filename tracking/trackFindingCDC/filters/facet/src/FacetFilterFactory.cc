@@ -39,8 +39,7 @@ std::string FacetFilterFactory::getFilterPurpose() const
   return "Facet filter to construct of a facet network";
 }
 
-std::map<std::string, std::string>
-FacetFilterFactory::getValidFilterNamesAndDescriptions() const
+std::map<std::string, std::string> FacetFilterFactory::getValidFilterNamesAndDescriptions() const
 {
   return {
     {"none", "no facet is valid, stop at cluster generation."},
@@ -56,8 +55,7 @@ FacetFilterFactory::getValidFilterNamesAndDescriptions() const
   };
 }
 
-std::unique_ptr<Filter<CDCFacet> >
-FacetFilterFactory::create(const std::string& filterName) const
+std::unique_ptr<BaseFacetFilter> FacetFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
     return makeUnique<BaseFacetFilter>();

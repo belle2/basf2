@@ -1,0 +1,57 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Marko Staric                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#include <top/modules/TOPDigitizer/PulseHeightGenerator.h>
+#include <framework/logging/Logger.h>
+#include <iostream>
+
+using namespace std;
+
+namespace Belle2 {
+  namespace TOP {
+
+    PulseHeightGenerator::PulseHeightGenerator(double x0, double p1, double p2,
+                                               double xmax):
+      m_x0(x0), m_p1(p1), m_p2(p2), m_xmax(xmax)
+    {
+      if (x0 <= 0)
+        B2FATAL("TOP::PulseHeightGenerator: parameter x0 must be positive");
+      if (p1 < 0)
+        B2FATAL("TOP::PulseHeightGenerator: parameter p1 must be non-negative");
+      if (p2 <= 0)
+        B2FATAL("TOP::PulseHeightGenerator: parameter p2 must be positive");
+      if (xmax <= 0)
+        B2FATAL("TOP::PulseHeightGenerator: upper bound xmax must be positive");
+
+      m_xPeak = pow((p1 / p2), 1 / p2) * x0;
+      m_vPeak = getValue(m_xPeak);
+
+    }
+
+
+    double PulseHeightGenerator::generate() const
+    {
+      while (true) {
+        double x = gRandom->Uniform(m_xmax);
+        if (gRandom->Uniform(m_vPeak) < getValue(x)) return x;
+      }
+    }
+
+
+    double PulseHeightGenerator::getIntegral(double pulseHeight, int numSamples) const
+    {
+      double sigma = 0;
+      if (numSamples > 1) sigma = m_pedestalRMS * sqrt(numSamples - 1);
+      return gRandom->Gaus(pulseHeight * m_scale, sigma);
+    }
+
+
+  } // TOP
+} // Belle2

@@ -34,7 +34,9 @@ CONTACT = "oliver.frost@desy.de"
 
 class SegmentFitValidationRun(HarvestingRun):
     n_events = 10000
-    generator_module = "simple_gun"  # Rather high momentum tracks should make the tracks rather straight.
+    generator_module = "low_gun"  # Rather high momentum tracks should make the tracks rather straight.
+    root_input_file = "low_gun.root"
+
     monte_carlo = "no"
     karimaki_fit = False
     flight_time_estimation = "none"
@@ -153,32 +155,38 @@ class SegmentFitValidationRun(HarvestingRun):
         # based on the properties in the base class.
         path = super().create_path()
 
-        path.add_module("WireHitPreparer",
+        path.add_module("TFCDC_WireHitPreparer",
                         flightTimeEstimation=self.flight_time_estimation,
-                        UseNLoops=0.5)
+                        UseNLoops=1
+                        )
 
         if self.monte_carlo == "no":
             # MC free - default
-            path.add_module("SegmentFinderCDCFacetAutomaton",
-                            SegmentOrientation="outwards")
+            path.add_module(
+                "TFCDC_SegmentFinderFacetAutomaton",
+                # investigate=[],
+                SegmentOrientation="none",
+            )
 
         elif self.monte_carlo == "medium":
             # Medium MC - proper generation logic, but true facets and facet relations
-            path.add_module("SegmentFinderCDCFacetAutomaton",
+            path.add_module("TFCDC_SegmentFinderFacetAutomaton",
                             FacetFilter="truth",
                             FacetRelationFilter="truth",
-                            SegmentOrientation="outwards")
+                            SegmentOrientation="none",
+                            # SegmentOrientation="outwards"
+                            )
 
         elif self.monte_carlo == "full":
             # Only true monte carlo segments, but make the positions realistic
-            path.add_module("SegmentCreatorMCTruth",
+            path.add_module("TFCDC_SegmentCreatorMCTruth",
                             reconstructedDriftLength=False,
                             reconstructedPositions=True)
 
         else:
             raise ValueError("Invalid degree of Monte Carlo information")
 
-        path.add_module("SegmentFitter",
+        path.add_module("TFCDC_SegmentFitter",
                         inputSegments="CDCSegment2DVector",
                         karimakiFit=self.karimaki_fit,
                         fitPos=self.fit_positions,
@@ -229,6 +237,7 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         curvature_truth = fit3d_truth.getCurvatureXY()
 
         reconstructed_backward = mc_segment_lookup.isForwardOrBackwardToMCTrack(segment)
+        is_fake = mc_segment_lookup.getMCTrackId(segment) < 0
 
         if reconstructed_backward != 1:
             curvature_truth = -curvature_truth
@@ -236,9 +245,11 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         truth_crops = dict(
             tan_lambda_truth=fit3d_truth.getTanLambda(),
             curvature_truth=curvature_truth,
+            abs_curvature_truth=abs(curvature_truth),
             curvature_residual=segment_crops["curvature_estimate"] - curvature_truth,
             curvature_pull=(segment_crops["curvature_estimate"] - curvature_truth) / segment_crops["curvature_variance"],
             reconstructed_backward=reconstructed_backward,
+            is_fake=is_fake
         )
 
         rl_sum = 0
@@ -297,14 +308,14 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         return segment_crops
 
     # Refiners to be executed at the end of the harvesting / termination of the module
-    # save_histograms = refiners.save_histograms(outlier_z_score=5.0, allow_discrete=True)
+    save_histograms = refiners.save_histograms(outlier_z_score=5.0, allow_discrete=True)
     save_tree = refiners.save_tree()
 
     save_curvature_pull = refiners.save_pull_analysis(
         part_name="curvature",
         unit="1/cm",
         absolute=False,
-        aux_names=["tan_lambda_truth", "curvature_truth"],
+        aux_names=["tan_lambda_truth", "abs_curvature_truth"],
         groupby=[
             "stereo_kind",
             "superlayer_id"
@@ -318,7 +329,7 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         absolute=True,
         filter_on="rl_purity",
         filter=lambda rl_purity: rl_purity > 0.5,
-        aux_names=["tan_lambda_truth", "curvature_truth"],
+        aux_names=["tan_lambda_truth", "abs_curvature_truth"],
         groupby=[
             "stereo_kind",
             "superlayer_id"
@@ -332,7 +343,7 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         part_name="curvature",
         unit="1/cm",
         absolute=True,
-        aux_names=["tan_lambda_truth", "curvature_truth"],
+        aux_names=["tan_lambda_truth", "abs_curvature_truth"],
         groupby=[
             "stereo_kind",
             "superlayer_id"

@@ -35,8 +35,8 @@ namespace Belle2 {
   class ClassName : public std::runtime_error { \
   public: \
     ClassName(): std::runtime_error(""), m_format(Message) { } \
-    ~ClassName() throw() {} \
-    virtual const char * what() const throw() override { \
+    ~ClassName() noexcept {} \
+    virtual const char * what() const noexcept override { \
       m_finalStr = m_format.str();\
       return m_finalStr.c_str();\
     }\

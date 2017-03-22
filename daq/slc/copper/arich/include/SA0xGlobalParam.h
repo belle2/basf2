@@ -23,7 +23,7 @@ public:
        };
 public:
   SA0xGlobalParam() {}
-  ~SA0xGlobalParam() {}
+  virtual ~SA0xGlobalParam() {}
   unsigned int getMaskVariable() { return MASK_VARIABLE; }
   /* individual value */
   void set_phasecmps(int x)

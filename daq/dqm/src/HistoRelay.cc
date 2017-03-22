@@ -9,6 +9,9 @@
 
 #include "daq/dqm/HistoRelay.h"
 
+#include <framework/pcore/EvtMessage.h>
+#include <framework/pcore/MsgHandler.h>
+
 using namespace Belle2;
 using namespace std;
 

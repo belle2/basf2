@@ -11,7 +11,6 @@
 #pragma once
 
 #include <calibration/DBObjCalibrationConstMapBase.h>
-#include <vxd/dataobjects/VxdID.h>
 
 namespace Belle2 {
   /// VXD alignment (and maybe some calibration) parameters
@@ -35,6 +34,8 @@ namespace Belle2 {
     static const baseType dLorentzAngle = 11;
     /// Correction of Lorentz shift w.r.t. common per layer
     static const baseType dLayerLorentzAngle = 12;
+
+    static unsigned short getGlobalUniqueID() {return 1;}
 
     /// Constructor
     VXDAlignment() : DBObjCalibrationConstMapBase() {}

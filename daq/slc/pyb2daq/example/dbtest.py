@@ -12,7 +12,7 @@ print(obj.getFieldNames())
 print(obj.getNameList(True))
 
 # show all varialble in the object
-obj.print()
+# obj.print()
 
 # find child object
 record = obj.getObject("record")

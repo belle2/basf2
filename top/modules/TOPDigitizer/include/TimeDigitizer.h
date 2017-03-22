@@ -14,6 +14,7 @@
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPRawDigit.h>
 #include <framework/datastore/StoreArray.h>
+#include <top/modules/TOPDigitizer/PulseHeightGenerator.h>
 
 
 #include <map>
@@ -32,8 +33,11 @@ namespace Belle2 {
        * Constructor
        * @param moduleID TOP module ID
        * @param pixelID pixel ID
+       * @param window storage window number (first window of waveform)
+       * @param generator pulse height generator
        */
-      TimeDigitizer(int moduleID, int pixelID);
+      TimeDigitizer(int moduleID, int pixelID, unsigned window,
+                    const TOP::PulseHeightGenerator& generator);
 
       /**
        * Add time of simulated hit
@@ -72,18 +76,6 @@ namespace Belle2 {
 
       /**
        * Do time digitization using simplified pile-up and double-hit-resolution model.
-       * As a result, the digitized hits are appended to TOPDigits and the relations to
-       * TOPSimHits and MCParticles are set with proper weights.
-       *
-       * Note: to be refactorized or removed in future!
-       *
-       * @param digits a reference to TOPDigits
-       * @param sigma a r.m.s. of an additional time jitter due to electronics
-       */
-      void digitize(StoreArray<TOPDigit>& digits, double sigma = 0.0);
-
-      /**
-       * Do time digitization using simplified pile-up and double-hit-resolution model.
        * As a result, the digitized hits are appended to TOPRawDigits, then
        * they are converted to TOPDigits and the relations to
        * TOPSimHits and MCParticles are set with proper weights.
@@ -92,11 +84,15 @@ namespace Belle2 {
        *
        * @param digits a reference to TOPRawDigits
        * @param digits a reference to TOPDigits
-       * @param sigma a r.m.s. of an additional time jitter due to electronics
+       * @param threshold pulse height threshold [ADC counts]
+       * @param thresholdCount minimal number of samples above threshold
+       * @param timeJitter a r.m.s. of an additional time jitter due to electronics
        */
       void digitize(StoreArray<TOPRawDigit>& rawDigits,
                     StoreArray<TOPDigit>& digits,
-                    double sigma = 0.0);
+                    short threshold = 0,
+                    short thresholdCount = 0,
+                    double timeJitter = 0);
 
     private:
 
@@ -115,15 +111,18 @@ namespace Belle2 {
 
       int m_moduleID;         /**< module ID (1-based) */
       int m_pixelID;          /**< pixel (e.g. software channel) ID (1-based) */
+      unsigned m_window = 0;  /**< storage window number */
+      TOP::PulseHeightGenerator m_pulseHeightGenerator; /**< pulse height generator */
+
       unsigned m_channel = 0; /**< hardware channel number (0-based) */
       unsigned m_scrodID = 0; /**< SCROD ID */
       unsigned m_carrier = 0; /**< carrier board number */
       unsigned m_asic = 0;    /**< ASIC number */
       unsigned m_chan = 0;    /**< ASIC channel number */
-      unsigned m_window = 0;  /**< storage window number */
       bool m_valid = false;   /**< true, if module/pixel is mapped to hardware */
 
       std::multimap<double, const TOPSimHit*> m_times; /**< sorted hit times */
+
 
     };
 

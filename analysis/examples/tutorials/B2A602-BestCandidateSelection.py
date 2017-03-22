@@ -27,9 +27,7 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdLooseFSParticles import stdVeryLoosePi
-from stdLooseFSParticles import stdLoosePi
-from stdLooseFSParticles import stdLooseK
+from stdCharged import *
 
 # Add 10 signal MC files (each containing 1000 generated events)
 filelistSIG = \
@@ -41,7 +39,7 @@ inputMdstList('MC5', filelistSIG)
 # use standard final state particle lists
 #
 # creates "pi+:all" ParticleList (and c.c.)
-stdVeryLoosePi()
+stdPi('all')
 # creates "K+:loose" ParticleList (and c.c.)
 stdLooseK()
 

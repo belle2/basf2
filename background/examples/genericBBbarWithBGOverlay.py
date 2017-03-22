@@ -14,7 +14,7 @@ import sys
 # This example generates BBbar events using EvtGenInput module,
 # runs full simulation and digitization,
 # then adds measured BG to simulated data using BGOverlayExecutor module,
-# the runs full reconstruction and finaly writes the results to mdst file.
+# runs full reconstruction and finaly writes the results to mdst file.
 # ----------------------------------------------------------------------------------
 
 set_log_level(LogLevel.ERROR)
@@ -23,7 +23,7 @@ set_log_level(LogLevel.ERROR)
 bg = 'BGforOverlay.root'
 if not os.path.exists(bg):
     print(bg + ' not found')
-    print('You can prepare the sample by: basf2 makeBGOverlayFile.py')
+    print('You can prepare the sample by: basf2 background/examples/makeBGOverlayFile.py')
     sys.exit(1)
 
 # Create path

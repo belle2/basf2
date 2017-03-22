@@ -46,9 +46,8 @@ TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Mod
            "name for StoreArray< SpacePointTrackCand> to be filled.",
            string(""));
 
-  addParam("sectorMapName",
-           m_PARAMsecMapName,
-           "the name of the SectorMap used for this instance.", string("testMap"));
+  addParam("SpacePoints", m_spacePointsName,
+           "SpacePoints collection name", string(""));
 
   addParam("printNetworks",
            m_PARAMprintNetworks,
@@ -56,13 +55,13 @@ TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Mod
 
   addParam("strictSeeding",
            m_PARAMstrictSeeding,
-           "Regulates if every subset of sufficient length of a path shall be collected as separate path or not (if true, only one path per possibility is collected, if false subsets are collected too.",
+           "Regulates if every node with enough notes below it is used as a seed or only the outermost nodes.",
            bool(true));
 
-  addParam("removeVirtualIP",
-           m_PARAMremoveVirtualIP,
-           "If true, the virtual interaction Point will be removed from the track candidates.",
-           bool(true));
+  addParam("storeSubsets",
+           m_PARAMstoreSubsets,
+           "Regulates if every subset of sufficient length of a path shall be collected as separate path or not.",
+           bool(false));
 
 }
 
@@ -76,22 +75,14 @@ TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Mod
 
 void TrackFinderVXDBasicPathFinderModule::initialize()
 {
-  m_sectorMap.isRequired();
-  bool wasFound = false;
-  for (auto& setup : m_sectorMap->getAllSetups()) {
-    auto& filters = *(setup.second);
-
-    if (filters.getConfig().secMapName != m_PARAMsecMapName) { continue; }
-    B2INFO("TrackFinderVXDBasicPathFinderModule::initialize(): loading mapName: " << m_PARAMsecMapName << ".");
-    m_config = filters.getConfig();
-    wasFound = true;
-    break; // have found our secMap no need for further searching
-  }
-  if (wasFound == false) B2FATAL("TrackFinderVXDBasicPathFinderModule::initialize(): requested secMapName '" << m_PARAMsecMapName <<
-                                   "' does not exist! Can not continue...");
+  m_spacePoints.isRequired(m_spacePointsName);
 
   m_network.isRequired(m_PARAMNetworkName);
   m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
+
+  //Relations SpacePoints and SpacePointTCs:
+  m_TCs.registerRelationTo(m_spacePoints, DataStore::c_Event, DataStore::c_DontWriteOut);
+  m_spacePoints.registerRelationTo(m_TCs, DataStore::c_Event, DataStore::c_DontWriteOut);
 }
 
 
@@ -138,18 +129,20 @@ void TrackFinderVXDBasicPathFinderModule::event()
 
 
   /// collect all Paths starting from a Seed:
-  auto collectedPaths = m_pathCollector.findPaths(segmentNetwork);
+  auto collectedPaths = m_pathCollector.findPaths(segmentNetwork, m_PARAMstoreSubsets);
 
 
   /// convert paths of directedNodeNetwork-nodes to paths of const SpacePoint*:
+  //  Resulting SpacePointPath contains SpacePoints sorted from the innermost to the outermost.
   vector< vector <const SpacePoint*> > collectedSpacePointPaths;
+  collectedSpacePointPaths.reserve(collectedPaths.size());
   for (auto& aPath : collectedPaths) {
-    collectedSpacePointPaths.push_back({});
-    vector <const SpacePoint*>& spPath = collectedSpacePointPaths.back();
-    for (auto* aNode : *aPath) {
-      spPath.push_back(aNode->getEntry().getOuterHit()->spacePoint);
-    }
+    vector <const SpacePoint*> spPath;
     spPath.push_back(aPath->back()->getEntry().getInnerHit()->spacePoint);
+    for (auto aNodeIt = (*aPath).rbegin(); aNodeIt != (*aPath).rend();  ++aNodeIt) {
+      spPath.push_back((*aNodeIt)->getEntry().getOuterHit()->spacePoint);
+    }
+    collectedSpacePointPaths.push_back(spPath);
   }
 
 
@@ -160,15 +153,13 @@ void TrackFinderVXDBasicPathFinderModule::event()
           ". Among these the pathCollector found " << m_pathCollector.nTrees <<
           " and " << collectedPaths.size() <<
           " paths while calling its collecting function " << m_pathCollector.nRecursiveCalls <<
-          " times and checking " << m_pathCollector.nNodesPassed <<
-          " nodes.");
+          " times.");
 
 
   /// convert the raw paths to fullgrown SpacePoinTrackCands
-  unsigned int nCreated = m_sptcCreator.createSPTCs(m_TCs, collectedSpacePointPaths, m_PARAMremoveVirtualIP);
+  unsigned int nCreated = m_sptcCreator.createSPTCs(m_TCs, collectedSpacePointPaths);
   B2DEBUG(10, " TrackFinderVXDCellOMat-event" << m_eventCounter <<
           ": " << nCreated <<
           " TCs created and stored into StoreArray!");
 
 }
-

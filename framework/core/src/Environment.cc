@@ -62,6 +62,7 @@ Environment::Environment() :
   m_steering(""),
   m_numberEventsOverride(0),
   m_inputFilesOverride(),
+  m_entrySequencesOverride(),
   m_outputFileOverride(""),
   m_numberProcessesOverride(-1),
   m_logLevelOverride(LogConfig::c_Default),
@@ -71,7 +72,7 @@ Environment::Environment() :
   m_mcEvents(0),
   m_run(-1),
   m_experiment(-1),
-  m_skipNEvents(-1)
+  m_skipNEvents(0)
 {
   // Check for environment variables set by setuprel
   const char* envarReleaseDir = getenv("BELLE2_RELEASE_DIR");
@@ -130,10 +131,11 @@ void Environment::setJobInformation(const boost::shared_ptr<Path>& path)
   const std::list<ModulePtr>& modules = path->getModules();
 
   for (ModulePtr m : modules) {
-    string name = m->getName();
-    if (name == "RootInput") {
+    string type = m->getType();
+    if (type == "RootInput") {
+      bool ignoreOverride = m->getParam<bool>("ignoreCommandLineOverride").getValue();
       std::vector<std::string> inputFiles = Environment::Instance().getInputFilesOverride();
-      if (inputFiles.empty()) {
+      if (ignoreOverride or inputFiles.empty()) {
         string inputFileName = m->getParam<string>("inputFileName").getValue();
         if (!inputFileName.empty())
           inputFiles.push_back(inputFileName);
@@ -144,9 +146,10 @@ void Environment::setJobInformation(const boost::shared_ptr<Path>& path)
       for (string file : inputFiles) {
         m_jobInfoOutput += "INPUT FILE: " + file + "\n";
       }
-    } else if (name == "RootOutput") {
+    } else if (type == "RootOutput") {
       std::string out = Environment::Instance().getOutputFileOverride();
-      if (out.empty())
+      bool ignoreOverride = m->getParam<bool>("ignoreCommandLineOverride").getValue();
+      if (ignoreOverride or out.empty())
         out = m->getParam<string>("outputFileName").getValue();
       m_jobInfoOutput += "OUTPUT FILE: " + out + "\n";
     }

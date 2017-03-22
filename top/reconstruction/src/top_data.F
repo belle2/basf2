@@ -1,7 +1,8 @@
 !-----------------------------------------------------------------------
 ! TOP counter for Belle: interface to TOP_DATA
-! M. Staric, mar-2009, sept-2011, 
+! M. Staric, mar-2009, sept-2011, mar-2017
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
+! mar-2017: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE DATA_CLEAR
@@ -34,6 +35,10 @@
       INTEGER KK                ! return status: index or 0 (failure)
 #include "TOP_DATA.fi"
 #include "TOP_TDC.fi"
+#include "TOP_GEO.fi"
+#include "TOP_PIK.fi"
+#include "TOP_MASK.fi"
+
       INTEGER K
 
       KK=0
@@ -42,8 +47,10 @@
          PRINT*,'TOP_DATA: no space for new digitized data'
          RETURN
       ENDIF
-      IF(ICH.LT.0) RETURN
-      IF(TDC.LT.0.OR.TDC.GE.TDC_RANGE) RETURN
+      IF(MDN.LT.0.OR.MDN.GE.NSIZ_MOD) RETURN
+      IF(ICH.LT.0.OR.ICH.GE.NUM_CHA) RETURN
+      IF(.NOT.CH_MASK(ICH,MDN)) RETURN
+c      IF(TDC.LT.0.OR.TDC.GE.TDC_RANGE) RETURN
       DATA_MOD(K)=MDN
       DATA_ICH(K)=ICH
       DATA_TDC(K)=TDC

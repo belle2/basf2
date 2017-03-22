@@ -8,6 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wstack-usage="
+#endif
+
 #include <pxd/modules/pxdUnpacking/PXDUnpackerDQMModule.h>
 
 #include "TDirectory.h"

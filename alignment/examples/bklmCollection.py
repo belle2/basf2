@@ -23,7 +23,6 @@ main.add_module('Geometry',
                 additionalComponents=['MagneticField2d'])
 
 main.add_module('SetupGenfitExtrapolation', whichGeometry='TGeo', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
-main.add_module('GBLfit')
 main.add_module('MillepedeCollector')
 
 main.add_module('Progress')

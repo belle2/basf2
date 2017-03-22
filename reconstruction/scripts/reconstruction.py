@@ -19,7 +19,7 @@ from softwaretrigger import (
 
 
 def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False,
-                       additionalTrackFitHypotheses=None):
+                       additionalTrackFitHypotheses=None, addClusterExpertModules=True):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -45,6 +45,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
         all (but you will have to add it on your own then).
     :param additionalTrackFitHypotheses: Change the additional fitted track fit hypotheses. If no argument is given,
         the additional fitted hypotheses are muon, kaon and proton, i.e. [13, 321, 2212].
+    :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to improve
+        reconstruction performance.
     """
 
     # Add tracking reconstruction modules
@@ -60,17 +62,18 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
     add_posttracking_reconstruction(path,
                                     components=components,
                                     pruneTracks=pruneTracks,
+                                    addClusterExpertModules=addClusterExpertModules,
                                     trigger_mode=trigger_mode)
 
     # Add the modules calculating the software trigger cuts (but not performing them)
     if trigger_mode == "all" and (not components or (
-            "CDC" in components and "SVD" in components and "ECL" in components and "EKLM" in components and "BKLM" in components)):
+            "CDC" in components and "ECL" in components and "EKLM" in components and "BKLM" in components)):
         add_fast_reco_software_trigger(path)
         add_hlt_software_trigger(path)
         add_calibration_software_trigger(path)
 
 
-def add_mc_reconstruction(path, components=None, pruneTracks=True):
+def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True):
     """
     This function adds the standard reconstruction modules with MC tracking
     to a path.
@@ -86,10 +89,11 @@ def add_mc_reconstruction(path, components=None, pruneTracks=True):
     # add further reconstruction modules
     add_posttracking_reconstruction(path,
                                     components=components,
-                                    pruneTracks=pruneTracks)
+                                    pruneTracks=pruneTracks,
+                                    addClusterExpertModules=addClusterExpertModules)
 
 
-def add_posttracking_reconstruction(path, components=None, pruneTracks=True,
+def add_posttracking_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
                                     trigger_mode="all"):
     """
     This function adds the standard reconstruction modules after tracking
@@ -99,6 +103,8 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True,
     :param components: list of geometry components to include reconstruction for, or None for all components.
     :param pruneTracks: Delete all hits except the first and last after the dEdX modules.
     :param trigger_mode: Please see add_reconstruction for a description of all trigger modes.
+    :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to improve
+        reconstruction performance.
     """
 
     if trigger_mode in ["hlt", "all"]:
@@ -124,7 +130,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True,
         add_muid_module(path, components)
         add_pid_module(path, components)
 
-    if trigger_mode in ["all"]:
+    if trigger_mode in ["all"] and addClusterExpertModules:
         # FIXME: Disabled for HLT until performance bug is fixed
         add_cluster_expert_modules(path, components)
 

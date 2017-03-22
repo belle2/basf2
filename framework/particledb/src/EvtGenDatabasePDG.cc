@@ -26,19 +26,17 @@ using namespace Belle2;
 EvtGenDatabasePDG* EvtGenDatabasePDG::Instance()
 {
   static bool instanceCreated = false;
-  EvtGenDatabasePDG* instance = dynamic_cast<EvtGenDatabasePDG*>(fgInstance);
-  if (!instanceCreated || !instance) {
-    if (fgInstance) {
-      B2ERROR("TDatabasePDG instance found? Replacing existing instance...");
-    }
-    //let's set the instance pointer to ourselves
-    instance = new EvtGenDatabasePDG();
-    fgInstance = instance;
+  if (!instanceCreated) {
+    //hope we are the first to create a TDatabasePDG instance (setting the instance pointer in the process)
+    auto instance = new EvtGenDatabasePDG();
     //ok, now load the data
     instance->ReadEvtGenTable();
     instanceCreated = true;
+    if (instance != TDatabasePDG::Instance())
+      B2FATAL("EvtGenDatabasePDG created too late!");
   }
-  return instance;
+  //this cast should be safe as we stop execution above if we couldn't create the first instance ourselves
+  return static_cast<EvtGenDatabasePDG*>(TDatabasePDG::Instance());
 }
 
 EvtGenParticlePDG* EvtGenDatabasePDG::AddParticle(const char* name, const char* title, Double_t mass, Bool_t stable, Double_t width,

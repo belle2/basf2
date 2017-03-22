@@ -202,7 +202,7 @@ textarea {
     /* use all viewport space */
 	height:100vh;
 	/* fixed width for now */
-	width:280px;
+	width:300px;
 }
 
 #content_scroll {

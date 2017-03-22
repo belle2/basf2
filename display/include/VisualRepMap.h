@@ -8,7 +8,7 @@ class TObject;
 
 namespace Belle2 {
   class EveTower;
-  /** defines a bidirectional mapping between TObjects in DataStore and their visual representation.
+  /** defines a bidirectional (many to many) mapping between TObjects in DataStore and their visual representation.
    *
    * This is used to allow retrieving the original objects for a given TEveElement (to show additional info),
    * and vice versa.

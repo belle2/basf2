@@ -12,7 +12,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/core/EventProcessor.h>
-
+#include <framework/pcore/ProcHandler.h>
 
 namespace Belle2 {
   class Path;
@@ -47,5 +47,6 @@ namespace Belle2 {
     /** number of crashes encountered. */
     int m_nCrashedEvents = 0;
 
+    ProcHandler m_procHandler; /**< handles forking of processes. */
   };
 }

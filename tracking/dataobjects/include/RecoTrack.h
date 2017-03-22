@@ -81,19 +81,24 @@ namespace Belle2 {
     /// Copy the definitions from the RecoHitInformation to this class.
     typedef RecoHitInformation::RightLeftInformation RightLeftInformation;
     /// Copy the definitions from the RecoHitInformation to this class.
-    typedef RecoHitInformation::TrackingDetector TrackingDetector;
+    typedef RecoHitInformation::RecoHitDetector TrackingDetector;
     /// Copy the definitions from the RecoHitInformation to this class.
     typedef RecoHitInformation::OriginTrackFinder OriginTrackFinder;
     /// Copy the definitions from the RecoHitInformation to this class.
     typedef RecoHitInformation::UsedCDCHit UsedCDCHit;
     /// Copy the definitions from the RecoHitInformation to this class.
+    typedef RecoHitInformation::UsedSVDHit UsedSVDHit;
+    /// Copy the definitions from the RecoHitInformation to this class.
     typedef RecoHitInformation::UsedPXDHit UsedPXDHit;
     /// Copy the definitions from the RecoHitInformation to this class.
-    typedef RecoHitInformation::UsedSVDHit UsedSVDHit;
+    typedef RecoHitInformation::UsedBKLMHit UsedBKLMHit;
+    /// Copy the definitions from the RecoHitInformation to this class.
+    typedef RecoHitInformation::UsedEKLMHit UsedEKLMHit;
 
   public:
-
-
+    /**
+     * Enum for the matching status of this reco track (set by the matching modules in the tracking package).
+     */
     enum MatchingStatus {
       c_undefined,
       c_matched,
@@ -105,19 +110,26 @@ namespace Belle2 {
     /**
      * Convenience method which registers all relations required to fully use
      * a RecoTrack. If you create a new RecoTrack StoreArray, call this method
-     * in the initialize() method of your module.
+     * in the initialize() method of your module. Note that the BKLM and EKLM
+     * relations may not be registered because the KLM modules are loaded after
+     * tracking; in this case, a second call of this method is required after
+     * creation of the BKLM and EKLM hits store arrays.
      * @param recoTracks  Reference to the store array where the new RecoTrack list is located
-     * @param recoHitInformationStoreArrayName  name of the StoreArray holding RecoHitInformation lists
-     * @param pxdHitsStoreArrayName  name of the StoreArray holding the PXDClusters lists
-     * @param svdHitsStoreArrayName  name of the StoreArray holding the SVDClusters lists
      * @param cdcHitsStoreArrayName  name of the StoreArray holding the CDCHits lists
+     * @param svdHitsStoreArrayName  name of the StoreArray holding the SVDClusters lists
+     * @param pxdHitsStoreArrayName  name of the StoreArray holding the PXDClusters lists
+     * @param bklmHitsStoreArrayName  name of the StoreArray holding the CDCHits lists
+     * @param eklmHitsStoreArrayName  name of the StoreArray holding the CDCHits lists
+     * @param recoHitInformationStoreArrayName  name of the StoreArray holding RecoHitInformation lists
      */
     static void registerRequiredRelations(
       StoreArray<RecoTrack>& recoTracks,
-      std::string recoHitInformationStoreArrayName = "",
-      std::string pxdHitsStoreArrayName = "",
-      std::string svdHitsStoreArrayName = "",
-      std::string cdcHitsStoreArrayName = "")
+      std::string const& pxdHitsStoreArrayName = "",
+      std::string const& svdHitsStoreArrayName = "",
+      std::string const& cdcHitsStoreArrayName = "",
+      std::string const& bklmHitsStoreArrayName = "",
+      std::string const& eklmHitsStoreArrayName = "",
+      std::string const& recoHitInformationStoreArrayName = "")
     {
       StoreArray<RecoHitInformation> recoHitInformations(recoHitInformationStoreArrayName);
       recoHitInformations.registerInDataStore();
@@ -140,6 +152,18 @@ namespace Belle2 {
         pxdHits.registerRelationTo(recoTracks);
         recoHitInformations.registerRelationTo(pxdHits);
       }
+
+      StoreArray<RecoHitInformation::UsedBKLMHit> bklmHits(bklmHitsStoreArrayName);
+      if (bklmHits.isOptional()) {
+        bklmHits.registerRelationTo(recoTracks);
+        recoHitInformations.registerRelationTo(bklmHits);
+      }
+
+      StoreArray<RecoHitInformation::UsedEKLMHit> eklmHits(eklmHitsStoreArrayName);
+      if (eklmHits.isOptional()) {
+        eklmHits.registerRelationTo(recoTracks);
+        recoHitInformations.registerRelationTo(eklmHits);
+      }
     }
 
     /// Empty constructor for ROOT. Do not use!
@@ -154,12 +178,16 @@ namespace Belle2 {
        * @param storeArrayNameOfCDCHits The name of the store array where the related cdc hits are stored.
        * @param storeArrayNameOfSVDHits The name of the store array where the related svd hits are stored.
        * @param storeArrayNameOfPXDHits The name of the store array where the related pxd hits are stored.
+       * @param storeArrayNameOfBKLMHits The name of the store array where the related pxd hits are stored.
+       * @param storeArrayNameOfEKLMHits The name of the store array where the related pxd hits are stored.
        * @param storeArrayNameOfRecoHitInformation The name of the store array where the related hit information are stored.
        */
     RecoTrack(const TVector3& seedPosition, const TVector3& seedMomentum, const short int seedCharge,
               const std::string& storeArrayNameOfCDCHits = "",
               const std::string& storeArrayNameOfSVDHits = "",
               const std::string& storeArrayNameOfPXDHits = "",
+              const std::string& storeArrayNameOfBKLMHits = "",
+              const std::string& storeArrayNameOfEKLMHits = "",
               const std::string& storeArrayNameOfRecoHitInformation = "");
 
     /** Delete the copy construtr. */
@@ -174,8 +202,10 @@ namespace Belle2 {
      * @param storeArrayNameOfCDCHits The name of the store array where the related cdc hits are stored.
      * @param storeArrayNameOfSVDHits The name of the store array where the related svd hits are stored.
      * @param storeArrayNameOfPXDHits The name of the store array where the related pxd hits are stored.
+     * @param storeArrayNameOfBKLMHits The name of the store array where the related bklm hits are stored.
+     * @param storeArrayNameOfEKLMHits The name of the store array where the related eklm hits are stored.
      * @param storeArrayNameOfRecoHitInformation The name of the store array where the related hit information are stored.
-     * @param recreateSortingParameters The VXDTF dos not set the sorting parameters correctly (they are all 0).
+     * @param recreateSortingParameters The VXDTF does not set the sorting parameters correctly (they are all 0).
      *        This flag can be used to recover the parameters.
      * @return The newly created reco track.
      * @todo Let the track finders determine the cov seed.
@@ -185,6 +215,8 @@ namespace Belle2 {
                                           const std::string& storeArrayNameOfCDCHits = "",
                                           const std::string& storeArrayNameOfSVDHits = "",
                                           const std::string& storeArrayNameOfPXDHits = "",
+                                          const std::string& storeArrayNameOfBKLMHits = "",
+                                          const std::string& storeArrayNameOfEKLMHits = "",
                                           const std::string& storeArrayNameOfRecoHitInformation = "",
                                           const bool recreateSortingParameters = false
                                          );
@@ -193,6 +225,16 @@ namespace Belle2 {
      * Create a genfit::TrackCand out of this reco track and copy all information to the track candidate.
      */
     genfit::TrackCand createGenfitTrackCand() const;
+
+    /**
+     * Add all hits from another RecoTrack to this RecoTrack.
+     * @param recoTrack Pointer to the RecoTrack where the hits are copied from
+     * @param sortingParameterOffset This number will be added to the sortingParameter of all hits copied
+     *        from recoTrack. Set this to (largest sorting parameter) + 1 in order to add hits at the end of
+     *        this reco track.
+     * @return The number of hits copied.
+     */
+    size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, const unsigned int sortingParameterOffset = 0);
 
     /**
      * Adds a cdc hit with the given information to the reco track.
@@ -211,16 +253,6 @@ namespace Belle2 {
     }
 
     /**
-     * Add all hits from another RecoTrack to this RecoTrack.
-     * @param recoTrack Pointer to the RecoTrack where the hits are copied from
-     * @param sortingParameterOffset This number will be added to the sortingParameter of all hits copied
-     *        from recoTrack. Set this to (largest sorting parameter) + 1 in order to add hits at the end of
-     *        this reco track.
-     * @return The number of hits copied.
-     */
-    size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, const unsigned int sortingParameterOffset = 0);
-
-    /**
      * Adds a pxd hit with the given information to the reco track.
      * You only have to provide the hit and the sorting parameter, all other parameters have default value.
      * @param pxdHit The pointer to a stored PXDHit/Cluster in the store array you provided earlier, which you want to add.
@@ -231,21 +263,49 @@ namespace Belle2 {
     bool addPXDHit(const UsedPXDHit* pxdHit, const unsigned int sortingParameter,
                    OriginTrackFinder foundByTrackFinder = OriginTrackFinder::c_undefinedTrackFinder)
     {
-      return addHit(pxdHit, RightLeftInformation::c_undefinedRightLeftInformation, foundByTrackFinder, sortingParameter);
+      return addHit(pxdHit, foundByTrackFinder, sortingParameter);
     }
 
     /**
      * Adds a svd hit with the given information to the reco track.
-     * You only have to provide the hit and the arc length, all other parameters have default value.
+     * You only have to provide the hit and the sorting parameter, all other parameters have default value.
      * @param svdHit The pointer to a stored SVDHit in the store array you provided earlier, which you want to add.
-     * @param sortingParameter The arc length of the hit. The arc length is - by our definition - between -pi and pi.
+     * @param sortingParameter The index of the hit. It starts with 0 with the first hit.
      * @param foundByTrackFinder Which track finder has found the hit?
      * @return True if the hit was not already added to the track.
      */
     bool addSVDHit(const UsedSVDHit* svdHit, const unsigned int sortingParameter,
                    OriginTrackFinder foundByTrackFinder = OriginTrackFinder::c_undefinedTrackFinder)
     {
-      return addHit(svdHit, RightLeftInformation::c_undefinedRightLeftInformation, foundByTrackFinder, sortingParameter);
+      return addHit(svdHit, foundByTrackFinder, sortingParameter);
+    }
+
+    /**
+     * Adds a bklm hit with the given information to the reco track.
+     * You only have to provide the hit and the sorting parameter, all other parameters have default value.
+     * @param bklmHit The pointer to a stored BKLMHit in the store array you provided earlier, which you want to add.
+     * @param sortingParameter The index of the hit. It starts with 0 with the first hit.
+     * @param foundByTrackFinder Which track finder has found the hit?
+     * @return True if the hit was not already added to the track.
+     */
+    bool addBKLMHit(const UsedBKLMHit* bklmHit, const unsigned int sortingParameter,
+                    OriginTrackFinder foundByTrackFinder = OriginTrackFinder::c_undefinedTrackFinder)
+    {
+      return addHit(bklmHit, foundByTrackFinder, sortingParameter);
+    }
+
+    /**
+     * Adds an eklm hit with the given information to the reco track.
+     * You only have to provide the hit and the sorting parameter, all other parameters have default value.
+     * @param bklmHit The pointer to a stored BKLMHit in the store array you provided earlier, which you want to add.
+     * @param sortingParameter The index of the hit. It starts with 0 with the first hit.
+     * @param foundByTrackFinder Which track finder has found the hit?
+     * @return True if the hit was not already added to the track.
+     */
+    bool addEKLMHit(const UsedEKLMHit* eklmHit, const unsigned int sortingParameter,
+                    OriginTrackFinder foundByTrackFinder = OriginTrackFinder::c_undefinedTrackFinder)
+    {
+      return addHit(eklmHit, foundByTrackFinder, sortingParameter);
     }
 
     /// Return the reco hit information for a given cdc hit or nullptr if there is none.
@@ -255,15 +315,27 @@ namespace Belle2 {
     }
 
     /// Return the reco hit information for a given svd hit or nullptr if there is none.
-    RecoHitInformation* getRecoHitInformation(const UsedSVDHit* cdcHit) const
+    RecoHitInformation* getRecoHitInformation(const UsedSVDHit* svdHit) const
     {
-      return getRecoHitInformation(cdcHit, m_storeArrayNameOfSVDHits);
+      return getRecoHitInformation(svdHit, m_storeArrayNameOfSVDHits);
     }
 
     /// Return the reco hit information for a given pxd hit or nullptr if there is none.
-    RecoHitInformation* getRecoHitInformation(const UsedPXDHit* cdcHit) const
+    RecoHitInformation* getRecoHitInformation(const UsedPXDHit* pxdHit) const
     {
-      return getRecoHitInformation(cdcHit, m_storeArrayNameOfPXDHits);
+      return getRecoHitInformation(pxdHit, m_storeArrayNameOfPXDHits);
+    }
+
+    /// Return the reco hit information for a given bklm hit or nullptr if there is none.
+    RecoHitInformation* getRecoHitInformation(const UsedBKLMHit* bklmHit) const
+    {
+      return getRecoHitInformation(bklmHit, m_storeArrayNameOfBKLMHits);
+    }
+
+    /// Return the reco hit information for a given eklm hit or nullptr if there is none.
+    RecoHitInformation* getRecoHitInformation(const UsedEKLMHit* eklmHit) const
+    {
+      return getRecoHitInformation(eklmHit, m_storeArrayNameOfEKLMHits);
     }
 
     // Hits Information Questioning
@@ -335,6 +407,12 @@ namespace Belle2 {
     /// Returns true if the track has pxd hits.
     bool hasPXDHits() const { return getRelatedFrom<UsedPXDHit>(m_storeArrayNameOfPXDHits) != nullptr; }
 
+    /// Returns true if the track has bklm hits.
+    bool hasBKLMHits() const { return getRelatedFrom<UsedBKLMHit>(m_storeArrayNameOfBKLMHits) != nullptr; }
+
+    /// Returns true if the track has eklm hits.
+    bool hasEKLMHits() const { return getRelatedFrom<UsedEKLMHit>(m_storeArrayNameOfEKLMHits) != nullptr; }
+
     /// Returns true if the given hit is in the track.
     template <class HitType>
     bool hasHit(const HitType* hit) const
@@ -355,8 +433,25 @@ namespace Belle2 {
     /// Return the number of pxd hits.
     unsigned int getNumberOfPXDHits() const { return getNumberOfHitsOfGivenType<UsedPXDHit>(m_storeArrayNameOfPXDHits); }
 
-    /// Return the number of cdc + svd + pxd hits.
-    unsigned int getNumberOfTotalHits() const { return getNumberOfCDCHits() + getNumberOfPXDHits() + getNumberOfSVDHits(); }
+    /// Return the number of bklm hits.
+    unsigned int getNumberOfBKLMHits() const { return getNumberOfHitsOfGivenType<UsedBKLMHit>(m_storeArrayNameOfBKLMHits); }
+
+    /// Return the number of eklm hits.
+    unsigned int getNumberOfEKLMHits() const { return getNumberOfHitsOfGivenType<UsedEKLMHit>(m_storeArrayNameOfEKLMHits); }
+
+    /// Return the number of cdc + svd + pxd + bklm + eklm hits.
+    unsigned int getNumberOfTotalHits() const
+    {
+      return getNumberOfCDCHits() + getNumberOfPXDHits() +
+             getNumberOfSVDHits() + getNumberOfBKLMHits() + getNumberOfEKLMHits();
+    }
+
+    /// Return the number of cdc + svd + pxd  hits.
+    unsigned int getNumberOfTrackingHits() const
+    {
+      return getNumberOfCDCHits() + getNumberOfPXDHits() +
+             getNumberOfSVDHits();
+    }
 
     /// Return an unsorted list of cdc hits.
     std::vector<Belle2::RecoTrack::UsedCDCHit*> getCDCHitList() const { return getHitList<UsedCDCHit>(m_storeArrayNameOfCDCHits); }
@@ -367,6 +462,12 @@ namespace Belle2 {
     /// Return an unsorted list of pxd hits.
     std::vector<Belle2::RecoTrack::UsedPXDHit*> getPXDHitList() const { return getHitList<UsedPXDHit>(m_storeArrayNameOfPXDHits); }
 
+    /// Return an unsorted list of bklm hits.
+    std::vector<Belle2::RecoTrack::UsedBKLMHit*> getBKLMHitList() const { return getHitList<UsedBKLMHit>(m_storeArrayNameOfBKLMHits); }
+
+    /// Return an unsorted list of eklm hits.
+    std::vector<Belle2::RecoTrack::UsedEKLMHit*> getEKLMHitList() const { return getHitList<UsedEKLMHit>(m_storeArrayNameOfEKLMHits); }
+
     /// Return a sorted list of cdc hits. Sorted by the sortingParameter.
     std::vector<Belle2::RecoTrack::UsedCDCHit*> getSortedCDCHitList() const { return getSortedHitList<UsedCDCHit>(m_storeArrayNameOfCDCHits); }
 
@@ -375,6 +476,12 @@ namespace Belle2 {
 
     /// Return a sorted list of pxd hits. Sorted by the sortingParameter.
     std::vector<Belle2::RecoTrack::UsedPXDHit*> getSortedPXDHitList() const { return getSortedHitList<UsedPXDHit>(m_storeArrayNameOfPXDHits); }
+
+    /// Return a sorted list of bklm hits. Sorted by the sortingParameter.
+    std::vector<Belle2::RecoTrack::UsedBKLMHit*> getSortedBKLMHitList() const { return getSortedHitList<UsedBKLMHit>(m_storeArrayNameOfBKLMHits); }
+
+    /// Return a sorted list of eklm hits. Sorted by the sortingParameter.
+    std::vector<Belle2::RecoTrack::UsedEKLMHit*> getSortedEKLMHitList() const { return getSortedHitList<UsedEKLMHit>(m_storeArrayNameOfEKLMHits); }
 
     // Seed Helix Functionality
     /// Return the position seed stored in the reco track. ATTENTION: This is not the fitted position.
@@ -421,6 +528,9 @@ namespace Belle2 {
     /// Set the covariance of the seed. ATTENTION: This is not the fitted covariance.
     void setSeedCovariance(const TMatrixDSym& seedCovariance) { m_genfitTrack.setCovSeed(seedCovariance); }
 
+    /// Set the tracking seed by using the fitted state at the first measurement. Will fail if the state is not present.
+    void copyStateFromSeed();
+
     // Fitting
     /// Returns true if the last fit with the given representation was successful.
     bool wasFitSuccessful(const genfit::AbsTrackRep* representation = nullptr) const;
@@ -436,6 +546,14 @@ namespace Belle2 {
     bool hasTrackFitStatus(const genfit::AbsTrackRep* representation = nullptr) const
     {
       checkDirtyFlag();
+
+      // there might be the case, where the genfit track has no trackreps, even not the cardinal
+      // one because no fit attempt was performed. In this case, the "hasFitStatus" call to genfit
+      // will fail with an access violation. To prevent that, check for the number of reps here before
+      // actually calling genfit's hasFitStatus(...)
+      if (m_genfitTrack.getNumReps() == 0)
+        return false;
+
       return m_genfitTrack.hasFitStatus(representation);
     }
 
@@ -453,29 +571,79 @@ namespace Belle2 {
       return m_genfitTrack.getTrackReps();
     }
 
+    /**
+     * Return a list of all RecoHitInformations associated with the RecoTrack. This is especially useful when
+     * you want to iterate over all (fitted) hits in a track without caring whether its a CDC, VXD etc hit.
+     */
+    std::vector<RecoHitInformation*> getRecoHitInformations() const
+    {
+      std::vector<RecoHitInformation*> hitList;
+      StoreArray<RecoHitInformation> recoHitInformations(m_storeArrayNameOfRecoHitInformation);
+
+      hitList.reserve(recoHitInformations.getEntries());
+      for (auto& recoHit : recoHitInformations) {
+        hitList.push_back(&recoHit);
+      }
+
+      return hitList;
+    }
+
     /** Return genfit's MeasuredStateOnPlane for the first hit in a fit
-    * useful for extrapolation of measurements other locations
+    * useful for extrapolation of measurements to other locations
     */
     const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromFirstHit(const genfit::AbsTrackRep* representation = nullptr)
     {
       return getMeasuredStateOnPlaneFromHit(0, representation);
     }
 
+    /** Return genfit's MeasuredStateOnPlane for the first hit in a fit
+    * useful for extrapolation of measurements to other locations
+    * Const version.
+    */
+    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromFirstHit(const genfit::AbsTrackRep* representation = nullptr) const
+    {
+      return getMeasuredStateOnPlaneFromHit(0, representation);
+    }
+
     /** Return genfit's MeasuredStateOnPlane for the last hit in a fit
-    * useful for extrapolation of measurements other locations
+    * useful for extrapolation of measurements to other locations
     */
     const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation = nullptr)
     {
       return getMeasuredStateOnPlaneFromHit(-1, representation);
     }
 
-    /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
-    * useful for extrapolation of measurements other locations
+    /** Return genfit's MeasuredStateOnPlane for the last hit in a fit
+    * useful for extrapolation of measurements to other locations
+    * Const version.
     */
-    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr)
+    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromLastHit(const genfit::AbsTrackRep* representation = nullptr) const
+    {
+      return getMeasuredStateOnPlaneFromHit(-1, representation);
+    }
+
+    /**
+     * Return genfit's MeasuredStateOnPlane on plane for associated with one RecoHitInformation. The caller needs to ensure that
+     * recoHitInfo->useInFit() is true and the a fit has been performed on the track, a.k.a. hasTrackFitStatus() == true
+     */
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromRecoHit(const RecoHitInformation* recoHitInfo,
+        const genfit::AbsTrackRep* representation = nullptr) const
     {
       checkDirtyFlag();
-      return m_genfitTrack.getFittedState(id, representation);
+
+      if (!hasTrackFitStatus(representation)) {
+        B2FATAL("MeasuredStateOnPlane can not be retrieved for RecoTracks where no fit has been attempted.");
+      }
+
+      if (!recoHitInfo->useInFit()) {
+        B2FATAL("MeasuredStateOnPlane cannot be provided for RecoHit which was not used in the fit.");
+      }
+
+      const auto hitTrackPoint = recoHitInfo->getCreatedTrackPoint();
+      if (hitTrackPoint == nullptr) {
+        B2FATAL("TrackPoint was requested which has not been created");
+      }
+      return hitTrackPoint->getFitterInfo(representation)->getFittedState();
     }
 
     /** Return genfit's MasuredStateOnPlane, that is closest to the given point
@@ -528,6 +696,12 @@ namespace Belle2 {
     /// Name of the store array of the pxd hits.
     const std::string& getStoreArrayNameOfPXDHits() const { return m_storeArrayNameOfPXDHits; }
 
+    /// Name of the store array of the bklm hits.
+    const std::string& getStoreArrayNameOfBKLMHits() const { return m_storeArrayNameOfBKLMHits; }
+
+    /// Name of the store array of the eklm hits.
+    const std::string& getStoreArrayNameOfEKLMHits() const { return m_storeArrayNameOfEKLMHits; }
+
     /// Name of the store array of the reco hit informations.
     const std::string& getStoreArrayNameOfRecoHitInformation() const { return m_storeArrayNameOfRecoHitInformation; }
 
@@ -539,8 +713,8 @@ namespace Belle2 {
      */
     template<class HitType>
     void mapOnHits(const std::string& storeArrayNameOfHits,
-                   std::function<void(RecoHitInformation&, HitType*)> mapFunction,
-                   std::function<bool(const RecoHitInformation&, const HitType*)> pickFunction)
+                   std::function<void(RecoHitInformation&, HitType*)> const&   mapFunction,
+                   std::function<bool(const RecoHitInformation&, const HitType*)> const& pickFunction)
     {
       RelationVector<RecoHitInformation> relatedHitInformation = getRelationsTo<RecoHitInformation>
                                                                  (m_storeArrayNameOfRecoHitInformation);
@@ -561,8 +735,8 @@ namespace Belle2 {
      */
     template<class HitType>
     void mapOnHits(const std::string& storeArrayNameOfHits,
-                   std::function<void(const RecoHitInformation&, const HitType*)> mapFunction,
-                   std::function<bool(const RecoHitInformation&, const HitType*)> pickFunction) const
+                   std::function<void(const RecoHitInformation&, const HitType*)> const& mapFunction,
+                   std::function<bool(const RecoHitInformation&, const HitType*)> const& pickFunction) const
     {
       RelationVector<RecoHitInformation> relatedHitInformation = getRelationsTo<RecoHitInformation>
                                                                  (m_storeArrayNameOfRecoHitInformation);
@@ -582,7 +756,7 @@ namespace Belle2 {
      */
     template<class HitType>
     void mapOnHits(const std::string& storeArrayNameOfHits,
-                   std::function<void(RecoHitInformation&, HitType*)> mapFunction)
+                   std::function<void(RecoHitInformation&, HitType*)> const& mapFunction)
     {
       mapOnHits<HitType>(storeArrayNameOfHits, mapFunction, [](const RecoHitInformation&, const HitType*) -> bool { return true; });
     }
@@ -594,7 +768,7 @@ namespace Belle2 {
      */
     template<class HitType>
     void mapOnHits(const std::string& storeArrayNameOfHits,
-                   std::function<void(const RecoHitInformation&, const HitType*)> mapFunction) const
+                   std::function<void(const RecoHitInformation&, const HitType*)> const&   mapFunction) const
     {
       mapOnHits<HitType>(storeArrayNameOfHits, mapFunction, [](const RecoHitInformation&, const HitType*) -> bool { return true; });
     }
@@ -635,6 +809,10 @@ namespace Belle2 {
     std::string m_storeArrayNameOfSVDHits = "";
     /// Store array name of added PXD hits.
     std::string m_storeArrayNameOfPXDHits = "";
+    /// Store array name of added BKLM hits.
+    std::string m_storeArrayNameOfBKLMHits = "";
+    /// Store array name of added EKLM hits.
+    std::string m_storeArrayNameOfEKLMHits = "";
     /// Store array of added RecoHitInformation.
     std::string m_storeArrayNameOfRecoHitInformation = "";
     /// Bool is hits were added to track after fitting and the measurements should be recalculated.
@@ -770,6 +948,25 @@ namespace Belle2 {
       return hitList;
     }
 
+    /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
+    * useful for extrapolation of measurements to other locations
+    */
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr)
+    {
+      checkDirtyFlag();
+      return m_genfitTrack.getFittedState(id, representation);
+    }
+
+    /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
+    * useful for extrapolation of measurements other locations
+    * Const version.
+    */
+    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr) const
+    {
+      checkDirtyFlag();
+      return m_genfitTrack.getFittedState(id, representation);
+    }
+
     /// Helper: Check the dirty flag and produce a warning, whenever a fit result is accessed.
     void checkDirtyFlag() const
     {
@@ -779,7 +976,7 @@ namespace Belle2 {
     }
 
     /** Making this class a ROOT class.*/
-    ClassDef(RecoTrack, 6);
+    ClassDef(RecoTrack, 7);
   };
 
   /**

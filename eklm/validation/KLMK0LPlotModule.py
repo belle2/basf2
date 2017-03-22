@@ -201,11 +201,11 @@ class KLMK0LPlotModule(Module):
                 self.hist_pres.Fill(momentum_k.Mag() - momentum.Mag())
                 self.hist_ptres.Fill(momentum_k.Theta() - momentum.Theta())
                 self.hist_ppres.Fill(momentum_k.Phi() - momentum.Phi())
-        self.vertex_k_av = self.vertex_k_av * (1.0 / len(self.vertex))
-        self.momentum_av = self.momentum_av * (1.0 / len(self.vertex))
 
     def terminate(self):
         """ Termination function. """
+        self.vertex_k_av = self.vertex_k_av * (1.0 / len(self.vertex))
+        self.momentum_av = self.momentum_av * (1.0 / len(self.vertex))
         # x, y, z, e
         cov_mat = numpy.zeros((4, 4))
         corr_mat = numpy.zeros((4, 4))

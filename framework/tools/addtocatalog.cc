@@ -45,6 +45,7 @@ int main(int argc, char* argv[])
   // Check for help option
   if (varMap.count("help")) {
     cout << "Usage: " << argv[0] << " [OPTIONS] [FILE]\n";
+    cout << "Add the given file to the file catalog (e.g. so it can be found as a parent file).\n\n";
     cout << options << endl;
     return 0;
   }

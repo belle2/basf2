@@ -39,8 +39,8 @@ namespace Belle2 {
 
       /** Checks if more than 66% of the hits in this segment are contained in the phi0 curv hough space
        *  Returns the sum of the individual hit weights in this case. Else returns NAN.*/
-      Weight operator()(const CDCSegment2D* const& segment2D,
-                        const HoughBox* const& houghBox)
+      Weight operator()(const CDCSegment2D* segment2D,
+                        const HoughBox* houghBox)
       {
         size_t nHits = segment2D->size();
         auto weightOfHit = [this, &houghBox](const Weight & totalWeight,
@@ -66,8 +66,8 @@ namespace Belle2 {
       /** Checks if the two dimensional reconstructed hit is contained in a phi0 curv hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
        */
-      Weight operator()(const CDCRecoHit2D* const& recoHit2D,
-                        const HoughBox* const& houghBox)
+      Weight operator()(const CDCRecoHit2D* recoHit2D,
+                        const HoughBox* houghBox)
       {
         const CDCWire& wire = recoHit2D->getWire();
         const double signedDriftLength = recoHit2D->getSignedRefDriftLength();
@@ -82,8 +82,8 @@ namespace Belle2 {
        *  Accepts if either the right passage hypothesis or the left passage hypothesis
        *  is in the hough box.
        */
-      Weight operator()(const CDCWireHit* const& wireHit,
-                        const HoughBox* const& houghBox)
+      Weight operator()(const CDCWireHit* wireHit,
+                        const HoughBox* houghBox)
       {
         const CDCWire& wire = wireHit->getWire();
         const double driftLength = wireHit->getRefDriftLength();
@@ -104,11 +104,11 @@ namespace Belle2 {
        *  is in the hough box.
        */
       Weight operator()(CDCRLWireHit& rlTaggedWireHit,
-                        const HoughBox* const& houghBox)
+                        const HoughBox* houghBox)
       {
-        const CDCWire& wire = rlTaggedWireHit->getWire();
+        const CDCWire& wire = rlTaggedWireHit.getWire();
         const ERightLeft rlInfo = rlTaggedWireHit.getRLInfo();
-        const double driftLength = rlTaggedWireHit->getRefDriftLength();
+        const double driftLength = rlTaggedWireHit.getRefDriftLength();
 
         ERightLeft newRLInfo =
           containsRightOrLeft(*houghBox, wire, driftLength, rlInfo);

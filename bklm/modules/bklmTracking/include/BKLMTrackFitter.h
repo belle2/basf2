@@ -20,7 +20,6 @@
 #include <bklm/geometry/GeometryPar.h>
 #include "bklm/dataobjects/BKLMHit2d.h"
 
-using namespace CLHEP;
 
 namespace Belle2 {
 
@@ -49,21 +48,21 @@ namespace Belle2 {
 
     //! do fit in the y-x plane or z-x plane
     double fit1dSectorTrack(std::list< BKLMHit2d* > hitList,
-                            HepVector&  eta,
-                            HepSymMatrix&  error,
+                            CLHEP::HepVector&  eta,
+                            CLHEP::HepSymMatrix&  error,
                             int depDir,    int indDir);
 
     //! Get track parameters in the global system. y = p0 + p1 * x; z = p2 + p3 * x
-    HepVector    getTrackParam() {return m_GlobalPar; }
+    CLHEP::HepVector    getTrackParam() {return m_GlobalPar; }
 
     //! Get invariance matrix of track parameters in the global system.
-    HepSymMatrix getTrackParamErr() {return m_GlobalErr; }
+    CLHEP::HepSymMatrix getTrackParamErr() {return m_GlobalErr; }
 
     //! Get track parameters in the sector locan system, where the first layer of the sector is used as reference.
-    HepVector    getTrackParamSector() {return m_SectorPar; }
+    CLHEP::HepVector    getTrackParamSector() {return m_SectorPar; }
 
     //! Get invariance matrix of track parameters in the sector local system, where the first layer of the sector is used as reference.
-    HepSymMatrix getTrackParamSectorErr() {return m_SectorErr; }
+    CLHEP::HepSymMatrix getTrackParamSectorErr() {return m_SectorErr; }
 
     //! Is fit valid
     bool isValid() { return m_Valid; }

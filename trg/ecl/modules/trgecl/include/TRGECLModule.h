@@ -16,7 +16,7 @@
 
 #include <string>
 #include <framework/core/Module.h>
-#include "trg/ecl/TrgEcl.h"
+#include "trg/ecl/TrgEclMaster.h"
 
 namespace Belle2 {
 
@@ -84,6 +84,15 @@ namespace Belle2 {
     // double m_timeCPU;        //  CPU time
     int    m_nRun;           //  Run number
     int    m_nEvent;         //  Event number
+
+    int _Bhabha;  // Bhabha option
+    int _Clustering; // Clustering option
+    int _EventTiming;  // Eventtiming option
+    double _TimeWindow; // Trigger decision time window
+    double _OverlapWindow; // Trigger decision overlap window in oder to avoid boundary effect
+    int _NofTopTC; // # of considered TC in energy weighted Timing method
+    int _SelectEvent;  // Event selection
+
 
   };
 

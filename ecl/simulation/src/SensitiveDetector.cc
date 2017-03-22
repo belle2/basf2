@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <ecl/simulation/SensitiveDetector.h>
 #include <ecl/geometry/ECLGeometryPar.h>
+#include <framework/gearbox/Unit.h>
+#include <simulation/background/BkgNeutronWeight.h>
 
 using namespace std;
 using namespace Belle2::ECL;
@@ -98,10 +100,10 @@ void SensitiveDetector::EndOfEvent(G4HCofThisEvent*)
 
   for (const ECLSimHit& t : m_eclSimHits) {
     double tof = t.getFlightTime();
-    if (tof >= 8000 || tof < 0) continue;
-    int TimeIndex = tof * (1. / 100);
+    if (tof >= 8000.0 || tof < -8000.0) continue;
+    int TimeIndex = (tof + 8000.0) * (1. / 100);
     int cellId = t.getCellId() - 1;
-    int key = cellId * 80 + TimeIndex;
+    int key = cellId * 160 + TimeIndex;
     double edep = t.getEnergyDep();
     double tsen = tof + eclp->time2sensor(cellId, t.getPosition()); // flight time to diode sensor
 
@@ -120,7 +122,7 @@ void SensitiveDetector::EndOfEvent(G4HCofThisEvent*)
   int hitNum = m_eclHits.getEntries();
   //  assert(hitNum == 0);
   for (const pair<int, hit_t>&  t : a) {
-    int key = t.first, cellId = key / 80;
+    int key = t.first, cellId = key / 160;
     for (const thit_t& s : tr)
       if (s.hid == key) m_eclHitRel.add(s.tid, hitNum);
     const hit_t& h = t.second;
@@ -220,6 +222,7 @@ void SensitiveDiode::EndOfEvent(G4HCofThisEvent*)
   struct dep_t {double e, t;};
   vector<dep_t> v;
   for (int cellId : m_cells) {
+    v.clear();
     for (const hit_t& h : m_hits) {
       if (cellId == h.cellId) v.push_back({h.e, h.t});
     }
@@ -248,4 +251,73 @@ void SensitiveDiode::EndOfEvent(G4HCofThisEvent*)
     // cout<<"\n";
 
   }
+}
+
+BkgSensitiveDiode::BkgSensitiveDiode(const G4String& name):
+  Simulation::SensitiveDetectorBase(name, Const::invalidDetector),
+  m_eclBeamBkgHitRel(m_mcParticles, m_eclBeamBkgHits)
+{
+  registerMCParticleRelation(m_eclBeamBkgHitRel);
+  m_eclBeamBkgHits.registerInDataStore();
+  m_mcParticles.registerRelationTo(m_eclBeamBkgHits);
+
+  m_eclp = ECLGeometryPar::Instance();
+  m_energyDeposit = 0;
+  m_startEnergy = 0;
+  m_startTime = 0;
+  m_trackLength = 0;
+  m_trackID = -1;
+}
+
+//-----------------------------------------------------
+// Method invoked for every step in sensitive detector
+//-----------------------------------------------------
+bool BkgSensitiveDiode::step(G4Step* aStep, G4TouchableHistory*)
+{
+  const G4StepPoint& s0 = *aStep->GetPreStepPoint();
+  const G4Track&  track = *aStep->GetTrack();
+
+  if (m_trackID != track.GetTrackID()) { //TrackID changed, store track informations
+    m_trackID = track.GetTrackID();
+    //Get world position
+    const G4ThreeVector& worldPosition = s0.GetPosition();
+    const double mm2cm = Unit::mm / Unit::cm;
+    m_startPos.SetXYZ(worldPosition.x() * mm2cm , worldPosition.y() * mm2cm, worldPosition.z() * mm2cm);
+    //Get momentum
+    const G4ThreeVector& momentum = s0.GetMomentum() ;
+    m_startMom.SetXYZ(momentum.x() * Unit::MeV, momentum.y() * Unit::MeV, momentum.z() * Unit::MeV);
+    //Get time
+    m_startTime = s0.GetGlobalTime();
+    //Get energy
+    m_startEnergy = s0.GetKineticEnergy() * Unit::MeV;
+    //Reset energy deposit;
+    m_energyDeposit = 0;
+    //Reset track lenght;
+    m_trackLength = 0;
+  }
+  //Update energy deposit
+  m_energyDeposit += aStep->GetTotalEnergyDeposit() * Unit::MeV;
+  m_trackLength += aStep->GetStepLength() * Unit::mm;
+  //Save Hit if track leaves volume or is killed
+  if (track.GetNextVolume() != track.GetVolume() ||
+      track.GetTrackStatus() >= fStopAndKill) {
+    int pdgCode = track.GetDefinition()->GetPDGEncoding();
+    double endEnergy = track.GetKineticEnergy() * Unit::MeV;
+    double neutWeight = 0;
+    if (pdgCode == 2112) {
+      BkgNeutronWeight& wt = BkgNeutronWeight::getInstance();
+      neutWeight = wt.getWeight(m_startEnergy / Unit::MeV);
+    }
+
+    int bkgHitNumber = m_eclBeamBkgHits.getEntries();
+    m_eclBeamBkgHitRel.add(m_trackID, bkgHitNumber);
+
+    int cellID = m_eclp->TouchableDiodeToCellID(s0.GetTouchable());
+    m_eclBeamBkgHits.appendNew(6, cellID, pdgCode, m_trackID, m_startPos, m_startMom, m_startTime, endEnergy, m_startEnergy,
+                               m_energyDeposit, m_trackLength, neutWeight);
+
+    //Reset TrackID
+    m_trackID = 0;
+  }
+  return true;
 }

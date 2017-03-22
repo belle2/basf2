@@ -42,6 +42,11 @@ namespace Belle2 {
       virtual unsigned int getNumberOfFeatures() const override { return m_dataset.getNumberOfFeatures(); }
 
       /**
+       * Returns the number of features in this dataset
+       */
+      virtual unsigned int getNumberOfSpectators() const override { return m_dataset.getNumberOfSpectators(); }
+
+      /**
        * Returns the number of events in this dataset
        */
       virtual unsigned int getNumberOfEvents() const override { return 2 * m_dataset.getNumberOfEvents(); };

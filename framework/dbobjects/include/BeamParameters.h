@@ -158,9 +158,10 @@ namespace Belle2 {
      *   - 9 entries for the full covariance matrix in row-major order. The symmetry of
      *     the matrix will not be checked but just the lower triangle will be used.
      *
-     * @param pointer to the member which contains the matrix
+     * @param member to the member which contains the matrix
      * @param cov entries for the covariance matrix
-     * @return covariance matrix determined from the given entries
+     * @param common if true a 1-element cov will be treated as the common variance
+     *        for all diagonal elements
      */
     static void setCovMatrix(Double32_t* member, const std::vector<double>& cov, bool common);
     /** Set covariance matrix from ROOT Matrix object */

@@ -37,7 +37,7 @@ MagneticField::~MagneticField()
 void MagneticField::GetFieldValue(const G4double Point[3], G4double* Bfield) const
 {
   //Get the magnetic field vector from the central magnetic field map (Geant4 uses [mm] as a length unit)
-  TVector3 magField = m_bField.getBField(TVector3(Point[0] * Unit::mm, Point[1] * Unit::mm, Point[2] * Unit::mm));
+  B2Vector3D magField = m_bField.getBField(B2Vector3D(Point[0] * Unit::mm, Point[1] * Unit::mm, Point[2] * Unit::mm));
 
   //Set the magnetic field (Use the Geant4 tesla unit here !)
   Bfield[0] = magField[0] * CLHEP::tesla;

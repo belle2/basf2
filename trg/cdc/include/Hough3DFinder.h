@@ -23,38 +23,39 @@
 
 namespace Belle2 {
 
-class TRGCDC;
-class TRGCDCTrack;
-class TRGCDCSegmentHit;
-class TRGCDCLink;
+  class TRGCDC;
+  class TRGCDCTrack;
+  class TRGCDCSegmentHit;
+  class TRGCDCLink;
 
-class TRGCDCHough3DFinder {
+  class TRGCDCHough3DFinder {
   public:
     /// Contructor.
-    TRGCDCHough3DFinder(const TRGCDC &, bool makeRootFile, int finderMode);
+    TRGCDCHough3DFinder(const TRGCDC&, bool makeRootFile, int finderMode);
     /// Destructor
     ~TRGCDCHough3DFinder();
     /// Member functions.
     /// Finds tracks using tracklist2D and outputs to trackList3D. Has parameter to choose between perfect and original finder.
-    void doit(std::vector<TRGCDCTrack *> const & trackList2D, std::vector<TRGCDCTrack *> & trackList3D);
+    void doit(std::vector<TRGCDCTrack*> const& trackList2D, std::vector<TRGCDCTrack*>& trackList3D);
     /// Finds tracks using tracklist. Has parameter to choose between perfect and original finder.
-    void doit(std::vector<TRGCDCTrack *> & trackList);
+    void doit(std::vector<TRGCDCTrack*>& trackList);
     /// Perfect 3D finder for a track.
-    void perfectFinder(std::vector<TRGCDCTrack *> &trackList, unsigned j, std::vector<const TRGCDCSegmentHit*> &mcTSList);
+    void perfectFinder(std::vector<TRGCDCTrack*>& trackList, unsigned j, std::vector<const TRGCDCSegmentHit*>& mcTSList);
     /// Perfect 3D finder for a tracklist.
-    void doitPerfectly(std::vector<TRGCDCTrack *> & trackList);
+    void doitPerfectly(std::vector<TRGCDCTrack*>& trackList);
     /// Finds tracks using tracklist.
-    void doitFind(std::vector<TRGCDCTrack *> & trackList);
+    void doitFind(std::vector<TRGCDCTrack*>& trackList);
     /// Finds tracks using tracklist.
-    void doitNewFind(std::vector<TRGCDCTrack *> & trackList);
+    void doitNewFind(std::vector<TRGCDCTrack*>& trackList);
     /// Finds number of hit superlayers for each mc particle.
-    void findNumberOfHitSuperlayersForMcParticles(std::vector<std::vector<const TRGCDCSegmentHit *> > & p_stTSs, std::map<unsigned, unsigned> & numberTSsForParticle);
+    void findNumberOfHitSuperlayersForMcParticles(std::vector<std::vector<const TRGCDCSegmentHit*> >& p_stTSs,
+                                                  std::map<unsigned, unsigned>& numberTSsForParticle);
     /// Termination method.
     void terminate(void);
 
     /// Members.
     /// Holds the trgcdc singleton.
-    const TRGCDC & _cdc;
+    const TRGCDC& _cdc;
     /// Choose whether to save root file.
     bool m_makeRootFile;
     /// 0: perfect finder, 1: Hough3DFinder, 2: GeoFinder, 3: VHDL GeoFinder
@@ -92,7 +93,7 @@ class TRGCDCHough3DFinder {
     /// TClonesArray map for saving track values to root file.
     std::map<std::string, TClonesArray*> m_mTClonesArray;
 
-};
+  };
 
 } // namespace Belle2
 

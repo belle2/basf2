@@ -32,44 +32,43 @@ namespace Belle2 {
      * @param payloadDir The name of the directory in which the payloads are atored. By default the same directory as the one containing the database text file is used.
      * @param readOnly   If this flag is set the database is opened in read only mode without locking.
      * @param logLevel   The level of log messages about not-found payloads.
-     * @return           A pointer to the created database instance
+     * @param invertLogging  If true log messages will be created when a payload is
+     *                   found. This is intended for override setups where a
+     *                   few payloads are taken from non standard locations
      */
     static void createInstance(const std::string& fileName = "database.txt", const std::string& payloadDir = "",
-                               bool readOnly = false, LogConfig::ELogLevel logLevel = LogConfig::c_Warning);
+                               bool readOnly = false, LogConfig::ELogLevel logLevel = LogConfig::c_Warning,
+                               bool invertLogging = false);
 
     /**
      * Request an object from the database.
      *
      * @param event      The metadata of the event for which the object should be valid.
-     * @param package    Name of the package that identifies the object in the database.
-     * @param module     Name of the module that identifies the object in the database.
+     * @param name       Name that identifies the object in the database.
      * @return           A pair of a pointer to the object and the interval for which it is valid
      */
-    virtual std::pair<TObject*, IntervalOfValidity> getData(const EventMetaData& event, const std::string& package,
-                                                            const std::string& module) override;
+    virtual std::pair<TObject*, IntervalOfValidity> getData(const EventMetaData& event, const std::string& name) override;
 
     /**
      * Store an object in the database.
      *
-     * @param package    Name of the package that identifies the object in the database.
-     * @param module     Name of the module that identifies the object in the database.
+     * @param name       Name that identifies the object in the database.
      * @param object     The object that should be stored in the database.
      * @param iov        The interval of validity of the the object.
      * @return           True if the storage of the object succeeded.
      */
-    virtual bool storeData(const std::string& package, const std::string& module, TObject* object,
+    virtual bool storeData(const std::string& name, TObject* object,
                            const IntervalOfValidity& iov) override;
 
     /**
      * Add a payload file to the database.
      *
-     * @param package    Name of the package that identifies the object in the database.
-     * @param module     Name of the module that identifies the object in the database.
+     * @param name       Name that identifies the object in the database.
      * @param fileName   The name of the payload file.
      * @param iov        The interval of validity of the the object.
      * @return           True if the storage of the object succeeded.
      */
-    virtual bool addPayload(const std::string& package, const std::string& module, const std::string& fileName,
+    virtual bool addPayload(const std::string& name, const std::string& fileName,
                             const IntervalOfValidity& iov) override;
 
   private:
@@ -93,20 +92,19 @@ namespace Belle2 {
      * If a default payload exists return it with an infinite IoV.
      * Otherwise return a null pointer if empty IoV
      *
-     * @param package    Name of the package that identifies the object in the database.
-     * @param module     Name of the module that identifies the object in the database.
-     * @param object     The object that should be stored in the database.
-     * @param iov        The interval of validity of the the object.
-     * @return           True if the storage of the object succeeded.
+     * @param name       Name that identifies the object in the database.
      */
-    std::pair<TObject*, IntervalOfValidity> tryDefault(const std::string& package, const std::string& module);
+    std::pair<TObject*, IntervalOfValidity> tryDefault(const std::string& name);
 
     /** Write IoVs of payloads to database file.
      * @return   True if the database could be successfully written. */
     bool writeDatabase();
 
-    /** The database file name. */
+    /** The database file name as given (will be displayed in case of parsing errors */
     std::string m_fileName;
+
+    /** The absolute database file name. */
+    std::string m_absFileName;
 
     /** The directory of payloads. */
     std::string m_payloadDir;
@@ -114,7 +112,7 @@ namespace Belle2 {
     /** flag for read-only mode. */
     bool m_readOnly;
 
-    /** Map of packages to map of modules to vector of revisions and assigned IoVs. */
-    std::map<std::string, std::map<std::string, std::vector<std::pair<int, IntervalOfValidity>>>> m_database;
+    /** Map of payload names to vector of revisions and assigned IoVs. */
+    std::map<std::string, std::vector<std::pair<int, IntervalOfValidity>>> m_database;
   };
 } // namespace Belle2

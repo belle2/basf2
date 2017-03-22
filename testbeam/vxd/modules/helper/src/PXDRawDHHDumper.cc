@@ -35,6 +35,12 @@ void PXDRawDHHDumperModule::event(void)
   }
 
   if (pxdTriggerNr != 0x0 && tag != 0x0) {
+  } else { // else if put same upcounter in
+    static int nr1 = 1000, nr2 = 1000;
+    pxdTriggerNr = nr1++;
+    tag = nr2++;
+  }
+  {
     int i = 0;
     for (auto& it : m_storeRaw) {
       FILE* fh;

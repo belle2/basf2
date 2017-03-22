@@ -158,7 +158,9 @@ class SaveHistogramsRefiner(Refiner):
                  bins=None,
                  outlier_z_score=None,
                  allow_discrete=False,
-                 stackby=""):
+                 stackby="",
+                 fit=None,
+                 fit_z_score=None):
 
         super(SaveHistogramsRefiner, self).__init__()
 
@@ -176,6 +178,9 @@ class SaveHistogramsRefiner(Refiner):
         self.outlier_z_score = outlier_z_score
         self.allow_discrete = allow_discrete
         self.stackby = stackby
+
+        self.fit = fit
+        self.fit_z_score = fit_z_score
 
     def refine(self,
                harvesting_module,
@@ -230,6 +235,20 @@ class SaveHistogramsRefiner(Refiner):
 
             histogram.xlabel = compose_axis_label(part_name)
 
+            if self.fit:
+                if self.fit_z_score is None:
+                    kwds = dict()
+                else:
+                    kwds = dict(z_score=self.fit_z_score)
+
+                fit_method_name = 'fit_' + str(self.fit)
+                try:
+                    fit_method = getattr(histogram, fit_method_name)
+                except AttributeError:
+                    histogram.fit(str(fit), **kwds)
+                else:
+                    fit_method(**kwds)
+
             if tdirectory:
                 histogram.write(tdirectory)
 
@@ -254,6 +273,7 @@ class Plot2DRefiner(Refiner):
                  bins=None,
                  outlier_z_score=None,
                  fit=None,
+                 fit_z_score=None,
                  skip_single_valued=False,
                  allow_discrete=False):
 
@@ -281,6 +301,7 @@ class Plot2DRefiner(Refiner):
         self.allow_discrete = allow_discrete
 
         self.fit = fit
+        self.fit_z_score = fit_z_score
 
         self.skip_single_valued = skip_single_valued
 
@@ -363,13 +384,18 @@ class Plot2DRefiner(Refiner):
                                          stackby=self.stackby)
 
                     if self.fit:
+                        if self.fit_z_score is None:
+                            kwds = dict()
+                        else:
+                            kwds = dict(z_score=self.fit_z_score)
+
                         fit_method_name = 'fit_' + str(self.fit)
                         try:
                             fit_method = getattr(profile_plot, fit_method_name)
                         except:
-                            profile_plot.fit(str(fit))
+                            profile_plot.fit(str(fit), **kwds)
                         else:
-                            fit_method()
+                            fit_method(**kwds)
 
                 elif plot_kind == "scatter":
                     profile_plot.scatter(x_parts,

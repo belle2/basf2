@@ -37,10 +37,12 @@ namespace Belle2 {
        */
       static void normalizeHitsAndResetTrajectory(CDCTrack& track);
 
-      /** Remove all hits which can not belong to the track,
+      /**
+       * Remove all hits which can not belong to the track,
        * as the particle can not exit and enter the CDC again.
        * The radius of the CDC can be "scaled" with the given factor.
-       * Works not very good */
+       * Works not very good.
+       */
       static void removeHitsAfterCDCWall(CDCTrack& track, double outerCylindricalRFactor = 1.1);
 
       /** Delete a track fully of the number of hits is below minimalHits. */
@@ -69,16 +71,17 @@ namespace Belle2 {
       /// Remove all hits that are on the wrong side of the detector (so to say: "beyond the IP").
       static void removeHitsOnTheWrongSide(CDCTrack& track);
 
+      /// Remove all hits that come after a large hole in the two dimensional arc length.
       static void removeArcLength2DHoles(CDCTrack& track, double m_maximumArcLength2DDistance = 10);
 
-      /// Trasan did output curlers in split two halves - this method can be used to mimic this. The new track is automatically added to the list of tracks.
+      /**
+       * Trasan did output curlers in split two halves - this method can be used to mimic this.
+       * The new track is automatically added to the list of tracks.
+       */
       static void splitSecondHalfOfTrack(CDCTrack& track, std::vector<CDCTrack>& tracks);
 
       /// Delete hits of the first superlayer if it is a stereo one (fitting does not work very well when starting with a stereo hit).
       static void moveToNextAxialLayer(CDCTrack& track);
-
-      /// Refit and resort the track. Unmask all hits.
-      static void normalizeTrack(CDCTrack& track);
     };
   }
 }

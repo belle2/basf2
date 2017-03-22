@@ -10,14 +10,13 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/BaseSegmentPairRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
-
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/BasicSegmentPairRelationVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/FitSegmentPairRelationVarSet.h>
 
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
+
+#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -40,8 +39,7 @@ namespace Belle2 {
       MVARealisticSegmentPairRelationFilter();
 
       /// Function to object for its signalness
-      Weight operator()(const Relation<const CDCSegmentPair>& relation) override;
+      Weight operator()(const Relation<const CDCSegmentPair>& relation) final;
     };
-
   }
 }

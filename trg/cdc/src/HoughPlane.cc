@@ -18,27 +18,29 @@
 
 namespace Belle2 {
 
-TRGCDCHoughPlane::TRGCDCHoughPlane(const std::string & name,
-                                   const TCHTransformation & trans,
-                                   unsigned nX,
-                                   float xMin,
-                                   float xMax,
-                                   unsigned nY,
-                                   float yMin,
-                                   float yMax)
+  TRGCDCHoughPlane::TRGCDCHoughPlane(const std::string& name,
+                                     const TCHTransformation& trans,
+                                     unsigned nX,
+                                     float xMin,
+                                     float xMax,
+                                     unsigned nY,
+                                     float yMin,
+                                     float yMax)
     : TRGCDCHoughPlaneBase(name, trans, nX, xMin, xMax, nY, yMin, yMax),
 //    _cell(new unsigned[nX * nY * sizeof(unsigned)]),
       _cell(new int[nX * nY]),
       _patterns(0),
-      _nPatterns(0) {
+      _nPatterns(0)
+  {
     clear();
-}
+  }
 
-TRGCDCHoughPlane::~TRGCDCHoughPlane() {
+  TRGCDCHoughPlane::~TRGCDCHoughPlane()
+  {
     delete [] _cell;
     if (_patterns)
-        delete [] _patterns;
-}
+      delete [] _patterns;
+  }
 
 // void
 // TRGCDCHoughPlane::vote(float x, float y) {
@@ -172,7 +174,7 @@ TRGCDCHoughPlane::~TRGCDCHoughPlane() {
 //         std::cout << "        crs0=(" << crs[0].x() << "," << crs[0].y()
 //                   << "),crs1=(" << crs[1].x() << "," << crs[1].y() << "),"
 //                   << std::endl;
-// #endif        
+// #endif
 
 //         //...Move...
 //         if (best == 0) {
@@ -194,17 +196,18 @@ TRGCDCHoughPlane::~TRGCDCHoughPlane() {
 //     }
 // }
 
-void
-TRGCDCHoughPlane::registerPattern(unsigned) {
+  void
+  TRGCDCHoughPlane::registerPattern(unsigned)
+  {
     if (_patterns) {
-        delete [] _patterns;
-        _nPatterns = 0;
+      delete [] _patterns;
+      _nPatterns = 0;
     }
     const unsigned n = nX() * nY();
 
     //...Check # of active cells...
     for (unsigned i = 0; i < n; i++)
-        if (_cell[i]) ++_nPatterns;
+      if (_cell[i]) ++_nPatterns;
 
     //...Create array...
     _patterns = new unsigned[_nPatterns];
@@ -212,17 +215,18 @@ TRGCDCHoughPlane::registerPattern(unsigned) {
     //...Store them...
     unsigned j = 0;
     for (unsigned i = 0; i < n; i++)
-        if (_cell[i]) _patterns[j++] = i;
-}
+      if (_cell[i]) _patterns[j++] = i;
+  }
 
-void
-TRGCDCHoughPlane::voteByPattern(float xOffset, int weight) {
+  void
+  TRGCDCHoughPlane::voteByPattern(float xOffset, int weight)
+  {
 #ifdef TRASAN_DEBUG
     if (_patterns == 0)
-        std::cout << "TRGCDCHoughPlane::vote !!! pattern is note defined" << std::endl;
+      std::cout << "TRGCDCHoughPlane::vote !!! pattern is note defined" << std::endl;
     if ((xOffset < 0) || (xOffset > 1))
-        std::cout << "TRGCDCHoughPlane::vote !!! xOffset should be (0 - 1). xOffset="
-               << xOffset << std::endl;
+      std::cout << "TRGCDCHoughPlane::vote !!! xOffset should be (0 - 1). xOffset="
+                << xOffset << std::endl;
 #endif
 
     const unsigned x = unsigned(nX() * xOffset);
@@ -230,9 +234,9 @@ TRGCDCHoughPlane::voteByPattern(float xOffset, int weight) {
     const unsigned n = nX() * nY();
 
     for (unsigned i = 0; i < _nPatterns; i++) {
-        unsigned id = _patterns[i] + p;
-        if (id > n) id -= n;
-        _cell[id] += weight;
+      unsigned id = _patterns[i] + p;
+      if (id > n) id -= n;
+      _cell[id] += weight;
     }
 
 //     const unsigned x = unsigned(nX() * xOffset);
@@ -245,7 +249,7 @@ TRGCDCHoughPlane::voteByPattern(float xOffset, int weight) {
 //         _cell[i] += _pattern[j++] * weight;
 
 //    std::cout << "--------------------------------" << std::endl;
-}
+  }
 
 } // namespace Belle2
 

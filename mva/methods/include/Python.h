@@ -33,6 +33,7 @@
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
 #include <boost/python/object.hpp>
+#include <boost/python/dict.hpp>
 #include <boost/python/import.hpp>
 #include <boost/python/extract.hpp>
 #if !defined(__GNUG__) || defined(__ICC)
@@ -74,8 +75,7 @@ namespace Belle2 {
       virtual std::string getMethod() const override { return "Python"; }
 
       std::string m_framework = "sklearn"; /**< framework to use e.g. sklearn, xgboost, theano, tensorflow, ... */
-      std::string m_steering_file =
-        "basf2_mva_empty.py"; /**< steering file provided by the user to override the functions in the framework */
+      std::string m_steering_file = ""; /**< steering file provided by the user to override the functions in the framework */
       std::string m_config = "null"; /**< Config string in json, which is passed to the get model function */
       unsigned int m_mini_batch_size = 0; /**< Mini batch size, 0 passes the whole data in one call */
       unsigned int m_nIterations = 1; /**< Number of iterations trough the whole data */

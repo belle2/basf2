@@ -15,6 +15,7 @@
 #include <iosfwd>
 #include <vector>
 #include <string>
+#include <map>
 
 namespace Belle2 {
 
@@ -31,7 +32,7 @@ namespace Belle2 {
 
     /** Logical file name getter.
      */
-    std::string getLfn() const {return m_lfn;}
+    const std::string& getLfn() const {return m_lfn;}
 
     /** Number of events getter.
      */
@@ -79,36 +80,47 @@ namespace Belle2 {
 
     /** Get LFN of parent file.
      *
+     *  @note Not range-checked!
      *  @param iParent The number of the parent file.
      */
-    std::string getParent(int iParent) const {return m_parentLfns[iParent];}
+    const std::string& getParent(int iParent) const {return m_parentLfns[iParent];}
 
     /** File creation date and time getter (UTC) */
-    std::string getDate() const {return m_date;}
+    const std::string& getDate() const {return m_date;}
 
     /** Site where the file was created getter.
      */
-    std::string getSite() const {return m_site;}
+    const std::string& getSite() const {return m_site;}
 
     /** User who created the file getter.
      */
-    std::string getUser() const {return m_user;}
+    const std::string& getUser() const {return m_user;}
 
     /** Random seed getter.
      */
-    std::string getRandomSeed() const {return m_randomSeed;}
+    const std::string& getRandomSeed() const {return m_randomSeed;}
 
     /** Software release version getter.
      */
-    std::string getRelease() const {return m_release;}
+    const std::string& getRelease() const {return m_release;}
 
     /** Steering file content getter.
      */
-    std::string getSteering() const {return m_steering;}
+    const std::string& getSteering() const {return m_steering;}
 
     /** Number of generated events getter.
      */
     unsigned int getMcEvents() const {return m_mcEvents;}
+
+    /** Get the database global tag used when creating this file. If more then
+     * one global tag was used by multiple conditions database instances all
+     * are concatenated using ',' as separation. If no conditions database was
+     * used an empty string is returned
+     */
+    const std::string& getDatabaseGlobalTag() const { return m_databaseGlobalTag; }
+
+    /** get data description. (Keys and values to be defined by the computing group) */
+    const std::map<std::string, std::string>& getDataDescription() const { return m_dataDescription; }
 
     /** Setter for LFN.
       *
@@ -172,6 +184,19 @@ namespace Belle2 {
      */
     void setMcEvents(unsigned int nEvents) {m_mcEvents = nEvents;}
 
+    /** Set the database global tag used when creating this file. If more then
+     * one global tag was used by multiple conditions database instances all
+     * should be concatenated using ',' as separation. If no conditions
+     * database was used an empty string should be set.
+     */
+    void setDatabaseGlobalTag(const std::string& globalTag) { m_databaseGlobalTag = globalTag; }
+
+    /** describe the data, if the key exists contents will be overwritten.
+     *
+     * (Keys and values to be defined by the computing group)
+     */
+    void setDataDescription(const std::string& key, const std::string& value) { m_dataDescription[key] = value; }
+
     /**
      * Exposes methods of the FileMetaData class to Python.
      */
@@ -179,7 +204,7 @@ namespace Belle2 {
 
     /** Print the content of the meta data object.
      *
-     *  @param option Use "all" to print everything, except steering file. Use "steering" for printing steering file.
+     *  @param option Use "all" to print everything, except steering file. Use "steering" for printing (only) steering file. "json" for machine-readable output
      */
     virtual void Print(Option_t* option = "") const override;
 
@@ -197,7 +222,7 @@ namespace Belle2 {
      *  @param physicalFileName The physical file name.
      *  @return True if metadata could be written
      */
-    bool write(std::ostream& output, std::string physicalFileName);
+    bool write(std::ostream& output, const std::string& physicalFileName) const;
 
   private:
 
@@ -233,7 +258,11 @@ namespace Belle2 {
 
     unsigned int m_mcEvents; /**< Number of generated events, 0 for real data.  */
 
-    ClassDefOverride(FileMetaData, 7); /**< Metadata information about a file. */
+    std::string m_databaseGlobalTag; /**< Global tag in the database used for production of this file */
+
+    std::map<std::string, std::string> m_dataDescription; /**< key-value store to describe the data. (for use by the computing group) */
+
+    ClassDefOverride(FileMetaData, 9); /**< Metadata information about a file. */
 
   }; //class
 

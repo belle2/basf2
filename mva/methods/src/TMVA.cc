@@ -92,9 +92,17 @@ namespace Belle2 {
     TMVATeacher::TMVATeacher(const GeneralOptions& general_options, const TMVAOptions& specific_options) : Teacher(general_options),
       specific_options(specific_options) { }
 
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
+    Weightfile TMVATeacher::trainFactory(TMVA::Factory& factory, TMVA::DataLoader& data_loader, std::string& jobName) const
+#else
     Weightfile TMVATeacher::trainFactory(TMVA::Factory& factory, std::string& jobName) const
+#endif
     {
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
+      data_loader.PrepareTrainingAndTestTree("", specific_options.m_prepareOption);
+#else
       factory.PrepareTrainingAndTestTree("", specific_options.m_prepareOption);
+#endif
 
       if (specific_options.m_type == "Plugins") {
         auto base = std::string("TMVA@@MethodBase");
@@ -109,7 +117,11 @@ namespace Belle2 {
         gROOT->GetPluginManager()->AddHandler(base.c_str(), regexp2.c_str(), className.c_str(), pluginName.c_str(), ctor2.c_str());
       }
 
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
+      if (!factory.BookMethod(&data_loader, specific_options.m_type, specific_options.m_method, specific_options.m_config)) {
+#else
       if (!factory.BookMethod(specific_options.m_type, specific_options.m_method, specific_options.m_config)) {
+#endif
         B2ERROR("TMVA Method with name " + specific_options.m_method + " cannot be booked.");
       }
 
@@ -119,6 +131,7 @@ namespace Belle2 {
       // Pipe stdout into a logfile to get TMVA output, which contains valueable information
       // which cannot be retreived otherwise!
       // Hence we do some black magic here
+      // TODO Using ROOT_VERSION 6.08  this should be possible without this workaround
       auto logfile = open(logfilename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
       auto saved_stdout = dup(STDOUT_FILENO);
       dup2(logfile, 1);
@@ -171,6 +184,7 @@ namespace Belle2 {
 
     }
 
+
     TMVATeacherClassification::TMVATeacherClassification(const GeneralOptions& general_options,
                                                          const TMVAOptionsClassification& specific_options) : TMVATeacher(general_options, specific_options),
       specific_options(specific_options) { }
@@ -179,6 +193,7 @@ namespace Belle2 {
     {
 
       unsigned int numberOfFeatures = training_data.getNumberOfFeatures();
+      unsigned int numberOfSpectators = training_data.getNumberOfSpectators();
       unsigned int numberOfEvents = training_data.getNumberOfEvents();
 
       WorkingDirectoryManager dummy(specific_options.m_workingDirectory);
@@ -190,14 +205,35 @@ namespace Belle2 {
       classFile.cd();
 
       TMVA::Tools::Instance();
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
+      TMVA::DataLoader data_loader(jobName);
+#endif
       TMVA::Factory factory(jobName, &classFile, specific_options.m_factoryOption);
+
 
       // Add variables to the factory
       for (auto& var : m_general_options.m_variables) {
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
+        data_loader.AddVariable(Belle2::makeROOTCompatible(var));
+#else
         factory.AddVariable(Belle2::makeROOTCompatible(var));
+#endif
       }
 
+      // Add variables to the factory
+      for (auto& var : m_general_options.m_spectators) {
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
+        data_loader.AddSpectator(Belle2::makeROOTCompatible(var));
+#else
+        factory.AddSpectator(Belle2::makeROOTCompatible(var));
+#endif
+      }
+
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
+      data_loader.SetWeightExpression(Belle2::makeROOTCompatible(m_general_options.m_weight_variable));
+#else
       factory.SetWeightExpression(Belle2::makeROOTCompatible(m_general_options.m_weight_variable));
+#endif
 
       TTree* signal_tree = new TTree("signal_tree", "signal_tree");
       TTree* background_tree = new TTree("background_tree", "background_tree");
@@ -207,6 +243,13 @@ namespace Belle2 {
                             &training_data.m_input[iFeature]);
         background_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]).c_str(),
                                 &training_data.m_input[iFeature]);
+      }
+
+      for (unsigned int iSpectator = 0; iSpectator < numberOfSpectators; ++iSpectator) {
+        signal_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_spectators[iSpectator]).c_str(),
+                            &training_data.m_spectators[iSpectator]);
+        background_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_spectators[iSpectator]).c_str(),
+                                &training_data.m_spectators[iSpectator]);
       }
 
       signal_tree->Branch("__weight__", &training_data.m_weight);
@@ -221,10 +264,16 @@ namespace Belle2 {
         }
       }
 
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
+      data_loader.AddSignalTree(signal_tree);
+      data_loader.AddBackgroundTree(background_tree);
+      auto weightfile = trainFactory(factory, data_loader, jobName);
+#else
       factory.AddSignalTree(signal_tree);
       factory.AddBackgroundTree(background_tree);
-
       auto weightfile = trainFactory(factory, jobName);
+#endif
+
       weightfile.addOptions(specific_options);
       weightfile.addSignalFraction(training_data.getSignalFraction());
 
@@ -243,6 +292,7 @@ namespace Belle2 {
     {
 
       unsigned int numberOfFeatures = training_data.getNumberOfFeatures();
+      unsigned int numberOfSpectators = training_data.getNumberOfSpectators();
       unsigned int numberOfEvents = training_data.getNumberOfEvents();
 
       WorkingDirectoryManager dummy(specific_options.m_workingDirectory);
@@ -254,13 +304,34 @@ namespace Belle2 {
       classFile.cd();
 
       TMVA::Tools::Instance();
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
+      TMVA::DataLoader data_loader(jobName);
+#endif
       TMVA::Factory factory(jobName, &classFile, specific_options.m_factoryOption);
 
       // Add variables to the factory
       for (auto& var : m_general_options.m_variables) {
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
+        data_loader.AddVariable(Belle2::makeROOTCompatible(var));
+#else
         factory.AddVariable(Belle2::makeROOTCompatible(var));
+#endif
       }
+
+      // Add variables to the factory
+      for (auto& var : m_general_options.m_spectators) {
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
+        data_loader.AddSpectator(Belle2::makeROOTCompatible(var));
+#else
+        factory.AddSpectator(Belle2::makeROOTCompatible(var));
+#endif
+      }
+
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
+      data_loader.AddTarget(Belle2::makeROOTCompatible(m_general_options.m_target_variable));
+#else
       factory.AddTarget(Belle2::makeROOTCompatible(m_general_options.m_target_variable));
+#endif
 
 
       TTree* regression_tree = new TTree("regression_tree", "regression_tree");
@@ -268,6 +339,10 @@ namespace Belle2 {
       for (unsigned int iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
         regression_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]).c_str(),
                                 &training_data.m_input[iFeature]);
+      }
+      for (unsigned int iSpectator = 0; iSpectator < numberOfSpectators; ++iSpectator) {
+        regression_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_spectators[iSpectator]).c_str(),
+                                &training_data.m_spectators[iSpectator]);
       }
       regression_tree->Branch(Belle2::makeROOTCompatible(m_general_options.m_target_variable).c_str(),
                               &training_data.m_target);
@@ -279,10 +354,17 @@ namespace Belle2 {
         regression_tree->Fill();
       }
 
+#if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
+      data_loader.AddRegressionTree(regression_tree);
+      data_loader.SetWeightExpression(Belle2::makeROOTCompatible(m_general_options.m_weight_variable), "Regression");
+
+      auto weightfile = trainFactory(factory, data_loader, jobName);
+#else
       factory.AddRegressionTree(regression_tree);
       factory.SetWeightExpression(Belle2::makeROOTCompatible(m_general_options.m_weight_variable), "Regression");
 
       auto weightfile = trainFactory(factory, jobName);
+#endif
       weightfile.addOptions(specific_options);
 
       delete regression_tree;

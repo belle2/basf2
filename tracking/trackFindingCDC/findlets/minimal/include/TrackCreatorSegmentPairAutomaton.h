@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
-#include <tracking/trackFindingCDC/ca/WeightedRelation.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 #include <tracking/trackFindingCDC/ca/Path.h>
 
 #include <vector>
@@ -24,15 +24,11 @@ namespace Belle2 {
 
     /// Findlet that generates tracks based on a cellular automaton of segment pairs
     class TrackCreatorSegmentPairAutomaton
-      : public Findlet<const CDCSegmentPair,
-        const WeightedRelation<const CDCSegmentPair>,
-        CDCTrack> {
+      : public Findlet<const CDCSegmentPair, const WeightedRelation<const CDCSegmentPair>, CDCTrack> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCSegmentPair,
-            const WeightedRelation<const CDCSegmentPair>,
-            CDCTrack>;
+      using Super = Findlet<const CDCSegmentPair, const WeightedRelation<const CDCSegmentPair>, CDCTrack>;
 
     public:
       /// Short description of the findlet
@@ -50,7 +46,7 @@ namespace Belle2 {
 
     private: // object pools
       /// Memory for the segment pair paths generated from the graph.
-      std::vector< Path<const CDCSegmentPair> > m_segmentPairPaths;
+      std::vector<Path<const CDCSegmentPair>> m_segmentPairPaths;
     };
   }
 }

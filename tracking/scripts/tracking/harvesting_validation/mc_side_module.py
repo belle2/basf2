@@ -83,14 +83,14 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
 
             found_det_hit_ids |= det_hit_ids
 
-            if track_match_look_up.isMatchedPRTrackCand(reco_track):
+            if track_match_look_up.isMatchedPRRecoTrack(reco_track):
                 matched_det_hit_ids |= det_hit_ids
 
-            if track_match_look_up.isClonePRTrackCand(reco_track):
+            if track_match_look_up.isClonePRRecoTrack(reco_track):
                 clone_det_hit_ids |= det_hit_ids
 
-            if (track_match_look_up.isGhostPRTrackCand(reco_track) or
-                    track_match_look_up.isBackgroundPRTrackCand(reco_track)):
+            if (track_match_look_up.isGhostPRRecoTrack(reco_track) or
+                    track_match_look_up.isBackgroundPRRecoTrack(reco_track)):
                 fake_det_hit_ids |= det_hit_ids
 
         self.found_det_hit_ids = found_det_hit_ids
@@ -127,11 +127,10 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
     def peel_mc_to_pr_match_info(self, mc_reco_track):
         track_match_look_up = self.track_match_look_up
         return dict(
-            is_matched=track_match_look_up.isMatchedMCTrackCand(mc_reco_track),
-            is_merged=track_match_look_up.isMergedMCTrackCand(mc_reco_track),
-            is_missing=track_match_look_up.isMissingMCTrackCand(mc_reco_track),
+            is_matched=track_match_look_up.isMatchedMCRecoTrack(mc_reco_track),
+            is_merged=track_match_look_up.isMergedMCRecoTrack(mc_reco_track),
+            is_missing=track_match_look_up.isMissingMCRecoTrack(mc_reco_track),
             hit_efficiency=track_match_look_up.getRelatedEfficiency(mc_reco_track),
-            hit_purity=track_match_look_up.getRelatedPurity(mc_reco_track),
         )
 
     def peel_hit_efficiencies_in_all_pr_tracks(self, mc_reco_track):
@@ -169,15 +168,17 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
         aggregation=np.nanmean,
         key="{part_name}",
         select={"is_matched": "finding efficiency", "hit_efficiency": "hit efficiency", },
+        filter_on="is_primary",
         description="""
-finding efficiency - the ratio of matched Monte Carlo tracks to all Monte Carlo tracks
-hit efficiency - the ratio of hits picked up by a matched Carlo track  to all Monte Carlo tracks
+finding efficiency - the ratio of matched primary Monte Carlo tracks to all Monte Carlo tracks
+hit efficiency - the ratio of hits picked up by the matched pattern recognition track of primary Monte Carlo tracks
 """
     )
 
     # Save a histogram of the hit efficiency
     save_hit_efficiency_histogram = refiners.save_histograms(
         select={"hit_efficiency": "hit efficiency"},
+        filter_on="is_primary",
         description="Not a serious plot yet.",
     )
 
@@ -195,6 +196,7 @@ hit efficiency - the ratio of hits picked up by a matched Carlo track  to all Mo
         select=renaming_select_for_finding_efficiency_profiles,
         y='finding efficiency',
         y_binary=True,
+        filter_on="is_primary",
         outlier_z_score=5.0,
         allow_discrete=True,
     )
@@ -206,6 +208,7 @@ hit efficiency - the ratio of hits picked up by a matched Carlo track  to all Mo
         },
         y='finding efficiency',
         y_binary=True,
+        filter_on="is_primary",
         outlier_z_score=5.0,
         lower_bound=-1.73,
         upper_bound=3.27,
@@ -218,6 +221,7 @@ hit efficiency - the ratio of hits picked up by a matched Carlo track  to all Mo
         },
         y='finding efficiency',
         y_binary=True,
+        filter_on="is_primary",
         groupby=[("pt_truth", [0.070, 0.250, 0.600])],
         outlier_z_score=5.0,
         lower_bound=-1.73,
@@ -238,6 +242,7 @@ hit efficiency - the ratio of hits picked up by a matched Carlo track  to all Mo
         select=renaming_select_for_hit_efficiency_profiles,
         y='hit efficiency',
         y_binary=True,
+        filter_on="is_primary",
         outlier_z_score=5.0,
         allow_discrete=True,
     )
@@ -249,6 +254,7 @@ hit efficiency - the ratio of hits picked up by a matched Carlo track  to all Mo
         },
         y='hit efficiency',
         y_binary=True,
+        filter_on="is_primary",
         outlier_z_score=5.0,
         lower_bound=-1.73,
         upper_bound=3.27,

@@ -30,8 +30,6 @@ from vertex import *
 from modularAnalysis import *
 from reconstruction import *
 from stdFSParticles import *
-from stdLooseFSParticles import *
-
 
 # load input ROOT file
 inputMdst('default', '../mdst-dstars.root')
@@ -40,16 +38,16 @@ inputMdst('default', '../mdst-dstars.root')
 # Create and fill final state ParticleLists
 # --------------------------------------------------
 
-fillParticleList('pi+:std', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4')
-fillParticleList('K+:std', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4')
+fillParticleList('pi+:all', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4')
+fillParticleList('K+:all', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4')
 
 
 # reconstruct D0:kpi and perform a mass constrained vertex fit
-reconstructDecay('D0:kpi -> K-:std pi+:std', '1.835 < M < 1.895')
+reconstructDecay('D0:kpi -> K-:all pi+:all', '1.835 < M < 1.895')
 vertexRave('D0:kpi', 0.001)
 
-# reconstruct the D*+ from the D0:kpi and pi+:std
-reconstructDecay('D*+:sig -> D0:kpi pi+:std', '1.7 < M < 2.3')
+# reconstruct the D*+ from the D0:kpi and pi+:all
+reconstructDecay('D*+:sig -> D0:kpi pi+:all', '1.7 < M < 2.3')
 
 
 # --------------------------------------------------
@@ -58,9 +56,9 @@ reconstructDecay('D*+:sig -> D0:kpi pi+:std', '1.7 < M < 2.3')
 
 # information to be saved to file
 toolsnu = ['EventMetaData', '^D*+:sig']
-toolsnu += ['Kinematics', '^D*+:sig -> [^D0:kpi -> ^K-:std ^pi+:std] ^pi+:std']
-toolsnu += ['InvMass[BeforeFit]', '^D*+:sig -> [^D0:kpi -> K-:std pi+:std] pi+:std']
-toolsnu += ['PID', 'D*+:sig -> [D0:kpi -> ^K-:std ^pi+:std] ^pi+:std']
+toolsnu += ['Kinematics', '^D*+:sig -> [^D0:kpi -> ^K-:all ^pi+:all] ^pi+:all']
+toolsnu += ['InvMass[BeforeFit]', '^D*+:sig -> [^D0:kpi -> K-:all pi+:all] pi+:all']
+toolsnu += ['PID', 'D*+:sig -> [D0:kpi -> ^K-:all ^pi+:all] ^pi+:all']
 
 # write out the flat ntuple
 ntupleFile('../ana-dstars.root')

@@ -1,13 +1,7 @@
-
-#include <tracking/trackFindingCDC/config/CompileConfiguration.h>
-
 #pragma link off all globals;
 #pragma link off all classes;
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
-
-
-#ifdef TRACKFINDINGCDC_USE_ROOT_DICTIONARY
 
 #pragma link C++ class Belle2::TrackFindingCDC::Vector2D+;
 #pragma link C++ class Belle2::TrackFindingCDC::Vector3D+;
@@ -31,5 +25,3 @@
 #pragma link C++ class Belle2::TrackFindingCDC::Helix+;
 #pragma link C++ defined_in "HelixParameters.h";
 #pragma link C++ class Belle2::TrackFindingCDC::UncertainHelix+;
-
-#endif

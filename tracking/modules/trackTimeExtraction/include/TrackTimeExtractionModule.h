@@ -58,6 +58,8 @@ namespace Belle2 {
     bool m_param_overwriteExistingEstimation = true;
     /// Module parameter: Hard cut on this value of extracted times in the positive as well as the negative direction.
     double m_param_maximalExtractedT0 = 20;
+    /// Module Parameter: Use this as sigma t0.
+    double m_param_t0Uncertainty = 5.1;
 
     /// Pointer to the storage of the eventwise T0 estimation in the data store.
     StoreObjPtr<EventT0> m_eventT0;

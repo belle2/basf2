@@ -172,7 +172,7 @@ namespace Belle2 {
       /** counter for send unfiltered */
       unsigned int m_sendunfiltered{0};
       /** flag send unfiltered */
-      bool m_event_unfiltered{false};
+      // Unused - commented out! bool m_event_unfiltered{false};
     };//end class declaration
 
 

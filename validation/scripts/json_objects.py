@@ -30,10 +30,10 @@ class Revision(JsonBase):
         #  was created, as datetime object
         self.creation_date = creation_date
 
-        # timezone used by the creation date
+        #: timezone used by the creation date
         self.creation_timezone = creation_timezone
 
-        # The git commit hash which has the HEAD while the validation
+        #: The git commit hash which has the HEAD while the validation
         # scripts were executed
         self.git_hash = git_hash
 

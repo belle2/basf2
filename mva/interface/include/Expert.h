@@ -25,10 +25,6 @@ namespace Belle2 {
      * Abstract base class of all Expert
      * Each MVA library has its own implementation of this class,
      * so all libraries can be accessed via this common interface
-     *
-     * NeuroBayes has another class also named Expert in the global namespace.
-     * Therefore we use MVA::Expert throughout the code so the IDE doesn't get confused,
-     * the compiler however chooses always the correct one if not further specified.
      */
     class Expert {
     public:

@@ -9,20 +9,28 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facet/MCFacetFilter.h>
 
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
+
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
-#include <framework/logging/Logger.h>
+
 #include <cmath>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+MCFacetFilter::MCFacetFilter(bool allowReverse)
+  : Super(allowReverse)
+{
+}
+
 Weight MCFacetFilter::operator()(const CDCFacet& facet)
 {
-  const int inTrackHitDistanceTolerance = 3;
-  bool isCorrectFacet = operator()(facet, inTrackHitDistanceTolerance);
+  const int maxInTrackHitIdDifference = 3;
+  bool isCorrectFacet = operator()(facet, maxInTrackHitIdDifference);
 
   bool isCorrectReverseFacet =
-    getAllowReverse() and operator()(facet.reversed(), inTrackHitDistanceTolerance);
+    this->getAllowReverse() and operator()(facet.reversed(), maxInTrackHitIdDifference);
 
   if (isCorrectFacet) {
     if (facet.getFitLine()->isInvalid()) {
@@ -40,7 +48,7 @@ Weight MCFacetFilter::operator()(const CDCFacet& facet)
 }
 
 bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
-                               int inTrackHitDistanceTolerance)
+                               int maxInTrackHitIdDifference)
 {
   const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
 
@@ -85,28 +93,26 @@ bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
       makeNoDifferenceForReassignedSecondaries) {
 
     distanceInTrackIsSufficientlyLow =
-      0 < startToMiddleInTrackDistance and startToMiddleInTrackDistance <= inTrackHitDistanceTolerance and
-      0 < middleToEndInTrackDistance and middleToEndInTrackDistance <= inTrackHitDistanceTolerance;
+      0 < startToMiddleInTrackDistance and startToMiddleInTrackDistance <= maxInTrackHitIdDifference and
+      0 < middleToEndInTrackDistance and middleToEndInTrackDistance <= maxInTrackHitIdDifference;
 
   } else if (not startIsReassigned and not middleIsReassigned) {
 
     distanceInTrackIsSufficientlyLow =
-      0 < startToMiddleInTrackDistance and startToMiddleInTrackDistance <= inTrackHitDistanceTolerance;
+      0 < startToMiddleInTrackDistance and startToMiddleInTrackDistance <= maxInTrackHitIdDifference;
 
   } else if (not middleIsReassigned and not endIsReassigned) {
 
     distanceInTrackIsSufficientlyLow =
-      0 < middleToEndInTrackDistance and middleToEndInTrackDistance <= inTrackHitDistanceTolerance;
+      0 < middleToEndInTrackDistance and middleToEndInTrackDistance <= maxInTrackHitIdDifference;
 
   } else if (not startIsReassigned and not endIsReassigned) {
 
     distanceInTrackIsSufficientlyLow =
-      0 < startToEndInTrackDistance and startToEndInTrackDistance <= 2 * inTrackHitDistanceTolerance;
+      0 < startToEndInTrackDistance and startToEndInTrackDistance <= 2 * maxInTrackHitIdDifference;
 
   } else {
-
-    // can not say anything about the in
-
+    // can not say anything about the two or more reassigned hits.
   }
 
   if (not distanceInTrackIsSufficientlyLow) return false;

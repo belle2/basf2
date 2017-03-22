@@ -19,6 +19,8 @@ class TTree;
 class TClass;
 
 namespace Belle2 {
+  class FileMetaData;
+
   /** Some constants and helpers common to the RootInput and RootOutput modules. */
   namespace RootIOUtilities {
     /** Given a list of input branches and lists of branches to include/exclude, returns a list of branches that are accepted.
@@ -61,6 +63,17 @@ namespace Belle2 {
     /** Load dictionaries for classes found in input files. */
     void loadDictionaries();
 
+    /** Fill the creation info of a file meta data: site, user, data */
+    void setCreationData(FileMetaData& metadata);
+
+    /** Return git SHA1 hashes taking into account local & central release.
+     *
+     * ID is a combined hash $CENTRAL_SHA1[+$LOCAL_SHA1][-modified],
+     * or just SHA1[-modified] if only one release or they are on the
+     * same revision.
+     * Empty string denotes at least one untracked release directory.
+     */
+    std::string getCommitID();
 
     /** Names of trees. */
     extern const std::string c_treeNames[];

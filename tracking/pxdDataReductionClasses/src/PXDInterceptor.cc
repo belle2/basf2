@@ -10,6 +10,7 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/MeasurementFactory.h>
+#include <genfit/AbsTrackRep.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 #include <framework/datastore/StoreArray.h>
@@ -79,7 +80,7 @@ PXDInterceptor::appendIntercepts(StoreArray<PXDIntercept>* interceptList, std::l
 
   PXDIntercept tmpPXDIntercept;
 
-  genfit::Track gfTrack = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
+  genfit::Track& gfTrack = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
 
   std::list<ROIDetPlane>::iterator itPlanes = planeList.begin();
 

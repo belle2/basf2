@@ -21,12 +21,12 @@
 #include <boost/cstdint.hpp>
 #include <boost/spirit/home/support/detail/endian.hpp>
 
-using namespace boost::spirit::endian;
 
 namespace Belle2 {
 
   namespace PXD {
 
+    using namespace boost::spirit::endian;
 #define ONSEN_MAX_TYPE_ERR  32
 
     /** The PXDClusterMerger module.

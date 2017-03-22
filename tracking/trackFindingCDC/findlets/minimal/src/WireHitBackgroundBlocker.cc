@@ -57,8 +57,8 @@ void WireHitBackgroundBlocker::apply(std::vector<CDCWireHit>& wireHits)
     }
 
     if (markAsBackground) {
-      wireHit.getAutomatonCell().setBackgroundFlag();
-      wireHit.getAutomatonCell().setTakenFlag();
+      wireHit->setBackgroundFlag();
+      wireHit->setTakenFlag();
     }
   }
 }

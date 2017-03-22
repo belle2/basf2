@@ -30,8 +30,6 @@ from vertex import *
 from modularAnalysis import *
 from reconstruction import *
 from stdFSParticles import *
-from stdLooseFSParticles import *
-
 
 # load input ROOT file
 inputMdst('default', '../mdst-xi-lambda.root')
@@ -41,15 +39,15 @@ inputMdst('default', '../mdst-xi-lambda.root')
 # --------------------------------------------------
 
 fillParticleList('pi+:xi', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4')
-fillParticleList('pi+:std', 'chiProb > 0.001')
-fillParticleList('p+:std', 'chiProb > 0.001')
+fillParticleList('pi+:all', 'chiProb > 0.001')
+fillParticleList('p+:all', 'chiProb > 0.001')
 
 
 # reconstruct Lambda:ppi
-reconstructDecay('Lambda0:ppi -> p+:std pi-:std', '1.100 < M < 1.130')
+reconstructDecay('Lambda0:ppi -> p+:all pi-:all', '1.100 < M < 1.130')
 massVertexRave('Lambda0:ppi', 0.001)
 
-# reconstruct the Xi+ from the Lambda:ppi and pi+:std
+# reconstruct the Xi+ from the Lambda:ppi and pi+:all
 reconstructDecay('Xi-:sig -> Lambda0:ppi pi-:xi', '1.300 < M < 1.340')
 vertexRave('Xi-:sig', 0.001)
 
@@ -60,11 +58,11 @@ vertexRave('Xi-:sig', 0.001)
 
 # information to be saved to file
 toolsnu = ['EventMetaData', '^Xi-']
-toolsnu += ['Kinematics', '^Xi- -> [^Lambda0 -> ^p+:std ^pi-:std] ^pi-:xi']
-toolsnu += ['InvMass[BeforeFit]', '^Xi- -> [^Lambda0 -> p+:std pi-:std] pi-:xi']
-toolsnu += ['PID', 'Xi- -> [Lambda0 -> ^p+:std ^pi-:std] ^pi-:xi']
-toolsnu += ['Vertex', '^Xi- -> [^Lambda0 -> p+:std pi-:std] pi-:xi']
-toolsnu += ['FlightInfo', '^Xi- -> [^Lambda0 -> p+:std pi-:std] pi-:xi']
+toolsnu += ['Kinematics', '^Xi- -> [^Lambda0 -> ^p+:all ^pi-:all] ^pi-:xi']
+toolsnu += ['InvMass[BeforeFit]', '^Xi- -> [^Lambda0 -> p+:all pi-:all] pi-:xi']
+toolsnu += ['PID', 'Xi- -> [Lambda0 -> ^p+:all ^pi-:all] ^pi-:xi']
+toolsnu += ['Vertex', '^Xi- -> [^Lambda0 -> p+:all pi-:all] pi-:xi']
+toolsnu += ['FlightInfo', '^Xi- -> [^Lambda0 -> p+:all pi-:all] pi-:xi']
 
 # write out the flat ntuple
 ntupleFile('../ana-xi-lambda.root')

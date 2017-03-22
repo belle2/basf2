@@ -54,6 +54,7 @@ namespace Belle2 {
       std::vector<SVDDigit> m_digitcopy;
       /** Mode: if true, merge duplicate pixels, otherwise delete all but the first occurence */
       bool m_mergeDuplicates;
+      /** Minimum number of samples over threshold to accept the digit */
       int m_minSamples;
       /** Low limit of ADC range in electrons. */
       double m_minADC;

@@ -2,6 +2,7 @@
 ! TOP counter for Belle II: Alignment
 ! M. Staric, sep-2015
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
+! mar-2017: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE TOP_ALIGNMENT(NP,PAR,STEP,UM,DPAR,COV,IER)

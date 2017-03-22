@@ -11,6 +11,7 @@
 #include <top/modules/TOPDigitizer/TOPDigitizerModule.h>
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/modules/TOPDigitizer/TimeDigitizer.h>
+#include <top/modules/TOPDigitizer/PulseHeightGenerator.h>
 
 // Hit classes
 #include <top/dataobjects/TOPSimHit.h>
@@ -59,10 +60,27 @@ namespace Belle2 {
     // Add parameters
     addParam("timeZeroJitter", m_timeZeroJitter,
              "r.m.s of T0 jitter [ns]", 25e-3);
+    addParam("electronicJitter", m_electronicJitter,
+             "r.m.s of electronic jitter [ns], "
+             "if negative the one from TOPNominalTDC is used", -1.0);
     addParam("darkNoise", m_darkNoise,
              "uniformly distributed dark noise (hits per module)", 0.0);
     addParam("trigT0Sigma", m_trigT0Sigma,
              "trigger T0 resolution [ns], if >0 trigger T0 will be simulated", 0.0);
+    addParam("ADCx0", m_ADCx0,
+             "pulse height distribution parameter [ADC counts]", 3.0);
+    addParam("ADCp1", m_ADCp1,
+             "pulse height distribution parameter (must be non-negative)", 3.85);
+    addParam("ADCp2", m_ADCp2,
+             "pulse height distribution parameter (must be non-negative)", 0.544);
+    addParam("ADCmax", m_ADCmax,
+             "pulse height upper bound of range [ADC counts]", 2000.0);
+    addParam("pedestalRMS", m_pedestalRMS,
+             "r.m.s of pedestals [ADC counts]", 10.0);
+    addParam("threshold", m_threshold,
+             "pulse height threshold [ADC counts]", (short) 40);
+    addParam("thresholdCount", m_thresholdCount,
+             "minimal number of samples above threshold", (short) 3);
 
   }
 
@@ -91,6 +109,13 @@ namespace Belle2 {
 
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
+    if (m_electronicJitter < 0) {
+      m_electronicJitter = geo->getNominalTDC().getTimeJitter();
+    } else {
+      B2WARNING("Electronic time jitter is explicitely set in TOPDigitizer to "
+                << m_electronicJitter << " ns");
+    }
+
     // set pile-up and double hit resolution times (needed for BG overlay)
     TOPDigit::setDoubleHitResolution(geo->getNominalTDC().getDoubleHitResolution());
     TOPDigit::setPileupTime(geo->getNominalTDC().getPileupTime());
@@ -99,6 +124,7 @@ namespace Belle2 {
     if (m_trigT0Sigma > 0) {
       m_bunchTimeSep = geo->getNominalTDC().getBunchSeparationTime();
     }
+
   }
 
   void TOPDigitizerModule::beginRun()
@@ -119,6 +145,13 @@ namespace Belle2 {
     // output: simulated bunch values
     StoreObjPtr<TOPRecBunch> recBunch;
     if (!recBunch.isValid()) recBunch.create();
+
+    // pulse height generator
+    TOP::PulseHeightGenerator pulseHeightGenerator(m_ADCx0, m_ADCp1, m_ADCp2, m_ADCmax);
+    pulseHeightGenerator.setPedestalRMS(m_pedestalRMS);
+
+    // storage window number
+    unsigned window = int(gRandom->Rndm() * 512);
 
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
@@ -149,14 +182,16 @@ namespace Belle2 {
       double x = simHit.getX();
       double y = simHit.getY();
       int pmtID = simHit.getPmtID();
-      int pixelID = geo->getPMTArray().getPixelID(x, y, pmtID);
+      int moduleID = simHit.getModuleID();
+      if (!geo->isModuleIDValid(moduleID)) continue;
+      int pixelID = geo->getModule(moduleID).getPMTArray().getPixelID(x, y, pmtID);
       if (pixelID == 0) continue;
 
       // add TTS to photon time and make it relative to start time
       double time = simHit.getTime() + tts.generateTTS() - startTime;
 
       // add time to digitizer of a given pixel
-      TimeDigitizer digitizer(simHit.getModuleID(), pixelID);
+      TimeDigitizer digitizer(moduleID, pixelID, window, pulseHeightGenerator);
       unsigned id = digitizer.getUniqueID();
       Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
       it->second.addTimeOfHit(time, &simHit);
@@ -165,15 +200,15 @@ namespace Belle2 {
     // add randomly distributed dark noise
     if (m_darkNoise > 0) {
       int numModules = geo->getNumModules();
-      int numPixels = geo->getPMTArray().getNumPixels();
       double timeMin = geo->getNominalTDC().getTimeMin();
       double timeMax = geo->getNominalTDC().getTimeMax();
       for (int moduleID = 1; moduleID <= numModules; moduleID++) {
+        int numPixels = geo->getModule(moduleID).getPMTArray().getNumPixels();
         int numHits = gRandom->Poisson(m_darkNoise);
         for (int i = 0; i < numHits; i++) {
           int pixelID = int(gRandom->Rndm() * numPixels) + 1;
           double time = (timeMax - timeMin) * gRandom->Rndm() + timeMin;
-          TimeDigitizer digitizer(moduleID, pixelID);
+          TimeDigitizer digitizer(moduleID, pixelID, window, pulseHeightGenerator);
           unsigned id = digitizer.getUniqueID();
           Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
           it->second.addTimeOfHit(time);
@@ -182,10 +217,9 @@ namespace Belle2 {
     }
 
     // digitize in time
-    double electronicJitter = geo->getNominalTDC().getTimeJitter();
     for (auto& pixel : pixels) {
-      // pixel.second.digitize(digits, electronicJitter);
-      pixel.second.digitize(rawDigits, digits, electronicJitter);
+      pixel.second.digitize(rawDigits, digits,
+                            m_threshold, m_thresholdCount, m_electronicJitter);
     }
 
   }

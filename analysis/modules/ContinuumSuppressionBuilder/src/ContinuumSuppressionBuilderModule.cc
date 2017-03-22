@@ -38,8 +38,8 @@ ContinuumSuppressionBuilderModule::ContinuumSuppressionBuilderModule() : Module(
   // Parameter definitions
   addParam("particleList", m_particleList, "Name of the ParticleList", std::string(""));
 
-  // TODO: Add a parameter to select use_finalstate_for_sig==0 or ==1.
-  // addParam("FinalStateForSignalSelection",     m_finalStateForSignalSelection,     "Final state for signal selection criteria",      defaultSelection);
+  addParam("ROEMask", m_ROEMask, "ROE mask", std::string(""));
+
 }
 
 void ContinuumSuppressionBuilderModule::initialize()
@@ -61,7 +61,7 @@ void ContinuumSuppressionBuilderModule::event()
   StoreObjPtr<ParticleList> plist(m_particleList);
 
   for (unsigned i = 0; i < plist->getListSize(); i++) {
-    addContinuumSuppression(plist->getParticle(i));
+    addContinuumSuppression(plist->getParticle(i), m_ROEMask);      // pass the ROEMask to cs.cc here as a second argument.
   }
 }
 

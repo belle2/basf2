@@ -14,6 +14,8 @@
 #include <tracking/trackFitting/measurementCreator/factories/CDCMeasurementCreatorFactory.h>
 #include <tracking/trackFitting/measurementCreator/factories/SVDMeasurementCreatorFactory.h>
 #include <tracking/trackFitting/measurementCreator/factories/PXDMeasurementCreatorFactory.h>
+#include <tracking/trackFitting/measurementCreator/factories/BKLMMeasurementCreatorFactory.h>
+#include <tracking/trackFitting/measurementCreator/factories/EKLMMeasurementCreatorFactory.h>
 #include <tracking/trackFitting/measurementCreator/factories/AdditionalMeasurementCreatorFactory.h>
 
 #include <genfit/MeasurementFactory.h>
@@ -74,10 +76,13 @@ namespace Belle2 {
      * Create a new instance of the measurement adder.
      * You probably only have to do this once in your module, except the case you want to test out different settings.
      */
-    MeasurementAdder(const std::string& storeArrayNameOfCDCHits,
+    MeasurementAdder(const std::string& storeArrayNameOfPXDHits,
                      const std::string& storeArrayNameOfSVDHits,
-                     const std::string& storeArrayNameOfPXDHits,
-                     const bool& cosmicsTemporaryFix = false);
+                     const std::string& storeArrayNameOfCDCHits,
+                     const std::string& storeArrayNameOfBKLMHits,
+                     const std::string& storeArrayNameOfEKLMHits,
+                     const bool& cosmicsTemporaryFix = false,
+                     const bool initializeCDCTranslators = true);
 
     /**
      * Reset the internal measurement creator storage to the default settings.
@@ -96,9 +101,11 @@ namespace Belle2 {
      * and the track must be refitted afterwards.
      */
     void resetMeasurementCreators(
-      const std::vector<std::shared_ptr<CDCBaseMeasurementCreator>>& cdcMeasurementCreators,
-      const std::vector<std::shared_ptr<SVDBaseMeasurementCreator>>& svdMeasurementCreators,
       const std::vector<std::shared_ptr<PXDBaseMeasurementCreator>>& pxdMeasurementCreators,
+      const std::vector<std::shared_ptr<SVDBaseMeasurementCreator>>& svdMeasurementCreators,
+      const std::vector<std::shared_ptr<CDCBaseMeasurementCreator>>& cdcMeasurementCreators,
+      const std::vector<std::shared_ptr<BKLMBaseMeasurementCreator>>& bklmMeasurementCreators,
+      const std::vector<std::shared_ptr<EKLMBaseMeasurementCreator>>& eklmMeasurementCreators,
       const std::vector<std::shared_ptr<BaseMeasurementCreator>>& additionalMeasurementCreators);
 
     /**
@@ -119,9 +126,11 @@ namespace Belle2 {
      * and the track must be refitted afterwards.
      */
     void resetMeasurementCreatorsUsingFactories(
-      const std::map<std::string, std::map<std::string, std::string>>& cdcMeasurementCreators,
-      const std::map<std::string, std::map<std::string, std::string>>& svdMeasurementCreators,
       const std::map<std::string, std::map<std::string, std::string>>& pxdMeasurementCreators,
+      const std::map<std::string, std::map<std::string, std::string>>& svdMeasurementCreators,
+      const std::map<std::string, std::map<std::string, std::string>>& cdcMeasurementCreators,
+      const std::map<std::string, std::map<std::string, std::string>>& bklmMeasurementCreators,
+      const std::map<std::string, std::map<std::string, std::string>>& eklmMeasurementCreators,
       const std::map<std::string, std::map<std::string, std::string>>& additionalMeasurementCreators);
 
     /**
@@ -139,21 +148,29 @@ namespace Belle2 {
     bool addMeasurements(RecoTrack& recoTrack) const;
 
   private:
-    /// The name of the store array for the CDC hits.
-    std::string m_param_storeArrayNameOfCDCHits = "";
-    /// The name of the store array for the SVD hits.
-    std::string m_param_storeArrayNameOfSVDHits = "";
     /// The name of the store array for the PXD hits.
     std::string m_param_storeArrayNameOfPXDHits = "";
+    /// The name of the store array for the SVD hits.
+    std::string m_param_storeArrayNameOfSVDHits = "";
+    /// The name of the store array for the CDC hits.
+    std::string m_param_storeArrayNameOfCDCHits = "";
+    /// The name of the store array for the BKLM hits.
+    std::string m_param_storeArrayNameOfBKLMHits = "";
+    /// The name of the store array for the EKLM hits.
+    std::string m_param_storeArrayNameOfEKLMHits = "";
     /// Flag to skip the dirty check. Useful when using non default measurement creators.
     bool m_skipDirtyCheck = false;
 
-    /// Internal storage of the CDC measurement creators.
-    std::vector<std::shared_ptr<CDCBaseMeasurementCreator>> m_cdcMeasurementCreators;
-    /// Internal storage of the SVD measurement creators.
-    std::vector<std::shared_ptr<SVDBaseMeasurementCreator>> m_svdMeasurementCreators;
     /// Internal storage of the PXD measurement creators.
     std::vector<std::shared_ptr<PXDBaseMeasurementCreator>> m_pxdMeasurementCreators;
+    /// Internal storage of the SVD measurement creators.
+    std::vector<std::shared_ptr<SVDBaseMeasurementCreator>> m_svdMeasurementCreators;
+    /// Internal storage of the CDC measurement creators.
+    std::vector<std::shared_ptr<CDCBaseMeasurementCreator>> m_cdcMeasurementCreators;
+    /// Internal storage of the BKLM measurement creators.
+    std::vector<std::shared_ptr<BKLMBaseMeasurementCreator>> m_bklmMeasurementCreators;
+    /// Internal storage of the EKLM measurement creators.
+    std::vector<std::shared_ptr<EKLMBaseMeasurementCreator>> m_eklmMeasurementCreators;
     /// Internal storage of the additional measurement creators.
     std::vector<std::shared_ptr<BaseMeasurementCreator>> m_additionalMeasurementCreators;
 

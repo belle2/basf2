@@ -23,7 +23,7 @@
 namespace Belle2 {
 
 /// A module to process CDC trigger data
-class TRGCDCTSStreamModule : public Module {
+  class TRGCDCTSStreamModule : public Module {
 
   public:
 
@@ -67,14 +67,14 @@ class TRGCDCTSStreamModule : public Module {
   private:
 
     /// A pointer to a TRGCDC;
-    TRGCDC * _cdc;
+    TRGCDC* _cdc;
 
     /// Storage for TS central wires.
-    std::vector<const TRGCDCWire *> _wires[9];
+    std::vector<const TRGCDCWire*> _wires[9];
 
     /// A pointer to an output file.
-    std::ofstream * _out;
-};
+    std::ofstream* _out;
+  };
 
 } // namespace Belle2
 

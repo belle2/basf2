@@ -204,24 +204,22 @@ double TrackletFilters::circleFit(double& pocaPhi, double& pocaD, double& curvat
 
   double stopper = 0.000000001; /// WARNING hardcoded values!
   double meanX = 0, meanY = 0, meanX2 = 0, meanY2 = 0, meanR2 = 0, meanR4 = 0, meanXR2 = 0, meanYR2 = 0, meanXY = 0; //mean values
-  double r2 = 0, x = 0, y = 0, x2 = 0, y2 = 0; // coords
-  double weight;// weight of each hit, so far no difference in hit quality
   double sumWeights = 0, divisor/*, weightNormalizer = 0*/; // sumWeights is sum of weights, divisor is 1/sumWeights;
   double tuningParameter =
     1.; //0.02; // this parameter is for internal tuning of the weights, since at the moment, the error seams highly overestimated at the moment. 1 means no influence of parameter.
 
   // looping over all hits and do the division afterwards
   for (PositionInfo* hit : *m_hits) {
-    weight = 1. / (sqrt(hit->hitSigma.X() * hit->hitSigma.X() + hit->hitSigma.Y() * hit->hitSigma.Y()) * tuningParameter);
+    double weight = 1. / (sqrt(hit->hitSigma.X() * hit->hitSigma.X() + hit->hitSigma.Y() * hit->hitSigma.Y()) * tuningParameter);
     B2DEBUG(100, " current hitSigmaU/V/X/Y: " << hit->sigmaU << "/" << hit->sigmaV << "/" << hit->hitSigma.X() << "/" <<
             hit->hitSigma.Y() << ", weight: " << weight);
     sumWeights += weight;
     if (std::isnan(weight) or std::isinf(weight) == true) { B2ERROR("TrackletFilters::circleFit, chosen sigma is 'nan': " << weight << ", setting arbitrary error: " << stopper << ")"); weight = stopper; }
-    x = hit->hitPosition.X();
-    y = hit->hitPosition.Y();
-    x2 = x * x;
-    y2 = y * y;
-    r2 = x2 + y2;
+    double x = hit->hitPosition.X();
+    double y = hit->hitPosition.Y();
+    double x2 = x * x;
+    double y2 = y * y;
+    double r2 = x2 + y2;
     meanX += x * weight;
     meanY += y * weight;
     meanXY += x * y * weight;
@@ -429,18 +427,7 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
    * - detailed check whether results are okay
    * */
 
-  double  x = 0, // current x variable
-          y = 0,
-          z = 0,
-          //      varXY = 0, // variance of XY
-          invVarZ = 0, // inverse variance of Z
-///         phi = 0, // angle phi  // not used yet, but will be needed for some calculations which are not implemented yet
-          r2 = 0, // radius^2
-//          tempRadius = 0,
-//          r = 0,
-///         rPhi = 0,  // not used yet, but will be needed for some calculations which are not implemented yet
-          sumWeights = 0, // the sum of the weightsXY
-          inverseVarianceXY = 0; // current inverse of varianceXY
+  double sumWeights = 0;
 
   TMatrixD inverseCovMatrix(nHits, nHits); // carries inverse of the variances for the circle fit in its diagonal elements
   TMatrixD X(nHits, 3); // carries mapped hits, column 0 = x variables, column 1 = y variables, col 2 = r2 variables
@@ -459,10 +446,10 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 //  B2ERROR(" useBackwards == " << useBackwards << ", seedHit.Mag()/secondHit.Mag(): " << seedHit.Mag()<<"/"<< secondHit.Mag())
 
   for (PositionInfo* hit : *hits) {  // column vectors now
-    x = hit->hitPosition.X();
-    y = hit->hitPosition.Y();
-    z = hit->hitPosition.Z();
-    invVarZ = 1. / hit->hitSigma.Z();
+    double x = hit->hitPosition.X();
+    double y = hit->hitPosition.Y();
+    double z = hit->hitPosition.Z();
+    double invVarZ = 1. / hit->hitSigma.Z();
     if (std::isnan(invVarZ) == true or std::isinf(invVarZ) == true) { B2ERROR("TrackletFilters::helixFit, chosen varZ is 'nan': " << invVarZ << ", setting arbitrary error: " << 0.000001 << ")"); invVarZ = 0.000001; }
     invVarZvalues(index, 0) = invVarZ;
     B2DEBUG(75, "helixFit: hit.X(): " << hit->hitPosition.X() << ", hit.Y(): " << hit->hitPosition.Y() << ", hit.Z(): " <<
@@ -471,9 +458,9 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 
 //    hitsFileStream << setprecision(14) << x << " " << y << " " << z << " " << varU << " " << varV << endl;
 ///   phi = atan2(y , x);  // not used yet, but will be needed for some calculations which are not implemented yet
-    r2 = x * x + y * y;
+    double r2 = x * x + y * y;
 ///     rPhi = phi*sqrt(r2); // not used yet, but will be needed for some calculations which are not implemented yet
-    inverseVarianceXY = 1. / sqrt(hit->hitSigma.X() * hit->hitSigma.X() + hit->hitSigma.Y() * hit->hitSigma.Y());
+    double inverseVarianceXY = 1. / sqrt(hit->hitSigma.X() * hit->hitSigma.X() + hit->hitSigma.Y() * hit->hitSigma.Y());
     if (std::isnan(inverseVarianceXY) == true or std::isinf(inverseVarianceXY) == true) { B2ERROR("TrackletFilters::helixFit, chosen inverseVarianceXY is 'nan': " << inverseVarianceXY << ", setting arbitrary error: " << 0.000001 << ")"); inverseVarianceXY = 0.000001; }
     sumWeights += inverseVarianceXY;
     inverseCovMatrix(index, index) = inverseVarianceXY;
@@ -712,14 +699,16 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 
   TMatrixD AtGA(2, 2);
   TMatrixD AtG(2, nHits);
-  double sumWi = 0, sumWiSi = 0, sumWiSi2 = 0, sw = 0;
+  TMatrixDSparse Diag(nHits, nHits);
+  double sumWi = 0, sumWiSi = 0, sumWiSi2 = 0;
   for (int i = 0; i < nHits; ++i) {
     sumWi += invVarZvalues(i, 0);
-    sw = invVarZvalues(i, 0) * s(i, 0);
+    double sw = invVarZvalues(i, 0) * s(i, 0);
     sumWiSi += sw;
     sumWiSi2 += invVarZvalues(i, 0) * s(i, 0) * s(i, 0);
     AtG(0, i) = invVarZvalues(i, 0);
     AtG(1, i) = sw;
+    Diag(i, i) = 1.;
     B2DEBUG(75, "hit i: " <<  i << ", sumWi: " << sumWi << ", sw: " << sw << ", sumWiSi: " << sumWiSi << ", sumWiSi2: " << sumWiSi2 <<
             ", s(i): " << s(i, 0) << ", invVarZvalues(i): " << invVarZvalues(i, 0));
   }
@@ -736,6 +725,13 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
   TMatrixD p = AtGAInv * AtG *
                zValues; // fitted z value in the first point, tan(lambda) -> WARNING FIXME why is the first point 1,0 not 0,0? jkl feb8th2014
   if (lambdaCheckMatrix4NAN(p) == true) { B2DEBUG(10, "helixFit: p got 'nan'-entries!"); }
+
+  TMatrixD TAtG = AtG;
+  TAtG.T();
+  TMatrixD zValuesT = zValues;
+  zValuesT.T();
+
+  TMatrixD sigma2M = zValuesT * (Diag * TAtG * AtGAInv * AtG) * zValues;
 
   double thetaVal = (M_PI * 0.5 - atan(p(1,
                                          0))); // WARNING: was M_PI*0.5 - atan(p(1,0)), but values were wrong! double-WARNING: but + atan was wrong too!
@@ -777,10 +773,11 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 
 //   double pZ = pT / tan(thetaVal);
 //  double pZ = -calcPt(rho)*p(1,0); // TODO check that !!!1111eleven
-  double pZ = calcPt(rho) * p(1,
-                              0); // pz = pt / tan (Theta); where Theta is Arctan(s/z), s... arc length in (x,y) = radius * Phi in radians, z... z-distance. So pz = pt * z / s = magneticFieldFactor*rho*z/s, and p(1,0).."fitted z-value" (TODO: check that!) seems to be z/s. => calcPt(rho)p(1,0)
+  double pZ = calcPt(rho) * p(1, 0) ;
+  // pz = pt / tan (Theta); where Theta is Arctan(s/z), s... arc length in (x,y) = radius * Phi in radians, z... z-distance.
+  // So pz = pt * z / s = magneticFieldFactor*rho*z/s, and p(1,0).."fitted z-value" (TODO: check that!) seems to be z/s. => calcPt(rho)p(1,0)
   B2DEBUG(25, "helixFit: radius(rho): " << rho << ", theta: " << thetaVal << ", pT: " << pT << ", pZ: " << pZ << ", pVector.Perp: " <<
-          pVector.Perp() << ", pVector.Mag: " << pVector.Mag() << ", fitted zValue: " << p(1, 0));
+          pVector.Perp() << ", pVector.Mag: " << pVector.Mag() << ", fitted zValue: " << p(0, 0));
   TVector3 vectorToSecondHit = secondHit - seedHit;
   vectorToSecondHit.SetZ(0);
 
@@ -970,9 +967,7 @@ pair<double, TVector3> TrackletFilters::simpleLineFit3D(const vector<PositionInf
    * */
 
   TVector3 directionVector;
-  double Wyi = 0, // weight for Yi
-         Wzi = 0, // weight for Zi
-         sumWyi = 0, // sum of weights for Yi
+  double sumWyi = 0, // sum of weights for Yi
          sumWzi = 0, // sum of weights for Zi
          sumWyiXi = 0, // sum of (y-weights times x-values)
          sumWziXi = 0, // sum of (z-weights times x-values)
@@ -992,8 +987,8 @@ pair<double, TVector3> TrackletFilters::simpleLineFit3D(const vector<PositionInf
 
   // NOTE: this approach is not optimal. Maybe can be optimized for less redundancy
   for (const PositionInfo* aHit : *hits) {
-    Wyi = (1. / (aHit->hitSigma.Y() * aHit->hitSigma.Y()));
-    Wzi = (1. / (aHit->hitSigma.Z() * aHit->hitSigma.Z()));
+    double Wyi = (1. / (aHit->hitSigma.Y() * aHit->hitSigma.Y()));
+    double Wzi = (1. / (aHit->hitSigma.Z() * aHit->hitSigma.Z()));
 
     sumWyi += Wyi;
     sumWzi += Wzi;

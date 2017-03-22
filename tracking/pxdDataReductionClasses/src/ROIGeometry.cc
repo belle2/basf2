@@ -34,67 +34,6 @@ ROIGeometry::~ROIGeometry()
 }
 
 
-/*
-void
-ROIGeometry::appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled,
-                              RecoTrack* recoTrack, int recoTrackIndex,
-                              RelationArray* recoTrackToPXDIntercepts)
-{
-
-  PXDIntercept tmpPXDIntercept;
-
-  genfit::Track gfTrack = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
-
-  std::list<ROIDetPlane>::iterator itPlanes = m_planeList.begin();
-
-  B2DEBUG(1, "appendIntercepts, checking " << m_planeList.size() << " planes");
-
-  double lambda = 0;
-
-
-  for (int propDir = -1; propDir <= 1; propDir += 2) {
-    gfTrack.getCardinalRep()->setPropDir(propDir);
-
-    while (itPlanes != m_planeList.end()) {
-
-      genfit::MeasuredStateOnPlane state;
-
-      try {
-        state = gfTrack.getFittedState();
-        genfit::SharedPlanePtr plane(new ROIDetPlane(*itPlanes)); // TODO: save copying
-        lambda = state.extrapolateToPlane(plane);
-      }  catch (...) {
-        B2DEBUG(1, "extrapolation failed");
-        ++itPlanes;
-        continue;
-      }
-
-      const TVectorD& predictedIntersect = state.getState();
-      const TMatrixDSym& covMatrix = state.getCov();
-
-      tmpPXDIntercept.setCoorU(predictedIntersect[3]);
-      tmpPXDIntercept.setCoorV(predictedIntersect[4]);
-      tmpPXDIntercept.setSigmaU(sqrt(covMatrix(3, 3)));
-      tmpPXDIntercept.setSigmaV(sqrt(covMatrix(4, 4)));
-      tmpPXDIntercept.setSigmaUprime(sqrt(covMatrix(1, 1)));
-      tmpPXDIntercept.setSigmaVprime(sqrt(covMatrix(2, 2)));
-      tmpPXDIntercept.setLambda(lambda);
-      tmpPXDIntercept.setVxdID(itPlanes->getSensorInfo());
-
-      listToBeFilled->appendNew(tmpPXDIntercept);
-
-      recoTrackToPXDIntercepts->add(recoTrackIndex, listToBeFilled->getEntries() - 1);
-
-      ++itPlanes;
-
-    }
-  }
-
-
-};
-
-*/
-
 void
 ROIGeometry::fillPlaneList(double toleranceZ, double tolerancePhi)
 {

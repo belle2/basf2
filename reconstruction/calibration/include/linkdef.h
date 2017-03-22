@@ -5,6 +5,8 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::CDCElectronCalibrationAlgorithm+;
+#pragma link C++ class Belle2::CDCDedxWireGainAlgorithm+;
+#pragma link C++ class Belle2::CDCDedxRunGainAlgorithm+;
+#pragma link C++ class Belle2::CDCDedxCosineAlgorithm+;
 
 #endif

@@ -21,15 +21,15 @@ namespace Belle2 {
     static char const* const basicFacetVarNames[] = {
       "superlayer_id",
 
-      "start_layer_id",
+      // "start_layer_id",
       "start_drift_length",
       "start_drift_length_sigma",
 
-      "middle_layer_id",
+      // "middle_layer_id",
       "middle_drift_length",
       "middle_drift_length_sigma",
 
-      "end_layer_id",
+      // "end_layer_id",
       "end_drift_length",
       "end_drift_length_sigma",
 
@@ -40,7 +40,7 @@ namespace Belle2 {
     };
 
     /// Vehicle class to transport the variable names
-    struct BasicFacetVarNames : public VarNames<CDCFacet> {
+    struct BasicFacetVarNames : public VarNames<const CDCFacet> {
 
       /// Number of variables to be generated
       static const size_t nVars = size(basicFacetVarNames);

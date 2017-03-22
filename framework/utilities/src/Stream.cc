@@ -1,6 +1,5 @@
 #include <framework/utilities/Stream.h>
 
-#include <framework/pcore/EvtMessage.h>
 #include <framework/logging/Logger.h>
 
 #include <TBase64.h>
@@ -10,6 +9,18 @@
 #include <boost/algorithm/string/replace.hpp>
 
 using namespace Belle2;
+
+namespace {
+  /** Use TMessage for reading (needed constructor is protected. ) */
+  class StreamMsg : public TMessage {
+  public:
+    StreamMsg(const void* buf, int len) : TMessage(const_cast<void*>(buf), len)
+    {
+      this->SetBit(kIsOwner, false);
+    }
+  };
+}
+
 
 std::string Stream::serializeAndEncode(const TObject* obj)
 {
@@ -59,8 +70,7 @@ TObject* Stream::deserializeEncodedRawData(const std::string& base64Data)
   //convert data back into raw byte stream
   const TString& data(TBase64::Decode(base64Data.c_str()));
 
-  //const-cast ok since TMessage doesn't own the buffer
-  InMessage msg(const_cast<char*>(data.Data()), data.Length());
+  StreamMsg msg(data.Data(), data.Length());
   //some checking
   if (msg.What() != kMESS_OBJECT or msg.GetClass() == nullptr) {
     return nullptr;

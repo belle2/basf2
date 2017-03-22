@@ -52,7 +52,7 @@ int AsyncWrapper::numAvailableEvents()
   return s_currentRingBuffer->numq();
 }
 
-AsyncWrapper::AsyncWrapper(const std::string& moduleType): Module(), m_procHandler(0), m_ringBuffer(0), m_rx(0), m_tx(0)
+AsyncWrapper::AsyncWrapper(const std::string& moduleType): Module(), m_procHandler(nullptr), m_ringBuffer(0), m_rx(0), m_tx(0)
 {
   m_wrappedModule = ModuleManager::Instance().registerModule(moduleType);
   setParamList(m_wrappedModule->getParamList()); //inherit parameters from wrapped module
@@ -70,7 +70,7 @@ void AsyncWrapper::initialize()
 {
   B2INFO("Initializing AsyncWrapper...");
 
-  m_procHandler = new ProcHandler();
+  m_procHandler = new ProcHandler(1);
   const int bufferSizeInts = 8000000; //~32M, within Ubuntu's shmmax limit
   m_ringBuffer = new RingBuffer(bufferSizeInts);
   rbList.push_back(m_ringBuffer);
@@ -81,7 +81,7 @@ void AsyncWrapper::initialize()
   m_tx->setBlockingInsert(!m_discardOldEvents); //actually decouple this process
 
   //fork out one extra process
-  m_procHandler->startWorkerProcesses(1);
+  m_procHandler->startWorkerProcesses();
   if (m_procHandler->isWorkerProcess()) {
     //forked thread:
     //allow access to async parts

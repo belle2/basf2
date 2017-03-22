@@ -46,7 +46,7 @@ bool TruthTrackVarSet::extract(const CDCTrack* track)
 
     unsigned int numberOfCorrectHits = 0;
     for (const CDCRecoHit3D& recoHit : *track) {
-      if (hitLookup.getMCTrackId(recoHit->getWireHit().getHit()) == trackMCMatch) {
+      if (hitLookup.getMCTrackId(recoHit.getWireHit().getHit()) == trackMCMatch) {
         numberOfCorrectHits++;
       }
     }

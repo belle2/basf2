@@ -10,20 +10,26 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+
+#include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
+    class CDCFacet;
+    class CDCRLWireHitTriple;
+
     /**
      *  Filter for the constuction of good facets investigating the feasability
      *  of the right left passage hypotheses combination.
      *  If the given combination cannot be made by a track reject it.
      */
-    class FeasibleRLFacetFilter : public Filter<CDCFacet> {
+    class FeasibleRLFacetFilter : public BaseFacetFilter {
 
     private:
       /// Type of the super class
-      using Super = Filter<CDCFacet>;
+      using Super = BaseFacetFilter;
 
     public:
       /// Constructor taking a flag if boarderline feasable cases should be excluded.
@@ -31,7 +37,7 @@ namespace Belle2 {
 
     public:
       /// Expose the set of parameters of the filter to the module parameter list.
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
     public:
       /**
@@ -60,7 +66,6 @@ namespace Belle2 {
     private:
       /// Switch for hard selection.
       bool m_param_hardRLCut = true;
-
     };
   }
 }

@@ -16,6 +16,10 @@
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/core/FileCatalog.h>
 #include <framework/core/RandomNumbers.h>
+#include <framework/database/Database.h>
+
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
 
 #include <TClonesArray.h>
 
@@ -100,7 +104,18 @@ void RootOutputModule::initialize()
   TDirectory* dir = gDirectory;
   m_file = new TFile(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
   if (m_file->IsZombie()) {
-    B2FATAL("Couldn't open file '" << m_outputFileName << "' for writing!");
+    //try creating necessary directories
+    boost::filesystem::path dirpath(m_outputFileName);
+    dirpath.remove_filename();
+
+    if (boost::filesystem::create_directories(dirpath)) {
+      B2WARNING("Created missing directory " << dirpath << ".");
+      //try again
+      m_file = new TFile(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
+    }
+
+    if (m_file->IsZombie())
+      B2FATAL("Couldn't open file '" << m_outputFileName << "' for writing!");
   }
   m_file->SetCompressionLevel(m_compressionLevel);
 
@@ -130,7 +145,7 @@ void RootOutputModule::initialize()
           continue;
       }
 
-      const TClass* entryClass = iter->second.objClass;
+      TClass* entryClass = iter->second.objClass;
 
       //I want to do this in the input module, but I apparently I cannot disable reading those branches.
       //isabling reading the branch by not calling SetBranchAddress() for it results in the following crashes. Calling SetBranchStatus(..., 0) doesn't help, either.
@@ -139,9 +154,7 @@ void RootOutputModule::initialize()
       //HasDictionary() is a new function in root 6
       //using it instead of GetClassInfo() avoids  having to parse header files (and
       //the associated memory cost)
-      //
-      //it also is missing a 'const', hopefully this will be fixed at some point
-      if (!const_cast<TClass*>(entryClass)->HasDictionary()) {
+      if (!entryClass->HasDictionary()) {
         B2WARNING("No dictionary found for class " << entryClass->GetName() << ", branch '" << branchName <<
                   "' will not be saved. (This is probably an obsolete class that is still present in the input file.)");
         continue;
@@ -239,29 +252,11 @@ void RootOutputModule::fillFileMetaData()
 
   //fill more file level metadata
   fileMetaDataPtr->setParents(m_parentLfns);
-  string site;
-  char date[100];
-  auto now = time(0);
-  strftime(date, 100, "%Y-%m-%d %H:%M:%S", gmtime(&now));
-  const char* belle2_site = getenv("BELLE2_SITE");
-  if (belle2_site) {
-    site = belle2_site;
-  } else {
-    char hostname[1024];
-    gethostname(hostname, 1023); //will not work well for ipv6
-    hostname[1023] = '\0'; //if result is truncated, terminating null byte may be missing
-    site = hostname;
-  }
-  const char* user = getenv("BELLE2_USER");
-  if (!user) user = getenv("USER");
-  if (!user) user = getlogin();
-  if (!user) user = "unknown";
+  RootIOUtilities::setCreationData(*fileMetaDataPtr);
   fileMetaDataPtr->setRandomSeed(RandomNumbers::getSeed());
-  const char* release = getenv("BELLE2_RELEASE");
-  if (!release) release = "unknown";
-  fileMetaDataPtr->setCreationData(date, site, user, release);
   fileMetaDataPtr->setSteering(Environment::Instance().getSteering());
   fileMetaDataPtr->setMcEvents(Environment::Instance().getNumberOfMCEvents());
+  fileMetaDataPtr->setDatabaseGlobalTag(Database::getGlobalTag());
 
   //register the file in the catalog
   if (m_updateFileCatalog) {

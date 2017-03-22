@@ -33,6 +33,7 @@
 #include <tracking/dataobjects/ExtHit.h>
 #include <testbeam/top/dataobjects/TOPTBSimHit.h>
 #include <top/dataobjects/TOPRecBunch.h>
+#include <framework/dataobjects/EventT0.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
@@ -132,6 +133,9 @@ namespace Belle2 {
 
     StoreObjPtr<TOPRecBunch> recBunch;
     recBunch.registerInDataStore();
+
+    StoreObjPtr<EventT0> eventT0;
+    eventT0.registerInDataStore();
 
     trackCandidates.registerRelationTo(fitResults);
     trackCandidates.registerRelationTo(mcParticles);
@@ -272,7 +276,7 @@ namespace Belle2 {
     StoreArray<CDCHit> hits;
     const auto& cdcgp = CDC::CDCGeometryPar::Instance();
     CDC::RealisticTDCCountTranslator translator(true); // use in wire propagation delay
-    translator.setEventTime(m_startTime);
+    // translator.setEventTime(m_startTime); // deprecated
 
     tema_clear_();
 
@@ -478,6 +482,10 @@ namespace Belle2 {
     } else {
       B2ERROR("No trigger found to determine start time");
     }
+
+    StoreObjPtr<EventT0> eventT0;
+    if (!eventT0) eventT0.create();
+    eventT0->addEventT0(m_startTime, 0., Const::TEST);
 
   }
 

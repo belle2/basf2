@@ -73,6 +73,8 @@ std::size_t CDCObservations2D::append(const CDCWireHit& wireHit, ERightLeft rlIn
   double variance = 1;
   if (m_fitVariance == EFitVariance::c_Unit) {
     variance = 1;
+  } else if (m_fitVariance == EFitVariance::c_Nominal) {
+    variance = CDCWireHit::c_simpleDriftLengthVariance;
   } else if (m_fitVariance == EFitVariance::c_DriftLength) {
     const double driftLength = wireHit.getRefDriftLength();
     variance = fabs(driftLength);
@@ -116,6 +118,8 @@ std::size_t CDCObservations2D::append(const CDCRLWireHit& rlWireHit)
   double variance = 1;
   if (m_fitVariance == EFitVariance::c_Unit) {
     variance = 1;
+  } else if (m_fitVariance == EFitVariance::c_Nominal) {
+    variance = CDCWireHit::c_simpleDriftLengthVariance;
   } else if (m_fitVariance == EFitVariance::c_DriftLength) {
     variance = fabs(driftLength);
   } else if (m_fitVariance == EFitVariance::c_Pseudo) {
@@ -181,6 +185,8 @@ std::size_t CDCObservations2D::append(const CDCRecoHit2D& recoHit2D)
   double variance = recoHit2D.getRefDriftLengthVariance();
   if (m_fitVariance == EFitVariance::c_Unit) {
     variance = 1;
+  } else if (m_fitVariance == EFitVariance::c_Nominal) {
+    variance = CDCWireHit::c_simpleDriftLengthVariance;
   } else if (m_fitVariance == EFitVariance::c_DriftLength) {
     variance = std::fabs(driftLength);
   } else if (m_fitVariance == EFitVariance::c_Pseudo or abs(rlInfo) != 1) {
@@ -213,6 +219,8 @@ std::size_t CDCObservations2D::append(const CDCRecoHit3D& recoHit3D)
   double variance = recoHit3D.getRecoDriftLengthVariance();
   if (m_fitVariance == EFitVariance::c_Unit) {
     variance = 1;
+  } else if (m_fitVariance == EFitVariance::c_Nominal) {
+    variance = CDCWireHit::c_simpleDriftLengthVariance;
   } else if (m_fitVariance == EFitVariance::c_DriftLength) {
     variance = std::fabs(driftLength);
   } else if (m_fitVariance == EFitVariance::c_Pseudo or abs(rlInfo) != 1) {
@@ -340,7 +348,7 @@ Vector2D CDCObservations2D::centralize()
 
 Eigen::Matrix<double, 5, 5> CDCObservations2D::getWXYRLSumMatrix()
 {
-  CDCObservations2D::EigenObservationMatrix&& eigenObservation = getObservationMatrix();
+  CDCObservations2D::EigenObservationMatrix eigenObservation = getObservationMatrix();
   std::size_t nObservations = size();
 
   // B2INFO("Matrix of observations: " << endl << eigenObservation);
@@ -373,7 +381,7 @@ Eigen::Matrix<double, 5, 5> CDCObservations2D::getWXYRLSumMatrix()
 Eigen::Matrix<double, 4, 4> CDCObservations2D::getWXYLSumMatrix()
 {
 
-  CDCObservations2D::EigenObservationMatrix&& eigenObservation = getObservationMatrix();
+  CDCObservations2D::EigenObservationMatrix eigenObservation = getObservationMatrix();
   std::size_t nObservations = size();
 
   Matrix<double, Dynamic, 4> projectedPoints(nObservations, 4);
@@ -398,7 +406,7 @@ Eigen::Matrix<double, 4, 4> CDCObservations2D::getWXYLSumMatrix()
 
 Eigen::Matrix<double, 4, 4> CDCObservations2D::getWXYRSumMatrix()
 {
-  CDCObservations2D::EigenObservationMatrix&& eigenObservation = getObservationMatrix();
+  CDCObservations2D::EigenObservationMatrix eigenObservation = getObservationMatrix();
   std::size_t nObservations = size();
 
   Matrix<double, Dynamic, 4> projectedPoints(nObservations, 4);
@@ -423,7 +431,7 @@ Eigen::Matrix<double, 4, 4> CDCObservations2D::getWXYRSumMatrix()
 
 Eigen::Matrix<double, 3, 3> CDCObservations2D::getWXYSumMatrix()
 {
-  CDCObservations2D::EigenObservationMatrix&& eigenObservation = getObservationMatrix();
+  CDCObservations2D::EigenObservationMatrix eigenObservation = getObservationMatrix();
   std::size_t nObservations = size();
 
   Matrix<double, Dynamic, 3> projectedPoints(nObservations, 3);

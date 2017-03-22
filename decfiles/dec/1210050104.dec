@@ -1,0 +1,68 @@
+# EventType: 1210050104
+# Descriptor: Y(4S) -> B+ B-
+#                     [B+ -> (rho(770)0 -> pi+ pi- ) (K0s pi+)]
+#                      B- -> anything
+# NickName: Bu_Rho0K0spi
+# Documentation:    3 Body hadronic decay, not-resonant in K0spi
+# Tested: Yes
+# PhysicsWG: BTOCHARMLESS
+# Reponsible: Ilya Komarov
+# Email: ilya.komarov@desy.de
+# Cuts: None
+# Date: 20170314
+# Changes: Use of aliases defined in DECAY.DEC; date: 20170314; author: Pablo Goldenzweig
+
+
+#
+# Aliases
+#
+
+Alias      Kssig      K_S0
+ChargeConj Kssig      Kssig
+Alias      rho0sig    rho0
+ChargeConj rho0sig    rho0sig
+
+
+#
+# Y(4S) -> B+ B- 
+#
+
+Decay Upsilon(4S)
+0.5 B+sig B-                   VSS;
+0.5 B+ B-sig                   VSS;
+Enddecay
+
+#
+# B+ -> rho(770)0 K0s pi+
+#
+
+Decay B+sig
+1.000   rho0sig  Kssig  pi+ PHSP;
+Enddecay
+
+#
+# B- -> rho(770)0 K0s pi-
+#
+
+Decay B-sig
+1.000   rho0sig  Kssig  pi- PHSP;
+Enddecay
+
+#
+# K_S0 -> pi+ pi-
+#
+
+Decay Kssig
+1.000   pi+ pi-      PHSP; 
+Enddecay
+
+#
+# rho(770)0 -> pi+ pi-
+#
+
+Decay rho0sig
+1.000         pi+        pi-            VSS;
+Enddecay
+
+
+End

@@ -175,6 +175,12 @@ namespace Belle2 {
     private:
 
       /**
+       * copy constructor
+       */
+      ChannelMapper(const ChannelMapper&)
+      {}
+
+      /**
        * Clear
        */
       void clear();

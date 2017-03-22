@@ -84,6 +84,8 @@ namespace Belle2 {
       std::vector<TVector3> TPCCenter;
       /** Event counter */
       //int Event = 0;
+      /** rate */
+      TH1F* h_tpc_rate[20];
       /** Neutron kin energy dis */
       TH1F* h_mctpc_kinetic[20];
       /** Neutron kin energy dis */

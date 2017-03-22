@@ -13,7 +13,7 @@
 
 #include <vector>
 #include <G4Transform3D.hh>
-#include <boost/foreach.hpp>
+
 class G4LogicalVolume;
 
 namespace Belle2 {
@@ -39,7 +39,8 @@ namespace Belle2 {
        * @param volume Volume to be added
        * @param transform Transformation to be applied to the volume
        */
-      void add(G4LogicalVolume* volume, const G4Transform3D& transform = G4Transform3D()) {
+      void add(G4LogicalVolume* volume, const G4Transform3D& transform = G4Transform3D())
+      {
         m_volumes.push_back(std::make_pair(volume, transform));
       }
 
@@ -47,8 +48,9 @@ namespace Belle2 {
        * @param assembly assembly to be added
        * @param transform Transformation to be applied to the volume
        */
-      void add(const GeoVXDAssembly& assembly, const G4Transform3D& transform = G4Transform3D()) {
-        BOOST_FOREACH(const Placement & p, assembly.m_volumes) {
+      void add(const GeoVXDAssembly& assembly, const G4Transform3D& transform = G4Transform3D())
+      {
+        for (const Placement& p : assembly.m_volumes) {
           m_volumes.push_back(std::make_pair(p.first, transform * p.second));
         }
       }

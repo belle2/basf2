@@ -22,14 +22,14 @@
 
 namespace Belle2 {
 
-class TRGPoint2D;
+  class TRGPoint2D;
 
 /// An abstract class to represent a Hough transformation.
-class TRGCDCHoughTransformation {
+  class TRGCDCHoughTransformation {
 
   public:
     /// Contructor.
-    TRGCDCHoughTransformation(const std::string & name);
+    TRGCDCHoughTransformation(const std::string& name);
 
     /// Destructor
     virtual ~TRGCDCHoughTransformation();
@@ -43,33 +43,34 @@ class TRGCDCHoughTransformation {
 
     /// returns true if Y diverges in given region.
     virtual bool diverge(float xReal, float yReal, float x0, float x1)
-        const = 0;
+    const = 0;
 
     /// returns true if Y diverges in given region.
     virtual bool positiveDiverge(float xReal, float yReal, float x0, float x1)
-        const = 0;
+    const = 0;
 
     /// returns true if Y diverges in given region.
     virtual bool negativeDiverge(float xReal, float yReal, float x0, float x1)
-        const = 0;
+    const = 0;
 
 //     /// returns a gradient at given regsion.
 //     virtual float gradient(float xReal, float yReal, float x) const = 0;
 
     /// converts Point2D(r, phi) in real plane into Point2D(r, phi) in Hough plane.
-    virtual TRGPoint2D convert(const TRGPoint2D &) const;
+    virtual TRGPoint2D convert(const TRGPoint2D&) const;
 
   public:// Modifiers
 
   private:
     const std::string _name;
-};
+  };
 
-inline
-std::string
-TRGCDCHoughTransformation::name(void) const {
+  inline
+  std::string
+  TRGCDCHoughTransformation::name(void) const
+  {
     return _name;
-}
+  }
 
 } // namespace Belle
 

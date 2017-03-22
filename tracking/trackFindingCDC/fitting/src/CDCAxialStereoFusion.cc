@@ -35,41 +35,6 @@ namespace {
     }
     return result;
   }
-
-  void reestimateDriftLength(CDCSegment3D& segment3D,
-                             const CDCTrajectory3D& trajectory3D)
-  {
-    double tanLambda = trajectory3D.getTanLambda();
-    double theta = M_PI / 2 - std::atan(tanLambda);
-    static CDC::RealisticTDCCountTranslator tdcCountTranslator(true);
-    const FlightTimeEstimator& flightTimeEstimator = FlightTimeEstimator::instance();
-    for (CDCRecoHit3D& recoHit3D : segment3D) {
-      Vector2D flightDirection = recoHit3D.getFlightDirection2D();
-      Vector2D recoPos2D = recoHit3D.getRecoPos2D();
-      double alpha = recoPos2D.angleWith(flightDirection);
-      const double beta = 1;
-      double flightTimeEstimate = flightTimeEstimator.getFlightTime2D(recoPos2D, alpha, beta);
-      flightTimeEstimate *= hypot2(1, tanLambda);
-
-      const CDCWire& wire = recoHit3D.getWire();
-      const CDCHit* hit = recoHit3D.getWireHit().getHit();
-      const bool rl = recoHit3D.getRLInfo() == ERightLeft::c_Right;
-      double driftLength =
-        tdcCountTranslator.getDriftLength(hit->getTDCCount(),
-                                          wire.getWireID(),
-                                          flightTimeEstimate,
-                                          rl,
-                                          recoHit3D.getRecoZ(),
-                                          alpha,
-                                          theta,
-                                          hit->getADCCount());
-
-      if (driftLength > -2) {
-        bool snapRecoPos = true;
-        recoHit3D.setRecoDriftLength(driftLength, snapRecoPos);
-      }
-    }
-  }
 }
 
 void CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCSegmentPair& segmentPair)
@@ -137,8 +102,8 @@ CDCTrajectory3D CDCAxialStereoFusion::fusePreliminary(const CDCSegment2D& fromSe
   }
 
   bool fromIsAxial = fromSegment2D.isAxial();
-  const CDCAxialSegment2D& axialSegment2D = fromIsAxial ? fromSegment2D : toSegment2D;
-  const CDCStereoSegment2D& stereoSegment2D = not fromIsAxial ? fromSegment2D : toSegment2D;
+  const CDCSegment2D& axialSegment2D = fromIsAxial ? fromSegment2D : toSegment2D;
+  const CDCSegment2D& stereoSegment2D = not fromIsAxial ? fromSegment2D : toSegment2D;
 
   CDCTrajectory2D axialTrajectory2D = axialSegment2D.getTrajectory2D();
 
@@ -189,8 +154,9 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCSegme
   CDCSegment3D toSegment3D   = reconstruct(toSegment2D, preliminaryTrajectory3D);
 
   if (m_reestimateDriftLength) {
-    reestimateDriftLength(fromSegment3D,  preliminaryTrajectory3D);
-    reestimateDriftLength(toSegment3D,  preliminaryTrajectory3D);
+    double tanLambda = preliminaryTrajectory3D.getTanLambda();
+    m_driftLengthEstimator.updateDriftLength(fromSegment3D, tanLambda);
+    m_driftLengthEstimator.updateDriftLength(toSegment3D, tanLambda);
   }
 
   CDCTrajectory2D fromTrajectory2D = riemannFitter.fit(fromSegment3D);

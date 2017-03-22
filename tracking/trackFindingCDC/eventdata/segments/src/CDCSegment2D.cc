@@ -16,7 +16,6 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
 
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/utilities/GetIterator.h>
 
 #include <boost/range/adaptor/reversed.hpp>
@@ -235,6 +234,13 @@ CDCSegment2D CDCSegment2D::reconstructUsingFacets(const CDCRLWireHitSegment& rlW
     CDCFacetSegment facetSegment = CDCFacetSegment::create(rlWireHitSegment);
     return condense(facetSegment);
   }
+}
+
+bool CDCSegment2D::operator<(const CDCSegment2D& segment2D) const
+{
+  return this->getISuperCluster() < segment2D.getISuperCluster();
+  // Activate merging in across the whole superlayer
+  // return this->getISuperLayer() < segment2D.getISuperLayer();
 }
 
 std::vector<const CDCWire*> CDCSegment2D::getWireSegment() const

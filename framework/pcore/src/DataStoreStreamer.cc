@@ -173,14 +173,13 @@ EvtMessage* DataStoreStreamer::streamDataStore(bool addPersistentDurability, boo
       entry->object->SetBit(c_IsTransient, entry->dontWriteOut);
       entry->object->SetBit(c_IsNull, (entry->ptr == NULL));
       entry->object->SetBit(c_PersistentDurability, (durability == DataStore::c_Persistent));
-      if (m_msghandler->add(entry->object, it->first)) {
-        B2DEBUG(100, "adding item " << it->first);
+      m_msghandler->add(entry->object, it->first);
+      B2DEBUG(100, "adding item " << it->first);
 
-        if (entry->isArray)
-          narrays++;
-        else
-          nobjs++;
-      }
+      if (entry->isArray)
+        narrays++;
+      else
+        nobjs++;
 
       //reset bits (are checked to be false when streaming the object)
       entry->object->SetBit(c_IsTransient, false);
@@ -229,6 +228,8 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
     m_msghandler->decode_msg(msg, objlist, namelist);
     int nobjs = (msg->header())->nObjects;
     int narrays = (msg->header())->nArrays;
+    if (unsigned(nobjs + narrays) != objlist.size())
+      B2WARNING("restoreDataStore(): inconsistent #objects/#arrays in header");
 
     // Restore objects in DataStore
     for (int i = 0; i < nobjs + narrays; i++) {
@@ -238,23 +239,23 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
 
         // Read and Build StreamerInfo
         if (msg->type() == MSG_STREAMERINFO) {
-          restoreStreamerInfos((TList*)obj);
+          restoreStreamerInfos(static_cast<TList*>(obj));
           return 0;
         }
 
         bool isPersistent = obj->TestBit(c_PersistentDurability);
         DataStore::EDurability durability = isPersistent ? (DataStore::c_Persistent) : (DataStore::c_Event);
-        const TClass* cl = obj->IsA();
+        TClass* cl = obj->IsA();
         if (array)
           cl = static_cast<TClonesArray*>(obj)->GetClass();
         if (m_initStatus == 0 && DataStore::Instance().getInitializeActive()) { //are we called by the module's initialize() function?
           auto flags = obj->TestBit(c_IsTransient) ? DataStore::c_DontWriteOut : DataStore::c_WriteOut;
           DataStore::Instance().registerEntry(namelist.at(i), durability, cl, array, flags);
         }
+        DataStore::StoreEntry* entry = DataStore::Instance().getEntry(StoreAccessorBase(namelist.at(i), durability, cl, array));
         //only restore object if it is valid for current event
         bool ptrIsNULL = obj->TestBit(c_IsNull);
         if (!ptrIsNULL) {
-          DataStore::StoreEntry* entry = DataStore::Instance().getEntry(StoreAccessorBase(namelist.at(i), durability, cl, array));
           bool merge = m_handleMergeable and !array and entry->ptr != NULL and isMergeable(obj);
           if (merge) {
             B2DEBUG(100, "Will now merge " << namelist.at(i));
@@ -273,6 +274,9 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
           }
           //   B2DEBUG(100, "restoreDS: " << (array ? "Array" : "Object") << ": " << namelist.at(i) << " stored");
         } else {
+          //usually entry should already be invalidated, but e.g. for CrashHandler, it might not be.
+          if (entry->ptr)
+            entry->invalidate();
           //not stored, clean up
           delete obj;
         }
@@ -417,7 +421,7 @@ int DataStoreStreamer::restoreDataStoreAsync()
       TObject* obj = objlist.at(i);
       bool isPersistent = obj->TestBit(c_PersistentDurability);
       DataStore::EDurability durability = isPersistent ? (DataStore::c_Persistent) : (DataStore::c_Event);
-      const TClass* cl = obj->IsA();
+      TClass* cl = obj->IsA();
       if (array)
         cl = static_cast<TClonesArray*>(obj)->GetClass();
       if (m_initStatus == 0 && DataStore::Instance().getInitializeActive()) { //are we called by the module's initialize() function?
@@ -473,20 +477,17 @@ void DataStoreStreamer::setDecoderStatus(int val)
 }
 
 
-int DataStoreStreamer::restoreStreamerInfos(TList* obj)
+int DataStoreStreamer::restoreStreamerInfos(const TList* list)
 {
   //
   // Copy from TSocket::RecvStreamerInfos()
   //
 
   //      TList *list = (TList*)mess->ReadObject(TList::Class());
-  TList* list = (TList*)obj;
-  TIter next(list);
   TStreamerInfo* info;
   TObjLink* lnk = list->FirstLink();
 
   vector<string> class_name;
-  class_name.clear();
 
   // First call BuildCheck for regular class
   while (lnk) {
@@ -496,7 +497,7 @@ int DataStoreStreamer::restoreStreamerInfos(TList* obj)
     for (auto itr = class_name.begin(); itr != class_name.end(); ++itr) {
       if (strcmp((*itr).c_str(), info->GetName()) == 0) {
         ovlap = 1;
-        B2INFO("Regular Class Loop : The class " << info->GetName() << " has already appeared. Skipping...");
+        B2DEBUG(100, "Regular Class Loop : The class " << info->GetName() << " has already appeared. Skipping...");
         break;
       }
     }
@@ -529,7 +530,7 @@ int DataStoreStreamer::restoreStreamerInfos(TList* obj)
     for (auto itr = class_name.begin(); itr != class_name.end(); ++itr) {
       if (strcmp((*itr).c_str(), info->GetName()) == 0) {
         ovlap = 1;
-        B2INFO("STL Class Loop : The class " << info->GetName() << " has already appeared. Skipping...");
+        B2DEBUG(100, "STL Class Loop : The class " << info->GetName() << " has already appeared. Skipping...");
         break;
       }
     }

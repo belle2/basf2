@@ -12,6 +12,7 @@
 #include <boost/graph/adjacency_list.hpp>
 
 /* Belle2 headers. */
+#include <eklm/dataobjects/EKLMFPGAFit.h>
 #include <eklm/modules/EKLMDigitizer/EKLMDigitizerModule.h>
 #include <eklm/simulation/FiberAndElectronics.h>
 
@@ -27,12 +28,13 @@ EKLMDigitizerModule::EKLMDigitizerModule() : Module()
            "Strip hits with npe lower this value will be marked as bad",
            double(7.));
   addParam("DigitizationInitialTime", m_DigitizationInitialTime,
-           "Initial digitization time (ns).", double(0.));
+           "Initial digitization time (ns).", double(-40.));
   addParam("CreateSim2Hits", m_CreateSim2Hits,
-           "Create merged EKLMSim2Hits", bool(false));
+           "Create merged EKLMSim2Hits", false);
+  addParam("SaveFPGAFit", m_SaveFPGAFit, "Save FPGA fit data", false);
   addParam("Debug", m_Debug,
            "Debug mode (generates additional output files with histograms).",
-           bool(false));
+           false);
   m_GeoDat = NULL;
   m_Fitter = NULL;
 }
@@ -49,6 +51,11 @@ void EKLMDigitizerModule::initialize()
   digits.registerRelationTo(simHits);
   if (m_CreateSim2Hits)
     StoreArray<EKLMSim2Hit>::registerPersistent();
+  if (m_SaveFPGAFit) {
+    StoreArray<EKLMFPGAFit> fpgaFits;
+    fpgaFits.registerPersistent();
+    digits.registerRelationTo(fpgaFits);
+  }
   m_GeoDat = &(EKLM::GeometryData::Instance());
   m_Fitter = new EKLM::FPGAFitter(m_DigPar->getNDigitizations());
 }
@@ -206,6 +213,8 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
     ub = m_SimHitVolumeMap.upper_bound(it->first);
     fes.setHitRange(it, ub);
     fes.processEntry();
+    if (fes.getGeneratedNPE() == 0)
+      continue;
     EKLMSimHit* simHit = it->second;
     EKLMDigit* digit = m_Digits.appendNew(simHit);
     digit->setMCTime(simHit->getTime());
@@ -214,7 +223,7 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
     digit->setGeneratedNPE(fes.getGeneratedNPE());
     digit->addRelationTo(simHit);
     if (!fes.getFitStatus()) {
-      digit->setTime(fes.getFitResults()->startTime);
+      digit->setTime(fes.getFPGAFit()->getStartTime());
       digit->setNPE(fes.getNPE());
     } else {
       digit->setTime(0.);
@@ -225,6 +234,11 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
       digit->isGood(true);
     else
       digit->isGood(false);
+    if (fes.getFitStatus() == EKLM::c_FPGASuccessfulFit && m_SaveFPGAFit) {
+      StoreArray<EKLMFPGAFit> fpgaFits;
+      EKLMFPGAFit* fit = fpgaFits.appendNew(*fes.getFPGAFit());
+      digit->addRelationTo(fit);
+    }
     /* cppcheck-suppress memleak */
   }
 }

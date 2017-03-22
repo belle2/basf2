@@ -26,19 +26,20 @@ from tracking.validation.run import TrackingValidationRun
 
 class CosmicsHough(TrackingValidationRun):
     n_events = N_EVENTS
+    #: Generator to be used in the simulation (-so)
+    generator_module = 'Cosmics'
     root_input_file = '../CosmicsSimNoBkg.root'
     components = None
 
     def finder_module(self, path):
-        path.add_module('WireHitPreparer')
-        path.add_module('SegmentFinderCDCFacetAutomaton',
+        path.add_module('TFCDC_WireHitPreparer')
+        path.add_module('TFCDC_SegmentFinderFacetAutomaton',
                         SegmentOrientation="downwards")
-        path.add_module('AxialTrackCreatorSegmentHough',
+        path.add_module('TFCDC_AxialTrackCreatorSegmentHough',
                         tracks="CDCAxialTrackVector")
-        path.add_module('StereoHitFinderCDCLegendreHistogramming',
-                        TracksStoreObjNameIsInput=True,
-                        TracksStoreObjName="CDCAxialTrackVector")
-        path.add_module('TrackExporter',
+        path.add_module('TFCDC_StereoHitFinder',
+                        inputTracks="CDCAxialTrackVector")
+        path.add_module('TFCDC_TrackExporter',
                         inputTracks="CDCAxialTrackVector")
 
         interactive_display = False
@@ -49,12 +50,13 @@ class CosmicsHough(TrackingValidationRun):
             path.add_module(cdc_display_module)
 
     tracking_coverage = {
+        'WhichParticles': ['CDC'],  # Include all particles seen in CDC, also secondaries
         'UsePXDHits': False,
         'UseSVDHits': False,
         'UseCDCHits': True,
         'UseOnlyAxialCDCHits': False,
+        "UseReassignedHits": True,
     }
-    fit_geometry = None
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE
 

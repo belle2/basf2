@@ -15,7 +15,7 @@
 
 namespace Belle2 {
 
-  // Reconstruct K0L-meson clusters
+  //! Reconstruct K0L-meson clusters
   class BKLMK0LReconstructorModule : public Module {
 
   public:

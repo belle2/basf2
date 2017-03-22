@@ -1,3 +1,17 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2011 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Program that record  cavariance matrices and other                     *
+ * parameters in root file that needs for simulation                      *
+ *                                                                        *
+ * Contributors: Alexander Bobrov (a.v.bobrov@inp.nsk.su) ,               *
+ * Guglielmo De Nardo                                                     *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <TFile.h>
 #include <TTree.h>
 #include <ecl/dataobjects/ECLWaveformData.h>

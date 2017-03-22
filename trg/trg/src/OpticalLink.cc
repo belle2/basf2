@@ -19,13 +19,15 @@ using namespace std;
 
 namespace Belle2 {
 
-TRGOpticalLink::TRGOpticalLink(const std::string & name,
-			       const TRGClock & clock) :
+  TRGOpticalLink::TRGOpticalLink(const std::string& name,
+                                 const TRGClock& clock) :
     _name(name),
-    _clock(& clock) {
-}
+    _clock(& clock)
+  {
+  }
 
-TRGOpticalLink::~TRGOpticalLink() {
-}
+  TRGOpticalLink::~TRGOpticalLink()
+  {
+  }
 
 } // namespace Belle2

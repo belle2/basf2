@@ -10,9 +10,10 @@
 #include <tracking/trackFindingCDC/filters/facet/FitFacetVarSet.h>
 
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
-#include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
-#include <cassert>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+
+#include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -26,9 +27,10 @@ bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
   const Vector2D middleWirePos2D = facet.getMiddleWire().getRefPos2D();
   const Vector2D endWirePos2D = facet.getEndWire().getRefPos2D();
 
+  // 0 step fit
   {
-    int nSteps = 0;
-    double chi2_0 = FacetFitter::fit(facet, nSteps);
+    constexpr const int nSteps = 0;
+    const double chi2_0 = FacetFitter::fit(facet, nSteps);
     const UncertainParameterLine2D& fitLine = facet.getFitLine();
     const double s = fitLine->lengthOnCurve(startWirePos2D, endWirePos2D);
 
@@ -38,9 +40,10 @@ bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
     var<named("fit_0_phi0_sigma")>() = std::sqrt(fitLine.variance(ELineParameter::c_Phi0));
   }
 
+  // 1 step fit
   {
-    int nSteps = 1;
-    double chi2_1 = FacetFitter::fit(facet, nSteps);
+    constexpr const int nSteps = 1;
+    const double chi2_1 = FacetFitter::fit(facet, nSteps);
     const UncertainParameterLine2D& fitLine = facet.getFitLine();
     const double s = fitLine->lengthOnCurve(startWirePos2D, endWirePos2D);
 
@@ -50,17 +53,18 @@ bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
     var<named("fit_1_phi0_sigma")>() = std::sqrt(fitLine.variance(ELineParameter::c_Phi0));
   }
 
+  // N step fit
   {
-    double chi2 = FacetFitter::fit(facet);
+    const double chi2 = FacetFitter::fit(facet);
     const UncertainParameterLine2D& fitLine = facet.getFitLine();
     const double s = fitLine->lengthOnCurve(startWirePos2D, endWirePos2D);
 
     var<named("chi2")>() = chi2;
     var<named("chi2_per_s")>() = chi2 / s;
 
-    // Heuristic flattening functions. Ffactor is chosen by hand.
-    const double erfWidth = 120.0;
-    const double tanhWidth = 1.64 * erfWidth;
+    // Heuristic flattening functions. Factor is chosen by hand for some experimentation here.
+    constexpr const double erfWidth = 120.0;
+    constexpr const double tanhWidth = 1.64 * erfWidth;
 
     var<named("erf")>() = std::erf(chi2 / erfWidth);
     var<named("tanh")>() = std::tanh(chi2 / tanhWidth);
@@ -84,6 +88,5 @@ bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
     var<named("end_distance")>() = endDistance;
     var<named("d2")>() = square(startDistance) + square(middleDistance) + square(endDistance);
   }
-
   return true;
 }

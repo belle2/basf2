@@ -525,17 +525,36 @@
     
   <Material name="TOPPCB">
     <state>Solid</state>
-    <density unit="g/cm3">4.2</density>
+    <density unit="g/cm3">2.0</density>
     <Components>   
       <Element fraction="0.14">Cu</Element>
       <Element fraction="0.02">Fe</Element>
       <Element fraction="0.02">Sn</Element>
       <Element fraction="0.01">Ta</Element>
       <Element fraction="0.01">Al</Element>
-      <Element fraction="0.3">O</Element>
+      <Element fraction="0.30">O</Element>
       <Element fraction="0.05">H</Element>
       <Element fraction="0.05">N</Element>
-      <Element fraction="0.3">Si</Element>
+      <Element fraction="0.30">Si</Element>
+      <Element fraction="0.05">C</Element>
+      <Element fraction="0.04">Sb</Element>
+      <Element fraction="0.01">Zn</Element>            
+    </Components>  
+  </Material>
+    
+  <Material name="TOPBoardStack">
+    <state>Solid</state>
+    <density unit="g/cm3">0.5</density>
+    <Components>   
+      <Element fraction="0.14">Cu</Element>
+      <Element fraction="0.02">Fe</Element>
+      <Element fraction="0.02">Sn</Element>
+      <Element fraction="0.01">Ta</Element>
+      <Element fraction="0.01">Al</Element>
+      <Element fraction="0.30">O</Element>
+      <Element fraction="0.05">H</Element>
+      <Element fraction="0.05">N</Element>
+      <Element fraction="0.30">Si</Element>
       <Element fraction="0.05">C</Element>
       <Element fraction="0.04">Sb</Element>
       <Element fraction="0.01">Zn</Element>            
@@ -583,5 +602,46 @@
       <Element fraction="1.0">Al</Element>      
     </Components>        
   </Material> 
+
+  <Material name="TOPColdPlate"> 
+    <state>Solid</state>
+    <density unit="g/cm3">4.35</density> 
+    <Components>   
+      <Element fraction="0.5">Al</Element>      
+      <Element fraction="0.5">Cu</Element>      
+    </Components>        
+  </Material> 
+
+  <Material name="TOPBrokenGlue"> 
+    <state>Gas</state>
+    <density unit="g/cm3">1.22e-3</density> 
+    <Components>   
+      <Element fraction="0.78">N</Element> 
+      <Element fraction="0.21">O</Element>  
+      <Element fraction="0.01">Ar</Element>       
+    </Components>        
+    <Property name="RINDEX" unit="eV"> 
+      <value energy="1.0">1.000274</value>
+      <value energy="2.0">1.000277</value>
+      <value energy="3.0">1.000282</value>
+      <value energy="4.0">1.000290</value>         
+    </Property> 
+  </Material> 
     
+  <Material name="TOPPeelOffCookie"> 
+    <state>Gas</state>
+    <density unit="g/cm3">1.22e-3</density> 
+    <Components>   
+      <Element fraction="0.78">N</Element> 
+      <Element fraction="0.21">O</Element>  
+      <Element fraction="0.01">Ar</Element>       
+    </Components>        
+    <Property name="RINDEX" unit="eV"> 
+      <value energy="1.0">1.000274</value>
+      <value energy="2.0">1.000277</value>
+      <value energy="3.0">1.000282</value>
+      <value energy="4.0">1.000290</value>         
+    </Property> 
+  </Material> 
+  
 </Materials> 

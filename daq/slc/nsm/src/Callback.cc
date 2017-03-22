@@ -72,47 +72,6 @@ NSMVHandler* Callback::getHandler_p(const std::string& node, const std::string& 
   return NULL;
 }
 
-int Callback::add(const DBObject& obj)
-{
-  DBObject::NameValueList list;
-  obj.search(list, "", true);
-  int id = 0;
-  for (DBObject::NameValueList::iterator it = list.begin();
-       it != list.end(); it++) {
-    const std::string& name(it->name);
-    if (name.size() == 0 || name.at(0) == '$') continue;
-    switch (it->type) {
-      case DBField::BOOL:
-        id = add(new NSMVHandlerInt("", name, true, true, (int) * ((bool*)it->buf)));
-        break;
-      case DBField::CHAR:
-        id = add(new NSMVHandlerInt("", name, true, true, (int) * ((char*)it->buf)));
-        break;
-      case DBField::SHORT:
-        id = add(new NSMVHandlerInt("", name, true, true, (int) * ((short*)it->buf)));
-        break;
-      case DBField::INT:
-        id = add(new NSMVHandlerInt("", name, true, true, *((int*)it->buf)));
-        break;
-      case DBField::LONG:
-        id = add(new NSMVHandlerInt("", name, true, true, (int) * ((long long*)it->buf)));
-        break;
-      case DBField::FLOAT:
-        id = add(new NSMVHandlerFloat("", name, true, true, *((float*)it->buf)));
-        break;
-      case DBField::DOUBLE:
-        id = add(new NSMVHandlerFloat("", name, true, true, (float) * ((double*)it->buf)));
-        break;
-      case DBField::TEXT:
-        id = add(new NSMVHandlerText("", name, true, true, *((std::string*)it->buf)));
-        break;
-      default:
-        break;
-    }
-  }
-  return id;
-}
-
 void Callback::remove(const DBObject& obj)
 {
   DBObject::NameValueList list;

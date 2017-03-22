@@ -14,13 +14,15 @@ set_debug_level(1000)
 # only load persistent objects stored during data collection
 input = register_module('RootInput')
 input.param('inputFileName', 'RootOutput.root')
-input.initialize()
-
 gear = register_module('Gearbox')
-gear.initialize()
 geom = register_module('Geometry')
 geom.param('components', ['PXD', 'SVD'])
-geom.initialize()
+
+main = create_path()
+main.add_module(input)
+main.add_module(gear)
+main.add_module(geom)
+process(main)
 
 algo = Belle2.MillepedeAlgorithm()
 algo.steering().command('method diagonalization 1 0.1')
@@ -120,9 +122,11 @@ for ipar in range(0, algo.result().getNoParameters()):
         sid = label.getVxdID().getID()
         pid = label.getParameterId()
         ew = algo.result().getEigenVectorElement(0, ipar)  # + algo.result().getEigenVectorElement(1, ipar)
-        pos = Belle2.VXD.GeoCache.getInstance().get(label.getVxdID()).pointToGlobal(ROOT.TVector3(0, 0, 0))
 
-        value[0] = vxd.get(sid, pid)
+        if vxd:
+            value[0] = vxd.get(sid, pid)
+        else:
+            value[0] = 0.
         corrections.set(sid, pid, correction[0])
         errors.set(sid, pid, error[0])
         eigenweights.set(sid, pid, ew)
@@ -130,9 +134,9 @@ for ipar in range(0, algo.result().getNoParameters()):
         layer[0] = label.getVxdID().getLayerNumber()
         ladder[0] = label.getVxdID().getLadderNumber()
         sensor[0] = label.getVxdID().getSensorNumber()
-        x[0] = pos[0]
-        y[0] = pos[1]
-        z[0] = pos[2]
+        x[0] = 0.
+        y[0] = 0.
+        z[0] = 0.
         eigenweight[0] = ew
         vxdtree.Fill()
 

@@ -44,7 +44,6 @@ using namespace boost;
 
 namespace Belle2 {
 
-
   using namespace geometry;
 
   namespace ir {
@@ -107,8 +106,7 @@ namespace Belle2 {
       double SafetyLength = cSafety.getLength("L1") / Unit::mm;
 
       double stepMax = 5.0 * Unit::mm;
-      bool flag_limitStep = false;
-      //bool flag_limitStep = true;
+      int flag_limitStep = content.getInt("LimitStepLength");
 
       double A11 = 0.03918;
 

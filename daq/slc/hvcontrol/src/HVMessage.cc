@@ -59,6 +59,12 @@ HVMessage::State HVMessage::getState(const char* pstate)
     return RAMPDOWN;
   } else if (pname == "rampup") {
     return RAMPUP;
+  } else if (pname == "trip") {
+    return TRIP;
+  } else if (pname == "etrip") {
+    return ETRIP;
+  } else if (pname == "ilock") {
+    return INTERLOCK;
   }
   return ERR;
 }
@@ -73,6 +79,9 @@ const std::string HVMessage::getStateText(HVMessage::State state)
     case ERR: return "ERR";
     case RAMPUP: return "RAMPUP";
     case RAMPDOWN: return "RAMPDOWN";
+    case TRIP: return "TRIP";
+    case ETRIP: return "ETRIP";
+    case INTERLOCK: return "ILOCK";
   }
   return "UNKNOWN";
 }

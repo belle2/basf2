@@ -158,9 +158,10 @@ namespace Belle2 {
     if (pixelID == 0) return 0;
 
     const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
-    int Npmtx = geo->getPMTArray().getNumColumns();
-    int Npadx = geo->getPMTArray().getPMT().getNumColumns();
-    int Npady = geo->getPMTArray().getPMT().getNumRows();
+    const auto& pmtArray = geo->getModule(1).getPMTArray();
+    int Npmtx = pmtArray.getNumColumns();
+    int Npadx = pmtArray.getPMT().getNumColumns();
+    int Npady = pmtArray.getPMT().getNumRows();
 
     pixelID--;
     int nx = Npmtx * Npadx;

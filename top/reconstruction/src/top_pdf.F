@@ -1,8 +1,10 @@
 !-----------------------------------------------------------------------
 ! TOP counter for Belle: Reconstruction - construct TOP PDF
-! M. Staric, nov-2008, jun-2009, feb-2010, jun-2012, feb-2013, dec-2013
+! M. Staric, nov-2008, jun-2009, feb-2010, jun-2012, feb-2013, dec-2013,
+! mar-2017
 !
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
+! mar-2017: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE TOP_SET_PDF(MASS,T0)
@@ -19,6 +21,7 @@
 #include "TOP_PIK.fi"
 #include "TOP_TOPF.fi"
 #include "TOP_TRACK.fi"
+#include "TOP_MASK.fi"
       DATA NCH /3*0/
       DATA BETA_RQ /0./
       DATA STORE_OPT /.TRUE./
@@ -128,8 +131,13 @@
       STFS=0.
       NORM=0.
       DO ICH=0,NUMCH-1
+         IF(.NOT.CH_MASK(ICH,MODUL)) THEN
+            NUM_PIK(ICH)=0
+            CYCLE
+         ENDIF
          FOT=0.                 ! kaj pa ozadje?
          DO K=1,NUM_PIK(ICH)
+            PIK_NPH(K,ICH)=PIK_NPH(K,ICH)*CH_EFFI(ICH,MODUL)
             NORM=NORM+PIK_NPH(K,ICH)
             FOT=FOT+PIK_NPH(K,ICH)
          ENDDO
@@ -550,12 +558,11 @@ c--   calculate PDF parameters
 #include "TOP_PIK.fi"
 #include "TOP_PAR.fi"
 #include "TOP_DATA.fi"
-
+#include "TOP_MASK.fi"
+      
       INTEGER N_BGR, I
       INTEGER ICH, NUMCH
       REAL S, T
-      INTEGER M_OLD /-1/
-      SAVE M_OLD
       
       IF(NUM_MOD.GT.1) THEN
          N_BGR=0
@@ -572,17 +579,19 @@ c--   calculate PDF parameters
          STFB=NUM_BGR
       ENDIF
 
-      IF(M.EQ.M_OLD) RETURN
-      M_OLD=M
-
       NUMCH=NCH(0)+NCH(1)
       S=0.
       DO ICH=0,NUMCH-1
-         S=S+PIK_DXCH(ICH)*PIK_DYCH(ICH)
+         IF(CH_MASK(ICH,M)) THEN
+            PIK_BGR(ICH)=PIK_DXCH(ICH)*PIK_DYCH(ICH)*CH_EFFI(ICH,M)
+            S=S+PIK_BGR(ICH)
+         ELSE
+            PIK_BGR(ICH)=0.
+         ENDIF
       ENDDO
-      IF(S.EQ.0) S=1.
+      IF(S.EQ.0) RETURN
       DO ICH=0,NUMCH-1
-         PIK_BGR(ICH)=PIK_DXCH(ICH)*PIK_DYCH(ICH)/S/T_MAX
+         PIK_BGR(ICH)=PIK_BGR(ICH)/S/T_MAX
       ENDDO
 
       END

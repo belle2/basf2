@@ -33,9 +33,11 @@ namespace Belle2 {
     std::string m_param_recoTracksStoreArrayName = "";
     /// StoreArray name to which to write the selected reco tracks.
     std::string m_param_selectedRecoTracksStoreArrayName = "__SelectedRecoTracks";
+    /// Parameter to choose the selection criteria of the best tracks
+    std::string m_param_selectionCriteria = "highest_pt";
     /// Flag to delete the not selected RecoTracks from the input StoreArray.
     bool m_param_deleteOtherRecoTracks = true;
     /// How many reco tracks should be copied over.
-    unsigned long m_param_maximalNumberOfTracks = 1;
+    unsigned long m_param_maximalNumberOfTracks = 2;
   };
 }

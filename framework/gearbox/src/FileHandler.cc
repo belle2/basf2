@@ -82,12 +82,12 @@ namespace Belle2 {
         //Ok, let's try to find the file
         B2DEBUG(350, "Trying to find " << filename);
 
-        std::string fullpath = FileSystem::findFile(filename);
+        std::string fullpath = FileSystem::findFile(filename, true);
         if (!fullpath.empty()) {
           if (m_rundependence) B2INFO("gearbox::FileHandler: Reading '" << fullpath << "'");
           return new FileContext(fullpath, false);
         }
-        fullpath = FileSystem::findFile(filename + ".gz");
+        fullpath = FileSystem::findFile(filename + ".gz", true);
         if (!fullpath.empty()) {
           if (m_rundependence) B2INFO("gearbox::FileHandler: Reading '" << fullpath << "' (gzip)");
           return new FileContext(fullpath, true);

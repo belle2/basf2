@@ -67,7 +67,7 @@ namespace Belle2 {
         m_config = createConfiguration(content);
 
         // override geometry configuration from the DB
-        DBStore::Instance().addConstantOverride("dbstore", "ARICHGeometryConfig", new ARICHGeometryConfig(m_config));
+        DBStore::Instance().addConstantOverride("ARICHGeometryConfig", new ARICHGeometryConfig(m_config));
 
         createGeometry(topVolume, type);
       }

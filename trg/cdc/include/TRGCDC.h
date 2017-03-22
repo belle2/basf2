@@ -207,11 +207,11 @@ namespace Belle2 {
     /// gets return value for trg cdc module.
     int getReturnValue(void) const;
 
-    /// gets return value for a module in trg cdc module. 
-    int getReturnValue(EReturnValueType const & moduleName) const;
+    /// gets return value for a module in trg cdc module.
+    int getReturnValue(EReturnValueType const& moduleName) const;
 
-    /// sets return value for trg cdc module. 
-    void setReturnValue(EReturnValueType const & moduleName, bool flag);
+    /// sets return value for trg cdc module.
+    void setReturnValue(EReturnValueType const& moduleName, bool flag);
 
     /// sets return value for trg cdc module.
     void setReturnValue(int);
@@ -438,16 +438,16 @@ namespace Belle2 {
 
     /// returns start clock of the firmware simulation in FE clock.
     int firmwareSimulationStart(void) const;
-      
+
     /// returns stop clock of the firmware simulation in FE clock.
     int firmwareSimulationStop(void) const;
-      
+
     /// returns start clock of the firmware simulation in data clock.
     int firmwareSimulationStartDataClock(void) const;
-      
+
     /// returns stop clock of the firmware simulation in data clock.
     int firmwareSimulationStopDataClock(void) const;
-      
+
     /// returns the user clock for Aurora 3.125 Gbps.
     const TRGClock& userClock3125(void) const;
 
@@ -1093,35 +1093,40 @@ namespace Belle2 {
   {
     return _returnValue;
   }
-  
+
   inline
   void
-  TRGCDC::setReturnValue(int returnValue) {
+  TRGCDC::setReturnValue(int returnValue)
+  {
     _returnValue = returnValue;
   }
 
   inline
   int
-  TRGCDC::firmwareSimulationStart(void) const {
-      return _firmwareSimulationStart;
+  TRGCDC::firmwareSimulationStart(void) const
+  {
+    return _firmwareSimulationStart;
   }
 
   inline
   int
-  TRGCDC::firmwareSimulationStop(void) const {
-      return _firmwareSimulationStop;
+  TRGCDC::firmwareSimulationStop(void) const
+  {
+    return _firmwareSimulationStop;
   }
 
   inline
   int
-  TRGCDC::firmwareSimulationStartDataClock(void) const {
-      return _firmwareSimulationStartDataClock;
+  TRGCDC::firmwareSimulationStartDataClock(void) const
+  {
+    return _firmwareSimulationStartDataClock;
   }
 
   inline
   int
-  TRGCDC::firmwareSimulationStopDataClock(void) const {
-      return _firmwareSimulationStopDataClock;
+  TRGCDC::firmwareSimulationStopDataClock(void) const
+  {
+    return _firmwareSimulationStopDataClock;
   }
 
 } // namespace Belle2

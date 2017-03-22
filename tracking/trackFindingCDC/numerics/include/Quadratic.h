@@ -46,10 +46,6 @@ namespace Belle2 {
      */
     inline std::pair<double, double> solveQuadraticABC(const double a, const double b, const double c)
     {
-      std::pair<double, double> result;
-      double& bigSolution = result.first;
-      double& smallSolution = result.second;
-
       /*if ( a == 0 ){
       // this distinction must not be made since the else block gives the same result
       // we may save some computation steps here but maybe that is not worth while
@@ -60,14 +56,14 @@ namespace Belle2 {
       return result;
       }*/
 
-      const double discriminant = ((double)b) * b - 4 * a * c;
+      const double discriminant = b * b - 4 * a * c;
       const double root = sqrt(discriminant);
       const double bigSum = (b > 0) ? -b - root : -b + root;
 
-      bigSolution = bigSum / 2 / a;
-      smallSolution = 2 * c / bigSum;
+      const double bigSolution = bigSum / 2 / a;
+      const double smallSolution = 2 * c / bigSum;
 
-      return result;
+      return {bigSolution, smallSolution};
     }
   }
 }

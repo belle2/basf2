@@ -3,12 +3,47 @@
 
 from basf2 import *
 from modularAnalysis import *
-# Prepare all standard final state particles
+
+
+def stdPhotons(listtype='loose', path=analysis_main):
+
+    if listtype == 'all':
+        fillParticleList('gamma:all', '', True, path)
+    elif listtype == 'loose':
+        stdPhotons('all', path)
+        cutAndCopyList('gamma:loose', 'gamma:all', 'clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]', True, path)
+    elif listtype == 'tight':
+        stdPhotons('loose', path)
+        cutAndCopyList(
+            'gamma:tight',
+            'gamma:loose',
+            '[clusterReg == 1 and E > 0.05] or [clusterReg == 2 and E > 0.05] or [clusterReg == 3 and E > 0.075]',
+            True,
+            path)
+    elif listtype == 'pi0':
+        stdPhotons('loose', path)
+        cutAndCopyList(
+            'gamma:pi0',
+            'gamma:loose',
+            '',
+            True,
+            path)
+    elif listtype == 'pi0highE':
+        stdPhotons('loose', path)
+        cutAndCopyList(
+            'gamma:pi0highE',
+            'gamma:loose',
+            'E > 0.2',
+            True,
+            path)
+    else:
+        fillParticleList('gamma:all', '', True, path)
+
+# Used in skimming code
 
 
 def loadStdAllPhoton(path=analysis_main):
     fillParticleList('gamma:all', '', True, path)
-    calibratePhotonEnergy('gamma:all', 0.030, path)
 
 
 def loadStdPhoton(path=analysis_main):

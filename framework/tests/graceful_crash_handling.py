@@ -44,6 +44,7 @@ def run_test():
                 pid = os.getpid()
                 B2INFO("Killing %s" % (pid))
                 os.kill(pid, 11)
+                # B2FATAL("diediedie")  # faster
 
     # Create paths
     main = create_path()

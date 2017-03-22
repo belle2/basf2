@@ -91,7 +91,7 @@ namespace Belle2 {
       const double m_BRLthetaMin = 32.2 * Unit::deg; /**< Minimum theta of barrel used for choosing which Zernike MVA to apply */
       const double m_BRLthetaMax = 128.7 * Unit::deg; /**< Maximum theta of barrel used for choosing which Zernike MVA to apply */
 
-      const unsigned int m_numZernikeMVAvariables = 22; /** number of variables expected in the Zernike MVA weightfile */
+      const unsigned int m_numZernikeMVAvariables = 22; /**< number of variables expected in the Zernike MVA weightfile */
 
       std::string m_zernike_MVAidentifier_FWD; /**< Zernike moment MVA - FWD endcap weight-file */
       std::string m_zernike_MVAidentifier_BRL; /**< Zernike moment MVA - Barrel weight-file */

@@ -35,7 +35,7 @@ namespace Belle2 {
 
     public:
       /// Constructor setting up the minimal length / energy cut off.
-      explicit MultipassCellularPathFinder(CellState minStateToFollow = -std::numeric_limits<CellState>::infinity())
+      explicit MultipassCellularPathFinder(Weight minStateToFollow = -std::numeric_limits<Weight>::infinity())
         : m_minStateToFollow(minStateToFollow)
       {}
 
@@ -57,51 +57,65 @@ namespace Belle2 {
           cellHolder.unsetAndForwardMaskedFlag();
         }
 
-        bool created = false;
         B2DEBUG(100, "Apply multipass cellular automat");
         do {
-          const ACellHolder* highestCellHolder = m_cellularAutomaton.applyTo(cellHolders,
-                                                 cellHolderNeighborhood);
+          m_cellularAutomaton.applyTo(cellHolders, cellHolderNeighborhood);
+
+          auto lessStartCellState = [this](ACellHolder & lhs, ACellHolder & rhs) {
+            AutomatonCell& lhsCell = lhs.getAutomatonCell();
+            AutomatonCell& rhsCell = rhs.getAutomatonCell();
+
+            // Cells with state lower than the minimal cell state are one lowest category
+            if (rhsCell.getCellState() < m_minStateToFollow) return false;
+            if (lhsCell.getCellState() < m_minStateToFollow) return true;
+
+            return (std::make_tuple(lhsCell.hasPriorityPathFlag(),
+                                    lhsCell.hasStartFlag(),
+                                    lhsCell.getCellState()) <
+                    std::make_tuple(rhsCell.hasPriorityPathFlag(),
+                                    rhsCell.hasStartFlag(),
+                                    rhsCell.getCellState()));
+          };
+
+          auto itStartCellHolder =
+            std::max_element(cellHolders.begin(), cellHolders.end(), lessStartCellState);
+          if (itStartCellHolder == cellHolders.end()) break;
+          else if (not itStartCellHolder->getAutomatonCell().hasStartFlag()) break;
+          else if (itStartCellHolder->getAutomatonCell().getCellState() < m_minStateToFollow) break;
+
+          const ACellHolder* highestCellHolder = &*itStartCellHolder;
 
           Path<ACellHolder> newPath = m_cellularPathFollower.followSingle(highestCellHolder,
                                       cellHolderNeighborhood,
                                       m_minStateToFollow);
-          if (newPath.empty()) {
-            created = false;
-          } else {
 
-            // Block the used items
-            for (ACellHolder* cellHolderPtr : newPath) {
-              cellHolderPtr->setAndForwardMaskedFlag();
-            }
+          if (newPath.empty()) break;
 
-            // Block the items that have already used components
-            for (ACellHolder& cellHolder : cellHolders) {
-              cellHolder.receiveMaskedFlag();
-            }
-
-            paths.push_back(std::move(newPath));
-            created = true;
-
+          // Block the used items
+          for (ACellHolder* cellHolderPtr : newPath) {
+            cellHolderPtr->setAndForwardMaskedFlag();
           }
 
-        } while (created);
+          // Block the items that have already used components
+          for (ACellHolder& cellHolder : cellHolders) {
+            cellHolder.receiveMaskedFlag();
+          }
+
+          paths.push_back(std::move(newPath));
+
+        } while (true);
 
       }
 
     private:
       /// The minimal path length / energy to be followed.
-      CellState m_minStateToFollow;
+      Weight m_minStateToFollow;
 
       /// The cellular automaton to be used.
       CellularAutomaton<ACellHolder> m_cellularAutomaton;
 
       /// The path follower used to extract the path from the graph processed by the cellular automaton.
       CellularPathFollower<ACellHolder> m_cellularPathFollower;
-
     };
-
   }
-
 }
-

@@ -73,9 +73,12 @@
       <!-- Sensor operation parameters. -->
       <DepletionVoltage unit="V">60.0</DepletionVoltage>
       <BiasVoltage unit="V">150</BiasVoltage>
-      <BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
-      <InterstripCapacitance unit="pF">6</InterstripCapacitance>
-      <CouplingCapacitance unit="pF">120</CouplingCapacitance>
+      <BackplaneCapacitanceU unit="pF">1.4</BackplaneCapacitanceU>
+      <InterstripCapacitanceU unit="pF">9</InterstripCapacitanceU>
+      <CouplingCapacitanceU unit="pF">180</CouplingCapacitanceU>
+      <BackplaneCapacitanceV unit="pF">2.3</BackplaneCapacitanceV>
+      <InterstripCapacitanceV unit="pF">3.9</InterstripCapacitanceV>
+      <CouplingCapacitanceV unit="pF">180</CouplingCapacitanceV>
       <ElectronicNoiseU unit="e">650</ElectronicNoiseU>
       <ElectronicNoiseV unit="e">1100</ElectronicNoiseV>
    </Snippet>
@@ -87,9 +90,12 @@
      <!-- Sensor operation parameters. -->
      <DepletionVoltage unit="V">60.0</DepletionVoltage>
      <BiasVoltage unit="V">150</BiasVoltage>
-     <BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
-     <InterstripCapacitance unit="pF">6</InterstripCapacitance>
-     <CouplingCapacitance unit="pF">120</CouplingCapacitance>
+     <BackplaneCapacitanceU unit="pF">1</BackplaneCapacitanceU>
+     <InterstripCapacitanceU unit="pF">11</InterstripCapacitanceU>
+     <CouplingCapacitanceU unit="pF">180</CouplingCapacitanceU>
+     <BackplaneCapacitanceV unit="pF">1</BackplaneCapacitanceV>
+     <InterstripCapacitanceV unit="pF">3</InterstripCapacitanceV>
+     <CouplingCapacitanceV unit="pF">120</CouplingCapacitanceV>
      <ElectronicNoiseU unit="e">480</ElectronicNoiseU>
      <ElectronicNoiseV unit="e">850</ElectronicNoiseV>
    </Snippet>

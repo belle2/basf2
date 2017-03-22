@@ -217,9 +217,9 @@ namespace {
                                      pValue);
 
       const TMatrixDSym cov6_2 = uncertainHelix2.getCartesianCovariance(bZ);
-      for (int i : irange(0, 6)) {
-        for (int j : irange(0, 6)) {
-          EXPECT_NEAR(cov6(i, j), cov6_2(i, j), 1e-7);
+      for (int j : irange(0, 6)) {
+        for (int k : irange(0, 6)) {
+          EXPECT_NEAR(cov6(j, k), cov6_2(j, k), 1e-7);
         }
       }
     }
@@ -266,9 +266,9 @@ namespace {
       const TMatrixDSym cov5 = uncertainHelix2.getCovariance();
       EXPECT_EQ(-1, charge);
 
-      for (int i : irange(0, 5)) {
-        for (int j : irange(0, 5)) {
-          EXPECT_NEAR(expectedCov5(i, j), cov5(i, j), 1e-7);
+      for (int j : irange(0, 5)) {
+        for (int k : irange(0, 5)) {
+          EXPECT_NEAR(expectedCov5(j, k), cov5(j, k), 1e-7);
         }
       }
     }
@@ -446,4 +446,63 @@ namespace {
     }
   }
 
+  TEST(UncertainHelixTest, MoveInCartesianVersusMoveInPerigeeCoordinates)
+  {
+    // Move of the coordinate system
+    TVector3 moveBy(0.5, -1, 0.5);
+
+    double d0 = 1;
+    double phi0 = 0;
+    double omega = -0.005;
+    double tanLambda = 1;
+    double z0 = 0;
+
+    const double bZ = 2;
+    const double pValue = 0.5;
+
+    TMatrixDSym initialCov5(5);
+    initialCov5.Zero();
+    for (int i : irange(0, 5)) {
+      for (int j : irange(0, 5)) {
+        initialCov5(i, j) = i + j;
+      }
+    }
+
+    UncertainHelix uncertainHelix(d0, phi0, omega, z0, tanLambda, initialCov5, pValue);
+
+    const TVector3 position = uncertainHelix.getPerigee();
+    const TVector3 momentum = uncertainHelix.getMomentum(bZ);
+    const double charge = uncertainHelix.getChargeSign();
+    const TMatrixDSym cov6 = uncertainHelix.getCartesianCovariance(bZ);
+
+    // Execute the move in cartesian coordinates
+    const TVector3 movedPosition = position - moveBy;
+    UncertainHelix movedUncertainHelix(movedPosition,
+                                       momentum,
+                                       charge,
+                                       bZ,
+                                       cov6,
+                                       pValue);
+
+    const TMatrixDSym cov5 = movedUncertainHelix.getCovariance();
+
+    // Execute the move in perigee coordinates
+    UncertainHelix expectedMovedUncertainHelix = uncertainHelix;
+    expectedMovedUncertainHelix.passiveMoveBy(moveBy);
+    const TMatrixDSym expectedCov5 = expectedMovedUncertainHelix.getCovariance();
+
+    // Test equivalence of both transformation
+    EXPECT_NEAR(expectedMovedUncertainHelix.getD0(), movedUncertainHelix.getD0(), 1e-7);
+    EXPECT_NEAR(expectedMovedUncertainHelix.getPhi0(), movedUncertainHelix.getPhi0(), 1e-7);
+    EXPECT_NEAR(expectedMovedUncertainHelix.getOmega(), movedUncertainHelix.getOmega(), 1e-7);
+    EXPECT_NEAR(expectedMovedUncertainHelix.getZ0(), movedUncertainHelix.getZ0(), 1e-7);
+    EXPECT_NEAR(expectedMovedUncertainHelix.getTanLambda(), movedUncertainHelix.getTanLambda(), 1e-7);
+
+    for (int i : irange(0, 5)) {
+      for (int j : irange(0, 5)) {
+        TEST_CONTEXT("Failed for index (" << i << ", " << j << ")");
+        EXPECT_NEAR(expectedCov5(i, j), cov5(i, j), 1e-7);
+      }
+    }
+  }
 }

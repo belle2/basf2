@@ -62,11 +62,11 @@ namespace {
     EXPECT_TRUE(profileData[0] == relObjData[0]->getRelated<ProfileInfo>());
 
     //getRelatedWithWeight
-    EXPECT_TRUE(std::make_pair(profileData[0], -42.0) == relObjData[0]->getRelatedToWithWeight<ProfileInfo>());
+    EXPECT_TRUE(std::make_pair(profileData[0], -42.0f) == relObjData[0]->getRelatedToWithWeight<ProfileInfo>());
     ProfileInfo* profileNullPtr = nullptr;
-    EXPECT_TRUE(std::make_pair(profileNullPtr, 1.0) == relObjData[1]->getRelatedToWithWeight<ProfileInfo>());
-    EXPECT_TRUE(std::make_pair(profileNullPtr, 1.0) == relObjData[0]->getRelatedFromWithWeight<ProfileInfo>());
-    EXPECT_TRUE(std::make_pair(profileData[0], -42.0) == relObjData[0]->getRelatedWithWeight<ProfileInfo>());
+    EXPECT_TRUE(std::make_pair(profileNullPtr, 1.0f) == relObjData[1]->getRelatedToWithWeight<ProfileInfo>());
+    EXPECT_TRUE(std::make_pair(profileNullPtr, 1.0f) == relObjData[0]->getRelatedFromWithWeight<ProfileInfo>());
+    EXPECT_TRUE(std::make_pair(profileData[0], -42.0f) == relObjData[0]->getRelatedWithWeight<ProfileInfo>());
 
 
     //adding relations to NULL is safe and doesn't do anything
@@ -174,6 +174,30 @@ namespace {
     EXPECT_TRUE(relObjData[3] == relObjData[3]->getRelated<RelationsObject>());
     EXPECT_TRUE(relObjData[3] == relObjData[3]->getRelatedFrom<RelationsObject>());
     EXPECT_TRUE(relObjData[3] == relObjData[3]->getRelatedTo<RelationsObject>());
+  }
+
+  TEST_F(RelationsObjectTest, ModifyRelations)
+  {
+    relObjData.registerRelationTo(profileData);
+    DataStore::Instance().setInitializeActive(false);
+
+    (relObjData)[0]->addRelationTo((profileData)[0], -42.0);
+
+    //weights
+    RelationVector<ProfileInfo> rels = (relObjData)[0]->getRelationsTo<ProfileInfo>();
+    EXPECT_DOUBLE_EQ(rels.weight(0), -42.0);
+    rels.setWeight(0, -3.0);
+    EXPECT_DOUBLE_EQ(rels.weight(0), -3.0); //updated immediately
+    RelationVector<ProfileInfo> rels2 = (relObjData)[0]->getRelationsTo<ProfileInfo>();
+    EXPECT_DOUBLE_EQ(rels2.weight(0), -3.0); //and in DataStore
+
+    //removal
+    EXPECT_EQ(1u, relObjData[0]->getRelationsTo<ProfileInfo>().size());
+    EXPECT_EQ(1u, relObjData[0]->getRelationsWith<ProfileInfo>().size());
+    rels2.remove(0);
+    EXPECT_EQ(0u, rels2.size());
+    EXPECT_EQ(0u, relObjData[0]->getRelationsTo<ProfileInfo>().size());
+    EXPECT_EQ(0u, relObjData[0]->getRelationsWith<ProfileInfo>().size());
   }
 
 

@@ -400,7 +400,7 @@ void DisplayUI::makeGui()
   TEveBrowser* browser = gEve->GetBrowser();
   const int margin = 3;
 
-  browser->Connect("CloseWindow()", "Belle2::DisplayUI", this, "closeAndContinue()");
+  browser->Connect("CloseWindow()", "Belle2::DisplayUI", this, "exit()");
 
   //add handler for keyboard events, needs to be done for browser TGFrame as well as frames of all TGLViewers
   browser->Connect("ProcessedEvent(Event_t*)", "Belle2::DisplayUI", this, "handleEvent(Event_t*)");
@@ -794,7 +794,7 @@ void DisplayUI::pollNewEvents()
     m_nextButton->SetEnabled(numEvents > 0);
 }
 
-void DisplayUI::closeAndContinue()
+void DisplayUI::exit()
 {
   gSystem->ExitLoop();
   gROOT->SetInterrupt();
@@ -811,11 +811,6 @@ void DisplayUI::closeAndContinue()
 
   gEve->GetBrowser()->UnmapWindow();
   gEve->GetBrowser()->SendCloseMessage();
-}
-
-void DisplayUI::exit()
-{
-  closeAndContinue();
 
   //stop event processing after current event
   StoreObjPtr<EventMetaData> eventMetaData;

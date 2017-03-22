@@ -20,6 +20,12 @@
 
 #include <framework/logging/Logger.h>
 
+#include <alignment/dbobjects/VXDAlignment.h>
+#include <alignment/dbobjects/CDCCalibration.h>
+#include <alignment/dbobjects/BKLMAlignment.h>
+#include <eklm/dbobjects/EKLMAlignment.h>
+
+
 namespace Belle2 {
   namespace alignment {
     /// pair of the global unique id from object with constants and element representing some rigid body in hierarchy
@@ -207,6 +213,21 @@ namespace Belle2 {
 
     class GlobalParamVector {
     public:
+      GlobalParamVector()
+      {
+        addDBObj<VXDAlignment>();
+        addDBObj<CDCCalibration>();
+        addDBObj<BKLMAlignment>();
+        addDBObj<EKLMAlignment>();
+      }
+
+      template <class DBObjType>
+      void addDBObj()
+      {
+        m_vector.insert(std::make_pair(DBObjType::getGlobalUniqueID(),
+                                       std::shared_ptr<GlobalParamSet<DBObjType>>(new GlobalParamSet<DBObjType>)));
+      }
+
       void setGlobalParam(double value, unsigned short uniqueID, unsigned short element, unsigned short param)
       {
         auto dbObj = m_vector.find(uniqueID);

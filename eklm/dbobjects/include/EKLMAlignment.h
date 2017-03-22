@@ -58,6 +58,32 @@ namespace Belle2 {
      */
     void cleanAlignmentData();
 
+    /// Get global unique id
+    static unsigned short getGlobalUniqueID() {return 80;}
+    /// Get global parameter
+    double getGlobalParam(unsigned short element, unsigned short param)
+    {
+
+      auto adata = getAlignmentData(element);
+      if (param == 1) return adata->getDx();
+      if (param == 2) return adata->getDy();
+      if (param == 6) return adata->getDalpha();
+
+      return 0.;
+    }
+    /// Set global parameter
+    void setGlobalParam(double value, unsigned short element, unsigned short param)
+    {
+
+      auto adata = getAlignmentData(element);
+      if (param == 1) adata->setDx(value);
+      if (param == 2) adata->setDy(value);
+      if (param == 6) adata->setDalpha(value);
+
+    }
+    /// TODO: list stored global parameters
+    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {};}
+
   private:
 
     /** Alignment data. */

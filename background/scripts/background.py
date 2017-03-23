@@ -8,10 +8,10 @@ def add_output(path, bgType, realTime, sampleType, phase=3, fileName='output.roo
     '''
     A function to be used for output of BG simulation.
     @param path path name
-    @param specify the Phase, 1 for Phase 1, 2 for Phase 2, and 3 for Physics Run or Phase 3
     @param bgType background type, to get available types: basf2 -m BeamBkgTagSetter
     @param realTime equivalent time of superKEKB running in [ns]
     @param sampleType 'study' (for BG studies) or 'usual', 'PXD', 'ECL' (for BG mixer)
+    @param specify the Phase, 1 for Phase 1, 2 for Phase 2, and 3 for Physics Run or Phase 3
     @param fileName optional file name, can be overridden by basf2 -o
     '''
 

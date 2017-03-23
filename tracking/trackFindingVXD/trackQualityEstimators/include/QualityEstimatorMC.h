@@ -27,9 +27,9 @@ namespace Belle2 {
     typedef std::pair<MCRecoTrackIndex, NMatches> MatchInfo;
 
     QualityEstimatorMC(double magneticFieldZ, std::string mcRecoTracksStoreArrayName = "MCRecoTracks", bool strictQualityIndex = true):
-      QualityEstimatorBase(magneticFieldZ), m_MCRecoTracksStoreArrayName(mcRecoTracksStoreArrayName),
-      m_strictQualityIndex(strictQualityIndex)
+      QualityEstimatorBase(magneticFieldZ), m_strictQualityIndex(strictQualityIndex)
     {
+      m_mcRecoTracks.isRequired(mcRecoTracksStoreArrayName);
       // store to make sure SPTCs are compared to the correct SVDStoreArray
       m_svdClustersName = m_mcRecoTracks[0]->getStoreArrayNameOfSVDHits();
 
@@ -52,7 +52,6 @@ namespace Belle2 {
     void fillMatrixWithMCInformation();
 
     // parameters
-    std::string m_MCRecoTracksStoreArrayName;
 
     /** If true only SPTCs containing SVDClusters corresponding to a single MCRecoTrack get a QI != 0.
      *  If a SVDCluster corresponds to several MCRecoTracks it is still valid as long as the correct MCRecoTrack is one of them.

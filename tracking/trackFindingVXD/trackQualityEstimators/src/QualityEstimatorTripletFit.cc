@@ -135,7 +135,7 @@ double QualityEstimatorTripletFit::estimateQuality(std::vector<SpacePoint const*
 
   m_results.chiSquared = finalChi2;
 
-  return TMath::Prob(finalChi2, 2 * nTriplets - 5);
+  return TMath::Prob(finalChi2, 2 * measurements.size() - 5);
 }
 
 

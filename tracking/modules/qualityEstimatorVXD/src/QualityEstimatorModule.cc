@@ -30,7 +30,7 @@ QualityEstimatorModule::QualityEstimatorModule() : Module()
            "Name of StoreArray containing the SpacePointTrackCandidates to be estimated.", std::string(""));
 
   addParam("MCRecoTracksStoreArrayName", m_MCRecoTracksStoreArrayName,
-           "Name of StoreArray containing MCRecoTracks. Only required for MCInfo method", std::string(""));
+           "Name of StoreArray containing MCRecoTracks. Only required for MCInfo method", std::string("MCRecoTracks"));
 
   addParam("MCStrictQualityEstimator", m_MCStrictQualityEstimator,
            "Only required for MCInfo method. If false combining several MCTracks is allowed.", bool(false));
@@ -45,7 +45,6 @@ void QualityEstimatorModule::initialize()
 
   // create pointer to chosen estimator
   if (m_EstimationMethod == "MCInfo") {
-    StoreArray<RecoTrack>::required(m_MCRecoTracksStoreArrayName);
     m_estimator = std::unique_ptr<QualityEstimatorBase>(
                     new QualityEstimatorMC(bFieldZ, m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator));
   } else if (m_EstimationMethod == "TripletFit") {

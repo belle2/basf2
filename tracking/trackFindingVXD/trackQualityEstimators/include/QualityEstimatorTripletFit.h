@@ -11,21 +11,20 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
-#include <TVector3.h>
 
 namespace Belle2 {
   /** does a tripletFit of the given hits
    * The filter is based on the paper 'A New Three-Dimensional Track Fit with Multiple Scattering'
    * by Andre Schoening et al. https://arxiv.org/abs/1606.04990*/
-  class QualityEstimatorTripletFit : QualityEstimatorBase {
+  class QualityEstimatorTripletFit : public QualityEstimatorBase {
 
   public:
 
     QualityEstimatorTripletFit(double bFieldValue): QualityEstimatorBase(bFieldValue) {};
 
-    virtual float calcChiSquared(std::vector<Measurement> const& measurements) final;
+    virtual double estimateQuality(std::vector<SpacePoint const*> const& measurements) final;
 
-    virtual QualityEstimationResults calcCompleteResults(std::vector<Measurement> const& measurements) final;
+    virtual QualityEstimationResults estimateQualityAndProperties(std::vector<SpacePoint const*> const& measurements) final;
 
   protected:
 

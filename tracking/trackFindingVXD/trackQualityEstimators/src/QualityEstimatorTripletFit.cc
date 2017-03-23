@@ -10,14 +10,18 @@
 
 #include "tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h"
 #include <math.h>
+#include <framework/logging/Logger.h>
+#include <TMath.h>
+
+
 
 using namespace Belle2;
 
-float QualityEstimatorTripletFit::calcChiSquared(std::vector<Measurement> const& measurements)
+double QualityEstimatorTripletFit::estimateQuality(std::vector<SpacePoint const*> const& measurements)
 {
   const int nTriplets = measurements.size() - 2;
 
-  if (nTriplets < 1) return NAN;
+  if (nTriplets < 1) return 0;
 
   double combinedChi2 = 0.;
 
@@ -35,9 +39,9 @@ float QualityEstimatorTripletFit::calcChiSquared(std::vector<Measurement> const&
   for (int i = 0; i < nTriplets; i++) {
 
     // Three hits relevant for curent triplet
-    const TVector3 hit0 = measurements.at(i).position;
-    const TVector3 hit1 = measurements.at(i + 1).position;
-    const TVector3 hit2 = measurements.at(i + 2).position;
+    const TVector3 hit0 = measurements.at(i)->getPosition();
+    const TVector3 hit1 = measurements.at(i + 1)->getPosition();
+    const TVector3 hit2 = measurements.at(i + 2)->getPosition();
 
     const double d01sq = pow(hit1.X() - hit0.X(), 2) + pow(hit1.Y() - hit0.Y(), 2);
     const double d12sq = pow(hit2.X() - hit1.X(), 2) + pow(hit2.Y() - hit1.Y(), 2);
@@ -129,14 +133,17 @@ float QualityEstimatorTripletFit::calcChiSquared(std::vector<Measurement> const&
 
   double const finalChi2 = combinedChi2 + globalCompatibilityOfR3Ds;
 
-  return finalChi2;
+  m_results.chiSquared = finalChi2;
+
+  return TMath::Prob(finalChi2, 2 * nTriplets - 5);
 }
 
 
-QualityEstimationResults QualityEstimatorTripletFit::calcCompleteResults(std::vector<Measurement> const& measurements)
+QualityEstimationResults QualityEstimatorTripletFit::estimateQualityAndProperties(std::vector<SpacePoint const*> const&
+    measurements)
 {
   // calculate and store chiSquared(calcChiSquared) and curvature(calcCurvature) in m_reuslts.
-  QualityEstimatorBase::calcCompleteResults(measurements);
+  QualityEstimatorBase::estimateQualityAndProperties(measurements);
   if (measurements.size() < 3) return m_results;
 
   m_results.curvatureSign = calcCurvatureSign(measurements);
@@ -148,14 +155,7 @@ QualityEstimationResults QualityEstimatorTripletFit::calcCompleteResults(std::ve
   }
   averageThetaPrime /= m_thetas.size();
 
-  double sum = 0;
-  for (unsigned short i = 0; i < m_sigmaR3DSquareds.size(); ++i) {
-    sum += pow(m_R3Ds.at(i), 2) / m_sigmaR3DSquareds.at(i);
-  }
-  double sigmaAverageR3D = m_averageR3D / sqrt(sum);
-
   m_results.pt = calcPt(m_averageR3D * sin(averageThetaPrime));
-  m_results.pt_sigma = calcPt(sigmaAverageR3D * sin(averageThetaPrime));
 
   return m_results;
 }

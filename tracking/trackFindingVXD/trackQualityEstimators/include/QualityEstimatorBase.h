@@ -11,37 +11,31 @@
 #pragma once
 
 #include <boost/optional.hpp>
-#include <TVector3.h>
 #include <math.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
+#include <framework/geometry/B2Vector3.h>
+
+
 
 namespace Belle2 {
 
-  /** Container for a 3D measurement in global coordinates including uncertainty. */
-  struct Measurement {
-    TVector3 const position;
-    TVector3 const sigma;
-
-    Measurement(TVector3 const& position, TVector3 const& sigma) : position(position), sigma(sigma) {}
-  };
-
-  /** Container for comlete fit results.
-   * chiSquared is always computed, all other values are optional, depending on the implementation.
+  /** Container for complete fit/estimation results.
+   * qualityIndicator is always computed, all other values are optional, depending on the implementation.
    */
   struct QualityEstimationResults {
-    float chiSquared;
+    double qualityIndicator;
+    boost::optional<double> chiSquared;
     boost::optional<short> curvatureSign;
-    boost::optional<float> pt;
-    boost::optional<float> pt_sigma;
-    boost::optional<TVector3> p;
-    boost::optional<TVector3> p_sigma;
+    boost::optional<double> pt;
+    boost::optional<B2Vector3<double>> p;
   };
 
   /** BaseClass for QualityEstimators
    *
-   * m_magneticFieldZ    - Z component of magnetic field
-   * m_results           - Member object storing all optional results.
-   * calcChiSquared      - Minimal implementation of the quality estimation
-   * calcCompleteResults - Additionally calculates other properties that can be derived from the fit.
+   * m_magneticFieldZ             - Z component of magnetic field
+   * m_results                    - Member object storing all optional results.
+   * estimateQuality              - Minimal implementation of the quality estimation
+   * estimateQualityAndProperties - Additionally calculates other properties that can be derived from the fit.
    */
   class QualityEstimatorBase {
 
@@ -53,43 +47,46 @@ namespace Belle2 {
     virtual ~QualityEstimatorBase() = default;
 
     /** Minimal implementation of the quality estimation
-     * Calculates only chi2
+     * Calculates quality indicator in range [0,1]
      *
-     * measurements - std::vector<Measurement> ordered from innermost to outermost measurement
+     * measurements - std::vector<SpacePoint const*> ordered from innermost to outermost measurement
      */
-    virtual float calcChiSquared(std::vector<Measurement> const& measurements) = 0;
+    virtual double estimateQuality(std::vector<SpacePoint const*> const& measurements) = 0;
 
     /** Quality estimation providing additional quantities
-     * Calculates chi2, curvatureSign , pt, pt_sigma
+     * Calculates quality indicator in range [0,1]
+     * Optionally returns chi2, curvatureSign , pt, p
      *
-     * measurements - std::vector<Measurement> ordered from innermost to outermost measurement
+     * measurements - std::vector<SpacePoint const*> ordered from innermost to outermost measurement
      */
-    virtual QualityEstimationResults calcCompleteResults(std::vector<Measurement> const& measurements)
+    virtual QualityEstimationResults estimateQualityAndProperties(std::vector<SpacePoint const*> const& measurements)
     {
       m_results = QualityEstimationResults();
-      m_results.chiSquared = calcChiSquared(measurements);
+      m_results.qualityIndicator = estimateQuality(measurements);
       return m_results;
     }
 
 
   protected:
 
-    /** Returns a value for the transverse momentun Pt in GeV calculated from a provided radius.
-     *  Utilizing m_magneticFieldZ and hardcoded speed of light*/
+    // utility methods
+
+    /** Returns a value for the transverse momentum in GeV calculated from a provided radius.
+     *  Utilizing m_magneticFieldZ and hard coded speed of light*/
     double calcPt(double radius) { return m_magneticFieldZ * radius * 0.00299792458; }
 
     /** Calculate curvature based on triplets of measurements.
      *  Ignores uncertainties.
      *  Returns -1,0,1 depending on the sum of all triplets.
      */
-    short calcCurvatureSign(std::vector<Measurement> const& measurements)
+    short calcCurvatureSign(std::vector<SpacePoint const*> const& measurements)
     {
       if (measurements.size() < 3) return 0;
       float sumOfCurvature = 0.;
       for (unsigned int i = 0; i < measurements.size() - 2; ++i) {
-        TVector3 ab = measurements.at(i).position - measurements.at(i + 1).position;
+        TVector3 ab = measurements.at(i)->getPosition() - measurements.at(i + 1)->getPosition();
         ab.SetZ(0.);
-        TVector3 bc = measurements.at(i + 1).position - measurements.at(i + 2).position;
+        TVector3 bc = measurements.at(i + 1)->getPosition() - measurements.at(i + 2)->getPosition();
         bc.SetZ(0.);
         sumOfCurvature += bc.Orthogonal() * ab; //normal vector of m_vecBC times segment of ba
       }

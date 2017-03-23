@@ -11,11 +11,16 @@
 #include "tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h"
 #include <math.h>
 #include <framework/logging/Logger.h>
+#include <TMath.h>
 
 using namespace Belle2;
 
-float QualityEstimatorCircleFit::calcChiSquared(std::vector<Measurement> const& measurements)
+double QualityEstimatorCircleFit::estimateQuality(std::vector<SpacePoint const*> const& measurements)
 {
+  if (measurements.size() < 4) {
+    if (measurements.size() == 3) return 0.2; // Arbitrary value to prevent excluding measurements with 3 hits later on.
+    else return 0;
+  }
   // Calculates Curvature: True means clockwise, False means counterclockwise.
   // TODO this is not an optimized approach; just to get things to work.
   // CalcCurvature could be integrated into the looping over the hits which CircleFit does anyhow.
@@ -31,14 +36,15 @@ float QualityEstimatorCircleFit::calcChiSquared(std::vector<Measurement> const& 
     1.; //0.02; // this parameter is for internal tuning of the weights, since at the moment, the error seams highly overestimated at the moment. 1 means no influence of parameter.
 
   // looping over all hits and do the division afterwards
-  for (Measurement hit : measurements) {
-    weight = 1. / (sqrt(hit.sigma.X() * hit.sigma.X() + hit.sigma.Y() * hit.sigma.Y()) * tuningParameter);
-    B2DEBUG(100, " current hitSigmaU/V/X/Y: " << hit.sigma.X() << "/" <<
-            hit.sigma.Y() << ", weight: " << weight);
+  for (const SpacePoint* hit : measurements) {
+    weight = 1. / (sqrt(hit->getPositionError().X() * hit->getPositionError().X() + hit->getPositionError().Y() *
+                        hit->getPositionError().Y()) * tuningParameter);
+    B2DEBUG(100, " current hitSigmaU/V/X/Y: " << hit->getPositionError().X() << "/" <<
+            hit->getPositionError().Y() << ", weight: " << weight);
     sumWeights += weight;
     if (std::isnan(weight) or std::isinf(weight) == true) { B2ERROR("QualityEstimators::circleFit, chosen sigma is 'nan': " << weight << ", setting arbitrary error: " << stopper << ")"); weight = stopper; }
-    x = hit.position.X();
-    y = hit.position.Y();
+    x = hit->getPosition().X();
+    y = hit->getPosition().Y();
     x2 = x * x;
     y2 = y * y;
     r2 = x2 + y2;
@@ -101,7 +107,12 @@ float QualityEstimatorCircleFit::calcChiSquared(std::vector<Measurement> const& 
 
   m_results.pt = calcPt(absRadius);
 
-  return sumWeights * (1. + curvature * pocaD) * (1. + curvature * pocaD) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi * covXY +
-         cosPhi * cosPhi * covYY - kappa * kappa * covR2R2); // returns chi2
+  double chi2 = sumWeights * (1. + curvature * pocaD) * (1. + curvature * pocaD) * (sinPhi * sinPhi * covXX - 2.*sinPhi * cosPhi *
+                covXY +
+                cosPhi * cosPhi * covYY - kappa * kappa * covR2R2);
+
+  m_results.chiSquared = chi2;
+
+  return TMath::Prob(chi2, measurements.size() - 3);
 }
 

@@ -11,16 +11,15 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
-#include <TVector3.h>
 
 namespace Belle2 {
-  class QualityEstimatorCircleFit : QualityEstimatorBase {
+  class QualityEstimatorCircleFit : public QualityEstimatorBase {
 
   public:
 
-    QualityEstimatorCircleFit(double bFieldValue): QualityEstimatorBase(bFieldValue) {};
+    QualityEstimatorCircleFit(double magneticFieldZ): QualityEstimatorBase(magneticFieldZ) {};
 
-    virtual float calcChiSquared(std::vector<Measurement> const& measurements) final;
+    virtual double estimateQuality(std::vector<SpacePoint const*> const& measurements) final;
   };
 }
 

@@ -17,7 +17,9 @@ env['LIBS'] = ['framework', 'background_dataobjects',
 	       'beast_pindiode_dataobjects',
 	       'beast_he3tube_dataobjects',
 	       'beast_microtpc_dataobjects',
-       	       'beast_qcsmonitor_dataobjects',		
+       	       'beast_qcsmonitor_dataobjects',
+	       'beast_bgo_dataobjects',
+	       'beast_csi_dataobjects',		
                '$ROOT_LIBS']
 
 Return('env')

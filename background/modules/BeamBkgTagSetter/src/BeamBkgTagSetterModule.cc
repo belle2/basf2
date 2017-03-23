@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Yuri Solovier, Igal Jaegle                 *
+ * Contributors: Marko Staric, Yuri Soloviev, Igal Jaegle                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -43,6 +43,8 @@
 #include <beast/he3tube/dataobjects/He3tubeSimHit.h>
 #include <beast/microtpc/dataobjects/MicrotpcSimHit.h>
 #include <beast/qcsmonitor/dataobjects/QcsmonitorSimHit.h>
+#include <beast/bgo/dataobjects/BgoSimHit.h>
+#include <beast/csi/dataobjects/CsiSimHit.h>
 
 // MetaData
 #include <framework/dataobjects/EventMetaData.h>
@@ -86,7 +88,7 @@ namespace Belle2 {
              "tag ordinary file (default) or additional file ('ECL' or 'PXD')",
              string(""));
     addParam("Phase", m_phase,
-             "specify the phase: 1 for phase 1, 2 for phase 2, 3 for physics run or phase 3");
+             "specify the Phase: 1 for Phase 1, 2 for Phase 2, 3 for Physics Run or Phase 3", 3);
 
   }
 
@@ -140,6 +142,8 @@ namespace Belle2 {
     StoreArray<He3tubeSimHit>::optional();
     StoreArray<MicrotpcSimHit>::optional();
     StoreArray<QcsmonitorSimHit>::optional();
+    StoreArray<BgoSimHit>::optional();
+    StoreArray<CsiSimHit>::optional();
   }
 
   void BeamBkgTagSetterModule::beginRun()
@@ -168,6 +172,8 @@ namespace Belle2 {
     StoreArray<He3tubeSimHit> he3SimHits;
     StoreArray<MicrotpcSimHit> tpcSimHits;
     StoreArray<QcsmonitorSimHit> sciSimHits;
+    StoreArray<BgoSimHit> bgoSimHits;
+    StoreArray<CsiSimHit> csiSimHits;
 
     int n = 0;
     if (m_phase == 2 || m_phase == 3) {
@@ -184,8 +190,11 @@ namespace Belle2 {
     // BEAST addition
     if (m_phase == 1 || m_phase == 2) {
       n += setBackgroundTag(diaSimHits);
-      if (m_phase == 1)
+      if (m_phase == 1) {
         n += setBackgroundTag(clw1SimHits);
+        n += setBackgroundTag(csiSimHits);
+        n += setBackgroundTag(bgoSimHits);
+      }
       if (m_phase == 2) {
         n += setBackgroundTag(clw2SimHits);
         n += setBackgroundTag(fngSimHits);

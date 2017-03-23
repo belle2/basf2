@@ -199,6 +199,8 @@ def add_top_modules(path, components=None):
     """
     # TOP reconstruction
     if components is None or 'TOP' in components:
+        top_cm = register_module('TOPChannelMasker')
+        path.add_module(top_cm)
         top_rec = register_module('TOPReconstructor')
         path.add_module(top_rec)
 

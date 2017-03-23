@@ -132,7 +132,7 @@ class TestModule(basf2.Module):
                 ptfactor = 0.3 * 1.5 / 100 * 222.376063
                 oldString = "phi %.3f pt %.3f charge %d chi2 %.3f z %.3f cot %.3f chi2 %.3f" % \
                             (oldTracks[i].getPhi0() * 180. / np.pi,
-                             oldTracks[i].getTransverseMomentum() / ptfactor,
+                             oldTracks[i].getTransverseMomentum(1.5) / ptfactor,
                              oldTracks[i].getChargeSign(),
                              oldTracks[i].getChi2D(),
                              oldTracks[i].getZ0(),
@@ -143,7 +143,7 @@ class TestModule(basf2.Module):
             if i < newTracks.getEntries():
                 newString = "phi %.3f pt %.3f charge %d chi2 %.3f z %.3f cot %.3f chi2 %.3f" % \
                             (newTracks[i].getPhi0() * 180. / np.pi,
-                             newTracks[i].getTransverseMomentum(),
+                             newTracks[i].getTransverseMomentum(1.5),
                              newTracks[i].getChargeSign(),
                              newTracks[i].getChi2D(),
                              newTracks[i].getZ0(),

@@ -31,6 +31,17 @@ TOPChannelMaskerModule::TOPChannelMaskerModule() : Module()
 {
   // Set module properties
   setDescription("Masks dead PMs from the reconstruction");
+
+  // Set property flags
+  setPropertyFlags(c_ParallelProcessingCertified);
+}
+
+void TOPChannelMaskerModule::initialize()
+{
+  // register data objects
+  StoreArray<TOPDigit> digits;
+  digits.isRequired();
+  return;
 }
 
 void TOPChannelMaskerModule::event()
@@ -53,4 +64,5 @@ void TOPChannelMaskerModule::event()
     if (!m_channelMask->isActive(digit.getModuleID(), digit.getChannel()))
       digit.setHitQuality(TOPDigit::c_Junk);
   }
+  return;
 }

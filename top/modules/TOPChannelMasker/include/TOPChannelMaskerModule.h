@@ -30,6 +30,10 @@ namespace Belle2 {
      */
     TOPChannelMaskerModule();
     /**
+     * initialize method: registers datastore objects (the TOP hits)
+     */
+    virtual void initialize();
+    /**
      * event method: removes channels from the reconstruction pdf, flags hits
      * from noisy channels as junk
      */

@@ -23,9 +23,11 @@ def setAnalysisConfigParams(configParametersAndValues, path=analysis_main):
     - 'tupleStyle': 'Default' (default) or 'Laconic'
       o) defines the style of the branch name in the ntuple
 
-    - 'mcMatchingVersion': 'BelleII' (default), 'MC5' and 'Belle'
-      o) Specifies what version of mc matching algorithm is going to be used
-         Use 'MC5' for analysis of BelleII MC5, 'Belle' for analaysis of Belle MC and 'BelleII' for the rest.
+    - 'mcMatchingVersion': Specifies what version of mc matching algorithm is going to be used:
+
+          - 'MC5' - analysis of BelleII MC5
+          - 'Belle' - analaysis of Belle MC
+          - 'BelleII' (default) - all other cases
 
     @param configParametersAndValues dictionary of parameters and their values of the form {param1: value, param2: value, ...)
     @param modules are added to this path
@@ -1163,6 +1165,7 @@ def looseMCTruth(list_name, path=analysis_main):
     particles while the normal algorithm finds the common mother of all daughters.
     The results of loose mc matching algorithm are stored to the following extraInfo
     items:
+
       - looseMCMotherPDG: PDG code of most common mother
       - looseMCMotherIndex: 1-based StoreArray<MCParticle> index of most common mother
       - looseMCWrongDaughterN: number of daughters that don't originate from the most

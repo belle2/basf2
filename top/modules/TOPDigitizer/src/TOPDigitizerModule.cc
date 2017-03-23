@@ -17,6 +17,7 @@
 #include <top/dataobjects/TOPSimHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPRawDigit.h>
+#include <top/dataobjects/TOPRawWaveform.h>
 #include <top/dataobjects/TOPRecBunch.h>
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -62,7 +63,8 @@ namespace Belle2 {
              "r.m.s of T0 jitter [ns]", 25e-3);
     addParam("electronicJitter", m_electronicJitter,
              "r.m.s of electronic jitter [ns], "
-             "if negative the one from TOPNominalTDC is used", -1.0);
+             "if negative the one from TOPNominalTDC is used. "
+             "This parameter is ignored in the full waveform digitization.", -1.0);
     addParam("darkNoise", m_darkNoise,
              "uniformly distributed dark noise (hits per module)", 0.0);
     addParam("trigT0Sigma", m_trigT0Sigma,
@@ -74,18 +76,27 @@ namespace Belle2 {
     addParam("ADCp2", m_ADCp2,
              "pulse height distribution parameter (must be non-negative)", 0.544);
     addParam("ADCmax", m_ADCmax,
-             "pulse height upper bound of range [ADC counts]", 2000.0);
+             "pulse height distribution upper bound [ADC counts]", 2000.0);
     addParam("pedestalRMS", m_pedestalRMS,
-             "r.m.s of pedestals [ADC counts]", 10.0);
+             "r.m.s of pedestals [ADC counts]", 9.0);
     addParam("threshold", m_threshold,
-             "pulse height threshold [ADC counts]", (short) 40);
+             "pulse height threshold [ADC counts]", 40);
+    addParam("hysteresis", m_hysteresis,
+             "pulse height threshold hysteresis [ADC counts]", 10);
     addParam("thresholdCount", m_thresholdCount,
-             "minimal number of samples above threshold", (short) 3);
+             "minimal number of samples above threshold", 3);
+    addParam("useWaveforms", m_useWaveforms,
+             "if true, use full waveform digitization", false);
+    addParam("useDatabase", m_useDatabase,
+             "if true, use sample times from database instead of equidistant time base",
+             false);
+
 
   }
 
   TOPDigitizerModule::~TOPDigitizerModule()
   {
+    if (m_timebase) delete m_timebase;
   }
 
   void TOPDigitizerModule::initialize()
@@ -107,6 +118,13 @@ namespace Belle2 {
     StoreObjPtr<TOPRecBunch> recBunch;
     recBunch.registerInDataStore();
 
+    if (m_useWaveforms) {
+      StoreArray<TOPRawWaveform> waveforms;
+      waveforms.registerInDataStore(DataStore::c_DontWriteOut);
+      rawDigits.registerRelationTo(waveforms, DataStore::c_Event,
+                                   DataStore::c_DontWriteOut);
+    }
+
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
     if (m_electronicJitter < 0) {
@@ -125,37 +143,57 @@ namespace Belle2 {
       m_bunchTimeSep = geo->getNominalTDC().getBunchSeparationTime();
     }
 
+    // set sample times
+
+    double syncTimeBase = geo->getNominalTDC().getSyncTimeBase();
+    m_sampleTimes.setTimeAxis(syncTimeBase); // equidistant time base
+
+    if (m_useDatabase) m_timebase = new DBObjPtr<TOPCalTimebase>;
+
   }
 
   void TOPDigitizerModule::beginRun()
   {
-
+    StoreObjPtr<EventMetaData> evtMetaData;
+    if (m_useDatabase) {
+      if (!(*m_timebase).isValid()) {
+        B2FATAL("Sample time calibration requested but not available for run "
+                << evtMetaData->getRun()
+                << " of experiment " << evtMetaData->getExperiment());
+      }
+    }
   }
 
   void TOPDigitizerModule::event()
   {
 
     // input: simulated hits
+
     StoreArray<TOPSimHit> simHits;
 
     // output: digitized hits
+
     StoreArray<TOPDigit> digits;
     StoreArray<TOPRawDigit> rawDigits;
 
     // output: simulated bunch values
+
     StoreObjPtr<TOPRecBunch> recBunch;
     if (!recBunch.isValid()) recBunch.create();
 
     // pulse height generator
+
     TOP::PulseHeightGenerator pulseHeightGenerator(m_ADCx0, m_ADCp1, m_ADCp2, m_ADCmax);
     pulseHeightGenerator.setPedestalRMS(m_pedestalRMS);
 
     // storage window number
+
     unsigned window = int(gRandom->Rndm() * 512);
 
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
     // simulate trigger T0 accuracy in finding the right bunch crossing
+
     double trigT0 = 0;
     if (m_trigT0Sigma > 0) {
       trigT0 = gRandom->Gaus(0., m_trigT0Sigma);
@@ -165,13 +203,16 @@ namespace Belle2 {
     }
 
     // simulate start time (bunch time given by trigger smeared according to T0 jitter)
+
     double startTime = gRandom->Gaus(trigT0, m_timeZeroJitter);
 
     // pixels with time digitizers
+
     std::map<unsigned, TimeDigitizer> pixels;
     typedef std::map<unsigned, TimeDigitizer>::iterator Iterator;
 
     // add simulated hits
+
     double electronicEfficiency = geo->getNominalTDC().getEfficiency();
     const auto& tts = geo->getNominalTTS();
     for (const auto& simHit : simHits) {
@@ -191,13 +232,21 @@ namespace Belle2 {
       double time = simHit.getTime() + tts.generateTTS() - startTime;
 
       // add time to digitizer of a given pixel
-      TimeDigitizer digitizer(moduleID, pixelID, window, pulseHeightGenerator);
+      TimeDigitizer digitizer(moduleID, pixelID, window,
+                              pulseHeightGenerator, m_sampleTimes);
+      if (!digitizer.isValid()) continue;
+      if (m_timebase) {
+        const auto* sampleTimes = (*m_timebase)->getSampleTimes(digitizer.getScrodID(),
+                                                                digitizer.getChannel());
+        digitizer.setSampleTimes(sampleTimes);
+      }
       unsigned id = digitizer.getUniqueID();
       Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
       it->second.addTimeOfHit(time, &simHit);
     }
 
     // add randomly distributed dark noise
+
     if (m_darkNoise > 0) {
       int numModules = geo->getNumModules();
       double timeMin = geo->getNominalTDC().getTimeMin();
@@ -208,7 +257,14 @@ namespace Belle2 {
         for (int i = 0; i < numHits; i++) {
           int pixelID = int(gRandom->Rndm() * numPixels) + 1;
           double time = (timeMax - timeMin) * gRandom->Rndm() + timeMin;
-          TimeDigitizer digitizer(moduleID, pixelID, window, pulseHeightGenerator);
+          TimeDigitizer digitizer(moduleID, pixelID, window,
+                                  pulseHeightGenerator, m_sampleTimes);
+          if (!digitizer.isValid()) continue;
+          if (m_timebase) {
+            const auto* sampleTimes = (*m_timebase)->getSampleTimes(digitizer.getScrodID(),
+                                                                    digitizer.getChannel());
+            digitizer.setSampleTimes(sampleTimes);
+          }
           unsigned id = digitizer.getUniqueID();
           Iterator it = pixels.insert(pair<unsigned, TimeDigitizer>(id, digitizer)).first;
           it->second.addTimeOfHit(time);
@@ -217,9 +273,18 @@ namespace Belle2 {
     }
 
     // digitize in time
-    for (auto& pixel : pixels) {
-      pixel.second.digitize(rawDigits, digits,
-                            m_threshold, m_thresholdCount, m_electronicJitter);
+
+    if (m_useWaveforms) {
+      StoreArray<TOPRawWaveform> waveforms;
+      for (auto& pixel : pixels) {
+        pixel.second.digitize(waveforms, rawDigits, digits,
+                              m_threshold, m_hysteresis, m_thresholdCount);
+      }
+    } else {
+      for (auto& pixel : pixels) {
+        pixel.second.digitize(rawDigits, digits,
+                              m_threshold, m_thresholdCount, m_electronicJitter);
+      }
     }
 
   }

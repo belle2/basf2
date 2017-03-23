@@ -9,5 +9,7 @@
   <doubleHitResolution unit="ns">5.0</doubleHitResolution>
   <timeJitter unit="ps">50</timeJitter>
   <efficiency>1.0</efficiency>
+  <adcBits descr="number of ADC bits">12</adcBits>
+  <averagePedestal descr="average of pedestals [adc bins]">970</averagePedestal>
 </TDC>
 

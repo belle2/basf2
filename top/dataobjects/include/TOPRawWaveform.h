@@ -32,6 +32,22 @@ namespace Belle2 {
          };
 
     /**
+     * Feature extraction data
+     */
+    struct FeatureExtraction {
+      int sampleRise = 0; /**< sample number just before 50% CFD crossing */
+      int samplePeak = 0; /**< sample number at maximum */
+      int sampleFall = 0; /**< same for falling edge */
+      short vRise0 = 0;   /**< ADC value at sampleRise */
+      short vRise1 = 0;   /**< ADC value at sampleRise + 1 */
+      short vPeak = 0;    /**< ADC value at samplePeak */
+      short vFall0 = 0;   /**< ADC value at sampleFall */
+      short vFall1 = 0;   /**< ADC value at sampleFall + 1 */
+      short integral = 0; /**< integral of a pulse (e.g. \propto charge) */
+    };
+
+
+    /**
      * Default constructor
      */
     TOPRawWaveform()
@@ -251,6 +267,24 @@ namespace Belle2 {
       return true;
     }
 
+    /**
+     * Do feature extraction
+     * @param threshold pulse height threshold [ADC counts]
+     * @param hysteresis threshold hysteresis [ADC counts]
+     * @param thresholdCount minimal number of samples above threshold
+     * @return number of feature extraction data (hits found)
+     */
+    int featureExtraction(int threshold, int hysteresis, int thresholdCount) const;
+
+    /**
+     * Returns feature extraction data
+     * @return FE data
+     */
+    const std::vector<FeatureExtraction>& getFeatureExtractionData() const
+    {
+      return m_features;
+    }
+
 
   private:
 
@@ -270,7 +304,10 @@ namespace Belle2 {
     std::string m_electronicName;   /**< electronic name */
     bool m_pedestalSubtracted = false; /**< true, if pedestal already subtracted */
 
-    ClassDef(TOPRawWaveform, 6); /**< ClassDef */
+    /** cache for feature extraction data */
+    mutable std::vector<FeatureExtraction> m_features; //!
+
+    ClassDef(TOPRawWaveform, 7); /**< ClassDef */
 
   };
 

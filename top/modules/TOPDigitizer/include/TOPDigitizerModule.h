@@ -11,6 +11,9 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <top/dbobjects/TOPSampleTimes.h>
+#include <top/dbobjects/TOPCalTimebase.h>
+#include <framework/database/DBObjPtr.h>
 #include <string>
 
 
@@ -66,6 +69,7 @@ namespace Belle2 {
 
   private:
 
+    // module steering parameters
     double m_timeZeroJitter = 0;       /**< r.m.s of T0 jitter */
     double m_electronicJitter = 0;     /**< r.m.s of electronic jitter */
     double m_darkNoise = 0;            /**< uniform dark noise (hits per bar) */
@@ -76,8 +80,16 @@ namespace Belle2 {
     double m_ADCp2 = 0; /**< pulse height distribution parameter, must be positive */
     double m_ADCmax = 0; /**< pulse height upper bound of range [ADC counts] */
     double m_pedestalRMS = 0; /**< r.m.s of pedestals [ADC counts]*/
-    short m_threshold = 0; /**< pulse height threshold [ADC counts] */
-    short m_thresholdCount = 0; /**< minimal number of samples above threshold */
+    int m_threshold = 0; /**< pulse height threshold [ADC counts] */
+    int m_hysteresis = 0; /**< pulse height threshold hysteresis [ADC counts] */
+    int m_thresholdCount = 0; /**< minimal number of samples above threshold */
+    bool m_useWaveforms = false; /**< if true, use full waveform digitization */
+    bool m_useDatabase = false;  /**< if true, use sample times from database */
+
+    // other
+    TOPSampleTimes m_sampleTimes; /**< equidistant sample times */
+    DBObjPtr<TOPCalTimebase>* m_timebase = 0; /**< sample times from database */
+
 
   };
 

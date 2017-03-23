@@ -16,29 +16,41 @@ def add_cdc_trigger(path, SimulationMode=1, minHits=4):
     @minHits           the minimum number of  super layers with hits, the default
                        values is 4
     """
-
-    # standard CDC trigger
-    trgcdc = register_module('TRGCDC')
-    trgcdc_params = {
-        'ConfigFile': Belle2.FileSystem.findFile("data/trg/cdc/TRGCDCConfig_0_20101111.dat"),
-        'InnerTSLUTFile': Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_v3.0.coe"),
-        'OuterTSLUTFile': Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_v3.0.coe"),
-        'HoughFinderMappingFileMinus': Belle2.FileSystem.findFile("data/trg/cdc/HoughMappingMinus20160223.dat"),
-        'HoughFinderMappingFilePlus': Belle2.FileSystem.findFile("data/trg/cdc/HoughMappingPlus20160223.dat"),
-        'SimulationMode': SimulationMode,
-        '2DfinderCollection': 'TRGOld2DFinderTracks',
-        '2DfitterCollection': 'TRG2DFitterTracks',
-        '3DfitterCollection': 'TRG3DFitterTracks'}
-    trgcdc.param(trgcdc_params)
-    path.add_module(trgcdc)
-    # new 2D finder
-    hough = register_module('CDCTriggerHoughtracking')
-    hough.param('outputCollection', 'TRG2DFinderTracks')
-    hough.param('minHits', minHits)
-    path.add_module(hough)
-    # neurotrigger
-    neuro = register_module('NeuroTrigger')
-    neuro.param('inputCollection', 'TRG2DFinderTracks')
-    neuro.param('outputCollection', 'TRGNNTracks')
-    neuro.param('filename', Belle2.FileSystem.findFile("data/trg/cdc/Neuro20170109.root"))
-    path.add_module(neuro)
+    if SimulationMode == 1:
+        # TSF
+        path.add_module('CDCTriggerTSF',
+                        InnerTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_v3.0.coe"),
+                        OuterTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_v3.0.coe"))
+        # 2D finder
+        path.add_module('CDCTriggerHoughtracking',
+                        outputCollection='TRG2DFinderTracks',
+                        minHits=minHits)
+        # ETF
+        path.add_module('CDCTriggerETF')
+        # fitters
+        path.add_module('CDCTrigger2DFitter',
+                        inputCollection='TRG2DFinderTracks',
+                        outputCollection='TRG2DFitterTracks')
+        path.add_module('CDCTrigger3DFitter',
+                        inputCollection='TRG2DFitterTracks',
+                        outputCollection='TRG3DFitterTracks')
+        # neurotrigger
+        path.add_module('NeuroTrigger',
+                        filename=Belle2.FileSystem.findFile("data/trg/cdc/Neuro20160601NonlinBkg.root"),
+                        inputCollection='TRG2DFinderTracks',
+                        outputCollection='TRGNNTracks')
+    elif SimulationMode == 2:
+        # standard CDC trigger
+        trgcdc = register_module('TRGCDC')
+        trgcdc_params = {
+            'ConfigFile': Belle2.FileSystem.findFile("data/trg/cdc/TRGCDCConfig_0_20101111.dat"),
+            'InnerTSLUTFile': Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_v3.0.coe"),
+            'OuterTSLUTFile': Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_v3.0.coe"),
+            'HoughFinderMappingFileMinus': Belle2.FileSystem.findFile("data/trg/cdc/HoughMappingMinus20160223.dat"),
+            'HoughFinderMappingFilePlus': Belle2.FileSystem.findFile("data/trg/cdc/HoughMappingPlus20160223.dat"),
+            'SimulationMode': SimulationMode,
+            '2DfinderCollection': 'TRGOld2DFinderTracks',
+            '2DfitterCollection': 'TRG2DFitterTracks',
+            '3DfitterCollection': 'TRG3DFitterTracks'}
+        trgcdc.param(trgcdc_params)
+        path.add_module(trgcdc)

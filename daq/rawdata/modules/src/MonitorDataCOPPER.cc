@@ -8,6 +8,7 @@
 #include <daq/rawdata/modules/MonitorDataCOPPER.h>
 #include <rawdata/dataobjects/RawECL.h>
 
+#include <TDirectory.h>
 #include <cstdio>
 
 using namespace std;
@@ -47,14 +48,18 @@ void MonitorDataCOPPERModule::defineHisto()
 //   double t_min = 0.;
 //   double t_max = 600.;
 //   int t_nbin = 600;
+  TDirectory* oldDir = gDirectory;
 
+  TDirectory* dirDAQ = NULL;
+  dirDAQ = oldDir->mkdir("DAQExample");
+  dirDAQ->cd();
   h_nevt = new TH1F("h_nevt", "Number of Events / COPPER; COPPER ID; # of Events", 20, 0, 20);
 
   h_size = new TH1F("h_size", "Data size / COPPER; Data size [Byte]; entries", 50, 0, 10000);
 
   h_rate = new TH1F("h_rate", "Event rate; Time [s]; Event Rate [Hz]", 1000, 0, 100000);
   h_diff = new TH1F("h_diff", "Event inetrval; Event interval[s]; # of Events", 2000, 0, 0.2);
-
+  oldDir->cd();
 
   /*
   h_hslb_size[0] = new TH1F("h_hslb_size_0", "Data size / HSLB; Data size [Byte]; entries", 50, 0, 10000);

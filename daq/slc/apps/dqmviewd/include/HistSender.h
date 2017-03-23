@@ -27,11 +27,12 @@ namespace Belle2 {
     ~HistSender();
 
   public:
-    bool update(std::vector<TH1*>& hist);
+    bool update(std::vector<TH1*>& hist, bool newconf);
 
   private:
     DQMViewCallback* m_callback;
     TCPSocket m_socket;
+    bool m_configured;
 
   };
 

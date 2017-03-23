@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Igal Jaegle                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -71,6 +71,7 @@ namespace Belle2 {
 
     std::string m_backgroundType; /**< BG type */
     double m_realTime; /**< real time that corresponds to beam background sample */
+    int m_phase; /**< Phase that corresponds to beam background sample */
     std::string m_specialFor; /**< ordinary or special file for ECL, PXD */
 
     background::BeamBGTypes m_bgTypes;  /**< defined BG types */

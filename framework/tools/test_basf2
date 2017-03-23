@@ -113,7 +113,7 @@ def run_test_ipynb(argument):
             ep = ExecutePreprocessor(timeout=600, kernel_name='python3')
             ep.preprocess(nb, resources = {})
             result = True
-            message = "Execution successful"
+            message = "finished successfully"
     # execution errors within the notebook will throw this exception
     except CellExecutionError as ce:
         result = False

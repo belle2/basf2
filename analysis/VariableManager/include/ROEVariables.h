@@ -90,10 +90,10 @@ namespace Belle2 {
     Manager::FunctionPtr nROENeutralECLClusters(const std::vector<std::string>& arguments);
 
     /**
-     * Returns the number of pi0s in ROE from the given pi0 particle list.
-     * The accepted argument is the label of the pi0 particle list, not the full particle list name (part of name after colon)!
+     * Returns the number of particles in ROE from the given particle list.
+     * Use of variable aliases is advised.
      */
-    Manager::FunctionPtr nROEPi0(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr nParticlesInROE(const std::vector<std::string>& arguments);
 
     /**
      * Returns total charge of the related RestOfEvent object

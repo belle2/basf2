@@ -971,11 +971,15 @@ def variablesToHistogram(
 def variablesToExtraInfo(
     particleList,
     variables,
+    option=0,
     path=analysis_main,
 ):
     """
     For each particle in the input list the selected variables are saved in an extra-info field witht he given name.
     Can be used when wanting to save variables before modifying them, e.g. when performing vertex fits.
+
+    It is possible to overwrite if lower / don't overwrite / overwrite if higher, in case if extra info with given
+    name already exists (-1/0/1).
 
     @param particleList  The input ParticleList
     @param variables     Dictionary of Variables and extraInfo names.
@@ -986,6 +990,7 @@ def variablesToExtraInfo(
     mod.set_name('VariablesToExtraInfo_' + particleList)
     mod.param('particleList', particleList)
     mod.param('variables', variables)
+    mod.param('overwrite', option)
     path.add_module(mod)
 
 

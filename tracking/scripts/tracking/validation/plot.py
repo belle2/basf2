@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import sys
 import math
 import itertools
 import collections
@@ -416,9 +417,15 @@ class ValidationPlot(object):
                outlier_z_score=(None, None),
                include_exceptionals=(True, True),
                allow_discrete=(False, False),
+               quantiles=None,
                is_expert=True):
         """Fill the plot with a two dimensional histogram"""
+
         name = self.name
+        # Introduce a dummy name for the temporary two dimensional histogram
+        if quantiles is not None:
+            name = "_" + self.name
+
         is_expert = self.is_expert
 
         x_bins, y_bins = self.unpack_2d_param(bins)
@@ -481,6 +488,31 @@ class ValidationPlot(object):
             self.add_stats_entry(histogram, "dy", y_bin_width)
 
         self.create(histogram, xs, ys=ys, weights=weights, stackby=stackby)
+
+        if quantiles is not None:
+            self.name = self.name[1:]
+            profiles = []
+            for histogram in self.histograms:
+                for quantile in quantiles:
+                    profile = histogram.QuantilesX(quantile, histogram.GetName()[1:] + '_' + str(quantile))
+
+                    # Manually copy labels grumble grumble
+                    x_taxis = histogram.GetXaxis()
+                    new_x_taxis = profile.GetXaxis()
+                    for i_bin in range(x_taxis.GetNbins()):
+                        label = x_taxis.GetBinLabel(i_bin)
+                        if label != "":
+                            new_x_taxis.SetBinLabel(i_bin, label)
+
+                    # Remove faulty error values)
+                    epsilon = sys.float_info.epsilon
+                    for i_bin in range(0, profile.GetNbinsX() + 2):
+                        profile.SetBinError(i_bin, epsilon)
+
+                    profiles.append(profile)
+
+            self.histograms = profiles
+            self.plot = self.create_stack(profiles, name=self.plot.GetName()[1:], reverse_stack=False, force_graph=True)
 
         # Adjust the discrete bins after the filling to be equidistant
         if x_bin_labels:
@@ -968,11 +1000,11 @@ class ValidationPlot(object):
         self.attach_attributes()
 
     @classmethod
-    def create_stack(cls, histograms, name, reverse_stack):
+    def create_stack(cls, histograms, name, reverse_stack, force_graph=False):
         if len(histograms) == 1:
             plot = histograms[0]
         else:
-            if isinstance(histograms[0], (ROOT.TProfile, ROOT.TGraph)):
+            if isinstance(histograms[0], (ROOT.TProfile, ROOT.TGraph)) or force_graph:
                 plot = ROOT.TMultiGraph()
             else:
                 plot = ROOT.THStack()
@@ -983,14 +1015,14 @@ class ValidationPlot(object):
             # that the signal usually is on the bottom an well visible
             if reverse_stack:
                 for histogram in reversed(histograms):
-                    if isinstance(histogram, ROOT.TProfile):
+                    if isinstance(histogram, ROOT.TProfile) or (isinstance(histogram, ROOT.TH1) and force_graph):
                         histogram = cls.convert_tprofile_to_tgrapherrors(histogram)
                         plot.Add(histogram, "APZ")
                     else:
                         plot.Add(histogram)
             else:
                 for histogram in histograms:
-                    if isinstance(histogram, ROOT.TProfile):
+                    if isinstance(histogram, ROOT.TProfile) or (isinstance(histogram, ROOT.TH1) and force_graph):
                         histogram = cls.convert_tprofile_to_tgrapherrors(histogram)
                         plot.Add(histogram, "APZ")
                     else:

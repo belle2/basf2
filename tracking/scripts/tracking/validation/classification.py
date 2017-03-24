@@ -331,6 +331,36 @@ class ClassificationAnalysis(object):
 
             self.plots["purity_over_efficiency"] = purity_over_efficiency_profile
 
+            # Cut over efficiency #
+            # ################### #
+            cut_over_efficiency_profile_name = formatter.format(plot_name, subplot_name="cut_over_efficiency")
+            cut_over_efficiency_profile = ValidationPlot(cut_over_efficiency_profile_name)
+            cut_over_efficiency_profile.profile(
+                sorted_efficiencies,
+                sorted_estimates,
+                lower_bound=0,
+                upper_bound=1
+            )
+            cut_over_efficiency_profile.xlabel = 'efficiency'
+            cut_over_efficiency_profile.ylabel = cut_x_label
+
+            self.plots["cut_over_efficiency"] = cut_over_efficiency_profile
+
+            # Cut over bkg_rejection #
+            # ###################### #
+            cut_over_bkg_rejection_profile_name = formatter.format(plot_name, subplot_name="cut_over_bkg_rejection")
+            cut_over_bkg_rejection_profile = ValidationPlot(cut_over_bkg_rejection_profile_name)
+            cut_over_bkg_rejection_profile.profile(
+                sorted_bkg_rejections,
+                sorted_estimates,
+                lower_bound=0,
+                upper_bound=1
+            )
+            cut_over_bkg_rejection_profile.xlabel = 'bkg_rejection'
+            cut_over_bkg_rejection_profile.ylabel = cut_x_label
+
+            self.plots["cut_over_bkg_rejection"] = cut_over_bkg_rejection_profile
+
             # Efficiency over background rejection #
             # #################################### #
             efficiency_over_bkg_rejection_profile_name = formatter.format(plot_name, subplot_name="efficiency_over_bkg_rejection")

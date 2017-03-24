@@ -148,9 +148,7 @@ class ClassificationAnalysis(object):
         self.plots["purity"] = purity_profile
 
         # Auxiliary hists
-        signal_idx = truths == 1
-        bkg_idx = np.logical_not(signal_idx)
-
+        signal_idx = truths != 0
         for aux_name, aux_values in auxiliaries.items():
             if statistics.is_single_value_series(aux_values):
                 continue
@@ -202,20 +200,6 @@ class ClassificationAnalysis(object):
                 print("Determined cut direction", 1)
                 cut_direction = +1  # reject high values
 
-        cut_abs = False
-        if cut_direction is None:
-            purity_grapherrors = ValidationPlot.convert_tprofile_to_tgrapherrors(purity_profile.plot,
-                                                                                 abs_x=True)
-            correlation = purity_grapherrors.GetCorrelationFactor()
-            if correlation > 0.1:
-                print("Determined absolute cut direction", -1)
-                cut_direction = -1  # reject low values
-                cut_abs = True
-            elif correlation < -0.1:
-                print("Determined absolute cut direction", 1)
-                cut_direction = +1  # reject high values
-                cut_abs = True
-
         # Figures of merit
         if cut_value is not None:
             fom_name = formatter.format(plot_name, subplot_name="classification_figures_of_merits")
@@ -249,14 +233,59 @@ class ClassificationAnalysis(object):
 
             self.fom = classification_fom
 
-        if not estimate_is_binary and cut_direction is not None:
-            if cut_abs:
-                estimates = np.abs(estimates)
-                cut_x_label = "cut " + compose_axis_label("abs(" + quantity_name + ")", self.unit)
-                lower_bound = 0
-            else:
-                cut_x_label = "cut " + axis_label
+        cut_abs = False
+        if cut_direction is None:
+            purity_grapherrors = ValidationPlot.convert_tprofile_to_tgrapherrors(purity_profile.plot,
+                                                                                 abs_x=True)
+            correlation = purity_grapherrors.GetCorrelationFactor()
+            if correlation > 0.1:
+                print("Determined absolute cut direction", -1)
+                cut_direction = -1  # reject low values
+                cut_abs = True
+            elif correlation < -0.1:
+                print("Determined absolute cut direction", 1)
+                cut_direction = +1  # reject high values
+                cut_abs = True
 
+        if cut_abs:
+            estimates = np.abs(estimates)
+            cut_x_label = "cut " + compose_axis_label("abs(" + quantity_name + ")", self.unit)
+            lower_bound = 0
+        else:
+            cut_x_label = "cut " + axis_label
+
+        # Quantile plots
+        if not estimate_is_binary and cut_direction is not None:
+            # Signal estimate quantiles over auxiliary variable #
+            # ################################################# #
+            if cut_direction > 0:
+                quantiles = [0.5, 0.90, 0.99]
+            else:
+                quantiles = [0.01, 0.10, 0.5]
+
+            for aux_name, aux_values in auxiliaries.items():
+                if statistics.is_single_value_series(aux_values):
+                    continue
+
+                aux_axis_label = compose_axis_label(aux_name)
+
+                signal_quantile_aux_profile_name = formatter.format(plot_name, subplot_name=aux_name + '_signal_quantiles_aux2d')
+                signal_quantile_aux_profile = ValidationPlot(signal_quantile_aux_profile_name)
+                signal_quantile_aux_profile.hist2d(
+                    aux_values[signal_idx],
+                    estimates[signal_idx],
+                    quantiles=quantiles,
+                    lower_bound=(None, lower_bound),
+                    upper_bound=(None, upper_bound),
+                    outlier_z_score=self.outlier_z_score,
+                    allow_discrete=self.allow_discrete,
+                )
+                signal_quantile_aux_profile.xlabel = aux_axis_label
+                signal_quantile_aux_profile.ylabel = cut_x_label
+                self.plots[signal_quantile_aux_profile_name] = signal_quantile_aux_profile
+
+        # ROC plots
+        if not estimate_is_binary and cut_direction is not None:
             n_data = len(estimates)
             n_signals = scores.signal_amount(truths, estimates)
             n_bkgs = n_data - n_signals

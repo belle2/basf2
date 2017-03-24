@@ -73,13 +73,13 @@ namespace Belle2 {
 
     /** Returns a value for the transverse momentum in GeV calculated from a provided radius.
      *  Utilizing m_magneticFieldZ and hard coded speed of light*/
-    double calcPt(double radius) { return m_magneticFieldZ * radius * 0.00299792458; }
+    double calcPt(double const radius) const { return m_magneticFieldZ * radius * 0.00299792458; }
 
     /** Calculate curvature based on triplets of measurements.
      *  Ignores uncertainties.
      *  Returns -1,0,1 depending on the sum of all triplets.
      */
-    short calcCurvatureSign(std::vector<SpacePoint const*> const& measurements)
+    short calcCurvatureSign(std::vector<SpacePoint const*> const& measurements) const
     {
       if (measurements.size() < 3) return 0;
       float sumOfCurvature = 0.;

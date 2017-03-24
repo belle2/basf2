@@ -169,7 +169,7 @@ void RootInputModule::initialize()
 
     if (m_inputFileNames.size() != unique_filenames.size()) {
       if (m_entrySequences.size() > 0) {
-        B2FATAL("You specified a file multiple times, and specified a sequence of entries which should be used for each file."
+        B2FATAL("You specified a file multiple times, and specified a sequence of entries which should be used for each file. "
                 "Please specify each file only once if you're using the sequence feature!");
       } else {
         B2WARNING("You specified a file multiple times as input file.");
@@ -185,7 +185,7 @@ void RootInputModule::initialize()
       for (const auto& entry : generate_number_sequence(m_entrySequences[iFile])) {
         int64_t global_entry = entry + offset;
         if (global_entry >= next_offset) {
-          B2WARNING("Given sequence contains entry numbers which are out of range."
+          B2WARNING("Given sequence contains entry numbers which are out of range. "
                     "I won't add any further events to the EventList for the current file.");
           break;
         } else {

@@ -216,12 +216,11 @@ class ClassificationAnalysis(object):
             n_signals = scores.signal_amount(truths, estimates)
             n_bkgs = n_data - n_signals
 
-            # work around for numpy sorting nan values as high but we want it as low
-            reverse_sorting_indices = np.argsort(-estimates)
+            # work around for numpy sorting nan values as high but we want it as low depending on the cut direction
             if cut_direction < 0:  # reject low
-                sorting_indices = reverse_sorting_indices
+                sorting_indices = np.argsort(-estimates)
             else:
-                sorting_indices = reverse_sorting_indices[::-1]
+                sorting_indices = np.argsort(estimates)
 
             sorted_truths = truths[sorting_indices]
             sorted_estimates = estimates[sorting_indices]

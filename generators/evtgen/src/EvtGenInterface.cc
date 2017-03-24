@@ -48,6 +48,9 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pa
 {
   B2INFO("Begin initialisation of EvtGen Interface.");
 
+  //tauola prints normal things to stderr.. oh well.
+  IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Info, LogConfig::c_Info);
+  initLogCapture.start();
   EvtRandom::setRandomEngine((EvtRandomEngine*)&m_eng);
 
   // Official BelleII models
@@ -73,6 +76,7 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pa
 
   // Setup Parent Particle in rest frame
   m_ParentParticle = EvtPDL::getId(parentParticle);
+  initLogCapture.finish();
 
   B2INFO("End initialisation of EvtGen Interface.");
 
@@ -89,6 +93,7 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParen
   EvtId Inclusive_Particle_ID = EvtPDL::getId(inclusiveParticle);
   EvtId Inclusive_Anti_Particle_ID = EvtPDL::chargeConj(Inclusive_Particle_ID);
 
+  m_logCapture.start();
   bool we_got_inclusive_particle = false;
   do {
     m_parent = EvtParticleFactory::particleFactory(m_ParentParticle, m_pinit);
@@ -118,6 +123,7 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParen
       we_got_inclusive_particle = true;
     }
   } while (!we_got_inclusive_particle);
+  m_logCapture.finish();
 
   //  B2INFO("after generate Decay.");
 

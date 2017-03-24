@@ -18,7 +18,6 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <framework/core/Module.h>
-#include <framework/utilities/IOIntercept.h>
 
 #include <string>
 #include <vector>
@@ -74,7 +73,6 @@ namespace Belle2 {
     int m_maxTries; /**< Maximum number of tries for generating the parent particle */
     EvtId m_parentId; /**< EvtGen Id of the parent particle we want to generate */
     TVector3 m_PrimaryVertex; /**< primary vertex incl. spread */
-    IOIntercept::OutputToLogMessages m_logCapture; /**< Capture evtgen log and transform into basf2 logging. */
 
   private:
 

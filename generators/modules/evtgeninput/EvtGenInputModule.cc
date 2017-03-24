@@ -31,7 +31,6 @@ REG_MODULE(EvtGenInput)
 //-----------------------------------------------------------------
 
 EvtGenInputModule::EvtGenInputModule() : Module(),
-  m_logCapture("EvtGen", LogConfig::c_Info, LogConfig::c_Warning),
   m_initial(BeamParameters::c_smearALL)
 {
   //Set module properties
@@ -125,10 +124,8 @@ void EvtGenInputModule::event()
   mpg.clear();
 
   //generate event.
-  m_logCapture.start();
   int nPart =  m_Ievtgen.simulateEvent(mpg, pParentParticle, m_PrimaryVertex,
                                        m_inclusiveType, m_inclusiveParticle);
-  m_logCapture.finish();
 
   B2DEBUG(10, "EvtGen: generated event with " << nPart << " particles.");
 }
@@ -141,12 +138,8 @@ void EvtGenInputModule::initializeGenerator()
     B2ERROR("The 'pdlFile' parameter is deprecated and will be ignored. Use \"import pdg; pdg.read('pdlFile')\" instead.");
   }
 
-  //tauola prints normal things to stderr.. oh well.
-  IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Info, LogConfig::c_Info);
-  initLogCapture.start();
   //setup the DECAY files:
   m_Ievtgen.setup(m_DECFileName, m_parentParticle, m_userDECFileName);
-  initLogCapture.finish();
 
   if (m_inclusiveType == 0) m_inclusiveParticle = "";
   if (m_inclusiveType != 0 && EvtPDL::getId(m_inclusiveParticle).getId() == -1) {

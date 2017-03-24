@@ -55,7 +55,8 @@ class ClassificationAnalysis(object):
     def analyse(
         self,
         estimates,
-        truths
+        truths,
+        auxiliaries={}
     ):
         """Compares the concrete estimate to the truth and efficiency, purity and background rejection
         as figure of merit and plots the selection as a stacked plot over the truths.
@@ -145,6 +146,50 @@ class ClassificationAnalysis(object):
         purity_profile.xlabel = axis_label
         purity_profile.ylabel = 'purity'
         self.plots["purity"] = purity_profile
+
+        # Auxiliary hists
+        signal_idx = truths == 1
+        bkg_idx = np.logical_not(signal_idx)
+
+        for aux_name, aux_values in auxiliaries.items():
+            if statistics.is_single_value_series(aux_values):
+                continue
+
+            aux_axis_label = compose_axis_label(aux_name)
+
+            # Signal distribution over estimate and auxiliary variable #
+            # ######################################################## #
+            signal_aux_hist2d_name = formatter.format(plot_name, subplot_name=aux_name + '_signal_aux2d')
+            signal_aux_hist2d = ValidationPlot(signal_aux_hist2d_name)
+            signal_aux_hist2d.hist2d(
+                aux_values[signal_idx],
+                estimates[signal_idx],
+                lower_bound=(None, lower_bound),
+                upper_bound=(None, upper_bound),
+                outlier_z_score=self.outlier_z_score,
+                allow_discrete=self.allow_discrete,
+            )
+
+            signal_aux_hist2d.xlabel = aux_axis_label
+            signal_aux_hist2d.ylabel = axis_label
+            self.plots[signal_aux_hist2d_name] = signal_aux_hist2d
+
+            # Bkg distribution over estimate and auxiliary variable #
+            # ##################################################### #
+            bkg_aux_hist2d_name = formatter.format(plot_name, subplot_name=aux_name + '_bkg_aux2d')
+            bkg_aux_hist2d = ValidationPlot(bkg_aux_hist2d_name)
+            bkg_aux_hist2d.hist2d(
+                aux_values[~signal_idx],
+                estimates[~signal_idx],
+                lower_bound=(None, lower_bound),
+                upper_bound=(None, upper_bound),
+                outlier_z_score=self.outlier_z_score,
+                allow_discrete=self.allow_discrete,
+            )
+
+            bkg_aux_hist2d.xlabel = aux_axis_label
+            bkg_aux_hist2d.ylabel = axis_label
+            self.plots[bkg_aux_hist2d_name] = bkg_aux_hist2d
 
         # Try to guess the cur direction form the correlation
         if cut_direction is None:

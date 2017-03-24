@@ -18,7 +18,7 @@ from trackfindingcdc.run.training import TrainingRunMixin
 class FacetRelationFilterTrainingRun(TrainingRunMixin, StandardEventGenerationRun):
     """Run for recording facets encountered at the filter"""
     #: Suggested number for this analysis
-    n_events = 100
+    n_events = 1000
 
     #: Suggested generator module
     generator_module = "generic"
@@ -76,10 +76,10 @@ class FacetRelationFilterTrainingRun(TrainingRunMixin, StandardEventGenerationRu
                 # "to_middle_cos_delta",
 
                 "chi2_0",
-                "chi2_0_per_s",
-                "erf_0",
+                # "chi2_0_per_s",
+                # "erf_0",
                 # "fit_0_phi0",
-                "fit_0_cos_delta",
+                # "fit_0_cos_delta",
 
                 # "chi2_1",
                 # "chi2_1_per_s",
@@ -103,17 +103,22 @@ class FacetRelationFilterTrainingRun(TrainingRunMixin, StandardEventGenerationRu
                 # "phi0_comb_diff",
                 # "phi0_comb_sigma",
 
-                "chi2_kari_unit",
-                "abs_curv_unit",
+                # "chi2_kari_unit",
+                # "abs_curv_unit",
 
-                "chi2_kari_l",
-                "abs_curv_l",
+                # "chi2_kari_l",
+                # "abs_curv_l",
 
-                "chi2_kari_pseudo",
-                "abs_curv_pseudo",
+                # "chi2_kari_pseudo",
+                # "abs_curv_pseudo",
 
-                "chi2_kari_proper",
-                "abs_curv_proper",
+                # "chi2_kari_proper",
+                # "abs_curv_proper",
+            ]
+
+            self.groupby = ["", "superlayer_id"]
+            self.auxiliaries = [
+                "superlayer_id",
             ]
 
         path.add_module("TFCDC_WireHitPreparer",

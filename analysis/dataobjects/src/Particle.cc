@@ -160,9 +160,6 @@ Particle::Particle(const ECLCluster* eclCluster) :
 {
   if (!eclCluster) return;
 
-  // Only use the photon hypothesis for now
-  if (eclCluster->getHypothesisId() != 5) return;
-
   // TODO: avoid hard coded values
   m_pdgCode = 22;
   setFlavorType();
@@ -419,8 +416,7 @@ bool Particle::overlapsWith(const Particle* oParticle) const
   // check if they share any of the FSPs
   for (unsigned tFSP = 0; tFSP < thisFSPs.size(); tFSP++)
     for (unsigned oFSP = 0; oFSP < otherFSPs.size(); oFSP++)
-      if (thisFSPs[tFSP]->getParticleType() == otherFSPs[oFSP]->getParticleType()
-          && thisFSPs[tFSP]->getMdstArrayIndex() == otherFSPs[oFSP]->getMdstArrayIndex())
+      if (thisFSPs[tFSP]->getMdstSource() == otherFSPs[oFSP]->getMdstSource())
         return true;
 
   return false;

@@ -85,6 +85,7 @@ namespace Belle2 {
     int m_thresholdCount = 0; /**< minimal number of samples above threshold */
     bool m_useWaveforms = false; /**< if true, use full waveform digitization */
     bool m_useDatabase = false;  /**< if true, use sample times from database */
+    bool m_simulateTTS = true; /**< if true, add TTS to simulated hits */
 
     // other
     TOPSampleTimes m_sampleTimes; /**< equidistant sample times */

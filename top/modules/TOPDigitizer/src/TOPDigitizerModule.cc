@@ -90,7 +90,10 @@ namespace Belle2 {
     addParam("useDatabase", m_useDatabase,
              "if true, use sample times from database instead of equidistant time base",
              false);
-
+    addParam("simulateTTS", m_simulateTTS,
+             "if true, simulate time transition spread. "
+             "Should be always switched ON, except for some dedicated timing studies.",
+             true);
 
   }
 
@@ -229,7 +232,8 @@ namespace Belle2 {
       if (pixelID == 0) continue;
 
       // add TTS to photon time and make it relative to start time
-      double time = simHit.getTime() + tts.generateTTS() - startTime;
+      double time = simHit.getTime() - startTime;
+      if (m_simulateTTS) time += tts.generateTTS();
 
       // add time to digitizer of a given pixel
       TimeDigitizer digitizer(moduleID, pixelID, window,

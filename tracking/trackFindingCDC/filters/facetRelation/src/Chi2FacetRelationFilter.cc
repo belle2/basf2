@@ -21,10 +21,14 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-Chi2FacetRelationFilter::Chi2FacetRelationFilter() = default;
+Chi2FacetRelationFilter::Chi2FacetRelationFilter()
+// : m_param_chi2CutByISuperLayer{89.0, 268.0, 205.0, 206.0, 182.0, 200.0, 174.0, 197.0, 197.0} // efficiency 0.99 is a bit to loose
+  : m_param_chi2CutByISuperLayer{89.0, 130.0, 130.0, 130.0, 130.0, 130.0, 130.0, 130.0, 130.0}
+{
+}
 
 Chi2FacetRelationFilter::Chi2FacetRelationFilter(double chi2Cut, double penaltyWidth)
-  : m_param_chi2CutByISuperLayer{chi2Cut,}
+  : m_param_chi2CutByISuperLayer{chi2Cut}
   , m_param_penaltyFactor(penaltyWidth / chi2Cut)
 {
 }

@@ -156,39 +156,23 @@ class ClassificationAnalysis(object):
 
             aux_axis_label = compose_axis_label(aux_name)
 
-            # Signal distribution over estimate and auxiliary variable #
-            # ######################################################## #
-            signal_aux_hist2d_name = formatter.format(plot_name, subplot_name=aux_name + '_signal_aux2d')
-            signal_aux_hist2d = ValidationPlot(signal_aux_hist2d_name)
-            signal_aux_hist2d.hist2d(
-                aux_values[signals],
-                estimates[signals],
+            # Signal + bkg distribution over estimate and auxiliary variable #
+            # ############################################################## #
+            signal_bkg_aux_hist2d_name = formatter.format(plot_name, subplot_name=aux_name + '_signal_bkg_aux2d')
+            signal_bkg_aux_hist2d = ValidationPlot(signal_bkg_aux_hist2d_name)
+            signal_bkg_aux_hist2d.hist2d(
+                aux_values,
+                estimates,
+                stackby=truths,
                 lower_bound=(None, lower_bound),
                 upper_bound=(None, upper_bound),
                 outlier_z_score=self.outlier_z_score,
                 allow_discrete=self.allow_discrete,
             )
 
-            signal_aux_hist2d.xlabel = aux_axis_label
-            signal_aux_hist2d.ylabel = axis_label
-            self.plots[signal_aux_hist2d_name] = signal_aux_hist2d
-
-            # Bkg distribution over estimate and auxiliary variable #
-            # ##################################################### #
-            bkg_aux_hist2d_name = formatter.format(plot_name, subplot_name=aux_name + '_bkg_aux2d')
-            bkg_aux_hist2d = ValidationPlot(bkg_aux_hist2d_name)
-            bkg_aux_hist2d.hist2d(
-                aux_values[~signals],
-                estimates[~signals],
-                lower_bound=(None, lower_bound),
-                upper_bound=(None, upper_bound),
-                outlier_z_score=self.outlier_z_score,
-                allow_discrete=self.allow_discrete,
-            )
-
-            bkg_aux_hist2d.xlabel = aux_axis_label
-            bkg_aux_hist2d.ylabel = axis_label
-            self.plots[bkg_aux_hist2d_name] = bkg_aux_hist2d
+            signal_bkg_aux_hist2d.xlabel = aux_axis_label
+            signal_bkg_aux_hist2d.ylabel = axis_label
+            self.plots[signal_bkg_aux_hist2d_name] = signal_bkg_aux_hist2d
 
         # Try to guess the cur direction form the correlation
         if cut_direction is None:

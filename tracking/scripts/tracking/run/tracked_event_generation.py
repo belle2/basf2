@@ -146,6 +146,7 @@ finder_modules_by_short_name = {
     'MC': 'TrackFinderMCTruthRecoTracks',
     'Reconstruction': add_standard_reconstruction,
     'TrackFinder': add_standard_finder,
+    'TFCDC': lambda path: tracking.add_cdc_track_finding(path, with_ca=True),
     'TrackFinderCDC': tracking.add_cdc_track_finding,
     'TrackFinderVXD': tracking.add_vxd_track_finding,
     'TrackFinderCDCLegendre': lambda path: (path.add_module('TFCDC_WireHitPreparer',

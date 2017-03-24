@@ -75,11 +75,13 @@ class ClassificationAnalysis(object):
         plot_name = "{quantity_name}_{subplot_name}"
         plot_name = formatter.format(plot_name, quantity_name=quantity_name)
 
+        signals = truths != 0
+
         # Some different things become presentable depending on the estimates
         estimate_is_binary = statistics.is_binary_series(estimates)
 
         if estimate_is_binary:
-            binary_estimates = estimates
+            binary_estimates = estimates != 0
             cut_value = 0.5
             cut_direction = -1  # reject low values
 
@@ -94,7 +96,7 @@ class ClassificationAnalysis(object):
                 cut_classifier = cut_classifier.clone()
 
             cut_classifier.fit(estimates, truths)
-            binary_estimates = cut_classifier.predict(estimates)
+            binary_estimates = cut_classifier.predict(estimates) != 0
             cut_direction = cut_classifier.cut_direction
             cut_value = cut_classifier.cut_value
 
@@ -148,7 +150,6 @@ class ClassificationAnalysis(object):
         self.plots["purity"] = purity_profile
 
         # Auxiliary hists
-        signal_idx = truths != 0
         for aux_name, aux_values in auxiliaries.items():
             if statistics.is_single_value_series(aux_values):
                 continue
@@ -160,8 +161,8 @@ class ClassificationAnalysis(object):
             signal_aux_hist2d_name = formatter.format(plot_name, subplot_name=aux_name + '_signal_aux2d')
             signal_aux_hist2d = ValidationPlot(signal_aux_hist2d_name)
             signal_aux_hist2d.hist2d(
-                aux_values[signal_idx],
-                estimates[signal_idx],
+                aux_values[signals],
+                estimates[signals],
                 lower_bound=(None, lower_bound),
                 upper_bound=(None, upper_bound),
                 outlier_z_score=self.outlier_z_score,
@@ -177,8 +178,8 @@ class ClassificationAnalysis(object):
             bkg_aux_hist2d_name = formatter.format(plot_name, subplot_name=aux_name + '_bkg_aux2d')
             bkg_aux_hist2d = ValidationPlot(bkg_aux_hist2d_name)
             bkg_aux_hist2d.hist2d(
-                aux_values[~signal_idx],
-                estimates[~signal_idx],
+                aux_values[~signals],
+                estimates[~signals],
                 lower_bound=(None, lower_bound),
                 upper_bound=(None, upper_bound),
                 outlier_z_score=self.outlier_z_score,
@@ -233,6 +234,59 @@ class ClassificationAnalysis(object):
 
             self.fom = classification_fom
 
+        # Figures of merit as function of the auxiliary variables
+        if cut_value is not None and auxiliaries is not None:
+            for aux_name, aux_values in auxiliaries.items():
+                if statistics.is_single_value_series(aux_values):
+                    continue
+
+                aux_axis_label = compose_axis_label(aux_name)
+
+                # Auxiliary purity profile #
+                # ######################## #
+                aux_purity_profile_name = formatter.format(plot_name, subplot_name=aux_name + "_aux_purity_profile")
+                aux_purity_profile = ValidationPlot(aux_purity_profile_name)
+                aux_purity_profile.profile(
+                    aux_values[binary_estimates],
+                    truths[binary_estimates],
+                    outlier_z_score=self.outlier_z_score,
+                    allow_discrete=self.allow_discrete,
+                )
+
+                aux_purity_profile.xlabel = aux_axis_label
+                aux_purity_profile.ylabel = 'purity'
+                self.plots[aux_purity_profile_name] = aux_purity_profile
+
+                # Auxiliary efficiency profile #
+                # ############################ #
+                aux_efficiency_profile_name = formatter.format(plot_name, subplot_name=aux_name + "_aux_efficiency_profile")
+                aux_efficiency_profile = ValidationPlot(aux_efficiency_profile_name)
+                aux_efficiency_profile.profile(
+                    aux_values[signals],
+                    binary_estimates[signals],
+                    outlier_z_score=self.outlier_z_score,
+                    allow_discrete=self.allow_discrete,
+                )
+
+                aux_efficiency_profile.xlabel = aux_axis_label
+                aux_efficiency_profile.ylabel = 'efficiency'
+                self.plots[aux_efficiency_profile_name] = aux_efficiency_profile
+
+                # Auxiliary bkg rejection profile #
+                # ############################### #
+                aux_bkg_rejection_profile_name = formatter.format(plot_name, subplot_name=aux_name + "_aux_bkg_rejection_profile")
+                aux_bkg_rejection_profile = ValidationPlot(aux_bkg_rejection_profile_name)
+                aux_bkg_rejection_profile.profile(
+                    aux_values[~signals],
+                    ~binary_estimates[~signals],
+                    outlier_z_score=self.outlier_z_score,
+                    allow_discrete=self.allow_discrete,
+                )
+
+                aux_bkg_rejection_profile.xlabel = aux_axis_label
+                aux_bkg_rejection_profile.ylabel = 'bkg rejection'
+                self.plots[aux_bkg_rejection_profile_name] = aux_bkg_rejection_profile
+
         cut_abs = False
         if cut_direction is None:
             purity_grapherrors = ValidationPlot.convert_tprofile_to_tgrapherrors(purity_profile.plot,
@@ -272,8 +326,8 @@ class ClassificationAnalysis(object):
                 signal_quantile_aux_profile_name = formatter.format(plot_name, subplot_name=aux_name + '_signal_quantiles_aux2d')
                 signal_quantile_aux_profile = ValidationPlot(signal_quantile_aux_profile_name)
                 signal_quantile_aux_profile.hist2d(
-                    aux_values[signal_idx],
-                    estimates[signal_idx],
+                    aux_values[signals],
+                    estimates[signals],
                     quantiles=quantiles,
                     lower_bound=(None, lower_bound),
                     upper_bound=(None, upper_bound),

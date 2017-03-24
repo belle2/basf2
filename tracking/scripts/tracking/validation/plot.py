@@ -1804,7 +1804,6 @@ class ValidationPlot(object):
 
                 stack_ranges.append([stack_lower_bound, stack_upper_bound])
 
-            print(stack_ranges)
             lower_bound = np.nanmin([lwb for lwb, upb in stack_ranges])
             upper_bound = np.nanmax([upb for lwb, upb in stack_ranges])
 

@@ -46,9 +46,24 @@ class FacetRelationFilterTrainingRun(TrainingRunMixin, StandardEventGenerationRu
 
         elif self.task == "eval":
             var_sets = [
+                "basic",
                 "filter(chi2)",
+                "filter(chi2_old)",
                 "filter(simple)",
                 "filter(truth)",
+            ]
+
+            self.variables = [
+                "chi2_weight",
+                "chi2_accept",
+                "chi2_old_weight",
+                "chi2_old_accept",
+                "simple_accept",
+                ]
+
+            self.groupby = ["", "superlayer_id"]
+            self.auxiliaries = [
+                "superlayer_id",
             ]
 
         elif self.task == "explore":

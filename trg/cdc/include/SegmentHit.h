@@ -22,15 +22,15 @@
 
 namespace Belle2 {
 
-class TRGCDCSegment;
+  class TRGCDCSegment;
 
 /// A class to represent a track segment hit in CDC.
-class TRGCDCSegmentHit : public TRGCDCCellHit {
+  class TRGCDCSegmentHit : public TRGCDCCellHit {
 
   public:
 
     /// Constructor.
-    TRGCDCSegmentHit(const TRGCDCSegment &);
+    TRGCDCSegmentHit(const TRGCDCSegment&);
 
     /// Destructor
     virtual ~TRGCDCSegmentHit();
@@ -39,45 +39,46 @@ class TRGCDCSegmentHit : public TRGCDCCellHit {
     static void removeAll(void);
 
     /// new operator.
-    static void * operator new(size_t);
+    static void* operator new(size_t);
 
     /// delete operator.
-    static void operator delete(void *);
+    static void operator delete(void*);
 
   public:// Selectors
 
     /// dumps debug information.
-    virtual void dump(const std::string & message = std::string(""),
-		      const std::string & prefix = std::string("")) const;
+    virtual void dump(const std::string& message = std::string(""),
+                      const std::string& prefix = std::string("")) const;
 
     /// returns a pointer to a track segment.
-    const TRGCDCSegment & segment(void) const;
+    const TRGCDCSegment& segment(void) const;
 
     /// returns trigger output. Null will returned if no signal.
-    const TRGSignal & signal(void) const;
+    const TRGSignal& signal(void) const;
 
   public:// Modifiers
 
   public:// Static utility functions
 
     /// Sorting funnction.
-    static int sortById(const TRGCDCSegmentHit ** a,
-			const TRGCDCSegmentHit ** b);
+    static int sortById(const TRGCDCSegmentHit** a,
+                        const TRGCDCSegmentHit** b);
 
   private:
 
     /// Keeps all TRGCDCSegmentHit created by new().
-    static std::vector<TRGCDCSegmentHit *> _all;
+    static std::vector<TRGCDCSegmentHit*> _all;
 
-};
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-const TRGSignal &
-TRGCDCSegmentHit::signal(void) const {
+  inline
+  const TRGSignal&
+  TRGCDCSegmentHit::signal(void) const
+  {
     return cell().signal();
-}
+  }
 
 } // namespace Belle2
 

@@ -2,6 +2,7 @@
 ! TOP counter for Belle: interface to TOP_RTRA
 ! M. Staric, mar-2009, mar-2010, 
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
+! mar-2017: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE RTRA_CLEAR

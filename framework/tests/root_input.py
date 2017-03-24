@@ -21,14 +21,13 @@ eventinfo = register_module('EventInfoPrinter')
 printcollections = register_module('PrintCollections')
 
 input.param('inputFileName', Belle2.FileSystem.findFile('framework/tests/root_input.root'))
-# load all branches, minus PXDClusters
+# load all branches, minus PXDClusters (relations with PXDClusters are automatically excluded)
 input.param('branchNames', [
     'EventMetaData',
-    'PXDClustersToPXDDigits',
-    'PXDClustersToPXDTrueHits',
     'PXDDigits',
     'PXDTrueHits',
-    'PXDClusters', ])
+    'PXDClusters'])
+# (yes, we also added PXDClusters in branchNames, to check if it's overridden by excludeBranchNames)
 input.param('excludeBranchNames', ['PXDClusters'])
 input.param('skipNEvents', 1)
 input.logging.log_level = LogLevel.WARNING

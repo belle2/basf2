@@ -443,6 +443,8 @@ namespace Belle2 {
                                  tdcParams.getTime("doubleHitResolution"),
                                  tdcParams.getTime("timeJitter"),
                                  tdcParams.getDouble("efficiency"));
+        nominalTDC.setADCBits(tdcParams.getInt("adcBits"));
+        nominalTDC.setAveragePedestal(tdcParams.getInt("averagePedestal"));
         geo->setNominalTDC(nominalTDC);
       } else {
         TOPNominalTDC nominalTDC(pmtParams.getInt("TDCbits"),
@@ -453,6 +455,19 @@ namespace Belle2 {
                                  pmtParams.getTime("TDCtimeJitter", 50e-3),
                                  pmtParams.getDouble("TDCefficiency", 1));
         geo->setNominalTDC(nominalTDC);
+      }
+
+      // single photon signal shape
+
+      GearDir shapeParams(content, "SignalShape");
+      if (shapeParams) {
+        GearDir noiseBandwidth(shapeParams, "noiseBandwidth");
+        TOPSignalShape signalShape(shapeParams.getArray("sampleValues"),
+                                   geo->getNominalTDC().getSampleWidth(),
+                                   shapeParams.getTime("tailTimeConstant"),
+                                   noiseBandwidth.getDouble("pole1") / 1000,
+                                   noiseBandwidth.getDouble("pole2") / 1000);
+        geo->setSignalShape(signalShape);
       }
 
       return geo;

@@ -79,15 +79,20 @@ namespace Belle2 {
 
     private:
       // members of SensitiveDiode
-      ECLGeometryPar* m_eclp;
-      struct hit_t { int cellId; double e, t; };
-      int m_trackID;                /**< current track id */
-      double m_tsum;        /**< average track time weighted by energy deposition */
-      double m_esum;       /**< total energy deposited in a volume by a track */
+      ECLGeometryPar* m_eclp; /**< pointer to ECLGeometryPar */
+      /** simple hit structure */
+      struct hit_t {
+        int cellId; /**< cell id */
+        double e; /**< energy deposition in a crystal */
+        double t; /**< time of energy deposition in a crystal */
+      };
+      int m_trackID; /**< current track id */
+      double m_tsum; /**< average track time weighted by energy deposition */
+      double m_esum; /**< total energy deposited in a volume by a track */
 
-      std::vector<hit_t> m_hits;
-      std::vector<int> m_cells;
-      StoreArray<ECLHit> m_eclHits;         /**< ECLHit array */
+      std::vector<hit_t> m_hits; /**< array of hits*/
+      std::vector<int> m_cells; /**< array of hitted crystals */
+      StoreArray<ECLHit> m_eclHits;  /**< ECLHit array */
     };
 
     /** Class for ECL Sensitive Detector for neutron background study*/

@@ -29,13 +29,14 @@ class Cosmics(TrackingValidationRun):
     generator_module = 'Cosmics'
     root_input_file = '../CosmicsSimNoBkg.root'
     components = None
-    finder_module = 'TrackFinderCDCCosmics'
+    finder_module = 'TFCDC_TrackFinderCosmics'
     tracking_coverage = {
         'WhichParticles': ['CDC'],  # Include all particles seen in CDC, also secondaries
         'UsePXDHits': False,
         'UseSVDHits': False,
         'UseCDCHits': True,
-        'UseOnlyAxialCDCHits': False
+        'UseOnlyAxialCDCHits': False,
+        "UseReassignedHits": True,
     }
     pulls = True
     contact = CONTACT

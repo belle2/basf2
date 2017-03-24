@@ -2,6 +2,7 @@
 ! TOP counter for Belle: interface to TOP_DATA
 ! M. Staric, mar-2009, sept-2011, mar-2017
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
+! mar-2017: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE DATA_CLEAR

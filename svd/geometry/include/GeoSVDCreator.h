@@ -91,7 +91,7 @@ namespace Belle2 {
        * Read the sensor definitions from the database
        * @param sensors Reference to the database containing the parameters
        */
-      virtual VXD::SensorInfoBase* createSensorInfo(const VXDGeoSensorPar& sensor);
+      virtual VXD::SensorInfoBase* createSensorInfo(const VXDGeoSensorPar& sensor) override;
 
       /**
        * Read the sensor definitions from gearbox
@@ -106,7 +106,7 @@ namespace Belle2 {
        * @param placement Information on how to place the sensor
        */
       virtual VXD::SensitiveDetectorBase* createSensitiveDetector(
-        VxdID sensorID, const VXDGeoSensor& sensor, const VXDGeoSensorPlacement& placement);
+        VxdID sensorID, const VXDGeoSensor& sensor, const VXDGeoSensorPlacement& placement) override;
 
       /**
        * Create support structure for SVD Half Shell, that means everything

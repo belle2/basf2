@@ -130,7 +130,6 @@ TrgEclCluster::setICN(std::vector<int> tcid, std::vector<double> tcenergy, std::
   _icnfwbrbw[0] = setForwardICN(_Method);
   _icnfwbrbw[2] = setBackwardICN(_Method);
 
-
   save(_EventId);
 
   return;
@@ -291,13 +290,10 @@ TrgEclCluster::setBarrelICN(int Method)
     TempCluster[8] = tc_upper_left; //lower right;
 
 
+
     if (!(tc_upper != 0 || tc_left != 0)) {
       if (!(tc_lower != 0 && tc_lower_left != 0)) {
-        // cout << "befor 1 :";
-        // for (int iTC = 0; iTC < 9; iTC++) { //find center of Cluster
-        //   cout     << TempCluster[iTC] << " ";
-        // }
-        // cout << endl;
+
         if (Method == 1) { //for cluster method2(Consider TC energy in oderto find the center of cluster)
 
           int maxTCid = 0;
@@ -338,7 +334,7 @@ TrgEclCluster::setBarrelICN(int Method)
 
             }
           }
-          if (maxTCid > 93 && maxTCid < 501) {
+          if (maxTCid > 92 && maxTCid < 501) {
 
             TempCluster[1] = TCFire[maxTCid - 12 - 81] ;
             TempCluster[2] = TCFire[maxTCid - 13 - 81] ;
@@ -390,13 +386,19 @@ TrgEclCluster::setBarrelICN(int Method)
 
             }
           }
-          // cout << "after 1 :  ";
-          // for (int iTC = 0; iTC < 9; iTC++) { //find center of Cluster
-          //   cout  << TempCluster[iTC] << " ";
-          // }
-          // cout << endl;
+
 
         }
+        for (int iNearTC = 1; iNearTC < 9; iNearTC ++) {
+          for (int jNearTC = 1; jNearTC < 9; jNearTC ++) {
+            if (TempCluster[iNearTC] == 0) {continue;}
+            if (iNearTC == jNearTC) {continue;}
+            if (TempCluster[iNearTC] == TempCluster[jNearTC]) {
+              TempCluster[jNearTC] = 0;
+            }
+          }
+        }
+
         double maxTC = 0;
         int maxTCId = 999;
         double clusterenergy = 0;
@@ -426,6 +428,7 @@ TrgEclCluster::setBarrelICN(int Method)
             maxTCId = TempCluster[iNearTC] ;
           }
         }
+
         clustertiming /= clusterenergy;
         clusterpositionX /= clusterenergy;
         clusterpositionY /= clusterenergy;
@@ -654,13 +657,15 @@ TrgEclCluster::setForwardICN(int Method)
     }
     if (!(TempCluster[1] != 0 || TempCluster[7] != 0)) {
       if (!(TempCluster[5] != 0 && TempCluster[6] != 0)) {
+
+
         if (Method == 1) { //for cluster method2
           int maxTCid = 0;
           double maxTCEnergy = 0;
           for (int iTC = 0; iTC < 9; iTC++) { //find center of Cluster
             if (TempCluster[iTC] == 0) {continue;}
-            if (maxTCEnergy <       TCFireEnergy[TempCluster[iTC] - 81]) {
-              maxTCEnergy = TCFireEnergy[TempCluster[iTC] - 81];
+            if (maxTCEnergy <  TCFireEnergy[TempCluster[iTC] - 1]) {
+              maxTCEnergy = TCFireEnergy[TempCluster[iTC]];
               maxTCid = TempCluster[iTC];
             }
           }
@@ -800,8 +805,10 @@ TrgEclCluster::setForwardICN(int Method)
 
         }
 
+
         for (int iNearTC = 1; iNearTC < 9; iNearTC ++) {
           for (int jNearTC = 1; jNearTC < 9; jNearTC ++) {
+            if (TempCluster[iNearTC] == 0) {continue;}
             if (iNearTC == jNearTC)continue;
             if (TempCluster[iNearTC] == TempCluster[jNearTC]) {
               TempCluster[jNearTC] = 0;
@@ -981,6 +988,7 @@ int TrgEclCluster::setBackwardICN(int Method)
 
     if (!(TempCluster[1] != 0 || TempCluster[7] != 0)) {
       if (!(TempCluster[5] != 0 && TempCluster[6] != 0)) {
+
         if (Method == 1) {
           int maxTCid = 0;
           double maxTCEnergy = 0;
@@ -1054,6 +1062,16 @@ int TrgEclCluster::setBackwardICN(int Method)
           }
 
         }
+        for (int iNearTC = 1; iNearTC < 9; iNearTC ++) {
+          for (int jNearTC = 1; jNearTC < 9; jNearTC ++) {
+            if (TempCluster[iNearTC] == 0) {continue;}
+            if (iNearTC == jNearTC) {continue;}
+            if (TempCluster[iNearTC] == TempCluster[jNearTC]) {
+              TempCluster[jNearTC] = 0;
+            }
+          }
+        }
+
         double maxTC = 0;
         int maxTCId = 999;
         double clusterenergy = 0;

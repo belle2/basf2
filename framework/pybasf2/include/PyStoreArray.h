@@ -71,7 +71,7 @@ namespace Belle2 {
     * @param objClass Class of the object to be accessed
     * @param durability 0: event, 1: persistent
     */
-    explicit PyStoreArray(const TClass* objClass,
+    explicit PyStoreArray(TClass* objClass,
                           DataStore::EDurability durability =  DataStore::EDurability::c_Event);
 
     /** constructor.
@@ -79,7 +79,7 @@ namespace Belle2 {
     * @param name Name of the entry to be accessed
     * @param durability 0: event, 1: persistent
     */
-    explicit PyStoreArray(const TClass* objClass,
+    explicit PyStoreArray(TClass* objClass,
                           const std::string& name,
                           DataStore::EDurability durability =  DataStore::EDurability::c_Event);
 

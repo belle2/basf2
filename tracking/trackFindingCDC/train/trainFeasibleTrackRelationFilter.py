@@ -20,7 +20,7 @@ class FeasibleTrackRelationFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEve
     def create_path(self):
         """Setup the recording path after the simulation"""
         path = super().create_path()
-        path.add_module("WireHitPreparer",
+        path.add_module("TFCDC_WireHitPreparer",
                         flightTimeEstimation="outwards",
                         UseNLoops=1.0)
 
@@ -46,7 +46,7 @@ class FeasibleTrackRelationFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEve
         else:
             raise ValueError("Unknown task " + self.task)
 
-        path.add_module("TrackFinderCDCAutomaton",
+        path.add_module("TFCDC_TrackFinderAutomaton",
                         TrackRelationFilter="unionrecording",
                         TrackRelationFilterParameters={
                             "rootFileName": self.sample_file_name,

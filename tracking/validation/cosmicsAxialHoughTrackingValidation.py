@@ -32,11 +32,11 @@ class CosmicsAxialHough(TrackingValidationRun):
     components = None
 
     def finder_module(self, path):
-        path.add_module('WireHitPreparer')
-        path.add_module('SegmentFinderCDCFacetAutomaton',
+        path.add_module('TFCDC_WireHitPreparer')
+        path.add_module('TFCDC_SegmentFinderFacetAutomaton',
                         SegmentOrientation="downwards")
-        path.add_module('AxialTrackCreatorSegmentHough')
-        path.add_module('TrackExporter')
+        path.add_module('TFCDC_AxialTrackCreatorSegmentHough')
+        path.add_module('TFCDC_TrackExporter')
 
         interactive_display = False
         if interactive_display:
@@ -50,7 +50,8 @@ class CosmicsAxialHough(TrackingValidationRun):
         'UsePXDHits': False,
         'UseSVDHits': False,
         'UseCDCHits': True,
-        'UseOnlyAxialCDCHits': True
+        'UseOnlyAxialCDCHits': True,
+        "UseReassignedHits": True,
     }
 
     pulls = True

@@ -92,6 +92,8 @@ namespace Belle2 {
     /**
      * Returns calibration constants for given SCROD and channel.
      * If calibration doesn't exist, return equidistant sample times.
+     * @param scrodID SCROD ID
+     * @param channel channel number (within SCROD or within module)
      * @return calibration constants (always valid pointer)
      */
     const TOPSampleTimes* getSampleTimes(unsigned scrodID, unsigned channel) const;

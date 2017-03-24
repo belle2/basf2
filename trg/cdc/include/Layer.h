@@ -23,29 +23,29 @@
 
 namespace Belle2 {
 
-class TRGCDC;
-class TRGCDCCell;
+  class TRGCDC;
+  class TRGCDCCell;
 
 /// A class to represent a cell layer.
-class TRGCDCLayer : public std::vector<TRGCDCCell *> {
+  class TRGCDCLayer : public std::vector<TRGCDCCell*> {
 
   public:
 
     /// Constructor.
     TRGCDCLayer(unsigned id,
-		unsigned superLayerId,
-		unsigned localLayerId,
-		unsigned axialStereoLayerId,
-		unsigned axialStereoSuperLayerId,
-		float offset,
-		int nShifts,
-		float cellSize,
-		unsigned nCells,
-		float innerRadius,
-		float outerRadius);
+                unsigned superLayerId,
+                unsigned localLayerId,
+                unsigned axialStereoLayerId,
+                unsigned axialStereoSuperLayerId,
+                float offset,
+                int nShifts,
+                float cellSize,
+                unsigned nCells,
+                float innerRadius,
+                float outerRadius);
 
     /// Constructor for track segments.
-    TRGCDCLayer(unsigned id, const TRGCDCCell & w);
+    TRGCDCLayer(unsigned id, const TRGCDCCell& w);
 
     /// Destructor
     virtual ~TRGCDCLayer();
@@ -53,7 +53,7 @@ class TRGCDCLayer : public std::vector<TRGCDCCell *> {
   public:// Selectors
 
     /// return name.
-    const std::string & name(void) const;
+    const std::string& name(void) const;
 
     /// returns id.
     unsigned id(void) const;
@@ -74,7 +74,7 @@ class TRGCDCLayer : public std::vector<TRGCDCCell *> {
     unsigned nCells(void) const;
 
     /// returns a pointer to a cell. 'id' can be negative or 'id' can be greater than 'nCells()'.
-    const TRGCDCCell & cell(int id) const;
+    const TRGCDCCell& cell(int id) const;
 
     /// returns true if this is an axial layer.
     bool axial(void) const;
@@ -98,8 +98,8 @@ class TRGCDCLayer : public std::vector<TRGCDCCell *> {
     float outerRadius(void) const;
 
     /// dumps debug information.
-    void dump(const std::string & message = std::string(""),
-              const std::string & prefix = std::string("")) const;
+    void dump(const std::string& message = std::string(""),
+              const std::string& prefix = std::string("")) const;
 
     /// returns "A" or "U" or "V" depending on stereo type.
     const std::string stereoType(void) const;
@@ -144,106 +144,121 @@ class TRGCDCLayer : public std::vector<TRGCDCCell *> {
 
     /// TRGCDC has complete access.
     friend class TRGCDC;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-unsigned
-TRGCDCLayer::id(void) const {
+  inline
+  unsigned
+  TRGCDCLayer::id(void) const
+  {
     return _id;
-}
+  }
 
-inline
-unsigned
-TRGCDCLayer::superLayerId(void) const {
+  inline
+  unsigned
+  TRGCDCLayer::superLayerId(void) const
+  {
     return _superLayerId;
-}
+  }
 
-inline
-unsigned
-TRGCDCLayer::localLayerId(void) const {
+  inline
+  unsigned
+  TRGCDCLayer::localLayerId(void) const
+  {
     return _localLayerId;
-}
+  }
 
-inline
-float
-TRGCDCLayer::offset(void) const {
+  inline
+  float
+  TRGCDCLayer::offset(void) const
+  {
     return _offset;
-}
+  }
 
-inline
-int
-TRGCDCLayer::nShifts(void) const {
+  inline
+  int
+  TRGCDCLayer::nShifts(void) const
+  {
     return _nShifts;
-}
+  }
 
-inline
-unsigned
-TRGCDCLayer::nCells(void) const {
+  inline
+  unsigned
+  TRGCDCLayer::nCells(void) const
+  {
     return _nCells;
-}
+  }
 
-inline
-bool
-TRGCDCLayer::axial(void) const {
+  inline
+  bool
+  TRGCDCLayer::axial(void) const
+  {
     if (! _nShifts) return true;
     return false;
-}
+  }
 
-inline
-bool
-TRGCDCLayer::stereo(void) const {
+  inline
+  bool
+  TRGCDCLayer::stereo(void) const
+  {
     if (_nShifts) return true;
     return false;
-}
+  }
 
-inline
-unsigned
-TRGCDCLayer::axialStereoLayerId(void) const {
+  inline
+  unsigned
+  TRGCDCLayer::axialStereoLayerId(void) const
+  {
     return _axialStereoLayerId;
-}
+  }
 
-inline
-unsigned
-TRGCDCLayer::axialStereoSuperLayerId(void) const {
+  inline
+  unsigned
+  TRGCDCLayer::axialStereoSuperLayerId(void) const
+  {
     return _axialStereoSuperLayerId;
-}
+  }
 
-inline
-float
-TRGCDCLayer::cellSize(void) const {
+  inline
+  float
+  TRGCDCLayer::cellSize(void) const
+  {
     return _cellSize;
-}
+  }
 
-inline
-const std::string
-TRGCDCLayer::stereoType(void) const {
+  inline
+  const std::string
+  TRGCDCLayer::stereoType(void) const
+  {
     if (axial())
-        return "A";
+      return "A";
     else if (nShifts() > 0)
-        return "U";
+      return "U";
     else
-        return "V";
-}
+      return "V";
+  }
 
-inline
-float
-TRGCDCLayer::innerRadius(void) const {
+  inline
+  float
+  TRGCDCLayer::innerRadius(void) const
+  {
     return _innerRadius;
-}
+  }
 
-inline
-float
-TRGCDCLayer::outerRadius(void) const {
+  inline
+  float
+  TRGCDCLayer::outerRadius(void) const
+  {
     return _outerRadius;
-}
+  }
 
-inline
-const std::string &
-TRGCDCLayer::name(void) const {
+  inline
+  const std::string&
+  TRGCDCLayer::name(void) const
+  {
     return _name;
-}
+  }
 
 } // namespace Belle2
 

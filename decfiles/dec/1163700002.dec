@@ -1,0 +1,27 @@
+# EventType: 1163700002
+# Descriptor: [B0 -> D* l nu ]cc
+# NickName: Bd_Dslnu
+# Documentation: B->D* l nu process
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Florian Bernlochner
+# Email: florian.bernlochner@cern.ch 
+# Cuts: None
+# Date: 20170309
+#
+#
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0	VSS_BMIX dm;
+Enddecay
+
+#central values from HFAG 2016 average
+
+Decay B0sig
+0.5   D*-    e+ nu_e        PHOTOS        HQET2  1.205 0.906 1.404 0.854;
+0.5   D*-    mu+ nu_mu        PHOTOS        HQET2  1.205 0.906 1.404 0.854;
+Enddecay
+CDecay anti-B0sig
+
+#
+End

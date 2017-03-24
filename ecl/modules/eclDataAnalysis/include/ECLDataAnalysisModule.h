@@ -66,12 +66,12 @@ namespace Belle2 {
     std::string m_rootFileName; /**< name of the root file */
     bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
     bool m_doTracking; /**< if true, info on tracking will be stored, job will fail if doTracking==1 and the tracking modules are not enabled at phyton level */
-    bool m_doPureCsIStudy; /**< if true, info on pureCsI upgrade is stored*/
+    //bool m_doPureCsIStudy; /**< if true, info on pureCsI upgrade is stored*/
     bool m_doSimulation; /**< if true, info on Hits and SimHits is stored*/
-    bool m_doMC; /**< if true, MC info is stored*/
-    std::string m_pure_clusters; /**< Pure CsI clusters StoreArray name*/
-    std::string m_pure_digits; /**< Pure CsI digits StoreArray name*/
-    std::string m_pure_cal_digits; /**< Pure CsI cal digits StoreArray name*/
+    //bool m_doMC; /**< if true, MC info is stored*/
+    //std::string m_pure_clusters; /**< Pure CsI clusters StoreArray name*/
+    //std::string m_pure_digits; /**< Pure CsI digits StoreArray name*/
+    //std::string m_pure_cal_digits; /**< Pure CsI cal digits StoreArray name*/
 
     TTree* m_tree; /**< Root tree and file for saving the output */
     //TFile* m_rootFile;
@@ -156,8 +156,8 @@ namespace Belle2 {
     std::vector<int>* m_eclHitToMC; /**< Index of MCParticle related to ECLHit */
     std::vector<int>* m_eclHitToDigit; /**< Index of ECLDigit related to ECLHit */
     std::vector<int>* m_eclHitToDigitAmp; /**< Amplitude of ECLDigit related to ECLHit */
-    std::vector<int>* m_eclHitToPureDigit; /**< Index of ECLDigit related to ECLHit */
-    std::vector<int>* m_eclHitToPureDigitAmp; /**< Amplitude of ECLDigit related to ECLHit */
+    //std::vector<int>* m_eclHitToPureDigit; /**< Index of ECLDigit related to ECLHit */
+    //std::vector<int>* m_eclHitToPureDigitAmp; /**< Amplitude of ECLDigit related to ECLHit */
     std::vector<int>* m_eclHitCellId; /**< ECLHit CellID */
     std::vector<double>* m_eclHitEnergyDep; /**< ECLHit energy */
     std::vector<double>* m_eclHitTimeAve; /**< ECLHit time */
@@ -216,39 +216,39 @@ namespace Belle2 {
     std::vector<int>* m_eclClusterDetectorRegion; /**< Cluster Detector Region */
     std::vector<int>* m_eclClusterHypothesisId; /**< Cluster Detector Region */
 
-    int m_eclPureDigitMultip; /**< Number of ECLPureDigits per event */
-    std::vector<int>* m_eclPureDigitIdx; /**< ECLPureDigit index */
-    std::vector<int>* m_eclPureDigitToMC; /**< Index of MCParticle related to that ECLPureDigit */
-    std::vector<int>* m_eclPureDigitCellId; /**< Number of ECLPureDigit CellId */
-    std::vector<int>* m_eclPureDigitAmp;  /**< ECLPureDigit amplitude */
-    std::vector<int>* m_eclPureDigitTimeFit;  /**< ECLPureDigit timing */
-    std::vector<int>* m_eclPureDigitFitQuality;  /**< ECLPureDigit fit quality */
-    std::vector<int>* m_eclPureDigitToCluster;  /**< ECLPureDigit To Cluster */
+    //int m_eclPureDigitMultip; /**< Number of ECLPureDigits per event */
+    //std::vector<int>* m_eclPureDigitIdx; /**< ECLPureDigit index */
+    //std::vector<int>* m_eclPureDigitToMC; /**< Index of MCParticle related to that ECLPureDigit */
+    //std::vector<int>* m_eclPureDigitCellId; /**< Number of ECLPureDigit CellId */
+    //std::vector<int>* m_eclPureDigitAmp;  /**< ECLPureDigit amplitude */
+    //std::vector<int>* m_eclPureDigitTimeFit;  /**< ECLPureDigit timing */
+    //std::vector<int>* m_eclPureDigitFitQuality;  /**< ECLPureDigit fit quality */
+    //std::vector<int>* m_eclPureDigitToCluster;  /**< ECLPureDigit To Cluster */
 
-    int m_eclPureClusterMultip;  /**< Number of ECLClusterss per event */
-    std::vector<int>* m_eclPureClusterIdx;  /**< ECLCluster index */
-    std::vector<int>* m_eclPureClusterToMC; /**< Index of MCParticle related to that ECLPureCluster */
-    std::vector<double>* m_eclPureClusterEnergy; /**< ECLPureCluster energy */
-    std::vector<double>* m_eclPureClusterEnergyError; /**< ECLPureCluster energy error*/
-    std::vector<double>* m_eclPureClusterTheta;  /**< ECLPureCluster polar direction */
-    std::vector<double>* m_eclPureClusterThetaError;  /**< ECLPureCluster error on polar direction */
-    std::vector<double>* m_eclPureClusterPhi;  /**< ECLPureCluster azimuthal direction */
-    std::vector<double>* m_eclPureClusterPhiError;  /**< ECLPureCluster error on azimuthal direction */
-    std::vector<double>* m_eclPureClusterR;  /**< ECLPureCluster distance from IP */
-    std::vector<double>* m_eclPureClusterEnergyDepSum;  /**< ECLPureCluster simulated energy */
-    std::vector<double>* m_eclPureClusterTiming;  /**< ECLPureCluster time */
-    std::vector<double>* m_eclPureClusterTimingError;  /**< ECLPureCluster time error */
-    std::vector<double>* m_eclPureClusterE9oE21;  /**< Ratio of 3x3 over 5x5 crystal matrices energies for ECLPureCluster*/
-    std::vector<double>* m_eclPureClusterHighestE; /**< Highest energy deposit (per crystal) in ECLPureCluster */
-    std::vector<double>* m_eclPureClusterLat; /**< ECLPureCluster shape parameter */
-    std::vector<int>* m_eclPureClusterNofCrystals;  /**< Number of crystals in ECLPureCluster */
-    std::vector<int>* m_eclPureClusterCrystalHealth;  /**< Crystal healt flag */
-    std::vector<double>* m_eclPureClusterMergedPi0;  /**< Flag for merged pi0 */
-    std::vector<double>* m_eclPureClusterPx;  /**< Reconstructed momentum along X */
-    std::vector<double>* m_eclPureClusterPy;  /**< Reconstructed momentum along Y */
-    std::vector<double>* m_eclPureClusterPz;  /**< Reconstructed momentum along Z */
-    std::vector<bool>* m_eclPureClusterIsTrack; /**< Flag for charged clusters */
-    std::vector<double>* m_eclPureClusterDeltaL; /**< Reconstructed Cluster DeltaL */
+    //int m_eclPureClusterMultip;  /**< Number of ECLClusterss per event */
+    //std::vector<int>* m_eclPureClusterIdx;  /**< ECLCluster index */
+    //std::vector<int>* m_eclPureClusterToMC; /**< Index of MCParticle related to that ECLPureCluster */
+    //std::vector<double>* m_eclPureClusterEnergy; /**< ECLPureCluster energy */
+    //std::vector<double>* m_eclPureClusterEnergyError; /**< ECLPureCluster energy error*/
+    //std::vector<double>* m_eclPureClusterTheta;  /**< ECLPureCluster polar direction */
+    //std::vector<double>* m_eclPureClusterThetaError;  /**< ECLPureCluster error on polar direction */
+    //std::vector<double>* m_eclPureClusterPhi;  /**< ECLPureCluster azimuthal direction */
+    //std::vector<double>* m_eclPureClusterPhiError;  /**< ECLPureCluster error on azimuthal direction */
+    //std::vector<double>* m_eclPureClusterR;  /**< ECLPureCluster distance from IP */
+    //std::vector<double>* m_eclPureClusterEnergyDepSum;  /**< ECLPureCluster simulated energy */
+    //std::vector<double>* m_eclPureClusterTiming;  /**< ECLPureCluster time */
+    //std::vector<double>* m_eclPureClusterTimingError;  /**< ECLPureCluster time error */
+    //std::vector<double>* m_eclPureClusterE9oE21;  /**< Ratio of 3x3 over 5x5 crystal matrices energies for ECLPureCluster*/
+    //std::vector<double>* m_eclPureClusterHighestE; /**< Highest energy deposit (per crystal) in ECLPureCluster */
+    //std::vector<double>* m_eclPureClusterLat; /**< ECLPureCluster shape parameter */
+    //std::vector<int>* m_eclPureClusterNofCrystals;  /**< Number of crystals in ECLPureCluster */
+    //std::vector<int>* m_eclPureClusterCrystalHealth;  /**< Crystal healt flag */
+    //std::vector<double>* m_eclPureClusterMergedPi0;  /**< Flag for merged pi0 */
+    //std::vector<double>* m_eclPureClusterPx;  /**< Reconstructed momentum along X */
+    //std::vector<double>* m_eclPureClusterPy;  /**< Reconstructed momentum along Y */
+    //std::vector<double>* m_eclPureClusterPz;  /**< Reconstructed momentum along Z */
+    //std::vector<bool>* m_eclPureClusterIsTrack; /**< Flag for charged clusters */
+    //std::vector<double>* m_eclPureClusterDeltaL; /**< Reconstructed Cluster DeltaL */
 
     /*
     int m_eclGammaMultip;
@@ -352,6 +352,8 @@ namespace Belle2 {
     std::vector<bool>* m_eclShowerIsCluster; /**< Shower Cluster Match */
     std::vector<int>*   m_eclShowerMCVtxInEcl; /**< Int, 1 if particle decays (interacts) in ECL, 0 otherwise*/
     std::vector<int>*   m_eclShowerMCFlightMatch; /**< Int, 1 if particle flight direction is "well" reconstructed in ECL, 0 otherwise*/
+    std::vector<int>*
+    m_eclShowerMCFFlightMatch; /**< Int, 1 if primary particle flight direction is "well" reconstructed in ECL, 0 otherwise, DEBUG PURPOSE*/
     std::vector<double>*   m_eclShowerHighestE1mE2; /**< Energy difference for 2 highest energy deposits in shower*/
 
 

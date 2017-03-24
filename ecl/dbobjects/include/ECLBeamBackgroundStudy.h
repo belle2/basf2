@@ -25,7 +25,7 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ECLBeamBackgroundStudy() {}
+    ECLBeamBackgroundStudy() : m_isBeamBackgroundStudy(false) {}
 
     /**
      * Destructor

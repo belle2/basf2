@@ -19,42 +19,48 @@
 
 namespace Belle2 {
 
-TRGCDCHoughTransformationCircle::TRGCDCHoughTransformationCircle(
-    const std::string & name)
-    : TRGCDCHoughTransformation(name) {
-}
+  TRGCDCHoughTransformationCircle::TRGCDCHoughTransformationCircle(
+    const std::string& name)
+    : TRGCDCHoughTransformation(name)
+  {
+  }
 
-TRGCDCHoughTransformationCircle::~TRGCDCHoughTransformationCircle() {
-}
+  TRGCDCHoughTransformationCircle::~TRGCDCHoughTransformationCircle()
+  {
+  }
 
-float
-TRGCDCHoughTransformationCircle::y(float xReal, float yReal, float x) const {
+  float
+  TRGCDCHoughTransformationCircle::y(float xReal, float yReal, float x) const
+  {
 //    return log10((xReal * xReal + yReal * yReal) /
 //        (2 * xReal * cos(x) + 2 * yReal * sin(x)));
     const float r = (xReal * xReal + yReal * yReal) /
-        (2 * xReal * cos(x) + 2 * yReal * sin(x));
+                    (2 * xReal * cos(x) + 2 * yReal * sin(x));
     if (r > 0)
-        return log10(r);
+      return log10(r);
     else
-        return 0;
-}
+      return 0;
+  }
 
-TRGPoint2D
-TRGCDCHoughTransformationCircle::circleCenter(const TRGPoint2D & p) const {
+  TRGPoint2D
+  TRGCDCHoughTransformationCircle::circleCenter(const TRGPoint2D& p) const
+  {
 //    return TRGPoint2D(pow(10, p.y()), p.x());
     return TRGPoint2D(p.x(), pow(10, p.y()));
-}
+  }
 
-TRGPoint2D
-TRGCDCHoughTransformationCircle::convert(const TRGPoint2D & p) const {
+  TRGPoint2D
+  TRGCDCHoughTransformationCircle::convert(const TRGPoint2D& p) const
+  {
     return TRGPoint2D(p.x(), log10(p.y()));
-}
+  }
 
-bool
-TRGCDCHoughTransformationCircle::diverge(float xReal,
-                                         float yReal,
-                                         float x0,
-                                         float x1) const {
+  bool
+  TRGCDCHoughTransformationCircle::diverge(float xReal,
+                                           float yReal,
+                                           float x0,
+                                           float x1) const
+  {
     static const float PI2 = 2 * M_PI;
 
     //...Divergence points...
@@ -68,22 +74,24 @@ TRGCDCHoughTransformationCircle::diverge(float xReal,
     if ((x0 < d1) && (d1 < x1)) return true;
 
     return false;
-}
+  }
 
-bool
-TRGCDCHoughTransformationCircle::positiveDiverge(float xReal,
-                                            float yReal,
-                                            float x0,
-                                            float x1) const {
+  bool
+  TRGCDCHoughTransformationCircle::positiveDiverge(float xReal,
+                                                   float yReal,
+                                                   float x0,
+                                                   float x1) const
+  {
     return diverge(xReal, yReal, x0, x1);
-}
+  }
 
-bool
-TRGCDCHoughTransformationCircle::negativeDiverge(float xReal,
-                                            float yReal,
-                                            float x0,
-                                            float x1) const {
+  bool
+  TRGCDCHoughTransformationCircle::negativeDiverge(float xReal,
+                                                   float yReal,
+                                                   float x0,
+                                                   float x1) const
+  {
     return diverge(xReal, yReal, x0, x1);
-}
+  }
 
 } // namespace Belle2

@@ -695,6 +695,21 @@ namespace Belle2 {
     double eclClusterTrackMatched(const Particle* particle);
 
     /**
+     * return the ConnectedRegion ID of this cluster
+     */
+    double eclClusterConnectedRegionId(const Particle* particle);
+
+    /**
+     * return the Cluster ID of this cluster
+     */
+    double eclClusterId(const Particle* particle);
+
+    /**
+     * return the Hypothesis ID of this cluster
+     */
+    double eclClusterHypothesisId(const Particle* particle);
+
+    /**
      * return always zero
      */
     double False(const Particle*);

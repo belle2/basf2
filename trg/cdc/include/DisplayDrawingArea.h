@@ -25,23 +25,23 @@
 
 namespace Belle2 {
 
-class TRGCDCDisplay;
+  class TRGCDCDisplay;
 
 /// Actual class to display trigger objects
-class TRGCDCDisplayDrawingArea : public Gtk::DrawingArea {
+  class TRGCDCDisplayDrawingArea : public Gtk::DrawingArea {
 
   public:
 
     /// Default constructor
-    TRGCDCDisplayDrawingArea(TRGCDCDisplay &, int size, double outerR);
-    
+    TRGCDCDisplayDrawingArea(TRGCDCDisplay&, int size, double outerR);
+
     /// Destructor
     virtual ~TRGCDCDisplayDrawingArea();
 
   public:
 
     /// returns mother window.
-    TRGCDCDisplay & display(void);
+    TRGCDCDisplay& display(void);
 
     double scale(double);
     double scale(void) const;
@@ -57,8 +57,8 @@ class TRGCDCDisplayDrawingArea : public Gtk::DrawingArea {
 
     virtual void clear(void) = 0;
 
-    virtual bool on_expose_event(GdkEventExpose *) = 0;
-    virtual bool on_button_press_event(GdkEventButton *) = 0;
+    virtual bool on_expose_event(GdkEventExpose*) = 0;
+    virtual bool on_button_press_event(GdkEventButton*) = 0;
 
   private:
     virtual void on_realize() = 0;
@@ -66,82 +66,93 @@ class TRGCDCDisplayDrawingArea : public Gtk::DrawingArea {
   private:
 
     /// Mother window.
-    TRGCDCDisplay & _w;
+    TRGCDCDisplay& _w;
 
     double _scale;
     bool _axial;
     bool _stereo;
     bool _wireName;
     bool _oldCDC;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-double
-TRGCDCDisplayDrawingArea::scale(double a) {
+  inline
+  double
+  TRGCDCDisplayDrawingArea::scale(double a)
+  {
     return _scale = a;
-}
+  }
 
-inline
-double
-TRGCDCDisplayDrawingArea::scale(void) const {
+  inline
+  double
+  TRGCDCDisplayDrawingArea::scale(void) const
+  {
     return _scale;
-}
+  }
 
-inline
-bool
-TRGCDCDisplayDrawingArea::axial(void) const {
+  inline
+  bool
+  TRGCDCDisplayDrawingArea::axial(void) const
+  {
     return _axial;
-}
+  }
 
-inline
-bool
-TRGCDCDisplayDrawingArea::axial(bool a) {
+  inline
+  bool
+  TRGCDCDisplayDrawingArea::axial(bool a)
+  {
     return _axial = a;
-}
+  }
 
-inline
-bool
-TRGCDCDisplayDrawingArea::stereo(void) const {
+  inline
+  bool
+  TRGCDCDisplayDrawingArea::stereo(void) const
+  {
     return _stereo;
-}
+  }
 
-inline
-bool
-TRGCDCDisplayDrawingArea::stereo(bool a) {
+  inline
+  bool
+  TRGCDCDisplayDrawingArea::stereo(bool a)
+  {
     return _stereo = a;
-}
+  }
 
-inline
-bool
-TRGCDCDisplayDrawingArea::wireName(void) const {
+  inline
+  bool
+  TRGCDCDisplayDrawingArea::wireName(void) const
+  {
     return _wireName;
-}
+  }
 
-inline
-bool
-TRGCDCDisplayDrawingArea::wireName(bool a) {
+  inline
+  bool
+  TRGCDCDisplayDrawingArea::wireName(bool a)
+  {
     return _wireName = a;
-}
+  }
 
-inline
-bool
-TRGCDCDisplayDrawingArea::oldCDC(void) const {
+  inline
+  bool
+  TRGCDCDisplayDrawingArea::oldCDC(void) const
+  {
     return _oldCDC;
-}
+  }
 
-inline
-bool
-TRGCDCDisplayDrawingArea::oldCDC(bool a) {
+  inline
+  bool
+  TRGCDCDisplayDrawingArea::oldCDC(bool a)
+  {
     return _oldCDC = a;
-}
+  }
 
-inline
-TRGCDCDisplay &
-TRGCDCDisplayDrawingArea::display(void) {
+  inline
+  TRGCDCDisplay&
+  TRGCDCDisplayDrawingArea::display(void)
+  {
     return _w;
-}
+  }
 
 } // namespace Belle2
 

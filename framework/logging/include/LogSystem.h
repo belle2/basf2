@@ -79,7 +79,7 @@ namespace Belle2 {
      * @param package The name of the package whose log configuration should be added.
      * @param logConfig The log configuration which should be assigned to the given package.
      */
-    void addPackageLogConfig(const std::string& package, const LogConfig& logConfig) { m_packageLogConfigs[package] = logConfig; };
+    void addPackageLogConfig(const std::string& package, const LogConfig& logConfig) { m_packageLogConfigs[package] = logConfig; }
 
     /**
      * Get the log configuration for the package with the given name.
@@ -88,7 +88,7 @@ namespace Belle2 {
      * @param package The name of the package whose log configuration should be returned
      * @return The log configuration of the given package
      */
-    LogConfig& getPackageLogConfig(const std::string& package) { return m_packageLogConfigs[package]; };
+    LogConfig& getPackageLogConfig(const std::string& package) { return m_packageLogConfigs[package]; }
 
     /**
      * Returns true if the given log level is allowed by the log system (i.e. >= the system level).
@@ -167,7 +167,7 @@ namespace Belle2 {
      *                        Set to NULL to use the global log configuration.
      * @param moduleName Name of the module.
      */
-    void updateModule(const LogConfig* moduleLogConfig = nullptr, const std::string& moduleName = "-global-") { m_moduleLogConfig = moduleLogConfig; m_moduleName = moduleName; };
+    void updateModule(const LogConfig* moduleLogConfig = nullptr, const std::string& moduleName = "-global-") { m_moduleLogConfig = moduleLogConfig; m_moduleName = moduleName; }
 
   private:
     std::vector<LogConnectionBase*> m_logConnections;     /**< Stores the pointers to the log connection objects. (owned by us) */

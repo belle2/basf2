@@ -24,8 +24,6 @@
 #include <tracking/dataobjects/MCParticleInfo.h>
 
 // forward declarations
-namespace genfit { class Track; }
-
 namespace Belle2 {
   class MCParticle;
   class Track;
@@ -35,8 +33,8 @@ namespace Belle2 {
   class StoreArray;
 
 
-  /** This module takes the MCParticles, the genfit Tracks, the genfit TrackCand,
-   *  and the MCTrackCands input and produce a root file containing various histograms
+  /** This module takes the MCParticles, the Tracks, the RecoTrack,
+   *  and the MCRecoTracks input and produce a root file containing various histograms
    *  showing the performance of the tracking package: fitter, pattern recongnition algorithms.
    */
   class TrackingPerformanceEvaluationModule : public Module, PerformanceEvaluationBaseClass {
@@ -65,7 +63,7 @@ namespace Belle2 {
 
     void fillTrackErrParams2DHistograms(const TrackFitResult* fitResult); /**< fills TH2F*/
 
-    void fillHitsUsedInTrackFitHistograms(const genfit::Track& track); /**< fill TH2F*/
+    void fillHitsUsedInTrackFitHistograms(const Track& track); /**< fill TH2F*/
 
     bool isTraceable(const MCParticle& the_mcParticle); /**< is traceable*/
 
@@ -74,19 +72,21 @@ namespace Belle2 {
 
     /* user-defined parameters */
     std::string m_MCParticlesName; /**< MCParticle StoreArray name */
-    std::string m_MCTrackCandsName; /**< MCTrackCand StoreArray name */
-    std::string m_TrackCandsName; /**< TrackCand StoreArray name */
+    std::string m_MCRecoTracksName; /**< MCRecoTrack StoreArray name */
+    std::string m_RecoTracksName; /**< RecoTrack StoreArray name */
     std::string m_TracksName; /**< Track StoreArray name */
 
 
     /* list of histograms filled per MCParticle found in the event */
 
     TH1F* m_multiplicityTracks; /**< number of tracks per MCParticles*/
+    TH1F* m_multiplicityRecoTracks; /**< number of recoTracks per MCParticles*/
+    TH1F* m_multiplicityMCRecoTracks; /**< number of MCRecoTracks per MCParticles*/
     TH1F* m_multiplicityFittedTracks; /**< number of fitted tracks per MCParticles*/
-    TH1F* m_multiplicityFittedTracksPerMCTC; /**< number of fitted tracks per MCTrackCand*/
-    TH1F* m_multiplicityMCParticles;  /**< number of MCParticles per fitted Track*/
-    TH1F* m_multiplicityTrackCands;  /**< number of TrackCands per MCTrackCands*/
-    TH1F* m_multiplicityMCTrackCands;  /**< number of MCTrackCands per TrackCands*/
+    TH1F* m_multiplicityFittedTracksPerMCRT; /**< number of fitted tracks per MCRecoTrack*/
+    TH1F* m_multiplicityMCParticlesPerTrack;  /**< number of MCParticles per fitted Track*/
+    TH1F* m_multiplicityRecoTracksPerMCRT;  /**< number of RecoTracks per MCRecoTracks*/
+    TH1F* m_multiplicityMCRecoTracksPerRT;  /**< number of MCRecoTracks per RecoTracks*/
 
     //error on track parameters
     TH1F* m_h1_d0_err; /**< error */
@@ -139,23 +139,23 @@ namespace Belle2 {
 
 
     //histograms used for efficiency plots
-    TH1F* m_h1_HitsTrackCandPerMCTrackCand;  /**< hits */
-    TH1F* m_h1_HitsMCTrackCand;  /**< hits */
+    TH1F* m_h1_HitsRecoTrackPerMCRecoTrack;  /**< hits */
+    TH1F* m_h1_HitsMCRecoTrack;  /**< hits */
 
     TH3F* m_h3_MCParticle;  /**< efficiency*/
     TH3F* m_h3_TracksPerMCParticle;  /**< efficiency*/
     TH3F* m_h3_TrackswPXDHitsPerMCParticle;  /**< efficiency*/
-    TH3F* m_h3_MCTrackCand;  /**< efficiency*/
-    TH3F* m_h3_TracksPerMCTrackCand;  /**< efficiency*/
+    TH3F* m_h3_MCRecoTrack;  /**< efficiency*/
+    TH3F* m_h3_TracksPerMCRecoTrack;  /**< efficiency*/
 
     TH3F* m_h3_MCParticle_plus;  /**< efficiency*/
     TH3F* m_h3_TracksPerMCParticle_plus;  /**< efficiency*/
-    TH3F* m_h3_MCTrackCand_plus;  /**< efficiency*/
-    TH3F* m_h3_TracksPerMCTrackCand_plus;  /**< efficiency*/
+    TH3F* m_h3_MCRecoTrack_plus;  /**< efficiency*/
+    TH3F* m_h3_TracksPerMCRecoTrack_plus;  /**< efficiency*/
     TH3F* m_h3_MCParticle_minus;  /**< efficiency*/
     TH3F* m_h3_TracksPerMCParticle_minus;  /**< efficiency*/
-    TH3F* m_h3_MCTrackCand_minus;  /**< efficiency*/
-    TH3F* m_h3_TracksPerMCTrackCand_minus;  /**< efficiency*/
+    TH3F* m_h3_MCRecoTrack_minus;  /**< efficiency*/
+    TH3F* m_h3_TracksPerMCRecoTrack_minus;  /**< efficiency*/
 
     //histograms used for purity plots
     TH3F* m_h3_MCParticlesPerTrack;  /**< purityy*/

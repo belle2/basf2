@@ -35,6 +35,8 @@
 
 #include <framework/datastore/StoreArray.h>
 
+#include <boost/range/adaptor/reversed.hpp>
+
 #include <cmath>
 
 using namespace Belle2;
@@ -283,7 +285,7 @@ void CDCSVGPlotter::drawRecoTracks(const std::string& storeArrayName,
                                    const std::string& stroke,
                                    const std::string& strokeWidth)
 {
-  DefaultColorCycleStyling<const RecoTrack> styling;
+  ChooseableRecoTrackStyling styling;
   if (stroke != "") styling.setStroke(stroke);
   if (strokeWidth != "") styling.setStrokeWidth(strokeWidth);
   drawStoreArray<const RecoTrack>(storeArrayName, styling);
@@ -588,7 +590,7 @@ void CDCSVGPlotter::drawStoreVector(const std::string& storeObjName,
   B2INFO("with " << vector.size() << " entries");
   B2INFO("Attributes are");
   B2INFO(styling.info());
-  drawIterable<a_drawTrajectories>(vector, styling);
+  drawIterable<a_drawTrajectories>(vector | boost::adaptors::reversed, styling);
 }
 
 template <bool a_drawTrajectory, class AIterable, class AStyling>

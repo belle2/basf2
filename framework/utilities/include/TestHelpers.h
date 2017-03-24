@@ -147,7 +147,7 @@ namespace Belle2 {
  *  The message can be composed in a B2INFO style manner with addtional << between
  *  individual strings and values to be concatenated.
  *
- *  @example TEST_CONTEXT("for my value set to "  << myValue);
+ *  \code TEST_CONTEXT("for my value set to "  << myValue); \endcode
  */
 #define TEST_CONTEXT(message) SCOPED_TRACE([&](){std::ostringstream messageStream; messageStream << message; return messageStream.str();}())
 

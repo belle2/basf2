@@ -33,7 +33,7 @@ class CDCFull(TrackingValidationRun):
 
     def finder_module(self, path):
         tracking.add_cdc_track_finding(path)
-        # adjust_module(path, "WireHitPreparer",
+        # adjust_module(path, "TFCDC_WireHitPreparer",
         #               UseNLoops=1)
 
     tracking_coverage = {
@@ -42,9 +42,13 @@ class CDCFull(TrackingValidationRun):
         'UseSVDHits': False,
         'UseCDCHits': True,
         'UseOnlyAxialCDCHits': False,
+        "UseReassignedHits": True,
         "UseNLoops": 1,
         "UseOnlyBeforeTOP": True,
-        # 'EnergyCut': 0.1,
+        'MinCDCAxialHits': 8,
+        'MinCDCStereoHits': 6,
+        "AllowFirstCDCSuperLayerOnly": True,
+        'EnergyCut': 0,
     }
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE

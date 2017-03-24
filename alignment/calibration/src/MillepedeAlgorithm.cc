@@ -91,15 +91,15 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   // Objects in DB we are interested in
   std::list<Database::DBQuery> belle2Constants;
   if (nBeamParams)
-    belle2Constants.push_back(Database::DBQuery("dbstore", "BeamParameters"));
+    belle2Constants.push_back(Database::DBQuery("BeamParameters"));
   if (nVXDparams)
-    belle2Constants.push_back(Database::DBQuery("dbstore", "VXDAlignment"));
+    belle2Constants.push_back(Database::DBQuery("VXDAlignment"));
   if (nCDCparams)
-    belle2Constants.push_back(Database::DBQuery("dbstore", "CDCCalibration"));
+    belle2Constants.push_back(Database::DBQuery("CDCCalibration"));
   if (nBKLMparams)
-    belle2Constants.push_back(Database::DBQuery("dbstore", "BKLMAlignment"));
+    belle2Constants.push_back(Database::DBQuery("BKLMAlignment"));
   if (nEKLMparams)
-    belle2Constants.push_back(Database::DBQuery("dbstore", "EKLMAlignment"));
+    belle2Constants.push_back(Database::DBQuery("EKLMAlignment"));
   // Maps (key is IOV of object in DB)
   std::map<string, BeamParameters*> previousBeam;
   std::map<string, VXDAlignment*> previousVXD;

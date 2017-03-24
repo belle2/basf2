@@ -32,14 +32,14 @@ class CosmicsHough(TrackingValidationRun):
     components = None
 
     def finder_module(self, path):
-        path.add_module('WireHitPreparer')
-        path.add_module('SegmentFinderCDCFacetAutomaton',
+        path.add_module('TFCDC_WireHitPreparer')
+        path.add_module('TFCDC_SegmentFinderFacetAutomaton',
                         SegmentOrientation="downwards")
-        path.add_module('AxialTrackCreatorSegmentHough',
+        path.add_module('TFCDC_AxialTrackCreatorSegmentHough',
                         tracks="CDCAxialTrackVector")
-        path.add_module('StereoHitFinderCDCLegendreHistogramming',
+        path.add_module('TFCDC_StereoHitFinder',
                         inputTracks="CDCAxialTrackVector")
-        path.add_module('TrackExporter',
+        path.add_module('TFCDC_TrackExporter',
                         inputTracks="CDCAxialTrackVector")
 
         interactive_display = False
@@ -55,6 +55,7 @@ class CosmicsHough(TrackingValidationRun):
         'UseSVDHits': False,
         'UseCDCHits': True,
         'UseOnlyAxialCDCHits': False,
+        "UseReassignedHits": True,
     }
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE

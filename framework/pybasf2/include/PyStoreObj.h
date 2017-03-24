@@ -82,7 +82,7 @@ namespace Belle2 {
     * @param objClass Class of the object to be accessed
     * @param durability 0: event, 1: persistent
     */
-    explicit PyStoreObj(const TClass* objClass,
+    explicit PyStoreObj(TClass* objClass,
                         DataStore::EDurability durability =  DataStore::EDurability::c_Event);
 
     /** constructor.
@@ -90,7 +90,7 @@ namespace Belle2 {
     * @param name Name of the entry to be accessed
     * @param durability 0: event, 1: persistent
     */
-    explicit PyStoreObj(const TClass* objClass,
+    explicit PyStoreObj(TClass* objClass,
                         const std::string& name,
                         DataStore::EDurability durability =  DataStore::EDurability::c_Event);
 
@@ -177,7 +177,7 @@ namespace Belle2 {
     void attach() const;
 
   private:
-    /// Store accessor to retrive the object.
+    /// Store accessor to retrieve the object.
     StoreAccessorBase m_storeAccessor;
 
     /// Pointer to the DataStore entry - serves as an internal cache omitting repeated look up from the DataStore.

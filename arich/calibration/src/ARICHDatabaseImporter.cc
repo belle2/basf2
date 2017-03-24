@@ -672,7 +672,7 @@ void ARICHDatabaseImporter::exportAerogelInfoEventDep()
   EventMetaData event = EventMetaData(1200, 4, 0); // (event, run, exp)
 
   // Extract object and IOV from database
-  std::pair<TObject*, IntervalOfValidity> podatki = Database::Instance().getData(event, "dbstore", "ARICHAerogelInfoEventDep");
+  std::pair<TObject*, IntervalOfValidity> podatki = Database::Instance().getData(event, "ARICHAerogelInfoEventDep");
 
   // print interval of validity
 //  IntervalOfValidity iov = std::get<1>(podatki);

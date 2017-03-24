@@ -21,10 +21,17 @@ import signal
 from pybasf2 import *
 # inspect is also used by LogPythonInterface. Do not remove!
 import inspect
-# we need to patch PyDBObj so lets import the ROOT cpp backend and the constant
-# we need
-from ROOT import kIsConstMethod as ROOT_kIsConstMethod, kIsStatic as ROOT_kIsStatic
+# we need to patch PyDBObj so lets import the ROOT cpp backend.
 import cppyy
+# However importing ROOT.kIsConstMethod and kIsStatic is a bad idea
+# here since it triggers final setup of ROOT and thus starts a gui thread
+# (probably) and consumes command lines if not disabled *sigh*. So we take them
+# as literal values from TDictionary.h
+
+#: EProperty::kIsStatic value from TDictionary.h
+ROOT_kIsStatic = 0x00004000
+#: EProperty::kIsConstMethod value from TDictionary.h
+ROOT_kIsConstMethod = 0x10000000
 
 
 def _avoidPyRootHang():
@@ -51,8 +58,7 @@ _avoidPyRootHang()
 #             Set basf2 information
 # -----------------------------------------------
 basf2label = 'BASF2 (Belle Analysis Software Framework 2)'
-basf2version = os.environ.get('BELLE2_RELEASE', 'unknown')
-basf2copyright = 'Copyright(C) 2010-2016  Belle II Collaboration'
+basf2copyright = 'Copyright(C) 2010-2017  Belle II Collaboration'
 
 # -----------------------------------------------
 #               Prepare basf2
@@ -79,13 +85,8 @@ def get_terminal_width():
     """
     Returns width of terminal in characters, or 80 if unknown.
     """
-    from subprocess import Popen, PIPE
-
-    try:
-        pipe = Popen('stty size', shell=True, stdout=PIPE, stderr=PIPE)
-        return int(pipe.stdout.read().split()[1])
-    except:
-        return 80
+    from shutil import get_terminal_size
+    return get_terminal_size(fallback=(80, 24)).columns
 
 
 def pretty_print_table(table, column_widths, first_row_is_heading=True):
@@ -367,7 +368,6 @@ def print_all_modules(moduleList, package=''):
     register them and print their information
     """
 
-    term_width = get_terminal_width()
     fail = False
 
     modules = []

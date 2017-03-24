@@ -100,7 +100,7 @@ void RootOutputModule::initialize()
   StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
   fileMetaData.registerInDataStore();
 
-  m_outputFileName = getOutputFile();
+  setOutputFile();
   TDirectory* dir = gDirectory;
   m_file = new TFile(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
   if (m_file->IsZombie()) {
@@ -145,7 +145,7 @@ void RootOutputModule::initialize()
           continue;
       }
 
-      const TClass* entryClass = iter->second.objClass;
+      TClass* entryClass = iter->second.objClass;
 
       //I want to do this in the input module, but I apparently I cannot disable reading those branches.
       //isabling reading the branch by not calling SetBranchAddress() for it results in the following crashes. Calling SetBranchStatus(..., 0) doesn't help, either.

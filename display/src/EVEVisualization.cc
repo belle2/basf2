@@ -45,6 +45,7 @@
 
 #include <framework/dataobjects/DisplayData.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/ColorPalette.h>
 
 #include <TEveArrow.h>
 #include <TEveBox.h>
@@ -82,6 +83,7 @@
 #include <cmath>
 
 using namespace Belle2;
+using namespace Belle2::TangoPalette;
 
 namespace {
   /** Destroys 'el', zeroes pointer. Supposed to also remove el from global lists, which 'delete el' would not. */
@@ -111,6 +113,13 @@ namespace {
       gGeoManager->GetListOfShapes()->Remove(s);
   }
 }
+
+const int EVEVisualization::c_recoHitColor = getTColorID("Orange", 1);
+const int EVEVisualization::c_unassignedHitColor = getTColorID("Plum", 1);
+const int EVEVisualization::c_trackColor = getTColorID("Sky Blue", 2);
+const int EVEVisualization::c_recoTrackColor = getTColorID("Sky Blue", 1);
+const int EVEVisualization::c_trackMarkerColor = getTColorID("Chameleon", 3);
+const int EVEVisualization::c_klmClusterColor = getTColorID("Chameleon", 1);
 
 EVEVisualization::EVEVisualization():
   m_assignToPrimaries(false),
@@ -661,6 +670,18 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
         }
 
       }
+    }
+
+    auto& firstref = eveTrack->RefPathMarks().front();
+    auto& lastref = eveTrack->RefPathMarks().back();
+    double f = firstref.fV.Distance(recTrack.fV);
+    double b = lastref.fV.Distance(recTrack.fV);
+    if (f > 100 and f > b) {
+      B2WARNING("Decay vertex is much closer to POCA than first vertex, reversing order of track points... (this is intended for cosmic tracks, if you see this message in other context it might indicate a problem)");
+      //last ref is better than first...
+      lastref.fType = TEvePathMarkD::kReference;
+      firstref.fType = TEvePathMarkD::kDecay;
+      std::reverse(eveTrack->RefPathMarks().begin(), eveTrack->RefPathMarks().end());
     }
   }
   eveTrack->SetTitle(TString::Format("%s\n"

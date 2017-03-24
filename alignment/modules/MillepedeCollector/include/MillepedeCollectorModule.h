@@ -92,6 +92,8 @@ namespace Belle2 {
     std::vector<gbl::GblData> m_currentGblData{};
     /** Whether to use TTree to accumulate GBL data instead of binary files*/
     bool m_useGblTree{true};
+    /** Whether to use VXD alignment hierarchy*/
+    bool m_useVXDHierarchy{false};
   };
 }
 

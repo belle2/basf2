@@ -32,7 +32,7 @@ namespace Belle2 {
   public:
     /** return the magnetic field at a given position.
      * @param[in] pos position, needs to be of at least size 3
-     * @param[out] magnetic field field value at position pos
+     * @param[out] field magnetic field field value at position pos
      */
     static void getField(const double* pos, double* field);
     /** return the magnetic field at a given position.

@@ -38,7 +38,7 @@ CONTACT = "oliver.frost@desy.de"
 
 
 class ClusterFilterValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
-    segment_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton")
+    segment_finder_module = basf2.register_module("TFCDC_SegmentFinderFacetAutomaton")
     segment_finder_module.param({
         "WriteClusters": True,
         "FacetFilter": "none",

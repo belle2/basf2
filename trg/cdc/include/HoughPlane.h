@@ -24,13 +24,13 @@
 namespace Belle2 {
 
 /// A class to represent a Hough parameter plane.
-class TRGCDCHoughPlane : public TRGCDCHoughPlaneBase {
+  class TRGCDCHoughPlane : public TRGCDCHoughPlaneBase {
 
   public:
 
     /// Contructor.
-    TRGCDCHoughPlane(const std::string & name,
-                     const TRGCDCHoughTransformation & transformation,
+    TRGCDCHoughPlane(const std::string& name,
+                     const TRGCDCHoughTransformation& transformation,
                      unsigned nX,
                      float xMin,
                      float xMax,
@@ -80,77 +80,85 @@ class TRGCDCHoughPlane : public TRGCDCHoughPlaneBase {
   private:
 
     /// Counters.
-    int * const _cell;
+    int* const _cell;
 
     /// Curve patterns.
-    unsigned * _patterns;
+    unsigned* _patterns;
 
     /// \# of curve patterns.
     unsigned _nPatterns;
 
     friend class TRGCDCHoughPlaneMulti;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-unsigned
-TRGCDCHoughPlane::setEntry(unsigned serialId, unsigned n) {
+  inline
+  unsigned
+  TRGCDCHoughPlane::setEntry(unsigned serialId, unsigned n)
+  {
     return _cell[serialId] = n;
-}
+  }
 
-inline
-void
-TRGCDCHoughPlane::clear(void) {
+  inline
+  void
+  TRGCDCHoughPlane::clear(void)
+  {
     memset(_cell, 0, nX() * nY() * sizeof(int));
     TRGCDCHoughPlaneBase::clear();
-}
+  }
 
-inline
-void
-TRGCDCHoughPlane::clearCells(void) {
+  inline
+  void
+  TRGCDCHoughPlane::clearCells(void)
+  {
     memset(_cell, 0, nX() * nY() * sizeof(int));
-}
+  }
 
-inline
-unsigned
-TRGCDCHoughPlane::entry(unsigned id) const {
+  inline
+  unsigned
+  TRGCDCHoughPlane::entry(unsigned id) const
+  {
     if (id < nX() * nY()) return _cell[id];
     return 0;
-}
+  }
 
-inline
-unsigned
-TRGCDCHoughPlane::entry(unsigned x, unsigned y) const {
+  inline
+  unsigned
+  TRGCDCHoughPlane::entry(unsigned x, unsigned y) const
+  {
     if (x < nX())
-        if (y < nY())
-            return _cell[nY() * x + y];
+      if (y < nY())
+        return _cell[nY() * x + y];
     return 0;
-}
+  }
 
-inline
-int
-TRGCDCHoughPlane::maxEntry(void) const {
+  inline
+  int
+  TRGCDCHoughPlane::maxEntry(void) const
+  {
     int m = 0;
     for (unsigned i = 0; i < nX() * nY(); i++)
-        if (_cell[i] > m)
-            m = _cell[i];
+      if (_cell[i] > m)
+        m = _cell[i];
     return m;
-}
+  }
 
-inline
-unsigned
-TRGCDCHoughPlane::nActiveCellsInPattern(void) const {
+  inline
+  unsigned
+  TRGCDCHoughPlane::nActiveCellsInPattern(void) const
+  {
     return _nPatterns;
-}
+  }
 
-inline
-void
-TRGCDCHoughPlane::add(unsigned a, int w) {
+  inline
+  void
+  TRGCDCHoughPlane::add(unsigned a, int w)
+  {
     _cell[a] += w;
     if (_cell[a] < 0)
-        _cell[a] = 0;
-}
+      _cell[a] = 0;
+  }
 
 } // namespace Belle2
 

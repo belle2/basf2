@@ -74,7 +74,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      virtual std::string getString(const std::string& path = "") const throw(PathEmptyError) = 0;
+      virtual std::string getString(const std::string& path = "") const noexcept(false) = 0;
 
       /**
        * Get the parameter path as string and also return the unit it was defined with.
@@ -87,8 +87,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      virtual std::pair<std::string, std::string> getStringWithUnit(const std::string& path) const
-      throw(PathEmptyError) = 0;
+      virtual std::pair<std::string, std::string> getStringWithUnit(const std::string& path) const noexcept(false) = 0;
 
       /**
        * Get the parameter path as a string.
@@ -109,7 +108,7 @@ namespace Belle2 {
        *         be deleted once it is no longer valid (e.g. after the current
        *         run if it belongs to this run)
        */
-      virtual const TObject* getTObject(const std::string& path) const throw(PathEmptyError, TObjectConversionError) = 0;
+      virtual const TObject* getTObject(const std::string& path) const noexcept(false) = 0;
 
       /**
        * Get the parameter path as a double.
@@ -118,7 +117,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      double getDouble(const std::string& path = "") const throw(PathEmptyError, ConversionError);
+      double getDouble(const std::string& path = "") const noexcept(false);
 
       /**
        * Get the parameter path as a double.
@@ -129,7 +128,7 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      double getDouble(const std::string& path, double defaultValue) const throw(ConversionError);
+      double getDouble(const std::string& path, double defaultValue) const noexcept(false);
 
       /**
        * Get the parameter path as a int.
@@ -138,7 +137,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      int getInt(const std::string& path = "") const throw(PathEmptyError, ConversionError);
+      int getInt(const std::string& path = "") const noexcept(false);
 
       /**
        * Get the parameter path as a int.
@@ -149,7 +148,7 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      int getInt(const std::string& path, int defaultValue) const throw(ConversionError);
+      int getInt(const std::string& path, int defaultValue) const noexcept(false);
 
       /**
        * Get the parameter path as a bool.
@@ -157,7 +156,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      bool getBool(const std::string& path = "") const throw(PathEmptyError);
+      bool getBool(const std::string& path = "") const noexcept(false);
 
       /**
        * Get the parameter path as a bool.
@@ -182,7 +181,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      double getWithUnit(const std::string& path) const throw(PathEmptyError, ConversionError);
+      double getWithUnit(const std::string& path) const noexcept(false);
 
       /**
        * Get the parameter path as a double converted to the standard unit.
@@ -200,7 +199,7 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      double getWithUnit(const std::string& path, double defaultValue) const throw(ConversionError);
+      double getWithUnit(const std::string& path, double defaultValue) const noexcept(false);
 
       /**
        * Get the parameter path as a list of double values converted to the standard unit.
@@ -219,7 +218,7 @@ namespace Belle2 {
        * @return value of the parameter
        */
 
-      std::vector<double> getArray(const std::string& path) const throw(PathEmptyError, ConversionError);
+      std::vector<double> getArray(const std::string& path) const noexcept(false);
 
       /**
        * Get the parameter path as a list of double values converted to the standard unit.
@@ -240,7 +239,7 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      std::vector<double> getArray(const std::string& path, const std::vector<double>& defaultValue) const throw(ConversionError);
+      std::vector<double> getArray(const std::string& path, const std::vector<double>& defaultValue) const noexcept(false);
 
 
       /**
@@ -256,7 +255,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      double getLength(const std::string& path = "") const throw(PathEmptyError, ConversionError)
+      double getLength(const std::string& path = "") const noexcept(false)
       {
         return getWithUnit(path);
       }
@@ -278,7 +277,7 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      double getLength(const std::string& path, double defaultValue) const throw(ConversionError)
+      double getLength(const std::string& path, double defaultValue) const noexcept(false)
       {
         return getWithUnit(path, defaultValue);
       }
@@ -296,7 +295,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      double getAngle(const std::string& path = "") const throw(PathEmptyError, ConversionError)
+      double getAngle(const std::string& path = "") const noexcept(false)
       {
         return getWithUnit(path);
       }
@@ -318,7 +317,7 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      double getAngle(const std::string& path, double defaultValue) const throw(ConversionError)
+      double getAngle(const std::string& path, double defaultValue) const noexcept(false)
       {
         return getWithUnit(path, defaultValue);
       }
@@ -336,7 +335,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      double getEnergy(const std::string& path = "") const throw(PathEmptyError, ConversionError)
+      double getEnergy(const std::string& path = "") const noexcept(false)
       {
         return getWithUnit(path);
       }
@@ -358,7 +357,7 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      double getEnergy(const std::string& path, double defaultValue) const throw(ConversionError)
+      double getEnergy(const std::string& path, double defaultValue) const noexcept(false)
       {
         return getWithUnit(path, defaultValue);
       }
@@ -376,7 +375,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      double getDensity(const std::string& path = "") const throw(PathEmptyError, ConversionError)
+      double getDensity(const std::string& path = "") const noexcept(false)
       {
         return getWithUnit(path);
       }
@@ -398,7 +397,7 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      double getDensity(const std::string& path, double defaultValue) const throw(ConversionError)
+      double getDensity(const std::string& path, double defaultValue) const noexcept(false)
       {
         return getWithUnit(path, defaultValue);
       }
@@ -416,7 +415,7 @@ namespace Belle2 {
        * @param path Path of the parameter to get
        * @return value of the parameter
        */
-      double getTime(const std::string& path = "") const throw(PathEmptyError, ConversionError)
+      double getTime(const std::string& path = "") const noexcept(false)
       {
         return getWithUnit(path);
       }
@@ -438,7 +437,7 @@ namespace Belle2 {
        * @param defaultValue Value to return if the Path es empty or does not exist
        * @return value of the parameter
        */
-      double getTime(const std::string& path, double defaultValue) const throw(ConversionError)
+      double getTime(const std::string& path, double defaultValue) const noexcept(false)
       {
         return getWithUnit(path, defaultValue);
       }

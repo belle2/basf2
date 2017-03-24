@@ -15,9 +15,9 @@ from basf2 import *
 from ROOT import Belle2
 
 release = sys.argv[1]
-input_root_files = ['./' + release + '/TV_reco_' + release + '_2.root']
-root_file_name_TRK = './' + release + '/TVtest_TRK_analysis_' + release + '.root'
-root_file_name_V0 = './' + release + '/TVtest_V0_analysis_' + release + '.root'
+input_root_files = ['./' + release + '/TV_reco_' + release + '.root']
+root_file_name_TRK = './' + release + '/TV_TRK_analysis_' + release + '.root'
+root_file_name_V0 = './' + release + '/TV_V0_analysis_' + release + '.root'
 
 print('Tracking Validation will run over these files: ')
 print(input_root_files)

@@ -24,7 +24,7 @@ namespace Belle2 {
 /// requires sub-trigger simulation data (CDC, ECL, TOP, and KLM). The
 /// output is GDL response.
 
-class TRGGDLModule : public Module {
+  class TRGGDLModule : public Module {
 
   public:
 
@@ -77,8 +77,8 @@ class TRGGDLModule : public Module {
   private:
 
     /// A pointer to a TRGGDL;
-    static TRGGDL * _gdl;
-};
+    static TRGGDL* _gdl;
+  };
 
 } // namespace Belle2
 

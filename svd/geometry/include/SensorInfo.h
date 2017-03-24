@@ -50,11 +50,13 @@ namespace Belle2 {
       SensorInfo(VxdID id = 0, float width = 0, float length = 0, float thickness = 0,
                  int uCells = 0, int vCells = 0, float width2 = 0):
         VXD::SensorInfoBase(SensorInfo::SVD, id, width, length, thickness, uCells, vCells, width2, -1, 0),
-        m_temperature(300), m_depletionVoltage(0), m_biasVoltage(0),
+        m_temperature(300), m_stripEdgeU(0), m_stripEdgeV(0),
+        m_depletionVoltage(0), m_biasVoltage(0),
         m_backplaneCapacitanceU(0), m_interstripCapacitanceU(0),
         m_couplingCapacitanceU(0), m_backplaneCapacitanceV(0),
         m_interstripCapacitanceV(0), m_couplingCapacitanceV(0),
-        m_electronicNoiseU(0), m_electronicNoiseV(0), m_isBackward(false)
+        m_electronicNoiseU(0), m_electronicNoiseV(0), m_electronicNoiseSbwU(0), m_electronicNoiseSbwV(0),
+        m_isBackward(false)
       {
         setIsBackward(id);
       }

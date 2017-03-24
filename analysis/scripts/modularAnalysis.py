@@ -58,7 +58,9 @@ def inputMdst(environmentType, filename, path=analysis_main):
 
     - 'MC5': for analysis of Belle II MC samples produced with releases prior to build-2016-05-01.
       This environment sets the constant magnetic field (B = 1.5 T)
-    - 'default': for analysis of Belle II MC samples produced with releases with build-2016-05-01 or newer
+    - 'MC6': for analysis of Belle II MC samples produced with build-2016-05-01 or newer but prior to release-00-08-00
+    - 'MC7': for analysis of Belle II MC samples produced with build-2016-05-01 or newer but prior to release-00-08-00
+    - 'default': for analysis of Belle II MC samples produced with releases with release-00-08-00 or newer
       This environment sets the default magnetic field (see geometry settings)
     - 'Belle': for analysis of converted (or during of conversion of) Belle MC/DATA samples
     - 'None': for analysis of generator level information or during simulation/reconstruction of
@@ -81,11 +83,15 @@ def inputMdstList(environmentType, filelist, path=analysis_main):
 
     - 'MC5': for analysis of Belle II MC samples produced with releases prior to build-2016-05-01.
       This environment sets the constant magnetic field (B = 1.5 T)
-    - 'default': for analysis of Belle II MC samples produced with releases with build-2016-05-01 or newer
+    - 'MC6': for analysis of Belle II MC samples produced with build-2016-05-01 or newer but prior to release-00-08-00
+    - 'MC7': for analysis of Belle II MC samples produced with build-2016-05-01 or newer but prior to release-00-08-00
+    - 'default': for analysis of Belle II MC samples produced with releases with release-00-08-00 or newer
       This environment sets the default magnetic field (see geometry settings)
     - 'Belle': for analysis of converted (or during of conversion of) Belle MC/DATA samples
     - 'None': for analysis of generator level information or during simulation/reconstruction of
       previously generated events
+
+    Note that there is no difference between MC6 and MC7. Both are given for sake of completion.
 
     @param environmentType type of the environment to be loaded
     @param filelist the filename list of files to be loaded
@@ -99,8 +105,16 @@ def inputMdstList(environmentType, filelist, path=analysis_main):
     path.add_module(progress)
 
     environToMagneticField = {'MC5': 'MagneticFieldConstant',
+                              'MC6': 'MagneticField',
+                              'MC7': 'MagneticField',
                               'default': 'MagneticField',
                               'Belle': 'MagneticFieldConstantBelle'}
+
+    fixECLClusters = {'MC5': True,
+                      'MC6': True,
+                      'MC7': True,
+                      'default': False,
+                      'Belle': False}
 
     if environmentType in environToMagneticField:
         path.add_module('Gearbox')
@@ -120,6 +134,11 @@ def inputMdstList(environmentType, filelist, path=analysis_main):
         setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
     if environmentType is 'MC5':
         setAnalysisConfigParams({'mcMatchingVersion': 'MC5'}, path)
+
+    # fixECLCluster for MC5/MC6/MC7
+    if fixECLClusters.get(environmentType) is True:
+        fixECL = register_module('FixECLClusters')
+        path.add_module(fixECL)
 
 
 def outputMdst(filename, path=analysis_main):
@@ -307,6 +326,40 @@ def copyList(
     """
 
     copyLists(outputListName, [inputListName], writeOut, path)
+
+
+def correctFSR(
+    outputListName,
+    inputListName,
+    gammaListName,
+    angleThreshold=5.0,
+    energyThreshold=1.0,
+    writeOut=False,
+    path=analysis_main,
+):
+    """
+    Takes the particles from the given lepton list copies them to the output list and adds the
+    4-vector of the closest photon (considered as radiative) to the lepton, if the given
+    criteria for maximal angle and energy are fulfilled.
+
+    @param outputListName The output lepton list containing the corrected leptons.
+    @param inputListName The initial lepton list containing the leptons to correct, should already exists.
+    @param gammaListName The gammas list containing possibly radiative gammas, should already exist..
+    @param angleThreshold The maximum angle (in degrees) between the lepton and the (radiative) gamma to be accepted.
+    @param energyThreshold The maximum energy of the (radiative) gamma to be accepted.
+    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param path          modules are added to this path
+    """
+
+    fsrcorrector = register_module('FSRCorrection')
+    fsrcorrector.set_name('FSRCorrection_' + outputListName)
+    fsrcorrector.param('inputListName', inputListName)
+    fsrcorrector.param('outputListName', outputListName)
+    fsrcorrector.param('gammaListName', gammaListName)
+    fsrcorrector.param('angleThreshold', angleThreshold)
+    fsrcorrector.param('energyThreshold', energyThreshold)
+    fsrcorrector.param('writeOut', writeOut)
+    path.add_module(fsrcorrector)
 
 
 def copyLists(
@@ -937,11 +990,15 @@ def variablesToHistogram(
 def variablesToExtraInfo(
     particleList,
     variables,
+    option=0,
     path=analysis_main,
 ):
     """
     For each particle in the input list the selected variables are saved in an extra-info field witht he given name.
     Can be used when wanting to save variables before modifying them, e.g. when performing vertex fits.
+
+    It is possible to overwrite if lower / don't overwrite / overwrite if higher, in case if extra info with given
+    name already exists (-1/0/1).
 
     @param particleList  The input ParticleList
     @param variables     Dictionary of Variables and extraInfo names.
@@ -952,6 +1009,7 @@ def variablesToExtraInfo(
     mod.set_name('VariablesToExtraInfo_' + particleList)
     mod.param('particleList', particleList)
     mod.param('variables', variables)
+    mod.param('overwrite', option)
     path.add_module(mod)
 
 

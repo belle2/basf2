@@ -22,10 +22,10 @@ namespace Belle2 {
   public:
 
     /** The LogConnectionBase default constructor. */
-    LogConnectionBase() {};
+    LogConnectionBase() {}
 
     /** The LogConnectionBase destructor. */
-    virtual ~LogConnectionBase() {};
+    virtual ~LogConnectionBase() {}
 
     /**
      * Sends a log message.

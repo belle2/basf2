@@ -206,6 +206,15 @@ class CDCSVGDisplayModule(basf2.Module):
         #: Draw the output RecoTracks
         self.draw_recotracks = False
 
+        #: Draw the MC reference RecoTracks
+        self.draw_mcrecotracks = False
+
+        #: Draw the output RecoTracks pattern recognition matching status
+        self.draw_recotrack_matching = False
+
+        #: Draw the MC reference RecoTracks pattern recognition matching status
+        self.draw_mcrecotrack_matching = False
+
         #: Draw the output Genfit track trajectories
         self.draw_recotrack_trajectories = False
 
@@ -220,6 +229,9 @@ class CDCSVGDisplayModule(basf2.Module):
 
         #: Name of the RecoTracks store array
         self.reco_tracks_store_array_name = "RecoTracks"
+
+        #: Name of the Monte Carlo reference RecoTracks store array
+        self.mc_reco_tracks_store_array_name = "MCRecoTracks"
 
         #: Name of the CDC Wire Hit Clusters
         self.cdc_wire_hit_cluster_store_obj_name = "CDCWireHitClusterVector"
@@ -263,6 +275,9 @@ class CDCSVGDisplayModule(basf2.Module):
             'draw_rlinfo',
             'draw_reassigned',
             'draw_recotracks',
+            'draw_mcrecotracks',
+            'draw_recotrack_matching',
+            'draw_mcrecotrack_matching',
             'draw_recotrack_trajectories',
             # Specialised options to be used in the CDC local tracking context
             # obtain them from the all_drawoptions property
@@ -795,7 +810,7 @@ class CDCSVGDisplayModule(basf2.Module):
         # Draw Tracks
         if self.draw_tracks:
             if self.use_cpp:
-                cppplotter.drawTracks('CDCTrackVector', 'ListColors', '')
+                cppplotter.drawTracks('CDCTrackVector', '', '')
             if self.use_python:
                 styleDict = {'stroke': attributemaps.listColors}
                 plotter.draw_storevector('CDCTrackVector', **styleDict)
@@ -834,10 +849,32 @@ class CDCSVGDisplayModule(basf2.Module):
         # Draw the RecoTracks
         if self.draw_recotracks:
             if self.use_cpp:
-                cppplotter.drawRecoTracks(self.reco_tracks_store_array_name, '', '')
+                cppplotter.drawRecoTracks(self.reco_tracks_store_array_name, 'ListColors', '')
             if self.use_python:
                 styleDict = {'stroke': attributemaps.listColors}
                 plotter.draw_storearray(self.reco_tracks_store_array_name, **styleDict)
+
+        # Draw the MCRecoTracks
+        if self.draw_mcrecotracks:
+            if self.use_cpp:
+                cppplotter.drawRecoTracks(self.mc_reco_tracks_store_array_name, 'ListColors', '')
+            if self.use_python:
+                styleDict = {'stroke': attributemaps.listColors}
+                plotter.draw_storearray(self.mc_reco_tracks_store_array_name, **styleDict)
+
+        # Draw the RecoTracks matching status
+        if self.draw_recotrack_matching:
+            if self.use_cpp:
+                cppplotter.drawRecoTracks(self.reco_tracks_store_array_name, 'MatchingStatus', '')
+            if self.use_python:
+                print('No Python-function defined')
+
+        # Draw the Monte Carlo reference RecoTracks matching status
+        if self.draw_mcrecotrack_matching:
+            if self.use_cpp:
+                cppplotter.drawRecoTracks(self.mc_reco_tracks_store_array_name, 'MCMatchingStatus', '')
+            if self.use_python:
+                print('No Python-function defined')
 
         # Draw interaction point
         if self.draw_interaction_point:

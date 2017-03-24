@@ -27,7 +27,6 @@ namespace Belle2 {
      * @param globalTag   The name of the global tag
      * @param logLevel    The level of log messages about not-found payloads.
      * @param payloadDir  Directory for local copies of the payloads
-     * @return            A pointer to the created database instance
      */
     static void createDefaultInstance(const std::string& globalTag, LogConfig::ELogLevel logLevel = LogConfig::c_Warning,
                                       const std::string& payloadDir = "centraldb");
@@ -44,7 +43,6 @@ namespace Belle2 {
      *                       payload is found. This is intended for override
      *                       setups where a few payloads are taken from non
      *                       standard locations
-     * @return               A pointer to the created database instance
      */
     static void createInstance(const std::string& globalTag, const std::string& restBaseName, const std::string& fileBaseName,
                                const std::string& fileBaseLocal, LogConfig::ELogLevel logLevel = LogConfig::c_Warning,
@@ -57,8 +55,7 @@ namespace Belle2 {
      * @param name       Name that identifies the object in the database.
      * @return           A pair of a pointer to the object and the interval for which it is valid
      */
-    virtual std::pair<TObject*, IntervalOfValidity> getData(const EventMetaData& event, const std::string& package,
-                                                            const std::string& module) override;
+    virtual std::pair<TObject*, IntervalOfValidity> getData(const EventMetaData& event, const std::string& name) override;
 
     /**
      * Store an object in the database.
@@ -68,43 +65,29 @@ namespace Belle2 {
      * @param iov        The interval of validity of the the object.
      * @return           True if the storage of the object succeeded.
      */
-    virtual bool storeData(const std::string& package, const std::string& module, TObject* object,
+    virtual bool storeData(const std::string& name, TObject* object,
                            const IntervalOfValidity& iov) override;
 
     /**
      * Add a payload file to the database.
      *
-     * @param package    Name of the package that identifies the object in the database.
-     * @param module     Name of the module that identifies the object in the database.
+     * @param name       Name that identifies the object in the database.
      * @param fileName   The name of the payload file.
      * @param iov        The interval of validity of the the object.
      * @return           True if the storage of the object succeeded.
      */
-    virtual bool addPayload(const std::string& package, const std::string& module, const std::string& fileName,
+    virtual bool addPayload(const std::string& name, const std::string& fileName,
                             const IntervalOfValidity& iov) override;
 
     /** Return the global tag */
     std::string getGlobalTag() const { return m_globalTag; }
-
-    /** set a mapping from experiment name to experiment number.
-     * The experiment numbers and names need to be unique as we have to
-     * transform the mapping in both directions. So a experiment number cannot
-     * have multiple names different experiment numbers cannot have the same
-     * name.
-     *
-     * @param experiment experiment number as used in the EventMetaData
-     * @param name       name of that experiment in the ConditionsDB
-     * @return           true if the mapping could be added, false if there's a
-     *                   conflict with an existing entry.
-     */
-    bool addExperimentName(int experiment, const std::string& name);
 
     /** Set the base of the url used for REST requests to the central server */
     void setRESTBase(const std::string& restBase);
 
     /** Add a directory to the list of directories to look for payloads before
      * downloading them.
-     * @param directory path to the directory to add to the list
+     * @param localDir path to the directory to add to the list
      * @param structure indicate how the payloads are stored in this directory
      */
     void addLocalDirectory(const std::string& localDir, EConditionsDirectoryStructure structure);
@@ -115,7 +98,6 @@ namespace Belle2 {
      *
      * @param globalTag      The name of the global tag
      * @param payloadDir     The name of the directory in which the payloads are atored.
-     * @param restBaseName   Base name for REST services
      */
     explicit ConditionsDatabase(const std::string& globalTag, const std::string& payloadDir = "");
 

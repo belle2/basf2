@@ -50,6 +50,7 @@
 #include <alignment/reconstruction/AlignableEKLMRecoHit.h>
 
 #include <alignment/Hierarchy.h>
+#include <alignment/GlobalParam.h>
 
 #include <alignment/dbobjects/VXDAlignment.h>
 

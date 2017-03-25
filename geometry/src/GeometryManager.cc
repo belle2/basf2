@@ -17,9 +17,6 @@
 #include <geometry/CreatorManager.h>
 #include <geometry/CreatorBase.h>
 #include <geometry/utilities.h>
-#include <geometry/bfieldmap/BFieldMap.h>
-#include <framework/geometry/BFieldManager.h>
-#include <geometry/bfieldmap/BFieldFrameworkInterface.h>
 #include <geometry/dbobjects/GeoConfiguration.h>
 
 #include "G4Box.hh"
@@ -105,8 +102,6 @@ namespace Belle2 {
       for (CreatorBase* creator : m_creators) delete creator;
       m_creators.clear();
       m_topVolume = 0;
-      // empty magnetic field
-      BFieldManager::getInstance().clearComponents();
       //Clean up existing Geometry
       G4GeometryManager::GetInstance()->OpenGeometry();
       G4PhysicalVolumeStore::Clean();
@@ -240,9 +235,6 @@ namespace Belle2 {
         materials.createMaterial(mat);
       }
 
-      //Interface the magnetic field
-      BFieldManager::getInstance().addComponent(new BFieldFrameworkInterface());
-
       //Now set Top volume. Be aware that Geant4 uses "half size" so the size
       //will be in each direction even though the member name suggests a total size
       G4Material*      top_mat = Materials::get(config.getGlobalMaterial());
@@ -315,8 +307,6 @@ namespace Belle2 {
       top_box->SetYHalfLength(getTopMinSize("y", kYAxis, top_log, yHalfLength));
       top_box->SetZHalfLength(getTopMinSize("z", kZAxis, top_log, zHalfLength));
 
-      B2DEBUG(50, "Initializing magnetic field if present ...");
-      BFieldMap::Instance().initialize();
       B2DEBUG(50, "Optimizing geometry and creating lookup tables ...");
       G4GeometryManager::GetInstance()->CloseGeometry(true, LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 200, PACKAGENAME()));
     }

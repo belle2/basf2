@@ -12,6 +12,7 @@
 #define GEOMAGNETICFIELD_H
 
 #include <geometry/CreatorBase.h>
+#include <framework/dbobjects/MagneticField.h>
 
 #include <boost/function.hpp>
 #include <map>
@@ -51,6 +52,9 @@ namespace Belle2 {
      */
     virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
+    virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov);
+
+    MagneticField createConfiguration(const GearDir& content);
 
   protected:
 
@@ -95,6 +99,7 @@ namespace Belle2 {
      */
     void read3dBField(const GearDir& component);
 
+    void add3dBField(const GearDir& component, MagneticField& fielmap);
   private:
 
   };

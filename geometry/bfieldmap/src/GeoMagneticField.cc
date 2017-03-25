@@ -17,15 +17,22 @@
 #include <geometry/bfieldmap/BFieldComponentBeamline.h>
 #include <geometry/bfieldmap/BFieldComponentKlm1.h>
 #include <geometry/bfieldmap/BFieldComponent3d.h>
+#include <geometry/bfieldmap/BFieldFrameworkInterface.h>
+#include <geometry/dbobjects/MagneticFieldComponent3D.h>
 #include <geometry/CreatorFactory.h>
-
+#include <framework/database/DBImportObjPtr.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/utilities/FileSystem.h>
 
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/device/file.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
+#include <TFile.h>
 
 using namespace std;
 using namespace boost;
@@ -58,17 +65,84 @@ GeoMagneticField::~GeoMagneticField()
 
 }
 
+MagneticField GeoMagneticField::createConfiguration(const GearDir& content)
+{
+  MagneticField fieldmap;
+  //Read the magnetic field components
+  for (const GearDir& component : content.getNodes("Components/Component")) {
+    //Get the type of the magnetic field and call the appropriate function
+    string compType = component.getString("attribute::type");
+    B2DEBUG(10, "GeoMagneticField creator: Loading the parameters for the component type'" << compType << "'");
+    if (compType != "3d") continue;
+    add3dBField(component, fieldmap);
+  }
+  return fieldmap;
+}
+
+void GeoMagneticField::add3dBField(const GearDir& component, MagneticField& fieldmap)
+{
+  string mapFilename   = component.getString("MapFilename");
+  int mapSizeR         = component.getInt("NumberGridPointsR");
+  int mapSizeZ         = component.getInt("NumberGridPointsZ");
+  int mapSizePhi       = component.getInt("NumberGridPointsPhi");
+
+  double minZ = component.getLength("ZMin");
+  double maxZ = component.getLength("ZMax");
+  double minR = component.getLength("RadiusMin");
+  double maxR = component.getLength("RadiusMax");
+
+  const string fullPath = FileSystem::findFile("/data/" + mapFilename);
+  if (!FileSystem::fileExists(fullPath)) {
+    B2ERROR("The 3d magnetic field map file '" << mapFilename << "' could not be found !");
+    return;
+  }
+
+  std::vector<B2Vector3F> bmap;
+  bmap.reserve(mapSizeR * mapSizeZ * mapSizePhi);
+  // Load B-field map file
+  iostreams::filtering_istream fieldMapFile;
+  fieldMapFile.push(iostreams::gzip_decompressor());
+  fieldMapFile.push(iostreams::file_source(fullPath));
+
+  char tmp[256];
+  for (int k = 0; k < mapSizeZ; k++) { // z
+    for (int i = 0; i < mapSizeR; i++) { // r
+      for (int j = 0;  j < mapSizePhi; j++) { // phi
+        double Br, Bz, Bphi;
+        //r[m]  phi[deg]  z[m]  Br[T]  Bphi[T]  Bz[T]
+        fieldMapFile.getline(tmp, 256);
+        // sscanf(tmp+33,"%lf %lf %lf",&Br,&Bphi,&Bz);
+        char* next;
+        Br   = strtod(tmp + 33, &next);
+        Bphi = strtod(next, &next);
+        Bz   = strtod(next, NULL);
+        bmap.emplace_back(-Br * Unit::T, -Bphi * Unit::T, -Bz * Unit::T);
+      }
+    }
+  }
+  MagneticFieldComponent3D* field = new MagneticFieldComponent3D(
+    minR, maxR, minZ, maxZ,
+    mapSizeR, mapSizePhi, mapSizeZ,
+    std::move(bmap)
+  );
+  fieldmap.addComponent(field);
+}
+
+void GeoMagneticField::createPayloads(const GearDir& content, const IntervalOfValidity& iov)
+{
+  DBImportObjPtr<MagneticField> importObj;
+  importObj.construct(createConfiguration(content));
+  importObj.import(iov);
+}
 
 void GeoMagneticField::create(const GearDir& content, G4LogicalVolume& /*topVolume*/, geometry::GeometryTypes)
 {
   // clear any existing BField
   BFieldMap::Instance().clear();
-  //Read the magnetic field components
-  GearDir components(content, "Components/Component");
 
   //Loop over all components of the magnetic field
   CompTypeMap::iterator findIter;
-  BOOST_FOREACH(const GearDir & component, content.getNodes("Components/Component")) {
+  for (const GearDir& component : content.getNodes("Components/Component")) {
     //Get the type of the magnetic field and call the appropriate function
     string compType = component.getString("attribute::type");
     B2DEBUG(10, "GeoMagneticField creator: Loading the parameters for the component type'" << compType << "'");
@@ -80,6 +154,12 @@ void GeoMagneticField::create(const GearDir& content, G4LogicalVolume& /*topVolu
       B2ERROR("The magnetic field component type '" << compType << "' is unknown !");
     }
   }
+
+  // make it found by the framework fieldmap by adding it as a fake database payload
+  MagneticField* fieldmap = new MagneticField();
+  fieldmap->addComponent(new BFieldFrameworkInterface());
+  BFieldMap::Instance().initialize();
+  DBStore::Instance().addConstantOverride("MagneticField", fieldmap, false);
 }
 
 

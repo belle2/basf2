@@ -30,12 +30,14 @@ namespace Belle2 {
      * field of other components will not be added
      */
     explicit MagneticFieldComponent(bool exclusive): m_exclusive(exclusive) {}
+    /** set the state of the exclusive flag */
+    void setExclusive(bool exclusive) { m_exclusive = exclusive; }
     /** returns whether the field is set to exclusive mode */
-    bool exclusive() const { return m_exclusive; }
+    bool isExclusive() const { return m_exclusive; }
     /** check whether the point pos is inside the volume covered by the component */
-    virtual bool inside(const B2Vector3D& pos) = 0;
+    virtual bool inside(const B2Vector3D& pos) const = 0;
     /** return the field at point pos */
-    virtual B2Vector3D getField(const B2Vector3D& pos) = 0;
+    virtual B2Vector3D getField(const B2Vector3D& pos) const = 0;
     /** destructor */
     virtual ~MagneticFieldComponent() {}
 

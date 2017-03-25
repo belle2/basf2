@@ -46,19 +46,19 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     return c_Failure;
   }
 
-//   int undeterminedParams = 0;
-//   for (int ipar = 0; ipar < m_result.getNoParameters(); ipar++) {
-//     if (!m_result.isParameterDetermined(ipar)) {
-//       if (!m_result.isParameterFixed(ipar)) {
-//         ++undeterminedParams;
-//       }
-//     }
-//   }
-//
-//   if (undeterminedParams) {
-//     B2WARNING("There are " << undeterminedParams << " undetermined parameters. Not enough data for calibration.");
-//     return c_NotEnoughData;
-//   }
+  int undeterminedParams = 0;
+  for (int ipar = 0; ipar < m_result.getNoParameters(); ipar++) {
+    if (!m_result.isParameterDetermined(ipar)) {
+      if (!m_result.isParameterFixed(ipar)) {
+        ++undeterminedParams;
+      }
+    }
+  }
+
+  if (undeterminedParams) {
+    B2WARNING("There are " << undeterminedParams << " undetermined parameters. Not enough data for calibration.");
+    return c_NotEnoughData;
+  }
 
 
 

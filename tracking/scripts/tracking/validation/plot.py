@@ -499,7 +499,7 @@ class ValidationPlot(object):
                     # Manually copy labels grumble grumble
                     x_taxis = histogram.GetXaxis()
                     new_x_taxis = profile.GetXaxis()
-                    for i_bin in range(x_taxis.GetNbins()):
+                    for i_bin in range(x_taxis.GetNbins() + 2):
                         label = x_taxis.GetBinLabel(i_bin)
                         if label != "":
                             new_x_taxis.SetBinLabel(i_bin, label)
@@ -1462,7 +1462,7 @@ class ValidationPlot(object):
         # Manually copy labels grumble grumble
         x_taxis = th2.GetXaxis()
         new_x_taxis = th1_means.GetXaxis()
-        for i_bin in range(x_taxis.GetNbins()):
+        for i_bin in range(x_taxis.GetNbins() + 2):
             label = x_taxis.GetBinLabel(i_bin)
             if label != "":
                 new_x_taxis.SetBinLabel(i_bin, label)

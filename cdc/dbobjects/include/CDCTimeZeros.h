@@ -113,6 +113,31 @@ namespace Belle2 {
       }
     }
 
+    // ------------- Interface to global Millepede calibration ----------------
+    /// Get global unique id
+    static unsigned short getGlobalUniqueID() {return 25;}
+    /// Get global parameter: 1 = vertex X, 2 = vertex Y, 3 = vertex Z
+    double getGlobalParam(unsigned short element, unsigned short)
+    {
+      return getT0(WireID(element));
+    }
+    /// Set global parameter: 1 = vertex X, 2 = vertex Y, 3 = vertex Z
+    void setGlobalParam(double value, unsigned short element, unsigned short)
+    {
+      WireID wire(element);
+      setT0(wire.getICLayer(), wire.getEWire(), value);
+    }
+    /// list stored global parameters: 1, 2, 3 (vertex X, Y, Z)
+    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()
+    {
+      std::vector<std::pair<unsigned short, unsigned short>> result;
+      for (auto id_t0 : getT0s()) {
+        result.push_back({id_t0.first, 0});
+      }
+      return result;
+    }
+    // ------------------------------------------------------------------------
+
   private:
     std::map<unsigned short, float> m_t0s; /**< t0 list*/
 

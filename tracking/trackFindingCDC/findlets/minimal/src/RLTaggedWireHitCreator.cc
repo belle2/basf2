@@ -30,7 +30,7 @@ void RLTaggedWireHitCreator::apply(std::vector<CDCWireHit>& inputWireHits, std::
       wireHit->unsetAssignedFlag();
 
       for (ERightLeft rlInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {
-        outputRLWireHits.emplace_back(&wireHit, rlInfo, wireHit.getRefDriftLength());
+        outputRLWireHits.emplace_back(&wireHit, rlInfo);
       }
     }
   }

@@ -151,7 +151,7 @@ class ClassificationAnalysis(object):
 
         # Auxiliary hists
         for aux_name, aux_values in auxiliaries.items():
-            if statistics.is_single_value_series(aux_values):
+            if statistics.is_single_value_series(aux_values) or aux_name == quantity_name:
                 continue
 
             aux_axis_label = compose_axis_label(aux_name)
@@ -221,7 +221,7 @@ class ClassificationAnalysis(object):
         # Figures of merit as function of the auxiliary variables
         if cut_value is not None and auxiliaries is not None:
             for aux_name, aux_values in auxiliaries.items():
-                if statistics.is_single_value_series(aux_values):
+                if statistics.is_single_value_series(aux_values) or aux_name == quantity_name:
                     continue
 
                 aux_axis_label = compose_axis_label(aux_name)
@@ -302,7 +302,7 @@ class ClassificationAnalysis(object):
                 quantiles = [0.01, 0.10, 0.5]
 
             for aux_name, aux_values in auxiliaries.items():
-                if statistics.is_single_value_series(aux_values):
+                if statistics.is_single_value_series(aux_values) or aux_name == quantity_name:
                     continue
 
                 aux_axis_label = compose_axis_label(aux_name)

@@ -435,6 +435,10 @@ class ValidationPlot(object):
         x_include_exceptionals, y_include_exceptionals = self.unpack_2d_param(include_exceptionals)
         x_allow_discrete, y_allow_discrete = self.unpack_2d_param(allow_discrete)
 
+        if quantiles is not None:
+            y_include_exceptionals = True
+            y_allow_discrete = False
+
         x_bin_edges, x_bin_labels = self.determine_bin_edges(xs,
                                                              stackbys=stackby,
                                                              bins=x_bins,

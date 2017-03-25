@@ -88,9 +88,9 @@ namespace Belle2 {
       template <class DBObjType>
       void addDBObj()
       {
-        m_vector.insert({DBObjType::getGlobalUniqueID(),
-                         std::unique_ptr<GlobalParamSet<DBObjType>>(new GlobalParamSet<DBObjType>)
-                        });
+        m_vector.insert(std::make_pair(DBObjType::getGlobalUniqueID(),
+                                       std::unique_ptr<GlobalParamSet<DBObjType>>(new GlobalParamSet<DBObjType>)
+                                      ));
       }
 
 //       std::list<Database::DBQuery> getDBQueryList() {

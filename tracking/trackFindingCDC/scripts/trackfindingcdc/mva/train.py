@@ -98,12 +98,6 @@ class ClassificationOverview:
         if exclude:
             variable_names = [name for name in variable_names if name not in exclude]
 
-        if groupbys:
-            variable_names = [name for name in variable_names if name not in groupbys]
-
-        if auxiliaries:
-            variable_names = [name for name in variable_names if name not in auxiliaries]
-
         if filters:
             variable_names = [name for name in variable_names if name not in filters]
 
@@ -152,6 +146,9 @@ class ClassificationOverview:
                 with root_cd(groupby_folder_name) as tdirectory:
                     for variable_name in variable_names:
                         print('Analyse', variable_name, 'groupby', groupby, '=', groupby_value)
+
+                        if variable_name == groupby:
+                            continue
 
                         # Get the truths as a numpy array
                         estimates = input_record_array[variable_name]

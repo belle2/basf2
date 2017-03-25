@@ -20,6 +20,7 @@
 
 #include <framework/logging/Logger.h>
 
+#include <framework/dbobjects/BeamParameters.h>
 #include <alignment/dbobjects/VXDAlignment.h>
 #include <alignment/dbobjects/CDCCalibration.h>
 #include <alignment/dbobjects/BKLMAlignment.h>
@@ -181,100 +182,6 @@ namespace Belle2 {
     private:
 
 
-    };
-
-
-    class GlobalParamSetAccess {
-    public:
-      virtual unsigned short getGlobalUniqueID() = 0;
-      virtual double getGlobalParam(unsigned short, unsigned short) = 0;
-      virtual void setGlobalParam(double, unsigned short, unsigned short) = 0;
-      virtual std::vector<DetectorLevelElement> listGlobalParams() = 0;
-
-      virtual void construct() = 0;
-    };
-
-    template<class DBObjType>
-    class GlobalParamSet : public GlobalParamSetAccess {
-    public:
-      GlobalParamSet() {}
-      ~GlobalParamSet() {m_object.reset();}
-
-      virtual unsigned short getGlobalUniqueID() final {return DBObjType::getGlobalUniqueID();}
-      virtual double getGlobalParam(unsigned short element, unsigned short param) final {ensureConstructed(); return m_object->getGlobalParam(element, param);}
-      virtual void setGlobalParam(double value, unsigned short element, unsigned short param) final {ensureConstructed(); m_object->setGlobalParam(value, element, param);}
-      virtual std::vector<DetectorLevelElement> listGlobalParams() final {ensureConstructed(); return m_object->listGlobalParams();}
-
-      virtual void construct() final {m_object.reset(new DBObjType());}
-    private:
-      std::shared_ptr<DBObjType> m_object {};
-      void ensureConstructed() {if (!m_object) construct();}
-    };
-
-    class GlobalParamVector {
-    public:
-      GlobalParamVector()
-      {
-        addDBObj<VXDAlignment>();
-        addDBObj<CDCCalibration>();
-        addDBObj<BKLMAlignment>();
-        addDBObj<EKLMAlignment>();
-      }
-
-      template <class DBObjType>
-      void addDBObj()
-      {
-        m_vector.insert(std::make_pair(DBObjType::getGlobalUniqueID(),
-                                       std::shared_ptr<GlobalParamSet<DBObjType>>(new GlobalParamSet<DBObjType>)));
-      }
-
-      void setGlobalParam(double value, unsigned short uniqueID, unsigned short element, unsigned short param)
-      {
-        auto dbObj = m_vector.find(uniqueID);
-        if (dbObj != m_vector.end()) {
-          dbObj->second->setGlobalParam(value, element, param);
-        } else {
-          B2WARNING("Did not found DB object with unique id " << uniqueID << " in global vector. Cannot set value");
-        }
-      }
-
-      double getGlobalParam(unsigned short uniqueID, unsigned short element, unsigned short param)
-      {
-        auto dbObj = m_vector.find(uniqueID);
-        if (dbObj != m_vector.end()) {
-          return dbObj->second->getGlobalParam(element, param);
-        } else {
-          B2WARNING("Did not found DB object with unique id " << uniqueID << " in global vector. Returning 0.");
-          return 0.;
-        }
-      }
-
-      std::vector<std::tuple<unsigned short, unsigned short, unsigned short>> listGlobalParams()
-      {
-        std::vector<std::tuple<unsigned short, unsigned short, unsigned short>> params;
-        for (auto uID_DBObj : m_vector) {
-          for (auto element_param : uID_DBObj.second->listGlobalParams()) {
-            params.push_back(std::make_tuple(uID_DBObj.first, element_param.first, element_param.second))   ;
-          }
-        }
-        return params;
-      }
-    private:
-      std::map<unsigned short, std::shared_ptr<GlobalParamSetAccess>> m_vector {};
-    };
-
-
-    /// Set with no parameters, terminates hierarchy etc.
-    class EmptyGlobaParamSet {
-    public:
-      /// Get global unique id = 0
-      static unsigned short getGlobalUniqueID() {return 0;}
-      /// There no params stored here, returns always 0.
-      double getGlobalParam(unsigned short, unsigned short) {return 0.;}
-      /// No parameters to set. Does nothing
-      void setGlobalParam(double, unsigned short, unsigned short) {}
-      /// No parameters, returns empty vector
-      std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {};}
     };
 
     /// Class to hold hierarchy of whole Belle2

@@ -86,11 +86,11 @@ namespace Belle2 {
                                       maxTIF; /**< max internal id = 1.999.999.999 */
     static const gidTYPE maxLabel   =
       maxGID;  /**< Label and internal id ("gid") are the same numbers (label is signed but 0 and <0 values are invalid to give to Pede)*/
-    static const gidTYPE beamOffset = 0;       /**< Offset of 0 for BeamParameters */
-    static const gidTYPE vxdOffset  = 100000;  /**< Offset of 100000 for VXD (VxdID(0) is dummy) */
-    static const gidTYPE cdcOffset  = 200000;  /**< Offset of 200000 in element ids for CDC. WireID(0) is a real wire */
-    static const gidTYPE bklmOffset  = 300000;  /**< Offset of 300000 in element ids for BKLM */
-    static const gidTYPE eklmOffset  = 400000;  /**< Offset of 400000 in element ids for EKLM */
+    static const gidTYPE beamOffset =  100000;       /**< Offset of 0 for BeamParameters */
+    static const gidTYPE vxdOffset  = 1000000;  /**< Offset of 100000 for VXD (VxdID(0) is dummy) */
+    static const gidTYPE cdcOffset  = 2000000;  /**< Offset of 200000 in element ids for CDC. WireID(0) is a real wire */
+    static const gidTYPE bklmOffset = 3000000;  /**< Offset of 300000 in element ids for BKLM */
+    static const gidTYPE eklmOffset = 4000000;  /**< Offset of 400000 in element ids for EKLM */
 
     /// Default constuctor. Members initialized in declaration
     GlobalLabel() {}
@@ -143,6 +143,13 @@ namespace Belle2 {
      */
     GlobalLabel(EKLMSegmentID eklmSegment, gidTYPE paramId);
 
+    template<class DBObjType>
+    void construct(gidTYPE element, gidTYPE param)
+    {
+      construct(DBObjType::getGlobalUniqueID(), element, param);
+    }
+
+    //TODO
     void construct(gidTYPE dbObjId, gidTYPE element, gidTYPE param)
     {
       construct(100000 * dbObjId + element, param);
@@ -225,6 +232,12 @@ namespace Belle2 {
     //! Is this EKLM label?
     bool    isEKLM()         const {return (eid >= eklmOffset && eid < maxEID);}
 
+    //TODO
+    gidTYPE getUniqueId() const {return eid / 100000;}
+
+    //TODO
+    gidTYPE getElementId() const {return eid % 100000;}
+
     //! Get id of alignment/calibration parameter
     gidTYPE getParameterId() const {return pid;}
 
@@ -235,7 +248,7 @@ namespace Belle2 {
     bool    getTimeFlag()    const {return tif;}
 
     //! Is label valid? (non-zero)
-    bool    isValid() {return 0 != gid * eid * pid;}
+    bool    isValid() {return 0 != gid;}
 
     //! Dumps the label to std::cout
     void    dump(int level = 0) const;

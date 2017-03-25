@@ -125,6 +125,7 @@ std::vector<genfit::MeasurementOnPlane*> BKLMRecoHit::constructMeasurementsOnPla
 
 vector< int > BKLMRecoHit::labels()
 {
+  return {};
   BKLMElementID klmid;
   klmid.setIsForward(m_IsForward);
   klmid.setSectorNumber(m_Sector);
@@ -143,6 +144,7 @@ vector< int > BKLMRecoHit::labels()
 
 TMatrixD BKLMRecoHit::derivatives(const genfit::StateOnPlane* sop)
 {
+  return TMatrixD();
   // Matrix of global derivatives
   TMatrixD derGlobal(2, 6);
   derGlobal.Zero();

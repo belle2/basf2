@@ -336,9 +336,10 @@ void MillepedeCollectorModule::collect()
           TMatrixD globals(3, 3);
           globals.UnitMatrix();
           std::vector<int> labels;
-          labels.push_back(GlobalLabel(BeamID(), BeamID::vertexX).label());
-          labels.push_back(GlobalLabel(BeamID(), BeamID::vertexY).label());
-          labels.push_back(GlobalLabel(BeamID(), BeamID::vertexZ).label());
+          GlobalLabel label = GlobalLabel::construct<BeamParameters>(0, 0);
+          labels.push_back(label.setParameterId(1));
+          labels.push_back(label.setParameterId(2));
+          labels.push_back(label.setParameterId(3));
 
           // Add derivatives for vertex calibration to first point of first trajectory
           daughters[0].first[0].addGlobals(labels, globals);

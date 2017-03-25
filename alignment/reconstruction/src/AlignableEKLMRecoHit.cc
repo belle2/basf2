@@ -92,13 +92,14 @@ AlignableEKLMRecoHit::~AlignableEKLMRecoHit()
 std::vector<int> AlignableEKLMRecoHit::labels()
 {
   std::vector<int> labels;
-  labels.push_back(GlobalLabel(m_Segment, 1));
-  labels.push_back(GlobalLabel(m_Segment, 2));
+//   labels.push_back(GlobalLabel(m_Segment, 1));
+//   labels.push_back(GlobalLabel(m_Segment, 2));
   return labels;
 }
 
 TMatrixD AlignableEKLMRecoHit::derivatives(const genfit::StateOnPlane* sop)
 {
+  return TMatrixD();
   /* Local parameters. */
   const double dalpha = 0;
   const double dy = 0;

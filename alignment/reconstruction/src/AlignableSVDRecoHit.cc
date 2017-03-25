@@ -18,5 +18,6 @@ using namespace Belle2;
 
 std::pair<std::vector<int>, TMatrixD> AlignableSVDRecoHit::globalDerivatives(const genfit::StateOnPlane* sop)
 {
-  return alignment::HierarchyManager::getInstance().getAlignmentHierarchy().getGlobalDerivatives<VXDAlignment>(getPlaneId(), sop);
+  return alignment::GlobalDerivatives::passGlobals(
+           alignment::HierarchyManager::getInstance().getAlignmentHierarchy().getGlobalDerivatives<VXDAlignment>(getPlaneId(), sop));
 }

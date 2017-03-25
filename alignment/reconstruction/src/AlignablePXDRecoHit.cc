@@ -15,8 +15,10 @@
 
 using namespace std;
 using namespace Belle2;
+using namespace alignment;
 
 std::pair<std::vector<int>, TMatrixD> AlignablePXDRecoHit::globalDerivatives(const genfit::StateOnPlane* sop)
 {
-  return alignment::HierarchyManager::getInstance().getAlignmentHierarchy().getGlobalDerivatives<VXDAlignment>(getPlaneId(), sop);
+  return GlobalDerivatives::passGlobals(
+           HierarchyManager::getInstance().getAlignmentHierarchy().getGlobalDerivatives<VXDAlignment>(getPlaneId(), sop));
 }

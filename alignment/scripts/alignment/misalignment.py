@@ -106,7 +106,7 @@ class Clamshell(GlobalDeformation):
         import math
         import numpy
 
-        return [0., self.scale * math.cos(phi) / r, 0.]
+        return [0., self.scale * math.cos(phi), 0.]
 
 
 class Skew(GlobalDeformation):

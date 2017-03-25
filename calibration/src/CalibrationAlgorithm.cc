@@ -126,6 +126,16 @@ void CalibrationAlgorithm::saveCalibration(TObject* data, const string& name, co
   m_payloads.emplace_back(name, data, iov);
 }
 
+void CalibrationAlgorithm::saveCalibration(TObject* data, const IntervalOfValidity& iov)
+{
+  saveCalibration(data, data->ClassName(), iov);
+}
+
+void CalibrationAlgorithm::saveCalibration(TObject* data)
+{
+  saveCalibration(data, data->ClassName());
+}
+
 void CalibrationAlgorithm::saveCalibration(TObject* data, const string& name)
 {
   if (m_runs.empty())

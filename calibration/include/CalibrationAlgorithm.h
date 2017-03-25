@@ -155,6 +155,12 @@ namespace Belle2 {
     /// Get the interval of validity from minimum and maximum experiment and run of data in requested calibration range
     IntervalOfValidity getIovFromData();
 
+    /// Store DB payload with default name and default IOV
+    void saveCalibration(TObject* data);
+
+    /// Store DB payload with default name and custom IOV
+    void saveCalibration(TObject* data, const IntervalOfValidity& iov);
+
     /// Store DB payload with given name with default IOV
     void saveCalibration(TObject* data, const std::string& name);
 

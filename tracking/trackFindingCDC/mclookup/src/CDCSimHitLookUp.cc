@@ -313,7 +313,7 @@ CDCRLWireHit CDCSimHitLookUp::getRLWireHit(const CDCHit* ptrHit,
   double driftLength = getDriftLength(ptrHit);
   const CDCWireHit* wireHit = getWireHit(ptrHit, wireHits);
   B2ASSERT("Could not find CDCWireHit for the requested hit", wireHit);
-  return CDCRLWireHit(wireHit, rlInfo, driftLength);
+  return CDCRLWireHit(wireHit, rlInfo, driftLength, CDCWireHit::c_simpleDriftLengthVariance);
 }
 
 CDCRecoHit3D CDCSimHitLookUp::getRecoHit3D(const CDCHit* ptrHit,

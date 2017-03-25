@@ -42,10 +42,12 @@ namespace Belle2 {
        *  @param wireHit      The wire hit the oriented hit is associated with.
        *  @param rlInfo       The right left passage information of the _wire_ relative to the track
        *  @param driftLength  The reestimated drift length
+       *  @param driftLengthVariance  The reestimated drift length variance
        */
       CDCRLWireHit(const CDCWireHit* wireHit,
                    ERightLeft rlInfo,
-                   double driftLength);
+                   double driftLength,
+                   double driftLengthVariance);
 
       /**
        *  Constructs the average of two wire hits with right left passage informations.
@@ -73,7 +75,12 @@ namespace Belle2 {
 
       /// Returns the oriented wire hit with the opposite right left information.
       CDCRLWireHit reversed() const
-      { return CDCRLWireHit(m_wireHit, NRightLeft::reversed(m_rlInfo), m_refDriftLength); }
+      {
+        return CDCRLWireHit(m_wireHit,
+                            NRightLeft::reversed(m_rlInfo),
+                            m_refDriftLength,
+                            m_refDriftLengthVariance);
+      }
 
       /// Swiches the right left passage to its opposite inplace.
       void reverse()
@@ -183,7 +190,11 @@ namespace Belle2 {
 
       /// Getter for the variance of the drift length at the reference position of the wire.
       double getRefDriftLengthVariance() const
-      { return getWireHit().getRefDriftLengthVariance(); }
+      { return m_refDriftLengthVariance; }
+
+      /// Setter for the variance of the drift length at the reference position of the wire.
+      void setRefDriftLengthVariance(double driftLengthVariance)
+      { m_refDriftLengthVariance = driftLengthVariance; }
 
       /// Getter for the right left passage information.
       ERightLeft getRLInfo() const
@@ -237,6 +248,8 @@ namespace Belle2 {
       /// Memory for the reestimated drift length
       double m_refDriftLength = 0.0;
 
+      /// Memory for the reestimated drift length variance
+      double m_refDriftLengthVariance = 0.0;
     };
   }
 }

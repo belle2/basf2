@@ -29,6 +29,37 @@
 
 namespace Belle2 {
   namespace alignment {
+    class GlobalDerivatives {
+    public:
+      static std::pair<std::vector<int>, TMatrixD> passGlobals(std::pair<std::vector<int>, TMatrixD> globals)
+      {
+        TMatrixD newMatrix(globals.second.GetNrows(), 0);
+        std::vector<int> newLabels;
+
+        for (auto label : globals.first) {
+          if (label == 0) continue;
+
+          newLabels.push_back(label);
+          newMatrix.ResizeTo(globals.second.GetNrows(), newMatrix.GetNcols() + 1);
+          for (int iRow = 0; iRow < globals.second.GetNrows(); ++iRow) {
+            newMatrix(iRow, newMatrix.GetNcols()) = globals.second(iRow, newMatrix.GetNcols());
+          }
+        }
+        /*
+                int counter = 0;
+                for (auto label : globals.first) {
+                  if (label == 0) {
+                    globals.first.at(counter) = 1;
+                    for (int iRow = 0; iRow < globals.second.GetNrows(); ++iRow) {
+                      globals.second(iRow, counter) = 0.;
+                    }
+                  }
+                  counter++;
+                }*/
+        return {newLabels, newMatrix};
+      }
+    };
+
     /// pair of the global unique id from object with constants and element representing some rigid body in hierarchy
     typedef std::pair<unsigned short, unsigned short> DetectorLevelElement;
     /// pair with global labels and matrix with coresponding global derivatives

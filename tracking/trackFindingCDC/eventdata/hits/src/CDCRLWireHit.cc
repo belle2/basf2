@@ -15,10 +15,8 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCRLWireHit::CDCRLWireHit(const CDCWireHit* wireHit)
-  : CDCRLWireHit(wireHit,
-                 ERightLeft::c_Unknown,
-                 wireHit->getRefDriftLength())
+CDCRLWireHit::CDCRLWireHit(const CDCWireHit* wireHit, ERightLeft rlInfo)
+  : CDCRLWireHit(wireHit, rlInfo, wireHit->getRefDriftLength())
 {
 }
 

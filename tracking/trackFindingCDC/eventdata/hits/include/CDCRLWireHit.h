@@ -33,8 +33,9 @@ namespace Belle2 {
       /**
        *  Constructs an oriented wire hit with unknown left right passage information.
        *  @param wireHit      The wire hit the oriented hit is associated with.
+       *  @param rlInfo       The right left passage information of the _wire_ relative to the track
        */
-      explicit CDCRLWireHit(const CDCWireHit* wireHit);
+      explicit CDCRLWireHit(const CDCWireHit* wireHit, ERightLeft rlInfo = ERightLeft::c_Unknown);
 
       /**
        *  Constructs an oriented wire hit.

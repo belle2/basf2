@@ -12,6 +12,7 @@
 #define GLOBALLABEL_H
 
 #include <map>
+#include <set>
 #include <vxd/dataobjects/VxdID.h>
 #include <cdc/dataobjects/WireID.h>
 #include <bklm/dataobjects/BKLMElementID.h>
@@ -144,15 +145,32 @@ namespace Belle2 {
     GlobalLabel(EKLMSegmentID eklmSegment, gidTYPE paramId);
 
     template<class DBObjType>
-    void construct(gidTYPE element, gidTYPE param)
+    static GlobalLabel construct(gidTYPE element, gidTYPE param)
     {
-      construct(DBObjType::getGlobalUniqueID(), element, param);
+      GlobalLabel label;
+      label.construct(DBObjType::getGlobalUniqueID(), element, param);
+      return label;
     }
 
     //TODO
     void construct(gidTYPE dbObjId, gidTYPE element, gidTYPE param)
     {
+      if (m_disabledComponents.find(dbObjId) != m_disabledComponents.end()) {
+        construct(0, 0, 0);
+        return;
+      }
       construct(100000 * dbObjId + element, param);
+    }
+
+    template<class DBObjType>
+    static void disableComponent()
+    {
+      disableComponent(DBObjType::getGlobalUniqueID());
+    }
+
+    static void disableComponent(unsigned short componentUniqueID)
+    {
+      m_disabledComponents.insert(componentUniqueID);
     }
 
     /**
@@ -295,6 +313,7 @@ namespace Belle2 {
     }
 
   private:
+    static std::set<unsigned short> m_disabledComponents;
 
     //! Constructor for any detector
     //! @param elementId Unique id of Belle2 detector element (sensor, layer, wire...)

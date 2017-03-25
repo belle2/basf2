@@ -28,16 +28,6 @@ CDCRecoHit3D::CDCRecoHit3D(const CDCRLWireHit& rlWireHit,
 {
 }
 
-CDCRecoHit3D::CDCRecoHit3D(const CDCWireHit* wireHit,
-                           ERightLeft rlInfo,
-                           const Vector3D& recoPos3D,
-                           double arcLength2D)
-  : m_rlWireHit(wireHit, rlInfo, wireHit->getRefDriftLength())
-  , m_recoPos3D(recoPos3D)
-  , m_arcLength2D(arcLength2D)
-{
-}
-
 CDCRecoHit3D CDCRecoHit3D::fromSimHit(const CDCWireHit* wireHit, const CDCSimHit& simHit)
 {
   // arc length cannot be deduced from the flightTime in this context
@@ -62,7 +52,8 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCWireHit* wireHit,
 {
   Vector3D recoPos3D = wireHit->reconstruct3D(trajectory2D, rlInfo);
   double arcLength2D = trajectory2D.calcArcLength2D(recoPos3D.xy());
-  return CDCRecoHit3D(wireHit, rlInfo, recoPos3D, arcLength2D);
+  CDCRLWireHit rlWireHit(wireHit, rlInfo);
+  return CDCRecoHit3D(rlWireHit, recoPos3D, arcLength2D);
 }
 
 CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRLWireHit& rlWireHit,

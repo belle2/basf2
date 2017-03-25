@@ -36,7 +36,7 @@ namespace Belle2 {
     ~BKLMAlignment() {}
 
     /// Get global unique id
-    static unsigned short getGlobalUniqueID() {return 70;}
+    static unsigned short getGlobalUniqueID() {return 30;}
     /// Get global parameter
     double getGlobalParam(unsigned short element, unsigned short param) {return get(element, param);}
     /// Set global parameter

@@ -59,7 +59,7 @@ namespace Belle2 {
     void cleanAlignmentData();
 
     /// Get global unique id
-    static unsigned short getGlobalUniqueID() {return 80;}
+    static unsigned short getGlobalUniqueID() {return 40;}
     /// Get global parameter
     double getGlobalParam(unsigned short element, unsigned short param)
     {

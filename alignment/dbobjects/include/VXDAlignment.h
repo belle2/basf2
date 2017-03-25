@@ -41,7 +41,7 @@ namespace Belle2 {
     ~VXDAlignment() {}
 
     /// Get global unique id
-    static unsigned short getGlobalUniqueID() {return 20;}
+    static unsigned short getGlobalUniqueID() {return 10;}
     /// Get global parameter
     double getGlobalParam(unsigned short element, unsigned short param) {return get(element, param);}
     /// Set global parameter

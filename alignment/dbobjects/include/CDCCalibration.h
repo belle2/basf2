@@ -95,7 +95,7 @@ namespace Belle2 {
     ~CDCCalibration() {}
 
     /// Get global unique id
-    static unsigned short getGlobalUniqueID() {return 40;}
+    static unsigned short getGlobalUniqueID() {return 20;}
     /// Get global parameter
     double getGlobalParam(unsigned short element, unsigned short param) {return get(element, param);}
     /// Set global parameter

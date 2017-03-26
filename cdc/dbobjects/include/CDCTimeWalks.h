@@ -101,7 +101,7 @@ namespace Belle2 {
     /// Set global parameter
     void setGlobalParam(double value, unsigned short element, unsigned short)
     {
-      setGlobalParam(element, value);
+      setTimeWalkParam(element, value);
     }
     /// list stored global parameters
     std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()

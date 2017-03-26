@@ -23,10 +23,13 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-Chi2FacetFilter::Chi2FacetFilter(double chi2Cut,
-                                 double penaltyWidth):
-  m_param_chi2Cut(chi2Cut),
-  m_param_penaltyWidth(penaltyWidth)
+Chi2FacetFilter::Chi2FacetFilter()
+{
+}
+
+Chi2FacetFilter::Chi2FacetFilter(double chi2Cut, double penaltyWidth)
+  : m_param_chi2CutByISuperLayer{chi2Cut}
+  , m_param_penaltyFactor(penaltyWidth / chi2Cut)
 {
 }
 
@@ -34,27 +37,50 @@ void Chi2FacetFilter::exposeParameters(ModuleParamList* moduleParamList,
                                        const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);
-  moduleParamList->addParameter(prefixed(prefix, "chi2Cut"),
-                                m_param_chi2Cut,
-                                "Acceptable chi2 fit value",
-                                m_param_chi2Cut);
 
-  moduleParamList->addParameter(prefixed(prefix, "penaltyWidth"),
-                                m_param_penaltyWidth,
-                                "Width used in translation from chi2 values to weight penalties",
-                                m_param_penaltyWidth);
+  moduleParamList->addParameter(prefixed(prefix, "chi2CutByISuperLayer"),
+                                m_param_chi2CutByISuperLayer,
+                                "Acceptable chi2 values by superlayer id",
+                                m_param_chi2CutByISuperLayer);
+
+  moduleParamList->addParameter(prefixed(prefix, "penaltyFactor"),
+                                m_param_penaltyFactor,
+                                "Factor for cut value to obtain the width used in translation from chi2 values to weight penalties",
+                                m_param_penaltyFactor);
+}
+
+void Chi2FacetFilter::initialize()
+{
+  if (m_param_chi2CutByISuperLayer.size() == 1) {
+    for (int iSL = 0; iSL < ISuperLayerUtil::c_N; ++iSL) {
+      m_chi2CutByISuperLayer[iSL] = m_param_chi2CutByISuperLayer[0];
+      m_penaltyWidthByISuperLayer[iSL] = m_param_chi2CutByISuperLayer[0] * m_param_penaltyFactor;
+    }
+  } else if (m_param_chi2CutByISuperLayer.size() == ISuperLayerUtil::c_N) {
+    for (int iSL = 0; iSL < ISuperLayerUtil::c_N; ++iSL) {
+      m_chi2CutByISuperLayer[iSL] = m_param_chi2CutByISuperLayer[iSL];
+      m_penaltyWidthByISuperLayer[iSL] = m_param_chi2CutByISuperLayer[iSL] * m_param_penaltyFactor;
+    }
+  } else {
+    B2ERROR("Expected chi2CutByISuperLayer to be of length 1 or "
+            << ISuperLayerUtil::c_N
+            << " received "
+            << m_param_chi2CutByISuperLayer.size());
+  }
+
 }
 
 Weight Chi2FacetFilter::operator()(const CDCFacet& facet)
 {
   constexpr const int nSteps = 1;
   const double chi2 = FacetFitter::fit(facet, nSteps);
-  if (chi2 > m_param_chi2Cut or std::isnan(chi2)) {
+
+  ISuperLayer iSL = facet.getISuperLayer();
+  if (chi2 > m_chi2CutByISuperLayer[iSL] or std::isnan(chi2)) {
     return NAN;
   } else {
-
     // Introducing a mini penilty to distiguish better facets.
-    const double penalty = std::erf(chi2 / m_param_penaltyWidth);
+    double penalty = std::erf(chi2 / m_penaltyWidthByISuperLayer[iSL]);
 
     // Good facet contains three points of the track
     // the amount carried by this facet can the adjusted more realistically

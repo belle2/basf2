@@ -24,10 +24,15 @@ using namespace CDC;
 std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(const genfit::StateOnPlane* sop)
 {
   std::vector<int> labels;
-  TMatrixD derivs(2, 1);
-  // TODO: fix the derivative to return actuall time zero ... something with nominal drift velocity (and leftRight????)
-  derivs(0, 0) = 1.;
+  TMatrixD derivs(2, 2);
+
+  // TODO/FIXME fix/check this!!
+  derivs(0, 0) = 1. * double(int(m_leftRight));
   derivs(1, 0) = 0.; // insensitive coordinate
+
+  //TODO/FIXME fix/check this!
+  derivs(0, 1) = sqrt(getCDCHit()->getADCCount());
+  derivs(1, 1) = 0.; // insensitive coordinate
 
   labels.push_back(GlobalLabel::construct<CDCTimeZeros>(getWireID(), 0).label());
 

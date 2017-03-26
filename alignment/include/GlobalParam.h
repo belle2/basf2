@@ -23,6 +23,7 @@
 #include <eklm/dbobjects/EKLMAlignment.h>
 
 #include <cdc/dbobjects/CDCTimeZeros.h>
+#include <cdc/dbobjects/CDCTimeWalks.h>
 
 #include <framework/database/Database.h>
 
@@ -97,6 +98,7 @@ namespace Belle2 {
         addDBObj<CDCCalibration>();
 
         addDBObj<CDCTimeZeros>();
+        addDBObj<CDCTimeWalks>();
 
         addDBObj<BKLMAlignment>();
         addDBObj<EKLMAlignment>();

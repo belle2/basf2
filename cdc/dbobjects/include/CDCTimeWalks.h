@@ -90,6 +90,30 @@ namespace Belle2 {
       }
     }
 
+    // ------------- Interface to global Millepede calibration ----------------
+    /// Get global unique id
+    static unsigned short getGlobalUniqueID() {return 26;}
+    /// Get global parameter
+    double getGlobalParam(unsigned short element, unsigned short)
+    {
+      return getTimeWalkParam(element);
+    }
+    /// Set global parameter
+    void setGlobalParam(double value, unsigned short element, unsigned short)
+    {
+      setGlobalParam(element, value);
+    }
+    /// list stored global parameters
+    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()
+    {
+      std::vector<std::pair<unsigned short, unsigned short>> result;
+      for (auto id_timewalk : getTimeWalkParams()) {
+        result.push_back({id_timewalk.first, 0});
+      }
+      return result;
+    }
+    // ------------------------------------------------------------------------
+
   private:
     std::map<unsigned short, float> m_tws; /**< tw list*/
 

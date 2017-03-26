@@ -313,6 +313,7 @@ class ClassificationAnalysis(object):
                     aux_values[signals],
                     estimates[signals],
                     quantiles=quantiles,
+                    bins=('flat', None),
                     lower_bound=(None, lower_bound),
                     upper_bound=(None, upper_bound),
                     outlier_z_score=self.outlier_z_score,
@@ -406,7 +407,9 @@ class ClassificationAnalysis(object):
                 sorted_efficiencies,
                 sorted_estimates,
                 lower_bound=0,
-                upper_bound=1
+                upper_bound=1,
+                outlier_z_score=self.outlier_z_score,
+                allow_discrete=self.allow_discrete,
             )
             cut_over_efficiency_profile.xlabel = 'efficiency'
             cut_over_efficiency_profile.ylabel = cut_x_label
@@ -421,7 +424,9 @@ class ClassificationAnalysis(object):
                 sorted_bkg_rejections,
                 sorted_estimates,
                 lower_bound=0,
-                upper_bound=1
+                upper_bound=1,
+                outlier_z_score=self.outlier_z_score,
+                allow_discrete=self.allow_discrete,
             )
             cut_over_bkg_rejection_profile.xlabel = 'bkg_rejection'
             cut_over_bkg_rejection_profile.ylabel = cut_x_label

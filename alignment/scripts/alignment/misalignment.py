@@ -133,7 +133,7 @@ class Twist(GlobalDeformation):
         super().__init__(scale)
 
     def _transform(self, r, phi, z):
-        return [0., self.scale * z / r, 0.]
+        return [0., self.scale * z, 0.]
 
 
 class ZExpansion(GlobalDeformation):

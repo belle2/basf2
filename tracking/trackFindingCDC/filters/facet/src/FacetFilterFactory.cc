@@ -50,6 +50,7 @@ std::map<std::string, std::string> FacetFilterFactory::getValidFilterNamesAndDes
     {"realistic", "mc free with realistic criteria"},
     {"realistic_loss", "mc with realistice criteria but losser cut"},
     {"chi2", "mc free based on chi2 fitting"},
+    {"chi2_old", "old based on chi2 fitting with single cut regardless of superlayer"},
     {"unionrecording", "record many multiple choosable variable set"},
     {"mva", "filter facets with a mva method"},
   };
@@ -73,6 +74,8 @@ std::unique_ptr<BaseFacetFilter> FacetFilterFactory::create(const std::string& f
     return makeUnique<RealisticFacetFilter>(25);
   } else if (filterName == "chi2") {
     return makeUnique<Chi2FacetFilter>();
+  } else if (filterName == "chi2_old") {
+    return makeUnique<Chi2FacetFilter>(75.0, 120.0);
   } else if (filterName == "unionrecording") {
     return makeUnique<UnionRecordingFacetFilter>();
   } else if (filterName == "mva") {

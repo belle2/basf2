@@ -17,6 +17,7 @@
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
@@ -25,6 +26,7 @@ using namespace TrackFindingCDC;
 
 namespace {
   using AllTrackFilter = AllFilter<BaseTrackFilter>;
+  using NoneTrackFilter = NoneFilter<BaseTrackFilter>;
   using MCTrackFilter = MCFilter<VariadicUnionVarSet<TruthTrackVarSet, BasicTrackVarSet>>;
   using RecordingTrackFilter = RecordingFilter<VariadicUnionVarSet<TruthTrackVarSet, BasicTrackVarSet>>;
   using MVATrackFilter = MVAFilter<BasicTrackVarSet>;
@@ -62,7 +64,7 @@ std::unique_ptr<BaseTrackFilter>
 TrackFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<BaseTrackFilter>();
+    return makeUnique<NoneTrackFilter>();
   } else if (filterName == "all") {
     return makeUnique<AllTrackFilter>();
   } else if (filterName == "truth") {

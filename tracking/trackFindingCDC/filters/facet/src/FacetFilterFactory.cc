@@ -19,6 +19,8 @@
 #include <tracking/trackFindingCDC/filters/facet/UnionRecordingFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/MVAFacetFilter.h>
 
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
+
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
@@ -59,7 +61,7 @@ std::map<std::string, std::string> FacetFilterFactory::getValidFilterNamesAndDes
 std::unique_ptr<BaseFacetFilter> FacetFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<BaseFacetFilter>();
+    return makeUnique<NoneFilter<BaseFacetFilter>>();
   } else if (filterName == "all") {
     return makeUnique<AllFacetFilter>();
   } else if (filterName == "truth") {

@@ -14,6 +14,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/FilterVarSet.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
@@ -25,6 +26,7 @@ using namespace TrackFindingCDC;
 
 namespace {
   using AllSegmentTrackFilter = AllFilter<BaseSegmentTrackFilter>;
+  using NoneSegmentTrackFilter = NoneFilter<BaseSegmentTrackFilter>;
   using MCSegmentTrackFilter = MCFilter<VariadicUnionVarSet<SegmentTrackTruthVarSet, SegmentTrackVarSet>>;
   using RecordingSegmentTrackFilter = RecordingFilter<VariadicUnionVarSet<SegmentTrackTruthVarSet, SegmentTrackVarSet>>;
   using MVASegmentTrackFilter = MVAFilter<SegmentTrackVarSet>;
@@ -50,7 +52,7 @@ std::unique_ptr<BaseSegmentTrackFilter>
 SegmentTrackFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<BaseSegmentTrackFilter>();
+    return makeUnique<NoneSegmentTrackFilter>();
   } else if (filterName == "truth") {
     return makeUnique<MCSegmentTrackFilter>();
   } else if (filterName == "mva") {

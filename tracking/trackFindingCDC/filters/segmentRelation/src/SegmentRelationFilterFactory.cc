@@ -15,6 +15,8 @@
 #include <tracking/trackFindingCDC/filters/segmentRelation/MVAFeasibleSegmentRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentRelation/MVARealisticSegmentRelationFilter.h>
 
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
+
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
@@ -51,7 +53,7 @@ std::unique_ptr<BaseSegmentRelationFilter >
 SegmentRelationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<BaseSegmentRelationFilter>();
+    return makeUnique<NoneFilter<BaseSegmentRelationFilter>>();
   } else if (filterName == "truth") {
     return makeUnique<MCSegmentRelationFilter>();
   } else if (filterName == "unionrecording") {

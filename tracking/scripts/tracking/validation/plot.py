@@ -2160,6 +2160,22 @@ class ValidationPlot(object):
         self.ylabel = self.ylabel
         self.title = self.title
 
+    def set_maximum(self, maximum):
+        """Sets the maximum of the vertical plotable range"""
+        for histogram in self.histograms:
+            if isinstance(histogram, ROOT.TH1):
+                histogram.SetMaximum(histogram.GetMaximum(maximum))
+            else:
+                histogram.SetMaximum(maximum)
+
+    def set_minimum(self, minimum):
+        """Sets the minimum of the vertical plotable range"""
+        for histogram in self.histograms:
+            if isinstance(histogram, ROOT.TH1):
+                histogram.SetMinimum(histogram.GetMinimum(minimum))
+            else:
+                histogram.SetMinimum(minimum)
+
     @classmethod
     def set_tstyle(cls):
         """Set the style such that the additional stats entries are shown by the TBrowser"""

@@ -25,7 +25,7 @@ Weight MCSegmentRelationFilter::operator()(const CDCSegment2D& fromSegment,
   const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
 
   // Check if the segments are aligned correctly along the Monte Carlo track
-  EForwardBackward pairFBInfo = mcSegmentLookUp.areAlignedInMCTrack(&fromSegment, &toSegment);
+  EForwardBackward pairFBInfo = mcSegmentLookUp.areAlignedInMCTrackWithRLCheck(&fromSegment, &toSegment);
   if (pairFBInfo == EForwardBackward::c_Invalid) return NAN;
 
   if (pairFBInfo == EForwardBackward::c_Forward or

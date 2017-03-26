@@ -11,6 +11,10 @@
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
+#include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/CDCSimHit.h>
+#include <mdst/dataobjects/MCParticle.h>
+
 #include <TDatabasePDG.h>
 #include <boost/range/adaptor/reversed.hpp>
 
@@ -24,7 +28,56 @@ void CDCMCHitCollectionLookUp<ACDCHitCollection>::clear()
 }
 
 template <class ACDCHitCollection>
-const float CDCMCHitCollectionLookUp<ACDCHitCollection>::s_minimalMatchPurity = 0.5;
+std::map<ITrackType, size_t> CDCMCHitCollectionLookUp<ACDCHitCollection>::getHitCountByMCTrackId(
+  const ACDCHitCollection& hits) const
+{
+  const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
+
+  std::map<ITrackType, size_t> hitCountByMCTrackId;
+  for (const CDCHit* ptrHit : hits) {
+    ITrackType mcTrackId = mcHitLookUp.getMCTrackId(ptrHit);
+    if (hitCountByMCTrackId.count(mcTrackId) == 0) hitCountByMCTrackId[mcTrackId] = 0;
+    ++(hitCountByMCTrackId[mcTrackId]);
+  }
+  return hitCountByMCTrackId;
+}
+
+template <class ACDCHitCollection>
+MCTrackIdPurityPair
+CDCMCHitCollectionLookUp<ACDCHitCollection>::getHighestPurity(const ACDCHitCollection& hits) const
+{
+  std::map<ITrackType, size_t> hitCountByMCTrackId = getHitCountByMCTrackId(hits);
+
+  size_t nHits = 0;
+  std::pair<ITrackType, size_t> highestHitCountMCTrackId(0, 0);
+  std::max_element(hitCountByMCTrackId.begin(), hitCountByMCTrackId.end(), LessOf<Second>());
+
+  for (const std::pair<ITrackType, size_t>& hitCountForMCTrackId : hitCountByMCTrackId) {
+
+    nHits += hitCountForMCTrackId.second;
+
+    if (highestHitCountMCTrackId.second < hitCountForMCTrackId.second) {
+      highestHitCountMCTrackId = hitCountForMCTrackId;
+    }
+  }
+
+  const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
+
+  int correctRLVote = 0;
+  for (const auto& recoHit : hits) {
+    const CDCHit* hit = recoHit;
+    ERightLeft mcRLInfo = mcHitLookUp.getRLInfo(hit);
+    ERightLeft rlInfo = recoHit.getRLInfo();
+    if (rlInfo == mcRLInfo) {
+      ++correctRLVote;
+    } else {
+      --correctRLVote;
+    }
+  }
+
+  const float purity = static_cast<float>(highestHitCountMCTrackId.second) / nHits;
+  return MCTrackIdPurityPair(highestHitCountMCTrackId.first, purity, correctRLVote);
+}
 
 template <class ACDCHitCollection>
 ITrackType
@@ -33,10 +86,23 @@ CDCMCHitCollectionLookUp<ACDCHitCollection>::getMCTrackId(const ACDCHitCollectio
   if (not ptrHits) return INVALID_ITRACK;
   const ACDCHitCollection& hits = *ptrHits;
   MCTrackIdPurityPair mcTrackIdAndPurity = getHighestPurity(hits);
-  if (mcTrackIdAndPurity.getPurity() >= s_minimalMatchPurity) {
+  if (mcTrackIdAndPurity.getPurity() >= m_minimalMatchPurity) {
     return mcTrackIdAndPurity.getMCTrackId();
   } else {
     return INVALID_ITRACK;
+  }
+}
+
+template <class ACDCHitCollection>
+int CDCMCHitCollectionLookUp<ACDCHitCollection>::getCorrectRLVote(const ACDCHitCollection* ptrHits) const
+{
+  if (not ptrHits) return INVALID_ITRACK;
+  const ACDCHitCollection& hits = *ptrHits;
+  MCTrackIdPurityPair mcTrackIdAndPurity = getHighestPurity(hits);
+  if (mcTrackIdAndPurity.getPurity() >= m_minimalMatchPurity) {
+    return mcTrackIdAndPurity.getCorrectRLVote();
+  } else {
+    return 0;
   }
 }
 
@@ -210,6 +276,38 @@ EForwardBackward CDCMCHitCollectionLookUp<ACDCHitCollection>::areAlignedInMCTrac
   }
 
   // FIXME: Handle intertwined hits that are not cleanly consecutive along the track?
+  return EForwardBackward::c_Invalid;
+}
+
+template <class ACDCHitCollection>
+EForwardBackward CDCMCHitCollectionLookUp<ACDCHitCollection>::areAlignedInMCTrackWithRLCheck(
+  const ACDCHitCollection* ptrFromHits,
+  const ACDCHitCollection* ptrToHits) const
+{
+  EForwardBackward result = areAlignedInMCTrack(ptrFromHits, ptrToHits);
+  if (result == EForwardBackward::c_Invalid) return result;
+
+  int fromCorrectRLVote = getCorrectRLVote(ptrFromHits);
+  int toCorrectRLVote = getCorrectRLVote(ptrToHits);
+
+  if (result == EForwardBackward::c_Backward) {
+    fromCorrectRLVote = -fromCorrectRLVote;
+    toCorrectRLVote = -toCorrectRLVote;
+  }
+
+  int fromNCorrectRL = (fromCorrectRLVote + ptrFromHits->size()) / 2;
+  int toNCorrectRL = (toCorrectRLVote + ptrToHits->size()) / 2;
+
+  float fromRLPurity = 1.0 * fromNCorrectRL / ptrFromHits->size();
+  float toRLPurity = 1.0 * toNCorrectRL / ptrToHits->size();
+
+  // Require the minimal rl purity and also at least 2.5 correct hits
+  // (cut chosen to require all correct in single hit triplet segment)
+  if (fromRLPurity > m_minimalRLPurity and toRLPurity > m_minimalRLPurity and
+      fromNCorrectRL > 2.5 and toNCorrectRL > 2.5) {
+    return result;
+  }
+
   return EForwardBackward::c_Invalid;
 }
 

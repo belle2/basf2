@@ -14,88 +14,79 @@
 #include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
 #include <tracking/trackFindingCDC/numerics/Index.h>
 
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/CDCSimHit.h>
-#include <mdst/dataobjects/MCParticle.h>
-
 namespace Belle2 {
+  class MCParticle;
+  class CDCSimHit;
+  class CDCHit;
+
   namespace TrackFindingCDC {
     class CDCTrajectory3D;
+
+    /// Structure representing a matched Monte Carlo track id with the corresponding purity
+    struct MCTrackIdPurityPair {
+
+      /// Constructor taking the Monte Carlo track id and the purity to be stored
+      MCTrackIdPurityPair(ITrackType mcTrackId, float purity, int correctRLVote)
+        : m_mcTrackId(mcTrackId)
+        , m_purity(purity)
+        , m_correctRLVote(correctRLVote)
+      {
+      }
+
+      /// Getter for the Monte Carlo track Id
+      ITrackType getMCTrackId() const
+      {
+        return m_mcTrackId;
+      }
+
+      /// Getter for the purity
+      float getPurity() const
+      {
+        return m_purity;
+      }
+
+      /// Getter for the rl vote
+      int getCorrectRLVote() const
+      {
+        return m_correctRLVote;
+      }
+
+    private:
+      // Id of the mc track
+      ITrackType m_mcTrackId;
+
+      // Purity wrt mc track
+      float m_purity;
+
+      // Number of correct rl information in the track
+      int m_correctRLVote;
+    };
 
     /// Interface class to the Monte Carlo information for collections of hits
     template<class ACDCHitCollection>
     class CDCMCHitCollectionLookUp  {
 
     public:
-      /// Structure representing a matched Monte Carlo track id with the corresponding purity
-      struct MCTrackIdPurityPair : public std::pair<ITrackType, float> {
-
-        /// Constructor taking the Monte Carlo track id and the purity to be stored
-        MCTrackIdPurityPair(ITrackType mcTrackId, float purity):
-          std::pair<ITrackType, float>(mcTrackId, purity) {}
-
-        /// Getter for the Monte Carlo track Id
-        ITrackType getMCTrackId() const
-        { return this->first; }
-
-        /// Getter for the purity
-        float getPurity() const
-        { return this->second; }
-
-      };
-
-    public:
       /// Clears all Monte Carlo information left from the last event
       void clear();
 
     private:
-      /// Threshold for the purity of the segments must exceed to be considered as a match.
-      static const float s_minimalMatchPurity;
-
-    private:
       /// Fill a map with the number of hits for each track id contained in the given hit range.
-      std::map<ITrackType, size_t> getHitCountByMCTrackId(const ACDCHitCollection& hits) const
-      {
-        const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
-
-        std::map<ITrackType, size_t> hitCountByMCTrackId;
-        for (const CDCHit* ptrHit : hits) {
-          ITrackType mcTrackId = mcHitLookUp.getMCTrackId(ptrHit);
-          if (hitCountByMCTrackId.count(mcTrackId) == 0) hitCountByMCTrackId[mcTrackId] = 0;
-          ++(hitCountByMCTrackId[mcTrackId]);
-        }
-        return hitCountByMCTrackId;
-      }
-
-      /// Get the track id with the highest corresponding purity.
-      MCTrackIdPurityPair getHighestPurity(const ACDCHitCollection& hits) const
-      {
-        std::map<ITrackType, size_t> hitCountByMCTrackId = getHitCountByMCTrackId(hits);
-
-        size_t nHits = 0;
-        std::pair<ITrackType, size_t> highestHitCountMCTrackId(0, 0);
-
-        for (const std::pair<ITrackType, size_t>& hitCountForMCTrackId : hitCountByMCTrackId) {
-
-          nHits += hitCountForMCTrackId.second;
-
-          if (highestHitCountMCTrackId.second < hitCountForMCTrackId.second) {
-            highestHitCountMCTrackId = hitCountForMCTrackId;
-          }
-
-        }
-
-        const float purity = float(highestHitCountMCTrackId.second) / nHits;
-        return MCTrackIdPurityPair(highestHitCountMCTrackId.first, purity);
-      }
+      std::map<ITrackType, size_t> getHitCountByMCTrackId(const ACDCHitCollection& hits) const;
 
     public:
+      /// Get the track id with the highest corresponding purity.
+      MCTrackIdPurityPair getHighestPurity(const ACDCHitCollection& hits) const;
+
       /// Getter for the Monte Carlo track id matched to this collection of hits
       /** On first encounter of a collection of hits this evaluates the purities for the contained track ids.
        *  The match is valid if the highest purity exceeds the s_minimalMatchPurity threshold.
        *  In case the highest purity is to low to result will be INVALID_ITRACK. To result is stored
        *  in member map object for fast look up for repeated calls.*/
       ITrackType getMCTrackId(const ACDCHitCollection* ptrHits) const;
+
+      /// Getter for the difference of correct versus incorrect right left passage informations
+      int getCorrectRLVote(const ACDCHitCollection* ptrHits) const;
 
       /// Getter for the mc particle matched to this collection of hits
       const MCParticle* getMCParticle(const ACDCHitCollection* ptrHits) const;
@@ -137,9 +128,8 @@ namespace Belle2 {
       Index getLastNPassedSuperLayers(const ACDCHitCollection* ptrHits) const
       { return CDCMCHitLookUp::getInstance().getNPassedSuperLayers(getLastHit(ptrHits)); }
 
-
-
-      /** Returns the orientation of the collection of hits relative to its matched track.
+      /**
+       *  Returns the orientation of the collection of hits relative to its matched track.
        *  * Returns EForwardBackward::c_Invalid if the collection of hits is not matched to any track.
        *  * Returns EForwardBackward::c_Forward if the collection of hits is coaligned with the matched track.
        *  * Returns EForwardBackward::c_Backward if the collection of hits is coaligned with the matched track interpreted in reverse.
@@ -147,8 +137,9 @@ namespace Belle2 {
        */
       EForwardBackward isForwardOrBackwardToMCTrack(const ACDCHitCollection* ptrHits) const;
 
-      /** Returns if the second collection of hits
-       *  follows the first collection of hits in their common Monte Carlo track.
+      /**
+       *  Returns if the second collection of hits follows the first collection of hits in their common Monte Carlo track.
+       *
        *  * Returns EForwardBackward::c_Invalid if the collection of hits is not matched in the same Monte Carlo track.
        *  * Returns EForwardBackward::c_Forward  if both collections of hits are coaligned
        *                     with the Monte Carlo track and the second collection of hits
@@ -160,12 +151,23 @@ namespace Belle2 {
       EForwardBackward areAlignedInMCTrack(const ACDCHitCollection* ptrFromHits,
                                            const ACDCHitCollection* ptrToHits) const;
 
-
+      /**
+       *  Returns if the second collection of hits follows the first collection of hits in their common Monte Carlo track.
+       *
+       *  Also checks that the majority of the right left passage informations agrees with the forward backward information
+       */
+      EForwardBackward areAlignedInMCTrackWithRLCheck(const ACDCHitCollection* ptrFromHits,
+                                                      const ACDCHitCollection* ptrToHits) const;
 
       /** Returns the trajectory of the collection of hits */
       CDCTrajectory3D getTrajectory3D(const ACDCHitCollection* ptrHits) const;
 
-    };
+    private:
+      /// Threshold for the purity that must be exceeded to be considered as a match.
+      float m_minimalMatchPurity = 0.5;
 
+      /// Threshold for the correct fraction of right left passage informations to be considered a match
+      float m_minimalRLPurity = 0.5;
+    };
   }
 }

@@ -17,7 +17,7 @@
 #include <cdc/dbobjects/CDCTimeWalks.h>
 
 #include <alignment/Hierarchy.h>
-#include <../../release/cdc/geometry/include/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 using namespace std;
 using namespace Belle2;

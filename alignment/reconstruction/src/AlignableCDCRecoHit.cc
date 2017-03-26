@@ -14,8 +14,10 @@
 #include <cdc/dataobjects/WireID.h>
 
 #include <cdc/dbobjects/CDCTimeZeros.h>
+#include <cdc/dbobjects/CDCTimeWalks.h>
 
 #include <alignment/Hierarchy.h>
+#include <../../release/cdc/geometry/include/CDCGeometryPar.h>
 
 using namespace std;
 using namespace Belle2;
@@ -30,11 +32,13 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
   derivs(0, 0) = 1. * double(int(m_leftRight));
   derivs(1, 0) = 0.; // insensitive coordinate
 
+  labels.push_back(GlobalLabel::construct<CDCTimeZeros>(getWireID(), 0).label());
+
   //TODO/FIXME fix/check this!
   derivs(0, 1) = sqrt(getCDCHit()->getADCCount());
   derivs(1, 1) = 0.; // insensitive coordinate
 
-  labels.push_back(GlobalLabel::construct<CDCTimeZeros>(getWireID(), 0).label());
+  labels.push_back(GlobalLabel::construct<CDCTimeWalks>(CDCGeometryPar::Instance().getBoardID(getWireID()), 0).label());
 
   return alignment::GlobalDerivatives::passGlobals({labels, derivs});
 }

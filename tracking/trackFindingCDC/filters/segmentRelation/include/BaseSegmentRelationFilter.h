@@ -45,7 +45,7 @@ namespace Belle2 {
       virtual Weight operator()(const CDCSegment2D& from  __attribute__((unused)),
                                 const CDCSegment2D& to  __attribute__((unused)))
       {
-        return NAN;
+        return 1;
       }
 
       /** Main filter method overriding the filter interface method.
@@ -57,7 +57,7 @@ namespace Belle2 {
         const CDCSegment2D* ptrTo(relation.second);
         if (ptrFrom == ptrTo) return NAN; // Prevent relation to same.
         if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
-        return operator()(*ptrFrom, *ptrTo);
+        return this->operator()(*ptrFrom, *ptrTo);
       }
     };
   }

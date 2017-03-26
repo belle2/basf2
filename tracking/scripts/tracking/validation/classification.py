@@ -411,6 +411,8 @@ class ClassificationAnalysis(object):
                 outlier_z_score=self.outlier_z_score,
                 allow_discrete=self.allow_discrete,
             )
+            cut_over_efficiency_profile.set_minimum(lower_bound)
+            cut_over_efficiency_profile.set_maximum(upper_bound)
             cut_over_efficiency_profile.xlabel = 'efficiency'
             cut_over_efficiency_profile.ylabel = cut_x_label
 
@@ -428,6 +430,8 @@ class ClassificationAnalysis(object):
                 outlier_z_score=self.outlier_z_score,
                 allow_discrete=self.allow_discrete,
             )
+            cut_over_bkg_rejection_profile.set_minimum(lower_bound)
+            cut_over_bkg_rejection_profile.set_maximum(upper_bound)
             cut_over_bkg_rejection_profile.xlabel = 'bkg_rejection'
             cut_over_bkg_rejection_profile.ylabel = cut_x_label
 

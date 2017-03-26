@@ -1630,7 +1630,11 @@ class ValidationPlot(object):
         debug = get_logger().debug
         debug('Determine binning for plot named %s', self.name)
 
-        if isinstance(bins, collections.Iterable):
+        if bins == 'flat':
+            # Special value for the flat distribution binning
+            n_bins = None
+
+        elif isinstance(bins, collections.Iterable):
             # Bins is considered as an array
             # Construct a float array forwardable to root.
             bin_edges = bins
@@ -1639,7 +1643,7 @@ class ValidationPlot(object):
             return bin_edges, bin_labels
 
         # If bins is not an iterable assume it is the number of bins or None
-        if bins is None:
+        elif bins is None:
             n_bins = None
         else:
             # Check that bins can be coerced to an integer.
@@ -1714,9 +1718,14 @@ class ValidationPlot(object):
 
         n_bin_edges = n_bins + 1
         if lower_bound != upper_bound:
-            # Correct the upper bound such that all values are strictly smaller than the upper bound
-            # Make one step in single precision in the positive direction
-            bin_edges = np.linspace(lower_bound, upper_bound, n_bin_edges)
+            if bins == "flat":
+                debug("Creating flat distribution binning")
+                precentiles = np.linspace(0.0, 100.0, n_bin_edges)
+                bin_edges = np.unique(np.nanpercentile(xs[(lower_bound <= xs) & (xs <= upper_bound)], precentiles))
+            else:
+                # Correct the upper bound such that all values are strictly smaller than the upper bound
+                # Make one step in single precision in the positive direction
+                bin_edges = np.linspace(lower_bound, upper_bound, n_bin_edges)
 
             # Reinforce the upper and lower bound to be exact
             # Also expand the upper bound by an epsilon

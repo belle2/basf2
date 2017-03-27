@@ -116,19 +116,13 @@ namespace Belle2 {
       }
 
       /// Setter for the globale super cluster id.
-      void setISuperCluster(int iSuperCluster)
+      void setISuperCluster(int iSuperCluster) const
       {
         m_iSuperCluster = iSuperCluster;
       }
 
       /// Setter for the super cluster id based on the hit content
-      void receiveISuperCluster()
-      {
-        auto getISuperClusterOfHit = [](const CDCRecoHit2D & recoHit2d) -> int
-        { return recoHit2d.getWireHit().getISuperCluster(); };
-        int iSuperCluster = common(*this, getISuperClusterOfHit, -1);
-        setISuperCluster(iSuperCluster);
-      }
+      void receiveISuperCluster() const;
 
       /// Returns false, if there are more than N hits in the range which does not have a taken flag.
       bool isFullyTaken(unsigned int maxNotTaken = 0) const;
@@ -142,7 +136,7 @@ namespace Belle2 {
       mutable AutomatonCell m_automatonCell;
 
       /// Memory for the global super cluster id.
-      int m_iSuperCluster = -1;
+      mutable int m_iSuperCluster = -1;
     };
   }
 }

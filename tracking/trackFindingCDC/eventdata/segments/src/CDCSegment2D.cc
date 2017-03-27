@@ -383,3 +383,12 @@ bool CDCSegment2D::isFullyTaken(unsigned int maxNotTaken) const
 
   return true;
 }
+
+void CDCSegment2D::receiveISuperCluster() const
+{
+  auto getISuperClusterOfHit = [](const CDCRecoHit2D & recoHit2d) -> int {
+    return recoHit2d.getWireHit().getISuperCluster();
+  };
+  int iSuperCluster = common(*this, getISuperClusterOfHit, -1);
+  setISuperCluster(iSuperCluster);
+}

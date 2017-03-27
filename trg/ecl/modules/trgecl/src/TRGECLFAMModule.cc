@@ -46,7 +46,7 @@ using namespace std;
 namespace Belle2 {
 //
 //
-//
+//! Register module name
   REG_MODULE(TRGECLFAM);
 //
 //
@@ -86,8 +86,7 @@ namespace Belle2 {
              _beambkgtag);
     addParam("TCThreshold", _threshold, "Set FAM TC threshold ",
              _threshold);
-    addParam("ShapingFunction", _FADC, "Set function of shaper ",
-             _FADC);
+    addParam("ShapingFunction", _FADC, "Set function of shaper ",  _FADC);
 
 
 
@@ -180,7 +179,7 @@ namespace Belle2 {
     TrgEclDigitizer* obj_trgeclDigi = new TrgEclDigitizer();
     obj_trgeclDigi-> setWaveform(_waveform);
     obj_trgeclDigi-> setFADC(_FADC);
-    obj_trgeclDigi-> setup(m_nEvent);
+    obj_trgeclDigi-> setup();
     if (_famMethod == 2 || _famMethod == 1) {obj_trgeclDigi->  digitization01(TCDigiE, TCDigiT); } // no-fit method = backup method 1
     else if (_famMethod == 3) { obj_trgeclDigi-> digitization02(TCDigiE, TCDigiT); } // orignal method = backup method 2
     obj_trgeclDigi-> save(m_nEvent);

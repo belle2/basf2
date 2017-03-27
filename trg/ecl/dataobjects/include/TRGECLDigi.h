@@ -130,6 +130,7 @@ namespace Belle2 {
       int phiid,
       int thetaid,
       int tcnoutput,
+      int beambkgtag,
       double raw_energy,
       double raw_timing,
       double raw_energy_tot,
@@ -149,6 +150,7 @@ namespace Belle2 {
       m_fit_energy = fit_energy;
       m_fit_timing = fit_timing;
       m_tcnoutput = tcnoutput;
+      m_beambkgtag = beambkgtag;
 
 
     }

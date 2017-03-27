@@ -175,15 +175,6 @@ EForwardBackward CDCMCHitCollectionLookUp<ACDCHitCollection>::areAlignedInMCTrac
   const ACDCHitCollection* ptrFromHits,
   const ACDCHitCollection* ptrToHits) const
 {
-  // Check if the segments are sensable on their own
-  EForwardBackward fromFBInfo = isForwardOrBackwardToMCTrack(ptrFromHits);
-  if (fromFBInfo == EForwardBackward::c_Invalid) return EForwardBackward::c_Invalid;
-
-  EForwardBackward toFBInfo = isForwardOrBackwardToMCTrack(ptrToHits);
-  if (toFBInfo == EForwardBackward::c_Invalid) return EForwardBackward::c_Invalid;
-
-  if (fromFBInfo != toFBInfo) return EForwardBackward::c_Invalid;
-
   /// Check if the segments are in the same track
   ITrackType fromMCTrackId = getMCTrackId(ptrFromHits);
   if (fromMCTrackId == INVALID_ITRACK) return EForwardBackward::c_Invalid;
@@ -193,88 +184,97 @@ EForwardBackward CDCMCHitCollectionLookUp<ACDCHitCollection>::areAlignedInMCTrac
 
   if (fromMCTrackId != toMCTrackId) return EForwardBackward::c_Invalid;
 
-  // Now check are aligned with their common track
-  // Examine if they are in the same super layer
+  // Check if the segments are sensable on their own
+  EForwardBackward fromFBInfo = isForwardOrBackwardToMCTrack(ptrFromHits);
+  if (fromFBInfo == EForwardBackward::c_Invalid) return EForwardBackward::c_Invalid;
 
-  Index firstNPassedSuperLayersOfFromHits = getFirstNPassedSuperLayers(ptrFromHits);
-  Index lastNPassedSuperLayersOfFromHits = getLastNPassedSuperLayers(ptrFromHits);
-  if (firstNPassedSuperLayersOfFromHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
-  if (lastNPassedSuperLayersOfFromHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
+  EForwardBackward toFBInfo = isForwardOrBackwardToMCTrack(ptrToHits);
+  if (toFBInfo == EForwardBackward::c_Invalid) return EForwardBackward::c_Invalid;
 
-  Index firstNPassedSuperLayersOfToHits = getFirstNPassedSuperLayers(ptrToHits);
-  Index lastNPassedSuperLayersOfToHits = getLastNPassedSuperLayers(ptrToHits);
-  if (firstNPassedSuperLayersOfToHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
-  if (lastNPassedSuperLayersOfToHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
+  if (fromFBInfo != toFBInfo) return EForwardBackward::c_Invalid;
 
-  if (lastNPassedSuperLayersOfFromHits < firstNPassedSuperLayersOfToHits) {
-    if (fromFBInfo == EForwardBackward::c_Forward and toFBInfo == EForwardBackward::c_Forward) {
-      return EForwardBackward::c_Forward;
-    } else {
-      return EForwardBackward::c_Invalid;
-    }
-  } else if (lastNPassedSuperLayersOfToHits < firstNPassedSuperLayersOfFromHits) {
-    if (fromFBInfo == EForwardBackward::c_Backward and toFBInfo == EForwardBackward::c_Backward) {
-      return EForwardBackward::c_Backward;
-    } else {
-      return EForwardBackward::c_Invalid;
-    }
-  }
+  {
+    // Now check if hits are aligned within their common track
+    // Index firstNPassedSuperLayersOfFromHits = getFirstNPassedSuperLayers(ptrFromHits);
+    Index lastNPassedSuperLayersOfFromHits = getLastNPassedSuperLayers(ptrFromHits);
+    // if (firstNPassedSuperLayersOfFromHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
+    if (lastNPassedSuperLayersOfFromHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
 
-  // Now we are in the same true segment with both segments
-  Index firstInTrackSegmentIdOfFromHits = getFirstInTrackSegmentId(ptrFromHits);
-  Index lastInTrackSegmentIdOfFromHits = getLastInTrackSegmentId(ptrFromHits);
-  if (firstInTrackSegmentIdOfFromHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
-  if (lastInTrackSegmentIdOfFromHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
+    Index firstNPassedSuperLayersOfToHits = getFirstNPassedSuperLayers(ptrToHits);
+    // Index lastNPassedSuperLayersOfToHits = getLastNPassedSuperLayers(ptrToHits);
+    if (firstNPassedSuperLayersOfToHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
+    // if (lastNPassedSuperLayersOfToHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
 
-  Index firstInTrackSegmentIdOfToHits = getFirstInTrackSegmentId(ptrToHits);
-  Index lastInTrackSegmentIdOfToHits = getLastInTrackSegmentId(ptrToHits);
-  if (firstInTrackSegmentIdOfToHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
-  if (lastInTrackSegmentIdOfToHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
-
-  if (lastInTrackSegmentIdOfFromHits < firstInTrackSegmentIdOfToHits) {
-    if (fromFBInfo == EForwardBackward::c_Forward and toFBInfo == EForwardBackward::c_Forward) {
-      return EForwardBackward::c_Forward;
-    } else {
-      return EForwardBackward::c_Invalid;
-    }
-  } else if (lastInTrackSegmentIdOfToHits < firstInTrackSegmentIdOfFromHits) {
-    // Test if to segment lies before in the mc track
-    // Hence the whole pair of segments is reverse to the track direction of flight
-    if (fromFBInfo == EForwardBackward::c_Backward and toFBInfo == EForwardBackward::c_Backward) {
-      return EForwardBackward::c_Backward;
-    } else {
-      return EForwardBackward::c_Invalid;
+    if (lastNPassedSuperLayersOfFromHits < firstNPassedSuperLayersOfToHits) {
+      if (fromFBInfo == EForwardBackward::c_Forward and toFBInfo == EForwardBackward::c_Forward) {
+        return EForwardBackward::c_Forward;
+      } else {
+        return EForwardBackward::c_Invalid;
+      }
+    } else if (firstNPassedSuperLayersOfToHits < lastNPassedSuperLayersOfFromHits) {
+      if (fromFBInfo == EForwardBackward::c_Backward and toFBInfo == EForwardBackward::c_Backward) {
+        return EForwardBackward::c_Backward;
+      } else {
+        return EForwardBackward::c_Invalid;
+      }
     }
   }
 
-  // Now we are in the same true segment with both of the hits
-  Index firstInTrackIdOfFromHits = getFirstInTrackId(ptrFromHits);
-  Index lastInTrackIdOfFromHits = getLastInTrackId(ptrFromHits);
-  if (firstInTrackIdOfFromHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
-  if (lastInTrackIdOfFromHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
+  {
+    // Now we are in the same true segment with both segments
+    // Index firstInTrackSegmentIdOfFromHits = getFirstInTrackSegmentId(ptrFromHits);
+    Index lastInTrackSegmentIdOfFromHits = getLastInTrackSegmentId(ptrFromHits);
+    // if (firstInTrackSegmentIdOfFromHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
+    if (lastInTrackSegmentIdOfFromHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
 
-  Index firstInTrackIdOfToHits = getFirstInTrackId(ptrToHits);
-  Index lastInTrackIdOfToHits = getLastInTrackId(ptrToHits);
-  if (firstInTrackIdOfToHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
-  if (lastInTrackIdOfToHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
+    Index firstInTrackSegmentIdOfToHits = getFirstInTrackSegmentId(ptrToHits);
+    // Index lastInTrackSegmentIdOfToHits = getLastInTrackSegmentId(ptrToHits);
+    if (firstInTrackSegmentIdOfToHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
+    // if (lastInTrackSegmentIdOfToHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
 
-  if (fromFBInfo == EForwardBackward::c_Forward and toFBInfo == EForwardBackward::c_Forward) {
+    if (lastInTrackSegmentIdOfFromHits < firstInTrackSegmentIdOfToHits) {
+      if (fromFBInfo == EForwardBackward::c_Forward and toFBInfo == EForwardBackward::c_Forward) {
+        return EForwardBackward::c_Forward;
+      } else {
+        return EForwardBackward::c_Invalid;
+      }
+    } else if (firstInTrackSegmentIdOfToHits < lastInTrackSegmentIdOfFromHits) {
+      // Test if to segment lies before in the mc track
+      // Hence the whole pair of segments is reverse to the track direction of flight
+      if (fromFBInfo == EForwardBackward::c_Backward and toFBInfo == EForwardBackward::c_Backward) {
+        return EForwardBackward::c_Backward;
+      } else {
+        return EForwardBackward::c_Invalid;
+      }
+    }
+  }
+
+  {
+    // Now we are in the same true segment with both of the hits
+    // Index firstInTrackIdOfFromHits = getFirstInTrackId(ptrFromHits);
+    Index lastInTrackIdOfFromHits = getLastInTrackId(ptrFromHits);
+    // if (firstInTrackIdOfFromHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
+    if (lastInTrackIdOfFromHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
+
+    Index firstInTrackIdOfToHits = getFirstInTrackId(ptrToHits);
+    // Index lastInTrackIdOfToHits = getLastInTrackId(ptrToHits);
+    if (firstInTrackIdOfToHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
+    // if (lastInTrackIdOfToHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
+
     if (lastInTrackIdOfFromHits < firstInTrackIdOfToHits) {
-      return EForwardBackward::c_Forward;
-    } else {
-      return EForwardBackward::c_Invalid;
-    }
-  } else if (fromFBInfo == EForwardBackward::c_Backward and
-             toFBInfo == EForwardBackward::c_Backward) {
-    // Test if to segment lies before in the mc track
-    // Hence the whole pair of segments is reverse to the track direction of flight
-    if (lastInTrackIdOfToHits < firstInTrackIdOfFromHits) {
-      return EForwardBackward::c_Backward;
-    } else {
-      return EForwardBackward::c_Invalid;
+      if (fromFBInfo == EForwardBackward::c_Forward and toFBInfo == EForwardBackward::c_Forward) {
+        return EForwardBackward::c_Forward;
+      } else {
+        return EForwardBackward::c_Invalid;
+      }
+    } else if (firstInTrackIdOfToHits < lastInTrackIdOfFromHits) {
+      if (fromFBInfo == EForwardBackward::c_Backward and toFBInfo == EForwardBackward::c_Backward) {
+        return EForwardBackward::c_Backward;
+      } else {
+        return EForwardBackward::c_Invalid;
+      }
     }
   }
-
   // FIXME: Handle intertwined hits that are not cleanly consecutive along the track?
   return EForwardBackward::c_Invalid;
 }

@@ -131,80 +131,154 @@ void CDCMCTrackStore::fillMCSegments()
     ITrackType mcParticleIdx = mcTrackAndMCParticleIdx.first;
     CDCHitVector& mcTrack = mcTrackAndMCParticleIdx.second;
 
+    if (mcTrack.empty()) continue;
     std::vector<CDCHitVector>& mcSegments = m_mcSegmentsByMCParticleIdx[mcParticleIdx];
     mcSegments.clear();
 
-    if (mcTrack.empty()) continue;
+    // Split track into runs in the same superlayer
+    auto superLayerRanges = adjacent_groupby(mcTrack.begin(), mcTrack.end(), [](const CDCHit * hit) {
+      return hit->getISuperLayer();
+    });
 
-    // Safest way to make the segments is to cluster
-    // the elements in the track for their nearest neighbors.
-    // Bundle them together with a automaton cell and construct a relation
-    // to serve them to the Clusterizer for generation of the clusters.
-
-    using HitWithCell = WithAutomatonCell<const CDCHit*>;
-
-    std::vector<HitWithCell> hitsWithCells;
-    for (const CDCHit* hit : mcTrack) {
-      hitsWithCells.push_back(HitWithCell(hit));
+    std::vector<CDCHitVector> superLayerRuns;
+    for (const auto& superLayerRange : superLayerRanges) {
+      superLayerRuns.push_back({superLayerRange.begin(), superLayerRange.end()});
     }
 
-    std::multimap<HitWithCell*, HitWithCell*> hitNeighborhood;
-    const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+    std::vector<std::vector<CDCHitVector>::iterator> smallSuperLayerRuns;
+    for (auto itSuperLayerRun = superLayerRuns.begin();
+         itSuperLayerRun != superLayerRuns.end();
+         ++itSuperLayerRun) {
+      if (itSuperLayerRun->size() < 3) smallSuperLayerRuns.push_back(itSuperLayerRun);
+    }
 
-    for (HitWithCell& hitWithCell : hitsWithCells) {
-      const CDCHit* ptrHit(hitWithCell);
-      const CDCHit& hit = *ptrHit;
+    // Merge small run to an adjacent run
+    for (auto itSuperLayerRun : smallSuperLayerRuns) {
+      ISuperLayer iSL = itSuperLayerRun->front()->getISuperLayer();
 
-      WireID wireID(hit.getISuperLayer(),
-                    hit.getILayer(),
-                    hit.getIWire());
-
-      for (HitWithCell& neighborHitWithCell : hitsWithCells) {
-
-        const CDCHit* ptrNeighborHit(neighborHitWithCell);
-        if (ptrHit == ptrNeighborHit) continue;
-
-        const CDCHit& neighborHit = *ptrNeighborHit;
-        WireID neighborWireID(neighborHit.getISuperLayer(),
-                              neighborHit.getILayer(),
-                              neighborHit.getIWire());
-
-        if (wireTopology.arePrimaryNeighbors(wireID, neighborWireID) or
-            wireTopology.areSeconaryNeighbors(wireID, neighborWireID) or
-            wireID == neighborWireID) {
-          HitWithCell* ptrHitWithCell = &hitWithCell;
-          HitWithCell* ptrNeighborHitWithCell = &neighborHitWithCell;
-          hitNeighborhood.emplace(ptrHitWithCell, ptrNeighborHitWithCell);
+      // Look in both directions to adopt the hits in this small runs
+      auto itSuperLayerRunBefore = superLayerRuns.end();
+      int hitDistanceBefore = INT_MAX;
+      if (std::distance(superLayerRuns.begin(), itSuperLayerRun) >= 2) {
+        itSuperLayerRunBefore = itSuperLayerRun - 2;
+        if (itSuperLayerRunBefore->front()->getISuperLayer() == iSL) {
+          hitDistanceBefore = (itSuperLayerRunBefore - 1)->size();
+        } else {
+          itSuperLayerRunBefore = superLayerRuns.end();
         }
-
       }
 
-    }
-
-    using CDCHitCluster = std::vector<HitWithCell*>;
-    Clusterizer<HitWithCell> hitClusterizer;
-    std::vector<CDCHitCluster> hitClusters;
-    auto hitsWithCellPtrs =
-      hitsWithCells | boost::adaptors::transformed(&std::addressof<HitWithCell>);
-    hitClusterizer.createFromPointers(hitsWithCellPtrs, hitNeighborhood, hitClusters);
-
-    // Strip the automaton cell
-    for (const CDCHitCluster& hitCluster : hitClusters) {
-      CDCHitVector mcSegment;
-      mcSegment.reserve(hitCluster.size());
-      for (HitWithCell* hitWithCell : hitCluster) {
-        const CDCHit* hit(*hitWithCell);
-        mcSegment.push_back(hit);
+      auto itSuperLayerRunAfter = superLayerRuns.end();
+      int hitDistanceAfter = INT_MAX;
+      if (std::distance(itSuperLayerRun, superLayerRuns.end()) > 2) {
+        itSuperLayerRunAfter = itSuperLayerRun + 2;
+        if (itSuperLayerRunAfter->front()->getISuperLayer() == iSL) {
+          hitDistanceAfter = (itSuperLayerRunAfter + 1)->size();
+        } else {
+          itSuperLayerRunAfter = superLayerRuns.end();
+        }
       }
-      mcSegments.push_back(std::move(mcSegment));
+
+      auto itMergeSuperLayerRun = superLayerRuns.end();
+      bool mergeBefore = false;
+      if (hitDistanceBefore < hitDistanceAfter) {
+        itMergeSuperLayerRun = itSuperLayerRunBefore;
+        mergeBefore = true;
+      } else {
+        itMergeSuperLayerRun = itSuperLayerRunAfter;
+        mergeBefore = false;
+      }
+
+      if (itMergeSuperLayerRun == superLayerRuns.end()) continue;
+      else if (mergeBefore) {
+        itMergeSuperLayerRun->insert(itMergeSuperLayerRun->end(), itSuperLayerRun->begin(), itSuperLayerRun->end());
+        itSuperLayerRun->clear();
+      } else {
+        itMergeSuperLayerRun->insert(itMergeSuperLayerRun->begin(), itSuperLayerRun->begin(), itSuperLayerRun->end());
+        itSuperLayerRun->clear();
+      }
     }
+
+    // Remove empty small runs
+    erase_remove_if(superLayerRuns, Size() == 0u);
+
+    // Concat the runs that are now in the same superlayer
+    auto mergeSameSuperLayer = [](CDCHitVector & lhs, CDCHitVector & rhs) {
+      if (lhs.empty() or rhs.empty()) return true;
+      if (lhs.front()->getISuperLayer() != rhs.front()->getISuperLayer()) return false;
+      lhs.insert(lhs.end(), rhs.begin(), rhs.end());
+      rhs.clear();
+      return true;
+    };
+    erase_unique(superLayerRuns, mergeSameSuperLayer);
+
+    // Now analyse the runs in turn and break them in the connected segments
+    for (const CDCHitVector& superLayerRun : superLayerRuns) {
+      // Safest way to make the segments is to cluster
+      // the elements in the track for their nearest neighbors.
+      // Bundle them together with a automaton cell and construct a relation
+      // to serve them to the Clusterizer for generation of the clusters.
+
+      using HitWithCell = WithAutomatonCell<const CDCHit*>;
+
+      std::vector<HitWithCell> hitsWithCells;
+      for (const CDCHit* hit : superLayerRun) {
+        hitsWithCells.push_back(HitWithCell(hit));
+      }
+
+      std::multimap<HitWithCell*, HitWithCell*> hitNeighborhood;
+      const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+
+      for (HitWithCell& hitWithCell : hitsWithCells) {
+        const CDCHit* ptrHit(hitWithCell);
+        const CDCHit& hit = *ptrHit;
+
+        WireID wireID(hit.getISuperLayer(), hit.getILayer(), hit.getIWire());
+
+        for (HitWithCell& neighborHitWithCell : hitsWithCells) {
+
+          const CDCHit* ptrNeighborHit(neighborHitWithCell);
+          if (ptrHit == ptrNeighborHit) continue;
+
+          const CDCHit& neighborHit = *ptrNeighborHit;
+          WireID neighborWireID(neighborHit.getISuperLayer(),
+                                neighborHit.getILayer(),
+                                neighborHit.getIWire());
+
+          if (wireTopology.arePrimaryNeighbors(wireID, neighborWireID) or
+              wireTopology.areSeconaryNeighbors(wireID, neighborWireID) or
+              wireID == neighborWireID) {
+            HitWithCell* ptrHitWithCell = &hitWithCell;
+            HitWithCell* ptrNeighborHitWithCell = &neighborHitWithCell;
+            hitNeighborhood.emplace(ptrHitWithCell, ptrNeighborHitWithCell);
+          }
+        }
+      }
+
+      using CDCHitCluster = std::vector<HitWithCell*>;
+      Clusterizer<HitWithCell> hitClusterizer;
+      std::vector<CDCHitCluster> hitClusters;
+      auto hitsWithCellPtrs =
+        hitsWithCells | boost::adaptors::transformed(&std::addressof<HitWithCell>);
+      hitClusterizer.createFromPointers(hitsWithCellPtrs, hitNeighborhood, hitClusters);
+
+      // Strip the automaton cell
+      for (const CDCHitCluster& hitCluster : hitClusters) {
+        CDCHitVector mcSegment;
+        mcSegment.reserve(hitCluster.size());
+        for (HitWithCell* hitWithCell : hitCluster) {
+          const CDCHit* hit(*hitWithCell);
+          mcSegment.push_back(hit);
+        }
+        mcSegments.push_back(std::move(mcSegment));
+      }
+    } // end for superLayerRuns
 
     // Lets sort them along for the time of flight.
     for (CDCHitVector& mcSegment : mcSegments) {
       arrangeMCTrack(mcSegment);
     }
-  }
-
+  } // End for mc track
 }
 
 void CDCMCTrackStore::arrangeMCTrack(CDCHitVector& mcTrack) const

@@ -104,7 +104,7 @@ namespace Belle2 {
      * and only those T0 estimations, that were included as a double (not the int values).
      *
      * This means, that if you want to have your T0 estimation returned here, you have
-     * tu supply a double value (you can include an int also).
+     * to supply a double value (you can include an int also).
      *
      * If there is no extracted eventT0 in any of these detectors, return (0, 0).
      */
@@ -125,7 +125,7 @@ namespace Belle2 {
 
     /*
      * Return the binned eventT0 using only the detectors given
-     * and only those T0 estimations, that were included as a double (not the int values).
+     * and only those T0 estimations, that were included as an int (not the double values).
      *
      * If there is no extracted eventT0 in any of these detectors, return 0.
      * As we do not have an uncertainty (and we are dealing with integers), no average is created

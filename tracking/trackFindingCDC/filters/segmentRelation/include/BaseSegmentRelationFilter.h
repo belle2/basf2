@@ -31,11 +31,8 @@ namespace Belle2 {
                            const ASegmentIterator& itBegin,
                            const ASegmentIterator& itEnd) const
       {
-        auto compareISuperCluster = [](const CDCSegment2D & lhs, const CDCSegment2D & rhs) {
-          return lhs.getISuperCluster() < rhs.getISuperCluster();
-        };
         std::pair<ASegmentIterator, ASegmentIterator> sameSuperClusterItPair =
-          std::equal_range(itBegin, itEnd, segment, compareISuperCluster);
+          std::equal_range(itBegin, itEnd, segment, std::less<CDCSegment2D>());
         return boost::iterator_range<ASegmentIterator>(sameSuperClusterItPair.first,
                                                        sameSuperClusterItPair.second);
       }

@@ -238,9 +238,9 @@ CDCSegment2D CDCSegment2D::reconstructUsingFacets(const CDCRLWireHitSegment& rlW
 
 bool CDCSegment2D::operator<(const CDCSegment2D& segment2D) const
 {
-  return this->getISuperCluster() < segment2D.getISuperCluster();
-  // Activate merging in across the whole superlayer
-  // return this->getISuperLayer() < segment2D.getISuperLayer();
+  return (this->getISuperLayer() < segment2D.getISuperLayer()) or
+         (not(segment2D.getISuperLayer() < this->getISuperLayer()) and
+          this->getISuperCluster() < segment2D.getISuperCluster());
 }
 
 std::vector<const CDCWire*> CDCSegment2D::getWireSegment() const

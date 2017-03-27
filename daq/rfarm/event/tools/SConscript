@@ -18,5 +18,6 @@ env['TOOLS_LIBS']['rawsock2rbr'] = ['daq', 'framework', '$ROOT_LIBS' ]
 env['TOOLS_LIBS']['rawrb2sockr'] = ['daq', 'framework', '$ROOT_LIBS' ]
 env['TOOLS_LIBS']['removerb'] = ['daq', 'framework', '$ROOT_LIBS' ]
 env['TOOLS_LIBS']['dump_sendheader'] = ['daq', 'framework', '$ROOT_LIBS' ]
+env['TOOLS_LIBS']['file2sockr'] = ['daq', 'framework', '$ROOT_LIBS' ]
 
 Return('env')

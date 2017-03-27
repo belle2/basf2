@@ -26,6 +26,10 @@ namespace Belle2 {
       /// Constructor
       MCSegmentRelationFilter(bool allowReverse = true);
 
+      /// Tell Root to look at this operator
+      using Super::operator();
+
+    private:
       /// Checks if a segment relation is a good combination.
       Weight operator()(const CDCSegment2D& fromSegment, const CDCSegment2D& toSegment) final;
     };

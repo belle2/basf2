@@ -236,6 +236,11 @@ CDCSegment2D CDCSegment2D::reconstructUsingFacets(const CDCRLWireHitSegment& rlW
   }
 }
 
+Relation<const CDCSegment2D> CDCSegment2D::makeRelation(const CDCSegment2D& segment) const
+{
+  return {this, &segment};
+}
+
 bool CDCSegment2D::operator<(const CDCSegment2D& segment2D) const
 {
   return (this->getISuperLayer() < segment2D.getISuperLayer()) or

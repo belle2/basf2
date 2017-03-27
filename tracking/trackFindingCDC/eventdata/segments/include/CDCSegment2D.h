@@ -15,6 +15,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 namespace Belle2 {
@@ -59,6 +60,9 @@ namespace Belle2 {
 
       /// Comparision of segments up to the super cluster id keeping them close together on sort
       bool operator<(const CDCSegment2D& segment2D) const;
+
+      /// Helper constructor to create a relation in python
+      Relation<const CDCSegment2D> makeRelation(const CDCSegment2D& segment) const;
 
       /// Getter for the vector of wires the hits of this segment are based on in the same order.
       std::vector<const CDCWire*> getWireSegment() const;

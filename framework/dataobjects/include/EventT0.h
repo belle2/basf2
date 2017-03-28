@@ -40,7 +40,7 @@ namespace Belle2 {
         m_doubleValue(value), m_doubleUncertaintySquared(uncertaintySquared), m_isDouble(true) {}
 
       /// Constructor using an int
-      IntOrDouble(int value) : m_intValue(value), m_isDouble(false) {}
+      explicit IntOrDouble(int value) : m_intValue(value), m_isDouble(false) {}
 
       /// Get the int value
       int getIntValue() const

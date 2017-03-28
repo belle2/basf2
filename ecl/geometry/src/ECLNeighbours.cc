@@ -68,7 +68,7 @@ ECLNeighbours::ECLNeighbours(const std::string& neighbourDef, const double par)
   // or wrong type:
   else {
     B2FATAL("ECLNeighbours::ECLNeighbours (constructor via std::string): Invalid option: " << neighbourDef <<
-            " (valid: N, NC, NC2, R ( with R<30 cm), F (with 0<f<1)");
+            " (valid: N, NC, NC2, R ( with R<30 cm), F (with 0.1<f<1)");
   }
 
 }
@@ -139,20 +139,21 @@ void ECLNeighbours::initializeF(double frac)
     neighbours.push_back(geom->GetCellID(tid , phiInc) + 1);
     neighbours.push_back(geom->GetCellID(tid , phiDec) + 1);
 
-    // find the two closest crystals in the inner theta ring
-    short int tidinner = tid - 1;
-    short int n1 = -1;
-    double dist1 = 999.;
-    short int pid1 = -1;
-    short int n2 = -1;
-    double dist2 = 999.;
-
     double fracPos = (pid + 0.5) / m_crystalsPerRing[tid];
 
+    // find the two closest crystals in the inner theta ring
+    short int tidinner = tid - 1;
     if (tidinner >= 0) {
+
+      short int n1 = -1;
+      double dist1 = 999.;
+      short int pid1 = -1;
+      short int n2 = -1;
+      double dist2 = 999.;
+
       for (short int inner = 0; inner < m_crystalsPerRing[tidinner]; ++inner) {
-        double f = (inner + 0.5) / m_crystalsPerRing[tidinner];
-        double dist = fabs(fracPos - f);
+        const double f = (inner + 0.5) / m_crystalsPerRing[tidinner];
+        const double dist = fabs(fracPos - f);
         if (dist < dist1) {
           dist2 = dist1;
           dist1 = dist;
@@ -177,16 +178,16 @@ void ECLNeighbours::initializeF(double frac)
 
     // find the two closest crystals in the outer theta ring
     short int tidouter = tid + 1;
-    short int no1 = -1;
-    double disto1 = 999.;
-    short int pido1 = -1;
-    short int no2 = -1;
-    double disto2 = 999.;
-
     if (tidouter <= 68) {
+      short int no1 = -1;
+      double disto1 = 999.;
+      short int pido1 = -1;
+      short int no2 = -1;
+      double disto2 = 999.;
+
       for (short int outer = 0; outer < m_crystalsPerRing[tidouter]; ++outer) {
-        double f = (outer + 0.5) / m_crystalsPerRing[tidouter];
-        double dist = fabs(fracPos - f);
+        const double f = (outer + 0.5) / m_crystalsPerRing[tidouter];
+        const double dist = fabs(fracPos - f);
         if (dist < disto1) {
           disto2 = disto1;
           disto1 = dist;

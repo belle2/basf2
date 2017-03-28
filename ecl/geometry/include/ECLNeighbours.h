@@ -25,10 +25,7 @@ namespace Belle2 {
 
     public:
 
-      /**  Constructor: Default. */
-//      ECLNeighbours();
-
-      /**  Constructor: Fix number of neighbours ("N") in the seed theta ring, fraction cross ("F"),  radius ("R") with par = n or or par = fraction (0.5-1.0) or par = radius [cm]. */
+      /**  Constructor: Fix number of neighbours ("N") in the seed theta ring, fraction cross ("F"),  radius ("R") with par = n or par = fraction (0.1-1.0) or par = radius [cm]. */
       ECLNeighbours(const std::string& neighbourDef, const double par);
 
       /**  Destructor. */

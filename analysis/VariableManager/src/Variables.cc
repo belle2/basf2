@@ -704,6 +704,11 @@ namespace Belle2 {
       return part->getMdstArrayIndex();
     }
 
+    double particleMdstSource(const Particle* part)
+    {
+      return part->getMdstSource();
+    }
+
     double particleCosMdstArrayIndex(const Particle* part)
     {
       return std::cos(part->getMdstArrayIndex());
@@ -1999,6 +2004,8 @@ namespace Belle2 {
                       "called connected - region(CR) track match");
     REGISTER_VARIABLE("mdstIndex", particleMdstArrayIndex,
                       "StoreArray index(0 - based) of the MDST object from which the Particle was created");
+    REGISTER_VARIABLE("mdstSource", particleMdstSource,
+                      "mdstSource - unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)");
     REGISTER_VARIABLE("CosMdstIndex", particleCosMdstArrayIndex,
                       " Cosinus of StoreArray index(0 - based) of the MDST object from which the Particle was created. To be used for random ranking.");
 

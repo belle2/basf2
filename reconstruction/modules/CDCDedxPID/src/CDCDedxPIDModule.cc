@@ -273,9 +273,14 @@ void CDCDedxPIDModule::event()
     // get momentum (at origin) from fit result
     const TVector3& trackMom = fitResult->getMomentum();
     dedxTrack->m_p = trackMom.Mag();
-    dedxTrack->m_cosTheta = trackMom.CosTheta();
-    dedxTrack->m_charge = fitResult->getChargeSign();
-
+    bool nomom = (dedxTrack->m_p != dedxTrack->m_p);
+    if (nomom) {
+      dedxTrack->m_cosTheta = std::cos(std::atan(1 / fitResult->getCotTheta()));
+      dedxTrack->m_charge = 1.0;
+    } else {
+      dedxTrack->m_cosTheta = trackMom.CosTheta();
+      dedxTrack->m_charge = fitResult->getChargeSign();
+    }
     // dE/dx values will be calculated using associated RecoTrack
     const RecoTrack* recoTrack = track.getRelatedTo<RecoTrack>();
     if (!recoTrack) {
@@ -379,6 +384,8 @@ void CDCDedxPIDModule::event()
           cdcMom = pocaMom.Mag();
           dedxTrack->m_p_cdc = cdcMom;
         }
+        if (nomom)
+          dedxTrack->m_p = cdcMom;
 
         // get the doca and entrance angle information.
         // constructPlane places the coordinate center in the POCA to the
@@ -423,7 +430,10 @@ void CDCDedxPIDModule::event()
           layerdx += celldx;
 
           // save individual hits
-          double cellDedx = (adcCount / celldx) * sin(trackMom.Theta());
+          double cellDedx = (adcCount / celldx);
+          if (nomom) cellDedx *= sin(std::atan(1 / fitResult->getCotTheta()));
+          else  cellDedx *= sin(trackMom.Theta());
+
           if (m_enableDebugOutput)
             dedxTrack->addHit(wire, currentLayer, doca, entAng, adcCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
                               driftDRealistic, driftDRealisticRes);
@@ -435,7 +445,9 @@ void CDCDedxPIDModule::event()
 
       // check if there are any more hits in this layer
       if (lastHitInCurrentLayer) {
-        double totalDistance = layerdx / sin(trackMom.Theta());
+        double totalDistance;
+        if (nomom) totalDistance = layerdx / sin(std::atan(1 / fitResult->getCotTheta()));
+        else  totalDistance = layerdx / sin(trackMom.Theta());
         double layerDedx = layerdE / totalDistance;
 
         // save the information for this layer

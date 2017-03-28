@@ -27,17 +27,17 @@ namespace Belle2 {
         B2FATAL("TOP::PulseHeightGenerator: parameter p1 must be non-negative");
       if (p2 <= 0)
         B2FATAL("TOP::PulseHeightGenerator: parameter p2 must be positive");
-      if (xmax <= 0)
-        B2FATAL("TOP::PulseHeightGenerator: upper bound xmax must be positive");
 
-      m_xPeak = pow((p1 / p2), 1 / p2) * x0;
-      m_vPeak = getValue(m_xPeak);
+      double xPeak = pow((p1 / p2), 1 / p2) * x0;
+      if (m_xmax < xPeak) xPeak = m_xmax;
+      m_vPeak = getValue(xPeak);
 
     }
 
 
     double PulseHeightGenerator::generate() const
     {
+      if (m_xmax <= 0) return 0;
       while (true) {
         double x = gRandom->Uniform(m_xmax);
         if (gRandom->Uniform(m_vPeak) < getValue(x)) return x;

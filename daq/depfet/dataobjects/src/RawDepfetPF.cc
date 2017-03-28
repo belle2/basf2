@@ -6,13 +6,13 @@
 // Date : 13 - Aug - 2013
 //-
 
-#include "daq/storage/depfet/dataobjects/RawDepfetPF.h"
+#include "daq/depfet/dataobjects/RawDepfetPF.h"
 #include "framework/logging/Logger.h"
 
 using namespace std;
 using namespace Belle2;
 
-ClassImp(RawDepfetPF);
+//ClassImp(RawDepfetPF);
 
 RawDepfetPF::RawDepfetPF() : m_nwords(0), m_buffer(NULL)
 {

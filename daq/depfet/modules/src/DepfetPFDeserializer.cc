@@ -6,7 +6,7 @@
 // Date : 16 - Oct - 2013
 //-
 
-#include <daq/storage/depfet/modules/DepfetPFDeserializer.h>
+#include <daq/depfet/modules/DepfetPFDeserializer.h>
 
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/system/Time.h>

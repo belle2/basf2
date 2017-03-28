@@ -14,7 +14,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <daq/storage/depfet/dataobjects/RawDepfetPF.h>
+#include <daq/depfet/dataobjects/RawDepfetPF.h>
 
 #include <daq/slc/readout/RunInfoBuffer.h>
 

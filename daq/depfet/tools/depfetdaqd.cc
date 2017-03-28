@@ -1,4 +1,4 @@
-#include "daq/storage/depfet/DepfetDAQCallback.h"
+#include "daq/depfet/DepfetDAQCallback.h"
 
 #include <daq/slc/psql/PostgreSQLInterface.h>
 

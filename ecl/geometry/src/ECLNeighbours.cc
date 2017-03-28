@@ -61,7 +61,7 @@ ECLNeighbours::ECLNeighbours(const std::string& neighbourDef, const double par)
   else if (neighbourDef == "F") {
     double parChecked = par;
     if (parChecked > 1.0) parChecked = 1.0;
-    else if (parChecked < 0.0) parChecked = 0.1;
+    else if (parChecked < 0.1) parChecked = 0.1;
     B2INFO("ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", fraction: " << parChecked);
     initializeF(parChecked);
   }

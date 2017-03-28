@@ -28,7 +28,7 @@ namespace Belle2 {
       /**  Constructor: Default. */
 //      ECLNeighbours();
 
-      /**  Constructor: Fix number of neighbours ("N") in the seed theta ring or radius ("R") with par = n or par = radius [cm]. */
+      /**  Constructor: Fix number of neighbours ("N") in the seed theta ring, fraction cross ("F"),  radius ("R") with par = n or or par = fraction (0.5-1.0) or par = radius [cm]. */
       ECLNeighbours(const std::string& neighbourDef, const double par);
 
       /**  Destructor. */
@@ -62,10 +62,10 @@ namespace Belle2 {
       /**  initialize the mask neighbour list, remove corners. */
       void initializeNC(const int nneighbours, const int corners);
 
-      /**  initialize the radius neighbout list. */
+      /**  initialize the radius neighbour list. */
       void initializeR(const double radius);
 
-      /**  initialize the fractional cross neighbout list. */
+      /**  initialize the fractional cross neighbour list. */
       void initializeF(const double fraction);
 
       /**  return the previous phi id. */

@@ -119,11 +119,7 @@ namespace Belle2 {
     int m_BeamBkgVeto;
     //! bhabha veto
     int m_BhabhaVeto;
-    //! max TC Id
-    int m_maxTCId;
-    //! max TC Energy
-    double m_maxTCEnergy;
-    //! max TC Timing
+    //! Event Timing
     double m_eventtiming;
     //! The number of TC Hit
     int m_NofTCHit;
@@ -228,8 +224,7 @@ namespace Belle2 {
     void setBhabhaVeto(int bhabhaveto) { m_BhabhaVeto = bhabhaveto; }
     //! Set Event Timing
     void setEventTiming(double eventtiming) { m_eventtiming = eventtiming; }
-    //! Set Max TC Energy
-    void setMaxTCEnergy(double maxTCEnergy) { m_maxTCEnergy = maxTCEnergy; }
+
     //! Set No of TC Hit
     void setNofTCHit(double NofTCHit) { m_NofTCHit = NofTCHit; }
     //! Set No of TC Hit
@@ -297,7 +292,6 @@ namespace Belle2 {
       m_BhabhaVeto = 0;
       m_eventtiming = 0;
       m_itimebin = 0;
-      m_maxTCEnergy = 0;
       m_NofTCHit = 0;
       m_BrNofTCHit = 0;
       m_FwdNofTCHit = 0;
@@ -354,9 +348,9 @@ namespace Belle2 {
       //!
       int bitECLtoGDL,
       int BeamBkgVeto,
+      int BhabhaVeto,
       int itimebin,
       double eventtiming,
-      double maxTCEnergy,
       int NofTCHit,
       int BrNofTCHit,
       int FwdNofTCHit,
@@ -411,10 +405,10 @@ namespace Belle2 {
       m_icn_bw = icn_bw;
       //!
       m_bitECLtoGDL = bitECLtoGDL;
+      m_BhabhaVeto =  BhabhaVeto;
       m_BeamBkgVeto = BeamBkgVeto;
       m_eventtiming = eventtiming;
       m_itimebin = itimebin;
-      m_maxTCEnergy = maxTCEnergy;
       m_NofTCHit = NofTCHit;
       m_BrNofTCHit = BrNofTCHit;
       m_FwdNofTCHit = FwdNofTCHit;

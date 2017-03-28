@@ -14,7 +14,6 @@
 #include <framework/core/Module.h>
 
 namespace Belle2 {
-
   class KLMTriggerModule : public Module {
   public:
 
@@ -52,25 +51,29 @@ namespace Belle2 {
     //! @param z x coordinate of the hit
     void geometryConverter(bool fwd, int sector, int layer, int phiStrip, int zStrip, int& x, int& y, int& z);
 
+    //! Total number of sectors (eight, a constant)
     static const int c_TotalSectors = 8;
+    //! Total number of layers (fifteen, a constant)
     static const int c_TotalLayers = 15;
 
-    //! Trigger thresholds
+    //! Trigger threshold on chisq
     double m_maxChisq;
+    //! Trigger threshold on the impact parameter
     double m_maxIP;
+    //! Trigger threshold on the number of fired layers
     int m_minLayers;
 
-    //! Total number of processed events and found tracks
+    //! Total number of processed events
     int m_nEvents;
+    //! Total number of found tracks
     int m_nTracks;
 
     /**name of StoreArray Tracks*/
     std::string m_klmtrackCollectionName;
     /**name of StoreArray Hits*/
     std::string m_klmhitCollectionName;
-
   };
-
 } // namespace Belle2
 
 #endif // KLMTRIGGERMODULE_H
+

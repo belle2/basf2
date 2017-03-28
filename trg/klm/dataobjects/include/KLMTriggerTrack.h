@@ -33,6 +33,8 @@ namespace Belle2 {
       m_impactParameterXZ(0.0),
       m_chisqXZ(0.0),
       m_nLayers(0),
+      m_firstLayer(0),
+      m_lastLayer(0),
       m_trigger(false)
     { }
 
@@ -52,6 +54,8 @@ namespace Belle2 {
       m_impactParameterXZ(0.0),
       m_chisqXZ(0.0),
       m_nLayers(0),
+      m_firstLayer(0),
+      m_lastLayer(0),
       m_trigger(false)
     { }
 

@@ -110,7 +110,7 @@ namespace Belle2 {
      */
     std::pair<double, double> getEventT0WithUncertainty(const Const::DetectorSet& detectorSet = Const::allDetectors) const;
 
-    /*
+    /**
      * Return the calculated eventT0 using only the detectors given
      * and only those T0 estimations, that were included as a double (not the int values).
      *
@@ -123,7 +123,7 @@ namespace Belle2 {
       return getEventT0WithUncertainty(detectorSet).first;
     }
 
-    /*
+    /**
      * Return the binned eventT0 using only the detectors given
      * and only those T0 estimations, that were included as an int (not the double values).
      *

@@ -4,7 +4,8 @@ INCDIR=$(BELLE2_DAQ_SLC)/include/daq/slc/
 
 copyinc:
 	@ mkdir -p $(INCDIR)/apps/thscanerd
-	@  install -m 644 -p $(BELLE2_DAQ_SLC)/apps/thscanerd/include/* $(INCDIR)/apps/thscanerd
+	@ ln -s $(BELLE2_DAQ_SLC)/apps/thscanerd/include/* $(INCDIR)/apps/thscanerd/
+#	@ install -m 644 -p $(BELLE2_DAQ_SLC)/apps/thscanerd/include/* $(INCDIR)/apps/thscanerd
 
 apps/thscanerd: %:
 	@ make -C $(BELLE2_DAQ_SLC) -f Makefile.src TARGET=$@

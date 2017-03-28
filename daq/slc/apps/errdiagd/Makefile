@@ -4,7 +4,8 @@ INCDIR=$(BELLE2_DAQ_SLC)/include/daq/slc/
 
 copyinc:
 	@ mkdir -p $(INCDIR)/apps/errdiagd
-	@  install -m 644 -p $(BELLE2_DAQ_SLC)/apps/errdiagd/include/* $(INCDIR)/apps/errdiagd
+	@ ln -s $(BELLE2_DAQ_SLC)/apps/errdiagd/include/* $(INCDIR)/apps/errdiagd
+#	@ install -m 644 -p $(BELLE2_DAQ_SLC)/apps/errdiagd/include/* $(INCDIR)/apps/errdiagd
 
 apps/errdiagd: %:
 	@ make -C $(BELLE2_DAQ_SLC) -f Makefile.src TARGET=$@

@@ -14,11 +14,13 @@ INCDIR  = $(BELLE2_DAQ_SLC)/include
 TMPDIR  = $(BELLE2_DAQ_SLC)/tmp
 LIBDIR  = $(BELLE2_DAQ_SLC)/lib
 
-LIBS    += -lm -lpthread -ldl -lrt -lvme
+LIBS    += -lm -lpthread -ldl -lrt #-lvme
+ifneq ($(NOT_USE_PSQL),yes)
+LIBS    += -L$(PGSQL_LIB_PATH)/lib -lpq
+endif
 LIBS    += -L$(BELLE2_LIB) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database \
- -ldaq_slc_nsm -ldaq_slc_runcontrol -ldaq_slc_readout -ldaq_slc_apps_ttdad
+ -ldaq_slc_nsm -ldaq_slc_runcontrol -ldaq_slc_readout  -lstatft -ldaq_slc_apps_ttdad
 LIBS    += -lnsm2_corelib -lnsm2_b2lib
-LIBS    += -L$(BELLE2_DAQ_SLC)/extra/ftprogs/ -lstatft
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT -DSTATFT_NSM
 CFLAGS  += -I$(BELLE2_DAQ_SLC)/include -I.
@@ -45,7 +47,7 @@ clean:
 
 $(TARGETS): $(BINDIR)/% : %.cc $(OBJS)
 	@ echo '<< creating executable $@ >>'
-	@ $(CXX) $(CFLAGS) $(LIBS)  $^ -o $@ $(GLIBS) $(LOADLIBES)
+	 $(CXX) $(CFLAGS) $(LIBS)  $^ -o $@ $(GLIBS) $(LOADLIBES)
 	@ $(RM) *~ */*~ \#*\#* */\#*\#*
 	@ echo '<< compiling succeded!! >>'
 

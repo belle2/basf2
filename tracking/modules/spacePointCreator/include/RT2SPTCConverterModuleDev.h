@@ -55,11 +55,11 @@ namespace Belle2 {
 
     /* Convert Clusters to SpacePoints using the Relation: Cluster->SpacePoint */
     std::pair<std::vector<const SpacePoint*>, ConversionState>
-    getSpacePointsFromSVDClusters(std::vector<SVDCluster*>);
+    getSpacePointsFromRecoHitInformations(std::vector<RecoHitInformation*> hitInfos);
 
     /* Convert Clusters to SpacePoints using the Relation: Cluster->TrueHit->SpacePoint */
     std::pair<std::vector<const SpacePoint*>, ConversionState>
-    getSpacePointsFromSVDClustersViaTrueHits(std::vector<SVDCluster*> clusters);
+    getSpacePointsFromRecoHitInformationViaTrueHits(std::vector<RecoHitInformation*> hitInfos);
 
     /** reset counters to 0 to avoid indeterministic behaviour */
     void initializeCounters()
@@ -75,6 +75,8 @@ namespace Belle2 {
     std::string m_SVDClusterName; /**< SVDCluster collection name */
 
     std::string m_SVDDoubleClusterSPName; /**< Non SingleCluster SVD SpacePoints collection name */
+
+    std::string m_PXDClusterSPName; /**< PXD SpacePoints collection name */
 
     std::string m_SVDSingleClusterSPName; /**< Single Cluster SVD SpacePoints collection name */
 

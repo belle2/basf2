@@ -20,7 +20,9 @@ HVMasterCallback::HVMasterCallback()
   reg(HVCommand::PEAK);
   reg(HVCommand::TURNON);
   reg(HVCommand::TURNOFF);
+  setAutoReply(false);
   m_showall = false;
+  m_loading = false;
 }
 
 HVMasterCallback::~HVMasterCallback() throw()
@@ -50,15 +52,6 @@ void HVMasterCallback::configure(const DBObject& obj) throw(RCHandlerException)
         LogFile::info("New node : " + node.getName());
       }
       node.setUsed(o_node.getBool("used"));
-      /*
-      if (o_node.hasObject("config")) {
-        const std::string path = o_node("config").getPath();
-        LogFile::info("found config :%s %s", node.getName().c_str(), path.c_str());
-        node.setConfig(path);
-      } else {
-        LogFile::warning("Not found config");
-      }
-      */
       node_v.push_back(node);
     }
   } catch (const DBHandlerException& e) {
@@ -108,7 +101,7 @@ void HVMasterCallback::monitor() throw(RCHandlerException)
                 node.getName().c_str(), cstate_new.getLabel());
           }
           cstate = cstate_new;
-          setState(node, cstate);
+          setHVState(node, cstate);
         }
       } catch (const TimeoutException& e) {
         LogFile::debug("%s timeout", node.getName().c_str());
@@ -116,8 +109,8 @@ void HVMasterCallback::monitor() throw(RCHandlerException)
     } catch (const NSMNotConnectedException&) {
       if (cstate != Enum::UNKNOWN) {
         log(LogFile::ERROR, "%s got down.", node.getName().c_str());
-        setState(node, Enum::UNKNOWN);
-        setState(HVState::ERROR_ES);
+        setHVState(node, Enum::UNKNOWN);
+        setHVState(HVState::ERROR_ES);
         failed = true;
       }
     }
@@ -128,91 +121,110 @@ void HVMasterCallback::monitor() throw(RCHandlerException)
       state_new = HVState::UNKNOWN;
     }
   }
-  //if (failed) state_new = HVState::NOTREADY_S;
   if (state_new != HVState::UNKNOWN && state != state_new) {
-    setState(state_new);
+    setHVState(state_new);
   }
   const std::string nodename = m_node_v[m_node_v.size() - 1].getName();
   if (getNode().getState() != HVState::OFF_S &&
       checkAll(nodename, HVState::OFF_S)) {
-    setState(HVState::OFF_S);
+    setHVState(HVState::OFF_S);
+    setState(RCState::NOTREADY_S);
   }
   if (getNode().getState() != HVState::STANDBY_S &&
       checkAll(nodename, HVState::STANDBY_S)) {
-    setState(HVState::STANDBY_S);
+    setHVState(HVState::STANDBY_S);
   }
   if (getNode().getState() != HVState::PEAK_S &&
       checkAll(nodename, HVState::PEAK_S)) {
-    setState(HVState::PEAK_S);
+    setHVState(HVState::PEAK_S);
+    setState(RCState::READY_S);
+    m_loading = false;
+  }
+  if (m_loading) {
+    load(getDBObject());
   }
 }
 
 void HVMasterCallback::load(const DBObject& obj) throw(RCHandlerException)
 {
-  /*
-  bool ready = false;
-  while (!ready) {
-    ready = true;
-    for (HVNodeIterator it = m_node_v.begin(); it != m_node_v.end(); it++) {
-      HVNode& node(*it);
-      if (!node.isUsed()) continue;
-      HVState cstate(node.getState());
-      if (cstate != HVState::PEAK_S) {
-        try {
-          std::string s;
-          get(node, "hvstate", s, 1);
-          if ((cstate = HVState(s)) != Enum::UNKNOWN) {
-            setState(node, cstate);
-          }
-        } catch (const TimeoutException& e) {
-          LogFile::debug("%s timeout for state", node.getName().c_str());
+  m_loading = true;
+  for (HVNodeIterator it = m_node_v.begin(); it != m_node_v.end(); it++) {
+    HVNode& node(*it);
+    if (!node.isUsed()) continue;
+    HVState cstate(node.getState());
+    if (cstate != HVState::PEAK_S) {
+      try {
+        std::string s;
+        get(node, "hvstate", s, 1);
+        if ((cstate = HVState(s)) != Enum::UNKNOWN) {
+          setHVState(node, cstate);
+        } else {
+          setState(RCState::ERROR_ES);
+          m_loading = false;
+          return ;
         }
-      }
-      cstate = node.getState();
-      if (cstate == HVState::OFF_S) {
-        NSMCommunicator::send(NSMMessage(node, HVCommand::TURNON));
-        log(LogFile::DEBUG, "TURNON >> " + node.getName());
-        setState(node, HVState::TURNINGON_TS);
-        ready = false;
-      } else if (cstate == HVState::STANDBY_S) {
-        NSMCommunicator::send(NSMMessage(node, HVCommand::PEAK));
-        log(LogFile::DEBUG, "PEAK >> " + node.getName());
-        setState(node, HVState::RAMPINGUP_TS);
-        ready = false;
-      } else if (!cstate.isStable()) {
-        ready = false;
+      } catch (const TimeoutException& e) {
+        LogFile::debug("%s timeout for state", node.getName().c_str());
+        setState(RCState::ERROR_ES);
+        m_loading = false;
+        return ;
       }
     }
-    if (ready) break;
-    try {
-      perform(wait(NSMNode(), NSMCommand::UNKNOWN, 1));
-    } catch (const TimeoutException& e) {
-      monitor();
+    cstate = node.getState();
+    if (cstate == HVState::OFF_S) {
+      NSMCommunicator::send(NSMMessage(node, HVCommand::TURNON));
+      log(LogFile::DEBUG, "TURNON >> " + node.getName());
+      setHVState(node, HVState::TURNINGON_TS);
+    } else if (cstate == HVState::STANDBY_S) {
+      NSMCommunicator::send(NSMMessage(node, HVCommand::PEAK));
+      log(LogFile::DEBUG, "PEAK >> " + node.getName());
+      setHVState(node, HVState::RAMPINGUP_TS);
+    } else if (!cstate.isStable()) {
     }
   }
-  LogFile::debug("Load done");
-  */
+  const std::string nodename = m_node_v[m_node_v.size() - 1].getName();
+  if (getNode().getState() != HVState::OFF_S &&
+      checkAll(nodename, HVState::OFF_S)) {
+    setHVState(HVState::OFF_S);
+    setState(RCState::NOTREADY_S);
+  }
+  if (getNode().getState() != HVState::STANDBY_S &&
+      checkAll(nodename, HVState::STANDBY_S)) {
+    setHVState(HVState::STANDBY_S);
+  }
+  if (getNode().getState() != HVState::PEAK_S &&
+      checkAll(nodename, HVState::PEAK_S)) {
+    setHVState(HVState::PEAK_S);
+    setState(RCState::READY_S);
+    m_loading = false;
+  }
+  //  LogFile::debug("Load done");
+  //monitor();
 }
 
 void HVMasterCallback::start(int expno, int runno) throw(RCHandlerException)
 {
   LogFile::debug("run # = %04d.%04d.%03d", expno, runno, 0);
   LogFile::debug("Start done");
+  setState(RCState::RUNNING_S);
 }
 
 void HVMasterCallback::stop() throw(RCHandlerException)
 {
   LogFile::debug("Stop done");
+  setState(RCState::READY_S);
 }
 
 bool HVMasterCallback::resume(int subno) throw(RCHandlerException)
 {
+  setState(RCState::RUNNING_S);
   return true;
 }
 
 bool HVMasterCallback::pause() throw(RCHandlerException)
 {
   LogFile::debug("Pause done");
+  setState(RCState::PAUSED_S);
   return true;
 }
 
@@ -225,14 +237,8 @@ void HVMasterCallback::recover(const DBObject& obj) throw(RCHandlerException)
 
 void HVMasterCallback::abort() throw(RCHandlerException)
 {
-  /*
-  for (HVNodeIterator it = m_node_v.begin(); it != m_node_v.end(); it++) {
-    HVNode& node(*it);
-    if (!node.isUsed()) continue;
-    //NSMCommunicator::send(NSMMessage(node, HVCommand::TURNOFF));
-  }
-  LogFile::debug("Abort done");
-  */
+  m_loading = false;
+  setState(RCState::NOTREADY_S);
 }
 
 void HVMasterCallback::ok(const char* nodename, const char* data) throw()
@@ -245,7 +251,7 @@ void HVMasterCallback::ok(const char* nodename, const char* data) throw()
       if (state == NSMState::UNKNOWN) {
         LogFile::warning("got unknown state (%s) from %s", data, nodename);
       } else {
-        setState(node, state);
+        setHVState(node, state);
       }
     }
   } catch (const std::out_of_range& e) {}
@@ -256,7 +262,9 @@ void HVMasterCallback::error(const char* nodename, const char* data) throw()
 {
   try {
     HVNode& node(findNode(nodename));
-    setState(node, HVState::ERROR_ES);
+    m_loading = false;
+    setHVState(node, HVState::ERROR_ES);
+    setHVState(HVState::ERROR_ES);
   } catch (const std::out_of_range& e) {
     LogFile::warning("ERROR from unknown node %s : %s", nodename, data);
   }
@@ -345,11 +353,13 @@ bool HVMasterCallback::perform(NSMCommunicator& com) throw()
 
 void HVMasterCallback::distribute(NSMMessage msg) throw()
 {
+  m_loading = false;
   std::for_each(m_node_v.begin(), m_node_v.end(), Distributor(*this, msg));
 }
 
 void HVMasterCallback::distribute_r(NSMMessage msg) throw()
 {
+  m_loading = false;
   std::for_each(m_node_v.rbegin(), m_node_v.rend(), Distributor(*this, msg));
 }
 
@@ -386,7 +396,7 @@ bool HVMasterCallback::checkAll(const std::string& node, const HVState& state) t
   return true;
 }
 
-void HVMasterCallback::setState(const HVState& state) throw()
+void HVMasterCallback::setHVState(const HVState& state) throw()
 {
   if (m_hvnode.getState() != state) {
     LogFile::debug("state transit : %s >> %s",
@@ -414,11 +424,15 @@ void HVMasterCallback::setState(const HVState& state) throw()
   //reply(NSMMessage(NSMCommand::OK, state.getLabel()));
 }
 
-void HVMasterCallback::setState(HVNode& node, const HVState& state) throw()
+void HVMasterCallback::setHVState(HVNode& node, const HVState& state) throw()
 {
-  node.setState(state);
-  std::string vname = StringUtil::tolower(node.getName()) + ".hvstate";
-  set(vname, state.getLabel());
+  if (node.getState() != state) {
+    std::string vname = StringUtil::tolower(node.getName()) + ".hvstate";
+    LogFile::debug("state transit (%s): %s >> %s", node.getName().c_str(),
+                   node.getState().getLabel(), state.getLabel());
+    node.setState(state);
+    set(vname, state.getLabel());
+  }
 }
 
 void HVMasterCallback::setConfig(HVNode& node, const std::string& config) throw()
@@ -439,13 +453,14 @@ void HVMasterCallback::Distributor::operator()(HVNode& node) throw()
         if (NSMCommunicator::send(m_msg)) {
           HVState tstate = cmd.nextTState(HVState(node.getState()));
           if (tstate != Enum::UNKNOWN)
-            m_callback.setState(node, tstate);
+            m_callback.setHVState(node, tstate);
         } else {
           if (node.getState() != HVState::UNKNOWN) {
             m_callback.log(LogFile::ERROR, node.getName() + " is down.");
           }
-          m_callback.setState(node, HVState::UNKNOWN);
-          m_callback.setState(HVState::ERROR_ES);
+          m_callback.setHVState(node, HVState::UNKNOWN);
+          m_callback.setHVState(HVState::ERROR_ES);
+          m_callback.setState(RCState::ERROR_ES);
         }
       } catch (const NSMHandlerException& e) {
         LogFile::fatal("Failed to NSM2 request");
@@ -453,7 +468,8 @@ void HVMasterCallback::Distributor::operator()(HVNode& node) throw()
       } catch (const IOException& e) {
         LogFile::error(e.what());
         m_enabled = false;
-        m_callback.setState(HVState::UNKNOWN);
+        m_callback.setHVState(HVState::UNKNOWN);
+        m_callback.setState(RCState::NOTREADY_S);
       }
     }
   }

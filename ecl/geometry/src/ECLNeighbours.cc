@@ -158,12 +158,10 @@ void ECLNeighbours::initializeF(double frac)
           dist1 = dist;
           n2 = n1;
           n1 = geom->GetCellID(tidinner, inner);
-          pid2 = pid1;
           pid1 = inner;
         } else if (dist < dist2) {
           dist2 = dist;
           n2 = geom->GetCellID(tidinner, inner);
-          pid2 = inner;
         }
       }
 
@@ -194,12 +192,10 @@ void ECLNeighbours::initializeF(double frac)
           disto1 = dist;
           no2 = no1;
           no1 = geom->GetCellID(tidouter, outer);
-          pido2 = pido1;
           pido1 = outer;
         } else if (dist < disto2) {
           disto2 = dist;
           no2 = geom->GetCellID(tidouter, outer);
-          pido2 = outer;
         }
       }
       // check coverage

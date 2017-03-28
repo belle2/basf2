@@ -36,7 +36,7 @@ using namespace Belle2;
 
 Particle::Particle() :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
   m_arrayPointer(nullptr)
 {
   resetErrorMatrix();
@@ -44,7 +44,7 @@ Particle::Particle() :
 
 Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
   m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
   m_arrayPointer(nullptr)
 {
   setFlavorType();
@@ -58,12 +58,13 @@ Particle::Particle(const TLorentzVector& momentum,
                    const EParticleType type,
                    const unsigned mdstIndex) :
   m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(flavorType), m_particleType(type), m_mdstIndex(mdstIndex),
+  m_pValue(-1), m_flavorType(flavorType), m_particleType(type),
   m_arrayPointer(nullptr)
 {
   if (flavorType == c_Unflavored and pdgCode < 0)
     m_pdgCode = -pdgCode;
 
+  setMdstArrayIndex(mdstIndex);
   set4Vector(momentum);
   resetErrorMatrix();
 }
@@ -76,7 +77,7 @@ Particle::Particle(const TLorentzVector& momentum,
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1),
   m_daughterIndices(daughterIndices),
-  m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
   m_arrayPointer(arrayPointer)
 {
   m_pdgCode = pdgCode;
@@ -98,7 +99,7 @@ Particle::Particle(const TLorentzVector& momentum,
 Particle::Particle(const Track* track,
                    const Const::ChargedStable& chargedStable) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
   m_arrayPointer(nullptr)
 {
   if (!track) return;
@@ -108,7 +109,7 @@ Particle::Particle(const Track* track,
   m_flavorType = c_Flavored; //tracks are charged
   m_particleType = c_Track;
 
-  m_mdstIndex = track->getArrayIndex();
+  setMdstArrayIndex(track->getArrayIndex());
 
   // set PDG code TODO: ask Anze why this procedure is needed?
   int absPDGCode = chargedStable.getPDGCode();
@@ -129,7 +130,7 @@ Particle::Particle(const int trackArrayIndex,
                    const TrackFitResult* trackFit,
                    const Const::ChargedStable& chargedStable) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
   m_arrayPointer(nullptr)
 {
   if (!trackFit) return;
@@ -137,7 +138,8 @@ Particle::Particle(const int trackArrayIndex,
   m_flavorType = c_Flavored; //tracks are charged
   m_particleType = c_Track;
 
-  m_mdstIndex = trackArrayIndex;
+  setMdstArrayIndex(trackArrayIndex);
+
 
   int absPDGCode = chargedStable.getPDGCode();
   int signFlip = 1;
@@ -155,7 +157,7 @@ Particle::Particle(const int trackArrayIndex,
 
 Particle::Particle(const ECLCluster* eclCluster) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
   m_arrayPointer(nullptr)
 {
   if (!eclCluster) return;
@@ -171,7 +173,7 @@ Particle::Particle(const ECLCluster* eclCluster) :
   setVertex(eclCluster->getPosition());
 
   m_particleType = c_ECLCluster;
-  m_mdstIndex = eclCluster->getArrayIndex();
+  setMdstArrayIndex(eclCluster->getArrayIndex());
 
   // set Chi^2 probability:
   //TODO: gamma quality can be written here
@@ -183,7 +185,7 @@ Particle::Particle(const ECLCluster* eclCluster) :
 
 Particle::Particle(const KLMCluster* klmCluster) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
   m_arrayPointer(nullptr)
 {
   if (!klmCluster) return;
@@ -196,7 +198,7 @@ Particle::Particle(const KLMCluster* klmCluster) :
   setVertex(klmCluster->getPosition());
 
   m_particleType = c_KLMCluster;
-  m_mdstIndex = klmCluster->getArrayIndex();
+  setMdstArrayIndex(klmCluster->getArrayIndex());
 
   // set Chi^2 probability:
   //TODO: KL quality can be written here
@@ -209,7 +211,7 @@ Particle::Particle(const KLMCluster* klmCluster) :
 
 Particle::Particle(const MCParticle* mcParticle) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_identifier(-1),
   m_arrayPointer(nullptr)
 {
   if (!mcParticle) return;
@@ -217,7 +219,8 @@ Particle::Particle(const MCParticle* mcParticle) :
   m_pdgCode      = mcParticle->getPDG();
   m_particleType = c_MCParticle; // TODO: what about daughters if not FS particle?
 
-  m_mdstIndex = mcParticle->getArrayIndex();
+  setMdstArrayIndex(mcParticle->getArrayIndex());
+
 
   setFlavorType();
 
@@ -236,6 +239,52 @@ Particle::Particle(const MCParticle* mcParticle) :
 
 Particle::~Particle()
 {
+}
+
+void Particle::setMdstArrayIndex(const int arrayIndex)
+{
+  m_mdstIndex = arrayIndex;
+
+  // set the identifier
+  if (m_particleType == c_ECLCluster) {
+    const ECLCluster* cluster = this->getECLCluster();
+    if (cluster) {
+      const int crid     = cluster->getConnectedRegionId();
+      const int showerid = cluster->getClusterId();
+      m_identifier = 1000 * crid + showerid;
+    } else {
+      B2ERROR("Particle is of type = ECLCluster has identifier not set and no relation to ECLCluster.\n"
+              "This has happen because old microDST is analysed with newer version of software.");
+    }
+  } else {
+    m_identifier = m_mdstIndex;
+  }
+}
+
+
+int Particle::getMdstSource() const
+{
+  // Is identifier already set
+  if (m_identifier > -1)
+    return m_identifier + (m_particleType << 24);
+
+  // Identifier is not set.
+  int identifier = 0;
+  if (m_particleType == c_ECLCluster) {
+    const ECLCluster* cluster = this->getECLCluster();
+    if (cluster) {
+      const int crid     = cluster->getConnectedRegionId();
+      const int showerid = cluster->getClusterId();
+      identifier = 1000 * crid + showerid;
+    } else {
+      B2ERROR("Particle is of type = ECLCluster has identifier not set and no relation to ECLCluster.\n"
+              "This has happen because old microDST is analysed with newer version of software.");
+    }
+  } else {
+    identifier = m_mdstIndex;
+  }
+
+  return identifier + (m_particleType << 24);
 }
 
 
@@ -666,6 +715,7 @@ std::string Particle::getInfoHTML() const
 
   stream << " <b>mdstIndex</b>=" << m_mdstIndex;
   stream << " <b>arrayIndex</b>=" << getArrayIndex();
+  stream << " <b>identifier</b>=" << m_identifier;
   stream << " <b>daughterIndices</b>: ";
   for (unsigned i = 0; i < m_daughterIndices.size(); i++) {
     stream << m_daughterIndices[i] << ", ";

@@ -2,6 +2,7 @@
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/ECLCluster.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
@@ -27,8 +28,10 @@ namespace {
       StoreArray<Particle> particles;
       StoreArray<MCParticle> mcparticles;
       StoreArray<RestOfEvent> roes;
+      StoreArray<ECLCluster> eclClusters;
       particles.registerInDataStore();
       mcparticles.registerInDataStore();
+      eclClusters.registerInDataStore();
       roes.registerInDataStore();
       particles.registerRelationTo(mcparticles);
       particles.registerRelationTo(roes);
@@ -131,6 +134,25 @@ namespace {
   TEST_F(ParticleTest, Copies)
   {
     StoreArray<Particle> particles;
+    StoreArray<ECLCluster> eclClusters;
+    ECLCluster* eclGamma1 = eclClusters. appendNew(ECLCluster());
+    eclGamma1->setConnectedRegionId(1);
+    eclGamma1->setClusterId(1);
+    eclGamma1->setHypothesisId(5);
+    ECLCluster* eclGamma2 = eclClusters. appendNew(ECLCluster());
+    eclGamma2->setConnectedRegionId(1);
+    eclGamma2->setClusterId(2);
+    eclGamma2->setHypothesisId(5);
+    ECLCluster* eclGamma3 = eclClusters. appendNew(ECLCluster());
+    eclGamma3->setConnectedRegionId(2);
+    eclGamma3->setClusterId(1);
+    eclGamma3->setHypothesisId(5);
+    ECLCluster* eclKL = eclClusters. appendNew(ECLCluster());
+    eclKL->setConnectedRegionId(2);
+    eclKL->setClusterId(1);
+    eclKL->setHypothesisId(6);
+
+
 
     // create some particles
     Particle* T1Pion     = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0),  211, Particle::c_Flavored, Particle::c_Track, 1));
@@ -147,10 +169,22 @@ namespace {
 
     // T1Gamma
     Particle* T1Gamma    = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
-                                                        1));
+                                                        0));
     // T2Gamma
     Particle* T2Gamma    = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
+                                                        1));
+
+    // T3Gamma
+    Particle* T3Gamma    = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
                                                         2));
+    // T4KL
+    Particle* T4KL       = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 130, Particle::c_Unflavored, Particle::c_ECLCluster,
+                                                        3));
+
+    EXPECT_TRUE(T3Gamma->overlapsWith(T4KL));
+    EXPECT_FALSE(T3Gamma->overlapsWith(T2Gamma));
+    EXPECT_FALSE(T3Gamma->overlapsWith(T1Gamma));
+    EXPECT_FALSE(T1Gamma->overlapsWith(T2Gamma));
 
     EXPECT_TRUE(T1Pion->isCopyOf(T1PionCopy));
     EXPECT_FALSE(T1Pion->isCopyOf(T1Kaon));

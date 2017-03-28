@@ -65,6 +65,9 @@ namespace Belle2 {
       /**  initialize the radius neighbout list. */
       void initializeR(const double radius);
 
+      /**  initialize the fractional cross neighbout list. */
+      void initializeF(const double fraction);
+
       /**  return the previous phi id. */
       short int decreasePhiId(const short int phiid, const short int thetaid, const short int n);
 

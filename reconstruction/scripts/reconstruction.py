@@ -6,6 +6,7 @@ from basf2 import *
 from tracking import (
     add_mc_tracking_reconstruction,
     add_tracking_reconstruction,
+    add_cr_tracking_reconstruction,
     add_mc_track_finding,
     add_track_finding,
     add_prune_tracks,
@@ -41,7 +42,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
         not make any trigger decisions itself.
     :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
-        determine, if the geometry is already loaded. This flag can be used o just turn off the geometry adding at
+        determine, if the geometry is already loaded. This flag can be used to just turn off the geometry adding at
         all (but you will have to add it on your own then).
     :param additionalTrackFitHypotheses: Change the additional fitted track fit hypotheses. If no argument is given,
         the additional fitted hypotheses are muon, kaon and proton, i.e. [13, 321, 2212].
@@ -71,6 +72,46 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
         add_fast_reco_software_trigger(path)
         add_hlt_software_trigger(path)
         add_calibration_software_trigger(path)
+
+
+def add_cosmics_reconstruction(
+        path,
+        components=None,
+        pruneTracks=True,
+        skipGeometryAdding=False,
+        eventTimingExtraction=False,
+        addClusterExpertModules=True):
+    """
+    This function adds the standard reconstruction modules for cosmic data to a path.
+    Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
+    plus the modules to calculate the software trigger cuts.
+
+    :param path: Add the modules to this path.
+    :param components: list of geometry components to include reconstruction for, or None for all components.
+    :param pruneTracks: Delete all hits except the first and last of the tracks after the dEdX modules.
+    :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
+        if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
+        determine, if the geometry is already loaded. This flag can be used to just turn off the geometry adding at
+        all (but you will have to add it on your own then).
+    :param eventTimingExtraction: extract time with either the TrackTimeExtraction or
+        FullGridTrackTimeExtraction modules.
+    :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to improve
+        reconstruction performance.
+    """
+
+    # Add cdc tracking reconstruction modules
+    add_cr_tracking_reconstruction(path,
+                                   components=components,
+                                   pruneTracks=False,
+                                   skipGeometryAdding=skipGeometryAdding,
+                                   eventTimingExtraction=eventTimingExtraction)
+
+    # Add further reconstruction modules
+    add_posttracking_reconstruction(path,
+                                    components=components,
+                                    pruneTracks=pruneTracks,
+                                    addClusterExpertModules=addClusterExpertModules,
+                                    trigger_mode="all")
 
 
 def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True):

@@ -5,7 +5,6 @@
 #include <framework/gearbox/Unit.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 
@@ -291,24 +290,13 @@ NeuroTrigger::selectMLP(const CDCTriggerTrack& track)
 }
 
 vector<int>
-NeuroTrigger::selectMLPs(const CDCTriggerTrack& track,
-                         const MCParticle& mcparticle, bool selectByMC)
+NeuroTrigger::selectMLPs(float phi0, float invpt, float theta)
 {
   vector<int> indices = {};
 
   if (m_MLPs.size() == 0) {
     B2WARNING("Trying to select MLP before initializing MLPs.");
     return indices;
-  }
-
-  float phi0 = track.getPhi0();
-  float invpt = track.getKappa(1.5);
-  float theta = atan2(1., track.getCotTheta());
-
-  if (selectByMC) {
-    phi0 = mcparticle.getMomentum().Phi();
-    invpt = mcparticle.getCharge() / mcparticle.getMomentum().Pt();
-    theta = mcparticle.getMomentum().Theta();
   }
 
   // find all matching sectors

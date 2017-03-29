@@ -292,8 +292,15 @@ void NeuroTriggerTrainerModule::event()
     m_NeuroTrigger.updateTrack(*tracks[itrack]);
 
     // find all matching sectors
-    vector<int> sectors = m_NeuroTrigger.selectMLPs(*tracks[itrack], *mcTrack,
-                                                    m_selectSectorByMC);
+    float phi0 = tracks[itrack]->getPhi0();
+    float invpt = tracks[itrack]->getKappa(1.5);
+    float theta = atan2(1., tracks[itrack]->getCotTheta());
+    if (m_selectSectorByMC) {
+      phi0 = mcTrack->getMomentum().Phi();
+      invpt = mcTrack->getCharge() / mcTrack->getMomentum().Pt();
+      theta = mcTrack->getMomentum().Theta();
+    }
+    vector<int> sectors = m_NeuroTrigger.selectMLPs(phi0, invpt, theta);
     if (sectors.size() == 0) continue;
     // get target values
     vector<float> targetRaw = {};

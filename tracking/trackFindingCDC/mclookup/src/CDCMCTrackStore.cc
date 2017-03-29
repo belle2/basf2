@@ -19,6 +19,8 @@
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>

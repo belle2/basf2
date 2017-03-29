@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCFacetSegment.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 

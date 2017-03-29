@@ -24,8 +24,8 @@ namespace Belle2 {
    * NOTE: currently only working with SVD clusters!
    *
    * Intended Behaviour: The Module takes a RecoTrack and converts it to a SpacePointTrackCand
-   * by taking the Clusters of the RecoTrack and then look for Relations of these Clusters to SpacePoints.
-   *
+   * by taking the Clusters (PXD and SVD) of the RecoTrack and then look for Relations of these Clusters to SpacePoints.
+   * NOTE: other hits than PXD and SVD are ignored!
    *
    */
   class RT2SPTCConverterModule : public Module {

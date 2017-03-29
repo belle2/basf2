@@ -574,7 +574,8 @@ namespace Belle2 {
     /**
      * Return a list of all RecoHitInformations associated with the RecoTrack. This is especially useful when
      * you want to iterate over all (fitted) hits in a track without caring whether its a CDC, VXD etc hit.
-     * @param getSorted : if true a sorted list of RecoHitInformations will be returned otherwise an unsorted one
+     * @param getSorted if true, the list of RecoHitInformations will be returned sorted by the Sorting parameter
+     * in an ascending order. If false, the hits will be returned unsorted.
      */
     std::vector<RecoHitInformation*> getRecoHitInformations(bool getSorted = false) const
     {

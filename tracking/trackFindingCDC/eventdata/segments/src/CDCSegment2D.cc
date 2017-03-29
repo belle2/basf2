@@ -7,7 +7,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCFacetSegment.h>
@@ -16,6 +15,9 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
 
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/utilities/GetIterator.h>
 
 #include <boost/range/adaptor/reversed.hpp>
@@ -124,8 +126,8 @@ namespace {
       result.push_back(secondFacetIt->getEndRecoHit2D());
 
     } else { // nFacets > 2
-      FacetIt firstFacetIt = facetIt++;   // facetSegment[0];
-      FacetIt secondFacetIt = facetIt++;  // facetSegment[1];
+      FacetIt firstFacetIt = facetIt++; // facetSegment[0];
+      FacetIt secondFacetIt = facetIt++; // facetSegment[1];
       FacetIt thirdFacetIt = facetIt++;  // facetSegment[2];
 
       result.push_back(firstFacetIt->getStartRecoHit2D());
@@ -138,10 +140,9 @@ namespace {
                                              thirdFacetIt->getStartRecoHit2D()));
 
       while (facetIt != endFacetIt) {
-
-        firstFacetIt = secondFacetIt;                   // facetSegment[iFacet];
-        secondFacetIt = thirdFacetIt;                   // facetSegment[iFacet+1];
-        thirdFacetIt = facetIt++;                     // facetSegment[iFacet+2];
+        firstFacetIt = secondFacetIt; // facetSegment[iFacet];
+        secondFacetIt = thirdFacetIt; // facetSegment[iFacet+1];
+        thirdFacetIt = facetIt++; // facetSegment[iFacet+2];
 
         result.push_back(CDCRecoHit2D::average(firstFacetIt->getEndRecoHit2D(),
                                                secondFacetIt->getMiddleRecoHit2D(),
@@ -236,9 +237,14 @@ CDCSegment2D CDCSegment2D::reconstructUsingFacets(const CDCRLWireHitSegment& rlW
   }
 }
 
-Relation<const CDCSegment2D> CDCSegment2D::makeRelation(const CDCSegment2D& segment) const
+Relation<const CDCSegment2D> CDCSegment2D::makeRelation(const CDCSegment2D* segment) const
 {
-  return {this, &segment};
+  return {this, segment};
+}
+
+WeightedRelation<const CDCSegment2D> CDCSegment2D::makeWeightedRelation(double weight, const CDCSegment2D* segment) const
+{
+  return {this, weight, segment};
 }
 
 bool CDCSegment2D::operator<(const CDCSegment2D& segment2D) const

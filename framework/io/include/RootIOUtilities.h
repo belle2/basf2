@@ -26,12 +26,10 @@ namespace Belle2 {
     /** Given a list of input branches and lists of branches to include/exclude, returns a list of branches that are accepted.
      *
      * More precisely, an item b from 'branchesToFilter' will be in the returned set if
-     * b not excludeBranches and (b in branches or empty(branches) or b in relationsBetweenAcceptedBranches)
-     *
-     * TODO: arrays listed in excludeBranches will still have their (not otherwise excluded) relations in the output. need to incorporate DataStore / Branch type information to make this work properly.
+     * b not in excludeBranches and (b in branches or empty(branches) or b in relationsBetweenAcceptedBranches) and b not in relationsInvolvingExcludedBranches
      *
      * @param branchesToFilter input
-     * @param branches if not empty, the list of branches (without relations) to be accepted
+     * @param branches if not empty, the list of branches to be accepted
      * @param excludeBranches branches that should never end up in output (takes precedence over everything else)
      * @param durability Durability being filtered (used for messages only)
      */

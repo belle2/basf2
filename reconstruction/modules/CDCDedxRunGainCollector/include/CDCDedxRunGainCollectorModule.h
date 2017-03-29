@@ -55,16 +55,6 @@ namespace Belle2 {
     int m_run = -1;    /**< Current run id */
     int m_exp = -1;    /**< Current experiment id */
     int m_procId = -1; /**< Current process id */
-
-    // track level information
-    double m_dedx = -1;  /**< dE/dx truncated mean */
-    double m_costh = -1; /**< track cos(theta) */
-    int m_nhits = -1;    /**< number of dE/dx hits on the track */
-
-    // hit level information
-    int m_wire[100];       /**< wire number for hit */
-    int m_layer[100];      /**< continuous layer number for hit */
-    double m_dedxhit[100]; /**< dE/dx for hit */
   };
 }
 

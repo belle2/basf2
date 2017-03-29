@@ -56,8 +56,8 @@ int main(int argc, char** argv)
     for (;;) {
       irb = rbuf->insq((int*)evbuf, (is - 1) / 4 + 1);
       if (irb >= 0) break;
-      usleep(100);
-      //      usleep(20);
+      //      usleep(100);
+      usleep(20);
     }
   }
 }

@@ -39,6 +39,8 @@ namespace Belle2 {
         c_Taken = 32,
         c_Background = 64,
         c_Priority = 128,
+        c_Reverse = 256,
+        c_Alias = 512,
       };
 
       /// Type for an ored combination of the status flags of cells in the cellular automata
@@ -51,8 +53,9 @@ namespace Belle2 {
                                                       ECellFlag::c_Cycle +
                                                       ECellFlag::c_Masked +
                                                       ECellFlag::c_Taken +
-                                                      ECellFlag::c_Background);
-
+                                                      ECellFlag::c_Background +
+                                                      ECellFlag::c_Reverse +
+                                                      ECellFlag::c_Alias);
 
       /// Flage that are reset at the start of each run of the cellular automaton
       static const ECellFlags c_TemporaryFlags = ECellFlags(ECellFlag::c_Assigned +
@@ -265,6 +268,42 @@ namespace Belle2 {
       bool hasPriorityFlag() const
       {
         return hasAnyFlags(ECellFlag::c_Priority);
+      }
+
+      /// Sets the reverse flag to the given value. Default value true.
+      void setReverseFlag(bool setTo = true)
+      {
+        setFlags<ECellFlag::c_Reverse>(setTo);
+      }
+
+      /// Resets the reverse flag to false.
+      void unsetReverseFlag()
+      {
+        setFlags<ECellFlag::c_Reverse>(false);
+      }
+
+      /// Gets the current state of the do not use flag marker flag.
+      bool hasReverseFlag() const
+      {
+        return hasAnyFlags(ECellFlag::c_Reverse);
+      }
+
+      /// Sets the alias flag to the given value. Default value true.
+      void setAliasFlag(bool setTo = true)
+      {
+        setFlags<ECellFlag::c_Alias>(setTo);
+      }
+
+      /// Resets the alias flag to false.
+      void unsetAliasFlag()
+      {
+        setFlags<ECellFlag::c_Alias>(false);
+      }
+
+      /// Gets the current state of the do not use flag marker flag.
+      bool hasAliasFlag() const
+      {
+        return hasAnyFlags(ECellFlag::c_Alias);
       }
 
       /// Setting accessing the flag by tag.

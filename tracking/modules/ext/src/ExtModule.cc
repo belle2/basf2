@@ -140,7 +140,8 @@ void ExtModule::beginRun()
 
 void ExtModule::event()
 {
-  m_Extrapolator->event(false);
+  //m_Extrapolator->event(false);
+  m_Extrapolator->eventExt();
 }
 
 void ExtModule::endRun()

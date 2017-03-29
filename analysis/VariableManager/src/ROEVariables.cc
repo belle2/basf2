@@ -447,16 +447,15 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr nROEPi0(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr nParticlesInROE(const std::vector<std::string>& arguments)
     {
-      std::string pi0ListName;
 
       if (arguments.size() != 1)
-        B2FATAL("Wrong number of arguments (1 required) for meta function nROEPi0s");
+        B2FATAL("Wrong number of arguments (1 required) for meta function nParticlesInROE");
 
-      pi0ListName = "pi0:" + arguments[0];
+      std::string pListName = arguments[0];
 
-      auto func = [pi0ListName](const Particle * particle) -> double {
+      auto func = [pListName](const Particle * particle) -> double {
 
         // Get related ROE object
         const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
@@ -467,19 +466,21 @@ namespace Belle2 {
           return -1;
         }
 
-        int nPi0 = 0;
+        int nPart = 0;
 
         // Get pi0 particle list
-        StoreObjPtr<ParticleList> pi0ParticleList(pi0ListName);
+        StoreObjPtr<ParticleList> pList(pListName);
+        if (!pList.isValid())
+          B2FATAL("ParticleList " << pListName << " could not be found or is not valid!");
 
-        for (unsigned int i = 0; i < pi0ParticleList->getListSize(); i++)
+        for (unsigned int i = 0; i < pList->getListSize(); i++)
         {
-          const Particle* pi0 = pi0ParticleList->getParticle(i);
-          if (isInThisRestOfEvent(pi0, roe) == 1)
-            ++nPi0;
+          const Particle* part = pList->getParticle(i);
+          if (isInThisRestOfEvent(part, roe) == 1)
+            ++nPart;
         }
 
-        return nPi0;
+        return nPart;
       };
       return func;
     }
@@ -1335,38 +1336,41 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function trackPassesMask");
+        B2FATAL("Wrong number of arguments (1 required) for meta function passesROEMask");
 
       auto func = [maskName](const Particle * particle) -> double {
 
+        double result = -1;
+
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (not roe.isValid())
-          return -1;
-
-        double result = -1;
+          return result;
 
         if (particle->getParticleType() == Particle::c_Track)
         {
-
           const Track* track = particle->getTrack();
 
           std::map<unsigned int, bool> trackMask = roe->getTrackMask(maskName);
 
-          result = trackMask.at(track->getArrayIndex());
+          auto it = trackMask.find(track->getArrayIndex());
+          if (it == trackMask.end())
+            B2ERROR("Something is wrong, track not found in map of ROE tracks!");
+          else
+            result = trackMask[track->getArrayIndex()];
         } else if (particle->getParticleType() == Particle::c_ECLCluster)
         {
-
           const ECLCluster* ecl = particle->getECLCluster();
 
           std::map<unsigned int, bool> eclClusterMask = roe->getECLClusterMask(maskName);
 
-          result = eclClusterMask.at(ecl->getArrayIndex());
-        } else {
+          auto it = eclClusterMask.find(ecl->getArrayIndex());
+          if (it == eclClusterMask.end())
+            B2ERROR("Something is wrong, cluster not found in map of ROE clusters!");
+          else
+            result = eclClusterMask[ecl->getArrayIndex()];
+        } else
           B2ERROR("Particle used is not an ECLCluster or Track type particle!");
-        }
-
         return result;
-
       };
       return func;
     }
@@ -1623,9 +1627,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("nROENeutralECLClusters(maskName)", nROENeutralECLClusters,
                       "Returns number of neutral ECL clusters in the related RestOfEvent object that pass the selection criteria.");
 
-    REGISTER_VARIABLE("nROEPi0(pi0PListLabel)", nROEPi0,
-                      "Returns the number of pi0s in ROE from the given pi0 particle list.\n"
-                      "The accepted argument is the label of the pi0 particle list, not the full particle list name (part of name after colon)!");
+    REGISTER_VARIABLE("nParticlesInROE(pListName)", nParticlesInROE,
+                      "Returns the number of particles in ROE from the given particle list.\n"
+                      "Use of variable aliases is advised.");
 
     REGISTER_VARIABLE("ROE_charge(maskName)", ROECharge,
                       "Returns total charge of the related RestOfEvent object.");

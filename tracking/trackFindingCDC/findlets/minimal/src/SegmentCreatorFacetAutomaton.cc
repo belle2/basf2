@@ -33,10 +33,20 @@ std::string SegmentCreatorFacetAutomaton::getDescription()
 
 void SegmentCreatorFacetAutomaton::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(prefixed(prefix, "constructFacetAliases"),
-                                m_param_constructFacetAliases,
+  moduleParamList->addParameter(prefixed(prefix, "searchReversed"),
+                                m_param_searchReversed,
+                                "Switch to construct the reversed segment if it is available in the facet graph as well.",
+                                m_param_searchReversed);
+
+  moduleParamList->addParameter(prefixed(prefix, "searchAlias"),
+                                m_param_searchAlias,
                                 "Switch to construct the alias segment if it is available in the facet graph as well.",
-                                m_param_constructFacetAliases);
+                                m_param_searchAlias);
+
+  moduleParamList->addParameter(prefixed(prefix, "relaxSingleLayerSearch"),
+                                m_param_relaxSingleLayerSearch,
+                                "Switch to relax the alias and reverse search for segments contained in a single layer.",
+                                m_param_relaxSingleLayerSearch);
 }
 
 void SegmentCreatorFacetAutomaton::apply(
@@ -77,7 +87,9 @@ void SegmentCreatorFacetAutomaton::apply(
 
     // Helper function to check if a segment is also present in the graph of facets
     // Used in the search for aliasing segments
-    auto getFacetPath = [&facetsInCluster, &facetNeighborhood, &iCluster](CDCSegment2D & segment) {
+    auto getFacetPath = [&facetsInCluster,
+                         &facetNeighborhood,
+    &iCluster](const CDCSegment2D & segment, bool checkRelations = true) {
       CDCRLWireHitSegment rlWireHitSegment = segment.getRLWireHitSegment();
       CDCFacetSegment aliasFacetSegment = CDCFacetSegment::create(rlWireHitSegment);
       std::vector<const CDCFacet*> facetPath;
@@ -92,7 +104,7 @@ void SegmentCreatorFacetAutomaton::apply(
         const CDCFacet* facet = &*itFacet;
 
         // Check whether there is a relation to this new facet
-        if (not facetPath.empty()) {
+        if (not facetPath.empty() and checkRelations) {
           const CDCFacet* fromFacet = facetPath.back();
           auto relationsFromFacet =
             std::equal_range(facetNeighborhood.begin(), facetNeighborhood.end(), fromFacet);
@@ -103,29 +115,76 @@ void SegmentCreatorFacetAutomaton::apply(
       return facetPath;
     };
 
-    outputSegments.reserve(outputSegments.size() + m_facetPaths.size());
+    // Resever enough space to prevent reallocation and invalidated references
+    size_t additionalSpace = m_facetPaths.size();
+    if (m_param_searchReversed) additionalSpace *= 2;
+    if (m_param_searchAlias) additionalSpace *= 2;
+    outputSegments.reserve(outputSegments.size() + additionalSpace);
+
     for (const std::vector<const CDCFacet*>& facetPath : m_facetPaths) {
       outputSegments.push_back(CDCSegment2D::condense(facetPath));
-      const CDCSegment2D& segment =  outputSegments.back();
+      const CDCSegment2D* segment = &outputSegments.back();
 
-      if (not m_param_constructFacetAliases) continue;
+      // Check for the special situation where the segment is confined to one layer
+      // Relax the alias search a bit to better capture the situation
+      bool checkRelations = true;
+      if (m_param_relaxSingleLayerSearch) {
+        auto differentILayer = [](const CDCRecoHit2D & lhs, const CDCRecoHit2D & rhs) {
+          return lhs.getWire().getILayer() != rhs.getWire().getILayer();
+        };
+        auto itLayerSwitch = std::adjacent_find(segment->begin(), segment->end(), differentILayer);
+        const bool onlyOneLayer = itLayerSwitch == segment->end();
+        checkRelations = not onlyOneLayer;
+      }
+
+      const CDCSegment2D* reverseSegment = nullptr;
+      if (m_param_searchReversed) {
+        std::vector<const CDCFacet*> reverseFacetPath = getFacetPath(segment->reversed(), checkRelations);
+        if (reverseFacetPath.size() == facetPath.size()) {
+          B2DEBUG(100, "Successful constructed REVERSE");
+          outputSegments.push_back(CDCSegment2D::condense(reverseFacetPath));
+          reverseSegment = &outputSegments.back();
+
+          (*segment)->setReverseFlag(true);
+          (*reverseSegment)->setReverseFlag(true);
+        }
+      }
+
+      if (not m_param_searchAlias) continue;
 
       // Search for aliasing segment in the facet graph
-      int nRLSwitches = segment.getNRLSwitches();
+      int nRLSwitches = segment->getNRLSwitches();
       if (nRLSwitches > 2) continue; // Segment is stable against aliases
 
-      CDCSegment2D aliasSegment = segment.getAlias();
-      std::vector<const CDCFacet*> aliasFacetPath = getFacetPath(aliasSegment);
+      const CDCSegment2D* aliasSegment = nullptr;
+      std::vector<const CDCFacet*> aliasFacetPath = getFacetPath(segment->getAlias(), checkRelations);
       if (aliasFacetPath.size() == facetPath.size()) {
         B2DEBUG(100, "Successful constructed alias");
         outputSegments.push_back(CDCSegment2D::condense(aliasFacetPath));
-      } else {
-        aliasSegment.reverse();
-        std::vector<const CDCFacet*> reverseAliasFacetPath = getFacetPath(aliasSegment);
+        aliasSegment = &outputSegments.back();
+
+        (*segment)->setAliasFlag(true);
+        (*aliasSegment)->setAliasFlag(true);
+      }
+
+      const CDCSegment2D* reverseAliasSegment = nullptr;
+      if (m_param_searchReversed) {
+        std::vector<const CDCFacet*> reverseAliasFacetPath =
+          getFacetPath(segment->reversed().getAlias(), checkRelations);
         if (reverseAliasFacetPath.size() == facetPath.size()) {
           B2DEBUG(100, "Successful constructed REVERSE alias");
           outputSegments.push_back(CDCSegment2D::condense(reverseAliasFacetPath));
+          reverseAliasSegment = &outputSegments.back();
+          if (aliasSegment != nullptr) {
+            (*aliasSegment)->setReverseFlag(true);
+            (*reverseAliasSegment)->setReverseFlag(true);
+          }
         }
+      }
+
+      if (reverseSegment != nullptr and reverseAliasSegment != nullptr) {
+        (*reverseSegment)->setAliasFlag(true);
+        (*reverseAliasSegment)->setAliasFlag(true);
       }
     }
   }

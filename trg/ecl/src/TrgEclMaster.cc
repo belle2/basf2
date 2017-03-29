@@ -54,7 +54,6 @@ TrgEclMaster::TrgEclMaster():
   TCHitBeamBkgTag.clear();
 
 
-
   TCEnergy.resize(576);
   TCTiming.resize(576);
   TCBeamBkgTag.resize(576);
@@ -65,9 +64,6 @@ TrgEclMaster::TrgEclMaster():
 
   //ThetaRingSum.resize(3,std::vector<double>(36,0));
   //PhiRingSum.resize(17,0);
-
-  ClusterEnergy.clear();
-  ClusterTiming.clear();
 
   //  obf_timing = new TrgEclTiming();
   obj_cluster = new TrgEclCluster();
@@ -276,7 +272,7 @@ TrgEclMaster::simulate01(int m_nEvent)
       boolBtoBTag  =  obj_bhabha -> GetBhabha00(phiringsum);
       vct_bhabha = obj_bhabha -> GetBhabhaComb();
     } else if (_Bhabha == 1) {
-      boolBtoBTag  =  obj_bhabha -> GetBhabha01(ClusterEnergy, ClusterTiming);
+      boolBtoBTag  =  obj_bhabha -> GetBhabha01();
     }
     int BtoBTag = 0;
     if (boolBtoBTag && icn > 4) {
@@ -618,7 +614,7 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
     boolBtoBTag  =  obj_bhabha -> GetBhabha00(phiringsum);
     vct_bhabha = obj_bhabha -> GetBhabhaComb();
   } else if (_Bhabha == 1) {
-    boolBtoBTag  =  obj_bhabha -> GetBhabha01(ClusterEnergy, ClusterTiming);
+    boolBtoBTag  =  obj_bhabha -> GetBhabha01();
   }
   int BtoBTag = 0;
   if (boolBtoBTag && icn > 4) {

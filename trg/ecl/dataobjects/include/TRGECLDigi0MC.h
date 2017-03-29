@@ -142,7 +142,7 @@ namespace Belle2 {
     void setEventId(int eventid) { m_eventid = eventid; }
     //! Set TC id
     void setTCId(int tcid) { m_tcid = tcid; }
-    //!
+    //! Set Bin Number
     void setiBinTime(int ibintime) { m_ibintime = ibintime; }
 
     //! Set Energy and Timing
@@ -266,10 +266,11 @@ namespace Belle2 {
     int getEventId() const { return m_eventid; }
     //! Get TC id
     int getTCId() const { return m_tcid; }
-    //!
+    //! get Bin number
     int getiBinTime() const { return m_ibintime; }
-    //! Get Energy and Timing
+    //! Get Raw Energy
     double getRawEnergy() const {return m_raw_energy; }
+    //! Get Raw Timing
     double getRawTiming() const {return m_raw_timing; }
 
     //! Empty constructor

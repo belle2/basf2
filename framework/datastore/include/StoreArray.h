@@ -107,8 +107,6 @@ namespace Belle2 {
    *  @sa See StoreObjPtr for a way store single objects
    *  @sa Data can also be accessed from Python modules using PyStoreArray
    *  @sa While individual elements cannot be removed directly from StoreArray, SelectSubset can be used to filter it.
-   *
-   *  @author <a href="mailto:software@belle2.kek.jp?subject=StoreArray">The basf2 developers</a>
    */
   template <class T>
   class StoreArray : public StoreAccessorBase {

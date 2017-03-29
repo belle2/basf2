@@ -17,6 +17,7 @@
 #include <top/dbobjects/TOPNominalQE.h>
 #include <top/dbobjects/TOPNominalTTS.h>
 #include <top/dbobjects/TOPNominalTDC.h>
+#include <top/dbobjects/TOPSignalShape.h>
 #include <framework/gearbox/Unit.h>
 #include <vector>
 
@@ -94,6 +95,12 @@ namespace Belle2 {
     void setNominalTDC(const TOPNominalTDC& nominalTDC) {m_nominalTDC = nominalTDC;}
 
     /**
+     * Sets single photon signal shape
+     * @param signalShape signal shape
+     */
+    void setSignalShape(const TOPSignalShape& signalShape) {m_signalShape = signalShape;}
+
+    /**
      * Returns number of modules
      * @return number of modules
      */
@@ -156,6 +163,12 @@ namespace Belle2 {
     const TOPNominalTDC& getNominalTDC() const {return m_nominalTDC;}
 
     /**
+     * Returns single photon signal shape
+     * @return signal shape
+     */
+    const TOPSignalShape& getSignalShape() const {return m_signalShape;}
+
+    /**
      * Returns inner radius of the volume devoted to TOP counter
      * @return inner radius
      */
@@ -207,8 +220,9 @@ namespace Belle2 {
     TOPNominalQE m_nominalQE; /**< nominal quantum efficiency of PMT */
     TOPNominalTTS m_nominalTTS; /**< nominal time transition spread of PMT */
     TOPNominalTDC m_nominalTDC; /**< nominal time-to-digit conversion parameters */
+    TOPSignalShape m_signalShape; /**< shape of single photon signal */
 
-    ClassDef(TOPGeometry, 3); /**< ClassDef */
+    ClassDef(TOPGeometry, 4); /**< ClassDef */
 
   };
 

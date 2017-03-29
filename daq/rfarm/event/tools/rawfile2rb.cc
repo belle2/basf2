@@ -59,8 +59,8 @@ retry:
     for (;;) {
       irb = rbuf->insq((int*)buf, *recsize);
       if (irb >= 0) break;
-      usleep(100);
-      //      usleep(20);
+      //      usleep(100);
+      usleep(20);
     }
     nrec++;
   }

@@ -33,7 +33,7 @@ class CDCCombined(TrackingValidationRun):
 
     def finder_module(self, path):
         tracking.add_cdc_track_finding(path, with_ca=True)
-        # adjust_module(path, "WireHitPreparer",
+        # adjust_module(path, "TFCDC_WireHitPreparer",
         #               UseNLoops=1)
 
     tracking_coverage = {

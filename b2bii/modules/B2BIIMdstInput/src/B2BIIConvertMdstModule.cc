@@ -917,6 +917,11 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
     convertMdstECLObject(mdstEcl, mdstEclAux, B2EclCluster);
     mdstEclToECLCluster[mdstEcl.get_ID()] = B2EclCluster->getArrayIndex();
 
+    // set ConnectedRegionID and ClusterID to
+    // cluster's array index + 1 and 1, respectively
+    B2EclCluster->setConnectedRegionId(B2EclCluster->getArrayIndex() + 1);
+    B2EclCluster->setClusterId(1);
+
     if (m_realData)
       continue;
 

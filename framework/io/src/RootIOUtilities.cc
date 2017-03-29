@@ -40,12 +40,30 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
       B2WARNING(c_SteerExcludeBranchNames[durability] << " has duplicate entry " << b);
   }
 
-  set<string> out, relations;
+  set<string> out, relations, excluderelations;
   for (string branch : branchesToFilter) {
     if (excludeBranchSet.count(branch))
       continue;
     if (branchSet.empty() or branchSet.count(branch))
       out.insert(branch);
+  }
+  if (!excludeBranchSet.empty()) {
+    //remove relations for excluded things
+    for (string from : branchesToFilter) {
+      for (string to : branchesToFilter) {
+        string branch = DataStore::relationName(from, to);
+        if (out.count(branch) == 0)
+          continue; //not selected
+        if (excludeBranchSet.count(from) == 0 and excludeBranchSet.count(to) == 0)
+          continue; //at least one side should be excluded
+        if (branchSet.count(branch) != 0)
+          continue; //specifically included
+        excluderelations.insert(branch);
+      }
+    }
+    for (string rel : excluderelations) {
+      out.erase(rel);
+    }
   }
   //add relations between accepted branches
   for (string from : out) {

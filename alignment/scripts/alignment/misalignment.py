@@ -75,7 +75,7 @@ class Curl(GlobalDeformation):
         super().__init__(scale)
 
     def _transform(self, r, phi, z):
-        return [0., self.scale * r + self.scale2 * 1. / r, 0.]
+        return [0., self.scale * r + self.scale2, 0.]
 
 
 class Telescope(GlobalDeformation):
@@ -106,7 +106,7 @@ class Clamshell(GlobalDeformation):
         import math
         import numpy
 
-        return [0., self.scale * abs(math.sin(phi)) * numpy.sign(math.tan(phi)), 0.]
+        return [0., self.scale * math.cos(phi), 0.]
 
 
 class Skew(GlobalDeformation):
@@ -124,7 +124,7 @@ class Bowing(GlobalDeformation):
         super().__init__(scale)
 
     def _transform(self, r, phi, z):
-        return [self.scale * z, 0., 0.]
+        return [self.scale * abs(z), 0., 0.]
 
 
 class Twist(GlobalDeformation):
@@ -133,7 +133,7 @@ class Twist(GlobalDeformation):
         super().__init__(scale)
 
     def _transform(self, r, phi, z):
-        return [0., self.scale * z / r, 0.]
+        return [0., self.scale * z, 0.]
 
 
 class ZExpansion(GlobalDeformation):

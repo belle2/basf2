@@ -20,7 +20,7 @@ class RealisticSegmentRelationFilterTrainingRun(TrainingRunMixin, ReadOrGenerate
     def create_path(self):
         """Setup the recording path after the simulation"""
         path = super().create_path()
-        path.add_module("WireHitPreparer",
+        path.add_module("TFCDC_WireHitPreparer",
                         flightTimeEstimation="outwards",
                         UseNLoops=1.0)
 
@@ -51,7 +51,7 @@ class RealisticSegmentRelationFilterTrainingRun(TrainingRunMixin, ReadOrGenerate
         else:
             raise ValueError("Unknown task " + self.task)
 
-        path.add_module("SegmentFinderCDCFacetAutomaton",
+        path.add_module("TFCDC_SegmentFinderFacetAutomaton",
                         SegmentRelationFilter="unionrecording",
                         SegmentRelationFilterParameters={
                             "rootFileName": self.sample_file_name,

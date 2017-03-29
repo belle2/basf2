@@ -20,7 +20,6 @@ class TTimer;
 struct Event_t;
 
 namespace Belle2 {
-  //forward declaration needed because CINT balks at inclusion of python headers in ModuleParam...
   template <class T> class ModuleParam;
   class SplitGLView;
   class DisplayData;
@@ -129,9 +128,6 @@ namespace Belle2 {
      * Only useful for AsyncDisplay.
      */
     void pollNewEvents();
-
-    /** Close window and continue execution. */
-    void closeAndContinue();
 
     /** Close window and exit immediately. */
     void exit();

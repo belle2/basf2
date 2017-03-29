@@ -47,8 +47,14 @@ namespace Belle2 {
                  std::vector<CDCSegment2D>& outputSegments) final;
 
     private:
+      /// Parameter : Switch to construct the reversed segment if it is available in the facet graph as well
+      bool m_param_searchReversed = false;
+
       /// Parameter : Switch to construct the alias segment if it is available in the facet graph as well
-      bool m_param_constructFacetAliases = true;
+      bool m_param_searchAlias = true;
+
+      /// Parameter : Switch to relax the alias and reverse search for segments contained in a single layer
+      bool m_param_relaxSingleLayerSearch = true;
 
     private: // cellular automaton
       /// Instance of the cellular automaton path finder

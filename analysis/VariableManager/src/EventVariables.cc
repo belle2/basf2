@@ -98,6 +98,12 @@ namespace Belle2 {
       StoreArray<ECLCluster> eclClusters;
       double result = 0;
       for (int i = 0; i < eclClusters.getEntries(); ++i) {
+        // sum only energy of T1 (1) and N1 (5) ECLClusters
+        // other clusters are duplicates
+        if (eclClusters[i]->getHypothesisId() != 1 &&
+            eclClusters[i]->getHypothesisId() != 5)
+          continue;
+
         result += eclClusters[i]->getEnergy();
       }
       return result;
@@ -130,6 +136,12 @@ namespace Belle2 {
       }
       StoreArray<ECLCluster> eclClusters;
       for (int i = 0; i < eclClusters.getEntries(); ++i) {
+        // sum only momentum of T1 (1) and N1 (5) ECLClusters
+        // other clusters are duplicates
+        if (eclClusters[i]->getHypothesisId() != 1 &&
+            eclClusters[i]->getHypothesisId() != 5)
+          continue;
+
         TLorentzVector iMomECLCluster = eclClusters[i] -> get4Vector();
         if (iMomECLCluster == iMomECLCluster) {
           if (eclClusters[i]->isNeutral()) momNeutralClusters += iMomECLCluster;

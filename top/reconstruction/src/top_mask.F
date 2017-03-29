@@ -47,3 +47,54 @@
 
 
       
+      SUBROUTINE PRINT_CHANNEL_MASK
+
+      IMPLICIT NONE
+
+#include "TOP_GEO.fi"
+#include "TOP_PIK.fi"
+#include "TOP_MASK.fi"
+      INTEGER MDN, ICH, ACTIVE, NROW, I, K
+      REAL P
+      CHARACTER*64 TXT
+
+      PRINT*,'Channel masks (pixel row vs. column)'
+      PRINT*,'===================================='
+      
+      DO MDN=0,NUM_MOD-1
+         ACTIVE=0
+         DO ICH=0,NUM_CHA-1
+            IF(CH_MASK(ICH,MDN)) ACTIVE=ACTIVE+1
+         ENDDO
+         P=ACTIVE*100./NUM_CHA
+         PRINT '(A,I3,A,F6.1,A)','Slot',MDN+1,': ',P,'% active'
+         NROW=NUM_CHA/64
+         DO K=NROW,1,-1
+            DO I=1,64
+               ICH=I-1+(K-1)*64
+               IF(CH_MASK(ICH,MDN)) THEN
+                  TXT(I:I)='1'
+               ELSE
+                  TXT(I:I)='0'
+               ENDIF
+            ENDDO
+            PRINT '(I2,A,A)',K,'|',TXT
+         ENDDO
+         DO I=1,64
+            TXT(I:I)='-'
+         ENDDO
+         PRINT '(A,A)','  +',TXT
+         DO I=1,64
+            WRITE(TXT(I:I),'(I1)') I/10
+         ENDDO
+         PRINT '(A,A)','   ',TXT
+         DO I=1,64
+            WRITE(TXT(I:I),'(I1)') MOD(I,10)
+         ENDDO
+         PRINT '(A,A)','   ',TXT
+         PRINT*
+      ENDDO
+      
+      END
+
+      

@@ -38,7 +38,8 @@ namespace Belle2 {
     }
 
 
-    void TOPreco::setChannelMask(const DBObjPtr<TOPCalChannelMask>& mask)
+    void TOPreco::setChannelMask(const DBObjPtr<TOPCalChannelMask>& mask,
+                                 bool printMask)
     {
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
       const auto& mapper = TOPGeometryPar::Instance()->getChannelMapper();
@@ -52,6 +53,8 @@ namespace Belle2 {
           set_channel_mask_(&mdn, &ich, &flag);
         }
       }
+
+      if (printMask) print_channel_mask_();
     }
 
 

@@ -51,6 +51,11 @@ void SegmentFitter::exposeParameters(ModuleParamList* moduleParamList, const std
                                 "Switch to reestimate the drift length",
                                 m_param_updateDriftLength);
 
+  moduleParamList->addParameter(prefixed(prefix, "updateRecoPos"),
+                                m_param_updateRecoPos,
+                                "Switch to reestimate the position and right left passage information",
+                                m_param_updateRecoPos);
+
   m_driftLengthEstimator.exposeParameters(moduleParamList, prefix);
 }
 
@@ -108,6 +113,22 @@ void SegmentFitter::apply(std::vector<CDCSegment2D>& outputSegments)
 
       CDCTrajectory2D trajectory2D = m_riemannFitter.fit(observations2D);
       segment.setTrajectory2D(trajectory2D);
+    }
+  }
+
+  if (m_param_updateRecoPos) {
+    for (CDCSegment2D& segment : outputSegments) {
+      const CDCTrajectory2D& trajectory2D = segment.getTrajectory2D();
+      int nRLChanges = 0;
+      for (CDCRecoHit2D recoHit2D : segment) {
+        ERightLeft rlInfo = trajectory2D.isRightOrLeft(recoHit2D.getRefPos2D());
+        if (rlInfo == recoHit2D.getRLInfo()) ++nRLChanges;
+        recoHit2D.setRLInfo(rlInfo);
+        const CDCRLWireHit& rlWireHit = recoHit2D.getRLWireHit();
+        Vector2D recoPos2D = rlWireHit.reconstruct2D(trajectory2D);
+        recoHit2D.setRecoPos2D(recoPos2D);
+      }
+      if (nRLChanges > 0) B2DEBUG(100, "RL changes " << nRLChanges);
     }
   }
 }

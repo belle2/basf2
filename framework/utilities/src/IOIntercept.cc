@@ -113,7 +113,7 @@ namespace Belle2 {
        *  @param logLevel log level of the message
        *  @param debugLevel debug level in case logLevel is c_Debug
        *  @param name name of the thing causing the output, e.g. Geant4
-       *  @param string to add to the beginning of each line of the message
+       *  @param indent string to add to the beginning of each line of the message
        *  @param message actuall message to output
        */
       void sendLogMessage(LogConfig::ELogLevel logLevel, int debugLevel, const std::string& name, const std::string& indent,

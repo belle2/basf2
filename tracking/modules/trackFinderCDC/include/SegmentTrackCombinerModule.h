@@ -32,14 +32,14 @@ namespace Belle2 {
      *  3. Filtering of fake tracks in the made combinations.
      *  4. Cleanup of the lookup cache.
      */
-    class SegmentTrackCombinerModule : public FindletModule<SegmentTrackCombiner> {
+    class  TFCDC_SegmentTrackCombinerModule : public FindletModule<SegmentTrackCombiner> {
 
       /// The base class
       using Super = FindletModule<SegmentTrackCombiner>;
 
     public:
       /// Constructor
-      SegmentTrackCombinerModule();
+      TFCDC_SegmentTrackCombinerModule();
     };
   }
 }

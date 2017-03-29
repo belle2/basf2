@@ -545,14 +545,17 @@ bool RootInputModule::readParentTrees()
     parentLfn = parentMetaData->getParentLfn();
   }
 
-  if (m_parentLevel > 0 and m_storeEntries.size() == 1)
-    addEventListForIndexFile(parentLfn);
+  addEventListForIndexFile(parentLfn);
 
   return true;
 }
 
 void RootInputModule::addEventListForIndexFile(const std::string& parentLfn)
 {
+  //is this really an index file? (=only EventMetaData stored)
+  if (!(m_parentLevel > 0 and m_storeEntries.size() == 1))
+    return;
+  //did we handle the current parent file already?
   if (parentLfn == m_lastParentFileLFN)
     return;
   m_lastParentFileLFN = parentLfn;

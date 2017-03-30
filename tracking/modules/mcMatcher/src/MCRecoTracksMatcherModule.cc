@@ -449,20 +449,35 @@ void MCRecoTracksMatcherModule::event()
     Eigen::VectorXd weightedEfficiencyCol = weightedEfficiencyMatrix.col(mcId);
 
     RecoTrackId bestPrId = 0;
-    Efficiency weightedEfficiency = weightedEfficiencyCol(0);
-    Efficiency efficiency = efficiencyCol(0);
+    Efficiency bestWeightedEfficiency = weightedEfficiencyCol(0);
+    Efficiency bestEfficiency = efficiencyCol(0);
+
+    // Reject efficiency smaller than the minimal one
+    if (bestWeightedEfficiency < m_param_minimalEfficiency) {
+      bestWeightedEfficiency = 0;
+    }
 
     // In case of a tie in the weighted efficiency we use the regular efficiency to break it.
     for (RecoTrackId prId = 1; prId < nPRRecoTracks; ++prId) {
-      if (std::tie(weightedEfficiencyCol(prId), efficiencyCol(prId)) >
-          std::tie(weightedEfficiency, efficiency)) {
+      Efficiency currentWeightedEfficiency = weightedEfficiencyCol(prId);
+      Efficiency currentEfficiency = efficiencyCol(prId);
+
+      // Reject efficiency smaller than the minimal one
+      if (currentWeightedEfficiency < m_param_minimalEfficiency) {
+        currentWeightedEfficiency = 0;
+      }
+
+      if (std::tie(currentWeightedEfficiency, currentEfficiency) >
+          std::tie(bestWeightedEfficiency, bestEfficiency)) {
         bestPrId = prId;
-        efficiency = efficiencyCol(prId);
-        weightedEfficiency = weightedEfficiencyCol(prId);
+        bestEfficiency = currentEfficiency;
+        bestWeightedEfficiency = currentWeightedEfficiency;
       }
     }
 
-    mostWeightEfficientPRId_by_mcId[mcId] = {bestPrId, weightedEfficiency, efficiency};
+    bestWeightedEfficiency = weightedEfficiencyCol(bestPrId);
+    bestEfficiency = efficiencyCol(bestPrId);
+    mostWeightEfficientPRId_by_mcId[mcId] = {bestPrId, bestWeightedEfficiency, bestEfficiency};
   }
 
   // ### Building the patter recognition track to highest purity Monte-Carlo track relation ###

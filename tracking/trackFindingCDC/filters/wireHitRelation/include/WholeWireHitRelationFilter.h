@@ -24,8 +24,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class mapping the neighborhood of wires to the neighborhood of wire hits.
-    /** Class providing the neighborhood filter interface to the NeighborhoodBuilder for the construction of wire neighborhoods.*/
-    template<bool withSecondaryNeighborhood = false>
+    template <int a_neighborhoodDegree>
     class WholeWireHitRelationFilter : public Filter<Relation<const CDCWireHit>> {
 
     public:
@@ -36,10 +35,10 @@ namespace Belle2 {
           const ACDCWireHitIterator& itEnd)
       {
         std::vector<const CDCWire* > m_wireNeighbors;
-        m_wireNeighbors.reserve(withSecondaryNeighborhood ? 18 : 6);
+        m_wireNeighbors.reserve((a_neighborhoodDegree > 1) ? 18 : 6);
 
         std::vector<std::reference_wrapper<CDCWireHit> > m_wireHitNeighbors;
-        m_wireHitNeighbors.reserve(withSecondaryNeighborhood ? 32 : 12);
+        m_wireHitNeighbors.reserve((a_neighborhoodDegree > 1) ? 32 : 12);
 
         const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 
@@ -53,7 +52,7 @@ namespace Belle2 {
         const CDCWire* ccwOutWireNeighborPtr = wireTopology.getNeighborCCWOutwards(wire);
         const CDCWire* cwOutWireNeighborPtr = wireTopology.getNeighborCWOutwards(wire);
 
-        if (withSecondaryNeighborhood) {
+        if (a_neighborhoodDegree > 1) {
 
           const CDCWire* oneSecondWireNeighborPtr = wireTopology.getSecondNeighborOneOClock(wire);
           const CDCWire* twoSecondWireNeighborPtr = wireTopology.getSecondNeighborTwoOClock(wire);
@@ -90,7 +89,6 @@ namespace Belle2 {
           if (oneSecondWireNeighborPtr) m_wireNeighbors.push_back(oneSecondWireNeighborPtr);
           if (twelveSecondWireNeighborPtr) m_wireNeighbors.push_back(twelveSecondWireNeighborPtr);
           if (elevenSecondWireNeighborPtr) m_wireNeighbors.push_back(elevenSecondWireNeighborPtr);
-
         } else {
 
           // Insert the neighbors such that they are most likely sorted.
@@ -132,10 +130,6 @@ namespace Belle2 {
         if (not ptrFrom or not ptrTo) return NAN;
         return 0;
       }
-
-    private:
-
     };
-
   }
 }

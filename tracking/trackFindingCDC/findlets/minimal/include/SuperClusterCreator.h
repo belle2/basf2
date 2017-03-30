@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/minimal/ClusterCreator.h>
 
-#include <tracking/trackFindingCDC/filters/wireHitRelation/SecondaryWireHitRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/wireHitRelation/WholeWireHitRelationFilter.h>
 
 #include <vector>
 #include <string>
@@ -42,7 +42,7 @@ namespace Belle2 {
 
     private:
       /// Creator of the super clusters
-      ClusterCreator<SecondaryWireHitRelationFilter> m_clusterCreator;
+      ClusterCreator<WholeWireHitRelationFilter<2>> m_clusterCreator;
     };
   }
 }

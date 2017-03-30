@@ -50,14 +50,15 @@ namespace Belle2 {
     bool checkAll(const std::string& node, const HVState& state) throw();
 
   public:
-    void setState(const HVState& state) throw();
-    void setState(HVNode& node, const HVState& state) throw();
+    void setHVState(const HVState& state) throw();
+    void setHVState(HVNode& node, const HVState& state) throw();
     void setConfig(HVNode& node, const std::string& config) throw();
 
   private:
     HVNodeList m_node_v;
     StringList m_excluded_v;
     HVNode m_hvnode;
+    bool m_loading;
 
   private:
     class Distributor {

@@ -107,8 +107,17 @@ namespace Belle2 {
     /** Return cos(theta) for this track */
     double getCosTheta() const { return m_cosTheta; }
 
+
+    /** Return the (global) layer number for a layer hit */
+    int getLayer(int i) const { return dedxLayer[i]; }
+    /** Return the distance travelled in this layer */
+    double getLayerDist(int i) const { return dist[i]; }
+    /** Return the total dE/dx for this layer */
+    double getLayerDedx(int i) const { return dedx[i]; }
+
+
     /** Return the (global) layer number for a hit */
-    int getLayer(int i) const { return m_layer[i]; }
+    int getHitLayer(int i) const { return m_layer[i]; }
     /** Return the sensor ID for this hit: wire number for CDC (0-14336) */
     int getWire(int i) const { return m_wire[i]; }
 
@@ -199,7 +208,7 @@ namespace Belle2 {
     double m_cdcChi[Const::ChargedStable::c_SetSize];  /**< chi values for each particle type */
     double m_cdcLogl[Const::ChargedStable::c_SetSize]; /**< log likelihood for each particle, not including momentum prior */
 
-    ClassDef(CDCDedxTrack, 3); /**< Debug output for CDCDedxPID module. */
+    ClassDef(CDCDedxTrack, 4); /**< Debug output for CDCDedxPID module. */
   };
 }
 #endif

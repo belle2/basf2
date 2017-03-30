@@ -94,7 +94,6 @@ namespace Belle2 {
       double m_p1 = 0; /**< distribution parameter, must be non-negative */
       double m_p2 = 0; /**< distribution parameter */
       double m_xmax = 0; /**< upper bound of range [ADC counts] */
-      double m_xPeak = 0; /**< peak position [ADC counts] */
       double m_vPeak = 0; /**< peak value */
       double m_pedestalRMS = 10.0; /**< r.m.s of pedestals [ADC counts] */
       double m_scale = 7.0; /**< conversion factor of pulse height to integral */

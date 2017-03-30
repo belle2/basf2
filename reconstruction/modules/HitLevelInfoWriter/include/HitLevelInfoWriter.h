@@ -114,7 +114,7 @@ namespace Belle2 {
     // hit level information (references on nhits)
     static const int kMaxHits = 100; /**< default hit level index */
 
-    int m_layer[kMaxHits]; /**< layer number */
+    int m_hitlayer[kMaxHits]; /**< layer number */
     int m_wire[kMaxHits];  /**< sense wire ID */
 
     double m_adcraw[kMaxHits]; /**< charge per hit */
@@ -123,6 +123,11 @@ namespace Belle2 {
     double m_doca[kMaxHits];   /**< distance of closest approach */
     double m_enta[kMaxHits];   /**< entrance angle */
     double m_driftT[kMaxHits];   /**< drift time */
+
+    // layer level information
+    double m_layer[kMaxHits];     /**< layer number */
+    double m_layerdx[kMaxHits];   /**< distance travelled in this layer */
+    double m_layerdedx[kMaxHits]; /**< dE/dx for this layer */
 
   };
 } // Belle2 namespace

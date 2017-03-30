@@ -417,12 +417,10 @@ namespace Belle2 {
         continue;
 
       // TODO: can we get hypothesis enumerator instead of hard coded values
-      // TODO: at the moment allow only photons
-      if (cluster->getHypothesisId() != 5)
+      if (cluster->getHypothesisId() != 5 && cluster->getHypothesisId() != 1)
         continue;
 
       // TODO: allow at some point
-      //cluster->getHypothesisId() != 1 &&
       //cluster->getHypothesisId() != 3)
 
 

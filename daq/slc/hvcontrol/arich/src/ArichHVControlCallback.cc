@@ -1,4 +1,4 @@
-//#include "daq/slc/hvcontrol/arich/ArichHVControlCallback.h"
+#include "daq/slc/hvcontrol/arich/ArichHVControlCallback.h"
 #include <daq/slc/hvcontrol/arich/ArichHVControlCallback.h>
 #include <daq/slc/hvcontrol/arich/zlibstream.h>
 #include <daq/slc/hvcontrol/arich/hvinfo.h>
@@ -21,9 +21,10 @@
 #include <iostream>
 #include <list>
 
-
 #define Recovery
 #define Recovery_Function
+#define all_sw
+#define check_all
 
 
 namespace Belle2 {
@@ -456,6 +457,7 @@ void ArichHVControlCallback::initialize(const HVConfig& hvconf) throw()
   }
   LogFile::debug("initialize : done");
   HVControlCallback::configure(hvconf);
+
 }
 
 void ArichHVControlCallback::deinitialize(int handle) throw()
@@ -641,309 +643,37 @@ void ArichHVControlCallback::turnon() throw(HVHandlerException)
 {
   LogFile::debug("start turn on");
 
-  int nhapd = 1;
-  bool check_hv[nhapd];
-  bool check_biasA[nhapd];
-  bool check_biasB[nhapd];
-  bool check_biasC[nhapd];
-  bool check_biasD[nhapd];
-  bool check_guard[nhapd];
+  for (int i = 0; i < 16; i++)setVoltageDemand(1, 3, i, 1000); // for debug
 
-  for (int i = 0; i < nhapd; i++) {
-    check_hv[i] = 0;
-    check_biasA[i] = 0;
-    check_biasB[i] = 0;
-    check_biasC[i] = 0;
-    check_biasD[i] = 0;
-    check_guard[i] = 0;
-  }
-
-  /*
-  bool check_all_hv = 0;
-  bool check_all_biasA = 0;
-  bool check_all_biasB = 0;
-  bool check_all_biasC = 0;
-  bool check_all_biasD = 0;
-  bool check_all_guard = 0;
-  */
-  bool check_all = 0;
-  //  int cnt=0;
-
-  while (check_all != 1) {
-    //load(getConfig(0), false, false);
-    /*    std::cout <<"-----"<< cnt << " times" <<"-----"<<std::endl;
-    cnt++;
-
-    std::cout << "1,0,0 : " <<getVoltageMonitor(1,0,0) <<std::endl;
-    std::cout << "1,0,1 : " <<getVoltageMonitor(1,0,1) <<std::endl;
-    std::cout << "1,0,2 : " <<getVoltageMonitor(1,0,2) <<std::endl;
-    std::cout << "1,0,3 : " <<getVoltageMonitor(1,0,3) <<std::endl;
-    std::cout << "1,0,4 : " <<getVoltageMonitor(1,0,4) <<std::endl;
-    std::cout << "1,1,0 : " <<getVoltageMonitor(1,1,0) <<std::endl;
-    */
-
-    const HVConfig& config(getConfig());
-    const HVCrateList& crate_v(config.getCrates());
-    for (HVCrateList::const_iterator icrate = crate_v.begin();
-         icrate != crate_v.end(); icrate++) {
-      const HVCrate& crate(*icrate);
-      const HVChannelList& channel_v(crate.getChannels());
-      int crateid = crate.getId();
-      for (HVChannelList::const_iterator ichannel = channel_v.begin();
-           ichannel != channel_v.end(); ichannel++) {
-        const HVChannel& channel(*ichannel);
-        int slot = channel.getSlot();
-        int ch = channel.getChannel();
-
-        if ((slot == 0) && (ch == 4)) {
-
-          if (getState(crateid, slot, ch) == 0) {
-            setSwitch(crateid, slot, ch, true);
-          }
-
-          if (getState(crateid, slot, ch) == 1) {
-            check_guard[0] = 1;
-          } else {
-            check_guard[0] = 0;
-          }
-
-        }
-
-        if ((slot == 1) && (ch == 0) && (check_guard[0] == 1)) {
-
-          if (getState(crateid, slot, ch) == 0) {
-            setSwitch(crateid, slot, ch, true);
-          }
-
-          if (getState(crateid, slot, ch) == 1) {
-            check_hv[0] = 1;
-          } else {
-            check_hv[0] = 0;
-          }
-
-        }
-
-        if ((check_hv[0] == 1) && (check_guard[0] == 1)) {
-
-          if ((slot == 0) && (ch == 0)) {
-            if (getState(crateid, slot, ch) == 0) {
-              setSwitch(crateid, slot, ch, true);
-            }
-
-            if (getState(crateid, slot, ch) == 1) {
-              check_biasA[0] = 1;
-            } else {
-              check_biasA[0] = 0;
-            }
-          }
-
-
-          if ((slot == 0) && (ch == 1)) {
-            if (getState(crateid, slot, ch) == 0) {
-              setSwitch(crateid, slot, ch, true);
-            }
-
-            if (getState(crateid, slot, ch) == 1) {
-              check_biasB[0] = 1;
-            } else {
-              check_biasB[0] = 0;
-            }
-          }
-
-
-          if ((slot == 0) && (ch == 2)) {
-            if (getState(crateid, slot, ch) == 0) {
-              setSwitch(crateid, slot, ch, true);
-            }
-            if (getState(crateid, slot, ch) == 1) {
-              check_biasC[0] = 1;
-            } else {
-              check_biasC[0] = 0;
-            }
-          }
-
-
-          if ((slot == 0) && (ch == 3)) {
-            if (getState(crateid, slot, ch) == 0) {
-              setSwitch(crateid, slot, ch, true);
-            }
-            if (getState(crateid, slot, ch) == 1) {
-              check_biasD[0] = 1;
-            } else {
-              check_biasD[0] = 0;
-            }
-          }
-
-        }
-
-
-
-        if ((check_hv[0] == 1) && (check_guard[0] == 1) && (check_biasA[0] == 1) && (check_biasB[0] == 1) && (check_biasC[0] == 1)
-            && (check_biasD[0] == 1)) {
-          check_all = 1;
-        }
-
-
-      }
-
+  while (!(check_all_switch("guard", 1) && check_all_switch("hv", 1) && check_all_switch("bias", 1))) {
+    if (check_all_switch("guard", 0) && check_all_switch("hv", 0) && check_all_switch("bias", 0)) all_switch("guard", true);
+    else if (check_all_switch("guard", 1) && check_all_switch("hv", 0) && check_all_switch("bias", 0)) all_switch("hv", true);
+    else if (check_all_switch("guard", 1) && check_all_switch("hv", 1) && check_all_switch("bias", 0)) all_switch("bias", true);
+    else {
+      //  LogFile::debug("you should check");
     }
     wait(5);
   }
-
   LogFile::debug("finish turn on");
+
 }
 
 
 void ArichHVControlCallback::turnoff() throw(HVHandlerException)
 {
-  std::cout << "start turn off" << std::endl;
-  int nhapd = 1;
-  bool check_hv[nhapd];
-  bool check_biasA[nhapd];
-  bool check_biasB[nhapd];
-  bool check_biasC[nhapd];
-  bool check_biasD[nhapd];
-  bool check_guard[nhapd];
+  LogFile::debug("start turn off");
 
-  for (int i = 0; i < nhapd; i++) {
-    check_hv[i] = 1;
-    check_biasA[i] = 1;
-    check_biasB[i] = 1;
-    check_biasC[i] = 1;
-    check_biasD[i] = 1;
-    check_guard[i] = 1;
-  }
-
-  /*
-  bool check_all_hv = 1;
-  bool check_all_biasA = 1;
-  bool check_all_biasB = 1;
-  bool check_all_biasC = 1;
-  bool check_all_biasD = 1;
-  bool check_all_guard = 1;
-  */
-
-  bool check_all = 1;
-  //  int cnt=0;
-  //load(getConfig(0), false, false);
-  while (check_all != 0) {
-    //load(getConfig(0), false, false);
-
-
-    /*    std::cout <<"-----"<< cnt << " times" <<"-----"<<std::endl;
-    cnt++;
-
-    std::cout << "1,0,0 : " <<getVoltageMonitor(1,0,0) <<std::endl;
-    std::cout << "1,0,1 : " <<getVoltageMonitor(1,0,1) <<std::endl;
-    std::cout << "1,0,2 : " <<getVoltageMonitor(1,0,2) <<std::endl;
-    std::cout << "1,0,3 : " <<getVoltageMonitor(1,0,3) <<std::endl;
-    std::cout << "1,0,4 : " <<getVoltageMonitor(1,0,4) <<std::endl;
-    std::cout << "1,1,0 : " <<getVoltageMonitor(1,1,0) <<std::endl;
-
-
-    */
-    const HVConfig& config(getConfig());
-    const HVCrateList& crate_v(config.getCrates());
-    for (HVCrateList::const_iterator icrate = crate_v.begin();
-         icrate != crate_v.end(); icrate++) {
-      const HVCrate& crate(*icrate);
-      const HVChannelList& channel_v(crate.getChannels());
-      int crateid = crate.getId();
-      for (HVChannelList::const_iterator ichannel = channel_v.begin();
-           ichannel != channel_v.end(); ichannel++) {
-        const HVChannel& channel(*ichannel);
-        int slot = channel.getSlot();
-        int ch = channel.getChannel();
-
-        if ((slot == 0) && (ch == 0)) {
-          if (getState(crateid, slot, ch) == 1) {
-            setSwitch(crateid, slot, ch, false);
-          }
-
-          if (getState(crateid, slot, ch) == 0) {
-            check_biasA[0] = 0;
-          } else {
-            check_biasA[0] = 1;
-          }
-        }
-
-        if ((slot == 0) && (ch == 1)) {
-          if (getState(crateid, slot, ch) == 1) {
-            setSwitch(crateid, slot, ch, false);
-          }
-
-          if (getState(crateid, slot, ch) == 0) {
-            check_biasB[0] = 0;
-          } else {
-            check_biasB[0] = 1;
-          }
-        }
-
-
-        if ((slot == 0) && (ch == 2)) {
-          if (getState(crateid, slot, ch) == 1) {
-            setSwitch(crateid, slot, ch, false);
-          }
-          if (getState(crateid, slot, ch) == 0) {
-            check_biasC[0] = 0;
-          } else {
-            check_biasC[0] = 1;
-          }
-        }
-
-
-        if ((slot == 0) && (ch == 3)) {
-          if (getState(crateid, slot, ch) == 1) {
-            setSwitch(crateid, slot, ch, false);
-          }
-          if (getState(crateid, slot, ch) == 0) {
-            check_biasD[0] = 0;
-          } else {
-            check_biasD[0] = 1;
-          }
-        }
-
-
-        if ((check_biasA[0] == 0) && (check_biasB[0] == 0) && (check_biasC[0] == 0) && (check_biasD[0] == 0)) {
-
-          if ((slot == 1) && (ch == 0)) {
-            if (getState(crateid, slot, ch) == 1) {
-              setSwitch(crateid, slot, ch, false);
-            }
-            if (getState(crateid, slot, ch) == 0) {
-              check_hv[0] = 0;
-            } else {
-              check_hv[0] = 1;
-            }
-          }
-        }
-
-        if ((check_biasA[0] == 0) && (check_biasB[0] == 0) && (check_biasC[0] == 0) && (check_biasD[0] == 0) && (check_hv[0] == 0)) {
-          if ((slot == 0) && (ch == 4)) {
-            if (getState(crateid, slot, ch) == 1) {
-              setSwitch(crateid, slot, ch, false);
-            }
-            if (getState(crateid, slot, ch) == 0) {
-              check_guard[0] = 0;
-            } else {
-              check_guard[0] = 1;
-            }
-          }
-        }
-
-        if ((check_biasA[0] == 0) && (check_biasB[0] == 0) && (check_biasC[0] == 0) && (check_biasD[0] == 0) && (check_hv[0] == 0)
-            && (check_guard[0] == 0)) {
-          check_all = 0;
-        }
-
-
-      }
+  while (!(check_all_switch("guard", 0) && check_all_switch("hv", 0) && check_all_switch("bias", 0))) {
+    if (check_all_switch("guard", 1) && check_all_switch("hv", 1) && check_all_switch("bias", 1)) all_switch("bias", false);
+    else if (check_all_switch("guard", 1) && check_all_switch("hv", 1) && check_all_switch("bias", 0)) all_switch("hv", false);
+    else if (check_all_switch("guard", 1) && check_all_switch("hv", 0) && check_all_switch("bias", 0)) all_switch("guard", false);
+    else {
+      //  LogFile::debug("you should check");
     }
 
     wait(5);
   }
-
-  std::cout << "finish turn off" << std::endl;
+  LogFile::debug("finish turn off");
 }
 
 void ArichHVControlCallback::standby() throw(HVHandlerException)
@@ -1009,13 +739,36 @@ void ArichHVControlCallback::peak() throw(HVHandlerException)
   std::cout << "finish peak" << std::endl;
 }
 
+
+#ifdef all_sw
+void ArichHVControlCallback::all_guard_off() throw(HVHandlerException)
+{
+  all_switch("guard", false);
+}
+void ArichHVControlCallback::all_guard_on() throw(HVHandlerException)
+{
+  all_switch("guard", true);
+}
+void ArichHVControlCallback::all_bias_off() throw(HVHandlerException)
+{
+  all_switch("bias", false);
+}
 void ArichHVControlCallback::all_bias_on() throw(HVHandlerException)
 {
-  std::cout << "start all bias on" << std::endl;
+  all_switch("bias", true);
+}
+void ArichHVControlCallback::all_hv_off() throw(HVHandlerException)
+{
+  all_switch("hv", false);
+}
+void ArichHVControlCallback::all_hv_on() throw(HVHandlerException)
+{
+  all_switch("hv", true);
+}
 
-
-  /**/
-
+void ArichHVControlCallback::all_switch(std::string set_type, bool sw) throw(HVHandlerException)
+{
+  //  printf("start all %s switch %d\n",set_type.c_str(),sw);
   const HVConfig& config(getConfig());
   const DBObject& obj(config.get());
   DBObject m_obj = obj;
@@ -1036,219 +789,138 @@ void ArichHVControlCallback::all_bias_on() throw(HVHandlerException)
       HVChannel ch(j, c_ch.getInt("slot"),
                    c_ch.getInt("channel"),
                    c_ch.getInt("turnon"));
-      std::cout << "tyep = " << c_ch.getText("type") << std::endl;
-      //confirm return
-
-      if (c_ch.getText("type") == "bias-a") {
-        //      if(c_ch.getText("type") == "bias-a" ||
-        //   c_ch.getText("type") == "bias-b" ||
-        //   c_ch.getText("type") == "bias-c" ||
-        //   c_ch.getText("type") == "bias-d" ){
-
-        const HVChannelList& channel_v(crate.getChannels());
+      std::string type = c_ch.getValueText("type");
+      if (type.find(set_type) != std::string::npos) {
         int crateid = crate.getId();
-        for (HVChannelList::const_iterator ichannel = channel_v.begin();
-             ichannel != channel_v.end(); ichannel++) {
-          const HVChannel& channel(*ichannel);
-          int slot = channel.getSlot();
-          int ch = channel.getChannel();
-          int slot1 =  c_ch.getInt("slot");
-          int ch1 =  c_ch.getInt("channel");
-          std::cout << printf("(HVChannel) setSwitch(%d, %d, %d, true)", crateid, slot, ch) << std::endl;
-          std::cout << printf("(DBObject) setSwitch(%d, %d, %d, true)", crateid, slot1, ch1) << std::endl;
-          //    setSwitch(crateid, slot, ch, true);
+        int slot =  c_ch.getInt("slot");
+        int ch =  c_ch.getInt("channel");
+        //  printf("setSwitch(%d, %d, %d, %d) %s\n",crateid,slot,ch,sw,type.c_str());
+        setSwitch(crateid, slot, ch, sw);
+      }
 
+    }
+  }
+  //  printf("start all %s switch sw",set_type);
+}
+
+#endif
+
+#ifdef check_all
+bool ArichHVControlCallback::check_all_bias_on() throw(HVHandlerException)
+{
+  if (check_all_switch("bias", 1)) {
+    std::cout << "all bias are on" << std::endl;
+    return true;
+  } else {
+    std::cout << "all bias are NOT on" << std::endl;
+    return false;
+  }
+}
+
+bool ArichHVControlCallback::check_all_bias_off() throw(HVHandlerException)
+{
+  if (check_all_switch("bias", 0)) {
+    std::cout << "all bias are off" << std::endl;
+    return true;
+  } else {
+    std::cout << "all bias are NOT off" << std::endl;
+    return false;
+  }
+}
+
+bool ArichHVControlCallback::check_all_hv_on() throw(HVHandlerException)
+{
+  if (check_all_switch("hv", 1)) {
+    std::cout << "all hv are on" << std::endl;
+    return true;
+  } else {
+    std::cout << "all hv are NOT on" << std::endl;
+    return false;
+  }
+}
+
+bool ArichHVControlCallback::check_all_hv_off() throw(HVHandlerException)
+{
+  if (check_all_switch("hv", 0)) {
+    std::cout << "all hv are off" << std::endl;
+    return true;
+  } else {
+    std::cout << "all hv are NOT off" << std::endl;
+    return false;
+  }
+}
+
+bool ArichHVControlCallback::check_all_guard_on() throw(HVHandlerException)
+{
+  if (check_all_switch("guard", 1)) {
+    std::cout << "all guard are on" << std::endl;
+    return true;
+  } else {
+    std::cout << "all guard are NOT on" << std::endl;
+    return false;
+  }
+}
+
+bool ArichHVControlCallback::check_all_guard_off() throw(HVHandlerException)
+{
+  if (check_all_switch("guard", 0)) {
+    std::cout << "all guard are off" << std::endl;
+    return true;
+  } else {
+    std::cout << "all guard are NOT off" << std::endl;
+    return false;
+  }
+}
+
+bool ArichHVControlCallback::check_all_switch(std::string set_type, int sw) throw(HVHandlerException)
+{
+  //  return true;
+
+  //  printf("start check all %s switch %d\n",set_type.c_str(),sw);
+  const HVConfig& config(getConfig());
+  const DBObject& obj(config.get());
+  DBObject m_obj = obj;
+  std::string m_type = "";
+  //error
+  DBObjectList& c_crate_v(m_obj.getObjects("crate"));
+  for (size_t i = 0; i < c_crate_v.size(); i++) {
+    HVCrate crate(i + 1);
+    DBObject& c_crate(c_crate_v[i]);
+    if (c_crate.hasText("name")) {
+      crate.setName(c_crate.getText("name"));
+    }
+    //error
+    DBObjectList& c_ch_v(c_crate.getObjects("channel"));
+    for (size_t j = 0; j < c_ch_v.size(); j++) {
+
+      DBObject& c_ch(c_ch_v[j]);
+      HVChannel ch(j, c_ch.getInt("slot"),
+                   c_ch.getInt("channel"),
+                   c_ch.getInt("turnon"));
+      std::string type = c_ch.getValueText("type");
+      if (type.find(set_type) != std::string::npos) {
+        int crateid = crate.getId();
+        int slot =  c_ch.getInt("slot");
+        int ch =  c_ch.getInt("channel");
+        //        printf("getState(%d, %d, %d) %s = %d\n",crateid,slot,ch,type.c_str(), getState(crateid,slot,ch));
+        //  return true;
+
+        if (getState(crateid, slot, ch) == sw) {
+          continue;
+        } else {
+          return false;
         }
+
       }
 
     }
-
   }
 
-  /**/
-
-  //  std::cout << config << std::endl;
-
-  /*
-  //get voltage type from DB
-
-  if(type == "bias")
-    {
-      setSwitch(crate.slot,channel,switchon);
-    }
-
-  */
-
-  std::cout << "finish all bias on" << std::endl;
-
+  //  printf("finish check all %s switch %d\n",set_type.c_str(),sw);
+  return true;
+  //  return false;
 }
-
-void ArichHVControlCallback::all_bias_off() throw(HVHandlerException)
-{
-  std::cout << "start bias off" << std::endl;
-  /*
-  //get voltage type from DB
-
-  if(type == "bias")
-    {
-      setSwitch(crate.slot,channel,switchon);
-    }
-
-  */
-
-  std::cout << "finish bias off" << std::endl;
-}
-
-void ArichHVControlCallback::all_hv_on() throw(HVHandlerException)
-{
-  std::cout << "start all hv on" << std::endl;
-  /*
-  //get voltage type from DB
-
-  if(type == "hv")
-    {
-      setSwitch(crate.slot,channel,switchon);
-    }
-
-  */
-  std::cout << "finish all hv on" << std::endl;
-}
-
-void ArichHVControlCallback::all_hv_off() throw(HVHandlerException)
-{
-  std::cout << "start all hv off" << std::endl;
-  /*
-  //get voltage type from DB
-
-  if(type == "hv")
-    {
-      setSwitch(crate.slot,channel,switchon);
-    }
-
-  */
-  std::cout << "finish all hv off" << std::endl;
-}
-
-void ArichHVControlCallback::all_guard_on() throw(HVHandlerException)
-{
-  std::cout << "start all guard on" << std::endl;
-  /*
-  //get voltage type from DB
-
-  if(type == "guard")
-    {
-      setSwitch(crate.slot,channel,switchon);
-    }
-
-  */
-  std::cout << "finish all guard on" << std::endl;
-}
-
-void ArichHVControlCallback::all_guard_off() throw(HVHandlerException)
-{
-  std::cout << "start all guard off" << std::endl;
-  /*
-  //get voltage type from DB
-
-  if(type == "guard")
-    {
-      setSwitch(crate.slot,channel,switchon);
-    }
-
-  */
-  std::cout << "finish all guard off" << std::endl;
-}
-
-
-void ArichHVControlCallback::check_all_bias_on() throw(HVHandlerException)
-{
-  std::cout << "check all bias on" << std::endl;
-  /*
-  //get voltage type from DB
-  if(type == "bias"){
-    if(getState(crate,slot,channel) != ON)
-      {
-  return BUT;
-      }
-  }
-  return OK;
-  */
-}
-
-void ArichHVControlCallback::check_all_bias_off() throw(HVHandlerException)
-{
-  std::cout << "check all bias off" << std::endl;
-  /*
-  //get voltage type from DB
-  if(type == "bias"){
-    if(getState(crate,slot,channel) != OFF)
-      {
-  return BUT;
-      }
-  }
-  return OK;
-  */
-}
-
-void ArichHVControlCallback::check_all_hv_on() throw(HVHandlerException)
-{
-  std::cout << "check all hv on" << std::endl;
-  /*
-  //get voltage type from DB
-  if(type == "hv"){
-    if(getState(crate,slot,channel) != ON)
-      {
-  return BUT;
-      }
-  }
-  return OK;
-  */
-}
-
-void ArichHVControlCallback::check_all_hv_off() throw(HVHandlerException)
-{
-  std::cout << "check all hv off" << std::endl;
-  /*
-  //get voltage type from DB
-  if(type == "hv"){
-    if(getState(crate,slot,channel) != OFF)
-      {
-  return BUT;
-      }
-  }
-  return OK;
-  */
-}
-
-void ArichHVControlCallback::check_all_guard_on() throw(HVHandlerException)
-{
-  std::cout << "check all guard on" << std::endl;
-  /*
-  //get voltage type from DB
-  if(type == "guard"){
-    if(getState(crate,slot,channel) != ON)
-      {
-  return BUT;
-      }
-  }
-  return OK;
-  */
-}
-
-void ArichHVControlCallback::check_all_guard_off() throw(HVHandlerException)
-{
-  std::cout << "check all guard off" << std::endl;
-  /*
-  //get voltage type from DB
-  if(type == "guard"){
-    if(getState(crate,slot,channel) != OFF)
-      {
-  return BUT;
-      }
-  }
-  return OK;
-  */
-}
+#endif
 
 
 #ifdef Recovery_Function

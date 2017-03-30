@@ -13,14 +13,10 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <framework/core/Environment.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <framework/gearbox/GearDir.h>
-
-#include <TRandom.h>
 
 using namespace std;
 using namespace Belle2;
@@ -34,10 +30,10 @@ REG_MODULE(EvtGenInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-EvtGenInputModule::EvtGenInputModule() : Module(), m_initial(BeamParameters::c_smearALL)
+EvtGenInputModule::EvtGenInputModule() : Module(),
+  m_initial(BeamParameters::c_smearALL)
 {
   //Set module properties
-  //setDescription("EvtGen input");
   setDescription("EvtGenInput module. The module is served as an interface for EvtGen Event Generator so that the EvtGen generator can store the generated particles into MCParticles. The users need to provide their own decay mode based on the standard DECAY.DEC.");
   setPropertyFlags(c_Input);
 

@@ -193,6 +193,9 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
       m_o_fee[i] = dbload(obj("fee", i).getText("path"));
       m_o_fee[i].print();
       m_fee[i]->init(*this, hslb, m_o_fee[i]);
+      add(new NSMVHandlerHSLBFirmware(*this, "hslb.firm", -1,
+                                      o_hslb.hasText("firm") ? o_hslb.getText("firm") : ""));
+      add(new NSMVHandlerText("hslb.msg", true, false, ""));
       add(new NSMVHandlerText(vname + ".msg", true, false, ""));
       add(new NSMVHandlerInt(vname + ".err.fifoempty", true, false, 0));
       add(new NSMVHandlerInt(vname + ".err.b2linkdown", true, false, 0));

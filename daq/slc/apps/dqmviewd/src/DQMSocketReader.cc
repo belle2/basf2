@@ -37,11 +37,11 @@ void DQMSocketReader::run()
   TCPServerSocket server("0.0.0.0", m_port);
   server.open();
   char* buf = new char[MAXBUFSIZE];
+  std::map<std::string, TH1*> hist_m;
   while (true) {
     TCPSocket socket;
     MsgHandler handler(0);
     bool configured = false;
-    std::map<std::string, TH1*> hist_m;
     try {
       socket = server.accept();
       LogFile::info("Accepted new connection for data");
@@ -49,6 +49,7 @@ void DQMSocketReader::run()
       LogFile::fatal(e.what());
       exit(1);
     }
+    hist_m = std::map<std::string, TH1*>();
     bool newconf = false;
     try {
       while (true) {

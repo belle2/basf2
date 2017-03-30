@@ -11,7 +11,7 @@ int main(int argc, char** argv)
 {
   if (Daemon::start(argv[1], argc, argv, 1, "<config>")) {
     ConfigFile config("slowcontrol", argv[1]);
-    TTDACallback callback(config.getInt("ftsw"), config.get("ttdnode"));
+    TTDACallback callback;
     TTDMasterCallback callback2(&callback);
     RCNodeDaemon(config, &callback, &callback2).run();
   }

@@ -36,7 +36,7 @@ namespace Belle2 {
    *  The module supports reading from multiple files using TChain, entries will
    *  be read in the order the files are specified.
    *
-   *  @sa EDurability
+   *  @sa DataStore::EDurability
   */
   class RootInputModule : public Module {
   public:
@@ -100,6 +100,9 @@ namespace Belle2 {
     /** Check if we warn the user or abort after an entry was missing after changing files. */
     void entryNotFound(std::string entryOrigin, std::string name, bool fileChanged = true);
 
+    /** For index files, this creates TEventList/TEntryListArray to enable better cache use. */
+    void addEventListForIndexFile(const std::string& parentLfn);
+
     //first the steerable variables:
     /** File to read from. Cannot be used together with m_inputFileNames. */
     std::string m_inputFileName;
@@ -154,6 +157,10 @@ namespace Belle2 {
 
     /** last entry to be in persistent tree.  */
     long m_lastPersistentEntry;
+
+    /** last parent file LFN seen. (used by addEventListForIndexFile()) */
+    std::string m_lastParentFileLFN;
+
 
     /**  TTree for event input. */
     TChain* m_tree;

@@ -81,8 +81,6 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
             if (s.size() > 1) {
               if (s[0] == "standby") {
                 m_configname_standby = s[1];
-              } else if (s[0] == "shoulder") {
-                m_configname_shoulder = s[1];
               } else if (s[0] == "peak") {
                 m_configname_peak = s[1];
               }
@@ -92,16 +90,13 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
           LogFile::warning("No config name");
         }
         LogFile::info("standby  : %s", m_configname_standby.c_str());
-        LogFile::info("shoulder : %s", m_configname_shoulder.c_str());
         LogFile::info("peak     : %s", m_configname_peak.c_str());
         reset();
         lock();
         dbload(m_config_standby, m_configname_standby);
-        dbload(m_config_shoulder, m_configname_shoulder);
         dbload(m_config_peak, m_configname_peak);
         addAll(m_config_standby);
         set("config.standby", m_configname_standby);
-        set("config.shoulder", m_configname_shoulder);
         set("config.peak", m_configname_peak);
         m_config = FLAG_STANDBY;
         addAll(getConfig());
@@ -113,7 +108,7 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
         dbload(m_config_standby, m_configname_standby);
         addAll(m_config_standby);
         unlock();
-        getNode().setState(tstate);
+        setHVState(tstate);
         m_state_demand = HVState::STANDBY_S;
         m_config = FLAG_STANDBY;
         turnon();
@@ -130,18 +125,6 @@ bool HVCallback::perform(NSMCommunicator& com) throw()
         configure(getConfig());
         unlock();
         standby();
-      } else if (cmd == HVCommand::SHOULDER && state != HVState::SHOULDER_S) {
-        get("config.shoulder", m_configname_shoulder);
-        dbload(m_config_shoulder, m_configname_shoulder);
-        addAll(m_config_shoulder);
-        getNode().setState(tstate);
-        setHVState(tstate);
-        m_state_demand = HVState::SHOULDER_S;
-        m_config = FLAG_SHOULDER;
-        lock();
-        configure(getConfig());
-        unlock();
-        shoulder();
       } else if (cmd == HVCommand::PEAK && state != HVState::PEAK_S) {
         get("config.peak", m_configname_peak);
         dbload(m_config_peak, m_configname_peak);
@@ -167,7 +150,6 @@ void HVCallback::addAll(const HVConfig& config) throw()
   reset();
   add(new NSMVHandlerText("config", true, false, config.getName()));
   add(new NSMVHandlerText("config.standby", true, true, m_configname_standby));
-  add(new NSMVHandlerText("config.shoulder", true, true, m_configname_shoulder));
   add(new NSMVHandlerText("config.peak", true, true, m_configname_peak));
   add(new NSMVHandlerText("hvstate", true, false, getNode().getState().getLabel()));
   add(new NSMVHandlerInt("ncrates", true, false, (int)crate_v.size()));
@@ -217,5 +199,6 @@ void HVCallback::setHVState(const HVState& state)
 {
   getNode().setState(state);
   set("hvstate", state.getLabel());
+  log(LogFile::INFO, "HV State >> %s", state.getLabel());
 }
 

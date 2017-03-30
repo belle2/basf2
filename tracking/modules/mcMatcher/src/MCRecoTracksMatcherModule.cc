@@ -435,6 +435,15 @@ void MCRecoTracksMatcherModule::event()
   Eigen::MatrixXd efficiencyMatrix = confusionMatrix.array().rowwise() / totalNDF_by_mcId.array();
   Eigen::MatrixXd weightedEfficiencyMatrix = weightedConfusionMatrix.array().rowwise() / totalWeight_by_mcId.array();
 
+  B2DEBUG(100, "Purities");
+  B2DEBUG(100, purityMatrix);
+
+  B2DEBUG(100, "Efficiencies");
+  B2DEBUG(100, efficiencyMatrix);
+
+  B2DEBUG(100, "Weighted efficiencies");
+  B2DEBUG(100, weightedEfficiencyMatrix);
+
   // ### Building the Monte-Carlo track to highest efficiency patter recognition track relation ###
   // Weighted efficiency
   using Efficiency = float;
@@ -667,6 +676,14 @@ void MCRecoTracksMatcherModule::event()
     // No related pattern recognition track
     // Do not create a relation.
     B2DEBUG(100, "mcId " << mcId << " is missing. No relation created.");
+    B2DEBUG(100, "is Primary" << mcRecoTracks[mcId]->getRelatedTo<MCParticle>()->isPrimaryParticle());
+    B2DEBUG(100, "best prId " << prId << " with purity " << mostPureMCId_for_prId.purity << " -> " << mostPureMCId);
+    B2DEBUG(100, "MC Total ndf " << totalNDF_by_mcId[mcId]);
+    B2DEBUG(100, "MC Total weight" << totalWeight_by_mcId[mcId]);
+    B2DEBUG(100, "MC Overlap ndf\n " << confusionMatrix.col(mcId).transpose());
+    B2DEBUG(100, "MC Overlap weight\n " << weightedConfusionMatrix.col(mcId).transpose());
+    B2DEBUG(100, "MC Efficiencies for the track\n" << efficiencyMatrix.col(mcId).transpose());
+    B2DEBUG(100, "MC Weighted efficiencies for the track\n" << weightedEfficiencyMatrix.col(mcId).transpose());
   } // end for mcId
 
   B2DEBUG(100, "########## End MCRecoTracksMatcherModule ############");

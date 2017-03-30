@@ -84,6 +84,15 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
 
             # Include the mc tracks if the monte carlo data is presentx
             if 'MCRecoTracksMatcher' not in path:
+                matching_coverage = {key: value for key, value in tracking_coverage.items()
+                                     if key in ('UsePXDHits', 'UseSVDHits', 'UseCDCHits', 'MinimalEfficiency', 'MinimalPurity')}
+
+                # Removing minimal efficiency and purity as they are only parameters of the matching
+                if "MinimalEfficiency" in tracking_coverage:
+                    tracking_coverage.pop("MinimalEfficiency")
+                if "MinimalPurity" in tracking_coverage:
+                    tracking_coverage.pop("MinimalPurity")
+
                 # Reference Monte Carlo tracks
                 track_finder_mc_truth_module = basf2.register_module('TrackFinderMCTruthRecoTracks')
                 track_finder_mc_truth_module.param({
@@ -94,8 +103,6 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                 # Track matcher
                 mc_track_matcher_module = basf2.register_module('MCRecoTracksMatcher')
 
-                matching_coverage = {key: value for key, value in tracking_coverage.items()
-                                     if key in ('UsePXDHits', 'UseSVDHits', 'UseCDCHits')}
                 mc_track_matcher_module.param({
                     'mcRecoTracksStoreArrayName': 'MCRecoTracks',
                     'MinimalPurity': 0.66,

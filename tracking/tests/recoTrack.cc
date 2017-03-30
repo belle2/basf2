@@ -307,6 +307,7 @@ namespace Belle2 {
     }
   }
 
+  /* Test the getRecoHitInformations() function */
   TEST_F(RecoTrackTest, recoHitInformations)
   {
     StoreArray<CDCHit> cdcHits(m_storeArrayNameOfCDCHits);

@@ -93,12 +93,13 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParen
   EvtId Inclusive_Particle_ID = EvtPDL::getId(inclusiveParticle);
   EvtId Inclusive_Anti_Particle_ID = EvtPDL::chargeConj(Inclusive_Particle_ID);
 
-  m_logCapture.start();
   bool we_got_inclusive_particle = false;
   do {
+    m_logCapture.start();
     m_parent = EvtParticleFactory::particleFactory(m_ParentParticle, m_pinit);
     m_parent->setVectorSpinDensity();
     m_Generator->generateDecay(m_parent);
+    m_logCapture.finish();
 
     if (inclusiveType != 0) {
       EvtParticle* p = m_parent;
@@ -123,7 +124,6 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParen
       we_got_inclusive_particle = true;
     }
   } while (!we_got_inclusive_particle);
-  m_logCapture.finish();
 
   //  B2INFO("after generate Decay.");
 

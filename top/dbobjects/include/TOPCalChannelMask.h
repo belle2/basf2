@@ -18,9 +18,9 @@ namespace Belle2 {
   /**
    * Channel status for all 512 channels of 16 modules.
    * The Channel condition is stored as the enum EStatus with the convention:
-   * c_Dead = 0 dead channel
-   * c_Active = 1  active channel
-   * c_Noisy = 2 noisy channel.
+   * c_Active = 0 active channel
+   * c_Dead   = 1 dead channel
+   * c_Noisy  = 2 noisy channel.
    * A simple method isActive has been implemented to return false if
    * the channel has been masked for whatever reason and true if
    * the channel is active.
@@ -31,8 +31,8 @@ namespace Belle2 {
     /**
      * Status of the channel
      */
-    enum EStatus {c_Dead = 0,
-                  c_Active = 1,
+    enum EStatus {c_Active = 0,
+                  c_Dead = 1,
                   c_Noisy = 2
                  };
 
@@ -170,7 +170,8 @@ namespace Belle2 {
           c_numChannels = 512 /**< number of channels per module */
          };
 
-    EStatus m_status[c_numModules][c_numChannels] = {{c_Active}};    /**< channel status. c_Active by default.*/
+    EStatus m_status[c_numModules][c_numChannels] = {{ c_Active }};    /**< channel status. c_Active by default.*/
+    // instantiating an array with not enough entries fills with zeroes (active)
 
     ClassDef(TOPCalChannelMask, 1); /**< ClassDef */
 

@@ -40,6 +40,10 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
 
   labels.push_back(GlobalLabel::construct<CDCTimeWalks>(CDCGeometryPar::Instance().getBoardID(getWireID()), 0).label());
 
+  /*
+    alignment::GlobalDerivatives gd;
+    return gd;*/
+
   return alignment::GlobalDerivatives::passGlobals({labels, derivs});
 }
 

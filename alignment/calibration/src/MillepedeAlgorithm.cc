@@ -46,26 +46,13 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     return c_Failure;
   }
 
-  int undeterminedParams = 0;
-  for (int ipar = 0; ipar < m_result.getNoParameters(); ipar++) {
-    if (!m_result.isParameterDetermined(ipar)) {
-      if (!m_result.isParameterFixed(ipar)) {
-        ++undeterminedParams;
-      }
-    }
-  }
-
-  if (undeterminedParams) {
-    B2WARNING("There are " << undeterminedParams << " undetermined parameters. Not enough data for calibration.");
-    return c_NotEnoughData;
-  }
-
-
-
-  double maxCorrectionPull = 0.;
-  int maxCorrectionPullLabel = 0;
-  int nParams = 0;
-  double paramChi2 = 0.;
+//   for (int ipar = 0; ipar < m_result.getNoParameters(); ipar++) {
+//     if (!m_result.isParameterDetermined(ipar)) {
+//       if (!m_result.isParameterFixed(ipar)) {
+//         ++undeterminedParams;
+//       }
+//     }
+//   }
 
   GlobalParamVector result;
 
@@ -75,10 +62,20 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     break;
   }
 
+  int undeterminedParams = 0;
+  double maxCorrectionPull = 0.;
+  int maxCorrectionPullLabel = 0;
+  int nParams = 0;
+  double paramChi2 = 0.;
+
   // Loop over all determined parameters:
   for (int ipar = 0; ipar < m_result.getNoParameters(); ipar++) {
-    if (!m_result.isParameterDetermined(ipar))
+    if (!m_result.isParameterDetermined(ipar)) {
+      if (!m_result.isParameterFixed(ipar)) {
+        ++undeterminedParams;
+      }
       continue;
+    }
 
     GlobalLabel label(m_result.getParameterLabel(ipar));
     double correction = m_result.getParameterCorrection(ipar);
@@ -101,6 +98,11 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 
   for (auto object : result.releaseObjects()) {
     saveCalibration(object);
+  }
+
+  if (undeterminedParams) {
+    B2WARNING("There are " << undeterminedParams << " undetermined parameters. Not enough data for calibration.");
+    return c_NotEnoughData;
   }
 
   //commit();

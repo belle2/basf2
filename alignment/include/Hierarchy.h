@@ -31,6 +31,46 @@ namespace Belle2 {
   namespace alignment {
     class GlobalDerivatives {
     public:
+      explicit GlobalDerivatives(int dim = 2)
+      {
+        m_globals.second.ResizeTo(dim, 0);
+      }
+      explicit GlobalDerivatives(std::pair<std::vector<int>, TMatrixD> globals)
+      {
+        m_globals = globals;
+      }
+      GlobalDerivatives(std::vector<int> labels, TMatrixD derivs)
+      {
+        m_globals.first = labels;
+        m_globals.second = derivs;
+      }
+      operator std::pair<std::vector<int>, TMatrixD>() {return m_globals;}
+
+      std::vector<int> getLabels()
+      {
+        return m_globals.first;
+      }
+
+      TMatrixD getDerivatives()
+      {
+        return m_globals.second;
+      }
+
+      void add(int paramLabel, std::vector<double> dResiduals_dParam)
+      {
+        if (paramLabel == 0)
+          return;
+
+        int nRows = m_globals.second.GetNrows();
+        int nCols = m_globals.second.GetNcols();
+
+        m_globals.first.push_back(paramLabel);
+        m_globals.second.ResizeTo(m_globals.second.GetNrows(), nCols + 1);
+        for (int iRow = 0; iRow < nRows; ++iRow) {
+          m_globals.second(iRow, nCols) = dResiduals_dParam.at(iRow);
+        }
+      }
+
       static std::pair<std::vector<int>, TMatrixD> passGlobals(std::pair<std::vector<int>, TMatrixD> globals)
       {
         TMatrixD newMatrix(globals.second.GetNrows(), 0);
@@ -45,19 +85,11 @@ namespace Belle2 {
             newMatrix(iRow, newMatrix.GetNcols()) = globals.second(iRow, newMatrix.GetNcols());
           }
         }
-        /*
-                int counter = 0;
-                for (auto label : globals.first) {
-                  if (label == 0) {
-                    globals.first.at(counter) = 1;
-                    for (int iRow = 0; iRow < globals.second.GetNrows(); ++iRow) {
-                      globals.second(iRow, counter) = 0.;
-                    }
-                  }
-                  counter++;
-                }*/
         return {newLabels, newMatrix};
       }
+    private:
+      /// The global labels and derivatives matrix
+      std::pair<std::vector<int>, TMatrixD> m_globals {{}, TMatrixD()};
     };
 
     /// pair of the global unique id from object with constants and element representing some rigid body in hierarchy

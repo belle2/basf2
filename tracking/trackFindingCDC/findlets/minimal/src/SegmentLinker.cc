@@ -37,6 +37,11 @@ void SegmentLinker::exposeParameters(ModuleParamList* moduleParamList, const std
                                 m_param_wholeSuperLayer,
                                 "Link segment in the whole superlayer instead of inside the super cluster.",
                                 m_param_wholeSuperLayer);
+
+  moduleParamList->addParameter(prefixed(prefix, "dealiasLinked"),
+                                m_param_dealiasLinked,
+                                "Block hits that appear in linked segments such that unlinked reverse and aliases are excluded.",
+                                m_param_dealiasLinked);
 }
 
 void SegmentLinker::apply(const std::vector<CDCSegment2D>& inputSegment2Ds,
@@ -57,11 +62,34 @@ void SegmentLinker::apply(const std::vector<CDCSegment2D>& inputSegment2Ds,
   WeightedNeighborhood<const CDCSegment2D> segment2DNeighborhood(m_segment2DRelations);
   m_cellularPathFinder.apply(inputSegment2Ds, segment2DNeighborhood, m_segment2DPaths);
 
+  // Unmasked hits in case the blocking logic is requested
+  const bool toHits = true;
+  for (const CDCSegment2D& segment : inputSegment2Ds) {
+    segment.unsetAndForwardMaskedFlag(toHits);
+  }
+
   // Put the linked segments together
   std::vector<CDCSegment2D> tempOutputSegment2Ds;
   tempOutputSegment2Ds.reserve(m_segment2DPaths.size());
   for (const Path<const CDCSegment2D>& segment2DPath : m_segment2DPaths) {
+
+    // Do not use the single segments blocked in the dealiasing
+    if (m_param_dealiasLinked and segment2DPath.size() == 1 and
+        (*segment2DPath[0])->hasMaskedFlag()) {
+      continue;
+    }
+
     tempOutputSegment2Ds.push_back(CDCSegment2D::condense(segment2DPath));
+
+    // If two segments are linked odds are that it is the correct alias
+    // Block the used hits.
+    if (m_param_dealiasLinked and segment2DPath.size() > 1) {
+      tempOutputSegment2Ds.back().setAndForwardMaskedFlag(toHits);
+      for (const CDCSegment2D& otherSegment : inputSegment2Ds) {
+        otherSegment.receiveMaskedFlag(toHits);
+      }
+    }
+
   }
   outputSegment2Ds = std::move(tempOutputSegment2Ds);
 }

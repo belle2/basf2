@@ -84,9 +84,13 @@ namespace Belle2 {
       m_recoTrack = recoTracks.appendNew(position, momentum, charge,
                                          m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits,
                                          m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits, m_storeArrayNameOfHitInformation);
+      m_recoTrack2 = recoTracks.appendNew(position, momentum, charge,
+                                          m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits,
+                                          m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits, m_storeArrayNameOfHitInformation);
     }
 
     RecoTrack* m_recoTrack;
+    RecoTrack* m_recoTrack2;
     std::string m_storeArrayNameOfRecoTracks;
     std::string m_storeArrayNameOfCDCHits;
     std::string m_storeArrayNameOfSVDHits;
@@ -301,5 +305,27 @@ namespace Belle2 {
       ASSERT_EQ(this_i, sortParam);
       this_i++;
     }
+  }
+
+  TEST_F(RecoTrackTest, recoHitInformations)
+  {
+    StoreArray<CDCHit> cdcHits(m_storeArrayNameOfCDCHits);
+
+    m_recoTrack->addCDCHit(cdcHits[0], 1);
+
+    // create a second RecoTrack
+    StoreArray<RecoTrack> recoTracks(m_storeArrayNameOfRecoTracks);
+
+    RecoTrack* recoTrack2 = recoTracks.appendNew(m_recoTrack->getPositionSeed(), m_recoTrack->getMomentumSeed(),
+                                                 m_recoTrack->getChargeSeed(),
+                                                 m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits,
+                                                 m_storeArrayNameOfBKLMHits, m_storeArrayNameOfBKLMHits,
+                                                 m_storeArrayNameOfHitInformation);
+    recoTrack2->addCDCHit(cdcHits[1], 2);
+
+    ASSERT_EQ(m_recoTrack->getRecoHitInformations().size(), 1);
+    ASSERT_EQ(m_recoTrack->getRecoHitInformations()[0]->getSortingParameter(), 1);
+    ASSERT_EQ(recoTrack2->getRecoHitInformations().size(), 1);
+    ASSERT_EQ(recoTrack2->getRecoHitInformations()[0]->getSortingParameter(), 2);
   }
 }

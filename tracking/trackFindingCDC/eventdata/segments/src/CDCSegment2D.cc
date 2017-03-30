@@ -198,8 +198,12 @@ CDCSegment2D CDCSegment2D::condense(const std::vector<const CDCSegment2D*>& segm
   for (const CDCSegment2D* ptrSegment2D : segmentPath) {
     assert(ptrSegment2D);
     const CDCSegment2D& segment2D = *ptrSegment2D;
-    for (const CDCRecoHit2D& recoHit2D : segment2D) {
-      result.push_back(recoHit2D);
+    if (result.empty()) {
+      result = segment2D;
+    } else {
+      for (const CDCRecoHit2D& recoHit2D : segment2D) {
+        result.push_back(recoHit2D);
+      }
     }
     aliasScore = aliasScore + segment2D.getAliasScore();
   }

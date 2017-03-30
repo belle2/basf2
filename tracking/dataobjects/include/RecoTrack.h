@@ -580,9 +580,10 @@ namespace Belle2 {
     std::vector<RecoHitInformation*> getRecoHitInformations(bool getSorted = false) const
     {
       std::vector<RecoHitInformation*> hitList;
-      StoreArray<RecoHitInformation> recoHitInformations(m_storeArrayNameOfRecoHitInformation);
+      RelationVector<RecoHitInformation> recoHitInformations = getRelationsTo<RecoHitInformation>
+                                                               (m_storeArrayNameOfRecoHitInformation);
 
-      hitList.reserve(recoHitInformations.getEntries());
+      hitList.reserve(recoHitInformations.size());
       for (auto& recoHit : recoHitInformations) {
         hitList.push_back(&recoHit);
       }

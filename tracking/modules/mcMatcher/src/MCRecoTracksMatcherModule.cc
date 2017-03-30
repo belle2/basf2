@@ -105,11 +105,10 @@ namespace {
                              const StoreArray<RecoTrack>& storedRecoTracks)
   {
     RecoTrackId recoTrackId = -1;
-    typename AMapOrSet::iterator itInsertHint = recoTrackID_by_hitID.end();
-
     for (const RecoTrack& recoTrack : storedRecoTracks) {
       ++recoTrackId;
-
+      std::vector<std::pair<DetHitIdPair, WeightedRecoTrackId> > hitIDsInTrack;
+      double totalWeight = 0;
       using OriginTrackFinder = RecoHitInformation::OriginTrackFinder;
       const OriginTrackFinder c_MCTrackFinderAuxiliaryHit =
         OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
@@ -117,23 +116,33 @@ namespace {
       for (const RecoHitInformation::UsedCDCHit* cdcHit : recoTrack.getCDCHitList()) {
         OriginTrackFinder originFinder = recoTrack.getFoundByTrackFinder(cdcHit);
         double weight = originFinder == c_MCTrackFinderAuxiliaryHit ? 0 : 1;
-        itInsertHint =
-          recoTrackID_by_hitID.insert(itInsertHint,
-        {{Const::CDC, cdcHit->getArrayIndex()}, {recoTrackId, weight}});
+        totalWeight += weight;
+        hitIDsInTrack.push_back({{Const::CDC, cdcHit->getArrayIndex()}, {recoTrackId, weight}});
       }
       for (const RecoHitInformation::UsedSVDHit* svdHit : recoTrack.getSVDHitList()) {
         OriginTrackFinder originFinder = recoTrack.getFoundByTrackFinder(svdHit);
         double weight = originFinder == c_MCTrackFinderAuxiliaryHit ? 0 : 1;
-        itInsertHint =
-          recoTrackID_by_hitID.insert(itInsertHint,
-        {{Const::SVD, svdHit->getArrayIndex()}, {recoTrackId, weight}});
+        totalWeight += weight;
+        hitIDsInTrack.push_back({{Const::SVD, svdHit->getArrayIndex()}, {recoTrackId, weight}});
       }
       for (const RecoHitInformation::UsedPXDHit* pxdHit : recoTrack.getPXDHitList()) {
         OriginTrackFinder originFinder = recoTrack.getFoundByTrackFinder(pxdHit);
         double weight = originFinder == c_MCTrackFinderAuxiliaryHit ? 0 : 1;
-        itInsertHint =
-          recoTrackID_by_hitID.insert(itInsertHint,
-        {{Const::PXD, pxdHit->getArrayIndex()}, {recoTrackId, weight}});
+        totalWeight += weight;
+        hitIDsInTrack.push_back({{Const::PXD, pxdHit->getArrayIndex()}, {recoTrackId, weight}});
+      }
+
+      // In case all hits are auxiliary for a track - reset all weights to 1
+      if (totalWeight == 0) {
+        for (std::pair<DetHitIdPair, WeightedRecoTrackId>& recoTrack_for_hitID : hitIDsInTrack) {
+          recoTrack_for_hitID.second.weight = 1;
+        }
+      }
+
+      // Commit to output
+      typename AMapOrSet::iterator itInsertHint = recoTrackID_by_hitID.end();
+      for (std::pair<DetHitIdPair, WeightedRecoTrackId>& recoTrack_for_hitID : hitIDsInTrack) {
+        itInsertHint = recoTrackID_by_hitID.insert(itInsertHint, recoTrack_for_hitID);
       }
     }
   }

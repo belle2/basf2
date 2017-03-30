@@ -25,20 +25,12 @@
 #include <TObjArray.h>
 #include <TChainElement.h>
 
-#include <iostream>
-
 using namespace std;
 using namespace Belle2;
 using namespace RootIOUtilities;
 
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
 REG_MODULE(RootInput)
 
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
 RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentEntry(-1), m_tree(0), m_persistent(0)
 {
   //Set module properties
@@ -103,6 +95,7 @@ void RootInputModule::initialize()
 
   m_nextEntry = m_skipNEvents;
   m_lastPersistentEntry = -1;
+  m_lastParentFileLFN = "";
 
   loadDictionaries();
 
@@ -360,7 +353,7 @@ void RootInputModule::readTree()
     // file changed, read the FileMetaData object from the persistent tree and update the parent file metadata
     readPersistentEntry(treeNum);
     if (!m_recovery or fileMetaData)
-      B2INFO("Loading new input file with LFN:" << FileCatalog::Instance().getPhysicalFileName(fileMetaData->getLfn()));
+      B2INFO("Loading new input file with physical path:" << FileCatalog::Instance().getPhysicalFileName(fileMetaData->getLfn()));
   }
 
   for (auto entry : m_storeEntries) {
@@ -462,18 +455,17 @@ bool RootInputModule::createParentStoreEntries()
   int run = eventMetaData->getRun();
   unsigned int event = eventMetaData->getEvent();
   std::string parentLfn = eventMetaData->getParentLfn();
-  std::string parentPfn = FileCatalog::Instance().getPhysicalFileName(parentLfn);
   branch->SetAddress(address);
 
   // loop over parents and get their metadata
   for (int level = 0; level < m_parentLevel; level++) {
-
     // open the parent file
     TDirectory* dir = gDirectory;
+    const std::string parentPfn = FileCatalog::Instance().getPhysicalFileName(parentLfn);
     TFile* file = TFile::Open(parentPfn.c_str(), "READ");
     dir->cd();
     if (!file || !file->IsOpen()) {
-      B2ERROR("Couldn't open parent file " << parentPfn);
+      B2ERROR("Couldn't open parent file " << parentLfn << " " << parentPfn);
       return false;
     }
 
@@ -496,7 +488,7 @@ bool RootInputModule::createParentStoreEntries()
     connectBranches(persistent, DataStore::c_Persistent, 0);
 
     // get parent LFN of parent
-    EventMetaData* metaData = 0;
+    EventMetaData* metaData = nullptr;
     tree->SetBranchAddress("EventMetaData", &metaData);
     long entry = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, event, run, experiment);
     tree->GetBranch("EventMetaData")->GetEntry(entry);
@@ -515,11 +507,11 @@ bool RootInputModule::readParentTrees()
   unsigned int event = eventMetaData->getEvent();
 
   std::string parentLfn = eventMetaData->getParentLfn();
-  std::string parentPfn = FileCatalog::Instance().getPhysicalFileName(parentLfn);
   for (int level = 0; level < m_parentLevel; level++) {
+    const std::string& parentPfn = FileCatalog::Instance().getPhysicalFileName(parentLfn);
 
     // Open the parent file if we haven't done this already
-    TTree* tree = 0;
+    TTree* tree = nullptr;
     if (m_parentTrees.find(parentLfn) == m_parentTrees.end()) {
       TDirectory* dir = gDirectory;
       B2DEBUG(50, "Opening parent file: " << parentPfn);
@@ -550,7 +542,7 @@ bool RootInputModule::readParentTrees()
     }
 
     // read the tree and mark the data read in the data store
-    EventMetaData* parentMetaData = 0;
+    EventMetaData* parentMetaData = nullptr;
     tree->SetBranchAddress("EventMetaData", &parentMetaData);
     tree->GetEntry(entry);
     for (auto entry : m_parentStoreEntries[level]) {
@@ -561,7 +553,53 @@ bool RootInputModule::readParentTrees()
     parentLfn = parentMetaData->getParentLfn();
   }
 
+  addEventListForIndexFile(parentLfn);
+
   return true;
+}
+
+void RootInputModule::addEventListForIndexFile(const std::string& parentLfn)
+{
+  //is this really an index file? (=only EventMetaData stored)
+  if (!(m_parentLevel > 0 and m_storeEntries.size() == 1))
+    return;
+  //did we handle the current parent file already?
+  if (parentLfn == m_lastParentFileLFN)
+    return;
+  m_lastParentFileLFN = parentLfn;
+
+  B2INFO("Index file detected, scanning to generate event list.");
+  TTree* tree = m_parentTrees.at(parentLfn);
+
+  //both types of list work, TEventList seems to result in slightly less data being read.
+  TEventList* elist = new TEventList("parent_entrylist");
+  //TEntryListArray* elist = new TEntryListArray();
+
+  TBranch* branch = m_tree->GetBranch("EventMetaData");
+  auto* address = branch->GetAddress();
+  EventMetaData* eventMetaData = 0;
+  branch->SetAddress(&eventMetaData);
+  long nEntries = m_tree->GetEntries();
+  for (long i = m_nextEntry; i < nEntries; i++) {
+    branch->GetEntry(i);
+    int experiment = eventMetaData->getExperiment();
+    int run = eventMetaData->getRun();
+    unsigned int event = eventMetaData->getEvent();
+    const std::string& newParentLfn = eventMetaData->getParentLfn();
+
+    if (parentLfn != newParentLfn) {
+      //parent file changed, stopping for now
+      break;
+    }
+    long entry = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, event, run, experiment);
+    elist->Enter(entry);
+  }
+  branch->SetAddress(address);
+
+  if (tree) {
+    tree->SetEventList(elist);
+    //tree->SetEntryList(elist);
+  }
 }
 
 void RootInputModule::entryNotFound(std::string entryOrigin, std::string name, bool fileChanged)

@@ -61,8 +61,9 @@ void TOPChannelMaskerModule::event()
   // now flag actual data Cherenkov hits as coming from bad channels
   StoreArray<TOPDigit> digits;
   for (auto& digit : digits) {
-    if (!m_channelMask->isActive(digit.getModuleID(), digit.getChannel()))
+    if (!m_channelMask->isActive(digit.getModuleID(), digit.getChannel())) {
       digit.setHitQuality(TOPDigit::c_Junk);
+    }
   }
   return;
 }

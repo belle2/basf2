@@ -41,14 +41,13 @@ class BackgroundClusterFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEventsR
                 "filter(mva_bkg)",
             ]
 
-        path.add_module("TFCDC_SegmentFinderFacetAutomaton",
+        path.add_module("TFCDC_ClusterPreparer",
                         ClusterFilter="unionrecording",
                         ClusterFilterParameters={
                             "rootFileName": self.sample_file_name,
                             "varSets": varSets,
-                        },
-                        FacetFilter="none",
-                        FacetRelationFilter="none")
+                        })
+
         return path
 
 

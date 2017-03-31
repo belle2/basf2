@@ -162,6 +162,7 @@ finder_modules_by_short_name = {
                                             path.add_module('TFCDC_TrackExporter')),
     'SegmentFinderCDC': lambda path: (path.add_module('TFCDC_WireHitPreparer',
                                                       flightTimeEstimation="outwards"),
+                                      path.add_module('TFCDC_ClusterPreparer'),
                                       path.add_module('TFCDC_SegmentFinderFacetAutomaton'),
                                       path.add_module('TFCDC_TrackCreatorSingleSegments',
                                                       MinimalHitsBySuperLayerId={sl_id: 0 for sl_id in range(9)}),

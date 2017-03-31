@@ -24,6 +24,8 @@ class FeasibleSegmentRelationFilterTrainingRun(TrainingRunMixin, ReadOrGenerateE
                         flightTimeEstimation="outwards",
                         UseNLoops=1.0)
 
+        path.add_module("TFCDC_ClusterPreparer")
+
         if self.task == "train":
             varSets = [
                 "feasible",

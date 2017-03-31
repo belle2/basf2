@@ -227,13 +227,15 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
 
     # Init the geometry for cdc tracking and the hits
     path.add_module("TFCDC_WireHitPreparer",
-                    flightTimeEstimation="outwards",
-                    )
+                    flightTimeEstimation="outwards")
 
-    # Find segments and reduce background hits
-    path.add_module("TFCDC_SegmentFinderFacetAutomaton",
+    # Constructs clusters and reduce background hits
+    path.add_module("TFCDC_ClusterPreparer",
                     ClusterFilter="mva_bkg",
                     ClusterFilterParameters={"cut": 0.2})
+
+    # Find segments within the clusters
+    path.add_module("TFCDC_SegmentFinderFacetAutomaton")
 
     # Find axial tracks
     path.add_module("TFCDC_AxialTrackFinderLegendre")
@@ -307,13 +309,15 @@ def add_cdc_cr_track_finding(path,
     # Init the geometry for cdc tracking and the hits
     path.add_module("TFCDC_WireHitPreparer",
                     flightTimeEstimation="downwards",
-                    triggerPoint=trigger_point,
-                    )
+                    triggerPoint=trigger_point)
 
-    # Find segments and reduce background hits
-    path.add_module("TFCDC_SegmentFinderFacetAutomaton",
+    # Constructs clusters and reduce background hits
+    path.add_module("TFCDC_ClusterPreparer",
                     ClusterFilter="mva_bkg",
-                    ClusterFilterParameters={"cut": 0.2},
+                    ClusterFilterParameters={"cut": 0.2})
+
+    # Find segments within the clusters
+    path.add_module("TFCDC_SegmentFinderFacetAutomaton",
                     SegmentOrientation="downwards")
 
     # Find axial tracks

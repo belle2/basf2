@@ -59,7 +59,7 @@ class FacetRelationFilterTrainingRun(TrainingRunMixin, StandardEventGenerationRu
                 "chi2_old_weight",
                 "chi2_old_accept",
                 "simple_accept",
-                ]
+            ]
 
             self.groupby = ["", "superlayer_id"]
             self.auxiliaries = [
@@ -139,6 +139,8 @@ class FacetRelationFilterTrainingRun(TrainingRunMixin, StandardEventGenerationRu
         path.add_module("TFCDC_WireHitPreparer",
                         flightTimeEstimation="outwards",
                         UseNLoops=1.0)
+
+        path.add_module("TFCDC_ClusterPreparer")
 
         path.add_module("TFCDC_SegmentFinderFacetAutomaton",
                         FacetRelationFilter="unionrecording",

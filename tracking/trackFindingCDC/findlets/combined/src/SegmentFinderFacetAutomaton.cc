@@ -87,6 +87,7 @@ void SegmentFinderFacetAutomaton::apply(std::vector<CDCWireHit>& inputWireHits, 
   m_clusterBackgroundDetector.apply(m_clusters);
   m_facetCreator.apply(m_clusters, m_facets);
   m_facetRelationCreator.apply(m_facets, m_facetRelations);
+  if (m_facetRelations.size() == 0) return; // Break point for facet recording runs
   m_segmentCreatorFacetAutomaton.apply(m_facets, m_facetRelations, m_segments);
   m_segmentFitter.apply(m_segments);
 

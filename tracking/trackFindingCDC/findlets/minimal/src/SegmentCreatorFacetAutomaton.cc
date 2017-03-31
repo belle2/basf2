@@ -100,10 +100,6 @@ void SegmentCreatorFacetAutomaton::apply(
     WeightedNeighborhood<const CDCFacet> facetNeighborhood(beginFacetRelationInSuperCluster,
                                                            endFacetRelationInSuperCluster);
 
-    if (facetNeighborhood.size() == 0) {
-      continue; // No neighborhood generated. Next cluster.
-    }
-
     // Apply the cellular automaton in a multipass manner
     m_facetPaths.clear();
     m_cellularPathFinder.apply(facetsInCluster, facetNeighborhood, m_facetPaths);

@@ -85,6 +85,10 @@ void FacetCreator::apply(const std::vector<CDCWireHitCluster>& inputClusters, st
     // Sort the facets in their cluster
     std::sort(facetsInCluster.begin(), facetsInCluster.end());
 
+    B2ASSERT("Expected all facets to be different",
+             std::adjacent_find(facetsInCluster.begin(), facetsInCluster.end()) ==
+             facetsInCluster.end());
+
     for (CDCFacet& facet : facetsInCluster) {
       facet.setICluster(iCluster);
     }

@@ -43,13 +43,13 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
     "Target data is collected from a MCParticle related to the 2D track."
   );
   // parameters for saving / loading
-  addParam("TSHitCollectionName", m_TSHitCollectionName,
+  addParam("hitCollectionName", m_hitCollectionName,
            "Name of the input StoreArray of CDCTriggerSegmentHits.",
            string(""));
-  addParam("inputCollection", m_inputCollectionName,
+  addParam("inputCollectionName", m_inputCollectionName,
            "Name of the StoreArray holding the 2D input tracks.",
            string("Trg2DFinderTracks"));
-  addParam("targetCollection", m_targetCollectionName,
+  addParam("targetCollectionName", m_targetCollectionName,
            "Name of the MCParticle collection used as target values.",
            string("MCParticles"));
   addParam("filename", m_filename,
@@ -184,7 +184,7 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
 void NeuroTriggerTrainerModule::initialize()
 {
   // register store objects
-  StoreArray<CDCTriggerSegmentHit>::required(m_TSHitCollectionName);
+  StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
   StoreArray<CDCTriggerTrack>::required(m_inputCollectionName);
   StoreArray<MCParticle>::required(m_targetCollectionName);
   // load or initialize neurotrigger
@@ -203,7 +203,7 @@ void NeuroTriggerTrainerModule::initialize()
       }
     }
   }
-  m_NeuroTrigger.setTSHitCollectionName(m_TSHitCollectionName);
+  m_NeuroTrigger.setHitCollectionName(m_hitCollectionName);
   // consistency check of training parameters
   if (m_NeuroTrigger.nSectors() != m_trainSets.size())
     B2ERROR("Number of training sets (" << m_trainSets.size() << ") should match " <<
@@ -320,7 +320,7 @@ void NeuroTriggerTrainerModule::event()
         // and count them to find relevant id range
         // using only related hits suppresses background EXCEPT for curling tracks
         for (const CDCTriggerSegmentHit& hit :
-             mcTrack->getRelationsTo<CDCTriggerSegmentHit>(m_TSHitCollectionName)) {
+             mcTrack->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName)) {
           // get relative id
           double relId = m_NeuroTrigger.getRelId(hit);
           int intId = round(relId);

@@ -26,16 +26,16 @@ CDCTrigger2DFitterModule::CDCTrigger2DFitterModule() : Module::Module()
     "Requires a preceding track finder to sort hits to tracks.\n"
   );
 
-  addParam("TSHitCollectionName", m_TSHitCollectionName,
+  addParam("hitCollectionName", m_hitCollectionName,
            "Name of the input StoreArray of CDCTriggerSegmentHits.",
            string(""));
   addParam("EventTimeName", m_EventTimeName,
            "Name of the event time object.",
            string("CDCTriggerEventTime"));
-  addParam("inputCollection", m_inputCollectionName,
+  addParam("inputCollectionName", m_inputCollectionName,
            "Name of the StoreArray holding the input tracks from the track finder.",
            string("Trg2DFinderTracks"));
-  addParam("outputCollection", m_outputCollectionName,
+  addParam("outputCollectionName", m_outputCollectionName,
            "Name of the StoreArray holding the fitted output tracks.",
            string("Trg2DFitterTracks"));
   addParam("minHits", m_minHits,
@@ -56,11 +56,11 @@ CDCTrigger2DFitterModule::initialize()
   // register DataStore elements
   StoreArray<CDCTriggerTrack>::registerPersistent(m_outputCollectionName);
   StoreArray<CDCTriggerTrack>::required(m_inputCollectionName);
-  StoreArray<CDCTriggerSegmentHit>::required(m_TSHitCollectionName);
+  StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
   // register relations
   StoreArray<CDCTriggerTrack> finderTracks(m_inputCollectionName);
   StoreArray<CDCTriggerTrack> fitterTracks(m_outputCollectionName);
-  StoreArray<CDCTriggerSegmentHit> segmentHits(m_TSHitCollectionName);
+  StoreArray<CDCTriggerSegmentHit> segmentHits(m_hitCollectionName);
   finderTracks.registerRelationTo(fitterTracks);
   fitterTracks.registerRelationTo(segmentHits);
 
@@ -110,7 +110,7 @@ CDCTrigger2DFitterModule::event()
   for (int itrack = 0; itrack < finderTracks.getEntries(); ++itrack) {
     // get selected hits (positive relation weight)
     RelationVector<CDCTriggerSegmentHit> hits =
-      finderTracks[itrack]->getRelationsTo<CDCTriggerSegmentHit>(m_TSHitCollectionName);
+      finderTracks[itrack]->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
     unsigned nHits = 0;
     vector<double> tsId(5, -1.);
     vector<double> wirePhi(5, 0.);

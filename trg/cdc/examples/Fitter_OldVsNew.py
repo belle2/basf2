@@ -99,11 +99,11 @@ main.add_module(trgcdc, logLevel=basf2.LogLevel.INFO)
 # fitters
 main.add_module('CDCTrigger2DFitter', logLevel=basf2.LogLevel.INFO,
                 minHits=2, useDriftTime=fitdrift, xtSimple=xtsimple,
-                outputCollection='FitterTracks')  # to distinguish from old output
+                outputCollectionName='FitterTracks')  # to distinguish from old output
 main.add_module('CDCTrigger3DFitter', logLevel=basf2.LogLevel.INFO,
                 xtSimple=xtsimple,
-                inputCollection='FitterTracks',
-                outputCollection='Fitter3DTracks')  # to distinguish from old output
+                inputCollectionName='FitterTracks',
+                outputCollectionName='Fitter3DTracks')  # to distinguish from old output
 
 
 # ----------- #

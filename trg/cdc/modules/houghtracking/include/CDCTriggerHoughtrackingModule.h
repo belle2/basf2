@@ -162,7 +162,7 @@ namespace Belle2 {
   protected:
 
     /** Name of the StoreArray containing the input track segment hits. */
-    std::string m_TSHitCollectionName;
+    std::string m_hitCollectionName;
     /** Name of the StoreArray containing the tracks found by the Hough tracking. */
     std::string m_outputCollectionName;
     /** Name of the StoreArray containing the clusters formed in the Hough plane. */

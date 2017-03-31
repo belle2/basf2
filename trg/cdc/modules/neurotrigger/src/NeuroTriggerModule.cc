@@ -33,13 +33,13 @@ NeuroTriggerModule::NeuroTriggerModule() : Module()
            "Name of the TObjArray holding the NeuroTrigger parameters "
            "(compare NeuroTriggerTrainer).",
            string("MLPs"));
-  addParam("TSHitCollectionName", m_TSHitCollectionName,
+  addParam("hitCollectionName", m_hitCollectionName,
            "Name of the input StoreArray of CDCTriggerSegmentHits.",
            string(""));
-  addParam("inputCollection", m_inputCollectionName,
+  addParam("inputCollectionName", m_inputCollectionName,
            "Name of the StoreArray holding the 2D input tracks.",
            string("Trg2DFinderTracks"));
-  addParam("outputCollection", m_outputCollectionName,
+  addParam("outputCollectionName", m_outputCollectionName,
            "Name of the StoreArray holding the output tracks with neural network estimates.",
            string("TrgNNTracks"));
   addParam("fixedPoint", m_fixedPoint,
@@ -55,7 +55,7 @@ NeuroTriggerModule::NeuroTriggerModule() : Module()
 void
 NeuroTriggerModule::initialize()
 {
-  StoreArray<CDCTriggerSegmentHit>::required(m_TSHitCollectionName);
+  StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
   StoreArray<CDCTriggerTrack>::required(m_inputCollectionName);
   if (!m_NeuroTrigger.load(m_filename, m_arrayname))
     B2ERROR("NeuroTrigger could not be loaded correctly.");
@@ -64,13 +64,13 @@ NeuroTriggerModule::initialize()
   StoreArray<CDCTriggerTrack> tracks2D(m_inputCollectionName);
   StoreArray<CDCTriggerTrack> tracksNN(m_outputCollectionName);
   tracks2D.registerRelationTo(tracksNN);
-  StoreArray<CDCTriggerSegmentHit> segmentHits(m_TSHitCollectionName);
+  StoreArray<CDCTriggerSegmentHit> segmentHits(m_hitCollectionName);
   tracksNN.registerRelationTo(segmentHits);
 
   if (m_fixedPoint) {
     m_NeuroTrigger.setPrecision(m_precision);
   }
-  m_NeuroTrigger.setTSHitCollectionName(m_TSHitCollectionName);
+  m_NeuroTrigger.setHitCollectionName(m_hitCollectionName);
 }
 
 
@@ -79,7 +79,7 @@ NeuroTriggerModule::event()
 {
   StoreArray<CDCTriggerTrack> tracks2D(m_inputCollectionName);
   StoreArray<CDCTriggerTrack> tracksNN(m_outputCollectionName);
-  StoreArray<CDCTriggerSegmentHit> segmentHits(m_TSHitCollectionName);
+  StoreArray<CDCTriggerSegmentHit> segmentHits(m_hitCollectionName);
   for (int itrack = 0; itrack < tracks2D.getEntries(); ++itrack) {
     if (m_fixedPoint) {
       m_NeuroTrigger.updateTrackFix(*tracks2D[itrack]);

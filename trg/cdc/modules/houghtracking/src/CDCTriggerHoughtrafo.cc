@@ -172,7 +172,7 @@ CDCTriggerHoughtrackingModule::connectedRegions()
   vector<CDCTriggerHoughCand> cpyCand = houghCand;
 
   StoreArray<CDCTriggerTrack> storeTracks(m_outputCollectionName);
-  StoreArray<CDCTriggerSegmentHit> tsHits(m_TSHitCollectionName);
+  StoreArray<CDCTriggerSegmentHit> tsHits(m_hitCollectionName);
   StoreArray<CDCTriggerHoughCluster> clusters(m_clusterCollectionName);
 
   // debug: print candidate list
@@ -411,7 +411,7 @@ CDCTriggerHoughtrackingModule::findAllCrossingHits(std::vector<unsigned>& list,
                                                    double x1, double x2,
                                                    double y1, double y2)
 {
-  StoreArray<CDCTriggerSegmentHit> tsHits(m_TSHitCollectionName);
+  StoreArray<CDCTriggerSegmentHit> tsHits(m_hitCollectionName);
 
   double m, a, y1_h, y2_h;
   for (int iHit = 0; iHit < tsHits.getEntries(); iHit++) {
@@ -448,7 +448,7 @@ CDCTriggerHoughtrackingModule::selectHits(std::vector<unsigned>& list,
                                           std::vector<unsigned>& selected,
                                           std::vector<unsigned>& unselected)
 {
-  StoreArray<CDCTriggerSegmentHit> tsHits(m_TSHitCollectionName);
+  StoreArray<CDCTriggerSegmentHit> tsHits(m_hitCollectionName);
 
   std::vector<int> bestPerSL(5, -1);
   for (unsigned i = 0; i < list.size(); ++i) {
@@ -483,7 +483,7 @@ void
 CDCTriggerHoughtrackingModule::patternClustering()
 {
   StoreArray<CDCTriggerTrack> storeTracks(m_outputCollectionName);
-  StoreArray<CDCTriggerSegmentHit> tsHits(m_TSHitCollectionName);
+  StoreArray<CDCTriggerSegmentHit> tsHits(m_hitCollectionName);
   StoreArray<CDCTriggerHoughCluster> clusters(m_clusterCollectionName);
 
   // fill a matrix of 2 x 2 squares

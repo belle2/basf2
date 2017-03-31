@@ -26,7 +26,7 @@ namespace Belle2 {
 
   protected:
     /** Name of the StoreArray containing the input track segment hits. */
-    std::string m_TSHitCollectionName;
+    std::string m_hitCollectionName;
     /** name of the event time StoreObjPtr */
     std::string m_EventTimeName;
     /** Name of the StoreArray containing the input tracks from the finder. */

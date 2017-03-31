@@ -48,7 +48,7 @@ namespace Belle2 {
                 double& z0, double& cot, double& chi2);
 
     /** Name of the StoreArray containing the input track segment hits. */
-    std::string m_TSHitCollectionName;
+    std::string m_hitCollectionName;
     /** name of the event time StoreObjPtr */
     std::string m_EventTimeName;
     /** Name of the StoreArray containing the input tracks from the 2D fitter. */

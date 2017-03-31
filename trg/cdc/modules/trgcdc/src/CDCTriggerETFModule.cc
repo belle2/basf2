@@ -21,8 +21,8 @@ CDCTriggerETFModule::CDCTriggerETFModule() : Module::Module()
     "Uses fastest time of CDCTriggerSegmentHits to find the event time.\n"
   );
 
-  addParam("TSHitCollectionName",
-           m_TSHitCollectionName,
+  addParam("hitCollectionName",
+           m_hitCollectionName,
            "Name of the input StoreArray of CDCTriggerSegmentHits.",
            string(""));
   addParam("EventTimeName", m_EventTimeName,
@@ -43,7 +43,7 @@ CDCTriggerETFModule::initialize()
 {
   // register DataStore elements
   StoreObjPtr<TRGTiming>::registerPersistent(m_EventTimeName);
-  StoreArray<CDCTriggerSegmentHit>::required(m_TSHitCollectionName);
+  StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
 }
 
 void
@@ -60,7 +60,7 @@ CDCTriggerETFModule::event()
   // histogram for fastest timings
   TH1* h = new TH1D("h", "h", 1000, -500, 499);
   // loop over hits
-  StoreArray<CDCTriggerSegmentHit> hits(m_TSHitCollectionName);
+  StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
   // loop over clock cycles to get time ordered hits
   for (int iClk = 0; iClk < 64; ++iClk) {
     for (int iTS = 0; iTS < hits.getEntries(); ++iTS) {

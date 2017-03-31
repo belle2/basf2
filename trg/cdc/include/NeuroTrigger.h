@@ -103,7 +103,7 @@ namespace Belle2 {
     void setPrecision(std::vector<unsigned> precision) { m_precision = precision; }
 
     /** set name of the track segment hit StoreArray */
-    void setTSHitCollectionName(std::string name) { m_TSHitCollectionName = name; }
+    void setHitCollectionName(std::string name) { m_hitCollectionName = name; }
 
     /** return reference to a neural network */
     CDCTriggerMLP& operator[](unsigned index) { return m_MLPs[index]; }
@@ -194,7 +194,7 @@ namespace Belle2 {
      */
     std::vector<unsigned> m_precision;
     /** Name of the StoreArray containing the input track segment hits. */
-    std::string m_TSHitCollectionName;
+    std::string m_hitCollectionName;
   };
 }
 #endif

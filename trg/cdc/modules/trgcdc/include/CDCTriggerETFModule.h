@@ -29,7 +29,7 @@ namespace Belle2 {
     /** bin threshold for event time */
     unsigned m_threshold;
     /** name of the input track segment hit StoreArray */
-    std::string m_TSHitCollectionName;
+    std::string m_hitCollectionName;
     /** name of the output StoreObjPtr holding the event time */
     std::string m_EventTimeName;
 

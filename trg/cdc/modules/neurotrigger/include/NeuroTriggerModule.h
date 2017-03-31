@@ -38,7 +38,7 @@ namespace Belle2 {
     /** Name of the TObjArray holding the networks. */
     std::string m_arrayname;
     /** Name of the StoreArray containing the input track segment hits. */
-    std::string m_TSHitCollectionName;
+    std::string m_hitCollectionName;
     /** Name of the StoreArray containing the input 2D tracks. */
     std::string m_inputCollectionName;
     /** Name of the StoreArray containing the resulting NN tracks. */

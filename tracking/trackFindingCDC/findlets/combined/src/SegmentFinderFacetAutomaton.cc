@@ -50,7 +50,7 @@ std::string SegmentFinderFacetAutomaton::getDescription()
 
 void SegmentFinderFacetAutomaton::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  m_superClusterCreator.exposeParameters(moduleParamList, prefix);
+  m_superClusterCreator.exposeParameters(moduleParamList, prefixed(prefix, "SuperCluster"));
   m_clusterRefiner.exposeParameters(moduleParamList, prefix);
   m_clusterBackgroundDetector.exposeParameters(moduleParamList, prefixed(prefix, "Cluster"));
   m_facetCreator.exposeParameters(moduleParamList, prefixed(prefix, "Facet"));

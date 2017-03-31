@@ -112,7 +112,7 @@ main.add_module('CDCTrigger3DFitter', logLevel=basf2.LogLevel.INFO,
 
 class TestModule(basf2.Module):
     """
-    test module to compare the output of TRGCDC and CDCTrigger2DFitter
+    test module to compare the output of TRGCDC and CDCTrigger2DFitter/CDCTrigger3DFitter
     """
 
     def event(self):

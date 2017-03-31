@@ -1,13 +1,12 @@
 //-----------------------------------------------------------
 // $Id$
 //-----------------------------------------------------------
-// Filename : TRGGRLResults.h
-// Section  : TRG GRL
-// Owner    : Ke LI, Junhao Yin, Chunhua Li
-// Email    : like@ihep.ac.cn, yinjh@ihep.ac.cn,
-//            chunhua.li@unimelb.edu.au
+// Filename : TRGGDLResults.h
+// Section  : TRG GDL
+// Owner    : Chunhua Li
+// Email    : chunhua.li@unimelb.edu.au
 //-----------------------------------------------------------
-// Description : A class to save TRG GRL information of event.
+// Description : A class to save TRG GDL information of event.
 //-----------------------------------------------------------
 // $Log$
 //-----------------------------------------------------------
@@ -19,16 +18,16 @@ namespace Belle2 {
   class TRGGDLResults : public TObject {
   public:
 
-    //! The Class title
+    /**! The Class title*/
     ClassDef(TRGGDLResults, 1); /*< the class title */
     TRGGDLResults(): m_L1TriggerResults(0) {}
     ~TRGGDLResults() {}
 
 
-    //set the trigger results
+    /**set the trigger results*/
     void setL1TriggerRsults(int L1TriggerResults) {m_L1TriggerResults = L1TriggerResults;}
 
-    //get trigger result
+    /**get trigger result*/
     int getL1TriggerResults() const {return m_L1TriggerResults;}
 
 

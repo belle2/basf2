@@ -20,12 +20,12 @@ CDCTriggerMLP::CDCTriggerMLP():
   weights.assign(nWeightsCal(), 0.);
 }
 
-CDCTriggerMLP::CDCTriggerMLP(std::vector<unsigned short> nNodes,
+CDCTriggerMLP::CDCTriggerMLP(std::vector<unsigned short>& nNodes,
                              unsigned short targetVars,
-                             std::vector<float> outputScale,
-                             std::vector<float> phiRange,
-                             std::vector<float> invptRange,
-                             std::vector<float> thetaRange,
+                             std::vector<float>& outputScale,
+                             std::vector<float>& phiRange,
+                             std::vector<float>& invptRange,
+                             std::vector<float>& thetaRange,
                              unsigned short maxHits,
                              unsigned long SLpattern,
                              unsigned long SLpatternMask,

@@ -24,18 +24,18 @@ Hough3DFinder::Hough3DFinder(void) :
   m_hitMap(0), m_geoCandidatesIndex(0), m_geoCandidatesPhi(0),
   m_geoCandidatesDiffStWires(0), m_stAxPhi(), m_bestCot(0), m_bestZ0(0),
   m_houghMax(0), m_minDiffHough(0), m_foundZ(), m_foundPhiSt(), m_bestTSIndex(),
-  m_bestTS(),  m_findRhoMax(0), m_findRhoMin(0), m_findRhoIntMax(0), m_findRhoIntMin(0),
+  m_bestTS(), m_inputFileName("GeoFinder.input"), m_findRhoMax(0), m_findRhoMin(0),
+  m_findRhoIntMax(0), m_findRhoIntMin(0),
   m_findPhi0Max(0), m_findPhi0Min(0), m_findPhi0IntMax(0), m_findPhi0IntMin(0),
   m_findArcCosMax(0), m_findArcCosMin(0), m_findArcCosIntMax(0), m_findArcCosIntMin(0),
   m_findPhiZMax(0), m_findPhiZMin(0), m_findPhiZIntMax(0), m_findPhiZIntMin(0),
   m_rhoMax(0), m_rhoMin(0), m_rhoBit(0), m_phi0Max(0), m_phi0Min(0), m_phi0Bit(0),
   m_stAxWireFactor(0), m_LUT(0),
-  m_arcCosLUT(0), m_wireConvertLUT(0), m_commonData(0)
+  m_arcCosLUT(0), m_wireConvertLUT(0),
+  m_commonData(0), m_outputVhdlDirname("./VHDL/finder3D")
 {
   m_mode = 2;
   m_Trg_PI = 3.141592653589793;
-  m_inputFileName = "GeoFinder.input";
-  m_outputVhdlDirname = "./VHDL/finder3D";
   m_outputLutDirname = m_outputVhdlDirname + "/" + "LutData";
 }
 
@@ -197,7 +197,7 @@ void Hough3DFinder::initVersion1(vector<float >& initVariables)
 
 void Hough3DFinder::initVersion2(vector<float >& initVariables)
 {
-  if (1 == 2) cout << initVariables.size() << endl; // Removes warning when compiling
+  if (false) cout << initVariables.size() << endl; // Removes warning when compiling
 
   // index values of candidates.
   m_geoCandidatesIndex = new vector<vector<int > >;
@@ -212,7 +212,7 @@ void Hough3DFinder::initVersion2(vector<float >& initVariables)
 
 void Hough3DFinder::initVersion3(vector<float >& initVariables)
 {
-  if (1 == 2) cout << initVariables.size() << endl; // Removes warning when compiling
+  if (false) cout << initVariables.size() << endl; // Removes warning when compiling
 
   // Make hitMap
   m_hitMap = new bool*[4];
@@ -430,7 +430,7 @@ void Hough3DFinder::runFinderVersion1(vector<double>& trackVariables, vector<vec
       actualCot = houghCot * m_cotStepSize + m_cotStart;
       actualZ0 = tempHoughZ0 * m_z0StepSize;
       // To remove warning of actualCot and actualZ0.
-      if (1 == 2) cout << actualCot << actualZ0 << endl;
+      if (false) cout << actualCot << actualZ0 << endl;
 
       for (int layer = 0; layer < 4; layer++) {
         m_houghMesh[houghCot][houghZ0] += m_houghMeshLayer[houghCot][houghZ0][layer];

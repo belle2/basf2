@@ -875,10 +875,6 @@ namespace Belle2 {
     //...Event time...
     bool fEvtTime = true;
     double eventTime = fEvtTime ? _cdc.getEventTime() : 0;
-    if (! fEvtTime)
-      eventTime = 0;
-    else
-      eventTime = _cdc.getEventTime();
 
     // Loop over all tracks
     for (unsigned int iTrack = 0; iTrack < trackList2D.size(); iTrack++) {

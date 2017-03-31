@@ -106,8 +106,6 @@ NeuroTriggerModule::event()
       for (unsigned i = 0; i < hitIds.size(); ++i) {
         NNtrack->addRelationTo(segmentHits[hitIds[i]]);
       }
-    } else {
-      B2WARNING("No MLP trained for this track.");
     }
   }
 }

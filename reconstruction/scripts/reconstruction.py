@@ -46,8 +46,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
         all (but you will have to add it on your own then).
     :param additionalTrackFitHypotheses: Change the additional fitted track fit hypotheses. If no argument is given,
         the additional fitted hypotheses are muon, kaon and proton, i.e. [13, 321, 2212].
-    :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to improve
-        reconstruction performance.
+    :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
+        execution time.
     """
 
     # Add tracking reconstruction modules
@@ -95,8 +95,8 @@ def add_cosmics_reconstruction(
         all (but you will have to add it on your own then).
     :param eventTimingExtraction: extract time with either the TrackTimeExtraction or
         FullGridTrackTimeExtraction modules.
-    :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to improve
-        reconstruction performance.
+    :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
+        execution time.
     """
 
     # Add cdc tracking reconstruction modules
@@ -144,8 +144,8 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     :param components: list of geometry components to include reconstruction for, or None for all components.
     :param pruneTracks: Delete all hits except the first and last after the dEdX modules.
     :param trigger_mode: Please see add_reconstruction for a description of all trigger modes.
-    :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to improve
-        reconstruction performance.
+    :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
+        execution time.
     """
 
     if trigger_mode in ["hlt", "all"]:
@@ -172,7 +172,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
         add_pid_module(path, components)
 
     if trigger_mode in ["all"] and addClusterExpertModules:
-        # FIXME: Disabled for HLT until performance bug is fixed
+        # FIXME: Disabled for HLT until execution time bug is fixed
         add_cluster_expert_modules(path, components)
 
 

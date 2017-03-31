@@ -86,7 +86,7 @@ CDCTrigger2DFitterModule::event()
   StoreArray<CDCTriggerTrack> finderTracks(m_inputCollectionName);
   StoreArray<CDCTriggerTrack> fitterTracks(m_outputCollectionName);
   StoreObjPtr<TRGTiming> eventTime("CDCTriggerEventTime");
-  int T0 = eventTime->getTiming();
+  int T0 = (eventTime) ? eventTime->getTiming() : 9999;
 
   vector<double> wirePhi2DError({0.00085106,
                                  0.00039841,

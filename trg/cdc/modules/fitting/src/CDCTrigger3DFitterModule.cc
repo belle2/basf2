@@ -212,7 +212,7 @@ CDCTrigger3DFitterModule::fitter(vector<int>& bestTSIndex, vector<double>& bestT
 {
   StoreArray<CDCTriggerSegmentHit> hits;
   StoreObjPtr<TRGTiming> eventTime("CDCTriggerEventTime");
-  int T0 = eventTime->getTiming();
+  int T0 = (eventTime) ? eventTime->getTiming() : 9999;
 
   // Fill information for stereo layers
   vector<double> wirePhi(4, 9999);

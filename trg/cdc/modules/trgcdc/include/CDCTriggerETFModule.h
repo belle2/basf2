@@ -24,6 +24,14 @@ namespace Belle2 {
     virtual void event();
 
   protected:
+    /** if true, always output 0 (assuming this is the true event time for MC) */
+    bool m_trueEventTime;
+    /** bin threshold for event time */
+    unsigned m_threshold;
+    /** name of the input track segment hit StoreArray */
+    std::string m_TSHitCollectionName;
+    /** name of the output StoreObjPtr holding the event time */
+    std::string m_EventTimeName;
 
   private:
   };

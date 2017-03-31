@@ -9,14 +9,19 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/minimal/ClusterCreator.h>
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/filters/wireHitRelation/WholeWireHitRelationFilter.h>
+
+#include <tracking/trackFindingCDC/ca/Clusterizer.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <vector>
 #include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
     class CDCWireHit;
     class CDCWireHitCluster;
@@ -35,14 +40,27 @@ namespace Belle2 {
       /// Short description of the findlet
       std::string getDescription() final;
 
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+
     public:
       /// Main algorithm applying the cluster refinement
       void apply(std::vector<CDCWireHit>& inputWireHits,
                  std::vector<CDCWireHitCluster>& outputSuperClusters) final;
 
     private:
-      /// Creator of the super clusters
-      ClusterCreator<WholeWireHitRelationFilter<2>> m_clusterCreator;
+      /// Parameter : Expand the super clusters over the typical gap at the apogee of the trajectory
+      bool m_param_expandOverApogeeGap = false;
+
+    private:
+      /// Instance of the hit cluster generator
+      Clusterizer<CDCWireHit, CDCWireHitCluster> m_wirehitClusterizer;
+
+      /// Memory for the wire hit neighborhood in a cluster.
+      std::vector<WeightedRelation<CDCWireHit>> m_wireHitRelations;
+
+      /// Wire hit neighborhood relation filter
+      WholeWireHitRelationFilter<2> m_wireHitRelationFilter;
     };
   }
 }

@@ -40,6 +40,7 @@ def add_cdc_trigger(path, SimulationMode=1, minHits=4):
                         inputCollectionName='TRG2DFinderTracks',
                         outputCollectionName='TRGNNTracks')
     elif SimulationMode == 2:
+        B2WARNING("full simulation mode does not include all CDC trigger modules yet")
         # standard CDC trigger
         trgcdc = register_module('TRGCDC')
         trgcdc_params = {

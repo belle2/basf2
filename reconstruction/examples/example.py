@@ -37,15 +37,9 @@ add_simulation(main)
 # trigger simulation
 add_tsim(main)
 
-# HLT L3 simulation
-main.add_module('Level3')
-
 # reconstruction
 add_reconstruction(main)
 # or add_reconstruction(main, components) to run the reconstruction of a selection of detectors
-
-# HLT physics trigger
-add_HLT_Y4S(main)
 
 # full output
 main.add_module('RootOutput', outputFileName='output.root')

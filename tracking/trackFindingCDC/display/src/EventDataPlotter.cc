@@ -7,17 +7,22 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/display/EventDataPlotter.h>
 
 #include <tracking/trackFindingCDC/display/SVGPrimitivePlotter.h>
+#include <tracking/trackFindingCDC/display/BoundingBox.h>
 
-#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+
+#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCTangent.h>
@@ -27,9 +32,15 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+
+#include <cdc/dataobjects/CDCSimHit.h>
+#include <cdc/dataobjects/CDCHit.h>
+
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
+#include <tracking/dataobjects/RecoTrack.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -39,17 +50,20 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-EventDataPlotter::EventDataPlotter(bool animate)
+EventDataPlotter::EventDataPlotter(bool animate, bool forwardFade)
   : m_ptrPrimitivePlotter(new SVGPrimitivePlotter(
                             AttributeMap{{"stroke", "orange"}, {"stroke-width", "0.55"}, {"fill", "none"}}))
 , m_animate(animate)
+, m_forwardFade(forwardFade)
 {
 }
 
 EventDataPlotter::EventDataPlotter(std::unique_ptr<PrimitivePlotter> ptrPrimitivePlotter,
-                                   bool animate)
+                                   bool animate,
+                                   bool forwardFade)
   : m_ptrPrimitivePlotter(std::move(ptrPrimitivePlotter))
   , m_animate(animate)
+  , m_forwardFade(forwardFade)
 {
   B2ASSERT("EventDataPlotter initialized with nullptr. Using default backend SVGPrimitivePlotter.",
            m_ptrPrimitivePlotter);
@@ -58,6 +72,7 @@ EventDataPlotter::EventDataPlotter(std::unique_ptr<PrimitivePlotter> ptrPrimitiv
 EventDataPlotter::EventDataPlotter(const EventDataPlotter& eventDataPlotter)
   : m_ptrPrimitivePlotter(eventDataPlotter.m_ptrPrimitivePlotter->clone())
   , m_animate(eventDataPlotter.m_animate)
+  , m_forwardFade(eventDataPlotter.m_forwardFade)
 {
 }
 
@@ -240,6 +255,7 @@ void EventDataPlotter::drawLine(float startX,
 
   primitivePlotter.drawLine(startX, startY, endX, endY, attributeMap);
 }
+
 /// --------------------- Draw Circle2D ------------------------
 void EventDataPlotter::draw(const Circle2D& circle, AttributeMap attributeMap)
 {
@@ -497,6 +513,29 @@ void EventDataPlotter::draw(const CDCTrajectory2D& trajectory2D, AttributeMap at
   }
 }
 
+void EventDataPlotter::draw(const CDCWireHitCluster& wireHitCluster, const AttributeMap& attributeMap)
+{
+  drawRange(wireHitCluster, attributeMap);
+}
+
+void EventDataPlotter::draw(const CDCSegment2D& segment2D, const AttributeMap& attributeMap)
+{
+  if (m_forwardFade) {
+    drawRangeWithFade(segment2D, attributeMap);
+  } else {
+    drawRange(segment2D, attributeMap);
+  }
+}
+
+void EventDataPlotter::draw(const CDCSegment3D& segment3D, const AttributeMap& attributeMap)
+{
+  if (m_forwardFade) {
+    drawRange(segment3D, attributeMap);
+  } else {
+    drawRange(segment3D, attributeMap);
+  }
+}
+
 void EventDataPlotter::draw(const CDCAxialSegmentPair& axialSegmentPair,
                             const AttributeMap& attributeMap)
 {
@@ -623,6 +662,15 @@ void EventDataPlotter::draw(const CDCSegmentTriple& segmentTriple, const Attribu
   const float endFrontY = endFrontPos2D.y();
 
   primitivePlotter.drawArrow(middleBackX, middleBackY, endFrontX, endFrontY, attributeMap);
+}
+
+void EventDataPlotter::draw(const CDCTrack& track, const AttributeMap& attributeMap)
+{
+  if (m_forwardFade) {
+    drawRangeWithFade(track, attributeMap);
+  } else {
+    drawRange(track, attributeMap);
+  }
 }
 
 void EventDataPlotter::draw(const RecoTrack& recoTrack, const AttributeMap& attributeMap)

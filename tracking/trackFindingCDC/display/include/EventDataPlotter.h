@@ -9,20 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
-
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-
-#include <cdc/dataobjects/CDCSimHit.h>
-#include <cdc/dataobjects/CDCHit.h>
-
 #include <tracking/trackFindingCDC/display/PrimitivePlotter.h>
-#include <tracking/trackFindingCDC/display/BoundingBox.h>
+#include <tracking/trackFindingCDC/display/AttributeMap.h>
 
 #include <framework/datastore/StoreArray.h>
 
@@ -31,9 +19,20 @@
 namespace Belle2 {
   class MCParticle;
   class RecoTrack;
+  class CDCHit;
+  class CDCSimHit;
 
   namespace TrackFindingCDC {
+    class PrimitivePlotter;
+
+    class BoundingBox;
+
     class Circle2D;
+
+    class CDCWireTopology;
+    class CDCWireSuperLayer;
+    class CDCWireLayer;
+    class CDCWire;
 
     class CDCTrajectory2D;
     class CDCTrajectory3D;
@@ -44,9 +43,15 @@ namespace Belle2 {
     class CDCRecoHit2D;
     class CDCRecoHit3D;
 
+    class CDCWireHitCluster;
+    class CDCSegment2D;
+    class CDCSegment3D;
+
     class CDCSegmentPair;
     class CDCAxialSegmentPair;
     class CDCSegmentTriple;
+
+    class CDCTrack;
 
     /// A class that can plot event related data types.
     class EventDataPlotter {
@@ -58,14 +63,16 @@ namespace Belle2 {
 
     public:
       /// Default constructor for ROOT compatibility. Uses an SVGPrimitivePlotter as backend.
-      explicit EventDataPlotter(bool animate = false);
+      explicit EventDataPlotter(bool animate = false, bool forwardFade = false);
 
       /**
        *  Constructor taking the specifc PrimitivePlotter instance as backend.
        *
        *  Note that the EventDataPlotter takes ownership of the PrimitivePlotter and destroys it on its on own deconstruction.
        */
-      EventDataPlotter(std::unique_ptr<PrimitivePlotter> ptrPrimitivePlotter, bool animate = false);
+      EventDataPlotter(std::unique_ptr<PrimitivePlotter> ptrPrimitivePlotter,
+                       bool animate = false,
+                       bool forwardFade = false);
 
       /// Copy constructor
       EventDataPlotter(const EventDataPlotter& eventDataPlotter);
@@ -196,22 +203,13 @@ namespace Belle2 {
       void draw(const CDCTrajectory2D& trajectory2D, AttributeMap attributeMap = AttributeMap());
 
       /// Draws all CDCWireHits of the cluster
-      void draw(const CDCWireHitCluster& wireHitCluster, const AttributeMap& attributeMap = AttributeMap())
-      {
-        drawRange(wireHitCluster, attributeMap);
-      }
+      void draw(const CDCWireHitCluster& wireHitCluster, const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws all CDCRecoHits2D of the segment
-      void draw(const CDCSegment2D& segment2D, const AttributeMap& attributeMap = AttributeMap())
-      {
-        drawRange(segment2D, attributeMap);
-      }
+      void draw(const CDCSegment2D& segment2D, const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws all CDCRecoHits3D of the segment
-      void draw(const CDCSegment3D& segment3D, const AttributeMap& attributeMap = AttributeMap())
-      {
-        drawRange(segment3D, attributeMap);
-      }
+      void draw(const CDCSegment3D& segment3D, const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the pair of segments as an arrow connecting the centers of them.
       void draw(const CDCAxialSegmentPair& axialSegmentPair, const AttributeMap& attributeMap = AttributeMap());
@@ -223,10 +221,7 @@ namespace Belle2 {
       void draw(const CDCSegmentTriple& segmentTriple, const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws all CDCRecoHits3D of the segment
-      void draw(const CDCTrack& track, const AttributeMap& attributeMap = AttributeMap())
-      {
-        drawRange(track, attributeMap);
-      }
+      void draw(const CDCTrack& track, const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the hit content of the RecoTrack.
       void draw(const RecoTrack& recoTrack, const AttributeMap& attributeMap = AttributeMap());
@@ -257,9 +252,8 @@ namespace Belle2 {
       template<class T>
       void draw(const StoreArray<T>& storeArray, const AttributeMap& attributeMap = AttributeMap())
       {
-        if (storeArray) {
-          drawRange(storeArray, attributeMap);
-        }
+        if (not storeArray) return;
+        drawRange(storeArray, attributeMap);
       }
 
       /// Draws a range iterable collection of drawable elements
@@ -275,6 +269,26 @@ namespace Belle2 {
         primitivePlotter.endGroup();
       }
 
+      /// Draws a range iterable collection of drawable elements
+      template<class ARange>
+      void drawRangeWithFade(const ARange& range, const AttributeMap& attributeMap = AttributeMap())
+      {
+        if (not m_ptrPrimitivePlotter) return;
+        PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+        primitivePlotter.startGroup(attributeMap);
+        float opacity = 1;
+        float endOpacity = 0.5;
+        int n = std::distance(std::begin(range), std::end(range));
+        if (n == 0) return;
+        float opacityFactor = std::pow(endOpacity / opacity, 1.0 / (n - 1));
+        for (const auto& element : range) {
+          AttributeMap elementAttributeMap{{"opacity", std::to_string(opacity)}};
+          draw(element, elementAttributeMap);
+          opacity *= opacityFactor;
+        }
+        primitivePlotter.endGroup();
+      }
+
     private:
       /// Reference to the primitivePlotter instance used as backend for the draw commands.
       std::unique_ptr<PrimitivePlotter> m_ptrPrimitivePlotter;
@@ -282,7 +296,9 @@ namespace Belle2 {
       /// Memory for the flag if the event data should be animated. If animation is supported is backend dependent.
       bool m_animate = false;
 
-    };
+      /// Memory for the flag whether the orientation of tracks segments etc should be shown as diming opacity
+      bool m_forwardFade = false;
 
+    };
   }
 }

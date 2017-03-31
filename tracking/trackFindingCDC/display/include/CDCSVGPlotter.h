@@ -29,7 +29,7 @@ namespace Belle2 {
        *                the wires in this case to reduce the rendering load.
        *                Switch to make an animated event display by means of animated SVG.
        */
-      explicit CDCSVGPlotter(bool animate = false);
+      explicit CDCSVGPlotter(bool animate = false, bool forwardFade = false);
 
       /**
        * Make a copy of the current status of the plotter.

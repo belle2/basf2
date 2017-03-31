@@ -23,6 +23,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
@@ -98,9 +99,9 @@ const AttributeMap c_defaultSVGAttributes({
   {"transform", "translate(0, 1120) scale(1,-1)"}
 });
 
-CDCSVGPlotter::CDCSVGPlotter(bool animate)
+CDCSVGPlotter::CDCSVGPlotter(bool animate, bool forwardFade)
   : m_animate(animate)
-  , m_eventdataPlotter(makeUnique<SVGPrimitivePlotter>(c_defaultSVGAttributes), animate)
+  , m_eventdataPlotter(makeUnique<SVGPrimitivePlotter>(c_defaultSVGAttributes), animate, forwardFade)
 {
   int top = -112;
   int left = -112;

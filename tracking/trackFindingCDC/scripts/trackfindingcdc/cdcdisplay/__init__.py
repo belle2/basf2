@@ -58,6 +58,9 @@ class CDCSVGDisplayModule(basf2.Module):
         #: Switch to make an animated event display by means of animated SVG.
         self.animate = False
 
+        #: Switch to make the color of segments and tracks fade out in the forward direction
+        self.forward_fade = False
+
         # The following options can be used independent of the track finder
         # to view Monte Carlo information after the simulation is done
 
@@ -257,6 +260,7 @@ class CDCSVGDisplayModule(basf2.Module):
         """
         result = [
             'animate',
+            'forward_fade',
             'draw_superlayer_boundaries',
             'draw_walls',
             'draw_interaction_point',
@@ -369,7 +373,7 @@ class CDCSVGDisplayModule(basf2.Module):
             self.use_cpp = True
 
         if self.use_cpp:
-            cppplotter = Belle2.TrackFindingCDC.CDCSVGPlotter(self.animate)
+            cppplotter = Belle2.TrackFindingCDC.CDCSVGPlotter(self.animate, self.forward_fade)
         if self.use_python:
             plotter = svgdrawing.CDCSVGPlotter(animate=self.animate)
 
@@ -609,7 +613,7 @@ class CDCSVGDisplayModule(basf2.Module):
         if self.draw_superclusters:
             if self.use_cpp:
                 cppplotter.drawClusters('CDCWireHitSuperClusterVector',
-                                        'ListColors', '')
+                                        '', '')
             if self.use_python:
                 styleDict = {'stroke': attributemaps.listColors}
                 plotter.draw_storevector('CDCWireHitSuperClusterVector', **styleDict)
@@ -618,7 +622,7 @@ class CDCSVGDisplayModule(basf2.Module):
         if self.draw_clusters:
             if self.use_cpp:
                 cppplotter.drawClusters(self.cdc_wire_hit_cluster_store_obj_name,
-                                        'ListColors', '')
+                                        '', '')
             if self.use_python:
                 styleDict = {'stroke': attributemaps.listColors}
                 plotter.draw_storevector(self.cdc_wire_hit_cluster_store_obj_name, **styleDict)
@@ -669,6 +673,7 @@ class CDCSVGDisplayModule(basf2.Module):
                 plotter.draw_storevector(self.cdc_segment_vector_store_obj_name, **styleDict)
 
         if self.draw_segment_firstNPassedSuperLayers:
+            Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
             if self.use_cpp:
                 cppplotter.drawSegments(self.cdc_segment_vector_store_obj_name,
                                         "SegmentFirstNPassedSuperLayersColorMap", "")
@@ -678,6 +683,7 @@ class CDCSVGDisplayModule(basf2.Module):
                 plotter.draw_storevector(self.cdc_segment_vector_store_obj_name, **styleDict)
 
         if self.draw_segment_lastNPassedSuperLayers:
+            Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
             if self.use_cpp:
                 cppplotter.drawSegments(self.cdc_segment_vector_store_obj_name,
                                         "SegmentLastNPassedSuperLayersColorMap", "")

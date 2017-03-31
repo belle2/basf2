@@ -41,6 +41,9 @@ CDCTriggerHoughtrackingModule::CDCTriggerHoughtrackingModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Define module parameters
+  addParam("TSHitCollectionName", m_TSHitCollectionName,
+           "Name of the input StoreArray of CDCTriggerSegmentHits.",
+           string(""));
   addParam("outputCollection", m_outputCollectionName,
            "Name of the StoreArray holding the tracks found in the Hough tracking.",
            string("Trg2DFinderTracks"));
@@ -107,11 +110,11 @@ CDCTriggerHoughtrackingModule::CDCTriggerHoughtrackingModule() : Module()
 void
 CDCTriggerHoughtrackingModule::initialize()
 {
-  StoreArray<CDCTriggerSegmentHit>::required();
+  StoreArray<CDCTriggerSegmentHit>::required(m_TSHitCollectionName);
   StoreArray<CDCTriggerTrack>::registerPersistent(m_outputCollectionName);
   StoreArray<CDCTriggerHoughCluster>::registerPersistent(m_clusterCollectionName);
 
-  StoreArray<CDCTriggerSegmentHit> segmentHits;
+  StoreArray<CDCTriggerSegmentHit> segmentHits(m_TSHitCollectionName);
   StoreArray<CDCTriggerTrack> tracks(m_outputCollectionName);
   StoreArray<CDCTriggerHoughCluster> clusters(m_clusterCollectionName);
 
@@ -141,7 +144,7 @@ CDCTriggerHoughtrackingModule::initialize()
 void
 CDCTriggerHoughtrackingModule::event()
 {
-  StoreArray<CDCTriggerSegmentHit> tsHits("CDCTriggerSegmentHits");
+  StoreArray<CDCTriggerSegmentHit> tsHits(m_TSHitCollectionName);
   StoreArray<CDCTriggerTrack> storeTracks(m_outputCollectionName);
 
   /* Clean hits */

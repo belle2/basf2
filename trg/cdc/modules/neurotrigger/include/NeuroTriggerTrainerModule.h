@@ -57,6 +57,8 @@ namespace Belle2 {
 
   protected:
     //module parameters
+    /** Name of the StoreArray containing the input track segment hits. */
+    std::string m_TSHitCollectionName;
     /** Name of the StoreArray containing the input 2D tracks. */
     std::string m_inputCollectionName;
     /** Name of the MCParticles collection used as target values. */

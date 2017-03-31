@@ -387,14 +387,14 @@ NeuroTrigger::getRelId(const CDCTriggerSegmentHit& hit)
 unsigned long
 NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track)
 {
-  StoreArray<CDCTriggerSegmentHit> hits;
+  StoreArray<CDCTriggerSegmentHit> hits(m_TSHitCollectionName);
   CDCTriggerMLP& expert = m_MLPs[isector];
   unsigned long hitPattern = 0;
   vector<unsigned> nHits;
   nHits.assign(9, 0);
   // loop over axial hits related to input track
   RelationVector<CDCTriggerSegmentHit> axialHits =
-    track.getRelationsTo<CDCTriggerSegmentHit>();
+    track.getRelationsTo<CDCTriggerSegmentHit>(m_TSHitCollectionName);
   for (unsigned ihit = 0; ihit < axialHits.size(); ++ ihit) {
     // skip hits with negative relation weight (not selected in finder)
     if (axialHits.weight(ihit) < 0) continue;
@@ -442,7 +442,7 @@ vector<unsigned>
 NeuroTrigger::selectHits(unsigned isector, const CDCTriggerTrack& track,
                          bool returnAllRelevant)
 {
-  StoreArray<CDCTriggerSegmentHit> hits;
+  StoreArray<CDCTriggerSegmentHit> hits(m_TSHitCollectionName);
   CDCTriggerMLP& expert = m_MLPs[isector];
   vector<unsigned> selectedHitIds = {};
   // prepare vectors to keep best drift times, left/right and selected hit IDs
@@ -457,7 +457,7 @@ NeuroTrigger::selectHits(unsigned isector, const CDCTriggerTrack& track,
 
   // loop over axial hits related to input track
   RelationVector<CDCTriggerSegmentHit> axialHits =
-    track.getRelationsTo<CDCTriggerSegmentHit>();
+    track.getRelationsTo<CDCTriggerSegmentHit>(m_TSHitCollectionName);
   B2DEBUG(250, "start axial hit loop");
   for (unsigned ihit = 0; ihit < axialHits.size(); ++ihit) {
     // skip hits with negative relation weight (not selected in finder)
@@ -571,7 +571,7 @@ NeuroTrigger::selectHits(unsigned isector, const CDCTriggerTrack& track,
 vector<float>
 NeuroTrigger::getInputVector(unsigned isector, const vector<unsigned>& hitIds)
 {
-  StoreArray<CDCTriggerSegmentHit> hits;
+  StoreArray<CDCTriggerSegmentHit> hits(m_TSHitCollectionName);
   CDCTriggerMLP& expert = m_MLPs[isector];
   // prepare empty input vector and vectors to keep best drift times
   vector<float> inputVector;

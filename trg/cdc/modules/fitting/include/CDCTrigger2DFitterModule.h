@@ -25,6 +25,10 @@ namespace Belle2 {
     virtual void event();
 
   protected:
+    /** Name of the StoreArray containing the input track segment hits. */
+    std::string m_TSHitCollectionName;
+    /** name of the event time StoreObjPtr */
+    std::string m_EventTimeName;
     /** Name of the StoreArray containing the input tracks from the finder. */
     std::string m_inputCollectionName;
     /** Name of the StoreArray containing the resulting fitted tracks. */

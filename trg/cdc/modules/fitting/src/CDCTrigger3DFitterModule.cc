@@ -26,6 +26,12 @@ CDCTrigger3DFitterModule::CDCTrigger3DFitterModule() : Module::Module()
     "in the s-z plane (s: 2D arclength).\n"
   );
 
+  addParam("TSHitCollectionName", m_TSHitCollectionName,
+           "Name of the input StoreArray of CDCTriggerSegmentHits.",
+           string(""));
+  addParam("EventTimeName", m_EventTimeName,
+           "Name of the event time object.",
+           string("CDCTriggerEventTime"));
   addParam("inputCollection", m_inputCollectionName,
            "Name of the StoreArray holding the input tracks from the 2D fitter.",
            string("Trg2DFitterTracks"));
@@ -47,11 +53,11 @@ CDCTrigger3DFitterModule::initialize()
   // register DataStore elements
   StoreArray<CDCTriggerTrack>::registerPersistent(m_outputCollectionName);
   StoreArray<CDCTriggerTrack>::required(m_inputCollectionName);
-  StoreArray<CDCTriggerSegmentHit>::required();
+  StoreArray<CDCTriggerSegmentHit>::required(m_TSHitCollectionName);
   // register relations
   StoreArray<CDCTriggerTrack> tracks2D(m_inputCollectionName);
   StoreArray<CDCTriggerTrack> tracks3D(m_outputCollectionName);
-  StoreArray<CDCTriggerSegmentHit> segmentHits;
+  StoreArray<CDCTriggerSegmentHit> segmentHits(m_TSHitCollectionName);
   tracks2D.registerRelationTo(tracks3D);
   tracks3D.registerRelationTo(segmentHits);
 
@@ -86,7 +92,7 @@ CDCTrigger3DFitterModule::event()
 {
   StoreArray<CDCTriggerTrack> tracks2D(m_inputCollectionName);
   StoreArray<CDCTriggerTrack> tracks3D(m_outputCollectionName);
-  StoreArray<CDCTriggerSegmentHit> hits;
+  StoreArray<CDCTriggerSegmentHit> hits(m_TSHitCollectionName);
 
   for (int itrack = 0; itrack < tracks2D.getEntries(); ++itrack) {
     int charge = tracks2D[itrack]->getChargeSign();
@@ -136,7 +142,7 @@ CDCTrigger3DFitterModule::event()
     }
     // add axial relations from 2D track
     RelationVector<CDCTriggerSegmentHit> axialHits =
-      tracks2D[itrack]->getRelationsTo<CDCTriggerSegmentHit>();
+      tracks2D[itrack]->getRelationsTo<CDCTriggerSegmentHit>(m_TSHitCollectionName);
     for (unsigned ihit = 0; ihit < axialHits.size(); ++ihit) {
       fittedTrack->addRelationTo(axialHits[ihit]);
     }
@@ -147,7 +153,7 @@ void
 CDCTrigger3DFitterModule::finder(int charge, double rho, double phi,
                                  vector<int>& bestTSIndex, vector<double>& bestTSPhi)
 {
-  StoreArray<CDCTriggerSegmentHit> hits;
+  StoreArray<CDCTriggerSegmentHit> hits(m_TSHitCollectionName);
 
   vector<double> stAxPhi(4);
   for (int iSt = 0; iSt < 4; ++iSt) {
@@ -210,8 +216,8 @@ CDCTrigger3DFitterModule::fitter(vector<int>& bestTSIndex, vector<double>& bestT
                                  int charge, double rho, double phi,
                                  double& z0, double& cot, double& chi2)
 {
-  StoreArray<CDCTriggerSegmentHit> hits;
-  StoreObjPtr<TRGTiming> eventTime("CDCTriggerEventTime");
+  StoreArray<CDCTriggerSegmentHit> hits(m_TSHitCollectionName);
+  StoreObjPtr<TRGTiming> eventTime(m_EventTimeName);
   int T0 = (eventTime) ? eventTime->getTiming() : 9999;
 
   // Fill information for stereo layers

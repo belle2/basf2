@@ -26,7 +26,7 @@ CDCTriggerETFModule::CDCTriggerETFModule() : Module::Module()
            "Name of the input StoreArray of CDCTriggerSegmentHits.",
            string(""));
   addParam("EventTimeName", m_EventTimeName,
-           "Name of the output StoreObtPtr.",
+           "Name of the output StoreObjPtr.",
            string("CDCTriggerEventTime"));
   addParam("trueEventTime",
            m_trueEventTime,

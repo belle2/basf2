@@ -43,6 +43,9 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
     "Target data is collected from a MCParticle related to the 2D track."
   );
   // parameters for saving / loading
+  addParam("TSHitCollectionName", m_TSHitCollectionName,
+           "Name of the input StoreArray of CDCTriggerSegmentHits.",
+           string(""));
   addParam("inputCollection", m_inputCollectionName,
            "Name of the StoreArray holding the 2D input tracks.",
            string("Trg2DFinderTracks"));
@@ -181,7 +184,7 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
 void NeuroTriggerTrainerModule::initialize()
 {
   // register store objects
-  StoreArray<CDCTriggerSegmentHit>::required();
+  StoreArray<CDCTriggerSegmentHit>::required(m_TSHitCollectionName);
   StoreArray<CDCTriggerTrack>::required(m_inputCollectionName);
   StoreArray<MCParticle>::required(m_targetCollectionName);
   // load or initialize neurotrigger
@@ -200,6 +203,7 @@ void NeuroTriggerTrainerModule::initialize()
       }
     }
   }
+  m_NeuroTrigger.setTSHitCollectionName(m_TSHitCollectionName);
   // consistency check of training parameters
   if (m_NeuroTrigger.nSectors() != m_trainSets.size())
     B2ERROR("Number of training sets (" << m_trainSets.size() << ") should match " <<
@@ -315,7 +319,8 @@ void NeuroTriggerTrainerModule::event()
         // get relative ids for all hits related to the MCParticle
         // and count them to find relevant id range
         // using only related hits suppresses background EXCEPT for curling tracks
-        for (const CDCTriggerSegmentHit& hit : mcTrack->getRelationsTo<CDCTriggerSegmentHit>()) {
+        for (const CDCTriggerSegmentHit& hit :
+             mcTrack->getRelationsTo<CDCTriggerSegmentHit>(m_TSHitCollectionName)) {
           // get relative id
           double relId = m_NeuroTrigger.getRelId(hit);
           int intId = round(relId);

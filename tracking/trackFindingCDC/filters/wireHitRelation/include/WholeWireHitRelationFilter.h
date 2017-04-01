@@ -10,32 +10,38 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
-#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
-#include <boost/range/iterator_range.hpp>
+
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 #include <cmath>
 
 namespace Belle2 {
+  class ModuleParamList;
   namespace TrackFindingCDC {
 
     /// Class mapping the neighborhood of wires to the neighborhood of wire hits.
-    template <int a_neighborhoodDegree>
     class WholeWireHitRelationFilter : public Filter<Relation<const CDCWireHit>> {
 
     public:
+      /// Constructor form the default neighborhood degree
+      explicit WholeWireHitRelationFilter(int neighborhoodDegree = 2);
+
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
+
       /// Returns a vector containing the neighboring wire hits of the given wire hit out of the sorted range given by the two iterator other argumets.
       template<class ACDCWireHitIterator>
       std::vector<std::reference_wrapper<CDCWireHit> > getPossibleNeighbors(const CDCWireHit& wireHit,
           const ACDCWireHitIterator& itBegin,
-          const ACDCWireHitIterator& itEnd)
+          const ACDCWireHitIterator& itEnd) const
       {
 
-        const int nWireNeighbors = 8 + 10 * (a_neighborhoodDegree - 1);
+        const int nWireNeighbors = 8 + 10 * (m_param_degree - 1);
         std::vector<const CDCWire*> m_wireNeighbors;
         m_wireNeighbors.reserve(nWireNeighbors);
 
@@ -60,7 +66,7 @@ namespace Belle2 {
         // Insert the neighbors such that they are most likely sorted.
 
         // Degree 1 neighnborhood - only add the six oclock and the twelve oclock neighbot once
-        if (a_neighborhoodDegree > 1 and ccwSixthSecondWireNeighbor) m_wireNeighbors.push_back(ccwSixthSecondWireNeighbor);
+        if (m_param_degree > 1 and ccwSixthSecondWireNeighbor) m_wireNeighbors.push_back(ccwSixthSecondWireNeighbor);
 
         if (cwInWireNeighbor) m_wireNeighbors.push_back(cwInWireNeighbor);
         if (ccwInWireNeighbor) m_wireNeighbors.push_back(ccwInWireNeighbor);
@@ -71,9 +77,9 @@ namespace Belle2 {
         if (cwOutWireNeighbor) m_wireNeighbors.push_back(cwOutWireNeighbor);
         if (ccwOutWireNeighbor) m_wireNeighbors.push_back(ccwOutWireNeighbor);
 
-        if (a_neighborhoodDegree > 1 and ccwTwelvethSecondWireNeighbor) m_wireNeighbors.push_back(ccwTwelvethSecondWireNeighbor);
+        if (m_param_degree > 1 and ccwTwelvethSecondWireNeighbor) m_wireNeighbors.push_back(ccwTwelvethSecondWireNeighbor);
 
-        for (int degree = 1; degree < a_neighborhoodDegree; ++degree) {
+        for (int degree = 1; degree < m_param_degree; ++degree) {
           if (cwSixthSecondWireNeighbor) {
             cwSixthSecondWireNeighbor = cwSixthSecondWireNeighbor->getNeighborCW();
             m_wireNeighbors.push_back(cwSixthSecondWireNeighbor);
@@ -146,6 +152,10 @@ namespace Belle2 {
         if (not ptrFrom or not ptrTo) return NAN;
         return 0;
       }
+
+    private:
+      /// Degree of the neighbor extend
+      int m_param_degree = 2;
     };
   }
 }

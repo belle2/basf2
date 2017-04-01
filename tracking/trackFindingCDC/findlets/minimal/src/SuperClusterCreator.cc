@@ -36,12 +36,15 @@ std::string SuperClusterCreator::getDescription()
   return "Groups the wire hits into super cluster by expanding the secondary wire "
          "neighborhood";
 }
+
 void SuperClusterCreator::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   moduleParamList->addParameter(prefixed(prefix, "expandOverApogeeGap"),
                                 m_param_expandOverApogeeGap,
                                 "Expand the super clusters over the typical gap at the apogee of the trajectory",
                                 m_param_expandOverApogeeGap);
+
+  m_wireHitRelationFilter.exposeParameters(moduleParamList, prefix);
 }
 
 void SuperClusterCreator::apply(std::vector<CDCWireHit>& inputWireHits,

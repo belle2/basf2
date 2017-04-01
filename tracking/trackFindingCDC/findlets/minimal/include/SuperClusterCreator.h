@@ -60,7 +60,7 @@ namespace Belle2 {
       std::vector<WeightedRelation<CDCWireHit>> m_wireHitRelations;
 
       /// Wire hit neighborhood relation filter
-      WholeWireHitRelationFilter<2> m_wireHitRelationFilter;
+      WholeWireHitRelationFilter m_wireHitRelationFilter{2};
     };
   }
 }

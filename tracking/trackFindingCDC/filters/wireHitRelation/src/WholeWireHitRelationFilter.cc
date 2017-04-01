@@ -7,14 +7,26 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
-
 #include <tracking/trackFindingCDC/filters/wireHitRelation/WholeWireHitRelationFilter.h>
 
-namespace Belle2 {
-  namespace TrackFindingCDC {
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-    using SecondaryWireHitRelationFilter = WholeWireHitRelationFilter<2>;
+#include <framework/core/ModuleParamList.h>
 
-  }
+using namespace Belle2;
+using namespace TrackFindingCDC;
+
+WholeWireHitRelationFilter::WholeWireHitRelationFilter(int neighborhoodDegree)
+  : m_param_degree(neighborhoodDegree)
+{
+}
+
+void WholeWireHitRelationFilter::exposeParameters(ModuleParamList* moduleParamList,
+                                                  const std::string& prefix)
+{
+  moduleParamList
+  ->addParameter(prefixed(prefix, "degree"),
+                 m_param_degree,
+                 "Neighbor degree which are included. 1 for primary, 2 for secondary, 3 ...",
+                 m_param_degree);
 }

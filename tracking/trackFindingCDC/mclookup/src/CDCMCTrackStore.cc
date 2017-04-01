@@ -92,8 +92,6 @@ void CDCMCTrackStore::fill(const CDCMCMap* ptrMCMap, const CDCSimHitLookUp* ptrS
 
 void CDCMCTrackStore::fillMCTracks()
 {
-
-  //StoreArray<CDCHit> hits;
   if (not m_ptrMCMap) {
     B2WARNING("CDCMCMap not set. Cannot create tracks");
     return;

@@ -314,73 +314,89 @@ void CDCSVGPlotter::drawMCParticleTrajectories(const std::string& storeArrayName
   drawStoreArray<const MCParticle, drawTrajectories>(storeArrayName, styling);
 }
 
-void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& simHitStoreArrayName,
+void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& hitStoreArrayName,
                                             const std::string& stroke,
                                             const std::string& strokeWidth)
 {
   B2INFO("Drawing simulated hits connected by tof");
-  StoreArray<CDCHit> hitStoreArray(simHitStoreArrayName);
+  StoreArray<CDCHit> hitStoreArray(hitStoreArrayName);
   if (not hitStoreArray) {
-    B2WARNING("StoreArray " << simHitStoreArrayName << " not present");
+    B2WARNING("StoreArray " << hitStoreArrayName << " not present");
     printDataStoreContent();
     return;
   }
   std::vector<CDCSimHit*> simHits;
   for (const CDCHit& hit : hitStoreArray) {
-    simHits.push_back(hit.getRelated<CDCSimHit>("CDCSimHits"));
+    simHits.push_back(hit.getRelated<CDCSimHit>());
   }
 
   // group them by their mcparticle id
   std::map<int, std::set<CDCSimHit*, FlightTimeOrder>> simHitsByMcParticleId;
   for (CDCSimHit* simHit : simHits) {
-    MCParticle* mcParticle = simHit->getRelated<MCParticle>("MCParticles");
+    MCParticle* mcParticle = simHit->getRelated<MCParticle>();
     if (mcParticle != nullptr) {
       int mcTrackId = mcParticle->getArrayIndex();
       simHitsByMcParticleId[mcTrackId].insert(simHit);
     }
   }
 
-  AttributeMap attributeMap = {{"stroke", stroke}, {"stroke-width", strokeWidth}};
+  AttributeMap defaultAttributeMap = {{"stroke", stroke}, {"stroke-width", strokeWidth}};
 
   for (const auto& mcParticleIdAndSimHits : simHitsByMcParticleId) {
-    const std::set<CDCSimHit*, FlightTimeOrder>& simHitsForMcParticle = mcParticleIdAndSimHits.second;
+    const std::set<CDCSimHit*, FlightTimeOrder>& simHitsForMcParticle =
+      mcParticleIdAndSimHits.second;
 
-    for (auto itSimHit = simHitsForMcParticle.begin(), itEndSimHit = --simHitsForMcParticle.end();
-         itSimHit != itEndSimHit;) {
-      CDCSimHit* fromSimHit = *itSimHit;
-      ++itSimHit;
-      CDCSimHit* toSimHit = *itSimHit;
+    auto drawConnectSimHits = [this, &defaultAttributeMap](CDCSimHit * fromSimHit, CDCSimHit * toSimHit) {
 
-      CDCHit* fromHit = fromSimHit->getRelated<CDCHit>(simHitStoreArrayName);
-      CDCHit* toHit = toSimHit->getRelated<CDCHit>(simHitStoreArrayName);
+      CDCHit* fromHit = fromSimHit->getRelated<CDCHit>();
+      CDCHit* toHit = toSimHit->getRelated<CDCHit>();
+      if (fromHit == nullptr) return false;
+      if (toHit == nullptr) return false;
 
-      if (fromHit != nullptr and toHit != nullptr) {
-        CDCWireHit fromWireHit(fromHit);
-        CDCWireHit toWireHit(toHit);
+      CDCWireHit fromWireHit(fromHit);
+      CDCWireHit toWireHit(toHit);
 
-        CDCRLWireHit fromRLWireHit(&fromWireHit);
-        CDCRLWireHit toRLWireHit(&toWireHit);
+      CDCRLWireHit fromRLWireHit(&fromWireHit);
+      CDCRLWireHit toRLWireHit(&toWireHit);
 
-        Vector3D fromDisplacement(fromSimHit->getPosTrack() - fromSimHit->getPosWire());
-        Vector3D toDisplacement(toSimHit->getPosTrack() - toSimHit->getPosWire());
+      Vector3D fromDisplacement(fromSimHit->getPosTrack() - fromSimHit->getPosWire());
+      Vector3D toDisplacement(toSimHit->getPosTrack() - toSimHit->getPosWire());
 
-        CDCRecoHit2D fromRecoHit2D(fromRLWireHit, fromDisplacement.xy());
-        CDCRecoHit2D toRecoHit2D(toRLWireHit, toDisplacement.xy());
+      CDCRecoHit2D fromRecoHit2D(fromRLWireHit, fromDisplacement.xy());
+      CDCRecoHit2D toRecoHit2D(toRLWireHit, toDisplacement.xy());
 
-        draw(fromRecoHit2D, attributeMap);
-        draw(toRecoHit2D, attributeMap);
-
-        const Vector2D fromPos = fromRecoHit2D.getRecoPos2D();
-        const float fromX =  fromPos.x();
-        const float fromY =  fromPos.y();
-
-        const Vector2D toPos = toRecoHit2D.getRecoPos2D();
-        const float toX =  toPos.x();
-        const float toY =  toPos.y();
-
-        m_eventdataPlotter.drawLine(fromX, fromY, toX, toY, attributeMap);
+      bool falseOrder = false;
+      if (fromSimHit->getArrayIndex() > toSimHit->getArrayIndex()) {
+        bool fromReassigned = fromHit->getRelatedWithWeight<MCParticle>().second < 0;
+        bool toReassigned = toHit->getRelatedWithWeight<MCParticle>().second < 0;
+        if (not fromReassigned and not toReassigned) {
+          falseOrder = true;
+        }
       }
-    }
+
+      AttributeMap attributeMap = defaultAttributeMap;
+      if (falseOrder) {
+        attributeMap["stroke"] = "red";
+        attributeMap["stroke-width"] = "1.0";
+      }
+      draw(fromRecoHit2D, attributeMap);
+      draw(toRecoHit2D, attributeMap);
+
+      const Vector2D fromPos = fromRecoHit2D.getRecoPos2D();
+      const float fromX = fromPos.x();
+      const float fromY = fromPos.y();
+
+      const Vector2D toPos = toRecoHit2D.getRecoPos2D();
+      const float toX = toPos.x();
+      const float toY = toPos.y();
+
+      m_eventdataPlotter.drawLine(fromX, fromY, toX, toY, attributeMap);
+      return false;
+    };
+
+    std::adjacent_find(simHitsForMcParticle.begin(),
+                       simHitsForMcParticle.end(),
+                       drawConnectSimHits);
   }
 }
 

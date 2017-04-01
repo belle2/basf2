@@ -34,75 +34,91 @@ namespace Belle2 {
           const ACDCWireHitIterator& itBegin,
           const ACDCWireHitIterator& itEnd)
       {
-        std::vector<const CDCWire* > m_wireNeighbors;
-        m_wireNeighbors.reserve((a_neighborhoodDegree > 1) ? 18 : 6);
+
+        const int nWireNeighbors = 8 + 10 * (a_neighborhoodDegree - 1);
+        std::vector<const CDCWire*> m_wireNeighbors;
+        m_wireNeighbors.reserve(nWireNeighbors);
 
         std::vector<std::reference_wrapper<CDCWireHit> > m_wireHitNeighbors;
-        m_wireHitNeighbors.reserve((a_neighborhoodDegree > 1) ? 32 : 12);
+        m_wireHitNeighbors.reserve(2 * nWireNeighbors);
 
         const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
-
         const CDCWire& wire = wireHit.getWire();
-        const CDCWire* ccwInWireNeighborPtr = wireTopology.getNeighborCCWInwards(wire);
-        const CDCWire* cwInWireNeighborPtr = wireTopology.getNeighborCWInwards(wire);
 
-        const CDCWire* ccwWireNeighborPtr = wireTopology.getNeighborCCW(wire);
-        const CDCWire* cwWireNeighborPtr = wireTopology.getNeighborCW(wire);
+        const CDCWire* ccwSixthSecondWireNeighbor = wireTopology.getSecondNeighborSixOClock(wire);
+        const CDCWire* ccwInWireNeighbor = wireTopology.getNeighborCCWInwards(wire);
+        const CDCWire* ccwWireNeighbor = wireTopology.getNeighborCCW(wire);
+        const CDCWire* ccwOutWireNeighbor = wireTopology.getNeighborCCWOutwards(wire);
+        const CDCWire* ccwTwelvethSecondWireNeighbor = wireTopology.getSecondNeighborTwelveOClock(wire);
 
-        const CDCWire* ccwOutWireNeighborPtr = wireTopology.getNeighborCCWOutwards(wire);
-        const CDCWire* cwOutWireNeighborPtr = wireTopology.getNeighborCWOutwards(wire);
+        const CDCWire* cwSixthSecondWireNeighbor = ccwSixthSecondWireNeighbor;
+        const CDCWire* cwInWireNeighbor = wireTopology.getNeighborCWInwards(wire);
+        const CDCWire* cwWireNeighbor = wireTopology.getNeighborCW(wire);
+        const CDCWire* cwOutWireNeighbor = wireTopology.getNeighborCWOutwards(wire);
+        const CDCWire* cwTwelvethSecondWireNeighbor = ccwTwelvethSecondWireNeighbor;
 
-        if (a_neighborhoodDegree > 1) {
+        // Insert the neighbors such that they are most likely sorted.
 
-          const CDCWire* oneSecondWireNeighborPtr = wireTopology.getSecondNeighborOneOClock(wire);
-          const CDCWire* twoSecondWireNeighborPtr = wireTopology.getSecondNeighborTwoOClock(wire);
-          const CDCWire* threeSecondWireNeighborPtr = wireTopology.getSecondNeighborThreeOClock(wire);
-          const CDCWire* fourSecondWireNeighborPtr = wireTopology.getSecondNeighborFourOClock(wire);
-          const CDCWire* fiveSecondWireNeighborPtr = wireTopology.getSecondNeighborFiveOClock(wire);
-          const CDCWire* sixSecondWireNeighborPtr = wireTopology.getSecondNeighborSixOClock(wire);
-          const CDCWire* sevenSecondWireNeighborPtr = wireTopology.getSecondNeighborSevenOClock(wire);
-          const CDCWire* eightSecondWireNeighborPtr = wireTopology.getSecondNeighborEightOClock(wire);
-          const CDCWire* nineSecondWireNeighborPtr = wireTopology.getSecondNeighborNineOClock(wire);
-          const CDCWire* tenSecondWireNeighborPtr = wireTopology.getSecondNeighborTenOClock(wire);
-          const CDCWire* elevenSecondWireNeighborPtr = wireTopology.getSecondNeighborElevenOClock(wire);
-          const CDCWire* twelveSecondWireNeighborPtr = wireTopology.getSecondNeighborTwelveOClock(wire);
-          // Insert the neighbors such that they are most likely sorted.
-          if (fiveSecondWireNeighborPtr) m_wireNeighbors.push_back(fiveSecondWireNeighborPtr);
-          if (sixSecondWireNeighborPtr) m_wireNeighbors.push_back(sixSecondWireNeighborPtr);
-          if (sevenSecondWireNeighborPtr) m_wireNeighbors.push_back(sevenSecondWireNeighborPtr);
+        // Degree 1 neighnborhood - only add the six oclock and the twelve oclock neighbot once
+        if (a_neighborhoodDegree > 1 and ccwSixthSecondWireNeighbor) m_wireNeighbors.push_back(ccwSixthSecondWireNeighbor);
 
-          if (fourSecondWireNeighborPtr) m_wireNeighbors.push_back(fourSecondWireNeighborPtr);
-          if (cwInWireNeighborPtr) m_wireNeighbors.push_back(cwInWireNeighborPtr);
-          if (ccwInWireNeighborPtr) m_wireNeighbors.push_back(ccwInWireNeighborPtr);
-          if (eightSecondWireNeighborPtr) m_wireNeighbors.push_back(eightSecondWireNeighborPtr);
+        if (cwInWireNeighbor) m_wireNeighbors.push_back(cwInWireNeighbor);
+        if (ccwInWireNeighbor) m_wireNeighbors.push_back(ccwInWireNeighbor);
 
-          if (threeSecondWireNeighborPtr) m_wireNeighbors.push_back(threeSecondWireNeighborPtr);
-          if (cwWireNeighborPtr) m_wireNeighbors.push_back(cwWireNeighborPtr);
-          if (ccwWireNeighborPtr) m_wireNeighbors.push_back(ccwWireNeighborPtr);
-          if (nineSecondWireNeighborPtr) m_wireNeighbors.push_back(nineSecondWireNeighborPtr);
+        if (cwWireNeighbor) m_wireNeighbors.push_back(cwWireNeighbor);
+        if (ccwWireNeighbor) m_wireNeighbors.push_back(ccwWireNeighbor);
 
-          if (twoSecondWireNeighborPtr) m_wireNeighbors.push_back(twoSecondWireNeighborPtr);
-          if (cwOutWireNeighborPtr) m_wireNeighbors.push_back(cwOutWireNeighborPtr);
-          if (ccwOutWireNeighborPtr) m_wireNeighbors.push_back(ccwOutWireNeighborPtr);
-          if (tenSecondWireNeighborPtr) m_wireNeighbors.push_back(tenSecondWireNeighborPtr);
+        if (cwOutWireNeighbor) m_wireNeighbors.push_back(cwOutWireNeighbor);
+        if (ccwOutWireNeighbor) m_wireNeighbors.push_back(ccwOutWireNeighbor);
 
-          if (oneSecondWireNeighborPtr) m_wireNeighbors.push_back(oneSecondWireNeighborPtr);
-          if (twelveSecondWireNeighborPtr) m_wireNeighbors.push_back(twelveSecondWireNeighborPtr);
-          if (elevenSecondWireNeighborPtr) m_wireNeighbors.push_back(elevenSecondWireNeighborPtr);
-        } else {
+        if (a_neighborhoodDegree > 1 and ccwTwelvethSecondWireNeighbor) m_wireNeighbors.push_back(ccwTwelvethSecondWireNeighbor);
 
-          // Insert the neighbors such that they are most likely sorted.
-          if (cwInWireNeighborPtr) m_wireNeighbors.push_back(cwInWireNeighborPtr);
-          if (ccwInWireNeighborPtr) m_wireNeighbors.push_back(ccwInWireNeighborPtr);
+        for (int degree = 1; degree < a_neighborhoodDegree; ++degree) {
+          if (cwSixthSecondWireNeighbor) {
+            cwSixthSecondWireNeighbor = cwSixthSecondWireNeighbor->getNeighborCW();
+            m_wireNeighbors.push_back(cwSixthSecondWireNeighbor);
+          }
+          if (ccwSixthSecondWireNeighbor) {
+            ccwSixthSecondWireNeighbor = ccwSixthSecondWireNeighbor->getNeighborCCW();
+            m_wireNeighbors.push_back(ccwSixthSecondWireNeighbor);
+          }
 
-          if (cwWireNeighborPtr) m_wireNeighbors.push_back(cwWireNeighborPtr);
-          if (ccwWireNeighborPtr) m_wireNeighbors.push_back(ccwWireNeighborPtr);
+          if (cwInWireNeighbor) {
+            cwInWireNeighbor = cwInWireNeighbor->getNeighborCW();
+            m_wireNeighbors.push_back(cwInWireNeighbor);
+          }
+          if (ccwInWireNeighbor) {
+            ccwInWireNeighbor = ccwInWireNeighbor->getNeighborCCW();
+            m_wireNeighbors.push_back(ccwInWireNeighbor);
+          }
 
-          if (cwOutWireNeighborPtr) m_wireNeighbors.push_back(cwOutWireNeighborPtr);
-          if (ccwOutWireNeighborPtr) m_wireNeighbors.push_back(ccwOutWireNeighborPtr);
+          if (cwWireNeighbor) {
+            cwWireNeighbor = cwWireNeighbor->getNeighborCW();
+            m_wireNeighbors.push_back(cwWireNeighbor);
+          }
+          if (ccwWireNeighbor) {
+            ccwWireNeighbor = ccwWireNeighbor->getNeighborCCW();
+            m_wireNeighbors.push_back(ccwWireNeighbor);
+          }
 
+          if (cwOutWireNeighbor) {
+            cwOutWireNeighbor = cwOutWireNeighbor->getNeighborCW();
+            m_wireNeighbors.push_back(cwOutWireNeighbor);
+          }
+          if (ccwOutWireNeighbor) {
+            ccwOutWireNeighbor = ccwOutWireNeighbor->getNeighborCCW();
+            m_wireNeighbors.push_back(ccwOutWireNeighbor);
+          }
+
+          if (cwTwelvethSecondWireNeighbor) {
+            cwTwelvethSecondWireNeighbor = cwTwelvethSecondWireNeighbor->getNeighborCW();
+            m_wireNeighbors.push_back(cwTwelvethSecondWireNeighbor);
+          }
+          if (ccwTwelvethSecondWireNeighbor) {
+            ccwTwelvethSecondWireNeighbor = ccwTwelvethSecondWireNeighbor->getNeighborCCW();
+            m_wireNeighbors.push_back(ccwTwelvethSecondWireNeighbor);
+          }
         }
-
 
         std::sort(std::begin(m_wireNeighbors), std::end(m_wireNeighbors));
 

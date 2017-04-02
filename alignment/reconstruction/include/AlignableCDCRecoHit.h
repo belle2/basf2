@@ -81,14 +81,7 @@ namespace Belle2 {
      * @param sop State on virtual plane to calculate derivatives
      * @return TMatrixD of local derivatives, #columns=#params, #row=2 (or measurement dimension if > 2)
      */
-    //virtual TMatrixD localDerivatives(const genfit::StateOnPlane* sop);
-
-    /**
-     * @brief Labels for (local) alignment/calibration parameters
-     *
-     * @return Vector of ints, one per each parameter
-     */
-    //virtual std::vector< int > localLabels();
+    virtual TMatrixD localDerivatives(const genfit::StateOnPlane* sop);
 
   private:
     /** ROOT Macro.*/

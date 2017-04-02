@@ -124,6 +124,30 @@ namespace Belle2 {
     /// Destructor
     ~CDCAlignment() {}
 
+    // ------------- Interface to global Millepede calibration ----------------
+    /// Get global unique id
+    static unsigned short getGlobalUniqueID() {return 27;}
+    /// Get global parameter FIXME does nothing because CDC is not ready
+    double getGlobalParam(unsigned short element, unsigned short param)
+    {
+      //return get(element, param);
+      return 0.;
+    }
+    /// Set global parameter FIXME does nothing because CDC is not ready
+    void setGlobalParam(double, unsigned short, unsigned short)
+    {
+      //set(value, element, param);
+    }
+    /// list stored global parameters TODO FIXME CDC not ready
+    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()
+    {
+      return {};
+    }
+
+    void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>& result) {};
+
+    // ------------------------------------------------------------------------
+
   private:
 
     ClassDef(CDCAlignment, 1); /**< Storage for CDC alignment constants (mainly now for Millepede) */

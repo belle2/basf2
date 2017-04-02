@@ -16,6 +16,8 @@
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/TransformDataGlobalDisplaced.h>
 
+#include <alignment/Hierarchy.h>
+
 using namespace Belle2;
 
 AlignableEKLMRecoHit::AlignableEKLMRecoHit()
@@ -89,18 +91,12 @@ AlignableEKLMRecoHit::~AlignableEKLMRecoHit()
 {
 }
 
-std::vector<int> AlignableEKLMRecoHit::labels()
+std::pair<std::vector<int>, TMatrixD> AlignableEKLMRecoHit::globalDerivatives(const genfit::StateOnPlane* sop)
 {
   std::vector<int> labels;
-//   labels.push_back(GlobalLabel(m_Segment, 1));
-//   labels.push_back(GlobalLabel(m_Segment, 2));
-  return labels;
-}
+  labels.push_back(GlobalLabel::construct<EKLMAlignment>(m_Segment.getSegmentGlobalNumber(), 1));
+  labels.push_back(GlobalLabel::construct<EKLMAlignment>(m_Segment.getSegmentGlobalNumber(), 2));
 
-TMatrixD AlignableEKLMRecoHit::derivatives(const genfit::StateOnPlane* sop)
-{
-  return TMatrixD();
-  /* Local parameters. */
   const double dalpha = 0;
   const double dy = 0;
   const double sinda = sin(dalpha);
@@ -115,8 +111,10 @@ TMatrixD AlignableEKLMRecoHit::derivatives(const genfit::StateOnPlane* sop)
   derGlobal(0, 1) = -cosda;
   derGlobal(1, 0) = -u * sinda + (v - dy) * cosda;
   derGlobal(1, 1) = -u * cosda + (v + dy) * sinda;
-  return derGlobal;
+
+  return alignment::GlobalDerivatives::passGlobals(make_pair(labels, derGlobal));
 }
+
 
 genfit::AbsMeasurement* AlignableEKLMRecoHit::clone() const
 {

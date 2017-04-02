@@ -48,6 +48,8 @@ namespace Belle2 {
     void setGlobalParam(double value, unsigned short element, unsigned short param) {set(element, param, value);}
     /// TODO: list stored global parameters
     std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {};}
+
+    void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>& result) {};
   private:
     ClassDef(VXDAlignment, 2); /**< VXD allignment and calibration constants */
   };

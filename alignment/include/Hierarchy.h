@@ -82,7 +82,7 @@ namespace Belle2 {
           newLabels.push_back(label);
           newMatrix.ResizeTo(globals.second.GetNrows(), newMatrix.GetNcols() + 1);
           for (int iRow = 0; iRow < globals.second.GetNrows(); ++iRow) {
-            newMatrix(iRow, newMatrix.GetNcols()) = globals.second(iRow, newMatrix.GetNcols());
+            newMatrix(iRow, newMatrix.GetNcols() - 1) = globals.second(iRow, newMatrix.GetNcols() - 1);
           }
         }
         return {newLabels, newMatrix};

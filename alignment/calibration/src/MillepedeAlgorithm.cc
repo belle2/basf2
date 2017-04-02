@@ -55,6 +55,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 //   }
 
   GlobalParamVector result;
+  std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>> resultTuple;
 
   for (auto& exprun : getObject<RunRange>(CalibrationAlgorithm::RUN_RANGE_OBJ_NAME).getExpRunSet()) {
     auto event1 = EventMetaData(1, exprun.second, exprun.first);
@@ -93,8 +94,11 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     if (m_invertSign) correction = - correction;
 
     result.updateGlobalParam(correction, label.getUniqueId(), label.getElementId(), label.getParameterId());
+    resultTuple.push_back({label.getUniqueId(), label.getElementId(), label.getParameterId(), correction});
 
   }
+
+  result.readFromResult(resultTuple);
 
   for (auto object : result.releaseObjects()) {
     saveCalibration(object);

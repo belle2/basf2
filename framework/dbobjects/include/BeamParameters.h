@@ -157,6 +157,9 @@ namespace Belle2 {
     {
       return {{0, 1}, {0, 2}, {0, 3}};
     }
+
+    void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>& result) {};
+
     // ------------------------------------------------------------------------
 
   private:

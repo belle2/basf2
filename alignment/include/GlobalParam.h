@@ -24,6 +24,7 @@
 
 #include <cdc/dbobjects/CDCTimeZeros.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
+#include <cdc/dbobjects/CDCAlignment.h>
 
 #include <framework/database/Database.h>
 
@@ -44,6 +45,8 @@ namespace Belle2 {
       virtual void construct() = 0;
       virtual bool isConstructed() = 0;
       virtual bool hasBeenChanged() = 0;
+
+      virtual void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>& result) = 0;
     };
 
     template<class DBObjType>
@@ -80,6 +83,10 @@ namespace Belle2 {
       virtual void construct() final {m_object.reset(new DBObjType());}
       virtual bool isConstructed() final {return !!m_object;}
       virtual bool hasBeenChanged() final {return m_hasBeenChanged;}
+
+      //TODO: just because of CDC alignment :-(
+      virtual void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>& result) final {ensureConstructed(); m_object->readFromResult(result);};
+
     private:
       bool m_hasBeenChanged {false};
       std::unique_ptr<DBObjType> m_object {};
@@ -95,7 +102,8 @@ namespace Belle2 {
         addDBObj<BeamParameters>();
         addDBObj<VXDAlignment>();
 
-        addDBObj<CDCCalibration>();
+        //addDBObj<CDCCalibration>();
+        addDBObj<CDCAlignment>();
 
         addDBObj<CDCTimeZeros>();
         addDBObj<CDCTimeWalks>();
@@ -188,6 +196,13 @@ namespace Belle2 {
       {
         for (auto& uID_DBObj : m_vector) {
           uID_DBObj.second->loadFromDB(event);
+        }
+      }
+
+      void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>& result)
+      {
+        for (auto& uID_DBObj : m_vector) {
+          uID_DBObj.second->readFromResult(result);
         }
       }
 

@@ -54,6 +54,8 @@
 
 #include <alignment/dbobjects/VXDAlignment.h>
 
+#include <alignment/GblMultipleScatteringController.h>
+
 using namespace Belle2;
 using namespace std;
 
@@ -214,8 +216,8 @@ void MillepedeCollectorModule::collect()
       mille.open(getUniqueMilleName());
   }
 
-
   std::shared_ptr<genfit::GblFitter> gbl(new genfit::GblFitter());
+  //gbl->setTrackSegmentController(new GblMultipleScatteringController);
 
 
   for (auto arrayName : m_tracks) {
@@ -340,6 +342,11 @@ void MillepedeCollectorModule::collect()
           labels.push_back(label.setParameterId(1));
           labels.push_back(label.setParameterId(2));
           labels.push_back(label.setParameterId(3));
+          /*
+          auto globalDerivs = alignment::GlobalDerivatives::passGlobals(make_pair(labels, globals));
+
+          // Add derivatives for vertex calibration to first point of first trajectory
+          daughters[0].first[0].addGlobals(globalDerivs.first, globalDerivs.second);*/
 
           // Add derivatives for vertex calibration to first point of first trajectory
           daughters[0].first[0].addGlobals(labels, globals);
@@ -431,6 +438,7 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
 {
   std::shared_ptr<genfit::GblFitter> gbl(new genfit::GblFitter());
   gbl->setOptions("", true, true, 1, 1);
+  //gbl->setTrackSegmentController(new GblMultipleScatteringController);
 
   MeasurementAdder factory("", "", "", "", "");
 

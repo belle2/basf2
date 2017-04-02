@@ -103,6 +103,9 @@ namespace Belle2 {
     /// TODO: list stored global parameters
     std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {};}
 
+    void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>& result) {};
+
+
   private:
 
     ClassDef(CDCCalibration, 2); /**< Storage for CDC alignment and calibration constants (mainly now for Millepede) */

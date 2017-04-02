@@ -17,6 +17,8 @@
 #include <bklm/dataobjects/BKLMElementID.h>
 #include <alignment/dbobjects/BKLMAlignment.h>
 
+#include <alignment/Hierarchy.h>
+
 #include <genfit/DetPlane.h>
 #include <TVector3.h>
 #include <TRandom.h>
@@ -123,28 +125,22 @@ std::vector<genfit::MeasurementOnPlane*> BKLMRecoHit::constructMeasurementsOnPla
                                                   state.getRep(), this->constructHMatrix(state.getRep())));
 }
 
-vector< int > BKLMRecoHit::labels()
+std::pair<std::vector<int>, TMatrixD> BKLMRecoHit::globalDerivatives(const genfit::StateOnPlane* sop)
 {
-  return {};
+
   BKLMElementID klmid;
   klmid.setIsForward(m_IsForward);
   klmid.setSectorNumber(m_Sector);
   klmid.setLayerNumber(m_Layer);
   std::vector<int> labGlobal;
 
-  labGlobal.push_back(GlobalLabel(klmid, BKLMAlignment::dU)); // du
-  labGlobal.push_back(GlobalLabel(klmid, BKLMAlignment::dV));// dv
-  labGlobal.push_back(GlobalLabel(klmid, BKLMAlignment::dW)); // dw
-  labGlobal.push_back(GlobalLabel(klmid, BKLMAlignment::dAlpha)); // dalpha
-  labGlobal.push_back(GlobalLabel(klmid, BKLMAlignment::dBeta)); // dbeta
-  labGlobal.push_back(GlobalLabel(klmid, BKLMAlignment::dGamma)); // dgamma
+  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(klmid, BKLMAlignment::dU)); // du
+  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(klmid, BKLMAlignment::dV));// dv
+  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(klmid, BKLMAlignment::dW)); // dw
+  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(klmid, BKLMAlignment::dAlpha)); // dalpha
+  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(klmid, BKLMAlignment::dBeta)); // dbeta
+  labGlobal.push_back(GlobalLabel::construct<BKLMAlignment>(klmid, BKLMAlignment::dGamma)); // dgamma
 
-  return labGlobal;
-}
-
-TMatrixD BKLMRecoHit::derivatives(const genfit::StateOnPlane* sop)
-{
-  return TMatrixD();
   // Matrix of global derivatives
   TMatrixD derGlobal(2, 6);
   derGlobal.Zero();
@@ -173,7 +169,8 @@ TMatrixD BKLMRecoHit::derivatives(const genfit::StateOnPlane* sop)
   derGlobal(1, 4) = -uPos * vSlope;
   derGlobal(1, 5) = -uPos;
 
-  return derGlobal;
+  return alignment::GlobalDerivatives::passGlobals(make_pair(labGlobal, derGlobal));
+
 }
 
 

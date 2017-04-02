@@ -24,7 +24,9 @@ class RealisticSegmentRelationFilterTrainingRun(TrainingRunMixin, ReadOrGenerate
                         flightTimeEstimation="outwards",
                         UseNLoops=1.0)
 
-        path.add_module("TFCDC_ClusterPreparer")
+        path.add_module("TFCDC_ClusterPreparer",
+                        SuperClusterDegree=3,
+                        SuperClusterExpandOverApogeeGap=True)
 
         if self.task == "train":
             varSets = [

@@ -268,7 +268,6 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
     path.add_module("TFCDC_TrackQualityAsserter",
                     corrections=[
                         "LayerBreak",
-                        "LargeBreak2",
                         "OneSuperlayer",
                         "Small",
                     ])
@@ -339,7 +338,7 @@ def add_cdc_cr_track_finding(path,
 
     # Improve the quality of all tracks and output
     path.add_module("TFCDC_TrackQualityAsserter",
-                    corrections=["LayerBreak", "LargeBreak2", "OneSuperlayer", "Small"],
+                    corrections=["LayerBreak", "OneSuperlayer", "Small"],
                     )
 
     # Flip track orientation to always point downwards

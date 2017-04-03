@@ -339,6 +339,7 @@ void CDCMCTrackStore::fillNPassedSuperLayers()
 
 bool CDCMCTrackStore::changedSuperLayer(const CDCHitVector& mcSegment, const CDCHitVector& nextMCSegment) const
 {
+  const CDCSimHitLookUp& simHitLookUp = *m_ptrSimHitLookUp;
   const CDCHit* ptrHit = mcSegment.front();
   const CDCHit* ptrNextHit = nextMCSegment.front();
 
@@ -351,8 +352,19 @@ bool CDCMCTrackStore::changedSuperLayer(const CDCHitVector& mcSegment, const CDC
   if (hit.getISuperLayer() != nextHit.getISuperLayer()) {
     return true;
   } else if (hit.getISuperLayer() == 0) {
-    // TODO introduce a smart check here
+    const CDCSimHit* ptrSimHit = simHitLookUp.getClosestPrimarySimHit(ptrHit);
+    const CDCSimHit* ptrNextSimHit = simHitLookUp.getClosestPrimarySimHit(ptrNextHit);
 
+    Vector3D pos(ptrSimHit->getPosTrack());
+    Vector3D mom(ptrSimHit->getMomentum());
+    Vector3D nextMom(ptrNextSimHit->getMomentum());
+    Vector3D nextPos(ptrNextSimHit->getPosTrack());
+
+    if (pos.dotXY(nextPos) < 0) return true;
+    if ((nextPos - pos).dotXY(nextMom) < 0) return true;
+    if ((nextPos - pos).dotXY(mom) < 0) return true;
+
+    // TODO introduce a smarter check here
     return false;
   } else {
     return false;

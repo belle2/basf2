@@ -21,8 +21,7 @@ class RealisticSegmentRelationFilterTrainingRun(TrainingRunMixin, ReadOrGenerate
         """Setup the recording path after the simulation"""
         path = super().create_path()
         path.add_module("TFCDC_WireHitPreparer",
-                        flightTimeEstimation="outwards",
-                        UseNLoops=1.0)
+                        flightTimeEstimation="outwards")
 
         path.add_module("TFCDC_ClusterPreparer",
                         SuperClusterDegree=3,

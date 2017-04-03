@@ -261,17 +261,17 @@ EForwardBackward CDCMCHitCollectionLookUp<ACDCHitCollection>::areAlignedInMCTrac
     if (firstInTrackIdOfToHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
     // if (lastInTrackIdOfToHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
 
-    if (lastInTrackIdOfFromHits < firstInTrackIdOfToHits) {
+    // Relax conditions somewhat such that segments may overlap at the borders.
+
+    if (lastInTrackIdOfFromHits - 1 < firstInTrackIdOfToHits + 1) {
       if (fromFBInfo == EForwardBackward::c_Forward and toFBInfo == EForwardBackward::c_Forward) {
         return EForwardBackward::c_Forward;
-      } else {
-        return EForwardBackward::c_Invalid;
       }
-    } else if (firstInTrackIdOfToHits < lastInTrackIdOfFromHits) {
+    }
+
+    if (firstInTrackIdOfToHits - 1 < lastInTrackIdOfFromHits + 1) {
       if (fromFBInfo == EForwardBackward::c_Backward and toFBInfo == EForwardBackward::c_Backward) {
         return EForwardBackward::c_Backward;
-      } else {
-        return EForwardBackward::c_Invalid;
       }
     }
   }

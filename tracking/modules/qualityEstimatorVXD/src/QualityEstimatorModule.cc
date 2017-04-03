@@ -9,6 +9,10 @@
  **************************************************************************/
 
 #include <tracking/modules/qualityEstimatorVXD/QualityEstimatorModule.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorMC.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRandom.h>
 #include <framework/logging/Logger.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 
@@ -51,6 +55,8 @@ void QualityEstimatorModule::initialize()
     m_estimator = std::unique_ptr<QualityEstimatorBase>(new QualityEstimatorTripletFit(bFieldZ));
   } else if (m_EstimationMethod == "CircleFit") {
     m_estimator = std::unique_ptr<QualityEstimatorBase>(new QualityEstimatorCircleFit(bFieldZ));
+  } else if (m_EstimationMethod == "Random") {
+    m_estimator = std::unique_ptr<QualityEstimatorBase>(new QualityEstimatorRandom(bFieldZ));
   }
   B2ASSERT("QualityEstimator could not be initialized with method: " << m_EstimationMethod, m_estimator);
 }

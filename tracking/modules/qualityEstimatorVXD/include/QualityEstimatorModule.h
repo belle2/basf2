@@ -9,12 +9,8 @@
  **************************************************************************/
 
 #pragma once
-
-#pragma once
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorMC.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
@@ -49,6 +45,7 @@ namespace Belle2 {
      * MCInfo
      * CircleFit
      * TripletFit
+     * Random
      */
     std::string m_EstimationMethod;
 

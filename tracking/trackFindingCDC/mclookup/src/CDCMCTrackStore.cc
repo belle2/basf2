@@ -214,63 +214,20 @@ void CDCMCTrackStore::fillMCSegments()
 
     // Now analyse the runs in turn and break them in the connected segments
     for (const CDCHitVector& superLayerRun : superLayerRuns) {
-      // Safest way to make the segments is to cluster
-      // the elements in the track for their nearest neighbors.
-      // Bundle them together with a automaton cell and construct a relation
-      // to serve them to the Clusterizer for generation of the clusters.
-
-      using HitWithCell = WithAutomatonCell<const CDCHit*>;
-
-      std::vector<HitWithCell> hitsWithCells;
-      for (const CDCHit* hit : superLayerRun) {
-        hitsWithCells.push_back(HitWithCell(hit));
-      }
-
-      std::multimap<HitWithCell*, HitWithCell*> hitNeighborhood;
       const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+      auto areNeighbors = [&wireTopology](const CDCHit * lhs, const CDCHit * rhs) {
+        WireID lhsWireID(lhs->getISuperLayer(), lhs->getILayer(), lhs->getIWire());
+        WireID rhsWireID(rhs->getISuperLayer(), rhs->getILayer(), rhs->getIWire());
 
-      for (HitWithCell& hitWithCell : hitsWithCells) {
-        const CDCHit* ptrHit(hitWithCell);
-        const CDCHit& hit = *ptrHit;
+        return (wireTopology.arePrimaryNeighbors(lhsWireID, rhsWireID) or
+                wireTopology.areSeconaryNeighbors(lhsWireID, rhsWireID) or
+                lhsWireID == rhsWireID);
+      };
 
-        WireID wireID(hit.getISuperLayer(), hit.getILayer(), hit.getIWire());
+      auto segmentRanges = unique_ranges(superLayerRun.begin(), superLayerRun.end(), areNeighbors);
 
-        for (HitWithCell& neighborHitWithCell : hitsWithCells) {
-
-          const CDCHit* ptrNeighborHit(neighborHitWithCell);
-          if (ptrHit == ptrNeighborHit) continue;
-
-          const CDCHit& neighborHit = *ptrNeighborHit;
-          WireID neighborWireID(neighborHit.getISuperLayer(),
-                                neighborHit.getILayer(),
-                                neighborHit.getIWire());
-
-          if (wireTopology.arePrimaryNeighbors(wireID, neighborWireID) or
-              wireTopology.areSeconaryNeighbors(wireID, neighborWireID) or
-              wireID == neighborWireID) {
-            HitWithCell* ptrHitWithCell = &hitWithCell;
-            HitWithCell* ptrNeighborHitWithCell = &neighborHitWithCell;
-            hitNeighborhood.emplace(ptrHitWithCell, ptrNeighborHitWithCell);
-          }
-        }
-      }
-
-      using CDCHitCluster = std::vector<HitWithCell*>;
-      Clusterizer<HitWithCell> hitClusterizer;
-      std::vector<CDCHitCluster> hitClusters;
-      auto hitsWithCellPtrs =
-        hitsWithCells | boost::adaptors::transformed(&std::addressof<HitWithCell>);
-      hitClusterizer.createFromPointers(hitsWithCellPtrs, hitNeighborhood, hitClusters);
-
-      // Strip the automaton cell
-      for (const CDCHitCluster& hitCluster : hitClusters) {
-        CDCHitVector mcSegment;
-        mcSegment.reserve(hitCluster.size());
-        for (HitWithCell* hitWithCell : hitCluster) {
-          const CDCHit* hit(*hitWithCell);
-          mcSegment.push_back(hit);
-        }
-        mcSegments.push_back(std::move(mcSegment));
+      for (const ConstVectorRange<const CDCHit*> segmentRange : segmentRanges) {
+        mcSegments.emplace_back(segmentRange.begin(), segmentRange.end());
       }
     } // end for superLayerRuns
 

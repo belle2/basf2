@@ -183,12 +183,11 @@ namespace Belle2 {
           m_arich.d0 = (trkPos.XYvector()).Mod();
         }
         m_arich.status += 10;
-
+        int fromARICHMCP = 0;
         particle = mdstTrack->getRelated<MCParticle>();
+        if (!particle) { particle = mdstTrack->getRelated<MCParticle>("arichMCParticles"); fromARICHMCP = 1;}
         if (particle) {
           m_arich.PDG = particle->getPDG();
-          MCParticle* mother = particle->getMother();
-          if (mother) m_arich.motherPDG = mother->getPDG();
           m_arich.primary = particle->getStatus(MCParticle::c_PrimaryParticle);
           m_arich.seen = particle->hasSeenInDetector(Const::ARICH);
           TVector3 prodVertex = particle->getProductionVertex();
@@ -200,9 +199,14 @@ namespace Belle2 {
           m_arich.zDec = decVertex.Z();
           m_arich.phiDec = decVertex.Phi();
 
-          std::vector<Belle2::MCParticle*> daughs =  particle->getDaughters();
-          for (const auto daugh : daughs) {
-            if (daugh->getPDG() == particle->getPDG()) m_arich.scatter = 1;
+          if (!fromARICHMCP) {
+            MCParticle* mother = particle->getMother();
+            if (mother) m_arich.motherPDG = mother->getPDG();
+            std::vector<Belle2::MCParticle*> daughs =  particle->getDaughters();
+            for (const auto daugh : daughs) {
+              if (daugh == NULL) continue;
+              if (daugh->getPDG() == particle->getPDG()) m_arich.scatter = 1;
+            }
           }
         }
       }

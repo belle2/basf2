@@ -55,6 +55,9 @@ namespace Belle2 {
       /// Parameter : Switch to block hits that appear in linked segments such that unlinked reverse and aliases are excluded
       bool m_param_dealiasLinked = false;
 
+      /// Parameter : Switch to construct only segments that have a linked partner
+      bool m_param_onlyLinked = false;
+
     private:
       /// Creator of the segment relations for linking
       WeightedRelationCreator<const CDCSegment2D, ChooseableSegmentRelationFilter> m_segment2DRelationCreator;

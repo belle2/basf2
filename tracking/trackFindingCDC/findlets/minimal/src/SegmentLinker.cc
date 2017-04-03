@@ -42,6 +42,11 @@ void SegmentLinker::exposeParameters(ModuleParamList* moduleParamList, const std
                                 m_param_dealiasLinked,
                                 "Block hits that appear in linked segments such that unlinked reverse and aliases are excluded.",
                                 m_param_dealiasLinked);
+
+  moduleParamList->addParameter(prefixed(prefix, "onlyLinked"),
+                                m_param_onlyLinked,
+                                "Switch to construct only segments that have a linked partner.",
+                                m_param_onlyLinked);
 }
 
 void SegmentLinker::apply(const std::vector<CDCSegment2D>& inputSegment2Ds,
@@ -72,6 +77,7 @@ void SegmentLinker::apply(const std::vector<CDCSegment2D>& inputSegment2Ds,
   std::vector<CDCSegment2D> tempOutputSegment2Ds;
   tempOutputSegment2Ds.reserve(m_segment2DPaths.size());
   for (const Path<const CDCSegment2D>& segment2DPath : m_segment2DPaths) {
+    if (m_param_onlyLinked and segment2DPath.size() == 1) continue;
 
     // Do not use the single segments blocked in the dealiasing
     if (m_param_dealiasLinked and segment2DPath.size() == 1 and

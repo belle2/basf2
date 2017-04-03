@@ -10,7 +10,7 @@ import os
 import threading
 import time
 import signal
-from basf2_mva_python_interface.tensorflow import State
+import tempfile
 import pickle
 
 #: Array for saving evaluation score in tensorflow summary folder
@@ -26,6 +26,7 @@ class save_decider():
     Decides which file in tensorflow summary folder is used for storing variables by comparing the evaluation score of
     the independent validation dataset defined by training fraction.
     If training fraction is 1. The latest file will be used.
+    Also can end training if break conditions is reached.
     """
 
     def __init__(self):
@@ -36,18 +37,35 @@ class save_decider():
         self.lowest_value = np.inf
         #: save state with the lowest evaluation score
         self.save_state = None
+        #: number how many times to perform check without improving training, before ending training
+        self.break_number = np.inf
+
+    def set_break_number(self, number):
+        """
+        Set break number
+        """
+        self.break_number = number
 
     def check(self, value, save_state):
         """
         Check if current training state is better, than the stored one.
+        Also decides if training should be continued.
         :param value: evaluation score
-        :param save_state: name of the file which stores the tensorflow state
+        :param save_state: save state
+        :return: bool which decides, if training should be continued
         """
-        if self.lowest_value > value:
+        if self.lowest_value > value or value == np.nan:
             self.save_state = save_state
             self.lowest_value = value
-        if self.lowest_value == np.inf and value == np.nan:
-            self.save_state = save_state
+            self.counter = 0
+            return True
+        else:
+            self.counter += 1
+            if self.counter > self.break_number:
+                print('Stop training. Validation Score is not getting better')
+                global COORD
+                COORD.request_stop()
+            return False
 
     def get_savestate(self):
         """
@@ -118,18 +136,20 @@ class preprocessor():
 PREPROCESSOR = preprocessor()
 
 
-def inference_model(x, num_of_features, par_weight_decay, reuse_model=False):
+def inference_model(x, num_of_features, hidden_layers, par_weight_decay, reuse_model=False, dropout=(1., 1.)):
     """
     Build Network topology
     :param x: tensorflow placeholder for feeding the data
     :param num_of_features: dimension of feature vector
+    :param hidden_layers: shape of hidden layers
     :param par_weight_decay: weight decay factor used for training
     :param reuse_model: Used for building tensorflow graphs with shared weights.
                         Param has to be False for creating new weights
+    :param dropout: use for applying dropout for input and hidden layers. 1 means no dropout.
     :return: tensorflow output node of Network topology
     """
     with tf.name_scope('inference'):
-        def layer(x, shape, name, unit=tf.nn.tanh):
+        def layer(x, shape, name, unit=tf.nn.tanh, keep_prob=1.):
             with tf.name_scope(name), tf.variable_scope(name, reuse=reuse_model):  # prevent names to duplicate
                 weights = tf.get_variable('weights', initializer=tf.truncated_normal(shape, stddev=1. / math.sqrt(float(shape[0]))))
                 tf.summary.histogram('weights', weights)
@@ -139,16 +159,18 @@ def inference_model(x, num_of_features, par_weight_decay, reuse_model=False):
                 tf.add_to_collection('losses', weight_decay)  # for adding to the loss in loss model
                 layer = unit(tf.matmul(x, weights) + biases)
                 tf.summary.histogram('layer_output', layer)
-            return layer
+                layer_after_dropout = tf.nn.dropout(layer, keep_prob)
+                tf.summary.histogram('layer_output', layer_after_dropout)
+            return layer_after_dropout
 
-        # convert nan to 0 in x
-        x_clean = tf.select(tf.is_nan(x), tf.ones_like(x) * 0., x)
-        tf.summary.histogram('clean_input', x_clean)
-        hidden0 = layer(x_clean, [num_of_features, 180], 'hidden0')
-        hidden1 = layer(hidden0, [180, 120], 'hidden1')
-        hidden2 = layer(hidden1, [120, 60], 'hidden2')
-        hidden3 = layer(hidden2, [60, 30], 'hidden3')
-        output = layer(hidden3, [30, 1], 'output', tf.sigmoid)
+        tf.summary.histogram('clean_input', x)
+        x_after_dropout = tf.nn.dropout(x, dropout[0])
+        hidden_array = [layer(x_after_dropout, [num_of_features, hidden_layers[0]], 'hidden0', keep_prob=dropout[1])]
+        for i in range(len(hidden_layers) - 1):
+            hidden_array.append(layer(hidden_array[-1], [hidden_layers[i], hidden_layers[i + 1]], 'hidden' + str(i + 1),
+                                      keep_prob=dropout[1]))
+
+        output = layer(hidden_array[-1], [hidden_layers[-1], 1], 'output', tf.sigmoid)
     return output
 
 
@@ -168,7 +190,7 @@ def loss_model(y, p):
     return tf.add_n(tf.get_collection('losses'), name='total_loss')  # returns tensor
 
 
-def training_operation(loss, par_learning_rate):
+def training_operation(loss, par_learning_rate, par_epsilon):
     """
     Describes how the network should be trained
     :param loss: tensorflow node for loss calculation
@@ -182,7 +204,7 @@ def training_operation(loss, par_learning_rate):
         learning_rate = tf.train.exponential_decay(par_learning_rate[0], global_step,
                                                    par_learning_rate[1], par_learning_rate[2], staircase=True)
         tf.summary.scalar('learning_rate', learning_rate)
-        optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+        optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate, epsilon=par_epsilon)
         gradients = optimizer.compute_gradients(loss)
         for gradient, variable in gradients:
             tf.summary.histogram(variable.name + '_gradients', gradient)
@@ -225,9 +247,12 @@ def execute_train_op(state):
             if state.param['items_permanent_in_queue']:
                 state.session.run(state.enqueue, feed_dict=feed_dict)
 
+            feed_dict.update({state.hidden_dropout: state.param['hidden_dropout'],
+                              state.input_dropout: state.param['input_dropout']})
             state.session.run(state.optimizer, feed_dict=feed_dict)
 
             if (epoch % state.param['n_step_summaries'] == 0) or epoch == state.param['max_epoch']:
+                feed_dict.update({state.hidden_dropout: 1., state.input_dropout: 1.})
                 train_eva = state.session.run(state.train_evaluation, feed_dict=feed_dict)
                 if state.training_fraction < 1:
                     val_eva = state.session.run(state.val_evaluation, feed_dict=feed_dict)
@@ -242,9 +267,10 @@ def execute_train_op(state):
                 state.summary_writer.add_summary(summary_str, epoch)
 
             if (epoch % state.param['n_step_save_model'] == 0) or epoch == state.param['max_epoch']:
-                state.saver.save(state.session, os.path.join(state.param['tensorflow_folder'],
-                                                             'mymodel'), global_step=epoch)
-                SAVER_DECIDER.check(val_eva, tf.train.latest_checkpoint(state.param['tensorflow_folder']))
+                if SAVER_DECIDER.check(val_eva, os.path.join(state.param['tensorflow_folder'], 'mymodel-' + str(epoch))):
+                    state.saver.save(state.session, os.path.join(state.param['tensorflow_folder'],
+                                                                 'mymodel'), global_step=epoch)
+
             epoch += 1
 
     except tf.errors.OutOfRangeError:
@@ -257,10 +283,12 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     """
     Build tensorflow graph, handles parameter and initialise variables
     """
-    param = {'visible_gpu': '', 'capacity': 10000000, 'min_after_dequeue': 20, 'max_epoch': np.inf,
+    param = {'visible_gpu': '', 'capacity': 2e6, 'min_after_dequeue': 0, 'max_epoch': np.inf,
              'batch_size': 500, 'tensorflow_folder': 'tensorflow_summary', 'clean_summary_folder': False,
-             'weight_decay': 0.001, 'learning_rate': (0.001, 10000, 0.95), 'n_step_summaries': 1000, 'n_step_save_model': 10000,
-             'n_step_queue_epoch': 0, 'items_permanent_in_queue': False}
+             'weight_decay': 0.001, 'learning_rate': (0.001, 10000, 1.),
+             'n_step_summaries': 1000, 'n_step_save_model': 10000, 'break_number': 50,
+             'n_step_queue_epoch': 1, 'items_permanent_in_queue': False, 'adam_epsilon': 1e-08,
+             'input_dropout': 1, 'hidden_dropout': 1, 'hidden_layers': [180, 120, 60, 30]}
 
     if isinstance(parameters, dict):
         param.update(parameters)
@@ -275,19 +303,23 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     y = tf.placeholder("float", [None, 1])
     val_x = tf.placeholder("float", [None, number_of_features])
     val_y = tf.placeholder("float", [None, 1])
+    input_dropout = tf.placeholder("float")
+    hidden_dropout = tf.placeholder("float")
 
-    activation = inference_model(x, number_of_features, param['weight_decay'])
+    activation = inference_model(x, number_of_features, param['hidden_layers'],
+                                 param['weight_decay'], dropout=(input_dropout, hidden_dropout))
     cost = loss_model(y, activation)
-    optimizer = training_operation(cost, param['learning_rate'])
+    optimizer = training_operation(cost, param['learning_rate'], param['adam_epsilon'])
 
-    val_activation = inference_model(val_x, number_of_features, param['weight_decay'], True)
+    val_activation = inference_model(val_x, number_of_features, param['hidden_layers'],
+                                     param['weight_decay'], reuse_model=True)
 
     init = tf.global_variables_initializer()
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
     session = tf.Session(config=config)
     session.run(init)
-    tmp_state = State(x, y, activation, cost, optimizer, session)
+    tmp_state = State(x, y, activation, cost, optimizer, session, input_dropout, hidden_dropout)
 
     # All steps below are needed in state for training but not needed for mva_expert
 
@@ -295,6 +327,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     tmp_state.param = param
     tmp_state.training_fraction = training_fraction
     tmp_state.val_x, tmp_state.val_y = val_x, val_y
+    tmp_state.input_dropout, tmp_state.hidden_dropout = input_dropout, hidden_dropout
 
     # defining queue, enqueue and dequeue-operation
     tmp_state.queue = tf.RandomShuffleQueue(round(param['capacity'] * training_fraction),
@@ -313,6 +346,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     tmp_state.thread = threading.Thread(target=execute_train_op, args=(tmp_state,))
 
     # Define items for saving
+    SAVER_DECIDER.set_break_number(param['break_number'])
     tmp_state.saver = tf.train.Saver(max_to_keep=1000)
     tmp_state.summary_writer = tf.summary.FileWriter(param['tensorflow_folder'], graph=session.graph,
                                                      max_queue=param['n_step_summaries'])
@@ -413,7 +447,8 @@ def apply(state, X):
     Apply preprocessing and estimator to passed data.
     """
     X = state.preprocessor.apply(X)
-    r = state.session.run(state.activation, feed_dict={state.x: X}).flatten()
+    r = state.session.run(state.activation, feed_dict={
+        state.x: X, state.hidden_dropout: 1., state.input_dropout: 1.}).flatten()
     return np.require(r, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
@@ -441,6 +476,60 @@ def delete_all_files_in_folders(folderlist):
     for folder in folderlist:
         for file in os.listdir(folder):
             os.remove(os.path.join(folder, file))
+
+
+class State(object):
+    """
+    Tensorflow state
+    """
+
+    def __init__(
+            self,
+            x=None,
+            y=None,
+            activation=None,
+            cost=None,
+            optimizer=None,
+            session=None,
+            input_dropout=None,
+            hidden_dropout=None):
+        """ Constructor of the state object """
+        #: feature matrix placeholder
+        self.x = x
+        #: target placeholder
+        self.y = y
+        #: activation function
+        self.activation = activation
+        #: cost function
+        self.cost = cost
+        #: optimizer used to minimize cost function
+        self.optimizer = optimizer
+        #: tensorflow session
+        self.session = session
+        #: input dropout probability(it's the keeping probability)
+        self.input_dropout = input_dropout
+        #: hidden dropout probability(it's the keeping probability)
+        self.hidden_dropout = hidden_dropout
+
+    def add_to_collection(self):
+        """ Add the stored members to the current tensorflow collection """
+        tf.add_to_collection('x', self.x)
+        tf.add_to_collection('y', self.y)
+        tf.add_to_collection('activation', self.activation)
+        tf.add_to_collection('cost', self.cost)
+        tf.add_to_collection('optimizer', self.optimizer)
+        tf.add_to_collection('input_dropout', self.input_dropout)
+        tf.add_to_collection('hidden_dropout', self.hidden_dropout)
+
+    def get_from_collection(self):
+        """ Get members from the current tensorflow collection """
+        self.x = tf.get_collection('x')[0]
+        self.y = tf.get_collection('y')[0]
+        self.activation = tf.get_collection('activation')[0]
+        self.cost = tf.get_collection('cost')[0]
+        self.optimizer = tf.get_collection('optimizer')[0]
+        self.input_dropout = tf.get_collection('input_dropout')[0]
+        self.hidden_dropout = tf.get_collection('hidden_dropout')[0]
 
 if __name__ == "__main__":
     import basf2_mva
@@ -473,7 +562,7 @@ if __name__ == "__main__":
     general_options.m_target_variable = "isContinuumEvent"
     general_options.m_method = "Python"
 
-    events_in_root_file = 742181
+    events_in_root_file = 1782534
 
     python_options = basf2_mva.PythonOptions()
     python_options.m_framework = "tensorflow"
@@ -482,36 +571,40 @@ if __name__ == "__main__":
     # Because MVA use the first fraction of the sample as validation, the data should be shuffled beforehand
     python_options.m_training_fraction = 0.99
 
-    tensorflow_dic = {'batch_size': 5000,
-                      'clean_summary_folder': True,
-                      'learning_rate': (0.001, 5000, 0.95),
+    tensorflow_dic = {'adam_epsilon': 1e-08,
+                      'batch_size': 5000,
+                      'break_number': 50,
+                      'clean_summary_folder': False,
+                      'input_dropout': 1,
+                      'hidden_dropout': 1,
+                      'hidden_layers': [180, 120, 60, 30],
+                      'learning_rate': (0.001, 5000, 1.),
+                      'max_epoch': np.inf,
                       'n_step_queue_epoch': 1,
                       'n_step_save_model': 100,
                       'n_step_summaries': 1,
-                      'tensorflow_folder': '/usr/users/dweyland/ssd/tensorflow_summary',
+                      'tensorflow_folder': '/usr/users/dweyland/ssd/tensorflow_summary_2',
                       'visible_gpu': '0',
                       'weight_decay': 0.001}
 
     # There are 2 different types of training:
 
-    # 1. Directly write all data in queue and train afterwards
+    # 1. Directly write all data in queue and train afterwards (could require huge amount of ram)
     if(training_type == 1):
         tensorflow_dic.update({
             # has to be at least number of events
             'capacity': events_in_root_file + 10,
             # events shouldn't be deleted from queue
             'items_permanent_in_queue': True,
-            # number of epochs after training will end
-            'max_epoch': 1000000,
             # not importan in this mode
-            'min_after_dequeue': 0})
+            'min_after_dequeue': 1300e3})
 
         # describes how many times data will fed into the queue
         # be careful not to forget to calculate with training_fraction
         python_options.m_mini_batch_size = int(700e3)
         python_options.m_nIterations = 1
 
-    # 2. Stream data in queue and train while reading root files
+    # 2. Stream data in queue and train while reading root files (longer training times, as in first type)
     if (training_type == 2):
         tensorflow_dic.update({
             # Describes how many data the queue will hold.
@@ -519,10 +612,8 @@ if __name__ == "__main__":
             'capacity': 3 * events_in_root_file,
             # events should be deleted from queue after used for training
             'items_permanent_in_queue': False,
-            # Not necessary in this mode
-            'max_epoch': 100000000000000,
             # describes how many items should be at least in queue after dequeue-op
-            'min_after_dequeue': 0.5 * events_in_root_file})
+            'min_after_dequeue': 500e3})
 
         # Duration of training is now controlled, how long data will be streamed into partial fit
         python_options.m_mini_batch_size = int(700e3)

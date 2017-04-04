@@ -28,7 +28,7 @@ QualityEstimatorModule::QualityEstimatorModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("EstimationMethod", m_EstimationMethod,
-           "Identifier which estimation method to use. Valid identifiers are: [MCInfo, CircleFit, TripletFit]", std::string(""));
+           "Identifier which estimation method to use. Valid identifiers are: [MCInfo, CircleFit, TripletFit, Random]", std::string(""));
 
   addParam("SpacePointTrackCandsStoreArrayName", m_SpacePointTrackCandsStoreArrayName,
            "Name of StoreArray containing the SpacePointTrackCandidates to be estimated.", std::string(""));
@@ -37,7 +37,7 @@ QualityEstimatorModule::QualityEstimatorModule() : Module()
            "Name of StoreArray containing MCRecoTracks. Only required for MCInfo method", std::string("MCRecoTracks"));
 
   addParam("MCStrictQualityEstimator", m_MCStrictQualityEstimator,
-           "Only required for MCInfo method. If false combining several MCTracks is allowed.", bool(false));
+           "Only required for MCInfo method. If false combining several MCTracks is allowed.", bool(true));
 }
 
 void QualityEstimatorModule::initialize()

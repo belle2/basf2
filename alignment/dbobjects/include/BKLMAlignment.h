@@ -35,6 +35,7 @@ namespace Belle2 {
     /// Destructor
     ~BKLMAlignment() {}
 
+    // ------------- Interface to global Millepede calibration ----------------
     /// Get global unique id
     static unsigned short getGlobalUniqueID() {return 30;}
     /// Get global parameter
@@ -43,8 +44,10 @@ namespace Belle2 {
     void setGlobalParam(double value, unsigned short element, unsigned short param) {set(element, param, value);}
     /// TODO: list stored global parameters
     std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {};}
+    /// Not used
+    void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>&) {}
+    // ------------------------------------------------------------------------
 
-    void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>& result) {};
   private:
     ClassDef(BKLMAlignment, 2); /**< BKLM allignment and calibration constants */
   };

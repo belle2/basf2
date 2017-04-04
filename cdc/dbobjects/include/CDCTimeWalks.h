@@ -113,7 +113,7 @@ namespace Belle2 {
       return result;
     }
 
-    void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>& result) {};
+    void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>&) {};
 
     // ------------------------------------------------------------------------
 

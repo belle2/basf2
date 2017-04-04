@@ -18,6 +18,8 @@
 #include <alignment/dbobjects/BKLMAlignment.h>
 
 #include <alignment/Hierarchy.h>
+#include <alignment/GlobalDerivatives.h>
+
 
 #include <genfit/DetPlane.h>
 #include <TVector3.h>

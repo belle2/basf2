@@ -13,6 +13,9 @@
 #include <alignment/Hierarchy.h>
 #include <alignment/dbobjects/VXDAlignment.h>
 
+#include <alignment/GlobalDerivatives.h>
+
+
 using namespace std;
 using namespace Belle2;
 using namespace alignment;

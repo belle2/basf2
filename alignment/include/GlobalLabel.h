@@ -156,7 +156,7 @@ namespace Belle2 {
     void construct(gidTYPE dbObjId, gidTYPE element, gidTYPE param)
     {
       if (m_disabledComponents.find(dbObjId) != m_disabledComponents.end()) {
-        construct(0, 0, 0);
+        construct(0, 0);
         return;
       }
       construct(100000 * dbObjId + element, param);

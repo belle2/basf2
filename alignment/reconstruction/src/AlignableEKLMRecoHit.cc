@@ -17,6 +17,8 @@
 #include <eklm/geometry/TransformDataGlobalDisplaced.h>
 
 #include <alignment/Hierarchy.h>
+#include <alignment/GlobalDerivatives.h>
+
 
 using namespace Belle2;
 

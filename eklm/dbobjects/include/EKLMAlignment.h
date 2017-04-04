@@ -58,6 +58,7 @@ namespace Belle2 {
      */
     void cleanAlignmentData();
 
+    // ------------- Interface to global Millepede calibration ----------------
     /// Get global unique id
     static unsigned short getGlobalUniqueID() {return 40;}
     /// Get global parameter
@@ -83,8 +84,9 @@ namespace Belle2 {
     }
     /// TODO: list stored global parameters
     std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {};}
-
-    void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>& result) {};
+    /// Not used
+    void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>&) {}
+    // ------------------------------------------------------------------------
 
   private:
 

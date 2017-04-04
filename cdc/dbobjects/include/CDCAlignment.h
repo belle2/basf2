@@ -128,7 +128,7 @@ namespace Belle2 {
     /// Get global unique id
     static unsigned short getGlobalUniqueID() {return 27;}
     /// Get global parameter FIXME does nothing because CDC is not ready
-    double getGlobalParam(unsigned short element, unsigned short param)
+    double getGlobalParam(unsigned short, unsigned short)
     {
       //return get(element, param);
       return 0.;
@@ -144,7 +144,8 @@ namespace Belle2 {
       return {};
     }
 
-    void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>& result) {};
+    //TODO this the temporary place to be able to change wire positions according to layer alignment - not yet done
+    void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>&) {}
 
     // ------------------------------------------------------------------------
 

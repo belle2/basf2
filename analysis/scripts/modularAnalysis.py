@@ -1024,7 +1024,6 @@ def variablesToDaughterExtraInfo(
     For each daughter particle specified via decay string the selected variables (estimated for the mother particle)
     are saved in an extra-info field with the given name. In other words, the property of mother is saved as extra-info
     to specified daughter particle.
-    Should only be used in ROE path, that is path executed for each ROE object in an event.
 
     It is possible to overwrite if lower / don't overwrite / overwrite if higher, in case if extra info with given name
     already exists (-1/0/1)

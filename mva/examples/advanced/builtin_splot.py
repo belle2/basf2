@@ -4,6 +4,9 @@
 # Thomas Keck 2016
 
 import basf2_mva
+from basf2 import *
+from modularAnalysis import *
+
 
 if __name__ == "__main__":
 
@@ -74,3 +77,22 @@ if __name__ == "__main__":
     basf2_mva.expert(basf2_mva.vector('MVAPdf', 'MVAFull', 'MVAOrdinary', 'MVASPlot',
                                       'MVASPlotCombined', 'MVASPlotBoosted', 'MVASPlotCombinedBoosted'),
                      basf2_mva.vector('train.root'), 'tree', 'expert.root')
+
+    path = create_path()
+    inputMdstList('MC6', ['/storage/jbod/tkeck/MC6/evtgen-charged/sub00/mdst_0001*.root'], path=path)
+    fillParticleLists([('K-', 'Kid > 0.5'), ('pi+', 'piid > 0.5')], path=path)
+    reconstructDecay('D0 -> K- pi+', '1.8 < M < 1.9', path=path)
+    fitVertex('D0', 0.1, fitter='kfitter', path=path)
+    applyCuts('D0', '1.8 < M < 1.9', path=path)
+    matchMCTruth('D0', path=path)
+
+    path.add_module('MVAExpert', listNames=['D0'], extraInfoName='Pdf', identifier='MVAPdf')
+    path.add_module('MVAExpert', listNames=['D0'], extraInfoName='Full', identifier='MVAFull')
+    path.add_module('MVAExpert', listNames=['D0'], extraInfoName='Ordinary', identifier='MVAOrdinary')
+    path.add_module('MVAExpert', listNames=['D0'], extraInfoName='SPlot', identifier='MVASPlot')
+    path.add_module('MVAExpert', listNames=['D0'], extraInfoName='SPlotCombined', identifier='MVASPlotCombined')
+    path.add_module('MVAExpert', listNames=['D0'], extraInfoName='SPlotBoosted', identifier='MVASPlotBoosted')
+    path.add_module('MVAExpert', listNames=['D0'], extraInfoName='SPlotCombinedBoosted', identifier='MVASPlotCombinedBoosted')
+    variablesToNTuple('D0', ['isSignal', 'extraInfo(Pdf)', 'extraInfo(Full)', 'extraInfo(Ordinary)', 'extraInfo(SPlot)',
+                             'extraInfo(SPlotCombined)', 'extraInfo(SPlotBoosted)', 'extraInfo(SPlotCombinedBoosted)'], path=path)
+    process(path)

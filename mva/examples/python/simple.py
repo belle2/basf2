@@ -5,6 +5,7 @@
 
 import numpy as np
 import basf2_mva
+import importlib
 
 
 def apply(state, X):
@@ -44,10 +45,14 @@ if __name__ == "__main__":
 
     specific_options = basf2_mva.PythonOptions()
     specific_options.m_mini_batch_size = 10000
-    specific_options.m_steering_file = 'mva/examples/python_based.py'
+    specific_options.m_steering_file = 'mva/examples/python/simple.py'
 
     for i, l in enumerate(["sklearn", "xgboost"]):
-        general_options.m_identifier = "Python_{}".format(i)
-        specific_options.m_nIterations = 1
-        specific_options.m_framework = l
-        basf2_mva.teacher(general_options, specific_options)
+        try:
+            importlib.import_module(l)
+            general_options.m_identifier = "Python_{}".format(i)
+            specific_options.m_nIterations = 1
+            specific_options.m_framework = l
+            basf2_mva.teacher(general_options, specific_options)
+        except ImportError:
+            print("Module {} is not available, install it using pip3".format(l))

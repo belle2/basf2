@@ -149,31 +149,6 @@ class ClassificationAnalysis(object):
         purity_profile.ylabel = 'purity'
         self.plots["purity"] = purity_profile
 
-        # Auxiliary hists
-        for aux_name, aux_values in auxiliaries.items():
-            if statistics.is_single_value_series(aux_values) or aux_name == quantity_name:
-                continue
-
-            aux_axis_label = compose_axis_label(aux_name)
-
-            # Signal + bkg distribution over estimate and auxiliary variable #
-            # ############################################################## #
-            signal_bkg_aux_hist2d_name = formatter.format(plot_name, subplot_name=aux_name + '_signal_bkg_aux2d')
-            signal_bkg_aux_hist2d = ValidationPlot(signal_bkg_aux_hist2d_name)
-            signal_bkg_aux_hist2d.hist2d(
-                aux_values,
-                estimates,
-                stackby=truths,
-                lower_bound=(None, lower_bound),
-                upper_bound=(None, upper_bound),
-                outlier_z_score=self.outlier_z_score,
-                allow_discrete=self.allow_discrete,
-            )
-
-            signal_bkg_aux_hist2d.xlabel = aux_axis_label
-            signal_bkg_aux_hist2d.ylabel = axis_label
-            self.plots[signal_bkg_aux_hist2d_name] = signal_bkg_aux_hist2d
-
         # Try to guess the cur direction form the correlation
         if cut_direction is None:
             purity_grapherrors = ValidationPlot.convert_tprofile_to_tgrapherrors(purity_profile.plot)
@@ -217,14 +192,36 @@ class ClassificationAnalysis(object):
             classification_fom['background_rejection'] = background_rejection
 
             self.fom = classification_fom
+        # Auxiliary hists
+        for aux_name, aux_values in auxiliaries.items():
+            if statistics.is_single_value_series(aux_values) or aux_name == quantity_name:
+                continue
 
-        # Figures of merit as function of the auxiliary variables
-        if cut_value is not None and auxiliaries is not None:
-            for aux_name, aux_values in auxiliaries.items():
-                if statistics.is_single_value_series(aux_values) or aux_name == quantity_name:
-                    continue
+            aux_axis_label = compose_axis_label(aux_name)
 
-                aux_axis_label = compose_axis_label(aux_name)
+            # Signal + bkg distribution over estimate and auxiliary variable #
+            # ############################################################## #
+            signal_bkg_aux_hist2d_name = formatter.format(plot_name, subplot_name=aux_name + '_signal_bkg_aux2d')
+            signal_bkg_aux_hist2d = ValidationPlot(signal_bkg_aux_hist2d_name)
+            signal_bkg_aux_hist2d.hist2d(
+                aux_values,
+                estimates,
+                stackby=truths,
+                lower_bound=(None, lower_bound),
+                upper_bound=(None, upper_bound),
+                outlier_z_score=self.outlier_z_score,
+                allow_discrete=self.allow_discrete,
+            )
+
+            aux_lower_bound = signal_bkg_aux_hist2d.lower_bound[0]
+            aux_upper_bound = signal_bkg_aux_hist2d.upper_bound[0]
+
+            signal_bkg_aux_hist2d.xlabel = aux_axis_label
+            signal_bkg_aux_hist2d.ylabel = axis_label
+            self.plots[signal_bkg_aux_hist2d_name] = signal_bkg_aux_hist2d
+
+            # Figures of merit as function of the auxiliary variables
+            if cut_value is not None:
 
                 # Auxiliary purity profile #
                 # ######################## #
@@ -235,6 +232,8 @@ class ClassificationAnalysis(object):
                     truths[binary_estimates],
                     outlier_z_score=self.outlier_z_score,
                     allow_discrete=self.allow_discrete,
+                    lower_bound=aux_lower_bound,
+                    upper_bound=aux_upper_bound,
                 )
 
                 aux_purity_profile.xlabel = aux_axis_label
@@ -250,6 +249,8 @@ class ClassificationAnalysis(object):
                     binary_estimates[signals],
                     outlier_z_score=self.outlier_z_score,
                     allow_discrete=self.allow_discrete,
+                    lower_bound=aux_lower_bound,
+                    upper_bound=aux_upper_bound,
                 )
 
                 aux_efficiency_profile.xlabel = aux_axis_label
@@ -265,6 +266,8 @@ class ClassificationAnalysis(object):
                     ~binary_estimates[~signals],
                     outlier_z_score=self.outlier_z_score,
                     allow_discrete=self.allow_discrete,
+                    lower_bound=aux_lower_bound,
+                    upper_bound=aux_upper_bound,
                 )
 
                 aux_bkg_rejection_profile.xlabel = aux_axis_label

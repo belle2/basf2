@@ -73,9 +73,10 @@ double QualityEstimatorMC::calculateQualityIndex(int nClusters, MatchInfo& match
 QualityEstimationResults QualityEstimatorMC::estimateQualityAndProperties(std::vector<SpacePoint const*> const& measurements)
 {
   QualityEstimatorBase::estimateQualityAndProperties(measurements);
-  if (m_results.qualityIndicator == 1) {
+  if (m_results.qualityIndicator != 0) {
     auto mcParticle = m_mcRecoTracks[m_match.first]->getRelated<MCParticle>();
     m_results.p = mcParticle->getMomentum();
+    m_results.pt = mcParticle->get4Vector().Pt();
   }
   return m_results;
 }

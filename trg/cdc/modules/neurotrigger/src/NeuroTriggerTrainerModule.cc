@@ -7,6 +7,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -40,7 +41,7 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
     "is prepared. The relevant ID range is determined by a threshold on "
     "the hit counters or on the sum of the hit counters over the relevant range.\n"
     "2. Input data is calculated from the hits, the 2D tracks and the ID ranges. "
-    "Target data is collected from a MCParticle related to the 2D track."
+    "Target data is collected from a MCParticle or RecoTrack related to the 2D track."
   );
   // parameters for saving / loading
   addParam("hitCollectionName", m_hitCollectionName,
@@ -49,8 +50,11 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
   addParam("inputCollectionName", m_inputCollectionName,
            "Name of the StoreArray holding the 2D input tracks.",
            string("Trg2DFinderTracks"));
+  addParam("trainOnRecoTracks", m_trainOnRecoTracks,
+           "If true, use RecoTracks as targets instead of MCParticles.",
+           false);
   addParam("targetCollectionName", m_targetCollectionName,
-           "Name of the MCParticle collection used as target values.",
+           "Name of the MCParticle/RecoTrack collection used as target values.",
            string("MCParticles"));
   addParam("filename", m_filename,
            "Name of the root file where the NeuroTrigger parameters will be saved.",
@@ -126,7 +130,7 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
            "Super layer pattern mask for which experts are trained. "
            "1 value or same as SLpattern.", m_parameters.SLpatternMask);
   addParam("tMax", m_parameters.tMax,
-           "Maximal drift time (for scaling).", m_parameters.tMax);
+           "Maximal drift time (for scaling, unit: trigger timing bins).", m_parameters.tMax);
   addParam("selectSectorByMC", m_selectSectorByMC,
            "If true, track parameters for sector selection are taken "
            "from MCParticle instead of CDCTriggerTrack.", false);
@@ -186,7 +190,11 @@ void NeuroTriggerTrainerModule::initialize()
   // register store objects
   StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
   StoreArray<CDCTriggerTrack>::required(m_inputCollectionName);
-  StoreArray<MCParticle>::required(m_targetCollectionName);
+  if (m_trainOnRecoTracks) {
+    StoreArray<RecoTrack>::required(m_targetCollectionName);
+  } else {
+    StoreArray<MCParticle>::required(m_targetCollectionName);
+  }
   // load or initialize neurotrigger
   if (!m_load ||
       !loadTraindata(m_trainFilename, m_trainArrayname) ||
@@ -267,27 +275,60 @@ void NeuroTriggerTrainerModule::event()
 {
   StoreArray<CDCTriggerTrack> tracks(m_inputCollectionName);
   for (int itrack = 0; itrack < tracks.getEntries(); ++itrack) {
-    // get related MC track for target
-    RelationVector<MCParticle> mcParticles =
-      tracks[itrack]->getRelationsTo<MCParticle>(m_targetCollectionName);
-    if (mcParticles.size() == 0) {
-      B2DEBUG(150, "Skipping CDCTriggerTrack without relation to MCParticle.");
-      continue;
-    }
-    MCParticle* mcTrack = mcParticles[0];
-    double maxWeight = mcParticles.weight(0);
-    if (mcParticles.size() > 1) {
-      for (unsigned imc = 1; imc < mcParticles.size(); ++imc) {
-        if (mcParticles.weight(imc) > maxWeight) {
-          mcTrack = mcParticles[imc];
-          maxWeight = mcParticles.weight(imc);
-        }
+    // get related MCParticle/RecoTrack for target
+    // and retrieve track parameters
+    float phi0Target = 0;
+    float invptTarget = 0;
+    float thetaTarget = 0;
+    float zTarget = 0;
+    if (m_trainOnRecoTracks) {
+      RecoTrack* recoTrack =
+        tracks[itrack]->getRelatedTo<RecoTrack>(m_targetCollectionName);
+      if (!recoTrack) {
+        B2DEBUG(150, "Skipping CDCTriggerTrack without relation to RecoTrack.");
+        continue;
       }
+      // a RecoTrack has multiple representations for different particle hypothesis
+      // -> just take the first one that does not give errors.
+      const vector<genfit::AbsTrackRep*>& reps = recoTrack->getRepresentations();
+      bool foundValidRep = false;
+      for (unsigned irep = 0; irep < reps.size() && !foundValidRep; ++irep) {
+        if (!recoTrack->wasFitSuccessful(reps[irep]))
+          continue;
+        // get state (position, momentum etc.) from first hit
+        genfit::MeasuredStateOnPlane state =
+          recoTrack->getMeasuredStateOnPlaneFromFirstHit(reps[irep]);
+        // extrapolate to z-axis (may throw an exception -> continue to next representation)
+        try {
+          reps[irep]->extrapolateToLine(state, TVector3(0, 0, -1000), TVector3(0, 0, 2000));
+        } catch (...) {
+          continue;
+        }
+        // get track parameters
+        phi0Target = state.getMom().Phi();
+        invptTarget = reps[irep]->getCharge(state) / state.getMom().Pt();
+        thetaTarget = state.getMom().Theta();
+        zTarget = state.getPos().Z();
+        // break loop
+        foundValidRep = true;
+      }
+      if (!foundValidRep) {
+        B2DEBUG(150, "No valid representation found for RecoTrack, skipping.");
+        continue;
+      }
+    } else {
+      MCParticle* mcTrack =
+        tracks[itrack]->getRelatedTo<MCParticle>(m_targetCollectionName);
+      if (!mcTrack) {
+        B2DEBUG(150, "Skipping CDCTriggerTrack without relation to MCParticle.");
+        continue;
+      }
+      phi0Target = mcTrack->getMomentum().Phi();
+      invptTarget = mcTrack->getCharge() / mcTrack->getMomentum().Pt();
+      thetaTarget = mcTrack->getMomentum().Theta();
+      zTarget = mcTrack->getProductionVertex().Z();
     }
-    if (maxWeight <= 0) {
-      B2DEBUG(150, "Skipping CDCTriggerTrack with negative weight relation to MCParticle.");
-      continue;
-    }
+
     // update 2D track variables
     m_NeuroTrigger.updateTrack(*tracks[itrack]);
 
@@ -296,18 +337,18 @@ void NeuroTriggerTrainerModule::event()
     float invpt = tracks[itrack]->getKappa(1.5);
     float theta = atan2(1., tracks[itrack]->getCotTheta());
     if (m_selectSectorByMC) {
-      phi0 = mcTrack->getMomentum().Phi();
-      invpt = mcTrack->getCharge() / mcTrack->getMomentum().Pt();
-      theta = mcTrack->getMomentum().Theta();
+      phi0 = phi0Target;
+      invpt = invptTarget;
+      theta = thetaTarget;
     }
     vector<int> sectors = m_NeuroTrigger.selectMLPs(phi0, invpt, theta);
     if (sectors.size() == 0) continue;
     // get target values
     vector<float> targetRaw = {};
     if (m_parameters.targetZ)
-      targetRaw.push_back(mcTrack->getProductionVertex().Z());
+      targetRaw.push_back(zTarget);
     if (m_parameters.targetTheta)
-      targetRaw.push_back(mcTrack->getMomentum().Theta());
+      targetRaw.push_back(thetaTarget);
     for (unsigned i = 0; i < sectors.size(); ++i) {
       int isector = sectors[i];
       vector<float> target = m_NeuroTrigger[isector].scaleTarget(targetRaw);
@@ -323,15 +364,27 @@ void NeuroTriggerTrainerModule::event()
 
       if (m_nTrainPrepare > 0 &&
           m_trainSets[isector].getTrackCounter() < m_nTrainPrepare) {
-        // get relative ids for all hits related to the MCParticle
+        // get relative ids for all hits related to the MCParticle / RecoTrack
         // and count them to find relevant id range
         // using only related hits suppresses background EXCEPT for curling tracks
-        for (const CDCTriggerSegmentHit& hit :
-             mcTrack->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName)) {
-          // get relative id
-          double relId = m_NeuroTrigger.getRelId(hit);
-          int intId = round(relId);
-          m_trainSets[isector].addHit(hit.getISuperLayer(), intId);
+        if (m_trainOnRecoTracks) {
+          RecoTrack* recoTrack =
+            tracks[itrack]->getRelatedTo<RecoTrack>(m_targetCollectionName);
+          for (const CDCTriggerSegmentHit& hit :
+               recoTrack->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName)) {
+            // get relative id
+            double relId = m_NeuroTrigger.getRelId(hit);
+            m_trainSets[isector].addHit(hit.getISuperLayer(), round(relId));
+          }
+        } else {
+          MCParticle* mcTrack =
+            tracks[itrack]->getRelatedTo<MCParticle>(m_targetCollectionName);
+          for (const CDCTriggerSegmentHit& hit :
+               mcTrack->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName)) {
+            // get relative id
+            double relId = m_NeuroTrigger.getRelId(hit);
+            m_trainSets[isector].addHit(hit.getISuperLayer(), round(relId));
+          }
         }
         m_trainSets[isector].countTrack();
         // if required hit number is reached, get relevant ids
@@ -356,10 +409,10 @@ void NeuroTriggerTrainerModule::event()
         vector<unsigned> hitIds = m_NeuroTrigger.selectHits(isector, *tracks[itrack]);
         m_trainSets[isector].addSample(m_NeuroTrigger.getInputVector(isector, hitIds), target);
         if (m_saveDebug) {
-          phiHistsMC[isector]->Fill(mcTrack->getMomentum().Phi());
-          ptHistsMC[isector]->Fill(mcTrack->getCharge() / mcTrack->getMomentum().Pt());
-          thetaHistsMC[isector]->Fill(mcTrack->getMomentum().Theta());
-          zHistsMC[isector]->Fill(mcTrack->getProductionVertex().Z());
+          phiHistsMC[isector]->Fill(phi0Target);
+          ptHistsMC[isector]->Fill(invptTarget);
+          thetaHistsMC[isector]->Fill(thetaTarget);
+          zHistsMC[isector]->Fill(zTarget);
           phiHists2D[isector]->Fill(tracks[itrack]->getPhi0());
           ptHists2D[isector]->Fill(tracks[itrack]->getKappa(1.5));
         }

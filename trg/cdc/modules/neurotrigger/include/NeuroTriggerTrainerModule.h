@@ -61,7 +61,9 @@ namespace Belle2 {
     std::string m_hitCollectionName;
     /** Name of the StoreArray containing the input 2D tracks. */
     std::string m_inputCollectionName;
-    /** Name of the MCParticles collection used as target values. */
+    /** Switch between MCParticles or RecoTracks as targets. */
+    bool m_trainOnRecoTracks;
+    /** Name of the MCParticles/RecoTracks collection used as target values. */
     std::string m_targetCollectionName;
     /** Name of file where network weights etc. are stored after training. */
     std::string m_filename;

@@ -56,6 +56,9 @@ CDCTriggerMCMatcherModule::CDCTriggerMCMatcherModule() : Module()
   addParam("MCTrackableCollectionName", m_MCTrackableCollectionName,
            "Name of a new StoreArray holding MCParticles considered as trackable.",
            string("MCTracks"));
+  addParam("hitCollectionName", m_hitCollectionName,
+           "Name of the StoreArray of CDCTriggerSegmentHits used for the matching.",
+           string(""));
   addParam("minAxial", m_minAxial,
            "Minimum number of axial hits in different super layers.",
            0);
@@ -84,12 +87,12 @@ CDCTriggerMCMatcherModule::CDCTriggerMCMatcherModule() : Module()
 void
 CDCTriggerMCMatcherModule::initialize()
 {
-  StoreArray<CDCTriggerSegmentHit>::required();
+  StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
   StoreArray<CDCTriggerTrack>::required(m_TrgTrackCollectionName);
   StoreArray<MCParticle>::required(m_MCParticleCollectionName);
   StoreArray<MCParticle>::registerPersistent(m_MCTrackableCollectionName);
 
-  StoreArray<CDCTriggerSegmentHit> segmentHits;
+  StoreArray<CDCTriggerSegmentHit> segmentHits(m_hitCollectionName);
   StoreArray<CDCTriggerTrack> tracks(m_TrgTrackCollectionName);
   StoreArray<MCParticle> mcparticles(m_MCParticleCollectionName);
   StoreArray<MCParticle> mctracks(m_MCTrackableCollectionName);
@@ -108,7 +111,7 @@ CDCTriggerMCMatcherModule::initialize()
 void
 CDCTriggerMCMatcherModule::event()
 {
-  StoreArray<CDCTriggerSegmentHit> segmentHits;
+  StoreArray<CDCTriggerSegmentHit> segmentHits(m_hitCollectionName);
   StoreArray<CDCTriggerTrack> prTracks(m_TrgTrackCollectionName);
   StoreArray<MCParticle> mcParticles(m_MCParticleCollectionName);
   StoreArray<MCParticle> mcTracks(m_MCTrackableCollectionName);
@@ -132,7 +135,7 @@ CDCTriggerMCMatcherModule::event()
     SLcounted.assign(9, false);
 
     RelationVector<CDCTriggerSegmentHit> relHits =
-      mcParticle->getRelationsTo<CDCTriggerSegmentHit>();
+      mcParticle->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
     for (unsigned ihit = 0; ihit < relHits.size(); ++ihit) {
       unsigned iSL = relHits[ihit]->getISuperLayer();
       if (SLcounted[iSL]) continue;
@@ -177,7 +180,7 @@ CDCTriggerMCMatcherModule::event()
     for (const MCParticle& mcTrack : mcTracks) {
       ++mcTrackId;
       RelationVector<CDCTriggerSegmentHit> relHits =
-        mcTrack.getRelationsTo<CDCTriggerSegmentHit>();
+        mcTrack.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
       for (unsigned iHit = 0; iHit < relHits.size(); ++iHit) {
         const HitId hitId = relHits[iHit]->getArrayIndex();
         itMCInsertHit = mcTrackId_by_hitId.insert(itMCInsertHit,
@@ -196,7 +199,7 @@ CDCTriggerMCMatcherModule::event()
     for (const CDCTriggerTrack& prTrack : prTracks) {
       ++prTrackId;
       RelationVector<CDCTriggerSegmentHit> relHits =
-        prTrack.getRelationsTo<CDCTriggerSegmentHit>();
+        prTrack.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
       for (unsigned int iHit = 0; iHit < relHits.size(); ++iHit) {
         const HitId hitId = relHits[iHit]->getArrayIndex();
         itPRInsertHit = prTrackId_by_hitId.insert(itPRInsertHit,

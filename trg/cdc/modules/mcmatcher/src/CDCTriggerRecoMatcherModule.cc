@@ -54,6 +54,9 @@ CDCTriggerRecoMatcherModule::CDCTriggerRecoMatcherModule() : Module()
   addParam("TrgTrackCollectionName", m_TrgTrackCollectionName,
            "Name of the CDCTriggerTrack StoreArray to be matched.",
            string("Trg2DFinderTracks"));
+  addParam("hitCollectionName", m_hitCollectionName,
+           "Name of the StoreArray of CDCTriggerSegmentHits used for the matching.",
+           string(""));
   addParam("axialOnly", m_axialOnly,
            "Switch to ignore stereo hits (= 2D matching).",
            false);
@@ -74,12 +77,12 @@ void
 CDCTriggerRecoMatcherModule::initialize()
 {
   StoreArray<CDCHit>::required();
-  StoreArray<CDCTriggerSegmentHit>::required();
+  StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
   StoreArray<CDCTriggerTrack>::required(m_TrgTrackCollectionName);
   StoreArray<RecoTrack>::required(m_RecoTrackCollectionName);
 
   StoreArray<CDCHit> cdcHits;
-  StoreArray<CDCTriggerSegmentHit> segmentHits;
+  StoreArray<CDCTriggerSegmentHit> segmentHits(m_hitCollectionName);
   StoreArray<CDCTriggerTrack> trgTracks(m_TrgTrackCollectionName);
   StoreArray<RecoTrack> recoTracks(m_RecoTrackCollectionName);
 
@@ -94,7 +97,7 @@ CDCTriggerRecoMatcherModule::initialize()
 void
 CDCTriggerRecoMatcherModule::event()
 {
-  StoreArray<CDCTriggerSegmentHit> segmentHits;
+  StoreArray<CDCTriggerSegmentHit> segmentHits(m_hitCollectionName);
   StoreArray<CDCTriggerTrack> trgTracks(m_TrgTrackCollectionName);
   StoreArray<RecoTrack> recoTracks(m_RecoTrackCollectionName);
 
@@ -103,12 +106,12 @@ CDCTriggerRecoMatcherModule::event()
     RecoTrack* recoTrack = recoTracks[ireco];
     // if relations exist already, skip this step
     // (matching may be done several times with different trigger tracks)
-    if (recoTrack->getRelationsTo<CDCTriggerSegmentHit>().size() > 0)
+    if (recoTrack->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName).size() > 0)
       continue;
     vector<CDCHit*> cdcHits = recoTrack->getCDCHitList();
     for (unsigned iHit = 0; iHit < cdcHits.size(); ++iHit) {
       RelationVector<CDCTriggerSegmentHit> relHits =
-        cdcHits[iHit]->getRelationsFrom<CDCTriggerSegmentHit>();
+        cdcHits[iHit]->getRelationsFrom<CDCTriggerSegmentHit>(m_hitCollectionName);
       for (unsigned iTS = 0; iTS < relHits.size(); ++iTS) {
         // create relations only for priority hits (relation weight 2)
         if (relHits.weight(iTS) > 1)
@@ -143,7 +146,7 @@ CDCTriggerRecoMatcherModule::event()
     for (const RecoTrack& recoTrack : recoTracks) {
       ++recoTrackId;
       RelationVector<CDCTriggerSegmentHit> relHits =
-        recoTrack.getRelationsTo<CDCTriggerSegmentHit>();
+        recoTrack.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
       for (unsigned iHit = 0; iHit < relHits.size(); ++iHit) {
         const HitId hitId = relHits[iHit]->getArrayIndex();
         itRecoInsertHit = recoTrackId_by_hitId.insert(itRecoInsertHit,
@@ -162,7 +165,7 @@ CDCTriggerRecoMatcherModule::event()
     for (const CDCTriggerTrack& trgTrack : trgTracks) {
       ++trgTrackId;
       RelationVector<CDCTriggerSegmentHit> relHits =
-        trgTrack.getRelationsTo<CDCTriggerSegmentHit>();
+        trgTrack.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
       for (unsigned int iHit = 0; iHit < relHits.size(); ++iHit) {
         const HitId hitId = relHits[iHit]->getArrayIndex();
         itTrgInsertHit = trgTrackId_by_hitId.insert(itTrgInsertHit,

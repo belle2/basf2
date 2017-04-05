@@ -26,6 +26,8 @@ namespace Belle2 {
     std::string m_RecoTrackCollectionName;
     /** Name of the CDCTriggerTrack Store Array to be matched */
     std::string m_TrgTrackCollectionName;
+    /** Name of the StoreArray containing the hits that are used for the matching. */
+    std::string m_hitCollectionName;
     /** switch for 2D matching */
     bool m_axialOnly;
     /** minimum purity */

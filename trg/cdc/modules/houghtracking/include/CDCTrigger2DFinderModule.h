@@ -7,8 +7,8 @@
  *                                                                        *
  **************************************************************************/
 
-#ifndef CDCTriggerHoughtrackingModule_H
-#define CDCTriggerHoughtrackingModule_H
+#ifndef CDCTrigger2DFinderModule_H
+#define CDCTrigger2DFinderModule_H
 
 #include <framework/core/Module.h>
 
@@ -69,10 +69,10 @@ namespace Belle2 {
             a.getCoord().first.Y() == b.getCoord().first.Y());
   }
 
-  class CDCTriggerHoughtrackingModule : public Module {
+  class CDCTrigger2DFinderModule : public Module {
   public:
     /** Constructor.  */
-    CDCTriggerHoughtrackingModule();
+    CDCTrigger2DFinderModule();
 
     /** Initialize the module and check module parameters */
     virtual void initialize();
@@ -243,4 +243,4 @@ namespace Belle2 {
   };//end class declaration
 } // end namespace Belle2
 
-#endif // CDCTriggerHoughtrackingModule_H
+#endif // CDCTrigger2DFinderModule_H

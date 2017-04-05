@@ -7,7 +7,7 @@
  *                                                                        *
  **************************************************************************/
 
-#include <trg/cdc/modules/houghtracking/CDCTriggerHoughtrackingModule.h>
+#include <trg/cdc/modules/houghtracking/CDCTrigger2DFinderModule.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -28,13 +28,13 @@ using namespace Belle2::CDC;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCTriggerHoughtracking)
+REG_MODULE(CDCTrigger2DFinder)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-CDCTriggerHoughtrackingModule::CDCTriggerHoughtrackingModule() : Module()
+CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module()
 {
   //Set module properties
   setDescription("Hough tracking algorithm for CDC trigger.");
@@ -108,7 +108,7 @@ CDCTriggerHoughtrackingModule::CDCTriggerHoughtrackingModule() : Module()
 }
 
 void
-CDCTriggerHoughtrackingModule::initialize()
+CDCTrigger2DFinderModule::initialize()
 {
   StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
   StoreArray<CDCTriggerTrack>::registerPersistent(m_outputCollectionName);
@@ -142,7 +142,7 @@ CDCTriggerHoughtrackingModule::initialize()
 }
 
 void
-CDCTriggerHoughtrackingModule::event()
+CDCTrigger2DFinderModule::event()
 {
   StoreArray<CDCTriggerSegmentHit> tsHits(m_hitCollectionName);
   StoreArray<CDCTriggerTrack> storeTracks(m_outputCollectionName);
@@ -244,7 +244,7 @@ CDCTriggerHoughtrackingModule::event()
 }
 
 void
-CDCTriggerHoughtrackingModule::terminate()
+CDCTrigger2DFinderModule::terminate()
 {
   if (m_testFilename != "") testFile.close();
 }

@@ -7,7 +7,7 @@
 *                                                                        *
 **************************************************************************/
 
-#include <trg/cdc/modules/houghtracking/CDCTriggerHoughtrackingModule.h>
+#include <trg/cdc/modules/houghtracking/CDCTrigger2DFinderModule.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -27,7 +27,7 @@ using namespace std;
 using namespace Belle2;
 
 unsigned short
-CDCTriggerHoughtrackingModule::countSL(bool* layer)
+CDCTrigger2DFinderModule::countSL(bool* layer)
 {
   if (m_requireSL0 && !layer[0]) return 0;
   unsigned short lcnt = 0;
@@ -47,11 +47,11 @@ CDCTriggerHoughtrackingModule::countSL(bool* layer)
 * y = a
 */
 int
-CDCTriggerHoughtrackingModule::fastInterceptFinder(cdcMap& hits,
-                                                   double x1_s, double x2_s,
-                                                   double y1_s, double y2_s,
-                                                   unsigned iterations,
-                                                   unsigned ix_s, unsigned iy_s)
+CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
+                                              double x1_s, double x2_s,
+                                              double y1_s, double y2_s,
+                                              unsigned iterations,
+                                              unsigned ix_s, unsigned iy_s)
 {
   string indent = "";
   for (unsigned i = 0; i < iterations; ++i) indent += " ";
@@ -166,7 +166,7 @@ CDCTriggerHoughtrackingModule::fastInterceptFinder(cdcMap& hits,
 * Peak finding method: connected regions & center of gravity
 */
 void
-CDCTriggerHoughtrackingModule::connectedRegions()
+CDCTrigger2DFinderModule::connectedRegions()
 {
   vector<vector<CDCTriggerHoughCand>> regions;
   vector<CDCTriggerHoughCand> cpyCand = houghCand;
@@ -281,11 +281,11 @@ CDCTriggerHoughtrackingModule::connectedRegions()
 }
 
 void
-CDCTriggerHoughtrackingModule::addNeighbors(const CDCTriggerHoughCand& center,
-                                            const vector<CDCTriggerHoughCand>& candidates,
-                                            vector<CDCTriggerHoughCand>& merged,
-                                            vector<CDCTriggerHoughCand>& rejected,
-                                            unsigned short nSLmax) const
+CDCTrigger2DFinderModule::addNeighbors(const CDCTriggerHoughCand& center,
+                                       const vector<CDCTriggerHoughCand>& candidates,
+                                       vector<CDCTriggerHoughCand>& merged,
+                                       vector<CDCTriggerHoughCand>& rejected,
+                                       unsigned short nSLmax) const
 {
   for (unsigned icand = 0; icand < candidates.size(); ++icand) {
     B2DEBUG(120, "compare center " << center.getID()
@@ -325,8 +325,8 @@ CDCTriggerHoughtrackingModule::addNeighbors(const CDCTriggerHoughCand& center,
 }
 
 bool
-CDCTriggerHoughtrackingModule::inList(const CDCTriggerHoughCand& a,
-                                      const vector<CDCTriggerHoughCand>& list) const
+CDCTrigger2DFinderModule::inList(const CDCTriggerHoughCand& a,
+                                 const vector<CDCTriggerHoughCand>& list) const
 {
   for (unsigned i = 0; i < list.size(); ++i) {
     if (a == list[i]) return true;
@@ -335,8 +335,8 @@ CDCTriggerHoughtrackingModule::inList(const CDCTriggerHoughCand& a,
 }
 
 bool
-CDCTriggerHoughtrackingModule::connected(const CDCTriggerHoughCand& a,
-                                         const CDCTriggerHoughCand& b) const
+CDCTrigger2DFinderModule::connected(const CDCTriggerHoughCand& a,
+                                    const CDCTriggerHoughCand& b) const
 {
   double ax1 = a.getCoord().first.X();
   double ax2 = a.getCoord().second.X();
@@ -373,9 +373,9 @@ CDCTriggerHoughtrackingModule::connected(const CDCTriggerHoughCand& a,
 * Merge Id lists.
 */
 void
-CDCTriggerHoughtrackingModule::mergeIdList(std::vector<unsigned>& merged,
-                                           std::vector<unsigned>& a,
-                                           std::vector<unsigned>& b)
+CDCTrigger2DFinderModule::mergeIdList(std::vector<unsigned>& merged,
+                                      std::vector<unsigned>& a,
+                                      std::vector<unsigned>& b)
 {
   bool found;
 
@@ -407,9 +407,9 @@ CDCTriggerHoughtrackingModule::mergeIdList(std::vector<unsigned>& merged,
 }
 
 void
-CDCTriggerHoughtrackingModule::findAllCrossingHits(std::vector<unsigned>& list,
-                                                   double x1, double x2,
-                                                   double y1, double y2)
+CDCTrigger2DFinderModule::findAllCrossingHits(std::vector<unsigned>& list,
+                                              double x1, double x2,
+                                              double y1, double y2)
 {
   StoreArray<CDCTriggerSegmentHit> tsHits(m_hitCollectionName);
 
@@ -444,9 +444,9 @@ CDCTriggerHoughtrackingModule::findAllCrossingHits(std::vector<unsigned>& list,
  * Select one hit per super layer
  */
 void
-CDCTriggerHoughtrackingModule::selectHits(std::vector<unsigned>& list,
-                                          std::vector<unsigned>& selected,
-                                          std::vector<unsigned>& unselected)
+CDCTrigger2DFinderModule::selectHits(std::vector<unsigned>& list,
+                                     std::vector<unsigned>& selected,
+                                     std::vector<unsigned>& unselected)
 {
   StoreArray<CDCTriggerSegmentHit> tsHits(m_hitCollectionName);
 
@@ -480,7 +480,7 @@ CDCTriggerHoughtrackingModule::selectHits(std::vector<unsigned>& list,
 * Alternative peak finding with nested patterns
 */
 void
-CDCTriggerHoughtrackingModule::patternClustering()
+CDCTrigger2DFinderModule::patternClustering()
 {
   StoreArray<CDCTriggerTrack> storeTracks(m_outputCollectionName);
   StoreArray<CDCTriggerSegmentHit> tsHits(m_hitCollectionName);
@@ -658,7 +658,7 @@ CDCTriggerHoughtrackingModule::patternClustering()
 * connection definitions for 2 x 2 squares
 */
 bool
-CDCTriggerHoughtrackingModule::connectedLR(unsigned patternL, unsigned patternR)
+CDCTrigger2DFinderModule::connectedLR(unsigned patternL, unsigned patternR)
 {
   // connected if
   // . x | x .  or  . . | . .
@@ -682,7 +682,7 @@ CDCTriggerHoughtrackingModule::connectedLR(unsigned patternL, unsigned patternR)
 }
 
 bool
-CDCTriggerHoughtrackingModule::connectedUD(unsigned patternD, unsigned patternU)
+CDCTrigger2DFinderModule::connectedUD(unsigned patternD, unsigned patternU)
 {
   // connected if
   // . .      . .
@@ -715,7 +715,7 @@ CDCTriggerHoughtrackingModule::connectedUD(unsigned patternD, unsigned patternU)
 }
 
 bool
-CDCTriggerHoughtrackingModule::connectedDiag(unsigned patternLD, unsigned patternRU)
+CDCTrigger2DFinderModule::connectedDiag(unsigned patternLD, unsigned patternRU)
 {
   if (m_connect == 4) return false;
 
@@ -728,7 +728,7 @@ CDCTriggerHoughtrackingModule::connectedDiag(unsigned patternLD, unsigned patter
 }
 
 unsigned
-CDCTriggerHoughtrackingModule::topRightSquare(vector<unsigned>& pattern)
+CDCTrigger2DFinderModule::topRightSquare(vector<unsigned>& pattern)
 {
   // scan from top right corner until an active square is found
   for (unsigned index = pattern.size() - 1; index > 0; --index) {
@@ -758,7 +758,7 @@ CDCTriggerHoughtrackingModule::topRightSquare(vector<unsigned>& pattern)
 }
 
 unsigned
-CDCTriggerHoughtrackingModule::topRightCorner(unsigned pattern)
+CDCTrigger2DFinderModule::topRightCorner(unsigned pattern)
 {
   // scan pattern from right to left:
   // 2 3
@@ -776,7 +776,7 @@ CDCTriggerHoughtrackingModule::topRightCorner(unsigned pattern)
 }
 
 unsigned
-CDCTriggerHoughtrackingModule::bottomLeftCorner(unsigned pattern)
+CDCTrigger2DFinderModule::bottomLeftCorner(unsigned pattern)
 {
   // scan pattern from left to right:
   // 2 3

@@ -22,7 +22,7 @@ def add_cdc_trigger(path, SimulationMode=1, minHits=4):
                         InnerTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_v3.0.coe"),
                         OuterTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_v3.0.coe"))
         # 2D finder
-        path.add_module('CDCTriggerHoughtracking',
+        path.add_module('CDCTrigger2DFinder',
                         outputCollectionName='TRG2DFinderTracks',
                         minHits=minHits)
         # ETF

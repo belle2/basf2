@@ -38,10 +38,10 @@ CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
            string(""));
   addParam("inputCollectionName", m_inputCollectionName,
            "Name of the StoreArray holding the 2D input tracks.",
-           string("Trg2DFinderTracks"));
+           string("TRGCDC2DFinderTracks"));
   addParam("outputCollectionName", m_outputCollectionName,
            "Name of the StoreArray holding the output tracks with neural network estimates.",
-           string("TrgNNTracks"));
+           string("TRGCDCNeuroTracks"));
   addParam("fixedPoint", m_fixedPoint,
            "Switch to turn on fixed point arithmetic for FPGA simulation.",
            false);

@@ -49,7 +49,7 @@ CDCTriggerNeuroTrainerModule::CDCTriggerNeuroTrainerModule() : Module()
            string(""));
   addParam("inputCollectionName", m_inputCollectionName,
            "Name of the StoreArray holding the 2D input tracks.",
-           string("Trg2DFinderTracks"));
+           string("TRGCDC2DFinderTracks"));
   addParam("trainOnRecoTracks", m_trainOnRecoTracks,
            "If true, use RecoTracks as targets instead of MCParticles.",
            false);

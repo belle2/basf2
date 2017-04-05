@@ -23,22 +23,15 @@ def add_cdc_trigger(path, SimulationMode=1, minHits=4):
                         OuterTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_v3.0.coe"))
         # 2D finder
         path.add_module('CDCTrigger2DFinder',
-                        outputCollectionName='TRG2DFinderTracks',
                         minHits=minHits)
         # ETF
         path.add_module('CDCTriggerETF')
         # fitters
-        path.add_module('CDCTrigger2DFitter',
-                        inputCollectionName='TRG2DFinderTracks',
-                        outputCollectionName='TRG2DFitterTracks')
-        path.add_module('CDCTrigger3DFitter',
-                        inputCollectionName='TRG2DFitterTracks',
-                        outputCollectionName='TRG3DFitterTracks')
+        path.add_module('CDCTrigger2DFitter')
+        path.add_module('CDCTrigger3DFitter')
         # neurotrigger
         path.add_module('CDCTriggerNeuro',
-                        filename=Belle2.FileSystem.findFile("data/trg/cdc/Neuro20170109.root"),
-                        inputCollectionName='TRG2DFinderTracks',
-                        outputCollectionName='TRGNNTracks')
+                        filename=Belle2.FileSystem.findFile("data/trg/cdc/Neuro20170109.root"))
     elif SimulationMode == 2:
         B2WARNING("full simulation mode does not include all CDC trigger modules yet")
         # standard CDC trigger
@@ -50,8 +43,8 @@ def add_cdc_trigger(path, SimulationMode=1, minHits=4):
             'HoughFinderMappingFileMinus': Belle2.FileSystem.findFile("data/trg/cdc/HoughMappingMinus20160223.dat"),
             'HoughFinderMappingFilePlus': Belle2.FileSystem.findFile("data/trg/cdc/HoughMappingPlus20160223.dat"),
             'SimulationMode': SimulationMode,
-            '2DfinderCollection': 'TRGOld2DFinderTracks',
-            '2DfitterCollection': 'TRG2DFitterTracks',
-            '3DfitterCollection': 'TRG3DFitterTracks'}
+            '2DfinderCollection': 'TRGCDC2DFinderTracks',
+            '2DfitterCollection': 'TRGCDC2DFitterTracks',
+            '3DfitterCollection': 'TRGCDC3DFitterTracks'}
         trgcdc.param(trgcdc_params)
         path.add_module(trgcdc)

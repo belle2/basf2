@@ -46,7 +46,7 @@ CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module()
            string(""));
   addParam("outputCollectionName", m_outputCollectionName,
            "Name of the StoreArray holding the tracks found in the Hough tracking.",
-           string("Trg2DFinderTracks"));
+           string("TRGCDC2DFinderTracks"));
   addParam("clusterCollectionName", m_clusterCollectionName,
            "Name of the StoreArray holding the clusters formed in the Hough plane.",
            string(""));

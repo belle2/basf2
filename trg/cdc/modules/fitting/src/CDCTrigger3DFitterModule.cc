@@ -34,10 +34,10 @@ CDCTrigger3DFitterModule::CDCTrigger3DFitterModule() : Module::Module()
            string("CDCTriggerEventTime"));
   addParam("inputCollectionName", m_inputCollectionName,
            "Name of the StoreArray holding the input tracks from the 2D fitter.",
-           string("Trg2DFitterTracks"));
+           string("TRGCDC2DFitterTracks"));
   addParam("outputCollectionName", m_outputCollectionName,
            "Name of the StoreArray holding the 3D output tracks.",
-           string("Trg3DFitterTracks"));
+           string("TRGCDC3DFitterTracks"));
   addParam("minHits", m_minHits,
            "Minimal number of hits required for the fitting.",
            unsigned(2));

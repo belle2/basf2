@@ -24,6 +24,7 @@ class VxdCdcPartFinderHarvester(HarvestingModule):
     Harvester module to extract the information, if a MCTrack was found by the CDC
     and/or the VXD tracking reconstruction.
     """
+
     def __init__(self, output_file_name):
         """
         Init harvester

@@ -35,7 +35,7 @@ def add_cdc_trigger(path, SimulationMode=1, minHits=4):
                         inputCollectionName='TRG2DFitterTracks',
                         outputCollectionName='TRG3DFitterTracks')
         # neurotrigger
-        path.add_module('NeuroTrigger',
+        path.add_module('CDCTriggerNeuro',
                         filename=Belle2.FileSystem.findFile("data/trg/cdc/Neuro20170109.root"),
                         inputCollectionName='TRG2DFinderTracks',
                         outputCollectionName='TRGNNTracks')

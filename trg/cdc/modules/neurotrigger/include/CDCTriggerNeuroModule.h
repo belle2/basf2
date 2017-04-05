@@ -1,5 +1,5 @@
-#ifndef NEUROTRIGGERMODULE_H
-#define NEUROTRIGGERMODULE_H
+#ifndef CDCTRIGGERNEUROMODULE_H
+#define CDCTRIGGERNEUROMODULE_H
 
 #include <framework/core/Module.h>
 #include <trg/cdc/NeuroTrigger.h>
@@ -8,18 +8,18 @@ namespace Belle2 {
 
   class CDCTriggerMLP;
 
-  /** The NeuroTrigger module of the CDC trigger.
+  /** The neural network module of the CDC trigger.
    * Select one of several trained neural networks
    * and run it to estimate the z-vertex of a track
    * from track segment hits and 2D track estimates.
    */
-  class NeuroTriggerModule : public Module {
+  class CDCTriggerNeuroModule : public Module {
   public:
     /** Constructor, for setting module description and parameters. */
-    NeuroTriggerModule();
+    CDCTriggerNeuroModule();
 
     /** Destructor. */
-    virtual ~NeuroTriggerModule() {}
+    virtual ~CDCTriggerNeuroModule() {}
 
     /** Initialize the module.
      * Load the network weights and register datastore objects.

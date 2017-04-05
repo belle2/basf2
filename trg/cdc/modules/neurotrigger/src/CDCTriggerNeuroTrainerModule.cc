@@ -1,4 +1,4 @@
-#include "trg/cdc/modules/neurotrigger/NeuroTriggerTrainerModule.h"
+#include "trg/cdc/modules/neurotrigger/CDCTriggerNeuroTrainerModule.h"
 #ifdef HAS_OPENMP
 #include <parallel_fann.hpp>
 #else
@@ -26,9 +26,9 @@ using namespace std;
 
 //this line registers the module with the framework and actually makes it available
 //in steering files or the the module list (basf2 -m).
-REG_MODULE(NeuroTriggerTrainer)
+REG_MODULE(CDCTriggerNeuroTrainer)
 
-NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
+CDCTriggerNeuroTrainerModule::CDCTriggerNeuroTrainerModule() : Module()
 {
   setDescription(
     "The NeuroTriggerTrainer module of the CDC trigger.\n"
@@ -185,7 +185,8 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
 }
 
 
-void NeuroTriggerTrainerModule::initialize()
+void
+CDCTriggerNeuroTrainerModule::initialize()
 {
   // register store objects
   StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
@@ -271,7 +272,8 @@ void NeuroTriggerTrainerModule::initialize()
   }
 }
 
-void NeuroTriggerTrainerModule::event()
+void
+CDCTriggerNeuroTrainerModule::event()
 {
   StoreArray<CDCTriggerTrack> tracks(m_inputCollectionName);
   for (int itrack = 0; itrack < tracks.getEntries(); ++itrack) {
@@ -440,7 +442,8 @@ void NeuroTriggerTrainerModule::event()
   }
 }
 
-void NeuroTriggerTrainerModule::terminate()
+void
+CDCTriggerNeuroTrainerModule::terminate()
 {
   // do training for all sectors with sufficient training samples
   for (unsigned isector = 0; isector < m_NeuroTrigger.nSectors(); ++isector) {
@@ -471,7 +474,7 @@ void NeuroTriggerTrainerModule::terminate()
 }
 
 void
-NeuroTriggerTrainerModule::updateRelevantID(unsigned isector)
+CDCTriggerNeuroTrainerModule::updateRelevantID(unsigned isector)
 {
   B2DEBUG(50, "Setting relevant ID ranges for sector " << isector);
   vector<float> relevantID;
@@ -542,7 +545,8 @@ NeuroTriggerTrainerModule::updateRelevantID(unsigned isector)
   m_NeuroTrigger[isector].relevantID = relevantID;
 }
 
-void NeuroTriggerTrainerModule::train(unsigned isector)
+void
+CDCTriggerNeuroTrainerModule::train(unsigned isector)
 {
 #ifdef HAS_OPENMP
   B2INFO("Training network for sector " << isector << " with OpenMP");
@@ -708,7 +712,7 @@ void NeuroTriggerTrainerModule::train(unsigned isector)
 }
 
 void
-NeuroTriggerTrainerModule::saveTraindata(const string& filename, const string& arrayname)
+CDCTriggerNeuroTrainerModule::saveTraindata(const string& filename, const string& arrayname)
 {
   B2INFO("Saving traindata to file " << filename << ", array " << arrayname);
   TFile datafile(filename.c_str(), "UPDATE");
@@ -745,7 +749,7 @@ NeuroTriggerTrainerModule::saveTraindata(const string& filename, const string& a
 }
 
 bool
-NeuroTriggerTrainerModule::loadTraindata(const string& filename, const string& arrayname)
+CDCTriggerNeuroTrainerModule::loadTraindata(const string& filename, const string& arrayname)
 {
   TFile datafile(filename.c_str(), "READ");
   if (!datafile.IsOpen()) {

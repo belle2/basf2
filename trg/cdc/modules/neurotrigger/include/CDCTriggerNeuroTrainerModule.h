@@ -1,5 +1,5 @@
-#ifndef NEUROTRIGGERTRAINERMODULE_H
-#define NEUROTRIGGERTRAINERMODULE_H
+#ifndef CDCTRIGGERNEUROTRAINERMODULE_H
+#define CDCTRIGGERNEUROTRAINERMODULE_H
 
 #include <framework/core/Module.h>
 
@@ -9,18 +9,18 @@
 #include <TH1D.h>
 
 namespace Belle2 {
-  /** The NeuroTriggerTrainer module of the CDC trigger.
+  /** The trainer module for the neural networks of the CDC trigger.
    * Prepare training data for several neural networks and train them
    * using the Fast Artificial Neural Network library (FANN).
    * For documentation of FANN see http://leenissen.dk/fann/wp/
    */
-  class NeuroTriggerTrainerModule : public Module {
+  class CDCTriggerNeuroTrainerModule : public Module {
   public:
     /** Constructor, for setting module description and parameters. */
-    NeuroTriggerTrainerModule();
+    CDCTriggerNeuroTrainerModule();
 
     /** Destructor. */
-    virtual ~NeuroTriggerTrainerModule() {}
+    virtual ~CDCTriggerNeuroTrainerModule() {}
 
     /** Initialize the module.
      * Initialize the networks and register datastore objects.

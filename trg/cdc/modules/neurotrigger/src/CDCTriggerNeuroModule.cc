@@ -1,4 +1,4 @@
-#include "trg/cdc/modules/neurotrigger/NeuroTriggerModule.h"
+#include "trg/cdc/modules/neurotrigger/CDCTriggerNeuroModule.h"
 
 #include <framework/datastore/StoreArray.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
@@ -14,9 +14,9 @@ using namespace std;
 
 //this line registers the module with the framework and actually makes it available
 //in steering files or the the module list (basf2 -m).
-REG_MODULE(NeuroTrigger)
+REG_MODULE(CDCTriggerNeuro)
 
-NeuroTriggerModule::NeuroTriggerModule() : Module()
+CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
 {
   setDescription(
     "The NeuroTrigger module of the CDC trigger.\n"
@@ -53,7 +53,7 @@ NeuroTriggerModule::NeuroTriggerModule() : Module()
 
 
 void
-NeuroTriggerModule::initialize()
+CDCTriggerNeuroModule::initialize()
 {
   StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
   StoreArray<CDCTriggerTrack>::required(m_inputCollectionName);
@@ -75,7 +75,7 @@ NeuroTriggerModule::initialize()
 
 
 void
-NeuroTriggerModule::event()
+CDCTriggerNeuroModule::event()
 {
   StoreArray<CDCTriggerTrack> tracks2D(m_inputCollectionName);
   StoreArray<CDCTriggerTrack> tracksNN(m_outputCollectionName);

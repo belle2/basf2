@@ -128,12 +128,12 @@ void CalibrationAlgorithm::saveCalibration(TObject* data, const string& name, co
 
 void CalibrationAlgorithm::saveCalibration(TObject* data, const IntervalOfValidity& iov)
 {
-  saveCalibration(data, data->ClassName(), iov);
+  saveCalibration(data, DataStore::objectName(data->IsA(), ""), iov);
 }
 
 void CalibrationAlgorithm::saveCalibration(TObject* data)
 {
-  saveCalibration(data, data->ClassName());
+  saveCalibration(data, DataStore::objectName(data->IsA(), ""));
 }
 
 void CalibrationAlgorithm::saveCalibration(TObject* data, const string& name)

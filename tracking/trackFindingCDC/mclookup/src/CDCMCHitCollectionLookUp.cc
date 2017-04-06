@@ -107,6 +107,23 @@ int CDCMCHitCollectionLookUp<ACDCHitCollection>::getCorrectRLVote(const ACDCHitC
 }
 
 template <class ACDCHitCollection>
+double CDCMCHitCollectionLookUp<ACDCHitCollection>::getRLPurity(const ACDCHitCollection* ptrHits) const
+{
+  EForwardBackward fbInfo = isForwardOrBackwardToMCTrack(ptrHits);
+  if (fbInfo == EForwardBackward::c_Invalid) return NAN;
+
+  int correctRLVote = getCorrectRLVote(ptrHits);
+
+  if (fbInfo == EForwardBackward::c_Backward) {
+    correctRLVote = -correctRLVote;
+  }
+
+  int nCorrectRL = (correctRLVote + ptrHits->size()) / 2;
+  float rlPurity = 1.0 * nCorrectRL / ptrHits->size();
+  return rlPurity;
+}
+
+template <class ACDCHitCollection>
 const MCParticle*
 CDCMCHitCollectionLookUp<ACDCHitCollection>::getMCParticle(const ACDCHitCollection* ptrHits) const
 {

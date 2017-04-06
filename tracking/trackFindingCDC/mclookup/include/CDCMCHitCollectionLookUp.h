@@ -88,6 +88,9 @@ namespace Belle2 {
       /// Getter for the difference of correct versus incorrect right left passage informations
       int getCorrectRLVote(const ACDCHitCollection* ptrHits) const;
 
+      /// Getter for the right left passge purity which respects the forward backward reconstruction
+      double getRLPurity(const ACDCHitCollection* ptrHits) const;
+
       /// Getter for the mc particle matched to this collection of hits
       const MCParticle* getMCParticle(const ACDCHitCollection* ptrHits) const;
 

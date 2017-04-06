@@ -122,6 +122,16 @@ namespace Belle2 {
        */
       void setCanvasHeight(float height);
 
+      /*
+       *  Indicates the start of a group of drawn elements.
+       */
+      void startGroup(const AttributeMap& attributeMap = AttributeMap());
+
+      /**
+       *  Indicates the end of a group of drawn elements.
+       */
+      void endGroup();
+
     public:
       /// Converts a time given in nanoseconds to a time sting of the from "%fs".
       std::string getAnimationTimeFromNanoSeconds(float nanoseconds)

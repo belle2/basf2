@@ -148,6 +148,22 @@ void EventDataPlotter::setCanvasHeight(float height)
   }
 }
 
+void EventDataPlotter::startGroup(const AttributeMap& attributeMap)
+{
+  if (m_ptrPrimitivePlotter) {
+    PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+    primitivePlotter.startGroup(attributeMap);
+  }
+}
+
+void EventDataPlotter::endGroup()
+{
+  if (m_ptrPrimitivePlotter) {
+    PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+    primitivePlotter.endGroup();
+  }
+}
+
 void EventDataPlotter::startAnimationGroup(const Belle2::CDCSimHit& simHit)
 {
   // In case the event should be animated

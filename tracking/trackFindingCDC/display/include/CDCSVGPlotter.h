@@ -200,6 +200,27 @@ namespace Belle2 {
       /* *** Section with some more complex operations *** */
 
       /**
+       * Draw the CDCRLWireHits in the CDCSegments colored by the match of the right left passage informations.
+       * It respects segments reconstructed backwards to have the opposite rl informations
+       */
+      void drawWrongRLHitsInSegments(const std::string& segmentsStoreObjName);
+
+      /**
+       * Draw the CDCRLWireHits in the CDCTracks colored by the match of the right left passage informations.
+       * It respects tracks reconstructed backwards to have the opposite rl informations
+       */
+      void drawWrongRLHitsInTracks(const std::string& tracksStoreObjName);
+
+    private:
+      /**
+       * Draw the CDCRLWireHits in the ACDCHitCollection colored by the match of the right left passage informations.
+       * It respects hit collections reconstructed backwards to have the opposite rl informations.
+       */
+      template<class ACDCHitCollection>
+      void drawWrongRLHits(const std::string& storeObjName);
+
+    public:
+      /**
        * Draw the CDCSimHits connected in the order of their getFlightTime for each Monte Carlo particle.
        * @param storeArrayName The name of the StoreArray containing the CDCSimHits.
        * @param stroke                Color of the lines to be drawn.

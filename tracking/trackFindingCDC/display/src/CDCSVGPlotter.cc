@@ -400,6 +400,69 @@ void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& hitStoreArrayName
   }
 }
 
+void CDCSVGPlotter::drawWrongRLHitsInSegments(const std::string& segmentsStoreObjName)
+{
+  this->drawWrongRLHits<CDCSegment2D>(segmentsStoreObjName);
+}
+
+void CDCSVGPlotter::drawWrongRLHitsInTracks(const std::string& tracksStoreObjName)
+{
+  this->drawWrongRLHits<CDCTrack>(tracksStoreObjName);
+}
+
+template<class ACDCHitCollection>
+void CDCSVGPlotter::drawWrongRLHits(const std::string& hitCollectionsStoreObjName)
+{
+  B2INFO("Draw wrong right left passage information from " << hitCollectionsStoreObjName);
+  StoreWrappedObjPtr<std::vector<ACDCHitCollection>> storedHitCollections(hitCollectionsStoreObjName);
+  if (not storedHitCollections) {
+    B2WARNING(hitCollectionsStoreObjName << "does not exist in current DataStore");
+    printDataStoreContent();
+    return;
+  }
+
+  std::vector<ACDCHitCollection>& hitCollections = *storedHitCollections;
+  B2INFO("#HitCollections: " << hitCollections.size());
+
+  const CDCMCHitCollectionLookUp<ACDCHitCollection> mcHitCollectionLookUp;
+  const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
+
+  for (const ACDCHitCollection& hitCollection : hitCollections) {
+    EForwardBackward fbInfo = mcHitCollectionLookUp.isForwardOrBackwardToMCTrack(&hitCollection);
+
+    double rlPurity = mcHitCollectionLookUp.getRLPurity(&hitCollection);
+    int correctRLVote = mcHitCollectionLookUp.getCorrectRLVote(&hitCollection);
+
+    // Skip the impure alias
+    if (rlPurity < 0.5 and hitCollection.getAutomatonCell().hasAliasFlag()) continue;
+
+    // Skip the bad reverse
+    if (correctRLVote < 0 and hitCollection.getAutomatonCell().hasReverseFlag()) continue;
+
+    for (const auto& recoHit : hitCollection) {
+      ERightLeft rlInfo = recoHit.getRLInfo();
+      const CDCHit* hit = recoHit.getWireHit().getHit();
+      ERightLeft mcRLInfo = mcHitLookUp.getRLInfo(hit);
+
+      if (fbInfo == EForwardBackward::c_Backward) {
+        mcRLInfo = reversed(mcRLInfo);
+      }
+
+      std::string color = "orange";
+      if (mcRLInfo != ERightLeft::c_Right and mcRLInfo != ERightLeft::c_Left) {
+        color = "violet";
+      } else if (mcRLInfo == rlInfo) {
+        color = "green";
+      } else if (mcRLInfo == -rlInfo) {
+        color = "red";
+      }
+
+      AttributeMap attributeMap{{"stroke", color}};
+      m_eventdataPlotter.draw(recoHit, attributeMap);
+    }
+  }
+}
+
 void CDCSVGPlotter::drawMCAxialSegmentPairs(const std::string& segmentsStoreObjName,
                                             const std::string& stroke,
                                             const std::string& strokeWidth)

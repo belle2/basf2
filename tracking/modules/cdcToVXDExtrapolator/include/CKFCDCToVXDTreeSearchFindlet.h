@@ -22,9 +22,11 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 
 namespace Belle2 {
-  class CKFCDCToVXDTreeSearchFindlet : public TrackFindingCDC::TreeSearchFindlet<RecoTrack, SpacePoint, CKFCDCToVXDResultObject> {
+  class CKFCDCToVXDTreeSearchFindlet : public TrackFindingCDC::TreeSearchFindlet<RecoTrack, SpacePoint, CKFCDCToVXDStateObject> {
   public:
-    CKFCDCToVXDTreeSearchFindlet() : TrackFindingCDC::TreeSearchFindlet<RecoTrack, SpacePoint, CKFCDCToVXDResultObject>()
+    using Super = TrackFindingCDC::TreeSearchFindlet<RecoTrack, SpacePoint, CKFCDCToVXDStateObject>;
+
+    CKFCDCToVXDTreeSearchFindlet() : Super()
     {
       addProcessingSignalListener(&m_hitFilter);
     }
@@ -55,9 +57,8 @@ namespace Belle2 {
     }
 
   protected:
-    TrackFindingCDC::SortedVectorRange<const SpacePoint*> getMatchingHits(const CKFCDCToVXDResultObject& currentResult) override
-    {
-      const unsigned int nextLayer = currentResult.getLastLayer() - 1;
+    TrackFindingCDC::SortedVectorRange<const SpacePoint*> getMatchingHits(Super::StateIterator currentState) final {
+      const unsigned int nextLayer = currentState->getLastLayer() - 1;
       const auto& hitsOnNextLayer = m_cachedHitMap[nextLayer];
       return hitsOnNextLayer;
       /*matchingHits.reserve(hitsOnNextLayer.size());
@@ -70,8 +71,7 @@ namespace Belle2 {
       }*/
     }
 
-    bool useResult(const CKFCDCToVXDResultObject& currentResult) override
-    {
+    bool useResult(Super::StateIterator currentState) final {
       return true;
     }
 

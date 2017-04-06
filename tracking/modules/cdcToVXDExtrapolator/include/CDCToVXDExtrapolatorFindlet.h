@@ -45,9 +45,5 @@ namespace Belle2 {
     std::vector<RecoTrack*> m_cdcRecoTrackVector;
     /// Pointers to the (const) SpacePoints as a vector
     std::vector<const SpacePoint*> m_spacePointVector;
-    /// Results of the tree finding: reco tracks with their matched space points
-    std::vector<std::pair<RecoTrack*, std::vector<const SpacePoint*>>> m_cdcTracksWithMatchedSpacePoints;
-    /// Results
-    std::vector<CKFCDCToVXDResultObject> m_results;
   };
 }

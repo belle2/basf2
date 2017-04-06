@@ -15,54 +15,61 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    template<class SeedObject, class HitObject, class ResultObject>
+    template<class SeedObject, class HitObject, class StateObject>
     class TreeSearchFindlet : public Findlet<SeedObject*, const HitObject*> {
     public:
-      virtual void apply(std::vector<SeedObject*>& seedsVector,
-                         std::vector<const HitObject*>& filteredHitVector) override
+      using SeedPtr = SeedObject*;
+      using HitPtr = const HitObject*;
+      using StateArray = typename std::array<StateObject, StateObject::N>;
+      using StateIterator = typename StateArray::iterator;
+
+      virtual void apply(std::vector<SeedPtr>& seedsVector,
+                         std::vector<HitPtr>& filteredHitVector) override
       {
         // Maybe implement some caching here.
       }
 
-      void traverseTree(SeedObject* seed, std::vector<ResultObject>& resultsVector)
+      void traverseTree(SeedPtr seed, std::vector<std::vector<HitPtr>>& resultsVector)
       {
-        traverseTree(ResultObject(seed), resultsVector);
+        m_states.front().initialize(seed);
+        traverseTree(m_states.begin(), resultsVector);
       }
 
-      void traverseTree(const ResultObject& currentResult,
-                        std::vector<ResultObject>& resultsVector)
+
+    protected:
+      virtual TrackFindingCDC::SortedVectorRange<HitPtr> getMatchingHits(StateIterator currentState) = 0;
+
+      virtual bool useResult(StateIterator currentState) = 0;
+
+    private:
+      StateArray m_states{};
+
+      void traverseTree(StateIterator currentState,
+                        std::vector<std::vector<HitPtr>>& resultsVector)
       {
+        const auto& matchingHits = getMatchingHits(currentState);
+        StateIterator nextState = std::next(currentState);
 
-        const auto& matchingHits = getMatchingHits(currentResult);
-
-        if (matchingHits.empty()) {
-          resultsVector.push_back(currentResult);
+        if (nextState == m_states.end() or matchingHits.empty()) {
+          resultsVector.push_back(currentState->finalize());
           return;
         }
 
         unsigned int counter = 0;
         for (const auto& hit : matchingHits) {
-          ResultObject resultWithThisHit = currentResult.append(hit);
+          nextState->buildFrom(currentState, hit);
 
-          if (not useResult(resultWithThisHit)) {
+          if (not useResult(nextState)) {
             continue;
           }
 
-          traverseTree(resultWithThisHit, resultsVector);
+          traverseTree(nextState, resultsVector);
           counter++;
 
           if (counter > 5) {
             break;
           }
         };
-      }
-
-    protected:
-      virtual TrackFindingCDC::SortedVectorRange<const SpacePoint*> getMatchingHits(const ResultObject& currentResult) = 0;
-
-      virtual bool useResult(const ResultObject& currentResult)
-      {
-        return true;
       }
     };
   }

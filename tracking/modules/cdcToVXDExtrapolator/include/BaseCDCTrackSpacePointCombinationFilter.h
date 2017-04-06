@@ -20,5 +20,5 @@ namespace Belle2 {
    * the base object includes poitners to pointers.
    */
   using BaseCDCTrackSpacePointCombinationFilter =
-    TrackFindingCDC::Filter<std::pair<CKFCDCToVXDResultObject, const SpacePoint* const>>;
+    TrackFindingCDC::Filter<std::pair<CKFCDCToVXDStateObject, const SpacePoint* const>>;
 }

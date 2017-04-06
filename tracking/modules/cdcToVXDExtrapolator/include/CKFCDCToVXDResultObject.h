@@ -13,25 +13,41 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 
 namespace Belle2 {
-  class CKFCDCToVXDResultObject {
+  class CKFCDCToVXDStateObject {
   public:
-    CKFCDCToVXDResultObject(const RecoTrack* seed)
-    {
-      m_addedSpacePoints.reserve(5);
-    }
-
-    CKFCDCToVXDResultObject append(const SpacePoint* hit) const
-    {
-      CKFCDCToVXDResultObject copiedObject(*this);
-
-      copiedObject.m_addedSpacePoints.push_back(hit);
-      copiedObject.m_lastLayer--;
-      return copiedObject;
-    }
+    static constexpr unsigned int N = 7;
 
     unsigned int getLastLayer() const
     {
       return m_lastLayer;
+    }
+
+    void initialize(RecoTrack* seed)
+    {
+      m_seedRecoTrack = seed;
+    }
+
+    std::vector<const SpacePoint*> finalize() const
+    {
+      std::vector<const SpacePoint*> spacePoints;
+      spacePoints.reserve(N);
+
+      const CKFCDCToVXDStateObject* walkObject = this;
+
+      while (walkObject != nullptr) {
+        const SpacePoint* spacePoint = walkObject->getSpacePoint();
+        if (spacePoint) {
+          spacePoints.push_back(spacePoint);
+        }
+        walkObject = walkObject->getParent();
+      }
+
+      return spacePoints;
+    }
+
+    const CKFCDCToVXDStateObject* getParent() const
+    {
+      return m_parent;
     }
 
     RecoTrack* getSeedRecoTrack() const
@@ -39,9 +55,22 @@ namespace Belle2 {
       return m_seedRecoTrack;
     }
 
+    const SpacePoint* getSpacePoint() const
+    {
+      return m_spacePoint;
+    }
+
+    void buildFrom(const CKFCDCToVXDStateObject* parent, const SpacePoint* m_spacePoint)
+    {
+      m_parent = parent;
+      m_seedRecoTrack = parent->getSeedRecoTrack();
+    }
+
   private:
-    RecoTrack* m_seedRecoTrack;
-    std::vector<const SpacePoint*> m_addedSpacePoints;
-    unsigned int m_lastLayer = 7;
+    // TODO: Also include the MeasuredStateOnPlane
+    RecoTrack* m_seedRecoTrack = nullptr;
+    const SpacePoint* m_spacePoint = nullptr;
+    unsigned int m_lastLayer = N;
+    const CKFCDCToVXDStateObject* m_parent = nullptr;
   };
 }

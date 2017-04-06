@@ -78,7 +78,7 @@ void SegmentFinderFacetAutomaton::apply(std::vector<CDCWireHitCluster>& clusters
   m_segmentFitter.apply(m_intermediateSegments);
 
   m_segmentAliasResolver.apply(m_intermediateSegments);
-  m_segmentFitter.apply(outputSegments);
+  m_segmentFitter.apply(m_intermediateSegments);
 
   m_segmentLinker.apply(m_intermediateSegments, outputSegments);
   m_segmentFitter.apply(outputSegments);

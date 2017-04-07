@@ -90,7 +90,7 @@ RFEventProcessor::~RFEventProcessor()
 
 // Functions hooked up by NSM2
 
-int RFEventProcessor::Configure(NSMmsg*, NSMcontext*)
+int RFEventProcessor::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
 {
   // Start processes from down stream
 
@@ -127,6 +127,10 @@ int RFEventProcessor::Configure(NSMmsg*, NSMcontext*)
 
   // 4. Run basf2
   char* basf2 = m_conf->getconf("processor", "basf2", "script");
+  if (nsmm->len > 0) {
+    basf2 = (char*) nsmm->datap;
+    printf("Configure: basf2 script overridden : %s\n", basf2);
+  }
   m_pid_basf2 = m_proc->Execute(basf2, (char*)rbufin.c_str(), (char*)rbufout.c_str(), hport);
 
   // 5. Run receiver
@@ -191,6 +195,9 @@ int RFEventProcessor::UnConfigure(NSMmsg*, NSMcontext*)
   m_rbufin->forceClear();
   m_rbufout->forceClear();
 
+  // Clear PID list
+  m_flow->fillProcessStatus(GetNodeInfo());
+
   printf("Unconfigure : done\n");
   fflush(stdout);
   return 0;
@@ -253,7 +260,30 @@ int RFEventProcessor::Restart(NSMmsg*, NSMcontext*)
 
 void RFEventProcessor::server()
 {
+  // Clear PID list
+  m_flow->fillProcessStatus(GetNodeInfo());
+  // Start Loop
   while (true) {
+    pid_t pid = m_proc->CheckProcess();
+    if (pid > 0) {
+      printf("RFEventProcessor : process dead pid=%d\n", pid);
+      if (pid == m_pid_sender) {
+        m_log->Fatal("RFEventProcessor : sender dead. pid=%d\n", m_pid_sender);
+        m_pid_sender = 0;
+      } else if (pid == m_pid_basf2) {
+        m_log->Fatal("RFEventProcessor : basf2 dead. pid=%d\n", m_pid_basf2);
+        m_pid_basf2 = 0;
+      } else if (pid == m_pid_receiver) {
+        m_log->Fatal("RFEventProcessor : receiver dead. pid=%d\n", m_pid_receiver);
+        m_pid_receiver = 0;
+      } else if (pid == m_pid_hrecv) {
+        m_log->Fatal("RFEventProcessor : hserver dead. pid=%d\n", m_pid_hrecv);
+        m_pid_hrecv = 0;
+      } else if (pid == m_pid_hrelay) {
+        m_log->Fatal("RFEventProcessor : hrelay dead. pid=%d\n", m_pid_hrelay);
+        m_pid_hrelay = 0;
+      }
+    }
     int st = m_proc->CheckOutput();
     if (st < 0) {
       perror("RFEventProcessor::server");
@@ -263,6 +293,8 @@ void RFEventProcessor::server()
     }
     m_flow->fillNodeInfo(0, GetNodeInfo(), false);
     m_flow->fillNodeInfo(1, GetNodeInfo(), true);
+    m_flow->fillProcessStatus(GetNodeInfo(), m_pid_receiver, m_pid_sender, m_pid_basf2,
+                              m_pid_hrecv, m_pid_hrelay);
   }
 }
 

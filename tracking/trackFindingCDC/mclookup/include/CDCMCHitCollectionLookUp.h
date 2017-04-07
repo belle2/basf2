@@ -131,6 +131,14 @@ namespace Belle2 {
       Index getLastNPassedSuperLayers(const ACDCHitCollection* ptrHits) const
       { return CDCMCHitLookUp::getInstance().getNPassedSuperLayers(getLastHit(ptrHits)); }
 
+      /// Getter for number of loops till the first hit the collection of hits which has the Monte Carlo track id matched to this collection of hits
+      Index getFirstNLoops(const ACDCHitCollection* ptrHits) const
+      { return CDCMCHitLookUp::getInstance().getNLoops(getFirstHit(ptrHits)); }
+
+      /// Getter for number of loops till the last hit the collection of hits which has the Monte Carlo track id matched to this collection of hits
+      Index getLastNLoops(const ACDCHitCollection* ptrHits) const
+      { return CDCMCHitLookUp::getInstance().getNLoops(getLastHit(ptrHits)); }
+
       /**
        *  Returns the orientation of the collection of hits relative to its matched track.
        *  * Returns EForwardBackward::c_Invalid if the collection of hits is not matched to any track.

@@ -76,6 +76,9 @@ namespace Belle2 {
       /// Returns the number of superlayers the track traversed until this hit.
       Index getNPassedSuperLayers(const CDCHit* ptrHit) const;
 
+      /// Returns the number of loops the track traversed until this hit.
+      Index getNLoops(const CDCHit* ptrHit) const;
+
       /// Returns the true right left passage information
       ERightLeft getRLInfo(const CDCHit* ptrHit) const;
 

@@ -51,6 +51,7 @@ void CDCMCTrackStore::clear()
   m_inTrackIds.clear();
   m_inTrackSegmentIds.clear();
   m_nPassedSuperLayers.clear();
+  m_nLoops.clear();
 
 }
 
@@ -78,7 +79,7 @@ void CDCMCTrackStore::fill(const CDCMCMap* ptrMCMap, const CDCSimHitLookUp* ptrS
   fillInTrackSegmentId();
 
   // Assigne the reverse mapping from CDCHits to the number of already traversed superlayers
-  fillNPassedSuperLayers();
+  fillNLoopsAndNPassedSuperLayers();
 
   B2DEBUG(100, "m_mcTracksByMCParticleIdx.size(): " << m_mcTracksByMCParticleIdx.size());
   B2DEBUG(100, "m_mcSegmentsByMCParticleIdx.size(): " << m_mcSegmentsByMCParticleIdx.size());
@@ -86,6 +87,7 @@ void CDCMCTrackStore::fill(const CDCMCMap* ptrMCMap, const CDCSimHitLookUp* ptrS
   B2DEBUG(100, "m_inTrackIds.size(): " << m_inTrackIds.size());
   B2DEBUG(100, "m_inTrackSegmentIds.size() " << m_inTrackSegmentIds.size());
   B2DEBUG(100, "m_nPassedSuperLayers.size(): " << m_nPassedSuperLayers.size());
+  B2DEBUG(100, "m_nLoops.size(): " << m_nLoops.size());
 
 }
 
@@ -311,7 +313,7 @@ void CDCMCTrackStore::fillInTrackSegmentId()
 
 }
 
-void CDCMCTrackStore::fillNPassedSuperLayers()
+void CDCMCTrackStore::fillNLoopsAndNPassedSuperLayers()
 {
 
   for (const std::pair<ITrackType, std::vector<CDCHitVector> >& mcSegmentsAndMCParticleIdx : getMCSegmentsByMCParticleIdx()) {
@@ -319,22 +321,29 @@ void CDCMCTrackStore::fillNPassedSuperLayers()
 
     const CDCHitVector* ptrLastMCSegment = nullptr;
     int nPassedSuperLayers = 0;
+    int nLoops = 0;
 
     for (const CDCHitVector& mcSegment : mcSegments) {
-
       if (ptrLastMCSegment and changedSuperLayer(*ptrLastMCSegment, mcSegment)) {
         ++nPassedSuperLayers;
+
+        // Increase the superlayer number if the track leaves the CDC for the inner volume.
+        // Feel free to do something smarter here.
+        if (ptrLastMCSegment->front()->getISuperLayer() == 0 and
+            mcSegment.front()->getISuperLayer() == 0) {
+          ++nLoops;
+        }
       }
 
       for (const CDCHit* ptrHit : mcSegment) {
         m_nPassedSuperLayers[ptrHit] = nPassedSuperLayers;
+        m_nLoops[ptrHit] = nLoops;
       }
 
       ptrLastMCSegment = &mcSegment;
 
     }
   }
-
 }
 
 bool CDCMCTrackStore::changedSuperLayer(const CDCHitVector& mcSegment, const CDCHitVector& nextMCSegment) const
@@ -396,5 +405,13 @@ Index CDCMCTrackStore::getNPassedSuperLayers(const CDCHit* ptrHit) const
 
   auto itFoundHit = m_nPassedSuperLayers.find(ptrHit);
   return itFoundHit == m_nPassedSuperLayers.end() ? c_InvalidIndex : itFoundHit->second;
+
+}
+
+Index CDCMCTrackStore::getNLoops(const CDCHit* ptrHit) const
+{
+
+  auto itFoundHit = m_nLoops.find(ptrHit);
+  return itFoundHit == m_nLoops.end() ? c_InvalidIndex : itFoundHit->second;
 
 }

@@ -121,6 +121,9 @@ class CDCSVGDisplayModule(basf2.Module):
         #: Switch to draw the CDCSimHits red for getBackgroundTag() != bg_none. Default: inactive
         self.draw_simhit_isbkg = False
 
+        #: Switch to draw the CDCHit colored by the number of loops passed
+        self.draw_nloops = False
+
         #: Switch to draw the CDCSimHits connected in the order of their getFlightTime
         #: for each Monte Carlo particle.
         #: Default: inactive
@@ -275,6 +278,7 @@ class CDCSVGDisplayModule(basf2.Module):
             'draw_simhit_pdgcode',
             'draw_simhit_bkgtag',
             'draw_simhit_isbkg',
+            'draw_nloops',
             'draw_connect_tof',
             'draw_rlinfo',
             'draw_reassigned',
@@ -548,6 +552,14 @@ class CDCSVGDisplayModule(basf2.Module):
 
                 styleDict = {'stroke': color_map}
                 plotter.draw_storearray(self.cdc_hits_store_array_name, **styleDict)
+
+        # Draw background tag != bg_none of related simhits
+        if self.draw_nloops:
+            if self.use_cpp:
+                Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
+                cppplotter.drawHits(self.cdc_hits_store_array_name, 'NLoops', '')
+            if self.use_python:
+                print('No Python-function defined')
 
         if self.draw_connect_tof:
             if self.use_cpp:

@@ -47,7 +47,8 @@ void CDCToVXDExtrapolatorFindlet::apply()
   // Apply the tree search
   m_treeSearchFindlet.apply(m_cdcRecoTrackVector, m_spacePointVector);
 
-  std::vector<std::vector<const SpacePoint*>> results;
+  std::vector<std::pair<RecoTrack*, std::vector<const SpacePoint*>>> results;
+  results.reserve(2000);
 
   for (RecoTrack* seed : m_cdcRecoTrackVector) {
     m_treeSearchFindlet.traverseTree(seed, results);
@@ -56,5 +57,5 @@ void CDCToVXDExtrapolatorFindlet::apply()
 
   // Use the found hits for each track, create new VXD reco tracks, add relations, merge the tracks and fill them
   // into a new store array
-  //m_storeArrayMerger.apply(m_cdcTracksWithMatchedSpacePoints);
+  m_storeArrayMerger.apply(results);
 }

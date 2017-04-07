@@ -14,12 +14,12 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool CDCTrackSpacePointCombinationTruthVarSet::extract(const BaseCDCTrackSpacePointCombinationFilter::Object* pair)
+bool CDCTrackSpacePointCombinationTruthVarSet::extract(const BaseCDCTrackSpacePointCombinationFilter::Object* result)
 {
-  RecoTrack* cdcTrack = pair->first.getSeedRecoTrack();
-  const SpacePoint* spacePoint = pair->second;
+  RecoTrack* cdcTrack = result->getSeedRecoTrack();
+  const SpacePoint* spacePoint = result->getSpacePoint();
 
-  if (not pair or not cdcTrack or not spacePoint) return false;
+  if (not cdcTrack or not spacePoint) return false;
 
   const std::string& cdcTrackStoreArrayName = cdcTrack->getArrayName();
 
@@ -49,6 +49,23 @@ bool CDCTrackSpacePointCombinationTruthVarSet::extract(const BaseCDCTrackSpacePo
       var<named("truth")>() = false;
       return true;
     }
+  }
+
+  // Test if these clusters are on the first half of the track
+  // The track needs to have some SVD hits, so we can savely access the first element
+  const auto& recoHitInformations = cdcMCTrack->getRecoHitInformations(true);
+
+  const auto& isCDCHit = [](RecoHitInformation * recoHitInformation) {
+    return recoHitInformation->getTrackingDetector() == RecoHitInformation::RecoHitDetector::c_CDC;
+  };
+
+  const RecoHitInformation* firstCDCHitInformation = *(std::find_if(recoHitInformations.begin(), recoHitInformations.end(),
+                                                       isCDCHit));
+  const RecoHitInformation* firstClusterInformation = cdcMCTrack->getRecoHitInformation(relatedSVDClusters[0]);
+
+  if (firstCDCHitInformation->getSortingParameter() < firstClusterInformation->getSortingParameter()) {
+    var<named("truth")>() = false;
+    return true;
   }
 
   var<named("truth")>() = true;

@@ -16,6 +16,8 @@
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
 
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackFindingCDC/utilities/SortedVectorRange.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
@@ -31,8 +33,18 @@ namespace Belle2 {
       addProcessingSignalListener(&m_hitFilter);
     }
 
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+    {
+      m_hitFilter.exposeParameters(moduleParamList, prefix);
+
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumXYNorm"), m_param_maximumXYNorm,
+                                    "", m_param_maximumXYNorm);
+    }
+
     void apply(std::vector<RecoTrack*>& seedsVector,
                std::vector<const SpacePoint*>& filteredHitVector) final {
+
+      m_cachedHitMap.clear();
 
       const auto& hitSorterByLayer = [](const SpacePoint * lhs, const SpacePoint * rhs)
       {
@@ -72,7 +84,42 @@ namespace Belle2 {
     }
 
     bool useResult(Super::StateIterator currentState) final {
-      return true;
+      // Simple filtering based on xy distance
+      // TODO: Move in own filter
+      RecoTrack* cdcTrack = currentState->getSeedRecoTrack();
+      const SpacePoint* spacePoint = currentState->getSpacePoint();
+
+      TrackFindingCDC::Vector3D position;
+      TrackFindingCDC::Vector3D momentum;
+
+      if (cdcTrack->wasFitSuccessful())
+      {
+        const auto& firstMeasurement = cdcTrack->getMeasuredStateOnPlaneFromFirstHit();
+        position = TrackFindingCDC::Vector3D(firstMeasurement.getPos());
+        momentum = TrackFindingCDC::Vector3D(firstMeasurement.getMom());
+      } else {
+        position = TrackFindingCDC::Vector3D(cdcTrack->getPositionSeed());
+        momentum = TrackFindingCDC::Vector3D(cdcTrack->getMomentumSeed());
+      }
+
+      const TrackFindingCDC::CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
+
+      const auto& hitPosition = TrackFindingCDC::Vector3D(spacePoint->getPosition());
+
+      const double arcLength = trajectory.calcArcLength2D(hitPosition);
+      const auto& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
+      const auto& trackPositionAtHitZ = trajectory.getTrajectorySZ().mapSToZ(arcLength);
+
+      TrackFindingCDC::Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
+      TrackFindingCDC::Vector3D distance = trackPositionAtHit - hitPosition;
+
+      if (distance.xy().norm() > m_param_maximumXYNorm)
+      {
+        return false;
+      }
+
+      TrackFindingCDC::Weight weight = m_hitFilter(*currentState);
+      return not std::isnan(weight);
     }
 
   private:
@@ -81,5 +128,7 @@ namespace Belle2 {
 
     /// Subfindlet: Filter
     TrackFindingCDC::ChooseableFilter<CDCTrackSpacePointCombinationFilterFactory> m_hitFilter;
+
+    double m_param_maximumXYNorm = 1;
   };
 }

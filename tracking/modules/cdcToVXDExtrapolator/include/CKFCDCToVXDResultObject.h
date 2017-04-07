@@ -27,7 +27,7 @@ namespace Belle2 {
       m_seedRecoTrack = seed;
     }
 
-    std::vector<const SpacePoint*> finalize() const
+    std::pair<RecoTrack*, std::vector<const SpacePoint*>> finalize() const
     {
       std::vector<const SpacePoint*> spacePoints;
       spacePoints.reserve(N);
@@ -42,7 +42,7 @@ namespace Belle2 {
         walkObject = walkObject->getParent();
       }
 
-      return spacePoints;
+      return std::make_pair(getSeedRecoTrack(), spacePoints);
     }
 
     const CKFCDCToVXDStateObject* getParent() const
@@ -60,10 +60,12 @@ namespace Belle2 {
       return m_spacePoint;
     }
 
-    void buildFrom(const CKFCDCToVXDStateObject* parent, const SpacePoint* m_spacePoint)
+    void buildFrom(const CKFCDCToVXDStateObject* parent, const SpacePoint* spacePoint)
     {
       m_parent = parent;
       m_seedRecoTrack = parent->getSeedRecoTrack();
+      m_lastLayer = parent->getLastLayer() - 1;
+      m_spacePoint = spacePoint;
     }
 
   private:

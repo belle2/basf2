@@ -29,7 +29,7 @@ namespace Belle2 {
         // Maybe implement some caching here.
       }
 
-      void traverseTree(SeedPtr seed, std::vector<std::vector<HitPtr>>& resultsVector)
+      void traverseTree(SeedPtr seed, std::vector<std::pair<SeedPtr, std::vector<HitPtr>>>& resultsVector)
       {
         m_states.front().initialize(seed);
         traverseTree(m_states.begin(), resultsVector);
@@ -45,17 +45,16 @@ namespace Belle2 {
       StateArray m_states{};
 
       void traverseTree(StateIterator currentState,
-                        std::vector<std::vector<HitPtr>>& resultsVector)
+                        std::vector<std::pair<SeedPtr, std::vector<HitPtr>>>& resultsVector)
       {
         const auto& matchingHits = getMatchingHits(currentState);
         StateIterator nextState = std::next(currentState);
 
         if (nextState == m_states.end() or matchingHits.empty()) {
-          resultsVector.push_back(currentState->finalize());
+          resultsVector.emplace_back(currentState->finalize());
           return;
         }
 
-        unsigned int counter = 0;
         for (const auto& hit : matchingHits) {
           nextState->buildFrom(currentState, hit);
 
@@ -64,11 +63,7 @@ namespace Belle2 {
           }
 
           traverseTree(nextState, resultsVector);
-          counter++;
-
-          if (counter > 5) {
-            break;
-          }
+          //return;
         };
       }
     };

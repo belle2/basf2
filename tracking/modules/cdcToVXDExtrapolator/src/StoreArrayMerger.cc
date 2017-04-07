@@ -95,16 +95,17 @@ void StoreArrayMerger::apply(const std::vector<std::pair<RecoTrack*, std::vector
 
     unsigned int hitCounter = 0;
     for (const auto& spacePoint : matchedSpacePoints) {
-      const auto& relatedClusters = spacePoint->getRelationsWith<SVDCluster>();
-      vxdRecoTrack->addSVDHit(relatedClusters[0], hitCounter);
-      vxdRecoTrack->addSVDHit(relatedClusters[1], hitCounter + 1);
-      hitCounter += 2;
+      if (spacePoint) {
+        const auto& relatedClusters = spacePoint->getRelationsWith<SVDCluster>();
+        vxdRecoTrack->addSVDHit(relatedClusters[0], hitCounter);
+        vxdRecoTrack->addSVDHit(relatedClusters[1], hitCounter + 1);
+        hitCounter += 2;
+      }
     }
 
     cdcRecoTrack->addRelationTo(vxdRecoTrack);
   }
   /////// CUT
-
 
   // Combine the vxd and cdc tracks based on the relations between tracks in the Data Store
   // write all vxd tracks to StoreArray and add a CDC track, if there is one.

@@ -21,26 +21,26 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool CDCTrackSpacePointCombinationVarSet::extract(const BaseCDCTrackSpacePointCombinationFilter::Object* pair)
+bool CDCTrackSpacePointCombinationVarSet::extract(const BaseCDCTrackSpacePointCombinationFilter::Object* result)
 {
-  const RecoTrack* recoTrack = pair->first.getSeedRecoTrack();
-  const SpacePoint* spacePoint = pair->second;
+  RecoTrack* cdcTrack = result->getSeedRecoTrack();
+  const SpacePoint* spacePoint = result->getSpacePoint();
 
-  if (not recoTrack or not spacePoint) { return false; }
+  if (not cdcTrack or not spacePoint) { return false; }
 
   Vector3D position;
   Vector3D momentum;
 
-  if (recoTrack->wasFitSuccessful()) {
-    const auto& firstMeasurement = recoTrack->getMeasuredStateOnPlaneFromFirstHit();
+  if (cdcTrack->wasFitSuccessful()) {
+    const auto& firstMeasurement = cdcTrack->getMeasuredStateOnPlaneFromFirstHit();
     position = Vector3D(firstMeasurement.getPos());
     momentum = Vector3D(firstMeasurement.getMom());
   } else {
-    position = Vector3D(recoTrack->getPositionSeed());
-    momentum = Vector3D(recoTrack->getMomentumSeed());
+    position = Vector3D(cdcTrack->getPositionSeed());
+    momentum = Vector3D(cdcTrack->getMomentumSeed());
   }
 
-  const CDCTrajectory3D trajectory(position, 0, momentum, recoTrack->getChargeSeed());
+  const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
 
   const auto& hitPosition = Vector3D(spacePoint->getPosition());
 
@@ -49,7 +49,7 @@ bool CDCTrackSpacePointCombinationVarSet::extract(const BaseCDCTrackSpacePointCo
   const auto& trackPositionAtHitZ = trajectory.getTrajectorySZ().mapSToZ(arcLength);
 
   Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
-  Vector3D distance = trackPositionAtHit - position;
+  Vector3D distance = trackPositionAtHit - hitPosition;
 
   const auto& sensorInfo = spacePoint->getVxdID();
 

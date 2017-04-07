@@ -48,11 +48,11 @@ namespace Belle2 {
   private:
     // Parameters
     /** StoreArray name of the VXD Track Store Array */
-    std::string m_param_vxdRecoTrackStoreArrayName;
+    std::string m_param_vxdRecoTrackStoreArrayName = "CKFVXDRecoTracks";
     /** StoreArray name of the CDC Track Store Array */
-    std::string m_param_cdcRecoTrackStoreArrayName;
+    std::string m_param_cdcRecoTrackStoreArrayName = "CDCRecoTracks";
     /** StoreArray name of the merged Track Store Array */
-    std::string m_param_mergedRecoTrackStoreArrayName;
+    std::string m_param_mergedRecoTrackStoreArrayName = "MergedRecoTracks";
     /** Also add tracks, which could not be fitted and have no partner to the resulting array. */
     bool m_param_addUnfittableTracks = true;
 

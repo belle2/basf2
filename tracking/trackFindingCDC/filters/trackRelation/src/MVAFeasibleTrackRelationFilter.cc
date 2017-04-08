@@ -14,8 +14,6 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 MVAFeasibleTrackRelationFilter::MVAFeasibleTrackRelationFilter()
-  : Super(makeUnique<VarSet>(),
-          "trackfindingcdc_FeasibleTrackRelationFilter",
-          0.02)
+  : Super(makeUnique<VarSet>(), "tracking/data/trackfindingcdc_FeasibleTrackRelationFilter.xml", 0.03)
 {
 }

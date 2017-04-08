@@ -30,6 +30,12 @@ void MCSegmentPairFilter::exposeParameters(ModuleParamList* moduleParamList,
                                 "Switch to require the segment combination contain mostly correct rl information",
                                 m_param_requireRLPure);
 
+
+  moduleParamList->addParameter(prefixed(prefix, "minSegmentSize"),
+                                m_param_minSegmentSize,
+                                "Minimum segment size to pass as monte carlo truth",
+                                m_param_minSegmentSize);
+
 }
 
 Weight MCSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
@@ -43,7 +49,10 @@ Weight MCSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
   const CDCSegment2D& fromSegment = *ptrFromSegment;
   const CDCSegment2D& toSegment = *ptrToSegment;
 
-  if (fromSegment.size() < 4 or toSegment.size() < 4) return NAN;
+  if (static_cast<int>(fromSegment.size()) < m_param_minSegmentSize or
+      static_cast<int>(toSegment.size()) < m_param_minSegmentSize) {
+    return NAN;
+  }
 
   const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
 

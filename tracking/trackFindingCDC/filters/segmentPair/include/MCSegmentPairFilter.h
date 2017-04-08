@@ -36,6 +36,9 @@ namespace Belle2 {
     private:
       /// Parameter : Switch to require the segment combination contain mostly correct rl information
       bool m_param_requireRLPure = true;
+
+      /// Parameter : Minimum segment size to pass as monte carlo truth
+      int m_param_minSegmentSize = 4;
     };
   }
 }

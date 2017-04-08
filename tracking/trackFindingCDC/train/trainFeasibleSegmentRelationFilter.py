@@ -17,12 +17,16 @@ class FeasibleSegmentRelationFilterTrainingRun(TrainingRunMixin, ReadOrGenerateE
 
     truth = "truth_positive"
 
+    @property
+    def identifier(self):
+        """Database identifier of the filter being trained"""
+        return "trackfindingcdc_FeasibleSegmentRelationFilter.xml"
+
     def create_path(self):
         """Setup the recording path after the simulation"""
         path = super().create_path()
         path.add_module("TFCDC_WireHitPreparer",
-                        flightTimeEstimation="outwards",
-                        UseNLoops=1.0)
+                        flightTimeEstimation="outwards")
 
         path.add_module("TFCDC_ClusterPreparer",
                         SuperClusterDegree=3,

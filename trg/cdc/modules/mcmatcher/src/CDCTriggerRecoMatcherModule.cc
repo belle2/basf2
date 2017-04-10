@@ -53,7 +53,7 @@ CDCTriggerRecoMatcherModule::CDCTriggerRecoMatcherModule() : Module()
            string("RecoTracks"));
   addParam("TrgTrackCollectionName", m_TrgTrackCollectionName,
            "Name of the CDCTriggerTrack StoreArray to be matched.",
-           string("Trg2DFinderTracks"));
+           string("TRGCDC2DFinderTracks"));
   addParam("hitCollectionName", m_hitCollectionName,
            "Name of the StoreArray of CDCTriggerSegmentHits used for the matching.",
            string(""));

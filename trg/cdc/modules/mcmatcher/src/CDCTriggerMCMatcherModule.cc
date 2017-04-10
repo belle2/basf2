@@ -52,7 +52,7 @@ CDCTriggerMCMatcherModule::CDCTriggerMCMatcherModule() : Module()
            string("MCParticles"));
   addParam("TrgTrackCollectionName", m_TrgTrackCollectionName,
            "Name of the CDCTriggerTrack StoreArray to be matched.",
-           string("Trg2DFinderTracks"));
+           string("TRGCDC2DFinderTracks"));
   addParam("MCTrackableCollectionName", m_MCTrackableCollectionName,
            "Name of a new StoreArray holding MCParticles considered as trackable.",
            string("MCTracks"));

@@ -130,95 +130,84 @@ void PartialUpdateDaughtersModule::event()
 
 bool PartialUpdateDaughtersModule::doVertexFit(Particle* mother)
 {
-  //analysis::RaveKinematicVertexFitter rf;
 
   std::vector<const Particle*> tracksVertex = m_decaydescriptor.getSelectionParticles(mother);
   std::vector<std::string> tracksName = m_decaydescriptor.getSelectionNames();
 
-  analysis::RaveKinematicVertexFitter rsf;
-  //rsf.setVertFit(true); rsf.setMassConstFit(false);
-  //analysis::RaveVertexFitter rsf;
-  int nTrk = 0;
-  for (unsigned itrack = 0; itrack < tracksVertex.size(); itrack++) {
-    if (tracksVertex[itrack] != mother) {
-      //cout<<"Pval track = "<<tracksVertex[itrack]->getPValue();
-      rsf.addTrack(tracksVertex[itrack]);
-      //B2DEBUG(1, "PartialUpdateDaughtersModule: Adding particle " << tracksName[itrack] << " to vertex fit ");
-      B2INFO("PartialUpdateDaughtersModule: Adding particle " << tracksName[itrack] << " to vertex fit ");
-      //tracksVertex[itrack]->print();
-      nTrk++;
-    }
-    if (tracksVertex[itrack] == mother) B2WARNING("PartialUpdateDaughtersModule: Selected Mother not used in the fit");
-  }
-  //rsf.setMother(mother);
-
-  TVector3 pos;
-  TMatrixDSym RerrMatrix(7); /// SCRIVERE L'AGGIORNAMENTO MADRE E FIGLIE
   int nvert = 0;
 
-  if (nTrk == 0) return false;
+  if (tracksVertex.size() == 0) return false;
 
-  if (nTrk == 1) {
-    if (m_withConstraint == "") B2FATAL("PartialUpdateDaughtersModule: sigle track fit needs a valid constraint");
-    B2ERROR("PartialUpdateDaughtersModule: sigle track fit not developed yet");
-    return false;
-    // // One track fit cannot be kinematic
-    // analysis::RaveVertexFitter rsg;
-    // for (unsigned itrack = 0; itrack < tracksVertex.size(); itrack++) {
-    //   rsg.addTrack(tracksVertex[itrack]);
-    //   nvert = rsg.fit("kalman");
-    //   if (nvert > 0) {
-    //  pos = rsg.getPos(0);
-    //  RerrMatrix = rsg.getCov(0);
-    //  double prob = rsg.getPValue(0);
-    //  TLorentzVector mom(mother->getMomentum(), mother->getEnergy());
-    //  TMatrixDSym errMatrix(7);
-    //  for (int i = 0; i < 7; i++) {
-    //    for (int j = 0; j < 7; j++) {
-    //      if (i > 3 && j > 3) {errMatrix[i][j] = RerrMatrix[i - 4][j - 4];}
-    //      else {errMatrix[i][j] = 0;}
-    //    }
-    //  }
-    //   }
-    // }
-    // mother->updateMomentum(mom, pos, errMatrix, prob);
+  if (tracksVertex.size() > 1) {
 
-    //nvert = rsf.fit();
-  } else {
-    nvert = rsf.fit();
-  }
 
-  //cout<<"NVERT = "<<nvert<<endl;
-  if (nvert > 0) {
-    pos = rsf.getPos();
-    //RerrMatrix = rsf.getVertexErrorMatrix();
-    RerrMatrix = rsf.getCov();
-    double prob = rsf.getPValue();
-    TLorentzVector mom(mother->getMomentum(), mother->getEnergy());
-    TMatrixDSym errMatrix(7);
-
-    for (int i = 0; i < 7; i++) {
-      for (int j = 0; j < 7; j++) {
-        if (i < 4 && j < 4) errMatrix(i, j) = RerrMatrix(i + 3, j + 3);
-        if (i > 3 && j > 3) errMatrix(i, j) = RerrMatrix(i - 4, j - 4);
-        if (i < 4 && j > 3) errMatrix(i, j) = RerrMatrix(i + 3, j - 4);
-        if (i > 3 && j < 4) errMatrix(i, j) = RerrMatrix(i - 4, j + 3);
+    analysis::RaveKinematicVertexFitter rsf;
+    for (unsigned itrack = 0; itrack < tracksVertex.size(); itrack++) {
+      if (tracksVertex[itrack] != mother) {
+        rsf.addTrack(tracksVertex[itrack]);
+        B2DEBUG(1, "PartialUpdateDaughtersModule: Adding particle " << tracksName[itrack] << " to vertex fit ");
       }
+      if (tracksVertex[itrack] == mother) B2WARNING("PartialUpdateDaughtersModule: Selected Mother not used in the fit");
     }
 
+    TVector3 pos; TMatrixDSym RerrMatrix(7);
+
+    nvert = rsf.fit();
+
+    if (nvert > 0) {
+      pos = rsf.getPos();
+      RerrMatrix = rsf.getCov();
+      double prob = rsf.getPValue();
+      TLorentzVector mom(mother->getMomentum(), mother->getEnergy());
+      TMatrixDSym errMatrix(7);
+
+      for (int i = 0; i < 7; i++) {
+        for (int j = 0; j < 7; j++) {
+          if (i < 4 && j < 4) errMatrix(i, j) = RerrMatrix(i + 3, j + 3);
+          if (i > 3 && j > 3) errMatrix(i, j) = RerrMatrix(i - 4, j - 4);
+          if (i < 4 && j > 3) errMatrix(i, j) = RerrMatrix(i + 3, j - 4);
+          if (i > 3 && j < 4) errMatrix(i, j) = RerrMatrix(i - 4, j + 3);
+        }
+      }
+
+      mother->updateMomentum(mom, pos, errMatrix, prob);
+      rsf.updateDaughters();
+
+    } else {return false;}
+  }
 
 
-    //for (int i = 0; i < 7; i++) {
-    //for (int j = 0; j < 7; j++) {
-    //if (i > 3 && j > 3) {errMatrix[i][j] = RerrMatrix[i - 4][j - 4];}
-    //else {errMatrix[i][j] = 0;}
-    //}
-    //}
-    mother->updateMomentum(mom, pos, errMatrix, prob);
-    rsf.updateDaughters();
+  if (tracksVertex.size() == 1) {
+    if (m_withConstraint == "") B2FATAL("PartialUpdateDaughtersModule: sigle track fit needs a valid constraint");
 
-  } else {return false;}
+    // One track fit cannot be kinematic
+    analysis::RaveVertexFitter rsg;
+    rsg.addTrack(tracksVertex[0]);
+    B2DEBUG(1, "PartialUpdateDaughtersModule: Adding particle " << tracksName[0] << " to vertex fit ");
+    if (tracksVertex[0] == mother) B2FATAL("PartialUpdateDaughtersModule: Selected Mother not used in sigle track fit");
 
+    TVector3 pos; TMatrixDSym RerrMatrix(3);
+
+    //nvert = rsg.fit("kalman");
+    nvert = rsg.fit("avf");
+
+    if (nvert > 0) {
+      pos = rsg.getPos(0);
+      RerrMatrix = rsg.getCov(0);
+      double prob = rsg.getPValue(0);
+      TLorentzVector mom(mother->getMomentum(), mother->getEnergy());
+      TMatrixDSym errMatrix(7);
+      for (int i = 0; i < 7; i++) {
+        for (int j = 0; j < 7; j++) {
+          if (i > 3 && j > 3) {errMatrix[i][j] = RerrMatrix[i - 4][j - 4];}
+          else {errMatrix[i][j] = 0;} // da correggere: lasciare i valori precedenti
+        }
+      }
+      mother->updateMomentum(mom, pos, errMatrix, prob);
+      rsg.updateDaughters();
+
+    } else {return false;}
+  }
 
   return true;
 }

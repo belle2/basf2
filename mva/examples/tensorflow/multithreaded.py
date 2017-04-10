@@ -585,7 +585,7 @@ if __name__ == "__main__":
                       'n_step_summaries': 1,
                       'tensorflow_folder': '/usr/users/dweyland/ssd/tensorflow_summary_2',
                       'visible_gpu': '0',
-                      'weight_decay': 0.001}
+                      'weight_decay': 0.01}
 
     # There are 2 different types of training:
 

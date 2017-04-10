@@ -36,6 +36,27 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+CDCTrajectory2D::CDCTrajectory2D()
+  : m_localOrigin()
+  , m_localPerigeeCircle()
+{
+}
+
+CDCTrajectory2D::CDCTrajectory2D(const UncertainPerigeeCircle& perigeeCircle)
+  : m_localOrigin(0.0, 0.0)
+  , m_localPerigeeCircle(perigeeCircle)
+{
+}
+
+CDCTrajectory2D::CDCTrajectory2D(const Vector2D& localOrigin,
+                                 const UncertainPerigeeCircle& localPerigeeCircle,
+                                 double flightTime)
+  : m_localOrigin(localOrigin)
+  , m_localPerigeeCircle(localPerigeeCircle)
+  , m_flightTime(flightTime)
+{
+}
+
 CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
                                  const double time,
                                  const Vector2D& mom2D,
@@ -61,29 +82,66 @@ CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
 {
 }
 
-Vector3D CDCTrajectory2D::reconstruct3D(const WireLine& wireLine,
-                                        const double distance) const
+bool CDCTrajectory2D::isFitted() const
 {
-  Vector2D globalRefPos2D = wireLine.refPos2D();
-  Vector2D movePerZ = wireLine.nominalMovePerZ();
+  return not getLocalCircle()->isInvalid();
+}
 
-  Vector2D localRefPos2D = globalRefPos2D - getLocalOrigin();
+void CDCTrajectory2D::clear()
+{
+  m_localOrigin.set(0.0, 0.0);
+  m_localPerigeeCircle.invalidate();
+  m_flightTime = NAN;
+}
+
+void CDCTrajectory2D::reverse()
+{
+  m_localPerigeeCircle.reverse();
+  m_flightTime = -m_flightTime;
+}
+
+
+CDCTrajectory2D CDCTrajectory2D::reversed() const
+{
+  CDCTrajectory2D result = *this;
+  result.reverse();
+  return result;
+}
+
+Vector3D CDCTrajectory2D::reconstruct3D(const WireLine& wireLine,
+                                        const double distance,
+                                        const double z) const
+{
+  Vector2D globalPos2D = wireLine.sagPos2DAtZ(z);
+  Vector2D movePerZ = wireLine.sagMovePerZ(z);
+
+  Vector2D localPos2D = globalPos2D - getLocalOrigin();
   const PerigeeCircle& localCircle = getLocalCircle();
 
   double fastDistance = distance != 0.0 ? localCircle.fastDistance(distance) : 0.0;
 
-  double c = localCircle.fastDistance(localRefPos2D) - fastDistance;
-  double b = localCircle.gradient(localRefPos2D).dot(movePerZ);
+  double c = localCircle.fastDistance(localPos2D) - fastDistance;
+  double b = localCircle.gradient(localPos2D).dot(movePerZ);
   double a = localCircle.n3() * movePerZ.normSquared();
 
-  std::pair<double, double> solutionsDeltaZ = solveQuadraticABC(a, b, c);
+  const std::pair<double, double> solutionsDeltaZ = solveQuadraticABC(a, b, c);
+  const std::pair<double, double> solutionsZ{solutionsDeltaZ.first + z, solutionsDeltaZ.second + z};
 
   // Take the solution with the smaller deviation from the reference position
-  const double deltaZ = solutionsDeltaZ.second;
-  const double z = deltaZ + wireLine.refZ();
+  bool firstIsInCDC = (wireLine.backwardZ() < solutionsZ.first and
+                       solutionsZ.first < wireLine.forwardZ());
+  bool secondIsInCDC = (wireLine.backwardZ() < solutionsZ.second and
+                        solutionsZ.second < wireLine.forwardZ());
 
-  Vector3D recoWirePos2D = wireLine.nominalPos3DAtZ(z);
-  return Vector3D(getClosest(recoWirePos2D.xy()), z);
+  const double recoZ = (secondIsInCDC or not firstIsInCDC) ? solutionsZ.second : solutionsZ.first;
+
+  Vector3D recoWirePos2D = wireLine.sagPos3DAtZ(recoZ);
+  return Vector3D(getClosest(recoWirePos2D.xy()), recoZ);
+}
+
+Vector2D CDCTrajectory2D::getClosest(const Vector2D& point) const
+{
+  return getLocalCircle()->closest(point - getLocalOrigin()) + getLocalOrigin();
 }
 
 ISuperLayer CDCTrajectory2D::getISuperLayerAfter(ISuperLayer iSuperLayer, bool movingOutward) const

@@ -130,9 +130,9 @@ void CDCRecoHit2D::snapToDriftCircle(bool switchSide)
   }
 }
 
-Vector3D CDCRecoHit2D::reconstruct3D(const CDCTrajectory2D& trajectory2D) const
+Vector3D CDCRecoHit2D::reconstruct3D(const CDCTrajectory2D& trajectory2D, double z) const
 {
-  return getRLWireHit().reconstruct3D(trajectory2D);
+  return getRLWireHit().reconstruct3D(trajectory2D, z);
 }
 
 std::ostream& TrackFindingCDC::operator<<(std::ostream& output, const CDCRecoHit2D& recohit)

@@ -3,7 +3,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
-#include <trg/trg/dataobjects/TRGTiming.h>
+#include <framework/dataobjects/EventT0.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 #include <TH1.h>
 
@@ -27,7 +28,7 @@ CDCTriggerETFModule::CDCTriggerETFModule() : Module::Module()
            string(""));
   addParam("EventTimeName", m_EventTimeName,
            "Name of the output StoreObjPtr.",
-           string("CDCTriggerEventTime"));
+           string(""));
   addParam("trueEventTime",
            m_trueEventTime,
            "If true, always output 0 (assuming this is the true event time for MC).",
@@ -42,16 +43,18 @@ void
 CDCTriggerETFModule::initialize()
 {
   // register DataStore elements
-  StoreObjPtr<TRGTiming>::registerPersistent(m_EventTimeName);
+  StoreObjPtr<EventT0>::registerPersistent(m_EventTimeName);
   StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
 }
 
 void
 CDCTriggerETFModule::event()
 {
+  StoreObjPtr<EventT0> eventTime(m_EventTimeName);
+  if (!eventTime.isValid()) eventTime.create();
+
   if (m_trueEventTime) {
-    StoreObjPtr<TRGTiming> eventTime(m_EventTimeName);
-    eventTime.construct(Const::CDC, 0);
+    eventTime->addEventT0(0, Const::CDC);
     return;
   }
 
@@ -98,7 +101,13 @@ CDCTriggerETFModule::event()
 
   // save event time
   if (foundT0) {
-    StoreObjPtr<TRGTiming> eventTime(m_EventTimeName);
-    eventTime.construct(Const::CDC, T0);
+    // add the event time as int for the following trigger modules
+    eventTime->addEventT0(T0, Const::CDC);
+    // add the event time in ns (with uncertainty)
+    // TODO: verify the algorithm, estimate the uncertainty,
+    // then uncomment the following:
+    //double deltaT0 = 1.; //TODO: replace with real uncertainty
+    //CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
+    //eventTime->addEventT0(double(T0) * 2. * cdc.getTdcBinWidth() , deltaT0, Const::CDC);
   }
 }

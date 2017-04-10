@@ -98,6 +98,7 @@ if clock:
 main.add_module(trgcdc, logLevel=basf2.LogLevel.INFO)
 
 # fitters
+main.add_module('CDCTriggerETF')
 main.add_module('CDCTrigger2DFitter', logLevel=basf2.LogLevel.INFO,
                 minHits=2, useDriftTime=fitdrift, xtSimple=xtsimple,
                 outputCollectionName='FitterTracks')  # to distinguish from old output

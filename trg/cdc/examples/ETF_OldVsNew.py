@@ -92,8 +92,7 @@ if clock:
 main.add_module(trgcdc)
 
 # ETF
-main.add_module('CDCTriggerETF',
-                EventTimeName='T0')  # to distinguish from old output
+main.add_module('CDCTriggerETF')
 
 
 # ----------- #
@@ -110,8 +109,8 @@ class TestModule(basf2.Module):
         give info for both modules and warnings in the case of mismatches
         """
         oldT0 = Belle2.PyStoreObj("CDCTriggerEventTime").obj().getTiming()
-        if Belle2.PyStoreObj("T0").isValid():
-            newT0 = Belle2.PyStoreObj("T0").obj().getTiming()
+        if Belle2.PyStoreObj("EventT0").hasEventT0():
+            newT0 = Belle2.PyStoreObj("EventT0").obj().getBinnedEventT0()
         else:
             newT0 = 9999
         if oldT0 == newT0:

@@ -6,7 +6,7 @@
 
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-#include <trg/trg/dataobjects/TRGTiming.h>
+#include <framework/dataobjects/EventT0.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <trg/cdc/Fitter3DUtility.h>
@@ -31,7 +31,7 @@ CDCTrigger3DFitterModule::CDCTrigger3DFitterModule() : Module::Module()
            string(""));
   addParam("EventTimeName", m_EventTimeName,
            "Name of the event time object.",
-           string("CDCTriggerEventTime"));
+           string(""));
   addParam("inputCollectionName", m_inputCollectionName,
            "Name of the StoreArray holding the input tracks from the 2D fitter.",
            string("TRGCDC2DFitterTracks"));
@@ -54,6 +54,7 @@ CDCTrigger3DFitterModule::initialize()
   StoreArray<CDCTriggerTrack>::registerPersistent(m_outputCollectionName);
   StoreArray<CDCTriggerTrack>::required(m_inputCollectionName);
   StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
+  StoreObjPtr<EventT0>::required(m_EventTimeName);
   // register relations
   StoreArray<CDCTriggerTrack> tracks2D(m_inputCollectionName);
   StoreArray<CDCTriggerTrack> tracks3D(m_outputCollectionName);
@@ -217,8 +218,10 @@ CDCTrigger3DFitterModule::fitter(vector<int>& bestTSIndex, vector<double>& bestT
                                  double& z0, double& cot, double& chi2)
 {
   StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
-  StoreObjPtr<TRGTiming> eventTime(m_EventTimeName);
-  int T0 = (eventTime) ? eventTime->getTiming() : 9999;
+  StoreObjPtr<EventT0> eventTime(m_EventTimeName);
+  int T0 = (eventTime->hasBinnedEventT0(Const::CDC))
+           ? eventTime->getBinnedEventT0(Const::CDC)
+           : 9999;
 
   // Fill information for stereo layers
   vector<double> wirePhi(4, 9999);

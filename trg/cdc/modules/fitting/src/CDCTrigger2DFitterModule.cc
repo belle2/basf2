@@ -6,7 +6,7 @@
 
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-#include <trg/trg/dataobjects/TRGTiming.h>
+#include <framework/dataobjects/EventT0.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <trg/cdc/Fitter3DUtility.h>
@@ -31,7 +31,7 @@ CDCTrigger2DFitterModule::CDCTrigger2DFitterModule() : Module::Module()
            string(""));
   addParam("EventTimeName", m_EventTimeName,
            "Name of the event time object.",
-           string("CDCTriggerEventTime"));
+           string(""));
   addParam("inputCollectionName", m_inputCollectionName,
            "Name of the StoreArray holding the input tracks from the track finder.",
            string("TRGCDC2DFinderTracks"));
@@ -57,6 +57,8 @@ CDCTrigger2DFitterModule::initialize()
   StoreArray<CDCTriggerTrack>::registerPersistent(m_outputCollectionName);
   StoreArray<CDCTriggerTrack>::required(m_inputCollectionName);
   StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
+  if (m_useDriftTime)
+    StoreObjPtr<EventT0>::required(m_EventTimeName);
   // register relations
   StoreArray<CDCTriggerTrack> finderTracks(m_inputCollectionName);
   StoreArray<CDCTriggerTrack> fitterTracks(m_outputCollectionName);
@@ -91,8 +93,10 @@ CDCTrigger2DFitterModule::event()
 {
   StoreArray<CDCTriggerTrack> finderTracks(m_inputCollectionName);
   StoreArray<CDCTriggerTrack> fitterTracks(m_outputCollectionName);
-  StoreObjPtr<TRGTiming> eventTime(m_EventTimeName);
-  int T0 = (eventTime) ? eventTime->getTiming() : 9999;
+  StoreObjPtr<EventT0> eventTime(m_EventTimeName);
+  int T0 = (eventTime->hasBinnedEventT0(Const::CDC))
+           ? eventTime->getBinnedEventT0(Const::CDC)
+           : 9999;
 
   vector<double> wirePhi2DError({0.00085106,
                                  0.00039841,

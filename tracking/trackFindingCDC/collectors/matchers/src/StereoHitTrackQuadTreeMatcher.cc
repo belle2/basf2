@@ -221,7 +221,7 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
   // Add the found stereo hits to the relation vector. In the moment, all hits get the same weight (may change later).
   for (const CDCRecoHitWithRLPointer& recoHitWithRLPointer : foundStereoHits) {
     const CDCRLWireHit* rlWireHit = recoHitWithRLPointer.second;
-    relationsForCollector.emplace_back(&track, 0, rlWireHit);
+    relationsForCollector.emplace_back(&track, foundStereoHits.size(), rlWireHit);
   }
 }
 

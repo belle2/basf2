@@ -10,6 +10,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <framework/dataobjects/EventT0.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
@@ -46,6 +47,9 @@ CDCTriggerNeuroTrainerModule::CDCTriggerNeuroTrainerModule() : Module()
   // parameters for saving / loading
   addParam("hitCollectionName", m_hitCollectionName,
            "Name of the input StoreArray of CDCTriggerSegmentHits.",
+           string(""));
+  addParam("EventTimeName", m_EventTimeName,
+           "Name of the event time object.",
            string(""));
   addParam("inputCollectionName", m_inputCollectionName,
            "Name of the StoreArray holding the 2D input tracks.",
@@ -195,6 +199,7 @@ CDCTriggerNeuroTrainerModule::initialize()
   // register store objects
   StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
   StoreArray<CDCTriggerTrack>::required(m_inputCollectionName);
+  StoreObjPtr<EventT0>::required(m_EventTimeName);
   if (m_trainOnRecoTracks) {
     StoreArray<RecoTrack>::required(m_targetCollectionName);
   } else {
@@ -216,7 +221,7 @@ CDCTriggerNeuroTrainerModule::initialize()
       }
     }
   }
-  m_NeuroTrigger.setHitCollectionName(m_hitCollectionName);
+  m_NeuroTrigger.setCollectionNames(m_hitCollectionName, m_EventTimeName);
   // consistency check of training parameters
   if (m_NeuroTrigger.nSectors() != m_trainSets.size())
     B2ERROR("Number of training sets (" << m_trainSets.size() << ") should match " <<

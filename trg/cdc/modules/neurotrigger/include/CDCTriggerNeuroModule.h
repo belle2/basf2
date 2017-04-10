@@ -39,6 +39,8 @@ namespace Belle2 {
     std::string m_arrayname;
     /** Name of the StoreArray containing the input track segment hits. */
     std::string m_hitCollectionName;
+    /** name of the event time StoreObjPtr */
+    std::string m_EventTimeName;
     /** Name of the StoreArray containing the input 2D tracks. */
     std::string m_inputCollectionName;
     /** Name of the StoreArray containing the resulting NN tracks. */

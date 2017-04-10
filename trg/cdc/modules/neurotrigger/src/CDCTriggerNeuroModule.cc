@@ -1,8 +1,10 @@
 #include "trg/cdc/modules/neurotrigger/CDCTriggerNeuroModule.h"
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <framework/dataobjects/EventT0.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/gearbox/Const.h>
@@ -36,6 +38,9 @@ CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
   addParam("hitCollectionName", m_hitCollectionName,
            "Name of the input StoreArray of CDCTriggerSegmentHits.",
            string(""));
+  addParam("EventTimeName", m_EventTimeName,
+           "Name of the event time object.",
+           string(""));
   addParam("inputCollectionName", m_inputCollectionName,
            "Name of the StoreArray holding the 2D input tracks.",
            string("TRGCDC2DFinderTracks"));
@@ -57,6 +62,7 @@ CDCTriggerNeuroModule::initialize()
 {
   StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
   StoreArray<CDCTriggerTrack>::required(m_inputCollectionName);
+  StoreObjPtr<EventT0>::required(m_EventTimeName);
   if (!m_NeuroTrigger.load(m_filename, m_arrayname))
     B2ERROR("NeuroTrigger could not be loaded correctly.");
   StoreArray<CDCTriggerTrack>::registerPersistent(m_outputCollectionName);
@@ -70,7 +76,7 @@ CDCTriggerNeuroModule::initialize()
   if (m_fixedPoint) {
     m_NeuroTrigger.setPrecision(m_precision);
   }
-  m_NeuroTrigger.setHitCollectionName(m_hitCollectionName);
+  m_NeuroTrigger.setCollectionNames(m_hitCollectionName, m_EventTimeName);
 }
 
 

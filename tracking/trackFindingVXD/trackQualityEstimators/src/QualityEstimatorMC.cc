@@ -27,6 +27,13 @@ void QualityEstimatorMC::fillMatrixWithMCInformation()
 
 double QualityEstimatorMC::estimateQuality(std::vector<SpacePoint const*> const& measurements)
 {
+  // initialize Matrix
+  m_linkMatrix = Eigen::SparseMatrix<bool> (m_mcRecoTracks.getEntries(), StoreArray<SVDCluster>("").getEntries());
+  // Best guess about required size. Average should be slightly below 8 SVD clusters (2 per layer) per Track.
+  m_linkMatrix.reserve(m_mcRecoTracks.getEntries() * 8);
+  // create relation SVDClusterIndex to MCRecoTrackIndex
+  fillMatrixWithMCInformation();
+
   m_match = getBestMatchToMCClusters(measurements);
 
   // assuming that each SpacePoint corresponds to two Clusters. Only valid for SVD!

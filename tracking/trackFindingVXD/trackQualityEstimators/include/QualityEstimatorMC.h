@@ -32,13 +32,6 @@ namespace Belle2 {
       m_mcRecoTracks.isRequired(mcRecoTracksStoreArrayName);
       // store to make sure SPTCs are compared to the correct SVDStoreArray
       m_svdClustersName = m_mcRecoTracks[0]->getStoreArrayNameOfSVDHits();
-
-      // initialize Matrix
-      m_linkMatrix = Eigen::SparseMatrix<bool> (m_mcRecoTracks.getEntries(), StoreArray<SVDCluster>("").getEntries());
-      // Best guess about required size. Average should be slightly below 8 SVD clusters (2 per layer) per Track.
-      m_linkMatrix.reserve(m_mcRecoTracks.getEntries() * 8);
-      // create relation SVDClusterIndex to MCRecoTrackIndex
-      fillMatrixWithMCInformation();
     };
 
     virtual double estimateQuality(std::vector<SpacePoint const*> const& measurements) final;

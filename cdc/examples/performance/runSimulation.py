@@ -67,9 +67,8 @@ def main(exp, run, evt, st):
 
     add_cdc_cr_simulation(main_path, emptyPath)
 
-    output = register_module('RootOutput')
-    outputFilename = 'cr.cdc.{0:04d}.{1:06d}.mc{2:04d}.root'.format(int(exp), int(run), int(st))
-    output.param('outputFileName', outputFilename)
+    output = register_module('RootOutput',
+                             outputFileName='gcr.cdc.{0:04d}.{1:06d}.{2:04d}.root'.format(int(exp), int(run), int(st)))
     main_path.add_module(output)
     print_path(main_path)
     process(main_path)

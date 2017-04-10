@@ -156,7 +156,7 @@ QualityEstimationResults QualityEstimatorTripletFit::estimateQualityAndPropertie
   averageThetaPrime /= m_thetas.size();
 
   m_results.pt = calcPt(m_averageR3D * sin(averageThetaPrime));
-
+  m_results.pmag = calcPt(m_averageR3D);
   return m_results;
 }
 

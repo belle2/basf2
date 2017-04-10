@@ -27,6 +27,7 @@ namespace Belle2 {
     boost::optional<double> chiSquared;
     boost::optional<short> curvatureSign;
     boost::optional<double> pt;
+    boost::optional<double> pmag;
     boost::optional<B2Vector3<double>> p;
   };
 

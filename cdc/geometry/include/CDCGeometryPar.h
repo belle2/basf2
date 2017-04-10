@@ -794,9 +794,21 @@ namespace Belle2 {
        * @param[in] lr Left/Right
        * @param[in] alpha incident angle (in rphi plane) w.r.t. the cell (rad).
        * @param[in] theta incident angle (polar angle) (rad).
+       * @param calculateMinTime calculate min. drift time inside this function (=true) or feed as input (=false).
+       * @param minTime input min. drift time when calculateMinTime=false.
        */
 
-      double getDriftLength(double dt, unsigned short layer, unsigned short lr, double alpha = 0., double theta = 0.5 * M_PI) const;
+      double getDriftLength(double dt, unsigned short layer, unsigned short lr, double alpha = 0., double theta = 0.5 * M_PI,
+                            bool calculateMinTime = true, double minTime = 0.) const;
+
+      /**
+       * Return the min. drift time (ns).
+       * @param[in] layer Layer ID.
+       * @param[in] lr Left/Right
+       * @param[in] alpha incident angle (in rphi plane) w.r.t. the cell (rad).
+       * @param[in] theta incident angle (polar angle) (rad).
+       */
+      double getMinDriftTime(unsigned short layer, unsigned short lr, double alpha = 0., double theta = 0.5 * M_PI) const;
 
       /**
        * Return the drift time to the sense wire.

@@ -1599,13 +1599,18 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
 {
   double dDdt = 0.;
 
+  //calculate min. drift time
+  double minTime = getMinDriftTime(iCLayer, lr, alpha, theta);
+  double delta = time - minTime;
+  //use xt reversed at (x=0,t=tmin) for delta<0 ("negative drifttime")
+  double timep = delta < 0. ? minTime - delta : time;
+
   //convert incoming- to outgoing-lr
   unsigned short lro = getOutgoingLR(lr, alpha);
 
   if (!m_linearInterpolationOfXT) {
     B2FATAL("linearInterpolationOfXT = false is not allowed now !");
-  }
-  if (m_linearInterpolationOfXT) {
+  } else {
     double wal(0.);
     unsigned short ial[2] = {0};
     unsigned short ilr[2] = {lro, lro};
@@ -1643,40 +1648,46 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
 
       double boundary = m_XT[iCLayer][jlr][jal][jth][6];
 
-      if (time < boundary) {
+      if (timep < boundary) {
         if (m_xtParamMode == 1) {
-          double c1 = m_XT[iCLayer][jlr][jal][jth][1];
-          double c2 = m_XT[iCLayer][jlr][jal][jth][2];
-          double c3 = m_XT[iCLayer][jlr][jal][jth][3];
-          double c4 = m_XT[iCLayer][jlr][jal][jth][4];
-          double c5 = m_XT[iCLayer][jlr][jal][jth][5];
-          dDdt += w * ROOT::Math::Chebyshev4(time, c1 + 3.*c3 + 5.*c5, 4.*c2 + 8.*c4, 6.*c3 + 10.*c5, 8.*c4, 10.*c5);
+          const double& c1 = m_XT[iCLayer][jlr][jal][jth][1];
+          const double& c2 = m_XT[iCLayer][jlr][jal][jth][2];
+          const double& c3 = m_XT[iCLayer][jlr][jal][jth][3];
+          const double& c4 = m_XT[iCLayer][jlr][jal][jth][4];
+          const double& c5 = m_XT[iCLayer][jlr][jal][jth][5];
+          dDdt += w * ROOT::Math::Chebyshev4(timep, c1 + 3.*c3 + 5.*c5, 4.*c2 + 8.*c4, 6.*c3 + 10.*c5, 8.*c4, 10.*c5);
         } else {
-          dDdt += w * (m_XT[iCLayer][jlr][jal][jth][1] + time
-                       * (2.*m_XT[iCLayer][jlr][jal][jth][2] + time
-                          * (3.*m_XT[iCLayer][jlr][jal][jth][3] + time
-                             * (4.*m_XT[iCLayer][jlr][jal][jth][4] + time
+          dDdt += w * (m_XT[iCLayer][jlr][jal][jth][1] + timep
+                       * (2.*m_XT[iCLayer][jlr][jal][jth][2] + timep
+                          * (3.*m_XT[iCLayer][jlr][jal][jth][3] + timep
+                             * (4.*m_XT[iCLayer][jlr][jal][jth][4] + timep
                                 * (5.*m_XT[iCLayer][jlr][jal][jth][5])))));
         }
       } else {
         dDdt += w * m_XT[iCLayer][jlr][jal][jth][7];
       }
-    }
-
-  } else {
+    } //end of weighted mean loop
   }
 
-  //replaced with return fabs, since dDdt < 0 rarely; why happens ???
-  //  if (lr == 1) dDdt *= -1.;
-  //  return dDdt;
-  return fabs(dDdt);
+  dDdt = fabs(dDdt);
+  //n.b. following line not needed since dDdt > 0 even for delta < 0
+  //  if (delta < 0.) dDdt *= -1.;
+  return dDdt;
 
 }
 
 double CDCGeometryPar::getDriftLength(const double time, const unsigned short iCLayer, const unsigned short lr, const double alpha,
-                                      const double theta) const
+                                      const double theta,
+                                      const bool calculateMinTime,
+                                      const double inputMinTime) const
 {
   double dist = 0.;
+
+  //calculate min. drift time
+  double minTime = calculateMinTime ? getMinDriftTime(iCLayer, lr, alpha, theta) : inputMinTime;
+  double delta = time - minTime;
+  //use xt reversed at (x=0,t=tmin) for delta<0 ("negative drifttime")
+  double timep = delta < 0. ? minTime - delta : time;
 
   //convert incoming- to outgoing-lr
   unsigned short lro = getOutgoingLR(lr, alpha);
@@ -1685,8 +1696,7 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
   //  exit(-1);
   if (!m_linearInterpolationOfXT) {
     B2FATAL("linearInterpolationOfXT = false is not allowed now !");
-  }
-  if (m_linearInterpolationOfXT) {
+  } else {
     double wal(0.);
     unsigned short ial[2] = {0};
     unsigned short ilr[2] = {lro, lro};
@@ -1739,29 +1749,123 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
       */
       double boundary = m_XT[iCLayer][jlr][jal][jth][6];
 
-      if (time < boundary) {
+      if (timep < boundary) {
         if (m_xtParamMode == 1) {
-          dist += w * ROOT::Math::Chebyshev5(time, m_XT[iCLayer][jlr][jal][jth][0], m_XT[iCLayer][jlr][jal][jth][1],
+          dist += w * ROOT::Math::Chebyshev5(timep, m_XT[iCLayer][jlr][jal][jth][0], m_XT[iCLayer][jlr][jal][jth][1],
                                              m_XT[iCLayer][jlr][jal][jth][2], m_XT[iCLayer][jlr][jal][jth][3], m_XT[iCLayer][jlr][jal][jth][4], m_XT[iCLayer][jlr][jal][jth][5]);
         } else {
-          dist += w * (m_XT[iCLayer][jlr][jal][jth][0] + time
-                       * (m_XT[iCLayer][jlr][jal][jth][1] + time
-                          * (m_XT[iCLayer][jlr][jal][jth][2] + time
-                             * (m_XT[iCLayer][jlr][jal][jth][3] + time
-                                * (m_XT[iCLayer][jlr][jal][jth][4] + time
+          dist += w * (m_XT[iCLayer][jlr][jal][jth][0] + timep
+                       * (m_XT[iCLayer][jlr][jal][jth][1] + timep
+                          * (m_XT[iCLayer][jlr][jal][jth][2] + timep
+                             * (m_XT[iCLayer][jlr][jal][jth][3] + timep
+                                * (m_XT[iCLayer][jlr][jal][jth][4] + timep
                                    * (m_XT[iCLayer][jlr][jal][jth][5]))))));
         }
       } else {
-        dist += w * (m_XT[iCLayer][jlr][jal][jth][7] * (time - boundary) + m_XT[iCLayer][jlr][jal][jth][8]);
+        dist += w * (m_XT[iCLayer][jlr][jal][jth][7] * (timep - boundary) + m_XT[iCLayer][jlr][jal][jth][8]);
       }
       //      std::cout <<"k,w,dist= " << k <<" "<< w <<" "<< dist << std::endl;
-    }
-
-  } else {
+    } //end of weighted mean loop
   }
 
-  return fabs(dist);
+  dist = fabs(dist);
+  if (delta < 0.) dist *= -1.;
+  return dist;
 
+}
+
+double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsigned short lr, const double alpha,
+                                       const double theta) const
+{
+  double minTime = 999.;
+
+  //convert incoming- to outgoing-lr
+  unsigned short lro = getOutgoingLR(lr, alpha);
+
+  if (!m_linearInterpolationOfXT) {
+    B2FATAL("linearInterpolationOfXT = false is not allowed now !");
+  } else {
+    double wal(0.);
+    unsigned short ial[2] = {0};
+    unsigned short ilr[2] = {lro, lro};
+    getClosestAlphaPoints(alpha, wal, ial, ilr);
+    double wth(0.);
+    unsigned short ith[2] = {0};
+    getClosestThetaPoints(alpha, theta, wth, ith);
+
+    unsigned short jal(0), jlr(0), jth(0);
+    double w = 0.;
+
+    double c[6] = {0.}, a[6] = {0.};
+    for (unsigned k = 0; k < 4; ++k) {
+      if (k == 0) {
+        jal = ial[0];
+        jlr = ilr[0];
+        jth = ith[0];
+        w = (1. - wal) * (1. - wth);
+      } else if (k == 1) {
+        jal = ial[0];
+        jlr = ilr[0];
+        jth = ith[1];
+        w = (1. - wal) * wth;
+      } else if (k == 2) {
+        jal = ial[1];
+        jlr = ilr[1];
+        jth = ith[0];
+        w = wal * (1. - wth);
+      } else if (k == 3) {
+        jal = ial[1];
+        jlr = ilr[1];
+        jth = ith[1];
+        w = wal * wth;
+      }
+
+      for (int i = 0; i < 5; ++i) {
+        c[i] += w * m_XT[iCLayer][jlr][jal][jth][i];
+      }
+    }
+
+    if (m_xtParamMode == 1) { //convert c to coeff for normal-poly if Chebyshev
+      a[0] = c[0] -    c[2] +    c[4];
+      a[1] = c[1] - 3.*c[3] + 5.*c[5];
+      a[2] =        2.*c[2] - 8.*c[4];
+      a[3] =        4.*c[3] - 20.*c[5];
+      a[4] =        8.*c[4];
+      a[5] =       16.*c[5];
+    } else { //normal-poly
+      for (int i = 0; i < 5; ++i) a[i] = c[i];
+    }
+
+    double det = a[1] * a[1] - 4.*a[2] * a[0];
+    if (a[2] != 0. && det >= 0.) {
+      //2nd-order approx. assuming minTime near zero
+      minTime = (-a[1] + sqrt(det)) / (2.*a[2]);
+      //plus higher-order corr.
+      const double& t = minTime;
+      const double num = (a[3] + t * (a[4] + t * a[5])) * t * t * t;
+      const double den = a[1] + t * (2.*a[2] + t * (3.*a[3] + t * (4.*a[4] + t * 5.*a[5])));
+      if (den != 0.) minTime -= num / den;
+    } else {
+      //1st-order approx. assuming minTime near zero
+      if (a[1] == 0.) B2FATAL("CDCGeometryPar::getMinDriftTime: a[1]=0 !");
+      B2WARNING("CDCGeometryPar::getMinDriftTime: 1st-order approx.");
+      minTime = -a[0] / a[1];
+      //plus higher-order corr.
+      const double& t = minTime;
+      const double num = (a[2] + t * (a[3] + t * (a[4] + t * a[5]))) * t * t;
+      const double den = a[1] + t * (2.*a[2] + t * (3.*a[3] + t * (4.*a[4] + t * 5.*a[5])));
+      if (den != 0.) minTime -= num / den;
+    }
+  }
+
+  if (minTime == 999.) {
+    B2WARNING("CDCGeometryPar::getMinDriftTime: minDriftTime not determined; assume zero.");
+    minTime = 0.;
+  } else if (minTime > 20.) {
+    B2WARNING("CDCGeometryPar::getMinDriftTime: minDriftTime > 20ns. Ok ?");
+  }
+
+  return minTime;
 }
 
 double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLayer, const unsigned short lr, const double alpha,
@@ -1778,20 +1882,24 @@ double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLa
   //convert incoming- to outgoing-lr
   //  unsigned short lrp = getOutgoingLR(lr, alpha);
 
-  double maxTime = 5000.; //in ns
+  double maxTime = 2000.; //in ns
   //  if (m_XT[iCLayer][lrp][ialpha][itheta][7] == 0.) {
   //    maxTime = m_XT[iCLayer][lrp][ialpha][itheta][6];
   //  }
 
-  double t0 = 0.;
-  double d0 = getDriftLength(t0, iCLayer, lr, alpha, theta) - dist;
+  double minTime = getMinDriftTime(iCLayer, lr, alpha, theta);
+  double t0 = minTime;
+  //  std::cout << "minTime,x= " << t0 <<" "<< getDriftLength(t0, iCLayer, lr, alpha, theta) << std::endl;
+  const bool calMinTime = false;
+  //  double d0 = getDriftLength(t0, iCLayer, lr, alpha, theta, calMinTime, minTime) - dist;
+  double d0 = - dist;
 
   unsigned i = 0;
   double t1 = maxTime;
   double time = dist * m_nominalDriftVInv;
   while (((t1 - t0) > eps) && (i < maxTrials)) {
     time = 0.5 * (t0 + t1);
-    double d1 = getDriftLength(time, iCLayer, lr, alpha, theta) - dist;
+    double d1 = getDriftLength(time, iCLayer, lr, alpha, theta, calMinTime, minTime) - dist;
     //    std::cout <<"i,dist,t0,t1,d0,d1= " << i <<" "<< dist <<" "<< t0 <<" "<< t1 <<" "<< d0 <<" "<< d1 << std::endl;
     if (d0 * d1 > 0.) {
       t0 = time;

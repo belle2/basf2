@@ -5,7 +5,7 @@ from basf2 import *
 from ROOT import Belle2
 
 
-def add_cdc_trigger(path, SimulationMode=1, minHits=4):
+def add_cdc_trigger(path, SimulationMode=1, minHits=4, trueEventTime=False):
     """
     This function adds the CDC trigger modules to a path.
     @path              modules are added to this path
@@ -15,6 +15,9 @@ def add_cdc_trigger(path, SimulationMode=1, minHits=4):
                        are simulated
     @minHits           the minimum number of  super layers with hits, the default
                        values is 4
+    @trueEventTime     since the event time finder is not yet finalized,
+                       the true event time can be used instead.
+                       recommended especially for tests on single tracks.
     """
     if SimulationMode == 1:
         # TSF
@@ -25,7 +28,7 @@ def add_cdc_trigger(path, SimulationMode=1, minHits=4):
         path.add_module('CDCTrigger2DFinder',
                         minHits=minHits)
         # ETF
-        path.add_module('CDCTriggerETF')
+        path.add_module('CDCTriggerETF', trueEventTime=trueEventTime)
         # fitters
         path.add_module('CDCTrigger2DFitter')
         path.add_module('CDCTrigger3DFitter')

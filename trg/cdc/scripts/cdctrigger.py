@@ -22,8 +22,8 @@ def add_cdc_trigger(path, SimulationMode=1, minHits=4, trueEventTime=False):
     if SimulationMode == 1:
         # TSF
         path.add_module('CDCTriggerTSF',
-                        InnerTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_v3.0.coe"),
-                        OuterTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_v3.0.coe"))
+                        InnerTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_Bkg_p0.70_b0.80.coe"),
+                        OuterTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_Bkg_p0.70_b0.80.coe"))
         # 2D finder
         path.add_module('CDCTrigger2DFinder',
                         minHits=minHits)
@@ -34,7 +34,7 @@ def add_cdc_trigger(path, SimulationMode=1, minHits=4, trueEventTime=False):
         path.add_module('CDCTrigger3DFitter')
         # neurotrigger
         path.add_module('CDCTriggerNeuro',
-                        filename=Belle2.FileSystem.findFile("data/trg/cdc/Neuro20170109.root"))
+                        filename=Belle2.FileSystem.findFile("data/trg/cdc/Neuro20170405_LUTBkg.root"))
     elif SimulationMode == 2:
         B2WARNING("full simulation mode does not include all CDC trigger modules yet")
         # standard CDC trigger

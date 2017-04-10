@@ -446,6 +446,7 @@ void CDCSVGPlotter::drawWrongRLHits(const std::string& hitCollectionsStoreObjNam
     // Skip the bad reverse
     if (correctRLVote < 0 and hitCollection.getAutomatonCell().hasReverseFlag()) continue;
 
+    m_eventdataPlotter.startGroup();
     for (const auto& recoHit : hitCollection) {
       ERightLeft rlInfo = recoHit.getRLInfo();
       const CDCHit* hit = recoHit.getWireHit().getHit();
@@ -467,6 +468,7 @@ void CDCSVGPlotter::drawWrongRLHits(const std::string& hitCollectionsStoreObjNam
       AttributeMap attributeMap{{"stroke", color}};
       m_eventdataPlotter.draw(recoHit, attributeMap);
     }
+    m_eventdataPlotter.endGroup();
   }
 }
 

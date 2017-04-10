@@ -171,6 +171,10 @@ CDCTriggerNeuroTrainerModule::CDCTriggerNeuroTrainerModule() : Module()
            "If true, set target values > outputScale to 1, "
            "else skip them.", true);
   // parameters for training
+  addParam("wMax", m_wMax,
+           "Weights are limited to [-wMax, wMax] after each training epoch "
+           "(for convenience of the FPGA implementation).",
+           63.);
   addParam("nThreads", m_nThreads,
            "Number of threads for parallel training.", 1);
   addParam("checkInterval", m_checkInterval,
@@ -620,6 +624,13 @@ CDCTriggerNeuroTrainerModule::train(unsigned isector)
       double mse = fann_train_epoch(ann, train_data);
 #endif
       trainLog[epoch - 1] = mse;
+      // reduce weights that got too large
+      for (unsigned iw = 0; iw < ann->total_connections; ++iw) {
+        if (ann->weights[iw] > m_wMax)
+          ann->weights[iw] = m_wMax;
+        else if (ann->weights[iw] < -m_wMax)
+          ann->weights[iw] = -m_wMax;
+      }
       // evaluate validation set
       fann_reset_MSE(ann);
 #ifdef HAS_OPENMP

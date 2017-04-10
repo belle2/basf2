@@ -105,6 +105,8 @@ namespace Belle2 {
     bool m_stopLoop;
     /** Switch to rescale out of range target values or ignore them. */
     bool m_rescaleTarget;
+    /** Limit for weights. */
+    double m_wMax;
     /** Number of threads for training. */
     int m_nThreads;
     /** Training is stopped if validation error is higher than

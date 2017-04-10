@@ -190,6 +190,42 @@ namespace Belle2 {
     int stripLocalNumber(int strip) const;
 
     /**
+     * Get maximal endcap number.
+     */
+    int getMaximalEndcapNumber() const;
+
+    /**
+     * Get maximal layer number.
+     */
+    int getMaximalLayerNumber() const;
+
+    /**
+     * Get maximal detector layer number.
+     * @param[in] endcap Endcap number.
+     */
+    int getMaximalDetectorLayerNumber(int endcap) const;
+
+    /**
+     * Get maximal sector number.
+     */
+    int getMaximalSectorNumber() const;
+
+    /**
+     * Get maximal plane number.
+     */
+    int getMaximalPlaneNumber() const;
+
+    /**
+     * Get maximal segment number.
+     */
+    int getMaximalSegmentNumber() const;
+
+    /**
+     * Get maximal strip number.
+     */
+    int getMaximalStripNumber() const;
+
+    /**
      * Get maximal detector layer global number.
      */
     int getMaximalLayerGlobalNumber() const;

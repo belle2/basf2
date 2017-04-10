@@ -90,7 +90,8 @@ trgcdc_params = {
     'HoughFinderMappingFilePlus': Belle2.FileSystem.findFile("data/trg/cdc/HoughMappingPlus20160223.dat"),
     'DebugLevel': 0,
     'Fitter3Ds2DFitDrift': fitdrift,
-    'Fitter3DsXtSimple': xtsimple}
+    'Fitter3DsXtSimple': xtsimple,
+    '2DfinderCollection': 'TRGCDC2DFinderTracks'}
 trgcdc.param(trgcdc_params)
 if clock:
     trgcdc.param('inputCollection', 'CDCHits4Trg')

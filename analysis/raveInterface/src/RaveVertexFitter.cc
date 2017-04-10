@@ -309,8 +309,6 @@ void RaveVertexFitter::updateDaughters()
   std::vector < rave::Track > rTracks = m_raveVertices[0].tracks(); //< the original tracks
   std::vector < rave::Track > rfTracks = m_raveVertices[0].refittedTracks(); //< the refitted tracks
 
-  std::cout << "rTracks.size() = " << rTracks.size() << "    rfTracks.size() = " << rfTracks.size() << std::endl;
-
   for (unsigned int i = 0; i < rTracks.size(); i++) {
     rave::Track rtrk =  m_raveVertices[0].refittedTrack(rTracks[i]);
     const rave::Point3D fittedV = rtrk.position();
@@ -367,7 +365,5 @@ void RaveVertexFitter::updateDaughters()
     m_belleDaughters[i]->updateMomentum(p4, x3, fitted7CovM, pValDau);
 
   }
-
-  std::cout << "SI PUO' AGGIORNARE " << std::endl;
 
 }

@@ -75,8 +75,6 @@ void VertexFitUpdateDaughtersModule::initialize()
 
   if (m_decayString != "")
     m_decaydescriptor.init(m_decayString);
-  if (m_decayString == "")
-    B2FATAL("PartialUpdateDaughter: empty decayString, use ParticleVertexFitter");
 
 }
 
@@ -131,17 +129,34 @@ void VertexFitUpdateDaughtersModule::event()
 bool VertexFitUpdateDaughtersModule::doVertexFit(Particle* mother)
 {
 
-  std::vector<const Particle*> tracksVertex = m_decaydescriptor.getSelectionParticles(mother);
+  //std::vector<const Particle*> tracksVertex;
+  std::vector<Particle*> tracksVertex;
+
+  if (m_decayString == "") {
+    tracksVertex = mother->getDaughters();
+  } else {
+    std::vector<const Particle*> ctracksVertex = m_decaydescriptor.getSelectionParticles(mother);
+    for (unsigned itrack = 0; itrack < ctracksVertex.size(); itrack++) {
+      tracksVertex.push_back(const_cast<Particle*>(ctracksVertex[itrack]));
+    }
+  }
+
   std::vector<std::string> tracksName = m_decaydescriptor.getSelectionNames();
 
   int nvert = 0;
 
-  if (tracksVertex.size() == 0) return false;
+  if (tracksVertex.size() == 0) {
+    B2ERROR("VertexFitUpdateDaughtersModule: no track selected");
+    return false;
+  }
+
 
   if (tracksVertex.size() > 1) {
 
-
     analysis::RaveKinematicVertexFitter rsf;
+
+    if (m_decayString == "") rsf.setMother(mother);
+
     for (unsigned itrack = 0; itrack < tracksVertex.size(); itrack++) {
       if (tracksVertex[itrack] != mother) {
         rsf.addTrack(tracksVertex[itrack]);
@@ -150,28 +165,33 @@ bool VertexFitUpdateDaughtersModule::doVertexFit(Particle* mother)
       if (tracksVertex[itrack] == mother) B2WARNING("VertexFitUpdateDaughtersModule: Selected Mother not used in the fit");
     }
 
+
     TVector3 pos; TMatrixDSym RerrMatrix(7);
 
     nvert = rsf.fit();
 
     if (nvert > 0) {
-      pos = rsf.getPos();
-      RerrMatrix = rsf.getCov();
-      double prob = rsf.getPValue();
-      TLorentzVector mom(mother->getMomentum(), mother->getEnergy());
-      TMatrixDSym errMatrix(7);
 
-      for (int i = 0; i < 7; i++) {
-        for (int j = 0; j < 7; j++) {
-          if (i < 4 && j < 4) errMatrix(i, j) = RerrMatrix(i + 3, j + 3);
-          if (i > 3 && j > 3) errMatrix(i, j) = RerrMatrix(i - 4, j - 4);
-          if (i < 4 && j > 3) errMatrix(i, j) = RerrMatrix(i + 3, j - 4);
-          if (i > 3 && j < 4) errMatrix(i, j) = RerrMatrix(i - 4, j + 3);
+      if (m_decayString == "") {
+        rsf.updateMother();
+      } else {
+        pos = rsf.getPos();
+        RerrMatrix = rsf.getCov();
+        double prob = rsf.getPValue();
+        TLorentzVector mom(mother->getMomentum(), mother->getEnergy());
+        TMatrixDSym errMatrix(7);
+
+        for (int i = 0; i < 7; i++) {
+          for (int j = 0; j < 7; j++) {
+            if (i < 4 && j < 4) errMatrix(i, j) = RerrMatrix(i + 3, j + 3);
+            if (i > 3 && j > 3) errMatrix(i, j) = RerrMatrix(i - 4, j - 4);
+            if (i < 4 && j > 3) errMatrix(i, j) = RerrMatrix(i + 3, j - 4);
+            if (i > 3 && j < 4) errMatrix(i, j) = RerrMatrix(i - 4, j + 3);
+          }
         }
+        mother->updateMomentum(mom, pos, errMatrix, prob);
+        rsf.updateDaughters();
       }
-
-      mother->updateMomentum(mom, pos, errMatrix, prob);
-      rsf.updateDaughters();
 
     } else {return false;}
   }
@@ -188,7 +208,6 @@ bool VertexFitUpdateDaughtersModule::doVertexFit(Particle* mother)
 
     TVector3 pos; TMatrixDSym RerrMatrix(3);
 
-    //nvert = rsg.fit("kalman");
     nvert = rsg.fit("avf");
 
     if (nvert > 0) {
@@ -196,11 +215,12 @@ bool VertexFitUpdateDaughtersModule::doVertexFit(Particle* mother)
       RerrMatrix = rsg.getCov(0);
       double prob = rsg.getPValue(0);
       TLorentzVector mom(mother->getMomentum(), mother->getEnergy());
+      TMatrixDSym fitted7CovPart = mother->getMomentumVertexErrorMatrix() ;
       TMatrixDSym errMatrix(7);
       for (int i = 0; i < 7; i++) {
         for (int j = 0; j < 7; j++) {
           if (i > 3 && j > 3) {errMatrix[i][j] = RerrMatrix[i - 4][j - 4];}
-          else {errMatrix[i][j] = 0;} // da correggere: lasciare i valori precedenti
+          else {errMatrix[i][j] = fitted7CovPart[i][j];}
         }
       }
       mother->updateMomentum(mom, pos, errMatrix, prob);

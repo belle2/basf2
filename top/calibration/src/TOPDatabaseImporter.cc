@@ -12,6 +12,9 @@
 #include <top/calibration/TOPDatabaseImporter.h>
 #include <top/geometry/TOPGeometryPar.h>
 
+// framework - core
+#include <framework/core/RandomGenerator.h> // gRandom
+
 // framework - Database
 #include <framework/database/Database.h>
 #include <framework/database/IntervalOfValidity.h>
@@ -321,13 +324,9 @@ void TOPDatabaseImporter::generateFakeChannelMask(double fractionDead, double fr
   DBImportObjPtr<TOPCalChannelMask> channelMask;
   channelMask.construct();
 
-  // set up for loop channel maper and random number generator
+  // set up for loop channel mapper
   auto& chMapper = TOP::TOPGeometryPar::Instance()->getChannelMapper();
   const size_t nModules = TOP::TOPGeometryPar::Instance()->getGeometry()->getNumModules();
-  // http://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution
-  std::random_device rd;
-  std::mt19937 gen(rd());  // std generator
-  std::uniform_real_distribution<> dist(0, 1);
   unsigned ncall = 0;
   unsigned nall = 0;
 
@@ -342,11 +341,11 @@ void TOPDatabaseImporter::generateFakeChannelMask(double fractionDead, double fr
           for (int chan = 0; chan < 8; chan++) {
             auto channel = chMapper.getChannel(boardStack, carrierBoard, asic, chan);
             nall++;
-            if (dist(gen) < fractionDead) {
+            if (gRandom->Rndm() < fractionDead) {
               channelMask->setDead(moduleID, channel);
               ncall++;
             }
-            if (dist(gen) < fractionHot) {
+            if (gRandom->Rndm() < fractionHot) {
               channelMask->setNoisy(moduleID, channel);
               ncall++;
             }

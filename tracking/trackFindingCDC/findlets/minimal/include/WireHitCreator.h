@@ -81,6 +81,9 @@ namespace Belle2 {
       /// Parameter : If true, the second hit information will be used to create Wire Hits
       bool m_param_useSecondHits = false;
 
+      /// Parameter : Angular range in degrees for which hits should be unpacked
+      std::tuple<double, double> m_param_useDegreeSector{INFINITY, INFINITY};
+
     private: // Prepared variables
       /// Geometry set to be used.
       EWirePosition m_wirePosition = EWirePosition::c_Base;
@@ -93,6 +96,9 @@ namespace Belle2 {
 
       /// Bits for the used super layers
       std::array<bool, ISuperLayerUtil::c_N> m_useSuperLayers{};
+
+      /// Unit vectors denoting the sector for which hits should be created
+      std::array<Vector2D, 2> m_useSector{};
 
     private: // Translators
       /// TDC Count translator to be used to calculate the initial dirft length estiamtes

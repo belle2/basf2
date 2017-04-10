@@ -78,6 +78,10 @@ void WireHitCreator::exposeParameters(ModuleParamList* moduleParamList, const st
                                 "Use the second hit information in the track finding.",
                                 m_param_useSecondHits);
 
+  moduleParamList->addParameter(prefixed(prefix, "useDegreeSector"),
+                                m_param_useDegreeSector,
+                                "To angles in degrees for which hits should be created - mostly for debugging",
+                                m_param_useDegreeSector);
 }
 
 void WireHitCreator::initialize()
@@ -129,6 +133,11 @@ void WireHitCreator::initialize()
     m_useSuperLayers.fill(true);
   }
 
+  if (std::isfinite(std::get<0>(m_param_useDegreeSector))) {
+    m_useSector[0] = Vector2D::Phi(std::get<0>(m_param_useDegreeSector) * Unit::deg);
+    m_useSector[1] = Vector2D::Phi(std::get<1>(m_param_useDegreeSector) * Unit::deg);
+  }
+
   Super::initialize();
 }
 
@@ -175,6 +184,9 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
     const CDCWire& wire = wireTopology.getWire(wireID);
 
     const Vector2D& pos2D = wire.getRefPos2D();
+
+    // Check whether the position is outside the selected sector
+    if (pos2D.isBetween(m_useSector[1], m_useSector[0])) continue;
 
     // Consider the particle as incoming in the top part of the CDC for a downwards flight direction
     bool isIncoming = m_flightTimeEstimation == EPreferredDirection::c_Downwards and pos2D.y() > 0;

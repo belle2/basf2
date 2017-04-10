@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <analysis/modules/PartialUpdateDaughters/PartialUpdateDaughtersModule.h>
+#include <analysis/modules/VertexFitUpdateDaughters/VertexFitUpdateDaughtersModule.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -38,13 +38,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PartialUpdateDaughters)
+REG_MODULE(VertexFitUpdateDaughters)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-PartialUpdateDaughtersModule::PartialUpdateDaughtersModule() : Module(),
+VertexFitUpdateDaughtersModule::VertexFitUpdateDaughtersModule() : Module(),
   m_Bfield(0)
 {
   // Set module properties
@@ -59,11 +59,11 @@ PartialUpdateDaughtersModule::PartialUpdateDaughtersModule() : Module(),
   addParam("decayString", m_decayString, "specifies which daughter particles are included in the kinematic fit", string(""));
 }
 
-PartialUpdateDaughtersModule::~PartialUpdateDaughtersModule()
+VertexFitUpdateDaughtersModule::~VertexFitUpdateDaughtersModule()
 {
 }
 
-void PartialUpdateDaughtersModule::initialize()
+void VertexFitUpdateDaughtersModule::initialize()
 {
   // magnetic field
   m_Bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
@@ -71,7 +71,7 @@ void PartialUpdateDaughtersModule::initialize()
   // RAVE setup
   analysis::RaveSetup::initialize(1, m_Bfield);
 
-  B2INFO("PartialUpdateDaughters : magnetic field = " << m_Bfield);
+  B2INFO("VertexFitUpdateDaughters : magnetic field = " << m_Bfield);
 
   if (m_decayString != "")
     m_decaydescriptor.init(m_decayString);
@@ -80,11 +80,11 @@ void PartialUpdateDaughtersModule::initialize()
 
 }
 
-void PartialUpdateDaughtersModule::beginRun()
+void VertexFitUpdateDaughtersModule::beginRun()
 {
 }
 
-void PartialUpdateDaughtersModule::event()
+void VertexFitUpdateDaughtersModule::event()
 {
   //cout<<"DECAY STRING = "<<m_decayString<<endl;
 
@@ -100,12 +100,12 @@ void PartialUpdateDaughtersModule::event()
   m_beamSpotCov.ResizeTo(3, 3);
   TMatrixDSym beamSpotCov(3);
   if (m_withConstraint == "ipprofile") m_beamSpotCov = m_beamParams->getCovVertex();
-  if (m_withConstraint == "iptube") PartialUpdateDaughtersModule::findConstraintBoost(2.);
+  if (m_withConstraint == "iptube") VertexFitUpdateDaughtersModule::findConstraintBoost(2.);
 
   if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube"  || m_withConstraint == "mother") {
     analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
   } else {
-    if (m_withConstraint != "") B2FATAL("PartialUpdateDaughtersModule: worng constraint");
+    if (m_withConstraint != "") B2FATAL("VertexFitUpdateDaughtersModule: worng constraint");
   }
 
   std::vector<unsigned int> toRemove;
@@ -128,7 +128,7 @@ void PartialUpdateDaughtersModule::event()
   analysis::RaveSetup::getInstance()->reset();
 }
 
-bool PartialUpdateDaughtersModule::doVertexFit(Particle* mother)
+bool VertexFitUpdateDaughtersModule::doVertexFit(Particle* mother)
 {
 
   std::vector<const Particle*> tracksVertex = m_decaydescriptor.getSelectionParticles(mother);
@@ -145,9 +145,9 @@ bool PartialUpdateDaughtersModule::doVertexFit(Particle* mother)
     for (unsigned itrack = 0; itrack < tracksVertex.size(); itrack++) {
       if (tracksVertex[itrack] != mother) {
         rsf.addTrack(tracksVertex[itrack]);
-        B2DEBUG(1, "PartialUpdateDaughtersModule: Adding particle " << tracksName[itrack] << " to vertex fit ");
+        B2DEBUG(1, "VertexFitUpdateDaughtersModule: Adding particle " << tracksName[itrack] << " to vertex fit ");
       }
-      if (tracksVertex[itrack] == mother) B2WARNING("PartialUpdateDaughtersModule: Selected Mother not used in the fit");
+      if (tracksVertex[itrack] == mother) B2WARNING("VertexFitUpdateDaughtersModule: Selected Mother not used in the fit");
     }
 
     TVector3 pos; TMatrixDSym RerrMatrix(7);
@@ -178,13 +178,13 @@ bool PartialUpdateDaughtersModule::doVertexFit(Particle* mother)
 
 
   if (tracksVertex.size() == 1) {
-    if (m_withConstraint == "") B2FATAL("PartialUpdateDaughtersModule: sigle track fit needs a valid constraint");
+    if (m_withConstraint == "") B2FATAL("VertexFitUpdateDaughtersModule: sigle track fit needs a valid constraint");
 
     // One track fit cannot be kinematic
     analysis::RaveVertexFitter rsg;
     rsg.addTrack(tracksVertex[0]);
-    B2DEBUG(1, "PartialUpdateDaughtersModule: Adding particle " << tracksName[0] << " to vertex fit ");
-    if (tracksVertex[0] == mother) B2FATAL("PartialUpdateDaughtersModule: Selected Mother not used in sigle track fit");
+    B2DEBUG(1, "VertexFitUpdateDaughtersModule: Adding particle " << tracksName[0] << " to vertex fit ");
+    if (tracksVertex[0] == mother) B2FATAL("VertexFitUpdateDaughtersModule: Selected Mother not used in sigle track fit");
 
     TVector3 pos; TMatrixDSym RerrMatrix(3);
 
@@ -214,16 +214,16 @@ bool PartialUpdateDaughtersModule::doVertexFit(Particle* mother)
 
 
 
-void PartialUpdateDaughtersModule::endRun()
+void VertexFitUpdateDaughtersModule::endRun()
 {
 }
 
-void PartialUpdateDaughtersModule::terminate()
+void VertexFitUpdateDaughtersModule::terminate()
 {
 }
 
 
-void PartialUpdateDaughtersModule::findConstraintBoost(double cut)
+void VertexFitUpdateDaughtersModule::findConstraintBoost(double cut)
 {
 
   PCmsLabTransform T;

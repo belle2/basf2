@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTIALUPDATEDAUGHTERSMODULE_H
-#define PARTIALUPDATEDAUGHTERSMODULE_H
+#ifndef VERTEXFITUPDATEDAUGHTERSMODULE_H
+#define VERTEXFITUPDATEDAUGHTERSMODULE_H
 
 #include <framework/core/Module.h>
 #include <string>
@@ -32,17 +32,17 @@ namespace Belle2 {
    *
    * a way of performing vertex fits and update daughters   *
    */
-  class PartialUpdateDaughtersModule : public Module {
+  class VertexFitUpdateDaughtersModule : public Module {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    PartialUpdateDaughtersModule();
+    VertexFitUpdateDaughtersModule();
 
     /** sdf */
-    virtual ~PartialUpdateDaughtersModule();
+    virtual ~VertexFitUpdateDaughtersModule();
 
     /** sdf */
     virtual void initialize();
@@ -85,4 +85,4 @@ namespace Belle2 {
   };
 }
 
-#endif /* PARTIALUPDATEDAUGHTERSMODULE_H */
+#endif /* VERTEXFITUPDATEDAUGHTERSMODULE_H */

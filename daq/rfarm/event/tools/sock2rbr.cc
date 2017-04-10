@@ -53,11 +53,9 @@ int main(int argc, char** argv)
       }
     }
     nevt++;
-    /*
     if (nevt % 5000 == 0) {
       printf("sock2rbr : evt = %d\n", nevt);
     }
-    */
   }
   exit(0);
 }

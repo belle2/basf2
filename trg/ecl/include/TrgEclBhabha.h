@@ -40,18 +40,28 @@ namespace Belle2 {
     virtual ~TrgEclBhabha();/// Destructor
 
   public:
-
-    bool GetBhabha00(std::vector<double>);//  Belle 2D Bhabha veto method
-    bool GetBhabha01(std::vector<double>, std::vector<double>); //  Belle II 3D Bhabha veto method
-    std::vector<double> GetBhabhaComb() {return BhabhaComb ;} // Output 2D Bhabha combination
+    //!  Belle 2D Bhabha veto method
+    bool GetBhabha00(std::vector<double>);
+    //!  Belle II 3D Bhabha veto method
+    bool GetBhabha01();
+    //! Output 2D Bhabha combination
+    std::vector<double> GetBhabhaComb() {return BhabhaComb ;}
+    //! Save
+    void save(int);
 
   private:
-    //
-    /** 4 region along r phi plane  */
-    int Quadrant[3][4];
     /** Object of TC Mapping */
     TrgEclMapping* _TCMap;
+    /** Bhabha Combination*/
     std::vector<double> BhabhaComb;
+    /** Max TC Id */
+    std::vector<double> MaxTCId;
+    /** Cluster Energy*/
+    std::vector<double> ClusterEnergy;
+    /** Cluster Timing*/
+    std::vector<double> ClusterTiming;
+
+
   };
 //
 //

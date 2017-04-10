@@ -29,8 +29,7 @@ namespace Belle2 {
 
     //! The TC id of this hit.
     int m_TCId;
-
-    //
+    //! beambkg tag
     int m_beambkgtag;
     //! Deposited energy of this hit.
     double m_edep;
@@ -83,6 +82,7 @@ namespace Belle2 {
     TRGECLHit(
       int eventId,
       int TCId,
+      int beambkgtag,
       double edep,
       double TimeAve
     )
@@ -91,8 +91,11 @@ namespace Belle2 {
       m_TCId = TCId;
       m_edep = edep;
       m_TimeAve = TimeAve;
+      m_beambkgtag = beambkgtag;
+
     }
-    ClassDef(TRGECLHit, 1); /*< the class title */
+    /** the class title */
+    ClassDef(TRGECLHit, 1);
 
   };
 

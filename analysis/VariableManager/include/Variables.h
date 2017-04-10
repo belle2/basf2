@@ -257,6 +257,11 @@ namespace Belle2 {
     double particleMdstArrayIndex(const Particle* part);
 
     /**
+     * return unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)
+     */
+    double particleMdstSource(const Particle* part);
+
+    /**
      * returns cosinus of StoreArray index (0-based) of the MDST object from which the Particle was created.
      * To be used for random ranking.
      */
@@ -693,6 +698,21 @@ namespace Belle2 {
      * return 1/0 if charged track is/is not Matched to this cluster
      */
     double eclClusterTrackMatched(const Particle* particle);
+
+    /**
+     * return the ConnectedRegion ID of this cluster
+     */
+    double eclClusterConnectedRegionId(const Particle* particle);
+
+    /**
+     * return the Cluster ID of this cluster
+     */
+    double eclClusterId(const Particle* particle);
+
+    /**
+     * return the Hypothesis ID of this cluster
+     */
+    double eclClusterHypothesisId(const Particle* particle);
 
     /**
      * return always zero

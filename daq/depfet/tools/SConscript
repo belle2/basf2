@@ -1,0 +1,11 @@
+Import('env')
+
+env['TOOLS_LIBS']['depfetdaqd'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['merger'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['sender'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['receiver'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['recorder'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['generator'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+env['TOOLS_LIBS']['monitor'] = ['daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+
+Return('env')

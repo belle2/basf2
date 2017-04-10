@@ -11,7 +11,6 @@
 
 
 namespace Belle2 {
-
   //!  Digitize result
   class TRGECLWaveform: public TObject {
   private:
@@ -24,9 +23,7 @@ namespace Belle2 {
     int m_phiid;
     //! Theta id of TC
     int m_thetaid;
-    //! TC Energy and Timing
-    //! Raw TC energy
-
+    //! Waveform
     double m_TCDigiE[64];
 
   public:
@@ -36,42 +33,50 @@ namespace Belle2 {
     {
       m_eventid = 0;
       m_tcid = 0;
-
+      m_phiid = 0;
+      m_thetaid = 0;
       for (int i = 0; i < 64; i++) m_TCDigiE[i] = 0;
     }
     //! Useful Constructor
     TRGECLWaveform(int tcid, double* digiarray)
     {
       m_tcid = tcid;
-
+      m_eventid = 0;
+      m_phiid = 0;
+      m_thetaid = 0;
       for (int i = 0 ; i < 64; i++) {
         m_TCDigiE[i] = digiarray[i];
       }
 
     }
     ~TRGECLWaveform() {};
-
+    //! Get TC Id
     int getTCID() const
     {
       return m_tcid;
     }
+    //! Get WaveForm
     const double* getWaveform() const
     {
       return m_TCDigiE;
     }
+    //! Fill Waveform
     void fillWaveform(double* wf) const
     {
       for (int i = 0; i < 64; i++) wf[i] = m_TCDigiE[i];
     }
+    //! Set Theta and Phi Id of TC
     void setThetaPhiIDs(int thid, int phid)
     {
       m_phiid = phid;
       m_thetaid = thid;
     }
+    //! Get Theta Id
     int getThetaID() const
     {
       return m_thetaid;
     }
+    //! Get Phi ID
     int getPhiID() const
     {
       return m_phiid;

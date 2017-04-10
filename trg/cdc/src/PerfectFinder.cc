@@ -62,89 +62,9 @@ namespace Belle2 {
   int
   TRGCDCPerfectFinder::doit(vector<TCTrack*>& trackListClone, vector<TCTrack*>& trackList)
   {
-//  return doitPerfectlySingleTrack(trackList);
     int result = doitPerfectly(trackList);
     trackListClone = trackList;
     return result;
-  }
-
-  int
-  TRGCDCPerfectFinder::doitPerfectlySingleTrack(
-    vector<TRGCDCTrack*>& trackList)
-  {
-
-    TRGDebug::enterStage("Perfect Finder Single Track");
-
-    //...TS hit loop...
-    //   Presently assuming single track event.
-    //   Select the best TS(the fastest hit) in eash super layer.
-    //
-
-    vector<TCLink*> links;
-    for (unsigned i = 0; i < _cdc.nSegmentLayers(); i++) {
-      const Belle2::TRGCDCLayer* l = _cdc.segmentLayer(i);
-      const unsigned nWires = l->nCells();
-      if (! nWires) continue;
-
-      int timeMin = 99999;
-      const TCSegment* best = 0;
-      for (unsigned j = 0; j < nWires; j++) {
-        const TCSegment& s = (TCSegment&) * (* l)[j];
-
-        //...Select hit TS only...
-        const TRGSignal& signal = s.signal();
-        if (! signal.active())
-          continue;
-
-        //...Select TS with the shortest drift time.
-        const TRGTime& t = * signal[0];
-        if (t.time() < timeMin) {
-          timeMin = t.time();
-          best = & s;
-        }
-      }
-
-      if (best) {
-        TCLink* link = new TCLink(0,
-                                  best->hit(),
-                                  best->hit()->cell().xyPosition());
-        links.push_back(link);
-      }
-    }
-
-    //...Let's fit it...
-    TCCircle c = TCCircle(links);
-    c.fit();
-    c.name("CircleFitted");
-
-    //...Make a track...
-    TCTrack& t = * new TCTrack(c);
-    t.name("Track");
-    trackList.push_back(& t);
-
-    if (TRGDebug::level())
-      t.dump("detail");
-
-#ifdef TRGCDC_DISPLAY_HOUGH
-    vector<const TCCircle*> cc;
-    cc.push_back(& c);
-    vector<const TCTrack*> tt;
-    tt.push_back(& t);
-    string stg = "2D : Perfect Finder circle fit";
-    string inf = "   ";
-    D->clear();
-    D->stage(stg);
-    D->information(inf);
-    D->area().append(cc, Gdk::Color("#FF0066009900"));
-//  D->area().append(tt, Gdk::Color("#990066009900"));
-    D->area().append(_cdc.hits());
-    D->area().append(_cdc.segmentHits());
-    D->show();
-    D->run();
-#endif
-
-    TRGDebug::leaveStage("Perfect Finder Single Track");
-    return 0;
   }
 
   int

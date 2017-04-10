@@ -3,7 +3,7 @@
 //---------------------------------------------------------------
 // Filename : TrgEclBhabha.cc
 // Section  : TRG ECL
-// Owner    : InSu Lee/Yuuji Unno
+// Owner    : InSoo Lee/Yuuji Unno
 // Email    : islee@hep.hanyang.ac.kr / yunno@post.kek.jp
 //---------------------------------------------------------------
 // Description : A class to represent TRG ECL
@@ -14,11 +14,13 @@
 #define TRG_SHORT_NAMES
 #define TRGECLCLUSTER_SHORT_NAMES
 #include <framework/gearbox/Unit.h>
+#include "framework/datastore/StoreArray.h"
 
 
 #include <trg/ecl/TrgEclBhabha.h>
 #include <framework/logging/Logger.h>
 
+#include "trg/ecl/dataobjects/TRGECLCluster.h"
 
 using namespace std;
 using namespace Belle2;
@@ -28,6 +30,10 @@ using namespace Belle2;
 TrgEclBhabha::TrgEclBhabha()
 {
   BhabhaComb.clear();
+  MaxTCId.clear();
+  ClusterEnergy.clear();
+  ClusterTiming.clear();
+
   _TCMap = new TrgEclMapping();
 
 
@@ -36,7 +42,6 @@ TrgEclBhabha::TrgEclBhabha()
 
 TrgEclBhabha::~TrgEclBhabha()
 {
-
   delete _TCMap;
 }
 bool TrgEclBhabha::GetBhabha00(std::vector<double> PhiRingSum)  //Belle 2D Bhabha veto method
@@ -110,15 +115,69 @@ bool TrgEclBhabha::GetBhabha00(std::vector<double> PhiRingSum)  //Belle 2D Bhabh
 
   return  BtoBflag;
 }
-bool TrgEclBhabha::GetBhabha01(std::vector<double> ClusterEnergy, std::vector<double> ClusterTiming)
+bool TrgEclBhabha::GetBhabha01()
 {
-
+  //-----------------------
+  // 3D Bhabha veto
+  //------------------------
   bool BtoBflag = false;
+  bool GapFlag = false;
+  // bool ThetaBtoBFlag = false;
+  // bool PhiBtoBFlag = false;
+  //
+  //
+  // Read Cluster Table
+  //
+  //
+  StoreArray<TRGECLCluster> trgeclClusterArray;
+  for (int ii = 0; ii < trgeclClusterArray.getEntries(); ii++) {
+
+    TRGECLCluster* aTRGECLCluster = trgeclClusterArray[ii];
+
+    int maxTCId    = aTRGECLCluster ->getMaxTCId();
+    double clustertiming    = aTRGECLCluster ->getEnergyDep();
+    double clusterenergy =  aTRGECLCluster -> getTimeAve();
+
+    ClusterTiming.push_back(clustertiming);
+    ClusterEnergy.push_back(clusterenergy);
+    MaxTCId.push_back(maxTCId);
+
+  }
+
+
+  const int hit_size = ClusterEnergy.size();
+  //
+  //
+  //
+  //Find 2 energetic TCs in a event
+  //
+  std::vector<double> Max2TCId;
+  std::vector<double> Max2Energy;
+  std::vector<double> Max2Timing;
+  Max2TCId.clear();
+  Max2Energy.clear();
+  Max2Timing.clear();
+  Max2Energy.resize(2, 0.0);
+  Max2Timing.resize(2, 0.0);
+  for (int ihit = 0; ihit < hit_size; ihit ++) {
+    if (Max2Energy[0] < ClusterEnergy[ihit]) {
+      Max2Energy[0] = ClusterEnergy[ihit];
+      Max2Timing[0] = ClusterTiming[ihit];
+
+    } else if (Max2Energy[0] > ClusterEnergy[ihit] && Max2Energy[1] < ClusterEnergy[ihit]) {
+      Max2Energy[1] = ClusterEnergy[ihit];
+      Max2Timing[1] = ClusterTiming[ihit];
+    }
+  }
+
+  if (Max2Energy[0] == 0 && Max2Energy[1] == 0) {return BtoBflag;}
+  else if (Max2Energy[0] != 0 && Max2Energy[1] == 0) { //Gap event
+    GapFlag = true;
+  }
 
 
 
-
-  return BtoBflag;
+  return GapFlag;
 }
 
 //

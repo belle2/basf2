@@ -39,7 +39,7 @@ namespace Belle2 {
    *   - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
    *
    * o) neutral final state particles
-   *   - gamma                            (input MDST type = ECLCluster)
+   *   - gamma                            (input MDST type = ECLCluster with hypothesis N1 only at the moment)
    *   - K_S0, Lambda0, converted photons (input MDST type = V0)
    *   - K_L0                             (input MDST type = KLMCluster)
    *

@@ -40,12 +40,14 @@ class ClassificationOverview:
                  select=[],
                  exclude=[],
                  groupbys=[],
+                 auxiliaries=[],
                  filters=[]):
         self.output_file_name = output_file_name
         self.truth_name = truth_name
         self.select = select
         self.exclude = exclude
         self.groupbys = groupbys
+        self.auxiliaries = auxiliaries
         self.filters = filters
 
         self.classification_analyses = []
@@ -87,6 +89,7 @@ class ClassificationOverview:
         exclude = self.exclude
         select = self.select
         groupbys = self.groupbys
+        auxiliaries = self.auxiliaries
         filters = self.filters
 
         if select:
@@ -94,9 +97,6 @@ class ClassificationOverview:
 
         if exclude:
             variable_names = [name for name in variable_names if name not in exclude]
-
-        if groupbys:
-            variable_names = [name for name in variable_names if name not in groupbys]
 
         if filters:
             variable_names = [name for name in variable_names if name not in filters]
@@ -111,7 +111,7 @@ class ClassificationOverview:
 
         import root_numpy
         print("Loading tree")
-        branch_names = {*variable_names, truth_name, *groupbys, *filters}
+        branch_names = {*variable_names, truth_name, *groupbys, *auxiliaries, *filters}
         branch_names = [name for name in branch_names if name]
         input_array = root_numpy.tree2array(input_tree, branches=branch_names)
         input_record_array = input_array.view(np.recarray)
@@ -147,10 +147,14 @@ class ClassificationOverview:
                     for variable_name in variable_names:
                         print('Analyse', variable_name, 'groupby', groupby, '=', groupby_value)
 
+                        if variable_name == groupby:
+                            continue
+
                         # Get the truths as a numpy array
                         estimates = input_record_array[variable_name]
                         estimates[estimates == np.finfo(np.float32).max] = float("nan")
                         estimates[estimates == -np.finfo(np.float32).max] = -float("inf")
+                        auxiliaries = {name: input_record_array[name][groupby_select] for name in self.auxiliaries}
 
                         classification_analysis = classification.ClassificationAnalysis(
                             contact="",
@@ -158,7 +162,11 @@ class ClassificationOverview:
                             outlier_z_score=5.0,
                             allow_discrete=True,
                         )
-                        classification_analysis.analyse(estimates[groupby_select], truths[groupby_select])
+                        classification_analysis.analyse(
+                            estimates[groupby_select],
+                            truths[groupby_select],
+                            auxiliaries=auxiliaries
+                        )
 
                         with root_cd(variable_name) as tdirectory:
                             classification_analysis.write(tdirectory)

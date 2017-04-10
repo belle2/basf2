@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
 
+#include <mdst/dataobjects/ECLCluster.h>
+
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
@@ -36,6 +38,8 @@ namespace {
     {
       DataStore::Instance().setInitializeActive(true);
       StoreArray<Particle>::registerPersistent();
+      StoreArray<ECLCluster> eclClusters;
+      eclClusters.registerInDataStore();
       DataStore::Instance().setInitializeActive(false);
     }
 
@@ -709,6 +713,28 @@ namespace {
   {
     // create particles
     StoreArray<Particle> particles;
+    StoreArray<ECLCluster> eclClusters;
+
+    ECLCluster* eclGamma1 = eclClusters. appendNew(ECLCluster());
+    eclGamma1->setConnectedRegionId(1);
+    eclGamma1->setClusterId(1);
+    eclGamma1->setHypothesisId(5);
+    ECLCluster* eclGamma2 = eclClusters. appendNew(ECLCluster());
+    eclGamma2->setConnectedRegionId(1);
+    eclGamma2->setClusterId(2);
+    eclGamma2->setHypothesisId(5);
+    ECLCluster* eclGamma3 = eclClusters. appendNew(ECLCluster());
+    eclGamma3->setConnectedRegionId(2);
+    eclGamma3->setClusterId(1);
+    eclGamma3->setHypothesisId(5);
+    ECLCluster* eclGamma4 = eclClusters. appendNew(ECLCluster());
+    eclGamma4->setConnectedRegionId(3);
+    eclGamma4->setClusterId(1);
+    eclGamma4->setHypothesisId(5);
+    ECLCluster* eclKL = eclClusters. appendNew(ECLCluster());
+    eclKL->setConnectedRegionId(3);
+    eclKL->setClusterId(1);
+    eclKL->setHypothesisId(6);
 
     Particle* pip_1 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0),  211, Particle::c_Flavored, Particle::c_Track, 2));
     Particle* pip_2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0),  211, Particle::c_Flavored, Particle::c_Track, 4));
@@ -733,18 +759,19 @@ namespace {
     Particle* km_1_copy = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), -321, Particle::c_Flavored, Particle::c_Track, 1));
     Particle* kp_1_copy = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0),  321, Particle::c_Flavored, Particle::c_Track, 2));
 
-    Particle* g_1 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster, 1));
-    Particle* g_2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster, 2));
-    Particle* g_3 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster, 3));
-    Particle* g_4 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster, 4));
+    Particle* g_1 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster, 0));
+    Particle* g_2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster, 1));
+    Particle* g_3 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster, 2));
+    Particle* g_4 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster, 3));
+    Particle* KL  = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 130, Particle::c_Unflavored, Particle::c_ECLCluster, 4));
 
 
     Particle* g_1_copy = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
-                                                      1));
+                                                      0));
     Particle* g_2_copy = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
-                                                      2));
+                                                      1));
     Particle* g_3_copy = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
-                                                      3));
+                                                      2));
 
     // create Particle Lists
     // pi+:all
@@ -833,6 +860,15 @@ namespace {
     gamma_1->initialize(22, "gamma:1");
     gamma_2->initialize(22, "gamma:2");
 
+    // Klong
+    StoreObjPtr<ParticleList> klong_1("K_L0:1");
+    DataStore::Instance().setInitializeActive(true);
+    klong_1.registerInDataStore();
+    DataStore::Instance().setInitializeActive(false);
+
+    klong_1.create();
+    klong_1->initialize(130, "K_L0:1");
+
     // add particles to lists
     pipAll->addParticle(pip_1);
     pipAll->addParticle(pip_2);
@@ -872,6 +908,8 @@ namespace {
     gamma_2->addParticle(g_3_copy);
     gamma_2->addParticle(g_4);
 
+    klong_1->addParticle(KL);
+
     // Check consistency
     EXPECT_EQ(6, pipAll->getListSize());
     EXPECT_EQ(6, pimAll->getListSize());
@@ -881,6 +919,7 @@ namespace {
     EXPECT_EQ(2, kpGood->getListSize());
     EXPECT_EQ(3, gamma_1->getListSize());
     EXPECT_EQ(4, gamma_2->getListSize());
+    EXPECT_EQ(1, klong_1->getListSize());
 
     // check if indexToUniqueID map is properly initialized
     ParticleGenerator comb7("D+:3 -> K-:all K+:good K-:good2 pi+:good pi+:all gamma:1 gamma:2");
@@ -955,6 +994,10 @@ namespace {
     StoreObjPtr<ParticleList> anti_D02KK_2("anti-D0:kk2");
     StoreObjPtr<ParticleList>      D02KK_3("D0:kk3");
     StoreObjPtr<ParticleList> anti_D02KK_3("anti-D0:kk3");
+    StoreObjPtr<ParticleList>      D0KLg_1("D0:klg1");
+    StoreObjPtr<ParticleList>      D0KLg_2("D0:klg2");
+    StoreObjPtr<ParticleList> anti_D0KLg_1("anti-D0:klg1");
+    StoreObjPtr<ParticleList> anti_D0KLg_2("anti-D0:klg2");
     DataStore::Instance().setInitializeActive(true);
     D02Kpi_1.registerInDataStore();
     anti_D02Kpi_1.registerInDataStore();
@@ -966,6 +1009,10 @@ namespace {
     anti_D02KK_2.registerInDataStore();
     D02KK_3.registerInDataStore();
     anti_D02KK_3.registerInDataStore();
+    D0KLg_1.registerInDataStore();
+    D0KLg_2.registerInDataStore();
+    anti_D0KLg_1.registerInDataStore();
+    anti_D0KLg_2.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
     D02Kpi_1.create();
@@ -998,6 +1045,16 @@ namespace {
     anti_D02KK_3->initialize(-421, "anti-D0:kk3");
     D02KK_3->bindAntiParticleList(*(anti_D02KK_3));
 
+    D0KLg_1.create();
+    D0KLg_2.create();
+    anti_D0KLg_1.create();
+    anti_D0KLg_2.create();
+    D0KLg_1->initialize(421, "D0:klg1");
+    D0KLg_2->initialize(421, "D0:klg2");
+    anti_D0KLg_1->initialize(-421, "anti-D0:klg1");
+    anti_D0KLg_2->initialize(-421, "anti-D0:klg2");
+    D0KLg_1->bindAntiParticleList(*(anti_D0KLg_1));
+    D0KLg_2->bindAntiParticleList(*(anti_D0KLg_2));
     // make combinations
     ParticleGenerator combiner_D02Kpi_1("D0:kpi1 -> K-:all pi+:all");
     combiner_D02Kpi_1.init();
@@ -1077,6 +1134,36 @@ namespace {
     EXPECT_EQ(9 , D02KK_3->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
     EXPECT_EQ(9 , D02KK_3->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle, true));
 
+
+    ParticleGenerator combiner_D02KLg1("D0:klg1 -> K_L0:1 gamma:1");
+    ParticleGenerator combiner_D02KLg2("D0:klg2 -> K_L0:1 gamma:2");
+    combiner_D02KLg1.init();
+    while (combiner_D02KLg1.loadNext()) {
+      const Particle& particle = combiner_D02KLg1.getCurrentParticle();
+
+      particles.appendNew(particle);
+      int iparticle = particles.getEntries() - 1;
+
+      D0KLg_1->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
+    }
+    EXPECT_EQ(3, D0KLg_1->getListSize());
+    EXPECT_EQ(0 , D0KLg_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
+    EXPECT_EQ(0 , D0KLg_1->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
+    EXPECT_EQ(3 , D0KLg_1->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
+
+    combiner_D02KLg2.init();
+    while (combiner_D02KLg2.loadNext()) {
+      const Particle& particle = combiner_D02KLg2.getCurrentParticle();
+
+      particles.appendNew(particle);
+      int iparticle = particles.getEntries() - 1;
+
+      D0KLg_2->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
+    }
+    EXPECT_EQ(3, D0KLg_2->getListSize());
+    EXPECT_EQ(0 , D0KLg_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle));
+    EXPECT_EQ(0 , D0KLg_2->getNParticlesOfType(ParticleList::c_FlavorSpecificParticle, true));
+    EXPECT_EQ(3 , D0KLg_2->getNParticlesOfType(ParticleList::c_SelfConjugatedParticle));
 
     // more examples
     // D+ -> K- pi+ pi+

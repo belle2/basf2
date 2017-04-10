@@ -6,11 +6,21 @@ from ROOT import Belle2
 
 
 class EffModule(Module):
+    """
+    This module is to calculate and print out the efficiency of each L1 trigger line with
+    the trigger result from object 'TRGGDLResults'
+    """
+    #: The total number of events
     Ntot_event = 0
+    #: The number of events passing L1 trigger
     Ntrg_event = 0
+    #: The number of events passing each L1 trigger line
     Nsubtrg_event = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
     def event(self):
+        """
+        Event function to count the numbers of events passing each trigger line
+        """
         self.Ntot_event += 1
         trgresult = Belle2.PyStoreObj('TRGGDLResults')
         summary = trgresult.getL1TriggerResults()
@@ -23,6 +33,9 @@ class EffModule(Module):
                 self.Nsubtrg_event[i] += 1
 
     def terminate(self):
+        """
+        Calculate the efficiency of each trigger line with the statistical values in event function
+        """
         if self.Ntot_event == 0:
             return
         sp = ' '

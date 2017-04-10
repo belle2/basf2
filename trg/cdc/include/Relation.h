@@ -35,7 +35,7 @@ namespace Belle2 {
 
     /// Constructor.
     TRGCDCRelation(const TRGCDCTrackBase& track,
-                   const std::map<unsigned, unsigned> relation);
+                   const std::map<unsigned, unsigned>& relation);
 
     /// Destructor
     virtual ~TRGCDCRelation();

@@ -54,11 +54,11 @@ namespace Belle2 {
     ~TRGCDCJSignal() {}
 
     /// Assign operator with setting target clock with outputing final code.
-    TRGCDCJSignal& assignTo(TRGCDCJSignal const rhs, int targetClock, std::string& finalCode);
+    TRGCDCJSignal& assignTo(TRGCDCJSignal const& rhs, int targetClock, std::string& finalCode);
     /// Assign operator with setting target clock.
-    TRGCDCJSignal& assignTo(TRGCDCJSignal const rhs, int targetClock);
+    TRGCDCJSignal& assignTo(TRGCDCJSignal const& rhs, int targetClock);
     /// Assign operator.
-    TRGCDCJSignal& operator<= (TRGCDCJSignal const rhs);
+    TRGCDCJSignal& operator<= (TRGCDCJSignal const& rhs);
     /// Unary operator.
     TRGCDCJSignal const operator- () const;
     /// Arithmetic add operator.
@@ -73,21 +73,21 @@ namespace Belle2 {
     /// Shift signal. Shift direction is right. operate=0 to change m_toReal(unit).
     TRGCDCJSignal const shift(int nBits, int operate = 1) const;
     /// Outputs an offset signal which is an unsigned signal.
-    TRGCDCJSignal const offset(TRGCDCJSignal const valueMin) const;
+    TRGCDCJSignal const offset(TRGCDCJSignal const& valueMin) const;
     /// Outputs a signal that is not offset.
-    TRGCDCJSignal const invOffset(TRGCDCJSignal const valueMin) const;
+    TRGCDCJSignal const invOffset(TRGCDCJSignal const& valueMin) const;
     /// Case method. Reference is what is used to determine. Target is what is going to be assigned. Data is (Assignment, From, To)... (Assignment). Last is default.
     /// Choose with target clock. Also has input for target min and target max signal.
     static void choose(TRGCDCJSignal& target, TRGCDCJSignal const& targetMin, TRGCDCJSignal const& targetMax,
                        TRGCDCJSignal const& reference, std::vector<std::vector<TRGCDCJSignal> > data, int targetClock);
     /// Chooes method. Also has input for target min and target max signal.
     static void choose(TRGCDCJSignal& target, TRGCDCJSignal const& targetMin, TRGCDCJSignal const& targetMax,
-                       TRGCDCJSignal const& reference, std::vector<std::vector<TRGCDCJSignal> > data);
+                       TRGCDCJSignal const& reference, std::vector<std::vector<TRGCDCJSignal> >& data);
     /// Choose with target clock.
     static void choose(TRGCDCJSignal& target, TRGCDCJSignal const& reference, std::vector<std::vector<TRGCDCJSignal> > data,
                        int targetClock);
     /// Choose method.
-    static void choose(TRGCDCJSignal& target, TRGCDCJSignal const& reference, std::vector<std::vector<TRGCDCJSignal> > data);
+    static void choose(TRGCDCJSignal& target, TRGCDCJSignal const& reference, std::vector<std::vector<TRGCDCJSignal> >& data);
     /// If else implementation with target clock.
     static void ifElse(std::vector<std::pair<TRGCDCJSignal, std::vector<std::pair<TRGCDCJSignal*, TRGCDCJSignal> > > >& data,
                        int targetClock);
@@ -217,7 +217,7 @@ namespace Belle2 {
     /// Calculates integer value with unit of a TRGCDCJSignal.
     static signed long long calInt(double value, TRGCDCJSignal const& mother);
     /// Calculates vhdl bitwidth and type for operation.
-    static void calVhdlTypeBitwidth(TRGCDCJSignal const& first, std::string operation, TRGCDCJSignal const& second, int& type,
+    static void calVhdlTypeBitwidth(TRGCDCJSignal const& first, std::string& operation, TRGCDCJSignal const& second, int& type,
                                     int& bitwidth);
     /// Initializes the argument signals for the signal.
     void initArgumentSignals();
@@ -247,7 +247,7 @@ namespace Belle2 {
     static std::string ifElseVhdlCode(std::vector<std::pair<TRGCDCJSignal, std::vector<std::pair<TRGCDCJSignal*, TRGCDCJSignal> > > >
                                       const& data);
     /// Prints vhdl code.
-    void printVhdl(std::string vhdlCode);
+    void printVhdl(std::string& vhdlCode);
     /// Checks underflow or overflow for TRGCDCJSignal.
     void checkInt(std::string name) const;
     /// Checks if signal is same signal

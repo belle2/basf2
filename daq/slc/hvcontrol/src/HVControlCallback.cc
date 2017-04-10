@@ -78,19 +78,19 @@ throw(HVHandlerException)
           paramLock();
           setSwitch(crateid, slot, ch, false);
           set(vname + "switch", "OFF");
-          /*
-                if (channel.isTurnOn()) {
-                  if (m_state_demand.isOn() && !getSwitch(crateid, slot, ch)) {
-                    setSwitch(crateid, slot, ch, true);
-                    set(vname + "switch", "ON");
-                  }
-                } else {
-                  if (getSwitch(crateid, slot, ch)) {
-                    setSwitch(crateid, slot, ch, false);
-                    set(vname + "switch", "OFF");
-                  }
-                }
-          */
+          ///*
+          if (channel.isTurnOn()) {
+            if (m_state_demand.isOn() && !getSwitch(crateid, slot, ch)) {
+              setSwitch(crateid, slot, ch, true);
+              set(vname + "switch", "ON");
+            }
+          } else {
+            if (getSwitch(crateid, slot, ch)) {
+              setSwitch(crateid, slot, ch, false);
+              set(vname + "switch", "OFF");
+            }
+          }
+          //*/
           setRampUpSpeed(crateid, slot, ch, channel.getRampUpSpeed());
           setRampDownSpeed(crateid, slot, ch, channel.getRampDownSpeed());
           LogFile::debug("voltage.demand : %f ", channel.getVoltageDemand());
@@ -173,6 +173,7 @@ void HVControlCallback::monitor() throw()
                     (channel.isTurnOn() && state != HVMessage::ON)) {
           isstable = false;
         }
+        LogFile::debug("istrunon = %s state = %s", (channel.isTurnOn() ? "ON" : "OFF"), state_s.c_str());
         if (m_mon_tmp[crateid][i].state != state) {
           set(vname + "state", state_s);
           m_mon_tmp[crateid][i].state = state;

@@ -37,7 +37,7 @@ using namespace std;
 namespace Belle2 {
 //
 //
-//
+//! Register Module
   REG_MODULE(TRGECL);
 //
 //

@@ -38,12 +38,7 @@ CONTACT = "oliver.frost@desy.de"
 
 
 class ClusterFilterValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
-    segment_finder_module = basf2.register_module("TFCDC_SegmentFinderFacetAutomaton")
-    segment_finder_module.param({
-        "WriteClusters": True,
-        "FacetFilter": "none",
-        "FacetRelationFilter": "none",
-    })
+    cluster_preparation_module = basf2.register_module("TFCDC_ClusterPreparer")
 
     py_profile = True
     output_file_name = "ClusterFilterValidation.root"  # Specification for BrowseTFileOnTerminateRunMixin
@@ -57,8 +52,8 @@ class ClusterFilterValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGe
         # based on the properties in the base class.
         main_path = super(ClusterFilterValidationRun, self).create_path()
 
-        segment_finder_module = self.get_basf2_module(self.segment_finder_module)
-        main_path.add_module(segment_finder_module)
+        cluster_preparation_module = self.get_basf2_module(self.cluster_preparation_module)
+        main_path.add_module(cluster_preparation_module)
 
         # main_path.add_module(AxialStereoPairFitterModule())
         validation_module = ClusterFilterValidationModule(output_file_name=self.output_file_name)

@@ -257,43 +257,56 @@ int ARICHMerger::setThreshold(double th0, double dth/*, const DBObject& obj*/, i
 void ARICHMerger::load_global(ARICHFEBSA0x& sa03, unsigned int chip)
 {
   SA0xGlobalParam& prm(m_globalparam[chip]);
-  sa03.select(chip, -1);
-  printf("param: 0x%x\n", prm.param());
-  sa03.wparam(prm.param());
-  sa03.prmset(); // load parameter
-  sa03.ndro();   // ndro
-  int val = sa03.rparam();
-  prm.rbparam(val);
-  printf("rbparam: 0x%x\n", val);
-  /* compare */
-  if (prm.compare(false) == 0) {
-    LogFile::debug("global param 0x%07x correctly loaded for chip %d (id=0x%x).",
-                   prm.param(), chip, prm.getrb_id());
-  } else {
-    throw (RCHandlerException("Error in global param for chip %d (id=0x%x):"
-                              "(set 0x%07x readback 0x%07x).", chip,
-                              prm.getrb_id(), prm.param(), prm.getrb_masked()));
+  for (int i = 0; i < 10; i++) {
+    sa03.select(chip, -1);
+    printf("param: 0x%x\n", prm.param());
+    sa03.wparam(prm.param());
+    sa03.prmset(); // load parameter
+    sa03.ndro();   // ndro
+    int val = sa03.rparam();
+    prm.rbparam(val);
+    printf("rbparam: 0x%x\n", val);
+    /* compare */
+    if (prm.compare(false) == 0) {
+      LogFile::debug("global param 0x%07x correctly loaded for chip %d (id=0x%x).",
+                     prm.param(), chip, prm.getrb_id());
+      return;
+    } else {
+      LogFile::warning("Error in global param for chip %d (id=0x%x):"
+                       "(set 0x%07x readback 0x%07x).", chip,
+                       prm.getrb_id(), prm.param(), prm.getrb_masked());
+    }
   }
+  throw (RCHandlerException("Error in global param for chip %d (id=0x%x):"
+                            "(set 0x%07x readback 0x%07x).", chip,
+                            prm.getrb_id(), prm.param(), prm.getrb_masked()));
 }
 
 void ARICHMerger::load_ch(ARICHFEBSA0x& sa03, unsigned int chip, unsigned int ch)
 {
   SA0xChannelParam& prm(m_channelparam[chip][ch]);
-  sa03.select(chip, ch);
-  sa03.wparam(prm.param());
-  sa03.prmset(); // load parameter
-  sa03.ndro(); // load parameter once more
-  int val = sa03.rparam();
-  prm.rbparam(val);
-  /* compare */
-  if (prm.compare(false) == 0) {
-    LogFile::debug("ch. param 0x%07x correctly loaded for chip %d ch %2d.",
-                   prm.param(), chip, ch);
-  } else {
-    throw (RCHandlerException("Error in ch. param for chip %d ch %2d:"
-                              "(set 0x%07x readback 0x%07x).", chip, ch,
-                              prm.param(), prm.rbparam()));
+  for (int i = 0; i < 10; i++) {
+    sa03.select(chip, ch);
+    sa03.wparam(prm.param());
+    sa03.prmset(); // load parameter
+    sa03.ndro(); // load parameter once more
+    int val = sa03.rparam();
+    prm.rbparam(val);
+    /* compare */
+    if (prm.compare(false) == 0) {
+      LogFile::debug("ch. param 0x%07x correctly loaded for chip %d ch %2d.",
+                     prm.param(), chip, ch);
+      usleep(500);
+      return;
+    } else {
+      LogFile::warning("Error in ch. param for chip %d ch %2d:"
+                       "(set 0x%07x readback 0x%07x).", chip, ch,
+                       prm.param(), prm.rbparam());
+    }
+    usleep(500);
   }
-  usleep(500);
+  throw (RCHandlerException("Error in ch. param for chip %d ch %2d:"
+                            "(set 0x%07x readback 0x%07x).", chip, ch,
+                            prm.param(), prm.rbparam()));
 }
 

@@ -25,7 +25,9 @@ namespace Belle2 {
       "curv",
       "curv_var",
       "chi2",
+      "chi2_no_rl",
       "chi2_per_ndf",
+      "chi2_no_rl_per_ndf",
       "ndf",
       "p_value",
     };

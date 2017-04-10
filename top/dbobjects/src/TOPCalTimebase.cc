@@ -20,7 +20,7 @@ const TOPSampleTimes* TOPCalTimebase::getSampleTimes(unsigned scrodID,
 {
   if (m_map.empty()) createMap();
 
-  unsigned key = (scrodID << 16) + channel;
+  unsigned key = (scrodID << 16) + (channel % 128);
   typedef std::map<unsigned, const TOPSampleTimes*>::const_iterator Iterator;
   Iterator it = m_map.find(key);
   if (it == m_map.end()) return m_sampleTime;

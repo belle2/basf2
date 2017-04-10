@@ -102,8 +102,17 @@ namespace Belle2 {
     /** Override output file name for modules */
     void setOutputFileOverride(const std::string& name) { m_outputFileOverride = name; }
 
-    /** Return overriden output file name, or "" if none was set */
-    const std::string& getOutputFileOverride() const { return m_outputFileOverride; }
+    /** Return overriden output file name, or "" if none was set
+     *
+     * Note that this will remove the current value to avoid reuse.
+     * (e.g. subsequent calls will always return "")
+     */
+    std::string getOutputFileOverride()
+    {
+      std::string s = m_outputFileOverride;
+      m_outputFileOverride = "";
+      return s;
+    }
 
     /** Override number of processes to run in parallel.
      *

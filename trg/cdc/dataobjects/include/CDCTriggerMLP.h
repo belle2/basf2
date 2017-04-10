@@ -15,12 +15,12 @@ namespace Belle2 {
     CDCTriggerMLP();
 
     /** constructor to set all parameters (not weights and relevantID ranges). */
-    CDCTriggerMLP(std::vector<unsigned short> nNodes,
+    CDCTriggerMLP(std::vector<unsigned short>& nNodes,
                   unsigned short targetVars,
-                  std::vector<float> outputScale,
-                  std::vector<float> phiRange,
-                  std::vector<float> invptRange,
-                  std::vector<float> thetaRange,
+                  std::vector<float>& outputScale,
+                  std::vector<float>& phiRange,
+                  std::vector<float>& invptRange,
+                  std::vector<float>& thetaRange,
                   unsigned short maxHits,
                   unsigned long SLpattern,
                   unsigned long SLpatternMask,

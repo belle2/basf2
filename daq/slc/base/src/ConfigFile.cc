@@ -65,6 +65,14 @@ void ConfigFile::read(std::istream& is, bool overload)
     if (str_v.size() >= 2) {
       std::string label = StringUtil::replace(StringUtil::replace(str_v[0],
                                                                   " ", ""), "\t", "");
+      if (label.find("[]") != std::string::npos) {
+        if (m_count.find(label) == m_count.end()) {
+          m_count.insert(std::pair<std::string, int>(label, 0));
+        }
+        std::string l = label;
+        label = StringUtil::replace(label, "[]", StringUtil::form("[%d]", m_count[l]));
+        m_count[l] = m_count[l] + 1;
+      }
       if (str_v.size() > 2) {
         for (size_t i = 2; i < str_v.size(); i++) {
           str_v[1].append(":");

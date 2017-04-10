@@ -21,10 +21,7 @@ namespace Belle2 {
   typedef std::pair<std::string, DataStore::EDurability>
   AccessorParams; /**< Pair of parameters needed to find an object in the DataStore. */
 
-  /** Base class for StoreObjPtr and StoreArray for easier common treatment.
-   *
-   *  @author <a href="mailto:software@belle2.kek.jp?subject=StoreAccessorBase">The basf2 developers</a>
-   */
+  /** Base class for StoreObjPtr and StoreArray for easier common treatment.  */
   class StoreAccessorBase {
   public:
 

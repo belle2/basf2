@@ -30,23 +30,21 @@ REG_MODULE(ROIDQM)
 //-----------------------------------------------------------------
 
 ROIDQMModule::ROIDQMModule()
-  : HistoModule(),
-    m_InterDir(NULL),
-    m_ROIDir(NULL),
-    hInterDictionary(40, [](const Belle2::VxdID & vxdid) {return (size_t)vxdid.getID(); }),
-hROIDictionary(40, [](const Belle2::VxdID& vxdid) {return (size_t)vxdid.getID(); }),
-hROIDictionaryEvt(40, [](const Belle2::VxdID& vxdid) {return (size_t)vxdid.getID(); }),
-
-m_numModules(0),
-hnROIs(NULL),
-hnInter(NULL),
-harea(NULL),
-hredFactor(NULL),
-hCellUV(NULL),
-n_events(0),
-h_HitRow_CellU(NULL),
-h_HitCol_CellV(NULL)
-
+  : HistoModule()
+  , m_InterDir(NULL)
+  , m_ROIDir(NULL)
+  , hInterDictionary(40, [](const Belle2::VxdID & vxdid) {return (size_t)vxdid.getID(); })
+, hROIDictionary(40, [](const Belle2::VxdID& vxdid) {return (size_t)vxdid.getID(); })
+, hROIDictionaryEvt(40, [](const Belle2::VxdID& vxdid) {return (size_t)vxdid.getID(); })
+, m_numModules(0)
+, hnROIs(NULL)
+, hnInter(NULL)
+, harea(NULL)
+, hredFactor(NULL)
+, hCellUV(NULL)
+, n_events(0)
+, h_HitRow_CellU(NULL)
+, h_HitCol_CellV(NULL)
 {
   //Set module properties
   setDescription("Monitor of the  ROIs creation on HLT");
@@ -172,7 +170,7 @@ void ROIDQMModule::event()
   harea->Fill((double)ROIarea);
 
   hredFactor->Fill((double)redFactor);
-  //  cout << " o  DQM: area = " << ROIarea << "  redFactor = " << redFactor << endl;
+
 
   for (auto it = hROIDictionaryEvt.begin(); it != hROIDictionaryEvt.end(); ++it) {
     ROIHistoAccumulateAndFill aROIHistoAccumulateAndFill = it->second;
@@ -365,8 +363,6 @@ void ROIDQMModule::createHistosDictionaries()
               const VXD::SensorInfoBase& aSensorInfo = m_aGeometry.getSensorInfo(it.getSensorID());
               double residU = inter->getCoorU() - aSensorInfo.getUCellPosition(it.getUCellID(), it.getVCellID());
               double residV = inter->getCoorV() - aSensorInfo.getVCellPosition(it.getVCellID());
-              //    double residU = inter->getCoorU() + it.getVCellID()*75e-4 ;
-              //    double residV = inter->getCoorV() + it.getUCellID()*50e-4 ;
               hPtr->Fill(residU, residV);
             }
         }
@@ -595,7 +591,6 @@ void ROIDQMModule::createHistosDictionaries()
 
           struct timeval triggerTime;
           rawFTSW[0]->GetTTTimeVal(0, & triggerTime);
-          //    int time =  int (   (triggerTime.tv_sec *1e6  + triggerTime.tv_usec  ) ) % 100000;
           long int time =  triggerTime.tv_usec;
 
           for (auto& it : PXDDigits)

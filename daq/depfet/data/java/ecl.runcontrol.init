@@ -1,0 +1,17 @@
+#
+# Login to Belle II Run control
+#
+
+hostname : ropc02.kek.jp
+port : 9090
+nsmhost : 172.22.32.11
+nsmport : 8122
+nsmnode : RC_GUI_konno2
+nsmtarget : ECL
+data00.dataname : ECL_STATUS
+data00.format : rc_status
+data00.revision : 4
+
+#
+#
+#

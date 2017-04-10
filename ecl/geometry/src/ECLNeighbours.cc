@@ -19,7 +19,7 @@
 #include <framework/gearbox/Unit.h>
 
 // OTHER
-#include "TMath.h" // for Nint
+#include "TMath.h"
 #include "TVector3.h"
 
 using namespace Belle2;
@@ -57,10 +57,18 @@ ECLNeighbours::ECLNeighbours(const std::string& neighbourDef, const double par)
     if ((par > 0.0) and (par < 30.0 * Belle2::Unit::cm)) initializeR(par);
     else B2FATAL("ECLNeighbours::ECLNeighbours: " << par << " is an invalid parameter (must be between 0 cm and 30 cm)!");
   }
+  // or neighbours that form a cross, user defined coverage of up to 100% in neighbouring ring:
+  else if (neighbourDef == "F") {
+    double parChecked = par;
+    if (parChecked > 1.0) parChecked = 1.0;
+    else if (parChecked < 0.1) parChecked = 0.1;
+    B2INFO("ECLNeighbours::ECLNeighbours: initialize " << neighbourDef << ", fraction: " << parChecked);
+    initializeF(parChecked);
+  }
   // or wrong type:
   else {
     B2FATAL("ECLNeighbours::ECLNeighbours (constructor via std::string): Invalid option: " << neighbourDef <<
-            " (valid: N1, N2, N3, N4, N5 or R ( with R<30 cm)");
+            " (valid: N, NC, NC2, R ( with R<30 cm), F (with 0.1<f<1)");
   }
 
 }
@@ -107,6 +115,105 @@ void ECLNeighbours::initializeR(double radius)
 
   // all done, reoplace the original map
   m_neighbourMap = m_neighbourMapTemp;
+
+}
+
+void ECLNeighbours::initializeF(double frac)
+{
+  // ECL geometry
+  ECLGeometryPar* geom = ECLGeometryPar::Instance();
+
+  for (int i = 0; i < 8736; i++) {
+    // this vector will hold all neighbours for the i-th crystal
+    std::vector<short int> neighbours;
+
+    // phi and theta coordinates of the central crystal
+    geom->Mapping(i);
+    const short tid = geom->GetThetaID();
+    const short pid = geom->GetPhiID();
+
+    // add the two in the same theta ring
+    const short int phiInc = increasePhiId(pid, tid, 1);
+    const short int phiDec = decreasePhiId(pid, tid, 1);
+    neighbours.push_back(geom->GetCellID(tid , pid) + 1);
+    neighbours.push_back(geom->GetCellID(tid , phiInc) + 1);
+    neighbours.push_back(geom->GetCellID(tid , phiDec) + 1);
+
+    double fracPos = (pid + 0.5) / m_crystalsPerRing[tid];
+
+    // find the two closest crystals in the inner theta ring
+    short int tidinner = tid - 1;
+    if (tidinner >= 0) {
+
+      short int n1 = -1;
+      double dist1 = 999.;
+      short int pid1 = -1;
+      short int n2 = -1;
+      double dist2 = 999.;
+
+      for (short int inner = 0; inner < m_crystalsPerRing[tidinner]; ++inner) {
+        const double f = (inner + 0.5) / m_crystalsPerRing[tidinner];
+        const double dist = fabs(fracPos - f);
+        if (dist < dist1) {
+          dist2 = dist1;
+          dist1 = dist;
+          n2 = n1;
+          n1 = geom->GetCellID(tidinner, inner);
+          pid1 = inner;
+        } else if (dist < dist2) {
+          dist2 = dist;
+          n2 = geom->GetCellID(tidinner, inner);
+        }
+      }
+
+      // check coverage
+      double cov = TMath::Min(((double) pid + 1) / m_crystalsPerRing[tid],
+                              ((double) pid1 + 1) / m_crystalsPerRing[tidinner]) - TMath::Max(((double) pid) / m_crystalsPerRing[tid],
+                                  ((double) pid1) / m_crystalsPerRing[tidinner]);
+      cov = cov / (1. / m_crystalsPerRing[tid]);
+
+      neighbours.push_back(n1 + 1);
+      if (cov < frac - 1e-4) neighbours.push_back(n2 + 1);
+    }
+
+    // find the two closest crystals in the outer theta ring
+    short int tidouter = tid + 1;
+    if (tidouter <= 68) {
+      short int no1 = -1;
+      double disto1 = 999.;
+      short int pido1 = -1;
+      short int no2 = -1;
+      double disto2 = 999.;
+
+      for (short int outer = 0; outer < m_crystalsPerRing[tidouter]; ++outer) {
+        const double f = (outer + 0.5) / m_crystalsPerRing[tidouter];
+        const double dist = fabs(fracPos - f);
+        if (dist < disto1) {
+          disto2 = disto1;
+          disto1 = dist;
+          no2 = no1;
+          no1 = geom->GetCellID(tidouter, outer);
+          pido1 = outer;
+        } else if (dist < disto2) {
+          disto2 = dist;
+          no2 = geom->GetCellID(tidouter, outer);
+        }
+      }
+      // check coverage
+      double cov = TMath::Min(((double) pid + 1) / m_crystalsPerRing[tid],
+                              ((double) pido1 + 1) / m_crystalsPerRing[tidouter]) - TMath::Max(((double) pid) / m_crystalsPerRing[tid],
+                                  ((double) pido1) / m_crystalsPerRing[tidouter]);
+      cov = cov / (1. / m_crystalsPerRing[tid]);
+
+      neighbours.push_back(no1 + 1);
+      if (cov < frac - 1e-4) {
+        neighbours.push_back(no2 + 1);
+      }
+    }
+
+    // push back the final vector of IDs
+    m_neighbourMap.push_back(neighbours);
+  }
 
 }
 

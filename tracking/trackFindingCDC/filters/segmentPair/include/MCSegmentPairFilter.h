@@ -27,8 +27,18 @@ namespace Belle2 {
       /// Constructor
       explicit MCSegmentPairFilter(bool allowReverse = true);
 
+      /// Expose the set of parameters of the filter to the module parameter list.
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+
       /// Checks if a axial stereo segment pair is a good combination.
       Weight operator()(const CDCSegmentPair& segmentPair) final;
+
+    private:
+      /// Parameter : Switch to require the segment combination contain mostly correct rl information
+      bool m_param_requireRLPure = true;
+
+      /// Parameter : Minimum segment size to pass as monte carlo truth
+      int m_param_minSegmentSize = 4;
     };
   }
 }

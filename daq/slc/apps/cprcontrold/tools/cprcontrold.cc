@@ -2,7 +2,9 @@
 
 #include <daq/slc/runcontrol/RCNodeDaemon.h>
 
+#ifdef BELLE2_DAQ_PYFEE
 #include <daq/slc/pyb2daq/PyFEE.h>
+#endif
 
 #include <daq/slc/system/DynamicLoader.h>
 
@@ -26,6 +28,7 @@ int main(int argc, char** argv)
     std::string name = config.get("fee.name");
     const std::string script = config.get("fee.script");
     if (script.size() > 0) {
+#ifdef BELLE2_DAQ_PYFEE
       for (int i = 0; i < 4; i++) {
         if (config.getBool(StringUtil::form("fee.%c.used", i + 'a'))) {
           try {
@@ -39,6 +42,7 @@ int main(int argc, char** argv)
           fee[i] = NULL;
         }
       }
+#endif
     } else if (libname.size() > 0) {
       std::string funcname = "get" + name + "FEE";
       LogFile::debug("dlopen(lib=%s, func=%s)", libname.c_str(), funcname.c_str());

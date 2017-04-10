@@ -88,16 +88,16 @@ void Rbuf2RbufModule::event()
 
   // Get a record from input ringbuf
   while ((size = m_rbufin->remq(evtbuf)) == 0) {
-    usleep(100);
-    //    usleep(20);
+    //    usleep(100);
+    usleep(20);
   }
 
   // Put the record in output ringbuf
   for (;;) {
     int stat = m_rbufout->insq(evtbuf, size);
     if (stat >= 0) break;
-    usleep(100);
-    //    usleep(20);
+    //    usleep(100);
+    usleep(20);
   }
 
   // Set EventMetaData

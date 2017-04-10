@@ -18,8 +18,10 @@ using namespace std;
 
 namespace TrgTest {
 
+  /** Test class for the NeuroTrigger */
   class NeuroTriggerTest : public TestHelpers::TestWithGearbox {
   protected:
+    /** set up the test environment */
     virtual void SetUp()
     {
       // Stolen from
@@ -50,9 +52,9 @@ namespace TrgTest {
       CDC::CDCGeometryPar::Instance(&cdcGeometry);
     }
 
+    /** Close the gearbox and reset the global objects */
     virtual void TearDown()
     {
-      // Close the gearbox and reset the global objects
       Database::reset();
       DataStore::Instance().reset();
     }

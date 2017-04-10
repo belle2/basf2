@@ -170,7 +170,8 @@ void MuidModule::beginRun()
 
 void MuidModule::event()
 {
-  m_Extrapolator->event(true);
+  //m_Extrapolator->event(true);
+  m_Extrapolator->eventMuid();
 }
 
 void MuidModule::endRun()

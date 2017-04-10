@@ -93,7 +93,7 @@ namespace Belle2 {
     //! The method to get cell id
     int getNofTCinCluster() const { return m_NofTCinCluster; }
     //! The method to get the Maximum TC  id
-    int getkMaxTCId() const { return m_MaxTCId; }
+    int getMaxTCId() const { return m_MaxTCId; }
 
     //! The method to get deposited energy
     double getEnergyDep() const { return m_edep; }

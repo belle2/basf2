@@ -71,6 +71,7 @@ namespace Belle2 {
     int m_particleProperties;                                   /**< Internal encoding of m_whichParticles to avoid string comparisons */
     double m_energyCut;                                         /**< Create track candidates only for MCParticles with energy above this cut*/
     bool m_neutrals;                                            /**< Boolean to mark if track candidates should also be created for neutral particles.*/
+    bool m_mergeDecayInFlight;                                  /**< Boolean to merge decay in flight chains that involve a single charged particle */
 
     bool m_setTimeSeed;                                         /**< Boolean to forward the production time as seed time*/
     double m_smearing;                                          /**< Smearing of MCMomentum and MCVertex in %. This adds a relative error to the initial values without changing the default large initial covariance matrix using for fitting*/

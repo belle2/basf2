@@ -73,7 +73,7 @@ namespace Belle2 {
       void fillInTrackSegmentId();
 
       /// Fill the look up table of the number of traversed super layers until each hit
-      void fillNPassedSuperLayers();
+      void fillNLoopsAndNPassedSuperLayers();
 
       /// Helper function to decide whether the number of passed superlayers changed from one segment to the next
       /** The number of passed superlayers is easily detectable in a switch of the superlayer number form one segment to the next.
@@ -92,6 +92,9 @@ namespace Belle2 {
 
       /// Getter for the number of super layers traversed until this hit.
       Index getNPassedSuperLayers(const CDCHit* ptrHit) const;
+
+      /// Getter for the number of traversed loops until this hit.
+      Index getNLoops(const CDCHit* ptrHit) const;
 
     private:
       /// Reference to the MC map of the current event
@@ -115,6 +118,8 @@ namespace Belle2 {
       /// Look up table for the number of super layers the particle traversed before making the individual hit
       std::map<const CDCHit*, int> m_nPassedSuperLayers;
 
+      /// Look up table for the number of loops the particle traversed before making the individual hit
+      std::map<const CDCHit*, int> m_nLoops;
     };
   }
 }

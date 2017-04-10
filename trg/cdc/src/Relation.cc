@@ -22,7 +22,7 @@ using namespace std;
 namespace Belle2 {
 
   TRGCDCRelation::TRGCDCRelation(const TRGCDCTrackBase& track,
-                                 const std::map<unsigned, unsigned> relation)
+                                 const std::map<unsigned, unsigned>& relation)
     : _track(track),
       _relations(relation),
       _pairs(0)

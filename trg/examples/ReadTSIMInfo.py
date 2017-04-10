@@ -385,45 +385,78 @@ def PrintBranchDef():
 
 
 class CreateLogics(Module):
+    """This module is to calculate some variables which are useful for the trigger development"""
+    #: the output file
     file = ROOT.TFile(argvs[2], 'recreate')
+    #: the tree in the output file
     tgrl = ROOT.TTree('tgrl', 'tree with GRL_Logic')
+    #: #2d finder tracks
     ntrk_2dfinder_t = array('i', [-1])
+    #: #2d fitter tracks
     ntrk_2dfitter_t = array('i', [-1])
+    #: #3d fitter tracks
     ntrk_3dfitter_t = array('i', [-1])
+    #: #NN tracks
     ntrk_NN_t = array('i', [-1])
+    #: #2d matched tracks
     ntrk_2Dmatch_t = array('i', [-1])
+    #: #3d matched tracks
     ntrk_3Dmatch_t = array('i', [-1])
+    #: #max phi angle between two 2d finder tracks
     max_deltphi_2dfinder_t = array('f', [0.0])
+    #: #cluster pairs with different energy threshold
     cpair_t = array('i', 8 * [0])
-
+    #: #array components
     ncomp_clu = 3
+    #: the total deposited cluster energy in ecl
     etot_t = array('f', [0.0])
+    #: #ecl cluster with threshold >1.0GeV, exclude TC ID 1,2, 17
     ncluster_1000b_t = array('i', [-1])
+    #: # ecl cluster with threshold >2.0GeV in TC ID 1, 17
     ncluster_2000e_t = array('i', [-1])
+    #: # ecl clusters
     ncluster_t = array('i', [-1])
+    #: # ecl cluster w/o associated cdc track
     ncluster_neutral_t = array('i', [-1])
+    #: [energy, theta, phi] of the largest energetic ecl neutral  cluster
     max_cluster_neutral_t = array('f', ncomp_clu * [0.0])
+    #: [energy, theta, phi] of the largest energetic ecl neutral  cluster in CMS
     max_cms_cluster_neutral_t = array('f', ncomp_clu * [0.0])
+    #: [energy, theta, phi] of the largest energetic ecl cluster
     max_cluster_t = array('f', ncomp_clu * [0.0])
+    #: [energy, theta, phi] of the largest energetic ecl cluster in CMS
     max_cms_cluster_t = array('f', ncomp_clu * [0.0])
+    #: [energy, theta, phi] of the secondary energetic ecl neutral cluster
     smax_cluster_neutral_t = array('f', ncomp_clu * [0.0])
+    #: [energy, theta, phi] of the secondary energetic ecl neutral cluster in CMS
     smax_cms_cluster_neutral_t = array('f', ncomp_clu * [0.0])
+    #: [energy, theta, phi] of the secondary energetic ecl cluster
     smax_cluster_t = array('f', ncomp_clu * [0.0])
+    #: [energy, theta, phi] of the secondary energetic ecl cluster in CMS
     smax_cms_cluster_t = array('f', ncomp_clu * [0.0])
+    #: max delt phi angle between two clusters
     max_deltphi_cluster_t = array('f', [0.0])
+    #: the timing of clusters
     time_cluster_t = array('f', 100 * [-99999.])
-
+    #: #KLM track
     ntrk_klm_t = array('i', [-1])
+    #: #KLM hits
     nhit_klm_t = array('i', [-1])
-
+    #: # back to back track and cluster pairs
     npair_tc_t = array('i', [-1])
+    #: # back to back cluster pairs
     npair_cc_t = array('i', [-1])
-
+    #: #array components
     nbha_var = 5
+    #: bhabha veto logic, 1: bhabha, 0: non bhabha
     bhabha_t = array('i', [0])
+    #: bhabha with single track veto logic, 1: bhabha, 0: non bhabha
     sbhabha_t = array('i', [0])
+    #: eclbhabha veto logic, 1: bhabha, 0: non bhabha
     eclbhabha_t = array('i', [0])
+    #: variables used in bhabha logic, [Delt_theta, Delt_phi, E1, E2, E1+E2]
     bhabha_var_t = array('f', nbha_var * [0.0])
+    #: variables used in eclbhabha logic, [Delt_theta, Delt_phi, E1, E2, E1+E2]
     eclbhabha_var_t = array('f', nbha_var * [0.0])
 
     # track
@@ -604,6 +637,7 @@ class CreateLogics(Module):
         self.tgrl.Fill()
 
     def terminate(self):
+        """Write and close the file"""
         self.file.cd()
         self.file.Write()
         self.file.Close()

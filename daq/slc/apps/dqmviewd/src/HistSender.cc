@@ -24,20 +24,22 @@ HistSender::~HistSender()
 {
   // m_socket.close();
   // LogFile::debug("GUI disconnected.");
+  m_configured = false;
 }
 
-bool HistSender::update(std::vector<TH1*>& hist)
+bool HistSender::update(std::vector<TH1*>& hist, bool newconf)
 {
   try {
     TCPSocketWriter writer(m_socket);
     int count = 0;
-    static bool configured = false;
-    if (!configured) {
+    if (newconf) m_configured = false;
+    if (!m_configured) {
       writer.writeInt(FLAG_CONFIG);
       writer.writeInt(hist.size());
       for (size_t n = 0; n < hist.size(); n++) {
         TH1* h = hist[n];
         std::string name = h->GetName();
+        LogFile::info(name);
         StringList str_v = StringUtil::split(name, '/');
         //LogFile::info(name);
         std::string dirname = "";
@@ -46,7 +48,6 @@ bool HistSender::update(std::vector<TH1*>& hist)
           name = str_v[1];
         }
         //LogFile::info(dirname);
-        //LogFile::info(name);
         TString class_name = h->ClassName();
         writer.writeString(class_name.Data());
         writer.writeString(dirname);
@@ -81,7 +82,7 @@ bool HistSender::update(std::vector<TH1*>& hist)
         }
         writer.writeInt(0x7FFF);
       }
-      configured = true;
+      m_configured = true;
     }
     writer.writeInt(FLAG_UPDATE);
     writer.writeInt(hist.size());

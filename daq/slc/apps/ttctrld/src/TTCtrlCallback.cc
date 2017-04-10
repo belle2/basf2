@@ -23,6 +23,7 @@
 extern "C" {
   ft2p_t stat2p026(ftsw_t* ftsw, int ftswid, char* ss, char* fstate);
   ft2u_t stat2u067(ftsw_t* ftsw, int ftswid, char* ss, char* fstate);
+  //void stat2u067(ftsw_t *ftsw, int ftswid);
 }
 
 #ifndef D
@@ -107,12 +108,12 @@ namespace Belle2 {
     virtual ~NSMVHandlerStartFT() throw() {}
     bool handleSetInt(int val)
     {
+      g_flag = true;
       int expno = (val >> 24) & 0xff;
       int runno = val & 0xffffff;
       m_callback.resetft();
       usleep(1000);
       m_callback.start(expno, runno);
-      g_flag = true;
       return true;
     }
   private:
@@ -122,7 +123,7 @@ namespace Belle2 {
   class NSMVHandlerTrigIO : public NSMVHandlerText {
   public:
     NSMVHandlerTrigIO(TTCtrlCallback& callback, const std::string& name)
-      : NSMVHandlerText(name, false, true, std::string("off")), m_callback(callback) {}
+      : NSMVHandlerText(name, true, true, std::string("off")), m_callback(callback) {}
     virtual ~NSMVHandlerTrigIO() throw() {}
     bool handleSetText(const std::string& val)
     {
@@ -298,7 +299,6 @@ namespace Belle2 {
       if (File::exist(firmware)) {
         NSMVHandlerText::handleSetText(firmware);
         std::stringstream ss;
-        ss << "jtagft -" << m_ftswid << " ";
         for (int i = 0; i < 8; i++) {
           int used = 0;
           std::string vname = StringUtil::form("jtag.fee[%d].enable", i);
@@ -307,11 +307,17 @@ namespace Belle2 {
             ss << "-p" << i << " ";
           }
         }
-        ss << " -tfp program " << firmware;
-        std::string cmd = ss.str();
+        std::string cmd = StringUtil::form("jtagft -%d %s -tfp program ", m_ftswid, ss.str().c_str()) + firmware;
         LogFile::info(cmd);
+        m_callback.set("msg", "jtagft to " + ss.str());
+        m_callback.log(LogFile::INFO, "jtagft to " + ss.str());
         system(cmd.c_str());
+        m_callback.set("msg", "jtagft done");
+        m_callback.log(LogFile::INFO, "jtagft done: %s", firmware.c_str());
         return true;
+      } else {
+        m_callback.log(LogFile::WARNING, "Ignored : No bit file %s", firmware.c_str());
+        m_callback.set("msg", "No bit file: " + firmware);
       }
       return false;
     }
@@ -327,13 +333,17 @@ namespace Belle2 {
   public:
     void run()
     {
+      char ss[1024];
       while (true) {
         g_mutex.lock();
         try {
           if (g_flag == true) {
-            //stat2u067(g_ftsw, m_ftswid);
+            stat2u067(g_ftsw, m_ftswid, ss, g_ftstat.state);
             std::string state = g_ftstat.state;
-            if (state == "READY" && g_ftstat.toutcnt >= g_ftstat.tlimit) {
+            if (state == "READY"
+                //(state == "READY" || state == "PAUSED")
+                && g_ftstat.toutcnt >= g_ftstat.tlimit) {
+              m_callback.log(LogFile::NOTICE, "Trigger limit (state = %s)", g_ftstat.state);
               m_callback.set("toutcnt", (int)g_ftstat.toutcnt);
               m_callback.set("ftstate", g_ftstat.state);
               m_callback.set("endft", (int)1);
@@ -394,6 +404,7 @@ void TTCtrlCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 
 void TTCtrlCallback::configure(const DBObject& obj) throw(RCHandlerException)
 {
+  add(new NSMVHandlerText("msg", true, false, ""));
   add(new NSMVHandlerInt("expno", true, false, 0));
   add(new NSMVHandlerInt("runno", true, false, 0));
   add(new NSMVHandlerInt("subno", true, false, 0));
@@ -418,6 +429,7 @@ void TTCtrlCallback::configure(const DBObject& obj) throw(RCHandlerException)
   add(new NSMVHandlerText("statft", true, false, ""));
   //add(new NSMVHandlerStatFT(*this, "statft"));
   add(new NSMVHandlerResetFT(*this, "resetft"));
+  add(new NSMVHandlerStartFT(*this, "startft"));
   add(new NSMVHandlerTrigIO(*this, "trigio"));
   add(new NSMVHandlerInt("endft", true, false, 0));
   add(new NSMVHandlerRegFT(*this, "portmask", 0x170));
@@ -525,7 +537,8 @@ void TTCtrlCallback::start(int expno, int runno) throw(RCHandlerException)
   int dummy_rate = obj.getInt("dummy_rate");
   int trigger_limit = obj.getInt("trigger_limit");
   std::string trigger_type = obj.getText("trigger_type");
-  if (m_ttdnode.getName().size() > 0) {
+  g_mutex.lock();
+  if (!g_flag && m_ttdnode.getName().size() > 0) {
     int pars[3];
     pars[0] = m_trgcommands[trigger_type];
     pars[1] = dummy_rate * 1000;
@@ -554,6 +567,7 @@ void TTCtrlCallback::start(int expno, int runno) throw(RCHandlerException)
     LogFile::debug(cmd);
     system(cmd.c_str());
   }
+  g_mutex.unlock();
   monitor();
 }
 
@@ -599,6 +613,7 @@ void TTCtrlCallback::abort() throw(RCHandlerException)
 
 void TTCtrlCallback::trigft() throw(RCHandlerException)
 {
+  g_mutex.lock();
   try {
     DBObject& obj(getDBObject());
     get(obj);
@@ -611,7 +626,7 @@ void TTCtrlCallback::trigft() throw(RCHandlerException)
     pars[1] *= 1000;
     pars[2] = trigger_limit;
     pars[3] = dummy_rate;
-    if (m_ttdnode.getName().size() > 0) {
+    if (!g_flag && m_ttdnode.getName().size() > 0) {
       send(NSMMessage(m_ttdnode, NSMCommand(11, "TRIGFT"), 4, pars));
     } else {
       std::string cmd = StringUtil::form("trigft -%d reset", ftswid);
@@ -622,6 +637,7 @@ void TTCtrlCallback::trigft() throw(RCHandlerException)
   } catch (const std::out_of_range& e) {
     LogFile::error(e.what());
   }
+  g_mutex.unlock();
 }
 
 void TTCtrlCallback::trigio(const std::string& type) throw(RCHandlerException)
@@ -694,7 +710,8 @@ void TTCtrlCallback::error(const char* nodename, const char* data) throw()
 
 void TTCtrlCallback::resetft() throw()
 {
-  if (m_ttdnode.getName().size() > 0) {
+  g_mutex.lock();
+  if (!g_flag && m_ttdnode.getName().size() > 0) {
     LogFile::info("resetft");
     send(NSMMessage(m_ttdnode, NSMCommand(17, "RESETFT")));
   } else {
@@ -705,6 +722,7 @@ void TTCtrlCallback::resetft() throw()
     LogFile::info(cmd);
     system(cmd.c_str());
   }
+  g_mutex.unlock();
 }
 
 void TTCtrlCallback::statftx(ftsw_t* ftsw, int ftswid)
@@ -834,16 +852,14 @@ void TTCtrlCallback::statftx(ftsw_t* ftsw, int ftswid)
             set(vname + "c.err", (int)B(u.xdata[i], 26));
             set(vname + "d.err", (int)B(u.xdata[i], 27));
           } else {
-            for (int i = 0; i < 4; i++) {
-              set(vname + "mask", 1);
+            set(vname + "mask", 1);
+            set(vname + "err", 0);
+            for (int j = 0; j < 4; j++) {
+              std::string vname = StringUtil::form("link.x[%d].%c.", i, j + 'a');
+              set(vname + "enable", 0);
+              set(vname + "empty", 0);
+              set(vname + "full", 0);
               set(vname + "err", 0);
-              for (int j = 0; j < 4; j++) {
-                std::string vname = StringUtil::form("link.x[%d].%c.", i, j + 'a');
-                set(vname + "enable", 0);
-                set(vname + "empty", 0);
-                set(vname + "full", 0);
-                set(vname + "err", 0);
-              }
             }
           }
         }

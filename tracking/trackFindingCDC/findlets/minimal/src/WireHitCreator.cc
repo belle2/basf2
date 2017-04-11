@@ -27,6 +27,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/ModuleParamList.icc.h>
 
+#include <mdst/dataobjects/MCParticle.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -82,6 +84,11 @@ void WireHitCreator::exposeParameters(ModuleParamList* moduleParamList, const st
                                 m_param_useDegreeSector,
                                 "To angles in degrees for which hits should be created - mostly for debugging",
                                 m_param_useDegreeSector);
+
+  moduleParamList->addParameter(prefixed(prefix, "useMCParticleIds"),
+                                m_param_useMCParticleIds,
+                                "Ids of the MC particles to use. Default does not look at the MCParticles - most for debugging",
+                                m_param_useMCParticleIds);
 }
 
 void WireHitCreator::initialize()
@@ -164,12 +171,27 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
     outputWireHits.clear();
   }
 
+  std::map<int, size_t> nHitsByMCParticleId;
+
   outputWireHits.reserve(nHits);
   for (const CDCHit& hit : hits) {
 
     // ignore this hit if it contains the information of a 2nd hit
     if (!m_param_useSecondHits && hit.is2ndHit()) {
       continue;
+    }
+
+    // Only use some MCParticles if request - mostly for debug
+    if (not m_param_useMCParticleIds.empty()) {
+      MCParticle* mcParticle = hit.getRelated<MCParticle>();
+      int mcParticleId = mcParticle->getArrayIndex();
+      if (mcParticle) {
+        nHitsByMCParticleId[mcParticleId]++;
+      }
+      bool useMCParticleId = std::count(m_param_useMCParticleIds.begin(),
+                                        m_param_useMCParticleIds.end(),
+                                        mcParticleId);
+      if (not useMCParticleId) continue;
     }
 
     WireID wireID(hit.getID());
@@ -187,6 +209,19 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
 
     // Check whether the position is outside the selected sector
     if (pos2D.isBetween(m_useSector[1], m_useSector[0])) continue;
+
+    // Only use some MCParticles if request - mostly for debug
+    if (not m_param_useMCParticleIds.empty()) {
+      MCParticle* mcParticle = hit.getRelated<MCParticle>();
+      int mcParticleId = mcParticle->getArrayIndex();
+      if (mcParticle) {
+        nHitsByMCParticleId[mcParticleId]++;
+      }
+      bool useMCParticleId = std::count(m_param_useMCParticleIds.begin(),
+                                        m_param_useMCParticleIds.end(),
+                                        mcParticleId);
+      if (not useMCParticleId) continue;
+    }
 
     // Consider the particle as incoming in the top part of the CDC for a downwards flight direction
     bool isIncoming = m_flightTimeEstimation == EPreferredDirection::c_Downwards and pos2D.y() > 0;
@@ -260,4 +295,12 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
   }
 
   std::sort(outputWireHits.begin(), outputWireHits.end());
+
+  if (not m_param_useMCParticleIds.empty()) {
+    for (const std::pair<int, size_t> nHitsForMCParticleId : nHitsByMCParticleId) {
+      B2DEBUG(100,
+              "MC particle " << nHitsForMCParticleId.first << " #hits "
+              << nHitsForMCParticleId.second);
+    }
+  }
 }

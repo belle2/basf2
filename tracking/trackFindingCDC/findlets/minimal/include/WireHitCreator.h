@@ -84,6 +84,9 @@ namespace Belle2 {
       /// Parameter : Angular range in degrees for which hits should be unpacked
       std::tuple<double, double> m_param_useDegreeSector{INFINITY, INFINITY};
 
+      /// Parameter : Indices of the Monte Carlo particles for which hits should be used
+      std::vector<int> m_param_useMCParticleIds{};
+
     private: // Prepared variables
       /// Geometry set to be used.
       EWirePosition m_wirePosition = EWirePosition::c_Base;

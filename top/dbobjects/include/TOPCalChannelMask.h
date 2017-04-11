@@ -134,7 +134,7 @@ namespace Belle2 {
     /**
      * Check input module and channel arguments are sane
      */
-    bool check(const int& module, const unsigned& channel) const
+    bool check(const int module, const unsigned channel) const
     {
       if (module >= c_numModules) {
         B2ERROR("Module number greater than " << c_numModules);

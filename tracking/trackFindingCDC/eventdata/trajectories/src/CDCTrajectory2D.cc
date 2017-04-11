@@ -108,9 +108,9 @@ CDCTrajectory2D CDCTrajectory2D::reversed() const
   return result;
 }
 
-Vector3D CDCTrajectory2D::reconstruct3D(const WireLine& wireLine,
-                                        const double distance,
-                                        const double z) const
+std::array<double, 2> CDCTrajectory2D::reconstructBothZ(const WireLine& wireLine,
+                                                        const double distance,
+                                                        const double z) const
 {
   Vector2D globalPos2D = wireLine.sagPos2DAtZ(z);
   Vector2D movePerZ = wireLine.sagMovePerZ(z);
@@ -125,17 +125,48 @@ Vector3D CDCTrajectory2D::reconstruct3D(const WireLine& wireLine,
   double a = localCircle.n3() * movePerZ.normSquared();
 
   const std::pair<double, double> solutionsDeltaZ = solveQuadraticABC(a, b, c);
-  const std::pair<double, double> solutionsZ{solutionsDeltaZ.first + z, solutionsDeltaZ.second + z};
 
-  // Take the solution with the smaller deviation from the reference position
-  bool firstIsInCDC = (wireLine.backwardZ() < solutionsZ.first and
-                       solutionsZ.first < wireLine.forwardZ());
-  bool secondIsInCDC = (wireLine.backwardZ() < solutionsZ.second and
-                        solutionsZ.second < wireLine.forwardZ());
+  // Put the solution of smaller deviation first
+  const std::array<double, 2> solutionsZ{solutionsDeltaZ.second + z, solutionsDeltaZ.first + z};
+  return solutionsZ;
+}
 
-  const double recoZ = (secondIsInCDC or not firstIsInCDC) ? solutionsZ.second : solutionsZ.first;
+double CDCTrajectory2D::reconstructZ(const WireLine& wireLine,
+                                     const double distance,
+                                     const double z) const
+{
+  const std::array<double, 2> solutionsZ = reconstructBothZ(wireLine, distance, z);
 
-  Vector3D recoWirePos2D = wireLine.sagPos3DAtZ(recoZ);
+  bool firstIsInCDC = (wireLine.backwardZ() < solutionsZ[0] and
+                       solutionsZ[0] < wireLine.forwardZ());
+  bool secondIsInCDC = (wireLine.backwardZ() < solutionsZ[1] and
+                        solutionsZ[1] < wireLine.forwardZ());
+
+  // Prefer the solution with the smaller deviation from the given z position which is the first
+  assert(not(std::fabs(solutionsZ[0] - z) > std::fabs(solutionsZ[1] - z)));
+  const double recoZ = (firstIsInCDC or not secondIsInCDC) ? solutionsZ[0] : solutionsZ[1];
+  return recoZ;
+}
+
+std::array<Vector3D, 2> CDCTrajectory2D::reconstructBoth3D(const WireLine& wireLine,
+                                                           const double distance,
+                                                           const double z) const
+{
+  const std::array<double, 2> solutionsZ = reconstructBothZ(wireLine, distance, z);
+
+  const Vector3D firstRecoWirePos3D = wireLine.sagPos3DAtZ(solutionsZ[0]);
+  const Vector3D secondRecoWirePos3D = wireLine.sagPos3DAtZ(solutionsZ[1]);
+  return {{{getClosest(firstRecoWirePos3D.xy()), firstRecoWirePos3D.z()},
+      {getClosest(secondRecoWirePos3D.xy()), secondRecoWirePos3D.z()}
+    }};
+}
+
+Vector3D CDCTrajectory2D::reconstruct3D(const WireLine& wireLine,
+                                        const double distance,
+                                        const double z) const
+{
+  const double recoZ = reconstructZ(wireLine, distance, z);
+  const Vector3D recoWirePos2D = wireLine.sagPos3DAtZ(recoZ);
   return Vector3D(getClosest(recoWirePos2D.xy()), recoZ);
 }
 

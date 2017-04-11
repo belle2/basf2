@@ -85,7 +85,42 @@ namespace Belle2 {
 
     public:
       /**
-       *  Gives the three dimensional point which is on the dirft circle away from the wire line.
+       *  Gives the two z postions where the given drift circle on the wire line touches the trajectory
+       *
+       *  Only works for the skew stereo wires
+       *
+       *  @param wireLine  The geometrical wire line on which the hit is located-
+       *  @param distance  The desired distance from the wire line a.k.a. drift length
+       *  @param z         The expected value of z to which to closest solution should be selected.
+       */
+      std::array<double, 2> reconstructBothZ(const WireLine& wireLine, double distance = 0.0, double z = 0) const;
+
+      /**
+       *  Gives the one z postions within the CDC closest to the given z
+       *  where the given drift circle on the wire line touches the trajectory.
+       *
+       *  Only works for the skew stereo wires.
+       *
+       *  @param wireLine  The geometrical wire line on which the hit is located-
+       *  @param distance  The desired distance from the wire line a.k.a. drift length
+       *  @param z         The expected value of z to which to closest solution should be selected.
+       */
+      double reconstructZ(const WireLine& wireLine, double distance = 0.0, double z = 0) const;
+
+      /**
+       *  Gives the two three dimensional points where the drift circle touches the wire line.
+       *
+       *  Only works for the skew stereo wires.
+       *
+       *  @param wireLine  The geometrical wire line on which the hit is located-
+       *  @param distance  The desired distance from the wire line a.k.a. drift length
+       *  @param z         The expected value of z to which to closest solution should be selected.
+       */
+      std::array<Vector3D, 2> reconstructBoth3D(const WireLine& wireLine, double distance = 0.0, double z = 0) const;
+
+      /**
+       *  Gives the one three dimensional postions within the CDC  closest to the given z
+       *  where the given drift circle on the wire line touches the trajectory.
        *
        *  This method makes the reconstruction of the z coordinate possible by using the skewness \n
        *  stereo layer of the stereo wires.  The point is determined such that it is at the (signed)

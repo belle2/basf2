@@ -136,47 +136,8 @@ def add_cdc_cr_reconstruction(path, eventTimingExtraction=False):
     # Add cdc track finder
     add_cdc_cr_track_finding(path)
 
-    path.add_module("SetupGenfitExtrapolation")
-    path.add_module("PlaneTriggerTrackTimeEstimator",
-                    pdgCodeToUseForEstimation=13,
-                    triggerPlanePosition=triggerPos,
-                    triggerPlaneDirection=normTriggerPlanDirection,
-                    useFittedInformation=False)
-
-    path.add_module("DAFRecoFitter",
-                    probCut=0.00001,
-                    pdgCodesToUseForFitting=13,
-                    )
-
-    path.add_module("PlaneTriggerTrackTimeEstimator",
-                    pdgCodeToUseForEstimation=13,
-                    triggerPlanePosition=triggerPos,
-                    triggerPlaneDirection=normTriggerPlanDirection,
-                    useFittedInformation=True,
-                    useReadoutPosition=True,
-                    readoutPosition=readOutPos,
-                    readoutPositionPropagationSpeed=lightPropSpeed
-                    )
-
-    path.add_module("DAFRecoFitter",
-                    # probCut=0.00001,
-                    pdgCodesToUseForFitting=13,
-                    )
-    if eventTimingExtraction is True:
-        # Select the tracks for the time extraction.
-        path.add_module("SelectionForTrackTimeExtraction")
-
-        # Extract the time: either with the TrackTimeExtraction or the FullGridTrackTimeExtraction module.
-        path.add_module("FullGridTrackTimeExtraction")
-
-        path.add_module("DAFRecoFitter",
-                        # probCut=0.00001,
-                        pdgCodesToUseForFitting=13,
-                        )
-    path.add_module('TrackCreator',
-                    defaultPDGCode=13,
-                    useClosestHitToIP=True
-                    )
+    # Add cdc track fitter
+    add_cdc_cr_track_fit_and_track_creator(path, eventTimingExtraction=eventTimingExtraction)
 
 
 def getRunNumber(fname):

@@ -100,17 +100,20 @@ void VertexFitUpdateDaughtersModule::event()
   if (m_withConstraint == "ipprofile") m_beamSpotCov = m_beamParams->getCovVertex();
   if (m_withConstraint == "iptube") VertexFitUpdateDaughtersModule::findConstraintBoost(2.);
 
-  if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube"  || m_withConstraint == "mother") {
-    analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
-  } else {
-    if (m_withConstraint != "") B2FATAL("VertexFitUpdateDaughtersModule: worng constraint");
-  }
+  if (m_withConstraint != "ipprofile" && m_withConstraint != "iptube"  && m_withConstraint != "mother" && m_withConstraint != "")
+    B2FATAL("VertexFitUpdateDaughtersModule: worng constraint");
+
 
   std::vector<unsigned int> toRemove;
   unsigned int n = plist->getListSize();
   for (unsigned i = 0; i < n; i++) {
     Particle* particle = plist->getParticle(i);
     ParticleCopy::copyDaughters(particle);
+
+    if (m_withConstraint == "mother") {
+      m_BeamSpotCenter = particle->getVertex();
+      m_beamSpotCov = particle->getVertexErrorMatrix();
+    }
 
     bool ok = doVertexFit(particle);
     if (!ok) particle->setPValue(-1);
@@ -128,6 +131,11 @@ void VertexFitUpdateDaughtersModule::event()
 
 bool VertexFitUpdateDaughtersModule::doVertexFit(Particle* mother)
 {
+
+  if (m_withConstraint == "") analysis::RaveSetup::getInstance()->unsetBeamSpot();
+  if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube"  || m_withConstraint == "mother")
+    analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
+
 
   //std::vector<const Particle*> tracksVertex;
   std::vector<Particle*> tracksVertex;

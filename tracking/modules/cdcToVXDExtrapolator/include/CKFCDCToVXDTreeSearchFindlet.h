@@ -30,20 +30,16 @@ namespace Belle2 {
 
     CKFCDCToVXDTreeSearchFindlet() : Super()
     {
-      addProcessingSignalListener(&m_hitFilter);
+      addProcessingSignalListener(&m_firstFilter);
+      addProcessingSignalListener(&m_secondFilter);
     }
 
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
     {
       Super::exposeParameters(moduleParamList, prefix);
 
-      m_hitFilter.exposeParameters(moduleParamList, prefix);
-
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumXYNorm"), m_param_maximumXYNorm,
-                                    "", m_param_maximumXYNorm);
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "checkDistanceWithoutExtrapolation"),
-                                    m_param_checkDistanceWithoutExtrapolation,
-                                    "", m_param_checkDistanceWithoutExtrapolation);
+      m_firstFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "first"));
+      m_secondFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "second"));
     }
 
     void apply(std::vector<RecoTrack*>& seedsVector,
@@ -79,14 +75,15 @@ namespace Belle2 {
     }
 
     bool useResult(Super::StateIterator currentState) final {
-      if (m_param_checkDistanceWithoutExtrapolation and not checkDistanceWithoutExtrapolation(currentState))
+      TrackFindingCDC::Weight weight = m_firstFilter(*currentState);
+      if (std::isnan(weight))
       {
         return false;
       }
 
       currentState->advance();
 
-      TrackFindingCDC::Weight weight = m_hitFilter(*currentState);
+      weight = m_secondFilter(*currentState);
       return not std::isnan(weight);
     }
 
@@ -95,41 +92,7 @@ namespace Belle2 {
     std::map<unsigned int, TrackFindingCDC::SortedVectorRange<const SpacePoint*>> m_cachedHitMap;
 
     /// Subfindlet: Filter
-    TrackFindingCDC::ChooseableFilter<CDCTrackSpacePointCombinationFilterFactory> m_hitFilter;
-
-    double m_param_maximumXYNorm = 1;
-    bool m_param_checkDistanceWithoutExtrapolation = true;
-
-    bool checkDistanceWithoutExtrapolation(Super::StateIterator currentState)
-    {
-      // Simple filtering based on xy distance
-      // TODO: Move in own filter
-      RecoTrack* cdcTrack = currentState->getSeedRecoTrack();
-      const SpacePoint* spacePoint = currentState->getSpacePoint();
-
-      TrackFindingCDC::Vector3D position;
-      TrackFindingCDC::Vector3D momentum;
-
-      if (not cdcTrack->wasFitSuccessful()) {
-        return false;
-      }
-
-      const auto& firstMeasurement = currentState->getMeasuredStateOnPlane();
-      position = TrackFindingCDC::Vector3D(firstMeasurement.getPos());
-      momentum = TrackFindingCDC::Vector3D(firstMeasurement.getMom());
-
-      const TrackFindingCDC::CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
-
-      const auto& hitPosition = TrackFindingCDC::Vector3D(spacePoint->getPosition());
-
-      const double arcLength = trajectory.calcArcLength2D(hitPosition);
-      const auto& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
-      const auto& trackPositionAtHitZ = trajectory.getTrajectorySZ().mapSToZ(arcLength);
-
-      TrackFindingCDC::Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
-      TrackFindingCDC::Vector3D distance = trackPositionAtHit - hitPosition;
-
-      return distance.xy().norm() < m_param_maximumXYNorm;
-    }
+    TrackFindingCDC::ChooseableFilter<CDCTrackSpacePointCombinationFilterFactory> m_firstFilter {"simple"};
+    TrackFindingCDC::ChooseableFilter<CDCTrackSpacePointCombinationFilterFactory> m_secondFilter;
   };
 }

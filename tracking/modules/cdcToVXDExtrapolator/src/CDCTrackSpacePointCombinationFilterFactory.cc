@@ -12,6 +12,7 @@
 
 #include <tracking/modules/cdcToVXDExtrapolator/CDCTrackSpacePointCombinationTruthVarSet.h>
 #include <tracking/modules/cdcToVXDExtrapolator/CDCTrackSpacePointCombinationVarSet.h>
+#include <tracking/modules/cdcToVXDExtrapolator/SimpleCDCToVXDExtrapolationFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
@@ -63,6 +64,7 @@ CDCTrackSpacePointCombinationFilterFactory::getValidFilterNamesAndDescriptions()
   return {
     {"none", "no track combination is valid"},
     {"all", "set all track combinations as good"},
+    {"simple", "based on non-extrapolation variables"},
     {"truth", "monte carlo truth"},
     {"recording", "record variables to a TTree"},
     {"mva", "test with a mva method"},
@@ -76,6 +78,8 @@ CDCTrackSpacePointCombinationFilterFactory::create(const std::string& filterName
     return makeUnique<BaseCDCTrackSpacePointCombinationFilter>();
   } else if (filterName == "all") {
     return makeUnique<AllCDCTrackSpacePointCombinationFilter>();
+  } else if (filterName == "simple") {
+    return makeUnique<SimpleCDCToVXDExtrapolationFilter>();
   } else if (filterName == "truth") {
     return makeUnique<MCCDCTrackSpacePointCombinationFilter>();
   } else if (filterName == "recording") {

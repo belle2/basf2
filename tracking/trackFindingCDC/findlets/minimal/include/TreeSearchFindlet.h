@@ -12,42 +12,65 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
+
 #include <tracking/trackFindingCDC/utilities/SortedVectorRange.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    template<class SeedObject, class HitObject, class StateObject>
-    class TreeSearchFindlet : public Findlet<SeedObject*, const HitObject*> {
+    template<class AStateObject, class AFilterFactory>
+    class TreeSearchFindlet : public Findlet<typename AStateObject::SeedObject*, const typename AStateObject::HitObject*> {
     public:
-      using SeedPtr = SeedObject*;
-      using HitPtr = const HitObject*;
-      using StateArray = typename std::array<StateObject, StateObject::N>;
+      using Super = Findlet<typename AStateObject::SeedObject*, const typename AStateObject::HitObject*>;
+      using SeedPtr = typename AStateObject::SeedObject*;
+      using HitPtr = const typename AStateObject::HitObject*;
+      using StateArray = typename std::array<AStateObject, AStateObject::N>;
       using StateIterator = typename StateArray::iterator;
 
+      /// Construct this findlet and add the two filters as listeners
+      TreeSearchFindlet() : Super()
+      {
+        Super::addProcessingSignalListener(&m_firstFilter);
+        Super::addProcessingSignalListener(&m_secondFilter);
+      }
+
+      /// Expose the parameters of the two filters and the makeHitJumpsPossible parameter
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
-        Findlet<SeedObject*, const HitObject*>::exposeParameters(moduleParamList, prefix);
+        Super::exposeParameters(moduleParamList, prefix);
+
+        m_firstFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "first"));
+        m_secondFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "second"));
 
         moduleParamList->addParameter(prefixed(prefix, "makeHitJumpingPossible"), m_param_makeHitJumpingPossible,
                                       "", m_param_makeHitJumpingPossible);
       }
 
+      /// Main function of this findlet: traverse a tree starting from a given seed object.
       void traverseTree(SeedPtr seed, std::vector<std::pair<SeedPtr, std::vector<HitPtr>>>& resultsVector)
       {
+        // TODO: Pull this into the apply function!
         m_states.front().initialize(seed);
         traverseTree(m_states.begin(), resultsVector);
       }
 
-
     protected:
+      /// Overloadable function to return the possible range of next hit objects for a given state
       virtual TrackFindingCDC::SortedVectorRange<HitPtr> getMatchingHits(StateIterator currentState) = 0;
-      virtual bool useResult(StateIterator currentState) = 0;
 
     private:
+      /// Object cache for states
       StateArray m_states{};
+
+      /// Parameter: make hit jumps possible
       bool m_param_makeHitJumpingPossible = true;
 
+      /// Subfindlet: Filter 1
+      ChooseableFilter<AFilterFactory> m_firstFilter;
+      /// Subfindlet: Filter 2
+      ChooseableFilter<AFilterFactory> m_secondFilter;
+
+      /// Implementation of the traverseTree function
       void traverseTree(StateIterator currentState,
                         std::vector<std::pair<SeedPtr, std::vector<HitPtr>>>& resultsVector)
       {
@@ -75,8 +98,24 @@ namespace Belle2 {
           if (useResult(nextState)) {
             traverseTree(nextState, resultsVector);
           }
-
         }
+      }
+
+      /// Test function whether a given state should be used or not
+      bool useResult(StateIterator currentState)
+      {
+        // Check the first filter before extrapolation
+        TrackFindingCDC::Weight weight = m_firstFilter(*currentState);
+        if (std::isnan(weight)) {
+          return false;
+        }
+
+        // Extrapolate
+        currentState->advance();
+
+        // Check the second filter after extrapolation
+        weight = m_secondFilter(*currentState);
+        return not std::isnan(weight);
       }
     };
   }

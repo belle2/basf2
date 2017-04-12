@@ -13,31 +13,15 @@
 #include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationFilterFactory.h>
 #include <tracking/modules/cdcToVXDExtrapolator/filterBased/CKFCDCToVXDResultObject.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
-
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
-
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 
 namespace Belle2 {
-  class CKFCDCToVXDTreeSearchFindlet : public TrackFindingCDC::TreeSearchFindlet<RecoTrack, SpacePoint, CKFCDCToVXDStateObject> {
+  class CKFCDCToVXDTreeSearchFindlet : public TrackFindingCDC::TreeSearchFindlet<CKFCDCToVXDStateObject,
+    CDCTrackSpacePointCombinationFilterFactory> {
   public:
-    using Super = TrackFindingCDC::TreeSearchFindlet<RecoTrack, SpacePoint, CKFCDCToVXDStateObject>;
-
-    CKFCDCToVXDTreeSearchFindlet() : Super()
-    {
-      addProcessingSignalListener(&m_firstFilter);
-      addProcessingSignalListener(&m_secondFilter);
-    }
-
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
-    {
-      Super::exposeParameters(moduleParamList, prefix);
-
-      m_firstFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "first"));
-      m_secondFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "second"));
-    }
+    using Super = TrackFindingCDC::TreeSearchFindlet<CKFCDCToVXDStateObject,
+          CDCTrackSpacePointCombinationFilterFactory>;
 
     void apply(std::vector<RecoTrack*>& seedsVector,
                std::vector<const SpacePoint*>& filteredHitVector) final {
@@ -71,25 +55,8 @@ namespace Belle2 {
       return m_cachedHitMap[nextLayer];
     }
 
-    bool useResult(Super::StateIterator currentState) final {
-      TrackFindingCDC::Weight weight = m_firstFilter(*currentState);
-      if (std::isnan(weight))
-      {
-        return false;
-      }
-
-      currentState->advance();
-
-      weight = m_secondFilter(*currentState);
-      return not std::isnan(weight);
-    }
-
   private:
     /// Cache
     std::map<unsigned int, TrackFindingCDC::SortedVectorRange<const SpacePoint*>> m_cachedHitMap;
-
-    /// Subfindlet: Filter
-    TrackFindingCDC::ChooseableFilter<CDCTrackSpacePointCombinationFilterFactory> m_firstFilter {"simple"};
-    TrackFindingCDC::ChooseableFilter<CDCTrackSpacePointCombinationFilterFactory> m_secondFilter;
   };
 }

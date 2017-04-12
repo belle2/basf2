@@ -17,6 +17,9 @@ namespace Belle2 {
   public:
     static constexpr unsigned int N = 7;
 
+    using SeedObject = RecoTrack;
+    using HitObject = SpacePoint;
+
     unsigned int getLastLayer() const
     {
       return m_lastLayer;

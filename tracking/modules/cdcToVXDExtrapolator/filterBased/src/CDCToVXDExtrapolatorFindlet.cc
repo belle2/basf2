@@ -57,5 +57,5 @@ void CDCToVXDExtrapolatorFindlet::apply()
 
   // Use the found hits for each track, create new VXD reco tracks, add relations, merge the tracks and fill them
   // into a new store array
-  m_storeArrayMerger.apply(results);
+  //m_storeArrayMerger.apply(results);
 }

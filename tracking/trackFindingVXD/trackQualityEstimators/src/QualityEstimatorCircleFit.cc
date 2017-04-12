@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include "tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h"
+#include <tracking/trackFindingVXD/utilities/CalcCurvatureSignum.h>
 #include <math.h>
 #include <framework/logging/Logger.h>
 #include <TMath.h>
@@ -24,8 +25,8 @@ double QualityEstimatorCircleFit::estimateQuality(std::vector<SpacePoint const*>
   // Calculates Curvature: True means clockwise, False means counterclockwise.
   // TODO this is not an optimized approach; just to get things to work.
   // CalcCurvature could be integrated into the looping over the hits which CircleFit does anyhow.
-  bool clockwise = QualityEstimatorBase::calcCurvatureSign(measurements);
-  m_results.curvatureSign = clockwise;
+  m_results.curvatureSign = calcCurvatureSignum(measurements);
+  bool clockwise = *(m_results.curvatureSign) >= 0 ? true : false;
 
   double stopper = 0.000000001; /// WARNING hardcoded values!
   double meanX = 0, meanY = 0, meanX2 = 0, meanY2 = 0, meanR2 = 0, meanR4 = 0, meanXR2 = 0, meanYR2 = 0, meanXY = 0; //mean values

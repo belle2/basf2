@@ -76,26 +76,6 @@ namespace Belle2 {
      *  Utilizing m_magneticFieldZ and hard coded speed of light*/
     double calcPt(double const radius) const { return m_magneticFieldZ * radius * 0.00299792458; }
 
-    /** Calculate curvature based on triplets of measurements.
-     *  Ignores uncertainties.
-     *  Returns -1,0,1 depending on the sum of all triplets.
-     */
-    short calcCurvatureSign(std::vector<SpacePoint const*> const& measurements) const
-    {
-      if (measurements.size() < 3) return 0;
-      float sumOfCurvature = 0.;
-      for (unsigned int i = 0; i < measurements.size() - 2; ++i) {
-        TVector3 ab = measurements.at(i)->getPosition() - measurements.at(i + 1)->getPosition();
-        ab.SetZ(0.);
-        TVector3 bc = measurements.at(i + 1)->getPosition() - measurements.at(i + 2)->getPosition();
-        bc.SetZ(0.);
-        sumOfCurvature += bc.Orthogonal() * ab; //normal vector of m_vecBC times segment of ba
-      }
-      if (sumOfCurvature > 0) return 1;
-      if (sumOfCurvature < 0) return -1;
-      else return 0;
-    }
-
     // Data members
 
     double m_magneticFieldZ;

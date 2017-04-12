@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include "tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h"
+#include <tracking/trackFindingVXD/utilities/CalcCurvatureSignum.h>
 #include <math.h>
 #include <framework/logging/Logger.h>
 #include <TMath.h>
@@ -146,7 +147,7 @@ QualityEstimationResults QualityEstimatorTripletFit::estimateQualityAndPropertie
   QualityEstimatorBase::estimateQualityAndProperties(measurements);
   if (measurements.size() < 3) return m_results;
 
-  m_results.curvatureSign = calcCurvatureSign(measurements);
+  m_results.curvatureSign = calcCurvatureSignum(measurements);
 
   // calculate pt and pt_sigma
   double averageThetaPrime = 0;

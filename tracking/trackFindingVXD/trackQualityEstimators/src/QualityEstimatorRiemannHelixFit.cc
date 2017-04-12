@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include "tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h"
+#include <tracking/trackFindingVXD/utilities/CalcCurvatureSignum.h>
 #include <math.h>
 #include <Eigen/Dense>
 #include <boost/math/special_functions/fpclassify.hpp>
@@ -139,7 +140,7 @@ double QualityEstimatorRiemannHelixFit::estimateQuality(std::vector<SpacePoint c
   Precision rootTerm = sqrt(1. - 4.*delta * kappa);
   Precision curvature = 2.*kappa / (rootTerm);
   Precision pocaD = 2.*delta / (1. + rootTerm);
-  short curvatureSign = calcCurvatureSign(measurements);
+  short curvatureSign = calcCurvatureSignum(measurements);
 
   if ((curvature < 0 && curvatureSign >= 0) || (curvature > 0 && curvatureSign < 0)) {
     curvature = -curvature;

@@ -10,6 +10,8 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
 #include <tracking/trackFindingCDC/utilities/SortedVectorRange.h>
 
 namespace Belle2 {
@@ -23,10 +25,12 @@ namespace Belle2 {
       using StateArray = typename std::array<StateObject, StateObject::N>;
       using StateIterator = typename StateArray::iterator;
 
-      virtual void apply(std::vector<SeedPtr>& seedsVector,
-                         std::vector<HitPtr>& filteredHitVector) override
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
-        // Maybe implement some caching here.
+        Findlet<SeedObject*, const HitObject*>::exposeParameters(moduleParamList, prefix);
+
+        moduleParamList->addParameter(prefixed(prefix, "makeHitJumpingPossible"), m_param_makeHitJumpingPossible,
+                                      "", m_param_makeHitJumpingPossible);
       }
 
       void traverseTree(SeedPtr seed, std::vector<std::pair<SeedPtr, std::vector<HitPtr>>>& resultsVector)
@@ -38,11 +42,11 @@ namespace Belle2 {
 
     protected:
       virtual TrackFindingCDC::SortedVectorRange<HitPtr> getMatchingHits(StateIterator currentState) = 0;
-
       virtual bool useResult(StateIterator currentState) = 0;
 
     private:
       StateArray m_states{};
+      bool m_param_makeHitJumpingPossible = true;
 
       void traverseTree(StateIterator currentState,
                         std::vector<std::pair<SeedPtr, std::vector<HitPtr>>>& resultsVector)
@@ -50,7 +54,7 @@ namespace Belle2 {
         const auto& matchingHits = getMatchingHits(currentState);
         StateIterator nextState = std::next(currentState);
 
-        if (nextState == m_states.end() or matchingHits.empty()) {
+        if (nextState == m_states.end() or (not m_param_makeHitJumpingPossible and matchingHits.empty())) {
           resultsVector.emplace_back(currentState->finalize());
           return;
         }
@@ -63,8 +67,16 @@ namespace Belle2 {
           }
 
           traverseTree(nextState, resultsVector);
-          //return;
-        };
+        }
+
+        if (m_param_makeHitJumpingPossible) {
+          nextState->buildFrom(currentState, nullptr);
+
+          if (useResult(nextState)) {
+            traverseTree(nextState, resultsVector);
+          }
+
+        }
       }
     };
   }

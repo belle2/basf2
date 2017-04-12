@@ -35,10 +35,15 @@ namespace Belle2 {
 
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
     {
+      Super::exposeParameters(moduleParamList, prefix);
+
       m_hitFilter.exposeParameters(moduleParamList, prefix);
 
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumXYNorm"), m_param_maximumXYNorm,
                                     "", m_param_maximumXYNorm);
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "checkDistanceWithoutExtrapolation"),
+                                    m_param_checkDistanceWithoutExtrapolation,
+                                    "", m_param_checkDistanceWithoutExtrapolation);
     }
 
     void apply(std::vector<RecoTrack*>& seedsVector,
@@ -64,59 +69,22 @@ namespace Belle2 {
         const auto last = std::find_if_not(first, filteredHitVector.end(), onGivenLayerCheck);
 
         m_cachedHitMap.emplace(layerID, TrackFindingCDC::SortedVectorRange<const SpacePoint*>(first, last));
-        B2INFO("Storing in " << layerID << " " << std::distance(first, last));
       }
     }
 
   protected:
     TrackFindingCDC::SortedVectorRange<const SpacePoint*> getMatchingHits(Super::StateIterator currentState) final {
       const unsigned int nextLayer = currentState->getLastLayer() - 1;
-      const auto& hitsOnNextLayer = m_cachedHitMap[nextLayer];
-      return hitsOnNextLayer;
-      /*matchingHits.reserve(hitsOnNextLayer.size());
-
-      for(const SpacePoint* spacePoint : hitsOnNextLayer) {
-        const auto& weight = m_hitFilter(std::make_pair(currentResult, spacePoint));
-        if(not std::isnan(weight)) {
-          matchingHits.push_back(spacePoint);
-        }
-      }*/
+      return m_cachedHitMap[nextLayer];
     }
 
     bool useResult(Super::StateIterator currentState) final {
-      // Simple filtering based on xy distance
-      // TODO: Move in own filter
-      RecoTrack* cdcTrack = currentState->getSeedRecoTrack();
-      const SpacePoint* spacePoint = currentState->getSpacePoint();
-
-      TrackFindingCDC::Vector3D position;
-      TrackFindingCDC::Vector3D momentum;
-
-      if (cdcTrack->wasFitSuccessful())
-      {
-        const auto& firstMeasurement = cdcTrack->getMeasuredStateOnPlaneFromFirstHit();
-        position = TrackFindingCDC::Vector3D(firstMeasurement.getPos());
-        momentum = TrackFindingCDC::Vector3D(firstMeasurement.getMom());
-      } else {
-        position = TrackFindingCDC::Vector3D(cdcTrack->getPositionSeed());
-        momentum = TrackFindingCDC::Vector3D(cdcTrack->getMomentumSeed());
-      }
-
-      const TrackFindingCDC::CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
-
-      const auto& hitPosition = TrackFindingCDC::Vector3D(spacePoint->getPosition());
-
-      const double arcLength = trajectory.calcArcLength2D(hitPosition);
-      const auto& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
-      const auto& trackPositionAtHitZ = trajectory.getTrajectorySZ().mapSToZ(arcLength);
-
-      TrackFindingCDC::Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
-      TrackFindingCDC::Vector3D distance = trackPositionAtHit - hitPosition;
-
-      if (distance.xy().norm() > m_param_maximumXYNorm)
+      if (m_param_checkDistanceWithoutExtrapolation and not checkDistanceWithoutExtrapolation(currentState))
       {
         return false;
       }
+
+      currentState->advance();
 
       TrackFindingCDC::Weight weight = m_hitFilter(*currentState);
       return not std::isnan(weight);
@@ -130,5 +98,38 @@ namespace Belle2 {
     TrackFindingCDC::ChooseableFilter<CDCTrackSpacePointCombinationFilterFactory> m_hitFilter;
 
     double m_param_maximumXYNorm = 1;
+    bool m_param_checkDistanceWithoutExtrapolation = true;
+
+    bool checkDistanceWithoutExtrapolation(Super::StateIterator currentState)
+    {
+      // Simple filtering based on xy distance
+      // TODO: Move in own filter
+      RecoTrack* cdcTrack = currentState->getSeedRecoTrack();
+      const SpacePoint* spacePoint = currentState->getSpacePoint();
+
+      TrackFindingCDC::Vector3D position;
+      TrackFindingCDC::Vector3D momentum;
+
+      if (not cdcTrack->wasFitSuccessful()) {
+        return false;
+      }
+
+      const auto& firstMeasurement = currentState->getMeasuredStateOnPlane();
+      position = TrackFindingCDC::Vector3D(firstMeasurement.getPos());
+      momentum = TrackFindingCDC::Vector3D(firstMeasurement.getMom());
+
+      const TrackFindingCDC::CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
+
+      const auto& hitPosition = TrackFindingCDC::Vector3D(spacePoint->getPosition());
+
+      const double arcLength = trajectory.calcArcLength2D(hitPosition);
+      const auto& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
+      const auto& trackPositionAtHitZ = trajectory.getTrajectorySZ().mapSToZ(arcLength);
+
+      TrackFindingCDC::Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
+      TrackFindingCDC::Vector3D distance = trackPositionAtHit - hitPosition;
+
+      return distance.xy().norm() < m_param_maximumXYNorm;
+    }
   };
 }

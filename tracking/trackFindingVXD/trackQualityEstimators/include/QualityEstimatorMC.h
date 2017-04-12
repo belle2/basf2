@@ -26,7 +26,8 @@ namespace Belle2 {
     typedef int NMatches;
     typedef std::pair<MCRecoTrackIndex, NMatches> MatchInfo;
 
-    QualityEstimatorMC(double magneticFieldZ, std::string mcRecoTracksStoreArrayName = "MCRecoTracks", bool strictQualityIndex = true):
+    QualityEstimatorMC(double magneticFieldZ = 0, std::string mcRecoTracksStoreArrayName = "MCRecoTracks",
+                       bool strictQualityIndex = true):
       QualityEstimatorBase(magneticFieldZ), m_strictQualityIndex(strictQualityIndex)
     {
       m_mcRecoTracks.isRequired(mcRecoTracksStoreArrayName);

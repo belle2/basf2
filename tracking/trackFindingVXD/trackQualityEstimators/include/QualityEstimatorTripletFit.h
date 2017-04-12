@@ -20,7 +20,7 @@ namespace Belle2 {
 
   public:
 
-    QualityEstimatorTripletFit(double bFieldValue): QualityEstimatorBase(bFieldValue) {};
+    QualityEstimatorTripletFit(double bFieldValue = 1.5): QualityEstimatorBase(bFieldValue) {};
 
     virtual double estimateQuality(std::vector<SpacePoint const*> const& measurements) final;
 

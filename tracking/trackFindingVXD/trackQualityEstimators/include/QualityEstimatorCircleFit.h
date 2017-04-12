@@ -17,7 +17,7 @@ namespace Belle2 {
 
   public:
 
-    QualityEstimatorCircleFit(double magneticFieldZ): QualityEstimatorBase(magneticFieldZ) {};
+    QualityEstimatorCircleFit(double magneticFieldZ = 1.5): QualityEstimatorBase(magneticFieldZ) {};
 
     virtual double estimateQuality(std::vector<SpacePoint const*> const& measurements) final;
   };

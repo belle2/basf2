@@ -12,6 +12,7 @@
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorMC.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRandom.h>
 #include <framework/logging/Logger.h>
 #include <geometry/bfieldmap/BFieldMap.h>
@@ -55,6 +56,8 @@ void QualityEstimatorModule::initialize()
     m_estimator = std::unique_ptr<QualityEstimatorBase>(new QualityEstimatorTripletFit(bFieldZ));
   } else if (m_EstimationMethod == "CircleFit") {
     m_estimator = std::unique_ptr<QualityEstimatorBase>(new QualityEstimatorCircleFit(bFieldZ));
+  } else if (m_EstimationMethod == "HelixFit") {
+    m_estimator = std::unique_ptr<QualityEstimatorBase>(new QualityEstimatorRiemannHelixFit(bFieldZ));
   } else if (m_EstimationMethod == "Random") {
     m_estimator = std::unique_ptr<QualityEstimatorBase>(new QualityEstimatorRandom(bFieldZ));
   }

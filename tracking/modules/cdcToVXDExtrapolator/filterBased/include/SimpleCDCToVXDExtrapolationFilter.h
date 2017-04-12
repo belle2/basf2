@@ -9,60 +9,29 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/BaseCDCTrackSpacePointCombinationFilter.h>
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationVarSet.h>
+#include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  /// Filter for the constuction of axial to axial segment pairs based on simple criterions
+  class SimpleCDCToVXDExtrapolationFilter : public TrackFindingCDC::FilterOnVarSet<CDCTrackSpacePointCombinationVarSet> {
+  public:
+    void exposeParameters(ModuleParamList* moduleParamList,
+                          const std::string& prefix) final {
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumXYNorm"),
+      m_param_maximumXYNorm, "", m_param_maximumXYNorm);
+    }
 
-    /// Filter for the constuction of axial to axial segment pairs based on simple criterions
-    class SimpleCDCToVXDExtrapolationFilter : public BaseCDCTrackSpacePointCombinationFilter {
-    public:
-      void exposeParameters(ModuleParamList* moduleParamList,
-                            const std::string& prefix) final {
-        moduleParamList->addParameter(prefixed(prefix, "maximumXYNorm"),
-        m_param_maximumXYNorm, "", m_param_maximumXYNorm);
-      }
+    /// Checks if a pair of axial segments is a good combination
+    TrackFindingCDC::Weight operator()(const BaseCDCTrackSpacePointCombinationFilter::Object& currentState) final {
+      TrackFindingCDC::FilterOnVarSet<CDCTrackSpacePointCombinationVarSet>::operator()(currentState);
 
-      /// Checks if a pair of axial segments is a good combination
-      Weight operator()(const BaseCDCTrackSpacePointCombinationFilter::Object& currentState) final {
-        RecoTrack* cdcTrack = currentState.getSeedRecoTrack();
-        const SpacePoint* spacePoint = currentState.getSpacePoint();
+      const Float_t* distance = getVarSet().find("xy_distance");
 
-        if (not spacePoint)
-        {
-          return true;
-        }
+      return (*distance) < m_param_maximumXYNorm;
+    }
 
-        TrackFindingCDC::Vector3D position;
-        TrackFindingCDC::Vector3D momentum;
-
-        if (not cdcTrack->wasFitSuccessful())
-        {
-          return false;
-        }
-
-        const auto& firstMeasurement = currentState.getMeasuredStateOnPlane();
-        position = TrackFindingCDC::Vector3D(firstMeasurement.getPos());
-        momentum = TrackFindingCDC::Vector3D(firstMeasurement.getMom());
-
-        const TrackFindingCDC::CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
-
-        const auto& hitPosition = TrackFindingCDC::Vector3D(spacePoint->getPosition());
-
-        const double arcLength = trajectory.calcArcLength2D(hitPosition);
-        const auto& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
-        const auto& trackPositionAtHitZ = trajectory.getTrajectorySZ().mapSToZ(arcLength);
-
-        TrackFindingCDC::Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
-        TrackFindingCDC::Vector3D distance = trackPositionAtHit - hitPosition;
-
-        return distance.xy().norm() < m_param_maximumXYNorm;
-      }
-
-    private:
-      double m_param_maximumXYNorm = 2;
-    };
-  }
+  private:
+    double m_param_maximumXYNorm = 2;
+  };
 }

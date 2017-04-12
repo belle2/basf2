@@ -26,19 +26,18 @@ bool CDCTrackSpacePointCombinationVarSet::extract(const BaseCDCTrackSpacePointCo
   RecoTrack* cdcTrack = result->getSeedRecoTrack();
   const SpacePoint* spacePoint = result->getSpacePoint();
 
-  if (not cdcTrack or not spacePoint) { return false; }
-
-  Vector3D position;
-  Vector3D momentum;
-
-  if (cdcTrack->wasFitSuccessful()) {
-    const auto& firstMeasurement = cdcTrack->getMeasuredStateOnPlaneFromFirstHit();
-    position = Vector3D(firstMeasurement.getPos());
-    momentum = Vector3D(firstMeasurement.getMom());
-  } else {
-    position = Vector3D(cdcTrack->getPositionSeed());
-    momentum = Vector3D(cdcTrack->getMomentumSeed());
+  // TODO: Do not dismiss spacePoint = 0 cases!
+  if (not cdcTrack or not spacePoint) {
+    return false;
   }
+
+  if (not cdcTrack->wasFitSuccessful()) {
+    return false;
+  }
+
+  const auto& firstMeasurement = result->getMeasuredStateOnPlane();
+  Vector3D position = Vector3D(firstMeasurement.getPos());
+  Vector3D momentum = Vector3D(firstMeasurement.getMom());
 
   const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
 
@@ -66,5 +65,6 @@ bool CDCTrackSpacePointCombinationVarSet::extract(const BaseCDCTrackSpacePointCo
   var<named("phi")>() = momentum.phi();
   var<named("arcLengthOfHitPosition")>() = arcLengthOfHitPosition;
   var<named("arcLengthOfCenterPosition")>() = arcLengthOfCenterPosition;
+  var<named("numberOfHoles")>() = result->getNumberOfHoles();
   return true;
 }

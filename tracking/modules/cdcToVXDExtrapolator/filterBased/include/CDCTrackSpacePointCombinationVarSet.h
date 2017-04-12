@@ -25,7 +25,8 @@ namespace Belle2 {
     "tan_lambda",
     "phi",
     "arcLengthOfHitPosition",
-    "arcLengthOfCenterPosition"
+    "arcLengthOfCenterPosition",
+    "numberOfHoles",
   };
 
   /// Vehicle class to transport the variable names

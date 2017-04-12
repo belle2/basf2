@@ -13,7 +13,6 @@
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
 
 namespace Belle2 {
-  /// Filter for the constuction of axial to axial segment pairs based on simple criterions
   class SimpleCDCToVXDExtrapolationFilter : public TrackFindingCDC::FilterOnVarSet<CDCTrackSpacePointCombinationVarSet> {
   public:
     void exposeParameters(ModuleParamList* moduleParamList,
@@ -22,13 +21,22 @@ namespace Belle2 {
       m_param_maximumXYNorm, "", m_param_maximumXYNorm);
     }
 
-    /// Checks if a pair of axial segments is a good combination
     TrackFindingCDC::Weight operator()(const BaseCDCTrackSpacePointCombinationFilter::Object& currentState) final {
-      TrackFindingCDC::FilterOnVarSet<CDCTrackSpacePointCombinationVarSet>::operator()(currentState);
+      TrackFindingCDC::Weight superWeight = TrackFindingCDC::FilterOnVarSet<CDCTrackSpacePointCombinationVarSet>::operator()(currentState);
+
+      if (std::isnan(superWeight))
+      {
+        return std::nan("");
+      }
 
       const Float_t* distance = getVarSet().find("xy_distance");
 
-      return (*distance) < m_param_maximumXYNorm;
+      if (*distance > m_param_maximumXYNorm)
+      {
+        return std::nan("");
+      }
+
+      return 1;
     }
 
   private:

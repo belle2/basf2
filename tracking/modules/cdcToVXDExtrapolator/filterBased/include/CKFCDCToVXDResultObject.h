@@ -20,11 +20,6 @@ namespace Belle2 {
     using SeedObject = RecoTrack;
     using HitObject = SpacePoint;
 
-    unsigned int getLastLayer() const
-    {
-      return m_lastLayer;
-    }
-
     void initialize(RecoTrack* seed)
     {
       m_seedRecoTrack = seed;
@@ -36,19 +31,36 @@ namespace Belle2 {
       std::vector<const SpacePoint*> spacePoints;
       spacePoints.reserve(N);
 
-      const CKFCDCToVXDStateObject* walkObject = this;
-
-      while (walkObject != nullptr) {
+      walk([&spacePoints](const CKFCDCToVXDStateObject * walkObject) {
         const SpacePoint* spacePoint = walkObject->getSpacePoint();
         if (spacePoint) {
           spacePoints.push_back(spacePoint);
         }
-        walkObject = walkObject->getParent();
       }
+          );
 
       return std::make_pair(getSeedRecoTrack(), spacePoints);
     }
 
+    void buildFrom(const CKFCDCToVXDStateObject* parent, const SpacePoint* spacePoint)
+    {
+      m_parent = parent;
+      m_seedRecoTrack = parent->getSeedRecoTrack();
+      m_lastLayer = parent->getLastLayer() - 1;
+      m_spacePoint = spacePoint;
+      // TODO: Include the Kalman Filter part here!
+      m_measuredStateOnPlane = parent->getMeasuredStateOnPlane();
+    }
+
+    void advance()
+    {
+      if (m_spacePoint) {
+        // TODO
+        m_measuredStateOnPlane.extrapolateToPoint(m_spacePoint->getPosition());
+      }
+    }
+
+    // Getters
     const CKFCDCToVXDStateObject* getParent() const
     {
       return m_parent;
@@ -69,21 +81,22 @@ namespace Belle2 {
       return m_spacePoint;
     }
 
-    void buildFrom(const CKFCDCToVXDStateObject* parent, const SpacePoint* spacePoint)
+    unsigned int getLastLayer() const
     {
-      m_parent = parent;
-      m_seedRecoTrack = parent->getSeedRecoTrack();
-      m_lastLayer = parent->getLastLayer() - 1;
-      m_spacePoint = spacePoint;
-      // TODO: Include the Kalman Filter part here!
-      m_measuredStateOnPlane = parent->getMeasuredStateOnPlane();
+      return m_lastLayer;
     }
 
-    void advance()
+    unsigned int getNumberOfHoles() const
     {
-      if (m_spacePoint) {
-        m_measuredStateOnPlane.extrapolateToPoint(m_spacePoint->getPosition());
-      }
+      unsigned int numberOfHoles = 0;
+
+      walk([&numberOfHoles](const CKFCDCToVXDStateObject * walkObject) {
+        if (not walkObject->getSpacePoint()) {
+          numberOfHoles++;
+        }
+      });
+
+      return numberOfHoles;
     }
 
   private:
@@ -92,5 +105,15 @@ namespace Belle2 {
     unsigned int m_lastLayer = N;
     const CKFCDCToVXDStateObject* m_parent = nullptr;
     genfit::MeasuredStateOnPlane m_measuredStateOnPlane;
+
+    void walk(const std::function<void(const CKFCDCToVXDStateObject*)> f) const
+    {
+      const CKFCDCToVXDStateObject* walkObject = this;
+
+      while (walkObject != nullptr) {
+        f(walkObject);
+        walkObject = walkObject->getParent();
+      }
+    }
   };
 }

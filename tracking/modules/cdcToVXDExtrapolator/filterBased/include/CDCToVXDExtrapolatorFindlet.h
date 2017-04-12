@@ -11,9 +11,9 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/modules/cdcToVXDExtrapolator/StoreArrayMerger.h>
-#include <tracking/modules/cdcToVXDExtrapolator/CKFCDCToVXDTreeSearchFindlet.h>
-#include <tracking/modules/cdcToVXDExtrapolator/CKFCDCToVXDResultObject.h>
+#include <tracking/modules/cdcToVXDExtrapolator/filterBased/StoreArrayMerger.h>
+#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CKFCDCToVXDTreeSearchFindlet.h>
+#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CKFCDCToVXDResultObject.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePoint.h>

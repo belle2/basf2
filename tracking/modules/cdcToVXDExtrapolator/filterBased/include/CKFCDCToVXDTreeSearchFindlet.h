@@ -10,15 +10,12 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/minimal/TreeSearchFindlet.h>
-#include <tracking/modules/cdcToVXDExtrapolator/CDCTrackSpacePointCombinationFilterFactory.h>
-#include <tracking/modules/cdcToVXDExtrapolator/CKFCDCToVXDResultObject.h>
+#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationFilterFactory.h>
+#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CKFCDCToVXDResultObject.h>
 
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
 
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
-#include <tracking/trackFindingCDC/utilities/SortedVectorRange.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePoint.h>

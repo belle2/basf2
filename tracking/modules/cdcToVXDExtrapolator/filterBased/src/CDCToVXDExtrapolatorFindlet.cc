@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/cdcToVXDExtrapolator/CDCToVXDExtrapolatorFindlet.h>
+#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCToVXDExtrapolatorFindlet.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

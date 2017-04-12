@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/modules/cdcToVXDExtrapolator/BaseCDCTrackSpacePointCombinationFilter.h>
+#include <tracking/modules/cdcToVXDExtrapolator/filterBased/BaseCDCTrackSpacePointCombinationFilter.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 

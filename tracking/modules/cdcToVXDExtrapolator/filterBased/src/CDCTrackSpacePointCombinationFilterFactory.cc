@@ -7,12 +7,11 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/modules/cdcToVXDExtrapolator/CDCTrackSpacePointCombinationFilterFactory.h>
-#include <tracking/modules/cdcToVXDExtrapolator/BaseCDCTrackSpacePointCombinationFilter.h>
-
-#include <tracking/modules/cdcToVXDExtrapolator/CDCTrackSpacePointCombinationTruthVarSet.h>
-#include <tracking/modules/cdcToVXDExtrapolator/CDCTrackSpacePointCombinationVarSet.h>
-#include <tracking/modules/cdcToVXDExtrapolator/SimpleCDCToVXDExtrapolationFilter.h>
+#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationFilterFactory.h>
+#include <tracking/modules/cdcToVXDExtrapolator/filterBased/BaseCDCTrackSpacePointCombinationFilter.h>
+#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationTruthVarSet.h>
+#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationVarSet.h>
+#include <tracking/modules/cdcToVXDExtrapolator/filterBased/SimpleCDCToVXDExtrapolationFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>

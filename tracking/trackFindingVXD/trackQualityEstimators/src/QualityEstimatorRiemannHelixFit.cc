@@ -139,8 +139,9 @@ double QualityEstimatorRiemannHelixFit::estimateQuality(std::vector<SpacePoint c
   Precision rootTerm = sqrt(1. - 4.*delta * kappa);
   Precision curvature = 2.*kappa / (rootTerm);
   Precision pocaD = 2.*delta / (1. + rootTerm);
+  short curvatureSign = calcCurvatureSign(measurements);
 
-  if ((curvature < 0 && calcCurvatureSign(measurements)) || (curvature > 0 && !calcCurvatureSign(measurements))) {
+  if ((curvature < 0 && curvatureSign >= 0) || (curvature > 0 && curvatureSign < 0)) {
     curvature = -curvature;
     // pocaPhi = pocaPhi + M_PI; //
     pocaD = -pocaD;
@@ -217,9 +218,8 @@ double QualityEstimatorRiemannHelixFit::estimateQuality(std::vector<SpacePoint c
   momVec(2) = - pZ;
   m_results.pt = pT;
   m_results.p = TVector3(momVec(0), momVec(1), momVec(2));
+  m_results.curvatureSign = curvatureSign;
 
   return TMath::Prob(*(m_results.chiSquared), 2 * measurements.size() - 5);
-  ;
-
 }
 

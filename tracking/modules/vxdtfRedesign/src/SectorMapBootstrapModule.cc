@@ -269,6 +269,10 @@ SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
   std::vector<VxdID> listOfSensors = geometry.getListOfSensors();
   for (VxdID aSensorId : listOfSensors) {
 
+    // filter only those sensors on layers which are specified in the config
+    if (std::find(config.allowedLayers.begin(), config.allowedLayers.end(),
+                  aSensorId.getLayerNumber()) == config.allowedLayers.end()) continue;
+
     // for testbeams there might be other sensors in the geometry so filter for SVD and PXD only, as the CompactSecID dont like those!
     VXD::SensorInfoBase::SensorType type = geometry.getSensorInfo(aSensorId).getType();
     if (type != VXD::SensorInfoBase::SVD && type != VXD::SensorInfoBase::PXD) {
@@ -289,6 +293,14 @@ SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
                                        sectors) ;
   }//end loop over sensors
 
+
+  // if layer 0 is specified in the config then the virtual IP is added
+  if (std::find(config.allowedLayers.begin(), config.allowedLayers.end(), 0) != config.allowedLayers.end()) {
+    std::vector<double> uCuts4vIP = {}, vCuts4vIP = {};
+    sectors.clear();
+    sectors = {{0}};
+    segmentFilters->addSectorsOnSensor(uCuts4vIP, vCuts4vIP, sectors);
+  }
 
   // put config into the container
   FiltersContainer<SpacePoint>::getInstance().assignFilters(config.secMapName, segmentFilters);

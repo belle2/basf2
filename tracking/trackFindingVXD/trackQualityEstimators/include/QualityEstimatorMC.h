@@ -26,9 +26,9 @@ namespace Belle2 {
     typedef int NMatches;
     typedef std::pair<MCRecoTrackIndex, NMatches> MatchInfo;
 
-    QualityEstimatorMC(double magneticFieldZ = 0, std::string mcRecoTracksStoreArrayName = "MCRecoTracks",
+    QualityEstimatorMC(std::string mcRecoTracksStoreArrayName = "MCRecoTracks",
                        bool strictQualityIndex = true):
-      QualityEstimatorBase(magneticFieldZ), m_strictQualityIndex(strictQualityIndex)
+      QualityEstimatorBase(), m_strictQualityIndex(strictQualityIndex)
     {
       m_mcRecoTracks.isRequired(mcRecoTracksStoreArrayName);
       // store to make sure SPTCs are compared to the correct SVDStoreArray

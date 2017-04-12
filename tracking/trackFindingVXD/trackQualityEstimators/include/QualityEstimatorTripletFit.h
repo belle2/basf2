@@ -20,15 +20,13 @@ namespace Belle2 {
 
   public:
 
-    QualityEstimatorTripletFit(double bFieldValue = 1.5): QualityEstimatorBase(bFieldValue) {};
-
     virtual double estimateQuality(std::vector<SpacePoint const*> const& measurements) final;
 
     virtual QualityEstimationResults estimateQualityAndProperties(std::vector<SpacePoint const*> const& measurements) final;
 
   protected:
 
-    // some variables that are required for the optional results, but are calculated by getChiSquared anyways
+    // some variables that are required for the optional results, but are calculated by 'estimateQuality' anyways
     std::vector<double> m_alphas;
     std::vector<double> m_thetas;
     std::vector<double> m_R3Ds;

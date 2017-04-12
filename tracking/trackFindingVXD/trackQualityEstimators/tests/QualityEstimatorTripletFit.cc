@@ -27,7 +27,8 @@ namespace QualityEstimatorTests {
   TEST(TripletFitTests, CircleChi2)
   {
     // Setup QualityEstimator
-    auto qualityEstimator = QualityEstimatorTripletFit(1.5);
+    auto qualityEstimator = QualityEstimatorTripletFit();
+    qualityEstimator.setMagneticFieldStrength(1.5);
 
     // Some hitpoints that are exactly on a circle in x,y with radius 1 and m=(1,0,0)
     auto position1 = B2Vector3<double>(0., 0., 0.);
@@ -102,7 +103,8 @@ namespace QualityEstimatorTests {
   TEST(TripletFitTests, CombinedCircleChi2)
   {
     // Setup QualityEstimator
-    auto qualityEstimator = QualityEstimatorTripletFit(1.5);
+    auto qualityEstimator = QualityEstimatorTripletFit();
+    qualityEstimator.setMagneticFieldStrength(1.5);
 
     // Some hitpoints that are exactly on a circle in x,y with radius 1 and m=(1,0,0)
     auto position1 = B2Vector3<double>(0., 0., 0.);
@@ -148,7 +150,8 @@ namespace QualityEstimatorTests {
   TEST(TripletFitTests, Interface)
   {
     // Setup QualityEstimator Class
-    auto qualityEstimator = QualityEstimatorTripletFit(1.5);
+    auto qualityEstimator = QualityEstimatorTripletFit();
+    qualityEstimator.setMagneticFieldStrength(1.5);
 
     // Some hitpoints
     auto position1 = B2Vector3<double>(0., 0., 0.);

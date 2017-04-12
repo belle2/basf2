@@ -40,7 +40,8 @@ void SPTCmomentumSeedRetrieverModule::beginRun()
   // BField is required by all QualityEstimators
   double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
 
-  m_estimator = QualityEstimatorRiemannHelixFit(bFieldZ);
+  m_estimator = QualityEstimatorRiemannHelixFit();
+  m_estimator.setMagneticFieldStrength(bFieldZ);
 
   B2DEBUG(1, "SPTCmomentumSeedRetrieverModule:beginRun: B-Field z-component: " << m_bFieldZ);
 }

@@ -21,8 +21,6 @@ namespace Belle2 {
 
   public:
 
-    QualityEstimatorRiemannHelixFit(double bFieldValue = 1.5): QualityEstimatorBase(bFieldValue) {};
-
     virtual double estimateQuality(std::vector<SpacePoint const*> const& measurements) final;
 
   protected:

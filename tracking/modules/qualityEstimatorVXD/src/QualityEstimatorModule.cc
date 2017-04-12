@@ -14,6 +14,7 @@
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRandom.h>
+#include <tracking/trackFindingVXD/utilities/UniquePointerHelper.h>
 #include <framework/logging/Logger.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 
@@ -29,13 +30,14 @@ QualityEstimatorModule::QualityEstimatorModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("EstimationMethod", m_EstimationMethod,
-           "Identifier which estimation method to use. Valid identifiers are: [MCInfo, CircleFit, TripletFit, Random]", std::string(""));
+           "Identifier which estimation method to use. Valid identifiers are: [MCInfo, CircleFit, TripletFit, HelixFit, Random]",
+           std::string(""));
 
   addParam("SpacePointTrackCandsStoreArrayName", m_SpacePointTrackCandsStoreArrayName,
            "Name of StoreArray containing the SpacePointTrackCandidates to be estimated.", std::string(""));
 
   addParam("MCRecoTracksStoreArrayName", m_MCRecoTracksStoreArrayName,
-           "Name of StoreArray containing MCRecoTracks. Only required for MCInfo method", std::string("MCRecoTracks"));
+           "Only required for MCInfo method. Name of StoreArray containing MCRecoTracks.", std::string("MCRecoTracks"));
 
   addParam("MCStrictQualityEstimator", m_MCStrictQualityEstimator,
            "Only required for MCInfo method. If false combining several MCTracks is allowed.", bool(true));
@@ -45,23 +47,26 @@ void QualityEstimatorModule::initialize()
 {
   m_spacePointTrackCands.isRequired(m_SpacePointTrackCandsStoreArrayName);
 
-  // BField is required by all QualityEstimators
-  double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
-
   // create pointer to chosen estimator
   if (m_EstimationMethod == "MCInfo") {
-    m_estimator = std::unique_ptr<QualityEstimatorBase>(
-                    new QualityEstimatorMC(bFieldZ, m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator));
+    m_estimator = make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
   } else if (m_EstimationMethod == "TripletFit") {
-    m_estimator = std::unique_ptr<QualityEstimatorBase>(new QualityEstimatorTripletFit(bFieldZ));
+    m_estimator = make_unique<QualityEstimatorTripletFit>();
   } else if (m_EstimationMethod == "CircleFit") {
-    m_estimator = std::unique_ptr<QualityEstimatorBase>(new QualityEstimatorCircleFit(bFieldZ));
+    m_estimator = make_unique<QualityEstimatorCircleFit>();
   } else if (m_EstimationMethod == "HelixFit") {
-    m_estimator = std::unique_ptr<QualityEstimatorBase>(new QualityEstimatorRiemannHelixFit(bFieldZ));
+    m_estimator = make_unique<QualityEstimatorRiemannHelixFit>();
   } else if (m_EstimationMethod == "Random") {
-    m_estimator = std::unique_ptr<QualityEstimatorBase>(new QualityEstimatorRandom(bFieldZ));
+    m_estimator = make_unique<QualityEstimatorRandom>();
   }
   B2ASSERT("QualityEstimator could not be initialized with method: " << m_EstimationMethod, m_estimator);
+}
+
+void QualityEstimatorModule::beginRun()
+{
+  // BField is required by all QualityEstimators
+  double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+  m_estimator->setMagneticFieldStrength(bFieldZ);
 }
 
 void QualityEstimatorModule::event()

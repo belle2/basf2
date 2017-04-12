@@ -31,10 +31,12 @@ namespace Belle2 {
     QualityEstimatorModule();
 
     /** Initializes the Module. */
-    virtual void initialize();
+    virtual void initialize() override;
+
+    virtual void beginRun() override;
 
     /** Applies the selected quality estimation method for a given set of TCs */
-    virtual void event();
+    virtual void event() override;
 
 
   protected:
@@ -45,6 +47,7 @@ namespace Belle2 {
      * MCInfo
      * CircleFit
      * TripletFit
+     * HelixFit
      * Random
      */
     std::string m_EstimationMethod;

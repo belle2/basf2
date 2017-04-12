@@ -23,7 +23,7 @@ namespace Belle2 {
    * qualityIndicator is always computed, all other values are optional, depending on the implementation.
    */
   struct QualityEstimationResults {
-    double qualityIndicator;
+    double qualityIndicator = 0;
     boost::optional<double> chiSquared;
     boost::optional<short> curvatureSign;
     boost::optional<double> pt;
@@ -42,10 +42,11 @@ namespace Belle2 {
 
   public:
 
-    QualityEstimatorBase(double magneticFieldZ = 1.5):
-      m_magneticFieldZ(magneticFieldZ) {}
+    QualityEstimatorBase() {}
 
     virtual ~QualityEstimatorBase() = default;
+
+    void setMagneticFieldStrength(double magneticFieldZ = 1.5) {m_magneticFieldZ = magneticFieldZ;}
 
     /** Minimal implementation of the quality estimation
      * Calculates quality indicator in range [0,1]
@@ -56,7 +57,7 @@ namespace Belle2 {
 
     /** Quality estimation providing additional quantities
      * Calculates quality indicator in range [0,1]
-     * Optionally returns chi2, curvatureSign , pt, p
+     * Optionally returns chi2 and additional informations. Eg. momentum estimation.
      *
      * measurements - std::vector<SpacePoint const*> ordered from innermost to outermost measurement
      */
@@ -78,8 +79,11 @@ namespace Belle2 {
 
     // Data members
 
-    double m_magneticFieldZ;
+    double m_magneticFieldZ = 1.5;
 
+    /* This is stored as a member variable, because some values may be calculated by 'estimateQuality' anyways.
+     * Therefore they don't need to be calculated explicitly in 'estimateQualityAndProperties'.
+     */
     QualityEstimationResults m_results;
   };
 }

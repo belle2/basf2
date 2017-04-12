@@ -18,8 +18,6 @@ namespace Belle2 {
 
   public:
 
-    QualityEstimatorRandom(double magneticFieldZ = 0): QualityEstimatorBase(magneticFieldZ) {};
-
     virtual double estimateQuality(std::vector<SpacePoint const*> const& measurements) final {return gRandom->Uniform(1.0);};
   };
 }

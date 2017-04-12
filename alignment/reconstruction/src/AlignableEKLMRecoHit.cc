@@ -24,7 +24,7 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit()
 
 AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   const EKLMAlignmentHit* hit, const genfit::TrackCandHit* trackCandHit) :
-  genfit::PlanarMeasurement(2)
+  genfit::PlanarMeasurement(1)
 {
   (void)trackCandHit;
   int digit, endcap, layer, sector, plane, segment, strip;
@@ -88,12 +88,10 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   /* Projection onto hit plane - only need to change Z. */
   globalPosition.SetZ(origin2.Z());
   localPosition = detPlane->LabToPlane(globalPosition);
-  rawHitCoords_[0] = localPosition.X();
-  rawHitCoords_[1] = localPosition.Y();
-  rawHitCov_[0][0] = pow(geoDat->getStripGeometry()->getWidth(), 2) / 12;
-  rawHitCov_[0][1] = 0;
-  rawHitCov_[1][0] = 0;
-  rawHitCov_[1][1] = rawHitCov_[0][0];
+  rawHitCoords_[0] = localPosition.Y();
+  rawHitCov_[0][0] = pow(geoDat->getStripGeometry()->getWidth() /
+                         CLHEP::cm * Unit::cm, 2) / 12;
+  setStripV();
 }
 
 AlignableEKLMRecoHit::~AlignableEKLMRecoHit()

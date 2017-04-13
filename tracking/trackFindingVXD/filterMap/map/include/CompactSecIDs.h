@@ -322,6 +322,18 @@ namespace Belle2 {
       return m_compactSectorsIDMap[layer][ladder].size();
     }
 
+    /// set the SublayerID of the sector
+    /// @param sector: the FullSectorID of the sector, the sublayer id will be ignored during searching for the sector
+    /// @param sublayer: the new sublayer id
+    bool setSubLayerID(FullSecID& sector, int sublayer)
+    {
+      sectorID_t compactID = getCompactID(sector);
+      if (compactID == 0) return false;
+      return m_compactSectorsIDMap[sector.getLayerID()][sector.getLadderID()]
+             [sector.getVxdID().getSensorNumber()].updateSubLayerID(sector, sublayer);
+    }
+
+
   private:
 
     sectorID_t m_sectorCounter;

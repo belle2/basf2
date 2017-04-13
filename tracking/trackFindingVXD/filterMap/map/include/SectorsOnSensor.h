@@ -99,6 +99,9 @@ namespace Belle2 {
       return m_fullSecIDs[ uIndex ][ vIndex ];
     }
 
+
+
+
     /// copy the vector members on the vector pointed from the arguments.
     ///  @param normalizedUsup
     ///  @param normalizedVsup
@@ -156,8 +159,27 @@ namespace Belle2 {
     /// minimal vector semantics to resize the compactSecIDs vector
     void resize(size_t n) { m_compactSecIDs.resize(n); };
 
+
+    /// update the sublayer id for the sector with the given FullSecID, the sublayer id is ignored when searching for the sector
+    /// @param sector: FullSecID of the sector to be updated
+    /// @param sublayer : the new value for the sublayer ID, the new SubLayerID will be 0 if sublayer==0, and will be 1 else
+    bool updateSubLayerID(FullSecID sector, int sublayer)
+    {
+      for (auto& v : m_fullSecIDs) {
+        for (FullSecID& thisSecID : v) {
+          /// WARNING: the comparison will ignore the sublayer id
+          if (sector.equalIgnoreSubLayerID(thisSecID)) {
+            thisSecID = FullSecID(thisSecID.getVxdID(), (bool)sublayer, thisSecID.getSecID());
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
     /// JKL: for testing - get all compactSecIDs:
     const std::vector< sectorID >& getCompactSecIDs() const { return m_compactSecIDs; }
+
   };
 
 }

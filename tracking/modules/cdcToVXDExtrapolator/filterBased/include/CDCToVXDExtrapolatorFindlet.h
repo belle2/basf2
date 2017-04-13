@@ -20,6 +20,8 @@
 
 namespace Belle2 {
   class CDCToVXDExtrapolatorFindlet : public TrackFindingCDC::Findlet<> {
+    using Super = TrackFindingCDC::Findlet<>;
+
   public:
     /// Constructor, for setting module description and parameters.
     CDCToVXDExtrapolatorFindlet();
@@ -45,5 +47,7 @@ namespace Belle2 {
     std::vector<RecoTrack*> m_cdcRecoTrackVector;
     /// Pointers to the (const) SpacePoints as a vector
     std::vector<const SpacePoint*> m_spacePointVector;
+    /// Vector for storing the results
+    std::vector<std::pair<RecoTrack*, std::vector<const SpacePoint*>>> m_results;
   };
 }

@@ -12,13 +12,20 @@
 </header>
 """
 
-# NAME = 'ROIFinding' # not used
+NAME = 'ROIFinding'  # not used?
 CONTACT = 'giulia.casarosa@desy.de'
-OUTPUT_FILE = 'ROITFindingrackingValidation.root'
-# N_EVENTS = 1000 # TODO: limit the  number of processed events
+INPUT_FILE = '../EvtGenSimNoBkg.root'
+# INPUT_FILE = 'simRootOutput.root'  # for debugging purposes
+OUTPUT_FILE = 'ROIFindingTrackingValidation.root'
+N_EVENTS = 1000
+
 ACTIVE = False
 
-# from simulation import add_simulation
+CREATE_INPUT = False  # for debugging purposes, use it with the basf2 -n option
+if CREATE_INPUT:
+    OUTPUT_FILE = 'simRootOutput.root'
+
+from simulation import add_simulation
 
 import basf2
 import ROOT
@@ -197,61 +204,56 @@ class ROIFindingTrackingValidationPlots(basf2.Module):
 
 path = basf2.create_path()
 
-path.add_module('EventInfoSetter')
-path.add_module('Gearbox')
-path.add_module('Geometry')
+if CREATE_INPUT:
+    path.add_module('EventInfoSetter')
+    path.add_module('EvtGenInput')
+    add_simulation(path)
 
-# root_input_file = 'RootOutput.root' #'../EvtGenSimNoBkg.root'
+if not CREATE_INPUT:
 
-# path.add_module('EvtGenInput')
-# add_simulation(path, components=None, bkgfiles=None, bkgcomponents=None, bkgscale=1.0, usePXDDataReduction=True)
-# add_simulation(path)
+    path.add_module('RootInput', inputFileName=INPUT_FILE, entrySequences=["0:{}".format(N_EVENTS-1)])
+    path.add_module('Gearbox')
+    path.add_module('Geometry')
 
-path.add_module('RootInput')
+    pxd_unfiltered_digits = 'PXDDigits'
+    pxd_filtered_digits = 'filteredPXDDigits'
 
-pxd_unfiltered_digits = 'PXDDigits'
-pxd_filtered_digits = 'filteredPXDDigits'
+    # SVD+CDC tracking
+    svd_reco_tracks = '__ROIsvdRecoTracks'
+    add_tracking_for_PXDDataReduction_simulation(path, ['SVD', 'CDC'], False)
 
-# SVD+CDC tracking
-svd_reco_tracks = '__ROIsvdRecoTracks'
-add_tracking_for_PXDDataReduction_simulation(path, ['SVD', 'CDC'], False)
+    # ROI Finding
+    pxdDataRed = basf2.register_module('PXDDataReduction')
+    param_pxdDataRed = {
+        'recoTrackListName': svd_reco_tracks,
+        'PXDInterceptListName': 'PXDIntercepts',
+        'ROIListName': 'ROIs',
+        'tolerancePhi': 0.15,
+        'toleranceZ': 0.5,
+        'sigmaSystU': 0.02,
+        'sigmaSystV': 0.02,
+        'numSigmaTotU': 10,
+        'numSigmaTotV': 10,
+        'maxWidthU': 0.5,
+        'maxWidthV': 0.5,
+    }
+    pxdDataRed.param(param_pxdDataRed)
+    path.add_module(pxdDataRed)
 
-# ROI Finding
-pxdDataRed = basf2.register_module('PXDDataReduction')
-param_pxdDataRed = {
-    'recoTrackListName': svd_reco_tracks,
-    'PXDInterceptListName': 'PXDIntercepts',
-    'ROIListName': 'ROIs',
-    'tolerancePhi': 0.15,
-    'toleranceZ': 0.5,
-    'sigmaSystU': 0.02,
-    'sigmaSystV': 0.02,
-    'numSigmaTotU': 10,
-    'numSigmaTotV': 10,
-    'maxWidthU': 0.5,
-    'maxWidthV': 0.5,
-}
-pxdDataRed.param(param_pxdDataRed)
-path.add_module(pxdDataRed)
+    # Filtering of PXDDigits
+    pxd_digifilter = basf2.register_module('PXDdigiFilter')
+    pxd_digifilter.param('ROIidsName', 'ROIs')
+    pxd_digifilter.param('PXDDigitsName', pxd_unfiltered_digits)
+    pxd_digifilter.param('PXDDigitsInsideROIName', pxd_filtered_digits)
+    path.add_module(pxd_digifilter)
 
-# Filtering of PXDDigits
-pxd_digifilter = basf2.register_module('PXDdigiFilter')
-pxd_digifilter.param('ROIidsName', 'ROIs')
-pxd_digifilter.param('PXDDigitsName', pxd_unfiltered_digits)
-pxd_digifilter.param('PXDDigitsInsideROIName', pxd_filtered_digits)
-path.add_module(pxd_digifilter)
-
-ROIValidationPlots = ROIFindingTrackingValidationPlots()
-# param_ROIValidationPlots = {
-#    'name': NAME,
-#    'contact': CONTACT,
-# }
-# ROIValidationPlots.param(param_ROIValidationPlots)
-path.add_module(ROIValidationPlots)
+    ROIValidationPlots = ROIFindingTrackingValidationPlots()
+    path.add_module(ROIValidationPlots)
 
 path.add_module('Progress')
 
-# path.add_module('RootOutput')
+if CREATE_INPUT:
+    path.add_module('RootOutput', outputFileName=OUTPUT_FILE)
 
 if ACTIVE:
     basf2.process(path)

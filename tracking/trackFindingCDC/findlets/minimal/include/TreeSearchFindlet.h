@@ -19,13 +19,19 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     template<class AStateObject, class AFilterFactory>
-    class TreeSearchFindlet : public Findlet<typename AStateObject::SeedObject*, const typename AStateObject::HitObject*> {
+    class TreeSearchFindlet : public Findlet <
+      typename AStateObject::SeedObject*,
+      const typename AStateObject::HitObject*,
+      std::pair<typename AStateObject::SeedObject*, std::vector<const typename AStateObject::HitObject*>>
+          > {
     public:
-      using Super = Findlet<typename AStateObject::SeedObject*, const typename AStateObject::HitObject*>;
+      using Super = Findlet<typename AStateObject::SeedObject*, const typename AStateObject::HitObject*,
+            std::pair<typename AStateObject::SeedObject*, std::vector<const typename AStateObject::HitObject*>>>;
       using SeedPtr = typename AStateObject::SeedObject*;
       using HitPtr = const typename AStateObject::HitObject*;
       using StateArray = typename std::array<AStateObject, AStateObject::N>;
       using StateIterator = typename StateArray::iterator;
+      using ResultPair = std::pair<typename AStateObject::SeedObject*, std::vector<const typename AStateObject::HitObject*>>;
 
       /// Construct this findlet and add the two filters as listeners
       TreeSearchFindlet() : Super()
@@ -44,19 +50,33 @@ namespace Belle2 {
 
         moduleParamList->addParameter(prefixed(prefix, "makeHitJumpingPossible"), m_param_makeHitJumpingPossible,
                                       "", m_param_makeHitJumpingPossible);
+        moduleParamList->addParameter(prefixed(prefix, "advance"), m_param_advance,
+                                      "Do the advance step.", m_param_advance);
       }
 
       /// Main function of this findlet: traverse a tree starting from a given seed object.
-      void traverseTree(SeedPtr seed, std::vector<std::pair<SeedPtr, std::vector<HitPtr>>>& resultsVector)
-      {
-        // TODO: Pull this into the apply function!
-        m_states.front().initialize(seed);
-        traverseTree(m_states.begin(), resultsVector);
+      void apply(std::vector<SeedPtr>& seedsVector, std::vector<HitPtr>& hitVector,
+                 std::vector<ResultPair>& results) final {
+        initializeEventCache(seedsVector, hitVector);
+
+        for (SeedPtr seed : seedsVector)
+        {
+          initializeSeedCache(seed);
+
+          m_states.front().initialize(seed);
+          traverseTree(m_states.begin(), results);
+        }
       }
 
     protected:
       /// Overloadable function to return the possible range of next hit objects for a given state
       virtual TrackFindingCDC::SortedVectorRange<HitPtr> getMatchingHits(StateIterator currentState) = 0;
+
+      virtual void advance(StateIterator currentState) = 0;
+
+      virtual void initializeEventCache(std::vector<SeedPtr>& seedsVector, std::vector<HitPtr>& hitVector) { }
+
+      virtual void initializeSeedCache(SeedPtr seed) { }
 
     private:
       /// Object cache for states
@@ -65,14 +85,16 @@ namespace Belle2 {
       /// Parameter: make hit jumps possible
       bool m_param_makeHitJumpingPossible = true;
 
+      /// Parameter: do the advance step
+      bool m_param_advance = true;
+
       /// Subfindlet: Filter 1
       ChooseableFilter<AFilterFactory> m_firstFilter;
       /// Subfindlet: Filter 2
       ChooseableFilter<AFilterFactory> m_secondFilter;
 
       /// Implementation of the traverseTree function
-      void traverseTree(StateIterator currentState,
-                        std::vector<std::pair<SeedPtr, std::vector<HitPtr>>>& resultsVector)
+      void traverseTree(StateIterator currentState, std::vector<ResultPair>& resultsVector)
       {
         const auto& matchingHits = getMatchingHits(currentState);
         StateIterator nextState = std::next(currentState);
@@ -110,8 +132,10 @@ namespace Belle2 {
           return false;
         }
 
-        // Extrapolate
-        currentState->advance();
+        if (m_param_advance) {
+          // Extrapolate
+          advance(currentState);
+        }
 
         // Check the second filter after extrapolation
         weight = m_secondFilter(*currentState);

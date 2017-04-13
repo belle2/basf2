@@ -56,12 +56,12 @@ void EKLMAlignmentModule::generateZeroDisplacement()
 void EKLMAlignmentModule::generateRandomDisplacement()
 {
   IntervalOfValidity iov(0, 0, -1, -1);
-  const double sectorMaxDx = 1. * Unit::cm;
-  const double sectorMinDx = -1. * Unit::cm;
-  const double sectorMaxDy = 0.2 * Unit::cm;
-  const double sectorMinDy = -0.2 * Unit::cm;
-  const double sectorMaxDalpha = 0.003 * Unit::rad;
-  const double sectorMinDalpha = -0.003 * Unit::rad;
+  const double sectorMaxDx = 5. * Unit::cm;
+  const double sectorMinDx = -5. * Unit::cm;
+  const double sectorMaxDy = 5. * Unit::cm;
+  const double sectorMinDy = -5. * Unit::cm;
+  const double sectorMaxDalpha = 0.02 * Unit::rad;
+  const double sectorMinDalpha = -0.02 * Unit::rad;
   const double segmentMaxDx = 1. * Unit::cm;
   const double segmentMinDx = -1. * Unit::cm;
   const double segmentMaxDy = 0.2 * Unit::cm;
@@ -69,7 +69,7 @@ void EKLMAlignmentModule::generateRandomDisplacement()
   const double segmentMaxDalpha = 0.003 * Unit::rad;
   const double segmentMinDalpha = -0.003 * Unit::rad;
   EKLMAlignment alignment;
-  EKLMAlignmentData alignmentData;
+  EKLMAlignmentData sectorAlignment, segmentAlignment;
   EKLM::AlignmentChecker alignmentChecker;
   int iEndcap, iLayer, iSector, iPlane, iSegment, sector, segment;
   EKLM::fillZeroDisplacements(&alignment);
@@ -78,25 +78,28 @@ void EKLMAlignmentModule::generateRandomDisplacement()
          iLayer++) {
       for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
         do {
-          alignmentData.setDx(gRandom->Uniform(sectorMinDx, sectorMaxDx));
-          alignmentData.setDy(gRandom->Uniform(sectorMinDy, sectorMaxDy));
-          alignmentData.setDalpha(
+          sectorAlignment.setDx(gRandom->Uniform(sectorMinDx, sectorMaxDx));
+          sectorAlignment.setDy(gRandom->Uniform(sectorMinDy, sectorMaxDy));
+          sectorAlignment.setDalpha(
             gRandom->Uniform(sectorMinDalpha, sectorMaxDalpha));
-        } while (!alignmentChecker.checkSectorAlignment(&alignmentData));
+        } while (!alignmentChecker.checkSectorAlignment(&sectorAlignment));
         sector = m_GeoDat->sectorNumber(iEndcap, iLayer, iSector);
-        alignment.setSectorAlignment(sector, &alignmentData);
+        alignment.setSectorAlignment(sector, &sectorAlignment);
         for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
           for (iSegment = 1; iSegment <= m_GeoDat->getNSegments(); iSegment++) {
             do {
-              alignmentData.setDx(gRandom->Uniform(segmentMinDx, segmentMaxDx));
-              alignmentData.setDy(gRandom->Uniform(segmentMinDy, segmentMaxDy));
-              alignmentData.setDalpha(
+              segmentAlignment.setDx(
+                gRandom->Uniform(segmentMinDx, segmentMaxDx));
+              segmentAlignment.setDy(
+                gRandom->Uniform(segmentMinDy, segmentMaxDy));
+              segmentAlignment.setDalpha(
                 gRandom->Uniform(segmentMinDalpha, segmentMaxDalpha));
             } while (!alignmentChecker.checkSegmentAlignment(iPlane, iSegment,
-                                                             &alignmentData));
+                                                             &sectorAlignment,
+                                                             &segmentAlignment));
             segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector, iPlane,
                                               iSegment);
-            alignment.setSegmentAlignment(segment, &alignmentData);
+            alignment.setSegmentAlignment(segment, &segmentAlignment);
           }
         }
       }
@@ -109,12 +112,12 @@ void EKLMAlignmentModule::generateRandomDisplacement()
 void EKLMAlignmentModule::studySectorAlignmentLimits(TFile* f)
 {
   const int nPoints = 1000;
-  const float maxDx = 9. * Unit::cm;
-  const float minDx = -4. * Unit::cm;
-  const float maxDy = 0.2 * Unit::cm;
-  const float minDy = -0.2 * Unit::cm;
-  const float maxDalpha = 0.003 * Unit::rad;
-  const float minDalpha = -0.003 * Unit::rad;
+  const float maxDx = 5. * Unit::cm;
+  const float minDx = -5. * Unit::cm;
+  const float maxDy = 5. * Unit::cm;
+  const float minDy = -5. * Unit::cm;
+  const float maxDalpha = 0.02 * Unit::rad;
+  const float minDalpha = -0.02 * Unit::rad;
   float dx, dy, dalpha;
   int i, alignmentStatus, iEndcap, iLayer, iSector, sector;
   EKLMAlignment alignment;

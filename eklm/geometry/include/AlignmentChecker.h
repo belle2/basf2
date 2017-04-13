@@ -57,20 +57,22 @@ namespace Belle2 {
 
       /**
        * Check sector alignment.
-       * @param[in] alignment Alignment data.
+       * @param[in] sectorAlignment Sector alignment.
        * @return true Alignment is correct (no overlaps).
        */
-      bool checkSectorAlignment(EKLMAlignmentData* alignment) const;
+      bool checkSectorAlignment(EKLMAlignmentData* sectorAlignment) const;
 
       /**
        * Check segment alignment.
-       * @param[in] iPlane    Plane number.
-       * @param[in] iSegment  Segment number.
-       * @param[in] alignment Alignment data.
+       * @param[in] iPlane           Plane number.
+       * @param[in] iSegment         Segment number.
+       * @param[in] sectorAlignment  Sector alignment.
+       * @param[in] segmentAlignment Segment alignment.
        * @return true Alignment is correct (no overlaps).
        */
       bool checkSegmentAlignment(int iPlane, int iSegment,
-                                 EKLMAlignmentData* alignment) const;
+                                 EKLMAlignmentData* sectorAlignment,
+                                 EKLMAlignmentData* segmentAlignment) const;
 
     private:
 
@@ -94,6 +96,12 @@ namespace Belle2 {
 
       /** Segment support. */
       Polygon2D*** m_SegmentSupport;
+
+      /** Last checked sector. */
+      EKLMAlignmentData* m_LastCheckedSector;
+
+      /** Last sector check result. */
+      bool m_LastSectorCheckResult;
 
     };
 

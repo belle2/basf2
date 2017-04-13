@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Keck                                              *
+ * Contributors: Thomas Keck, Dennis Weyland                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -157,4 +157,45 @@ TMatrixFSym CMSFrame::getVertexErrorMatrix(const Particle* particle) const
   timeshift(2, 3) = boost_vector(2);
 
   return rotated_error_matrix.Similarity(timeshift);
+}
+
+RotationFrame::RotationFrame(const TVector3& newX, const TVector3& newY, const TVector3& newZ)
+{
+  m_rotation.RotateAxes(newX, newY, newZ);
+  m_rotation.Invert();
+}
+
+TVector3 RotationFrame::getVertex(const Particle* particle) const
+{
+  return m_rotation * particle->getVertex();
+}
+
+TLorentzVector RotationFrame::getMomentum(const Particle* particle) const
+{
+  TLorentzVector lorvector = particle->get4Vector();
+  TVector3 rotated_vector = m_rotation * lorvector.Vect();
+
+  return TLorentzVector(rotated_vector, lorvector[3]);
+}
+
+TMatrixFSym RotationFrame::getMomentumErrorMatrix(const Particle* particle) const
+{
+  TMatrixD extendedrot(4, 4);
+  extendedrot.Zero();
+  for (int i = 0; i < 3; ++i)
+    for (int j = 0; j < 3; ++j)
+      extendedrot(i, j) = m_rotation(i, j);
+  extendedrot(3, 3) = 1;
+
+  return particle->getMomentumErrorMatrix().Similarity(extendedrot);
+}
+
+TMatrixFSym RotationFrame::getVertexErrorMatrix(const Particle* particle) const
+{
+  TMatrixD rotmatrix(3, 3);
+  for (int i = 0; i < 3; ++i)
+    for (int j = 0; j < 3; ++j)
+      rotmatrix(i, j) = m_rotation(i, j);
+
+  return particle->getVertexErrorMatrix().Similarity(rotmatrix);
 }

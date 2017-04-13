@@ -56,6 +56,13 @@ namespace Belle2 {
       bool checkAlignment(EKLMAlignment* alignment) const;
 
       /**
+       * Check sector alignment.
+       * @param[in] alignment Alignment data.
+       * @return true Alignment is correct (no overlaps).
+       */
+      bool checkSectorAlignment(EKLMAlignmentData* alignment) const;
+
+      /**
        * Check segment alignment.
        * @param[in] iPlane    Plane number.
        * @param[in] iSegment  Segment number.

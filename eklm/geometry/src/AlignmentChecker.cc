@@ -109,6 +109,12 @@ EKLM::AlignmentChecker::~AlignmentChecker()
 }
 
 bool EKLM::AlignmentChecker::
+checkSectorAlignment(EKLMAlignmentData* alignment) const
+{
+  return true;
+}
+
+bool EKLM::AlignmentChecker::
 checkSegmentAlignment(int iPlane, int iSegment,
                       EKLMAlignmentData* alignment) const
 {

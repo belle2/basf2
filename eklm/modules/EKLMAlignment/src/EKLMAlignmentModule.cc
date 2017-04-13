@@ -56,26 +56,42 @@ void EKLMAlignmentModule::generateZeroDisplacement()
 void EKLMAlignmentModule::generateRandomDisplacement()
 {
   IntervalOfValidity iov(0, 0, -1, -1);
-  const double maxDx = 1. * Unit::cm;
-  const double minDx = -1. * Unit::cm;
-  const double maxDy = 0.2 * Unit::cm;
-  const double minDy = -0.2 * Unit::cm;
-  const double maxDalpha = 0.003 * Unit::rad;
-  const double minDalpha = -0.003 * Unit::rad;
+  const double sectorMaxDx = 1. * Unit::cm;
+  const double sectorMinDx = -1. * Unit::cm;
+  const double sectorMaxDy = 0.2 * Unit::cm;
+  const double sectorMinDy = -0.2 * Unit::cm;
+  const double sectorMaxDalpha = 0.003 * Unit::rad;
+  const double sectorMinDalpha = -0.003 * Unit::rad;
+  const double segmentMaxDx = 1. * Unit::cm;
+  const double segmentMinDx = -1. * Unit::cm;
+  const double segmentMaxDy = 0.2 * Unit::cm;
+  const double segmentMinDy = -0.2 * Unit::cm;
+  const double segmentMaxDalpha = 0.003 * Unit::rad;
+  const double segmentMinDalpha = -0.003 * Unit::rad;
   EKLMAlignment alignment;
   EKLMAlignmentData alignmentData;
   EKLM::AlignmentChecker alignmentChecker;
-  int iEndcap, iLayer, iSector, iPlane, iSegment, segment;
+  int iEndcap, iLayer, iSector, iPlane, iSegment, sector, segment;
+  EKLM::fillZeroDisplacements(&alignment);
   for (iEndcap = 1; iEndcap <= m_GeoDat->getNEndcaps(); iEndcap++) {
     for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
          iLayer++) {
       for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
+        do {
+          alignmentData.setDx(gRandom->Uniform(sectorMinDx, sectorMaxDx));
+          alignmentData.setDy(gRandom->Uniform(sectorMinDy, sectorMaxDy));
+          alignmentData.setDalpha(
+            gRandom->Uniform(sectorMinDalpha, sectorMaxDalpha));
+        } while (!alignmentChecker.checkSectorAlignment(&alignmentData));
+        sector = m_GeoDat->sectorNumber(iEndcap, iLayer, iSector);
+        alignment.setSectorAlignment(sector, &alignmentData);
         for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
           for (iSegment = 1; iSegment <= m_GeoDat->getNSegments(); iSegment++) {
             do {
-              alignmentData.setDx(gRandom->Uniform(minDx, maxDx));
-              alignmentData.setDy(gRandom->Uniform(minDy, maxDy));
-              alignmentData.setDalpha(gRandom->Uniform(minDalpha, maxDalpha));
+              alignmentData.setDx(gRandom->Uniform(segmentMinDx, segmentMaxDx));
+              alignmentData.setDy(gRandom->Uniform(segmentMinDy, segmentMaxDy));
+              alignmentData.setDalpha(
+                gRandom->Uniform(segmentMinDalpha, segmentMaxDalpha));
             } while (!alignmentChecker.checkSegmentAlignment(iPlane, iSegment,
                                                              &alignmentData));
             segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector, iPlane,
@@ -90,10 +106,55 @@ void EKLMAlignmentModule::generateRandomDisplacement()
   Database::Instance().storeData("EKLMDisplacement", (TObject*)&alignment, iov);
 }
 
-void EKLMAlignmentModule::studyAlignmentLimits()
+void EKLMAlignmentModule::studySectorAlignmentLimits(TFile* f)
 {
-  TFile* f;
+  const int nPoints = 1000;
+  const float maxDx = 9. * Unit::cm;
+  const float minDx = -4. * Unit::cm;
+  const float maxDy = 0.2 * Unit::cm;
+  const float minDy = -0.2 * Unit::cm;
+  const float maxDalpha = 0.003 * Unit::rad;
+  const float minDalpha = -0.003 * Unit::rad;
+  float dx, dy, dalpha;
+  int i, alignmentStatus, iEndcap, iLayer, iSector, sector;
+  EKLMAlignment alignment;
+  EKLMAlignmentData alignmentDataRandom;
+  EKLM::AlignmentChecker alignmentChecker;
   TTree* t;
+  f->cd();
+  t = new TTree("sector", "");
+  t->Branch("dx", &dx, "dx/F");
+  t->Branch("dy", &dy, "dy/F");
+  t->Branch("dalpha", &dalpha, "dalpha/F");
+  t->Branch("status", &alignmentStatus, "status/I");
+  for (i = 0; i < nPoints; i++) {
+    EKLM::fillZeroDisplacements(&alignment);
+    dx = gRandom->Uniform(minDx, maxDx);
+    dy = gRandom->Uniform(minDy, maxDy);
+    dalpha = gRandom->Uniform(minDalpha, maxDalpha);
+    alignmentDataRandom.setDx(dx);
+    alignmentDataRandom.setDy(dy);
+    alignmentDataRandom.setDalpha(dalpha);
+    for (iEndcap = 1; iEndcap <= m_GeoDat->getNEndcaps(); iEndcap++) {
+      for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
+           iLayer++) {
+        for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
+          sector = m_GeoDat->sectorNumber(iEndcap, iLayer, iSector);
+          alignment.setSectorAlignment(sector, &alignmentDataRandom);
+        }
+      }
+    }
+    if (alignmentChecker.checkAlignment(&alignment))
+      alignmentStatus = 1;
+    else
+      alignmentStatus = 0;
+    t->Fill();
+  }
+  t->Write();
+}
+
+void EKLMAlignmentModule::studySegmentAlignmentLimits(TFile* f)
+{
   const int nPoints = 1000;
   const float maxDx = 9. * Unit::cm;
   const float minDx = -4. * Unit::cm;
@@ -103,13 +164,13 @@ void EKLMAlignmentModule::studyAlignmentLimits()
   const float minDalpha = -0.003 * Unit::rad;
   float dx, dy, dalpha;
   int i, alignmentStatus;
-  int iEndcap, iLayer, iSector, iPlane, iSegment, jPlane, jSegment, segment;
+  int iEndcap, iLayer, iSector, jPlane, jSegment, segment;
   EKLMAlignment alignment;
-  EKLMAlignmentData alignmentDataZero(0., 0., 0.);
   EKLMAlignmentData alignmentDataRandom;
   EKLM::AlignmentChecker alignmentChecker;
-  f = new TFile(m_OutputFile.c_str(), "recreate");
-  t = new TTree("alignment", "");
+  TTree* t;
+  f->cd();
+  t = new TTree("segment", "");
   t->Branch("plane", &jPlane, "plane/I");
   t->Branch("segment", &jSegment, "segment/I");
   t->Branch("dx", &dx, "dx/F");
@@ -121,6 +182,7 @@ void EKLMAlignmentModule::studyAlignmentLimits()
     for (jSegment = 1; jSegment <= m_GeoDat->getNSegments(); jSegment++) {
       printf("Segment %d\n", jSegment);
       for (i = 0; i < nPoints; i++) {
+        EKLM::fillZeroDisplacements(&alignment);
         dx = gRandom->Uniform(minDx, maxDx);
         dy = gRandom->Uniform(minDy, maxDy);
         dalpha = gRandom->Uniform(minDalpha, maxDalpha);
@@ -131,17 +193,9 @@ void EKLMAlignmentModule::studyAlignmentLimits()
           for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
                iLayer++) {
             for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
-              for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
-                for (iSegment = 1; iSegment <= m_GeoDat->getNSegments();
-                     iSegment++) {
-                  segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector,
-                                                    iPlane, iSegment);
-                  if (iPlane == jPlane && iSegment == jSegment)
-                    alignment.setSegmentAlignment(segment, &alignmentDataRandom);
-                  else
-                    alignment.setSegmentAlignment(segment, &alignmentDataZero);
-                }
-              }
+              segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector,
+                                                jPlane, jSegment);
+              alignment.setSegmentAlignment(segment, &alignmentDataRandom);
             }
           }
         }
@@ -150,11 +204,18 @@ void EKLMAlignmentModule::studyAlignmentLimits()
         else
           alignmentStatus = 0;
         t->Fill();
-        alignment.cleanAlignmentData();
       }
     }
   }
   t->Write();
+}
+
+void EKLMAlignmentModule::studyAlignmentLimits()
+{
+  TFile* f;
+  f = new TFile(m_OutputFile.c_str(), "recreate");
+  studySectorAlignmentLimits(f);
+  studySegmentAlignmentLimits(f);
   delete f;
 }
 

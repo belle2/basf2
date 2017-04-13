@@ -23,6 +23,27 @@ EKLMAlignment::~EKLMAlignment()
 {
 }
 
+void EKLMAlignment::setSectorAlignment(uint16_t segment,
+                                       EKLMAlignmentData* dat)
+{
+  std::map<uint16_t, EKLMAlignmentData>::iterator it;
+  it = m_SectorAlignment.find(segment);
+  if (it == m_SectorAlignment.end()) {
+    m_SectorAlignment.insert(
+      std::pair<uint16_t, EKLMAlignmentData>(segment, *dat));
+  } else
+    it->second = *dat;
+}
+
+EKLMAlignmentData* EKLMAlignment::getSectorAlignment(uint16_t segment)
+{
+  std::map<uint16_t, EKLMAlignmentData>::iterator it;
+  it = m_SectorAlignment.find(segment);
+  if (it == m_SectorAlignment.end())
+    return NULL;
+  return &(it->second);
+}
+
 void EKLMAlignment::setSegmentAlignment(uint16_t segment,
                                         EKLMAlignmentData* dat)
 {
@@ -68,10 +89,5 @@ void EKLMAlignment::add(EKLMSegmentID segmentID, int parameter,
       B2FATAL("Incorrect EKLM alignment parameter " << parameter);
       break;
   }
-}
-
-void EKLMAlignment::cleanAlignmentData()
-{
-  m_SegmentAlignment.clear();
 }
 

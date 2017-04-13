@@ -82,6 +82,20 @@ namespace Belle2 {
     void generateRandomDisplacement();
 
     /**
+     * Generate random sector displacements and check if they are correct
+     * (no overlaps).
+     * @oaram[in] f Output file.
+     */
+    void studySectorAlignmentLimits(TFile* f);
+
+    /**
+     * Generate random segment displacements and check if they are correct
+     * (no overlaps).
+     * @oaram[in] f Output file.
+     */
+    void studySegmentAlignmentLimits(TFile* f);
+
+    /**
      * Generate random displacements and check if they are correct
      * (no overlaps).
      */

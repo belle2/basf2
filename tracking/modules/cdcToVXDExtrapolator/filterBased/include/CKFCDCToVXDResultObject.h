@@ -12,8 +12,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 
-#include <genfit/Tools.h>
-
 namespace Belle2 {
   class CKFCDCToVXDStateObject {
   public:
@@ -54,54 +52,6 @@ namespace Belle2 {
       m_measuredStateOnPlane = parent->getMeasuredStateOnPlane();
     }
 
-    void advance()
-    {
-      // TODO: Rewrite this with Eigen!
-      // TODO: Test this!
-      if (m_spacePoint) {
-        const std::vector<genfit::PlanarMeasurement> measurements = m_spacePoint->getGenfitCompatible();
-        B2ASSERT("Must have exactly 2 measurements", measurements.size() == 2);
-
-        // Extrapolate from k-1 -> k. The mSoP is copied from the state before, so it is k-1.
-        // By extrapolating, we will will go to k.
-        const genfit::SharedPlanePtr& plane = measurements.front().constructPlane(m_measuredStateOnPlane);
-        m_measuredStateOnPlane.extrapolateToPlane(plane);
-
-        // We will change the state x_k, the covariance C_k and the chi2
-        TVectorD x_k_old = m_measuredStateOnPlane.getState();
-        TMatrixDSym C_k_old = m_measuredStateOnPlane.getCov();
-
-        TVectorD& x_k_new = m_measuredStateOnPlane.getState();
-        TMatrixDSym& C_k_new = m_measuredStateOnPlane.getCov();
-
-        // Loop over the two clusters and extract the change for x_k and C_k.
-        for (const auto& clusterMeasurement : measurements) {
-          const std::vector<genfit::MeasurementOnPlane*> measurementsOnPlane = clusterMeasurement.constructMeasurementsOnPlane(
-                m_measuredStateOnPlane);
-          B2ASSERT("There should be exactly one measurement on plane", measurementsOnPlane.size() == 1);
-          const genfit::MeasurementOnPlane& measurementOnPlane = *(measurementsOnPlane.front());
-
-          const TVectorD& m_k = measurementOnPlane.getState();
-          const TMatrixD& H_k = measurementOnPlane.getHMatrix()->getMatrix();
-          const TMatrixD& H_k_t = TMatrixD(TMatrixD::kTransposed, H_k);
-          const TMatrixDSym& V_k = measurementOnPlane.getCov();
-
-          TMatrixDSym partOfK_k = (V_k + C_k_old.Similarity(H_k));
-          genfit::tools::invertMatrix(partOfK_k);
-          const TMatrixD& K_k = C_k_old * H_k_t * partOfK_k;
-
-          C_k_new -= partOfK_k.Similarity(C_k_old * H_k);
-          x_k_new += K_k * (m_k - H_k * x_k_old);
-
-          const TVectorD& residual = m_k - H_k * x_k_new;
-          TMatrixDSym someMatrix = V_k - C_k_new.Similarity(H_k);
-          genfit::tools::invertMatrix(someMatrix);
-
-          m_chi2 += someMatrix.Similarity(residual);
-        }
-      }
-    }
-
     // Getters
     const CKFCDCToVXDStateObject* getParent() const
     {
@@ -111,6 +61,11 @@ namespace Belle2 {
     RecoTrack* getSeedRecoTrack() const
     {
       return m_seedRecoTrack;
+    }
+
+    genfit::MeasuredStateOnPlane& getMeasuredStateOnPlane()
+    {
+      return m_measuredStateOnPlane;
     }
 
     const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlane() const
@@ -126,6 +81,16 @@ namespace Belle2 {
     unsigned int getLastLayer() const
     {
       return m_lastLayer;
+    }
+
+    double getChi2() const
+    {
+      return m_chi2;
+    }
+
+    double& getChi2()
+    {
+      return m_chi2;
     }
 
     unsigned int getNumberOfHoles() const

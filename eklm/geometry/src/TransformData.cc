@@ -106,7 +106,7 @@ EKLM::TransformData::TransformData(bool global, bool useDisplacement)
             for (iSegment = 1; iSegment <= nSegments; iSegment++) {
               segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector,
                                                 iPlane, iSegment);
-              alignmentData = alignment->getAlignmentData(segment);
+              alignmentData = alignment->getSegmentAlignment(segment);
               if (alignmentData == NULL)
                 B2FATAL("Incomplete EKLM displacement data.");
               m_Segment[iEndcap - 1][iLayer - 1][iSector - 1][iPlane - 1]

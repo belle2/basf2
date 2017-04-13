@@ -176,7 +176,7 @@ bool EKLM::AlignmentChecker::checkAlignment(EKLMAlignment* alignment) const
           for (iSegment = 1; iSegment <= m_GeoDat->getNSegments(); iSegment++) {
             segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector, iPlane,
                                               iSegment);
-            alignmentData = alignment->getAlignmentData(segment);
+            alignmentData = alignment->getSegmentAlignment(segment);
             if (alignmentData == NULL)
               B2FATAL("Incomplete alignment data.");
             if (!checkSegmentAlignment(iPlane, iSegment, alignmentData))

@@ -23,21 +23,23 @@ EKLMAlignment::~EKLMAlignment()
 {
 }
 
-void EKLMAlignment::setAlignmentData(uint16_t segment, EKLMAlignmentData* dat)
+void EKLMAlignment::setSegmentAlignment(uint16_t segment,
+                                        EKLMAlignmentData* dat)
 {
   std::map<uint16_t, EKLMAlignmentData>::iterator it;
-  it = m_Data.find(segment);
-  if (it == m_Data.end())
-    m_Data.insert(std::pair<uint16_t, EKLMAlignmentData>(segment, *dat));
-  else
+  it = m_SegmentAlignment.find(segment);
+  if (it == m_SegmentAlignment.end()) {
+    m_SegmentAlignment.insert(
+      std::pair<uint16_t, EKLMAlignmentData>(segment, *dat));
+  } else
     it->second = *dat;
 }
 
-EKLMAlignmentData* EKLMAlignment::getAlignmentData(uint16_t segment)
+EKLMAlignmentData* EKLMAlignment::getSegmentAlignment(uint16_t segment)
 {
   std::map<uint16_t, EKLMAlignmentData>::iterator it;
-  it = m_Data.find(segment);
-  if (it == m_Data.end())
+  it = m_SegmentAlignment.find(segment);
+  if (it == m_SegmentAlignment.end())
     return NULL;
   return &(it->second);
 }
@@ -49,7 +51,7 @@ void EKLMAlignment::add(EKLMSegmentID segmentID, int parameter,
   int segment;
   EKLMAlignmentData* alignmentData;
   segment = segmentID.getSegmentGlobalNumber();
-  alignmentData = getAlignmentData(segment);
+  alignmentData = getSegmentAlignment(segment);
   corr = correction;
   if (invertSign)
     corr = -corr;
@@ -70,6 +72,6 @@ void EKLMAlignment::add(EKLMSegmentID segmentID, int parameter,
 
 void EKLMAlignment::cleanAlignmentData()
 {
-  m_Data.clear();
+  m_SegmentAlignment.clear();
 }
 

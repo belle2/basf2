@@ -80,7 +80,7 @@ void EKLMAlignmentModule::generateRandomDisplacement()
                                                              &alignmentData));
             segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector, iPlane,
                                               iSegment);
-            alignment.setAlignmentData(segment, &alignmentData);
+            alignment.setSegmentAlignment(segment, &alignmentData);
           }
         }
       }
@@ -137,9 +137,9 @@ void EKLMAlignmentModule::studyAlignmentLimits()
                   segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector,
                                                     iPlane, iSegment);
                   if (iPlane == jPlane && iSegment == jSegment)
-                    alignment.setAlignmentData(segment, &alignmentDataRandom);
+                    alignment.setSegmentAlignment(segment, &alignmentDataRandom);
                   else
-                    alignment.setAlignmentData(segment, &alignmentDataZero);
+                    alignment.setSegmentAlignment(segment, &alignmentDataZero);
                 }
               }
             }
@@ -182,7 +182,7 @@ void EKLMAlignmentModule::saveDisplacement(EKLMAlignment* alignment)
           for (iSegment = 1; iSegment <= m_GeoDat->getNSegments(); iSegment++) {
             segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector, iPlane,
                                               iSegment);
-            alignmentData = alignment->getAlignmentData(segment);
+            alignmentData = alignment->getSegmentAlignment(segment);
             param = 1;
             value = alignmentData->getDy();
             t->Fill();

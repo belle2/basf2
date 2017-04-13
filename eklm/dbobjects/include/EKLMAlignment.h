@@ -42,17 +42,17 @@ namespace Belle2 {
     ~EKLMAlignment();
 
     /**
-     * Set alignment data.
+     * Set segment alignment data.
      * @param[in] segment Segment number.
      * @param[in] dat     Alignment data.
      */
-    void setAlignmentData(uint16_t segment, EKLMAlignmentData* dat);
+    void setSegmentAlignment(uint16_t segment, EKLMAlignmentData* dat);
 
     /**
      * Get alignment data.
      * @param[in] segment Segment number.
      */
-    EKLMAlignmentData* getAlignmentData(uint16_t segment);
+    EKLMAlignmentData* getSegmentAlignment(uint16_t segment);
 
     /**
      * Add correction.
@@ -72,7 +72,7 @@ namespace Belle2 {
   private:
 
     /** Alignment data. */
-    std::map<uint16_t, EKLMAlignmentData> m_Data;
+    std::map<uint16_t, EKLMAlignmentData> m_SegmentAlignment;
 
     /** Makes objects storable. */
     ClassDef(Belle2::EKLMAlignment, 1);

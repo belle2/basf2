@@ -27,7 +27,7 @@ void EKLM::fillZeroDisplacements(EKLMAlignment* alignment)
           for (iSegment = 1; iSegment <= geoDat->getNSegments(); iSegment++) {
             segment = geoDat->segmentNumber(iEndcap, iLayer, iSector, iPlane,
                                             iSegment);
-            alignment->setAlignmentData(segment, &alignmentData);
+            alignment->setSegmentAlignment(segment, &alignmentData);
           }
         }
       }

@@ -16,7 +16,13 @@ namespace Belle2 {
   /// Names of the variables to be generated.
   constexpr
   static char const* const cdcTrackSpacePointCombinationTruthNames[] = {
-    "truth"
+    "truth",
+    "truth_position_x",
+    "truth_position_y",
+    "truth_position_z",
+    "truth_momentum_x",
+    "truth_momentum_y",
+    "truth_momentum_z"
   };
 
   /// Vehicle class to transport the variable names

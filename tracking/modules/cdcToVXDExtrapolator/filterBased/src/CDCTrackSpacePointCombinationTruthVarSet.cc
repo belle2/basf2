@@ -26,6 +26,14 @@ bool CDCTrackSpacePointCombinationTruthVarSet::extract(const BaseCDCTrackSpacePo
   TrackMatchLookUp mcCDCMatchLookUp("MCRecoTracks", cdcTrackStoreArrayName);
   const RecoTrack* cdcMCTrack = mcCDCMatchLookUp.getMatchedMCRecoTrack(*cdcTrack);
 
+  // Default to 0
+  var<named("truth_position_x")>() = 0;
+  var<named("truth_position_y")>() = 0;
+  var<named("truth_position_z")>() = 0;
+  var<named("truth_momentum_x")>() = 0;
+  var<named("truth_momentum_y")>() = 0;
+  var<named("truth_momentum_z")>() = 0;
+
   // In case the CDC track is a fake, return false always
   if (not cdcMCTrack) {
     var<named("truth")>() = false;
@@ -69,5 +77,13 @@ bool CDCTrackSpacePointCombinationTruthVarSet::extract(const BaseCDCTrackSpacePo
   }
 
   var<named("truth")>() = true;
+
+  var<named("truth_position_x")>() = cdcMCTrack->getPositionSeed().X();
+  var<named("truth_position_y")>() = cdcMCTrack->getPositionSeed().Y();
+  var<named("truth_position_z")>() = cdcMCTrack->getPositionSeed().Z();
+  var<named("truth_momentum_x")>() = cdcMCTrack->getMomentumSeed().X();
+  var<named("truth_momentum_y")>() = cdcMCTrack->getMomentumSeed().Y();
+  var<named("truth_momentum_z")>() = cdcMCTrack->getMomentumSeed().Z();
+
   return true;
 }

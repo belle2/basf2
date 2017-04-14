@@ -20,6 +20,7 @@ xmldata = register_module('Gearbox')
 # EKLM alignment
 eklmalignment = register_module('EKLMAlignment')
 eklmalignment.param('Mode', 'Random')
+eklmalignment.param('RandomDisplacement', 'Both')
 
 # Create main path
 main = create_path()

@@ -34,6 +34,9 @@ EKLMAlignmentModule::EKLMAlignmentModule() : Module()
   setDescription("Module for generation of EKLM displacement data.");
   addParam("Mode", m_Mode, "Mode ('Zero', 'Random' or 'Limits').",
            std::string("Zero"));
+  addParam("RandomDisplacement", m_RandomDisplacement,
+           "What should be randomly displaced ('Sector', 'Segment' or 'Both').",
+           std::string("Both"));
   addParam("OutputFile", m_OutputFile, "Output file.",
            std::string("EKLMDisplacement.root"));
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -53,7 +56,8 @@ void EKLMAlignmentModule::generateZeroDisplacement()
   Database::Instance().storeData("EKLMDisplacement", (TObject*)&alignment, iov);
 }
 
-void EKLMAlignmentModule::generateRandomDisplacement()
+void EKLMAlignmentModule::generateRandomDisplacement(
+  bool displaceSector, bool displaceSegment)
 {
   IntervalOfValidity iov(0, 0, -1, -1);
   const double sectorMaxDx = 5. * Unit::cm;
@@ -77,29 +81,34 @@ void EKLMAlignmentModule::generateRandomDisplacement()
     for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
          iLayer++) {
       for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
-        do {
-          sectorAlignment.setDx(gRandom->Uniform(sectorMinDx, sectorMaxDx));
-          sectorAlignment.setDy(gRandom->Uniform(sectorMinDy, sectorMaxDy));
-          sectorAlignment.setDalpha(
-            gRandom->Uniform(sectorMinDalpha, sectorMaxDalpha));
-        } while (!alignmentChecker.checkSectorAlignment(&sectorAlignment));
-        sector = m_GeoDat->sectorNumber(iEndcap, iLayer, iSector);
-        alignment.setSectorAlignment(sector, &sectorAlignment);
-        for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
-          for (iSegment = 1; iSegment <= m_GeoDat->getNSegments(); iSegment++) {
-            do {
-              segmentAlignment.setDx(
-                gRandom->Uniform(segmentMinDx, segmentMaxDx));
-              segmentAlignment.setDy(
-                gRandom->Uniform(segmentMinDy, segmentMaxDy));
-              segmentAlignment.setDalpha(
-                gRandom->Uniform(segmentMinDalpha, segmentMaxDalpha));
-            } while (!alignmentChecker.checkSegmentAlignment(iPlane, iSegment,
-                                                             &sectorAlignment,
-                                                             &segmentAlignment));
-            segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector, iPlane,
-                                              iSegment);
-            alignment.setSegmentAlignment(segment, &segmentAlignment);
+        if (displaceSector) {
+          do {
+            sectorAlignment.setDx(gRandom->Uniform(sectorMinDx, sectorMaxDx));
+            sectorAlignment.setDy(gRandom->Uniform(sectorMinDy, sectorMaxDy));
+            sectorAlignment.setDalpha(
+              gRandom->Uniform(sectorMinDalpha, sectorMaxDalpha));
+          } while (!alignmentChecker.checkSectorAlignment(&sectorAlignment));
+          sector = m_GeoDat->sectorNumber(iEndcap, iLayer, iSector);
+          alignment.setSectorAlignment(sector, &sectorAlignment);
+        }
+        if (displaceSegment) {
+          for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
+            for (iSegment = 1; iSegment <= m_GeoDat->getNSegments();
+                 iSegment++) {
+              do {
+                segmentAlignment.setDx(
+                  gRandom->Uniform(segmentMinDx, segmentMaxDx));
+                segmentAlignment.setDy(
+                  gRandom->Uniform(segmentMinDy, segmentMaxDy));
+                segmentAlignment.setDalpha(
+                  gRandom->Uniform(segmentMinDalpha, segmentMaxDalpha));
+              } while (!alignmentChecker.checkSegmentAlignment(
+                         iPlane, iSegment,
+                         &sectorAlignment, &segmentAlignment));
+              segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector,
+                                                iPlane, iSegment);
+              alignment.setSegmentAlignment(segment, &segmentAlignment);
+            }
           }
         }
       }
@@ -269,9 +278,16 @@ void EKLMAlignmentModule::initialize()
   m_GeoDat = &(EKLM::GeometryData::Instance());
   if (m_Mode == "Zero")
     generateZeroDisplacement();
-  else if (m_Mode == "Random")
-    generateRandomDisplacement();
-  else if (m_Mode == "Limits")
+  else if (m_Mode == "Random") {
+    if (m_RandomDisplacement == "Sector")
+      generateRandomDisplacement(true, false);
+    else if (m_RandomDisplacement == "Segment")
+      generateRandomDisplacement(false, true);
+    else if (m_RandomDisplacement == "Both")
+      generateRandomDisplacement(true, true);
+    else
+      B2FATAL("Unknown random displacement mode.");
+  } else if (m_Mode == "Limits")
     studyAlignmentLimits();
   else
     B2FATAL("Unknown operation mode.");

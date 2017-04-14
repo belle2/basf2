@@ -65,6 +65,9 @@ namespace Belle2 {
     /** Mode. */
     std::string m_Mode;
 
+    /** What should be randomly displaced */
+    std::string m_RandomDisplacement;
+
     /** Name of output file. */
     std::string m_OutputFile;
 
@@ -78,8 +81,10 @@ namespace Belle2 {
 
     /**
      * Generation of random displacements.
+     * @param[in] displaceSector  Whether sectors should be displaced.
+     * @param[in] displaceSegment Whether segments should be displaced.
      */
-    void generateRandomDisplacement();
+    void generateRandomDisplacement(bool displaceSector, bool displaceSegment);
 
     /**
      * Generate random sector displacements and check if they are correct

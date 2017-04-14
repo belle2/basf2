@@ -81,6 +81,7 @@ void EKLMAlignmentModule::generateRandomDisplacement(
     for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
          iLayer++) {
       for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
+sector:
         if (displaceSector) {
           do {
             sectorAlignment.setDx(gRandom->Uniform(sectorMinDx, sectorMaxDx));
@@ -108,6 +109,15 @@ void EKLMAlignmentModule::generateRandomDisplacement(
               segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector,
                                                 iPlane, iSegment);
               alignment.setSegmentAlignment(segment, &segmentAlignment);
+            }
+          }
+        } else {
+          for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
+            for (iSegment = 1; iSegment <= m_GeoDat->getNSegments();
+                 iSegment++) {
+              if (!alignmentChecker.checkSegmentAlignment(
+                    iPlane, iSegment, &sectorAlignment, &segmentAlignment))
+                goto sector;
             }
           }
         }

@@ -40,8 +40,9 @@ namespace Belle2 {
 
       /**
        * Constructor.
+       * @param[in] printOverlaps Print information about overlaps or not.
        */
-      AlignmentChecker();
+      AlignmentChecker(bool printOverlaps);
 
       /**
        * Destructor.
@@ -75,6 +76,9 @@ namespace Belle2 {
                                  EKLMAlignmentData* segmentAlignment) const;
 
     private:
+
+      /** Print information about overlaps or not. */
+      bool m_PrintOverlaps;
 
       /** Geometry data. */
       const GeometryData* m_GeoDat;

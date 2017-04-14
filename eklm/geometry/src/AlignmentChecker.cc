@@ -17,7 +17,8 @@
 
 using namespace Belle2;
 
-EKLM::AlignmentChecker::AlignmentChecker()
+EKLM::AlignmentChecker::AlignmentChecker(bool printOverlaps) :
+  m_PrintOverlaps(printOverlaps)
 {
   int iPlane;
   m_GeoDat = &(EKLM::GeometryData::Instance());
@@ -129,20 +130,40 @@ checkSectorAlignment(EKLMAlignmentData* sectorAlignment) const
     for (iSegmentSupport = 1; iSegmentSupport <= m_GeoDat->getNSegments() + 1;
          iSegmentSupport++) {
       if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1]->hasIntersection(
-            *m_LineCorner1))
+            *m_LineCorner1)) {
+        if (m_PrintOverlaps)
+          B2ERROR("Overlap: segment support " << iSegmentSupport <<
+                  ", corner 1.");
         return false;
+      }
       if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1]->hasIntersection(
-            *m_ArcOuter))
+            *m_ArcOuter)) {
+        if (m_PrintOverlaps)
+          B2ERROR("Overlap: segment support " << iSegmentSupport <<
+                  ", outer arc.");
         return false;
+      }
       if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1]->hasIntersection(
-            *m_Line23))
+            *m_Line23)) {
+        if (m_PrintOverlaps)
+          B2ERROR("Overlap: segment support " << iSegmentSupport <<
+                  ", line 2-3.");
         return false;
+      }
       if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1]->hasIntersection(
-            *m_ArcInner))
+            *m_ArcInner)) {
+        if (m_PrintOverlaps)
+          B2ERROR("Overlap: segment support " << iSegmentSupport <<
+                  ", inner arc.");
         return false;
+      }
       if (m_SegmentSupport[iPlane - 1][iSegmentSupport - 1]->hasIntersection(
-            *m_Line41))
+            *m_Line41)) {
+        if (m_PrintOverlaps)
+          B2ERROR("Overlap: segment support " << iSegmentSupport <<
+                  ", line 4-1.");
         return false;
+      }
     }
   }
   return true;
@@ -196,19 +217,38 @@ checkSegmentAlignment(int iPlane, int iSegment,
     for (j = 0; j < 4; j++)
       stripRectangle[j] = t * stripRectangle[j];
     Polygon2D stripPolygon(stripRectangle, 4);
-    if (stripPolygon.hasIntersection(*m_LineCorner1))
+    if (stripPolygon.hasIntersection(*m_LineCorner1)) {
+      if (m_PrintOverlaps)
+        B2ERROR("Overlap: strip " << iStrip << ", corner 1.");
       return false;
-    if (stripPolygon.hasIntersection(*m_ArcOuter))
+    }
+    if (stripPolygon.hasIntersection(*m_ArcOuter)) {
+      if (m_PrintOverlaps)
+        B2ERROR("Overlap: strip " << iStrip << ", outer arc.");
       return false;
-    if (stripPolygon.hasIntersection(*m_Line23))
+    }
+    if (stripPolygon.hasIntersection(*m_Line23)) {
+      if (m_PrintOverlaps)
+        B2ERROR("Overlap: strip " << iStrip << ", line 2-3.");
       return false;
-    if (stripPolygon.hasIntersection(*m_ArcInner))
+    }
+    if (stripPolygon.hasIntersection(*m_ArcInner)) {
+      if (m_PrintOverlaps)
+        B2ERROR("Overlap: strip " << iStrip << ", inner arc.");
       return false;
-    if (stripPolygon.hasIntersection(*m_Line41))
+    }
+    if (stripPolygon.hasIntersection(*m_Line41)) {
+      if (m_PrintOverlaps)
+        B2ERROR("Overlap: strip " << iStrip << ", line 4-1.");
       return false;
+    }
     for (j = 0; j <= m_GeoDat->getNSegments(); j++) {
-      if (stripPolygon.hasIntersection(*m_SegmentSupport[iPlane - 1][j]))
+      if (stripPolygon.hasIntersection(*m_SegmentSupport[iPlane - 1][j])) {
+        if (m_PrintOverlaps)
+          B2ERROR("Overlap: strip " << iStrip <<
+                  ", segment support" << j + 1 << ".");
         return false;
+      }
     }
   }
   return true;

@@ -74,7 +74,7 @@ void EKLMAlignmentModule::generateRandomDisplacement(
   const double segmentMinDalpha = -0.003 * Unit::rad;
   EKLMAlignment alignment;
   EKLMAlignmentData sectorAlignment, segmentAlignment;
-  EKLM::AlignmentChecker alignmentChecker;
+  EKLM::AlignmentChecker alignmentChecker(false);
   int iEndcap, iLayer, iSector, iPlane, iSegment, sector, segment;
   EKLM::fillZeroDisplacements(&alignment);
   for (iEndcap = 1; iEndcap <= m_GeoDat->getNEndcaps(); iEndcap++) {
@@ -131,7 +131,7 @@ void EKLMAlignmentModule::studySectorAlignmentLimits(TFile* f)
   int i, alignmentStatus, iEndcap, iLayer, iSector, sector;
   EKLMAlignment alignment;
   EKLMAlignmentData alignmentDataRandom;
-  EKLM::AlignmentChecker alignmentChecker;
+  EKLM::AlignmentChecker alignmentChecker(false);
   TTree* t;
   f->cd();
   t = new TTree("sector", "");
@@ -179,7 +179,7 @@ void EKLMAlignmentModule::studySegmentAlignmentLimits(TFile* f)
   int iEndcap, iLayer, iSector, jPlane, jSegment, segment;
   EKLMAlignment alignment;
   EKLMAlignmentData alignmentDataRandom;
-  EKLM::AlignmentChecker alignmentChecker;
+  EKLM::AlignmentChecker alignmentChecker(false);
   TTree* t;
   f->cd();
   t = new TTree("segment", "");

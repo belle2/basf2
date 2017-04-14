@@ -16,6 +16,7 @@ whitespace, comma or semi-colon -->
 <bar unit="mm">1 2 3 4
 </bar>
 <!-- Lets define 3 sensitive Boxes at different z positions and with different sizes -->
+<Phase>2</Phase>
 <LookAtRec>0</LookAtRec>
 <GEMGain1>40</GEMGain1>
 <GEMGain2>50</GEMGain2>

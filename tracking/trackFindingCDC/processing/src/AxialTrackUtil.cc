@@ -144,8 +144,9 @@ void AxialTrackUtil::deleteHitsFarAwayFromTrajectory(CDCTrack& track, double max
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
   auto farFromTrajectory = [&trajectory2D, &maximumDistance](CDCRecoHit3D & recoHit3D) {
-    Vector2D recoPos2D = recoHit3D.getRecoPos2D();
-    if (fabs(trajectory2D.getDist2D(recoPos2D)) > maximumDistance) {
+    Vector2D refPos2D = recoHit3D.getRefPos2D();
+    double distance = trajectory2D.getDist2D(refPos2D) - recoHit3D.getSignedRecoDriftLength();
+    if (std::fabs(distance) > maximumDistance) {
       recoHit3D.getWireHit().getAutomatonCell().setTakenFlag(false);
       // This must be here as the deleted hits must not participate in the hough search again.
       recoHit3D.getWireHit().getAutomatonCell().setMaskedFlag(true);

@@ -66,7 +66,8 @@ EKLM::AlignmentChecker::~AlignmentChecker()
   for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
     for (iSegmentSupport = 1; iSegmentSupport <= m_GeoDat->getNSegments() + 1;
          iSegmentSupport++) {
-      delete m_SegmentSupport[iPlane - 1][iSegmentSupport - 1];
+      if (m_LastCheckedSector != NULL)
+        delete m_SegmentSupport[iPlane - 1][iSegmentSupport - 1];
     }
     delete[] m_SegmentSupport[iPlane - 1];
   }

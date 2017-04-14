@@ -179,7 +179,6 @@ EKLM::TransformData::~TransformData()
     nDetectorLayers = m_GeoDat->getNDetectorLayers(iEndcap + 1);
     for (iLayer = 0; iLayer < nLayers; iLayer++) {
       delete[] m_Sector[iEndcap][iLayer];
-      delete[] m_PlaneDisplacement[iEndcap][iLayer];
       if (iLayer >= nDetectorLayers)
         continue;
       for (iSector = 0; iSector < nSectors; iSector++) {
@@ -189,11 +188,13 @@ EKLM::TransformData::~TransformData()
           delete[] m_StripInverse[iEndcap][iLayer][iSector][iPlane];
         }
         delete[] m_Plane[iEndcap][iLayer][iSector];
+        delete[] m_PlaneDisplacement[iEndcap][iLayer][iSector];
         delete[] m_Segment[iEndcap][iLayer][iSector];
         delete[] m_Strip[iEndcap][iLayer][iSector];
         delete[] m_StripInverse[iEndcap][iLayer][iSector];
       }
       delete[] m_Plane[iEndcap][iLayer];
+      delete[] m_PlaneDisplacement[iEndcap][iLayer];
       delete[] m_Segment[iEndcap][iLayer];
       delete[] m_Strip[iEndcap][iLayer];
       delete[] m_StripInverse[iEndcap][iLayer];
@@ -241,6 +242,7 @@ void EKLM::TransformData::transformsToGlobal()
           for (iStrip = 0; iStrip < nStrips; iStrip++) {
             m_Strip[iEndcap][iLayer][iSector][iPlane][iStrip] =
               m_Plane[iEndcap][iLayer][iSector][iPlane] *
+              m_PlaneDisplacement[iEndcap][iLayer][iSector][iPlane] *
               m_Strip[iEndcap][iLayer][iSector][iPlane][iStrip];
             m_StripInverse[iEndcap][iLayer][iSector][iPlane][iStrip] =
               m_Strip[iEndcap][iLayer][iSector][iPlane][iStrip].inverse();

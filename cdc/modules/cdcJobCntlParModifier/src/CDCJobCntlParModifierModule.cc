@@ -121,7 +121,8 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
 
   //max. space resolution
   addParam("MaxSpaceResol", m_maxSpaceResol,
-           "Maximum space resolution (cm) in CDCGeometryPar::getSigma() to avoid a too large value.", double(2.5 * 0.0130));
+           "Maximum space resolution (cm) in CDCGeometryPar::getSigma() to avoid a too large value; from 2011 beam test; a bit larger value may be better...",
+           double(2.5 * 0.0130));
 
 }
 

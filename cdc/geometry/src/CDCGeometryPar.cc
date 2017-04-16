@@ -1602,8 +1602,6 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
   //calculate min. drift time
   double minTime = getMinDriftTime(iCLayer, lr, alpha, theta);
   double delta = time - minTime;
-  //use xt reversed at (x=0,t=tmin) for delta<0 ("negative drifttime")
-  double timep = delta < 0. ? minTime - delta : time;
 
   //convert incoming- to outgoing-lr
   unsigned short lro = getOutgoingLR(lr, alpha);
@@ -1621,6 +1619,9 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
 
     unsigned short jal(0), jlr(0), jth(0);
     double w = 0.;
+
+    //use xt reversed at (x=0,t=tmin) for delta<0 ("negative drifttime")
+    double timep = delta < 0. ? minTime - delta : time;
 
     //compute linear interpolation (=weithed average over 4 points) in (alpha-theta) space
     for (unsigned k = 0; k < 4; ++k) {
@@ -1686,8 +1687,6 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
   //calculate min. drift time
   double minTime = calculateMinTime ? getMinDriftTime(iCLayer, lr, alpha, theta) : inputMinTime;
   double delta = time - minTime;
-  //use xt reversed at (x=0,t=tmin) for delta<0 ("negative drifttime")
-  double timep = delta < 0. ? minTime - delta : time;
 
   //convert incoming- to outgoing-lr
   unsigned short lro = getOutgoingLR(lr, alpha);
@@ -1707,6 +1706,9 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
 
     unsigned short jal(0), jlr(0), jth(0);
     double w = 0.;
+
+    //use xt reversed at (x=0,t=tmin) for delta<0 ("negative drifttime")
+    double timep = delta < 0. ? minTime - delta : time;
 
     //    std::cout << "iCLayer,alpha,theta,lro= " << iCLayer <<" "<< (180./M_PI)*alpha <<" "<< (180./M_PI)*theta <<" "<< lro << std::endl;
 
@@ -1882,7 +1884,7 @@ double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLa
   //convert incoming- to outgoing-lr
   //  unsigned short lrp = getOutgoingLR(lr, alpha);
 
-  double maxTime = 2000.; //in ns
+  double maxTime = 2000.; //in ns (n.b. further reduction, 2->1us could be ok)
   //  if (m_XT[iCLayer][lrp][ialpha][itheta][7] == 0.) {
   //    maxTime = m_XT[iCLayer][lrp][ialpha][itheta][6];
   //  }

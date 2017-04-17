@@ -84,15 +84,21 @@ for endcap in range(1, 3):
         maxlayer = 14
     for layer in range(1, maxlayer + 1):
         for sector in range(1, 5):
+            for ipar in range(3, 4):
+                eklmid = Belle2.EKLMElementID(endcap, layer, sector)
+                label = Belle2.GlobalLabel(eklmid, ipar)
+                cmd = str(label.label()) + ' 0. -1.'
+                # Uncomment to fix EKLM parameters.
+                algo.steering().command(cmd)
             for plane in range(1, 3):
                 for segment in range(1, 6):
                     for ipar in range(1, 3):
-                        eklmid = Belle2.EKLMSegmentID(endcap, layer, sector,
+                        eklmid = Belle2.EKLMElementID(endcap, layer, sector,
                                                       plane, segment)
                         label = Belle2.GlobalLabel(eklmid, ipar)
                         cmd = str(label.label()) + ' 0. -1.'
                         # Uncomment to fix EKLM parameters.
-                        # algo.steering().command(cmd)
+                        algo.steering().command(cmd)
 
 # ---------- end of parameter fixing ----------------------
 
@@ -148,16 +154,25 @@ bklmtree.Branch('forward', forward, 'forward/I')
 bklmtree.Branch('param', param, 'param/I')
 bklmtree.Branch('value', value, 'value/F')
 bklmtree.Branch('error', error, 'error/F')
-# Tree with EKLM data.
-eklmtree = ROOT.TTree('eklm', 'EKLM data')
-eklmtree.Branch('endcap', endcap, 'endcap/I')
-eklmtree.Branch('layer', layer, 'layer/I')
-eklmtree.Branch('sector', sector, 'sector/I')
-eklmtree.Branch('plane', plane, 'plane/I')
-eklmtree.Branch('segment', segment, 'segment/I')
-eklmtree.Branch('param', param, 'param/I')
-eklmtree.Branch('value', value, 'value/F')
-eklmtree.Branch('error', error, 'error/F')
+# Tree with EKLM sector data.
+eklmsectortree = ROOT.TTree('eklm_sector', 'EKLM sector alignment data')
+eklmsectortree.Branch('endcap', endcap, 'endcap/I')
+eklmsectortree.Branch('layer', layer, 'layer/I')
+eklmsectortree.Branch('sector', sector, 'sector/I')
+eklmsectortree.Branch('param', param, 'param/I')
+eklmsectortree.Branch('value', value, 'value/F')
+eklmsectortree.Branch('error', error, 'error/F')
+# Tree with EKLM segment data.
+eklmsegmenttree = ROOT.TTree('eklm_segment', 'EKLM segment alignment data')
+eklmsegmenttree.Branch('endcap', endcap, 'endcap/I')
+eklmsegmenttree.Branch('layer', layer, 'layer/I')
+eklmsegmenttree.Branch('sector', sector, 'sector/I')
+eklmsegmenttree.Branch('plane', plane, 'plane/I')
+eklmsegmenttree.Branch('segment', segment, 'segment/I')
+eklmsegmenttree.Branch('param', param, 'param/I')
+eklmsegmenttree.Branch('value', value, 'value/F')
+eklmsegmenttree.Branch('error', error, 'error/F')
+
 
 # Index of determined param
 ibin = 0
@@ -190,12 +205,18 @@ for ipar in range(0, algo.result().getNoParameters()):
         bklmtree.Fill()
 
     if (label.isEKLM()):
-        endcap[0] = label.getEklmID().getEndcap()
-        layer[0] = label.getEklmID().getLayer()
-        sector[0] = label.getEklmID().getSector()
-        plane[0] = label.getEklmID().getPlane()
-        segment[0] = label.getEklmID().getSegment()
-        eklmtree.Fill()
+        if (label.getEklmID().getType() == 2):  # 2 = sector
+            endcap[0] = label.getEklmID().getEndcap()
+            layer[0] = label.getEklmID().getLayer()
+            sector[0] = label.getEklmID().getSector()
+            eklmsectortree.Fill()
+        else:
+            endcap[0] = label.getEklmID().getEndcap()
+            layer[0] = label.getEklmID().getLayer()
+            sector[0] = label.getEklmID().getSector()
+            plane[0] = label.getEklmID().getPlane()
+            segment[0] = label.getEklmID().getSegment()
+            eklmsegmenttree.Fill()
 
     if not algo.result().isParameterDetermined(ipar):
         continue
@@ -213,7 +234,8 @@ profile.Write()
 vxdtree.Write()
 cdctree.Write()
 bklmtree.Write()
-eklmtree.Write()
+eklmsectortree.Write()
+eklmsegmenttree.Write()
 alignment_file.Close()
 
 algo.commit()

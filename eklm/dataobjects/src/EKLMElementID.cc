@@ -37,6 +37,7 @@ EKLMElementID::EKLMElementID(
 
 EKLMElementID::EKLMElementID(int globalNumber)
 {
+  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
   int id = globalNumber;
   if (id <= 0)
     B2FATAL("Incorrect (non-positive) EKLM global element number.");
@@ -70,6 +71,7 @@ EKLMElementID::EKLMElementID(int globalNumber)
     m_Type = c_Segment;
     m_ElementNumbers->segmentNumberToElementNumbers(
       id, &m_Endcap, &m_Layer, &m_Sector, &m_Plane, &m_Segment);
+    return;
   }
   B2FATAL("Incorrect (too large) EKLM global element number.");
 }
@@ -136,6 +138,27 @@ void EKLMElementID::setSegment(int segment)
 int EKLMElementID::getSegment() const
 {
   return m_Segment;
+}
+
+int EKLMElementID::getLayerNumber() const
+{
+  return m_ElementNumbers->detectorLayerNumber(m_Endcap, m_Layer);
+}
+
+int EKLMElementID::getSectorNumber() const
+{
+  return m_ElementNumbers->sectorNumber(m_Endcap, m_Layer, m_Sector);
+}
+
+int EKLMElementID::getPlaneNumber() const
+{
+  return m_ElementNumbers->planeNumber(m_Endcap, m_Layer, m_Sector, m_Plane);
+}
+
+int EKLMElementID::getSegmentNumber() const
+{
+  return m_ElementNumbers->segmentNumber(m_Endcap, m_Layer, m_Sector,
+                                         m_Plane, m_Segment);
 }
 
 int EKLMElementID::getGlobalNumber() const

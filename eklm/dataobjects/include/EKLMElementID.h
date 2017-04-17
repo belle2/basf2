@@ -132,6 +132,26 @@ namespace Belle2 {
     int getSegment() const;
 
     /**
+     * Get global detector layer number.
+     */
+    int getLayerNumber() const;
+
+    /**
+     * Get global sector number.
+     */
+    int getSectorNumber() const;
+
+    /**
+     * Get global plane number.
+     */
+    int getPlaneNumber() const;
+
+    /**
+     * Get global segment number.
+     */
+    int getSegmentNumber() const;
+
+    /**
      * Get global element number.
      */
     int getGlobalNumber() const;

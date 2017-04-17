@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMSEGMENTID_H
-#define EKLMSEGMENTID_H
+#ifndef EKLMELEMENTID_H
+#define EKLMELEMENTID_H
 
 /* External headers. */
 #include <TObject.h>
@@ -19,14 +19,14 @@ namespace Belle2 {
   /**
    * EKLM segment identifier.
    */
-  class EKLMSegmentID {
+  class EKLMElementID {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMSegmentID();
+    EKLMElementID();
 
     /**
      * Constructor.
@@ -36,18 +36,18 @@ namespace Belle2 {
      * @param[in] plane   Plane number.
      * @param[in] segment Segment number.
      */
-    EKLMSegmentID(int endcap, int layer, int sector, int plane, int segment);
+    EKLMElementID(int endcap, int layer, int sector, int plane, int segment);
 
     /**
      * Constructor.
      * @param[in] segment Segment number (global).
      */
-    EKLMSegmentID(int segment);
+    EKLMElementID(int segment);
 
     /**
      * Destructor.
      */
-    ~EKLMSegmentID();
+    ~EKLMElementID();
 
     /**
      * Set endcap number.

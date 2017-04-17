@@ -65,13 +65,13 @@ EKLMAlignmentData* EKLMAlignment::getSegmentAlignment(uint16_t segment)
   return &(it->second);
 }
 
-void EKLMAlignment::add(EKLMSegmentID segmentID, int parameter,
+void EKLMAlignment::add(EKLMElementID element, int parameter,
                         double correction, bool invertSign)
 {
   double corr;
   int segment;
   EKLMAlignmentData* alignmentData;
-  segment = segmentID.getSegmentGlobalNumber();
+  segment = element.getSegmentGlobalNumber();
   alignmentData = getSegmentAlignment(segment);
   corr = correction;
   if (invertSign)

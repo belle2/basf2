@@ -65,8 +65,8 @@ for sector in range(1, 9):
             for ipar in [1, 2, 3, 4, 5, 6]:
 
                 # For U=1 or V=2 do not fix param
-                if ipar in [1, 2]:
-                    continue
+                # if ipar in [1, 2]:
+                #     continue
 
                 bklmid = Belle2.BKLMElementID()
                 bklmid.setIsForward(forward)

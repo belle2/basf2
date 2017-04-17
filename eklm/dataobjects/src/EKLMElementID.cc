@@ -9,23 +9,23 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <eklm/dataobjects/EKLMSegmentID.h>
+#include <eklm/dataobjects/EKLMElementID.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
 
 using namespace Belle2;
 
-EKLMSegmentID::EKLMSegmentID() : m_Endcap(-1), m_Layer(-1), m_Sector(-1),
+EKLMElementID::EKLMElementID() : m_Endcap(-1), m_Layer(-1), m_Sector(-1),
   m_Plane(-1), m_Segment(-1)
 {
 }
 
-EKLMSegmentID::EKLMSegmentID(
+EKLMElementID::EKLMElementID(
   int endcap, int layer, int sector, int plane, int segment) : m_Endcap(endcap),
   m_Layer(layer), m_Sector(sector), m_Plane(plane), m_Segment(segment)
 {
 }
 
-EKLMSegmentID::EKLMSegmentID(int segment)
+EKLMElementID::EKLMElementID(int segment)
 {
   static const EKLM::ElementNumbersSingleton& elementNumbers =
     EKLM::ElementNumbersSingleton::Instance();
@@ -33,61 +33,61 @@ EKLMSegmentID::EKLMSegmentID(int segment)
     segment, &m_Endcap, &m_Layer, &m_Sector, &m_Plane, &m_Segment);
 }
 
-EKLMSegmentID::~EKLMSegmentID()
+EKLMElementID::~EKLMElementID()
 {
 }
 
-void EKLMSegmentID::setEndcap(int endcap)
+void EKLMElementID::setEndcap(int endcap)
 {
   m_Endcap = endcap;
 }
 
-int EKLMSegmentID::getEndcap() const
+int EKLMElementID::getEndcap() const
 {
   return m_Endcap;
 }
 
-void EKLMSegmentID::setLayer(int layer)
+void EKLMElementID::setLayer(int layer)
 {
   m_Layer = layer;
 }
 
-int EKLMSegmentID::getLayer() const
+int EKLMElementID::getLayer() const
 {
   return m_Layer;
 }
 
-void EKLMSegmentID::setSector(int sector)
+void EKLMElementID::setSector(int sector)
 {
   m_Sector = sector;
 }
 
-int EKLMSegmentID::getSector() const
+int EKLMElementID::getSector() const
 {
   return m_Sector;
 }
 
-void EKLMSegmentID::setPlane(int plane)
+void EKLMElementID::setPlane(int plane)
 {
   m_Plane = plane;
 }
 
-int EKLMSegmentID::getPlane() const
+int EKLMElementID::getPlane() const
 {
   return m_Plane;
 }
 
-void EKLMSegmentID::setSegment(int segment)
+void EKLMElementID::setSegment(int segment)
 {
   m_Segment = segment;
 }
 
-int EKLMSegmentID::getSegment() const
+int EKLMElementID::getSegment() const
 {
   return m_Segment;
 }
 
-int EKLMSegmentID::getSegmentGlobalNumber() const
+int EKLMElementID::getSegmentGlobalNumber() const
 {
   static const EKLM::ElementNumbersSingleton& elementNumbers =
     EKLM::ElementNumbersSingleton::Instance();

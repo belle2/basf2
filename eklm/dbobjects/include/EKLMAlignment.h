@@ -19,7 +19,7 @@
 #include <TObject.h>
 
 /* Belle2 headers. */
-#include <eklm/dataobjects/EKLMSegmentID.h>
+#include <eklm/dataobjects/EKLMElementID.h>
 #include <eklm/dbobjects/EKLMAlignmentData.h>
 
 namespace Belle2 {
@@ -69,12 +69,12 @@ namespace Belle2 {
 
     /**
      * Add correction.
-     * @param[in] segment    Segment identifier.
+     * @param[in] element    Element identifier.
      * @param[in] parameter  Parameter number.
      * @param[in] correction Correction.
      * @param[in] invertSign Whether to invert the correction sign.
      */
-    void add(EKLMSegmentID segment, int parameter, double correction,
+    void add(EKLMElementID element, int parameter, double correction,
              bool invertSign);
 
   private:

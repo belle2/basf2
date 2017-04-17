@@ -22,7 +22,7 @@
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMAlignmentHit.h>
-#include <eklm/dataobjects/EKLMSegmentID.h>
+#include <eklm/dataobjects/EKLMElementID.h>
 
 namespace Belle2 {
 
@@ -77,7 +77,7 @@ namespace Belle2 {
   private:
 
     /** Segment identifier. */
-    EKLMSegmentID m_Segment;
+    EKLMElementID m_Segment;
 
     /** Needed to make objects storable. */
     ClassDef(AlignableEKLMRecoHit, 1)

@@ -64,6 +64,59 @@ namespace Belle2 {
 
     void MicrotpcCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
+      G4String symbol;
+      G4double a, z;
+      G4double density, fractionmass;
+      G4int ncomponents, natoms;
+
+      G4Element* H  = new G4Element("Hydrogen",  symbol = "H"  , z =  1., a =  1.00794 * CLHEP::g / CLHEP::mole);
+      G4Element* He = new G4Element("Helium",    symbol = "He" , z =  2., a =  4.002602 * CLHEP::g / CLHEP::mole);
+      G4Element* C  = new G4Element("Carbon",    symbol = "C"  , z =  6., a = 12.01    * CLHEP::g / CLHEP::mole);
+      G4Element* O  = new G4Element("Oxygen",    symbol = "O",   z =  8., a = 16.00    * CLHEP::g / CLHEP::mole);
+      G4Element* Si = new G4Element("Silicon",   symbol = "Si" , z = 14., a = 28.09    * CLHEP::g / CLHEP::mole);
+      G4Element* Cl = new G4Element("Chlore",    symbol = "Cl" , z = 17., a = 35.453   * CLHEP::g / CLHEP::mole);
+      G4Element* Cu = new G4Element("Copper",    symbol = "Cu" , z = 29., a = 63.546   * CLHEP::g / CLHEP::mole);
+      G4Element* Zn = new G4Element("Zinc",      symbol = "Zn" , z = 30., a = 65.38    * CLHEP::g / CLHEP::mole);
+
+      //Helium 4
+      G4Material* gas_4He = new G4Material("gas_4He", density = 0.0001664 * CLHEP::g / CLHEP::cm3, ncomponents = 1, kStateGas,
+                                           293.15 * CLHEP::kelvin,  1.*CLHEP::atmosphere);
+      gas_4He->AddElement(He, natoms = 1);
+      //C02
+      G4Material* gas_CO2 = new G4Material("gas_CO2", density = 0.001842 * CLHEP::g / CLHEP::cm3, ncomponents = 2, kStateGas,
+                                           293.15 * CLHEP::kelvin, 1.*CLHEP::atmosphere);
+      gas_CO2->AddElement(C, natoms = 1);
+      gas_CO2->AddElement(O, natoms = 2);
+
+      //70/30 - 4He/ CO2
+      G4Material* gasmix_4HeCO2 = new G4Material("gasmix_4HeCO2", density = 0.00066908 * CLHEP::g / CLHEP::cm3, ncomponents = 2,
+                                                 kStateGas,  293.15 * CLHEP::kelvin, 1.*CLHEP::atmosphere);
+      gasmix_4HeCO2->AddMaterial(gas_4He, fractionmass = 17.409 * CLHEP::perCent);
+      gasmix_4HeCO2->AddMaterial(gas_CO2, fractionmass = 82.591 * CLHEP::perCent);
+
+      //c8h7cl
+      G4Material* TPC_ParylenC = new G4Material("TPC_ParylenC", density = 1.298 * CLHEP::g / CLHEP::cm3, ncomponents = 3);
+      TPC_ParylenC->AddElement(H, fractionmass = 0.050908 * CLHEP::perCent);
+      TPC_ParylenC->AddElement(C, fractionmass = 0.693276 * CLHEP::perCent);
+      TPC_ParylenC->AddElement(Cl, fractionmass = 0.255816 * CLHEP::perCent);
+
+      //G10
+      G4Material* TPC_G10 = new G4Material("TPC_G10", density = 1.700 * CLHEP::g / CLHEP::cm3, ncomponents = 4);
+      TPC_G10->AddElement(Si, natoms = 1);
+      TPC_G10->AddElement(O , natoms = 2);
+      TPC_G10->AddElement(C , natoms = 3);
+      TPC_G10->AddElement(H , natoms = 3);
+
+      //Cu - copper
+      G4Material* metalCu = new G4Material("MetalCopper", density = 8.960 * CLHEP::g / CLHEP::cm3, ncomponents = 1);
+      metalCu->AddElement(Cu, 1);
+
+      //Copper screen
+      G4Material* TPC_metaCuScreen = new G4Material("TPC_metaCuScreen", density = 8.95 * CLHEP::g / CLHEP::cm3, ncomponents = 2);
+      TPC_metaCuScreen->AddElement(Cu, fractionmass = 90.*CLHEP::perCent);
+      TPC_metaCuScreen->AddElement(Zn, fractionmass = 10.*CLHEP::perCent);
+
+
       //lets get the stepsize parameter with a default value of 5 µm
       double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 
@@ -98,10 +151,8 @@ namespace Belle2 {
         //create subtraction ie vessel
         s_Vessel = new G4SubtractionSolid("s_Vessel", s_Vessel, s_iGasTPC, 0, G4ThreeVector(0, 0, 0));
 
-        string matVessel = activeParams.getString("MaterialVessel");
-        G4LogicalVolume* l_Vessel = new G4LogicalVolume(s_Vessel, geometry::Materials::get(matVessel), "l_Vessel");
-        string matGas = activeParams.getString("MaterialGas");
-        G4LogicalVolume* l_iGasTPC = new G4LogicalVolume(s_iGasTPC, geometry::Materials::get(matGas), "l_iGasTPC");
+        G4LogicalVolume* l_Vessel = new G4LogicalVolume(s_Vessel, geometry::Materials::get("TPC_Al6061"), "l_Vessel");
+        G4LogicalVolume* l_iGasTPC = new G4LogicalVolume(s_iGasTPC, gasmix_4HeCO2, "l_iGasTPC");
 
         G4RotationMatrix* rotXx = new G4RotationMatrix();
         G4double AngleX = activeParams.getAngle("AngleX");
@@ -157,7 +208,7 @@ namespace Belle2 {
         G4Box* s_parC1 = new G4Box("s_parC1", dx_parC1, dy_parC1, dz_parC1);
         G4Box* s_parC2 = new G4Box("s_parC2", dx_parC2, dy_parC2, dz_parC2);
         G4VSolid* s_parylenC = new G4SubtractionSolid("s_parylenC", s_parC1, s_parC2, 0, G4ThreeVector(0, 0, 0));
-        G4LogicalVolume* l_parylenC = new G4LogicalVolume(s_parylenC, geometry::Materials::get("ParylenC"), "l_parylenC");
+        G4LogicalVolume* l_parylenC = new G4LogicalVolume(s_parylenC, TPC_ParylenC, "l_parylenC");
         new G4PVPlacement(0, G4ThreeVector(0 * CLHEP::cm, 0 * CLHEP::cm, 0 * CLHEP::cm), l_parylenC, "p_parylenC", l_iGasTPC, false, 1);
 
         G4double dx_kap1 = dx_parC2;
@@ -170,7 +221,7 @@ namespace Belle2 {
         G4Box* s_kap1 = new G4Box("s_kap1", dx_kap1, dy_kap1, dz_kap1);
         G4Box* s_kap2 = new G4Box("s_kap2", dx_kap2, dy_kap2, dz_kap2);
         G4VSolid* s_kapton = new G4SubtractionSolid("s_kapton", s_kap1, s_kap2, 0, G4ThreeVector(0, 0, 0));
-        G4LogicalVolume* l_kapton = new G4LogicalVolume(s_kapton, geometry::Materials::get("Kapton"), "l_kapton");
+        G4LogicalVolume* l_kapton = new G4LogicalVolume(s_kapton, geometry::Materials::get("TPC_Kapton"), "l_kapton");
         new G4PVPlacement(0, G4ThreeVector(0 * CLHEP::cm, 0 * CLHEP::cm, 0 * CLHEP::cm), l_kapton, "p_kapton", l_iGasTPC, false, 1);
 
         //ring
@@ -237,7 +288,7 @@ namespace Belle2 {
           s_Ring = new G4SubtractionSolid(Name, s_Ring, s_RingHoles, 0, G4ThreeVector(x_Rod[i], y_Rod[i], 0));
         }
 
-        G4LogicalVolume* l_Ring = new G4LogicalVolume(s_Ring, geometry::Materials::get("Cu"), "l_Ring");
+        G4LogicalVolume* l_Ring = new G4LogicalVolume(s_Ring, geometry::Materials::get("TPC_Al6061"), "l_Ring");
         G4int RingNb = 10;
         G4double hspacer = 1.*CLHEP::cm;
         G4double offset = dz_iGasTPC - 5.*CLHEP::cm;
@@ -260,7 +311,7 @@ namespace Belle2 {
           sprintf(Name, "s_Anode_%d", i);
           s_Anode = new G4SubtractionSolid(Name, s_Anode, s_RingHoles, 0, G4ThreeVector(x_Rod[i], y_Rod[i], 0));
         }
-        G4LogicalVolume* l_Anode = new G4LogicalVolume(s_Anode, geometry::Materials::get("Cu"), "l_Anode");
+        G4LogicalVolume* l_Anode = new G4LogicalVolume(s_Anode, geometry::Materials::get("TPC_Al6061"), "l_Anode");
         x_Ring[10] = 0;
         y_Ring[10] = 0;
         z_Ring[10] = -dz_iGasTPC + offset + (hspacer + 2.*dz_Ring) * RingNb;
@@ -301,7 +352,7 @@ namespace Belle2 {
         << z_GEM[1] / CLHEP::cm << endl;*/
 
         G4VSolid* s_GEM = new G4Box("s_GEM", dx_GEM, dy_GEM, dz_GEM);
-        G4LogicalVolume* l_GEM = new G4LogicalVolume(s_GEM, geometry::Materials::get("Kovar"), "l_GEM");
+        G4LogicalVolume* l_GEM = new G4LogicalVolume(s_GEM, geometry::Materials::get("TPC_Kovar"), "l_GEM");
         for (G4int i = 0; i < 2; i++) {
           sprintf(Name, "p_GEM_%d", i);
           new G4PVPlacement(0, G4ThreeVector(x_GEM, y_GEM, z_GEM[i]), l_GEM, Name, l_iGasTPC, false, 1);
@@ -326,7 +377,7 @@ namespace Belle2 {
           s_GEMSupport = new G4SubtractionSolid(Name, s_GEMSupport, s_GEMSupportHoles, 0, G4ThreeVector(x_Rod[i], y_Rod[i], 0));
         }
 
-        G4LogicalVolume* l_GEMSupport = new G4LogicalVolume(s_GEMSupport, geometry::Materials::get("G10"), "l_GEMSupport");
+        G4LogicalVolume* l_GEMSupport = new G4LogicalVolume(s_GEMSupport, TPC_G10, "l_GEMSupport");
         for (G4int i = 0; i < 2; i++) {
           sprintf(Name, "p_GEMSupport_%d", i);
           new G4PVPlacement(0, G4ThreeVector(x_GEM, y_GEM, z_GEM[i]), l_GEMSupport, Name, l_iGasTPC, false, 1);
@@ -336,10 +387,9 @@ namespace Belle2 {
         G4double dx_GasTPC = 1.8 / 2. * CLHEP::cm;
         G4double dy_GasTPC = 2.12 / 2. * CLHEP::cm;
         G4double dz_GasTPC = (z_Ring[10] - dz_Ring - z_GEM[0] - dz_GEM) / 2.; //13.5 * CLHEP::cm;
-        //cout << " dz_GasTPC " << dz_GasTPC / CLHEP::cm << endl;
+        cout << " dz_GasTPC " << dz_GasTPC / CLHEP::cm << endl;
         G4Box* s_GasTPC = new G4Box("s_GasTPC", dx_GasTPC, dy_GasTPC, dz_GasTPC);
-        string matScaleGas = activeParams.getString("ScaleGas");
-        G4LogicalVolume* l_GasTPC = new G4LogicalVolume(s_GasTPC, geometry::Materials::get(matScaleGas), "l_GasTPC", 0, m_sensitive);
+        G4LogicalVolume* l_GasTPC = new G4LogicalVolume(s_GasTPC, gasmix_4HeCO2, "l_GasTPC", 0, m_sensitive);
 
         //Lets limit the Geant4 stepsize inside the volume
         l_GasTPC->SetUserLimits(new G4UserLimits(stepSize));
@@ -381,7 +431,7 @@ namespace Belle2 {
         s_CuPlate = new G4SubtractionSolid("s_CuPlate", s_CuPlate, s_PixelChip, 0, G4ThreeVector(0, 0, 0));
 
 
-        G4LogicalVolume* l_CuPlate = new G4LogicalVolume(s_CuPlate, geometry::Materials::get("Cu"), "l_CuPlate");
+        G4LogicalVolume* l_CuPlate = new G4LogicalVolume(s_CuPlate, TPC_metaCuScreen, "l_CuPlate");
         new G4PVPlacement(0, G4ThreeVector(x_PixelChip, y_PixelChip, z_PixelChip), l_CuPlate, "p_CuPlate", l_iGasTPC, false, 1);
 
         //create pixel board
@@ -401,7 +451,7 @@ namespace Belle2 {
         G4double y_PixelBoard = 0.*CLHEP::mm;
         G4double z_PixelBoard = z_PixelChip - dz_PixelBoard - dz_PixelChip;
 
-        G4LogicalVolume* l_PixelBoard = new G4LogicalVolume(s_PixelBoard, geometry::Materials::get("G10"), "l_PixelBoard");
+        G4LogicalVolume* l_PixelBoard = new G4LogicalVolume(s_PixelBoard, TPC_G10, "l_PixelBoard");
 
         new G4PVPlacement(0, G4ThreeVector(x_PixelBoard, y_PixelBoard, z_PixelBoard), l_PixelBoard, "p_PixelBoard", l_iGasTPC, false, 1);
         detID++;

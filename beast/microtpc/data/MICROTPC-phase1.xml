@@ -59,10 +59,6 @@ whitespace, comma or semi-colon -->
 <v_CG>0.00390826</v_CG>
 <!-- Position 1 prot # 2 -->    
 <Active>
-<MaterialVessel>MICROTPC-Material</MaterialVessel>
-<MaterialGas>MICROTPC-Material</MaterialGas>
-<ScaleGas>MICROTPC-Material</ScaleGas>
-<MaterialEndCap>MICROTPC-Material</MaterialEndCap>
 <Material>MICROTPC-Material</Material>
 <dx_Vessel unit="cm">12.7</dx_Vessel>
 <dy_Vessel unit="cm">10.16</dy_Vessel>
@@ -78,10 +74,6 @@ whitespace, comma or semi-colon -->
 </Active>
 <!-- Position 2 TPC # 2 -->
 <Active>
-<MaterialVessel>MICROTPC-Material</MaterialVessel>
-<MaterialGas>MICROTPC-Material</MaterialGas>
-<ScaleGas>MICROTPC-Material</ScaleGas>
-<MaterialEndCap>MICROTPC-Material</MaterialEndCap>
 <Material>MICROTPC-Material</Material>
 <dx_Vessel unit="cm">15.0</dx_Vessel>
 <dy_Vessel unit="cm">10.4</dy_Vessel>
@@ -97,10 +89,6 @@ whitespace, comma or semi-colon -->
 </Active>
 <!-- Position 3 TPC # 1 -->
 <Active>
-<MaterialVessel>MICROTPC-Material</MaterialVessel>
-<MaterialGas>MICROTPC-Material</MaterialGas>
-<ScaleGas>MICROTPC-Material</ScaleGas>
-<MaterialEndCap>MICROTPC-Material</MaterialEndCap>
 <Material>MICROTPC-Material</Material>
 <dx_Vessel unit="cm">15.0</dx_Vessel>
 <dy_Vessel unit="cm">10.4</dy_Vessel>
@@ -116,10 +104,6 @@ whitespace, comma or semi-colon -->
 </Active>
 <!-- Position 4 prot # 1 -->
 <Active>
-<MaterialVessel>MICROTPC-Material</MaterialVessel>
-<MaterialGas>MICROTPC-Material</MaterialGas>
-<ScaleGas>MICROTPC-Material</ScaleGas>
-<MaterialEndCap>MICROTPC-Material</MaterialEndCap>
 <Material>MICROTPC-Material</Material>
 <dx_Vessel unit="cm">12.7</dx_Vessel>
 <dy_Vessel unit="cm">10.16</dy_Vessel>

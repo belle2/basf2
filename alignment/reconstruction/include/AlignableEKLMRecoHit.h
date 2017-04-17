@@ -76,11 +76,17 @@ namespace Belle2 {
 
   private:
 
+    /** Sector identifier. */
+    EKLMElementID m_Sector;
+
     /** Segment identifier. */
     EKLMElementID m_Segment;
 
+    /** V direction. */
+    TVector3 m_StripV;
+
     /** Needed to make objects storable. */
-    ClassDef(AlignableEKLMRecoHit, 1)
+    ClassDef(AlignableEKLMRecoHit, 2);
 
   };
 

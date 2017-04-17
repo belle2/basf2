@@ -52,6 +52,11 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   segment = (eklmDigits[digit]->getStrip() - 1) / geoDat->getNStripsSegment()
             + 1;
   strip = (segment - 1) * geoDat->getNStripsSegment() + 1;
+  m_Sector.setType(EKLMElementID::c_Sector);
+  m_Sector.setEndcap(endcap);
+  m_Sector.setLayer(layer);
+  m_Sector.setSector(sector);
+  m_Segment.setType(EKLMElementID::c_Segment);
   m_Segment.setEndcap(endcap);
   m_Segment.setLayer(layer);
   m_Segment.setSector(sector);
@@ -71,6 +76,9 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   v2.SetX(v.x());
   v2.SetY(v.y());
   v2.SetZ(v.z());
+  m_StripV.SetX(v.unit().x());
+  m_StripV.SetY(v.unit().y());
+  m_StripV.SetZ(0);
   genfit::SharedPlanePtr detPlane(new genfit::DetPlane(origin2, u2, v2, 0));
   setPlane(detPlane, m_Segment.getGlobalNumber());
   globalPosition = hit2ds[0]->getPosition();
@@ -92,6 +100,9 @@ AlignableEKLMRecoHit::~AlignableEKLMRecoHit()
 std::vector<int> AlignableEKLMRecoHit::labels()
 {
   std::vector<int> labels;
+  labels.push_back(GlobalLabel(m_Sector, 1));
+  labels.push_back(GlobalLabel(m_Sector, 2));
+  labels.push_back(GlobalLabel(m_Sector, 3));
   labels.push_back(GlobalLabel(m_Segment, 1));
   labels.push_back(GlobalLabel(m_Segment, 2));
   return labels;
@@ -108,12 +119,21 @@ TMatrixD AlignableEKLMRecoHit::derivatives(const genfit::StateOnPlane* sop)
   TVector2 pos = sop->getPlane()->LabToPlane(sop->getPos());
   double u = pos.X();
   double v = pos.Y();
-  /* Matrix of global derivatives. */
-  TMatrixD derGlobal(2, 2);
-  derGlobal(0, 0) = -sinda;
-  derGlobal(0, 1) = -cosda;
-  derGlobal(1, 0) = -u * sinda + (v - dy) * cosda;
-  derGlobal(1, 1) = -u * cosda + (v + dy) * sinda;
+  /*
+   * Matrix of global derivatives (second dimension is added because of
+   * resizing in GblFitterInfo::constructGblPoint()).
+   */
+  TMatrixD derGlobal(2, 5);
+  derGlobal(0, 0) = 0;
+  derGlobal(0, 1) = 0;
+  derGlobal(0, 2) = 0;
+  derGlobal(0, 3) = 0;
+  derGlobal(0, 4) = 0;
+  derGlobal(1, 0) = -m_StripV.X();
+  derGlobal(1, 1) = -m_StripV.Y();
+  derGlobal(1, 2) = 0;
+  derGlobal(1, 3) = -cosda;
+  derGlobal(1, 4) = -u * cosda - (v - dy) * sinda;
   return derGlobal;
 }
 

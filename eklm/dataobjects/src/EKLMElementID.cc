@@ -78,6 +78,16 @@ EKLMElementID::~EKLMElementID()
 {
 }
 
+void EKLMElementID::setType(ElementType type)
+{
+  m_Type = type;
+}
+
+EKLMElementID::ElementType EKLMElementID::getType() const
+{
+  return m_Type;
+}
+
 void EKLMElementID::setEndcap(int endcap)
 {
   m_Endcap = endcap;

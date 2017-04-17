@@ -24,6 +24,8 @@ namespace Belle2 {
    */
   class EKLMElementID {
 
+  public:
+
     /**
      * Type of EKLM element.
      */
@@ -34,8 +36,6 @@ namespace Belle2 {
       c_Plane,   /**< Plane. */
       c_Segment, /**< Segment. */
     };
-
-  public:
 
     /**
      * Constructor.
@@ -70,6 +70,16 @@ namespace Belle2 {
      * Destructor.
      */
     ~EKLMElementID();
+
+    /**
+     * Set element type.
+     */
+    void setType(ElementType type);
+
+    /**
+     * Get element type.
+     */
+    ElementType getType() const;
 
     /**
      * Set endcap number.

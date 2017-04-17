@@ -14,12 +14,26 @@
 /* External headers. */
 #include <TObject.h>
 
+/* Belle2 headers. */
+#include <eklm/dataobjects/ElementNumbersSingleton.h>
+
 namespace Belle2 {
 
   /**
    * EKLM segment identifier.
    */
   class EKLMElementID {
+
+    /**
+     * Type of EKLM element.
+     */
+    enum ElementType {
+      c_Endcap,  /**< Endcap. */
+      c_Layer,   /**< Layer. */
+      c_Sector,  /**< Sector. */
+      c_Plane,   /**< Plane. */
+      c_Segment, /**< Segment. */
+    };
 
   public:
 
@@ -29,7 +43,15 @@ namespace Belle2 {
     EKLMElementID();
 
     /**
-     * Constructor.
+     * Constructor (sector).
+     * @param[in] endcap  Endcap number.
+     * @param[in] layer   Layer number.
+     * @param[in] sector  Sector number.
+     */
+    EKLMElementID(int endcap, int layer, int sector);
+
+    /**
+     * Constructor (segment).
      * @param[in] endcap  Endcap number.
      * @param[in] layer   Layer number.
      * @param[in] sector  Sector number.
@@ -40,9 +62,9 @@ namespace Belle2 {
 
     /**
      * Constructor.
-     * @param[in] segment Segment number (global).
+     * @param[in] globalNumber Element global number.
      */
-    EKLMElementID(int segment);
+    EKLMElementID(int globalNumber);
 
     /**
      * Destructor.
@@ -100,11 +122,17 @@ namespace Belle2 {
     int getSegment() const;
 
     /**
-     * Get segment global number.
+     * Get global element number.
      */
-    int getSegmentGlobalNumber() const;
+    int getGlobalNumber() const;
 
   private:
+
+    /** Element numbers. */
+    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
+
+    /** Element type. */
+    ElementType m_Type;
 
     /** Endcap number. */
     int m_Endcap;

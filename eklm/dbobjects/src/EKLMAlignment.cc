@@ -71,7 +71,7 @@ void EKLMAlignment::add(EKLMElementID element, int parameter,
   double corr;
   int segment;
   EKLMAlignmentData* alignmentData;
-  segment = element.getSegmentGlobalNumber();
+  segment = element.getGlobalNumber();
   alignmentData = getSegmentAlignment(segment);
   corr = correction;
   if (invertSign)

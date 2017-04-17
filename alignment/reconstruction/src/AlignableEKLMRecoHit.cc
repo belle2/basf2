@@ -72,7 +72,7 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   v2.SetY(v.y());
   v2.SetZ(v.z());
   genfit::SharedPlanePtr detPlane(new genfit::DetPlane(origin2, u2, v2, 0));
-  setPlane(detPlane, m_Segment.getSegmentGlobalNumber());
+  setPlane(detPlane, m_Segment.getGlobalNumber());
   globalPosition = hit2ds[0]->getPosition();
   /* Projection onto hit plane - only need to change Z. */
   globalPosition.SetZ(origin2.Z());

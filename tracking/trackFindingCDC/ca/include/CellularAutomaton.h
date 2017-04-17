@@ -123,11 +123,11 @@ namespace Belle2 {
       {
         AutomatonCell& cell = cellHolder.getAutomatonCell();
 
-        //--- blocked cells do not contribute a continuation ---
+        // --- blocked cells do not contribute a continuation ---
+        // Redundant check.
         if (cell.hasMaskedFlag()) {
-          cell.setCellState(NAN);
           cell.setAssignedFlag();
-          return cell.getCellState();
+          return NAN;
         }
 
         //--- Search for neighbors ---
@@ -197,12 +197,10 @@ namespace Belle2 {
         for (ACellHolder& cellHolder : cellHolders) {
           AutomatonCell& cell = cellHolder.getAutomatonCell();
           cell.unsetTemporaryFlags();
+          if (cell.hasMaskedFlag()) continue;
           cell.setCellState(NAN);
         }
       }
-
     };
-
   }
-
 }

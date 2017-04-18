@@ -71,7 +71,6 @@ namespace Belle2 {
       /// Fits to the wire positions. Explicit specialisation to be used from python.
       CDCTrajectory2D fit(const CDCWireHitSegment& wireHits) const;
 
-
       /// Updates the given trajectory inplace from the given segment
       void update(CDCTrajectory2D& trajectory2D, const CDCSegment2D& segment) const;
 

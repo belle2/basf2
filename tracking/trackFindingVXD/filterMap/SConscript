@@ -1,8 +1,0 @@
-Import('env')
-
-env['LIBS'] = [
-    ]
-
-Return('env')
-
-

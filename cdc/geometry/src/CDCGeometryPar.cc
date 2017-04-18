@@ -1850,7 +1850,7 @@ double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsig
     } else {
       //1st-order approx. assuming minTime near zero
       if (a[1] == 0.) B2FATAL("CDCGeometryPar::getMinDriftTime: a[1]=0 !");
-      B2WARNING("CDCGeometryPar::getMinDriftTime: 1st-order approx.");
+      //      B2WARNING("CDCGeometryPar::getMinDriftTime: 1st-order approx.");
       minTime = -a[0] / a[1];
       //plus higher-order corr.
       const double& t = minTime;

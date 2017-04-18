@@ -15,7 +15,9 @@
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
 #include <tracking/trackFindingCDC/ca/Path.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
+#include <framework/core/ModuleParamList.h>
 #include <framework/logging/Logger.h>
 
 #include <vector>
@@ -34,17 +36,56 @@ namespace Belle2 {
     class  MultipassCellularPathFinder {
 
     public:
-      /// Constructor setting up the minimal length / energy cut off.
-      explicit MultipassCellularPathFinder(Weight minStateToFollow = -std::numeric_limits<Weight>::infinity())
-        : m_minStateToFollow(minStateToFollow)
-      {}
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+      {
+        moduleParamList->addParameter(prefixed(prefix, "caMode"),
+                                      m_param_caMode,
+                                      "Mode for the cellular automaton application"
+                                      "*  * 'normal'    normal path search for high value paths"
+                                      "*  * 'cells'     make path for each individual cell for debugging"
+                                      "*  * 'relations' make path for each individual relation for debugging",
+                                      m_param_caMode);
+
+        moduleParamList->addParameter(prefixed(prefix, "minState"),
+                                      m_param_minState,
+                                      "The minimal accumulated state to follow",
+                                      m_param_minState);
+
+        moduleParamList->addParameter(prefixed(prefix, "minPathLength"),
+                                      m_param_minPathLength,
+                                      "The minimal path length to that is written to output",
+                                      m_param_minPathLength);
+
+      }
 
       /// Applies the cellular automaton to the collection and its neighborhood
       template<class ACellHolderRange>
       void apply(const ACellHolderRange& cellHolders,
                  const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood,
-                 std::vector<Path<ACellHolder> >& paths) const
+                 std::vector<Path<ACellHolder> >& paths)
       {
+        // Forward all cells as paths
+        if (m_param_caMode == "cells") {
+          for (ACellHolder& cellHolder : cellHolders) {
+            paths.push_back({&cellHolder});
+          }
+          return;
+        }
+
+        // Forward all relations as paths
+        if (m_param_caMode == "relations") {
+          for (const WeightedRelation<ACellHolder>& cellHolderRelation : cellHolderNeighborhood) {
+            paths.push_back({cellHolderRelation.getFrom(), cellHolderRelation.getTo()});
+          }
+          return;
+        }
+
+        // Everything else is just normal
+        if (m_param_caMode != "normal") {
+          B2WARNING("Unrecognised caMode parameter value " << m_param_caMode);
+          m_param_caMode = "normal";
+        }
 
         // multiple passes of the cellular automat
         // one segment is created at a time denying all knots it picked up,
@@ -66,8 +107,8 @@ namespace Belle2 {
             AutomatonCell& rhsCell = rhs.getAutomatonCell();
 
             // Cells with state lower than the minimal cell state are one lowest category
-            if (rhsCell.getCellState() < m_minStateToFollow) return false;
-            if (lhsCell.getCellState() < m_minStateToFollow) return true;
+            if (rhsCell.getCellState() < m_param_minState) return false;
+            if (lhsCell.getCellState() < m_param_minState) return true;
 
             return (std::make_tuple(lhsCell.hasPriorityPathFlag(),
                                     lhsCell.hasStartFlag(),
@@ -81,13 +122,13 @@ namespace Belle2 {
             std::max_element(cellHolders.begin(), cellHolders.end(), lessStartCellState);
           if (itStartCellHolder == cellHolders.end()) break;
           else if (not itStartCellHolder->getAutomatonCell().hasStartFlag()) break;
-          else if (itStartCellHolder->getAutomatonCell().getCellState() < m_minStateToFollow) break;
+          else if (itStartCellHolder->getAutomatonCell().getCellState() < m_param_minState) break;
 
           const ACellHolder* highestCellHolder = &*itStartCellHolder;
 
           Path<ACellHolder> newPath = m_cellularPathFollower.followSingle(highestCellHolder,
                                       cellHolderNeighborhood,
-                                      m_minStateToFollow);
+                                      m_param_minState);
 
           if (newPath.empty()) break;
 
@@ -101,15 +142,29 @@ namespace Belle2 {
             cellHolder.receiveMaskedFlag();
           }
 
-          paths.push_back(std::move(newPath));
+          if (static_cast<int>(newPath.size()) >= m_param_minPathLength) {
+            paths.push_back(std::move(newPath));
+          }
 
         } while (true);
 
       }
 
     private:
-      /// The minimal path length / energy to be followed.
-      Weight m_minStateToFollow;
+      /**
+       *  Mode for the cellular automaton application
+       *
+       *  * 'normal'    normal path search for high value paths
+       *  * 'cells'     make path for each individual cell for debugging
+       *  * 'relations' make path for each individual relation for debugging
+       */
+      std::string m_param_caMode{"normal"};
+
+      /// The minimal accumulated state of the paths to follow
+      Weight m_param_minState = -INFINITY;
+
+      /// The minimal path length to write to output
+      int m_param_minPathLength = 0;
 
       /// The cellular automaton to be used.
       CellularAutomaton<ACellHolder> m_cellularAutomaton;

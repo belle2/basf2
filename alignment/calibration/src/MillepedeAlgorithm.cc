@@ -99,7 +99,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   if (nBKLMparams)
     belle2Constants.push_back(Database::DBQuery("BKLMAlignment"));
   if (nEKLMparams)
-    belle2Constants.push_back(Database::DBQuery("EKLMAlignment"));
+    belle2Constants.push_back(Database::DBQuery("EKLMDisplacement"));
   // Maps (key is IOV of object in DB)
   std::map<string, BeamParameters*> previousBeam;
   std::map<string, VXDAlignment*> previousVXD;
@@ -258,7 +258,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   for (auto& bklm : newBKLM)
     saveCalibration(bklm.second, "BKLMAlignment", to_IOV(bklm.first).overlap(getIovFromData()));
   for (auto& eklm : newEKLM)
-    saveCalibration(eklm.second, "EKLMAlignment", to_IOV(eklm.first).overlap(getIovFromData()));
+    saveCalibration(eklm.second, "EKLMDisplacement", to_IOV(eklm.first).overlap(getIovFromData()));
 
   //commit();
 

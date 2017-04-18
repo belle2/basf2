@@ -248,11 +248,14 @@ namespace Belle2 {
         std::string mode = arguments[1];
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
 
-        auto func = [var, mode](const Particle * particle) -> double {
+        const bool modeisSignal = mode == "Signal";
+        const bool modeisAuto = mode == "Auto";
+
+        auto func = [var, modeisSignal, modeisAuto](const Particle * particle) -> double {
           const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
           bool isinROE = isInRestOfEvent(particle);
           TVector3 newZ;
-          if (mode == "Signal" or (mode == "Auto" and not isinROE))
+          if (modeisSignal or (modeisAuto and not isinROE))
             newZ = qq->getThrustB();
           else
             newZ = qq->getThrustO();
@@ -265,7 +268,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function KSFWVariables. It only takes one or two arguments. The first argument must be the variable and the second can either be left blank or must be FS1 to use the KSFW moments calculated from the B final state particles.");
+        B2FATAL("Wrong number of arguments for meta function useThrustFrame. It only takes two arguments. The first argument must be the variable and the second can either be Signal, ROE or Auto.");
       }
     }
 

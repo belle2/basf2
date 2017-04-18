@@ -3,16 +3,8 @@
 #include <alignment/PedeApplication.h>
 #include <alignment/PedeResult.h>
 #include <alignment/dataobjects/PedeSteering.h>
-#include <alignment/dbobjects/VXDAlignment.h>
-#include <alignment/dbobjects/CDCCalibration.h>
-#include <alignment/dbobjects/BKLMAlignment.h>
+
 #include <alignment/GlobalLabel.h>
-
-#include <eklm/alignment/AlignmentTools.h>
-#include <eklm/dbobjects/EKLMAlignment.h>
-
-#include <framework/dbobjects/BeamParameters.h>
-
 #include <alignment/GlobalParam.h>
 
 using namespace std;
@@ -98,7 +90,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 
   }
 
-  result.readFromResult(resultTuple);
+  result.postReadFromResult(resultTuple);
 
   for (auto object : result.releaseObjects()) {
     saveCalibration(object);

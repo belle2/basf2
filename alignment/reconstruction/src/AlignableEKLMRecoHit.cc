@@ -98,23 +98,33 @@ std::pair<std::vector<int>, TMatrixD> AlignableEKLMRecoHit::globalDerivatives(co
   std::vector<int> labels;
   labels.push_back(GlobalLabel::construct<EKLMAlignment>(m_Segment.getSegmentGlobalNumber(), 1));
   labels.push_back(GlobalLabel::construct<EKLMAlignment>(m_Segment.getSegmentGlobalNumber(), 2));
+  labels.push_back(0);
+  labels.push_back(0);
+  labels.push_back(0);
+  labels.push_back(GlobalLabel::construct<EKLMAlignment>(m_Segment.getSegmentGlobalNumber(), 6));
 
-  const double dalpha = 0;
-  const double dy = 0;
-  const double sinda = sin(dalpha);
-  const double cosda = cos(dalpha);
-  /* Local position. */
-  TVector2 pos = sop->getPlane()->LabToPlane(sop->getPos());
-  double u = pos.X();
-  double v = pos.Y();
-  /* Matrix of global derivatives. */
-  TMatrixD derGlobal(2, 2);
-  derGlobal(0, 0) = -sinda;
-  derGlobal(0, 1) = -cosda;
-  derGlobal(1, 0) = -u * sinda + (v - dy) * cosda;
-  derGlobal(1, 1) = -u * cosda + (v + dy) * sinda;
+  // If alignment nominal x and y of local strip is the same as
+  alignment::RigidBodyHierarchy rigidBodies;
+  auto drdglobal = rigidBodies.getRigidBodyDerivatives(sop);
+  /*
+    const double dalpha = 0;
+    const double dy = 0;
+    const double sinda = sin(dalpha);
+    const double cosda = cos(dalpha);
+    // Local position.
+    TVector2 pos = sop->getPlane()->LabToPlane(sop->getPos());
+    double u = pos.X();
+    double v = pos.Y();
+    // Matrix of global derivatives.
+    TMatrixD derGlobal(2, 2);
+    derGlobal(0, 0) = -sinda;
+    derGlobal(0, 1) = -cosda;
+    derGlobal(1, 0) = -u * sinda + (v - dy) * cosda;
+    derGlobal(1, 1) = -u * cosda + (v + dy) * sinda;
+    */
 
-  return alignment::GlobalDerivatives::passGlobals(make_pair(labels, derGlobal));
+
+  return alignment::GlobalDerivatives::passGlobals(make_pair(labels, drdglobal));
 }
 
 

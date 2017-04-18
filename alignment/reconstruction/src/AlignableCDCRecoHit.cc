@@ -95,8 +95,28 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
     GlobalLabel::construct<CDCAlignment>(getWireID().getICLayer(), 6),
     drldg(0, 5)
   );
+  //
+  /**
+  // Alignment of wires X in global coords
+  globals.add(
+    GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), 1),
+    drldg(0, 0)
+  );
 
-  /*
+  // Alignment of wires Y in global coords
+  globals.add(
+    GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), 2),
+    drldg(0, 1)
+  );
+
+  // Alignment of wires rotation (gamma) in global coords
+  globals.add(
+    GlobalLabel::construct<CDCAlignment>(getWireID().getEWire(), 6),
+    drldg(0, 5)
+  );
+  */
+
+  /**
   // Gravitational wire sagging TODO highly experimental
   double zWire; //TODO what is this and how to get?
   double zWireM;//TODO what is this and how to get?

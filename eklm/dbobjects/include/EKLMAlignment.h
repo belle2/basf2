@@ -66,6 +66,8 @@ namespace Belle2 {
     {
 
       auto adata = getAlignmentData(element);
+      if (!adata)
+        return 0.;
       if (param == 1) return adata->getDx();
       if (param == 2) return adata->getDy();
       if (param == 6) return adata->getDalpha();
@@ -77,13 +79,24 @@ namespace Belle2 {
     {
 
       auto adata = getAlignmentData(element);
+      if (!adata)
+        return;
       if (param == 1) adata->setDx(value);
       if (param == 2) adata->setDy(value);
       if (param == 6) adata->setDalpha(value);
 
     }
     /// TODO: list stored global parameters
-    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {};}
+    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()
+    {
+      std::vector<std::pair<unsigned short, unsigned short>> result;
+      for (auto data : m_Data) {
+        result.push_back({data.first, 1});
+        result.push_back({data.first, 2});
+        result.push_back({data.first, 6});
+      }
+      return result;
+    }
     /// Not used
     void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>&) {}
     // ------------------------------------------------------------------------

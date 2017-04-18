@@ -43,12 +43,6 @@ GlobalLabel::GlobalLabel(GlobalLabel::gidTYPE globalLabel) :
   }
 }
 
-GlobalLabel::GlobalLabel(BeamID beamid, gidTYPE paramId) : gid(0), eid(0),
-  pid(0), tid(0), tif(0)
-{
-  construct((int)beamid + beamOffset, paramId);
-}
-
 GlobalLabel::GlobalLabel(VxdID vxdid, GlobalLabel::gidTYPE paramId): gid(0),
   eid(0), pid(0), tid(0), tif(0)
 {

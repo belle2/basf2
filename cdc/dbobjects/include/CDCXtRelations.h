@@ -324,6 +324,27 @@ namespace Belle2 {
       }
     }
 
+
+    // ------------- Interface to global Millepede calibration ----------------
+    /// Get global unique id
+    static unsigned short getGlobalUniqueID() {return 29;}
+    /// Get global parameter FIXME does nothing because CDC is not ready
+    double getGlobalParam(unsigned short xtId, unsigned short xtParam)
+    {
+      return getXtParams(xtId).at(xtParam);
+    }
+    /// Set global parameter FIXME does nothing because CDC is not ready
+    void setGlobalParam(double value, unsigned short xtId, unsigned short xtParam)
+    {
+      std::vector<float> allParams = getXtParams(xtId);
+      allParams.at(xtParam) = value;
+      setXtParams(xtId, allParams);
+    }
+    /// list stored global parameters TODO FIXME CDC not ready
+    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()
+    {
+      return {};
+    }
   private:
     unsigned short m_xtParamMode;    /*!< Mode for xt parameterization */
     unsigned short m_nXtParams;      /*!< no. of xt parameters per bin */

@@ -22,31 +22,6 @@
 
 namespace Belle2 {
 
-  /// Class to identify beam parameters
-  class BeamID {
-
-  public:
-
-    /// Primary vertex x-position
-    static const int vertexX = 1;
-
-    /// Primary vertex y-position
-    static const int vertexY = 2;
-
-    /// Primary vertex z-position
-    static const int vertexZ = 3;
-
-    /// Constructor
-    explicit BeamID() {}
-
-    /// convert to int, returns 0 as there are no elements of beam, only parameters
-    operator int() {return 0;}
-
-    /// convert to unsigned int, returns 0 as there are no elements of beam, only parameters
-    operator unsigned int() {return 0;}
-
-  };
-
   /**
    * @brief Class to convert to/from global labels
    * for Millepede II to/from detector & parameter
@@ -87,7 +62,6 @@ namespace Belle2 {
                                       maxTIF; /**< max internal id = 1.999.999.999 */
     static const gidTYPE maxLabel   =
       maxGID;  /**< Label and internal id ("gid") are the same numbers (label is signed but 0 and <0 values are invalid to give to Pede)*/
-    static const gidTYPE beamOffset =  100000;       /**< Offset of 0 for BeamParameters */
     static const gidTYPE vxdOffset  = 1000000;  /**< Offset of 100000 for VXD (VxdID(0) is dummy) */
     static const gidTYPE cdcOffset  = 2000000;  /**< Offset of 200000 in element ids for CDC. WireID(0) is a real wire */
     static const gidTYPE bklmOffset = 3000000;  /**< Offset of 300000 in element ids for BKLM */
@@ -104,14 +78,6 @@ namespace Belle2 {
      * @param globalLabel The encoded label
      */
     explicit GlobalLabel(gidTYPE globalLabel);
-
-    /**
-     * @brief Constructor from BeamID (depends on time internally)
-     * @param vxdid BeamId of beam parameter (vertex, invariant mass ...)
-     * @param paramId Numeric identificator of calibration/alignment parameter
-     *                type (x,y,z of vertex etc.).
-     */
-    GlobalLabel(BeamID beamid, gidTYPE paramId);
 
     /**
      * @brief Constructor from VxdID (depends on time internally)
@@ -234,9 +200,6 @@ namespace Belle2 {
      * fatal error.
      */
     EKLMSegmentID getEklmID() const;
-
-    //! Is this beam label?
-    bool    isBeam()          const {return (eid < vxdOffset);}
 
     //! Is this VXD label?
     bool    isVXD()          const {return (eid >= vxdOffset && eid < cdcOffset);}

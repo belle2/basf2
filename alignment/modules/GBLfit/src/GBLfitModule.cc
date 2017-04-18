@@ -67,7 +67,7 @@
 #include <genfit/MeasurementFactory.h>
 
 #include <tracking/gfbfield/GFGeant4Field.h>
-#include <alignment/GblMultipleScatteringController.h>
+#include <alignment/reconstruction/GblMultipleScatteringController.h>
 
 #include <genfit/FieldManager.h>
 #include <genfit/MaterialEffects.h>

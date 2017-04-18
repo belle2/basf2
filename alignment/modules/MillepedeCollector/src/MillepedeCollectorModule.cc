@@ -51,10 +51,11 @@
 
 #include <alignment/Hierarchy.h>
 #include <alignment/GlobalParam.h>
+#include <alignment/GlobalDerivatives.h>
 
 #include <alignment/dbobjects/VXDAlignment.h>
 
-#include <alignment/GblMultipleScatteringController.h>
+#include <alignment/reconstruction/GblMultipleScatteringController.h>
 
 using namespace Belle2;
 using namespace std;
@@ -203,6 +204,7 @@ void MillepedeCollectorModule::prepare()
 
   Belle2::alignment::HierarchyManager::getInstance().writeConstraints("constraints.txt");
 
+  //TODO enable updates
   // Add callback to itself. Callback are unique, so further calls should not change anything
   //vxdAlignments.addCallback(this, &VXD::GeoCache::setupReconstructionTransformations);
 }
@@ -335,21 +337,19 @@ void MillepedeCollectorModule::collect()
         daughters[0].first[0].addMeasurement(extProjection, extMeasurements, vertexPrec);
 
         if (m_calibrateVertex) {
-          TMatrixD globals(3, 3);
-          globals.UnitMatrix();
+          TMatrixD derivatives(3, 3);
+          derivatives.UnitMatrix();
           std::vector<int> labels;
           GlobalLabel label = GlobalLabel::construct<BeamParameters>(0, 0);
           labels.push_back(label.setParameterId(1));
           labels.push_back(label.setParameterId(2));
           labels.push_back(label.setParameterId(3));
-          /*
-          auto globalDerivs = alignment::GlobalDerivatives::passGlobals(make_pair(labels, globals));
+
+          // Allow to disable BeamParameters externally
+          auto globals = alignment::GlobalDerivatives::passGlobals({labels, derivatives});
 
           // Add derivatives for vertex calibration to first point of first trajectory
-          daughters[0].first[0].addGlobals(globalDerivs.first, globalDerivs.second);*/
-
-          // Add derivatives for vertex calibration to first point of first trajectory
-          daughters[0].first[0].addGlobals(labels, globals);
+          daughters[0].first[0].addGlobals(globals.first, globals.second);
         }
 
         gbl::GblTrajectory combined(daughters);
@@ -443,9 +443,9 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
   MeasurementAdder factory("", "", "", "", "");
 
   // We need the store arrays
-  StoreArray <CDCHit> cdcHits("");
-  StoreArray <PXDCluster> pxdHits("");
-  StoreArray <SVDCluster> svdHits("");
+  StoreArray<RecoHitInformation::UsedCDCHit> cdcHits("");
+  StoreArray<RecoHitInformation::UsedPXDHit> pxdHits("");
+  StoreArray<RecoHitInformation::UsedSVDHit> svdHits("");
   StoreArray<RecoHitInformation::UsedBKLMHit> bklmHits("");
   StoreArray<RecoHitInformation::UsedEKLMHit> eklmHits("");
 
@@ -501,7 +501,10 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
 
   auto& gfTrack = RecoTrackGenfitAccess::getGenfitTrack(recoTrack);
 
-  const int currentPdgCode = TrackFitter::createCorrectPDGCodeForChargedStable(Const::muon, recoTrack);
+  int currentPdgCode = TrackFitter::createCorrectPDGCodeForChargedStable(Const::muon, recoTrack);
+  if (particle)
+    currentPdgCode = particle->getPDGCode();
+
   genfit::AbsTrackRep* trackRep = new genfit::RKTrackRep(currentPdgCode);
   gfTrack.addTrackRep(trackRep);
   gfTrack.setCardinalRep(gfTrack.getIdForRep(trackRep));
@@ -519,6 +522,8 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
     vertexSOP.setPosMom(vertexPos, vertexMom);
     TMatrixDSym vertexCov(5);
     vertexCov.UnitMatrix();
+    // By using negative covariance no measurement is added to GBL. But this first point
+    // is then used as additional point in trajectory at the assumed point of its fitted vertex
     vertexCov *= -1.;
     genfit::MeasuredStateOnPlane mop(vertexSOP, vertexCov);
     genfit::FullMeasurement* vertex = new genfit::FullMeasurement(mop, Const::IR);

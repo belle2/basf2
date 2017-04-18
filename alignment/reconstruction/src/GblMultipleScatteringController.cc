@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <alignment/GblMultipleScatteringController.h>
+#include <alignment/reconstruction/GblMultipleScatteringController.h>
 #include <framework/logging/Logger.h>
 #include <TGeoManager.h>
 

@@ -10,6 +10,7 @@
 
 #include <eklm/alignment/AlignmentTools.h>
 #include <eklm/dbobjects/EKLMAlignment.h>
+#include <eklm/geometry/AlignmentChecker.h>
 
 #include <framework/dbobjects/BeamParameters.h>
 
@@ -246,6 +247,12 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
       }
     }
 
+  }
+
+  if (newEKLM.size() > 0) {
+    EKLM::AlignmentChecker alignmentChecker(true);
+    for (auto& eklm : newEKLM)
+      alignmentChecker.restoreAlignment(eklm.second);
   }
 
   // Save (possibly updated) objects

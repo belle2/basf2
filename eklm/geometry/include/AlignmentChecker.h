@@ -50,13 +50,6 @@ namespace Belle2 {
       ~AlignmentChecker();
 
       /**
-       * Check alignment.
-       * @param[in] alignment Alignment data.
-       * @return true Alignment is correct (no overlaps).
-       */
-      bool checkAlignment(EKLMAlignment* alignment) const;
-
-      /**
        * Check sector alignment.
        * @param[in] sectorAlignment Sector alignment.
        * @return true Alignment is correct (no overlaps).
@@ -74,6 +67,32 @@ namespace Belle2 {
       bool checkSegmentAlignment(int iPlane, int iSegment,
                                  EKLMAlignmentData* sectorAlignment,
                                  EKLMAlignmentData* segmentAlignment) const;
+
+      /**
+       * Check alignment.
+       * @param[in] alignment Alignment data.
+       * @return true Alignment is correct (no overlaps).
+       */
+      bool checkAlignment(EKLMAlignment* alignment) const;
+
+      /**
+       * Restore sector alignment.
+       * @param[in] sectorAlignment Sector alignment.
+       * @return true Alignment is correct (no overlaps).
+       */
+      void restoreSectorAlignment(EKLMAlignmentData* sectorAlignment) const;
+
+      /**
+       * Restore segment alignment.
+       * @param[in] segmentAlignment Segment alignment.
+       * @return true Alignment is correct (no overlaps).
+       */
+      void restoreSegmentAlignment(EKLMAlignmentData* segmentAlignment) const;
+
+      /**
+       * Restore alignment (check and move elements if there are overlaps).
+       */
+      void restoreAlignment(EKLMAlignment* alignment) const;
 
     private:
 

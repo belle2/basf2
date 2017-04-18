@@ -41,7 +41,7 @@ void TrackFinderSegmentTripleAutomaton::exposeParameters(ModuleParamList* module
   m_axialSegmentPairCreator.exposeParameters(moduleParamList, prefixed(prefix, "axialSegmentPair"));
   m_segmentTripleCreator.exposeParameters(moduleParamList, prefixed(prefix, "segmentTriple"));
   m_segmentTripleRelationCreator.exposeParameters(moduleParamList, prefixed(prefix, "segmentTripleRelation"));
-  m_trackCreatorSegmentTripleAutomaton.exposeParameters(moduleParamList, prefix);
+  m_trackCreatorSegmentTripleAutomaton.exposeParameters(moduleParamList, prefixed(prefix, "segmentTripleRelation"));
   m_trackCreatorSingleSegments.exposeParameters(moduleParamList, prefix);
   m_trackLinker.exposeParameters(moduleParamList, prefixed(prefix, "TrackRelation"));
   m_trackOrienter.exposeParameters(moduleParamList, prefix);

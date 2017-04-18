@@ -26,6 +26,11 @@ std::string TrackCreatorSegmentPairAutomaton::getDescription()
   return "Constructs tracks by extraction of segment pair paths in a cellular automaton.";
 }
 
+void TrackCreatorSegmentPairAutomaton::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  m_cellularPathFinder.exposeParameters(moduleParamList, prefix);
+}
+
 void TrackCreatorSegmentPairAutomaton::apply(
   const std::vector<CDCSegmentPair>& inputSegmentPairs,
   const std::vector<WeightedRelation<const CDCSegmentPair>>& inputSegmentPairRelations,

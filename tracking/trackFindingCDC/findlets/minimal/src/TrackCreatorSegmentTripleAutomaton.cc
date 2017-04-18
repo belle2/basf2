@@ -24,6 +24,11 @@ std::string TrackCreatorSegmentTripleAutomaton::getDescription()
   return "Constructs tracks by extraction of segment triple paths in a cellular automaton.";
 }
 
+void TrackCreatorSegmentTripleAutomaton::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  m_cellularPathFinder.exposeParameters(moduleParamList, prefix);
+}
+
 void TrackCreatorSegmentTripleAutomaton::apply(const std::vector<CDCSegmentTriple>& inputSegmentTriples,
                                                const std::vector<WeightedRelation<const CDCSegmentTriple>>& inputSegmentTripleRelations,
                                                std::vector<CDCTrack>& outputTracks)

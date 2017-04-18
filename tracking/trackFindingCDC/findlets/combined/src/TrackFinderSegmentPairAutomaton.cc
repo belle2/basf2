@@ -46,7 +46,7 @@ void TrackFinderSegmentPairAutomaton::exposeParameters(ModuleParamList* modulePa
 {
   m_segmentPairCreator.exposeParameters(moduleParamList, prefixed(prefix, "SegmentPair"));
   m_segmentPairRelationCreator.exposeParameters(moduleParamList, prefixed(prefix, "SegmentPairRelation"));
-  m_trackCreatorSegmentPairAutomaton.exposeParameters(moduleParamList, prefix);
+  m_trackCreatorSegmentPairAutomaton.exposeParameters(moduleParamList, prefixed(prefix, "SegmentPairRelation"));
   m_trackCreatorSingleSegments.exposeParameters(moduleParamList, prefix);
   m_trackLinker.exposeParameters(moduleParamList, prefixed(prefix, "TrackRelation"));
   m_trackOrienter.exposeParameters(moduleParamList, prefix);

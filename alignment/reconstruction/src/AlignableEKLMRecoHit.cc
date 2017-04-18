@@ -76,6 +76,9 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   v2.SetX(v.x());
   v2.SetY(v.y());
   v2.SetZ(v.z());
+  t = transformData->getSectorTransform(endcap, layer, sector);
+  r = t->getRotation().inverse();
+  v = r * v;
   m_StripV.SetX(v.unit().x());
   m_StripV.SetY(v.unit().y());
   m_StripV.SetZ(0);

@@ -3,60 +3,98 @@
 
 #include <daq/slc/nsm/NSMCallback.h>
 
+#include <boost/python.hpp>
+#include <boost/python/wrapper.hpp>
+#include <boost/ref.hpp>
+
 namespace Belle2 {
 
   class PyNSMCallback {
 
-  private:
-    static NSMCallback* g_callback;
+  public:
+    PyNSMCallback() {}
+    ~PyNSMCallback() {}
 
   public:
-    static void setCallback(NSMCallback* callback)
+    void setCallback(NSMCallback* callback)
     {
-      g_callback = callback;
+      m_callback = callback;
     }
+
+  public:
+    virtual void run(const char* confname);
+    virtual void init() {}
+    virtual void term() {}
+    virtual void timeout() {}
 
   public:
     void addInt(const char* name, int val)
     {
-      if (g_callback) {
-        g_callback->add(new NSMVHandlerInt(name, true, true, val));
-      }
+      m_callback->add(new NSMVHandlerInt(name, true, true, val));
     }
     void addFloat(const char* name, float val)
     {
-      if (g_callback) {
-        g_callback->add(new NSMVHandlerFloat(name, true, true, val));
-      }
+      m_callback->add(new NSMVHandlerFloat(name, true, true, val));
     }
     void addText(const char* name, const char* val)
     {
-      if (g_callback) {
-        g_callback->add(new NSMVHandlerText(name, true, true, val));
-      }
+      m_callback->add(new NSMVHandlerText(name, true, true, val));
     }
-    void setInt(const char* name, int val) { _set(name, val); }
-    void setFloat(const char* name, float val) { _set(name, val); }
+    void setInt(const char* name, int val)
+    {
+      m_callback->set(name, val);
+    }
+    void setFloat(const char* name, float val)
+    {
+      m_callback->set(name, val);
+    }
     void setText(const char* name, const char* val)
     {
-      if (g_callback) {
-        g_callback->set(name, val);
-      }
+      m_callback->set(name, val);
     }
     void log(LogFile::Priority pri, const char* msg)
     {
-      if (g_callback) {
-        g_callback->log(pri, msg);
-      }
+      m_callback->log(pri, msg);
     }
 
-  private:
-    template<typename T> void _set(const char* name, T val)
+  protected:
+    NSMCallback* m_callback;
+
+  };
+
+  class PyNSMCallbackImp : public NSMCallback {
+
+  public:
+    PyNSMCallbackImp(PyNSMCallback* py) : m_py(py) {}
+    virtual ~PyNSMCallbackImp() throw() {}
+
+  public:
+    virtual void init(NSMCommunicator&) throw()
     {
-      if (g_callback) {
-        g_callback->set(name, val);
-      }
+      m_py->init();
     }
+    virtual void term() throw()
+    {
+      m_py->term();
+    }
+    virtual void timeout(NSMCommunicator&) throw()
+    {
+      m_py->timeout();
+    }
+
+  protected:
+    PyNSMCallback* m_py;
+  };
+
+
+  class PyNSMCallbackWrapper : public PyNSMCallback,
+    public boost::python::wrapper<PyNSMCallback> {
+
+  public:
+    virtual void init();
+    virtual void term();
+    virtual void timeout();
+
   };
 
 }

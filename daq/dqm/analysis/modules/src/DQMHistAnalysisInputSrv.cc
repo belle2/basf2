@@ -1,13 +1,15 @@
 //+
-// File : DQMHistAnalysisInput.cc
+// File : DQMHistAnalysisInputSrv.cc
 // Description :
 //
-// Author : Tomoyuki Konno, Tokyo Metropolitan Univerisity
-// Date : 25 - Dec - 2015
+// Author : B. Spruck
+// Date : 25 - Mar - 2017
+// based on wrok from Tomoyuki Konno, Tokyo Metropolitan Univerisity
 //-
 
 
-#include <daq/dqm/analysis/modules/DQMHistAnalysisInput.h>
+#include <daq/dqm/analysis/modules/DQMHistAnalysisInputSrv.h>
+#include <TSystem.h>
 
 using namespace std;
 using namespace Belle2;
@@ -15,43 +17,44 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisInput)
+REG_MODULE(DQMHistAnalysisInputSrv)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-DQMHistAnalysisInputModule::DQMHistAnalysisInputModule()
+DQMHistAnalysisInputSrvModule::DQMHistAnalysisInputSrvModule()
   : DQMHistAnalysisModule()
 {
   //Parameter definition
   addParam("HistMemoryPath", m_mempath, "Path to Input Hist memory", string(""));
   addParam("HistMemorySize", m_memsize, "Size of Input Hist memory", 10000000);
-  addParam("RefreshInterval", m_interval, "Refresh interval of histograms", 10);
-  B2DEBUG(1, "DQMHistAnalysisInput: Constructor done.");
+  addParam("RefreshInterval", m_interval, "Refresh interval of histograms in ms", 2000);
+  B2DEBUG(1, "DQMHistAnalysisInputSrv: Constructor done.");
 }
 
 
-DQMHistAnalysisInputModule::~DQMHistAnalysisInputModule() { }
+DQMHistAnalysisInputSrvModule::~DQMHistAnalysisInputSrvModule() { }
 
-void DQMHistAnalysisInputModule::initialize()
+void DQMHistAnalysisInputSrvModule::initialize()
 {
   m_expno = m_runno = 0;
   m_count = 0;
   m_memory = new DqmMemFile(m_mempath.c_str());
   m_eventMetaDataPtr.registerInDataStore();
-  B2INFO("DQMHistAnalysisInput: initialized.");
+  m_serv = new THttpServer("http:8081");
+  m_serv->SetReadOnly(kFALSE);
+  B2INFO("DQMHistAnalysisInputSrv: initialized.");
 }
 
 
-void DQMHistAnalysisInputModule::beginRun()
+void DQMHistAnalysisInputSrvModule::beginRun()
 {
-  //B2INFO("DQMHistAnalysisInput: beginRun called.");
+  B2INFO("DQMHistAnalysisInputSrv: beginRun called.");
 }
 
-void DQMHistAnalysisInputModule::event()
+void DQMHistAnalysisInputSrvModule::event()
 {
-  sleep(m_interval);
   std::vector<TH1*> h;
   TMemFile* file = m_memory->LoadMemFile();
   file->cd();
@@ -63,7 +66,7 @@ void DQMHistAnalysisInputModule::event()
   resetHist();
   for (size_t i = 0; i < h.size(); i++) {
     addHist("", h[i]->GetName(), h[i]);
-    B2INFO("Found : " << h[i]->GetName() << " : " << h[i]->GetEntries());
+    B2DEBUG(2, "Found : " << h[i]->GetName() << " : " << h[i]->GetEntries());
     std::string vname = h[i]->GetName();
     setFloatValue(vname + ".entries", h[i]->GetEntries());
     if (h[i]->GetDimension() == 1) {
@@ -87,16 +90,24 @@ void DQMHistAnalysisInputModule::event()
   m_eventMetaDataPtr->setExperiment(m_expno);
   m_eventMetaDataPtr->setRun(m_runno);
   m_eventMetaDataPtr->setEvent(m_count);
+
+  TTimer t(m_interval, kFALSE);// in ms
+
+  do { // call at least once!
+    m_serv->ProcessRequests();
+    gSystem->Sleep(10);  // 10 ms sleep
+  } while (!t.CheckTimer(gSystem->Now()));
+
 }
 
-void DQMHistAnalysisInputModule::endRun()
+void DQMHistAnalysisInputSrvModule::endRun()
 {
-  B2INFO("DQMHistAnalysisInput : endRun called");
+  B2INFO("DQMHistAnalysisInputSrv: endRun called");
 }
 
 
-void DQMHistAnalysisInputModule::terminate()
+void DQMHistAnalysisInputSrvModule::terminate()
 {
-  B2INFO("terminate called");
+  B2INFO("DQMHistAnalysisInputSrv: terminate called");
 }
 

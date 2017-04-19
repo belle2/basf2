@@ -1,32 +1,36 @@
 //+
-// File : DQMHistAnalysisExample.h
+// File : DQMHistAnalysisEpicsExample.h
 // Description : An example module for DQM histogram analysis
 //
 // Author : Tomoyuki Konno, Tokyo Metroplitan Univerisity
 // Date : 25  - Dec - 2015 ; first commit
 //-
 
-#ifndef _Belle2_DQMHistAnalysisExample_h
-#define _Belle2_DQMHistAnalysisExample_h
+#ifndef _Belle2_DQMHistAnalysisEpicsExample_h
+#define _Belle2_DQMHistAnalysisEpicsExample_h
+
+// EPICS
+//#include "cadef.h"
 
 #include <framework/core/Module.h>
 
 #include <daq/dqm/analysis/modules/DQMHistAnalysis.h>
 
-#include <TCanvas.h>
 #include <TF1.h>
+#include <TCanvas.h>
+#include <TLine.h>
 
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisExampleModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisEpicsExampleModule : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
     //! Constructor / Destructor
-    DQMHistAnalysisExampleModule();
-    virtual ~DQMHistAnalysisExampleModule();
+    DQMHistAnalysisEpicsExampleModule();
+    virtual ~DQMHistAnalysisEpicsExampleModule();
 
     //! Module functions to be called from main process
     virtual void initialize();
@@ -37,16 +41,18 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
-    //! Parameters accesible from basf2 scripts
-  protected:
+    // Data members
+  private:
     std::string m_histoname;
     std::string m_function;
+    Int_t m_parameters;
+    std::string  m_pvname;
 
-    //! Data members
-  private:
-    TF1* m_f;
-    TCanvas* m_c;
+    TF1* m_f1;
+    TCanvas* m_c1;
+    TLine* m_line, * m_line_lo, * m_line_hi;
 
+//    chid mychid[10];// hard limit max 10 parameters
   };
 } // end namespace Belle2
 

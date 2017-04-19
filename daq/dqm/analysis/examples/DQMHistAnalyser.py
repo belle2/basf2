@@ -30,7 +30,7 @@ SVDUnpack = register_module('SVDUnpacker')
 SVDClust = register_module('SVDClusterizer')
 vxdtf = register_module('VXDTF')
 SVD_DQM = register_module('SVDDQM')
-vxdtf_dqm = register_module('VXDTFDQM')
+# vxdtf_dqm = register_module('VXDTFDQM')
 trackfitter = register_module('GenFitter')
 roiprod = register_module('PXDDataReduction')
 roipayload = register_module('ROIPayloadAssembler')
@@ -44,11 +44,15 @@ input.param('HistMemoryPath', argv[1])
 main.add_module(input)
 
 example = register_module('DQMHistAnalysisExample')
+example.param("HistoName", "DAQ/h_Gaus_2")
+example.param("Function", "gaus(2)")
 main.add_module(example)
 
-output = register_module('DQMHistAnalysisOutputNSM')
-output.param('NSMNodeName', "DQMH1")
-# output.param('RunControlName', "RC")
+# nsm = register_module('DQMHistAnalysisOutputNSM')
+# nsm.param('NSMNodeName', "DQMH1")
+
+output = register_module('DQMHistAnalysisOutputRelayMsg')
+main.add_module(output)
 
 # Add modules to main path
 main.add_module(output)

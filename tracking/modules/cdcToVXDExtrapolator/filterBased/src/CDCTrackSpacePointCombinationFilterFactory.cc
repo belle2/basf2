@@ -12,6 +12,7 @@
 #include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationTruthVarSet.h>
 #include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationVarSet.h>
 #include <tracking/modules/cdcToVXDExtrapolator/filterBased/SimpleCDCToVXDExtrapolationFilter.h>
+#include <tracking/modules/cdcToVXDExtrapolator/filterBased/LayerToggleCDCToVXDExtrapolationFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
@@ -40,6 +41,10 @@ namespace {
 
   /// MVA filter for VXD - CDC relations.
   using MVACDCTrackSpacePointCombinationFilter = MVAFilter<CDCTrackSpacePointCombinationVarSet>;
+
+  /// Filter that toggles between simple and recording on a specified layer
+  using LayerToggleSimpleRecordingFilter = LayerToggleCDCToVXDExtrapolationFilter<RecordingCDCTrackSpacePointCombinationFilter,
+        BaseCDCTrackSpacePointCombinationFilter>;
 }
 
 CDCTrackSpacePointCombinationFilterFactory::CDCTrackSpacePointCombinationFilterFactory(const std::string& defaultFilterName)
@@ -66,6 +71,7 @@ CDCTrackSpacePointCombinationFilterFactory::getValidFilterNamesAndDescriptions()
     {"simple", "based on non-extrapolation variables"},
     {"truth", "monte carlo truth"},
     {"recording", "record variables to a TTree"},
+    {"layer_toggle", "record variables to a TTree on low layers and use the simple filter on high layers"},
     {"mva", "test with a mva method"},
   };
 }
@@ -83,6 +89,8 @@ CDCTrackSpacePointCombinationFilterFactory::create(const std::string& filterName
     return makeUnique<MCCDCTrackSpacePointCombinationFilter>();
   } else if (filterName == "recording") {
     return makeUnique<RecordingCDCTrackSpacePointCombinationFilter>("CDCTrackSpacePointCombinationFilter.root");
+  } else if (filterName == "layer_toggle") {
+    return makeUnique<LayerToggleSimpleRecordingFilter>();
   } else if (filterName == "mva") {
     return makeUnique<MVACDCTrackSpacePointCombinationFilter>("tracking/data/vxdcdc_CDCTrackSpacePointCombinationFilter.xml");
   } else {

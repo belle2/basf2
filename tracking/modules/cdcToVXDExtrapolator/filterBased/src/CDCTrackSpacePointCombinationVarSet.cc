@@ -16,6 +16,7 @@
 
 #include <framework/dataobjects/Helix.h>
 #include <geometry/bfieldmap/BFieldMap.h>
+#include <svd/reconstruction/SVDRecoHit.h>
 
 using namespace std;
 using namespace Belle2;
@@ -58,13 +59,57 @@ bool CDCTrackSpacePointCombinationVarSet::extract(const BaseCDCTrackSpacePointCo
   var<named("distance")>() = distance.norm();
   var<named("xy_distance")>() = distance.xy().norm();
   var<named("z_distance")>() = distance.z();
+
+  var<named("track_position_x")>() = position.x();
+  var<named("track_position_y")>() = position.y();
+  var<named("track_position_z")>() = position.z();
+
+  var<named("hit_position_x")>() = hitPosition.x();
+  var<named("hit_position_y")>() = hitPosition.y();
+  var<named("hit_position_z")>() = hitPosition.z();
+
+  var<named("track_position_at_hit_x")>() = trackPositionAtHit.x();
+  var<named("track_position_at_hit_y")>() = trackPositionAtHit.y();
+  var<named("track_position_at_hit_z")>() = trackPositionAtHit.z();
+
+  var<named("same_hemisphere")>() = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
+
   var<named("layer")>() = sensorInfo.getLayerNumber();
   var<named("ladder")>() = sensorInfo.getLadderNumber();
+  var<named("sensor")>() = sensorInfo.getSensorNumber();
+  var<named("segment")>() = sensorInfo.getSegmentNumber();
+  var<named("id")>() = sensorInfo.getID();
+
   var<named("pt")>() = momentum.xy().norm();
   var<named("tan_lambda")>() = trajectory.getTanLambda();
   var<named("phi")>() = momentum.phi();
+
   var<named("arcLengthOfHitPosition")>() = arcLengthOfHitPosition;
   var<named("arcLengthOfCenterPosition")>() = arcLengthOfCenterPosition;
+
   var<named("numberOfHoles")>() = result->getNumberOfHoles();
+
+  var<named("chi2")>() = result->getChi2();
+
+  var<named("last_layer")>() = 0;
+  var<named("last_ladder")>() = 0;
+  var<named("last_sensor")>() = 0;
+  var<named("last_segment")>() = 0;
+  var<named("last_id")>() = 0;
+
+  const auto* parent = result->getParent();
+  if (parent) {
+    const auto* parentSpacePoint = parent->getSpacePoint();
+    if (parentSpacePoint) {
+      const auto& parentSensorInfo = parentSpacePoint->getVxdID();
+
+      var<named("last_layer")>() = parentSensorInfo.getLayerNumber();
+      var<named("last_ladder")>() = parentSensorInfo.getLadderNumber();
+      var<named("last_sensor")>() = parentSensorInfo.getSensorNumber();
+      var<named("last_segment")>() = parentSensorInfo.getSegmentNumber();
+      var<named("last_id")>() = parentSensorInfo.getID();
+    }
+  }
+
   return true;
 }

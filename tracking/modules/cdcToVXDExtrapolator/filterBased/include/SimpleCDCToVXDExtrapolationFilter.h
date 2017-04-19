@@ -19,6 +19,8 @@ namespace Belle2 {
                           const std::string& prefix) final {
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumXYNorm"),
       m_param_maximumXYNorm, "", m_param_maximumXYNorm);
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumZNorm"),
+      m_param_maximumZNorm, "", m_param_maximumZNorm);
     }
 
     TrackFindingCDC::Weight operator()(const BaseCDCTrackSpacePointCombinationFilter::Object& currentState) final {
@@ -29,9 +31,11 @@ namespace Belle2 {
         return std::nan("");
       }
 
-      const Float_t* distance = getVarSet().find("xy_distance");
+      const Float_t* xyDistance = getVarSet().find("xy_distance");
+      const Float_t* zDistance = getVarSet().find("z_distance");
+      const Float_t* sameHemisphere = getVarSet().find("same_hemisphere");
 
-      if (*distance > m_param_maximumXYNorm)
+      if (*xyDistance > m_param_maximumXYNorm or fabs(*zDistance) > m_param_maximumZNorm or * sameHemisphere != 1)
       {
         return std::nan("");
       }
@@ -40,6 +44,7 @@ namespace Belle2 {
     }
 
   private:
-    double m_param_maximumXYNorm = 2;
+    double m_param_maximumXYNorm = 0.5;
+    double m_param_maximumZNorm = 5;
   };
 }

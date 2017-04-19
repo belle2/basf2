@@ -93,6 +93,7 @@ namespace Belle2 {
     ~CDCAlignment() {}
 
     // ------------- Interface to global Millepede calibration ----------------
+    //TODO: enable the wire alignment
     /// Get global unique id
     static unsigned short getGlobalUniqueID() {return 27;}
     /// Get global parameter FIXME does nothing because CDC is not ready
@@ -111,8 +112,6 @@ namespace Belle2 {
     {
       return {};
     }
-
-
     // ------------------------------------------------------------------------
 
   private:

@@ -14,78 +14,46 @@
 #include <vector>
 #include <root/TMatrixD.h>
 
-#include <framework/logging/Logger.h>
-
 namespace Belle2 {
   namespace alignment {
+    /// Class for easier manipulation with global derivatives (and their labels)
+    ///
+    /// Allows to simply add, merge and pass global derivatives matrix and
+    /// global label vector in RecoHit.
+    /// For lables = 0 removes given columns from derivative matrix
+    /// (e.g. save disc space for parameters you do not want to calibrate)
     class GlobalDerivatives {
     public:
-      explicit GlobalDerivatives(int dim = 2)
-      {
-        m_globals.second.ResizeTo(dim, 0);
-      }
-      explicit GlobalDerivatives(std::pair<std::vector<int>, TMatrixD> globals)
-      {
-        m_globals.second.ResizeTo(globals.second);
-        m_globals.first = globals.first;
-        m_globals.second = globals.second;
-      }
-      GlobalDerivatives(std::vector<int> labels, TMatrixD derivs)
-      {
-        m_globals.second.ResizeTo(derivs);
-        m_globals.first = labels;
-        m_globals.second = derivs;
-      }
-
+      /// Constructor for empty derivative matrix and label vector
+      /// @param dim number of matrix rows (number of local residuals in virtual plane)
+      /// Usually 2 (also for 1 dim measurement, u/v selected via precision matrix)
+      explicit GlobalDerivatives(int dim = 2) {m_globals.second.ResizeTo(dim, 0);}
+      /// Constructor from pair of the vector and the matrix
+      explicit GlobalDerivatives(std::pair<std::vector<int>, TMatrixD> globals);
+      /// constructor from label vector and derivative matrix
+      GlobalDerivatives(std::vector<int> labels, TMatrixD derivs);
+      /// Convenient operator to allow to pass the object directly from RecoHit to globalDerivatives()
+      /// WARNING: causes zero labels to be removed
       operator std::pair<std::vector<int>, TMatrixD>() {return passGlobals(m_globals);}
-
-      std::vector<int> getLabels()
-      {
-        return m_globals.first;
-      }
-
-      TMatrixD getDerivatives()
-      {
-        return m_globals.second;
-      }
-
-      void add(int paramLabel, std::vector<double> dResiduals_dParam)
-      {
-        int nRows = m_globals.second.GetNrows();
-        int nCols = m_globals.second.GetNcols();
-
-        m_globals.first.push_back(paramLabel);
-        m_globals.second.ResizeTo(nRows, nCols + 1);
-        for (int iRow = 0; iRow < nRows; ++iRow) {
-          m_globals.second(iRow, nCols) = dResiduals_dParam.at(iRow);
-        }
-      }
-
-      void add(int paramLabel, double drudp)
-      {
-        std::vector<double> dResiduals_dParam(m_globals.second.GetNrows(), 0.);
-        dResiduals_dParam.at(0) = drudp;
-        add(paramLabel, dResiduals_dParam);
-      }
-
-      static std::pair<std::vector<int>, TMatrixD> passGlobals(std::pair<std::vector<int>, TMatrixD> globals)
-      {
-        TMatrixD newMatrix(globals.second.GetNrows(), 0);
-        std::vector<int> newLabels;
-
-        for (unsigned int iOldCol = 0; iOldCol < globals.first.size(); ++iOldCol) {
-          auto label = globals.first.at(iOldCol);
-          if (label == 0)
-            continue;
-
-          newLabels.push_back(label);
-          newMatrix.ResizeTo(globals.second.GetNrows(), newMatrix.GetNcols() + 1);
-          for (int iRow = 0; iRow < globals.second.GetNrows(); ++iRow) {
-            newMatrix(iRow, newMatrix.GetNcols() - 1) = globals.second(iRow, iOldCol);
-          }
-        }
-        return {newLabels, newMatrix};
-      }
+      /// Convenient operator to pass only labels (non-zero)
+      operator std::vector<int>() {return passGlobals(m_globals).first;}
+      /// Covenient operator to pass only derivatives (for non-zero labels)
+      operator TMatrixD() {return passGlobals(m_globals).second;}
+      /// Get stored lables (includes zeros)
+      const std::vector<int>& getLabels() const {return m_globals.first;}
+      /// Return the derivative matrix (includes columns with zero labels)
+      const TMatrixD& getDerivatives() {return m_globals.second;}
+      /// Add one parameter - label and the corresponding residual derivative
+      /// @param paramLabel label of the global parameter to calibrate
+      /// @param dResiduals_dParam vector od derivatives of local residual (U, v) versus global parameter
+      void add(int paramLabel, std::vector<double> dResiduals_dParam);
+      /// Add derivative of local U residual w.r.t. global parameter
+      /// Global derivative versus V residual is set to zero.
+      /// For (u, v) measurement use add(p, {dru/dp, drv/dp}.
+      void add(int paramLabel, double drudp);
+      /// Static convenient function to remove columns with zero labels (make error in Pede btw.)
+      /// TODO: refactore interface: return value, params <->
+      static std::pair<std::vector<int>, TMatrixD> passGlobals(std::pair<std::vector<int>, TMatrixD> globals);
     private:
       /// The global labels and derivatives matrix
       std::pair<std::vector<int>, TMatrixD> m_globals {{}, TMatrixD()};

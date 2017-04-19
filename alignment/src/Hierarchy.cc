@@ -248,13 +248,13 @@ namespace Belle2 {
 
     // ------------------ HierarchyManager ----------------------------
 
-    HierarchyManager::~HierarchyManager() {}
-    HierarchyManager& HierarchyManager::getInstance()
+    GlobalCalibrationManager::~GlobalCalibrationManager() {}
+    GlobalCalibrationManager& GlobalCalibrationManager::getInstance()
     {
-      static std::unique_ptr<HierarchyManager> instance(new HierarchyManager());
+      static std::unique_ptr<GlobalCalibrationManager> instance(new GlobalCalibrationManager());
       return *instance;
     }
-    void HierarchyManager::writeConstraints(std::string txtFilename)
+    void GlobalCalibrationManager::writeConstraints(std::string txtFilename)
     {
       std::ofstream txt(txtFilename);
       Constraints constraints;

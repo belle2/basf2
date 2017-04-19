@@ -14,12 +14,15 @@
 #include <alignment/dbobjects/VXDAlignment.h>
 
 #include <alignment/GlobalDerivatives.h>
+#include <alignment/Hierarchy.h>
 
 using namespace std;
 using namespace Belle2;
+using namespace alignment;
 
 std::pair<std::vector<int>, TMatrixD> AlignableSVDRecoHit::globalDerivatives(const genfit::StateOnPlane* sop)
 {
-  return alignment::GlobalDerivatives::passGlobals(
-           alignment::HierarchyManager::getInstance().getAlignmentHierarchy().getGlobalDerivatives<VXDAlignment>(getPlaneId(), sop));
+  auto globals = GlobalCalibrationManager::getInstance().getAlignmentHierarchy().getGlobalDerivatives<VXDAlignment>(getPlaneId(),
+                 sop);
+  return GlobalDerivatives(globals);
 }

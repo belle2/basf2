@@ -49,7 +49,7 @@ namespace {
     /// init - fill hierarchy
     virtual void SetUp()
     {
-      auto& hierarchy = HierarchyManager::getInstance().getAlignmentHierarchy();
+      auto& hierarchy = GlobalCalibrationManager::getInstance().getAlignmentHierarchy();
 
       G4Transform3D unitTrafo;
       hierarchy.insertG4Transform<TestLevelDBObj, TestTopLevelDBObj>(element1, topElement, unitTrafo);
@@ -67,7 +67,7 @@ namespace {
   /// Test calculation of global derivatives
   TEST_F(HierarchyTest, HierarchyDerivatives)
   {
-    auto& hierarchy = HierarchyManager::getInstance().getAlignmentHierarchy();
+    auto& hierarchy = GlobalCalibrationManager::getInstance().getAlignmentHierarchy();
 
     auto sop = new genfit::StateOnPlane(nullptr);
     TVectorD state(5);
@@ -86,7 +86,7 @@ namespace {
   /// Test constraint generation
   TEST_F(HierarchyTest, HierarchyConstraints)
   {
-    auto& hierarchy = HierarchyManager::getInstance().getAlignmentHierarchy();
+    auto& hierarchy = GlobalCalibrationManager::getInstance().getAlignmentHierarchy();
 
     Constraints constraints;
     hierarchy.buildConstraints(constraints);

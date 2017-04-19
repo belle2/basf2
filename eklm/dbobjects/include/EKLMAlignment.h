@@ -97,8 +97,6 @@ namespace Belle2 {
       }
       return result;
     }
-    /// Not used
-    void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>&) {}
     // ------------------------------------------------------------------------
 
   private:

@@ -16,17 +16,6 @@
 
 #include <framework/logging/Logger.h>
 
-#include <framework/dbobjects/BeamParameters.h>
-#include <alignment/dbobjects/VXDAlignment.h>
-#include <alignment/dbobjects/CDCCalibration.h>
-#include <alignment/dbobjects/BKLMAlignment.h>
-#include <eklm/dbobjects/EKLMAlignment.h>
-
-#include <cdc/dbobjects/CDCTimeZeros.h>
-#include <cdc/dbobjects/CDCTimeWalks.h>
-#include <cdc/dbobjects/CDCAlignment.h>
-#include <cdc/dbobjects/CDCXtRelations.h>
-
 #include <framework/database/Database.h>
 
 #include <vxd/geometry/GeoCache.h>
@@ -34,26 +23,7 @@
 
 namespace Belle2 {
   namespace alignment {
-
-    GlobalParamVector::GlobalParamVector(std::vector< std::string > components)
-    {
-      m_components = components;
-
-      auto cdcInterface = std::shared_ptr<IGlobalParamInterface>(new CDCGlobalParamInterface());
-      auto vxdInterface = std::shared_ptr<IGlobalParamInterface>(new VXDGlobalParamInterface());
-
-      addDBObj<BeamParameters>();
-
-      addDBObj<VXDAlignment>(vxdInterface);
-
-      addDBObj<CDCAlignment>(cdcInterface);
-      addDBObj<CDCTimeZeros>(cdcInterface);
-      addDBObj<CDCTimeWalks>(cdcInterface);
-      addDBObj<CDCXtRelations>(cdcInterface);
-
-      addDBObj<BKLMAlignment>();
-      addDBObj<EKLMAlignment>();
-    }
+    GlobalParamVector::GlobalParamVector(std::vector< std::string > components) : m_components(components) {}
 
     void GlobalParamVector::updateGlobalParam(double difference, short unsigned int uniqueID, short unsigned int element,
                                               short unsigned int param)
@@ -94,21 +64,40 @@ namespace Belle2 {
       }
       return params;
     }
-    std::vector< TObject* > GlobalParamVector::releaseObjects(bool onlyChanged)
+    std::vector< TObject* > GlobalParamVector::releaseObjects(bool onlyConstructed)
     {
       std::vector<TObject*> result;
       for (auto& uID_DBObj : m_vector) {
-        if (onlyChanged and not uID_DBObj.second->hasBeenChanged())
+        if (onlyConstructed and not uID_DBObj.second->isConstructed())
           continue;
 
         result.push_back({uID_DBObj.second->releaseObject()});
       }
       return result;
     }
-    void GlobalParamVector::loadFromDB(EventMetaData event)
+    void GlobalParamVector::loadFromDB()
+    {
+      for (auto& uID_DBObj : m_vector) {
+        uID_DBObj.second->loadFromDBObjPtr();
+      }
+    }
+    void GlobalParamVector::loadFromDB(const EventMetaData& event)
     {
       for (auto& uID_DBObj : m_vector) {
         uID_DBObj.second->loadFromDB(event);
+      }
+    }
+    void GlobalParamVector::postHierarchyChanged(GlobalDerivativesHierarchy& hierarchy)
+    {
+      for (auto interface : m_subDetectorInterfacesVector) {
+        interface->setupAlignmentHierarchy(hierarchy);
+      }
+
+    }
+    void GlobalParamVector::construct()
+    {
+      for (auto& uID_DBObj : m_vector) {
+        uID_DBObj.second->construct();
       }
     }
     void GlobalParamVector::postReadFromResult(
@@ -219,8 +208,10 @@ namespace Belle2 {
 
           auto wire = WireID(l, w);
           // Test direct access
-          if (thisGlobalParamVector.getDBObj<CDCAlignment>())
-            thisGlobalParamVector.getDBObj<CDCAlignment>()->getWireTension(wire.getICLayer(), wire.getILayer());
+          if (auto cdc = thisGlobalParamVector.getDBObj<CDCAlignment>()) {
+            cdc->getWireTension(wire.getICLayer(), wire.getILayer());
+            std::cout << " CDC Global Param Interface running" << std::endl;
+          }
 
           thisGlobalParamVector.updateGlobalParam(misForward[l][w][0], CDCAlignment::getGlobalUniqueID(), wire, CDCAlignment::wireFwdX);
           thisGlobalParamVector.updateGlobalParam(misForward[l][w][1], CDCAlignment::getGlobalUniqueID(), wire, CDCAlignment::wireFwdY);
@@ -233,64 +224,70 @@ namespace Belle2 {
       }
     }
 
-    void VXDGlobalParamInterface::setupAlignmentHierarchy(RigidBodyHierarchy& hierarchy)
+    void VXDGlobalParamInterface::setupAlignmentHierarchy(GlobalDerivativesHierarchy& hierarchy)
     {
-      auto& geo = VXD::GeoCache::getInstance();
-      // Set-up hierarchy
-      DBObjPtr<VXDAlignment> vxdAlignments;
-      /**
-      So the hierarchy is as follows:
-                  Belle 2
-                / |     | \
-            Ying  Yang Pat  Mat ... other sub-detectors
-            / |   / |  |  \  | \
-          ......  ladders ......
-          / / |   / |  |  \  | \ \
-        ......... sensors ........
-      */
+      try {
+        auto& rigidBodyHierarchy = dynamic_cast<RigidBodyHierarchy&>(hierarchy);
+        auto& geo = VXD::GeoCache::getInstance();
+        // Set-up hierarchy
+        DBObjPtr<VXDAlignment> vxdAlignments;
+        /**
+        So the hierarchy is as follows:
+                    Belle 2
+                  / |     | \
+              Ying  Yang Pat  Mat ... other sub-detectors
+              / |   / |  |  \  | \
+            ......  ladders ......
+            / / |   / |  |  \  | \ \
+          ......... sensors ........
+        */
 
-      for (auto& halfShellPlacement : geo.getHalfShellPlacements()) {
-        TGeoHMatrix trafoHalfShell = halfShellPlacement.second;
-        trafoHalfShell *= geo.getTGeoFromRigidBodyParams(
-                            vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dU),
-                            vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dV),
-                            vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dW),
-                            vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dAlpha),
-                            vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dBeta),
-                            vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dGamma)
-                          );
-        hierarchy.insertTGeoTransform<VXDAlignment, alignment::EmptyGlobaParamSet>(halfShellPlacement.first, 0, trafoHalfShell);
+        for (auto& halfShellPlacement : geo.getHalfShellPlacements()) {
+          TGeoHMatrix trafoHalfShell = halfShellPlacement.second;
+          trafoHalfShell *= geo.getTGeoFromRigidBodyParams(
+                              vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dU),
+                              vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dV),
+                              vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dW),
+                              vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dAlpha),
+                              vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dBeta),
+                              vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dGamma)
+                            );
+          rigidBodyHierarchy.insertTGeoTransform<VXDAlignment, alignment::EmptyGlobaParamSet>(halfShellPlacement.first, 0, trafoHalfShell);
 
-        for (auto& ladderPlacement : geo.getLadderPlacements(halfShellPlacement.first)) {
-          // Updated trafo
-          TGeoHMatrix trafoLadder = ladderPlacement.second;
-          trafoLadder *= geo.getTGeoFromRigidBodyParams(
-                           vxdAlignments->get(ladderPlacement.first, VXDAlignment::dU),
-                           vxdAlignments->get(ladderPlacement.first, VXDAlignment::dV),
-                           vxdAlignments->get(ladderPlacement.first, VXDAlignment::dW),
-                           vxdAlignments->get(ladderPlacement.first, VXDAlignment::dAlpha),
-                           vxdAlignments->get(ladderPlacement.first, VXDAlignment::dBeta),
-                           vxdAlignments->get(ladderPlacement.first, VXDAlignment::dGamma)
-                         );
-          hierarchy.insertTGeoTransform<VXDAlignment, VXDAlignment>(ladderPlacement.first, halfShellPlacement.first, trafoLadder);
-
-          for (auto& sensorPlacement : geo.getSensorPlacements(ladderPlacement.first)) {
+          for (auto& ladderPlacement : geo.getLadderPlacements(halfShellPlacement.first)) {
             // Updated trafo
-            TGeoHMatrix trafoSensor = sensorPlacement.second;
-            trafoSensor *= geo.getTGeoFromRigidBodyParams(
-                             vxdAlignments->get(sensorPlacement.first, VXDAlignment::dU),
-                             vxdAlignments->get(sensorPlacement.first, VXDAlignment::dV),
-                             vxdAlignments->get(sensorPlacement.first, VXDAlignment::dW),
-                             vxdAlignments->get(sensorPlacement.first, VXDAlignment::dAlpha),
-                             vxdAlignments->get(sensorPlacement.first, VXDAlignment::dBeta),
-                             vxdAlignments->get(sensorPlacement.first, VXDAlignment::dGamma)
+            TGeoHMatrix trafoLadder = ladderPlacement.second;
+            trafoLadder *= geo.getTGeoFromRigidBodyParams(
+                             vxdAlignments->get(ladderPlacement.first, VXDAlignment::dU),
+                             vxdAlignments->get(ladderPlacement.first, VXDAlignment::dV),
+                             vxdAlignments->get(ladderPlacement.first, VXDAlignment::dW),
+                             vxdAlignments->get(ladderPlacement.first, VXDAlignment::dAlpha),
+                             vxdAlignments->get(ladderPlacement.first, VXDAlignment::dBeta),
+                             vxdAlignments->get(ladderPlacement.first, VXDAlignment::dGamma)
                            );
-            hierarchy.insertTGeoTransform<VXDAlignment, VXDAlignment>(sensorPlacement.first, ladderPlacement.first, trafoSensor);
+            rigidBodyHierarchy.insertTGeoTransform<VXDAlignment, VXDAlignment>(ladderPlacement.first, halfShellPlacement.first, trafoLadder);
+
+            for (auto& sensorPlacement : geo.getSensorPlacements(ladderPlacement.first)) {
+              // Updated trafo
+              TGeoHMatrix trafoSensor = sensorPlacement.second;
+              trafoSensor *= geo.getTGeoFromRigidBodyParams(
+                               vxdAlignments->get(sensorPlacement.first, VXDAlignment::dU),
+                               vxdAlignments->get(sensorPlacement.first, VXDAlignment::dV),
+                               vxdAlignments->get(sensorPlacement.first, VXDAlignment::dW),
+                               vxdAlignments->get(sensorPlacement.first, VXDAlignment::dAlpha),
+                               vxdAlignments->get(sensorPlacement.first, VXDAlignment::dBeta),
+                               vxdAlignments->get(sensorPlacement.first, VXDAlignment::dGamma)
+                             );
+              rigidBodyHierarchy.insertTGeoTransform<VXDAlignment, VXDAlignment>(sensorPlacement.first, ladderPlacement.first, trafoSensor);
 
 
+            }
           }
         }
+      } catch (const std::bad_cast& e) {
+        // Bad cast
       }
     }
+
   }
 }

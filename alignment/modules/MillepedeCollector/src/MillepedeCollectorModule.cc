@@ -141,7 +141,7 @@ void MillepedeCollectorModule::prepare()
   registerObject<TH1F>("pval", new TH1F("pval", "pval", 100, 0., 1.));
 
   auto& geo = VXD::GeoCache::getInstance();
-  auto& hierarchy = Belle2::alignment::HierarchyManager::getInstance().getAlignmentHierarchy();
+  auto& hierarchy = Belle2::alignment::GlobalCalibrationManager::getInstance().getAlignmentHierarchy();
 
   if (m_useVXDHierarchy) {
     // Set-up hierarchy
@@ -202,7 +202,7 @@ void MillepedeCollectorModule::prepare()
 
   }
 
-  Belle2::alignment::HierarchyManager::getInstance().writeConstraints("constraints.txt");
+  Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
 
   //TODO enable updates
   // Add callback to itself. Callback are unique, so further calls should not change anything
@@ -346,10 +346,10 @@ void MillepedeCollectorModule::collect()
           labels.push_back(label.setParameterId(3));
 
           // Allow to disable BeamParameters externally
-          auto globals = alignment::GlobalDerivatives::passGlobals({labels, derivatives});
+          alignment::GlobalDerivatives globals(labels, derivatives);
 
           // Add derivatives for vertex calibration to first point of first trajectory
-          daughters[0].first[0].addGlobals(globals.first, globals.second);
+          daughters[0].first[0].addGlobals(globals.getLabels(), globals.getDerivatives());
         }
 
         gbl::GblTrajectory combined(daughters);

@@ -20,15 +20,27 @@
 
 #include <framework/logging/Logger.h>
 
+#include <alignment/GlobalParam.h>
+
+
 #include <framework/dbobjects/BeamParameters.h>
 #include <alignment/dbobjects/VXDAlignment.h>
 #include <alignment/dbobjects/CDCCalibration.h>
 #include <alignment/dbobjects/BKLMAlignment.h>
+#include "GlobalLabel.h"
 #include <eklm/dbobjects/EKLMAlignment.h>
 
+#include <cdc/dbobjects/CDCTimeZeros.h>
+#include <cdc/dbobjects/CDCTimeWalks.h>
+#include <cdc/dbobjects/CDCAlignment.h>
+#include <cdc/dbobjects/CDCXtRelations.h>
+
+#include <alignment/GlobalParam.h>
 
 namespace Belle2 {
   namespace alignment {
+    class MillepedeAlgorithm;
+
     /// pair of the global unique id from object with constants and element representing some rigid body in hierarchy
     typedef std::pair<unsigned short, unsigned short> DetectorLevelElement;
     /// pair with global labels and matrix with coresponding global derivatives
@@ -70,6 +82,8 @@ namespace Belle2 {
           m_hierarchy.insert(std::make_pair(parentUID, std::vector<DetectorLevelElement>()));
           // insert child (can happen only once, so the vect is unique)
           m_hierarchy[parentUID].push_back(childUID);
+          m_usedUniqueIDs.insert(ChildDBObjectType::getGlobalUniqueID());
+          m_usedUniqueIDs.insert(MotherDBObjectType::getGlobalUniqueID());
         } else {
           // Update element transformation if inserted again
           m_lookup[childUID].second = childToMotherParamTransform;
@@ -86,6 +100,10 @@ namespace Belle2 {
       /// The only function to implement: what are the global labels for the element?
       virtual std::vector<int> getElementLabels(DetectorLevelElement element) = 0;
 
+      /// Get the global unique ids of DB objects used to construct hierarchy
+      /// Usefull to update hierarchy only when those changed
+      const std::set<unsigned short>& getUsedDBObjUniqueIDs() {return m_usedUniqueIDs;}
+
     private:
       /// Find the transformation in the lookup
       std::pair<DetectorLevelElement, TMatrixD> getChildToMotherTransform(DetectorLevelElement child);
@@ -94,6 +112,10 @@ namespace Belle2 {
       std::map<DetectorLevelElement, std::pair<DetectorLevelElement, TMatrixD>> m_lookup;
       //! Map of hierarchy relations mother-> child
       std::map<DetectorLevelElement, std::vector<DetectorLevelElement>> m_hierarchy;
+
+      /// The set of unique id of each DB object used for construction
+      /// For more efficient updates of hierarchy only when used objects change
+      std::set<unsigned short> m_usedUniqueIDs {};
     };
 
     /// 1D Hierarchy for Lorentz shift correction
@@ -185,40 +207,153 @@ namespace Belle2 {
     };
 
     /// Class to hold hierarchy of whole Belle2
-    class HierarchyManager {
+    class GlobalCalibrationManager {
 
     public:
+      /// Comparison function for EventMetaData
+      std::function<bool(const EventMetaData&, const EventMetaData&)> cmpEventMetaData = [](const EventMetaData& lhs,
+      const EventMetaData& rhs) -> bool {
+        if (lhs.getExperiment() < rhs.getExperiment()) return true;
+        if (lhs.getRun() < rhs.getRun()) return true;
+        if (lhs.getEvent() < rhs.getEvent()) return true;
+        return false;
+      };
+
       /// Destructor
-      ~HierarchyManager();
+      ~GlobalCalibrationManager();
 
       /// Get instance of the manager
-      static HierarchyManager& getInstance();
+      static GlobalCalibrationManager& getInstance();
+
+      /// Initialize a given GlobalParamVector with all DB objects and interfaces
+      ///
+      /// This one central function should be used to prepare the global vectors even
+      /// for local calibrations using Millepede. By setting the components argument
+      /// of GlobalParamVector one can limit which addDBObj<>() calls are actually executed below
+      static void initGlobalVector(GlobalParamVector& vector)
+      {
+        // Interfaces for sub-detectors
+        auto cdcInterface = std::shared_ptr<IGlobalParamInterface>(new CDCGlobalParamInterface());
+        auto vxdInterface = std::shared_ptr<IGlobalParamInterface>(new VXDGlobalParamInterface());
+
+        // Try add all supported DB objects
+        // - will be not added if not in selected components of the 'vector'
+        vector.addDBObj<BeamParameters>();
+        vector.addDBObj<VXDAlignment>(vxdInterface);
+        vector.addDBObj<CDCAlignment>(cdcInterface);
+        vector.addDBObj<CDCTimeZeros>(cdcInterface);
+        vector.addDBObj<CDCTimeWalks>(cdcInterface);
+        vector.addDBObj<CDCXtRelations>(cdcInterface);
+        vector.addDBObj<BKLMAlignment>();
+        vector.addDBObj<EKLMAlignment>();
+      }
+
+      /// Initialize the manager with given configuration
+      void initialize(std::vector<std::string> components = {}, std::vector<EventMetaData> timeSlices = {})
+      {
+        // Reset the config of global vector to restrict components if needed
+        m_globalVector.reset(new GlobalParamVector(components));
+        // Fill with DB objects and interfaces according to components
+        initGlobalVector(*m_globalVector);
+
+        // Reset time intervals and add pre-defined times where
+        // constants can change (in addition of what is already in DB)
+        m_dbTimeSlicing.clear();
+        for (auto& emd : timeSlices)
+          m_dbTimeSlicing.insert(emd);
+
+        // already during initialization (due to geometry) we know the first event
+        // to be processed, so we can actually load the consts here - and construct the vector
+        //
+        // m_globalVector->loadFromDB();
+        // m_globalVector->listGlobalParams().size();
+
+        // Try to build hierarchy
+        m_globalVector->postHierarchyChanged(getAlignmentHierarchy());
+
+        //
+      }
+
+      /// Call from MillepedeCollector after prepare and before end of initialize()
+      void postInit() {}
+      /// Call from MillepedeCollector beginRun()
+      void beginRun() {}
+      /// Notice manager of a comming event (from MillepedeCollector)
+      void preCollect(const EventMetaData& emd)
+      {
+        if (m_globalVector->hasBeenChangedInDB({}, false)) {
+          m_dbTimeSlicing.insert(EventMetaData(emd));
+          // m_globalVector->loadFromDB();
+        }
+
+        // Set index for label time dependence
+        for (unsigned int index = 0; index < m_dbTimeSlicing.size(); ++index) {
+          // emd < slice <=> slice >= emd
+          if (not cmpEventMetaData(emd, m_dbTimeSlicing[index])) {
+            GlobalLabel::setCurrentTimeInterval(index);
+            break;
+          }
+        }
+
+
+        if (m_globalVector->hasBeenChangedInDB(getAlignmentHierarchy().getUsedDBObjUniqueIDs(), false)) {
+          m_globalVector->postHierarchyChanged(getAlignmentHierarchy());
+          getAlignmentHierarchy().buildConstraints(m_constraints);
+        }
+        if (m_globalVector->hasBeenChangedInDB(getLorentzShiftHierarchy().getUsedDBObjUniqueIDs(), false)) {
+          m_globalVector->postHierarchyChanged(getLorentzShiftHierarchy());
+          getLorentzShiftHierarchy().buildConstraints(m_constraints);
+        }
+
+        // reset the hasBeenChanged state, ignore return value
+        m_globalVector->hasBeenChangedInDB();
+      }
+      /// Call from MillepedeCollector before end of collect()
+      void postCollect(const EventMetaData&) {}
+      /// Call from MillepedeCollector endRun()
+      void endRun() {}
+      /// Call from MillepedeCollector terminate()
+      void terminate()
+      {
+        writeConstraints("Constraints.txt");
+      }
+      /// Call from MillepedeAlgorithm at the end of calibrate()
+      void preCalibrate(MillepedeAlgorithm&) {}
+      /// Call from MillepedeAlgorithm before end of terminate()
+      void postCalibrate(MillepedeAlgorithm&) {}
 
       /// Get the rigid body alignment hierarchy
       RigidBodyHierarchy& getAlignmentHierarchy() { return *m_alignment; }
-
       /// Get the Lorentz shift hierarchy
       LorentShiftHierarchy& getLorentzShiftHierarchy() { return *m_lorentzShift; }
+      /// Get the global vector for unified access to DB constants
+      GlobalParamVector& getGlobalParamVector() { return *m_globalVector; }
+      /// Get the constraints collected so far
+      Constraints& getConstraints() { return m_constraints; }
 
       /// Write-out complete hierarchy to a text file
       void writeConstraints(std::string txtFilename);
 
     private:
       /** Singleton class, hidden constructor */
-      HierarchyManager() {};
+      GlobalCalibrationManager() {};
       /** Singleton class, hidden copy constructor */
-      HierarchyManager(const HierarchyManager&);
+      GlobalCalibrationManager(const GlobalCalibrationManager&);
       /** Singleton class, hidden assignment operator */
-      HierarchyManager& operator=(const HierarchyManager&);
+      GlobalCalibrationManager& operator=(const GlobalCalibrationManager&);
 
       /// The alignment hierarchy
       std::unique_ptr<RigidBodyHierarchy> m_alignment {new RigidBodyHierarchy()};
       /// Hierarchy for Lorentz shift corrections
       std::unique_ptr<LorentShiftHierarchy> m_lorentzShift {new LorentShiftHierarchy()};
+      /// The global vector for unified access to DB constants
+      std::unique_ptr<GlobalParamVector> m_globalVector {new GlobalParamVector()};
 
+      /// Map of constraints {unique label, labels and coefficients}
+      std::map<int, Constraint> m_constraints {};
 
-      //std::vector<std::shared_ptr<GlobalParamSetAccess>> m_globalVector {};
-
+      /// Set of EventMetaData containing the time slicing of the calibration job
+      std::set<EventMetaData, std::function<bool(const EventMetaData&, const EventMetaData&)>> m_dbTimeSlicing {cmpEventMetaData};
     };
   }
 }

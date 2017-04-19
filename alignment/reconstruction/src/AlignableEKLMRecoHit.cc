@@ -103,7 +103,7 @@ std::pair<std::vector<int>, TMatrixD> AlignableEKLMRecoHit::globalDerivatives(co
   labels.push_back(0);
   labels.push_back(GlobalLabel::construct<EKLMAlignment>(m_Segment.getSegmentGlobalNumber(), 6));
 
-  // If alignment nominal x and y of local strip is the same as
+  // Alignment in local coordinates of the module
   alignment::RigidBodyHierarchy rigidBodies;
   auto drdglobal = rigidBodies.getRigidBodyDerivatives(sop);
   /*
@@ -124,7 +124,7 @@ std::pair<std::vector<int>, TMatrixD> AlignableEKLMRecoHit::globalDerivatives(co
     */
 
 
-  return alignment::GlobalDerivatives::passGlobals(make_pair(labels, drdglobal));
+  return alignment::GlobalDerivatives(labels, drdglobal);
 }
 
 

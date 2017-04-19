@@ -107,14 +107,11 @@ namespace Belle2 {
     std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()
     {
       std::vector<std::pair<unsigned short, unsigned short>> result;
-      for (auto id_timewalk : getTimeWalkParams()) {
+      for (auto id_timewalk : m_tws) {
         result.push_back({id_timewalk.first, 0});
       }
       return result;
     }
-
-    void readFromResult(std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>>&) {};
-
     // ------------------------------------------------------------------------
 
   private:

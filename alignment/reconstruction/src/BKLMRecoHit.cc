@@ -171,7 +171,7 @@ std::pair<std::vector<int>, TMatrixD> BKLMRecoHit::globalDerivatives(const genfi
   derGlobal(1, 4) = -uPos * vSlope;
   derGlobal(1, 5) = -uPos;
 
-  return alignment::GlobalDerivatives::passGlobals(make_pair(labGlobal, derGlobal));
+  return alignment::GlobalDerivatives(labGlobal, derGlobal);
 
 }
 

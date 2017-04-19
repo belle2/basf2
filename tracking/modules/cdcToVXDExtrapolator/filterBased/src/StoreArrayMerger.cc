@@ -75,7 +75,9 @@ void StoreArrayMerger::fetch(std::vector<RecoTrack*>& cdcRecoTrackVector)
   cdcRecoTrackVector.reserve(cdcRecoTrackVector.size() + m_cdcRecoTracks.getEntries());
 
   for (RecoTrack& recoTrack : m_cdcRecoTracks) {
-    cdcRecoTrackVector.push_back(&recoTrack);
+    if (recoTrack.wasFitSuccessful()) {
+      cdcRecoTrackVector.push_back(&recoTrack);
+    }
   }
 }
 
@@ -88,10 +90,24 @@ void StoreArrayMerger::apply(const std::vector<std::pair<RecoTrack*, std::vector
     RecoTrack* cdcRecoTrack = cdcTrackWithMatchedSpacePoints.first;
     const std::vector<const SpacePoint*> matchedSpacePoints = cdcTrackWithMatchedSpacePoints.second;
 
-    // TODO: correct seeds
-    RecoTrack* vxdRecoTrack = m_vxdRecoTracks.appendNew(cdcRecoTrack->getPositionSeed(),
-                                                        cdcRecoTrack->getMomentumSeed(),
-                                                        cdcRecoTrack->getChargeSeed());
+    TVector3 cdcPosition;
+    TVector3 cdcMomentum;
+    int cdcCharge;
+
+    extractTrackState(*cdcRecoTrack, cdcPosition, cdcMomentum, cdcCharge);
+
+    const auto bField = BFieldMap::Instance().getBField(cdcPosition).Z();
+
+    TVector3 vxdPosition = matchedSpacePoints.front()->getPosition();
+
+    const Helix cdcHelix(cdcPosition, cdcMomentum, cdcCharge, bField);
+    const double arcLengthOfVXDPosition = cdcHelix.getArcLength2DAtXY(vxdPosition.X(), vxdPosition.Y());
+
+    const auto& extrapolatedMomentum = cdcHelix.getMomentumAtArcLength2D(arcLengthOfVXDPosition, bField);
+
+    RecoTrack* vxdRecoTrack = m_vxdRecoTracks.appendNew(vxdPosition,
+                                                        extrapolatedMomentum,
+                                                        cdcCharge);
 
     unsigned int hitCounter = 0;
     for (const auto& spacePoint : matchedSpacePoints) {

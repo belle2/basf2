@@ -53,6 +53,13 @@ namespace Belle2 {
     bool empty() const {return ((m_experimentLow < 0) && (m_experimentHigh < 0));};
 
     /**
+     * Function that returns an interval of validity that is always valid, c.f.
+     * the default constructor which is never valid (a zero interval)
+     * @return             an interval of validity that is always valid
+     */
+    static always() {return IntervalOfValidity(0, 0, -1, -1);};
+
+    /**
      * Check whether two intervals of validity are identical.
      */
     bool operator==(const IntervalOfValidity& other) const

@@ -57,7 +57,7 @@ namespace Belle2 {
      * the default constructor which is never valid (a zero interval)
      * @return             an interval of validity that is always valid
      */
-    static always() {return IntervalOfValidity(0, 0, -1, -1);};
+    static IntervalOfValidity always() {return IntervalOfValidity(0, 0, -1, -1);};
 
     /**
      * Check whether two intervals of validity are identical.

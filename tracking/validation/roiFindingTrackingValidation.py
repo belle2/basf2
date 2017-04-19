@@ -19,7 +19,7 @@ INPUT_FILE = '../EvtGenSimNoBkg.root'
 OUTPUT_FILE = 'ROIFindingTrackingValidation.root'
 N_EVENTS = 1000
 
-ACTIVE = False
+ACTIVE = True
 
 CREATE_INPUT = False  # for debugging purposes, use it with the basf2 -n option
 if CREATE_INPUT:

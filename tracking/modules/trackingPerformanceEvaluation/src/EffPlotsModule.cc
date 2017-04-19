@@ -85,7 +85,6 @@ void EffPlotsModule::initialize()
   StoreArray<Track> tracks(m_TrackColName);
   tracks.isRequired();
 
-  //StoreArray<RecoTrack>::required(m_RecoTracksName);
   StoreArray<RecoTrack>::required(m_MCRecoTracksName);
 
   //create list of histograms to be saved in the rootfile
@@ -100,26 +99,21 @@ void EffPlotsModule::initialize()
   //set the ROOT File
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
 
-  unsigned int nBinsPt = 25;
-  unsigned int nBinsTheta = 10;
-  unsigned int nBinsPhi = 14;
-  unsigned int nBinsCosTheta = 20;
+  Double_t bins_pt_new[25 + 1] = {0., 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.2, 1.4, 1.6, 1.8, 2, 2.2, 2.4, 2.6, 2.8, 3., 3.2, 3.4};
 
-  Double_t bins_pt_new[nBinsPt + 1] = {0., 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.2, 1.4, 1.6, 1.8, 2, 2.2, 2.4, 2.6, 2.8, 3., 3.2, 3.4}; // -- NEW --
-
-  Double_t bins_theta[nBinsTheta + 1];
-  Double_t width_theta = TMath::Pi() / nBinsTheta;
-  for (unsigned int bin = 0; bin < nBinsTheta + 1; bin++)
+  Double_t bins_theta[10 + 1];
+  Double_t width_theta = TMath::Pi() / 10;
+  for (unsigned int bin = 0; bin < 10 + 1; bin++)
     bins_theta[bin] = bin * width_theta;
 
-  Double_t bins_phi[nBinsPhi + 1];
-  Double_t width_phi = 2 * TMath::Pi() / nBinsPhi;
-  for (unsigned int bin = 0; bin < nBinsPhi + 1; bin++)
+  Double_t bins_phi[14 + 1];
+  Double_t width_phi = 2 * TMath::Pi() / 14;
+  for (unsigned int bin = 0; bin < 14 + 1; bin++)
     bins_phi[bin] = - TMath::Pi() + bin * width_phi;
 
-  Double_t bins_costheta[nBinsCosTheta + 1];
-  Double_t width_cosTheta = 2. / nBinsCosTheta;
-  for (unsigned int bin1 = 0; bin1 < nBinsCosTheta + 1; bin1++)
+  Double_t bins_costheta[20 + 1];
+  Double_t width_cosTheta = 2. / 20;
+  for (unsigned int bin1 = 0; bin1 < 20 + 1; bin1++)
     bins_costheta[bin1] = - 1 + bin1 * width_cosTheta;
 
   //create histograms
@@ -133,48 +127,48 @@ void EffPlotsModule::initialize()
   m_h1_MC_dau0_z0 = createHistogram1D("h1MCdau0Z0", "z0 dau_{0}", 100, -10, 10, "z0_{dau_{0}}", m_histoList_MCParticles);
   m_h1_MC_dau0_RMother = createHistogram1D("h1MCdau0RMother", "dau_{0}, R mother", 200, 0, 20, "R mother", m_histoList_MCParticles);
   m_h3_MC_dau0 = createHistogram3D("h3MCdau0", "entry per MC dau_{0}",
-                                   nBinsPt, bins_pt_new, "p_{t} (GeV/c)",
-                                   nBinsTheta, bins_theta, "#theta",
-                                   nBinsPhi, bins_phi, "#phi", m_histoList_MCParticles);
-  m_h1_MC_dau0_pt = createHistogram1D("h1MCdau0Pt", "dau_{0}, p_{T}", nBinsPt, bins_pt_new, "p_{T} (GeV/c)", m_histoList_MCParticles);
-  m_h1_MC_dau0_pz = createHistogram1D("h1MCdau0Pz", "dau_{0}, p_{z}", nBinsPt, bins_pt_new, "p_{z} (GeV/c)", m_histoList_MCParticles);
-  m_h1_MC_dau0_p = createHistogram1D("h1MCdau0P", "dau_{0}, p", nBinsPt, bins_pt_new, "p (GeV/c)", m_histoList_MCParticles);
-  m_h1_MC_dau0_theta = createHistogram1D("h1MCdau0Theta", "dau_{0}, #theta", nBinsTheta, bins_theta, "#theta",
+                                   25, bins_pt_new, "p_{t} (GeV/c)",
+                                   10, bins_theta, "#theta",
+                                   14, bins_phi, "#phi", m_histoList_MCParticles);
+  m_h1_MC_dau0_pt = createHistogram1D("h1MCdau0Pt", "dau_{0}, p_{T}", 25, bins_pt_new, "p_{T} (GeV/c)", m_histoList_MCParticles);
+  m_h1_MC_dau0_pz = createHistogram1D("h1MCdau0Pz", "dau_{0}, p_{z}", 25, bins_pt_new, "p_{z} (GeV/c)", m_histoList_MCParticles);
+  m_h1_MC_dau0_p = createHistogram1D("h1MCdau0P", "dau_{0}, p", 25, bins_pt_new, "p (GeV/c)", m_histoList_MCParticles);
+  m_h1_MC_dau0_theta = createHistogram1D("h1MCdau0Theta", "dau_{0}, #theta", 10, bins_theta, "#theta",
                                          m_histoList_MCParticles);
-  m_h1_MC_dau0_costheta = createHistogram1D("h1MCdau0CosTheta", "dau_{0}, cos#theta", nBinsCosTheta, bins_costheta, "cos#theta",
+  m_h1_MC_dau0_costheta = createHistogram1D("h1MCdau0CosTheta", "dau_{0}, cos#theta", 20, bins_costheta, "cos#theta",
                                             m_histoList_MCParticles);
-  m_h1_MC_dau0_Mother_cosAngle = createHistogram1D("h1MCdau0MothercosAngle", "cos#theta_{mother,dau_{0}}", nBinsCosTheta,
+  m_h1_MC_dau0_Mother_cosAngle = createHistogram1D("h1MCdau0MothercosAngle", "cos#theta_{mother,dau_{0}}", 20,
                                                    bins_costheta, "cos#theta", m_histoList_MCParticles);
-  m_h1_MC_dau0_phi = createHistogram1D("h1MCdau0Phi", "dau_{0}, #phi", nBinsPhi, bins_phi, "#phi", m_histoList_MCParticles);
-  m_h1_MC_dau0_phi_BW = createHistogram1D("h1MCdau0PhiBW", "dau_{0}, #phi", nBinsPhi, bins_phi, "#phi", m_histoList_MCParticles);
-  m_h1_MC_dau0_phi_barrel = createHistogram1D("h1MCdau0Phibarrel", "dau_{0}, #phi", nBinsPhi, bins_phi, "#phi",
+  m_h1_MC_dau0_phi = createHistogram1D("h1MCdau0Phi", "dau_{0}, #phi", 14, bins_phi, "#phi", m_histoList_MCParticles);
+  m_h1_MC_dau0_phi_BW = createHistogram1D("h1MCdau0PhiBW", "dau_{0}, #phi", 14, bins_phi, "#phi", m_histoList_MCParticles);
+  m_h1_MC_dau0_phi_barrel = createHistogram1D("h1MCdau0Phibarrel", "dau_{0}, #phi", 14, bins_phi, "#phi",
                                               m_histoList_MCParticles);
-  m_h1_MC_dau0_phi_FW = createHistogram1D("h1MCdau0PhiFW", "dau_{0}, #phi", nBinsPhi, bins_phi, "#phi", m_histoList_MCParticles);
+  m_h1_MC_dau0_phi_FW = createHistogram1D("h1MCdau0PhiFW", "dau_{0}, #phi", 14, bins_phi, "#phi", m_histoList_MCParticles);
 
-  m_h1_MC_dau0_phiMother_total = createHistogram1D("h1MCdau0phiMothertotal", "dau_{0}, #phi_{mother}", nBinsPhi, bins_phi,
+  m_h1_MC_dau0_phiMother_total = createHistogram1D("h1MCdau0phiMothertotal", "dau_{0}, #phi_{mother}", 14, bins_phi,
                                                    "#phi_{mother}", m_histoList_MCParticles);
-  m_h1_MC_dau0_phiMother_BW = createHistogram1D("h1MCdau0phiMotherBW", "dau_{0}, #phi_{mother}, BW", nBinsPhi, bins_phi,
+  m_h1_MC_dau0_phiMother_BW = createHistogram1D("h1MCdau0phiMotherBW", "dau_{0}, #phi_{mother}, BW", 14, bins_phi,
                                                 "#phi_{mother} BW", m_histoList_MCParticles);
-  m_h1_MC_dau0_phiMother_barrel = createHistogram1D("h1MCdau0phiMotherbarrel", "dau_{0}, #phi_{mother}, barrel", nBinsPhi, bins_phi,
+  m_h1_MC_dau0_phiMother_barrel = createHistogram1D("h1MCdau0phiMotherbarrel", "dau_{0}, #phi_{mother}, barrel", 14, bins_phi,
                                                     "#phi_{mother} barrel", m_histoList_MCParticles);
-  m_h1_MC_dau0_phiMother_FW = createHistogram1D("h1MCdau0phiMotherFW", "dau_{0}, #phi_{mother}, FW", nBinsPhi, bins_phi,
+  m_h1_MC_dau0_phiMother_FW = createHistogram1D("h1MCdau0phiMotherFW", "dau_{0}, #phi_{mother}, FW", 14, bins_phi,
                                                 "#phi_{mother} FW", m_histoList_MCParticles);
 
-  m_h1_MC_dau0_thetaMother = createHistogram1D("h1MCdau0ThetaMother", "dau_{0}, #theta_{mother}", nBinsTheta, bins_theta,
+  m_h1_MC_dau0_thetaMother = createHistogram1D("h1MCdau0ThetaMother", "dau_{0}, #theta_{mother}", 10, bins_theta,
                                                "#theta_{mother}", m_histoList_MCParticles);
-  m_h1_MC_dau0_ptMother = createHistogram1D("h1MCdau0PtMother", "dau_{0}, p_{T,mother}", nBinsPt, bins_pt_new, "p_{T,mother} (GeV/c)",
+  m_h1_MC_dau0_ptMother = createHistogram1D("h1MCdau0PtMother", "dau_{0}, p_{T,mother}", 25, bins_pt_new, "p_{T,mother} (GeV/c)",
                                             m_histoList_MCParticles);
 
   m_h2_MC_dau0_2D = createHistogram2D("h2MCdau0", "entry per MC dau_{0}",
-                                      nBinsTheta, bins_theta, "#theta",
-                                      nBinsPt, bins_pt_new, "p_{t} (GeV/c)", m_histoList_MCParticles);
+                                      10, bins_theta, "#theta",
+                                      25, bins_pt_new, "p_{t} (GeV/c)", m_histoList_MCParticles);
   m_h2_MC_dau0_2D_BP = createHistogram2D("h2MCdau0BP", "entry per MC dau_{0}, beam pipe",
-                                         nBinsTheta, bins_theta, "#theta",
-                                         nBinsPt, bins_pt_new, "p_{t} (GeV/c)", m_histoList_MCParticles);
+                                         10, bins_theta, "#theta",
+                                         25, bins_pt_new, "p_{t} (GeV/c)", m_histoList_MCParticles);
 
   m_h2_MC_dau0_2DMother = createHistogram2D("h2MCdau0Mother", "entry mother per MC dau_{0}",
-                                            nBinsTheta, bins_theta, "#theta_{mother}",
-                                            nBinsPt, bins_pt_new, "p_{T,mother} (GeV/c)", m_histoList_MCParticles);
+                                            10, bins_theta, "#theta_{mother}",
+                                            25, bins_pt_new, "p_{T,mother} (GeV/c)", m_histoList_MCParticles);
 
   m_h2_MC_dau0_pVScostheta = createHistogram2D("h2MCdau0pVScostheta", "p_{CM} VS cos(#theta)_{CM}, dau_{0}",
                                                20, -1., 1.,
@@ -189,50 +183,50 @@ void EffPlotsModule::initialize()
   m_h1_MC_dau1_z0 = createHistogram1D("h1MCdau1Z0", "z0 dau_{1}", 100, -10, 10, "z0_{dau_{1}}", m_histoList_MCParticles);
   m_h1_MC_dau1_RMother = createHistogram1D("h1MCdau1RMother", "dau_{1}, R mother", 200, 0, 20, "R mother", m_histoList_MCParticles);
   m_h3_MC_dau1 = createHistogram3D("h3MCdau1", "entry per MC dau_{1}",
-                                   nBinsPt, bins_pt_new, "p_{t} (GeV/c)",
-                                   nBinsTheta, bins_theta, "#theta",
-                                   nBinsPhi, bins_phi, "#phi", m_histoList_MCParticles);
-  m_h1_MC_dau1_pt = createHistogram1D("h1MCdau1Pt", "dau_{1}, p_{T}", nBinsPt, bins_pt_new, "p_{T} (GeV/c)", m_histoList_MCParticles);
-  m_h1_MC_dau1_pz = createHistogram1D("h1MCdau1Pz", "dau_{1}, p_{z}", nBinsPt, bins_pt_new, "p_{z} (GeV/c)", m_histoList_MCParticles);
-  m_h1_MC_dau1_p = createHistogram1D("h1MCdau1P", "dau_{1}, ", nBinsPt, bins_pt_new, "p (GeV/c)", m_histoList_MCParticles);
-  m_h1_MC_dau1_theta = createHistogram1D("h1MCdau1Theta", "dau_{1}, #theta", nBinsTheta, bins_theta, "#theta",
+                                   25, bins_pt_new, "p_{t} (GeV/c)",
+                                   10, bins_theta, "#theta",
+                                   14, bins_phi, "#phi", m_histoList_MCParticles);
+  m_h1_MC_dau1_pt = createHistogram1D("h1MCdau1Pt", "dau_{1}, p_{T}", 25, bins_pt_new, "p_{T} (GeV/c)", m_histoList_MCParticles);
+  m_h1_MC_dau1_pz = createHistogram1D("h1MCdau1Pz", "dau_{1}, p_{z}", 25, bins_pt_new, "p_{z} (GeV/c)", m_histoList_MCParticles);
+  m_h1_MC_dau1_p = createHistogram1D("h1MCdau1P", "dau_{1}, ", 25, bins_pt_new, "p (GeV/c)", m_histoList_MCParticles);
+  m_h1_MC_dau1_theta = createHistogram1D("h1MCdau1Theta", "dau_{1}, #theta", 10, bins_theta, "#theta",
                                          m_histoList_MCParticles);
-  m_h1_MC_dau1_costheta = createHistogram1D("h1MCdau1CosTheta", "dau_{1}, cos#theta", nBinsCosTheta, bins_costheta, "cos#theta",
+  m_h1_MC_dau1_costheta = createHistogram1D("h1MCdau1CosTheta", "dau_{1}, cos#theta", 20, bins_costheta, "cos#theta",
                                             m_histoList_MCParticles);
-  m_h1_MC_dau1_phi = createHistogram1D("h1MCdau1Phi", "dau_{1}, #phi", nBinsPhi, bins_phi, "#phi", m_histoList_MCParticles);
-  m_h1_MC_dau1_phi_BW = createHistogram1D("h1MCdau1PhiBW", "dau_{1}, #phi", nBinsPhi, bins_phi, "#phi", m_histoList_MCParticles);
-  m_h1_MC_dau1_phi_barrel = createHistogram1D("h1MCdau1Phibarrel", "dau_{1}, #phi", nBinsPhi, bins_phi, "#phi",
+  m_h1_MC_dau1_phi = createHistogram1D("h1MCdau1Phi", "dau_{1}, #phi", 14, bins_phi, "#phi", m_histoList_MCParticles);
+  m_h1_MC_dau1_phi_BW = createHistogram1D("h1MCdau1PhiBW", "dau_{1}, #phi", 14, bins_phi, "#phi", m_histoList_MCParticles);
+  m_h1_MC_dau1_phi_barrel = createHistogram1D("h1MCdau1Phibarrel", "dau_{1}, #phi", 14, bins_phi, "#phi",
                                               m_histoList_MCParticles);
-  m_h1_MC_dau1_phi_FW = createHistogram1D("h1MCdau1PhiFW", "dau_{1}, #phi", nBinsPhi, bins_phi, "#phi", m_histoList_MCParticles);
+  m_h1_MC_dau1_phi_FW = createHistogram1D("h1MCdau1PhiFW", "dau_{1}, #phi", 14, bins_phi, "#phi", m_histoList_MCParticles);
 
-  m_h1_MC_dau1_Mother_cosAngle = createHistogram1D("h1MCdau1MothercosAngle", "cos#theta_{mother,p}", nBinsCosTheta, bins_costheta,
+  m_h1_MC_dau1_Mother_cosAngle = createHistogram1D("h1MCdau1MothercosAngle", "cos#theta_{mother,p}", 20, bins_costheta,
                                                    "cos#theta", m_histoList_MCParticles);
 
-  m_h1_MC_dau1_phiMother_total = createHistogram1D("h1MCdau1phiMothertotal", "dau_{1}, #phi_{mother}", nBinsPhi, bins_phi,
+  m_h1_MC_dau1_phiMother_total = createHistogram1D("h1MCdau1phiMothertotal", "dau_{1}, #phi_{mother}", 14, bins_phi,
                                                    "#phi_{mother}", m_histoList_MCParticles);
-  m_h1_MC_dau1_phiMother_BW = createHistogram1D("h1MCdau1phiMotherBW", "dau_{1}, #phi_{mother}, BW", nBinsPhi, bins_phi,
+  m_h1_MC_dau1_phiMother_BW = createHistogram1D("h1MCdau1phiMotherBW", "dau_{1}, #phi_{mother}, BW", 14, bins_phi,
                                                 "#phi_{mother} BW", m_histoList_MCParticles);
-  m_h1_MC_dau1_phiMother_barrel = createHistogram1D("h1MCdau1phiMotherbarrel", "dau_{1}, #phi_{mother}, barrel", nBinsPhi, bins_phi,
+  m_h1_MC_dau1_phiMother_barrel = createHistogram1D("h1MCdau1phiMotherbarrel", "dau_{1}, #phi_{mother}, barrel", 14, bins_phi,
                                                     "#phi_{mother} barrel", m_histoList_MCParticles);
-  m_h1_MC_dau1_phiMother_FW = createHistogram1D("h1MCdau1phiMotherFW", "dau_{1}, #phi_{mother}, FW", nBinsPhi, bins_phi,
+  m_h1_MC_dau1_phiMother_FW = createHistogram1D("h1MCdau1phiMotherFW", "dau_{1}, #phi_{mother}, FW", 14, bins_phi,
                                                 "#phi_{mother} FW", m_histoList_MCParticles);
 
-  m_h1_MC_dau1_thetaMother = createHistogram1D("h1MCdau1ThetaMother", "dau_{1}, #theta_{mother}", nBinsTheta, bins_theta,
+  m_h1_MC_dau1_thetaMother = createHistogram1D("h1MCdau1ThetaMother", "dau_{1}, #theta_{mother}", 10, bins_theta,
                                                "#theta_{mother}", m_histoList_MCParticles);
-  m_h1_MC_dau1_ptMother = createHistogram1D("h1MCdau1PtMother", "dau_{1}, p_{T,mother}", nBinsPt, bins_pt_new, "p_{T,mother} (GeV/c)",
+  m_h1_MC_dau1_ptMother = createHistogram1D("h1MCdau1PtMother", "dau_{1}, p_{T,mother}", 25, bins_pt_new, "p_{T,mother} (GeV/c)",
                                             m_histoList_MCParticles);
 
   m_h2_MC_dau1_2D = createHistogram2D("h2MCdau1", "entry per MC dau_{1}",
-                                      nBinsTheta, bins_theta, "#theta",
-                                      nBinsPt, bins_pt_new, "p_{t} (GeV/c)", m_histoList_MCParticles);
+                                      10, bins_theta, "#theta",
+                                      25, bins_pt_new, "p_{t} (GeV/c)", m_histoList_MCParticles);
 
   m_h2_MC_dau1_2D_BP = createHistogram2D("h2MCdau1BP", "entry per MC dau_{1}, beam pipe",
-                                         nBinsTheta, bins_theta, "#theta",
-                                         nBinsPt, bins_pt_new, "p_{t} (GeV/c)", m_histoList_MCParticles);
+                                         10, bins_theta, "#theta",
+                                         25, bins_pt_new, "p_{t} (GeV/c)", m_histoList_MCParticles);
 
   m_h2_MC_dau1_2DMother = createHistogram2D("h2MCdau1Mother", "entry mother per MC dau_{1}",
-                                            nBinsTheta, bins_theta, "#theta_{mother}",
-                                            nBinsPt, bins_pt_new, "p_{T,mother} (GeV/c)", m_histoList_MCParticles);
+                                            10, bins_theta, "#theta_{mother}",
+                                            25, bins_pt_new, "p_{T,mother} (GeV/c)", m_histoList_MCParticles);
 
   m_h2_MC_dau1_pVScostheta = createHistogram2D("h2MCdau1pVScostheta", "p_{CM} VS cos(#theta)_{CM}, dau_{1}",
                                                20, -1., 1.,
@@ -246,31 +240,31 @@ void EffPlotsModule::initialize()
   m_h1_MC_Mother_RMother = createHistogram1D("h1MCMotherRMother", "mother, R mother", 200, 0, 20, "R mother",
                                              m_histoList_MCParticles);
   m_h3_MC_Mother = createHistogram3D("h3MCMother", "entry per MCmother",
-                                     nBinsPt, bins_pt_new, "p_{t} (GeV/c)",
-                                     nBinsTheta, bins_theta, "#theta",
-                                     nBinsPhi, bins_phi, "#phi", m_histoList_MCParticles);
-  m_h1_MC_Mother_pt = createHistogram1D("h1MCMotherPt", "mother, p_{T}", nBinsPt, bins_pt_new, "p_{T} (GeV/c)",
+                                     25, bins_pt_new, "p_{t} (GeV/c)",
+                                     10, bins_theta, "#theta",
+                                     14, bins_phi, "#phi", m_histoList_MCParticles);
+  m_h1_MC_Mother_pt = createHistogram1D("h1MCMotherPt", "mother, p_{T}", 25, bins_pt_new, "p_{T} (GeV/c)",
                                         m_histoList_MCParticles);
-  m_h1_MC_Mother_pz = createHistogram1D("h1MCMotherPz", "mother, p_{z}", nBinsPt, bins_pt_new, "p_{z} (GeV/c)",
+  m_h1_MC_Mother_pz = createHistogram1D("h1MCMotherPz", "mother, p_{z}", 25, bins_pt_new, "p_{z} (GeV/c)",
                                         m_histoList_MCParticles);
-  m_h1_MC_Mother_p = createHistogram1D("h1MCMotherP", "mother, p", nBinsPt, bins_pt_new, "p (GeV/c)", m_histoList_MCParticles);
-  m_h1_MC_Mother_theta = createHistogram1D("h1MCMotherTheta", "mother, #theta", nBinsTheta, bins_theta, "#theta",
+  m_h1_MC_Mother_p = createHistogram1D("h1MCMotherP", "mother, p", 25, bins_pt_new, "p (GeV/c)", m_histoList_MCParticles);
+  m_h1_MC_Mother_theta = createHistogram1D("h1MCMotherTheta", "mother, #theta", 10, bins_theta, "#theta",
                                            m_histoList_MCParticles);
-  m_h1_MC_Mother_costheta = createHistogram1D("h1MCMotherCosTheta", "mother, cos#theta", nBinsCosTheta, bins_costheta, "cos#theta",
+  m_h1_MC_Mother_costheta = createHistogram1D("h1MCMotherCosTheta", "mother, cos#theta", 20, bins_costheta, "cos#theta",
                                               m_histoList_MCParticles);
-  m_h1_MC_Mother_phi = createHistogram1D("h1MCMotherPhi", "mother, #phi", nBinsPhi, bins_phi, "#phi", m_histoList_MCParticles);
-  m_h1_MC_Mother_phi_BW = createHistogram1D("h1MCMotherPhiBW", "mother, #phi", nBinsPhi, bins_phi, "#phi", m_histoList_MCParticles);
-  m_h1_MC_Mother_phi_barrel = createHistogram1D("h1MCMotherPhibarrel", "mother, #phi", nBinsPhi, bins_phi, "#phi",
+  m_h1_MC_Mother_phi = createHistogram1D("h1MCMotherPhi", "mother, #phi", 14, bins_phi, "#phi", m_histoList_MCParticles);
+  m_h1_MC_Mother_phi_BW = createHistogram1D("h1MCMotherPhiBW", "mother, #phi", 14, bins_phi, "#phi", m_histoList_MCParticles);
+  m_h1_MC_Mother_phi_barrel = createHistogram1D("h1MCMotherPhibarrel", "mother, #phi", 14, bins_phi, "#phi",
                                                 m_histoList_MCParticles);
-  m_h1_MC_Mother_phi_FW = createHistogram1D("h1MCMotherPhiFW", "mother, #phi", nBinsPhi, bins_phi, "#phi", m_histoList_MCParticles);
+  m_h1_MC_Mother_phi_FW = createHistogram1D("h1MCMotherPhiFW", "mother, #phi", 14, bins_phi, "#phi", m_histoList_MCParticles);
 
   m_h2_MC_Mother_2D = createHistogram2D("h2MCMother", "entry per MCmother",
-                                        nBinsTheta, bins_theta, "#theta",
-                                        nBinsPt, bins_pt_new, "p_{t} (GeV/c)", m_histoList_MCParticles);
+                                        10, bins_theta, "#theta",
+                                        25, bins_pt_new, "p_{t} (GeV/c)", m_histoList_MCParticles);
 
   m_h2_MC_Mother_2D_BP = createHistogram2D("h2MCMotherBP", "entry per MCmother, beam pipe",
-                                           nBinsTheta, bins_theta, "#theta",
-                                           nBinsPt, bins_pt_new, "p_{t} (GeV/c)", m_histoList_MCParticles);
+                                           10, bins_theta, "#theta",
+                                           25, bins_pt_new, "p_{t} (GeV/c)", m_histoList_MCParticles);
 
   m_h2_MC_Mother_pVScostheta = createHistogram2D("h2MCMotherpVScostheta", "p_{CM} VS cos(#theta)_{CM}, mother",
                                                  20, -1., 1.,

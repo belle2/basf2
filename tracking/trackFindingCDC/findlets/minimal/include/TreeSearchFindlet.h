@@ -52,6 +52,8 @@ namespace Belle2 {
                                       "", m_param_makeHitJumpingPossible);
         moduleParamList->addParameter(prefixed(prefix, "advance"), m_param_advance,
                                       "Do the advance step.", m_param_advance);
+        moduleParamList->addParameter(prefixed(prefix, "fit"), m_param_fit,
+                                      "Do the fit step.", m_param_fit);
       }
 
       /// Main function of this findlet: traverse a tree starting from a given seed object.
@@ -72,7 +74,9 @@ namespace Belle2 {
       /// Overloadable function to return the possible range of next hit objects for a given state
       virtual TrackFindingCDC::SortedVectorRange<HitPtr> getMatchingHits(StateIterator currentState) = 0;
 
-      virtual void advance(StateIterator currentState) = 0;
+      virtual bool advance(StateIterator currentState) = 0;
+
+      virtual bool fit(StateIterator currentState) = 0;
 
       virtual void initializeEventCache(std::vector<SeedPtr>& seedsVector, std::vector<HitPtr>& hitVector) { }
 
@@ -87,6 +91,9 @@ namespace Belle2 {
 
       /// Parameter: do the advance step
       bool m_param_advance = true;
+
+      /// Parameter: do the fit step
+      bool m_param_fit = true;
 
       /// Subfindlet: Filter 1
       ChooseableFilter<AFilterFactory> m_firstFilter;
@@ -134,12 +141,25 @@ namespace Belle2 {
 
         if (m_param_advance) {
           // Extrapolate
-          advance(currentState);
+          if (not advance(currentState)) {
+            return false;
+          }
         }
 
         // Check the second filter after extrapolation
         weight = m_secondFilter(*currentState);
-        return not std::isnan(weight);
+        if (std::isnan(weight)) {
+          return false;
+        }
+
+        if (m_param_fit) {
+          // Fit the state with the new hit
+          if (not fit(currentState)) {
+            return false;
+          }
+        }
+
+        return true;
       }
     };
   }

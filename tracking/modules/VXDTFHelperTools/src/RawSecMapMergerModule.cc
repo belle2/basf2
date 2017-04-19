@@ -310,8 +310,8 @@ void RawSecMapMergerModule::printVXDTFFilters(const VXDTFFilters<SpacePoint>& fi
 
 
 
-template <class FilterType> unsigned RawSecMapMergerModule::addAllSectorsToSecMapThingy(const SectorMapConfig& config,
-    SectorGraph<FilterType>& mainGraph, VXDTFFilters<SpacePoint>& segFilters)
+template <class FilterType> unsigned RawSecMapMergerModule::updateFilterSubLayerIDs(SectorGraph<FilterType>& mainGraph,
+    VXDTFFilters<SpacePoint>& segFilters)
 {
   // get all VXD sensors in the geometry
   // WARNING: if a different geometry in the first training step was used this may lead to difficulties
@@ -332,30 +332,15 @@ template <class FilterType> unsigned RawSecMapMergerModule::addAllSectorsToSecMa
         allTrainedSecIDsOfSensor.end()),
       allTrainedSecIDsOfSensor.end());
 
-    // lambda for finding the correct sector-position
-    auto findSector = [](std::vector< FullSecID>& secIDs, int counter) {
-      std::vector< FullSecID>::iterator iter = secIDs.begin();
-      for (; iter != secIDs.end(); ++iter) {
-        if (iter->getSecID() == counter) return iter;
-      }
-      return secIDs.end();
-    };
-
     for (FullSecID sector : allTrainedSecIDsOfSensor) {
-      // the search within that function will ignore the sublayerid
-      segFilters.setSubLayerIDs(sector, sector.getSubLayerID());
+      // the search within that function will ignore the sublayerid, the sublayer id will be set to the one in "sector"
+      bool success = segFilters.setSubLayerIDs(sector, sector.getSubLayerID());
+      // if success is false the sector was not found in the segFilters. This should not happen!
+      if (!success) B2FATAL("There is a mismatch between the FullSecIDs in the Trainings Graph and the SectorMap!");
     }
 
     B2DEBUG(1, "Sensor: " << sensor << " had " << allTrainedSecIDsOfSensor.size() << " trained IDs and ");
   } // end loop sensor of vxdIDs.
-
-
-  // Thomas : removed that one as it is already added during bootstrapping
-  // and add the virtual IP:
-  //std::vector<double> uCuts4vIP = {}, vCuts4vIP = {};
-  //allSecIDsOfThisSensor.clear();
-  //allSecIDsOfThisSensor = {{0}};
-  //segFilters.addSectorsOnSensor(uCuts4vIP, vCuts4vIP, allSecIDsOfThisSensor);
 
   return vxdIDs.size() + 1;
 }
@@ -375,8 +360,8 @@ template <class FilterType> void RawSecMapMergerModule::getSegmentFilters(
   // Thomas : possible bug, the sublayer id s have been updated only for the nSecChainLength==2 case
   /*
   if (xHitFilters->size() == 0) {
-    unsigned nSectors = addAllSectorsToSecMapThingy(config, mainGraph, *xHitFilters);
-    B2DEBUG(1, "RawSecMapMerger::getSegmentFilters: in addAllSectorsToSecMapThingy " << nSectors << " were added to secMap " <<
+    unsigned nSectors = updateFilterSubLayerIDs( mainGraph, *xHitFilters);
+    B2DEBUG(1, "RawSecMapMerger::getSegmentFilters: in updateSubLayerIDs " << nSectors << " were added to secMap " <<
             config.secMapName);
   } else {
     B2DEBUG(1, "RawSecMapMerger::getSegmentFilters: in given xHitFilters-container has size of " << xHitFilters->size() <<
@@ -386,8 +371,7 @@ template <class FilterType> void RawSecMapMergerModule::getSegmentFilters(
   // after rewriting this function only updates the sublayer ids of the already existing sectors
   // so it should only be executed once!!
   // TODO: remove the if by a better construction!! Also what happens if for the nSecChainLength>2 case the sublayerids need updates???
-
-  // if( nSecChainLength == 2 ) addAllSectorsToSecMapThingy(config, mainGraph, *xHitFilters);
+  if (nSecChainLength == 2) updateFilterSubLayerIDs(mainGraph, *xHitFilters);
 
   B2DEBUG(1, "RawSecMapMerger::getSegmentFilters: secMap " << config.secMapName << " got the following sectors:\n" <<
           mainGraph.print());

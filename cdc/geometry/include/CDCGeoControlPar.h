@@ -517,7 +517,7 @@ namespace Belle2 {
       std::string m_xtFile = "xt_v3.dat";  /**< Xt file. */
       std::string m_sigmaFile = "sigma_v2.dat";  /**< Sigma file. */
       std::string m_propSpeedFile = "propspeed_v0.dat";  /**< Prop-apeed file. */
-      std::string m_t0File = "t0.dat";  /**< T0 file. */
+      std::string m_t0File = "t0_v1.dat";  /**< T0 file. */
       std::string m_twFile = "tw_off.dat";  /**< Time walk file. */
       std::string m_bwFile = "badwire_v1.dat";  /**< Bad wire file. */
       std::string m_chMapFile = "ch_map.dat";  /**< Channel map file. */

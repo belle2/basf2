@@ -154,7 +154,7 @@ void CDCGeometryPar::clear()
   m_senseWireDensity  = 0.0;
   m_fieldWireDiameter = 0.0;
 
-  m_tdcOffset         = 0;
+  m_tdcOffset         = 0; //not used; to be removed later
   m_clockFreq4TDC     = 0.0;
   m_tdcBinWidth       = 0.0;
   m_nominalDriftV     = 0.0;
@@ -305,8 +305,6 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   m_fieldWireDiameter = geom.getFieldDiameter();
 
   //Set various quantities (should be moved to CDC.xml later...)
-  m_tdcOffset = 8192;  //for common-stop mode; to be adjused later
-
   m_clockFreq4TDC = 1.017774;  //in GHz
   double tmp = geom.getClockFrequency();
 
@@ -2475,8 +2473,6 @@ void CDCGeometryPar::read()
 
 
   //Set various quantities (should be moved to CDC.xml later...)
-  m_tdcOffset = 8192;  //for common-stop mode; to be adjused later
-
   m_clockFreq4TDC = 1.017774;  //in GHz
   double tmp = gbxParams.getDouble("ClockFrequencyForTDC");
   if (tmp != m_clockFreq4TDC) {

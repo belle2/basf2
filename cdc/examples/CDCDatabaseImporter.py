@@ -17,7 +17,7 @@ import subprocess
 from fnmatch import fnmatch
 
 mapfile = FileSystem.findFile('data/cdc/ch_map.dat')
-t0file = FileSystem.findFile('data/cdc/t0.dat')
+t0file = FileSystem.findFile('data/cdc/t0_v1.dat')
 bwfile = FileSystem.findFile('data/cdc/badwire_v1.dat')
 psfile = FileSystem.findFile('data/cdc/propspeed_v0.dat')
 twfile = FileSystem.findFile('data/cdc/tw_off.dat')

@@ -111,7 +111,7 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   //prop-speed
   addParam("PropSpeedFile", m_propSpeedFile, "Input file name (on cdc/data) for prop-speeds.",  string("propspeed_v0.dat"));
   //t0
-  addParam("T0File", m_t0File, "Input file name (on cdc/data) for t0s.",  string("t0.dat"));
+  addParam("T0File", m_t0File, "Input file name (on cdc/data) for t0s.",  string("t0_v1.dat"));
   //time walk
   addParam("TimeWalkFile", m_twFile, "Input file name (on cdc/data) for time walks.",  string("tw_off.dat"));
   //bad wire

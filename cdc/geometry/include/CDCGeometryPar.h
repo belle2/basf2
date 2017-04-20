@@ -1024,7 +1024,7 @@ namespace Belle2 {
 
       std::vector<unsigned short> m_badWire;  /*!< list of bad-wires. */
 
-      unsigned short m_tdcOffset;  /*!< TDC off set value (default = 0).*/
+      unsigned short m_tdcOffset;  /*!< Not used; to be removed later. */
       double m_clockFreq4TDC;      /*!< Clock frequency used for TDC (GHz). */
       double m_tdcBinWidth;        /*!< TDC bin width (nsec/bin). */
       double m_nominalDriftV;      /*!< Nominal drift velocity (4.0x10^-3 cm/nsec). */

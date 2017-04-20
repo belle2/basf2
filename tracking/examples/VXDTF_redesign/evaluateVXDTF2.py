@@ -78,7 +78,7 @@ setup_VXDTF2(path=path,
              use_pxd=usePXD,
              secmap_name=secmap_name,
              overlap_filter='hopfield',
-             quality_estimator='circleFit')
+             quality_estimator='CircleFit')
 
 if performFit:
     genFitExtrapolation = register_module('SetupGenfitExtrapolation')

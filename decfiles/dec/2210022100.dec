@@ -1,3 +1,14 @@
+# EventType: 2210022100
+# Descriptor: [ccbar D02KsPiz]
+# NickName: 
+# Cuts: None
+# Documentation: 
+# PhysicsWG: Charm
+# Tested: No
+# Responsible: Giulia Casarosa
+# Email: giulia.casarosa@pi.infn.it
+# Date: 20170420
+
 #JetSetPar PARJ(21)=0.28 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
 
 #JetSetPar PARJ(25)=0.27 ---> corresponding to Pythia8 StringFlav:etaSup

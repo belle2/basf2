@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <memory>
+#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -27,6 +28,13 @@ namespace Belle2 {
 
     template <class AFilter>
     NotFilter<AFilter>::~NotFilter() = default;
+
+    template <class AFilter>
+    void NotFilter<AFilter>::exposeParameters(ModuleParamList* moduleParamList,
+                                              const std::string& prefix)
+    {
+      if (m_filter) m_filter->exposeParameters(moduleParamList, prefix);
+    }
 
     template <class AFilter>
     Weight NotFilter<AFilter>::operator()(const typename AFilter::Object& obj)

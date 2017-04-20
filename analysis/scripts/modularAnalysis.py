@@ -178,7 +178,8 @@ def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main)
                                           additionalBranches=partBranches)
 
 
-def skimOutputUdst(skimname, skimParticleLists=[], outputParticleLists=[], includeArrays=[], path=analysis_main):
+def skimOutputUdst(skimname, skimParticleLists=[], outputParticleLists=[], includeArrays=[], path=analysis_main, *,
+                   outputFile=None):
     """
     Create a new path for events that contain a non-empty particle list specified via skimParticleLists.
     Write the accepted events as a udst file, saving only particles from skimParticleLists
@@ -186,9 +187,26 @@ def skimOutputUdst(skimname, skimParticleLists=[], outputParticleLists=[], inclu
     Additional Store Arrays and Relations to be stored can be specified via includeArrays
     list argument.
 
-    Currently mdst are also written. This is for testing purposes
-    and will be removed in the future.
+    :param str skimname: Name of the skim. If no outputFile is given this is
+        also the name of the output filename. This name will be added to the
+        FileMetaData as an extra data description "SkimName"
+    :param list(str) skimParticleLists: Names of the particle lists to skim for.
+        An event will be accepted if at least one of the particle lists is not empty
+    :param list(str) outputParticleLists: Names of the particle lists to store in
+        the output in addition to the ones in skimParticleLists
+    :param list(str) includeArrays: datastore arrays/objects to write to the output
+        file in addition to mdst and particle information
+    :param basf2.Path path: Path to add the skim output to. Defaults to the default analysis path
+    :param str outputFile: Name of the output file if different from the skim name
     """
+
+    # if no outputfile is specified, set it to the skim name
+    if outputFile is None:
+        outputFile = skimname
+
+    # make sure the output filename has the correct extension
+    if not outputFile.endswith(".udst.root"):
+        outputFile += ".udst.root"
 
     skimfilter = register_module('SkimFilter')
     skimfilter.set_name('SkimFilter_' + skimname)
@@ -201,7 +219,8 @@ def skimOutputUdst(skimname, skimParticleLists=[], outputParticleLists=[], inclu
     skim_path = create_path()
     saveParticleLists = skimParticleLists + outputParticleLists
     removeParticlesNotInLists(saveParticleLists, path=skim_path)
-    outputUdst(skimname + '.udst.root', saveParticleLists, includeArrays, path=skim_path)
+    output_module = outputUdst(outputFile, saveParticleLists, includeArrays, path=skim_path)
+    output_module.param("additionalDataDescription", {"SkimName": skimname})
     filter_path.add_independent_path(skim_path, "skim_" + skimname)
 
 

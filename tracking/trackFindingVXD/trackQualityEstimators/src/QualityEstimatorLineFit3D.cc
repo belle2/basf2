@@ -61,13 +61,13 @@ double QualityEstimatorLineFit3D::estimateQuality(std::vector<SpacePoint const*>
 
   detValY = sumWyiXi2 * sumWyi - sumWyiXi * sumWyiXi;
   if (detValY == 0) {
-    return NAN;
+    return 0;
   }
   detValY = 1. / detValY; // invert
 
   detValZ = sumWziXi2 * sumWzi - sumWziXi * sumWziXi;
   if (detValZ == 0) {
-    return NAN;
+    return 0;
   }
   detValZ = 1. / detValZ; // invert
 
@@ -83,8 +83,8 @@ double QualityEstimatorLineFit3D::estimateQuality(std::vector<SpacePoint const*>
   }
   m_results.chiSquared = chi2;
 
-  m_results.p = B2Vector3<double>(1, slopeY, slopeZ);
+  //m_results.p = B2Vector3<double>(1, slopeY, slopeZ);
 
-  return TMath::Prob(*(m_results.chiSquared),  measurements.size() - 1);
+  return TMath::Prob(chi2,  measurements.size() - 1);
 }
 

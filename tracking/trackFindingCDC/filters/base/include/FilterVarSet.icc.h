@@ -124,13 +124,13 @@ namespace Belle2 {
     }
 
     template <class AFilter>
-    std::vector<Named<Float_t*>> FilterVarSet<AFilter>::getNamedVariables(std::string prefix)
+    std::vector<Named<Float_t*>> FilterVarSet<AFilter>::getNamedVariables(const std::string& prefix)
     {
       return Super::getNamedVariables(prefix + m_filterNamePrefix);
     }
 
     template <class AFilter>
-    MayBePtr<Float_t> FilterVarSet<AFilter>::find(std::string varName)
+    MayBePtr<Float_t> FilterVarSet<AFilter>::find(const std::string& varName)
     {
       if (varName.find(m_filterNamePrefix) == 0) {
         std::string varNameWithoutPrefix = varName.substr(m_filterNamePrefix.size());

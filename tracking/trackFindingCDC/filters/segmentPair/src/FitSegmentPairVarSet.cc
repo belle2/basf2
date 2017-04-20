@@ -56,7 +56,7 @@ bool FitSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   return true;
 }
 
-std::vector<Named<Float_t*> > FitSegmentPairVarSet::getNamedVariables(std::string prefix)
+std::vector<Named<Float_t*> > FitSegmentPairVarSet::getNamedVariables(const std::string& prefix)
 {
   return m_preliminaryFit ?
          Super::getNamedVariables(prefix + "pre_") :

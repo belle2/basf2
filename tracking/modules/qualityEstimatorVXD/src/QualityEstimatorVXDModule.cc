@@ -8,7 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/qualityEstimatorVXD/QualityEstimatorModule.h>
+#include "../include/QualityEstimatorVXDModule.h"
+
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorMC.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
@@ -21,9 +22,9 @@
 using namespace Belle2;
 
 
-REG_MODULE(QualityEstimator)
+REG_MODULE(QualityEstimatorVXD)
 
-QualityEstimatorModule::QualityEstimatorModule() : Module()
+QualityEstimatorVXDModule::QualityEstimatorVXDModule() : Module()
 {
   //Set module properties
   setDescription("The quality estimator module for SpacePointTrackCandidates.");
@@ -43,7 +44,7 @@ QualityEstimatorModule::QualityEstimatorModule() : Module()
            "Only required for MCInfo method. If false combining several MCTracks is allowed.", bool(true));
 }
 
-void QualityEstimatorModule::initialize()
+void QualityEstimatorVXDModule::initialize()
 {
   m_spacePointTrackCands.isRequired(m_SpacePointTrackCandsStoreArrayName);
 
@@ -62,14 +63,14 @@ void QualityEstimatorModule::initialize()
   B2ASSERT("QualityEstimator could not be initialized with method: " << m_EstimationMethod, m_estimator);
 }
 
-void QualityEstimatorModule::beginRun()
+void QualityEstimatorVXDModule::beginRun()
 {
   // BField is required by all QualityEstimators
   double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
   m_estimator->setMagneticFieldStrength(bFieldZ);
 }
 
-void QualityEstimatorModule::event()
+void QualityEstimatorVXDModule::event()
 {
   // assign a QI computed using the selected QualityEstimator for each given SpacePointTrackCand
   for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {

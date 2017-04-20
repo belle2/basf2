@@ -23,12 +23,12 @@
 namespace Belle2 {
 
   /** Quality estimator module for SpacePointTrackCandidates */
-  class QualityEstimatorModule : public Module {
+  class QualityEstimatorVXDModule : public Module {
 
   public:
 
     /** Constructor of the module. */
-    QualityEstimatorModule();
+    QualityEstimatorVXDModule();
 
     /** Initializes the Module. */
     virtual void initialize() override;

@@ -32,7 +32,7 @@ QualityEstimatorVXDModule::QualityEstimatorVXDModule() : Module()
 
   addParam("EstimationMethod", m_EstimationMethod,
            "Identifier which estimation method to use. Valid identifiers are: [MCInfo, CircleFit, TripletFit, HelixFit, Random]",
-           std::string(""));
+           std::string("TripletFit"));
 
   addParam("SpacePointTrackCandsStoreArrayName", m_SpacePointTrackCandsStoreArrayName,
            "Name of StoreArray containing the SpacePointTrackCandidates to be estimated.", std::string(""));

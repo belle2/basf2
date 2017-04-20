@@ -386,12 +386,11 @@ namespace Belle2 {
         //       this statement is useless as the filters from bootstrapping have already sectors added so the size is !=0
         if (xHitFilters->size() == 0) {
           B2FATAL("This should not happen!");
-
         }
         B2INFO("\n\nRawSecMapMerger::initialize(): for mapName " << config.secMapName << ": process 3-hit-combinations:\n\n");
         processSectorCombinations(config, xHitFilters, 3);
 
-        return; // TODO WARNING DEBUG we do not want to run more than one run yet!
+        // return; // TODO WARNING DEBUG we do not want to run more than one run yet!
 
         B2INFO("\n\nRawSecMapMerger::initialize(): for mapName " << config.secMapName << ": process 4-hit-combinations:\n\n");
         B2INFO(" assigning no filters to the FiltersContainer: ");

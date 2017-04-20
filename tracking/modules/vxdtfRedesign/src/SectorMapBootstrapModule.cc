@@ -102,6 +102,9 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
 
   // TODO: find a better way to put the configs into the framework
 
+  // WARNING: chose the names of the configs in that way that they are not contained in each other!
+  //       E.g. having two configs with names "BobTheGreat" and "Bob" is not allowed as it will cause problems in some modules!
+
   SectorMapConfig config1;
 //   config1.pTmin = 0.02;
 //   config1.pTmax = 0.08;
@@ -147,7 +150,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1point1.seedMaxDist2IPZ = 23.5;
   config1point1.nHitsMin = 3;
   config1point1.vIP = B2Vector3D(0, 0, 0);
-  config1point1.secMapName = "lowTestRedesign_SVDPXD";
+  config1point1.secMapName = "lowTestSVDPXD";
   config1point1.twoHitFilters = { "Distance3DSquared", "Distance2DXYSquared", "Distance1DZ", "SlopeRZ", "Distance3DNormed"};
   config1point1.threeHitFilters = { "Angle3DSimple", "CosAngleXY", "AngleRZSimple", "CircleDist2IP", "DeltaSlopeRZ", "DeltaSlopeZoverS", "DeltaSoverZ", "HelixParameterFit", "Pt", "CircleRadius"};
   config1point1.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
@@ -391,6 +394,8 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
   for (int i = 0;  i < nEntries ; i++) {
     tree->GetEntry(i);
     rootFile.cd(setupKeyName->Data());
+
+    B2DEBUG(1, "Retrieving SectorMap with name " << setupKeyName->Data());
 
     VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
 

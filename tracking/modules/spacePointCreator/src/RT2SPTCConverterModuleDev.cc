@@ -118,7 +118,7 @@ void RT2SPTCConverterModule::event()
     std::pair<std::vector<const SpacePoint*>, ConversionState> spacePointStatePair;
 
     // the hit informations from the recotrack, the option "true" will result in a sorted vector
-    std::vector<RecoHitInformation*> hitInfos = recoTrack.getRecoHitInformations(); // true);
+    std::vector<RecoHitInformation*> hitInfos = recoTrack.getRecoHitInformations(true);
     B2DEBUG(20, "New call getSpacePointsFromRecoHitInformationViaTrueHits. Number of hitInfos: " << hitInfos.size());
     B2DEBUG(20, "number of SVD hits in RecoTrack : " << recoTrack.getNumberOfSVDHits());
     B2DEBUG(20, "number of PXD hits in RecoTrack : " << recoTrack.getNumberOfPXDHits());

@@ -34,6 +34,18 @@ MCSegmentTripleFilter::MCSegmentTripleFilter(bool allowReverse) :
   this->addProcessingSignalListener(&m_mcAxialSegmentPairFilter);
 }
 
+void MCSegmentTripleFilter::exposeParameters(ModuleParamList* moduleParamList,
+                                             const std::string& prefix)
+{
+  m_mcAxialSegmentPairFilter.exposeParameters(moduleParamList, prefix);
+}
+
+void MCSegmentTripleFilter::initialize()
+{
+  Super::initialize();
+  setAllowReverse(m_mcAxialSegmentPairFilter.getAllowReverse());
+}
+
 Weight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
 {
   const CDCAxialSegment2D* ptrStartSegment = segmentTriple.getStartSegment();
@@ -70,7 +82,7 @@ Weight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
     setTrajectoryOf(segmentTriple);
 
     Weight cellWeight = startSegment.size() + middleSegment.size() + endSegment.size();
-    return cellWeight;
+    return startToMiddleFBInfo > 0 ? cellWeight : -cellWeight;
   }
 
   return NAN;

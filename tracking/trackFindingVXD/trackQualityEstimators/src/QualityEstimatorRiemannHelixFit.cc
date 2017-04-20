@@ -26,6 +26,7 @@ typedef double Precision;
 double QualityEstimatorRiemannHelixFit::estimateQuality(std::vector<SpacePoint const*> const& measurements)
 {
   const int nHits = measurements.size();
+  if (nHits < 3) return 0;
 
   // Circle Fit
 

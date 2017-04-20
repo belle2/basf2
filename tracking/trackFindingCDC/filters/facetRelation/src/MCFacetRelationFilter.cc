@@ -25,6 +25,18 @@ MCFacetRelationFilter::MCFacetRelationFilter(bool allowReverse)
   this->addProcessingSignalListener(&m_mcFacetFilter);
 }
 
+void MCFacetRelationFilter::exposeParameters(ModuleParamList* moduleParamList,
+                                             const std::string& prefix)
+{
+  m_mcFacetFilter.exposeParameters(moduleParamList, prefix);
+}
+
+void MCFacetRelationFilter::initialize()
+{
+  Super::initialize();
+  setAllowReverse(m_mcFacetFilter.getAllowReverse());
+}
+
 Weight MCFacetRelationFilter::operator()(const CDCFacet& fromFacet,
                                          const CDCFacet& toFacet)
 {

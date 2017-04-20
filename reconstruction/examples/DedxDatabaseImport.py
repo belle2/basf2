@@ -22,14 +22,6 @@ import sys
 inputFile = sys.argv[1]
 outputFile = sys.argv[2]
 
-# register event info setter
-eventinfo = register_module('EventInfoSetter')
-eventinfo.initialize()
-
-# register gearbox
-gearbox = register_module('Gearbox')
-gearbox.initialize()
-
 rootFiles = ROOT.vector('string')()
 [rootFiles.push_back(name) for name in glob.glob(inputFile)]
 dedxDBImporter = DedxDatabaseImporter(rootFiles, outputFile)

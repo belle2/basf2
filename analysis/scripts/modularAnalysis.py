@@ -174,8 +174,8 @@ def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main)
     partBranches = ['Particles', 'ParticlesToMCParticles',
                     'ParticlesToPIDLikelihoods', 'ParticleExtraInfoMap',
                     'EventExtraInfo'] + includeArrays + list(plSet)
-    reconstruction.add_mdst_output(path, mc=True, filename=filename,
-                                   additionalBranches=partBranches)
+    return reconstruction.add_mdst_output(path, mc=True, filename=filename,
+                                          additionalBranches=partBranches)
 
 
 def skimOutputUdst(skimname, skimParticleLists=[], outputParticleLists=[], includeArrays=[], path=analysis_main):

@@ -215,6 +215,7 @@ def add_mdst_output(
     output.param('branchNames', branches)
     output.param('branchNamesPersistent', persistentBranches)
     path.add_module(output)
+    return output
 
 
 def add_arich_modules(path, components=None):

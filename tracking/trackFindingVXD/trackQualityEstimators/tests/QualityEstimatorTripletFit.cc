@@ -178,6 +178,7 @@ namespace QualityEstimatorTests {
 
     ASSERT_TRUE(resultObject.chiSquared);
     ASSERT_TRUE(resultObject.pt);
+    ASSERT_TRUE(resultObject.pmag);
     ASSERT_TRUE(resultObject.curvatureSign);
 
     // Test if tripletFit handles empty measurements vector correct
@@ -191,6 +192,7 @@ namespace QualityEstimatorTests {
     ASSERT_FALSE(resultObject.chiSquared);
     ASSERT_FALSE(resultObject.p);
     ASSERT_FALSE(resultObject.pt);
+    ASSERT_FALSE(resultObject.pmag);
     ASSERT_FALSE(resultObject.curvatureSign);
   }
 }

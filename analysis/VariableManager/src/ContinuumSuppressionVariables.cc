@@ -242,8 +242,8 @@ namespace Belle2 {
     {
       if (arguments.size() == 2) {
         auto variableName = arguments[0];
-        if (arguments[1] != "Signal" or arguments[1] != "ROE" or arguments[1] !=  "Auto")
-          B2FATAL("Second argument in useThrustFrame can only be 'Signal', 'ROE' or 'Auto'.");
+        if (arguments[1] != "Signal" and arguments[1] != "ROE" and arguments[1] !=  "Auto")
+          B2FATAL("Second argument in useThrustFrame can only be 'Signal', 'ROE' or 'Auto'. Your argument was " + arguments[1]);
 
         std::string mode = arguments[1];
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
@@ -260,15 +260,22 @@ namespace Belle2 {
           else
             newZ = qq->getThrustO();
 
-          TVector3 newY(0, newZ(2), -newZ(1));
+          TVector3 newY(0, 0, 0);
+          if (newz(2) == 0 and newz(1) == 0)
+            newY(0) = 1;
+          else{
+            newY(1) = newZ(2);
+            newY(2) = -newZ(1);
+          }
           TVector3 newX = newY.Cross(newZ);
+
           UseReferenceFrame<RotationFrame> signalframe(newX, newY, newZ);
 
           return var->function(particle);
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function useThrustFrame. It only takes two arguments. The first argument must be the variable and the second can either be Signal, ROE or Auto.");
+        B2FATAL("Wrong number of arguments for meta function useThrustFrame. It only takes two arguments. The first argument must be the variable and the second can either be .");
       }
     }
 

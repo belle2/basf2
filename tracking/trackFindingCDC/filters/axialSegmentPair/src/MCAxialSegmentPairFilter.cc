@@ -58,7 +58,11 @@ Weight MCAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axialSegm
 
     if (abs(startNPassedSuperLayers - endNPassedSuperLayers) > 2) return NAN;
 
-    //do fits?
+    if (not axialSegmentPair.getTrajectory2D().isFitted()) {
+      CDCTrajectory2D trajectory2D = CDCRiemannFitter::getFitter().fit(*ptrStartSegment, *ptrEndSegment);
+      axialSegmentPair.setTrajectory2D(trajectory2D);
+    }
+
     return startSegment.size() + endSegment.size();
   }
 

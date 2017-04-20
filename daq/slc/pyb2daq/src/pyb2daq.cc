@@ -12,6 +12,7 @@
 #include <daq/slc/pyb2daq/DAQDBObject.h>
 #include <daq/slc/pyb2daq/PyNSMCallback.h>
 #include <daq/slc/pyb2daq/PyHVControlCallback.h>
+#include <daq/slc/pyb2daq/PyRCCallback.h>
 
 using namespace boost::python;
 using namespace Belle2;
@@ -155,6 +156,20 @@ BOOST_PYTHON_MODULE(pyb2daq)
   //.def("init", &PyHVControlCallback::init)
   //.def("term", &PyHVControlCallback::term)
   //.def("timeout", &PyHVControlCallback::timeout)
+  ;
+
+  boost::python::class_<PyRCCallbackWrapper, boost::noncopyable>("RCCallback", boost::python::init<>())
+  .def("addInt", &PyRCCallback::addInt)
+  .def("addFloat", &PyRCCallback::addFloat)
+  .def("addText", &PyRCCallback::addText)
+  .def("setInt", &PyRCCallback::setInt)
+  .def("setFloat", &PyRCCallback::setFloat)
+  .def("setText", &PyRCCallback::setText)
+  .def("log", &PyRCCallback::log)
+  .def("run", &PyRCCallback::run)
+  //.def("init", &PyRCCallback::init)
+  //.def("term", &PyRCCallback::term)
+  //.def("timeout", &PyRCCallback::timeout)
   ;
 
 }

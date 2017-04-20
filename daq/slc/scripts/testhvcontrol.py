@@ -13,7 +13,7 @@ class TestHVControlCallback(HVControlCallback):
         self.m_vlim = [[[0 for i3 in range(10)]for i2 in range(10)]for i1 in range(100)]
         self.m_clim = [[[0 for i3 in range(10)]for i2 in range(10)]for i1 in range(100)]
 
-    def update():
+    def update(self):
         # performed at the interval of hv.interval
         return
 

@@ -107,7 +107,7 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   //xt-relation
   addParam("XtFile", m_xtFile, "Input file name (on cdc/data) for xt-relations.",  string("xt_v3.dat"));
   //sigma
-  addParam("SigmaFile", m_sigmaFile, "Input file name (on cdc/data) for sigmas.",  string("sigma_v1.dat"));
+  addParam("SigmaFile", m_sigmaFile, "Input file name (on cdc/data) for sigmas.",  string("sigma_v2.dat"));
   //prop-speed
   addParam("PropSpeedFile", m_propSpeedFile, "Input file name (on cdc/data) for prop-speeds.",  string("propspeed_v0.dat"));
   //t0

@@ -515,7 +515,7 @@ namespace Belle2 {
       std::string m_alignmentFile = "alignment_v2.dat";  /**< Alignment file. */
       std::string m_misalignmentFile = "misalignment_v2.dat";  /**< Misalignment file. */
       std::string m_xtFile = "xt_v3.dat";  /**< Xt file. */
-      std::string m_sigmaFile = "sigma_v1.dat";  /**< Sigma file. */
+      std::string m_sigmaFile = "sigma_v2.dat";  /**< Sigma file. */
       std::string m_propSpeedFile = "propspeed_v0.dat";  /**< Prop-apeed file. */
       std::string m_t0File = "t0.dat";  /**< T0 file. */
       std::string m_twFile = "tw_off.dat";  /**< Time walk file. */

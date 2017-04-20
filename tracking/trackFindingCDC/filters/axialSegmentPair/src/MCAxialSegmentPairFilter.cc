@@ -18,54 +18,69 @@
 
 #include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.icc.h>
 
+#include <framework/core/ModuleParamList.icc.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 template class TrackFindingCDC::MCSymmetric<BaseAxialSegmentPairFilter>;
 
-MCAxialSegmentPairFilter::MCAxialSegmentPairFilter(bool allowReverse) :
-  Super(allowReverse)
+MCAxialSegmentPairFilter::MCAxialSegmentPairFilter(bool allowReverse)
+  : Super(allowReverse)
 {
 }
 
-MCAxialSegmentPairFilter::~MCAxialSegmentPairFilter() = default;
+void MCAxialSegmentPairFilter::exposeParameters(ModuleParamList* moduleParamList,
+                                                const std::string& prefix)
+{
+  Super::exposeParameters(moduleParamList, prefix);
+  moduleParamList->addParameter(prefixed(prefix, "requireRLPure"),
+                                m_param_requireRLPure,
+                                "Switch to require the segment combination contain mostly correct rl information",
+                                m_param_requireRLPure);
+}
 
 Weight MCAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axialSegmentPair)
 {
-  const CDCAxialSegment2D* ptrStartSegment = axialSegmentPair.getStartSegment();
-  const CDCAxialSegment2D* ptrEndSegment = axialSegmentPair.getEndSegment();
+  const CDCAxialSegment2D* ptrFromSegment = axialSegmentPair.getStartSegment();
+  const CDCAxialSegment2D* ptrToSegment = axialSegmentPair.getEndSegment();
 
-  assert(ptrStartSegment);
-  assert(ptrEndSegment);
+  assert(ptrFromSegment);
+  assert(ptrToSegment);
 
-  const CDCAxialSegment2D& startSegment = *ptrStartSegment;
-  const CDCAxialSegment2D& endSegment = *ptrEndSegment;
+  const CDCAxialSegment2D& fromSegment = *ptrFromSegment;
+  const CDCAxialSegment2D& toSegment = *ptrToSegment;
 
   const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
 
   // Check if the segments are aligned correctly along the Monte Carlo track
   EForwardBackward pairFBInfo =
-    mcSegmentLookUp.areAlignedInMCTrack(ptrStartSegment, ptrEndSegment);
+    m_param_requireRLPure
+    ? mcSegmentLookUp.areAlignedInMCTrackWithRLCheck(ptrFromSegment, ptrToSegment)
+    : mcSegmentLookUp.areAlignedInMCTrack(ptrFromSegment, ptrToSegment);
+
   if (pairFBInfo == EForwardBackward::c_Invalid) return NAN;
 
   if (pairFBInfo == EForwardBackward::c_Forward or (getAllowReverse() and pairFBInfo == EForwardBackward::c_Backward)) {
     // Final check for the distance between the segment
-    Index startNPassedSuperLayers = mcSegmentLookUp.getLastNPassedSuperLayers(ptrStartSegment);
-    if (startNPassedSuperLayers == c_InvalidIndex) return NAN;
+    Index fromNPassedSuperLayers = mcSegmentLookUp.getLastNPassedSuperLayers(ptrFromSegment);
+    if (fromNPassedSuperLayers == c_InvalidIndex) return NAN;
 
-    Index endNPassedSuperLayers = mcSegmentLookUp.getFirstNPassedSuperLayers(ptrEndSegment);
-    if (endNPassedSuperLayers == c_InvalidIndex) return NAN;
+    Index toNPassedSuperLayers = mcSegmentLookUp.getFirstNPassedSuperLayers(ptrToSegment);
+    if (toNPassedSuperLayers == c_InvalidIndex) return NAN;
 
-    if (abs(startNPassedSuperLayers - endNPassedSuperLayers) > 2) return NAN;
+    // Do not join in the same superlayer - this should be the responsibility of the segment relation filter
+    if (abs(fromNPassedSuperLayers - toNPassedSuperLayers) == 0) return NAN;
+
+    // Do not join further away than two superlayers
+    if (abs(fromNPassedSuperLayers - toNPassedSuperLayers) > 2) return NAN;
 
     if (not axialSegmentPair.getTrajectory2D().isFitted()) {
-      CDCTrajectory2D trajectory2D = CDCRiemannFitter::getFitter().fit(*ptrStartSegment, *ptrEndSegment);
+      CDCTrajectory2D trajectory2D = CDCRiemannFitter::getFitter().fit(fromSegment, toSegment);
       axialSegmentPair.setTrajectory2D(trajectory2D);
     }
 
-    return startSegment.size() + endSegment.size();
+    return fromSegment.size() + toSegment.size();
   }
-
   return NAN;
-
 }

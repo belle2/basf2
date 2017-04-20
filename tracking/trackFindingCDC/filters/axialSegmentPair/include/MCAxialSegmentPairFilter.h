@@ -14,6 +14,8 @@
 #include <tracking/trackFindingCDC/filters/base/MCSymmetricFilter.dcl.h>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
 
     /// Filter for the constuction of axial to axial segment pairs based on simple criterions
@@ -27,12 +29,15 @@ namespace Belle2 {
       /// Constructor
       explicit MCAxialSegmentPairFilter(bool allowReverse = true);
 
-      /// Default destructor
-      ~MCAxialSegmentPairFilter();
+      /// Expose the set of parameters of the filter to the module parameter list.
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Checks if a pair of axial segments is a good combination
       Weight operator()(const CDCAxialSegmentPair& axialSegmentPair) final;
-    };
 
+    private:
+      /// Parameter : Switch to require the segment combination contain mostly correct rl information
+      bool m_param_requireRLPure = true;
+    };
   }
 }

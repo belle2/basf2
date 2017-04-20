@@ -18,7 +18,7 @@ namespace Belle2 {
 
   public:
 
-    virtual double estimateQuality(std::vector<SpacePoint const*> const& measurements) final {return gRandom->Uniform(1.0);};
+    virtual double estimateQuality(std::vector<SpacePoint const*> const&) final { return gRandom->Uniform(1.0); };
   };
 }
 

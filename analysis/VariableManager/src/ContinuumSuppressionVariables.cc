@@ -261,7 +261,7 @@ namespace Belle2 {
             newZ = qq->getThrustO();
 
           TVector3 newY(0, 0, 0);
-          if (newz(2) == 0 and newz(1) == 0)
+          if (newZ(2) == 0 and newZ(1) == 0)
             newY(0) = 1;
           else{
             newY(1) = newZ(2);

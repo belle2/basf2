@@ -78,7 +78,7 @@ double QualityEstimatorCircleFit::estimateQuality(std::vector<SpacePoint const*>
   double covYR2 = meanYR2 - meanY * meanR2;
   double covR2R2 = meanR4 - meanR2 * meanR2;
 
-  if (covR2R2 == 0) {return NAN;} // TODO could be problematic if it is pretty near to 0
+  if (covR2R2 == 0) {return 0;} // TODO could be problematic if it is pretty near to 0
 
   // q1, q2: helping variables, to make the code more readable
   double q1 = covR2R2 * covXY - covXR2 * covYR2;

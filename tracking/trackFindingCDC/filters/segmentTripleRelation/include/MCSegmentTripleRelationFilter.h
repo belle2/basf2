@@ -25,14 +25,23 @@ namespace Belle2 {
       using Super = MCSymmetric<BaseSegmentTripleRelationFilter>;
 
     public:
-      /** Constructor. */
+      /// Constructor.
       MCSegmentTripleRelationFilter(bool allowReverse = true);
 
-      /** Main filter method returning the weight of the neighborhood relation.
-       *  Return NAN if relation shall be rejected.*/
-      Weight
-      operator()(const CDCSegmentTriple& triple, const CDCSegmentTriple& neighborTriple) final;
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
+      /// Initialize the before event processing.
+      void initialize() final;
+
+    public:
+      /**
+       *  Main filter method returning the weight of the neighborhood relation.
+       *  Return NAN if relation shall be rejected.
+       */
+      Weight operator()(const CDCSegmentTriple& fromTriple, const CDCSegmentTriple& toTriple) final;
+
+    public:
       /// Setter for the allow reverse parameter
       void setAllowReverse(bool allowReverse) override
       {

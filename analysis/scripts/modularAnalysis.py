@@ -202,7 +202,6 @@ def skimOutputUdst(skimname, skimParticleLists=[], outputParticleLists=[], inclu
     saveParticleLists = skimParticleLists + outputParticleLists
     removeParticlesNotInLists(saveParticleLists, path=skim_path)
     outputUdst(skimname + '.udst.root', saveParticleLists, includeArrays, path=skim_path)
-    outputMdst(skimname + '.mdst.root', path=skim_path)
     filter_path.add_independent_path(skim_path, "skim_" + skimname)
 
 

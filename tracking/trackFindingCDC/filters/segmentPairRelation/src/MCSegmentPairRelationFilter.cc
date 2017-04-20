@@ -25,6 +25,18 @@ MCSegmentPairRelationFilter::MCSegmentPairRelationFilter(bool allowReverse)
   this->addProcessingSignalListener(&m_mcSegmentPairFilter);
 }
 
+void MCSegmentPairRelationFilter::exposeParameters(ModuleParamList* moduleParamList,
+                                                   const std::string& prefix)
+{
+  m_mcSegmentPairFilter.exposeParameters(moduleParamList, prefix);
+}
+
+void MCSegmentPairRelationFilter::initialize()
+{
+  Super::initialize();
+  setAllowReverse(m_mcSegmentPairFilter.getAllowReverse());
+}
+
 Weight MCSegmentPairRelationFilter::operator()(const CDCSegmentPair& fromSegmentPair,
                                                const CDCSegmentPair& toSegmentPair)
 {

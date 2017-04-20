@@ -17,7 +17,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    ///Class filtering the neighborhood of axial stereo segment pairs with monte carlo information
+    /// Class filtering the neighborhood of axial stereo segment pairs with monte carlo information
     class MCSegmentPairRelationFilter : public MCSymmetric<BaseSegmentPairRelationFilter> {
 
     private:
@@ -25,12 +25,20 @@ namespace Belle2 {
       using Super = MCSymmetric<BaseSegmentPairRelationFilter>;
 
     public:
-      /** Constructor setting to default reversal symmetry. */
+      /// Constructor setting to default reversal symmetry.
       MCSegmentPairRelationFilter(bool allowReverse = true);
 
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+
+      /// Initialize the before event processing.
+      void initialize() final;
+
     public:
-      /// Main filter method returning the weight of the neighborhood relation. Return NAN if relation shall
-      /// be rejected.
+      /**
+       *  Main filter method returning the weight of the neighborhood relation.
+       *  Return NAN if relation shall be rejected.
+       */
       Weight operator()(const CDCSegmentPair& fromSegmentPair, const CDCSegmentPair& toSegmentPair) final;
 
     public:

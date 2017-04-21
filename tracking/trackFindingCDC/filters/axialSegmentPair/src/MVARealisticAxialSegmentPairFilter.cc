@@ -17,7 +17,7 @@ using namespace TrackFindingCDC;
 MVARealisticAxialSegmentPairFilter::MVARealisticAxialSegmentPairFilter()
   : Super(std::make_unique<VarSet>(),
           "tracking/data/trackfindingcdc_RealisticAxialSegmentPairFilter.xml",
-          0.805)
+          0.49)
 {
   this->addProcessingSignalListener(&m_feasibleAxialSegmentPairFilter);
 }

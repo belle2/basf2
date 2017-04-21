@@ -10,57 +10,42 @@
 
 #pragma once
 
-#include <tracking/spacePointCreation/SpacePointTrackCand.h>
-
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
+#include <Eigen/Sparse>
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <framework/core/Module.h>
-#include <Eigen/Sparse>
+#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 
 namespace Belle2 {
-
-  /** The quality estimator module for SpacePointTrackCandidates using MC information.
-   * WARNING: Only working for SVDClusters!
-   * */
-  class MCQualityEstimatorVXDModule : public Module {
+  class QualityEstimatorMC : public QualityEstimatorBase {
 
   public:
-
-
-    /** Constructor of the module. */
-    MCQualityEstimatorVXDModule();
-
-    void initialize()
-    {
-      m_spacePointTrackCands.isRequired(m_SPTCsName);
-      m_mcRecoTracks.isRequired(m_mcRecoTracksName);
-    }
-
-    void event();
-
-
-  protected:
-
     // some typedefs to increase readability
     typedef int MCRecoTrackIndex;
     typedef int NMatches;
     typedef std::pair<MCRecoTrackIndex, NMatches> MatchInfo;
 
+    QualityEstimatorMC(std::string mcRecoTracksStoreArrayName = "MCRecoTracks",
+                       bool strictQualityIndex = true):
+      QualityEstimatorBase(), m_strictQualityIndex(strictQualityIndex)
+    {
+      m_mcRecoTracks.isRequired(mcRecoTracksStoreArrayName);
+      // store to make sure SPTCs are compared to the correct SVDStoreArray
+      m_svdClustersName = m_mcRecoTracks[0]->getStoreArrayNameOfSVDHits();
+    };
+
+    virtual double estimateQuality(std::vector<SpacePoint const*> const& measurements) final;
+
+    /** additionally return momentum_truth if it is a perfect match to a single MCRecoTrack */
+    virtual QualityEstimationResults estimateQualityAndProperties(std::vector<SpacePoint const*> const& measurements) override final;
+
+  protected:
+    MatchInfo getBestMatchToMCClusters(std::vector<SpacePoint const*> const& measurements);
+    double calculateQualityIndex(int nClusters, MatchInfo& match);
     void fillMatrixWithMCInformation();
 
-    MatchInfo getBestMatchToMCClusters(SpacePointTrackCand& sptc);
-
-    double calculateQualityIndex(int nClusters, MatchInfo& match);
-
-
-    // module parameters
-
-    /** sets the name of expected StoreArray with mcRecoTracks in it. */
-    std::string m_mcRecoTracksName;
-
-    /** sets the name of expected StoreArray with SPTCs in it. */
-    std::string m_SPTCsName;
+    // parameters
 
     /** If true only SPTCs containing SVDClusters corresponding to a single MCRecoTrack get a QI != 0.
      *  If a SVDCluster corresponds to several MCRecoTracks it is still valid as long as the correct MCRecoTrack is one of them.
@@ -68,11 +53,10 @@ namespace Belle2 {
     bool m_strictQualityIndex;
 
     // module members
-
     std::string m_svdClustersName;
 
-    /** the storeArray for SpacePointTrackCands as member */
-    StoreArray<SpacePointTrackCand> m_spacePointTrackCands;
+    /** stores the current match for optional return values */
+    MatchInfo m_match;
 
     /** the storeArray for RecoTracks as member */
     StoreArray<RecoTrack> m_mcRecoTracks;
@@ -81,3 +65,4 @@ namespace Belle2 {
     Eigen::SparseMatrix<bool> m_linkMatrix;
   };
 }
+

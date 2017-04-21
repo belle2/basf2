@@ -161,7 +161,7 @@ TMatrixFSym CMSFrame::getVertexErrorMatrix(const Particle* particle) const
 
 RotationFrame::RotationFrame(const TVector3& newX, const TVector3& newY, const TVector3& newZ)
 {
-  m_rotation.RotateAxes(newX, newY, newZ);
+  m_rotation.RotateAxes(newX.Unit(), newY.Unit(), newZ.Unit());
   m_rotation.Invert();
 }
 

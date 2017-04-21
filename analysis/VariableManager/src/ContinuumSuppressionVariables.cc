@@ -252,10 +252,12 @@ namespace Belle2 {
         const bool modeisAuto = mode == "Auto";
 
         auto func = [var, modeisSignal, modeisAuto](const Particle * particle) -> double {
-          const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
-          bool isinROE = isInRestOfEvent(particle);
+          StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+          const Particle* Bparticle = roe->getRelated<Particle>();
+          const ContinuumSuppression* qq = Bparticle->getRelatedTo<ContinuumSuppression>();
+          double isinROE = isInRestOfEvent(particle);
           TVector3 newZ;
-          if (modeisSignal or (modeisAuto and not isinROE))
+          if (modeisSignal or (modeisAuto and isinROE < 0.5))
             newZ = qq->getThrustB();
           else
             newZ = qq->getThrustO();
@@ -299,7 +301,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("useThrustFrame(variable, mode)", useThrustFrame,
                       "Returns the variable in respect to rotated coordinates, in which z lies on the specified thrust axis.\n"
                       "If mode is set to Signal it will use the thrust axis of the reconstructed B candidate, if mode is set to ROE it will use the ROE thrust axis.\n"
-                      "If mode is set to Auto the function use the thrust axis based on isInRestOfEvent(particle).")
+                      "If mode is set to Auto the function use the thrust axis based on isInRestOfEvent(particle).\n"
+                      "Like isinRestofEvent, you have to use path.for_each( . . .) to use this MetaVariable.")
 
   }
 }

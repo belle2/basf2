@@ -98,6 +98,8 @@ int ERecoDistributor::Configure(NSMmsg*, NSMcontext*)
       char portchar[256];
       sprintf(portchar, "%d", port);
       m_pid_sender[m_nnodes] = m_proc->Execute(sender, (char*)ringbuf.c_str(), portchar, (char*)shmname.c_str(), shmid);
+      printf("Running sender to %d\n", port);
+      fflush(stdout);
       m_nnodes++;
     }
   }
@@ -113,15 +115,19 @@ int ERecoDistributor::Configure(NSMmsg*, NSMcontext*)
 
   //  char hostname[512], idname[3], shmid[3];
   for (int i = 0; i < maxrecv; i++) {
-    sprintf(hostname, "%s%2.2d", hostbase, idbase + i);
+    sprintf(hostname, "%s%2.2d", rhostbase, idbase + i);
     sprintf(idname, "%2.2d", idbase + i);
     sprintf(shmid, "%2.2d", i + 20);
     if (rbadlist == NULL  ||
         strstr(rbadlist, hostname) == 0) {
+      printf("Running receiver for %s\n", hostname);
+      fflush(stdout);
       m_pid_recv[m_nrecv] = m_proc->Execute(receiver, (char*)ringbuf.c_str(), hostname, port, (char*)shmname.c_str(), shmid);
       m_nrecv++;
     }
   }
+
+  printf("ERecoDistributor : Configure done\n");
   return 0;
 }
 
@@ -129,15 +135,20 @@ int ERecoDistributor::UnConfigure(NSMmsg*, NSMcontext*)
 {
   //  system("killall sock2rbr rb2sockr");
   int status;
+
+  printf("m_nrecv = %d\n", m_nrecv);
   for (int i = 0; i < m_nrecv; i++) {
     if (m_pid_recv[i] != 0) {
+      printf("ERecoDistributor : killing receiver pid=%d\n", m_pid_sender[i]);
       kill(m_pid_recv[i], SIGKILL);
       waitpid(m_pid_recv[i], &status, 0);
     }
   }
+
+  printf("m_nnodes = %d\n", m_nnodes);
   for (int i = 0; i < m_nnodes; i++) {
     if (m_pid_sender[i] != 0) {
-      printf("ERecoDistributor:: killing sender pid=%d\n", m_pid_sender[i]);
+      printf("ERecoDistributor : killing sender pid=%d\n", m_pid_sender[i]);
       //      kill(m_pid_sender[i], SIGINT);
       kill(m_pid_sender[i], SIGKILL);
       waitpid(m_pid_sender[i], &status, 0);
@@ -149,7 +160,7 @@ int ERecoDistributor::UnConfigure(NSMmsg*, NSMcontext*)
   // Clear process list
   m_flow->fillProcessStatus(GetNodeInfo());
 
-  printf("Unconfigure : done\n");
+  printf("ERecoDistributor : Unconfigure done\n");
   return 0;
 }
 
@@ -204,13 +215,14 @@ void ERecoDistributor::server()
         }
       }
     }
-  }
-  int st = m_proc->CheckOutput();
-  if (st < 0) {
-    perror("ERecoDistributor::server");
-    //      exit ( -1 );
-  } else if (st > 0) {
-    m_log->ProcessLog(m_proc->GetFd());
+
+    int st = m_proc->CheckOutput();
+    if (st < 0) {
+      perror("ERecoDistributor::server");
+      //      exit ( -1 );
+    } else if (st > 0) {
+      m_log->ProcessLog(m_proc->GetFd());
+    }
   }
   //    m_flow->fillNodeInfo(RF_INPUT_ID, GetNodeInfo(), false);
   //    m_flow->fillProcessStatus(GetNodeInfo(), m_pid_recv, m_pid_sender[sender_id]);

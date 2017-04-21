@@ -84,7 +84,7 @@ int ERecoMaster::Configure(NSMmsg*, NSMcontext*)
   b2nsm_sendreq(dqmserver, "RC_LOAD", 0, pars);
   while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
   printf("ERecoMaster:: dqmserver configured\n");
-  //  sleep(2);
+  sleep(2);
 
   // 1. Configure distributor
   char* distributor = m_conf->getconf("distributor", "nodename");
@@ -94,7 +94,7 @@ int ERecoMaster::Configure(NSMmsg*, NSMcontext*)
   while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
   printf("ERecoMaster:: distributor configured\n");
 
-  //  sleep(2);
+  sleep(2);
 
   // 2. Configure event processors
   int maxnodes = m_conf->getconfi("processor", "nnodes");
@@ -151,6 +151,7 @@ int ERecoMaster::UnConfigure(NSMmsg*, NSMcontext*)
 #else
   while (RFNSM_Status::Instance().get_flag() != nnodes) b2nsm_wait(1);
 #endif
+  printf("ERecoMaster: eventprocessors unconfigured.\n");
 
   // Unconfigure distributor
   char* distributor = m_conf->getconf("distributor", "nodename");
@@ -158,15 +159,17 @@ int ERecoMaster::UnConfigure(NSMmsg*, NSMcontext*)
   //  b2nsm_sendreq(distributor, "RF_UNCONFIGURE", 0, pars);
   b2nsm_sendreq(distributor, "RC_ABORT", 0, pars);
   while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
+  printf("ErecoMaster: distributor unconfigured.\n");
 
   // Unconfigure DqmServer
   char* dqmserver = m_conf->getconf("dqmserver", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   //  b2nsm_sendreq(dqmserver, "RF_UNCONFIGURE", 0, pars);
   b2nsm_sendreq(dqmserver, "RC_ABORT", 0, pars);
-  while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
+  //  while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
+  sleep(5);
+  printf("ErecoMaster: dqmserver unconfigured.\n");
 
-  //  sleep ( 5 );
   return 0;
 
 }

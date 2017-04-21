@@ -44,11 +44,11 @@ namespace Belle2 {
     // module parameters
 
     /** Identifier which estimation method to use. Valid identifiers are:
-     * MCInfo
-     * CircleFit
-     * TripletFit
-     * HelixFit
-     * Random
+     * mcInfo
+     * circleFit
+     * tripletFit
+     * helixFit
+     * random
      */
     std::string m_EstimationMethod;
 

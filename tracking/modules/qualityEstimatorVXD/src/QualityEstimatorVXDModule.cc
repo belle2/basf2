@@ -31,8 +31,8 @@ QualityEstimatorVXDModule::QualityEstimatorVXDModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("EstimationMethod", m_EstimationMethod,
-           "Identifier which estimation method to use. Valid identifiers are: [MCInfo, CircleFit, TripletFit, HelixFit, Random]",
-           std::string("TripletFit"));
+           "Identifier which estimation method to use. Valid identifiers are: [mcInfo, circleFit, tripletFit, helixFit, random]",
+           std::string("tripletFit"));
 
   addParam("SpacePointTrackCandsStoreArrayName", m_SpacePointTrackCandsStoreArrayName,
            "Name of StoreArray containing the SpacePointTrackCandidates to be estimated.", std::string(""));
@@ -49,15 +49,15 @@ void QualityEstimatorVXDModule::initialize()
   m_spacePointTrackCands.isRequired(m_SpacePointTrackCandsStoreArrayName);
 
   // create pointer to chosen estimator
-  if (m_EstimationMethod == "MCInfo") {
+  if (m_EstimationMethod == "mcInfo") {
     m_estimator = make_unique<QualityEstimatorMC>(m_MCRecoTracksStoreArrayName, m_MCStrictQualityEstimator);
-  } else if (m_EstimationMethod == "TripletFit") {
+  } else if (m_EstimationMethod == "tripletFit") {
     m_estimator = make_unique<QualityEstimatorTripletFit>();
-  } else if (m_EstimationMethod == "CircleFit") {
+  } else if (m_EstimationMethod == "circleFit") {
     m_estimator = make_unique<QualityEstimatorCircleFit>();
-  } else if (m_EstimationMethod == "HelixFit") {
+  } else if (m_EstimationMethod == "helixFit") {
     m_estimator = make_unique<QualityEstimatorRiemannHelixFit>();
-  } else if (m_EstimationMethod == "Random") {
+  } else if (m_EstimationMethod == "random") {
     m_estimator = make_unique<QualityEstimatorRandom>();
   }
   B2ASSERT("QualityEstimator could not be initialized with method: " << m_EstimationMethod, m_estimator);

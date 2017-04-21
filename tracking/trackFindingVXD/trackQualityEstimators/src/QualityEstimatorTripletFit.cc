@@ -81,7 +81,6 @@ double QualityEstimatorTripletFit::estimateQuality(std::vector<SpacePoint const*
     const double beta = (1 - alpha2) / (R3D2C * tan(theta2C)) - (1 - alpha1) / (R3D1C * tan(theta1C));
 
     // Calculation of sigmaMS
-    // Calculation of sigmaMS
     // First get the orientation of the sensor plate for material budged calculation
     VxdID::baseType sensorID = measurements.at(i + 1)->getVxdID();
     const SVD::SensorInfo& sensor = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));

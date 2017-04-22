@@ -2,10 +2,10 @@ from basf2 import *
 from ROOT import Belle2
 from tracking import add_cdc_cr_track_finding
 from tracking import add_cdc_track_finding
+from tracking import add_cdc_cr_track_fit_and_track_creator
 
 # Propagation velocity of the light in the scinti.
 lightPropSpeed = 12.9925
-
 
 # Run range.
 run_range = {'201607': [787, 833],
@@ -86,7 +86,7 @@ def set_cdc_cr_parameters(period):
 
 def add_cdc_cr_simulation(path, empty_path):
     """
-    Add cdc cr simulation.
+    Add CDC CR simulation.
 
     """
     # Register the CRY module
@@ -132,27 +132,50 @@ def add_cdc_cr_simulation(path, empty_path):
 
 
 def add_cdc_cr_reconstruction(path, eventTimingExtraction=False):
+    """
+    Add CDC CR reconstruction
+    """
 
     # Add cdc track finder
     add_cdc_cr_track_finding(path)
 
+    # Setup Genfit extrapolation
+    path.add_module("SetupGenfitExtrapolation")
+
     # Add cdc track fitter
-    add_cdc_cr_track_fit_and_track_creator(path, eventTimingExtraction=eventTimingExtraction)
-
-
-def getRunNumber(fname):
-    run = int((fname.split('/')[-1]).split('.')[3])
-    return run
+    add_cdc_cr_track_fit_and_track_creator(path,
+                                           eventTimingExtraction=eventTimingExtraction,
+                                           lightPropSpeed=lightPropSpeed,
+                                           triggerPos=triggerPos,
+                                           normTriggerPlaneDirection=normTriggerPlanDirection,
+                                           readOutPos=readOutPos
+                                           )
 
 
 def getExpNumber(fname):
+    """
+    Get expperimental number from file name.
+    """
     exp = int((fname.split('/')[-1]).split('.')[2])
     return exp
 
 
+def getRunNumber(fname):
+    """
+    Get run number from file name.
+    """
+    run = int((fname.split('/')[-1]).split('.')[3])
+    return run
+
+
 def getDataPeriod(run):
+    """
+    Get data period from run number
+    It should be replaced the argument from run to (exp, run)!
+    """
     period = None
     global run_range
+
     for key in run_range:
         if run_range[key][0] <= run <= run_range[key][1]:
             period = key

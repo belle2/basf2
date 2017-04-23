@@ -85,6 +85,7 @@ void SegmentFinderFacetAutomaton::apply(std::vector<CDCWireHitCluster>& clusters
 
   m_segmentLinker.apply(m_intermediateSegments, outputSegments);
   m_segmentFitter.apply(outputSegments);
+  m_segmentFitter.apply(outputSegments);
 
   // Move facets to the DataStore
   m_facetSwapper.apply(m_facets);

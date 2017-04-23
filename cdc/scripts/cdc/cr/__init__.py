@@ -3,6 +3,7 @@ from ROOT import Belle2
 from tracking import add_cdc_cr_track_finding
 from tracking import add_cdc_track_finding
 from tracking import add_cdc_cr_track_fit_and_track_creator
+from time_extraction_helper_modules import *
 
 # Propagation velocity of the light in the scinti.
 lightPropSpeed = 12.9925
@@ -128,6 +129,7 @@ def add_cdc_cr_simulation(path, empty_path):
     path.add_module('FullSim',
                     # Uncomment if you want to disable secondaries.
                     ProductionCut=1000000.)
+    #    path.add_module(RandomizeTrackTimeModule(8.0))
     path.add_module('CDCDigitizer')
 
 
@@ -183,7 +185,9 @@ def getDataPeriod(run):
             break
 
     if period is None:
-        B2ERROR("No valid data period is specified.")
+        B2WARNING("No valid data period is specified.")
+        B2WARNING("Default configuration is loaded.")
+        period = 'normal'
     return period
 
 

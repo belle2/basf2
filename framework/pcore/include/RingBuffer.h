@@ -24,7 +24,7 @@ namespace Belle2 {
     int nbusy; /**< Number of attached _reading_ processes currently processing events. */
     int __readbuf; /**< Unused. */
     int errtype; /**< Error state? 0: Normal, 1: buffer full and wptr>rptr, others are complicated. */
-    int numAttachedTx; /**< # attached sending processes. 0: Processes reading from this buffer should terminate once it's empty. -1: attach pending (initial state) */
+    int numAttachedTx; /**< number of attached sending processes. 0: Processes reading from this buffer should terminate once it's empty. -1: attach pending (initial state) */
     int ninsq; /**< Count insq() calls for this buffer. */
     int nremq; /**< Count remq() calls for this buffer. */
   };
@@ -58,9 +58,9 @@ namespace Belle2 {
     /** Returns number of entries/buffers in the RingBuffer */
     int numq() const;
 
-    /** Increase #attached Tx counter. */
+    /** Increase the number of attached Tx counter. */
     void txAttached();
-    /** Decrease #attached Tx counter. */
+    /** Decrease the number of attached Tx counter. */
     void txDetached();
     /** Cause termination of reading processes (if they use isDead()). Assumed to be atomic. */
     void kill();

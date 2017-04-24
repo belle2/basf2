@@ -32,6 +32,22 @@ namespace Belle2 {
          };
 
     /**
+     * Feature extraction data
+     */
+    struct FeatureExtraction {
+      int sampleRise = 0; /**< sample number just before 50% CFD crossing */
+      int samplePeak = 0; /**< sample number at maximum */
+      int sampleFall = 0; /**< same for falling edge */
+      short vRise0 = 0;   /**< ADC value at sampleRise */
+      short vRise1 = 0;   /**< ADC value at sampleRise + 1 */
+      short vPeak = 0;    /**< ADC value at samplePeak */
+      short vFall0 = 0;   /**< ADC value at sampleFall */
+      short vFall1 = 0;   /**< ADC value at sampleFall + 1 */
+      short integral = 0; /**< integral of a pulse (e.g. \propto charge) */
+    };
+
+
+    /**
      * Default constructor
      */
     TOPRawWaveform()
@@ -62,24 +78,18 @@ namespace Belle2 {
                    unsigned flags,
                    unsigned referenceASIC,
                    unsigned segmentASIC,
-                   std::vector<unsigned short> windows,
+                   const std::vector<unsigned short>& windows,
                    unsigned electronicType,
-                   std::string electronicName,
+                   const std::string& electronicName,
                    const std::vector<short>& data):
-      m_data(data),  m_electronicName(electronicName)
+      m_moduleID(moduleID), m_pixelID(pixelID), m_channel(channel),
+      m_freezeDate(freezeDate), m_triggerType(triggerType), m_flags(flags),
+      m_referenceASIC(referenceASIC), m_segmentASIC(segmentASIC),
+      m_windows(windows), m_data(data),  m_electronicType(electronicType),
+      m_electronicName(electronicName)
     {
-      m_moduleID = moduleID;
-      m_pixelID = pixelID;
-      m_channel = channel;
       m_scrodID = scrod & 0xFFFF;
       m_scrodRevision = (scrod >> 16) & 0x00FF;
-      m_freezeDate = freezeDate;
-      m_triggerType = triggerType;
-      m_flags = flags;
-      m_referenceASIC = referenceASIC;
-      m_segmentASIC = segmentASIC;
-      m_windows = windows;
-      m_electronicType = electronicType;
     }
 
     /**
@@ -251,6 +261,24 @@ namespace Belle2 {
       return true;
     }
 
+    /**
+     * Do feature extraction
+     * @param threshold pulse height threshold [ADC counts]
+     * @param hysteresis threshold hysteresis [ADC counts]
+     * @param thresholdCount minimal number of samples above threshold
+     * @return number of feature extraction data (hits found)
+     */
+    int featureExtraction(int threshold, int hysteresis, int thresholdCount) const;
+
+    /**
+     * Returns feature extraction data
+     * @return FE data
+     */
+    const std::vector<FeatureExtraction>& getFeatureExtractionData() const
+    {
+      return m_features;
+    }
+
 
   private:
 
@@ -264,13 +292,16 @@ namespace Belle2 {
     unsigned short m_flags = 0;         /**< event flags (bits 0:7) */
     unsigned short m_referenceASIC = 0; /**< reference ASIC window */
     unsigned short m_segmentASIC = 0;   /**< segment ASIC window (storage window) */
-    std::vector<unsigned short> m_windows; /**< storage windows of ASIC waveform segments */
-    std::vector<short> m_data;  /**< waveform ADC values */
-    unsigned m_electronicType = 0;      /**< electronic type (see ChannelMapper::EType) */
+    std::vector<unsigned short> m_windows; /**< storage windows of waveform segments */
+    std::vector<short> m_data;      /**< waveform ADC values */
+    unsigned m_electronicType = 0;  /**< electronic type (see ChannelMapper::EType) */
     std::string m_electronicName;   /**< electronic name */
-    bool m_pedestalSubtracted = false; /**< true, if pedestal already subtracted */
+    bool m_pedestalSubtracted = false; /**< true, if pedestals already subtracted */
 
-    ClassDef(TOPRawWaveform, 6); /**< ClassDef */
+    /** cache for feature extraction data */
+    mutable std::vector<FeatureExtraction> m_features; //!
+
+    ClassDef(TOPRawWaveform, 7); /**< ClassDef */
 
   };
 

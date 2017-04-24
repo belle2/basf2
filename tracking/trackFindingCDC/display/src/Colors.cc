@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/display/Colors.h>
 
+#include <sstream>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -18,16 +20,22 @@ std::vector<std::string> Colors::getList()
     "red",
     "blue",
     "green",
-    "orange",
+    "orangered",
     "cyan",
     "olive",
-    "lime",
     "maroon",
-    "tomato",
     "turquoise",
-    "mediumspringgreen",
+    "lime",
+    "teal",
     "darkgreen",
     "indigo",
+    "darkolivegreen",
+    "orange",
+    "darkmagenta",
+    "seagreen",
+    "magenta",
+    "midnightblue",
+    "darkgoldenrod"
   };
 }
 
@@ -60,4 +68,16 @@ std::array<double, 3> Colors::hlsToRgb(const double h, const double l, const dou
       hueToRgb(p, q, h - 1. / 3.)  //b
     };
   }
+}
+
+std::string Colors::getWheelColor(int degree)
+{
+  double hue(degree % 360 / 360.);
+  double saturation = 0.75;
+  double lightness = 0.5;
+
+  std::array<double, 3> rgb = Colors::hlsToRgb(hue, lightness, saturation);
+  std::ostringstream oss;
+  oss << "rgb(" << rgb[0] * 100 << "%, " << rgb[1] * 100 << "%, " << rgb[2] * 100 << "%)";
+  return oss.str();
 }

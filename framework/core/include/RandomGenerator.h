@@ -60,7 +60,7 @@ namespace Belle2 {
      * copied when calling this function so the original buffer can be
      * freed afterwards
      * @param seed pointer to seed data
-     * @param length of the seed data in bytes
+     * @param n of the seed data in bytes
      */
     void setSeed(const unsigned char* seed, unsigned int n);
 

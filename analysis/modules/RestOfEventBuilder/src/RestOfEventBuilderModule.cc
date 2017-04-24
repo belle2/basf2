@@ -130,6 +130,11 @@ void RestOfEventBuilderModule::addRemainingECLClusters(const Particle* particle,
   for (int i = 0; i < eclClusters.getEntries(); i++) {
     const ECLCluster* shower = eclClusters[i];
 
+    // allow only N1 (5) and T1 (1) cluster hypotheses enter ROE
+    if (shower->getHypothesisId() != 5  &&
+        shower->getHypothesisId() != 1)
+      continue;
+
     bool remainingCluster = true;
     for (unsigned j = 0; j < eclFSPs.size(); j++) {
       if (shower->getArrayIndex() == eclFSPs[j]) {

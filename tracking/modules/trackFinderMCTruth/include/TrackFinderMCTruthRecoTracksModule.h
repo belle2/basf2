@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Heck, Oksana Brovchenko, Moritz Nadler,           *
- *               Thomas Hauth                                             *
+ *               Thomas Hauth, Oliver Frost                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -63,7 +63,7 @@ namespace Belle2 {
     bool m_useOnlyAxialCDCHits;                                 /**< Boolean to select if only axial CDCHits should be used*/
     bool m_useOnlyBeforeTOP;                                    /**< Boolean to select if CDC hits after TOP detector are discarded*/
     float m_useNLoops;                                          /**< Number of loops to include in the MC tracks - effects only CDC.*/
-
+    bool m_useReassignedHits;                                   /**< Boolean to select the inclusion of hits form discarded secondary daughters*/
 
     bool m_enforceTrueHit;                                      /**< If set true only cluster hits that have a relation to a TrueHit will be included in the track candidate */
     std::vector<std::string>
@@ -71,6 +71,7 @@ namespace Belle2 {
     int m_particleProperties;                                   /**< Internal encoding of m_whichParticles to avoid string comparisons */
     double m_energyCut;                                         /**< Create track candidates only for MCParticles with energy above this cut*/
     bool m_neutrals;                                            /**< Boolean to mark if track candidates should also be created for neutral particles.*/
+    bool m_mergeDecayInFlight;                                  /**< Boolean to merge decay in flight chains that involve a single charged particle */
 
     bool m_setTimeSeed;                                         /**< Boolean to forward the production time as seed time*/
     double m_smearing;                                          /**< Smearing of MCMomentum and MCVertex in %. This adds a relative error to the initial values without changing the default large initial covariance matrix using for fitting*/
@@ -86,6 +87,7 @@ namespace Belle2 {
     int m_minSVDHits;                                           /**< Minimum number of SVD hits per track to allow track candidate creation*/
     int m_minCDCAxialHits;                                      /**< Minimum number of CDC hits from axial wires per track to allow track candidate creation*/
     int m_minCDCStereoHits;                                     /**< Minimum number of CDC hits from stereo wires per track to allow track candidate creation*/
+    bool m_allowFirstCDCSuperLayerOnly;                         /**< Boolean to allow tracks to pass the stereo hit requirement if they touched only the first (axial) CDC layer */
     int m_minimalNdf;                                           /**< Minimum number of total hits per track to allow track candidate creation. 2D hits are counted as 2*/
     std::vector<int>
     m_fromPdgCodes;                            /**< if size() is not 0, only for particles having an ancestor (mother or mother of mother etc) with PDG codes same as in this vector a track candidate be created*/

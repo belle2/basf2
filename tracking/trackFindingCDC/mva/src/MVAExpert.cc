@@ -23,7 +23,7 @@ using namespace TrackFindingCDC;
 
 MVAExpert::MVAExpert(const std::string& identifier,
                      std::vector<Named<Float_t*> > namedVariables)
-  : m_namedVariables(std::move(namedVariables))
+  : m_allNamedVariables(std::move(namedVariables))
   , m_identifier(identifier)
 {
 }
@@ -47,26 +47,28 @@ void MVAExpert::beginRun()
         weightfile->getElement<int>("FastBDT_version") == 1) {
 
       int nExpectedVars = weightfile->getElement<int>("number_feature_variables");
-      int nActualVars = m_namedVariables.size();
 
-      if (nExpectedVars != nActualVars) {
-        B2ERROR("Variable number mismatch for FastBDT. " <<
-                "Expected '" << nExpectedVars << "' " <<
-                "but received '" << nActualVars << "'");
-      }
-
-      for (int iVar = 0; iVar < nActualVars; ++iVar) {
+      m_selectedNamedVariables.clear();
+      for (int iVar = 0; iVar < nExpectedVars; ++iVar) {
         std::string variableElementName = "variable" + std::to_string(iVar);
         std::string expectedName = weightfile->getElement<std::string>(variableElementName);
-        std::string actualName = m_namedVariables[iVar].getName();
-        if (expectedName != actualName) {
+
+        auto itNamedVariable = std::find_if(m_allNamedVariables.begin(),
+                                            m_allNamedVariables.end(),
+        [expectedName](const Named<Float_t*>& namedVariable) {
+          return namedVariable.getName() == expectedName;
+        });
+
+        if (itNamedVariable == m_allNamedVariables.end()) {
           B2ERROR("Variable name " << iVar << " mismatch for FastBDT. " <<
-                  "Expected '" << expectedName << "' " <<
-                  "but received '" << actualName << "'");
+                  "Could not fing expected variable '" << expectedName << "'");
         }
+        m_selectedNamedVariables.push_back(*itNamedVariable);
       }
+      B2ASSERT("Number of variables mismatch", nExpectedVars == static_cast<int>(m_selectedNamedVariables.size()));
     } else {
       B2WARNING("Unpacked new kind of classifier. Consider to extend the feature variable check.");
+      m_selectedNamedVariables = m_allNamedVariables;
     }
 
     std::map<std::string, MVA::AbstractInterface*> supportedInterfaces =
@@ -77,7 +79,7 @@ void MVAExpert::beginRun()
     m_expert->load(*weightfile);
 
     std::vector<float> dummy;
-    dummy.resize(m_namedVariables.size(), 0);
+    dummy.resize(m_selectedNamedVariables.size(), 0);
     m_dataset = makeUnique<MVA::SingleDataset>(generalOptions, std::move(dummy), 0);
   } else {
     B2ERROR("Could not find weight file for identifier " << m_identifier);
@@ -103,8 +105,8 @@ double MVAExpert::predict()
   }
 
   // Transfer the extracted values to the data set were the expert can find them
-  for (unsigned int i = 0; i < m_namedVariables.size(); ++i) {
-    m_dataset->m_input[i] = *m_namedVariables[i];
+  for (unsigned int i = 0; i < m_selectedNamedVariables.size(); ++i) {
+    m_dataset->m_input[i] = *m_selectedNamedVariables[i];
   }
   return m_expert->apply(*m_dataset)[0];
 }

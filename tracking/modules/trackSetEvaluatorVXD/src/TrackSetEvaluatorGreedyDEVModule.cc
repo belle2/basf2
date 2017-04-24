@@ -15,12 +15,6 @@
 
 #include <vector>
 
-//------------------------------------------------------------------------------------------------
-//TMPTMPTMP:::
-#include <iostream>
-//------------------------------------------------------------------------------------------------
-
-using namespace std;
 using namespace Belle2;
 
 
@@ -31,14 +25,14 @@ TrackSetEvaluatorGreedyDEVModule::TrackSetEvaluatorGreedyDEVModule() : Module()
   setDescription("Expects a container of SpacePointTrackCandidates,\
  selects a subset of non-overlapping TCs using the Greedy algorithm.");
 
-  addParam("NameSpacePointTrackCands", m_nameSpacePointTrackCands, "Name of expected StoreArray.", string(""));
+  addParam("NameSpacePointTrackCands", m_nameSpacePointTrackCands, "Name of expected StoreArray.", std::string(""));
 }
 
 void TrackSetEvaluatorGreedyDEVModule::event()
 {
   //Create an empty object of the type,
   //that needs to be given to Scrooge.
-  vector<OverlapResolverNodeInfo> qiTrackOverlap;
+  std::vector<OverlapResolverNodeInfo> qiTrackOverlap;
   unsigned int const nSpacePointTrackCands = m_spacePointTrackCands.getEntries();
   qiTrackOverlap.reserve(nSpacePointTrackCands);
 
@@ -49,22 +43,13 @@ void TrackSetEvaluatorGreedyDEVModule::event()
                                 true);
   }
 
-  //give it make a Scrooge with this input and
-  Scrooge scrooge(qiTrackOverlap);
-  scrooge.performSelection();
-
-  //-----------------------------------------------------------------------------------------------
-  //TMPTMPTMP:::
-  for (auto && track : m_spacePointTrackCands) {
-    if (track.getRefereeStatus(SpacePointTrackCand::c_isActive)) {
-      cout << track.getRefereeStatusString() << ", Array Index: " << track.getArrayIndex()
-           << ", QI: " << track.getQualityIndex() << endl;
-    }
-  }
+  //make a Scrooge and udpate the activity
+  Scrooge scrooge;
+  scrooge.performSelection(qiTrackOverlap);
 
   for (auto && track : qiTrackOverlap) {
-    if (track.activityState > 0.75) {
-      cout << "Array Index: " << track.trackIndex  << ", QI: " << track.qualityIndex << endl;
+    if (track.activityState < 0.75) {
+      m_spacePointTrackCands[track.trackIndex]->removeRefereeStatus(SpacePointTrackCand::c_isActive);
     }
   }
 

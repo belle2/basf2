@@ -39,6 +39,10 @@ namespace Belle2 {
       /// Constructor initialising the MVAFilter with standard training name for this filter.
       MVARealisticSegmentRelationFilter();
 
+      /// Tell Root to look at this operator
+      using Super::operator();
+
+    private:
       /// Function to object for its signalness
       Weight operator()(const Relation<const CDCSegment2D>& segmentRelation) override;
 

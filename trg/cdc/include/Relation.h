@@ -25,17 +25,17 @@
 namespace Belle2 {
 
 //class G4Track;
-class MCParticle;
+  class MCParticle;
 //class TRGCDCTrackBase;
 
 /// A class to represent a wire in CDC.
-class TRGCDCRelation {
+  class TRGCDCRelation {
 
   public:
 
     /// Constructor.
-    TRGCDCRelation(const TRGCDCTrackBase & track,
-		   const std::map<unsigned, unsigned> relation);
+    TRGCDCRelation(const TRGCDCTrackBase& track,
+                   const std::map<unsigned, unsigned>& relation);
 
     /// Destructor
     virtual ~TRGCDCRelation();
@@ -43,7 +43,7 @@ class TRGCDCRelation {
   public:// Selectors
 
     /// returns a track.
-    const TRGCDCTrackBase & track(void) const;
+    const TRGCDCTrackBase& track(void) const;
 
     /// returns /# of contributors.
     unsigned nContributors(void) const;
@@ -53,7 +53,7 @@ class TRGCDCRelation {
     unsigned contributor(unsigned i = 0) const;
 
     /// returns i'th contributor.
-    const MCParticle & mcParticle(unsigned i = 0) const;
+    const MCParticle& mcParticle(unsigned i = 0) const;
 
     /// returns i'th purity.
     float purity(unsigned i = 0) const;
@@ -62,37 +62,39 @@ class TRGCDCRelation {
     float purity3D(unsigned trkID) const;
 
     /// returns efficiency of TS for 3D
-    float efficiency3D(unsigned trkID, std::map<unsigned, unsigned> & numTSsParticle ) const;
+    float efficiency3D(unsigned trkID, std::map<unsigned, unsigned>& numTSsParticle) const;
 
     /// Dumps debug information.
-    void dump(const std::string & message = std::string(""),
-	      const std::string & prefix = std::string("")) const;
+    void dump(const std::string& message = std::string(""),
+              const std::string& prefix = std::string("")) const;
 
   private:
 
     /// Track
-    const TRGCDCTrackBase & _track;
+    const TRGCDCTrackBase& _track;
 
     /// Map
     const std::map<unsigned, unsigned> _relations;
 
     /// Pairs
-    mutable const std::pair<unsigned, unsigned> ** _pairs;
-};
+    mutable const std::pair<unsigned, unsigned>** _pairs;
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-const TRGCDCTrackBase &
-TRGCDCRelation::track(void) const {
+  inline
+  const TRGCDCTrackBase&
+  TRGCDCRelation::track(void) const
+  {
     return _track;
-}
+  }
 
-inline
-unsigned
-TRGCDCRelation::nContributors(void) const {
+  inline
+  unsigned
+  TRGCDCRelation::nContributors(void) const
+  {
     return _relations.size();
-}
+  }
 
 } // namespace Belle2
 #endif /* TRGCDCRelation_FLAG_ */

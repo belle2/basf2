@@ -18,13 +18,13 @@
 
 namespace Belle2 {
 
-class TRGSignal;
-class TRGState;
-class TRGClock;
+  class TRGSignal;
+  class TRGState;
+  class TRGClock;
 
 /// A class to represent a bundle of digitized signals. Given
 /// TRGSignal should exist while this object alive.
-class TRGSignalVector : public std::vector<TRGSignal> {
+  class TRGSignalVector : public std::vector<TRGSignal> {
 
   public:
 
@@ -32,16 +32,16 @@ class TRGSignalVector : public std::vector<TRGSignal> {
 //  TRGSignalVector(const TRGClock & = Belle2_GDL::GDLSystemClock);
 
     /// Constructor with name.
-    TRGSignalVector(const std::string & name,
-//		    const TRGClock & = Belle2_GDL::GDLSystemClock,
-		    const TRGClock &,
-		    unsigned size = 0);
+    TRGSignalVector(const std::string& name,
+//        const TRGClock & = Belle2_GDL::GDLSystemClock,
+                    const TRGClock&,
+                    unsigned size = 0);
 
     /// Copy constructor.
-    TRGSignalVector(const TRGSignalVector &);
+    TRGSignalVector(const TRGSignalVector&);
 
     /// Constructor.
-    TRGSignalVector(const TRGSignal &);
+    TRGSignalVector(const TRGSignal&);
 
     /// Destructor
     virtual ~TRGSignalVector();
@@ -49,13 +49,13 @@ class TRGSignalVector : public std::vector<TRGSignal> {
   public:// Selectors
 
     /// returns name.
-    const std::string & name(void) const;
+    const std::string& name(void) const;
 
     /// sets and returns name.
-    const std::string & name(const std::string & newName);
+    const std::string& name(const std::string& newName);
 
     /// returns clock.
-    const TRGClock & clock(void) const;
+    const TRGClock& clock(void) const;
 
     /// returns true if there is a signal.
     bool active(void) const;
@@ -71,30 +71,30 @@ class TRGSignalVector : public std::vector<TRGSignal> {
 
     /// dumps contents. "message" is to select information to
     /// dump. "pre" will be printed in head of each line.
-    void dump(const std::string & message = "",
-              const std::string & pre = "") const;
+    void dump(const std::string& message = "",
+              const std::string& pre = "") const;
 
   public:// Modifiers
 
     /// sets state at given clock.
-    const TRGSignalVector & set(const TRGState &, int clockPosition);
+    const TRGSignalVector& set(const TRGState&, int clockPosition);
 
   public:// Operators
 
     /// changes clock.
-    const TRGClock & clock(const TRGClock &);
+    const TRGClock& clock(const TRGClock&);
 
     /// appends TRGSignal.
-    TRGSignalVector & operator+=(const TRGSignal &);
+    TRGSignalVector& operator+=(const TRGSignal&);
 
     /// appends TRGSignalVector.
-    TRGSignalVector & operator+=(const TRGSignalVector &);
+    TRGSignalVector& operator+=(const TRGSignalVector&);
 
     /// compare two TRGSignalVectors.
-    bool operator==(const TRGSignalVector &) const;
+    bool operator==(const TRGSignalVector&) const;
 
     /// compare two TRGSignalVectors.
-    bool operator!=(const TRGSignalVector &) const;
+    bool operator!=(const TRGSignalVector&) const;
 
   private:
 
@@ -102,34 +102,38 @@ class TRGSignalVector : public std::vector<TRGSignal> {
     std::string _name;
 
     /// Clock
-    const TRGClock * _clock;
-};
+    const TRGClock* _clock;
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-const std::string &
-TRGSignalVector::name(void) const {
+  inline
+  const std::string&
+  TRGSignalVector::name(void) const
+  {
     return _name;
-}
+  }
 
-inline
-const std::string &
-TRGSignalVector::name(const std::string & newName) {
+  inline
+  const std::string&
+  TRGSignalVector::name(const std::string& newName)
+  {
     return _name = newName;
-}
+  }
 
-inline
-const TRGClock &
-TRGSignalVector::clock(void) const {
+  inline
+  const TRGClock&
+  TRGSignalVector::clock(void) const
+  {
     return * _clock;
-}
+  }
 
-inline
-bool
-TRGSignalVector::operator!=(const TRGSignalVector & a) const {
+  inline
+  bool
+  TRGSignalVector::operator!=(const TRGSignalVector& a) const
+  {
     return (! operator==(a));
-}
+  }
 
 } // namespace Belle2
 

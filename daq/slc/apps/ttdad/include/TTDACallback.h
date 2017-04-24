@@ -13,7 +13,7 @@ namespace Belle2 {
   class TTDACallback : public RCCallback {
 
   public:
-    TTDACallback(int ftswid, const std::string& ttdname);
+    TTDACallback();
     virtual ~TTDACallback() throw() {}
 
   public:
@@ -35,9 +35,9 @@ namespace Belle2 {
     void trigio(const std::string& type) throw(RCHandlerException);
 
   private:
-    int m_ftswid;
     RCNode m_ttdnode;
     std::map<std::string, int> m_trgcommands;
+    int m_ftswid;
 
   private:
     void send(const NSMMessage& msg) throw(RCHandlerException);

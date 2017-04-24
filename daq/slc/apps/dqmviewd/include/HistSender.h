@@ -5,6 +5,10 @@
 
 #include <daq/slc/base/Writer.h>
 
+#include <TH1.h>
+
+#include <vector>
+
 namespace Belle2 {
 
   class DQMViewCallback;
@@ -23,11 +27,12 @@ namespace Belle2 {
     ~HistSender();
 
   public:
-    void run();
+    bool update(std::vector<TH1*>& hist, bool newconf);
 
   private:
     DQMViewCallback* m_callback;
     TCPSocket m_socket;
+    bool m_configured;
 
   };
 

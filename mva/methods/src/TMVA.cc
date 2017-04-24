@@ -18,6 +18,7 @@
 #include <TROOT.h>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem/operations.hpp>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -63,6 +64,7 @@ namespace Belle2 {
       ("tmva_method", po::value<std::string>(&m_method), "TMVA Method Name")
       ("tmva_type", po::value<std::string>(&m_type), "TMVA Method Type (e.g. Plugin, BDT, ...)")
       ("tmva_config", po::value<std::string>(&m_config), "TMVA Configuration string for the method")
+      ("tmva_working_directory", po::value<std::string>(&m_workingDirectory), "TMVA working directory which stores e.g. TMVA.root")
       ("tmva_factory", po::value<std::string>(&m_factoryOption), "TMVA Factory options passed to TMVAFactory constructor")
       ("tmva_prepare", po::value<std::string>(&m_prepareOption),
        "TMVA Preprare options passed to prepareTrainingAndTestTree function");
@@ -196,7 +198,14 @@ namespace Belle2 {
       unsigned int numberOfSpectators = training_data.getNumberOfSpectators();
       unsigned int numberOfEvents = training_data.getNumberOfEvents();
 
-      WorkingDirectoryManager dummy(specific_options.m_workingDirectory);
+      std::string directory = specific_options.m_workingDirectory;
+      if (specific_options.m_workingDirectory.empty()) {
+        char* directory_template = strdup("/tmp/Basf2TMVA.XXXXXX");
+        directory = mkdtemp(directory_template);
+        free(directory_template);
+      }
+
+      WorkingDirectoryManager dummy(directory);
 
       std::string jobName = specific_options.m_prefix;
       if (jobName.empty())
@@ -280,6 +289,10 @@ namespace Belle2 {
       delete signal_tree;
       delete background_tree;
 
+      if (specific_options.m_workingDirectory.empty()) {
+        boost::filesystem::remove_all(directory);
+      }
+
       return weightfile;
 
     }
@@ -295,7 +308,14 @@ namespace Belle2 {
       unsigned int numberOfSpectators = training_data.getNumberOfSpectators();
       unsigned int numberOfEvents = training_data.getNumberOfEvents();
 
-      WorkingDirectoryManager dummy(specific_options.m_workingDirectory);
+      std::string directory = specific_options.m_workingDirectory;
+      if (specific_options.m_workingDirectory.empty()) {
+        char* directory_template = strdup("/tmp/Basf2TMVA.XXXXXX");
+        directory = mkdtemp(directory_template);
+        free(directory_template);
+      }
+
+      WorkingDirectoryManager dummy(directory);
 
       std::string jobName = specific_options.m_prefix;
       if (jobName.empty())
@@ -368,6 +388,10 @@ namespace Belle2 {
       weightfile.addOptions(specific_options);
 
       delete regression_tree;
+
+      if (specific_options.m_workingDirectory.empty()) {
+        boost::filesystem::remove_all(directory);
+      }
 
       return weightfile;
 

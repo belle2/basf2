@@ -49,10 +49,6 @@ Standard Particles
    :members:
    :undoc-members:
 
-.. automodule:: stdLooseFSParticles
-   :members:
-   :undoc-members:
-
 .. automodule:: stdPhotons
    :members:
    :undoc-members:

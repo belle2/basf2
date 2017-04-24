@@ -194,7 +194,8 @@ namespace Belle2 {
 
     //! Performs track extrapolation for all tracks in one event
     //! flag is true if called by Muid, false if called by Ext
-    void event(bool);
+    void eventExt(void);
+    void eventMuid(void);
 
     //! Perform end-of-run actions
     void endRun(bool);

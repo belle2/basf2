@@ -39,8 +39,10 @@ class SegmentQuadTreeRun(StandardEventGenerationRun):
         main_path = super(SegmentQuadTreeRun, self).create_path()
 
         add_mc_track_finder(main_path)
+        main_path.add_module("TFCDC_WireHitPreparer")
+        main_path.add_module("TFCDC_ClusterPreparer")
 
-        segment_finder = basf2.register_module("SegmentFinderCDCFacetAutomaton")
+        segment_finder = basf2.register_module("TFCDC_SegmentFinderFacetAutomaton")
         segment_finder.param({
             "WriteFacets": True,
             "SegmentOrientation": "none",

@@ -7,6 +7,7 @@
 //-
 
 #include "daq/dqm/DqmMemFile.h"
+#include <framework/pcore/MsgHandler.h>
 
 using namespace Belle2;
 using namespace std;

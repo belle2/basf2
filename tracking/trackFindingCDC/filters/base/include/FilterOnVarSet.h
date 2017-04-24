@@ -74,8 +74,10 @@ namespace Belle2 {
       /// Function extracting the variables of the object into the variable set.
       Weight operator()(const Object& obj) override
       {
+        Weight weight = Super::operator()(obj);
+        if (std::isnan(weight)) return NAN;
         bool extracted = m_varSet->extract(&obj);
-        return extracted ? 1 : NAN;
+        return extracted ? weight : NAN;
       }
 
     public:

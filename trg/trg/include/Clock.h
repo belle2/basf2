@@ -18,33 +18,33 @@
 #include "trg/trg/SignalVector.h"
 
 namespace Belle2 {
-    class TRGClock;
-    class TRGTime;
+  class TRGClock;
+  class TRGTime;
 }
 
 namespace Belle2_GDL {
 
-    //...This should be moved to GDL module...
-    extern const Belle2::TRGClock GDLSystemClock;
+  //...This should be moved to GDL module...
+  extern const Belle2::TRGClock GDLSystemClock;
 }
 
 namespace Belle2 {
 
 /// A class to represent a digitized signal. Unit is nano second.
-class TRGClock {
+  class TRGClock {
 
   public:
 
     /// Constructor. "offset" is in unit of ns. "frequency" is in unit of MHz.
-    TRGClock(const std::string & name,
-	     double offset,
+    TRGClock(const std::string& name,
+             double offset,
              double frequency);
 
     /// Constructor with clock source.
-    TRGClock(const std::string & name,
-	     const TRGClock &,
-	     unsigned multiplicationFactor,
-	     unsigned divisionFactor = 1);
+    TRGClock(const std::string& name,
+             const TRGClock&,
+             unsigned multiplicationFactor,
+             unsigned divisionFactor = 1);
 
     /// Destructor
     virtual ~TRGClock();
@@ -52,7 +52,7 @@ class TRGClock {
   public:// Selectors
 
     /// returns name.
-    const std::string & name(void) const;
+    const std::string& name(void) const;
 
     /// returns clock position.
     int position(double timing) const;
@@ -77,14 +77,14 @@ class TRGClock {
 
     /// returns phase of given timing in degree (0 to 360).
     double phase(double timing) const;
-  
+
     /// returns the clock counter.
-    const TRGSignalVector & clockCounter(void) const;
+    const TRGSignalVector& clockCounter(void) const;
 
     /// dumps contents. "message" is to select information to
     /// dump. "pre" will be printed in head of each line.
-    void dump(const std::string & message = "",
-              const std::string & pre = "") const;
+    void dump(const std::string& message = "",
+              const std::string& pre = "") const;
 
   public://
 
@@ -112,7 +112,7 @@ class TRGClock {
     const std::string _name;
 
     /// Clock source.
-    const TRGClock * _source;
+    const TRGClock* _source;
 
     /// Multiplication factor.
     const unsigned _multi;
@@ -136,66 +136,75 @@ class TRGClock {
     int _max;
 
     /// Clock counter
-    mutable TRGSignalVector * _clockCounter;
-};
+    mutable TRGSignalVector* _clockCounter;
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-double
-TRGClock::offset(void) const {
+  inline
+  double
+  TRGClock::offset(void) const
+  {
     return _offset;
-}
+  }
 
-inline
-const std::string &
-TRGClock::name(void) const {
+  inline
+  const std::string&
+  TRGClock::name(void) const
+  {
     return _name;
-}
+  }
 
-inline
-double
-TRGClock::minTiming(void) const {
+  inline
+  double
+  TRGClock::minTiming(void) const
+  {
 //    return _min * _cycle + _offset;
     return _min * _cycle;
-}
+  }
 
-inline
-double
-TRGClock::maxTiming(void) const {
+  inline
+  double
+  TRGClock::maxTiming(void) const
+  {
 //    return _max * _cycle + _offset;
     return _max * _cycle;
-}
+  }
 
-inline
-int
-TRGClock::unit(double a) const {
+  inline
+  int
+  TRGClock::unit(double a) const
+  {
     return int(a / _cycle) + 1;
-}
+  }
 
-inline
-double
-TRGClock::frequency(void) const {
+  inline
+  double
+  TRGClock::frequency(void) const
+  {
     return _frequency;
-}
+  }
 
-inline
-int
-TRGClock::min(void) const {
+  inline
+  int
+  TRGClock::min(void) const
+  {
     return _min;
-}
+  }
 
-inline
-int
-TRGClock::max(void) const {
+  inline
+  int
+  TRGClock::max(void) const
+  {
     return _max;
-}
+  }
 
-inline
-int
-TRGClock::positionInSourceClock(double a) const {
+  inline
+  int
+  TRGClock::positionInSourceClock(double a) const
+  {
     return _source->position(a);
-}
+  }
 
 } // namespace Belle2
 

@@ -24,27 +24,27 @@
 
 namespace Belle2 {
 
-class TRGCDCWire;
-class TRGCDCWireHit;
-class TRGCDCSegment;
-class TRGCDCSegmentHit;
-class TRGCDCCircle;
-class TRGCDCTrack;
-class TRGCDCFrontEnd;
-class TRGCDCMerger;
-class TRGCDCDisplay;
+  class TRGCDCWire;
+  class TRGCDCWireHit;
+  class TRGCDCSegment;
+  class TRGCDCSegmentHit;
+  class TRGCDCCircle;
+  class TRGCDCTrack;
+  class TRGCDCFrontEnd;
+  class TRGCDCMerger;
+  class TRGCDCDisplay;
 
 /// Actual class to display trigger objects
-class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
+  class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
 
   public:
 
     /// Default constructor
-    TRGCDCDisplayDrawingAreaRphi(TRGCDCDisplay &,
+    TRGCDCDisplayDrawingAreaRphi(TRGCDCDisplay&,
                                  int size,
                                  double innerR,
                                  double outerR);
-    
+
     /// Destructor
     virtual ~TRGCDCDisplayDrawingAreaRphi();
 
@@ -63,35 +63,35 @@ class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
     void clear(void);
 
     /// appends wire hits to display.
-    void append(const std::vector<const TRGCDCWire *> &,
+    void append(const std::vector<const TRGCDCWire*>&,
                 Gdk::Color color = Gdk::Color("grey"));
-    void append(const std::vector<const TRGCDCWireHit *> &,
+    void append(const std::vector<const TRGCDCWireHit*>&,
                 Gdk::Color color = Gdk::Color("grey"));
-    void append(const TRGCDCSegment &,
+    void append(const TRGCDCSegment&,
                 Gdk::Color color = Gdk::Color("#6600FF009900"));
-    void append(const std::vector<const TRGCDCSegment *> &,
+    void append(const std::vector<const TRGCDCSegment*>&,
                 Gdk::Color color = Gdk::Color("#6600FF009900"));
-    void append(const std::vector<const TRGCDCSegmentHit *> &,
+    void append(const std::vector<const TRGCDCSegmentHit*>&,
                 Gdk::Color color = Gdk::Color("#6600FF009900"));
-    void append(const TRGCDCCircle &,
+    void append(const TRGCDCCircle&,
                 Gdk::Color color = Gdk::Color("#FF0066009900"));
-    void append(const std::vector<const TRGCDCCircle *> &,
+    void append(const std::vector<const TRGCDCCircle*>&,
                 Gdk::Color color = Gdk::Color("#FF0066009900"));
-    void append(const TRGCDCTrack &,
+    void append(const TRGCDCTrack&,
                 Gdk::Color color = Gdk::Color("#99006600FF00"));
-    void append(const std::vector<const TRGCDCTrack *> &,
+    void append(const std::vector<const TRGCDCTrack*>&,
                 Gdk::Color color = Gdk::Color("#99006600FF00"));
-    void append(const TRGCDCFrontEnd &,
+    void append(const TRGCDCFrontEnd&,
                 Gdk::Color color = Gdk::Color("grey"));
-    void append(const TRGCDCMerger &,
+    void append(const TRGCDCMerger&,
                 Gdk::Color color = Gdk::Color("grey"));
 
     /// Draws only once.
-    void oneShot(const std::vector<const TRGCDCSegment *> &,
+    void oneShot(const std::vector<const TRGCDCSegment*>&,
                  Gdk::Color color = Gdk::Color("#6600FF009900"));
 
-    virtual bool on_expose_event(GdkEventExpose *);
-    virtual bool on_button_press_event(GdkEventButton *);
+    virtual bool on_expose_event(GdkEventExpose*);
+    virtual bool on_button_press_event(GdkEventButton*);
 
   private:
     virtual void on_realize();
@@ -101,29 +101,29 @@ class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
     void drawHits(void);
     void drawSegmentHits(void);
 
-    void drawWire(const TRGCDCWire & w,
+    void drawWire(const TRGCDCWire& w,
                   int lineWidth,
-                  Gdk::Color & c,
+                  Gdk::Color& c,
                   Gdk::LineStyle s);
-    void drawSegment(const TRGCDCSegment & w,
-		     int lineWidth,
-		     Gdk::Color & c,
-		     Gdk::LineStyle s);
-    void drawCircle(const TRGCDCCircle & w,
+    void drawSegment(const TRGCDCSegment& w,
+                     int lineWidth,
+                     Gdk::Color& c,
+                     Gdk::LineStyle s);
+    void drawCircle(const TRGCDCCircle& w,
                     int lineWidth,
-                    Gdk::Color & c,
+                    Gdk::Color& c,
                     Gdk::LineStyle s);
-    void drawTrack(const TRGCDCTrack & w,
-                    int lineWidth,
-                    Gdk::Color & c,
-                    Gdk::LineStyle s);
-    void drawFrontEnd(const TRGCDCFrontEnd & w,
+    void drawTrack(const TRGCDCTrack& w,
+                   int lineWidth,
+                   Gdk::Color& c,
+                   Gdk::LineStyle s);
+    void drawFrontEnd(const TRGCDCFrontEnd& w,
                       int lineWidth,
-                      Gdk::Color & c,
+                      Gdk::Color& c,
                       Gdk::LineStyle s);
-    void drawMerger(const TRGCDCMerger & w,
+    void drawMerger(const TRGCDCMerger& w,
                     int lineWidth,
-                    Gdk::Color & c,
+                    Gdk::Color& c,
                     Gdk::LineStyle s);
 
     /// Coordinate transformations.
@@ -142,28 +142,28 @@ class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
     double _innerR;
     double _outerR;
 
-    std::vector<const TRGCDCWire *> _wires;
+    std::vector<const TRGCDCWire*> _wires;
     std::vector<Gdk::Color> _wiresColor;
 
-    std::vector<const TRGCDCWireHit *> _hits;
+    std::vector<const TRGCDCWireHit*> _hits;
     std::vector<Gdk::Color> _hitsColor;
 
-    std::vector<const TRGCDCSegment *> _segments;
+    std::vector<const TRGCDCSegment*> _segments;
     std::vector<Gdk::Color> _segmentsColor;
 
-    std::vector<const TRGCDCSegmentHit *> _segmentHits;
+    std::vector<const TRGCDCSegmentHit*> _segmentHits;
     std::vector<Gdk::Color> _segmentHitsColor;
 
-    std::vector<const TRGCDCCircle *> _circles;
+    std::vector<const TRGCDCCircle*> _circles;
     std::vector<Gdk::Color> _circlesColor;
 
-    std::vector<const TRGCDCTrack *> _tracks;
+    std::vector<const TRGCDCTrack*> _tracks;
     std::vector<Gdk::Color> _tracksColor;
 
-    std::vector<const TRGCDCFrontEnd *> _fronts;
+    std::vector<const TRGCDCFrontEnd*> _fronts;
     std::vector<Gdk::Color> _frontColors;
 
-    std::vector<const TRGCDCMerger *> _mergers;
+    std::vector<const TRGCDCMerger*> _mergers;
     std::vector<Gdk::Color> _mergerColors;
 
     Glib::RefPtr<Gdk::Window> _window;
@@ -173,95 +173,109 @@ class TRGCDCDisplayDrawingAreaRphi : public TRGCDCDisplayDrawingArea {
     Gdk::Color _blue, _red, _green, _black, _white, _grey, _yellow, _grey0;
 
     Glib::RefPtr<Pango::Layout> _pl;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-double
-TRGCDCDisplayDrawingAreaRphi::scale(double a) {
+  inline
+  double
+  TRGCDCDisplayDrawingAreaRphi::scale(double a)
+  {
     return _scale = a;
-}
+  }
 
-inline
-double
-TRGCDCDisplayDrawingAreaRphi::scale(void) const {
+  inline
+  double
+  TRGCDCDisplayDrawingAreaRphi::scale(void) const
+  {
     return _scale;
-}
+  }
 
-inline
-bool
-TRGCDCDisplayDrawingAreaRphi::axial(void) const {
+  inline
+  bool
+  TRGCDCDisplayDrawingAreaRphi::axial(void) const
+  {
     return _axial;
-}
+  }
 
-inline
-bool
-TRGCDCDisplayDrawingAreaRphi::axial(bool a) {
+  inline
+  bool
+  TRGCDCDisplayDrawingAreaRphi::axial(bool a)
+  {
     return _axial = a;
-}
+  }
 
-inline
-bool
-TRGCDCDisplayDrawingAreaRphi::stereo(void) const {
+  inline
+  bool
+  TRGCDCDisplayDrawingAreaRphi::stereo(void) const
+  {
     return _stereo;
-}
+  }
 
-inline
-bool
-TRGCDCDisplayDrawingAreaRphi::stereo(bool a) {
+  inline
+  bool
+  TRGCDCDisplayDrawingAreaRphi::stereo(bool a)
+  {
     return _stereo = a;
-}
+  }
 
-inline
-bool
-TRGCDCDisplayDrawingAreaRphi::wireName(void) const {
+  inline
+  bool
+  TRGCDCDisplayDrawingAreaRphi::wireName(void) const
+  {
     return _wireName;
-}
+  }
 
-inline
-bool
-TRGCDCDisplayDrawingAreaRphi::wireName(bool a) {
+  inline
+  bool
+  TRGCDCDisplayDrawingAreaRphi::wireName(bool a)
+  {
     return _wireName = a;
-}
+  }
 
-inline
-bool
-TRGCDCDisplayDrawingAreaRphi::oldCDC(void) const {
+  inline
+  bool
+  TRGCDCDisplayDrawingAreaRphi::oldCDC(void) const
+  {
     return _oldCDC;
-}
+  }
 
-inline
-bool
-TRGCDCDisplayDrawingAreaRphi::oldCDC(bool a) {
+  inline
+  bool
+  TRGCDCDisplayDrawingAreaRphi::oldCDC(bool a)
+  {
     return _oldCDC = a;
-}
+  }
 
-inline
-int
-TRGCDCDisplayDrawingAreaRphi::x(double a) const {
-/*     std::cout << "_x,_scale,_winw/2,a=" << _x << "," << _scale << "," */
-/*               << _winw/2 << "," << a << std::endl; */
+  inline
+  int
+  TRGCDCDisplayDrawingAreaRphi::x(double a) const
+  {
+    /*     std::cout << "_x,_scale,_winw/2,a=" << _x << "," << _scale << "," */
+    /*               << _winw/2 << "," << a << std::endl; */
     return int((a - _x) * _scale + _winw / 2);
-}
+  }
 
-inline
-int
-TRGCDCDisplayDrawingAreaRphi::y(double a) const {
+  inline
+  int
+  TRGCDCDisplayDrawingAreaRphi::y(double a) const
+  {
     return int((- a - _y) * _scale + _winh / 2);
-}
+  }
 
-inline
-int
-TRGCDCDisplayDrawingAreaRphi::xR(double a) const {
+  inline
+  int
+  TRGCDCDisplayDrawingAreaRphi::xR(double a) const
+  {
     return int((a - _winw / 2) / _scale + _x);
-}
+  }
 
-inline
-int
-TRGCDCDisplayDrawingAreaRphi::yR(double a) const {
+  inline
+  int
+  TRGCDCDisplayDrawingAreaRphi::yR(double a) const
+  {
     return int((- a - _winh / 2) / _scale + _y);
-}
+  }
 
 } // namespace Belle2
 

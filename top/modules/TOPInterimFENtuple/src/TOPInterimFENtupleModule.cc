@@ -4,6 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Maeda Yosuke                                             *
+ *               Umberto Tamponi                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -36,7 +37,7 @@ REG_MODULE(TOPInterimFENtuple)
 
 TOPInterimFENtupleModule::TOPInterimFENtupleModule() : HistoModule()
 {
-  setDescription("TOP data analysis module for Interim FE firmware (since Jan, 2017)");
+  setDescription("TOP data analysis module for Interim FE firmware (since Jan, 2017), to be used to produce an NTuple with the basic TOPDigis and TOPRawDigits informations.");
 
   addParam("calibrationChannel", m_calibrationChannel, "asic channel # where calibration pulses routed",
            (unsigned)0);
@@ -74,12 +75,26 @@ void TOPInterimFENtupleModule::defineHisto()
   m_tree->Branch("height", m_height, "height[nHit]/F");
   m_tree->Branch("q", m_q, "q[nHit]/F");
   m_tree->Branch("width", m_width, "width[nHit]/F");
+
+  m_tree->Branch("carrier", m_carrier, "carrier[nHit]/S");
+  m_tree->Branch("asic", m_asic, "asic[nHit]/S");
+  m_tree->Branch("channel", m_channel, "channel[nHit]/S");
+  m_tree->Branch("TFine", m_TFine, "TFine[nHit]/S");
+  m_tree->Branch("sampleRise", m_sampleRise, "sampleRise[nHit]/S");
+  m_tree->Branch("samplePeak", m_samplePeak, "samplePeak[nHit]/S");
+  m_tree->Branch("sampleFall", m_sampleFall, "sampleFall[nHit]/S");
+
+  m_tree->Branch("quality", &m_quality, "quality[nHit]/S");
+  m_tree->Branch("sample", &m_sample, "sample[nHit]/S");
+
   m_tree->Branch("nPixelRawInRawDigit", &m_nPixelInRawDigit, "nPixelInRawDigit/S");
 
   m_tree->Branch("nFEHeader", &m_nFEHeader, "nFEHeader/S");
   m_tree->Branch("nEmptyFEHeader", &m_nEmptyFEHeader, "nEmptyFEHeader/S");
   m_tree->Branch("nWaveform", &m_nWaveform, "nWaveform/S");
   m_tree->Branch("errorFlag", &m_errorFlag, "errorFlag/i");
+
+
 }
 
 void TOPInterimFENtupleModule::beginRun() {}
@@ -112,10 +127,18 @@ void TOPInterimFENtupleModule::event()
     m_height[m_nHit] = digit.getADC();
     m_q[m_nHit] = digit.getIntegral();
     m_width[m_nHit] = digit.getPulseWidth();
-
-    //    const auto* rawDigit = digit.getRelated<TOPRawDigit>();
-    //    if( rawDigit ){
-    //    }
+    m_sample[m_nHit] = (digit.getTDC() / 16 + digit.getFirstWindow() * 64) % 256;
+    m_quality[m_nHit] = digit.getHitQuality();
+    const auto* rawDigit = digit.getRelated<TOPRawDigit>();
+    if (rawDigit) {
+      m_carrier[m_nHit] = rawDigit->getCarrierNumber();
+      m_asic[m_nHit] = rawDigit->getASICNumber();
+      m_channel[m_nHit] = rawDigit->getASICChannel();
+      m_TFine[m_nHit] = rawDigit->getTFine();
+      m_sampleRise[m_nHit] = rawDigit->getSampleRise();
+      m_samplePeak[m_nHit] = rawDigit->getSamplePeak();
+      m_sampleFall[m_nHit] = rawDigit->getSampleFall();
+    }
 
     if (m_isCalCh[m_nHit]) {
       short reducedPixelId = (m_pixelId[m_nHit] - 1) / 8;
@@ -129,7 +152,8 @@ void TOPInterimFENtupleModule::event()
     short reducedPixelId = (m_pixelId[iHit] - 1) / 8;
     if (refTdcMap.count(reducedPixelId) > 0)
       m_refTdc[iHit] = refTdcMap[reducedPixelId];
-    else m_refTdc[iHit] = -99999;
+    else
+      m_refTdc[iHit] = -99999;
   }
 
   for (const auto& rawDigit : rawDigits) {

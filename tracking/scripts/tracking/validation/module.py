@@ -13,7 +13,13 @@ from .plot import ValidationPlot, compose_axis_label
 from .pull import PullAnalysis
 from .resolution import ResolutionAnalysis
 from .fom import ValidationFiguresOfMerit
-from .utilities import getHelixFromMCParticle, getSeedTrackFitResult, is_primary
+from .utilities import (
+    getHelixFromMCParticle,
+    getSeedTrackFitResult,
+    is_primary,
+    get_det_hit_ids,
+    calc_ndf_from_det_hit_ids
+    )
 
 import basf2
 
@@ -162,6 +168,7 @@ class TrackingValidationModule(basf2.Module):
         self.mc_pts = collections.deque()
         self.mc_hit_efficiencies = collections.deque()
         self.mc_multiplicities = collections.deque()
+        self.mc_ndf = collections.deque()
 
     def event(self):
         """Event method"""
@@ -322,6 +329,8 @@ class TrackingValidationModule(basf2.Module):
             pt = momentum.Perp()
             tan_lambda = np.divide(1.0, math.tan(momentum.Theta()))  # Avoid zero division exception
             d0 = mcHelix.getD0()
+            det_hit_ids = get_det_hit_ids(mcTrackCand)
+            ndf = calc_ndf_from_det_hit_ids(det_hit_ids)
 
             self.mc_matches.append(is_matched)
             self.mc_primaries.append(is_primary(mcParticle))
@@ -332,6 +341,7 @@ class TrackingValidationModule(basf2.Module):
             self.mc_multiplicities.append(multiplicity)
             self.mc_theta.append(momentum.Theta())
             self.mc_phi.append(momentum.Phi())
+            self.mc_ndf.append(ndf)
 
     def terminate(self):
         name = self.validation_name
@@ -546,6 +556,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             'multiplicity',
             'phi',
             'theta',
+            'ndf',
         ],
         non_expert_parameters=['p_{t}'],
         make_hist=True,
@@ -564,6 +575,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             '#phi': self.mc_phi,
             '#theta': self.mc_theta,
             'multiplicity': self.mc_multiplicities,
+            'ndf': self.mc_ndf,
         }
 
         return self.profiles_by_parameters_base(
@@ -649,6 +661,9 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                 elif root_save_name(parameter_name) == 'theta':
                     lower_bound = 17 * math.pi / 180
                     upper_bound = 150 * math.pi / 180
+                elif root_save_name(parameter_name) == 'ndf':
+                    lower_bound = 0
+                    upper_bound = min(200, np.max(parameter_values))
                 else:
                     lower_bound = None
                     upper_bound = None

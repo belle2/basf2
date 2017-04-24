@@ -1,0 +1,154 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Martin Ritter                                            *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#include <framework/utilities/IOIntercept.h>
+#include <framework/logging/Logger.h>
+#include <memory>
+#include <cstring>
+#include <unistd.h>
+#include <fcntl.h>
+#include <boost/algorithm/string.hpp>
+
+namespace Belle2 {
+  namespace IOIntercept {
+    StreamInterceptor::StreamInterceptor(std::ostream& stream, FILE* fileObject):
+      m_stream(stream), m_fileObject(fileObject), m_savedFD(dup(fileno(m_fileObject)))
+    {
+      if (m_savedFD < 0) {
+        B2ERROR("Error duplicating file descriptor: " << std::strerror(errno));
+      }
+    }
+    StreamInterceptor::~StreamInterceptor()
+    {
+      finish();
+      if (m_savedFD >= 0) close(m_savedFD);
+      if (m_replacementFD >= 0) close(m_replacementFD);
+    }
+
+    void StreamInterceptor::readFD(int fd, std::string& out)
+    {
+      out.clear();
+      if (fd <= 0) return;
+      // need a buffer to read
+      static std::unique_ptr<char[]> buffer(new char[1024]);
+      // so then, read everything
+      while (true) {
+        ssize_t size = read(fd, buffer.get(), 1024);
+        if (size < 0) {
+          // in case we get interrupted by signal, try again
+          if (errno == EINTR)  continue;
+          break;
+        }
+        out.append(buffer.get(), static_cast<size_t>(size));
+      }
+    }
+
+    bool StreamInterceptor::replaceFD(int fileDescriptor)
+    {
+      // obviously we don't want to replace invalid descriptors
+      if (fileDescriptor < 0) return false;
+      // flush existing stream
+      m_stream << std::flush;
+      std::fflush(m_fileObject);
+      // and clear the bad bits we might have gotten when pipe capacity is reached
+      m_stream.clear();
+      // and then replace the file descriptor
+      const int currentFD = fileno(m_fileObject);
+      if (currentFD < 0) {
+        B2ERROR("Error obtaining file descriptor: " << std::strerror(errno));
+        return false;
+      }
+      while (dup2(fileDescriptor, currentFD) < 0) {
+        if (errno != EINTR && errno != EBUSY) {
+          B2ERROR("Error in dup2(), cannot replace file descriptor: " << std::strerror(errno));
+          return false;
+        }
+        // interrupted or busy, let's try again
+      }
+      return true;
+    }
+
+    DiscardStream::DiscardStream(std::ostream& stream, FILE* fileObject): StreamInterceptor(stream, fileObject)
+    {
+      int devNull = open("/dev/null", O_WRONLY);
+      if (devNull < 0) {
+        // warning
+        B2ERROR("Cannot open /dev/null: " << std::strerror(errno));
+        return;
+      }
+      setReplacementFD(devNull);
+    }
+
+    CaptureStream::CaptureStream(std::ostream& stream, FILE* fileObject): StreamInterceptor(stream, fileObject)
+    {
+      int pipeFD[2] {0};
+      if (pipe2(pipeFD, O_NONBLOCK) < 0) {
+        B2ERROR("Error creating pipe: " << std::strerror(errno));
+        return;
+      }
+      m_pipeReadFD = pipeFD[0];
+      setReplacementFD(pipeFD[1]);
+    }
+
+    CaptureStream::~CaptureStream()
+    {
+      // no need to close the write part, done by base class
+      if (m_pipeReadFD >= 0) close(m_pipeReadFD);
+    }
+
+    namespace {
+      /** small helper function to format output into a nice error message:
+       *  - do nothing if message is empty
+       *  - trim white space from message
+       *  - replace all newlines and add an indentation marker to distuingish
+       *    that this is sill part of the message
+       *
+       *  @param logLevel log level of the message
+       *  @param debugLevel debug level in case logLevel is c_Debug
+       *  @param name name of the thing causing the output, e.g. Geant4
+       *  @param indent string to add to the beginning of each line of the message
+       *  @param message actuall message to output
+       */
+      void sendLogMessage(LogConfig::ELogLevel logLevel, int debugLevel, const std::string& name, const std::string& indent,
+                          std::string message)
+      {
+        // avoid formatting if message will not be shown anyway
+        if (!LogSystem::Instance().isLevelEnabled(logLevel, debugLevel)) return;
+        // remove trailing whitespace and end of lines
+        boost::algorithm::trim_right(message);
+        // remove empty lines but keep white space in non empty first line
+        while (!message.empty()) {
+          std::string new_message = boost::algorithm::trim_left_copy_if(message, boost::algorithm::is_any_of(" \t\r"));
+          if (new_message.empty()) {
+            message = new_message;
+          } else if (new_message[0] == '\n') {
+            message = new_message.substr(1, std::string::npos);
+            continue;
+          }
+          break;
+        }
+        // is the message empty?
+        if (message.empty()) return;
+        // add indentation
+        boost::algorithm::replace_all(message, "\n", "\n" + indent);
+        // fine, show message
+        B2LOG(logLevel, debugLevel, "Output from " << name << ":\n" << indent << message);
+      }
+    }
+
+    bool OutputToLogMessages::finish()
+    {
+      bool result = CaptureStdOutStdErr::finish();
+      sendLogMessage(m_stdoutLevel, m_stdoutDebugLevel, m_name, m_indent, getStdOut());
+      sendLogMessage(m_stderrLevel, m_stderrDebugLevel, m_name, m_indent, getStdErr());
+      return result;
+    }
+  }
+}

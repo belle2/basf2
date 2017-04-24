@@ -7,6 +7,7 @@ env.Dictionary()['SUBLIB'] = True
 
 # Additional libraries
 env['LIBS'] = [
+    'tracking',
     'tracking_dataobjects',
     'geometry',
     'cdc', 'cdc_dataobjects',

@@ -106,7 +106,7 @@ bool LocalDatabase::readDatabase()
       // and add to map of payloads
       B2DEBUG(100, m_fileName << ":" << lineno << ": found payload " << boost::io::quoted(module)
               << ", revision " << revision << ", iov " << iov);
-      m_database[package][module].push_back(make_pair(revision, iov));
+      m_database[module].push_back(make_pair(revision, iov));
     }
   } catch (std::exception& e) {
     B2ERROR(m_fileName << ":" << lineno << " error: " << e.what());
@@ -116,63 +116,66 @@ bool LocalDatabase::readDatabase()
   return true;
 }
 
-pair<TObject*, IntervalOfValidity> LocalDatabase::tryDefault(const std::string& package, const std::string& module)
+pair<TObject*, IntervalOfValidity> LocalDatabase::tryDefault(const std::string& name)
 {
   pair<TObject*, IntervalOfValidity> result;
   result.first = 0;
 
-  std::string defaultName = payloadFileName(m_payloadDir, package, module, 0);
+  std::string defaultName = payloadFileName(m_payloadDir, name, 0);
   if (FileSystem::fileExists(defaultName)) {
-    result.first = readPayload(defaultName, module);
+    result.first = readPayload(defaultName, name);
     if (!result.first) return result;
     result.second = IntervalOfValidity(0, -1, -1, -1);
     if (m_invertLogging)
-      B2LOG(m_logLevel, 0, "Obtained " << module << " from " << defaultName << ". IoV="
+      B2LOG(m_logLevel, 0, "Obtained " << name << " from " << defaultName << ". IoV="
             << result.second);
     return result;
   }
 
   if (!m_invertLogging)
-    B2LOG(m_logLevel, 0, "Failed to get " << module << " from local database " << m_fileName << ".");
+    B2LOG(m_logLevel, 0, "Failed to get " << name << " from local database " << m_fileName << ".");
   return result;
 }
 
-pair<TObject*, IntervalOfValidity> LocalDatabase::getData(const EventMetaData& event, const string& package,
-                                                          const std::string& module)
+pair<TObject*, IntervalOfValidity> LocalDatabase::getData(const EventMetaData& event, const string& name)
 {
   pair<TObject*, IntervalOfValidity> result;
   result.first = 0;
 
   // find the entry for package and module in the maps
-  const auto& packageEntry = m_database.find(package);
-  if (packageEntry == m_database.end()) return tryDefault(package, module);
-  const auto& moduleEntry = packageEntry->second.find(module);
-  if (moduleEntry == packageEntry->second.end()) return tryDefault(package, module);
+  const auto& entry = m_database.find(name);
+  if (entry == m_database.end()) return tryDefault(name);
 
   // find the payload whose IoV contains the current event and load it
-  for (auto& entry : boost::adaptors::reverse(moduleEntry->second)) {
+  for (auto& entry : boost::adaptors::reverse(entry->second)) {
     if (entry.second.contains(event)) {
       int revision = entry.first;
-      result.first = readPayload(payloadFileName(m_payloadDir, package, module, revision), module);
+      result.first = readPayload(payloadFileName(m_payloadDir, name, revision), name);
       if (!result.first) return result;
       result.second = entry.second;
       if (m_invertLogging)
-        B2LOG(m_logLevel, 0, "Obtained " << module << " from local database " << m_fileName <<
+        B2LOG(m_logLevel, 0, "Obtained " << name << " from local database " << m_fileName <<
               ". IoV=" << result.second);
       return result;
     }
   }
 
   if (!m_invertLogging)
-    B2LOG(m_logLevel, 0, "Failed to get " << module << " from local database " << m_fileName <<
+    B2LOG(m_logLevel, 0, "Failed to get " << name << " from local database " << m_fileName <<
           ". No matching entry for experiment/run " << event.getExperiment() << "/" << event.getRun() << " found.");
   return result;
 }
 
 
-bool LocalDatabase::storeData(const std::string& package, const std::string& module, TObject* object,
+bool LocalDatabase::storeData(const std::string& name, TObject* object,
                               const IntervalOfValidity& iov)
 {
+  if (iov.empty()) {
+    B2ERROR("IoV is empty, refusing to store '" << name << "' in local database: "
+            "Please provide a valid experiment/run range for the data, for example "
+            "using IntervalOfValidity::always() to store data which is always valid");
+    return false;
+  }
   if (m_readOnly) {
     B2ERROR("Database file " << m_fileName << " is opened in read-only mode.");
     return false;
@@ -190,21 +193,23 @@ bool LocalDatabase::storeData(const std::string& package, const std::string& mod
 
   // get revision number
   int revision = 1;
-  while (FileSystem::fileExists(payloadFileName(m_payloadDir, package, module, revision))) revision++;
+  while (FileSystem::fileExists(payloadFileName(m_payloadDir, name, revision))) revision++;
 
   // write payload file
-  if (!writePayload(payloadFileName(m_payloadDir, package, module, revision), module, object, &iov)) return false;
+  if (!writePayload(payloadFileName(m_payloadDir, name, revision), name, object, &iov)) return false;
 
   // add to database and update database file
-  m_database[package][module].push_back(make_pair(revision, iov));
+  m_database[name].push_back(make_pair(revision, iov));
   std::ofstream file(m_absFileName.c_str(), std::ios::app);
   if (!file.is_open()) return false;
-  file << package << "/" << module << " " << revision << " " << iov << endl;
+  B2DEBUG(100, "Storing payload '" << name << "', rev " << revision << " with iov=" << iov
+          << " into " << m_fileName);
+  file << "dbstore/" << name << " " << revision << " " << iov << endl;
 
   return true;
 }
 
-bool LocalDatabase::addPayload(const std::string& package, const std::string& module, const std::string& fileName,
+bool LocalDatabase::addPayload(const std::string& name, const std::string& fileName,
                                const IntervalOfValidity& iov)
 {
   if (m_readOnly) {
@@ -225,16 +230,16 @@ bool LocalDatabase::addPayload(const std::string& package, const std::string& mo
 
   // get revision number
   int revision = 1;
-  while (FileSystem::fileExists(payloadFileName(m_payloadDir, package, module, revision))) revision++;
+  while (FileSystem::fileExists(payloadFileName(m_payloadDir, name, revision))) revision++;
 
   // copy payload file to payload directory and rename it to follow the file name convention
-  boost::filesystem::copy(fileName, payloadFileName(m_payloadDir, package, module, revision));
+  boost::filesystem::copy(fileName, payloadFileName(m_payloadDir, name, revision));
 
   // add to database and update database file
-  m_database[package][module].push_back(make_pair(revision, iov));
+  m_database[name].push_back(make_pair(revision, iov));
   std::ofstream file(m_absFileName.c_str(), std::ios::app);
   if (!file.is_open()) return false;
-  file << package << "/" << module << " " << revision << " " << iov << endl;
+  file << "dbstore/" << name << " " << revision << " " << iov << endl;
 
   return true;
 }

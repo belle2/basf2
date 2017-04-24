@@ -18,7 +18,7 @@ using namespace Belle2;
 struct XY {double x; double y;};
 struct Plane {unsigned x; unsigned y;};
 
-void printHeader(ofstream& out, const string function);
+void printHeader(ofstream& out, const string& function);
 void superLayer(const unsigned id);
 void printMapping(ofstream& out, vector<vector<vector<int>>>& HPcell);
 
@@ -72,7 +72,7 @@ main(int, char**)
 }
 
 void
-printHeader(ofstream& out, const string function)
+printHeader(ofstream& out, const string& function)
 {
   //...Date...
   string ts = TRGUtil::dateString();

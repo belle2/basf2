@@ -661,25 +661,19 @@ namespace Belle2 {
 
         StoreObjPtr<ParticleList> Y(motherlist);
         std::vector<Particle*> daughters;
-        if (Y.isValid())
+        double result = 0.0;
+        if (!Y.isValid())
+          B2ERROR("Particle List with name " << motherlist << "isn't valid!");
+
+        for (unsigned int i = 0; i < Y->getListSize(); ++i)
         {
-          for (unsigned int i = 0; i < Y->getListSize(); ++i) {
-            const auto& x = Y->getParticle(i)->getDaughters();
-            daughters.insert(daughters.end(), x.begin(), x.end());
-          }
+          const auto& oParticle = Y->getParticle(i);
+          result = particle->overlapsWith(oParticle);
+          if (result == 1.0)
+            return 1;
         }
-        while (!daughters.empty())
-        {
-          std::vector<Particle*> tmpdaughters;
-          for (auto& d : daughters) {
-            if (d == particle)
-              return 1.0;
-            const auto& x = d->getDaughters();
-            tmpdaughters.insert(tmpdaughters.end(), x.begin(), x.end());
-          }
-          daughters = tmpdaughters;
-        }
-        return 0.0;
+
+        return result;
       };
       return func;
     }

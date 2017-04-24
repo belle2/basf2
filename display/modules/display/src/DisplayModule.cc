@@ -10,6 +10,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Gearbox.h>
+#include <framework/core/Path.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
@@ -98,6 +99,8 @@ void DisplayModule::initialize()
   StoreArray<SectorTFInfo>::optional();
 
   m_display = new DisplayUI(m_automatic);
+  if (hasCondition())
+    m_display->allowFlaggingEvents(getCondition()->getPath()->getPathString());
   //pass some parameters to DisplayUI to be able to change them at run time
   m_display->addParameter("Show full geometry", getParam<bool>("fullGeometry"), 0);
   m_display->addParameter("Show MC info", getParam<bool>("showMCInfo"), 0);
@@ -130,6 +133,7 @@ void DisplayModule::initialize()
 
 void DisplayModule::event()
 {
+  setReturnValue(false);
   if (!gEve) {
     //window closed?
     B2WARNING("Display window closed, continuing with next module. (hit Ctrl+C to exit)");
@@ -274,6 +278,7 @@ void DisplayModule::event()
 
 
   bool reshow = m_display->startDisplay();
+  setReturnValue(m_display->getReturnValue());
   if (!m_display->cumulativeIsOn()) {
     m_visualizer->clearEvent(); //clean up internal state of visualiser
   }

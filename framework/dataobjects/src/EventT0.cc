@@ -21,16 +21,16 @@ std::pair<double, double> EventT0::getEventT0WithUncertainty(const Const::Detect
   bool found = false;
 
   for (const EventT0Component& component : m_eventT0List) {
-    if (detectorSet.getIndex(component.detector) != -1) {
+    if (detectorSet.getIndex(component.detector) != -1 and component.eventT0.isDoubleStored()) {
       found = true;
-      const double oneOverUncertaintySquared = 1 / component.eventT0UncertaintySquared;
-      eventT0WithUncertainty.first += component.eventT0  * oneOverUncertaintySquared;
+      const double oneOverUncertaintySquared = 1 / component.eventT0.getDoubleUncertaintySquared();
+      eventT0WithUncertainty.first += component.eventT0.getDoubleValue()  * oneOverUncertaintySquared;
       preFactor += oneOverUncertaintySquared;
     }
   }
 
   if (not found) {
-    B2ERROR("No EventT0 available for the given detector set. Returning 0, 0.");
+    B2ERROR("No double EventT0 available for the given detector set. Returning 0, 0.");
     return std::make_pair(0, 0);
   }
 
@@ -38,6 +38,18 @@ std::pair<double, double> EventT0::getEventT0WithUncertainty(const Const::Detect
   eventT0WithUncertainty.second = std::sqrt(1 / preFactor);
 
   return eventT0WithUncertainty;
+}
+
+int EventT0::getBinnedEventT0(const Const::DetectorSet& detectorSet) const
+{
+  for (const EventT0Component& component : m_eventT0List) {
+    if (detectorSet.getIndex(component.detector) != -1 and not component.eventT0.isDoubleStored()) {
+      return component.eventT0.getIntValue();
+    }
+  }
+
+  B2ERROR("No binned EventT0 available for the given detector set. Returning 0, 0.");
+  return 0;
 }
 
 Const::DetectorSet EventT0::getDetectors() const
@@ -55,6 +67,28 @@ bool EventT0::hasEventT0(const Const::DetectorSet& detectorSet) const
 {
   for (const EventT0Component& component : m_eventT0List) {
     if (detectorSet.getIndex(component.detector) != -1) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool EventT0::hasDoubleEventT0(const Const::DetectorSet& detectorSet) const
+{
+  for (const EventT0Component& component : m_eventT0List) {
+    if (detectorSet.getIndex(component.detector) != -1 and component.eventT0.isDoubleStored()) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool EventT0::hasBinnedEventT0(const Const::DetectorSet& detectorSet) const
+{
+  for (const EventT0Component& component : m_eventT0List) {
+    if (detectorSet.getIndex(component.detector) != -1 and not component.eventT0.isDoubleStored()) {
       return true;
     }
   }

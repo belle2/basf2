@@ -19,11 +19,13 @@ namespace Belle2 {
      * @param path path to file/directory, assuming it's installed locally
      *             (e.g. /data/geometry/Belle2.xml). Leading slash is not
      *             strictly required.
+     * @param silent If true, no error message is printed when file could
+     *             not be found.
      * @return absolute path to file in local directory, if it exists,
      *         otherwise abs. path to file in central release directory,
      *         or empty string if file wasn't found.
      */
-    static std::string findFile(const std::string& path);
+    static std::string findFile(const std::string& path, bool silent = false);
 
     /** Check if the file with given filename exists */
     static bool fileExists(const std::string& filename);

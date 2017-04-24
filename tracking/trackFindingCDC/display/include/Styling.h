@@ -23,6 +23,8 @@
 #include <memory>
 
 namespace Belle2 {
+  class RecoTrack;
+
   namespace TrackFindingCDC {
 
     /// Interface for a mapping of object and an index to styling attributes
@@ -187,6 +189,24 @@ namespace Belle2 {
       {
         this->set("stroke", makeUnique<DefaultColorCycleMapping<AObject>>());
       }
+    };
+
+    /**
+     * This Class handles the mapping from the colormapping-method name given as a string to the
+     * actual color mapping for RecoTrack.
+     */
+    class ChooseableRecoTrackStyling : public ChooseableStyling<const RecoTrack> {
+
+    private:
+      /// Type of the base class
+      using Super = ChooseableStyling<const RecoTrack>;
+
+      /// Mapping to be constructed
+      using Super::ObjectMapping;
+
+    public:
+      /// Method defining the available mapping names
+      std::unique_ptr<ObjectMapping> createMapping(const std::string& mappingName) override;
     };
 
     /**

@@ -10,19 +10,20 @@
 import basf2
 
 from simulation import add_simulation
-import os
-
 
 from softwaretrigger.path_functions import (
     setup_softwaretrigger_database_access,
     add_packers,
     add_unpackers,
-    add_softwaretrigger_reconstruction
+    add_softwaretrigger_reconstruction,
+    DEFAULT_HLT_COMPONENTS
 )
 
 setup_softwaretrigger_database_access()
 
 main_path = basf2.create_path()
+
+components = DEFAULT_HLT_COMPONENTS
 
 # generate Y4s event as test input to the reconstruction and filter chain
 
@@ -30,18 +31,18 @@ main_path = basf2.create_path()
 main_path.add_module("EventInfoSetter", evtNumList=[10])
 main_path.add_module("EvtGenInput")
 
-add_simulation(main_path)
-add_packers(main_path)
+add_simulation(main_path, components=components)
+add_packers(main_path, components=components)
 # SIMULATED HLT INPUT ENDS HERE
 
 # HLT Processing starts here
 
 # add the unpackers required on HLT
-add_unpackers(main_path)
+add_unpackers(main_path, components=components)
 # add HLT reconstruction and software trigger filter
 # remove 'store_array_debug_prescale' parameter, if you want the software trigger
 # to actually filter events and not write out their RAW objects
-add_softwaretrigger_reconstruction(main_path, store_array_debug_prescale=1)
+add_softwaretrigger_reconstruction(main_path, store_array_debug_prescale=1, components=components)
 # HLT Processing ends here
 
 main_path.add_module("RootOutput", outputFileName="output.root")

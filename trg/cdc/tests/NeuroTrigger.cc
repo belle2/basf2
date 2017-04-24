@@ -18,8 +18,10 @@ using namespace std;
 
 namespace TrgTest {
 
+  /** Test class for the NeuroTrigger */
   class NeuroTriggerTest : public TestHelpers::TestWithGearbox {
   protected:
+    /** set up the test environment */
     virtual void SetUp()
     {
       // Stolen from
@@ -30,6 +32,10 @@ namespace TrgTest {
       DataStore::Instance().setInitializeActive(true);
       evtPtr.registerInDataStore();
       StoreArray<CDCTriggerSegmentHit>::registerPersistent("CDCTriggerSegmentHits");
+      StoreArray<CDCTriggerTrack>::registerPersistent("CDCTriggerTracks");
+      StoreArray<CDCTriggerSegmentHit> hits;
+      StoreArray<CDCTriggerTrack> tracks;
+      tracks.registerRelationTo(hits);
       DataStore::Instance().setInitializeActive(false);
       evtPtr.construct(0, 0, 1);
 
@@ -46,9 +52,9 @@ namespace TrgTest {
       CDC::CDCGeometryPar::Instance(&cdcGeometry);
     }
 
+    /** Close the gearbox and reset the global objects */
     virtual void TearDown()
     {
-      // Close the gearbox and reset the global objects
       Database::reset();
       DataStore::Instance().reset();
     }
@@ -83,7 +89,8 @@ namespace TrgTest {
     neuroTrigger.initialize(p);
 
     // test track: phi = 0, no curvature
-    CDCTriggerTrack track;
+    StoreArray<CDCTriggerTrack> tracks("CDCTriggerTracks");
+    CDCTriggerTrack* track = tracks.appendNew();
     // list of test hits: 3 for each super layer with identical id and priority, but different LR and time
     vector<vector<CDCTriggerSegmentHit>> tsHitList;
     unsigned nTS = 0;
@@ -145,19 +152,20 @@ namespace TrgTest {
       tsHits.clear();
       for (unsigned iSL = 0; iSL < 9; ++iSL) {
         for (unsigned ihit = 0; ihit < nHitsPerSL[i][iSL]; ++ihit) {
-          tsHits.appendNew(tsHitList[iSL][ihit]);
+          CDCTriggerSegmentHit* hit = tsHits.appendNew(tsHitList[iSL][ihit]);
+          track->addRelationTo(hit);
         }
       }
       for (unsigned isector = 0; isector < p.nMLP; ++isector) {
         // check hit pattern
-        unsigned long hitPattern = neuroTrigger.getInputPattern(isector);
+        unsigned long hitPattern = neuroTrigger.getInputPattern(isector, *track);
         unsigned long sectorPattern = neuroTrigger[isector].getSLpattern();
         bool useForTrain = ((hitPattern & sectorPattern) == sectorPattern);
         bool useForTest = (hitPattern == sectorPattern);
         EXPECT_EQ(expectedUseForTrain[isector][i], useForTrain) << "sector " << isector << " hitPattern " << hitPattern;
         EXPECT_EQ(expectedUseForTest[isector][i], useForTest) << "sector " << isector << " hitPattern " << hitPattern;
         // check number of selected hits
-        vector<unsigned> hitIndices = neuroTrigger.selectHits(isector);
+        vector<unsigned> hitIndices = neuroTrigger.selectHits(isector, *track);
         vector<unsigned> selectedHitsPerSL(9, 0);
         for (unsigned ii = 0; ii < hitIndices.size(); ++ii) {
           ++selectedHitsPerSL[tsHits[hitIndices[ii]]->getISuperLayer()];

@@ -129,7 +129,7 @@ if __name__ == "__main__":
     path = basf2.create_path()
 
     # Take the output of the __init__.py script
-    path.add_module("RootInput", inputFileName="output.root")
+    path.add_module("SeqRootInput", inputFileName="raw.sroot")
 
     path.add_module(SummarizeTriggerResults())
     path.add_module(SummarizeTriggerVariables())

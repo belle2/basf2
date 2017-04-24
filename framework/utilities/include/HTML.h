@@ -15,22 +15,31 @@ namespace Belle2 {
   namespace HTML {
     /** get HTML table representing a matrix.
      *
+     * @param matrix The matrix to be represented
+     * @param precision The amount of significant digits to use
      * @param color If true, vary background colour depending on value.
      */
     std::string getString(const TMatrixFBase& matrix, int precision = 2, bool color = true);
 
     /** get HTML table representing a matrix (double precision).
      *
+     * @param matrix The matrix to be represented
+     * @param precision The amount of significant digits to use
      * @param color If true, vary background colour depending on value.
      */
     std::string getString(const TMatrixDBase& matrix, int precision = 2, bool color = true);
 
-    /** get a string with vector coordinates: (x, y, z). (uses fixed-length output). */
+    /** get a string with vector coordinates: (x, y, z). (uses fixed-length output).
+     * @param vec the vector to be printend
+     * @param precision The amount of digits to use
+     */
     std::string getString(const TVector3& vec, int precision = 2);
 
     /** get a string with vector coordinates: (x, y, z). (uses fixed-length output).
      * converts floating point value from standard framework unit to given unit.
      *
+     * @param vec the vector to be printend
+     * @param precision The amount of digits to use
      * @param unitType Defines the unit to convert the vector values from standard framework unit.
      */
     std::string getStringConvertToUnit(const TVector3& vec, int precision = 2,

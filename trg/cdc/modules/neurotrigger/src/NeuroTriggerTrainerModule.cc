@@ -56,8 +56,9 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
            "Name of the root file where the generated training samples will be saved.",
            string("NeuroTrigger.root"));
   addParam("logFilename", m_logFilename,
-           "Name of the text file where the training logs will be saved "
-           "(one for each sector, named logFilename_i.log).",
+           "Base name of the text files where the training logs will be saved "
+           "(two for each sector, named logFilename_BestRun_i.log "
+           "and logFilename_AllOptima_i.log).",
            string("NeuroTrigger"));
   addParam("arrayname", m_arrayname,
            "Name of the TObjArray to hold the NeuroTrigger parameters.",
@@ -212,11 +213,12 @@ void NeuroTriggerTrainerModule::initialize()
     if (m_IDranges.size() == 1 || m_IDranges.size() == m_NeuroTrigger.nSectors()) {
       B2DEBUG(50, "Setting relevant ID ranges from parameters.");
       for (unsigned isector = 0; isector < m_NeuroTrigger.nSectors(); ++isector) {
-        if (m_IDranges[isector].size() == 18)
-          m_NeuroTrigger[isector].relevantID = m_IDranges[isector];
+        unsigned iranges = (m_IDranges.size() == 1) ? 0 : isector;
+        if (m_IDranges[iranges].size() == 18)
+          m_NeuroTrigger[isector].relevantID = m_IDranges[iranges];
         else
           B2ERROR("IDranges must contain 18 values (sector " << isector
-                  << " has " << m_IDranges[isector].size() << ")");
+                  << " has " << m_IDranges[iranges].size() << ")");
       }
       if (m_nTrainPrepare > 0)
         B2WARNING("Given ID ranges will be replaced during training. "
@@ -331,7 +333,7 @@ void NeuroTriggerTrainerModule::event()
           continue;
         }
         // check hit pattern
-        unsigned long hitPattern = m_NeuroTrigger.getInputPattern(isector);
+        unsigned long hitPattern = m_NeuroTrigger.getInputPattern(isector, *tracks[itrack]);
         unsigned long sectorPattern = m_NeuroTrigger[isector].getSLpattern();
         B2DEBUG(250, "hitPattern " << hitPattern << " sectorPattern " << sectorPattern);
         if (sectorPattern > 0 && (sectorPattern & hitPattern) != sectorPattern) {
@@ -339,7 +341,7 @@ void NeuroTriggerTrainerModule::event()
           continue;
         }
         // get training data
-        vector<unsigned> hitIds = m_NeuroTrigger.selectHits(isector);
+        vector<unsigned> hitIds = m_NeuroTrigger.selectHits(isector, *tracks[itrack]);
         m_trainSets[isector].addSample(m_NeuroTrigger.getInputVector(isector, hitIds), target);
         if (m_saveDebug) {
           phiHistsMC[isector]->Fill(mcTrack->getMomentum().Phi());
@@ -523,8 +525,12 @@ void NeuroTriggerTrainerModule::train(unsigned isector)
   fann_set_activation_function_output(ann, FANN_SIGMOID_SYMMETRIC);
   fann_set_training_algorithm(ann, FANN_TRAIN_RPROP);
   double bestRMS = 999.;
+  // keep full train error curve for best run
   vector<double> bestTrainLog = {};
   vector<double> bestValidLog = {};
+  // keep train error of optimum for all runs
+  vector<double> trainOptLog = {};
+  vector<double> validOptLog = {};
   // repeat training several times with different random start weights
   for (int irun = 0; irun < m_repeatTrain; ++irun) {
     double bestValid = 999.;
@@ -533,6 +539,7 @@ void NeuroTriggerTrainerModule::train(unsigned isector)
     trainLog.assign(m_maxEpochs, 0.);
     validLog.assign(m_maxEpochs, 0.);
     int breakEpoch = 0;
+    int bestEpoch = 0;
     vector<fann_type> bestWeights = {};
     bestWeights.assign(m_NeuroTrigger[isector].nWeights(), 0.);
     fann_randomize_weights(ann, -0.1, 0.1);
@@ -558,6 +565,7 @@ void NeuroTriggerTrainerModule::train(unsigned isector)
         for (unsigned iw = 0; iw < ann->total_connections; ++iw) {
           bestWeights[iw] = ann->weights[iw];
         }
+        bestEpoch = epoch;
       }
       // break when validation error increases
       if (epoch > m_checkInterval && valid_mse > validLog[epoch - m_checkInterval]) {
@@ -573,6 +581,12 @@ void NeuroTriggerTrainerModule::train(unsigned isector)
                ", valid error = " << valid_mse << ", best valid = " << bestValid);
       }
     }
+    if (breakEpoch == 0) {
+      B2INFO("Training run " << irun << " finished in epoch " << m_maxEpochs);
+      breakEpoch = m_maxEpochs;
+    }
+    trainOptLog.push_back(trainLog[bestEpoch - 1]);
+    validOptLog.push_back(validLog[bestEpoch - 1]);
     // test trained network
     vector<float> oldWeights = m_NeuroTrigger[isector].getWeights();
     m_NeuroTrigger[isector].weights = bestWeights;
@@ -608,11 +622,18 @@ void NeuroTriggerTrainerModule::train(unsigned isector)
   }
   // save training log
   if (m_saveDebug) {
-    ofstream logstream(m_logFilename + "_" + to_string(isector) + ".log");
+    // full error curve for best run
+    ofstream logstream(m_logFilename + "_BestRun_" + to_string(isector) + ".log");
     for (unsigned i = 0; i < bestTrainLog.size(); ++i) {
       logstream << bestTrainLog[i] << " " << bestValidLog[i] << endl;
     }
     logstream.close();
+    // training optimum for all runs
+    ofstream logstreamOpt(m_logFilename + "_AllOptima_" + to_string(isector) + ".log");
+    for (unsigned i = 0; i < trainOptLog.size(); ++i) {
+      logstreamOpt << trainOptLog[i] << " " << validOptLog[i] << endl;
+    }
+    logstreamOpt.close();
   }
   // free memory
   fann_destroy_train(train_data);

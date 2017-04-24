@@ -31,15 +31,19 @@ namespace Belle2 {
    * See DBStore::m_dbEntryMap.
    */
   struct DBEntry {
-    DBEntry() : package(""), module(""), objClass(0), isArray(false), object(0), intraRunDependency(0) {};
-
-    std::string package; /**< Package name of the entry in the database. Equal to the key in the first map. **/
-    std::string module; /**< Module name of the entry in the database. Equal to the key in the second map. **/
-    const TClass* objClass;   /**< type of the object **/
-    bool isArray;   /**< flag indicating that the object is a TClonesArray **/
-    TObject* object;   /**< pointer to the currently valid object that was returned from the database. **/
-    IntervalOfValidity iov;   /**< the interval of validity of the object. **/
-    IntraRunDependency* intraRunDependency;   /**< conditions data for cases where it changes during a run. **/
-    DBCallbackMap callbackFunctions;   /**< map of identifiers to callback functions. **/
+    /** Name of the entry in the database. Equal to the key in the map */
+    std::string name{""};
+    /** type of the object */
+    const TClass* objClass {nullptr};
+    /** flag indicating that the object is a TClonesArray */
+    bool isArray{false};
+    /** pointer to the currently valid object that was returned from the database. */
+    TObject* object{nullptr};
+    /** the interval of validity of the object. */
+    IntervalOfValidity iov;
+    /** conditions data for cases where it changes during a run. */
+    IntraRunDependency* intraRunDependency{nullptr};
+    /** map of identifiers to callback functions. */
+    DBCallbackMap callbackFunctions;
   };
 }

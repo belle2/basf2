@@ -60,6 +60,7 @@ namespace Belle2 {
     ValueList m_value_m;
     std::vector<std::string> m_label_v;
     std::string m_dir;
+    std::map<std::string, int> m_count;
 
   };
 

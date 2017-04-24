@@ -52,17 +52,19 @@ KLMTriggerModule::KLMTriggerModule() : Module()
   addParam("MinLayers", m_minLayers,
            "Minimum number of fired layers for a track",
            int(10));
+  addParam("TrgKLMTracks", m_klmtrackCollectionName, "Name of the StoreArray holding the track list", string("TRGKLMTracks"));
+  addParam("TrgKLMHits", m_klmhitCollectionName, "Name of the StoreArray holding the hit list", string("TRGKLMHits"));
 }
 
 void KLMTriggerModule::initialize()
 {
   StoreArray<BKLMDigit> bklmDigits;
 
-  StoreArray<KLMTriggerHit> klmTriggerHits;
+  StoreArray<KLMTriggerHit> klmTriggerHits(m_klmhitCollectionName);
   klmTriggerHits.registerInDataStore();
   klmTriggerHits.registerRelationTo(bklmDigits);
 
-  StoreArray<KLMTriggerTrack> klmTriggerTracks;
+  StoreArray<KLMTriggerTrack> klmTriggerTracks(m_klmtrackCollectionName);
   klmTriggerTracks.registerInDataStore();
   klmTriggerTracks.registerRelationTo(klmTriggerHits);
 }
@@ -95,7 +97,7 @@ void KLMTriggerModule::fillHits()
   if (!bklmDigits.isValid())
     return;
 
-  StoreArray<KLMTriggerHit> klmTriggerHits;
+  StoreArray<KLMTriggerHit> klmTriggerHits(m_klmhitCollectionName);
 
   int nEntries = bklmDigits.getEntries();
   for (int i = 0; i < nEntries; ++i) {
@@ -151,7 +153,7 @@ void KLMTriggerModule::fillTracks()
   if (!klmTriggerHits.isValid())
     return;
 
-  StoreArray<KLMTriggerTrack> klmTriggerTracks;
+  StoreArray<KLMTriggerTrack> klmTriggerTracks(m_klmtrackCollectionName);
 
   std::unordered_map<int, KLMTriggerTrack*> trackMap;
 
@@ -585,9 +587,7 @@ void KLMTriggerModule::geometryConverter(bool fwd, int sector, int layer, int ph
     dz = 0;
 
   y  = c_LayerY0[layer] + dy + phiStrip * c_PhiWidth[layer];
-  if (!flipped)
-    y = y;
-  else
+  if (flipped)
     y = -y;
 
   z  = z0 + dz + zStrip * zWidth;
@@ -598,5 +598,5 @@ void KLMTriggerModule::geometryConverter(bool fwd, int sector, int layer, int ph
 
   x      = c_LayerXCoord[layer];
   y      = y >> 2; // y values are defined in 1/32 cm here, round up to 1/8 cm
-  z      = z;
+//z      = z;
 }

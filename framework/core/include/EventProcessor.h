@@ -105,6 +105,7 @@ namespace Belle2 {
 
     /** Calls event() functions on all modules for the current event. Used by processCore.
      *
+     * @param moduleIter iterator of the path containing all the modules
      * @param skipMasterModule skip the execution of the master module,
      * presumably because this is the first event and it's already been done in
      * initialize()

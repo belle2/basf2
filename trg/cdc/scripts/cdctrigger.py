@@ -5,9 +5,16 @@ from basf2 import *
 from ROOT import Belle2
 
 
-def add_cdc_trigger(path):
+def add_cdc_trigger(path, SimulationMode=1, minHits=4):
     """
     This function adds the CDC trigger modules to a path.
+    @path              modules are added to this path
+    @SimulationMode    the simulation mode in TSIM, 1: fast simulation,
+                       trigger algoritm simulation only, no firmware simulation
+                       2: full simulation, both trigger algorithm and firmware
+                       are simulated
+    @minHits           the minimum number of  super layers with hits, the default
+                       values is 4
     """
 
     # standard CDC trigger
@@ -18,13 +25,20 @@ def add_cdc_trigger(path):
         'OuterTSLUTFile': Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_v3.0.coe"),
         'HoughFinderMappingFileMinus': Belle2.FileSystem.findFile("data/trg/cdc/HoughMappingMinus20160223.dat"),
         'HoughFinderMappingFilePlus': Belle2.FileSystem.findFile("data/trg/cdc/HoughMappingPlus20160223.dat"),
-        '2DfinderCollection': 'TrgOld2DFinderTracks'}
+        'SimulationMode': SimulationMode,
+        '2DfinderCollection': 'TRGOld2DFinderTracks',
+        '2DfitterCollection': 'TRG2DFitterTracks',
+        '3DfitterCollection': 'TRG3DFitterTracks'}
     trgcdc.param(trgcdc_params)
     path.add_module(trgcdc)
     # new 2D finder
     hough = register_module('CDCTriggerHoughtracking')
+    hough.param('outputCollection', 'TRG2DFinderTracks')
+    hough.param('minHits', minHits)
     path.add_module(hough)
     # neurotrigger
     neuro = register_module('NeuroTrigger')
+    neuro.param('inputCollection', 'TRG2DFinderTracks')
+    neuro.param('outputCollection', 'TRGNNTracks')
     neuro.param('filename', Belle2.FileSystem.findFile("data/trg/cdc/Neuro20170109.root"))
     path.add_module(neuro)

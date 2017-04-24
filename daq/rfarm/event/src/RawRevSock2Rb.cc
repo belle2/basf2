@@ -43,8 +43,8 @@ int RawRevSock2Rb::ReceiveEvent(void)
   for (;;) {
     stat = m_rbuf->insq(m_buf, bufsize);
     if (stat >= 0) break;
-    usleep(100);
-    //    usleep(20);
+    //    usleep(100);
+    usleep(20);
   }
   return stat;
 }

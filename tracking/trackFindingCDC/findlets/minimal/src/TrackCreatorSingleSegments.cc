@@ -40,31 +40,38 @@ void TrackCreatorSingleSegments::apply(const std::vector<CDCSegment2D>& segments
   // Create tracks from left over segments
   // First figure out which segments do not share any hits with any of the given tracks
   // (if the tracks vector is empty this is the case for all segments)
+  const bool toHits = true;
   for (const CDCSegment2D& segment : segments) {
-    segment.unsetAndForwardMaskedFlag();
+    segment.unsetAndForwardMaskedFlag(toHits);
   }
 
   for (const CDCTrack& track : tracks) {
-    track.unsetAndForwardMaskedFlag();
+    track.setAndForwardMaskedFlag();
   }
 
   for (const CDCSegment2D& segment : segments) {
-    segment.receiveMaskedFlag();
+    segment.receiveMaskedFlag(toHits);
   }
 
   if (not m_param_minimalHitsBySuperLayerId.empty()) {
     for (const CDCSegment2D& segment : segments) {
-      if (segment->hasMaskedFlag()) continue;
-
+      if (segment->hasMaskedFlag()) {
+        int nMasked = 0;
+        for (const CDCRecoHit2D& recoHit2D : segment) {
+          if (recoHit2D.getWireHit()->hasMaskedFlag()) ++nMasked;
+        }
+        // Relaxed requirement of only 20% of hits masked by other tracks
+        if (nMasked > segment.size() * 0.2) continue;
+      }
       ISuperLayer iSuperLayer = segment.getISuperLayer();
       if (m_param_minimalHitsBySuperLayerId.count(iSuperLayer) and
           segment.size() >= m_param_minimalHitsBySuperLayerId[iSuperLayer]) {
 
         if (segment.getTrajectory2D().isFitted()) {
           tracks.push_back(CDCTrack(segment));
-          segment.setAndForwardMaskedFlag();
+          segment.setAndForwardMaskedFlag(toHits);
           for (const CDCSegment2D& otherSegment : segments) {
-            otherSegment.receiveMaskedFlag();
+            otherSegment.receiveMaskedFlag(toHits);
           }
         }
       }

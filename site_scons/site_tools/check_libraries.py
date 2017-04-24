@@ -61,7 +61,7 @@ def get_package(env, node):
 def print_libs(title, text, pkg, lib, libs):
     """Print information on extra/missing libraries"""
     for l in sorted(libs):
-        print "%s:%s:%s -> %s (%s)" % (title, pkg, os.path.basename(lib), l, text)
+        print "%s:%s:%s -> %s (%s)" % (title, pkg, lib, l, text)
 
 
 def check_libraries(target, source, env):
@@ -86,10 +86,15 @@ def check_libraries(target, source, env):
                 # it to. Skip for now
                 if os.path.basename(node.get_abspath()) == "libdataobjects.so":
                     continue
+                fullname = str(node)
+                name = os.path.basename(fullname)
+                # is it in a modules directory? if so add it to the name
+                if "modules" in fullname.split(os.path.sep):
+                    name = "modules/" + name
                 # find out which package the file belongs to
                 pkg = get_package(env, node)
                 # and add lib to the list of libraries
-                libraries.append((pkg, os.path.basename(str(node)), node))
+                libraries.append((pkg, name, node))
 
     # now we have them sorted, go through the list
     for pkg, lib, node in sorted(libraries):
@@ -133,11 +138,11 @@ def check_libraries(target, source, env):
         # simple set operations
         if GetOption("libcheck_extra"):
             extra = given_internal - needed_internal
-            print_libs("LIB_EXTRA", "dependency not needed and can be removed from SConscript", pkg, str(node), extra)
+            print_libs("LIB_EXTRA", "dependency not needed and can be removed from SConscript", pkg, lib, extra)
 
         if GetOption("libcheck_missing"):
             missing = needed_internal - given_internal
-            print_libs("LIB_MISSING", "library needed directly, please add to SConscript", pkg, str(node), missing)
+            print_libs("LIB_MISSING", "library needed directly, please add to SConscript", pkg, lib, missing)
 
     print "*** finished checking library dependencies"
 

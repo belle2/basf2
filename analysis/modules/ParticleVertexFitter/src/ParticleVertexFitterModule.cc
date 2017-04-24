@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Luigi Li Gioi, Anze Zupanc                 *
+ * Contributors: Marko Staric, Luigi Li Gioi, Anze Zupanc Yu Hu           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -132,7 +132,6 @@ namespace Belle2 {
     for (unsigned i = 0; i < n; i++) {
       Particle* particle = plist->getParticle(i);
 
-      //particle->print();
       if (m_updateDaughters == true) {
         if (m_decayString.empty()) ParticleCopy::copyDaughters(particle);
         else B2ERROR("Daughters update works only when all daughters are selected. Daughters will not be updated");
@@ -212,10 +211,20 @@ namespace Belle2 {
         }
       }
 
+      // four C fit
+      if (m_fitType == "fourC") {
+        if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut") {
+          B2FATAL("ParticleVertexFitter: Invalid options - four C fit using kfitter does not work with iptube or ipprofile constraint.");
+        } else {
+          ok = doKFourCFit(mother);
+        }
+      }
+
       // invalid KFitter fit type
       if (m_fitType != "vertex"
           && m_fitType != "massvertex"
-          && m_fitType != "mass")
+          && m_fitType != "mass"
+          && m_fitType != "fourC")
         B2FATAL("ParticleVertexFitter: " << m_fitType << " ***invalid fit type for the Kfitter ");
     }
 
@@ -516,6 +525,38 @@ namespace Belle2 {
     return ok;
   }
 
+  bool ParticleVertexFitterModule::doKFourCFit(Particle* mother)
+  {
+    if (mother->getNDaughters() < 2) return false;
+
+    analysis::FourCFitKFit kf;
+    kf.setMagneticField(m_Bfield);
+
+    for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
+      const Particle* child = mother->getDaughter(ichild);
+
+      if (child->getNDaughters() > 0) {
+        bool err = addChildofParticletoKfitter(kf, child);
+        if (!err) return false;
+      } else {
+        if (child->getPValue() < 0) return false; // error matrix not valid
+
+        addParticleToKfitter(kf, child);
+      }
+    }
+
+    // apply mass constraint
+    kf.setFourMomentum(m_beamParams->getHER() + m_beamParams->getLER());
+
+    int err = kf.doFit();
+
+    if (err != 0) return false;
+
+    bool ok = makeKFourCMother(kf, mother);
+
+    return ok;
+  }
+
 
   bool ParticleVertexFitterModule::makeKVertexMother(analysis::VertexFitKFit& kv,
                                                      Particle* mother)
@@ -605,6 +646,7 @@ namespace Belle2 {
 
     return true;
   }
+
 
 
   bool ParticleVertexFitterModule::makeKMassVertexMother(analysis::MassVertexFitKFit& kmv,
@@ -787,6 +829,126 @@ namespace Belle2 {
     return true;
   }
 
+
+
+  bool ParticleVertexFitterModule::makeKFourCMother(analysis::FourCFitKFit& kf, Particle* mother)
+  {
+
+    analysis::MakeMotherKFit kmm;
+    kmm.setMagneticField(m_Bfield);
+
+    unsigned n = kf.getTrackCount();
+    for (unsigned i = 0; i < n; ++i) {
+      kmm.addTrack(kf.getTrackMomentum(i),
+                   kf.getTrackPosition(i),
+                   kf.getTrackError(i),
+                   kf.getTrack(i).getCharge());
+
+      if (kf.getFlagFitWithVertex()) kmm.setTrackVertexError(kf.getTrackVertexError(i));
+
+      for (unsigned j = i + 1; j < n; ++j) {
+        kmm.setCorrelation(kf.getCorrelation(i, j));
+      }
+    }
+
+    kmm.setVertex(kf.getVertex());
+    if (kf.getFlagFitWithVertex())
+      kmm.setVertexError(kf.getVertexError());
+
+    int err = kmm.doMake();
+    if (err != 0) return false;
+
+    TLorentzVector mom(kmm.getMotherMomentum().px(),
+                       kmm.getMotherMomentum().py(),
+                       kmm.getMotherMomentum().pz(),
+                       kmm.getMotherMomentum().e());
+
+    TVector3 pos(kmm.getMotherPosition().x(),
+                 kmm.getMotherPosition().y(),
+                 kmm.getMotherPosition().z());
+
+    CLHEP::HepSymMatrix covMatrix = kmm.getMotherError();
+
+    TMatrixFSym errMatrix(7);
+    for (int i = 0; i < 7; i++) {
+      for (int j = 0; j < 7; j++) {
+        errMatrix[i][j] = covMatrix[i][j];
+      }
+    }
+
+    double chi2 = kf.getCHIsq();
+    int ndf = kf.getNDF();
+    double prob = TMath::Prob(chi2, ndf);
+
+    mother->updateMomentum(mom, pos, errMatrix, prob);
+
+    if (m_decayString.empty() && m_updateDaughters == true) {
+      // update daughter moenta as well
+      // the order of daughters in the *fitter is the same as in the mother Particle
+
+      std::vector<Particle*> daughters = mother->getDaughters();
+
+      const unsigned nd = daughters.size();
+      unsigned l = 0;
+      std::vector<unsigned> u[nd];
+      for (unsigned ichild = 0; ichild < nd; ichild++) {
+        const Particle* daughter = mother->getDaughter(ichild);
+        if (daughter->getNDaughters() > 0) {
+          updateMapofTrackandDaughter(u[ichild], l, daughter);
+        } else {
+          u[ichild].push_back(l);
+          l++;
+        }
+      }
+
+      unsigned n = kf.getTrackCount();
+      if (l != n)
+        return false;
+
+      for (unsigned iDaug = 0; iDaug < nd; iDaug++) {
+        TLorentzVector childMoms;
+        TVector3 childPoss;
+        TMatrixFSym childErrMatrixs(7);
+        for (unsigned iChild = 0; iChild < u[iDaug].size(); iChild++) {
+          TLorentzVector childMom(kf.getTrackMomentum(u[iDaug][iChild]).px(),
+                                  kf.getTrackMomentum(u[iDaug][iChild]).py(),
+                                  kf.getTrackMomentum(u[iDaug][iChild]).pz(),
+                                  kf.getTrackMomentum(u[iDaug][iChild]).e());
+          childMoms = childMoms + childMom;
+
+          TVector3 childPos(kf.getTrackPosition(u[iDaug][iChild]).x(),
+                            kf.getTrackPosition(u[iDaug][iChild]).y(),
+                            kf.getTrackPosition(u[iDaug][iChild]).z());
+          childPoss = childPoss + childPos;
+
+          CLHEP::HepSymMatrix childCovMatrix = kf.getTrackError(u[iDaug][iChild]);
+
+          TMatrixFSym childErrMatrix(7);
+          for (int i = 0; i < 7; i++) {
+            for (int j = 0; j < 7; j++) {
+              childErrMatrix[i][j] = childCovMatrix[i][j];
+            }
+          }
+          childErrMatrixs = childErrMatrixs + childErrMatrix;
+        }
+        daughters[iDaug]->set4Vector(childMoms);
+        daughters[iDaug]->setVertex(childPoss);
+        daughters[iDaug]->setMomentumVertexErrorMatrix(childErrMatrixs);
+      }
+    }
+
+    return true;
+  }
+
+  void ParticleVertexFitterModule::updateMapofTrackandDaughter(std::vector<unsigned>& ui, unsigned& l, const Particle* daughter)
+  {
+    for (unsigned ichild = 0; ichild < daughter->getNDaughters(); ichild++) {
+      const Particle* child = daughter->getDaughter(ichild);
+      if (child->getNDaughters() > 0) updateMapofTrackandDaughter(ui, l, child);
+      else  ui.push_back(l);
+      l++;
+    }
+  }
 
 
   bool ParticleVertexFitterModule::doRaveFit(Particle* mother)
@@ -1002,6 +1164,30 @@ namespace Belle2 {
 
     km.addTrack(mom, pos, err, particle->getCharge());
   }
+
+  void ParticleVertexFitterModule::addParticleToKfitter(analysis::FourCFitKFit& kf, const Particle* particle)
+  {
+    CLHEP::HepLorentzVector mom = getCLHEPLorentzVector(particle);
+    HepPoint3D              pos = getCLHEPPoint3D(particle);
+    CLHEP::HepSymMatrix     err = getCLHEPSymMatrix(particle);
+
+    kf.addTrack(mom, pos, err, particle->getCharge());
+  }
+
+  bool ParticleVertexFitterModule::addChildofParticletoKfitter(analysis::FourCFitKFit& kf, const Particle* particle)
+  {
+    for (unsigned ichild = 0; ichild < particle->getNDaughters(); ichild++) {
+      const Particle* child = particle->getDaughter(ichild);
+      if (child->getNDaughters() > 0) addChildofParticletoKfitter(kf, child);
+      else {
+        if (child->getPValue() < 0) return false; // error matrix not valid
+
+        addParticleToKfitter(kf, child);
+      }
+    }
+    return true;
+  }
+
 
   CLHEP::HepLorentzVector ParticleVertexFitterModule::getCLHEPLorentzVector(const Particle* particle)
   {

@@ -253,6 +253,8 @@ namespace Belle2 {
     void GeoCache::setupReconstructionTransformations()
     {
       DBObjPtr<VXDAlignment> vxdAlignments;
+      if (!vxdAlignments.isValid())
+        B2FATAL("No VXD alignment data.");
       /**
       So the hierarchy is as follows:
                   Belle 2

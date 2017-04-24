@@ -113,33 +113,34 @@ int main(int argc, char* argv[])
 
     prog::options_description generic("Generic options (to be used instead of steering file)");
     generic.add_options()
-    ("help,h", "print this help")
-    ("version,v", "print version string")
-    ("info", "print information about basf2")
+    ("help,h", "Print this help")
+    ("version,v", "Print version string")
+    ("info", "Print information about basf2")
     ("modules,m", prog::value<string>()->implicit_value(""),
-     "print a list of all available modules (can be limited to a given package), or give detailed information on a specific module given as an argument (case sensitive).")
+     "Print a list of all available modules (can be limited to a given package), or give detailed information on a specific module given as an argument (case sensitive).")
     ;
 
     prog::options_description config("Configuration");
     config.add_options()
-    ("steering", prog::value<string>(), "the python steering file")
-    ("arg", prog::value<vector<string> >(&arguments), "additional arguments to be passed to the steering file")
+    ("steering", prog::value<string>(), "The python steering file to run.")
+    ("arg", prog::value<vector<string> >(&arguments), "Additional arguments to be passed to the steering file")
     ("log_level,l", prog::value<string>(),
-     "set global log level (one of DEBUG, INFO, RESULT, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
-    ("events,n", prog::value<unsigned int>(), "override number of events for EventInfoSetter; otherwise set maximum number of events.")
-    ("run", prog::value<int>(), "override run for EventInfoSetter, must be used with -n and --experiment")
-    ("experiment", prog::value<int>(), "override experiment for EventInfoSetter, must be used with -n and --run")
+     "Set global log level (one of DEBUG, INFO, RESULT, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
+    ("events,n", prog::value<unsigned int>(), "Override number of events for EventInfoSetter; otherwise set maximum number of events.")
+    ("run", prog::value<int>(), "Override run for EventInfoSetter, must be used with -n and --experiment")
+    ("experiment", prog::value<int>(), "Override experiment for EventInfoSetter, must be used with -n and --run")
     ("skip-events", prog::value<unsigned int>(),
-     "override skipNEvents for EventInfoSetter and RootInput. Skips this many events before starting.")
+     "Override skipNEvents for EventInfoSetter and RootInput. Skips this many events before starting.")
     ("input,i", prog::value<vector<string> >(),
-     "override name of input file for (Seq)RootInput. Can be specified multiple times to use more than one file. For RootInput, wildcards (as in *.root or [1-3].root) can be used, but need to be escaped with \\  or by quoting the argument to avoid expansion by the shell.")
+     "Override name of input file for (Seq)RootInput. Can be specified multiple times to use more than one file. For RootInput, wildcards (as in *.root or [1-3].root) can be used, but need to be escaped with \\  or by quoting the argument to avoid expansion by the shell.")
     ("sequence,S", prog::value<vector<string> >(),
-     "override the number sequence (e.g. 23:42,101) defining the entries (starting from 0) which are processed by RootInput."
+     "Override the number sequence (e.g. 23:42,101) defining the entries (starting from 0) which are processed by RootInput."
      "Must be specified exactly once for each file to be opened."
      "This means one sequence per input file AFTER wildcard expansion."
      "The first event has the number 0.")
-    ("output,o", prog::value<string>(), "override name of output file for (Seq)RootOutput")
-    ("processes,p", prog::value<int>(), "override number of worker processes (>=1 enables, 0 disables parallel processing)");
+    ("output,o", prog::value<string>(),
+     "Override name of output file for (Seq)RootOutput. In case multiple modules are present in the path, only the first will be affected.")
+    ("processes,p", prog::value<int>(), "Override number of worker processes (>=1 enables, 0 disables parallel processing)");
 
     prog::options_description advanced("Advanced Options");
     advanced.add_options()
@@ -178,7 +179,7 @@ int main(int argc, char* argv[])
       cout << cmdlineOptions << endl;
       return 0;
     } else if (varMap.count("version")) {
-      pythonFile = "version.py";
+      pythonFile = "basf2_version.py";
     } else if (varMap.count("info")) {
       pythonFile = "info.py";
     } else if (varMap.count("modules")) {
@@ -356,7 +357,7 @@ int main(int argc, char* argv[])
   if (!pythonFile.empty()) {
     //Search in local or central lib/ if this isn't a direct path
     if (!boost::filesystem::exists(pythonFile)) {
-      std::string libFile = FileSystem::findFile((libPath / pythonFile).string());
+      std::string libFile = FileSystem::findFile((libPath / pythonFile).string(), true);
       if (!libFile.empty())
         pythonFile = libFile;
     }

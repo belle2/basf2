@@ -15,6 +15,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 
+#include <TROOT.h>
 #include <signal.h>
 
 #include <cstdio>
@@ -94,6 +95,9 @@ bool LogSystem::sendMessage(LogMessage message)
     //this avoids a problem seen in ROOT's atexit() handler, which might crash
     //and then deadlock the process in the SIGSEGV handler...
     signal(SIGSEGV, nullptr);
+
+    //ROOT will also try to do this, but doesn't get the order right.
+    gROOT->CloseFiles();
     exit(1);
   }
 
@@ -177,30 +181,40 @@ void LogSystem::printErrorSummary()
   if (numLines == 0)
     return; //nothing to do
 
+  // save configuration
   const LogConfig oldConfig = m_logConfig;
-  m_logConfig.setAbortLevel(LogConfig::c_Default); //prevent calling printErrorSummary() again when printing
+  // and make sure module configuration is bypassed, otherwise changing the settings in m_logConfig would be ignored
+  const LogConfig* oldModuleConfig {nullptr};
+  std::swap(m_moduleLogConfig, oldModuleConfig);
+  // similar for package configuration
+  map<string, LogConfig> oldPackageConfig;
+  std::swap(m_packageLogConfigs, oldPackageConfig);
+  // prevent calling printErrorSummary() again when printing
+  m_logConfig.setAbortLevel(LogConfig::c_Default);
 
   // only show level & message
+  m_logConfig.setLogInfo(LogConfig::c_Info, LogConfig::c_Level | LogConfig::c_Message);
   m_logConfig.setLogInfo(LogConfig::c_Warning, LogConfig::c_Level | LogConfig::c_Message);
   m_logConfig.setLogInfo(LogConfig::c_Error, LogConfig::c_Level | LogConfig::c_Message);
+  m_logConfig.setLogInfo(LogConfig::c_Fatal, LogConfig::c_Level | LogConfig::c_Message);
   m_logConfig.setLogLevel(LogConfig::c_Info);
 
   B2INFO("================================================================================");
   B2INFO("Error summary: " << numLogError << " errors and " << numLogWarn << " warnings occurred.");
 
 
-  //start with 100 entries in hash map
+  // start with 100 entries in hash map
   std::function<size_t (const LogMessage&)> hashFunction = &hash;
   std::unordered_map<LogMessage, int, decltype(hashFunction)> errorCount(100, hashFunction);
 
-  //log in chronological order, with repetitions removed
+  // log in chronological order, with repetitions removed
   std::vector<LogMessage> uniqueLog;
   uniqueLog.reserve(100);
 
   for (const LogMessage& msg : m_errorLog) {
     int count = errorCount[msg]++;
 
-    if (count == 0) //this is the first time we see this message
+    if (count == 0) // this is the first time we see this message
       uniqueLog.push_back(msg);
   }
   m_errorLog.clear(); // only do this once (e.g. not again when used through python)
@@ -218,7 +232,10 @@ void LogSystem::printErrorSummary()
     B2WARNING("Note: The error log was truncated to " << c_errorSummaryMaxLines << " messages");
   }
 
+  // restore old configuration
   m_logConfig = oldConfig;
+  std::swap(m_moduleLogConfig, oldModuleConfig);
+  std::swap(m_packageLogConfigs, oldPackageConfig);
 }
 
 LogSystem::~LogSystem()

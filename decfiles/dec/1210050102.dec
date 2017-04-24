@@ -1,0 +1,69 @@
+# EventType: 1210050102
+# Descriptor: Y(4S) -> B+ B-
+#                     [B+ -> (pi+ pi- ) (K*(892)+ -> K0s pi+)]
+#                      B- -> anything
+# NickName: Bu_Kstpipi_K0spi
+# Documentation:    3 Body hadronic decay, non-resonant in pipi channel
+# Tested: Yes
+# PhysicsWG: BTOCHARMLESS
+# Reponsible: Ilya Komarov
+# Email: ilya.komarov@desy.de
+# Cuts: None
+# Date: 20170314
+# Changes: Use of aliases defined in DECAY.DEC; date: 20170314; author: Pablo Goldenzweig
+
+
+#
+# Aliases
+#
+
+Alias      Kstpsig    K*+
+Alias      Kstmsig    K*-
+ChargeConj Kstpsig    Kstmsig
+Alias      Kssig      K_S0
+ChargeConj Kssig      Kssig
+
+
+#
+# Y(4S) -> B+ B- 
+#
+
+Decay Upsilon(4S)
+0.5 B+sig B-                   VSS;
+0.5 B+ B-sig                   VSS;
+Enddecay
+
+#
+# B+ -> pi+ pi- K*(892)+
+#
+
+Decay B+sig
+1.000   Kstpsig pi+ pi- PHSP;
+Enddecay
+
+#
+# B- -> pi+ pi- K*(892)-
+#
+
+Decay B-sig
+1.000   Kstmsig pi+ pi- PHSP;
+Enddecay
+
+#
+# K*(892)+ -> K0s pi+
+#
+
+Decay Kstpsig
+1.000         Kssig        pi+            VSS;
+Enddecay
+CDecay Kstmsig
+
+#
+# K_S0 -> pi+ pi-
+#
+
+Decay Kssig
+1.000   pi+ pi-      PHSP; 
+Enddecay
+
+End

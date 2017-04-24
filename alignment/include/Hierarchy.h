@@ -16,6 +16,7 @@
 #include <Geant4/G4Transform3D.hh>
 #include <root/TMatrixD.h>
 #include <genfit/StateOnPlane.h>
+#include <root/TGeoMatrix.h>
 
 namespace Belle2 {
   namespace alignment {
@@ -154,12 +155,21 @@ namespace Belle2 {
         insert<ChildDBObjectType, MotherDBObjectType>(child, mother, convertG4ToRigidBodyTransformation(childToMother));
       }
 
+      /// Insert hierarchy relation
+      template<class ChildDBObjectType, class MotherDBObjectType>
+      void insertTGeoTransform(unsigned short child, unsigned short mother, TGeoHMatrix childToMother)
+      {
+        insert<ChildDBObjectType, MotherDBObjectType>(child, mother, convertTGeoToRigidBodyTransformation(childToMother));
+      }
+
       /// 2x6 matrix of rigid body derivatives
       TMatrixD getRigidBodyDerivatives(const genfit::StateOnPlane* sop);
 
       /// Conversion from G4Transform3D to 6D rigid body transformation parametrization
       TMatrixD convertG4ToRigidBodyTransformation(G4Transform3D g4transform);
 
+      /// Conversion from G4Transform3D to 6D rigid body transformation parametrization
+      TMatrixD convertTGeoToRigidBodyTransformation(TGeoHMatrix tgeo);
     private:
 
 

@@ -28,22 +28,22 @@
 namespace Belle2 {
 
 /// TRGCDCHelix parameter class
-class TRGCDCHelix {
+  class TRGCDCHelix {
 
   public:
     /// Constructor with pivot, helix parameter a, and its error matrix.
-    TRGCDCHelix(const HepGeom::Point3D<double>  & pivot,
-		const CLHEP::HepVector & a,
-		const CLHEP::HepSymMatrix & Ea);
+    TRGCDCHelix(const HepGeom::Point3D<double>&   pivot,
+                const CLHEP::HepVector& a,
+                const CLHEP::HepSymMatrix& Ea);
 
     /// Constructor without error matrix.
-    TRGCDCHelix(const HepGeom::Point3D<double>  & pivot,
-		const CLHEP::HepVector & a);
+    TRGCDCHelix(const HepGeom::Point3D<double>&   pivot,
+                const CLHEP::HepVector& a);
 
     /// Constructor with position, momentum, and charge.
-    TRGCDCHelix(const HepGeom::Point3D<double>  & position,
-		const CLHEP::Hep3Vector & momentum,
-		double charge);
+    TRGCDCHelix(const HepGeom::Point3D<double>&   position,
+                const CLHEP::Hep3Vector& momentum,
+                double charge);
 
     /// Destructor
     virtual ~TRGCDCHelix();
@@ -51,10 +51,10 @@ class TRGCDCHelix {
   public:// Selectors
 
     /// returns position of helix center(z = 0.);
-    const HepGeom::Point3D<double>  & center(void) const;
+    const HepGeom::Point3D<double>&   center(void) const;
 
     /// returns pivot position.
-    const HepGeom::Point3D<double>  & pivot(void) const;
+    const HepGeom::Point3D<double>&   pivot(void) const;
 
     /// returns radious of helix.
     double radius(void) const;
@@ -63,10 +63,10 @@ class TRGCDCHelix {
     HepGeom::Point3D<double>  x(double dPhi = 0.) const;
 
     /// returns position after rotating angle dPhi in phi direction.
-    double * x(double dPhi, double p[3]) const;
+    double* x(double dPhi, double p[3]) const;
 
     /// returns position and convariance matrix(Ex) after rotation.
-    HepGeom::Point3D<double>  x(double dPhi, CLHEP::HepSymMatrix & Ex) const;
+    HepGeom::Point3D<double>  x(double dPhi, CLHEP::HepSymMatrix& Ex) const;
 
     /// returns direction vector after rotating angle dPhi in phi direction.
     CLHEP::Hep3Vector direction(double dPhi = 0.) const;
@@ -75,16 +75,16 @@ class TRGCDCHelix {
     CLHEP::Hep3Vector momentum(double dPhi = 0.) const;
 
     /// returns momentum vector after rotating angle dPhi in phi direction.
-    CLHEP::Hep3Vector momentum(double dPhi, CLHEP::HepSymMatrix & Em) const;
+    CLHEP::Hep3Vector momentum(double dPhi, CLHEP::HepSymMatrix& Em) const;
 
     /// returns 4momentum vector after rotating angle dPhi in phi direction.
     CLHEP::HepLorentzVector momentum(double dPhi, double mass) const;
 
     /// returns 4momentum vector after rotating angle dPhi in phi direction.
-    CLHEP::HepLorentzVector momentum(double dPhi, double mass, CLHEP::HepSymMatrix & Em) const;
+    CLHEP::HepLorentzVector momentum(double dPhi, double mass, CLHEP::HepSymMatrix& Em) const;
 
     /// returns 4momentum vector after rotating angle dPhi in phi direction.
-    CLHEP::HepLorentzVector momentum(double dPhi, double mass, HepGeom::Point3D<double>  & x, CLHEP::HepSymMatrix & Emx) const;  
+    CLHEP::HepLorentzVector momentum(double dPhi, double mass, HepGeom::Point3D<double>&   x, CLHEP::HepSymMatrix& Emx) const;
 
   public:// Parametrization dependent functions. Prepared for tracking codes. Users should not use them.
 
@@ -113,25 +113,25 @@ class TRGCDCHelix {
     double cosPhi0(void) const;
 
     /// returns helix parameters.
-    const CLHEP::HepVector & a(void) const;
+    const CLHEP::HepVector& a(void) const;
 
     /// returns error matrix.
-    const CLHEP::HepSymMatrix & Ea(void) const;
+    const CLHEP::HepSymMatrix& Ea(void) const;
 
   public:// Modifiers
     /// sets helix parameters.
-    const CLHEP::HepVector & a(const CLHEP::HepVector & newA); 
+    const CLHEP::HepVector& a(const CLHEP::HepVector& newA);
 
     /// sets helix paramters and error matrix.
-    const CLHEP::HepSymMatrix & Ea(const CLHEP::HepSymMatrix & newdA);
+    const CLHEP::HepSymMatrix& Ea(const CLHEP::HepSymMatrix& newdA);
 
     /// sets pivot position.
-    const HepGeom::Point3D<double>  & pivot(const HepGeom::Point3D<double>  & newPivot);
+    const HepGeom::Point3D<double>&   pivot(const HepGeom::Point3D<double>&   newPivot);
 
     /// sets helix pivot position, parameters, and error matrix.
-    void set(const HepGeom::Point3D<double>  & pivot,
-	     const CLHEP::HepVector & a,
-	     const CLHEP::HepSymMatrix & Ea);
+    void set(const HepGeom::Point3D<double>&   pivot,
+             const CLHEP::HepVector& a,
+             const CLHEP::HepSymMatrix& Ea);
 
     /// unsets error matrix. Error calculations will be ignored after this function call until an error matrix be set again. 0 matrix will be return as a return value for error matrix when you call functions which returns an error matrix.
     void ignoreErrorMatrix(void);
@@ -142,24 +142,24 @@ class TRGCDCHelix {
     /// sets and returns z componet of the magnetic field.
     double bFieldZ(double);
 
-    static void set_limits(const CLHEP::HepVector & a_min,
-			   const CLHEP::HepVector & a_max);
+    static void set_limits(const CLHEP::HepVector& a_min,
+                           const CLHEP::HepVector& a_max);
     static bool set_exception(bool);
     static bool set_print(bool);
 
-private:
+  private:
     static CLHEP::HepVector ms_amin, ms_amax;
     static bool ms_check_range;
     static bool ms_print_debug;
     static bool ms_throw_exception;
-  
+
 
   public:// Operators
     /// Copy operator
-    TRGCDCHelix & operator = (const TRGCDCHelix &);
+    TRGCDCHelix& operator = (const TRGCDCHelix&);
 
   public:// Mathmatical functions
-    CLHEP::HepMatrix delApDelA(const CLHEP::HepVector & ap) const;
+    CLHEP::HepMatrix delApDelA(const CLHEP::HepVector& ap) const;
     CLHEP::HepMatrix delXDelA(double phi) const;
     CLHEP::HepMatrix delMDelA(double phi) const;
     CLHEP::HepMatrix del4MDelA(double phi, double mass) const;
@@ -192,127 +192,145 @@ private:
     double m_r;
     double m_ac[5];
 
-  static const std::string invalidhelix;
+    static const std::string invalidhelix;
 
-};
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-const HepGeom::Point3D<double> &
-TRGCDCHelix::center(void) const {
+  inline
+  const HepGeom::Point3D<double>&
+  TRGCDCHelix::center(void) const
+  {
     return m_center;
-}
+  }
 
-inline
-const HepGeom::Point3D<double> &
-TRGCDCHelix::pivot(void) const {
+  inline
+  const HepGeom::Point3D<double>&
+  TRGCDCHelix::pivot(void) const
+  {
     return m_pivot;
-}
+  }
 
-inline
-double
-TRGCDCHelix::radius(void) const {
+  inline
+  double
+  TRGCDCHelix::radius(void) const
+  {
     return m_r;
-}
+  }
 
-inline
-CLHEP::Hep3Vector
-TRGCDCHelix::direction(double phi) const {
+  inline
+  CLHEP::Hep3Vector
+  TRGCDCHelix::direction(double phi) const
+  {
     return momentum(phi).unit();
-}
+  }
 
-inline
-double
-TRGCDCHelix::dr(void) const {
+  inline
+  double
+  TRGCDCHelix::dr(void) const
+  {
     return m_ac[0];
-}
+  }
 
-inline
-double
-TRGCDCHelix::phi0(void) const {
+  inline
+  double
+  TRGCDCHelix::phi0(void) const
+  {
     return m_ac[1];
-}
+  }
 
-inline
-double
-TRGCDCHelix::kappa(void) const {
+  inline
+  double
+  TRGCDCHelix::kappa(void) const
+  {
     return m_ac[2];
-}
+  }
 
-inline
-double
-TRGCDCHelix::dz(void) const {
+  inline
+  double
+  TRGCDCHelix::dz(void) const
+  {
     return m_ac[3];
-}
+  }
 
-inline
-double
-TRGCDCHelix::tanl(void) const {
+  inline
+  double
+  TRGCDCHelix::tanl(void) const
+  {
     return m_ac[4];
-}
+  }
 
-inline
-double
-TRGCDCHelix::curv(void) const {
+  inline
+  double
+  TRGCDCHelix::curv(void) const
+  {
     return m_r;
-}
+  }
 
-inline
-const CLHEP::HepVector &
-TRGCDCHelix::a(void) const {
+  inline
+  const CLHEP::HepVector&
+  TRGCDCHelix::a(void) const
+  {
     return m_a;
-}
+  }
 
-inline
-const CLHEP::HepSymMatrix &
-TRGCDCHelix::Ea(void) const {
+  inline
+  const CLHEP::HepSymMatrix&
+  TRGCDCHelix::Ea(void) const
+  {
     return m_Ea;
-}
+  }
 
-inline
-const CLHEP::HepVector &
-TRGCDCHelix::a(const CLHEP::HepVector & i) {
+  inline
+  const CLHEP::HepVector&
+  TRGCDCHelix::a(const CLHEP::HepVector& i)
+  {
     if (i.num_row() == 5) {
-	m_a = i;
-	m_helixValid = false;
-	updateCache();
+      m_a = i;
+      m_helixValid = false;
+      updateCache();
     }
     return m_a;
-}
+  }
 
-inline
-const CLHEP::HepSymMatrix &
-TRGCDCHelix::Ea(const CLHEP::HepSymMatrix & i) {
+  inline
+  const CLHEP::HepSymMatrix&
+  TRGCDCHelix::Ea(const CLHEP::HepSymMatrix& i)
+  {
     return m_Ea = i;
-}
+  }
 
-inline
-double
-TRGCDCHelix::bFieldZ(double a) {
+  inline
+  double
+  TRGCDCHelix::bFieldZ(double a)
+  {
     m_bField = a;
     m_alpha = 10000. / 2.99792458 / m_bField;
     updateCache();
     return m_bField;
-}
+  }
 
-inline
-double
-TRGCDCHelix::bFieldZ(void) const {
+  inline
+  double
+  TRGCDCHelix::bFieldZ(void) const
+  {
     return m_bField;
-}
+  }
 
-inline
-double
-TRGCDCHelix::sinPhi0(void) const {
+  inline
+  double
+  TRGCDCHelix::sinPhi0(void) const
+  {
     return m_sp;
-}
+  }
 
-inline
-double
-TRGCDCHelix::cosPhi0(void) const {
+  inline
+  double
+  TRGCDCHelix::cosPhi0(void) const
+  {
     return m_cp;
-}
+  }
 
 } // namespace Belle2
 

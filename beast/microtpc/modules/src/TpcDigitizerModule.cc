@@ -115,11 +115,11 @@ void TpcDigitizerModule::event()
     TVector3 chipPosition(
       simHitPosition.X() / 100. - m_TPCCenter[detNb].X(),
       simHitPosition.Y() / 100. - m_TPCCenter[detNb].Y(),
-      simHitPosition.Z() / 100. - m_TPCCenter[detNb].Z() + m_z_DG / 2.
+      simHitPosition.Z() / 100. - m_TPCCenter[detNb].Z()
     );
     chipPosition.RotateZ(-m_TPCAngleZ[detNb] * TMath::DegToRad());
     chipPosition.RotateX(-m_TPCAngleX[detNb] * TMath::DegToRad());
-    const double T = chipPosition.Z();
+    const double T = chipPosition.Z() + m_z_DG / 2.;
     if (T < T0[detNb]) {
       T0[detNb] = T;
     }
@@ -154,10 +154,30 @@ void TpcDigitizerModule::event()
     TVector3 chipPosition(
       simHitPosition.X() / 100. - m_TPCCenter[detNb].X(),
       simHitPosition.Y() / 100. - m_TPCCenter[detNb].Y(),
-      simHitPosition.Z() / 100. - m_TPCCenter[detNb].Z() + m_z_DG / 2.
+      simHitPosition.Z() / 100. - m_TPCCenter[detNb].Z()
     );
     chipPosition.RotateZ(-m_TPCAngleZ[detNb] * TMath::DegToRad());
     chipPosition.RotateX(-m_TPCAngleX[detNb] * TMath::DegToRad());
+
+    TVector3 ChipPosition(0, 0, 0);
+    if (m_phase == 1) {
+      if (detNb == 0 || detNb == 3) {
+        ChipPosition.SetX(-chipPosition.Y());
+        ChipPosition.SetY(-chipPosition.X());
+        ChipPosition.SetZ(chipPosition.Z() + m_z_DG / 2.);
+      }
+      if (detNb == 1 || detNb == 2) {
+        ChipPosition.SetX(chipPosition.Y());
+        ChipPosition.SetY(chipPosition.X());
+        ChipPosition.SetZ(chipPosition.Z() + m_z_DG / 2.);
+      }
+    }
+    if (m_phase == 2) {
+      ChipPosition.SetX(chipPosition.Y());
+      ChipPosition.SetY(chipPosition.X());
+      ChipPosition.SetZ(chipPosition.Z() + m_z_DG / 2);
+    }
+
 
     //If new detector filled the chip
     if (olddetNb != detNb && m_dchip_map.size() > 0 && m_dchip.size() < 20000 && oldtrkID != trkID) {
@@ -172,9 +192,9 @@ void TpcDigitizerModule::event()
     }
 
     //check if ionization within sensitive volume
-    if ((-m_ChipColumnX < chipPosition.X() && chipPosition.X() < m_ChipColumnX) &&
-        (-m_ChipRowY < chipPosition.Y() && chipPosition.Y() <  m_ChipRowY) &&
-        (0. < chipPosition.Z() && chipPosition.Z() <  m_z_DG) &&
+    if ((-m_ChipColumnX < ChipPosition.X() && ChipPosition.X() < m_ChipColumnX) &&
+        (-m_ChipRowY < ChipPosition.Y() && ChipPosition.Y() <  m_ChipRowY) &&
+        (0. < ChipPosition.Z() && ChipPosition.Z() <  m_z_DG) &&
         (m_lowerTimingCut < T0[detNb] && T0[detNb] < m_upperTimingCut)) {
 
       //ionization energy
@@ -200,9 +220,9 @@ void TpcDigitizerModule::event()
           //drift ionization to GEM 1 plane
           //const TLorentzVector driftGap(Drift(chipPosition.X(), chipPosition.Y(), chipPosition.Z(), m_Dt_DG, m_Dl_DG, m_v_DG));
           double x_DG, y_DG, z_DG, t_DG;
-          Drift(chipPosition.X(),
-                chipPosition.Y(),
-                chipPosition.Z(),
+          Drift(ChipPosition.X(),
+                ChipPosition.Y(),
+                ChipPosition.Z(),
                 x_DG, y_DG, z_DG, t_DG, m_Dt_DG, m_Dl_DG, m_v_DG);
 
           //calculate and scale 1st GEM gain
@@ -685,13 +705,14 @@ void TpcDigitizerModule::getXMLData()
   //get the location of the tubes
   BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
-    m_TPCCenter.push_back(TVector3(activeParams.getLength("TPCpos_x"), activeParams.getLength("TPCpos_y"),
-                                   activeParams.getLength("TPCpos_z")));
+    m_TPCCenter.push_back(TVector3(activeParams.getLength("SensVol_x"), activeParams.getLength("SensVol_y"),
+                                   activeParams.getLength("SensVol_z")));
     m_TPCAngleX.push_back(activeParams.getLength("AngleX"));
     m_TPCAngleZ.push_back(activeParams.getLength("AngleZ"));
 
     m_nTPC++;
   }
+  m_phase = content.getDouble("Phase");
   m_LookAtRec = content.getDouble("LookAtRec");
   m_GEMGain1 = content.getDouble("GEMGain1");
   m_GEMGain2 = content.getDouble("GEMGain2");

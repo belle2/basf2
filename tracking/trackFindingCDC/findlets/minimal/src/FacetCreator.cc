@@ -85,6 +85,10 @@ void FacetCreator::apply(const std::vector<CDCWireHitCluster>& inputClusters, st
     // Sort the facets in their cluster
     std::sort(facetsInCluster.begin(), facetsInCluster.end());
 
+    B2ASSERT("Expected all facets to be different",
+             std::adjacent_find(facetsInCluster.begin(), facetsInCluster.end()) ==
+             facetsInCluster.end());
+
     for (CDCFacet& facet : facetsInCluster) {
       facet.setICluster(iCluster);
     }
@@ -130,9 +134,9 @@ void FacetCreator::createFacetsForHitTriple(const CDCWireHit& startWireHit,
                                             std::vector<CDCFacet>& facets)
 {
   /// Prepare a facet - without fitted tangent lines.
-  CDCRLWireHit startRLWireHit(&startWireHit, ERightLeft::c_Left, startWireHit.getRefDriftLength());
-  CDCRLWireHit middleRLWireHit(&middleWireHit, ERightLeft::c_Left, middleWireHit.getRefDriftLength());
-  CDCRLWireHit endRLWireHit(&endWireHit, ERightLeft::c_Left, endWireHit.getRefDriftLength());
+  CDCRLWireHit startRLWireHit(&startWireHit, ERightLeft::c_Left);
+  CDCRLWireHit middleRLWireHit(&middleWireHit, ERightLeft::c_Left);
+  CDCRLWireHit endRLWireHit(&endWireHit, ERightLeft::c_Left);
   CDCFacet facet(startRLWireHit, middleRLWireHit, endRLWireHit, UncertainParameterLine2D());
 
   for (ERightLeft startRLInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {

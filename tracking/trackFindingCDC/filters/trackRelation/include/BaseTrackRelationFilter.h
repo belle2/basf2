@@ -41,7 +41,7 @@ namespace Belle2 {
       virtual Weight operator()(const CDCTrack& from  __attribute__((unused)),
                                 const CDCTrack& to  __attribute__((unused)))
       {
-        return NAN;
+        return 1;
       }
 
       /**
@@ -55,7 +55,7 @@ namespace Belle2 {
         const CDCTrack* ptrTo(relation.second);
         if (ptrFrom == ptrTo) return NAN; // Prevent relation to same.
         if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
-        return operator()(*ptrFrom, *ptrTo);
+        return this->operator()(*ptrFrom, *ptrTo);
       }
     };
   }

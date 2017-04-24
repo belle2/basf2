@@ -10,13 +10,15 @@ from softwaretrigger import add_fast_reco_software_trigger, add_hlt_software_tri
 
 RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs"]
 ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*"]
+DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
 
 
-def add_packers(path):
+def add_packers(path, components=DEFAULT_HLT_COMPONENTS):
     """
     Slightly modified version of rawdata.add_packers to not include the packer for PXD and add the Geometry/Gearbox
      when needed.
     :param path: The path to which the packers will be added.
+    :param components: Which components to use.
     """
     # Add Gearbox or geometry to path if not already there
     if "Gearbox" not in path:
@@ -26,14 +28,15 @@ def add_packers(path):
         path.add_module("Geometry")
 
     # Exclude PXD
-    rawdata.add_packers(path, components=["SVD", "CDC", "ECL", "TOP", "ARICH", "BKLM", "EKLM"])
+    rawdata.add_packers(path, components=components)
 
 
-def add_unpackers(path):
+def add_unpackers(path, components=DEFAULT_HLT_COMPONENTS):
     """
     Slightly modified version of rawdata.add_unpackers to not include the unpacker for PXD and add the Geometry/Gearbox
      when needed.
     :param path: The path to which the unpackers will be added.
+    :param components: Which components to use.
     """
     # Add Gearbox or geometry to path if not already there
     if "Gearbox" not in path:
@@ -43,13 +46,14 @@ def add_unpackers(path):
         path.add_module("Geometry")
 
     # Exclude PXD
-    rawdata.add_unpackers(path, components=["SVD", "CDC", "ECL", "TOP", "ARICH", "BKLM", "EKLM"])
+    rawdata.add_unpackers(path, components=components)
 
     # add clusterizer
-    path.add_module("SVDClusterizer")
+    if not components or "SVD" in components:
+        path.add_module("SVDClusterizer")
 
 
-def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None):
+def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None, components=DEFAULT_HLT_COMPONENTS):
     """
     Add all modules, conditions and conditional paths to the given path, that are needed for a full
     reconstruction stack in the HLT using the software trigger modules. Several steps are performed:
@@ -95,7 +99,8 @@ def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None):
     calibration_and_store_only_rawdata_path = basf2.create_path()
 
     # Add fast reco reconstruction
-    reconstruction.add_reconstruction(fast_reco_reconstruction_path, trigger_mode="fast_reco", skipGeometryAdding=True)
+    reconstruction.add_reconstruction(fast_reco_reconstruction_path, trigger_mode="fast_reco", skipGeometryAdding=True,
+                                      components=components)
 
     # Add fast reco cuts
     fast_reco_cut_module = add_fast_reco_software_trigger(fast_reco_reconstruction_path, store_array_debug_prescale)
@@ -112,7 +117,8 @@ def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None):
     # fast_reco_cut_module.if_value("==0", hlt_reconstruction_path, basf2.AfterConditionPath.CONTINUE)
 
     # Add hlt reconstruction
-    reconstruction.add_reconstruction(hlt_reconstruction_path, trigger_mode="hlt", skipGeometryAdding=True)
+    reconstruction.add_reconstruction(hlt_reconstruction_path, trigger_mode="hlt", skipGeometryAdding=True,
+                                      components=components)
     hlt_cut_module = add_hlt_software_trigger(hlt_reconstruction_path, store_array_debug_prescale)
 
     # Fill the calibration_and_store_only_rawdata_path path

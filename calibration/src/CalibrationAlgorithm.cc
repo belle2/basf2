@@ -123,7 +123,7 @@ IntervalOfValidity CalibrationAlgorithm::getIovFromData()
 
 void CalibrationAlgorithm::saveCalibration(TObject* data, const string& name, const IntervalOfValidity& iov)
 {
-  m_payloads.emplace_back("dbstore", name, data, iov);
+  m_payloads.emplace_back(name, data, iov);
 }
 
 void CalibrationAlgorithm::saveCalibration(TObject* data, const string& name)

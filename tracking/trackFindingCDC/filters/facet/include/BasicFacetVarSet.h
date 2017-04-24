@@ -37,6 +37,8 @@ namespace Belle2 {
       "twist",
       "cell_extend",
       "n_crossing",
+
+      "alpha",
     };
 
     /// Vehicle class to transport the variable names

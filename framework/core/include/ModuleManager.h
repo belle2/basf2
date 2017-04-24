@@ -123,7 +123,7 @@ namespace Belle2 {
      * @return A shared pointer to the created module instance.
      */
     boost::shared_ptr<Module> registerModule(const std::string& moduleName,
-                                             const std::string& sharedLibPath = "") throw(ModuleNotCreatedError);
+                                             const std::string& sharedLibPath = "") noexcept(false);
 
     /**
      * Returns a reference to the list of created modules.

@@ -9,6 +9,7 @@
 #include <daq/rfarm/event/modules/Raw2DsModule.h>
 #include <TSystem.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "framework/datastore/StoreObjPtr.h"
 #include "framework/dataobjects/EventMetaData.h"
@@ -103,11 +104,12 @@ void Raw2DsModule::registerRawCOPPERs()
   int size;
   int* evtbuf = new int[MAXEVTSIZE];
   while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
-    usleep(100);
+    //    usleep(100);
     //    usleep(20);
+    usleep(5);
   }
-  B2INFO("Raw2Ds: got an event from RingBuffer, size=" << size <<
-         " (proc= " << (int)getpid() << ")");
+  //  B2INFO("Raw2Ds: got an event from RingBuffer, size=" << size <<
+  //         " (proc= " << (int)getpid() << ")");
 
   // Unpack SendHeader
   SendHeader sndhdr;
@@ -118,7 +120,7 @@ void Raw2DsModule::registerRawCOPPERs()
   }
   int ncprs = sndhdr.GetNumNodesinPacket();
   int nwords = sndhdr.GetTotalNwords() - SendHeader::SENDHDR_NWORDS - SendTrailer::SENDTRL_NWORDS;
-  B2INFO("Raw2DS: Ncprs=" << ncprs << " Nwords=" << nwords);
+  //  B2INFO("Raw2DS: Ncprs=" << ncprs << " Nwords=" << nwords);
 
 
   // Get buffer header
@@ -128,6 +130,9 @@ void Raw2DsModule::registerRawCOPPERs()
   RawDataBlock tempdblk;
   tempdblk.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);
 
+  unsigned int utime = 0;
+  unsigned int ctime = 0;
+  unsigned long long int mtime = 0;
   // Store data contents in Corresponding RawXXXX
   for (int cprid = 0; cprid < ncprs * npackedevts; cprid++) {
     // Pick up one COPPER and copy data in a temporary buffer
@@ -138,7 +143,14 @@ void Raw2DsModule::registerRawCOPPERs()
     // Check FTSW
     if (tempdblk.CheckFTSWID(cprid)) {
       StoreArray<RawFTSW> ary;
-      (ary.appendNew())->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
+      RawFTSW* ftsw = ary.appendNew();
+      ftsw->SetBuffer(cprbuf, nwds_buf, 1, 1, 1);
+
+      // Tentative for DESY TB 2017
+      utime = (unsigned int)(ftsw->GetTTUtime(0));
+      ctime = (unsigned int)(ftsw->GetTTCtime(0));
+      mtime = 1000000000 * (unsigned long long int)utime + (unsigned long long int)(ctime / 0.127216);
+
       continue;
     }
 
@@ -192,11 +204,13 @@ void Raw2DsModule::registerRawCOPPERs()
   evtmetadata->setRun(sndhdr.GetRunNum());
   evtmetadata->setSubrun(sndhdr.GetSubRunNum());
   evtmetadata->setEvent(sndhdr.GetEventNumber());
+  evtmetadata->setTime(mtime);  //time(NULL));
+  //  evtmetadata->setTime((unsigned long long int) utime);//time(NULL));
   if (error_flag) evtmetadata->addErrorFlag(EventMetaData::c_B2LinkCRCError);
 
   delete[] evtbuf;
 
-  B2INFO("Raw2Ds: DataStore Restored!!");
+  //  B2INFO("Raw2Ds: DataStore Restored!!");
   return;
 }
 

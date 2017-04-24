@@ -24,7 +24,7 @@
 namespace Belle2 {
 
 /// A class to control a track in G4
-class TRGCDCSteppingAction : public G4UserSteppingAction {
+  class TRGCDCSteppingAction : public G4UserSteppingAction {
 
   public:
     /// Constructor.
@@ -35,7 +35,7 @@ class TRGCDCSteppingAction : public G4UserSteppingAction {
 
     /// Stepping action to control a step in G4.
     virtual void UserSteppingAction(const G4Step*);
-};
+  };
 
 //-----------------------------------------------------------------------------
 

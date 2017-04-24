@@ -57,9 +57,9 @@ TEST_F(TrackFindingCDCTestWithTopology, filter_facet_FeasibleRLFacetFilter_accep
     TEST_CONTEXT("For rl combination " << static_cast<int>(acceptableRL[0]) << ", "
                  << static_cast<int>(acceptableRL[1]) << ", "
                  << static_cast<int>(acceptableRL[2]));
-    CDCRLWireHit aRLWireHit(&aWireHit, acceptableRL[0], 0.1);
-    CDCRLWireHit bRLWireHit(&bWireHit, acceptableRL[1], 0.1);
-    CDCRLWireHit cRLWireHit(&cWireHit, acceptableRL[2], 0.1);
+    CDCRLWireHit aRLWireHit(&aWireHit, acceptableRL[0]);
+    CDCRLWireHit bRLWireHit(&bWireHit, acceptableRL[1]);
+    CDCRLWireHit cRLWireHit(&cWireHit, acceptableRL[2]);
     CDCFacet facet(aRLWireHit, bRLWireHit, cRLWireHit);
     Weight weight = filter(facet);
     EXPECT_TRUE(not std::isnan(weight));

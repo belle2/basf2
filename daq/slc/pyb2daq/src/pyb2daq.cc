@@ -11,6 +11,8 @@
 
 #include <daq/slc/pyb2daq/DAQDBObject.h>
 #include <daq/slc/pyb2daq/PyNSMCallback.h>
+#include <daq/slc/pyb2daq/PyHVControlCallback.h>
+#include <daq/slc/pyb2daq/PyRCCallback.h>
 
 using namespace boost::python;
 using namespace Belle2;
@@ -115,14 +117,59 @@ BOOST_PYTHON_MODULE(pyb2daq)
   .def("addObject", &DAQDBObject::addObject)
   ;
 
-  boost::python::class_<PyNSMCallback>("NSMCallback", boost::python::init<>())
-  .def("add", &PyNSMCallback::addInt)
-  .def("add", &PyNSMCallback::addFloat)
-  .def("add", &PyNSMCallback::addText)
-  .def("set", &PyNSMCallback::setInt)
-  .def("set", &PyNSMCallback::setFloat)
-  .def("set", &PyNSMCallback::setText)
+  boost::python::class_<PyNSMCallbackWrapper, boost::noncopyable>("NSMCallback", boost::python::init<>())
+  .def("addInt", &PyNSMCallback::addInt)
+  .def("addFloat", &PyNSMCallback::addFloat)
+  .def("addText", &PyNSMCallback::addText)
+  .def("setInt", &PyNSMCallback::setInt)
+  .def("setFloat", &PyNSMCallback::setFloat)
+  .def("setText", &PyNSMCallback::setText)
   .def("log", &PyNSMCallback::log)
+  .def("run", &PyNSMCallback::run)
+  //.def("init", &PyNSMCallback::init)
+  //.def("term", &PyNSMCallback::term)
+  //.def("timeout", &PyNSMCallback::timeout)
+  ;
+
+  boost::python::enum_<HVMessage::State>("HVState")
+  .value("OFF", HVMessage::OFF)
+  .value("ON", HVMessage::ON)
+  .value("OCP", HVMessage::OCP)
+  .value("OVP", HVMessage::OVP)
+  .value("ERR", HVMessage::ERR)
+  .value("RAMPUP", HVMessage::RAMPUP)
+  .value("RAMPDOWN", HVMessage::RAMPDOWN)
+  .value("TRIP", HVMessage::TRIP)
+  .value("ERTIP", HVMessage::ETRIP)
+  .value("INTERLOCK", HVMessage::INTERLOCK)
+  ;
+
+  boost::python::class_<PyHVControlCallbackWrapper, boost::noncopyable>("HVControlCallback", boost::python::init<>())
+  .def("addInt", &PyHVControlCallback::addInt)
+  .def("addFloat", &PyHVControlCallback::addFloat)
+  .def("addText", &PyHVControlCallback::addText)
+  .def("setInt", &PyHVControlCallback::setInt)
+  .def("setFloat", &PyHVControlCallback::setFloat)
+  .def("setText", &PyHVControlCallback::setText)
+  .def("log", &PyHVControlCallback::log)
+  .def("run", &PyHVControlCallback::run)
+  //.def("init", &PyHVControlCallback::init)
+  //.def("term", &PyHVControlCallback::term)
+  //.def("timeout", &PyHVControlCallback::timeout)
+  ;
+
+  boost::python::class_<PyRCCallbackWrapper, boost::noncopyable>("RCCallback", boost::python::init<>())
+  .def("addInt", &PyRCCallback::addInt)
+  .def("addFloat", &PyRCCallback::addFloat)
+  .def("addText", &PyRCCallback::addText)
+  .def("setInt", &PyRCCallback::setInt)
+  .def("setFloat", &PyRCCallback::setFloat)
+  .def("setText", &PyRCCallback::setText)
+  .def("log", &PyRCCallback::log)
+  .def("run", &PyRCCallback::run)
+  //.def("init", &PyRCCallback::init)
+  //.def("term", &PyRCCallback::term)
+  //.def("timeout", &PyRCCallback::timeout)
   ;
 
 }

@@ -245,7 +245,7 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
 
         bool isPersistent = obj->TestBit(c_PersistentDurability);
         DataStore::EDurability durability = isPersistent ? (DataStore::c_Persistent) : (DataStore::c_Event);
-        const TClass* cl = obj->IsA();
+        TClass* cl = obj->IsA();
         if (array)
           cl = static_cast<TClonesArray*>(obj)->GetClass();
         if (m_initStatus == 0 && DataStore::Instance().getInitializeActive()) { //are we called by the module's initialize() function?
@@ -421,7 +421,7 @@ int DataStoreStreamer::restoreDataStoreAsync()
       TObject* obj = objlist.at(i);
       bool isPersistent = obj->TestBit(c_PersistentDurability);
       DataStore::EDurability durability = isPersistent ? (DataStore::c_Persistent) : (DataStore::c_Event);
-      const TClass* cl = obj->IsA();
+      TClass* cl = obj->IsA();
       if (array)
         cl = static_cast<TClonesArray*>(obj)->GetClass();
       if (m_initStatus == 0 && DataStore::Instance().getInitializeActive()) { //are we called by the module's initialize() function?

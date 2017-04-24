@@ -13,6 +13,8 @@
 #include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
 
     /// Filter for the constuction of segment relations based on MC information.
@@ -25,6 +27,16 @@ namespace Belle2 {
     public:
       /// Constructor
       MCSegmentRelationFilter(bool allowReverse = true);
+
+      /// Expose the set of parameters of the filter to the module parameter list.
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+
+      /// Tell Root to look at this operator
+      using Super::operator();
+
+    private:
+      /// Parameter : Switch to require the segment combination contain mostly correct rl information
+      bool m_param_requireRLPure = false;
 
       /// Checks if a segment relation is a good combination.
       Weight operator()(const CDCSegment2D& fromSegment, const CDCSegment2D& toSegment) final;

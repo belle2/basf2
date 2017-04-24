@@ -10,9 +10,26 @@
 #include <tracking/trackFindingCDC/display/Styling.h>
 #include <tracking/trackFindingCDC/display/HitColorMapping.h>
 #include <tracking/trackFindingCDC/display/SegmentColorMapping.h>
+#include <tracking/trackFindingCDC/display/RecoTrackColorMapping.h>
+
+#include <tracking/dataobjects/RecoTrack.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+std::unique_ptr<ChooseableRecoTrackStyling::ObjectMapping>
+ChooseableRecoTrackStyling::createMapping(const std::string& mappingName)
+{
+  if (mappingName == "ListColors") {
+    return makeUnique<RecoTrackListColorsColorMap>();
+  } else if (mappingName == "MatchingStatus") {
+    return makeUnique<RecoTrackMatchingStatusColorMap>();
+  } else if (mappingName == "MCMatchingStatus") {
+    return makeUnique<MCRecoTrackMatchingStatusColorMap>();
+  } else {
+    return Super::createMapping(mappingName);
+  }
+}
 
 std::unique_ptr<ChooseableSegmentStyling::ObjectMapping>
 ChooseableSegmentStyling::createMapping(const std::string& mappingName)
@@ -67,6 +84,8 @@ ChooseableHitStyling::createMapping(const std::string& mappingName)
     return makeUnique<SimHitPDGCodeColorMap>();
   } else if (mappingName == "SimHitIsBkgColorMap") {
     return makeUnique<SimHitIsBkgColorMap>();
+  } else if (mappingName == "NLoops") {
+    return makeUnique<NLoopsColorMap>();
   } else {
     return Super::createMapping(mappingName);
   }

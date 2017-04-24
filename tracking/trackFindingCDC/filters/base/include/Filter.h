@@ -63,7 +63,7 @@ namespace Belle2 {
        */
       virtual Weight operator()(const Object& obj __attribute__((unused)))
       {
-        return NAN;
+        return 1;
       }
 
       /**

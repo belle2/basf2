@@ -44,7 +44,6 @@ namespace Belle2 {
    *  - Durability: defines duration that objects are valid, see DataStore::EDurability.
    *
    *  @sa EDurability StoreObjPtr StoreArray RelationsObject
-   *  @author <a href="mailto:software@belle2.kek.jp?subject=DataStore">The basf2 developers</a>
    */
   class DataStore {
   public:
@@ -201,11 +200,13 @@ namespace Belle2 {
      *  @sa DependencyMap
      */
     bool registerEntry(const std::string& name, EDurability durability,
-                       const TClass* objClass, bool array, EStoreFlags storeFlags);
+                       TClass* objClass, bool array, EStoreFlags storeFlags);
 
     /** Register a relation in the DataStore map.
      *
      *  This must be called in the initialization phase. Otherwise an error is returned.
+     *  @param fromArray  Origin of the relation
+     *  @param toArray    Target of the relation
      *  @param durability Decide with which durability map you want to perform the requested action.
      *  @param storeFlags ORed combination of DataStore::EStoreFlags.
      *  @return           True if the registration succeeded.
@@ -505,6 +506,7 @@ namespace Belle2 {
      *
      *  @param arrayName  A given array name, the special string "ALL" for all arrays deriving from the given class, or an empty string for the default array name.
      *  @param arrayClass The class of the array(s).
+     *  @param durability Decide with which durability map you want to perform the requested action.
      */
     const std::vector<std::string>& getArrayNames(const std::string& arrayName, const TClass* arrayClass,
                                                   EDurability durability = c_Event) const;

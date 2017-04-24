@@ -17,12 +17,22 @@ class RealisticSegmentPairRelationFilterTrainingRun(TrainingRunMixin, ReadOrGene
 
     truth = "truth_positive"
 
+    @property
+    def identifier(self):
+        """Database identifier of the filter being trained"""
+        return "trackfindingcdc_RealisticSegmentPairRelationFilter.xml"
+
     def create_path(self):
         """Setup the recording path after the simulation"""
         path = super().create_path()
-        path.add_module("WireHitPreparer",
-                        flightTimeEstimation="outwards",
-                        UseNLoops=1.0)
+        path.add_module("TFCDC_WireHitPreparer",
+                        flightTimeEstimation="outwards")
+
+        path.add_module('TFCDC_ClusterPreparer',
+                        SuperClusterDegree=3,
+                        SuperClusterExpandOverApogeeGap=True)
+
+        path.add_module("TFCDC_SegmentFinderFacetAutomaton")
 
         if self.task == "train":
             varSets = [
@@ -49,7 +59,7 @@ class RealisticSegmentPairRelationFilterTrainingRun(TrainingRunMixin, ReadOrGene
         else:
             raise ValueError("Unknown task " + self.task)
 
-        path.add_module("TrackFinderCDCAutomaton",
+        path.add_module("TFCDC_TrackFinderSegmentPairAutomaton",
                         SegmentPairRelationFilter="unionrecording",
                         SegmentPairRelationFilterParameters={
                             "rootFileName": self.sample_file_name,

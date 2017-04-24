@@ -34,6 +34,8 @@ namespace Belle2 {
     // functions for retriever
     RfShm_Cell& getinfo(int id);
     void fillNodeInfo(int id, RfNodeInfo* info, bool inout);
+    void fillProcessStatus(RfNodeInfo* info, int pid_input = 0, int pid_output = 0,
+                           int pid_basf2 = 0, int pid_hserver = 0, int pid_hrelay = 0);
 
   private:
     RFSharedMem* m_rfshm;

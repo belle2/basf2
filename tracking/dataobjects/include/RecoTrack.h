@@ -549,7 +549,7 @@ namespace Belle2 {
 
       // there might be the case, where the genfit track has no trackreps, even not the cardinal
       // one because no fit attempt was performed. In this case, the "hasFitStatus" call to genfit
-      // will fail with access violation. To prevent that, check for the number of reps here before
+      // will fail with an access violation. To prevent that, check for the number of reps here before
       // actually calling genfit's hasFitStatus(...)
       if (m_genfitTrack.getNumReps() == 0)
         return false;
@@ -569,6 +569,34 @@ namespace Belle2 {
     {
       checkDirtyFlag();
       return m_genfitTrack.getTrackReps();
+    }
+
+    /**
+     * Return a list of all RecoHitInformations associated with the RecoTrack. This is especially useful when
+     * you want to iterate over all (fitted) hits in a track without caring whether its a CDC, VXD etc hit.
+     * @param getSorted if true, the list of RecoHitInformations will be returned sorted by the Sorting parameter
+     * in an ascending order. If false, the hits will be returned unsorted.
+     */
+    std::vector<RecoHitInformation*> getRecoHitInformations(bool getSorted = false) const
+    {
+      std::vector<RecoHitInformation*> hitList;
+      RelationVector<RecoHitInformation> recoHitInformations = getRelationsTo<RecoHitInformation>
+                                                               (m_storeArrayNameOfRecoHitInformation);
+
+      hitList.reserve(recoHitInformations.size());
+      for (auto& recoHit : recoHitInformations) {
+        hitList.push_back(&recoHit);
+      }
+
+      // sort the returned vector if requested
+      if (getSorted) {
+        std::sort(hitList.begin(), hitList.end(), [](const RecoHitInformation * a,
+        const RecoHitInformation * b) -> bool {
+          return a->getSortingParameter() < b->getSortingParameter();
+        });
+      }
+
+      return hitList;
     }
 
     /** Return genfit's MeasuredStateOnPlane for the first hit in a fit
@@ -605,23 +633,28 @@ namespace Belle2 {
       return getMeasuredStateOnPlaneFromHit(-1, representation);
     }
 
-    /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
-    * useful for extrapolation of measurements to other locations
-    */
-    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr)
+    /**
+     * Return genfit's MeasuredStateOnPlane on plane for associated with one RecoHitInformation. The caller needs to ensure that
+     * recoHitInfo->useInFit() is true and the a fit has been performed on the track, a.k.a. hasTrackFitStatus() == true
+     */
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromRecoHit(const RecoHitInformation* recoHitInfo,
+        const genfit::AbsTrackRep* representation = nullptr) const
     {
       checkDirtyFlag();
-      return m_genfitTrack.getFittedState(id, representation);
-    }
 
-    /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
-    * useful for extrapolation of measurements other locations
-    * Const version.
-    */
-    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr) const
-    {
-      checkDirtyFlag();
-      return m_genfitTrack.getFittedState(id, representation);
+      if (!hasTrackFitStatus(representation)) {
+        B2FATAL("MeasuredStateOnPlane can not be retrieved for RecoTracks where no fit has been attempted.");
+      }
+
+      if (!recoHitInfo->useInFit()) {
+        B2FATAL("MeasuredStateOnPlane cannot be provided for RecoHit which was not used in the fit.");
+      }
+
+      const auto hitTrackPoint = recoHitInfo->getCreatedTrackPoint();
+      if (hitTrackPoint == nullptr) {
+        B2FATAL("TrackPoint was requested which has not been created");
+      }
+      return hitTrackPoint->getFitterInfo(representation)->getFittedState();
     }
 
     /** Return genfit's MasuredStateOnPlane, that is closest to the given point
@@ -924,6 +957,25 @@ namespace Belle2 {
       }
 
       return hitList;
+    }
+
+    /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
+    * useful for extrapolation of measurements to other locations
+    */
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr)
+    {
+      checkDirtyFlag();
+      return m_genfitTrack.getFittedState(id, representation);
+    }
+
+    /** Return genfit's MeasuredStateOnPlane for an arbitrary hit id
+    * useful for extrapolation of measurements other locations
+    * Const version.
+    */
+    genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneFromHit(int id, const genfit::AbsTrackRep* representation = nullptr) const
+    {
+      checkDirtyFlag();
+      return m_genfitTrack.getFittedState(id, representation);
     }
 
     /// Helper: Check the dirty flag and produce a warning, whenever a fit result is accessed.

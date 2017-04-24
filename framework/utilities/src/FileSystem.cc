@@ -66,7 +66,7 @@ bool FileSystem::loadLibrary(std::string library, bool fullname)
   return true;
 }
 
-std::string FileSystem::findFile(const string& path)
+std::string FileSystem::findFile(const string& path, bool silent)
 {
   //environment doesn't change, so only done once
   static const char* localdir = getenv("BELLE2_LOCAL_DIR");
@@ -82,9 +82,11 @@ std::string FileSystem::findFile(const string& path)
   //check if this thing exists as normal path (absolute / relative to PWD)
   else if (fileExists(fullpath = (fs::absolute(path).string())))
     return fullpath;
+
   //nothing found
-  else
-    return string("");
+  if (!silent)
+    B2ERROR("findFile(): Could not find '" << path << "'!");
+  return string("");
 }
 
 

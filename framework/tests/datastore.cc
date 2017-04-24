@@ -229,14 +229,21 @@ namespace {
     EXPECT_TRUE(evtPtr.isValid());
     EXPECT_EQ(evtPtr->getEvent(), 1);
   }
-  TEST_F(DataStoreTest, FailedCreation)
+  TEST_F(DataStoreTest, InvalidAccessor)
   {
     StoreArray<EventMetaData> none("doesntexist");
+    EXPECT_FALSE(none.isValid());
     EXPECT_THROW(none.getPtr(), std::runtime_error);
     EXPECT_THROW(none.appendNew(), std::runtime_error);
     none.clear();
     EXPECT_THROW(none.getPtr(), std::runtime_error);
     EXPECT_EQ(0, none.getEntries());
+
+    StoreObjPtr<EventMetaData> noobj("doesntexist");
+    EXPECT_FALSE(noobj.isValid());
+    EXPECT_THROW(*noobj, std::runtime_error);
+    EXPECT_THROW(noobj->getEvent(), std::runtime_error);
+
   }
   TEST_F(DataStoreTest, RawAccess)
   {

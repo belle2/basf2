@@ -66,6 +66,8 @@ namespace Belle2 {
     int _famana;
     /** Set Threshold */
     int _threshold;
+    /** Set Shaping Function */
+    int _FADC;
 
 
 

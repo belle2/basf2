@@ -27,11 +27,11 @@ using namespace std;
 
 namespace Belle2 {
 
-TRGCDCCell::TRGCDCCell(unsigned id,
-		       unsigned localId,
-		       const TCLayer & l,
-                       const P3D & fp,
-                       const P3D & bp)
+  TRGCDCCell::TRGCDCCell(unsigned id,
+                         unsigned localId,
+                         const TCLayer& l,
+                         const P3D& fp,
+                         const P3D& bp)
     : _id(id),
       _localId(localId),
       _layer(l),
@@ -40,14 +40,17 @@ TRGCDCCell::TRGCDCCell(unsigned id,
       _backwardPosition(bp),
       _direction((fp - bp).unit()),
       _state(0),
-      _hit(0) {
-}
+      _hit(0)
+  {
+  }
 
-TRGCDCCell::~TRGCDCCell() {
-}
+  TRGCDCCell::~TRGCDCCell()
+  {
+  }
 
-void
-TRGCDCCell::dump(const string & msg, const string & pre) const {
+  void
+  TRGCDCCell::dump(const string& msg, const string& pre) const
+  {
     cout << pre;
     cout << "w " << _id;
     cout << ",local " << _localId;
@@ -59,30 +62,30 @@ TRGCDCCell::dump(const string & msg, const string & pre) const {
 //        for (unsigned i = 0; i < 7; i++)
 //             if (neighbor(i))
 //                 neighbor(i)->dump("", pre + TRGUtil::itostring(i) + "   ");
-    }    
-}
-  
-int
-TRGCDCCell::localIdDifference(const TRGCDCCell & a) const {
+    }
+  }
+
+  int
+  TRGCDCCell::localIdDifference(const TRGCDCCell& a) const
+  {
 
     if (superLayerId() != a.superLayerId()) {
-        cout << "TRGCDCCell::localIdDifference !!!";
-        cout << "super layer assumption violation" << endl;
+      cout << "TRGCDCCell::localIdDifference !!!";
+      cout << "super layer assumption violation" << endl;
     }
 
     int diff = int(a.localId()) - int(localId());
     unsigned nCells = layer().nCells();
     if (diff > 0) {
-        int difR = nCells - diff;
-        if (diff < difR) return diff;
-        else return - difR;
+      int difR = nCells - diff;
+      if (diff < difR) return diff;
+      else return - difR;
+    } else {
+      int difR = nCells + diff;
+      if (- diff < difR) return diff;
+      else return difR;
     }
-    else {
-        int difR = nCells + diff;
-        if (- diff < difR) return diff;
-        else return difR;
-    }
-}
+  }
 
 } // namespace Belle2
 

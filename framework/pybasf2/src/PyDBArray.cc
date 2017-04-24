@@ -47,7 +47,7 @@ PyDBArray::PyDBArray(const std::string& name): PyDBArray(name, getDefaultClass(n
 
 PyDBArray::PyDBArray(const TClass* objClass): PyDBArray(DataStore::defaultArrayName(objClass), objClass) {}
 
-PyDBArray::PyDBArray(const std::string& name, const TClass* objClass): DBAccessorBase("dbstore", name, objClass, true)
+PyDBArray::PyDBArray(const std::string& name, const TClass* objClass): DBAccessorBase(name, objClass, true)
 {
   m_array = reinterpret_cast<TClonesArray**>(&m_entry->object);
 }

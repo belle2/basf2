@@ -52,8 +52,11 @@ namespace Belle2 {
       double predict();
 
     private:
-      /// References to the named values from the source variable set.
-      std::vector<Named<Float_t*> > m_namedVariables;
+      /// References to the all named values from the source variable set.
+      std::vector<Named<Float_t*> > m_allNamedVariables;
+
+      /// References to the *selected* named values from the source variable set.
+      std::vector<Named<Float_t*> > m_selectedNamedVariables;
 
       /// Database pointer to the Database representation of the weightfile
       std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile> > m_weightfileRepresentation;

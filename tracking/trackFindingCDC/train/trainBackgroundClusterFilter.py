@@ -18,7 +18,7 @@ class BackgroundClusterFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEventsR
     def create_path(self):
         """Setup the recording path after the simulation"""
         path = super().create_path()
-        path.add_module("WireHitPreparer",
+        path.add_module("TFCDC_WireHitPreparer",
                         flightTimeEstimation="outwards")
 
         if self.task == "train":
@@ -41,14 +41,13 @@ class BackgroundClusterFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEventsR
                 "filter(mva_bkg)",
             ]
 
-        path.add_module("SegmentFinderCDCFacetAutomaton",
+        path.add_module("TFCDC_ClusterPreparer",
                         ClusterFilter="unionrecording",
                         ClusterFilterParameters={
                             "rootFileName": self.sample_file_name,
                             "varSets": varSets,
-                        },
-                        FacetFilter="none",
-                        FacetRelationFilter="none")
+                        })
+
         return path
 
 

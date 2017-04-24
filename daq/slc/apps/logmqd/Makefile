@@ -9,7 +9,8 @@ EXTERNAL_CFLAGS2=-I$(CMS_INC)
 
 copyinc:
 	@ mkdir -p $(INCDIR)/apps/logmqd
-	@  install -m 644 -p $(BELLE2_DAQ_SLC)/apps/logmqd/include/* $(INCDIR)/apps/logmqd
+	@ ln -s $(BELLE2_DAQ_SLC)/apps/logmqd/include/* $(INCDIR)/apps/logmqd/
+#	@ install -m 644 -p $(BELLE2_DAQ_SLC)/apps/logmqd/include/* $(INCDIR)/apps/logmqd
 
 apps/logmqd: %:
 	@ make -C $(BELLE2_DAQ_SLC) -f Makefile.src TARGET=$@ EXTERNAL_CFLAGS=$(EXTERNAL_CFLAGS) EXTERNAL_CFLAGS2=$(EXTERNAL_CFLAGS2)

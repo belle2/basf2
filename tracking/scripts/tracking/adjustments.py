@@ -53,6 +53,23 @@ def disable_deltas(path):
             module.param('ProductionCut', 1000000.)
 
 
+def keep_secondaries(path):
+    """Keep all secondaries from the FullSim
+
+    Arguments
+    ---------
+    path : basf2.Path
+    """
+
+    for module in path.modules():
+        if module.type() == 'FullSim':
+            module.param({
+                "StoreAllSecondaries": True,
+                "SecondariesEnergyCut": 0,
+                "trajectoryStore": 2,
+            })
+
+
 def enable_wire_by_wire_mode(path):
     """Enables the wire by wire material distribution in the CDC
 

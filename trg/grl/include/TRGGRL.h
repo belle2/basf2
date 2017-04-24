@@ -33,43 +33,43 @@
 
 
 namespace HepGeom {
-template <class T> class Point3D;
+  template <class T> class Point3D;
 }
 
 namespace Belle2 {
 
-class TRGTime;
-class TRGClock;
-class TRGLink;
-class TRGGRL;
+  class TRGTime;
+  class TRGClock;
+  class TRGLink;
+  class TRGGRL;
 
-///  The instance of TRGGRL is a singleton. 'TRGGRL::getTRGGRL()'
-///  gives you a pointer to access the TRGGRL. Geometrical information
-///  is initialized automatically. Before accessing hit information,
-///  user has to call 'update()' to initialize hit information event
-///  by event.
+//  The instance of TRGGRL is a singleton. 'TRGGRL::getTRGGRL()'
+//  gives you a pointer to access the TRGGRL. Geometrical information
+//  is initialized automatically. Before accessing hit information,
+//  user has to call 'update()' to initialize hit information event
+//  by event.
 
-class TRGGRL {
+  class TRGGRL {
 
   public:
 
     /// returns TRGGRL object with specific configuration.
-    static TRGGRL * getTRGGRL(const std::string & configFile,
-                              unsigned simulationMode = 0,
-                              unsigned fastSimulationMode = 0,
-                              unsigned firmwareSimulationMode = 0);
+    static TRGGRL* getTRGGRL(const std::string& configFile,
+                             unsigned simulationMode = 0,
+                             unsigned fastSimulationMode = 0,
+                             unsigned firmwareSimulationMode = 0);
 
     /// returns TRGGRL object. TRGGRL should be created with specific
     /// configuration before calling this function.
-    static TRGGRL * getTRGGRL(void);
+    static TRGGRL* getTRGGRL(void);
 
   private:
 
     /// Constructor
-    TRGGRL(const std::string & configFile,
-	   unsigned simulationMode,
-	   unsigned fastSimulationMode,
-	   unsigned firmwareSimulationMode);
+    TRGGRL(const std::string& configFile,
+           unsigned simulationMode,
+           unsigned fastSimulationMode,
+           unsigned firmwareSimulationMode);
 
     /// Destructor
     virtual ~TRGGRL();
@@ -110,7 +110,7 @@ class TRGGRL {
     unsigned firmwareSimulationMode(void) const;
 
     /// dumps debug information.
-    void dump(const std::string & message) const;
+    void dump(const std::string& message) const;
 
     /// returns debug level.
     int debugLevel(void) const;
@@ -134,7 +134,7 @@ class TRGGRL {
   public:// TRG information
 
     /// returns the system clock.
-    const TRGClock & systemClock(void) const;
+    const TRGClock& systemClock(void) const;
 
   private:
 
@@ -147,7 +147,7 @@ class TRGGRL {
   private:
 
     /// GRL singleton.
-    static TRGGRL * _grl;
+    static TRGGRL* _grl;
 
     /// Debug level.
     mutable int _debugLevel;
@@ -165,55 +165,60 @@ class TRGGRL {
     unsigned _firmwareSimulationMode;
 
     /// GRL trigger system clock.
-    const TRGClock & _clock;
+    const TRGClock& _clock;
 
     /// root file
-    TFile * m_file;
+    TFile* m_file;
 
-    /// root tree 
-    TTree * h1;
+    /// root tree
+    TTree* h1;
 
-	/** Temporary variables to make tree in root files */
-    double x0, x1, x2, x3, x4, x5, x6, x7, x8, x9;	
-	/**  Vector which stores list of TRGGRLMatch without 3D information */
-    std::vector<TRGGRLMatch * > matchList;
-	/**  Vector which stores list of TRGGRLMatch with 3D information */
-    std::vector<TRGGRLMatch * > matchList3D;
+    /** Temporary variables to make tree in root files */
+    double x0, x1, x2, x3, x4, x5, x6, x7, x8, x9;
+    /**  Vector which stores list of TRGGRLMatch without 3D information */
+    std::vector<TRGGRLMatch* > matchList;
+    /**  Vector which stores list of TRGGRLMatch with 3D information */
+    std::vector<TRGGRLMatch* > matchList3D;
 
     friend class TRGGRLModule;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-int
-TRGGRL::debugLevel(void) const {
+  inline
+  int
+  TRGGRL::debugLevel(void) const
+  {
     return _debugLevel;
-}
+  }
 
-inline
-int
-TRGGRL::debugLevel(int a) const {
+  inline
+  int
+  TRGGRL::debugLevel(int a) const
+  {
     return _debugLevel = a;
-}
+  }
 
-inline
-const TRGClock &
-TRGGRL::systemClock(void) const {
+  inline
+  const TRGClock&
+  TRGGRL::systemClock(void) const
+  {
     return _clock;
-}
+  }
 
-inline
-unsigned
-TRGGRL::firmwareSimulationMode(void) const {
+  inline
+  unsigned
+  TRGGRL::firmwareSimulationMode(void) const
+  {
     return _firmwareSimulationMode;
-}
+  }
 
-inline
-std::string
-TRGGRL::configFile(void) const {
+  inline
+  std::string
+  TRGGRL::configFile(void) const
+  {
     return _configFilename;
-}
+  }
 
 } // namespace Belle2
 

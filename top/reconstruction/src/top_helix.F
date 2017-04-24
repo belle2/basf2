@@ -15,6 +15,7 @@
 ! HLX(8)  S_T    pT/p                                 S_T pT/p
 ! HLX(9)  S_Z    pz/p                                 S_Z pz/p
 ! HLX(10) T0     2*pi/OMEGA        - t' period        =0
+! mar-2017: change in some commons
 !-----------------------------------------------------------------------
 
 

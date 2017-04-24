@@ -91,6 +91,9 @@ namespace Belle2 {
     bool m_useSingleClusterSP; /**< If true use single cluster SpacePoint collection as fallback */
     bool m_markRecoTracks; /**< If True RecoTracks where conversion problems occurred are marked dirty */
 
+    NoKickRTSel* m_trackSel;
+    std::string m_noKickCutsFile;
+
     // state variables
 
     bool m_mcParticlesPresent;

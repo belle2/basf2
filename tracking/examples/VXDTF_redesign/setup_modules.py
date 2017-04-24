@@ -272,6 +272,7 @@ def setup_RTCtoSPTCConverters(
     recoTrackCandConverter.param('useSingleClusterSP', False)
     recoTrackCandConverter.param('minSP', 3)
     recoTrackCandConverter.param('skipProblematicCluster', False)
+    recoTrackCandConverter.param('noKickCutsFile', "NoKick/NoKickCuts.root")
 
     # SpacePointTrackCand referee
     sptcReferee = register_module('SPTCReferee')

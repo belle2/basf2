@@ -74,9 +74,7 @@ namespace Belle2 {
 
     std::string m_SVDClusterName; /**< SVDCluster collection name */
 
-    std::string m_SVDDoubleClusterSPName; /**< Non SingleCluster SVD SpacePoints collection name */
-
-    std::string m_PXDClusterSPName; /**< PXD SpacePoints collection name */
+    std::string m_SVDAndPXDSPName; /**< Non SingleCluster SVD SpacePoints AND PXD SpacePoints collection name */
 
     std::string m_SVDSingleClusterSPName; /**< Single Cluster SVD SpacePoints collection name */
 

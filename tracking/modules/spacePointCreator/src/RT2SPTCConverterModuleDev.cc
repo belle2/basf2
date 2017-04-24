@@ -37,13 +37,11 @@ RT2SPTCConverterModule::RT2SPTCConverterModule() :
   // required for conversion
   addParam("SVDClusters", m_SVDClusterName, "SVDCluster collection name", std::string(""));
 
-  addParam("SVDDoubleClusterSP", m_SVDDoubleClusterSPName, "SVD Cluster SpacePoints collection name.", std::string(""));
+  addParam("SVDandPXDSPName", m_SVDAndPXDSPName, "Name of the collection for SVD and PXD SpacePoints. Note: that "
+           "both PXD and SVD SpacePoints should be contained in that collection.", std::string(""));
 
   // optional input
-  addParam("SVDSingleClusterSP", m_SVDSingleClusterSPName, "SVD single Cluster SpacePoints collection name", std::string(""));
-
-  // optional input the space points created from pxd clusters
-  addParam("PXDClusterSP", m_PXDClusterSPName, "SpacePoints collection name created from PXD Cluster", std::string(""));
+  addParam("SVDSingleClusterSP", m_SVDSingleClusterSPName, "SVD single Cluster SpacePoints collection name.", std::string(""));
 
   // output
   addParam("SpacePointTCName", m_SPTCName,
@@ -65,6 +63,8 @@ RT2SPTCConverterModule::RT2SPTCConverterModule() :
 
   addParam("markRecoTracks", m_markRecoTracks, "If True RecoTracks where conversion problems occurred are marked dirty.", false);
 
+
+
   initializeCounters();
 }
 
@@ -77,7 +77,7 @@ void RT2SPTCConverterModule::initialize()
 
   // check if all required StoreArrays are here
   StoreArray<SVDCluster>::required(m_SVDClusterName);
-  StoreArray<SpacePoint>::required(m_SVDDoubleClusterSPName);
+  StoreArray<SpacePoint>::required(m_SVDAndPXDSPName);
 
 
   StoreArray<RecoTrack> recoTracks(m_RecoTracksName);
@@ -231,14 +231,11 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformationViaTrueHits(std::vec
       else break;
     }
 
-
-    const SpacePoint* relatedSpacePoint = NULL;
-    if (hitInfo->getTrackingDetector() == RecoHitInformation::c_PXD)
-      relatedSpacePoint = relatedTrueHit->getRelatedFrom<SpacePoint>(m_PXDClusterSPName);
+    // NOTE: double cluster SVD SP and PXD SP should be stored in the same StoreArray!
+    const SpacePoint* relatedSpacePoint = relatedTrueHit->getRelatedFrom<SpacePoint>(m_SVDAndPXDSPName);
 
     // special case for the SVD cluster as there is the option for single cluster SP
     if (hitInfo->getTrackingDetector() == RecoHitInformation::c_SVD) {
-      relatedSpacePoint = relatedTrueHit->getRelatedFrom<SpacePoint>(m_SVDDoubleClusterSPName);
       if (!relatedSpacePoint && m_useSingleClusterSP) {
         relatedSpacePoint = cluster->getRelatedFrom<SpacePoint>(m_SVDSingleClusterSPName);
         if (!relatedSpacePoint->getRelatedTo<SVDTrueHit>()) relatedSpacePoint = nullptr;
@@ -253,7 +250,7 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformationViaTrueHits(std::vec
     }
 
 
-    // Prevent adding the same SpacePoint twice
+    // Prevent adding the same SpacePoint twice as there are 2 clusters per SP for SVD
     if (std::find(finalSpacePoints.begin(), finalSpacePoints.end(), relatedSpacePoint) == finalSpacePoints.end()) {
       finalSpacePoints.push_back(relatedSpacePoint);
     }
@@ -301,7 +298,7 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
       else break;
     }
 
-    RelationVector<SpacePoint> relatedSpacePointsA = clusterA->getRelationsFrom<SpacePoint>(m_SVDDoubleClusterSPName);
+    RelationVector<SpacePoint> relatedSpacePointsA = clusterA->getRelationsFrom<SpacePoint>(m_SVDAndPXDSPName);
 
     SVDCluster* clusterB = NULL;
     if (iHit + 1 < hitInfos.size()) clusterB = hitInfos.at(iHit + 1)->getRelated<SVDCluster>();
@@ -311,7 +308,7 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
 
     // Try to verify SpacePoint by using next cluster to build a U/V pair.
     if (clusterA && clusterB && (clusterA->isUCluster() != clusterB->isUCluster())) {
-      auto relatedSpacePointsB = clusterB->getRelationsFrom<SpacePoint>(m_SVDDoubleClusterSPName);
+      auto relatedSpacePointsB = clusterB->getRelationsFrom<SpacePoint>(m_SVDAndPXDSPName);
 
       // determine intersecting SpacePoints.
       for (const auto& spacePoint : relatedSpacePointsA) {

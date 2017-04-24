@@ -51,7 +51,7 @@ void SPTCmomentumSeedRetrieverModule::event()
           m_spacePointTrackCands.getEntries() << " TCs\n");
 
   // create momentum seed for each given SpacePointTrackCand
-  B2WARNING("Number of TCs in Event = " << m_spacePointTrackCands.getEntries());
+  B2INFO("Number of TCs in Event = " << m_spacePointTrackCands.getEntries()); // demoted to a INFO, has been a warning
   for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
     B2DEBUG(1, "\n" << "SPTCmomentumSeedRetrieverModule:event: this TC has got " << aTC.size() << " hits\n");
     createSPTCmomentumSeed(aTC);

@@ -28,6 +28,7 @@ REG_MODULE(RT2SPTCConverter)
 RT2SPTCConverterModule::RT2SPTCConverterModule() :
   Module(),
   m_trackSel(nullptr)
+
 {
   setDescription("Module for converting RecoTracks (e.g. from TrackFinderMCTruth) to SpacePointTrackCands.");
   setPropertyFlags(c_ParallelProcessingCertified);

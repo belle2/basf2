@@ -17,6 +17,9 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <tracking/trackFindingVXD/sectorMapTools/NoKickRTSel.h>
+#include <tracking/trackFindingVXD/sectorMapTools/NoKickCuts.h>
+
 namespace Belle2 {
   /**
    * Module for converting RecoTracks to SpacePointTrackCands

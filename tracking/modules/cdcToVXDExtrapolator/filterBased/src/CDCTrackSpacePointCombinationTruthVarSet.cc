@@ -9,6 +9,7 @@
  **************************************************************************/
 #include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationTruthVarSet.h>
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 using namespace std;
 using namespace Belle2;
@@ -20,6 +21,12 @@ bool CDCTrackSpacePointCombinationTruthVarSet::extract(const BaseCDCTrackSpacePo
   const SpacePoint* spacePoint = result->getSpacePoint();
 
   if (not cdcTrack or not spacePoint) return false;
+
+  StoreObjPtr<EventMetaData> eventMetaData;
+  var<named("event_id")>() = eventMetaData->getEvent();
+
+  var<named("space_point_number")>() = spacePoint->getArrayIndex();
+  var<named("cdc_number")>() = cdcTrack->getArrayIndex();
 
   const std::string& cdcTrackStoreArrayName = cdcTrack->getArrayName();
 
@@ -33,10 +40,11 @@ bool CDCTrackSpacePointCombinationTruthVarSet::extract(const BaseCDCTrackSpacePo
   var<named("truth_momentum_x")>() = 0;
   var<named("truth_momentum_y")>() = 0;
   var<named("truth_momentum_z")>() = 0;
+  var<named("truth")>() = false;
+  var<named("truth_no_curler")>() = false;
 
   // In case the CDC track is a fake, return false always
   if (not cdcMCTrack) {
-    var<named("truth")>() = false;
     return true;
   }
 
@@ -54,10 +62,11 @@ bool CDCTrackSpacePointCombinationTruthVarSet::extract(const BaseCDCTrackSpacePo
     });
 
     if (not cdcTrackMatchedToCluster) {
-      var<named("truth")>() = false;
       return true;
     }
   }
+
+  var<named("truth_no_curler")>() = true;
 
   // Test if these clusters are on the first half of the track
   // The track needs to have some SVD hits, so we can savely access the first element
@@ -72,7 +81,6 @@ bool CDCTrackSpacePointCombinationTruthVarSet::extract(const BaseCDCTrackSpacePo
   const RecoHitInformation* firstClusterInformation = cdcMCTrack->getRecoHitInformation(relatedSVDClusters[0]);
 
   if (firstCDCHitInformation->getSortingParameter() < firstClusterInformation->getSortingParameter()) {
-    var<named("truth")>() = false;
     return true;
   }
 

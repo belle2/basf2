@@ -17,12 +17,16 @@ namespace Belle2 {
   constexpr
   static char const* const cdcTrackSpacePointCombinationTruthNames[] = {
     "truth",
+    "truth_no_curler",
     "truth_position_x",
     "truth_position_y",
     "truth_position_z",
     "truth_momentum_x",
     "truth_momentum_y",
-    "truth_momentum_z"
+    "truth_momentum_z",
+    "event_id",
+    "space_point_number",
+    "cdc_number"
   };
 
   /// Vehicle class to transport the variable names

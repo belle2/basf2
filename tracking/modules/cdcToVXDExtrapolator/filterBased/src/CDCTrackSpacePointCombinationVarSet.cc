@@ -72,6 +72,113 @@ bool CDCTrackSpacePointCombinationVarSet::extract(const BaseCDCTrackSpacePointCo
   var<named("track_position_at_hit_y")>() = trackPositionAtHit.y();
   var<named("track_position_at_hit_z")>() = trackPositionAtHit.z();
 
+  const auto& cov = firstMeasurement.get6DCov();
+  const auto& cov5 = firstMeasurement.getCov();
+
+  var<named("C_00")>() = cov(0, 0);
+  var<named("C_01")>() = cov(0, 1);
+  var<named("C_02")>() = cov(0, 2);
+  var<named("C_03")>() = cov(0, 3);
+  var<named("C_04")>() = cov(0, 4);
+  var<named("C_05")>() = cov(0, 4);
+
+  var<named("C_10")>() = cov(1, 0);
+  var<named("C_11")>() = cov(1, 1);
+  var<named("C_12")>() = cov(1, 2);
+  var<named("C_13")>() = cov(1, 3);
+  var<named("C_14")>() = cov(1, 4);
+  var<named("C_15")>() = cov(1, 4);
+
+  var<named("C_20")>() = cov(2, 0);
+  var<named("C_21")>() = cov(2, 1);
+  var<named("C_22")>() = cov(2, 2);
+  var<named("C_23")>() = cov(2, 3);
+  var<named("C_24")>() = cov(2, 4);
+  var<named("C_25")>() = cov(2, 4);
+
+  var<named("C_30")>() = cov(3, 0);
+  var<named("C_31")>() = cov(3, 1);
+  var<named("C_32")>() = cov(3, 2);
+  var<named("C_33")>() = cov(3, 3);
+  var<named("C_34")>() = cov(3, 4);
+  var<named("C_35")>() = cov(3, 4);
+
+  var<named("C_40")>() = cov(4, 0);
+  var<named("C_41")>() = cov(4, 1);
+  var<named("C_42")>() = cov(4, 2);
+  var<named("C_43")>() = cov(4, 3);
+  var<named("C_44")>() = cov(4, 4);
+  var<named("C_45")>() = cov(4, 4);
+
+  var<named("C_50")>() = cov(5, 0);
+  var<named("C_51")>() = cov(5, 1);
+  var<named("C_52")>() = cov(5, 2);
+  var<named("C_53")>() = cov(5, 3);
+  var<named("C_54")>() = cov(5, 4);
+  var<named("C_55")>() = cov(5, 4);
+
+  var<named("C5_00")>() = cov5(0, 0);
+  var<named("C5_01")>() = cov5(0, 1);
+  var<named("C5_02")>() = cov5(0, 2);
+  var<named("C5_03")>() = cov5(0, 3);
+  var<named("C5_04")>() = cov5(0, 4);
+
+  var<named("C5_10")>() = cov5(1, 0);
+  var<named("C5_11")>() = cov5(1, 1);
+  var<named("C5_12")>() = cov5(1, 2);
+  var<named("C5_13")>() = cov5(1, 3);
+  var<named("C5_14")>() = cov5(1, 4);
+
+  var<named("C5_20")>() = cov5(2, 0);
+  var<named("C5_21")>() = cov5(2, 1);
+  var<named("C5_22")>() = cov5(2, 2);
+  var<named("C5_23")>() = cov5(2, 3);
+  var<named("C5_24")>() = cov5(2, 4);
+
+  var<named("C5_30")>() = cov5(3, 0);
+  var<named("C5_31")>() = cov5(3, 1);
+  var<named("C5_32")>() = cov5(3, 2);
+  var<named("C5_33")>() = cov5(3, 3);
+  var<named("C5_34")>() = cov5(3, 4);
+
+  var<named("C5_40")>() = cov5(4, 0);
+  var<named("C5_41")>() = cov5(4, 1);
+  var<named("C5_42")>() = cov5(4, 2);
+  var<named("C5_43")>() = cov5(4, 3);
+  var<named("C5_44")>() = cov5(4, 4);
+
+  const auto& state = firstMeasurement.getState();
+
+  var<named("state_0")>() = state(0);
+  var<named("state_1")>() = state(1);
+  var<named("state_2")>() = state(2);
+  var<named("state_3")>() = state(3);
+  var<named("state_4")>() = state(4);
+
+  unsigned int clusterNumber = 0;
+  for (const SVDCluster& relatedCluster : spacePoint->getRelationsTo<SVDCluster>()) {
+    SVDRecoHit clusterMeasurement(&relatedCluster);
+    const std::vector<genfit::MeasurementOnPlane*> measurementsOnPlane = clusterMeasurement.constructMeasurementsOnPlane(
+          firstMeasurement);
+
+    const genfit::MeasurementOnPlane& measurementOnPlane = *(measurementsOnPlane.front());
+
+    const auto& m_k = measurementOnPlane.getState();
+    const auto& V_k = measurementOnPlane.getCov();
+
+    if (clusterNumber == 0) {
+      var<named("m_0_state")>() = m_k(0);
+      var<named("m_0_cov")>() = V_k(0, 0);
+      var<named("is_u_0")>() = clusterMeasurement.isU();
+    } else {
+      var<named("m_1_state")>() = m_k(0);
+      var<named("m_1_cov")>() = V_k(0, 0);
+      var<named("is_u_1")>() = clusterMeasurement.isU();
+    }
+
+    clusterNumber++;
+  }
+
   var<named("same_hemisphere")>() = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
 
   var<named("layer")>() = sensorInfo.getLayerNumber();
@@ -90,6 +197,7 @@ bool CDCTrackSpacePointCombinationVarSet::extract(const BaseCDCTrackSpacePointCo
   var<named("numberOfHoles")>() = result->getNumberOfHoles();
 
   var<named("chi2")>() = result->getChi2();
+  var<named("lastChi2")>() = result->getLastChi2();
 
   var<named("last_layer")>() = 0;
   var<named("last_ladder")>() = 0;

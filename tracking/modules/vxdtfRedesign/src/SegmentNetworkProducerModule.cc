@@ -116,6 +116,7 @@ SegmentNetworkProducerModule::initialize()
            filters.size());
 
     m_vxdtfFilters = &filters;
+    SecMapHelper::printStaticSectorRelations(filters, filters.getConfig().secMapName + "segNetProducer", 2, true, true);
     if (m_vxdtfFilters == nullptr) B2FATAL("SegmentNetworkProducerModule::initialize(): requested secMapName '" << m_PARAMsecMapName <<
                                              "' does not exist! Can not continue...");
     break; // have found our secMap no need for further searching
@@ -250,7 +251,7 @@ std::vector< SegmentNetworkProducerModule::RawSectorData > SegmentNetworkProduce
       }
       nSPsFound++;
 
-      TrackNode* trackNode = new TrackNode(aSP.getArrayIndex());
+      TrackNode* trackNode = new TrackNode();
       trackNode->spacePoint = &aSP;
       trackNodes.push_back(trackNode);
 
@@ -272,7 +273,6 @@ std::vector< SegmentNetworkProducerModule::RawSectorData > SegmentNetworkProduce
       } else {
         iter->hits.push_back(trackNode);
       }
-//    B2INFO("matchSpacePointToSectors: trackNode Found2: " << *trackNode); // TODO Jan8_2016: remove!
 
     } // loop over SpacePoints in StoreArray
   } // loop over StoreArrays
@@ -432,7 +432,7 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
         bool wasAnythingFoundSoFar = false;
 
 
-        std::string outerNodeID = outerHit->getID();
+        std::string outerNodeID = outerHit->getName();
         hitNetwork.addNode(outerNodeID, *outerHit);
 
         for (TrackNode* innerHit : innerHits) {
@@ -446,7 +446,7 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
           nAccepted++;
 
 
-          std::string innerNodeID = innerHit->getID();
+          std::string innerNodeID = innerHit->getName();
           hitNetwork.addNode(innerNodeID, *innerHit);
           // store combination of hits in network:
           if (!wasAnythingFoundSoFar) {
@@ -524,7 +524,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
         if (accepted == false) { nRejected++; continue; } // skip combinations which weren't accepted
         nAccepted++;
 
-        std::string innerSegmentID = centerHit->getEntry().getID() + innerHit->getEntry().getID();
+        std::string innerSegmentID = centerHit->getEntry().getName() + innerHit->getEntry().getName();
         if (not segmentNetwork.isNodeInNetwork(innerSegmentID)) {
           // create innerSegment first (order of storage in vector<segments> is irrelevant):
           Segment<TrackNode>* innerSegment = new Segment<TrackNode>(
@@ -537,7 +537,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
           segmentNetwork.addNode(innerSegmentID, *innerSegment);
         }
 
-        std::string outerSegmentID = outerHit->getEntry().getID() + centerHit->getEntry().getID();
+        std::string outerSegmentID = outerHit->getEntry().getName() + centerHit->getEntry().getName();
         if (not segmentNetwork.isNodeInNetwork(outerSegmentID)) {
           // create innerSegment first (order of storage in vector<segments> is irrelevant):
           Segment<TrackNode>* outerSegment = new Segment<TrackNode>(

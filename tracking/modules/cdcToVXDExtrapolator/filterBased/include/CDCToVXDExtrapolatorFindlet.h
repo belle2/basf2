@@ -42,6 +42,9 @@ namespace Belle2 {
     /// Findlet doing the main work: the tree finding
     CKFCDCToVXDTreeSearchFindlet m_treeSearchFindlet;
 
+    // Parameters
+    bool m_param_exportTracks = true;
+
     // Object pools
     /// Pointers to the CDC Reco tracks as a vector
     std::vector<RecoTrack*> m_cdcRecoTrackVector;

@@ -25,6 +25,8 @@ void CDCToVXDExtrapolatorFindlet::exposeParameters(ModuleParamList* moduleParamL
 
   m_treeSearchFindlet.exposeParameters(moduleParamList, prefix);
   m_storeArrayMerger.exposeParameters(moduleParamList, prefix);
+
+  moduleParamList->addParameter("exportTracks", m_param_exportTracks, "", m_param_exportTracks);
 }
 
 void CDCToVXDExtrapolatorFindlet::beginEvent()
@@ -56,5 +58,7 @@ void CDCToVXDExtrapolatorFindlet::apply()
 
   // Use the found hits for each track, create new VXD reco tracks, add relations, merge the tracks and fill them
   // into a new store array
-  m_storeArrayMerger.apply(m_results);
+  if (m_param_exportTracks) {
+    m_storeArrayMerger.apply(m_results);
+  }
 }

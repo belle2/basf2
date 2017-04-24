@@ -63,7 +63,7 @@ RT2SPTCConverterModule::RT2SPTCConverterModule() :
 
   addParam("markRecoTracks", m_markRecoTracks, "If True RecoTracks where conversion problems occurred are marked dirty.", false);
 
-
+  addParam("ignorePXDHits", m_ignorePXDHits, "If true no PXD hits will be used when creating the SpacePointTrackCand", bool(false));
 
   initializeCounters();
 }
@@ -119,6 +119,17 @@ void RT2SPTCConverterModule::event()
 
     // the hit informations from the recotrack, the option "true" will result in a sorted vector
     std::vector<RecoHitInformation*> hitInfos = recoTrack.getRecoHitInformations(true);
+
+    // if requested remove the PXD hits
+    // NOTE: in RecoTracks there is also a function to get sorted SVD hits only but this uses not the same code as getRecoHitInformations!
+    if (m_ignorePXDHits) {
+      std::vector<RecoHitInformation*> hitInfos_buff;
+      for (std::vector<RecoHitInformation*>::iterator it = hitInfos.begin(); it < hitInfos.end(); it++) {
+        if ((*it)->getTrackingDetector() != RecoHitInformation::c_PXD) hitInfos_buff.push_back(*it);
+      }
+      hitInfos = hitInfos_buff;
+    }
+
     B2DEBUG(20, "New call getSpacePointsFromRecoHitInformationViaTrueHits. Number of hitInfos: " << hitInfos.size());
     B2DEBUG(20, "number of SVD hits in RecoTrack : " << recoTrack.getNumberOfSVDHits());
     B2DEBUG(20, "number of PXD hits in RecoTrack : " << recoTrack.getNumberOfPXDHits());
@@ -201,6 +212,7 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformationViaTrueHits(std::vec
     if (hitInfo->getTrackingDetector() != RecoHitInformation::c_SVD && hitInfo->getTrackingDetector() != RecoHitInformation::c_PXD)
       continue;
 
+
     const VXDTrueHit* relatedTrueHit = NULL;
     RelationsObject* cluster = NULL;
 
@@ -272,6 +284,7 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
     // ignore all hits that are not SVD or PXD
     if (hitInfos[iHit]->getTrackingDetector() != RecoHitInformation::c_SVD &&
         hitInfos[iHit]->getTrackingDetector() != RecoHitInformation::c_PXD) continue;
+
 
     std::vector<const SpacePoint*> spacePointCandidates; /**< For all SpacePoints in this vector a TrackNode will be created */
 

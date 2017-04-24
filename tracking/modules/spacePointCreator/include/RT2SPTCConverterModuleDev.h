@@ -83,6 +83,7 @@ namespace Belle2 {
     std::string m_SPTCName; /**< Name of collection under which SpacePointTrackCands will be stored in the StoreArray */
 
     // parameters
+    bool m_ignorePXDHits; /**< PXD hits will be ignored when creating the SP track candidate */
 
     int m_minSP; /**< parameter for specifying a minimal number of SpacePoints a SpacePointTrackCand has to have in order to be registered in the DataStore */
     bool m_useTrueHits; /**< If true the method getSpacePointsFromSVDClustersViaTrueHits is utilized. Requires TrueHits to be present and to have relations to SpacePoints! */

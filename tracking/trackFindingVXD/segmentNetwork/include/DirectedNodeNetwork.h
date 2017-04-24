@@ -204,17 +204,16 @@ namespace Belle2 {
       else return nullptr;
     }
 
-    //  std::vector<std::unique_ptr<Node> >& getNodes() { return m_nodes; }
     /** returns all nodes of the network */
     std::unordered_map<NodeID, Node* >& getNodes() { return m_nodeMap; }
 
 
     /** returns iterator for container: begin */
-    //typename std::unordered_map< NodeID, Node* >::iterator begin() { return m_nodeMap.begin(); }
+    typename std::unordered_map< NodeID, Node* >::iterator begin() { return m_nodeMap.begin(); }
 
 
     /** returns iterator for container: end */
-    //typename std::unordered_map< NodeID, Node* >::iterator end() { return m_nodeMap.end(); }
+    typename std::unordered_map< NodeID, Node* >::iterator end() { return m_nodeMap.end(); }
 
 
     /** returns number of nodes to be found in the network */

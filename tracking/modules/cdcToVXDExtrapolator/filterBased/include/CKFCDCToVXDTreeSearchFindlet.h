@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/minimal/TreeSearchFindlet.h>
+#include <tracking/modules/cdcToVXDExtrapolator/filterBased/LayerToggleCDCToVXDExtrapolationFilter.h>
 #include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationFilterFactory.h>
 #include <tracking/modules/cdcToVXDExtrapolator/filterBased/CKFCDCToVXDResultObject.h>
 
@@ -53,9 +54,6 @@ namespace Belle2 {
         Eigen::Vector5d x_k_old(measuredStateOnPlane.getState().GetMatrixArray());
         Eigen::Matrix5d C_k_old(measuredStateOnPlane.getCov().GetMatrixArray());
 
-        Eigen::Vector5d x_k_new = x_k_old;
-        Eigen::Matrix5d C_k_new = C_k_old;
-
         // Loop over the two clusters and extract the change for x_k and C_k.
         for (const SVDCluster& relatedCluster : spacePoint->getRelationsTo<SVDCluster>()) {
           SVDRecoHit clusterMeasurement(&relatedCluster);
@@ -79,20 +77,20 @@ namespace Belle2 {
           B2DEBUG(200, "x_k_old " << x_k_old);
           B2DEBUG(200, "K_k " << K_k);
 
-          C_k_new -= K_k * H_k * C_k_old;
-          x_k_new += K_k * (m_k - H_k * x_k_old);
+          C_k_old -= K_k * H_k * C_k_old;
+          x_k_old += K_k * (m_k - H_k * x_k_old);
 
-          Eigen::Vector1d residual = m_k - H_k * x_k_new;
+          Eigen::Vector1d residual = m_k - H_k * x_k_old;
 
-          chi2 += residual.transpose() * (V_k - H_k * C_k_new * H_k_t).inverse() * residual;
+          chi2 += residual.transpose() * (V_k - H_k * C_k_old * H_k_t).inverse() * residual;
 
-          B2DEBUG(200, "C_k_new " << C_k_new);
-          B2DEBUG(200, "x_k_new " << x_k_new);
+          B2DEBUG(200, "C_k_old " << C_k_old);
+          B2DEBUG(200, "x_k_old " << x_k_old);
           B2DEBUG(100, "chi2 " << chi2);
         }
 
-        measuredStateOnPlane.setState(TVectorD(5, x_k_new.data()));
-        measuredStateOnPlane.setCov(TMatrixDSym(5, C_k_new.data()));
+        measuredStateOnPlane.setState(TVectorD(5, x_k_old.data()));
+        measuredStateOnPlane.setCov(TMatrixDSym(5, C_k_old.data()));
       }
 
       return true;

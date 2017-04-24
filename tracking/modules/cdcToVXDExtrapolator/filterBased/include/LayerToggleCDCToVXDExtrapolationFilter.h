@@ -10,9 +10,10 @@
 #pragma once
 
 #include <tracking/modules/cdcToVXDExtrapolator/filterBased/BaseCDCTrackSpacePointCombinationFilter.h>
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
 
 namespace Belle2 {
-  template <class AHighLayerFilter, class ALowLayerFilter>
+  template <class AFilterFactory>
   class LayerToggleCDCToVXDExtrapolationFilter : public BaseCDCTrackSpacePointCombinationFilter {
   public:
     LayerToggleCDCToVXDExtrapolationFilter() : BaseCDCTrackSpacePointCombinationFilter()
@@ -26,8 +27,8 @@ namespace Belle2 {
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "toggleOnLayer"),
       m_param_toggleOnLayer, "", m_param_toggleOnLayer);
 
-      m_highLayerFilter.exposeParameters(moduleParamList, prefix);
-      m_lowLayerFilter.exposeParameters(moduleParamList, prefix);
+      m_highLayerFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "high"));
+      m_lowLayerFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "low"));
     }
 
     TrackFindingCDC::Weight operator()(const BaseCDCTrackSpacePointCombinationFilter::Object& currentState) final {
@@ -50,7 +51,7 @@ namespace Belle2 {
   private:
     int m_param_toggleOnLayer = 0;
 
-    AHighLayerFilter m_highLayerFilter;
-    ALowLayerFilter m_lowLayerFilter;
+    TrackFindingCDC::ChooseableFilter<AFilterFactory> m_highLayerFilter;
+    TrackFindingCDC::ChooseableFilter<AFilterFactory> m_lowLayerFilter;
   };
 }

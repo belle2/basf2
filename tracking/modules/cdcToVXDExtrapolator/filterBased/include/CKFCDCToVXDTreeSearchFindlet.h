@@ -30,7 +30,7 @@ namespace Eigen {
 
 namespace Belle2 {
   class CKFCDCToVXDTreeSearchFindlet : public TrackFindingCDC::TreeSearchFindlet<CKFCDCToVXDStateObject,
-    CDCTrackSpacePointCombinationFilterFactory> {
+    LayerToggleCDCToVXDExtrapolationFilter<CDCTrackSpacePointCombinationFilterFactory>> {
   public:
     using Super = TrackFindingCDC::TreeSearchFindlet<CKFCDCToVXDStateObject,
           CDCTrackSpacePointCombinationFilterFactory>;

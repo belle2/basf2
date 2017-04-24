@@ -106,18 +106,17 @@ void TrackFinderVXDCellOMatModule::event()
 
   DirectedNodeNetwork< Segment<TrackNode>, CACell >& segmentNetwork = m_network->accessSegmentNetwork();
 
-  if (m_PARAMprintNetworks) {
-    std::string fileName = m_PARAMsecMapName + "_CA_Ev" + std::to_string(m_eventCounter);
-    //DNN::printCANetwork<Segment< Belle2::TrackNode>>(segmentNetwork, fileName);
-  }
-
-
-/// apply CA algorithm:
+  /// apply CA algorithm:
   int nRounds = m_cellularAutomaton.apply(segmentNetwork);
   if (nRounds < 0) { B2ERROR("CA failed, skipping event!"); return; }
 
+  if (m_PARAMprintNetworks) {
+    std::string fileName = m_PARAMNetworkName + "_CA_Ev" + std::to_string(m_eventCounter);
+    DNN::printCANetwork<Segment< Belle2::TrackNode>>(segmentNetwork, fileName);
+  }
 
-/// mark valid Cells as Seeds:
+
+  /// mark valid Cells as Seeds:
   unsigned int nSeeds = m_cellularAutomaton.findSeeds(segmentNetwork, m_PARAMstrictSeeding);
   if (nSeeds == 0) { B2WARNING("TrackFinderVXDCellOMatModule: In Event: " << m_eventCounter << " no seed could be found -> no TCs created!"); return; }
 

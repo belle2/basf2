@@ -70,11 +70,6 @@ namespace Belle2 {
       return (getFullSecID() > b.getFullSecID());
     }
 
-
-    /** overloaded '<<' stream operator. Print secID to stream by converting it to string */
-    friend std::ostream& operator<< (std::ostream& out, const ActiveSector& aSector) { out << aSector.getName(); return out; }
-
-
     /** ************************* PUBLIC MEMBER FUNCTIONS ************************* */
 /// getters:
 

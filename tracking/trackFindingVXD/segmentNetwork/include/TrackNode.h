@@ -74,14 +74,6 @@ namespace Belle2 {
     }
 
 
-    /** overloaded '<<' stream operator. Print secID to stream by converting it to string */
-    friend std::ostream& operator<< (std::ostream& out, const TrackNode& aNode)
-    {
-      out << aNode.getName();
-      return out;
-    }
-
-
     /** returns reference to hit. */
     const SpacePoint& getHit() const
     {

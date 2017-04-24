@@ -36,7 +36,7 @@ namespace Belle2 {
      * takes network and prints it to given fileName.
      *
      * prerequisite for NodeEntryType:
-     * - '<<' operator overload.
+     * - std::string getName()
      */
     template<class NodeEntryType>
     void printCANetwork(DirectedNodeNetwork<NodeEntryType, CACell>& network, std::string fName/*, bool useGetName = false*/)
@@ -44,24 +44,27 @@ namespace Belle2 {
       std::string fullOut = "digraph G {\n";
       fullOut +=
         "ranksep=\"0.2\" edge[labelfontsize=\"8\" fontsize=\"8\" arrowsize=\"0.9\"] nodesep=\"0.2\" node[shape=\"box\" width=\"0\" height=\"0\" fontsize=\"10\"]\n";
-      for (auto* entry : network) { // write vertices:
-
+      // write vertices:
+      for (auto nodeIterator : network) {
+        auto node = nodeIterator.second;
         std::stringstream  outStream;
-        outStream << entry->getEntry();
 
-        fullOut += std::to_string(entry->getIndex()) +
+        fullOut += "\"" + node->getEntry().getName() + "\"" +
                    " [label=\"" +
-                   outStream.str() +
+                   node->getEntry().getName() +
                    " State,Seed: " +
-                   std::to_string(entry->getMetaInfo().getState()) +
+                   std::to_string(node->getMetaInfo().getState()) +
                    "," +
-                   std::to_string(entry->getMetaInfo().isSeed()) +
+                   std::to_string(node->getMetaInfo().isSeed()) +
                    "\"];\n";
       }
-      for (auto* entry : network) { // write edges:
-        for (auto* nb : entry->getInnerNodes()) {
-          std::string arrowStyle = (entry->getMetaInfo().getState() == (nb->getMetaInfo().getState() + 1)) ? "" : " [style=dashed]";
-          fullOut += std::to_string(entry->getIndex()) + " -> " + std::to_string(nb->getIndex()) + arrowStyle + ";\n";
+      // write edges:
+      for (auto nodeIterator : network) {
+        auto node = nodeIterator.second;
+        for (auto* innerNode : node->getInnerNodes()) {
+          auto innerEntry = innerNode->getEntry();
+          std::string arrowStyle = (node->getMetaInfo().getState() == (innerNode->getMetaInfo().getState() + 1)) ? "" : " [style=dotted]";
+          fullOut += "\"" + node->getEntry().getName() + "\" -> \"" + innerEntry.getName() + "\"" + arrowStyle + ";\n";
         }
       }
       fullOut += "labelloc=\"t\";\nlabel=\"" + fName + "\";\n";
@@ -83,19 +86,22 @@ namespace Belle2 {
       fullOut +=
         "ranksep=\"0.2\" edge[labelfontsize=\"8\" fontsize=\"8\" arrowsize=\"0.9\"] nodesep=\"0.2\" node[shape=\"box\" width=\"0\" height=\"0\" fontsize=\"10\"]\n";
 
-      for (auto* entry : network) { // write vertices:
-
+      // write vertices:
+      for (auto nodeIterator : network) {
+        auto node = nodeIterator.second;
         std::stringstream  outStream;
-        outStream << entry->getEntry();
-        fullOut += std::to_string(entry->getIndex()) +
+        fullOut += "\"" + node->getEntry().getName() + "\"" +
                    " [label=\"" +
-                   outStream.str() +
+                   node->getEntry().getName() +
                    "\"];\n";
       }
-      for (auto* entry : network) { // write edges:
-        for (auto* nb : entry->getInnerNodes()) {
+      // write edges:
+      for (auto nodeIterator : network) {
+        auto node = nodeIterator.second;
+        for (auto* innerNode : node->getInnerNodes()) {
+          auto innerEntry = innerNode->getEntry();
           std::string arrowStyle = "";
-          fullOut += std::to_string(entry->getIndex()) + " -> " + std::to_string(nb->getIndex()) + arrowStyle + ";\n";
+          fullOut += "\"" + node->getEntry().getName() + "\" -> \"" + innerEntry.getName() + "\"" + arrowStyle + ";\n";
         }
       }
       fullOut += "labelloc=\"t\";\nlabel=\"" + fName + "\";\n";

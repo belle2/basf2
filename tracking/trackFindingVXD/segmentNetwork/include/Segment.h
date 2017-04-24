@@ -73,14 +73,6 @@ namespace Belle2 {
       return (*getInnerHit() == *b.getInnerHit() and * getOuterHit() == *b.getOuterHit());
     }
 
-
-    /** overloaded '<<' stream operator. Print secID to stream by converting it to string */
-    friend std::ostream& operator<< (std::ostream& out, const Segment& aSegment)
-    {
-      out << aSegment.getName();
-      return out;
-    }
-
     /** ************************* PUBLIC MEMBER FUNCTIONS ************************* */
 /// getters:
 

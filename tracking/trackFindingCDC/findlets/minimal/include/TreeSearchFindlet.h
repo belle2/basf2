@@ -18,7 +18,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    template<class AStateObject, class AFilterFactory>
+    template<class AStateObject, class AFilter>
     class TreeSearchFindlet : public Findlet <
       typename AStateObject::SeedObject*,
       const typename AStateObject::HitObject*,
@@ -38,6 +38,7 @@ namespace Belle2 {
       {
         Super::addProcessingSignalListener(&m_firstFilter);
         Super::addProcessingSignalListener(&m_secondFilter);
+        Super::addProcessingSignalListener(&m_thirdFilter);
       }
 
       /// Expose the parameters of the two filters and the makeHitJumpsPossible parameter
@@ -47,6 +48,7 @@ namespace Belle2 {
 
         m_firstFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "first"));
         m_secondFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "second"));
+        m_thirdFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "third"));
 
         moduleParamList->addParameter(prefixed(prefix, "makeHitJumpingPossible"), m_param_makeHitJumpingPossible,
                                       "", m_param_makeHitJumpingPossible);
@@ -96,9 +98,11 @@ namespace Belle2 {
       bool m_param_fit = true;
 
       /// Subfindlet: Filter 1
-      ChooseableFilter<AFilterFactory> m_firstFilter;
+      AFilter m_firstFilter;
       /// Subfindlet: Filter 2
-      ChooseableFilter<AFilterFactory> m_secondFilter;
+      AFilter m_secondFilter;
+      /// Subfindlet: Filter 3
+      AFilter m_thirdFilter;
 
       /// Implementation of the traverseTree function
       void traverseTree(StateIterator currentState, std::vector<ResultPair>& resultsVector)
@@ -159,7 +163,9 @@ namespace Belle2 {
           }
         }
 
-        return true;
+        // Check the third filter after extrapolation
+        weight = m_thirdFilter(*currentState);
+        return not std::isnan(weight);
       }
     };
   }

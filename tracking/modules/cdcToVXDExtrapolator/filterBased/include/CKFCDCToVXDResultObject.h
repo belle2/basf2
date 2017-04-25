@@ -50,6 +50,8 @@ namespace Belle2 {
       m_lastLayer = parent->getLastLayer() - 1;
       m_spacePoint = spacePoint;
       m_measuredStateOnPlane = parent->getMeasuredStateOnPlane();
+      m_chi2 = parent->getChi2();
+      m_lastChi2 = parent->getChi2();
     }
 
     // Getters
@@ -93,6 +95,16 @@ namespace Belle2 {
       return m_chi2;
     }
 
+    double getLastChi2() const
+    {
+      return m_lastChi2;
+    }
+
+    double& getLastChi2()
+    {
+      return m_lastChi2;
+    }
+
     unsigned int getNumberOfHoles() const
     {
       unsigned int numberOfHoles = 0;
@@ -106,6 +118,16 @@ namespace Belle2 {
       return numberOfHoles;
     }
 
+    unsigned int getState() const
+    {
+      return m_state;
+    }
+
+    void setState(unsigned int state)
+    {
+      m_state = state;
+    }
+
   private:
     RecoTrack* m_seedRecoTrack = nullptr;
     const SpacePoint* m_spacePoint = nullptr;
@@ -113,6 +135,8 @@ namespace Belle2 {
     const CKFCDCToVXDStateObject* m_parent = nullptr;
     genfit::MeasuredStateOnPlane m_measuredStateOnPlane;
     double m_chi2 = 0;
+    double m_lastChi2 = 0;
+    unsigned int m_state = 0;
 
     void walk(const std::function<void(const CKFCDCToVXDStateObject*)> f) const
     {

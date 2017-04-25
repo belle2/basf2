@@ -93,6 +93,8 @@ namespace Belle2 {
         measuredStateOnPlane.setCov(TMatrixDSym(5, C_k_old.data()));
       }
 
+      currentState->setState(2);
+
       return true;
     }
 
@@ -141,6 +143,8 @@ namespace Belle2 {
           }
         }
       }
+
+      currentState->setState(1);
 
       return true;
     }

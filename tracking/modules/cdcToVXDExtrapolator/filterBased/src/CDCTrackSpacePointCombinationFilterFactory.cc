@@ -11,6 +11,7 @@
 #include <tracking/modules/cdcToVXDExtrapolator/filterBased/BaseCDCTrackSpacePointCombinationFilter.h>
 #include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationTruthVarSet.h>
 #include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationVarSet.h>
+#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationBasicVarSet.h>
 #include <tracking/modules/cdcToVXDExtrapolator/filterBased/SimpleCDCToVXDExtrapolationFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
@@ -28,18 +29,19 @@ using namespace TrackFindingCDC;
 
 namespace {
   /// MC filter for VXD - CDC relations.
-  using MCCDCTrackSpacePointCombinationFilter =
-    MCFilter<VariadicUnionVarSet<CDCTrackSpacePointCombinationTruthVarSet, CDCTrackSpacePointCombinationVarSet>>;
+  using MCCDCTrackSpacePointCombinationFilter = MCFilter<CDCTrackSpacePointCombinationTruthVarSet>;
 
   /// Recording filter for VXD - CDC relations.
   using RecordingCDCTrackSpacePointCombinationFilter =
-    RecordingFilter<VariadicUnionVarSet<CDCTrackSpacePointCombinationTruthVarSet, CDCTrackSpacePointCombinationVarSet>>;
+    RecordingFilter<VariadicUnionVarSet<CDCTrackSpacePointCombinationTruthVarSet,
+    CDCTrackSpacePointCombinationBasicVarSet, CDCTrackSpacePointCombinationVarSet>>;
+
+  /// Basic recording filter for VXD - CDC relations.
+  using BasicRecordingCDCTrackSpacePointCombinationFilter =
+    RecordingFilter<VariadicUnionVarSet<CDCTrackSpacePointCombinationTruthVarSet, CDCTrackSpacePointCombinationBasicVarSet>>;
 
   /// All filter for VXD - CDC relations.
   using AllCDCTrackSpacePointCombinationFilter = AllFilter<BaseCDCTrackSpacePointCombinationFilter>;
-
-  /// MVA filter for VXD - CDC relations.
-  using MVACDCTrackSpacePointCombinationFilter = MVAFilter<CDCTrackSpacePointCombinationVarSet>;
 }
 
 CDCTrackSpacePointCombinationFilterFactory::CDCTrackSpacePointCombinationFilterFactory(const std::string& defaultFilterName)
@@ -66,7 +68,7 @@ CDCTrackSpacePointCombinationFilterFactory::getValidFilterNamesAndDescriptions()
     {"simple", "based on non-extrapolation variables"},
     {"truth", "monte carlo truth"},
     {"recording", "record variables to a TTree"},
-    {"mva", "test with a mva method"},
+    {"basic_recording", "record variables to a TTree"},
   };
 }
 
@@ -83,8 +85,8 @@ CDCTrackSpacePointCombinationFilterFactory::create(const std::string& filterName
     return makeUnique<MCCDCTrackSpacePointCombinationFilter>();
   } else if (filterName == "recording") {
     return makeUnique<RecordingCDCTrackSpacePointCombinationFilter>("CDCTrackSpacePointCombinationFilter.root");
-  } else if (filterName == "mva") {
-    return makeUnique<MVACDCTrackSpacePointCombinationFilter>("tracking/data/vxdcdc_CDCTrackSpacePointCombinationFilter.xml");
+  } else if (filterName == "basic_recording") {
+    return makeUnique<BasicRecordingCDCTrackSpacePointCombinationFilter>("CDCTrackSpacePointCombinationFilter.root");
   } else {
     return Super::create(filterName);
   }

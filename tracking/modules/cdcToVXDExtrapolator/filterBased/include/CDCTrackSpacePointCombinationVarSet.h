@@ -16,37 +16,32 @@ namespace Belle2 {
   /// Names of the variables to be generated.
   constexpr
   static char const* const cdcTrackSpacePointCombinationVarNames[] = {
-    "distance",
-    "xy_distance",
-    "z_distance",
     "track_position_x",
     "track_position_y",
     "track_position_z",
+
     "hit_position_x",
     "hit_position_y",
     "hit_position_z",
+
     "track_position_at_hit_x",
     "track_position_at_hit_y",
     "track_position_at_hit_z",
-    "same_hemisphere",
-    "layer",
+
     "ladder",
     "sensor",
     "segment",
     "id",
+
     "last_layer",
     "last_ladder",
     "last_sensor",
     "last_segment",
     "last_id",
+
     "pt",
     "tan_lambda",
     "phi",
-    "arcLengthOfHitPosition",
-    "arcLengthOfCenterPosition",
-    "numberOfHoles",
-    "chi2",
-    "lastChi2",
 
     "C_00",
     "C_01",

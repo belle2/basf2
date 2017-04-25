@@ -14,8 +14,6 @@
 
 #include <TMath.h>
 
-#include <framework/dataobjects/Helix.h>
-#include <geometry/bfieldmap/BFieldMap.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 
 using namespace std;
@@ -49,16 +47,8 @@ bool CDCTrackSpacePointCombinationVarSet::extract(const BaseCDCTrackSpacePointCo
   const auto& trackPositionAtHitZ = trajectory.getTrajectorySZ().mapSToZ(arcLength);
 
   Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
-  Vector3D distance = trackPositionAtHit - hitPosition;
 
   const auto& sensorInfo = spacePoint->getVxdID();
-
-  double arcLengthOfHitPosition = trajectory.calcArcLength2D(hitPosition);
-  double arcLengthOfCenterPosition = trajectory.calcArcLength2D(Vector3D(0, 0, 0));
-
-  var<named("distance")>() = distance.norm();
-  var<named("xy_distance")>() = distance.xy().norm();
-  var<named("z_distance")>() = distance.z();
 
   var<named("track_position_x")>() = position.x();
   var<named("track_position_y")>() = position.y();
@@ -179,9 +169,6 @@ bool CDCTrackSpacePointCombinationVarSet::extract(const BaseCDCTrackSpacePointCo
     clusterNumber++;
   }
 
-  var<named("same_hemisphere")>() = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
-
-  var<named("layer")>() = sensorInfo.getLayerNumber();
   var<named("ladder")>() = sensorInfo.getLadderNumber();
   var<named("sensor")>() = sensorInfo.getSensorNumber();
   var<named("segment")>() = sensorInfo.getSegmentNumber();
@@ -190,14 +177,6 @@ bool CDCTrackSpacePointCombinationVarSet::extract(const BaseCDCTrackSpacePointCo
   var<named("pt")>() = momentum.xy().norm();
   var<named("tan_lambda")>() = trajectory.getTanLambda();
   var<named("phi")>() = momentum.phi();
-
-  var<named("arcLengthOfHitPosition")>() = arcLengthOfHitPosition;
-  var<named("arcLengthOfCenterPosition")>() = arcLengthOfCenterPosition;
-
-  var<named("numberOfHoles")>() = result->getNumberOfHoles();
-
-  var<named("chi2")>() = result->getChi2();
-  var<named("lastChi2")>() = result->getLastChi2();
 
   var<named("last_layer")>() = 0;
   var<named("last_ladder")>() = 0;

@@ -397,6 +397,20 @@ namespace Belle2 {
       setDirtyFlag();
     }
 
+    /** Get a pointer to the TrackPoint that was created from this hit. Can be a nullptr if no measurement was already created.
+     * Please be aware that refitting may or may not recreate the track points and older pointers can be invalidated.
+     * Also, pruning a RecoTrack will also delete most of the TrackPoints.
+     */
+    const genfit::TrackPoint* getCreatedTrackPoint(const RecoHitInformation* recoHitInformation) const
+    {
+      int createdTrackPointID = recoHitInformation->getCreatedTrackPointID();
+      if (createdTrackPointID == -1) {
+        return nullptr;
+      }
+
+      return m_genfitTrack.getPoint(createdTrackPointID);
+    }
+
     // Hits Added Questioning
     /// Returns true if the track has cdc hits.
     bool hasCDCHits() const { return getRelatedFrom<UsedCDCHit>(m_storeArrayNameOfCDCHits) != nullptr; }
@@ -650,7 +664,7 @@ namespace Belle2 {
         B2FATAL("MeasuredStateOnPlane cannot be provided for RecoHit which was not used in the fit.");
       }
 
-      const auto hitTrackPoint = recoHitInfo->getCreatedTrackPoint();
+      const auto hitTrackPoint = getCreatedTrackPoint(recoHitInfo);
       if (hitTrackPoint == nullptr) {
         B2FATAL("TrackPoint was requested which has not been created");
       }

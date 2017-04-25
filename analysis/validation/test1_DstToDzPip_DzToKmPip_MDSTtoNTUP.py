@@ -4,7 +4,7 @@
 """
 <header>
   <input>../DstToDzPip_DzToKmPip_GENSIMRECtoMDST.mdst.root</input>
-  <output>../DstToDzPip_DzToKmPip.root</output>
+  <output>../DstToDzPip_DzToKmPip_MDSTtoNTUP.root</output>
   <contact>Giulia Casarosa; giulia.casarosa@pi.infn.it</contact>
 </header>
 """
@@ -52,11 +52,11 @@ copyList('K+:pt', 'K+:all')
 applyCuts('K+:pt', 'pt > 0.1')
 
 # reconstruct D0:kpi and perform a mass constrained vertex fit
-reconstructDecay('D0:kpi -> K-:pt pi+:pt', '1.81 < M < 1.91')
+reconstructDecay('D0:kpi -> K-:pt pi+:pt', 'useCMSFrame(p) > 2.4 and 1.81 < M < 1.91')
 massVertexRave('D0:kpi', 0.001)
 
 # reconstruct the D*+ from the D0:kpi and pi+:all
-reconstructDecay('D*+:sig -> D0:kpi pi+:slow', '0 < Q < 0.03')
+reconstructDecay('D*+:sig -> D0:kpi pi+:slow', '0 < Q < 0.02')
 vertexRave('D*+:sig', 0.001, '', 'ipprofile')
 applyCuts('D*+:sig', '0.0 < Q < 0.02')
 
@@ -75,8 +75,10 @@ toolsDST += ['InvMass[BeforeFit]', 'D*+ -> ^D0 pi+']
 toolsDST += ['CustomFloats[Q]', '^D*+ -> D0 pi+']
 toolsDST += ['CustomFloats[isSignal]', '^D*+ -> D0 pi+']
 toolsDST += ['Kinematics', '^D*+ -> [^D0 -> ^K- ^pi+] ^pi+']
+toolsDST += ['CMSKinematics', '^D*+ -> [^D0 -> ^K- ^pi+] ^pi+']
 toolsDST += ['Vertex', '^D*+ -> ^D0 pi+']
 toolsDST += ['Track', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
+toolsDST += ['TrackHits', 'D*+ -> [D0 -> ^K- ^pi+] ^pi+']
 toolsDST += ['FlightInfo', '^D*+ -> ^D0 pi+']
 
 toolsDST += ['MCKinematics', '^D*+ -> [^D0 -> ^K- ^pi+] ^pi+']
@@ -85,13 +87,15 @@ toolsDST += ['MCFlightInfo', '^D*+ -> ^D0 pi+']
 toolsDST += ['MCTruth', '^D*+ -> [^D0 -> ^K- ^pi+] ^pi+']
 
 # write out the flat ntuple
-ntupleFile('../DstToDzPip_DzToKmPip.root')
+ntupleFile('../DstToDzPip_DzToKmPip_MDSTtoNTUP.root')
 ntupleTree('dst', 'D*+:sig', toolsDST)
 
 summaryOfLists(['D*+:sig', 'D0:kpi', 'pi+:slow'])
 # --------------------------------------------------
 # Process the events and print call statistics
 # --------------------------------------------------
+
+analysis_main.add_module('Progress')
 
 process(analysis_main)
 

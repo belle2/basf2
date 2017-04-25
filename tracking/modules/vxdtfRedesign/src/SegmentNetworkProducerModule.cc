@@ -251,8 +251,7 @@ std::vector< SegmentNetworkProducerModule::RawSectorData > SegmentNetworkProduce
       }
       nSPsFound++;
 
-      TrackNode* trackNode = new TrackNode();
-      trackNode->spacePoint = &aSP;
+      TrackNode* trackNode = new TrackNode(&aSP);
       trackNodes.push_back(trackNode);
 
       // sector for SpacePoint exists:

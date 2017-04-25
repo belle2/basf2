@@ -37,6 +37,8 @@ EKLMAlignmentModule::EKLMAlignmentModule() : Module()
   addParam("RandomDisplacement", m_RandomDisplacement,
            "What should be randomly displaced ('Sector', 'Segment' or 'Both').",
            std::string("Both"));
+  addParam("SectorSameDisplacement", m_SectorSameDisplacement,
+           "If the displacement should be the same for all sectors.", false);
   addParam("OutputFile", m_OutputFile, "Output file.",
            std::string("EKLMDisplacement.root"));
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -73,7 +75,7 @@ void EKLMAlignmentModule::generateRandomDisplacement(
   const double segmentMaxDalpha = 0.003 * Unit::rad;
   const double segmentMinDalpha = -0.003 * Unit::rad;
   EKLMAlignment alignment;
-  EKLMAlignmentData sectorAlignment, segmentAlignment;
+  EKLMAlignmentData sectorAlignment, segmentAlignment, *alignmentData;
   EKLM::AlignmentChecker alignmentChecker(false);
   int iEndcap, iLayer, iSector, iPlane, iSegment, sector, segment;
   EKLM::fillZeroDisplacements(&alignment);
@@ -81,6 +83,25 @@ void EKLMAlignmentModule::generateRandomDisplacement(
     for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
          iLayer++) {
       for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
+        if (m_SectorSameDisplacement) {
+          if (iEndcap > 1 || iLayer > 1 || iSector > 1) {
+            sector = m_GeoDat->sectorNumber(1, 1, 1);
+            alignmentData = alignment.getSectorAlignment(sector);
+            sector = m_GeoDat->sectorNumber(iEndcap, iLayer, iSector);
+            alignment.setSectorAlignment(sector, alignmentData);
+            for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
+              for (iSegment = 1; iSegment <= m_GeoDat->getNSegments();
+                   iSegment++) {
+                segment = m_GeoDat->segmentNumber(1, 1, 1, iPlane, iSegment);
+                alignmentData = alignment.getSegmentAlignment(segment);
+                segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector,
+                                                  iPlane, iSegment);
+                alignment.setSegmentAlignment(segment, alignmentData);
+              }
+            }
+            continue;
+          }
+        }
 sector:
         if (displaceSector) {
           do {

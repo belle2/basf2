@@ -68,6 +68,9 @@ namespace Belle2 {
     /** What should be randomly displaced */
     std::string m_RandomDisplacement;
 
+    /** If the displacement should be the same for all sectors. */
+    bool m_SectorSameDisplacement;
+
     /** Name of output file. */
     std::string m_OutputFile;
 

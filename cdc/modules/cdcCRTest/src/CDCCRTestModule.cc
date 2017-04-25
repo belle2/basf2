@@ -48,7 +48,6 @@ using namespace genfit;
 REG_MODULE(CDCCRTest)
 
 //                 Implementation
-
 CDCCRTestModule::CDCCRTestModule() : HistoModule()
 {
   setDescription("CDC Cosmic ray test module");
@@ -98,6 +97,7 @@ void CDCCRTestModule::defineHisto()
   m_tree->Branch("theta", &theta, "theta/D");
   m_tree->Branch("z_prop", &z_prop, "z_prop/D");
   m_tree->Branch("t", &t, "t/D");
+  m_tree->Branch("evtT0", &evtT0, "evtT0/D");
   m_tree->Branch("tdc", &tdc, "tdc/I");
   m_tree->Branch("adc", &adc, "adc/s");
   m_tree->Branch("boardID", &boardID, "boardID/I");
@@ -331,10 +331,9 @@ void CDCCRTestModule::event()
     }
     try {
       plotResults(track);
-    } catch (...) {
-
+    } catch (const genfit::Exception& e) {
       // at least log that there was something going very wrong
-      B2ERROR("Exception when calling the plotResults method");
+      B2ERROR("Exception when calling the plotResults method" << e.what());
     }
 
     if (m_EstimateResultForUnFittedLayer) {
@@ -416,14 +415,13 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
           res_u = residual_u.getState()(0);
           if (x_u > 0) lr = 1;
           else lr = 0;
-          x_mea = copysign(x_mea, x_u);
           if (fabs(alpha) > M_PI / 2) {
             x_b *= -1;
             res_b *= -1;
             x_u *= -1;
             res_u *= -1;
           }
-
+          x_mea = copysign(x_mea, x_u);
           lr = cdcgeo.getOutgoingLR(lr, alpha);
           theta = cdcgeo.getOutgoingTheta(alpha, theta);
           alpha = cdcgeo.getOutgoingAlpha(alpha);
@@ -456,6 +454,13 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
 
           /*Time Walk*/
           t -= cdcgeo.getTimeWalk(wireid, adc);
+
+          // Second: correct for event time. If this wasn't simulated, m_eventTime can just be set to 0.
+          if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
+            evtT0 =  m_eventTimeStoreObject->getEventT0();
+            t -= evtT0;
+          }
+
           //    t = getCorrectedDriftTime(wireid, tdc, adc, z, z0);
           if (m_StoreCDCSimHitInfo) {
             CDCSimHit* simhit = rawCDC->getCDCHit()->getRelated<Belle2::CDCSimHit>();
@@ -650,8 +655,15 @@ void CDCCRTestModule::getResidualOfUnFittedLayer(Belle2::RecoTrack* track)
 
     //start to extrapolation
     WireID wireid = WireID(cdchit->getID());
+    //    double flightTime1 = meaOnPlane.getTime();
     //Now reconstruct plane for hit
-    genfit::SharedPlanePtr plane = constructPlane(meaOnPlane, wireid);
+    genfit::SharedPlanePtr plane = nullptr;
+    try {
+      plane = constructPlane(meaOnPlane, wireid);
+    } catch (const genfit::Exception& e) {
+      B2WARNING("Error happen, can not reconstruct plan for extrapolating" << e.what());
+      continue;
+    }
     double segmentLength;
     try {
       segmentLength = meaOnPlane.extrapolateToPlane(plane);

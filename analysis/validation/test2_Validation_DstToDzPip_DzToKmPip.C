@@ -60,12 +60,16 @@ void plotTime(TFile* pfile, TTree* ptree, TFile *outputFile){
 
   h_sigmat_all = new TH1F("h_sigmat_all", "full momentum range", 100,0, 0.5);
   ptree->Project("h_sigmat_all", "DST_D0_FTE*1000",cuts);
+
+  h_sig_all = new TH1F("h_sig_all", "full momentum range", 100,0, 20);
+  ptree->Project("h_sig_all", "DST_D0_FT/DST_D0_FTE",tmCuts);
   
   
   outputFile->cd();
   
   h_tres_all->Write();
   h_sigmat_all->Write();
+  h_sig_all->Write();
 
 }
 

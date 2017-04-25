@@ -100,9 +100,9 @@ void FastBDTClassifierTrainingModule::event()
   size_t samplePriorEvent = m_samples.size();
 
   // XXXHit is of type DirectedNode<TrackNode, VoidMetaInfo>
-  for (const auto outerHit : hitNetwork.getNodes()) { // loop over all outer nodes
-    for (const auto centerHit : outerHit->getInnerNodes()) { // loop over all center nodes attached to outer node
-      for (const auto innerHit : centerHit->getInnerNodes()) { // loop over all inner nodes attached to center node
+  for (const auto& outerHit : hitNetwork.getNodes()) { // loop over all outer nodes
+    for (const auto& centerHit : outerHit->getInnerNodes()) { // loop over all center nodes attached to outer node
+      for (const auto& innerHit : centerHit->getInnerNodes()) { // loop over all inner nodes attached to center node
         m_samples.push_back(makeTrainSample(outerHit->getEntry().spacePoint,
                                             centerHit->getEntry().spacePoint,
                                             innerHit->getEntry().spacePoint));

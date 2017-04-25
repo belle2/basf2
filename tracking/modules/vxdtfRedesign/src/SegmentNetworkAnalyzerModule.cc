@@ -57,9 +57,9 @@ void SegmentNetworkAnalyzerModule::event()
   m_rootVariables.networkSize = segmentNetwork.size();
   m_rootVariables.networkConnections = getNConnections(segmentNetwork);
 
-  for (const auto outerHit : hitNetwork.getNodes()) {
-    for (const auto centerHit : outerHit->getInnerNodes()) {
-      for (const auto innerHit : centerHit->getInnerNodes()) {
+  for (const auto& outerHit : hitNetwork.getNodes()) {
+    for (const auto& centerHit : outerHit->getInnerNodes()) {
+      for (const auto& innerHit : centerHit->getInnerNodes()) {
 
         Segment<TrackNode>* innerSegment = new Segment<TrackNode>(centerHit->getEntry().sector->getFullSecID(),
                                                                   innerHit->getEntry().sector->getFullSecID(),

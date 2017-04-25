@@ -310,7 +310,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
   for (RawSectorData& outerSectorData : collectedData) {
     ActiveSector<StaticSectorType, TrackNode>* outerSector = new ActiveSector<StaticSectorType, TrackNode>
     (outerSectorData.staticSector);
-    std::string outerEntryID = outerSector->getFullSecID().getFullSecString();
+    std::string outerEntryID = outerSector->getName();
 
     // skip double-adding of nodes into the network after first time found -> speeding up the code:
     bool wasAnythingFoundSoFar = false;

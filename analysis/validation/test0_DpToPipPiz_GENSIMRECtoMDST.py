@@ -34,7 +34,7 @@ main = create_path()
 # e+e- -> ccbar -> D0 anything
 # D0 -> pi+ pi0
 #
-generateContinuum(1000, 'D0', Belle2.FileSystem.findFile('/decfiles/dec/2110012000.dec'), path=main)
+generateContinuum(10000, 'D0', Belle2.FileSystem.findFile('/decfiles/dec/2110012000.dec'), path=main)
 
 # detector simulation,  digitisers and clusterisers
 add_simulation(main)

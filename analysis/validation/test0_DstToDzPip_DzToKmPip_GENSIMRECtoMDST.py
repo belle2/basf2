@@ -27,14 +27,14 @@ from reconstruction import add_mdst_output
 from ROOT import Belle2
 import glob
 
-set_random_seed(1509)
+set_random_seed(150922)
 
 main = create_path()
 
 # e+e- -> ccbar -> D*+ anthing
 # D*+ -> D0 pi+; D0 -> K- pi+
 #
-generateContinuum(1000, 'D*+', Belle2.FileSystem.findFile('/decfiles/dec/2610030000.dec'), path=main)
+generateContinuum(10000, 'D*+', Belle2.FileSystem.findFile('/decfiles/dec/2610030000.dec'), path=main)
 
 # detector simulation,  digitisers and clusterisers
 add_simulation(main)

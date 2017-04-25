@@ -109,8 +109,9 @@ def run_test_ipynb(argument):
     result = None
     try:
         with open(nb_filename) as f:
-            nb = nbformat.read(f, as_version=4)
-            ep = ExecutePreprocessor(timeout=600, kernel_name='python3')
+            nb = nbformat.read(f, as_version=4)#
+            # wait 30 seconds for each cell executing before timing out
+            ep = ExecutePreprocessor(timeout=30, kernel_name='python3')
             ep.preprocess(nb, resources = {})
             result = True
             message = "finished successfully"

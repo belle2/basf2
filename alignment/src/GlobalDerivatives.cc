@@ -24,6 +24,27 @@ namespace Belle2 {
       m_globals.first = labels;
       m_globals.second = derivs;
     }
+    void GlobalDerivatives::add(const std::pair<std::vector<int>, TMatrixD>& globals)
+    {
+      if (globals.first.empty())
+        return;
+
+      auto& main = m_globals;
+
+      // Create composed matrix of derivatives
+      //TODO: check main and globals matrix has the same number of rows
+      TMatrixD allDerivatives(main.second.GetNrows(), main.second.GetNcols() + globals.second.GetNcols());
+      allDerivatives.Zero();
+      allDerivatives.SetSub(0, 0, main.second);
+      allDerivatives.SetSub(0, main.second.GetNcols(), globals.second);
+
+      // Merge labels
+      main.first.insert(main.first.end(), globals.first.begin(), globals.first.end());
+      // Update matrix
+      main.second.ResizeTo(allDerivatives);
+      main.second = allDerivatives;
+
+    }
     void GlobalDerivatives::add(int paramLabel, std::vector< double > dResiduals_dParam)
     {
       int nRows = m_globals.second.GetNrows();

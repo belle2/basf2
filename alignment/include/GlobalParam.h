@@ -26,18 +26,21 @@ namespace Belle2 {
     class GlobalParamVector;
     class GlobalDerivativesHierarchy;
 
-    /// Set with no parameters, terminates hierarchy etc.
-    class EmptyGlobaParamSet : public TObject {
+
+    class EmptyGlobalParamSet : public TObject {
     public:
-      /// Get global unique id = 0
+      // ------------- Interface to global Millepede calibration ----------------
+      /// Get global unique id = 0 (empty/none)
       static unsigned short getGlobalUniqueID() {return 0;}
-      /// There no params stored here, returns always 0.
+      /// Get global parameter - return zero
       double getGlobalParam(unsigned short, unsigned short) {return 0.;}
-      /// No parameters to set. Does nothing
+      /// Set global parameter - do nothing
       void setGlobalParam(double, unsigned short, unsigned short) {}
-      /// No parameters, returns empty vector
+      /// list stored global parameters - empty list, no parameters
       std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {};}
+      // ------------------------------------------------------------------------
     };
+
 
     /// Some tentative base class to allow to add functionality to the default
     /// behavior, like manipulate constants in DB objects after clibration is finished
@@ -80,7 +83,7 @@ namespace Belle2 {
       /// Virtual destructor (base class, but with no members)
       virtual ~GlobalParamSetAccess() {}
       /// implement: Get the global unique id of DBObject
-      virtual unsigned short getGlobalUniqueID() = 0;
+      virtual unsigned short getGlobalUniqueID() const = 0;
       /// implement: get a global parameter value based on the element number in the DBObject and its parameter
       /// number. Might be that element/param is zero. Check the meaning in DB object
       virtual double getGlobalParam(unsigned short, unsigned short) = 0;
@@ -89,13 +92,13 @@ namespace Belle2 {
       /// implement: generate list of all global parameters in the DBObject
       virtual std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() = 0;
 
-      /// Sum value of global parameter and @param correction
-      void updateGlobalParam(double correction, unsigned short element, unsigned short param) {setGlobalParam(getGlobalParam(element, param) + correction, element, param);}
+      /// Sum value of global @param element @param param with a @param correction
+      virtual void updateGlobalParam(double correction, unsigned short element, unsigned short param) {setGlobalParam(getGlobalParam(element, param) + correction, element, param);}
       /// Get a raw pointer to the internal DB object (can be nullptr if not yet constructed)
-      /// Use with caution
+      /// Use with caution - always check for nullptr
       virtual TObject* getDBObj() = 0;
       /// Get the default DBObject name used by datastore
-      virtual std::string getDefaultName() = 0;
+      virtual std::string getDefaultName() const = 0;
       /// Release the object from internal unique_ptr to be managed elsewhere
       /// Useful to pass it to be stored in DB (and thus later deleted by framework)
       virtual TObject* releaseObject() = 0;
@@ -108,20 +111,24 @@ namespace Belle2 {
       virtual void construct() = 0;
       /// Has the internal DBObject been already constructed
       /// The object is constructed at latest on first access to its parameters
-      virtual bool isConstructed() = 0;
+      virtual bool isConstructed() const = 0;
 
       /// Has the object been updated in DB since GlobalParamSet<...> has been constructed? Since last call to this function with resetChangedState=true
       virtual bool hasBeenChangedInDB(bool resetChangedState = true) final {auto tmp = m_hasBeenChangedInDB; if (resetChangedState) m_hasBeenChangedInDB = false; return tmp;}
       /// Function to call when object has been changed in DB since last loaded
       virtual void callbackDB() {m_hasBeenChangedInDB = true;}
 
+      /// Is this set of given type?
+      /// @return true if stored set is of given type
       template<class DBObjType>
-      bool is() {return DBObjType::getGlobalUniqueID() == getGlobalUniqueID();}
+      bool is() const {return DBObjType::getGlobalUniqueID() == getGlobalUniqueID();}
 
+      /// Is this set empty or otherwise 'invalid'
+      /// to identify null sets, end of hierarchy
       bool empty()
       {
         // We consider this to be the definition of empty
-        if (is<EmptyGlobaParamSet>())
+        if (is<EmptyGlobalParamSet>())
           return true;
         // This is by convention (also used in hierarchy)
         if (getGlobalUniqueID() == 0)
@@ -134,6 +141,9 @@ namespace Belle2 {
         return false;
       }
 
+      /// Tentative operator to quickly check the set
+      /// Returns true when the set is not empty() and the DB
+      /// object is constructed and can be accessed
       operator bool()
       {
         return not empty() and isConstructed();
@@ -168,15 +178,16 @@ namespace Belle2 {
       ~GlobalParamSet() {m_object.reset();}
 
       /// The DB object unique id in global calibration
-      virtual unsigned short getGlobalUniqueID() override final {return DBObjType::getGlobalUniqueID();}
+      virtual unsigned short getGlobalUniqueID() const override final {return DBObjType::getGlobalUniqueID();}
       /// Get global parameter of the DB object by its element and parameter number
+      /// Note this is not const, it might need to construct the object
       virtual double getGlobalParam(unsigned short element, unsigned short param) override final {ensureConstructed(); return m_object->getGlobalParam(element, param);}
       /// Set global parameter of the DB object by its element and parameter number
       virtual void setGlobalParam(double value, unsigned short element, unsigned short param) override final {ensureConstructed(); m_object->setGlobalParam(value, element, param);}
       /// List global parameters in this DB object
       virtual std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() override final {ensureConstructed(); return m_object->listGlobalParams();}
       /// Get the DB object default name used by datastore
-      virtual std::string getDefaultName() override final {return DataStore::objectName<DBObjType>("");}
+      virtual std::string getDefaultName() const override final {return DataStore::objectName<DBObjType>("");}
 
       /// Get the raw pointer to the stored object
       /// WARNING: Use with caution if you really need to access the internal object
@@ -242,9 +253,10 @@ namespace Belle2 {
       virtual void construct() override final {m_object.reset(new DBObjType());}
       /// Is the internal object already constructed?
       /// we construct the object on first access to the stored values
-      virtual bool isConstructed() override final {return !!m_object;}
+      virtual bool isConstructed() const override final {return !!m_object;}
 
       /// Function to call when object has been changed in DB since last loaded
+      /// TODO Hide and find the class which calls this to make it friend
       virtual void callbackDB() override final {GlobalParamSetAccess::callbackDB();}
 
 
@@ -258,11 +270,14 @@ namespace Belle2 {
     /// The central user class to manipulate any global constant in any DB object
     /// Used to retrieve global parameters from database and access the for update.
     /// Finally all objects can be released for storing in the DB.
+    /// NOTE the objects are not constructed (an thus quite some memory is saved) until
+    /// you access them. But the monitoring of changes in DB starts since addDBObj<...>()
+    /// TODO correct constness to not construct on listGlobalParams()
     class GlobalParamVector {
     public:
       /// An empty set to which reference is returned if DB object not found
       /// Also used e.g. to terminate hierarchy
-      GlobalParamSet<EmptyGlobaParamSet> c_emptyGlobalParamSet {};
+      GlobalParamSet<EmptyGlobalParamSet> c_emptyGlobalParamSet {};
 
       /// Constructor
       /// @param components vector of string with DB objects default names in the global vector
@@ -272,7 +287,7 @@ namespace Belle2 {
       /// Destructor
       ~GlobalParamVector() {}
 
-      /// Construct all DB objects using default constructor (should be filled with zeros
+      /// Construct all DB objects using default constructors (should be filled with zeros)
       void construct();
 
       /// TODO: operator += to sum two global vectors
@@ -317,7 +332,7 @@ namespace Belle2 {
 
       /// Has any DB object in vector changed from last call to this function
       /// @param subset set of unique ids of objects we are interested
-      bool hasBeenChangedInDB(const std::set<unsigned short>& subset = {}, bool resetChangedState = true)
+      bool hasBeenChangedInDB(const std::set<unsigned short>& subset, bool resetChangedState = true)
       {
         bool changed = false;
 
@@ -332,6 +347,8 @@ namespace Belle2 {
 
         return changed;
       }
+      /// Const version which does not change the state
+      bool hasBeenChangedInDB(const std::set<unsigned short>& subset = {}) {return hasBeenChangedInDB(subset, false);}
 
       /// Add 'difference' to param value
       /// @param difference value to add to current value
@@ -396,6 +413,19 @@ namespace Belle2 {
           return c_emptyGlobalParamSet;
 
         return static_cast<GlobalParamSet<DBObjType>&>(*m_vector[DBObjType::getGlobalUniqueID()]);
+      }
+
+      const std::map<unsigned short, std::unique_ptr<GlobalParamSetAccess>>& getGlobalParamSets() const
+      {
+        return m_vector;
+      }
+      const std::vector<std::shared_ptr<IGlobalParamInterface>>& getSubDetectorInterfaces() const
+      {
+        return m_subDetectorInterfacesVector;
+      }
+      const std::vector<std::string>& getComponents() const
+      {
+        return m_components;
       }
     private:
       /// The vector (well, actually a map) of DB objects

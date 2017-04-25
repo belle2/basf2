@@ -42,7 +42,9 @@ namespace Belle2 {
       /// Get stored lables (includes zeros)
       const std::vector<int>& getLabels() const {return m_globals.first;}
       /// Return the derivative matrix (includes columns with zero labels)
-      const TMatrixD& getDerivatives() {return m_globals.second;}
+      const TMatrixD& getDerivatives() const {return m_globals.second;}
+      /// Add another set of global labels and derivatives
+      void add(const std::pair<std::vector<int>, TMatrixD>& globals);
       /// Add one parameter - label and the corresponding residual derivative
       /// @param paramLabel label of the global parameter to calibrate
       /// @param dResiduals_dParam vector od derivatives of local residual (U, v) versus global parameter

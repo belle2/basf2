@@ -143,11 +143,13 @@ namespace Belle2 {
     /// Get global parameter: 1 = vertex X, 2 = vertex Y, 3 = vertex Z
     double getGlobalParam(unsigned short, unsigned short param)
     {
+      if (param > 3) return 0.;
       return getVertex()[param - 1];
     }
     /// Set global parameter: 1 = vertex X, 2 = vertex Y, 3 = vertex Z
     void setGlobalParam(double value, unsigned short, unsigned short param)
     {
+      if (param > 3) return;
       TVector3 vertex = getVertex();
       vertex[param - 1] = value;
       setVertex(vertex);

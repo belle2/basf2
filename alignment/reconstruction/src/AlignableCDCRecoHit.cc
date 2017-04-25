@@ -136,12 +136,14 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
 TMatrixD AlignableCDCRecoHit::localDerivatives(const genfit::StateOnPlane*)
 {
   // CDC track time correction ----------------------------------------
+  //TODO change to derivative of the full Xt relation
   double driftVelocity = CDCGeometryPar::Instance().getNominalDriftV();
 
   TMatrixD locals(2, 1);
   //TODO sign: plus or minus??
   locals(0, 0) = - double(int(m_leftRight)) * driftVelocity;
-  locals(1, 0) = 0.; // insesitive coordinate
+  // FIXME not insensitive for stero wires!
+  locals(1, 0) = 0.; // insesitive coordinate along wire
 
   return locals;
 }

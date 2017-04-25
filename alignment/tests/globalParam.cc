@@ -18,6 +18,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <alignment/dbobjects/VXDAlignment.h>
 #include <alignment/Hierarchy.h>
+#include <alignment/Manager.h>
 #include <TMath.h>
 
 
@@ -163,19 +164,19 @@ namespace {
 
     // Accessing non-existing object will return an empty set
     EXPECT_EQ(gpvComp.getGlobalParamSet<VXDAlignment>().is<VXDAlignment>(), false);
-    EXPECT_EQ(gpvComp.getGlobalParamSet<VXDAlignment>().is<EmptyGlobaParamSet>(), true);
+    EXPECT_EQ(gpvComp.getGlobalParamSet<VXDAlignment>().is<EmptyGlobalParamSet>(), true);
     EXPECT_EQ(gpvComp.getGlobalParamSet<VXDAlignment>().empty(), true);
     EXPECT_EQ(gpvComp.getGlobalParamSet<VXDAlignment>().isConstructed(), false);
     EXPECT_EQ((bool) gpvComp.getGlobalParamSet<VXDAlignment>(), false);
 
     EXPECT_EQ(gpv.getGlobalParamSet<BeamParameters>().is<BeamParameters>(), true);
-    EXPECT_EQ(gpv.getGlobalParamSet<BeamParameters>().is<EmptyGlobaParamSet>(), false);
+    EXPECT_EQ(gpv.getGlobalParamSet<BeamParameters>().is<EmptyGlobalParamSet>(), false);
     EXPECT_EQ(gpv.getGlobalParamSet<BeamParameters>().empty(), false);
     EXPECT_EQ(gpv.getGlobalParamSet<BeamParameters>().isConstructed(), true);
     EXPECT_EQ((bool) gpv.getGlobalParamSet<BeamParameters>(), true);
 
 
-    EXPECT_EQ(gpvComp.getGlobalParamSet<EmptyGlobaParamSet>().is<EmptyGlobaParamSet>(), true);
+    EXPECT_EQ(gpvComp.getGlobalParamSet<EmptyGlobalParamSet>().is<EmptyGlobalParamSet>(), true);
 
     auto& alcaman = GlobalCalibrationManager::getInstance();
     alcaman.initialize({}, {EventMetaData(1, 1, 0), EventMetaData(1, 1, 1000), EventMetaData(1, 1, 2000)});

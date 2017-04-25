@@ -47,6 +47,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 //   }
 
   GlobalParamVector result;
+  // <UniqueID, ElementID, ParameterId, value>
   std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>> resultTuple;
 
   for (auto& exprun : getObject<RunRange>(CalibrationAlgorithm::RUN_RANGE_OBJ_NAME).getExpRunSet()) {

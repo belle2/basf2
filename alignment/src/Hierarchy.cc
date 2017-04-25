@@ -245,32 +245,5 @@ namespace Belle2 {
 
       return loc2glo;
     }
-
-    // ------------------ HierarchyManager ----------------------------
-
-    GlobalCalibrationManager::~GlobalCalibrationManager() {}
-    GlobalCalibrationManager& GlobalCalibrationManager::getInstance()
-    {
-      static std::unique_ptr<GlobalCalibrationManager> instance(new GlobalCalibrationManager());
-      return *instance;
-    }
-    void GlobalCalibrationManager::writeConstraints(std::string txtFilename)
-    {
-      std::ofstream txt(txtFilename);
-      Constraints constraints;
-      m_alignment->buildConstraints(constraints);
-      m_lorentzShift->buildConstraints(constraints);
-      for (auto& name_elements : constraints) {
-        auto name = name_elements.first;
-        txt << "Constraint 0. ! Constraint for global label: " << name << std::endl;
-        auto& elements = name_elements.second;
-        for (auto& label_coefficient : elements) {
-          auto label = label_coefficient.first;
-          auto coeff = label_coefficient.second;
-          txt << label << " " << coeff << std::endl;
-        }
-        txt << std::endl << std::endl;
-      }
-    }
   }
 }

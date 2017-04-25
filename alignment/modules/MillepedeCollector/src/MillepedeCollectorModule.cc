@@ -49,6 +49,7 @@
 #include <alignment/reconstruction/BKLMRecoHit.h>
 #include <alignment/reconstruction/AlignableEKLMRecoHit.h>
 
+#include <alignment/Manager.h>
 #include <alignment/Hierarchy.h>
 #include <alignment/GlobalParam.h>
 #include <alignment/GlobalDerivatives.h>
@@ -57,8 +58,9 @@
 
 #include <alignment/reconstruction/GblMultipleScatteringController.h>
 
-using namespace Belle2;
 using namespace std;
+using namespace Belle2;
+using namespace alignment;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -84,13 +86,14 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
   addParam("doublePrecision", m_doublePrecision, "Use double (=true) or single/float (=false) precision for writing binary files",
            bool(false));
   addParam("calibrateVertex", m_calibrateVertex, "For primary vertices, beam spot calibration derivatives are added",
-           bool(false));
+           bool(true));
   addParam("minPValue", m_minPValue, "Minimum p-value to write out a trejectory, <0 to write out all",
            double(-1.));
   addParam("useGblTree", m_useGblTree, "Store GBL trajectories in a tree instead of output to binary files",
            bool(true));
-  addParam("useVXDHierarchy", m_useVXDHierarchy, "Use hierarchy for VXD alignment (adds alignment of half-shells, ladders)",
-           bool(false));
+  addParam("components", m_components,
+           "Specify which DB objects are calibrated, like ['BeamParameters', 'CDCTimeWalks'] or leave empty to use all components available.",
+           m_components);
 }
 
 void MillepedeCollectorModule::prepare()
@@ -140,13 +143,14 @@ void MillepedeCollectorModule::prepare()
   registerObject<TH1F>("chi2/ndf", new TH1F("chi2/ndf", "chi2/ndf", 200, 0., 50.));
   registerObject<TH1F>("pval", new TH1F("pval", "pval", 100, 0., 1.));
 
-  auto& geo = VXD::GeoCache::getInstance();
-  auto& hierarchy = Belle2::alignment::GlobalCalibrationManager::getInstance().getAlignmentHierarchy();
+  Belle2::alignment::GlobalCalibrationManager::getInstance().initialize(m_components);
+  Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
 
+  /*
   if (m_useVXDHierarchy) {
     // Set-up hierarchy
     DBObjPtr<VXDAlignment> vxdAlignments;
-    /**
+
     So the hierarchy is as follows:
                 Belle 2
               / |     | \
@@ -155,7 +159,7 @@ void MillepedeCollectorModule::prepare()
         ......  ladders ......
         / / |   / |  |  \  | \ \
       ......... sensors ........
-    */
+
 
     for (auto& halfShellPlacement : geo.getHalfShellPlacements()) {
       TGeoHMatrix trafoHalfShell = halfShellPlacement.second;
@@ -199,18 +203,15 @@ void MillepedeCollectorModule::prepare()
         }
       }
     }
-
   }
-
-  Belle2::alignment::GlobalCalibrationManager::getInstance().writeConstraints("constraints.txt");
-
-  //TODO enable updates
-  // Add callback to itself. Callback are unique, so further calls should not change anything
-  //vxdAlignments.addCallback(this, &VXD::GeoCache::setupReconstructionTransformations);
+  */
 }
 
 void MillepedeCollectorModule::collect()
 {
+  StoreObjPtr<EventMetaData> emd;
+  alignment::GlobalCalibrationManager::getInstance().preCollect(*emd);
+
   if (!m_useGblTree) {
     // Open new file on request (at start or after being closed)
     auto& mille = getObject<MilleData>("mille");
@@ -349,7 +350,9 @@ void MillepedeCollectorModule::collect()
           alignment::GlobalDerivatives globals(labels, derivatives);
 
           // Add derivatives for vertex calibration to first point of first trajectory
-          daughters[0].first[0].addGlobals(globals.getLabels(), globals.getDerivatives());
+          // NOTE: use GlobalDerivatives operators vector<int> and TMatrixD which filter
+          // the derivatives to not pass those with zero labels (usefull to get rid of some params)
+          daughters[0].first[0].addGlobals(globals, globals);
         }
 
         gbl::GblTrajectory combined(daughters);
@@ -361,7 +364,6 @@ void MillepedeCollectorModule::collect()
         combined.fit(chi2, ndf, lostWeight);
         B2INFO("Combined GBL fit with vertex + ip profile constraint: NDF = " << ndf << " Chi2/NDF = " << chi2 / ndf);
 
-        // if (TMath::Prob(chi2, ndf) > m_minPValue) mille.fill(combined);
         if (TMath::Prob(chi2, ndf) > m_minPValue) storeTrajectory(combined);
 
         getObject<TH1F>("chi2/ndf").Fill(chi2 / ndf);
@@ -599,9 +601,9 @@ std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::
       B2INFO("No related RecoTrack for Belle2::Track");
       continue;
     }
-    auto& track = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
 
     fitRecoTrack(*recoTrack, (addVertexPoint) ? particle : nullptr);
+    auto& track = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
 
     if (!track.hasFitStatus()) {
       B2INFO("Track has no fit status");

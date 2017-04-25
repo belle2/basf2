@@ -252,7 +252,7 @@ namespace Belle2 {
                               vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dBeta),
                               vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dGamma)
                             );
-          rigidBodyHierarchy.insertTGeoTransform<VXDAlignment, alignment::EmptyGlobaParamSet>(halfShellPlacement.first, 0, trafoHalfShell);
+          rigidBodyHierarchy.insertTGeoTransform<VXDAlignment, alignment::EmptyGlobalParamSet>(halfShellPlacement.first, 0, trafoHalfShell);
 
           for (auto& ladderPlacement : geo.getLadderPlacements(halfShellPlacement.first)) {
             // Updated trafo

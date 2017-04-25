@@ -124,6 +124,7 @@ namespace Belle2 {
       int tcid,
       int phiid,
       int thetaid,
+      int beambkgtag,
       double raw_energy,
       double raw_timing,
       double raw_energy_tot,
@@ -142,6 +143,7 @@ namespace Belle2 {
       m_raw_timing_tot = raw_timing_tot;
       m_fit_energy = fit_energy;
       m_fit_timing = fit_timing;
+      m_beambkgtag = beambkgtag;
 
 
     }

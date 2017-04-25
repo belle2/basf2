@@ -36,6 +36,14 @@ namespace Belle2 {
     virtual float getVoltageMonitor(int crate, int slot, int channel) throw(IOException);
     virtual float getCurrentMonitor(int crate, int slot, int channel) throw(IOException);
 
+  protected:
+    bool m_sw[10][10][100];
+    float m_vup[10][10][100];
+    float m_vdown[10][10][100];
+    float m_vdemand[10][10][100];
+    float m_vlim[10][10][100];
+    float m_clim[10][10][100];
+
   };
 
 };

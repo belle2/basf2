@@ -12,7 +12,6 @@
 #include <analysis/modules/ParticlePrinter/ParticlePrinterModule.h>
 
 // framework - DataStore
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
@@ -22,8 +21,6 @@
 // dataobjects
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
-
-#include <iostream>
 
 using namespace std;
 
@@ -42,9 +39,8 @@ namespace Belle2 {
   ParticlePrinterModule::ParticlePrinterModule() : Module()
 
   {
-    // set module description (e.g. insert text)
     setDescription("Prints specified variables for all particles in the specified particle list to screen (useful for debugging).\n"
-                   "Event based variables can be printed by not specifying the particle list (empty string).");
+                   "Event-based variables can be printed by not specifying the particle list (empty string).");
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
@@ -58,6 +54,8 @@ namespace Belle2 {
   void ParticlePrinterModule::initialize()
   {
     if (!m_listName.empty()) {
+      StoreObjPtr<ParticleList> plist(m_listName);
+      plist.isRequired();
 
       // obtain the input and output particle lists from the decay string
       bool valid = m_decaydescriptor.init(m_listName);
@@ -100,12 +98,10 @@ namespace Belle2 {
       if (includingVars) {
         B2INFO(" - " << particle->getArrayIndex() << " = " << particle->getPDGCode() << "[" << i << "]");
         if (particle->getParticleType() == Particle::EParticleType::c_Composite) {
-          std::cout << "[INFO]     o) daughter indices = ";
-          const std::vector<int>& daughters = particle->getDaughterIndices();
-          for (unsigned j = 0; j < daughters.size(); ++j) {
-            std::cout << " " << daughters[j];
-          }
-          std::cout << std::endl;
+          std::string s;
+          for (int idx : particle->getDaughterIndices())
+            s += " " + std::to_string(idx);
+          B2INFO("     o) daughter indices =" << s);
         }
         printVariables(particle);
       }

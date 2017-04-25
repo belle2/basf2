@@ -18,6 +18,8 @@
 #include <tracking/trackFindingCDC/filters/segmentPair/MVAFeasibleSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/MVARealisticSegmentPairFilter.h>
 
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
+
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
@@ -57,7 +59,7 @@ std::unique_ptr<Filter<CDCSegmentPair> >
 SegmentPairFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<BaseSegmentPairFilter>();
+    return makeUnique<NoneFilter<BaseSegmentPairFilter>>();
   } else if (filterName == "all") {
     return makeUnique<AllSegmentPairFilter>();
   } else if (filterName == "truth") {

@@ -88,7 +88,7 @@ TrgEclDigitizer::~TrgEclDigitizer()
 //
 
 void
-TrgEclDigitizer::setup(int m_nEvent)
+TrgEclDigitizer::setup()
 {
   // prepare Matrix for Noise generation
   //
@@ -134,11 +134,9 @@ TrgEclDigitizer::getTCHit(int TableFlag)
       float aveT     = aECLHit->getTimeAve(); // ns :time from  IP  to PD
       if (aveT < - TimeRange || aveT > TimeRange) {continue;} //Choose - TimeRange ~ TimeTange
       int  TimeIndex = (int)((aveT + TimeRange) / 100); //Binning : -4000 = 1st bin ~  4000 80th bin.
-
       E_cell[hitCellId][TimeIndex]  = E_cell[hitCellId][TimeIndex] + hitE;
       T_ave[hitCellId][TimeIndex]   = T_ave[hitCellId][TimeIndex] + hitE * aveT;
       beambkg_tag[hitCellId][TimeIndex] = beambkg ;
-
     }
     for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
       for (int  iTime = 0; iTime < nBinTime; iTime++) {
@@ -596,8 +594,6 @@ TrgEclDigitizer::FADC(int flag_gen,
   //
   //--------------------------------------
   double tsh, dd;
-  // static double tc, fm, fff, tt, dt, tc2, tm, tsc, tris;
-//   static double amp, td, t1, b1, t2, b2, ts, dft, as;
   static double tc, tc2, tsc, tris, b1, b2;
   static double amp, td, t1, t2,  dft, as;
 

@@ -172,6 +172,16 @@ namespace Belle2 {
     double particleDRho(const Particle* part);
 
     /**
+     * return vertex azimuthal angle
+     */
+    double particleDPhi(const Particle* part);
+
+    /**
+     * return vertex polar angle
+     */
+    double particleDCosTheta(const Particle* part);
+
+    /**
      * return the (i,j)-th element of the MomentumVertex covariance matrix
      * Ordering of the elements in the error matrix is: px, py, pz, E, x, y, z
      */
@@ -255,6 +265,11 @@ namespace Belle2 {
      * return StoreArray index (0-based) of the MDST object from which the Particle was created
      */
     double particleMdstArrayIndex(const Particle* part);
+
+    /**
+     * return unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)
+     */
+    double particleMdstSource(const Particle* part);
 
     /**
      * returns cosinus of StoreArray index (0-based) of the MDST object from which the Particle was created.
@@ -693,6 +708,21 @@ namespace Belle2 {
      * return 1/0 if charged track is/is not Matched to this cluster
      */
     double eclClusterTrackMatched(const Particle* particle);
+
+    /**
+     * return the ConnectedRegion ID of this cluster
+     */
+    double eclClusterConnectedRegionId(const Particle* particle);
+
+    /**
+     * return the Cluster ID of this cluster
+     */
+    double eclClusterId(const Particle* particle);
+
+    /**
+     * return the Hypothesis ID of this cluster
+     */
+    double eclClusterHypothesisId(const Particle* particle);
 
     /**
      * return always zero

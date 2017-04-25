@@ -76,7 +76,9 @@ double RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
 
   //Now we have an estimate for the time it took from the ionisation to the hitting of the wire.
   //Need to reverse calculate the relation between drift lenght and drift time.
-  double driftL = std::copysign(m_cdcp.getDriftLength(fabs(driftTime), layer, leftRight, alpha, theta), driftTime);
+  //  double driftL = std::copysign(m_cdcp.getDriftLength(fabs(driftTime), layer, leftRight, alpha, theta), driftTime);
+  //Note: The above treatment for negative drifttime is now done in m_cdcp.getDriftLength, so the line is commented out
+  double driftL = m_cdcp.getDriftLength(driftTime, layer, leftRight, alpha, theta);
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;

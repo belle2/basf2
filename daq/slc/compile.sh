@@ -28,6 +28,7 @@ tar zxvf ${SRC}/boost_src.tgz
 cd boost_1_62_0
 ./bootstrap.sh
 ./b2 install -j${ncore} --prefix=${INS}/boost
+#./b2 install --prefix=${INS}/boost
 
 mkdir -p ${INS}/pgsql
 cd ${SRC}

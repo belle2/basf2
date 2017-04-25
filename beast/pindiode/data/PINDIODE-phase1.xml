@@ -22,7 +22,7 @@
       <phase >1</phase>
       <Material>PINDIODE-Material</Material>
       <dx_pins unit="cm">0.265</dx_pins>
-      <dy_pins unit="cm">0.01</dy_pins>
+      <dy_pins unit="cm">0.02</dy_pins>
       <dz_pins unit="cm">0.265</dz_pins>
 
       <!--

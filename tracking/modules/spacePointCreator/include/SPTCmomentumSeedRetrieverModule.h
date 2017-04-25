@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimators.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -86,6 +86,9 @@ namespace Belle2 {
 
     /** the storeArray for SpacePointTrackCands as member, is faster than recreating link for each event. */
     StoreArray<SpacePointTrackCand> m_spacePointTrackCands;
+
+    /** the QualityEstimator used to determine momentum seed. */
+    QualityEstimatorRiemannHelixFit m_estimator;
 
   private:
   };

@@ -52,11 +52,16 @@ namespace Belle2 {
   }
 
   TRGCDCJLUT::TRGCDCJLUT(const TRGCDCJLUT& in)
+    : m_const(in.m_const),
+      m_name(in.m_name),
+      m_fileName(in.m_fileName),
+      m_function(in.m_function),
+      m_floatFunction(in.m_floatFunction),
+      m_inputMin(in.m_inputMin),
+      m_inputMax(in.m_inputMax),
+      m_shiftOutputMin(in.m_shiftOutputMin),
+      m_shiftOffsetOutputMax(in.m_shiftOffsetOutputMax)
   {
-    m_name = in.m_name;
-    m_fileName = in.m_fileName;
-    m_function = in.m_function;
-    m_floatFunction = in.m_floatFunction;
     m_outputFlag = in.m_outputFlag;
     m_inputBitsize = in.m_inputBitsize;
     m_outputBitsize = in.m_outputBitsize;
@@ -68,11 +73,6 @@ namespace Belle2 {
     m_toReal = in.m_toReal;
     m_inputShiftBits = in.m_inputShiftBits;
     m_outputIntMax = in.m_outputIntMax;
-    m_const = in.m_const;
-    m_inputMin = in.m_inputMin;
-    m_inputMax = in.m_inputMax;
-    m_shiftOutputMin = in.m_shiftOutputMin;
-    m_shiftOffsetOutputMax = in.m_shiftOffsetOutputMax;
     m_write = 0;
   }
 

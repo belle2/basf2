@@ -117,6 +117,10 @@ namespace Belle2 {
     addParam("inputDoseHistoNamesVrs", m_inputDoseHistoNamesVrs,
              "List of dose histograms");
 
+
+    addParam("input_PIN_width", m_input_PIN_width, "PIN width");
+    addParam("input_HE3_EfCor", m_input_HE3_EfCor, "HE3 inefficiency correction");
+
     // initialize other private data members
     m_file = NULL;
     m_tree = NULL;
@@ -186,6 +190,8 @@ namespace Belle2 {
               if (fileName.Contains("LER")) rate *= m_input_Z_scaling[3];
             }
 
+            if (HistoRateName.Contains("Def")) rate *= m_input_HE3_EfCor[i];
+
             if (fileName.Contains("HER")) {
               if (HistoRateName.Contains("qcss") && fileName.Contains("Touschek")) m_input_HT_QCSS_rate.push_back(rate); //Hz
               if (HistoRateName.Contains("claws") && fileName.Contains("Touschek")) m_input_HT_CLAWS_rate.push_back(rate); //Hz
@@ -241,7 +247,7 @@ namespace Belle2 {
           if (HistoDoseName.Contains("bgo")) imax = 8;
           if (HistoDoseName.Contains("pin")) {
             imax = 64;
-            volume = 0.265 * 0.265 * 0.01; //cm^3
+            volume = 0.265 * 0.265 * m_input_PIN_width; //cm^3
             rho = 2.32; //g/cm^3
             mass = rho * volume * 1e-3; //g to kg
           }
@@ -410,6 +416,8 @@ namespace Belle2 {
                 if (fileName.Contains("LER")) rate *= m_input_Z_scaling[3];
               }
 
+              if (HistoRateName.Contains("Def")) rate *= m_input_HE3_EfCor[i];
+
               if (fileName.Contains("Coulomb_HER")) {
                 if (HistoRateName.Contains("qcss")) m_input_HC_QCSS_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("claws")) m_input_HC_CLAWS_rate[k].push_back(rate); //Hz
@@ -457,7 +465,7 @@ namespace Belle2 {
           if (HistoDoseName.Contains("bgo")) imax = 8;
           if (HistoDoseName.Contains("pin")) {
             imax = 64;
-            volume = 0.265 * 0.265 * 0.01; //cm^3
+            volume = 0.265 * 0.265 * m_input_PIN_width; //cm^3
             rho = 2.32; //g/cm^3
             mass = rho * volume * 1e-3; //g to kg
           }

@@ -303,8 +303,8 @@ void Fitter3DUtility::calPhi(std::map<std::string, double> const& mConstD,
 
   // Confine drift time
   // Constants for driftTime
-  int maxDriftTime = 287;
   if (mSignalStorage.find("maxDriftTimeLow") == mSignalStorage.end()) {
+    int maxDriftTime = 287;
     mSignalStorage["maxDriftTimeLow"] = Belle2::TRGCDCJSignal(-512 + maxDriftTime + 1, mSignalStorage["eventTime"].getToReal(),
                                                               commonData);
     mSignalStorage["maxDriftTimeHigh"] = Belle2::TRGCDCJSignal(maxDriftTime, mSignalStorage["eventTime"].getToReal(), commonData);
@@ -362,8 +362,8 @@ void Fitter3DUtility::calPhi(std::map<std::string, double> const& mConstD,
   //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<invErrorRho_"<<iSt<<">>>"<<endl; mSignalStorage["invErrorRho_"+to_string(iSt)].dump();}
   // Remove negative driftTime
   // Constants for driftTime
-  int minDriftTime = -8;
   if (mSignalStorage.find("minDriftTime") == mSignalStorage.end()) {
+    int minDriftTime = -8;
     mSignalStorage["minDriftTime"] = Belle2::TRGCDCJSignal(minDriftTime, mSignalStorage["eventTime"].getToReal(), commonData);
     mSignalStorage["minDriftTimeLow"] = Belle2::TRGCDCJSignal(0, mSignalStorage["eventTime"].getToReal(), commonData);
   }
@@ -698,7 +698,7 @@ void Fitter3DUtility::setError(std::map<std::string, double> const& mConstD,
 
 double Fitter3DUtility::calStAxPhi(int mysign, double anglest, double ztostraw, double rr, double rho, double myphi0)
 {
-  if (1 == 2) cout << anglest << ztostraw << endl; // Removes warnings when compileing
+  if (false) cout << anglest << ztostraw << endl; // Removes warnings when compileing
 
   double myphiz, acos_real;
   double Trg_PI = 3.141592653589793;
@@ -719,7 +719,7 @@ double Fitter3DUtility::calStAxPhi(int mysign, double anglest, double ztostraw, 
 
 double Fitter3DUtility::calDeltaPhi(int mysign, double anglest, double ztostraw, double rr, double phi2, double rho, double myphi0)
 {
-  if (1 == 2) cout << anglest << ztostraw << endl; // Removes warnings when compileing
+  if (false) cout << anglest << ztostraw << endl; // Removes warnings when compileing
 
   double myphiz, acos_real;
   double Trg_PI = 3.141592653589793;

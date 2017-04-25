@@ -17,8 +17,6 @@
 #include <TTree.h>
 #include <TFile.h>
 
-using namespace Belle2;
-
 namespace Belle2 {
 
   class ECLDigiStudyModule : public Module {

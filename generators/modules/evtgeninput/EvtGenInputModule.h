@@ -11,16 +11,16 @@
 #ifndef EVTGENINPUTMODULE_H
 #define EVTGENINPUTMODULE_H
 
+#include <generators/evtgen/EvtGenInterface.h>
+
+#include <generators/utilities/InitialParticleGeneration.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
+
 #include <framework/core/Module.h>
 
 #include <string>
 #include <vector>
-
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/MCParticleGraph.h>
-#include <generators/evtgen/EvtGenInterface.h>
-
-#include <generators/utilities/InitialParticleGeneration.h>
 
 namespace Belle2 {
 

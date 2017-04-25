@@ -253,7 +253,17 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_ShowCurlCurv)
   }
 }
 
-
+TEST_F(TrackFindingCDCTestWithTopology, topology_ShowLayerLimits)
+{
+  const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
+  ISuperLayer iL = -1;
+  for (const CDCWireLayer& wireLayer : theWireTopology.getWireLayers()) {
+    ++iL;
+    B2INFO("Layer " << iL << ":");
+    B2INFO("z in " << wireLayer.getForwardZ() << ", " << wireLayer.getBackwardZ());
+    B2INFO("r in " << wireLayer.getInnerCylindricalR() << ", " << wireLayer.getOuterCylindricalR());
+  }
+}
 
 TEST_F(TrackFindingCDCTestWithTopology, topology_CDCGeometryPar_cellId)
 {

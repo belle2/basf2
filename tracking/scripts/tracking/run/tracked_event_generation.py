@@ -84,6 +84,15 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
 
             # Include the mc tracks if the monte carlo data is presentx
             if 'MCRecoTracksMatcher' not in path:
+                matching_coverage = {key: value for key, value in tracking_coverage.items()
+                                     if key in ('UsePXDHits', 'UseSVDHits', 'UseCDCHits', 'MinimalEfficiency', 'MinimalPurity')}
+
+                # Removing minimal efficiency and purity as they are only parameters of the matching
+                if "MinimalEfficiency" in tracking_coverage:
+                    tracking_coverage.pop("MinimalEfficiency")
+                if "MinimalPurity" in tracking_coverage:
+                    tracking_coverage.pop("MinimalPurity")
+
                 # Reference Monte Carlo tracks
                 track_finder_mc_truth_module = basf2.register_module('TrackFinderMCTruthRecoTracks')
                 track_finder_mc_truth_module.param({
@@ -94,8 +103,6 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                 # Track matcher
                 mc_track_matcher_module = basf2.register_module('MCRecoTracksMatcher')
 
-                matching_coverage = {key: value for key, value in tracking_coverage.items()
-                                     if key in ('UsePXDHits', 'UseSVDHits', 'UseCDCHits')}
                 mc_track_matcher_module.param({
                     'mcRecoTracksStoreArrayName': 'MCRecoTracks',
                     'MinimalPurity': 0.66,
@@ -146,26 +153,40 @@ finder_modules_by_short_name = {
     'MC': 'TrackFinderMCTruthRecoTracks',
     'Reconstruction': add_standard_reconstruction,
     'TrackFinder': add_standard_finder,
-    'TrackFinderCDC': tracking.add_cdc_track_finding,
     'TrackFinderVXD': tracking.add_vxd_track_finding,
-    'TrackFinderCDCLegendre': lambda path: (path.add_module('TFCDC_WireHitPreparer',
-                                                            flightTimeEstimation="outwards"),
-                                            path.add_module('TFCDC_AxialTrackFinderLegendre'),
-                                            path.add_module('TFCDC_TrackExporter')),
-    'SegmentFinderCDC': lambda path: (path.add_module('TFCDC_WireHitPreparer',
+    'TFCDC': lambda path: tracking.add_cdc_track_finding(path, with_ca=True),
+    'TFCDC_Global': tracking.add_cdc_track_finding,
+    'TFCDC_Ca': lambda path: (path.add_module('TFCDC_WireHitPreparer',
+                                              flightTimeEstimation="outwards"),
+                              path.add_module('TFCDC_ClusterPreparer',
+                                              SuperClusterDegree=3,
+                                              SuperClusterExpandOverApogeeGap=True),
+                              path.add_module('TFCDC_SegmentFinderFacetAutomaton'),
+                              path.add_module("TFCDC_TrackFinderSegmentPairAutomaton"),
+                              path.add_module("TFCDC_TrackCreatorSingleSegments",
+                                              MinimalHitsBySuperLayerId={0: 15}),
+                              path.add_module('TFCDC_TrackExporter')),
+    'TFCDC_Axial': lambda path: (path.add_module('TFCDC_WireHitPreparer',
+                                                 flightTimeEstimation="outwards"),
+                                 path.add_module('TFCDC_ClusterPreparer'),
+                                 path.add_module('TFCDC_AxialTrackFinderLegendre'),
+                                 path.add_module('TFCDC_TrackExporter')),
+    'TFCDC_Segments': lambda path: (path.add_module('TFCDC_WireHitPreparer',
+                                                    flightTimeEstimation="outwards"),
+                                    path.add_module('TFCDC_ClusterPreparer'),
+                                    path.add_module('TFCDC_SegmentFinderFacetAutomaton'),
+                                    path.add_module('TFCDC_TrackCreatorSingleSegments',
+                                                    MinimalHitsBySuperLayerId={sl_id: 0 for sl_id in range(9)}),
+                                    path.add_module('TFCDC_TrackExporter')),
+    'TFCDC_MCSegments': lambda path: (path.add_module('TFCDC_WireHitPreparer',
                                                       flightTimeEstimation="outwards"),
-                                      path.add_module('TFCDC_SegmentFinderFacetAutomaton'),
+                                      path.add_module('TFCDC_SegmentCreatorMCTruth'),
+                                      path.add_module('TFCDC_SegmentLinker',
+                                                      segments="CDCSegment2DVector",
+                                                      filter="truth"),
                                       path.add_module('TFCDC_TrackCreatorSingleSegments',
                                                       MinimalHitsBySuperLayerId={sl_id: 0 for sl_id in range(9)}),
-                                      path.add_module('TFCDC_TrackExporter'),
-                                      ),
-    'MCSegmentFinderCDC': lambda path: (path.add_module('TFCDC_WireHitPreparer',
-                                                        flightTimeEstimation="outwards"),
-                                        path.add_module('TFCDC_SegmentCreatorMCTruth'),
-                                        path.add_module('TFCDC_TrackCreatorSingleSegments',
-                                                        MinimalHitsBySuperLayerId={sl_id: 0 for sl_id in range(9)}),
-                                        path.add_module('TFCDC_TrackExporter'),
-                                        ),
+                                      path.add_module('TFCDC_TrackExporter')),
     'FirstLoop': lambda path: path.add_module('TFCDC_WireHitPreparer', UseNLoops=1.0),
 }
 

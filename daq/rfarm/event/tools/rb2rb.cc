@@ -41,8 +41,8 @@ int main(int argc, char** argv)
     int bsize;
     while ((bsize = rbufin->remq((int*)evbuf)) == 0) {
       //    printf ( "Rx : evtbuf is not available yet....\n" );
-      usleep(100);
-      //      usleep(20);
+      //      usleep(100);
+      usleep(20);
     }
     EvtMessage* msg = new EvtMessage(evbuf);
     if (msg->type() == MSG_TERMINATE) {
@@ -55,8 +55,8 @@ int main(int argc, char** argv)
     for (;;) {
       irb = rbufout->insq((int*)evbuf, bsize);
       if (irb >= 0) break;
-      usleep(100);
-      //      usleep(20);
+      //      usleep(100);
+      usleep(20);
     }
   }
 }

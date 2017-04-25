@@ -130,6 +130,15 @@ def peel_reco_track_seed(reco_track, key="{part_name}"):
 
 
 @format_crop_keys
+def peel_event_info(event_meta_data, key="{part_name}"):
+    return dict(
+        event_number=event_meta_data.getEvent(),
+        run_number=event_meta_data.getRun(),
+        experiment_number=event_meta_data.getExperiment(),
+    )
+
+
+@format_crop_keys
 def peel_track_fit_result(track_fit_result, key="{part_name}"):
     nan = float("nan")
     if track_fit_result:

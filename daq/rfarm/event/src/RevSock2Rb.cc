@@ -47,8 +47,8 @@ int RevSock2Rb::ReceiveEvent(void)
   for (;;) {
     stat = m_rbuf->insq((int*)msg->buffer(), msg->paddedSize());
     if (stat >= 0) break;
-    usleep(100);
-    //    usleep(20);
+    //    usleep(100);
+    usleep(20);
   }
   delete msg;
   return stat;

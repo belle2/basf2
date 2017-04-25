@@ -32,12 +32,12 @@ using namespace std;
 namespace Belle2 {
 
   TRGCDCJSignalData::TRGCDCJSignalData()
+    : m_vhdlOutputFile("vhdlOutput"),
+      m_vhdlEntry(""),
+      m_vhdlDefine(""),
+      m_vhdlInProcess(""),
+      m_vhdlOutProcess("")
   {
-    m_vhdlOutputFile = "vhdlOutput";
-    m_vhdlEntry = "";
-    m_vhdlDefine = "";
-    m_vhdlInProcess = "";
-    m_vhdlOutProcess = "";
     m_printVhdl = 0;
     m_printedToFile = 0;
   }

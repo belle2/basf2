@@ -511,6 +511,12 @@ namespace Belle2 {
       return frame.getVertex(part).Phi();
     }
 
+    double particleDCosTheta(const Particle* part)
+    {
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getVertex(part).CosTheta();
+    }
+
     double particleDistance(const Particle* part)
     {
       const auto& frame = ReferenceFrame::GetCurrent();
@@ -702,6 +708,11 @@ namespace Belle2 {
     double particleMdstArrayIndex(const Particle* part)
     {
       return part->getMdstArrayIndex();
+    }
+
+    double particleMdstSource(const Particle* part)
+    {
+      return part->getMdstSource();
     }
 
     double particleCosMdstArrayIndex(const Particle* part)
@@ -1721,6 +1732,39 @@ namespace Belle2 {
 
     }
 
+    double eclClusterConnectedRegionId(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getConnectedRegionId();
+      }
+      return result;
+    }
+
+    double eclClusterId(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getClusterId();
+      }
+      return result;
+    }
+
+    double eclClusterHypothesisId(const Particle* particle)
+    {
+      double result = -1.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getHypothesisId();
+      }
+      return result;
+    }
+
     double nRemainingTracksInEvent(const Particle* particle)
     {
 
@@ -1848,7 +1892,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("y", particleDY, "y coordinate of vertex");
     REGISTER_VARIABLE("z", particleDZ, "z coordinate of vertex");
     REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP");
-    REGISTER_VARIABLE("dphi", particleDPhi, "momentum azimuthal angle in degrees in respect to IP");
+    REGISTER_VARIABLE("dphi", particleDPhi, "vertex azimuthal angle in degrees in respect to IP");
+    REGISTER_VARIABLE("dcosTheta", particleDCosTheta, "vertex polar angle in respect to IP");
 
     REGISTER_VARIABLE("M", particleMass,
                       "invariant mass(determined from particle's 4-momentum vector)");
@@ -1966,6 +2011,8 @@ namespace Belle2 {
                       "called connected - region(CR) track match");
     REGISTER_VARIABLE("mdstIndex", particleMdstArrayIndex,
                       "StoreArray index(0 - based) of the MDST object from which the Particle was created");
+    REGISTER_VARIABLE("mdstSource", particleMdstSource,
+                      "mdstSource - unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)");
     REGISTER_VARIABLE("CosMdstIndex", particleCosMdstArrayIndex,
                       " Cosinus of StoreArray index(0 - based) of the MDST object from which the Particle was created. To be used for random ranking.");
 
@@ -2068,6 +2115,13 @@ namespace Belle2 {
                       "number of hits associated to this cluster");
     REGISTER_VARIABLE("clusterTrackMatch", eclClusterTrackMatched,
                       "number of charged track matched to this cluster");
+    REGISTER_VARIABLE("clusterCRID", eclClusterConnectedRegionId,
+                      "Returns the connected region ID this cluster belongs to.");
+    REGISTER_VARIABLE("clusterClusterID", eclClusterId,
+                      "Returns the cluster id of this cluster within the connected region to which it belongs to.");
+    REGISTER_VARIABLE("clusterHypothesis", eclClusterHypothesisId,
+                      "Returns the hypothesis ID of this cluster belongs.");
+
     REGISTER_VARIABLE("infinity", infinity,
                       "returns std::numeric_limits<double>::infinity()");
     REGISTER_VARIABLE("random", random, "return a random number between 0 and 1. Can be used, e.g. for picking a random"

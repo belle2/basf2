@@ -31,7 +31,7 @@ namespace {
               "!H:!V:CreateMVAPdfs:NTrees=400:BoostType=Grad:Shrinkage=0.1:UseBaggedBoost:BaggedSampleFraction=0.5:nCuts=1024:MaxDepth=3:IgnoreNegWeightsInTraining");
     EXPECT_EQ(specific_options.m_factoryOption, "!V:!Silent:Color:DrawProgressBar");
     EXPECT_EQ(specific_options.m_prepareOption, "SplitMode=random:!V");
-    EXPECT_EQ(specific_options.m_workingDirectory, ".");
+    EXPECT_EQ(specific_options.m_workingDirectory, "");
     EXPECT_EQ(specific_options.m_prefix, "TMVA");
 
     specific_options.m_method = "Method";
@@ -84,13 +84,13 @@ namespace {
 
     // Test if po::options_description is created without crashing
     auto description = specific_options.getDescription();
-    EXPECT_EQ(description.options().size(), 5);
+    EXPECT_EQ(description.options().size(), 6);
 
     auto description_reg = specific_regression_options.getDescription();
-    EXPECT_EQ(description_reg.options().size(), 5);
+    EXPECT_EQ(description_reg.options().size(), 6);
 
     auto description_cls = specific_classification_options.getDescription();
-    EXPECT_EQ(description_cls.options().size(), 6);
+    EXPECT_EQ(description_cls.options().size(), 7);
 
     // Check for B2ERROR and throw if version is wrong
     // we try with version 100, surely we will never reach this!

@@ -27,10 +27,11 @@
 #include "tracking/dataobjects/VXDTFSecMap.h"
 #include "tracking/dataobjects/FilterID.h"
 #include "tracking/dataobjects/SectorMapConfig.h"
+#include <tracking/spacePointCreation/SpacePoint.h>
+
 #include "framework/gearbox/Const.h"
 #include "framework/datastore/StoreObjPtr.h"
 
-#include <tracking/spacePointCreation/SpacePoint.h>
 
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
@@ -41,6 +42,7 @@
 
 #include <math.h>
 #include <algorithm>
+#include <fstream>
 
 
 using namespace Belle2;
@@ -50,6 +52,9 @@ REG_MODULE(SectorMapBootstrap);
 
 SectorMapBootstrapModule::SectorMapBootstrapModule() : Module()
 {
+
+  setPropertyFlags(c_ParallelProcessingCertified);
+
   setDescription("Create the VXDTF SectorMap for the following modules."
                 );
 
@@ -79,6 +84,14 @@ SectorMapBootstrapModule::initialize()
   else
     bootstrapSectorMap();
 
+  // security measurement: test if output file exists so that existing sector maps are not overwritten
+  if (m_writeSectorMap) {
+    if (std::ifstream(m_sectorMapsOutputFile.c_str())) {
+      B2FATAL("Detected existing output file! Please delete or move before proceeding! File name: " << m_sectorMapsOutputFile);
+    } else {
+      B2DEBUG(1, "Checked that output file does not exist!");
+    }
+  }
 }
 
 void
@@ -213,8 +226,8 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   configTB.pTmax = 8.0; // minimal relevant version // Feb18-onePass-Test
   configTB.pTSmear = 0.;
   configTB.allowedLayers = {0, 3, 4, 5, 6};
-  configTB.uSectorDivider = { .3, .7, 1.}; // standard relevant version
-  configTB.vSectorDivider = { .3, .7, 1.}; // standard relevant version
+  configTB.uSectorDivider = { 1.}; // standard relevant version
+  configTB.vSectorDivider = { 1.}; // standard relevant version
   configTB.pdgCodesAllowed = { -11, 11};
   configTB.seedMaxDist2IPXY = 23.5;
   configTB.seedMaxDist2IPZ = 23.5;
@@ -301,8 +314,10 @@ void
 SectorMapBootstrapModule::persistSectorMap(void)
 {
 
-
-  TFile rootFile(m_sectorMapsOutputFile.c_str() , "RECREATE");
+  // the "CREATE" option results in the root file not being opened if it already exists (to prevent overwriting existing sectormaps)
+  TFile rootFile(m_sectorMapsOutputFile.c_str() , "CREATE");
+  if (!rootFile.IsOpen()) B2FATAL("Unable to open rootfile! This could be caused by an already existing file of the same name: "
+                                    << m_sectorMapsOutputFile.c_str());
 
   TTree* tree = new TTree(c_setupKeyNameTTreeName.c_str(),
                           c_setupKeyNameTTreeName.c_str());
@@ -360,6 +375,7 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
     string setupKeyNameStd = string(setupKeyName->Data());
     segmentFilters->retrieveFromRootFile(setupKeyName);
 
+    B2DEBUG(1, "Retrieved map with name: " << setupKeyNameStd << " from rootfie.");
     filtersContainer.assignFilters(setupKeyNameStd, segmentFilters);
 
     rootFile.cd("..");

@@ -65,6 +65,15 @@ namespace Belle2 {
 
     TTree* m_tree;
 
+    /** ConnectedRegionID */
+    int m_CRID;
+
+    /** ClusterID */
+    int m_clusterID;
+
+    /** Hypothesis ID */
+    int m_hypothesisID;
+
     /** Corrected Energy (GeV) */
 
     float m_E;

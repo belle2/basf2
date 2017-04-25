@@ -1,14 +1,12 @@
 from b2daq import *
 from cdcfeehandler import *
 
-callback = NSMCallback()
-
 
 def set_non(hslb, val):
     return True
 
 
-def init(hslb, db):
+def init(callback, hslb, db):
     print('initing')
     vname = ('cdc[%d].' % hslb.get_finid())
     callback.addFloat(vname + 'temp', 0)
@@ -26,11 +24,11 @@ def init(hslb, db):
                         {'hslb': hslb, 'index': i})
 
 
-def boot(hslb, db):
+def boot(callback, hslb, db):
     print('booting')
 
 
-def load(hslb, db):
+def load(callback, hslb, db):
     print("loading slot-%d" % hslb.get_finid())
     # setting CDC control (data format, window and delay)
     val = int(0)
@@ -58,7 +56,7 @@ def load(hslb, db):
     hslb.writefee32(0x0015, val)
 
 
-def monitor(hslb):
+def monitor(callback, hslb):
     hslb.writefee32(0X0016, 0x00480F00)
     # time.sleep(0.5)
     hslb.writefee32(0X0016, 0x00400400)

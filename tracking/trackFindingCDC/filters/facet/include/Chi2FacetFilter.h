@@ -11,7 +11,11 @@
 
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+
+#include <vector>
 #include <string>
+#include <cmath>
 
 namespace Belle2 {
   class ModuleParamList;
@@ -28,14 +32,17 @@ namespace Belle2 {
 
     public:
       /// Constructor with the default chi2 cut value and width parameter
-      Chi2FacetFilter() = default;
+      Chi2FacetFilter();
 
       /// Constructor using given chi2 cut value and width parameter
-      explicit Chi2FacetFilter(double chi2Cut, double penaltyWidth);
+      Chi2FacetFilter(double chi2Cut, double penaltyWidth);
 
     public:
       /// Expose the set of parameters of the filter to the module parameter list.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+
+      /// Initialise the parameter caches before the processing starts
+      void initialize() final;
 
     public:
       /**
@@ -44,12 +51,19 @@ namespace Belle2 {
        */
       Weight operator()(const CDCFacet& facet) final;
 
-    private:
-      /// Memory for the chi2 cut value
-      double m_param_chi2Cut = 75;
+    private: // Parameters
+      /// Parameter : The chi2 cut values distinguished by superlayer
+      std::vector<double> m_param_chi2CutByISuperLayer{75.0};
 
-      /// Memory for the width parameter to translate the chi2 value to a weight penatlity
-      double m_param_penaltyWidth = 120.0;
+      /// Parameter : The chi2 cut values distinguished by superlayer
+      double m_param_penaltyFactor = 120.0 / 75.0;
+
+    private: // Cached values
+      /// Memory for the chi2 cut values distinguished by superlayer
+      std::array<double, ISuperLayerUtil::c_N> m_chi2CutByISuperLayer{};
+
+      /// Memory for the chi2 cut values distinguished by superlayer
+      std::array<double, ISuperLayerUtil::c_N> m_penaltyWidthByISuperLayer{};
     };
   }
 }

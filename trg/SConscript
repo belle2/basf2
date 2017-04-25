@@ -3,10 +3,7 @@ Import('env')
 # env['CONTINUE'] = False
 
 env['LIBS'] = ['framework',
-	       'cdc',
 	       'ecl',
-	       'rawdata_dataobjects',
-	       'cdc_dataobjects',
 	       'ecl_dataobjects',
 	       'trg_ecl_dataobjects',
 	       'trg_grl_dataobjects',

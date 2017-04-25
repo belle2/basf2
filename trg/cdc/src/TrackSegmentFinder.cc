@@ -2994,8 +2994,6 @@ namespace Belle2 {
     //  int tmpFTime = 0 ;
 
     //variables for Tracker & N.N
-    vector <bool> tmpOutBool;
-
     TRGSignalVector* resultT = new TRGSignalVector(na, in->clock(), 13);
     TRGSignalVector* resultE = new TRGSignalVector(na, in->clock(), 10);
     TRGSignalVector* Hitmap = new TRGSignalVector(na + "HitMap",
@@ -3100,7 +3098,7 @@ namespace Belle2 {
         const bool hit1st = pri0->riseEdge(ct);
         const bool hit2nd0 = pri1->riseEdge(ct);
         const bool hit2nd1 = pri2->riseEdge(ct);
-        const bool hit2nd = hit2nd0 | hit2nd1;
+        const bool hit2nd = hit2nd0 || hit2nd1;
 
         //...Hit position state machine...
 

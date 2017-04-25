@@ -112,15 +112,8 @@ def setup_VXDTF2(path=None,
 
     # Quality
 
-    if quality_estimator is "random":
-        qualityEstimator = register_module('QualityEstimatorVXDRandom')
-    elif quality_estimator is "circleFit":
-        qualityEstimator = register_module('QualityEstimatorVXDCircleFit')
-    elif quality_estimator is "tripletFit":
-        qualityEstimator = register_module('QualityEstimatorVXDTripletFit')
-    else:
-        print("ERROR! unknown estimatorType " + quality_estimator + " is given - can not proceed!")
-        exit
+    qualityEstimator = register_module('QualityEstimatorVXD')
+    qualityEstimator.param('EstimationMethod', quality_estimator)
     qualityEstimator.logging.log_level = log_level
     qualityEstimator.logging.debug_level = debug_level
     modules.append(qualityEstimator)

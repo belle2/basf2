@@ -41,7 +41,6 @@ HVState HVCommand::nextState() const throw()
   if (*this == TURNON) return HVState::STANDBY_S;
   else if (*this == TURNOFF) return HVState::OFF_S;
   else if (*this == STANDBY) return HVState::STANDBY_S;
-  else if (*this == SHOULDER) return HVState::SHOULDER_S;
   else if (*this == PEAK) return HVState::PEAK_S;
   else if (*this == RECOVER) return HVState::OFF_S;
   return HVState::UNKNOWN;
@@ -50,31 +49,21 @@ HVState HVCommand::nextState() const throw()
 HVState HVCommand::nextTState(const HVState& state) const throw()
 {
   if (*this == TURNON) {
-    if (state == HVState::OFF_S)
-      return HVState::RAMPINGUP_TS;
+    if (state == HVState::OFF_S) {
+      return HVState::TURNINGON_TS;
+    }
   } else if (*this == TURNOFF) {
-    return HVState::RAMPINGDOWN_TS;
+    return HVState::TURNINGOFF_TS;
   } else if (*this == STANDBY) {
     if (state == HVState::STANDBY_S) {
       return HVState::STANDBY_S;
     } else if (state == HVState::OFF_S) {
-      return HVState::RAMPINGUP_TS;
-    } else if (state == HVState::PEAK_S ||
-               state == HVState::SHOULDER_S) {
-      return HVState::RAMPINGDOWN_TS;
-    }
-  } else if (*this == SHOULDER) {
-    if (state == HVState::OFF_S || state == HVState::STANDBY_S) {
-      return HVState::RAMPINGUP_TS;
+      return HVState::TURNINGON_TS;
     } else if (state == HVState::PEAK_S) {
       return HVState::RAMPINGDOWN_TS;
-    } else if (state == HVState::SHOULDER_S) {
-      return HVState::SHOULDER_S;
     }
   } else if (*this == PEAK) {
-    if (state == HVState::OFF_S ||
-        state == HVState::STANDBY_S ||
-        state == HVState::SHOULDER_S) {
+    if (state == HVState::STANDBY_S) {
       return HVState::RAMPINGUP_TS;
     } else if (state == HVState::PEAK_S) {
       return HVState::PEAK_S;

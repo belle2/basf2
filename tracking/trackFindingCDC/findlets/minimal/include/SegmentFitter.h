@@ -63,6 +63,9 @@ namespace Belle2 {
       /// Parameter : Switch to reestimate the drift length before the fit
       bool m_param_updateDriftLength = true;
 
+      /// Parameter : Switch to reevaluate the position and right left passage information based in the fit
+      bool m_param_updateRecoPos = false;
+
       /// Option which positional information from the hits should be used
       EFitPos m_fitPos = EFitPos::c_RecoPos;
 

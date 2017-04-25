@@ -84,25 +84,6 @@ void DQMHistAnalysisOutputNSMModule::initialize()
   PThread(new NSMNodeDaemon(m_callback, host, port));
   sleep(1);
   B2INFO("DQMHistAnalysisOutputNSM: initialized.");
-  ParamTypeList& parnames(getParNames());
-  IntValueList& vints(getIntValues());
-  FloatValueList& vfloats(getFloatValues());
-  TextList& texts(getTexts());
-  for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); i++) {
-    std::string pname = i->first;
-    B2INFO("Addding : " << pname);
-    switch (i->second) {
-      case INT:
-        m_callback->add(new NSMVHandlerInt(pname, true, false, vints[pname]));
-        break;
-      case FLOAT:
-        m_callback->add(new NSMVHandlerFloat(pname, true, false, vfloats[pname]));
-        break;
-      case TEXT:
-        m_callback->add(new NSMVHandlerText(pname, true, false, texts[pname]));
-        break;
-    }
-  }
 }
 
 void DQMHistAnalysisOutputNSMModule::beginRun()
@@ -112,23 +93,43 @@ void DQMHistAnalysisOutputNSMModule::beginRun()
 
 void DQMHistAnalysisOutputNSMModule::event()
 {
+  static bool initialized = false;
   ParamTypeList& parnames(getParNames());
   IntValueList& vints(getIntValues());
   FloatValueList& vfloats(getFloatValues());
   TextList& texts(getTexts());
-  for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); i++) {
-    std::string pname = i->first;
-    std::string vname = StringUtil::tolower(StringUtil::replace(pname, "/", "."));
-    switch (i->second) {
-      case INT:
-        m_callback->add(new NSMVHandlerInt(vname, true, false, vints[pname]));
-        break;
-      case FLOAT:
-        m_callback->add(new NSMVHandlerFloat(vname, true, false, vfloats[pname]));
-        break;
-      case TEXT:
-        m_callback->add(new NSMVHandlerText(vname, true, false, texts[pname]));
-        break;
+  if (!initialized) {
+    for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); i++) {
+      std::string pname = i->first;
+      std::string vname = StringUtil::replace(pname, "/", ".");
+      switch (i->second) {
+        case INT:
+          m_callback->add(new NSMVHandlerInt(vname, true, false, vints[pname]));
+          break;
+        case FLOAT:
+          m_callback->add(new NSMVHandlerFloat(vname, true, false, vfloats[pname]));
+          break;
+        case TEXT:
+          m_callback->add(new NSMVHandlerText(vname, true, false, texts[pname]));
+          break;
+      }
+    }
+    initialized = true;
+  } else {
+    for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); i++) {
+      std::string pname = i->first;
+      std::string vname = StringUtil::replace(pname, "/", ".");
+      switch (i->second) {
+        case INT:
+          m_callback->set(vname, vints[pname]);
+          break;
+        case FLOAT:
+          m_callback->set(vname, vfloats[pname]);
+          break;
+        case TEXT:
+          m_callback->set(vname, texts[pname]);
+          break;
+      }
     }
   }
 }

@@ -170,6 +170,12 @@ pair<TObject*, IntervalOfValidity> LocalDatabase::getData(const EventMetaData& e
 bool LocalDatabase::storeData(const std::string& name, TObject* object,
                               const IntervalOfValidity& iov)
 {
+  if (iov.empty()) {
+    B2ERROR("IoV is empty, refusing to store '" << name << "' in local database: "
+            "Please provide a valid experiment/run range for the data, for example "
+            "using IntervalOfValidity::always() to store data which is always valid");
+    return false;
+  }
   if (m_readOnly) {
     B2ERROR("Database file " << m_fileName << " is opened in read-only mode.");
     return false;

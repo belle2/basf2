@@ -587,9 +587,7 @@ void KLMTriggerModule::geometryConverter(bool fwd, int sector, int layer, int ph
     dz = 0;
 
   y  = c_LayerY0[layer] + dy + phiStrip * c_PhiWidth[layer];
-  if (!flipped)
-    y = y;
-  else
+  if (flipped)
     y = -y;
 
   z  = z0 + dz + zStrip * zWidth;
@@ -600,5 +598,5 @@ void KLMTriggerModule::geometryConverter(bool fwd, int sector, int layer, int ph
 
   x      = c_LayerXCoord[layer];
   y      = y >> 2; // y values are defined in 1/32 cm here, round up to 1/8 cm
-  z      = z;
+//z      = z;
 }

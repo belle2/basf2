@@ -59,7 +59,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
 
   //  if( wirededx.size() < 14336 ) return c_Failure;
 
-  TH2F* gains = new TH2F("wireGains", "CDC dE/dx wire gains", 14337, -0.5, 14336.5, 2, -0.5, 1.5);
+  TH2F* gains = new TH2F("CDCDedxWireGains", "CDC dE/dx wire gains", 14337, -0.5, 14336.5, 2, -0.5, 1.5);
   int counter = 1;
   for (auto const& awire : wirededx) {
     B2INFO("Wire " << awire.first << ": " << calculateMean(awire.second, 0.05, 0.25));
@@ -67,7 +67,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     gains->SetBinContent(counter, 2, calculateMean(awire.second, 0.05, 0.25));
     counter++;
   }
-  saveCalibration(gains, getPrefix());
+  saveCalibration(gains, "CDCDedxWireGains");
 
   // Iterate
   //  B2INFO("mean: " << mean);

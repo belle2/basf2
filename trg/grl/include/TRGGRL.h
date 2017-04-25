@@ -43,11 +43,11 @@ namespace Belle2 {
   class TRGLink;
   class TRGGRL;
 
-///  The instance of TRGGRL is a singleton. 'TRGGRL::getTRGGRL()'
-///  gives you a pointer to access the TRGGRL. Geometrical information
-///  is initialized automatically. Before accessing hit information,
-///  user has to call 'update()' to initialize hit information event
-///  by event.
+//  The instance of TRGGRL is a singleton. 'TRGGRL::getTRGGRL()'
+//  gives you a pointer to access the TRGGRL. Geometrical information
+//  is initialized automatically. Before accessing hit information,
+//  user has to call 'update()' to initialize hit information event
+//  by event.
 
   class TRGGRL {
 

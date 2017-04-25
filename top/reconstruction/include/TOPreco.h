@@ -22,6 +22,7 @@ extern "C" {
   float get_logl_(float*, float*, float*);
   int data_getnum_();
   void set_channel_mask_(int*, int*, int*);
+  void print_channel_mask_();
   void set_channel_effi_(int*, int*, float*);
 }
 
@@ -58,8 +59,10 @@ namespace Belle2 {
       /**
        * Set channel mask
        * @param mask channel mask
+       * @param printMask if true, print masks to std output
        */
-      static void setChannelMask(const DBObjPtr<TOPCalChannelMask>& mask);
+      static void setChannelMask(const DBObjPtr<TOPCalChannelMask>& mask,
+                                 bool printMask = false);
 
       /**
        * Set hypothesis internal code: 1=e, 2=mu, 3=pi, 4=K, 5=p, 0=other

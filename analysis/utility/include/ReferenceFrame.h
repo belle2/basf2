@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Keck                                              *
+ * Contributors: Thomas Keck, Dennis Weyland                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,6 +12,7 @@
 #define REFERENCEFRAME_H
 
 #include <TLorentzRotation.h>
+#include <TRotation.h>
 #include <TLorentzVector.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/PCmsLabTransform.h>
@@ -202,6 +203,49 @@ namespace Belle2 {
 
   private:
     PCmsLabTransform m_transform; /**< Lab to CMS Transform */
+  };
+
+  /**
+   * Rotation frame around vector
+   */
+  class RotationFrame : public ReferenceFrame {
+
+  public:
+    /**
+     * Create new rotation frame
+     */
+    explicit RotationFrame(const TVector3& newX, const TVector3& newY, const TVector3& newZ);
+
+    /**
+     * Get vertex 3-vector in rotation frame
+     * @param particle
+     * @return 3-vector in rotation frame
+     */
+    virtual TVector3 getVertex(const Particle* particle) const;
+
+    /**
+     * Get Lorentz vector in rotation frame
+     * @param particle
+     * @return Lorentz vector in rotation frame
+     */
+    virtual TLorentzVector getMomentum(const Particle* particle) const;
+
+    /**
+     * Get Momentum error matrix in rotation frame
+     * @param particle
+     * @return Covariance matrix in rotation frame
+     */
+    virtual TMatrixFSym getMomentumErrorMatrix(const Particle* particle) const;
+
+    /**
+     * Get Vertex error matrix in rotation frame
+     * @param particle
+     * @return Covariance matrix in rotation frame
+     */
+    virtual TMatrixFSym getVertexErrorMatrix(const Particle* particle) const;
+
+  private:
+    TRotation m_rotation; /**< Rotation */
   };
 
   template<class T>

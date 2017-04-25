@@ -23,9 +23,11 @@ def setAnalysisConfigParams(configParametersAndValues, path=analysis_main):
     - 'tupleStyle': 'Default' (default) or 'Laconic'
       o) defines the style of the branch name in the ntuple
 
-    - 'mcMatchingVersion': 'BelleII' (default), 'MC5' and 'Belle'
-      o) Specifies what version of mc matching algorithm is going to be used
-         Use 'MC5' for analysis of BelleII MC5, 'Belle' for analaysis of Belle MC and 'BelleII' for the rest.
+    - 'mcMatchingVersion': Specifies what version of mc matching algorithm is going to be used:
+
+          - 'MC5' - analysis of BelleII MC5
+          - 'Belle' - analaysis of Belle MC
+          - 'BelleII' (default) - all other cases
 
     @param configParametersAndValues dictionary of parameters and their values of the form {param1: value, param2: value, ...)
     @param modules are added to this path
@@ -58,7 +60,9 @@ def inputMdst(environmentType, filename, path=analysis_main):
 
     - 'MC5': for analysis of Belle II MC samples produced with releases prior to build-2016-05-01.
       This environment sets the constant magnetic field (B = 1.5 T)
-    - 'default': for analysis of Belle II MC samples produced with releases with build-2016-05-01 or newer
+    - 'MC6': for analysis of Belle II MC samples produced with build-2016-05-01 or newer but prior to release-00-08-00
+    - 'MC7': for analysis of Belle II MC samples produced with build-2016-05-01 or newer but prior to release-00-08-00
+    - 'default': for analysis of Belle II MC samples produced with releases with release-00-08-00 or newer
       This environment sets the default magnetic field (see geometry settings)
     - 'Belle': for analysis of converted (or during of conversion of) Belle MC/DATA samples
     - 'None': for analysis of generator level information or during simulation/reconstruction of
@@ -81,11 +85,15 @@ def inputMdstList(environmentType, filelist, path=analysis_main):
 
     - 'MC5': for analysis of Belle II MC samples produced with releases prior to build-2016-05-01.
       This environment sets the constant magnetic field (B = 1.5 T)
-    - 'default': for analysis of Belle II MC samples produced with releases with build-2016-05-01 or newer
+    - 'MC6': for analysis of Belle II MC samples produced with build-2016-05-01 or newer but prior to release-00-08-00
+    - 'MC7': for analysis of Belle II MC samples produced with build-2016-05-01 or newer but prior to release-00-08-00
+    - 'default': for analysis of Belle II MC samples produced with releases with release-00-08-00 or newer
       This environment sets the default magnetic field (see geometry settings)
     - 'Belle': for analysis of converted (or during of conversion of) Belle MC/DATA samples
     - 'None': for analysis of generator level information or during simulation/reconstruction of
       previously generated events
+
+    Note that there is no difference between MC6 and MC7. Both are given for sake of completion.
 
     @param environmentType type of the environment to be loaded
     @param filelist the filename list of files to be loaded
@@ -99,8 +107,16 @@ def inputMdstList(environmentType, filelist, path=analysis_main):
     path.add_module(progress)
 
     environToMagneticField = {'MC5': 'MagneticFieldConstant',
+                              'MC6': 'MagneticField',
+                              'MC7': 'MagneticField',
                               'default': 'MagneticField',
                               'Belle': 'MagneticFieldConstantBelle'}
+
+    fixECLClusters = {'MC5': True,
+                      'MC6': True,
+                      'MC7': True,
+                      'default': False,
+                      'Belle': False}
 
     if environmentType in environToMagneticField:
         path.add_module('Gearbox')
@@ -120,6 +136,11 @@ def inputMdstList(environmentType, filelist, path=analysis_main):
         setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
     if environmentType is 'MC5':
         setAnalysisConfigParams({'mcMatchingVersion': 'MC5'}, path)
+
+    # fixECLCluster for MC5/MC6/MC7
+    if fixECLClusters.get(environmentType) is True:
+        fixECL = register_module('FixECLClusters')
+        path.add_module(fixECL)
 
 
 def outputMdst(filename, path=analysis_main):
@@ -546,6 +567,31 @@ def fillParticleList(
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
     pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('writeOut', writeOut)
+    path.add_module(pload)
+
+
+def fillParticleListWithTrackHypothesis(
+    decayString,
+    cut,
+    hypothesis,
+    writeOut=False,
+    path=analysis_main,
+):
+    """
+    As fillParticleList, but if used for a charged FSP, loads the particle with the requested hypothesis if available
+
+    @param decayString   specifies type of Particles and determines the name of the ParticleList
+    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
+    @param hypothesis    the PDG code of the desired track hypothesis
+    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param path          modules are added to this path
+    """
+
+    pload = register_module('ParticleLoader')
+    pload.set_name('ParticleLoader_' + decayString)
+    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('trackHypothesis', hypothesis)
     pload.param('writeOut', writeOut)
     path.add_module(pload)
 
@@ -1005,7 +1051,6 @@ def variablesToDaughterExtraInfo(
     For each daughter particle specified via decay string the selected variables (estimated for the mother particle)
     are saved in an extra-info field with the given name. In other words, the property of mother is saved as extra-info
     to specified daughter particle.
-    Should only be used in ROE path, that is path executed for each ROE object in an event.
 
     It is possible to overwrite if lower / don't overwrite / overwrite if higher, in case if extra info with given name
     already exists (-1/0/1)
@@ -1168,6 +1213,7 @@ def looseMCTruth(list_name, path=analysis_main):
     particles while the normal algorithm finds the common mother of all daughters.
     The results of loose mc matching algorithm are stored to the following extraInfo
     items:
+
       - looseMCMotherPDG: PDG code of most common mother
       - looseMCMotherIndex: 1-based StoreArray<MCParticle> index of most common mother
       - looseMCWrongDaughterN: number of daughters that don't originate from the most

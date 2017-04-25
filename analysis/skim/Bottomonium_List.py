@@ -57,3 +57,51 @@ def EtabList():
 
     Lists = EtabList
     return Lists
+
+
+def HbInclusiveList():
+    Hbcuts = '0.4 < M < 0.6 and 9.8 < mRecoil < 10.'
+
+    fillParticleList('gamma:all', 'p<2')
+    buildRestOfEvent('gamma:all')
+    buildContinuumSuppression('gamma:all')
+    applyCuts('gamma:all', 'R2 < 0.5')
+
+    fillParticleList('pi+:pi0', 'pt<0.5 and pt>0.05')
+    reconstructDecay('pi0:all -> gamma:all gamma:all', '0.125 < M < 0.14')
+
+    Eta_Channels = ['pi+:pi0 pi-:pi0 pi0:all',
+                    'gamma:all gamma:all']
+
+    HbList = []
+    for chID, channel in enumerate(Eta_Channels):
+        reconstructDecay('eta:all' + str(chID) + ' -> ' + channel, Hbcuts, chID)
+        HbList.append('eta:all' + str(chID))
+
+    Lists = HbList
+    return Lists
+
+
+def EtabInclusiveList():
+    Etabcuts = 'mRecoil > 9 and mRecoil < 10'
+    fillParticleList('gamma:all', 'p<2')
+    fillParticleList('gamma:hb', 'useCMSFrame(p)>0.4 and useCMSFrame(p)<0.5')
+    buildRestOfEvent('gamma:hb')
+    buildContinuumSuppression('gamma:hb')
+    applyCuts('gamma:hb', 'R2 < 0.5')
+
+    fillParticleList('pi+:pi0', 'pt<0.5 and pt>0.05')
+    reconstructDecay('pi0:all -> gamma:all gamma:all', '0.125 < M < 0.14')
+    reconstructDecay('eta:3pi -> pi+:pi0 pi-:pi0 pi0:all', '0.53 < M < 0.56 and 9.85 < mRecoil < 9.9')
+    reconstructDecay('eta:gg -> gamma:all gamma:all', '0.53 < M < 0.56 and 9.85 < mRecoil < 9.92')
+
+    EtabInclusive_Channels = ['eta:3pi gamma:hb',
+                              'eta:gg gamma:hb']
+
+    EtabInclusiveList = []
+    for chID, channel in enumerate(EtabInclusive_Channels):
+        reconstructDecay('junction:all' + str(chID) + ' -> ' + channel, Etabcuts, chID)
+        EtabInclusiveList.append('junction:all' + str(chID))
+
+    Lists = EtabInclusiveList
+    return Lists

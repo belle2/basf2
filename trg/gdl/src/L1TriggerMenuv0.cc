@@ -30,10 +30,12 @@
 
 namespace Belle2 {
 
-//set the total number of trigger lines and prescalefactor
+  /**set the total number of trigger lines and prescalefactor*/
   const int ntrgline = 12;
+  /**prescale factor*/
   double scalef[ntrgline] = {1, 1, 1, 1, 1, 1, 2000, 2000, 2000, 1000, 1000, 1000};
 
+  /**select one event in number of prescale factor events*/
   int doprescale(int f)
   {
 
@@ -43,7 +45,7 @@ namespace Belle2 {
     return Val;
   }
 
-
+  /**do trigger with the import objects, and export the trigger results to trgres*/
   void dotrigger(std::vector<int>& trgres, std::vector<int> objects)
   {
 

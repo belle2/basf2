@@ -15,8 +15,8 @@ using namespace TrackFindingCDC;
 
 MVARealisticSegmentRelationFilter::MVARealisticSegmentRelationFilter()
   : Super(makeUnique<VarSet>(),
-          "trackfindingcdc_RealisticSegmentRelationFilter",
-          0.90)
+          "tracking/data/trackfindingcdc_RealisticSegmentRelationFilter.xml",
+          0.805)
 {
   this->addProcessingSignalListener(&m_feasibleSegmentRelationFilter);
 }

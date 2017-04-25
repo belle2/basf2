@@ -15,7 +15,7 @@
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNode.h>
 
 // stl:
-#include <set>
+#include <vector>
 #include <unordered_map>
 
 
@@ -43,16 +43,20 @@ namespace Belle2 {
     /** temporal storage for last inner node added, used for speed-up */
     NodeID m_lastInnerNodeID;
 
+    /** keeps track of the state of the network to fill the vectors m_nodes, m_outerEnds, m_innerEnds only if required */
+    bool m_isFinalized;
 
+    /** After the network is finalized this vector will also carry all nodes to be able to keep the old interface.
+     * This shouldn't affect the performance drastically in comparison to directly accessing the nodeMap.
+     */
     std::vector<Node*> m_nodes;
-    /** keeps track of current outerEnds (nodes which have no outerNodes) - entries are the index numbers of the nodes which currently form an outermost node */
+
+    /** keeps track of current outerEnds (nodes which have no outerNodes) - entries are the NodeIDs of the nodes which currently form an outermost node */
     std::vector<Node*> m_outerEnds;
 
 
-    /** keeps track of current innerEnds (nodes which have no innerNodes) - entries are the index numbers of the nodes which currently form an innermost node */
+    /** keeps track of current innerEnds (nodes which have no innerNodes) - entries are the NodeIds of the nodes which currently form an innermost node */
     std::vector<Node*> m_innerEnds;
-
-    bool m_isFinalized;
 
 
     /** ************************* INTERNAL MEMBER FUNCTIONS ************************* */

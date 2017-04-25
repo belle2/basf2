@@ -161,7 +161,7 @@ template<typename EntryType, typename MetaInfoType >
 size_t SegmentNetworkAnalyzerModule::getNConnections(Belle2::DirectedNodeNetwork<EntryType, MetaInfoType>& network) const
 {
   size_t nLinks{};
-  for (const auto outerNodes : network) {
+  for (const auto& outerNodes : network) {
     nLinks += outerNodes->getInnerNodes().size();
   }
   return nLinks;

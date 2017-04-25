@@ -104,18 +104,18 @@ void TrackFinderVXDBasicPathFinderModule::event()
 
   if (m_PARAMprintNetworks) {
     std::string fileName = m_PARAMsecMapName + "_BasicPF_Ev" + std::to_string(m_eventCounter);
-    //DNN::printCANetwork<Segment< Belle2::TrackNode>>(segmentNetwork, fileName);
+    DNN::printCANetwork<Segment< Belle2::TrackNode>>(segmentNetwork, fileName);
   }
 
 
 /// apply CA algorithm:
-  //int nRounds = m_cellularAutomaton.apply(segmentNetwork);
-  //if (nRounds < 0) { B2ERROR("Basic Path Finder failed, skipping event!"); return; }
+  int nRounds = m_cellularAutomaton.apply(segmentNetwork);
+  if (nRounds < 0) { B2ERROR("Basic Path Finder failed, skipping event!"); return; }
 
 
 /// mark valid Cells as Seeds:
   unsigned int nSeeds = 0;
-  for (auto* aNode : segmentNetwork.getNodes()) {
+  for (auto* aNode : segmentNetwork) {
     if (m_PARAMstrictSeeding && !(aNode->getOuterNodes().empty())) continue;
     if (aNode->getInnerNodes().empty()) continue; // mark as seed, if node has got an inner node..
 
@@ -147,6 +147,7 @@ void TrackFinderVXDBasicPathFinderModule::event()
 
 
   B2DEBUG(10, " TrackFinderVXDCellOMat-event" << m_eventCounter <<
+          ": CA needed " << nRounds <<
           " for network with " << segmentNetwork.size() <<
           " nodes, which resulted in " << nSeeds <<
           ". Among these the pathCollector found " << m_pathCollector.nTrees <<

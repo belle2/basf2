@@ -62,7 +62,7 @@ void MLSegmentNetworkProducerModule::event()
   for (const auto& outerHit : hitNetwork.getNodes()) {
     for (const auto& centerHit : outerHit->getInnerNodes()) {
       bool alreadyAdded = false; // skip adding Nodes twice into the network
-      for (const auto innerHit : centerHit->getInnerNodes()) {
+      for (const auto& innerHit : centerHit->getInnerNodes()) {
         bool accepted = m_filter->accept(*(innerHit->getEntry().spacePoint),
                                          *(centerHit->getEntry().spacePoint),
                                          *(outerHit->getEntry().spacePoint));

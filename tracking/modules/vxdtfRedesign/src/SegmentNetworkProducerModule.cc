@@ -386,7 +386,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
   if (!m_PARAMprintNetworks) return;
 
   std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_ActiveSector_Ev" + std::to_string(m_eventCounter);
-  //DNN::printNetwork<ActiveSector<StaticSectorType, TrackNode>, VoidMetaInfo>(activeSectorNetwork, fileName);
+  DNN::printNetwork<ActiveSector<StaticSectorType, TrackNode>, VoidMetaInfo>(activeSectorNetwork, fileName);
 }
 
 
@@ -468,7 +468,7 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
   if (!m_PARAMprintNetworks) return;
 
   std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_TrackNode_Ev" + std::to_string(m_eventCounter);
-  //DNN::printNetwork<Belle2::TrackNode, VoidMetaInfo>(hitNetwork, fileName);
+  DNN::printNetwork<Belle2::TrackNode, VoidMetaInfo>(hitNetwork, fileName);
 
 }
 
@@ -481,9 +481,8 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
   DirectedNodeNetwork<Belle2::TrackNode, VoidMetaInfo>& hitNetwork = m_network->accessHitNetwork();
   DirectedNodeNetwork<Segment< Belle2::TrackNode>, CACell>& segmentNetwork = m_network->accessSegmentNetwork();
   vector<Belle2::Segment<Belle2::TrackNode>* >& segments = m_network->accessSegments();
-  int nAccepted = 0, nRejected = 0, nLinked = 0;;
-  B2WARNING("buildSegmentNetwork");
-  for (auto* outerHit : hitNetwork.getNodes()) {
+  int nAccepted = 0, nRejected = 0, nLinked = 0;
+  for (DirectedNode<TrackNode, VoidMetaInfo>* outerHit : hitNetwork.getNodes()) {
     const vector<DirectedNode<TrackNode, VoidMetaInfo>*>& centerHits = outerHit->getInnerNodes();
     if (centerHits.empty()) continue; // go to next outerHit
 
@@ -567,6 +566,6 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
   if (!m_PARAMprintNetworks) return;
 
   std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_Segment_Ev" + std::to_string(m_eventCounter);
-  //DNN::printNetwork<Segment< Belle2::TrackNode>, CACell>(segmentNetwork, fileName);
-  //DNN::printCANetwork<Segment< Belle2::TrackNode>>(segmentNetwork, "CA" + fileName);
+  DNN::printNetwork<Segment< Belle2::TrackNode>, CACell>(segmentNetwork, fileName);
+  DNN::printCANetwork<Segment< Belle2::TrackNode>>(segmentNetwork, "CA" + fileName);
 }

@@ -305,7 +305,6 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
   // activeSectors are to be stored separately:
   vector<ActiveSector<StaticSectorType, TrackNode>*>& activeSectors = m_network->accessActiveSectors();
   int nNoSPinThisInnerSector = 0, nNoValidOfAllInnerSectors = 0, nNoInnerExisting = 0, nSectorsLinked = 0;
-  int nChecked = 0;
 
   // loop over all raw sectors found so far:
   for (RawSectorData& outerSectorData : collectedData) {
@@ -319,7 +318,6 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
     const std::vector<FullSecID>& innerSecIDs = outerSector->getInner2spSecIDs();
 
     for (const FullSecID innerSecID : innerSecIDs) {
-      nChecked++;
       std::string innerEntryID = innerSecID.getFullSecString();
       vector<RawSectorData>::iterator innerRawSecPos =
         std::find_if(
@@ -401,9 +399,7 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
 
   // loop over outer sectors to get their hits(->outerHits) and inner sectors
   for (auto* outerSector : activeSectorNetwork.getNodes()) {
-
     if (outerSector->getInnerNodes().empty()) continue; // go to next sector
-
     const vector<TrackNode*>& outerHits = outerSector->getEntry().getHits();
     if (outerHits.empty()) continue;
 
@@ -469,7 +465,6 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
 
   std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_TrackNode_Ev" + std::to_string(m_eventCounter);
   DNN::printNetwork<Belle2::TrackNode, VoidMetaInfo>(hitNetwork, fileName);
-
 }
 
 
@@ -556,6 +551,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
       } // innerHit-loop
     } // centerHit-loop
   } // outerHit-loop
+
   B2DEBUG(1, "SegmentNetworkProducerModule::buildSegmentNetwork() (ev " << m_eventCounter << "): nAccepted/nRejected: " << nAccepted
           << "/" << nRejected <<
           ", size of nLinked/hitNetwork: " << nLinked << "/" << segmentNetwork.size());
@@ -568,4 +564,5 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
   std::string fileName = m_vxdtfFilters->getConfig().secMapName + "_Segment_Ev" + std::to_string(m_eventCounter);
   DNN::printNetwork<Segment< Belle2::TrackNode>, CACell>(segmentNetwork, fileName);
   DNN::printCANetwork<Segment< Belle2::TrackNode>>(segmentNetwork, "CA" + fileName);
+
 }

@@ -12,9 +12,11 @@
 #include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationVarSet.h>
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 namespace Belle2 {
-  class SimpleCDCToVXDExtrapolationFilter : public TrackFindingCDC::FilterOnVarSet<CDCTrackSpacePointCombinationVarSet> {
+  class SimpleCDCToVXDExtrapolationFilter : public BaseCDCTrackSpacePointCombinationFilter {
   public:
     void exposeParameters(ModuleParamList* moduleParamList,
                           const std::string& prefix) final {
@@ -28,7 +30,7 @@ namespace Belle2 {
 
     void initialize() override
     {
-      TrackFindingCDC::FilterOnVarSet<CDCTrackSpacePointCombinationVarSet>::initialize();
+      BaseCDCTrackSpacePointCombinationFilter::initialize();
 
       B2ASSERT("You need to provide exactly 4 maximal norms (for four layers).", m_param_maximumXYDistance.size() == 4);
       B2ASSERT("You need to provide exactly 4 maximal norms (for four layers).", m_param_maximumDistance.size() == 4);
@@ -36,14 +38,22 @@ namespace Belle2 {
     }
 
     TrackFindingCDC::Weight operator()(const BaseCDCTrackSpacePointCombinationFilter::Object& currentState) final {
-      TrackFindingCDC::Weight superWeight = TrackFindingCDC::FilterOnVarSet<CDCTrackSpacePointCombinationVarSet>::operator()(currentState);
 
-      if (std::isnan(superWeight))
+      const SpacePoint* spacePoint = currentState.getSpacePoint();
+      const RecoTrack* cdcTrack = currentState.getSeedRecoTrack();
+
+      if (not spacePoint)
       {
+        // TODO
         return std::nan("");
       }
 
-      const double& sameHemisphere = *(getVarSet().find("same_hemisphere"));
+      const auto& mSoP = currentState.getMeasuredStateOnPlane();
+      TrackFindingCDC::Vector3D position = TrackFindingCDC::Vector3D(mSoP.getPos());
+      TrackFindingCDC::Vector3D momentum = TrackFindingCDC::Vector3D(mSoP.getMom());
+      TrackFindingCDC::Vector3D hitPosition = TrackFindingCDC::Vector3D(spacePoint->getPosition());
+
+      const double& sameHemisphere = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
 
       if (sameHemisphere != 1)
       {
@@ -51,17 +61,27 @@ namespace Belle2 {
       }
 
       const unsigned int& state = currentState.getState();
-      const double& layer = *(getVarSet().find("layer"));
+      const double& layer = spacePoint->getVxdID().getLayerNumber();
+
+      const TrackFindingCDC::CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
+
+      const double arcLength = trajectory.calcArcLength2D(hitPosition);
+      const auto& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
+      const auto& trackPositionAtHitZ = trajectory.getTrajectorySZ().mapSToZ(arcLength);
+
+      TrackFindingCDC::Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
+      TrackFindingCDC::Vector3D difference = trackPositionAtHit - hitPosition;
+
 
       if (state == 0)
       {
-        const double& xy_distance = *(getVarSet().find("xy_distance"));
+        const double& xy_distance = difference.xy().norm();
         if (xy_distance > m_param_maximumXYDistance[layer - 3]) {
           return std::nan("");
         }
       } else if (state == 1)
       {
-        const double& distance = *(getVarSet().find("distance"));
+        const double& distance = difference.norm();
         if (distance > m_param_maximumDistance[layer - 3]) {
           return std::nan("");
         }

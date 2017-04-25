@@ -116,17 +116,20 @@ namespace Belle2 {
         if (cachedMSOP == m_cachedMeasuredStates.end()) {
           const genfit::SharedPlanePtr& plane = recoHit.constructPlane(measuredStateOnPlane);
 
-          B2INFO("New Plane: " << id << " " << vxdID.getLayerNumber() << " " << vxdID.getLadderNumber() << " " << vxdID.getSensorNumber());
-          B2INFO(plane->getO().X() << " " << plane->getO().Y() << " " << plane->getO().Z());
-          B2INFO(plane->getU().X() << " " << plane->getU().Y() << " " << plane->getU().Z());
-          B2INFO(plane->getV().X() << " " << plane->getV().Y() << " " << plane->getV().Z());
+          B2DEBUG(100, "New Plane: " << id << " " << vxdID.getLayerNumber() << " " << vxdID.getLadderNumber() << " " <<
+          vxdID.getSensorNumber());
+          B2DEBUG(100, plane->getO().X() << " " << plane->getO().Y() << " " << plane->getO().Z());
+          B2DEBUG(100, plane->getU().X() << " " << plane->getU().Y() << " " << plane->getU().Z());
+          B2DEBUG(100, plane->getV().X() << " " << plane->getV().Y() << " " << plane->getV().Z());
 
           try {
             measuredStateOnPlane.extrapolateToPlane(plane);
 
-            B2INFO("Result:");
-            B2INFO(measuredStateOnPlane.getPos().X() << " " << measuredStateOnPlane.getPos().Y() << " " << measuredStateOnPlane.getPos().Z());
-            B2INFO(measuredStateOnPlane.getMom().X() << " " << measuredStateOnPlane.getMom().Y() << " " << measuredStateOnPlane.getMom().Z());
+            B2DEBUG(100, "Result:");
+            B2DEBUG(100, measuredStateOnPlane.getPos().X() << " " << measuredStateOnPlane.getPos().Y() << " " <<
+            measuredStateOnPlane.getPos().Z());
+            B2DEBUG(100, measuredStateOnPlane.getMom().X() << " " << measuredStateOnPlane.getMom().Y() << " " <<
+            measuredStateOnPlane.getMom().Z());
 
             m_cachedMeasuredStates[id] = measuredStateOnPlane;
           } catch (genfit::Exception e) {

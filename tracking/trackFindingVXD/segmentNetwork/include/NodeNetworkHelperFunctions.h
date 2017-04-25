@@ -45,8 +45,7 @@ namespace Belle2 {
       fullOut +=
         "ranksep=\"0.2\" edge[labelfontsize=\"8\" fontsize=\"8\" arrowsize=\"0.9\"] nodesep=\"0.2\" node[shape=\"box\" width=\"0\" height=\"0\" fontsize=\"10\"]\n";
       // write vertices:
-      for (auto nodeIterator : network) {
-        auto node = nodeIterator.second;
+      for (auto* node : network) {
         std::stringstream  outStream;
 
         fullOut += "\"" + node->getEntry().getName() + "\"" +
@@ -59,8 +58,7 @@ namespace Belle2 {
                    "\"];\n";
       }
       // write edges:
-      for (auto nodeIterator : network) {
-        auto node = nodeIterator.second;
+      for (auto* node : network) {
         for (auto* innerNode : node->getInnerNodes()) {
           auto innerEntry = innerNode->getEntry();
           std::string arrowStyle = (node->getMetaInfo().getState() == (innerNode->getMetaInfo().getState() + 1)) ? "" : " [style=dotted]";
@@ -87,8 +85,7 @@ namespace Belle2 {
         "ranksep=\"0.2\" edge[labelfontsize=\"8\" fontsize=\"8\" arrowsize=\"0.9\"] nodesep=\"0.2\" node[shape=\"box\" width=\"0\" height=\"0\" fontsize=\"10\"]\n";
 
       // write vertices:
-      for (auto nodeIterator : network) {
-        auto node = nodeIterator.second;
+      for (auto* node : network) {
         std::stringstream  outStream;
         fullOut += "\"" + node->getEntry().getName() + "\"" +
                    " [label=\"" +
@@ -96,8 +93,7 @@ namespace Belle2 {
                    "\"];\n";
       }
       // write edges:
-      for (auto nodeIterator : network) {
-        auto node = nodeIterator.second;
+      for (auto* node : network) {
         for (auto* innerNode : node->getInnerNodes()) {
           auto innerEntry = innerNode->getEntry();
           std::string arrowStyle = "";

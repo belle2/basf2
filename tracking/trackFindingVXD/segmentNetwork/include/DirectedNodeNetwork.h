@@ -44,12 +44,15 @@ namespace Belle2 {
     NodeID m_lastInnerNodeID;
 
 
+    std::vector<Node*> m_nodes;
     /** keeps track of current outerEnds (nodes which have no outerNodes) - entries are the index numbers of the nodes which currently form an outermost node */
-    std::set<NodeID> m_outerEnds;
+    std::vector<Node*> m_outerEnds;
 
 
     /** keeps track of current innerEnds (nodes which have no innerNodes) - entries are the index numbers of the nodes which currently form an innermost node */
-    std::set<NodeID> m_innerEnds;
+    std::vector<Node*> m_innerEnds;
+
+    bool m_isFinalized;
 
 
     /** ************************* INTERNAL MEMBER FUNCTIONS ************************* */
@@ -75,7 +78,8 @@ namespace Belle2 {
 
     DirectedNodeNetwork() :
       m_lastOuterNodeID(),
-      m_lastInnerNodeID() {}
+      m_lastInnerNodeID(),
+      m_isFinalized(false) {}
 
     /** destructor taking care of cleaning up the pointer-mess - WARNING only needed when using classic pointers for the nodes! */
     ~DirectedNodeNetwork()
@@ -94,6 +98,7 @@ namespace Belle2 {
       Node* tmpNode = new Node(newEntry);
       auto insertOp = m_nodeMap.insert({nodeID, tmpNode});
       if (insertOp.second) {
+        m_isFinalized = false;
         return true;
       } else {
         delete tmpNode;
@@ -147,6 +152,7 @@ namespace Belle2 {
     /** takes two entries and weaves them into the network TODO: UMBENENNEN! */
     bool linkNodes(NodeID outerNodeID, NodeID innerNodeID)
     {
+      m_isFinalized = false;
       // check if entries are identical (catch loops):
       if (outerNodeID == innerNodeID) {
         B2ERROR("DirectedNodeNetwork::linkNodes(): outerNodeID and innerNodeID are identical! Aborting linking-process");
@@ -160,12 +166,6 @@ namespace Belle2 {
 
       m_lastOuterNodeID = outerNodeID;
       m_lastInnerNodeID = innerNodeID;
-      // update inner nodes list
-      m_innerEnds.erase(outerNodeID);
-      if (m_nodeMap[innerNodeID]->getInnerNodes().empty()) {m_innerEnds.insert(innerNodeID);}
-      // update outer nodes list
-      m_outerEnds.erase(innerNodeID);
-      if (m_nodeMap[outerNodeID]->getOuterNodes().empty()) {m_outerEnds.insert(outerNodeID);}
 
       return createLink(*(m_nodeMap[outerNodeID]), *(m_nodeMap[innerNodeID]));
     }
@@ -176,24 +176,16 @@ namespace Belle2 {
     /** returns all nodes which have no outer nodes (but inner ones) and therefore are outer ends of the network */
     std::vector<Node*> getOuterEnds()
     {
-      std::vector<Node*> outerEnds;
-      outerEnds.reserve(m_outerEnds.size());
-      for (NodeID nodeID : m_outerEnds) {
-        outerEnds.push_back(m_nodeMap[nodeID]);
-      }
-      return outerEnds;
+      if (!m_isFinalized) finalize();
+      return m_outerEnds;
     }
 
 
     /** returns all nodes which have no inner nodes (but outer ones) and therefore are inner ends of the network */
     std::vector<Node*> getInnerEnds()
     {
-      std::vector<Node*> innerEnds;
-      innerEnds.reserve(m_innerEnds.size());
-      for (NodeID nodeID : m_innerEnds) {
-        innerEnds.push_back(m_nodeMap[nodeID]);
-      }
-      return innerEnds;
+      if (!m_isFinalized) finalize();
+      return m_innerEnds;
     }
 
 
@@ -205,15 +197,27 @@ namespace Belle2 {
     }
 
     /** returns all nodes of the network */
-    std::unordered_map<NodeID, Node* >& getNodes() { return m_nodeMap; }
+    std::vector<Node* >& getNodes()
+    {
+      if (!m_isFinalized) finalize();
+      return m_nodes;
+    }
 
 
     /** returns iterator for container: begin */
-    typename std::unordered_map< NodeID, Node* >::iterator begin() { return m_nodeMap.begin(); }
+    typename std::vector<Node* >::iterator begin()
+    {
+      if (!m_isFinalized) finalize();
+      return m_nodes.begin();
+    }
 
 
     /** returns iterator for container: end */
-    typename std::unordered_map< NodeID, Node* >::iterator end() { return m_nodeMap.end(); }
+    typename std::vector<Node* >::iterator end()
+    {
+      if (!m_isFinalized) finalize();
+      return m_nodes.end();
+    }
 
 
     /** returns number of nodes to be found in the network */
@@ -224,6 +228,22 @@ namespace Belle2 {
     bool isNodeInNetwork(const NodeID nodeID) const
     {
       return m_nodeMap.count(nodeID);
+    }
+  protected:
+
+    void finalize()
+    {
+      if (m_isFinalized) return;
+      m_nodes.clear();
+      m_nodes.reserve(m_nodeMap.size());
+      m_innerEnds.clear();
+      m_outerEnds.clear();
+      for (const auto& item : m_nodeMap) {
+        m_nodes.push_back(item.second);
+        if (item.second->getInnerNodes().empty()) m_innerEnds.push_back(item.second);
+        if (item.second->getOuterNodes().empty()) m_outerEnds.push_back(item.second);
+      }
+      m_isFinalized = true;
     }
   };
 }

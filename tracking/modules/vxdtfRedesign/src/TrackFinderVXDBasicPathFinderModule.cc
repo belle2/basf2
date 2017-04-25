@@ -115,8 +115,7 @@ void TrackFinderVXDBasicPathFinderModule::event()
 
 /// mark valid Cells as Seeds:
   unsigned int nSeeds = 0;
-  for (auto& aNodIter : segmentNetwork.getNodes()) {
-    auto aNode = aNodIter.second;
+  for (auto* aNode : segmentNetwork.getNodes()) {
     if (m_PARAMstrictSeeding && !(aNode->getOuterNodes().empty())) continue;
     if (aNode->getInnerNodes().empty()) continue; // mark as seed, if node has got an inner node..
 

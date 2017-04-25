@@ -62,8 +62,7 @@ namespace Belle2 {
 
       B2DEBUG(25, "findPaths: executing now a network of size " << aNetwork.size());
       std::vector<PathPtr> allNodePaths;
-      for (auto& aNodeIter : aNetwork.getNodes()) {
-        auto aNode = aNodeIter.second;
+      for (auto* aNode : aNetwork.getNodes()) {
         if (aNode->getMetaInfo().isSeed() == false) { B2DEBUG(75, "findPaths: current node is no seed!-> skipping"); continue; } // was: B2DEBUG(100,
 
         NeighbourContainerType& innerNeighbours = aNode->getInnerNodes();

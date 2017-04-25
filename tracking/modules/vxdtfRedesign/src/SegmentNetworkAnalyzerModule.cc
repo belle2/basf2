@@ -57,10 +57,9 @@ void SegmentNetworkAnalyzerModule::event()
   m_rootVariables.networkSize = segmentNetwork.size();
   m_rootVariables.networkConnections = getNConnections(segmentNetwork);
 
-  for (const auto& outerHitPair : hitNetwork.getNodes()) {
-    auto outerHit = outerHitPair.second;
-    for (const auto& centerHit : outerHit->getInnerNodes()) {
-      for (const auto& innerHit : centerHit->getInnerNodes()) {
+  for (const auto outerHit : hitNetwork.getNodes()) {
+    for (const auto centerHit : outerHit->getInnerNodes()) {
+      for (const auto innerHit : centerHit->getInnerNodes()) {
 
         Segment<TrackNode>* innerSegment = new Segment<TrackNode>(centerHit->getEntry().sector->getFullSecID(),
                                                                   innerHit->getEntry().sector->getFullSecID(),
@@ -162,8 +161,8 @@ template<typename EntryType, typename MetaInfoType >
 size_t SegmentNetworkAnalyzerModule::getNConnections(Belle2::DirectedNodeNetwork<EntryType, MetaInfoType>& network) const
 {
   size_t nLinks{};
-  for (const auto& outerNodes : network) {
-    nLinks += outerNodes.second->getInnerNodes().size();
+  for (const auto outerNodes : network) {
+    nLinks += outerNodes->getInnerNodes().size();
   }
   return nLinks;
 }

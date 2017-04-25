@@ -400,8 +400,7 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
   int nAccepted = 0, nRejected = 0, nLinked = 0;;
 
   // loop over outer sectors to get their hits(->outerHits) and inner sectors
-  for (auto& nodeIter : activeSectorNetwork.getNodes()) {
-    auto outerSector = nodeIter.second;
+  for (auto* outerSector : activeSectorNetwork.getNodes()) {
 
     if (outerSector->getInnerNodes().empty()) continue; // go to next sector
 
@@ -484,8 +483,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
   vector<Belle2::Segment<Belle2::TrackNode>* >& segments = m_network->accessSegments();
   int nAccepted = 0, nRejected = 0, nLinked = 0;;
   B2WARNING("buildSegmentNetwork");
-  for (auto& outerIter : hitNetwork.getNodes()) {
-    auto outerHit = outerIter.second;
+  for (auto* outerHit : hitNetwork.getNodes()) {
     const vector<DirectedNode<TrackNode, VoidMetaInfo>*>& centerHits = outerHit->getInnerNodes();
     if (centerHits.empty()) continue; // go to next outerHit
 
@@ -559,7 +557,6 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
       } // innerHit-loop
     } // centerHit-loop
   } // outerHit-loop
-
   B2DEBUG(1, "SegmentNetworkProducerModule::buildSegmentNetwork() (ev " << m_eventCounter << "): nAccepted/nRejected: " << nAccepted
           << "/" << nRejected <<
           ", size of nLinked/hitNetwork: " << nLinked << "/" << segmentNetwork.size());

@@ -56,6 +56,8 @@
 
 #include <alignment/dbobjects/VXDAlignment.h>
 
+#include <genfit/KalmanFitterInfo.h>
+
 #include <alignment/reconstruction/GblMultipleScatteringController.h>
 
 using namespace std;
@@ -438,6 +440,30 @@ std::string MillepedeCollectorModule::getUniqueMilleName()
 
 void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* particle)
 {
+  // Do the hits synchronisation
+  auto relatedRecoHitInformation =
+    recoTrack.getRelationsTo<RecoHitInformation>(recoTrack.getStoreArrayNameOfRecoHitInformation());
+
+  for (RecoHitInformation& recoHitInformation : relatedRecoHitInformation) {
+    const genfit::TrackPoint* trackPoint = recoHitInformation.getCreatedTrackPoint();
+    if (trackPoint) {
+      genfit::KalmanFitterInfo* kalmanFitterInfo = trackPoint->getKalmanFitterInfo(recoTrack.getCardinalRepresentation());
+      if (not kalmanFitterInfo) {
+        recoHitInformation.setFlag(RecoHitInformation::RecoHitFlag::c_dismissedByFit);
+      } else {
+        std::vector<double> weights = kalmanFitterInfo->getWeights();
+        if (weights.size() == 2) {
+          if (weights.at(0) > weights.at(1))
+            recoHitInformation.setRightLeftInformation(RecoHitInformation::c_left);
+          else if (weights.at(0) < weights.at(1))
+            recoHitInformation.setRightLeftInformation(RecoHitInformation::c_right);
+          else
+            recoHitInformation.setRightLeftInformation(RecoHitInformation::c_invalidRightLeftInformation);
+        }
+      }
+    }
+  }
+
   std::shared_ptr<genfit::GblFitter> gbl(new genfit::GblFitter());
   gbl->setOptions("", true, true, 1, 1);
   //gbl->setTrackSegmentController(new GblMultipleScatteringController);

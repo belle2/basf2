@@ -121,22 +121,16 @@ namespace Belle2 {
     //TODO
     void construct(gidTYPE dbObjId, gidTYPE element, gidTYPE param)
     {
-      if (m_disabledComponents.find(dbObjId) != m_disabledComponents.end()) {
+      if (m_components.empty() or m_components.find(dbObjId) == m_components.end()) {
         construct(0, 0);
         return;
       }
       construct(100000 * dbObjId + element, param);
     }
 
-    template<class DBObjType>
-    static void disableComponent()
+    static void setComponents(const std::set<unsigned short>& components)
     {
-      disableComponent(DBObjType::getGlobalUniqueID());
-    }
-
-    static void disableComponent(unsigned short componentUniqueID)
-    {
-      m_disabledComponents.insert(componentUniqueID);
+      m_components = components;
     }
 
     /**
@@ -276,7 +270,7 @@ namespace Belle2 {
     }
 
   private:
-    static std::set<unsigned short> m_disabledComponents;
+    static std::set<unsigned short> m_components;
 
     //! Constructor for any detector
     //! @param elementId Unique id of Belle2 detector element (sensor, layer, wire...)

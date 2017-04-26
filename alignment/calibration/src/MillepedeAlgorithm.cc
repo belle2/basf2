@@ -7,6 +7,8 @@
 #include <alignment/GlobalLabel.h>
 #include <alignment/GlobalParam.h>
 
+#include <alignment/Manager.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace alignment;
@@ -46,7 +48,8 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 //     }
 //   }
 
-  GlobalParamVector result;
+  GlobalParamVector result(m_components);
+  GlobalCalibrationManager::initGlobalVector(result);
   // <UniqueID, ElementID, ParameterId, value>
   std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>> resultTuple;
 

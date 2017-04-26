@@ -208,10 +208,10 @@ namespace Belle2 {
 
           auto wire = WireID(l, w);
           // Test direct access
-          if (auto cdc = thisGlobalParamVector.getDBObj<CDCAlignment>()) {
-            cdc->getWireTension(wire.getICLayer(), wire.getILayer());
-            std::cout << " CDC Global Param Interface running" << std::endl;
-          }
+          //if (auto cdc = thisGlobalParamVector.getDBObj<CDCAlignment>()) {
+          //  cdc->getWireTension(wire.getICLayer(), wire.getILayer());
+          //  std::cout << " CDC Global Param Interface running" << std::endl;
+          //}
 
           thisGlobalParamVector.updateGlobalParam(misForward[l][w][0], CDCAlignment::getGlobalUniqueID(), wire, CDCAlignment::wireFwdX);
           thisGlobalParamVector.updateGlobalParam(misForward[l][w][1], CDCAlignment::getGlobalUniqueID(), wire, CDCAlignment::wireFwdY);

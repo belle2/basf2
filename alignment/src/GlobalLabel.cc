@@ -15,7 +15,7 @@ using namespace std;
 
 using namespace Belle2;
 
-std::set<unsigned short> GlobalLabel::m_disabledComponents = {};
+std::set<unsigned short> GlobalLabel::m_components = {};
 
 GlobalLabel::GlobalLabel(GlobalLabel::gidTYPE globalLabel) :
   gid(0), eid(0), pid(0), tid(0), tif(0)

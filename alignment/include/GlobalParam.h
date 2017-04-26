@@ -20,6 +20,7 @@
 #include <framework/database/Database.h>
 
 #include <framework/database/DBObjPtr.h>
+#include <alignment/GlobalLabel.h>
 
 namespace Belle2 {
   namespace alignment {
@@ -169,8 +170,9 @@ namespace Belle2 {
       //       explicit GlobalParamSet(bool autoConstruct = false) {
       GlobalParamSet()
       {
-        DBObjPtr<DBObjType> dbObject;
-        dbObject.addCallback(this, &GlobalParamSet<DBObjType>::callbackDB);
+        //TODO: re-enable
+        //DBObjPtr<DBObjType> dbObject;
+        //dbObject.addCallback(this, &GlobalParamSet<DBObjType>::callbackDB);
         // if (autoConstruct)
         //  construct();
       }
@@ -324,6 +326,7 @@ namespace Belle2 {
           m_vector.insert(std::make_pair(DBObjType::getGlobalUniqueID(),
                                          std::unique_ptr<GlobalParamSet<DBObjType>>(new GlobalParamSet<DBObjType>)
                                         ));
+          m_componentsIDs.insert(DBObjType::getGlobalUniqueID());
           // NOTE: Components disabled this way also disable added interfaces (e.g. if geometry would be needed to load)
           // NOTE: add generic interfaces only once by addSubDetectorInterface(...)
           addSubDetectorInterface(interface);
@@ -427,6 +430,10 @@ namespace Belle2 {
       {
         return m_components;
       }
+      const std::set<unsigned short>& getComponentsIDs() const
+      {
+        return m_componentsIDs;
+      }
     private:
       /// The vector (well, actually a map) of DB objects
       std::map<unsigned short, std::unique_ptr<GlobalParamSetAccess>> m_vector {};
@@ -434,6 +441,8 @@ namespace Belle2 {
       std::vector<std::shared_ptr<IGlobalParamInterface>> m_subDetectorInterfacesVector {};
       /// Vector of names of DB objects to consider in the vector - if not here and non-empy, ignored by addDBObj()
       std::vector<std::string> m_components {};
+      /// Vector of UniqueIDs of DB objects to consider in the vector
+      std::set<unsigned short> m_componentsIDs {};
     };
   }
 }

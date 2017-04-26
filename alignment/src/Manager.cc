@@ -34,6 +34,8 @@ namespace Belle2 {
       m_globalVector.reset(new GlobalParamVector(components));
       // Fill with DB objects and interfaces according to components
       initGlobalVector(*m_globalVector);
+      // Set the components for global label system
+      GlobalLabel::setComponents(m_globalVector->getComponentsIDs());
 
       // Reset time intervals and add pre-defined times where
       // constants can change (in addition of what is already in DB)

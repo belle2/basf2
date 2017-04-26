@@ -38,8 +38,8 @@
 #include <alignment/GlobalParam.h>
 
 namespace Belle2 {
+  class MillepedeAlgorithm;
   namespace alignment {
-    class MillepedeAlgorithm;
 
     /// pair of the global unique id from object with constants and element representing some rigid body in hierarchy
     typedef std::pair<unsigned short, unsigned short> DetectorLevelElement;

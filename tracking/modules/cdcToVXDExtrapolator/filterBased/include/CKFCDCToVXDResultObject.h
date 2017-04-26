@@ -22,8 +22,14 @@ namespace Belle2 {
 
     void initialize(RecoTrack* seed)
     {
+      m_parent = nullptr;
       m_seedRecoTrack = seed;
+      m_layer = N;
+
       m_measuredStateOnPlane = seed->getMeasuredStateOnPlaneFromFirstHit();
+      m_cachedMeasuredStateOnPlane = seed->getMeasuredStateOnPlaneFromFirstHit();
+
+      m_hasCache = false;
     }
 
     std::pair<RecoTrack*, std::vector<const SpacePoint*>> finalize() const

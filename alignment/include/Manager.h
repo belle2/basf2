@@ -17,8 +17,7 @@
 #include <root/TMatrixD.h>
 #include <genfit/StateOnPlane.h>
 #include <root/TGeoMatrix.h>
-#include <c++/4.8/set>
-#include <c++/4.8/vector>
+#include <set>
 
 #include <framework/logging/Logger.h>
 

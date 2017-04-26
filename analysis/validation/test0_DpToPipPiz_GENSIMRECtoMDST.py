@@ -27,7 +27,7 @@ from reconstruction import add_mdst_output
 from ROOT import Belle2
 import glob
 
-set_random_seed(1509)
+set_random_seed(922)
 
 main = create_path()
 

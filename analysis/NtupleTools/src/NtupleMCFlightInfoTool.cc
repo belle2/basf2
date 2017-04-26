@@ -52,7 +52,11 @@ void NtupleMCFlightInfoTool::eval(const Particle* particle)
   //get the MC DAUGHTER
   const MCParticle*  daughter = selparticles[1]->getRelatedTo<MCParticle>();
 
-
+  if (!mother || !daughter) {
+    m_fD  = -9;
+    m_fT = -9;
+    return;
+  }
   //mother vertex
   double mumvtxX = mother->getDecayVertex().X();
   double mumvtxY = mother->getDecayVertex().Y();

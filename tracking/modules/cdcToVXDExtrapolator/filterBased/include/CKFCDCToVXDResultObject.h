@@ -24,7 +24,6 @@ namespace Belle2 {
     {
       m_seedRecoTrack = seed;
       m_measuredStateOnPlane = seed->getMeasuredStateOnPlaneFromFirstHit();
-      m_chi2 = m_seedRecoTrack->getTrackFitStatus()->getChi2();
     }
 
     std::pair<RecoTrack*, std::vector<const SpacePoint*>> finalize() const
@@ -43,18 +42,25 @@ namespace Belle2 {
       return std::make_pair(getSeedRecoTrack(), spacePoints);
     }
 
-    void buildFrom(const CKFCDCToVXDStateObject* parent, const SpacePoint* spacePoint)
+    // Important: set all values here!
+    void buildFrom(CKFCDCToVXDStateObject* parent, const SpacePoint* spacePoint)
     {
       m_parent = parent;
       m_seedRecoTrack = parent->getSeedRecoTrack();
-      m_lastLayer = parent->getLastLayer() - 1;
+      m_layer = parent->getLayer() - 1;
       m_spacePoint = spacePoint;
+
       m_measuredStateOnPlane = parent->getMeasuredStateOnPlane();
-      m_chi2 = parent->getChi2();
-      m_lastChi2 = parent->getChi2();
+      m_cachedMeasuredStateOnPlane = parent->getMeasuredStateOnPlane();
+      m_hasCache = false;
+
+      m_isFitted = false;
+      m_isAdvanced = false;
+
+      m_chi2 = 0;
     }
 
-    // Getters
+    // const Getters
     const CKFCDCToVXDStateObject* getParent() const
     {
       return m_parent;
@@ -65,44 +71,14 @@ namespace Belle2 {
       return m_seedRecoTrack;
     }
 
-    genfit::MeasuredStateOnPlane& getMeasuredStateOnPlane()
-    {
-      return m_measuredStateOnPlane;
-    }
-
-    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlane() const
-    {
-      return m_measuredStateOnPlane;
-    }
-
     const SpacePoint* getSpacePoint() const
     {
       return m_spacePoint;
     }
 
-    unsigned int getLastLayer() const
+    unsigned int getLayer() const
     {
-      return m_lastLayer;
-    }
-
-    double getChi2() const
-    {
-      return m_chi2;
-    }
-
-    double& getChi2()
-    {
-      return m_chi2;
-    }
-
-    double getLastChi2() const
-    {
-      return m_lastChi2;
-    }
-
-    double& getLastChi2()
-    {
-      return m_lastChi2;
+      return m_layer;
     }
 
     unsigned int getNumberOfHoles() const
@@ -118,25 +94,85 @@ namespace Belle2 {
       return numberOfHoles;
     }
 
-    unsigned int getState() const
+    // mSoP handling
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlane() const
     {
-      return m_state;
+      return m_measuredStateOnPlane;
     }
 
-    void setState(unsigned int state)
+    genfit::MeasuredStateOnPlane& getMeasuredStateOnPlane()
     {
-      m_state = state;
+      return m_measuredStateOnPlane;
+    }
+
+    const genfit::MeasuredStateOnPlane& getParentsCachedMeasuredStateOnPlane() const
+    {
+      return m_parent->m_cachedMeasuredStateOnPlane;
+    }
+
+    genfit::MeasuredStateOnPlane& getParentsCachedMeasuredStateOnPlane()
+    {
+      return m_parent->m_cachedMeasuredStateOnPlane;
+    }
+
+    bool parentHasCache() const
+    {
+      return m_parent->m_hasCache;
+    }
+
+    void setParentHasCache()
+    {
+      m_parent->m_hasCache = true;
+    }
+
+    // chi2
+    double getChi2() const
+    {
+      return m_chi2;
+    }
+
+    double& getChi2()
+    {
+      return m_chi2;
+    }
+
+    // State control
+    bool isFitted() const
+    {
+      return m_isFitted;
+    }
+
+    void setFitted()
+    {
+      m_isFitted = true;
+    }
+
+    bool isAdvanced() const
+    {
+      return m_isAdvanced;
+    }
+
+    void setAdvanced()
+    {
+      m_isAdvanced = true;
     }
 
   private:
     RecoTrack* m_seedRecoTrack = nullptr;
     const SpacePoint* m_spacePoint = nullptr;
-    unsigned int m_lastLayer = N;
-    const CKFCDCToVXDStateObject* m_parent = nullptr;
-    genfit::MeasuredStateOnPlane m_measuredStateOnPlane;
+    unsigned int m_layer = N;
+    CKFCDCToVXDStateObject* m_parent = nullptr;
+
     double m_chi2 = 0;
-    double m_lastChi2 = 0;
-    unsigned int m_state = 0;
+
+    bool m_isFitted = false;
+    bool m_isAdvanced = false;
+
+    genfit::MeasuredStateOnPlane m_measuredStateOnPlane;
+
+    bool m_hasCache = false;
+    genfit::MeasuredStateOnPlane m_cachedMeasuredStateOnPlane;
+
 
     void walk(const std::function<void(const CKFCDCToVXDStateObject*)> f) const
     {

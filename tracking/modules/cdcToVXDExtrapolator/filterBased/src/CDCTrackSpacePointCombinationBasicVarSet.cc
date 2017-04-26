@@ -50,6 +50,12 @@ bool CDCTrackSpacePointCombinationBasicVarSet::extract(const BaseCDCTrackSpacePo
   var<named("xy_distance")>() = distance.xy().norm();
   var<named("z_distance")>() = distance.z();
 
+  Vector3D mSoP_distance = position - hitPosition;
+
+  var<named("mSoP_distance")>() = mSoP_distance.norm();
+  var<named("mSoP_xy_distance")>() = mSoP_distance.xy().norm();
+  var<named("mSoP_z_distance")>() = mSoP_distance.z();
+
   var<named("same_hemisphere")>() = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
 
   var<named("arcLengthOfHitPosition")>() = trajectory.calcArcLength2D(hitPosition);
@@ -60,7 +66,6 @@ bool CDCTrackSpacePointCombinationBasicVarSet::extract(const BaseCDCTrackSpacePo
   var<named("layer")>() = spacePoint->getVxdID().getLayerNumber();
 
   var<named("chi2")>() = result->getChi2();
-  var<named("lastChi2")>() = result->getLastChi2();
 
   return true;
 }

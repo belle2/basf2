@@ -33,8 +33,7 @@ namespace Belle2 {
 
     "numberOfHoles",
 
-    "chi2",
-    "lastChi2"
+    "chi2"
   };
 
   /// Vehicle class to transport the variable names

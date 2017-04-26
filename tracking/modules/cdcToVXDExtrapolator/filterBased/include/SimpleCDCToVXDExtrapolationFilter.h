@@ -48,9 +48,11 @@ namespace Belle2 {
         return std::nan("");
       }
 
-      const auto& mSoP = currentState.getMeasuredStateOnPlane();
+      const genfit::MeasuredStateOnPlane& mSoP = currentState.getMeasuredStateOnPlane();
+
       TrackFindingCDC::Vector3D position = TrackFindingCDC::Vector3D(mSoP.getPos());
       TrackFindingCDC::Vector3D momentum = TrackFindingCDC::Vector3D(mSoP.getMom());
+      // TODO: Cache this also
       TrackFindingCDC::Vector3D hitPosition = TrackFindingCDC::Vector3D(spacePoint->getPosition());
 
       const double& sameHemisphere = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
@@ -60,8 +62,7 @@ namespace Belle2 {
         return std::nan("");
       }
 
-      const unsigned int& state = currentState.getState();
-      const double& layer = spacePoint->getVxdID().getLayerNumber();
+      const double& layer = currentState.getLayer();
 
       const TrackFindingCDC::CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
 
@@ -72,30 +73,25 @@ namespace Belle2 {
       TrackFindingCDC::Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
       TrackFindingCDC::Vector3D difference = trackPositionAtHit - hitPosition;
 
-
-      if (state == 0)
+      if (not currentState.isFitted() and not currentState.isAdvanced())
       {
         const double& xy_distance = difference.xy().norm();
         if (xy_distance > m_param_maximumXYDistance[layer - 3]) {
           return std::nan("");
         }
-      } else if (state == 1)
+      } else if (not currentState.isFitted())
       {
         const double& distance = difference.norm();
         if (distance > m_param_maximumDistance[layer - 3]) {
           return std::nan("");
         }
-      } else if (state == 2)
-      {
-        const double& lastChi2 = currentState.getLastChi2();
+      } else {
         const double& chi2 = currentState.getChi2();
-        if (chi2 - lastChi2 > m_param_maximumChi2Difference[layer - 3]) {
+        if (chi2 > m_param_maximumChi2Difference[layer - 3])
+        {
           return std::nan("");
         }
-      } else {
-        B2FATAL("Invalid state encountered");
       }
-
 
       return 1;
     }

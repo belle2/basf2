@@ -118,11 +118,9 @@ namespace Belle2 {
         for (const auto& hit : matchingHits) {
           nextState->buildFrom(currentState, hit);
 
-          if (not useResult(nextState)) {
-            continue;
+          if (useResult(nextState)) {
+            traverseTree(nextState, resultsVector);
           }
-
-          traverseTree(nextState, resultsVector);
         }
 
         if (m_param_makeHitJumpingPossible) {

@@ -121,11 +121,10 @@ namespace Belle2 {
     //TODO
     void construct(gidTYPE dbObjId, gidTYPE element, gidTYPE param)
     {
-      if (m_components.empty() or m_components.find(dbObjId) == m_components.end()) {
+      if (m_components.empty() or m_components.find(dbObjId) != m_components.end())
+        construct(100000 * dbObjId + element, param);
+      else
         construct(0, 0);
-        return;
-      }
-      construct(100000 * dbObjId + element, param);
     }
 
     static void setComponents(const std::set<unsigned short>& components)

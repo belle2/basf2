@@ -162,7 +162,7 @@ def main(run, period, mode):
     #                additionalBranches=['ECLDigits','ECLCalDigits','RecoTracks'])
 
     #
-    main_path.add_module('MillepedeCollector', minPValue=0.)
+    main_path.add_module('MillepedeCollector', minPValue=0., components=['CDCAlignment'])
     output = register_module('RootOutput')
     outputFilename = '/ghi/fs01/belle2/bdata/users/karim/MC_data/Cosmics/dst_run' + run + '.root'
     output.param('outputFileName', outputFilename)

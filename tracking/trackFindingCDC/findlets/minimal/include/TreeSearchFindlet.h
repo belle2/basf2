@@ -29,7 +29,7 @@ namespace Belle2 {
             std::pair<typename AStateObject::SeedObject*, std::vector<const typename AStateObject::HitObject*>>>;
       using SeedPtr = typename AStateObject::SeedObject*;
       using HitPtr = const typename AStateObject::HitObject*;
-      using StateArray = typename std::array<AStateObject, AStateObject::N>;
+      using StateArray = typename std::array < AStateObject, AStateObject::N + 1 >;
       using StateIterator = typename StateArray::iterator;
       using ResultPair = std::pair<typename AStateObject::SeedObject*, std::vector<const typename AStateObject::HitObject*>>;
 

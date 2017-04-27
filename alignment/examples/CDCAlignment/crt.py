@@ -78,13 +78,15 @@ def main(run, period, mode):
 
 #    phi = getPhiRotation()
 
-    gearbox = register_module('Gearbox',
+    gearbox = register_module('Gearbox')
+    """,
                               fileName="/geometry/GCR_Summer2017.xml",
                               override=[
                                   ("/Global/length", "8.", "m"),
                                   ("/Global/width", "8.", "m"),
                                   ("/Global/height", "8.", "m"),
                               ])
+    """
     main_path.add_module(gearbox)
 
     main_path.add_module('Geometry')

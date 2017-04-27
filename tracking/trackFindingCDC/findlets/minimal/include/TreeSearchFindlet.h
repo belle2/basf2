@@ -107,19 +107,22 @@ namespace Belle2 {
       /// Implementation of the traverseTree function
       void traverseTree(StateIterator currentState, std::vector<ResultPair>& resultsVector)
       {
-        const auto& matchingHits = getMatchingHits(currentState);
         StateIterator nextState = std::next(currentState);
 
-        if (nextState == m_states.end() or (not m_param_makeHitJumpingPossible and matchingHits.empty())) {
+        if (nextState == m_states.end()) {
           resultsVector.emplace_back(currentState->finalize());
           return;
         }
 
+        bool childWasUsed = false;
+
+        const auto& matchingHits = getMatchingHits(currentState);
         for (const auto& hit : matchingHits) {
           *nextState = AStateObject(currentState, hit);
 
           if (useResult(nextState)) {
             traverseTree(nextState, resultsVector);
+            childWasUsed = true;
           }
         }
 
@@ -128,7 +131,12 @@ namespace Belle2 {
 
           if (useResult(nextState)) {
             traverseTree(nextState, resultsVector);
+            childWasUsed = true;
           }
+        }
+
+        if (not childWasUsed) {
+          resultsVector.emplace_back(currentState->finalize());
         }
       }
 

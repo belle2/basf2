@@ -5,20 +5,36 @@
 <header>
   <input>Bd_rho0gamma_GENSIMRECtoDST.dst.root</input>
   <output>Bd_rho0gamma.ntup.root</output>
-  <contact>Jorge Martinez-Ortega; jmartinez@fis.cinvestav.mx</contact>
+  <contact>Saurabh Sandilya; saurabhsandilya@gmail.com</contact>
 </header>
 """
+#######################################################                         
+#                                                                               
+# Obtain Delta E and Mbc distribution from the decay:                           
+#                                                                               
+#                                                                               
+#    B0 -> rho0 + gamma                                                          
+#           |                                                                   
+#           +-> pi+ pi-                                                          
+#                                                                               
+#                                                                               
+# Contributors: Saurabh Sandilya (April 2017)                                   
+#                                                                               
+######################################################                          
 
-import sys
-import os
 from basf2 import *
+from vertex import *
 from modularAnalysis import *
-from stdCharged import *
-from stdPhotons import *
+from reconstruction import *
+from stdFSParticles import *
 
-inputMdst('default', '../Bd_rho0gamma_GENSIMRECtoDST.dst.root')
-loadStdCharged()
-loadStdPhoton()
+gb2_setuprel="release-00-08-00"
+
+inputMdst('default', '/gpfs/home/belle/saurabh/ewp2/validation/mdst-rfiles/mdst-1110021010-1.root')
+
+fillParticleList('pi+:all', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4 and piid > 0.1')
+
+fillParticleList('gamma:all', 'E > 0.050 and clusterE9E25 > 0.8')
 
 reconstructDecay('rho0 -> pi-:all pi+:all', '0.6 < M < 1.2')
 matchMCTruth('rho0')

@@ -170,7 +170,11 @@ void MuidModule::beginRun()
 
 void MuidModule::event()
 {
-  m_Extrapolator->event(true);
+  try {
+    m_Extrapolator->event(true);
+  } catch (...) {
+    B2ERROR("Muid event failed.");
+  }
 }
 
 void MuidModule::endRun()

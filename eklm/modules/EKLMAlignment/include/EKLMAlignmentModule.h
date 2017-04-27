@@ -80,6 +80,15 @@ namespace Belle2 {
     /** Fix sector dalpha at 0. */
     bool m_SectorZeroDalpha;
 
+    /** Sector dx */
+    double m_SectorDx;
+
+    /** Sector dy. */
+    double m_SectorDy;
+
+    /** Sector dalpha. */
+    double m_SectorDalpha;
+
     /** Name of output file. */
     std::string m_OutputFile;
 
@@ -90,6 +99,14 @@ namespace Belle2 {
      * Generation of zero displacements.
      */
     void generateZeroDisplacement();
+
+    /**
+     * Generation of fixed sector displacements.
+     * @param[in] dx     dx.
+     * @param[in] dy     dy.
+     * @param[in] dalpha dalpha.
+     */
+    void generateFixedSectorDisplacement(double dx, double dy, double dalpha);
 
     /**
      * Generation of random displacements.

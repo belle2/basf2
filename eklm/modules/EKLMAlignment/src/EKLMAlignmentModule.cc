@@ -32,7 +32,8 @@ REG_MODULE(EKLMAlignment)
 EKLMAlignmentModule::EKLMAlignmentModule() : Module()
 {
   setDescription("Module for generation of EKLM displacement data.");
-  addParam("Mode", m_Mode, "Mode ('Zero', 'Random' or 'Limits').",
+  addParam("Mode", m_Mode,
+           "Mode ('Zero', 'FixedSector', 'Random' or 'Limits').",
            std::string("Zero"));
   addParam("RandomDisplacement", m_RandomDisplacement,
            "What should be randomly displaced ('Sector', 'Segment' or 'Both').",
@@ -43,6 +44,9 @@ EKLMAlignmentModule::EKLMAlignmentModule() : Module()
   addParam("SectorZeroDy", m_SectorZeroDy, "Fix sector dy at 0.", false);
   addParam("SectorZeroDalpha", m_SectorZeroDalpha, "Fix sector dalpha at 0.",
            false);
+  addParam("SectorDx", m_SectorDx, "Sector dx.", 0.);
+  addParam("SectorDy", m_SectorDy, "Sector dy.", 0.);
+  addParam("SectorDalpha", m_SectorDalpha, "Sector dalpha.", 0.);
   addParam("OutputFile", m_OutputFile, "Output file.",
            std::string("EKLMDisplacement.root"));
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -58,6 +62,27 @@ void EKLMAlignmentModule::generateZeroDisplacement()
   IntervalOfValidity iov(0, 0, -1, -1);
   EKLMAlignment alignment;
   EKLM::fillZeroDisplacements(&alignment);
+  saveDisplacement(&alignment);
+  Database::Instance().storeData("EKLMDisplacement", (TObject*)&alignment, iov);
+}
+
+void EKLMAlignmentModule::generateFixedSectorDisplacement(
+  double dx, double dy, double dalpha)
+{
+  IntervalOfValidity iov(0, 0, -1, -1);
+  EKLMAlignment alignment;
+  EKLMAlignmentData sectorAlignment(dx, dy, dalpha);
+  int iEndcap, iLayer, iSector, sector;
+  EKLM::fillZeroDisplacements(&alignment);
+  for (iEndcap = 1; iEndcap <= m_GeoDat->getNEndcaps(); iEndcap++) {
+    for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
+         iLayer++) {
+      for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
+        sector = m_GeoDat->sectorNumber(iEndcap, iLayer, iSector);
+        alignment.setSectorAlignment(sector, &sectorAlignment);
+      }
+    }
+  }
   saveDisplacement(&alignment);
   Database::Instance().storeData("EKLMDisplacement", (TObject*)&alignment, iov);
 }
@@ -344,6 +369,8 @@ void EKLMAlignmentModule::initialize()
   m_GeoDat = &(EKLM::GeometryData::Instance());
   if (m_Mode == "Zero")
     generateZeroDisplacement();
+  else if (m_Mode == "FixedSector")
+    generateFixedSectorDisplacement(m_SectorDx, m_SectorDy, m_SectorDalpha);
   else if (m_Mode == "Random") {
     if (m_RandomDisplacement == "Sector")
       generateRandomDisplacement(true, false);

@@ -32,7 +32,7 @@ set_random_seed(922)
 main = create_path()
 
 # e+e- -> ccbar -> D0 anything
-# D0 -> pi+ pi0
+# D+ -> pi+ pi0
 #
 generateContinuum(10000, 'D0', Belle2.FileSystem.findFile('/decfiles/dec/2110012000.dec'), path=main)
 

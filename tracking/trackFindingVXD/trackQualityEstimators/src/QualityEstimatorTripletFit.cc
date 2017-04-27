@@ -8,12 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h"
-#include <tracking/trackFindingVXD/utilities/CalcCurvatureSignum.h>
 #include <math.h>
-#include <framework/logging/Logger.h>
 #include <TMath.h>
 
+#include <framework/logging/Logger.h>
+
+#include <svd/geometry/SensorInfo.h>
+
+#include "tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h"
+#include <tracking/trackFindingVXD/utilities/CalcCurvatureSignum.h>
 
 
 using namespace Belle2;

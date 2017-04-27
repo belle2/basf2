@@ -326,7 +326,6 @@ namespace Belle2 {
           m_vector.insert(std::make_pair(DBObjType::getGlobalUniqueID(),
                                          std::unique_ptr<GlobalParamSet<DBObjType>>(new GlobalParamSet<DBObjType>)
                                         ));
-          m_componentsIDs.insert(DBObjType::getGlobalUniqueID());
           // NOTE: Components disabled this way also disable added interfaces (e.g. if geometry would be needed to load)
           // NOTE: add generic interfaces only once by addSubDetectorInterface(...)
           addSubDetectorInterface(interface);
@@ -426,13 +425,12 @@ namespace Belle2 {
       {
         return m_subDetectorInterfacesVector;
       }
-      const std::vector<std::string>& getComponents() const
+      std::set<unsigned short> getComponentsIDs() const
       {
-        return m_components;
-      }
-      const std::set<unsigned short>& getComponentsIDs() const
-      {
-        return m_componentsIDs;
+        std::set<unsigned short> result;
+        for (auto& id_obj : m_vector)
+          result.insert(id_obj.first);
+        return result;
       }
     private:
       /// The vector (well, actually a map) of DB objects

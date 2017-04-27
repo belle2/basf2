@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "tracking/modules/trackSetEvaluatorVXD/BestCandidateSelectionModule.h"
+#include "tracking/modules/trackSetEvaluatorVXD/BestVXDTrackCandidatesSelectorModule.h"
 #include <framework/logging/Logger.h>
 #include <vector>
 #include <numeric>
@@ -16,9 +16,9 @@
 using namespace Belle2;
 
 
-REG_MODULE(BestCandidateSelectionVXD)
+REG_MODULE(BestVXDTrackCandidatesSelector)
 
-BestCandidateSelectionVXDModule::BestCandidateSelectionVXDModule() : Module()
+BestVXDTrackCandidatesSelectorModule::BestVXDTrackCandidatesSelectorModule() : Module()
 {
   setDescription("Module that selects a subset with a fixed size x out of all SpacePointTrackCandidates. Based on qualityIndex.");
 
@@ -30,7 +30,7 @@ BestCandidateSelectionVXDModule::BestCandidateSelectionVXDModule() : Module()
            "Only required if 'CreateNewStoreArray' is true. Name of StoreArray to store the subset.", std::string("BestSpacePointTrackCands"));
 }
 
-void BestCandidateSelectionVXDModule::initialize()
+void BestVXDTrackCandidatesSelectorModule::initialize()
 {
   m_spacePointTrackCands.isRequired(m_nameSpacePointTrackCands);
   if (m_createNewStoreArray) {
@@ -38,13 +38,13 @@ void BestCandidateSelectionVXDModule::initialize()
   }
 }
 
-void BestCandidateSelectionVXDModule::event()
+void BestVXDTrackCandidatesSelectorModule::event()
 {
   if (m_createNewStoreArray) copyCandidates();
   else deactivateCandidates();
 }
 
-void BestCandidateSelectionVXDModule::deactivateCandidates()
+void BestVXDTrackCandidatesSelectorModule::deactivateCandidates()
 {
   const unsigned int nTracks = m_spacePointTrackCands.getEntries();
   // define subset
@@ -64,7 +64,7 @@ void BestCandidateSelectionVXDModule::deactivateCandidates()
   }
 }
 
-void BestCandidateSelectionVXDModule::copyCandidates()
+void BestVXDTrackCandidatesSelectorModule::copyCandidates()
 {
   const unsigned int nTracks = m_spacePointTrackCands.getEntries();
   // define subset

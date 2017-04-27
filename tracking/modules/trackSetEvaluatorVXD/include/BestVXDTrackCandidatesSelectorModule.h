@@ -23,10 +23,10 @@ namespace Belle2 {
    *  Either deactivates the remaining candidates
    *  or fills a new StoreArray with the selected candidates.
    */
-  class BestCandidateSelectionVXDModule : public Module {
+  class BestVXDTrackCandidatesSelectorModule : public Module {
   public:
     /** Constructor of the module. */
-    BestCandidateSelectionVXDModule();
+    BestVXDTrackCandidatesSelectorModule();
 
     /** Requires SpacePointTrackCands. */
     void initialize() override final;

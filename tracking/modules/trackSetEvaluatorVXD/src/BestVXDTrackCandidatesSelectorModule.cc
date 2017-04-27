@@ -46,7 +46,7 @@ void BestVXDTrackCandidatesSelectorModule::event()
 
 void BestVXDTrackCandidatesSelectorModule::deactivateCandidates()
 {
-  const unsigned int nTracks = m_spacePointTrackCands.getEntries();
+  const int nTracks = m_spacePointTrackCands.getEntries();
   // define subset
   if (nTracks > m_subsetSize) {
     // sort by lowest -> highest quality index

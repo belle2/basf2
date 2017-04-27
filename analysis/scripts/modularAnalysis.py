@@ -571,6 +571,31 @@ def fillParticleList(
     path.add_module(pload)
 
 
+def fillParticleListWithTrackHypothesis(
+    decayString,
+    cut,
+    hypothesis,
+    writeOut=False,
+    path=analysis_main,
+):
+    """
+    As fillParticleList, but if used for a charged FSP, loads the particle with the requested hypothesis if available
+
+    @param decayString   specifies type of Particles and determines the name of the ParticleList
+    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
+    @param hypothesis    the PDG code of the desired track hypothesis
+    @param writeOut      wether RootOutput module should save the created ParticleList
+    @param path          modules are added to this path
+    """
+
+    pload = register_module('ParticleLoader')
+    pload.set_name('ParticleLoader_' + decayString)
+    pload.param('decayStringsWithCuts', [(decayString, cut)])
+    pload.param('trackHypothesis', hypothesis)
+    pload.param('writeOut', writeOut)
+    path.add_module(pload)
+
+
 def fillConvertedPhotonsList(
     decayString,
     cut,

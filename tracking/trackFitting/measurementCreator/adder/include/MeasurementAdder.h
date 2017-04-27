@@ -189,16 +189,19 @@ namespace Belle2 {
         return;
       }
 
+      genfit::Track& genfitTrack = RecoTrackGenfitAccess::getGenfitTrack(recoTrack);
+
       for (const auto& measurementCreator : measurementCreators) {
         const std::vector<genfit::TrackPoint*>& trackPoints = measurementCreator->createMeasurementPoints(hit, recoTrack,
                                                               recoHitInformation);
 
         if (trackPoints.size() >= 1) {
-          recoHitInformation.setCreatedTrackPoint(trackPoints.front());
+          int trackPointCounter = genfitTrack.getNumPoints();
+          recoHitInformation.setCreatedTrackPointID(trackPointCounter);
         }
 
         for (genfit::TrackPoint* trackPoint : trackPoints) {
-          RecoTrackGenfitAccess::getGenfitTrack(recoTrack).insertPoint(trackPoint);
+          genfitTrack.insertPoint(trackPoint);
         }
       }
     }

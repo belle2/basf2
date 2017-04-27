@@ -24,6 +24,10 @@
 #include <iostream>
 #include <iomanip>
 
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/device/file.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+
 #include <Math/ChebyshevPol.h>
 
 using namespace std;
@@ -443,7 +447,7 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 
 }
 
-
+//TODO: move the following two functions to cdc/utilities
 // Open a file
 void CDCGeometryPar::openFile(std::ifstream& ifs, const std::string& fileName0) const
 {
@@ -463,6 +467,29 @@ void CDCGeometryPar::openFile(std::ifstream& ifs, const std::string& fileName0) 
   }
 }
 
+/*
+// Open a file using boost (to be able to read a gzipped file)
+void CDCGeometryPar::openFile(boost::iostreams::filtering_istream& ifs, const std::string& fileName0) const
+{
+  std::string fileName1 = "/cdc/data/" + fileName0;
+  std::string fileName = FileSystem::findFile(fileName1);
+
+  if (fileName == "") {
+    fileName = FileSystem::findFile(fileName0);
+  }
+
+  if (fileName == "") {
+    B2FATAL("CDCGeometryPar: " << fileName1 << " not exist!");
+  } else {
+    B2INFO("CDCGeometryPar: open " << fileName1);
+    if ((fileName.rfind(".gz") != string::npos) && (fileName.length() - fileName.rfind(".gz") == 3)) {
+      ifs.push(boost::iostreams::gzip_decompressor());
+    }
+    ifs.push(boost::iostreams::file_source(fileName));
+    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName1 << " !");
+  }
+}
+*/
 
 // Read displacement or (mis)alignment params.
 //void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometry* geom,  const GearDir gbxParams)
@@ -650,8 +677,26 @@ void CDCGeometryPar::newReadXT(const GearDir gbxParams, const int mode)
     fileName0 = gbxParams.getString("xt4ReconFileName");
   }
 
-  ifstream ifs;
-  openFile(ifs, fileName0);
+  boost::iostreams::filtering_istream ifs;
+  //  openFile(ifs, fileName0);
+  //TODO: use openFile() in cdc/utilities instead of the following 18 lines
+  std::string fileName1 = "/cdc/data/" + fileName0;
+  std::string fileName = FileSystem::findFile(fileName1);
+
+  if (fileName == "") {
+    fileName = FileSystem::findFile(fileName0);
+  }
+
+  if (fileName == "") {
+    B2FATAL("CDCGeometryPar: " << fileName1 << " not exist!");
+  } else {
+    B2INFO("CDCGeometryPar: open " << fileName1);
+    if ((fileName.rfind(".gz") != string::npos) && (fileName.length() - fileName.rfind(".gz") == 3)) {
+      ifs.push(boost::iostreams::gzip_decompressor());
+    }
+    ifs.push(boost::iostreams::file_source(fileName));
+    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName1 << " !");
+  }
 
   //read alpha bin info.
   unsigned short nAlphaBins = 0;
@@ -738,6 +783,9 @@ void CDCGeometryPar::newReadXT(const GearDir gbxParams, const int mode)
                     * (xtc[5])))));
     }
   }  //end of while loop
+
+  //  ifs.close();
+  boost::iostreams::close(ifs);
 
   //convert unit
   const double degrad = M_PI / 180.;
@@ -850,6 +898,8 @@ void CDCGeometryPar::newReadSigma(const GearDir gbxParams, const int mode)
       m_Sigma[iCL][iLR][ialpha][itheta][i] = sigma[i];
     }
   }  //end of while loop
+
+  ifs.close();
 
   //convert unit
   const double degrad = M_PI / 180.;

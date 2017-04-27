@@ -24,6 +24,17 @@ def poisson_error(n_tot):
     return numpy.where(n_tot > 0, numpy.sqrt(n_tot), numpy.log(1.0 / (1 - 0.6827)))
 
 
+def weighted_mean_and_std(x, w):
+    """
+    Return the weighted average and standard deviation.
+    @param x values
+    @param w weights
+    """
+    mean = numpy.average(x, weights=w)
+    var = numpy.average((x-mean)**2, weights=w)
+    return (mean, numpy.sqrt(var))
+
+
 class Histograms(object):
     """
     Extracts information from a pandas.DataFrame and stores it
@@ -43,7 +54,7 @@ class Histograms(object):
     #: Dictionary of histograms for the given masks
     hists = None
 
-    def __init__(self, data, column, masks=dict(), weight_column=None, bins=100, equal_frequency=True):
+    def __init__(self, data, column, masks=dict(), weight_column=None, bins=100, equal_frequency=True, range_in_std=None):
         """
         Creates a common binning of the given column of the given pandas.Dataframe,
         and stores for each given mask the histogram of the column
@@ -54,8 +65,15 @@ class Histograms(object):
         @param weight_column identifiying the column in the pandas.DataFrame which is used as weight
         @param bins use given bins instead of default 100
         @param equal_frequency perform an equal_frequency binning
+        @param range_in_std show only the data in a windows around +- range_in_std * standard_deviation around the mean
         """
         isfinite = numpy.isfinite(data[column])
+        if range_in_std is not None:
+            mean, std = weighted_mean_and_std(data[column][isfinite],
+                                              None if weight_column is None else data[weight_column][isfinite])
+            # Everything outside mean +- range_in_std * std is considered infinite
+            isfinite = isfinite & (data[column] > (mean - range_in_std * std)) & (data[column] < (mean + range_in_std * std))
+
         if equal_frequency:
             bins = numpy.percentile(data[column][isfinite], q=range(bins + 1))
         self.hist, self.bins = numpy.histogram(data[column][isfinite], bins=bins,

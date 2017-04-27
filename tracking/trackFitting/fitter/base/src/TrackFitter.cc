@@ -46,20 +46,19 @@ bool TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRe
   recoTrack.setDirtyFlag(false);
 
   // Do the hits synchronisation
-  auto relatedRecoHitInformation =
-    recoTrack.getRelationsTo<RecoHitInformation>(recoTrack.getStoreArrayNameOfRecoHitInformation());
+  const std::vector<RecoHitInformation*>& relatedRecoHitInformation = recoTrack.getRecoHitInformations();
 
-  for (RecoHitInformation& recoHitInformation : relatedRecoHitInformation) {
-    const genfit::TrackPoint* trackPoint = recoHitInformation.getCreatedTrackPoint();
+  for (RecoHitInformation* recoHitInformation : relatedRecoHitInformation) {
+    const genfit::TrackPoint* trackPoint = recoTrack.getCreatedTrackPoint(recoHitInformation);
     if (trackPoint) {
       genfit::KalmanFitterInfo* kalmanFitterInfo = trackPoint->getKalmanFitterInfo(&trackRepresentation);
       if (not kalmanFitterInfo) {
-        recoHitInformation.setFlag(RecoHitInformation::RecoHitFlag::c_dismissedByFit);
+        recoHitInformation->setFlag(RecoHitInformation::RecoHitFlag::c_dismissedByFit);
       } else {
         std::vector<double> weights = kalmanFitterInfo->getWeights();
         for (const double weight : weights) {
           if (weight == 0) {
-            recoHitInformation.setFlag(RecoHitInformation::RecoHitFlag::c_dismissedByFit);
+            recoHitInformation->setFlag(RecoHitInformation::RecoHitFlag::c_dismissedByFit);
           }
         }
       }

@@ -210,7 +210,7 @@ namespace {
     EXPECT_EQ(probabilities.size(), dataset.getNumberOfEvents());
     for (unsigned int i = 0; i < 24; ++i) {
       EXPECT_LE(probabilities[i], 0.55);
-      EXPECT_GE(probabilities[i], 0.45);
+      EXPECT_GE(probabilities[i], 0.42);
     }
     for (unsigned int i = 24; i < 48; i += 2) {
       EXPECT_LE(probabilities[i], 0.1);
@@ -218,7 +218,7 @@ namespace {
     }
     for (unsigned int i = 48; i < 72; ++i) {
       EXPECT_LE(probabilities[i], 0.55);
-      EXPECT_GE(probabilities[i], 0.45);
+      EXPECT_GE(probabilities[i], 0.42);
     }
     for (unsigned int i = 72; i < 96; i += 2) {
       EXPECT_LE(probabilities[i], 0.1);

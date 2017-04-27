@@ -1,12 +1,7 @@
 Import('env')
 
 env['TOOLS_LIBS']['ereco_eventserver'] = ['daq', 'framework', '$ROOT_LIBS' ]
-<<<<<<< Updated upstream
 env['TOOLS_LIBS']['ereco_distributor'] = ['daq', 'framework', '$ROOT_LIBS' ]
 env['TOOLS_LIBS']['ereco_master_local'] = ['daq', 'framework', '$ROOT_LIBS' ]
-=======
-env['TOOLS_LIBS']['ereco_master_local'] = ['daq', 'framework', '$ROOT_LIBS' ]
-env['TOOLS_LIBS']['ereco_distributor'] = ['daq', 'framework', '$ROOT_LIBS' ]
->>>>>>> Stashed changes
 
 Return('env')

@@ -83,6 +83,7 @@ void CDCInitialT0DeterminationModule::terminate()
     if (m_hTDCBoard[ib]->GetEntries() < m_minEntries) {
       B2DEBUG(99, "Warning: this board low statistic: " << m_hTDCBoard[ib]->GetEntries());
       bflag[ib] = 0;
+      m_t0b[ib] = m_initT0;
       continue;
     }
     double p3 = m_hTDCBoard[ib]->GetXaxis()->GetBinCenter(m_hTDCBoard[ib]->GetMaximumBin());
@@ -92,6 +93,7 @@ void CDCInitialT0DeterminationModule::terminate()
     if ((f1->GetProb() < 1E-15) || (fabs(f1->GetParameter(4) - m_initT0) > 100) || (f1->GetParameter(5) < 0.01)
         || (f1->GetParameter(5) > 16)) {
       bflag[ib] = 0;
+      m_t0b[ib] = m_initT0;
       continue;
     }
     bflag[ib] = 1;
@@ -109,6 +111,7 @@ void CDCInitialT0DeterminationModule::terminate()
     for (unsigned short w = 0; w < cdcgeo.nWiresInLayer(il); ++w) {
       B2DEBUG(99, "fitting for channel: " << il << " - " << w);
       B2DEBUG(99, "number of entries" << m_hTDC[il][w]->GetEntries());
+      m_t0[il][w] = m_initT0 * tdcBinWidth;
       int bid = cdcgeo.getBoardID(WireID(il, w));
       if (m_hTDC[il][w]->GetEntries() < m_minEntries) {
         B2DEBUG(99, "Warning: low statistic channel: " << m_hTDC[il][w]->GetEntries());

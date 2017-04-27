@@ -120,7 +120,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     return state
 
 
-def partial_fit(state, X, S, y, w, Xtest, Stest, ytest, wtest, epoch):
+def partial_fit(state, X, S, y, w, epoch):
     """
     Pass received data to tensorflow session
     """

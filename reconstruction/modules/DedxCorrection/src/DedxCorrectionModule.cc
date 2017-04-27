@@ -156,14 +156,21 @@ double DedxCorrectionModule::RunGainCorrection(double& dedx) const
 double DedxCorrectionModule::WireGainCorrection(int wireID, double& dedx) const
 {
 
+  if (m_valid[wireID] && m_wireGain[wireID] != 0) {
+    double newDedx = dedx / m_wireGain[wireID];
+    return newDedx;
+  } else
+    return dedx;
+
   /*
   B2INFO("Rescaling wire gains for " << wireID << " = " << m_wireGains[wireID]->getWireID() << " by " << m_wireGains[wireID]->getWireGain());
 
   if (m_wireGains[wireID]->getWireID() == wireID) {
     double newDedx = dedx / m_wireGains[wireID]->getWireGain();
     return newDedx;
-    } else*/
+    } else
   return dedx;
+  */
 }
 
 double DedxCorrectionModule::HadronCorrection(double costheta, double dedx) const

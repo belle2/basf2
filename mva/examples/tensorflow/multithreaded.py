@@ -39,6 +39,8 @@ class save_decider():
         self.save_state = None
         #: number how many times to perform check without improving training, before ending training
         self.break_number = np.inf
+        #: counter used in check method
+        self.counter = 0
 
     def set_break_number(self, number):
         """

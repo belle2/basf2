@@ -39,6 +39,10 @@ EKLMAlignmentModule::EKLMAlignmentModule() : Module()
            std::string("Both"));
   addParam("SectorSameDisplacement", m_SectorSameDisplacement,
            "If the displacement should be the same for all sectors.", false);
+  addParam("SectorZeroDx", m_SectorZeroDx, "Fix sector dx at 0.", false);
+  addParam("SectorZeroDy", m_SectorZeroDy, "Fix sector dy at 0.", false);
+  addParam("SectorZeroDalpha", m_SectorZeroDalpha, "Fix sector dalpha at 0.",
+           false);
   addParam("OutputFile", m_OutputFile, "Output file.",
            std::string("EKLMDisplacement.root"));
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -78,6 +82,7 @@ void EKLMAlignmentModule::generateRandomDisplacement(
   EKLMAlignmentData sectorAlignment, segmentAlignment, *alignmentData;
   EKLM::AlignmentChecker alignmentChecker(false);
   int iEndcap, iLayer, iSector, iPlane, iSegment, sector, segment;
+  double d;
   EKLM::fillZeroDisplacements(&alignment);
   for (iEndcap = 1; iEndcap <= m_GeoDat->getNEndcaps(); iEndcap++) {
     for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
@@ -105,10 +110,21 @@ void EKLMAlignmentModule::generateRandomDisplacement(
 sector:
         if (displaceSector) {
           do {
-            sectorAlignment.setDx(gRandom->Uniform(sectorMinDx, sectorMaxDx));
-            sectorAlignment.setDy(gRandom->Uniform(sectorMinDy, sectorMaxDy));
-            sectorAlignment.setDalpha(
-              gRandom->Uniform(sectorMinDalpha, sectorMaxDalpha));
+            if (m_SectorZeroDx)
+              d = 0;
+            else
+              d = gRandom->Uniform(sectorMinDx, sectorMaxDx);
+            sectorAlignment.setDx(d);
+            if (m_SectorZeroDy)
+              d = 0;
+            else
+              d = gRandom->Uniform(sectorMinDy, sectorMaxDy);
+            sectorAlignment.setDy(d);
+            if (m_SectorZeroDalpha)
+              d = 0;
+            else
+              d = gRandom->Uniform(sectorMinDalpha, sectorMaxDalpha);
+            sectorAlignment.setDalpha(d);
           } while (!alignmentChecker.checkSectorAlignment(&sectorAlignment));
           sector = m_GeoDat->sectorNumber(iEndcap, iLayer, iSector);
           alignment.setSectorAlignment(sector, &sectorAlignment);

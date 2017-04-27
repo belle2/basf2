@@ -71,6 +71,15 @@ namespace Belle2 {
     /** If the displacement should be the same for all sectors. */
     bool m_SectorSameDisplacement;
 
+    /** Fix sector dx at 0. */
+    bool m_SectorZeroDx;
+
+    /** Fix sector dy at 0. */
+    bool m_SectorZeroDy;
+
+    /** Fix sector dalpha at 0. */
+    bool m_SectorZeroDalpha;
+
     /** Name of output file. */
     std::string m_OutputFile;
 

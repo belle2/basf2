@@ -447,9 +447,11 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
   for (RecoHitInformation& recoHitInformation : relatedRecoHitInformation) {
     const genfit::TrackPoint* trackPoint = recoHitInformation.getCreatedTrackPoint();
     if (trackPoint) {
-      genfit::KalmanFitterInfo* kalmanFitterInfo = trackPoint->getKalmanFitterInfo(recoTrack.getCardinalRepresentation());
+      if (not trackPoint->hasFitterInfo(recoTrack.getCardinalRepresentation()))
+        continue;
+      auto kalmanFitterInfo = dynamic_cast<genfit::KalmanFitterInfo*>(trackPoint->getFitterInfo());
       if (not kalmanFitterInfo) {
-        recoHitInformation.setFlag(RecoHitInformation::RecoHitFlag::c_dismissedByFit);
+        continue;
       } else {
         std::vector<double> weights = kalmanFitterInfo->getWeights();
         if (weights.size() == 2) {
@@ -457,8 +459,6 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
             recoHitInformation.setRightLeftInformation(RecoHitInformation::c_left);
           else if (weights.at(0) < weights.at(1))
             recoHitInformation.setRightLeftInformation(RecoHitInformation::c_right);
-          else
-            recoHitInformation.setRightLeftInformation(RecoHitInformation::c_invalidRightLeftInformation);
         }
       }
     }

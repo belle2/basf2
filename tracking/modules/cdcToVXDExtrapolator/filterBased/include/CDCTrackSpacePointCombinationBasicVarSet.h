@@ -27,6 +27,7 @@ namespace Belle2 {
     "same_hemisphere",
 
     "layer",
+    "number",
 
     "arcLengthOfHitPosition",
     "arcLengthOfCenterPosition",

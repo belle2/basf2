@@ -65,6 +65,7 @@ bool CDCTrackSpacePointCombinationBasicVarSet::extract(const BaseCDCTrackSpacePo
   var<named("numberOfHoles")>() = result->getNumberOfHoles();
 
   var<named("layer")>() = spacePoint->getVxdID().getLayerNumber();
+  var<named("number")>() = result->getNumber();
 
   var<named("chi2")>() = result->getChi2();
 

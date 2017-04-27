@@ -20,12 +20,10 @@ bool CDCTrackSpacePointCombinationTruthVarSet::extract(const BaseCDCTrackSpacePo
   RecoTrack* cdcTrack = result->getSeedRecoTrack();
   const SpacePoint* spacePoint = result->getSpacePoint();
 
-  if (not cdcTrack or not spacePoint) return false;
+  if (not cdcTrack) return false;
 
   StoreObjPtr<EventMetaData> eventMetaData;
   var<named("event_id")>() = eventMetaData->getEvent();
-
-  var<named("space_point_number")>() = spacePoint->getArrayIndex();
   var<named("cdc_number")>() = cdcTrack->getArrayIndex();
 
   const std::string& cdcTrackStoreArrayName = cdcTrack->getArrayName();
@@ -33,7 +31,7 @@ bool CDCTrackSpacePointCombinationTruthVarSet::extract(const BaseCDCTrackSpacePo
   TrackMatchLookUp mcCDCMatchLookUp("MCRecoTracks", cdcTrackStoreArrayName);
   const RecoTrack* cdcMCTrack = mcCDCMatchLookUp.getMatchedMCRecoTrack(*cdcTrack);
 
-  // Default to 0
+  // Default to 0, -1 or false (depending on context)
   var<named("truth_position_x")>() = 0;
   var<named("truth_position_y")>() = 0;
   var<named("truth_position_z")>() = 0;
@@ -42,11 +40,24 @@ bool CDCTrackSpacePointCombinationTruthVarSet::extract(const BaseCDCTrackSpacePo
   var<named("truth_momentum_z")>() = 0;
   var<named("truth")>() = false;
   var<named("truth_no_curler")>() = false;
+  var<named("space_point_number")>() = -1;
 
   // In case the CDC track is a fake, return false always
   if (not cdcMCTrack) {
     return true;
   }
+
+  if (not spacePoint) {
+    // on every second layer (the overlap layers) it is fine to have no space point
+    if (result->isOnOverlapLayer()) {
+      var<named("truth")>() = true;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  var<named("space_point_number")>() = spacePoint->getArrayIndex();
 
   // Next we have to get all MC tracks for the two SVD Clusters matches to the SpacePoint
   const auto& relatedSVDClusters = spacePoint->getRelationsWith<SVDCluster>();

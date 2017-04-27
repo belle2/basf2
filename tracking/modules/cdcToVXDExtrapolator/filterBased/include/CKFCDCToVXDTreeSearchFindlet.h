@@ -44,7 +44,8 @@ namespace Belle2 {
     }
   private:
     TrackFindingCDC::SortedVectorRange<const SpacePoint*> getMatchingHits(Super::StateIterator currentState) final {
-      const unsigned int nextLayer = currentState->getLayer() - 1;
+      // TODO: Do something on overlaps!
+      const unsigned int nextLayer = currentState->extractGeometryLayer() - 1;
       return m_cachedHitMap[nextLayer];
     }
 
@@ -55,6 +56,7 @@ namespace Belle2 {
 
       if (not spacePoint)
       {
+        // If we do not have a space point, we do not need to do anything here.
         currentState->setFitted();
         return true;
       }
@@ -118,6 +120,7 @@ namespace Belle2 {
 
       if (not spacePoint)
       {
+        // If we do not have a space point, we do not need to do anything here.
         currentState->setAdvanced();
         return true;
       }

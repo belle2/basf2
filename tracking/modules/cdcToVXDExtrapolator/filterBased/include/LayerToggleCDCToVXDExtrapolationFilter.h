@@ -32,14 +32,7 @@ namespace Belle2 {
     }
 
     TrackFindingCDC::Weight operator()(const BaseCDCTrackSpacePointCombinationFilter::Object& currentState) final {
-      const auto* spacePoint = currentState.getSpacePoint();
-
-      if (not spacePoint)
-      {
-        return std::nan("");
-      }
-
-      const unsigned int layer = spacePoint->getVxdID().getLayerNumber();
+      const unsigned int layer = currentState.extractGeometryLayer();
       if (layer > m_param_toggleOnLayer)
       {
         return m_highLayerFilter(currentState);

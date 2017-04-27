@@ -28,6 +28,7 @@ bool CDCTrackSpacePointCombinationBasicVarSet::extract(const BaseCDCTrackSpacePo
   const SpacePoint* spacePoint = result->getSpacePoint();
 
   if (not cdcTrack or not spacePoint) {
+    // TODO: Can we also extract meaningful things of the spacePoint is null?
     return false;
   }
 

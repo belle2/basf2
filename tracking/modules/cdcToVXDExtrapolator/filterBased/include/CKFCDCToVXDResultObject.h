@@ -15,7 +15,7 @@
 namespace Belle2 {
   class CKFCDCToVXDStateObject {
   public:
-    static constexpr unsigned int N = 7;
+    static constexpr unsigned int N = 8;
 
     using SeedObject = RecoTrack;
     using HitObject = SpacePoint;
@@ -34,7 +34,7 @@ namespace Belle2 {
     {
       m_parent = parent;
       m_seedRecoTrack = parent->getSeedRecoTrack();
-      m_layer = parent->getLayer() - 1;
+      m_number = parent->getNumber() - 1;
       m_spacePoint = spacePoint;
 
       m_measuredStateOnPlane = parent->getMeasuredStateOnPlane();
@@ -74,10 +74,21 @@ namespace Belle2 {
       return m_spacePoint;
     }
 
-    unsigned int getLayer() const
+    unsigned int getNumber() const
     {
-      return m_layer;
+      return m_number;
     }
+
+    unsigned int extractGeometryLayer() const
+    {
+      return static_cast<unsigned int>((static_cast<double>(m_number) / 2) + 3);
+    }
+
+    bool isOnOverlapLayer() const
+    {
+      return m_number % 2 == 0;
+    }
+
 
     unsigned int getNumberOfHoles() const
     {
@@ -158,7 +169,7 @@ namespace Belle2 {
   private:
     RecoTrack* m_seedRecoTrack = nullptr;
     const SpacePoint* m_spacePoint = nullptr;
-    unsigned int m_layer = N;
+    unsigned int m_number = N;
     CKFCDCToVXDStateObject* m_parent = nullptr;
 
     double m_chi2 = 0;

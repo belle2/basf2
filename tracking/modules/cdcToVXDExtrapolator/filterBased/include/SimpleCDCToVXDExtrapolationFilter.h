@@ -42,10 +42,15 @@ namespace Belle2 {
       const SpacePoint* spacePoint = currentState.getSpacePoint();
       const RecoTrack* cdcTrack = currentState.getSeedRecoTrack();
 
+      // Allow overlap layers to have no hit
+      // TODO: do only allow this in some cases where we actually have no overlap!
       if (not spacePoint)
       {
-        // TODO
-        return std::nan("");
+        if (currentState.isOnOverlapLayer()) {
+          return 1;
+        } else {
+          return std::nan("");
+        }
       }
 
       const genfit::MeasuredStateOnPlane& mSoP = currentState.getMeasuredStateOnPlane();
@@ -62,7 +67,7 @@ namespace Belle2 {
         return std::nan("");
       }
 
-      const double& layer = currentState.getLayer();
+      const double& layer = currentState.extractGeometryLayer();
 
       const TrackFindingCDC::CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
 

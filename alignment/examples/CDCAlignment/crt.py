@@ -160,7 +160,7 @@ def main(run, period, mode):
     #                additionalBranches=['ECLDigits','ECLCalDigits','RecoTracks'])
 
     #
-    main.add_module('MillepedeCollector', minPValue=0.)
+    main_path.add_module('MillepedeCollector', minPValue=0.)
     output = register_module('RootOutput')
     outputFilename = '/ghi/fs01/belle2/bdata/users/karim/MC_data/Cosmics/dst_run' + run + '.root'
     output.param('outputFileName', outputFilename)

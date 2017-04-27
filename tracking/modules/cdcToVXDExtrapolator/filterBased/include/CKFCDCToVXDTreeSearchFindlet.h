@@ -210,6 +210,7 @@ namespace Belle2 {
     std::map<unsigned int, TrackFindingCDC::SortedVectorRange<const SpacePoint*>> m_cachedHitMap;
     /// Parameter: which caching method to use
     bool m_param_useCachingOne = false;
-    bool m_param_useCaching = true;
+    /// Parameter: use caching it all
+    bool m_param_useCaching = false;
   };
 }

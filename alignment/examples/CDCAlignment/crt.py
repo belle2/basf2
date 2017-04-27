@@ -140,7 +140,7 @@ def main(run, period, mode):
     # add_posttracking_reconstruction(main_path)
 
     # I have a problem with the following line ? significantly reduced [mdst] output, why ?
-    add_dedx_modules(main_path)
+    add_dedx_modules(main_path, pruneTracks=False)
     add_ext_module(main_path)
 
     add_top_modules(main_path)

@@ -537,12 +537,7 @@ namespace Belle2 {
 
     }
 
-    int remainingWords = array.getRemainingWords();
-//    for (int i=0; i<remainingWords; ++i){
-//      B2DEBUG(100,std::hex << array.getWord());
-//    }
-
-    return remainingWords;
+    return remainingWords = array.getRemainingWords();
 
   }
 

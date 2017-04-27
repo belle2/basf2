@@ -185,14 +185,14 @@ namespace Belle2 {
 
       m_cachedHitMap.clear();
 
-      const auto& hitSorterByLayer = [](const SpacePoint * lhs, const SpacePoint * rhs)
+      const auto& hitSorterByID = [](const SpacePoint * lhs, const SpacePoint * rhs)
       {
-        return lhs->getVxdID().getLayerNumber() < rhs->getVxdID().getLayerNumber();
+        return lhs->getVxdID() < rhs->getVxdID();
       };
 
-      std::sort(filteredHitVector.begin(), filteredHitVector.end(), hitSorterByLayer);
+      std::sort(filteredHitVector.begin(), filteredHitVector.end(), hitSorterByID);
 
-      for (unsigned int layerID = 0; layerID < 8; ++layerID)
+      for (unsigned int layerID = 3; layerID <= 6; ++layerID)
       {
         const auto& onGivenLayerCheck = [layerID](const SpacePoint * spacePoint) {
           return spacePoint->getVxdID().getLayerNumber() == layerID;

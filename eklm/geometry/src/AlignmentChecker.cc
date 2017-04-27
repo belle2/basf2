@@ -288,25 +288,41 @@ bool EKLM::AlignmentChecker::checkAlignment(EKLMAlignment* alignment) const
 }
 
 void EKLM::AlignmentChecker::restoreSectorAlignment(
-  EKLMAlignmentData* sectorAlignment) const
+  EKLMAlignmentData* sectorAlignment,
+  EKLMAlignmentData* oldSectorAlignment) const
 {
-  sectorAlignment->setDx(0);
-  sectorAlignment->setDy(0);
-  sectorAlignment->setDalpha(0);
+  if (oldSectorAlignment == NULL) {
+    sectorAlignment->setDx(0);
+    sectorAlignment->setDy(0);
+    sectorAlignment->setDalpha(0);
+  } else {
+    sectorAlignment->setDx(oldSectorAlignment->getDx());
+    sectorAlignment->setDy(oldSectorAlignment->getDy());
+    sectorAlignment->setDalpha(oldSectorAlignment->getDalpha());
+  }
 }
 
 void EKLM::AlignmentChecker::restoreSegmentAlignment(
-  EKLMAlignmentData* segmentAlignment) const
+  EKLMAlignmentData* segmentAlignment,
+  EKLMAlignmentData* oldSegmentAlignment) const
 {
-  segmentAlignment->setDx(0);
-  segmentAlignment->setDy(0);
-  segmentAlignment->setDalpha(0);
+  if (oldSegmentAlignment == NULL) {
+    segmentAlignment->setDx(0);
+    segmentAlignment->setDy(0);
+    segmentAlignment->setDalpha(0);
+  } else {
+    segmentAlignment->setDx(oldSegmentAlignment->getDx());
+    segmentAlignment->setDy(oldSegmentAlignment->getDy());
+    segmentAlignment->setDalpha(oldSegmentAlignment->getDalpha());
+  }
 }
 
-void EKLM::AlignmentChecker::restoreAlignment(EKLMAlignment* alignment) const
+void EKLM::AlignmentChecker::restoreAlignment(EKLMAlignment* alignment,
+                                              EKLMAlignment* oldAlignment) const
 {
   int iEndcap, iLayer, iSector, iPlane, iSegment, sector, segment;
   EKLMAlignmentData* sectorAlignment, *segmentAlignment;
+  EKLMAlignmentData* oldSectorAlignment, *oldSegmentAlignment;
   for (iEndcap = 1; iEndcap <= m_GeoDat->getNEndcaps(); iEndcap++) {
     for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iEndcap);
          iLayer++) {
@@ -315,8 +331,15 @@ void EKLM::AlignmentChecker::restoreAlignment(EKLMAlignment* alignment) const
         sectorAlignment = alignment->getSectorAlignment(sector);
         if (sectorAlignment == NULL)
           B2FATAL("Incomplete alignment data.");
-        if (!checkSectorAlignment(sectorAlignment))
-          restoreSectorAlignment(sectorAlignment);
+        if (!checkSectorAlignment(sectorAlignment)) {
+          if (oldAlignment != NULL) {
+            oldSectorAlignment = oldAlignment->getSectorAlignment(sector);
+            if (oldSectorAlignment == NULL)
+              B2FATAL("Incomplete alignment data.");
+          } else
+            oldSectorAlignment = NULL;
+          restoreSectorAlignment(sectorAlignment, oldSectorAlignment);
+        }
         for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
           for (iSegment = 1; iSegment <= m_GeoDat->getNSegments(); iSegment++) {
             segment = m_GeoDat->segmentNumber(iEndcap, iLayer, iSector, iPlane,
@@ -326,7 +349,14 @@ void EKLM::AlignmentChecker::restoreAlignment(EKLMAlignment* alignment) const
               B2FATAL("Incomplete alignment data.");
             if (!checkSegmentAlignment(iPlane, iSegment, sectorAlignment,
                                        segmentAlignment)) {
-              restoreSegmentAlignment(segmentAlignment);
+              if (oldAlignment != NULL) {
+                oldSegmentAlignment =
+                  oldAlignment->getSegmentAlignment(segment);
+                if (oldSegmentAlignment == NULL)
+                  B2FATAL("Incomplete alignment data.");
+              } else
+                oldSegmentAlignment = NULL;
+              restoreSegmentAlignment(segmentAlignment, oldSegmentAlignment);
             }
           }
         }

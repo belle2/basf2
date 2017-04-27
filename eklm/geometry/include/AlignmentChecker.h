@@ -77,22 +77,27 @@ namespace Belle2 {
 
       /**
        * Restore sector alignment.
-       * @param[in] sectorAlignment Sector alignment.
-       * @return true Alignment is correct (no overlaps).
+       * @param[in] sectorAlignment    Sector alignment.
+       * @param[in] oldSectorAlignment Old sector alignment.
        */
-      void restoreSectorAlignment(EKLMAlignmentData* sectorAlignment) const;
+      void restoreSectorAlignment(EKLMAlignmentData* sectorAlignment,
+                                  EKLMAlignmentData* oldSectorAlignment) const;
 
       /**
        * Restore segment alignment.
-       * @param[in] segmentAlignment Segment alignment.
-       * @return true Alignment is correct (no overlaps).
+       * @param[in] segmentAlignment    Segment alignment.
+       * @param[in] oldSegmentAlignment Old segment alignment.
        */
-      void restoreSegmentAlignment(EKLMAlignmentData* segmentAlignment) const;
+      void restoreSegmentAlignment(EKLMAlignmentData* segmentAlignment,
+                                   EKLMAlignmentData* oldSegmentAlignment) const;
 
       /**
        * Restore alignment (check and move elements if there are overlaps).
+       * @param[in] alignment    Alignment to be checked.
+       * @param[in] oldAlignment Old alignment (if NULL, restores to zeros).
        */
-      void restoreAlignment(EKLMAlignment* alignment) const;
+      void restoreAlignment(EKLMAlignment* alignment,
+                            EKLMAlignment* oldAlignment) const;
 
     private:
 

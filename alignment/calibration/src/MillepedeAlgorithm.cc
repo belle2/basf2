@@ -252,7 +252,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   if (newEKLM.size() > 0) {
     EKLM::AlignmentChecker alignmentChecker(true);
     for (auto& eklm : newEKLM)
-      alignmentChecker.restoreAlignment(eklm.second);
+      alignmentChecker.restoreAlignment(eklm.second, previousEKLM[eklm.first]);
   }
 
   // Save (possibly updated) objects

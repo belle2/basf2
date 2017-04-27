@@ -20,17 +20,27 @@ namespace Belle2 {
     using SeedObject = RecoTrack;
     using HitObject = SpacePoint;
 
-    void initialize(RecoTrack* seed)
+    CKFCDCToVXDStateObject() = default;
+
+    CKFCDCToVXDStateObject(RecoTrack* seed)
     {
-      m_parent = nullptr;
       m_seedRecoTrack = seed;
-      m_layer = N;
 
       m_measuredStateOnPlane = seed->getMeasuredStateOnPlaneFromFirstHit();
       m_cachedMeasuredStateOnPlane = seed->getMeasuredStateOnPlaneFromFirstHit();
-
-      m_hasCache = false;
     }
+
+    CKFCDCToVXDStateObject(CKFCDCToVXDStateObject* parent, const SpacePoint* spacePoint)
+    {
+      m_parent = parent;
+      m_seedRecoTrack = parent->getSeedRecoTrack();
+      m_layer = parent->getLayer() - 1;
+      m_spacePoint = spacePoint;
+
+      m_measuredStateOnPlane = parent->getMeasuredStateOnPlane();
+      m_cachedMeasuredStateOnPlane = parent->getMeasuredStateOnPlane();
+    }
+
 
     std::pair<RecoTrack*, std::vector<const SpacePoint*>> finalize() const
     {
@@ -46,24 +56,6 @@ namespace Belle2 {
       walk(spacePointAdder);
 
       return std::make_pair(getSeedRecoTrack(), spacePoints);
-    }
-
-    // Important: set all values here!
-    void buildFrom(CKFCDCToVXDStateObject* parent, const SpacePoint* spacePoint)
-    {
-      m_parent = parent;
-      m_seedRecoTrack = parent->getSeedRecoTrack();
-      m_layer = parent->getLayer() - 1;
-      m_spacePoint = spacePoint;
-
-      m_measuredStateOnPlane = parent->getMeasuredStateOnPlane();
-      m_cachedMeasuredStateOnPlane = parent->getMeasuredStateOnPlane();
-      m_hasCache = false;
-
-      m_isFitted = false;
-      m_isAdvanced = false;
-
-      m_chi2 = 0;
     }
 
     // const Getters

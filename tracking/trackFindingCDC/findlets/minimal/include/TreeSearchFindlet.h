@@ -67,7 +67,7 @@ namespace Belle2 {
         {
           initializeSeedCache(seed);
 
-          m_states.front().initialize(seed);
+          m_states.front() = AStateObject(seed);
           traverseTree(m_states.begin(), results);
         }
       }
@@ -116,7 +116,7 @@ namespace Belle2 {
         }
 
         for (const auto& hit : matchingHits) {
-          nextState->buildFrom(currentState, hit);
+          *nextState = AStateObject(currentState, hit);
 
           if (useResult(nextState)) {
             traverseTree(nextState, resultsVector);
@@ -124,7 +124,7 @@ namespace Belle2 {
         }
 
         if (m_param_makeHitJumpingPossible) {
-          nextState->buildFrom(currentState, nullptr);
+          *nextState = AStateObject(currentState, nullptr);
 
           if (useResult(nextState)) {
             traverseTree(nextState, resultsVector);

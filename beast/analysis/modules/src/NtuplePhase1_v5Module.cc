@@ -1304,13 +1304,24 @@ namespace Belle2 {
       //if (TMath::IsNaN(BG)) BG = 0;
       m_beast.BGO_energy.push_back(BG + To);
     }
-
+    int he3order[4];
+    if (m_beast.ts > 1464868800) {
+      he3order[0] = 0;
+      he3order[1] = 3;
+      he3order[2] = 2;
+      he3order[3] = 1;
+    } else {
+      he3order[0] = 0;
+      he3order[1] = 1;
+      he3order[2] = 2;
+      he3order[3] = 3;
+    }
     //Scale HE3
     for (int i = 0; i < (int)m_input_LT_HE3_rate.size(); i++) {
-      double LBG = m_input_LB_HE3_rate_av[i] + m_input_LC_HE3_rate_av[i];
-      double HBG = m_input_HB_HE3_rate_av[i] + m_input_HC_HE3_rate_av[i];
+      double LBG = m_input_LB_HE3_rate_av[he3order[i]] + m_input_LC_HE3_rate_av[he3order[i]];
+      double HBG = m_input_HB_HE3_rate_av[he3order[i]] + m_input_HC_HE3_rate_av[he3order[i]];
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
-      double To = ScaleFacTo_LER * m_input_LT_HE3_rate[i] + ScaleFacTo_HER * m_input_HT_HE3_rate[i];
+      double To = ScaleFacTo_LER * m_input_LT_HE3_rate[he3order[i]] + ScaleFacTo_HER * m_input_HT_HE3_rate[he3order[i]];
       //if (TMath::IsNaN(To)) To = 0;
       //if (TMath::IsNaN(BG)) BG = 0;
       m_beast.HE3_rate_av.push_back(BG + To);
@@ -1318,8 +1329,8 @@ namespace Belle2 {
       for (int j = 0; j < 12; j++) {
         LBG = 0; HBG = 0;
         if (m_input_LB_HE3_rate[j].size() > 0) {
-          LBG = m_input_LB_HE3_rate[j][i] + m_input_LC_HE3_rate[j][i];
-          HBG = m_input_HB_HE3_rate[j][i] + m_input_HC_HE3_rate[j][i];
+          LBG = m_input_LB_HE3_rate[j][he3order[i]] + m_input_LC_HE3_rate[j][he3order[i]];
+          HBG = m_input_HB_HE3_rate[j][he3order[i]] + m_input_HC_HE3_rate[j][he3order[i]];
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }

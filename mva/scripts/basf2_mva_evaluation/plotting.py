@@ -656,6 +656,10 @@ class Difference(Plotter):
     #: min y value
     #: @var x_axis_label
     #: Label on x axis
+    #: @var normed
+    #: Minuend and subtrahend are normed before comparing them if this is true
+    #: @var shift_to_zero
+    #: Mean difference is shifted to zero (removes constant offset) if this is true
 
     def __init__(self, figure=None, axis=None, normed=False, shift_to_zero=False):
         """

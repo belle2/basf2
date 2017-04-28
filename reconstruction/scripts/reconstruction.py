@@ -261,9 +261,6 @@ def add_cluster_expert_modules(path, components=None):
         ECLClassifier = register_module('ECLExpert')
         path.add_module(ECLClassifier)
 
-        ClusterMatcher = register_module('ClusterMatcher')
-        path.add_module(ClusterMatcher)
-
 
 def add_pid_module(path, components=None):
     """

@@ -44,8 +44,7 @@ class Basf2CalculationProcess(CalculationProcess):
             created_path.add_module(python_modules.ProgressPython(self.progress_queue_remote))
 
             # Add the print collections python module
-            # FIXME: Disabled because of performance reasons
-            # created_path.add_module(python_modules.PrintCollections(self.result_queue))
+            created_path.add_module(python_modules.PrintCollections(self.result_queue))
 
             self.path = created_path
 

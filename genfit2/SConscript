@@ -16,34 +16,8 @@ env['LIBS'] = ['$ROOT_LIBS', 'RaveBase', 'geometry', 'Geom', 'EG']
 # prevent cling c++11 warnins as genfit is c++03 compatible
 env.Append(CLINGFLAGS="-Wno-inconsistent-missing-override")
 
-# check for EVE (needed for eventDisplay)
-if env.get('HAS_TEVE', False):
-    env['LIBS'] += env['TEVE_LIBS']
-    dirs += ['eventDisplay']
-else:
-    print "Genfit's eventDisplay disabled, please recompile root with opengl "\
-        "support (on Debian/Ubuntu you'll probably only need to install "\
-        "libglu1-mesa-dev and rebuild)"
-
 # add genfit2 to include path
 env.Append(CPPPATH=os.path.join(env['INCDIR'], 'genfit'))
-
-# install header files
-includes = env.Install(os.path.join(env['INCDIR'], 'genfit'), Glob(os.path.join(src_dir, '*', 'include', '*.h')))
-env.Alias('genfit2', includes)
-
-# collect source files
-source_files = []
-for dir in dirs:
-    source_files.append([os.path.join(env['BUILDDIR'], 'genfit2', str(source_file))
-                         for source_file in Glob(os.path.join(src_dir, dir, 'src', '*.cc'))])
-
-# see if it found source files, since this is a list of lists, we have
-# to flatten it, following an example from the Python documentation
-# http://docs.python.org/2/tutorial/datastructures.html
-if len(Flatten(source_files)) == 0:
-    print "No genfit sources found.  Please check if svn up fills the genfit2/$src_dir subdirectory."
-    Exit(1)
 
 # builder for root dictionaries
 from root_dict import rootcling_generator
@@ -52,53 +26,85 @@ rootcint = Builder(generator=rootcling_generator, source_scanner=CScanner())
 env['BUILDERS']['RootCint'] = rootcint
 rootcint.action.cmdstr = '${ROOTCINTCOMSTR}'
 
-# generate, build, and collect dictionary files
-dict_files = []
-for dir in dirs:
-    linkdef_files = Glob(os.path.join(src_dir, dir, 'src', '*LinkDef.h'))
-    for linkdef_file in linkdef_files:
-        dict_filename = str(linkdef_file).replace(os.sep, '_')[:-9] + 'Dict.cc'
-        header_files = Glob(os.path.join(src_dir, dir, 'include', '*.h'))
-        if dir == 'core':
-            header_files += Glob(os.path.join(src_dir, 'finitePlanes', 'include', '*.h'))
-        elif dir == 'GBL':
-            header_files = [
-                os.path.join(src_dir, dir, 'include', 'GFGbl.h'),
-                os.path.join(src_dir, dir, 'include', 'GblFitter.h'),
-                os.path.join(src_dir, dir, 'include', 'GblFitterInfo.h'),
-                os.path.join(src_dir, dir, 'include', 'GblFitStatus.h'),
-                os.path.join(src_dir, dir, 'include', 'ICalibrationParametersDerivatives.h')
-            ]
-        elif dir == 'GFRave':
-            header_files = [
-                os.path.join(src_dir, dir, 'include', 'GFRaveVertex.h'),
-                os.path.join(src_dir, dir, 'include', 'GFRaveTrackParameters.h')
-            ]
-        header_files = [os.path.join(env['INCDIR'], 'genfit', os.path.basename(str(header_file)))
-                        for header_file in header_files]
-        dict_file = env.RootCint(os.path.join(env['BUILDDIR'], dict_filename), header_files + [linkdef_file])
-        dict_files.append(env.SharedObject(dict_file, CPPPATH=['#'] + env['CPPPATH']))
 
-        # install corresponding pcm file in lib (for cling)
-        pcm_path = str(dict_file[0])[:-3] + '_rdict.pcm'
-        pcm_name = os.path.basename(pcm_path)
-        pcm_target = env.InstallAs(os.path.join(env['LIBDIR'], pcm_name),
-                                   pcm_path)
+def create_dictionaries(dirs):
+    """generate, build, and collect dictionary files"""
+    dict_files = []
+    for dir in dirs:
+        linkdef_files = Glob(os.path.join(src_dir, dir, 'src', '*LinkDef.h'))
+        for linkdef_file in linkdef_files:
+            dict_filename = str(linkdef_file).replace(os.sep, '_')[:-9] + 'Dict.cc'
+            header_files = Glob(os.path.join(src_dir, dir, 'include', '*.h'))
+            if dir == 'core':
+                header_files += Glob(os.path.join(src_dir, 'finitePlanes', 'include', '*.h'))
+            elif dir == 'GBL':
+                header_files = [
+                    os.path.join(src_dir, dir, 'include', 'GFGbl.h'),
+                    os.path.join(src_dir, dir, 'include', 'GblFitter.h'),
+                    os.path.join(src_dir, dir, 'include', 'GblFitterInfo.h'),
+                    os.path.join(src_dir, dir, 'include', 'GblFitStatus.h'),
+                    os.path.join(src_dir, dir, 'include', 'ICalibrationParametersDerivatives.h')
+                ]
+            elif dir == 'GFRave':
+                header_files = [
+                    os.path.join(src_dir, dir, 'include', 'GFRaveVertex.h'),
+                    os.path.join(src_dir, dir, 'include', 'GFRaveTrackParameters.h')
+                ]
+            header_files = [os.path.join(env['INCDIR'], 'genfit', os.path.basename(str(header_file)))
+                            for header_file in header_files]
+            dict_file = env.RootCint(os.path.join(env['BUILDDIR'], dict_filename), header_files + [linkdef_file])
+            dict_files.append(env.SharedObject(dict_file, CPPPATH=['#'] + env['CPPPATH']))
 
-        # install corresponding rootmap files to support auto-loading of libraries
-        # once used via ROOT
-        rootmap_path = str(dict_file[0])[:-3] + '.rootmap'
-        rootmap_name = os.path.basename(rootmap_path)
-        rootmap_target = env.InstallAs(os.path.join(env['LIBDIR'], rootmap_name),
-                                       rootmap_path)
+            # install corresponding pcm file in lib (for cling)
+            pcm_path = str(dict_file[0])[:-3] + '_rdict.pcm'
+            pcm_name = os.path.basename(pcm_path)
+            pcm_target = env.InstallAs(os.path.join(env['LIBDIR'], pcm_name),
+                                       pcm_path)
 
-        # Ensure InstallAs() comes after the dictionary build
-        env.Depends(rootmap_path, dict_file)
-        env.Depends(pcm_path, dict_file)
+            # install corresponding rootmap files to support auto-loading of libraries
+            # once used via ROOT
+            rootmap_path = str(dict_file[0])[:-3] + '.rootmap'
+            rootmap_name = os.path.basename(rootmap_path)
+            rootmap_target = env.InstallAs(os.path.join(env['LIBDIR'], rootmap_name),
+                                           rootmap_path)
 
-# build library
-lib = env.SharedLibrary(os.path.join(env['LIBDIR'], 'libgenfit2.so'), [source_files, dict_files])
-env.Alias('genfit2', lib)
+            # Ensure InstallAs() comes after the dictionary build
+            env.Depends(rootmap_path, dict_file)
+            env.Depends(pcm_path, dict_file)
+
+    return dict_files
+
+
+def build_library(name, dirs, extra_libs=[]):
+    """build library"""
+    # collect source files and install header files
+    source_files = []
+    for dir in dirs:
+        includes = env.Install(os.path.join(env['INCDIR'], 'genfit'), Glob(os.path.join(src_dir, dir, 'include', '*.h')))
+        env.Alias('genfit2', includes)
+        source_files.append([os.path.join(env['BUILDDIR'], 'genfit2', str(source_file))
+                             for source_file in Glob(os.path.join(src_dir, dir, 'src', '*.cc'))])
+
+    # see if it found source files, since this is a list of lists, we have to
+    # flatten it
+    if len(Flatten(source_files)) == 0:
+        print "No genfit sources found.  Please check if svn up fills the genfit2/$src_dir subdirectory."
+        Exit(1)
+
+    dict_files = create_dictionaries(dirs)
+    lib = env.SharedLibrary(os.path.join(env['LIBDIR'], name), [source_files, dict_files], LIBS=extra_libs + env["LIBS"])
+    env.Alias('genfit2', lib)
+
+
+build_library("libgenfit2.so", dirs)
+
+# check for EVE (needed for eventDisplay) and if so create extra library
+if env.get('HAS_TEVE', False):
+    build_library("libgenfit2_eventDisplay.so", ["eventDisplay"], env["TEVE_LIBS"] + ["genfit2"])
+else:
+    print "Genfit's eventDisplay disabled, please recompile root with opengl "\
+        "support (on Debian/Ubuntu you'll probably only need to install "\
+        "libglu1-mesa-dev and rebuild)"
 
 
 env['CONTINUE'] = False

@@ -302,9 +302,10 @@ namespace Belle2 {
       float object;
       m_tree->SetBranchStatus("*", 0);
       m_tree->SetBranchStatus(branchName.c_str(), 1);
-      m_tree->SetBranchAddress(branchName.c_str(), &object);
+      TBranch* branch = m_tree->GetBranch(branchName.c_str());
+      branch->SetAddress(&object);
       for (int i = 0; i < nentries; ++i) {
-        m_tree->GetEvent(i);
+        branch->GetEntry(m_tree->LoadTree(i));
         values[i] = object;
       }
       m_tree->SetBranchStatus("*", 1);

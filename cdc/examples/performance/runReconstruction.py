@@ -41,8 +41,8 @@ def main(input, output):
 
     globalPhiRotation = getPhiRotation()
 
-    if os.path.exists(data_period) is False:
-        os.mkdir(data_period)
+    if os.path.exists('output') is False:
+        os.mkdir('output')
 
     # RootInput
     main_path.add_module('RootInput',
@@ -65,7 +65,7 @@ def main(input, output):
     add_cdc_cr_reconstruction(main_path, eventTimingExtraction=False)
 
     # Simple analysi module.
-    output = "/".join([data_period, output])
+    output = "/".join(['output', output])
     main_path.add_module('CDCCosmicAnalysis',
                          Output=output)
 

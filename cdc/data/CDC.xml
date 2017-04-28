@@ -67,8 +67,8 @@
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
         <Offset desc="wire offset in phi direction at endplate">0.5</Offset>
-        <BwdDeltaZ desc="distance betw. endplate (gas side) and bush inside feedthrough" unit="mm">12.8</BwdDeltaZ>
-        <FwdDeltaZ desc="distance betw. endplate (gas side) and bush inside feedthrough" unit="mm">28.2</FwdDeltaZ>
+        <BwdDeltaZ desc="distance betw. endplate (gas side) and bush inside feedthrough" unit="mm">11.8</BwdDeltaZ>
+        <FwdDeltaZ desc="distance betw. endplate (gas side) and bush inside feedthrough" unit="mm">27.2</FwdDeltaZ>
       </SLayer>
       <SLayer id="1">
         <Radius desc="Radius of wires in this layer" unit="mm">178</Radius>

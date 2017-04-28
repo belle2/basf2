@@ -98,9 +98,9 @@ namespace Belle2 {
       }
 
       FastBDT::EventSample eventSample(numberOfEvents, numberOfFeatures, nBinningLevels);
+      std::vector<unsigned int> bins(numberOfFeatures);
       for (unsigned int iEvent = 0; iEvent < numberOfEvents; ++iEvent) {
         training_data.loadEvent(iEvent);
-        std::vector<unsigned int> bins(numberOfFeatures);
         for (unsigned int iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
           bins[iFeature] = featureBinnings[iFeature].ValueToBin(training_data.m_input[iFeature]);
         }

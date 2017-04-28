@@ -289,7 +289,7 @@ namespace Belle2 {
 
     void ROOTDataset::loadEvent(unsigned int event)
     {
-      m_tree->GetEvent(event, 1);
+      m_tree->GetEvent(event, 0);
       m_isSignal = std::lround(m_target) == m_general_options.m_signal_class;
     }
 
@@ -300,16 +300,14 @@ namespace Belle2 {
       std::vector<float> values(nentries);
 
       float object;
-      m_tree->SetBranchStatus("*", 0);
-      m_tree->SetBranchStatus(branchName.c_str(), 1);
       TBranch* branch = m_tree->GetBranch(branchName.c_str());
       branch->SetAddress(&object);
       for (int i = 0; i < nentries; ++i) {
         branch->GetEntry(m_tree->LoadTree(i));
         values[i] = object;
       }
-      m_tree->SetBranchStatus("*", 1);
-      setBranchAddresses();
+      // Reset branch to correct input address, just to be sure
+      m_tree->SetBranchAddress(branchName.c_str(), &m_input[iFeature]);
       return values;
     }
 
@@ -320,15 +318,14 @@ namespace Belle2 {
       std::vector<float> values(nentries);
 
       float object;
-      m_tree->SetBranchStatus("*", 0);
-      m_tree->SetBranchStatus(branchName.c_str(), 1);
-      m_tree->SetBranchAddress(branchName.c_str(), &object);
+      TBranch* branch = m_tree->GetBranch(branchName.c_str());
+      branch->SetAddress(&object);
       for (int i = 0; i < nentries; ++i) {
-        m_tree->GetEvent(i);
+        branch->GetEntry(m_tree->LoadTree(i));
         values[i] = object;
       }
-      m_tree->SetBranchStatus("*", 1);
-      setBranchAddresses();
+      // Reset branch to correct input address, just to be sure
+      m_tree->SetBranchAddress(branchName.c_str(), &m_spectators[iSpectator]);
       return values;
     }
 
@@ -347,8 +344,12 @@ namespace Belle2 {
 
     void ROOTDataset::setBranchAddresses()
     {
+      // Deactivate all branches by default
+      m_tree->SetBranchStatus("*", 0);
+
       if (m_general_options.m_weight_variable == "__weight__") {
         if (checkForBranch(m_tree, "__weight__")) {
+          m_tree->SetBranchStatus("__weight__", 1);
           m_tree->SetBranchAddress("__weight__", &m_weight);
         } else {
           B2INFO("Couldn't find default weight feature named __weight__, all weights will be 1. Consider setting the weight variable to an empty string if you don't need it.");
@@ -356,9 +357,11 @@ namespace Belle2 {
         }
       } else if (not m_general_options.m_weight_variable.empty()) {
         if (checkForBranch(m_tree, m_general_options.m_weight_variable)) {
+          m_tree->SetBranchStatus(m_general_options.m_weight_variable.c_str(), 1);
           m_tree->SetBranchAddress(m_general_options.m_weight_variable.c_str(), &m_weight);
         } else {
           if (checkForBranch(m_tree, Belle2::makeROOTCompatible(m_general_options.m_weight_variable))) {
+            m_tree->SetBranchStatus(Belle2::makeROOTCompatible(m_general_options.m_weight_variable).c_str(), 1);
             m_tree->SetBranchAddress(Belle2::makeROOTCompatible(m_general_options.m_weight_variable).c_str(), &m_weight);
           } else {
             B2ERROR("Couldn't find given weight variable named " << m_general_options.m_weight_variable <<
@@ -371,9 +374,11 @@ namespace Belle2 {
 
       if (not m_general_options.m_target_variable.empty()) {
         if (checkForBranch(m_tree, m_general_options.m_target_variable)) {
+          m_tree->SetBranchStatus(m_general_options.m_target_variable.c_str(), 1);
           m_tree->SetBranchAddress(m_general_options.m_target_variable.c_str(), &m_target);
         } else {
           if (checkForBranch(m_tree, Belle2::makeROOTCompatible(m_general_options.m_target_variable))) {
+            m_tree->SetBranchStatus(Belle2::makeROOTCompatible(m_general_options.m_target_variable).c_str(), 1);
             m_tree->SetBranchAddress(Belle2::makeROOTCompatible(m_general_options.m_target_variable).c_str(), &m_target);
           } else {
             B2ERROR("Couldn't find given target variable named " << m_general_options.m_target_variable <<
@@ -386,9 +391,11 @@ namespace Belle2 {
 
       for (unsigned int i = 0; i < m_general_options.m_variables.size(); ++i)
         if (checkForBranch(m_tree, m_general_options.m_variables[i])) {
+          m_tree->SetBranchStatus(m_general_options.m_variables[i].c_str(), 1);
           m_tree->SetBranchAddress(m_general_options.m_variables[i].c_str(), &m_input[i]);
         } else {
           if (checkForBranch(m_tree, Belle2::makeROOTCompatible(m_general_options.m_variables[i]))) {
+            m_tree->SetBranchStatus(Belle2::makeROOTCompatible(m_general_options.m_variables[i]).c_str(), 1);
             m_tree->SetBranchAddress(Belle2::makeROOTCompatible(m_general_options.m_variables[i]).c_str(), &m_input[i]);
           } else {
             B2ERROR("Couldn't find given feature variable named " << m_general_options.m_variables[i] <<
@@ -400,9 +407,11 @@ namespace Belle2 {
 
       for (unsigned int i = 0; i < m_general_options.m_spectators.size(); ++i)
         if (checkForBranch(m_tree, m_general_options.m_spectators[i])) {
+          m_tree->SetBranchStatus(m_general_options.m_spectators[i].c_str(), 1);
           m_tree->SetBranchAddress(m_general_options.m_spectators[i].c_str(), &m_spectators[i]);
         } else {
           if (checkForBranch(m_tree, Belle2::makeROOTCompatible(m_general_options.m_spectators[i]))) {
+            m_tree->SetBranchStatus(Belle2::makeROOTCompatible(m_general_options.m_spectators[i]).c_str(), 1);
             m_tree->SetBranchAddress(Belle2::makeROOTCompatible(m_general_options.m_spectators[i]).c_str(), &m_spectators[i]);
           } else {
             B2ERROR("Couldn't find given spectator variable named " << m_general_options.m_spectators[i] <<

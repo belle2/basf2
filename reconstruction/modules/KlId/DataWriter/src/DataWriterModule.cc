@@ -206,7 +206,7 @@ void DataWriterModule::event()
 
     // use genfit to find nearest track by extrapolation
     tuple<RecoTrack*, double, std::unique_ptr<const TVector3>> closestTrackAndDistance
-                                                            = findClosestTrack(clusterPos, 30);
+                                                            = findClosestTrack(clusterPos, 0.26);
     m_KLMtrackDist = get<1>(closestTrackAndDistance);
     const TVector3* poca = get<2>(closestTrackAndDistance).get();
 
@@ -249,7 +249,7 @@ void DataWriterModule::event()
     m_isBeamBKG = mcParticleIsBeamBKG(part);
     m_ECLTruth = mcParticleIsKlong(part);
 
-    tuple<RecoTrack*, double, std::unique_ptr<const TVector3>> closestTrackAndDistance = findClosestTrack(clusterPos, 30);
+    tuple<RecoTrack*, double, std::unique_ptr<const TVector3>> closestTrackAndDistance = findClosestTrack(clusterPos, .26);
     m_ECLtrackDist = get<1>(closestTrackAndDistance);
 
     m_treeECL -> Fill();

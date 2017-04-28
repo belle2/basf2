@@ -123,9 +123,10 @@ void ECLExpertModule::event()
 
     const TVector3& clusterPos = cluster.getClusterPosition();
 
-    //find closest track
-    tuple<RecoTrack*, double, std::unique_ptr<const TVector3>> closestTrackAndDistance = findClosestTrack(clusterPos);
-    m_ECLtrackDist = get<1>(closestTrackAndDistance);
+    // find closest track
+    // obsolete and slow. just kept for future toying.
+    //  tuple<RecoTrack*, double, std::unique_ptr<const TVector3>> closestTrackAndDistance = findClosestTrack(clusterPos);
+    //m_ECLtrackDist = get<1>(closestTrackAndDistance);
 
 
     m_feature_variables[0] = m_ECLE;

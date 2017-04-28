@@ -118,7 +118,8 @@ namespace KlIdHelpers {
 
 
   /** find nearest genfit track and return it and its distance  */
-  std::tuple<Belle2::RecoTrack*, double, std::unique_ptr<const TVector3> > findClosestTrack(const TVector3& clusterPosition)
+  std::tuple<Belle2::RecoTrack*, double, std::unique_ptr<const TVector3> > findClosestTrack(const TVector3& clusterPosition,
+      float cutAngle)
   {
     Belle2::StoreArray<Belle2::RecoTrack> genfitTracks;
     double oldDistance = INFINITY;
@@ -127,22 +128,32 @@ namespace KlIdHelpers {
 
 
     for (Belle2::RecoTrack& track : genfitTracks) {
+
+
+
       try {
         genfit::MeasuredStateOnPlane state;
-        state = track.getMeasuredStateOnPlaneFromLastHit();
-        state.extrapolateToPoint(clusterPosition);
-        const TVector3& trackPos = state.getPos();
+        genfit::MeasuredStateOnPlane state_for_cut;
+        state_for_cut = track.getMeasuredStateOnPlaneFromFirstHit();
 
-        const TVector3& distanceVecCluster = clusterPosition - trackPos;
-        double newDistance = distanceVecCluster.Mag2();
+        // only use tracks that are close cos the extrapolation takes ages
+        if (clusterPosition.Angle(state_for_cut.getPos()) < cutAngle) {
 
-        // overwrite old distance
-        if (newDistance < oldDistance) {
-          oldDistance = newDistance;
-          closestTrack = &track;
-          poca = trackPos;
+
+          state = track.getMeasuredStateOnPlaneFromLastHit();
+          state.extrapolateToPoint(clusterPosition);
+          const TVector3& trackPos = state.getPos();
+
+          const TVector3& distanceVecCluster = clusterPosition - trackPos;
+          double newDistance = distanceVecCluster.Mag2();
+
+          // overwrite old distance
+          if (newDistance < oldDistance) {
+            oldDistance = newDistance;
+            closestTrack = &track;
+            poca = trackPos;
+          }
         }
-
       } catch (genfit::Exception& e) {
       }// try
     }// for gftrack

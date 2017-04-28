@@ -90,6 +90,10 @@ void StoreArrayMerger::apply(const std::vector<std::pair<RecoTrack*, std::vector
     RecoTrack* cdcRecoTrack = cdcTrackWithMatchedSpacePoints.first;
     const std::vector<const SpacePoint*> matchedSpacePoints = cdcTrackWithMatchedSpacePoints.second;
 
+    if (matchedSpacePoints.empty()) {
+      continue;
+    }
+
     TVector3 cdcPosition;
     TVector3 cdcMomentum;
     int cdcCharge;

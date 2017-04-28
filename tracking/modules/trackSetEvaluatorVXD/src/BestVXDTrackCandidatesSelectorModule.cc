@@ -69,15 +69,16 @@ void BestVXDTrackCandidatesSelectorModule::copyCandidates()
   const unsigned int nTracks = m_spacePointTrackCands.getEntries();
   if (nTracks > m_subsetSize) {
     // sort by highest -> lowest quality index
-    std::vector<SpacePointTrackCand> sortedTrackCands(m_spacePointTrackCands.begin(), m_spacePointTrackCands.end());
+    std::vector<int> sortedTrackCandIndices(nTracks);
+    std::iota(sortedTrackCandIndices.begin(), sortedTrackCandIndices.end(), 0);
 
-    std::sort(sortedTrackCands.begin(), sortedTrackCands.end(),
-    [](const SpacePointTrackCand & lhs, const SpacePointTrackCand & rhs) {
-      return lhs.getQualityIndex() > rhs.getQualityIndex();
+    std::sort(sortedTrackCandIndices.begin(), sortedTrackCandIndices.end(),
+    [this](const int lhs, const int rhs) {
+      return this->m_spacePointTrackCands[lhs]->getQualityIndex() > this->m_spacePointTrackCands[rhs]->getQualityIndex();
     });
     for (unsigned int iCand = 0; iCand < m_subsetSize; ++iCand) {
-      SpacePointTrackCand sptc = sortedTrackCands.at(iCand);
-      m_newSpacePointTrackCands.appendNew(sptc);
+      SpacePointTrackCand* sptc = m_spacePointTrackCands[sortedTrackCandIndices.at(iCand)];
+      m_newSpacePointTrackCands.appendNew(*(sptc));
     }
   } else {
     for (SpacePointTrackCand sptc : m_spacePointTrackCands) {

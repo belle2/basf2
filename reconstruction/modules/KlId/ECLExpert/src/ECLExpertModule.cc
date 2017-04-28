@@ -117,7 +117,7 @@ void ECLExpertModule::event()
   for (ECLCluster& cluster : eclClusters) {
 
     // just go thru as kl reconstructed clusters
-    //TODO if(cluster.getHypothesisId() !=5 or 6 ??){continue;}
+    if (cluster.getHypothesisId() != 6) {continue;}
 
 
     // get various ECLCluster vars from getters

@@ -48,7 +48,7 @@
 	<Rmax unit="mm">1140.0</Rmax>
       </ZBound>
       <ZBound id="5">
-        <Z unit="mm">672.1</Z>
+        <Z unit="mm">673.1</Z>
 	<Rmin unit="mm">160.0</Rmin>
 	<Rmax unit="mm">1140.0</Rmax>
       </ZBound>
@@ -1016,14 +1016,14 @@
           <Name>BackwardEndplate</Name>
           <InnerR desc="Inner radius" unit="mm">163</InnerR>
           <OuterR desc="Outer radius" unit="mm">166</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-322.1</BackwardZ>
+          <BackwardZ desc="Backward z position" unit="mm">-323.1</BackwardZ>
           <ForwardZ desc="Forward z position" unit="mm">-312.0</ForwardZ>
         </EndplateLayer>
         <EndplateLayer id="1">
           <Name>BackwardEndplate</Name>
           <InnerR desc="Inner radius" unit="mm">166</InnerR>
           <OuterR desc="Outer radius" unit="mm">170</OuterR>
-          <BackwardZ desc="Backward z position" unit="mm">-322.1</BackwardZ>
+          <BackwardZ desc="Backward z position" unit="mm">-323.1</BackwardZ>
           <ForwardZ desc="Forward z position" unit="mm">-312.1</ForwardZ>
         </EndplateLayer>
         <EndplateLayer id="2">
@@ -1045,14 +1045,14 @@
           <InnerR desc="Inner radius" unit="mm">163</InnerR>
           <OuterR desc="Outer radius" unit="mm">166</OuterR>
           <BackwardZ desc="Backward z position" unit="mm">572.0</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">582.1</ForwardZ>
+          <ForwardZ desc="Forward z position" unit="mm">583.1</ForwardZ>
         </EndplateLayer>
         <EndplateLayer id="5">
           <Name>ForwardEndplate</Name>
           <InnerR desc="Inner radius" unit="mm">166</InnerR>
           <OuterR desc="Outer radius" unit="mm">170</OuterR>
           <BackwardZ desc="Backward z position" unit="mm">572.1</BackwardZ>
-          <ForwardZ desc="Forward z position" unit="mm">582.1</ForwardZ>
+          <ForwardZ desc="Forward z position" unit="mm">583.1</ForwardZ>
         </EndplateLayer>
         <EndplateLayer id="6">
           <Name>ForwardEndplate</Name>

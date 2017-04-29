@@ -188,7 +188,7 @@ namespace HandleRoot {
     terminateRoot(runMapTVectorD, eventMapTVectorD, trackMapTVectorD);
   }
 
-  void initializeBranches(std::string prefix, TFile* file, TTree** runTree, TTree** eventTree,
+  void initializeBranches(std::string& prefix, TFile* file, TTree** runTree, TTree** eventTree,
                           std::map<std::string, TVectorD*>& runMapTVectorD,
                           std::map<std::string, TVectorD*>& eventMapTVectorD,
                           std::map<std::string, TClonesArray*>& trackMapTVectorD
@@ -223,7 +223,7 @@ namespace HandleRoot {
     }
   }
 
-  void initializeBranches(std::string prefix, TFile* file, TTree** runTree, TTree** eventTree,
+  void initializeBranches(std::string& prefix, TFile* file, TTree** runTree, TTree** eventTree,
                           std::map<std::string, TVectorD*>& runMapTVectorD,
                           std::map<std::string, TClonesArray*>& trackMapTVectorD
                          )
@@ -257,7 +257,7 @@ namespace HandleRoot {
     }
   }
 
-  void getEventValues(std::string prefix,
+  void getEventValues(std::string& prefix,
                       std::map<std::string, TVectorD*>& eventMapTVectorD,
                       std::map<std::string, double>& eventMapD, std::map<std::string, std::vector<double> >& eventMapV
                      )
@@ -280,7 +280,7 @@ namespace HandleRoot {
     }
   }
 
-  void getTrackValues(std::string prefix, int iTrack,
+  void getTrackValues(std::string& prefix, int iTrack,
                       std::map<std::string, TClonesArray*>& trackMapTVectorD,
                       std::map<std::string, double>& trackMapD, std::map<std::string, std::vector<double> >& trackMapV
                      )

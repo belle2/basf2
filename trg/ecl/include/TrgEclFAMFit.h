@@ -51,9 +51,11 @@ namespace Belle2 {
     /** Set Beam Background Tag */
     void SetBeamBkgTag();
 
-
+    //! Get TC Energy
     std::vector<std::vector<double>>  GetFitEnergy() {return TCFitEnergy;}
+    //! Get TC Timing
     std::vector<std::vector<double>>  GetFitTiming() {return TCFitTiming;}
+    //! Get Background Tag of TC Hit
     std::vector<std::vector<int>>  GetBeamBkgTag() {return BeamBkgTag;}
 
 
@@ -86,6 +88,7 @@ namespace Belle2 {
     std::vector<std::vector<double>> CoeffNoise32;
     /** Coeffisient of noise 3   */
     std::vector<std::vector<double>> CoeffNoise33;
+    /** TC Latency */
     std::vector<double>  TCLatency;
 
     /** Add beambkg */

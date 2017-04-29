@@ -671,6 +671,18 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
       }
     }
+
+    auto& firstref = eveTrack->RefPathMarks().front();
+    auto& lastref = eveTrack->RefPathMarks().back();
+    double f = firstref.fV.Distance(recTrack.fV);
+    double b = lastref.fV.Distance(recTrack.fV);
+    if (f > 100 and f > b) {
+      B2WARNING("Decay vertex is much closer to POCA than first vertex, reversing order of track points... (this is intended for cosmic tracks, if you see this message in other context it might indicate a problem)");
+      //last ref is better than first...
+      lastref.fType = TEvePathMarkD::kReference;
+      firstref.fType = TEvePathMarkD::kDecay;
+      std::reverse(eveTrack->RefPathMarks().begin(), eveTrack->RefPathMarks().end());
+    }
   }
   eveTrack->SetTitle(TString::Format("%s\n"
                                      "pruned: %s\n"

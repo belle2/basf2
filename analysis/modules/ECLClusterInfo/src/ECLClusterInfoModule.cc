@@ -36,7 +36,10 @@ REG_MODULE(ECLClusterInfo)
 ECLClusterInfoModule::ECLClusterInfoModule() : Module()
 {
   // Set module properties
-  setDescription("Creates an output root file which contains info from ECL clusters.");
+  setDescription("Creates an output root file which contains info from ECL clusters.\n"
+                 "Note that since release-00-08-00 multiple ECLClusters consisting of\n"
+                 "the same ECL crystals appear in the StoreArray. Use ConnecdtedRegionId,\n"
+                 "clusterID and hypothesis ID to separate them.");
 
   // Parameter definition
   addParam("outputFileName", m_fileName, "The name of the output .root file", string("ECLClusterInfo.root"));
@@ -45,6 +48,9 @@ ECLClusterInfoModule::ECLClusterInfoModule() : Module()
   // Initializing the rest of private memebers
   m_file = nullptr;
   m_tree = nullptr;
+  m_CRID = 0;
+  m_clusterID = 0;
+  m_hypothesisID = 0;
   m_E = 0;
   m_Theta = 0;
   m_Phi = 0;
@@ -103,6 +109,10 @@ void ECLClusterInfoModule::initialize()
 
   m_tree = new TTree(m_treeName.c_str(), "");
 
+  m_tree->Branch("Cluster_CRID",         &m_CRID,         "Cluster_CRID/I");
+  m_tree->Branch("Cluster_ClusterID",    &m_clusterID,    "Cluster_ClusterID/I");
+  m_tree->Branch("Cluster_HypothesisID", &m_hypothesisID, "Cluster_HypothesisID/I");
+
   m_tree->Branch("Cluster_E",        &m_E,        "Cluster_E/F");
   m_tree->Branch("Cluster_Theta",    &m_Theta,    "Cluster_Theta/F");
   m_tree->Branch("Cluster_Phi",      &m_Phi,      "Cluster_Phi/F");
@@ -143,6 +153,10 @@ void ECLClusterInfoModule::event()
   // Loop over existing ECLClusters in StoreArray
   for (int iECL = 0; iECL < eclClusters.getEntries(); iECL++) {
     const ECLCluster* ecl = eclClusters[iECL];
+
+    m_CRID         = ecl->getConnectedRegionId();
+    m_clusterID    = ecl->getClusterId();
+    m_hypothesisID = ecl->getHypothesisId();
 
     // Get ecl values
     m_E = ecl->getEnergy();

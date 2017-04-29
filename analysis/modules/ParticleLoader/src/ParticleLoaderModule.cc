@@ -416,6 +416,14 @@ namespace Belle2 {
       if (!cluster->isNeutral())
         continue;
 
+      // TODO: can we get hypothesis enumerator instead of hard coded values
+      if (cluster->getHypothesisId() != 5 && cluster->getHypothesisId() != 1)
+        continue;
+
+      // TODO: allow at some point
+      //cluster->getHypothesisId() != 3)
+
+
       // const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
       // ECLCluster can be matched to multiple MCParticles
       // order the relations by weights and set Particle -> multiple MCParticle relation

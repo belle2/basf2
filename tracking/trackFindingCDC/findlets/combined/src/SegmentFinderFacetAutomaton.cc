@@ -36,6 +36,11 @@ SegmentFinderFacetAutomaton::SegmentFinderFacetAutomaton()
   m_facetRelations.reserve(1000);
   m_segments.reserve(200);
   m_intermediateSegments.reserve(200);
+
+  ModuleParamList moduleParamList;
+  const std::string prefix = "";
+  this->exposeParameters(&moduleParamList, prefix);
+  moduleParamList.getParameter<std::string>("SegmentOrientation").setDefaultValue("curling");
 }
 
 std::string SegmentFinderFacetAutomaton::getDescription()
@@ -89,6 +94,7 @@ void SegmentFinderFacetAutomaton::apply(std::vector<CDCWireHit>& inputWireHits, 
   m_segmentFitter.apply(m_intermediateSegments);
 
   m_segmentAliasResolver.apply(m_intermediateSegments);
+  m_segmentFitter.apply(outputSegments);
 
   m_segmentLinker.apply(m_intermediateSegments, outputSegments);
   m_segmentFitter.apply(outputSegments);

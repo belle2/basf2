@@ -34,7 +34,8 @@ copyinc:
 	@ mkdir -p bin
 	@ mkdir -p lib
 	@ for dir in $(SUBPACKAGES); \
-	  do mkdir -p $(INCDIR)/$$dir; install -m 644 -p $$dir/include/* $(INCDIR)/$$dir; done
+	  do mkdir -p $(INCDIR)/$$dir; ln -fs ${PWD}/$$dir/include/* $(INCDIR)/$$dir; done
+#	  do mkdir -p $(INCDIR)/$$dir; install -m 644 -p $$dir/include/* $(INCDIR)/$$dir; done
 	@ mkdir -p include/nsm2
 	@ make nsmlib
 	@ mkdir -p include/mgt

@@ -149,11 +149,13 @@ namespace {
 
     tries.emplace_back(startValue, firstChi2);
 
+    double extracted_time = startValue;
+
     for (unsigned int i = 0; i < steps; i++) {
       // Extract the time for the next time step
       std::pair<double, double> extractedDerivativePair = extractChi2DerivativesHelper(recoTracks, fittableRecoTracks,
                                                           numberOfFittableRecoTracks);
-      const double extracted_time = extractedDerivativePair.first / extractedDerivativePair.second;
+      extracted_time += extractedDerivativePair.first / extractedDerivativePair.second;
 
       if (extracted_time > maximalT0 or extracted_time < minimalT0 or std::isnan(extracted_time)) {
         break;
@@ -161,7 +163,16 @@ namespace {
 
       // Apply this new extracted time and extract the chi^2
       setTimeAndFitTracks(extracted_time, recoTracksWithInitialValue, fittableRecoTracks, numberOfFittableRecoTracks);
+
+      if (numberOfFittableRecoTracks == 0) {
+        break;
+      }
+
       const double chi2 = extractChi2Helper(recoTracks, fittableRecoTracks, numberOfFittableRecoTracks);
+
+      if (chi2 > 10) {
+        break;
+      }
 
       // Decide if we are already finished or not depending on the extracted values.
       const bool finished = extractedDerivativePair.second > 2.7122 and chi2 < 1.739;

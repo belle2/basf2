@@ -40,16 +40,17 @@ void TrackCreatorSingleSegments::apply(const std::vector<CDCSegment2D>& segments
   // Create tracks from left over segments
   // First figure out which segments do not share any hits with any of the given tracks
   // (if the tracks vector is empty this is the case for all segments)
+  const bool toHits = true;
   for (const CDCSegment2D& segment : segments) {
-    segment.unsetAndForwardMaskedFlag();
+    segment.unsetAndForwardMaskedFlag(toHits);
   }
 
   for (const CDCTrack& track : tracks) {
-    track.unsetAndForwardMaskedFlag();
+    track.setAndForwardMaskedFlag();
   }
 
   for (const CDCSegment2D& segment : segments) {
-    segment.receiveMaskedFlag();
+    segment.receiveMaskedFlag(toHits);
   }
 
   if (not m_param_minimalHitsBySuperLayerId.empty()) {
@@ -62,9 +63,9 @@ void TrackCreatorSingleSegments::apply(const std::vector<CDCSegment2D>& segments
 
         if (segment.getTrajectory2D().isFitted()) {
           tracks.push_back(CDCTrack(segment));
-          segment.setAndForwardMaskedFlag();
+          segment.setAndForwardMaskedFlag(toHits);
           for (const CDCSegment2D& otherSegment : segments) {
-            otherSegment.receiveMaskedFlag();
+            otherSegment.receiveMaskedFlag(toHits);
           }
         }
       }

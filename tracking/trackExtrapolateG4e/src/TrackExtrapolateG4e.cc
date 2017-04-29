@@ -255,6 +255,14 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxDist
   // Store the address of the ExtManager (used later)
   m_ExtMgr = Simulation::ExtManager::GetManager();
 
+  // Set up the EXT-specific geometry
+  GearDir coilContent = GearDir("Detector/DetectorComponent[@name=\"COIL\"]/Content/");
+  double offsetZ = coilContent.getLength("OffsetZ") * CLHEP::cm;
+  double rMaxCoil = coilContent.getLength("Cryostat/Rmin") * CLHEP::cm;
+  double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
+  m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
+
+  // Set up the MUID-specific geometry
   bklm::GeometryPar* bklmGeometry = bklm::GeometryPar::instance();
   const EKLM::GeometryData& eklmGeometry = EKLM::GeometryData::Instance();
   m_MinRadiusSq = bklmGeometry->getSolenoidOuterRadius() * CLHEP::cm * 0.2; // roughly 400 mm
@@ -366,7 +374,7 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
   }
 }
 
-void TrackExtrapolateG4e::event(bool byMuid)
+void TrackExtrapolateG4e::eventExt(void)
 {
 
   // Put geant4 in proper state (in case this module is in a separate process)
@@ -375,38 +383,19 @@ void TrackExtrapolateG4e::event(bool byMuid)
   }
 
   std::vector<G4ThreeVector> clusterPositions;
-  if (byMuid) {
-    StoreArray<TrackClusterSeparation> trackClusterSeparations(*m_TrackClusterSeparationsColName);
-    StoreArray<KLMCluster> klmClusters(*m_KLMClustersColName);
-    // one-to-one indexing correlation among clusterPositions, klmClusters, and trackClusterSeparations
-    for (int c = 0; c < klmClusters.getEntries(); ++c) {
-      TrackClusterSeparation* trackClusterSeparation = trackClusterSeparations.appendNew(); // initializes to HUGE distance
-      klmClusters[c]->addRelationTo(trackClusterSeparation);
-      clusterPositions.push_back(G4ThreeVector(klmClusters[c]->getClusterPosition().X(),
-                                               klmClusters[c]->getClusterPosition().Y(),
-                                               klmClusters[c]->getClusterPosition().Z()) * CLHEP::cm);
-    }
-  }
 
   G4ThreeVector directionAtIP, positionG4e, momentumG4e;
   G4ErrorTrajErr covG4e(5, 0);
-  Simulation::ExtCylSurfaceTarget* target = (byMuid ? m_TargetMuid : m_TargetExt);
-  G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(target);
-
-  // Put geant4 in proper state (in case this module is in a separate process)
-  if (G4StateManager::GetStateManager()->GetCurrentState() == G4State_Idle) {
-    G4StateManager::GetStateManager()->SetNewState(G4State_GeomClosed);
-  }
+  G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
 
   // Loop over the reconstructed tracks
   // Do extrapolation for each hypothesis of each reconstructed track.
 
   unsigned int trackIndex = 0; // DEPRECATED - remove this
-  const std::vector<Const::ChargedStable>& hypotheses = (byMuid ? *m_HypothesesMuid : *m_HypothesesExt);
   StoreArray<Track> tracks(*m_TracksColName);
   for (auto& b2track : tracks) {
     RecoTrack* recoTrack = b2track.getRelatedTo<RecoTrack>();
-    for (const auto& hypothesis : hypotheses) {
+    for (const auto& hypothesis : *m_HypothesesExt) {
 
       // DIVOT: Use correct rep! Check, if really fitted! Which track representation do you want here?
       const genfit::AbsTrackRep* trackRep = recoTrack->getCardinalRepresentation();
@@ -422,14 +411,7 @@ void TrackExtrapolateG4e::event(bool byMuid)
       double tof = 0.0;
       getStartPoint(recoTrack, trackRep, pdgCode, directionAtIP, positionG4e, momentumG4e, covG4e, tof);
       if (momentumG4e.perp() <= m_MinPt) continue;
-      if (target->GetDistanceFromPoint(positionG4e) < 0.0) continue;
-      Muid* muid = NULL;
-      if (byMuid) {
-        StoreArray<Muid> muids(*m_MuidsColName);
-        muid = muids.appendNew(pdgCode); // rest of this object will be filled later
-        b2track.addRelationTo(muid);
-        muid->setMomentum(momentumG4e.x(), momentumG4e.y(), momentumG4e.z());
-      }
+      if (m_TargetExt->GetDistanceFromPoint(positionG4e) < 0.0) continue;
       bool isForward = (momentumG4e.z() > 0.0); // to distinguish forward/backward endcaps for muid
       G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode);
       string nameG4e = "g4e_" + particle->GetParticleName();
@@ -437,8 +419,8 @@ void TrackExtrapolateG4e::event(bool byMuid)
       double minPSq = (mass + m_MinKE) * (mass + m_MinKE) - mass * mass;
       G4ErrorFreeTrajState* g4eState = new G4ErrorFreeTrajState(nameG4e, positionG4e, momentumG4e, covG4e);
       ExtState extState = { pdgCode, g4eState, &b2track, isForward, tof, // for EXT and MUID
-                            0.0, 0, 0, 0, -1, -1, -1, -1, 0, 0, false
-                          }; // for MUID only
+                            0.0, 0, 0, 0, -1, -1, -1, -1, 0, 0, false    // for MUID only
+                          };
       m_ExtMgr->InitTrackPropagation();
       while (true) {
         const G4int errCode = m_ExtMgr->PropagateOneStep(g4eState);
@@ -449,52 +431,28 @@ void TrackExtrapolateG4e::event(bool byMuid)
         G4ThreeVector pos = track->GetPosition();
         G4ThreeVector mom = track->GetMomentum();
         // First step on this track?
-        if (!byMuid && (preStatus == fUndefined)) {
+        if (preStatus == fUndefined) {
           createExtHit(EXT_FIRST, extState);
         }
         // Ignore the zero-length step by PropagateOneStep() at each boundary
         if (step->GetStepLength() > 0.0) {
           if (preStatus == fGeomBoundary) {      // first step in this volume?
-            // KLM hits only for MUID, inner-detector hits only for EXT
-            if (byMuid != (m_TargetExt->GetDistanceFromPoint(pos) > 0.0)) { createExtHit(EXT_ENTER, extState); }
+            createExtHit(EXT_ENTER, extState);
           }
           extState.tof += step->GetDeltaTime();
           // Last step in this volume?
           if (postStatus == fGeomBoundary) {
-            // KLM hits only for MUID, inner-detector hits only for EXT
-            if (byMuid != (m_TargetExt->GetDistanceFromPoint(pos) > 0.0)) { createExtHit(EXT_EXIT, extState); }
-          }
-          if (byMuid) {
-            if (createMuidHit(extState)) {
-              // Force geant4e to update its G4Track from the Kalman-updated state
-              m_ExtMgr->GetPropagator()->SetStepN(0);
-            }
-            StoreArray<KLMCluster> klmClusters(*m_KLMClustersColName);
-            StoreArray<TrackClusterSeparation> trackClusterSeparations(*m_TrackClusterSeparationsColName);
-            for (int c = 0; c < trackClusterSeparations.getEntries(); ++c) {
-              G4ThreeVector clusterToTrack = clusterPositions[c] - pos;
-              double distance = clusterToTrack.mag();
-              if (clusterToTrack.mag() < trackClusterSeparations[c]->getDistance()) {
-                trackClusterSeparations[c]->setTrackIndex(trackIndex); // DEPRECATED - use Relation
-                trackClusterSeparations[c]->setDistance(distance);
-                G4ThreeVector dir(clusterToTrack.unit());
-                trackClusterSeparations[c]->setDirection(dir);
-                trackClusterSeparations[c]->setTrackClusterAngle(mom.angle(dir));
-                trackClusterSeparations[c]->setTrackClusterInitialSeparationAngle(clusterPositions[c].angle(directionAtIP));
-                trackClusterSeparations[c]->setTrackClusterSeparationAngle(clusterPositions[c].angle(mom));
-                trackClusterSeparations[c]->setTrackRotationAngle(mom.angle(directionAtIP));
-              }
-            }
+            createExtHit(EXT_EXIT, extState);
           }
         }
         // Post-step momentum too low?
         if (errCode || (mom.mag2() < minPSq)) {
-          if (!byMuid) { createExtHit(EXT_STOP, extState); }
+          createExtHit(EXT_STOP, extState);
           break;
         }
         // Detect escapes from the imaginary target cylinder.
-        if (target->GetDistanceFromPoint(pos) < 0.0) {
-          if (!byMuid) { createExtHit(EXT_ESCAPE, extState); }
+        if (m_TargetExt->GetDistanceFromPoint(pos) < 0.0) {
+          createExtHit(EXT_ESCAPE, extState);
           break;
         }
         // Stop extrapolating as soon as the track curls inward too much
@@ -507,24 +465,150 @@ void TrackExtrapolateG4e::event(bool byMuid)
 
       delete g4eState;
 
-      if (byMuid) {
-        finishTrack(extState, muid, charge);
-        // Find the matching KLMCluster(s)
-        StoreArray<KLMCluster> klmClusters(*m_KLMClustersColName);
-        StoreArray<TrackClusterSeparation> trackClusterSeparations(*m_TrackClusterSeparationsColName);
-        for (int c = 0; c < trackClusterSeparations.getEntries(); ++c) {
-          if (trackClusterSeparations[c]->getTrackIndex() == int(trackIndex)) {
-            if (positionG4e.angle(clusterPositions[c]) < m_MaxClusterTrackConeAngle) {
-              b2track.addRelationTo(klmClusters[c]);
-              break;
-            }
-          }
-        }
-      }
-
     } // hypothesis loop
     trackIndex++;
   } // track loop
+
+}
+
+void TrackExtrapolateG4e::eventMuid(void)
+{
+
+  // Put geant4 in proper state (in case this module is in a separate process)
+  if (G4StateManager::GetStateManager()->GetCurrentState() == G4State_Idle) {
+    G4StateManager::GetStateManager()->SetNewState(G4State_GeomClosed);
+  }
+
+  StoreArray<Muid> muids(*m_MuidsColName);
+  std::vector<G4ThreeVector> clusterPositions;
+  StoreArray<TrackClusterSeparation> trackClusterSeparations(*m_TrackClusterSeparationsColName);
+  StoreArray<KLMCluster> klmClusters(*m_KLMClustersColName);
+  // one-to-one indexing correlation among clusterPositions, klmClusters, and trackClusterSeparations
+  for (int c = 0; c < klmClusters.getEntries(); ++c) {
+    TrackClusterSeparation* trackClusterSeparation = trackClusterSeparations.appendNew(); // initializes to HUGE distance
+    klmClusters[c]->addRelationTo(trackClusterSeparation);
+    clusterPositions.push_back(G4ThreeVector(klmClusters[c]->getClusterPosition().X(),
+                                             klmClusters[c]->getClusterPosition().Y(),
+                                             klmClusters[c]->getClusterPosition().Z()) * CLHEP::cm);
+  }
+  std::vector<Track*> matchedTrackCluster(klmClusters.getEntries(), NULL);
+
+  G4ThreeVector directionAtIP, positionG4e, momentumG4e;
+  G4ErrorTrajErr covG4e(5, 0);
+  G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetMuid);
+
+  // Loop over the reconstructed tracks
+  // Do extrapolation for each hypothesis of each reconstructed track.
+
+  // unsigned int trackIndex = 0; // DEPRECATED - remove this
+  StoreArray<Track> tracks(*m_TracksColName);
+  for (auto& b2track : tracks) {
+    RecoTrack* recoTrack = b2track.getRelatedTo<RecoTrack>();
+    for (const auto& hypothesis : *m_HypothesesMuid) {
+
+      // DIVOT: Use correct rep! Check, if really fitted! Which track representation do you want here?
+      const genfit::AbsTrackRep* trackRep = recoTrack->getCardinalRepresentation();
+
+      int charge = int(recoTrack->getTrackFitStatus(trackRep)->getCharge());
+      int pdgCode = hypothesis.getPDGCode() * charge;
+      if (hypothesis == Const::electron || hypothesis == Const::muon) pdgCode = -pdgCode;
+      if (pdgCode == 0) {
+        B2WARNING("Skipping track. PDGCode " << pdgCode << " is zero, probably because charge was zero (charge=" << charge << ").");
+        continue;
+      }
+
+      double tof = 0.0;
+      getStartPoint(recoTrack, trackRep, pdgCode, directionAtIP, positionG4e, momentumG4e, covG4e, tof);
+      if (momentumG4e.perp() <= m_MinPt) continue;
+      if (m_TargetMuid->GetDistanceFromPoint(positionG4e) < 0.0) continue;
+      std::vector<double> initialSeparationAngle(klmClusters.getEntries(), 0.0);
+      for (int c = 0; c < klmClusters.getEntries(); ++c) {
+        initialSeparationAngle[c] = clusterPositions[c].angle(directionAtIP);
+      }
+      Muid* muid = muids.appendNew(pdgCode); // rest of this object will be filled later
+      b2track.addRelationTo(muid);
+      muid->setMomentum(momentumG4e.x(), momentumG4e.y(), momentumG4e.z());
+      bool isForward = (momentumG4e.z() > 0.0); // to distinguish forward/backward endcaps for muid
+      G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle(pdgCode);
+      string nameG4e = "g4e_" + particle->GetParticleName();
+      double mass = particle->GetPDGMass();
+      double minPSq = (mass + m_MinKE) * (mass + m_MinKE) - mass * mass;
+      G4ErrorFreeTrajState* g4eState = new G4ErrorFreeTrajState(nameG4e, positionG4e, momentumG4e, covG4e);
+      ExtState extState = { pdgCode, g4eState, &b2track, isForward, tof, // for EXT and MUID
+                            0.0, 0, 0, 0, -1, -1, -1, -1, 0, 0, false    // for MUID only
+                          };
+      m_ExtMgr->InitTrackPropagation();
+      while (true) {
+        const G4int errCode = m_ExtMgr->PropagateOneStep(g4eState);
+        G4Track*       track      = g4eState->GetG4Track();
+        const G4Step*  step       = track->GetStep();
+        const G4int    preStatus  = step->GetPreStepPoint()->GetStepStatus();
+        const G4int    postStatus = step->GetPostStepPoint()->GetStepStatus();
+        G4ThreeVector pos = track->GetPosition();
+        G4ThreeVector mom = track->GetMomentum();
+        // First step on this track?
+        // Ignore the zero-length step by PropagateOneStep() at each boundary
+        if (step->GetStepLength() > 0.0) {
+          if (preStatus == fGeomBoundary) {      // first step in this volume?
+            if (m_TargetExt->GetDistanceFromPoint(pos) < 0.0) { createExtHit(EXT_ENTER, extState); }
+          }
+          extState.tof += step->GetDeltaTime();
+          // Last step in this volume?
+          if (postStatus == fGeomBoundary) {
+            // KLM ext hits only for MUID
+            if (m_TargetExt->GetDistanceFromPoint(pos) < 0.0) { createExtHit(EXT_EXIT, extState); }
+          }
+          if (createMuidHit(extState)) {
+            // Force geant4e to update its G4Track from the Kalman-updated state
+            m_ExtMgr->GetPropagator()->SetStepN(0);
+          }
+          for (int c = 0; c < trackClusterSeparations.getEntries(); ++c) {
+            if (initialSeparationAngle[c] < m_MaxClusterTrackConeAngle) {
+              G4ThreeVector clusterToTrack = clusterPositions[c] - pos;
+              double distance = clusterToTrack.mag();
+              if (clusterToTrack.mag() < trackClusterSeparations[c]->getDistance()) {
+                matchedTrackCluster[c] = &b2track;
+                trackClusterSeparations[c]->setDistance(distance);
+                trackClusterSeparations[c]->setTrackClusterAngle(mom.angle(clusterToTrack));
+                trackClusterSeparations[c]->setTrackClusterInitialSeparationAngle(initialSeparationAngle[c]);
+                trackClusterSeparations[c]->setTrackClusterSeparationAngle(clusterPositions[c].angle(mom));
+                trackClusterSeparations[c]->setTrackRotationAngle(mom.angle(directionAtIP));
+              }
+            }
+          }
+        }
+        // Post-step momentum too low?
+        if (errCode || (mom.mag2() < minPSq)) {
+          break;
+        }
+        // Detect escapes from the imaginary target cylinder.
+        if (m_TargetMuid->GetDistanceFromPoint(pos) < 0.0) {
+          break;
+        }
+        // Stop extrapolating as soon as the track curls inward too much
+        if (pos.perp2() < m_MinRadiusSq) {
+          break;
+        }
+      } // track-extrapolation "infinite" loop
+
+      m_ExtMgr->EventTermination();
+
+      delete g4eState;
+
+      finishTrack(extState, muid, charge);
+
+    } // hypothesis loop
+
+  } // track loop
+
+  // Find the matching KLMCluster(s)
+  for (auto& b2track : tracks) {
+    for (int c = 0; c < trackClusterSeparations.getEntries(); ++c) {
+      if (matchedTrackCluster[c] == &b2track) {
+        b2track.addRelationTo(klmClusters[c]);
+      }
+    }
+  }
 
 }
 

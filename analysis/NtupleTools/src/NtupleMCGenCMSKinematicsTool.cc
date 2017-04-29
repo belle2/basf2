@@ -13,8 +13,6 @@
 #include <TBranch.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/PCmsLabTransform.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <analysis/VariableManager/Variables.h>

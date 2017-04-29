@@ -325,7 +325,7 @@ def generate_cos_theta_plot(data_tree, pt_value):
     description = ('Events with 10 muon tracks with fixed transverse '
                    'momentum are generated using the ParticleGun(500 '
                    'events for each pt value). The events are reconstructed '
-                   'with VXDTF + Trasan + MCTrackCandCombiner. The plot '
+                   'with VXDTF + CDCTF + MCTrackCandCombiner. The plot '
                    'shows the single track reconstruction efficiency in '
                    'bins of the polar angle for the fixed transverse '
                    'momentum pt = %.2f GeV.')
@@ -400,7 +400,7 @@ def create_momentum_resolution_plot(data_tree):
     description = ('Events with 10 muon tracks with fixed transverse '
                    'momentum are generated using the ParticleGun(200 '
                    'events for each pt value). The events are reconstructed '
-                   'with VXDTF + Trasan + MCTrackCandCombiner. The plot '
+                   'with VXDTF + CDCTF + MCTrackCandCombiner. The plot '
                    'shows the relative momentum resolution of the '
                    'transverse momentum over transverse momentum.')
 

@@ -33,7 +33,7 @@ class CDCAutomaton(TrackingValidationRun):
     root_input_file = '../EvtGenSimNoBkg.root'
 
     def finder_module(self, path):
-        path.add_module('TrackFinderCDCAutomaton',
+        path.add_module('TFCDC_TrackFinderAutomaton',
                         # UseNLoops = 1,
                         )
 

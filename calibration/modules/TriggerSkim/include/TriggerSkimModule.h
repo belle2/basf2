@@ -11,8 +11,6 @@
 
 #include <framework/core/Module.h>
 
-using namespace std;
-
 namespace Belle2 {
   /// Returns the calibration result from SoftwareTriigerResult for skimming out calibration flagged events
   class TriggerSkimModule : public Module {
@@ -25,6 +23,6 @@ namespace Belle2 {
     virtual void event() override;
 
   private:
-    vector<string> m_triggerLines;
+    std::vector<std::string> m_triggerLines;
   };
 }

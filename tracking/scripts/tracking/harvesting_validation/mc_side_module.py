@@ -116,11 +116,17 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
         mc_to_pr_match_info_crops = self.peel_mc_to_pr_match_info(mc_reco_track)
         mc_hit_efficiencies_in_all_pr_tracks_crops = self.peel_hit_efficiencies_in_all_pr_tracks(mc_reco_track)
 
+        # Event Info
+        event_meta_data = Belle2.PyStoreObj("EventMetaData")
+        event_crops = peelers.peel_event_info(event_meta_data)
+
         crops = dict(multiplicity=multiplicity,
                      **mc_to_pr_match_info_crops,
                      **hit_content_crops,
                      **mc_particle_crops,
-                     **mc_hit_efficiencies_in_all_pr_tracks_crops)
+                     **mc_hit_efficiencies_in_all_pr_tracks_crops,
+                     **event_crops
+                     )
 
         return crops
 

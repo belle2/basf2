@@ -30,12 +30,15 @@ namespace Belle2 {
     virtual void all_hv_off() throw(HVHandlerException);//yone
     virtual void all_guard_on() throw(HVHandlerException);//yone
     virtual void all_guard_off() throw(HVHandlerException);//yone
-    virtual void check_all_bias_on() throw(HVHandlerException);//yone
-    virtual void check_all_hv_on() throw(HVHandlerException);//yone
-    virtual void check_all_guard_on() throw(HVHandlerException);//yone
-    virtual void check_all_bias_off() throw(HVHandlerException);//yone
-    virtual void check_all_hv_off() throw(HVHandlerException);//yone
-    virtual void check_all_guard_off() throw(HVHandlerException);//yone
+    virtual bool check_all_bias_on() throw(HVHandlerException);//yone
+    virtual bool check_all_hv_on() throw(HVHandlerException);//yone
+    virtual bool check_all_guard_on() throw(HVHandlerException);//yone
+    virtual bool check_all_bias_off() throw(HVHandlerException);//yone
+    virtual bool check_all_hv_off() throw(HVHandlerException);//yone
+    virtual bool check_all_guard_off() throw(HVHandlerException);//yone
+    //    virtual void all_sw(bool sw, char* set_type) throw(HVHandlerException);//yone
+    virtual void all_switch(std::string set_type, bool sw) throw(HVHandlerException);//yone
+    virtual bool check_all_switch(std::string set_type, int sw) throw(HVHandlerException);//yone
     virtual void configure(const HVConfig&) throw(HVHandlerException);
 
   public:

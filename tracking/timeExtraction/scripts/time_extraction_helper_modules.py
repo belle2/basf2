@@ -28,8 +28,9 @@ class RandomizeTrackTimeModule(basf2.Module):
         :param mc_drift: The drift in ns to which the CDCSimHits and MCParticles should be shifted.
         """
         self.mc_drift = mc_drift
-
         basf2.Module.__init__(self)
+
+        self.set_property_flags(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
 
     def event(self):
         """
@@ -58,6 +59,10 @@ class MCRecoTracksResetModule(basf2.Module):
     which makes the time extraction too simple. Instead, we have to reset the track time to 0 and set the
      track start position to the first hit, which will allow us to use the IPTrackTimeEstimator later.
     """
+    def __init__(self):
+        basf2.Module.__init__(self)
+
+        self.set_property_flags(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
 
     def event(self):
         """

@@ -495,7 +495,7 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 0.0);
 
-    var = Manager::Instance().getVariable("nROEPi0(vartest)");
+    var = Manager::Instance().getVariable("nParticlesInROE(pi0:vartest)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 0.0);
 

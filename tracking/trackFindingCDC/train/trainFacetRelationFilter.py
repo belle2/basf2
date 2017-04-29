@@ -116,11 +116,11 @@ class FacetRelationFilterTrainingRun(TrainingRunMixin, StandardEventGenerationRu
                 "abs_curv_proper",
             ]
 
-        path.add_module("WireHitPreparer",
+        path.add_module("TFCDC_WireHitPreparer",
                         flightTimeEstimation="outwards",
                         UseNLoops=1.0)
 
-        path.add_module("SegmentFinderCDCFacetAutomaton",
+        path.add_module("TFCDC_SegmentFinderFacetAutomaton",
                         FacetRelationFilter="unionrecording",
                         FacetRelationFilterParameters={
                             "rootFileName": self.sample_file_name,

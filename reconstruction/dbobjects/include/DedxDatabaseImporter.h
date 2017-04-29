@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef DEDXDATABASEIMPORTER_H
-#define DEDXDATABASEIMPORTER_H
+
+#pragma once
 
 #include <TObject.h>
 
@@ -37,6 +37,16 @@ namespace Belle2 {
      */
     void importWireGainCalibration();
 
+    /**
+     * Import CDC run gain calibration constants to the database
+     */
+    void importRunGainCalibration();
+
+    /**
+     * Import CDC electron saturation calibration constants to the database
+     */
+    void importCosineCalibration();
+
   private:
 
     std::vector<std::string> m_inputFileNames; /**< Name of input ROOT files */
@@ -46,4 +56,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-#endif

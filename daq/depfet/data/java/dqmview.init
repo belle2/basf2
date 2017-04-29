@@ -1,0 +1,12 @@
+#
+# Login to Belle II DQM
+#
+
+#dqmview.host : localhost
+dqmview.host : hlttb01.kek.jp
+dqmview.port : 50100
+dqmview.node : DQMGUI
+
+#
+#
+#

@@ -6,6 +6,8 @@
 #include <daq/slc/system/TCPSocket.h>
 #include <daq/slc/system/LogFile.h>
 
+#include <daq/slc/base/StringUtil.h>
+
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/MsgHandler.h>
 
@@ -35,21 +37,27 @@ void DQMSocketReader::run()
   TCPServerSocket server("0.0.0.0", m_port);
   server.open();
   char* buf = new char[MAXBUFSIZE];
+  std::map<std::string, TH1*> hist_m;
   while (true) {
     TCPSocket socket;
     MsgHandler handler(0);
     bool configured = false;
-    std::map<std::string, TH1*> hist_m;
     try {
       socket = server.accept();
+      LogFile::info("Accepted new connection for data");
     } catch (const IOException& e) {
       LogFile::fatal(e.what());
       exit(1);
     }
+    hist_m = std::map<std::string, TH1*>();
+    bool newconf = false;
     try {
       while (true) {
-        socket.read(buf, sizeof(int));
-        socket.read(buf + 4, *(int*)buf);
+        int size;
+        socket.read(&size, sizeof(int));
+        size = ntohl(size);
+        //LogFile::info("size=%d", size);
+        socket.read(buf, size);
         EvtMessage hmsg(buf);
         std::vector<TObject*> objlist;
         std::vector<std::string> strlist;
@@ -63,7 +71,8 @@ void DQMSocketReader::run()
           std::string objname = strlist.at(i);
           int lpos = objname.find_first_not_of("SUBDIR:", 0);
           if (lpos != 0) {
-            dir = objname.substr(lpos);
+            dir = StringUtil::replace(objname, "SUBDIR:", "");//objname.substr(lpos-1);
+            //LogFile::info("new dir: " + dir);
             if (dir == "EXIT") dir = "";
           } else {
             TObject* obj = objlist.at(i);
@@ -74,9 +83,11 @@ void DQMSocketReader::run()
               if (dir.size() > 0) name = dir + "/" + name;
               if (hist_m.find(name) == hist_m.end()) {
                 std::string vname = StringUtil::form("hist[%d].", nhist);
+                LogFile::info("new hist: " + name);
                 m_callback->add(new NSMVHandlerText(vname + "path", true, false, name));
                 hist_m.insert(std::pair<std::string, TH1*>(name, h));
                 nhist++;
+                newconf = true;
               } else {
                 hist_m[name] = h;
                 nhist++;
@@ -91,15 +102,16 @@ void DQMSocketReader::run()
         } else {
           m_callback->set("nhists", nhist);
         }
-        std::vector<HistSender> senders = m_callback->getSenders();
+        std::vector<HistSender>& senders(m_callback->getSenders());
         std::vector<HistSender>::iterator it = senders.begin();
         while (it != senders.end()) {
-          if (!it->update(hists)) {
+          if (!it->update(hists, newconf)) {
             it = senders.erase(it);
           } else {
             it++;
           }
         }
+        newconf = false;
       }
     } catch (const std::exception& e) {
       LogFile::error(e.what());

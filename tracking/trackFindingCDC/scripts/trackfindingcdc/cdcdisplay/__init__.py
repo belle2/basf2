@@ -810,7 +810,7 @@ class CDCSVGDisplayModule(basf2.Module):
         # Draw Tracks
         if self.draw_tracks:
             if self.use_cpp:
-                cppplotter.drawTracks('CDCTrackVector', 'ListColors', '')
+                cppplotter.drawTracks('CDCTrackVector', '', '')
             if self.use_python:
                 styleDict = {'stroke': attributemaps.listColors}
                 plotter.draw_storevector('CDCTrackVector', **styleDict)

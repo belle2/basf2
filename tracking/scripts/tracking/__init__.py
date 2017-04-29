@@ -213,7 +213,7 @@ def add_mc_track_finding(path, components=None):
                         UseCDCHits=is_cdc_used(components))
 
 
-def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
+def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
     """
     Convenience function for adding all cdc track finder modules
     to the path.
@@ -226,40 +226,58 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
     """
 
     # Init the geometry for cdc tracking and the hits
-    path.add_module("WireHitPreparer",
+    path.add_module("TFCDC_WireHitPreparer",
                     flightTimeEstimation="outwards",
                     )
 
     # Find segments and reduce background hits
-    path.add_module("SegmentFinderCDCFacetAutomaton",
+    path.add_module("TFCDC_SegmentFinderFacetAutomaton",
                     ClusterFilter="mva_bkg",
-                    ClusterFilterParameters={"cut": 0.2},
-                    FacetUpdateDriftLength=True,
-                    FacetFilter="chi2")
+                    ClusterFilterParameters={"cut": 0.2})
 
     # Find axial tracks
-    path.add_module("TrackFinderCDCLegendreTracking")
+    path.add_module("TFCDC_AxialTrackFinderLegendre")
 
     # Improve the quality of the axial tracks
-    path.add_module("TrackQualityAsserterCDC",
+    path.add_module("TFCDC_TrackQualityAsserter",
                     corrections=["B2B"])
 
     # Find the stereo hits to those axial tracks
-    path.add_module('StereoHitFinderCDCLegendreHistogramming')
+    path.add_module('TFCDC_StereoHitFinder')
 
     # Combine segments with axial tracks
-    path.add_module('SegmentTrackCombiner',
+    path.add_module('TFCDC_SegmentTrackCombiner',
                     segmentTrackFilter="mva",
                     segmentTrackFilterParameters={"cut": 0.74},
                     trackFilter="mva",
                     trackFilterParameters={"cut": 0.1})
 
+    if with_ca:
+        path.add_module("TFCDC_TrackFinderSegmentPairAutomaton",
+                        tracks="CDCTrackVector2")
+
+        # Overwrites the origin CDCTrackVector
+        path.add_module("TFCDC_TrackCombiner",
+                        inputTracks="CDCTrackVector",
+                        secondaryInputTracks="CDCTrackVector2",
+                        tracks="CDCTrackVector")
+
     # Improve the quality of all tracks and output
-    path.add_module("TrackQualityAsserterCDC",
-                    corrections=["LayerBreak", "LargeBreak2", "OneSuperlayer", "Small"])
+    path.add_module("TFCDC_TrackQualityAsserter",
+                    corrections=[
+                        "LayerBreak",
+                        "LargeBreak2",
+                        "OneSuperlayer",
+                        "Small",
+                    ])
+
+    if with_ca:
+        # Add curlers in the axial inner most superlayer
+        path.add_module("TFCDC_TrackCreatorSingleSegments",
+                        MinimalHitsBySuperLayerId={0: 15})
 
     # Export CDCTracks to RecoTracks representation
-    path.add_module("TrackExporter",
+    path.add_module("TFCDC_TrackExporter",
                     RecoTracksStoreArrayName=reco_tracks)
 
     # Correct time seed (only necessary for the CDC tracks)
@@ -287,56 +305,53 @@ def add_cdc_cr_track_finding(path,
     """
 
     # Init the geometry for cdc tracking and the hits
-    path.add_module("WireHitPreparer",
+    path.add_module("TFCDC_WireHitPreparer",
                     flightTimeEstimation="downwards",
                     triggerPoint=trigger_point,
                     )
 
     # Find segments and reduce background hits
-    path.add_module("SegmentFinderCDCFacetAutomaton",
+    path.add_module("TFCDC_SegmentFinderFacetAutomaton",
                     ClusterFilter="mva_bkg",
                     ClusterFilterParameters={"cut": 0.2},
-                    FacetUpdateDriftLength=False,
-                    FacetFilter="chi2",
-                    SegmentOrientation="downwards",
-                    )
+                    SegmentOrientation="downwards")
 
     # Find axial tracks
-    path.add_module("TrackFinderCDCLegendreTracking")
+    path.add_module("TFCDC_AxialTrackFinderLegendre")
 
     # Improve the quality of the axial tracks
-    path.add_module("TrackQualityAsserterCDC",
+    path.add_module("TFCDC_TrackQualityAsserter",
                     corrections=["B2B"])
 
     # Find the stereo hits to those axial tracks
-    path.add_module('StereoHitFinderCDCLegendreHistogramming')
+    path.add_module('TFCDC_StereoHitFinder')
 
     # Combine segments with axial tracks
-    path.add_module('SegmentTrackCombiner',
+    path.add_module('TFCDC_SegmentTrackCombiner',
                     segmentTrackFilter="mva",
                     segmentTrackFilterParameters={"cut": 0.74},
                     trackFilter="mva",
                     trackFilterParameters={"cut": 0.1})
 
     # Improve the quality of all tracks and output
-    path.add_module("TrackQualityAsserterCDC",
+    path.add_module("TFCDC_TrackQualityAsserter",
                     corrections=["LayerBreak", "LargeBreak2", "OneSuperlayer", "Small"],
                     )
 
     # Flip track orientation to always point downwards
-    path.add_module("TrackOrienter",
+    path.add_module("TFCDC_TrackOrienter",
                     inputTracks="CDCTrackVector",
                     tracks="OrientedCDCTrackVector",
                     TrackOrientation="downwards",
                     )
 
     # Correct time seed - assumes velocity near light speed
-    path.add_module("TrackFlightTimeAdjuster",
+    path.add_module("TFCDC_TrackFlightTimeAdjuster",
                     inputTracks="OrientedCDCTrackVector",
                     )
 
     # Export CDCTracks to RecoTracks representation
-    path.add_module("TrackExporter",
+    path.add_module("TFCDC_TrackExporter",
                     inputTracks="OrientedCDCTrackVector",
                     RecoTracksStoreArrayName=reco_tracks)
 

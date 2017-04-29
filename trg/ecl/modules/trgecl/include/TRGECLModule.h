@@ -69,29 +69,40 @@ namespace Belle2 {
     //    TrgEcl* _ecl; */
 
   protected:
+    //! Input array name.
+    std::string m_inColName;
+    //! Output array name for Xtal
+    std::string m_eclHitOutColName;
+    //! Output array name for TC
+    std::string m_eclTCHitOutColName;
 
-    std::string m_inColName;          // Input array name.
-    std::string m_eclHitOutColName;   // Output array name for Xtal
-    std::string m_eclTCHitOutColName;   // Output array name for TC
-
-    // The current number of created hits in an event.
-    // Used to fill the DataStore ECL array.
+    //! The current number of created hits in an event.
+    //! Used to fill the DataStore ECL array.
     int m_hitNum;
+    //! TC Hit number
     int m_hitTCNum;
 
   private:
 
     // double m_timeCPU;        //  CPU time
-    int    m_nRun;           //  Run number
-    int    m_nEvent;         //  Event number
-
-    int _Bhabha;  // Bhabha option
-    int _Clustering; // Clustering option
-    int _EventTiming;  // Eventtiming option
-    double _TimeWindow; // Trigger decision time window
-    double _OverlapWindow; // Trigger decision overlap window in oder to avoid boundary effect
-    int _NofTopTC; // # of considered TC in energy weighted Timing method
-    int _SelectEvent;  // Event selection
+    //!  Run number
+    int    m_nRun;
+    //!  Event number
+    int    m_nEvent;
+    //! Bhabha option
+    int _Bhabha;
+    //! Clustering option
+    int _Clustering;
+    //! Eventtiming option
+    int _EventTiming;
+    //! Trigger decision time window
+    double _TimeWindow;
+    //! Trigger decision overlap window in oder to avoid boundary effect
+    double _OverlapWindow;
+    //! # of considered TC in energy weighted Timing method
+    int _NofTopTC;
+    //! Event selection
+    int _SelectEvent;
 
 
   };

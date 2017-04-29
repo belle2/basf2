@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['$ROOT_LIBS','framework']
+env['LIBS'] = ['$ROOT_LIBS']
 
 Return('env')

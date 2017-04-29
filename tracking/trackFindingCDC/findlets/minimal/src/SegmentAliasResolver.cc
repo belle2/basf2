@@ -61,6 +61,8 @@ void SegmentAliasResolver::initialize()
   for (const std::string& investigatedAlias : m_param_investigateAlias) {
     if (investigatedAlias == "full") {
       m_fullAlias = true;
+    } else if (investigatedAlias == "cross") {
+      m_crossAliases = true;
     } else if (investigatedAlias == "borders") {
       m_borderAliases = true;
     } else if (investigatedAlias == "middle") {
@@ -84,6 +86,68 @@ void SegmentAliasResolver::apply(std::vector<CDCSegment2D>& outputSegments)
       refit(aliasSegment, true);
       swapBetterChi2(segment, aliasSegment);
     } // end alias loop
+  }
+
+  // Detect whether the segment has a waist and flip the rest of the segment to right
+  if (m_crossAliases) {
+    for (CDCSegment2D& segment : outputSegments) {
+      int nRLSwitches = segment.getNRLSwitches();
+      // Sufficiently right left constrained that the alias is already fixed.
+      bool aliasStable = nRLSwitches > 2;
+      if (aliasStable) continue;
+
+      if (nRLSwitches == 1) {
+        // One RL switch. Try the all left and all right aliases
+        CDCSegment2D rightSegment = segment;
+        CDCSegment2D leftSegment = segment;
+        for (CDCRecoHit2D& recoHit2D : rightSegment) {
+          if (recoHit2D.getRLInfo() == ERightLeft::c_Left) {
+            recoHit2D = recoHit2D.getAlias();
+          }
+        }
+
+        for (CDCRecoHit2D& recoHit2D : leftSegment) {
+          if (recoHit2D.getRLInfo() == ERightLeft::c_Right) {
+            recoHit2D = recoHit2D.getAlias();
+          }
+        }
+        refit(rightSegment, true);
+        refit(leftSegment, true);
+        swapBetterChi2(segment, rightSegment);
+        swapBetterChi2(segment, leftSegment);
+
+      } else if (nRLSwitches == 0) {
+        // No RL switch. Try to introduce one at the smallest drift length
+        CDCSegment2D frontCrossSegment = segment;
+        CDCSegment2D backCrossSegment = segment;
+
+        auto lessDriftLength = [](const CDCRecoHit2D & lhs, const CDCRecoHit2D & rhs) {
+          return lhs.getRefDriftLength() < rhs.getRefDriftLength();
+        };
+
+        // Alias before the minimal drift length
+        {
+          auto itMinLRecoHit2D =
+            std::min_element(frontCrossSegment.begin(), frontCrossSegment.end(), lessDriftLength);
+          for (CDCRecoHit2D& recoHit2D : asRange(frontCrossSegment.begin(), itMinLRecoHit2D)) {
+            recoHit2D = recoHit2D.getAlias();
+          }
+        }
+
+        // Alias after the minimal drift length
+        {
+          auto itMinLRecoHit2D =
+            std::min_element(backCrossSegment.begin(), backCrossSegment.end(), lessDriftLength);
+          for (CDCRecoHit2D& recoHit2D : asRange(itMinLRecoHit2D, backCrossSegment.end())) {
+            recoHit2D = recoHit2D.getAlias();
+          }
+        }
+        refit(frontCrossSegment, true);
+        refit(backCrossSegment, true);
+        swapBetterChi2(segment, frontCrossSegment);
+        swapBetterChi2(segment, backCrossSegment);
+      }
+    }
   }
 
   if (m_borderAliases) {
@@ -149,6 +213,8 @@ void SegmentAliasResolver::apply(std::vector<CDCSegment2D>& outputSegments)
       }
     }
   }
+
+  std::sort(outputSegments.begin(), outputSegments.end());
 }
 
 void SegmentAliasResolver::refit(CDCSegment2D& segment, bool reestimate)

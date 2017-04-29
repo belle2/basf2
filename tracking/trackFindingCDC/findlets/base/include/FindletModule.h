@@ -170,13 +170,6 @@ namespace Belle2 {
       template<std::size_t I>
       void createStoreVector()
       {
-        if (not isInputStoreVector<I>() and getStoreVector<I>().isValid()) {
-          B2WARNING("Output StoreVector for "
-                    << getStoreVectorParameterName<I>()
-                    << " already created in the DataStore with name "
-                    << m_param_storeVectorNames[I]);
-        }
-
         if (not getStoreVector<I>().isValid()) {
           getStoreVector<I>().construct();
         }

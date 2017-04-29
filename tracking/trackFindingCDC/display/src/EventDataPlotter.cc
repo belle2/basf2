@@ -682,15 +682,15 @@ void EventDataPlotter::drawTrajectory(const RecoTrack& recoTrack, const Attribut
     std::vector<std::array<float, 2>> points;
     std::vector<std::array<float, 2>> tangents;
 
-    TVector3 pos;
-    TVector3 mom;
-    TMatrixDSym cov;
-    size_t nHits = recoTrack.getHitPointsWithMeasurement().size();
-
     for (auto recoHit : recoTrack.getRecoHitInformations()) {
       // skip for reco hits which have not been used in the fit (and therefore have no fitted information on the plane
       if (!recoHit->useInFit())
         continue;
+
+      TVector3 pos;
+      TVector3 mom;
+      TMatrixDSym cov;
+
       try {
         const genfit::MeasuredStateOnPlane& state = recoTrack.getMeasuredStateOnPlaneFromRecoHit(recoHit);
         state.getPosMomCov(pos, mom, cov);

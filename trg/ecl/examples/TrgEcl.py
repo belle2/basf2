@@ -51,7 +51,8 @@ trgeclfam.param('TCThreshold', 100)  # TC Threshold (Default is 100 MeV )
 # Save beam background tag of TC in TRGECLHit table (0: no save, 1:
 # save(It would be slower than 0 becaused of  comparison process btw
 # TRGECLHit and TRGECLDigi ))
-trgeclfam.param('BeamBkgTag', 0)
+trgeclfam.param('BeamBkgTag', 0)  # Calculate BeamBkgTag (0: no save(default), 1: save(slow))
+trgeclfam.param('ShapingFunction', 1)  # Choose shaping function (0: Original function(slower), 1: Interpolation (default) )
 
 
 trgecl = register_module("TRGECL")

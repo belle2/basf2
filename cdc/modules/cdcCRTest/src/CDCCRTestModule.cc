@@ -549,7 +549,7 @@ void CDCCRTestModule::HitEfficiency(const Belle2::RecoTrack* track)
   ////
   BOOST_FOREACH(const RecoHitInformation::UsedCDCHit * cdchit, track->getCDCHitList()) {
     WireID Wid = WireID(cdchit->getID());
-    const genfit::TrackPoint* tp = track->getRecoHitInformation(cdchit)->getCreatedTrackPoint();
+    const genfit::TrackPoint* tp = track->getCreatedTrackPoint(track->getRecoHitInformation(cdchit));
     //some hit didn't take account in fitting, so I use left/right info frm track finding results.
     int RLInfo = 0;
     RecoHitInformation::RightLeftInformation rightLeftHitInformation = track->getRecoHitInformation(cdchit)->getRightLeftInformation();
@@ -642,7 +642,7 @@ void CDCCRTestModule::getResidualOfUnFittedLayer(Belle2::RecoTrack* track)
     if (hit4extraction.second == nullptr)
       continue;
 
-    auto closestHitTrackPoint = hit4extraction.second->getCreatedTrackPoint();
+    auto closestHitTrackPoint = track->getCreatedTrackPoint(hit4extraction.second);
     // now we need to find the hit behind this sorting param !
     // but easy: we have already the TrackPoint via the RecoHitInformation
     genfit::MeasuredStateOnPlane meaOnPlane = closestHitTrackPoint->getFitterInfo(trackRepresentation)->getFittedState(
@@ -650,7 +650,6 @@ void CDCCRTestModule::getResidualOfUnFittedLayer(Belle2::RecoTrack* track)
 
     //start to extrapolation
     WireID wireid = WireID(cdchit->getID());
-    double flightTime1 = meaOnPlane.getTime();
     //Now reconstruct plane for hit
     genfit::SharedPlanePtr plane = constructPlane(meaOnPlane, wireid);
     double segmentLength;
@@ -697,10 +696,6 @@ void CDCCRTestModule::getResidualOfUnFittedLayer(Belle2::RecoTrack* track)
       }
     }
     B2DEBUG(199, "we calculate residua for lay - IWire: " << lay << " - " << IWire);
-    // left to do for you: enable this again
-//    B2DEBUG(199, "Layer use for extrapolate and flight time of that hit "
-//            << WireID(track->getCDCHitList().at(hitID4extr)->getID()).getICLayer()
-//            << " " << flightTime1);
     B2DEBUG(199, "distance between two hit" << segmentLength);
     B2DEBUG(199, "Flight Time (extra | sim)" << dt_flight << " - " << dt_flight_sim);
     B2DEBUG(199, "DriftLength (cal   | sim)" << x_mea << " - " << x_sim);

@@ -40,18 +40,28 @@ namespace Belle2 {
     virtual ~TrgEclTiming();/// Destructor
 
   public:
-    void Setup(std::vector<int>, std::vector<double>, std::vector<double>); //setting
+    //! SetUp
+    void Setup(std::vector<int>, std::vector<double>, std::vector<double>);
+    //! Get Evnet-timing
     double GetEventTiming(int);//Get eventtming
+    //! Fastest TC Timing
     double GetEventTiming00();// Fastest TC timing
+    //! The Most energetic TC Timing
     double GetEventTiming01();// The Most energetic TC Timing
-    double GetEventTiming02();// Energy weighted Timing of Top 3 energetic TC
+    //! Energy weighted Timing of Top 3 energetic TC
+    double GetEventTiming02();
+    //! Set # of  considered TC  in Energy weighted timing method.
     void SetNofTopTC(int NtopTC) {NofTopTC = NtopTC;}
 
   private:
+    //! TC Energy
     std::vector<double> TCEnergy;
+    //! TC Timing
     std::vector<double> TCTiming;
+    //! TC Id
     std::vector<int> TCId;
 
+    //! # of  considered TC  in Energy weighted timing method.
     int NofTopTC;
     /** Object of TC Mapping */
     TrgEclMapping* _TCMap;

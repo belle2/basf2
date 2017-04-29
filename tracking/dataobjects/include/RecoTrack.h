@@ -397,6 +397,20 @@ namespace Belle2 {
       setDirtyFlag();
     }
 
+    /** Get a pointer to the TrackPoint that was created from this hit. Can be a nullptr if no measurement was already created.
+     * Please be aware that refitting may or may not recreate the track points and older pointers can be invalidated.
+     * Also, pruning a RecoTrack will also delete most of the TrackPoints.
+     */
+    const genfit::TrackPoint* getCreatedTrackPoint(const RecoHitInformation* recoHitInformation) const
+    {
+      int createdTrackPointID = recoHitInformation->getCreatedTrackPointID();
+      if (createdTrackPointID == -1) {
+        return nullptr;
+      }
+
+      return m_genfitTrack.getPoint(createdTrackPointID);
+    }
+
     // Hits Added Questioning
     /// Returns true if the track has cdc hits.
     bool hasCDCHits() const { return getRelatedFrom<UsedCDCHit>(m_storeArrayNameOfCDCHits) != nullptr; }
@@ -574,15 +588,26 @@ namespace Belle2 {
     /**
      * Return a list of all RecoHitInformations associated with the RecoTrack. This is especially useful when
      * you want to iterate over all (fitted) hits in a track without caring whether its a CDC, VXD etc hit.
+     * @param getSorted if true, the list of RecoHitInformations will be returned sorted by the Sorting parameter
+     * in an ascending order. If false, the hits will be returned unsorted.
      */
-    std::vector<RecoHitInformation*> getRecoHitInformations() const
+    std::vector<RecoHitInformation*> getRecoHitInformations(bool getSorted = false) const
     {
       std::vector<RecoHitInformation*> hitList;
-      StoreArray<RecoHitInformation> recoHitInformations(m_storeArrayNameOfRecoHitInformation);
+      RelationVector<RecoHitInformation> recoHitInformations = getRelationsTo<RecoHitInformation>
+                                                               (m_storeArrayNameOfRecoHitInformation);
 
-      hitList.reserve(recoHitInformations.getEntries());
+      hitList.reserve(recoHitInformations.size());
       for (auto& recoHit : recoHitInformations) {
         hitList.push_back(&recoHit);
+      }
+
+      // sort the returned vector if requested
+      if (getSorted) {
+        std::sort(hitList.begin(), hitList.end(), [](const RecoHitInformation * a,
+        const RecoHitInformation * b) -> bool {
+          return a->getSortingParameter() < b->getSortingParameter();
+        });
       }
 
       return hitList;
@@ -639,7 +664,7 @@ namespace Belle2 {
         B2FATAL("MeasuredStateOnPlane cannot be provided for RecoHit which was not used in the fit.");
       }
 
-      const auto hitTrackPoint = recoHitInfo->getCreatedTrackPoint();
+      const auto hitTrackPoint = getCreatedTrackPoint(recoHitInfo);
       if (hitTrackPoint == nullptr) {
         B2FATAL("TrackPoint was requested which has not been created");
       }

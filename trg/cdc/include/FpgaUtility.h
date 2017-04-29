@@ -18,7 +18,7 @@ public:
   /// Change octal to string.
   static std::string doubleToArb(double in, int outRadix, int numberOfDigits = -1);
   /// Change string number to another string number depending on radix.
-  static std::string arbToArb(std::string in, int inRadix, int outRadix, int numberOfDigits = -1);
+  static std::string arbToArb(std::string& in, int inRadix, int outRadix, int numberOfDigits = -1);
   /// Changes string signed binary(-sign) to two complements.
   static std::string signedToTwosComplement(std::string in, int numberOfDigits);
   /// Changes string two complements to string signed binary(-sign).

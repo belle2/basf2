@@ -479,10 +479,7 @@ namespace Belle2 {
      * Returns unique identifier of final state particle (needed in particle combiner)
      * @return unique identifier of final state particle
      */
-    int getMdstSource() const
-    {
-      return m_mdstIndex + (m_particleType << 24);
-    }
+    int getMdstSource() const;
 
     /**
      * Returns number of daughter particles
@@ -674,6 +671,15 @@ namespace Belle2 {
     EParticleType m_particleType;  /**< particle type */
     unsigned m_mdstIndex;  /**< 0-based index of MDST store array object */
 
+    /**
+     * Identifier that can be used to identify whether the particle is unqiue
+     * or is a copy or representation of another. For example a kaon and pion
+     * particles constructed from the same Track are representations of the
+     * same physical object in the detector and cannot be used in the reconstruction
+     * of the same decay chain
+     */
+    int m_identifier = -1;
+
     /** Stores associated user defined values.
      *
      * Order is given by string -> index mapping in ParticleExtraInfoMap.
@@ -732,7 +738,13 @@ namespace Belle2 {
     void setFlavorType();
 
 
-    ClassDef(Particle, 7); /**< Class to store reconstructed particles. */
+    /**
+     * set mdst array index
+     */
+    void setMdstArrayIndex(const int arrayIndex);
+
+    ClassDef(Particle, 8); /**< Class to store reconstructed particles. */
+    // v8: added identifier, changed getMdstSource
 
     friend class ParticleSubset;
   };

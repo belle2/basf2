@@ -66,7 +66,7 @@ bool NSMVHandlerHVRequest::handleSetText(const std::string& val)
     }
     HVState tstate = cmd.nextTState(m_hvnode.getState());
     if (tstate != Enum::UNKNOWN) {
-      m_callback.setState(m_hvnode, tstate);
+      m_callback.setHVState(m_hvnode, tstate);
       //m_callback.HVCallback::setState(tstate);
     }
   } catch (const NSMHandlerException& e) {
@@ -88,12 +88,12 @@ bool NSMVHandlerHVNodeUsed::handleSetInt(int val)
     std::string state;
     try {
       m_callback.get(m_hvnode, "hvstate", state);
-      m_callback.setState(m_hvnode, HVState(state));
+      m_callback.setHVState(m_hvnode, HVState(state));
     } catch (const NSMHandlerException& e) {
       LogFile::warning(e.what());
     } catch (const TimeoutException& e) {
       LogFile::warning(e.what());
-      m_callback.setState(m_hvnode, NSMState::UNKNOWN);
+      m_callback.setHVState(m_hvnode, NSMState::UNKNOWN);
     }
   }
   LogFile::info("set %s.used to %d", m_hvnode.getName().c_str(), val);

@@ -13,6 +13,8 @@
 
 #include <tracking/ckf/findlets/cdcToSpacePoint/StoreArrayMerger.h>
 #include <tracking/ckf/findlets/cdcToSpacePoint/CDCToSpacePointTreeSearchFindlet.h>
+#include <tracking/ckf/findlets/base/OverlapResolverFindlet.h>
+#include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCVXDTrackCombinationFilterFactory.h>
 #include <tracking/ckf/states/CKFCDCToVXDStateObject.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
@@ -41,6 +43,9 @@ namespace Belle2 {
     StoreArrayMerger m_storeArrayMerger;
     /// Findlet doing the main work: the tree finding
     CDCToSpacePointTreeSearchFindlet m_treeSearchFindlet;
+    /// Findlet for resolving overlaps
+    OverlapResolverFindlet<RecoTrack, SpacePoint,
+                           TrackFindingCDC::ChooseableFilter<CDCVXDTrackCombinationFilterFactory>> m_overlapResolver;
 
     // Parameters
     bool m_param_exportTracks = true;

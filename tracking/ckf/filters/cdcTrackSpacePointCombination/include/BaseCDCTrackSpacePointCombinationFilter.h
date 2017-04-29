@@ -18,4 +18,6 @@ namespace Belle2 {
    */
   using BaseCDCTrackSpacePointCombinationFilter =
     TrackFindingCDC::Filter<CKFCDCToVXDStateObject>;
+  using BaseCDCVXDTrackCombinationFilter =
+    TrackFindingCDC::Filter<std::pair<RecoTrack*, std::vector<const SpacePoint*>>>;
 }

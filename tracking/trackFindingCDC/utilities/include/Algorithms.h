@@ -199,5 +199,14 @@ namespace Belle2 {
     {
       return std::any_of(std::begin(ts), std::end(ts), comparator);
     }
+
+    /**
+     * Shortcut for applying std::find(..) != end.
+     */
+    template <class Ts, class AItem>
+    bool is_in(const AItem& item, const Ts& ts)
+    {
+      return std::find(std::begin(ts), std::end(ts), item) != std::end(ts);
+    };
   }
 }

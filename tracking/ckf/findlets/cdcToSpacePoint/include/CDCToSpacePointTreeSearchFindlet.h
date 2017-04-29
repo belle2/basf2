@@ -18,11 +18,12 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 
 namespace Belle2 {
-  class CDCToSpacePointTreeSearchFindlet : public TrackFindingCDC::TreeSearchFindlet<CKFCDCToVXDStateObject,
+  class CDCToSpacePointTreeSearchFindlet : public TreeSearchFindlet<CKFCDCToVXDStateObject,
     LayerToggledFilter<CDCTrackSpacePointCombinationFilterFactory>> {
   public:
-    using Super = TrackFindingCDC::TreeSearchFindlet<CKFCDCToVXDStateObject,
-          LayerToggledFilter<CDCTrackSpacePointCombinationFilterFactory>>;
+    using Super = TreeSearchFindlet<CKFCDCToVXDStateObject,
+          and started implementing a first quality estimator based on the MC truth information
+          LayerToggledFilter<CDCTrackSpacePointCombinationFilterFactory >>;
 
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 

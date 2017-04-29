@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/minimal/TreeSearchFindlet.h>
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/LayerToggleCDCToVXDExtrapolationFilter.h>
+#include <tracking/ckf/filters/base/LayerToggledFilter.h>
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCTrackSpacePointCombinationFilterFactory.h>
 #include <tracking/modules/cdcToVXDExtrapolator/filterBased/CKFCDCToVXDResultObject.h>
 
@@ -19,10 +19,10 @@
 
 namespace Belle2 {
   class CKFCDCToVXDTreeSearchFindlet : public TrackFindingCDC::TreeSearchFindlet<CKFCDCToVXDStateObject,
-    LayerToggleCDCToVXDExtrapolationFilter<CDCTrackSpacePointCombinationFilterFactory>> {
+    LayerToggledFilter<CDCTrackSpacePointCombinationFilterFactory>> {
   public:
     using Super = TrackFindingCDC::TreeSearchFindlet<CKFCDCToVXDStateObject,
-          LayerToggleCDCToVXDExtrapolationFilter<CDCTrackSpacePointCombinationFilterFactory>>;
+          LayerToggledFilter<CDCTrackSpacePointCombinationFilterFactory>>;
 
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 

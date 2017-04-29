@@ -13,9 +13,9 @@
 
 namespace Belle2 {
   template <class AFilterFactory>
-  class LayerToggleCDCToVXDExtrapolationFilter : public AFilterFactory::CreatedFilter {
+  class LayerToggledFilter : public AFilterFactory::CreatedFilter {
   public:
-    LayerToggleCDCToVXDExtrapolationFilter() : AFilterFactory::CreatedFilter()
+    LayerToggledFilter() : AFilterFactory::CreatedFilter()
     {
       AFilterFactory::CreatedFilter::addProcessingSignalListener(&m_highLayerFilter);
       AFilterFactory::CreatedFilter::addProcessingSignalListener(&m_lowLayerFilter);

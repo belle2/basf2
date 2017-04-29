@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/minimal/TreeSearchFindlet.h>
+#include <tracking/ckf/findlets/base/TreeSearchFindlet.h>
 #include <tracking/ckf/filters/base/LayerToggledFilter.h>
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCTrackSpacePointCombinationFilterFactory.h>
 #include <tracking/ckf/states/CKFCDCToVXDStateObject.h>

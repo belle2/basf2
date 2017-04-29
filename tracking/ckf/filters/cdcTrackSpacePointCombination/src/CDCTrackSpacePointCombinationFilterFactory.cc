@@ -7,21 +7,16 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationFilterFactory.h>
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/BaseCDCTrackSpacePointCombinationFilter.h>
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationTruthVarSet.h>
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationVarSet.h>
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationBasicVarSet.h>
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/SimpleCDCToVXDExtrapolationFilter.h>
+#include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCTrackSpacePointCombinationFilterFactory.h>
+#include <tracking/ckf/filters/cdcTrackSpacePointCombination/BaseCDCTrackSpacePointCombinationFilter.h>
+#include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCTrackSpacePointCombinationTruthVarSet.h>
+#include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCTrackSpacePointCombinationVarSet.h>
+#include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCTrackSpacePointCombinationBasicVarSet.h>
+#include <tracking/ckf/filters/cdcTrackSpacePointCombination/SimpleCDCTrackSpacePointCombinationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/Filter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
-#include <tracking/trackFindingCDC/filters/base/PassThroughFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
-#include <tracking/trackFindingCDC/filters/base/RandomFilter.h>
-#include <tracking/trackFindingCDC/filters/base/NamedChoosableVarSetFilter.h>
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
 using namespace Belle2;
@@ -80,7 +75,7 @@ CDCTrackSpacePointCombinationFilterFactory::create(const std::string& filterName
   } else if (filterName == "all") {
     return makeUnique<AllCDCTrackSpacePointCombinationFilter>();
   } else if (filterName == "simple") {
-    return makeUnique<SimpleCDCToVXDExtrapolationFilter>();
+    return makeUnique<SimpleCDCTrackSpacePointCombinationFilter>();
   } else if (filterName == "truth") {
     return makeUnique<MCCDCTrackSpacePointCombinationFilter>();
   } else if (filterName == "recording") {

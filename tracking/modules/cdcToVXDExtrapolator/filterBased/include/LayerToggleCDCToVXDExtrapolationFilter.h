@@ -9,17 +9,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/BaseCDCTrackSpacePointCombinationFilter.h>
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
 
 namespace Belle2 {
   template <class AFilterFactory>
-  class LayerToggleCDCToVXDExtrapolationFilter : public BaseCDCTrackSpacePointCombinationFilter {
+  class LayerToggleCDCToVXDExtrapolationFilter : public AFilterFactory::CreatedFilter {
   public:
-    LayerToggleCDCToVXDExtrapolationFilter() : BaseCDCTrackSpacePointCombinationFilter()
+    LayerToggleCDCToVXDExtrapolationFilter() : AFilterFactory::CreatedFilter()
     {
-      addProcessingSignalListener(&m_highLayerFilter);
-      addProcessingSignalListener(&m_lowLayerFilter);
+      AFilterFactory::CreatedFilter::addProcessingSignalListener(&m_highLayerFilter);
+      AFilterFactory::CreatedFilter::addProcessingSignalListener(&m_lowLayerFilter);
     }
 
     void exposeParameters(ModuleParamList* moduleParamList,
@@ -31,7 +30,7 @@ namespace Belle2 {
       m_lowLayerFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "low"));
     }
 
-    TrackFindingCDC::Weight operator()(const BaseCDCTrackSpacePointCombinationFilter::Object& currentState) final {
+    TrackFindingCDC::Weight operator()(const typename AFilterFactory::CreatedFilter::Object& currentState) final {
       const unsigned int layer = currentState.extractGeometryLayer();
       if (layer > m_param_toggleOnLayer)
       {

@@ -14,8 +14,7 @@
 
 namespace Belle2 {
   /**
-   * Base filter for detector track combination filters. Please note that for implementation reasons
-   * the base object includes poitners to pointers.
+   * Base filter for detector track combination filters.
    */
   using BaseCDCTrackSpacePointCombinationFilter =
     TrackFindingCDC::Filter<CKFCDCToVXDStateObject>;

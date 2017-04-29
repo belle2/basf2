@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationTruthVarSet.h>
+#include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCTrackSpacePointCombinationTruthVarSet.h>
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
 #include <framework/dataobjects/EventMetaData.h>
 

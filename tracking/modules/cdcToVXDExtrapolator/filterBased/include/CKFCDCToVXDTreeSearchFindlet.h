@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/minimal/TreeSearchFindlet.h>
 #include <tracking/modules/cdcToVXDExtrapolator/filterBased/LayerToggleCDCToVXDExtrapolationFilter.h>
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationFilterFactory.h>
+#include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCTrackSpacePointCombinationFilterFactory.h>
 #include <tracking/modules/cdcToVXDExtrapolator/filterBased/CKFCDCToVXDResultObject.h>
 
 #include <tracking/dataobjects/RecoTrack.h>

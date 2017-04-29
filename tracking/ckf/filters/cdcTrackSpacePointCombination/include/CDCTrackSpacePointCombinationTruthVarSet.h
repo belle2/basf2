@@ -8,9 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+
+#include <tracking/ckf/filters/cdcTrackSpacePointCombination/BaseCDCTrackSpacePointCombinationFilter.h>
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/BaseCDCTrackSpacePointCombinationFilter.h>
 
 namespace Belle2 {
   /// Names of the variables to be generated.
@@ -52,7 +53,7 @@ namespace Belle2 {
   class CDCTrackSpacePointCombinationTruthVarSet : public TrackFindingCDC::VarSet<CDCTrackSpacePointCombinationTruthVarNames> {
 
   public:
-    /// Generate and assign the variables from the pair.
-    virtual bool extract(const BaseCDCTrackSpacePointCombinationFilter::Object* pair) override;
+    /// Generate and assign the variables from the object.
+    virtual bool extract(const BaseCDCTrackSpacePointCombinationFilter::Object* object) override;
   };
 }

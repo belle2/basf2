@@ -8,15 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCTrackSpacePointCombinationBasicVarSet.h>
-#include <tracking/trackFindingCDC/numerics/ToFinite.h>
+#include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCTrackSpacePointCombinationBasicVarSet.h>
+
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
 #include <TMath.h>
-
-#include <framework/dataobjects/Helix.h>
-#include <geometry/bfieldmap/BFieldMap.h>
-#include <svd/reconstruction/SVDRecoHit.h>
 
 using namespace std;
 using namespace Belle2;

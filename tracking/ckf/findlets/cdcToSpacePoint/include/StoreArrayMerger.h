@@ -18,6 +18,8 @@
 
 namespace Belle2 {
   /**
+   * TODO: Generalize and put this into a specific folder
+   *
    * Findlet for using the relations between two store arrays of RecoTracks
    * to create new RecoTracks with the merged tracks and write them to a new store array.
    *

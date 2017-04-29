@@ -11,20 +11,20 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/StoreArrayMerger.h>
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CKFCDCToVXDTreeSearchFindlet.h>
+#include <tracking/ckf/findlets/cdcToSpacePoint/StoreArrayMerger.h>
+#include <tracking/ckf/findlets/cdcToSpacePoint/CDCToSpacePointTreeSearchFindlet.h>
 #include <tracking/ckf/states/CKFCDCToVXDStateObject.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 
 namespace Belle2 {
-  class CDCToVXDExtrapolatorFindlet : public TrackFindingCDC::Findlet<> {
+  class CDCToSpacePointCKFFindlet : public TrackFindingCDC::Findlet<> {
     using Super = TrackFindingCDC::Findlet<>;
 
   public:
     /// Constructor, for setting module description and parameters.
-    CDCToVXDExtrapolatorFindlet();
+    CDCToSpacePointCKFFindlet();
 
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
@@ -40,7 +40,7 @@ namespace Belle2 {
     /// Findlet for handling the store array access and write out
     StoreArrayMerger m_storeArrayMerger;
     /// Findlet doing the main work: the tree finding
-    CKFCDCToVXDTreeSearchFindlet m_treeSearchFindlet;
+    CDCToSpacePointTreeSearchFindlet m_treeSearchFindlet;
 
     // Parameters
     bool m_param_exportTracks = true;

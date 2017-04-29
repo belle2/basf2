@@ -18,7 +18,7 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 
 namespace Belle2 {
-  class CKFCDCToVXDTreeSearchFindlet : public TrackFindingCDC::TreeSearchFindlet<CKFCDCToVXDStateObject,
+  class CDCToSpacePointTreeSearchFindlet : public TrackFindingCDC::TreeSearchFindlet<CKFCDCToVXDStateObject,
     LayerToggledFilter<CDCTrackSpacePointCombinationFilterFactory>> {
   public:
     using Super = TrackFindingCDC::TreeSearchFindlet<CKFCDCToVXDStateObject,

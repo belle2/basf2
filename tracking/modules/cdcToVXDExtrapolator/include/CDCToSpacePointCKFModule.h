@@ -7,9 +7,18 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCToVXDExtrapolator2Module.h>
+#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
+#include <tracking/modules/cdcToVXDExtrapolator/CDCToSpacePointCKFFindlet.h>
 
-using namespace Belle2;
+namespace Belle2 {
+  class CDCToSpacePointCKFModule : public TrackFindingCDC::FindletModule<CDCToSpacePointCKFFindlet> {
 
-REG_MODULE(CDCToVXDExtrapolator2)
+  public:
+    CDCToSpacePointCKFModule()
+    {
+      setDescription("");
+    }
+  };
+}

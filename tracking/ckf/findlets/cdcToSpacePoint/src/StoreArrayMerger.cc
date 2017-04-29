@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/StoreArrayMerger.h>
+#include <tracking/ckf/findlets/cdcToSpacePoint/StoreArrayMerger.h>
 #include <framework/dataobjects/Helix.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <geometry/bfieldmap/BFieldMap.h>

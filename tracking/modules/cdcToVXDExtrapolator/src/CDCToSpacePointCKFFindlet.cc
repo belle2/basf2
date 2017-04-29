@@ -8,18 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CDCToVXDExtrapolatorFindlet.h>
+#include <tracking/modules/cdcToVXDExtrapolator/CDCToSpacePointCKFFindlet.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCToVXDExtrapolatorFindlet::CDCToVXDExtrapolatorFindlet()
+CDCToSpacePointCKFFindlet::CDCToSpacePointCKFFindlet()
 {
   addProcessingSignalListener(&m_treeSearchFindlet);
   addProcessingSignalListener(&m_storeArrayMerger);
 }
 
-void CDCToVXDExtrapolatorFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void CDCToSpacePointCKFFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);
 
@@ -29,7 +29,7 @@ void CDCToVXDExtrapolatorFindlet::exposeParameters(ModuleParamList* moduleParamL
   moduleParamList->addParameter("exportTracks", m_param_exportTracks, "", m_param_exportTracks);
 }
 
-void CDCToVXDExtrapolatorFindlet::beginEvent()
+void CDCToSpacePointCKFFindlet::beginEvent()
 {
   Super::beginEvent();
 
@@ -38,7 +38,7 @@ void CDCToVXDExtrapolatorFindlet::beginEvent()
   m_results.clear();
 }
 
-void CDCToVXDExtrapolatorFindlet::apply()
+void CDCToSpacePointCKFFindlet::apply()
 {
   // Read in the CDC reco tracks
   m_storeArrayMerger.fetch(m_cdcRecoTrackVector);

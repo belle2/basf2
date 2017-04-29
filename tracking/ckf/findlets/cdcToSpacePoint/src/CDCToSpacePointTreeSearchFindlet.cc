@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CKFCDCToVXDTreeSearchFindlet.h>
+#include <tracking/ckf/findlets/cdcToSpacePoint/CDCToSpacePointTreeSearchFindlet.h>
 
 #include <svd/reconstruction/SVDRecoHit.h>
 
@@ -23,14 +23,14 @@ namespace Eigen {
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void CKFCDCToVXDTreeSearchFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void CDCToSpacePointTreeSearchFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   Super::exposeParameters(moduleParamList, prefix);
 
   moduleParamList->addParameter("useCaching", m_param_useCaching, "Use caching or not", m_param_useCaching);
 }
 
-SortedVectorRange<const SpacePoint*> CKFCDCToVXDTreeSearchFindlet::getMatchingHits(Super::StateIterator currentState)
+SortedVectorRange<const SpacePoint*> CDCToSpacePointTreeSearchFindlet::getMatchingHits(Super::StateIterator currentState)
 {
   const unsigned int currentNumber = currentState->getNumber();
 
@@ -77,7 +77,7 @@ SortedVectorRange<const SpacePoint*> CKFCDCToVXDTreeSearchFindlet::getMatchingHi
 
 }
 
-bool CKFCDCToVXDTreeSearchFindlet::fit(Super::StateIterator currentState)
+bool CDCToSpacePointTreeSearchFindlet::fit(Super::StateIterator currentState)
 {
   B2ASSERT("Encountered invalid state", not currentState->isFitted() and currentState->isAdvanced());
 
@@ -140,7 +140,7 @@ bool CKFCDCToVXDTreeSearchFindlet::fit(Super::StateIterator currentState)
   return true;
 }
 
-bool CKFCDCToVXDTreeSearchFindlet::advance(Super::StateIterator currentState)
+bool CDCToSpacePointTreeSearchFindlet::advance(Super::StateIterator currentState)
 {
   B2ASSERT("Encountered invalid state", not currentState->isFitted() and not currentState->isAdvanced());
 
@@ -203,10 +203,9 @@ bool CKFCDCToVXDTreeSearchFindlet::advance(Super::StateIterator currentState)
   return true;
 }
 
-void CKFCDCToVXDTreeSearchFindlet::initializeEventCache(std::vector<RecoTrack*>& seedsVector,
-                                                        std::vector<const SpacePoint*>& filteredHitVector)
+void CDCToSpacePointTreeSearchFindlet::initializeEventCache(std::vector<RecoTrack*>& seedsVector,
+                                                            std::vector<const SpacePoint*>& filteredHitVector)
 {
-
   m_cachedHitMap.clear();
 
   const auto& hitSorterByID = [](const SpacePoint * lhs, const SpacePoint * rhs) {

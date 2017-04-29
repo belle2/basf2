@@ -13,7 +13,7 @@
 
 #include <tracking/modules/cdcToVXDExtrapolator/filterBased/StoreArrayMerger.h>
 #include <tracking/modules/cdcToVXDExtrapolator/filterBased/CKFCDCToVXDTreeSearchFindlet.h>
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CKFCDCToVXDResultObject.h>
+#include <tracking/ckf/states/CKFCDCToVXDStateObject.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePoint.h>

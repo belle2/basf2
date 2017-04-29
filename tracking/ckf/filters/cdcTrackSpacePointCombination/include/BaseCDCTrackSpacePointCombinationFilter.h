@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
-#include <tracking/modules/cdcToVXDExtrapolator/filterBased/CKFCDCToVXDResultObject.h>
+#include <tracking/ckf/states/CKFCDCToVXDStateObject.h>
 
 namespace Belle2 {
   /**

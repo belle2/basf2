@@ -18,8 +18,6 @@ using namespace TrackFindingCDC;
 bool CDCVXDTrackCombinationTruthVarSet::extract(const BaseCDCVXDTrackCombinationFilter::Object* result)
 {
   RecoTrack* cdcTrack = result->first;
-  const std::vector<const SpacePoint*>& spacePoints = result->second;
-
   if (not cdcTrack) return false;
 
   StoreObjPtr<EventMetaData> eventMetaData;
@@ -43,7 +41,7 @@ bool CDCVXDTrackCombinationTruthVarSet::extract(const BaseCDCVXDTrackCombination
   unsigned int numberOfCorrectHits = 0;
 
   for (const SpacePoint* spacePoint : result->second) {
-    for (const SVDCluster* relatedCluster : spacePoint->getRelated<SVDCluster>()) {
+    for (const SVDCluster& relatedCluster : spacePoint->getRelationsWith<SVDCluster>()) {
       const auto& relatedMCRecoTracksToOneCluster = relatedCluster.getRelationsWith<RecoTrack>("MCRecoTracks");
 
       bool cdcTrackMatchedToCluster = std::any_of(relatedMCRecoTracksToOneCluster.begin(),

@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
+#include <tracking/trackFindingCDC/filters/base/NamedChoosableVarSetFilter.h>
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
 using namespace Belle2;
@@ -24,7 +25,7 @@ namespace {
   using MCCDCVXDTrackCombinationFilter = MCFilter<CDCVXDTrackCombinationTruthVarSet>;
 
   /// MC filter for VXD - CDC relations.
-  using MCCTruthNumberDCVXDTrackCombinationFilter = ChooseableFromVarSet<CDCVXDTrackCombinationTruthVarSet>;
+  using MCCTruthNumberCDCVXDTrackCombinationFilter = NamedChoosableVarSetFilter<CDCVXDTrackCombinationTruthVarSet>;
 
   /// All filter for VXD - CDC relations.
   using AllCDCVXDTrackCombinationFilter = AllFilter<BaseCDCVXDTrackCombinationFilter>;
@@ -65,8 +66,8 @@ CDCVXDTrackCombinationFilterFactory::create(const std::string& filterName) const
     return makeUnique<AllCDCVXDTrackCombinationFilter >();
   } else if (filterName == "truth") {
     return makeUnique<MCCDCVXDTrackCombinationFilter >();
-  } else if (filterName == "truth") {
-    return makeUnique<MCTruthNumberCDCVXDTrackCombinationFilter >("truth");
+  } else if (filterName == "truth_number") {
+    return makeUnique<MCCTruthNumberCDCVXDTrackCombinationFilter>("truth");
   } else {
     return Super::create(filterName);
   }

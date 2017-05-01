@@ -17,7 +17,6 @@
 #include <tracking/trackFindingVXD/trackSetEvaluator/HopfieldNetwork.h>
 
 namespace Belle2 {
-  // TODO: Let filter determine the template classes
   template<class AFilter>
   class OverlapResolverFindlet : public TrackFindingCDC::Findlet<typename AFilter::Object> {
   public:
@@ -51,32 +50,50 @@ namespace Belle2 {
 
     /// Main function of this findlet: traverse a tree starting from a given seed object.
     void apply(std::vector<ResultPair>& resultElements) final {
-      // Create overlaps using the input elements
-      // TODO: Can this be done better? I think so.
-      for (unsigned int resultIndex = 0; resultIndex < resultElements.size(); resultIndex++)
-      {
-        const ResultPair& resultPair = resultElements[resultIndex];
 
+      TrackFindingCDC::Weight maximalWeight = 0;
+      unsigned int resultIndex = 0;
+
+      for (const ResultPair& resultPair : resultElements)
+      {
         TrackFindingCDC::Weight weight = m_qualityFilter(resultPair);
-        m_overlaps.clear();
+        if (weight > maximalWeight) {
+          maximalWeight = weight;
+        }
+
+        // activity state has no meaning here -> set to 0.
+        // the overlap will be set later on.
+        // TODO: why is emplace_back not working here?
+        m_overlapResolverInfos.emplace_back(OverlapResolverNodeInfo(weight, resultIndex, {}, 0));
+        resultIndex++;
+      }
+
+      for (resultIndex = 0; resultIndex < resultElements.size(); resultIndex++)
+      {
+        auto& resolverInfo = m_overlapResolverInfos[resultIndex];
+        ResultPair& resultPair = resultElements[resultIndex];
+
+        // Normalize the weight
+        resolverInfo.qualityIndex /= maximalWeight;
+
+        // Find overlaps. TODO: Can this be done better? Maybe with a list of pointers?
+        auto& overlaps = resolverInfo.overlaps;
 
         for (unsigned int loopResultIndex = 0; loopResultIndex < resultElements.size(); loopResultIndex++) {
           const ResultPair& loopResultPair = resultElements[loopResultIndex];
 
           if (loopResultPair.first == resultPair.first) {
-            m_overlaps.push_back(loopResultIndex);
+            overlaps.push_back(loopResultIndex);
             break;
           }
 
           for (const auto& hit : resultPair.second) {
             if (TrackFindingCDC::is_in(hit, loopResultPair.second)) {
-              m_overlaps.push_back(loopResultIndex);
+              overlaps.push_back(loopResultIndex);
               break;
             }
           }
         }
-        // activity state has no meaning here.
-        m_overlapResolverInfos.emplace_back(weight, resultIndex, m_overlaps, 0);
       }
 
       // do hopfield
@@ -100,12 +117,14 @@ namespace Belle2 {
     // TODO: export parameters
     HopfieldNetwork m_hopfieldNetwork;
 
-    /// Parameters
+    // Parameters
+    /// Minimal activity state above a node is seen as active.
     double m_param_minimalActivityState = 0.75;
 
-    /// Object Pools
+    // Object Pools
+    /// Overlap resolver infos as input to the hopfield network.
     std::vector<OverlapResolverNodeInfo> m_overlapResolverInfos;
+    /// temporary results vector, that will be swapped with the real results vector.
     std::vector<ResultPair> m_temporaryResults;
-    std::vector<unsigned short> m_overlaps;
   };
 }

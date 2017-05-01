@@ -51,10 +51,11 @@ void CDCToSpacePointCKFFindlet::apply()
     m_spacePointVector.push_back(&spacePoint);
   }
 
-  // Apply the tree search
   m_treeSearchFindlet.apply(m_cdcRecoTrackVector, m_spacePointVector, m_results);
-
   B2INFO("Found " << m_results.size() << " tracks");
+
+  m_overlapResolver.apply(m_results);
+  B2INFO("After overlap resolving: Found " << m_results.size() << " tracks");
 
   // Use the found hits for each track, create new VXD reco tracks, add relations, merge the tracks and fill them
   // into a new store array

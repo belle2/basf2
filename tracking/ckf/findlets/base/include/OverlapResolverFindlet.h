@@ -18,11 +18,10 @@
 
 namespace Belle2 {
   // TODO: Let filter determine the template classes
-  template<class ASeedObject, class AHitObject, class AFilter>
-  class OverlapResolverFindlet : public TrackFindingCDC::Findlet<std::pair<ASeedObject*, std::vector<const AHitObject*>>> {
-    using ResultPair = std::pair<ASeedObject*, std::vector<const AHitObject*>>;
-
+  template<class AFilter>
+  class OverlapResolverFindlet : public TrackFindingCDC::Findlet<typename AFilter::Object> {
   public:
+    using ResultPair = typename AFilter::Object;
     using Super = TrackFindingCDC::Findlet<ResultPair>;
 
     OverlapResolverFindlet() : Super()
@@ -69,7 +68,7 @@ namespace Belle2 {
             break;
           }
 
-          for (const AHitObject* hit : resultPair.second) {
+          for (const auto& hit : resultPair.second) {
             if (TrackFindingCDC::is_in(hit, loopResultPair.second)) {
               m_overlaps.push_back(loopResultIndex);
               break;

@@ -44,8 +44,7 @@ namespace Belle2 {
     /// Findlet doing the main work: the tree finding
     CDCToSpacePointTreeSearchFindlet m_treeSearchFindlet;
     /// Findlet for resolving overlaps
-    OverlapResolverFindlet<RecoTrack, SpacePoint,
-                           TrackFindingCDC::ChooseableFilter<CDCVXDTrackCombinationFilterFactory>> m_overlapResolver;
+    OverlapResolverFindlet<TrackFindingCDC::ChooseableFilter<CDCVXDTrackCombinationFilterFactory>> m_overlapResolver;
 
     // Parameters
     bool m_param_exportTracks = true;

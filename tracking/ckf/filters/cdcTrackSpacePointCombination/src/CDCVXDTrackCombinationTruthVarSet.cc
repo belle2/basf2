@@ -31,7 +31,33 @@ bool CDCVXDTrackCombinationTruthVarSet::extract(const BaseCDCVXDTrackCombination
   TrackMatchLookUp mcCDCMatchLookUp("MCRecoTracks", cdcTrackStoreArrayName);
   const RecoTrack* cdcMCTrack = mcCDCMatchLookUp.getMatchedMCRecoTrack(*cdcTrack);
 
-  // TODO
+  // Default to false
+  var<named("truth")>() = 0;
+
+  if (not cdcMCTrack) {
+    // CDC track is a fake.
+    return true;
+  }
+
+  // Count the number of times the CDC-related MC-track is also related to the SVD cluster.
+  unsigned int numberOfCorrectHits = 0;
+
+  for (const SpacePoint* spacePoint : result->second) {
+    for (const SVDCluster* relatedCluster : spacePoint->getRelated<SVDCluster>()) {
+      const auto& relatedMCRecoTracksToOneCluster = relatedCluster.getRelationsWith<RecoTrack>("MCRecoTracks");
+
+      bool cdcTrackMatchedToCluster = std::any_of(relatedMCRecoTracksToOneCluster.begin(),
+      relatedMCRecoTracksToOneCluster.end(), [cdcMCTrack](const RecoTrack & mcRecoTrack) {
+        return &mcRecoTrack == cdcMCTrack;
+      });
+
+      if (cdcTrackMatchedToCluster) {
+        numberOfCorrectHits++;
+      }
+    }
+  }
+
+  var<named("truth")>() = numberOfCorrectHits;
 
   return true;
 }

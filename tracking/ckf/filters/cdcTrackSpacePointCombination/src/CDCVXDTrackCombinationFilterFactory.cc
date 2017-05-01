@@ -23,6 +23,9 @@ namespace {
   /// MC filter for VXD - CDC relations.
   using MCCDCVXDTrackCombinationFilter = MCFilter<CDCVXDTrackCombinationTruthVarSet>;
 
+  /// MC filter for VXD - CDC relations.
+  using MCCTruthNumberDCVXDTrackCombinationFilter = ChooseableFromVarSet<CDCVXDTrackCombinationTruthVarSet>;
+
   /// All filter for VXD - CDC relations.
   using AllCDCVXDTrackCombinationFilter = AllFilter<BaseCDCVXDTrackCombinationFilter>;
 }
@@ -49,6 +52,7 @@ CDCVXDTrackCombinationFilterFactory::getValidFilterNamesAndDescriptions() const
     {"none", "no track combination is valid"},
     {"all", "set all track combinations as good"},
     {"truth", "monte carlo truth"},
+    {"truth_number", "monte carlo truth returning the number of correct hits"},
   };
 }
 
@@ -61,6 +65,8 @@ CDCVXDTrackCombinationFilterFactory::create(const std::string& filterName) const
     return makeUnique<AllCDCVXDTrackCombinationFilter >();
   } else if (filterName == "truth") {
     return makeUnique<MCCDCVXDTrackCombinationFilter >();
+  } else if (filterName == "truth") {
+    return makeUnique<MCTruthNumberCDCVXDTrackCombinationFilter >("truth");
   } else {
     return Super::create(filterName);
   }

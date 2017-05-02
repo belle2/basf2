@@ -34,7 +34,13 @@ void VXDTrackCandidatesQualityIndexCutterModule::initialize()
 {
   m_spacePointTrackCands.isRequired(m_nameSpacePointTrackCands);
   if (m_createNewStoreArray) {
-    m_newSpacePointTrackCands.registerInDataStore(m_newNameSpacePointTrackCands, DataStore::c_DontWriteOut);
+    B2ASSERT("BestVXDTrackCandidatesSelectorModule::CopyMode: Target StoreArray has to be different from source StoreArray!",
+             m_nameSpacePointTrackCands != m_newNameSpacePointTrackCands);
+    if (StoreArray<SpacePointTrackCand>("m_newNameSpacePointTrackCands").isValid()) {
+      B2WARNING("BestVXDTrackCandidatesSelectorModule::CopyMode: Target StoreArray already present!");
+    } else {
+      m_newSpacePointTrackCands.registerInDataStore(m_newNameSpacePointTrackCands, DataStore::c_DontWriteOut);
+    }
   }
 }
 

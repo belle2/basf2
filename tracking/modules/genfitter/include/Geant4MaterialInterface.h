@@ -15,9 +15,11 @@ class G4VPhysicalVolume;
 
 namespace Belle2 {
 
-
   /**
-   * @brief AbsMaterialInterface implementation for use with ROOT's TGeoManager.
+   * @brief AbsMaterialInterface implementation for use with Geant4's navigator.
+   *
+   * This allows to look up the material properties from the Geant4 geometry also used for
+   * simulation purposes.
    */
   class Geant4MaterialInterface : public genfit::AbsMaterialInterface {
 

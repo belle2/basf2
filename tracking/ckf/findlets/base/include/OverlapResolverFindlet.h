@@ -50,13 +50,17 @@ namespace Belle2 {
 
     /// Main function of this findlet: traverse a tree starting from a given seed object.
     void apply(std::vector<ResultPair>& resultElements) final {
-
       TrackFindingCDC::Weight maximalWeight = 0;
-      unsigned int resultIndex = 0;
 
-      for (const ResultPair& resultPair : resultElements)
+      for (unsigned int resultIndex = 0; resultIndex < resultElements.size(); resultIndex++)
       {
+        ResultPair& resultPair = resultElements[resultIndex];
+
         TrackFindingCDC::Weight weight = m_qualityFilter(resultPair);
+        if (std::isnan(weight)) {
+          continue;
+        }
+
         if (weight > maximalWeight) {
           maximalWeight = weight;
         }
@@ -65,13 +69,11 @@ namespace Belle2 {
         // the overlap will be set later on.
         // TODO: why is emplace_back not working here?
         m_overlapResolverInfos.emplace_back(OverlapResolverNodeInfo(weight, resultIndex, {}, 0));
-        resultIndex++;
       }
 
-      for (resultIndex = 0; resultIndex < resultElements.size(); resultIndex++)
+      for (OverlapResolverNodeInfo& resolverInfo : m_overlapResolverInfos)
       {
-        auto& resolverInfo = m_overlapResolverInfos[resultIndex];
-        ResultPair& resultPair = resultElements[resultIndex];
+        const ResultPair& resultPair = resultElements[resolverInfo.trackIndex];
 
         // Normalize the weight
         resolverInfo.qualityIndex /= maximalWeight;
@@ -79,17 +81,22 @@ namespace Belle2 {
         // Find overlaps. TODO: Can this be done better? Maybe with a list of pointers?
         auto& overlaps = resolverInfo.overlaps;
 
-        for (unsigned int loopResultIndex = 0; loopResultIndex < resultElements.size(); loopResultIndex++) {
-          const ResultPair& loopResultPair = resultElements[loopResultIndex];
+        for (const OverlapResolverNodeInfo& loopResolverInfo : m_overlapResolverInfos) {
+          // We do not allow overlap with ourselves
+          if (&loopResolverInfo == &resolverInfo) {
+            continue;
+          }
+
+          const ResultPair& loopResultPair = resultElements[loopResolverInfo.trackIndex];
 
           if (loopResultPair.first == resultPair.first) {
-            overlaps.push_back(loopResultIndex);
-            break;
+            overlaps.push_back(loopResolverInfo.trackIndex);
+            continue;
           }
 
           for (const auto& hit : resultPair.second) {
             if (TrackFindingCDC::is_in(hit, loopResultPair.second)) {
-              overlaps.push_back(loopResultIndex);
+              overlaps.push_back(loopResolverInfo.trackIndex);
               break;
             }
           }

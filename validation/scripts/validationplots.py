@@ -518,6 +518,8 @@ def create_RootObjects_from_file(root_file, is_reference, work_folder):
         name = key.GetName()
         file_keys.append(name)
 
+        metaoptions = []
+
         # temporary workaround for dbstore files located (wrongly)
         # in the validation results folder
         if re.search(".*dbstore.*root", root_file):

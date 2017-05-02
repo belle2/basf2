@@ -16,12 +16,78 @@
 #include "G4Material.hh"
 #include "G4TouchableHistory.hh"
 
+
+#include <G4VExceptionHandler.hh>
+#include <G4StateManager.hh>
+
+
 static const bool debug = false;
-//static const bool debug = true;
 
 using namespace Belle2;
 
 namespace Belle2 {
+
+  /**
+   * This class implements a custom exception handler for Geant4 which is used
+   * to record whether a critical exception occurred when calling the G4Navigator.
+   * This class is mainly used to handle stuck tracks.
+   */
+  class Geant4MaterialInterfaceExceptioHandler : public G4VExceptionHandler {
+  public:
+    /**
+     * virtual destructor for proper resource de-allocation
+     */
+    virtual ~Geant4MaterialInterfaceExceptioHandler() = default;
+
+    /**
+     *  G4VExceptionHandler method called when an exception is raised
+     */
+    virtual bool Notify(const char* origin, const char* code, G4ExceptionSeverity serv, const char* description)
+    {
+      B2WARNING("Geant4 exception during material lookup -- origin: "
+                << origin << "\n code:"
+                << code << "\n description:"
+                << description);
+
+      if (serv == EventMustBeAborted || serv == RunMustBeAborted) {
+        m_inFailureState = true;
+      }
+
+      if (serv == FatalException || serv == FatalErrorInArgument) {
+        // on fatal exceptions, instruct Geant4 to create core dump
+        // and crash
+        return true;
+      }
+
+      // returning false will continue the program execution
+      // G4ExceptionSeverity = JustWarning will be covered by this, too
+      return false;
+    }
+
+    /**
+     * Returns true if a problematic exception was encountered
+     */
+    bool isInFailureState() const
+    {
+      return m_inFailureState;
+    }
+
+    /**
+     * Reset the recorded failure state to be ready for the next
+     * calls to Geant4
+     */
+    void resetFailureState()
+    {
+      m_inFailureState = false;
+    }
+
+  private:
+    /**
+     * Stores whether a problematic exception occured.
+     */
+    bool m_inFailureState = false;
+  };
+
   /**
    * Guards against leaving the physical volume.
    *
@@ -84,7 +150,37 @@ namespace Belle2 {
     {
       return nav_.CreateTouchableHistory();
     }
+
   private:
+
+    /**
+     * Install our specific exception handler and cache the one which was set before. Be sure
+     * to call uninstallAndCheckOurExceptionHandler() once the G4Navigator call is completed.
+     */
+    void installOurExceptionHandler()
+    {
+      otherHandler = G4StateManager::GetStateManager()->GetExceptionHandler();
+      exceptionHandler.resetFailureState();
+      G4StateManager::GetStateManager()->SetExceptionHandler(&exceptionHandler);
+    }
+
+    /**
+     * Reinstate the previously used exception handler and check whether a critical
+     * exception was recorded by our exception handler. If so, throw a Genfit exception.
+     */
+    void uninstallAndCheckOurExceptionHandler()
+    {
+      G4StateManager::GetStateManager()->SetExceptionHandler(otherHandler);
+
+      // was the a problem in the last usage ?
+      if (exceptionHandler.isInFailureState()) {
+        genfit::Exception exc("Geant4MaterialInterface::findNextBoundary ==> Geant4 exception during geometry navigation", __LINE__,
+                              __FILE__);
+        exc.setFatal();
+        throw exc;
+      }
+    }
+
     /** the last point which has been queried with G4 */
     G4ThreeVector lastpoint_;
     /** the last volume which has been queried */
@@ -93,6 +189,10 @@ namespace Belle2 {
     G4Navigator nav_;
     /** The topmost solid of the G4 world */
     const G4VSolid* worldsolid_ {0};
+    /** Stores the pointer to exception handler which this class temporarily replaces for most calls */
+    G4VExceptionHandler* otherHandler = nullptr;
+    /** Custom exception handler to handle stuck tracks properly (and abort) */
+    Geant4MaterialInterfaceExceptioHandler exceptionHandler;
   };
 }
 
@@ -110,7 +210,11 @@ G4VPhysicalVolume* G4SafeNavigator::LocateGlobalPointAndSetup(const G4ThreeVecto
     return lastvolume_;
   }
   //B2INFO("###  init: " << point);
+
+  installOurExceptionHandler();
   G4VPhysicalVolume* volume = nav_.LocateGlobalPointAndSetup(point, direction, pRelativeSearch, ignoreDirection);
+  uninstallAndCheckOurExceptionHandler();
+
   if (!volume) {
     volume = nav_.GetWorldVolume();
   }
@@ -128,7 +232,10 @@ G4VPhysicalVolume* G4SafeNavigator::ResetHierarchyAndLocate(const G4ThreeVector&
     return lastvolume_;
   }
   //B2INFO("### reset: " << point);
+  installOurExceptionHandler();
   G4VPhysicalVolume* volume = nav_.ResetHierarchyAndLocate(point, direction, h);
+  uninstallAndCheckOurExceptionHandler();
+
   if (!volume) {
     volume = nav_.GetWorldVolume();
   }
@@ -148,7 +255,12 @@ G4double G4SafeNavigator::CheckNextStep(const G4ThreeVector& point,
     pNewSafety = worldsolid_->DistanceToIn(point);
     return worldsolid_->DistanceToIn(point, direction);
   }
-  return nav_.CheckNextStep(point, direction, pCurrentProposedStepLength, pNewSafety);
+
+  installOurExceptionHandler();
+  const auto distance =  nav_.CheckNextStep(point, direction, pCurrentProposedStepLength, pNewSafety);
+  uninstallAndCheckOurExceptionHandler();
+
+  return distance;
 }
 
 

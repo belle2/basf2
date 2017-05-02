@@ -1,5 +1,5 @@
 /* Copyright 2014, Ludwig-Maximilians-Universität München,
-   Authors: Tobias Schlüter
+   Authors: Tobias Schlüter, Thomas Hauth
 
    Provided as part of the Belle II software framework basf2.  Its
    licenses apply.

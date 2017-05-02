@@ -22,15 +22,27 @@ namespace Belle2 {
 
     CKFCDCToVXDStateObject() = default;
 
-    CKFCDCToVXDStateObject(RecoTrack* seed)
+    void initialize(RecoTrack* seed)
     {
       m_seedRecoTrack = seed;
 
       m_measuredStateOnPlane = seed->getMeasuredStateOnPlaneFromFirstHit();
       m_cachedMeasuredStateOnPlane = seed->getMeasuredStateOnPlaneFromFirstHit();
+
+      // Reset other state
+      m_spacePoint = nullptr;
+      m_number = N;
+      m_parent = nullptr;
+
+      m_chi2 = 0;
+
+      m_isFitted = false;
+      m_isAdvanced = false;
+
+      m_hasCache = false;
     }
 
-    CKFCDCToVXDStateObject(CKFCDCToVXDStateObject* parent, const SpacePoint* spacePoint)
+    void set(CKFCDCToVXDStateObject* parent, const SpacePoint* spacePoint)
     {
       m_parent = parent;
       m_seedRecoTrack = parent->getSeedRecoTrack();
@@ -39,6 +51,14 @@ namespace Belle2 {
 
       m_measuredStateOnPlane = parent->getMeasuredStateOnPlane();
       m_cachedMeasuredStateOnPlane = parent->getMeasuredStateOnPlane();
+
+      // Reset other state
+      m_chi2 = 0;
+
+      m_isFitted = false;
+      m_isAdvanced = false;
+
+      m_hasCache = false;
     }
 
 

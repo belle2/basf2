@@ -27,6 +27,9 @@ void plotStd(TFile* pfile, TTree* ptree, TFile *outputFile){
 
   TString tmCuts("(DST_isSignal == 1)");
 
+  TH1F* h_Dst_Q = new TH1F("h_Dst_Q","Q Value",100,0,0.02);
+  ptree->Project("h_Dst_Q", "DST_Q", tmCuts);
+
   TH1F* h_D0_p = new TH1F("h_D0_p","D0 momentum",100,0,7);
   ptree->Project("h_D0_p", "DST_D0_P", tmCuts);
 
@@ -39,6 +42,7 @@ void plotStd(TFile* pfile, TTree* ptree, TFile *outputFile){
 
   outputFile->cd();
 
+  h_Dst_Q->Write();
   h_D0_p->Write();
   h_pis_p->Write();
   h_pi_p->Write();

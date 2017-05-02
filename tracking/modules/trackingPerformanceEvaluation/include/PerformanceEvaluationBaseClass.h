@@ -68,10 +68,19 @@ namespace Belle2 {
                             Int_t nbins, Double_t min, Double_t max,
                             const char* xtitle, TList* histoList = NULL);  /**< thf */
 
+    TH1F* createHistogram1D(const char* name, const char* title,
+                            Int_t nbins, Double_t* bins,
+                            const char* xtitle, TList* histoList = NULL);
+
     TH2F* createHistogram2D(const char* name, const char* title,
                             Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
                             Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
                             TList* histoList = NULL);  /**< thf */
+
+    TH2F* createHistogram2D(const char* name, const char* title,
+                            Int_t nbinsX, Double_t* binsX, const char* titleX,
+                            Int_t nbinsY, Double_t* binsY, const char* titleY,
+                            TList* histoList = NULL);
 
     TH3F* createHistogram3D(const char* name, const char* title,
                             Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
@@ -99,6 +108,27 @@ namespace Belle2 {
     void addInefficiencyPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL,
                               TH3F* h3_MCParticle = NULL);  /**< inefficiency */
     void addPurityPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL, TH3F* h3_MCParticle = NULL);  /**< purity */
+
+    TH1F* effPlot1D(TH1F* h1_den, TH1F* h1_num,
+                    const char* name, const char* title, bool geo_accettance, TList* histoList = NULL);
+
+    TH1F* effPlot1D(TH1F* h1_MC, TH1F* h1_RecoTrack, TH1F* h1_Track,
+                    const char* name, const char* title, TList* histoList = NULL);
+
+    TH2F* effPlot2D(TH2F* h2_den, TH2F* h2_num,
+                    const char* name, const char* title, bool geo_accettance, TList* histoList = NULL);
+
+    TH2F* effPlot2D(TH2F* h2_MC, TH2F* h2_RecoTrack, TH2F* h2_Track,
+                    const char* name, const char* title, TList* histoList);
+
+    TH1F* geoAcc1D(TH1F* h1_den, TH1F* h1_num,
+                   const char* name, const char* title, TList* histoList = NULL);
+
+    TH2F* geoAcc2D(TH2F* h2_den, TH2F* h2_num,
+                   const char* name, const char* title, TList* histoList = NULL);
+
+    TH1F* V0FinderEff(TH1F* h1_dau0, TH1F* h1_dau1, TH1F* h1_Mother,
+                      const char* name, const char* title, TList* histoList = NULL);
 
 
     /* user-defined parameters */

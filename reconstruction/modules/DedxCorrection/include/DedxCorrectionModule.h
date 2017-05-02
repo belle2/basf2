@@ -17,6 +17,11 @@
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
 
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/DBArray.h>
+
+#include <reconstruction/dbobjects/CDCDedxWireGain.h>
+
 #include <string>
 #include <vector>
 
@@ -73,6 +78,8 @@ namespace Belle2 {
     double I2D(const double& cosTheta, const double& I) const;
 
   private:
+
+    DBArray<CDCDedxWireGain> m_wireGains; /**< CDC dE/dx wire gains */
 
     /** Recalculate the dE/dx mean values after corrections */
     void calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr, const std::vector<double>& dedx) const;

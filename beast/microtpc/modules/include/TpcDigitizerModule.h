@@ -95,6 +95,8 @@ namespace Belle2 {
       /** GEMazition of GEM2 */
       TVector2 GEMGeo2(double x1, double y1);
 
+      /** Phase */
+      Int_t m_phase;
       /** Define ToT calib 1 */
       TF1* fctToT_Calib1;
       /** Define ToT calib 2 */

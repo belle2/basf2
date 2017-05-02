@@ -105,11 +105,10 @@ namespace {
                              const StoreArray<RecoTrack>& storedRecoTracks)
   {
     RecoTrackId recoTrackId = -1;
-    typename AMapOrSet::iterator itInsertHint = recoTrackID_by_hitID.end();
-
     for (const RecoTrack& recoTrack : storedRecoTracks) {
       ++recoTrackId;
-
+      std::vector<std::pair<DetHitIdPair, WeightedRecoTrackId> > hitIDsInTrack;
+      double totalWeight = 0;
       using OriginTrackFinder = RecoHitInformation::OriginTrackFinder;
       const OriginTrackFinder c_MCTrackFinderAuxiliaryHit =
         OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
@@ -117,23 +116,33 @@ namespace {
       for (const RecoHitInformation::UsedCDCHit* cdcHit : recoTrack.getCDCHitList()) {
         OriginTrackFinder originFinder = recoTrack.getFoundByTrackFinder(cdcHit);
         double weight = originFinder == c_MCTrackFinderAuxiliaryHit ? 0 : 1;
-        itInsertHint =
-          recoTrackID_by_hitID.insert(itInsertHint,
-        {{Const::CDC, cdcHit->getArrayIndex()}, {recoTrackId, weight}});
+        totalWeight += weight;
+        hitIDsInTrack.push_back({{Const::CDC, cdcHit->getArrayIndex()}, {recoTrackId, weight}});
       }
       for (const RecoHitInformation::UsedSVDHit* svdHit : recoTrack.getSVDHitList()) {
         OriginTrackFinder originFinder = recoTrack.getFoundByTrackFinder(svdHit);
         double weight = originFinder == c_MCTrackFinderAuxiliaryHit ? 0 : 1;
-        itInsertHint =
-          recoTrackID_by_hitID.insert(itInsertHint,
-        {{Const::SVD, svdHit->getArrayIndex()}, {recoTrackId, weight}});
+        totalWeight += weight;
+        hitIDsInTrack.push_back({{Const::SVD, svdHit->getArrayIndex()}, {recoTrackId, weight}});
       }
       for (const RecoHitInformation::UsedPXDHit* pxdHit : recoTrack.getPXDHitList()) {
         OriginTrackFinder originFinder = recoTrack.getFoundByTrackFinder(pxdHit);
         double weight = originFinder == c_MCTrackFinderAuxiliaryHit ? 0 : 1;
-        itInsertHint =
-          recoTrackID_by_hitID.insert(itInsertHint,
-        {{Const::PXD, pxdHit->getArrayIndex()}, {recoTrackId, weight}});
+        totalWeight += weight;
+        hitIDsInTrack.push_back({{Const::PXD, pxdHit->getArrayIndex()}, {recoTrackId, weight}});
+      }
+
+      // In case all hits are auxiliary for a track - reset all weights to 1
+      if (totalWeight == 0) {
+        for (std::pair<DetHitIdPair, WeightedRecoTrackId>& recoTrack_for_hitID : hitIDsInTrack) {
+          recoTrack_for_hitID.second.weight = 1;
+        }
+      }
+
+      // Commit to output
+      typename AMapOrSet::iterator itInsertHint = recoTrackID_by_hitID.end();
+      for (std::pair<DetHitIdPair, WeightedRecoTrackId>& recoTrack_for_hitID : hitIDsInTrack) {
+        itInsertHint = recoTrackID_by_hitID.insert(itInsertHint, recoTrack_for_hitID);
       }
     }
   }
@@ -426,6 +435,15 @@ void MCRecoTracksMatcherModule::event()
   Eigen::MatrixXd efficiencyMatrix = confusionMatrix.array().rowwise() / totalNDF_by_mcId.array();
   Eigen::MatrixXd weightedEfficiencyMatrix = weightedConfusionMatrix.array().rowwise() / totalWeight_by_mcId.array();
 
+  B2DEBUG(100, "Purities");
+  B2DEBUG(100, purityMatrix);
+
+  B2DEBUG(100, "Efficiencies");
+  B2DEBUG(100, efficiencyMatrix);
+
+  B2DEBUG(100, "Weighted efficiencies");
+  B2DEBUG(100, weightedEfficiencyMatrix);
+
   // ### Building the Monte-Carlo track to highest efficiency patter recognition track relation ###
   // Weighted efficiency
   using Efficiency = float;
@@ -440,20 +458,35 @@ void MCRecoTracksMatcherModule::event()
     Eigen::VectorXd weightedEfficiencyCol = weightedEfficiencyMatrix.col(mcId);
 
     RecoTrackId bestPrId = 0;
-    Efficiency weightedEfficiency = weightedEfficiencyCol(0);
-    Efficiency efficiency = efficiencyCol(0);
+    Efficiency bestWeightedEfficiency = weightedEfficiencyCol(0);
+    Efficiency bestEfficiency = efficiencyCol(0);
+
+    // Reject efficiency smaller than the minimal one
+    if (bestWeightedEfficiency < m_param_minimalEfficiency) {
+      bestWeightedEfficiency = 0;
+    }
 
     // In case of a tie in the weighted efficiency we use the regular efficiency to break it.
     for (RecoTrackId prId = 1; prId < nPRRecoTracks; ++prId) {
-      if (std::tie(weightedEfficiencyCol(prId), efficiencyCol(prId)) >
-          std::tie(weightedEfficiency, efficiency)) {
+      Efficiency currentWeightedEfficiency = weightedEfficiencyCol(prId);
+      Efficiency currentEfficiency = efficiencyCol(prId);
+
+      // Reject efficiency smaller than the minimal one
+      if (currentWeightedEfficiency < m_param_minimalEfficiency) {
+        currentWeightedEfficiency = 0;
+      }
+
+      if (std::tie(currentWeightedEfficiency, currentEfficiency) >
+          std::tie(bestWeightedEfficiency, bestEfficiency)) {
         bestPrId = prId;
-        efficiency = efficiencyCol(prId);
-        weightedEfficiency = weightedEfficiencyCol(prId);
+        bestEfficiency = currentEfficiency;
+        bestWeightedEfficiency = currentWeightedEfficiency;
       }
     }
 
-    mostWeightEfficientPRId_by_mcId[mcId] = {bestPrId, weightedEfficiency, efficiency};
+    bestWeightedEfficiency = weightedEfficiencyCol(bestPrId);
+    bestEfficiency = efficiencyCol(bestPrId);
+    mostWeightEfficientPRId_by_mcId[mcId] = {bestPrId, bestWeightedEfficiency, bestEfficiency};
   }
 
   // ### Building the patter recognition track to highest purity Monte-Carlo track relation ###
@@ -643,6 +676,14 @@ void MCRecoTracksMatcherModule::event()
     // No related pattern recognition track
     // Do not create a relation.
     B2DEBUG(100, "mcId " << mcId << " is missing. No relation created.");
+    B2DEBUG(100, "is Primary" << mcRecoTracks[mcId]->getRelatedTo<MCParticle>()->isPrimaryParticle());
+    B2DEBUG(100, "best prId " << prId << " with purity " << mostPureMCId_for_prId.purity << " -> " << mostPureMCId);
+    B2DEBUG(100, "MC Total ndf " << totalNDF_by_mcId[mcId]);
+    B2DEBUG(100, "MC Total weight" << totalWeight_by_mcId[mcId]);
+    B2DEBUG(100, "MC Overlap ndf\n " << confusionMatrix.col(mcId).transpose());
+    B2DEBUG(100, "MC Overlap weight\n " << weightedConfusionMatrix.col(mcId).transpose());
+    B2DEBUG(100, "MC Efficiencies for the track\n" << efficiencyMatrix.col(mcId).transpose());
+    B2DEBUG(100, "MC Weighted efficiencies for the track\n" << weightedEfficiencyMatrix.col(mcId).transpose());
   } // end for mcId
 
   B2DEBUG(100, "########## End MCRecoTracksMatcherModule ############");

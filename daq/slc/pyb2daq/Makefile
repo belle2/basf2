@@ -35,9 +35,9 @@ CFLAGS  += -I$(BELLE2_DAQ_SLC)/externals/python/include/python3.5m
 LIBS   += -L$(BELLE2_DAQ_SLC)/externals/boost/lib -lboost_python -lboost_filesystem -lboost_program_options -lboost_system
 LIBS   += -L$(BELLE2_DAQ_SLC)/externals/python/lib -lpython3.5m
 
-LIBS    += -lm -lpthread -ldl -lrt \
+LIBS    += -lm -lpthread -ldl -lrt -lreadline -lncurses \
          -L$(SLCDIR)/lib -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database -ldaq_slc_psql \
-	 -ldaq_slc_nsm -ldaq_slc_runcontrol -ldaq_slc_readout -ldaq_slc_copper \
+	 -ldaq_slc_nsm -ldaq_slc_runcontrol -ldaq_slc_readout -ldaq_slc_copper -ldaq_slc_hvcontrol \
 	 -lhs -lttrx -lnsm2_corelib -lnsm2_b2lib
 LIBS    += -L$(PGSQL_LIB_PATH) -lpq
 

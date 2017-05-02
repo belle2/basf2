@@ -275,6 +275,9 @@ namespace Belle2 {
     std::vector<Double_t> m_input_LB_DOSI_av; /**< list of PIN LB dose */
     std::vector<Double_t> m_input_HB_DOSI_av; /**< list of PIN HB dose */
 
+    Double_t m_input_PIN_width; /**< PIN width */
+    std::vector<Double_t> m_input_HE3_EfCor; /**< HE3 inefficiency correction */
+
     TF1* fctRate_HB;  /** fct HB */
     TF1* fctRate_HC;  /** fct HC */
     TF1* fctRate_LB;  /** fct LB */

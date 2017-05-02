@@ -56,11 +56,15 @@ void DedxDatabaseImporter::importWireGainCalibration()
 
       std::string histconstants = key->GetName();
 
-      if (histconstants.compare("wireGains") == 0) {
+      if (histconstants.compare("CDCDedxWireGainCollector") == 0) {
         gains = (TH2F*)f->Get(histconstants.c_str());
+        B2INFO("Key name matches: " << histconstants);
       }
 
-      else { B2ERROR("Key name does not match: gain!"); }
+      else {
+        B2WARNING("Key name does not match: " << histconstants);
+        continue;
+      }
     }
 
     nFiles++;

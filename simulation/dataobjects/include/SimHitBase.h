@@ -44,6 +44,11 @@ namespace Belle2 {
                   bg_SynchRad_HER     = 14, /**< Synchrotron radiation HER */
                   bg_BHWide_LER       = 15, /**< Wide angle radiative Bhabha LER */
                   bg_BHWide_HER       = 16, /**< Wide angle radiative Bhabha HER */
+                  bg_RBB              = 17, /**< Radiative Bhabha */
+                  bg_BHWide           = 18, /**< Wide angle radiative Bhabha */
+                  bg_BHWideLargeAngle = 19, /**< Large angle radiative Bhabha */
+                  bg_InjectionLER     = 21, /**< injection background LER */
+                  bg_InjectionHER     = 22, /**< injection background HER */
                   bg_other            = 99  /**< Other type of background */
                 };
     /**

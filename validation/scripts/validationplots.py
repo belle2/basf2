@@ -351,6 +351,7 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
             i_key = 0
             compare_plots = []
             compare_ntuples = []
+            compare_html_content = []
             for key in sorted(list_of_keys):
                 i_key = i_key + 1
 
@@ -374,6 +375,13 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
                                                                          check=plotuple.check,
                                                                          is_expert=plotuple.is_expert(),
                                                                          json_file_path=plotuple.file))
+                elif plotuple.type == 'TNamed':
+                    compare_html_content.append(json_objects.ComparisonHtmlContent(title=plotuple.get_plot_title(),
+                                                                                   description=plotuple.description,
+                                                                                   contact=plotuple.contact,
+                                                                                   check=plotuple.check,
+                                                                                   is_expert=plotuple.is_expert(),
+                                                                                   html_content=plotuple.html_content))
                 else:
                     compare_plots.append(json_objects.ComparisonPlot(title=plotuple.get_plot_title(),
                                                                      comparison_result=plotuple.comparison_result,
@@ -396,7 +404,8 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
                                                            rootfile=fileName,
                                                            compared_revisions=list_of_revisions,
                                                            plots=compare_plots,
-                                                           ntuples=compare_ntuples)
+                                                           ntuples=compare_ntuples,
+                                                           html_content=compare_html_content)
             compare_files.append(compare_file)
 
         comparison_packages.append(json_objects.ComparisonPackage(name=package, plotfiles=compare_files))
@@ -535,6 +544,9 @@ def create_RootObjects_from_file(root_file, is_reference, work_folder):
             root_object_type = 'TEfficiency'
         elif root_object.InheritsFrom('TGraph'):
             root_object_type = 'TGraph'
+        # use to store user's html output
+        elif root_object.ClassName() == 'TNamed':
+            root_object_type = 'TNamed'
         elif root_object.InheritsFrom('TASImage'):
             root_object_type = 'TASImage'
         else:
@@ -617,7 +629,11 @@ def create_RootObjects_from_file(root_file, is_reference, work_folder):
             # want to use the same RootObject()-call for both histograms and
             # n-tuples :-)
             root_object = ntuple_values
-
+        elif root_object_type == 'TNamed':
+            # TODO Set this to correct values
+            description = None
+            check = None
+            contact = None
         elif root_object_type == 'TASImage':
             # TODO Set this to correct values
             description = None

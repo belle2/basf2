@@ -169,5 +169,11 @@ namespace Belle2 {
       std::string map(int index, const CDCHit& hit) override;
     };
 
+    /// Segment to color map by the number of passed loops.
+    class NLoopsColorMap: public HitColorMapping {
+    public:
+      /// Function call to map a segments object from the local finder to a color.
+      std::string map(int index, const CDCHit& hit) override;
+    };
   }
 }

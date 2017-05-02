@@ -17,6 +17,7 @@
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
@@ -25,6 +26,7 @@ using namespace TrackFindingCDC;
 
 namespace {
   using AllSegmentFilter = AllFilter<BaseSegmentFilter>;
+  using NoneSegmentFilter = NoneFilter<BaseSegmentFilter>;
   using BkgMCSegmentFilter =
     MCFilter<VariadicUnionVarSet<BkgTruthSegmentVarSet, AdvancedSegmentVarSet>>;
   using BkgRecordingSegmentFilter =
@@ -63,7 +65,7 @@ std::unique_ptr<BaseSegmentFilter>
 SegmentFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<BaseSegmentFilter>();
+    return makeUnique<NoneSegmentFilter>();
   } else if (filterName == "all") {
     return makeUnique<AllSegmentFilter>();
   } else if (filterName == "bkg_truth") {

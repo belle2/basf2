@@ -1,0 +1,27 @@
+# EventType: 4120010000
+# Descriptor: [vpho_piZb10610_BB]
+# NickName: vpho_piZb10610_BB 
+# Cuts: None
+# Documentation: Decay for non-Y(4S) physics
+# PhysicsWG: Bottomonium
+# Tested: Yes
+# Responsible: Bryan Fulsom
+# Email: bryan.fulsom@pnnl.gov
+# Date: 20170306
+
+Decay vpho
+0.5 pi+ Zb(10610)- PHSP;
+0.5 pi- Zb(10610)+ PHSP;
+Enddecay
+
+Decay Zb(10610)-
+0.5 B- B*0 PHSP;
+0.5 B0 B*- PHSP;
+Enddecay
+
+Decay Zb(10610)+
+0.5 B+ anti-B*0 PHSP;
+0.5 anti-B0 B*+ PHSP;
+Enddecay
+
+End

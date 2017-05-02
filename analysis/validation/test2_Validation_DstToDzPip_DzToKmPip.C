@@ -8,7 +8,7 @@
 
 ////////////////////////////////////////////////////////////
 //
-// Validation_DstToDzPip_DzToKmPip,C
+// Validation_DstToDzPip_DzToKmPip.C
 // Check the proper time and the slow pion
 //
 // Constributor: Giulia Casarosa

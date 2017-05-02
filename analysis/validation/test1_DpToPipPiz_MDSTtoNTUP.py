@@ -68,7 +68,7 @@ toolsDZ += ['MCTruth', '^D+ -> pi+ pi0']
 
 # write out the flat ntuple
 ntupleFile('../DpToPipPiz_MDSTtoNTUP.root')
-ntupleTree('dz', 'D+:sig', toolsDZ)
+ntupleTree('dp', 'D+:sig', toolsDZ)
 
 summaryOfLists(['D+:sig', 'pi+:pt', 'pi0:all'])
 # --------------------------------------------------

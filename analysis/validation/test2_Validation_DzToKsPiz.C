@@ -1,15 +1,15 @@
 /*
 <header>
-<input>../DstToDzPip_DzToKmPip_MDSTtoNTUP.root</input>
-<output>DstToDzPip_DzToKmPip_Validation.root</output>
+<input>../DzToKsPiz_MDSTtoNTUP.root</input>
+<output>DzToKsPiz_Validation.root</output>
 <contact>Giulia Casarosa; giulia.casarosa@pi.infn.it</contact>
 </header>
 */
 
 ////////////////////////////////////////////////////////////
 //
-// Validation_DstToDzPip_DzToKmPip,C
-// Check the proper time and the slow pion
+// Validation_DzToKsPiz.C
+// Check the Ks flight significance
 //
 // Constributor: Giulia Casarosa
 // April 20, 2017

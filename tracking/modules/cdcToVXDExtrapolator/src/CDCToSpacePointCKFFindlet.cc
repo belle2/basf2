@@ -17,6 +17,7 @@ CDCToSpacePointCKFFindlet::CDCToSpacePointCKFFindlet()
 {
   addProcessingSignalListener(&m_treeSearchFindlet);
   addProcessingSignalListener(&m_storeArrayMerger);
+  addProcessingSignalListener(&m_overlapResolver);
 }
 
 void CDCToSpacePointCKFFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
@@ -25,6 +26,7 @@ void CDCToSpacePointCKFFindlet::exposeParameters(ModuleParamList* moduleParamLis
 
   m_treeSearchFindlet.exposeParameters(moduleParamList, prefix);
   m_storeArrayMerger.exposeParameters(moduleParamList, prefix);
+  m_overlapResolver.exposeParameters(moduleParamList, prefix);
 
   moduleParamList->addParameter("exportTracks", m_param_exportTracks, "", m_param_exportTracks);
 }

@@ -72,7 +72,11 @@ namespace Belle2 {
                                                const G4ThreeVector& direction,
                                                const G4TouchableHistory& h);
 
+    /**
+     * Calls Geant4's SetGeometricallyLimitedStep
+     */
     void SetGeometricallyLimitedStep();
+
     /**
      * Call Geant4's CreateTouchableHistory
      */

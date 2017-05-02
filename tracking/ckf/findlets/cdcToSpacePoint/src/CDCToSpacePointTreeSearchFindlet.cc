@@ -126,7 +126,7 @@ bool CDCToSpacePointTreeSearchFindlet::fit(Super::StateIterator currentState)
 
     Eigen::Vector1d residual = m_k - H_k * x_k_old;
 
-    chi2 += residual.transpose() * (V_k - H_k * C_k_old * H_k_t).inverse() * residual;
+    chi2 += (residual.transpose() * (V_k - H_k * C_k_old * H_k_t).inverse() * residual).value();
 
     B2DEBUG(200, "C_k_old " << C_k_old);
     B2DEBUG(200, "x_k_old " << x_k_old);

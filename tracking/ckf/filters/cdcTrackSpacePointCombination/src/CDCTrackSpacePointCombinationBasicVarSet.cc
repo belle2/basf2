@@ -22,7 +22,7 @@ using namespace TrackFindingCDC;
 bool CDCTrackSpacePointCombinationBasicVarSet::extract(const BaseCDCTrackSpacePointCombinationFilter::Object* result)
 {
   RecoTrack* cdcTrack = result->getSeedRecoTrack();
-  const SpacePoint* spacePoint = result->getSpacePoint();
+  const SpacePoint* spacePoint = result->getHit();
 
   if (not cdcTrack or not spacePoint) {
     // TODO: Can we also extract meaningful things of the spacePoint is null?

@@ -41,7 +41,7 @@ void SimpleCDCTrackSpacePointCombinationFilter::initialize()
 Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackSpacePointCombinationFilter::Object& currentState)
 {
 
-  const SpacePoint* spacePoint = currentState.getSpacePoint();
+  const SpacePoint* spacePoint = currentState.getHit();
   const RecoTrack* cdcTrack = currentState.getSeedRecoTrack();
 
   // Allow overlap layers to have no hit

@@ -18,7 +18,7 @@ using namespace TrackFindingCDC;
 bool CDCTrackSpacePointCombinationTruthVarSet::extract(const BaseCDCTrackSpacePointCombinationFilter::Object* result)
 {
   RecoTrack* cdcTrack = result->getSeedRecoTrack();
-  const SpacePoint* spacePoint = result->getSpacePoint();
+  const SpacePoint* spacePoint = result->getHit();
 
   if (not cdcTrack) return false;
 

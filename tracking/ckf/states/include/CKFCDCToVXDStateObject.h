@@ -30,7 +30,7 @@ namespace Belle2 {
       m_cachedMeasuredStateOnPlane = seed->getMeasuredStateOnPlaneFromFirstHit();
 
       // Reset other state
-      m_spacePoint = nullptr;
+      m_hitObject = nullptr;
       m_number = N;
       m_parent = nullptr;
 
@@ -42,12 +42,12 @@ namespace Belle2 {
       m_hasCache = false;
     }
 
-    void set(CKFCDCToVXDStateObject* parent, const SpacePoint* spacePoint)
+    void set(CKFCDCToVXDStateObject* parent, const HitObject* hitObject)
     {
       m_parent = parent;
       m_seedRecoTrack = parent->getSeedRecoTrack();
       m_number = parent->getNumber() - 1;
-      m_spacePoint = spacePoint;
+      m_hitObject = hitObject;
 
       m_measuredStateOnPlane = parent->getMeasuredStateOnPlane();
       m_cachedMeasuredStateOnPlane = parent->getMeasuredStateOnPlane();
@@ -62,20 +62,20 @@ namespace Belle2 {
     }
 
 
-    std::pair<RecoTrack*, std::vector<const SpacePoint*>> finalize() const
+    std::pair<RecoTrack*, std::vector<const HitObject*>> finalize() const
     {
-      std::vector<const SpacePoint*> spacePoints;
-      spacePoints.reserve(N);
+      std::vector<const HitObject*> hits;
+      hits.reserve(N);
 
-      const auto& spacePointAdder = [&spacePoints](const CKFCDCToVXDStateObject * walkObject) {
-        const SpacePoint* spacePoint = walkObject->getSpacePoint();
-        if (spacePoint) {
-          spacePoints.push_back(spacePoint);
+      const auto& hitAdder = [&hits](const CKFCDCToVXDStateObject * walkObject) {
+        const HitObject* hitObject = walkObject->getHit();
+        if (hitObject) {
+          hits.push_back(hitObject);
         }
       };
-      walk(spacePointAdder);
+      walk(hitAdder);
 
-      return std::make_pair(getSeedRecoTrack(), spacePoints);
+      return std::make_pair(getSeedRecoTrack(), hits);
     }
 
     // const Getters
@@ -89,9 +89,9 @@ namespace Belle2 {
       return m_seedRecoTrack;
     }
 
-    const SpacePoint* getSpacePoint() const
+    const HitObject* getHit() const
     {
-      return m_spacePoint;
+      return m_hitObject;
     }
 
     unsigned int getNumber() const
@@ -115,7 +115,7 @@ namespace Belle2 {
       unsigned int numberOfHoles = 0;
 
       walk([&numberOfHoles](const CKFCDCToVXDStateObject * walkObject) {
-        if (not walkObject->getSpacePoint()) {
+        if (not walkObject->getHit()) {
           numberOfHoles++;
         }
       });
@@ -188,7 +188,7 @@ namespace Belle2 {
 
   private:
     RecoTrack* m_seedRecoTrack = nullptr;
-    const SpacePoint* m_spacePoint = nullptr;
+    const HitObject* m_hitObject = nullptr;
     unsigned int m_number = N;
     CKFCDCToVXDStateObject* m_parent = nullptr;
 

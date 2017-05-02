@@ -41,7 +41,7 @@ SortedVectorRange<const SpacePoint*> CDCToSpacePointTreeSearchFindlet::getMatchi
   } else {
     // next layer is an overlap one, so lets return all hits from the same layer, that are on a
     // ladder which is one below the last added hit.
-    const SpacePoint* lastAddedSpacePoint = currentState->getSpacePoint();
+    const SpacePoint* lastAddedSpacePoint = currentState->getHit();
     if (not lastAddedSpacePoint) {
       // No hit was added on the layer, so no overlap can occur.
       return SortedVectorRange<const SpacePoint*>();
@@ -81,7 +81,7 @@ bool CDCToSpacePointTreeSearchFindlet::fit(Super::StateIterator currentState)
 {
   B2ASSERT("Encountered invalid state", not currentState->isFitted() and currentState->isAdvanced());
 
-  const SpacePoint* spacePoint = currentState->getSpacePoint();
+  const SpacePoint* spacePoint = currentState->getHit();
 
   if (not spacePoint) {
     // If we do not have a space point, we do not need to do anything here.
@@ -144,7 +144,7 @@ bool CDCToSpacePointTreeSearchFindlet::advance(Super::StateIterator currentState
 {
   B2ASSERT("Encountered invalid state", not currentState->isFitted() and not currentState->isAdvanced());
 
-  const SpacePoint* spacePoint = currentState->getSpacePoint();
+  const SpacePoint* spacePoint = currentState->getHit();
 
   if (not spacePoint) {
     // If we do not have a space point, we do not need to do anything here.

@@ -22,7 +22,7 @@ using namespace TrackFindingCDC;
 bool CDCTrackSpacePointCombinationVarSet::extract(const BaseCDCTrackSpacePointCombinationFilter::Object* result)
 {
   RecoTrack* cdcTrack = result->getSeedRecoTrack();
-  const SpacePoint* spacePoint = result->getSpacePoint();
+  const SpacePoint* spacePoint = result->getHit();
 
   // TODO: Do not dismiss spacePoint = 0 cases!
   if (not cdcTrack or not spacePoint) {
@@ -185,7 +185,7 @@ bool CDCTrackSpacePointCombinationVarSet::extract(const BaseCDCTrackSpacePointCo
 
   const auto* parent = result->getParent();
   if (parent) {
-    const auto* parentSpacePoint = parent->getSpacePoint();
+    const auto* parentSpacePoint = parent->getHit();
     if (parentSpacePoint) {
       const auto& parentSensorInfo = parentSpacePoint->getVxdID();
 

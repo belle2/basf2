@@ -332,6 +332,12 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
       // 2. Volume changed?
       //
       // Where are we after the step?
+
+      if (takingFullStep) {
+        takingFullStep = false;
+        nav_->SetGeometricallyLimitedStep();
+      }
+
       std::unique_ptr<G4TouchableHistory> hist(nav_->CreateTouchableHistory());
       G4VPhysicalVolume* newVolume = nav_->LocateGlobalPointAndSetup(pos, &dir);
 

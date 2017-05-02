@@ -72,6 +72,7 @@ namespace Belle2 {
                                                const G4ThreeVector& direction,
                                                const G4TouchableHistory& h);
 
+    void SetGeometricallyLimitedStep();
     /**
      * Call Geant4's CreateTouchableHistory
      */
@@ -89,6 +90,11 @@ namespace Belle2 {
     /** The topmost solid of the G4 world */
     const G4VSolid* worldsolid_ {0};
   };
+}
+
+void G4SafeNavigator::SetGeometricallyLimitedStep()
+{
+  nav_.SetGeometricallyLimitedStep();
 }
 
 G4VPhysicalVolume* G4SafeNavigator::LocateGlobalPointAndSetup(const G4ThreeVector& point,
@@ -241,11 +247,16 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
 
   // Initialize the geometry to the current location (set by caller).
   double safety;
+  // stores whether to call SetGeometricallyLimitedStep() because the full step
+  // length was taken.
+  bool takingFullStep = false;
   double slDist = nav_->CheckNextStep(pointOld, dirOld, fabs(sMax) * CLHEP::cm, safety);
-  if (slDist == kInfinity)
+  if (slDist == kInfinity) {
     slDist = fabs(sMax);
-  else
+    takingFullStep = true;
+  } else {
     slDist /= CLHEP::cm;
+  }
   safety /= CLHEP::cm;
 
   // No boundary in sight?
@@ -338,7 +349,7 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
         nav_->ResetHierarchyAndLocate(pointOld, dirCloser, *hist);
 
         // Look along the secant of the actual trajectory instead of
-        // the original direction.  There should be a crossing within
+        // the original direction. There should be a crossing within
         // distance step.
         double secantDist = nav_->CheckNextStep(pointOld, dirCloser,
                                                 step * CLHEP::cm, safety) / CLHEP::cm;
@@ -370,13 +381,21 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
 
     oldState7 = state7;
     pointOld = pos;
+    if (takingFullStep) {
+      takingFullStep = false;
+      // inform the navigator that the full geometrical step was taken. This is required for
+      // some Geant4 volume enter/exit optimizations to work.
+      nav_->SetGeometricallyLimitedStep();
+    }
     nav_->LocateGlobalPointAndSetup(pos, &dir);
     slDist = nav_->CheckNextStep(pos, dir,
                                  (fabs(sMax) - s) * CLHEP::cm, safety);
-    if (slDist == kInfinity)
+    if (slDist == kInfinity) {
+      takingFullStep = true;
       slDist = fabs(sMax) - s;
-    else
+    } else {
       slDist /= CLHEP::cm;
+    }
     safety /= CLHEP::cm;
     step = slDist;
 

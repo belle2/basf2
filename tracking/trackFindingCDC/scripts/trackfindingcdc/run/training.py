@@ -16,6 +16,12 @@ class TrainingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin):
     #: Input variable for the training or the classification analysis. Default use all variables
     variables = None
 
+    #: Input groupby the classification analysis. Default use no groupby
+    groupby = None
+
+    #: Input auxiliaries the classification analysis. Default use none
+    auxiliaries = None
+
     #: Truth variable name
     truth = "truth"
 
@@ -81,6 +87,20 @@ class TrainingRunMixin(BrowseTFileOnTerminateRunMixin, PostProcessingRunMixin):
             if self.variables:
                 cmd += ["-v"]
                 cmd += self.variables
+
+            if self.groupby is not None:
+                cmd += ["-g"]
+                if isinstance(self.groupby, str):
+                    cmd += [self.groupby]
+                else:
+                    cmd += self.groupby
+
+            if self.auxiliaries is not None:
+                cmd += ["-a"]
+                if isinstance(self.auxiliaries, str):
+                    cmd += [self.auxiliaries]
+                else:
+                    cmd += self.auxiliaries
 
             cmd += [
                 "--truth=" + self.truth,

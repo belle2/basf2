@@ -1,71 +1,71 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-<header>
-  <input>Bd_rho0gamma_GENSIMRECtoDST.dst.root</input>
-  <output>Bd_rho0gamma.ntup.root</output>
-  <contact>Jorge Martinez-Ortega; jmartinez@fis.cinvestav.mx</contact>
-</header>
-"""
+#"""
+#<header>
+#  <input>Bd_rho0gamma_GENSIMRECtoDST.dst.root</input>
+#  <output>Bd_rho0gamma.ntup.root</output>
+#  <contact>Saurabh Sandilya; saurabhsandilya@gmail.com</contact>
+#</header>
+#"""
+#######################################################                         
+#                                                                               
+# Obtain Delta E and Mbc distribution from the decay:                           
+#                                                                               
+#                                                                               
+#    B0 -> rho0 + gamma                                                          
+#           |                                                                   
+#           +-> pi+ pi-                                                          
+#                                                                               
+#                                                                               
+# Contributors: Saurabh Sandilya (April 2017)                                   
+#                                                                               
+######################################################                          
 
-import sys
-import os
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import *
-from stdPhotons import *
+#from basf2 import *
+#from vertex import *
+#from modularAnalysis import *
+#from reconstruction import *
+#from stdFSParticles import *
 
-inputMdst('default', '../Bd_rho0gamma_GENSIMRECtoDST.dst.root')
-loadStdCharged()
-loadStdPhoton()
+#gb2_setuprel="release-00-08-00"
 
-reconstructDecay('rho0 -> pi-:all pi+:all', '0.6 < M < 1.2')
-matchMCTruth('rho0')
+#inputMdst('default', '/gpfs/home/belle/saurabh/ewp2/validation/mdst-rfiles/mdst-1110021010-1.root')
+# default: for analysis of Belle II MC samples produced              
+# with releases with release-00-08-00 or newer 
 
-# Prepare the B candidates
-reconstructDecay('B0 -> rho0 gamma:all', '5.2 < M < 5.4')
-matchMCTruth('B0')
+#fillParticleList('pi+:all', 'chiProb > 0.001 and abs(d0) < 2 and abs(z0) < 4 and piid > 0.1')
 
-ntupleFile('../Bd_rho0gamma.ntup.root')
-tools = [
-    'EventMetaData',
-    'B0',
-    'RecoStats',
-    'B0',
-    'Kinematics',
-    '^B0 -> [^rho0 -> ^pi+ ^pi-] ^gamma',
-    'MCTruth',
-    '^B0 -> [^rho0 -> ^pi+ ^pi-] ^gamma',
-    'DeltaEMbc',
-    '^B0 -> [rho0 -> pi+ pi-] gamma',
-    'MCHierarchy',
-    'B0 -> [rho0 -> ^pi+ ^pi-] ^gamma',
-    'PID',
-    'B0 -> [rho0 -> ^pi+ ^pi-] gamma',
-]
+#fillParticleList('gamma:all', 'E > 0.050 and clusterE9E25 > 0.8')
 
-ntupleTree('Bd_rho0gamma_tuple', 'B0', tools)
+# reconstruct rho0:pipi
+#reconstructDecay('rho0:pipi -> pi+:all pi-:all', '0.35 < M < 1.2')
+#matchMCTruth('rho0:pipi')
 
-##########
-# dump all event summary information
-eventtools = [
-    'EventMetaData',
-    'B0',
-    'RecoStats',
-    'B0',
-    'DetectorStatsRec',
-    'B0',
-    'DetectorStatsSim',
-    'B0',
-]
+# reconstruct B0:sig
+#reconstructDecay('B0:sig -> rho0:pipi gamma:all', '4.8 < M < 5.8')
+#matchMCTruth('B0:sig')
 
-ntupleTree('eventtuple', '', eventtools)
+# --------------------------------------------------
+# write out useful information to a ROOT file
+# --------------------------------------------------
+# information to be saved to file 
+#tools = ['EventMetaData', '^B0:sig']
+#tools += ['RecoStats', '^B0:sig']
+#tools += ['Kinematics', '^B0:sig -> [^rho0:pipi -> ^pi+:all ^pi-:all] ^gamma:all']
+#tools += ['InvMass', '^B0:sig -> [^rho0:pipi -> pi+:all pi-:all] gamma:all']
+#tools += ['DeltaEMbc', '^B0:sig -> [rho0:pipi -> pi+:all pi-:all] gamma:all']
+#tools += ['MCTruth', '^B0:sig -> [^rho0:pipi -> ^pi+:all ^pi-:all] ^gamma:all']
+#tools += ['MCHierarchy', 'B0:sig -> [rho0:pipi -> ^pi+:all ^pi-:all] ^gamma:all']
+#tools += ['PID', 'B0:sig -> [rho0:pipi -> ^pi+:all ^pi-:all] gamma:all']
 
-summaryOfLists(['rho0', 'B0'])
-
-# ----> start processing of modules
-process(analysis_main)
-
+# write out the flat ntuple 
+#ntupleFile('./ana-rfiles/ana-1110021010.root')
+#ntupleTree('h1', 'B0:sig', tools)
+# --------------------------------------------------
+# Process the events and print call statistics
+# --------------------------------------------------
+#process(analysis_main)
 # ----> Print call statistics
-print(statistics)
+#print(statistics)
+

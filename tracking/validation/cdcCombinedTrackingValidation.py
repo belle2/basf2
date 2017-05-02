@@ -30,6 +30,7 @@ class CDCCombined(TrackingValidationRun):
     #: Generator to be used in the simulation (-so)
     generator_module = 'generic'
     root_input_file = '../EvtGenSimNoBkg.root'
+    contact = 'software-tracking@belle2.org - why are we not founding this?'
 
     def finder_module(self, path):
         tracking.add_cdc_track_finding(path, with_ca=True)
@@ -48,6 +49,7 @@ class CDCCombined(TrackingValidationRun):
         'MinCDCAxialHits': 8,
         'MinCDCStereoHits': 6,
         "AllowFirstCDCSuperLayerOnly": True,
+        "MergeDecayInFlight": True,
         'EnergyCut': 0,
     }
     pulls = True

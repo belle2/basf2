@@ -17,12 +17,12 @@ import subprocess
 from fnmatch import fnmatch
 
 mapfile = FileSystem.findFile('data/cdc/ch_map.dat')
-t0file = FileSystem.findFile('data/cdc/t0.dat')
+t0file = FileSystem.findFile('data/cdc/t0_v1.dat')
 bwfile = FileSystem.findFile('data/cdc/badwire_v1.dat')
 psfile = FileSystem.findFile('data/cdc/propspeed_v0.dat')
 twfile = FileSystem.findFile('data/cdc/tw_off.dat')
-xtfile = FileSystem.findFile('data/cdc/xt_v3.dat')
-sgfile = FileSystem.findFile('data/cdc/sigma_v1.dat')
+xtfile = FileSystem.findFile('data/cdc/xt_v3_chebyshev.dat.gz')
+sgfile = FileSystem.findFile('data/cdc/sigma_v2.dat')
 dispfile = FileSystem.findFile('data/cdc/displacement_v1.1.dat')
 alfile = FileSystem.findFile('data/cdc/alignment_v2.dat')
 misalfile = FileSystem.findFile('data/cdc/misalignment_v2.dat')

@@ -13,6 +13,7 @@ const RCCommand RCCommand::PAUSE(106, "RC_PAUSE");
 const RCCommand RCCommand::RECOVER(107, "RC_RECOVER");
 const RCCommand RCCommand::ABORT(108, "RC_ABORT");
 const RCCommand RCCommand::BOOT(109, "RC_BOOT");
+const RCCommand RCCommand::STATUS(110, "RC_STATUS");
 
 const RCCommand& RCCommand::operator=(const std::string& label) throw()
 {
@@ -26,6 +27,7 @@ const RCCommand& RCCommand::operator=(const std::string& label) throw()
   else if (label == PAUSE.getLabel()) *this = PAUSE;
   else if (label == ABORT.getLabel()) *this = ABORT;
   else if (label == BOOT.getLabel()) *this = BOOT;
+  else if (label == STATUS.getLabel()) *this = STATUS;
   else *this = Enum::UNKNOWN;
   return *this;
 }
@@ -42,6 +44,7 @@ const RCCommand& RCCommand::operator=(int id) throw()
   else if (id == PAUSE.getId()) *this = PAUSE;
   else if (id == ABORT.getId()) *this = ABORT;
   else if (id == BOOT.getId()) *this = BOOT;
+  else if (id == STATUS.getId()) *this = STATUS;
   else *this = Enum::UNKNOWN;
   return *this;
 }

@@ -43,6 +43,40 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         add_track_fit_and_track_creator(path, components, pruneTracks, additionalTrackFitHypotheses)
 
 
+def add_cr_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False, eventTimingExtraction=False):
+    """
+    This function adds the reconstruction modules for cr tracking to a path.
+
+    :param path: The path to which to add the tracking reconstruction modules
+    :param components: the list of geometry components in use or None for all components.
+    :param pruneTracks: Delete all hits except the first and the last in the found tracks.
+    :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
+        if it is not already present in the path. In a setup with multiple (conditional) paths however, it cannot
+        determine if the geometry is already loaded. This flag can be used to just turn off the geometry adding
+        (but you will have to add it on your own).
+    :param eventTimingExtraction: extract time with either the TrackTimeExtraction or
+        FullGridTrackTimeExtraction modules.
+    """
+
+    # make sure CDC is used
+    if not is_cdc_used(components):
+        return
+
+    if not skipGeometryAdding:
+        # Add the geometry in all trigger modes if not already in the path
+        add_geometry_modules(path, components)
+
+    # Material effects for all track extrapolations
+    if 'SetupGenfitExtrapolation' not in path:
+        path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
+
+    # track finding
+    add_cdc_cr_track_finding(path)
+
+    # track fitting
+    add_cdc_cr_track_fit_and_track_creator(path, components, pruneTracks, eventTimingExtraction)
+
+
 def add_geometry_modules(path, components=None):
     """
     Helper function to add the geometry related modules needed for tracking
@@ -98,6 +132,76 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, ad
     path.add_module('V0Finder')
 
     # prune genfit tracks
+    if pruneTracks:
+        add_prune_tracks(path, components)
+
+
+def add_cdc_cr_track_fit_and_track_creator(
+    path, components=None, pruneTracks=False, eventTimingExtraction=False, lightPropSpeed=12.9925, triggerPos=[
+        0, 0, 0], normTriggerPlaneDirection=[
+            0, 1, 0], readOutPos=[
+                0, 0, -50.0]):
+    """
+    Helper function to add the modules performing the cdc cr track fit
+    and track creation to the path.
+
+    :param path: The path to which to add the tracking reconstruction modules
+    :param components: the list of geometry components in use or None for all components.
+    :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
+    :param eventTimingExtraction: extract time with either the TrackTimeExtraction or
+        FullGridTrackTimeExtraction modules.
+    """
+
+    # Time seed
+    path.add_module("PlaneTriggerTrackTimeEstimator",
+                    pdgCodeToUseForEstimation=13,
+                    triggerPlanePosition=triggerPos,
+                    triggerPlaneDirection=normTriggerPlaneDirection,
+                    useFittedInformation=False)
+
+    # Initial track fitting
+    path.add_module("DAFRecoFitter",
+                    probCut=0.00001,
+                    pdgCodesToUseForFitting=13,
+                    )
+
+    # Correct time seed
+    path.add_module("PlaneTriggerTrackTimeEstimator",
+                    pdgCodeToUseForEstimation=13,
+                    triggerPlanePosition=triggerPos,
+                    triggerPlaneDirection=normTriggerPlaneDirection,
+                    useFittedInformation=True,
+                    useReadoutPosition=True,
+                    readoutPosition=readOutPos,
+                    readoutPositionPropagationSpeed=lightPropSpeed
+                    )
+
+    # Track fitting
+    path.add_module("DAFRecoFitter",
+                    # probCut=0.00001,
+                    pdgCodesToUseForFitting=13,
+                    )
+
+    if eventTimingExtraction is True:
+        # Select the tracks for the time extraction.
+        path.add_module("SelectionForTrackTimeExtraction")
+
+        # Extract the time
+        path.add_module("FullGridTrackTimeExtraction")
+
+        # Track fitting
+        path.add_module("DAFRecoFitter",
+                        # probCut=0.00001,
+                        pdgCodesToUseForFitting=13,
+                        )
+
+    # Create Belle2 Tracks from the genfit Tracks
+    path.add_module('TrackCreator',
+                    defaultPDGCode=13,
+                    useClosestHitToIP=True
+                    )
+
+    # Prune genfit tracks
     if pruneTracks:
         add_prune_tracks(path, components)
 
@@ -227,13 +331,15 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
 
     # Init the geometry for cdc tracking and the hits
     path.add_module("TFCDC_WireHitPreparer",
-                    flightTimeEstimation="outwards",
-                    )
+                    flightTimeEstimation="outwards")
 
-    # Find segments and reduce background hits
-    path.add_module("TFCDC_SegmentFinderFacetAutomaton",
+    # Constructs clusters and reduce background hits
+    path.add_module("TFCDC_ClusterPreparer",
                     ClusterFilter="mva_bkg",
                     ClusterFilterParameters={"cut": 0.2})
+
+    # Find segments within the clusters
+    path.add_module("TFCDC_SegmentFinderFacetAutomaton")
 
     # Find axial tracks
     path.add_module("TFCDC_AxialTrackFinderLegendre")
@@ -266,7 +372,6 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
     path.add_module("TFCDC_TrackQualityAsserter",
                     corrections=[
                         "LayerBreak",
-                        "LargeBreak2",
                         "OneSuperlayer",
                         "Small",
                     ])
@@ -286,10 +391,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
                     recoTracksStoreArrayName=reco_tracks)
 
 
-def add_cdc_cr_track_finding(path,
-                             reco_tracks="RecoTracks",
-                             trigger_point=(0, 0, 0),
-                             ):
+def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0, 0)):
     """
     Convenience function for adding all cdc track finder modules currently dedicated for the CDC-TOP testbeam
     to the path.
@@ -299,7 +401,7 @@ def add_cdc_cr_track_finding(path,
     Arguments
     ---------
     path: basf2.Path
-       The path to be  filled
+       The path to be filled
     reco_tracks: str
        Name of the output RecoTracks. Defaults to RecoTracks.
     """
@@ -307,13 +409,15 @@ def add_cdc_cr_track_finding(path,
     # Init the geometry for cdc tracking and the hits
     path.add_module("TFCDC_WireHitPreparer",
                     flightTimeEstimation="downwards",
-                    triggerPoint=trigger_point,
-                    )
+                    triggerPoint=trigger_point)
 
-    # Find segments and reduce background hits
-    path.add_module("TFCDC_SegmentFinderFacetAutomaton",
+    # Constructs clusters and reduce background hits
+    path.add_module("TFCDC_ClusterPreparer",
                     ClusterFilter="mva_bkg",
-                    ClusterFilterParameters={"cut": 0.2},
+                    ClusterFilterParameters={"cut": 0.2})
+
+    # Find segments within the clusters
+    path.add_module("TFCDC_SegmentFinderFacetAutomaton",
                     SegmentOrientation="downwards")
 
     # Find axial tracks
@@ -335,7 +439,7 @@ def add_cdc_cr_track_finding(path,
 
     # Improve the quality of all tracks and output
     path.add_module("TFCDC_TrackQualityAsserter",
-                    corrections=["LayerBreak", "LargeBreak2", "OneSuperlayer", "Small"],
+                    corrections=["LayerBreak", "OneSuperlayer", "Small"],
                     )
 
     # Flip track orientation to always point downwards

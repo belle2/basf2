@@ -105,13 +105,13 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   addParam("MisalignmentFile", m_misalignmentFile, "Input file name (on cdc/data) for wire misalignment.",
            string("misalignment_v2.dat"));
   //xt-relation
-  addParam("XtFile", m_xtFile, "Input file name (on cdc/data) for xt-relations.",  string("xt_v3.dat"));
+  addParam("XtFile", m_xtFile, "Input file name (on cdc/data) for xt-relations.",  string("xt_v3_chebyshev.dat.gz"));
   //sigma
-  addParam("SigmaFile", m_sigmaFile, "Input file name (on cdc/data) for sigmas.",  string("sigma_v1.dat"));
+  addParam("SigmaFile", m_sigmaFile, "Input file name (on cdc/data) for sigmas.",  string("sigma_v2.dat"));
   //prop-speed
   addParam("PropSpeedFile", m_propSpeedFile, "Input file name (on cdc/data) for prop-speeds.",  string("propspeed_v0.dat"));
   //t0
-  addParam("T0File", m_t0File, "Input file name (on cdc/data) for t0s.",  string("t0.dat"));
+  addParam("T0File", m_t0File, "Input file name (on cdc/data) for t0s.",  string("t0_v1.dat"));
   //time walk
   addParam("TimeWalkFile", m_twFile, "Input file name (on cdc/data) for time walks.",  string("tw_off.dat"));
   //bad wire
@@ -121,7 +121,8 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
 
   //max. space resolution
   addParam("MaxSpaceResol", m_maxSpaceResol,
-           "Maximum space resolution (cm) in CDCGeometryPar::getSigma() to avoid a too large value.", double(2.5 * 0.0130));
+           "Maximum space resolution (cm) in CDCGeometryPar::getSigma() to avoid a too large value; from 2011 beam test; a bit larger value may be better...",
+           double(2.5 * 0.0130));
 
 }
 

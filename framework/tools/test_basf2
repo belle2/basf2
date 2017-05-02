@@ -13,6 +13,9 @@ import subprocess
 import difflib
 from concurrent.futures import ThreadPoolExecutor
 import threading
+import nbformat
+from nbconvert.preprocessors import ExecutePreprocessor
+from nbconvert.preprocessors.execute import CellExecutionError
 import argparse
 import re
 import datetime
@@ -69,7 +72,62 @@ def format_output(name, out, err):
     return "".join(output)
 
 
+def report_test_result(result, extra, name, message):
+    """ print out the result of one test"""
+    result_message = {True: "passed", None: "skipped", False: "FAILED"}[result]
+    print("%sfinished test %s\n     -> %s: %s" % (extra, name, result_message, message), flush=True)
+
+
 def run_test(argument):
+    """ run either regurlar python tests (with basf2) or as jupyter notebooks """
+
+    name, release_dir = argument
+    ext = os.path.splitext(name)[1]
+    if ext == ".ipynb":
+        return run_test_ipynb(argument)
+    elif ext == ".py":
+        return run_test_py(argument)
+    else:
+        print("Testfile {} with extension {} not supported".format(name, ext))
+
+
+def run_test_ipynb(argument):
+    """Run the test within a jupyter notebook
+    Currently not supported is skipping ipynb's and forwarding output of the notebook
+    """
+
+    global options
+    global print_lock
+
+    name, release_dir = argument
+    nb_filename = os.path.join(release_dir, name)
+    result = None
+    message = None
+    extra = ""
+    time_start = timeit.default_timer()
+
+    result = None
+    try:
+        with open(nb_filename) as f:
+            nb = nbformat.read(f, as_version=4)
+            # wait 30 seconds for each cell executing before timing out
+            ep = ExecutePreprocessor(timeout=30, kernel_name='python3')
+            ep.preprocess(nb, resources = {})
+            result = True
+            message = "finished successfully"
+    # execution errors within the notebook will throw this exception
+    except CellExecutionError as ce:
+        result = False
+        message = "Error while executing cell: {}".format(ce)
+
+    time = timeit.default_timer() - time_start
+        
+    with print_lock:
+        report_test_result(result, extra, name, message)
+
+    return (result, message, time)
+
+def run_test_py(argument):
     """Run the test for the given steering file"""
 
     global options
@@ -124,8 +182,7 @@ def run_test(argument):
                 result = False
                 message = "logs differ"
 
-        result_message = {True: "passed", None: "skipped", False: "FAILED"}[result]
-        print("%sfinished test %s\n     -> %s: %s" % (extra, name, result_message, message), flush=True)
+        report_test_result(result, extra, name, message)
     return (result, message, time)
 
 
@@ -139,7 +196,8 @@ def process_dir(dir, release_dir):
         if entry.find('.') > -1 or not os.path.isdir(dir_entry) or entry in exclude_dirs:
             continue
         if entry == 'tests':
-            for steering in glob.glob(os.path.join(dir_entry, '*.py')):
+            # search for files with .py (basf2 steering files) and .ipynb (jupyter notebooks) extensions
+            for steering in glob.glob(os.path.join(dir_entry, '*.py')) + glob.glob(os.path.join(dir_entry, '*.ipynb')):
                 name = steering[len(release_dir):]
                 name = name.lstrip('/')
                 tests.append((name, release_dir))

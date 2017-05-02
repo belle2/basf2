@@ -13,8 +13,6 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
-#include <sstream>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -23,14 +21,7 @@ const std::string c_bkgSegmentColor = "orange";
 namespace {
   std::string inTrackIdToColor(int inTrackId)
   {
-    double hue(50 * inTrackId % 360 / 360.);
-    double saturation = 0.75;
-    double lightness = 0.5;
-
-    std::array<double, 3> rgb = Colors::hlsToRgb(hue, lightness, saturation);
-    std::ostringstream oss;
-    oss << "rgb(" << rgb[0] * 100 << "%, " << rgb[1] * 100 << "%, " << rgb[2] * 100 << "%)";
-    return oss.str();
+    return Colors::getWheelColor(50 * inTrackId);
   }
 }
 

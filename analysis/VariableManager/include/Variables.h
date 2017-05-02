@@ -172,6 +172,16 @@ namespace Belle2 {
     double particleDRho(const Particle* part);
 
     /**
+     * return vertex azimuthal angle
+     */
+    double particleDPhi(const Particle* part);
+
+    /**
+     * return vertex polar angle
+     */
+    double particleDCosTheta(const Particle* part);
+
+    /**
      * return the (i,j)-th element of the MomentumVertex covariance matrix
      * Ordering of the elements in the error matrix is: px, py, pz, E, x, y, z
      */

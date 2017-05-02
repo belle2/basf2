@@ -85,7 +85,7 @@ SecMapTrainerVXDTFModule::SecMapTrainerVXDTFModule() :
   filtersContainer.assignFilters(setupName, filters);
 
 
-  SecMapTrainer<XHitFilterFactory<SecMapTrainerHit> > newTrainer(setupName, rngAppendix());
+  SecMapTrainer<XHitFilterFactory<SecMapTrainerHit> > newTrainer(setupName, std::to_string(rngAppendix()));
 
   m_secMapTrainers.push_back(std::move(newTrainer));
 }

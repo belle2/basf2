@@ -135,6 +135,8 @@ void CDCMCMap::fillMCParticleByHitMap()
   //Pickup an iterator for hinted insertion
   MCParticleByCDCHitMap::iterator itInsertHint = m_mcParticlesByHit.end();
 
+  std::map<const MCParticle*, std::vector<const CDCSimHit*>> primarySimHitsByMCParticle;
+
   for (const RelationElement& mcParticleToHitsRelation : mcParticleToHitsRelations) {
 
     RelationElement::index_type iMCParticle = mcParticleToHitsRelation.getFromIndex();
@@ -154,6 +156,11 @@ void CDCMCMap::fillMCParticleByHitMap()
 
       if (indicatesReassignedSecondary(weight)) {
         m_reassignedSecondaryHits.insert(ptrHit);
+      } else {
+        const CDCSimHit* ptrSimHit = ptrHit->getRelated<CDCSimHit>();
+        if (ptrMCParticle->isPrimaryParticle() and ptrSimHit) {
+          primarySimHitsByMCParticle[ptrMCParticle].push_back(ptrSimHit);
+        }
       }
 
       itInsertHint = m_mcParticlesByHit.insert(itInsertHint, MCParticleByCDCHitMap::value_type(ptrHit, ptrMCParticle));
@@ -173,6 +180,37 @@ void CDCMCMap::fillMCParticleByHitMap()
 
   }
 
+  // Check time ordering of primary hits
+  int nSortedIncorretly = 0;
+  auto lessFlightTime = [](const CDCSimHit * lhs, const CDCSimHit * rhs) {
+    return lhs->getFlightTime() < rhs->getFlightTime();
+  };
+
+  auto lessArrayIndex = [](const CDCSimHit * lhs, const CDCSimHit * rhs) -> bool {
+    return lhs->getArrayIndex() < rhs->getArrayIndex();
+  };
+
+  for (std::pair<const MCParticle* const, std::vector<const CDCSimHit*>>& primarySimHitsForMCParticle : primarySimHitsByMCParticle) {
+    const MCParticle* ptrMCParticle = primarySimHitsForMCParticle.first;
+    std::vector<const CDCSimHit*>& simHits = primarySimHitsForMCParticle.second;
+    std::sort(simHits.begin(), simHits.end(), lessArrayIndex);
+    auto itSorted = std::is_sorted_until(simHits.begin(), simHits.end(), lessFlightTime);
+    if (itSorted != simHits.end()) {
+      ++nSortedIncorretly;
+      B2DEBUG(100, "CDCSimHits for MCParticle " << ptrMCParticle->getArrayIndex() << " only sorted correctly up to hit number " <<
+              std::distance(simHits.begin(), itSorted));
+      --itSorted;
+      B2DEBUG(100, "Between wire " << (*itSorted)->getWireID() << " " << (*itSorted)->getFlightTime() << "ns " <<
+              (*itSorted)->getArrayIndex());
+      ++itSorted;
+      B2DEBUG(100, "and wire " << (*itSorted)->getWireID() << " " << (*itSorted)->getFlightTime() << "ns " <<
+              (*itSorted)->getArrayIndex());
+    }
+  }
+  if (nSortedIncorretly) {
+    B2WARNING("(BII-2136) CDCSimHits for " << nSortedIncorretly <<
+              " primary mc particles are not sorted correctly by their time of flight");
+  }
 }
 
 

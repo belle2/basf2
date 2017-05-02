@@ -94,6 +94,7 @@ int RFProcessManager::Execute(char* scr, int nargs, char** args)
   printf("RFProcessManager : forked. pid=%d\n", pid);
   //close(m_iopipe[1]);
 
+  m_pidlist.push_back(pid);
   return pid;
 }
 
@@ -199,6 +200,19 @@ int RFProcessManager::GetFd()
   return m_iopipe[0];
 }
 
+pid_t RFProcessManager::CheckProcess()
+{
+  for (vector<pid_t>::iterator it = m_pidlist.begin(); it != m_pidlist.end(); ++it) {
+    pid_t pid = *it;
+    int status;
+    pid_t outpid = waitpid(pid, &status, WNOHANG);
+    if (outpid == -1) {
+      m_pidlist.erase(it);
+      return pid;
+    }
+  }
+  return 0;
+}
 
 
 

@@ -10,6 +10,9 @@
 </header>
 """
 import basf2
+from ROOT import TFile, TNamed
+
+VALIDATION_OUTPUT_FILE = "fullTrackingTableValidation.root"
 
 try:
     from root_pandas import read_root
@@ -32,7 +35,7 @@ def load_data():
 def reducelist(list_of_cuts, df, current_name=None, current_cut=None, x=0, y=0):
     if current_name is not None:
         yield (y, x, current_name + "_missing"), (
-            current_cut & ((df.is_merged) | (df.is_missing))).sum()
+            current_cut & ((df.is_merged == 1) | (df.is_missing == 1))).sum()
         yield (y, x, current_name), current_cut.sum()
 
     if not list_of_cuts:
@@ -61,7 +64,7 @@ def get_result(df, test):
     to the data. In each step, store the amount of rows that have survived or not survived the
     cut and apply on *both* the next cut (so we end up with 2^(number of cuts) categories in the end).
     """
-    results = pd.DataFrame(dict(reducelist(test, df[df.is_primary])), index=[0])
+    results = pd.DataFrame(dict(reducelist(test, df[df.is_primary == 1])), index=[0])
     results = results.unstack()
     results = pd.DataFrame(results).set_index(results.index.get_level_values(2)).T
     return results
@@ -74,9 +77,9 @@ if __name__ == '__main__':
     test = [
         ("all", None),
         ("has_vxd", lambda x: (x.n_svd_hits >= 2) | (x.n_pxd_hits >= 2)),
-        ("vxd_was_found", lambda x: x["vxd_was_found"]),
+        ("vxd_was_found", lambda x: x["vxd_was_found"] == 1),
         ("has_cdc", lambda x: x.n_cdc_hits >= 3),
-        ("cdc_was_found", lambda x: x["cdc_was_found"]),
+        ("cdc_was_found", lambda x: x["cdc_was_found"] == 1),
     ]
 
     # Retrieve the results for both data frames
@@ -98,5 +101,7 @@ if __name__ == '__main__':
     with open("table.html", "r") as f:
         content = f.read()
 
-    with open("table_out.html", "w") as f:
-        f.write(content.format(**dict(zip(results.columns, results.values[0]))))
+    tfile = TFile(VALIDATION_OUTPUT_FILE, "RECREATE")
+    html_content = TNamed("Tracking Table Validation", content.format(**dict(zip(results.columns, results.values[0]))))
+    html_content.Write()
+    tfile.Close()

@@ -10,7 +10,7 @@
 </header>
 """
 import basf2
-from ROOT import TFile, TNamed
+from ROOT import TFile, TNamed, Belle2
 
 VALIDATION_OUTPUT_FILE = "fullTrackingTableValidation.root"
 
@@ -98,7 +98,7 @@ if __name__ == '__main__':
             results[col + "_percentage"] = 100 * results[col] / results["all"]
 
     # Write back the results into an HTML table
-    with open("table.html", "r") as f:
+    with open(Belle2.FileSystem.findFile("tracking/validation/table.html"), "r") as f:
         content = f.read()
 
     tfile = TFile(VALIDATION_OUTPUT_FILE, "RECREATE")

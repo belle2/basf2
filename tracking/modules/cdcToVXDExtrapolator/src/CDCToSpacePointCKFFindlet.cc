@@ -16,7 +16,7 @@ using namespace TrackFindingCDC;
 CDCToSpacePointCKFFindlet::CDCToSpacePointCKFFindlet()
 {
   addProcessingSignalListener(&m_treeSearchFindlet);
-  addProcessingSignalListener(&m_storeArrayMerger);
+  addProcessingSignalListener(&m_storeArrayHandler);
   addProcessingSignalListener(&m_overlapResolver);
 }
 
@@ -25,10 +25,8 @@ void CDCToSpacePointCKFFindlet::exposeParameters(ModuleParamList* moduleParamLis
   Super::exposeParameters(moduleParamList, prefix);
 
   m_treeSearchFindlet.exposeParameters(moduleParamList, prefix);
-  m_storeArrayMerger.exposeParameters(moduleParamList, prefix);
+  m_storeArrayHandler.exposeParameters(moduleParamList, prefix);
   m_overlapResolver.exposeParameters(moduleParamList, prefix);
-
-  moduleParamList->addParameter("exportTracks", m_param_exportTracks, "", m_param_exportTracks);
 }
 
 void CDCToSpacePointCKFFindlet::beginEvent()
@@ -42,16 +40,7 @@ void CDCToSpacePointCKFFindlet::beginEvent()
 
 void CDCToSpacePointCKFFindlet::apply()
 {
-  // Read in the CDC reco tracks
-  m_storeArrayMerger.fetch(m_cdcRecoTrackVector);
-
-  // Read in the SpacePoints
-  StoreArray<SpacePoint> spacePoints;
-  m_spacePointVector.reserve(spacePoints.getEntries());
-
-  for (const SpacePoint& spacePoint : spacePoints) {
-    m_spacePointVector.push_back(&spacePoint);
-  }
+  m_storeArrayHandler.fetch(m_cdcRecoTrackVector, m_spacePointVector);
 
   m_treeSearchFindlet.apply(m_cdcRecoTrackVector, m_spacePointVector, m_results);
   B2INFO("Found " << m_results.size() << " tracks");
@@ -59,9 +48,5 @@ void CDCToSpacePointCKFFindlet::apply()
   m_overlapResolver.apply(m_results);
   B2INFO("After overlap resolving: Found " << m_results.size() << " tracks");
 
-  // Use the found hits for each track, create new VXD reco tracks, add relations, merge the tracks and fill them
-  // into a new store array
-  if (m_param_exportTracks) {
-    m_storeArrayMerger.apply(m_results);
-  }
+  m_storeArrayHandler.apply(m_results);
 }

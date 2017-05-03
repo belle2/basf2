@@ -14,7 +14,7 @@ from reconstruction import add_cosmics_reconstruction
 from softwaretrigger.path_functions import add_unpackers
 
 components = ["CDC", "ECL", "TOP", "ARICH", "BKLM", "EKLM"]
-saverawdataObjs = ['EventMetaData', 'RawSVDs', 'RawCDCs', 'RawTOPs', 'RawARICHs', 'RawECLs', 'RawKLMs']
+saverawdataObjs = ['EventMetaData', 'RawCDCs', 'RawTOPs', 'RawARICHs', 'RawECLs', 'RawKLMs']
 
 main_path = basf2.create_path()
 

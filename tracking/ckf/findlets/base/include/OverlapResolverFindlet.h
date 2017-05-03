@@ -52,7 +52,7 @@ namespace Belle2 {
 
     /// Main function of this findlet: traverse a tree starting from a given seed object.
     void apply(std::vector<ResultPair>& resultElements) final {
-      if (not m_param_enableOverlapResolving)
+      if (not m_param_enableOverlapResolving or resultElements.empty())
       {
         return;
       }

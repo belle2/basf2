@@ -78,7 +78,7 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
   setPropertyFlags(c_ParallelProcessingCertified);
   setDescription("Calibration data collector for Millepede Algorithm");
 
-  addParam("tracks", m_tracks, "Names of collections of genfit::Tracks for calibration", vector<string>({""}));
+  addParam("tracks", m_tracks, "Names of collections of RecoTracks (already fitted with DAF) for calibration", vector<string>({""}));
   addParam("particles", m_particles, "Names of particle list of single particles", vector<string>());
   addParam("vertices", m_vertices,
            "Name of particle list of (mother) particles with daughters for calibration using vertex constraint", vector<string>());
@@ -445,7 +445,7 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
     recoTrack.getRelationsTo<RecoHitInformation>(recoTrack.getStoreArrayNameOfRecoHitInformation());
 
   for (RecoHitInformation& recoHitInformation : relatedRecoHitInformation) {
-    const genfit::TrackPoint* trackPoint = recoHitInformation.getCreatedTrackPoint();
+    const genfit::TrackPoint* trackPoint = recoTrack.getCreatedTrackPoint(&recoHitInformation);
     if (trackPoint) {
       if (not trackPoint->hasFitterInfo(recoTrack.getCardinalRepresentation()))
         continue;

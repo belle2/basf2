@@ -74,7 +74,7 @@ namespace Belle2 {
     void storeTrajectory(gbl::GblTrajectory& trajectory);
 
   private:
-    /** Names of arrays with single genfit::Tracks fitted by GBL */
+    /** Names of arrays with single RecoTracks fitted by GBL */
     std::vector<std::string> m_tracks;
     /** Names of particle list with single particles */
     std::vector<std::string> m_particles;

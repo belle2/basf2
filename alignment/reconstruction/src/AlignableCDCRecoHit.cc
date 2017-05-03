@@ -15,7 +15,7 @@
 
 #include <cdc/dbobjects/CDCTimeZeros.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
-#include <cdc/dbobjects/CDCAlignment.h>
+#include <cdc/dbobjects/CDCLayerAlignment.h>
 
 #include <alignment/GlobalLabel.h>
 #include <alignment/GlobalDerivatives.h>
@@ -80,19 +80,19 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
 
   // Alignment of layer X
   globals.add(
-    GlobalLabel::construct<CDCAlignment>(getWireID().getICLayer(), 1),
+    GlobalLabel::construct<CDCLayerAlignment>(getWireID().getICLayer(), CDCLayerAlignment::layerX),
     drldg(0, 0)
   );
 
   // Alignment of layer Y
   globals.add(
-    GlobalLabel::construct<CDCAlignment>(getWireID().getICLayer(), 2),
+    GlobalLabel::construct<CDCLayerAlignment>(getWireID().getICLayer(), CDCLayerAlignment::layerY),
     drldg(0, 1)
   );
 
   // Alignment of layer rotation (gamma)
   globals.add(
-    GlobalLabel::construct<CDCAlignment>(getWireID().getICLayer(), 6),
+    GlobalLabel::construct<CDCLayerAlignment>(getWireID().getICLayer(), CDCLayerAlignment::layerPhi),
     drldg(0, 5)
   );
   //

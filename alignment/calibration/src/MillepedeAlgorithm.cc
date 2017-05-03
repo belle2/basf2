@@ -50,6 +50,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 
   GlobalParamVector result(m_components);
   GlobalCalibrationManager::initGlobalVector(result);
+
   // <UniqueID, ElementID, ParameterId, value>
   std::vector<std::tuple<unsigned short, unsigned short, unsigned short, double>> resultTuple;
 
@@ -58,6 +59,11 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     result.loadFromDB(event1);
     break;
   }
+
+  // Construct all remaining components not loaded from DB
+  // to easily create new objects not previously in DB :-)
+  // TODO: remove?
+  result.construct();
 
   int undeterminedParams = 0;
   double maxCorrectionPull = 0.;
@@ -107,7 +113,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 
   //commit();
 
-  if (paramChi2 / nParams > 1. || fabs(maxCorrectionPull) > 50.) {
+  if (paramChi2 / nParams > 1. || fabs(maxCorrectionPull) > 10.) {
     B2INFO("Largest correction/error is " << maxCorrectionPull << " for parameter with label " << maxCorrectionPullLabel);
     B2INFO("Parameter corrections Chi2/NDF, e.g. sum[(correction/error)^2]/#params = " << paramChi2 / nParams
            << " = " << paramChi2 << " / " << nParams << " > 1.");

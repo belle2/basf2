@@ -105,7 +105,7 @@ namespace Belle2 {
     /// Set global parameter FIXME does nothing because CDC is not ready
     void setGlobalParam(double, unsigned short, unsigned short)
     {
-      //set(value, element, param);
+      //set(element, param, value);
     }
     /// list stored global parameters TODO FIXME CDC not ready
     std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()

@@ -53,7 +53,7 @@ BaseRecoFitterModule::BaseRecoFitterModule() :
   addParam("cosmicsTemporaryFix", m_param_cosmicsTemporaryFix, "Turn on the temporary fix for cosmics events",
            m_param_cosmicsTemporaryFix);
 
-  addParam("initializeCDCTranslators", m_param_cosmicsTemporaryFix,
+  addParam("initializeCDCTranslators", m_param_initializeCDCTranslators,
            "Configures whether the CDC Translators should be initialized by the FitterModule",
            m_param_initializeCDCTranslators);
 }

@@ -15,6 +15,10 @@ using namespace Belle2;
 void CDCTrackSpacePointStoreArrayHandler::apply(const std::vector<std::pair<RecoTrack*, std::vector<const SpacePoint*>>>&
                                                 cdcTracksWithMatchedSpacePoints)
 {
+  if (not m_param_exportTracks) {
+    return;
+  }
+
   // Create new VXD tracks out of the found VXD space points and store them into a store array
   for (const auto& cdcTrackWithMatchedSpacePoints : cdcTracksWithMatchedSpacePoints) {
     RecoTrack* cdcRecoTrack = cdcTrackWithMatchedSpacePoints.first;

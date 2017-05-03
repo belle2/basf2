@@ -282,6 +282,12 @@ Geant4MaterialInterface::initTrack(double posX, double posY, double posZ,
 {
   G4ThreeVector pos(posX * CLHEP::cm, posY * CLHEP::cm, posZ * CLHEP::cm);
   G4ThreeVector dir(dirX, dirY, dirZ);
+
+  if (m_takingFullStep) {
+    m_takingFullStep = false;
+    nav_->SetGeometricallyLimitedStep();
+  }
+
   const G4VPhysicalVolume* newVolume = nav_->LocateGlobalPointAndSetup(pos, &dir);
   bool volChanged = newVolume != currentVolume_;
   currentVolume_ = newVolume;
@@ -363,13 +369,12 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
 
   // Initialize the geometry to the current location (set by caller).
   double safety;
-  // stores whether to call SetGeometricallyLimitedStep() because the full step
-  // length was taken.
-  bool takingFullStep = false;
+
+  m_takingFullStep = false;
   double slDist = nav_->CheckNextStep(pointOld, dirOld, fabs(sMax) * CLHEP::cm, safety);
   if (slDist == kInfinity) {
     slDist = fabs(sMax);
-    takingFullStep = true;
+    m_takingFullStep = true;
   } else {
     slDist /= CLHEP::cm;
   }
@@ -445,8 +450,8 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
       //
       // Where are we after the step?
 
-      if (takingFullStep) {
-        takingFullStep = false;
+      if (m_takingFullStep) {
+        m_takingFullStep = false;
         nav_->SetGeometricallyLimitedStep();
       }
 
@@ -503,8 +508,8 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
 
     oldState7 = state7;
     pointOld = pos;
-    if (takingFullStep) {
-      takingFullStep = false;
+    if (m_takingFullStep) {
+      m_takingFullStep = false;
       // inform the navigator that the full geometrical step was taken. This is required for
       // some Geant4 volume enter/exit optimizations to work.
       nav_->SetGeometricallyLimitedStep();
@@ -513,7 +518,7 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
     slDist = nav_->CheckNextStep(pos, dir,
                                  (fabs(sMax) - s) * CLHEP::cm, safety);
     if (slDist == kInfinity) {
-      takingFullStep = true;
+      m_takingFullStep = true;
       slDist = fabs(sMax) - s;
     } else {
       slDist /= CLHEP::cm;

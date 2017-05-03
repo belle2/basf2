@@ -65,6 +65,11 @@ namespace Belle2 {
 
     /** the volume the extraoplation is currenly located in*/
     const class G4VPhysicalVolume* currentVolume_;
+
+    /** stores whether to call SetGeometricallyLimitedStep() because the full step
+     * length was taken.
+     */
+    bool m_takingFullStep = false;
   };
 
 }

@@ -58,11 +58,11 @@ namespace Belle2 {
 
     /// Main function of this findlet: traverse a tree starting from a given seed object.
     void apply(std::vector<SeedPtr>& seedsVector, std::vector<HitPtr>& hitVector,
-               std::vector<ResultPair>& results) final {
+               std::vector<ResultPair>& results) override
+    {
       initializeEventCache(seedsVector, hitVector);
 
-      for (SeedPtr seed : seedsVector)
-      {
+      for (SeedPtr seed : seedsVector) {
         initializeSeedCache(seed);
 
         StateIterator firstStateIterator = m_states.begin();

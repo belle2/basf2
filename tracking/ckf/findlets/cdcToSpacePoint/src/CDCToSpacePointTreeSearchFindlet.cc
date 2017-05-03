@@ -11,6 +11,9 @@
 
 #include <svd/reconstruction/SVDRecoHit.h>
 
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
 #include <Eigen/Dense>
 
 namespace Eigen {
@@ -28,6 +31,8 @@ void CDCToSpacePointTreeSearchFindlet::exposeParameters(ModuleParamList* moduleP
   Super::exposeParameters(moduleParamList, prefix);
 
   moduleParamList->addParameter("useCaching", m_param_useCaching, "Use caching or not", m_param_useCaching);
+  moduleParamList->addParameter("useMaterialEffects", m_param_useMaterialEffects,
+                                "Use material effects during extrapolation.", m_param_useMaterialEffects);
 }
 
 SortedVectorRange<const SpacePoint*> CDCToSpacePointTreeSearchFindlet::getMatchingHits(Super::StateIterator currentState)
@@ -189,7 +194,6 @@ bool CDCToSpacePointTreeSearchFindlet::advance(Super::StateIterator currentState
     B2WARNING(e.what());
     return false;
   }
-
 
   // Possibility 2: extrapolate this state as normal and store this as a cache (the other then maybe have to
   //                extrapolate back a bit, but the calculation is much easier)

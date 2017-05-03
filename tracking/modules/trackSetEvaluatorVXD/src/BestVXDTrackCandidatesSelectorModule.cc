@@ -23,30 +23,30 @@ BestVXDTrackCandidatesSelectorModule::BestVXDTrackCandidatesSelectorModule() : M
   setDescription("Module that selects a subset with a fixed size x out of all SpacePointTrackCandidates. Based on qualityIndex.");
 
   addParam("NameSpacePointTrackCands", m_nameSpacePointTrackCands, "Name of expected StoreArray.", std::string(""));
-  addParam("SubsetSize", m_subsetSize, "Target size of selected subset.", (unsigned short)(200));
-  addParam("CreateNewStoreArray", m_createNewStoreArray,
+  addParam("SubsetSize", m_subsetSize, "Target size of selected subset.", (unsigned short)(1000));
+  addParam("SubsetCreation", m_subsetCreation,
            "If True copy selected SpacePoints to new StoreArray, if False deactivate remaining SpacePoints.", bool(false));
   addParam("NewNameSpacePointTrackCands", m_newNameSpacePointTrackCands,
-           "Only required if 'CreateNewStoreArray' is true. Name of StoreArray to store the subset.", std::string("BestSpacePointTrackCands"));
+           "Only required if 'CreateNewStoreArray' is true. Name of StoreArray to store the subset. If the target name is equal to the source candidates not matching the selection criteria are deleted.",
+           std::string("BestSpacePointTrackCands"));
 }
 
 void BestVXDTrackCandidatesSelectorModule::initialize()
 {
   m_spacePointTrackCands.isRequired(m_nameSpacePointTrackCands);
-  if (m_createNewStoreArray) {
-    B2ASSERT("BestVXDTrackCandidatesSelectorModule::CopyMode: Target StoreArray has to be different from source StoreArray!",
-             m_nameSpacePointTrackCands != m_newNameSpacePointTrackCands);
-    if (StoreArray<SpacePointTrackCand>("m_newNameSpacePointTrackCands").isValid()) {
-      B2WARNING("BestVXDTrackCandidatesSelectorModule::CopyMode: Target StoreArray already present!");
+  if (m_subsetCreation) {
+    if (m_newNameSpacePointTrackCands == m_nameSpacePointTrackCands) {
+      m_bestCandidates.registerSubset(m_spacePointTrackCands);
     } else {
-      m_newSpacePointTrackCands.registerInDataStore(m_newNameSpacePointTrackCands, DataStore::c_DontWriteOut);
+      m_bestCandidates.registerSubset(m_spacePointTrackCands, m_newNameSpacePointTrackCands);
+      m_bestCandidates.inheritAllRelations();
     }
   }
 }
 
 void BestVXDTrackCandidatesSelectorModule::event()
 {
-  if (m_createNewStoreArray) copyCandidates();
+  if (m_subsetCreation) selectSubset();
   else deactivateCandidates();
 }
 
@@ -56,39 +56,47 @@ void BestVXDTrackCandidatesSelectorModule::deactivateCandidates()
   // define subset
   if (nTracks > m_subsetSize) {
     // sort by lowest -> highest quality index
-    std::vector<int> sortedTrackCandIndices(nTracks);
-    std::iota(sortedTrackCandIndices.begin(), sortedTrackCandIndices.end(), 0);
+    std::vector<int> sortedTrackCandIndices = getSortedTrackCandIndices(true);
 
-    std::sort(sortedTrackCandIndices.begin(), sortedTrackCandIndices.end(),
-    [this](const int lhs, const int rhs) {
-      return this->m_spacePointTrackCands[lhs]->getQualityIndex() < this->m_spacePointTrackCands[rhs]->getQualityIndex();
-    });
-
+    // deactivate candidates with lowest quality index until desired subsetSize is reached;
     for (int iCandidate = 0; iCandidate < nTracks - m_subsetSize; ++iCandidate) {
       m_spacePointTrackCands[iCandidate]->removeRefereeStatus(SpacePointTrackCand::c_isActive);
     }
   }
 }
 
-void BestVXDTrackCandidatesSelectorModule::copyCandidates()
+void BestVXDTrackCandidatesSelectorModule::selectSubset()
 {
   const unsigned int nTracks = m_spacePointTrackCands.getEntries();
+  // sorting is only required if there are too many candidates
   if (nTracks > m_subsetSize) {
     // sort by highest -> lowest quality index
-    std::vector<int> sortedTrackCandIndices(nTracks);
-    std::iota(sortedTrackCandIndices.begin(), sortedTrackCandIndices.end(), 0);
+    std::vector<int> sortedTrackCandIndices = getSortedTrackCandIndices(false);
 
-    std::sort(sortedTrackCandIndices.begin(), sortedTrackCandIndices.end(),
-    [this](const int lhs, const int rhs) {
-      return this->m_spacePointTrackCands[lhs]->getQualityIndex() > this->m_spacePointTrackCands[rhs]->getQualityIndex();
-    });
-    for (unsigned int iCand = 0; iCand < m_subsetSize; ++iCand) {
-      SpacePointTrackCand* sptc = m_spacePointTrackCands[sortedTrackCandIndices.at(iCand)];
-      m_newSpacePointTrackCands.appendNew(*(sptc));
-    }
+    // select subset of desired size
+    std::set<int> subset(sortedTrackCandIndices.cbegin(), sortedTrackCandIndices.cbegin() + m_subsetSize);
+    m_bestCandidates.select([subset](const SpacePointTrackCand * sptc) {return subset.count(sptc->getArrayIndex()) != 0;});
   } else {
-    for (SpacePointTrackCand sptc : m_spacePointTrackCands) {
-      m_newSpacePointTrackCands.appendNew(sptc);
+    // only need to do something if target StoreArray is different from source StoreArray
+    if (m_newNameSpacePointTrackCands != m_nameSpacePointTrackCands) {
+      m_bestCandidates.select([](const SpacePointTrackCand*) {return true;});
     }
   }
 }
+
+std::vector<int> BestVXDTrackCandidatesSelectorModule::getSortedTrackCandIndices(bool increasing)
+{
+  // Create an index for all spacePointTrackCandidates in the StoreArray.
+  // Should be faster than calling 'getArrayIndex()' on all of them.
+  std::vector<int> sortedTrackCandIndices(m_spacePointTrackCands.getEntries());
+  std::iota(sortedTrackCandIndices.begin(), sortedTrackCandIndices.end(), 0);
+
+  std::sort(sortedTrackCandIndices.begin(), sortedTrackCandIndices.end(),
+  [this, increasing](const int lhs, const int rhs) {
+    bool smaller = this->m_spacePointTrackCands[lhs]->getQualityIndex() < this->m_spacePointTrackCands[rhs]->getQualityIndex();
+    return increasing ? smaller : !smaller;
+  });
+
+  return sortedTrackCandIndices;
+}
+

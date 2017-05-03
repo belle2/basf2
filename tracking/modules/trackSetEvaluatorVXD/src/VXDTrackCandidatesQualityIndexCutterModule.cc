@@ -24,29 +24,29 @@ VXDTrackCandidatesQualityIndexCutterModule::VXDTrackCandidatesQualityIndexCutter
 
   addParam("NameSpacePointTrackCands", m_nameSpacePointTrackCands, "Name of expected StoreArray.", std::string(""));
   addParam("minRequiredQuality", m_minRequiredQuality, "Minimum value of qualityIndex to keep candidate active.", float(0));
-  addParam("CreateNewStoreArray", m_createNewStoreArray,
+  addParam("SubsetCreation", m_subsetCreation,
            "If True copy selected SpacePoints to new StoreArray, if False deactivate remaining SpacePoints.", bool(false));
   addParam("NewNameSpacePointTrackCands", m_newNameSpacePointTrackCands,
-           "Only required if 'CreateNewStoreArray' is true. Name of StoreArray to store the subset.", std::string("BestSpacePointTrackCands"));
+           "Only required if 'CreateNewStoreArray' is true. Name of StoreArray to store the subset. If the target name is equal to the source candidates not matching the selection criteria are deleted.",
+           std::string("BestSpacePointTrackCands"));
 }
 
 void VXDTrackCandidatesQualityIndexCutterModule::initialize()
 {
   m_spacePointTrackCands.isRequired(m_nameSpacePointTrackCands);
-  if (m_createNewStoreArray) {
-    B2ASSERT("BestVXDTrackCandidatesSelectorModule::CopyMode: Target StoreArray has to be different from source StoreArray!",
-             m_nameSpacePointTrackCands != m_newNameSpacePointTrackCands);
-    if (StoreArray<SpacePointTrackCand>("m_newNameSpacePointTrackCands").isValid()) {
-      B2WARNING("BestVXDTrackCandidatesSelectorModule::CopyMode: Target StoreArray already present!");
+  if (m_subsetCreation) {
+    if (m_newNameSpacePointTrackCands == m_nameSpacePointTrackCands) {
+      m_goodCandidates.registerSubset(m_spacePointTrackCands);
     } else {
-      m_newSpacePointTrackCands.registerInDataStore(m_newNameSpacePointTrackCands, DataStore::c_DontWriteOut);
+      m_goodCandidates.registerSubset(m_spacePointTrackCands, m_newNameSpacePointTrackCands);
+      m_goodCandidates.inheritAllRelations();
     }
   }
 }
 
 void VXDTrackCandidatesQualityIndexCutterModule::event()
 {
-  if (m_createNewStoreArray) copyCandidates();
+  if (m_subsetCreation) selectSubset();
   else deactivateCandidates();
 }
 
@@ -59,11 +59,7 @@ void VXDTrackCandidatesQualityIndexCutterModule::deactivateCandidates()
   }
 }
 
-void VXDTrackCandidatesQualityIndexCutterModule::copyCandidates()
+void VXDTrackCandidatesQualityIndexCutterModule::selectSubset()
 {
-  for (SpacePointTrackCand sptc : m_spacePointTrackCands) {
-    if (sptc.getQualityIndex() >= m_minRequiredQuality) {
-      m_newSpacePointTrackCands.appendNew(sptc);
-    }
-  }
+  m_goodCandidates.select([this](const SpacePointTrackCand * sptc) {return sptc->getQualityIndex() >= this->m_minRequiredQuality;});
 }

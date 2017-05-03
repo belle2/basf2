@@ -12,6 +12,8 @@
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
+#include <framework/datastore/SelectSubset.h>
+
 
 
 namespace Belle2 {
@@ -21,7 +23,8 @@ namespace Belle2 {
    *  Expects SpacePointTrackCandidates.
    *  Selects x candidates ranked by their qualityIndex
    *  Either deactivates the remaining candidates
-   *  or fills a new StoreArray with the selected candidates.
+   *  or fills a StoreArray with the selected candidates.
+   *  If the target StoreArray is the same as the source StoreArray not matching candidates will be deleted.
    */
   class BestVXDTrackCandidatesSelectorModule : public Module {
   public:
@@ -36,12 +39,18 @@ namespace Belle2 {
 
   protected:
 
+    /** Don't copy/delete candidates but rather deactivate them by setting a SpacePointTrackCandidate flag. */
     void deactivateCandidates();
 
-    void copyCandidates();
+    /** Copy or delete candidates to achieve a subset creation. */
+    void selectSubset();
+
+    /** Return StoreArrayIndices of all candidates sorted by their qualityIndex. */
+    std::vector<int> getSortedTrackCandIndices(bool increasing);
 
     // parameters
 
+    /** target size of subset */
     unsigned short m_subsetSize;
 
     /** Name of input StoreArray containing SpacePointTrackCands */
@@ -50,7 +59,7 @@ namespace Belle2 {
     /** If True copy selected SpacePoints to new StoreArray,
      * If False deactivate remaining SpacePoints.
      */
-    bool m_createNewStoreArray;
+    bool m_subsetCreation;
 
     /** Name of optional output StoreArray containing SpacePointTrackCands */
     std::string m_newNameSpacePointTrackCands;
@@ -63,5 +72,8 @@ namespace Belle2 {
 
     /** StoreArray for optional output SpacePointTrackCands*/
     StoreArray<SpacePointTrackCand> m_newSpacePointTrackCands;
+
+    /** SubsetSelector operating on a custom selection criteria*/
+    SelectSubset<SpacePointTrackCand> m_bestCandidates;
   };
 }

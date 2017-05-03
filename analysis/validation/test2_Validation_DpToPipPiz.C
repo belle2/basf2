@@ -52,7 +52,7 @@ void plotTrack(TFile* pfile, TTree* ptree, TFile *outputFile){
 
   h_pi_d0 = new TH2F("h_pi_d0VSpt","d0 error vs transverse momentum",100,0,4,100,0,0.1);
   ptree->Project("h_pi_d0VSpt","D_pi_d0err:sqrt(D_pi_P4[0]*D_pi_P4[0] + D_pi_P4[1]*D_pi_P4[1])",cuts);
-  TProfile * pfx_pi_d0 = h_pi_d0->ProfileX("hprof_pis_d0");
+  TProfile * pfx_pi_d0 = h_pi_d0->ProfileX("hprof_pi_d0");
 
   h_pi_z0 = new TH2F("h_pi_z0VSpt","z0 error vs transverse momentum",100,0,4,100,0,0.1);
   ptree->Project("h_pi_z0VSpt","D_pi_z0err:sqrt(D_pi_P4[0]*D_pi_P4[0] + D_pi_P4[1]*D_pi_P4[1])",cuts);

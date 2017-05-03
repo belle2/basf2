@@ -21,8 +21,6 @@
 #include "TH1F.h"
 #include "TGraph.h"
 
-/* Validation script to determine benchmarks for PID cuts. */
-
 void plotStd(TFile* pfile, TTree* ptree, TFile *outputFile){
 
   TString tmCuts("(D0_isSignal == 1)");
@@ -52,9 +50,11 @@ void plotTime(TFile* pfile, TTree* ptree, TFile *outputFile){
  
   h_tres_all = new TH1F("h_tres_all", "full momentum range", 100,-ax, ax);
   ptree->Project("h_tres_all", "D0_K_S0_FT - D0_K_S0_MCFT",tmCuts);
+  h_tres_all->GetXaxis()->SetTitle("t_{reco} - t_{gen} (ns)");
 
-  h_sigmat_all = new TH1F("h_sigmat_all", "full momentum range", 100,0, 0.02);
+  h_sigmat_all = new TH1F("h_sigmat_all", "full momentum range", 100,0, 0.01);
   ptree->Project("h_sigmat_all", "D0_K_S0_FTE",tmCuts);
+  h_sigmat_all->GetXaxis()->SetTitle("#sigma_{t} (ns)");
 
   h_sig_all = new TH1F("h_sig_all", "full momentum range", 100,0, 200);
   ptree->Project("h_sig_all", "D0_K_S0_FT/D0_K_S0_FTE",tmCuts);

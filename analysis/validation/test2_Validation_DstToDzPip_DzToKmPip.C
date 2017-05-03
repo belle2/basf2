@@ -27,13 +27,14 @@ void plotStd(TFile* pfile, TTree* ptree, TFile *outputFile){
 
   TString tmCuts("(DST_isSignal == 1)");
 
-  TH1F* h_Dst_Q = new TH1F("h_Dst_Q","Q Value",100,0,0.02);
-  ptree->Project("h_Dst_Q", "DST_Q", tmCuts);
+  TH1F* h_Dst_Q = new TH1F("h_Dst_Q","Q Value",100,0,12);
+  ptree->Project("h_Dst_Q", "DST_Q*1000", tmCuts);
+  h_Dst_Q->GetXaxis()->SetTitle("Q-calue (MeV)");
 
   TH1F* h_D0_p = new TH1F("h_D0_p","D0 momentum",100,0,7);
   ptree->Project("h_D0_p", "DST_D0_P", tmCuts);
 
-  TH1F* h_pis_p = new TH1F("h_pis_p","soft pi momentum",100,0,0.5);
+  TH1F* h_pis_p = new TH1F("h_pis_p","soft pi momentum",100,0,0.6);
   ptree->Project("h_pis_p", "DST_pi_P", tmCuts);
   TH1F* h_pi_p = new TH1F("h_pi_p","pi momentum",100,0,5);
   ptree->Project("h_pi_p", "DST_D0_pi_P", tmCuts);
@@ -61,9 +62,11 @@ void plotTime(TFile* pfile, TTree* ptree, TFile *outputFile){
  
   h_tres_all = new TH1F("h_tres_all", "full momentum range", 100,-ax, ax);
   ptree->Project("h_tres_all", "(DST_D0_FT - DST_D0_MCFT)*1000",cuts);
+  h_tres_all->GetXaxis()->SetTitle("t_{reco} - t_{gen} (ps)");
 
   h_sigmat_all = new TH1F("h_sigmat_all", "full momentum range", 100,0, 0.5);
   ptree->Project("h_sigmat_all", "DST_D0_FTE*1000",cuts);
+  h_sigmat_all->GetXaxis()->SetTitle("#sigma_{t} (ps)");
 
   h_sig_all = new TH1F("h_sig_all", "full momentum range", 100,0, 20);
   ptree->Project("h_sig_all", "DST_D0_FT/DST_D0_FTE",tmCuts);

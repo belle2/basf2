@@ -39,6 +39,8 @@ namespace Belle2 {
       m_qualityFilter.exposeParameters(moduleParamList, prefix);
 
       moduleParamList->addParameter("minimalActivityState", m_param_minimalActivityState, "", m_param_minimalActivityState);
+      moduleParamList->addParameter("enableOverlapResolving", m_param_enableOverlapResolving,
+                                    "Enable the overlap resolving.", m_param_enableOverlapResolving);
     }
 
     void beginEvent() final {
@@ -50,6 +52,11 @@ namespace Belle2 {
 
     /// Main function of this findlet: traverse a tree starting from a given seed object.
     void apply(std::vector<ResultPair>& resultElements) final {
+      if (not m_param_enableOverlapResolving)
+      {
+        return;
+      }
+
       TrackFindingCDC::Weight maximalWeight = 0;
 
       for (unsigned int resultIndex = 0; resultIndex < resultElements.size(); resultIndex++)
@@ -125,8 +132,10 @@ namespace Belle2 {
     HopfieldNetwork m_hopfieldNetwork;
 
     // Parameters
-    /// Minimal activity state above a node is seen as active.
+    /// Parameter: Minimal activity state above a node is seen as active.
     double m_param_minimalActivityState = 0.75;
+    /// Parameter: Enable overlap
+    bool m_param_enableOverlapResolving = true;
 
     // Object Pools
     /// Overlap resolver infos as input to the hopfield network.

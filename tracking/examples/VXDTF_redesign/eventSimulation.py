@@ -28,6 +28,7 @@ from simulation import add_simulation
 
 # If later the use of bg is wanted, you can as well import setup_bg
 from setup_modules import setup_sim
+from setup_modules import setup_Geometry
 
 # ---------------------------------------------------------------------------------------
 
@@ -92,7 +93,7 @@ main.add_module(evtgenInput)
 
 
 # setup the geometry (the Geometry and the Gearbox will be ignore in add_simulation if they are already in the path)
-setup_Geometry(path)
+setup_Geometry(path=main)
 
 # Detector Simulation:
 add_simulation(path=main,

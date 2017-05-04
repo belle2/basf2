@@ -109,6 +109,8 @@ class Calculation:
                 elif process.progress_queue_local.poll():
                     result = process.progress_queue_local.recv()
                     if result == "end":
+                        process.join(timeout=10)
+                        process.result_queue.fill_results()
                         process.join()
 
                     elif display_bar:

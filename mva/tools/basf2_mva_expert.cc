@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
   ("help", "print this message")
   ("identifiers", po::value<std::vector<std::string>>(&filenames)->multitoken(), "Identifiers of the trained methods")
   ("datafiles", po::value<std::vector<std::string>>(&datafiles)->multitoken()->required(),
-   "ROOT files containing the training dataset")
+   "ROOT files containing the dataset")
   ("treename", po::value<std::string>(&treename), "Name of tree in ROOT datafile")
   ("outputfile", po::value<std::string>(&outputfile)->required(), "ROOT file containing the results");
 

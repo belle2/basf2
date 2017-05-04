@@ -85,19 +85,22 @@ double QualityEstimatorTripletFit::estimateQuality(std::vector<SpacePoint const*
 
     // Calculation of sigmaMS
     // First get the orientation of the sensor plate for material budged calculation
+    double entranceAngle = theta;
     VxdID::baseType sensorID = measurements.at(i + 1)->getVxdID();
-    const SVD::SensorInfo& sensor = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-    TVector3 sensorOrigin  = sensor.pointToGlobal(TVector3(0, 0, 0), true);
-    TVector3 sensoru  = sensor.pointToGlobal(TVector3(1, 0, 0), true);
-    TVector3 sensorv  = sensor.pointToGlobal(TVector3(0, 1, 0), true);
+    if (sensorID != 0) {
+      const SVD::SensorInfo& sensor = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      TVector3 sensorOrigin  = sensor.pointToGlobal(TVector3(0, 0, 0), true);
+      TVector3 sensoru  = sensor.pointToGlobal(TVector3(1, 0, 0), true);
+      TVector3 sensorv  = sensor.pointToGlobal(TVector3(0, 1, 0), true);
 
-    TVector3 globalu = sensoru - sensorOrigin;
-    TVector3 globalv = sensorv - sensorOrigin;
-    TVector3 normal = globalu.Cross(globalv);
+      TVector3 globalu = sensoru - sensorOrigin;
+      TVector3 globalv = sensorv - sensorOrigin;
+      TVector3 normal = globalu.Cross(globalv);
 
-    // Calculate the angle of incidence for the middle hit
-    if (sensorOrigin.Angle(normal) > M_PI * 0.5) { normal *= -1.; }
-    double entranceAngle = (hit1 - hit0).Angle(normal);
+      // Calculate the angle of incidence for the middle hit
+      if (sensorOrigin.Angle(normal) > M_PI * 0.5) { normal *= -1.; }
+      entranceAngle = (hit1 - hit0).Angle(normal);
+    }
 
     /** Using average material budged of SVD sensors for approximation of radiation length
      *  Belle II TDR page 156 states a value of 0.57% X_0.

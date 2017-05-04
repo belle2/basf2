@@ -96,7 +96,6 @@ class Basf2CalculationProcess(CalculationProcess):
             raise
         finally:
             self.result_queue.queue.close()
-            self.result_queue.queue.join_thread()
 
             self.progress_queue_remote.send("end")
             self.progress_queue_remote.close()

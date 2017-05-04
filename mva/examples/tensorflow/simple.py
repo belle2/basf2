@@ -6,7 +6,9 @@
 import numpy as np
 import tensorflow as tf
 import basf2_mva
+import basf2_mva_util
 import pandas
+import time
 
 from basf2_mva_python_interface.tensorflow import State
 
@@ -24,9 +26,8 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
             layer = unit(tf.matmul(x, weights) + biases)
         return layer
 
-    inference_hidden1 = layer(x, [number_of_features, 20], 'inference_hidden1')
-    inference_hidden2 = layer(inference_hidden1, [20, 20], 'inference_hidden2')
-    inference_activation = layer(inference_hidden2, [20, 1], 'inference_sigmoid', unit=tf.sigmoid)
+    inference_hidden1 = layer(x, [number_of_features, number_of_features+1], 'inference_hidden1')
+    inference_activation = layer(inference_hidden1, [number_of_features+1, 1], 'inference_sigmoid', unit=tf.sigmoid)
 
     epsilon = 1e-5
     inference_loss = -tf.reduce_sum(y * tf.log(inference_activation + epsilon) +
@@ -56,9 +57,6 @@ def partial_fit(state, X, S, y, w, epoch):
     if epoch % 100 == 0:
         avg_cost = state.session.run(state.cost, feed_dict=feed_dict)
         print("Epoch:", '%04d' % (epoch), "cost=", "{:.9f}".format(avg_cost))
-
-    if epoch >= 20000:
-        return False
     return True
 
 
@@ -68,12 +66,33 @@ if __name__ == "__main__":
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_identifier = "Simple"
     general_options.m_treename = "tree"
-    general_options.m_variables = basf2_mva.vector('M', 'p', 'pz')
+    variables = ['M', 'p', 'pt', 'pz',
+                 'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)',
+                 'daughter(1, p)', 'daughter(1, pz)', 'daughter(1, pt)',
+                 'daughter(2, p)', 'daughter(2, pz)', 'daughter(2, pt)',
+                 'chiProb', 'dr', 'dz',
+                 'daughter(0, dr)', 'daughter(1, dr)',
+                 'daughter(0, dz)', 'daughter(1, dz)',
+                 'daughter(0, chiProb)', 'daughter(1, chiProb)', 'daughter(2, chiProb)',
+                 'daughter(0, Kid)', 'daughter(0, piid)',
+                 'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
+    general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
     specific_options = basf2_mva.PythonOptions()
     specific_options.m_framework = "tensorflow"
-    specific_options.m_steering_file = 'mva/examples/tensorflow_simple.py'
-    specific_options.m_nIterations = 0  # Feed data until partial fit returns False
+    specific_options.m_steering_file = 'mva/examples/tensorflow/simple.py'
+    specific_options.m_nIterations = 100
     specific_options.m_mini_batch_size = 100
+    training_start = time.time()
     basf2_mva.teacher(general_options, specific_options)
+    training_stop = time.time()
+    training_time = training_stop - training_start
+    method = basf2_mva_util.Method(general_options.m_identifier)
+    inference_start = time.time()
+    test_data = ["test.root"] * 10
+    p, t = method.apply_expert(basf2_mva.vector(*test_data), general_options.m_treename)
+    inference_stop = time.time()
+    inference_time = inference_stop - inference_start
+    auc = basf2_mva_util.calculate_roc_auc(p, t)
+    print("Tensorflow", training_time, inference_time, auc)

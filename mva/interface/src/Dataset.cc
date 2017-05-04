@@ -293,6 +293,24 @@ namespace Belle2 {
       m_isSignal = std::lround(m_target) == m_general_options.m_signal_class;
     }
 
+    std::vector<float> ROOTDataset::getWeights()
+    {
+      std::string branchName = Belle2::makeROOTCompatible(m_general_options.m_weight_variable);
+      int nentries = getNumberOfEvents();
+      std::vector<float> values(nentries);
+
+      float object;
+      TBranch* branch = m_tree->GetBranch(branchName.c_str());
+      branch->SetAddress(&object);
+      for (int i = 0; i < nentries; ++i) {
+        branch->GetEntry(m_tree->LoadTree(i));
+        values[i] = object;
+      }
+      // Reset branch to correct input address, just to be sure
+      m_tree->SetBranchAddress(branchName.c_str(), &m_weight);
+      return values;
+    }
+
     std::vector<float> ROOTDataset::getFeature(unsigned int iFeature)
     {
       std::string branchName = Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]);

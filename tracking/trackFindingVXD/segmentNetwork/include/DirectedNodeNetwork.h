@@ -114,12 +114,11 @@ namespace Belle2 {
     /** to the last outerNode added, another innerNode will be attached */
     void addInnerToLastOuterNode(NodeID innerNodeID)
     {
-//    B2INFO("addInnerToLastOuterNode: inner: " << innerEntry); // TODO Jan8_2016: remove!
-      if (m_lastOuterNodeID.empty()) { B2FATAL("addInnerToLastOuterNode() last OuterNode is not yet in this network! CurrentNetworkSize is: " << size()); }
+      if (m_lastOuterNodeID.empty()) { B2WARNING("addInnerToLastOuterNode() last OuterNode is not yet in this network! CurrentNetworkSize is: " << size()); return;}
 
       // check if entries are identical (catch loops):
       if (m_lastOuterNodeID == innerNodeID) {
-        B2ERROR("DirectedNodeNetwork::addInnerToLastOuterNode(): lastOuterNode and innerEntry are identical! Aborting linking-process");
+        B2WARNING("DirectedNodeNetwork::addInnerToLastOuterNode(): lastOuterNode and innerEntry are identical! Aborting linking-process");
         return;
       }
 
@@ -129,17 +128,17 @@ namespace Belle2 {
         B2DEBUG(250, "DirectedNodeNetwork::addInnerToLastOuterNode(): linking was successful!");
         return;
       }
-      B2ERROR("DirectedNodeNetwork::addInnerToLastOuterNode(): last OuterNode and innerEntry were already in the network and were already connected. This is a sign for unintended behavior!");
+      B2WARNING("DirectedNodeNetwork::addInnerToLastOuterNode(): last OuterNode and innerEntry were already in the network and were already connected. This is a sign for unintended behavior!");
     }
 
 
     /** to the last innerNode added, another outerNode will be attached */
     void addOuterToLastInnerNode(NodeID outerNodeID)
     {
-      if (m_lastInnerNodeID.empty()) { B2FATAL("addOuterToLastInnerNode() last InnerNode is not yet in this network! CurrentNetworkSize is: " << size()); }
+      if (m_lastInnerNodeID.empty()) { B2WARNING("addOuterToLastInnerNode() last InnerNode is not yet in this network! CurrentNetworkSize is: " << size()); return; }
       // check if entries are identical (catch loops):
       if (outerNodeID == m_lastInnerNodeID) {
-        B2ERROR("DirectedNodeNetwork::addOuterToLastInnerNode(): outerEntry and lastInnerNode are identical! Aborting linking-process");
+        B2WARNING("DirectedNodeNetwork::addOuterToLastInnerNode(): outerEntry and lastInnerNode are identical! Aborting linking-process");
         return;
       }
 
@@ -149,21 +148,21 @@ namespace Belle2 {
         B2DEBUG(250, "DirectedNodeNetwork::addOuterToLastInnerNode(): linking was successful!");
         return;
       }
-      B2ERROR("DirectedNodeNetwork::addOuterToLastInnerNode(): last InnerNode and outerEntry were already in the network and were already connected. This is a sign for unintended behavior!");
+      B2WARNING("DirectedNodeNetwork::addOuterToLastInnerNode(): last InnerNode and outerEntry were already in the network and were already connected. This is a sign for unintended behavior!");
     }
 
 
-    /** takes two entries and weaves them into the network TODO: UMBENENNEN! */
+    /** takes two entry IDs and weaves them into the network */
     bool linkNodes(NodeID outerNodeID, NodeID innerNodeID)
     {
       m_isFinalized = false;
       // check if entries are identical (catch loops):
       if (outerNodeID == innerNodeID) {
-        B2ERROR("DirectedNodeNetwork::linkNodes(): outerNodeID and innerNodeID are identical! Aborting linking-process");
+        B2WARNING("DirectedNodeNetwork::linkNodes(): outerNodeID and innerNodeID are identical! Aborting linking-process");
         return false;
       }
       if (m_nodeMap.count(innerNodeID) == 0 or m_nodeMap.count(outerNodeID) == 0) {
-        B2ERROR("DirectedNodeNetwork::linkNodes(): Trying to link Nodes that are not present yet");
+        B2WARNING("DirectedNodeNetwork::linkNodes(): Trying to link Nodes that are not present yet");
         return false;
       }
       B2DEBUG(10, "DNN:linkEntriesDEBUG: outer: " << outerNodeID << ", inner: " << innerNodeID);

@@ -72,7 +72,7 @@ void SegmentNetworkAnalyzerModule::event()
 
         bool passed = false;
         // check if the outerSegment is in the network and then look if the inner is connected to it
-        if (auto outerNode = segmentNetwork.getNode(*outerSegment)) {
+        if (auto outerNode = segmentNetwork.getNode(outerSegment->getName())) {
           for (const auto& connectedNode : outerNode->getInnerNodes()) {
             if (connectedNode->getEntry() == *innerSegment) {
               passed = true;

@@ -251,9 +251,8 @@ namespace Belle2 {
 
 
     // output containers
-
     /** access to the DirectedNodeNetwork, which will be produced by this module */
-    StoreObjPtr<Belle2::DirectedNodeNetworkContainer> m_network;
+    StoreObjPtr<DirectedNodeNetworkContainer> m_network;
 
 
 // counters

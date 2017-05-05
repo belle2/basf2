@@ -92,7 +92,7 @@ double QualityEstimatorTripletFit::estimateQuality(std::vector<SpacePoint const*
     double R3D = - (eta * PhiTilde * sin(theta) * sin(theta) + beta * ThetaTilde);
     R3D *= 1. / (eta * eta * sin(theta) * sin(theta) + beta * beta);
     const double b = 4.5 / m_magneticFieldZ * sqrt(XoverX0);
-    const double sigmaMS = 50 * b / R3D;
+    const double sigmaMS = 50. * b / R3D;
 
     double sigmaR3DSquared = pow(sigmaMS, 2) / (pow(eta * sin(theta), 2) + pow(beta, 2));
 
@@ -120,8 +120,8 @@ double QualityEstimatorTripletFit::estimateQuality(std::vector<SpacePoint const*
   double numerator = 0;
   double denominator = 0;
   for (short i = 0; i < nTriplets; ++i) {
-    numerator += m_R3Ds.at(i) / m_sigmaR3DSquareds.at(i);
-    denominator += 1. / m_sigmaR3DSquareds.at(i);
+    numerator += pow(m_R3Ds.at(i), 3) / m_sigmaR3DSquareds.at(i);
+    denominator += pow(m_R3Ds.at(i), 2) / m_sigmaR3DSquareds.at(i);
   }
   m_averageR3D = numerator / denominator;
 

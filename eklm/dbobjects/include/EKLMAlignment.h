@@ -18,7 +18,8 @@
 /* External headers. */
 #include <TObject.h>
 
-/* Belle2 Headers. */
+/* Belle2 headers. */
+#include <eklm/dataobjects/EKLMSegmentID.h>
 #include <eklm/dbobjects/EKLMAlignmentData.h>
 
 namespace Belle2 {
@@ -52,6 +53,16 @@ namespace Belle2 {
      * @param[in] segment Segment number.
      */
     EKLMAlignmentData* getAlignmentData(uint16_t segment);
+
+    /**
+     * Add correction.
+     * @param[in] segment    Segment identifier.
+     * @param[in] parameter  Parameter number.
+     * @param[in] correction Correction.
+     * @param[in] invertSign Whether to invert the correction sign.
+     */
+    void add(EKLMSegmentID segment, int parameter, double correction,
+             bool invertSign);
 
     /**
      * Clean alignment data.

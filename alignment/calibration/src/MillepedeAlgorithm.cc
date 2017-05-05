@@ -242,24 +242,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     if (param.isEKLM()) {
       // Add correction to all objects
       for (auto& eklm : newEKLM) {
-        int segment = param.getEklmID().getSegmentGlobalNumber();
-        EKLMAlignmentData* alignmentData =
-          eklm.second->getAlignmentData(segment);
-        if (alignmentData == NULL)
-          B2FATAL("EKLM alignment data not found, probable error in segment "
-                  "number.");
-        switch (param.getParameterId()) {
-          case 1:
-            alignmentData->setDy(correction);
-            break;
-          case 2:
-            alignmentData->setDalpha(correction);
-            break;
-          default:
-            B2FATAL("Incorrect EKLM alignment parameter " <<
-                    param.getParameterId());
-            break;
-        }
+        eklm.second->add(param.getEklmID(), param.getParameterId(), correction, m_invertSign);
       }
     }
 

@@ -42,6 +42,32 @@ EKLMAlignmentData* EKLMAlignment::getAlignmentData(uint16_t segment)
   return &(it->second);
 }
 
+void EKLMAlignment::add(EKLMSegmentID segmentID, int parameter,
+                        double correction, bool invertSign)
+{
+  double corr;
+  int segment;
+  EKLMAlignmentData* alignmentData;
+  segment = segmentID.getSegmentGlobalNumber();
+  alignmentData = getAlignmentData(segment);
+  corr = correction;
+  if (invertSign)
+    corr = -corr;
+  if (alignmentData == NULL)
+    B2FATAL("EKLM alignment data not found, probable error in segment number.");
+  switch (parameter) {
+    case 1:
+      alignmentData->setDy(alignmentData->getDy() + corr);
+      break;
+    case 2:
+      alignmentData->setDalpha(alignmentData->getDalpha() + corr);
+      break;
+    default:
+      B2FATAL("Incorrect EKLM alignment parameter " << parameter);
+      break;
+  }
+}
+
 void EKLMAlignment::cleanAlignmentData()
 {
   m_Data.clear();

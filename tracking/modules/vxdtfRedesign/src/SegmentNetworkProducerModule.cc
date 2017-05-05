@@ -360,12 +360,13 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector< Segment
         B2DEBUG(5, "SegmentNetworkProducerModule::buildActiveSectorNetwork(): sector " << outerSector->getName() <<
                 " will be combined with inner sector " << innerSector->getName());
 
-        activeSectorNetwork.linkNodes(outerEntryID, innerEntryID);
-        wasAnythingFoundSoFar = true;
-        nSectorsLinked++;
-        continue;
+        if (activeSectorNetwork.linkNodes(outerEntryID, innerEntryID)) {
+          wasAnythingFoundSoFar = true;
+          nSectorsLinked++;
+        }
+      } else {
+        activeSectorNetwork.addInnerToLastOuterNode(innerEntryID);
       }
-      activeSectorNetwork.addInnerToLastOuterNode(innerEntryID);
     } // inner sector loop
     // discard outerSector if no valid innerSector could be found
     if (wasAnythingFoundSoFar == false) { B2DEBUG(5, "SegmentNetworkProducerModule::buildActiveSectorNetwork(): sector " << outerSectorData.secID.getFullSecString() << " had no matching inner sectors of " << innerSecIDs.size() << " stored in secMap - discarding as outer sector..."); nNoValidOfAllInnerSectors++; if (innerSecIDs.empty()) { nNoInnerExisting++; }; delete outerSector; }
@@ -444,12 +445,13 @@ void SegmentNetworkProducerModule::buildTrackNodeNetwork()
           hitNetwork.addNode(innerNodeID, *innerHit);
           // store combination of hits in network:
           if (!wasAnythingFoundSoFar) {
-            hitNetwork.linkNodes(outerNodeID, innerNodeID);
-            nLinked++;
-            wasAnythingFoundSoFar = true;
-            continue;
+            if (hitNetwork.linkNodes(outerNodeID, innerNodeID)) {
+              nLinked++;
+              wasAnythingFoundSoFar = true;
+            }
+          } else {
+            hitNetwork.addInnerToLastOuterNode(innerNodeID);
           }
-          hitNetwork.addInnerToLastOuterNode(innerNodeID);
         } // inner hit loop
       } // outer hit loop
     } // inner sector loop
@@ -542,12 +544,13 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
         }
         // store combination of hits in network:
         if (!wasAnythingFoundSoFar) {
-          segmentNetwork.linkNodes(outerSegmentID, innerSegmentID);
-          nLinked++;
-          wasAnythingFoundSoFar = true;
-          continue;
+          if (segmentNetwork.linkNodes(outerSegmentID, innerSegmentID)) {
+            nLinked++;
+            wasAnythingFoundSoFar = true;
+          }
+        } else {
+          segmentNetwork.addInnerToLastOuterNode(innerSegmentID);
         }
-        segmentNetwork.addInnerToLastOuterNode(innerSegmentID);
       } // innerHit-loop
     } // centerHit-loop
   } // outerHit-loop

@@ -304,22 +304,24 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
     struct zwall_t { double zlow, zup;};
     zwall_t zs[] = {{ -682.1, -883.9}, { -445.9, -571.7}, { -220.8, -274.2}, {0, 0}, {220.8, 274.2}, {445.9, 571.7}, {682.1, 883.9}, {936.6, 1220.5}, {1217.1, 1591.2}, {1532., 2007.4}};
 
-    G4Transform3D tf0 = G4RotateZ3D(2.5 / 180 * M_PI) * G4Translate3D(0, 1251.6,
-                        0) * G4RotateZ3D(1.25 / 180 * M_PI) * G4RotateY3D(-M_PI / 2);
-    G4Transform3D tf1 = G4RotateZ3D(-2.5 / 180 * M_PI) * G4Translate3D(0, 1251.6,
-                        0) * G4RotateZ3D(1.25 / 180 * M_PI) * G4RotateY3D(-M_PI / 2);
-    G4Vector3D n0(sind(90 + 2.5 + 1.25), -cosd(90 + 2.5 + 1.25), 0); G4Point3D r0 = tf0 * G4Point3D(0, 0, -0.26);
-    G4Vector3D n1(-sind(90 - 2.5 + 1.25), cosd(90 - 2.5 + 1.25), 0); G4Point3D r1 = tf1 * G4Point3D(0, 0, 0.26);
+    const double dz = 0.5 / 2; // half of theta fin thickness
 
-    G4Vector3D n2(0, 1, 0); G4Point3D r2(0, 1251.6 + 0.2, 0), r3(0, 1251.6 + 310, 0);
+    G4Vector3D n0(sind(90 + 2.5 + 1.25), -cosd(90 + 2.5 + 1.25), 0); // normal vector of the left sector wall pointing inside the sector
+    G4Point3D r0 = G4Point3D(-1251.6 * sind(2.5), 0, 0) + dz * n0; // point in the left sector wall shifted by phi fin
+    G4Vector3D n1(-sind(90 - 2.5 + 1.25), cosd(90 - 2.5 + 1.25),
+                  0); // normal vector of the right sector wall pointing inside the sector
+    G4Point3D r1 = G4Point3D(1251.6 * sind(2.5), 0, 0) + dz * n1; // point in the right sector wall shifted by phi fin
+
+    G4Vector3D n2(0, 1, 0); G4Point3D r2(0, 0, 0), r3(0, 310, 0);
 
     for (unsigned int i = 0; i < sizeof(zs) / sizeof(zwall_t); i++) {
-      //  double th = -atan(404 / (zs[i].zlow - zs[i].zup));
       double th = atan2(404, -(zs[i].zlow - zs[i].zup));
-      //    std::cout<<i<<" "<<th*180/M_PI<<std::endl;
 
-      G4Vector3D nf(0, -cos(th), sin(th)); G4Point3D rf(0, 1251.6, zs[i].zlow);
+      G4Vector3D nf(0, -cos(th), sin(th));
+      // take into account finite thickness of the theta fin
+      G4Point3D rf(0, 0, copysign(dz / sin(th), cos(th)));
 
+      // calculate three plane intersection point
       auto inter = [&top](const G4Vector3D & n0, const G4Point3D & r0,
                           const G4Vector3D & n1, const G4Point3D & r1,
       const G4Vector3D & n2, const G4Point3D & r2) -> G4Point3D {
@@ -338,8 +340,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
         return  res;
       };
 
-      G4Transform3D tfin(G4Translate3D(0, 1251.6, zs[i].zlow)*G4RotateX3D(-th + M_PI / 2)),
-                    tfini(G4RotateX3D(th - M_PI / 2)*G4Translate3D(0, -1251.6, -zs[i].zlow));
+      G4Transform3D tfin(G4RotateX3D(-th + M_PI / 2)), tfini(G4RotateX3D(th - M_PI / 2));
       G4ThreeVector t0 = tfini * inter(n0, r0, n2, r2, nf, rf);
       G4ThreeVector t1 = tfini * inter(n1, r1, n2, r2, nf, rf);
       G4ThreeVector t2 = tfini * inter(n0, r0, n2, r3, nf, rf);
@@ -347,7 +348,6 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
       //    G4cout<<t0<<" "<<t1<<" "<<t2<<" "<<t3<<" "<<G4RotateX3D(th-M_PI/2)*G4Point3D(0,404,zs[i].zup-zs[i].zlow)<<G4endl;
 
       G4ThreeVector thfin[8];
-      double dz = 0.25;
       thfin[0] = G4ThreeVector(t0.x(), t0.y(), -dz);
       thfin[1] = G4ThreeVector(t1.x(), t1.y(), -dz);
       thfin[2] = G4ThreeVector(t3.x(), t3.y(), -dz);
@@ -360,7 +360,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
       G4VSolid* thfinsolid = new BelleCrystal("thfinsolid", 4, thfin);
       G4LogicalVolume* thfinlogical = new G4LogicalVolume(thfinsolid, Materials::get("A5052"), "thfinlogical", 0, 0, 0);
       thfinlogical->SetVisAttributes(att("iron2"));
-      new G4PVPlacement(tfin, thfinlogical, "thfinphysical", sectorlogical, false, 0, overlap);
+      new G4PVPlacement(G4Translate3D(0, 1251.6, zs[i].zlow)*tfin, thfinlogical, "thfinphysical", sectorlogical, false, 0, overlap);
     }
   }
 

@@ -4,7 +4,7 @@
 #######################################################
 #
 # Validation script for B --> tau nu
-# FEI B-tag reconstraction, with hadronic and semileptonic tag
+# FEI B-tag reconstruction, with hadronic and semileptonic tag
 #
 # Contributors: M. Merola (April 2017)
 #

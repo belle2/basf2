@@ -411,7 +411,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
     vector<G4LogicalVolume*> wrapped_crystals;
     for (auto it = cryst.begin(); it != cryst.end(); it++) {
       shape_t* s = *it;
-      wrapped_crystals.push_back(wrapped_crystal(s, "barrel", 0.17 - 0.03));
+      wrapped_crystals.push_back(wrapped_crystal(s, "barrel", 0.17 - 0.0325));
     }
 
     for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); ++it) {

@@ -84,6 +84,7 @@ if __name__ == "__main__":
     specific_options.m_steering_file = 'mva/examples/tensorflow/simple.py'
     specific_options.m_nIterations = 100
     specific_options.m_mini_batch_size = 100
+    specific_options.m_normalize = True
     training_start = time.time()
     basf2_mva.teacher(general_options, specific_options)
     training_stop = time.time()

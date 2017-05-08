@@ -25,7 +25,6 @@
 #include <framework/logging/Logger.h>
 #include "trg/ecl/TrgEclMaster.h"
 #include "trg/ecl/TrgEclCluster.h"
-#include "trg/ecl/TrgEclMapping.h"
 
 #include "trg/ecl/dataobjects/TRGECLTrg.h"
 #include "trg/ecl/dataobjects/TRGECLHit.h"
@@ -70,6 +69,7 @@ TrgEclMaster::TrgEclMaster():
   obj_beambkg = new TrgEclBeamBKG();
   obj_bhabha = new TrgEclBhabha();
   obj_timing = new TrgEclTiming();
+  obj_map = new TrgEclMapping();
 
 
 }
@@ -79,6 +79,7 @@ TrgEclMaster::~TrgEclMaster()
   delete obj_beambkg;
   delete obj_bhabha;
   delete obj_timing;
+  delete obj_map;
 }
 //
 //
@@ -798,15 +799,14 @@ TrgEclMaster::setRS(std::vector<int> TCId, std::vector<double> TCHit, std::vecto
 
   //----------------------------------------
   //
-  TrgEclMapping* map = new TrgEclMapping();
   thetaringsum.resize(3, std::vector<double>(36, 0.));
   phiringsum.resize(17);
   const int size_hit = TCHit.size();
   for (int iHit = 0; iHit < size_hit; iHit++) {
     int iTCId = TCId[iHit] - 1;
     if (TCHit[iHit] > 0) {
-      int iTCThetaId = map ->getTCThetaIdFromTCId(iTCId + 1) ;
-      int iTCPhiId = map ->getTCPhiIdFromTCId(iTCId + 1) ;
+      int iTCThetaId = obj_map ->getTCThetaIdFromTCId(iTCId + 1) ;
+      int iTCPhiId = obj_map ->getTCPhiIdFromTCId(iTCId + 1) ;
       phiringsum[iTCThetaId] += TCHit[iHit];
       if (iTCThetaId < 3) { //fwd
         thetaringsum[0][iTCPhiId] += TCHit[iHit];

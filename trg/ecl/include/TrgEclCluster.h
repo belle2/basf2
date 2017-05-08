@@ -38,7 +38,7 @@ namespace Belle2 {
     TrgEclCluster();    /// Constructor
 
     /** Destructor */
-    virtual ~TrgEclCluster() {};/// Destructor
+    virtual ~TrgEclCluster();/// Destructor
 
   public:
 

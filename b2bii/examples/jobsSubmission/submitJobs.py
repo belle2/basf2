@@ -10,33 +10,24 @@ import os
 import sys
 import csv
 
-if len(sys.argv) == 1:
-    sys.exit('Need one argument: path of look up table !')
+if len(sys.argv) != 3:
+    sys.exit('Need two arguments: 1) path of look up table, 2) mc or data')
 
-# assuming interest only in this type of events
-dataType = 'on_resonance'
-belleLevel = 'caseB'
+# yourWorkingDirectoryPath = '.'
+# logDir = yourWorkingDirectoryPath + '/analysisLog/'
 
-yourWorkingDirectoryPath = '.'
-subLogDir = yourWorkingDirectoryPath + '/analysisLog/'
-lookUpTablePath = yourWorkingDirectoryPath + sys.argv[1]
+lookUpTablePath = sys.argv[1]
+
+mc_or_data = sys.argv[2].lower()
+isMC = {"mc": True, "data": False}.get(mc_or_data, None)
+if isMC is None:
+    sys.exit('Second parameter must be "mc" or "data" to indicate whether we run on MC or real data')
 
 # the job we are submitting
-myCmd = yourWorkingDirectoryPath + '/analysisJob.sh'
+# myCmd = yourWorkingDirectoryPath + '/analysisJob.sh'
+myCmd = './analysisJob.sh'
+logDir = './analysisLog'
 
-# a bit of clean-up before job submission
-
-for eventType in ['evtgen-charged', 'evtgen-mixed']:
-
-    print('Cleaning log dir ..')
-    # path where we want to store the log files
-    logDir = subLogDir + eventType
-
-    if os.path.exists(logDir):
-        # clean up log dir before jobs, so only relevant files are saved
-        os.system("rm -rf " + logDir + '/*')
-    else:
-        os.makedirs(logDir)
 # ================================= Submit jobs ! ==============================
 print('Jobs submission ..')
 
@@ -46,11 +37,16 @@ with open(lookUpTablePath) as f:
 
     # for each line of the txt file submit a job
     for row in reader:
-        expNo, streamNo, eventType, minRunNo, maxRunNo, nothing = row
+
+        if isMC:
+            expNo, eventType, streamNo, dataType, belleLevel, minRunNo, maxRunNo =\
+                row[:-1]
+        else:
+            expNo, skimType, dataType, belleLevel, minRunNo, maxRunNo =\
+                row[:-1]
 
         # end of file name for log files
-        filenameEnd = str(expNo) + '_' + str(minRunNo) + '_' + str(maxRunNo) +\
-            '_' + str(streamNo)
+        filenameEnd = '_'.join(row[:-1])
 
         # job submission with arguments
         os.system('bsub ' +
@@ -58,21 +54,19 @@ with open(lookUpTablePath) as f:
                   ' -oo ' + logDir + '/' + 'out_' + filenameEnd +
                   ' -eo ' + logDir + '/' + 'err_' + filenameEnd +
                   ' -N' +
-                  ' \" ' + myCmd + ' ' +
-                  str(expNo) + ' ' +
-                  str(minRunNo) + ' ' +
-                  str(maxRunNo) + ' ' +
-                  eventType + ' ' +
-                  dataType + ' ' +
-                  belleLevel + ' ' +
-                  str(streamNo) + '\"')
+                  ' \" ' + myCmd +
+                  ' ' + sys.argv[2].lower() + ' ' +
+                  ' '.join(row[:-1]) +
+                  '\"')
+        print('bsub ' +
+              ' -q l' +
+              ' -oo ' + logDir + '/' + 'out_' + filenameEnd +
+              ' -eo ' + logDir + '/' + 'err_' + filenameEnd +
+              ' -N' +
+              ' \" ' + myCmd + ' ' +
+              ' ' + sys.argv[2].lower() + ' ' +
+              ' '.join(row[:-1]) +
+              '\"')
 
         # summary
-        print('Submitted job for: ' +
-              str(expNo) + ' ' +
-              str(minRunNo) + ' ' +
-              str(maxRunNo) + ' ' +
-              eventType + ' ' +
-              dataType + ' ' +
-              belleLevel + ' ' +
-              str(streamNo))
+        print('Submitted job for: ' + ' '.join(row))

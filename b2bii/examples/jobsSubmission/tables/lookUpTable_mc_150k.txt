@@ -1,0 +1,3 @@
+65	evtgen-charged	0	on_resonance	caseB	1	25	
+65	evtgen-charged	0	on_resonance	caseB	26	56	
+65	evtgen-charged	0	on_resonance	caseB	57	74	

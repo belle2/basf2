@@ -2,78 +2,104 @@
 # -*- coding: utf-8 -*-
 
 # This is the main file for the analysis script
-# It only contains:
-#   some arguments sorting that will make it work with the job submission script
-#   the relevant code for B2BII + FEI
-# so it needs to be completed to make it work
-
 # G. Caria
 
+import os
+import sys
+from tools import *
 from basf2 import *
+from modularAnalysis import inputMdstList
+from modularAnalysis import reconstructDecay
+from modularAnalysis import matchMCTruth
+from modularAnalysis import analysis_main
+from modularAnalysis import ntupleFile
+from modularAnalysis import ntupleTree
+from modularAnalysis import fillParticleList
+from modularAnalysis import fillConvertedPhotonsList
+from modularAnalysis import loadGearbox
+from modularAnalysis import vertexKFit
+from modularAnalysis import vertexRave
+from modularAnalysis import printVariableValues
+from stdCharged import *
 
 import b2biiConversion
 import ROOT
 from ROOT import Belle2
 ROOT.Belle2.BFieldManager.getInstance().setConstantOverride(0, 0, 1.5 * ROOT.Belle2.Unit.T)
 
-# ------- Arguments sorting
-if len(sys.argv) != 8:
-    sys.exit('Must provide all 7 parameters !')
 
-expNo = sys.argv[1]
-minRunNo = sys.argv[2]
-maxRunNo = sys.argv[3]
-eventType = sys.argv[4]
-dataType = sys.argv[5]
-belleLevel = sys.argv[6]
-streamNo = sys.argv[7]
+# ------- Arguments sorting
+
+mc_or_data = sys.argv[1].lower()
+isMC = {"mc": True, "data": False}.get(mc_or_data, None)
+if isMC is None:
+    sys.exit('First parameter must be "mc" or "data" to indicate whether we run on MC or real data')
+
+if isMC:
+    if len(sys.argv) != 9:
+        sys.exit('Must provide all 8 parameters !')
+    expNo = sys.argv[2]
+    eventType = sys.argv[3]
+    streamNo = sys.argv[4]
+    dataType = sys.argv[5]
+    belleLevel = sys.argv[6]
+    minRunNo = sys.argv[7]
+    maxRunNo = sys.argv[8]
+else:
+    if len(sys.argv) != 8:
+        sys.exit('Must provide all 7 parameters !')
+    expNo = sys.argv[2]
+    skimType = sys.argv[3]
+    dataType = sys.argv[4]
+    belleLevel = sys.argv[5]
+    minRunNo = sys.argv[6]
+    maxRunNo = sys.argv[7]
+
 
 # ------- B2BII
-mc_beamparams = ''
 
-os.environ['BELLE_POSTGRES_SERVER'] = 'can01'
+b2biiConversion.setupB2BIIDatabase(isMC)
+
 os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
 
-isMC = True
-b2biiConversion.setupB2BIIDatabase(True, False)
+if isMC:
+    url = getBelleUrl_mc(expNo, minRunNo, maxRunNo,
+                         eventType, dataType, belleLevel, streamNo)
+else:
+    url = getBelleUrl_data(expNo, minRunNo, maxRunNo,
+                           skimType, dataType, belleLevel)
 
-url = getBelleUrl(expNo, minRunNo, maxRunNo,
-                  eventType, dataType, belleLevel, streamNo)
-
-use_local_database(filename=os.path.join(mc_beamparams, 'B2BII_MC_database/dbcache.txt'),
-                   directory=os.path.join(mc_beamparams, 'B2BII_MC_database'),
-                   readonly=False, loglevel=LogLevel.INFO)
-
-for exp in range(100):
-    set_experiment_name(exp, "BELLE_exp%d" % exp)
-
-b2biiConversion.convertBelleMdstToBelleIIMdst(url,
-                                              applyHadronBJSkim=True)
-
-# Gearbox needs to be loaded
+b2biiConversion.convertBelleMdstToBelleIIMdst(url, applyHadronBJSkim=True)
 loadGearbox()
 
-#  ------- FEI
-empty_path = create_path()
-skimfilter = register_module('VariableToReturnValue')
-skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
-skimfilter.if_value('>12', empty_path, AfterConditionPath.END)
-analysis_main.add_module(skimfilter)
-
-fei_path = get_path_from_file('')
-analysis_main.add_path(fei_path)
 
 # ------- Output file
-outDir = ''
 
-if not os.path.exists(outDir):
-    os.makedirs(outDir)
+outDir = './analysisOutput'
 
-filenameEnd = str(expNo) + '_' + str(minRunNo) + '_' + str(maxRunNo) + '_' +\
-    str(streamNo) + '_' + eventType + '_' + dataType + '.root'
+filenameEnd = '_'.join(sys.argv[2:]) + '.root'
 
 outputFileName = outDir + '/output_' + filenameEnd
 
 ntupleFile(outputFileName)
 
-# Rest of analysis script goes here...
+
+# ------- Rest of analysis script goes here...
+
+# this sample code is take from b2bii/examples
+
+fillParticleList('pi+:all', '')
+
+toolsTrackPI = ['EventMetaData', 'pi+']
+toolsTrackPI += ['Kinematics', '^pi+']
+
+ntupleTree('pion', 'pi+:all', toolsTrackPI)
+
+# progress
+progress = register_module('Progress')
+analysis_main.add_module(progress)
+
+process(analysis_main)
+
+# Print call statistics
+print(statistics)

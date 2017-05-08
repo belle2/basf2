@@ -50,9 +50,6 @@ BaseRecoFitterModule::BaseRecoFitterModule() :
   addParam("resortHits", m_param_resortHits, "Resort the hits while fitting.",
            m_param_resortHits);
 
-  addParam("cosmicsTemporaryFix", m_param_cosmicsTemporaryFix, "Turn on the temporary fix for cosmics events",
-           m_param_cosmicsTemporaryFix);
-
   addParam("initializeCDCTranslators", m_param_initializeCDCTranslators,
            "Configures whether the CDC Translators should be initialized by the FitterModule",
            m_param_initializeCDCTranslators);
@@ -79,7 +76,7 @@ void BaseRecoFitterModule::event()
 
   // The used fitting algorithm class.
   TrackFitter fitter(m_param_pxdHitsStoreArrayName, m_param_svdHitsStoreArrayName, m_param_cdcHitsStoreArrayName,
-                     m_param_bklmHitsStoreArrayName, m_param_eklmHitsStoreArrayName, m_param_cosmicsTemporaryFix, m_param_initializeCDCTranslators);
+                     m_param_bklmHitsStoreArrayName, m_param_eklmHitsStoreArrayName);
 
   const std::shared_ptr<genfit::AbsFitter>& genfitFitter = createFitter();
   fitter.resetFitter(genfitFitter);

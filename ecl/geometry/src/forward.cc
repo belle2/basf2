@@ -201,8 +201,8 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
                     overlap);
 
   if (b_septum_wall) {
-    double d = 5;
-    Point_t vin[] = {{3., RI}, {ZT - zsep, RIp - tand(th0)* zsep}, {ZT - zsep, RT - 20 - d}, {3 + (RT - 20 - d - RC) / tand(th1), RT - 20 - d}, {3, RC}};
+    double d = 5, aRC = RC - 30e-6;
+    Point_t vin[] = {{3., RI}, {ZT - zsep, RIp - tand(th0)* zsep}, {ZT - zsep, RT - 20 - d}, {3 + (RT - 20 - d - aRC) / tand(th1), RT - 20 - d}, {3, aRC}};
     const int n = sizeof(vin) / sizeof(Point_t);
     Point_t c = centerofgravity(vin, vin + n);
     G4ThreeVector cin[n * 2];

@@ -76,7 +76,12 @@ namespace Belle2 {
       if (!m_extHit) return;
 
       m_mcParticle = track->getRelated<MCParticle>();
-      if (m_mcParticle) m_barHit = m_mcParticle->getRelated<TOPBarHit>();
+      if (m_mcParticle) {
+        const auto barHits = m_mcParticle->getRelationsWith<TOPBarHit>();
+        for (const auto& barHit : barHits) {
+          if (barHit.getModuleID() == m_extHit->getCopyID()) m_barHit = &barHit;
+        }
+      }
 
       // set track parameters
       m_position = m_extHit->getPosition();

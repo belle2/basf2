@@ -135,6 +135,8 @@ class Calibration():
         self.dependencies = []
         #: File:Iov dictionary, should be key=absolute_file_path:value=IoV for file (see utils.IoV())
         self.files_to_iovs = dict()
+        #: Variable to define the maximum number of iterations for this calibration specifically. It overrides tha CAF value if set.
+        self.max_iterations = None
 
     def is_valid(self):
         """A full calibration consists of a collector AND an associated algorithm AND input_files.
@@ -415,7 +417,8 @@ class CAF():
         self.output_dir = self.config['CAF_DEFAULTS']['ResultsDir']
         #: Polling frequencywhile waiting for jobs to finish
         self.heartbeat = decode_json_string(self.config['CAF_DEFAULTS']['HeartBeat'])
-        #: Maximum number of iterations the CAF will make of all necessary calibrations
+        #: Default maximum number of iterations the CAF will make of all necessary calibrations. Overridden by the individual
+        # Calibration.max_iterations attribute.
         self.max_iterations = decode_json_string(self.config['CAF_DEFAULTS']['MaxIterations'])
         #: The ordering and explicit future dependencies of calibrations. Will be filled during self.run()
         self.order = None
@@ -543,6 +546,8 @@ class CAF():
             runners = []
             # Create Runners to spawn threads for each calibration
             for calibration_name, calibration in self.calibrations.items():
+                if not calibration.max_iterations:
+                    calibration.max_iterations = self.max_iterations
                 machine = CalibrationMachine(calibration, iov)
                 machine.collector_backend = self.backend
                 runner = CalibrationRunner(machine, heartbeat=self.heartbeat)

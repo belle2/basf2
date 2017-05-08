@@ -393,8 +393,6 @@ class CalibrationMachine(Machine):
         self.calibration.machine = self
         #: Which iteration step are we in
         self.iteration = iteration
-        #: Maximum allowed iterations
-        self.max_iterations = self.default_max_iterations
         #: Backend used for this calibration machine collector
         self.collector_backend = None
         #: Result object of collector, filled by submitting to backend
@@ -484,7 +482,7 @@ class CalibrationMachine(Machine):
     def _below_max_iterations(self):
         """
         """
-        return self.iteration < self.max_iterations
+        return self.iteration < self.calibration.max_iterations
 
     def _increment_iteration(self):
         """
@@ -518,7 +516,7 @@ class CalibrationMachine(Machine):
         if self._require_iteration() and self._below_max_iterations():
             return False
         elif self._require_iteration() and not self._below_max_iterations():
-            B2INFO("Reached maximum number of iterations ({0}), will complete now.".format(self.max_iterations))
+            B2INFO("Reached maximum number of iterations ({0}), will complete now.".format(self.calibration.max_iterations))
             return True
         elif not self._require_iteration():
             return True
@@ -546,8 +544,6 @@ class CalibrationMachine(Machine):
             config.read(config_file_path)
         else:
             B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
-        #: Default max number of iterations
-        self.default_max_iterations = decode_json_string(config['CAF_DEFAULTS']['MaxIterations'])
         #: Default location of the generic collector steering file
         self.default_collector_steering_file_path = ROOT.Belle2.FileSystem.findFile('calibration/scripts/caf/run_collector_path.py')
 

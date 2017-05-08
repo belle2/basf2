@@ -8,40 +8,25 @@ This module implements several objects/functions to configure and run the calibr
 These can then be used to construct the workflow of the calibration job.
 """
 
-from basf2 import *
+__all__ = ["Calibration", "Algorithm", "CAF"]
+
 import os
 import sys
-import shutil
-from pprint import PrettyPrinter
-from datetime import datetime
-from collections import OrderedDict
-from collections import defaultdict
-from collections import deque
-import pickle
-from time import sleep
-import multiprocessing
-import glob
 
-from .utils import past_from_future_dependencies
-from .utils import topological_sort
-from .utils import all_dependencies
-from .utils import decode_json_string
-from .utils import method_dispatch
-from .utils import find_sources
-from .utils import AlgResult
-from .utils import temporary_workdir
-from .utils import iov_from_vector
-from .utils import IoV
-from .utils import IoV_Result
+from caf.utils import past_from_future_dependencies
+from caf.utils import topological_sort
+from caf.utils import all_dependencies
+from caf.utils import decode_json_string
+from caf.utils import method_dispatch
+from caf.utils import find_sources
+from caf.utils import AlgResult
+from caf.utils import temporary_workdir
+from caf.utils import iov_from_vector
+from caf.utils import IoV
+from caf.utils import IoV_Result
 
-import caf.utils
 import caf.backends
 from caf.state_machines import CalibrationMachine, MachineError, ConditionError, TransitionError, CalibrationRunner
-
-import ROOT
-from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm
-
-pp = PrettyPrinter()
 
 
 class Calibration():
@@ -224,7 +209,9 @@ class Calibration():
         # check if collector is already a module or if we need to create one
         # from the name
         if collector:
+            from basf2 import Module
             if isinstance(collector, str):
+                from basf2 import register_module
                 collector = register_module(collector)
             if not isinstance(collector, Module):
                 B2ERROR("Collector needs to be either a Module or the name of such a module")
@@ -244,6 +231,7 @@ class Calibration():
         """
         Setter for the algorithms property, checks if single or list of algorithms passed in.
         """
+        from ROOT.Belle2 import CalibrationAlgorithm
         if isinstance(value, CalibrationAlgorithm):
             self._algorithms = [Algorithm(value)]
         else:
@@ -256,6 +244,7 @@ class Calibration():
         """
         Alternate algorithms setter for lists and tuples of CalibrationAlgorithms
         """
+        from ROOT.Belle2 import CalibrationAlgorithm
         if value:
             self._algorithms = []
             for alg in value:
@@ -371,6 +360,7 @@ class Algorithm():
         Simple RootInput setup and initilise bound up in a method. Applied to the input_func
         by default.
         """
+        from basf2 import register_module
         root_input = register_module('RootInput')
         root_input.param('inputFileName', 'RootOutput.root')
         root_input.initialize()
@@ -403,6 +393,7 @@ class CAF():
         that $BELLE2_LOCAL_DIR is set and that it is the correct release directory to
         access the config file.
         """
+        import ROOT
         config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
         if config_file_path:
             import configparser

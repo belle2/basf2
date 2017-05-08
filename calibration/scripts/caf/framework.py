@@ -351,7 +351,7 @@ class Algorithm():
         self.data_input = data_input
         if not self.data_input:
             self.data_input = self.default_rootinput_setup
-        #: Function called after input_func but before algorithm.execute to do any remaining setup
+        #: Function called after data_input but before algorithm.execute to do any remaining setup
         #: IT MUST ONLY HAVE TWO ARGUMENTS pre_algorithm(algorithm, iteration)  where algorithm can be
         #: assumed to be the CalibrationAlgorithm instance, and iteration is an int e.g. 0, 1, 2...
         self.pre_algorithm = pre_algorithm
@@ -359,12 +359,13 @@ class Algorithm():
     @staticmethod
     def default_rootinput_setup():
         """
-        Simple RootInput setup and initilise bound up in a method. Applied to the input_func
+        Simple RootInput setup and initilise bound up in a method. Applied to the data_input attribute
         by default.
         """
         from basf2 import register_module
         root_input = register_module('RootInput')
         root_input.param('inputFileName', 'RootOutput.root')
+        root_input.param('ignoreCommandLineOverride', True)
         root_input.initialize()
 
 

@@ -149,7 +149,7 @@ namespace Belle2 {
 
 
       weightfile.addOptions(m_general_options);
-      weightfile.addFile("TMVA_Weightfile", std::string("weights/") + jobName + "_" + specific_options.m_method + ".weights.xml");
+      weightfile.addFile("TMVA_Weightfile", std::string("TMVA/weights/") + jobName + "_" + specific_options.m_method + ".weights.xml");
       weightfile.addFile("TMVA_Logfile", logfilename);
 
       // We have to parse the TMVA output to get the feature importances, there is no other way currently

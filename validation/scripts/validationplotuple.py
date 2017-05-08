@@ -144,6 +144,8 @@ class Plotuple:
         # The json file, in which the ntuple information is stored
         self.file = None
 
+        self.html_content = None
+
         #: width of the plotted image in pixels, will be set by the draw function
         self.width = None
 
@@ -175,6 +177,9 @@ class Plotuple:
             self.create_graph_plot()
         elif self.type == 'TH2':
             self.create_histogram_plot('2D')
+        # used to store HTML user content
+        elif self.type == 'TNamed':
+            self.create_html_content()
         elif self.type == 'TASImage':
             self.create_image_plot()
         elif self.type == 'TNtuple':
@@ -661,6 +666,17 @@ class Plotuple:
         self.file = './{0}/{1}_{2}'.format('/'.join(path.split('/')[2:]),
                                            strip_ext(self.rootfile), self.key)
 
+    def create_html_content(self):
+
+        # self.elements
+        self.html_content = ""
+
+        for elem in self.elements:
+            self.html_content = self.html_content + "<p>" + elem.revision + "</p>" + elem.object.GetTitle()
+
+        # there is no file storing this, because it is directly in the json file
+        self.file = None
+
     def create_ntuple_table_json(self):
         """!
         If the Plotuple-object contains n-tuples, this will create the
@@ -717,4 +733,8 @@ class Plotuple:
         self.file = json_ntuple_file
 
     def get_plot_title(self):
-        return self.file.split("/")[-1].replace(".", "_").strip()
+        if self.file:
+            return self.file.split("/")[-1].replace(".", "_").strip()
+        else:
+            # this is for html content which is not stored in any file
+            return self.key

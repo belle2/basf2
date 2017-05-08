@@ -27,8 +27,8 @@ namespace Belle2 {
     /**
      * default constructor
      */
-    ARICHPhoton(): m_hitID(0), m_thetaCer(0), m_phiCer(0), m_aerogel(0), m_mirror(0), m_sigExpPi(0), m_bkgExpPi(0), m_sigExpK(0),
-      m_bkgExpK(0), m_zVtx(0)
+    ARICHPhoton(): m_hitID(0), m_thetaCer(0), m_phiCer(0),  m_mirror(0), m_sigExpPi(0), m_bkgExpPi(0), m_sigExpK(0),
+      m_bkgExpK(0)
     {};
 
     /**
@@ -36,12 +36,11 @@ namespace Belle2 {
      * @param hitID       Id of used ARICHHit
      * @param thetaCer    reconstructed cherenkov angle theta
      * @param phiCer      reconstructed cherenkov angle phi
-     * @param aergel      assumed aerogel layer of photon emission point
      * @param mirror      assumed mirror plane of photon reflection
      */
-    ARICHPhoton(int hitID, float thetaCer, float phiCer, int aerogel, int mirror): m_hitID(hitID), m_thetaCer(thetaCer),
+    ARICHPhoton(int hitID, float thetaCer, float phiCer, int mirror): m_hitID(hitID), m_thetaCer(thetaCer),
       m_phiCer(phiCer),
-      m_aerogel(aerogel), m_mirror(mirror), m_sigExpPi(0), m_bkgExpPi(0), m_sigExpK(0), m_bkgExpK(0), m_zVtx(0) {};
+      m_mirror(mirror), m_sigExpPi(0), m_bkgExpPi(0), m_sigExpK(0), m_bkgExpK(0) {};
 
 
     /**
@@ -64,24 +63,6 @@ namespace Belle2 {
     {
       m_bkgExpPi = pi;
       m_bkgExpK = k;
-    }
-
-    /**
-     * Set Z poition of photon production vertex
-     * @param z Z poition of photon production vertex
-     */
-    void setZVertex(double z)
-    {
-      m_zVtx = z;
-    }
-
-
-    /**
-     * Get Z poition of photon production vertex
-     */
-    float getZVertex()
-    {
-      return m_zVtx;
     }
 
     /**
@@ -133,14 +114,6 @@ namespace Belle2 {
     }
 
     /**
-     * Get used aerogel layer hypothesis
-     */
-    int getAerogel()
-    {
-      return m_aerogel;
-    }
-
-    /**
      * Get used mirror hypothesis (0 for no reflection)
      */
     int getMirror()
@@ -160,15 +133,13 @@ namespace Belle2 {
     int m_hitID;       /**< id of corresponding ARICHHit */
     float m_thetaCer;  /**< reconstructed theta angle */
     float m_phiCer;    /**< reconstructed phi angle */
-    int m_aerogel;     /**< assumed aerogel layer of photon emission */
     int m_mirror;      /**< assumed reflection of mirror plate (0 for no reflection) */
     float m_sigExpPi;  /**< expected signal contribution for pion hypothesis */
     float m_bkgExpPi;  /**< expected background contribution for pion hypothesis */
     float m_sigExpK;   /**< expected signal contribution for kaon hypothesis */
     float m_bkgExpK;   /**< expected background contribution for kaon hypothesis */
-    float m_zVtx;      /**< z position of photon production vertex */
 
-    ClassDef(ARICHPhoton, 1); /**< ClassDef */
+    ClassDef(ARICHPhoton, 2); /**< ClassDef */
 
   };
 } //Belle2 namespace

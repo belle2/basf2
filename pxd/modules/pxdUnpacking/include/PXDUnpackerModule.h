@@ -24,6 +24,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <math.h>
+#include <arpa/inet.h>
 
 namespace Belle2 {
 

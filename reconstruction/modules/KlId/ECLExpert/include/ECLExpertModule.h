@@ -46,12 +46,7 @@ namespace Belle2 {
     virtual void event() override;
 
     /** terminate and free */
-    virtual void terminate() override
-    {
-      m_expert.reset();
-      m_dataset.reset();
-    }
-
+    virtual void terminate() override;
 
   protected:
 

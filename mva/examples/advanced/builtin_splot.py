@@ -10,9 +10,16 @@ from modularAnalysis import *
 
 if __name__ == "__main__":
 
-    variables = ['M', 'p', 'pz', 'daughter(0, p)', 'daughter(0, pz)', 'daughter(1, p)', 'daughter(1, pz)',
-                 'chiProb', 'dr', 'dz', 'daughter(0, dr)', 'daughter(1, dr)', 'daughter(0, chiProb)', 'daughter(1, chiProb)',
-                 'daughter(0, Kid)', 'daughter(0, piid)', 'daughterAngle(0, 1)']
+    variables = ['M', 'p', 'pt', 'pz',
+                 'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)',
+                 'daughter(1, p)', 'daughter(1, pz)', 'daughter(1, pt)',
+                 'daughter(2, p)', 'daughter(2, pz)', 'daughter(2, pt)',
+                 'chiProb', 'dr', 'dz',
+                 'daughter(0, dr)', 'daughter(1, dr)',
+                 'daughter(0, dz)', 'daughter(1, dz)',
+                 'daughter(0, chiProb)', 'daughter(1, chiProb)', 'daughter(2, chiProb)',
+                 'daughter(0, Kid)', 'daughter(0, piid)',
+                 'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
 
     # Perform an sPlot training
     general_options = basf2_mva.GeneralOptions()

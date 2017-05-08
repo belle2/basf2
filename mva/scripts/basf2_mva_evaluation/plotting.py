@@ -180,9 +180,11 @@ class Plotter(object):
         color = matplotlib.colors.ColorConverter().to_rgb(color)
         patch = matplotlib.patches.Patch(color=color, alpha=0.5)
         patch.get_color = patch.get_facecolor
+        patches = [patch]
 
         if plot_kwargs is not None:
             p, = axis.plot(x, y, **plot_kwargs)
+            patches.append(p)
 
         if errorbar_kwargs is not None and (xerr is not None or yerr is not None):
             if 'color' not in errorbar_kwargs:
@@ -190,6 +192,7 @@ class Plotter(object):
             if 'ecolor' not in errorbar_kwargs:
                 errorbar_kwargs['ecolor'] = [0.5 * x for x in color]
             e = axis.errorbar(x, y, xerr=xerr, yerr=yerr, **errorbar_kwargs)
+            patches.append(e)
 
         if errorband_kwargs is not None and yerr is not None:
             if 'color' not in errorband_kwargs:
@@ -208,7 +211,7 @@ class Plotter(object):
         if fill_kwargs is not None:
             axis.fill_between(x, y, 0, **fill_kwargs)
 
-        return (patch, p, e, f)
+        return (tuple(patches), p, e, f)
 
     def add(self, *args, **kwargs):
         """
@@ -490,19 +493,23 @@ class Distribution(Plotter):
     Plots distribution of a quantity
     """
 
-    def __init__(self, figure=None, axis=None, normed_to_all_entries=False, normed_to_bin_width=False, keep_first_binning=False):
+    def __init__(self, figure=None, axis=None, normed_to_all_entries=False, normed_to_bin_width=False,
+                 keep_first_binning=False, range_in_std=None):
         """
         Creates a new figure and axis if None is given, sets the default plot parameters
         @param figure default draw figure which is used
         @param axis default draw axis which is used
         @param normed true if histograms should be normed before drawing
         @param keep_first_binning use the binning of the first distribution for further plots
+        @param range_in_std show only the data in a windows around +- range_in_std * standard_deviation around the mean
         """
         super(Distribution, self).__init__(figure, axis)
         #: Normalize histograms before drawing them
         self.normed_to_all_entries = normed_to_all_entries
         #: Normalize histograms before drawing them
         self.normed_to_bin_width = normed_to_bin_width
+        #: Show only a certain range in terms of standard deviations of the data
+        self.range_in_std = range_in_std
         # if self.normed_to_all_entries or self.normed_to_bin_width:
         #: size in x/y
         self.ymin = float(0)
@@ -533,7 +540,8 @@ class Distribution(Plotter):
         bins = 100
         if self.keep_first_binning and self.first_binning is not None:
             bins = self.first_binning
-        hists = histogram.Histograms(data, column, {'Total': mask}, weight_column=weight_column, bins=bins, equal_frequency=False)
+        hists = histogram.Histograms(data, column, {'Total': mask}, weight_column=weight_column,
+                                     bins=bins, equal_frequency=False, range_in_std=self.range_in_std)
         if self.keep_first_binning and self.first_binning is None:
             self.first_binning = hists.bins
         hist, hist_error = hists.get_hist('Total')
@@ -648,8 +656,30 @@ class Difference(Plotter):
     #: min y value
     #: @var x_axis_label
     #: Label on x axis
+    #: @var normed
+    #: Minuend and subtrahend are normed before comparing them if this is true
+    #: @var shift_to_zero
+    #: Mean difference is shifted to zero (removes constant offset) if this is true
 
-    def add(self, data, column, minuend_mask, subtrahend_mask, weight_column=None, shift_to_zero=False, label=None):
+    def __init__(self, figure=None, axis=None, normed=False, shift_to_zero=False):
+        """
+        Creates a new figure and axis if None is given, sets the default plot parameters
+        @param figure default draw figure which is used
+        @param axis default draw axis which is used
+        @param normed normalize minuend and subtrahend before comparing them
+        @param shift_to_zero mean difference is shifted to zero, to remove constant offset due to e.g. different sample sizes
+        """
+        super(Difference, self).__init__(figure, axis)
+        self.normed = normed
+        self.shift_to_zero = shift_to_zero
+        if self.normed:
+            self.ymin = -0.01
+            self.ymax = 0.01
+        else:
+            self.ymin = -1
+            self.ymax = 1
+
+    def add(self, data, column, minuend_mask, subtrahend_mask, weight_column=None, label=None):
         """
         Add a new difference plot
         @param data pandas.DataFrame containing all data
@@ -657,15 +687,21 @@ class Difference(Plotter):
         @param minuend_mask boolean numpy.array defining which events are for the minuend histogram
         @param subtrahend_mask boolean numpy.array defining which events are for the subtrahend histogram
         @param weight_column column in data containing the weights for each event
-        @param shift_to_zero mean difference is shifted to zero, to remove constant offset due to e.g. different sample sizes
+        @param label label for the legend if None, the column name is used
         """
         hists = histogram.Histograms(data, column, {'Minuend': minuend_mask, 'Subtrahend': subtrahend_mask},
                                      weight_column=weight_column, equal_frequency=False)
         minuend, minuend_error = hists.get_hist('Minuend')
         subtrahend, subtrahend_error = hists.get_hist('Subtrahend')
-        difference, difference_error = minuend - subtrahend, histogram.poisson_error(minuend + subtrahend)
 
-        if shift_to_zero:
+        difference_error = histogram.poisson_error(minuend + subtrahend)
+        if self.normed:
+            difference_error = difference_error / (numpy.sum(minuend) + numpy.sum(subtrahend))
+            minuend = minuend / numpy.sum(minuend)
+            subtrahend = subtrahend / numpy.sum(subtrahend)
+        difference = minuend - subtrahend
+
+        if self.shift_to_zero:
             difference = difference - numpy.mean(difference)
 
         self.xmin, self.xmax = min(hists.bin_centers.min(), self.xmin), max(hists.bin_centers.max(), self.xmax)
@@ -749,40 +785,39 @@ class Overtraining(Plotter):
         distribution.add(data, column, test_mask & signal_mask, weight_column)
         distribution.add(data, column, test_mask & bckgrd_mask, weight_column)
 
-        distribution.set_plot_options({'color': distribution.plots[0][0].get_color(), 'linestyle': 'steps-mid-', 'lw': 4})
-        distribution.set_fill_options({'color': distribution.plots[0][0].get_color(), 'alpha': 0.5, 'step': 'mid'})
+        distribution.set_plot_options({'color': distribution.plots[0][0][0].get_color(), 'linestyle': 'steps-mid-', 'lw': 4})
+        distribution.set_fill_options({'color': distribution.plots[0][0][0].get_color(), 'alpha': 0.5, 'step': 'mid'})
         distribution.set_errorbar_options(None)
         distribution.set_errorband_options(None)
         distribution.add(data, column, train_mask & signal_mask, weight_column)
-        distribution.set_plot_options({'color': distribution.plots[1][0].get_color(), 'linestyle': 'steps-mid-', 'lw': 4})
-        distribution.set_fill_options({'color': distribution.plots[1][0].get_color(), 'alpha': 0.5, 'step': 'mid'})
+        distribution.set_plot_options({'color': distribution.plots[1][0][0].get_color(), 'linestyle': 'steps-mid-', 'lw': 4})
+        distribution.set_fill_options({'color': distribution.plots[1][0][0].get_color(), 'alpha': 0.5, 'step': 'mid'})
         distribution.add(data, column, train_mask & bckgrd_mask, weight_column)
 
         distribution.labels = ['Test-Signal', 'Test-Background', 'Train-Signal', 'Train-Background']
-
         distribution.finish()
 
-        self.plot_kwargs['color'] = distribution.plots[0][0].get_color()
-        difference_signal = Difference(self.figure, self.axis_d1)
+        self.plot_kwargs['color'] = distribution.plots[0][0][0].get_color()
+        difference_signal = Difference(self.figure, self.axis_d1, shift_to_zero=True, normed=True)
         difference_signal.set_plot_options(self.plot_kwargs)
         difference_signal.set_errorbar_options(self.errorbar_kwargs)
         difference_signal.set_errorband_options(self.errorband_kwargs)
-        difference_signal.add(data, column, train_mask & signal_mask, test_mask & signal_mask, weight_column, shift_to_zero=True)
+        difference_signal.add(data, column, train_mask & signal_mask, test_mask & signal_mask, weight_column)
         self.axis_d1.set_xlim((difference_signal.xmin, difference_signal.xmax))
         self.axis_d1.set_ylim((difference_signal.ymin, difference_signal.ymax))
         difference_signal.plots = difference_signal.labels = []
-        difference_signal.finish(line_color=distribution.plots[0][0].get_color())
+        difference_signal.finish(line_color=distribution.plots[0][0][0].get_color())
 
-        self.plot_kwargs['color'] = distribution.plots[1][0].get_color()
-        difference_bckgrd = Difference(self.figure, self.axis_d2)
+        self.plot_kwargs['color'] = distribution.plots[1][0][0].get_color()
+        difference_bckgrd = Difference(self.figure, self.axis_d2, shift_to_zero=True, normed=True)
         difference_bckgrd.set_plot_options(self.plot_kwargs)
         difference_bckgrd.set_errorbar_options(self.errorbar_kwargs)
         difference_bckgrd.set_errorband_options(self.errorband_kwargs)
-        difference_bckgrd.add(data, column, train_mask & bckgrd_mask, test_mask & bckgrd_mask, weight_column, shift_to_zero=True)
+        difference_bckgrd.add(data, column, train_mask & bckgrd_mask, test_mask & bckgrd_mask, weight_column)
         self.axis_d2.set_xlim((difference_bckgrd.xmin, difference_bckgrd.xmax))
         self.axis_d2.set_ylim((difference_bckgrd.ymin, difference_bckgrd.ymax))
         difference_bckgrd.plots = difference_bckgrd.labels = []
-        difference_bckgrd.finish(line_color=distribution.plots[1][0].get_color())
+        difference_bckgrd.finish(line_color=distribution.plots[1][0][0].get_color())
 
         try:
             import scipy.stats
@@ -830,16 +865,19 @@ class VerboseDistribution(Plotter):
     #: Axes for the boxplots
     box_axes = None
 
-    def __init__(self, figure=None, axis=None, normed=False):
+    def __init__(self, figure=None, axis=None, normed=False, range_in_std=None):
         """
         Creates a new figure and axis if None is given, sets the default plot parameters
         @param figure default draw figure which is used
         @param axis default draw axis which is used
         @param normed true if the histograms should be normed before drawing
+        @param range_in_std show only the data in a windows around +- range_in_std * standard_deviation around the mean
         """
         super(VerboseDistribution, self).__init__(figure, axis)
         #: Normalize histograms before drawing them
         self.normed = normed
+        #: Show only a certain range in terms of standard deviations of the data
+        self.range_in_std = range_in_std
         self.box_axes = []
 
     def add(self, data, column, mask=None, weight_column=None, label=None):
@@ -851,7 +889,7 @@ class VerboseDistribution(Plotter):
         @param mask boolean numpy.array defining which events are used for the distribution histogram
         @param weight_column column in data containing the weights for each event
         """
-        distribution = Distribution(self.figure, self.axis, normed_to_all_entries=self.normed)
+        distribution = Distribution(self.figure, self.axis, normed_to_all_entries=self.normed, range_in_std=self.range_in_std)
         distribution.set_plot_options(self.plot_kwargs)
         distribution.set_errorbar_options(self.errorbar_kwargs)
         distribution.set_errorband_options(self.errorband_kwargs)
@@ -865,10 +903,14 @@ class VerboseDistribution(Plotter):
         gridspecs = [gs[:3 * n, :]] + [gs[3 * n + i, :] for i in range(n)]
         box_axis = self.add_subplot(gridspecs)
 
+        if self.range_in_std is not None:
+            mean, std = histogram.weighted_mean_and_std(data[column], None if weight_column is None else data[weight_column])
+            # Everything outside mean +- range_in_std * std is considered not inside the mask
+            mask = mask & (data[column] > (mean - self.range_in_std * std)) & (data[column] < (mean + self.range_in_std * std))
         box = Box(self.figure, box_axis)
         box.add(data, column, mask, weight_column)
         if len(box.plots) > 0:
-            box.plots[0]['boxes'][0].set_facecolor(distribution.plots[0][0].get_color())
+            box.plots[0]['boxes'][0].set_facecolor(distribution.plots[0][0][0].get_color())
         box.finish()
 
         self.box_axes.append(box_axis)

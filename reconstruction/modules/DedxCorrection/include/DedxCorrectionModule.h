@@ -79,7 +79,7 @@ namespace Belle2 {
 
   private:
 
-    DBArray<CDCDedxWireGain> m_wireGains; /*< CDC dE/dx wire gains */
+    DBArray<CDCDedxWireGain> m_wireGains; /**< CDC dE/dx wire gains */
 
     /** Recalculate the dE/dx mean values after corrections */
     void calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr, const std::vector<double>& dedx) const;

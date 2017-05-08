@@ -105,7 +105,7 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   addParam("MisalignmentFile", m_misalignmentFile, "Input file name (on cdc/data) for wire misalignment.",
            string("misalignment_v2.dat"));
   //xt-relation
-  addParam("XtFile", m_xtFile, "Input file name (on cdc/data) for xt-relations.",  string("xt_v3.dat"));
+  addParam("XtFile", m_xtFile, "Input file name (on cdc/data) for xt-relations.",  string("xt_v3_chebyshev.dat.gz"));
   //sigma
   addParam("SigmaFile", m_sigmaFile, "Input file name (on cdc/data) for sigmas.",  string("sigma_v2.dat"));
   //prop-speed

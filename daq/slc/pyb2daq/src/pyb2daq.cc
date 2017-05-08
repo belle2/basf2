@@ -3,6 +3,10 @@
 #ifdef PYHSLB
 #include <daq/slc/copper/HSLB.h>
 #include <boost/python.hpp>
+#include <boost/python/module.hpp>
+#include <boost/python/def.hpp>
+#include <boost/python/exception_translator.hpp>
+#include <exception>
 #else
 #include <framework/utilities/RegisterPythonModule.h>
 #endif
@@ -16,6 +20,11 @@
 
 using namespace boost::python;
 using namespace Belle2;
+
+void py2daq_translate(const Exception& e)
+{
+  PyErr_SetString(PyExc_RuntimeError, e.what());
+}
 
 BOOST_PYTHON_MODULE(pyb2daq)
 {
@@ -73,6 +82,11 @@ BOOST_PYTHON_MODULE(pyb2daq)
   .value("TEXT", DBField::TEXT)
   .value("OBJECT", DBField::OBJECT)
   ;
+  boost::python::register_exception_translator<NSMHandlerException>(& py2daq_translate);
+  boost::python::register_exception_translator<RCHandlerException>(& py2daq_translate);
+  boost::python::register_exception_translator<HVHandlerException>(& py2daq_translate);
+  boost::python::register_exception_translator<IOException>(& py2daq_translate);
+  boost::python::register_exception_translator<Exception>(& py2daq_translate);
 
   boost::python::class_<DAQDBObject>("DAQDBObject", boost::python::init<const char*, const char*>())
   .def(boost::python::init<>())
@@ -124,6 +138,15 @@ BOOST_PYTHON_MODULE(pyb2daq)
   .def("setInt", &PyNSMCallback::setInt)
   .def("setFloat", &PyNSMCallback::setFloat)
   .def("setText", &PyNSMCallback::setText)
+  .def("getInt", &PyNSMCallback::getInt)
+  .def("getFloat", &PyNSMCallback::getFloat)
+  .def("getText", &PyNSMCallback::getText)
+  .def("setInt", &PyNSMCallback::setNodeInt)
+  .def("setFloat", &PyNSMCallback::setNodeFloat)
+  .def("setText", &PyNSMCallback::setNodeText)
+  .def("getInt", &PyNSMCallback::getNodeInt)
+  .def("getFloat", &PyNSMCallback::getNodeFloat)
+  .def("getText", &PyNSMCallback::getNodeText)
   .def("log", &PyNSMCallback::log)
   .def("run", &PyNSMCallback::run)
   //.def("init", &PyNSMCallback::init)
@@ -151,6 +174,15 @@ BOOST_PYTHON_MODULE(pyb2daq)
   .def("setInt", &PyHVControlCallback::setInt)
   .def("setFloat", &PyHVControlCallback::setFloat)
   .def("setText", &PyHVControlCallback::setText)
+  .def("getInt", &PyHVControlCallback::getInt)
+  .def("getFloat", &PyHVControlCallback::getFloat)
+  .def("getText", &PyHVControlCallback::getText)
+  .def("setInt", &PyHVControlCallback::setNodeInt)
+  .def("setFloat", &PyHVControlCallback::setNodeFloat)
+  .def("setText", &PyHVControlCallback::setNodeText)
+  .def("getInt", &PyHVControlCallback::getNodeInt)
+  .def("getFloat", &PyHVControlCallback::getNodeFloat)
+  .def("getText", &PyHVControlCallback::getNodeText)
   .def("log", &PyHVControlCallback::log)
   .def("run", &PyHVControlCallback::run)
   //.def("init", &PyHVControlCallback::init)
@@ -165,6 +197,15 @@ BOOST_PYTHON_MODULE(pyb2daq)
   .def("setInt", &PyRCCallback::setInt)
   .def("setFloat", &PyRCCallback::setFloat)
   .def("setText", &PyRCCallback::setText)
+  .def("getInt", &PyRCCallback::getInt)
+  .def("getFloat", &PyRCCallback::getFloat)
+  .def("getText", &PyRCCallback::getText)
+  .def("setInt", &PyRCCallback::setNodeInt)
+  .def("setFloat", &PyRCCallback::setNodeFloat)
+  .def("setText", &PyRCCallback::setNodeText)
+  .def("getInt", &PyRCCallback::getNodeInt)
+  .def("getFloat", &PyRCCallback::getNodeFloat)
+  .def("getText", &PyRCCallback::getNodeText)
   .def("log", &PyRCCallback::log)
   .def("run", &PyRCCallback::run)
   //.def("init", &PyRCCallback::init)

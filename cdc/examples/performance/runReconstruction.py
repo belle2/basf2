@@ -16,7 +16,6 @@ output : Output root file, which contains helix parameters.
 import basf2
 from basf2 import *
 import ROOT
-import datetime
 import os
 import os.path
 import argparse
@@ -42,8 +41,8 @@ def main(input, output):
 
     globalPhiRotation = getPhiRotation()
 
-    if os.path.exists(data_period) is False:
-        os.mkdir(data_period)
+    if os.path.exists('output') is False:
+        os.mkdir('output')
 
     # RootInput
     main_path.add_module('RootInput',
@@ -66,7 +65,7 @@ def main(input, output):
     add_cdc_cr_reconstruction(main_path, eventTimingExtraction=False)
 
     # Simple analysi module.
-    output = "/".join([data_period, output])
+    output = "/".join(['output', output])
     main_path.add_module('CDCCosmicAnalysis',
                          Output=output)
 
@@ -83,9 +82,4 @@ if __name__ == "__main__":
     parser.add_argument('input', help='Input file to be processed (unpacked CDC data).')
     parser.add_argument('output', help='Output file you want to store the results.')
     args = parser.parse_args()
-
-    date = datetime.datetime.today()
-    print(date.strftime('Start at : %d-%m-%y %H:%M:%S\n'))
     main(args.input, args.output)
-    date = datetime.datetime.today()
-    print(date.strftime('End at : %y-%m-%d %H:%M:%S\n'))

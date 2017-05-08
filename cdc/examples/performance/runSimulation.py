@@ -5,9 +5,10 @@
 Simple example script to simulate cosmics events only with CDC.
 Usage :
 basf2 runSimulation.py <exp> <run> <nevt> <st>
-run: Run number
+exp: Experimental number
 run: Run number
 nevt: Number of events to be generated
+st: Stream ID
 """
 
 from basf2 import *

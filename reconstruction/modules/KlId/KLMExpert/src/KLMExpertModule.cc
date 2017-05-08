@@ -167,7 +167,7 @@ void KLMExpertModule::event()
     // calculate eucl. distance klmcluster <-> nearest track
     // extrapolate genfit trackfit result to their ends and find the
     tuple<RecoTrack*, double, std::unique_ptr<const TVector3>> closestTrackAndDistance
-                                                            = findClosestTrack(clusterPos);
+                                                            = findClosestTrack(clusterPos, .26);
     m_KLMtrackDist = get<1>(closestTrackAndDistance);
     const TVector3* poca = get<2>(closestTrackAndDistance).get();
 

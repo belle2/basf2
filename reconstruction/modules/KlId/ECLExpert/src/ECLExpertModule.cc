@@ -25,6 +25,10 @@
 
 #include "reconstruction/modules/KlId/KLMExpert/helperFunctions.h"
 
+#include <cstring>
+#include <TTree.h>
+#include <TFile.h>
+
 using namespace KlIdHelpers;
 using namespace Belle2;
 using namespace std;
@@ -105,13 +109,16 @@ void ECLExpertModule::event()
   StoreArray<ECLCluster> eclClusters;
   StoreArray<KlId> klids;
 
-
   //overwritten at the end of the cluster loop
   double MVAOut;
   KlId* klid = nullptr;
 
   // loop thru clusters in event and classify
   for (ECLCluster& cluster : eclClusters) {
+
+    // just go thru as kl reconstructed clusters
+    if (cluster.getHypothesisId() != 6) {continue;}
+
 
     // get various ECLCluster vars from getters
     m_ECLE              = cluster.getEnergy();
@@ -121,11 +128,14 @@ void ECLExpertModule::event()
     m_ECLminTrkDistance = cluster.getMinTrkDistance();
     m_ECLdeltaL         = cluster.getDeltaL();
 
+
+
     const TVector3& clusterPos = cluster.getClusterPosition();
 
-    //find closest track
-    tuple<RecoTrack*, double, std::unique_ptr<const TVector3>> closestTrackAndDistance = findClosestTrack(clusterPos);
-    m_ECLtrackDist = get<1>(closestTrackAndDistance);
+    // find closest track
+    // obsolete and slow. just kept for future toying.
+    //tuple<RecoTrack*, double, std::unique_ptr<const TVector3>> closestTrackAndDistance = findClosestTrack(clusterPos, 4);
+    //m_ECLtrackDist = get<1>(closestTrackAndDistance);
 
 
     m_feature_variables[0] = m_ECLE;
@@ -150,4 +160,15 @@ void ECLExpertModule::event()
 
   }// for cluster in clusters
 } // event
+
+
+void ECLExpertModule::terminate()
+{
+  m_expert.reset();
+  m_dataset.reset();
+
+}
+
+
+
 

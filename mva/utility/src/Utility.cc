@@ -39,6 +39,7 @@
 #include <fstream>
 #include <cerrno>
 #include <memory>
+#include <chrono>
 
 namespace Belle2 {
   namespace MVA {
@@ -164,7 +165,11 @@ namespace Belle2 {
         general_options.m_datafiles = datafiles;
         auto& branch = branches[i];
         ROOTDataset data(general_options);
+        std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
         auto results = expert->apply(data);
+        std::chrono::high_resolution_clock::time_point stop = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> training_time = stop - start;
+        B2INFO("Elapsed application time in ms " << training_time.count() << " for " << general_options.m_identifier);
         for (auto& r : results) {
           // Suppress cppcheck false positive
           // style: Variable 'result' is assigned a value that is never used.
@@ -224,7 +229,11 @@ namespace Belle2 {
       auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
       if (supported_interfaces.find(general_options.m_method) != supported_interfaces.end()) {
         auto teacher = supported_interfaces[general_options.m_method]->getTeacher(general_options, specific_options);
+        std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
         auto weightfile = teacher->train(data);
+        std::chrono::high_resolution_clock::time_point stop = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> training_time = stop - start;
+        B2INFO("Elapsed training time in ms " << training_time.count() << " for " << general_options.m_identifier);
         Weightfile::save(weightfile, general_options.m_identifier);
         auto expert = supported_interfaces[general_options.m_method]->getExpert();
         expert->load(weightfile);

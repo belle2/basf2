@@ -134,6 +134,8 @@ class Method(object):
         @param general_options general options given to basf2_mva.teacher (if None the options of this method are used)
         @param specific_options specific options given to basf2_mva.teacher (if None the options of this method are used)
         """
+        if isinstance(datafiles, str):
+            datafiles = [datafiles]
         if general_options is None:
             general_options = self.general_options
         if specific_options is None:
@@ -156,6 +158,8 @@ class Method(object):
         @param datafiles the datafiles
         @param treename the name of the tree containing the data
         """
+        if isinstance(datafiles, str):
+            datafiles = [datafiles]
         with tempfile.TemporaryDirectory() as tempdir:
             identifier = tempdir + "/weightfile.xml"
             basf2_mva.Weightfile.save(self.weightfile, identifier)

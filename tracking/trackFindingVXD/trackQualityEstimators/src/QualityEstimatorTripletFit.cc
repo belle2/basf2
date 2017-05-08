@@ -142,8 +142,8 @@ double QualityEstimatorTripletFit::estimateQuality(std::vector<SpacePoint const*
   double numerator = 0;
   double denominator = 0;
   for (short i = 0; i < nTriplets; ++i) {
-    numerator += m_R3Ds.at(i) / m_sigmaR3DSquareds.at(i);
-    denominator += 1. / m_sigmaR3DSquareds.at(i);
+    numerator += pow(m_R3Ds.at(i), 3) / m_sigmaR3DSquareds.at(i);
+    denominator += pow(m_R3Ds.at(i), 2) / m_sigmaR3DSquareds.at(i);
   }
   m_averageR3D = numerator / denominator;
 

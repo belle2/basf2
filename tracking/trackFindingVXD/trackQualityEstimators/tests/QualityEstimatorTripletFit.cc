@@ -8,14 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
 #include <gtest/gtest.h>
 
-#include "tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h"
 #include <vector>
 #include <utility> // pair
 #include <math.h>
+
 #include <framework/geometry/B2Vector3.h>
+
+#include "tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h"
 
 
 using namespace Belle2;

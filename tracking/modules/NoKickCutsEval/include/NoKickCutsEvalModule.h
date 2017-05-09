@@ -116,7 +116,7 @@ namespace Belle2 {
   private:
 
     double pmin = 0.025;
-    double pmax = 1;
+    double pmax = 1.;
     double tmin = 17.*M_PI / 180.; //17 degrees
     double tmax = 5. / 6.*M_PI; //150 degrees
     int nbin = 5000;

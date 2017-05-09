@@ -15,6 +15,26 @@
 from basf2 import *
 
 
+def setup_Geometry(path=None):
+    """
+    Sets the geometry. Should be used in all VXDTF2 related scripts to ensure to use the same geometry in all
+    trainings / validation steps!
+    param path: the path to append the geometry
+    """
+    # Gearbox
+    gearbox = register_module('Gearbox')
+    path.add_module(gearbox)
+
+    # Geometry
+    geometry = register_module('Geometry')
+    geometry.param('components', ['BeamPipe',
+                                  'MagneticFieldConstant4LimitedRSVD',
+                                  'PXD',
+                                  'SVD',
+                                  'CDC'])
+    path.add_module(geometry)
+
+
 def setup_VXDTF2(path=None,
                  use_pxd=False,
                  use_svd=True,
@@ -23,14 +43,16 @@ def setup_VXDTF2(path=None,
                  observerType=0,
                  quality_estimator='circleFit',
                  overlap_filter='greedy',
-                 secmap_name=None,
+                 sec_map_file=None,
+                 setup_name='lowTestRedesign',
                  log_level=LogLevel.INFO,
                  debug_level=1):
     """
     Convenience Method to setup the redesigned vxd track finding module chain.
     Reuslt is a store array containing reco tracks called 'RecoTracks'.
-    :param sec_map_file: training data for segment network.
     :param path: basf2.Path
+    :param sec_map_file: training data for segment network.
+    :param setup_name: name of the setup within all the sectormaps in the sec_map_file which should be used,
     :param use_pxd: if true use pxd hits. Default False.
     :param use_svd: if true use svd hits. Default True.
     :param quality_estimator: which fit to use to determine track quality. Options 'circle', 'random'. Default 'circle'.
@@ -54,7 +76,7 @@ def setup_VXDTF2(path=None,
         spCreatorPXD = register_module('SpacePointCreatorPXD')
         spCreatorPXD.logging.log_level = log_level
         spCreatorPXD.logging.debug_level = debug_level
-        spCreatorPXD.param('NameOfInstance', 'SpacePoints')
+        spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
         spCreatorPXD.param('SpacePoints', 'SpacePoints')
         modules.append(spCreatorPXD)
 
@@ -63,15 +85,15 @@ def setup_VXDTF2(path=None,
         spCreatorSVD.logging.log_level = log_level
         spCreatorSVD.logging.debug_level = debug_level
         spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
-        spCreatorSVD.param('NameOfInstance', 'SpacePoints')
+        spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
         spCreatorSVD.param('SpacePoints', 'SpacePoints')
         modules.append(spCreatorSVD)
 
     # SecMap Bootstrap
     secMapBootStrap = register_module('SectorMapBootstrap')
     secMapBootStrap.param('ReadSectorMap', True)
-    if secmap_name:
-        secMapBootStrap.param('SectorMapsInputFile', secmap_name)
+    if sec_map_file:
+        secMapBootStrap.param('SectorMapsInputFile', sec_map_file)
     secMapBootStrap.param('WriteSectorMap', False)
     modules.append(secMapBootStrap)
 
@@ -86,6 +108,7 @@ def setup_VXDTF2(path=None,
     segNetProducer.param('allFiltersOff', not use_segment_network_filters)
     segNetProducer.param('SpacePointsArrayNames', ['SpacePoints'])
     segNetProducer.param('printNetworks', False)
+    segNetProducer.param('sectorMapName', setup_name)
     segNetProducer.param('addVirtualIP', False)
     segNetProducer.param('observerType', observerType)
     segNetProducer.logging.log_level = log_level
@@ -170,8 +193,7 @@ def setup_VXDTF2(path=None,
 
 def setup_RTCtoSPTCConverters(
         path=0,
-        pxdSPs='pxdOnly',
-        svdSPs='nosingleSP',
+        SPscollection='SpacePoints',
         RTCinput='mcTracks',
         sptcOutput='checkedSPTCs',
         usePXD=True,
@@ -182,9 +204,7 @@ def setup_RTCtoSPTCConverters(
     @param path if set to 0 (standard) the created modules will not be added, but returned.
     If a path is given, 'None' is returned but will be added to given path instead.
 
-    @param pxdSPs the name of the storeArray containing PXDSPs - gets ignored if usePXD is False.
-
-    @param svdSPs the name of the storeArray containing SVDSPs.
+    @param SPscollection the name of the storeArray containing SPs of both SVD and PXD.
 
     @param RTCinput defines the name of input-Reco-TCs.
 
@@ -197,17 +217,18 @@ def setup_RTCtoSPTCConverters(
     @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
     """
     print("setup RTCtoSPTCConverters...")
-    doPXD = 0
     spacePointNames = []
     detectorTypes = []
     trueHitNames = []
     clusterNames = []
     if usePXD:
-        spacePointNames.append(pxdSPs)
         detectorTypes.append('PXD')
+        # PXD SpacePoints and SVD SpacePoints are assumed to be in the same StoreArray
+        spacePointNames.append(SPscollection)
         trueHitNames.append('')
         clusterNames.append('')
-    spacePointNames.append(svdSPs)
+    # PXD SpacePoints and SVD SpacePoints are assumed to be in the same StoreArray
+    spacePointNames.append(SPscollection)
     detectorTypes.append('SVD')
     trueHitNames.append('')
     clusterNames.append('')
@@ -234,8 +255,9 @@ def setup_RTCtoSPTCConverters(
     recoTrackCandConverter.logging.log_level = logLevel
     recoTrackCandConverter.param('RecoTracksName', RTCinput)
     recoTrackCandConverter.param('SpacePointTCName', 'SPTracks')
-    recoTrackCandConverter.param('SVDDoubleClusterSP', svdSPs)
+    recoTrackCandConverter.param('SVDandPXDSPName', SPscollection)
     recoTrackCandConverter.param('useTrueHits', True)
+    recoTrackCandConverter.param('ignorePXDHits', not usePXD)  # if True PXD hits will be ignored
     recoTrackCandConverter.param('useSingleClusterSP', False)
     recoTrackCandConverter.param('minSP', 3)
     recoTrackCandConverter.param('skipProblematicCluster', False)

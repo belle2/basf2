@@ -35,25 +35,25 @@ void CDCToSpacePointTreeSearchFindlet::exposeParameters(ModuleParamList* moduleP
                                 "Use material effects during extrapolation.", m_param_useMaterialEffects);
 }
 
-SortedVectorRange<const SpacePoint*> CDCToSpacePointTreeSearchFindlet::getMatchingHits(Super::StateIterator currentState)
+SortedVectorRange<const SpacePoint*> CDCToSpacePointTreeSearchFindlet::getMatchingHits(Super::StateObject& currentState)
 {
-  const unsigned int currentNumber = currentState->getNumber();
+  const unsigned int currentNumber = currentState.getNumber();
 
-  if (currentNumber == CKFCDCToVXDStateObject::N or currentState->isOnOverlapLayer()) {
+  if (currentNumber == CKFCDCToVXDStateObject::N or currentState.isOnOverlapLayer()) {
     // next layer is not an overlap one, so we can just return all hits of this layer.
-    const unsigned int nextLayer = currentState->extractGeometryLayer() - 1;
+    const unsigned int nextLayer = currentState.extractGeometryLayer() - 1;
     return m_cachedHitMap[nextLayer];
   } else {
     // next layer is an overlap one, so lets return all hits from the same layer, that are on a
     // ladder which is one below the last added hit.
-    const SpacePoint* lastAddedSpacePoint = currentState->getHit();
+    const SpacePoint* lastAddedSpacePoint = currentState.getHit();
     if (not lastAddedSpacePoint) {
       // No hit was added on the layer, so no overlap can occur.
       return SortedVectorRange<const SpacePoint*>();
     }
 
     const unsigned int ladderNumber = lastAddedSpacePoint->getVxdID().getLadderNumber();
-    const unsigned int currentLayer = currentState->extractGeometryLayer();
+    const unsigned int currentLayer = currentState.extractGeometryLayer();
     const unsigned int maximumLadderNumber = m_maximumLadderNumbers[currentLayer];
 
     // the reason for this strange formula is the numbering scheme in the VXD.
@@ -82,20 +82,20 @@ SortedVectorRange<const SpacePoint*> CDCToSpacePointTreeSearchFindlet::getMatchi
 
 }
 
-bool CDCToSpacePointTreeSearchFindlet::fit(Super::StateIterator currentState)
+Weight CDCToSpacePointTreeSearchFindlet::fit(Super::StateObject& currentState)
 {
-  B2ASSERT("Encountered invalid state", not currentState->isFitted() and currentState->isAdvanced());
+  B2ASSERT("Encountered invalid state", not currentState.isFitted() and currentState.isAdvanced());
 
-  const SpacePoint* spacePoint = currentState->getHit();
+  const SpacePoint* spacePoint = currentState.getHit();
 
   if (not spacePoint) {
     // If we do not have a space point, we do not need to do anything here.
-    currentState->setFitted();
-    return true;
+    currentState.setFitted();
+    return 1;
   }
 
-  genfit::MeasuredStateOnPlane& measuredStateOnPlane = currentState->getMeasuredStateOnPlane();
-  double& chi2 = currentState->getChi2();
+  genfit::MeasuredStateOnPlane& measuredStateOnPlane = currentState.getMeasuredStateOnPlane();
+  double chi2 = 0;
 
   // We will change the state x_k, the covariance C_k and the chi2
   Eigen::Vector5d x_k_old(measuredStateOnPlane.getState().GetMatrixArray());
@@ -140,50 +140,52 @@ bool CDCToSpacePointTreeSearchFindlet::fit(Super::StateIterator currentState)
 
   measuredStateOnPlane.setState(TVectorD(5, x_k_old.data()));
   measuredStateOnPlane.setCov(TMatrixDSym(5, C_k_old.data()));
+  currentState.setChi2(chi2);
 
-  currentState->setFitted();
-  return true;
+  currentState.setFitted();
+  return 1;
 }
 
-bool CDCToSpacePointTreeSearchFindlet::advance(Super::StateIterator currentState)
+Weight CDCToSpacePointTreeSearchFindlet::advance(Super::StateObject& currentState)
 {
-  B2ASSERT("Encountered invalid state", not currentState->isFitted() and not currentState->isAdvanced());
+  B2ASSERT("Encountered invalid state", not currentState.isFitted() and not currentState.isAdvanced());
 
-  const SpacePoint* spacePoint = currentState->getHit();
+  const SpacePoint* spacePoint = currentState.getHit();
 
   if (not spacePoint) {
     // If we do not have a space point, we do not need to do anything here.
-    currentState->setAdvanced();
-    return true;
+    currentState.setAdvanced();
+    return 1;
   }
 
   // We always use the first cluster here to create the plane. Should not make much difference?
   SVDRecoHit recoHit(spacePoint->getRelated<SVDCluster>());
 
   // This is the mSoP we will edit.
-  genfit::MeasuredStateOnPlane& measuredStateOnPlane = currentState->getMeasuredStateOnPlane();
+  genfit::MeasuredStateOnPlane& measuredStateOnPlane = currentState.getMeasuredStateOnPlane();
 
   // This mSoP may help us for extrapolation
-  genfit::MeasuredStateOnPlane& parentsCachedMSoP = currentState->getParentsCachedMeasuredStateOnPlane();
+  // TODO
+  /*genfit::MeasuredStateOnPlane& parentsCachedMSoP = currentState.getMeasuredStateOnPlane();
 
   // Possibility 1: extrapolate onto a "common ground", e.g. the average radius and store this as a cache.
   // In possibility 2 (below), we start with the former
   if (m_param_useCaching and m_param_useCachingOne) {
     // Test if we have already calculated an extrapolated state in former calculations. The parent
     // knows about this.
-    if (not currentState->parentHasCache()) {
+    if (not currentState.parentHasCache()) {
       // If not, use the parents mSoP (which is copied into the cache before) as a starting point and extrapolate this.
       // parentsCachedMSoP.extrapolateToCone();
       B2FATAL("Extrapolation not implemented in the moment");
-      currentState->setParentHasCache();
+      currentState.setParentHasCache();
     }
   }
 
   // only use the cache if it is there.
   // Otherwise, just stay with the mSoP, which is equal to the parents (fitted) state.
-  if (m_param_useCaching and currentState->parentHasCache()) {
+  if (m_param_useCaching and currentState.parentHasCache()) {
     measuredStateOnPlane = parentsCachedMSoP;
-  }
+  }*/
 
   // The mSoP plays no role here (it is unused in the function)
   const genfit::SharedPlanePtr& plane = recoHit.constructPlane(measuredStateOnPlane);
@@ -192,19 +194,20 @@ bool CDCToSpacePointTreeSearchFindlet::advance(Super::StateIterator currentState
     measuredStateOnPlane.extrapolateToPlane(plane);
   } catch (genfit::Exception e) {
     B2WARNING(e.what());
-    return false;
+    return std::nan("");
   }
 
   // Possibility 2: extrapolate this state as normal and store this as a cache (the other then maybe have to
   //                extrapolate back a bit, but the calculation is much easier)
-  if (m_param_useCaching and not m_param_useCachingOne) {
+  // TODO
+  /*if (m_param_useCaching and not m_param_useCachingOne) {
     // TODO: Always or only store the first one?
     parentsCachedMSoP = measuredStateOnPlane;
-    currentState->setParentHasCache();
-  }
+    currentState.setParentHasCache();
+  }*/
 
-  currentState->setAdvanced();
-  return true;
+  currentState.setAdvanced();
+  return 1;
 }
 
 void CDCToSpacePointTreeSearchFindlet::initializeEventCache(std::vector<RecoTrack*>& seedsVector,

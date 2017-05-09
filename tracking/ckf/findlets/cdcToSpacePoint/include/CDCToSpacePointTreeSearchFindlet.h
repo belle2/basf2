@@ -36,11 +36,11 @@ namespace Belle2 {
     }
 
   private:
-    TrackFindingCDC::SortedVectorRange<const SpacePoint*> getMatchingHits(Super::StateIterator currentState) final;
+    TrackFindingCDC::SortedVectorRange<const SpacePoint*> getMatchingHits(Super::StateObject& currentState) final;
 
-    bool fit(Super::StateIterator currentState) final;
+    TrackFindingCDC::Weight fit(Super::StateObject& currentState) final;
 
-    bool advance(Super::StateIterator currentState) final;
+    TrackFindingCDC::Weight advance(Super::StateObject& currentState) final;
 
     void initializeEventCache(std::vector<RecoTrack*>& seedsVector, std::vector<const SpacePoint*>& filteredHitVector) final;
 

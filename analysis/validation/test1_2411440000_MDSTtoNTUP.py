@@ -3,8 +3,8 @@
 
 """
 <header>
-  <input>../mdst-pipiJ_psi_Y4S.root</input>
-  <output>../ana-pipiJ_psi.root</output>
+  <input>../2411440000.mdst.root</input>
+  <output>../2411440000.ntup.root</output>
   <contact>Yubo Li; liyb@pku.edu.cn</contact>
 </header>
 """
@@ -32,7 +32,7 @@ from variables import variables
 from modularAnalysis import *
 
 # Add signal MC files
-inputFile = "../mdst-pipiJ_psi_Y4S.root"
+inputFile = "../2411440000.mdst.root"
 inputMdstList('default', inputFile)
 
 # fill candidates
@@ -66,7 +66,7 @@ tools += ['CustomFloats[useCMSFrame(cosTheta)]', '^vpho']
 tools += ['CustomFloats[E]', 'vpho -> J/psi pi+ pi- ^gamma']
 
 # write out the flat ntuple
-ntupleFile('../ana-pipiJ_psi.root')
+ntupleFile('../2411440000.ntup.root')
 ntupleTree('h1', 'vpho:myCombinations', tools)
 
 # log info

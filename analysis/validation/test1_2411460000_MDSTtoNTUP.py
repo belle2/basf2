@@ -3,8 +3,8 @@
 
 """
 <header>
-  <input>../mdst-pipipsi_Y4S.root</input>
-  <output>../ana-pipipsi.root</output>
+  <input>../2411460000.mdst.root</input>
+  <output>../2411460000.ntup.root</output>
   <contact>Sen Jia; jiasen@buaa.edu.cn</contact>
 </header>
 """
@@ -29,7 +29,7 @@ from modularAnalysis import ntupleTree
 from variables import variables
 from modularAnalysis import *
 
-inputFile = "../mdst-pipipsi_Y4S.root"
+inputFile = "../2411460000.mdst.root"
 inputMdstList('default', inputFile)
 
 # fill candidates
@@ -69,7 +69,7 @@ tools += ['CustomFloats[daughterInvariantMass(1,2)]', 'vpho -> ^psi(2S) pi+ pi- 
 tools += ['CustomFloats[E]', 'vpho -> psi(2S) pi+ pi- ^gamma']
 
 # write out the flat ntuple
-ntupleFile('../ana-pipipsi.root')
+ntupleFile('../2411460000.ntup.root')
 ntupleTree('h1', 'vpho:myCombinations', tools)
 
 # log info

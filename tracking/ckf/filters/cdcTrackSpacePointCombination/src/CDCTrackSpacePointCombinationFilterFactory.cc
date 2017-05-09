@@ -15,6 +15,7 @@
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/SimpleCDCTrackSpacePointCombinationFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
@@ -71,7 +72,7 @@ std::unique_ptr<BaseCDCTrackSpacePointCombinationFilter>
 CDCTrackSpacePointCombinationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<BaseCDCTrackSpacePointCombinationFilter>();
+    return makeUnique<NoneFilter<BaseCDCTrackSpacePointCombinationFilter>>();
   } else if (filterName == "all") {
     return makeUnique<AllCDCTrackSpacePointCombinationFilter>();
   } else if (filterName == "simple") {

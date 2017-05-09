@@ -13,6 +13,7 @@
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCVXDTrackCombinationTruthVarSet.h>
 
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
 #include <tracking/trackFindingCDC/filters/base/NamedChoosableVarSetFilter.h>
@@ -63,7 +64,7 @@ std::unique_ptr<BaseCDCVXDTrackCombinationFilter>
 CDCVXDTrackCombinationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<BaseCDCVXDTrackCombinationFilter >();
+    return makeUnique<NoneFilter<BaseCDCVXDTrackCombinationFilter>>();
   } else if (filterName == "all") {
     return makeUnique<AllCDCVXDTrackCombinationFilter >();
   } else if (filterName == "truth") {

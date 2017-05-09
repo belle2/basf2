@@ -96,6 +96,7 @@ main.add_module(ext)
 topreco = register_module('TOPReconstructorPDF')
 topreco.logging.log_level = LogLevel.DEBUG  # remove or comment to suppress printout
 topreco.logging.debug_level = 2  # or set level to 0 to suppress printout
+topreco.param("writeNPdfs", 0)
 main.add_module(topreco)
 
 # TOP DQM

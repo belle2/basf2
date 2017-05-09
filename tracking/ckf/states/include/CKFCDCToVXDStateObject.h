@@ -27,7 +27,6 @@ namespace Belle2 {
       m_seedRecoTrack = seed;
 
       m_measuredStateOnPlane = seed->getMeasuredStateOnPlaneFromFirstHit();
-      m_cachedMeasuredStateOnPlane = seed->getMeasuredStateOnPlaneFromFirstHit();
 
       // Reset other state
       m_hitObject = nullptr;
@@ -38,8 +37,6 @@ namespace Belle2 {
 
       m_isFitted = false;
       m_isAdvanced = false;
-
-      m_hasCache = false;
     }
 
     void set(CKFCDCToVXDStateObject* parent, const HitObject* hitObject)
@@ -50,17 +47,13 @@ namespace Belle2 {
       m_hitObject = hitObject;
 
       m_measuredStateOnPlane = parent->getMeasuredStateOnPlane();
-      m_cachedMeasuredStateOnPlane = parent->getMeasuredStateOnPlane();
 
       // Reset other state
       m_chi2 = 0;
 
       m_isFitted = false;
       m_isAdvanced = false;
-
-      m_hasCache = false;
     }
-
 
     std::pair<RecoTrack*, std::vector<const HitObject*>> finalize() const
     {
@@ -109,7 +102,6 @@ namespace Belle2 {
       return m_number % 2 == 0;
     }
 
-
     unsigned int getNumberOfHoles() const
     {
       unsigned int numberOfHoles = 0;
@@ -123,46 +115,43 @@ namespace Belle2 {
       return numberOfHoles;
     }
 
-    // mSoP handling
-    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlane() const
-    {
-      return m_measuredStateOnPlane;
-    }
-
-    genfit::MeasuredStateOnPlane& getMeasuredStateOnPlane()
-    {
-      return m_measuredStateOnPlane;
-    }
-
-    const genfit::MeasuredStateOnPlane& getParentsCachedMeasuredStateOnPlane() const
-    {
-      return m_parent->m_cachedMeasuredStateOnPlane;
-    }
-
-    genfit::MeasuredStateOnPlane& getParentsCachedMeasuredStateOnPlane()
-    {
-      return m_parent->m_cachedMeasuredStateOnPlane;
-    }
-
-    bool parentHasCache() const
-    {
-      return m_parent->m_hasCache;
-    }
-
-    void setParentHasCache()
-    {
-      m_parent->m_hasCache = true;
-    }
-
     // chi2
     double getChi2() const
     {
       return m_chi2;
     }
 
-    double& getChi2()
+    void setChi2(double chi2)
     {
-      return m_chi2;
+      m_chi2 = chi2;
+    }
+
+    // weight
+    void setWeight(double weight)
+    {
+      m_weight = weight;
+    }
+
+    double getWeight() const
+    {
+      return m_weight;
+    }
+
+    // ordering
+    bool operator<(const CKFCDCToVXDStateObject& rhs)
+    {
+      return getWeight() < rhs.getWeight();
+    }
+
+    // mSoP
+    genfit::MeasuredStateOnPlane& getMeasuredStateOnPlane()
+    {
+      return m_measuredStateOnPlane;
+    }
+
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlane() const
+    {
+      return m_measuredStateOnPlane;
     }
 
     // State control
@@ -199,9 +188,7 @@ namespace Belle2 {
 
     genfit::MeasuredStateOnPlane m_measuredStateOnPlane;
 
-    bool m_hasCache = false;
-    genfit::MeasuredStateOnPlane m_cachedMeasuredStateOnPlane;
-
+    double m_weight = 0;
 
     void walk(const std::function<void(const CKFCDCToVXDStateObject*)> f) const
     {

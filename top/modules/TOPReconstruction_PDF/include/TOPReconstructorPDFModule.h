@@ -79,6 +79,8 @@ namespace Belle2 {
     double m_sigmaPhi = 0;     /**< track smearing in Phi (r.m.s) */
     double m_maxTime = 0;      /**< optional time limit for photons */
     int m_PDGCode = 0;   /**< PDG code of hypothesis to construct pulls */
+    int m_writeNPdfs = 0; /**< write out the pdfs for the first N events */
+    long long m_iEvent = -1; /**< count the events in the current process */
 
     // others
     int m_debugLevel = 0;       /**< debug level from logger */

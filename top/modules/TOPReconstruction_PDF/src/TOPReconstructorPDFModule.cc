@@ -84,6 +84,9 @@ namespace Belle2 {
     addParam("PDGCode", m_PDGCode,
              "PDG code of hypothesis to construct pulls (0 means: use MC truth)",
              211);
+    addParam("writeNPdfs", m_writeNPdfs,
+             "Write out the PDF for the first N events. -1 is for all.",
+             0);
 
     for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {m_masses[i] = 0;}
     for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {m_pdgCodes[i] = 0;}
@@ -127,19 +130,16 @@ namespace Belle2 {
     pdfCollection.registerInDataStore();
     tracks.registerRelationTo(pdfCollection);
 
-
     StoreArray<TOPPull> topPulls;
     topPulls.registerInDataStore(DataStore::c_DontWriteOut);
     tracks.registerRelationTo(topPulls, DataStore::c_Event, DataStore::c_DontWriteOut);
 
     // check for module debug level
-
     if (getLogConfig().getLogLevel() == LogConfig::c_Debug) {
       m_debugLevel = getLogConfig().getDebugLevel();
     }
 
     // Initialize masses
-
     for (const auto& part : Const::chargedStableSet) {
       m_masses[part.getIndex()] = part.getMass();
       m_pdgCodes[part.getIndex()] = abs(part.getPDGCode());
@@ -151,7 +151,6 @@ namespace Belle2 {
                    m_sigmaPhi > 0;
 
     // Configure TOP detector
-
     TOPconfigure config;
     if (m_debugLevel > 0) config.print();
   }
@@ -162,26 +161,20 @@ namespace Belle2 {
 
   void TOPReconstructorPDFModule::event()
   {
-
-
     // output: log likelihoods
-
     StoreArray<TOPLikelihood> likelihoods;
     StoreArray<TOPPDFCollection> pdfCollection;
 
     StoreArray<TOPPull> topPulls;
 
     // create reconstruction object
-
     TOPreco reco(Const::ChargedStable::c_SetSize, m_masses, m_minBkgPerBar, m_scaleN0);
     reco.setHypID(Const::ChargedStable::c_SetSize, m_pdgCodes);
 
     // set time limit for photons lower than that given by TDC range (optional)
-
     if (m_maxTime > 0) reco.setTmax(m_maxTime);
 
     // add photons
-
     StoreArray<TOPDigit> digits;
     for (const auto& digit : digits) {
       if (digit.getHitQuality() == TOPDigit::EHitQuality::c_Good)
@@ -190,7 +183,6 @@ namespace Belle2 {
     }
 
     // reconstruct track-by-track and store the results
-
     StoreArray<Track> tracks;
     for (const auto& track : tracks) {
 
@@ -217,20 +209,23 @@ namespace Belle2 {
       double logl[Const::ChargedStable::c_SetSize];
       double estPhot[Const::ChargedStable::c_SetSize];
       int nphot = 0;
-      vector<vector<double>> channelPDFCollection(512);
-      for (int iChannel = 1; iChannel <= 512; ++iChannel) {
-        vector<double>& pdfSample = channelPDFCollection[iChannel - 1];
-        pdfSample.resize(200);
-        for (int iTimeBin = 0; iTimeBin < 200; ++iTimeBin) {
-          double t = 0.3 * iTimeBin;
-          double pdf = reco.getPDF(iChannel, t, m_masses[1]);
-          pdfSample[iTimeBin] = pdf;
-//              cout << setprecision(10) << "HELLOPDF: " << iChannel << "\t" << t << "\t" << pdf << "\t" << m_masses[1] << endl;
+      // write out the pdf if needed
+      if (m_writeNPdfs < 0 or m_iEvent < m_writeNPdfs) {
+        vector<vector<double>> channelPDFCollection(512);
+        for (int iChannel = 1; iChannel <= 512; ++iChannel) {
+          vector<double>& pdfSample = channelPDFCollection[iChannel - 1];
+          pdfSample.resize(200);
+          for (int iTimeBin = 0; iTimeBin < 200; ++iTimeBin) {
+            double t = 0.3 * iTimeBin;
+            double pdf = reco.getPDF(iChannel, t, m_masses[1]);
+            pdfSample[iTimeBin] = pdf;
+          }
         }
+        TOPPDFCollection* topPDFColl = pdfCollection.appendNew();
+        topPDFColl->addHypothesisPDFSample(channelPDFCollection, 1);
+        track.addRelationTo(topPDFColl);
       }
-      TOPPDFCollection* topPDFColl = pdfCollection.appendNew();
-      topPDFColl->addHypothesisPDFSample(channelPDFCollection, 1);
-      track.addRelationTo(topPDFColl);
+      // normal reconstruction
       reco.getLogL(Const::ChargedStable::c_SetSize, logl, estPhot, nphot);
       double estBkg = reco.getExpectedBG();
 
@@ -250,6 +245,7 @@ namespace Belle2 {
         track.addRelationTo(pull);
       }
     }
+    ++m_iEvent;
   }
 
 

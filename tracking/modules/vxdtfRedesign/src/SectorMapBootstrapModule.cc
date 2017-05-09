@@ -113,6 +113,11 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   // TODO: Most of these informations are not used at all.
   //        It seems to me (EP) that only the SectorDividers are used.
 
+  // TODO: find a better way to put the configs into the framework
+
+  // WARNING: chose the names of the configs in that way that they are not contained in each other!
+  //       E.g. having two configs with names "BobTheGreat" and "Bob" is not allowed as it will cause problems in some modules!
+
   SectorMapConfig config1;
 //   config1.pTmin = 0.02;
 //   config1.pTmax = 0.08;
@@ -143,6 +148,29 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1.quantiles = {0., 1.};  //{0.005, 1. - 0.005};
   // TODO: still missing: minimal sample-size, quantiles for smaller samplesizes, threshshold small <-> big sampleSize.
   bootstrapSectorMap(config1);
+
+
+  // same as config1 but allows the PXD layers
+  SectorMapConfig config1point1;
+  config1point1.pTmin = 0.02; // minimal relevant version
+  config1point1.pTmax = 3.15; // minimal relevant version // Feb18-onePass-Test
+  config1point1.pTSmear = 0.;
+  config1point1.allowedLayers = {0, 1, 2, 3, 4, 5, 6};
+  config1point1.uSectorDivider = { .3, .7, 1.}; // standard relevant version
+  config1point1.vSectorDivider = { .3, .7, 1.}; // standard relevant version
+  config1point1.pdgCodesAllowed = {};
+  config1point1.seedMaxDist2IPXY = 23.5;
+  config1point1.seedMaxDist2IPZ = 23.5;
+  config1point1.nHitsMin = 3;
+  config1point1.vIP = B2Vector3D(0, 0, 0);
+  config1point1.secMapName = "lowTestSVDPXD";
+  config1point1.twoHitFilters = { "Distance3DSquared", "Distance2DXYSquared", "Distance1DZ", "SlopeRZ", "Distance3DNormed"};
+  config1point1.threeHitFilters = { "Angle3DSimple", "CosAngleXY", "AngleRZSimple", "CircleDist2IP", "DeltaSlopeRZ", "DeltaSlopeZoverS", "DeltaSoverZ", "HelixParameterFit", "Pt", "CircleRadius"};
+  config1point1.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
+  config1point1.mField = 1.5;
+  config1point1.rarenessThreshold = 0.; //0.001;
+  config1point1.quantiles = {0., 1.};  //{0.005, 1. - 0.005};
+  bootstrapSectorMap(config1point1);
 
   SectorMapConfig config2;
 //   config2.pTCuts = {0.075, 0.300};
@@ -282,6 +310,10 @@ SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
   std::vector<VxdID> listOfSensors = geometry.getListOfSensors();
   for (VxdID aSensorId : listOfSensors) {
 
+    // filter only those sensors on layers which are specified in the config
+    if (std::find(config.allowedLayers.begin(), config.allowedLayers.end(),
+                  aSensorId.getLayerNumber()) == config.allowedLayers.end()) continue;
+
     // for testbeams there might be other sensors in the geometry so filter for SVD and PXD only, as the CompactSecID dont like those!
     VXD::SensorInfoBase::SensorType type = geometry.getSensorInfo(aSensorId).getType();
     if (type != VXD::SensorInfoBase::SVD && type != VXD::SensorInfoBase::PXD) {
@@ -302,6 +334,14 @@ SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
                                        sectors) ;
   }//end loop over sensors
 
+
+  // if layer 0 is specified in the config then the virtual IP is added
+  if (std::find(config.allowedLayers.begin(), config.allowedLayers.end(), 0) != config.allowedLayers.end()) {
+    std::vector<double> uCuts4vIP = {}, vCuts4vIP = {};
+    sectors.clear();
+    sectors = {{0}};
+    segmentFilters->addSectorsOnSensor(uCuts4vIP, vCuts4vIP, sectors);
+  }
 
   // put config into the container
   FiltersContainer<SpacePoint>::getInstance().assignFilters(config.secMapName, segmentFilters);
@@ -369,6 +409,8 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
   for (int i = 0;  i < nEntries ; i++) {
     tree->GetEntry(i);
     rootFile.cd(setupKeyName->Data());
+
+    B2DEBUG(1, "Retrieving SectorMap with name " << setupKeyName->Data());
 
     VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
 

@@ -624,7 +624,7 @@
     <FLayers>
       <FLayer id="0">
         <Radius desc="Radius of field wires in this layer" unit="mm">173</Radius>
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-320.762</BackwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-320.76</BackwardZ>
         <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">588.45</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>

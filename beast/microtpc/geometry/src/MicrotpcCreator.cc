@@ -384,8 +384,8 @@ namespace Belle2 {
         }
         //cout <<"gem 1 " << z_GEM[0] << " gem 2 " << z_GEM[1] << " ring 22 " << z_Ring[22] << " anode " << z_Ring[23] << " dz_GEM " << dz_GEM << " dz_Ring " << dz_Ring << endl;
         //create sensitive volume
-        G4double dx_GasTPC = 1.8 / 2. * CLHEP::cm;
-        G4double dy_GasTPC = 2.12 / 2. * CLHEP::cm;
+        G4double dx_GasTPC = 3.0 / 2. * CLHEP::cm;
+        G4double dy_GasTPC = 3.0 / 2. * CLHEP::cm;
         G4double dz_GasTPC = (z_Ring[10] - dz_Ring - z_GEM[0] - dz_GEM) / 2.; //13.5 * CLHEP::cm;
         cout << " dz_GasTPC " << dz_GasTPC / CLHEP::cm << endl;
         G4Box* s_GasTPC = new G4Box("s_GasTPC", dx_GasTPC, dy_GasTPC, dz_GasTPC);

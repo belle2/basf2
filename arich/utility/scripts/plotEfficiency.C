@@ -120,7 +120,6 @@ void plotEfficiency(){
   // To plot cherenkov angle distribution the following members are relevant:
   // photons.m_thetaCer  -  reconstructed Cherenkov theta angle  
   // photons.m_phiCer  -  reconstructed Cherenkov phi angle  
-  // photons.m_aerogel  -  aerogel layer hypothesis (0 - 1st layer, 1 - 2nd layer)
   // photons.m_mirror  -  mirror plate hypothesis (0 - no reflection, 1 - , 2 - two plates closest to the track)  
   
   // lets plot Cherenkov theta angle for pi,K tracks, assuming photons were emitted from the 1st aerogel layer
@@ -128,8 +127,8 @@ void plotEfficiency(){
   
   TH1F* h_chK = new TH1F("h_chK","Cherenkov angle distribution for kaons/pions;#theta_{ch}", 200,0,0.5);
   TH1F* h_chPi = new TH1F("h_chPi","Cherenkov angle distribution for kaons/pions;#theta_{ch}", 200,0,0.5);
-  ch->Draw("photons.m_thetaCer>>h_chPi","abs(mcHit.PDG)==211 && photons.m_aerogel==0 && photons.m_mirror==0 && primary==1  && " + momCut);
-  ch->Draw("photons.m_thetaCer>>h_chK","abs(mcHit.PDG)==321 && photons.m_aerogel==0 && photons.m_mirror==0 && primary==1 && " + momCut);
+  ch->Draw("photons.m_thetaCer>>h_chPi","abs(mcHit.PDG)==211 && photons.m_mirror==0 && primary==1  && " + momCut);
+  ch->Draw("photons.m_thetaCer>>h_chK","abs(mcHit.PDG)==321  && photons.m_mirror==0 && primary==1 && " + momCut);
   //--------------------------------------
   
   TLegend* leg = new TLegend(0.1,0.75,0.48,0.9);

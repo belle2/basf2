@@ -143,6 +143,13 @@ namespace Belle2 {
     }
 
 
+    /** set sublayer ID, needed as it is updated in the trainings phase */
+    // @param sublayer : the new SubLayerID will be 0 if sublayer==0, and will be 1 else
+    void setSubLayerID(int sublayer)
+    {
+      m_secID = FullSecID(m_secID.getVxdID(), (bool)sublayer, m_secID.getSecID());
+    }
+
 
     /** returns all IDs for inner sectors of two-sector-combinations */
     const std::vector< FullSecID >& getInner2spSecIDs() const

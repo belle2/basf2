@@ -292,6 +292,23 @@ namespace Belle2 {
       return true;
     };
 
+    /// during the trainings phase the sublayer ids have to be updated
+    /// @param sector : FullSecID of the sector to be updated (SubLayerID of sector will be ignored while searching for it!)
+    /// @param sublayer : new value for the sublayer, the new SubLayerID will be 0 if sublayer==0, and 1 else
+    bool setSubLayerIDs(FullSecID sector, int sublayer)
+    {
+      // first update the static sector
+      // the static sector is retrieved from the compactid which automatically ignores the sublayer id
+      auto sectorPosition = m_compactSecIDsMap[ sector ];
+      if (sectorPosition == 0) return false;
+      staticSector_t* staticsector = m_staticSectors[ sectorPosition ];
+      if (!staticsector) return false;
+      staticsector->setSubLayerID(sublayer);
+
+      // then update the fullsectorid in the compactsectoridmap, the sublayerid of sector will be ignored when searching for sector to update
+      return m_compactSecIDsMap.setSubLayerID(sector, sublayer);
+    }
+
   private:
 
     /// Persists all the sectors on the current TDirectory

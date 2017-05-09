@@ -9,9 +9,16 @@ import time
 
 if __name__ == "__main__":
 
-    variables = ['M', 'p', 'pz', 'daughter(0, p)', 'daughter(0, pz)', 'daughter(1, p)', 'daughter(1, pz)',
-                 'chiProb', 'dr', 'dz', 'daughter(0, dr)', 'daughter(1, dr)', 'daughter(0, chiProb)', 'daughter(1, chiProb)',
-                 'daughter(0, Kid)', 'daughter(0, piid)', 'daughterAngle(0, 1)']
+    variables = ['M', 'p', 'pt', 'pz',
+                 'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)',
+                 'daughter(1, p)', 'daughter(1, pz)', 'daughter(1, pt)',
+                 'daughter(2, p)', 'daughter(2, pz)', 'daughter(2, pt)',
+                 'chiProb', 'dr', 'dz',
+                 'daughter(0, dr)', 'daughter(1, dr)',
+                 'daughter(0, dz)', 'daughter(1, dz)',
+                 'daughter(0, chiProb)', 'daughter(1, chiProb)', 'daughter(2, chiProb)',
+                 'daughter(0, Kid)', 'daughter(0, piid)',
+                 'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
 
     # Train a MVA method and directly upload it to the database
     general_options = basf2_mva.GeneralOptions()
@@ -44,7 +51,7 @@ if __name__ == "__main__":
     tmva_bdt_options = basf2_mva.TMVAOptionsClassification()
     tmva_bdt_options.m_config = ("!H:!V:CreateMVAPdfs:NTrees=100:BoostType=Grad:Shrinkage=0.2:UseBaggedBoost:"
                                  "BaggedSampleFraction=0.5:nCuts=1024:MaxDepth=3:IgnoreNegWeightsInTraining")
-    tmva_bdt_options.m_prepareOptions = ("SplitMode=block:V:nTrain_Signal=25579:nTrain_Background=25579:"
+    tmva_bdt_options.m_prepareOptions = ("SplitMode=block:V:nTrain_Signal=9691:nTrain_Background=136972:"
                                          "nTest_Signal=1:nTest_Background=1")
 
     sklearn_bdt_options = basf2_mva.PythonOptions()
@@ -64,6 +71,7 @@ if __name__ == "__main__":
                            ("TMVA-BDT", tmva_bdt_options),
                            ("SKLearn-BDT", sklearn_bdt_options), ("XGBoost", xgboost_options), ("Trivial", trivial_options)]:
         training_start = time.time()
+        general_options.m_identifier = label
         basf2_mva.teacher(general_options, options)
         training_stop = time.time()
         training_time = training_stop - training_start

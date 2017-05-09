@@ -458,6 +458,15 @@ namespace {
     EXPECT_FLOAT_EQ(weights[3], 4.2);
     EXPECT_FLOAT_EQ(weights[4], 5.2);
 
+    // Same result for mother class implementation
+    weights = x.Dataset::getWeights();
+    EXPECT_EQ(weights.size(), 5);
+    EXPECT_FLOAT_EQ(weights[0], 1.2);
+    EXPECT_FLOAT_EQ(weights[1], 2.2);
+    EXPECT_FLOAT_EQ(weights[2], 3.2);
+    EXPECT_FLOAT_EQ(weights[3], 4.2);
+    EXPECT_FLOAT_EQ(weights[4], 5.2);
+
     auto targets = x.getTargets();
     EXPECT_EQ(targets.size(), 5);
     EXPECT_FLOAT_EQ(targets[0], 1.0);

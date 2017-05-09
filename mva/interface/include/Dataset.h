@@ -307,6 +307,11 @@ namespace Belle2 {
       virtual std::vector<float> getFeature(unsigned int iFeature) override;
 
       /**
+       * Returns all values of of the weights in a std::vector<float>
+       */
+      virtual std::vector<float> getWeights() override;
+
+      /**
        * Returns all values of one spectator in a std::vector<float>
        * @param iSpectator the position of the spectator to return
        */

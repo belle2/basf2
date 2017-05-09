@@ -98,7 +98,7 @@ namespace Belle2 {
       B2DEBUG(10, "SecMapTrainer::acceptHit: the TC has layerID: " << layerID << " and allowd layers: " << ids << " and was " <<
               (found ? "accepted" : "rejected"));
 
-      return true;
+      return found;
     }
 
 

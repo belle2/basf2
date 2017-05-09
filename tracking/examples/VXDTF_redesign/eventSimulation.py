@@ -28,6 +28,7 @@ from simulation import add_simulation
 
 # If later the use of bg is wanted, you can as well import setup_bg
 from setup_modules import setup_sim
+from setup_modules import setup_Geometry
 
 # ---------------------------------------------------------------------------------------
 
@@ -57,11 +58,11 @@ main.add_module(progress)
 particlegun = register_module('ParticleGun')
 particlegun.logging.log_level = LogLevel.WARNING
 param_pGun = {
-              'pdgCodes': [13, -13],   # 13 = muon --> negatively charged!
-              'nTracks': 1,
-              'momentumGeneration': 'uniform',
-              'momentumParams': [0.1, 4]
-             }
+    'pdgCodes': [13, -13],   # 13 = muon --> negatively charged!
+    'nTracks': 1,
+    'momentumGeneration': 'uniform',
+    'momentumParams': [0.1, 4]
+}
 """
               'momentumGeneration': 'fixed',
               'momentumParams': [2, 2],           # 2 values: [min, max] in GeV
@@ -90,6 +91,10 @@ main.add_module(evtgenInput)
 
 # ---------------------------------------------------------------------------------------
 
+
+# setup the geometry (the Geometry and the Gearbox will be ignore in add_simulation if they are already in the path)
+setup_Geometry(path=main)
+
 # Detector Simulation:
 add_simulation(path=main,
                components=['BeamPipe',
@@ -104,7 +109,8 @@ add_simulation(path=main,
 mctrackfinder = register_module('TrackFinderMCTruthRecoTracks')
 mctrackfinder.param('UseCDCHits', False)
 mctrackfinder.param('UseSVDHits', True)
-mctrackfinder.param('UsePXDHits', False)
+# Always use PXD hits! For SVD only, these will be filtered later when converting to SPTrackCand
+mctrackfinder.param('UsePXDHits', True)
 mctrackfinder.param('Smearing', False)
 mctrackfinder.param('MinimalNDF', 6)
 mctrackfinder.param('WhichParticles', ['primary'])

@@ -8,12 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h"
-#include <tracking/trackFindingVXD/utilities/CalcCurvatureSignum.h>
 #include <math.h>
-#include <framework/logging/Logger.h>
 #include <TMath.h>
 
+#include <framework/logging/Logger.h>
+
+#include <svd/geometry/SensorInfo.h>
+
+#include "tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h"
+#include <tracking/trackFindingVXD/utilities/CalcCurvatureSignum.h>
 
 
 using namespace Belle2;
@@ -81,18 +84,37 @@ double QualityEstimatorTripletFit::estimateQuality(std::vector<SpacePoint const*
     const double beta = (1 - alpha2) / (R3D2C * tan(theta2C)) - (1 - alpha1) / (R3D1C * tan(theta1C));
 
     // Calculation of sigmaMS
-    //double bField = getMagneticField();
+    // First get the orientation of the sensor plate for material budged calculation
+    double entranceAngle = theta;
+    VxdID::baseType sensorID = measurements.at(i + 1)->getVxdID();
+    if (sensorID != 0) {
+      const SVD::SensorInfo& sensor = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      TVector3 sensorOrigin  = sensor.pointToGlobal(TVector3(0, 0, 0), true);
+      TVector3 sensoru  = sensor.pointToGlobal(TVector3(1, 0, 0), true);
+      TVector3 sensorv  = sensor.pointToGlobal(TVector3(0, 1, 0), true);
+
+      TVector3 globalu = sensoru - sensorOrigin;
+      TVector3 globalv = sensorv - sensorOrigin;
+      TVector3 normal = globalu.Cross(globalv);
+
+      // Calculate the angle of incidence for the middle hit
+      if (sensorOrigin.Angle(normal) > M_PI * 0.5) { normal *= -1.; }
+      entranceAngle = (hit1 - hit0).Angle(normal);
+    }
 
     /** Using average material budged of SVD sensors for approximation of radiation length
      *  Belle II TDR page 156 states a value of 0.57% X_0.
      *  This approximation is a first approach to the problem and must be checked.
      */
-    const double XoverX0 = 0.0057 / sin(theta1C);
+    const double XoverX0 = 0.0057 / sin(entranceAngle);
 
     double R3D = - (eta * PhiTilde * sin(theta) * sin(theta) + beta * ThetaTilde);
     R3D *= 1. / (eta * eta * sin(theta) * sin(theta) + beta * beta);
     const double b = 4.5 / m_magneticFieldZ * sqrt(XoverX0);
-    const double sigmaMS = 50 * b / R3D;
+
+    double R3DmaxCut = .1 / (m_magneticFieldZ * 0.00299792458);
+    double R3D_truncated = R3D > R3DmaxCut ? R3DmaxCut : R3D;
+    const double sigmaMS = 5. * b / R3D_truncated;
 
     double sigmaR3DSquared = pow(sigmaMS, 2) / (pow(eta * sin(theta), 2) + pow(beta, 2));
 
@@ -120,8 +142,8 @@ double QualityEstimatorTripletFit::estimateQuality(std::vector<SpacePoint const*
   double numerator = 0;
   double denominator = 0;
   for (short i = 0; i < nTriplets; ++i) {
-    numerator += m_R3Ds.at(i) / m_sigmaR3DSquareds.at(i);
-    denominator += 1. / m_sigmaR3DSquareds.at(i);
+    numerator += pow(m_R3Ds.at(i), 3) / m_sigmaR3DSquareds.at(i);
+    denominator += pow(m_R3Ds.at(i), 2) / m_sigmaR3DSquareds.at(i);
   }
   m_averageR3D = numerator / denominator;
 

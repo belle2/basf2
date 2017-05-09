@@ -105,18 +105,28 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
 
 @format_crop_keys
 def peel_reco_track_hit_content(reco_track, key="{part_name}"):
-    n_cdc_hits = reco_track.getNumberOfCDCHits()
-    n_svd_hits = reco_track.getNumberOfSVDHits()
-    n_pxd_hits = reco_track.getNumberOfPXDHits()
-    ndf = 2 * n_pxd_hits + 2 * n_svd_hits + n_cdc_hits
+    if reco_track:
+        n_cdc_hits = reco_track.getNumberOfCDCHits()
+        n_svd_hits = reco_track.getNumberOfSVDHits()
+        n_pxd_hits = reco_track.getNumberOfPXDHits()
+        ndf = 2 * n_pxd_hits + 2 * n_svd_hits + n_cdc_hits
 
-    return dict(
-        n_pxd_hits=n_pxd_hits,
-        n_svd_hits=n_svd_hits,
-        n_cdc_hits=n_cdc_hits,
-        n_hits=n_pxd_hits + n_svd_hits + n_cdc_hits,
-        ndf_hits=ndf,
-    )
+        return dict(
+            n_pxd_hits=n_pxd_hits,
+            n_svd_hits=n_svd_hits,
+            n_cdc_hits=n_cdc_hits,
+            n_hits=n_pxd_hits + n_svd_hits + n_cdc_hits,
+            ndf_hits=ndf,
+        )
+    else:
+        nan = float('nan')
+        return dict(
+            n_pxd_hits=nan,
+            n_svd_hits=nan,
+            n_cdc_hits=nan,
+            n_hits=nan,
+            ndf_hits=nan,
+        )
 
 
 @format_crop_keys

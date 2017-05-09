@@ -14,6 +14,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
 
+#include <tracking/trackFindingCDC/utilities/VectorRange.h>
 #include <tracking/trackFindingCDC/utilities/SortedVectorRange.h>
 
 namespace Belle2 {
@@ -26,6 +27,7 @@ namespace Belle2 {
   public:
     using SeedPtr = typename AStateObject::SeedObject*;
     using HitPtr = const typename AStateObject::HitObject*;
+    using StateObject = AStateObject;
     using StateArray = typename std::array < AStateObject, AStateObject::N + 1 >;
     using StateIterator = typename StateArray::iterator;
     using ResultPair = std::pair<typename AStateObject::SeedObject*, std::vector<const typename AStateObject::HitObject*>>;
@@ -73,11 +75,11 @@ namespace Belle2 {
 
   protected:
     /// Overloadable function to return the possible range of next hit objects for a given state
-    virtual TrackFindingCDC::SortedVectorRange<HitPtr> getMatchingHits(StateIterator currentState) = 0;
+    virtual TrackFindingCDC::SortedVectorRange<HitPtr> getMatchingHits(StateObject& currentState) = 0;
 
-    virtual bool advance(StateIterator currentState) = 0;
+    virtual TrackFindingCDC::Weight advance(StateObject& currentState) = 0;
 
-    virtual bool fit(StateIterator currentState) = 0;
+    virtual TrackFindingCDC::Weight fit(StateObject& currentState) = 0;
 
     virtual void initializeEventCache(std::vector<SeedPtr>& seedsVector, std::vector<HitPtr>& hitVector) { }
 
@@ -87,6 +89,8 @@ namespace Belle2 {
     /// Object cache for states
     StateArray m_states{};
 
+    std::array < std::vector<StateObject>, StateObject::N + 1 > m_temporaryStates;
+
     /// Parameter: make hit jumps possible
     bool m_param_makeHitJumpingPossible = true;
 
@@ -95,6 +99,9 @@ namespace Belle2 {
 
     /// Parameter: do the fit step
     bool m_param_fit = true;
+
+    /// Parameter:
+    unsigned int m_param_useNResults = 10;
 
     /// Subfindlet: Filter 1
     AFilter m_firstFilter;
@@ -113,64 +120,98 @@ namespace Belle2 {
         return;
       }
 
-      bool childWasUsed = false;
+      // Filter and apply the advance & fit functions
+      auto childStates = filterFromHits(*currentState, m_firstFilter);
 
-      const auto& matchingHits = getMatchingHits(currentState);
+      if (m_param_advance) {
+        //applyAndFilter(childStates, advance);
+      }
+
+      applyAndFilter(childStates, m_secondFilter);
+
+      if (m_param_fit) {
+        //applyAndFilter(childStates, &(this->fit));
+      }
+
+      if (childStates.empty()) {
+        resultsVector.emplace_back(currentState->finalize());
+        return;
+      }
+
+      for (StateObject& childState : childStates) {
+        // Attention: In the moment we only have states from the temporary list!
+        std::swap(*nextState, childState);
+        traverseTree(nextState, resultsVector);
+      }
+    }
+
+    // This method does more or less the same as the one below -> can this be combined?
+    TrackFindingCDC::VectorRange<StateObject> filterFromHits(StateObject& parentState, AFilter& filter)
+    {
+      const auto& matchingHits = getMatchingHits(parentState);
+      auto& temporaryStates = m_temporaryStates[parentState.getNumber()];
+
+      temporaryStates.resize(matchingHits.size());
+
+      auto lastFiniteState = temporaryStates.begin();
       for (const auto& hit : matchingHits) {
-        nextState->set(currentState, hit);
+        lastFiniteState->set(&parentState, hit);
+        TrackFindingCDC::Weight weight = filter(*lastFiniteState);
 
-        if (useResult(nextState)) {
-          traverseTree(nextState, resultsVector);
-          childWasUsed = true;
+        if (not std::isnan(weight)) {
+          lastFiniteState->setWeight(weight);
+          lastFiniteState = std::next(lastFiniteState);
         }
       }
 
       if (m_param_makeHitJumpingPossible) {
-        nextState->set(currentState, nullptr);
+        lastFiniteState->set(&parentState, nullptr);
+        TrackFindingCDC::Weight weight = filter(*lastFiniteState);
 
-        if (useResult(nextState)) {
-          traverseTree(nextState, resultsVector);
-          childWasUsed = true;
+        if (not std::isnan(weight)) {
+          lastFiniteState->setWeight(weight);
+          lastFiniteState = std::next(lastFiniteState);
         }
       }
 
-      if (not childWasUsed) {
-        resultsVector.emplace_back(currentState->finalize());
+      TrackFindingCDC::VectorRange<StateObject> childStates(temporaryStates.begin(), lastFiniteState);
+
+      // TODO: THE SAME
+      // Select only the N best if necessary (otherwise we do not have to sort at all).
+      if (childStates.size() > m_param_useNResults) {
+        std::sort(childStates.begin(), childStates.end());
+        childStates.second = std::next(childStates.begin(), m_param_useNResults);
       }
+
+      return childStates;
     }
 
-    /// Test function whether a given state should be used or not
-    bool useResult(StateIterator currentState)
+    template <class APredicate>
+    void applyAndFilter(TrackFindingCDC::VectorRange<StateObject>& childStates, APredicate& predicate)
     {
-      // Check the first filter before extrapolation
-      TrackFindingCDC::Weight weight = m_firstFilter(*currentState);
-      if (std::isnan(weight)) {
-        return false;
+      if (childStates.empty()) {
+        return;
       }
 
-      if (m_param_advance) {
-        // Extrapolate
-        if (not advance(currentState)) {
-          return false;
+      auto firstFiniteState = childStates.begin();
+      for (auto& state : childStates) {
+        TrackFindingCDC::Weight weight = predicate(state);
+        if (std::isnan(weight)) {
+          std::swap(*firstFiniteState, state);
+          firstFiniteState = std::next(firstFiniteState);
+        } else {
+          state.setWeight(weight);
         }
       }
 
-      // Check the second filter after extrapolation
-      weight = m_secondFilter(*currentState);
-      if (std::isnan(weight)) {
-        return false;
-      }
+      childStates.first = firstFiniteState;
 
-      if (m_param_fit) {
-        // Fit the state with the new hit
-        if (not fit(currentState)) {
-          return false;
-        }
+      // TODO: THE SAME
+      // Select only the N best if necessary (otherwise we do not have to sort at all).
+      if (childStates.size() > m_param_useNResults) {
+        std::sort(childStates.begin(), childStates.end());
+        childStates.second = std::next(childStates.begin(), m_param_useNResults);
       }
-
-      // Check the third filter after extrapolation
-      weight = m_thirdFilter(*currentState);
-      return not std::isnan(weight);
     }
   };
 }

@@ -122,6 +122,7 @@ def setup_VXDTF2(path=None,
 
     cellOmat = register_module('TrackFinderVXDCellOMat')
     cellOmat.param('NetworkName', 'test2Hits')
+    cellOmat.param('SpacePointTrackCandArrayName', 'SPTCs')
     cellOmat.param('printNetworks', False)
     cellOmat.param('strictSeeding', True)
     cellOmat.logging.log_level = log_level
@@ -137,9 +138,18 @@ def setup_VXDTF2(path=None,
 
     qualityEstimator = register_module('QualityEstimatorVXD')
     qualityEstimator.param('EstimationMethod', quality_estimator)
+    qualityEstimator.param('SpacePointTrackCandsStoreArrayName', 'SPTCs')
     qualityEstimator.logging.log_level = log_level
     qualityEstimator.logging.debug_level = debug_level
     modules.append(qualityEstimator)
+
+    maxCandidateSelection = register_module('BestVXDTrackCandidatesSelector')
+    maxCandidateSelection.param('SubsetCreation', 'SPTCs')
+    maxCandidateSelection.param('CreateNewStoreArray', True)
+    maxCandidateSelection.param('NewNameSpacePointTrackCands', '')
+    maxCandidateSelection.logging.log_level = log_level
+    maxCandidateSelection.logging.debug_level = debug_level
+    modules.append(maxCandidateSelection)
 
     # Properties
     vIPRemover = register_module('SPTCvirtualIPRemover')

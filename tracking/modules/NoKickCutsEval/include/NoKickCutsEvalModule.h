@@ -116,14 +116,14 @@ namespace Belle2 {
   private:
 
     double pmin = 0.025;
-    double pmax = 1.;
+    double pmax = 1;
     double tmin = 17.*M_PI / 180.; //17 degrees
     double tmax = 5. / 6.*M_PI; //150 degrees
-    int nbin = 100;
-    int nbinp = 10;
+    int nbin = 5000;
+    int nbinp = 100;
     int nbinpar = 5;
     int nbinlay = 7;//present IP too
-    int nbint = 10;
+    int nbint = 20;
     double pwidth = (pmax - pmin) / (double)nbinp;
     double twidth = (tmax - tmin) / (double)nbint;
     double ext_lim = 1;

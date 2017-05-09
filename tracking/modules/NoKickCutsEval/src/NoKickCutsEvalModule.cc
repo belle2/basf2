@@ -143,13 +143,13 @@ void NoKickCutsEvalModule::event()
       for (int i = 0; i < (int)(XP8.size() - 2); i++) {
         for (int par = 0; par < nbinpar; par++) {
           int p = (int)((XP8.at(i).m_momentum0.Mag() - pmin) / pwidth);
-          if (p > 10 || p < 0) {
+          if (p > nbinp || p < 0) {
             pCounter++;
             continue;
           }
           double sinTheta = abs(XP8.at(i).m_momentum0.Y()) / sqrt(pow(XP8.at(i).m_momentum0.Y(), 2) + pow(XP8.at(i).m_momentum0.Z(), 2));
           int t = (int)((asin(sinTheta) - tmin) / pwidth);
-          if (t > 10 || t < 0) {
+          if (t > nbint || t < 0) {
             tCounter++;
             continue;
           }
@@ -233,7 +233,7 @@ void NoKickCutsEvalModule::endRun()
             }
             while (sum_M < integral * percent / 2) {
               bin_M--;
-              sum_M = sum_m + histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(bin_M);
+              sum_M = sum_M + histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(bin_M);
             }
             cut_M_theta.push_back(histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinCenter(bin_M));
             cut_m_theta.push_back(histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinCenter(bin_m));
@@ -278,8 +278,8 @@ void NoKickCutsEvalModule::endRun()
                                             "CUTS_M_" + name_par.at(par) + Form("_layer%d_%d", lay1, lay2), nbinp, pmin, pmax, nbint, tmin, tmax));
         cut_m_histo_lay1.push_back(new TH2F("CUTS_m_" + name_par.at(par) + Form("layer%d_%d", lay1, lay2),
                                             "CUTS_m_" + name_par.at(par) + Form("_layer%d_%d", lay1, lay2), nbinp, pmin, pmax, nbint, tmin, tmax));
-        for (int theta = 1; theta < nbint; theta++) {
-          for (int p = 1; p < nbinp; p++) {
+        for (int theta = 1; theta <= nbint; theta++) {
+          for (int p = 1; p <= nbinp; p++) {
             cut_M_histo_lay1.at(lay2)->SetBinContent(p, theta, cut_M.at(par).at(lay1).at(lay2).at(theta).at(p));
             cut_m_histo_lay1.at(lay2)->SetBinContent(p, theta, cut_m.at(par).at(lay1).at(lay2).at(theta).at(p));
           }
@@ -319,7 +319,7 @@ void NoKickCutsEvalModule::endRun()
 
           double norm = cut_M.at(par).at(lay1).at(lay2).at(1).at(1);
           double Pow = 1;
-          double bkg = cut_M.at(par).at(lay1).at(lay2).at(1).at((int)pmax / pwidth);
+          double bkg = cut_M.at(par).at(lay1).at(lay2).at(1).at(nbinp - 1);
           fit_MS->SetParameters(norm, Pow, bkg);
 
           if (minmax == 0) {
@@ -535,6 +535,30 @@ void NoKickCutsEvalModule::endRun()
 
   }
 
+  //------------------_DEBUG------------//
+  // for(int g=0; g<=nbinp; g++){
+  //   double p_out_mom = g*pwidth+pmin;
+  // std::cout << "momentum=" << p_out_mom << std::endl;
+  // std::cout << "d0, 3-4,  Min: "<< cut_m.at(1).at(3).at(4).at(5).at(g) << std::endl;
+  // std::cout << "d0, 3-4,  Max: "<< cut_M.at(1).at(3).at(4).at(5).at(g) << std::endl;
+  // std::cout << "----------------------------------------" << std::endl;
+  // }
+  m_outputFile->cd();
+  for (int par = 0; par < nbinpar; par++) {
+    for (int lay1 = 0; lay1 < nbinlay; lay1++) {
+      for (int lay2 = 0; lay2 < nbinlay; lay2++) {
+        for (int minmax = 0; minmax < 2; minmax++) {
+          if (minmax == 0) {
+            cut_m_histo.at(par).at(lay1).at(lay2)->Write();
+          }
+          if (minmax == 1) {
+            cut_M_histo.at(par).at(lay1).at(lay2)->Write();
+          }
+        }
+      }
+    }
+  }
+  //END OF DEBUG -------------_//
 
 
   //--------------------------------OUTPUT: histogram booking, filling -------------------//

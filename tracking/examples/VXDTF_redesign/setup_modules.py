@@ -44,7 +44,7 @@ def setup_VXDTF2(path=None,
                  quality_estimator='circleFit',
                  overlap_filter='greedy',
                  sec_map_file=None,
-                 setup_name='lowTestRedesign',
+                 setup_name='SVDOnlyDefault',
                  log_level=LogLevel.INFO,
                  debug_level=1):
     """

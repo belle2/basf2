@@ -118,6 +118,8 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   // WARNING: chose the names of the configs in that way that they are not contained in each other!
   //       E.g. having two configs with names "BobTheGreat" and "Bob" is not allowed as it will cause problems in some modules!
 
+
+  // for now declare this as default config for SVD only tracking!
   SectorMapConfig config1;
 //   config1.pTmin = 0.02;
 //   config1.pTmax = 0.08;
@@ -139,7 +141,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1.seedMaxDist2IPZ = 23.5;
   config1.nHitsMin = 3;
   config1.vIP = B2Vector3D(0, 0, 0);
-  config1.secMapName = "lowTestRedesign";
+  config1.secMapName = "SVDOnlyDefault"; // has been: "lowTestRedesign";
   config1.twoHitFilters = { "Distance3DSquared", "Distance2DXYSquared", "Distance1DZ", "SlopeRZ", "Distance3DNormed"};
   config1.threeHitFilters = { "Angle3DSimple", "CosAngleXY", "AngleRZSimple", "CircleDist2IP", "DeltaSlopeRZ", "DeltaSlopeZoverS", "DeltaSoverZ", "HelixParameterFit", "Pt", "CircleRadius"};
   config1.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
@@ -151,6 +153,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
 
 
   // same as config1 but allows the PXD layers
+  // default for VXD tracking (SVD+PXD)
   SectorMapConfig config1point1;
   config1point1.pTmin = 0.02; // minimal relevant version
   config1point1.pTmax = 3.15; // minimal relevant version // Feb18-onePass-Test
@@ -163,7 +166,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1point1.seedMaxDist2IPZ = 23.5;
   config1point1.nHitsMin = 3;
   config1point1.vIP = B2Vector3D(0, 0, 0);
-  config1point1.secMapName = "lowTestSVDPXD";
+  config1point1.secMapName = "SVDPXDDefault"; // has been: "lowTestSVDPXD";
   config1point1.twoHitFilters = { "Distance3DSquared", "Distance2DXYSquared", "Distance1DZ", "SlopeRZ", "Distance3DNormed"};
   config1point1.threeHitFilters = { "Angle3DSimple", "CosAngleXY", "AngleRZSimple", "CircleDist2IP", "DeltaSlopeRZ", "DeltaSlopeZoverS", "DeltaSoverZ", "HelixParameterFit", "Pt", "CircleRadius"};
   config1point1.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};

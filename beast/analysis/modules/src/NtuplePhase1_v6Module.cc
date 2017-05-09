@@ -233,7 +233,7 @@ namespace Belle2 {
 
     if (m_numEvents > 0) {
       m_tree->GetEntry(0);
-      m_DayBin = (int)((m_beast.ts - 1486566000) / 60. / 60. / 24.);
+      m_DayBin = (int)((m_beast.ts - 1454943600) / 60. / 60. / 24.);
     }
 
     // expand possible wildcards
@@ -785,7 +785,7 @@ namespace Belle2 {
     m_tree->SetBranchAddress("SKB_LER_Zeff_D02", &(m_beast.SKB_LER_Zeff_D02));
     m_tree->SetBranchAddress("SKB_LER_Zeff_D06", &(m_beast.SKB_LER_Zeff_D06));
     */
-
+    dir->cd();
     m_numEntries = m_tree->GetEntries();
     cout << "m_numEntries " << m_numEntries << endl;
     m_entryCounter = 0;

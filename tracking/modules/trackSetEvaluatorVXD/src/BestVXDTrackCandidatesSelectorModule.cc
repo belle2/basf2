@@ -59,7 +59,8 @@ void BestVXDTrackCandidatesSelectorModule::deactivateCandidates()
     std::vector<int> sortedTrackCandIndices = getSortedTrackCandIndices(true);
 
     // deactivate candidates with lowest quality index until desired subsetSize is reached;
-    for (int iCandidate = 0; iCandidate < nTracks - m_subsetSize; ++iCandidate) {
+    for (int iTracks = 0; iTracks < nTracks - m_subsetSize; ++iTracks) {
+      int iCandidate = sortedTrackCandIndices[iTracks];
       m_spacePointTrackCands[iCandidate]->removeRefereeStatus(SpacePointTrackCand::c_isActive);
     }
   }
@@ -93,8 +94,8 @@ std::vector<int> BestVXDTrackCandidatesSelectorModule::getSortedTrackCandIndices
 
   std::sort(sortedTrackCandIndices.begin(), sortedTrackCandIndices.end(),
   [this, increasing](const int lhs, const int rhs) {
-    bool smaller = this->m_spacePointTrackCands[lhs]->getQualityIndex() < this->m_spacePointTrackCands[rhs]->getQualityIndex();
-    return increasing ? smaller : !smaller;
+    if (increasing) return m_spacePointTrackCands[lhs]->getQualityIndex() < m_spacePointTrackCands[rhs]->getQualityIndex();
+    else return m_spacePointTrackCands[lhs]->getQualityIndex() > m_spacePointTrackCands[rhs]->getQualityIndex();
   });
 
   return sortedTrackCandIndices;

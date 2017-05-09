@@ -26,8 +26,6 @@ namespace Belle2 {
     {
       m_seedRecoTrack = seed;
 
-      m_measuredStateOnPlane = seed->getMeasuredStateOnPlaneFromFirstHit();
-
       // Reset other state
       m_hitObject = nullptr;
       m_number = N;
@@ -45,8 +43,6 @@ namespace Belle2 {
       m_seedRecoTrack = parent->getSeedRecoTrack();
       m_number = parent->getNumber() - 1;
       m_hitObject = hitObject;
-
-      m_measuredStateOnPlane = parent->getMeasuredStateOnPlane();
 
       // Reset other state
       m_chi2 = 0;
@@ -147,6 +143,11 @@ namespace Belle2 {
     genfit::MeasuredStateOnPlane& getMeasuredStateOnPlane()
     {
       return m_measuredStateOnPlane;
+    }
+
+    void setMeasuredStateOnPlane(const genfit::MeasuredStateOnPlane& mSoP)
+    {
+      m_measuredStateOnPlane = mSoP;
     }
 
     const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlane() const

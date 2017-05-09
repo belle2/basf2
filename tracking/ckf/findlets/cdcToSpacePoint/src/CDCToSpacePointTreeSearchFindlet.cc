@@ -30,7 +30,6 @@ void CDCToSpacePointTreeSearchFindlet::exposeParameters(ModuleParamList* moduleP
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter("useCaching", m_param_useCaching, "Use caching or not", m_param_useCaching);
   moduleParamList->addParameter("useMaterialEffects", m_param_useMaterialEffects,
                                 "Use material effects during extrapolation.", m_param_useMaterialEffects);
 }
@@ -162,7 +161,8 @@ Weight CDCToSpacePointTreeSearchFindlet::advance(Super::StateObject& currentStat
   SVDRecoHit recoHit(spacePoint->getRelated<SVDCluster>());
 
   // This is the mSoP we will edit.
-  genfit::MeasuredStateOnPlane& measuredStateOnPlane = currentState.getMeasuredStateOnPlane();
+  genfit::MeasuredStateOnPlane measuredStateOnPlane = currentState.getParent() ? currentState.getParent()->getMeasuredStateOnPlane() :
+                                                      currentState.getSeedRecoTrack()->getMeasuredStateOnPlaneFromFirstHit();
 
   // This mSoP may help us for extrapolation
   // TODO
@@ -206,6 +206,7 @@ Weight CDCToSpacePointTreeSearchFindlet::advance(Super::StateObject& currentStat
     currentState.setParentHasCache();
   }*/
 
+  currentState.setMeasuredStateOnPlane(measuredStateOnPlane);
   currentState.setAdvanced();
   return 1;
 }

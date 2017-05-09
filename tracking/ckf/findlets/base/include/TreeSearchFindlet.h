@@ -151,7 +151,7 @@ namespace Belle2 {
       const auto& matchingHits = getMatchingHits(parentState);
       auto& temporaryStates = m_temporaryStates[parentState.getNumber()];
 
-      temporaryStates.resize(matchingHits.size());
+      temporaryStates.resize(matchingHits.size() + 1);
 
       auto lastFiniteState = temporaryStates.begin();
       for (const auto& hit : matchingHits) {

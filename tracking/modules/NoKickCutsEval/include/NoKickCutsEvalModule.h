@@ -77,8 +77,8 @@ namespace Belle2 {
             break;
 
           case 2:
-            out = hit1.getPhi0Entry() - hit2.getPhi0Entry();
-            if (is0) out = hit1.getPhi00() - hit2.getPhi0Entry();
+            out = asin(sin(hit1.getPhi0Entry())) - asin(sin(hit2.getPhi0Entry()));
+            if (is0) out = asin(sin(hit1.getPhi00())) - asin(sin(hit2.getPhi0Entry()));
             break;
 
           case 3:
@@ -120,10 +120,10 @@ namespace Belle2 {
     double tmin = 17.*M_PI / 180.; //17 degrees
     double tmax = 5. / 6.*M_PI; //150 degrees
     int nbin = 5000;
-    int nbinp = 100;
+    int nbinp = 20;
     int nbinpar = 5;
     int nbinlay = 7;//present IP too
-    int nbint = 20;
+    int nbint = 5;
     double pwidth = (pmax - pmin) / (double)nbinp;
     double twidth = (tmax - tmin) / (double)nbint;
     double ext_lim = 1;

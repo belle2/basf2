@@ -144,8 +144,8 @@ def setup_VXDTF2(path=None,
     modules.append(qualityEstimator)
 
     maxCandidateSelection = register_module('BestVXDTrackCandidatesSelector')
-    maxCandidateSelection.param('SubsetCreation', 'SPTCs')
-    maxCandidateSelection.param('CreateNewStoreArray', True)
+    maxCandidateSelection.param('NameSpacePointTrackCands', 'SPTCs')
+    maxCandidateSelection.param('SubsetCreation', True)
     maxCandidateSelection.param('NewNameSpacePointTrackCands', '')
     maxCandidateSelection.logging.log_level = log_level
     maxCandidateSelection.logging.debug_level = debug_level

@@ -9,9 +9,6 @@
 ######################################################
 from basf2 import *
 from modularAnalysis import *
-from stdPhotons import *
-
-loadStdGoodPhoton()
 
 
 def UpsilonList():
@@ -19,7 +16,7 @@ def UpsilonList():
     fillParticleList('mu+:stiff', 'p<15 and p>3.5')
     fillParticleList('e+:stiff', 'p<15 and p>3.5')
     fillParticleList('pi+:soft', 'p<1.5 and pt>0.05')
-    cutAndCopyList('gamma:soft', 'gamma:good', 'E>0.15')
+    cutAndCopyList('gamma:soft', 'gamma:loose', 'E>0.15')
     reconstructDecay('Upsilon:ee -> e+:stiff e-:stiff', 'M > 8')
     reconstructDecay('Upsilon:mumu -> mu+:stiff mu-:stiff', 'M > 8')
     copyLists('Upsilon:all', ['Upsilon:ee', 'Upsilon:mumu'])
@@ -42,8 +39,8 @@ def UpsilonList():
 
 def EtabList():
     Etabcuts = 'M > 7 and M < 10'
-#    fillParticleList('pi+:soft', 'p<1.5 and pt>0.05')
-    cutAndCopyList('gamma:hard', 'gamma:good', 'E>3.5')
+    fillParticleList('gamma:hard', 'E>3.5')
+#    cutAndCopyList('gamma:hard', 'gamma:loose', 'E>3.5') # for some unknown reason this line is crashing the code
     buildRestOfEvent('gamma:hard')
     buildContinuumSuppression('gamma:hard')
     applyCuts('gamma:hard', 'R2 < 0.995')
@@ -62,16 +59,16 @@ def EtabList():
 def HbInclusiveList():
     Hbcuts = '0.4 < M < 0.6 and 9.8 < mRecoil < 10.'
 
-    fillParticleList('gamma:all', 'p<2')
-    buildRestOfEvent('gamma:all')
-    buildContinuumSuppression('gamma:all')
-    applyCuts('gamma:all', 'R2 < 0.5')
+    cutAndCopyList('gamma:soft', 'gamma:loose', 'E<2')
+    buildRestOfEvent('gamma:soft')
+    buildContinuumSuppression('gamma:soft')
+    applyCuts('gamma:soft', 'R2 < 0.5')
 
     fillParticleList('pi+:pi0', 'pt<0.5 and pt>0.05')
-    reconstructDecay('pi0:all -> gamma:all gamma:all', '0.125 < M < 0.14')
+    reconstructDecay('pi0:all -> gamma:soft gamma:soft', '0.125 < M < 0.14')
 
     Eta_Channels = ['pi+:pi0 pi-:pi0 pi0:all',
-                    'gamma:all gamma:all']
+                    'gamma:soft gamma:soft']
 
     HbList = []
     for chID, channel in enumerate(Eta_Channels):
@@ -84,16 +81,16 @@ def HbInclusiveList():
 
 def EtabInclusiveList():
     Etabcuts = 'mRecoil > 9 and mRecoil < 10'
-    fillParticleList('gamma:all', 'p<2')
-    fillParticleList('gamma:hb', 'useCMSFrame(p)>0.4 and useCMSFrame(p)<0.5')
+    cutAndCopyList('gamma:soft', 'gamma:loose', 'E<2')
+    cutAndCopyList('gamma:hb', 'gamma:loose', 'useCMSFrame(p)>0.4 and useCMSFrame(p)<0.5')
     buildRestOfEvent('gamma:hb')
     buildContinuumSuppression('gamma:hb')
     applyCuts('gamma:hb', 'R2 < 0.5')
 
     fillParticleList('pi+:pi0', 'pt<0.5 and pt>0.05')
-    reconstructDecay('pi0:all -> gamma:all gamma:all', '0.125 < M < 0.14')
+    reconstructDecay('pi0:all -> gamma:soft gamma:soft', '0.125 < M < 0.14')
     reconstructDecay('eta:3pi -> pi+:pi0 pi-:pi0 pi0:all', '0.53 < M < 0.56 and 9.85 < mRecoil < 9.9')
-    reconstructDecay('eta:gg -> gamma:all gamma:all', '0.53 < M < 0.56 and 9.85 < mRecoil < 9.92')
+    reconstructDecay('eta:gg -> gamma:soft gamma:soft', '0.53 < M < 0.56 and 9.85 < mRecoil < 9.92')
 
     EtabInclusive_Channels = ['eta:3pi gamma:hb',
                               'eta:gg gamma:hb']

@@ -92,14 +92,15 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
 
   //Switch to control sense wire sag
   addParam("CorrectForWireSag",   m_correctForWireSag,
-           "A switch for sense wire sag effect; true: drift-time is calculated with the sag taken into account; false: not", true);
+           "A switch for sense wire sag effect; true: drift-time is calculated with the sag taken into account; false: not. Here, sag means the perturbative part which corresponds to (mis)alignment in case of wire-position. The main part (corresponding to design+displacement in wire-position) is taken into account in FullSim; you can control it via CDCJobCntlParModifier.",
+           true);
 
   //TDC Threshold
   addParam("Threshold", m_tdcThreshold,
            "dEdx value for TDC Threshold in eV", 40.0);
   addParam("tMin", m_tMin, "Lower edge of time window in ns", -100.);
-  addParam("tMaxOuter", m_tMaxOuter, "Upper edge of time window in ns for the outer layers", 500.);
-  addParam("tMaxInner", m_tMaxInner, "Upper edge of time window in ns for the inner layers", 300.);
+  addParam("tMaxOuter", m_tMaxOuter, "Upper edge of time window in ns for the normal-cell layers", 500.);
+  addParam("tMaxInner", m_tMaxInner, "Upper edge of time window in ns for the small-cell layers", 300.);
   // The following doesn't make any sense. The only reasonable steerable would be a switch to decide if the jitter shall be
   // activated. Then there has to be event by event jitter.
   /*  addParam("EventTime",                   m_eventTime,

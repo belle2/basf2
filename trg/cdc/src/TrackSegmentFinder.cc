@@ -136,7 +136,8 @@ namespace Belle2 {
     const unsigned n = tss.size();
     for (unsigned i = 0; i < n; i++) {
       TCSegment& s = * tss[i];
-      s.simulate(trackSegmentClockSimulation, m_logicLUTFlag);
+      s.simulate(trackSegmentClockSimulation, m_logicLUTFlag,
+                 TRGCDC::getTRGCDC()->getCDCHitCollectionName());
       if (s.signal().active()) {
         TCSHit* th = new TCSHit(s);
         s.hit(th);

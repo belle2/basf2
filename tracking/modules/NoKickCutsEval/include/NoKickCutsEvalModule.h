@@ -97,15 +97,26 @@ namespace Belle2 {
 
 //This is the funcion that select the percentage that has to be cut away from
 // deltaPar distributions (function of momentum)
-    double cutFunction(int p, double pwidth)
+
+    //OLD CUTFUNCTION: NOT USED NOW (1/1000 ACCEPTED)
+    // double cutFunction(int p, double pwidth)
+    // {
+    //   double out;
+    //   double mom = p * pwidth;
+    //   if (mom > 0.04)
+    //     out = -7.5 * pow(10, -7) / pow(mom, 3.88) + 1;
+    //   else out = 6.3 * mom + 0.57;
+    //   return out;
+    // }
+
+    double cutFunction(int p, double pwid)
     {
       double out;
-      double mom = p * pwidth;
-      if (mom > 0.04)
-        out = -7.5 * pow(10, -7) / pow(mom, 3.88) + 1;
-      else out = 6.3 * mom + 0.57;
+      double mom = p * pwid + pmin;
+      out = -3.971 * pow(10, -7) / pow(mom, 3.373) + 1;
       return out;
     }
+
 
 
 
@@ -124,7 +135,7 @@ namespace Belle2 {
     const int nbint = 3;
     double pwidth = (pmax - pmin) / (double)nbinp;
     double twidth = (tmax - tmin) / (double)nbint;
-    const double ext_lim = 1;
+    const double ext_lim = 5;
     const int OVER = 9999999;
     int pCounter = 0;
     int tCounter = 0;

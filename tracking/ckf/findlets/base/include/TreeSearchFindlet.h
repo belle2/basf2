@@ -61,6 +61,8 @@ namespace Belle2 {
                                     "Do the advance step.", m_param_advance);
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "fit"), m_param_fit,
                                     "Do the fit step.", m_param_fit);
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useNResults"), m_param_useNResults,
+                                    "Do only use the best N results.", m_param_useNResults);
     }
 
     /// Main function of this findlet: traverse a tree starting from a given seed object.
@@ -188,7 +190,7 @@ namespace Belle2 {
 
       // TODO: THE SAME
       // Select only the N best if necessary (otherwise we do not have to sort at all).
-      if (childStates.size() > m_param_useNResults) {
+      if (m_param_useNResults > 0 and childStates.size() > m_param_useNResults) {
         std::sort(childStates.begin(), childStates.end());
         childStates.second = std::next(childStates.begin(), m_param_useNResults);
       }
@@ -218,7 +220,7 @@ namespace Belle2 {
 
       // TODO: THE SAME
       // Select only the N best if necessary (otherwise we do not have to sort at all).
-      if (childStates.size() > m_param_useNResults) {
+      if (m_param_useNResults > 0 and childStates.size() > m_param_useNResults) {
         std::sort(childStates.begin(), childStates.end());
         childStates.second = std::next(childStates.begin(), m_param_useNResults);
       }

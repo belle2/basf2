@@ -7,7 +7,7 @@
  *                                                                        *
  **************************************************************************/
 
-#include <trg/cdc/modules/houghtracking/CDCTriggerHoughtrackingModule.h>
+#include <trg/cdc/modules/houghtracking/CDCTrigger2DFinderModule.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -28,23 +28,26 @@ using namespace Belle2::CDC;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCTriggerHoughtracking)
+REG_MODULE(CDCTrigger2DFinder)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-CDCTriggerHoughtrackingModule::CDCTriggerHoughtrackingModule() : Module()
+CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module()
 {
   //Set module properties
   setDescription("Hough tracking algorithm for CDC trigger.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Define module parameters
-  addParam("outputCollection", m_outputCollectionName,
+  addParam("hitCollectionName", m_hitCollectionName,
+           "Name of the input StoreArray of CDCTriggerSegmentHits.",
+           string(""));
+  addParam("outputCollectionName", m_outputCollectionName,
            "Name of the StoreArray holding the tracks found in the Hough tracking.",
-           string("Trg2DFinderTracks"));
-  addParam("clusterCollection", m_clusterCollectionName,
+           string("TRGCDC2DFinderTracks"));
+  addParam("clusterCollectionName", m_clusterCollectionName,
            "Name of the StoreArray holding the clusters formed in the Hough plane.",
            string(""));
   addParam("nCellsPhi", m_nCellsPhi,
@@ -105,13 +108,13 @@ CDCTriggerHoughtrackingModule::CDCTriggerHoughtrackingModule() : Module()
 }
 
 void
-CDCTriggerHoughtrackingModule::initialize()
+CDCTrigger2DFinderModule::initialize()
 {
-  StoreArray<CDCTriggerSegmentHit>::required();
+  StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
   StoreArray<CDCTriggerTrack>::registerPersistent(m_outputCollectionName);
   StoreArray<CDCTriggerHoughCluster>::registerPersistent(m_clusterCollectionName);
 
-  StoreArray<CDCTriggerSegmentHit> segmentHits;
+  StoreArray<CDCTriggerSegmentHit> segmentHits(m_hitCollectionName);
   StoreArray<CDCTriggerTrack> tracks(m_outputCollectionName);
   StoreArray<CDCTriggerHoughCluster> clusters(m_clusterCollectionName);
 
@@ -139,9 +142,9 @@ CDCTriggerHoughtrackingModule::initialize()
 }
 
 void
-CDCTriggerHoughtrackingModule::event()
+CDCTrigger2DFinderModule::event()
 {
-  StoreArray<CDCTriggerSegmentHit> tsHits("CDCTriggerSegmentHits");
+  StoreArray<CDCTriggerSegmentHit> tsHits(m_hitCollectionName);
   StoreArray<CDCTriggerTrack> storeTracks(m_outputCollectionName);
 
   /* Clean hits */
@@ -228,7 +231,7 @@ CDCTriggerHoughtrackingModule::event()
       testFile << round(2 * ix) / 2. << " " << round(2 * iy) / 2. << " "
                << storeTracks[i]->getChargeSign() << endl;
       RelationVector<CDCTriggerSegmentHit> hits =
-        storeTracks[i]->getRelationsTo<CDCTriggerSegmentHit>();
+        storeTracks[i]->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
       testFile << hits.size() << endl;
       for (unsigned ihit = 0; ihit < hits.size(); ++ihit) {
         unsigned short iSL = hits[ihit]->getISuperLayer();
@@ -241,7 +244,7 @@ CDCTriggerHoughtrackingModule::event()
 }
 
 void
-CDCTriggerHoughtrackingModule::terminate()
+CDCTrigger2DFinderModule::terminate()
 {
   if (m_testFilename != "") testFile.close();
 }

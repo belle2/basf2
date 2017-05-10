@@ -1,19 +1,19 @@
-#ifndef CDCTRIGGERMCMATCHERMODULE_H
-#define CDCTRIGGERMCMATCHERMODULE_H
+#ifndef CDCTRIGGERRECOMATCHERMODULE_H
+#define CDCTRIGGERRECOMATCHERMODULE_H
 
 #include <framework/core/Module.h>
 
 namespace Belle2 {
 
-  /** A module to match CDCTriggerTracks to MCParticles.
+  /** A module to match CDCTriggerTracks to RecoTracks.
    */
-  class CDCTriggerMCMatcherModule : public Module {
+  class CDCTriggerRecoMatcherModule : public Module {
   public:
     /** Constructor, for setting module description and parameters. */
-    CDCTriggerMCMatcherModule();
+    CDCTriggerRecoMatcherModule();
 
     /** Destructor. */
-    virtual ~CDCTriggerMCMatcherModule() {}
+    virtual ~CDCTriggerRecoMatcherModule() {}
 
     /** Initialize the module. */
     virtual void initialize();
@@ -22,26 +22,18 @@ namespace Belle2 {
     virtual void event();
 
   protected:
-    /** Name of the MCParticle StoreArray to be matched */
-    std::string m_MCParticleCollectionName;
+    /** Name of the RecoTrack StoreArray to be matched */
+    std::string m_RecoTrackCollectionName;
     /** Name of the CDCTriggerTrack Store Array to be matched */
     std::string m_TrgTrackCollectionName;
-    /** Name of a new StoreArray holding MCParticles considered as trackable */
-    std::string m_MCTrackableCollectionName;
     /** Name of the StoreArray containing the hits that are used for the matching. */
     std::string m_hitCollectionName;
-    /** minimum number of axial hits to consider a MCParticle as trackable */
-    int m_minAxial;
-    /** minimum number of stereo hits to consider a MCParticle as trackable */
-    int m_minStereo;
     /** switch for 2D matching */
     bool m_axialOnly;
     /** minimum purity */
     double m_minPurity;
     /** minimum efficiency */
     double m_minEfficiency;
-    /** switch for ignoring secondary particles */
-    bool m_onlyPrimaries;
     /** switch for creating relations for clones and merged tracks */
     bool m_relateClonesAndMerged;
   };

@@ -1,8 +1,10 @@
-#include "trg/cdc/modules/neurotrigger/NeuroTriggerModule.h"
+#include "trg/cdc/modules/neurotrigger/CDCTriggerNeuroModule.h"
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <framework/dataobjects/EventT0.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/gearbox/Const.h>
@@ -14,9 +16,9 @@ using namespace std;
 
 //this line registers the module with the framework and actually makes it available
 //in steering files or the the module list (basf2 -m).
-REG_MODULE(NeuroTrigger)
+REG_MODULE(CDCTriggerNeuro)
 
-NeuroTriggerModule::NeuroTriggerModule() : Module()
+CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
 {
   setDescription(
     "The NeuroTrigger module of the CDC trigger.\n"
@@ -33,12 +35,18 @@ NeuroTriggerModule::NeuroTriggerModule() : Module()
            "Name of the TObjArray holding the NeuroTrigger parameters "
            "(compare NeuroTriggerTrainer).",
            string("MLPs"));
-  addParam("inputCollection", m_inputCollectionName,
+  addParam("hitCollectionName", m_hitCollectionName,
+           "Name of the input StoreArray of CDCTriggerSegmentHits.",
+           string(""));
+  addParam("EventTimeName", m_EventTimeName,
+           "Name of the event time object.",
+           string(""));
+  addParam("inputCollectionName", m_inputCollectionName,
            "Name of the StoreArray holding the 2D input tracks.",
-           string("Trg2DFinderTracks"));
-  addParam("outputCollection", m_outputCollectionName,
+           string("TRGCDC2DFinderTracks"));
+  addParam("outputCollectionName", m_outputCollectionName,
            "Name of the StoreArray holding the output tracks with neural network estimates.",
-           string("TrgNNTracks"));
+           string("TRGCDCNeuroTracks"));
   addParam("fixedPoint", m_fixedPoint,
            "Switch to turn on fixed point arithmetic for FPGA simulation.",
            false);
@@ -50,10 +58,11 @@ NeuroTriggerModule::NeuroTriggerModule() : Module()
 
 
 void
-NeuroTriggerModule::initialize()
+CDCTriggerNeuroModule::initialize()
 {
-  StoreArray<CDCTriggerSegmentHit>::required();
+  StoreArray<CDCTriggerSegmentHit>::required(m_hitCollectionName);
   StoreArray<CDCTriggerTrack>::required(m_inputCollectionName);
+  StoreObjPtr<EventT0>::required(m_EventTimeName);
   if (!m_NeuroTrigger.load(m_filename, m_arrayname))
     B2ERROR("NeuroTrigger could not be loaded correctly.");
   StoreArray<CDCTriggerTrack>::registerPersistent(m_outputCollectionName);
@@ -61,21 +70,22 @@ NeuroTriggerModule::initialize()
   StoreArray<CDCTriggerTrack> tracks2D(m_inputCollectionName);
   StoreArray<CDCTriggerTrack> tracksNN(m_outputCollectionName);
   tracks2D.registerRelationTo(tracksNN);
-  StoreArray<CDCTriggerSegmentHit> segmentHits;
+  StoreArray<CDCTriggerSegmentHit> segmentHits(m_hitCollectionName);
   tracksNN.registerRelationTo(segmentHits);
 
   if (m_fixedPoint) {
     m_NeuroTrigger.setPrecision(m_precision);
   }
+  m_NeuroTrigger.setCollectionNames(m_hitCollectionName, m_EventTimeName);
 }
 
 
 void
-NeuroTriggerModule::event()
+CDCTriggerNeuroModule::event()
 {
   StoreArray<CDCTriggerTrack> tracks2D(m_inputCollectionName);
   StoreArray<CDCTriggerTrack> tracksNN(m_outputCollectionName);
-  StoreArray<CDCTriggerSegmentHit> segmentHits;
+  StoreArray<CDCTriggerSegmentHit> segmentHits(m_hitCollectionName);
   for (int itrack = 0; itrack < tracks2D.getEntries(); ++itrack) {
     if (m_fixedPoint) {
       m_NeuroTrigger.updateTrackFix(*tracks2D[itrack]);
@@ -106,8 +116,6 @@ NeuroTriggerModule::event()
       for (unsigned i = 0; i < hitIds.size(); ++i) {
         NNtrack->addRelationTo(segmentHits[hitIds[i]]);
       }
-    } else {
-      B2WARNING("No MLP trained for this track.");
     }
   }
 }

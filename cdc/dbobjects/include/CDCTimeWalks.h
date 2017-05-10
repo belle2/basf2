@@ -101,7 +101,10 @@ namespace Belle2 {
     /// Set global parameter
     void setGlobalParam(double value, unsigned short element, unsigned short)
     {
-      setTimeWalkParam(element, value);
+      // TODO: this does not allow updates
+      //setTimeWalkParam(element, value);
+      // directly access the map
+      m_tws[element] = value;
     }
     /// list stored global parameters
     std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()

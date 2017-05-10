@@ -18,7 +18,7 @@
 #include <tracking/trackFindingCDC/utilities/SortedVectorRange.h>
 
 namespace Belle2 {
-  template<class AStateObject, class AFilter>
+  template<class AStateObject, class AFilter, class AnAdvanceAlgorithm, class AFitterAlgorithm>
   class TreeSearchFindlet : public TrackFindingCDC::Findlet <
     typename AStateObject::SeedObject*,
     const typename AStateObject::HitObject*,
@@ -39,6 +39,8 @@ namespace Belle2 {
       Super::addProcessingSignalListener(&m_firstFilter);
       Super::addProcessingSignalListener(&m_secondFilter);
       Super::addProcessingSignalListener(&m_thirdFilter);
+      Super::addProcessingSignalListener(&m_advanceAlgorithm);
+      Super::addProcessingSignalListener(&m_fitterAlgorithm);
     }
 
     /// Expose the parameters of the two filters and the makeHitJumpsPossible parameter
@@ -49,6 +51,9 @@ namespace Belle2 {
       m_firstFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "first"));
       m_secondFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "second"));
       m_thirdFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "third"));
+
+      m_advanceAlgorithm.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "advance"));
+      m_fitterAlgorithm.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "fitter"));
 
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "makeHitJumpingPossible"), m_param_makeHitJumpingPossible,
                                     "", m_param_makeHitJumpingPossible);
@@ -77,18 +82,15 @@ namespace Belle2 {
     /// Overloadable function to return the possible range of next hit objects for a given state
     virtual TrackFindingCDC::SortedVectorRange<HitPtr> getMatchingHits(StateObject& currentState) = 0;
 
-    virtual TrackFindingCDC::Weight advance(StateObject& currentState) = 0;
-
-    virtual TrackFindingCDC::Weight fit(StateObject& currentState) = 0;
-
     virtual void initializeEventCache(std::vector<SeedPtr>& seedsVector, std::vector<HitPtr>& hitVector) { }
 
     virtual void initializeSeedCache(SeedPtr seed) { }
 
   private:
-    /// Object cache for states
+    /// Object pool for states
     StateArray m_states{};
 
+    /// Temporary object pool for finding the next state
     std::array < std::vector<StateObject>, StateObject::N + 1 > m_temporaryStates;
 
     /// Parameter: make hit jumps possible
@@ -101,7 +103,7 @@ namespace Belle2 {
     bool m_param_fit = true;
 
     /// Parameter:
-    unsigned int m_param_useNResults = 10;
+    unsigned int m_param_useNResults = 5;
 
     /// Subfindlet: Filter 1
     AFilter m_firstFilter;
@@ -109,6 +111,10 @@ namespace Belle2 {
     AFilter m_secondFilter;
     /// Subfindlet: Filter 3
     AFilter m_thirdFilter;
+    /// Subfindlet: Advancer
+    AnAdvanceAlgorithm m_advanceAlgorithm;
+    /// Subfindlet: Fitter
+    AFitterAlgorithm m_fitterAlgorithm;
 
     /// Implementation of the traverseTree function
     void traverseTree(StateIterator currentState, std::vector<ResultPair>& resultsVector)
@@ -120,18 +126,21 @@ namespace Belle2 {
         return;
       }
 
+      // TODO: factor this out into another findlet
       // Filter and apply the advance & fit functions
       auto childStates = filterFromHits(*currentState, m_firstFilter);
 
       if (m_param_advance) {
-        //applyAndFilter(childStates, advance);
+        applyAndFilter(childStates, m_advanceAlgorithm);
       }
 
       applyAndFilter(childStates, m_secondFilter);
 
       if (m_param_fit) {
-        //applyAndFilter(childStates, &(this->fit));
+        applyAndFilter(childStates, m_fitterAlgorithm);
       }
+
+      applyAndFilter(childStates, m_thirdFilter);
 
       if (childStates.empty()) {
         resultsVector.emplace_back(currentState->finalize());
@@ -146,7 +155,8 @@ namespace Belle2 {
     }
 
     // This method does more or less the same as the one below -> can this be combined?
-    TrackFindingCDC::VectorRange<StateObject> filterFromHits(StateObject& parentState, AFilter& filter)
+    template <class APredicate>
+    TrackFindingCDC::VectorRange<StateObject> filterFromHits(StateObject& parentState, APredicate& predicate)
     {
       const auto& matchingHits = getMatchingHits(parentState);
       auto& temporaryStates = m_temporaryStates[parentState.getNumber()];
@@ -156,7 +166,7 @@ namespace Belle2 {
       auto lastFiniteState = temporaryStates.begin();
       for (const auto& hit : matchingHits) {
         lastFiniteState->set(&parentState, hit);
-        TrackFindingCDC::Weight weight = filter(*lastFiniteState);
+        TrackFindingCDC::Weight weight = predicate(*lastFiniteState);
 
         if (not std::isnan(weight)) {
           lastFiniteState->setWeight(weight);
@@ -166,7 +176,7 @@ namespace Belle2 {
 
       if (m_param_makeHitJumpingPossible) {
         lastFiniteState->set(&parentState, nullptr);
-        TrackFindingCDC::Weight weight = filter(*lastFiniteState);
+        TrackFindingCDC::Weight weight = predicate(*lastFiniteState);
 
         if (not std::isnan(weight)) {
           lastFiniteState->setWeight(weight);

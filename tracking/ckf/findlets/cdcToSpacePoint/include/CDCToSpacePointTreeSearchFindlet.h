@@ -12,6 +12,8 @@
 #include <tracking/ckf/findlets/base/TreeSearchFindlet.h>
 #include <tracking/ckf/filters/base/LayerToggledFilter.h>
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCTrackSpacePointCombinationFilterFactory.h>
+#include <tracking/ckf/findlets/cdcToSpacePoint/SpacePointAdvanceAlgorithm.h>
+#include <tracking/ckf/findlets/cdcToSpacePoint/SpacePointKalmanUpdateFitter.h>
 #include <tracking/ckf/states/CKFCDCToVXDStateObject.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
@@ -20,11 +22,17 @@
 #include <genfit/MaterialEffects.h>
 
 namespace Belle2 {
-  class CDCToSpacePointTreeSearchFindlet : public TreeSearchFindlet<CKFCDCToVXDStateObject,
-    LayerToggledFilter<CDCTrackSpacePointCombinationFilterFactory>> {
+  class CDCToSpacePointTreeSearchFindlet : public TreeSearchFindlet <
+    CKFCDCToVXDStateObject,
+    LayerToggledFilter<CDCTrackSpacePointCombinationFilterFactory>,
+    SpacePointAdvanceAlgorithm,
+    SpacePointKalmanUpdateFitter > {
   public:
-    using Super = TreeSearchFindlet<CKFCDCToVXDStateObject,
-          LayerToggledFilter<CDCTrackSpacePointCombinationFilterFactory >>;
+    using Super = TreeSearchFindlet <
+                  CKFCDCToVXDStateObject,
+                  LayerToggledFilter<CDCTrackSpacePointCombinationFilterFactory>,
+                  SpacePointAdvanceAlgorithm,
+                  SpacePointKalmanUpdateFitter >;
 
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
@@ -38,17 +46,14 @@ namespace Belle2 {
   private:
     TrackFindingCDC::SortedVectorRange<const SpacePoint*> getMatchingHits(Super::StateObject& currentState) final;
 
-    TrackFindingCDC::Weight fit(Super::StateObject& currentState) final;
-
-    TrackFindingCDC::Weight advance(Super::StateObject& currentState) final;
-
     void initializeEventCache(std::vector<RecoTrack*>& seedsVector, std::vector<const SpacePoint*>& filteredHitVector) final;
 
   private:
-    /// Cache for sorted hits
-    std::map<unsigned int, TrackFindingCDC::SortedVectorRange<const SpacePoint*>> m_cachedHitMap;
     /// Parameter: use material effects
     bool m_param_useMaterialEffects = true;
+
+    /// Cache for sorted hits
+    std::map<unsigned int, TrackFindingCDC::SortedVectorRange<const SpacePoint*>> m_cachedHitMap;
 
     std::vector<unsigned int> m_maximumLadderNumbers = {8, 12, 7, 10, 12, 16};
   };

@@ -130,19 +130,19 @@ namespace Belle2 {
 
       // TODO: factor this out into another findlet
       // Filter and apply the advance & fit functions
-      auto childStates = filterFromHits(*currentState, m_firstFilter);
+      auto childStates = filterFromHits(*currentState, m_firstFilter, 2 * m_param_useNResults);
 
       if (m_param_advance) {
-        applyAndFilter(childStates, m_advanceAlgorithm);
+        applyAndFilter(childStates, m_advanceAlgorithm, 0);
       }
 
-      applyAndFilter(childStates, m_secondFilter);
+      applyAndFilter(childStates, m_secondFilter, m_param_useNResults);
 
       if (m_param_fit) {
-        applyAndFilter(childStates, m_fitterAlgorithm);
+        applyAndFilter(childStates, m_fitterAlgorithm, 0);
       }
 
-      applyAndFilter(childStates, m_thirdFilter);
+      applyAndFilter(childStates, m_thirdFilter, m_param_useNResults);
 
       if (childStates.empty()) {
         resultsVector.emplace_back(currentState->finalize());
@@ -158,7 +158,7 @@ namespace Belle2 {
 
     // This method does more or less the same as the one below -> can this be combined?
     template <class APredicate>
-    TrackFindingCDC::VectorRange<StateObject> filterFromHits(StateObject& parentState, APredicate& predicate)
+    TrackFindingCDC::VectorRange<StateObject> filterFromHits(StateObject& parentState, APredicate& predicate, unsigned int useNResults)
     {
       const auto& matchingHits = getMatchingHits(parentState);
       auto& temporaryStates = m_temporaryStates[parentState.getNumber()];
@@ -190,7 +190,7 @@ namespace Belle2 {
 
       // TODO: THE SAME
       // Select only the N best if necessary (otherwise we do not have to sort at all).
-      if (m_param_useNResults > 0 and childStates.size() > m_param_useNResults) {
+      if (useNResults > 0 and childStates.size() > useNResults) {
         std::sort(childStates.begin(), childStates.end());
         childStates.second = std::next(childStates.begin(), m_param_useNResults);
       }
@@ -199,7 +199,7 @@ namespace Belle2 {
     }
 
     template <class APredicate>
-    void applyAndFilter(TrackFindingCDC::VectorRange<StateObject>& childStates, APredicate& predicate)
+    void applyAndFilter(TrackFindingCDC::VectorRange<StateObject>& childStates, APredicate& predicate, unsigned int useNResults)
     {
       if (childStates.empty()) {
         return;
@@ -220,7 +220,7 @@ namespace Belle2 {
 
       // TODO: THE SAME
       // Select only the N best if necessary (otherwise we do not have to sort at all).
-      if (m_param_useNResults > 0 and childStates.size() > m_param_useNResults) {
+      if (useNResults > 0 and childStates.size() > useNResults) {
         std::sort(childStates.begin(), childStates.end());
         childStates.second = std::next(childStates.begin(), m_param_useNResults);
       }

@@ -55,10 +55,10 @@ namespace Belle2 {
     public:
       /**
        *  Function to evaluate the object.
-       *  Base implementation rejects all objects.
+       *  Base implementation accepts all objects.
        *
        *  @param obj The object to be accepted or rejected.
-       *  @return    A finit float value if the object is accepted.
+       *  @return    A finite float value if the object is accepted.
        *             NAN if the object is rejected.
        */
       virtual Weight operator()(const Object& obj __attribute__((unused)))
@@ -68,7 +68,7 @@ namespace Belle2 {
 
       /**
        *  Function to evaluate the object.
-       *  Base implementation rejects all objects.
+       *  Base implementation accepts all objects, except nullptr.
        *
        *  @param obj The object to be accepted or rejected.
        *  @return    A finit float value if the object is accepted.

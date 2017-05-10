@@ -84,17 +84,15 @@ namespace Belle2 {
           case 3:
             out = hit1.getZ0Entry() - hit2.getZ0Entry();
             if (is0) out = hit1.getZ00() - hit2.getZ0Entry();
-
             break;
 
           case 4:
             out = hit1.getTanLambdaEntry() - hit2.getTanLambdaEntry();
             if (is0) out = hit1.getTanLambda0() - hit2.getTanLambdaEntry();
-
             break;
         }
-        return out;
-      } else return out;
+      }
+      return out;
     }
 
 //This is the funcion that select the percentage that has to be cut away from
@@ -115,19 +113,19 @@ namespace Belle2 {
 
   private:
 
-    double pmin = 0.025;
-    double pmax = 1.;
-    double tmin = 17.*M_PI / 180.; //17 degrees
-    double tmax = 5. / 6.*M_PI; //150 degrees
-    int nbin = 5000;
-    int nbinp = 20;
-    int nbinpar = 5;
-    int nbinlay = 7;//present IP too
-    int nbint = 3;
+    const double pmin = 0.025;
+    const double pmax = 1.;
+    const double tmin = 17.*M_PI / 180.; //17 degrees
+    const double tmax = 5. / 6.*M_PI; //150 degrees
+    const int nbin = 5000;
+    const int nbinp = 20;
+    const int nbinpar = 5;
+    const int nbinlay = 7;//present IP too
+    const int nbint = 3;
     double pwidth = (pmax - pmin) / (double)nbinp;
     double twidth = (tmax - tmin) / (double)nbint;
-    double ext_lim = 1;
-    int OVER = 9999999;
+    const double ext_lim = 1;
+    const int OVER = 9999999;
     int pCounter = 0;
     int tCounter = 0;
     bool validationON = 0;

@@ -63,11 +63,17 @@ NoKickCutsEvalModule::~NoKickCutsEvalModule()
 void NoKickCutsEvalModule::initialize()
 {
 
+  // lim_temp.push_back(0.0003 * ext_lim);
+  // lim_temp.push_back(0.3 * ext_lim);
+  // lim_temp.push_back(0.05 * ext_lim);
+  // lim_temp.push_back(0.2 * ext_lim);
+  // lim_temp.push_back(0.5 * 0.3 * ext_lim);
   lim_temp.push_back(0.0003 * ext_lim);
-  lim_temp.push_back(0.3 * ext_lim);
-  lim_temp.push_back(0.05 * ext_lim);
+  lim_temp.push_back(1. * ext_lim);
   lim_temp.push_back(0.2 * ext_lim);
-  lim_temp.push_back(0.5 * 0.3 * ext_lim);
+  lim_temp.push_back(1. * ext_lim);
+  lim_temp.push_back(0.2 * ext_lim);
+
 
   for (int par = 0; par < nbinpar; par++) {
     std::vector<std::vector<std::vector<std::vector<TH1F*>>>> histo_par;

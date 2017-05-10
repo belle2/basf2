@@ -33,7 +33,7 @@ bool CDCTrackSpacePointCombinationVarSet::extract(const BaseCDCTrackSpacePointCo
     return false;
   }
 
-  const auto& firstMeasurement = result->getMeasuredStateOnPlane();
+  const auto& firstMeasurement = result->getMeasuredStateOnPlaneSavely();
   Vector3D position = Vector3D(firstMeasurement.getPos());
   Vector3D momentum = Vector3D(firstMeasurement.getMom());
 

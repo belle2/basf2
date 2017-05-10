@@ -150,9 +150,22 @@ namespace Belle2 {
       m_measuredStateOnPlane = mSoP;
     }
 
-    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlane() const
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneSavely() const
     {
-      return m_measuredStateOnPlane;
+      if (isAdvanced() and m_hitObject) {
+        return m_measuredStateOnPlane;
+      } else {
+        return getMeasuredStateOnPlaneFromParent();
+      }
+    }
+
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromParent() const
+    {
+      if (getParent()) {
+        return getParent()->getMeasuredStateOnPlaneSavely();
+      } else {
+        return getSeedRecoTrack()->getMeasuredStateOnPlaneFromFirstHit();
+      }
     }
 
     // State control

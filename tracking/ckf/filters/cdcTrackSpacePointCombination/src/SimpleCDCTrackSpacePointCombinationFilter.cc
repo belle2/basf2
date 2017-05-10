@@ -21,21 +21,21 @@ using namespace TrackFindingCDC;
 void SimpleCDCTrackSpacePointCombinationFilter::exposeParameters(ModuleParamList* moduleParamList,
     const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumXYDistance"),
-                                m_param_maximumXYDistance, "", m_param_maximumXYDistance);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumDistance"),
-                                m_param_maximumDistance, "", m_param_maximumDistance);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumChi2Difference"),
-                                m_param_maximumChi2Difference, "", m_param_maximumChi2Difference);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHelixChi2XYZ"),
+                                m_param_maximumHelixChi2XYZ, "", m_param_maximumHelixChi2XYZ);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumChi2XY"),
+                                m_param_maximumChi2XY, "", m_param_maximumChi2XY);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumChi2"),
+                                m_param_maximumChi2, "", m_param_maximumChi2);
 }
 
 void SimpleCDCTrackSpacePointCombinationFilter::initialize()
 {
   BaseCDCTrackSpacePointCombinationFilter::initialize();
 
-  B2ASSERT("You need to provide exactly 4 maximal norms (for four layers).", m_param_maximumXYDistance.size() == 4);
-  B2ASSERT("You need to provide exactly 4 maximal norms (for four layers).", m_param_maximumDistance.size() == 4);
-  B2ASSERT("You need to provide exactly 4 maximal norms (for four layers).", m_param_maximumChi2Difference.size() == 4);
+  B2ASSERT("You need to provide exactly 4 maximal norms (for four layers).", m_param_maximumHelixChi2XYZ.size() == 4);
+  B2ASSERT("You need to provide exactly 4 maximal norms (for four layers).", m_param_maximumChi2XY.size() == 4);
+  B2ASSERT("You need to provide exactly 4 maximal norms (for four layers).", m_param_maximumChi2.size() == 4);
 }
 
 Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackSpacePointCombinationFilter::Object& currentState)
@@ -58,7 +58,6 @@ Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackS
 
   Vector3D position = TrackFindingCDC::Vector3D(mSoP.getPos());
   Vector3D momentum = TrackFindingCDC::Vector3D(mSoP.getMom());
-  // TODO: Cache this also
   Vector3D hitPosition = TrackFindingCDC::Vector3D(spacePoint->getPosition());
 
   const double& sameHemisphere = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
@@ -76,25 +75,36 @@ Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackS
   const auto& trackPositionAtHitZ = trajectory.getTrajectorySZ().mapSToZ(arcLength);
 
   Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
-  Vector3D difference = trackPositionAtHit - hitPosition;
+  Vector3D differenceHelix = trackPositionAtHit - hitPosition;
+  Vector3D difference = position - hitPosition;
+
+  const TMatrixDSym& cov6D = mSoP.get6DCov();
 
   if (not currentState.isFitted() and not currentState.isAdvanced()) {
-    const double& xy_distance = difference.xy().norm();
-    if (xy_distance > m_param_maximumXYDistance[layer - 3]) {
+    // Filter 1
+    // TODO: this is wrong!
+    const double& helix_chi2_xyz = (differenceHelix.x() * differenceHelix.x() / sqrt(cov6D(0, 0)) +
+                                    differenceHelix.y() * differenceHelix.y() / sqrt(cov6D(1, 1)) +
+                                    differenceHelix.z() * differenceHelix.z() / sqrt(cov6D(2, 2)));
+    if (helix_chi2_xyz > m_param_maximumHelixChi2XYZ[layer - 3]) {
       return std::nan("");
     } else {
-      return xy_distance;
+      return helix_chi2_xyz;
     }
   } else if (not currentState.isFitted()) {
-    const double& distance = difference.norm();
-    if (distance > m_param_maximumDistance[layer - 3]) {
+    // Filter 2
+    const double& chi2_xy = (difference.x() * difference.x() / sqrt(cov6D(0, 0)) +
+                             difference.y() * difference.y() / sqrt(cov6D(1, 1)));
+    const double& chi2_xyz = chi2_xy + difference.z() * difference.z() / sqrt(cov6D(2, 2));
+    if (chi2_xy > m_param_maximumChi2XY[layer - 3]) {
       return std::nan("");
     } else {
-      return distance;
+      return chi2_xyz;
     }
   } else {
+    // Filter 3
     const double& chi2 = currentState.getChi2();
-    if (chi2 > m_param_maximumChi2Difference[layer - 3]) {
+    if (chi2 > m_param_maximumChi2[layer - 3]) {
       return std::nan("");
     } else {
       return chi2;

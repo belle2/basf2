@@ -24,8 +24,8 @@ namespace Belle2 {
     TrackFindingCDC::Weight operator()(const BaseCDCTrackSpacePointCombinationFilter::Object& currentState) final;
 
   private:
-    std::vector<double> m_param_maximumXYDistance {10, 10, 10, 10};
-    std::vector<double> m_param_maximumDistance {20, 20, 20, 20};
-    std::vector<double> m_param_maximumChi2Difference {100, 100, 100, 100};
+    std::vector<double> m_param_maximumHelixChi2XYZ {10000, 10000, 10000, 10000};
+    std::vector<double> m_param_maximumChi2XY {100, 100, 100, 100};
+    std::vector<double> m_param_maximumChi2 {10000, 10000, 10000, 10000};
   };
 }

@@ -82,18 +82,22 @@ Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackS
     const double& xy_distance = difference.xy().norm();
     if (xy_distance > m_param_maximumXYDistance[layer - 3]) {
       return std::nan("");
+    } else {
+      return xy_distance;
     }
   } else if (not currentState.isFitted()) {
     const double& distance = difference.norm();
     if (distance > m_param_maximumDistance[layer - 3]) {
       return std::nan("");
+    } else {
+      return distance;
     }
   } else {
     const double& chi2 = currentState.getChi2();
     if (chi2 > m_param_maximumChi2Difference[layer - 3]) {
       return std::nan("");
+    } else {
+      return chi2;
     }
   }
-
-  return 1;
 }

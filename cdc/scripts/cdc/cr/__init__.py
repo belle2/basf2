@@ -85,7 +85,7 @@ def set_cdc_cr_parameters(period):
     globalPhi = globalPhiRotation[period]
 
 
-def add_cdc_cr_simulation(path, empty_path):
+def add_cdc_cr_simulation(path, empty_path, topInCounter=True):
     """
     Add CDC CR simulation.
 
@@ -118,7 +118,7 @@ def add_cdc_cr_simulation(path, empty_path):
                           yOfCounter=triggerPos[1],
                           zOfCounter=triggerPos[2],
                           phiOfCounter=0.,
-                          TOP=True,
+                          TOP=topInCounter,
                           propSpeed=lightPropSpeed,
                           TOF=1,
                           cryGenerator=True

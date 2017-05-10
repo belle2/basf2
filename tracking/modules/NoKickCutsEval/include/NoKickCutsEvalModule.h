@@ -123,7 +123,7 @@ namespace Belle2 {
     int nbinp = 20;
     int nbinpar = 5;
     int nbinlay = 7;//present IP too
-    int nbint = 5;
+    int nbint = 3;
     double pwidth = (pmax - pmin) / (double)nbinp;
     double twidth = (tmax - tmin) / (double)nbint;
     double ext_lim = 1;

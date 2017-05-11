@@ -241,7 +241,7 @@ void NoKickCutsEvalModule::endRun()
               bin_M--;
               sum_M = sum_M + histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(bin_M);
             }
-            if (histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetEntries() < 1000) {
+            if (histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetEntries() < 100) {
               bin_m = 0;
               bin_M = nbin + 1;
             }

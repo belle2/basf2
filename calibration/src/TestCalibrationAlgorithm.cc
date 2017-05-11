@@ -2,6 +2,10 @@
 
 #include <TProfile.h>
 #include <TRandom.h>
+#include <TClonesArray.h>
+#include <calibration/dbobjects/TestCalibObject.h>
+#include <calibration/dbobjects/TestCalibMean.h>
+
 
 using namespace std;
 using namespace Belle2;
@@ -20,6 +24,7 @@ TestCalibrationAlgorithm::TestCalibrationAlgorithm(): CalibrationAlgorithm("CaTe
 
 CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
 {
+  // Pulling in data from collector output
   auto& histogram1 = getObject<TH1F>("histogram1");
   auto& ttree = getObject<TTree>("tree");
   auto& mille = getObject<MilleData>("test_mille");
@@ -33,13 +38,23 @@ CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
   if (meanerror <= 0.)
     return c_Failure;
 
-  static int nameDistinguisher(0);
-  TH1I* correction = new TH1I(TString(string("constant-in-histo") + to_string(nameDistinguisher)),
-                              "Histogram should have one entry at mean value of calibration test histo", 100, 0, 100);
-  nameDistinguisher++;
-  correction->Fill((int)mean);
+  // Example of saving a DBObject. In this case it is a DBObject derived from TH1I
+  string mean_name = "TestCalibMean_";
+  static int nameDistinguisher(0);  // ROOT's habit of holding onto object references forever.
+  mean_name += to_string(nameDistinguisher);
 
-  saveCalibration(correction, getPrefix());
+  TestCalibMean* correction = new TestCalibMean(mean_name, mean);  // Not really certain whose job it is to delete this...
+  saveCalibration(correction, "TestCalibMean");
+  nameDistinguisher++;
+
+  // Example of using a Belle2 DBArray of DBObjects defined in the dbobjects directory
+  TClonesArray* exampleDBArrayConstants = new TClonesArray("Belle2::TestCalibObject", 2);
+  float val = 0.0;
+  for (int i = 0; i < 2; i++) {
+    val += 1.0;
+    new((*exampleDBArrayConstants)[i]) TestCalibObject(val);
+  }
+  saveCalibration(exampleDBArrayConstants, "TestCalibObjects");
 
   // Iterate until we find answer to the most fundamental question...
   B2INFO("mean: " << mean);

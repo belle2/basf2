@@ -205,3 +205,29 @@ TMatrixFSym RotationFrame::getVertexErrorMatrix(const TMatrixFSym& matrix) const
   TMatrixFSym tmp_matrix(matrix);
   return tmp_matrix.Similarity(rotmatrix);
 }
+
+CMSRotationFrame::CMSRotationFrame(const TVector3& newX, const TVector3& newY, const TVector3& newZ) :
+  rotationframe(newX, newY, newZ)
+{
+
+}
+
+TVector3 CMSRotationFrame::getVertex(const TVector3& vector) const
+{
+  return rotationframe.getVertex(cmsframe.getVertex(vector));
+}
+
+TLorentzVector CMSRotationFrame::getMomentum(const TLorentzVector& vector) const
+{
+  return rotationframe.getMomentum(cmsframe.getMomentum(vector));
+}
+
+TMatrixFSym CMSRotationFrame::getMomentumErrorMatrix(const TMatrixFSym& matrix) const
+{
+  return rotationframe.getMomentumErrorMatrix(cmsframe.getMomentumErrorMatrix(matrix));
+}
+
+TMatrixFSym CMSRotationFrame::getVertexErrorMatrix(const TMatrixFSym& matrix) const
+{
+  return rotationframe.getVertexErrorMatrix(cmsframe.getVertexErrorMatrix(matrix));
+}

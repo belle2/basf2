@@ -280,6 +280,51 @@ namespace Belle2 {
     TRotation m_rotation; /**< Rotation */
   };
 
+  /**
+   * Stack frame for cms and Rotation frame
+   */
+  class CMSRotationFrame : public ReferenceFrame {
+
+  public:
+    /**
+     * Create new rotation frame
+     */
+    explicit CMSRotationFrame(const TVector3& newX, const TVector3& newY, const TVector3& newZ);
+
+    /**
+     * Get vertex 3-vector in rotation frame
+     * @param 3-vector from particle
+     * @return 3-vector in rotation frame
+     */
+    virtual TVector3 getVertex(const TVector3& vector) const;
+
+    /**
+     * Get Lorentz vector in rotation frame
+     * @param Lorentz vector from particle
+     * @return Lorentz vector in rotation frame
+     */
+    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const;
+
+    /**
+     * Get Momentum error matrix in rotation frame
+     * @param Covariance matrix from particle
+     * @return Covariance matrix in rotation frame
+     */
+    virtual TMatrixFSym getMomentumErrorMatrix(const TMatrixFSym& matrix) const;
+
+    /**
+     * Get Vertex error matrix in rotation frame
+     * @param Covariance matrix from particle
+     * @return Covariance matrix in rotation frame
+     */
+    virtual TMatrixFSym getVertexErrorMatrix(const TMatrixFSym& matrix) const;
+
+  private:
+    CMSFrame cmsframe; /**< CMSFrame*/
+    RotationFrame rotationframe; /**< Rotationframe*/
+
+  };
+
   template<class T>
   class UseReferenceFrame {
   public:

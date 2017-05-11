@@ -156,11 +156,17 @@ class WaveformDumper(Module):
                 wf_display(waveform, run, event, "windowOrder")
                 self.plotCounter += 1
             wf = np.array(waveform.getWaveform())
+            if False:
+                wf_display(waveform, run, event, "general")
+                self.plotCounter += 1
             indexes = peakutils.indexes(wf, thres=0.5, min_dist=20)
             rawDigits = waveform.getRelationsWith("TOPRawDigits")
             nPyPeaks = len(indexes)
             if len(rawDigits) != 1:
                 print("Warning: #TOPRawDigits is not 1, but", len(rawDigits))
+            if True and nPyPeaks > 3:
+                wf_display(waveform, run, event, "tooManyPeaks")
+                self.plotCounter += 1
             raw = rawDigits[0]
             fePeakHt = raw.getValuePeak()
             fePeakTDC = raw.getSamplePeak()
@@ -170,18 +176,18 @@ class WaveformDumper(Module):
             idx = np.argsort(wf[indexes])
             pyPeak0Ht = -1
             pyPeak0TDC = -1
-            if nPyPeaks > 2 and 0 == 1:
+            if False and nPyPeaks > 2:
                 wf_display(waveform, run, event, "manyPeaks")
                 self.plotCounter += 1
             elif nPyPeaks > 0:
                 pyPeak0Ht = wf[indexes][idx[-1]]
                 pyPeak0TDC = indexes[idx[-1]]
                 assert pyPeak0Ht == wf[pyPeak0TDC]
-            if pyPeak0Ht != fePeakHt and 0 == 1:
+            if False and pyPeak0Ht != fePeakHt:
                 print(pyPeak0Ht, fePeakHt)
                 wf_display(waveform, run, event, "notHighest")
                 self.plotCounter += 1
-            if 0 < pyPeak0TDC < 65 and chan % 8 == 0 and 1 == 0:
+            if False and 0 < pyPeak0TDC < 65 and chan % 8 == 0:
                 wf_display(waveform, run, event, "calPuls_firstWin")
                 self.plotCounter += 1
 
@@ -193,7 +199,7 @@ class WaveformDumper(Module):
                 pyPeak1TDC = indexes[idx[-2]]
                 assert pyPeak1Ht == wf[pyPeak1TDC]
             pyPeak0Wd, pyPeak1Wd = peakWidths(wf, [pyPeak0TDC, pyPeak1TDC])
-            if 1 == 0 and (pyPeak0Wd < 5 or nPyPeaks > 1 and pyPeak1Wd < 5):
+            if False and (pyPeak0Wd < 5 or nPyPeaks > 1 and pyPeak1Wd < 5):
                 wf_display(waveform, run, event, "thinpeak")
                 self.plotCounter += 1
             self.feProps.Fill(pyPeak0Ht,
@@ -209,11 +215,11 @@ class WaveformDumper(Module):
                               nPyPeaks,
                               chan
                               )
-            if 0 == 0 and (145 < pyPeak1Ht < 155 and chan % 8 == 0):
-                wf_display(waveform, run, event, "thinpeak")
+            if False and (145 < pyPeak1Ht < 155 and chan % 8 == 0):
+                wf_display(waveform, run, event, "peak1Ht_is_150")
                 self.plotCounter += 1
             # only plot the first 10 figures.
-            if self.plotCounter >= 100:
+            if self.plotCounter >= 10:
                 evtMetaData.obj().setEndOfData()
 
     def terminate(self):

@@ -35,6 +35,8 @@ namespace Belle2 {
 
     /**
      * Wrapper for particles
+     * @param particle
+     * @return 3-vector in reference frame
      */
     virtual TVector3 getVertex(const Particle* particle) const
     {
@@ -50,6 +52,8 @@ namespace Belle2 {
 
     /**
      * Wrapper for particles
+     * @param  particle
+     * @return momentum 4-vector in reference frame
      */
     virtual TLorentzVector getMomentum(const Particle* particle) const
     {
@@ -65,6 +69,8 @@ namespace Belle2 {
 
     /**
      * Wrapper for particles
+     * @param  particle
+     * @return Covariance matrix in reference frame
      */
     virtual TMatrixFSym getMomentumErrorMatrix(const Particle* particle) const
     {
@@ -80,6 +86,8 @@ namespace Belle2 {
 
     /**
      * Wrapper for particles
+     * @param particle
+     * @return Covariance matrix in reference frame
      */
     virtual TMatrixFSym getVertexErrorMatrix(const Particle* particle) const
     {

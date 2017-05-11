@@ -1,37 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Thomas Keck 2016
+# Thomas Keck 2017
 
+import numpy as np
 import basf2_mva
 import basf2_mva_util
 import time
-
-
-def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
-    """
-    Create SKLearn classifier and store it in a State object
-    """
-    from sklearn.neural_network import MLPClassifier
-    from basf2_mva_python_interface.sklearn import State
-    if isinstance(parameters, collections.Mapping):
-        clf = MLPClassifier(**parameters)
-    elif isinstance(parameters, collections.Sequence):
-        clf = MLPClassifier(*parameters)
-    else:
-        clf = MLPClassifier()
-    return State(clf)
-
-
-def end_fit(state):
-    """
-    Merge received data together and fit estimator.
-    Neural network do not support weights at the moment (slearn 0.18.1).
-    So these are ignored here!
-    """
-    state.estimator = state.estimator.fit(np.vstack(state.X), np.hstack(state.y))
-    return state.estimator
-
 
 if __name__ == "__main__":
 
@@ -46,24 +21,23 @@ if __name__ == "__main__":
                  'daughter(0, Kid)', 'daughter(0, piid)',
                  'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
 
-    # Train a MVA method and directly upload it to the database
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
-    general_options.m_identifier = "SKLearn-NN"
+    general_options.m_identifier = "XGBoost"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
-    sklearn_nn_options = basf2_mva.PythonOptions()
-    sklearn_nn_options.m_framework = "sklearn"
-    sklearn_nn_options.m_steering_file = 'mva/examples/python/sklearn_mlpclassifier.py'
-    param = '{"hidden_layer_sizes": [29], "activation": "logistic", "max_iter": 100, "solver": "adam", "batch_size": 100}'
-    sklearn_nn_options.m_config = param
-    sklearn_nn_options.m_normalize = True
+    specific_options = basf2_mva.PythonOptions()
+    specific_options.m_steering_file = 'mva/examples/python/xgboost_default.py'
+    specific_options.m_framework = "xgboost"
+    param = ('{"max_depth": 3, "eta": 0.1, "silent": 1, "objective": "binary:logistic",'
+             '"subsample": 0.5, "nthread": 1, "nTrees": 100}')
+    specific_options.m_config = param
 
     test_data = ["test.root"] * 10
     training_start = time.time()
-    basf2_mva.teacher(general_options, sklearn_nn_options)
+    basf2_mva.teacher(general_options, specific_options)
     training_stop = time.time()
     training_time = training_stop - training_start
     method = basf2_mva_util.Method(general_options.m_identifier)
@@ -72,4 +46,4 @@ if __name__ == "__main__":
     inference_stop = time.time()
     inference_time = inference_stop - inference_start
     auc = basf2_mva_util.calculate_roc_auc(p, t)
-    print("SKLearn", training_time, inference_time, auc)
+    print("XGBoost", training_time, inference_time, auc)

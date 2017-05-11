@@ -7,32 +7,6 @@ import basf2_mva
 import basf2_mva_util
 import time
 
-
-def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
-    """
-    Create SKLearn classifier and store it in a State object
-    """
-    from sklearn.neural_network import MLPClassifier
-    from basf2_mva_python_interface.sklearn import State
-    if isinstance(parameters, collections.Mapping):
-        clf = MLPClassifier(**parameters)
-    elif isinstance(parameters, collections.Sequence):
-        clf = MLPClassifier(*parameters)
-    else:
-        clf = MLPClassifier()
-    return State(clf)
-
-
-def end_fit(state):
-    """
-    Merge received data together and fit estimator.
-    Neural network do not support weights at the moment (slearn 0.18.1).
-    So these are ignored here!
-    """
-    state.estimator = state.estimator.fit(np.vstack(state.X), np.hstack(state.y))
-    return state.estimator
-
-
 if __name__ == "__main__":
 
     variables = ['M', 'p', 'pt', 'pz',
@@ -50,26 +24,27 @@ if __name__ == "__main__":
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
-    general_options.m_identifier = "SKLearn-NN"
+    general_options.m_identifier = "TMVA"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
-    sklearn_nn_options = basf2_mva.PythonOptions()
-    sklearn_nn_options.m_framework = "sklearn"
-    sklearn_nn_options.m_steering_file = 'mva/examples/python/sklearn_mlpclassifier.py'
-    param = '{"hidden_layer_sizes": [29], "activation": "logistic", "max_iter": 100, "solver": "adam", "batch_size": 100}'
-    sklearn_nn_options.m_config = param
-    sklearn_nn_options.m_normalize = True
+    tmva_nn_options = basf2_mva.TMVAOptionsClassification()
+    tmva_nn_options.m_type = "MLP"
+    tmva_nn_options.m_method = "MLP"
+    tmva_nn_options.m_config = ("H:!V:CreateMVAPdfs:VarTransform=N:NCycles=10:HiddenLayers=N+1:TrainingMethod=BFGS")
 
-    test_data = ["test.root"] * 10
     training_start = time.time()
-    basf2_mva.teacher(general_options, sklearn_nn_options)
+    basf2_mva.teacher(general_options, tmva_nn_options)
     training_stop = time.time()
+
     training_time = training_stop - training_start
     method = basf2_mva_util.Method(general_options.m_identifier)
+
     inference_start = time.time()
+    test_data = ["test.root"] * 10
     p, t = method.apply_expert(basf2_mva.vector(*test_data), general_options.m_treename)
     inference_stop = time.time()
     inference_time = inference_stop - inference_start
+
     auc = basf2_mva_util.calculate_roc_auc(p, t)
-    print("SKLearn", training_time, inference_time, auc)
+    print("TMVA", training_time, inference_time, auc)

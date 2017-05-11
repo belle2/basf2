@@ -36,24 +36,24 @@ const ReferenceFrame& ReferenceFrame::GetCurrent()
   }
 }
 
-TVector3 RestFrame::getVertex(const Particle* particle) const
+TVector3 RestFrame::getVertex(const TVector3& vector) const
 {
   // Transform Vertex from lab into rest frame:
   // 1. Subtract displacement of rest frame origin in the lab frame
   // 2. Use Lorentz Transformation to Boost Vertex vector into rest frame
   // 3. Subtract movement of vertex end due to the time difference between
   //    the former simultaneous measured vertex points (see derivation of Lorentz contraction)
-  TLorentzVector a = m_lab2restframe * TLorentzVector(particle->getVertex() - m_displacement, 0);
+  TLorentzVector a = m_lab2restframe * TLorentzVector(vector - m_displacement, 0);
   return a.Vect() - m_boost * a.T();
 }
 
-TLorentzVector RestFrame::getMomentum(const Particle* particle) const
+TLorentzVector RestFrame::getMomentum(const TLorentzVector& vector) const
 {
   // 1. Boost momentum into rest frame
-  return m_lab2restframe * particle->get4Vector();
+  return m_lab2restframe * vector;
 }
 
-TMatrixFSym RestFrame::getMomentumErrorMatrix(const Particle* particle) const
+TMatrixFSym RestFrame::getMomentumErrorMatrix(const TMatrixFSym& matrix) const
 {
   TMatrixD lorentzrot(4, 4);
 
@@ -61,10 +61,12 @@ TMatrixFSym RestFrame::getMomentumErrorMatrix(const Particle* particle) const
     for (int j = 0; j < 4; ++j)
       lorentzrot(i, j) = m_lab2restframe(i, j);
 
-  return particle->getMomentumErrorMatrix().Similarity(lorentzrot);
+  TMatrixFSym tmp_matrix(matrix);
+
+  return tmp_matrix.Similarity(lorentzrot);
 }
 
-TMatrixFSym RestFrame::getVertexErrorMatrix(const Particle* particle) const
+TMatrixFSym RestFrame::getVertexErrorMatrix(const TMatrixFSym& matrix) const
 {
   TMatrixD lorentzrot(4, 3);
 
@@ -72,7 +74,8 @@ TMatrixFSym RestFrame::getVertexErrorMatrix(const Particle* particle) const
     for (int j = 0; j < 3; ++j)
       lorentzrot(i, j) = m_lab2restframe(i, j);
 
-  auto rotated_error_matrix = particle->getVertexErrorMatrix().Similarity(lorentzrot);
+  TMatrixFSym tmp_matrix(matrix);
+  auto rotated_error_matrix = tmp_matrix.Similarity(lorentzrot);
 
   TMatrixD timeshift(3, 4);
   timeshift.Zero();
@@ -86,44 +89,44 @@ TMatrixFSym RestFrame::getVertexErrorMatrix(const Particle* particle) const
   return rotated_error_matrix.Similarity(timeshift);
 }
 
-TVector3 LabFrame::getVertex(const Particle* particle) const
+TVector3 LabFrame::getVertex(const TVector3& vector) const
 {
-  return particle->getVertex();
+  return vector;
 }
 
-TLorentzVector LabFrame::getMomentum(const Particle* particle) const
+TLorentzVector LabFrame::getMomentum(const TLorentzVector& vector) const
 {
-  return particle->get4Vector();
+  return vector;
 }
 
-TMatrixFSym LabFrame::getMomentumErrorMatrix(const Particle* particle) const
+TMatrixFSym LabFrame::getMomentumErrorMatrix(const TMatrixFSym& matrix) const
 {
-  return particle->getMomentumErrorMatrix();
+  return matrix;
 }
 
-TMatrixFSym LabFrame::getVertexErrorMatrix(const Particle* particle) const
+TMatrixFSym LabFrame::getVertexErrorMatrix(const TMatrixFSym& matrix) const
 {
-  return particle->getVertexErrorMatrix();
+  return matrix;
 }
 
-TVector3 CMSFrame::getVertex(const Particle* particle) const
+TVector3 CMSFrame::getVertex(const TVector3& vector) const
 {
   // Transform Vertex from lab into cms frame:
   // TODO 0: Substract fitted IP similar to RestFrame
   // 1. Use Lorentz Transformation to Boost Vertex vector into cms frame
   // 2. Subtract movement of vertex end due to the time difference between
   //    the former simultaneous measured vertex points (see derivation of Lorentz contraction)
-  TLorentzVector a = m_transform.rotateLabToCms() * TLorentzVector(particle->getVertex(), 0);
+  TLorentzVector a = m_transform.rotateLabToCms() * TLorentzVector(vector, 0);
   return a.Vect() - m_transform.getBoostVector().BoostVector() * a.T();
 }
 
-TLorentzVector CMSFrame::getMomentum(const Particle* particle) const
+TLorentzVector CMSFrame::getMomentum(const TLorentzVector& vector) const
 {
   // 1. Boost momentum into cms frame
-  return m_transform.rotateLabToCms() * particle->get4Vector();
+  return m_transform.rotateLabToCms() * vector;
 }
 
-TMatrixFSym CMSFrame::getMomentumErrorMatrix(const Particle* particle) const
+TMatrixFSym CMSFrame::getMomentumErrorMatrix(const TMatrixFSym& matrix) const
 {
   TMatrixD lorentzrot(4, 4);
 
@@ -132,10 +135,11 @@ TMatrixFSym CMSFrame::getMomentumErrorMatrix(const Particle* particle) const
     for (int j = 0; j < 4; ++j)
       lorentzrot(i, j) = labToCmsFrame(i, j);
 
-  return particle->getMomentumErrorMatrix().Similarity(lorentzrot);
+  TMatrixFSym tmp_matrix(matrix);
+  return tmp_matrix.Similarity(lorentzrot);
 }
 
-TMatrixFSym CMSFrame::getVertexErrorMatrix(const Particle* particle) const
+TMatrixFSym CMSFrame::getVertexErrorMatrix(const TMatrixFSym& matrix) const
 {
   TMatrixD lorentzrot(4, 3);
 
@@ -144,7 +148,8 @@ TMatrixFSym CMSFrame::getVertexErrorMatrix(const Particle* particle) const
     for (int j = 0; j < 3; ++j)
       lorentzrot(i, j) = labToCmsFrame(i, j);
 
-  auto rotated_error_matrix = particle->getVertexErrorMatrix().Similarity(lorentzrot);
+  TMatrixFSym tmp_matrix(matrix);
+  auto rotated_error_matrix = tmp_matrix.Similarity(lorentzrot);
 
   TMatrixD timeshift(3, 4);
   timeshift.Zero();
@@ -165,20 +170,19 @@ RotationFrame::RotationFrame(const TVector3& newX, const TVector3& newY, const T
   m_rotation.Invert();
 }
 
-TVector3 RotationFrame::getVertex(const Particle* particle) const
+TVector3 RotationFrame::getVertex(const TVector3& vector) const
 {
-  return m_rotation * particle->getVertex();
+  return m_rotation * vector;
 }
 
-TLorentzVector RotationFrame::getMomentum(const Particle* particle) const
+TLorentzVector RotationFrame::getMomentum(const TLorentzVector& vector) const
 {
-  TLorentzVector lorvector = particle->get4Vector();
-  TVector3 rotated_vector = m_rotation * lorvector.Vect();
+  TVector3 rotated_vector = m_rotation * vector.Vect();
 
-  return TLorentzVector(rotated_vector, lorvector[3]);
+  return TLorentzVector(rotated_vector, vector[3]);
 }
 
-TMatrixFSym RotationFrame::getMomentumErrorMatrix(const Particle* particle) const
+TMatrixFSym RotationFrame::getMomentumErrorMatrix(const TMatrixFSym& matrix) const
 {
   TMatrixD extendedrot(4, 4);
   extendedrot.Zero();
@@ -187,15 +191,17 @@ TMatrixFSym RotationFrame::getMomentumErrorMatrix(const Particle* particle) cons
       extendedrot(i, j) = m_rotation(i, j);
   extendedrot(3, 3) = 1;
 
-  return particle->getMomentumErrorMatrix().Similarity(extendedrot);
+  TMatrixFSym tmp_matrix(matrix);
+  return tmp_matrix.Similarity(extendedrot);
 }
 
-TMatrixFSym RotationFrame::getVertexErrorMatrix(const Particle* particle) const
+TMatrixFSym RotationFrame::getVertexErrorMatrix(const TMatrixFSym& matrix) const
 {
   TMatrixD rotmatrix(3, 3);
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 3; ++j)
       rotmatrix(i, j) = m_rotation(i, j);
 
-  return particle->getVertexErrorMatrix().Similarity(rotmatrix);
+  TMatrixFSym tmp_matrix(matrix);
+  return tmp_matrix.Similarity(rotmatrix);
 }

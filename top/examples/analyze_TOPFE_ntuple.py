@@ -124,8 +124,10 @@ t.Draw("pyPeak0Ht>>pyh0")
 hists = []
 for iCanv in range(1, 9):
     c.cd(iCanv)
-    h = ROOT.TH1D("pyh%d" % iCanv, "channel %d" % iCanv, 1000, 50, 1050)
+    h = ROOT.TH1D("pyh%d" % iCanv, "channel %d" % (iCanv-1), 1000, 50, 1050)
     t.Draw("pyPeak0Ht>>pyh%d" % iCanv, "ch %% 8 == %d" % (iCanv-1))
+    if iCanv == 0:
+        h.SetTitle("calibration channel")
     hists.append(h)
 c.SaveAs("pyPeak0Ht_byChannel.pdf")
 
@@ -154,6 +156,32 @@ for iASIC, iCanv in enumerate([1, 3, 7, 9]):
     t.Draw("fePeakHt>>fe_asic%d" % iCanv, "(ch/8) %% 4 == %d" % (iASIC))
     hists.append(h)
 c.SaveAs("fePeakHt_byASIC.pdf")
+
+hists = []
+c.Clear()
+c.Divide(3, 3)
+c.cd(5)
+h0 = ROOT.TH1D("fe_carrier0", "all Carriers", 1000, 50, 1050)
+t.Draw("fePeakHt>>fe_carrier0")
+for iCarrier, iCanv in enumerate([1, 3, 7, 9]):
+    c.cd(iCanv)
+    h = ROOT.TH1D("fe_carrier%d" % iCanv, "Carrier %d" % iCarrier, 1000, 50, 1050)
+    t.Draw("fePeakHt>>fe_carrier%d" % iCanv, "(ch/8/4) %% 4 == %d" % (iCarrier))
+    hists.append(h)
+c.SaveAs("fePeakHt_byCarrier.pdf")
+
+hists = []
+c.Clear()
+c.Divide(3, 3)
+c.cd(5)
+h0 = ROOT.TH1D("fe_boardstack0", "all board stacks", 1000, 50, 1050)
+t.Draw("fePeakHt>>fe_boardstack0")
+for iBS, iCanv in enumerate([1, 3, 7, 9]):
+    c.cd(iCanv)
+    h = ROOT.TH1D("fe_boardstack%d" % iCanv, "board stack %d" % iBS, 1000, 50, 1050)
+    t.Draw("fePeakHt>>fe_boardstack%d" % iCanv, "(ch/8/4/4) %% 4 == %d" % (iBS))
+    hists.append(h)
+c.SaveAs("fePeakHt_byBoardStack.pdf")
 
 # Count the number of failure modes
 total = t.GetEntries()

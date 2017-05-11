@@ -60,9 +60,13 @@ bool NoKickRTSel::segmentSelector(hitToTrueXP hit1, hitToTrueXP hit2, std::vecto
 {
   double deltaPar = 0;
   if (hit2.m_sensorLayer - hit1.m_sensorLayer > 1) return true;
+//  if (hit2.m_sensorLayer !=4 || hit1.m_sensorLayer !=3) return true;
+//  if(is0) return true;
+  //if (hit2.m_sensorLayer == hit1.m_sensorLayer) return true;
   else {
     switch (par) {
       case 0:
+        return true;//REMOVED OMEGA FROM CUTS
         deltaPar = abs(hit1.getOmegaEntry() - hit2.getOmegaEntry());
         if (is0) deltaPar = abs(hit1.getOmega0() - hit2.getOmegaEntry());
         break;
@@ -73,23 +77,48 @@ bool NoKickRTSel::segmentSelector(hitToTrueXP hit1, hitToTrueXP hit2, std::vecto
         break;
 
       case 2:
-        deltaPar = hit1.getPhi0Entry() - hit2.getPhi0Entry();
-        if (is0) deltaPar = hit1.getPhi00() - hit2.getPhi0Entry();
+        //  return true;
+        deltaPar = asin(sin(hit1.getPhi0Entry())) - asin(sin(hit2.getPhi0Entry()));
+        if (is0) deltaPar = asin(sin(hit1.getPhi00())) - asin(sin(hit2.getPhi0Entry()));
         break;
 
       case 3:
+        // return true;
         deltaPar = hit1.getZ0Entry() - hit2.getZ0Entry();
         if (is0) deltaPar = hit1.getZ00() - hit2.getZ0Entry();
 
         break;
 
       case 4:
+        // return true;
         deltaPar = hit1.getTanLambdaEntry() - hit2.getTanLambdaEntry();
         if (is0) deltaPar = hit1.getTanLambda0() - hit2.getTanLambdaEntry();
 
         break;
     }
-    if (deltaPar > selCut.at(0) && deltaPar < selCut.at(1)) return true;
+    //DEBUG-----------------------------------------
+    double usedCut = 0;
+    if (abs(selCut.at(0)) > abs(selCut.at(1))) {
+      usedCut = abs(selCut.at(0));
+    }
+    //else usedCut =abs(selCut.at(1));
+    else usedCut = abs(selCut.at(1));
+    if (deltaPar < -usedCut || deltaPar > usedCut) {
+      //if(deltaPar < 1*selCut.at(0) || deltaPar > 1*selCut.at(1)){
+      std::cout << "--------------------------" << std::endl;
+      std::cout << "lay1=" << hit1.m_sensorLayer << std::endl;
+      std::cout << "lay2=" << hit2.m_sensorLayer << std::endl;
+      std::cout << "parametro=" << par << std::endl;
+      std::cout << "Min=" << selCut.at(0) << std::endl;
+      std::cout << "Max=" << selCut.at(1) << std::endl;
+      std::cout << "deltapar=" << deltaPar << std::endl;
+      std::cout << "momentum=" << hit1.m_momentum0.Mag() << std::endl;
+
+
+    }
+
+    if (deltaPar > -usedCut && deltaPar < usedCut) return true;
+    //if (deltaPar > 1*selCut.at(0) && deltaPar < 1*selCut.at(1)) return true;
     else return false;
   }
 }

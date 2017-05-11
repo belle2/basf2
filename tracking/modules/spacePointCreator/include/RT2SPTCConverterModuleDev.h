@@ -42,6 +42,8 @@ namespace Belle2 {
 
     virtual void event(); /**< event: convert RecoTracks to SpacePointTrackCands */
 
+    virtual void endRun();
+
     virtual void terminate(); /**< terminate: print some summary information on the processed events */
 
   protected:
@@ -96,6 +98,14 @@ namespace Belle2 {
 
     NoKickRTSel* m_trackSel;
     std::string m_noKickCutsFile;
+    int n_cut = 0;
+    int n_pass = 0;
+    TFile* m_momentumTFile;
+    TCanvas* m_cMomentum;
+    TH1F* m_momSel;
+    TH1F* m_momCut;
+    TH1F* m_momEff;
+
 
     // state variables
 

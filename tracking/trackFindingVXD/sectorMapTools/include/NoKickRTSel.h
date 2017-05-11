@@ -67,7 +67,7 @@ namespace Belle2 {
     std::set<hitToTrueXP, hitToTrueXP::timeCompare> m_setHitToTrueXP;
     std::vector<hitToTrueXP> m_8hitTrack;
     NoKickCuts m_trackCuts;
-    double m_pmax = 1; //range analyzed with cuts
+    double m_pmax = 1.; //range analyzed with cuts
 
     enum parameters {
       omega,

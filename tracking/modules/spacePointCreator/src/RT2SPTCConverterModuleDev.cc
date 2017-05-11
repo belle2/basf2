@@ -105,6 +105,15 @@ void RT2SPTCConverterModule::initialize()
 
   m_trackSel = new NoKickRTSel(m_noKickCutsFile);
 
+  m_momentumTFile = new TFile("TrackSelection.root", "RECREATE");
+  m_momSel = new TH1F("m_momSel", "m_momSel", 100, 0, 4);
+  m_momCut = new TH1F("m_momCut", "m_momCut", 100, 0, 4);
+  m_momEff = new TH1F("m_momEff", "m_momEff", 100, 0, 4);
+
+  m_cMomentum = new TCanvas("m_cMomentum", "m_cMomentum", 800, 600);
+
+
+
 }
 
 // ------------------------------------- EVENT -------------------------------------------------------
@@ -123,7 +132,14 @@ void RT2SPTCConverterModule::event()
 
     if (m_noKickCutsFile.size() != 0) {
       bool passCut = m_trackSel->trackSelector(recoTrack);
-      if (!passCut) continue; //exclude tracks with catastrophic multiple scattering interactions
+      if (!passCut) {
+        n_cut++;
+        m_momCut->Fill(recoTrack.getMomentumSeed().Mag());
+        continue; //exclude tracks with catastrophic multiple scattering interactions
+      } else {
+        n_pass++;
+        m_momSel->Fill(recoTrack.getMomentumSeed().Mag());
+      }
     }
     std::pair<std::vector<const SpacePoint*>, ConversionState> spacePointStatePair;
 
@@ -372,6 +388,43 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
   delete m_trackSel;
 
   return std::make_pair(finalSpacePoints, state);
+}
+
+void RT2SPTCConverterModule::endRun()
+{
+  std::cout << "Number of Selected Tracks: " << n_pass << std::endl;
+  std::cout << "Number of Cutted Tracks: " << n_cut << std::endl;
+
+  m_cMomentum->cd();
+  m_momSel->Draw();
+  m_momCut->Draw("SAME");
+  m_momSel->GetXaxis()->SetTitle("Momentum [Gev/c] ");
+  m_momSel->GetYaxis()->SetTitle(Form("(dN/dp)/%.4f ", m_momSel->GetXaxis()->GetBinWidth(1)));
+  m_momSel->SetTitle("Momentum distribution of selected and rejected tracks");
+  m_momCut->GetXaxis()->SetTitle("Momentum [Gev/c] ");
+  m_momCut->GetYaxis()->SetTitle(Form("(dN/dp)/%.4f ", m_momCut->GetXaxis()->GetBinWidth(1)));
+  m_momCut->SetTitle("Momentum distribution of selected and rejected tracks");
+  m_momSel->SetLineColor(2);
+  m_momCut->SetLineColor(4);
+  m_momSel->SetLineWidth(3);
+  m_momCut->SetLineWidth(3);
+  //
+  // TF1* cutfunc1 = new TF1("cutfunc1", "-7.5 * pow(10, -7) / pow(mom, 3.88) + 1",0,1);
+  // TF1* cutfunc2 = new TF1("cutfunc2", "6.3 * mom + 0.57;",0,1);
+
+
+  m_momentumTFile->cd();
+  m_momSel->Write();
+  m_momCut->Write();
+  m_cMomentum->Write();
+
+  m_momEff->Add(m_momSel, 1);
+  m_momEff->Add(m_momCut, 1);
+  m_momEff->Divide(m_momSel, m_momEff, 1, 1);
+  m_momEff->Write();
+
+
+
 }
 
 // -------------------------------- TERMINATE --------------------------------------------------------

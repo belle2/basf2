@@ -48,8 +48,8 @@ std::vector<double> NoKickCuts::cutSelector(double sinTheta, double momentum, in
   std::vector<double> out;
   for (int i = 0; i < 2; i++) {
     double cut = getCut(layer1, layer2, par, (minmax)i, Norm) /
-                 (sqrt(sinTheta) * pow(momentum, getCut(layer1, layer2, par, (minmax)i, Pow))
-                  + getCut(layer1, layer2, par, (minmax)i, Bkg));
+                 (sqrt(sinTheta) * pow(momentum, getCut(layer1, layer2, par, (minmax)i, Pow)))
+                 + getCut(layer1, layer2, par, (minmax)i, Bkg);
     out.push_back(cut);
   }
   return out;

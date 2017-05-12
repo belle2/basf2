@@ -142,10 +142,19 @@ void NoKickCutsEvalModule::event()
     m_trackSel.hit8TrackBuilder(track);
     std::vector<hitToTrueXP> XP8 = m_trackSel.m_8hitTrack;
     bool PriorCut = m_trackSel.globalCut(XP8);
+    // std::cout << "size XP8=" << XP8.size() << std::endl;
+    // int countee =0;
+    // for( auto ele : XP8){
+    //   countee++;
+    //   std::cout <<" count=" << countee;
+    //   std::cout << ", layer=" << ele.getSensorLayer() << std::endl;
+    // }
+    // std::cout << "----------------------------------" << std::endl;
+
     m_trackSel.m_8hitTrack.clear();
     m_trackSel.m_hitToTrueXP.clear();
     m_trackSel.m_setHitToTrueXP.clear();
-    if (!PriorCut) continue;
+    if (!PriorCut) {GlobCounter++; continue;}
 
     if (XP8.size() > 0) {
       for (int i = 0; i < (int)(XP8.size() - 2); i++) {
@@ -583,7 +592,9 @@ void NoKickCutsEvalModule::endRun()
           for (int p = 0; p < nbinp; p++) {
             double layerdiff = lay2 - lay1;
             if (layerdiff >= 0 && (layerdiff < 3 || (lay1 == 0 && lay2 == 3))) {
-              histo.at(par).at(lay1).at(lay2).at(theta).at(p)->Write();
+              if (histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetEntries() > 0) {
+                histo.at(par).at(lay1).at(lay2).at(theta).at(p)->Write();
+              }
             }
           }
         }
@@ -649,6 +660,8 @@ void NoKickCutsEvalModule::endRun()
   //m_outputFile->Close();
   std::cout << "number of spacepoint with theta out of limits=" << tCounter << std::endl;
   std::cout << "number of spacepoint with momentum out of limits=" << pCounter << std::endl;
+  std::cout << "number of tracks cutted by global cuts=" << GlobCounter << std::endl;
+
 
 }
 

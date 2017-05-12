@@ -139,6 +139,7 @@ namespace Belle2 {
     const int OVER = 9999999;
     int pCounter = 0;
     int tCounter = 0;
+    int GlobCounter = 0;
     bool validationON = 0;
 
     NoKickRTSel m_trackSel;

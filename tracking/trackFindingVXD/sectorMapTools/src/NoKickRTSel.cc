@@ -58,21 +58,39 @@ void NoKickRTSel::hit8TrackBuilder(const RecoTrack& track)
 
 bool NoKickRTSel::globalCut(const std::vector<hitToTrueXP>& track8)
 {
-  int flag3 = 0;
-  int flag6 = 0;
-  int flagd0 = 0;
-  int flagphi0 = 0;
-  int flagz0 = 0;
-  int flagtanlambda = 0;
+  // int flag3 = 0;
+  // int flag6 = 0;
+  int flagd0 = 1;
+  int flagphi0 = 1;
+  int flagz0 = 1;
+  int flagtanlambda = 1;
+  int lay3 = 0;
+  int lay4 = 0;
+  int lay5 = 0;
+  int lay6 = 0;
   for (hitToTrueXP XP : track8) {
-    if (XP.getSensorLayer() == 3) flag3 = 1;
-    if (XP.getSensorLayer() == 6) flag3 = 1;
-    if (abs(XP.getD0Entry()) > 0.5) flagd0 = 1;
-    if (abs(XP.getPhi0Entry()) > 0.2) flagphi0 = 1;
-    if (abs(XP.getZ0Entry()) > 0.5) flagz0 = 1;
-    if (abs(XP.getTanLambdaEntry()) > 0.2) flagtanlambda = 1;
+    if (XP.getSensorLayer() == 3) lay3 = 1;
+    if (XP.getSensorLayer() == 4) lay4 = 1;
+    if (XP.getSensorLayer() == 5) lay5 = 1;
+    if (XP.getSensorLayer() == 6) lay6 = 1;
+    // if (XP.getSensorLayer() == 3) flag3 = 1;
+    // if (XP.getSensorLayer() == 6) flag6 = 1;
+    if (abs(XP.getD0Entry()) > 0.5) flagd0 = 0;
+    if (abs(XP.getPhi0Entry()) > 4) flagphi0 = 0;
+    if (abs(XP.getZ0Entry()) > 0.5) flagz0 = 0;
+    if (abs(XP.getTanLambdaEntry()) > 4) flagtanlambda = 0;
   }
-  int flagTot = flag3 * flag6 * flagd0 * flagphi0 * flagz0 * flagtanlambda;
+  // if(flag3 ==0) std::cout << "flag3" << std::endl;
+  // if(flag6 ==0) std::cout << "flag6" << std::endl;
+  // if(flagd0 ==0) std::cout << "flagd0" << std::endl;
+  // if(flagphi0 ==0) std::cout << "flagphi0" << std::endl;
+  // if(flagz0 ==0) std::cout << "flagz0" << std::endl;
+  // if(flagtanlambda ==0) std::cout << "flagtanlambda" << std::endl;
+  int N_lay = lay3 + lay4 + lay5 + lay6;
+  if (N_lay >= 3) N_lay = 1;
+  else N_lay = 0;
+  // if(N_lay ==0) std::cout << "N_lay" << std::endl;
+  int flagTot = flagd0 * flagphi0 * flagz0 * flagtanlambda * N_lay;
   if (flagTot == 1) return true;
   else return false;
 }

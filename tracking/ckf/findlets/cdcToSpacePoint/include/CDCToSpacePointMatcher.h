@@ -10,31 +10,27 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/utilities/ProcessingSignalListener.h>
-#include <framework/core/ModuleParamList.h>
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+
+#include <tracking/trackFindingCDC/utilities/SortedVectorRange.h>
 #include <tracking/ckf/states/CKFCDCToVXDStateObject.h>
 
-namespace genfit {
-  class MeasuredStateOnPlane;
-}
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
 
 namespace Belle2 {
-  class SpacePoint;
-
-  class SpacePointAdvanceAlgorithm : public TrackFindingCDC::ProcessingSignalListener {
+  class CDCToSpacePointMatcher : public TrackFindingCDC::ProcessingSignalListener {
   public:
-    bool extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint* spacePoint) const;
+    /// Main function: return the next possible hits for a given state.
+    TrackFindingCDC::SortedVectorRange<const SpacePoint*> getMatchingHits(CKFCDCToVXDStateObject& currentState);
 
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
-    {
-      moduleParamList->addParameter("useMaterialEffects", m_param_useMaterialEffects,
-                                    "Use material effects during extrapolation.", m_param_useMaterialEffects);
-    }
-
-    TrackFindingCDC::Weight operator()(CKFCDCToVXDStateObject& currentState) const;
+    /// Fill the cache for each event
+    //void beginEvent(std::vector<RecoTrack*>& seedsVector, std::vector<const SpacePoint*>& filteredHitVector) final;
 
   private:
-    /// Parameter: use material effects
-    bool m_param_useMaterialEffects = true;
+    /// Cache for sorted hits
+    std::map<unsigned int, TrackFindingCDC::SortedVectorRange<const SpacePoint*>> m_cachedHitMap;
+
+    /// Maximal number of ladders per layer
+    std::vector<unsigned int> m_maximumLadderNumbers = {8, 12, 7, 10, 12, 16};
   };
 }

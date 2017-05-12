@@ -7,8 +7,9 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/ckf/findlets/cdcToSpacePoint/CDCToSpacePointTreeSearchFindlet.h>
+#include <tracking/ckf/findlets/cdcToSpacePoint/SpacePointAdvanceAlgorithm.h>
 
+#include <genfit/MaterialEffects.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 
 using namespace Belle2;

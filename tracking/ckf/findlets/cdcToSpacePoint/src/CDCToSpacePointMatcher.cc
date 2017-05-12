@@ -7,17 +7,12 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/ckf/findlets/cdcToSpacePoint/CDCToSpacePointTreeSearchFindlet.h>
-
-#include <svd/reconstruction/SVDRecoHit.h>
-
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/ckf/findlets/cdcToSpacePoint/CDCToSpacePointMatcher.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-SortedVectorRange<const SpacePoint*> CDCToSpacePointTreeSearchFindlet::getMatchingHits(Super::StateObject& currentState)
+SortedVectorRange<const SpacePoint*> CDCToSpacePointMatcher::getMatchingHits(CKFCDCToVXDStateObject& currentState)
 {
   const unsigned int currentNumber = currentState.getNumber();
 
@@ -64,7 +59,7 @@ SortedVectorRange<const SpacePoint*> CDCToSpacePointTreeSearchFindlet::getMatchi
 
 }
 
-void CDCToSpacePointTreeSearchFindlet::initializeEventCache(std::vector<RecoTrack*>& seedsVector,
+/*void CDCToSpacePointSelector::initializeEventCache(std::vector<RecoTrack*>& seedsVector,
                                                             std::vector<const SpacePoint*>& filteredHitVector)
 {
   m_cachedHitMap.clear();
@@ -94,4 +89,4 @@ void CDCToSpacePointTreeSearchFindlet::initializeEventCache(std::vector<RecoTrac
   // Include the PXD layers as empty
   m_cachedHitMap.emplace(2, SortedVectorRange<const SpacePoint*>());
   m_cachedHitMap.emplace(1, SortedVectorRange<const SpacePoint*>());
-}
+}*/

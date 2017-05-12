@@ -113,9 +113,6 @@ namespace Belle2 {
     //! user-defined maximum cone angle (radians) between KLMCluster and associated track
     double m_MaxClusterTrackConeAngle;
 
-    //! Flag for source (0 = beam, 1 = cosmic ray)
-    int m_Cosmic;
-
     //! Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info
     int m_TrackingVerbosity;
 

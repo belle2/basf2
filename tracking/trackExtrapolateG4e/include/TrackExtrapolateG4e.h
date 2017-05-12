@@ -16,9 +16,6 @@
 #include <tracking/dataobjects/ExtHit.h>
 #include <bklm/geometry/GeometryPar.h>
 
-#include <TMatrixDSym.h>
-#include <TVector3.h>
-
 #include <G4TouchableHandle.hh>
 #include <G4ErrorTrajErr.hh>
 #include <G4ThreeVector.hh>
@@ -76,11 +73,15 @@ namespace Belle2 {
     //! Pointer to the geant4e state
     G4ErrorFreeTrajState* g4eState;
     //! Pointer to the reconstructed track
-    Track* track;
-    //! MUID: true if in the forward half of the KLM
+    const Track* track;
+    //! MUID: true if in the forward EKLM
     bool isForward;
     //! Time of flight (ns), updated during extrapolation
     double tof;
+    //! True for back-propagation of a cosmic ray
+    bool isCosmic;
+    //! MUID: list of track(s) using each BKLMHit2d
+    std::vector<std::map<const Track*, double> >* bklmHitUsed;
     //! MUID: accumulated chi-squared of all in-plane transverse deviations between extrapolation and matching hit
     double chi2;
     //! MUID: accumulated number of points with matching 2D hits
@@ -107,26 +108,28 @@ namespace Belle2 {
 
   //! intersection of muid-extrapolated track with a KLM layer
   struct Intersection {
+    //! index in {B,E}KLMHit2ds of matching hit
+    int hit;
     //! flag to indicate if this point is in the barrel (true) or endcap (false)
-    bool        inBarrel;
+    bool inBarrel;
     //! flag to indicate if this point is in the forward (true) or backward (false) end
-    bool        isForward;
+    bool isForward;
     //! sector number (0..7 for barrel, 0..3 for endcap) of this point
-    int         sector;
+    int sector;
     //! layer number (0..14 for barrel, 0..13 for endcap) of this point
-    int         layer;
+    int layer;
     //! extrapolated-track global position (cm) of this intersection
-    TVector3    position;
+    G4ThreeVector position;
     //! extrapolated-track momentum (GeV/c) at this intersection
-    TVector3    momentum;
+    G4ThreeVector momentum;
     //! extrapolated-track phase-space covariance matrix at this intersection
-    TMatrixDSym covariance;
+    G4ErrorSymMatrix covariance;
     //! extrapolated-track position (cm) projected to the 2D hit's midplane
-    TVector3    positionAtHitPlane;
+    G4ThreeVector positionAtHitPlane;
     //! time (ns) of matching BKLMHit2d
-    double      time;
+    double time;
     //! chi-squared value of transverse deviation between extrapolated and measured hit positions
-    double      chi2;
+    double chi2;
   };
 
   /** geant4e-based track extrapolation
@@ -180,44 +183,84 @@ namespace Belle2 {
     //! Assign the TrackClusterSeparations collection name before initialization
     void setTrackClusterSeparationsColName(std::string& trackClusterSeparationsColName) { m_TrackClusterSeparationsColName = &trackClusterSeparationsColName; }
 
-    //! Initialize for track extrapolation by the EXT module
+    //! Initialize for track extrapolation by the EXT module.
+    //! @param minPt Minimum transverse momentum to begin extrapolation (GeV/c).
+    //! @param minKE Minimum kinetic energy to continue extrapolation (GeV/c).
+    //! @param hypotheses Vector of charged-particle hypotheses used in extrapolation of each track.
     void initialize(double minPt, double minKE,
-                    int cosmic, std::vector<Const::ChargedStable>& hypotheses);
+                    std::vector<Const::ChargedStable>& hypotheses);
 
-    //! Initialize for track extrapolation by the MUID module
-    void initialize(double meanDt, double maxDt, double m_MaxDistSqInVariances,
+    //! Initialize for track extrapolation by the MUID module.
+    //! @param meanDt Mean value of the in-time window (ns).
+    //! @param maxDt Half-width of the in-time window (ns).
+    //! @param maxSeparation Maximum separation between track crossing and matching hit in detector plane (#sigmas).
+    //! @param maxClusterTrackConeAngle Maximum angle between track and KLM-cluster directions (deg).
+    //! @param minPt Minimum transverse momentum to begin extrapolation (GeV/c).
+    //! @param minKE Minimum kinetic energy to continue extrapolation (GeV/c).
+    //! @param hypotheses Vector of charged-particle hypotheses used in extrapolation of each track.
+    void initialize(double meanDt, double maxDt, double maxSeparation,
                     double maxClusterTrackConeAngle, double minPt, double minKE,
-                    int cosmic, std::vector<Const::ChargedStable>& hypotheses);
+                    std::vector<Const::ChargedStable>& hypotheses);
 
-    //! Perform beginning-of-run actions
-    void beginRun(bool);
+    //! Perform beginning-of-run actions.
+    //! @param flag True if called by Muid module, false if called by Ext module.
+    void beginRun(bool flag);
 
-    //! Performs track extrapolation for all tracks in one event
-    //! flag is true if called by Muid, false if called by Ext
-    void eventExt(void);
-    void eventMuid(void);
+    //! Performs track extrapolation for all tracks in one event.
+    //! @param flag True if called by Muid module, false if called by Ext module.
+    void event(bool flag);
 
-    //! Perform end-of-run actions
-    void endRun(bool);
+    //! Perform end-of-run actions.
+    //! @param flag True if called by Muid module, false if called by Ext module.
+    void endRun(bool flag);
 
-    //! Terminates this singleton
-    void terminate(bool);
+    //! Terminates this singleton.
+    //! @param flag True if called by Muid module, false if called by Ext module.
+    void terminate(bool flag);
 
-    //! Performs track extrapolation for a single track (specified in genfit2 units: cm, GeV/c)
+    //! Performs track extrapolation for a single track (specified in genfit2 units).
+    //! @param pdgCode Signed PDG identifier of the particle hypothesis to be used for the extrapolation.
+    //! @param tof Starting time, i.e., time of flight from the IP, at the starting point (ns).
+    //! @param position Starting point of the extrapolation (cm).
+    //! @param momentum Momentum of the track at the starting point (GeV/c).
+    //! @param covariance Phase-space covariance matrix (6x6) at the starting point (cm, GeV/c).
+    //! @param extHitsColName (not used).
     void extrapolate(int pdgCode,
                      double tof,
                      const G4ThreeVector& position,
                      const G4ThreeVector& momentum,
-                     const G4ErrorSymMatrix& covariance, // (6x6)
+                     const G4ErrorSymMatrix& covariance,
                      const std::string& extHitsColName);
+
+    //! Performs muon identification for a single track (specified in genfit2 units).
+    //! @param pdgCode Signed PDG identifier of the particle hypothesis to be used for the extrapolation.
+    //! @param tof Starting time, i.e., time of flight from the IP, at the starting point (ns).
+    //! @param isCosmic True to back-extrapolate a cosmic ray
+    //! @param position Starting point of the extrapolation (cm).
+    //! @param momentum Momentum of the track at the starting point (GeV/c).
+    //! @param covariance Phase-space covariance matrix (6x6) at the starting point (cm, GeV/c).
+    void identifyMuon(int pdgCode,
+                      double tof,
+                      bool isCosmic,
+                      const G4ThreeVector& position,
+                      const G4ThreeVector& momentum,
+                      const G4ErrorSymMatrix& covariance);
 
   private:
 
     //! constructor is hidden; user calls TrackExtrapolateG4e::getInstance() instead
     TrackExtrapolateG4e();
 
-    //! copy constructor is hidden; user calls TrackExtrapolateG4e::GetInstance() instead
+    //! copy constructor is hidden; user calls TrackExtrapolateG4e::getInstance() instead
     TrackExtrapolateG4e(TrackExtrapolateG4e&);
+
+    //! Swim a single track (MUID) until it stops or leaves the target cylinder
+    void swim(const Track*, int, double, bool, const G4ThreeVector&, const G4ThreeVector&, const G4ThreeVector&,
+              const G4ErrorSymMatrix&,
+              const std::vector<G4ThreeVector>*, std::vector<Track*>*, std::vector<std::map<const Track*, double> >*);
+
+    //! Swim a single track (EXT) until it stops or leaves the target cylinder
+    void swim(const Track*, int, double, bool, const G4ThreeVector&, const G4ThreeVector&, const G4ErrorSymMatrix&);
 
     //! Register the list of geant4 physical volumes whose entry/exit
     //! points will be saved during extrapolation
@@ -227,17 +270,17 @@ namespace Belle2 {
     void getVolumeID(const G4TouchableHandle&, Const::EDetector&, int&);
 
     //! Convert the geant4e 5x5 covariance to phasespace 6x6 covariance
-    void fromG4eToPhasespace(const G4ErrorFreeTrajState*, TMatrixDSym&);
-
-    //! Convert the phasespace covariance to geant4e covariance
-    void fromPhasespaceToG4e(const TVector3&, const TMatrixDSym&, G4ErrorTrajErr&);
+    void fromG4eToPhasespace(const G4ErrorFreeTrajState*, G4ErrorSymMatrix&);
 
     //! Convert the phasespace covariance to geant4e covariance
     void fromPhasespaceToG4e(const G4ThreeVector&, const G4ErrorSymMatrix&, G4ErrorTrajErr&);
 
+    //! Convert the phasespace covariance to geant4e covariance
+    void fromPhasespaceToG4e(const TVector3&, const TMatrixDSym&, G4ErrorTrajErr&);
+
     //! Get the start point for a new reconstructed track with specific PDG hypothesis
-    void getStartPoint(RecoTrack*, const genfit::AbsTrackRep*, int, G4ThreeVector&,
-                       G4ThreeVector&, G4ThreeVector&, G4ErrorTrajErr&, double&);
+    void getStartPoint(const Track&, int&, double&, bool&,
+                       G4ThreeVector&, G4ThreeVector&, G4ThreeVector&, G4ErrorTrajErr&);
 
     //! Create another EXT extrapolation hit for a track candidate
     void createExtHit(ExtHitStatus, const Belle2::ExtState&);
@@ -246,10 +289,10 @@ namespace Belle2 {
     bool createMuidHit(Belle2::ExtState&);
 
     //! Find the intersection point of the track with the crossed BKLM plane
-    bool findBarrelIntersection(Belle2::ExtState&, const TVector3&, Belle2::Intersection&);
+    bool findBarrelIntersection(Belle2::ExtState&, const G4ThreeVector&, Belle2::Intersection&);
 
     //! Find the intersection point of the track with the crossed EKLM plane
-    bool findEndcapIntersection(Belle2::ExtState&, const TVector3&, Belle2::Intersection&);
+    bool findEndcapIntersection(Belle2::ExtState&, const G4ThreeVector&, Belle2::Intersection&);
 
     //! Find the matching BKLM 2D hit nearest the intersection point of the track with the crossed BKLM plane
     bool findMatchingBarrelHit(Belle2::Intersection&, const Track*);
@@ -258,10 +301,10 @@ namespace Belle2 {
     bool findMatchingEndcapHit(Belle2::Intersection&, const Track*);
 
     //! Nudge the track using the matching hit
-    void adjustIntersection(Belle2::Intersection&, const double*, const TVector3&, const TVector3&);
+    void adjustIntersection(Belle2::Intersection&, const double*, const G4ThreeVector&, const G4ThreeVector&);
 
     //! Complete muon identification after end of track extrapolation
-    void finishTrack(const Belle2::ExtState&, Muid*, int);
+    void finishTrack(const Belle2::ExtState&, Muid*);
 
     //! Stores pointer to the singleton class
     static TrackExtrapolateG4e* m_Singleton;
@@ -289,12 +332,6 @@ namespace Belle2 {
 
     //! Minimum kinetic energy in MeV for extrapolation to continue
     double m_MinKE;
-
-    //! Flag to enable EXT cosmic-ray extrapolation (i.e., from outside toward IP in top half of detector)
-    int m_CosmicExt;
-
-    //! Flag to enable MUID cosmic-ray extrapolation (i.e., from outside toward IP in top half of detector)
-    int m_CosmicMuid;
 
     //! Pointer to name of the Track collection of the reconstructed tracks to be extrapolated
     std::string* m_TracksColName;
@@ -332,6 +369,12 @@ namespace Belle2 {
     //!  ChargedStable hypotheses for MUID
     const std::vector<Const::ChargedStable>* m_HypothesesMuid;
 
+    //! Pointer to an empty string
+    std::string* m_DefaultName;
+
+    //! Default ChargedStable hypotheses (needed as call argument but not used)
+    std::vector<Const::ChargedStable>* m_DefaultHypotheses;
+
     //! Pointers to geant4 physical volumes whose entry/exit points will be saved
     std::map<G4VPhysicalVolume*, enum VolTypes>* m_EnterExit;
 
@@ -352,6 +395,9 @@ namespace Belle2 {
 
     //! offset (cm) along z axis of KLM midpoint from IP
     double m_OffsetZ;
+
+    //! Number of barrel sectors
+    int m_BarrelNSector;
 
     //! maximum radius (cm) of the barrel
     double m_BarrelMaxR;
@@ -378,10 +424,10 @@ namespace Belle2 {
     double m_BarrelModuleMiddleRadius[2][NSECTOR + 1][NLAYER + 1];
 
     //! normal unit vector of each barrel sector
-    TVector3 m_BarrelSectorPerp[NSECTOR + 1];
+    G4ThreeVector m_BarrelSectorPerp[NSECTOR + 1];
 
     //! azimuthal unit vector of each barrel sector
-    TVector3 m_BarrelSectorPhi[NSECTOR + 1];
+    G4ThreeVector m_BarrelSectorPhi[NSECTOR + 1];
 
     //! maximum radius (cm) of the endcaps
     double m_EndcapMaxR;

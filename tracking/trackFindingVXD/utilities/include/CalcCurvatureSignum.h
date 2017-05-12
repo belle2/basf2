@@ -29,6 +29,6 @@ namespace Belle2 {
       sumOfCurvature += bc.Orthogonal() * ab; //normal vector of m_vecBC times segment of ba
     }
     // signum
-    return (0 > sumOfCurvature) - (sumOfCurvature > 0);
+    return (0 < sumOfCurvature) - (sumOfCurvature < 0);
   }
 }

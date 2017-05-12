@@ -22,13 +22,13 @@ namespace Belle2 {
     if (measurements.size() < 3) return 0;
     float sumOfCurvature = 0.;
     for (unsigned int i = 0; i < measurements.size() - 2; ++i) {
-      B2Vector3<double> ab = measurements.at(i)->getPosition() - measurements.at(i + 1)->getPosition();
+      B2Vector3<double> ab = measurements.at(i + 1)->getPosition() - measurements.at(i)->getPosition();
       ab.SetZ(0.);
-      B2Vector3<double> bc = measurements.at(i + 1)->getPosition() - measurements.at(i + 2)->getPosition();
+      B2Vector3<double> bc = measurements.at(i + 2)->getPosition() - measurements.at(i + 1)->getPosition();
       bc.SetZ(0.);
       sumOfCurvature += bc.Orthogonal() * ab; //normal vector of m_vecBC times segment of ba
     }
     // signum
-    return (0 < sumOfCurvature) - (sumOfCurvature < 0);
+    return (0 > sumOfCurvature) - (sumOfCurvature > 0);
   }
 }

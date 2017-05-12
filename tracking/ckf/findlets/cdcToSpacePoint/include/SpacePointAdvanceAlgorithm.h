@@ -14,15 +14,19 @@
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 #include <tracking/ckf/states/CKFCDCToVXDStateObject.h>
 
-namespace Belle2 {
-  class SpacePointAdvanceAlgorithm : public TrackFindingCDC::CompositeProcessingSignalListener {
+namespace genfit {
+  class MeasuredStateOnPlane;
+}
 
+namespace Belle2 {
+  class SpacePoint;
+
+  class SpacePointAdvanceAlgorithm : public TrackFindingCDC::CompositeProcessingSignalListener {
   public:
+    static bool extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint* spacePoint);
 
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
-    {
-
-    }
+    {}
 
     TrackFindingCDC::Weight operator()(CKFCDCToVXDStateObject& currentState);
   };

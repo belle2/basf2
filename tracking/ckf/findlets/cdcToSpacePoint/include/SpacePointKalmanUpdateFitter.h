@@ -23,11 +23,11 @@ namespace Belle2 {
 
   class SpacePointKalmanUpdateFitter : public TrackFindingCDC::CompositeProcessingSignalListener {
   public:
-    static double kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint* spacePoint);
+    double kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint* spacePoint) const;
 
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
     {}
 
-    TrackFindingCDC::Weight operator()(CKFCDCToVXDStateObject& currentState);
+    TrackFindingCDC::Weight operator()(CKFCDCToVXDStateObject& currentState) const;
   };
 }

@@ -22,7 +22,8 @@ namespace Eigen {
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-double SpacePointKalmanUpdateFitter::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint* spacePoint)
+double SpacePointKalmanUpdateFitter::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+                                                const SpacePoint* spacePoint) const
 {
   double chi2 = 0;
 
@@ -73,7 +74,7 @@ double SpacePointKalmanUpdateFitter::kalmanStep(genfit::MeasuredStateOnPlane& me
   return chi2;
 }
 
-Weight SpacePointKalmanUpdateFitter::operator()(CKFCDCToVXDStateObject& currentState)
+Weight SpacePointKalmanUpdateFitter::operator()(CKFCDCToVXDStateObject& currentState) const
 {
   B2ASSERT("Encountered invalid state", not currentState.isFitted() and currentState.isAdvanced());
 

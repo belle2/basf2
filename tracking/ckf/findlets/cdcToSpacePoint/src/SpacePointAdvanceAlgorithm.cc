@@ -14,7 +14,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool SpacePointAdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint* spacePoint)
+bool SpacePointAdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint* spacePoint) const
 {
   // We always use the first cluster here to create the plane. Should not make much difference?
   SVDRecoHit recoHit(spacePoint->getRelated<SVDCluster>());
@@ -32,7 +32,7 @@ bool SpacePointAdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measu
   return true;
 }
 
-Weight SpacePointAdvanceAlgorithm::operator()(CKFCDCToVXDStateObject& currentState)
+Weight SpacePointAdvanceAlgorithm::operator()(CKFCDCToVXDStateObject& currentState) const
 {
   B2ASSERT("Encountered invalid state", not currentState.isFitted() and not currentState.isAdvanced());
 

@@ -23,11 +23,11 @@ namespace Belle2 {
 
   class SpacePointAdvanceAlgorithm : public TrackFindingCDC::CompositeProcessingSignalListener {
   public:
-    static bool extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint* spacePoint);
+    bool extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint* spacePoint) const;
 
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
     {}
 
-    TrackFindingCDC::Weight operator()(CKFCDCToVXDStateObject& currentState);
+    TrackFindingCDC::Weight operator()(CKFCDCToVXDStateObject& currentState) const;
   };
 }

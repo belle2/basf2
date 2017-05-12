@@ -84,8 +84,25 @@ class Job:
         Extends the self.setup_cmds attribute when called instead of replacing it.
         """
         setup_cmds = self.config['BASF2']['SetupCmds']
-        print(setup_cmds)
         self.setup_cmds.extend(decode_json_string(self.config['BASF2']['SetupCmds']))
+
+    def create_subjob(self, i):
+        """
+        Creates a subjob Job object but with specific changes to the variables to make a subjob.
+        """
+        B2INFO('Creating Job({}).Subjob({})'.format(self.name, i))
+        subjob = Job(self.name + "_subjob_" + str(i))
+        subjob.input_sandbox_files = self.input_sandbox_files[:]
+        subjob.working_dir = os.path.join(self.working_dir, str(i))
+        subjob.output_dir = os.path.join(self.output_dir, str(i))
+        subjob.output_patterns = self.output_patterns[:]
+        subjob.cmd = self.cmd[:]
+        subjob.input_files = self.input_files[:]
+        subjob.setup_cmds = self.setup_cmds[:]
+        subjob.config = self.config
+        subjob.queue = self.queue
+
+        return subjob
 
     @property
     def basf2_release(self):
@@ -323,14 +340,14 @@ class PBS(Backend):
     cmd_name = "#PBS -N"
     #: default PBS section name in config file
     default_config_section = "PBS"
-    #: required entries in config section
-    required_config = ["Queue"]
 
     def __init__(self):
         """
         Init method for PBS Backend. Does default setup based on config file.
         """
         self.subjobs_to_files = None
+        self.config = configparser.ConfigParser()
+        self.config.read(default_config_file)
 
     def _generate_pbs_script(self, job):
         """
@@ -398,6 +415,11 @@ class PBS(Backend):
                 for file_name in output_files:
                     shutil.move(file_name, self.job.output_dir)
 
+    def _dump_input_data(self, job):
+        # Now make a python file in our input sandbox containing a list of these valid files
+        with open(str(pathlib.Path(job.working_dir, 'input_data_files.data')), 'bw') as input_data_file:
+            pickle.dump(job.input_files, input_data_file)
+
     @method_dispatch
     def submit(self, job):
         """
@@ -407,8 +429,55 @@ class PBS(Backend):
         Should return a Result object that allows a 'ready' member method to be called from it which queries
         the PBS system and the job about whether or not the job has finished.
         """
-        B2INFO('Job Submitting: ' + job.name)
-        if job.max_files_per_subjob < 0:
+        if not job.queue:
+            job.queue = self.config["PBS"]["Queue"]
+            B2INFO('Setting Job queue {}'.format(job.queue))
+
+        if job.max_files_per_subjob == 0:
+            B2FATAL("When submitting Job({}) files per subjob was 0!".format(job.name))
+
+        # Check if we have any valid input files
+        existing_input_files = set()
+        for input_file_pattern in job.input_files:
+            if input_file_pattern[:7] != "root://":
+                input_files = glob.glob(input_file_pattern)
+                if not input_files:
+                    B2WARNING("No files matching {0} can be found, it will be skipped!".format(input_file_pattern))
+                else:
+                    for file_path in input_files:
+                        file_path = os.path.abspath(file_path)
+                        if os.path.isfile(file_path):
+                            existing_input_files.add(file_path)
+            else:
+                B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
+                        " before collector submission.".format(input_file_pattern)))
+                existing_input_files.add(input_file_pattern)
+
+        if not existing_input_files:
+            B2INFO("No valid input file paths found for job {0}".format(job.name))
+
+        if job.max_files_per_subjob > 0 and existing_input_files:
+
+            import itertools
+
+            def grouper(n, iterable):
+                it = iter(iterable)
+                while True:
+                    chunk = tuple(itertools.islice(it, n))
+                    if not chunk:
+                        return
+                    yield chunk
+
+            subjobs = []
+            for i, subjob_input_files in enumerate(grouper(job.max_files_per_subjob, existing_input_files)):
+                subjob = job.create_subjob(i)
+                if not subjob.working_dir:
+                    B2INFO('Setting SubJob working directory to {}' + subjob.output_dir)
+                    subjob.working_dir = subjob.output_dir
+                subjob.input_files = subjob_input_files
+                subjobs.append(subjob)
+            return self.submit(subjobs)
+        else:
             # Make sure the output directory of the job is created
             job_output_path = pathlib.Path(job.output_dir)
             job_output_path.mkdir(parents=True, exist_ok=True)
@@ -425,37 +494,11 @@ class PBS(Backend):
                     else:
                         shutil.copy(file_path, job.working_dir)
 
-            # Check if we have any valid input files
-            existing_input_files = set()
-            for input_file_pattern in job.input_files:
-                if input_file_pattern[:7] != "root://":
-                    input_files = glob.glob(input_file_pattern)
-                    if not input_files:
-                        B2WARNING("No files matching {0} can be found, it will be skipped!".format(input_file_pattern))
-                    else:
-                        for file_path in input_files:
-                            file_path = os.path.abspath(file_path)
-                            if os.path.isfile(file_path):
-                                existing_input_files.add(file_path)
-                else:
-                    B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
-                            " before collector submission.".format(input_file_pattern)))
-                    existing_input_files.add(input_file_pattern)
-
-            if existing_input_files:
-                # Now make a python file in our input sandbox containing a list of these valid files
-                with open(pathlib.Path(job.working_dir, 'input_data_files.data'), 'bw') as input_data_file:
-                    pickle.dump(list(existing_input_files), input_data_file)
-            else:
-                B2INFO("No valid input files found for job {0}".format(job.name))
-
+            self._dump_input_data(job)
             self._generate_pbs_script(job)
+            B2INFO("Submitting Job({})".format(job.name))
             result = self._submit_to_qsub(job)
             return result
-        elif job.max_files_per_subjob == 0:
-            B2FATAL("When submitting Job {}, files per subjob was 0!".format(job.name))
-        else:
-            B2INFO("Not Implemented subjobs yet")
 
     def _submit_to_qsub(self, job):
         """

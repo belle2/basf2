@@ -537,7 +537,7 @@ namespace Belle2 {
 
     }
 
-    return remainingWords = array.getRemainingWords();
+    return array.getRemainingWords();
 
   }
 

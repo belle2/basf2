@@ -14,13 +14,19 @@
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 #include <tracking/ckf/states/CKFCDCToVXDStateObject.h>
 
+namespace genfit {
+  class MeasuredStateOnPlane;
+}
+
 namespace Belle2 {
+  class SpacePoint;
+
   class SpacePointKalmanUpdateFitter : public TrackFindingCDC::CompositeProcessingSignalListener {
   public:
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
-    {
+    static double kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint* spacePoint);
 
-    }
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+    {}
 
     TrackFindingCDC::Weight operator()(CKFCDCToVXDStateObject& currentState);
   };

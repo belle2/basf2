@@ -10,6 +10,7 @@
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCVXDTrackCombinationFilterFactory.h>
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/BaseCDCTrackSpacePointCombinationFilter.h>
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/SimpleCDCVXDTrackCombinationFilter.h>
+#include <tracking/ckf/filters/cdcTrackSpacePointCombination/Chi2CDCVXDTrackCombinationFilter.h>
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCVXDTrackCombinationTruthVarSet.h>
 
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
@@ -57,6 +58,7 @@ CDCVXDTrackCombinationFilterFactory::getValidFilterNamesAndDescriptions() const
     {"truth", "monte carlo truth"},
     {"truth_number", "monte carlo truth returning the number of correct hits"},
     {"simple", "simple filter based on simple parameters"},
+    {"chi2", "filter based on a chi2 calculation"},
   };
 }
 
@@ -73,6 +75,8 @@ CDCVXDTrackCombinationFilterFactory::create(const std::string& filterName) const
     return makeUnique<MCCTruthNumberCDCVXDTrackCombinationFilter>("truth");
   } else if (filterName == "simple") {
     return makeUnique<SimpleCDCVXDTrackCombinationFilter>();
+  } else if (filterName == "chi2") {
+    return makeUnique<Chi2CDCVXDTrackCombinationFilter>();
   } else {
     return Super::create(filterName);
   }

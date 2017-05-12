@@ -81,9 +81,9 @@ namespace Belle2 {
         double weight = m_resultsWithWeight[resultIndex].getWeight();
         weight = (weight - minimalWeight) / (maximalWeight - minimalWeight);
 
-        // activity state has no meaning here -> set to 0.
+        // activity state has no meaning here -> set to 1.
         // the overlap will be set later on.
-        m_overlapResolverInfos.push_back(OverlapResolverNodeInfo(weight, resultIndex, {}, 0));
+        m_overlapResolverInfos.push_back(OverlapResolverNodeInfo(weight, resultIndex, {}, 1));
       }
 
       for (OverlapResolverNodeInfo& resolverInfo : m_overlapResolverInfos)
@@ -115,8 +115,11 @@ namespace Belle2 {
         }
       }
 
-      // do hopfield
-      m_hopfieldNetwork.doHopfield(m_overlapResolverInfos);
+      if (m_overlapResolverInfos.size() > 1)
+      {
+        // do hopfield
+        m_hopfieldNetwork.doHopfield(m_overlapResolverInfos);
+      }
 
       // copy results
       m_temporaryResults.clear();

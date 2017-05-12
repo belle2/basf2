@@ -925,6 +925,7 @@ void TrackExtrapolateG4e::getStartPoint(const Track& b2track, int& pdgCode, doub
 {
   RecoTrack* recoTrack = b2track.getRelatedTo<RecoTrack>();
   const genfit::AbsTrackRep* trackRep = recoTrack->getCardinalRepresentation();
+  /* DIVOT ignore other representations for now - they cause aborts
   std::vector<genfit::AbsTrackRep*> representations = recoTrack->getRepresentations();
   for (std::vector<genfit::AbsTrackRep*>::const_iterator i = representations.begin(); i != representations.end(); ++i) {
     if (abs(pdgCode) == abs((*i)->getPDG())) {
@@ -932,6 +933,7 @@ void TrackExtrapolateG4e::getStartPoint(const Track& b2track, int& pdgCode, doub
       break;
     }
   }
+  END DIVOT */
   int charge = int(trackRep->getPDGCharge());
   if (charge != 0) {
     pdgCode *= charge;

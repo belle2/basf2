@@ -641,4 +641,57 @@ cc            PRINT*,'construct PDF for Mass=',MASS
       END
 
 
+      SUBROUTINE REDO_PDF(MASS)
+      
+      IMPLICIT NONE
+      REAL MASS
+#include "TOP_RTRA.fi"     
+
+      CALL SET_PHTIMES(.TRUE.)
+      CALL TOP_SET_PDF(MASS,RTRA_T0(1))
+
+      END
+
+      
+      INTEGER FUNCTION GET_NUM_PEAKS(ICH)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+      
+      GET_NUM_PEAKS = 0
+
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      
+      GET_NUM_PEAKS = NUM_PIK(ICH)
+
+      END
+
+
+      SUBROUTINE GET_PEAK(ICH, K, POZ, WID, NPH)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+      REAL POZ                  ! position
+      REAL WID                  ! width
+      REAL NPH                  ! number of photons
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      POZ = 0
+      WID = 0
+      NPH = 0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+
+      POZ = PIK_POZ(K,ICH)
+      WID = SQRT(PIK_WID(K,ICH))
+      NPH = STFS*PIK_NPH(K,ICH)
+
+      END
+
 

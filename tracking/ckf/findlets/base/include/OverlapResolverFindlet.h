@@ -52,7 +52,8 @@ namespace Belle2 {
         return;
       }
 
-      TrackFindingCDC::Weight maximalWeight = 0;
+      TrackFindingCDC::Weight maximalWeight = std::nan("");
+      TrackFindingCDC::Weight minimalWeight = std::nan("");
       m_resultsWithWeight.clear();
 
       for (ResultPair& resultPair : resultElements)
@@ -62,8 +63,11 @@ namespace Belle2 {
           continue;
         }
 
-        if (weight > maximalWeight) {
+        if (std::isnan(maximalWeight) or weight > maximalWeight) {
           maximalWeight = weight;
+        }
+        if (std::isnan(minimalWeight) or weight < minimalWeight) {
+          minimalWeight = weight;
         }
 
         m_resultsWithWeight.emplace_back(&resultPair, weight);
@@ -73,17 +77,18 @@ namespace Belle2 {
 
       for (unsigned int resultIndex = 0; resultIndex < m_resultsWithWeight.size(); resultIndex++)
       {
+        // normalize the weight
+        double weight = m_resultsWithWeight[resultIndex].getWeight();
+        weight = (weight - minimalWeight) / (maximalWeight - minimalWeight);
+
         // activity state has no meaning here -> set to 0.
         // the overlap will be set later on.
-        m_overlapResolverInfos.push_back(OverlapResolverNodeInfo(m_resultsWithWeight[resultIndex].getWeight(), resultIndex, {}, 0));
+        m_overlapResolverInfos.push_back(OverlapResolverNodeInfo(weight, resultIndex, {}, 0));
       }
 
       for (OverlapResolverNodeInfo& resolverInfo : m_overlapResolverInfos)
       {
         const ResultPair* resultPair = m_resultsWithWeight[resolverInfo.trackIndex];
-
-        // Normalize the weight
-        resolverInfo.qualityIndex /= maximalWeight;
 
         // Find overlaps.
         auto& overlaps = resolverInfo.overlaps;

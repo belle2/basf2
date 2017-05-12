@@ -135,7 +135,7 @@ namespace Belle2 {
     const int nbint = 3;
     double pwidth = (pmax - pmin) / (double)nbinp;
     double twidth = (tmax - tmin) / (double)nbint;
-    const double ext_lim = 15;
+    const double ext_lim = 1;
     const int OVER = 9999999;
     int pCounter = 0;
     int tCounter = 0;

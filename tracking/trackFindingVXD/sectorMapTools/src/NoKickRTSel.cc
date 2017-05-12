@@ -56,6 +56,27 @@ void NoKickRTSel::hit8TrackBuilder(const RecoTrack& track)
 
 }
 
+bool NoKickRTSel::globalCut(const std::vector<hitToTrueXP>& track8)
+{
+  int flag3 = 0;
+  int flag6 = 0;
+  int flagd0 = 0;
+  int flagphi0 = 0;
+  int flagz0 = 0;
+  int flagtanlambda = 0;
+  for (hitToTrueXP XP : track8) {
+    if (XP.getSensorLayer() == 3) flag3 = 1;
+    if (XP.getSensorLayer() == 6) flag3 = 1;
+    if (abs(XP.getD0Entry()) > 0.5) flagd0 = 1;
+    if (abs(XP.getPhi0Entry()) > 0.2) flagphi0 = 1;
+    if (abs(XP.getZ0Entry()) > 0.5) flagz0 = 1;
+    if (abs(XP.getTanLambdaEntry()) > 0.2) flagtanlambda = 1;
+  }
+  int flagTot = flag3 * flag6 * flagd0 * flagphi0 * flagz0 * flagtanlambda;
+  if (flagTot == 1) return true;
+  else return false;
+}
+
 bool NoKickRTSel::segmentSelector(hitToTrueXP hit1, hitToTrueXP hit2, std::vector<double> selCut, parameters par, bool is0)
 {
   double deltaPar = 0;
@@ -103,6 +124,7 @@ bool NoKickRTSel::segmentSelector(hitToTrueXP hit1, hitToTrueXP hit2, std::vecto
     }
     //else usedCut =abs(selCut.at(1));
     else usedCut = abs(selCut.at(1));
+    //if(par ==1 || par ==3) usedCut=0.5; else usedCut=0.2;
     if (deltaPar < -usedCut || deltaPar > usedCut) {
       //if(deltaPar < 1*selCut.at(0) || deltaPar > 1*selCut.at(1)){
       std::cout << "--------------------------" << std::endl;
@@ -130,6 +152,8 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
   initNoKickRTSel();
   hit8TrackBuilder(track);
   bool good = true;
+  good = globalCut(m_8hitTrack);
+  if (good == false) return good;
   if (track.getMomentumSeed().Mag() > m_pmax) return good;
   for (int i = 0; i < (int)(m_8hitTrack.size() - 2); i++) {
     double sinTheta = abs(m_8hitTrack.at(i).m_momentum0.Y()) /

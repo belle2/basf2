@@ -69,9 +69,9 @@ void NoKickCutsEvalModule::initialize()
   // lim_temp.push_back(0.2 * ext_lim);
   // lim_temp.push_back(0.5 * 0.3 * ext_lim);
   lim_temp.push_back(0.0003 * ext_lim);
-  lim_temp.push_back(1. * ext_lim);
+  lim_temp.push_back(0.5 * ext_lim);
   lim_temp.push_back(0.2 * ext_lim);
-  lim_temp.push_back(1. * ext_lim);
+  lim_temp.push_back(0.5 * ext_lim);
   lim_temp.push_back(0.2 * ext_lim);
 
 
@@ -141,9 +141,11 @@ void NoKickCutsEvalModule::event()
   for (const RecoTrack& track : recoTracks) {
     m_trackSel.hit8TrackBuilder(track);
     std::vector<hitToTrueXP> XP8 = m_trackSel.m_8hitTrack;
+    bool PriorCut = m_trackSel.globalCut(XP8);
     m_trackSel.m_8hitTrack.clear();
     m_trackSel.m_hitToTrueXP.clear();
     m_trackSel.m_setHitToTrueXP.clear();
+    if (!PriorCut) continue;
 
     if (XP8.size() > 0) {
       for (int i = 0; i < (int)(XP8.size() - 2); i++) {
@@ -577,12 +579,32 @@ void NoKickCutsEvalModule::endRun()
   for (int par = 0; par < nbinpar; par++) {
     for (int lay1 = 0; lay1 < nbinlay; lay1++) {
       for (int lay2 = 0; lay2 < nbinlay; lay2++) {
+        for (int theta = 0; theta < nbint; theta++) {
+          for (int p = 0; p < nbinp; p++) {
+            double layerdiff = lay2 - lay1;
+            if (layerdiff >= 0 && (layerdiff < 3 || (lay1 == 0 && lay2 == 3))) {
+              histo.at(par).at(lay1).at(lay2).at(theta).at(p)->Write();
+            }
+          }
+        }
+      }
+    }
+  }
+  for (int par = 0; par < nbinpar; par++) {
+    for (int lay1 = 0; lay1 < nbinlay; lay1++) {
+      for (int lay2 = 0; lay2 < nbinlay; lay2++) {
         for (int minmax = 0; minmax < 2; minmax++) {
           if (minmax == 0) {
-            cut_m_histo.at(par).at(lay1).at(lay2)->Write();
+            double layerdiff = lay2 - lay1;
+            if (layerdiff >= 0 && (layerdiff < 3 || (lay1 == 0 && lay2 == 3))) {
+              cut_m_histo.at(par).at(lay1).at(lay2)->Write();
+            }
           }
           if (minmax == 1) {
-            cut_M_histo.at(par).at(lay1).at(lay2)->Write();
+            double layerdiff = lay2 - lay1;
+            if (layerdiff >= 0 && (layerdiff < 3 || (lay1 == 0 && lay2 == 3))) {
+              cut_M_histo.at(par).at(lay1).at(lay2)->Write();
+            }
           }
         }
       }

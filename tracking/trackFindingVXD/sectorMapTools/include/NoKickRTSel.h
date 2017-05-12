@@ -116,6 +116,9 @@ namespace Belle2 {
     // This method return true if a couple of hits resects the cuts constraints.
     bool segmentSelector(hitToTrueXP hit1, hitToTrueXP hit2, std::vector<double> selCut, parameters par, bool is0 = false);
 
+    // This method make some global cuts on the tracks (layer 3 and 6 required, d0 and z0 inside beam pipe).
+    //Return false if this filter fails.
+    bool globalCut(const std::vector<hitToTrueXP>& track8);
 
     ClassDef(NoKickRTSel, 1);
   };

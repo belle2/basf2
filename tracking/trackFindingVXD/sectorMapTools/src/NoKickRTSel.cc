@@ -61,9 +61,9 @@ bool NoKickRTSel::globalCut(const std::vector<hitToTrueXP>& track8)
   // int flag3 = 0;
   // int flag6 = 0;
   int flagd0 = 1;
-  int flagphi0 = 1;
+  //int flagphi0 = 1;
   int flagz0 = 1;
-  int flagtanlambda = 1;
+  //int flagtanlambda = 1;
   int lay3 = 0;
   int lay4 = 0;
   int lay5 = 0;
@@ -75,10 +75,10 @@ bool NoKickRTSel::globalCut(const std::vector<hitToTrueXP>& track8)
     if (XP.getSensorLayer() == 6) lay6 = 1;
     // if (XP.getSensorLayer() == 3) flag3 = 1;
     // if (XP.getSensorLayer() == 6) flag6 = 1;
-    if (abs(XP.getD0Entry()) > 0.5) flagd0 = 0;
-    if (abs(XP.getPhi0Entry()) > 4) flagphi0 = 0;
-    if (abs(XP.getZ0Entry()) > 0.5) flagz0 = 0;
-    if (abs(XP.getTanLambdaEntry()) > 4) flagtanlambda = 0;
+    if (abs(XP.getD0Entry()) > 1.) flagd0 = 0;
+    //if (abs(XP.getPhi0Entry()) > 4) flagphi0 = 0;
+    if (abs(XP.getZ0Entry()) > 1.) flagz0 = 0;
+    //if (abs(XP.getTanLambdaEntry()) > 4) flagtanlambda = 0;
   }
   // if(flag3 ==0) std::cout << "flag3" << std::endl;
   // if(flag6 ==0) std::cout << "flag6" << std::endl;
@@ -90,7 +90,8 @@ bool NoKickRTSel::globalCut(const std::vector<hitToTrueXP>& track8)
   if (N_lay >= 3) N_lay = 1;
   else N_lay = 0;
   // if(N_lay ==0) std::cout << "N_lay" << std::endl;
-  int flagTot = flagd0 * flagphi0 * flagz0 * flagtanlambda * N_lay;
+  //int flagTot = flagd0 * flagphi0 * flagz0 * flagtanlambda * N_lay;
+  int flagTot = flagd0 * flagz0 * N_lay;
   if (flagTot == 1) return true;
   else return false;
 }

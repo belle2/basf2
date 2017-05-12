@@ -69,10 +69,10 @@ void NoKickCutsEvalModule::initialize()
   // lim_temp.push_back(0.2 * ext_lim);
   // lim_temp.push_back(0.5 * 0.3 * ext_lim);
   lim_temp.push_back(0.0003 * ext_lim);
-  lim_temp.push_back(0.5 * ext_lim);
-  lim_temp.push_back(0.2 * ext_lim);
-  lim_temp.push_back(0.5 * ext_lim);
-  lim_temp.push_back(0.2 * ext_lim);
+  lim_temp.push_back(1. * ext_lim);
+  lim_temp.push_back(0.3 * ext_lim);
+  lim_temp.push_back(1. * ext_lim);
+  lim_temp.push_back(0.3 * ext_lim);
 
 
   for (int par = 0; par < nbinpar; par++) {
@@ -157,7 +157,7 @@ void NoKickCutsEvalModule::event()
     if (!PriorCut) {GlobCounter++; continue;}
 
     if (XP8.size() > 0) {
-      for (int i = 0; i < (int)(XP8.size() - 2); i++) {
+      for (int i = 0; (i + 1) < (int)XP8.size(); i++) {
         for (int par = 0; par < nbinpar; par++) {
           int p = (int)((XP8.at(i).m_momentum0.Mag() - pmin) / pwidth);
           if (p > nbinp - 1 || p < 0) {

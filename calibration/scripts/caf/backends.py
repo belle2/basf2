@@ -8,12 +8,20 @@ import glob
 from .utils import method_dispatch
 import pickle
 import configparser
+from .utils import decode_json_string
+import pathlib
 
 import ROOT
+
+__all__ = ['pool', 'Job', 'Backend', 'Local', 'LSF', 'PBS']
+
 # For weird reasons, a multiprocessing pool doesn't work properly as a class attribute
 # So we make it a module variable. Should be fine as starting up multiple pools
 # is not recommended anyway. Will check this again someday.
 pool = None
+
+#: default configuration file location
+default_config_file = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
 
 
 class Job:
@@ -28,10 +36,16 @@ class Job:
     - Use absolute paths for all directories, otherwise you'll likely get into trouble
     """
 
-    def __init__(self, name):
+    def __init__(self, name, config_file=default_config_file):
         """
         Init method of Job object.
-        - Here you just set the job name, everything else comes later.
+        Params:
+
+        name = <str>  simply a name to describe the Job, not used for any critical purpose in the CAF
+
+        config_file = <str>  Optional path to a config file containing setup for the job. Generally used for basf2 setup.
+                             Requires a 'BASF2' section with 'Release', 'Tools', 'SetupCmds' options.
+                             By default the backends.default_config_file is used.
         """
         #: Job object's name. Only descriptive, not necessarily unique.
         self.name = name
@@ -45,14 +59,61 @@ class Job:
         self.output_patterns = []
         #: Command and arguments as a list that wil be run by the job on the backend
         self.cmd = []
-        #: Input root files to basf2 job
+        #: Input files to job, a list of these is copied to the working directory.
         self.input_files = []
+        #: Bash commands to run before the main self.cmd (mainly used for batch system setup
+        self.setup_cmds = []
+        #: ConfigParser object that sets the defaults (mainly for basf2 setup) and is used as the store
+        #: of configuration variables. Some other attributes reference this object via properties.
+        self.config = configparser.ConfigParser()
+        self.config.read(config_file)
+        #: Maximum number of files to place in a subjob (Not applicable to Local processing). -1 means don't split into subjobs
+        self.max_files_per_subjob = -1
+        #: Batch queue for each subjob when using the LSF or PBS backends
+        self.queue = None
 
     def __repr__(self):
         """
         Representation of Job class (what happens when you print a Job() instance)
         """
         return "\n".join([self.name, str(self.input_sandbox_files), str(self.input_files)])
+
+    def add_basf2_setup(self):
+        """
+        Creates a list of lines to write into a bash shell script that will setup basf2.
+        Extends the self.setup_cmds attribute when called instead of replacing it.
+        """
+        setup_cmds = self.config['BASF2']['SetupCmds']
+        print(setup_cmds)
+        self.setup_cmds.extend(decode_json_string(self.config['BASF2']['SetupCmds']))
+
+    @property
+    def basf2_release(self):
+        """
+        Getter for basf2 release version string. Pulls in the value from the configparser
+        """
+        return self.config.get("BASF2", "Release")
+
+    @basf2_release.setter
+    def basf2_release(self, release):
+        """
+        Setter for basf2 release version string, it actually sets the value in the configparser
+        """
+        self.config.set("BASF2", "Release", release)
+
+    @property
+    def basf2_tools(self):
+        """
+        Getter for basf2 tools location path. Pulls in the value from the configparser
+        """
+        return self.config.get("BASF2", "Tools")
+
+    @basf2_tools.setter
+    def basf2_tools(self, tools_location):
+        """
+        Setter for basf2 tools location path, it actually sets the value in the configparser
+        """
+        self.config.set("BASF2", "Tools", tools_location)
 
 
 class Backend():
@@ -167,14 +228,13 @@ class Local(Backend):
         """
         global pool
         # Submit the jobs to owned Pool
-        B2INFO('Job Submitting: '+job.name)
+        B2INFO('Job Submitting: ' + job.name)
         # Make sure the output directory of the job is created
-        if not os.path.exists(job.output_dir):
-            os.makedirs(job.output_dir)
-
+        job_output_path = pathlib.Path(job.output_dir)
+        job_output_path.mkdir(parents=True, exists_ok=True)
         # Make sure the working directory of the job is created
-        if job.working_dir and not os.path.exists(job.working_dir):
-            os.makedirs(job.working_dir)
+        job_wd_path = pathlib.Path(job.working_dir)
+        job_wd_path.mkdir(parents=True, exists_ok=True)
 
         # Get all of the requested files for the input sandbox and copy them to the working directory
         for file_pattern in job.input_sandbox_files:
@@ -261,75 +321,16 @@ class PBS(Backend):
     cmd_queue = "#PBS -q"
     #: Job name directive
     cmd_name = "#PBS -N"
-
-    #: default location of config file
-    default_config_file = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
     #: default PBS section name in config file
     default_config_section = "PBS"
     #: required entries in config section
-    required_config = ["Queue", "Release", "Tools"]
+    required_config = ["Queue"]
 
-    def __init__(self, config_file_path="", section=""):
+    def __init__(self):
         """
         Init method for PBS Backend. Does default setup based on config file.
         """
-        if config_file_path and section:
-            self.load_from_config(config_file_path, section)
-        else:
-            self.load_from_config(PBS.default_config_file, PBS.default_config_section)
-        self.basf2_setup = None
-
-    def load_from_config(self, config_file_path, section):
-        """
-        Takes a config file path (string) and the relevant section name (string).
-        Checks that the required setup options are set. When loading from a config file you
-        can't have a partially complete list of required options.
-
-        If you want to modify the default setup try changing the public attributes directly.
-        """
-        if config_file_path and section:
-            if os.path.exists(config_file_path):
-                cp = configparser.ConfigParser()
-                cp.read(config_file_path)
-            else:
-                B2FATAL("Attempted to load a config file that doesn't exist! {0}".format(config_file_path))
-            if cp.has_section(section):
-                for option in PBS.required_config:
-                    if not cp.has_option(section, option):
-                        B2FATAL(("Tried to load config file but required option {0} "
-                                 "not found in section {1}".format(option, section)))
-            else:
-                B2FATAL("Tried to load config file but required section {0} not found.".format(section))
-        self._update_from_config(cp, section)
-
-    def _update_from_config(self, config, section):
-        """
-        Sets attributes from a ConfigParser object. Checks for required options should already be done
-        so we can just use them here.
-        """
-        #: queue name for PBS submission
-        self.queue = config[section]["Queue"]
-        #: basf2 release path
-        self.release = config[section]["Release"]
-        #: basf2 tools location
-        self.tools = config[section]["Tools"]
-
-    def _generate_basf2_setup(self):
-        """
-        Creates a list of lines to write into a bash shell script that will setup basf2.
-        Will not be called if the user has set the pbs.basf2_setup attribute themselves.
-        """
-        #: A list of string lines that define how basf2 will be setup on the worker node.
-        #: Can be set explicitly by the user or ignored if the default/user defined config file
-        #: is good enough
-        self.basf2_setup = []
-        self.basf2_setup.extend(["export VO_BELLE2_SW_DIR=/cvmfs/belle.cern.ch/sl6\n",
-                                 "CAF_TOOLS_LOCATION="+self.tools+"\n",
-                                 "CAF_RELEASE_LOCATION="+self.release+"\n",
-                                 "source $CAF_TOOLS_LOCATION\n",
-                                 "pushd $CAF_RELEASE_LOCATION > /dev/null\n",
-                                 "setuprel\n",
-                                 "popd > /dev/null\n"])
+        self.subjobs_to_files = None
 
     def _generate_pbs_script(self, job):
         """
@@ -339,20 +340,20 @@ class PBS(Backend):
         with open(os.path.join(job.working_dir, "submit.sh"), "w") as batch_file:
             batch_file.write("#!/bin/bash\n")
             batch_file.write("# --- Start PBS ---\n")
-            batch_file.write(" ".join([PBS.cmd_queue, self.queue])+"\n")
-            batch_file.write(" ".join([PBS.cmd_name, job.name])+"\n")
-            batch_file.write(" ".join([PBS.cmd_wkdir, job.working_dir])+"\n")
-            batch_file.write(" ".join([PBS.cmd_stdout, os.path.join(job.output_dir, "stdout")])+"\n")
-            batch_file.write(" ".join([PBS.cmd_stderr, os.path.join(job.output_dir, "stderr")])+"\n")
+            batch_file.write(" ".join([PBS.cmd_queue, job.queue]) + "\n")
+            batch_file.write(" ".join([PBS.cmd_name, job.name]) + "\n")
+            batch_file.write(" ".join([PBS.cmd_wkdir, job.working_dir]) + "\n")
+            batch_file.write(" ".join([PBS.cmd_stdout, os.path.join(job.output_dir, "stdout")]) + "\n")
+            batch_file.write(" ".join([PBS.cmd_stderr, os.path.join(job.output_dir, "stderr")]) + "\n")
             batch_file.write("# --- End PBS ---\n")
-            self._add_basf2_setup(batch_file)
-            batch_file.write(" ".join(job.cmd)+"\n")
+            self._add_setup(job, batch_file)
+            batch_file.write(" ".join(job.cmd) + "\n")
 
-    def _add_basf2_setup(self, file):
+    def _add_setup(self, job, file):
         """
-        Adds basf2 setup lines to the PBS shell script file.
+        Adds setup lines to the PBS shell script file.
         """
-        for line in self.basf2_setup:
+        for line in job.setup_cmds:
             file.write(line)
 
     class Result():
@@ -406,54 +407,55 @@ class PBS(Backend):
         Should return a Result object that allows a 'ready' member method to be called from it which queries
         the PBS system and the job about whether or not the job has finished.
         """
-        B2INFO('Job Submitting: '+job.name)
-        # Make sure the output directory of the job is created
-        if not os.path.exists(job.output_dir):
-            os.makedirs(job.output_dir)
+        B2INFO('Job Submitting: ' + job.name)
+        if job.max_files_per_subjob < 0:
+            # Make sure the output directory of the job is created
+            job_output_path = pathlib.Path(job.output_dir)
+            job_output_path.mkdir(parents=True, exist_ok=True)
+            # Make sure the working directory of the job is created
+            job_wd_path = pathlib.Path(job.working_dir)
+            job_wd_path.mkdir(parents=True, exist_ok=True)
 
-        # Make sure the working directory of the job is created
-        if job.working_dir and not os.path.exists(job.working_dir):
-            os.makedirs(job.working_dir)
+            # Get all of the requested files for the input sandbox and copy them to the working directory
+            for file_pattern in job.input_sandbox_files:
+                input_files = glob.glob(file_pattern)
+                for file_path in input_files:
+                    if os.path.isdir(file_path):
+                        shutil.copytree(file_path, os.path.join(job.working_dir, os.path.split(file_path)[1]))
+                    else:
+                        shutil.copy(file_path, job.working_dir)
 
-        # Get all of the requested files for the input sandbox and copy them to the working directory
-        for file_pattern in job.input_sandbox_files:
-            input_files = glob.glob(file_pattern)
-            for file_path in input_files:
-                if os.path.isdir(file_path):
-                    shutil.copytree(file_path, os.path.join(job.working_dir, os.path.split(file_path)[1]))
+            # Check if we have any valid input files
+            existing_input_files = set()
+            for input_file_pattern in job.input_files:
+                if input_file_pattern[:7] != "root://":
+                    input_files = glob.glob(input_file_pattern)
+                    if not input_files:
+                        B2WARNING("No files matching {0} can be found, it will be skipped!".format(input_file_pattern))
+                    else:
+                        for file_path in input_files:
+                            file_path = os.path.abspath(file_path)
+                            if os.path.isfile(file_path):
+                                existing_input_files.add(file_path)
                 else:
-                    shutil.copy(file_path, job.working_dir)
+                    B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
+                            " before collector submission.".format(input_file_pattern)))
+                    existing_input_files.add(input_file_pattern)
 
-        # Check if we have any valid input files
-        existing_input_files = set()
-        for input_file_pattern in job.input_files:
-            if input_file_pattern[:7] != "root://":
-                input_files = glob.glob(input_file_pattern)
-                if not input_files:
-                    B2WARNING("No files matching {0} can be found, it will be skipped!".format(input_file_pattern))
-                else:
-                    for file_path in input_files:
-                        file_path = os.path.abspath(file_path)
-                        if os.path.isfile(file_path):
-                            existing_input_files.add(file_path)
+            if existing_input_files:
+                # Now make a python file in our input sandbox containing a list of these valid files
+                with open(pathlib.Path(job.working_dir, 'input_data_files.data'), 'bw') as input_data_file:
+                    pickle.dump(list(existing_input_files), input_data_file)
             else:
-                B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
-                        " before collector submission.".format(input_file_pattern)))
-                existing_input_files.add(input_file_pattern)
+                B2INFO("No valid input files found for job {0}".format(job.name))
 
-        if existing_input_files:
-            # Now make a python file in our input sandbox containing a list of these valid files
-            with open(os.path.join(job.working_dir, 'input_data_files.data'), 'bw') as input_data_file:
-                pickle.dump(list(existing_input_files), input_data_file)
+            self._generate_pbs_script(job)
+            result = self._submit_to_qsub(job)
+            return result
+        elif job.max_files_per_subjob == 0:
+            B2FATAL("When submitting Job {}, files per subjob was 0!".format(job.name))
         else:
-            B2FATAL("No valid input files found for job {0}".format(job.name))
-
-        # If the user hasn't explicitly set the basf2_setup attribute, then do the default here from the config values
-        if not self.basf2_setup:
-            self._generate_basf2_setup()
-        self._generate_pbs_script(job)
-        result = self._submit_to_qsub(job)
-        return result
+            B2INFO("Not Implemented subjobs yet")
 
     def _submit_to_qsub(self, job):
         """
@@ -468,8 +470,7 @@ class PBS(Backend):
     @submit.register(list)
     def _(self, jobs):
         """
-        Submit method of PBS() that takes a list of jobs instead of just one and submits each one
-        with qsub. Possibly with multiple submissions based on input file splitting.
+        Submit method of PBS() that takes a list of jobs instead of just one and submits each one.
         """
         results = []
         # Submit the jobs to PBS
@@ -509,7 +510,6 @@ class LSF(Backend):
             self.load_from_config(config_file_path, section)
         else:
             self.load_from_config(LSF.default_config_file, LSF.default_config_section)
-        self.basf2_setup = None
 
     def load_from_config(self, config_file_path, section):
         """
@@ -541,10 +541,6 @@ class LSF(Backend):
         """
         #: queue name for LSF submission
         self.queue = config[section]["Queue"]
-        #: basf2 release path
-        self.release = config[section]["Release"]
-        #: basf2 tools location
-        self.tools = config[section]["Tools"]
 
     def _generate_basf2_setup(self):
         """
@@ -554,14 +550,14 @@ class LSF(Backend):
         #: A list of string lines that define how basf2 will be setup on the worker node.
         #: Can be set explicitly by the user or ignored if the default/user defined config file
         #: is good enough
-        self.basf2_setup = []
-        self.basf2_setup.extend(["export VO_BELLE2_SW_DIR=/cvmfs/belle.cern.ch/sl6\n",
-                                 "CAF_TOOLS_LOCATION="+self.tools+"\n",
-                                 "CAF_RELEASE_LOCATION="+self.release+"\n",
-                                 "source $CAF_TOOLS_LOCATION\n",
-                                 "pushd $CAF_RELEASE_LOCATION > /dev/null\n",
-                                 "setuprel\n",
-                                 "popd > /dev/null\n"])
+        self.setup_cmds = []
+        self.setup_cmds.extend(["export VO_BELLE2_SW_DIR=/cvmfs/belle.cern.ch/sl6\n",
+                                "CAF_TOOLS_LOCATION=" + self.tools + "\n",
+                                "CAF_RELEASE_LOCATION=" + self.release + "\n",
+                                "source $CAF_TOOLS_LOCATION\n",
+                                "pushd $CAF_RELEASE_LOCATION > /dev/null\n",
+                                "setuprel\n",
+                                "popd > /dev/null\n"])
 
     def _generate_lsf_script(self, job):
         """
@@ -571,20 +567,20 @@ class LSF(Backend):
         with open(os.path.join(job.working_dir, "submit.sh"), "w") as batch_file:
             batch_file.write("#!/bin/bash\n")
             batch_file.write("# --- Start LSF ---\n")
-            batch_file.write(" ".join([LSF.cmd_queue, self.queue])+"\n")
-            batch_file.write(" ".join([LSF.cmd_name, job.name])+"\n")
-            batch_file.write(" ".join([LSF.cmd_wkdir, job.working_dir])+"\n")
-            batch_file.write(" ".join([LSF.cmd_stdout, os.path.join(job.output_dir, "stdout")])+"\n")
-            batch_file.write(" ".join([LSF.cmd_stderr, os.path.join(job.output_dir, "stderr")])+"\n")
+            batch_file.write(" ".join([LSF.cmd_queue, self.queue]) + "\n")
+            batch_file.write(" ".join([LSF.cmd_name, job.name]) + "\n")
+            batch_file.write(" ".join([LSF.cmd_wkdir, job.working_dir]) + "\n")
+            batch_file.write(" ".join([LSF.cmd_stdout, os.path.join(job.output_dir, "stdout")]) + "\n")
+            batch_file.write(" ".join([LSF.cmd_stderr, os.path.join(job.output_dir, "stderr")]) + "\n")
             batch_file.write("# --- End LSF ---\n")
-            self._add_basf2_setup(batch_file)
-            batch_file.write(" ".join(job.cmd)+"\n")
+            self._add_setup(batch_file)
+            batch_file.write(" ".join(job.cmd) + "\n")
 
-    def _add_basf2_setup(self, file):
+    def _add_setup(self, file):
         """
         Adds basf2 setup lines to the LSF shell script file.
         """
-        for line in self.basf2_setup:
+        for line in self.setup_cmds:
             file.write(line)
 
     class Result():
@@ -637,7 +633,7 @@ class LSF(Backend):
         Should return a Result object that allows a 'ready' member method to be called from it which queries
         the LSF system and the job about whether or not the job has finished.
         """
-        B2INFO('Job Submitting: '+job.name)
+        B2INFO('Job Submitting: ' + job.name)
         # Make sure the output directory of the job is created
         if not os.path.exists(job.output_dir):
             os.makedirs(job.output_dir)
@@ -680,7 +676,7 @@ class LSF(Backend):
             B2FATAL("No valid input files found for job {0}".format(job.name))
 
         # If the user hasn't explicitly set the basf2_setup attribute, then do the default here from the config values
-        if not self.basf2_setup:
+        if not self.setup_cmds:
             self._generate_basf2_setup()
         self._generate_lsf_script(job)
         result = self._submit_to_bsub(job)
@@ -692,11 +688,12 @@ class LSF(Backend):
         """
         B2INFO("Calling bsub for job {0}".format(job.name))
         script_path = os.path.join(job.working_dir, "submit.sh")
-        bsub_out = subprocess.check_output(("bsub < "+script_path,), stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        bsub_out = subprocess.check_output(("bsub < " + script_path,), stderr=subprocess.STDOUT,
+                                           universal_newlines=True, shell=True)
         job_id = bsub_out.split(" ")[1]
         for wrap in ["<", ">"]:
             job_id = job_id.replace(wrap, "")
-        B2INFO("Job ID recorded as: "+job_id)
+        B2INFO("Job ID recorded as: " + job_id)
         result = LSF.Result(job, job_id)
         return result
 

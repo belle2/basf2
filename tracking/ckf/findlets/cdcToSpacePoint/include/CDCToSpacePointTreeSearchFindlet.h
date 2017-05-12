@@ -34,13 +34,9 @@ namespace Belle2 {
                   SpacePointAdvanceAlgorithm,
                   SpacePointKalmanUpdateFitter >;
 
-    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
-
     void apply(std::vector<Super::SeedPtr>& seedsVector, std::vector<Super::HitPtr>& hitVector,
                std::vector<Super::ResultPair>& results) final {
-      genfit::MaterialEffects::getInstance()->setNoEffects(not m_param_useMaterialEffects);
       Super::apply(seedsVector, hitVector, results);
-      genfit::MaterialEffects::getInstance()->setNoEffects(false);
     }
 
   private:
@@ -49,9 +45,6 @@ namespace Belle2 {
     void initializeEventCache(std::vector<RecoTrack*>& seedsVector, std::vector<const SpacePoint*>& filteredHitVector) final;
 
   private:
-    /// Parameter: use material effects
-    bool m_param_useMaterialEffects = true;
-
     /// Cache for sorted hits
     std::map<unsigned int, TrackFindingCDC::SortedVectorRange<const SpacePoint*>> m_cachedHitMap;
 

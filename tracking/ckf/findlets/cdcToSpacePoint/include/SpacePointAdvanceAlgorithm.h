@@ -26,8 +26,15 @@ namespace Belle2 {
     bool extrapolate(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const SpacePoint* spacePoint) const;
 
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
-    {}
+    {
+      moduleParamList->addParameter("useMaterialEffects", m_param_useMaterialEffects,
+                                    "Use material effects during extrapolation.", m_param_useMaterialEffects);
+    }
 
     TrackFindingCDC::Weight operator()(CKFCDCToVXDStateObject& currentState) const;
+
+  private:
+    /// Parameter: use material effects
+    bool m_param_useMaterialEffects = true;
   };
 }

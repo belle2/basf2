@@ -17,14 +17,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void CDCToSpacePointTreeSearchFindlet::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
-{
-  Super::exposeParameters(moduleParamList, prefix);
-
-  moduleParamList->addParameter("useMaterialEffects", m_param_useMaterialEffects,
-                                "Use material effects during extrapolation.", m_param_useMaterialEffects);
-}
-
 SortedVectorRange<const SpacePoint*> CDCToSpacePointTreeSearchFindlet::getMatchingHits(Super::StateObject& currentState)
 {
   const unsigned int currentNumber = currentState.getNumber();

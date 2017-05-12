@@ -23,7 +23,9 @@ bool SpacePointAdvanceAlgorithm::extrapolate(genfit::MeasuredStateOnPlane& measu
   const genfit::SharedPlanePtr& plane = recoHit.constructPlane(measuredStateOnPlane);
 
   try {
+    genfit::MaterialEffects::getInstance()->setNoEffects(not m_param_useMaterialEffects);
     measuredStateOnPlane.extrapolateToPlane(plane);
+    genfit::MaterialEffects::getInstance()->setNoEffects(false);
   } catch (genfit::Exception e) {
     B2WARNING(e.what());
     return false;

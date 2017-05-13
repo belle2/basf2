@@ -11,6 +11,8 @@
 
 #include <tracking/trackFindingCDC/utilities/SortedRange.h>
 
+#include <vector>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 

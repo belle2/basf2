@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 
@@ -19,7 +20,7 @@ namespace Belle2 {
 
     using SeedObject = RecoTrack;
     using HitObject = SpacePoint;
-    using ResultObject = std::pair<RecoTrack*, std::vector<const HitObject*>>;
+    using ResultObject = TrackFindingCDC::WithWeight<std::pair<RecoTrack*, std::vector<const HitObject*>>>;
 
     void initialize(RecoTrack* seed)
     {
@@ -54,7 +55,7 @@ namespace Belle2 {
       // ATTENTION: We do not set the mSoP here, as this is quite costly.
     }
 
-    std::pair<RecoTrack*, std::vector<const HitObject*>> finalize() const
+    ResultObject finalize() const
     {
       std::vector<const HitObject*> hits;
       hits.reserve(N);
@@ -67,7 +68,14 @@ namespace Belle2 {
       };
       walk(hitAdder);
 
-      return std::make_pair(getSeedRecoTrack(), hits);
+      double chi2 = 0;
+
+      const auto& chi2Adder = [&chi2](const CKFCDCToVXDStateObject * walkObject) {
+        chi2 += walkObject->getChi2();
+      };
+      walk(chi2Adder);
+
+      return ResultObject(std::make_pair(getSeedRecoTrack(), hits), chi2);
     }
 
     // const Getters

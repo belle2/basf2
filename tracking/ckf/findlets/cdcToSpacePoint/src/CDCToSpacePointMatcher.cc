@@ -12,7 +12,27 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-SortedVectorRange<const SpacePoint*> CDCToSpacePointMatcher::getMatchingHits(CKFCDCToVXDStateObject& currentState)
+VectorRange<CKFCDCToVXDStateObject> CDCToSpacePointMatcher::getChildStates(CKFCDCToVXDStateObject& currentState)
+{
+  const auto& matchingHits = getMatchingHits(currentState);
+  auto& temporaryStates = m_temporaryStates[currentState.getNumber()];
+  temporaryStates.resize(matchingHits.size() + 1);
+
+  auto lastState = temporaryStates.begin();
+  for (const auto& hit : matchingHits) {
+    lastState->set(&currentState, hit);
+    lastState = std::next(lastState);
+  }
+
+  if (m_param_makeHitJumpingPossible) {
+    lastState->set(&currentState, nullptr);
+    lastState = std::next(lastState);
+  }
+
+  return VectorRange<CKFCDCToVXDStateObject>(temporaryStates.begin(), lastState);
+}
+
+VectorRange<const SpacePoint*> CDCToSpacePointMatcher::getMatchingHits(CKFCDCToVXDStateObject& currentState)
 {
   const unsigned int currentNumber = currentState.getNumber();
 
@@ -26,7 +46,7 @@ SortedVectorRange<const SpacePoint*> CDCToSpacePointMatcher::getMatchingHits(CKF
     const SpacePoint* lastAddedSpacePoint = currentState.getHit();
     if (not lastAddedSpacePoint) {
       // No hit was added on the layer, so no overlap can occur.
-      return SortedVectorRange<const SpacePoint*>();
+      return VectorRange<const SpacePoint*>();
     }
 
     const unsigned int ladderNumber = lastAddedSpacePoint->getVxdID().getLadderNumber();
@@ -54,13 +74,13 @@ SortedVectorRange<const SpacePoint*> CDCToSpacePointMatcher::getMatchingHits(CKF
     for (auto it = first; it != last; it++) {
       B2DEBUG(100, (*it)->getVxdID());
     }
-    return SortedVectorRange<const SpacePoint*>(first, last);
+    return VectorRange<const SpacePoint*>(first, last);
   }
 
 }
 
-/*void CDCToSpacePointSelector::initializeEventCache(std::vector<RecoTrack*>& seedsVector,
-                                                            std::vector<const SpacePoint*>& filteredHitVector)
+void CDCToSpacePointMatcher::initializeEventCache(std::vector<RecoTrack*>& seedsVector,
+                                                  std::vector<const SpacePoint*>& filteredHitVector)
 {
   m_cachedHitMap.clear();
 
@@ -78,7 +98,7 @@ SortedVectorRange<const SpacePoint*> CDCToSpacePointMatcher::getMatchingHits(CKF
     const auto first = std::find_if(filteredHitVector.begin(), filteredHitVector.end(), onGivenLayerCheck);
     const auto last = std::find_if_not(first, filteredHitVector.end(), onGivenLayerCheck);
 
-    m_cachedHitMap.emplace(layerID, SortedVectorRange<const SpacePoint*>(first, last));
+    m_cachedHitMap.emplace(layerID, VectorRange<const SpacePoint*>(first, last));
 
     B2DEBUG(100, "Storing in " << layerID << " " << std::distance(first, last));
     for (auto it = first; it != last; it++) {
@@ -87,6 +107,6 @@ SortedVectorRange<const SpacePoint*> CDCToSpacePointMatcher::getMatchingHits(CKF
   }
 
   // Include the PXD layers as empty
-  m_cachedHitMap.emplace(2, SortedVectorRange<const SpacePoint*>());
-  m_cachedHitMap.emplace(1, SortedVectorRange<const SpacePoint*>());
-}*/
+  m_cachedHitMap.emplace(2, VectorRange<const SpacePoint*>());
+  m_cachedHitMap.emplace(1, VectorRange<const SpacePoint*>());
+}

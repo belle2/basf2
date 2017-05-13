@@ -43,9 +43,12 @@ namespace Belle2 {
     void apply(std::vector<SeedPtr>& seedsVector, std::vector<HitPtr>& hitVector,
                std::vector<ResultPair>& results) override
     {
+      m_hitSelector.initializeEventCache(seedsVector, hitVector);
+
       for (SeedPtr seed : seedsVector) {
         StateIterator firstStateIterator = m_states.begin();
         firstStateIterator->initialize(seed);
+
         traverseTree(firstStateIterator, results);
       }
     }

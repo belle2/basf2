@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/findlets/cdcToSpacePoint/CDCToSpacePointHitSelector.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-
 #include <tracking/ckf/utilities/SelectionAlgorithms.h>
 
 using namespace Belle2;
@@ -27,6 +25,8 @@ CDCToSpacePointHitSelector::CDCToSpacePointHitSelector() : TrackFindingCDC::Comp
 
 void CDCToSpacePointHitSelector::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
+  m_hitMatcher.exposeParameters(moduleParamList, prefix);
+
   m_firstFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "first"));
   m_secondFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "second"));
   m_thirdFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "third"));
@@ -34,8 +34,6 @@ void CDCToSpacePointHitSelector::exposeParameters(ModuleParamList* moduleParamLi
   m_advanceAlgorithm.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "advance"));
   m_fitterAlgorithm.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "fitter"));
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "makeHitJumpingPossible"), m_param_makeHitJumpingPossible,
-                                "", m_param_makeHitJumpingPossible);
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "advance"), m_param_advance,
                                 "Do the advance step.", m_param_advance);
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "fit"), m_param_fit,
@@ -48,7 +46,7 @@ void CDCToSpacePointHitSelector::exposeParameters(ModuleParamList* moduleParamLi
 TrackFindingCDC::VectorRange<CKFCDCToVXDStateObject> CDCToSpacePointHitSelector::getChildStates(
   CKFCDCToVXDStateObject& currentState)
 {
-  auto childStates = fillChildStates(currentState);
+  auto childStates = m_hitMatcher.getChildStates(currentState);
 
   applyAndFilter(childStates, m_firstFilter, 2 * m_param_useNResults);
 
@@ -65,26 +63,4 @@ TrackFindingCDC::VectorRange<CKFCDCToVXDStateObject> CDCToSpacePointHitSelector:
   applyAndFilter(childStates, m_thirdFilter, m_param_useNResults);
 
   return childStates;
-}
-
-TrackFindingCDC::VectorRange<CKFCDCToVXDStateObject> CDCToSpacePointHitSelector::fillChildStates(
-  CKFCDCToVXDStateObject& currentState)
-{
-  // TODO: move out
-
-  const auto& matchingHits = m_hitMatcher.getMatchingHits(currentState);
-  auto& temporaryStates = m_temporaryStates[currentState.getNumber()];
-  temporaryStates.resize(matchingHits.size() + 1);
-
-  auto lastState = temporaryStates.begin();
-  for (const auto& hit : matchingHits) {
-    lastState->set(&currentState, hit);
-    lastState = std::next(lastState);
-  }
-
-  if (m_param_makeHitJumpingPossible) {
-    lastState->set(&currentState, nullptr);
-  }
-
-  return TrackFindingCDC::VectorRange<CKFCDCToVXDStateObject>(temporaryStates.begin(), temporaryStates.end());
 }

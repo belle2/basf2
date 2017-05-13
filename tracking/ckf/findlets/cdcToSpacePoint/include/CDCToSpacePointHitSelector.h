@@ -29,15 +29,16 @@ namespace Belle2 {
     /// Expose the parameters of the filters and our own parameters
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
 
-    /// Main function of this findlet: return a range of selected child states for a given current state.
+    /// Main function of this findlet: return a range of selected child states for a given current state
     TrackFindingCDC::VectorRange<CKFCDCToVXDStateObject> getChildStates(CKFCDCToVXDStateObject& currentState);
 
-  private:
-    /// Temporary object pool for finding the next state
-    std::array < std::vector<CKFCDCToVXDStateObject>, CKFCDCToVXDStateObject::N + 1 > m_temporaryStates;
+    /// Initialize the cache of the hit matcher with the hits to be used in this event
+    void initializeEventCache(std::vector<RecoTrack*>& seedsVector, std::vector<const SpacePoint*>& filteredHitVector)
+    {
+      m_hitMatcher.initializeEventCache(seedsVector, filteredHitVector);
+    }
 
-    /// Parameter: make hit jumps possible
-    bool m_param_makeHitJumpingPossible = true;
+  private:
     /// Parameter: do the advance step
     bool m_param_advance = true;
     /// Parameter: do the fit step
@@ -57,8 +58,5 @@ namespace Belle2 {
     SpacePointAdvanceAlgorithm m_advanceAlgorithm;
     /// Subfindlet: Fitter
     SpacePointKalmanUpdateFitter m_fitterAlgorithm;
-
-    // TODO: move away
-    TrackFindingCDC::VectorRange<CKFCDCToVXDStateObject> fillChildStates(CKFCDCToVXDStateObject& currentState);
   };
 }

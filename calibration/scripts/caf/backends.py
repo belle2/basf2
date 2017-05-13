@@ -196,7 +196,7 @@ class Backend():
     to whatever backend they describe. Common methods/attributes go here.
     """
 
-    def submit(self):
+    def submit(self, job):
         """
         Base method for submitting collection jobs to the backend type. This MUST be
         implemented for a correctly written backend class deriving from Backend().
@@ -419,15 +419,12 @@ class Batch(Backend):
             pickle.dump(job.input_files, input_data_file)
 
     @classmethod
-    def _submit_to_batch(cls, job):
+    def _submit_to_batch(cls, cmd):
         """
         Do the actual batch submission command and collect the output to find out the job id for later monitoring.
         """
-        script_path = os.path.join(job.working_dir, "submit.sh")
-        submission_cmd = cls.submission_cmds[:]
-        submission_cmd.append(script_path)
-        sub_out = subprocess.check_output(submission_cmd, stderr=subprocess.STDOUT, universal_newlines=True)
-        cls._create_job_result(job, sub_out)
+        raise NotImplementedError(("Need to implement a _submit_to_batch(cls, cmd) "
+                                   "method in {} backend.".format(self.__class__.__name__)))
 
     @method_dispatch
     def submit(self, job):
@@ -504,7 +501,11 @@ class Batch(Backend):
                     self._add_setup(job, batch_file)
                     batch_file.write(" ".join(job.cmd) + "\n")
                 B2INFO("Submitting Job({})".format(job.name))
-                self._submit_to_batch(job)
+
+                script_path = os.path.join(job.working_dir, "submit.sh")
+                cmd = self._create_cmd(script_path)
+                output = self._submit_to_batch(cmd)
+                self._create_job_result(job, output)
             else:
                 self.submit(list(job.subjobs.values()))
 
@@ -524,7 +525,10 @@ class Batch(Backend):
                 self._add_setup(job, batch_file)
                 batch_file.write(" ".join(job.cmd) + "\n")
             B2INFO("Submitting Job({})".format(job.name))
-            self._submit_to_batch(job)
+            script_path = os.path.join(job.working_dir, "submit.sh")
+            cmd = self._create_cmd(script_path)
+            output = self._submit_to_batch(cmd)
+            self._create_job_result(job, output)
 
     @submit.register(list)
     def _(self, jobs):
@@ -539,6 +543,10 @@ class Batch(Backend):
     @classmethod
     def _create_job_result(cls, job, batch_output):
         raise NotImplementedError("Need to implement a _create_job_result(job, batch_output) method")
+
+    @classmethod
+    def _create_cmd(cls, job):
+        raise NotImplementedError("Need to implement a _create_cmd(job) method")
 
 
 class PBS(Batch):
@@ -580,6 +588,20 @@ class PBS(Batch):
     def _create_job_result(cls, job, batch_output):
         job_id = batch_output.replace("\n", "")
         job.result = cls.Result(job, job_id)
+
+    @classmethod
+    def _create_cmd(cls, script_path):
+        submission_cmd = cls.submission_cmds[:]
+        submission_cmd.append(script_path)
+        return submission_cmd
+
+    @classmethod
+    def _submit_to_batch(cls, cmd):
+        """
+        Do the actual batch submission command and collect the output to find out the job id for later monitoring.
+        """
+        sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True)
+        return sub_out
 
     class Result():
         """
@@ -624,7 +646,7 @@ class PBS(Batch):
                     shutil.move(file_name, self.job.output_dir)
 
 
-class LSF(Backend):
+class LSF(Batch):
     """
     Backend for submitting calibration processes to a qsub batch system
     """
@@ -649,12 +671,27 @@ class LSF(Backend):
         """
         batch_file.write("#!/bin/bash\n")
         batch_file.write("# --- Start LSF ---\n")
-        batch_file.write(" ".join([LSF.cmd_queue, self.queue]) + "\n")
+        batch_file.write(" ".join([LSF.cmd_queue, job.queue]) + "\n")
         batch_file.write(" ".join([LSF.cmd_name, job.name]) + "\n")
         batch_file.write(" ".join([LSF.cmd_wkdir, job.working_dir]) + "\n")
         batch_file.write(" ".join([LSF.cmd_stdout, os.path.join(job.output_dir, "stdout")]) + "\n")
         batch_file.write(" ".join([LSF.cmd_stderr, os.path.join(job.output_dir, "stderr")]) + "\n")
         batch_file.write("# --- End LSF ---\n")
+
+    @classmethod
+    def _create_cmd(cls, script_path):
+        submission_cmd = cls.submission_cmds[:]
+        submission_cmd.append(script_path)
+        submission_cmd = " ".join(submission_cmd)
+        return [submission_cmd]
+
+    @classmethod
+    def _submit_to_batch(cls, cmd):
+        """
+        Do the actual batch submission command and collect the output to find out the job id for later monitoring.
+        """
+        sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        return sub_out
 
     class Result():
         """

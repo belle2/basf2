@@ -34,6 +34,8 @@ namespace Belle2 {
 
       m_isFitted = false;
       m_isAdvanced = false;
+
+      // ATTENTION: We do not set the mSoP here, as this is quite costly.
     }
 
     void set(CKFCDCToVXDStateObject* parent, const HitObject* hitObject)
@@ -48,6 +50,8 @@ namespace Belle2 {
 
       m_isFitted = false;
       m_isAdvanced = false;
+
+      // ATTENTION: We do not set the mSoP here, as this is quite costly.
     }
 
     std::pair<RecoTrack*, std::vector<const HitObject*>> finalize() const
@@ -141,6 +145,7 @@ namespace Belle2 {
     // mSoP
     genfit::MeasuredStateOnPlane& getMeasuredStateOnPlane()
     {
+      B2ASSERT("Measured on plane is not set", isAdvanced());
       return m_measuredStateOnPlane;
     }
 

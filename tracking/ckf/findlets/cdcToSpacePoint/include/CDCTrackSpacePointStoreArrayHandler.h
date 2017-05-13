@@ -11,19 +11,18 @@
 #pragma once
 
 #include <tracking/ckf/findlets/base/StoreArrayHandler.h>
-
-#include <tracking/spacePointCreation/SpacePoint.h>
+#include <tracking/ckf/states/CKFCDCToVXDStateObject.h>
 
 namespace Belle2 {
   /**
    *
    */
-  class CDCTrackSpacePointStoreArrayHandler : public StoreArrayHandler<SpacePoint> {
-    using Super = StoreArrayHandler<SpacePoint>;
+  class CDCTrackSpacePointStoreArrayHandler : public StoreArrayHandler<CKFCDCToVXDStateObject> {
+    using Super = StoreArrayHandler<CKFCDCToVXDStateObject>;
 
   public:
     /**
      */
-    void apply(const std::vector<std::pair<RecoTrack*, std::vector<const SpacePoint*>>>& cdcTracksWithMatchedSpacePoints) override;
+    void apply(const std::vector<CKFCDCToVXDStateObject::ResultObject>& cdcTracksWithMatchedSpacePoints) override;
   };
 }

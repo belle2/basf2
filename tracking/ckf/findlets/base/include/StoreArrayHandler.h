@@ -24,9 +24,10 @@ namespace Belle2 {
   /**
    *
    */
-  template <class AHit>
-  class StoreArrayHandler : public TrackFindingCDC::Findlet<const std::pair<RecoTrack*, std::vector<const AHit*>>> {
-    using Super = TrackFindingCDC::Findlet<const std::pair<RecoTrack*, std::vector<const AHit*>>>;
+  template <class AStateObject>
+  class StoreArrayHandler : public TrackFindingCDC::Findlet<const typename AStateObject::ResultObject> {
+    using Super = TrackFindingCDC::Findlet<const typename AStateObject::ResultObject>;
+    using HitObject = typename AStateObject::HitObject;
 
   public:
     /// Expose the parameters of the findlet
@@ -67,7 +68,7 @@ namespace Belle2 {
     }
 
     /// Fetch the CDC RecoTracks from the input Store Arrays and fill them into a vector.
-    void fetch(std::vector<RecoTrack*>& cdcRecoTrackVector, std::vector<const AHit*>& hitVector)
+    void fetch(std::vector<RecoTrack*>& cdcRecoTrackVector, std::vector<const HitObject*>& hitVector)
     {
       cdcRecoTrackVector.reserve(cdcRecoTrackVector.size() + m_cdcRecoTracks.getEntries());
 
@@ -79,7 +80,7 @@ namespace Belle2 {
 
       hitVector.reserve(hitVector.size() + m_hits.getEntries());
 
-      for (const AHit& hit : m_hits) {
+      for (const HitObject& hit : m_hits) {
         hitVector.push_back(&hit);
       }
     }
@@ -99,7 +100,7 @@ namespace Belle2 {
     /// CDC Reco Tracks Store Array
     StoreArray<RecoTrack> m_cdcRecoTracks;
     /// Space Points Store Array
-    StoreArray<AHit> m_hits;
+    StoreArray<HitObject> m_hits;
     /// VXD Reco Tracks Store Array
     StoreArray<RecoTrack> m_vxdRecoTracks;
     /// Merged Reco Tracks Store Array
@@ -143,8 +144,8 @@ namespace Belle2 {
     void relateAndCombineTracks();
   };
 
-  template <class AHit>
-  void StoreArrayHandler<AHit>::relateAndCombineTracks()
+  template <class AStateObject>
+  void StoreArrayHandler<AStateObject>::relateAndCombineTracks()
   {
     for (const RecoTrack& currentVXDTrack : m_vxdRecoTracks) {
       // track position will be filled with seed or fitted position of VXD track first.

@@ -17,16 +17,15 @@ namespace Belle2 {
   class TreeSearchFindlet : public TrackFindingCDC::Findlet <
     typename AStateObject::SeedObject*,
     const typename AStateObject::HitObject*,
-    std::pair<typename AStateObject::SeedObject*, std::vector<const typename AStateObject::HitObject*>>
-        > {
+    typename AStateObject::ResultObject > {
   public:
     using SeedPtr = typename AStateObject::SeedObject*;
     using HitPtr = const typename AStateObject::HitObject*;
     using StateArray = typename std::array < AStateObject, AStateObject::N + 1 >;
     using StateIterator = typename StateArray::iterator;
-    using ResultPair = std::pair<typename AStateObject::SeedObject*, std::vector<const typename AStateObject::HitObject*>>;
+    using ResultObject = typename AStateObject::ResultObject ;
 
-    using Super = TrackFindingCDC::Findlet<SeedPtr, HitPtr, ResultPair>;
+    using Super = TrackFindingCDC::Findlet<SeedPtr, HitPtr, ResultObject>;
 
     /// Construct this findlet and add the subfindlet as listener
     TreeSearchFindlet() : Super()
@@ -41,7 +40,7 @@ namespace Belle2 {
 
     /// Main function of this findlet: traverse a tree starting from a given seed object.
     void apply(std::vector<SeedPtr>& seedsVector, std::vector<HitPtr>& hitVector,
-               std::vector<ResultPair>& results) override
+               std::vector<ResultObject>& results) override
     {
       m_hitSelector.initializeEventCache(seedsVector, hitVector);
 
@@ -61,7 +60,7 @@ namespace Belle2 {
     AHitSelector m_hitSelector;
 
     /// Implementation of the traverseTree function
-    void traverseTree(StateIterator currentState, std::vector<ResultPair>& resultsVector)
+    void traverseTree(StateIterator currentState, std::vector<ResultObject>& resultsVector)
     {
       StateIterator nextState = std::next(currentState);
 

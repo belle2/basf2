@@ -19,8 +19,7 @@ namespace Belle2 {
 
     using SeedObject = RecoTrack;
     using HitObject = SpacePoint;
-
-    CKFCDCToVXDStateObject() = default;
+    using ResultObject = std::pair<RecoTrack*, std::vector<const HitObject*>>;
 
     void initialize(RecoTrack* seed)
     {

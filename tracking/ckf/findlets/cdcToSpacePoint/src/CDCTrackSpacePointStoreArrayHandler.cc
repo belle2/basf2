@@ -12,7 +12,7 @@
 
 using namespace Belle2;
 
-void CDCTrackSpacePointStoreArrayHandler::apply(const std::vector<std::pair<RecoTrack*, std::vector<const SpacePoint*>>>&
+void CDCTrackSpacePointStoreArrayHandler::apply(const std::vector<CKFCDCToVXDStateObject::ResultObject>&
                                                 cdcTracksWithMatchedSpacePoints)
 {
   if (not m_param_exportTracks) {

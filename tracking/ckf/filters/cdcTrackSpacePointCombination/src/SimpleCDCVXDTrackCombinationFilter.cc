@@ -14,7 +14,6 @@ using namespace TrackFindingCDC;
 
 Weight SimpleCDCVXDTrackCombinationFilter::operator()(const BaseCDCVXDTrackCombinationFilter::Object& pair)
 {
-  const RecoTrack* recoTrack = pair.first;
   const std::vector<const SpacePoint*> spacePoints = pair.second;
 
   return spacePoints.size();

@@ -36,6 +36,50 @@ class Job:
     - Use absolute paths for all directories, otherwise you'll likely get into trouble
     """
 
+    class SubJob():
+        """
+        SubJob class. Meant to simply hold basic information about which subjob you are
+        and a reference to the parent Job object to be able to access the main data there.
+        """
+
+        def __init__(self, job, subjob_id, input_files=None):
+            self.id = subjob_id
+            self.parent = job
+            self.input_files = input_files
+
+        @property
+        def output_dir(self):
+            """
+            Getter for output_dir of SubJob. Accesses the parent Job output_dir to infer this."""
+            return os.path.join(self.parent.output_dir, str(self.id))
+
+        @property
+        def working_dir(self):
+            """Getter for working_dir of SubJob. Accesses the parent Job working_dir to infer this."""
+            return os.path.join(self.parent.working_dir, str(self.id))
+
+        @property
+        def name(self):
+            """Getter for name of SubJob. Accesses the parent Job name to infer this."""
+            return "_".join((self.parent.name, str(self.id)))
+
+        @property
+        def subjobs(self):
+            """Getter for subjobs of SubJob object. Always returns None, used to prevent accessing the parent job by mistake"""
+            return None
+
+        @property
+        def max_files_per_subjob(self):
+            """Always returns -1, used to prevent accessing the parent job by mistake"""
+            return -1
+
+        def __getattr__(self, attribute):
+            """
+            Since a SubJob uses attributes from the parent Job, everything simply accesses the Job attributes
+            unless otherwise specified.
+            """
+            return getattr(self.parent, attribute)
+
     def __init__(self, name, config_file=default_config_file):
         """
         Init method of Job object.
@@ -67,16 +111,33 @@ class Job:
         #: of configuration variables. Some other attributes reference this object via properties.
         self.config = configparser.ConfigParser()
         self.config.read(config_file)
+        #: Config dictionary for the backend to use when submitting the job. Saves us from having multiple attributes that may or
+        #: may not be used.
+        self.backend_args = {}
         #: Maximum number of files to place in a subjob (Not applicable to Local processing). -1 means don't split into subjobs
         self.max_files_per_subjob = -1
         #: Batch queue for each subjob when using the LSF or PBS backends
         self.queue = None
+        #: list of subjobs assigned to this job
+        self.subjobs = {}
 
     def __repr__(self):
         """
         Representation of Job class (what happens when you print a Job() instance)
         """
         return "\n".join([self.name, str(self.input_sandbox_files), str(self.input_files)])
+
+    def ready(self):
+        """
+        Returns whether or not the Job has finished. If the job has subjobs then it will return true when they are all finished.
+        """
+        if self.subjobs:
+            if all(map(lambda x: x.result.ready(), self.subjobs.values())):
+                return True
+            else:
+                return False
+        else:
+            return self.result.ready()
 
     def add_basf2_setup(self):
         """
@@ -88,21 +149,16 @@ class Job:
 
     def create_subjob(self, i):
         """
-        Creates a subjob Job object but with specific changes to the variables to make a subjob.
+        Creates a subjob Job object that references that parent Job.
+        Returns the SubJob object at the end.
         """
-        B2INFO('Creating Job({}).Subjob({})'.format(self.name, i))
-        subjob = Job(self.name + "_subjob_" + str(i))
-        subjob.input_sandbox_files = self.input_sandbox_files[:]
-        subjob.working_dir = os.path.join(self.working_dir, str(i))
-        subjob.output_dir = os.path.join(self.output_dir, str(i))
-        subjob.output_patterns = self.output_patterns[:]
-        subjob.cmd = self.cmd[:]
-        subjob.input_files = self.input_files[:]
-        subjob.setup_cmds = self.setup_cmds[:]
-        subjob.config = self.config
-        subjob.queue = self.queue
-
-        return subjob
+        if i not in self.subjobs:
+            B2INFO('Creating Job({}).Subjob({})'.format(self.name, i))
+            subjob = Job.SubJob(self, i)
+            self.subjobs[i] = subjob
+            return subjob
+        else:
+            B2WARNING("Job({}) already contains SubJob({})! This will not be created.".format(self.name, i))
 
     @property
     def basf2_release(self):
@@ -429,62 +485,74 @@ class PBS(Backend):
         Should return a Result object that allows a 'ready' member method to be called from it which queries
         the PBS system and the job about whether or not the job has finished.
         """
-        if not job.queue:
-            job.queue = self.config["PBS"]["Queue"]
-            B2INFO('Setting Job queue {}'.format(job.queue))
+        # Make sure the output directory of the job is created
+        job_output_path = pathlib.Path(job.output_dir)
+        job_output_path.mkdir(parents=True, exist_ok=True)
+        # Make sure the working directory of the job is created
+        job_wd_path = pathlib.Path(job.working_dir)
+        job_wd_path.mkdir(parents=True, exist_ok=True)
 
-        if job.max_files_per_subjob == 0:
-            B2FATAL("When submitting Job({}) files per subjob was 0!".format(job.name))
+        if isinstance(job, Job):
+            if not job.queue:
+                job.queue = self.config["PBS"]["Queue"]
+                B2INFO('Setting Job queue {}'.format(job.queue))
 
-        # Check if we have any valid input files
-        existing_input_files = set()
-        for input_file_pattern in job.input_files:
-            if input_file_pattern[:7] != "root://":
-                input_files = glob.glob(input_file_pattern)
-                if not input_files:
-                    B2WARNING("No files matching {0} can be found, it will be skipped!".format(input_file_pattern))
+            if job.max_files_per_subjob == 0:
+                B2FATAL("When submitting Job({}) files per subjob was 0!".format(job.name))
+
+            # Check if we have any valid input files
+            existing_input_files = set()
+            for input_file_pattern in job.input_files:
+                if input_file_pattern[:7] != "root://":
+                    input_files = glob.glob(input_file_pattern)
+                    if not input_files:
+                        B2WARNING("No files matching {0} can be found, it will be skipped!".format(input_file_pattern))
+                    else:
+                        for file_path in input_files:
+                            file_path = os.path.abspath(file_path)
+                            if os.path.isfile(file_path):
+                                existing_input_files.add(file_path)
                 else:
+                    B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
+                            " before collector submission.".format(input_file_pattern)))
+                    existing_input_files.add(input_file_pattern)
+
+            if not existing_input_files:
+                B2INFO("No valid input file paths found for job {0}".format(job.name))
+
+            if job.max_files_per_subjob > 0 and existing_input_files:
+                import itertools
+
+                def grouper(n, iterable):
+                    it = iter(iterable)
+                    while True:
+                        chunk = tuple(itertools.islice(it, n))
+                        if not chunk:
+                            return
+                        yield chunk
+
+                for i, subjob_input_files in enumerate(grouper(job.max_files_per_subjob, existing_input_files)):
+                    subjob = job.create_subjob(i)
+                    subjob.input_files = subjob_input_files
+
+            if not job.subjobs:
+                # Get all of the requested files for the input sandbox and copy them to the working directory
+                for file_pattern in job.input_sandbox_files:
+                    input_files = glob.glob(file_pattern)
                     for file_path in input_files:
-                        file_path = os.path.abspath(file_path)
-                        if os.path.isfile(file_path):
-                            existing_input_files.add(file_path)
+                        if os.path.isdir(file_path):
+                            shutil.copytree(file_path, os.path.join(job.working_dir, os.path.split(file_path)[1]))
+                        else:
+                            shutil.copy(file_path, job.working_dir)
+
+                self._dump_input_data(job)
+                self._generate_pbs_script(job)
+                B2INFO("Submitting Job({})".format(job.name))
+                self._submit_to_qsub(job)
             else:
-                B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
-                        " before collector submission.".format(input_file_pattern)))
-                existing_input_files.add(input_file_pattern)
+                self.submit(list(job.subjobs.values()))
 
-        if not existing_input_files:
-            B2INFO("No valid input file paths found for job {0}".format(job.name))
-
-        if job.max_files_per_subjob > 0 and existing_input_files:
-
-            import itertools
-
-            def grouper(n, iterable):
-                it = iter(iterable)
-                while True:
-                    chunk = tuple(itertools.islice(it, n))
-                    if not chunk:
-                        return
-                    yield chunk
-
-            subjobs = []
-            for i, subjob_input_files in enumerate(grouper(job.max_files_per_subjob, existing_input_files)):
-                subjob = job.create_subjob(i)
-                if not subjob.working_dir:
-                    B2INFO('Setting SubJob working directory to {}' + subjob.output_dir)
-                    subjob.working_dir = subjob.output_dir
-                subjob.input_files = subjob_input_files
-                subjobs.append(subjob)
-            return self.submit(subjobs)
-        else:
-            # Make sure the output directory of the job is created
-            job_output_path = pathlib.Path(job.output_dir)
-            job_output_path.mkdir(parents=True, exist_ok=True)
-            # Make sure the working directory of the job is created
-            job_wd_path = pathlib.Path(job.working_dir)
-            job_wd_path.mkdir(parents=True, exist_ok=True)
-
+        elif isinstance(job, Job.SubJob):
             # Get all of the requested files for the input sandbox and copy them to the working directory
             for file_pattern in job.input_sandbox_files:
                 input_files = glob.glob(file_pattern)
@@ -497,8 +565,7 @@ class PBS(Backend):
             self._dump_input_data(job)
             self._generate_pbs_script(job)
             B2INFO("Submitting Job({})".format(job.name))
-            result = self._submit_to_qsub(job)
-            return result
+            self._submit_to_qsub(job)
 
     def _submit_to_qsub(self, job):
         """
@@ -508,19 +575,17 @@ class PBS(Backend):
         qsub_out = subprocess.check_output(["qsub", script_path], stderr=subprocess.STDOUT, universal_newlines=True)
         qsub_out = qsub_out.replace("\n", "")
         result = PBS.Result(job, qsub_out)
-        return result
+        job.result = result
 
     @submit.register(list)
     def _(self, jobs):
         """
         Submit method of PBS() that takes a list of jobs instead of just one and submits each one.
         """
-        results = []
         # Submit the jobs to PBS
         for job in jobs:
-            results.append(self.submit(job))
+            self.submit(job)
         B2INFO('All Requested Jobs Submitted')
-        return results
 
 
 class LSF(Backend):

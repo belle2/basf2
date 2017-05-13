@@ -13,6 +13,8 @@ __all__ = ["Calibration", "Algorithm", "CAF"]
 import os
 import sys
 
+from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL
+
 from caf.utils import past_from_future_dependencies
 from caf.utils import topological_sort
 from caf.utils import all_dependencies

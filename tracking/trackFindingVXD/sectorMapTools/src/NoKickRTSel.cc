@@ -106,7 +106,7 @@ bool NoKickRTSel::segmentSelector(hitToTrueXP hit1, hitToTrueXP hit2, std::vecto
   else {
     switch (par) {
       case 0:
-        return true;//REMOVED OMEGA FROM CUTS
+        //return true;//REMOVED OMEGA FROM CUTS
         deltaPar = abs(hit1.getOmegaEntry() - hit2.getOmegaEntry());
         if (is0) deltaPar = abs(hit1.getOmega0() - hit2.getOmegaEntry());
         break;

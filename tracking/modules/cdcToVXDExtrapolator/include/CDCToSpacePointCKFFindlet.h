@@ -23,7 +23,11 @@
 
 
 namespace Belle2 {
+  /**
+   * TODO: Add description.
+   */
   class CDCToSpacePointCKFFindlet : public TrackFindingCDC::Findlet<> {
+    /// Parent class
     using Super = TrackFindingCDC::Findlet<>;
 
   public:
@@ -33,7 +37,7 @@ namespace Belle2 {
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
-    /// Do the track/git finding/merging.
+    /// Do the track/hit finding/merging.
     void apply() override;
 
     /// Clear the object pools

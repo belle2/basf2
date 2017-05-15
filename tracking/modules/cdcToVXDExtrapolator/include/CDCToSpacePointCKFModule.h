@@ -13,12 +13,19 @@
 #include <tracking/modules/cdcToVXDExtrapolator/CDCToSpacePointCKFFindlet.h>
 
 namespace Belle2 {
+  /**
+   * Combinatorical Kalman Filter used for extracting CDC tracks into VXD (SVD) and create merged tracks.
+   *
+   * All implementation is done in the CDCToSpacePointCKFFindlet.
+   */
   class CDCToSpacePointCKFModule : public TrackFindingCDC::FindletModule<CDCToSpacePointCKFFindlet> {
 
   public:
+    /// Set description
     CDCToSpacePointCKFModule()
     {
-      setDescription("");
+      setDescription("Combinatorical Kalman Filter used for extracting CDC tracks into "
+                     "VXD (SVD) and create merged tracks.");
     }
   };
 }

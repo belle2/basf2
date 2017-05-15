@@ -21,6 +21,20 @@
 #include <tracking/ckf/findlets/cdcToSpacePoint/SpacePointKalmanUpdateFitter.h>
 
 namespace Belle2 {
+  /**
+   * Main findlet for the CKF for CDC RecoTracks and SpacePoints from the VXD (SVD).
+   *
+   * For a given state on a given number (~ layer), a list of child states (one for each next hit = space point in the track
+   * candidate) is returned. This is done in several steps:
+   * * select all hits on the next geometrical layer using the CDCToSpacePointMatcher
+   * * filter out only the best 2 * N candidates using a configurable filter based on this geometrical information
+   * * extrapolate the mSoP in each state to its corresponding hit
+   * * filter again using the best N candidates
+   * * do a Kalman update step for each hit separately
+   * * filter a last time
+   *
+   * The filters can be configured independently.
+   */
   class CDCToSpacePointHitSelector : public TrackFindingCDC::CompositeProcessingSignalListener {
   public:
     /// Constructor adding the subfindlets as listeners

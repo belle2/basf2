@@ -4,7 +4,14 @@
 # Thomas Keck 2016
 
 import numpy as np
-import xgboost as xgb
+
+try:
+    import xgboost as xgb
+except ImportError:
+    print("Please install xgboost: pip3 install xgboost")
+    import sys
+    sys.exit(1)
+
 import os
 import tempfile
 import collections

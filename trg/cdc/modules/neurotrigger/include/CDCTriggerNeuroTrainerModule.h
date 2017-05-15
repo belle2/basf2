@@ -1,5 +1,5 @@
-#ifndef NEUROTRIGGERTRAINERMODULE_H
-#define NEUROTRIGGERTRAINERMODULE_H
+#ifndef CDCTRIGGERNEUROTRAINERMODULE_H
+#define CDCTRIGGERNEUROTRAINERMODULE_H
 
 #include <framework/core/Module.h>
 
@@ -9,18 +9,18 @@
 #include <TH1D.h>
 
 namespace Belle2 {
-  /** The NeuroTriggerTrainer module of the CDC trigger.
+  /** The trainer module for the neural networks of the CDC trigger.
    * Prepare training data for several neural networks and train them
    * using the Fast Artificial Neural Network library (FANN).
    * For documentation of FANN see http://leenissen.dk/fann/wp/
    */
-  class NeuroTriggerTrainerModule : public Module {
+  class CDCTriggerNeuroTrainerModule : public Module {
   public:
     /** Constructor, for setting module description and parameters. */
-    NeuroTriggerTrainerModule();
+    CDCTriggerNeuroTrainerModule();
 
     /** Destructor. */
-    virtual ~NeuroTriggerTrainerModule() {}
+    virtual ~CDCTriggerNeuroTrainerModule() {}
 
     /** Initialize the module.
      * Initialize the networks and register datastore objects.
@@ -57,9 +57,15 @@ namespace Belle2 {
 
   protected:
     //module parameters
+    /** Name of the StoreArray containing the input track segment hits. */
+    std::string m_hitCollectionName;
+    /** name of the event time StoreObjPtr */
+    std::string m_EventTimeName;
     /** Name of the StoreArray containing the input 2D tracks. */
     std::string m_inputCollectionName;
-    /** Name of the MCParticles collection used as target values. */
+    /** Switch between MCParticles or RecoTracks as targets. */
+    bool m_trainOnRecoTracks;
+    /** Name of the MCParticles/RecoTracks collection used as target values. */
     std::string m_targetCollectionName;
     /** Name of file where network weights etc. are stored after training. */
     std::string m_filename;
@@ -101,6 +107,8 @@ namespace Belle2 {
     bool m_stopLoop;
     /** Switch to rescale out of range target values or ignore them. */
     bool m_rescaleTarget;
+    /** Limit for weights. */
+    double m_wMax;
     /** Number of threads for training. */
     int m_nThreads;
     /** Training is stopped if validation error is higher than

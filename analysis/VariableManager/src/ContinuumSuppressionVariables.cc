@@ -271,7 +271,7 @@ namespace Belle2 {
           }
           TVector3 newX = newY.Cross(newZ);
 
-          UseReferenceFrame<RotationFrame> signalframe(newX, newY, newZ);
+          UseReferenceFrame<CMSRotationFrame> signalframe(newX, newY, newZ);
 
           return var->function(particle);
         };

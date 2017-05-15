@@ -13,10 +13,12 @@
 #define INCLUDE_GUARD_BELLE2_MVA_OPTIONS_HEADER
 
 #include <boost/program_options.hpp>
+#include <boost/program_options/errors.hpp>
 #include <boost/property_tree/ptree_fwd.hpp>
 
 #include <string>
 #include <vector>
+#include <functional>
 
 namespace po = boost::program_options;
 
@@ -135,6 +137,17 @@ namespace Belle2 {
       bool m_splot_boosted = false; /**< Use boosted sPlot training (aPlot) */
     };
 
+    template<typename T>
+    std::function<void(T)> check_bounds(T min, T max, std::string name)
+    {
+      return [name, min, max](T v) -> void {
+        if (v <= min || v >= max)
+        {
+          throw po::validation_error(po::validation_error::invalid_option_value, name,
+          std::to_string(min) + " <= " + name + " <= " + std::to_string(max) + ": provided value " + std::to_string(v));
+        }
+      };
+    }
 
   }
 }

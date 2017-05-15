@@ -44,7 +44,6 @@ MuidModule::MuidModule() :
   m_MaxStep(0.0),
   m_MaxDistSqInVariances(0.0),
   m_MaxClusterTrackConeAngle(0.0),
-  m_Cosmic(0),
   m_TrackingVerbosity(0),
   m_EnableVisualization(false),
   m_MagneticFieldStepperName(""),
@@ -78,13 +77,12 @@ MuidModule::MuidModule() :
   addParam("MaxDistSigma", m_MaxDistSqInVariances, "[#sigmas] Maximum hit-to-extrapolation difference (default 3.5)", double(3.5));
   addParam("MaxKLMClusterTrackConeAngle", m_MaxClusterTrackConeAngle,
            "[degrees] Maximum cone angle between matching track and KLM cluster.", double(15.0));
-  addParam("Cosmic", m_Cosmic, "Particle source (0 = beam, 1 = cosmic ray.", 0);
   // Additional parameters copied from FullSimModule
   addParam("TrackingVerbosity", m_TrackingVerbosity,
            "Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info.",
            0);
   addParam("EnableVisualization", m_EnableVisualization, "If set to True the Geant4 visualization support is enabled.", false);
-  addParam("magneticField", m_MagneticFieldStepperName,
+  addParam("magneticFieldStepper", m_MagneticFieldStepperName,
            "Chooses the magnetic field stepper used by Geant4. possible values are: default, nystrom, expliciteuler, simplerunge",
            string("default"));
   addParam("magneticCacheDistance", m_MagneticCacheDistance,
@@ -157,7 +155,7 @@ void MuidModule::initialize()
   m_Extrapolator->setKLMClustersColName(m_KLMClustersColName);
   m_Extrapolator->setTrackClusterSeparationsColName(m_TrackClusterSeparationsColName);
   m_Extrapolator->initialize(m_MeanDt, m_MaxDt, m_MaxDistSqInVariances, m_MaxClusterTrackConeAngle,
-                             m_MinPt, m_MinKE, m_Cosmic, m_Hypotheses);
+                             m_MinPt, m_MinKE, m_Hypotheses);
 
   return;
 
@@ -171,7 +169,7 @@ void MuidModule::beginRun()
 void MuidModule::event()
 {
   //m_Extrapolator->event(true);
-  m_Extrapolator->eventMuid();
+  m_Extrapolator->event(true);
 }
 
 void MuidModule::endRun()

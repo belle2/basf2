@@ -63,7 +63,7 @@ globalPhiRotation = {'201607': 1.875,
 lengthOfCounter = 100.0
 widthOfCounter = 8.0
 triggerPos = []
-normTriggerPlanDirection = []
+normTriggerPlaneDirection = []
 readOutPos = []
 globalPhi = 0.0
 
@@ -73,19 +73,19 @@ def set_cdc_cr_parameters(period):
     global lengthOfCounter
     global widthOfCounter
     global triggerPos
-    global normTriggerPlanDirection
+    global normTriggerPlaneDirection
     global readOutPos
     global globalPhi
 
     lengthOfCounter = triggerSize[period][0]
     widthOfCounter = triggerSize[period][1]
     triggerPos = triggerPosition[period]
-    normTriggerPlanDirection = triggerPlaneDirection[period]
+    normTriggerPlaneDirection = triggerPlaneDirection[period]
     readOutPos = pmtPosition[period]
     globalPhi = globalPhiRotation[period]
 
 
-def add_cdc_cr_simulation(path, empty_path):
+def add_cdc_cr_simulation(path, empty_path, topInCounter=True):
     """
     Add CDC CR simulation.
 
@@ -118,7 +118,7 @@ def add_cdc_cr_simulation(path, empty_path):
                           yOfCounter=triggerPos[1],
                           zOfCounter=triggerPos[2],
                           phiOfCounter=0.,
-                          TOP=True,
+                          TOP=topInCounter,
                           propSpeed=lightPropSpeed,
                           TOF=1,
                           cryGenerator=True
@@ -149,7 +149,7 @@ def add_cdc_cr_reconstruction(path, eventTimingExtraction=False):
                                            eventTimingExtraction=eventTimingExtraction,
                                            lightPropSpeed=lightPropSpeed,
                                            triggerPos=triggerPos,
-                                           normTriggerPlaneDirection=normTriggerPlanDirection,
+                                           normTriggerPlaneDirection=normTriggerPlaneDirection,
                                            readOutPos=readOutPos
                                            )
 

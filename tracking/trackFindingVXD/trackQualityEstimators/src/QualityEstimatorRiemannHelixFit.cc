@@ -196,14 +196,14 @@ double QualityEstimatorRiemannHelixFit::estimateQuality(std::vector<SpacePoint c
 
   // Construction of momentum vector with innermost hit and reconstructed circle center
   Eigen::Matrix<Precision, 3, 1> momVec = Eigen::Matrix<Precision, 3, 1>::Zero();
-  momVec(0) = y0 - X.col(1)(nHits - 1);
-  momVec(1) = - (x0 - X.col(0)(nHits - 1));
+  momVec(0) = y0 - X.col(1)(0);
+  momVec(1) = - (x0 - X.col(0)(0));
 
   Precision pT = Precision(calcPt(rho));
   momVec = pT * momVec.normalized();
 
-  Eigen::Matrix<Precision, 3, 1> vec01 = X.row(nHits - 2) - X.row(nHits - 1);
-  vec01(2) = Z(nHits - 2) - Z(nHits - 1);
+  Eigen::Matrix<Precision, 3, 1> vec01 = X.row(1) - X.row(0);
+  vec01(2) = Z(1) - Z(0);
   Precision angle01 = std::acos(vec01.dot(momVec) / momVec.norm() / vec01.norm());
   if (angle01 > 0.5 * M_PI) { momVec *= -1.; }
 
@@ -217,7 +217,7 @@ double QualityEstimatorRiemannHelixFit::estimateQuality(std::vector<SpacePoint c
   B2DEBUG(75, "Chi Squared of extended Riemann = " << * (m_results.chiSquared) << std::endl);
 
   Precision pZ = pT * p(1);
-  momVec(2) = - pZ;
+  momVec(2) = pZ;
   m_results.pt = pT;
   m_results.p = TVector3(momVec(0), momVec(1), momVec(2));
   m_results.curvatureSign = curvatureSign;

@@ -39,7 +39,9 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   //Switch for debug
   addParam("Debug4Sim", m_debug4Sim, "Switch on/off debug in FullSim.", false);
   //Switch for wire sag
-  addParam("WireSag", m_wireSag, "Switch on/off sense wire (gravitational) sag in FullSim.", true);
+  addParam("WireSag", m_wireSag,
+           "Switch on/off sense wire (gravitational) sag in FullSim. Here, sag means the main part which corresponds to design+displacement in case of wire position. You can control the perturbative part (corresponting to (mis)alignment in case of wire-position) of sag in Digitizer.",
+           true);
   //Switch for modified left/right flag
   addParam("ModLeftRightFlag", m_modLeftRightFlag, "Switch on/off calculation of modified left/right flag in FullSim.", false);
   //energy thresh
@@ -105,7 +107,8 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   addParam("MisalignmentFile", m_misalignmentFile, "Input file name (on cdc/data) for wire misalignment.",
            string("misalignment_v2.dat"));
   //xt-relation
-  addParam("XtFile", m_xtFile, "Input file name (on cdc/data) for xt-relations.",  string("xt_v3_chebyshev.dat.gz"));
+  addParam("XtFile", m_xtFile, "Input file name (on cdc/data) for xt-relations. You can specify either an uncompressed or gzip file.",
+           string("xt_v3_chebyshev.dat.gz"));
   //sigma
   addParam("SigmaFile", m_sigmaFile, "Input file name (on cdc/data) for sigmas.",  string("sigma_v2.dat"));
   //prop-speed

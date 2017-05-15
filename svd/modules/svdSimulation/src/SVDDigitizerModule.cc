@@ -514,9 +514,9 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
     double Cb = (have_electrons) ? info.getBackplaneCapacitanceU(currentStrip) :
                 info.getBackplaneCapacitanceV(currentStrip);
 
-    double cNeighbour2 = 0.5 * Ci / (Ci + Cb + Cc);
-    double cNeighbour1 = Ci / (Ci + Cb);
-    double cSelf = Cc / (Ci + Cb + Cc);
+    double cNeighbour2 = 0.5 * Ci / (2 * Ci + Cb + Cc);
+    double cNeighbour1 = Ci / (2 * Ci + Cb);
+    double cSelf = Cc / (2 * Ci + Cb + Cc);
 
     readoutCharges.push_back(cSelf * (
                                cNeighbour2 * stripCharges[index - 2]

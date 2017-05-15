@@ -38,7 +38,7 @@ namespace Belle2 {
 
     /*! constructor: xxx */
     TRGTiming(unsigned int ID,
-              unsigned int timing)
+              int timing)
     {
       m_ID = ID;
       m_timing = timing;
@@ -64,7 +64,7 @@ namespace Belle2 {
     /*! get trigger timing
      * @return    trigger timing
      */
-    unsigned int getTiming() const
+    int getTiming() const
     {
       return m_timing;
     }
@@ -76,7 +76,7 @@ namespace Belle2 {
     // Const::DetectorSet m_detectors;   /**< set of detectors with PID information */
 
     unsigned int m_ID; /**< bit ID */
-    unsigned int m_timing; /**< tdc count */
+    int m_timing; /**< tdc count */
 
     ClassDef(TRGTiming, 1); /**< ClassDef */
 

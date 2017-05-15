@@ -75,16 +75,16 @@ namespace Belle2 {
              m_firmwareSimulationMode);
     addParam("2DfinderCollection", m_2DfinderCollectionName,
              "Name of the StoreArray holding the tracks made by the 2D finder to be used as input.",
-             string("TRG2DFinderTracks"));
+             string("TRGCDC2DFinderTracks"));
     addParam("2DfitterCollection", m_2DfitterCollectionName,
              "Name of the StoreArray holding the tracks made by the 2D fitter to be used as input.",
-             string("TRG2DFitterTracks"));
+             string("TRGCDC2DFitterTracks"));
     addParam("3DfitterCollection", m_3DfitterCollectionName,
              "Name of the StoreArray holding the tracks made by the 3D fitter to be used as input.",
-             string("TRG3DFitterTracks"));
+             string("TRGCDC3DFitterTracks"));
     addParam("NNCollection", m_NNCollectionName,
              "Name of the StoreArray holding the tracks made by the neural network (NN).",
-             string("TRGNNTracks"));
+             string("TRGCDCNeuroTracks"));
     addParam("2DmatchCollection", m_2DmatchCollectionName,
              "Name of the StoreArray holding the macthed tracks and clusters made by the 2D fitter.",
              string("TRG2DMatchTracks"));

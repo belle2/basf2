@@ -10,6 +10,8 @@
 
 from basf2 import *
 from modularAnalysis import *
+from stdPhotons import *
+stdPhotons('loose')
 
 set_log_level(LogLevel.ERROR)
 
@@ -39,9 +41,9 @@ elif len(sys.argv) == 1:
 
 # Bottomonium Skim
 from Bottomonium_List import *
-YList = EtabList()
-skimOutputUdst('outputFiles/Bottomonium1_' + bkgType, YList)
-summaryOfLists(YList)
+EtabList = EtabList()
+skimOutputUdst('outputFiles/BottomoniumEtabExclusive_' + bkgType, EtabList)
+summaryOfLists(EtabList)
 process(analysis_main)
 
 # print out the summary

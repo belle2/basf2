@@ -18,12 +18,26 @@
 #include <tracking/trackFindingVXD/trackSetEvaluator/HopfieldNetwork.h>
 
 namespace Belle2 {
+  /**
+   * Overlap check which sorts out only a non-overlapping set of states from a vector, which
+   * gives (as a sum) the best quality.
+   *
+   * The quality is calculated using the given filter.
+   * The overlaps are defined using
+   *   * the seed object (if the seed object is the same, the states are overlapping)
+   *   * the hit objects (if one of the hits is the same, the states are overlapping)
+   *
+   * The implementation is based on the Hopfield network.
+   */
   template<class AFilter>
   class OverlapResolverFindlet : public TrackFindingCDC::Findlet<typename AFilter::Object> {
   public:
+    /// The pair of seed and hit vector to check
     using ResultPair = typename AFilter::Object;
+    /// The parent class
     using Super = TrackFindingCDC::Findlet<ResultPair>;
 
+    /// Reserve space and add the filter as a listener.
     OverlapResolverFindlet() : Super()
     {
       Super::addProcessingSignalListener(&m_qualityFilter);
@@ -45,7 +59,7 @@ namespace Belle2 {
                                     "Enable the overlap resolving.", m_param_enableOverlapResolving);
     }
 
-    /// Main function of this findlet: traverse a tree starting from a given seed object.
+    /// Main function of this findlet: find a non overlapping set of results with the best quality.
     void apply(std::vector<ResultPair>& resultElements) final {
       if (not m_param_enableOverlapResolving or resultElements.empty())
       {

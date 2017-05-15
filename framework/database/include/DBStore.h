@@ -16,7 +16,7 @@
 
 #include <string>
 #include <map>
-#include <vector>
+#include <set>
 #include <functional>
 
 
@@ -154,8 +154,8 @@ namespace Belle2 {
     /** Map names to DBEntry objects. */
     std::map<std::string, DBEntry> m_dbEntries;
 
-    /** Vector of intra-run dependent conditions. */
-    std::vector<DBEntry*> m_intraRunDependencies;
+    /** List of intra-run dependent conditions. */
+    std::set<DBEntry*> m_intraRunDependencies;
 
     /**
      * StoreObjPtr for the EventMetaData to get the current experiment and run

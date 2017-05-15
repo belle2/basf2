@@ -15,13 +15,10 @@ import ROOT
 
 __all__ = ['pool', 'Job', 'Local', 'LSF', 'PBS']
 
-# For weird reasons, a multiprocessing pool doesn't work properly as a class attribute
-# So we make it a module variable. Should be fine as starting up multiple pools
-# is not recommended anyway. Will check this again someday.
-pool = None
-
 #: default configuration file location
 default_config_file = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
+#: Multiprocessing Pool used by Local Backend
+pool = None
 
 
 class Job:
@@ -105,7 +102,7 @@ class Job:
         self.cmd = []
         #: Input files to job, a list of these is copied to the working directory.
         self.input_files = []
-        #: Bash commands to run before the main self.cmd (mainly used for batch system setup
+        #: Bash commands to run before the main self.cmd (mainly used for batch system setup)
         self.setup_cmds = []
         #: ConfigParser object that sets the defaults (mainly for basf2 setup) and is used as the store
         #: of configuration variables. Some other attributes reference this object via properties.
@@ -118,7 +115,7 @@ class Job:
         self.max_files_per_subjob = -1
         #: Batch queue for each subjob when using the LSF or PBS backends
         self.queue = None
-        #: list of subjobs assigned to this job
+        #: dict of subjobs assigned to this job
         self.subjobs = {}
 
     def __repr__(self):
@@ -196,6 +193,8 @@ class Backend():
     to whatever backend they describe. Common methods/attributes go here.
     """
 
+    submit_script = "submit.sh"
+
     def submit(self, job):
         """
         Base method for submitting collection jobs to the backend type. This MUST be
@@ -203,14 +202,32 @@ class Backend():
         """
         raise NotImplementedError('Need to implement a submit() method in {} backend.'.format(self.__class__.__name__))
 
+    @staticmethod
+    def _dump_input_data(job):
+        if job.input_files:
+            with open(str(pathlib.Path(job.working_dir, 'input_data_files.data')), 'bw') as input_data_file:
+                pickle.dump(job.input_files, input_data_file)
+
+    @staticmethod
+    def _add_setup(job, batch_file):
+        """
+        Adds setup lines to the shell script file.
+        """
+        for line in job.setup_cmds:
+            batch_file.write(line)
+
+
+def test_func(job):
+    print("Running Job({})".format(job["name"]))
+
 
 class Local(Backend):
     """
-    Backend for local calibration processes i.e. on the same machine but in a subprocess.
+    Backend for local processes i.e. on the same machine but in a subprocess.
     Attributes:
         * max_processes=<int> Specifies the size of the process pool that spawns the subjobs.
         It's the maximium simultaneous subjobs. Try not to specify a large number or a number
-        larger than the number of cores (-1?). Won't crash the program but it will slow down
+        larger than the number of cores. Won't crash the program but it will slow down
         and negatively impact performance. Default = 1
 
     Note that you should call the self.join() method to close the pool and wait for any
@@ -230,7 +247,7 @@ class Local(Backend):
 
     class Result():
         """
-        Simple class to help monitor status of jobs submitted by CAF backend to Local process.
+        Simple class to help monitor status of jobs submitted by Local backend.
         """
 
         def __init__(self, job, result):
@@ -255,20 +272,18 @@ class Local(Backend):
             correct output location.
             """
             # Once the subprocess is done, move the requested output to the output directory
-            # B2INFO('Moving any output files of process {0} to output directory {1}'.format(job.name, job.output_dir))
             for pattern in self.job.output_patterns:
                 output_files = glob.glob(os.path.join(self.job.working_dir, pattern))
                 for file_name in output_files:
                     shutil.move(file_name, self.job.output_dir)
-                    # B2INFO('moving', file_name, 'to', job.output_dir)
 
     def join(self):
         """
         Closes and joins the Pool, letting you wait for all results currently
         still processing.
         """
-        B2INFO('Joining Process Pool, waiting for results to finish')
         global pool
+        B2INFO('Joining Process Pool, waiting for results to finish')
         pool.close()
         pool.join()
         B2INFO('Process Pool joined.')
@@ -292,90 +307,143 @@ class Local(Backend):
         if pool:
             self.join()
         B2INFO('Starting up new Pool with {0} processes'.format(self.max_processes))
-        pool = mp.Pool(self.max_processes)
+        pool = mp.Pool(processes=self.max_processes)
 
     @method_dispatch
     def submit(self, job):
         """
         Submit method of Local() backend. Mostly setup here creating the right directories.
         """
-        global pool
-        # Submit the jobs to owned Pool
-        B2INFO('Job Submitting: ' + job.name)
         # Make sure the output directory of the job is created
         job_output_path = pathlib.Path(job.output_dir)
-        job_output_path.mkdir(parents=True, exists_ok=True)
+        job_output_path.mkdir(parents=True, exist_ok=True)
         # Make sure the working directory of the job is created
         job_wd_path = pathlib.Path(job.working_dir)
-        job_wd_path.mkdir(parents=True, exists_ok=True)
+        job_wd_path.mkdir(parents=True, exist_ok=True)
 
-        # Get all of the requested files for the input sandbox and copy them to the working directory
-        for file_pattern in job.input_sandbox_files:
-            input_files = glob.glob(file_pattern)
-            for file_path in input_files:
-                if os.path.isdir(file_path):
-                    shutil.copytree(file_path, os.path.join(job.working_dir, os.path.split(file_path)[1]))
-                else:
-                    shutil.copy(file_path, job.working_dir)
+        global pool
+        if isinstance(job, Job):
+            if job.max_files_per_subjob == 0:
+                B2FATAL("When submitting Job({}) files per subjob was 0!".format(job.name))
 
-        # Check if we have any valid input files
-        existing_input_files = set()
-        for input_file_pattern in job.input_files:
-            if input_file_pattern[:7] != "root://":
-                input_files = glob.glob(input_file_pattern)
-                if not input_files:
-                    B2WARNING("No files matching {0} can be found, it will be skipped!".format(input_file_pattern))
+            # Check if we have any valid input files
+            existing_input_files = set()
+            for input_file_pattern in job.input_files:
+                if input_file_pattern[:7] != "root://":
+                    input_files = glob.glob(input_file_pattern)
+                    if not input_files:
+                        B2WARNING("No files matching {0} can be found, it will be skipped!".format(input_file_pattern))
+                    else:
+                        for file_path in input_files:
+                            file_path = os.path.abspath(file_path)
+                            if os.path.isfile(file_path):
+                                existing_input_files.add(file_path)
                 else:
+                    B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
+                            " before collector submission.".format(input_file_pattern)))
+                    existing_input_files.add(input_file_pattern)
+
+            if not existing_input_files:
+                B2INFO("No valid input file paths found for job {0}".format(job.name))
+
+            if job.max_files_per_subjob > 0 and existing_input_files:
+                import itertools
+
+                def grouper(n, iterable):
+                    it = iter(iterable)
+                    while True:
+                        chunk = tuple(itertools.islice(it, n))
+                        if not chunk:
+                            return
+                        yield chunk
+
+                for i, subjob_input_files in enumerate(grouper(job.max_files_per_subjob, existing_input_files)):
+                    subjob = job.create_subjob(i)
+                    subjob.input_files = subjob_input_files
+
+            if not job.subjobs:
+                # Get all of the requested files for the input sandbox and copy them to the working directory
+                for file_pattern in job.input_sandbox_files:
+                    input_files = glob.glob(file_pattern)
                     for file_path in input_files:
-                        file_path = os.path.abspath(file_path)
-                        if os.path.isfile(file_path):
-                            existing_input_files.add(file_path)
+                        if os.path.isdir(file_path):
+                            shutil.copytree(file_path, os.path.join(job.working_dir, os.path.split(file_path)[1]))
+                        else:
+                            shutil.copy(file_path, job.working_dir)
+
+                self._dump_input_data(job)
+                with open(os.path.join(job.working_dir, self.submit_script), "w") as batch_file:
+                    self._add_setup(job, batch_file)
+                    batch_file.write(" ".join(job.cmd) + "\n")
+                B2INFO("Submitting Job({})".format(job.name))
+                job.result = Local.Result(job,
+                                          pool.apply_async(self.run_job,
+                                                           (job.name,
+                                                            job.working_dir,
+                                                            job.output_dir,
+                                                            self.submit_script)
+                                                           )
+                                          )
+                B2INFO('Job {0} submitted'.format(job.name))
             else:
-                B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
-                        " before collector submission.".format(input_file_pattern)))
-                existing_input_files.add(input_file_pattern)
+                self.submit(list(job.subjobs.values()))
 
-        if existing_input_files:
-            # Now make a python file in our input sandbox containing a list of these valid files
-            with open(os.path.join(job.working_dir, 'input_data_files.data'), 'bw') as input_data_file:
-                pickle.dump(list(existing_input_files), input_data_file)
-        else:
-            B2FATAL("No valid input files found for job {0}".format(job.name))
+        elif isinstance(job, Job.SubJob):
+            # Get all of the requested files for the input sandbox and copy them to the working directory
+            for file_pattern in job.input_sandbox_files:
+                input_files = glob.glob(file_pattern)
+                for file_path in input_files:
+                    if os.path.isdir(file_path):
+                        shutil.copytree(file_path, os.path.join(job.working_dir, os.path.split(file_path)[1]))
+                    else:
+                        shutil.copy(file_path, job.working_dir)
 
-        result = Local.Result(job, pool.apply_async(Local.run_job, (job,)))
-        B2INFO('Job {0} submitted'.format(job.name))
-        return result
+            self._dump_input_data(job)
+            with open(os.path.join(job.working_dir, self.submit_script), "w") as batch_file:
+                self._add_setup(job, batch_file)
+                batch_file.write(" ".join(job.cmd) + "\n")
+            B2INFO("Submitting Job({})".format(job.name))
+            job.result = Local.Result(job,
+                                      pool.apply_async(self.run_job,
+                                                       (job.name,
+                                                        job.working_dir,
+                                                        job.output_dir,
+                                                        self.submit_script)
+                                                       )
+                                      )
+            B2INFO('Job {0} submitted'.format(job.name))
 
     @submit.register(list)
     def _(self, jobs):
         """
-        Submit method of Local() that takes a list of jobs instead of just one and creates a process pool
-        to run them.
+        Submit method of Local() that takes a list of jobs instead of just one and submits each one.
         """
-        results = []
-        # Submit the jobs to owned Pool
+        # Submit the jobs to PBS
         for job in jobs:
-            results.append(self.submit(job))
+            self.submit(job)
         B2INFO('All Requested Jobs Submitted')
-        return results
 
     @staticmethod
-    def run_job(job):
+    def run_job(name, working_dir, output_dir, script):
         """
         The function that is used by multiprocessing.Pool.map during process creation. This runs a
         shell command in a subprocess and captures the stdout and stderr of the subprocess to files.
         """
+        B2INFO('Starting Sub Process: {0}'.format(name))
         from subprocess import PIPE, STDOUT, Popen
-        stdout_file_path = os.path.join(job.output_dir, 'stdout')
+        stdout_file_path = os.path.join(output_dir, 'stdout')
         # Create unix command to redirect stdour and stderr
-        B2INFO(" ".join(job.cmd))
-        B2INFO('Starting Sub Process: {0}'.format(job.name))
-        B2INFO('Log files for SubProcess {0} visible at:\n\t{1}'.format(job.name, stdout_file_path))
+        B2INFO('Log files for SubProcess {0} visible at:\n\t{1}'.format(name, stdout_file_path))
         with open(stdout_file_path, 'w', buffering=1) as f_out:
-            with Popen(job.cmd, stdout=PIPE, stderr=STDOUT, bufsize=1, universal_newlines=True, cwd=job.working_dir) as p:
+            with Popen(["/bin/bash", "-l", script],
+                       stdout=PIPE,
+                       stderr=STDOUT,
+                       bufsize=1,
+                       universal_newlines=True,
+                       cwd=working_dir) as p:
                 for line in p.stdout:
                     print(line, end='', file=f_out)
-        B2INFO('Sub Process {0} Finished.'.format(job.name))
+        B2INFO('Sub Process {0} Finished.'.format(name))
 
 
 class Batch(Backend):
@@ -390,7 +458,7 @@ class Batch(Backend):
 
     def __init__(self):
         """
-        Init method for PBS Backend. Does default setup based on config file.
+        Init method for Batch Backend. Does default setup based on config file.
         """
         self.subjobs_to_files = None
         self.config = configparser.ConfigParser()
@@ -403,20 +471,6 @@ class Batch(Backend):
         """
         raise NotImplementedError(("Need to implement a _add_batch_directives(self, job, file) "
                                    "method in {} backend.".format(self.__class__.__name__)))
-
-    @staticmethod
-    def _add_setup(job, file):
-        """
-        Adds setup lines to the PBS shell script file.
-        """
-        for line in job.setup_cmds:
-            file.write(line)
-
-    @staticmethod
-    def _dump_input_data(job):
-        # Now make a python file in our input sandbox containing a list of these valid files
-        with open(str(pathlib.Path(job.working_dir, 'input_data_files.data')), 'bw') as input_data_file:
-            pickle.dump(job.input_files, input_data_file)
 
     @classmethod
     def _submit_to_batch(cls, cmd):
@@ -496,13 +550,13 @@ class Batch(Backend):
                             shutil.copy(file_path, job.working_dir)
 
                 self._dump_input_data(job)
-                with open(os.path.join(job.working_dir, "submit.sh"), "w") as batch_file:
+                with open(os.path.join(job.working_dir, self.submit_script), "w") as batch_file:
                     self._add_batch_directives(job, batch_file)
                     self._add_setup(job, batch_file)
                     batch_file.write(" ".join(job.cmd) + "\n")
                 B2INFO("Submitting Job({})".format(job.name))
 
-                script_path = os.path.join(job.working_dir, "submit.sh")
+                script_path = os.path.join(job.working_dir, self.submit_script)
                 cmd = self._create_cmd(script_path)
                 output = self._submit_to_batch(cmd)
                 self._create_job_result(job, output)
@@ -520,12 +574,12 @@ class Batch(Backend):
                         shutil.copy(file_path, job.working_dir)
 
             self._dump_input_data(job)
-            with open(os.path.join(job.working_dir, "submit.sh"), "w") as batch_file:
+            with open(os.path.join(job.working_dir, self.submit_script), "w") as batch_file:
                 self._add_batch_directives(job, batch_file)
                 self._add_setup(job, batch_file)
                 batch_file.write(" ".join(job.cmd) + "\n")
             B2INFO("Submitting Job({})".format(job.name))
-            script_path = os.path.join(job.working_dir, "submit.sh")
+            script_path = os.path.join(job.working_dir, self.submit_script)
             cmd = self._create_cmd(script_path)
             output = self._submit_to_batch(cmd)
             self._create_job_result(job, output)

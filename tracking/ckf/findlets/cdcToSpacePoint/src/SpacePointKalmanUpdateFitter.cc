@@ -49,23 +49,12 @@ double SpacePointKalmanUpdateFitter::kalmanStep(genfit::MeasuredStateOnPlane& me
 
     const Eigen::Vector5d& K_k = C_k_old * H_k_t * (V_k + H_k * C_k_old * H_k_t).inverse();
 
-    B2DEBUG(200, "C_k_old " << C_k_old);
-    B2DEBUG(200, "H_k " << H_k);
-    B2DEBUG(200, "m_k " << m_k);
-    B2DEBUG(200, "V_k " << V_k);
-    B2DEBUG(200, "x_k_old " << x_k_old);
-    B2DEBUG(200, "K_k " << K_k);
-
     C_k_old -= K_k * H_k * C_k_old;
     x_k_old += K_k * (m_k - H_k * x_k_old);
 
     Eigen::Vector1d residual = m_k - H_k * x_k_old;
 
     chi2 += (residual.transpose() * (V_k - H_k * C_k_old * H_k_t).inverse() * residual).value();
-
-    B2DEBUG(200, "C_k_old " << C_k_old);
-    B2DEBUG(200, "x_k_old " << x_k_old);
-    B2DEBUG(100, "chi2 " << chi2);
   }
 
   measuredStateOnPlane.setState(TVectorD(5, x_k_old.data()));

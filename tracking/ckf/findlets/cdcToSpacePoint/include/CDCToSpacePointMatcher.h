@@ -23,12 +23,21 @@
 namespace Belle2 {
   class CDCToSpacePointMatcher : public TrackFindingCDC::ProcessingSignalListener {
   public:
-    /// Return a range of all possible next child states on the next layer.
+    /**
+     * Return a range of all possible next child states on the next layer or all hits on the next segment on the same
+     * layer for overlaps.
+     *
+     * Returned is actually not a vector of states, but begin and end iterators which iterate through
+     * a list of temporarily created states (precisely, they are not recalculated but the ones from before
+     * are reused und reset). As it is very important to keep those states in memory until they are fully
+     * processed, we keep a different vector of states for each number ( = 2 per layer).
+     */
     TrackFindingCDC::VectorRange<CKFCDCToVXDStateObject> getChildStates(CKFCDCToVXDStateObject& currentState);
 
-    /// Fill the cache for each event
+    /// Fill the cache of hits for each event
     void initializeEventCache(std::vector<RecoTrack*>& seedsVector, std::vector<const SpacePoint*>& filteredHitVector);
 
+    /// Expose the hit jump parameters
     void exposeParameters(ModuleParamList* moduleParamList,  const std::string& prefix)
     {
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "makeHitJumpingPossible"), m_param_makeHitJumpingPossible,
@@ -44,10 +53,10 @@ namespace Belle2 {
     /// Maximal number of ladders per layer
     std::vector<unsigned int> m_maximumLadderNumbers = {8, 12, 7, 10, 12, 16};
 
-    /// Parameter: make hit jumps possible
+    /// Parameter: make hit jumps possible (missing hits on a layer)
     bool m_param_makeHitJumpingPossible = true;
 
-    /// return the next possible hits for a given state.
+    /// return the next hits for a given state, which are the hits on the next layer (or the same for overlaps)
     TrackFindingCDC::VectorRange<const SpacePoint*> getMatchingHits(CKFCDCToVXDStateObject& currentState);
   };
 }

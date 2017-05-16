@@ -34,10 +34,19 @@ def run_job_submission(backend):
     job2.working_dir = str(Path('testing', job2.name).absolute())
     job2.cmd = ['basf2', 'basic_basf2.py']
     # Central basf2 releases can be set up more easily (you don't need to write your own setup commands)
-    job2.basf2_release = "release-00-08-00"
-    job2.basf2_tools = "/sw/belle2/tools/setup_belle2"
-    # This actually tells the Job to append the correct basf2 setup to the job.setup_cmds. Otherwise it won't do it.
-    job2.add_basf2_setup()
+    # job2.basf2_release = "release-00-08-00"
+    # job2.basf2_tools = "/sw/belle2/tools/setup_belle2"
+    # This actually tells the Job to append the current central basf2 setup to the job2.setup_cmds. Otherwise it won't do it.
+    # job2.add_basf2_setup()
+    # Or you can set up a local release and your own commands by setting the commands manually
+    job2.setup_cmds = [
+        "CAF_TOOLS_LOCATION=/home/ddossett/Melbourne-Work/software/tools/setup_belle2",
+        "CAF_RELEASE_LOCATION=/home/ddossett/Melbourne-Work/software/release",
+        "source $CAF_TOOLS_LOCATION",
+        "pushd $CAF_RELEASE_LOCATION",
+        "setuprel",
+        "popd"
+    ]
     # Any files appended to this list will be place in the Job's working directory e.g. steering files, modules.
     # Since we're running this file we need to include it.
     job2.input_sandbox_files.append("basic_basf2.py")

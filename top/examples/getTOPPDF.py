@@ -97,7 +97,8 @@ main.add_module(ext)
 topreco = register_module('TOPReconstructorPDF')
 topreco.logging.log_level = LogLevel.DEBUG  # remove or comment to suppress printout
 topreco.logging.debug_level = 2  # or set level to 0 to suppress printout
-if sys.argv.count('nopdf'):
+topreco.param("writeNPdfs", 3)
+if 'nopdf' in sys.argv:
     # then dont write out any pdfs
     topreco.param("writeNPdfs", 0)
 main.add_module(topreco)

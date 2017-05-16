@@ -291,6 +291,10 @@ namespace Belle2 {
     StoreArray<TOPInterimFEInfo> infos;
 
     DataArray array(buffer, bufferSize, m_swapBytes);
+
+    map<unsigned short, int>
+    evtNumCounter; // counts the occurence of carrier-generated event numbers. Asynchronous carrier events numbers in one event are a strong indication of frameshifts occuring in the readout data.
+
     unsigned word = array.getWord(); // header word 0
     unsigned short scrodID = word & 0x0FFF;
     auto* info = infos.appendNew(scrodID, bufferSize);
@@ -312,6 +316,10 @@ namespace Belle2 {
       word = array.getWord(); // word 1
       unsigned short scrodID_FE = word >> 25;
       unsigned short convertedAddr = (word >> 16) & 0x1FF;
+      unsigned short evtNum_numWin_trigPat_FEheader = word & 0xFFFF;
+      unsigned short evtNum_FEheader = evtNum_numWin_trigPat_FEheader & 0xFF;
+      evtNumCounter[evtNum_FEheader] += 1;
+
       if (scrodID_FE != scrodID) {
         B2ERROR("TOPUnpacker: corrupted data - different scrodID's in HLSB and FE header");
         B2DEBUG(100, "Different scrodID's in HLSB and FE header: "
@@ -440,6 +448,14 @@ namespace Belle2 {
 
       // waveform header
       word = array.getWord(); // word 16
+      unsigned long evtNum_numWaves_refWin_WFheader = word;
+      unsigned short evtNum_WFheader = (evtNum_numWaves_refWin_WFheader >> 24) & 0xFF;
+
+      if (evtNum_WFheader != evtNum_FEheader) {
+        B2ERROR("TOPUnpacker: different carrier event number in FE header (" << evtNum_FEheader << ") and WF header (" << evtNum_WFheader <<
+                ")");
+      }
+
       word = array.getWord(); // word 17
       word = array.getWord(); // word 18
       word = array.getWord(); // word 19
@@ -536,6 +552,21 @@ namespace Belle2 {
       for (auto& digit : digits) digit->addRelationTo(waveform);
 
     }
+
+    if (evtNumCounter.size() != 1) {
+      B2ERROR("TOPUnpacker: Possible frame shift detected. (More than one unique carrier event number in this readout event)");
+    }
+
+    int nASICs = 0;
+
+    stringstream evtNumOutputString;
+    evtNumOutputString << "Carrier event numbers and their counts:\n";
+    for (auto const& it : evtNumCounter) {
+      nASICs += it.second;
+      evtNumOutputString << it.first << ":\t" << it.second << "\n";
+    }
+    evtNumOutputString << "Total:\t" << nASICs;
+    B2DEBUG(100, evtNumOutputString.str());
 
     return array.getRemainingWords();
 

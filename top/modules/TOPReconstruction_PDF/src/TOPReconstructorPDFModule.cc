@@ -225,7 +225,7 @@ namespace Belle2 {
 
         float position = 0, width = 0, numPhotons = 0;
         for (int pixelID = 1; pixelID <= 512; pixelID++) {
-          for (int k = 0; k < reco.getNumofPDFPeaks(pixelID); k++) {
+          for (int k = 0; k < reco.getNumOfPDFPeaks(pixelID); k++) {
             reco.getPDFPeak(pixelID, k, position, width, numPhotons);
             channelPDFCollection[pixelID].push_back(make_tuple(position, width, numPhotons));
           }

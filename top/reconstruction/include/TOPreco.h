@@ -273,7 +273,7 @@ namespace Belle2 {
        * @param pixelID pixel ID (1-based)
        * @return number of peaks
        */
-      int getNumofPDFPeaks(int pixelID) const
+      int getNumOfPDFPeaks(int pixelID) const
       {
         pixelID--; // 0-based is used in fortran
         return get_num_peaks_(&pixelID);

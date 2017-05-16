@@ -19,6 +19,7 @@ ln -sf ${B2SLC}/hvcontrol
 ln -sf ${B2SLC}/pyb2daq
 ln -sf ${B2SLC}/apps
 ln -sf ${B2SLC}/tools
+ln -sf ${B2SLC}/scripts
 cp ${B2SLC}/Makefile ${B2SLC}/Makefile.src ${B2SLC}/setenv.sh .
 cp -r ${B2SLC}/extra .
 cp -r ${B2SLC}/data .

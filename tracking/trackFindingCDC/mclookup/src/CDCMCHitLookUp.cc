@@ -131,3 +131,9 @@ Index CDCMCHitLookUp::getNPassedSuperLayers(const CDCHit* ptrHit) const
 {
   return CDCMCManager::getMCTrackStore().getNPassedSuperLayers(ptrHit);
 }
+
+
+Index CDCMCHitLookUp::getNLoops(const CDCHit* ptrHit) const
+{
+  return CDCMCManager::getMCTrackStore().getNLoops(ptrHit);
+}

@@ -58,7 +58,7 @@ REG_MODULE(PXDUnpacker)
 #define ONSEN_ERR_FLAG_ONSEN_TRG_FIRST 0x00000008ul
 #define ONSEN_ERR_FLAG_DHC_END   0x00000010ul
 #define ONSEN_ERR_FLAG_DHE_START  0x00000020ul
-#define ONSEN_ERR_FLAG_DHC_FRAMECOUNT 0x00000040ul
+#define ONSEN_ERR_FLAG_FRAMES_IN_EVENT_COUNT 0x00000040ul
 #define ONSEN_ERR_FLAG_DATA_OUTSIDE 0x00000080ul
 #define ONSEN_ERR_FLAG_DHC_START_SECOND  0x00000100ul
 #define ONSEN_ERR_FLAG_DHE_NUMBER_WRONG_SEQUENCE 0x00000200ul
@@ -108,7 +108,14 @@ REG_MODULE(PXDUnpacker)
 #define ONSEN_ERR_FLAG_DHE_START_GHOST_ID 0x10000000000000ull
 #define ONSEN_ERR_FLAG_DHE_START_COMMODE_ID 0x20000000000000ull
 #define ONSEN_ERR_FLAG_DHP_ZSD_DHE_DHC_TOTAL_MM 0x40000000000000ull
-
+#define ONSEN_ERR_FLAG_DHC_START_META_RUNNUMBER_MM 0x80000000000000ull
+#define ONSEN_ERR_FLAG_DHC_START_META_EXPNUMBER_MM 0x100000000000000ull
+#define ONSEN_ERR_FLAG_DHC_START_META_SUBRUNNUMBER_MM 0x200000000000000ull
+#define ONSEN_ERR_FLAG_DHC_WORDCOUNT 0x400000000000000ull
+#define ONSEN_ERR_FLAG_RUNNUMBER_EVTMETA_CHANGED 0x800000000000000ull
+#define ONSEN_ERR_FLAG_EXPERIMENT_NUMBER_EVTMETA_CHANGED 0x1000000000000000ull
+#define ONSEN_ERR_FLAG_RUNNUMBER_ONSEN_CHANGED 0x2000000000000000ull
+#define ONSEN_ERR_FLAG_EXPERIMENT_NUMBER_ONSEN_CHANGED 0x4000000000000000ull
 #define ONSEN_ERR_FLAG_EVENT_COUNT 0x8000000000000000ull
 //-----------------------------------------------------------------
 //                 Implementation
@@ -358,6 +365,25 @@ struct dhc_onsen_trigger_frame {
     word0.print();
     B2INFO("ONSEN Trigger Frame TNRLO $" << hex << trignr0);
   };
+
+  inline unsigned int get_subrun_number(void) const
+  {
+    return (trigtag1 & 0xFF);
+  };
+
+  inline unsigned int get_run_number(void) const
+  {
+//    return ((trigtag1 >> 8) & 0x3FFF);
+    return ((trigtag1 & 0x3FFF00) >> 8);
+  };
+
+  inline unsigned int get_exp_number(void) const
+  {
+    //return ((trigtag1 >> 22) & 0x3FF);
+    return ((trigtag1 & 0xFFC00000) >> 22);
+  };
+
+
   unsigned int check_error(bool ignore_datcon_flag = false) const
   {
     unsigned int m_errorMask = 0;
@@ -476,7 +502,7 @@ struct dhc_end_frame {
            << " CRC " << hex << crc32);
   };
   inline unsigned int get_dhc_id(void) const {return (word0.getMisc() >> 5) & 0xF;};
-  inline unsigned int get_dhc_nr_frames(void) const {return wordsinevent;};
+  inline unsigned int get_dhc_nr_words(void) const {return wordsinevent;};
 };
 
 struct dhc_dhe_end_frame {
@@ -767,13 +793,15 @@ const string error_name[ONSEN_MAX_TYPE_ERR] = {
   "DHE-END/ONSEN Trigger missmatch", "DHP-DHE DHEID mismatch in DHP-RAW Frame", "Nr of active DHP Ports != Nr DHPs in DHP-RAW",
   "DHE ID mismatch of START and GHOST frame", "DHE ID mismatch of START and COMMODE frame",
 
-  "TOTAL DHH Trigger missmatch", "unused", "unused",
-  "unused", "unused", "unused",
-  "unused", "unused", "unused",
+  "TOTAL DHH Trigger missmatch", "DHC Start Meta Data RunNr MM", "DHC Start Meta Data ExpNr MM",
+  "DHC Start Meta Data SubrunNr MM", "DHC Wordcount missmatch", "Run Number (EvtMeta) changed during run",
+  "Experiment number (EvtMeta) changed during run", "Run Number (ONSEN) changed during run", "Experiment number (ONSEN) changed during run",
   "TOTAL EVENTS PROCESSED"
 };
 
 const string errW[6] = {"ONSEN caused", "DHH caused", "HLT caused", "DATCON caused", "unclear" , "SetFlags & Events"};
+
+bool first_event = false;
 
 void PXDUnpackerModule::terminate()
 {
@@ -868,6 +896,7 @@ void PXDUnpackerModule::event()
       j += j;
     }
   }
+  first_event = true;
 }
 
 #ifndef __clang__
@@ -914,7 +943,7 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
   /// NEW format
   if (verbose) {
     B2INFO("PXD Unpacker --> data[0]: <-- Magic " << hex << data[0]);
-    B2INFO("PXD Unpacker --> data[1]: <-- #Frames " << hex << data[1]);
+    B2INFO("PXD Unpacker --> data[1]: <-- #Frames " << htonl(data[1]) << " in hex " << hex << data[1]);
     if (data[1] >= 1 && fullsize < 12) B2INFO("PXD Unpacker --> data[2]: <-- Frame 1 len " << hex << data[2]);
     if (data[1] >= 2 && fullsize < 16) B2INFO("PXD Unpacker --> data[3]: <-- Frame 2 len " << hex << data[3]);
     if (data[1] >= 3 && fullsize < 20) B2INFO("PXD Unpacker --> data[4]: <-- Frame 3 len " << hex << data[4]);
@@ -1248,6 +1277,7 @@ int PXDUnpackerModule::nr5bits(int i) const
 
 void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Frame_Number, const int Frames_in_event)
 {
+  ///len in bytes !!!!!!!!!!
   /// The following STATIC variables are used to save some state or count some things
   /// while depacking the frames. they are in most cases (re)set on the first frame or ONSEN trg frame
   /// Most could put in as a class member, but they are only needed within this function
@@ -1258,8 +1288,9 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   static int countedWordsInEvent;// count the size of all frames in words
   static int countedDHEStartFrames = 0;
   static int countedDHEEndFrames = 0;
-  static int nr_of_frames_dhc = 0;/// tbd if and where this number will still show up in te DHC format TODO
-  static int countedDHCFrames = 0;/// would not be needed if nr_of_frames_dhc is not within the data structure
+  static int nr_of_32bWords_in_dhc_end = 0;/// tbd if and where this number will still show up in te DHC format TODO
+  static int countedFramesInEvent = 0;
+  static int counted32bWordsInDHC = 0;
   static int mask_active_dhe = 0;// DHE mask (5 bit)
   static int nr_active_dhe =
     0;// just count the active DHEs. Until now, it is not possible to check for the bit mask. we would need the info on which DHE connects to which DHC at which port from gearbox/geometry?
@@ -1271,6 +1302,12 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   static unsigned int currentVxdId = 0;
   static bool isFakedData_event = false;
   static int number_dhe_frames = 0;
+  static unsigned int stored_run_nr_EvtMeta = 0;
+  static unsigned int stored_evt_nr_EvtMeta = 0;
+  static unsigned int stored_exp_nr_EvtMeta = 0;
+  static unsigned int stored_run_nr_ONSEN = 0;
+  static unsigned int stored_evt_nr_ONSEN = 0;
+  static unsigned int stored_exp_nr_ONSEN = 0;
 //  static unsigned int dhe_ordering_check = 0;
 
 
@@ -1287,12 +1324,17 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
   }
 
   unsigned int eventNrOfThisFrame = dhc.getEventNrLo();
+  unsigned int run_number_dhc_start = dhc.data_dhc_start_frame->get_run();
+  unsigned int exp_number_dhc_start = dhc.data_dhc_start_frame->get_experiment();
+  unsigned int subrun_number_dhc_start = dhc.data_dhc_start_frame->get_subrun();
+
   int type = dhc.getFrameType();
 
   if (Frame_Number == 0) { /// We reset the counters on the first event
     countedDHEStartFrames = 0;
     countedDHEEndFrames = 0;
     countedWordsInEvent = 0;
+    countedFramesInEvent = 0;
     currentDHEID = 0xFFFFFFFF;
     currentVxdId = 0;
 
@@ -1326,7 +1368,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 
   switch (type) {
     case DHC_FRAME_HEADER_DATA_TYPE_DHP_RAW: {
-      countedDHCFrames++;
+      countedFramesInEvent++;
 
       if (verbose) dhc.data_direct_readout_frame_raw->print();
 //      if (currentDHEID != dhc.data_direct_readout_frame_raw->getDHEId()) {
@@ -1338,17 +1380,17 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
 
 //       stat_raw++;
-
+      B2INFO("Unpack DHP RAW with " << (len / 4) << " words (32 bit)");
       unpack_dhp_raw(data, len - 4,
                      dhc.data_direct_readout_frame->getDHEId(),
                      dhc.data_direct_readout_frame->getDHPPort(),
                      currentVxdId);
-
+      counted32bWordsInDHC += (len / 4);
       break;
     };
     case DHC_FRAME_HEADER_DATA_TYPE_ONSEN_DHP:
     case DHC_FRAME_HEADER_DATA_TYPE_DHP_ZSD: {
-      countedDHCFrames++;
+      countedFramesInEvent++;
 
       if (verbose)dhc.data_direct_readout_frame->print();
 
@@ -1389,19 +1431,21 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       m_errorMask |= dhc.check_crc();
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
 //       stat_zsd++;
-      B2INFO("Unpack DHP ZSD with reformat flag $" << dhc.data_direct_readout_frame->getDataReformattedFlag());
+      B2INFO("Unpack DHP ZSD with reformat flag $" << dhc.data_direct_readout_frame->getDataReformattedFlag() << " and $" <<
+             (len / 4) << " words (32 bit)");
       unpack_dhp(data, len - 4,
                  dhe_first_readout_frame_id_lo,
                  dhc.data_direct_readout_frame->getDHEId(),
                  dhc.data_direct_readout_frame->getDHPPort(),
                  dhc.data_direct_readout_frame->getDataReformattedFlag(),
                  dhe_first_offset, currentVxdId);
+      counted32bWordsInDHC += (len / 4);
       break;
     };
     case DHC_FRAME_HEADER_DATA_TYPE_ONSEN_FCE:
     case DHC_FRAME_HEADER_DATA_TYPE_FCE_RAW: {
 
-      countedDHCFrames++;
+      countedFramesInEvent++;
       if (verbose) hw->print();
       if (currentDHEID != dhc.data_direct_readout_frame_raw->getDHEId()) {
         B2ERROR("DHE ID from DHE Start and FCE RAW (cluster frame) do not match $" << hex << currentDHEID << " != $" <<
@@ -1414,10 +1458,11 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       B2INFO("UNPACK FCE FRAME with len " << hex << len);
       unpack_fce((unsigned short*) data, len - 4, currentVxdId);
 
+      counted32bWordsInDHC += (len / 4);
       break;
     };
     case DHC_FRAME_HEADER_DATA_TYPE_COMMODE: {
-      countedDHCFrames++;
+      countedFramesInEvent++;
 
       if (verbose) hw->print();
       if (currentDHEID != dhc.data_commode_frame->getDHEId()) {
@@ -1426,6 +1471,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         m_errorMask |= ONSEN_ERR_FLAG_DHE_START_COMMODE_ID;
       }
       m_errorMask |= dhc.check_crc();
+      counted32bWordsInDHC += ((dhc.data_commode_frame->getFixedSize()) / 4);
       break;
     };
     case DHC_FRAME_HEADER_DATA_TYPE_DHC_START: {
@@ -1452,24 +1498,47 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 //      eventNrOfOnsenTrgFrame = eventNrOfThisFrame;
       currentDHEID = 0xFFFFFFFF;
       currentVxdId = 0; /// invalid
-      countedDHCFrames = 1;
+      countedFramesInEvent++; //1; count ONSEN Trigger frame as well
       m_errorMask |= dhc.check_crc();
 //       stat_start++;
 
-      /// TODO here we should check full(!) Event Number, Run Number, Subrun Nr and Exp Number
-      /// of this frame against the one from MEta Event Info
-      ///   m_meta_event_nr=evtPtr->getEvent();// filled already above
-      ///   m_meta_run_nr=evtPtr->getRun();// filled already above
-      ///   n_meta_subrun_nr=evtPtr->getSubrun();// filled already above
-      ///   m_meta_experiment=evtPtr->getExperiment();// filled already above
+
+      B2INFO("DHC Start Evt Nr $" << eventNrOfThisFrame << " (0x" << hex << eventNrOfThisFrame << ")");
+      if (run_number_dhc_start != m_meta_run_nr) {
+        if (run_number_dhc_start != 0) {
+          B2ERROR("DHC Start Run Nr $" << run_number_dhc_start << " (0x" << hex << run_number_dhc_start << ")" << " != EvtMetaData Run Nr $"
+                  << dec << m_meta_run_nr << " (0x" << hex << m_meta_run_nr << ")");
+          m_errorMask |= ONSEN_ERR_FLAG_DHC_START_META_RUNNUMBER_MM;
+        }
+        if (run_number_dhc_start == 0) {
+          B2WARNING("DHC dummy Frame !! DHC Start Run Nr == 0 " << " != EvtMetaData Run Nr $" << m_meta_run_nr << " (0x" << hex <<
+                    m_meta_run_nr << ")");
+        }
+      }
+      B2INFO("DHC Start Run Nr $" << run_number_dhc_start << " (0x" << hex << run_number_dhc_start << ")");
+
+      if (exp_number_dhc_start != m_meta_experiment) {
+        B2ERROR("DHC Start Experiment Nr $" << exp_number_dhc_start << " (0x" << hex << exp_number_dhc_start << ")"
+                " != EvtMetaData Experiment Nr $" << dec << m_meta_experiment
+                << "0x(" << hex << m_meta_experiment << ")");
+        m_errorMask |= ONSEN_ERR_FLAG_DHC_START_META_EXPNUMBER_MM;
+      }
+      B2INFO("DHC Start Exp Nr $" << exp_number_dhc_start << " (0x" << hex << exp_number_dhc_start << ")");
+
+      if (subrun_number_dhc_start != m_meta_subrun_nr) {
+        B2ERROR("DHC Start Subrun Nr $" << hex << subrun_number_dhc_start << " != EvtMetaData Subrun Nr $" << m_meta_subrun_nr);
+        m_errorMask |= ONSEN_ERR_FLAG_DHC_START_META_SUBRUNNUMBER_MM;
+      }
+      B2INFO("DHC Start Subrun Nr $" << subrun_number_dhc_start << " (0x" << hex << subrun_number_dhc_start << ")");
 
       mask_active_dhe = dhc.data_dhc_start_frame->get_active_dhe_mask();
       nr_active_dhe = nr5bits(mask_active_dhe);
+      counted32bWordsInDHC += (dhc.data_dhc_start_frame->getFixedSize() / 4);
       break;
     };
     case DHC_FRAME_HEADER_DATA_TYPE_DHE_START: {
 //       bool ref_flag;
-      countedDHCFrames++;
+      countedFramesInEvent++;
       number_dhe_frames++;
       if (verbose)dhc.data_dhe_start_frame->print();
       dhe_first_readout_frame_id_lo = dhc.data_dhe_start_frame->getStartFrameNr();
@@ -1529,10 +1598,11 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         B2ERROR("DHE Start Trigger Nr $" << hex << eventNrOfThisFrame << " != EvtMetaData Trigger Nr $" << (m_meta_event_nr & 0xFFFF));
         m_errorMask |= ONSEN_ERR_FLAG_DHE_EVT_META_MM;
       }
+      counted32bWordsInDHC += (dhc.data_dhe_start_frame->getFixedSize() / 4);
       break;
     };
-    case DHC_FRAME_HEADER_DATA_TYPE_GHOST:
-      countedDHCFrames++;
+    case DHC_FRAME_HEADER_DATA_TYPE_GHOST: {
+      countedFramesInEvent++;
       if (verbose)dhc.data_ghost_frame->print();
       if (currentDHEID != dhc.data_ghost_frame->getDHEId()) {
         B2ERROR("DHE ID from DHE Start and GHOST frame do not match $" << hex << currentDHEID << " != $" <<
@@ -1543,12 +1613,14 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       found_mask_active_dhp |= 1 << dhc.data_ghost_frame->getDHPPort();
       m_errorMask |= dhc.check_crc();
 //       stat_ghost++;
+      counted32bWordsInDHC += (dhc.data_ghost_frame->getFixedSize() / 4);
       break;
+    }
     case DHC_FRAME_HEADER_DATA_TYPE_DHC_END: {
       if (dhc.data_dhc_end_frame->isFakedData() != isFakedData_event) {
         B2ERROR("DHC END is but no Fake event OR Fake Event but DHE END is not.");
       }
-      countedDHCFrames++;
+      countedFramesInEvent++;
       currentDHEID = 0xFFFFFFFF;
       currentVxdId = 0; /// invalid
       if (isFakedData_event) {
@@ -1558,12 +1630,21 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         if (verbose)dhc.data_dhc_end_frame->print();
       }
 //       stat_end++;
-      nr_of_frames_dhc = dhc.data_dhc_end_frame->get_dhc_nr_frames();
+      nr_of_32bWords_in_dhc_end = dhc.data_dhc_end_frame->get_dhc_nr_words();
+      nr_of_32bWords_in_dhc_end = htonl(nr_of_32bWords_in_dhc_end);
       if (!isFakedData_event) {
-        if (countedDHCFrames != nr_of_frames_dhc) { /// Nr Frames has been removed .. tbd
+        if (countedFramesInEvent != Frames_in_event) {
           if (!m_ignore_headernrframes) {
-            B2ERROR("Number of DHC Frames in DHC End Frame $" << nr_of_frames_dhc << " != $" << countedDHCFrames << " Frames Counted");
-            m_errorMask |= ONSEN_ERR_FLAG_DHC_FRAMECOUNT;
+            B2ERROR("Number of Frames in Event derived from ONSEN Trigger Frame $" << Frames_in_event << " != $" << countedFramesInEvent <<
+                    " Frames Counted");
+            m_errorMask |= ONSEN_ERR_FLAG_FRAMES_IN_EVENT_COUNT;
+          }
+        }
+        if (counted32bWordsInDHC != nr_of_32bWords_in_dhc_end) {
+          if (!m_ignore_headernrframes) {
+            B2ERROR("Number of 32 Bit Words derived from DHC End Frame $" << nr_of_32bWords_in_dhc_end << " != $" << counted32bWordsInDHC <<
+                    " Words Counted");
+            m_errorMask |= ONSEN_ERR_FLAG_DHC_WORDCOUNT;
           }
         }
       }
@@ -1584,16 +1665,17 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       if (!isFakedData_event) {
         int w;
         w = dhc.data_dhc_end_frame->get_words() * 2;
+        w = htonl(w);
         countedWordsInEvent += 2;
-        if (verbose) {
-          B2INFO("countedWordsInEvent " << countedWordsInEvent << " w " << w);
-        };
+        //if (verbose) {
+        B2INFO("countedWordsInEvent " << countedWordsInEvent << " w " << w);
+        //};
         if (countedWordsInEvent != w) {
           if (verbose) {
             B2INFO("Error: WIE " << hex << countedWordsInEvent << " vs END " << hex << w);
           };
-//           error_flag = true;
-//           wie_error++;
+          //           error_flag = true;
+          //           wie_error++;
         } else {
           if (verbose)
             B2INFO("EVT END: WIE " << hex << countedWordsInEvent << " == END " << hex << w);
@@ -1602,10 +1684,12 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       m_errorMask |= dhc.check_crc();
       //dhe_ordering_check = 0;
       number_dhe_frames = 0;
+      countedFramesInEvent = 0;
+      counted32bWordsInDHC = 0;
       break;
     };
     case DHC_FRAME_HEADER_DATA_TYPE_DHE_END: {
-      countedDHCFrames++;
+      countedFramesInEvent++;
       if (verbose) dhc.data_dhe_end_frame->print();
       if (currentDHEID != dhc.data_dhe_end_frame->getDHEId()) {
         B2ERROR("DHE ID from DHE Start and this frame do not match $" << hex << currentDHEID << " != $" <<
@@ -1639,29 +1723,73 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         B2ERROR("DHE End Trigger Nr $" << hex << eventNrOfThisFrame << " != ONSENT Trigger Frame Trigger Nr $" << eventNrOfOnsenTrgFrame);
         m_errorMask |= ONSEN_ERR_FLAG_DHE_END_ONSEN_MM;
       }
+      counted32bWordsInDHC += (dhc.data_dhe_end_frame->getFixedSize() / 4);
       break;
     };
-    case DHC_FRAME_HEADER_DATA_TYPE_ONSEN_ROI:
-      countedDHCFrames += 0; /// DO NOT COUNT!!!!
+    case DHC_FRAME_HEADER_DATA_TYPE_ONSEN_ROI: {
+      countedFramesInEvent++;// += 0; /// DO NOT COUNT!!!! Count when comparing countedFramesInEvent to number of frames in index frame
       if (verbose) dhc.data_onsen_roi_frame->print();
       m_errorMask |= dhc.data_onsen_roi_frame->check_error();// dummy
       m_errorMask |= dhc.data_onsen_roi_frame->check_inner_crc(len - 4); /// CRC is without the DHC header, dummy see reason in function
       m_errorMask |= dhc.check_crc();
       if (!m_doNotStore) dhc.data_onsen_roi_frame->save(m_storeROIs, len, (unsigned int*) data);
       break;
-    case DHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG:
-      countedDHCFrames += 0; /// DO NOT COUNT!!!!
+    }
+    case DHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG: {
+      countedFramesInEvent++;//+= 0; /// DO NOT COUNT!!!! Count when comparing countedFramesInEvent to number of frames in index frame
       eventNrOfOnsenTrgFrame = eventNrOfThisFrame;
-//   m_meta_event_nr=evtPtr->getEvent();
-//   m_meta_run_nr=evtPtr->getRun();
-//   n_meta_subrun_nr=evtPtr->getSubrun();
-//   m_meta_experiment=evtPtr->getExperiment();
+
+      //check whether run number or experiment number changes during run
+      if (first_event) {
+        if (stored_run_nr_EvtMeta != m_meta_run_nr) {
+          B2ERROR("EvtMeta Run Number changed!! from event $" << stored_evt_nr_EvtMeta << " is $" << stored_run_nr_EvtMeta <<
+                  " and from (this) event $" << m_meta_event_nr <<
+                  " is $" << m_meta_run_nr);
+          m_errorMask |= ONSEN_ERR_FLAG_RUNNUMBER_EVTMETA_CHANGED;
+        }
+        if (stored_exp_nr_EvtMeta != m_meta_experiment) {
+          B2ERROR("EvtMeta Experiment Number changed!! from event $" << stored_evt_nr_EvtMeta << " is $" << stored_exp_nr_EvtMeta <<
+                  " and from (this) event $" <<
+                  m_meta_event_nr << " is $" << m_meta_experiment);
+          m_errorMask |= ONSEN_ERR_FLAG_EXPERIMENT_NUMBER_EVTMETA_CHANGED;
+        }
+
+
+        if (stored_run_nr_ONSEN != stored_run_nr_EvtMeta) {
+          if (stored_run_nr_EvtMeta != dhc.data_onsen_trigger_frame->get_run_number()) {
+            B2ERROR(" ONSEN TRG Run Number changed!! from event $" << stored_evt_nr_ONSEN << " is $" << stored_run_nr_ONSEN <<
+                    " and from (this) event $" << dhc.data_onsen_trigger_frame->get_trig_nr0() <<
+                    " is $" << dhc.data_onsen_trigger_frame->get_run_number());
+            m_errorMask |= ONSEN_ERR_FLAG_RUNNUMBER_ONSEN_CHANGED;
+          }
+        }
+        if (stored_exp_nr_ONSEN != stored_exp_nr_EvtMeta) {
+          if (stored_exp_nr_ONSEN != dhc.data_onsen_trigger_frame->get_exp_number()) {
+            B2ERROR("ONSEN TRG Experiment Number changed!! from event $" << stored_evt_nr_ONSEN << " is $" << stored_exp_nr_EvtMeta <<
+                    " and from (this) event $" <<
+                    dhc.data_onsen_trigger_frame->get_trig_nr0() << " is $" << dhc.data_onsen_trigger_frame->get_exp_number());
+            m_errorMask |= ONSEN_ERR_FLAG_EXPERIMENT_NUMBER_ONSEN_CHANGED;
+          }
+        }
+      }
+      B2INFO("ONSEN TRG Frame Evt Nr $" << dhc.data_onsen_trigger_frame->get_trig_nr0() << " (0x" << hex <<
+             dhc.data_onsen_trigger_frame->get_trig_nr0() << ")");
+
+      B2INFO("ONSEN TRG Frame Run Nr $" << dhc.data_onsen_trigger_frame->get_run_number() << " (0x" << hex <<
+             dhc.data_onsen_trigger_frame->get_run_number() << ")");
+
+      B2INFO("ONSEN TRG Frame Exp Nr $" <<  dhc.data_onsen_trigger_frame->get_exp_number() << " (0x" << hex <<
+             dhc.data_onsen_trigger_frame->get_exp_number() << ")");
+
+      B2INFO("ONSEN TRG Frame Subrun Nr $" << dhc.data_onsen_trigger_frame->get_subrun_number() << " (0x" << hex <<
+             dhc.data_onsen_trigger_frame->get_subrun_number() << ")");
+
       if (dhc.data_onsen_trigger_frame->is_SendUnfiltered()) {
-        B2ERROR("ONSEN TRG Frame Send out ALL Flag.");
+        B2INFO("ONSEN TRG Frame Send out ALL Flag.");
         m_errorMask |= ONSEN_ERR_FLAG_SENDALL;
       }
       if (dhc.data_onsen_trigger_frame->is_SendROIs()) {
-        B2ERROR("ONSEN TRG Frame Send debug ROI Flag.");
+        B2INFO("ONSEN TRG Frame Send debug ROI Flag.");
         m_errorMask |= ONSEN_ERR_FLAG_SEND_DEBUG_ROI;
       }
       if (verbose) dhc.data_onsen_trigger_frame->print();
@@ -1671,10 +1799,20 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         B2ERROR("ONSEN TRG Frame must be the first one.");
       }
       if (eventNrOfThisFrame != (m_meta_event_nr & 0xFFFF)) {
-        B2ERROR("DHC End Trigger Nr $" << hex << eventNrOfThisFrame << " != EvtMetaData Trigger Nr $" << (m_meta_event_nr & 0xFFFF));
+        B2ERROR("ONSEN TRG Frame Trigger Nr $" << hex << eventNrOfThisFrame << " != EvtMetaData Trigger Nr $" <<
+                (m_meta_event_nr & 0xFFFF));
         m_errorMask |= ONSEN_ERR_FLAG_ONSEN_TRG_EVT_MM;
       }
+      stored_evt_nr_EvtMeta = m_meta_event_nr;
+      stored_run_nr_EvtMeta = m_meta_run_nr;
+      stored_exp_nr_EvtMeta = m_meta_experiment;
+
+      stored_evt_nr_ONSEN = dhc.data_onsen_trigger_frame->get_trig_nr0();
+      stored_run_nr_ONSEN = dhc.data_onsen_trigger_frame->get_run_number();
+      stored_exp_nr_ONSEN = dhc.data_onsen_trigger_frame->get_exp_number();
+
       break;
+    }
     default:
       B2ERROR("UNKNOWN DHC frame type");
       m_errorMask |= ONSEN_ERR_FLAG_DHC_UNKNOWN;
@@ -1751,7 +1889,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
     m_errorMask |= ONSEN_ERR_FLAG_DHE_START;
   }
 
-  countedWordsInEvent += len;
+  countedWordsInEvent += len / 2; //len in bytes -> word count of 16bit words len / 2
 
 }
 
@@ -1792,8 +1930,16 @@ unsigned int PXDUnpackerModule::remap_col_IF_OB(unsigned int DHP_row, unsigned i
   u_cellID = Drain / 4;
 //   B2INFO(" col false " << DHP_col << " DCD line " << DCD_channel << " col geo " << col_geo);
 //  B2INFO("Remapped :: DHP_COL $" << DHP_col << " to u_cellID $" << u_cellID);
-  if (DHP_col > 250) {B2INFO("DHP_COL > 250 :: COL $" << DHP_col << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");}
-  if (u_cellID > 250) {B2INFO("U_CELLID > 250 :: u_cellID $" << u_cellID << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");}
+  if (DHP_col > 250) {
+    B2ERROR("DHP_COL > 250 :: COL $" << DHP_col);
+    B2ERROR("DHP_row = " << DHP_row << " DHP_col = " << DHP_col << " dhp_id = " << dhp_id << " DCD_channel " << DCD_channel << " Drain "
+            << Drain);
+  }
+  if (u_cellID > 250) {
+    B2ERROR("U_CELLID > 250 :: u_cellID $" << u_cellID);
+    B2ERROR("DHP_row = " << DHP_row << " DHP_col = " << DHP_col << " dhp_id = " << dhp_id << " DCD_channel " << DCD_channel << " Drain "
+            << Drain);
+  }
   return u_cellID;
 }
 
@@ -1837,8 +1983,14 @@ unsigned int PXDUnpackerModule::remap_col_IB_OF(unsigned int DHP_row, unsigned i
 //   B2INFO(" col false " << DHP_col << " DCD line " << DCD_channel << " col geo " << col_geo);
   if (u_cellID < 250) u_cellID = 250 - 1 - col;
 //  B2INFO("Remapped :: COL $" << DHP_col << " to u_cellID $" << u_cellID);
-  if (DHP_col > 250) {B2INFO("DHP_COL > 250 :: COL $" << DHP_col << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");}
-  if (u_cellID > 250) {B2INFO("U_CELLID > 250 :: u_cellID $" << u_cellID << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");}
+  if (DHP_col > 250) {
+    B2ERROR("DHP_COL > 250 :: COL $" << DHP_col);
+  }
+  if (u_cellID > 250) {
+    B2ERROR("U_CELLID > 250 :: u_cellID $" << u_cellID);
+    B2ERROR("DHP_row = " << DHP_row << " DHP_col = " << DHP_col << " dhp_id = " << dhp_id << " DCD_channel " << DCD_channel << " Drain "
+            << Drain);
+  }
   return u_cellID;
 }
 

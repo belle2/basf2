@@ -39,6 +39,9 @@ VXDTFTrainingDataCollectorModule::VXDTFTrainingDataCollectorModule() :
 
   addParam("SpacePointTrackCandsName", m_PARAMSpacePointTrackCandsName,
            "the name of the storeArray containing the SpacePointTrackCands used for extracting and collecting the training data.", string(""));
+
+  addParam("NameTag", m_PARAMNameTag, "A name tag that will be attached to the name of the output file. If left empty (\"\") a "
+           "random number will be attached!", std::string(""));
 }
 
 /**
@@ -55,9 +58,15 @@ void VXDTFTrainingDataCollectorModule::initialize()
   for (auto setup : filtersContainer.getAllSetups()) {
     auto config = setup.second->getConfig();
 
-    int randomInt = gRandom->Integer(std::numeric_limits<int>::max());
+    std::string nameAppendix = m_PARAMNameTag;
+    // if the name tag was not set a random number will be attached!
+    if (nameAppendix == std::string("")) {
+      int randomInt = gRandom->Integer(std::numeric_limits<int>::max());
+      nameAppendix = std::to_string(randomInt);
+    }
+
     SecMapTrainer<SelectionVariableFactory<SecMapTrainerHit> >
-    newMap(setup.first, randomInt);
+    newMap(setup.first, nameAppendix);
 
     m_secMapTrainers.push_back(std::move(newMap));
 

@@ -4,7 +4,14 @@
 # Thomas Keck 2016
 
 import numpy as np
-import xgboost as xgb
+
+try:
+    import xgboost as xgb
+except ImportError:
+    print("Please install xgboost: pip3 install xgboost")
+    import sys
+    sys.exit(1)
+
 import os
 import tempfile
 import collections
@@ -29,6 +36,10 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     Return default xgboost model
     """
     param = {'bst:max_depth': 2, 'bst:eta': 1, 'silent': 1, 'objective': 'binary:logistic'}
+    nTrees = 100
+    if 'nTrees' in parameters:
+        nTrees = parameters['nTrees']
+        del parameters['nTrees']
     if isinstance(parameters, collections.Mapping):
         param.update(parameters)
     return State(100, param)

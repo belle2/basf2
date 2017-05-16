@@ -47,8 +47,8 @@ namespace Belle2 {
       for (int moduleID = 1; moduleID <= numModules; moduleID++) {
         unsigned numPixels = geo->getModule(moduleID).getPMTArray().getNumPixels();
         for (unsigned channel = 0; channel < numPixels; channel++) {
-          int mdn = moduleID - 1;
-          int ich = mapper.getPixelID(channel) - 1;
+          int mdn = moduleID - 1; // 0-based used in fortran
+          int ich = mapper.getPixelID(channel) - 1; // 0-base used in fortran
           int flag = mask->isActive(moduleID, channel);
           set_channel_mask_(&mdn, &ich, &flag);
         }
@@ -261,7 +261,9 @@ namespace Belle2 {
 
     double TOPreco::getPDF(int pixelID, double T, double Mass)
     {
-      float t = (float) T; float mass = (float) Mass;
+      pixelID--;  // 0-based ID used in fortran
+      float t = (float) T;
+      float mass = (float) Mass;
       return get_pdf_(&pixelID, &t, &mass);
     }
 

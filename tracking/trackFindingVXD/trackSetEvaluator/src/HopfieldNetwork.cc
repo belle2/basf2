@@ -68,6 +68,9 @@ unsigned short HopfieldNetwork::doHopfield(
 
   //Iterate until change in weights is small:
   unsigned iIterations = 0;
+
+  float T = m_T;
+
   while (c > m_cmax) {
 
     std::shuffle(sequenceVector.begin(), sequenceVector.end(), TRandomWrapper());
@@ -82,10 +85,10 @@ unsigned short HopfieldNetwork::doHopfield(
 
       float act = aTempVal + m_omega * overlapResolverNodeInfos[i].qualityIndex;
 
-      xMatrix(0, i) = 0.5 * (1. + tanh(act / m_T));
+      xMatrix(0, i) = 0.5 * (1. + tanh(act / T));
     }
 
-    m_T = 0.5 * (m_T + m_Tmin);
+    T = 0.5 * (T + m_Tmin);
 
     //Determine maximum change in weights:
     c = ((xMatrix - xMatrixOld).Abs()).Max();

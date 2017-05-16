@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Keck                                              *
+ * Contributors: Thomas Keck, Dennis Weyland                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,6 +12,7 @@
 #define REFERENCEFRAME_H
 
 #include <TLorentzRotation.h>
+#include <TRotation.h>
 #include <TLorentzVector.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/PCmsLabTransform.h>
@@ -27,31 +28,71 @@ namespace Belle2 {
   public:
     /**
      * Get vertex 3-vector in reference frame
+     * @param 3-vector from particle
+     * @return 3-vector in reference frame
+     */
+    virtual TVector3 getVertex(const TVector3& vector) const = 0;
+
+    /**
+     * Wrapper for particles
      * @param particle
      * @return 3-vector in reference frame
      */
-    virtual TVector3 getVertex(const Particle* particle) const = 0;
+    virtual TVector3 getVertex(const Particle* particle) const
+    {
+      return getVertex(particle->getVertex());
+    }
 
     /**
      * Get momentum 4-vector in reference frame
-     * @param particle
+     * @param momentum 4-vector from particle
      * @return momentum 4-vector in reference frame
      */
-    virtual TLorentzVector getMomentum(const Particle* particle) const = 0;
+    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const = 0;
+
+    /**
+     * Wrapper for particles
+     * @param  particle
+     * @return momentum 4-vector in reference frame
+     */
+    virtual TLorentzVector getMomentum(const Particle* particle) const
+    {
+      return getMomentum(particle->get4Vector());
+    }
 
     /**
      * Get Momentum error matrix in reference frame
-     * @param particle
+     * @param Covariance matrix of particle
      * @return Covariance matrix in reference frame
      */
-    virtual TMatrixFSym getMomentumErrorMatrix(const Particle* particle) const = 0;
+    virtual TMatrixFSym getMomentumErrorMatrix(const TMatrixFSym& matrix) const = 0;
+
+    /**
+     * Wrapper for particles
+     * @param  particle
+     * @return Covariance matrix in reference frame
+     */
+    virtual TMatrixFSym getMomentumErrorMatrix(const Particle* particle) const
+    {
+      return getMomentumErrorMatrix(particle->getMomentumErrorMatrix());
+    }
 
     /**
      * Get Vertex error matrix in reference frame
+     * @param Covariance matrix of particle
+     * @return Covariance matrix in reference frame
+     */
+    virtual TMatrixFSym getVertexErrorMatrix(const TMatrixFSym& matrix) const = 0;
+
+    /**
+     * Wrapper for particles
      * @param particle
      * @return Covariance matrix in reference frame
      */
-    virtual TMatrixFSym getVertexErrorMatrix(const Particle* particle) const = 0;
+    virtual TMatrixFSym getVertexErrorMatrix(const Particle* particle) const
+    {
+      return getVertexErrorMatrix(particle->getVertexErrorMatrix());
+    }
 
     /**
      * Get current rest frame
@@ -96,31 +137,31 @@ namespace Belle2 {
 
     /**
      * Get vertex 3-vector in  rest frame system
-     * @param particle
+     * @param 3-vector from particle
      * @return 3-vector in rest frame System
      */
-    virtual TVector3 getVertex(const Particle* particle) const;
+    virtual TVector3 getVertex(const TVector3& vector) const;
 
     /**
      * Get Lorentz vector in rest frame System
-     * @param particle
+     * @param Lorentz vector from particle
      * @return Lorentz vector in rest frame System
      */
-    virtual TLorentzVector getMomentum(const Particle* particle) const;
+    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const;
 
     /**
      * Get Momentum error matrix in rest frame
-     * @param particle
+     * @param Covariance matrix from particle
      * @return Covariance matrix in rest frame
      */
-    virtual TMatrixFSym getMomentumErrorMatrix(const Particle* particle) const;
+    virtual TMatrixFSym getMomentumErrorMatrix(const TMatrixFSym& matrix) const;
 
     /**
      * Get Vertex error matrix in rest frame
-     * @param particle
+     * @param Covariance matrix from particle
      * @return Covariance matrix in rest frame
      */
-    virtual TMatrixFSym getVertexErrorMatrix(const Particle* particle) const;
+    virtual TMatrixFSym getVertexErrorMatrix(const TMatrixFSym& matrix) const;
 
   private:
     TLorentzVector m_momentum;         /**< momentum of RF in the lab frame */
@@ -138,31 +179,31 @@ namespace Belle2 {
 
     /**
      * Get vertex 3-vector in lab frame
-     * @param particle
+     * @param 3-vector from particle
      * @return 3-vector in lab frame
      */
-    virtual TVector3 getVertex(const Particle* particle) const;
+    virtual TVector3 getVertex(const TVector3& vector) const;
 
     /**
      * Get Lorentz vector in lab frame
-     * @param particle
+     * @param Lorentz vector from particle
      * @return Lorentz vector in lab frame
      */
-    virtual TLorentzVector getMomentum(const Particle* particle) const;
+    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const;
 
     /**
      * Get Momentum error matrix in lab frame
-     * @param particle
+     * @param Covariance matrix from particle
      * @return Covariance matrix in lab frame
      */
-    virtual TMatrixFSym getMomentumErrorMatrix(const Particle* particle) const;
+    virtual TMatrixFSym getMomentumErrorMatrix(const TMatrixFSym& matrix) const;
 
     /**
      * Get Vertex error matrix in lab frame
-     * @param particle
+     * @param Covariance matrix from particle
      * @return Covariance matrix in lab frame
      */
-    virtual TMatrixFSym getVertexErrorMatrix(const Particle* particle) const;
+    virtual TMatrixFSym getVertexErrorMatrix(const TMatrixFSym& matrix) const;
 
   };
 
@@ -174,34 +215,122 @@ namespace Belle2 {
   public:
     /**
      * Get vertex 3-vector in cms frame
-     * @param particle
+     * @param 3-vector from particle
      * @return 3-vector in cms frame
      */
-    virtual TVector3 getVertex(const Particle* particle) const;
+    virtual TVector3 getVertex(const TVector3& vector) const;
 
     /**
      * Get Lorentz vector in cms frame
-     * @param particle
+     * @param Lorentz vector from particle
      * @return Lorentz vector in cms frame
      */
-    virtual TLorentzVector getMomentum(const Particle* particle) const;
+    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const;
 
     /**
      * Get Momentum error matrix in cms frame
-     * @param particle
+     * @param Covariance matrix from particle
      * @return Covariance matrix in cms frame
      */
-    virtual TMatrixFSym getMomentumErrorMatrix(const Particle* particle) const;
+    virtual TMatrixFSym getMomentumErrorMatrix(const TMatrixFSym& matrix) const;
 
     /**
      * Get Vertex error matrix in cms frame
-     * @param particle
+     * @param Covariance matrix from particle
      * @return Covariance matrix in cms frame
      */
-    virtual TMatrixFSym getVertexErrorMatrix(const Particle* particle) const;
+    virtual TMatrixFSym getVertexErrorMatrix(const TMatrixFSym& matrix) const;
 
   private:
     PCmsLabTransform m_transform; /**< Lab to CMS Transform */
+  };
+
+  /**
+   * Rotation frame around vector
+   */
+  class RotationFrame : public ReferenceFrame {
+
+  public:
+    /**
+     * Create new rotation frame
+     */
+    explicit RotationFrame(const TVector3& newX, const TVector3& newY, const TVector3& newZ);
+
+    /**
+     * Get vertex 3-vector in rotation frame
+     * @param 3-vector from particle
+     * @return 3-vector in rotation frame
+     */
+    virtual TVector3 getVertex(const TVector3& vector) const;
+
+    /**
+     * Get Lorentz vector in rotation frame
+     * @param Lorentz vector from particle
+     * @return Lorentz vector in rotation frame
+     */
+    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const;
+
+    /**
+     * Get Momentum error matrix in rotation frame
+     * @param Covariance matrix from particle
+     * @return Covariance matrix in rotation frame
+     */
+    virtual TMatrixFSym getMomentumErrorMatrix(const TMatrixFSym& matrix) const;
+
+    /**
+     * Get Vertex error matrix in rotation frame
+     * @param Covariance matrix from particle
+     * @return Covariance matrix in rotation frame
+     */
+    virtual TMatrixFSym getVertexErrorMatrix(const TMatrixFSym& matrix) const;
+
+  private:
+    TRotation m_rotation; /**< Rotation */
+  };
+
+  /**
+   * Stack frame for cms and Rotation frame
+   */
+  class CMSRotationFrame : public ReferenceFrame {
+
+  public:
+    /**
+     * Create new rotation frame
+     */
+    explicit CMSRotationFrame(const TVector3& newX, const TVector3& newY, const TVector3& newZ);
+
+    /**
+     * Get vertex 3-vector in rotation frame
+     * @param 3-vector from particle
+     * @return 3-vector in rotation frame
+     */
+    virtual TVector3 getVertex(const TVector3& vector) const;
+
+    /**
+     * Get Lorentz vector in rotation frame
+     * @param Lorentz vector from particle
+     * @return Lorentz vector in rotation frame
+     */
+    virtual TLorentzVector getMomentum(const TLorentzVector& vector) const;
+
+    /**
+     * Get Momentum error matrix in rotation frame
+     * @param Covariance matrix from particle
+     * @return Covariance matrix in rotation frame
+     */
+    virtual TMatrixFSym getMomentumErrorMatrix(const TMatrixFSym& matrix) const;
+
+    /**
+     * Get Vertex error matrix in rotation frame
+     * @param Covariance matrix from particle
+     * @return Covariance matrix in rotation frame
+     */
+    virtual TMatrixFSym getVertexErrorMatrix(const TMatrixFSym& matrix) const;
+
+  private:
+    CMSFrame cmsframe; /**< CMSFrame*/
+    RotationFrame rotationframe; /**< Rotationframe*/
+
   };
 
   template<class T>

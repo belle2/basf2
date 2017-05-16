@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCFacetSegment.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -77,6 +79,7 @@ void SegmentAliasResolver::apply(std::vector<CDCSegment2D>& outputSegments)
 {
   if (m_fullAlias) {
     for (CDCSegment2D& segment : outputSegments) {
+      if (segment->hasAliasFlag()) continue; // A full alias has been found in the facet ca.
       int nRLSwitches = segment.getNRLSwitches();
       // Sufficiently right left constrained that the alias is already fixed.
       bool aliasStable = nRLSwitches > 2;

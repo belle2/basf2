@@ -33,6 +33,9 @@ namespace Belle2 {
       /// The type the iterator references
       using Reference = typename std::iterator_traits<AIterator>::reference;
 
+      /// The type the begind the iterator (make it possible to use the range as a "list")
+      using value_type = typename std::iterator_traits<AIterator>::value_type;
+
     public:
       /// Default constructor for ROOT
       Range() = default;

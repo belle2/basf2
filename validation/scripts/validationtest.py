@@ -137,3 +137,8 @@ def generateTestPlots(prefix):
     graph_err.GetListOfFunctions().Add(TNamed('Contact', "Contact Someone"))
 
     graph_err.Write()
+
+    # generate some user-defined HTML
+    html_content = TNamed("This is bold HTML tag", "<p><b>THIS IS USER'S HTML</b></p>")
+
+    html_content.Write()

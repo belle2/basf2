@@ -37,8 +37,12 @@ void SPTCmomentumSeedRetrieverModule::beginRun()
 {
   InitializeCounters();
 
-  // now retrieving the bfield value used in this module
-  m_bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+  // BField is required by all QualityEstimators
+  double bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+
+  m_estimator = QualityEstimatorRiemannHelixFit();
+  m_estimator.setMagneticFieldStrength(bFieldZ);
+
   B2DEBUG(1, "SPTCmomentumSeedRetrieverModule:beginRun: B-Field z-component: " << m_bFieldZ);
 }
 
@@ -51,7 +55,7 @@ void SPTCmomentumSeedRetrieverModule::event()
           m_spacePointTrackCands.getEntries() << " TCs\n");
 
   // create momentum seed for each given SpacePointTrackCand
-  B2WARNING("Number of TCs in Event = " << m_spacePointTrackCands.getEntries());
+  B2INFO("Number of TCs in Event = " << m_spacePointTrackCands.getEntries()); // demoted to a INFO, has been a warning
   for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
     B2DEBUG(1, "\n" << "SPTCmomentumSeedRetrieverModule:event: this TC has got " << aTC.size() << " hits\n");
     createSPTCmomentumSeed(aTC);
@@ -73,52 +77,33 @@ void SPTCmomentumSeedRetrieverModule::endRun()
 
 bool SPTCmomentumSeedRetrieverModule::createSPTCmomentumSeed(SpacePointTrackCand& aTC)
 {
-  // create tool for generating the momentum seed:
-  auto seedGenerator = QualityEstimators();
-  seedGenerator.resetMagneticField(m_bFieldZ);
-
   TVectorD stateSeed(6); //(x,y,z,px,py,pz)
   TMatrixDSym covSeed(6);
   covSeed(0, 0) = 0.01 ; covSeed(1, 1) = 0.01 ; covSeed(2, 2) = 0.04 ; // 0.01 = 0.1^2 = dx*dx =dy*dy. 0.04 = 0.2^2 = dz*dz
   covSeed(3, 3) = 0.01 ; covSeed(4, 4) = 0.01 ; covSeed(5, 5) = 0.04 ;
 
+  auto sortedHits = aTC.getSortedHits();
 
-  // containers for conversion to be compatible with old VXDTF-style interface:
-  std::vector<PositionInfo> convertedSPTCrawData;
-  convertedSPTCrawData.reserve(aTC.size());
-  std::vector<PositionInfo*> convertedSPTC;
-  convertedSPTC.reserve(aTC.size());
+  QualityEstimationResults results = m_estimator.estimateQualityAndProperties(sortedHits);
 
-  // collecting actual hits
-  // Inverting the hit sequence since the helix fit in the seedGenerator expects the hits in following order:
-  // Outermost -> Innermost
-  // While SPTCs store the hits from Innermost to Outermost.
-  std::vector<const SpacePoint*> Hits = aTC.getHits();
-  for (auto aHiti = aTC.getNHits(); aHiti > 0; --aHiti) {
-    PositionInfo convertedHit{
-      TVector3(Hits.at(aHiti - 1)->getPosition()),
-      TVector3(Hits.at(aHiti - 1)->getPositionError()),
-      0,
-      0};
-    convertedSPTCrawData.push_back(std::move(convertedHit));
-    convertedSPTC.push_back(&convertedSPTCrawData.back());
+  stateSeed(0) = (sortedHits.front()->X()); stateSeed(1) = (sortedHits.front()->Y());
+  stateSeed(2) = (sortedHits.front()->Z());
+  if (results.p) {
+    auto momentumSeed = *(results.p);
+    stateSeed(3) = momentumSeed.X();
+    stateSeed(4) = momentumSeed.Y();
+    stateSeed(5) = momentumSeed.Z();
+  } else {
+    stateSeed(3) = 0;
+    stateSeed(4) = 0;
+    stateSeed(5) = 0;
   }
-  seedGenerator.resetValues(&convertedSPTC);
-
-  std::pair<TVector3, int> seedValue; // first is momentum vector, second is signCurvature
-
-  // parameter means: false -> take last hit as seed hit (true would be other end), 0: do not artificially force a momentum value onto the seed).
-  seedValue = seedGenerator.calcMomentumSeed(false,
-                                             0); // ATTENTION: can throw an exception, therefore TODO: catche exception and return false if thrown, ATTENTION 2: check and verify that the seed is generated from the _innermost_ SP of the TC!
-
-
-  stateSeed(0) = (aTC.getHits().front()->X()); stateSeed(1) = (aTC.getHits().front()->Y());
-  stateSeed(2) = (aTC.getHits().front()->Z());
-  stateSeed(3) = seedValue.first[0]; stateSeed(4) = seedValue.first[1]; stateSeed(5) = seedValue.first[2];
 
   aTC.set6DSeed(stateSeed);
   aTC.setCovSeed(covSeed);
-  aTC.setChargeSeed(seedValue.second);
 
-  return true; // TODO: define cases for which a negative value shall be returned (e.g. seed creation failed)
+  double chargeSeed = results.curvatureSign ? -1 * (*(results.curvatureSign)) : 0;
+  aTC.setChargeSeed(chargeSeed);
+
+  return (results.p && results.curvatureSign);
 }

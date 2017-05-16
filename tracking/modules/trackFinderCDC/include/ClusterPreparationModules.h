@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/findlets/combined/ClusterPreparer.h>
+
 #include <tracking/trackFindingCDC/findlets/minimal/SuperClusterCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/ClusterBackgroundDetector.h>
 #include <tracking/trackFindingCDC/findlets/minimal/ClusterRefiner.h>
@@ -20,6 +22,18 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    /**
+     * Module implementation using the ClusterPreparer
+     */
+    class TFCDC_ClusterPreparerModule : public FindletModule<ClusterPreparer> {
+
+      /// Type of the base class
+      using Super = FindletModule<ClusterPreparer>;
+
+    public:
+      /// Constructor setting the default store vector names
+      TFCDC_ClusterPreparerModule();
+    };
 
     /**
      * Module implementation using the SuperClusterCreator

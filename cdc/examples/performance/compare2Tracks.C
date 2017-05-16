@@ -25,7 +25,7 @@ void fit(TH1D* h1){
   g2->Draw("same");
 }
 
-void compare2Tracks(string name = "201607"){
+void compare2Tracks(string name = "output"){
   //  SetBelle2Style();
   gStyle->SetOptFit(1111);
   string filename = name+"/output_*.root";

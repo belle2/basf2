@@ -32,6 +32,9 @@ def getCommandLineOptions():
     parser.add_argument('-tree', '--treename', dest='treename', type=str, default='tree', help='Treename in data file')
     parser.add_argument('-out', '--outputfile', dest='outputfile', type=str, default='output.pdf',
                         help='Name of the outputted pdf file')
+    parser.add_argument('-w', '--working_directory', dest='working_directory', type=str, default='',
+                        help="""Working directory where the created images and root files are stored,
+                              default is to create a temporary directory.""")
     args = parser.parse_args()
     return args
 
@@ -122,7 +125,10 @@ if __name__ == '__main__':
     # Change working directory after experts run, because they might want to access
     # a locadb in the current working directory
     with tempfile.TemporaryDirectory() as tempdir:
-        os.chdir(tempdir)
+        if args.working_directory == '':
+            os.chdir(tempdir)
+        else:
+            os.chdir(args.working_directory)
 
         o = b2latex.LatexFile()
         o += b2latex.TitlePage(title='Automatic MVA Evaluation',
@@ -148,7 +154,8 @@ if __name__ == '__main__':
         o += b2latex.Section("Variables")
         o += b2latex.String("""
             This section contains an overview of the importance and correlation of the variables used by the classifiers.
-            And distribution plots of the variables on the independent dataset.
+            And distribution plots of the variables on the independent dataset. The distributions are normed for signal and
+            background separately, and only the region +- 3 sigma around the mean is shown.
         """)
 
         table = b2latex.LongTable(r"ll", "Abbreviations of variables", "{name} & {abbr}", r"Variable & Abbreviation")
@@ -156,6 +163,7 @@ if __name__ == '__main__':
             table.add(name=format.string(v), abbr=format.string(variable_abbreviations[v]))
         o += table.finish()
 
+        o += b2latex.SubSection("Importance")
         graphics = b2latex.Graphics()
         p = plotting.Importance()
         p.add({identifier_abbreviations[i.identifier]: np.array([i.importances.get(v, 0.0) for v in variables]) for i in methods},
@@ -165,6 +173,7 @@ if __name__ == '__main__':
         graphics.add('importance.png', width=1.0)
         o += graphics.finish()
 
+        o += b2latex.SubSection("Correlation")
         first_identifier_abbr = list(identifier_abbreviations.values())[0]
         graphics = b2latex.Graphics()
         p = plotting.CorrelationMatrix()
@@ -191,7 +200,7 @@ if __name__ == '__main__':
             variable_abbr = variable_abbreviations[v]
             o += b2latex.SubSection(format.string(v))
             graphics = b2latex.Graphics()
-            p = plotting.VerboseDistribution()
+            p = plotting.VerboseDistribution(normed=True, range_in_std=3)
             p.add(variables_data, variable_abbr, test_target[first_identifier_abbr] == 1, label="Signal")
             p.add(variables_data, variable_abbr, test_target[first_identifier_abbr] == 0, label="Background")
             p.finish()
@@ -236,6 +245,7 @@ if __name__ == '__main__':
 
         for identifier in identifiers:
             identifier_abbr = identifier_abbreviations[identifier]
+            o += b2latex.SubSection(format.string(identifier_abbr))
             graphics = b2latex.Graphics()
             p = plotting.Multiplot(plotting.PurityAndEfficiencyOverCut, 2)
             p.add(0, test_probability, identifier_abbr, test_target[identifier_abbr] == 1,
@@ -255,6 +265,7 @@ if __name__ == '__main__':
         graphics = b2latex.Graphics()
         p = plotting.Diagonal()
         for identifier in identifiers:
+            o += b2latex.SubSection(format.string(identifier_abbr))
             identifier_abbr = identifier_abbreviations[identifier]
             p.add(test_probability, identifier_abbr, test_target[identifier_abbr] == 1, test_target[identifier_abbr] == 0)
         p.finish()
@@ -317,4 +328,7 @@ if __name__ == '__main__':
 
         o.save('latex.tex', compile=True)
         os.chdir(old_cwd)
-        shutil.copy(tempdir + '/latex.pdf', args.outputfile)
+        if args.working_directory == '':
+            shutil.copy(tempdir + '/latex.pdf', args.outputfile)
+        else:
+            shutil.copy(args.working_directory + '/latex.pdf', args.outputfile)

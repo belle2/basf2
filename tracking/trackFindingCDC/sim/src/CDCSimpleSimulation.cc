@@ -151,7 +151,7 @@ CDCSimpleSimulation::constructMCTracks(int nMCTracks, std::vector<SimpleSimHit> 
 
     CDCTrack& mcTrack = mcTracks[simpleSimHit.m_iMCTrack];
 
-    CDCRLWireHit rlWireHit(&wireHit, simpleSimHit.m_rlInfo, wireHit.getRefDriftLength());
+    CDCRLWireHit rlWireHit(&wireHit, simpleSimHit.m_rlInfo);
     CDCRecoHit3D recoHit3D(rlWireHit, simpleSimHit.m_pos3D, simpleSimHit.m_arcLength2D);
     mcTrack.push_back(recoHit3D);
   }

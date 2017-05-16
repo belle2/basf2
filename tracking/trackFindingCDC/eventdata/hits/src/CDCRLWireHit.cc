@@ -15,19 +15,19 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCRLWireHit::CDCRLWireHit(const CDCWireHit* wireHit)
-  : CDCRLWireHit(wireHit,
-                 ERightLeft::c_Unknown,
-                 wireHit->getRefDriftLength())
+CDCRLWireHit::CDCRLWireHit(const CDCWireHit* wireHit, ERightLeft rlInfo)
+  : CDCRLWireHit(wireHit, rlInfo, wireHit->getRefDriftLength(), wireHit->getRefDriftLengthVariance())
 {
 }
 
 CDCRLWireHit::CDCRLWireHit(const CDCWireHit* wireHit,
                            ERightLeft rlInfo,
-                           double driftLength)
-  : m_wireHit(wireHit),
-    m_rlInfo(rlInfo),
-    m_refDriftLength(driftLength)
+                           double driftLength,
+                           double driftLengthVariance)
+  : m_wireHit(wireHit)
+  , m_rlInfo(rlInfo)
+  , m_refDriftLength(driftLength)
+  , m_refDriftLengthVariance(driftLengthVariance)
 {
 }
 
@@ -46,7 +46,10 @@ CDCRLWireHit CDCRLWireHit::average(const CDCRLWireHit& rlWireHit1,
   double driftLength = (rlWireHit1.getRefDriftLength() +
                         rlWireHit2.getRefDriftLength()) / 2.0;
 
-  CDCRLWireHit result(&wireHit, rlInfo, driftLength);
+  double driftLengthVariance = (rlWireHit1.getRefDriftLengthVariance() +
+                                rlWireHit2.getRefDriftLengthVariance()) / 2.0;
+
+  CDCRLWireHit result(&wireHit, rlInfo, driftLength, driftLengthVariance);
   return result;
 }
 
@@ -70,7 +73,11 @@ CDCRLWireHit CDCRLWireHit::average(const CDCRLWireHit& rlWireHit1,
                         rlWireHit2.getRefDriftLength() +
                         rlWireHit3.getRefDriftLength()) / 3.0;
 
-  CDCRLWireHit result(&wireHit, rlInfo, driftLength);
+  double driftLengthVariance = (rlWireHit1.getRefDriftLengthVariance() +
+                                rlWireHit2.getRefDriftLengthVariance() +
+                                rlWireHit3.getRefDriftLengthVariance()) / 3.0;
+
+  CDCRLWireHit result(&wireHit, rlInfo, driftLength, driftLengthVariance);
   return result;
 }
 
@@ -84,7 +91,7 @@ CDCRLWireHit CDCRLWireHit::fromSimHit(const CDCWireHit* wirehit,
 
   ERightLeft rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
 
-  CDCRLWireHit rlWireHit(wirehit, rlInfo, simhit.getDriftLength());
+  CDCRLWireHit rlWireHit(wirehit, rlInfo, simhit.getDriftLength(), CDCWireHit::c_simpleDriftLengthVariance);
 
   return rlWireHit;
 }

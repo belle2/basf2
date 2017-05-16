@@ -3,13 +3,14 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Pablo Goldenzweig                                        *
+ * Contributors: Pablo Goldenzweig, Dennis Weyland                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <analysis/VariableManager/ContinuumSuppressionVariables.h>
 #include <analysis/VariableManager/ParameterVariables.h>
+#include <analysis/VariableManager/ROEVariables.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>
@@ -237,6 +238,49 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr useThrustFrame(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        auto variableName = arguments[0];
+        if (arguments[1] != "Signal" and arguments[1] != "ROE" and arguments[1] !=  "Auto")
+          B2FATAL("Second argument in useThrustFrame can only be 'Signal', 'ROE' or 'Auto'. Your argument was " + arguments[1]);
+
+        std::string mode = arguments[1];
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+
+        const bool modeisSignal = mode == "Signal";
+        const bool modeisAuto = mode == "Auto";
+
+        auto func = [var, modeisSignal, modeisAuto](const Particle * particle) -> double {
+          StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+          const Particle* Bparticle = roe->getRelated<Particle>();
+          const ContinuumSuppression* qq = Bparticle->getRelatedTo<ContinuumSuppression>();
+          double isinROE = isInRestOfEvent(particle);
+          TVector3 newZ;
+          if (modeisSignal or (modeisAuto and isinROE < 0.5))
+            newZ = qq->getThrustB();
+          else
+            newZ = qq->getThrustO();
+
+          TVector3 newY(0, 0, 0);
+          if (newZ(2) == 0 and newZ(1) == 0)
+            newY(0) = 1;
+          else{
+            newY(1) = newZ(2);
+            newY(2) = -newZ(1);
+          }
+          TVector3 newX = newY.Cross(newZ);
+
+          UseReferenceFrame<CMSRotationFrame> signalframe(newX, newY, newZ);
+
+          return var->function(particle);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function useThrustFrame. It only takes two arguments. The first argument must be the variable and the second can either be .");
+      }
+    }
+
 
     VARIABLE_GROUP("Continuum Suppression");
     REGISTER_VARIABLE("R2EventLevel", R2EventLevel, "Event-Level Reduced Fox-Wolfram moment R2");
@@ -254,6 +298,11 @@ namespace Belle2 {
                       "Returns -999 if particle is nullptr or if particle has no related ContinuumSuppression object.");
     REGISTER_VARIABLE("transformedNetworkOutput(name, low, high)", transformedNetworkOutput,
                       "Transforms the network output C->C' via: C'=log((C-low)/(high-C))");
+    REGISTER_VARIABLE("useThrustFrame(variable, mode)", useThrustFrame,
+                      "Returns the variable in respect to rotated coordinates, in which z lies on the specified thrust axis.\n"
+                      "If mode is set to Signal it will use the thrust axis of the reconstructed B candidate, if mode is set to ROE it will use the ROE thrust axis.\n"
+                      "If mode is set to Auto the function use the thrust axis based on isInRestOfEvent(particle).\n"
+                      "Like isinRestofEvent, you have to use path.for_each( . . .) to use this MetaVariable.")
 
   }
 }

@@ -97,6 +97,7 @@ namespace {
     MVA::GeneralOptions general_options;
     general_options.m_variables = {"A"};
     MVA::FastBDTOptions specific_options;
+    specific_options.m_randRatio = 1.0;
     TestDataset dataset({1.0, 1.0, 1.0, 1.0, 2.0, 3.0, 2.0, 3.0});
 
     auto teacher = interface.getTeacher(general_options, specific_options);

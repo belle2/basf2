@@ -33,6 +33,7 @@ class G4UserTrackingAction;
 class G4UserSteppingAction;
 class G4MagneticField;
 class G4MagIntegratorStepper;
+class G4EquationOfMotion;
 class G4ChordFinder;
 class G4Mag_UsualEqRhs;
 class G4VisManager;
@@ -56,7 +57,7 @@ namespace Belle2 {
       static ExtManager* GetManager();
 
       //! Terminate an event and set state to G4ErrorState_Init
-      void EventTermination();
+      void EventTermination(G4ErrorMode);
 
       //! Terminate a run and set state to G4ErrorState_Init
       void RunTermination();
@@ -65,7 +66,7 @@ namespace Belle2 {
       void Initialize(const char [], const std::string&, double, double, bool, int, const std::vector<std::string>&);
 
       //! Initialize for propagation of a track and set state to G4ErrorState_Propagating
-      void InitTrackPropagation();
+      void InitTrackPropagation(G4ErrorMode);
 
       //! Propagate a track by one step
       G4int PropagateOneStep(G4ErrorTrajState* currentTS, G4ErrorMode mode = G4ErrorMode_PropForwards);
@@ -119,12 +120,19 @@ namespace Belle2 {
       //! Pointer to the equation-of-motion chord finder (if not the default)
       G4ChordFinder* m_ChordFinder;
 
+      //! Pointer to the standard equation-of-motion stepper
+      G4MagIntegratorStepper* m_StdStepper;
+
+      //! Pointer to the forward-propagation equation of motion
+      G4EquationOfMotion* m_ForwardEquationOfMotion;
+
+      //! Pointer to the equation of motion that accommodates back-propagation
+      G4EquationOfMotion* m_BackwardEquationOfMotion;
+
       //! Pointer to the visualization manager (if used)
       G4VisManager* m_VisManager;
 
     };
-
-    // not needed inline G4ErrorRunManagerHelper* ExtManager::GetHelper() const { return m_helper; }
 
   } // end of namespace Simulation
 

@@ -1,0 +1,53 @@
+# EventType: 1300000040
+# Descriptor: [Y(5S) -> Bs Bs ]cc
+# NickName: Y5S_BsBs
+# Documentation: Inclusive production of Y5S to Bs(*) Bs(*)
+# input: (all in %) 
+# Belle,  PRD 87, 031101 (R) (2013)
+# fs=17.2
+# N_Bs*Bs*/N_Bs(*)Bs(*)=87.0
+# N_Bs*Bs/N_Bs(*)Bs(*)=7.3
+# N_BsBs/N_Bs(*)Bs(*)=5.7
+#
+# Tested: yes
+# PhysicsWG: Charmless Hadronic B decay
+# Responsible: Bilas Pal
+# Email: palbs@ucmail.uc.edu 
+# Cuts: None
+# Date: 20170220
+#
+# mixing parameter
+# Delta m_Bs =17.757/ps (HFAG summer 2016 from CDF+LHCb)
+
+Define dm_Bs 17.757e12
+
+
+Decay B_s0heavy
+1.000000 B_s0 gamma PHSP;
+Enddecay
+
+CDecay anti-B_s0heavy
+
+Decay B_s0long
+1.000000 B_s0 PHSP;
+Enddecay
+
+CDecay anti-B_s0long
+
+Decay Upsilon(5S) 
+
+# Bs SUM=0.17200
+0.149640   B_s0heavy    anti-B_s0heavy                                       PHSP_BB_MIX  dm_Bs  -1 ;
+
+#0.006278   B_s0heavy    anti-B_s0long           anti-B_s0heavy  B_s0long     PHSP_BB_MIX  dm_Bs  +1 ;
+#0.006278   B_s0long     anti-B_s0heavy          anti-B_s0long   B_s0heavy    PHSP_BB_MIX  dm_Bs  +1 ;
+#above two are the same so added them together
+0.012556   B_s0heavy    anti-B_s0long           anti-B_s0heavy  B_s0long     PHSP_BB_MIX  dm_Bs  +1 ;
+
+0.009804   B_s0long     anti-B_s0long                                        PHSP_BB_MIX  dm_Bs  -1 ;
+
+Enddecay
+
+
+End
+

@@ -4,7 +4,14 @@
 # Thomas Keck 2016
 
 import numpy as np
-import tensorflow as tf
+
+try:
+    import tensorflow as tf
+except ImportError:
+    print("Please install tensorflow: pip3 install tensorflow")
+    import sys
+    sys.exit(1)
+
 import os
 import tempfile
 

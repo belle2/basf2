@@ -62,6 +62,7 @@ RCCallback::RCCallback(int timeout) throw()
   reg(RCCommand::RESUME);
   reg(RCCommand::PAUSE);
   reg(RCCommand::ABORT);
+  reg(RCCommand::STATUS);
   reg(NSMCommand::FATAL);
   m_auto = true;
   m_db = NULL;
@@ -135,6 +136,11 @@ bool RCCallback::perform(NSMCommunicator& com) throw()
   }
   */
   if (NSMCallback::perform(com)) return true;
+  if (cmd == RCCommand::STATUS) {
+    NSMCommunicator::send(NSMMessage(NSMNode(msg.getNodeName()),
+                                     NSMCommand::OK, msg.getData()));
+    return true;
+  }
   if (cmd.isAvailable(state) ==  NSMCommand::DISABLED) {
     return false;
   }

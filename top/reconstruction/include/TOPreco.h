@@ -24,6 +24,9 @@ extern "C" {
   void set_channel_mask_(int*, int*, int*);
   void print_channel_mask_();
   void set_channel_effi_(int*, int*, float*);
+  void redo_pdf_(float*);
+  int get_num_peaks_(int*);
+  void get_peak_(int*, int*, float*, float*, float*);
 }
 
 namespace Belle2 {
@@ -254,6 +257,40 @@ namespace Belle2 {
        * @return beta value
        */
       double getBeta() const {return m_beta;};
+
+      /**
+       * Re-calculate PDF for a given particle mass using option c_Fine
+       * @param mass particle mass
+       */
+      void redoPDF(double mass)
+      {
+        float m = mass;
+        redo_pdf_(&m);
+      }
+
+      /**
+       * Returns number of peaks for given pixel describing signal PDF
+       * @param pixelID pixel ID (1-based)
+       * @return number of peaks
+       */
+      int getNumofPDFPeaks(int pixelID) const
+      {
+        pixelID--; // 0-based is used in fortran
+        return get_num_peaks_(&pixelID);
+      }
+
+      /**
+       * Returns k-th PDF peak for given pixel describing signal PDF
+       * @param pixelID pixel ID (1-based)
+       * @param k peak counter (in C++ sense - starts with 0)
+       */
+      void getPDFPeak(int pixelID, int k,
+                      float& position, float& width, float& numPhotons) const
+      {
+        pixelID--; // 0-based is used in fortran
+        k++; // counter starts with 1 in fortran
+        get_peak_(&pixelID, &k, &position, &width, &numPhotons);
+      }
 
 
     private:

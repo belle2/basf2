@@ -51,9 +51,9 @@ namespace TreeFitter {
   private:
     bool m_constrainXY ;
     bool m_constrainXYZ ;
-    HepVector m_ipPos ;       // interaction point position
-    HepSymMatrix m_ipCov ;    // cov matrix
-    HepSymMatrix m_ipCovInv ; // inverse of cov matrix
+    CLHEP::HepVector m_ipPos ;       // interaction point position
+    CLHEP::HepSymMatrix m_ipCov ;    // cov matrix
+    CLHEP::HepSymMatrix m_ipCovInv ; // inverse of cov matrix
   } ;
 
 }

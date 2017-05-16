@@ -53,8 +53,8 @@ namespace TreeFitter {
 
   protected: // I hate this, so we need to change the design ...
     // cache
-    HepVector m_m ;    // 'measurement' (x,y,z,px,py,pz,E)
-    HepSymMatrix m_matrixV ; // covariance in measurement
+    CLHEP::HepVector m_m ;    // 'measurement' (x,y,z,px,py,pz,E)
+    CLHEP::HepSymMatrix m_matrixV ; // covariance in measurement
     bool m_hasEnergy ;
   } ;
 

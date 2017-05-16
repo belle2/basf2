@@ -115,9 +115,9 @@ namespace TreeFitter {
     return ErrCode() ;
   }
 
-  HepVector symdiag(const HepSymMatrix& m)   //FT: I don't think this is actually ever used outside of printouts
+  CLHEP::HepVector symdiag(const CLHEP::HepSymMatrix& m)   //FT: I don't think this is actually ever used outside of printouts
   {
-    HepVector rc(m.num_row()) ;
+    CLHEP::HepVector rc(m.num_row()) ;
     for (int i = 1; i <= m.num_row(); ++i)
       rc(i) = sqrt(m.fast(i, i)) ;
     return rc ;
@@ -127,7 +127,7 @@ namespace TreeFitter {
   {
     ErrCode status ;
     // create HepVector with parameters
-    HepVector vertexpars(6) ;
+    CLHEP::HepVector vertexpars(6) ;
     int posindexmother = mother()->posIndex() ;
     for (int row = 1; row <= 3; ++row)
       vertexpars(row) = fitparams.par()(posindexmother + row) ;
@@ -136,8 +136,8 @@ namespace TreeFitter {
       vertexpars(3 + row) = fitparams.par()(momindex + row) ;
 
     // translate into trackparameters
-    HepVector helixpars(6) ;
-    HepMatrix jacobian(6, 6) ;
+    CLHEP::HepVector helixpars(6) ;
+    CLHEP::HepMatrix jacobian(6, 6) ;
     HelixUtils::helixFromVertex(vertexpars, charge(), m_bfield, helixpars, jacobian) ;
 
     // get the measured track parameters at the poca to the mother

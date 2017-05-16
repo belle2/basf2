@@ -62,20 +62,20 @@ namespace TreeFitter {
                 << std::setw(15) << sqrt(m_cov(row, row)) << std::endl ;
   } ;
 
-  HepSymMatrix FitParams::cov(const std::vector<int>& indexVec) const
+  CLHEP::HepSymMatrix FitParams::cov(const std::vector<int>& indexVec) const
   {
     int nrow = indexVec.size() ;
-    HepSymMatrix thecov(nrow, 0) ;
+    CLHEP::HepSymMatrix thecov(nrow, 0) ;
     for (int row = 1; row <= nrow; ++row)
       for (int col = 1; col <= row ; ++col)
         thecov(row, col) = m_cov(indexVec[row - 1] + 1, indexVec[col - 1] + 1);
     return thecov;
   }
 
-  HepVector FitParams::par(const std::vector<int>& indexVec) const
+  CLHEP::HepVector FitParams::par(const std::vector<int>& indexVec) const
   {
     int nrow = indexVec.size() ;
-    HepVector thepar(nrow, 0) ;
+    CLHEP::HepVector thepar(nrow, 0) ;
     for (int row = 1; row <= nrow; ++row)
       thepar(row) = m_par(indexVec[row - 1] + 1) ;
     return thepar ;
@@ -86,10 +86,10 @@ namespace TreeFitter {
     if (newdim > m_dim) {
       m_dim = newdim ;
       // very expensive, but okay ...
-      HepVector newpar(newdim, 0) ;
+      CLHEP::HepVector newpar(newdim, 0) ;
       newpar.sub(1, m_par);
 
-      HepSymMatrix newcov(newdim, 0) ;
+      CLHEP::HepSymMatrix newcov(newdim, 0) ;
       newcov.sub(1, m_cov) ;
 
       m_par = newpar ;

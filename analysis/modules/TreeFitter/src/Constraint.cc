@@ -70,8 +70,8 @@ namespace TreeFitter {
       if (vtxverbose >= 3) { std::cout << "filtering "  ; print() ;}
       // save the unfiltered ('predicted') parameters. we need to
       // store them if we want to iterate constraints.
-      const HepVector* pred(0) ;
-      if (m_maxNIter > 1) pred = new HepVector(fitpar->par()) ;
+      const CLHEP::HepVector* pred(0) ;
+      if (m_maxNIter > 1) pred = new CLHEP::HepVector(fitpar->par()) ;
       Projection p(fitpar->dim(), m_dim) ;
       KalmanCalculator kalman ;
       double chisq(0) ;

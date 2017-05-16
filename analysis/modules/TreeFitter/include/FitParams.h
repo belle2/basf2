@@ -17,7 +17,7 @@
 #include <CLHEP/Matrix/SymMatrix.h>
 #include <CLHEP/Matrix/DiagMatrix.h>
 
-using namespace CLHEP;
+//using namespace CLHEP;
 
 namespace TreeFitter {
   class ParticleBase ;
@@ -29,19 +29,19 @@ namespace TreeFitter {
     FitParams(int dim) ;
     ~FitParams() ;
 
-    HepSymMatrix& cov() { return m_cov ; }
-    HepVector& par() { return m_par ; }
+    CLHEP::HepSymMatrix& cov() { return m_cov ; }
+    CLHEP::HepVector& par() { return m_par ; }
     double& par(int row) { return m_par(row) ; }
     double cov(int row) const { return m_cov.fast(row, row) ; }
 
-    HepSymMatrix cov(const std::vector<int>& indexVec) const ;
-    HepVector par(const std::vector<int>& indexVec) const ;
+    CLHEP::HepSymMatrix cov(const std::vector<int>& indexVec) const ;
+    CLHEP::HepVector par(const std::vector<int>& indexVec) const ;
 
-    const HepSymMatrix& cov() const { return m_cov ; }
-    const HepVector& par() const { return m_par ; }
+    const CLHEP::HepSymMatrix& cov() const { return m_cov ; }
+    const CLHEP::HepVector& par() const { return m_par ; }
     const double& par(int row) const { return m_par(row) ; }
 
-    HepDiagMatrix& scale() { return m_scale ; }
+    CLHEP::HepDiagMatrix& scale() { return m_scale ; }
 
     int& nConstraintsVec(int row) { return m_nConstraintsVec[row - 1] ; }
 
@@ -70,9 +70,9 @@ namespace TreeFitter {
     FitParams() {}
   private:
     int m_dim;
-    HepVector m_par;
-    HepSymMatrix m_cov;
-    HepDiagMatrix m_scale;
+    CLHEP::HepVector m_par;
+    CLHEP::HepSymMatrix m_cov;
+    CLHEP::HepDiagMatrix m_scale;
     double m_chiSquare;
     int m_nConstraints;
     std::vector<int> m_nConstraintsVec ; // vector with number of constraints per parameter

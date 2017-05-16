@@ -32,8 +32,8 @@ namespace TreeFitter {
   //    return (row>=col? fastsymmatrixaccess(m,row,col) : fastsymmatrixaccess(m,col,row)) ;
   //  }
 
-  ErrCode KalmanCalculator::init(const HepVector& value, const HepMatrix& G,
-                                 const FitParams* fitparams, const HepSymMatrix* V, int weight)
+  ErrCode KalmanCalculator::init(const CLHEP::HepVector& value, const CLHEP::HepMatrix& G,
+                                 const FitParams* fitparams, const CLHEP::HepSymMatrix* V, int weight)
   {
     ErrCode status ;
     m_nconstraints = value.num_row() ;  // dimension of the constraint
@@ -50,7 +50,7 @@ namespace TreeFitter {
     //#endif
     m_value = &value ;
     m_matrixG     = &G ;
-    const HepSymMatrix& C = fitparams->cov() ;
+    const CLHEP::HepSymMatrix& C = fitparams->cov() ;
     // calculate C*G.T()
 #ifdef SLOWBUTSAFE
     m_matrixCGT = C * G.T() ;
@@ -58,7 +58,7 @@ namespace TreeFitter {
 #else
     //FT: not using this
     double tmp ;
-    m_matrixCGT = HepMatrix(statdim, valdim, 0) ;
+    m_matrixCGT = CLHEP::HepMatrix(statdim, valdim, 0) ;
     for (int col = 1; col <= m_nconstraints; ++col)
       for (int k = 1; k <= m_nparameters; ++k)
         if ((tmp = G(col, k)) != 0) {
@@ -88,7 +88,7 @@ namespace TreeFitter {
     if (V) {
       m_matrixRinv = *V ;
       if (weight != 1) m_matrixRinv *= weight ;
-    } else m_matrixRinv = HepSymMatrix(valdim, 0) ;
+    } else m_matrixRinv = CLHEP::HepSymMatrix(valdim, 0) ;
 
     for (int row = 1; row <= m_nconstraints; ++row)
       for (int k = 1; k <= m_nparameters; ++k)
@@ -141,10 +141,10 @@ namespace TreeFitter {
     m_chisq = m_matrixRinv.similarity(*m_value);
   }
 
-  void KalmanCalculator::updatePar(const HepVector& pred, FitParams* fitparams)
+  void KalmanCalculator::updatePar(const CLHEP::HepVector& pred, FitParams* fitparams)
   {
     // this is still very, very slow !
-    HepVector valueprime = (*m_value) + (*m_matrixG) * (pred - fitparams->par()) ;
+    CLHEP::HepVector valueprime = (*m_value) + (*m_matrixG) * (pred - fitparams->par()) ;
     fitparams->par() = pred - m_matrixK * valueprime ;
     m_chisq = m_matrixRinv.similarity(valueprime);
   }
@@ -152,7 +152,7 @@ namespace TreeFitter {
   void KalmanCalculator::updateCov(FitParams* fitparams, double chisq)
   {
 #ifdef SLOWBUTSAFE
-    HepSymMatrix deltaCov = m_matrixRinv.similarityT(*m_matrixG).similarity(fitparams->cov()) ;
+    CLHEP::HepSymMatrix deltaCov = m_matrixRinv.similarityT(*m_matrixG).similarity(fitparams->cov()) ;
     fitparams->cov() -= deltaCov ;
 #else
 

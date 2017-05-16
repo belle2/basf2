@@ -18,7 +18,7 @@
 #include <vector>
 #include <analysis/modules/TreeFitter/ErrCode.h>
 
-using namespace CLHEP;
+//using namespace CLHEP;
 using namespace Belle2;
 
 namespace TreeFitter {
@@ -44,10 +44,10 @@ namespace TreeFitter {
     bool fit() ; //FT: had to be changed from void to bool
     void print() const ;
     void printConstraints(std::ostream& os = std::cout) const ;
-    const HepSymMatrix& cov() const ;
-    const HepVector& par() const ;
-    HepSymMatrix cov(const std::vector<int>& indexVec) const ;
-    HepVector par(const std::vector<int>& indexVec) const ;
+    const CLHEP::HepSymMatrix& cov() const ;
+    const CLHEP::HepVector& par() const ;
+    CLHEP::HepSymMatrix cov(const std::vector<int>& indexVec) const ;
+    CLHEP::HepVector par(const std::vector<int>& indexVec) const ;
     //const DecayChain* decayChain() const { return _decaychain; }
     int posIndex(Particle* particle) const ;
     int momIndex(Particle* particle) const ;
@@ -78,7 +78,7 @@ namespace TreeFitter {
     //    Particle* fittedCand(Particle& particle, Particle* headoftree);
 
     //    BtaFitParams btaFitParams(Particle& particle) const ;//this passes out the set of particle parameters in BaBar, do the same for basf2
-    HepSymMatrix extractCov7(const ParticleBase* pb) const;
+    CLHEP::HepSymMatrix extractCov7(const ParticleBase* pb) const;
 
     bool updateCand(Particle& particle) const;
     void updateCand(const ParticleBase& pb, Particle& cand) const ;

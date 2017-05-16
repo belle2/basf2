@@ -54,7 +54,7 @@ namespace TreeFitter {
   {
     // calculate the direction
     int posindexmother = mother()->posIndex() ;
-    HepVector deltaX(3);
+    CLHEP::HepVector deltaX(3);
     double deltaX2(0);
     for (int row = 1; row <= 3; ++row) {
       double dx = m_m(row) - fitparams->par(posindexmother + row) ;
@@ -118,14 +118,14 @@ namespace TreeFitter {
 
     // calculate the total momentum and energy:
     int momindex  = momIndex() ;
-    HepVector mom = fitparams.par().sub(momindex + 1, momindex + 3) ;
+    CLHEP::HepVector mom = fitparams.par().sub(momindex + 1, momindex + 3) ;
     double mom2 = mom.normsq() ;
     double mass = pdgMass() ;
     double energy = sqrt(mass * mass + mom2) ;
 
     // calculate dX = Xc - Xmother
     int posindex  = mother()->posIndex() ;
-    HepVector dX(3);
+    CLHEP::HepVector dX(3);
     for (int row = 1; row <= 3; ++row)
       dX(row) = m_m(row) - fitparams.par(posindex + row) ;
 
@@ -140,20 +140,20 @@ namespace TreeFitter {
     //
     // create the matrix that projects the measurement in the constraint equations
     // this would all be easier if we had tensors. no such luck.
-    HepMatrix P(3, 4, 0) ;
+    CLHEP::HepMatrix P(3, 4, 0) ;
     P(1, 1) = mom(2) + mom(3) ; P(1, 2) = -mom(1) ; P(1, 3) = -mom(1) ;
     P(2, 1) = -mom(3) ;         P(2, 2) = -mom(3) ; P(2, 3) = mom(1) + mom(2) ;
     P(3, 4) = 1 ;
     // now get the residual. start in four dimensions
-    HepVector residual4(4);
+    CLHEP::HepVector residual4(4);
     for (int row = 1; row <= 3; ++row) residual4(row) = dX(row) ;
     residual4(4) = m_m(4) - energy ;
     // project out the 3D par
-    HepVector       r = P * residual4 ;
-    HepSymMatrix    V = m_matrixV.similarity(P) ;
+    CLHEP::HepVector       r = P * residual4 ;
+    CLHEP::HepSymMatrix    V = m_matrixV.similarity(P) ;
     // calculate the parameter projection matrix
     // first the 'position' part
-    HepMatrix H(3, 7, 0) ;
+    CLHEP::HepMatrix H(3, 7, 0) ;
     for (int irow = 1; irow <= 3; ++irow)
       for (int icol = 1; icol <= 3; ++icol)
         H(irow, icol) = - P(irow, icol) ;

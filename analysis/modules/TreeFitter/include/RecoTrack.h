@@ -20,7 +20,7 @@
 #include <CLHEP/Matrix/SymMatrix.h>
 #include <CLHEP/Matrix/Matrix.h>
 
-using namespace CLHEP;
+//using namespace CLHEP;
 
 namespace TreeFitter {
 
@@ -53,8 +53,8 @@ namespace TreeFitter {
     const TrackFitResult* m_trackfit;
     bool m_cached ;
     double m_flt ;
-    HepVector    m_m ;
-    HepSymMatrix m_matrixV ;
+    CLHEP::HepVector    m_m ;
+    CLHEP::HepSymMatrix m_matrixV ;
   } ;
 
 }

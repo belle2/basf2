@@ -345,8 +345,8 @@ namespace TreeFitter {
       double mass2 = E * E - px * px - py * py - pz * pz ;
       double mass = mass2 > 0 ? sqrt(mass2) : -sqrt(-mass2) ;
 
-      HepSymMatrix cov = fitpar->cov().sub(momindex + 1, momindex + 4) ;
-      HepVector G(4, 0) ;
+      CLHEP::HepSymMatrix cov = fitpar->cov().sub(momindex + 1, momindex + 4) ;
+      CLHEP::HepVector G(4, 0) ;
       G(1) = -px / mass ;
       G(2) = -py / mass ;
       G(3) = -pz / mass ;
@@ -517,7 +517,7 @@ namespace TreeFitter {
       //assert(fitparams->par(momposindex+1)!=0 ||fitparams->par(momposindex+2)!=0
       //       ||fitparams->par(momposindex+3)!=0) ; // mother must be initialized
 
-      HepVector dX(3), mom(3);
+      CLHEP::HepVector dX(3), mom(3);
       double mom2 = 0;
       for (int irow = 1; irow <= 3; ++irow) {
         dX(irow)  = fitparams->par(posindex + irow) - fitparams->par(momposindex + irow) ;

@@ -13,7 +13,7 @@
 
 #include <analysis/modules/TreeFitter/RecoParticle.h>
 
-using namespace CLHEP;
+//using namespace CLHEP;
 
 namespace TreeFitter {
   class RecoPhoton : public RecoParticle {
@@ -38,8 +38,8 @@ namespace TreeFitter {
   private:
     bool m_init ;
     bool m_useEnergy ;
-    HepVector m_m ;
-    HepSymMatrix m_matrixV ;
+    CLHEP::HepVector m_m ;
+    CLHEP::HepSymMatrix m_matrixV ;
   } ;
 
 }

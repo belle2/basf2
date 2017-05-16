@@ -144,7 +144,7 @@ namespace TreeFitter {
   {
     // calculate the chi2
     int posindex = posIndex() ;
-    HepVector residual = m_ipPos - fitparams->par().sub(posindex + 1, posindex + 3) ;
+    CLHEP::HepVector residual = m_ipPos - fitparams->par().sub(posindex + 1, posindex + 3) ;
     double chisq = m_ipCovInv.similarity(residual);
 
     // add the daughters

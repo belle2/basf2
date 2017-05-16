@@ -16,8 +16,6 @@
 //#include <analysis/dataobjects/Particle.h>
 #include <analysis/modules/TreeFitter/Resonance.h>
 
-
-
 namespace TreeFitter {
 
   extern int vtxverbose ;

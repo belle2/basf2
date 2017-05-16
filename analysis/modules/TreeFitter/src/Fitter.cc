@@ -94,7 +94,7 @@ namespace TreeFitter {
       bool finished = false ;
       B2DEBUG(80, "Fitter: Begin Iterations");
       for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
-        HepVector prevpar = m_fitparams->par() ;
+        CLHEP::HepVector prevpar = m_fitparams->par() ;
         bool firstpass = m_niter == 0 ;
         m_errCode = m_decaychain->filter(*m_fitparams, firstpass) ;
         double chisq = m_fitparams->chiSquare() ;
@@ -197,22 +197,22 @@ namespace TreeFitter {
     m_decaychain->printConstraints(os) ;
   }
 
-  const HepSymMatrix& Fitter::cov() const
+  const CLHEP::HepSymMatrix& Fitter::cov() const
   {
     return m_fitparams->cov() ;
   }
 
-  const HepVector& Fitter::par() const
+  const CLHEP::HepVector& Fitter::par() const
   {
     return m_fitparams->par() ;
   }
 
-  HepSymMatrix Fitter::cov(const vector<int>& indexVec) const
+  CLHEP::HepSymMatrix Fitter::cov(const vector<int>& indexVec) const
   {
     return m_fitparams->cov(indexVec) ;
   }
 
-  HepVector Fitter::par(const vector<int>& indexVec) const
+  CLHEP::HepVector Fitter::par(const vector<int>& indexVec) const
   {
     return m_fitparams->par(indexVec) ;
   }
@@ -310,7 +310,7 @@ namespace TreeFitter {
   //FT: this used to be btaFitParams, but since we don't use BtaFitParams and pass everything individually
   //it now only does only the one complicated part, i.e. building cov7
 
-  HepSymMatrix Fitter::extractCov7(const ParticleBase* pb) const
+  CLHEP::HepSymMatrix Fitter::extractCov7(const ParticleBase* pb) const
   //FT: having a matrix as an output is incredibly slow for allocation reasons, this must change;
   //also this needs to output a TMatrixFSym because it's only used to feed back into the Belle2::Particle
   {
@@ -319,7 +319,7 @@ namespace TreeFitter {
     if (posindex < 0 && pb->mother()) posindex = pb->mother()->posIndex() ;
     int momindex = pb->momIndex() ;
 
-    HepSymMatrix cov7(7, 0) ; //very important! Belle2 uses p,E,x! Change order here!
+    CLHEP::HepSymMatrix cov7(7, 0) ; //very important! Belle2 uses p,E,x! Change order here!
     if (pb->hasEnergy()) {
       // if particle has energy, get full p4 from fitparams
       int parmap[7] ;
@@ -331,7 +331,7 @@ namespace TreeFitter {
     } else {
       // if not, use the pdttable mass
 
-      HepSymMatrix cov6(6, 0) ;
+      CLHEP::HepSymMatrix cov6(6, 0) ;
       int parmap[6] ;
       for (int i = 0; i < 3; ++i) parmap[i] = momindex + i ; //energy should be after this
       for (int i = 0; i < 3; ++i) parmap[i + 3]   = posindex + i ;
@@ -348,7 +348,7 @@ namespace TreeFitter {
       }
       double energy = sqrt(energy2) ;
       //
-      HepMatrix jacobian(7, 6, 0);
+      CLHEP::HepMatrix jacobian(7, 6, 0);
       for (int col = 1; col <= 3; ++col) {
         jacobian(col, col) = 1; // don't modify momentum
         jacobian(4, col) = m_fitparams->par()(momindex + col) / energy ; //add energy row
@@ -462,7 +462,7 @@ namespace TreeFitter {
       p.SetE(p.Vect()*p.Vect() + mass * mass); //I risk rounding errors for no benefit
       cand.set4Vector(p);
     }
-    HepSymMatrix cov7 = extractCov7(&pb);
+    CLHEP::HepSymMatrix cov7 = extractCov7(&pb);
     //    B2DEBUG(80,"Fitter::updateCand - extracted cov7 matrix is " << cov7.num_row() << "x" << cov7.num_col() << ".");
     TMatrixFSym cov7b2(7);
     //FT: this can be improved
@@ -585,7 +585,7 @@ namespace TreeFitter {
       indexvec.push_back(momindex + 1) ;
       indexvec.push_back(momindex + 2) ;
 
-      HepVector jacobian(4) ;
+      CLHEP::HepVector jacobian(4) ;
       jacobian[0] = mom ;
       jacobian[1] = tau * fitparams->par()(momindex + 1) / mom ;
       jacobian[2] = tau * fitparams->par()(momindex + 2) / mom ;
@@ -641,7 +641,7 @@ namespace TreeFitter {
       indexvec.push_back(tauindexB);
       for (int i = 0; i < 3; ++i) indexvec.push_back(momindexB + i) ;
 
-      HepVector jacobian(8) ;
+      CLHEP::HepVector jacobian(8) ;
       jacobian(1) = momA ;
       for (int irow = 1; irow <= 3; ++irow)
         jacobian(irow + 1) = tauA * m_fitparams->par()(momindexA + irow) / momA ;

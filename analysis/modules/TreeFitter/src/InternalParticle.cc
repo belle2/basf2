@@ -251,7 +251,7 @@ namespace TreeFitter {
           //FT: this once again has to use pions
           std::vector<float> tmphelix1 = dau1->particle()->getTrack()->getTrackFitResult(Const::pion)->getTau();
           std::vector<float> tmphelix2 = dau2->particle()->getTrack()->getTrackFitResult(Const::pion)->getTau();
-          HepVector helix1(5), helix2(5);
+          CLHEP::HepVector helix1(5), helix2(5);
           for (int i = 1; i <= 5; ++i) {
             helix1(i) = tmphelix1[i - 1];
             helix2(i) = tmphelix2[i - 1];

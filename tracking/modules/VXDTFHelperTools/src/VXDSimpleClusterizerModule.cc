@@ -308,13 +308,15 @@ void VXDSimpleClusterizerModule::event()
      * @param clsCharge The cluster charge in electrons.
      * @param seedCharge The charge of the seed strip in electrons.
      * @param clsSize The size of the cluster in the corresponding strip pitch units.
+     * @param clsSNR The cluster charge SNR
      */
+
     SVDCluster* newClusterU =  m_svdClusters.appendNew(aVXDId, true, u, sigmaU, timeStamp, 0, 1, 1,
-                                                       3); // in a typical situation 3-5 Strips are excited per Hit -> set to 3
+                                                       3, 1); // in a typical situation 3-5 Strips are excited per Hit -> set to 3
     // add relations to u-cluster
     newClusterU->addRelationTo(m_svdTrueHits[currentTrueHit]);
 
-    SVDCluster* newClusterV = m_svdClusters.appendNew(aVXDId, false, v, sigmaV, timeStamp, 0, 1, 1, 3);
+    SVDCluster* newClusterV = m_svdClusters.appendNew(aVXDId, false, v, sigmaV, timeStamp, 0, 1, 1, 3, 1);
     // add relations to v-cluster
     newClusterV->addRelationTo(m_svdTrueHits[currentTrueHit]);
 

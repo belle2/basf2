@@ -176,58 +176,6 @@ namespace {
 
   }
 
-  TEST(TMVATest, TMVAClassificationPlugin)
-  {
-    MVA::Interface<MVA::TMVAOptionsClassification, MVA::TMVATeacherClassification, MVA::TMVAExpertClassification>
-    interface;
-
-    MVA::GeneralOptions general_options;
-    general_options.m_variables = {"A"};
-    general_options.m_target_variable = "Target";
-    MVA::TMVAOptionsClassification specific_options;
-    specific_options.m_prepareOption = "SplitMode=block:!V";
-    specific_options.transform2probability = false;
-    specific_options.m_method = "FastBDT";
-    specific_options.m_type = "Plugins";
-    specific_options.m_config =
-      "!H:!V:CreateMVAPdfs:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3";
-    TestClassificationDataset dataset({1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-                                       1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-                                       2.0, 3.0, 2.0, 3.0, 2.0, 3.0, 2.0, 3.0, 2.0, 3.0, 2.0, 3.0,
-                                       2.0, 3.0, 2.0, 3.0, 2.0, 3.0, 2.0, 3.0, 2.0, 3.0, 2.0, 3.0,
-                                       1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-                                       1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-                                       2.0, 3.0, 2.0, 3.0, 2.0, 3.0, 2.0, 3.0, 2.0, 3.0, 2.0, 3.0,
-                                       2.0, 3.0, 2.0, 3.0, 2.0, 3.0, 2.0, 3.0, 2.0, 3.0, 2.0, 3.0
-                                      });
-
-    auto teacher = interface.getTeacher(general_options, specific_options);
-    auto weightfile = teacher->train(dataset);
-
-    auto expert = interface.getExpert();
-    expert->load(weightfile);
-    auto probabilities = expert->apply(dataset);
-    EXPECT_EQ(probabilities.size(), dataset.getNumberOfEvents());
-    for (unsigned int i = 0; i < 24; ++i) {
-      EXPECT_LE(probabilities[i], 0.55);
-      EXPECT_GE(probabilities[i], 0.42);
-    }
-    for (unsigned int i = 24; i < 48; i += 2) {
-      EXPECT_LE(probabilities[i], 0.1);
-      EXPECT_GE(probabilities[i + 1], 0.9);
-    }
-    for (unsigned int i = 48; i < 72; ++i) {
-      EXPECT_LE(probabilities[i], 0.55);
-      EXPECT_GE(probabilities[i], 0.42);
-    }
-    for (unsigned int i = 72; i < 96; i += 2) {
-      EXPECT_LE(probabilities[i], 0.1);
-      EXPECT_GE(probabilities[i + 1], 0.9);
-    }
-
-
-  }
-
 
   class TestRegressionDataset : public MVA::Dataset {
   public:

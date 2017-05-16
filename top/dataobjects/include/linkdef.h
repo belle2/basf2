@@ -13,7 +13,6 @@
 #pragma link C++ class Belle2::TOPRecBunch+;
 #pragma link C++ class Belle2::TOPRawWaveform+;
 #pragma link C++ class Belle2::TOPWaveform+;
-#pragma link C++ class Belle2::TOPPull+;
 #pragma link C++ class Belle2::TOPTimeZero+;
 #pragma link C++ class Belle2::TOPRawDigit+;
 #pragma link C++ class Belle2::TOPSlowData+;

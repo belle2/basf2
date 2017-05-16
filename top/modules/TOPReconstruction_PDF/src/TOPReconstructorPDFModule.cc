@@ -26,7 +26,6 @@
 #include <top/dataobjects/TOPPDFCollection.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPBarHit.h>
-#include <top/dataobjects/TOPPull.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -130,10 +129,6 @@ namespace Belle2 {
     pdfCollection.registerInDataStore();
     tracks.registerRelationTo(pdfCollection);
 
-    StoreArray<TOPPull> topPulls;
-    topPulls.registerInDataStore(DataStore::c_DontWriteOut);
-    tracks.registerRelationTo(topPulls, DataStore::c_Event, DataStore::c_DontWriteOut);
-
     // check for module debug level
     if (getLogConfig().getLogLevel() == LogConfig::c_Debug) {
       m_debugLevel = getLogConfig().getDebugLevel();
@@ -164,8 +159,6 @@ namespace Belle2 {
     // output: log likelihoods
     StoreArray<TOPLikelihood> likelihoods;
     StoreArray<TOPPDFCollection> pdfCollection;
-
-    StoreArray<TOPPull> topPulls;
 
     // create reconstruction object
     TOPreco reco(Const::ChargedStable::c_SetSize, m_masses, m_minBkgPerBar, m_scaleN0);

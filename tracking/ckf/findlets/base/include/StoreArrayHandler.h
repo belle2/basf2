@@ -22,7 +22,13 @@
 
 namespace Belle2 {
   /**
+   * Findlet to handle import and export from the StoreArray.
    *
+   * Its fetch function fills a vector of RecoTracks from the fitted tracks in an input store array
+   * and additionally a hit vector.
+   *
+   * Its relateAndCombineTracks function can be used in derived classes, to export previously related
+   * reco track candidates into a third store array.
    */
   template <class AStateObject>
   class StoreArrayHandler : public TrackFindingCDC::Findlet<const typename AStateObject::ResultObject> {
@@ -67,7 +73,7 @@ namespace Belle2 {
       m_vxdRecoTracks.registerRelationTo(m_cdcRecoTracks);
     }
 
-    /// Fetch the CDC RecoTracks from the input Store Arrays and fill them into a vector.
+    /// Fetch the CDC RecoTracks and the hits from the input Store Arrays and fill them into a vector.
     void fetch(std::vector<RecoTrack*>& cdcRecoTrackVector, std::vector<const HitObject*>& hitVector)
     {
       cdcRecoTrackVector.reserve(cdcRecoTrackVector.size() + m_cdcRecoTracks.getEntries());
@@ -121,6 +127,7 @@ namespace Belle2 {
       }
     }
 
+    /// Extract a momentum and charge from a reco track at a given position.
     void extrapolateMomentum(const RecoTrack& relatedCDCRecoTrack, const TVector3& vxdPosition, TVector3& extrapolatedMomentum,
                              int& cdcCharge)
     {
@@ -144,6 +151,10 @@ namespace Belle2 {
     void relateAndCombineTracks();
   };
 
+  /**
+   * Merge related CDC and VXD tracks together and export them into a third store array.
+   * Also add CDC tracks without a match.
+   */
   template <class AStateObject>
   void StoreArrayHandler<AStateObject>::relateAndCombineTracks()
   {

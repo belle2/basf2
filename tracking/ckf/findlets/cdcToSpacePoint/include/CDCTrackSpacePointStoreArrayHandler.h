@@ -15,13 +15,20 @@
 
 namespace Belle2 {
   /**
+   * Derived store array handler for CDC RecoTrack seeds and SpacePoints.
    *
+   * This findlet is responsible for the interface between the DataStore and the CKF modules:
+   *  * to fetch the reco tracks and the space points from the StoreArray (fetch)
+   *  * to write back the found VXD tracks only and the merged tracks (CDC + VXD) (apply)
    */
   class CDCTrackSpacePointStoreArrayHandler : public StoreArrayHandler<CKFCDCToVXDStateObject> {
     using Super = StoreArrayHandler<CKFCDCToVXDStateObject>;
 
   public:
     /**
+     * Write back the found tracks (VXD only and the merged ones).
+     *
+     * TODO: This method is actually the slowest in the whole CKF module...
      */
     void apply(const std::vector<CKFCDCToVXDStateObject::ResultObject>& cdcTracksWithMatchedSpacePoints) override;
   };

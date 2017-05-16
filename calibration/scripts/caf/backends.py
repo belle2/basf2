@@ -13,12 +13,20 @@ import pathlib
 
 import ROOT
 
-__all__ = ['pool', 'Job', 'Local', 'LSF', 'PBS']
+__all__ = ['Job', 'Local', 'LSF', 'PBS']
 
 #: default configuration file location
 default_config_file = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
 #: Multiprocessing Pool used by Local Backend
-pool = None
+_pool = None
+#: Default name of the input data file passed to Backend jobs
+_input_data_file_path = "input_data_files.data"
+
+
+def get_input_data():
+    with open(_input_data_file_path, 'br') as input_data_file:
+        input_data = list(pickle.load(input_data_file))
+    return input_data
 
 
 class Job:
@@ -113,8 +121,6 @@ class Job:
         self.backend_args = {}
         #: Maximum number of files to place in a subjob (Not applicable to Local processing). -1 means don't split into subjobs
         self.max_files_per_subjob = -1
-        #: Batch queue for each subjob when using the LSF or PBS backends
-        self.queue = None
         #: dict of subjobs assigned to this job
         self.subjobs = {}
 
@@ -214,11 +220,7 @@ class Backend():
         Adds setup lines to the shell script file.
         """
         for line in job.setup_cmds:
-            batch_file.write(line)
-
-
-def test_func(job):
-    print("Running Job({})".format(job["name"]))
+            print(line, file=batch_file)
 
 
 class Local(Backend):
@@ -282,10 +284,10 @@ class Local(Backend):
         Closes and joins the Pool, letting you wait for all results currently
         still processing.
         """
-        global pool
+        global _pool
         B2INFO('Joining Process Pool, waiting for results to finish')
-        pool.close()
-        pool.join()
+        _pool.close()
+        _pool.join()
         B2INFO('Process Pool joined.')
 
     @property
@@ -303,11 +305,11 @@ class Local(Backend):
         """
         #: Internal attribute of max_processes
         self._max_processes = value
-        global pool
-        if pool:
+        global _pool
+        if _pool:
             self.join()
         B2INFO('Starting up new Pool with {0} processes'.format(self.max_processes))
-        pool = mp.Pool(processes=self.max_processes)
+        _pool = mp.Pool(processes=self.max_processes)
 
     @method_dispatch
     def submit(self, job):
@@ -321,7 +323,7 @@ class Local(Backend):
         job_wd_path = pathlib.Path(job.working_dir)
         job_wd_path.mkdir(parents=True, exist_ok=True)
 
-        global pool
+        global _pool
         if isinstance(job, Job):
             if job.max_files_per_subjob == 0:
                 B2FATAL("When submitting Job({}) files per subjob was 0!".format(job.name))
@@ -374,15 +376,15 @@ class Local(Backend):
                 self._dump_input_data(job)
                 with open(os.path.join(job.working_dir, self.submit_script), "w") as batch_file:
                     self._add_setup(job, batch_file)
-                    batch_file.write(" ".join(job.cmd) + "\n")
+                    print(" ".join(job.cmd), file=batch_file)
                 B2INFO("Submitting Job({})".format(job.name))
                 job.result = Local.Result(job,
-                                          pool.apply_async(self.run_job,
-                                                           (job.name,
-                                                            job.working_dir,
-                                                            job.output_dir,
-                                                            self.submit_script)
-                                                           )
+                                          _pool.apply_async(self.run_job,
+                                                            (job.name,
+                                                             job.working_dir,
+                                                             job.output_dir,
+                                                             self.submit_script)
+                                                            )
                                           )
                 B2INFO('Job {0} submitted'.format(job.name))
             else:
@@ -401,15 +403,15 @@ class Local(Backend):
             self._dump_input_data(job)
             with open(os.path.join(job.working_dir, self.submit_script), "w") as batch_file:
                 self._add_setup(job, batch_file)
-                batch_file.write(" ".join(job.cmd) + "\n")
+                print(" ".join(job.cmd), file=batch_file)
             B2INFO("Submitting Job({})".format(job.name))
             job.result = Local.Result(job,
-                                      pool.apply_async(self.run_job,
-                                                       (job.name,
-                                                        job.working_dir,
-                                                        job.output_dir,
-                                                        self.submit_script)
-                                                       )
+                                      _pool.apply_async(self.run_job,
+                                                        (job.name,
+                                                         job.working_dir,
+                                                         job.output_dir,
+                                                         self.submit_script)
+                                                        )
                                       )
             B2INFO('Job {0} submitted'.format(job.name))
 
@@ -497,9 +499,9 @@ class Batch(Backend):
         job_wd_path.mkdir(parents=True, exist_ok=True)
 
         if isinstance(job, Job):
-            if not job.queue:
-                job.queue = self.config[self.default_config_section]["Queue"]
-                B2INFO('Setting Job queue {}'.format(job.queue))
+            if 'queue' not in job.backend_args:
+                job.backend_args['queue'] = self.config[self.default_config_section]["Queue"]
+                B2INFO('Setting Job queue {}'.format(job.backend_args['queue']))
 
             if job.max_files_per_subjob == 0:
                 B2FATAL("When submitting Job({}) files per subjob was 0!".format(job.name))
@@ -553,7 +555,7 @@ class Batch(Backend):
                 with open(os.path.join(job.working_dir, self.submit_script), "w") as batch_file:
                     self._add_batch_directives(job, batch_file)
                     self._add_setup(job, batch_file)
-                    batch_file.write(" ".join(job.cmd) + "\n")
+                    print(" ".join(job.cmd), file=batch_file)
                 B2INFO("Submitting Job({})".format(job.name))
 
                 script_path = os.path.join(job.working_dir, self.submit_script)
@@ -577,7 +579,7 @@ class Batch(Backend):
             with open(os.path.join(job.working_dir, self.submit_script), "w") as batch_file:
                 self._add_batch_directives(job, batch_file)
                 self._add_setup(job, batch_file)
-                batch_file.write(" ".join(job.cmd) + "\n")
+                print(" ".join(job.cmd), file=batch_file)
             B2INFO("Submitting Job({})".format(job.name))
             script_path = os.path.join(job.working_dir, self.submit_script)
             cmd = self._create_cmd(script_path)
@@ -629,14 +631,18 @@ class PBS(Batch):
         Creates the bash shell script that qsub will call. Includes PBD directives
         and basf2 setup.
         """
-        batch_file.write("#!/bin/bash\n")
-        batch_file.write("# --- Start PBS ---\n")
-        batch_file.write(" ".join([PBS.cmd_queue, job.queue]) + "\n")
-        batch_file.write(" ".join([PBS.cmd_name, job.name]) + "\n")
-        batch_file.write(" ".join([PBS.cmd_wkdir, job.working_dir]) + "\n")
-        batch_file.write(" ".join([PBS.cmd_stdout, os.path.join(job.output_dir, "stdout")]) + "\n")
-        batch_file.write(" ".join([PBS.cmd_stderr, os.path.join(job.output_dir, "stderr")]) + "\n")
-        batch_file.write("# --- End PBS ---\n")
+        if "queue" in job.backend_args:
+            batch_queue = job.backend_args["queue"]
+        else:
+            batch_queue = self.config["Queue"]
+        print("#!/bin/bash", file=batch_file)
+        print("# --- Start PBS ---", file=batch_file)
+        print(" ".join([PBS.cmd_queue, batch_queue]), file=batch_file)
+        print(" ".join([PBS.cmd_name, job.name]), file=batch_file)
+        print(" ".join([PBS.cmd_wkdir, job.working_dir]), file=batch_file)
+        print(" ".join([PBS.cmd_stdout, os.path.join(job.output_dir, "stdout")]), file=batch_file)
+        print(" ".join([PBS.cmd_stderr, os.path.join(job.output_dir, "stderr")]), file=batch_file)
+        print("# --- End PBS ---", file=batch_file)
 
     @classmethod
     def _create_job_result(cls, job, batch_output):
@@ -723,14 +729,18 @@ class LSF(Batch):
         """
         Adds LSF BSUB directives for the job to a script
         """
-        batch_file.write("#!/bin/bash\n")
-        batch_file.write("# --- Start LSF ---\n")
-        batch_file.write(" ".join([LSF.cmd_queue, job.queue]) + "\n")
-        batch_file.write(" ".join([LSF.cmd_name, job.name]) + "\n")
-        batch_file.write(" ".join([LSF.cmd_wkdir, job.working_dir]) + "\n")
-        batch_file.write(" ".join([LSF.cmd_stdout, os.path.join(job.output_dir, "stdout")]) + "\n")
-        batch_file.write(" ".join([LSF.cmd_stderr, os.path.join(job.output_dir, "stderr")]) + "\n")
-        batch_file.write("# --- End LSF ---\n")
+        if "queue" in job.backend_args:
+            batch_queue = job.backend_args["queue"]
+        else:
+            batch_queue = self.config["Queue"]
+        print("#!/bin/bash", file=batch_file)
+        print("# --- Start LSF ---", file=batch_file)
+        print(" ".join([LSF.cmd_queue, batch_queue]), file=batch_file)
+        print(" ".join([LSF.cmd_name, job.name]), file=batch_file)
+        print(" ".join([LSF.cmd_wkdir, job.working_dir]), file=batch_file)
+        print(" ".join([LSF.cmd_stdout, os.path.join(job.output_dir, "stdout")]), file=batch_file)
+        print(" ".join([LSF.cmd_stderr, os.path.join(job.output_dir, "stderr")]), file=batch_file)
+        print("# --- End LSF ---", file=batch_file)
 
     @classmethod
     def _create_cmd(cls, script_path):

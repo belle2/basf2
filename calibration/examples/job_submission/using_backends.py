@@ -50,16 +50,16 @@ def run_job_submission(backend):
     # Any files appended to this list will be place in the Job's working directory e.g. steering files, modules.
     # Since we're running this file we need to include it.
     job2.input_sandbox_files.append("basic_basf2.py")
-    # Input files are special. The Backend checks that they exist (unless you pass a root:// url) and creates file paths
+    # Input files are special. The Backend checks that they exist (unless you pass a root:// url) and remembers the file paths
     # for the ones that do.
-    # Input files are split between subjobs if there are any.
+    # Input files are split between subjobs if requested.
     # Then it creates a pickle file of the valid data files ('input_data_files.data') and places it in the working
     # directory of the job/subjob.
     # It's your responsibility to write a steering file that can access this file and use the input data files correctly
     # Check the basic_basf2.py file to see how to pull in the data
     job2.input_files = ["../test_data/*.root"]
-    job2.max_files_per_subjob = 1
-    # Sometimes you need to configure how the backend will treat your Job
+    job2.max_files_per_subjob = 1  # This could be set to -1 to disallow splitting input data files into subjobs (default)
+    # Sometimes you need to configure how the backend will treat your Job but in a backend specific way
     # Any arguments to deal with this should be created in the backend_args dictionary
     # Here we set the batch queue used to submit the job
     if isinstance(backend, backends.LSF):

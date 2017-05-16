@@ -21,6 +21,7 @@ class TestCalibrationClass_Configure(TestCase):
     """
     UnitTest for configuration of Calibration class
     """
+
     def setUp(self):
         """
         Create useful objects for each test
@@ -89,6 +90,7 @@ class TestCalibrationClass_Args(TestCase):
     """
     UnitTest for validity of Calibration class when given arguments of different types
     """
+
     def setUp(self):
         """
         Create useful objects for each test
@@ -116,11 +118,22 @@ class TestCalibrationClass_Args(TestCase):
         cal = Calibration(self.name, 'CaTest', self.alg1, input_files='path/to/file.root')
         self.assertTrue(cal.is_valid() and cal.name == self.name)
 
+    def test_3(self):
+        """
+        Test that the default options are correctly applied to a calibration
+        """
+        defaults = {"max_iterations": 4}
+        cal1 = Calibration(self.name, collector=self.col1, algorithms=[self.alg1], input_files='path/to/file.root')
+        cal1._apply_calibration_defaults(defaults)
+        cal2 = Calibration(self.name, collector=self.col1, algorithms=[self.alg1], input_files='path/to/file.root')
+        self.assertTrue(cal1.max_iterations == 4 and not cal2.max_iterations)
+
 
 class TestCalibrationClass_Mismatch(TestCase):
     """
     UnitTest to check if Calibration class can identify mismatched collectors and alogirithms
     """
+
     def setUp(self):
         """
         Create useful objects for each test
@@ -153,6 +166,7 @@ class TestCAF(TestCase):
     """
     UnitTest for configuration and simple running of CAF
     """
+
     def setUp(self):
         """
         Create useful objects for each test and the teardown

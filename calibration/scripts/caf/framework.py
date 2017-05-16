@@ -137,8 +137,18 @@ class Calibration():
         self.dependencies = []
         #: File:Iov dictionary, should be key=absolute_file_path:value=IoV for file (see utils.IoV())
         self.files_to_iovs = dict()
-        #: Variable to define the maximum number of iterations for this calibration specifically. It overrides tha CAF value if set.
+        #: Variable to define the maximum number of iterations for this calibration specifically.
+        #: It overrides tha CAF calibration_defaults value if set.
         self.max_iterations = None
+
+    def _apply_calibration_defaults(self, defaults):
+        """
+        We pass in default calibration options from the CAF() instance here if called.
+        Won't overwrite any options already set.
+        """
+        for key, value in defaults.items():
+            if not getattr(self, key):
+                setattr(self, key, value)
 
     def is_valid(self):
         """A full calibration consists of a collector AND an associated algorithm AND input_files.
@@ -343,6 +353,7 @@ class Algorithm():
     setup. The Calibration class should be doing the creation of the defaults for
     these objects.
     """
+
     def __init__(self, algorithm, data_input=None, pre_algorithm=None):
         """
         Init function that only needs a CalibrationAlgorithm by default.
@@ -385,18 +396,23 @@ class CAF():
     class. Leaving functions that it calls to assume everything is correctly set up.
     - Choosing which files to use as input should be done from outside during the
     setup of the CAF and Calibration instances.
+
+    params
+
+    default_args: A dictionary of default options applied to the Calibration objects
+                  if they haven't already set them e.g. {"max_iterations":2}
+    type: dict
     """
-    def __init__(self):
+
+    def __init__(self, calibration_defaults=None):
         """
         Initialise CAF instance. Sets up some empty containers for attributes.
-        No default backend is set yet. This is to prevent unnecessary process pools
+        No default backend is set here. This is to prevent unnecessary process pools
         being allocated. You should set it directly before calling CAF().run() or
         leave it and the CAF will set a default Local one itself during run()
         e.g. caf.backend = Local()
 
-        Note that the config file is in the calibration/data directory and we assume
-        that $BELLE2_LOCAL_DIR is set and that it is the correct release directory to
-        access the config file.
+        Note that the config file is in the calibration/data directory.
         """
         import ROOT
         config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
@@ -406,7 +422,7 @@ class CAF():
             self.config = configparser.ConfigParser()
             self.config.read(config_file_path)
         else:
-            B2ERROR("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
+            B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
 
         #: Dictionary of calibrations for this CAF instance
         self.calibrations = {}
@@ -420,13 +436,18 @@ class CAF():
         self.output_dir = self.config['CAF_DEFAULTS']['ResultsDir']
         #: Polling frequencywhile waiting for jobs to finish
         self.heartbeat = decode_json_string(self.config['CAF_DEFAULTS']['HeartBeat'])
-        #: Default maximum number of iterations the CAF will make of all necessary calibrations. Overridden by the individual
-        # Calibration.max_iterations attribute.
-        self.max_iterations = decode_json_string(self.config['CAF_DEFAULTS']['MaxIterations'])
         #: The ordering and explicit future dependencies of calibrations. Will be filled during self.run()
         self.order = None
         #: Private backend attribute
         self._backend = None
+
+        if not calibration_defaults:
+            calibration_defaults = {}
+        if "max_iterations" not in calibration_defaults:
+            calibration_defaults["max_iterations"] = decode_json_string(self.config["CAF_DEFAULTS"]["MaxIterations"])
+        #: Default options applied to each calibration known to the CAF, if the calibration has these defined by the user
+        #: then the defaults aren't applied. A simple way to define the same configuration to all calibrations in the CAF.
+        self.calibration_defaults = calibration_defaults
 
     def add_calibration(self, calibration):
         """
@@ -439,7 +460,7 @@ class CAF():
             if calibration.name not in self.calibrations:
                 self.calibrations[calibration.name] = calibration
             else:
-                B2WARNING('Tried to add a calibration with the name '+calibration.name+' twice.')
+                B2WARNING('Tried to add a calibration with the name ' + calibration.name + ' twice.')
         else:
             B2WARNING(("Tried to add incomplete/invalid calibration ({0}) to the framwork."
                        "It was not added and will not be part of the final process.".format(calibration.name)))
@@ -503,11 +524,6 @@ class CAF():
             for dep in full_deps:
                 if dep not in explicit_deps:
                     calibration.dependencies.append(self.calibrations[dep])
-        ####################################
-        #
-        # TODO: Need to implement an ordering algorithm here, based on number of future dependents?
-        #
-        ####################################
         order = ordered_full_dependencies
         # We should also patch in all of the implicit dependencies for the calibrations
         return order
@@ -550,7 +566,7 @@ class CAF():
             # Create Runners to spawn threads for each calibration
             for calibration_name, calibration in self.calibrations.items():
                 if not calibration.max_iterations:
-                    calibration.max_iterations = self.max_iterations
+                    calibration._apply_calibration_defaults(self.calibration_defaults)
                 machine = CalibrationMachine(calibration, iov)
                 machine.collector_backend = self.backend
                 runner = CalibrationRunner(machine, heartbeat=self.heartbeat)

@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Sam Cunliffe Jan Strube                                  *
+ * Contributors: Sam Cunliffe Jan Strube (red badges)
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,6 +14,7 @@
 #include <framework/gearbox/Const.h>
 #include <map>
 #include <vector>
+#include <tuple>
 #include <utility>
 
 namespace Belle2 {
@@ -27,17 +28,22 @@ namespace Belle2 {
   class TOPPDFCollection : public RelationsObject {
 
   public:
+    /**
+     * typedef for parameters to describe a Gaussian
+     * position, peak width, nphotons (area)
+     */
+    typedef std::tuple<float, float, float> gaussian_t;
 
     /**
      * default constructor
      */
     TOPPDFCollection() { }
-    void addHypothesisPDFSample(const std::vector<std::vector<double>>& pdfSamples, int hypot)
+    void addHypothesisPDFSample(const std::vector<std::vector<gaussian_t>>& pdfSamples, int hypot)
     {
       // TODO Check for existing hypotheses before overriding
       m_data.insert(std::make_pair(hypot, pdfSamples));
     }
-    std::map<int, std::vector<std::vector<double>>> m_data; /**< collection of samples of the pdf */
+    std::map<int, std::vector<std::vector<gaussian_t>>> m_data; /**< collection of samples of the pdf */
 
   private:
     ClassDef(TOPPDFCollection, 1); /**< ClassDef */

@@ -209,22 +209,7 @@ namespace Belle2 {
       double logl[Const::ChargedStable::c_SetSize];
       double estPhot[Const::ChargedStable::c_SetSize];
       int nphot = 0;
-      // write out the pdf if needed
-      if (m_writeNPdfs < 0 or m_iEvent < m_writeNPdfs) {
-        vector<vector<double>> channelPDFCollection(512);
-        for (int iChannel = 1; iChannel <= 512; ++iChannel) {
-          vector<double>& pdfSample = channelPDFCollection[iChannel - 1];
-          pdfSample.resize(200);
-          for (int iTimeBin = 0; iTimeBin < 200; ++iTimeBin) {
-            double t = 0.3 * iTimeBin;
-            double pdf = reco.getPDF(iChannel, t, m_masses[1]);
-            pdfSample[iTimeBin] = pdf;
-          }
-        }
-        TOPPDFCollection* topPDFColl = pdfCollection.appendNew();
-        topPDFColl->addHypothesisPDFSample(channelPDFCollection, 1);
-        track.addRelationTo(topPDFColl);
-      }
+
       // normal reconstruction
       reco.getLogL(Const::ChargedStable::c_SetSize, logl, estPhot, nphot);
       double estBkg = reco.getExpectedBG();
@@ -237,17 +222,29 @@ namespace Belle2 {
       topL->addRelationTo(trk.getExtHit());
       topL->addRelationTo(trk.getBarHit());
 
-      // store pulls
-      int pixelID; float t, t0, wid, fic, wt;
-      for (int k = 0; k < reco.getPullSize(); k++) {
-        reco.getPull(k, pixelID, t, t0, wid, fic, wt);
-        auto* pull = topPulls.appendNew(pixelID, t, t0, wid, fic, wt);
-        track.addRelationTo(pull);
+      // write out the pdf if needed
+      reco.redoPDF(m_masses[1]);
+      // FIXME this hard codes muon id ... figure out how to make this better
+      if (m_writeNPdfs < 0 or m_iEvent < m_writeNPdfs) {
+
+        // collection of gaussian_t's for each pixel
+        vector<vector<TOPPDFCollection::gaussian_t>> channelPDFCollection(512);
+
+        float position = 0, width = 0, numPhotons = 0;
+        for (int pixelID = 1; pixelID <= 512; pixelID++) {
+          for (int k = 0; k < reco.getNumofPDFPeaks(pixelID); k++) {
+            reco.getPDFPeak(pixelID, k, position, width, numPhotons);
+            channelPDFCollection[pixelID].push_back(make_tuple(position, width, numPhotons));
+          }
+        }
+
+        TOPPDFCollection* topPDFColl = pdfCollection.appendNew();
+        topPDFColl->addHypothesisPDFSample(channelPDFCollection, 13);
+        track.addRelationTo(topPDFColl);
       }
     }
     ++m_iEvent;
   }
-
 
   void TOPReconstructorPDFModule::endRun()
   {

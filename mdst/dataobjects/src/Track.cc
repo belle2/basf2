@@ -3,7 +3,7 @@
  * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck                                              *
+ * Contributors: Martin Heck, Nils Braun                                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -15,24 +15,14 @@ using namespace Belle2;
 
 const TrackFitResult* Track::getTrackFitResult(const Const::ChargedStable& chargedStable) const
 {
-  StoreArray<TrackFitResult> trackFitResults;
   const auto trackFitResultArrayIndex = m_trackFitIndices[chargedStable.getIndex()];
   if (trackFitResultArrayIndex < 0) {
-    B2DEBUG(100, "TrackFitResult for the requested hypothesis is not set. Returning default hypothesis instead.");
-    const auto defaultTrackFitResultArrayIndex = m_trackFitIndices[Const::pion.getIndex()];
-    if (defaultTrackFitResultArrayIndex < 0) {
-      B2DEBUG(100, "TrackFitResult for the default hypothesis is not set. Returning any I can find or nullptr.");
-      TrackFitResult* lastTrackFitResult = nullptr;
-      for (const auto& arrayIndex : m_trackFitIndices) {
-        if (arrayIndex >= 0) lastTrackFitResult = trackFitResults[arrayIndex];
-      }
-      return lastTrackFitResult;
-    } else {
-      return trackFitResults[defaultTrackFitResultArrayIndex];
-    }
-  } else {
-    return trackFitResults[trackFitResultArrayIndex];
+    B2DEBUG(100, "TrackFitResult for the requested hypothesis is not set. Returning a nullptr instead.");
+    return nullptr;
   }
+
+  StoreArray<TrackFitResult> trackFitResults;
+  return trackFitResults[trackFitResultArrayIndex];
 }
 
 unsigned int Track::getNumberOfFittedHypotheses() const

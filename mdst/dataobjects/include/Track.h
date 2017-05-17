@@ -79,14 +79,6 @@ namespace Belle2 {
     /** Index list of the TrackFitResults associated with this Track. */
     short int m_trackFitIndices[Const::ChargedStable::c_SetSize];
 
-    /** This shall save a key with which sets the Track is compatible. */
-    //std::bitset<48>
-
-    /** Quality estimator for */
-    //short mass hypothesis for which the quality estimator was done.
-
-    /** Second version; doesn't store the name of the TrackFitResults, as default will be taken.
-     */
     ClassDef(Track, 3); // Class that bundles various TrackFitResults.
   };
 }

@@ -11,9 +11,9 @@
 
 #include <framework/core/Module.h>
 
+#include <TVector3.h>
 #include <vector>
 #include <string>
-
 
 namespace Belle2 {
 
@@ -49,8 +49,12 @@ namespace Belle2 {
 
     /// BeamSpot define the coordinate system in which the tracks will be extrapolated to the perigee.
     std::vector<double> m_beamSpot = {0.0, 0.0, 0.0};
+    /// BeamSpot as TVector3
+    TVector3 m_beamSpotAsTVector;
     /// BeamAxis define the coordinate system in which the tracks will be extrapolated to the perigee.
     std::vector<double> m_beamAxis = {0.0, 0.0, 1.0};
+    /// BeamAxis as TVector3
+    TVector3 m_beamAxisAsTVector;
     /// PDG codes for which TrackFitResults will be created.
     std::vector<int> m_pdgCodes = {211};
 

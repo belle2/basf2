@@ -76,6 +76,12 @@ void TrackCreatorModule::initialize()
   if (mcParticlesPresent) {
     tracks.registerRelationTo(mcParticles);
   }
+
+  B2ASSERT("BeamSpot should have exactly 3 parameters", m_beamSpot.size() == 3);
+  m_beamSpotAsTVector = TVector3(m_beamSpot[0], m_beamSpot[1], m_beamSpot[2]);
+
+  B2ASSERT("BeamAxis should have exactly 3 parameters", m_beamAxis.size() == 3);
+  m_beamAxisAsTVector = TVector3(m_beamAxis[0], m_beamAxis[1], m_beamAxis[2]);
 }
 
 void TrackCreatorModule::event()
@@ -86,7 +92,8 @@ void TrackCreatorModule::event()
   }
 
   TrackFitter trackFitter;
-  TrackBuilder trackBuilder(m_trackColName, m_trackFitResultColName, m_mcParticleColName, m_beamSpot, m_beamAxis);
+  TrackBuilder trackBuilder(m_trackColName, m_trackFitResultColName, m_mcParticleColName,
+                            m_beamSpotAsTVector, m_beamAxisAsTVector);
   for (auto& recoTrack : recoTracks) {
     for (const auto& pdg : m_pdgCodes) {
       // Does not refit in case the particle hypotheses demanded in this module have already been fitted before.

@@ -36,7 +36,10 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const bool useC
   B2DEBUG(100, trackReps.size() << " track representations available.");
   Track newTrack;
 
+  bool repAlreadySet = false;
+  unsigned int repIDPlusOne = 0;
   for (const auto& trackRep : trackReps) {
+    repIDPlusOne++;
 
     // Check if the fitted particle type is in our charged stable set.
     const Const::ParticleType particleType(std::abs(trackRep->getPDG()));
@@ -50,6 +53,11 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const bool useC
       B2DEBUG(100, "The fit with the given track representation (" << std::abs(trackRep->getPDG()) <<
               ") was not successful. Skipping ...");
       continue;
+    }
+
+    if (not repAlreadySet) {
+      RecoTrackGenfitAccess::getGenfitTrack(recoTrack).setCardinalRep(repIDPlusOne - 1);
+      repAlreadySet = true;
     }
 
     // Extrapolate the tracks to the perigee.

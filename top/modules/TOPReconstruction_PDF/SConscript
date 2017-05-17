@@ -4,4 +4,7 @@ env['LIBS'] = ['framework', 'top_dataobjects', 'mdst_dataobjects',
                'tracking_dataobjects', 'top_reconstruction', 
                '$ROOT_LIBS', 'gfortran']
 
+env.Append(CCFLAGS = ['-g'])
+
 Return('env')
+

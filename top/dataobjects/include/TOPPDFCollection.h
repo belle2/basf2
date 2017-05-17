@@ -32,7 +32,7 @@ namespace Belle2 {
      * typedef for parameters to describe a Gaussian
      * position, peak width, nphotons (area)
      */
-    typedef std::tuple<float, float, float> gaussian_t;
+    typedef std::vector<float> gaussian_t;
 
     /**
      * default constructor

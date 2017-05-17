@@ -58,11 +58,6 @@ TrackCreatorModule::TrackCreatorModule() :
 
 void TrackCreatorModule::initialize()
 {
-  B2WARNING("This module is still under development. "
-            "It will not set relations which are currently used by modules in the post-tracking reconstruction and will never do so,"
-            " because the desired workflow with the tracking dataobjects is via the RecoTracks. "
-            "This does also not support multiple hypothesis yet.");
-
   StoreArray<RecoTrack> recoTracks(m_recoTrackColName);
   recoTracks.isRequired();
 

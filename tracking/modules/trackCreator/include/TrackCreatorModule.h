@@ -37,24 +37,22 @@ namespace Belle2 {
   private:
     // Input
     /// Name of collection holding the RecoTracks (input).
-    std::string m_recoTrackColName;
+    std::string m_recoTrackColName = "";
     /// Name of collection holding the MCParticles (input, optional).
-    std::string m_mcParticleColName;
+    std::string m_mcParticleColName = "";
 
     // Output
     /// Name of collection holding the Tracks (output).
-    std::string m_trackColName;
+    std::string m_trackColName = "";
     /// Name of collection holding the TrackFitResult (output).
-    std::string m_trackFitResultColName;
+    std::string m_trackFitResultColName = "";
 
     /// BeamSpot define the coordinate system in which the tracks will be extrapolated to the perigee.
-    std::vector<double> m_beamSpot;
+    std::vector<double> m_beamSpot = {0.0, 0.0, 0.0};
     /// BeamAxis define the coordinate system in which the tracks will be extrapolated to the perigee.
-    std::vector<double> m_beamAxis;
+    std::vector<double> m_beamAxis = {0.0, 0.0, 1.0};
     /// PDG codes for which TrackFitResults will be created.
-    std::vector<int> m_additionalPDGCodes;
-    /// Default PDG code, for which TrackFitResults will be created.
-    int m_defaultPDGCode;
+    std::vector<int> m_pdgCodes = {211};
 
     /// Flag to turn on special handling which measurement to choose; especially useful for Cosmics.
     bool m_useClosestHitToIP = false;

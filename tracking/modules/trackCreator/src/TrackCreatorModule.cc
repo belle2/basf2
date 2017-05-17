@@ -32,24 +32,24 @@ TrackCreatorModule::TrackCreatorModule() :
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // input
-  addParam("recoTrackColName", m_recoTrackColName, "Name of collection holding the RecoTracks (input).", std::string(""));
+  addParam("recoTrackColName", m_recoTrackColName, "Name of collection holding the RecoTracks (input).",
+           m_recoTrackColName);
   addParam("mcParticleColName", m_mcParticleColName, "Name of collection holding the MCParticles (input, optional).",
-           std::string(""));
+           m_mcParticleColName);
   // output
-  addParam("trackColName", m_trackColName, "Name of collection holding the Tracks (output).", std::string(""));
+  addParam("trackColName", m_trackColName, "Name of collection holding the Tracks (output).", m_trackColName);
   addParam("trackFitResultColName", m_trackFitResultColName, "Name of collection holding the TrackFitResult (output).",
-           std::string(""));
+           m_trackFitResultColName);
 
   addParam("beamSpot", m_beamSpot,
            "BeamSpot (and BeamAxis) define the coordinate system in which the tracks will be extrapolated to the perigee.",
-           std::vector<double> {0.0, 0.0, 0.0});
+           m_beamSpot);
   addParam("beamAxis", m_beamAxis,
            "(BeamSpot and )BeamAxis define the coordinate system in which the tracks will be extrapolated to the perigee.",
-           std::vector<double> {0.0, 0.0, 1.0});
-  addParam("additionalPDGCodes", m_additionalPDGCodes,
-           "PDG codes additional to the defaultPDGCode (cardinal) representation, for which TrackFitResults will be created.",
-           std::vector<int> {});
-  addParam("defaultPDGCode", m_defaultPDGCode, "Default PDG code, for which TrackFitResults will be created.", 211);
+           m_beamAxis);
+  addParam("pdgCodes", m_pdgCodes,
+           "PDG codes for which TrackFitResults will be created.",
+           m_pdgCodes);
 
   addParam("useClosestHitToIP", m_useClosestHitToIP, "Flag to turn on special handling which measurement "
            "to choose; especially useful for Cosmics.", m_useClosestHitToIP);

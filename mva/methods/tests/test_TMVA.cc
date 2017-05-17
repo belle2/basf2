@@ -240,4 +240,33 @@ namespace {
 
   }
 
+  TEST(TMVATest, WeightfilesAreReadCorrectly)
+  {
+    MVA::Interface<MVA::TMVAOptionsClassification, MVA::TMVATeacherClassification, MVA::TMVAExpertClassification>
+    interface;
+
+    MVA::GeneralOptions general_options;
+    general_options.m_variables = {"M", "p", "pt"};
+    MVA::MultiDataset dataset(general_options, {{1.835127, 1.179507, 1.164944},
+      {1.873689, 1.881940, 1.843310},
+      {1.863657, 1.774831, 1.753773},
+      {1.858293, 1.605311, 0.631336},
+      {1.837129, 1.575739, 1.490166},
+      {1.811395, 1.524029, 0.565220}
+    },
+    {}, {0.0, 1.0, 0.0, 1.0, 0.0, 1.0});
+
+    auto expert = interface.getExpert();
+
+    auto weightfile = MVA::Weightfile::loadFromFile(FileSystem::findFile("mva/methods/tests/TMVA.xml"));
+    expert->load(weightfile);
+    auto probabilities = expert->apply(dataset);
+    EXPECT_NEAR(probabilities[0], 0.098980136215686798, 0.0001);
+    EXPECT_NEAR(probabilities[1], 0.35516414046287537, 0.0001);
+    EXPECT_NEAR(probabilities[2], 0.066082566976547241, 0.0001);
+    EXPECT_NEAR(probabilities[3], 0.18826344609260559, 0.0001);
+    EXPECT_NEAR(probabilities[4], 0.10691597312688828, 0.0001);
+    EXPECT_NEAR(probabilities[5], 1.4245844629813542e-13, 0.0001);
+  }
+
 }

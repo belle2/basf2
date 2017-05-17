@@ -216,7 +216,6 @@ namespace {
 #if FastBDT_VERSION_MAJOR >= 3
     auto weightfile_v3 = MVA::Weightfile::loadFromFile(FileSystem::findFile("mva/methods/tests/FastBDTv3.xml"));
     expert->load(weightfile_v3);
-    std::cout << "v3" << std::endl;
     auto probabilities_v3 = expert->apply(dataset);
     EXPECT_NEAR(probabilities_v3[0], 0.0402499, 0.0001);
     EXPECT_NEAR(probabilities_v3[1], 0.2189, 0.0001);
@@ -229,7 +228,6 @@ namespace {
 #if FastBDT_VERSION_MAJOR >= 5
     auto weightfile_v5 = MVA::Weightfile::loadFromFile(FileSystem::findFile("mva/methods/tests/FastBDTv5.xml"));
     expert->load(weightfile_v5);
-    std::cout << "v5" << std::endl;
     auto probabilities_v5 = expert->apply(dataset);
     EXPECT_NEAR(probabilities_v5[0], 0.0402498, 0.0001);
     EXPECT_NEAR(probabilities_v5[1], 0.218899, 0.0001);

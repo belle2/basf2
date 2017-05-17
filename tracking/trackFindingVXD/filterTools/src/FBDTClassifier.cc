@@ -90,7 +90,11 @@ void FBDTClassifier<Ndims>::train(const std::vector<Belle2::FBDTTrainSample<Ndim
 
   // have to use the decorrelated data for training!!!
   B2DEBUG(10, "FBDTClassifier::train(): Creating the EventSamples");
+#if FastBDT_VERSION_MAJOR >= 5
+  FastBDT::EventSample eventSample(nSamples, Ndims, 0, nBinningLevels);
+#else
   FastBDT::EventSample eventSample(nSamples, Ndims, nBinningLevels);
+#endif
   for (size_t iS = 0; iS < nSamples; ++iS) {
     std::vector<unsigned> bins(Ndims);
     for (size_t iF = 0; iF < Ndims; ++iF) {

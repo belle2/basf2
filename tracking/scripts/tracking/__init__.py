@@ -46,7 +46,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     if trigger_mode in ["hlt", "all"]:
         add_mc_matcher(path, components=components, reco_tracks=reco_tracks)
         add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
-                                        additionalTrackFitHypotheses=additionalTrackFitHypotheses,
+                                        trackFitHypotheses=additionalTrackFitHypotheses,
                                         reco_tracks=reco_tracks)
 
 
@@ -119,7 +119,7 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False):
                                 mcTrackFinding=True)
 
 
-def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, additionalTrackFitHypotheses=None,
+def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, trackFitHypotheses=None,
                                     reco_tracks="RecoTracks"):
     """
     Helper function to add the modules performing the
@@ -135,8 +135,8 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, ad
     # track fitting
     path.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks).set_name("Combined_DAFRecoFitter")
     # create Belle2 Tracks from the genfit Tracks
-    path.add_module('TrackCreator', defaultPDGCode=211, recoTrackColName=reco_tracks,
-                    additionalPDGCodes=[13, 321, 2212] if additionalTrackFitHypotheses is None else additionalTrackFitHypotheses)
+    path.add_module('TrackCreator', recoTrackColName=reco_tracks,
+                    pdgCodes=[211, 13, 321, 2212] if trackFitHypotheses is None else trackFitHypotheses)
     # V0 finding
     path.add_module('V0Finder', RecoTrackColName=reco_tracks)
 
@@ -206,7 +206,7 @@ def add_cdc_cr_track_fit_and_track_creator(
 
     # Create Belle2 Tracks from the genfit Tracks
     path.add_module('TrackCreator',
-                    defaultPDGCode=13,
+                    pdgCodes=[13],
                     useClosestHitToIP=True
                     )
 

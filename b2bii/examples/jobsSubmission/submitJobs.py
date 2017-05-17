@@ -10,6 +10,26 @@ import os
 import sys
 import csv
 
+
+def submit_job(listArgs, logDir, myCmd):
+    print(listArgs)
+    # end of file name for log files
+    filenameEnd = '_'.join(listArgs)
+
+    # job submission with arguments
+    os.system('bsub ' +
+              ' -q l' +
+              ' -oo ' + logDir + '/' + 'out_' + filenameEnd +
+              ' -eo ' + logDir + '/' + 'err_' + filenameEnd +
+              ' -N' +
+              ' \" ' + myCmd +
+              ' ' + sys.argv[2].lower() + ' ' +
+              ' '.join(listArgs) +
+              '\"')
+
+    # summary
+    print('Submitted job for: ' + ' '.join(listArgs))
+
 if len(sys.argv) != 3:
     sys.exit('Need two arguments: 1) path of look up table, 2) mc or data')
 
@@ -33,40 +53,26 @@ print('Jobs submission ..')
 
 # open look up table
 with open(lookUpTablePath) as f:
+
     reader = csv.reader(f, delimiter='\t')
 
-    # for each line of the txt file submit a job
+    # submit one job for each line , for each streamNo
     for row in reader:
-
         if isMC:
-            expNo, eventType, streamNo, dataType, belleLevel, minRunNo, maxRunNo =\
-                row[:-1]
+            print(row)
+            expNo = int(row[0])
+
+            if expNo in range(7, 28):
+                streamNoList = range(10, 20)
+            elif expNo in range(31, 66):
+                streamNoList = range(0, 10)
+
+            for streamNo in streamNoList:
+                # removing empty element at end of line
+                row = row[:-1]
+                # adding streamNo
+                row.append(str(streamNo))
+                submit_job(row, logDir, myCmd)
         else:
-            expNo, skimType, dataType, belleLevel, minRunNo, maxRunNo =\
-                row[:-1]
-
-        # end of file name for log files
-        filenameEnd = '_'.join(row[:-1])
-
-        # job submission with arguments
-        os.system('bsub ' +
-                  ' -q l' +
-                  ' -oo ' + logDir + '/' + 'out_' + filenameEnd +
-                  ' -eo ' + logDir + '/' + 'err_' + filenameEnd +
-                  ' -N' +
-                  ' \" ' + myCmd +
-                  ' ' + sys.argv[2].lower() + ' ' +
-                  ' '.join(row[:-1]) +
-                  '\"')
-        print('bsub ' +
-              ' -q l' +
-              ' -oo ' + logDir + '/' + 'out_' + filenameEnd +
-              ' -eo ' + logDir + '/' + 'err_' + filenameEnd +
-              ' -N' +
-              ' \" ' + myCmd + ' ' +
-              ' ' + sys.argv[2].lower() + ' ' +
-              ' '.join(row[:-1]) +
-              '\"')
-
-        # summary
-        print('Submitted job for: ' + ' '.join(row))
+            # removing empty element at end of line
+            submit_job(row[:-1], logDir, myCmd)

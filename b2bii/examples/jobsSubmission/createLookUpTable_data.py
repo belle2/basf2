@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Functions that help creating a txt file,
-# where each line contains the details (expNo, runNo range, etc) of a job to be submitted.
-# Runs are grouped according to a min number of events,
-# which can be changed through an argument to this script
-# and is set by default to 150k events.
-
 # G. Caria
 
 import os

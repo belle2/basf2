@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # This is the main file for the analysis script
+
 # G. Caria
 
 import os
@@ -25,7 +26,6 @@ from stdCharged import *
 import b2biiConversion
 import ROOT
 from ROOT import Belle2
-ROOT.Belle2.BFieldManager.getInstance().setConstantOverride(0, 0, 1.5 * ROOT.Belle2.Unit.T)
 
 
 # ------- Arguments sorting
@@ -40,11 +40,11 @@ if isMC:
         sys.exit('Must provide all 8 parameters !')
     expNo = sys.argv[2]
     eventType = sys.argv[3]
-    streamNo = sys.argv[4]
-    dataType = sys.argv[5]
-    belleLevel = sys.argv[6]
-    minRunNo = sys.argv[7]
-    maxRunNo = sys.argv[8]
+    dataType = sys.argv[4]
+    belleLevel = sys.argv[5]
+    minRunNo = sys.argv[6]
+    maxRunNo = sys.argv[7]
+    streamNo = sys.argv[8]
 else:
     if len(sys.argv) != 8:
         sys.exit('Must provide all 7 parameters !')
@@ -86,7 +86,7 @@ ntupleFile(outputFileName)
 
 # ------- Rest of analysis script goes here...
 
-# this sample code is take from b2bii/examples
+# this sample code is taken from b2bii/examples
 
 fillParticleList('pi+:all', '')
 

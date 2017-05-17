@@ -146,7 +146,7 @@ def Rec_Eff_Table():
     tab.append(['{:{align}{width}}'.format("$N^{\\text{Sel.}}_{\\text{SxF}}$", align='^', width=width),
                 '{:{align}{width}}'.format(str(Kpi0_Nsxf_trans_sel), align='^', width=width),
                 '{:{align}{width}}'.format(str(Kpi0_Nsxf_long_sel), align='^', width=width)])
-    tab.append(['{:{align}{width}}'.format("$\\epsilon^{\\text{Rec.}\\times\\epsilon^{\\text{Sel.}}$", align='^', width=width),
+    tab.append(['{:{align}{width}}'.format("$\\epsilon^{\\text{Rec.}}\\times\\epsilon^{\\text{Sel.}}$", align='^', width=width),
                 '{:{align}{width}}'.format(frmt_val_err(Kpi0_sel_eff_trans, Kpi0_sel_efferr_trans), align='^', width=width),
                 '{:{align}{width}}'.format(frmt_val_err(Kpi0_sel_eff_long, Kpi0_sel_efferr_long), align='^', width=width)])
     tab.append(['{:{align}{width}}'.format("$f^{\\text{Rec.+Sel.}}_{\\text{SXF}}$",

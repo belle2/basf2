@@ -44,7 +44,7 @@ WireNeighborKind CDCWireSuperLayer::getNeighborKind(ILayer iLayer,
 
   int iRow = 2 * iWire;
   int iOtherRow = 2 * iOtherWire + deltaShift;
-  int iRowDelta = symmetricModulo(iOtherRow - iRow, nWires);
+  int iRowDelta = symmetricModulo(iOtherRow - iRow, 2 * nWires);
   int absIRowDelta = abs(iRowDelta);
 
   if ((absILayerDifference + absIRowDelta) > 4 or absILayerDifference > 2) return WireNeighborKind(); // Invalid case

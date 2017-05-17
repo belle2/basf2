@@ -23,6 +23,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 
@@ -34,6 +35,8 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <framework/datastore/StoreArray.h>
+
+#include <boost/range/adaptor/reversed.hpp>
 
 #include <cmath>
 
@@ -96,9 +99,9 @@ const AttributeMap c_defaultSVGAttributes({
   {"transform", "translate(0, 1120) scale(1,-1)"}
 });
 
-CDCSVGPlotter::CDCSVGPlotter(bool animate)
+CDCSVGPlotter::CDCSVGPlotter(bool animate, bool forwardFade)
   : m_animate(animate)
-  , m_eventdataPlotter(makeUnique<SVGPrimitivePlotter>(c_defaultSVGAttributes), animate)
+  , m_eventdataPlotter(makeUnique<SVGPrimitivePlotter>(c_defaultSVGAttributes), animate, forwardFade)
 {
   int top = -112;
   int left = -112;
@@ -283,7 +286,7 @@ void CDCSVGPlotter::drawRecoTracks(const std::string& storeArrayName,
                                    const std::string& stroke,
                                    const std::string& strokeWidth)
 {
-  DefaultColorCycleStyling<const RecoTrack> styling;
+  ChooseableRecoTrackStyling styling;
   if (stroke != "") styling.setStroke(stroke);
   if (strokeWidth != "") styling.setStrokeWidth(strokeWidth);
   drawStoreArray<const RecoTrack>(storeArrayName, styling);
@@ -300,72 +303,162 @@ void CDCSVGPlotter::drawRecoTrackTrajectories(const std::string& storeArrayName,
   drawStoreArray<const RecoTrack, drawTrajectories>(storeArrayName, styling);
 }
 
-void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& simHitStoreArrayName,
+void CDCSVGPlotter::drawMCParticleTrajectories(const std::string& storeArrayName,
+                                               const std::string& stroke,
+                                               const std::string& strokeWidth)
+{
+  DefaultColorCycleStyling<const MCParticle> styling;
+  if (stroke != "") styling.setStroke(stroke);
+  if (strokeWidth != "") styling.setStrokeWidth(strokeWidth);
+  const bool drawTrajectories = true;
+  drawStoreArray<const MCParticle, drawTrajectories>(storeArrayName, styling);
+}
+
+void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& hitStoreArrayName,
                                             const std::string& stroke,
                                             const std::string& strokeWidth)
 {
   B2INFO("Drawing simulated hits connected by tof");
-  StoreArray<CDCHit> hitStoreArray(simHitStoreArrayName);
+  StoreArray<CDCHit> hitStoreArray(hitStoreArrayName);
   if (not hitStoreArray) {
-    B2WARNING("StoreArray " << simHitStoreArrayName << " not present");
+    B2WARNING("StoreArray " << hitStoreArrayName << " not present");
     printDataStoreContent();
     return;
   }
   std::vector<CDCSimHit*> simHits;
   for (const CDCHit& hit : hitStoreArray) {
-    simHits.push_back(hit.getRelated<CDCSimHit>("CDCSimHits"));
+    simHits.push_back(hit.getRelated<CDCSimHit>());
   }
 
   // group them by their mcparticle id
   std::map<int, std::set<CDCSimHit*, FlightTimeOrder>> simHitsByMcParticleId;
   for (CDCSimHit* simHit : simHits) {
-    MCParticle* mcParticle = simHit->getRelated<MCParticle>("MCParticles");
+    MCParticle* mcParticle = simHit->getRelated<MCParticle>();
     if (mcParticle != nullptr) {
       int mcTrackId = mcParticle->getArrayIndex();
       simHitsByMcParticleId[mcTrackId].insert(simHit);
     }
   }
 
-  AttributeMap attributeMap = {{"stroke", stroke}, {"stroke-width", strokeWidth}};
+  AttributeMap defaultAttributeMap = {{"stroke", stroke}, {"stroke-width", strokeWidth}};
 
   for (const auto& mcParticleIdAndSimHits : simHitsByMcParticleId) {
-    const std::set<CDCSimHit*, FlightTimeOrder>& simHitsForMcParticle = mcParticleIdAndSimHits.second;
+    const std::set<CDCSimHit*, FlightTimeOrder>& simHitsForMcParticle =
+      mcParticleIdAndSimHits.second;
 
-    for (auto itSimHit = simHitsForMcParticle.begin(), itEndSimHit = --simHitsForMcParticle.end();
-         itSimHit != itEndSimHit;) {
-      CDCSimHit* fromSimHit = *itSimHit;
-      ++itSimHit;
-      CDCSimHit* toSimHit = *itSimHit;
+    auto drawConnectSimHits = [this, &defaultAttributeMap](CDCSimHit * fromSimHit, CDCSimHit * toSimHit) {
 
-      CDCHit* fromHit = fromSimHit->getRelated<CDCHit>(simHitStoreArrayName);
-      CDCHit* toHit = toSimHit->getRelated<CDCHit>(simHitStoreArrayName);
+      CDCHit* fromHit = fromSimHit->getRelated<CDCHit>();
+      CDCHit* toHit = toSimHit->getRelated<CDCHit>();
+      if (fromHit == nullptr) return false;
+      if (toHit == nullptr) return false;
 
-      if (fromHit != nullptr and toHit != nullptr) {
-        CDCWireHit fromWireHit(fromHit);
-        CDCWireHit toWireHit(toHit);
+      CDCWireHit fromWireHit(fromHit);
+      CDCWireHit toWireHit(toHit);
 
-        CDCRLWireHit fromRLWireHit(&fromWireHit);
-        CDCRLWireHit toRLWireHit(&toWireHit);
+      CDCRLWireHit fromRLWireHit(&fromWireHit);
+      CDCRLWireHit toRLWireHit(&toWireHit);
 
-        Vector3D fromDisplacement(fromSimHit->getPosTrack() - fromSimHit->getPosWire());
-        Vector3D toDisplacement(toSimHit->getPosTrack() - toSimHit->getPosWire());
+      Vector3D fromDisplacement(fromSimHit->getPosTrack() - fromSimHit->getPosWire());
+      Vector3D toDisplacement(toSimHit->getPosTrack() - toSimHit->getPosWire());
 
-        CDCRecoHit2D fromRecoHit2D(fromRLWireHit, fromDisplacement.xy());
-        CDCRecoHit2D toRecoHit2D(toRLWireHit, toDisplacement.xy());
+      CDCRecoHit2D fromRecoHit2D(fromRLWireHit, fromDisplacement.xy());
+      CDCRecoHit2D toRecoHit2D(toRLWireHit, toDisplacement.xy());
 
-        draw(fromRecoHit2D, attributeMap);
-        draw(toRecoHit2D, attributeMap);
-
-        const Vector2D fromPos = fromRecoHit2D.getRecoPos2D();
-        const float fromX =  fromPos.x();
-        const float fromY =  fromPos.y();
-
-        const Vector2D toPos = toRecoHit2D.getRecoPos2D();
-        const float toX =  toPos.x();
-        const float toY =  toPos.y();
-
-        m_eventdataPlotter.drawLine(fromX, fromY, toX, toY, attributeMap);
+      bool falseOrder = false;
+      if (fromSimHit->getArrayIndex() > toSimHit->getArrayIndex()) {
+        bool fromReassigned = fromHit->getRelatedWithWeight<MCParticle>().second < 0;
+        bool toReassigned = toHit->getRelatedWithWeight<MCParticle>().second < 0;
+        if (not fromReassigned and not toReassigned) {
+          falseOrder = true;
+        }
       }
+
+      AttributeMap attributeMap = defaultAttributeMap;
+      if (falseOrder) {
+        attributeMap["stroke"] = "red";
+        attributeMap["stroke-width"] = "1.0";
+      }
+      draw(fromRecoHit2D, attributeMap);
+      draw(toRecoHit2D, attributeMap);
+
+      const Vector2D fromPos = fromRecoHit2D.getRecoPos2D();
+      const float fromX = fromPos.x();
+      const float fromY = fromPos.y();
+
+      const Vector2D toPos = toRecoHit2D.getRecoPos2D();
+      const float toX = toPos.x();
+      const float toY = toPos.y();
+
+      m_eventdataPlotter.drawLine(fromX, fromY, toX, toY, attributeMap);
+      return false;
+    };
+
+    std::adjacent_find(simHitsForMcParticle.begin(),
+                       simHitsForMcParticle.end(),
+                       drawConnectSimHits);
+  }
+}
+
+void CDCSVGPlotter::drawWrongRLHitsInSegments(const std::string& segmentsStoreObjName)
+{
+  this->drawWrongRLHits<CDCSegment2D>(segmentsStoreObjName);
+}
+
+void CDCSVGPlotter::drawWrongRLHitsInTracks(const std::string& tracksStoreObjName)
+{
+  this->drawWrongRLHits<CDCTrack>(tracksStoreObjName);
+}
+
+template<class ACDCHitCollection>
+void CDCSVGPlotter::drawWrongRLHits(const std::string& hitCollectionsStoreObjName)
+{
+  B2INFO("Draw wrong right left passage information from " << hitCollectionsStoreObjName);
+  StoreWrappedObjPtr<std::vector<ACDCHitCollection>> storedHitCollections(hitCollectionsStoreObjName);
+  if (not storedHitCollections) {
+    B2WARNING(hitCollectionsStoreObjName << "does not exist in current DataStore");
+    printDataStoreContent();
+    return;
+  }
+
+  std::vector<ACDCHitCollection>& hitCollections = *storedHitCollections;
+  B2INFO("#HitCollections: " << hitCollections.size());
+
+  const CDCMCHitCollectionLookUp<ACDCHitCollection> mcHitCollectionLookUp;
+  const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
+
+  for (const ACDCHitCollection& hitCollection : hitCollections) {
+    EForwardBackward fbInfo = mcHitCollectionLookUp.isForwardOrBackwardToMCTrack(&hitCollection);
+
+    double rlPurity = mcHitCollectionLookUp.getRLPurity(&hitCollection);
+    int correctRLVote = mcHitCollectionLookUp.getCorrectRLVote(&hitCollection);
+
+    // Skip the impure alias
+    if (rlPurity < 0.5 and hitCollection.getAutomatonCell().hasAliasFlag()) continue;
+
+    // Skip the bad reverse
+    if (correctRLVote < 0 and hitCollection.getAutomatonCell().hasReverseFlag()) continue;
+
+    for (const auto& recoHit : hitCollection) {
+      ERightLeft rlInfo = recoHit.getRLInfo();
+      const CDCHit* hit = recoHit.getWireHit().getHit();
+      ERightLeft mcRLInfo = mcHitLookUp.getRLInfo(hit);
+
+      if (fbInfo == EForwardBackward::c_Backward) {
+        mcRLInfo = reversed(mcRLInfo);
+      }
+
+      std::string color = "orange";
+      if (mcRLInfo != ERightLeft::c_Right and mcRLInfo != ERightLeft::c_Left) {
+        color = "violet";
+      } else if (mcRLInfo == rlInfo) {
+        color = "green";
+      } else if (mcRLInfo == -rlInfo) {
+        color = "red";
+      }
+
+      AttributeMap attributeMap{{"stroke", color}};
+      m_eventdataPlotter.draw(recoHit, attributeMap);
     }
   }
 }
@@ -577,7 +670,7 @@ void CDCSVGPlotter::drawStoreVector(const std::string& storeObjName,
   B2INFO("with " << vector.size() << " entries");
   B2INFO("Attributes are");
   B2INFO(styling.info());
-  drawIterable<a_drawTrajectories>(vector, styling);
+  drawIterable<a_drawTrajectories>(vector | boost::adaptors::reversed, styling);
 }
 
 template <bool a_drawTrajectory, class AIterable, class AStyling>

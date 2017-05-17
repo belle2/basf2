@@ -881,7 +881,7 @@ void CDCToVXDExtrapolatorModule::event()
       trkInfo.cdconly = true;
     }
 
-    RelationVector<MCParticle> MCParticles_fromTrack = DataStore::getRelationsFromObj<MCParticle>(&crnt);
+    RelationVector<MCParticle> MCParticles_fromTrack = DataStore::getRelationsWithObj<MCParticle>(&crnt);
     B2DEBUG(110, "--- Number of related MC particles: " << MCParticles_fromTrack.size());
 
     genfit::Track* mcTrk = 0;
@@ -906,9 +906,9 @@ void CDCToVXDExtrapolatorModule::event()
         if (cdcHitsFromMC) delete cdcHitsFromMC;
         if (svdClustersFromMC) delete svdClustersFromMC;
         if (pxdClustersFromMC) delete pxdClustersFromMC;
-        cdcHitsFromMC = new RelationVector<CDCHit>(DataStore::getRelationsFromObj<CDCHit>(MCParticles_fromTrack[0]));
-        svdClustersFromMC = new RelationVector<SVDCluster>(DataStore::getRelationsToObj<SVDCluster>(MCParticles_fromTrack[0]));
-        pxdClustersFromMC = new RelationVector<PXDCluster>(DataStore::getRelationsToObj<PXDCluster>(MCParticles_fromTrack[0]));
+        cdcHitsFromMC = new RelationVector<CDCHit>(DataStore::getRelationsWithObj<CDCHit>(MCParticles_fromTrack[0]));
+        svdClustersFromMC = new RelationVector<SVDCluster>(DataStore::getRelationsWithObj<SVDCluster>(MCParticles_fromTrack[0]));
+        pxdClustersFromMC = new RelationVector<PXDCluster>(DataStore::getRelationsWithObj<PXDCluster>(MCParticles_fromTrack[0]));
 
         nCdcMcHits = cdcHitsFromMC->size();
         nSvdMcClusters = svdClustersFromMC->size();

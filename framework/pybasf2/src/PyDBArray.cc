@@ -33,21 +33,21 @@ namespace {
   }
 }
 
+const TObject* PyDBArray::_get(int i) const
+{
+  return (**m_array)[i];
+}
+
 int PyDBArray::getEntries() const
 {
   return isValid() ? ((*m_array)->GetEntriesFast()) : 0;
-}
-
-TIter PyDBArray::__iter__() const
-{
-  return TIter(isValid() ? *m_array : nullptr);
 }
 
 PyDBArray::PyDBArray(const std::string& name): PyDBArray(name, getDefaultClass(name)) {}
 
 PyDBArray::PyDBArray(const TClass* objClass): PyDBArray(DataStore::defaultArrayName(objClass), objClass) {}
 
-PyDBArray::PyDBArray(const std::string& name, const TClass* objClass): DBAccessorBase("dbstore", name, objClass, true)
+PyDBArray::PyDBArray(const std::string& name, const TClass* objClass): DBAccessorBase(name, objClass, true)
 {
   m_array = reinterpret_cast<TClonesArray**>(&m_entry->object);
 }

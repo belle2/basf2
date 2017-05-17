@@ -564,6 +564,7 @@ namespace Belle2 {
      * The constructor of the ModuleProxyBase class.
      * The constructor registers the proxy to the ModuleManager.
      * @param moduleType The type name of the module.
+     * @param package the package which contains the module
      */
     ModuleProxyBase(const std::string& moduleType, const std::string& package);
 

@@ -11,7 +11,7 @@
 #include <generators/kkmc/KKGenInterface.h>
 #include <generators/modules/kkgeninput/KKGenInputModule.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
-#include <framework/core/Environment.h>
+#include <framework/utilities/FileSystem.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -46,54 +46,14 @@ KKGenInputModule::KKGenInputModule() : Module(), m_initial(BeamParameters::c_sme
   setDescription("KKGenInput module. This an interface for KK2f Event Generator for basf2. The generated events are stored into MCParticles. You can find an expample of its decay file (tau_decaytable.dat) for tau-pair events at ${BELLE2_RELEASE_DIR}/data/generators/kkmc. On the other hand, when you like to generate mu-pair events, ${BELLE2_RELEASE_DIR}/data/generators/kkmc/mu.input.dat should be set to tauinputFile in your steering file.");
   setPropertyFlags(c_Input);
 
-  //Get ENVIRONMENTs
-  char* belle2_release_dir = std::getenv("BELLE2_RELEASE_DIR");
-  char* belle2_local_dir = std::getenv("BELLE2_LOCAL_DIR");
-
-  //Set default full filenames of KK2f setting files
-  string default_KKdefaultFileName = string("");
-  string default_tauinputFileName = string("");
-  string default_taudecaytableFileName = string("");
-  string default_KKMCOutputFileName = string("kkmc.txt");
-  B2DEBUG(100, "Default setting files are set: empty...");
-
-  if (belle2_release_dir != NULL) {
-    string tentative_KKdefaultFileName = string(belle2_release_dir) +
-                                         string("/data/generators/kkmc/KK2f_defaults.dat");
-    boost::filesystem::path fpath_b2r_kk2f(tentative_KKdefaultFileName);
-    if (!boost::filesystem::exists(fpath_b2r_kk2f)) {
-      B2DEBUG(100, boost::format("Default directory for the setting files is re-set: %s/data/generators/kkmc") % belle2_release_dir);
-      default_KKdefaultFileName = string(belle2_release_dir) +
-                                  string("/data/generators/kkmc/KK2f_defaults.dat");
-      default_tauinputFileName = string(belle2_release_dir) +
-                                 string("/data/generators/kkmc/tau.input.dat");
-      default_taudecaytableFileName = string(belle2_release_dir) +
-                                      string("/data/generators/kkmc/tau_decaytable.dat");
-    }
-  }
-
-  if (belle2_local_dir != NULL) {
-    string tentative_KKdefaultFileName = string(belle2_local_dir) +
-                                         string("/data/generators/kkmc/KK2f_defaults.dat");
-    boost::filesystem::path fpath_b2l_kk2f(tentative_KKdefaultFileName);
-    if (boost::filesystem::exists(fpath_b2l_kk2f)) {
-      default_KKdefaultFileName = string(belle2_local_dir) +
-                                  string("/data/generators/kkmc/KK2f_defaults.dat");
-      default_tauinputFileName = string(belle2_local_dir) +
-                                 string("/data/generators/kkmc/tau.input.dat");
-      default_taudecaytableFileName = string(belle2_local_dir) +
-                                      string("/data/generators/kkmc/tau_decaytable.dat");
-      B2DEBUG(100, boost::format("Default directory for the setting files is re-set: %s/data/generators/kkmc") % belle2_local_dir);
-    }
-  }
-
   //Parameter definition
-  addParam("KKdefaultFile", m_KKdefaultFileName, "default KKMC setting filename", default_KKdefaultFileName);
-  addParam("tauinputFile", m_tauinputFileName, "user-defined tau/mu/q-pairs generation setting", default_tauinputFileName);
-  addParam("taudecaytableFile", m_taudecaytableFileName, "tau-decay-table file name", default_taudecaytableFileName);
-  addParam("evtpdlfilename", m_EvtPDLFileName, "EvtPDL filename. This parameter is deprecated and will be ignored", std::string(""));
-  addParam("kkmcoutputfilename", m_KKMCOutputFileName, "KKMC output filename", default_KKMCOutputFileName);
-
+  addParam("KKdefaultFile", m_KKdefaultFileName, "default KKMC setting filename",
+           FileSystem::findFile("/data/generators/kkmc/KK2f_defaults.dat"));
+  addParam("tauinputFile", m_tauinputFileName, "user-defined tau/mu/q-pairs generation setting",
+           FileSystem::findFile("/data/generators/kkmc/KK2f_defaults.dat"));
+  addParam("taudecaytableFile", m_taudecaytableFileName, "tau-decay-table file name",
+           FileSystem::findFile("/data/generators/kkmc/tau.input.dat"));
+  addParam("kkmcoutputfilename", m_KKMCOutputFileName, "KKMC output filename", string(""));
 }
 
 
@@ -158,23 +118,22 @@ void KKGenInputModule::terminate()
 void KKGenInputModule::initializeGenerator()
 {
   FILE* fp;
-  if (getParam<std::string>("evtpdlfilename").isSetInSteering()) {
-    B2ERROR("KKGenInputModule::initializeGenerator(): The 'pdlFile' parameter is deprecated and will be ignored. Use \"import pdg; pdg.read('pdlFile')\" instead.");
-  }
 
-  fp = fopen(m_KKMCOutputFileName.c_str(), "r");
+  if (m_KKMCOutputFileName.empty()) {
+    m_KKMCOutputFileName = boost::filesystem::unique_path("KKMC-%%%%%%%%%%.txt").native();
+    B2INFO("Using KKMC output file " << m_KKMCOutputFileName);
+  }
+  if (FileSystem::fileExists(m_KKMCOutputFileName)) {
+    auto uniqueOutputFileName = boost::filesystem::unique_path(m_KKMCOutputFileName + "-%%%%%%%%%%").native();
+    B2WARNING("The KKMC output file " << m_KKMCOutputFileName << " already exists. Using " << uniqueOutputFileName << " instead.");
+    m_KKMCOutputFileName = uniqueOutputFileName;
+  }
+  fp = fopen(m_KKMCOutputFileName.c_str(), "w");
   if (fp) {
     fclose(fp);
     remove(m_KKMCOutputFileName.c_str());
   } else {
-    fp = fopen(m_KKMCOutputFileName.c_str(), "w");
-    if (fp) {
-      fclose(fp);
-      remove(m_KKMCOutputFileName.c_str());
-    } else {
-      B2FATAL("KKGenInputModule::initializeGenerator(): Failed to open KKMC output file!");
-      exit(1);
-    }
+    B2FATAL("KKGenInputModule::initializeGenerator(): Failed to open KKMC output file!");
   }
 
   B2DEBUG(150, "m_KKdefaultFileName: " << m_KKdefaultFileName);

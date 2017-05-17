@@ -17,6 +17,7 @@
 #pragma link C++ class Belle2::TOPTimeZero+;
 #pragma link C++ class Belle2::TOPRawDigit+;
 #pragma link C++ class Belle2::TOPSlowData+;
+#pragma link C++ class Belle2::TOPInterimFEInfo+;
 
 // schema evolution rules to allow reading of old class versions
 

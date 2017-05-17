@@ -1,95 +1,75 @@
-#ifndef PHYSICSTRIGGERDQMMODULE_H
-#define PHYSICSTRIGGERDQMMODULE_H
+#ifndef SOFTWARETRIGGERDQMMODULE_H
+#define SOFTWARETRIGGERDQMMODULE_H
 //+
-// File : PysicsTriggerDQMModule.h
+// File : SoftwareTriggerDQMModule.h
 // Description : Module to monitor raw data accumulating histos
 //
 // Author : Chunhua LI, the University of Melbourne
+//          Thomas Hauth
 // Date :  4 - March - 2015
 //-
 
-#include <stdlib.h>
 #include <string>
 #include <vector>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#include <sys/resource.h>
-#include <sys/uio.h>
+#include <map>
+
+#include <TH1F.h>
 
 #include <framework/core/HistoModule.h>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include "TH1F.h"
-#include "TH2F.h"
 
 namespace Belle2 {
+  namespace SoftwareTrigger {
 
-  /*! A class definition of an input module for Sequential ROOT I/O */
+    /*! A class definition of an input module for Sequential ROOT I/O */
 
-  class SoftwareTriggerDQMModule : public HistoModule {
+    class SoftwareTriggerDQMModule : public HistoModule {
 
-    // Public functions
-  public:
+      // Public functions
+    public:
 
-    //! Constructor / Destructor
-    SoftwareTriggerDQMModule();
-    virtual ~SoftwareTriggerDQMModule();
+      //! Constructor / Destructor
+      SoftwareTriggerDQMModule();
+      virtual ~SoftwareTriggerDQMModule() = default;
 
-    //! Module functions to be called from main process
-    virtual void initialize();
+      //! Module functions to be called from main process
+      virtual void initialize() override;
 
-    //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+      //! Module functions to be called from event process
+      virtual void event() override;
 
-    //! Histogram definition
-    virtual void defineHisto();
+      //! Histogram definition
+      virtual void defineHisto() override;
 
-    // Data members
+      // Data members
 
-  private:
+    private:
 
+      /// contains a list of sw trigger variables that should be plotted
+      std::vector<std::string> m_param_triggerVariables;
 
-    //! Histograms
-    /**the number of tracks*/
-    TH1F* h_NTrack;
+      /// Base identifier for all variables and cut results reported
+      std::string m_param_baseIdentifier = "hlt";
 
-    /**the number of ECL clusters*/
-    TH1F* h_NCluster;
+      /// List of cut results to include in the final dqm plots
+      std::vector<std::string> m_param_cutIdentifiers;
 
-    /**the total deposited energy in ECL*/
-    TH1F* h_ESum;
+      /// Directory to put the generated histograms
+      std::string m_param_histogramDirectoryName = "softwaretrigger";
 
-    /**the total visible energy*/
-    TH1F* h_EVis;
+      /// contains the histogram holding the final sw trigger decision when
+      /// all individual cuts are combined
+      TH1F* m_totalResultHistogram;
 
-    /**Overall HLT contains two parts: Fast_Reco + hlt*/
-    /**the fast_Reco trigger rate*/
-    TH1F* h_fast_reco_map;
+      /// contains the histograms holding the sw trigger variables plots
+      std::map<std::string, TH1F*> m_triggerVariablesHistogram;
 
-    /**unique fast reco*/
-    TH1F* h_fast_reco_unique_map;
+      /// contains the histograms holnding the results of the cuts
+      std::map<std::string, TH1F*> m_cutResultsHistogram;
 
+    };
 
-    /**the hlt trigger rate, R = the number of event trigger by the line to the total number of events triggered by hlt*/
-    TH1F* h_hlt_map;
-
-    /**the unique hlt trigger rat, R = the number of event trigger by the line ONLY to the total number of event trigger by hlt*/
-    TH1F* h_hlt_unique_map;
-
-    /**D0, D+, D*+, Jpsi->ee, Jpsi->mumu mass*/
-    TH1F* h_dqm[5];
-
-  };
-
+  } // end namespace SoftwareTrigger
 } // end namespace Belle2
 
-#endif // MODULEHELLO_H
+#endif // SOFTWARETRIGGERDQMMODULE_H

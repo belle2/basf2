@@ -20,12 +20,13 @@ using namespace std;
 
 namespace Belle2 {
 
-TRGCDCDisplayHough::TRGCDCDisplayHough(const std::string & name,
-                                       int size)
+  TRGCDCDisplayHough::TRGCDCDisplayHough(const std::string& name,
+                                         int size)
     : TRGCDCDisplay(name, size, 10),
       _w(* this, size),
       _adjustment(1., 1., 50.0, 0.1),
-      _scaler(_adjustment) {
+      _scaler(_adjustment)
+  {
 
     _w.set_size_request(size, size);
 
@@ -35,9 +36,9 @@ TRGCDCDisplayHough::TRGCDCDisplayHough(const std::string & name,
     _scaler.set_draw_value();
     _scaler.set_size_request(200, 30);
     _scaler
-        .signal_value_changed()
-        .connect(sigc::mem_fun(* this,
-                               & TRGCDCDisplayHough::on_scale_value_changed));
+    .signal_value_changed()
+    .connect(sigc::mem_fun(* this,
+                           & TRGCDCDisplayHough::on_scale_value_changed));
 
     _bottom.pack_start(_scaler, Gtk::PACK_SHRINK, 5);
     _bottom.pack_start(_buttonPositionReset, Gtk::PACK_EXPAND_WIDGET, 2);
@@ -51,26 +52,29 @@ TRGCDCDisplayHough::TRGCDCDisplayHough(const std::string & name,
     set_border_width(5);
     add(_box0);
     show_all();
-}
+  }
 
-TRGCDCDisplayHough::~TRGCDCDisplayHough() {
-}
+  TRGCDCDisplayHough::~TRGCDCDisplayHough()
+  {
+  }
 
-void
-TRGCDCDisplayHough::on_scale_value_changed(void) {
+  void
+  TRGCDCDisplayHough::on_scale_value_changed(void)
+  {
     const double val = scale();
     _w.scale(val);
     cout << "TRGCDCDisplayHough ... scale value=" << val << endl;
-    _w.on_expose_event((GdkEventExpose *) NULL);
-}
+    _w.on_expose_event((GdkEventExpose*) NULL);
+  }
 
-void
-TRGCDCDisplayHough::on_positionReset(void) {
+  void
+  TRGCDCDisplayHough::on_positionReset(void)
+  {
     area().resetPosition();
     const double val = _w.scale();
     scale(val);
-    _w.on_expose_event((GdkEventExpose *) NULL);
-}
+    _w.on_expose_event((GdkEventExpose*) NULL);
+  }
 
 } // namespace Belle2
 

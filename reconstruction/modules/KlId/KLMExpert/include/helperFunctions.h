@@ -24,14 +24,11 @@
 #include <math.h>
 #include <TLorentzVector.h>
 
-using namespace Belle2;
-using namespace std;
-
 /** Helper functions for all klid modules to improve readability of the code */
 namespace KlIdHelpers {
 
   /** return if MCparticle is beambkg */
-  int mcParticleIsBeamBKG(MCParticle* part)
+  int mcParticleIsBeamBKG(Belle2::MCParticle* part)
   {
     if (part == nullptr) {
       return 1;
@@ -42,7 +39,7 @@ namespace KlIdHelpers {
 
 
   /** return if mc particle is a K_long */
-  int mcParticleIsKlong(MCParticle* part)
+  int mcParticleIsKlong(Belle2::MCParticle* part)
   {
 
     if (mcParticleIsBeamBKG(part)) {
@@ -60,15 +57,15 @@ namespace KlIdHelpers {
 
 
   /** find closest ECL Cluster and its distance */
-  pair<ECLCluster*, double> findClosestECLCluster(const TVector3& klmClusterPosition)
+  std::pair<Belle2::ECLCluster*, double> findClosestECLCluster(const TVector3& klmClusterPosition)
   {
 
-    ECLCluster* closestECL = nullptr ;
+    Belle2::ECLCluster* closestECL = nullptr ;
     double initDistance = 9999999;
     double closestECLAngleDist = 99999999;
-    StoreArray<ECLCluster> eclClusters;
+    Belle2::StoreArray<Belle2::ECLCluster> eclClusters;
 
-    for (ECLCluster& eclcluster : eclClusters) {
+    for (Belle2::ECLCluster& eclcluster : eclClusters) {
 
       const TVector3& eclclusterPos = eclcluster.getClusterPosition();
       closestECLAngleDist = eclclusterPos.Angle(klmClusterPosition);
@@ -80,22 +77,22 @@ namespace KlIdHelpers {
 
     }
 
-    return make_pair(closestECL, closestECLAngleDist);
+    return std::make_pair(closestECL, closestECLAngleDist);
   }
 
 
   /** find nearest KLMCluster, tis distance and the av intercluster distance */
-  tuple<const KLMCluster*, double, double> findClosestKLMCluster(const TVector3& klmClusterPosition)
+  std::tuple<const Belle2::KLMCluster*, double, double> findClosestKLMCluster(const TVector3& klmClusterPosition)
   {
 
-    StoreArray<KLMCluster> klmClusters;
-    const KLMCluster* closestKLM = nullptr;
+    Belle2::StoreArray<Belle2::KLMCluster> klmClusters;
+    const Belle2::KLMCluster* closestKLM = nullptr;
     double closestKLMDist = 99999999;
     double avInterClusterDist = 0;
     double nextClusterDist = 99999999;
     double nKLMCluster = klmClusters.getEntries();
 
-    for (const KLMCluster& nextCluster : klmClusters) {
+    for (const Belle2::KLMCluster& nextCluster : klmClusters) {
 
       const TVector3& nextClusterPos = nextCluster.getClusterPosition();
       const TVector3& clustDistanceVec = nextClusterPos - klmClusterPosition;
@@ -116,47 +113,56 @@ namespace KlIdHelpers {
       avInterClusterDist = 0;
     }
 
-    return make_tuple(closestKLM, closestKLMDist, avInterClusterDist);
+    return std::make_tuple(closestKLM, closestKLMDist, avInterClusterDist);
   }
 
 
   /** find nearest genfit track and return it and its distance  */
-  tuple<RecoTrack*, double, std::unique_ptr<const TVector3> > findClosestTrack(const TVector3& clusterPosition)
+  std::tuple<Belle2::RecoTrack*, double, std::unique_ptr<const TVector3> > findClosestTrack(const TVector3& clusterPosition,
+      float cutAngle)
   {
-    StoreArray<RecoTrack> genfitTracks;
+    Belle2::StoreArray<Belle2::RecoTrack> genfitTracks;
     double oldDistance = INFINITY;
-    RecoTrack* closestTrack = nullptr;
+    Belle2::RecoTrack* closestTrack = nullptr;
     TVector3 poca = TVector3(0, 0, 0);
 
 
-    for (RecoTrack& track : genfitTracks) {
+    for (Belle2::RecoTrack& track : genfitTracks) {
+
+
+
       try {
         genfit::MeasuredStateOnPlane state;
-        state = track.getMeasuredStateOnPlaneFromLastHit();
-        state.extrapolateToPoint(clusterPosition);
-        const TVector3& trackPos = state.getPos();
+        genfit::MeasuredStateOnPlane state_for_cut;
+        state_for_cut = track.getMeasuredStateOnPlaneFromFirstHit();
 
-        const TVector3& distanceVecCluster = clusterPosition - trackPos;
-        double newDistance = distanceVecCluster.Mag2();
+        // only use tracks that are close cos the extrapolation takes ages
+        if (clusterPosition.Angle(state_for_cut.getPos()) < cutAngle) {
 
-        // overwrite old distance
-        if (newDistance < oldDistance) {
-          oldDistance = newDistance;
-          closestTrack = &track;
-          poca = trackPos;
+
+          state = track.getMeasuredStateOnPlaneFromLastHit();
+          state.extrapolateToPoint(clusterPosition);
+          const TVector3& trackPos = state.getPos();
+
+          const TVector3& distanceVecCluster = clusterPosition - trackPos;
+          double newDistance = distanceVecCluster.Mag2();
+
+          // overwrite old distance
+          if (newDistance < oldDistance) {
+            oldDistance = newDistance;
+            closestTrack = &track;
+            poca = trackPos;
+          }
         }
-
       } catch (genfit::Exception& e) {
       }// try
     }// for gftrack
 
     if (not closestTrack) {
-      return make_tuple(closestTrack, oldDistance, std::unique_ptr<const TVector3>(nullptr));
+      return std::make_tuple(closestTrack, oldDistance, std::unique_ptr<const TVector3>(nullptr));
     } else {
-      return make_tuple(closestTrack, oldDistance, std::unique_ptr<const TVector3>(new TVector3(poca)));
+      return std::make_tuple(closestTrack, oldDistance, std::unique_ptr<const TVector3>(new TVector3(poca)));
     }
   }
-
-
 
 }//end namespace

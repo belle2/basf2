@@ -91,6 +91,12 @@ namespace Belle2 {
                        VXDTFFilters<point_t>* filters)
     {
       if ((*m_allSetupsFilters).count(setupName)) {
+        // case the filter is the same which is already in the container
+        if ((*m_allSetupsFilters)[ setupName ] == filters) {
+          B2WARNING("Trying to add a filter which is already in the container! Will not add it!");
+          return;
+        }
+
         if ((*m_allSetupsFilters)[ setupName ]) delete(*m_allSetupsFilters)[ setupName ];
       }
       (*m_allSetupsFilters)[ setupName ] = filters;

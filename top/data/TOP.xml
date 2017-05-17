@@ -15,6 +15,9 @@
     <xi:include href="ChannelMappingIRSX.xml"/>
     <xi:include href="BrokenGlues.xml"/>
     <xi:include href="PeelOffCookies.xml"/>
+    <xi:include href="SignalShape.xml"/>
+    <xi:include href="DisplacedGeometry.xml"/>
+    <xi:include href="DisplacedPMTArrays.xml"/>
     
     <BeamBackgroundStudy desc="select 1 to record neutron and gamma hits">0</BeamBackgroundStudy>
 

@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimators.h>
+#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -72,9 +72,6 @@ namespace Belle2 {
 
     /** sets the name of expected StoreArray with SpacePointTrackCand in it. */
     std::string m_PARAMtcArrayName;
-    /** sets default PDG code for all track candidate in this module. */
-    /** WARNING hardcoded values so far, should be passed by parameter! */
-    int m_PARAMstdPDGCode = 211;
 
     // member variables
 
@@ -89,6 +86,9 @@ namespace Belle2 {
 
     /** the storeArray for SpacePointTrackCands as member, is faster than recreating link for each event. */
     StoreArray<SpacePointTrackCand> m_spacePointTrackCands;
+
+    /** the QualityEstimator used to determine momentum seed. */
+    QualityEstimatorRiemannHelixFit m_estimator;
 
   private:
   };

@@ -34,6 +34,9 @@ namespace Belle2 {
     public:
       /// Constructor initialising the MVAFilter with standard training name for this filter.
       MVAFeasibleSegmentRelationFilter();
+
+      /// Tell Root to look at this operator
+      using Super::operator();
     };
   }
 }

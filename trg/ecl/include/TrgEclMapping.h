@@ -57,13 +57,13 @@ namespace Belle2 {
   private:
 
 
-    /** */
+    /** TC Id */
     int _tcid;       // ID = 1-576
-    /** */
+    /** TC Sub Id*/
     int _tcsubid;    // ID = 0-1
-    /** */
+    /** TC Theta Id*/
     int _tcthetaid;  // ID = 0-16
-    /** */
+    /** TC Phi Id*/
     int _tcphiid;    // ID = 0-35(0-31 for both endcap)
 
     /** Matrix of the relation of TC and Xtal*/

@@ -32,9 +32,7 @@
 #include <cdc/dataobjects/CDCRecoHit.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
-#include <genfit/Track.h>
-#include <genfit/TrackCand.h>
-#include <genfit/TrackCandHit.h>
+
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <cdc/dataobjects/CDCHit.h>
@@ -65,10 +63,11 @@ TrackingPerformanceEvaluationModule::TrackingPerformanceEvaluationModule() :
 
   addParam("outputFileName", m_rootFileName, "Name of output root file.",
            std::string("TrackingPerformanceEvaluation_output.root"));
-  addParam("TracksName", m_TracksName, "Name of genfit Track collection.", std::string("GF2Tracks"));
-  addParam("TrackCandsName", m_TrackCandsName, "Name of genfit TrackCand collection.", std::string(""));
-  addParam("MCTrackCandsName", m_MCTrackCandsName, "Name of MC TrackCand collection.", std::string("MCGFTrackCands"));
   addParam("MCParticlesName", m_MCParticlesName, "Name of MC Particle collection.", std::string(""));
+  addParam("TracksName", m_TracksName, "Name of Track collection.", std::string(""));
+  addParam("RecoTracksName", m_RecoTracksName, "Name of RecoTrack collection.", std::string("RecoTracks"));
+  addParam("MCRecoTracksName", m_MCRecoTracksName, "Name of MCRecoTrack collection.", std::string("MCRecoTracks"));
+
 
 }
 
@@ -79,15 +78,23 @@ TrackingPerformanceEvaluationModule::~TrackingPerformanceEvaluationModule()
 
 void TrackingPerformanceEvaluationModule::initialize()
 {
-  // MCParticles, MCTrackCands, TrackCands, Tracks needed for this module
+  // MCParticles, Tracks, RecoTracks, MCRecoTracks needed for this module
   StoreArray<MCParticle>::required(m_MCParticlesName);
-  StoreArray<genfit::Track>::required(m_TracksName);
-  StoreArray<genfit::TrackCand>::required(m_TrackCandsName);
-  StoreArray<genfit::TrackCand>::required(m_MCTrackCandsName);
+  StoreArray<RecoTrack>::required(m_RecoTracksName);
+  StoreArray<RecoTrack>::required(m_MCRecoTracksName);
+  StoreArray<Track>::required(m_TracksName);
 
   //create list of histograms to be saved in the rootfile
   m_histoList = new TList;
-
+  m_histoList_multiplicity = new TList;
+  m_histoList_evtCharacterization = new TList;
+  m_histoList_trkQuality = new TList;
+  m_histoList_firstHit = new TList;
+  m_histoList_pr = new TList;
+  m_histoList_fit = new TList;
+  m_histoList_efficiency = new TList;
+  m_histoList_purity = new TList;
+  m_histoList_others = new TList;
 
   //set the ROOT File
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
@@ -95,59 +102,107 @@ void TrackingPerformanceEvaluationModule::initialize()
   //now create histograms
 
   //multiplicity histograms
-  m_multiplicityTracks = createHistogram1D("h1nTrk", "number of tracks per MC Particle", 8, -0.5, 7.5, "# tracks", m_histoList);
+  m_multiplicityTracks = createHistogram1D("h1nTrk", "number of tracks per MC Particle", 8, -0.5, 7.5, "# tracks",
+                                           m_histoList_multiplicity);
+
+  m_multiplicityRecoTracks = createHistogram1D("h1nRcTrk", "number of recoTracks per MC Particle", 8, -0.5, 7.5, "# tracks",
+                                               m_histoList_multiplicity);
+
+  m_multiplicityMCRecoTracks = createHistogram1D("h1nMCRcTrk", "number of MC recoTracks per MC Particle", 8, -0.5, 7.5, "# tracks",
+                                                 m_histoList_multiplicity);
+
   m_multiplicityFittedTracks = createHistogram1D("h1nFitTrk", "number of fitted tracks per MC Particle", 5, -0.5, 4.5,
-                                                 "# fitted tracks", m_histoList);
-  m_multiplicityFittedTracksPerMCTC = createHistogram1D("h1nFitTrkMCTC", "number of fitted tracks per MCTrackCand", 5, -0.5, 4.5,
-                                                        "# fitted tracks", m_histoList);
-  m_multiplicityMCParticles = createHistogram1D("h1nMCPrtcl", "number of MCParticles per fitted tracks", 5, -0.5, 4.5,
-                                                "# MCParticles", m_histoList);
-  m_multiplicityTrackCands = createHistogram1D("h1nTrackCand", "number of TrackCand per MCTrackCand", 5, -0.5, 4.5, "# TrackCand",
-                                               m_histoList);
-  m_multiplicityMCTrackCands = createHistogram1D("h1nMCTrackCand", "number of MCTrackCand per TrackCand", 5, -0.5, 4.5,
-                                                 "# MCTrackCand", m_histoList);
+                                                 "# fitted tracks", m_histoList_multiplicity);
+  m_multiplicityFittedTracksPerMCRT = createHistogram1D("h1nFitTrkMCRT", "number of fitted tracks per MCRecoTrack", 5, -0.5, 4.5,
+                                                        "# fitted tracks", m_histoList_multiplicity);
+  m_multiplicityMCParticlesPerTrack = createHistogram1D("h1nMCPrtcl", "number of MCParticles per fitted tracks", 5, -0.5, 4.5,
+                                                        "# MCParticles", m_histoList_multiplicity);
+  m_multiplicityRecoTracksPerMCRT = createHistogram1D("h1nRecoTrack", "number of RecoTrack per MCRecoTrack", 5, -0.5, 4.5,
+                                                      "# RecoTrack",
+                                                      m_histoList_multiplicity);
+  m_multiplicityMCRecoTracksPerRT = createHistogram1D("h1nMCRecoTrack", "number of MCRecoTrack per RecoTrack", 5, -0.5, 4.5,
+                                                      "# MCRecoTrack", m_histoList_multiplicity);
+
+  //tracks pValue
+  m_h1_pValue = createHistogram1D("h1pValue", "pValue of the fit", 100, 0, 1, "pValue", m_histoList_trkQuality);
+
 
   //track parameters errors
-  m_h1_d0_err = createHistogram1D("h1d0err", "d0 error", 100, 0, 0.1, "#sigma_{d0} (cm)", m_histoList);
-  m_h1_phi_err = createHistogram1D("h1phierr", "#phi error", 100, 0, 0.02, "#sigma_{#phi} (rad)", m_histoList);
-  m_h1_omega_err = createHistogram1D("h1omegaerr", "#omega error", 100, 0, 0.002, "#sigma_{#omega} (cm^{-1})", m_histoList);
-  m_h1_z0_err = createHistogram1D("h1z0err", "z0 error", 100, 0, 0.1, "#sigma_{z0} (cm)", m_histoList);
-  m_h1_cotTheta_err = createHistogram1D("h1cotThetaerr", "cot#theta error", 100, 0, 0.03, "#sigma_{cot#theta}", m_histoList);
+  m_h1_d0_err = createHistogram1D("h1d0err", "d0 error", 100, 0, 0.1, "#sigma_{d0} (cm)", m_histoList_trkQuality);
+  m_h1_phi_err = createHistogram1D("h1phierr", "#phi error", 100, 0, 0.02, "#sigma_{#phi} (rad)", m_histoList_trkQuality);
+  m_h1_omega_err = createHistogram1D("h1omegaerr", "#omega error", 100, 0, 0.002, "#sigma_{#omega} (cm^{-1})",
+                                     m_histoList_trkQuality);
+  m_h1_z0_err = createHistogram1D("h1z0err", "z0 error", 100, 0, 0.1, "#sigma_{z0} (cm)", m_histoList_trkQuality);
+  m_h1_cotTheta_err = createHistogram1D("h1cotThetaerr", "cot#theta error", 100, 0, 0.03, "#sigma_{cot#theta}",
+                                        m_histoList_trkQuality);
 
   //track parameters residuals
-  m_h1_d0_res = createHistogram1D("h1d0res", "d0 residuals", 100, -0.1, 0.1, "d0 resid (cm)", m_histoList);
-  m_h1_phi_res = createHistogram1D("h1phires", "#phi residuals", 100, -0.1, 0.1, "#phi resid (rad)", m_histoList);
-  m_h1_omega_res = createHistogram1D("h1omegares", "#omega residuals", 100, -0.0005, 0.0005, "#omega resid (cm^{-1})", m_histoList);
-  m_h1_z0_res = createHistogram1D("h1z0res", "z0 residuals", 100, -0.1, 0.1, "z0 resid (cm)", m_histoList);
-  m_h1_cotTheta_res = createHistogram1D("h1cotThetares", "cot#theta residuals", 100, -0.1, 0.1, "cot#theta resid", m_histoList);
+  m_h1_d0_res = createHistogram1D("h1d0res", "d0 residuals", 100, -0.1, 0.1, "d0 resid (cm)", m_histoList_trkQuality);
+  m_h1_phi_res = createHistogram1D("h1phires", "#phi residuals", 100, -0.1, 0.1, "#phi resid (rad)", m_histoList_trkQuality);
+  m_h1_omega_res = createHistogram1D("h1omegares", "#omega residuals", 100, -0.0005, 0.0005, "#omega resid (cm^{-1})",
+                                     m_histoList_trkQuality);
+  m_h1_z0_res = createHistogram1D("h1z0res", "z0 residuals", 100, -0.1, 0.1, "z0 resid (cm)", m_histoList_trkQuality);
+  m_h1_cotTheta_res = createHistogram1D("h1cotThetares", "cot#theta residuals", 100, -0.1, 0.1, "cot#theta resid",
+                                        m_histoList_trkQuality);
 
 
   //track parameters pulls
-  m_h1_d0_pll = createHistogram1D("h1d0pll", "d0 pulls", 100, -5, 5, "d0 pull", m_histoList);
-  m_h1_phi_pll = createHistogram1D("h1phipll", "#phi pulls", 100, -5, 5, "#phi pull", m_histoList);
-  m_h1_omega_pll = createHistogram1D("h1omegapll", "#omega pulls", 100, -5, 5, "#omega pull", m_histoList);
-  m_h1_z0_pll = createHistogram1D("h1z0pll", "z0 pulls", 100,  -5, 5, "z0 pull", m_histoList);
-  m_h1_cotTheta_pll = createHistogram1D("h1cotThetapll", "cot#theta pulls", 100,  -5, 5, "cot#theta pull", m_histoList);
+  m_h1_d0_pll = createHistogram1D("h1d0pll", "d0 pulls", 100, -5, 5, "d0 pull", m_histoList_trkQuality);
+  m_h1_phi_pll = createHistogram1D("h1phipll", "#phi pulls", 100, -5, 5, "#phi pull", m_histoList_trkQuality);
+  m_h1_omega_pll = createHistogram1D("h1omegapll", "#omega pulls", 100, -5, 5, "#omega pull", m_histoList_trkQuality);
+  m_h1_z0_pll = createHistogram1D("h1z0pll", "z0 pulls", 100,  -5, 5, "z0 pull", m_histoList_trkQuality);
+  m_h1_cotTheta_pll = createHistogram1D("h1cotThetapll", "cot#theta pulls", 100,  -5, 5, "cot#theta pull", m_histoList_trkQuality);
 
 
   //first hit position using track parameters errors
   m_h2_d0errphi0err_xy = createHistogram2D("h2d0errphierrXY", "#sigma_{d0}/#sigma_{#phi} projected on x,y",
                                            2000, -10, 10, "x (cm)",
                                            2000, -10, 10, "y (cm)",
-                                           m_histoList);
+                                           m_histoList_firstHit);
 
   m_h2_d0errphi0err_rz = createHistogram2D("h2d0errphierrRZ", "#sigma_{d0}/#sigma_{#phi} projected on z and r_{t}=#sqrt{x^{2}+y^{2}}",
                                            2000, -30, 40, "z (cm)",
                                            2000, 0, 15, "r_{t} (cm)",
-                                           m_histoList);
+                                           m_histoList_firstHit);
 
   m_h2_z0errcotThetaerr_xy = (TH2F*)duplicateHistogram("h2z0errcotThetaerrXY", "#sigma_{z0}/#sigma_{cot#theta} projected on x,y",
                                                        m_h2_d0errphi0err_xy,
-                                                       m_histoList);
+                                                       m_histoList_firstHit);
+
+  m_h2_OmegaerrOmegaVSpt = createHistogram2D("h2OmegaerrOmegaVSpt", "#sigma_{#omega}/#omega VS p_{t}",
+                                             100, 0, 3, "p_{t} (GeV/c)",
+                                             1000, 0, 0.2, "#sigma_{#omega}/#omega",
+                                             m_histoList_firstHit);
+
+
+  m_h2_z0errVSpt = createHistogram2D("h2z0errVSpt", "#sigma_{z0} VS p_{t}",
+                                     100, 0, 3, "p_{t} (GeV/c)",
+                                     100, 0, 0.1, "#sigma_{z0} (cm)",
+                                     m_histoList_firstHit);
+
+  m_h2_z0errVSpt_wpxd = (TH2F*)duplicateHistogram("h2z0errVSpt_wPXD", "#sigma_{z0} VS p_{t}, with PXD hits", m_h2_z0errVSpt,
+                                                  m_histoList_firstHit);
+
+  m_h2_z0errVSpt_wopxd = (TH2F*)duplicateHistogram("h2z0errVSpt_woPXD", "#sigma_{z0} VS p_{t}, no PXD hits", m_h2_z0errVSpt,
+                                                   m_histoList_firstHit);
+
+  m_h2_d0errVSpt = createHistogram2D("h2d0errVSpt", "#sigma_{d0} VS p_{t}",
+                                     100, 0, 3, "p_{t} (GeV/c)",
+                                     100, 0, 0.1, "#sigma_{d0} (cm)",
+                                     m_histoList_firstHit);
+
+  m_h2_d0errVSpt_wpxd = (TH2F*)duplicateHistogram("h2d0errVSpt_wPXD", "#sigma_{d0} VS p_{t}, with PXD hits", m_h2_d0errVSpt,
+                                                  m_histoList_firstHit);
+
+  m_h2_d0errVSpt_wopxd = (TH2F*)duplicateHistogram("h2d0errVSpt_woPXD", "#sigma_{d0} VS p_{t}, no PXD hits", m_h2_d0errVSpt,
+                                                   m_histoList_firstHit);
+
+  m_h2_d0errMSVSpt = createHistogram2D("h2d0errMSVSpt", "#sigma_{d0} * #betapsin^{3/2}#theta VS p_{t}",
+                                       50, 0, 2.5, "p_{t} (GeV/c)",
+                                       500, 0, 1, "cm",
+                                       m_histoList_firstHit);
 
   //hits used in the fit
-
-
   m_h2_TrackPointFitWeightVXD = createHistogram2D("h2TPFitWeightVXD", "VXD TrackPoint Fit Weight", 6, 0.5, 6.5, "VXD layer", 20, 0, 1,
                                                   "weight", m_histoList);
   m_h2_TrackPointFitWeightCDC = createHistogram2D("h2TPFitWeightCDC", "CDC TrackPoint Fit Weight", 56, -0.5, 55.5, "CDC layer", 20, 0,
@@ -175,44 +230,10 @@ void TrackingPerformanceEvaluationModule::initialize()
                                         2000, 0, 15, "r_{t} (cm)",
                                         m_histoList);
 
-  m_h1_pValue = createHistogram1D("h1pValue", "pValue of the fit", 100, 0, 1, "pValue", m_histoList);
-
-  m_h2_OmegaerrOmegaVSpt = createHistogram2D("h2OmegaerrOmegaVSpt", "#sigma_{#omega}/#omega VS p_{t}",
-                                             100, 0, 3, "p_{t} (GeV/c)",
-                                             1000, 0, 0.2, "#sigma_{#omega}/#omega",
-                                             m_histoList);
-
-
-  m_h2_z0errVSpt = createHistogram2D("h2z0errVSpt", "#sigma_{z0} VS p_{t}",
-                                     100, 0, 3, "p_{t} (GeV/c)",
-                                     100, 0, 0.1, "#sigma_{z0} (cm)",
-                                     m_histoList);
-
-  m_h2_z0errVSpt_wpxd = (TH2F*)duplicateHistogram("h2z0errVSpt_wPXD", "#sigma_{z0} VS p_{t}, with PXD hits", m_h2_z0errVSpt,
-                                                  m_histoList);
-
-  m_h2_z0errVSpt_wopxd = (TH2F*)duplicateHistogram("h2z0errVSpt_woPXD", "#sigma_{z0} VS p_{t}, no PXD hits", m_h2_z0errVSpt,
-                                                   m_histoList);
-
-  m_h2_d0errVSpt = createHistogram2D("h2d0errVSpt", "#sigma_{d0} VS p_{t}",
-                                     100, 0, 3, "p_{t} (GeV/c)",
-                                     100, 0, 0.1, "#sigma_{d0} (cm)",
-                                     m_histoList);
-
-  m_h2_d0errVSpt_wpxd = (TH2F*)duplicateHistogram("h2d0errVSpt_wPXD", "#sigma_{d0} VS p_{t}, with PXD hits", m_h2_d0errVSpt,
-                                                  m_histoList);
-
-  m_h2_d0errVSpt_wopxd = (TH2F*)duplicateHistogram("h2d0errVSpt_woPXD", "#sigma_{d0} VS p_{t}, no PXD hits", m_h2_d0errVSpt,
-                                                   m_histoList);
-
-  m_h2_d0errMSVSpt = createHistogram2D("h2d0errMSVSpt", "#sigma_{d0} * #betapsin^{3/2}#theta VS p_{t}",
-                                       50, 0, 2.5, "p_{t} (GeV/c)",
-                                       500, 0, 1, "cm",
-                                       m_histoList);
 
 
   //histograms to produce efficiency plots
-  Double_t bins_pt[9 + 1] = {0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5, 1, 2, 3.5}; //GeV/c
+  Double_t bins_pt[10 + 1] = {0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.5, 1, 1.5, 2, 3.5}; //GeV/c
   Double_t bins_theta[10 + 1] = {0, 0.25, 0.5, 0.75, 0.75 + 0.32, 0.75 + 2 * 0.32, 0.75 + 3 * 0.32, 0.75 + 4 * 0.32, 0.75 + 5 * 0.32, 2.65, TMath::Pi()};
   Double_t bins_phi[14 + 1];
   Double_t width_phi = 2 * TMath::Pi() / 14;
@@ -221,7 +242,7 @@ void TrackingPerformanceEvaluationModule::initialize()
 
 
   m_h3_MCParticle = createHistogram3D("h3MCParticle", "entry per MCParticle",
-                                      9, bins_pt, "p_{t} (GeV/c)",
+                                      10, bins_pt, "p_{t} (GeV/c)",
                                       10, bins_theta, "#theta",
                                       14, bins_phi, "#phi" /*, m_histoList*/);
 
@@ -233,12 +254,12 @@ void TrackingPerformanceEvaluationModule::initialize()
                                      "entry per Track with PXD hits connected to a MCParticle",
                                      m_h3_MCParticle /*, m_histoList*/);
 
-  m_h3_MCTrackCand = (TH3F*)duplicateHistogram("h3MCTrackCand",
-                                               "entry per MCTrackCand connected to the MCParticle",
+  m_h3_MCRecoTrack = (TH3F*)duplicateHistogram("h3MCRecoTrack",
+                                               "entry per MCRecoTrack connected to the MCParticle",
                                                m_h3_MCParticle /*, m_histoList*/);
 
-  m_h3_TracksPerMCTrackCand = (TH3F*)duplicateHistogram("h3TracksPerMCTrackCand",
-                                                        "entry per Track connected to an MCTrackCand",
+  m_h3_TracksPerMCRecoTrack = (TH3F*)duplicateHistogram("h3TracksPerMCRecoTrack",
+                                                        "entry per Track connected to an MCRecoTrack",
                                                         m_h3_MCParticle /*, m_histoList*/);
   //plus
   m_h3_MCParticle_plus = (TH3F*)duplicateHistogram("h3MCParticle_plus", "entry per positive MCParticle",
@@ -248,12 +269,12 @@ void TrackingPerformanceEvaluationModule::initialize()
                                                             "entry per Track connected to a positive MCParticle",
                                                             m_h3_MCParticle /*, m_histoList*/);
 
-  m_h3_MCTrackCand_plus = (TH3F*)duplicateHistogram("h3MCTrackCand_plus",
-                                                    "entry per MCTrackCand connected to the positive MCParticle",
+  m_h3_MCRecoTrack_plus = (TH3F*)duplicateHistogram("h3MCRecoTrack_plus",
+                                                    "entry per MCRecoTrack connected to the positive MCParticle",
                                                     m_h3_MCParticle /*, m_histoList*/);
 
-  m_h3_TracksPerMCTrackCand_plus = (TH3F*)duplicateHistogram("h3TracksPerMCTrackCand_plus",
-                                                             "entry per Track connected to a positive MCTrackCand",
+  m_h3_TracksPerMCRecoTrack_plus = (TH3F*)duplicateHistogram("h3TracksPerMCRecoTrack_plus",
+                                                             "entry per Track connected to a positive MCRecoTrack",
                                                              m_h3_MCParticle /*, m_histoList*/);
 
 
@@ -265,20 +286,20 @@ void TrackingPerformanceEvaluationModule::initialize()
                                                              "entry per Track connected to a negative MCParticle",
                                                              m_h3_MCParticle /*, m_histoList*/);
 
-  m_h3_MCTrackCand_minus = (TH3F*)duplicateHistogram("h3MCTrackCand_minus",
-                                                     "entry per MCTrackCand connected to the negative MCParticle",
+  m_h3_MCRecoTrack_minus = (TH3F*)duplicateHistogram("h3MCRecoTrack_minus",
+                                                     "entry per MCRecoTrack connected to the negative MCParticle",
                                                      m_h3_MCParticle /*, m_histoList*/);
 
-  m_h3_TracksPerMCTrackCand_minus = (TH3F*)duplicateHistogram("h3TracksPerMCTrackCand_minus",
-                                                              "entry per Track connected to a negative MCTrackCand",
+  m_h3_TracksPerMCRecoTrack_minus = (TH3F*)duplicateHistogram("h3TracksPerMCRecoTrack_minus",
+                                                              "entry per Track connected to a negative MCRecoTrack",
                                                               m_h3_MCParticle /*, m_histoList*/);
 
   //histograms to produce efficiency plots
-  m_h1_HitsTrackCandPerMCTrackCand = createHistogram1D("h1hitsTCperMCTC", "TrackCand per MCTrackCand Hit in VXD layers", 6, 0.5, 6.5,
+  m_h1_HitsRecoTrackPerMCRecoTrack = createHistogram1D("h1hitsTCperMCRT", "RecoTrack per MCRecoTrack Hit in VXD layers", 6, 0.5, 6.5,
                                                        "# VXD layer" /*, m_histoList*/);
 
-  m_h1_HitsMCTrackCand = (TH1F*) duplicateHistogram("h1hitsMCTC", " MCTrackCand Hit in VXD layers",
-                                                    m_h1_HitsTrackCandPerMCTrackCand /*,  m_histoList*/);
+  m_h1_HitsMCRecoTrack = (TH1F*) duplicateHistogram("h1hitsMCRT", " MCRecoTrack Hit in VXD layers",
+                                                    m_h1_HitsRecoTrackPerMCRecoTrack /*,  m_histoList*/);
 
 
   //histograms to produce purity plots
@@ -313,10 +334,9 @@ void TrackingPerformanceEvaluationModule::event()
     int pdgCode = mcParticle.getPDG();
     B2DEBUG(99, "MCParticle has PDG code " << pdgCode);
 
-    int nFittedTracksMCTC = 0;
+    int nFittedTracksMCRT = 0;
     int nFittedTracks = 0;
     int nFittedTrackswPXDHits = 0;
-    int nTracks = 0;
 
     MCParticleInfo mcParticleInfo(mcParticle, magField);
 
@@ -333,41 +353,36 @@ void TrackingPerformanceEvaluationModule::event()
 
     //1. retrieve all the Tracks related to the MCParticle
 
-    //1.0 check if there is an MCTrackCand
-    RelationVector<genfit::TrackCand> MCTrackCands_fromMCParticle = DataStore::getRelationsToObj<genfit::TrackCand>(&mcParticle,
-        m_MCTrackCandsName);
-    if (MCTrackCands_fromMCParticle.size() > 0) {
-      m_h3_MCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
+    //1.0 check if there is a RecoTrack
+    RelationVector<RecoTrack> MCRecoTracks_fromMCParticle =
+      DataStore::getRelationsWithObj<RecoTrack>(&mcParticle, m_MCRecoTracksName);
+
+    m_multiplicityMCRecoTracks->Fill(MCRecoTracks_fromMCParticle.size());
+
+    RelationVector<RecoTrack> RecoTracks_fromMCParticle =
+      DataStore::getRelationsWithObj<RecoTrack>(&mcParticle, m_RecoTracksName);
+
+    m_multiplicityRecoTracks->Fill(RecoTracks_fromMCParticle.size());
+
+    if (MCRecoTracks_fromMCParticle.size() > 0) {
+      m_h3_MCRecoTrack->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
 
       if (mcParticleInfo.getCharge() > 0)
-        m_h3_MCTrackCand_plus->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
+        m_h3_MCRecoTrack_plus->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
       else if (mcParticleInfo.getCharge() < 0)
-        m_h3_MCTrackCand_minus->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
+        m_h3_MCRecoTrack_minus->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
       else
         continue;
     }
 
-    //1.a retrieve all TrackCands related to the MCParticle
-    //    RelationVector<genfit::TrackCand> TrackCands_fromMCParticle = DataStore::getRelationsToObj<genfit::TrackCand>(&mcParticle);
-    RelationVector<Track> Tracks_fromMCParticle = DataStore::getRelationsToObj<Track>(&mcParticle);
+    //1.a retrieve all Tracks related to the MCParticle
+    RelationVector<Track> Tracks_fromMCParticle = DataStore::getRelationsWithObj<Track>(&mcParticle);
+    m_multiplicityTracks->Fill(Tracks_fromMCParticle.size());
 
-    //    B2DEBUG(99,TrackCands_fromMCParticle.size()<<" TrackCands related to this MCParticle");
     B2DEBUG(99, Tracks_fromMCParticle.size() << " Tracks related to this MCParticle");
 
-    //    for (int tc = 0; tc < (int)TrackCands_fromMCParticle.size(); tc++) {
-
-    //1.b retrieve all Tracks related to the TrackCand
-    //      RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsFromObj<genfit::Track>(TrackCands_fromMCParticle[tc]);
-    //      RelationVector<Track> Tracks_fromTrackCand = DataStore::getRelationsToObj<Track>(TrackCands_fromMCParticle[tc]);
-
-    //      B2DEBUG(99,"   "<<Tracks_fromTrackCand.size()<<" Track related to this TrackCand");
-
-    //      for (int trk = 0; trk < (int)Tracks_fromTrackCand.size(); trk++) {
     for (int trk = 0; trk < (int)Tracks_fromMCParticle.size(); trk++) {
 
-      nTracks++;
-
-      //        const TrackFitResult* fitResult = Tracks_fromTrackCand[trk]->getTrackFitResult(Const::ChargedStable(211));
       const TrackFitResult* fitResult = Tracks_fromMCParticle[trk]->getTrackFitResult(Const::ChargedStable(211));
 
       if (fitResult == NULL)
@@ -394,13 +409,13 @@ void TrackingPerformanceEvaluationModule::event()
           else
             continue;
 
-          if (MCTrackCands_fromMCParticle.size() > 0) {
-            nFittedTracksMCTC++;
-            m_h3_TracksPerMCTrackCand->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
+          if (MCRecoTracks_fromMCParticle.size() > 0) {
+            nFittedTracksMCRT++;
+            m_h3_TracksPerMCRecoTrack->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
             if (mcParticleInfo.getCharge() > 0)
-              m_h3_TracksPerMCTrackCand_plus->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
+              m_h3_TracksPerMCRecoTrack_plus->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
             else if (mcParticleInfo.getCharge() < 0)
-              m_h3_TracksPerMCTrackCand_minus->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
+              m_h3_TracksPerMCRecoTrack_minus->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
             else
               continue;
           }
@@ -413,12 +428,10 @@ void TrackingPerformanceEvaluationModule::event()
 
       }
     }
-    //  }
 
-    m_multiplicityTracks->Fill(nTracks);
     m_multiplicityFittedTracks->Fill(nFittedTracks);
-    if (MCTrackCands_fromMCParticle.size() > 0)
-      m_multiplicityFittedTracksPerMCTC->Fill(nFittedTracksMCTC);
+    if (MCRecoTracks_fromMCParticle.size() > 0)
+      m_multiplicityFittedTracksPerMCRT->Fill(nFittedTracksMCRT);
 
   }
 
@@ -426,20 +439,17 @@ void TrackingPerformanceEvaluationModule::event()
   B2DEBUG(99, "+++++ 2. loop on Tracks");
 
   //2. retrieve all the MCParticles related to the Tracks
-  //  StoreArray<genfit::Track> tracks(m_TracksName);
-  StoreArray<Track> tracks;//(m_TracksName);
+  StoreArray<Track> tracks(m_TracksName);
 
-  //  BOOST_FOREACH(genfit::Track & track, tracks) {
   BOOST_FOREACH(Track & track, tracks) {
 
     int nMCParticles = 0;
 
     //check if the track has been fitted
     const TrackFitResult* fitResult = track.getTrackFitResult(Const::ChargedStable(211));
-    //    const TrackFitResult* fitResult = DataStore::getRelatedFromObj<TrackFitResult>(&track);
+
     if (fitResult == NULL)
       continue;
-
 
     m_h1_pValue->Fill(fitResult->getPValue());
 
@@ -448,14 +458,7 @@ void TrackingPerformanceEvaluationModule::event()
 
     fillTrackErrParams2DHistograms(fitResult);
 
-    //    const TrackFitResult* fitResult = DataStore::getRelatedFromObj<TrackFitResult>(&track);
-    const genfit::Track* gfTrack = DataStore::getRelatedToObj<genfit::Track>(&track);
-    if (!gfTrack)
-      continue;
-    else
-      B2INFO("found a ggenfit track related!");
-
-    fillHitsUsedInTrackFitHistograms(*gfTrack);
+    fillHitsUsedInTrackFitHistograms(track);
 
     for (int layer = 0; layer < 56; layer++) {
       if (fitResult->getHitPatternCDC().hasLayer(layer))
@@ -475,129 +478,133 @@ void TrackingPerformanceEvaluationModule::event()
     }
 
 
-    //2.a retrieve all TrackCands related to the Track
-    RelationVector<genfit::TrackCand> TrackCands_fromTrack = DataStore::getRelationsToObj<genfit::TrackCand>(&track);
+    RelationVector<MCParticle> MCParticles_fromTrack = DataStore::getRelationsWithObj<MCParticle>(&track);
 
-    for (int tc = 0; tc < (int)TrackCands_fromTrack.size(); tc++) {
+    for (int mcp = 0; mcp < (int)MCParticles_fromTrack.size(); mcp++)
+      if (isTraceable(*MCParticles_fromTrack[mcp])) {
+        nMCParticles ++;
+        m_h3_MCParticlesPerTrack->Fill(momentum.Pt(), momentum.Theta(), momentum.Phi());
+      }
+    //    }
 
-      //2.b retrieve all MCParticles related to the TrackCand
-      RelationVector<MCParticle> MCParticles_fromTrackCand = DataStore::getRelationsFromObj<MCParticle>(TrackCands_fromTrack[tc]);
-
-      for (int mcp = 0; mcp < (int)MCParticles_fromTrackCand.size(); mcp++)
-        if (isTraceable(*MCParticles_fromTrackCand[mcp])) {
-          nMCParticles ++;
-          m_h3_MCParticlesPerTrack->Fill(momentum.Pt(), momentum.Theta(), momentum.Phi());
-        }
-    }
-
-    m_multiplicityMCParticles->Fill(nMCParticles);
+    m_multiplicityMCParticlesPerTrack->Fill(nMCParticles);
 
   }
 
-  B2DEBUG(99, "+++++ 3. loop on MCTrackCands");
 
-  //3. retrieve all MCTrackCands
-  StoreArray<genfit::TrackCand> mcTrackCands(m_MCTrackCandsName);
+  B2DEBUG(99, "+++++ 3. loop on MCRecoTracks");
+
+  //3. retrieve all MCRecoTracks
+  StoreArray<RecoTrack> mcRecoTracks(m_MCRecoTracksName);
   StoreArray<PXDCluster> pxdClusters;
   StoreArray<SVDCluster> svdClusters;
   StoreArray<CDCHit> cdcHit;
 
-  bool hasTrackCand = false;
+  bool hasRecoTrack = false;
 
-  BOOST_FOREACH(genfit::TrackCand & mcTrackCand, mcTrackCands) {
+  BOOST_FOREACH(RecoTrack & mcRecoTrack, mcRecoTracks) {
 
-    int nTrackCand = 0;
-    hasTrackCand = false;
+    int nRecoTrack = 0;
+    hasRecoTrack = false;
 
-    //3.a retrieve the trackcand
-    RelationVector<genfit::TrackCand> TrackCands_fromMCTrackCand = DataStore::getRelationsFromObj<genfit::TrackCand>(&mcTrackCand);
-    B2DEBUG(99, "~ " << TrackCands_fromMCTrackCand.size() << " TrackCands related to this MCTrackCand");
+    //3.a retrieve the RecoTrack
+    RelationVector<RecoTrack> RecoTracks_fromMCRecoTrack = DataStore::getRelationsWithObj<RecoTrack>(&mcRecoTrack);
+    B2DEBUG(99, "~ " << RecoTracks_fromMCRecoTrack.size() << " RecoTracks related to this MCRecoTrack");
+    m_multiplicityRecoTracksPerMCRT->Fill(RecoTracks_fromMCRecoTrack.size());
 
     //3.a retrieve the MCParticle
-    RelationVector<MCParticle> MCParticles_fromMCTrackCand = DataStore::getRelationsFromObj<MCParticle>(&mcTrackCand);
+    RelationVector<MCParticle> MCParticles_fromMCRecoTrack = DataStore::getRelationsWithObj<MCParticle>(&mcRecoTrack);
 
-    B2DEBUG(99, "~~~ " << MCParticles_fromMCTrackCand.size() << " MCParticles related to this MCTrackCand");
-    for (int mcp = 0; mcp < (int)MCParticles_fromMCTrackCand.size(); mcp++) {
+    B2DEBUG(99, "~~~ " << MCParticles_fromMCRecoTrack.size() << " MCParticles related to this MCRecoTrack");
+    for (int mcp = 0; mcp < (int)MCParticles_fromMCRecoTrack.size(); mcp++) {
 
-      //3.b retrieve all TrackCands related to the MCTrackCand
-      RelationVector<genfit::TrackCand> TrackCands_fromMCParticle = DataStore::getRelationsToObj<genfit::TrackCand>
-          (MCParticles_fromMCTrackCand[mcp]);
+      //3.b retrieve all RecoTracks related to the MCRecoTrack
+      RelationVector<RecoTrack> RecoTracks_fromMCParticle = DataStore::getRelationsWithObj<RecoTrack>
+                                                            (MCParticles_fromMCRecoTrack[mcp]);
 
-      B2DEBUG(99, "~~~~~ " << TrackCands_fromMCParticle.size() << " TrackCands related to this MCParticle");
-      for (int tc = 0; tc < (int)TrackCands_fromMCParticle.size(); tc++)
+      B2DEBUG(99, "~~~~~ " << RecoTracks_fromMCParticle.size() << " RecoTracks related to this MCParticle");
+      for (int tc = 0; tc < (int)RecoTracks_fromMCParticle.size(); tc++)
 
-        if (!hasTrackCand) {
+        if (!hasRecoTrack) {
 
-          hasTrackCand = true;
-          nTrackCand++;
+          hasRecoTrack = true;
+          nRecoTrack++;
 
-          genfit::TrackCandHit* thehitMCTC = 0;
-          for (int hitMCTC = 0; hitMCTC < (int)mcTrackCand.getNHits(); hitMCTC++) {
+          /*
+                genfit::TrackCandHit* thehitMCRT = 0;
+                for (int hitMCRT = 0; hitMCRT < (int)mcTrackCand.getNHits(); hitMCRT++) {
 
-            thehitMCTC = mcTrackCand.getHit(hitMCTC);
-            if (!thehitMCTC)
-              continue;
+                  thehitMCRT = mcTrackCand.getHit(hitMCRT);
+                  if (!thehitMCRT)
+                    continue;
 
-            int hitId = thehitMCTC->getHitId();
-            int detId = thehitMCTC->getDetId();
-            if (detId == 1)
-              m_h1_HitsMCTrackCand->Fill(pxdClusters[hitId]->getSensorID().getLayerNumber());
-            if (detId == 2)
-              m_h1_HitsMCTrackCand->Fill(svdClusters[hitId]->getSensorID().getLayerNumber());
-            //      if(thehitMCTC->getDetId() == 3)
-            //        m_h1_HitsMCTrackCand->Fill( cdcHit[hitId]->getLayer() );
+                  int hitId = thehitMCRT->getHitId();
+                  int detId = thehitMCRT->getDetId();
+                  if (detId == 1)
+                    m_h1_HitsMCRecoTrack->Fill(pxdClusters[hitId]->getSensorID().getLayerNumber());
+                  if (detId == 2)
+                    m_h1_HitsMCRecoTrack->Fill(svdClusters[hitId]->getSensorID().getLayerNumber());
+                  //      if(thehitMCRT->getDetId() == 3)
+                  //        m_h1_HitsMCRecoTrack->Fill( cdcHit[hitId]->getLayer() );
 
-            genfit::TrackCandHit* thehitTC = 0;
-            for (int hitTC = 0; hitTC < (int)TrackCands_fromMCParticle[tc]->getNHits(); hitTC++) {
+                  genfit::TrackCandHit* thehitTC = 0;
+                  for (int hitTC = 0; hitTC < (int)TrackCands_fromMCParticle[tc]->getNHits(); hitTC++) {
 
-              thehitTC = TrackCands_fromMCParticle[tc]->getHit(hitTC);
-              if (!thehitTC)
-                continue;
+                    thehitTC = TrackCands_fromMCParticle[tc]->getHit(hitTC);
+                    if (!thehitTC)
+                      continue;
 
-              if ((*thehitTC) == (*thehitMCTC)) {
-                if (detId == Const::PXD)
-                  m_h1_HitsTrackCandPerMCTrackCand->Fill(pxdClusters[hitId]->getSensorID().getLayerNumber());
-                if (detId == Const::SVD)
-                  m_h1_HitsTrackCandPerMCTrackCand->Fill(svdClusters[hitId]->getSensorID().getLayerNumber());
-                continue;
-              }
+                    if ((*thehitTC) == (*thehitMCRT)) {
+                      if (detId == Const::PXD)
+                        m_h1_HitsRecoTrackPerMCRecoTrack->Fill(pxdClusters[hitId]->getSensorID().getLayerNumber());
+                      if (detId == Const::SVD)
+                        m_h1_HitsRecoTrackPerMCRecoTrack->Fill(svdClusters[hitId]->getSensorID().getLayerNumber());
+                      continue;
+                    }
+                  }
             }
-          }
-
+          */
         }
+
     }
-    m_multiplicityTrackCands->Fill(nTrackCand);
 
   }
 
-  B2DEBUG(99, "+++++ 4. loop on TrackCands");
 
-  //4. retrieve all TrackCands
-  StoreArray<genfit::TrackCand> TrackCands;
+  B2DEBUG(99, "+++++ 4. loop on RecoTracks");
 
-  BOOST_FOREACH(genfit::TrackCand & trackCand, TrackCands) {
+  //4. retrieve all RecoTracks
+  StoreArray<RecoTrack> RecoTracks;
 
-    int nMCTrackCand = 0;
+  BOOST_FOREACH(RecoTrack & recoTrack, RecoTracks) {
 
+    //   int nMCRecoTrack = 0;
+
+    // retrieve the MCRecoTrack
+    RelationVector<RecoTrack> MCRecoTracks_fromRecoTrack = DataStore::getRelationsWithObj<RecoTrack>(&recoTrack, m_MCRecoTracksName);
+    m_multiplicityMCRecoTracksPerRT->Fill(MCRecoTracks_fromRecoTrack.size());
+
+
+    /*
     //4.a retrieve the MCParticle
-    RelationVector<MCParticle> MCParticles_fromTrackCand = DataStore::getRelationsFromObj<MCParticle>(&trackCand);
+    RelationVector<MCParticle> MCParticles_fromRecoTrack = DataStore::getRelationsWithObj<MCParticle>(&recoTrack);
 
-    B2DEBUG(99, "~~~ " << MCParticles_fromTrackCand.size() << " MCParticles related to this TrackCand");
-    for (int mcp = 0; mcp < (int)MCParticles_fromTrackCand.size(); mcp++) {
+    B2DEBUG(99, "~~~ " << MCParticles_fromRecoTrack.size() << " MCParticles related to this RecoTrack");
+    for (int mcp = 0; mcp < (int)MCParticles_fromRecoTrack.size(); mcp++) {
 
-      //4.b retrieve all MCTrackCands related to the TrackCand
-      RelationVector<genfit::TrackCand> mcTrackCands_fromMCParticle = DataStore::getRelationsToObj<genfit::TrackCand>
-          (MCParticles_fromTrackCand[mcp], m_MCTrackCandsName);
+      //4.b retrieve all MCRecoTracks related to the RecoTrack
+      RelationVector<RecoTrack> mcRecoTracks_fromMCParticle = DataStore::getRelationsWithObj<RecoTrack>
+    (MCParticles_fromRecoTrack[mcp], m_MCRecoTracksName);
 
-      B2DEBUG(99, "~~~~~ " << mcTrackCands_fromMCParticle.size() << " MCTrackCands related to this MCParticle");
-      for (int mctc = 0; mctc < (int)mcTrackCands_fromMCParticle.size(); mctc++) {
-        nMCTrackCand++;
+      B2DEBUG(99, "~~~~~ " << mcRecoTracks_fromMCParticle.size() << " MCRecoTracks related to this MCParticle");
+      for (int mctc = 0; mctc < (int)mcRecoTracks_fromMCParticle.size(); mctc++) {
+        nMCRecoTrack++;
 
       }
     }
 
-    m_multiplicityMCTrackCands->Fill(nMCTrackCand);
-
+    //    m_multiplicityMCRecoTracksPerRT->Fill(nMCRecoTrack);
+    */
   }
 
 }
@@ -614,29 +621,29 @@ void TrackingPerformanceEvaluationModule::endRun()
   double efficiency = num / den ;
   double efficiencyErr =  sqrt(efficiency * (1 - efficiency)) / sqrt(den);
 
-  double nFittedTracksMCTC = 0;
-  for (int bin = 1; bin < m_multiplicityFittedTracksPerMCTC->GetNbinsX(); bin ++)
-    nFittedTracksMCTC += m_multiplicityFittedTracksPerMCTC->GetBinContent(bin + 1);
-  double efficiencyMCTC = nFittedTracksMCTC / m_multiplicityFittedTracksPerMCTC->GetEntries();
-  double efficiencyMCTCErr =  sqrt(efficiencyMCTC * (1 - efficiencyMCTC)) / sqrt(m_multiplicityFittedTracksPerMCTC->GetEntries());
+  double nFittedTracksMCRT = 0;
+  for (int bin = 1; bin < m_multiplicityFittedTracksPerMCRT->GetNbinsX(); bin ++)
+    nFittedTracksMCRT += m_multiplicityFittedTracksPerMCRT->GetBinContent(bin + 1);
+  double efficiencyMCRT = nFittedTracksMCRT / m_multiplicityFittedTracksPerMCRT->GetEntries();
+  double efficiencyMCRTErr =  sqrt(efficiencyMCRT * (1 - efficiencyMCRT)) / sqrt(m_multiplicityFittedTracksPerMCRT->GetEntries());
 
-  double nTrackCand = 0;
-  for (int bin = 1; bin < m_multiplicityTrackCands->GetNbinsX(); bin ++)
-    nTrackCand += m_multiplicityTrackCands->GetBinContent(bin + 1);
-  double efficiencyPR = nTrackCand / m_multiplicityTrackCands->GetEntries();
-  double efficiencyPRErr =  sqrt(efficiencyPR * (1 - efficiencyPR)) / sqrt(m_multiplicityTrackCands->GetEntries());
+  double nRecoTrack = 0;
+  for (int bin = 1; bin < m_multiplicityRecoTracksPerMCRT->GetNbinsX(); bin ++)
+    nRecoTrack += m_multiplicityRecoTracksPerMCRT->GetBinContent(bin + 1);
+  double efficiencyPR = nRecoTrack / m_multiplicityRecoTracksPerMCRT->GetEntries();
+  double efficiencyPRErr =  sqrt(efficiencyPR * (1 - efficiencyPR)) / sqrt(m_multiplicityRecoTracksPerMCRT->GetEntries());
 
-  double nMCTrackCand = 0;
-  for (int bin = 1; bin < m_multiplicityMCTrackCands->GetNbinsX(); bin ++)
-    nMCTrackCand += m_multiplicityMCTrackCands->GetBinContent(bin + 1);
-  double purityPR = nMCTrackCand / m_multiplicityMCTrackCands->GetEntries();
-  double purityPRErr =  sqrt(purityPR * (1 - purityPR)) / sqrt(m_multiplicityMCTrackCands->GetEntries());
+  double nMCRecoTrack = 0;
+  for (int bin = 1; bin < m_multiplicityMCRecoTracksPerRT->GetNbinsX(); bin ++)
+    nMCRecoTrack += m_multiplicityMCRecoTracksPerRT->GetBinContent(bin + 1);
+  double purityPR = nMCRecoTrack / m_multiplicityMCRecoTracksPerRT->GetEntries();
+  double purityPRErr =  sqrt(purityPR * (1 - purityPR)) / sqrt(m_multiplicityMCRecoTracksPerRT->GetEntries());
 
   double nMCParticles = 0;
-  for (int bin = 1; bin < m_multiplicityMCParticles->GetNbinsX(); bin ++)
-    nMCParticles += m_multiplicityMCParticles->GetBinContent(bin + 1);
-  double purity = nMCParticles / m_multiplicityMCParticles->GetEntries();
-  double purityErr =  sqrt(purity * (1 - purity)) / sqrt(m_multiplicityMCParticles->GetEntries());
+  for (int bin = 1; bin < m_multiplicityMCParticlesPerTrack->GetNbinsX(); bin ++)
+    nMCParticles += m_multiplicityMCParticlesPerTrack->GetBinContent(bin + 1);
+  double purity = nMCParticles / m_multiplicityMCParticlesPerTrack->GetEntries();
+  double purityErr =  sqrt(purity * (1 - purity)) / sqrt(m_multiplicityMCParticlesPerTrack->GetEntries());
 
   B2INFO("");
   B2INFO("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
@@ -647,19 +654,11 @@ void TrackingPerformanceEvaluationModule::endRun()
   B2INFO("       purity = " << purity * 100 << " +/- " << purityErr * 100 << ")% ");
   B2INFO("");
   B2INFO(" + factorizing geometrical acceptance:");
-  B2INFO("   efficiency = " << efficiencyMCTC * 100 << " +/- " << efficiencyMCTCErr * 100 << ")% ");
+  B2INFO("   efficiency = " << efficiencyMCRT * 100 << " +/- " << efficiencyMCRTErr * 100 << ")% ");
   B2INFO("");
   B2INFO(" + pattern recognition:");
   B2INFO("   efficiency = " << efficiencyPR * 100 << " +/- " << efficiencyPRErr * 100 << ")% ");
   B2INFO("       purity = " << purityPR * 100 << " +/- " << purityPRErr * 100 << ")% ");
-  /*  B2INFO("     nFittedTracks = "<< nFittedTracks );
-  B2INFO("     n inefficiency = "<< m_multiplicityFittedTracks->GetBinContent(1) );
-  B2INFO("           NUM = "<< nFittedTracks );
-  B2INFO("           DEN = "<< nFittedTracks+m_multiplicityFittedTracks->GetBinContent(1) ); */
-  /*  B2INFO("     nMCParticles = "<< nMCParticles);
-  B2INFO("     n inpurity = "<< m_multiplicityMCParticles->GetBinContent(1) );
-  B2INFO("           NUM = "<< nMCParticles );
-  B2INFO("           DEN = "<< nMCParticles+m_multiplicityMCParticles->GetBinContent(1) );*/
   B2INFO("");
   B2INFO("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 }
@@ -668,20 +667,42 @@ void TrackingPerformanceEvaluationModule::terminate()
 {
 
 
-  //  addMoreEfficiencyPlots(m_histoList, m_h3_TracksPerMCParticle, m_h3_MCParticle);
-  //  addMoreInefficiencyPlots(m_histoList, m_h3_TracksPerMCParticle, m_h3_MCParticle);
-  addMoreEfficiencyPlots(m_histoList);
-  addMoreInefficiencyPlots(m_histoList);
+  addMoreEfficiencyPlots(m_histoList_efficiency);
+  addMoreInefficiencyPlots(m_histoList_efficiency);
 
   addPurityPlots(m_histoList, m_h3_MCParticlesPerTrack, m_h3_Tracks);
 
   if (m_rootFilePtr != NULL) {
     m_rootFilePtr->cd();
 
-    TIter nextH(m_histoList);
+    TDirectory* oldDir = gDirectory;
+
+    TDirectory* dir_multiplicity = oldDir->mkdir("multiplicity");
+    dir_multiplicity->cd();
+    TIter nextH_multiplicity(m_histoList_multiplicity);
     TObject* obj;
-    while ((obj = nextH()))
+    while ((obj = nextH_multiplicity()))
       obj->Write();
+
+    TDirectory* dir_efficiency = oldDir->mkdir("efficiency");
+    dir_efficiency->cd();
+    TIter nextH_efficiency(m_histoList_efficiency);
+    while ((obj = nextH_efficiency()))
+      obj->Write();
+
+    TDirectory* dir_trkQuality = oldDir->mkdir("trkQuality");
+    dir_trkQuality->cd();
+    TIter nextH_trkQuality(m_histoList_trkQuality);
+    while ((obj = nextH_trkQuality()))
+      obj->Write();
+
+    TDirectory* dir_firstHit = oldDir->mkdir("firstHit");
+    dir_firstHit->cd();
+    TIter nextH_firstHit(m_histoList_firstHit);
+    while ((obj = nextH_firstHit()))
+      obj->Write();
+
+
 
 
     m_rootFilePtr->Close();
@@ -703,10 +724,7 @@ void  TrackingPerformanceEvaluationModule::fillTrackParams1DHistograms(const Tra
 
   //track parameters residuals:
   double d0_res = fitResult->getD0() - mcParticleInfo.getD0();
-
-  //  double phi_res = fmod(fitResult->getPhi() - mcParticleInfo.getPhi() + 2*TMath::Pi(), 2 * TMath::Pi()); //giulia
   double phi_res = TMath::ASin(TMath::Sin(fitResult->getPhi() - mcParticleInfo.getPhi()));   //giulia
-
   double omega_res =  fitResult->getOmega() - mcParticleInfo.getOmega();
   double z0_res = fitResult->getZ0() - mcParticleInfo.getZ0();
   double cotTheta_res = fitResult->getCotTheta() - mcParticleInfo.getCotTheta();
@@ -770,11 +788,13 @@ void  TrackingPerformanceEvaluationModule::fillTrackErrParams2DHistograms(const 
 
 }
 
-void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const genfit::Track& track)
+void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const Track& theTrack)
 {
 
   //hits used in the fit
-  int nHits = track.getNumPointsWithMeasurement();
+
+  const TrackFitResult* fitResult = theTrack.getTrackFitResult(Const::ChargedStable(211));
+
   VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
   bool hasPXDhit = false;
@@ -782,12 +802,6 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
   double z0_err = -999;
   double pt = -999;
 
-  //  const TrackFitResult* fitResult = DataStore::getRelatedFromObj<TrackFitResult>(&track);
-  const Track* theTrack = DataStore::getRelatedFromObj<Track>(&track);
-  if (! theTrack)
-    return;
-
-  const TrackFitResult* fitResult = theTrack->getTrackFitResult(Const::ChargedStable(211));
 
   if (fitResult != NULL) { // valid TrackFitResult found
     d0_err = sqrt((fitResult->getCovariance5())[0][0]);
@@ -797,113 +811,118 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
   bool hasCDChit[56] = { false };
 
-  B2INFO("number of hits: " << nHits);
-  for (int i = 0; i < nHits; i++) {
-    genfit::TrackPoint* tp = track.getPointWithMeasurement(i);
+  RelationVector<RecoTrack> RecoTracks_fromTrack = DataStore::getRelationsWithObj<RecoTrack>(&theTrack);
 
-    int nMea = tp->getNumRawMeasurements();
-    for (int mea = 0; mea < nMea; mea++) {
+  for (int tc = 0; tc < (int)RecoTracks_fromTrack.size(); tc++) {
 
-      genfit::AbsMeasurement* absMeas = tp->getRawMeasurement(mea);
-      double weight = 0;
+    const std::vector< genfit::TrackPoint* >& tp_vector = RecoTracks_fromTrack[tc]->getHitPointsWithMeasurement();
+    for (int i = 0; i < (int) tp_vector.size(); i++) {
+      genfit::TrackPoint* tp = tp_vector[i];
 
-      std::vector<double> weights;
-      genfit::KalmanFitterInfo* kalmanInfo = tp->getKalmanFitterInfo();
-      if (kalmanInfo)
-        weights = kalmanInfo->getWeights();
-      else //no kalman fitter info, fill the weights vector with 0 (VXD), or 0,0 (CDC)
-        B2WARNING(" No KalmanFitterInfo associated to the TrackPoint!");
+      int nMea = tp->getNumRawMeasurements();
+      for (int mea = 0; mea < nMea; mea++) {
 
-      double detId(-999);
-      TVector3 globalHit(-999, -999, -999);
+        genfit::AbsMeasurement* absMeas = tp->getRawMeasurement(mea);
+        double weight = 0;
 
-      PXDRecoHit* pxdHit =  dynamic_cast<PXDRecoHit*>(absMeas);
-      SVDRecoHit2D* svdHit2D =  dynamic_cast<SVDRecoHit2D*>(absMeas);
-      SVDRecoHit* svdHit =  dynamic_cast<SVDRecoHit*>(absMeas);
-      CDCRecoHit* cdcHit =  dynamic_cast<CDCRecoHit*>(absMeas);
-
-      if (pxdHit) {
-        hasPXDhit = true;
-
+        std::vector<double> weights;
+        genfit::KalmanFitterInfo* kalmanInfo = tp->getKalmanFitterInfo();
         if (kalmanInfo)
-          weight = weights.at(mea);
+          weights = kalmanInfo->getWeights();
+        else //no kalman fitter info, fill the weights vector with 0 (VXD), or 0,0 (CDC)
+          B2WARNING(" No KalmanFitterInfo associated to the TrackPoint!");
 
-        detId = 0;
-        double uCoor = pxdHit->getU();
-        double vCoor = pxdHit->getV();
-        VxdID sensor = pxdHit->getSensorID();
+        double detId(-999);
+        TVector3 globalHit(-999, -999, -999);
 
-        m_h1_nVXDhitsPR->Fill(sensor.getLayerNumber());
+        PXDRecoHit* pxdHit =  dynamic_cast<PXDRecoHit*>(absMeas);
+        SVDRecoHit2D* svdHit2D =  dynamic_cast<SVDRecoHit2D*>(absMeas);
+        SVDRecoHit* svdHit =  dynamic_cast<SVDRecoHit*>(absMeas);
+        CDCRecoHit* cdcHit =  dynamic_cast<CDCRecoHit*>(absMeas);
 
-        m_h1_nVXDhitsWeighted->Fill(sensor.getLayerNumber() , weight);
+        if (pxdHit) {
+          hasPXDhit = true;
 
-        m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
-        const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-        globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
+          if (kalmanInfo)
+            weight = weights.at(mea);
 
-      } else if (svdHit2D) {
+          detId = 0;
+          double uCoor = pxdHit->getU();
+          double vCoor = pxdHit->getV();
+          VxdID sensor = pxdHit->getSensorID();
 
-        if (kalmanInfo)
-          weight = weights.at(mea);
+          m_h1_nVXDhitsPR->Fill(sensor.getLayerNumber());
 
-        detId = 1;
-        double uCoor = svdHit2D->getU();
-        double vCoor = svdHit2D->getV();
-        VxdID sensor = svdHit2D->getSensorID();
+          m_h1_nVXDhitsWeighted->Fill(sensor.getLayerNumber() , weight);
 
-        m_h1_nVXDhitsPR->Fill(sensor.getLayerNumber());
+          m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
+          const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
+          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
 
-        m_h1_nVXDhitsWeighted->Fill(sensor.getLayerNumber() , weight);
+        } else if (svdHit2D) {
 
-        m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
+          if (kalmanInfo)
+            weight = weights.at(mea);
 
-        const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-        globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
+          detId = 1;
+          double uCoor = svdHit2D->getU();
+          double vCoor = svdHit2D->getV();
+          VxdID sensor = svdHit2D->getSensorID();
 
-      } else if (svdHit) {
+          m_h1_nVXDhitsPR->Fill(sensor.getLayerNumber());
 
-        if (kalmanInfo)
-          weight = weights.at(mea);
+          m_h1_nVXDhitsWeighted->Fill(sensor.getLayerNumber() , weight);
 
-        detId = 2;
-        double uCoor = 0;
-        double vCoor = 0;
-        if (svdHit->isU())
-          uCoor = svdHit->getPosition();
-        else
-          vCoor =  svdHit->getPosition();
+          m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
 
-        VxdID sensor = svdHit->getSensorID();
-        m_h1_nVXDhitsPR->Fill(sensor.getLayerNumber());
+          const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
+          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
 
-        m_h1_nVXDhitsWeighted->Fill(sensor.getLayerNumber() , weight);
+        } else if (svdHit) {
 
-        m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
-        const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
-        globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
-      } else if (cdcHit) {
+          if (kalmanInfo)
+            weight = weights.at(mea);
 
-        if (kalmanInfo)
-          weight = weights.at(mea);
+          detId = 2;
+          double uCoor = 0;
+          double vCoor = 0;
+          if (svdHit->isU())
+            uCoor = svdHit->getPosition();
+          else
+            vCoor =  svdHit->getPosition();
 
-        WireID wire = cdcHit->getWireID();
-        if (! hasCDChit[wire.getICLayer()]) { //needed to validate the HitPatternCDC filling
-          m_h1_nCDChitsPR->Fill(wire.getICLayer());
+          VxdID sensor = svdHit->getSensorID();
+          m_h1_nVXDhitsPR->Fill(sensor.getLayerNumber());
 
-          m_h1_nCDChitsWeighted->Fill(wire.getICLayer() , weight);
-          //    hasCDChit[wire.getICLayer()] = true;  //to validate the HitPatternCDC filling: uncomment this
+          m_h1_nVXDhitsWeighted->Fill(sensor.getLayerNumber() , weight);
+
+          m_h2_TrackPointFitWeightVXD->Fill(sensor.getLayerNumber(), weight);
+          const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensor);
+          globalHit = aSensorInfo.pointToGlobal(TVector3(uCoor, vCoor, 0));
+        } else if (cdcHit) {
+
+          if (kalmanInfo)
+            weight = weights.at(mea);
+
+          WireID wire = cdcHit->getWireID();
+          if (! hasCDChit[wire.getICLayer()]) { //needed to validate the HitPatternCDC filling
+            m_h1_nCDChitsPR->Fill(wire.getICLayer());
+
+            m_h1_nCDChitsWeighted->Fill(wire.getICLayer() , weight);
+            //    hasCDChit[wire.getICLayer()] = true;  //to validate the HitPatternCDC filling: uncomment this
+          }
+          m_h2_TrackPointFitWeightCDC->Fill(wire.getICLayer(), weight);
+          detId = 3;
         }
-        m_h2_TrackPointFitWeightCDC->Fill(wire.getICLayer(), weight);
-        detId = 3;
+
+
+        m_h1_nHitDetID ->Fill(detId);
+
+        m_h2_VXDhitsPR_xy->Fill(globalHit.X(), globalHit.Y());
+
+        m_h2_VXDhitsPR_rz->Fill(globalHit.Z(), globalHit.Perp());
+
       }
-
-
-
-      m_h1_nHitDetID ->Fill(detId);
-
-      m_h2_VXDhitsPR_xy->Fill(globalHit.X(), globalHit.Y());
-
-      m_h2_VXDhitsPR_rz->Fill(globalHit.Z(), globalHit.Perp());
 
     }
   }
@@ -936,18 +955,18 @@ void TrackingPerformanceEvaluationModule::addMoreInefficiencyPlots(TList* histoL
                                             m_h3_MCParticle, false, 2);
   histoList->Add(h_ineff_phi);
 
-  //normalized to MCTrackCands
-  TH1F* h_ineffMCTC_pt = createHistogramsRatio("hineffMCTCpt", "inefficiency VS pt, normalized to MCTrackCand",
-                                               m_h3_TracksPerMCTrackCand, m_h3_MCTrackCand, false, 0);
-  histoList->Add(h_ineffMCTC_pt);
+  //normalized to MCRecoTracks
+  TH1F* h_ineffMCRT_pt = createHistogramsRatio("hineffMCRTpt", "inefficiency VS pt, normalized to MCRecoTrack",
+                                               m_h3_TracksPerMCRecoTrack, m_h3_MCRecoTrack, false, 0);
+  histoList->Add(h_ineffMCRT_pt);
 
-  TH1F* h_ineffMCTC_theta = createHistogramsRatio("hineffMCTCtheta", "inefficiency VS #theta, normalized to MCTrackCand",
-                                                  m_h3_TracksPerMCTrackCand, m_h3_MCTrackCand, false, 1);
-  histoList->Add(h_ineffMCTC_theta);
+  TH1F* h_ineffMCRT_theta = createHistogramsRatio("hineffMCRTtheta", "inefficiency VS #theta, normalized to MCRecoTrack",
+                                                  m_h3_TracksPerMCRecoTrack, m_h3_MCRecoTrack, false, 1);
+  histoList->Add(h_ineffMCRT_theta);
 
-  TH1F* h_ineffMCTC_phi = createHistogramsRatio("hineffMCTCphi", "inefficiency VS #phi, normalized to MCTrackCand",
-                                                m_h3_TracksPerMCTrackCand, m_h3_MCTrackCand, false, 2);
-  histoList->Add(h_ineffMCTC_phi);
+  TH1F* h_ineffMCRT_phi = createHistogramsRatio("hineffMCRTphi", "inefficiency VS #phi, normalized to MCRecoTrack",
+                                                m_h3_TracksPerMCRecoTrack, m_h3_MCRecoTrack, false, 2);
+  histoList->Add(h_ineffMCRT_phi);
 
 }
 
@@ -955,7 +974,7 @@ void TrackingPerformanceEvaluationModule::addMoreEfficiencyPlots(TList* histoLis
 {
 
 
-  TH1F* h_wPXDhits_pt = createHistogramsRatio("hPXDhitspt", "fraction of tracks with PXD hits VS pt",
+  TH1F* h_wPXDhits_pt = createHistogramsRatio("hTrkswPXDhits", "fraction of tracks with PXD hits VS pt",
                                               m_h3_TrackswPXDHitsPerMCParticle,
                                               m_h3_TracksPerMCParticle, true, 0);
   histoList->Add(h_wPXDhits_pt);
@@ -974,18 +993,18 @@ void TrackingPerformanceEvaluationModule::addMoreEfficiencyPlots(TList* histoLis
                                           m_h3_MCParticle, true, 2);
   histoList->Add(h_eff_phi);
 
-  //normalized to MCTrackCands
-  TH1F* h_effMCTC_pt = createHistogramsRatio("heffMCTCpt", "efficiency VS pt, normalized to MCTrackCand", m_h3_TracksPerMCTrackCand,
-                                             m_h3_MCTrackCand, true, 0);
-  histoList->Add(h_effMCTC_pt);
+  //normalized to MCRecoTracks
+  TH1F* h_effMCRT_pt = createHistogramsRatio("heffMCRTpt", "efficiency VS pt, normalized to MCRecoTrack", m_h3_TracksPerMCRecoTrack,
+                                             m_h3_MCRecoTrack, true, 0);
+  histoList->Add(h_effMCRT_pt);
 
-  TH1F* h_effMCTC_theta = createHistogramsRatio("heffMCTCtheta", "efficiency VS #theta, normalized to MCTrackCand",
-                                                m_h3_TracksPerMCTrackCand, m_h3_MCTrackCand, true, 1);
-  histoList->Add(h_effMCTC_theta);
+  TH1F* h_effMCRT_theta = createHistogramsRatio("heffMCRTtheta", "efficiency VS #theta, normalized to MCRecoTrack",
+                                                m_h3_TracksPerMCRecoTrack, m_h3_MCRecoTrack, true, 1);
+  histoList->Add(h_effMCRT_theta);
 
-  TH1F* h_effMCTC_phi = createHistogramsRatio("heffMCTCphi", "efficiency VS #phi, normalized to MCTrackCand",
-                                              m_h3_TracksPerMCTrackCand, m_h3_MCTrackCand, true, 2);
-  histoList->Add(h_effMCTC_phi);
+  TH1F* h_effMCRT_phi = createHistogramsRatio("heffMCRTphi", "efficiency VS #phi, normalized to MCRecoTrack",
+                                              m_h3_TracksPerMCRecoTrack, m_h3_MCRecoTrack, true, 2);
+  histoList->Add(h_effMCRT_phi);
 
   // plus
 
@@ -1003,18 +1022,18 @@ void TrackingPerformanceEvaluationModule::addMoreEfficiencyPlots(TList* histoLis
                                                m_h3_TracksPerMCParticle_plus, m_h3_MCParticle_plus, true, 2);
   histoList->Add(h_eff_phi_plus);
 
-  //normalized to MCTrackCands
-  TH1F* h_effMCTC_pt_plus = createHistogramsRatio("heffMCTCpt_plus", "efficiency VS pt, normalized to positive MCTrackCand",
-                                                  m_h3_TracksPerMCTrackCand_plus, m_h3_MCTrackCand_plus, true, 0);
-  histoList->Add(h_effMCTC_pt_plus);
+  //normalized to MCRecoTracks
+  TH1F* h_effMCRT_pt_plus = createHistogramsRatio("heffMCRTpt_plus", "efficiency VS pt, normalized to positive MCRecoTrack",
+                                                  m_h3_TracksPerMCRecoTrack_plus, m_h3_MCRecoTrack_plus, true, 0);
+  histoList->Add(h_effMCRT_pt_plus);
 
-  TH1F* h_effMCTC_theta_plus = createHistogramsRatio("heffMCTCtheta_plus", "efficiency VS #theta, normalized to positive MCTrackCand",
-                                                     m_h3_TracksPerMCTrackCand_plus, m_h3_MCTrackCand_plus, true, 1);
-  histoList->Add(h_effMCTC_theta_plus);
+  TH1F* h_effMCRT_theta_plus = createHistogramsRatio("heffMCRTtheta_plus", "efficiency VS #theta, normalized to positive MCRecoTrack",
+                                                     m_h3_TracksPerMCRecoTrack_plus, m_h3_MCRecoTrack_plus, true, 1);
+  histoList->Add(h_effMCRT_theta_plus);
 
-  TH1F* h_effMCTC_phi_plus = createHistogramsRatio("heffMCTCphi_plus", "efficiency VS #phi, normalized to positive MCTrackCand",
-                                                   m_h3_TracksPerMCTrackCand_plus, m_h3_MCTrackCand_plus, true, 2);
-  histoList->Add(h_effMCTC_phi_plus);
+  TH1F* h_effMCRT_phi_plus = createHistogramsRatio("heffMCRTphi_plus", "efficiency VS #phi, normalized to positive MCRecoTrack",
+                                                   m_h3_TracksPerMCRecoTrack_plus, m_h3_MCRecoTrack_plus, true, 2);
+  histoList->Add(h_effMCRT_phi_plus);
 
   // minus
 
@@ -1032,22 +1051,22 @@ void TrackingPerformanceEvaluationModule::addMoreEfficiencyPlots(TList* histoLis
                                                 m_h3_TracksPerMCParticle_minus, m_h3_MCParticle_minus, true, 2);
   histoList->Add(h_eff_phi_minus);
 
-  //normalized to MCTrackCands
-  TH1F* h_effMCTC_pt_minus = createHistogramsRatio("heffMCTCpt_minus", "efficiency VS pt, normalized to positive MCTrackCand",
-                                                   m_h3_TracksPerMCTrackCand_minus, m_h3_MCTrackCand_minus, true, 0);
-  histoList->Add(h_effMCTC_pt_minus);
+  //normalized to MCRecoTracks
+  TH1F* h_effMCRT_pt_minus = createHistogramsRatio("heffMCRTpt_minus", "efficiency VS pt, normalized to positive MCRecoTrack",
+                                                   m_h3_TracksPerMCRecoTrack_minus, m_h3_MCRecoTrack_minus, true, 0);
+  histoList->Add(h_effMCRT_pt_minus);
 
-  TH1F* h_effMCTC_theta_minus = createHistogramsRatio("heffMCTCtheta_minus",
-                                                      "efficiency VS #theta, normalized to positive MCTrackCand", m_h3_TracksPerMCTrackCand_minus, m_h3_MCTrackCand_minus, true, 1);
-  histoList->Add(h_effMCTC_theta_minus);
+  TH1F* h_effMCRT_theta_minus = createHistogramsRatio("heffMCRTtheta_minus",
+                                                      "efficiency VS #theta, normalized to positive MCRecoTrack", m_h3_TracksPerMCRecoTrack_minus, m_h3_MCRecoTrack_minus, true, 1);
+  histoList->Add(h_effMCRT_theta_minus);
 
-  TH1F* h_effMCTC_phi_minus = createHistogramsRatio("heffMCTCphi_minus", "efficiency VS #phi, normalized to positive MCTrackCand",
-                                                    m_h3_TracksPerMCTrackCand_minus, m_h3_MCTrackCand_minus, true, 2);
-  histoList->Add(h_effMCTC_phi_minus);
+  TH1F* h_effMCRT_phi_minus = createHistogramsRatio("heffMCRTphi_minus", "efficiency VS #phi, normalized to positive MCRecoTrack",
+                                                    m_h3_TracksPerMCRecoTrack_minus, m_h3_MCRecoTrack_minus, true, 2);
+  histoList->Add(h_effMCRT_phi_minus);
 
   //pattern recognition efficiency
-  TH1F* h_effPR = createHistogramsRatio("heffPR", "PR efficiency VS VXD Layer, normalized to MCTrackCand",
-                                        m_h1_HitsTrackCandPerMCTrackCand, m_h1_HitsMCTrackCand, true, 0);
+  TH1F* h_effPR = createHistogramsRatio("heffPR", "PR efficiency VS VXD Layer, normalized to MCRecoTrack",
+                                        m_h1_HitsRecoTrackPerMCRecoTrack, m_h1_HitsMCRecoTrack, true, 0);
   histoList->Add(h_effPR);
 
   //tracks used in the fit

@@ -61,6 +61,14 @@ def main():
     )
 
     argument_parser.add_argument(
+        "-a",
+        "--auxiliaries",
+	nargs="*",
+	default=[],
+        help="Variable names to show auxiliary distribiutions",
+    )
+
+    argument_parser.add_argument(
         "-s",
         "--show",
         action="store_true",
@@ -81,10 +89,11 @@ def main():
         overview_file_name = records_file_basename + ".overview" + ext
         overview_file_path = os.path.join(records_folder_path, overview_file_name)
 
-        overview = ClassificationOverview(overview_file_path, 
+        overview = ClassificationOverview(overview_file_path,
                                           truth_name=arguments.truth,
                                           select=arguments.vars,
                                           groupbys=arguments.groupbys,
+                                          auxiliaries=arguments.auxiliaries,
                                           filters=arguments.filters,
                                           )
         overview.train(input_tree)

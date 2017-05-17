@@ -174,7 +174,7 @@ namespace Belle2 {
     void importAsicInfo();
 
     /**
-     * Import ARICH ASICs data in the database.
+     * Import large histograms from ARICH ASICs data in the database.
      */
     void importAsicInfoRoot();
 
@@ -205,6 +205,10 @@ namespace Belle2 {
      * Import ARICH FEB test data in the database.
      */
     void importFebTest();
+
+    /**
+     * Import large histograms from ARICH FEB test data in the database.
+     */
     void importFebTestRoot();
 
     /**

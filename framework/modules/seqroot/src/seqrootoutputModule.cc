@@ -94,7 +94,6 @@ void SeqRootOutputModule::event()
   int stat = m_file->write(msg->buffer());
   //  printf("SeqRootOuput : write = %d\n", stat);
 
-  // Clean up EvtMessage
   delete msg;
 
   // Statistics
@@ -171,14 +170,12 @@ void SeqRootOutputModule::writeStreamerInfos()
     //       TMessage messinfo(kMESS_STREAMERINFO);
     //       messinfo.WriteObject(minilist);
     m_msghandler->add(minilist, "StreamerInfo");
-    //      EvtMessage* msg = m_msghandler->encode_msg(MSG_EVENT);
     EvtMessage* msg = m_msghandler->encode_msg(MSG_STREAMERINFO);
     (msg->header())->nObjects = 1;       // No. of objects
     (msg->header())->nArrays = 0;    // No. of arrays
     int size = m_file->write(msg->buffer());
     B2INFO("Wrote StreamerInfo to a file : " << size << "bytes");
     delete minilist;
+    delete msg;
   }
-
-  return;
 }

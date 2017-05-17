@@ -21,26 +21,25 @@ namespace Belle2 {
   typedef std::pair<std::string, DataStore::EDurability>
   AccessorParams; /**< Pair of parameters needed to find an object in the DataStore. */
 
-  /** Base class for StoreObjPtr and StoreArray for easier common treatment.
-   *
-   *  @author <a href="mailto:software@belle2.kek.jp?subject=StoreAccessorBase">The basf2 developers</a>
-   */
+  /** Base class for StoreObjPtr and StoreArray for easier common treatment.  */
   class StoreAccessorBase {
   public:
 
-    /** Constructor to access an array in the DataStore.
+    /** Constructor to access an object or array in the DataStore.
      *
      *  @param name       Name under which the object is stored in the DataStore.
      *  @param durability Decides durability map used for getting the accessed object.
+     *  @param objClass   Type of the object
+     *  @param isArray    true if the entry in the DataStore is an array
      */
-    StoreAccessorBase(const std::string& name, DataStore::EDurability durability, const TClass* objClass, bool isArray):
-      m_name(name), m_durability(durability), m_class(objClass), m_isArray(isArray) {};
+    StoreAccessorBase(const std::string& name, DataStore::EDurability durability, TClass* objClass, bool isArray):
+      m_name(name), m_durability(durability), m_class(objClass), m_isArray(isArray) {}
 
     /** Destructor.
      *
      *  Virtual because this is a base class.
      */
-    virtual ~StoreAccessorBase() {};
+    virtual ~StoreAccessorBase() {}
 
     /** Register the object/array in the DataStore.
      *  This must be called in the initialization phase.
@@ -106,7 +105,7 @@ namespace Belle2 {
     bool create(bool replace = false)
     {
       return DataStore::Instance().createObject(0, replace, *this);
-    };
+    }
 
     /** Assign 'object' to this accessor. (takes ownership).
      *
@@ -130,7 +129,7 @@ namespace Belle2 {
     DataStore::EDurability getDurability() const { return m_durability; }
 
     /** Return pair of name and durability under which stored object is saved.  */
-    AccessorParams getAccessorParams() const { return make_pair(m_name, m_durability);};
+    AccessorParams getAccessorParams() const { return make_pair(m_name, m_durability);}
 
     /** Check if two store accessors point to the same object/array. */
     virtual bool operator==(const StoreAccessorBase& other) const
@@ -145,7 +144,7 @@ namespace Belle2 {
     }
 
     /** The underlying object's type. */
-    const TClass* getClass() const { return m_class; }
+    TClass* getClass() const { return m_class; }
 
     /** Is this an accessor for an array? */
     bool isArray() const { return m_isArray; }
@@ -168,7 +167,7 @@ namespace Belle2 {
     DataStore::EDurability m_durability;
 
     /** The underlying object's type. */
-    const TClass* m_class;
+    TClass* m_class;
 
     /** Is this an accessor for an array? */
     bool m_isArray;

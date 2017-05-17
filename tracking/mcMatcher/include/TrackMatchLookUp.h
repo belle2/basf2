@@ -61,7 +61,7 @@ namespace Belle2 {
      */
     MCToPRMatchInfo extractMCToPRMatchInfo(const RecoTrack& mcRecoTrack,
                                            const RecoTrack* prRecoTrack,
-                                           const float& efficiency);
+                                           const float& efficiency) const;
 
     /*!
      * Helper function to assume the correct matching category for the pattern recognition tracks
@@ -69,20 +69,20 @@ namespace Belle2 {
      */
     PRToMCMatchInfo extractPRToMCMatchInfo(const RecoTrack& prRecoTrack,
                                            const RecoTrack* mcRecoTrack,
-                                           const float& purity);
+                                           const float& purity) const;
 
   public:
     /*!
      * Looks up the matched Monte Carlo track for the given pattern recognition track.
      * If there is no match or the pattern recognition track is a clone return nullptr.
      */
-    const RecoTrack* getMatchedMCRecoTrack(const RecoTrack& prRecoTrack);
+    const RecoTrack* getMatchedMCRecoTrack(const RecoTrack& prRecoTrack) const;
 
     /*!
      * Looks up the matched pattern recognition track for the given Monte Carlo track.
      * If there is no match or the Monte Carlo track is a over-merged return nullptr.
      */
-    const RecoTrack* getMatchedPRRecoTrack(const RecoTrack& mcRecoTrack);
+    const RecoTrack* getMatchedPRRecoTrack(const RecoTrack& mcRecoTrack) const;
 
   public:
     /*!
@@ -93,7 +93,7 @@ namespace Belle2 {
      * The returned purity is positive, hence the absolute value of the relation weight.
      * If no exact match is assoziated with the track return NAN.
      */
-    float getMatchedPurity(const RecoTrack& recoTrack);
+    float getMatchedPurity(const RecoTrack& recoTrack) const;
 
     /*!
      * Get the hit efficiency of the matched track.
@@ -103,13 +103,13 @@ namespace Belle2 {
      * The returned efficiency is positive, hence the absolute value of the relation weight.
      * If no exact match is assoziated with the track return NAN.
      */
-    float getMatchedEfficiency(const RecoTrack& recoTrack);
+    float getMatchedEfficiency(const RecoTrack& recoTrack) const;
 
   public:
     /*!
      * Gets the matching category of Monte Carlo track.
      */
-    MCToPRMatchInfo getMCToPRMatchInfo(const RecoTrack& mcRecoTrack)
+    MCToPRMatchInfo getMCToPRMatchInfo(const RecoTrack& mcRecoTrack) const
     {
       float efficiency = NAN;
       const RecoTrack* prRecoTrack = getRelatedPRRecoTrack(mcRecoTrack, efficiency);
@@ -119,7 +119,7 @@ namespace Belle2 {
     /*!
      * Checks, if the pattern recognition track was matched to a Monte Carlo track.
      */
-    bool isMatchedPRRecoTrack(const RecoTrack& prRecoTrack)
+    bool isMatchedPRRecoTrack(const RecoTrack& prRecoTrack) const
     {
       return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_Matched;
     }
@@ -127,7 +127,7 @@ namespace Belle2 {
     /*!
      * Checks, if the pattern recognition track is a clone of an other pattern recognition track.
      */
-    bool isClonePRRecoTrack(const RecoTrack& prRecoTrack)
+    bool isClonePRRecoTrack(const RecoTrack& prRecoTrack) const
     {
       return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_Clone;
     }
@@ -135,7 +135,7 @@ namespace Belle2 {
     /*!
      * Checks, if the pattern recognition track is mostly made from background hits
      */
-    bool isBackgroundPRRecoTrack(const RecoTrack& prRecoTrack)
+    bool isBackgroundPRRecoTrack(const RecoTrack& prRecoTrack) const
     {
       return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_Background;
     }
@@ -144,7 +144,7 @@ namespace Belle2 {
      * Checks, if the pattern recognition track has contributions of different Monte Carlo tracks
      * and/or background hits, such that a match is not possible.
      */
-    bool isGhostPRRecoTrack(const RecoTrack& prRecoTrack)
+    bool isGhostPRRecoTrack(const RecoTrack& prRecoTrack) const
     {
       return getPRToMCMatchInfo(prRecoTrack) == PRToMCMatchInfo::c_Ghost;
     }
@@ -153,7 +153,7 @@ namespace Belle2 {
     /*!
      * Gets the matching category of pattern recognition track.
      */
-    PRToMCMatchInfo getPRToMCMatchInfo(const RecoTrack& prRecoTrack)
+    PRToMCMatchInfo getPRToMCMatchInfo(const RecoTrack& prRecoTrack) const
     {
       float purity = NAN;
       const RecoTrack* mcRecoTrack = getRelatedMCRecoTrack(prRecoTrack, purity);
@@ -163,7 +163,7 @@ namespace Belle2 {
     /*!
      * Checks, if the Monte Carlo Track was matched to a pattern recognition track.
      */
-    bool isMatchedMCRecoTrack(const RecoTrack& mcRecoTrack)
+    bool isMatchedMCRecoTrack(const RecoTrack& mcRecoTrack) const
     {
       return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_Matched;
     }
@@ -171,7 +171,7 @@ namespace Belle2 {
     /*!
      * Checks, if the Monte Carlo Track has been merged into another pattern recognition track.
      */
-    bool isMergedMCRecoTrack(const RecoTrack& mcRecoTrack)
+    bool isMergedMCRecoTrack(const RecoTrack& mcRecoTrack) const
     {
       return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_Merged;
     }
@@ -179,7 +179,7 @@ namespace Belle2 {
     /*!
      *  Checks, if the Monte Carlo Track has no corresponding pattern recognition track.
      */
-    bool isMissingMCRecoTrack(const RecoTrack& mcRecoTrack)
+    bool isMissingMCRecoTrack(const RecoTrack& mcRecoTrack) const
     {
       return getMCToPRMatchInfo(mcRecoTrack) == MCToPRMatchInfo::c_Missing;
     }
@@ -195,7 +195,7 @@ namespace Belle2 {
      * Whether clones have a related MCParticle depends on the settings of the MCTrackMatcher
      * module that filled the relations.
      */
-    const MCParticle* getRelatedMCParticle(const RecoTrack& recoTrack);
+    const MCParticle* getRelatedMCParticle(const RecoTrack& recoTrack) const;
 
     /*!
      * Looks up the TrackFitResult of a pattern recognition track.
@@ -211,19 +211,19 @@ namespace Belle2 {
      */
     const TrackFitResult*
     getRelatedTrackFitResult(const RecoTrack& prRecoTrack,
-                             Const::ChargedStable chargedStable = Const::pion);
+                             Const::ChargedStable chargedStable = Const::pion) const;
 
     /*!
      * Looks for a related Monte Carlo track for the given pattern recognition track and
      * return it if found. Return nullptr if not found.
      */
-    const RecoTrack* getRelatedMCRecoTrack(const RecoTrack& prRecoTrack);
+    const RecoTrack* getRelatedMCRecoTrack(const RecoTrack& prRecoTrack) const;
 
     /*!
      * Looks for a related pattern recognition track for the given Monte Carlo track and
      * return it if found. Return nullptr if not found.
      */
-    const RecoTrack* getRelatedPRRecoTrack(const RecoTrack& mcRecoTrack);
+    const RecoTrack* getRelatedPRRecoTrack(const RecoTrack& mcRecoTrack) const;
 
   public:
     /*!
@@ -237,7 +237,7 @@ namespace Belle2 {
      * Since the matching category can be found by other methods of this class, we only provide the
      * absolute value here.
      */
-    float getRelatedPurity(const RecoTrack& prRecoTrack);
+    float getRelatedPurity(const RecoTrack& prRecoTrack) const;
 
     /*!
      * Getter for the absolute value of the efficiency that is stored in the efficiency relation
@@ -250,36 +250,36 @@ namespace Belle2 {
      * Since the matching category can be found by other methods of this class, we only provide the
      * absolute value here.
      */
-    float getRelatedEfficiency(const RecoTrack& mcRecoTrack);
+    float getRelatedEfficiency(const RecoTrack& mcRecoTrack) const;
 
     /*!
      * Helper function looking for a related Monte Carlo track to the given pattern recognition
      * track in the purity relation. Also returns to found purity as output parameter.
      */
-    const RecoTrack* getRelatedMCRecoTrack(const RecoTrack& prRecoTrack, float& purity);
+    const RecoTrack* getRelatedMCRecoTrack(const RecoTrack& prRecoTrack, float& purity) const;
 
     /*!
      * Helper function looking for a related Monte Carlo track to the given pattern recognition
      * track in the efficiency relation. Also returns to found efficiency as output parameter.
      */
-    const RecoTrack* getRelatedPRRecoTrack(const RecoTrack& mcRecoTrack, float& efficiency);
+    const RecoTrack* getRelatedPRRecoTrack(const RecoTrack& mcRecoTrack, float& efficiency) const;
 
   public:
     /*!
      * Checks if the given track is in the Monte Carlo track StoreArray.
      */
-    bool isMCRecoTrack(const RecoTrack& recoTrack);
+    bool isMCRecoTrack(const RecoTrack& recoTrack) const;
 
     /*!
      * Checks if the given track is in the pattern recognition StoreArray.
      */
-    bool isPRRecoTrack(const RecoTrack& recoTrack);
+    bool isPRRecoTrack(const RecoTrack& recoTrack) const;
 
   public:
     /*!
      * Getter for the name of the StoreArray of the Monte Carlo tracks.
      */
-    const std::string& getMCTracksStoreArrayName()
+    const std::string& getMCTracksStoreArrayName() const
     {
       return m_mcTracksStoreArrayName;
     }
@@ -287,7 +287,7 @@ namespace Belle2 {
     /*!
      * Getter for the name of the StoreArray of the pattern recognition tracks.
      */
-    const std::string& getPRTracksStoreArrayName()
+    const std::string& getPRTracksStoreArrayName() const
     {
       return m_prTracksStoreArrayName;
     }

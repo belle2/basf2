@@ -19,6 +19,8 @@
 #include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
     class CDCSegment2D;
     class CDCFacet;
@@ -36,10 +38,26 @@ namespace Belle2 {
       /// Short description of the findlet
       std::string getDescription() final;
 
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+
       /// Main function of the segment finding by the cellular automaton.
       void apply(const std::vector<CDCFacet>& inputFacets,
                  const std::vector<WeightedRelation<const CDCFacet>>& inputFacetRelations,
                  std::vector<CDCSegment2D>& outputSegments) final;
+
+    private:
+      /// Parameter : Switch to construct the reversed segment if it is available in the facet graph as well
+      bool m_param_searchReversed = false;
+
+      /// Parameter : Switch to construct the alias segment if it is available in the facet graph as well
+      bool m_param_searchAlias = true;
+
+      /// Parameter : Switch to relax the alias and reverse search for segments contained in a single layer
+      bool m_param_relaxSingleLayerSearch = true;
+
+      /// Paraneter : Switch to activate the write out of all available orientations of single facet segments
+      bool m_param_allSingleAliases = false;
 
     private: // cellular automaton
       /// Instance of the cellular automaton path finder

@@ -43,20 +43,25 @@ namespace Belle2 {
 
   TRGCDCJLUT::TRGCDCJLUT(const string& name)
     : m_name(name),
-    m_outputFlag(0), m_inputBitsize(0), m_outputBitsize(0), 
-    m_inputOffset(0), m_outputOffset(0), m_outputIntMax(0), 
-    m_inputToReal(0), m_toReal(0), m_inputShiftBits(0),
-    m_outputType(0), m_outputNBitsWithOffset(0)
+      m_outputFlag(0), m_inputBitsize(0), m_outputBitsize(0),
+      m_inputOffset(0), m_outputOffset(0), m_outputIntMax(0),
+      m_inputToReal(0), m_toReal(0), m_inputShiftBits(0),
+      m_outputType(0), m_outputNBitsWithOffset(0)
   {
     m_write = 0;
   }
 
   TRGCDCJLUT::TRGCDCJLUT(const TRGCDCJLUT& in)
+    : m_const(in.m_const),
+      m_name(in.m_name),
+      m_fileName(in.m_fileName),
+      m_function(in.m_function),
+      m_floatFunction(in.m_floatFunction),
+      m_inputMin(in.m_inputMin),
+      m_inputMax(in.m_inputMax),
+      m_shiftOutputMin(in.m_shiftOutputMin),
+      m_shiftOffsetOutputMax(in.m_shiftOffsetOutputMax)
   {
-    m_name = in.m_name;
-    m_fileName = in.m_fileName;
-    m_function = in.m_function;
-    m_floatFunction = in.m_floatFunction;
     m_outputFlag = in.m_outputFlag;
     m_inputBitsize = in.m_inputBitsize;
     m_outputBitsize = in.m_outputBitsize;
@@ -68,11 +73,6 @@ namespace Belle2 {
     m_toReal = in.m_toReal;
     m_inputShiftBits = in.m_inputShiftBits;
     m_outputIntMax = in.m_outputIntMax;
-    m_const = in.m_const;
-    m_inputMin = in.m_inputMin;
-    m_inputMax = in.m_inputMax;
-    m_shiftOutputMin = in.m_shiftOutputMin;
-    m_shiftOffsetOutputMax = in.m_shiftOffsetOutputMax;
     m_write = 0;
   }
 
@@ -238,10 +238,12 @@ namespace Belle2 {
     double t_outputRealMinInt = function(minInv.getRealInt());
     double t_outputRealMaxInt = function(maxInv.getRealInt());
     if (std::isnan(t_outputRealMinInt)) {
-      cout << "[Error] TRGCDCJLUT::setFloatFunction() => t_outputRealMinInt is nan. Please change minInv signal so that function(minInv.getRealInt()) does not give nan." << endl;
+      cout << "[Error] TRGCDCJLUT::setFloatFunction() => t_outputRealMinInt is nan. Please change minInv signal so that function(minInv.getRealInt()) does not give nan."
+           << endl;
     }
     if (std::isnan(t_outputRealMaxInt)) {
-      cout << "[Error] TRGCDCJLUT::setFloatFunction() => t_outputRealMaxInt is nan. Please change maxInv so that function(maxInv.getRealInt()) does not give nan" << endl;
+      cout << "[Error] TRGCDCJLUT::setFloatFunction() => t_outputRealMaxInt is nan. Please change maxInv so that function(maxInv.getRealInt()) does not give nan"
+           << endl;
     }
     if (t_outputRealMaxInt < t_outputRealMinInt) {
       cout << "[Error] TRGCDCJLUT::setFloatFunction() => t_outputRealMaxInt is smaller than t_outputRealMinInt." << endl;
@@ -314,17 +316,20 @@ namespace Belle2 {
         result = m_shiftOffsetOutputMax.getInt();
       }
       // Warnings. Use ideal result for checking output.
-      double t_inputActual = anInt* m_inputMin.shift(m_inputShiftBits, 0).getToReal() + m_inputMin.getActual();
+      double t_inputActual = anInt * m_inputMin.shift(m_inputShiftBits, 0).getToReal() + m_inputMin.getActual();
       double t_outputActual = m_floatFunction(t_inputActual);
-      if (t_outputActual < m_shiftOutputMin.getActual()) {
+      if (t_outputActual < m_shiftOutputMin.getActual())
+      {
         if (m_write != 1) {
           cout << "[Warning] TRGCDCJLUT::m_function => output is smaller then 0. Changed to 0." << endl;
           cout << "Could happen if invY_min and invY_max are inside x range." << endl;
         }
       }
-      if (t_outputActual > m_shiftOffsetOutputMax.getActual() + m_shiftOutputMin.getActual()) {
+      if (t_outputActual > m_shiftOffsetOutputMax.getActual() + m_shiftOutputMin.getActual())
+      {
         if (m_write != 1) {
-          cout << "[Warning] TRGCDCJLUT::m_function => output is larger then allowed max value. Changed to " << m_shiftOffsetOutputMax.getInt() << "." << endl;
+          cout << "[Warning] TRGCDCJLUT::m_function => output is larger then allowed max value. Changed to " <<
+               m_shiftOffsetOutputMax.getInt() << "." << endl;
           cout << "Could happen if invY_min and invY_max are inside x range." << endl;
         }
       }

@@ -28,21 +28,28 @@ from tracking.validation.run import TrackingValidationRun
 
 class CDCAutomaton(TrackingValidationRun):
     n_events = N_EVENTS
+    #: Generator to be used in the simulation (-so)
+    generator_module = 'generic'
     root_input_file = '../EvtGenSimNoBkg.root'
 
     def finder_module(self, path):
-        path.add_module('TrackFinderCDCAutomaton',
+        path.add_module('TFCDC_TrackFinderAutomaton',
                         # UseNLoops = 1,
                         )
 
     tracking_coverage = {
+        'WhichParticles': ['CDC'],  # Include all particles seen in CDC, also secondaries
         'UsePXDHits': False,
         'UseSVDHits': False,
         'UseCDCHits': True,
         'UseOnlyAxialCDCHits': False,
-        # 'WhichParticles': ['CDC'], # Uncomment to count also secondary tracks
-        # "UseNLoops" : 1,
-        # 'EnergyCut': 0.1,
+        "UseReassignedHits": True,
+        "UseNLoops": 1.0,
+        "UseOnlyBeforeTOP": True,
+        'MinCDCAxialHits': 8,
+        'MinCDCStereoHits': 6,
+        "AllowFirstCDCSuperLayerOnly": True,
+        'EnergyCut': 0,
     }
     pulls = True
     contact = CONTACT

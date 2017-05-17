@@ -12,6 +12,10 @@
 #include <string>
 
 namespace Belle2 {
+  /** Utilities for converting PDG codes into particle names.
+   *
+   * Uses the TDatabasePDG class, which is filled from evt.pdl by basf2.
+   */
   namespace EvtPDLUtil {
     /**
      * Checks if the particle with given pdg code has an anti-particle or not.
@@ -33,13 +37,13 @@ namespace Belle2 {
     std::string antiParticleName(int pdgCode);
 
     /**
-     * Returns the name of the anti-particle PrticleList for particles with given pdg code and with given label.
+     * Returns the name of the anti-particle ParticleList for particles with given pdg code and with given label.
      * If the anti-particle does not exist the particle's name is returned instead
      */
     std::string antiParticleListName(int pdgCode, std::string label);
 
     /**
-     * Returns the name of the particle PrticleList for particles with given pdg code and with given label.
+     * Returns the name of the particle ParticleList for particles with given pdg code and with given label.
      */
     std::string particleListName(int pdgCode, std::string label);
 

@@ -13,15 +13,17 @@ main = create_path()
 
 main.add_module('RootInput', inputFileName=sys.argv[1], excludeBranchNames=['GF2TracksToMCParticles', 'TrackCandsToGF2Tracks'])
 main.add_module('Gearbox')
-geometry = register_module('Geometry', components=['MagneticField2d', 'BeamPipe', 'PXD', 'SVD', 'CDC', 'EKLM', 'BKLM'])
+geometry = register_module('Geometry', excludedComponents=['MagneticField'],
+                           additionalComponents=["MagneticField2d"])
 main.add_module(geometry)
 
-main.add_module('SetupGenfitExtrapolation', whichGeometry='TGeo', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
-main.add_module('MillepedeCollector')
+main.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False,
+                noiseCoulomb=False, noiseBrems=False)
+main.add_module('MillepedeCollector', useGblTree=False)
 
 main.add_module('Progress')
 # main.add_module('GBLdiagnostics')
-main.add_module('RootOutput', outputFileName=sys.argv[2])
+main.add_module('RootOutput', outputFileName=sys.argv[2], branchNames=['EventMetaData'])
 process(main)
 
 # Print call statistics

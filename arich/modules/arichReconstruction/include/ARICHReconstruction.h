@@ -45,7 +45,7 @@ namespace Belle2 {
   public:
 
     //! Constructor
-    ARICHReconstruction(int storePhotons = 0);
+    explicit ARICHReconstruction(int storePhotons = 0);
 
     //! Destructor
     ~ARICHReconstruction() {};
@@ -55,6 +55,9 @@ namespace Belle2 {
 
     //! Smeares track parameters ("simulate" the uncertainties of tracking).
     int smearTrack(ARICHTrack& arichTrack);
+
+    //! Transforms track parameters from global Belle2 to ARICH local frame
+    void transformTrackToLocal(ARICHTrack& arichTrack, bool align);
 
     //! Computes the value of identity likelihood function for different particle hypotheses.
     int likelihood2(ARICHTrack& arichTrack, StoreArray<ARICHHit>& arichHits, ARICHLikelihood& arichLikelihood);
@@ -135,13 +138,23 @@ namespace Belle2 {
     */
     int  CherenkovPhoton(TVector3 r, TVector3 rh,
                          TVector3& rf, TVector3& dirf,
-                         double* refind, double* z, int n);
+                         double* refind, double* z, int n, int mirrorID = 0);
+
+    //! returns true if photon at position pos with direction dir hits mirror plate with ID mirrorID
+    /*
+      \param pos photon position
+      \param dir photon direction
+      \param mirrorID ID of mirrro plate
+    */
+    bool HitsMirror(const TVector3& pos, const TVector3& dir, int mirrorID);
 
     //! Returns mean emission position of Cherenkov photons from i-th aerogel layer.
     TVector3 getTrackMeanEmissionPosition(const ARICHTrack& track, int iAero);
 
     //! Returns track direction at point with z coordinate "zout" (assumes straight track).
     TVector3 getTrackPositionAtZ(const ARICHTrack& track, double zout);
+
+
 
   };
 

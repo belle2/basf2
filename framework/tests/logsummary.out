@@ -1,0 +1,45 @@
+[INFO] Steering file: framework/tests/logsummary.py
+run in default settings
+[WARNING] warning  { module: FatalError package: steering }
+[ERROR] error  { module: FatalError package: steering }
+[FATAL] fatal error  { module: FatalError package: steering }
+[INFO] ================================================================================
+[INFO] Error summary: 1 errors and 1 warnings occurred.
+[WARNING] warning
+[ERROR] error
+[FATAL] fatal error
+[INFO] ================================================================================
+
+run with no warnings
+[ERROR] error  { module: FatalError package: steering }
+[FATAL] fatal error  { module: FatalError package: steering }
+[INFO] ================================================================================
+[INFO] Error summary: 1 errors and 0 warnings occurred.
+[ERROR] error
+[FATAL] fatal error
+[INFO] ================================================================================
+
+run with no framework warnings
+[WARNING] warning  { module: FatalError package: steering }
+[ERROR] error  { module: FatalError package: steering }
+[FATAL] fatal error  { module: FatalError package: steering }
+[INFO] ================================================================================
+[INFO] Error summary: 1 errors and 1 warnings occurred.
+[WARNING] warning
+[ERROR] error
+[FATAL] fatal error
+[INFO] ================================================================================
+
+run with no module warnings
+[ERROR] error  { module: FatalError package: steering }
+[FATAL] fatal error  { module: FatalError package: steering }
+[INFO] ================================================================================
+[INFO] Error summary: 1 errors and 0 warnings occurred.
+[ERROR] error
+[FATAL] fatal error
+[INFO] ================================================================================
+
+run without summary
+[WARNING] warning  { module: FatalError package: steering }
+[ERROR] error  { module: FatalError package: steering }
+[FATAL] fatal error  { module: FatalError package: steering }

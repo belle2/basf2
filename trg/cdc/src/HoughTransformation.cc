@@ -16,19 +16,22 @@
 
 namespace Belle2 {
 
-TRGCDCHoughTransformation::TRGCDCHoughTransformation(const std::string & name)
-    : _name(name) {
+  TRGCDCHoughTransformation::TRGCDCHoughTransformation(const std::string& name)
+    : _name(name)
+  {
 
 
-}
+  }
 
-TRGCDCHoughTransformation::~TRGCDCHoughTransformation() {
-}
+  TRGCDCHoughTransformation::~TRGCDCHoughTransformation()
+  {
+  }
 
-TRGPoint2D
-TRGCDCHoughTransformation::convert(const TRGPoint2D & p) const {
+  TRGPoint2D
+  TRGCDCHoughTransformation::convert(const TRGPoint2D& p) const
+  {
     return p;
-}
+  }
 
 } // namespace Belle
 

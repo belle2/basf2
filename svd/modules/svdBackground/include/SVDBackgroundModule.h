@@ -11,7 +11,7 @@
 #include <vector>
 #include <memory>
 #include <map>
-#include <svd/background/niel_fun.h>
+#include <vxd/background/niel_fun.h>
 
 namespace Belle2 {
 
@@ -117,15 +117,15 @@ namespace Belle2 {
       const double c_densitySi = 2.3290 * Unit::g_cm3; /**< Density of crystalline Silicon */
       const double c_smy = 1.0e7 * Unit::s;             /**< Seconds in snowmass year */
       const double c_APVCycleTime = 31.44 * Unit::ns;   /**< APV cycle time */
-      // NIEL file names - placed in svd/data, so needn't be module parameters.
+      // NIEL file names - placed in vxd/data, so needn't be module parameters.
       /** NIEL-correction file for neutrons */
-      const std::string c_niel_neutronFile = "/svd/data/neutrons.csv";
+      const std::string c_niel_neutronFile = "/vxd/data/neutrons.csv";
       /** NIEL-correction file for protons */
-      const std::string c_niel_protonFile = "/svd/data/protons.csv";
+      const std::string c_niel_protonFile = "/vxd/data/protons.csv";
       /** NIEL-correction file for pions */
-      const std::string c_niel_pionFile = "/svd/data/pions.csv";
+      const std::string c_niel_pionFile = "/vxd/data/pions.csv";
       /** NIEL-correction file for electrons */
-      const std::string c_niel_electronFile = "/svd/data/electrons.csv";
+      const std::string c_niel_electronFile = "/vxd/data/electrons.csv";
       // No NIEL for photons.
 
       /** This is a shortcut to getting SVD::SensorInfo from the GeoCache.

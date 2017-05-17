@@ -70,35 +70,35 @@ namespace Belle2 {
      *
      * @return Returns the configured log level.
      */
-    ELogLevel getLogLevel() const {return m_logLevel; };
+    ELogLevel getLogLevel() const {return m_logLevel; }
 
     /**
      * Configure the debug messaging level.
      *
      * @param debugLevel The debug level.
      */
-    void setDebugLevel(int debugLevel) {m_debugLevel = debugLevel; };
+    void setDebugLevel(int debugLevel) {m_debugLevel = debugLevel; }
 
     /**
      * Returns the configured debug messaging level.
      *
      * @return Returns the configured debug messaging level.
      */
-    int getDebugLevel() const {return m_debugLevel; };
+    int getDebugLevel() const {return m_debugLevel; }
 
     /**
      * Configure the abort level.
      *
      * @param abortLevel The abort log level.
      */
-    void setAbortLevel(ELogLevel abortLevel) {m_abortLevel = abortLevel; };
+    void setAbortLevel(ELogLevel abortLevel) {m_abortLevel = abortLevel; }
 
     /**
      * Returns the configured abort level.
      *
      * @return Returns the configured abort level.
      */
-    ELogLevel getAbortLevel() const {return m_abortLevel; };
+    ELogLevel getAbortLevel() const {return m_abortLevel; }
 
     /**
      * Configure the printed log information for the given level.
@@ -106,14 +106,14 @@ namespace Belle2 {
      * @param logLevel The log level.
      * @param logInfo The log information that should be printed.
      */
-    void setLogInfo(ELogLevel logLevel, unsigned int logInfo) {m_logInfo[logLevel] = logInfo; };
+    void setLogInfo(ELogLevel logLevel, unsigned int logInfo) {m_logInfo[logLevel] = logInfo; }
 
     /**
      * Returns the configured log information for the given level.
      *
      * @return Returns the configured log information.
      */
-    unsigned int getLogInfo(ELogLevel logLevel) const {return m_logInfo[logLevel]; };
+    unsigned int getLogInfo(ELogLevel logLevel) const {return m_logInfo[logLevel]; }
 
 
   private:

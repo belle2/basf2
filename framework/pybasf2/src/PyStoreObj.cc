@@ -40,13 +40,13 @@ PyStoreObj::PyStoreObj(const std::string& name,
 {
 }
 
-PyStoreObj::PyStoreObj(const TClass* objClass,
+PyStoreObj::PyStoreObj(TClass* objClass,
                        DataStore::EDurability durability) :
   PyStoreObj(objClass, DataStore::defaultObjectName(objClass), durability)
 {
 }
 
-PyStoreObj::PyStoreObj(const TClass* objClass,
+PyStoreObj::PyStoreObj(TClass* objClass,
                        const std::string& name,
                        DataStore::EDurability durability) :
   m_storeAccessor(name, durability, objClass, false)

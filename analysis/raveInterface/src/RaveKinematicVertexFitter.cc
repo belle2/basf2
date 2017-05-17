@@ -99,7 +99,7 @@ void RaveKinematicVertexFitter::addTrack(const Particle* aParticlePtr)
   // 1 and 1 are dummy values for chi2 and ndf. the are not used for the vertex fit
 
   m_inputParticles.push_back(aRaveParticle);
-
+  m_belleDaughters.push_back(const_cast<Particle*>(aParticlePtr));
 
 }
 
@@ -336,7 +336,7 @@ void RaveKinematicVertexFitter::updateDaughters()
 
   m_fittedResult.topParticle();
   std::vector< rave::KinematicParticle > rDau = m_fittedResult.daughterParticles();
-  std::vector<Belle2::Particle*> bDau = m_motherParticlePtr->getDaughters();
+  std::vector<Belle2::Particle*> bDau = m_belleDaughters;
   if (rDau.size() == bDau.size()) {
     for (unsigned ii = 0; ii < bDau.size(); ii++) {
       rave::Vector7D fittedState;

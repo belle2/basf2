@@ -4,6 +4,7 @@ env['LIBS'] = [
     '$ROOT_LIBS',
     "framework",
     "analysis_utility",
+    "tracking_dataobjects",
     "hlt_softwaretrigger_dbobjects",
     "analysis_dataobjects",
     "mdst_dataobjects"

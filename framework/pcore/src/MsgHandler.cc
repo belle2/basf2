@@ -12,8 +12,12 @@
 
 #include <TObject.h>
 #include <TMessage.h>
+#include <RZip.h>
 
 #include <stdlib.h>
+
+using namespace std;
+using namespace Belle2;
 
 
 namespace {
@@ -21,19 +25,17 @@ namespace {
   const static int c_maxObjectSizeBytes = 50000000; //50MB
 }
 
-using namespace std;
-using namespace Belle2;
-
-MsgHandler::MsgHandler(int complevel)
+MsgHandler::MsgHandler(int complevel):
+  m_buf(100000),
+  m_compBuf(0),
+  m_msg(new TMessage(kMESS_OBJECT))
 {
-  if (complevel != 0) {
-    B2FATAL("Compression support disabled because of https://sft.its.cern.ch/jira/browse/ROOT-4550 . You can enable it manually by removing this check in MsgHandler, but be aware of huge memory leaks.");
-  }
   m_complevel = complevel;
 
   //Schema evolution is needed to stream genfit tracks
   //If disabled, streamers will crash when reading data.
   TMessage::EnableSchemaEvolutionForAll();
+  m_msg->SetWriteMode();
 }
 
 MsgHandler::~MsgHandler()
@@ -43,129 +45,131 @@ MsgHandler::~MsgHandler()
 void MsgHandler::clear()
 {
   m_buf.clear();
+  m_compBuf.clear();
 }
 
-bool MsgHandler::add(const TObject* obj, const string& name)
+void MsgHandler::add(const TObject* obj, const string& name)
 {
-  // Initialize TMessage
-  TMessage* msg = new TMessage(kMESS_OBJECT);
-  msg->Reset();
-  msg->SetWriteMode();
-  msg->SetCompressionLevel(m_complevel);
+  m_msg->WriteObject(obj);
 
-  // Write object in TMessage
-  msg->WriteObject(obj);
-  msg->Compress(); //no effect if m_complevel == 0
-  //  msg->ForceWriteInfo(obj->, true );
-
-  // Obtain size of streamed object
-  //  int len = msg->BufferSize();
-  int len = msg->Length();
-  if (msg->CompBuffer()) {
-    // Compression ON
-    len = msg->CompLength();
-  }
-  //  printf ( "MsgHandler : size of %s = %d (pid=%d)\n", name.c_str(), len, (int)getpid() );
+  int len = m_msg->Length();
+  char* buf = m_msg->Buffer();
 
   if (len > c_maxObjectSizeBytes) {
     B2WARNING("MsgHandler: Object " << name << " is very large (" << len  << " bytes), parallel processing may be slow.");
   }
-  // Store streamed objects in array
-  m_buf.push_back(msg);
-  m_name.push_back(name);
-  return true;
+
+  // Put name of object in output buffer including a final 0-byte
+  UInt_t nameLength = name.size() + 1;
+  m_buf.add(&nameLength, sizeof(nameLength));
+  m_buf.add(name.c_str(), nameLength);
+  // Copy object into buffer
+  m_buf.add(&len, sizeof(len));
+  m_buf.add(buf, len);
+  m_msg->Reset();
 }
 
-EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
+EvtMessage* MsgHandler::encode_msg(ERecordType rectype)
 {
   if (rectype == MSG_TERMINATE) {
     EvtMessage* eod = new EvtMessage(NULL, 0, rectype);
     return eod;
   }
-  //  printf ( "MsgHandler : encoding message ..... Nobjs = %d\n", m_buf.size() );
 
-  // Initialize output buffer
-  int totlen = 0;
-  char* msgbuf = new char[EvtMessage::c_MaxEventSize];
-  char* msgptr = msgbuf;
-  int nameptr = 0;
-
-  // Loop over streamed objects
-  for (const TMessage* msg : m_buf) {
-    char* buf = msg->Buffer();
-    //    int len = msg->BufferSize();
-    UInt_t len = msg->Length();
-    if (msg->CompBuffer()) {
-      // Compression ON
-      len = msg->CompLength();
-      buf = msg->CompBuffer();
+  // which buffer to send? defaults to uncompressed
+  auto buf = &m_buf;
+  unsigned int flags = 0;
+  // but if we have compression enabled then please compress.
+  if (m_complevel > 0) {
+    // make sure buffer for the compression is big enough.
+    m_compBuf.resize(m_buf.size());
+    // And call the root compression function
+    const int algorithm = m_complevel / 100;
+    const int level = m_complevel % 100;
+    int irep{0}, nin{(int)m_buf.size()}, nout{nin};
+    R__zipMultipleAlgorithm(level, &nin, m_buf.data(), &nout, m_compBuf.data(), &irep, algorithm);
+    // it returns the number of bytes of the output in irep. If that is zero or
+    // to big compression failed and we transmit uncompressed.
+    if (irep > 0 && irep <= nin) {
+      //set correct size of compressed message
+      m_compBuf.resize(irep);
+      // and set pointer to correct buffer for creating message
+      buf = &m_compBuf;
+      // also add a flag indicating it's compressed
+      flags = EvtMessage::c_MsgCompressed;
     }
-    // Put name of object in output buffer
-    const string& name = m_name[nameptr];
-    UInt_t nameLength = strlen(name.c_str()) + 1;
-    memcpy(msgptr, &nameLength, sizeof(nameLength));
-    memcpy(msgptr + sizeof(nameLength), name.c_str(), nameLength);
-    msgptr += (sizeof(nameLength) + nameLength);
-    totlen += (sizeof(nameLength) + nameLength);
-    // Copy object into buffer
-    memcpy(msgptr, &len, sizeof(len));
-    memcpy(msgptr + sizeof(len), buf, len);
-    msgptr += (sizeof(len) + len);
-    totlen += (sizeof(len) + len);
-    nameptr++;
-    delete msg;
   }
 
-  EvtMessage* evtmsg = new EvtMessage(msgbuf, totlen, rectype);
-
-  //  printf ( "encode : msgbuf = %8.8x, %8.8x, %8.8x, %8.8x\n",
-  //     *((int*)msgbuf), *((int*)(msgbuf+1)), *((int*)(msgbuf+2)), *((int*)(msgbuf+3)) );
-
-  delete[] msgbuf;
-  m_buf.clear();
-  m_name.clear();
+  EvtMessage* evtmsg = new EvtMessage(buf->data(), buf->size(), rectype);
+  evtmsg->setMsgFlags(flags);
+  clear();
 
   return evtmsg;
 }
 
-int MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
-                           vector<string>& namelist)
+void MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
+                            vector<string>& namelist)
 {
-  int totlen = 0;
-  char* msgptr = msg->msg();
-  //  printf ( "decode : msgbuf = %8.8x, %8.8x, %8.8x, %8.8x\n",
-  //     *((int*)msgptr), *((int*)(msgptr+1)), *((int*)(msgptr+2)), *((int*)(msgptr+3)) );
+  const char* msgptr = msg->msg();
+  const char* end = msgptr + msg->msg_size();
 
-  while (totlen < msg->msg_size()) {
+  if (msg->hasMsgFlags(EvtMessage::c_MsgCompressed)) {
+    // apparently message is compressed, let's decompress
+    m_compBuf.clear();
+    int nzip{0}, nout{0};
+    // ROOT wants unsigned char so make a new pointer to the data
+    unsigned char* zipptr = (unsigned char*) msgptr;
+    // and uncompress everything
+    while (zipptr < (unsigned char*)end) {
+      // first get a header of the next block so we know how big the output will be
+      if (R__unzip_header(&nzip, zipptr, &nout) != 0) {
+        B2FATAL("Cannot uncompress message header");
+      }
+      // no more output? fine
+      if (!nout) break;
+      if (std::distance(zipptr, (unsigned char*) end) > nzip) {
+        B2FATAL("Not enough bytes left to uncompress");
+      }
+      // otherwise make sure output buffer is large enough
+      int old_size = m_compBuf.size();
+      m_compBuf.resize(old_size + nout);
+      // and uncompress, the amount of bytes will be returned as irep
+      int irep{0};
+      R__unzip(&nzip, zipptr, &nout, (unsigned char*)(m_compBuf.data() + old_size), &irep);
+      // if that is not positive an error happend, bail
+      if (irep <= 0) {
+        B2FATAL("Cannot uncompress message");
+      }
+      // otherwise advance pointer by the amount of bytes compressed bytes in the block
+      zipptr += nzip;
+    }
+    // ok, decompressed succesfully, set msg pointer to the correct area
+    msgptr = m_compBuf.data();
+    end = msgptr + m_compBuf.size();
+  }
+
+  while (msgptr < end) {
     // Restore object name
     UInt_t nameLength;
     memcpy(&nameLength, msgptr, sizeof(nameLength));
-    string name((char*)(msgptr + sizeof(nameLength)));
-    namelist.push_back(name);
-    msgptr += (sizeof(nameLength) + nameLength);
-    totlen += (sizeof(nameLength) + nameLength);
+    msgptr += sizeof(nameLength);
+    if (nameLength == 0 || std::distance(msgptr, end) < nameLength)
+      B2FATAL("Buffer overrun while decoding object name, check length fields!");
+
+    // read full string but omit final 0-byte. This safeguards against strings containing 0-bytes
+    namelist.emplace_back(msgptr, nameLength - 1);
+    msgptr += nameLength;
 
     // Restore object
     UInt_t objlen;
     memcpy(&objlen, msgptr, sizeof(objlen));
+    msgptr += sizeof(objlen);
+    if (objlen == 0 || std::distance(msgptr, end) < objlen)
+      B2FATAL("Buffer overrun while decoding object, check length fields!");
 
-    TMessage* tmsg = new InMessage(msgptr + sizeof(objlen), objlen);
-    TObject* obj = static_cast<TObject*>(tmsg->ReadObjectAny(tmsg->GetClass()));
-    objlist.push_back(obj);
-
-    msgptr += objlen + sizeof(objlen);
-    totlen += objlen + sizeof(objlen);
-
-    //TMessage doesn't honour the kIsOwner bit for the compression buffer and
-    //tries to delete the passed message.
-    //TODO: workaround: leak message; remove once fixed in ROOT
-    if (!tmsg->CompBuffer())
-      delete tmsg;
-
-    //    printf ( "decode : %s added to objlist; size=%d (pid=%d)\n",
-    //           name.c_str(), objlen, (int)getpid()  );
-    //    fflush(stdout);
-
+    m_inMsg.SetBuffer(msgptr, objlen);
+    objlist.push_back(m_inMsg.readTObject());
+    msgptr += objlen;
+    //no need to call InMessage::Reset() here (done in SetBuffer())
   }
-  return 0;
 }

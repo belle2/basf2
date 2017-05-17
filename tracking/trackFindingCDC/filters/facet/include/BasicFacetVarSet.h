@@ -21,15 +21,15 @@ namespace Belle2 {
     static char const* const basicFacetVarNames[] = {
       "superlayer_id",
 
-      "start_layer_id",
+      // "start_layer_id",
       "start_drift_length",
       "start_drift_length_sigma",
 
-      "middle_layer_id",
+      // "middle_layer_id",
       "middle_drift_length",
       "middle_drift_length_sigma",
 
-      "end_layer_id",
+      // "end_layer_id",
       "end_drift_length",
       "end_drift_length_sigma",
 
@@ -37,6 +37,8 @@ namespace Belle2 {
       "twist",
       "cell_extend",
       "n_crossing",
+
+      "alpha",
     };
 
     /// Vehicle class to transport the variable names

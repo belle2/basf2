@@ -40,13 +40,13 @@ PyStoreArray::PyStoreArray(const std::string& name,
 {
 }
 
-PyStoreArray::PyStoreArray(const TClass* objClass,
+PyStoreArray::PyStoreArray(TClass* objClass,
                            DataStore::EDurability durability) :
   PyStoreArray(objClass, DataStore::defaultArrayName(objClass), durability)
 {
 }
 
-PyStoreArray::PyStoreArray(const TClass* objClass,
+PyStoreArray::PyStoreArray(TClass* objClass,
                            const std::string& name,
                            DataStore::EDurability durability) :
   m_storeAccessor(name, durability, objClass, true)

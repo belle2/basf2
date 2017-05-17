@@ -61,6 +61,57 @@ namespace Belle2 {
 
     void CaveCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
+      G4double density;
+      G4double A;
+      G4int Z;
+
+      G4String name, symbol;
+      G4double fractionmass;
+
+      A = 1.01 * CLHEP::g / CLHEP::mole;
+      G4Element* elH  = new G4Element(name = "Hydrogen", symbol = "H" , Z = 1, A);
+
+      A = 12.01 * CLHEP::g / CLHEP::mole;
+      G4Element* elC  = new G4Element(name = "Carbon"  , symbol = "C" , Z = 6, A);
+
+      A = 16.00 * CLHEP::g / CLHEP::mole;
+      G4Element* elO  = new G4Element(name = "Oxygen"  , symbol = "O" , Z = 8, A);
+
+      A = 22.99 * CLHEP::g / CLHEP::mole;
+      G4Element* elNa  = new G4Element(name = "Natrium"  , symbol = "Na" , Z = 11 , A);
+
+      A = 200.59 * CLHEP::g / CLHEP::mole;
+      G4Element* elHg  = new G4Element(name = "Hg"  , symbol = "Hg" , Z = 80, A);
+
+      A = 26.98 * CLHEP::g / CLHEP::mole;
+      G4Element* elAl  = new G4Element(name = "Aluminium"  , symbol = "Al" , Z = 13, A);
+
+      A = 28.09 * CLHEP::g / CLHEP::mole;
+      G4Element* elSi  = new G4Element(name = "Silicon", symbol = "Si", Z = 14, A);
+
+      A = 39.1 * CLHEP::g / CLHEP::mole;
+      G4Element* elK  = new G4Element(name = "K"  , symbol = "K" , Z = 19 , A);
+
+      A = 69.72 * CLHEP::g / CLHEP::mole;
+      G4Element* elCa  = new G4Element(name = "Calzium"  , symbol = "Ca" , Z = 31 , A);
+
+      A = 55.85 * CLHEP::g / CLHEP::mole;
+      G4Element* elFe = new G4Element(name = "Iron"    , symbol = "Fe", Z = 26, A);
+
+      density = 2.03 * CLHEP::g / CLHEP::cm3;
+      G4Material* Concrete = new G4Material("Concrete", density, 10);
+      Concrete->AddElement(elH , fractionmass = 0.01);
+      Concrete->AddElement(elO , fractionmass = 0.529);
+      Concrete->AddElement(elNa , fractionmass = 0.016);
+      Concrete->AddElement(elHg , fractionmass = 0.002);
+      Concrete->AddElement(elAl , fractionmass = 0.034);
+      Concrete->AddElement(elSi , fractionmass = 0.337);
+      Concrete->AddElement(elK , fractionmass = 0.013);
+      Concrete->AddElement(elCa , fractionmass = 0.044);
+      Concrete->AddElement(elFe , fractionmass = 0.014);
+      Concrete->AddElement(elC , fractionmass = 0.001);
+
+
       //lets get the stepsize parameter with a default value of 5 µm
       double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 
@@ -82,7 +133,7 @@ namespace Belle2 {
                                   activeParams.getLength("pz")*CLHEP::cm);
 
         //G4LogicalVolume* l_CAVE = new G4LogicalVolume(s_CAVE, geometry::Materials::get("CAVE"), "l_CAVE", 0, m_sensitive);
-        G4LogicalVolume* l_CAVE = new G4LogicalVolume(s_CAVE, geometry::Materials::get("CAVE"), "l_CAVE", 0, 0);
+        G4LogicalVolume* l_CAVE = new G4LogicalVolume(s_CAVE, Concrete, "l_CAVE", 0, 0);
 
         //Lets limit the Geant4 stepsize inside the volume
         l_CAVE->SetUserLimits(new G4UserLimits(stepSize));

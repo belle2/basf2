@@ -12,7 +12,9 @@
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackTruthVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackVarSet.h>
 
+#include <tracking/trackFindingCDC/filters/base/FilterVarSet.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
+#include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
@@ -24,6 +26,7 @@ using namespace TrackFindingCDC;
 
 namespace {
   using AllSegmentTrackFilter = AllFilter<BaseSegmentTrackFilter>;
+  using NoneSegmentTrackFilter = NoneFilter<BaseSegmentTrackFilter>;
   using MCSegmentTrackFilter = MCFilter<VariadicUnionVarSet<SegmentTrackTruthVarSet, SegmentTrackVarSet>>;
   using RecordingSegmentTrackFilter = RecordingFilter<VariadicUnionVarSet<SegmentTrackTruthVarSet, SegmentTrackVarSet>>;
   using MVASegmentTrackFilter = MVAFilter<SegmentTrackVarSet>;
@@ -49,13 +52,19 @@ std::unique_ptr<BaseSegmentTrackFilter>
 SegmentTrackFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<BaseSegmentTrackFilter>();
+    return makeUnique<NoneSegmentTrackFilter>();
   } else if (filterName == "truth") {
     return makeUnique<MCSegmentTrackFilter>();
   } else if (filterName == "mva") {
-    return makeUnique<MVASegmentTrackFilter>("tracking/data/trackfindingcdc_SegmentTrackFilterFirstStep.xml");
+    return makeUnique<MVASegmentTrackFilter>("tracking/data/trackfindingcdc_SegmentTrackFilter.xml", 0.74);
+  } else if (filterName == "eval") {
+    auto recordedVarSets = makeUnique<UnionVarSet<BaseSegmentTrackFilter::Object>>();
+    using TrackFilterVarSet = FilterVarSet<BaseSegmentTrackFilter>;
+    recordedVarSets->push_back(makeUnique<TrackFilterVarSet>("mva", create("mva")));
+    recordedVarSets->push_back(makeUnique<TrackFilterVarSet>("truth", create("truth")));
+    return makeUnique<Recording<BaseSegmentTrackFilter>>(std::move(recordedVarSets), "SegmentTrackFilter_eval.root");
   } else if (filterName == "recording") {
-    return makeUnique<RecordingSegmentTrackFilter>("SegmentTrackFilterFirstStep.root");
+    return makeUnique<RecordingSegmentTrackFilter>("SegmentTrackFilter.root");
   } else {
     return Super::create(filterName);
   }

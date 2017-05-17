@@ -55,8 +55,13 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
 
   addParam("strictSeeding",
            m_PARAMstrictSeeding,
-           "Regulates if every subset of sufficient length of a path shall be collected as separate path or not (if true, only one path per possibility is collected, if false subsets are collected too.",
+           "Regulates if every node with enough notes below it is used as a seed or only the outermost nodes.",
            bool(true));
+
+  addParam("storeSubsets",
+           m_PARAMstoreSubsets,
+           "Regulates if every subset of sufficient length of a path shall be collected as separate path or not.",
+           bool(false));
 }
 
 /** *************************************+************************************* **/
@@ -76,7 +81,6 @@ void TrackFinderVXDCellOMatModule::initialize()
 
   //Relations SpacePoints and SpacePointTCs:
   m_TCs.registerRelationTo(m_spacePoints, DataStore::c_Event, DataStore::c_DontWriteOut);
-  m_spacePoints.registerRelationTo(m_TCs, DataStore::c_Event, DataStore::c_DontWriteOut);
 
 }
 
@@ -101,24 +105,23 @@ void TrackFinderVXDCellOMatModule::event()
 
   DirectedNodeNetwork< Segment<TrackNode>, CACell >& segmentNetwork = m_network->accessSegmentNetwork();
 
+  /// apply CA algorithm:
+  int nRounds = m_cellularAutomaton.apply(segmentNetwork);
+  if (nRounds < 0) { B2ERROR("CA failed, skipping event!"); return; }
+
   if (m_PARAMprintNetworks) {
-    std::string fileName = m_PARAMsecMapName + "_CA_Ev" + std::to_string(m_eventCounter);
+    std::string fileName = m_PARAMNetworkName + "_CA_Ev" + std::to_string(m_eventCounter);
     DNN::printCANetwork<Segment< Belle2::TrackNode>>(segmentNetwork, fileName);
   }
 
 
-/// apply CA algorithm:
-  int nRounds = m_cellularAutomaton.apply(segmentNetwork);
-  if (nRounds < 0) { B2ERROR("CA failed, skipping event!"); return; }
-
-
-/// mark valid Cells as Seeds:
+  /// mark valid Cells as Seeds:
   unsigned int nSeeds = m_cellularAutomaton.findSeeds(segmentNetwork, m_PARAMstrictSeeding);
   if (nSeeds == 0) { B2WARNING("TrackFinderVXDCellOMatModule: In Event: " << m_eventCounter << " no seed could be found -> no TCs created!"); return; }
 
 
   /// collect all Paths starting from a Seed:
-  auto collectedPaths = m_pathCollector.findPaths(segmentNetwork);
+  auto collectedPaths = m_pathCollector.findPaths(segmentNetwork, m_PARAMstoreSubsets);
 
 
   /// convert paths of directedNodeNetwork-nodes to paths of const SpacePoint*:

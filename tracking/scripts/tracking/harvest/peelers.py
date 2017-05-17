@@ -42,6 +42,10 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
         pdg_code = mc_particle.getPDG()
         is_primary = bool(mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle))
 
+        decay_vertex = mc_particle.getDecayVertex()
+        number_of_daughters = mc_particle.getNDaughters()
+        status = mc_particle.getStatus()
+
         return dict(
             # At origin assuming perfect magnetic field
             d0_truth=helix.getD0(),
@@ -58,6 +62,14 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
             x_truth=vertex.X(),
             y_truth=vertex.Y(),
             z_truth=vertex.Z(),
+
+            decay_vertex_radius_truth=decay_vertex.Mag(),
+            decay_vertex_x_truth=decay_vertex.X(),
+            decay_vertex_y_truth=decay_vertex.Y(),
+            decay_vertex_z_truth=decay_vertex.Z(),
+            number_of_daughters_truth=number_of_daughters,
+            status_truth=status,
+
 
             # MC Particle information
             charge_truth=charge,
@@ -93,18 +105,28 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
 
 @format_crop_keys
 def peel_reco_track_hit_content(reco_track, key="{part_name}"):
-    n_cdc_hits = reco_track.getNumberOfCDCHits()
-    n_svd_hits = reco_track.getNumberOfSVDHits()
-    n_pxd_hits = reco_track.getNumberOfPXDHits()
-    ndf = 2 * n_pxd_hits + 2 * n_svd_hits + n_cdc_hits
+    if reco_track:
+        n_cdc_hits = reco_track.getNumberOfCDCHits()
+        n_svd_hits = reco_track.getNumberOfSVDHits()
+        n_pxd_hits = reco_track.getNumberOfPXDHits()
+        ndf = 2 * n_pxd_hits + 2 * n_svd_hits + n_cdc_hits
 
-    return dict(
-        n_pxd_hits=n_pxd_hits,
-        n_svd_hits=n_svd_hits,
-        n_cdc_hits=n_cdc_hits,
-        n_hits=n_pxd_hits + n_svd_hits + n_cdc_hits,
-        ndf_hits=ndf,
-    )
+        return dict(
+            n_pxd_hits=n_pxd_hits,
+            n_svd_hits=n_svd_hits,
+            n_cdc_hits=n_cdc_hits,
+            n_hits=n_pxd_hits + n_svd_hits + n_cdc_hits,
+            ndf_hits=ndf,
+        )
+    else:
+        nan = float('nan')
+        return dict(
+            n_pxd_hits=nan,
+            n_svd_hits=nan,
+            n_cdc_hits=nan,
+            n_hits=nan,
+            ndf_hits=nan,
+        )
 
 
 @format_crop_keys
@@ -115,6 +137,15 @@ def peel_reco_track_seed(reco_track, key="{part_name}"):
 
     else:
         return peel_track_fit_result(None, key="seed_{part_name}")
+
+
+@format_crop_keys
+def peel_event_info(event_meta_data, key="{part_name}"):
+    return dict(
+        event_number=event_meta_data.getEvent(),
+        run_number=event_meta_data.getRun(),
+        experiment_number=event_meta_data.getExperiment(),
+    )
 
 
 @format_crop_keys

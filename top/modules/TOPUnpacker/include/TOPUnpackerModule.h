@@ -202,10 +202,10 @@ namespace Belle2 {
      * @param pedestalSubtracted false for version 2, true for version 3
      * @return number of words remaining in data buffer
      */
-    int unpackType2or3Ver1(const int* buffer, int bufferSize,
-                           StoreArray<TOPRawDigit>& rawDigits,
-                           StoreArray<TOPRawWaveform>& waveforms,
-                           bool pedestalSubtracted);
+    int unpackInterimFEVer01(const int* buffer, int bufferSize,
+                             StoreArray<TOPRawDigit>& rawDigits,
+                             StoreArray<TOPRawWaveform>& waveforms,
+                             bool pedestalSubtracted);
 
     /**
      * Unpack raw data given in waveform format (Kurtis packets - IRS3B)

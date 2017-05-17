@@ -13,8 +13,10 @@
 #include <top/dataobjects/TOPSimHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPRawDigit.h>
+#include <top/dataobjects/TOPRawWaveform.h>
 #include <framework/datastore/StoreArray.h>
-
+#include <top/modules/TOPDigitizer/PulseHeightGenerator.h>
+#include <top/dbobjects/TOPSampleTimes.h>
 
 #include <map>
 #include <vector>
@@ -32,8 +34,26 @@ namespace Belle2 {
        * Constructor
        * @param moduleID TOP module ID
        * @param pixelID pixel ID
+       * @param window storage window number (first window of waveform)
+       * @param generator pulse height generator
+       * @param sampleTimes sample times
        */
-      TimeDigitizer(int moduleID, int pixelID);
+      TimeDigitizer(int moduleID, int pixelID, unsigned window,
+                    const TOP::PulseHeightGenerator& generator,
+                    const TOPSampleTimes& sampleTimes);
+
+      /**
+       * Sets sample times
+       * @param sampleTimes sample times
+       */
+      void setSampleTimes(const TOPSampleTimes* sampleTimes)
+      {
+        if (sampleTimes) {
+          m_sampleTimes = sampleTimes;
+        } else {
+          B2ERROR("TOP::TimeDigitizer::setSampleTimes: argument is NULL pointer");
+        }
+      }
 
       /**
        * Add time of simulated hit
@@ -65,6 +85,42 @@ namespace Belle2 {
       unsigned getUniqueID() const {return m_pixelID + (m_moduleID << 16);}
 
       /**
+       * Returns ASIC storage window number
+       * @return window number
+       */
+      unsigned getASICWindow() const {return m_window;}
+
+      /**
+       * Returns hardware channel number
+       * @return hardware channel number
+       */
+      unsigned int getChannel() const { return m_channel; }
+
+      /**
+       * Returns SCROD ID
+       * @return SCROD ID
+       */
+      unsigned getScrodID() const {return m_scrodID;}
+
+      /**
+       * Returns carrier board number
+       * @return carrier board number
+       */
+      unsigned getCarrierNumber() const {return m_carrier;}
+
+      /**
+       * Returns ASIC number
+       * @return ASIC number
+       */
+      unsigned getASICNumber() const {return m_asic;}
+
+      /**
+       * Returns ASIC channel number
+       * @return ASIC channel number
+       */
+      unsigned getASICChannel() const {return m_chan;}
+
+      /**
        * Check if digitizer instance is valid (e.g. module/pixel is mapped to hardware)
        * @return true if valid
        */
@@ -72,36 +128,48 @@ namespace Belle2 {
 
       /**
        * Do time digitization using simplified pile-up and double-hit-resolution model.
-       * As a result, the digitized hits are appended to TOPDigits and the relations to
-       * TOPSimHits and MCParticles are set with proper weights.
-       *
-       * Note: to be refactorized or removed in future!
-       *
-       * @param digits a reference to TOPDigits
-       * @param sigma a r.m.s. of an additional time jitter due to electronics
-       */
-      void digitize(StoreArray<TOPDigit>& digits, double sigma = 0.0);
-
-      /**
-       * Do time digitization using simplified pile-up and double-hit-resolution model.
        * As a result, the digitized hits are appended to TOPRawDigits, then
        * they are converted to TOPDigits and the relations to
        * TOPSimHits and MCParticles are set with proper weights.
        *
-       * Note: to be refactorized in future!
-       *
-       * @param digits a reference to TOPRawDigits
-       * @param digits a reference to TOPDigits
-       * @param sigma a r.m.s. of an additional time jitter due to electronics
+       * @param rawDigits array of TOPRawDigits
+       * @param digits array of TOPDigits
+       * @param threshold pulse height threshold [ADC counts]
+       * @param thresholdCount minimal number of samples above threshold
+       * @param timeJitter a r.m.s. of an additional time jitter due to electronics
        */
       void digitize(StoreArray<TOPRawDigit>& rawDigits,
                     StoreArray<TOPDigit>& digits,
-                    double sigma = 0.0);
+                    int threshold = 0,
+                    int thresholdCount = 0,
+                    double timeJitter = 0);
+
+      /**
+       * Do full waveform time digitization.
+       * As a result, the digitized hits are appended to TOPRawDigits, then
+       * they are converted to TOPDigits and the relations to
+       * TOPSimHits and MCParticles are set with proper weights.
+       *
+       * Note: under development!
+       *
+       * @param waveforms generated waveforms
+       * @param rawDigits array of TOPRawDigits
+       * @param digits array of TOPDigits
+       * @param threshold pulse height threshold [ADC counts]
+       * @param hysteresis pulse height threshold hysteresis [ADC counts]
+       * @param thresholdCount minimal number of samples above threshold
+       */
+      void digitize(StoreArray<TOPRawWaveform>& waveforms,
+                    StoreArray<TOPRawDigit>& rawDigits,
+                    StoreArray<TOPDigit>& digits,
+                    int threshold,
+                    int hysteresis = 0,
+                    int thresholdCount = 0);
 
     private:
 
       /**
-       * Gauss function (pulse shape aproximation)
+       * Gauss function (pulse shape approximation)
        * @param x argument
        * @param mean mean
        * @param sigma sigma
@@ -113,14 +181,33 @@ namespace Belle2 {
         return exp(-0.5 * xx * xx);
       }
 
+      /**
+       * Generate waveform.
+       * The size (number of ASIC windows) is given by the size of first argument.
+       * The size of second argument must be the same as the first one.
+       * @param baselines possible baseline shifts of ASIC windows
+       * @param rmsNoises noise levels (r.m.s) per ASIC window
+       * @param pedestals average pedestals per ASIC window
+       * @param ADCRange ADC range (2^NumBits)
+       * @return generated waveform
+       */
+      std::vector<short> generateWaveform(const std::vector<double>& baselines,
+                                          const std::vector<double>& rmsNoises,
+                                          const std::vector<double>& pedestals,
+                                          int ADCRange);
+
+
       int m_moduleID;         /**< module ID (1-based) */
       int m_pixelID;          /**< pixel (e.g. software channel) ID (1-based) */
+      unsigned m_window = 0;  /**< storage window number */
+      TOP::PulseHeightGenerator m_pulseHeightGenerator; /**< pulse height generator */
+      const TOPSampleTimes* m_sampleTimes = 0; /**< sample times */
+
       unsigned m_channel = 0; /**< hardware channel number (0-based) */
       unsigned m_scrodID = 0; /**< SCROD ID */
       unsigned m_carrier = 0; /**< carrier board number */
       unsigned m_asic = 0;    /**< ASIC number */
       unsigned m_chan = 0;    /**< ASIC channel number */
-      unsigned m_window = 0;  /**< storage window number */
       bool m_valid = false;   /**< true, if module/pixel is mapped to hardware */
 
       std::multimap<double, const TOPSimHit*> m_times; /**< sorted hit times */

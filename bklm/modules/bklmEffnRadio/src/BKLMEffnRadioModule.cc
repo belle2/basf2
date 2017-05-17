@@ -48,6 +48,7 @@
 
 
 using namespace std;
+using namespace CLHEP;
 using namespace Belle2;
 using namespace Belle2::bklm;
 

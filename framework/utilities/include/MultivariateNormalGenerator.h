@@ -33,19 +33,19 @@ namespace Belle2 {
    * return value when setting the covariance matrix.
    *
    * To generate normal distributed random values according to a covariance
-   * matrix we need to decompose the covariance matrix M into M= A A^T. Given
-   * the vector of mean values as \mu and a vector of standard normal
-   * distributed random values (\mu=0, \sigma=1) as n we can obtain a set of
-   * correlated random values x = \mu + A * n.
+   * matrix we need to decompose the covariance matrix \f$M\f$ into \f$M= A A^T\f$. Given
+   * the vector of mean values as \f$\mu\f$ and a vector of standard normal
+   * distributed random values \f$(\mu=0, \sigma=1)\f$ as n we can obtain a set of
+   * correlated random values \f$x = \mu + A * n\f$.
    *
-   * Usually the Cholesky decomposition is chosen as it computes M = L L^T.
+   * Usually the Cholesky decomposition is chosen as it computes \f$M = L L^T\f$.
    * However the Cholesky composition only works for positive definite matrices
    * so it does not work if for example one of the values is fixed and has no
    * error.
    *
    * To ease this restriction a little we use the LDLT decomposition given as
-   * M = P^T L D L^T P where P is a permutation matrix and D a diagonal matrix.
-   * We then can use A = P^T L \sqrt(D) to caluclate the correlated values also
+   * \f$M = P^T L D L^T P\f$ where \f$P\f$ is a permutation matrix and D a diagonal matrix.
+   * We then can use \f$A = P^T L \sqrt(D)\f$ to caluclate the correlated values also
    * for positive semi-definite covariance matrices if the elements of D are
    * positive.
    */

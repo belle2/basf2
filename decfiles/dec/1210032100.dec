@@ -1,0 +1,24 @@
+# EventType: 1210032100
+# Descriptor: [B+ -> Ks pi+ pi0]cc
+# NickName: Bp_KsPipPi0
+# Documentation: 3 Body charmless process
+# Tested: Yes
+# PhysicsWG: BTOCHARMLESS
+# Responsible: Matthew Barrett
+# Email: matthew.barrett2@wayne.edu
+# Cuts: None
+# Date: 20170302
+# Changes: use of aliases defined in DECAY.DEC; date: 20170302; author: Pablo Goldenzweig
+
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.0 K_S0 pi+ pi0  PHOTOS PHSP;
+Enddecay
+CDecay B-sig
+
+End

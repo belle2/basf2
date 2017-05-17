@@ -85,6 +85,9 @@ RootOutputModule::RootOutputModule() : Module(), m_file(0), m_experimentLow(1), 
            "Value for TTree SetAutoSave(): a positive value tells ROOT to write the TTree metadata after n entries, a negative value to write the metadata after -n bytes",
            -30000000);
   addParam("basketSize", m_basketsize, "Basketsize for Branches in the Tree in bytes", 32000);
+  addParam("additionalDataDescription", m_additionalDataDescription, "Additional dictionary of "
+           "name->value pairs to be added to the file metadata to describe the data",
+           m_additionalDataDescription);
 }
 
 
@@ -100,7 +103,7 @@ void RootOutputModule::initialize()
   StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
   fileMetaData.registerInDataStore();
 
-  m_outputFileName = getOutputFile();
+  setOutputFile();
   TDirectory* dir = gDirectory;
   m_file = new TFile(m_outputFileName.c_str(), "RECREATE", "basf2 Event File");
   if (m_file->IsZombie()) {
@@ -145,7 +148,7 @@ void RootOutputModule::initialize()
           continue;
       }
 
-      const TClass* entryClass = iter->second.objClass;
+      TClass* entryClass = iter->second.objClass;
 
       //I want to do this in the input module, but I apparently I cannot disable reading those branches.
       //isabling reading the branch by not calling SetBranchAddress() for it results in the following crashes. Calling SetBranchStatus(..., 0) doesn't help, either.
@@ -257,7 +260,9 @@ void RootOutputModule::fillFileMetaData()
   fileMetaDataPtr->setSteering(Environment::Instance().getSteering());
   fileMetaDataPtr->setMcEvents(Environment::Instance().getNumberOfMCEvents());
   fileMetaDataPtr->setDatabaseGlobalTag(Database::getGlobalTag());
-
+  for (const auto& item : m_additionalDataDescription) {
+    fileMetaDataPtr->setDataDescription(item.first, item.second);
+  }
   //register the file in the catalog
   if (m_updateFileCatalog) {
     FileCatalog::Instance().registerFile(m_outputFileName, *fileMetaDataPtr);

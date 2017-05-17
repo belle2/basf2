@@ -207,6 +207,60 @@ def massKFitDaughtersUpdate(
     )
 
 
+def fourCKFit(
+    list_name,
+    conf_level,
+    decay_string='',
+    path=analysis_main,
+):
+    """
+    Perform vertex fit using the kfitter for each Particle in the given ParticleList.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param path         modules are added to this path
+    @param decay_string select particles used for the vertex fit
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        decay_string,
+        'kfitter',
+        'fourC',
+        '',
+        False,
+        path,
+    )
+
+
+def fourCKFitDaughtersUpdate(
+    list_name,
+    conf_level,
+    decay_string='',
+    path=analysis_main,
+):
+    """
+    Perform vertex fit using the kfitter for each Particle in the given ParticleList and update the daughters.
+
+    @param list_name    name of the input ParticleList
+    @param conf_level   minimum value of the confidence level to accept the fit
+    @param path         modules are added to this path
+    @param decay_string select particles used for the vertex fit
+    """
+
+    fitVertex(
+        list_name,
+        conf_level,
+        decay_string,
+        'kfitter',
+        'fourC',
+        '',
+        True,
+        path,
+    )
+
+
 def vertexRave(
     list_name,
     conf_level,
@@ -239,6 +293,7 @@ def vertexRave(
 def vertexRaveDaughtersUpdate(
     list_name,
     conf_level,
+    decay_string='',
     constraint='',
     path=analysis_main,
 ):
@@ -247,20 +302,18 @@ def vertexRaveDaughtersUpdate(
 
     @param list_name    name of the input ParticleList
     @param conf_level   minimum value of the confidence level to accept the fit
+    @param decay_string select particles used for the vertex fit
     @param constraint   add aditional constraint to the fit (valid options are ipprofile or iptube)
     @param path         modules are added to this path
     """
 
-    fitVertex(
-        list_name,
-        conf_level,
-        '',
-        'rave',
-        'vertex',
-        constraint,
-        True,
-        path,
-    )
+    puvfit = register_module('VertexFitUpdateDaughters')
+    puvfit.set_name('VertexFitUpdateDaughters_' + list_name)
+    puvfit.param('listName', list_name)
+    puvfit.param('confidenceLevel', conf_level)
+    puvfit.param('decayString', decay_string)
+    puvfit.param('withConstraint', constraint)
+    path.add_module(puvfit)
 
 
 def massVertexRave(

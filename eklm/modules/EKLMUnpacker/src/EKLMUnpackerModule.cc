@@ -26,7 +26,7 @@ REG_MODULE(EKLMUnpacker)
 
 EKLMUnpackerModule::EKLMUnpackerModule() : Module()
 {
-  setDescription("Produce EKLMDigits from RawEKLM");
+  setDescription("EKLM unpacker (creates EKLMDigit from RawKLM).");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("outputDigitsName", m_outputDigitsName,
            "Name of EKLMDigit store array", string("EKLMDigits"));
@@ -48,6 +48,11 @@ void EKLMUnpackerModule::beginRun()
 
 void EKLMUnpackerModule::event()
 {
+  /*
+   * Length of one hit in 4 byte words. This is needed find the hits in the
+   * detector buffer
+   */
+  const int hitLength = 2;
   StoreArray<RawKLM> rawKLM;
   StoreArray<EKLMDigit> eklmDigits(m_outputDigitsName);
 
@@ -97,7 +102,7 @@ void EKLMUnpackerModule::event()
           uint16_t plane = ((bword1 >> 7) & 1) + 1;
           uint16_t sector = ((bword1 >> 8) & 3) + 1;
           uint16_t layer = ((bword1 >> 10) & 0xF) + 1;
-          uint16_t forward = ((bword1 >> 14) & 1) + 1;
+          uint16_t endcap = ((bword1 >> 14) & 1) + 1;
           uint16_t ctime = bword2 & 0xFFFF; //full bword
           /* Unused yet? */
           //uint16_t tdc = bword3 & 0x7FF;
@@ -105,7 +110,7 @@ void EKLMUnpackerModule::event()
           B2DEBUG(1, "copper: " << copperId << " finesse: " << finesse_num);
           EKLMDigit* digit = eklmDigits.appendNew();
           digit->setTime(ctime);
-          digit->setEndcap(forward);
+          digit->setEndcap(endcap);
           digit->setLayer(layer);
           digit->setSector(sector);
           digit->setPlane(plane);

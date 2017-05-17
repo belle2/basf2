@@ -136,6 +136,7 @@ namespace Belle2 {
           ver->setTagVertexErrMatrix(m_tagVErrMatrix);
           ver->setTagVertexPval(m_fitPval);
           ver->setDeltaT(m_deltaT);
+          ver->setDeltaTErr(m_deltaTErr);
           ver->setMCTagVertex(m_MCtagV);
           ver->setMCTagBFlavor(m_mcPDG);
           ver->setMCDeltaT(m_MCdeltaT);
@@ -143,6 +144,7 @@ namespace Belle2 {
           ver->setTagVertex(m_tagV);
           ver->setTagVertexPval(-1.);
           ver->setDeltaT(-1111.);
+          ver->setDeltaTErr(-1111.);
           ver->setMCTagBFlavor(0.);
           ver->setMCDeltaT(-1111.);
         }
@@ -958,6 +960,36 @@ namespace Belle2 {
 
     m_deltaT = dt;
     m_MCdeltaT = MCdt;
+
+
+    // Calculate Delta t error
+
+    double cy = boost.Z() / TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());
+    double sy = boost.X() / TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());
+    double cx = TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X()) / boost.Mag();
+    double sx = boost.Y() / boost.Mag();
+
+    TMatrixD RotY(3, 3);
+    RotY(0, 0) = cy;  RotY(0, 1) = 0;   RotY(0, 2) = -sy;
+    RotY(1, 0) = 0;   RotY(1, 1) = 1;   RotY(1, 2) = 0;
+    RotY(2, 0) = sy;  RotY(2, 1) = 0;   RotY(2, 2) = cy;
+
+    TMatrixD RotX(3, 3);
+    RotX(0, 0) = 1;   RotX(0, 1) = 0;   RotX(0, 2) = 0;
+    RotX(1, 0) = 0;   RotX(1, 1) = cx;  RotX(1, 2) = -sx;
+    RotX(2, 0) = 0;   RotX(2, 1) = sx;  RotX(2, 2) = cx;
+
+    TMatrixD Rot = RotY * RotX;
+    TMatrixD RotCopy = Rot;
+    TMatrixD RotInv = Rot.Invert();
+
+    TMatrixD RotErr = RotInv * m_tagVErrMatrix * RotCopy;
+    TMatrixD RR = (TMatrixD)Breco->getVertexErrorMatrix();
+    TMatrixD RotErrBreco = RotInv * RR * RotCopy;
+
+    double dtErr = sqrt(RotErr(2, 2) + RotErrBreco(2, 2)) / (bg * c);
+
+    m_deltaTErr = dtErr;
 
   }
 

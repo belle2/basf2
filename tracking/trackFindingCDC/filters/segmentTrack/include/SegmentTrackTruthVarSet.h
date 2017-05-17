@@ -15,6 +15,7 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 #include <utility>
+#include <tracking/trackFindingCDC/filters/segmentTrack/BaseSegmentTrackFilter.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -32,7 +33,7 @@ namespace Belle2 {
     };
 
     /// Vehicle class to transport the variable names
-    struct SegmentTrackTruthVarNames : public VarNames<std::pair<const CDCTrack*, const CDCSegment2D*>> {
+    struct SegmentTrackTruthVarNames : public VarNames<BaseSegmentTrackFilter::Object> {
 
       /// Number of variables to be generated
       static const size_t nVars = size(segmentTrackTruthVarNames);
@@ -52,7 +53,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the contained variables
-      bool extract(const std::pair<const CDCTrack*, const CDCSegment2D*>* testPair) final;
+      bool extract(const BaseSegmentTrackFilter::Object* testPair) final;
 
 
       void initialize() override

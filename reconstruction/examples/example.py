@@ -15,8 +15,8 @@
 
 from basf2 import *
 from simulation import add_simulation
+from L1trigger import add_tsim
 from reconstruction import add_reconstruction, add_mdst_output
-from HLTTrigger import add_HLT_Y4S
 
 # create path
 main = create_path()
@@ -33,15 +33,12 @@ main.add_module('EvtGenInput')
 add_simulation(main)
 # or add_simulation(main, components) to simulate a selection of detectors
 
-# HLT L3 simulation
-main.add_module('Level3')
+# trigger simulation
+add_tsim(main)
 
 # reconstruction
 add_reconstruction(main)
 # or add_reconstruction(main, components) to run the reconstruction of a selection of detectors
-
-# HLT physics trigger
-add_HLT_Y4S(main)
 
 # full output
 main.add_module('RootOutput', outputFileName='output.root')

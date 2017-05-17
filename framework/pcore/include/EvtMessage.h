@@ -9,7 +9,7 @@
 #ifndef EVTMESSAGE_H
 #define EVTMESSAGE_H
 
-#include <TMessage.h>
+#include <RtypesCore.h>
 
 struct timeval;
 
@@ -19,20 +19,30 @@ namespace Belle2 {
    *
    * Note: for parallel processing, the only type that can work is MSG_EVENT. Other messages would need to be sent once to each process, which would result in all kinds of race conditions.
    */
-  enum RECORD_TYPE { MSG_EVENT, MSG_BEGIN_RUN, MSG_END_RUN, MSG_TERMINATE, MSG_NORECORD, MSG_STREAMERINFO };
+  enum ERecordType { MSG_EVENT, MSG_BEGIN_RUN, MSG_END_RUN, MSG_TERMINATE, MSG_NORECORD, MSG_STREAMERINFO };
 
   /** Header structure of streamed object list */
   struct EvtHeader {
+    /** set number of words and record type. */
+    EvtHeader(UInt_t aSize, ERecordType aRectype): size(aSize), rectype(aRectype) {}
     UInt_t size; /**< Number of words in this record. */
-    RECORD_TYPE rectype; /**< Type of message. */
-    Long64_t time_sec; /**< seconds part of timeval. */
-    Long64_t time_usec; /**< seconds part of timeval. */
-    UInt_t src; /**< source IP. */
-    UInt_t dest; /**< destination IP. */
-    UInt_t alsoReserved; /**< obsolete member removed, can be replaced with something else. */
-    UInt_t nObjects; /**< #objects in message. */
-    UInt_t nArrays; /**< #objects in message. */
-    UInt_t reserved[7]; /**< Reserved for future use. Don't ever use these directly. */
+    ERecordType rectype; /**< Type of message. */
+    Long64_t time_sec{0}; /**< seconds part of timeval. */
+    Long64_t time_usec{0}; /**< micro seconds part of timeval. */
+    UInt_t src{(UInt_t) - 1}; /**< source IP. */
+    UInt_t dest{(UInt_t) - 1}; /**< destination IP. */
+    UInt_t flags{0}; /**< flags concerning the content of the message. Usually 0
+                      but can be any combination of of EvtMessage::EMessageFlags. */
+    UInt_t nObjects{0}; /**< number of objects in message. */
+    UInt_t nArrays{0}; /**< number of objects in message. */
+    UInt_t reserved[6] {0}; /**< Reserved for future use. Don't ever use these directly. */
+    /** version field. Previously the reserved fields were not initialized
+     * properly so they could contain random garbage which makes it very hard
+     * to check for anything. Now we send 0xBEEFED + 8bit version to indicate
+     * that yes, this is indeed a valid version and not just random garbage.
+     * Chance of collision is low but there is nothing else we can do except
+     * breaking compatibility with old files. */
+    UInt_t version{0xBEEFED01};
   };
 
   /** Class to manage streamed object.
@@ -49,10 +59,17 @@ namespace Belle2 {
     /** maximal EvtMessage size, in bytes (200MB). */
     const static unsigned int c_MaxEventSize = 200000000;
 
+    /** Flags for the message */
+    enum EMessageFlags {
+      /** indicates that the message body is compressed and should be
+       * uncompressed using ROOT R__unzip_header and R__unzip before use */
+      c_MsgCompressed = 1
+    };
+
     /** build EvtMessage from existing buffer (no copy, but does not take ownership). */
-    explicit EvtMessage(char* buf = NULL);
+    explicit EvtMessage(char* buf = nullptr);
     /** build EvtMessage by allocating new message buffer (sobjs is copied). */
-    EvtMessage(const char* sobjs, int size, RECORD_TYPE type);
+    EvtMessage(const char* msg, int size, ERecordType type);
     /** Copy constructor (m_data is copied). */
     EvtMessage(const EvtMessage& evtmsg);
     /** Destructor */
@@ -83,15 +100,26 @@ namespace Belle2 {
     /** Get size of message body */
     int   msg_size() const;
 
+    /** get version of the header. Returns 0 for no valid version information */
+    unsigned int getVersion() const { return ((getHeader()->version & 0xFFFFFF00) == 0xBEEFED00) ? (getHeader()->version & 0xFF) : 0;}
+    /** Get flags of the  message */
+    unsigned int getMsgFlags() const { return getVersion() > 0 ? getHeader()->flags : 0; }
+    /** Set flags for the message */
+    void setMsgFlags(unsigned int flags) { header()->flags = flags;}
+    /** Add flags to the  message */
+    void addMsgFlags(unsigned int flags) { header()->flags |= flags;}
+    /** Check if the message has the given flags */
+    bool hasMsgFlags(unsigned int flags) const { return (getMsgFlags() & flags) == flags; }
+
     /** Get record type */
-    RECORD_TYPE type() const;
+    ERecordType type() const;
     /** Set record type */
-    void type(RECORD_TYPE);
+    void type(ERecordType);
 
     /** Get time stamp */
     struct timeval time() const;
     /** Set time stamp */
-    void time(struct timeval& time);
+    void setTime(const struct timeval& time);
 
     /** Get source IP of message */
     int   src() const;
@@ -105,26 +133,17 @@ namespace Belle2 {
 
     /** Get pointer to EvtHeader */
     EvtHeader* header();
+    /** Get pointer to EvtHeader */
+    const EvtHeader* getHeader() const;
     /** Get pointer to message body */
     char* msg();
-    /** Copy message into newly allocated buffer */
-    void msg(const char* msg, int size, RECORD_TYPE type);
 
   private:
+    /** Copy message into newly allocated buffer */
+    void setMsg(const char* msg, int size, ERecordType type);
+
     char* m_data;         ///< Pointer to the internal EvtMessage buffer
     bool m_ownsBuffer; ///< Wether to clean up m_data in destructor
-
   };
-
-  /**  Message class derived from TMessage */
-  class InMessage : public TMessage {
-  public:
-    /** Constructor to build a message */
-    InMessage(void* buf, int len) : TMessage(buf, len)
-    {
-      this->SetBit(kIsOwner, false);
-    }
-  };
-
 }
 #endif

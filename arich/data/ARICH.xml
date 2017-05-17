@@ -14,10 +14,15 @@
     <xi:include href="ARICH-CosmicTest.xml"/>
 	
     <Envelope>
-      <length desc="z length of aRICH envelope" unit="mm">280</length>
-      <zPosition desc="starting z position of ARICH envelope" unit="mm">1668</zPosition>
-      <outerRadius desc="Outer radius of aRICH envelope" unit="mm">1140</outerRadius> 
-      <innerRadius desc="Inner radius of aRICH evnelope" unit="mm">420</innerRadius> 
+      <length desc="z length of ARICH envelope" unit="mm">280</length>
+      <xPosition desc="center x position of ARICH envelope" unit="mm">0.0</xPosition>
+      <yPosition desc="center y position of ARICH envelope" unit="mm">0.0</yPosition>
+      <zPosition desc="starting z position of ARICH envelope" unit="mm">1668.0</zPosition>
+      <xRotation desc="rotation around x axis" unit="deg">0</xRotation>
+      <yRotation desc="rotation around y axis" unit="deg">0</yRotation>
+      <zRotation desc="rotation aroung z axis" unit="deg">0</zRotation>
+      <outerRadius desc="Outer radius of aRICH envelope" unit="mm">1140.0</outerRadius> 
+      <innerRadius desc="Inner radius of aRICH evnelope" unit="mm">420.0</innerRadius> 
       <material desc="aRICH envelope material: should be air with specified refractive index">ARICH_Air</material>
     </Envelope>
   </Content>

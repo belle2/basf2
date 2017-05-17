@@ -11,16 +11,16 @@
 #ifndef EVTGENINPUTMODULE_H
 #define EVTGENINPUTMODULE_H
 
+#include <generators/evtgen/EvtGenInterface.h>
+
+#include <generators/utilities/InitialParticleGeneration.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
+
 #include <framework/core/Module.h>
 
 #include <string>
 #include <vector>
-
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/MCParticleGraph.h>
-#include <generators/evtgen/EvtGenInterface.h>
-
-#include <generators/utilities/InitialParticleGeneration.h>
 
 namespace Belle2 {
 
@@ -66,7 +66,6 @@ namespace Belle2 {
     EvtGenInterface m_Ievtgen;  /**< An instance of the EvtGen Interface. */
     std::string m_DECFileName;     /**<  Standard input decay file.  */
     std::string m_userDECFileName; /**<  Standard input user decay file. */
-    std::string m_pdlFileName;     /**<  Standard input pdl file.  */
     std::string m_parentParticle;  /**<  Standard input parent particle. */
     int m_inclusiveType;        /**< Inclusive type 0 : generic, 1 : m_inclusiveParticle inclusive, 2 : m_inclusiveParticle + c.c. inclusive */
     std::string m_inclusiveParticle; /**< inclusive Particle */

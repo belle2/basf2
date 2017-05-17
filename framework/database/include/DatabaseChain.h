@@ -27,8 +27,11 @@ namespace Belle2 {
     /**
      * Method to set the database instance to a local database.
      *
-     * @param resetIoVs   A flag to indicate whether IoVs from non-primary databases should be set to the current run
-     * @param logLevel    The level of log messages about not-found payloads.
+     * @param resetIoVs A flag to indicate whether IoVs from non-primary databases should be set to the current run
+     * @param logLevel The level of log messages about not-found payloads.
+     * @param invertLogging If true log messages will be created when a
+     *   payload is found. This is intended for the local database to notify
+     *   the user that a non-standard payload from a local directory is used.
      */
     static void createInstance(bool resetIoVs = false, LogConfig::ELogLevel logLevel = LogConfig::c_Warning,
                                bool invertLogging = false);
@@ -47,8 +50,7 @@ namespace Belle2 {
      * @param name       Name that identifies the object in the database.
      * @return           A pair of a pointer to the object and the interval for which it is valid
      */
-    virtual std::pair<TObject*, IntervalOfValidity> getData(const EventMetaData& event, const std::string& package,
-                                                            const std::string& module) override;
+    virtual std::pair<TObject*, IntervalOfValidity> getData(const EventMetaData& event, const std::string& name) override;
 
     /**
      * Store an object in the database.
@@ -58,19 +60,17 @@ namespace Belle2 {
      * @param iov        The interval of validity of the the object.
      * @return           True if the storage of the object succeeded.
      */
-    virtual bool storeData(const std::string& package, const std::string& module, TObject* object,
-                           const IntervalOfValidity& iov) override;
+    virtual bool storeData(const std::string& name, TObject* object, const IntervalOfValidity& iov) override;
 
     /**
      * Add a payload file to the database.
      *
-     * @param package    Name of the package that identifies the object in the database.
-     * @param module     Name of the module that identifies the object in the database.
+     * @param name       Name that identifies the object in the database.
      * @param fileName   The name of the payload file.
      * @param iov        The interval of validity of the the object.
      * @return           True if the storage of the object succeeded.
      */
-    virtual bool addPayload(const std::string& package, const std::string& module, const std::string& fileName,
+    virtual bool addPayload(const std::string& name, const std::string& fileName,
                             const IntervalOfValidity& iov) override;
 
     /** Return the list of registered databases. */

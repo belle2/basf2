@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import sys
 import math
 import itertools
 import collections
@@ -278,10 +279,10 @@ class ValidationPlot(object):
 
             for histogram in self.histograms:
                 histogram.SetMinimum(0)
-                histogram.SetMaximum(1)
+                histogram.SetMaximum(1.05)
 
             self.plot.SetMinimum(0)
-            self.plot.SetMaximum(1)
+            self.plot.SetMaximum(1.05)
 
         return self
 
@@ -416,9 +417,15 @@ class ValidationPlot(object):
                outlier_z_score=(None, None),
                include_exceptionals=(True, True),
                allow_discrete=(False, False),
+               quantiles=None,
                is_expert=True):
         """Fill the plot with a two dimensional histogram"""
+
         name = self.name
+        # Introduce a dummy name for the temporary two dimensional histogram
+        if quantiles is not None:
+            name = "_" + self.name
+
         is_expert = self.is_expert
 
         x_bins, y_bins = self.unpack_2d_param(bins)
@@ -427,6 +434,10 @@ class ValidationPlot(object):
         x_outlier_z_score, y_outlier_z_score = self.unpack_2d_param(outlier_z_score)
         x_include_exceptionals, y_include_exceptionals = self.unpack_2d_param(include_exceptionals)
         x_allow_discrete, y_allow_discrete = self.unpack_2d_param(allow_discrete)
+
+        if quantiles is not None:
+            y_include_exceptionals = True
+            y_allow_discrete = False
 
         x_bin_edges, x_bin_labels = self.determine_bin_edges(xs,
                                                              stackbys=stackby,
@@ -482,6 +493,31 @@ class ValidationPlot(object):
 
         self.create(histogram, xs, ys=ys, weights=weights, stackby=stackby)
 
+        if quantiles is not None:
+            self.name = self.name[1:]
+            profiles = []
+            for histogram in self.histograms:
+                for quantile in quantiles:
+                    profile = histogram.QuantilesX(quantile, histogram.GetName()[1:] + '_' + str(quantile))
+
+                    # Manually copy labels grumble grumble
+                    x_taxis = histogram.GetXaxis()
+                    new_x_taxis = profile.GetXaxis()
+                    for i_bin in range(x_taxis.GetNbins() + 2):
+                        label = x_taxis.GetBinLabel(i_bin)
+                        if label != "":
+                            new_x_taxis.SetBinLabel(i_bin, label)
+
+                    # Remove faulty error values)
+                    epsilon = sys.float_info.epsilon
+                    for i_bin in range(0, profile.GetNbinsX() + 2):
+                        profile.SetBinError(i_bin, epsilon)
+
+                    profiles.append(profile)
+
+            self.histograms = profiles
+            self.plot = self.create_stack(profiles, name=self.plot.GetName()[1:], reverse_stack=False, force_graph=True)
+
         # Adjust the discrete bins after the filling to be equidistant
         if x_bin_labels:
             for histogram in self.histograms:
@@ -509,34 +545,33 @@ class ValidationPlot(object):
         title = "gaus"
         formula = "gaus"
 
-        if z_score is None:
-            lower_bound = None
-            upper_bound = None
-        else:
-            plot = self.plot
-            if plot is None:
-                raise RuntimeError('Validation plot must be filled before it can be fitted.')
+        plot = self.plot
+        if plot is None:
+            raise RuntimeError('Validation plot must be filled before it can be fitted.')
 
-            if not isinstance(plot, ROOT.TH1D):
-                raise RuntimeError('Fitting is currently implemented / tested for one dimensional, non stacked validation plots.')
+        if not isinstance(plot, ROOT.TH1D):
+            raise RuntimeError('Fitting is currently implemented / tested for one dimensional, non stacked validation plots.')
 
-            histogram = plot
-
-            mean = histogram.GetMean()
-            std = histogram.GetStdDev()
-            lower_bound = mean - z_score * std
-            upper_bound = mean + z_score * std
+        histogram = plot
 
         fit_tf1 = ROOT.TF1("Fit", formula)
         fit_tf1.SetTitle(title)
         fit_tf1.SetParName(0, "n")
         fit_tf1.SetParName(1, "mean")
         fit_tf1.SetParName(2, "std")
+
+        n = histogram.GetSumOfWeights()
+        mean = histogram.GetMean()
+        std = histogram.GetStdDev()
+
+        fit_tf1.SetParameter(0, n)
+        fit_tf1.SetParameter(1, mean)
+        fit_tf1.SetParameter(2, std)
+
         fit_options = "LM"
         return self.fit(fit_tf1,
                         fit_options,
-                        lower_bound=lower_bound,
-                        upper_bound=upper_bound)
+                        z_score=z_score)
 
     def fit_line(self):
         """Fit a general line to a one dimensional histogram"""
@@ -566,7 +601,7 @@ class ValidationPlot(object):
         fit_tf1.SetParName(0, "slope")
         self.fit(fit_tf1, 'M')
 
-    def fit(self, formula, options, lower_bound=None, upper_bound=None):
+    def fit(self, formula, options, lower_bound=None, upper_bound=None, z_score=None):
         """Fit a user defined function to a one dimensional histogram
 
         Parameters
@@ -594,6 +629,16 @@ class ValidationPlot(object):
         hist_lower_bound = xaxis.GetBinLowEdge(1)
         hist_upper_bound = xaxis.GetBinUpEdge(n_bins)
 
+        if z_score is not None:
+            mean = histogram.GetMean()
+            std = histogram.GetStdDev()
+
+            if lower_bound is None:
+                lower_bound = mean - z_score * std
+
+            if upper_bound is None:
+                upper_bound = mean + z_score * std
+
         # Setup the plotting range of the function to match the histogram
         if isinstance(formula, ROOT.TF1):
             fit_tf1 = formula
@@ -606,9 +651,9 @@ class ValidationPlot(object):
         get_logger().info('Fitting with %s', fit_tf1.GetExpFormula())
 
         # Determine fit range
-        if lower_bound is None:
+        if lower_bound is None or lower_bound < hist_lower_bound:
             lower_bound = hist_lower_bound
-        if upper_bound is None:
+        if upper_bound is None or upper_bound > hist_upper_bound:
             upper_bound = hist_upper_bound
 
         # Make sure the fitted function is not automatically added since we want to do that one our own.
@@ -959,11 +1004,11 @@ class ValidationPlot(object):
         self.attach_attributes()
 
     @classmethod
-    def create_stack(cls, histograms, name, reverse_stack):
+    def create_stack(cls, histograms, name, reverse_stack, force_graph=False):
         if len(histograms) == 1:
             plot = histograms[0]
         else:
-            if isinstance(histograms[0], (ROOT.TProfile, ROOT.TGraph)):
+            if isinstance(histograms[0], (ROOT.TProfile, ROOT.TGraph)) or force_graph:
                 plot = ROOT.TMultiGraph()
             else:
                 plot = ROOT.THStack()
@@ -974,14 +1019,14 @@ class ValidationPlot(object):
             # that the signal usually is on the bottom an well visible
             if reverse_stack:
                 for histogram in reversed(histograms):
-                    if isinstance(histogram, ROOT.TProfile):
+                    if isinstance(histogram, ROOT.TProfile) or (isinstance(histogram, ROOT.TH1) and force_graph):
                         histogram = cls.convert_tprofile_to_tgrapherrors(histogram)
                         plot.Add(histogram, "APZ")
                     else:
                         plot.Add(histogram)
             else:
                 for histogram in histograms:
-                    if isinstance(histogram, ROOT.TProfile):
+                    if isinstance(histogram, ROOT.TProfile) or (isinstance(histogram, ROOT.TH1) and force_graph):
                         histogram = cls.convert_tprofile_to_tgrapherrors(histogram)
                         plot.Add(histogram, "APZ")
                     else:
@@ -1421,7 +1466,7 @@ class ValidationPlot(object):
         # Manually copy labels grumble grumble
         x_taxis = th2.GetXaxis()
         new_x_taxis = th1_means.GetXaxis()
-        for i_bin in range(x_taxis.GetNbins()):
+        for i_bin in range(x_taxis.GetNbins() + 2):
             label = x_taxis.GetBinLabel(i_bin)
             if label != "":
                 new_x_taxis.SetBinLabel(i_bin, label)
@@ -1585,7 +1630,11 @@ class ValidationPlot(object):
         debug = get_logger().debug
         debug('Determine binning for plot named %s', self.name)
 
-        if isinstance(bins, collections.Iterable):
+        if bins == 'flat':
+            # Special value for the flat distribution binning
+            n_bins = None
+
+        elif isinstance(bins, collections.Iterable):
             # Bins is considered as an array
             # Construct a float array forwardable to root.
             bin_edges = bins
@@ -1594,7 +1643,7 @@ class ValidationPlot(object):
             return bin_edges, bin_labels
 
         # If bins is not an iterable assume it is the number of bins or None
-        if bins is None:
+        elif bins is None:
             n_bins = None
         else:
             # Check that bins can be coerced to an integer.
@@ -1669,9 +1718,14 @@ class ValidationPlot(object):
 
         n_bin_edges = n_bins + 1
         if lower_bound != upper_bound:
-            # Correct the upper bound such that all values are strictly smaller than the upper bound
-            # Make one step in single precision in the positive direction
-            bin_edges = np.linspace(lower_bound, upper_bound, n_bin_edges)
+            if bins == "flat":
+                debug("Creating flat distribution binning")
+                precentiles = np.linspace(0.0, 100.0, n_bin_edges)
+                bin_edges = np.unique(np.nanpercentile(xs[(lower_bound <= xs) & (xs <= upper_bound)], precentiles))
+            else:
+                # Correct the upper bound such that all values are strictly smaller than the upper bound
+                # Make one step in single precision in the positive direction
+                bin_edges = np.linspace(lower_bound, upper_bound, n_bin_edges)
 
             # Reinforce the upper and lower bound to be exact
             # Also expand the upper bound by an epsilon
@@ -1763,7 +1817,6 @@ class ValidationPlot(object):
 
                 stack_ranges.append([stack_lower_bound, stack_upper_bound])
 
-            print(stack_ranges)
             lower_bound = np.nanmin([lwb for lwb, upb in stack_ranges])
             upper_bound = np.nanmax([upb for lwb, upb in stack_ranges])
 
@@ -2107,6 +2160,22 @@ class ValidationPlot(object):
         self.ylabel = self.ylabel
         self.title = self.title
 
+    def set_maximum(self, maximum):
+        """Sets the maximum of the vertical plotable range"""
+        for histogram in self.histograms:
+            if isinstance(histogram, ROOT.TH1):
+                histogram.SetMaximum(histogram.GetMaximum(maximum))
+            else:
+                histogram.SetMaximum(maximum)
+
+    def set_minimum(self, minimum):
+        """Sets the minimum of the vertical plotable range"""
+        for histogram in self.histograms:
+            if isinstance(histogram, ROOT.TH1):
+                histogram.SetMinimum(histogram.GetMinimum(minimum))
+            else:
+                histogram.SetMinimum(minimum)
+
     @classmethod
     def set_tstyle(cls):
         """Set the style such that the additional stats entries are shown by the TBrowser"""
@@ -2122,7 +2191,7 @@ class ValidationPlot(object):
             belle2_validation_tstyle.SetOptStat(opt_stat)
             ROOT.gROOT.SetStyle(belle2_validation_style_name)
 
-            belle2_validation_tstyle.SetLineStyleString(cls.very_sparse_dots_line_style_index, "4 2000")
+            # belle2_validation_tstyle.SetLineStyleString(cls.very_sparse_dots_line_style_index, "4 2000")
 
         else:
             belle2_validation_tstyle.cd()

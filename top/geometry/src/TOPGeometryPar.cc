@@ -247,10 +247,55 @@ namespace Belle2 {
         module.setPMTArray(pmtArray);
         if (decoupledFraction > 0) module.generateDecoupledPMTs(decoupledFraction);
         // module.setModuleCNumber(num);
-        // module.setPMTArrayDisplacement(arrayDispl);
-        // module.setModuleDisplacement(moduleDispl);
         geo->appendModule(module);
         phi += 2 * M_PI / numModules;
+      }
+
+      // displaced geometry (if defined)
+
+      GearDir displacedGeometry(content, "DisplacedGeometry");
+      if (displacedGeometry) {
+        if (displacedGeometry.getInt("SwitchON") != 0) {
+          B2WARNING("TOP: displaced geometry is activated");
+          for (const GearDir& slot : displacedGeometry.getNodes("Slot")) {
+            int moduleID = slot.getInt("@ID");
+            if (!geo->isModuleIDValid(moduleID)) {
+              B2WARNING("TOPGeometryPar: DisplacedGeometry.xml: invalid moduleID "
+                        << moduleID);
+              continue;
+            }
+            TOPGeoModuleDisplacement moduleDispl(slot.getLength("x"),
+                                                 slot.getLength("y"),
+                                                 slot.getLength("z"),
+                                                 slot.getAngle("alpha"),
+                                                 slot.getAngle("beta"),
+                                                 slot.getAngle("gamma"));
+            auto& module = const_cast<TOPGeoModule&>(geo->getModule(moduleID));
+            module.setModuleDisplacement(moduleDispl);
+          }
+        }
+      }
+
+      // displaced PMT arrays (if defined)
+
+      GearDir displacedPMTArrays(content, "DisplacedPMTArrays");
+      if (displacedPMTArrays) {
+        if (displacedPMTArrays.getInt("SwitchON") != 0) {
+          B2WARNING("TOP: displaced PMT arrays are activated");
+          for (const GearDir& slot : displacedPMTArrays.getNodes("Slot")) {
+            int moduleID = slot.getInt("@ID");
+            if (!geo->isModuleIDValid(moduleID)) {
+              B2WARNING("TOPGeometryPar: DisplacedPMTArrays.xml: invalid moduleID "
+                        << moduleID);
+              continue;
+            }
+            TOPGeoPMTArrayDisplacement arrayDispl(slot.getLength("x"),
+                                                  slot.getLength("y"),
+                                                  slot.getAngle("alpha"));
+            auto& module = const_cast<TOPGeoModule&>(geo->getModule(moduleID));
+            module.setPMTArrayDisplacement(arrayDispl);
+          }
+        }
       }
 
       // broken glues (if any)
@@ -443,6 +488,8 @@ namespace Belle2 {
                                  tdcParams.getTime("doubleHitResolution"),
                                  tdcParams.getTime("timeJitter"),
                                  tdcParams.getDouble("efficiency"));
+        nominalTDC.setADCBits(tdcParams.getInt("adcBits"));
+        nominalTDC.setAveragePedestal(tdcParams.getInt("averagePedestal"));
         geo->setNominalTDC(nominalTDC);
       } else {
         TOPNominalTDC nominalTDC(pmtParams.getInt("TDCbits"),
@@ -453,6 +500,19 @@ namespace Belle2 {
                                  pmtParams.getTime("TDCtimeJitter", 50e-3),
                                  pmtParams.getDouble("TDCefficiency", 1));
         geo->setNominalTDC(nominalTDC);
+      }
+
+      // single photon signal shape
+
+      GearDir shapeParams(content, "SignalShape");
+      if (shapeParams) {
+        GearDir noiseBandwidth(shapeParams, "noiseBandwidth");
+        TOPSignalShape signalShape(shapeParams.getArray("sampleValues"),
+                                   geo->getNominalTDC().getSampleWidth(),
+                                   shapeParams.getTime("tailTimeConstant"),
+                                   noiseBandwidth.getDouble("pole1") / 1000,
+                                   noiseBandwidth.getDouble("pole2") / 1000);
+        geo->setSignalShape(signalShape);
       }
 
       return geo;

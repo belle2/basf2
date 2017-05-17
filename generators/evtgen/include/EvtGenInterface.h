@@ -11,9 +11,6 @@
 #ifndef EVTGENINTERFACE_H
 #define EVTGENINTERFACE_H
 
-#include <framework/core/FrameworkExceptions.h>
-#include <framework/logging/Logger.h>
-#include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <EvtGen/EvtGen.hh>
 #include <EvtGenBase/EvtCPUtil.hh>
@@ -22,6 +19,10 @@
 #include <EvtGenBase/EvtRandom.hh>
 #include <EvtGenBase/EvtVector4R.hh>
 #include <generators/evtgen/EvtGenFwRandEngine.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
+
+#include <framework/logging/Logger.h>
+#include <framework/utilities/IOIntercept.h>
 
 #include <string>
 #include <fstream>
@@ -40,7 +41,8 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EvtGenInterface(): m_parent(0), m_Generator(0), m_pinit(0, 0, 0, 0) {}
+    EvtGenInterface(): m_parent(0), m_Generator(0), m_pinit(0, 0, 0, 0),
+      m_logCapture("EvtGen", LogConfig::c_Info, LogConfig::c_Warning) {}
 
     /**
      * Destructor.
@@ -69,6 +71,7 @@ namespace Belle2 {
     EvtGen* m_Generator;        /**<Variable needed for EvtGen generator. */
     EvtVector4R m_pinit;        /**<Variable needed for initial momentum. */
     EvtId m_ParentParticle;     /**<Variable needed for parent particle ID. */
+    IOIntercept::OutputToLogMessages m_logCapture; /**< Capture evtgen log and transform into basf2 logging. */
   }; //! end of EvtGen Interface
 
 } //! end of Belle2 namespace

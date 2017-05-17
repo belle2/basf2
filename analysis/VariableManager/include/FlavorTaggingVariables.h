@@ -217,5 +217,22 @@ namespace Belle2 {
      * This is a Flavor Tagging variable for general use.
      */
     Manager::FunctionPtr qrOutput(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the flavor tag q output of the flavorTagger for the given combinerMethod.
+     * This is a Flavor Tagging variable for general use.
+     */
+    Manager::FunctionPtr qOutput(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the corresponding r (dilution) bin according to the Belle binning for the given combinerMethod.
+     * The default methods are 'FBDT' or 'FANN'.
+     * This is a Flavor Tagging variable for general use.
+     */
+    Manager::FunctionPtr rBinBelle(const std::vector<std::string>& arguments);
+
+
+
+
   }
 }

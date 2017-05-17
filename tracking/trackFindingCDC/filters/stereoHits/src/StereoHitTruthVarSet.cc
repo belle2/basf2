@@ -17,10 +17,10 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool StereoHitTruthVarSet::extract(const std::pair<const CDCTrack*, const CDCRLWireHit*>* testPair)
+bool StereoHitTruthVarSet::extract(const BaseStereoHitFilter::Object* testPair)
 {
-  const CDCRLWireHit* rlWireHit = testPair->second;
-  const CDCTrack* track = testPair->first;
+  const CDCRLWireHit* rlWireHit = testPair->getTo();
+  const CDCTrack* track = testPair->getFrom();
 
   if (not testPair or not rlWireHit or not track) return false;
 

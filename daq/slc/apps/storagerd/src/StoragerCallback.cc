@@ -17,14 +17,7 @@ using namespace Belle2;
 
 StoragerCallback::StoragerCallback()
 {
-  setAutoReply(false);
   setTimeout(1);
-  /*
-  system("killall storagein");
-  system("killall storagerecord");
-  system("killall storageout");
-  system("killall basf2");
-  */
   m_eb_stat = NULL;
   m_errcount = 0;
   m_expno = -1;
@@ -38,8 +31,7 @@ StoragerCallback::~StoragerCallback() throw()
 
 void StoragerCallback::initialize(const DBObject& obj) throw(RCHandlerException)
 {
-  allocData(getNode().getName(), "storage",
-            storage_status_revision);
+  allocData(getNode().getName(), "storage", storage_status_revision);
   configure(obj);
 }
 
@@ -87,8 +79,6 @@ void StoragerCallback::configure(const DBObject& obj) throw(RCHandlerException)
     add(new NSMVHandlerFloat(vname + "total_byte", true, false, 0));
     add(new NSMVHandlerFloat(vname + "flowrate", true, false, 0));
     add(new NSMVHandlerFloat(vname + "nqueue", true, false, 0));
-    //add(new NSMVHandlerFloat(vname + "nevent", true, false, 0));
-    //add(new NSMVHandlerFloat(vname + "evtrate", true, false, 0));
     m_nsenders++;
   }
   std::string vname = StringUtil::form("stat.out.");
@@ -99,8 +89,6 @@ void StoragerCallback::configure(const DBObject& obj) throw(RCHandlerException)
   add(new NSMVHandlerInt(vname + "event", true, false, 0));
   add(new NSMVHandlerFloat(vname + "total_byte", true, false, 0));
   add(new NSMVHandlerFloat(vname + "flowrate", true, false, 0));
-  //add(new NSMVHandlerFloat(vname + "nevent", true, false, 0));
-  //add(new NSMVHandlerFloat(vname + "evtrate", true, false, 0));
 }
 
 void StoragerCallback::term() throw()
@@ -161,7 +149,7 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     std::string upname = std::string("/dev/shm/") + getNode().getName() + "_eb2rx_up";
     std::string downname = std::string("/dev/shm/") + getNode().getName() + "_eb2rx_down";
     if (m_eb_stat) delete m_eb_stat;
-    LogFile::debug("wcreating eb_statistics(%s, %d, %s, %d)", upname.c_str(), m_nsenders, downname.c_str(), 1);
+    LogFile::debug("creating eb_statistics(%s, %d, %s, %d)", upname.c_str(), m_nsenders, downname.c_str(), 1);
     m_eb_stat = new eb_statistics(upname.c_str(), m_nsenders, downname.c_str(), 1);
     m_eb2rx.addArgument("-u");
     m_eb2rx.addArgument(upname);
@@ -196,49 +184,6 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     try_wait();
   }
 
-  /*
-  while(m_eb_stat && obj.hasObject("eb2rx") && obj("eb2rx").getBool("used")) {
-    std::string vname = StringUtil::form("stat.out.");
-    set(vname + "addr", (int)m_eb_stat->down(0).event);
-    set(vname + "port", (int)m_eb_stat->down(0).port);
-    bool connected = (int)m_eb_stat->down(0).port > 0;
-    LogFile::info("downstream %s", (connected?"connected":"disconnected"));
-    bool connected_all = true;
-    connected_all &= connected;
-    set(vname + "connection", connected);
-    const DBObject& eb2rx(obj("eb2rx"));
-    const DBObjectList& sender(eb2rx.getObjects("sender"));
-    for (int i = 0; i < m_nsenders; i++) {
-      if (sender[i].getBool("used")) {
-  std::string vname = StringUtil::form("stat.in[%d].", i);
-  set(vname + "addr", (int)m_eb_stat->up(i).event);
-  set(vname + "port", (int)m_eb_stat->up(i).port);
-  bool connected = (int)m_eb_stat->up(i).port > 0;
-  LogFile::info("upstream[%d] %s", i, (connected?"connected":"disconnected"));
-  set(vname + "connection", connected);
-  connected_all &= connected;
-      }
-    }
-    LogFile::info("all %s", (connected_all?"connected":"disconnected"));
-    if (connected_all) break;
-    try {
-      NSMCommunicator& com(wait(NSMNode(), RCCommand::UNKNOWN, 1));
-      NSMMessage msg = com.getMessage();
-      RCCommand cmd2(msg.getRequestName());
-      if (cmd2 == RCCommand::ABORT) {
-  setState(RCState::ABORTING_RS);
-  abort();
-  return;
-      } else {
-  perform(com);
-      }
-    } catch (const TimeoutException& e) {
-    } catch (const IOException& e) {
-      log(LogFile::ERROR, "IOError %s", e.what());
-      return;
-    }
-  }
-  */
   if (!m_con[1].isAlive()) {
     m_con[1].clearArguments();
     m_con[1].setExecutable("storagerecord");
@@ -317,7 +262,6 @@ void StoragerCallback::load(const DBObject& obj) throw(RCHandlerException)
     flow.open(&(m_con[i].getInfo()));
     m_flow.push_back(flow);
   }
-  setState(RCState::READY_S);
 }
 
 void StoragerCallback::start(int expno, int runno) throw(RCHandlerException)
@@ -339,7 +283,6 @@ void StoragerCallback::start(int expno, int runno) throw(RCHandlerException)
 
     }
   }
-  setState(RCState::RUNNING_S);
 }
 
 void StoragerCallback::stop() throw(RCHandlerException)
@@ -347,30 +290,8 @@ void StoragerCallback::stop() throw(RCHandlerException)
   for (size_t i = 0; i < m_con.size(); i++) {
     m_con[i].stop();
   }
-  if (m_expno >= 0 && m_runno >= 0) {
-    ConfigFile config("slowcontrol");
-    PostgreSQLInterface db(config.get("database.host"),
-                           config.get("database.dbname"),
-                           config.get("database.user"),
-                           config.get("database.password"),
-                           config.getInt("database.port"));
-    std::stringstream ss;
-    ss << "update fileinfo set time_runend = current_timestamp "
-       << "where expno = " << m_expno << " and runno = " << m_runno << " and time_runend is null;";
-    try {
-      db.connect();
-      db.execute(ss.str().c_str());
-    } catch (const DBHandlerException& e) {
-      LogFile::error("Failed to update : %s", e.what());
-    }
-    db.close();
-  }
-  std::string cmd = StringUtil::form("submit_filejob -all");
-  system(cmd.c_str());
-  LogFile::debug(cmd);
   m_expno = -1;
   m_runno = -1;
-  setState(RCState::READY_S);
 }
 
 void StoragerCallback::recover(const DBObject& obj) throw(RCHandlerException)
@@ -403,30 +324,7 @@ void StoragerCallback::abort() throw(RCHandlerException)
   m_ibuf.unlink();
   m_rbuf.unlink();
   m_obuf.unlink();
-  if (m_expno >= 0 && m_runno >= 0) {
-    ConfigFile config("slowcontrol");
-    PostgreSQLInterface db(config.get("database.host"),
-                           config.get("database.dbname"),
-                           config.get("database.user"),
-                           config.get("database.password"),
-                           config.getInt("database.port"));
-    std::stringstream ss;
-    ss << "update fileinfo set time_close = current_timestamp "
-       << "where expno = " << m_expno << " and runno = " << m_runno << " and time_close is null;";
-    try {
-      db.connect();
-      db.execute(ss.str().c_str());
-    } catch (const DBHandlerException& e) {
-      LogFile::error("Failed to update : %s", e.what());
-    }
-    db.close();
-  }
   stop();
-  //std::string cmd = StringUtil::form("submit_filejob -e %d -r %d", m_expno, m_runno);
-  std::string cmd = StringUtil::form("submit_filejob -all");
-  system(cmd.c_str());
-  LogFile::debug(cmd);
-  setState(RCState::NOTREADY_S);
 }
 
 void StoragerCallback::monitor() throw(RCHandlerException)
@@ -496,7 +394,7 @@ void StoragerCallback::monitor() throw(RCHandlerException)
       set(vname + "event", (int)m_eb_stat->down(0).event);
       set(vname + "byte", (float)(m_eb_stat->down(0).byte / 1024.));
       set(vname + "addr", (int)m_eb_stat->down(0).event);
-      port = m_eb_stat->down(0).port;//ntohl(m_eb_stat->down(0).port);
+      port = m_eb_stat->down(0).port;
       set(vname + "port", (int)port);
       set(vname + "connection", port > 0);
       unsigned long long total_byte = m_eb_stat->down(0).total_byte;
@@ -505,13 +403,12 @@ void StoragerCallback::monitor() throw(RCHandlerException)
       set(vname + "total_byte", (float)total_byte);
       set(vname + "flowrate", (float)flowrate);
       m_total_byte_out[0] = total_byte;
-      //m_nevent_out[0] = nevent;
       for (int i = 0; i < m_nsenders; i++) {
         std::string vname = StringUtil::form("stat.in[%d].", i);
         set(vname + "event", (int)m_eb_stat->up(i).event);
         set(vname + "byte", (float)(m_eb_stat->up(i).byte / 1024.));
         set(vname + "addr", (int)m_eb_stat->up(i).event);
-        port = m_eb_stat->up(i).port;//ntohl(m_eb_stat->up(i).port);
+        port = m_eb_stat->up(i).port;
         set(vname + "port", port);
         set(vname + "connection", port > 0);
         total_byte = m_eb_stat->up(i).total_byte;
@@ -520,7 +417,6 @@ void StoragerCallback::monitor() throw(RCHandlerException)
         set(vname + "total_byte", (float)total_byte);
         set(vname + "flowrate", (float)flowrate);
         m_total_byte_in[i] = total_byte;
-        //m_nevent_in[i] = nevent;
       }
       IOInfo::checkTCP(io_v);
       info->eb2out.event = m_eb_stat->down(0).event;

@@ -88,12 +88,17 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         fit_result = track_match_look_up.getRelatedTrackFitResult(reco_track)
         fit_crops = peelers.peel_track_fit_result(fit_result)
 
+        # Event Info
+        event_meta_data = Belle2.PyStoreObj("EventMetaData")
+        event_crops = peelers.peel_event_info(event_meta_data)
+
         return dict(
             **mc_particle_crops,
             **hit_content_crops,
             **pr_to_mc_match_info_crops,
             **seed_fit_crops,
             **fit_crops,
+            **event_crops
         )
 
     def peel_pr_to_mc_match_info(self, reco_track):

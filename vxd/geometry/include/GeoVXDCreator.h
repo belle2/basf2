@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Christian Oswald, Zbynek Drasal,           *
- *               Martin Ritter, Jozef Koval                               *
+ *               Martin Ritter, Jozef Koval, Benjamin Schwenker           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -24,7 +24,15 @@
 #include <vector>
 #include <map>
 
+
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/DBImportObjPtr.h>
+#include <framework/database/IntervalOfValidity.h>
+#include <vxd/dbobjects/VXDGeometryPar.h>
+
+
 #include <G4Transform3D.hh>
+#include <G4Polycone.hh>
 class G4LogicalVolume;
 class G4AssemblyVolume;
 class G4VSolid;
@@ -37,6 +45,7 @@ namespace Belle2 {
 
     /** The creator for the VXD geometry of the Belle II detector.   */
     class GeoVXDCreator : public geometry::CreatorBase {
+
     public:
       /** Constructor of the GeoVXDCreator class. */
       explicit GeoVXDCreator(const std::string& prefix);
@@ -45,58 +54,30 @@ namespace Belle2 {
       virtual ~GeoVXDCreator();
 
       /**
-       * Creates the Geant4 Objects for the VXD geometry.
-       * @param content A reference to the content part of the parameter
-       *                description, which should to be used to create the Geant4
-       *                objects.
-       */
-      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
-
-      /**
-       * Create support structure for VXD Half Shell, that means everything
-       * thagt does not depend on layer or sensor alignment
-       * @param support Reference to the database containing the parameters
-       */
-      virtual GeoVXDAssembly createHalfShellSupport(GearDir support);
-
-      /**
-       * Create support structure for a VXD Layer
-       * @param layer Layer ID to create the support for
-       * @param support Reference to the database containing the parameters
-       */
-      virtual GeoVXDAssembly createLayerSupport(int layer, GearDir support);
-
-      /**
-       * Create support structure for a VXD Ladder
-       * @param layer Layer ID to create the support for
-       * @param support Reference to the database containing the parameters
-       */
-      virtual GeoVXDAssembly createLadderSupport(int layer, GearDir support);
-
-      /**
        * Read the sensor definitions from the database
        * @param sensors Reference to the database containing the parameters
        */
-      virtual SensorInfoBase* createSensorInfo(const GearDir& sensor) = 0;
+      virtual SensorInfoBase* createSensorInfo(const VXDGeoSensorPar& sensor) = 0;
 
       /**
        * Return a SensitiveDetector implementation for a given sensor
        * @param sensorID SensorID for the sensor
        * @param sensor   Information about the sensor to create the Sensitive Detector for
        */
-      virtual SensitiveDetectorBase* createSensitiveDetector(VxdID sensorID, const GeoVXDSensor& sensor,
-                                                             const GeoVXDSensorPlacement& placement) = 0;
+      virtual SensitiveDetectorBase* createSensitiveDetector(VxdID sensorID, const VXDGeoSensor& sensor,
+                                                             const VXDGeoSensorPlacement& placement) = 0;
 
       /**
        * Read parameters for given layer and store in m_ladder
        */
-      virtual void setCurrentLayer(int layer);
+      virtual void setCurrentLayer(int layer, const VXDGeometryPar& parameters);
 
       /**
        * Place ladder corresponding to the given ladder id into volume
        * setLayer has to be called first to set the correct layer id
        */
-      G4Transform3D placeLadder(int ladderID, double phi, G4LogicalVolume* volume, const G4Transform3D& placement);
+      G4Transform3D placeLadder(int ladderID, double phi, G4LogicalVolume* volume, const G4Transform3D& placement,
+                                const VXDGeometryPar& parameters);
 
       /**
        * Return the position where a daughter component is to be placed
@@ -104,31 +85,15 @@ namespace Belle2 {
        * @param daugther Daughter component
        * @return Transformation matrix to place the daughter relative to the origin to the mother
        */
-      G4Transform3D getPosition(const GeoVXDComponent& mother, const GeoVXDComponent& daughter, const GeoVXDPlacement& placement,
+      G4Transform3D getPosition(const VXDGeoComponent& mother, const VXDGeoComponent& daughter, const VXDGeoPlacement& placement,
                                 bool originCenter);
 
       /**
-       * Get Alignment for given component from the database
-       * @param  component Name of the component to align
-       * @return Transformation matrix for component, identity if component
-       *         could not be found
+       * Get Alignment from paylead object
+       * @param  params Payload object
+       * @return Transformation matrix for component
        */
-      G4Transform3D getAlignment(const std::string& component);
-
-      /**
-       * Get the volume and the height representing a single sub-component
-       * The name is assumed to be unique and Volumes are cached. If a component had already
-       * been created, the pointer to the existing volume will be returned
-       * @param name Name of the component
-       * @return pair containing the TGeoVolume* of the component as well as
-       *         the height of the component
-       */
-      GeoVXDComponent getComponent(const std::string& component);
-
-      /**
-       * Return vector of GeoVXDPlacements with all the components defined inside a given path
-       */
-      std::vector<GeoVXDPlacement> getSubComponents(GearDir path);
+      G4Transform3D getAlignment(VXDAlignmentPar params);
 
       /**
        * Place a list of subcomponents into an component.
@@ -149,8 +114,8 @@ namespace Belle2 {
        *        wrapped in an Air volume fitting all components
        * @return offset in w which was applied to the component when extending it
        */
-      GeoVXDAssembly createSubComponents(const std::string& name, GeoVXDComponent&
-                                         component, std::vector<GeoVXDPlacement> placements,
+      GeoVXDAssembly createSubComponents(const std::string& name, VXDGeoComponent&
+                                         component, std::vector<VXDGeoPlacement> placements,
                                          bool originCenter = true, bool allowOutside = false);
 
       /** Create a trapezoidal solid.
@@ -169,6 +134,42 @@ namespace Belle2 {
       G4VSolid* createTrapezoidal(const std::string& name, double width, double
                                   width2, double length, double& height, double angle = 0);
 
+
+      void createDiamonds(const VXDGeoRadiationSensorsPar& params, G4LogicalVolume& topVolume, G4LogicalVolume& envelopeVolume);
+
+      /**
+       * Return vector of VXDGeoPlacements with all the components defined inside a given path
+       */
+      std::vector<VXDGeoPlacementPar> getSubComponents(GearDir path);
+
+      /**
+       * Read parameters for a ladder in layer with given ID from gearbox and layer
+       * store them in payload
+       */
+      virtual void readLadder(int layer, GearDir components, VXDGeometryPar& geoparameters);
+
+      /**
+        * Read parameters for ladder components and their alignment corresponding
+        * to the given ladder id
+        */
+      virtual void readLadderComponents(int layerID, int ladderID, GearDir content, VXDGeometryPar& vxdGeometryPar);
+
+      /**
+       * Read parameters for component name from Gearbox into geometry payload.
+       * The name is assumed to be unique and Volumes are cached.
+       * @param name Name of the component
+       * @param components Path to components
+       */
+      void readComponent(const std::string& name, GearDir components, VXDGeometryPar& vxdGeometryPar);
+
+      /**
+       * Read parameters for all components in placement container from Gearbox
+       * into payload.
+       * @param placements container holding names of all components to be cached
+       * @param componentDir Path to Gearbox where parameters are to be found
+       */
+      void readSubComponents(const std::vector<VXDGeoPlacementPar>& placements , GearDir componentsDir, VXDGeometryPar& vxdGeometryPar);
+
     protected:
       /** Prefix to prepend to all volume names */
       std::string m_prefix;
@@ -176,18 +177,20 @@ namespace Belle2 {
       GearDir m_alignment;
       /** GearDir pointing to the toplevel of the components */
       GearDir m_components;
-      /** Name of the Material to be used for Air */
-      std::string m_defaultMaterial;
+
       /** Cache of all previously created components */
-      std::map<std::string, GeoVXDComponent> m_componentCache;
+      std::map<std::string, VXDGeoComponent> m_componentCache;
       /** Map containing Information about all defined sensor types */
-      std::map<std::string, GeoVXDSensor> m_sensorMap;
+      std::map<std::string, VXDGeoSensor> m_sensorMap;
       /** Parameters of the currently active ladder */
-      GeoVXDLadder m_ladder;
+      VXDGeoLadder m_ladder;
       /** List to all created sensitive detector instances */
       std::vector<Simulation::SensitiveDetectorBase*> m_sensitive;
       /** Diamond radiation sensor "sub creator" */
       GeoVXDRadiationSensors m_radiationsensors;
+
+      /** Name of the Material to be used for Air */
+      std::string m_defaultMaterial;
       /** tolerance for Geant4 steps to be merged to a single step */
       float m_distanceTolerance {(float)(5 * Unit::um)};
       /** tolerance for the energy deposition in electrons to be merged in a single step */
@@ -207,6 +210,15 @@ namespace Belle2 {
       bool m_onlyActiveMaterial {false};
       /** Vector of G4UserLimit pointers */
       std::vector<G4UserLimits*> m_UserLimits;
+      /// Current half-shell being processed (need to know ladder parent for hierarchy)
+      std::string m_currentHalfShell {""};
+      /// Used for translation of half-shell name into a VxdID to consitently handle it in hierarchy
+      std::map<std::string, Belle2::VxdID> m_halfShellVxdIDs {
+        {{"PXD.Ying"}, {Belle2::VxdID(1, 0, 0, 1)}},
+        {{"PXD.Yang"}, {Belle2::VxdID(1, 0, 0, 2)}},
+        {{"SVD.Pat"}, {Belle2::VxdID(3, 0, 0, 1)}},
+        {{"SVD.Mat"}, {Belle2::VxdID(3, 0, 0, 2)}}
+      };
 
     }; // class GeoVXDCreator
 

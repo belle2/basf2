@@ -177,6 +177,7 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
     add(new NSMVHandlerLengthFifoFull(*this, "copper.err.lengthfifofull"));
     add(new NSMVHandlerInt("ttrx.err.b2link", true, false, 0));
     add(new NSMVHandlerInt("ttrx.err.linkup", true, false, 0));
+    add(new NSMVHandlerText("ttrx.msg", true, false, ""));
     const DBObject& o_ttrx(obj("ttrx"));
     add(new NSMVHandlerTTRXFirmware(*this, "ttrx.firm", 0,
                                     o_ttrx.hasText("firm") ? o_ttrx.getText("firm") : ""));
@@ -192,6 +193,10 @@ void COPPERCallback::configure(const DBObject& obj) throw(RCHandlerException)
       m_o_fee[i] = dbload(obj("fee", i).getText("path"));
       m_o_fee[i].print();
       m_fee[i]->init(*this, hslb, m_o_fee[i]);
+      add(new NSMVHandlerHSLBFirmware(*this, "hslb.firm", -1,
+                                      o_hslb.hasText("firm") ? o_hslb.getText("firm") : ""));
+      add(new NSMVHandlerText("hslb.msg", true, false, ""));
+      add(new NSMVHandlerText(vname + ".msg", true, false, ""));
       add(new NSMVHandlerInt(vname + ".err.fifoempty", true, false, 0));
       add(new NSMVHandlerInt(vname + ".err.b2linkdown", true, false, 0));
       add(new NSMVHandlerInt(vname + ".err.cprfifofull", true, false, 0));
@@ -291,7 +296,7 @@ bool COPPERCallback::feeload()
   if (m_disablefeconf) return true;
   try {
     DBObject& obj(getDBObject());
-    get(obj);
+    //    get(obj);
     for (int i = 0; i < 4; i++) {
       const DBObject& o_hslb(obj("hslb", i));
       if (m_fee[i] != NULL && o_hslb.getBool("used")) {
@@ -395,14 +400,15 @@ void COPPERCallback::load(const DBObject& obj) throw(RCHandlerException)
     try {
       int flag = 0;
       int nhslb = 0;
-      for (size_t i = 0; i < 4; i++) {
-        const DBObject& o_hslb(obj.getObject("hslb", i));
-        if (o_hslb.getBool("used")) {
+      const DBObjectList& o_hslbs(obj.getObjects("hslb"));
+      for (size_t i = 0; i < o_hslbs.size(); i++) {
+        o_hslbs[i].print();
+        if (o_hslbs[i].getBool("used")) {
           flag += 1 << i;
           nhslb++;
         }
       }
-      for (int i = 0; i < 4; i++) {
+      for (size_t i = 0; i < o_hslbs.size(); i++) {
         if (!m_fee[i]) continue;
         const DBObject& o_hslb(obj("hslb", i));
         if (o_hslb.getBool("used")) {
@@ -563,9 +569,6 @@ void COPPERCallback::monitor() throw(RCHandlerException)
 {
   RCState state = getNode().getState();
   try {
-    //int dummymode = 0;
-    //get("dummymode", dummymode);
-    //if (!dummymode) {
     try {
       m_ttrx.monitor();
     } catch (const IOException& e) {
@@ -578,7 +581,6 @@ void COPPERCallback::monitor() throw(RCHandlerException)
       LogFile::warning(e.what());
       return;
     }
-    //if (state == RCState::RUNNING_S && state.isStable()) {
     logging(m_copper.isFifoFull(), LogFile::WARNING, "COPPER FIFO full");
     logging(m_copper.isLengthFifoFull(), LogFile::WARNING, "COPPER length FIFO full");
     set("copper.err.fifoempty", m_copper.isFifoEmpty());
@@ -662,7 +664,6 @@ void COPPERCallback::monitor() throw(RCHandlerException)
     }
     set("ttrx.err.b2link", m_ttrx.isBelle2LinkError());
     set("ttrx.err.linkup", m_ttrx.isLinkUpError());
-    //}
     NSMData& data(getData());
     if (data.isAvailable()) {
       ronode_status* nsm = (ronode_status*)data.get();
@@ -680,7 +681,6 @@ void COPPERCallback::monitor() throw(RCHandlerException)
       }
       data.flush();
     }
-    //}
   } catch (const std::exception& e) {
     LogFile::warning(e.what());
   }
@@ -700,11 +700,10 @@ void COPPERCallback::bootBasf2(const DBObject& obj) throw(RCHandlerException)
     int flag = 0;
     int nhslb = 4;
     for (size_t i = 0; i < 4; i++) {
-      //if (!m_fee[i]) continue;
+      if (!m_fee[i]) continue;
       const DBObject& o_hslb(obj.getObject("hslb", i));
       if (m_fee[i] != NULL && o_hslb.getBool("used")) {
         flag += 1 << i;
-        //nhslb++;
       }
     }
     m_con.clearArguments();

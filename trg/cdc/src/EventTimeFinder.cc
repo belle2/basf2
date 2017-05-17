@@ -42,38 +42,42 @@ namespace Belle2 {
 // vector<TRGSignalVector * > dbgIn;
 // vector<TRGSignalVector * > dbgOut;
 
-TRGCDCEventTimeFinder::TRGCDCEventTimeFinder(const std::string & name,
-                                             const TRGClock & systemClock,
-                                             const TRGClock & dataClock,
-                                             const TRGClock & userClockInput,
-                                             const TRGClock & userClockOutput)
-    : TRGBoard(name, systemClock, dataClock, userClockInput, userClockOutput) {
-      // _tisb(0),
-      // _tosbE(0),
-      // _tosbT(0) {
-}
+  TRGCDCEventTimeFinder::TRGCDCEventTimeFinder(const std::string& name,
+                                               const TRGClock& systemClock,
+                                               const TRGClock& dataClock,
+                                               const TRGClock& userClockInput,
+                                               const TRGClock& userClockOutput)
+    : TRGBoard(name, systemClock, dataClock, userClockInput, userClockOutput)
+  {
+    // _tisb(0),
+    // _tosbE(0),
+    // _tosbT(0) {
+  }
 
-TRGCDCEventTimeFinder::~TRGCDCEventTimeFinder() {
-}
+  TRGCDCEventTimeFinder::~TRGCDCEventTimeFinder()
+  {
+  }
 
-void
-TRGCDCEventTimeFinder::push_back(const TRGCDCTrackSegmentFinder * a) {
-    std::vector<const TRGCDCTrackSegmentFinder *>::push_back(a);
-}
+  void
+  TRGCDCEventTimeFinder::push_back(const TRGCDCTrackSegmentFinder* a)
+  {
+    std::vector<const TRGCDCTrackSegmentFinder*>::push_back(a);
+  }
 
-void
-TRGCDCEventTimeFinder::simulate(void) {
+  void
+  TRGCDCEventTimeFinder::simulate(void)
+  {
 
     const string sn = "ETF::simulate : " + name();
     TRGDebug::enterStage(sn);
 
     //...Delete old objects...
     for (unsigned i = 0; i < nOutput(); i++) {
-        if (output(i))
-            if (output(i)->signal())
-                delete output(i)->signal();
+      if (output(i))
+        if (output(i)->signal())
+          delete output(i)->signal();
     }
     TRGDebug::leaveStage(sn);
-}
+  }
 
 } // namespace Belle2

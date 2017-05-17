@@ -66,11 +66,15 @@ namespace Belle2 {
     {
       po::options_description description("FastBDT options");
       description.add_options()
-      ("nTrees", po::value<unsigned int>(&m_nTrees), "Number of trees in the forest")
-      ("nCutLevels", po::value<unsigned int>(&m_nCuts), "Number of cut levels per feature")
-      ("nLevels", po::value<unsigned int>(&m_nLevels), "Depth of trees")
-      ("shrinkage", po::value<double>(&m_shrinkage), "Shrinkage of the boosting algorithm")
-      ("randRatio", po::value<double>(&m_randRatio), "Fraction of the data sampled each training iteration");
+      ("nTrees", po::value<unsigned int>(&m_nTrees), "Number of trees in the forest. Reasonable values are between 10 and 1000")
+      ("nCutLevels", po::value<unsigned int>(&m_nCuts)->notifier(check_bounds<unsigned int>(0, 20, "nCutLevels")),
+       "Number of cut levels N per feature. 2^N Bins will be used per feature. Reasonable values are between 6 and 12.")
+      ("nLevels", po::value<unsigned int>(&m_nLevels)->notifier(check_bounds<unsigned int>(0, 20, "nLevels")),
+       "Depth d of trees. The last layer of the tree will contain 2^d bins. Maximum is 20. Resonable values are 2 and 6.")
+      ("shrinkage", po::value<double>(&m_shrinkage)->notifier(check_bounds<double>(0.0, 1.0, "shrinkage")),
+       "Shrinkage of the boosting algorithm. Reasonable values are between 0.01 and 1.0.")
+      ("randRatio", po::value<double>(&m_randRatio)->notifier(check_bounds<double>(0.0, 1.0001, "randRatio")),
+       "Fraction of the data sampled each training iteration. Reasonable values are between 0.1 and 1.0.");
       return description;
     }
 
@@ -98,9 +102,9 @@ namespace Belle2 {
       }
 
       FastBDT::EventSample eventSample(numberOfEvents, numberOfFeatures, nBinningLevels);
+      std::vector<unsigned int> bins(numberOfFeatures);
       for (unsigned int iEvent = 0; iEvent < numberOfEvents; ++iEvent) {
         training_data.loadEvent(iEvent);
-        std::vector<unsigned int> bins(numberOfFeatures);
         for (unsigned int iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
           bins[iFeature] = featureBinnings[iFeature].ValueToBin(training_data.m_input[iFeature]);
         }

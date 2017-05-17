@@ -10,6 +10,7 @@
 
 /* Belle2 headers. */
 #include <eklm/dbobjects/EKLMAlignment.h>
+#include <eklm/geometry/GeometryData.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
@@ -29,7 +30,7 @@ void EKLMAlignment::setAlignmentData(uint16_t segment, EKLMAlignmentData* dat)
   if (it == m_Data.end())
     m_Data.insert(std::pair<uint16_t, EKLMAlignmentData>(segment, *dat));
   else
-    B2WARNING("Alignment data for the segment already exists.");
+    it->second = *dat;
 }
 
 EKLMAlignmentData* EKLMAlignment::getAlignmentData(uint16_t segment)

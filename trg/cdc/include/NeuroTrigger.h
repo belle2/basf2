@@ -7,7 +7,6 @@ namespace Belle2 {
 
   class CDCTriggerSegmentHit;
   class CDCTriggerTrack;
-  class MCParticle;
 
   /** Class to represent the CDC Neurotrigger.
    *
@@ -102,6 +101,13 @@ namespace Belle2 {
     /** set fixed point precision */
     void setPrecision(std::vector<unsigned> precision) { m_precision = precision; }
 
+    /** set name of the data store elements */
+    void setCollectionNames(std::string hitCollectionName, std::string eventTimeName)
+    {
+      m_hitCollectionName = hitCollectionName;
+      m_eventTimeName = eventTimeName;
+    }
+
     /** return reference to a neural network */
     CDCTriggerMLP& operator[](unsigned index) { return m_MLPs[index]; }
     /** return const reference to a neural network */
@@ -113,21 +119,20 @@ namespace Belle2 {
     /** add an MLP to the list of networks */
     void addMLP(const CDCTriggerMLP& newMLP) { m_MLPs.push_back(newMLP); }
 
-    /** Select one expert MLP based on the track parameters of the given track.
+    /** Select one expert MLP based on the track parameters of the given track
+     * and the hit pattern.
      * This function assumes that sectors are unique.
      * The first matching sector is returned without checking the rest.
      * @return index of the selected MLP, -1 if the track does not fit any sector
      */
     int selectMLP(const CDCTriggerTrack& track);
 
-    /** Select all matching expert MLPs based on the track parameters
-     * of the given track estimate or MC particle.
+    /** Select all matching expert MLPs based on the given track parameters.
      * This function is used only during training to train overlapping sectors.
      * At the end of the training, sectors are redefined to be unique.
      * @return indices of the selected MLPs, empty if the track does not fit any sector
      */
-    std::vector<int> selectMLPs(const CDCTriggerTrack& track,
-                                const MCParticle& mcparticle, bool selectByMC);
+    std::vector<int> selectMLPs(float phi0, float invpt, float theta);
 
     /** Calculate 2D phi position and arclength for the given track and store them. */
     void updateTrack(const CDCTriggerTrack& track);
@@ -141,14 +146,19 @@ namespace Belle2 {
 
     /** Calculate input pattern for MLP.
      * @param isector index of the MLP that will use the input
+     * @param track   axial hit relations are taken from given track
      * @return super layer pattern of hits in the current track
      */
-    unsigned long getInputPattern(unsigned isector);
+    unsigned long getInputPattern(unsigned isector, const CDCTriggerTrack& track);
 
     /** Select best hits for each super layer
-     * @param isector index of the MLP that will use the input
+     * @param isector              index of the MLP that will use the input
+     * @param track                axial hit relations are taken from given track
+     * @param returnAllRelevant    if true, return all relevant hits instead of
+     *                             selecting the best (for making relations)
      * @return list of selected hit indices */
-    std::vector<unsigned> selectHits(unsigned isector);
+    std::vector<unsigned> selectHits(unsigned isector, const CDCTriggerTrack& track,
+                                     bool returnAllRelevant = false);
 
     /** Calculate input values for MLP.
      * @param isector index of the MLP that will use the input
@@ -185,6 +195,10 @@ namespace Belle2 {
      *  - MLP values: nodes, weights, activation function LUT input (LUT output = nodes)
      */
     std::vector<unsigned> m_precision;
+    /** Name of the StoreArray containing the input track segment hits. */
+    std::string m_hitCollectionName;
+    /** Name of the StoreObjPtr containing the event time. */
+    std::string m_eventTimeName;
   };
 }
 #endif

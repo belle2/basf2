@@ -297,7 +297,7 @@ void B2BIIConvertMdstModule::event()
       B2FATAL("Cannot reliably override the Database content in parallel processing "
               "mode, please run the conversion in single processing mode");
     }
-    DBStore::Instance().addConstantOverride("dbstore", "BeamParameters", new BeamParameters(m_beamParams), true);
+    DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(m_beamParams), true);
   }
 
   // 1. Convert MC information
@@ -916,6 +916,11 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
     // Convert Mdst_ecl -> ECLCluster and create map of indices
     convertMdstECLObject(mdstEcl, mdstEclAux, B2EclCluster);
     mdstEclToECLCluster[mdstEcl.get_ID()] = B2EclCluster->getArrayIndex();
+
+    // set ConnectedRegionID and ClusterID to
+    // cluster's array index + 1 and 1, respectively
+    B2EclCluster->setConnectedRegionId(B2EclCluster->getArrayIndex() + 1);
+    B2EclCluster->setClusterId(1);
 
     if (m_realData)
       continue;

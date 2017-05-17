@@ -47,8 +47,8 @@ main = create_path()
 inputMdstList('MC5', input, path=main)
 
 fillParticleList('gamma:all', '', path=main)
-fillParticleList('pi+:good', 'chiProb > 0.001 and piid > 0.5 and abs(dz) < 4.0 and abs(dr) < 0.2', path=main)
-fillParticleList('pi-:good', 'chiProb > 0.001 and piid > 0.5 and abs(dz) < 4.0 and abs(dr) < 0.2', path=main)
+fillParticleList('pi+:good', 'chiProb > 0.001 and piid > 0.5', path=main)
+fillParticleList('pi-:good', 'chiProb > 0.001 and piid > 0.5', path=main)
 
 reconstructDecay('K_S0 -> pi+:good pi-:good', '0.480<=M<=0.516', 1, path=main)
 reconstructDecay('pi0  -> gamma:all gamma:all', '0.115<=M<=0.152', 1, path=main)
@@ -56,9 +56,19 @@ reconstructDecay('B0   -> K_S0 pi0', '5.2 < Mbc < 5.3 and -0.3 < deltaE < 0.2', 
 
 matchMCTruth('B0', path=main)
 buildRestOfEvent('B0', path=main)
-buildContinuumSuppression('B0', path=main)
+
+# The momentum cuts used to be hard-coded in the continuum suppression module. They can now be applied
+# via this mask. The nCDCHits requirement is new, and is recommended to remove VXD-only fake tracks.
+cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
+appendROEMasks('B0', [cleanMask], path=main)
+
+buildContinuumSuppression('B0', 'cleanMask', path=main)
 
 # Define the variables for training.
+#  For details, please see: https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
+#  Note that KSFWVariables takes the optional additional argument FS1, to return the variables calculated from the
+#  signal-B final state particles.
+#  CleoCone also takes the optional additional argument ROE, to return the cones calculated from ROE particles only.
 trainVars = [
     'R2',
     'thrustBm',

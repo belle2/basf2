@@ -24,6 +24,7 @@
 
 
 from basf2 import *
+from setup_modules import setup_Geometry
 import argparse
 
 
@@ -58,7 +59,10 @@ path = create_path()
 eventinfosetter = register_module('EventInfoSetter')
 path.add_module(eventinfosetter)
 
-# SecMapBootStrap Module is requiered, as it loads the SecMap config and is responsible
+# Gearbox
+setup_Geometry(path)
+
+# SecMapBootStrap Module is requiered, as it holds all  the sector maps and
 # for storing the trained SecMap.
 secMapBootStrap = register_module('SectorMapBootstrap')
 secMapBootStrap.param('ReadSectorMap', False)
@@ -72,6 +76,6 @@ merger = register_module('RawSecMapMerger')
 merger.param('rootFileNames', train_data)
 path.add_module(merger)
 
-
+print_path(path)
 process(path)
 print(statistics)

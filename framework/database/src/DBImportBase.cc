@@ -51,7 +51,7 @@ bool DBImportBase::import(const IntervalOfValidity& iov)
       return false;
     default:
       if (!m_object) return false;
-      return Database::Instance().storeData(m_package, m_module, m_object, iov);
+      return Database::Instance().storeData(m_name, m_object, iov);
   }
 
 }
@@ -72,7 +72,7 @@ void DBImportBase::clear()
 
 bool DBImportBase::storeData(TObject* intraRun, const IntervalOfValidity& iov)
 {
-  return Database::Instance().storeData(m_package, m_module, intraRun, iov);
+  return Database::Instance().storeData(m_name, intraRun, iov);
 }
 
 DBImportBase::~DBImportBase()

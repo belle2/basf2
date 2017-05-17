@@ -158,11 +158,6 @@ public:
     obj.addInt("runno", runno);
     obj.addInt("fileid", m_fileid);
     obj.addInt("diskid", m_diskid);
-    obj.addInt("time_create", Date().get());
-    obj.addInt("time_close", 0);
-    obj.addInt("time_runend", 0);
-    obj.addInt("time_copy", 0);
-    obj.addInt("time_delete", 0);
     DBObjectLoader::createDB(m_db, g_table, m_configname);
     return m_id;
   }
@@ -171,19 +166,6 @@ public:
   {
     if (m_file > 0) {
       ::close(m_file);
-      std::stringstream ss;
-      try {
-        m_db.connect();
-        ss << "update " << g_table << " set value_i = " << Date().get() << " "
-           << "where path = '." << m_configname << ".time_close.';";
-        m_db.execute(ss.str());
-        m_db.close();
-      } catch (const DBHandlerException& e) {
-        B2ERROR("Failed to access db for update: " << e.what());
-        std::ofstream fout(m_dbtmp.c_str(), std::ios::app);
-        fout << ss.str() << std::endl;
-        fout.close();
-      }
     }
   }
 
@@ -278,8 +260,6 @@ int main(int argc, char** argv)
     if (!newrun || expno < iheader.expno || runno < iheader.runno) {
       newrun = true;
       isnew = true;
-      unsigned int expno_tmp = expno;
-      unsigned int runno_tmp = runno;
       expno = iheader.expno;
       runno = iheader.runno;
       if (use_info) {
@@ -300,20 +280,6 @@ int main(int argc, char** argv)
       obuf.unlock();
       if (file) file.close();
       file.open(path, ndisks, expno, runno);
-      if (expno_tmp > 0 || runno_tmp > 0) {
-        std::stringstream ss;
-        try {
-          db.connect();
-          std::string configname = StringUtil::form("%s:%s:%04d:%06d:0000", hostname, runtype, expno, runno);
-          ss << "update " << g_table << " set value_i = " << Date().get() << " "
-             << "where path = '." << configname << ".time_runend.';";
-          db.execute(ss.str().c_str());
-          db.close();
-        } catch (const DBHandlerException& e) {
-          LogFile::error("Failed to update : %s", e.what());
-          return 1;
-        }
-      }
     }
     if (use_info) {
       info.addInputCount(1);

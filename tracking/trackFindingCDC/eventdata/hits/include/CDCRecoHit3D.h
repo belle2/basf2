@@ -49,12 +49,6 @@ namespace Belle2 {
       /// Constructor taking all stored variables of the reconstructed hit.
       CDCRecoHit3D(const CDCRLWireHit& rlWireHit, const Vector3D& recoPos3D, double arcLength2D = 0);
 
-      /// Constructor taking all stored variables of the reconstructed hit.
-      CDCRecoHit3D(const CDCWireHit* wireHit,
-                   ERightLeft rlInfo,
-                   const Vector3D& recoPos3D,
-                   double arcLength2D = 0);
-
       /**
        *  Constructs a three dimensional reconstructed hit from a sim hit and the assoziated wirehit.
        *  This translates the sim hit to a reconstructed hit mainly to be able to compare the
@@ -237,7 +231,7 @@ namespace Belle2 {
       { return getRLWireHit().getRLInfo(); }
 
       /// Setter the right left passage information.
-      void setRLInfo(ERightLeft& rlInfo)
+      void setRLInfo(ERightLeft rlInfo)
       { m_rlWireHit.setRLInfo(rlInfo); }
 
       /// Getter for the reference position of the wire.

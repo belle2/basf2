@@ -3,27 +3,22 @@
  * Copyright(C) 2012, 2015 - Belle II Collaboration                       *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guofu Cao, Martin Heck, Tobias Schlüter                  *
+ * Contributors: Tadeas Bilka                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ALIGNABLEPXDRECOHIT_H
-#define ALIGNABLEPXDRECOHIT_H
-
+#pragma once
 
 #include <pxd/reconstruction/PXDRecoHit.h>
-#include <pxd/dataobjects/PXDCluster.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
-
-#include <genfit/AbsMeasurement.h>
-#include <genfit/MeasurementOnPlane.h>
-#include <genfit/TrackCandHit.h>
-#include <genfit/HMatrixU.h>
-
-#include <memory>
-
 #include <genfit/ICalibrationParametersDerivatives.h>
+
+#include <TMatrix.h>
+
+namespace genfit {
+  class AbsMeasurement;
+  class StateOnPlane;
+}
 
 namespace Belle2 {
   /** This class is used to transfer PXD information to the track fit. */
@@ -42,23 +37,40 @@ namespace Belle2 {
     }
 
     /**
-     * @brief Labels for global derivatives
+     * @brief Labels and derivatives of residuals (local measurement coordinates) w.r.t. alignment/calibration parameters
+     * Matrix "G" of derivatives valid for given prediction of track state:
      *
-     * @return Vector of int labels, same size as derivatives matrix #columns
-     */
-    virtual std::vector< int > labels();
-
-    /**
-     * @brief Get alignment derivatives
+     * G(i, j) = d_residual_i/d_parameter_j
      *
-     * @param sop Track state on sensor plane
-     * @return TMatrixD
+     * For 2D measurement (u,v):
+     *
+     * G = ( du/da du/db du/dc ... )
+     *     ( dv/da dv/db dv/dc ... )
+     *
+     * for calibration parameters a, b, c.
+     *
+     * For 1D measurement:
+     *
+     * G = (   0     0     0   ... )
+     *     ( dv/da dv/db dv/dc ... )    for V-strip,
+     *
+     *
+     * G = ( du/da du/db du/dc ... )
+     *     (   0     0     0   ... )    for U-strip,
+     *
+     * Measurements with more dimesions (slopes, curvature) should provide
+     * full 4-5Dx(n params) matrix (state as (q/p, u', v', u, v) or (u', v', u, v))
+     *
+     *
+     * @param sop Predicted state of the track as linearization point around
+     * which derivatives of alignment/calibration parameters shall be computed
+     * @return pair<vector<int>, TMatrixD> With matrix with #rows = dimension of residual, #columns = number of parameters.
+     * #columns must match vector<int>.size().
      */
-    virtual TMatrixD derivatives(const genfit::StateOnPlane* sop);
+    virtual std::pair<std::vector<int>, TMatrixD> globalDerivatives(const genfit::StateOnPlane* sop);
 
   private:
 
-    ClassDef(AlignablePXDRecoHit, 2); /**< PXD RecoHit extended for alignment/calibration */
+    ClassDef(AlignablePXDRecoHit, 3); /**< PXD RecoHit extended for alignment/calibration */
   };
 }
-#endif

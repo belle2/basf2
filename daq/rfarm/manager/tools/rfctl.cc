@@ -16,6 +16,8 @@
 #include <sys/stat.h>
 #include "nsm2/belle2nsm.h"
 
+#include <string>
+
 extern "C" {
 #ifdef USE_READLINE
 #include <readline/readline.h>
@@ -268,7 +270,7 @@ main(int argc, char** argv)
         printf("usage: start <node> <run-number>\n");
       } else {
         int runno = atoi(av[2]);
-        b2nsm_sendreq(av[1], "RF_START", 1, &runno);
+        b2nsm_sendreq(av[1], "RC_START", 1, &runno);
       }
     } else if (strcasecmp(av[0], "stop") == 0) {
       if (ac < 4) {
@@ -277,25 +279,28 @@ main(int argc, char** argv)
         int pars[10];
         pars[0] = atoi(av[2]);
         pars[1] = atoi(av[3]);
-        b2nsm_sendreq(av[1], "RF_STOP", 0, pars);
+        b2nsm_sendreq(av[1], "RC_STOP", 0, pars);
       }
     } else if (strcasecmp(av[0], "config") == 0) {
       if (ac < 2) {
         printf("usage: config <node>\n");
       } else {
-        b2nsm_sendreq(av[1], "RF_CONFIGURE", 0, 0);
+        //        b2nsm_sendreq(av[1], "RC_LOAD", 0, 0);
+        char scrfile[256];
+        strcpy(scrfile, "run_processor.py");
+        b2nsm_sendany(av[1], "RC_LOAD", 0, 0, sizeof(scrfile) + 1, scrfile, "sendreq");
       }
     } else if (strcasecmp(av[0], "unconfig") == 0) {
       if (ac < 2) {
-        printf("usage: config <node>\n");
+        printf("usage: unconfig <node>\n");
       } else {
-        b2nsm_sendreq(av[1], "RF_UNCONFIGURE", 0, 0);
+        b2nsm_sendreq(av[1], "RC_ABORT", 0, 0);
       }
     } else if (strcasecmp(av[0], "restart") == 0) {
       if (ac < 2) {
         printf("usage: restart <node>\n");
       } else {
-        b2nsm_sendreq(av[1], "RF_RESTART", 0, 0);
+        b2nsm_sendreq(av[1], "RC_RECOVER", 0, 0);
       }
     } else {
       printf("unknown request %s\n", av[0]);

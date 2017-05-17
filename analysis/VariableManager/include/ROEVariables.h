@@ -12,6 +12,7 @@
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <analysis/dataobjects/RestOfEvent.h>
 #include <TLorentzVector.h>
 #include <string>
 #include <vector>
@@ -23,7 +24,8 @@ namespace Belle2 {
   namespace Variable {
 
     /**
-     * Returns 1 if a track, ecl or klmCluster associated to particle is in the related RestOfEvent object, 0 otherwise
+     * Returns 1 if a track, ecl or klmCluster associated to particle is in the related RestOfEvent object, 0 otherwise.
+     * Also works for composite particles, where all mdst objects of related FSP particles must be in ROE.
      */
     double isInRestOfEvent(const Particle* particle);
 
@@ -88,9 +90,10 @@ namespace Belle2 {
     Manager::FunctionPtr nROENeutralECLClusters(const std::vector<std::string>& arguments);
 
     /**
-     * Returns number of neutral pions, constructed from good gamma candidates in the related RestOfEvent object that passed the selection criteria
+     * Returns the number of particles in ROE from the given particle list.
+     * Use of variable aliases is advised.
      */
-    Manager::FunctionPtr nROEPi0s(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr nParticlesInROE(const std::vector<std::string>& arguments);
 
     /**
      * Returns total charge of the related RestOfEvent object
@@ -254,6 +257,13 @@ namespace Belle2 {
      * Helper function: Returns bit-pattern of flags corresponding to daughters of MCParticle missing in ROE
      */
     void checkMCParticleMissingFlags(const MCParticle* mcp, std::set<const MCParticle*> mcROEObjects, int& missingFlags);
+
+    /**
+     * Helper function: Returns 1 if a track, ecl or klmCluster associated to the particle is in the related RestOfEvent object, 0 otherwise.
+     * Also works for composite particles, where all mdst objects of related FSP particles must be in ROE.
+     * This helper function accepts a specific roe object as an argument
+     */
+    double isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe);
 
 
     /**

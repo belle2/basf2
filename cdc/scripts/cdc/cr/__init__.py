@@ -2,6 +2,8 @@ from basf2 import *
 from ROOT import Belle2
 from tracking import add_cdc_cr_track_finding
 from tracking import add_cdc_track_finding
+from tracking import add_cdc_cr_track_fit_and_track_creator
+from time_extraction_helper_modules import *
 
 # Propagation velocity of the light in the scinti.
 lightPropSpeed = 12.9925
@@ -11,6 +13,7 @@ run_range = {'201607': [787, 833],
              '201608a': [885, 896],
              '201608b': [917, 924],
              '201609': [966, 973],
+             '201702': [1601, 9999],
              'noamal': [-1, -1]
              }
 # Size of trigger counter.
@@ -18,6 +21,7 @@ triggerSize = {'201607': [20.0, 6.0, 10.0],
                '201608a': [100.0, 8.0, 10.0],
                '201608b': [100.0, 8.0, 10.0],
                '201609': [100.0, 8.0, 10.0],
+               '201702': [100.0, 8.0, 10.0],
                'normal': [100.0, 8.0, 10.0]
                }
 # Center position of trigger counter.
@@ -25,6 +29,7 @@ triggerPosition = {'201607': [0.3744, 0.0, -1.284],
                    '201608a': [-1.87, -1.25, 18.7],
                    '201608b': [-1.87, -1.25, 11.0],
                    '201609': [0, 0, 11.0],
+                   '201702': [0., -1.5, 21.0],
                    'normal': [0.0, 0.0, 0.0]
                    }
 
@@ -33,6 +38,7 @@ triggerPlaneDirection = {'201607': [1, -1, 0],
                          '201608a': [0, 1, 0],
                          '201608b': [0, 1, 0],
                          '201609': [0, 1, 0],
+                         '201702': [0, 1, 0],
                          'normal': [0, 1, 0]
                          }
 
@@ -41,6 +47,7 @@ pmtPosition = {'201607': [0, 0, 0],
                '201608a': [-1.87, 0, -25.0],
                '201608b': [-1.87, 0, -42.0],
                '201609': [0, 0, -42.0],
+               '201702': [0., -1.5, -31.0],
                'normal': [0, 0, -50.0]
                }
 
@@ -49,13 +56,14 @@ globalPhiRotation = {'201607': 1.875,
                      '201608a': 1.875,
                      '201608b': 1.875,
                      '201609': 1.875,
+                     '201702': 0.0,
                      'normal': 0.0
                      }
 
 lengthOfCounter = 100.0
 widthOfCounter = 8.0
 triggerPos = []
-normTriggerPlanDirection = []
+normTriggerPlaneDirection = []
 readOutPos = []
 globalPhi = 0.0
 
@@ -65,21 +73,21 @@ def set_cdc_cr_parameters(period):
     global lengthOfCounter
     global widthOfCounter
     global triggerPos
-    global normTriggerPlanDirection
+    global normTriggerPlaneDirection
     global readOutPos
     global globalPhi
 
     lengthOfCounter = triggerSize[period][0]
     widthOfCounter = triggerSize[period][1]
     triggerPos = triggerPosition[period]
-    normTriggerPlanDirection = triggerPlaneDirection[period]
+    normTriggerPlaneDirection = triggerPlaneDirection[period]
     readOutPos = pmtPosition[period]
     globalPhi = globalPhiRotation[period]
 
 
-def add_cdc_cr_simulation(path, empty_path):
+def add_cdc_cr_simulation(path, empty_path, topInCounter=True):
     """
-    Add cdc cr simulation.
+    Add CDC CR simulation.
 
     """
     # Register the CRY module
@@ -110,7 +118,7 @@ def add_cdc_cr_simulation(path, empty_path):
                           yOfCounter=triggerPos[1],
                           zOfCounter=triggerPos[2],
                           phiOfCounter=0.,
-                          TOP=True,
+                          TOP=topInCounter,
                           propSpeed=lightPropSpeed,
                           TOF=1,
                           cryGenerator=True
@@ -121,59 +129,55 @@ def add_cdc_cr_simulation(path, empty_path):
     path.add_module('FullSim',
                     # Uncomment if you want to disable secondaries.
                     ProductionCut=1000000.)
+    #    path.add_module(RandomizeTrackTimeModule(8.0))
     path.add_module('CDCDigitizer')
 
 
-def add_cdc_cr_reconstruction(path):
+def add_cdc_cr_reconstruction(path, eventTimingExtraction=False):
+    """
+    Add CDC CR reconstruction
+    """
 
     # Add cdc track finder
     add_cdc_cr_track_finding(path)
 
+    # Setup Genfit extrapolation
     path.add_module("SetupGenfitExtrapolation")
-    path.add_module("PlaneTriggerTrackTimeEstimator",
-                    pdgCodeToUseForEstimation=13,
-                    triggerPlanePosition=triggerPos,
-                    triggerPlaneDirection=normTriggerPlanDirection,
-                    useFittedInformation=False)
 
-    path.add_module("DAFRecoFitter",
-                    probCut=0.00001,
-                    pdgCodesToUseForFitting=13,
-                    )
-
-    path.add_module("PlaneTriggerTrackTimeEstimator",
-                    pdgCodeToUseForEstimation=13,
-                    triggerPlanePosition=triggerPos,
-                    triggerPlaneDirection=normTriggerPlanDirection,
-                    useFittedInformation=True,
-                    useReadoutPosition=True,
-                    readoutPosition=readOutPos,
-                    readoutPositionPropagationSpeed=lightPropSpeed
-                    )
-
-    path.add_module("DAFRecoFitter",
-                    # probCut=0.00001,
-                    pdgCodesToUseForFitting=13,
-                    )
-    path.add_module('TrackCreator',
-                    defaultPDGCode=13,
-                    useClosestHitToIP=True
-                    )
-
-
-def getRunNumber(fname):
-    run = int((fname.split('/')[-1]).split('.')[3])
-    return run
+    # Add cdc track fitter
+    add_cdc_cr_track_fit_and_track_creator(path,
+                                           eventTimingExtraction=eventTimingExtraction,
+                                           lightPropSpeed=lightPropSpeed,
+                                           triggerPos=triggerPos,
+                                           normTriggerPlaneDirection=normTriggerPlaneDirection,
+                                           readOutPos=readOutPos
+                                           )
 
 
 def getExpNumber(fname):
+    """
+    Get expperimental number from file name.
+    """
     exp = int((fname.split('/')[-1]).split('.')[2])
     return exp
 
 
+def getRunNumber(fname):
+    """
+    Get run number from file name.
+    """
+    run = int((fname.split('/')[-1]).split('.')[3])
+    return run
+
+
 def getDataPeriod(run):
+    """
+    Get data period from run number
+    It should be replaced the argument from run to (exp, run)!
+    """
     period = None
     global run_range
+
     for key in run_range:
         if run_range[key][0] <= run <= run_range[key][1]:
             period = key
@@ -181,7 +185,9 @@ def getDataPeriod(run):
             break
 
     if period is None:
-        B2ERROR("No valid data period is specified.")
+        B2WARNING("No valid data period is specified.")
+        B2WARNING("Default configuration is loaded.")
+        period = 'normal'
     return period
 
 

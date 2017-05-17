@@ -38,6 +38,8 @@ void FittedTracksStorerModule::initialize()
 
   RecoTrack::registerRequiredRelations(outputRecoTracks);
 
+  inputRecoTracks.registerRelationTo(outputRecoTracks);
+
   StoreArray<MCParticle> mcParticles;
   if (mcParticles.isOptional()) {
     outputRecoTracks.registerRelationTo(mcParticles);
@@ -75,6 +77,8 @@ void FittedTracksStorerModule::event()
       if (relatedParticle) {
         newRecoTrack->addRelationTo(relatedParticle);
       }
+
+      recoTrack.addRelationTo(newRecoTrack);
     }
   }
 }

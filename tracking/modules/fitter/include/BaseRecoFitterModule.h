@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFitting/fitter/base/TrackFitter.h>
-
 #include <framework/core/Module.h>
 #include <string>
 
@@ -68,8 +66,10 @@ namespace Belle2 {
     std::vector<unsigned int> m_param_pdgCodesToUseForFitting = {211};
     /** Resort the hits while fitting. */
     bool m_param_resortHits = false;
-    /** FIXME: Temporary fix for the cosmics data. */
-    bool m_param_cosmicsTemporaryFix = false;
+    /** Configures whether the CDC Translators should be initialized by the FitterModule
+     * especially useful for VXD-only beamtest. In the future this could be changed to check
+     * implicitly if the cdc is available in the geometry.*/
+    bool m_param_initializeCDCTranslators = true;
   };
 }
 

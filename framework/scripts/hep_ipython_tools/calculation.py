@@ -108,12 +108,13 @@ class Calculation:
                 # Check if there are news from the process python module (a new percentage)
                 elif process.progress_queue_local.poll():
                     result = process.progress_queue_local.recv()
-                    if result == "end":
-                        process.join()
-
-                    elif display_bar:
+                    if result != "end" and display_bar:
                         process_bar = process_bars[process]
                         process_bar.update(result)
+
+                else:
+                    process.result_queue.fill_results()
+                    process.join(timeout=0.01)
 
             time.sleep(0.01)
 

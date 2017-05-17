@@ -183,7 +183,8 @@ bool AbstractNSMCallback::get(const NSMNode& node, NSMVar& var,
       NSMMessage msg = com.getMessage();
       NSMCommand cmd(msg.getRequestName());
       if (cmd == NSMCommand::VSET) {
-        if (node.getName() == msg.getData() &&
+        if (msg.getLength() > 0 && msg.getData() != NULL &&
+            node.getName() == msg.getData() &&
             var.getName() == (msg.getData() + msg.getParam(2) + 1)) {
           readVar(msg, var);
           NSMVHandler* handler = getHandler_p(node.getName(), var.getName());

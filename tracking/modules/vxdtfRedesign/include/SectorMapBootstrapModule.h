@@ -17,11 +17,10 @@
 #include <string>
 #include <tuple>
 
-#include <TFile.h>
 namespace Belle2 {
 
   class VXDTFSecMap;
-  class SectorMapConfig;
+  struct SectorMapConfig;
 
   /** The SegmentFilterConverterModule is a module able to read the
    *  cutoff values for filtering the Segments written in the
@@ -41,7 +40,6 @@ namespace Belle2 {
     virtual void beginRun()     ;
     virtual void event()        ;
     virtual void endRun()       ;
-    virtual void terminate()    ;
 
   private:
     void bootstrapSectorMap(void);
@@ -51,7 +49,6 @@ namespace Belle2 {
 
     const std::string c_setupKeyNameTTreeName     = "Setups";
     const std::string c_setupKeyNameBranchName      = "name";
-    TFile* m_tfile = nullptr;
 
     std::string m_sectorMapsInputFile = "SectorMaps.root";
     std::string m_sectorMapsOutputFile = "SectorMaps.root";

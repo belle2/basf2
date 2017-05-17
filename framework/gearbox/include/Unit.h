@@ -43,6 +43,7 @@ namespace Belle2 {
     // standard units
     static const double cm;           /**< Standard of [length] */
     static const double ns;           /**< Standard of [time] */
+    static const double GHz;          /**< Standard of [frequency] */
     static const double rad;          /**< Standard of [angle] */
     static const double GeV;          /**< Standard of [energy, momentum, mass] */
     static const double K;            /**< Standard of [temperature] */
@@ -83,6 +84,12 @@ namespace Belle2 {
     static const double us;           /**< [microsecond] */
     static const double ps;           /**< [picosecond] */
     static const double fs;           /**< [femtosecond] */
+
+    // frequency units
+    static const double Hz;           /**< [Hertz] */
+    static const double kHz;          /**< [Kilohertz] */
+    static const double MHz;          /**< [Megahertz] */
+    static const double mHz;          /**< [Millihertz] */
 
     // angle units
     static const double mrad;         /**< [millirad] */

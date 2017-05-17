@@ -64,11 +64,12 @@ def add_dqms(path, raw_dqm=True, svd_only=args.svd_only):
     if not svd_only:
         if raw_dqm:
             path.add_module("PXDRawDQM")
-        path.add_module("PXDDQMCorr")
-        path.add_module('PXDDQM', histgramDirectoryName='pxddqm')
+        # path.add_module("PXDDQMCorr")
+        # path.add_module('PXDDQM', histgramDirectoryName='pxddqm')
 
-    path.add_module('SVDDQM3')
+    # path.add_module('SVDDQM3')
 
+    path.add_module('VXDTelDQMOffLine')
     """
     main.add_module("VXDTelDQMOffLine", SaveOtherHistos=1, CorrelationGranulation=0.5)
 

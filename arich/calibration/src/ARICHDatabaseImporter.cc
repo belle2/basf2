@@ -573,7 +573,7 @@ void ARICHDatabaseImporter::exportAerogelInfo()
     // Get entries from TClonesArray and print aerogel info
     (*elements).GetEntries();
     for (int i = 0; i < elements->GetSize(); i++) {
-      ARICHAerogelInfo* myelement = (ARICHAerogelInfo*)elements->At(i);
+      ARICHAerogelInfo* myelement = static_cast<ARICHAerogelInfo*>(elements->At(i));
       B2INFO("Version = " << myelement->getAerogelVersion() << ", SN = " << myelement->getAerogelSerial() << ", n = " << myelement->getAerogelRefractiveIndex() << ", trl = " << myelement->getAerogelTransmissionLength() << ", thickness = " << myelement->getAerogelThickness());
     }
   */
@@ -672,7 +672,7 @@ void ARICHDatabaseImporter::exportAerogelInfoEventDep()
   EventMetaData event = EventMetaData(1200, 4, 0); // (event, run, exp)
 
   // Extract object and IOV from database
-  std::pair<TObject*, IntervalOfValidity> podatki = Database::Instance().getData(event, "dbstore", "ARICHAerogelInfoEventDep");
+  std::pair<TObject*, IntervalOfValidity> podatki = Database::Instance().getData(event, "ARICHAerogelInfoEventDep");
 
   // print interval of validity
 //  IntervalOfValidity iov = std::get<1>(podatki);

@@ -55,6 +55,9 @@ namespace Belle2 {
       }
       \endcode
    *
+   *  \note Remember to use references or pointers when iterating,
+   *        otherwise accessing, e.g., relations will not work.
+   *
    *  Objects linked together using relations can also be obtained by querying
    *  the objects themselves, since they should derive from RelationsObject
    *  (See class documentation for usage examples.)
@@ -104,8 +107,6 @@ namespace Belle2 {
    *  @sa See StoreObjPtr for a way store single objects
    *  @sa Data can also be accessed from Python modules using PyStoreArray
    *  @sa While individual elements cannot be removed directly from StoreArray, SelectSubset can be used to filter it.
-   *
-   *  @author <a href="mailto:software@belle2.kek.jp?subject=StoreArray">The basf2 developers</a>
    */
   template <class T>
   class StoreArray : public StoreAccessorBase {

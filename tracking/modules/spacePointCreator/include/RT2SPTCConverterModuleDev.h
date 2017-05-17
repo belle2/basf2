@@ -24,8 +24,8 @@ namespace Belle2 {
    * NOTE: currently only working with SVD clusters!
    *
    * Intended Behaviour: The Module takes a RecoTrack and converts it to a SpacePointTrackCand
-   * by taking the Clusters of the RecoTrack and then look for Relations of these Clusters to SpacePoints.
-   *
+   * by taking the Clusters (PXD and SVD) of the RecoTrack and then look for Relations of these Clusters to SpacePoints.
+   * NOTE: other hits than PXD and SVD are ignored!
    *
    */
   class RT2SPTCConverterModule : public Module {
@@ -55,11 +55,11 @@ namespace Belle2 {
 
     /* Convert Clusters to SpacePoints using the Relation: Cluster->SpacePoint */
     std::pair<std::vector<const SpacePoint*>, ConversionState>
-    getSpacePointsFromSVDClusters(std::vector<SVDCluster*>);
+    getSpacePointsFromRecoHitInformations(std::vector<RecoHitInformation*> hitInfos);
 
     /* Convert Clusters to SpacePoints using the Relation: Cluster->TrueHit->SpacePoint */
     std::pair<std::vector<const SpacePoint*>, ConversionState>
-    getSpacePointsFromSVDClustersViaTrueHits(std::vector<SVDCluster*> clusters);
+    getSpacePointsFromRecoHitInformationViaTrueHits(std::vector<RecoHitInformation*> hitInfos);
 
     /** reset counters to 0 to avoid indeterministic behaviour */
     void initializeCounters()
@@ -74,7 +74,7 @@ namespace Belle2 {
 
     std::string m_SVDClusterName; /**< SVDCluster collection name */
 
-    std::string m_SVDDoubleClusterSPName; /**< Non SingleCluster SVD SpacePoints collection name */
+    std::string m_SVDAndPXDSPName; /**< Non SingleCluster SVD SpacePoints AND PXD SpacePoints collection name */
 
     std::string m_SVDSingleClusterSPName; /**< Single Cluster SVD SpacePoints collection name */
 
@@ -83,6 +83,7 @@ namespace Belle2 {
     std::string m_SPTCName; /**< Name of collection under which SpacePointTrackCands will be stored in the StoreArray */
 
     // parameters
+    bool m_ignorePXDHits; /**< PXD hits will be ignored when creating the SP track candidate */
 
     int m_minSP; /**< parameter for specifying a minimal number of SpacePoints a SpacePointTrackCand has to have in order to be registered in the DataStore */
     bool m_useTrueHits; /**< If true the method getSpacePointsFromSVDClustersViaTrueHits is utilized. Requires TrueHits to be present and to have relations to SpacePoints! */

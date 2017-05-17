@@ -329,7 +329,7 @@ void Module::exposePythonAPI()
                                      R"(Determines execution behaviour after a conditional path has been executed:
 
 END
-  End current event after the conditional path.
+  End current event after the conditional path. (this is the default for if_value() etc.)
 CONTINUE
   After the conditional path, resume execution after this module.)")
   .value("END", Module::EAfterConditionPath::c_End)
@@ -388,6 +388,10 @@ will be diverted into another_path for this event. You could for example set
 a special return value if an error occurs, and divert the execution into a
 path containing RootOutput if it is found; saving only the data producing/
 produced by the error.
+
+After a conditional path has executed, basf2 will by default stop processing
+the current event. This behaviour can be changed by setting the
+:class:`basf2.AfterConditionPath` argument.
 
 The 'Module Development' section in the manual provides detailed information
 on how to create modules, setting parameters, or using return values/conditions:

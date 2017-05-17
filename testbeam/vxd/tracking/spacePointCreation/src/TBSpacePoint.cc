@@ -85,5 +85,5 @@ vector< genfit::PlanarMeasurement > TBSpacePoint::getGenfitCompatible() const
 
   B2DEBUG(50, "TBSpacePoint::getGenfitCompatible(): collected " << collectedMeasurements.size() << " meaturements");
 
-  return move(collectedMeasurements);
+  return collectedMeasurements;
 }

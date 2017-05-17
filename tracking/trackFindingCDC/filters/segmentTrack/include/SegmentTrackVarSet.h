@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
+#include <tracking/trackFindingCDC/filters/segmentTrack/BaseSegmentTrackFilter.h>
+
 #include <utility>
 
 namespace Belle2 {
@@ -49,7 +51,7 @@ namespace Belle2 {
     };
 
     /// Vehicle class to transport the variable names
-    struct SegmentTrackVarNames : public VarNames<std::pair<const CDCTrack*, const CDCSegment2D*>> {
+    struct SegmentTrackVarNames : public VarNames<BaseSegmentTrackFilter::Object> {
 
       /// Number of variables to be generated
       static const size_t nVars = size(segmentTrackVarNames);
@@ -69,7 +71,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the contained variables
-      bool extract(const std::pair<const CDCTrack*, const CDCSegment2D*>* testPair) final;
+      bool extract(const BaseSegmentTrackFilter::Object* testPair) final;
     };
   }
 }

@@ -18,7 +18,7 @@ namespace Belle2 {
   class OverlapNetwork : public RelationsObject {
   public:
     /** Takes an OverlapMatrix in the form, that comes from the OverlapMatrixCreator. */
-    OverlapNetwork(const std::vector <std::vector <unsigned short> >& overlapMatrix) :
+    explicit OverlapNetwork(const std::vector <std::vector <unsigned short> >& overlapMatrix) :
       m_overlapMatrix(overlapMatrix)
     {}
 

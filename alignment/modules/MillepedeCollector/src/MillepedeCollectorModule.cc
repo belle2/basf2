@@ -49,6 +49,10 @@
 #include <alignment/reconstruction/BKLMRecoHit.h>
 #include <alignment/reconstruction/AlignableEKLMRecoHit.h>
 
+#include <alignment/Hierarchy.h>
+
+#include <alignment/dbobjects/VXDAlignment.h>
+
 using namespace Belle2;
 using namespace std;
 
@@ -81,6 +85,8 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
            double(-1.));
   addParam("useGblTree", m_useGblTree, "Store GBL trajectories in a tree instead of output to binary files",
            bool(true));
+  addParam("useVXDHierarchy", m_useVXDHierarchy, "Use hierarchy for VXD alignment (adds alignment of half-shells, ladders)",
+           bool(false));
 }
 
 void MillepedeCollectorModule::prepare()
@@ -129,6 +135,73 @@ void MillepedeCollectorModule::prepare()
 
   registerObject<TH1F>("chi2/ndf", new TH1F("chi2/ndf", "chi2/ndf", 200, 0., 50.));
   registerObject<TH1F>("pval", new TH1F("pval", "pval", 100, 0., 1.));
+
+  auto& geo = VXD::GeoCache::getInstance();
+  auto& hierarchy = Belle2::alignment::HierarchyManager::getInstance().getAlignmentHierarchy();
+
+  if (m_useVXDHierarchy) {
+    // Set-up hierarchy
+    DBObjPtr<VXDAlignment> vxdAlignments;
+    /**
+    So the hierarchy is as follows:
+                Belle 2
+              / |     | \
+          Ying  Yang Pat  Mat ... other sub-detectors
+          / |   / |  |  \  | \
+        ......  ladders ......
+        / / |   / |  |  \  | \ \
+      ......... sensors ........
+    */
+
+    for (auto& halfShellPlacement : geo.getHalfShellPlacements()) {
+      TGeoHMatrix trafoHalfShell = halfShellPlacement.second;
+      trafoHalfShell *= geo.getTGeoFromRigidBodyParams(
+                          vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dU),
+                          vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dV),
+                          vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dW),
+                          vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dAlpha),
+                          vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dBeta),
+                          vxdAlignments->get(halfShellPlacement.first, VXDAlignment::dGamma)
+                        );
+      hierarchy.insertTGeoTransform<VXDAlignment, alignment::EmptyGlobaParamSet>(halfShellPlacement.first, 0, trafoHalfShell);
+
+      for (auto& ladderPlacement : geo.getLadderPlacements(halfShellPlacement.first)) {
+        // Updated trafo
+        TGeoHMatrix trafoLadder = ladderPlacement.second;
+        trafoLadder *= geo.getTGeoFromRigidBodyParams(
+                         vxdAlignments->get(ladderPlacement.first, VXDAlignment::dU),
+                         vxdAlignments->get(ladderPlacement.first, VXDAlignment::dV),
+                         vxdAlignments->get(ladderPlacement.first, VXDAlignment::dW),
+                         vxdAlignments->get(ladderPlacement.first, VXDAlignment::dAlpha),
+                         vxdAlignments->get(ladderPlacement.first, VXDAlignment::dBeta),
+                         vxdAlignments->get(ladderPlacement.first, VXDAlignment::dGamma)
+                       );
+        hierarchy.insertTGeoTransform<VXDAlignment, VXDAlignment>(ladderPlacement.first, halfShellPlacement.first, trafoLadder);
+
+        for (auto& sensorPlacement : geo.getSensorPlacements(ladderPlacement.first)) {
+          // Updated trafo
+          TGeoHMatrix trafoSensor = sensorPlacement.second;
+          trafoSensor *= geo.getTGeoFromRigidBodyParams(
+                           vxdAlignments->get(sensorPlacement.first, VXDAlignment::dU),
+                           vxdAlignments->get(sensorPlacement.first, VXDAlignment::dV),
+                           vxdAlignments->get(sensorPlacement.first, VXDAlignment::dW),
+                           vxdAlignments->get(sensorPlacement.first, VXDAlignment::dAlpha),
+                           vxdAlignments->get(sensorPlacement.first, VXDAlignment::dBeta),
+                           vxdAlignments->get(sensorPlacement.first, VXDAlignment::dGamma)
+                         );
+          hierarchy.insertTGeoTransform<VXDAlignment, VXDAlignment>(sensorPlacement.first, ladderPlacement.first, trafoSensor);
+
+
+        }
+      }
+    }
+
+  }
+
+  Belle2::alignment::HierarchyManager::getInstance().writeConstraints("constraints.txt");
+
+  // Add callback to itself. Callback are unique, so further calls should not change anything
+  //vxdAlignments.addCallback(this, &VXD::GeoCache::setupReconstructionTransformations);
 }
 
 void MillepedeCollectorModule::collect()
@@ -175,7 +248,7 @@ void MillepedeCollectorModule::collect()
   for (auto listName : m_particles) {
     StoreObjPtr<ParticleList> list(listName);
     for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
-      for (auto& track : getParticlesTracks({list->getParticle(iParticle)})) {
+      for (auto& track : getParticlesTracks({list->getParticle(iParticle)}, false)) {
         auto gblfs = dynamic_cast<genfit::GblFitStatus*>(track->getFitStatus());
 
         getObject<TH1F>("chi2/ndf").Fill(gblfs->getChi2() / gblfs->getNdf());
@@ -390,13 +463,13 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
 
   if (bklmHits.isOptional()) {
     genfit::MeasurementProducer <RecoHitInformation::UsedBKLMHit, BKLMRecoHit>* BKLMProducer =  new genfit::MeasurementProducer
-    <RecoHitInformation::UsedBKLMHit, BKLMRecoHit> (cdcHits.getPtr());
+    <RecoHitInformation::UsedBKLMHit, BKLMRecoHit> (bklmHits.getPtr());
     genfitMeasurementFactory.addProducer(Const::BKLM, BKLMProducer);
   }
 
   if (eklmHits.isOptional()) {
     genfit::MeasurementProducer <RecoHitInformation::UsedEKLMHit, AlignableEKLMRecoHit>* EKLMProducer =  new genfit::MeasurementProducer
-    <RecoHitInformation::UsedEKLMHit, AlignableEKLMRecoHit> (cdcHits.getPtr());
+    <RecoHitInformation::UsedEKLMHit, AlignableEKLMRecoHit> (eklmHits.getPtr());
     genfitMeasurementFactory.addProducer(Const::EKLM, EKLMProducer);
   }
 
@@ -490,7 +563,7 @@ void MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
 }
 
 
-std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::vector<Particle*> particles)
+std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::vector<Particle*> particles, bool addVertexPoint)
 {
   std::vector< genfit::Track* > tracks;
   for (auto particle : particles) {
@@ -513,7 +586,7 @@ std::vector< genfit::Track* > MillepedeCollectorModule::getParticlesTracks(std::
     }
     auto& track = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
 
-    fitRecoTrack(*recoTrack, particle);
+    fitRecoTrack(*recoTrack, (addVertexPoint) ? particle : nullptr);
 
     if (!track.hasFitStatus()) {
       B2INFO("Track has no fit status");

@@ -49,14 +49,59 @@ namespace Belle2 {
     double particlePt(const Particle* part);
 
     /**
-     * return  momentum cosine of polar angle
+     * return error of momentum
+     */
+    double particlePErr(const Particle* part);
+
+    /**
+     * return error of momentum component x
+     */
+    double particlePxErr(const Particle* part);
+
+    /**
+     * return error of momentum component y
+     */
+    double particlePyErr(const Particle* part);
+
+    /**
+     * return error of momentum component z
+     */
+    double particlePzErr(const Particle* part);
+
+    /**
+     * return error of transverse momentum
+     */
+    double particlePtErr(const Particle* part);
+
+    /**
+     * return polar angle
+     */
+    double particleTheta(const Particle* part);
+
+    /**
+     * return error of polar angle
+     */
+    double particleThetaErr(const Particle* part);
+
+    /**
+     * return momentum cosine of polar angle
      */
     double particleCosTheta(const Particle* part);
+
+    /**
+     * return error of momentum cosine of polar angle
+     */
+    double particleCosThetaErr(const Particle* part);
 
     /**
      * return momentum azimuthal angle
      */
     double particlePhi(const Particle* part);
+
+    /**
+     * return error of momentum azimuthal angle
+     */
+    double particlePhiErr(const Particle* part);
 
     /**
      * return particle's pdg code
@@ -125,6 +170,16 @@ namespace Belle2 {
      * return transverse distance relative to interaction point
      */
     double particleDRho(const Particle* part);
+
+    /**
+     * return vertex azimuthal angle
+     */
+    double particleDPhi(const Particle* part);
+
+    /**
+     * return vertex polar angle
+     */
+    double particleDCosTheta(const Particle* part);
 
     /**
      * return the (i,j)-th element of the MomentumVertex covariance matrix
@@ -210,6 +265,11 @@ namespace Belle2 {
      * return StoreArray index (0-based) of the MDST object from which the Particle was created
      */
     double particleMdstArrayIndex(const Particle* part);
+
+    /**
+     * return unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)
+     */
+    double particleMdstSource(const Particle* part);
 
     /**
      * returns cosinus of StoreArray index (0-based) of the MDST object from which the Particle was created.
@@ -406,6 +466,13 @@ namespace Belle2 {
      * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
      */
     double particleDeltaT(const Particle* particle);
+
+    /**
+     * return Delta T error in ps
+     *
+     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
+     */
+    double particleDeltaTErr(const Particle* particle);
 
     /**
      * return generated Delta T (Brec - Btag) in ps
@@ -641,6 +708,21 @@ namespace Belle2 {
      * return 1/0 if charged track is/is not Matched to this cluster
      */
     double eclClusterTrackMatched(const Particle* particle);
+
+    /**
+     * return the ConnectedRegion ID of this cluster
+     */
+    double eclClusterConnectedRegionId(const Particle* particle);
+
+    /**
+     * return the Cluster ID of this cluster
+     */
+    double eclClusterId(const Particle* particle);
+
+    /**
+     * return the Hypothesis ID of this cluster
+     */
+    double eclClusterHypothesisId(const Particle* particle);
 
     /**
      * return always zero

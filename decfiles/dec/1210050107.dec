@@ -1,0 +1,39 @@
+# EventType: 1210050107
+# Descriptor: [B+ -> (phi-> K+ K- ) (K_S0 pi+) ]cc
+# NickName: Bu_phiKSpi PHSP
+# Documentation: Decay mode for sensitivity studies
+# Tested: Yes
+# PhysicsWG: BTOCHARMLESS
+# Responsible: Alyssa Loos
+# Email: aloos@email.sc.edu
+# Cuts: None
+# Date: 20170317
+# Changes: Use of aliases defined in DECAY.DEC; date: 20170320; author: Pablo Goldenzweig
+
+
+Alias phisig phi
+Alias K_S0sig K_S0
+Alias pimsig pi-
+Alias pipsig pi+
+
+Decay Upsilon(4S)
+0.5  B+  B-sig              VSS;
+0.5  B+sig  B-              VSS;
+Enddecay
+
+Decay B-sig
+1.0  phisig K_S0sig pimsig  PHOTOS PHSP;
+Enddecay
+
+Decay B+sig
+1.0  phisig K_S0sig pipsig  PHOTOS PHSP;
+Enddecay
+
+Decay phisig
+1.0  K+   K-                PHOTOS VSS;
+Enddecay
+
+End
+
+
+

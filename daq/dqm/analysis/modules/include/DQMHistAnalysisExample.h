@@ -13,6 +13,7 @@
 
 #include <daq/dqm/analysis/modules/DQMHistAnalysis.h>
 
+#include <TCanvas.h>
 #include <TF1.h>
 
 namespace Belle2 {
@@ -36,9 +37,15 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
-    // Data members
+    //! Parameters accesible from basf2 scripts
+  protected:
+    std::string m_histoname;
+    std::string m_function;
+
+    //! Data members
   private:
     TF1* m_f;
+    TCanvas* m_c;
 
   };
 } // end namespace Belle2

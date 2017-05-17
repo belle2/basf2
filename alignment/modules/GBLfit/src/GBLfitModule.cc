@@ -384,15 +384,6 @@ void GBLfitModule::event()
   //Create a relation between the gftracks and their most probable 'mother' MC particle
   RelationArray gfTracksToMCPart(gfTracks, mcParticles);
 
-  // Fill array of EKLMAlignmentHit (1 hit for each EKLMHit2d and plane)
-  StoreArray<EKLMAlignmentHit> eklmAlignmentHits;
-  for (int i = 0; i < eklmHits.getEntries(); i++) {
-    for (int j = 0; j < 2; j++) {
-      EKLMAlignmentHit* alignmentHit = eklmAlignmentHits.appendNew(j);
-      alignmentHit->addRelationTo(eklmHits[i]);
-    }
-  }
-
   //counter for fitted tracks, the number of fitted tracks may differ from the number of trackCandidates if the fit fails for some of them
   int trackCounter = -1;
   int trackFitResultCounter = 0;
@@ -540,6 +531,7 @@ void GBLfitModule::event()
         BKLMProducer =  new genfit::MeasurementProducer <BKLMHit2d, BKLMRecoHit> (bklmHits.getPtr());
         factory.addProducer(Const::BKLM, BKLMProducer);
       }
+      StoreArray<EKLMAlignmentHit> eklmAlignmentHits;
       if (eklmAlignmentHits.getEntries()) {
         genfit::MeasurementProducer<EKLMAlignmentHit, AlignableEKLMRecoHit>* eklmProducer = NULL;
         eklmProducer = new genfit::MeasurementProducer<EKLMAlignmentHit, AlignableEKLMRecoHit>(eklmAlignmentHits.getPtr());

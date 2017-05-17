@@ -30,6 +30,7 @@ void rbinfo(int shmid)
   double filled_MB = (filled_bytes) / 1024.0 / 1024.0;
   std::cout << "RB " << shmid
             << " #Tx: " << m_bufinfo->numAttachedTx << "\t"
+            << " #busy: " << m_bufinfo->nbusy << "\t"
             << m_bufinfo->nbuf << " entries\t"
             << filled_MB << " MiB filled\t(" << 100.0 * filled_bytes / double(m_bufinfo->size * sizeof(int)) << " %)"
             << "\n";

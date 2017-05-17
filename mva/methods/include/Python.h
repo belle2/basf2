@@ -80,6 +80,7 @@ namespace Belle2 {
       unsigned int m_mini_batch_size = 0; /**< Mini batch size, 0 passes the whole data in one call */
       unsigned int m_nIterations = 1; /**< Number of iterations trough the whole data */
       double m_training_fraction = 1.0; /**< Fraction of data passed as training data, rest is passed as test data */
+      bool m_normalize = false; /**< Normalize the inputs (shift mean to zero and std to 1) */
     };
 
 
@@ -133,6 +134,8 @@ namespace Belle2 {
       PythonOptions m_specific_options; /**< Method specific options */
       boost::python::object m_framework; /**< Framework module */
       boost::python::object m_state; /**< current state object of method */
+      std::vector<float> m_means; /**< Means of all features for normalization */
+      std::vector<float> m_stds; /**< Stds of all features for normalization */
     };
 
   }

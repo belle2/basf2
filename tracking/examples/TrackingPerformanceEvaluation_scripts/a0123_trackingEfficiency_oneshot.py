@@ -8,8 +8,12 @@
 #    written by Giulia Casarosa, INFN Pisa                      #
 #    giulia.casarosa@pi.infn.it                                 #
 #                                                               #
-# USAGE:
+# USAGE 1:
 #
+# > mkdir test
+# > basf2 -n100 a0123_trackingEfficiency_oneshot.py 1 test noROI noBKG
+#
+# USAGE 2:
 # > mkdir release/workdir
 # > cd release/workdir
 # > mkdir /group/belle2/users/casarosa/trackingValidation/release
@@ -23,10 +27,12 @@ import sys
 import glob
 from basf2 import *
 from simulation import add_simulation
-from tracking import *  # add_tracking_reconstruction
-from modularAnalysis import *  # add_tracking_reconstruction
+from tracking import *
+from modularAnalysis import *
 
 set_random_seed(123 + int(sys.argv[1]))
+
+particleGun = False
 
 release = sys.argv[2]
 
@@ -42,6 +48,7 @@ root_file_name_V0 = './' + release + '/TV_V0_analysis_' + roi + '_' + bkg + '_' 
 
 bkgFiles = None
 usePXDDataReduction = False
+mcTrackFinding = False
 
 if roi == 'wROI':
     usePXDDataReduction = True
@@ -64,7 +71,6 @@ path = create_path()
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('expList', [1])
 eventinfosetter.param('runList', [1])
-# eventinfosetter.param('evtNumList', [200])
 
 progress = register_module('Progress')
 
@@ -81,7 +87,21 @@ create_plots_V0 = register_module('V0findingPerformanceEvaluation')
 create_plots_V0.param('outputFileName', root_file_name_V0)
 create_plots_V0.logging.log_level = LogLevel.INFO
 
-generateY4S(100, None, path)
+if particleGun:
+    particleGunModule = register_module('ParticleGun')
+    particleGunModule.param({
+        'pdgCodes': [211, -211],
+        'nTracks': 1,
+        'varyNTracks': False,
+        'momentumGeneration': 'uniformpt',
+        'momentumParams': [0.5, 1.],
+        'thetaGeneration': 'uniform',
+        'thetaParams': [60., 60.],
+    })
+    path.add_module('EventInfoSetter')
+    path.add_module(particleGunModule)
+else:
+    generateY4S(100, None, path)
 
 path.add_module(progress)
 
@@ -91,43 +111,20 @@ add_tracking_reconstruction(
     path,
     components=None,
     pruneTracks=False,
-    mcTrackFinding=False,
+    mcTrackFinding=mcTrackFinding,
     trigger_mode="all",
-    skipGeometryAdding=False)
-tfmctruth = register_module('TrackFinderMCTruthRecoTracks')
-tfmctruth.param('RecoTracksStoreArrayName', 'MCRecoTracks')
-
-path.add_module(tfmctruth)
-add_mc_matcher(path)
-
-genfitTrackCand = register_module('GenfitTrackCandidatesCreator')
-path.add_module(genfitTrackCand)
-
-genfitMCTrackCand = register_module('GenfitTrackCandidatesCreator')
-genfitMCTrackCand.set_name('GenfitMCTrackCandidatesCreator')
-genfitMCTrackCand.param('recoTracksStoreArrayName', 'MCRecoTracks')
-genfitMCTrackCand.param('genfitTrackCandsStoreArrayName', 'MCGFTrackCands')
-path.add_module(genfitMCTrackCand)
-
-path.add_module('GenfitTrackCreator')
+    skipGeometryAdding=False
+)
 
 modList = path.modules()
 for modItem in modList:
     if modItem.name() == 'V0Finder':
         modItem.param('Validation', True)
-
-# path.add_module(mctf)
-# path.add_module(matcher)
 path.add_module(v0matcher)
 
 path.add_module(create_plots_TRK)
 path.add_module(create_plots_V0)
 
-# path.add_module(root_output)
-
-# for modItem in modList:
-#    if modItem.name() == 'PruneGenfitTracks':
-#        modItem.m_flags = ''
-
 process(path)
+
 print(statistics)

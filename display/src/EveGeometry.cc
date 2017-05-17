@@ -1,7 +1,9 @@
 #include <display/EveGeometry.h>
 
+#include <geometry/GeometryManager.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/utilities/ColorPalette.h>
 
 #include <TGeoManager.h>
 #include <TPRegexp.h>
@@ -14,6 +16,7 @@
 #include <cassert>
 
 using namespace Belle2;
+using namespace Belle2::TangoPalette;
 
 namespace {
   static TEveGeoTopNode* s_eveTopNode = nullptr;
@@ -22,10 +25,19 @@ namespace {
 
 void EveGeometry::addGeometry()
 {
-  if (!gGeoManager)
-    return;
-
   B2DEBUG(100, "Setting up geometry for TEve...");
+  if (!gEve)
+    B2FATAL("gEve must be set up before EveGeometry!");
+
+  if (!gGeoManager) { //TGeo geometry not initialized, do it ourselves
+    //convert geant4 geometry to TGeo geometry
+    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
+    geoManager.createTGeoRepresentation();
+    if (!gGeoManager) {
+      B2FATAL("Couldn't create TGeo geometry! Please make sure you add the Geometry module before Display");
+      return;
+    }
+  }
   //set colours by atomic mass number
   gGeoManager->DefaultColors();
 
@@ -63,12 +75,12 @@ void EveGeometry::addGeometry()
   */
 
   //set some nicer colors (at top level only)
-  setVolumeColor("PXD.Envelope", kGreen + 3);
-  setVolumeColor("SVD.Envelope", kOrange + 8);
-  setVolumeColor("logical_ecl", kOrange - 3);
-  setVolumeColor("BKLM.EnvelopeLogical", kGreen + 3);
-  setVolumeColor("Endcap_1", kGreen + 3);
-  setVolumeColor("Endcap_2", kGreen + 3);
+  setVolumeColor("PXD.Envelope", getTColorID("Chameleon", 2));
+  setVolumeColor("SVD.Envelope", getTColorID("Orange", 3));
+  setVolumeColor("logical_ecl", getTColorID("Orange", 1));
+  setVolumeColor("BKLM.EnvelopeLogical", getTColorID("Chameleon", 1));
+  setVolumeColor("Endcap_1", getTColorID("Chameleon", 1));
+  setVolumeColor("Endcap_2", getTColorID("Chameleon", 1));
 
   TGeoNode* top_node = gGeoManager->GetTopNode();
   assert(top_node != NULL);
@@ -77,7 +89,7 @@ void EveGeometry::addGeometry()
   s_eveTopNode->SetVisLevel(2);
   gEve->AddGlobalElement(s_eveTopNode);
 
-  //don't show full geo unless turned on by user
+  //don't show full geo unless turned on by user (will be set by setVisualisationMode())
   bool fullgeo = false;
   s_eveTopNode->SetRnrSelfChildren(fullgeo, fullgeo);
 
@@ -122,7 +134,8 @@ void EveGeometry::addGeometry()
 void EveGeometry::setVisualisationMode(EType visMode)
 {
   bool fullgeo = (visMode == c_Full);
-  s_eveTopNode->SetRnrSelfChildren(fullgeo, fullgeo);
+  if (s_eveTopNode)
+    s_eveTopNode->SetRnrSelfChildren(fullgeo, fullgeo);
   s_simplifiedShape->SetRnrSelfChildren(false, !fullgeo);
 }
 

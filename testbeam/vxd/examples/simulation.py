@@ -22,9 +22,7 @@ beamspot_size_y = 0.3  # cm (sigma of gaussian)
 beamspot_size_z = 0.3  # cm (sigma of gaussian)
 
 main = create_path()
-
-main = create_path()
-main.add_module('EventInfoSetter')
+main.add_module('EventInfoSetter', evtNumList=[100])
 main.add_module('Progress')
 main.add_module('Gearbox', fileName='testbeam/vxd/FullVXDTB2016.xml')
 

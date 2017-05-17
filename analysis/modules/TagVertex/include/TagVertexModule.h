@@ -88,6 +88,7 @@ namespace Belle2 {
     int m_mcPDG;                  /**< generated tag side B flavor */
     TVector3 m_MCVertReco;        /**< generated Breco decay vertex */
     double m_deltaT;              /**< reconstructed DeltaT */
+    double m_deltaTErr;           /**< reconstructed DeltaT error */
     double m_MCdeltaT;            /**< generated DeltaT */
     TMatrixDSym m_tube;           /**< constrained to be used in the tag vertex fit */
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */

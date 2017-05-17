@@ -181,7 +181,7 @@ namespace Belle2 {
      * Enables BG overlay module to identify uniquely the physical channel of this Digit.
      * @return unique channel ID, the WireID is returned for the CDC.
      */
-    unsigned int getUniqueChannelID() const {return static_cast<int>(m_eWire);}
+    unsigned int getUniqueChannelID() const {return static_cast<unsigned int>(m_eWire);}
 
     /**
      * Implementation of the base class function.

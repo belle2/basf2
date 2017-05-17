@@ -55,7 +55,7 @@ namespace Belle2 {
      *
      * @param particles vector of Belle2::Particles to be changed in vector of genfit::Tracks
      */
-    std::vector<genfit::Track*> getParticlesTracks(std::vector<Particle*> particles);
+    std::vector<genfit::Track*> getParticlesTracks(std::vector<Particle*> particles, bool addVertexPoint = true);
 
     /** Fit given RecoTrack with GBL
      *
@@ -92,6 +92,8 @@ namespace Belle2 {
     std::vector<gbl::GblData> m_currentGblData{};
     /** Whether to use TTree to accumulate GBL data instead of binary files*/
     bool m_useGblTree{true};
+    /** Whether to use VXD alignment hierarchy*/
+    bool m_useVXDHierarchy{false};
   };
 }
 

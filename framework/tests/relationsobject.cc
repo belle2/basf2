@@ -62,11 +62,11 @@ namespace {
     EXPECT_TRUE(profileData[0] == relObjData[0]->getRelated<ProfileInfo>());
 
     //getRelatedWithWeight
-    EXPECT_TRUE(std::make_pair(profileData[0], -42.0) == relObjData[0]->getRelatedToWithWeight<ProfileInfo>());
+    EXPECT_TRUE(std::make_pair(profileData[0], -42.0f) == relObjData[0]->getRelatedToWithWeight<ProfileInfo>());
     ProfileInfo* profileNullPtr = nullptr;
-    EXPECT_TRUE(std::make_pair(profileNullPtr, 1.0) == relObjData[1]->getRelatedToWithWeight<ProfileInfo>());
-    EXPECT_TRUE(std::make_pair(profileNullPtr, 1.0) == relObjData[0]->getRelatedFromWithWeight<ProfileInfo>());
-    EXPECT_TRUE(std::make_pair(profileData[0], -42.0) == relObjData[0]->getRelatedWithWeight<ProfileInfo>());
+    EXPECT_TRUE(std::make_pair(profileNullPtr, 1.0f) == relObjData[1]->getRelatedToWithWeight<ProfileInfo>());
+    EXPECT_TRUE(std::make_pair(profileNullPtr, 1.0f) == relObjData[0]->getRelatedFromWithWeight<ProfileInfo>());
+    EXPECT_TRUE(std::make_pair(profileData[0], -42.0f) == relObjData[0]->getRelatedWithWeight<ProfileInfo>());
 
 
     //adding relations to NULL is safe and doesn't do anything

@@ -28,7 +28,7 @@ namespace Belle2 {
     void PythonOptions::load(const boost::property_tree::ptree& pt)
     {
       int version = pt.get<int>("Python_version");
-      if (version != 1) {
+      if (version < 1 or version > 2) {
         B2ERROR("Unknown weightfile version " << std::to_string(version));
         throw std::runtime_error("Unknown weightfile version " + std::to_string(version));
       }
@@ -38,18 +38,24 @@ namespace Belle2 {
       m_nIterations = pt.get<unsigned int>("Python_n_iterations");
       m_config = pt.get<std::string>("Python_config");
       m_training_fraction = pt.get<double>("Python_training_fraction");
+      if (version == 2) {
+        m_normalize = pt.get<bool>("Python_normalize");
+      } else {
+        m_normalize = false;
+      }
 
     }
 
     void PythonOptions::save(boost::property_tree::ptree& pt) const
     {
-      pt.put("Python_version", 1);
+      pt.put("Python_version", 2);
       pt.put("Python_framework", m_framework);
       pt.put("Python_steering_file", m_steering_file);
       pt.put("Python_mini_batch_size", m_mini_batch_size);
       pt.put("Python_n_iterations", m_nIterations);
       pt.put("Python_config", m_config);
       pt.put("Python_training_fraction", m_training_fraction);
+      pt.put("Python_normalize", m_normalize);
     }
 
     po::options_description PythonOptions::getDescription()
@@ -61,6 +67,7 @@ namespace Belle2 {
       ("steering_file", po::value<std::string>(&m_steering_file), "Steering file which describes")
       ("mini_batch_size", po::value<unsigned int>(&m_mini_batch_size), "Size of the mini batch given to partial_fit function")
       ("nIterations", po::value<unsigned int>(&m_nIterations), "Number of iterations")
+      ("normalize", po::value<bool>(&m_normalize), "Normalize input data (shift mean to 0 and std to 1)")
       ("training_fraction", po::value<double>(&m_training_fraction),
        "Training fraction used to split up dataset in training and validation sample.")
       ("config", po::value<std::string>(&m_config), "Json encoded python object passed to begin_fit function");
@@ -203,6 +210,31 @@ namespace Belle2 {
         steering_file.read(&steering_file_source_code[0], steering_file_source_code.size());
       }
 
+      std::vector<float> means(numberOfFeatures, 0.0);
+      std::vector<float> stds(numberOfFeatures, 0.0);
+
+      if (m_specific_options.m_normalize) {
+        // Stable calculation of mean and variance with weights
+        // see https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
+        auto weights = training_data.getWeights();
+        for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
+          double wSum = 0.0;
+          double wSum2 = 0.0;
+          double mean = 0.0;
+          double S = 0.0;
+          auto feature = training_data.getFeature(iFeature);
+          for (uint64_t i = 0; i < weights.size(); ++i) {
+            wSum += weights[i];
+            wSum2 += weights[i] * weights[i];
+            double meanOld = mean;
+            mean += (weights[i] / wSum) * (feature[i] - meanOld);
+            S += weights[i] * (feature[i] - meanOld) * (feature[i] - mean);
+          }
+          means[iFeature] = mean;
+          stds[iFeature] = std::sqrt(S / (wSum - 1));
+        }
+      }
+
       try {
         // Load python modules
         auto json = boost::python::import("json");
@@ -222,8 +254,13 @@ namespace Belle2 {
         // Call begin_fit with validation sample
         for (uint64_t iEvent = 0; iEvent < numberOfValidationEvents; ++iEvent) {
           training_data.loadEvent(iEvent);
-          for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
-            X_v[iEvent * numberOfFeatures + iFeature] = training_data.m_input[iFeature];
+          if (m_specific_options.m_normalize) {
+            for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
+              X_v[iEvent * numberOfFeatures + iFeature] = (training_data.m_input[iFeature] - means[iFeature]) / stds[iFeature];
+          } else {
+            for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
+              X_v[iEvent * numberOfFeatures + iFeature] = training_data.m_input[iFeature];
+          }
           for (uint64_t iSpectator = 0; iSpectator < numberOfSpectators; ++iSpectator)
             S_v[iEvent * numberOfSpectators + iSpectator] = training_data.m_spectators[iSpectator];
           y_v[iEvent] = training_data.m_target;
@@ -241,12 +278,20 @@ namespace Belle2 {
         bool continue_loop = true;
         for (uint64_t iIteration = 0; (iIteration < m_specific_options.m_nIterations or m_specific_options.m_nIterations == 0)
              and continue_loop; ++iIteration) {
-
           for (uint64_t iBatch = 0; iBatch < nBatches and continue_loop; ++iBatch) {
+
+            // Release Global Interpreter Lock in python to allow multithreading while reading root files
+            // also see: https://docs.python.org/3.5/c-api/init.html
+            PyThreadState* m_thread_state =  PyEval_SaveThread();
             for (uint64_t iEvent = 0; iEvent < batch_size; ++iEvent) {
               training_data.loadEvent(iEvent + iBatch * batch_size + numberOfValidationEvents);
-              for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
-                X[iEvent * numberOfFeatures + iFeature] = training_data.m_input[iFeature];
+              if (m_specific_options.m_normalize) {
+                for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
+                  X[iEvent * numberOfFeatures + iFeature] = (training_data.m_input[iFeature] - means[iFeature]) / stds[iFeature];
+              } else {
+                for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
+                  X[iEvent * numberOfFeatures + iFeature] = training_data.m_input[iFeature];
+              }
               for (uint64_t iSpectator = 0; iSpectator < numberOfSpectators; ++iSpectator)
                 S[iEvent * numberOfSpectators + iSpectator] = training_data.m_spectators[iSpectator];
               y[iEvent] = training_data.m_target;
@@ -259,6 +304,8 @@ namespace Belle2 {
             auto ndarray_y = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_y, NPY_FLOAT32, y.get()));
             auto ndarray_w = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_w, NPY_FLOAT32, w.get()));
 
+            // Reactivate Global Interpreter Lock to safely execute python code
+            PyEval_RestoreThread(m_thread_state);
             auto r = framework.attr("partial_fit")(state, ndarray_X, ndarray_S, ndarray_y,
                                                    ndarray_w, iIteration * nBatches + iBatch);
             boost::python::extract<bool> proxy(r);
@@ -307,6 +354,10 @@ namespace Belle2 {
       weightfile.addFile("Python_Weightfile", custom_weightfile);
       weightfile.addFile("Python_Steeringfile", custom_steeringfile);
       weightfile.addSignalFraction(training_data.getSignalFraction());
+      if (m_specific_options.m_normalize) {
+        weightfile.addVector("Python_Means", means);
+        weightfile.addVector("Python_Stds", stds);
+      }
 
       return weightfile;
 
@@ -325,6 +376,11 @@ namespace Belle2 {
       weightfile.getFile("Python_Weightfile", custom_weightfile);
       weightfile.getOptions(m_general_options);
       weightfile.getOptions(m_specific_options);
+
+      if (m_specific_options.m_normalize) {
+        m_means = weightfile.getVector<float>("Python_Means");
+        m_stds = weightfile.getVector<float>("Python_Stds");
+      }
 
       try {
         auto pickle = boost::python::import("pickle");
@@ -363,8 +419,13 @@ namespace Belle2 {
 
       for (uint64_t iEvent = 0; iEvent < numberOfEvents; ++iEvent) {
         test_data.loadEvent(iEvent);
-        for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
-          X[iEvent * numberOfFeatures + iFeature] = test_data.m_input[iFeature];
+        if (m_specific_options.m_normalize) {
+          for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
+            X[iEvent * numberOfFeatures + iFeature] = (test_data.m_input[iFeature] - m_means[iFeature]) / m_stds[iFeature];
+        } else {
+          for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature)
+            X[iEvent * numberOfFeatures + iFeature] = test_data.m_input[iFeature];
+        }
       }
 
       std::vector<float> probabilities(test_data.getNumberOfEvents());

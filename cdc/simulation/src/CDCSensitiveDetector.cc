@@ -614,7 +614,9 @@ namespace Belle2 {
     if (edep <= m_thresholdEnergyDeposit) return;
 
     //compute tof at the closest point; linear approx.
-    const G4double CorrectTof = tof + (posTrack - posIn).mag() / speed;
+    const G4double sign = (posTrack - posIn).dot(mom) < 0. ? -1. : 1.;
+    const G4double CorrectTof = tof + sign * (posTrack - posIn).mag() / speed;
+    //    if (sign < 0.) std::cout <<"deltatof= "<< sign * (posTrack - posIn).mag() / speed << std::endl;
 #if defined(CDC_DEBUG)
     std::cout << "posIn= " << posIn.x() << "  " << posIn.y() << "  " << posIn.z() << std::endl;
     std::cout << "posOut= " << posOut.x() << "  " << posOut.y() << "  " << posOut.z() << std::endl;

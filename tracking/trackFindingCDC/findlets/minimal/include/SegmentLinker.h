@@ -48,6 +48,16 @@ namespace Belle2 {
       void apply(const std::vector<CDCSegment2D>& inputSegment2Ds,
                  std::vector<CDCSegment2D>& outputSegment2Ds) final;
 
+    private: // Parameters
+      /// Parameter : Switch to activate segment linking in the whole superlayer instead of only the super cluster
+      bool m_param_wholeSuperLayer = false;
+
+      /// Parameter : Switch to block hits that appear in linked segments such that unlinked reverse and aliases are excluded
+      bool m_param_dealiasLinked = false;
+
+      /// Parameter : Switch to construct only segments that have a linked partner
+      bool m_param_onlyLinked = false;
+
     private:
       /// Creator of the segment relations for linking
       WeightedRelationCreator<const CDCSegment2D, ChooseableSegmentRelationFilter> m_segment2DRelationCreator;

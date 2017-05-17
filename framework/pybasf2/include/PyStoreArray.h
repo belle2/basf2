@@ -50,7 +50,7 @@ namespace Belle2 {
   * You can check the runtime type information of the returned objects by
   * using Python's built-in type() function.
   *
-  * \sa PyStoreObj
+  * \sa PyStoreObj and the Conditions Data interface classes PyDBObj and PyDBArray
   */
   class PyStoreArray {
   public:
@@ -71,7 +71,7 @@ namespace Belle2 {
     * @param objClass Class of the object to be accessed
     * @param durability 0: event, 1: persistent
     */
-    explicit PyStoreArray(const TClass* objClass,
+    explicit PyStoreArray(TClass* objClass,
                           DataStore::EDurability durability =  DataStore::EDurability::c_Event);
 
     /** constructor.
@@ -79,7 +79,7 @@ namespace Belle2 {
     * @param name Name of the entry to be accessed
     * @param durability 0: event, 1: persistent
     */
-    explicit PyStoreArray(const TClass* objClass,
+    explicit PyStoreArray(TClass* objClass,
                           const std::string& name,
                           DataStore::EDurability durability =  DataStore::EDurability::c_Event);
 

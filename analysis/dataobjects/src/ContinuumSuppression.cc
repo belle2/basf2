@@ -16,6 +16,11 @@
 
 using namespace Belle2;
 
+void ContinuumSuppression::addThrustB(TVector3 thrustB)
+{
+  m_thrustB = thrustB;
+}
+
 void ContinuumSuppression::addThrustO(TVector3 thrustO)
 {
   m_thrustO = thrustO;
@@ -56,7 +61,12 @@ void ContinuumSuppression::addKsfwFS1(std::vector<float> KsfwFS1)
   m_ksfwFS1 = KsfwFS1;
 }
 
-void ContinuumSuppression::addCleoCones(std::vector<float> CleoCones)
+void ContinuumSuppression::addCleoConesALL(std::vector<float> CleoConesALL)
 {
-  m_cleoCones = CleoCones;
+  m_cleoConesALL = CleoConesALL;
+}
+
+void ContinuumSuppression::addCleoConesROE(std::vector<float> CleoConesROE)
+{
+  m_cleoConesROE = CleoConesROE;
 }

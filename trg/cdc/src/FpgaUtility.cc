@@ -104,7 +104,7 @@ string FpgaUtility::doubleToArb(double in, int outRadix, int numberOfDigits)
   return result;
 }
 // Change number system between strings.
-string FpgaUtility::arbToArb(std::string in, int inRadix, int outRadix, int numberOfDigits)
+string FpgaUtility::arbToArb(std::string& in, int inRadix, int outRadix, int numberOfDigits)
 {
   return doubleToArb(arbToDouble(in, inRadix), outRadix, numberOfDigits);
 }

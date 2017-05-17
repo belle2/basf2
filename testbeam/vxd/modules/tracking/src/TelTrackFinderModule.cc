@@ -117,7 +117,7 @@ void TelTrackFinderModule::event()
       //generate a new track cand by adding the new clusters to the old track cand
       if (ntellayer >= m_minTelLayers) {
         RelationVector<genfit::TrackCand> trackcands_from_track
-          = DataStore::getRelationsToObj<genfit::TrackCand>(m_tracks[itrack], "ALL");  // there should be only one!
+          = DataStore::getRelationsWithObj<genfit::TrackCand>(m_tracks[itrack], "ALL");  // there should be only one!
         if (trackcands_from_track.size() == 1) addNewTrackCand(clusterindizes, *(trackcands_from_track[0]));
       } else {
         B2DEBUG(1, "No track candidate added as only for " << ntellayer << " Layers hits have been found!");

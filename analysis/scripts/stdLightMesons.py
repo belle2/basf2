@@ -33,12 +33,12 @@ def loadStdAllRho0(persistent=True, path=analysis_main):
 
 
 def loadStdLooseRhoPlus(persistent=True, path=analysis_main):
-    reconstructDecay('rho+:loose -> pi0:all pi+:loose', '0.47 < M < 1.07', 1, persistent, path)
+    reconstructDecay('rho+:loose -> pi0:loose pi+:loose', '0.47 < M < 1.07', 1, persistent, path)
     return 'rho+:loose'
 
 
 def loadStdAllRhoPlus(persistent=True, path=analysis_main):
-    reconstructDecay('rho+:all -> pi0:all pi+:all', '0.47 < M < 1.07', 1, persistent, path)
+    reconstructDecay('rho+:all -> pi0:loose pi+:all', '0.47 < M < 1.07', 1, persistent, path)
     return 'rho+:all'
 
 
@@ -83,18 +83,18 @@ def loadStdLooseF_0(persistent=True, path=analysis_main):
 
 
 def loadStdAllOmega(persistent=True, path=analysis_main):
-    reconstructDecay('omega:all -> pi0:all pi-:all pi+:all', '0.73 < M < 0.83', 1, persistent, path)
+    reconstructDecay('omega:all -> pi0:loose pi-:all pi+:all', '0.73 < M < 0.83', 1, persistent, path)
     return 'omega:all'
 
 
 def loadStdLooseOmega(persistent=True, path=analysis_main):
-    reconstructDecay('omega:loose -> pi0:all pi-:loose pi+:loose', '0.73 < M < 0.83', 1, persistent, path)
+    reconstructDecay('omega:loose -> pi0:loose pi-:loose pi+:loose', '0.73 < M < 0.83', 1, persistent, path)
     return 'omega:loose'
 
 
 def loadStdLooseEta(persistent=True, path=analysis_main):
     reconstructDecay('eta:loose1 -> gamma:all gamma:all', '0.4 < M < 0.6', 1, persistent, path)
-    reconstructDecay('eta:loose2 -> pi0:all pi-:loose pi+:loose', '0.4 < M < 0.6', 2, persistent, path)
+    reconstructDecay('eta:loose2 -> pi0:loose pi-:loose pi+:loose', '0.4 < M < 0.6', 2, persistent, path)
     copyLists('eta:loose', ['eta:loose1', 'eta:loose2'], persistent, path)
     return 'eta:loose'
 

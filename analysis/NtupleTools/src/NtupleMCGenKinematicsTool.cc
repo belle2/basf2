@@ -12,8 +12,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <TBranch.h>
 #include <analysis/dataobjects/Particle.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <analysis/VariableManager/Variables.h>

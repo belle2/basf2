@@ -21,7 +21,6 @@
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/ParticleList.h>
 
 #include <mdst/dataobjects/Track.h>
@@ -85,39 +84,13 @@ namespace Belle2 {
     double isInRestOfEvent(const Particle* particle)
     {
 
-      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      if (not roe.isValid())
+      StoreObjPtr<RestOfEvent> roeobjptr;
+      if (not roeobjptr.isValid())
         return 0;
 
-      if (particle->getParticleType() == Particle::c_Composite) {
-        std::vector<const Particle*> fspDaug = particle->getFinalStateDaughters();
-        for (unsigned int i = 0; i < fspDaug.size(); i++) {
-          if (isInRestOfEvent(fspDaug[i]) == 0) {
-            break;
-            return 0;
-          }
-        }
-        return 1.0;
-      } else {
-        // Check for Tracks
-        const auto& tracks = roe->getTracks();
-        if (std::find(tracks.begin(), tracks.end(), particle->getTrack()) != tracks.end()) {
-          return 1.0;
-        }
+      const RestOfEvent* roe = &(*roeobjptr);
 
-        // Check for KLMClusters
-        const auto& klm = roe->getKLMClusters();
-        if (std::find(klm.begin(), klm.end(), particle->getKLMCluster()) != klm.end()) {
-          return 1.0;
-        }
-
-        // Check for ECLClusters
-        const auto& ecl = roe->getECLClusters();
-        if (std::find(ecl.begin(), ecl.end(), particle->getECLCluster()) != ecl.end()) {
-          return 1.0;
-        }
-      }
-      return 0;
+      return isInThisRestOfEvent(particle, roe);
     }
 
     Manager::FunctionPtr currentROEIsInList(const std::vector<std::string>& arguments)
@@ -137,6 +110,29 @@ namespace Belle2 {
 
         Particle* particle = roe->getRelatedTo<Particle>();
         return particleList->contains(particle) ? 1 : 0;
+
+      };
+      return func;
+    }
+
+
+    Manager::FunctionPtr particleRelatedToCurrentROE(const std::vector<std::string>& arguments)
+    {
+      std::string listName;
+
+      if (arguments.size() != 1)
+        B2FATAL("Wrong number of arguments (1 required) for meta function particleRelatedToCurrentROE");
+
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+      auto func = [var](const Particle*) -> double {
+
+        StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+
+        if (not roe.isValid())
+          return -999;
+
+        Particle* particle = roe->getRelatedTo<Particle>();
+        return var->function(particle);
 
       };
       return func;
@@ -451,24 +447,15 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr nROEPi0s(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr nParticlesInROE(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
-      std::string pi0CutString;
 
-      if (arguments.size() == 0) {
-        maskName = "";
-        pi0CutString = "";
-      } else if (arguments.size() == 1) {
-        maskName = "";
-        pi0CutString = arguments[0];
-      } else if (arguments.size() == 2) {
-        maskName = arguments[0];
-        pi0CutString = arguments[1];
-      } else
-        B2FATAL("Wrong number of arguments (2 required) for meta function nROEPi0s");
+      if (arguments.size() != 1)
+        B2FATAL("Wrong number of arguments (1 required) for meta function nParticlesInROE");
 
-      auto func = [maskName, pi0CutString](const Particle * particle) -> double {
+      std::string pListName = arguments[0];
+
+      auto func = [pListName](const Particle * particle) -> double {
 
         // Get related ROE object
         const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
@@ -479,38 +466,21 @@ namespace Belle2 {
           return -1;
         }
 
-        // Get ECLClusters in ROE
-        std::vector<const ECLCluster*> roeClusters = roe->getECLClusters(maskName);
-        int nPi0 = 0;
+        int nPart = 0;
 
-        // Set cut criteria for pi0
-        std::unique_ptr<Variable::Cut> pi0Cut = Variable::Cut::compile(pi0CutString);
+        // Get pi0 particle list
+        StoreObjPtr<ParticleList> pList(pListName);
+        if (!pList.isValid())
+          B2FATAL("ParticleList " << pListName << " could not be found or is not valid!");
 
-        // Select pairs of neutral ECLClusters cut
-        for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++)
-          for (unsigned int jEcl = 0; jEcl < iEcl; jEcl++)
-          {
+        for (unsigned int i = 0; i < pList->getListSize(); i++)
+        {
+          const Particle* part = pList->getParticle(i);
+          if (isInThisRestOfEvent(part, roe) == 1)
+            ++nPart;
+        }
 
-            if (!roeClusters[iEcl]->isNeutral() or !roeClusters[jEcl]->isNeutral())
-              continue;
-
-            Particle iP(roeClusters[iEcl]);
-            Particle* iGamma = &iP;
-
-            Particle jP(roeClusters[jEcl]);
-            Particle* jGamma = &jP;
-
-            Particle p;
-            Particle* pizero = &p;
-
-            pizero->set4Vector(iGamma->get4Vector() + jGamma->get4Vector());
-            pizero->appendDaughter(iGamma);
-            pizero->appendDaughter(jGamma);
-
-            if (pi0Cut->check(pizero))
-              nPi0++;
-          }
-        return nPi0;
+        return nPart;
       };
       return func;
     }
@@ -1366,38 +1336,41 @@ namespace Belle2 {
       else if (arguments.size() == 1)
         maskName = arguments[0];
       else
-        B2FATAL("Wrong number of arguments (1 required) for meta function trackPassesMask");
+        B2FATAL("Wrong number of arguments (1 required) for meta function passesROEMask");
 
       auto func = [maskName](const Particle * particle) -> double {
 
+        double result = -1;
+
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (not roe.isValid())
-          return -1;
-
-        double result = -1;
+          return result;
 
         if (particle->getParticleType() == Particle::c_Track)
         {
-
           const Track* track = particle->getTrack();
 
           std::map<unsigned int, bool> trackMask = roe->getTrackMask(maskName);
 
-          result = trackMask.at(track->getArrayIndex());
+          auto it = trackMask.find(track->getArrayIndex());
+          if (it == trackMask.end())
+            B2ERROR("Something is wrong, track not found in map of ROE tracks!");
+          else
+            result = trackMask[track->getArrayIndex()];
         } else if (particle->getParticleType() == Particle::c_ECLCluster)
         {
-
           const ECLCluster* ecl = particle->getECLCluster();
 
           std::map<unsigned int, bool> eclClusterMask = roe->getECLClusterMask(maskName);
 
-          result = eclClusterMask.at(ecl->getArrayIndex());
-        } else {
+          auto it = eclClusterMask.find(ecl->getArrayIndex());
+          if (it == eclClusterMask.end())
+            B2ERROR("Something is wrong, cluster not found in map of ROE clusters!");
+          else
+            result = eclClusterMask[ecl->getArrayIndex()];
+        } else
           B2ERROR("Particle used is not an ECLCluster or Track type particle!");
-        }
-
         return result;
-
       };
       return func;
     }
@@ -1566,6 +1539,38 @@ namespace Belle2 {
       }
     }
 
+    double isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe)
+    {
+      if (particle->getParticleType() == Particle::c_Composite) {
+        std::vector<const Particle*> fspDaug = particle->getFinalStateDaughters();
+        for (unsigned int i = 0; i < fspDaug.size(); i++) {
+          if (isInThisRestOfEvent(fspDaug[i], roe) == 0)
+            return 0;
+        }
+        return 1.0;
+      } else {
+        // Check for Tracks
+        const auto& tracks = roe->getTracks();
+        if (std::find(tracks.begin(), tracks.end(), particle->getTrack()) != tracks.end()) {
+          return 1.0;
+        }
+
+        // Check for KLMClusters
+        const auto& klm = roe->getKLMClusters();
+        if (std::find(klm.begin(), klm.end(), particle->getKLMCluster()) != klm.end()) {
+          return 1.0;
+        }
+
+        // Check for ECLClusters
+        const auto& ecl = roe->getECLClusters();
+        if (std::find(ecl.begin(), ecl.end(), particle->getECLCluster()) != ecl.end()) {
+          return 1.0;
+        }
+      }
+      return 0;
+    }
+
+
     VARIABLE_GROUP("Rest Of Event");
 
     REGISTER_VARIABLE("isInRestOfEvent", isInRestOfEvent,
@@ -1587,6 +1592,10 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("nROEKLMClusters", nROEKLMClusters,
                       "Returns number of all remaining KLM clusters in the related RestOfEvent object.");
+
+    REGISTER_VARIABLE("particleRelatedToCurrentROE(var)", particleRelatedToCurrentROE,
+                      "[EventBased] Returns variable applied to the particle which is related to the current RestOfEvent object"
+                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
     REGISTER_VARIABLE("mcROE_E", mcROEEnergy,
                       "Returns true energy of unused tracks and clusters in ROE");
@@ -1618,8 +1627,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("nROENeutralECLClusters(maskName)", nROENeutralECLClusters,
                       "Returns number of neutral ECL clusters in the related RestOfEvent object that pass the selection criteria.");
 
-    REGISTER_VARIABLE("nROEPi0s(maskName, pi0CutString)", nROEPi0s,
-                      "Returns number of neutral pions created from good gamma candidates in the related RestOfEvent object that passed the selection criteria.");
+    REGISTER_VARIABLE("nParticlesInROE(pListName)", nParticlesInROE,
+                      "Returns the number of particles in ROE from the given particle list.\n"
+                      "Use of variable aliases is advised.");
 
     REGISTER_VARIABLE("ROE_charge(maskName)", ROECharge,
                       "Returns total charge of the related RestOfEvent object.");

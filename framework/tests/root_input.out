@@ -10,8 +10,6 @@
 [INFO] ============================================================================
 [INFO] Type                 Name                       #Entries           <Event>
 [INFO] EventMetaData        EventMetaData
-[INFO] RelationContainer    PXDClustersToPXDDigits
-[INFO] RelationContainer    PXDClustersToPXDTrueHits
 [INFO] PXDDigit[]           PXDDigits                  165
 [INFO] PXDTrueHit[]         PXDTrueHits                37
 [INFO] 
@@ -27,8 +25,6 @@
 [INFO] ============================================================================
 [INFO] Type                 Name                       #Entries           <Event>
 [INFO] EventMetaData        EventMetaData
-[INFO] RelationContainer    PXDClustersToPXDDigits
-[INFO] RelationContainer    PXDClustersToPXDTrueHits
 [INFO] PXDDigit[]           PXDDigits                  150
 [INFO] PXDTrueHit[]         PXDTrueHits                59
 [INFO] 
@@ -44,8 +40,6 @@
 [INFO] ============================================================================
 [INFO] Type                 Name                       #Entries           <Event>
 [INFO] EventMetaData        EventMetaData
-[INFO] RelationContainer    PXDClustersToPXDDigits
-[INFO] RelationContainer    PXDClustersToPXDTrueHits
 [INFO] PXDDigit[]           PXDDigits                  103
 [INFO] PXDTrueHit[]         PXDTrueHits                18
 [INFO] 
@@ -61,8 +55,6 @@
 [INFO] ============================================================================
 [INFO] Type                 Name                       #Entries           <Event>
 [INFO] EventMetaData        EventMetaData
-[INFO] RelationContainer    PXDClustersToPXDDigits
-[INFO] RelationContainer    PXDClustersToPXDTrueHits
 [INFO] PXDDigit[]           PXDDigits                  165
 [INFO] PXDTrueHit[]         PXDTrueHits                48
 [INFO] 
@@ -77,7 +69,7 @@
 [INFO] ========================================================================
 [RESULT] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
-[WARNING] Given sequence contains entry numbers which are out of range.I won't add any further events to the EventList for the current file.  { module: RootInput }
+[WARNING] Given sequence contains entry numbers which are out of range. I won't add any further events to the EventList for the current file.  { module: RootInput }
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -87,8 +79,6 @@
 [INFO] ============================================================================
 [INFO] Type                 Name                       #Entries           <Event>
 [INFO] EventMetaData        EventMetaData
-[INFO] RelationContainer    PXDClustersToPXDDigits
-[INFO] RelationContainer    PXDClustersToPXDTrueHits
 [INFO] PXDDigit[]           PXDDigits                  103
 [INFO] PXDTrueHit[]         PXDTrueHits                18
 [INFO] 
@@ -104,8 +94,6 @@
 [INFO] ============================================================================
 [INFO] Type                 Name                       #Entries           <Event>
 [INFO] EventMetaData        EventMetaData
-[INFO] RelationContainer    PXDClustersToPXDDigits
-[INFO] RelationContainer    PXDClustersToPXDTrueHits
 [INFO] PXDDigit[]           PXDDigits                  165
 [INFO] PXDTrueHit[]         PXDTrueHits                48
 [INFO] 
@@ -120,7 +108,7 @@
 [INFO] ========================================================================
 [INFO] ================================================================================
 [INFO] Error summary: 0 errors and 1 warnings occurred.
-[WARNING] Given sequence contains entry numbers which are out of range.I won't add any further events to the EventList for the current file.
+[WARNING] Given sequence contains entry numbers which are out of range. I won't add any further events to the EventList for the current file.
 [INFO] ================================================================================
 
 [RESULT] Starting event processing, random seed is set to 'something important'
@@ -172,14 +160,14 @@
 [INFO] ================================================================================
 [INFO] Error summary: 1 errors and 0 warnings occurred.
 [ERROR] Couldn't find entry (5, 1, 0) in file! Loading entry 0 instead.
-[FATAL] 1 ERROR(S) occurred! The processing of events will not be started.  { module: -global- }
+[FATAL] 1 ERROR(S) occurred! The processing of events will not be started.
 [INFO] ================================================================================
 
 [RESULT] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems  { module: -global- }
-[WARNING] Given sequence contains entry numbers which are out of range.I won't add any further events to the EventList for the current file.  { module: RootInput }
+[WARNING] Given sequence contains entry numbers which are out of range. I won't add any further events to the EventList for the current file.  { module: RootInput }
 [INFO] ================================================================================
 [INFO] Error summary: 0 errors and 1 warnings occurred.
-[WARNING] Given sequence contains entry numbers which are out of range.I won't add any further events to the EventList for the current file.
+[WARNING] Given sequence contains entry numbers which are out of range. I won't add any further events to the EventList for the current file.
 [INFO] ================================================================================
 

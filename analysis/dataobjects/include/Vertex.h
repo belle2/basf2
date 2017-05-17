@@ -40,6 +40,7 @@ namespace Belle2 {
       m_tagVertex(0) = 0; m_tagVertex(1) = 0; m_tagVertex(2) = 0;
       m_tagVertexPval = 0;
       m_deltaT = 0;
+      m_deltaTErr = 0;
       m_MCdeltaT = 0;
       m_MCtagV(0) = 0; m_MCtagV(1) = 0; m_MCtagV(2) = 0;
       m_mcPDG = 0;
@@ -66,6 +67,11 @@ namespace Belle2 {
      * Returns DeltaT
      */
     float getDeltaT();
+
+    /**
+     * Returns DeltaTErr
+     */
+    float getDeltaTErr();
 
     /**
      * Returns generated BTag Vertex
@@ -103,6 +109,11 @@ namespace Belle2 {
     void setDeltaT(float DeltaT);
 
     /**
+     * Set DeltaTErr
+     */
+    void setDeltaTErr(float DeltaTErr);
+
+    /**
      * Set generated BTag Vertex
      */
     void setMCTagVertex(TVector3 MCTagVertex);
@@ -122,6 +133,7 @@ namespace Belle2 {
     TMatrixFSym m_tagVertexErrMatrix;   /**< Btag vertex (3x3) error matrix */
     float m_tagVertexPval;              /**< Btag vertex P value */
     float m_deltaT;                     /**< Delta t */
+    float m_deltaTErr;                  /**< Delta t error */
     TVector3 m_MCtagV;                  /**< generated Btag vertex */
     int m_mcPDG;                        /**< generated tag side B flavor (PDG code) */
     float m_MCdeltaT;                   /**< generated Delta t */

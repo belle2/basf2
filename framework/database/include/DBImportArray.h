@@ -30,12 +30,10 @@ namespace Belle2 {
 
     /**
      * Constructor
-     * @param module  Name under which the array will be stored in the database
-     * @param package Package name
+     * @param name  Name under which the array will be stored in the database
      */
-    explicit DBImportArray(const std::string& module = "",
-                           const std::string& package = "dbstore"):
-      DBImportBase(DBStore::arrayName<T>(module), package)
+    explicit DBImportArray(const std::string& name = ""):
+      DBImportBase(DBStore::arrayName<T>(name))
     {
       m_object = new TClonesArray(T::Class());
     }
@@ -93,7 +91,7 @@ namespace Belle2 {
       TObject* obj = static_cast<TClonesArray*>(m_object)->At(i);
       if (obj == nullptr)
         throw std::out_of_range("Out-of-range access in DBImportArray::operator[], for "
-                                + m_package + "/" + m_module + ", index "
+                                + getName() + ", index "
                                 + std::to_string(i));
       return static_cast<T*>(obj);
     }

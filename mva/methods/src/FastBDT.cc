@@ -191,6 +191,11 @@ namespace Belle2 {
       classifier.fit(X, y, w);
 #else
 
+      // Deactivate support for spectators below version 4!
+#if FastBDT_VERSION_MAJOR < 4
+      numberOfSpectators = 0;
+#endif
+
       std::vector<FastBDT::FeatureBinning<float>> featureBinnings;
       std::vector<unsigned int> nBinningLevels;
       for (unsigned int iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
@@ -219,7 +224,11 @@ namespace Belle2 {
 
       unsigned int numberOfEvents = training_data.getNumberOfEvents();
 
+#if FastBDT_VERSION_MAJOR >= 4
+      FastBDT::EventSample eventSample(numberOfEvents, numberOfFeatures, numberOfSpectators, nBinningLevels);
+#else
       FastBDT::EventSample eventSample(numberOfEvents, numberOfFeatures, nBinningLevels);
+#endif
       std::vector<unsigned int> bins(numberOfFeatures + numberOfSpectators);
       for (unsigned int iEvent = 0; iEvent < numberOfEvents; ++iEvent) {
         training_data.loadEvent(iEvent);
@@ -374,7 +383,7 @@ namespace Belle2 {
       }
 #else
       else {
-        B2ERROR("Unknown Version 2 of Weightfile, please use a more recent FastBDT version"),
+        B2ERROR("Unknown Version 2 of Weightfile, please use a more recent FastBDT version");
       }
 #endif
       file.close();

@@ -142,7 +142,10 @@ namespace Belle2 {
     void MultiDataset::loadEvent(unsigned int iEvent)
     {
       m_input = m_matrix[iEvent];
-      m_spectators = m_spectator_matrix[iEvent];
+
+      if (m_spectator_matrix.size() > 0) {
+        m_spectators = m_spectator_matrix[iEvent];
+      }
 
       if (m_targets.size() > 0) {
         m_target = m_targets[iEvent];

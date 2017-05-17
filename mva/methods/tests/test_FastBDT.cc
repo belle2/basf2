@@ -9,6 +9,7 @@
 
 #include <mva/methods/FastBDT.h>
 #include <mva/interface/Interface.h>
+#include <mva/interface/Dataset.h>
 #include <framework/utilities/FileSystem.h>
 #include <framework/utilities/TestHelpers.h>
 
@@ -194,5 +195,60 @@ namespace {
 
   }
 #endif
+
+  TEST(FastBDTTest, WeightfilesOfDifferentVersionsAreConsistent)
+  {
+    MVA::Interface<MVA::FastBDTOptions, MVA::FastBDTTeacher, MVA::FastBDTExpert> interface;
+
+    MVA::GeneralOptions general_options;
+    general_options.m_variables = {"M", "p", "pt"};
+    MVA::MultiDataset dataset(general_options, {{1.835127, 1.179507, 1.164944},
+      {1.873689, 1.881940, 1.843310},
+      {1.863657, 1.774831, 1.753773},
+      {1.858293, 1.605311, 0.631336},
+      {1.837129, 1.575739, 1.490166},
+      {1.811395, 1.524029, 0.565220}
+    },
+    {}, {0.0, 1.0, 0.0, 1.0, 0.0, 1.0});
+
+    auto expert = interface.getExpert();
+
+#if FastBDT_VERSION_MAJOR >= 3
+    auto weightfile_v3 = MVA::Weightfile::loadFromFile(FileSystem::findFile("mva/methods/tests/FastBDTv3.xml"));
+    expert->load(weightfile_v3);
+    std::cout << "v3" << std::endl;
+    auto probabilities_v3 = expert->apply(dataset);
+    EXPECT_NEAR(probabilities_v3[0], 0.0402499, 0.0001);
+    EXPECT_NEAR(probabilities_v3[1], 0.2189, 0.0001);
+    EXPECT_NEAR(probabilities_v3[2], 0.264094, 0.0001);
+    EXPECT_NEAR(probabilities_v3[3], 0.100049, 0.0001);
+    EXPECT_NEAR(probabilities_v3[4], 0.0664554, 0.0001);
+    EXPECT_NEAR(probabilities_v3[5], 0.00886221, 0.0001);
+#endif
+
+#if FastBDT_VERSION_MAJOR >= 5
+    auto weightfile_v5 = MVA::Weightfile::loadFromFile(FileSystem::findFile("mva/methods/tests/FastBDTv5.xml"));
+    expert->load(weightfile_v5);
+    std::cout << "v5" << std::endl;
+    auto probabilities_v5 = expert->apply(dataset);
+    EXPECT_NEAR(probabilities_v5[0], 0.0402498, 0.0001);
+    EXPECT_NEAR(probabilities_v5[1], 0.218899, 0.0001);
+    EXPECT_NEAR(probabilities_v5[2], 0.264093, 0.0001);
+    EXPECT_NEAR(probabilities_v5[3], 0.100048, 0.0001);
+    EXPECT_NEAR(probabilities_v5[4], 0.0664551, 0.0001);
+    EXPECT_NEAR(probabilities_v5[5], 0.00886217, 0.0001);
+
+    // There are small differences due to floating point precision
+    // the FastBDT code is compiled with -O3 and changes slightly
+    // depending on the compiler and random things.
+    // Nevertheless the returned probabilities should be nearly the same!
+    EXPECT_NEAR(probabilities_v5[0], probabilities_v3[0], 0.001);
+    EXPECT_NEAR(probabilities_v5[1], probabilities_v3[1], 0.001);
+    EXPECT_NEAR(probabilities_v5[2], probabilities_v3[2], 0.001);
+    EXPECT_NEAR(probabilities_v5[3], probabilities_v3[3], 0.001);
+    EXPECT_NEAR(probabilities_v5[4], probabilities_v3[4], 0.001);
+    EXPECT_NEAR(probabilities_v5[5], probabilities_v3[5], 0.001);
+#endif
+  }
 
 }

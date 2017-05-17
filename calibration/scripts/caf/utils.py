@@ -19,6 +19,7 @@ class IoV():
     Python class to more easily manipulate an IoV and compare against others.
     Uses the C++ framework IntervalOfValidity internally to do various comparisons.
     """
+
     def __init__(self, exp_low=-1, run_low=-1, exp_high=-1, run_high=-1):
         """
         """
@@ -99,10 +100,10 @@ class IoV():
         return self._cpp_iov.overlaps(iov._cpp_iov)
 
     def __repr__(self):
-        return "IoV("+(",".join(["exp_low="+str(self.exp_low),
-                                 "run_low="+str(self.run_low),
-                                 "exp_high="+str(self.exp_high),
-                                 "run_high="+str(self.run_high)]))+")"
+        return "IoV(" + (",".join(["exp_low=" + str(self.exp_low),
+                                   "run_low=" + str(self.run_low),
+                                   "exp_high=" + str(self.exp_high),
+                                   "run_high=" + str(self.run_high)])) + ")"
 
 
 @enum.unique

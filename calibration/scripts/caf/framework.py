@@ -565,8 +565,7 @@ class CAF():
             runners = []
             # Create Runners to spawn threads for each calibration
             for calibration_name, calibration in self.calibrations.items():
-                if not calibration.max_iterations:
-                    calibration._apply_calibration_defaults(self.calibration_defaults)
+                calibration._apply_calibration_defaults(self.calibration_defaults)
                 machine = CalibrationMachine(calibration, iov)
                 machine.collector_backend = self.backend
                 runner = CalibrationRunner(machine, heartbeat=self.heartbeat)

@@ -151,6 +151,7 @@ class Machine():
     This also means that if you call a trigger with arguments e.g. machine.walk(speed=5)
     you MUST use the keyword arguments rather than positional ones e.g. machine.walk(5)
     """
+
     def __init__(self, states=None, initial_state="default_initial"):
         """
         Basic Setup of states and initial_state
@@ -186,7 +187,7 @@ class Machine():
             else:
                 B2WARNING("You asked to add a state {0} but it was already in the machine states.".format(state))
         else:
-                B2WARNING("You asked to add a state ({0}) but it wasn't a State or str object".format(state))
+            B2WARNING("You asked to add a state ({0}) but it wasn't a State or str object".format(state))
 
     @property
     def initial_state(self):
@@ -353,12 +354,13 @@ class Machine():
         Does a simple dot file creation to visualise states and transiitons
         """
         with open(filename, "w") as dotfile:
-            dotfile.write("digraph "+graphname+" {\n")
+            dotfile.write("digraph " + graphname + " {\n")
             for state in self.states.keys():
-                dotfile.write('"'+state+'" [shape=ellipse, color=black]\n')
+                dotfile.write('"' + state + '" [shape=ellipse, color=black]\n')
             for trigger, transition_dicts in self.transitions.items():
                 for transition in transition_dicts:
-                    dotfile.write('"'+transition["source"].name+'" -> "'+transition["dest"].name+'" [label="'+trigger+'"]\n')
+                    dotfile.write('"' + transition["source"].name + '" -> "' +
+                                  transition["dest"].name + '" [label="' + trigger + '"]\n')
             dotfile.write("}\n")
 
 
@@ -395,8 +397,6 @@ class CalibrationMachine(Machine):
         self.iteration = iteration
         #: Backend used for this calibration machine collector
         self.collector_backend = None
-        #: Result object of collector, filled by submitting to backend
-        self._collector_result = None
         #: Results of each iteration for all algorithms of this calibration
         self._algorithm_results = {}
         #: IoV to be executed, currently will loop over all runs in IoV
@@ -497,18 +497,43 @@ class CalibrationMachine(Machine):
 
     def _post_process_collector(self):
         """
+        Runs a merging job on the collector output ROOT files
         """
-        self._collector_result.post_process()
+        if self._collector_job.subjobs:
+            B2INFO("Merging collector output for {}".format(self.calibration.name))
+            job = Job('_'.join([self.calibration.name, 'MergeCollectorOutput', 'Iteration', str(self.iteration)]))
+            job.output_dir = os.path.join(os.getcwd(), self.calibration.name, str(self.iteration), 'algorithm_output')
+            job.working_dir = os.path.join(
+                os.getcwd(), self.calibration.name, str(
+                    self.iteration), 'collector_output', 'merged_output')
+            job.cmd = ["merge_basf2_files", "RootOutput.root"]
+            collector_files = [os.path.join(subjob.working_dir, "RootOutput.root")
+                               for subjob in self._collector_job.subjobs.values()]
+            job.cmd.extend(collector_files)
+            job.output_patterns = ["RootOutput.root"]
+            job.setup_cmds = [
+                "CAF_TOOLS_LOCATION=/home/ddossett/Melbourne-Work/software/tools/setup_belle2",
+                "CAF_RELEASE_LOCATION=/home/ddossett/Melbourne-Work/software/release",
+                "source $CAF_TOOLS_LOCATION",
+                "pushd $CAF_RELEASE_LOCATION",
+                "setuprel",
+                "popd"
+            ]
+            self.collector_backend.submit(job)
+            while not job.ready():
+                sleep(5)
+            job.post_process()
+            B2INFO("Finished merging collector output for {}".format(self.calibration.name))
 
     def _collector_ready(self):
         """
         """
-        return self._collector_result.ready()
+        return self._collector_job.ready()
 
     def _submit_collector(self):
         """
         """
-        self._collector_result = self.collector_backend.submit(self._collector_job)
+        self.collector_backend.submit(self._collector_job)
 
     def _no_require_iteration(self):
         """
@@ -546,6 +571,9 @@ class CalibrationMachine(Machine):
             B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
         #: Default location of the generic collector steering file
         self.default_collector_steering_file_path = ROOT.Belle2.FileSystem.findFile('calibration/scripts/caf/run_collector_path.py')
+        #: Default location of the generic collector output merging steering file
+        self.default_collector_merger_file_path = ROOT.Belle2.FileSystem.findFile(
+            'calibration/scripts/caf/merge_collector_output.py')
 
     def _log_new_state(self, **kwargs):
         """
@@ -601,7 +629,7 @@ class CalibrationMachine(Machine):
         path = create_path()
         path.add_module(self.calibration.collector)
         # Dump the basf2 path to file
-        path_file_name = self.calibration.collector.name()+'.path'
+        path_file_name = self.calibration.collector.name() + '.path'
         path_file_name = os.path.join(path_output_dir, path_file_name)
         with open(path_file_name, 'bw') as serialized_path_file:
             pickle.dump(serialize_path(path), serialized_path_file)
@@ -629,8 +657,8 @@ class CalibrationMachine(Machine):
         to backend
         """
         job = Job('_'.join([self.calibration.name, 'Collector', 'Iteration', str(self.iteration)]))
-        job.output_dir = os.path.join(os.getcwd(), self.calibration.name, str(self.iteration), 'output')
-        job.working_dir = os.path.join(os.getcwd(), self.calibration.name, str(self.iteration), 'input')
+        job.output_dir = os.path.join(os.getcwd(), self.calibration.name, str(self.iteration), 'collector_output')
+        job.working_dir = os.path.join(os.getcwd(), self.calibration.name, str(self.iteration), 'collector_output')
         job.cmd = ['basf2', 'run_collector_path.py']
         job.input_sandbox_files.append(self.default_collector_steering_file_path)
         collector_path_file = self._make_collector_path()
@@ -645,10 +673,12 @@ class CalibrationMachine(Machine):
         if self.iteration > 0:
             for algorithm in self.calibration.algorithms:
                 algorithm_name = algorithm.algorithm.Class_Name().replace('Belle2::', '')
-                database_dir = os.path.join(os.getcwd(), self.calibration.name, str(self.iteration-1), 'output', 'outputdb')
+                database_dir = os.path.join(
+                    os.getcwd(), self.calibration.name, str(
+                        self.iteration - 1), 'algorithm_output', 'outputdb')
                 list_dependent_databases.append(database_dir)
                 B2INFO('Adding local database from previous iteration of {0} for use by {1}'.format(algorithm_name,
-                       self.calibration.name))
+                                                                                                    self.calibration.name))
 
         # Here we add the finished databases of previous calibrations that we depend on.
         # We can assume that the databases exist as we can't be here until they have returned
@@ -671,6 +701,15 @@ class CalibrationMachine(Machine):
             iov = self.iov_to_calibrate
             input_data_files = self.files_containing_iov(iov)
         job.input_files = input_data_files
+        job.max_files_per_subjob = 1
+        job.setup_cmds = [
+            "CAF_TOOLS_LOCATION=/home/ddossett/Melbourne-Work/software/tools/setup_belle2",
+            "CAF_RELEASE_LOCATION=/home/ddossett/Melbourne-Work/software/release",
+            "source $CAF_TOOLS_LOCATION",
+            "pushd $CAF_RELEASE_LOCATION",
+            "setuprel",
+            "popd"
+        ]
 
         # Output patterns to be returned from collector job
         job.output_patterns = self.calibration.output_patterns
@@ -774,7 +813,7 @@ class CalibrationMachine(Machine):
         Take the last iteration's outputdb and copy it to a more easily findable place.
         """
         database_location = os.path.join(self.calibration.name,
-                                         str(self.iteration), 'output', 'outputdb')
+                                         str(self.iteration), 'algorithm_output', 'outputdb')
         final_database_location = os.path.join(self.calibration.name, 'outputdb')
         shutil.copytree(database_location, final_database_location)
 
@@ -895,14 +934,14 @@ class AlgorithmMachine(Machine):
         """
         """
         last_result = self.results[-1]
-        B2INFO("Not enough data in "+str(last_result.iov)+". Attempting to merge with next IoV")
+        B2INFO("Not enough data in " + str(last_result.iov) + ". Attempting to merge with next IoV")
 
     def _log_mergeprev_attempt(self, **kwargs):
         """
         """
         last_result = self.results[-1]
-        B2INFO("Not enough data in "+str(last_result.iov)+" and no more IoVs left to merge with."
-               " Attempting to merge with previous "+str(self.results[-2]))
+        B2INFO("Not enough data in " + str(last_result.iov) + " and no more IoVs left to merge with."
+               " Attempting to merge with previous " + str(self.results[-2]))
 
     @staticmethod
     def clear_vec_iov(**kwargs):
@@ -929,7 +968,6 @@ class AlgorithmMachine(Machine):
         """
         Apply all databases in the correct order
         """
-        os.chdir(self.cal_machine._collector_job.output_dir)
         # Clean everything out just in case
         reset_database()
         # Fall back to previous databases if no payloads are found
@@ -947,11 +985,17 @@ class AlgorithmMachine(Machine):
 
         # Here we add the previous iteration's database
         if self.iteration > 0:
-            use_local_database(os.path.abspath(os.path.join("../../", str(self.iteration-1), 'output/outputdb/database.txt')),
-                               os.path.abspath(os.path.join("../../", str(self.iteration-1), 'output/outputdb')),
+            use_local_database(os.path.abspath(os.path.join("../../",
+                                               str(self.iteration - 1),
+                                               'algorithm_output/outputdb/database.txt')),
+                               os.path.abspath(os.path.join("../../",
+                                               str(self.iteration - 1),
+                                               'algorithm_output/outputdb')),
                                True,
                                LogLevel.INFO)
 
+        algo_dir = os.path.join(os.getcwd(), self.cal_machine.calibration.name, str(self.iteration), 'algorithm_output')
+        os.chdir(algo_dir)
         # Create a directory to store the payloads of this algorithm
         os.mkdir('outputdb')
         # add local database to save payloads
@@ -964,7 +1008,7 @@ class AlgorithmMachine(Machine):
         set_log_level(LogLevel.INFO)
 
         # add logfile for output
-        logging.add_file(self.name+'_b2log')
+        logging.add_file(self.name + '_stdout')
 
     def _get_input_data(self):
         self.algorithm.data_input()

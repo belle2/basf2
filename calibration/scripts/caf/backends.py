@@ -191,6 +191,21 @@ class Job:
         """
         self.config.set("BASF2", "Tools", tools_location)
 
+    def post_process(self):
+        """
+        Does clean up tasks after the main job has finished. Mainly downloading output to the
+        correct output location.
+        """
+        # Once the subprocess is done, move the requested output to the output directory
+        if not self.subjobs:
+            for pattern in self.output_patterns:
+                output_files = glob.glob(os.path.join(self.working_dir, pattern))
+                for file_name in output_files:
+                    shutil.move(file_name, self.output_dir)
+        else:
+            for subjob in job.subjobs:
+                subjob.post_process()
+
 
 class Backend():
     """
@@ -267,17 +282,6 @@ class Local(Backend):
             Function that simply wraps the ready() function of the multiprocessing result object.
             """
             return self.result.ready()
-
-        def post_process(self):
-            """
-            Does clean up tasks after the main job has finished. Mainly downloading output to the
-            correct output location.
-            """
-            # Once the subprocess is done, move the requested output to the output directory
-            for pattern in self.job.output_patterns:
-                output_files = glob.glob(os.path.join(self.job.working_dir, pattern))
-                for file_name in output_files:
-                    shutil.move(file_name, self.job.output_dir)
 
     def join(self):
         """

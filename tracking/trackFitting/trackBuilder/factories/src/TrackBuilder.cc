@@ -27,16 +27,14 @@
 
 using namespace Belle2;
 
-bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const Const::ParticleType& defaultHypothesis,
-                                           const bool useClosestHitToIP)
+bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const bool useClosestHitToIP)
 {
-
   StoreArray<Track> tracks(m_trackColName);
   StoreArray<TrackFitResult> trackFitResults(m_trackFitResultColName);
 
   const auto& trackReps = recoTrack.getRepresentations();
   B2DEBUG(100, trackReps.size() << " track representations available.");
-  Track newTrack = Track();
+  Track newTrack;
 
   for (const auto& trackRep : trackReps) {
 
@@ -100,36 +98,26 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const Const::Pa
 
     const int newTrackFitResultArrayIndex = newTrackFitResult->getArrayIndex();
     newTrack.setTrackFitResultIndex(particleType, newTrackFitResultArrayIndex);
-
   }
-
-  try {
-    const auto msop = recoTrack.getMeasuredStateOnPlaneFromFirstHit(TrackFitter::getTrackRepresentationForPDG(
-                        defaultHypothesis.getPDGCode(), recoTrack));
-  } catch (genfit::Exception e) {
-    B2WARNING("The default hypothesis is not available after track creation. Discarding track.");
-    return false;
-  }
-
 
   B2DEBUG(100, "Number of fitted hypothesis = " << newTrack.getNumberOfFittedHypotheses());
-  if (newTrack.getNumberOfFittedHypotheses() > 0) {
-    Track* addedTrack = tracks.appendNew(newTrack);
-    addedTrack->addRelationTo(&recoTrack);
-    const MCParticle* mcParticle = recoTrack.getRelated<MCParticle>(m_mcParticleColName);
-    if (mcParticle) {
-      B2DEBUG(200, "Relation to MCParticle set.");
-      addedTrack->addRelationTo(mcParticle);
-    } else {
-      B2DEBUG(200, "Relation to MCParticle not set. No related MCParticle to RecoTrack.");
-    }
-    // false positive due to new with placement (cppcheck issue #7163)
-    // cppcheck-suppress memleak
-    return true;
-  } else {
+  if (newTrack.getNumberOfFittedHypotheses() == 0) {
+    // Do not store the track if there are no fitted hypotheses.
     return false;
   }
 
+  Track* addedTrack = tracks.appendNew(newTrack);
+  addedTrack->addRelationTo(&recoTrack);
+  const MCParticle* mcParticle = recoTrack.getRelated<MCParticle>(m_mcParticleColName);
+  if (mcParticle) {
+    B2DEBUG(200, "Relation to MCParticle set.");
+    addedTrack->addRelationTo(mcParticle);
+  } else {
+    B2DEBUG(200, "Relation to MCParticle not set. No related MCParticle to RecoTrack.");
+  }
+  // false positive due to new with placement (cppcheck issue #7163)
+  // cppcheck-suppress memleak
+  return true;
 }
 
 

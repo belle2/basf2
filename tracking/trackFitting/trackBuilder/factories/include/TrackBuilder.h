@@ -70,7 +70,7 @@ namespace Belle2 {
      *
      * Every fitted hypothesis will be extrapolated to the perigee and stored as a TrackFitResult when the fit and the
      * extrapolation were successful. We will only create a Track mdst object, when we are sure that we have a valid
-     * default (pion) hypothesis available. If we do not have this, we discard the track no matter what.
+     * hypothesis available. If we do not have this, we discard the track no matter what.
      *
      * The StoreArrayIndex is stored in the Belle2 Track, no relation is set.
      *
@@ -78,8 +78,7 @@ namespace Belle2 {
      * @param useClosestHitInIP: Flag to turn on special handling which measurement to choose;
      *        especially useful for Cosmics
      */
-    bool storeTrackFromRecoTrack(RecoTrack& recoTrack, const Const::ParticleType& defaultHypothesis,
-                                 const bool useClosestHitToIP = false);
+    bool storeTrackFromRecoTrack(RecoTrack& recoTrack, const bool useClosestHitToIP = false);
 
   private:
     /// TrackColName (output).

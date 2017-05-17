@@ -17,7 +17,7 @@ namespace Belle2 {
   class TrackFitResult;
   /** Class that bundles various TrackFitResults.
    *
-   *  As the genfit::Track has a lot of information that is only necessary during the fit,
+   *  As the RecoTrack has a lot of information that is only necessary during the fit,
    *  this is a much stripped down version containing only indices of TrackFitResults
    *  (which is what remains of the various TrackReps, that Genfit might use during the fit).
    */

@@ -91,7 +91,7 @@ void TrackCreatorModule::event()
   }
 
   TrackFitter trackFitter;
-  TrackBuilder trackBuilder(m_trackColName, m_trackFitResultColName, m_mcParticleColName);
+  TrackBuilder trackBuilder(m_trackColName, m_trackFitResultColName, m_mcParticleColName, m_beamSpot, m_beamAxis);
   for (auto& recoTrack : recoTracks) {
     for (const auto& pdg : m_pdgCodes) {
       // Does not refit in case the particle hypotheses demanded in this module have already been fitted before.

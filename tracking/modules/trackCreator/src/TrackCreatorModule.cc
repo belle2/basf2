@@ -56,11 +56,6 @@ TrackCreatorModule::TrackCreatorModule() :
 
 }
 
-
-TrackCreatorModule::~TrackCreatorModule()
-{
-}
-
 void TrackCreatorModule::initialize()
 {
   B2WARNING("This module is still under development. "
@@ -88,10 +83,6 @@ void TrackCreatorModule::initialize()
   }
 }
 
-void TrackCreatorModule::beginRun()
-{
-}
-
 void TrackCreatorModule::event()
 {
   StoreArray<RecoTrack> recoTracks(m_recoTrackColName);
@@ -116,14 +107,4 @@ void TrackCreatorModule::event()
       B2DEBUG(200, "Pion fit failed - not creating a Track out of this RecoTrack.");
     }
   }
-}
-
-
-void TrackCreatorModule::endRun()
-{
-}
-
-
-void TrackCreatorModule::terminate()
-{
 }

@@ -437,7 +437,7 @@ class Local(Backend):
         """
         B2INFO('Starting Sub Process: {0}'.format(name))
         from subprocess import PIPE, STDOUT, Popen
-        stdout_file_path = os.path.join(output_dir, 'stdout')
+        stdout_file_path = os.path.join(working_dir, 'stdout')
         # Create unix command to redirect stdour and stderr
         B2INFO('Log files for SubProcess {0} visible at:\n\t{1}'.format(name, stdout_file_path))
         with open(stdout_file_path, 'w', buffering=1) as f_out:
@@ -644,8 +644,8 @@ class PBS(Batch):
         print(" ".join([PBS.cmd_queue, batch_queue]), file=batch_file)
         print(" ".join([PBS.cmd_name, job.name]), file=batch_file)
         print(" ".join([PBS.cmd_wkdir, job.working_dir]), file=batch_file)
-        print(" ".join([PBS.cmd_stdout, os.path.join(job.output_dir, "stdout")]), file=batch_file)
-        print(" ".join([PBS.cmd_stderr, os.path.join(job.output_dir, "stderr")]), file=batch_file)
+        print(" ".join([PBS.cmd_stdout, os.path.join(job.working_dir, "stdout")]), file=batch_file)
+        print(" ".join([PBS.cmd_stderr, os.path.join(job.working_dir, "stderr")]), file=batch_file)
         print("# --- End PBS ---", file=batch_file)
 
     @classmethod

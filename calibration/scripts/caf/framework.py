@@ -361,6 +361,7 @@ class Algorithm():
         #: CalibrationAlgorithm instance (assumed to be true since the Calibration class checks)
         self.algorithm = algorithm
         #: Function called before the pre_algorithm method to setup the input data that the CalibrationAlgorithm uses.
+        #: The list of input files from the collector output will be passed to it
         self.data_input = data_input
         if not self.data_input:
             self.data_input = self.default_rootinput_setup
@@ -370,16 +371,15 @@ class Algorithm():
         self.pre_algorithm = pre_algorithm
 
     @staticmethod
-    def default_rootinput_setup():
+    def default_rootinput_setup(input_file_paths):
         """
-        Simple RootInput setup and initilise bound up in a method. Applied to the data_input attribute
+        Simple RootInput setup and bound up in a method. Applied to the data_input attribute
         by default.
         """
-        from basf2 import register_module
-        root_input = register_module('RootInput')
-        root_input.param('inputFileName', 'RootOutput.root')
-        root_input.param('ignoreCommandLineOverride', True)
-        root_input.initialize()
+        from basf2 import create_path, process
+        load_data = create_path()
+        load_data.add_module('RootInput', inputFileNames=input_file_paths, ignoreCommandLineOverride=True)
+        process(load_data)
 
 
 class CAF():

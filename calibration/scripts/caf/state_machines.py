@@ -647,7 +647,7 @@ class CalibrationMachine(Machine):
         list_dependent_databases = []
         # Add previous iteration databases from this calibration
         if self.iteration > 0:
-            previous_iteration_dir = os.path.join(self.root_dir, str(self.iteration-1))
+            previous_iteration_dir = os.path.join(self.root_dir, str(self.iteration - 1))
             for algorithm in self.calibration.algorithms:
                 algorithm_name = algorithm.algorithm.Class_Name().replace('Belle2::', '')
                 database_dir = os.path.join(previous_iteration_dir, AlgorithmMachine.alg_output_dir, 'outputdb')
@@ -685,7 +685,7 @@ class CalibrationMachine(Machine):
             "setuprel",
             "popd"
         ]
-
+        job.backend_args = self.calibration.backend_args
         # Output patterns to be returned from collector job
         job.output_patterns = self.calibration.output_patterns
         B2DEBUG(100, "Collector job for {0}:\n{1}".format(self.calibration.name, str(job)))

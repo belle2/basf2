@@ -143,6 +143,10 @@ class Calibration():
         #: Maximum number of input files per subjob during the collector step (passed to Job object, see backends.py)
         #: -1 is the default meaning that all input files are run in one big collector job.
         self.max_files_per_collector_job = -1
+        #: Dictionary passed to the collector Job object to configure how the Backend should treat the collector job
+        #: Generally only useful for setting the 'queue' of the batch system backends that the collector jobs are submitted
+        #: to
+        self.backend_args = {}
 
     def _apply_calibration_defaults(self, defaults):
         """

@@ -16,7 +16,7 @@ import ROOT
 __all__ = ['Job', 'Local', 'LSF', 'PBS']
 
 #: default configuration file location
-default_config_file = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
+default_config_file = ROOT.Belle2.FileSystem.findFile('calibration/data/backends.cfg')
 #: Multiprocessing Pool used by Local Backend
 _pool = None
 #: Default name of the input data file passed to Backend jobs

@@ -30,6 +30,7 @@ bool CDCVXDTrackCombinationTruthVarSet::extract(const BaseCDCVXDTrackCombination
   const RecoTrack* cdcMCTrack = mcCDCMatchLookUp.getMatchedMCRecoTrack(*cdcTrack);
 
   // Default to false
+  var<named("truth_number_of_correct_hits")>() = 0;
   var<named("truth")>() = 0;
 
   if (not cdcMCTrack) {
@@ -55,7 +56,8 @@ bool CDCVXDTrackCombinationTruthVarSet::extract(const BaseCDCVXDTrackCombination
     }
   }
 
-  var<named("truth")>() = numberOfCorrectHits;
+  var<named("truth_number_of_correct_hits")>() = numberOfCorrectHits;
+  var<named("truth")>() = numberOfCorrectHits == result->second.size();
 
   return true;
 }

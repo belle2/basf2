@@ -72,7 +72,7 @@ CDCVXDTrackCombinationFilterFactory::create(const std::string& filterName) const
   } else if (filterName == "truth") {
     return makeUnique<MCCDCVXDTrackCombinationFilter >();
   } else if (filterName == "truth_number") {
-    return makeUnique<MCCTruthNumberCDCVXDTrackCombinationFilter>("truth");
+    return makeUnique<MCCTruthNumberCDCVXDTrackCombinationFilter>("truth_number_of_correct_hits");
   } else if (filterName == "simple") {
     return makeUnique<SimpleCDCVXDTrackCombinationFilter>();
   } else if (filterName == "chi2") {

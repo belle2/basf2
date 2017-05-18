@@ -18,6 +18,7 @@ namespace Belle2 {
   constexpr
   static char const* const cdcVXDTrackCombinationTruthNames[] = {
     "truth",
+    "truth_number_of_correct_hits",
     "event_id",
     "cdc_number"
   };

@@ -269,7 +269,10 @@ def add_cluster_expert_modules(path, components=None):
         KLMClassifier = register_module('KLMExpert')
         path.add_module(KLMClassifier)
 
-        ECLClassifier = register_module('ECLExpert')
+        ECLClassifier = register_module('ECLHadronExpert')
+        path.add_module(ECLClassifier)
+
+        ECLClassifier = register_module('ECLGammaExpert')
         path.add_module(ECLClassifier)
 
 

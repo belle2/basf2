@@ -85,7 +85,7 @@ class Job:
             """
             return getattr(self.parent, attribute)
 
-    def __init__(self, name, config_file=default_config_file):
+    def __init__(self, name, config_file=""):
         """
         Init method of Job object.
         Params:
@@ -115,6 +115,8 @@ class Job:
         #: ConfigParser object that sets the defaults (mainly for basf2 setup) and is used as the store
         #: of configuration variables. Some other attributes reference this object via properties.
         self.config = configparser.ConfigParser()
+        if not config_file:
+            config_file = default_config_file
         self.config.read(config_file)
         #: Config dictionary for the backend to use when submitting the job. Saves us from having multiple attributes that may or
         #: may not be used.

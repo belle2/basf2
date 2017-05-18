@@ -41,7 +41,7 @@ namespace Belle2 {
     enum EventErrorFlag {
       c_B2LinkPacketCRCError = 0x1, /**< Belle2link CRC error  is detected in the event */
       c_B2LinkEventCRCError = 0x2, /**< HSLB_COPPER CRC error  is detected in the event */
-      c_HLTError       = 0x3  /**< Error is returned from HLT modules. */
+      c_HLTError       = 0x4  /**< Error is returned from HLT modules. */
     };
 
     /** Event Setter.

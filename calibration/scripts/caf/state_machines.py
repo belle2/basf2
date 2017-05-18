@@ -677,14 +677,21 @@ class CalibrationMachine(Machine):
             input_data_files = self.files_containing_iov(iov)
         job.input_files = input_data_files
         job.max_files_per_subjob = self.calibration.max_files_per_collector_job
-        job.setup_cmds = [
-            "CAF_TOOLS_LOCATION=/home/ddossett/Melbourne-Work/software/tools/setup_belle2",
-            "CAF_RELEASE_LOCATION=/home/ddossett/Melbourne-Work/software/release",
-            "source $CAF_TOOLS_LOCATION",
-            "pushd $CAF_RELEASE_LOCATION",
-            "setuprel",
-            "popd"
-        ]
+        # In non-local processing we have to set up the basf2 environment again
+        if not isinstance(self.collector_backend, Local):
+            if "BELLE2_LOCAL_DIR" in os.environ:
+                job.setup_cmds = [
+                    "CAF_TOOLS_LOCATION=" + os.path.join(os.environ["BELLE2_TOOLS"], "setup_belle2"),
+                    "CAF_RELEASE_LOCATION=" + os.environ["BELLE2_LOCAL_DIR"],
+                    "source $CAF_TOOLS_LOCATION",
+                    "pushd $CAF_RELEASE_LOCATION",
+                    "setuprel",
+                    "popd"
+                ]
+            else:
+                job.basf2_release = os.environ["BELLE2_RELEASE"]
+                job.basf2_tools = os.path.join(os.environ["BELLE2_TOOLS"], "setup_belle2")
+                job.add_basf2_setup()
         job.backend_args = self.calibration.backend_args
         # Output patterns to be returned from collector job
         job.output_patterns = self.calibration.output_patterns

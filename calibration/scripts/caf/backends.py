@@ -807,7 +807,7 @@ class LSF(Batch):
         job_id = batch_output.split(" ")[1]
         for wrap in ["<", ">"]:
             job_id = job_id.replace(wrap, "")
-        B2INFO("Job ID recorded as: " + job_id)
+        B2INFO("Job ID of Job({}) recorded as: {}".format(job.name, job_id))
         job.result = cls.Result(job, job_id)
 
 

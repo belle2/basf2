@@ -1,4 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from basf2 import *
+
+# The backend provides the input data files to the job and you can get the list of
+# files from this function
+from caf.backends import get_input_data
 
 
 def run_collectors():
@@ -43,13 +50,7 @@ def run_collectors():
         B2FATAL("Couldn't find any pickle files for collector path!")
 
     # Grab the input data. Can't continue without some
-    input_data_file_path = 'input_data_files.data'
-    if os.path.exists(input_data_file_path):
-        with open(input_data_file_path, 'br') as input_data_file:
-            input_files = pickle.load(input_data_file)
-    else:
-        B2ERROR("No input data pickle file could be found: {0}".format(input_data_file))
-        sys.exit(1)
+    input_data = get_input_data()
 
     # Now we need to create a path that definitely has RootInput as a module.
     main = create_path()
@@ -58,9 +59,9 @@ def run_collectors():
     pe = PathExtras(collector_path)
     if 'RootInput' in pe:
         root_input_mod = collector_path.modules()[pe.index('RootInput')]
-        root_input_mod.param('inputFileNames', input_files)
+        root_input_mod.param('inputFileNames', input_data)
     else:
-        main.add_module('RootInput', inputFileNames=input_files)
+        main.add_module('RootInput', inputFileNames=input_data)
 
     main.add_path(collector_path)
     main.add_module('RootOutput', branchNames=["EventMetaData"])

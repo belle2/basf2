@@ -156,6 +156,9 @@ namespace Belle2 {
       B2FATAL("Cannot intialize libcurl");
     }
     curl_easy_setopt(m_session->curl, CURLOPT_HTTPHEADER, m_session->headers);
+    curl_easy_setopt(m_session->curl, CURLOPT_CONNECTTIMEOUT, 60);
+    curl_easy_setopt(m_session->curl, CURLOPT_LOW_SPEED_LIMIT, 10 * 1024); //10 kB/s
+    curl_easy_setopt(m_session->curl, CURLOPT_LOW_SPEED_TIME, 60);
     curl_easy_setopt(m_session->curl, CURLOPT_WRITEFUNCTION, write_function);
     curl_easy_setopt(m_session->curl, CURLOPT_VERBOSE, 1);
     curl_easy_setopt(m_session->curl, CURLOPT_NOPROGRESS, 0);

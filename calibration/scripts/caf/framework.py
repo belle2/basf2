@@ -2,122 +2,112 @@
 # -*- coding: utf-8 -*-
 
 """
-Calibration Framework - David Dossett 2016
-
-This module implements several objects/functions to configure and run the calibration.
-These can then be used to construct the workflow of the calibration job.
+This module implements several objects/functions to configure and run calibrations.
+These classes are used to construct the workflow of the calibration job.
+The actual processing code is mostly in the `caf.state_machines` module.
 """
 
-from basf2 import *
+__all__ = ["Calibration", "Algorithm", "CAF"]
+
 import os
 import sys
-import shutil
-from pprint import PrettyPrinter
-from datetime import datetime
-from collections import OrderedDict
-from collections import defaultdict
-from collections import deque
-import pickle
-from time import sleep
-import multiprocessing
-import glob
 
-from .utils import past_from_future_dependencies
-from .utils import topological_sort
-from .utils import all_dependencies
-from .utils import decode_json_string
-from .utils import method_dispatch
-from .utils import find_sources
-from .utils import AlgResult
-from .utils import temporary_workdir
-from .utils import iov_from_vector
-from .utils import IoV
-from .utils import IoV_Result
+from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL
 
-import caf.utils
+from caf.utils import past_from_future_dependencies
+from caf.utils import topological_sort
+from caf.utils import all_dependencies
+from caf.utils import decode_json_string
+from caf.utils import method_dispatch
+from caf.utils import find_sources
+from caf.utils import AlgResult
+from caf.utils import temporary_workdir
+from caf.utils import iov_from_vector
+from caf.utils import IoV
+from caf.utils import IoV_Result
+
 import caf.backends
 from caf.state_machines import CalibrationMachine, MachineError, ConditionError, TransitionError, CalibrationRunner
-
-import ROOT
-from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm
-
-pp = PrettyPrinter()
 
 
 class Calibration():
     """
-    Every Calibration object must have a collector and at least one algorithm.
-    You have the option to add in your collector/algorithm by argument here, or
-    later by changing the properties.
-
-    Calibration(name, collector=None, algorithms=None, input_files=None)
-    - 'name' must be set when you create the class instance. It should be unique
-    if you plan to add multiple Calibrations to a CAF().
-    - 'collector' should be set to a CalibrationCollectorModule or a string with the module name.
-    - 'algorithms' should be set to a CalibrationAlgorithm or a list of them.
-    - 'input_files' should be set to a string/list of strings.
-      The input files have to be understood by the backend used e.g. LFNs for DIRAC,
-      accessible local paths for Batch/Local.
-
-    # A Calibration won't be valid in the CAF until it has all of these attributes set.
-
-    Example
-    >>> cal = Calibration('TestCalibration1')
-    >>> col1 = register_module('CaTest')
-    >>> cal.collector = col1
-    OR
-    >>> cal.collector = 'CaTest'  # Automatically create module
-
-    # If you want to run a basf2 path before your collector module when running over data
-    >>> cal.pre_collector_path = my_basf2_path
-
-    You don't have to put a RootInput module in this pre-collection path, but you can if
-    you need some special parameters. The inputFileNames parameter will be set by the CAF directly.
-
-    # Adding the CalibrationAlgorithm(s) is easy
-    >>> alg1 = TestAlgo()
-    >>> alg2 = TestAlgo()
-    >>> cal.algorithms = alg1
-    OR
-    >>> cal.algorithms = [alg1]
-    OR
-    cal.algorithms = [alg1, alg2]  # Multiple algorithms for one collector
-
-    # Note that when you set the algorithms, they are automatically wrapped and stored as
-    caf.framework.Algorithm instances. To access the algorithm underneath directly do:
-    >>> cal.algorithms[i].algorithm
-
-    # If you have a setup function that you want to run before each of the algorithms, set that with
-    >>> cal.pre_algorithms = my_function_object
-
-    OR, if you want a different setup for each algorithm use a list with the same number of elements
-    as your algorithm list.
-    >>> cal.pre_algorithms = [my_function1, my_function2, ...]
-
-    # Can use optional arguments to pass in some/all during initialisation #
-    >>> cal = Calibration( 'TestCalibration1', 'CaTest', [alg1,alg2], ['/path/to/file.root'])
-
-    # Change the input file list later on, before running with CAF()
-    >>> cal.input_files = ['path/to/file.root', 'other/path/to/file2.root']
-
-    # You can also specify the dependencies of the calibration on others
-    >>> cal.depends_on(cal2)
-
-    # The default stored output from the collector is 'RootOutput.root'.
-    To tell the CAF about different/additional data that is output by this collector stage,
-    add output patterns e.g.
-
-    >>> cal.output_patterns.append('*.mille')
     """
 
     def __init__(self, name, collector=None, algorithms=None, input_files=None):
         """
-        You have to specify a unique name for the calibration when creating it.
-        You can specify the collector/algorithms/input files later on or here but it won't be valid
-        until those are set.
-        """
+        Every Calibration object must have a collector and at least one algorithm.
+        You have the option to add in your collector/algorithm by argument here, or
+        later by changing the properties.
 
-        #: Name of calibration object, THIS MUST BE UNIQUE WHEN ADDING INTO CAF!
+        :param name: A string to name this calibration. It should be unique for use in the `CAF`
+        :param collector: Should be set to a CalibrationCollectorModule or a string with the module name.
+        :param algorithms: Should be set to a CalibrationAlgorithm or a list of them.
+        :param input_files: A string/list of strings. May contain wildcards useable by glob
+
+        A Calibration won't be valid in the `CAF` until it has all of these four attributes set.
+
+        Example:
+
+        >>> cal = Calibration('TestCalibration1')
+        >>> col1 = register_module('CaTest')
+        >>> cal.collector = col1
+
+        or equivalently
+
+        >>> cal.collector = 'CaTest'
+
+        If you want to run a basf2 path before your collector module when running over data
+
+        >>> cal.pre_collector_path = my_basf2_path
+
+        You don't have to put a RootInput module in this pre-collection path, but you can if
+        you need some special parameters. The inputFileNames parameter will be set by the `CAF` directly.
+
+        Adding the CalibrationAlgorithm(s) is easy
+
+        >>> alg1 = TestAlgo()
+        >>> cal.algorithms = alg1
+
+        Or equivalently
+
+        >>> cal.algorithms = [alg1]
+
+        Or for multiple algorithms for one collector
+
+        >>> alg2 = TestAlgo()
+        >>> cal.algorithms = [alg1, alg2]
+
+        Note that when you set the algorithms, they are automatically wrapped and stored as
+        `Algorithm` instances. To access the algorithm underneath directly do:
+
+        >>> cal.algorithms[i].algorithm
+
+        If you have a setup function that you want to run before each of the algorithms, set that with
+
+        >>> cal.pre_algorithms = my_function_object
+
+        OR, if you want a different setup for each algorithm use a list with the same number of elements
+        as your algorithm list.
+
+        >>> cal.pre_algorithms = [my_function1, my_function2, ...]
+
+        Can use optional arguments to pass in some/all during initialisation
+
+        >>> cal = Calibration( 'TestCalibration1', 'CaTest', [alg1,alg2], ['/path/to/file.root'])
+
+        Change the input file list later on, before running with `CAF`
+
+        >>> cal.input_files = ['path/to/*.root', 'other/path/to/file2.root']
+
+        You can also specify the dependencies of the calibration on others
+
+        >>> cal.depends_on(cal2)
+
+        By doing this, the `CAF` will respect the ordering of the dependencies and pass the
+        calibration constants created by earlier calibrations to dependent ones.
+        """
+        #: Name of calibration object. This must be unique when adding into the `CAF`.
         self.name = name
         #: Internal calibration collector/algorithms/input_files stored for this calibration
         self._collector = None
@@ -148,8 +138,27 @@ class Calibration():
         #: OrderedDictionary of dependencies of calibration objects, where value is the calibrations
         #: that the key depends on.
         self.dependencies = []
-        #: File:Iov dictionary, should be key=absolute_file_path:value=IoV for file (see utils.IoV())
+        #: File:Iov dictionary, should be key=absolute_file_path:value=IoV for file (see `caf.utils.IoV`)
         self.files_to_iovs = dict()
+        #: Variable to define the maximum number of iterations for this calibration specifically.
+        #: It overrides tha CAF calibration_defaults value if set.
+        self.max_iterations = None
+        #: Maximum number of input files per subjob during the collector step (passed to Job object, see backends.py)
+        #: -1 is the default meaning that all input files are run in one big collector job.
+        self.max_files_per_collector_job = -1
+        #: Dictionary passed to the collector Job object to configure how the Backend should treat the collector job
+        #: Generally only useful for setting the 'queue' of the batch system backends that the collector jobs are submitted
+        #: to
+        self.backend_args = {}
+
+    def _apply_calibration_defaults(self, defaults):
+        """
+        We pass in default calibration options from the `CAF` instance here if called.
+        Won't overwrite any options already set.
+        """
+        for key, value in defaults.items():
+            if not getattr(self, key):
+                setattr(self, key, value)
 
     def is_valid(self):
         """A full calibration consists of a collector AND an associated algorithm AND input_files.
@@ -224,7 +233,9 @@ class Calibration():
         # check if collector is already a module or if we need to create one
         # from the name
         if collector:
+            from basf2 import Module
             if isinstance(collector, str):
+                from basf2 import register_module
                 collector = register_module(collector)
             if not isinstance(collector, Module):
                 B2ERROR("Collector needs to be either a Module or the name of such a module")
@@ -244,6 +255,7 @@ class Calibration():
         """
         Setter for the algorithms property, checks if single or list of algorithms passed in.
         """
+        from ROOT.Belle2 import CalibrationAlgorithm
         if isinstance(value, CalibrationAlgorithm):
             self._algorithms = [Algorithm(value)]
         else:
@@ -256,6 +268,7 @@ class Calibration():
         """
         Alternate algorithms setter for lists and tuples of CalibrationAlgorithms
         """
+        from ROOT.Belle2 import CalibrationAlgorithm
         if value:
             self._algorithms = []
             for alg in value:
@@ -350,6 +363,7 @@ class Algorithm():
     setup. The Calibration class should be doing the creation of the defaults for
     these objects.
     """
+
     def __init__(self, algorithm, data_input=None, pre_algorithm=None):
         """
         Init function that only needs a CalibrationAlgorithm by default.
@@ -357,23 +371,25 @@ class Algorithm():
         #: CalibrationAlgorithm instance (assumed to be true since the Calibration class checks)
         self.algorithm = algorithm
         #: Function called before the pre_algorithm method to setup the input data that the CalibrationAlgorithm uses.
+        #: The list of input files from the collector output will be passed to it
         self.data_input = data_input
         if not self.data_input:
             self.data_input = self.default_rootinput_setup
-        #: Function called after input_func but before algorithm.execute to do any remaining setup
+        #: Function called after data_input but before algorithm.execute to do any remaining setup
         #: IT MUST ONLY HAVE TWO ARGUMENTS pre_algorithm(algorithm, iteration)  where algorithm can be
         #: assumed to be the CalibrationAlgorithm instance, and iteration is an int e.g. 0, 1, 2...
         self.pre_algorithm = pre_algorithm
 
     @staticmethod
-    def default_rootinput_setup():
+    def default_rootinput_setup(input_file_paths):
         """
-        Simple RootInput setup and initilise bound up in a method. Applied to the input_func
+        Simple RootInput setup and bound up in a method. Applied to the data_input attribute
         by default.
         """
-        root_input = register_module('RootInput')
-        root_input.param('inputFileName', 'RootOutput.root')
-        root_input.initialize()
+        from basf2 import create_path, process
+        load_data = create_path()
+        load_data.add_module('RootInput', inputFileNames=input_file_paths, ignoreCommandLineOverride=True)
+        process(load_data)
 
 
 class CAF():
@@ -390,19 +406,25 @@ class CAF():
     class. Leaving functions that it calls to assume everything is correctly set up.
     - Choosing which files to use as input should be done from outside during the
     setup of the CAF and Calibration instances.
+
+    params
+
+    default_args: A dictionary of default options applied to the Calibration objects
+                  if they haven't already set them e.g. {"max_iterations":2}
+    type: dict
     """
-    def __init__(self):
+
+    def __init__(self, calibration_defaults=None):
         """
         Initialise CAF instance. Sets up some empty containers for attributes.
-        No default backend is set yet. This is to prevent unnecessary process pools
+        No default backend is set here. This is to prevent unnecessary process pools
         being allocated. You should set it directly before calling CAF().run() or
         leave it and the CAF will set a default Local one itself during run()
         e.g. caf.backend = Local()
 
-        Note that the config file is in the calibration/data directory and we assume
-        that $BELLE2_LOCAL_DIR is set and that it is the correct release directory to
-        access the config file.
+        Note that the config file is in the calibration/data directory.
         """
+        import ROOT
         config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
         if config_file_path:
             import configparser
@@ -410,7 +432,7 @@ class CAF():
             self.config = configparser.ConfigParser()
             self.config.read(config_file_path)
         else:
-            B2ERROR("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
+            B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
 
         #: Dictionary of calibrations for this CAF instance
         self.calibrations = {}
@@ -424,12 +446,18 @@ class CAF():
         self.output_dir = self.config['CAF_DEFAULTS']['ResultsDir']
         #: Polling frequencywhile waiting for jobs to finish
         self.heartbeat = decode_json_string(self.config['CAF_DEFAULTS']['HeartBeat'])
-        #: Maximum number of iterations the CAF will make of all necessary calibrations
-        self.max_iterations = decode_json_string(self.config['CAF_DEFAULTS']['MaxIterations'])
         #: The ordering and explicit future dependencies of calibrations. Will be filled during self.run()
         self.order = None
         #: Private backend attribute
         self._backend = None
+
+        if not calibration_defaults:
+            calibration_defaults = {}
+        if "max_iterations" not in calibration_defaults:
+            calibration_defaults["max_iterations"] = decode_json_string(self.config["CAF_DEFAULTS"]["MaxIterations"])
+        #: Default options applied to each calibration known to the CAF, if the calibration has these defined by the user
+        #: then the defaults aren't applied. A simple way to define the same configuration to all calibrations in the CAF.
+        self.calibration_defaults = calibration_defaults
 
     def add_calibration(self, calibration):
         """
@@ -442,7 +470,7 @@ class CAF():
             if calibration.name not in self.calibrations:
                 self.calibrations[calibration.name] = calibration
             else:
-                B2WARNING('Tried to add a calibration with the name '+calibration.name+' twice.')
+                B2WARNING('Tried to add a calibration with the name ' + calibration.name + ' twice.')
         else:
             B2WARNING(("Tried to add incomplete/invalid calibration ({0}) to the framwork."
                        "It was not added and will not be part of the final process.".format(calibration.name)))
@@ -506,11 +534,6 @@ class CAF():
             for dep in full_deps:
                 if dep not in explicit_deps:
                     calibration.dependencies.append(self.calibrations[dep])
-        ####################################
-        #
-        # TODO: Need to implement an ordering algorithm here, based on number of future dependents?
-        #
-        ####################################
         order = ordered_full_dependencies
         # We should also patch in all of the implicit dependencies for the calibrations
         return order
@@ -552,6 +575,7 @@ class CAF():
             runners = []
             # Create Runners to spawn threads for each calibration
             for calibration_name, calibration in self.calibrations.items():
+                calibration._apply_calibration_defaults(self.calibration_defaults)
                 machine = CalibrationMachine(calibration, iov)
                 machine.collector_backend = self.backend
                 runner = CalibrationRunner(machine, heartbeat=self.heartbeat)

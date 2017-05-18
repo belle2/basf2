@@ -35,10 +35,6 @@ def main(argv):
 
     # Create a single calibration from a collector module name + algorithm + input files
     cal_test = Calibration(name="TestCalibration", collector="CaTest", algorithms=alg_test, input_files=input_files_test)
-    # The RootOutput.root file will be automatically picked up as output of the collector.
-    # But CaTest also produces .mille files so let's make sure we grab them too (and might as well get the .xml)
-    cal_test.output_patterns.append('Belle2FileCatalog.xml')
-    cal_test.output_patterns.append('*.mille')
 
     ###################################################
     # Create a CAF instance and add the calibration to it. Should run on one CPU core locally by default.

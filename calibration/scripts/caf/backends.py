@@ -8,12 +8,25 @@ import glob
 from .utils import method_dispatch
 import pickle
 import configparser
+from .utils import decode_json_string
+import pathlib
 
 import ROOT
-# For weird reasons, a multiprocessing pool doesn't work properly as a class attribute
-# So we make it a module variable. Should be fine as starting up multiple pools
-# is not recommended anyway. Will check this again someday.
-pool = None
+
+__all__ = ['Job', 'Local', 'LSF', 'PBS']
+
+#: default configuration file location
+default_config_file = ROOT.Belle2.FileSystem.findFile('calibration/data/backends.cfg')
+#: Multiprocessing Pool used by Local Backend
+_pool = None
+#: Default name of the input data file passed to Backend jobs
+_input_data_file_path = "input_data_files.data"
+
+
+def get_input_data():
+    with open(_input_data_file_path, 'br') as input_data_file:
+        input_data = list(pickle.load(input_data_file))
+    return input_data
 
 
 class Job:
@@ -28,10 +41,60 @@ class Job:
     - Use absolute paths for all directories, otherwise you'll likely get into trouble
     """
 
-    def __init__(self, name):
+    class SubJob():
+        """
+        SubJob class. Meant to simply hold basic information about which subjob you are
+        and a reference to the parent Job object to be able to access the main data there.
+        """
+
+        def __init__(self, job, subjob_id, input_files=None):
+            self.id = subjob_id
+            self.parent = job
+            self.input_files = input_files
+
+        @property
+        def output_dir(self):
+            """
+            Getter for output_dir of SubJob. Accesses the parent Job output_dir to infer this."""
+            return os.path.join(self.parent.output_dir, str(self.id))
+
+        @property
+        def working_dir(self):
+            """Getter for working_dir of SubJob. Accesses the parent Job working_dir to infer this."""
+            return os.path.join(self.parent.working_dir, str(self.id))
+
+        @property
+        def name(self):
+            """Getter for name of SubJob. Accesses the parent Job name to infer this."""
+            return "_".join((self.parent.name, str(self.id)))
+
+        @property
+        def subjobs(self):
+            """Getter for subjobs of SubJob object. Always returns None, used to prevent accessing the parent job by mistake"""
+            return None
+
+        @property
+        def max_files_per_subjob(self):
+            """Always returns -1, used to prevent accessing the parent job by mistake"""
+            return -1
+
+        def __getattr__(self, attribute):
+            """
+            Since a SubJob uses attributes from the parent Job, everything simply accesses the Job attributes
+            unless otherwise specified.
+            """
+            return getattr(self.parent, attribute)
+
+    def __init__(self, name, config_file=""):
         """
         Init method of Job object.
-        - Here you just set the job name, everything else comes later.
+        Params:
+
+        name = <str>  simply a name to describe the Job, not used for any critical purpose in the CAF
+
+        config_file = <str>  Optional path to a config file containing setup for the job. Generally used for basf2 setup.
+                             Requires a 'BASF2' section with 'Release', 'Tools', 'SetupCmds' options.
+                             By default the backends.default_config_file is used.
         """
         #: Job object's name. Only descriptive, not necessarily unique.
         self.name = name
@@ -45,14 +108,105 @@ class Job:
         self.output_patterns = []
         #: Command and arguments as a list that wil be run by the job on the backend
         self.cmd = []
-        #: Input root files to basf2 job
+        #: Input files to job, a list of these is copied to the working directory.
         self.input_files = []
+        #: Bash commands to run before the main self.cmd (mainly used for batch system setup)
+        self.setup_cmds = []
+        #: ConfigParser object that sets the defaults (mainly for basf2 setup) and is used as the store
+        #: of configuration variables. Some other attributes reference this object via properties.
+        self.config = configparser.ConfigParser()
+        if not config_file:
+            config_file = default_config_file
+        self.config.read(config_file)
+        #: Config dictionary for the backend to use when submitting the job. Saves us from having multiple attributes that may or
+        #: may not be used.
+        self.backend_args = {}
+        #: Maximum number of files to place in a subjob (Not applicable to Local processing). -1 means don't split into subjobs
+        self.max_files_per_subjob = -1
+        #: dict of subjobs assigned to this job
+        self.subjobs = {}
 
     def __repr__(self):
         """
         Representation of Job class (what happens when you print a Job() instance)
         """
         return "\n".join([self.name, str(self.input_sandbox_files), str(self.input_files)])
+
+    def ready(self):
+        """
+        Returns whether or not the Job has finished. If the job has subjobs then it will return true when they are all finished.
+        """
+        if self.subjobs:
+            if all(map(lambda x: x.result.ready(), self.subjobs.values())):
+                return True
+            else:
+                return False
+        else:
+            return self.result.ready()
+
+    def add_basf2_setup(self):
+        """
+        Creates a list of lines to write into a bash shell script that will setup basf2.
+        Extends the self.setup_cmds attribute when called instead of replacing it.
+        """
+        setup_cmds = self.config['BASF2']['SetupCmds']
+        self.setup_cmds.extend(decode_json_string(self.config['BASF2']['SetupCmds']))
+
+    def create_subjob(self, i):
+        """
+        Creates a subjob Job object that references that parent Job.
+        Returns the SubJob object at the end.
+        """
+        if i not in self.subjobs:
+            B2INFO('Creating Job({}).Subjob({})'.format(self.name, i))
+            subjob = Job.SubJob(self, i)
+            self.subjobs[i] = subjob
+            return subjob
+        else:
+            B2WARNING("Job({}) already contains SubJob({})! This will not be created.".format(self.name, i))
+
+    @property
+    def basf2_release(self):
+        """
+        Getter for basf2 release version string. Pulls in the value from the configparser
+        """
+        return self.config.get("BASF2", "Release")
+
+    @basf2_release.setter
+    def basf2_release(self, release):
+        """
+        Setter for basf2 release version string, it actually sets the value in the configparser
+        """
+        self.config.set("BASF2", "Release", release)
+
+    @property
+    def basf2_tools(self):
+        """
+        Getter for basf2 tools location path. Pulls in the value from the configparser
+        """
+        return self.config.get("BASF2", "Tools")
+
+    @basf2_tools.setter
+    def basf2_tools(self, tools_location):
+        """
+        Setter for basf2 tools location path, it actually sets the value in the configparser
+        """
+        self.config.set("BASF2", "Tools", tools_location)
+
+    def post_process(self):
+        """
+        Does clean up tasks after the main job has finished. Mainly downloading output to the
+        correct output location.
+        """
+        # Once the subprocess is done, move the requested output to the output directory
+        if not self.subjobs:
+            for pattern in self.output_patterns:
+                output_files = glob.glob(os.path.join(self.working_dir, pattern))
+                for file_name in output_files:
+                    shutil.move(file_name, self.output_dir)
+        else:
+            for subjob in job.subjobs:
+                subjob.post_process()
 
 
 class Backend():
@@ -62,21 +216,37 @@ class Backend():
     to whatever backend they describe. Common methods/attributes go here.
     """
 
-    def submit(self):
+    submit_script = "submit.sh"
+
+    def submit(self, job):
         """
         Base method for submitting collection jobs to the backend type. This MUST be
         implemented for a correctly written backend class deriving from Backend().
         """
         raise NotImplementedError('Need to implement a submit() method in {} backend.'.format(self.__class__.__name__))
 
+    @staticmethod
+    def _dump_input_data(job):
+        if job.input_files:
+            with open(str(pathlib.Path(job.working_dir, 'input_data_files.data')), 'bw') as input_data_file:
+                pickle.dump(job.input_files, input_data_file)
+
+    @staticmethod
+    def _add_setup(job, batch_file):
+        """
+        Adds setup lines to the shell script file.
+        """
+        for line in job.setup_cmds:
+            print(line, file=batch_file)
+
 
 class Local(Backend):
     """
-    Backend for local calibration processes i.e. on the same machine but in a subprocess.
+    Backend for local processes i.e. on the same machine but in a subprocess.
     Attributes:
         * max_processes=<int> Specifies the size of the process pool that spawns the subjobs.
         It's the maximium simultaneous subjobs. Try not to specify a large number or a number
-        larger than the number of cores (-1?). Won't crash the program but it will slow down
+        larger than the number of cores. Won't crash the program but it will slow down
         and negatively impact performance. Default = 1
 
     Note that you should call the self.join() method to close the pool and wait for any
@@ -96,7 +266,7 @@ class Local(Backend):
 
     class Result():
         """
-        Simple class to help monitor status of jobs submitted by CAF backend to Local process.
+        Simple class to help monitor status of jobs submitted by Local backend.
         """
 
         def __init__(self, job, result):
@@ -115,28 +285,15 @@ class Local(Backend):
             """
             return self.result.ready()
 
-        def post_process(self):
-            """
-            Does clean up tasks after the main job has finished. Mainly downloading output to the
-            correct output location.
-            """
-            # Once the subprocess is done, move the requested output to the output directory
-            # B2INFO('Moving any output files of process {0} to output directory {1}'.format(job.name, job.output_dir))
-            for pattern in self.job.output_patterns:
-                output_files = glob.glob(os.path.join(self.job.working_dir, pattern))
-                for file_name in output_files:
-                    shutil.move(file_name, self.job.output_dir)
-                    # B2INFO('moving', file_name, 'to', job.output_dir)
-
     def join(self):
         """
         Closes and joins the Pool, letting you wait for all results currently
         still processing.
         """
+        global _pool
         B2INFO('Joining Process Pool, waiting for results to finish')
-        global pool
-        pool.close()
-        pool.join()
+        _pool.close()
+        _pool.join()
         B2INFO('Process Pool joined.')
 
     @property
@@ -154,98 +311,307 @@ class Local(Backend):
         """
         #: Internal attribute of max_processes
         self._max_processes = value
-        global pool
-        if pool:
+        global _pool
+        if _pool:
             self.join()
         B2INFO('Starting up new Pool with {0} processes'.format(self.max_processes))
-        pool = mp.Pool(self.max_processes)
+        _pool = mp.Pool(processes=self.max_processes)
 
     @method_dispatch
     def submit(self, job):
         """
         Submit method of Local() backend. Mostly setup here creating the right directories.
         """
-        global pool
-        # Submit the jobs to owned Pool
-        B2INFO('Job Submitting: '+job.name)
         # Make sure the output directory of the job is created
-        if not os.path.exists(job.output_dir):
-            os.makedirs(job.output_dir)
-
+        job_output_path = pathlib.Path(job.output_dir)
+        job_output_path.mkdir(parents=True, exist_ok=True)
         # Make sure the working directory of the job is created
-        if job.working_dir and not os.path.exists(job.working_dir):
-            os.makedirs(job.working_dir)
+        job_wd_path = pathlib.Path(job.working_dir)
+        job_wd_path.mkdir(parents=True, exist_ok=True)
 
-        # Get all of the requested files for the input sandbox and copy them to the working directory
-        for file_pattern in job.input_sandbox_files:
-            input_files = glob.glob(file_pattern)
-            for file_path in input_files:
-                if os.path.isdir(file_path):
-                    shutil.copytree(file_path, os.path.join(job.working_dir, os.path.split(file_path)[1]))
-                else:
-                    shutil.copy(file_path, job.working_dir)
+        global _pool
+        if isinstance(job, Job):
+            if job.max_files_per_subjob == 0:
+                B2FATAL("When submitting Job({}) files per subjob was 0!".format(job.name))
 
-        # Check if we have any valid input files
-        existing_input_files = set()
-        for input_file_pattern in job.input_files:
-            if input_file_pattern[:7] != "root://":
-                input_files = glob.glob(input_file_pattern)
-                if not input_files:
-                    B2WARNING("No files matching {0} can be found, it will be skipped!".format(input_file_pattern))
+            # Check if we have any valid input files
+            existing_input_files = set()
+            for input_file_pattern in job.input_files:
+                if input_file_pattern[:7] != "root://":
+                    input_files = glob.glob(input_file_pattern)
+                    if not input_files:
+                        B2WARNING("No files matching {0} can be found, it will be skipped!".format(input_file_pattern))
+                    else:
+                        for file_path in input_files:
+                            file_path = os.path.abspath(file_path)
+                            if os.path.isfile(file_path):
+                                existing_input_files.add(file_path)
                 else:
+                    B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
+                            " before collector submission.".format(input_file_pattern)))
+                    existing_input_files.add(input_file_pattern)
+
+            if not existing_input_files:
+                B2INFO("No valid input file paths found for job {0}".format(job.name))
+
+            if job.max_files_per_subjob > 0 and existing_input_files:
+                import itertools
+
+                def grouper(n, iterable):
+                    it = iter(iterable)
+                    while True:
+                        chunk = tuple(itertools.islice(it, n))
+                        if not chunk:
+                            return
+                        yield chunk
+
+                for i, subjob_input_files in enumerate(grouper(job.max_files_per_subjob, existing_input_files)):
+                    subjob = job.create_subjob(i)
+                    subjob.input_files = subjob_input_files
+
+            if not job.subjobs:
+                # Get all of the requested files for the input sandbox and copy them to the working directory
+                for file_pattern in job.input_sandbox_files:
+                    input_files = glob.glob(file_pattern)
                     for file_path in input_files:
-                        file_path = os.path.abspath(file_path)
-                        if os.path.isfile(file_path):
-                            existing_input_files.add(file_path)
+                        if os.path.isdir(file_path):
+                            shutil.copytree(file_path, os.path.join(job.working_dir, os.path.split(file_path)[1]))
+                        else:
+                            shutil.copy(file_path, job.working_dir)
+
+                self._dump_input_data(job)
+                with open(os.path.join(job.working_dir, self.submit_script), "w") as batch_file:
+                    self._add_setup(job, batch_file)
+                    print(" ".join(job.cmd), file=batch_file)
+                B2INFO("Submitting Job({})".format(job.name))
+                job.result = Local.Result(job,
+                                          _pool.apply_async(self.run_job,
+                                                            (job.name,
+                                                             job.working_dir,
+                                                             job.output_dir,
+                                                             self.submit_script)
+                                                            )
+                                          )
+                B2INFO('Job {0} submitted'.format(job.name))
             else:
-                B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
-                        " before collector submission.".format(input_file_pattern)))
-                existing_input_files.add(input_file_pattern)
+                self.submit(list(job.subjobs.values()))
 
-        if existing_input_files:
-            # Now make a python file in our input sandbox containing a list of these valid files
-            with open(os.path.join(job.working_dir, 'input_data_files.data'), 'bw') as input_data_file:
-                pickle.dump(list(existing_input_files), input_data_file)
-        else:
-            B2FATAL("No valid input files found for job {0}".format(job.name))
+        elif isinstance(job, Job.SubJob):
+            # Get all of the requested files for the input sandbox and copy them to the working directory
+            for file_pattern in job.input_sandbox_files:
+                input_files = glob.glob(file_pattern)
+                for file_path in input_files:
+                    if os.path.isdir(file_path):
+                        shutil.copytree(file_path, os.path.join(job.working_dir, os.path.split(file_path)[1]))
+                    else:
+                        shutil.copy(file_path, job.working_dir)
 
-        result = Local.Result(job, pool.apply_async(Local.run_job, (job,)))
-        B2INFO('Job {0} submitted'.format(job.name))
-        return result
+            self._dump_input_data(job)
+            with open(os.path.join(job.working_dir, self.submit_script), "w") as batch_file:
+                self._add_setup(job, batch_file)
+                print(" ".join(job.cmd), file=batch_file)
+            B2INFO("Submitting Job({})".format(job.name))
+            job.result = Local.Result(job,
+                                      _pool.apply_async(self.run_job,
+                                                        (job.name,
+                                                         job.working_dir,
+                                                         job.output_dir,
+                                                         self.submit_script)
+                                                        )
+                                      )
+            B2INFO('Job {0} submitted'.format(job.name))
 
     @submit.register(list)
     def _(self, jobs):
         """
-        Submit method of Local() that takes a list of jobs instead of just one and creates a process pool
-        to run them.
+        Submit method of Local() that takes a list of jobs instead of just one and submits each one.
         """
-        results = []
-        # Submit the jobs to owned Pool
+        # Submit the jobs to PBS
         for job in jobs:
-            results.append(self.submit(job))
+            self.submit(job)
         B2INFO('All Requested Jobs Submitted')
-        return results
 
     @staticmethod
-    def run_job(job):
+    def run_job(name, working_dir, output_dir, script):
         """
         The function that is used by multiprocessing.Pool.map during process creation. This runs a
         shell command in a subprocess and captures the stdout and stderr of the subprocess to files.
         """
+        B2INFO('Starting Sub Process: {0}'.format(name))
         from subprocess import PIPE, STDOUT, Popen
-        stdout_file_path = os.path.join(job.output_dir, 'stdout')
+        stdout_file_path = os.path.join(working_dir, 'stdout')
         # Create unix command to redirect stdour and stderr
-        B2INFO(" ".join(job.cmd))
-        B2INFO('Starting Sub Process: {0}'.format(job.name))
-        B2INFO('Log files for SubProcess {0} visible at:\n\t{1}'.format(job.name, stdout_file_path))
+        B2INFO('Log files for SubProcess {0} visible at:\n\t{1}'.format(name, stdout_file_path))
         with open(stdout_file_path, 'w', buffering=1) as f_out:
-            with Popen(job.cmd, stdout=PIPE, stderr=STDOUT, bufsize=1, universal_newlines=True, cwd=job.working_dir) as p:
+            with Popen(["/bin/bash", "-l", script],
+                       stdout=PIPE,
+                       stderr=STDOUT,
+                       bufsize=1,
+                       universal_newlines=True,
+                       cwd=working_dir) as p:
                 for line in p.stdout:
                     print(line, end='', file=f_out)
-        B2INFO('Sub Process {0} Finished.'.format(job.name))
+        B2INFO('Sub Process {0} Finished.'.format(name))
 
 
-class PBS(Backend):
+class Batch(Backend):
+    """
+    Abstract Base backend for submitting to a local batch system. Batch system specific commands should be implemented
+    in a derived class. Do not use this class directly!
+    """
+    #: default section name in config file, should be implemented in the derived class
+    default_config_section = ""
+    #: Shell command to submit a script, should be implemented in the derived class
+    submission_cmds = []
+
+    def __init__(self):
+        """
+        Init method for Batch Backend. Does default setup based on config file.
+        """
+        self.subjobs_to_files = None
+        self.config = configparser.ConfigParser()
+        self.config.read(default_config_file)
+
+    def _add_batch_directives(self, job, file):
+        """
+        Should be implemented in a derived class to write a batch submission script to the job.working_dir.
+        You should think about where the stdout/err should go, and set the queue name.
+        """
+        raise NotImplementedError(("Need to implement a _add_batch_directives(self, job, file) "
+                                   "method in {} backend.".format(self.__class__.__name__)))
+
+    @classmethod
+    def _submit_to_batch(cls, cmd):
+        """
+        Do the actual batch submission command and collect the output to find out the job id for later monitoring.
+        """
+        raise NotImplementedError(("Need to implement a _submit_to_batch(cls, cmd) "
+                                   "method in {} backend.".format(self.__class__.__name__)))
+
+    @method_dispatch
+    def submit(self, job):
+        """
+        Submit method of Batch backend. Should take job object, create needed directories, create batch script,
+        and send it off with the batch submission command, applying the correct options (default and user requested.)
+
+        Should set a Result object as an attribute of the job. Result object should allow a 'ready' member method to
+        be called from it which queries the batch system and the job id about whether or not the job has finished.
+        """
+        # Make sure the output directory of the job is created
+        job_output_path = pathlib.Path(job.output_dir)
+        job_output_path.mkdir(parents=True, exist_ok=True)
+        # Make sure the working directory of the job is created
+        job_wd_path = pathlib.Path(job.working_dir)
+        job_wd_path.mkdir(parents=True, exist_ok=True)
+
+        if isinstance(job, Job):
+            if 'queue' not in job.backend_args:
+                job.backend_args['queue'] = self.config[self.default_config_section]["Queue"]
+                B2INFO('Setting Job queue {}'.format(job.backend_args['queue']))
+
+            if job.max_files_per_subjob == 0:
+                B2FATAL("When submitting Job({}) files per subjob was 0!".format(job.name))
+
+            # Check if we have any valid input files
+            existing_input_files = set()
+            for input_file_pattern in job.input_files:
+                if input_file_pattern[:7] != "root://":
+                    input_files = glob.glob(input_file_pattern)
+                    if not input_files:
+                        B2WARNING("No files matching {0} can be found, it will be skipped!".format(input_file_pattern))
+                    else:
+                        for file_path in input_files:
+                            file_path = os.path.abspath(file_path)
+                            if os.path.isfile(file_path):
+                                existing_input_files.add(file_path)
+                else:
+                    B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
+                            " before collector submission.".format(input_file_pattern)))
+                    existing_input_files.add(input_file_pattern)
+
+            if not existing_input_files:
+                B2INFO("No valid input file paths found for job {0}".format(job.name))
+
+            if job.max_files_per_subjob > 0 and existing_input_files:
+                import itertools
+
+                def grouper(n, iterable):
+                    it = iter(iterable)
+                    while True:
+                        chunk = tuple(itertools.islice(it, n))
+                        if not chunk:
+                            return
+                        yield chunk
+
+                for i, subjob_input_files in enumerate(grouper(job.max_files_per_subjob, existing_input_files)):
+                    subjob = job.create_subjob(i)
+                    subjob.input_files = subjob_input_files
+
+            if not job.subjobs:
+                # Get all of the requested files for the input sandbox and copy them to the working directory
+                for file_pattern in job.input_sandbox_files:
+                    input_files = glob.glob(file_pattern)
+                    for file_path in input_files:
+                        if os.path.isdir(file_path):
+                            shutil.copytree(file_path, os.path.join(job.working_dir, os.path.split(file_path)[1]))
+                        else:
+                            shutil.copy(file_path, job.working_dir)
+
+                self._dump_input_data(job)
+                with open(os.path.join(job.working_dir, self.submit_script), "w") as batch_file:
+                    self._add_batch_directives(job, batch_file)
+                    self._add_setup(job, batch_file)
+                    print(" ".join(job.cmd), file=batch_file)
+                B2INFO("Submitting Job({})".format(job.name))
+
+                script_path = os.path.join(job.working_dir, self.submit_script)
+                cmd = self._create_cmd(script_path)
+                output = self._submit_to_batch(cmd)
+                self._create_job_result(job, output)
+            else:
+                self.submit(list(job.subjobs.values()))
+
+        elif isinstance(job, Job.SubJob):
+            # Get all of the requested files for the input sandbox and copy them to the working directory
+            for file_pattern in job.input_sandbox_files:
+                input_files = glob.glob(file_pattern)
+                for file_path in input_files:
+                    if os.path.isdir(file_path):
+                        shutil.copytree(file_path, os.path.join(job.working_dir, os.path.split(file_path)[1]))
+                    else:
+                        shutil.copy(file_path, job.working_dir)
+
+            self._dump_input_data(job)
+            with open(os.path.join(job.working_dir, self.submit_script), "w") as batch_file:
+                self._add_batch_directives(job, batch_file)
+                self._add_setup(job, batch_file)
+                print(" ".join(job.cmd), file=batch_file)
+            B2INFO("Submitting Job({})".format(job.name))
+            script_path = os.path.join(job.working_dir, self.submit_script)
+            cmd = self._create_cmd(script_path)
+            output = self._submit_to_batch(cmd)
+            self._create_job_result(job, output)
+
+    @submit.register(list)
+    def _(self, jobs):
+        """
+        Submit method of PBS() that takes a list of jobs instead of just one and submits each one.
+        """
+        # Submit the jobs to PBS
+        for job in jobs:
+            self.submit(job)
+        B2INFO('All Requested Jobs Submitted')
+
+    @classmethod
+    def _create_job_result(cls, job, batch_output):
+        raise NotImplementedError("Need to implement a _create_job_result(job, batch_output) method")
+
+    @classmethod
+    def _create_cmd(cls, job):
+        raise NotImplementedError("Need to implement a _create_cmd(job) method")
+
+
+class PBS(Batch):
     """
     Backend for submitting calibration processes to a qsub batch system
     """
@@ -261,99 +627,47 @@ class PBS(Backend):
     cmd_queue = "#PBS -q"
     #: Job name directive
     cmd_name = "#PBS -N"
-
-    #: default location of config file
-    default_config_file = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
     #: default PBS section name in config file
     default_config_section = "PBS"
-    #: required entries in config section
-    required_config = ["Queue", "Release", "Tools"]
+    #: Shell command to submit a script
+    submission_cmds = ["qsub"]
 
-    def __init__(self, config_file_path="", section=""):
-        """
-        Init method for PBS Backend. Does default setup based on config file.
-        """
-        if config_file_path and section:
-            self.load_from_config(config_file_path, section)
-        else:
-            self.load_from_config(PBS.default_config_file, PBS.default_config_section)
-        self.basf2_setup = None
-
-    def load_from_config(self, config_file_path, section):
-        """
-        Takes a config file path (string) and the relevant section name (string).
-        Checks that the required setup options are set. When loading from a config file you
-        can't have a partially complete list of required options.
-
-        If you want to modify the default setup try changing the public attributes directly.
-        """
-        if config_file_path and section:
-            if os.path.exists(config_file_path):
-                cp = configparser.ConfigParser()
-                cp.read(config_file_path)
-            else:
-                B2FATAL("Attempted to load a config file that doesn't exist! {0}".format(config_file_path))
-            if cp.has_section(section):
-                for option in PBS.required_config:
-                    if not cp.has_option(section, option):
-                        B2FATAL(("Tried to load config file but required option {0} "
-                                 "not found in section {1}".format(option, section)))
-            else:
-                B2FATAL("Tried to load config file but required section {0} not found.".format(section))
-        self._update_from_config(cp, section)
-
-    def _update_from_config(self, config, section):
-        """
-        Sets attributes from a ConfigParser object. Checks for required options should already be done
-        so we can just use them here.
-        """
-        #: queue name for PBS submission
-        self.queue = config[section]["Queue"]
-        #: basf2 release path
-        self.release = config[section]["Release"]
-        #: basf2 tools location
-        self.tools = config[section]["Tools"]
-
-    def _generate_basf2_setup(self):
-        """
-        Creates a list of lines to write into a bash shell script that will setup basf2.
-        Will not be called if the user has set the pbs.basf2_setup attribute themselves.
-        """
-        #: A list of string lines that define how basf2 will be setup on the worker node.
-        #: Can be set explicitly by the user or ignored if the default/user defined config file
-        #: is good enough
-        self.basf2_setup = []
-        self.basf2_setup.extend(["export VO_BELLE2_SW_DIR=/cvmfs/belle.cern.ch/sl6\n",
-                                 "CAF_TOOLS_LOCATION="+self.tools+"\n",
-                                 "CAF_RELEASE_LOCATION="+self.release+"\n",
-                                 "source $CAF_TOOLS_LOCATION\n",
-                                 "pushd $CAF_RELEASE_LOCATION > /dev/null\n",
-                                 "setuprel\n",
-                                 "popd > /dev/null\n"])
-
-    def _generate_pbs_script(self, job):
+    def _add_batch_directives(self, job, batch_file):
         """
         Creates the bash shell script that qsub will call. Includes PBD directives
         and basf2 setup.
         """
-        with open(os.path.join(job.working_dir, "submit.sh"), "w") as batch_file:
-            batch_file.write("#!/bin/bash\n")
-            batch_file.write("# --- Start PBS ---\n")
-            batch_file.write(" ".join([PBS.cmd_queue, self.queue])+"\n")
-            batch_file.write(" ".join([PBS.cmd_name, job.name])+"\n")
-            batch_file.write(" ".join([PBS.cmd_wkdir, job.working_dir])+"\n")
-            batch_file.write(" ".join([PBS.cmd_stdout, os.path.join(job.output_dir, "stdout")])+"\n")
-            batch_file.write(" ".join([PBS.cmd_stderr, os.path.join(job.output_dir, "stderr")])+"\n")
-            batch_file.write("# --- End PBS ---\n")
-            self._add_basf2_setup(batch_file)
-            batch_file.write(" ".join(job.cmd)+"\n")
+        if "queue" in job.backend_args:
+            batch_queue = job.backend_args["queue"]
+        else:
+            batch_queue = self.config["Queue"]
+        print("#!/bin/bash", file=batch_file)
+        print("# --- Start PBS ---", file=batch_file)
+        print(" ".join([PBS.cmd_queue, batch_queue]), file=batch_file)
+        print(" ".join([PBS.cmd_name, job.name]), file=batch_file)
+        print(" ".join([PBS.cmd_wkdir, job.working_dir]), file=batch_file)
+        print(" ".join([PBS.cmd_stdout, os.path.join(job.working_dir, "stdout")]), file=batch_file)
+        print(" ".join([PBS.cmd_stderr, os.path.join(job.working_dir, "stderr")]), file=batch_file)
+        print("# --- End PBS ---", file=batch_file)
 
-    def _add_basf2_setup(self, file):
+    @classmethod
+    def _create_job_result(cls, job, batch_output):
+        job_id = batch_output.replace("\n", "")
+        job.result = cls.Result(job, job_id)
+
+    @classmethod
+    def _create_cmd(cls, script_path):
+        submission_cmd = cls.submission_cmds[:]
+        submission_cmd.append(script_path)
+        return submission_cmd
+
+    @classmethod
+    def _submit_to_batch(cls, cmd):
         """
-        Adds basf2 setup lines to the PBS shell script file.
+        Do the actual batch submission command and collect the output to find out the job id for later monitoring.
         """
-        for line in self.basf2_setup:
-            file.write(line)
+        sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True)
+        return sub_out
 
     class Result():
         """
@@ -397,89 +711,8 @@ class PBS(Backend):
                 for file_name in output_files:
                     shutil.move(file_name, self.job.output_dir)
 
-    @method_dispatch
-    def submit(self, job):
-        """
-        Submit method of PBS backend. Should take job object, create needed directories, create PBS script,
-        and send it off with qsub applying the correct options (default and user requested.)
 
-        Should return a Result object that allows a 'ready' member method to be called from it which queries
-        the PBS system and the job about whether or not the job has finished.
-        """
-        B2INFO('Job Submitting: '+job.name)
-        # Make sure the output directory of the job is created
-        if not os.path.exists(job.output_dir):
-            os.makedirs(job.output_dir)
-
-        # Make sure the working directory of the job is created
-        if job.working_dir and not os.path.exists(job.working_dir):
-            os.makedirs(job.working_dir)
-
-        # Get all of the requested files for the input sandbox and copy them to the working directory
-        for file_pattern in job.input_sandbox_files:
-            input_files = glob.glob(file_pattern)
-            for file_path in input_files:
-                if os.path.isdir(file_path):
-                    shutil.copytree(file_path, os.path.join(job.working_dir, os.path.split(file_path)[1]))
-                else:
-                    shutil.copy(file_path, job.working_dir)
-
-        # Check if we have any valid input files
-        existing_input_files = set()
-        for input_file_pattern in job.input_files:
-            if input_file_pattern[:7] != "root://":
-                input_files = glob.glob(input_file_pattern)
-                if not input_files:
-                    B2WARNING("No files matching {0} can be found, it will be skipped!".format(input_file_pattern))
-                else:
-                    for file_path in input_files:
-                        file_path = os.path.abspath(file_path)
-                        if os.path.isfile(file_path):
-                            existing_input_files.add(file_path)
-            else:
-                B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
-                        " before collector submission.".format(input_file_pattern)))
-                existing_input_files.add(input_file_pattern)
-
-        if existing_input_files:
-            # Now make a python file in our input sandbox containing a list of these valid files
-            with open(os.path.join(job.working_dir, 'input_data_files.data'), 'bw') as input_data_file:
-                pickle.dump(list(existing_input_files), input_data_file)
-        else:
-            B2FATAL("No valid input files found for job {0}".format(job.name))
-
-        # If the user hasn't explicitly set the basf2_setup attribute, then do the default here from the config values
-        if not self.basf2_setup:
-            self._generate_basf2_setup()
-        self._generate_pbs_script(job)
-        result = self._submit_to_qsub(job)
-        return result
-
-    def _submit_to_qsub(self, job):
-        """
-        Do the actual qsub command and collect the output to find out the job id for later monitoring.
-        """
-        script_path = os.path.join(job.working_dir, "submit.sh")
-        qsub_out = subprocess.check_output(["qsub", script_path], stderr=subprocess.STDOUT, universal_newlines=True)
-        qsub_out = qsub_out.replace("\n", "")
-        result = PBS.Result(job, qsub_out)
-        return result
-
-    @submit.register(list)
-    def _(self, jobs):
-        """
-        Submit method of PBS() that takes a list of jobs instead of just one and submits each one
-        with qsub. Possibly with multiple submissions based on input file splitting.
-        """
-        results = []
-        # Submit the jobs to PBS
-        for job in jobs:
-            results.append(self.submit(job))
-        B2INFO('All Requested Jobs Submitted')
-        return results
-
-
-class LSF(Backend):
+class LSF(Batch):
     """
     Backend for submitting calibration processes to a qsub batch system
     """
@@ -493,106 +726,49 @@ class LSF(Backend):
     cmd_queue = "#BSUB -q"
     #: Job name directive
     cmd_name = "#BSUB -J"
-
-    #: default configuration file location
-    default_config_file = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
-    #: default configuration section for LSF
+    #: default LSF section name in config file
     default_config_section = "LSF"
-    #: Required configuration keys
-    required_config = ["Queue", "Release"]
+    #: Shell command to submit a script
+    submission_cmds = ["bsub", "<"]
 
-    def __init__(self, config_file_path="", section=""):
+    def _add_batch_directives(self, job, batch_file):
         """
-        Init method for LSF Backend. Does default setup based on config file.
+        Adds LSF BSUB directives for the job to a script
         """
-        if config_file_path and section:
-            self.load_from_config(config_file_path, section)
+        if "queue" in job.backend_args:
+            batch_queue = job.backend_args["queue"]
         else:
-            self.load_from_config(LSF.default_config_file, LSF.default_config_section)
-        self.basf2_setup = None
+            batch_queue = self.config["Queue"]
+        print("#!/bin/bash", file=batch_file)
+        print("# --- Start LSF ---", file=batch_file)
+        print(" ".join([LSF.cmd_queue, batch_queue]), file=batch_file)
+        print(" ".join([LSF.cmd_name, job.name]), file=batch_file)
+        print(" ".join([LSF.cmd_wkdir, job.working_dir]), file=batch_file)
+        print(" ".join([LSF.cmd_stdout, os.path.join(job.output_dir, "stdout")]), file=batch_file)
+        print(" ".join([LSF.cmd_stderr, os.path.join(job.output_dir, "stderr")]), file=batch_file)
+        print("# --- End LSF ---", file=batch_file)
 
-    def load_from_config(self, config_file_path, section):
-        """
-        Takes a config file path (string) and the relevant section name (string).
-        Checks that the required setup options are set. When loading from a config file you
-        can't have a partially complete list of required options.
+    @classmethod
+    def _create_cmd(cls, script_path):
+        submission_cmd = cls.submission_cmds[:]
+        submission_cmd.append(script_path)
+        submission_cmd = " ".join(submission_cmd)
+        return [submission_cmd]
 
-        If you want to modify the default setup try changing the public attributes directly.
+    @classmethod
+    def _submit_to_batch(cls, cmd):
         """
-        if config_file_path and section:
-            if os.path.exists(config_file_path):
-                cp = configparser.ConfigParser()
-                cp.read(config_file_path)
-            else:
-                B2FATAL("Attempted to load a config file that doesn't exist! {0}".format(config_file_path))
-            if cp.has_section(section):
-                for option in LSF.required_config:
-                    if not cp.has_option(section, option):
-                        B2FATAL(("Tried to load config file but required option {0} "
-                                 "not found in section {1}".format(option, section)))
-            else:
-                B2FATAL("Tried to load config file but required section {0} not found.".format(section))
-        self._update_from_config(cp, section)
-
-    def _update_from_config(self, config, section):
+        Do the actual batch submission command and collect the output to find out the job id for later monitoring.
         """
-        Sets attributes from a ConfigParser object. Checks for required options should already be done
-        so we can just use them here.
-        """
-        #: queue name for LSF submission
-        self.queue = config[section]["Queue"]
-        #: basf2 release path
-        self.release = config[section]["Release"]
-        #: basf2 tools location
-        self.tools = config[section]["Tools"]
-
-    def _generate_basf2_setup(self):
-        """
-        Creates a list of lines to write into a bash shell script that will setup basf2.
-        Will not be called if the user has set the lsf.basf2_setup attribute themselves.
-        """
-        #: A list of string lines that define how basf2 will be setup on the worker node.
-        #: Can be set explicitly by the user or ignored if the default/user defined config file
-        #: is good enough
-        self.basf2_setup = []
-        self.basf2_setup.extend(["export VO_BELLE2_SW_DIR=/cvmfs/belle.cern.ch/sl6\n",
-                                 "CAF_TOOLS_LOCATION="+self.tools+"\n",
-                                 "CAF_RELEASE_LOCATION="+self.release+"\n",
-                                 "source $CAF_TOOLS_LOCATION\n",
-                                 "pushd $CAF_RELEASE_LOCATION > /dev/null\n",
-                                 "setuprel\n",
-                                 "popd > /dev/null\n"])
-
-    def _generate_lsf_script(self, job):
-        """
-        Creates the bash shell script that qsub will call. Includes BSUB directives
-        and basf2 setup.
-        """
-        with open(os.path.join(job.working_dir, "submit.sh"), "w") as batch_file:
-            batch_file.write("#!/bin/bash\n")
-            batch_file.write("# --- Start LSF ---\n")
-            batch_file.write(" ".join([LSF.cmd_queue, self.queue])+"\n")
-            batch_file.write(" ".join([LSF.cmd_name, job.name])+"\n")
-            batch_file.write(" ".join([LSF.cmd_wkdir, job.working_dir])+"\n")
-            batch_file.write(" ".join([LSF.cmd_stdout, os.path.join(job.output_dir, "stdout")])+"\n")
-            batch_file.write(" ".join([LSF.cmd_stderr, os.path.join(job.output_dir, "stderr")])+"\n")
-            batch_file.write("# --- End LSF ---\n")
-            self._add_basf2_setup(batch_file)
-            batch_file.write(" ".join(job.cmd)+"\n")
-
-    def _add_basf2_setup(self, file):
-        """
-        Adds basf2 setup lines to the LSF shell script file.
-        """
-        for line in self.basf2_setup:
-            file.write(line)
+        sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        return sub_out
 
     class Result():
         """
-        Simple class to help monitor status of jobs submitted by CAF backend to LSF.
+        Simple class to help monitor status of jobs submitted by LSF Backend.
 
-        You pass in a Job ID from a bsub command and when you call the 'ready' method
-        it runs bjobs to see whether or not the job has finished.
+        You pass in a Job object and job id from a bsub command.
+        When you call the 'ready' method it runs bjobs to see whether or not the job has finished.
         """
 
         def __init__(self, job, job_id):
@@ -628,90 +804,13 @@ class LSF(Backend):
                 for file_name in output_files:
                     shutil.move(file_name, self.job.output_dir)
 
-    @method_dispatch
-    def submit(self, job):
-        """
-        Submit method of LSF backend. Should take job object, create needed directories, create LSF script,
-        and send it off with bsub applying the correct options (default and user requested.)
-
-        Should return a Result object that allows a 'ready' member method to be called from it which queries
-        the LSF system and the job about whether or not the job has finished.
-        """
-        B2INFO('Job Submitting: '+job.name)
-        # Make sure the output directory of the job is created
-        if not os.path.exists(job.output_dir):
-            os.makedirs(job.output_dir)
-
-        # Make sure the working directory of the job is created
-        if job.working_dir and not os.path.exists(job.working_dir):
-            os.makedirs(job.working_dir)
-
-        # Get all of the requested files for the input sandbox and copy them to the working directory
-        for file_pattern in job.input_sandbox_files:
-            input_files = glob.glob(file_pattern)
-            for file_path in input_files:
-                if os.path.isdir(file_path):
-                    shutil.copytree(file_path, os.path.join(job.working_dir, os.path.split(file_path)[1]))
-                else:
-                    shutil.copy(file_path, job.working_dir)
-
-        # Check if we have any valid input files
-        existing_input_files = set()
-        for input_file_pattern in job.input_files:
-            if input_file_pattern[:7] != "root://":
-                input_files = glob.glob(input_file_pattern)
-                if not input_files:
-                    B2WARNING("No files matching {0} can be found, it will be skipped!".format(input_file_pattern))
-                else:
-                    for file_path in input_files:
-                        file_path = os.path.abspath(file_path)
-                        if os.path.isfile(file_path):
-                            existing_input_files.add(file_path)
-            else:
-                B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
-                        " before collector submission.".format(input_file_pattern)))
-                existing_input_files.add(input_file_pattern)
-
-        if existing_input_files:
-            # Now make a python file in our input sandbox containing a list of these valid files
-            with open(os.path.join(job.working_dir, 'input_data_files.data'), 'bw') as input_data_file:
-                pickle.dump(list(existing_input_files), input_data_file)
-        else:
-            B2FATAL("No valid input files found for job {0}".format(job.name))
-
-        # If the user hasn't explicitly set the basf2_setup attribute, then do the default here from the config values
-        if not self.basf2_setup:
-            self._generate_basf2_setup()
-        self._generate_lsf_script(job)
-        result = self._submit_to_bsub(job)
-        return result
-
-    def _submit_to_bsub(self, job):
-        """
-        Do the actual bsub command and collect the output to find out the job id for later monitoring.
-        """
-        B2INFO("Calling bsub for job {0}".format(job.name))
-        script_path = os.path.join(job.working_dir, "submit.sh")
-        bsub_out = subprocess.check_output(("bsub < "+script_path,), stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
-        job_id = bsub_out.split(" ")[1]
+    @classmethod
+    def _create_job_result(cls, job, batch_output):
+        job_id = batch_output.split(" ")[1]
         for wrap in ["<", ">"]:
             job_id = job_id.replace(wrap, "")
-        B2INFO("Job ID recorded as: "+job_id)
-        result = LSF.Result(job, job_id)
-        return result
-
-    @submit.register(list)
-    def _(self, jobs):
-        """
-        Submit method of LSF() that takes a list of jobs instead of just one and submits each one
-        with qsub. Possibly with multiple submissions based on input file splitting.
-        """
-        results = []
-        # Submit the jobs to LSF
-        for job in jobs:
-            results.append(self.submit(job))
-        B2INFO('All Requested Jobs Submitted')
-        return results
+        B2INFO("Job ID of Job({}) recorded as: {}".format(job.name, job_id))
+        job.result = cls.Result(job, job_id)
 
 
 class DIRAC(Backend):

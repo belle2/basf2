@@ -12,6 +12,7 @@
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/SimpleCDCVXDTrackCombinationFilter.h>
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/Chi2CDCVXDTrackCombinationFilter.h>
 #include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCVXDTrackCombinationTruthVarSet.h>
+#include <tracking/ckf/filters/cdcTrackSpacePointCombination/CDCVXDTrackCombinationVarSet.h>
 
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.h>
@@ -29,6 +30,11 @@ namespace {
 
   /// MC filter for VXD - CDC relations.
   using MCCTruthNumberCDCVXDTrackCombinationFilter = NamedChoosableVarSetFilter<CDCVXDTrackCombinationTruthVarSet>;
+
+  /// Basic recording filter for VXD - CDC relations.
+  using RecordingCDCVXDTrackCombinationFilter =
+    RecordingFilter<VariadicUnionVarSet<CDCVXDTrackCombinationTruthVarSet, CDCVXDTrackCombinationVarSet>>;
+
 
   /// All filter for VXD - CDC relations.
   using AllCDCVXDTrackCombinationFilter = AllFilter<BaseCDCVXDTrackCombinationFilter>;
@@ -55,6 +61,7 @@ CDCVXDTrackCombinationFilterFactory::getValidFilterNamesAndDescriptions() const
   return {
     {"none", "no track combination is valid"},
     {"all", "set all track combinations as good"},
+    {"recording", "record variables to a TTree"},
     {"truth", "monte carlo truth"},
     {"truth_number", "monte carlo truth returning the number of correct hits"},
     {"simple", "simple filter based on simple parameters"},
@@ -69,6 +76,8 @@ CDCVXDTrackCombinationFilterFactory::create(const std::string& filterName) const
     return makeUnique<NoneFilter<BaseCDCVXDTrackCombinationFilter>>();
   } else if (filterName == "all") {
     return makeUnique<AllCDCVXDTrackCombinationFilter >();
+  } else if (filterName == "recording") {
+    return makeUnique<RecordingCDCVXDTrackCombinationFilter>();
   } else if (filterName == "truth") {
     return makeUnique<MCCDCVXDTrackCombinationFilter >();
   } else if (filterName == "truth_number") {

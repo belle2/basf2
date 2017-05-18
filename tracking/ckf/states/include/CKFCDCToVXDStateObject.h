@@ -104,7 +104,9 @@ namespace Belle2 {
       double chi2 = 0;
 
       const auto& chi2Adder = [&chi2](const CKFCDCToVXDStateObject * walkObject) {
-        chi2 += walkObject->getChi2();
+        if (walkObject->isFitted()) {
+          chi2 += walkObject->getChi2();
+        }
       };
       walk(chi2Adder);
 

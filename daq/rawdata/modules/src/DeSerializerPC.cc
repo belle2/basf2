@@ -754,7 +754,7 @@ void DeSerializerPCModule::event()
   m_eventMetaDataPtr->setSubrun(subrun_copper_0);
   m_eventMetaDataPtr->setEvent(eve_copper_0);
   if (error_bit_flag != 0) {
-    m_eventMetaDataPtr->addErrorFlag(EventMetaData::c_B2LinkCRCError);
+    m_eventMetaDataPtr->addErrorFlag(EventMetaData::c_B2LinkEventCRCError);
     printf("[ERROR] error bit was detected. exp %d run %d eve %d count = %d\n",
            exp_copper_0, run_copper_0, eve_copper_0, error_bit_flag);
   }

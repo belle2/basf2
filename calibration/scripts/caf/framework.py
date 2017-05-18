@@ -140,6 +140,9 @@ class Calibration():
         #: Variable to define the maximum number of iterations for this calibration specifically.
         #: It overrides tha CAF calibration_defaults value if set.
         self.max_iterations = None
+        #: Maximum number of input files per subjob during the collector step (passed to Job object, see backends.py)
+        #: -1 is the default meaning that all input files are run in one big collector job.
+        self.max_files_per_collector_job = -1
 
     def _apply_calibration_defaults(self, defaults):
         """

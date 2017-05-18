@@ -30,7 +30,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPLikelihood.h>
 #include <top/dataobjects/TOPBarHit.h>
-#include <top/dataobjects/TOPPull.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
 
@@ -272,32 +271,6 @@ namespace Belle2 {
       }
 
       m_treeTop->Fill();
-
-      if (!extHit) continue;
-
-      const auto pulls = track.getRelationsWith<TOPPull>();
-      std::vector<const TOPPull*> photonPulls;
-      for (const auto& pull : pulls) {
-        photonPulls.push_back(&pull);
-        if (!pull.isSignal()) {
-          double sum = 0;
-          double rnd = gRandom->Rndm();
-          for (const auto& photonPull : photonPulls) {
-            sum += photonPull->getWeight();
-            if (rnd < sum) {
-              m_pixelID = photonPull->getPixelID();
-              m_t = photonPull->getTime();
-              m_t0 = photonPull->getMeanTime();
-              m_sigma = photonPull->getSigma();
-              m_phiCer = photonPull->getPhiCer();
-              m_wt = photonPull->getWeight();
-              m_treePulls->Fill();
-              break;
-            }
-          }
-          photonPulls.clear();
-        }
-      }
 
     }
 

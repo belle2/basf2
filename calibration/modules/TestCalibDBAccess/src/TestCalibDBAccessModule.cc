@@ -41,8 +41,8 @@ TestCalibDBAccessModule::~TestCalibDBAccessModule()
 
 void TestCalibDBAccessModule::event()
 {
-  cout << "TestCalibMean mean value = " << m_obj_constant->GetMean() << "\n";
-  cout << "TestCalibMean mean error value = " << m_obj_constant->GetMeanError() << "\n";
+  cout << "TestCalibMean mean value = " << m_obj_constant->getMean() << "\n";
+  cout << "TestCalibMean mean error value = " << m_obj_constant->getMeanError() << "\n";
   cout << "TestCalibObject[0] value = " << m_array_constants[0]->getConstantValue() << "\n";
   cout << "TestCalibObject[1] value = " << m_array_constants[1]->getConstantValue() << "\n";
 }

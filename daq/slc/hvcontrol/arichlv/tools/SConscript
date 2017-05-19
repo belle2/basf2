@@ -1,0 +1,5 @@
+Import('env')
+
+env['TOOLS_LIBS']['arichlvhvd'] = ['pthread', '$PGSQL_LIBS', 'daq', 'framework', 'nsm2_b2lib', 'nsm2_corelib']
+
+Return('env')

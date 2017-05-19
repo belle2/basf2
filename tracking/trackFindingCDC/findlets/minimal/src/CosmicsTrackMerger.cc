@@ -31,6 +31,7 @@ void CosmicsTrackMerger::exposeParameters(ModuleParamList* moduleParamList, cons
                                 "Use a simple approach just based on the number of tracks in the event",
                                 m_param_useSimpleApproach);
 
+
   moduleParamList->addParameter("minimalNumberOfHits", m_param_minimalNumberOfHits,
                                 "Minimal amount of hits a track must have to be used in the merging procedure.",
                                 m_param_minimalNumberOfHits);
@@ -38,37 +39,55 @@ void CosmicsTrackMerger::exposeParameters(ModuleParamList* moduleParamList, cons
 
 void CosmicsTrackMerger::apply(const std::vector<CDCTrack>& inputTracks, std::vector<CDCTrack>& outputTracks)
 {
-  // Create a list of valid cosmic tracks sorted by their y position
+  // Create a list of valid cosmic tracks
   std::vector<const CDCTrack*> outputTrackPath;
   outputTrackPath.reserve(inputTracks.size());
 
-  const auto& fulfillsFeasibleCriteria = [this](const CDCTrack & track) {
-    return track.size() >= m_param_minimalNumberOfHits;
-  };
-
-  for (const CDCTrack& track : inputTracks) {
-    if (fulfillsFeasibleCriteria(track)) {
-      outputTrackPath.push_back(&track);
-    }
-  }
-
-  // Sort the tracks by their start position from top to bottom
-  // TODO: see how we can generalize this
-  const auto& trackSorter = [](const CDCTrack * lhs, const CDCTrack * rhs) {
-    return lhs->getStartRecoPos3D().y() > rhs->getStartRecoPos3D().y();
-  };
-  std::sort(outputTrackPath.begin(), outputTrackPath.end(), trackSorter);
-
   if (m_param_useSimpleApproach) {
+    const auto& fulfillsFeasibleCriteria = [this](const CDCTrack & track) {
+      return track.size() >= m_param_minimalNumberOfHits;
+    };
+
+    for (const CDCTrack& track : inputTracks) {
+      if (fulfillsFeasibleCriteria(track)) {
+        outputTrackPath.push_back(&track);
+      }
+    }
+
     if (outputTrackPath.size() > 2) {
       B2WARNING("Having found more than 2 possible candidates. The simple approach does not work here.");
       outputTrackPath.clear();
     }
   } else {
-    B2FATAL("Not implemented!");
+    // Possibilities:
+    // (1) chi2 with fitting (slow?)
+    // (2) filters (maybe use already created?)
+    // (3) distances etc
+
+    // TODO: should we also work in the minimal hit property here?
+
+    // Create linking relations
+    m_trackRelations.clear();
+    m_trackRelationCreator.apply(inputTracks, m_trackRelations);
+
+    if (not m_trackRelations.empty()) {
+      std::sort(m_trackRelations.begin(), m_trackRelations.end());
+
+      // only use the best two combination
+      outputTrackPath.push_back(m_trackRelations[0].getFrom());
+      outputTrackPath.push_back(m_trackRelations[0].getTo());
+    }
   }
 
   if (not outputTrackPath.empty()) {
+    // Sort the tracks by their start position from top to bottom
+    // TODO: see how we can generalize this
+    const auto& trackSorter = [](const CDCTrack * lhs, const CDCTrack * rhs) {
+      return lhs->getStartRecoPos3D().y() > rhs->getStartRecoPos3D().y();
+    };
+    std::sort(outputTrackPath.begin(), outputTrackPath.end(), trackSorter);
+
+
     // As we assume only one track per event, we merge them all together.
     outputTracks.push_back(CDCTrack::condense(outputTrackPath));
   }

@@ -11,6 +11,9 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <tracking/trackFindingCDC/findlets/minimal/WeightedRelationCreator.h>
+#include <tracking/trackFindingCDC/filters/trackRelation/ChooseableTrackRelationFilter.h>
+
 #include <vector>
 #include <string>
 
@@ -44,6 +47,12 @@ namespace Belle2 {
 
       /// Parameter: minimal amount of hits a track must have to be used in the merging procedure
       unsigned int m_param_minimalNumberOfHits = 40;
+
+      /// Subfindlet for creating relations of needed
+      WeightedRelationCreator<const CDCTrack, ChooseableTrackRelationFilter> m_trackRelationCreator;
+
+      /// Memory for the relations between tracks to be followed on linking
+      std::vector<WeightedRelation<const CDCTrack> > m_trackRelations;
     };
   }
 }

@@ -115,6 +115,7 @@ void BoardStackStatus::InitNSMCallbacksSCROD(Belle2::HSLB& hslb, Belle2::RCCallb
   callback.add(new NSMVHandlerInt(vname + "fwVersion", true, false, 0));
   callback.add(new NSMVHandlerInt(vname + "elfVersion", true, false, 0));
   callback.add(new NSMVHandlerInt(vname + "trigMask", true, false, 0));
+  callback.add(new NSMVHandlerInt(vname + "SCRODFeModeGet", true, false, 0));
   callback.add(new NSMVHandlerFloat(vname + "tempFPGA", true, false, 0));
   callback.add(new NSMVHandlerFloat(vname + "vRAW1", true, false, 0));
   callback.add(new NSMVHandlerFloat(vname + "vRAW2", true, false, 0));
@@ -160,6 +161,8 @@ void BoardStackStatus::UpdateNSMCallbacksSCROD(Belle2::HSLB& hslb, Belle2::RCCal
   callback.set(vname + "tempWall", m_boardstackObservables.sWallTemperature);
   callback.set(vname + "humidity", m_boardstackObservables.sHumidity);
   callback.set(vname + "humidityTemp", m_boardstackObservables.sHumidityTemperature);
+
+  callback.set(vname + "SCRODFeModeGet", m_boardstackObservables.sFEMode);
 
   std::string str = StringUtil::form("(BS: %d, SCROD: %d)", hslb.get_finid(), m_boardstackObservables.scrodID / 16);
   if (vRAW1_nominal + vRAW_high_margin < m_boardstackObservables.sVoltageRaw1) {
@@ -251,6 +254,7 @@ void BoardStackStatus::ReadSCRODObervables(Belle2::HSLB& hslb)
   m_boardstackObservables.sVoltageRaw1 = convert_FPGA_voltage_from_external_voltage_divider(Read_Register(hslb, SCROD_XADC_V_RAW1));
   m_boardstackObservables.sVoltageRaw2 = convert_FPGA_voltage_from_external_voltage_divider(Read_Register(hslb, SCROD_XADC_V_RAW2));
   m_boardstackObservables.sVoltageRaw3 = convert_FPGA_voltage_from_external_voltage_divider(Read_Register(hslb, SCROD_XADC_V_RAW3));
+  m_boardstackObservables.sFEMode = Read_Register(hslb, SCROD_PS_featureExtMode);
 }
 
 void BoardStackStatus::ReadCarrierObservables(Belle2::HSLB& hslb, const unsigned carrier)

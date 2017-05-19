@@ -50,7 +50,7 @@ namespace PrepBoardstackFE {
 
   void InitCallbacks(Belle2::HSLB& hslb, Belle2::RCCallback& callback)
   {
-    callback.add(new NSMVHandlerInt("ScrodfeMode", true, true, 3));
+    //callback.add(new NSMVHandlerInt("ScrodfeMode", true, true, 3));
   }
 
   void PrepareBoardStack(Belle2::HSLB& hslb, const int mode, const unsigned cfdthreshold)
@@ -65,10 +65,10 @@ namespace PrepBoardstackFE {
     LoadDefaultRegisterValues();
     int nCarriers = Read_Register(hslb, SCROD_PS_carriersDetected, 0, 0);
     if (nCarriers  < 4) {
-      callback.log(LogFile::WARNING, "Less than 4 carriers detected!");
+      cout << "WARNING: less than 4 carriers detected!" << endl;
     }
     if (nCarriers > 4) {
-      callback.log(LogFile::ERROR, "More than 4 carriers detected!?");
+      cout << "ERROR: more than 4 carriers detected!?" << endl;
     }
     Write_Register(hslb, SCROD_PS_pedCalcMode, pedCalcMode_normal, 0, 0);
     Write_Register(hslb, SCROD_PS_pedCalcTimeout, 0x00008000, 0, 0);
@@ -84,15 +84,15 @@ namespace PrepBoardstackFE {
         cout << "Pedestals passed quality check" << endl;
         break;
       } else if (pedQuality < 0) {
-        callback.log(LogFile::ERROR, "Could not get pedestal data. Aborting check!");
+        cout << "Could not get pedestal data. Aborting check!" << endl;
         break;
       } else {
-        callback.log(LogFile::WARNING, "Bad Pedestals. Trying pedestal accquisition again.");
+        cout << "Bad Pedestals. Trying pedestal accquisition again." << endl;
       }
       retries--;
     }
 
-    if (retries == 0) callback.log(LogFile::ERROR, "Did not obtain clean pedestals.");
+    if (retries == 0) cout << "Did not obtain clean pedestals." << endl;
 
     Write_Register(hslb, SCROD_PS_cfdThreshold, cfdthreshold, 0, 0);
     Write_Register(hslb, SCROD_PS_cfdPercent, registerValueMap["cfdPercent"], 0, 0);
@@ -102,9 +102,8 @@ namespace PrepBoardstackFE {
     } else {
       int mode_ext = 3;
       callback.get("ScrodfeMode", mode_ext);
-      if (mode_ext < 0 || mode_ext > 4) mode_ext = 0;
       Write_Register(hslb, SCROD_PS_featureExtMode, mode_ext, 0, 0);
-      callback.log(LogFile::DEBUG, StringUtil::form("Feature Extraction Mode = %d", featureExtModeList[mode_ext]));
+      cout << "Feature Extraction Mode = " << featureExtModeList[mode_ext] << endl;
     }
 
     return 0;

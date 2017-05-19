@@ -23,5 +23,11 @@ namespace PrepBoardstackData {
   void PrepareAsic(Belle2::HSLB& hslb, Belle2::RCCallback& callback, const unsigned carrier,
                    const unsigned asic);
 
+  void SetLookback(Belle2::HSLB& hslb, const int lookback);
+  void SetLookback(Belle2::HSLB& hslb, const unsigned carrier, const unsigned asic,
+                   const int lookback);
+
+  void SetFEMode(Belle2::HSLB& hslb, const int femode);
+
 }
 #endif

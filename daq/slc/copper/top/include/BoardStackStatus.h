@@ -30,6 +30,7 @@ struct BoardstackObservables {
   float sDieTemperature, sWallTemperature, sHumidityTemperature;
   float sHumidity;
   float sVoltageRaw1, sVoltageRaw2, sVoltageRaw3;
+  int sFEMode;
   //float sVoltage25, sVoltage33, sVoltage25MIO, sVoltage18AuxIO;
   //float sVoltage18VCCO, sVoltage25VCCO, sVoltage10GTX, sVoltage12GTX;
   std::string sARMState;

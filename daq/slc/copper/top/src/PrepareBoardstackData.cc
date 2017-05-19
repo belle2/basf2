@@ -29,12 +29,11 @@ namespace PrepBoardstackData {
   void PrepareBoardStack(HSLB& hslb, RCCallback& callback)
   {
     int mode_ext = 3;//set standard to FE+ped-sub
-    //this callback should get defined in PrepareBoardstackFe.cpp
     callback.get("ScrodfeMode", mode_ext);
-    if (mode_ext < 0 || mode_ext > 4) mode_ext = 0;
+    if (mode_ext < 0 || mode_ext > 4) mode_ext = 3;
+    SetFEMode(hslb, mode_ext);
 
     Write_Register(hslb, SCROD_AxiCommon_trigMask, 0, 0, 0);
-    Write_Register(hslb, SCROD_PS_featureExtMode, mode_ext, 0, 0);
 
     int carriersDetected = Read_Register(hslb, SCROD_PS_carriersDetected, 0, 0);
     cout << carriersDetected << " carriers detected" << endl;
@@ -58,6 +57,11 @@ namespace PrepBoardstackData {
                    const unsigned asic)
   {
     cout << "carrier " << carrier << " asic " << asic << endl;
+
+    int lookback = 28;
+    callback.get("Lookback", lookback);
+    SetLookback(hslb, carrier, asic, lookback);
+
     Write_Register(hslb, CARRIER_IRSX_wrAddrMode, wrAddrMode_Cyclic, carrier, asic);
     Write_Register(hslb, CARRIER_IRSX_wrAddrStart, 0x0, carrier, asic);
     Write_Register(hslb, CARRIER_IRSX_wrAddrStop, 0xfd, carrier, asic);
@@ -65,12 +69,9 @@ namespace PrepBoardstackData {
 
     Write_Register(hslb, CARRIER_IRSX_readoutMode, readoutMode_ROI, carrier, asic);
 
-    Write_Register(hslb, CARRIER_IRSX_readoutLookback, 44, carrier, asic);
     Write_Register(hslb, CARRIER_IRSX_writesAfterTrig, 42, carrier, asic);
     Write_Register(hslb, CARRIER_IRSX_readoutWindows, 15, carrier, asic);
     Write_Register(hslb, CARRIER_IRSX_convertResetWait, 0xf, carrier, asic);
-
-    Write_Register(hslb, CARRIER_IRSX_readoutChannels, 0x6000 + 125, carrier, asic);
 
     Write_Register(hslb, CARRIER_IRSX_enableTestPattern, 0, carrier, asic);
     int phase = 0;
@@ -90,4 +91,26 @@ namespace PrepBoardstackData {
 
     cout << "--> Current phase set to " << curphase << endl;
   }
+
+  void SetLookback(Belle2::HSLB& hslb, const int lookback)
+  {
+    for (unsigned carrier = 0; carrier < 4; carrier++) {
+      for (unsigned asic = 0; asic < 4; asic++) {
+        SetLookback(hslb, carrier, asic, lookback);
+      }
+    }
+  }
+
+  void SetLookback(Belle2::HSLB& hslb, const unsigned carrier, const unsigned asic,
+                   const int lookback)
+  {
+    Write_Register(hslb, CARRIER_IRSX_readoutLookback, lookback, carrier, asic);
+    Write_Register(hslb, CARRIER_IRSX_readoutChannels, 0x5000 + (lookback * 4) - 3, carrier, asic);
+  }
+
+  void SetFEMode(Belle2::HSLB& hslb, const int femode)
+  {
+    Write_Register(hslb, SCROD_PS_featureExtMode, femode, 0, 0);
+  }
+
 }

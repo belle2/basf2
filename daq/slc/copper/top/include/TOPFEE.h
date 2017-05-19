@@ -3,6 +3,10 @@
 
 #include <daq/slc/copper/FEE.h>
 
+#include "daq/slc/copper/top/BoardStackStatus.h"
+
+#include <map>
+
 namespace Belle2 {
 
   class TOPFEE : public FEE {
@@ -16,6 +20,11 @@ namespace Belle2 {
     virtual void boot(RCCallback& callback, HSLB& hslb, const DBObject& obj);
     virtual void load(RCCallback& callback, HSLB& hslb, const DBObject& obj);
     virtual void monitor(RCCallback& callback, HSLB& hslb);
+
+  private:
+    std::map<int, int> m_numberOfCarriers; /**number of carriers connected to scrods*/
+    std::map<int, BoardStackStatus> m_statusMonitor;/**board stack status object for every fee module connected to copper*/
+    bool m_initialConfigurationDone; /**flag to indicate if inital configuration has been performed */
 
   };
 

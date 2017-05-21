@@ -3,7 +3,7 @@
  * Copyright(C) 2012 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guofu Cao, Martin Heck                                   *
+ * Contributors: Guofu Cao, Martin Heck, CDC group                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,6 +13,8 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
+//temp
+//#include <framework/datastore/RelationIndex.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
@@ -89,7 +91,9 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("AddTimeOfFlight4Bg",   m_addTimeOfFlight4Bg,
            "The same switch but for beam bg. hits.", true);
   addParam("OutputNegativeDriftTime", m_outputNegativeDriftTime, "Output hits with negative drift time", true);
-
+  addParam("Output2ndHit", m_output2ndHit,
+           "Output the 2nd hit if exists in the time window. Note that it is not well-simulated at all, partly because no cross-talk betw. channels is simulated.",
+           false);
   //Switch to control sense wire sag
   addParam("CorrectForWireSag",   m_correctForWireSag,
            "A switch for sense wire sag effect; true: drift-time is calculated with the sag taken into account; false: not. Here, sag means the perturbative part which corresponds to (mis)alignment in case of wire-position. The main part (corresponding to design+displacement in wire-position) is taken into account in FullSim; you can control it via CDCJobCntlParModifier.",
@@ -329,6 +333,10 @@ void CDCDigitizerModule::event()
       // ... smallest drift time has to be checked, ...
 
       if (hitDriftTime < iterSignalMap->second.m_driftTime) {
+        iterSignalMap->second.m_driftTime3 = iterSignalMap->second.m_driftTime2;
+        iterSignalMap->second.m_simHitIndex3 = iterSignalMap->second.m_simHitIndex2;
+        iterSignalMap->second.m_driftTime2 = iterSignalMap->second.m_driftTime;
+        iterSignalMap->second.m_simHitIndex2 = iterSignalMap->second.m_simHitIndex;
         iterSignalMap->second.m_driftTime   = hitDriftTime;
         iterSignalMap->second.m_simHitIndex = iHits;
         B2DEBUG(250, "hitDriftTime of current Signal: " << hitDriftTime << ",  hitDriftLength: " << hitDriftLength);
@@ -378,31 +386,90 @@ void CDCDigitizerModule::event()
     //N.B. No bias (+ or -0.5 count) is introduced on average in digitization by the real TDC (info. from KEK electronics division). So round off (t0 - drifttime) below.
     unsigned short tdcCount = static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime) *
                                                           m_tdcBinWidthInv + 0.5);
-    //    //set tdcCount2ndHit = tdcCount
-    //    cdcHits.appendNew(tdcCount, getADCCount(iterSignalMap->second.m_charge), iterSignalMap->first, tdcCount);
-    //set tdcCount2ndHit = default value
-    cdcHits.appendNew(tdcCount, adcCount, iterSignalMap->first);
+    CDCHit* firstHit = cdcHits.appendNew(tdcCount, adcCount, iterSignalMap->first);
+    //temp
+    //    std::cout <<"firsthit?= " << firstHit->is2ndHit() << std::endl;
+    //set a relation: CDCSimHit -> CDCHit
+    cdcSimHitsToCDCHits.add(iterSignalMap->second.m_simHitIndex, iCDCHits);
+
+    //set a relation: MCParticle -> CDCHit
+    RelationVector<MCParticle> rels = simHits[iterSignalMap->second.m_simHitIndex]->getRelationsFrom<MCParticle>();
+    if (rels.size() != 0) {
+      //assumption: only one MCParticle
+      const MCParticle* mcparticle = rels[0];
+      double weight = rels.weight(0);
+      mcparticle->addRelationTo(firstHit, weight);
+    }
+
+    //Set 2nd-hit related things if it exists
+    if (m_output2ndHit && iterSignalMap->second.m_simHitIndex2 >= 0) {
+      unsigned short tdcCount2 = static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime2) *
+                                                             m_tdcBinWidthInv + 0.5);
+      if (tdcCount2 != tdcCount) {
+        CDCHit* secondHit = cdcHits.appendNew(tdcCount2, adcCount, iterSignalMap->first);
+        secondHit->set2ndHitFlag();
+        //temp
+        //  std::cout <<"2ndhit?= " << secondHit->is2ndHit() << std::endl;
+
+        //set a relation: CDCSimHit -> CDCHit
+        ++iCDCHits;
+        cdcSimHitsToCDCHits.add(iterSignalMap->second.m_simHitIndex2, iCDCHits);
+        //temp
+        //        std::cout << "settdc2 " << firstHit->getTDCCount() << " " << secondHit->getTDCCount() << std::endl;
+
+        //set a relation: MCParticle -> CDCHit
+        RelationVector<MCParticle> rels = simHits[iterSignalMap->second.m_simHitIndex2]->getRelationsFrom<MCParticle>();
+        if (rels.size() != 0) {
+          //assumption: only one MCParticle
+          const MCParticle* mcparticle = rels[0];
+          double weight = rels.weight(0);
+          mcparticle->addRelationTo(secondHit, weight);
+        }
+      } else { //Check the 3rd hit when tdcCount = tdcCount2
+        //temp
+        //        std::cout << "tdcCount1=2" << std::endl;
+        if (iterSignalMap->second.m_simHitIndex3 >= 0) {
+          unsigned short tdcCount3 = static_cast<unsigned short>((m_cdcgp->getT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime3) *
+                                                                 m_tdcBinWidthInv + 0.5);
+          //temp
+          //          std::cout << "tdcCount3= " << tdcCount3 << " " << tdcCount << std::endl;
+          if (tdcCount3 != tdcCount) {
+            CDCHit* secondHit = cdcHits.appendNew(tdcCount3, adcCount, iterSignalMap->first);
+            secondHit->set2ndHitFlag();
+            //temp
+            //      std::cout <<"2ndhit?= " << secondHit->is2ndHit() << std::endl;
+
+            //set a relation: CDCSimHit -> CDCHit
+            ++iCDCHits;
+            cdcSimHitsToCDCHits.add(iterSignalMap->second.m_simHitIndex3, iCDCHits);
+            //            std::cout << "settdc3 " << firstHit->getTDCCount() << " " << secondHit->getTDCCount() << std::endl;
+
+            //set a relation: MCParticle -> CDCHit
+            RelationVector<MCParticle> rels = simHits[iterSignalMap->second.m_simHitIndex3]->getRelationsFrom<MCParticle>();
+            if (rels.size() != 0) {
+              //assumption: only one MCParticle
+              const MCParticle* mcparticle = rels[0];
+              double weight = rels.weight(0);
+              mcparticle->addRelationTo(secondHit, weight);
+            }
+          }
+        }
+      } //end of checking tdcCount 1=2 ?
+    } //end of 2nd hit setting
 
     //    std::cout <<"t0= " << m_cdcgp->getT0(iterSignalMap->first) << std::endl;
     /*    unsigned short tdcInCommonStop = static_cast<unsigned short>((m_tdcOffset - iterSignalMap->second.m_driftTime) * m_tdcBinWidthInv);
     float driftTimeFromTDC = static_cast<float>(m_tdcOffset - (tdcInCommonStop + 0.5)) * m_tdcBinWidth;
     std::cout <<"driftT bf digitization, TDC in common stop, digitized driftT = " << iterSignalMap->second.m_driftTime <<" "<< tdcInCommonStop <<" "<< driftTimeFromTDC << std::endl;
     */
-
-    //add entry : CDCSimHit <-> CDCHit
-    cdcSimHitsToCDCHits.add(iterSignalMap->second.m_simHitIndex, iCDCHits);
-
-    const CDCHit* cdcHit = cdcHits[cdcHits.getEntries() - 1];
-    RelationVector<MCParticle> rels = simHits[iterSignalMap->second.m_simHitIndex]->getRelationsFrom<MCParticle>();
-
-    if (rels.size() != 0) {
-      //assumption: only one MCParticle
-      const MCParticle* mcparticle = rels[0];
+    /*
+    if (rels.size() == 0) {
+      std::cout <<"try to set null rel" << std::endl;
+      const MCParticle* mcparticle = nullptr;
       double weight = rels.weight(0);
-
-      mcparticle->addRelationTo(cdcHit, weight);
+      cdcHit->addRelationTo(mcparticle, weight);
     }
-
+    */
     ++iCDCHits;
   }
 
@@ -428,6 +495,19 @@ void CDCDigitizerModule::event()
     }
   }
 
+  /*
+  std::cout << " " << std::endl;
+  RelationIndex<MCParticle, CDCHit> mcp_to_hit(mcParticles, cdcHits);
+  if (!mcp_to_hit) B2FATAL("No MCParticle -> CDCHit relation founf!");
+  typedef RelationIndex<MCParticle, CDCHit>::Element RelationElement;
+  int ncdcHits = cdcHits.getEntries();
+  for (int j = 0; j < ncdcHits; ++j) {
+    for (const RelationElement& rel : mcp_to_hit.getElementsTo(cdcHits[j])) {
+      //      std::cout << j << " " << rel.from->getIndex() << " " << rel.weight << std::endl;
+      //      std::cout << rel.from->getWeight() << std::endl;
+    }
+  }
+  */
 }
 
 float CDCDigitizerModule::smearDriftLength(const float driftLength, const float dDdt)

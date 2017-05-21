@@ -17,6 +17,7 @@ using namespace TrackFindingCDC;
 
 CosmicsTrackMerger::CosmicsTrackMerger()
 {
+  addProcessingSignalListener(&m_trackRelationCreator);
 }
 
 std::string CosmicsTrackMerger::getDescription()

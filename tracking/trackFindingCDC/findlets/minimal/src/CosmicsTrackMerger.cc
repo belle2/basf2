@@ -10,6 +10,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/CosmicsTrackMerger.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/numerics/Angle.h>
 #include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
@@ -53,19 +54,20 @@ void CosmicsTrackMerger::apply(const std::vector<CDCTrack>& inputTracks, std::ve
   }
 
   if (m_param_useSimpleApproach) {
-    const auto& fulfillsFeasibleCriteria = [this](const CDCTrack & track) {
-      return track.size() >= m_param_minimalNumberOfHits;
+    const auto& tracksFitTogether = [](const CDCTrack & lhs, const CDCTrack & rhs) {
+      const double lhsPhi = lhs.getStartTrajectory3D().getFlightDirection3DAtSupport().phi();
+      const double rhsPhi = rhs.getStartTrajectory3D().getFlightDirection3DAtSupport().phi();
+
+      return std::fabs(AngleUtil::normalised(lhsPhi - rhsPhi)) < 0.2;
     };
 
-    for (const CDCTrack& track : inputTracks) {
-      if (fulfillsFeasibleCriteria(track)) {
-        outputTrackPath.push_back(&track);
-      }
-    }
+    if (inputTracks.size() == 2 and tracksFitTogether(inputTracks.front(), inputTracks.back())) {
+      outputTrackPath.push_back(&inputTracks.front());
+      outputTrackPath.push_back(&inputTracks.back());
+    } else {
+      B2WARNING("Not having found 2 possible candidates. The simple approach does not work here.");
 
-    if (outputTrackPath.size() != 2) {
-      B2WARNING("Having found more or less than 2 possible candidates. The simple approach does not work here.");
-
+      // Just copy all tracks to the output.
       for (const CDCTrack& track : inputTracks) {
         outputTracks.push_back(track);
       }

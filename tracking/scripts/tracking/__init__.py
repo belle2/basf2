@@ -401,7 +401,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks", with_ca=False):
                     recoTracksStoreArrayName=reco_tracks)
 
 
-def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0, 0)):
+def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0, 0), merge_tracks=True):
     """
     Convenience function for adding all cdc track finder modules currently dedicated for the CDC-TOP testbeam
     to the path.
@@ -414,6 +414,8 @@ def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0
        The path to be filled
     reco_tracks: str
        Name of the output RecoTracks. Defaults to RecoTracks.
+    merge_tracks: bool
+       The upper and lower half of the tracks should be merged together in one track
     """
 
     # Init the geometry for cdc tracking and the hits
@@ -459,14 +461,26 @@ def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0
                     TrackOrientation="downwards",
                     )
 
+    output_tracks = "OrientedCDCTrackVector"
+
+    if merge_tracks:
+        # Merge tracks together if needed
+        path.add_module("TFCDC_CosmicsTrackMerger",
+                        inputTracks="OrientedCDCTrackVector",
+                        tracks="MergedCDCTrackVector",
+                        useSimpleApproach=True,
+                        )
+
+        output_tracks = "MergedCDCTrackVector"
+
     # Correct time seed - assumes velocity near light speed
     path.add_module("TFCDC_TrackFlightTimeAdjuster",
-                    inputTracks="OrientedCDCTrackVector",
+                    inputTracks=output_tracks,
                     )
 
     # Export CDCTracks to RecoTracks representation
     path.add_module("TFCDC_TrackExporter",
-                    inputTracks="OrientedCDCTrackVector",
+                    inputTracks=output_tracks,
                     RecoTracksStoreArrayName=reco_tracks)
 
 

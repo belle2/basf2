@@ -58,7 +58,7 @@ void CosmicsTrackMerger::apply(const std::vector<CDCTrack>& inputTracks, std::ve
     };
 
     for (const CDCTrack& track : inputTracks) {
-      if (fulfillsFeasibleCriteria(track)) {
+      if (fulfillsFeasibleCriteria(track) or inputTracks.size() == 2) {
         outputTrackPath.push_back(&track);
       }
     }

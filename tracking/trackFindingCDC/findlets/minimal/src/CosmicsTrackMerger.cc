@@ -58,14 +58,19 @@ void CosmicsTrackMerger::apply(const std::vector<CDCTrack>& inputTracks, std::ve
     };
 
     for (const CDCTrack& track : inputTracks) {
-      if (fulfillsFeasibleCriteria(track) or inputTracks.size() == 2) {
+      if (fulfillsFeasibleCriteria(track)) {
         outputTrackPath.push_back(&track);
       }
     }
 
-    if (outputTrackPath.size() > 2) {
-      B2WARNING("Having found more than 2 possible candidates. The simple approach does not work here.");
-      outputTrackPath.clear();
+    if (outputTrackPath.size() != 2) {
+      B2WARNING("Having found more or less than 2 possible candidates. The simple approach does not work here.");
+
+      for (const CDCTrack& track : inputTracks) {
+        outputTracks.push_back(track);
+      }
+
+      return;
     }
   } else {
     // Possibilities:

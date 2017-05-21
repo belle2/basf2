@@ -44,6 +44,14 @@ void CosmicsTrackMerger::apply(const std::vector<CDCTrack>& inputTracks, std::ve
   std::vector<const CDCTrack*> outputTrackPath;
   outputTrackPath.reserve(inputTracks.size());
 
+  // Some simple cases
+  if (inputTracks.empty()) {
+    return;
+  } else if (inputTracks.size() == 1) {
+    outputTracks.push_back(inputTracks.front());
+    return;
+  }
+
   if (m_param_useSimpleApproach) {
     const auto& fulfillsFeasibleCriteria = [this](const CDCTrack & track) {
       return track.size() >= m_param_minimalNumberOfHits;

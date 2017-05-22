@@ -83,8 +83,6 @@ namespace Belle2 {
     float m_KLMhitDepth;
     /** Energy deposit in KLM (0.2 GeV * nHitCells) */
     float m_KLMenergy;
-    /** distance KLM Cluster <-> track extrapolated into KLM */
-    float m_KLMtrackDist;
     /** distance to next KLM cluster */
     float m_KLMnextCluster;
     /** distance from track separation object  */
@@ -113,19 +111,37 @@ namespace Belle2 {
     float m_KLMECLE9oE25;
     /** timing of associated ECL cluster */
     float m_KLMECLTiming;
-    /** uncertafloaty on time in associated ECL cluster */
+    /** uncertanty on time in associated ECL cluster */
     float m_KLMECLTerror;
-    /** uncertafloaty on E in associated ECL cluster */
+    /** uncertanty on E in associated ECL cluster */
     float m_KLMECLEerror;
     /** primitive distance cluster <-> track for associated ECL cluster */
-    float m_KLMtrackToECL;
+    //float m_KLMtrackToECL;
+
+    /** clustering hypothesis of closest ECL (N1: 5 :: photon, N2: 6 :: hadron)*/
+    //float m_KLMECLHypo;
+    /** output of a BDT fitted on various Z-moments for the closest ECL cluster */
+    float m_KLMECLZMVA;
+    /** zernike moment 4,0 of closest ECL */
+    float m_KLMECLZ40;
+    /** zernike moment 5,1 of closest ECL */
+    float m_KLMECLZ51;
+    /** phi uncertainty of closest ECL cluster */
+    //float m_KLMECLUncertaintyPhi;
+    /** theta uncertainty of closest ECL cluster */
+    //float m_KLMECLUncertaintyTheta;
+
+
+
 
     /** vars to be classified */
     std::vector<float> m_feature_variables;
 
     /** mva identifier. no ending means its loaded from the database  */
-    std::string m_identifier = FileSystem::findFile(
-                                 "reconstruction/data/weights/KLMKLExpert.xml") ; /** weight file  */
+    std::string m_identifier = "KLM_fBDT_1.0xbkg100krelease9"; /** weight file  */
+
+    //"reconstruction/data/weights/KLM_fBDT_1.0xbkg100krelease9") ; /** weight file  */
+
 
     /** Database pointer to the Database representation of the weightfile */
     std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>

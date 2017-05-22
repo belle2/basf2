@@ -12,6 +12,7 @@
 #include <reconstruction/dataobjects/KlId.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/logging/Logger.h>
 
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -24,6 +25,7 @@
 
 #include <mva/interface/Interface.h>
 
+// here's where the functions are hidden
 #include "reconstruction/modules/KlId/KLMExpert/helperFunctions.h"
 
 using namespace KlIdHelpers;
@@ -32,9 +34,12 @@ using namespace std;
 
 REG_MODULE(KLMExpert);
 
-KLMExpertModule::KLMExpertModule(): Module(), m_feature_variables(12, 0)
+KLMExpertModule::KLMExpertModule(): Module(), m_feature_variables(18, 0) //12
 {
-  setDescription("Use to calculate KlId for each KLMCluster.");
+  setDescription("Use to calculate KlId for each KLM cluster.");
+  addParam("classifierPath", m_identifier,
+           "path to the classifier you want to use. It is recommended to use the default classifiers and not to mess around with this.",
+           m_identifier);
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -75,19 +80,34 @@ void KLMExpertModule::initialize()
 
 void KLMExpertModule::beginRun()
 {
-
+  std::cout << "begin run " << endl;
   if (m_weightfile_representation) {
     if (m_weightfile_representation->hasChanged()) {
       std::stringstream ss((*m_weightfile_representation)->m_data);
       auto weightfile = MVA::Weightfile::loadFromStream(ss);
+      std::cout << "init weight from stream " <<  std::endl;
+
+      if (! weightfile) {
+        B2FATAL("no weigthfile spezified");
+      }
+
+
+
       init_mva(weightfile);
     }
   } else {
     auto weightfile = MVA::Weightfile::loadFromFile(m_identifier);
 
+    std::cout << "init weight files from else " << std::endl;
+    if (! weightfile) {
+      B2FATAL("no weigthfile spezified");
+    }
+
     init_mva(weightfile);
 
   }
+
+  std::cout << "begin run end " << endl;
 }
 /** init mva file taken from mva/ExpertModule */
 void KLMExpertModule::init_mva(MVA::Weightfile& weightfile)
@@ -137,25 +157,35 @@ void KLMExpertModule::event()
     ECLCluster* closestECLCluster = get<0>(closestECLAndDist);
     m_KLMECLDist = get<1>(closestECLAndDist);
 
-
+    // get variables of the closest ECL cluster might be removed in future
     if (!(closestECLCluster == nullptr)) {
-      m_KLMECLE      = closestECLCluster -> getEnergy();
-      m_KLMECLE9oE25 = closestECLCluster -> getE9oE21();
-      m_KLMECLTerror = closestECLCluster -> getDeltaTime99();
-      m_KLMECLTiming = closestECLCluster -> getTime();
-      m_KLMECLEerror = closestECLCluster -> getUncertaintyEnergy();
-      m_KLMECLdeltaL = closestECLCluster->getDeltaL();
-      m_KLMECLminTrackDist = closestECLCluster->getMinTrkDistance();
+      m_KLMECLE                = closestECLCluster -> getEnergy();
+      m_KLMECLE9oE25           = closestECLCluster -> getE9oE21();
+      m_KLMECLTerror           = closestECLCluster -> getDeltaTime99();
+      m_KLMECLTiming           = closestECLCluster -> getTime();
+      m_KLMECLEerror           = closestECLCluster -> getUncertaintyEnergy();
+      m_KLMECLdeltaL           = closestECLCluster -> getDeltaL();
+      m_KLMECLminTrackDist     = closestECLCluster -> getMinTrkDistance();
+      //m_KLMECLHypo             = closestECLCluster -> getHypothesisId();
+      m_KLMECLZMVA             = closestECLCluster -> getZernikeMVA();
+      m_KLMECLZ40              = closestECLCluster -> getAbsZernike40();
+      m_KLMECLZ51              = closestECLCluster -> getAbsZernike51();
+      //m_KLMECLUncertaintyPhi   = closestECLCluster -> getUncertaintyPhi();
+      //m_KLMECLUncertaintyTheta = closestECLCluster -> getUncertaintyTheta();
     } else {
-
-      m_KLMECLdeltaL       = -999;
-      m_KLMECLminTrackDist = -999;
-
-      m_KLMECLE      = -999;
-      m_KLMECLE9oE25 = -999;
-      m_KLMECLTiming = -999;
-      m_KLMECLTerror = -999;
-      m_KLMECLEerror = -999;
+      m_KLMECLdeltaL           = -999;
+      m_KLMECLminTrackDist     = -999;
+      m_KLMECLE                = -999;
+      m_KLMECLE9oE25           = -999;
+      m_KLMECLTiming           = -999;
+      m_KLMECLTerror           = -999;
+      m_KLMECLEerror           = -999;
+      //m_KLMECLHypo             = -999;
+      m_KLMECLZMVA             = -999;
+      m_KLMECLZ40              = -999;
+      m_KLMECLZ51              = -999;
+      //m_KLMECLUncertaintyPhi   = -999;
+      //m_KLMECLUncertaintyTheta = -999;
     }
 
     // calculate distance to next cluster
@@ -163,20 +193,6 @@ void KLMExpertModule::event()
     m_KLMnextCluster = get<1>(closestKLMAndDist);
     m_KLMavInterClusterDist = get<2>(closestKLMAndDist);
 
-
-    // calculate eucl. distance klmcluster <-> nearest track
-    // extrapolate genfit trackfit result to their ends and find the
-    tuple<RecoTrack*, double, std::unique_ptr<const TVector3>> closestTrackAndDistance
-                                                            = findClosestTrack(clusterPos, .26);
-    m_KLMtrackDist = get<1>(closestTrackAndDistance);
-    const TVector3* poca = get<2>(closestTrackAndDistance).get();
-
-    if (poca and closestECLCluster) {
-      const TVector3& trackECLClusterDist = closestECLCluster->getPosition() - *poca;
-      m_KLMtrackToECL = trackECLClusterDist.Mag2();
-    } else {
-      m_KLMtrackToECL = -999;
-    }
 
 
     TrackClusterSeparation* trackSep = cluster.getRelatedTo<TrackClusterSeparation>();
@@ -208,12 +224,18 @@ void KLMExpertModule::event()
     m_feature_variables[3] = m_KLMtime;
     m_feature_variables[4] = m_KLMnextCluster;
     m_feature_variables[5] = m_KLMenergy;
-    m_feature_variables[6] = m_KLMtrackToECL;
-    m_feature_variables[7] = m_KLMECLEerror;
-    m_feature_variables[8] = m_KLMTrackSepDist;
-    m_feature_variables[9] = m_KLMInitialTrackSepAngle;
-    m_feature_variables[10] = m_KLMTrackRotationAngle;
-    m_feature_variables[11] = m_KLMTrackSepAngle;
+    m_feature_variables[6] = m_KLMTrackSepDist;
+    m_feature_variables[7] = m_KLMInitialTrackSepAngle;
+    m_feature_variables[8] = m_KLMTrackRotationAngle;
+    m_feature_variables[9] = m_KLMTrackSepAngle;
+    m_feature_variables[10] = m_KLMhitDepth;
+    m_feature_variables[11] = m_KLMECLE;
+    m_feature_variables[12] = m_KLMECLE9oE25;
+    m_feature_variables[13] = m_KLMECLTiming;
+    m_feature_variables[14] = m_KLMECLminTrackDist;
+    m_feature_variables[15] = m_KLMECLZMVA;
+    m_feature_variables[16] = m_KLMECLZ40;
+    m_feature_variables[17] = m_KLMECLZ51;
 
 
     // rewrite dataset
@@ -221,9 +243,8 @@ void KLMExpertModule::event()
       m_dataset->m_input[i] = m_feature_variables[i];
     }
 
-    //classify dartaset
     IDMVAOut = m_expert->apply(*m_dataset)[0];
-
+    B2INFO("KLM Expert classification: " << IDMVAOut);
     // KlId, bkg prob, KLM, ECL
     klid = KlIds.appendNew(IDMVAOut, -1, 1, 0);
     cluster.addRelationTo(klid);

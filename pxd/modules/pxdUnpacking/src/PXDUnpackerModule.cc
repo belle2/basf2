@@ -168,8 +168,8 @@ struct dhc_frame_header_word0 {
       (const char*)"ONS_TRG",
       (const char*)"ONS_ROI"
     };
-    B2INFO("DHC FRAME TYP " << hex << getFrameType() << " -> " << dhc_type_name[getFrameType()] << " (ERR " << getErrorFlag() <<
-           ") data " << data);
+    B2DEBUG(20, "DHC FRAME TYP " << hex << getFrameType() << " -> " << dhc_type_name[getFrameType()] << " (ERR " << getErrorFlag() <<
+            ") data " << data);
   };
 };
 
@@ -220,11 +220,12 @@ struct dhc_start_frame {
   void print(void) const
   {
     word0.print();
-    B2INFO("DHC Start Frame TNRLO $" << hex << trigger_nr_lo << " TNRHI $" << hex << trigger_nr_hi << " TTLO $" << hex <<
-           time_tag_lo_and_type
-           << " TTMID $" << hex << time_tag_mid << " TTHI $" << hex << time_tag_hi << " Exp/Run/Subrun $" << hex << exp_run << " $" <<
-           run_subrun
-           << " CRC $" << hex << crc32);
+    B2DEBUG(20,
+            "DHC Start Frame TNRLO $" << hex << trigger_nr_lo << " TNRHI $" << hex << trigger_nr_hi << " TTLO $" << hex <<
+            time_tag_lo_and_type
+            << " TTMID $" << hex << time_tag_mid << " TTHI $" << hex << time_tag_hi << " Exp/Run/Subrun $" << hex << exp_run << " $" <<
+            run_subrun
+            << " CRC $" << hex << crc32);
   };
   inline unsigned short get_active_dhe_mask(void) const {return word0.getMisc() & 0x1F;};
   inline unsigned short get_dhc_id(void) const {return (word0.getMisc() >> 5) & 0xF;};
@@ -262,13 +263,14 @@ struct dhc_dhe_start_frame {
   void print(void) const
   {
     word0.print();
-    B2INFO("DHC Event Frame TNRLO $" << hex << trigger_nr_lo  << " DTTLO $" << hex << dhe_time_tag_lo << " DTTHI $" << hex <<
-           dhe_time_tag_hi
-           << " DHEID $" << hex << getDHEId()
-           << " DHPMASK $" << hex << getActiveDHPMask()
-           << " SFNR $" << hex << getStartFrameNr()
-           << " OFF $" << hex << getTriggerOffsetRow()
-           << " CRC " << hex << crc32);
+    B2DEBUG(20,
+            "DHC Event Frame TNRLO $" << hex << trigger_nr_lo  << " DTTLO $" << hex << dhe_time_tag_lo << " DTTHI $" << hex <<
+            dhe_time_tag_hi
+            << " DHEID $" << hex << getDHEId()
+            << " DHPMASK $" << hex << getActiveDHPMask()
+            << " SFNR $" << hex << getStartFrameNr()
+            << " OFF $" << hex << getTriggerOffsetRow()
+            << " CRC " << hex << crc32);
   };
   inline unsigned int getActiveDHPMask(void) const {return word0.getMisc() & 0xF;};
   inline unsigned int getDHEId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
@@ -305,8 +307,9 @@ struct dhc_direct_readout_frame {
   void print(void) const
   {
     word0.print();
-    B2INFO("DHC Direct Readout (Raw|ZSD|ONS) Frame TNRLO $" << hex << trigger_nr_lo << " DHE ID $" << getDHEId() << " DHP port $" <<
-           getDHPPort());
+    B2DEBUG(20,
+            "DHC Direct Readout (Raw|ZSD|ONS) Frame TNRLO $" << hex << trigger_nr_lo << " DHE ID $" << getDHEId() << " DHP port $" <<
+            getDHPPort());
   };
   inline unsigned short getDHEId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
   inline unsigned short getDHPPort(void) const {return (word0.getMisc()) & 0x3;};
@@ -363,7 +366,7 @@ struct dhc_onsen_trigger_frame {
   void print(void) const
   {
     word0.print();
-    B2INFO("ONSEN Trigger Frame TNRLO $" << hex << trignr0);
+    B2DEBUG(20, "ONSEN Trigger Frame TNRLO $" << hex << trignr0);
   };
 
   inline unsigned int get_subrun_number(void) const
@@ -427,7 +430,7 @@ struct dhc_onsen_roi_frame {
   void print(void) const
   {
     word0.print();
-    B2INFO("DHC HLT/ROI Frame");
+    B2DEBUG(20, "DHC HLT/ROI Frame");
   };
 
   unsigned int check_inner_crc(unsigned int /*length*/) const
@@ -464,7 +467,9 @@ struct dhc_ghost_frame {
   void print(void) const
   {
     word0.print();
-    B2INFO("DHC Ghost Frame TNRLO " << hex << trigger_nr_lo << " DHE ID $" << getDHEId() << " DHP port $" << getDHPPort() << " CRC $");
+    B2DEBUG(20, "DHC Ghost Frame TNRLO " << hex << trigger_nr_lo << " DHE ID $" << getDHEId() << " DHP port $" << getDHPPort() <<
+            " CRC $");
+
   };
   inline unsigned short getDHEId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
   inline unsigned short getDHPPort(void) const {return (word0.getMisc()) & 0x3;};
@@ -498,8 +503,9 @@ struct dhc_end_frame {
   void print(void) const
   {
     word0.print();
-    B2INFO("DHC End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsinevent << " ERR " << hex << errorinfo
-           << " CRC " << hex << crc32);
+    B2DEBUG(20,
+            "DHC End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsinevent << " ERR " << hex << errorinfo
+            << " CRC " << hex << crc32);
   };
   inline unsigned int get_dhc_id(void) const {return (word0.getMisc() >> 5) & 0xF;};
   inline unsigned int get_dhc_nr_words(void) const {return wordsinevent;};
@@ -524,8 +530,9 @@ struct dhc_dhe_end_frame {
   void print(void) const
   {
     word0.print();
-    B2INFO("DHC DHE End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsinevent << " ERR " << hex << errorinfo
-           << " CRC " << hex << crc32);
+    B2DEBUG(20,
+            "DHC DHE End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsinevent << " ERR " << hex << errorinfo
+            << " CRC " << hex << crc32);
   };
   inline unsigned int getDHEId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
 };
@@ -833,7 +840,8 @@ void PXDUnpackerModule::event()
 
   int nRaws = m_storeRawPXD.getEntries();
   if (verbose) {
-    B2INFO("PXD Unpacker --> RawPXD Objects in event: " << nRaws);
+    B2DEBUG(20,
+            "PXD Unpacker --> RawPXD Objects in event: " << nRaws);
   };
 
   m_errorMask = 0;
@@ -852,7 +860,8 @@ void PXDUnpackerModule::event()
   int nsr = 0;// number of packets
   for (auto& it : m_storeRawPXD) {
     if (verbose) {
-      B2INFO("PXD Unpacker --> Unpack Objects: ");
+      B2DEBUG(20,
+              "PXD Unpacker --> Unpack Objects: ");
     };
     unpack_event(it);
     nsr++;
@@ -942,12 +951,12 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
 
   /// NEW format
   if (verbose) {
-    B2INFO("PXD Unpacker --> data[0]: <-- Magic " << hex << data[0]);
-    B2INFO("PXD Unpacker --> data[1]: <-- #Frames " << htonl(data[1]) << " in hex " << hex << data[1]);
-    if (data[1] >= 1 && fullsize < 12) B2INFO("PXD Unpacker --> data[2]: <-- Frame 1 len " << hex << data[2]);
-    if (data[1] >= 2 && fullsize < 16) B2INFO("PXD Unpacker --> data[3]: <-- Frame 2 len " << hex << data[3]);
-    if (data[1] >= 3 && fullsize < 20) B2INFO("PXD Unpacker --> data[4]: <-- Frame 3 len " << hex << data[4]);
-    if (data[1] >= 4 && fullsize < 24) B2INFO("PXD Unpacker --> data[5]: <-- Frame 4 len " << hex << data[5]);
+    B2DEBUG(20, "PXD Unpacker --> data[0]: <-- Magic " << hex << data[0]);
+    B2DEBUG(20, "PXD Unpacker --> data[1]: <-- #Frames " << htonl(data[1]) << " in hex " << hex << data[1]);
+    if (data[1] >= 1 && fullsize < 12) B2DEBUG(20, "PXD Unpacker --> data[2]: <-- Frame 1 len " << hex << data[2]);
+    if (data[1] >= 2 && fullsize < 16) B2DEBUG(20, "PXD Unpacker --> data[3]: <-- Frame 2 len " << hex << data[3]);
+    if (data[1] >= 3 && fullsize < 20) B2DEBUG(20, "PXD Unpacker --> data[4]: <-- Frame 3 len " << hex << data[4]);
+    if (data[1] >= 4 && fullsize < 24) B2DEBUG(20, "PXD Unpacker --> data[5]: <-- Frame 4 len " << hex << data[5]);
   };
 
   unsigned int* tableptr;
@@ -977,7 +986,7 @@ void PXDUnpackerModule::unpack_event(RawPXD& px)
       B2ERROR("SKIP Frame with Data with not MOD 4 length " << " ( $" << hex << lo << " ) ");
       ll += (lo + 3) & 0xFFFFFFFC; /// round up to next 32 bit boundary
     } else {
-      B2INFO("unpack DHE(C) frame: " << j << " with size " << lo << " at byte offset in dataptr " << ll);
+      B2DEBUG(20, "unpack DHE(C) frame: " << j << " with size " << lo << " at byte offset in dataptr " << ll);
       unpack_dhc_frame(ll + (char*)dataptr, lo, j, Frames_in_event);
       ll += lo; /// no rounding needed
     }
@@ -1034,10 +1043,10 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
 
   /// Endian Swapping is done in Contructors of Raw Objects!
   if (frame_len == 0x10008) { // 64k
-    B2INFO("Pedestal Data - (ADC:ADC)");
+    B2DEBUG(20, "Pedestal Data - (ADC:ADC)");
     m_storeRawAdc.appendNew(vxd_id, data, false);
   } else if (frame_len == 0x20008) { // 128k
-    B2INFO("Pedestal Data - (ADC:Pedestal)");
+    B2DEBUG(20, "Pedestal Data - (ADC:Pedestal)");
     m_storeRawAdc.appendNew(vxd_id, data, true);
     m_storeRawPedestal.appendNew(vxd_id, data);
   } else {
@@ -1109,8 +1118,8 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   if ((((dhe_ID >> 5) & 0x1) == 1 && (dhe_ID & 0x1) == 0) || (((dhe_ID >> 5) & 0x1) == 0 && (dhe_ID & 0x1) == 1)) {
     IBOF_flag = true;
   }
-  B2INFO("dhe_reformat :: " << dhe_reformat << " IFOB_flag :: " << IFOB_flag);
-  B2INFO("dhe_reformat :: " << dhe_reformat << " IBOF_flag :: " << IBOF_flag);
+  B2DEBUG(20, "dhe_reformat :: " << dhe_reformat << " IFOB_flag :: " << IFOB_flag);
+  B2DEBUG(20, "dhe_reformat :: " << dhe_reformat << " IBOF_flag :: " << IBOF_flag);
   if (nr_words < 4) {
     B2ERROR("DHP frame size error (too small) " << nr_words);
     m_errorMask |= ONSEN_ERR_FLAG_DHP_SIZE;
@@ -1120,10 +1129,10 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   }
 
   if (printflag)
-    B2INFO("HEADER --  " << hex << dhp_pix[0] << hex << dhp_pix[1] << hex << dhp_pix[2] << hex << dhp_pix[3] << " -- ");
+    B2DEBUG(20, "HEADER --  " << hex << dhp_pix[0] << hex << dhp_pix[1] << hex << dhp_pix[2] << hex << dhp_pix[3] << " -- ");
 
   if (printflag)
-    B2INFO("DHP Header   | " << hex << dhp_pix[2] << " ( " << hex << dhp_pix[2] << " ) ");
+    B2DEBUG(20, "DHP Header   | " << hex << dhp_pix[2] << " ( " << hex << dhp_pix[2] << " ) ");
   dhp_header_type  = (dhp_pix[2] & 0xE000) >> 13;
   dhp_reserved     = (dhp_pix[2] & 0x1F00) >> 8;
   second_dhp_dhe_id       = (dhp_pix[2] & 0x00FC) >> 2;
@@ -1131,11 +1140,11 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   dhp_dhp_id       =  dhp_pix[2] & 0x0003;
 
   if (printflag) {
-    B2INFO("DHP type     | " << hex << dhp_header_type << " ( " << dec << dhp_header_type << " ) ");
-    B2INFO("DHP reserved | " << hex << dhp_reserved << " ( " << dec << dhp_reserved << " ) ");
-    B2INFO("DHP DHE ID first | " << hex << first_dhp_dhe_id << " ( " << dec << first_dhp_dhe_id << " ) ");
-    B2INFO("DHP DHE ID second | " << hex << second_dhp_dhe_id << " ( " << dec << second_dhp_dhe_id << " ) ");
-    B2INFO("DHP DHP ID   | " << hex << dhp_dhp_id << " ( " << dec << dhp_dhp_id << " ) ");
+    B2DEBUG(20, "DHP type     | " << hex << dhp_header_type << " ( " << dec << dhp_header_type << " ) ");
+    B2DEBUG(20, "DHP reserved | " << hex << dhp_reserved << " ( " << dec << dhp_reserved << " ) ");
+    B2DEBUG(20, "DHP DHE ID first | " << hex << first_dhp_dhe_id << " ( " << dec << first_dhp_dhe_id << " ) ");
+    B2DEBUG(20, "DHP DHE ID second | " << hex << second_dhp_dhe_id << " ( " << dec << second_dhp_dhe_id << " ) ");
+    B2DEBUG(20, "DHP DHP ID   | " << hex << dhp_dhp_id << " ( " << dec << dhp_dhp_id << " ) ");
   }
 
   if ((dhe_ID != first_dhp_dhe_id) && (dhe_ID != second_dhp_dhe_id)) {
@@ -1159,19 +1168,19 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
 
   dhp_readout_frame_lo  = dhp_pix[3] & 0xFFFF;
   if (printflag)
-    B2INFO("DHP Frame Nr     |   " << hex << dhp_readout_frame_lo << " ( " << hex << dhp_readout_frame_lo << " ) ");
+    B2DEBUG(20, "DHP Frame Nr     |   " << hex << dhp_readout_frame_lo << " ( " << hex << dhp_readout_frame_lo << " ) ");
 
   for (unsigned int i = 4; i < nr_words ; i++) {
 
     if (printflag)
-      B2INFO("-- " << hex << dhp_pix[i] << " --   " << dec << i);
+      B2DEBUG(20, "-- " << hex << dhp_pix[i] << " --   " << dec << i);
     {
       if (((dhp_pix[i] & 0x8000) >> 15) == 0) {
         rowflag = true;
         dhp_row = (dhp_pix[i] & 0xFFC0) >> 5;
         dhp_cm  = dhp_pix[i] & 0x3F;
         if (printflag)
-          B2INFO("SetRow: " << hex << dhp_row << " CM " << hex << dhp_cm);
+          B2DEBUG(20, "SetRow: " << hex << dhp_row << " CM " << hex << dhp_cm);
       } else {
 //         v_cellID = dhp_row;
 //         u_cellID = dhp_col;
@@ -1193,24 +1202,24 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
 
             if (m_RemapFlag) {
               if ((dhe_reformat == 0) && (IFOB_flag == 1)) {
-                //               B2INFO("Remap inner forward or outer backward ... with DHP_row :: " << dhp_row << " and DHP_col :: " << dhp_col << " DHE_ID $" <<
+                //               B2DEBUG(20,"Remap inner forward or outer backward ... with DHP_row :: " << dhp_row << " and DHP_col :: " << dhp_col << " DHE_ID $" <<
                 //                      dhe_ID << " DHP_ID $" << dhp_dhp_id);
                 v_cellID = PXDUnpackerModule::remap_row_IF_OB(dhp_row, dhp_col, dhp_dhp_id, dhe_ID);
                 u_cellID = PXDUnpackerModule::remap_col_IF_OB(dhp_row, dhp_col, dhp_dhp_id);
-                //                     B2INFO("Remapped :: ROW_GEO " << v_cellID << " COL_GEO " << u_cellID);
+                //                     B2DEBUG(20,"Remapped :: ROW_GEO " << v_cellID << " COL_GEO " << u_cellID);
               }
 
               if ((dhe_reformat == 0) && (IBOF_flag == 1)) {
-                //               B2INFO("Remap inner backward or outer forward ... with DHP_row :: " << dhp_row << " and DHP_col :: " << dhp_col << " DHE_ID $" <<
+                //               B2DEBUG(20,"Remap inner backward or outer forward ... with DHP_row :: " << dhp_row << " and DHP_col :: " << dhp_col << " DHE_ID $" <<
                 //                      dhe_ID << " DHP_ID $" << dhp_dhp_id);
                 v_cellID = PXDUnpackerModule::remap_row_IB_OF(dhp_row, dhp_col, dhp_dhp_id, dhe_ID);
                 u_cellID = PXDUnpackerModule::remap_col_IB_OF(dhp_row, dhp_col, dhp_dhp_id);
-                //                       B2INFO("Remapped :: ROW_GEO " << v_cellID << " COL_GEO " << u_cellID);
+                //                       B2DEBUG(20,"Remapped :: ROW_GEO " << v_cellID << " COL_GEO " << u_cellID);
               }
             }
-            //           B2INFO("ROW :: " << dhp_row << "COL :: " << dhp_col );
+            //           B2DEBUG(20,"ROW :: " << dhp_row << "COL :: " << dhp_col );
             dhp_col += dhp_offset;
-            //           B2INFO("ROW :: " << dhp_row << "COL after dhp_offset :: " << dhp_col );
+            //           B2DEBUG(20,"ROW :: " << dhp_row << "COL after dhp_offset :: " << dhp_col );
             dhp_adc = dhp_pix[i] & 0xFF;
 
             if (!m_RemapFlag) {
@@ -1226,21 +1235,21 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
                 v_cellID = /*1 +*/ dhp_row ;
                 u_cellID = /*250 - */dhp_col;
               }
-              B2INFO("NOT REMAPPED coords :: row " << v_cellID << " col " << u_cellID << " dhe ID " << dhe_ID << "chip ID" << dhp_dhp_id);
+              B2DEBUG(20, "NOT REMAPPED coords :: row " << v_cellID << " col " << u_cellID << " dhe ID " << dhe_ID << "chip ID" << dhp_dhp_id);
             }
 
             if (printflag)
-              B2INFO("SetPix: Row " << hex << v_cellID << " Col " << hex << u_cellID << " ADC " << hex << dhp_adc
-                     << " CM " << hex << dhp_cm);
+              B2DEBUG(20, "SetPix: Row " << hex << v_cellID << " Col " << hex << u_cellID << " ADC " << hex << dhp_adc
+                      << " CM " << hex << dhp_cm);
 
 
             /*if (verbose) {
-              B2INFO("raw    |   " << hex << d[i]);
-              B2INFO("row " << hex << ((d[i] >> 20) & 0xFFF) << "(" << ((d[i] >> 20) & 0xFFF) << ")" << " col " << "(" << hex << ((d[i] >> 8) & 0xFFF) << ((d[i] >> 8) & 0xFFF)
+              B2DEBUG(20,"raw    |   " << hex << d[i]);
+              B2DEBUG(20,"row " << hex << ((d[i] >> 20) & 0xFFF) << "(" << ((d[i] >> 20) & 0xFFF) << ")" << " col " << "(" << hex << ((d[i] >> 8) & 0xFFF) << ((d[i] >> 8) & 0xFFF)
                      << " adc " << "(" << hex << (d[i] & 0xFF) << (d[i] & 0xFF) << ")");
-              B2INFO("dhe_ID " << dhe_ID);
-              B2INFO("start-Frame-Nr " << dec << dhe_first_readout_frame_id_lo);
-              B2INFO("toffset " << toffset);
+              B2DEBUG(20,"dhe_ID " << dhe_ID);
+              B2DEBUG(20,"start-Frame-Nr " << dec << dhe_first_readout_frame_id_lo);
+              B2DEBUG(20,"toffset " << toffset);
             };*/
             if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
                                                           toffset, (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F, dhp_cm, sorPreWord
@@ -1252,13 +1261,13 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
   }
 
   if (printflag) {
-    B2INFO("(DHE) DHE_ID " << hex << dhe_ID << " (DHE) DHP ID  " << hex << dhe_DHPport << " first (DHP) DHE_ID " << hex <<
-           first_dhp_dhe_id <<
-           " second (DHP) DHE_ID " << hex << second_dhp_dhe_id << " (DHP) DHP ID " << hex << dhp_dhp_id);
+    B2DEBUG(20, "(DHE) DHE_ID " << hex << dhe_ID << " (DHE) DHP ID  " << hex << dhe_DHPport << " first (DHP) DHE_ID " << hex <<
+            first_dhp_dhe_id <<
+            " second (DHP) DHE_ID " << hex << second_dhp_dhe_id << " (DHP) DHP ID " << hex << dhp_dhp_id);
     /*for (int i = 0; i < raw_nr_words ; i++) {
-      B2INFO("RAW      |   " << hex << p_pix[i]);
+      B2DEBUG(20,"RAW      |   " << hex << p_pix[i]);
       printf("raw %08X  |  ", p_pix[i]);
-      B2INFO("row " << hex << ((p_pix[i] >> 20) & 0xFFF) << dec << " ( " << ((p_pix[i] >> 20) & 0xFFF) << " ) " << " col " << hex << ((p_pix[i] >> 8) & 0xFFF)
+      B2DEBUG(20,"row " << hex << ((p_pix[i] >> 20) & 0xFFF) << dec << " ( " << ((p_pix[i] >> 20) & 0xFFF) << " ) " << " col " << hex << ((p_pix[i] >> 8) & 0xFFF)
              << " ( " << dec << ((p_pix[i] >> 8) & 0xFFF) << " ) " << " adc " << hex << (p_pix[i] & 0xFF) << " ( " << (p_pix[i] & 0xFF) << " ) "
             );
     }*/
@@ -1380,7 +1389,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
 
 //       stat_raw++;
-      B2INFO("Unpack DHP RAW with " << (len / 4) << " words (32 bit)");
+      B2DEBUG(20, "Unpack DHP RAW with " << (len / 4) << " words (32 bit)");
       unpack_dhp_raw(data, len - 4,
                      dhc.data_direct_readout_frame->getDHEId(),
                      dhc.data_direct_readout_frame->getDHPPort(),
@@ -1431,8 +1440,8 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       m_errorMask |= dhc.check_crc();
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
 //       stat_zsd++;
-      B2INFO("Unpack DHP ZSD with reformat flag $" << dhc.data_direct_readout_frame->getDataReformattedFlag() << " and $" <<
-             (len / 4) << " words (32 bit)");
+      B2DEBUG(20, "Unpack DHP ZSD with reformat flag $" << dhc.data_direct_readout_frame->getDataReformattedFlag() << " and $" <<
+              (len / 4) << " words (32 bit)");
       unpack_dhp(data, len - 4,
                  dhe_first_readout_frame_id_lo,
                  dhc.data_direct_readout_frame->getDHEId(),
@@ -1455,7 +1464,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
       m_errorMask |= dhc.check_crc();
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
 
-      B2INFO("UNPACK FCE FRAME with len " << hex << len);
+      B2DEBUG(20, "UNPACK FCE FRAME with len " << hex << len);
       unpack_fce((unsigned short*) data, len - 4, currentVxdId);
 
       counted32bWordsInDHC += (len / 4);
@@ -1503,7 +1512,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
 //       stat_start++;
 
 
-      B2INFO("DHC Start Evt Nr $" << eventNrOfThisFrame << " (0x" << hex << eventNrOfThisFrame << ")");
+      B2DEBUG(20, "DHC Start Evt Nr $" << eventNrOfThisFrame << " (0x" << hex << eventNrOfThisFrame << ")");
       if (run_number_dhc_start != m_meta_run_nr) {
         if (run_number_dhc_start != 0) {
           B2ERROR("DHC Start Run Nr $" << run_number_dhc_start << " (0x" << hex << run_number_dhc_start << ")" << " != EvtMetaData Run Nr $"
@@ -1515,7 +1524,7 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
                     m_meta_run_nr << ")");
         }
       }
-      B2INFO("DHC Start Run Nr $" << run_number_dhc_start << " (0x" << hex << run_number_dhc_start << ")");
+      B2DEBUG(20, "DHC Start Run Nr $" << run_number_dhc_start << " (0x" << hex << run_number_dhc_start << ")");
 
       if (exp_number_dhc_start != m_meta_experiment) {
         B2ERROR("DHC Start Experiment Nr $" << exp_number_dhc_start << " (0x" << hex << exp_number_dhc_start << ")"
@@ -1523,13 +1532,13 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
                 << "0x(" << hex << m_meta_experiment << ")");
         m_errorMask |= ONSEN_ERR_FLAG_DHC_START_META_EXPNUMBER_MM;
       }
-      B2INFO("DHC Start Exp Nr $" << exp_number_dhc_start << " (0x" << hex << exp_number_dhc_start << ")");
+      B2DEBUG(20, "DHC Start Exp Nr $" << exp_number_dhc_start << " (0x" << hex << exp_number_dhc_start << ")");
 
       if (subrun_number_dhc_start != m_meta_subrun_nr) {
         B2ERROR("DHC Start Subrun Nr $" << hex << subrun_number_dhc_start << " != EvtMetaData Subrun Nr $" << m_meta_subrun_nr);
         m_errorMask |= ONSEN_ERR_FLAG_DHC_START_META_SUBRUNNUMBER_MM;
       }
-      B2INFO("DHC Start Subrun Nr $" << subrun_number_dhc_start << " (0x" << hex << subrun_number_dhc_start << ")");
+      B2DEBUG(20, "DHC Start Subrun Nr $" << subrun_number_dhc_start << " (0x" << hex << subrun_number_dhc_start << ")");
 
       mask_active_dhe = dhc.data_dhc_start_frame->get_active_dhe_mask();
       nr_active_dhe = nr5bits(mask_active_dhe);
@@ -1668,17 +1677,17 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
         w = htonl(w);
         countedWordsInEvent += 2;
         //if (verbose) {
-        B2INFO("countedWordsInEvent " << countedWordsInEvent << " w " << w);
+        B2DEBUG(20, "countedWordsInEvent " << countedWordsInEvent << " w " << w);
         //};
         if (countedWordsInEvent != w) {
           if (verbose) {
-            B2INFO("Error: WIE " << hex << countedWordsInEvent << " vs END " << hex << w);
+            B2DEBUG(20, "Error: WIE " << hex << countedWordsInEvent << " vs END " << hex << w);
           };
           //           error_flag = true;
           //           wie_error++;
         } else {
           if (verbose)
-            B2INFO("EVT END: WIE " << hex << countedWordsInEvent << " == END " << hex << w);
+            B2DEBUG(20, "EVT END: WIE " << hex << countedWordsInEvent << " == END " << hex << w);
         }
       }
       m_errorMask |= dhc.check_crc();
@@ -1772,24 +1781,24 @@ void PXDUnpackerModule::unpack_dhc_frame(void* data, const int len, const int Fr
           }
         }
       }
-      B2INFO("ONSEN TRG Frame Evt Nr $" << dhc.data_onsen_trigger_frame->get_trig_nr0() << " (0x" << hex <<
-             dhc.data_onsen_trigger_frame->get_trig_nr0() << ")");
+      B2DEBUG(20, "ONSEN TRG Frame Evt Nr $" << dhc.data_onsen_trigger_frame->get_trig_nr0() << " (0x" << hex <<
+              dhc.data_onsen_trigger_frame->get_trig_nr0() << ")");
 
-      B2INFO("ONSEN TRG Frame Run Nr $" << dhc.data_onsen_trigger_frame->get_run_number() << " (0x" << hex <<
-             dhc.data_onsen_trigger_frame->get_run_number() << ")");
+      B2DEBUG(20, "ONSEN TRG Frame Run Nr $" << dhc.data_onsen_trigger_frame->get_run_number() << " (0x" << hex <<
+              dhc.data_onsen_trigger_frame->get_run_number() << ")");
 
-      B2INFO("ONSEN TRG Frame Exp Nr $" <<  dhc.data_onsen_trigger_frame->get_exp_number() << " (0x" << hex <<
-             dhc.data_onsen_trigger_frame->get_exp_number() << ")");
+      B2DEBUG(20, "ONSEN TRG Frame Exp Nr $" <<  dhc.data_onsen_trigger_frame->get_exp_number() << " (0x" << hex <<
+              dhc.data_onsen_trigger_frame->get_exp_number() << ")");
 
-      B2INFO("ONSEN TRG Frame Subrun Nr $" << dhc.data_onsen_trigger_frame->get_subrun_number() << " (0x" << hex <<
-             dhc.data_onsen_trigger_frame->get_subrun_number() << ")");
+      B2DEBUG(20, "ONSEN TRG Frame Subrun Nr $" << dhc.data_onsen_trigger_frame->get_subrun_number() << " (0x" << hex <<
+              dhc.data_onsen_trigger_frame->get_subrun_number() << ")");
 
       if (dhc.data_onsen_trigger_frame->is_SendUnfiltered()) {
-        B2INFO("ONSEN TRG Frame Send out ALL Flag.");
+        B2DEBUG(20, "ONSEN TRG Frame Send out ALL Flag.");
         m_errorMask |= ONSEN_ERR_FLAG_SENDALL;
       }
       if (dhc.data_onsen_trigger_frame->is_SendROIs()) {
-        B2INFO("ONSEN TRG Frame Send debug ROI Flag.");
+        B2DEBUG(20, "ONSEN TRG Frame Send debug ROI Flag.");
         m_errorMask |= ONSEN_ERR_FLAG_SEND_DEBUG_ROI;
       }
       if (verbose) dhc.data_onsen_trigger_frame->print();
@@ -1904,15 +1913,15 @@ unsigned int PXDUnpackerModule::remap_row_IF_OB(unsigned int DHP_row, unsigned i
 
   DCD_channel = 4 * DHP_col + DHP_row % 4 + 256 * dhp_id;
   Drain = LUT_IF_OB[DCD_channel + 1]; //since LUT starts with one and array with zero
-//   B2INFO("in remap ROW ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
+//   B2DEBUG(20,"in remap ROW ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
   int gate = ((DHP_row / 4)) % 192;
   row = gate * 4  + Drain % 4; // change for TB
   //row = (DHP_row / 4) * 4 + Drain % 4;
 //   row = DHP_row + Drain % 4;
-  //   B2INFO("row false " << DHP_row << " col false " << DHP_col << " DCD line " << DCD_channel << " Gate " << Gate << " Drain " << Drain << " row geo " << row);
+  //   B2DEBUG(20,"row false " << DHP_row << " col false " << DHP_col << " DCD line " << DCD_channel << " Gate " << Gate << " Drain " << Drain << " row geo " << row);
   if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 768 - 1 - row ;} //if inner module
   if (((dhe_ID >> 5) & 0x1) == 1) {v_cellID = row ;} //if outer module
-//  B2INFO("Remapped :: ROW $" << DHP_row << " to v_cellID $" << v_cellID);
+//  B2DEBUG(20,"Remapped :: ROW $" << DHP_row << " to v_cellID $" << v_cellID);
 
   return v_cellID;
 }
@@ -1926,10 +1935,10 @@ unsigned int PXDUnpackerModule::remap_col_IF_OB(unsigned int DHP_row, unsigned i
 
   DCD_channel = 4 * DHP_col + DHP_row % 4 + 256 * dhp_id;
   Drain = LUT_IF_OB[DCD_channel + 1]; //since LUT starts with one and array with zero
-//   B2INFO("in remap COL ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
+//   B2DEBUG(20,"in remap COL ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
   u_cellID = Drain / 4;
-//   B2INFO(" col false " << DHP_col << " DCD line " << DCD_channel << " col geo " << col_geo);
-//  B2INFO("Remapped :: DHP_COL $" << DHP_col << " to u_cellID $" << u_cellID);
+//  B2DEBUG(20," col false " << DHP_col << " DCD line " << DCD_channel << " col geo " << col_geo);
+//  B2DEBUG(20,"Remapped :: DHP_COL $" << DHP_col << " to u_cellID $" << u_cellID);
   if (DHP_col > 250) {
     B2ERROR("DHP_COL > 250 :: COL $" << DHP_col);
     B2ERROR("DHP_row = " << DHP_row << " DHP_col = " << DHP_col << " dhp_id = " << dhp_id << " DCD_channel " << DCD_channel << " Drain "
@@ -1954,17 +1963,17 @@ unsigned int PXDUnpackerModule::remap_row_IB_OF(unsigned int DHP_row, unsigned i
 
   DCD_channel = 4 * DHP_col + DHP_row % 4 + 256 * dhp_id;
   Drain = LUT_IB_OF[DCD_channel + 1]; //since LUT starts with one and array with zero
-//   B2INFO("in remap ROW ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
+//   B2DEBUG(20,"in remap ROW ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
   int gate = ((DHP_row / 4)) % 192;
   row = gate * 4  + Drain % 4; // change for TB
   //row = (DHP_row / 4) * 4 + Drain % 4;
-//   B2INFO("row false " << DHP_row << " col false " << DHP_col << " DCD line " << DCD_channel << " Gate " << Gate << " Drain " << Drain << " row geo " << row);
+//   B2DEBUG(20,"row false " << DHP_row << " col false " << DHP_col << " DCD line " << DCD_channel << " Gate " << Gate << " Drain " << Drain << " row geo " << row);
   if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 768 - 1 - row ;} //if inner module
   if (((dhe_ID >> 5) & 0x1) == 1) {v_cellID = row ;} //if outer module
   //inverts last two bit
   v_cellID ^= (1u << 1);
   v_cellID ^= 1u ;
-//  B2INFO("Remapped :: ROW $" << DHP_row << " to v_cellID $" << v_cellID);
+//  B2DEBUG(20,"Remapped :: ROW $" << DHP_row << " to v_cellID $" << v_cellID);
   return v_cellID;
 }
 
@@ -1978,11 +1987,11 @@ unsigned int PXDUnpackerModule::remap_col_IB_OF(unsigned int DHP_row, unsigned i
 
   DCD_channel = 4 * DHP_col + DHP_row % 4 + 256 * dhp_id;
   Drain = LUT_IB_OF[DCD_channel + 1]; //since LUT starts with one and array with zero
-//   B2INFO("in remap COL ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
+//   B2DEBUG(20,"in remap COL ... DCD_channel :: " << DCD_channel << " DRAIN :: " << Drain);
   col = Drain / 4;
-//   B2INFO(" col false " << DHP_col << " DCD line " << DCD_channel << " col geo " << col_geo);
+//   B2DEBUG(20," col false " << DHP_col << " DCD line " << DCD_channel << " col geo " << col_geo);
   if (u_cellID < 250) u_cellID = 250 - 1 - col;
-//  B2INFO("Remapped :: COL $" << DHP_col << " to u_cellID $" << u_cellID);
+//  B2DEBUG(20,"Remapped :: COL $" << DHP_col << " to u_cellID $" << u_cellID);
   if (DHP_col > 250) {
     B2ERROR("DHP_COL > 250 :: COL $" << DHP_col);
   }

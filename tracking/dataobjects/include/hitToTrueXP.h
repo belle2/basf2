@@ -229,7 +229,7 @@ namespace Belle2 {
 
     //evaluates the parameter omega (1/curvature radius) of a helicoidal track
     //starting from position and momentum of the hit
-    double omega(TVector3 xx, TVector3 p, double charge)
+    double omega(TVector3 xx, TVector3 p, double charge) const
     {
       TVector3 x(0.01 * xx.X(), 0.01 * xx.Y(), 0.01 * xx.Z());
       double Bz = 1.5;
@@ -241,7 +241,7 @@ namespace Belle2 {
 
     //evaluates the parameter tanLambda (pz/pt) of a helicoidal track
     //starting from position and momentum of the hit
-    double tanLambda(TVector3 xx, TVector3 p)
+    double tanLambda(TVector3 xx, TVector3 p) const
     {
       TVector3 x(0.01 * xx.X(), 0.01 * xx.Y(), 0.01 * xx.Z());
       double aux = p.Z() / sqrt(p.X() * p.X() + p.Y() * p.Y());
@@ -250,7 +250,7 @@ namespace Belle2 {
 
     //evaluates the parameter d0 (impact parameter) of a helicoidal track
     //starting from position and momentum of the hit
-    double d0(TVector3 xx, TVector3 p, double charge)
+    double d0(TVector3 xx, TVector3 p, double charge) const
     {
       TVector3 x(0.01 * xx.X(), 0.01 * xx.Y(), 0.01 * xx.Z());
       double Bz = 1.5;
@@ -265,7 +265,7 @@ namespace Belle2 {
     }
     //evaluates the parameter phi0 (angle between pT and x) of a helicoidal track
     //starting from position and momentum of the hit
-    double phi0(const TVector3& xx, TVector3 p, double charge)
+    double phi0(const TVector3& xx, TVector3 p, double charge) const
     {
       TVector3 x(0.01 * xx.X(), 0.01 * xx.Y(), 0.01 * xx.Z());
       double Bz = 1.5;
@@ -283,7 +283,7 @@ namespace Belle2 {
 
     //evaluates the parameter z0 (distance transverse plane-POCA) of a helicoidal track
     //starting from position and momentum of the hit
-    double z0(TVector3 xx, TVector3 p, double charge)
+    double z0(TVector3 xx, TVector3 p, double charge) const
     {
       TVector3 x(0.01 * xx.X(), 0.01 * xx.Y(), 0.01 * xx.Z());
       double Bz = 1.5;
@@ -300,45 +300,45 @@ namespace Belle2 {
       return aux;
     }
 
-    const double getOmegaMid() { return omega(m_positionMid, m_momentumMid, m_charge); }
+    double getOmegaMid() const { return omega(m_positionMid, m_momentumMid, m_charge); }
 
-    const double getOmegaEntry() { return omega(m_positionEntry, m_momentumEntry, m_charge); }
+    double getOmegaEntry() const { return omega(m_positionEntry, m_momentumEntry, m_charge); }
 
-    const double getOmegaExit() { return omega(m_positionExit, m_momentumExit, m_charge); }
+    double getOmegaExit() const { return omega(m_positionExit, m_momentumExit, m_charge); }
 
-    const double getOmega0() { return omega(m_position0, m_momentum0, m_charge); }
+    double getOmega0() const { return omega(m_position0, m_momentum0, m_charge); }
 
-    const double getTanLambdaMid() { return tanLambda(m_positionMid, m_momentumMid); }
+    double getTanLambdaMid() const { return tanLambda(m_positionMid, m_momentumMid); }
 
-    const double getTanLambdaEntry() { return tanLambda(m_positionEntry, m_momentumEntry); }
+    double getTanLambdaEntry() const { return tanLambda(m_positionEntry, m_momentumEntry); }
 
-    const double getTanLambdaExit() { return tanLambda(m_positionExit, m_momentumExit); }
+    double getTanLambdaExit() const { return tanLambda(m_positionExit, m_momentumExit); }
 
-    const double getTanLambda0() { return tanLambda(m_position0, m_momentum0); }
+    double getTanLambda0() const { return tanLambda(m_position0, m_momentum0); }
 
-    const double getD0Mid() { return d0(m_positionMid, m_momentumMid, m_charge); }
+    double getD0Mid() const { return d0(m_positionMid, m_momentumMid, m_charge); }
 
-    const double getD0Entry() { return d0(m_positionEntry, m_momentumEntry, m_charge); }
+    double getD0Entry() const { return d0(m_positionEntry, m_momentumEntry, m_charge); }
 
-    const double getD0Exit() { return d0(m_positionExit, m_momentumExit, m_charge); }
+    double getD0Exit() const { return d0(m_positionExit, m_momentumExit, m_charge); }
 
-    const double getD00() { return d0(m_position0, m_momentum0, m_charge); }
+    double getD00() const { return d0(m_position0, m_momentum0, m_charge); }
 
-    const double getPhi0Mid() { return phi0(m_positionMid, m_momentumMid, m_charge); }
+    double getPhi0Mid() const { return phi0(m_positionMid, m_momentumMid, m_charge); }
 
-    const double getPhi0Entry() { return phi0(m_positionEntry, m_momentumEntry, m_charge); }
+    double getPhi0Entry() const { return phi0(m_positionEntry, m_momentumEntry, m_charge); }
 
-    const double getPhi0Exit() { return phi0(m_positionExit, m_momentumExit, m_charge); }
+    double getPhi0Exit() const { return phi0(m_positionExit, m_momentumExit, m_charge); }
 
-    const double getPhi00() { return phi0(m_position0, m_momentum0, m_charge); }
+    double getPhi00() const { return phi0(m_position0, m_momentum0, m_charge); }
 
-    const double getZ0Mid() { return z0(m_positionMid, m_momentumMid, m_charge); }
+    double getZ0Mid() const { return z0(m_positionMid, m_momentumMid, m_charge); }
 
-    const double getZ0Entry() { return z0(m_positionEntry, m_momentumEntry, m_charge); }
+    double getZ0Entry() const { return z0(m_positionEntry, m_momentumEntry, m_charge); }
 
-    const double getZ0Exit() { return z0(m_positionExit, m_momentumExit, m_charge); }
+    double getZ0Exit() const { return z0(m_positionExit, m_momentumExit, m_charge); }
 
-    const double getZ00() { return z0(m_position0, m_momentum0, m_charge); }
+    double getZ00() const { return z0(m_position0, m_momentum0, m_charge); }
 
 
     //This structure allows to compare times of 2 hitToTrueXP point

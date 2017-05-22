@@ -11,8 +11,8 @@ void NoKickRTSel::hitToTrueXPBuilder(const RecoTrack& track)
   StoreArray<MCParticle> MCParticles;
   StoreArray<RecoTrack> recoTracks;
 
-  std::vector<Belle2::RecoHitInformation::UsedSVDHit*> clusterList = track.getSVDHitList();
-  for (const SVDCluster* cluster : clusterList) {
+  std::vector<Belle2::RecoHitInformation::UsedSVDHit*> clusterListSVD = track.getSVDHitList();
+  for (const SVDCluster* cluster : clusterListSVD) {
     const MCParticle* particle = cluster->getRelationsTo<MCParticle>()[0];
     for (const SVDTrueHit& hit : cluster->getRelationsTo<SVDTrueHit>()) {
       VxdID trueHitSensorID = hit.getSensorID();
@@ -32,13 +32,39 @@ void NoKickRTSel::hitToTrueXPBuilder(const RecoTrack& track)
         isReconstructed |= aRecoTrack.hasSVDHits();
       entry.setReconstructed(isReconstructed);
 
+      m_setHitToTrueXP.insert(entry);
+    }
+  }
+
+
+  StoreArray<PXDCluster> PXDClusters;
+  StoreArray<PXDTrueHit> PXDTrueHits;
+
+  std::vector<Belle2::RecoHitInformation::UsedPXDHit*> clusterListPXD = track.getPXDHitList();
+  for (const PXDCluster* cluster : clusterListPXD) {
+    const MCParticle* particle = cluster->getRelationsTo<MCParticle>()[0];
+    for (const PXDTrueHit& hit : cluster->getRelationsTo<PXDTrueHit>()) {
+      VxdID trueHitSensorID = hit.getSensorID();
+      const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(trueHitSensorID);
+      hitToTrueXPDerivate entry(hit, *particle, sensorInfo);
+
+      bool isReconstructed(false);
+      for (const RecoTrack& aRecoTrack : particle->getRelationsFrom<RecoTrack>())
+        isReconstructed |= aRecoTrack.hasPXDHits();
+      entry.setReconstructed(isReconstructed);
 
       m_setHitToTrueXP.insert(entry);
     }
   }
+
+
+
   for (auto element : m_setHitToTrueXP) {
     m_hitToTrueXP.push_back(element);
   }
+
+
+
 }
 
 void NoKickRTSel::hit8TrackBuilder(const RecoTrack& track)
@@ -106,31 +132,32 @@ bool NoKickRTSel::segmentSelector(hitToTrueXP hit1, hitToTrueXP hit2, std::vecto
   else {
     switch (par) {
       case 0:
-        //return true;//REMOVED OMEGA FROM CUTS
+        return true;//REMOVED OMEGA FROM CUTS
         deltaPar = abs(hit1.getOmegaEntry() - hit2.getOmegaEntry());
         if (is0) deltaPar = abs(hit1.getOmega0() - hit2.getOmegaEntry());
         break;
 
       case 1:
+        return true;//REMOVED OMEGA FROM CUTS
         deltaPar = hit1.getD0Entry() - hit2.getD0Entry();
         if (is0) deltaPar = hit1.getD00() - hit2.getD0Entry();
         break;
 
       case 2:
-        //  return true;
+        return true;
         deltaPar = asin(sin(hit1.getPhi0Entry())) - asin(sin(hit2.getPhi0Entry()));
         if (is0) deltaPar = asin(sin(hit1.getPhi00())) - asin(sin(hit2.getPhi0Entry()));
         break;
 
       case 3:
-        // return true;
+        return true;
         deltaPar = hit1.getZ0Entry() - hit2.getZ0Entry();
         if (is0) deltaPar = hit1.getZ00() - hit2.getZ0Entry();
 
         break;
 
       case 4:
-        // return true;
+        return true;
         deltaPar = hit1.getTanLambdaEntry() - hit2.getTanLambdaEntry();
         if (is0) deltaPar = hit1.getTanLambda0() - hit2.getTanLambdaEntry();
 

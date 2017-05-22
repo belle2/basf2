@@ -220,8 +220,7 @@ struct dhc_start_frame {
   void print(void) const
   {
     word0.print();
-    B2DEBUG(20,
-            "DHC Start Frame TNRLO $" << hex << trigger_nr_lo << " TNRHI $" << hex << trigger_nr_hi << " TTLO $" << hex <<
+    B2DEBUG(20, "DHC Start Frame TNRLO $" << hex << trigger_nr_lo << " TNRHI $" << hex << trigger_nr_hi << " TTLO $" << hex <<
             time_tag_lo_and_type
             << " TTMID $" << hex << time_tag_mid << " TTHI $" << hex << time_tag_hi << " Exp/Run/Subrun $" << hex << exp_run << " $" <<
             run_subrun
@@ -263,8 +262,7 @@ struct dhc_dhe_start_frame {
   void print(void) const
   {
     word0.print();
-    B2DEBUG(20,
-            "DHC Event Frame TNRLO $" << hex << trigger_nr_lo  << " DTTLO $" << hex << dhe_time_tag_lo << " DTTHI $" << hex <<
+    B2DEBUG(20, "DHC Event Frame TNRLO $" << hex << trigger_nr_lo  << " DTTLO $" << hex << dhe_time_tag_lo << " DTTHI $" << hex <<
             dhe_time_tag_hi
             << " DHEID $" << hex << getDHEId()
             << " DHPMASK $" << hex << getActiveDHPMask()
@@ -307,8 +305,8 @@ struct dhc_direct_readout_frame {
   void print(void) const
   {
     word0.print();
-    B2DEBUG(20,
-            "DHC Direct Readout (Raw|ZSD|ONS) Frame TNRLO $" << hex << trigger_nr_lo << " DHE ID $" << getDHEId() << " DHP port $" <<
+    B2DEBUG(20, "DHC Direct Readout (Raw|ZSD|ONS) Frame TNRLO $" << hex << trigger_nr_lo << " DHE ID $" << getDHEId() << " DHP port $"
+            <<
             getDHPPort());
   };
   inline unsigned short getDHEId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
@@ -503,8 +501,7 @@ struct dhc_end_frame {
   void print(void) const
   {
     word0.print();
-    B2DEBUG(20,
-            "DHC End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsinevent << " ERR " << hex << errorinfo
+    B2DEBUG(20, "DHC End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsinevent << " ERR " << hex << errorinfo
             << " CRC " << hex << crc32);
   };
   inline unsigned int get_dhc_id(void) const {return (word0.getMisc() >> 5) & 0xF;};
@@ -530,8 +527,7 @@ struct dhc_dhe_end_frame {
   void print(void) const
   {
     word0.print();
-    B2DEBUG(20,
-            "DHC DHE End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsinevent << " ERR " << hex << errorinfo
+    B2DEBUG(20, "DHC DHE End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsinevent << " ERR " << hex << errorinfo
             << " CRC " << hex << crc32);
   };
   inline unsigned int getDHEId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
@@ -612,8 +608,8 @@ public:
 
     if (c == crc32) {
 //       if (verbose)
-      //         B2INFO("DHE Data Frame CRC: " << hex << c << "==" << crc32);
-//         B2INFO("DHC Data Frame CRC OK: " << hex << c << "==" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
+      //      B2DEBUG(20,"DHE Data Frame CRC: " << hex << c << "==" << crc32);
+//         B2DEBUG(20,"DHC Data Frame CRC OK: " << hex << c << "==" << crc32 << " data "  << * (unsigned int*)(d + length - 8) << " "
 //                << * (unsigned int*)(d + length - 6) << " " << * (unsigned int*)(d + length - 4) << " len $" << length);
     } else {
 //       crc_error++;
@@ -840,8 +836,7 @@ void PXDUnpackerModule::event()
 
   int nRaws = m_storeRawPXD.getEntries();
   if (verbose) {
-    B2DEBUG(20,
-            "PXD Unpacker --> RawPXD Objects in event: " << nRaws);
+    B2DEBUG(20, "PXD Unpacker --> RawPXD Objects in event: " << nRaws);
   };
 
   m_errorMask = 0;
@@ -860,8 +855,7 @@ void PXDUnpackerModule::event()
   int nsr = 0;// number of packets
   for (auto& it : m_storeRawPXD) {
     if (verbose) {
-      B2DEBUG(20,
-              "PXD Unpacker --> Unpack Objects: ");
+      B2DEBUG(20, "PXD Unpacker --> Unpack Objects: ");
     };
     unpack_event(it);
     nsr++;

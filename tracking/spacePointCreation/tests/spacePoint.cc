@@ -116,11 +116,11 @@ namespace Belle2 {
     VXD::SensorInfoBase anotherSensorInfoBase = createSensorInfo(anotherVxdID, 2.3, 4.2);
 
     // create new SVDClusters and fill it with Info getting a Hit which is not at the origin
-    // SVDCluster (VxdID sensorID, bool isU, float position, float positionSigma, double clsTime, double clsTimeSigma, float seedCharge, float clsCharge, unsigned short clsSize)
-    SVDCluster clusterU1 = SVDCluster(aVxdID, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1);
-    SVDCluster clusterV1 = SVDCluster(aVxdID, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1);
-    SVDCluster clusterU2 = SVDCluster(aVxdID, true, 0.23, 0.1, 0.01, 0.001, 1, 1, 1);
-    SVDCluster clusterU3 = SVDCluster(anotherVxdID, true, 0.23, 0.1, 0.01, 0.001, 1, 1, 1);
+    // SVDCluster (VxdID sensorID, bool isU, float position, float positionSigma, double clsTime, double clsTimeSigma, float seedCharge, float clsCharge, unsigned short clsSize, double clsSNR)
+    SVDCluster clusterU1 = SVDCluster(aVxdID, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1, 1);
+    SVDCluster clusterV1 = SVDCluster(aVxdID, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1, 1);
+    SVDCluster clusterU2 = SVDCluster(aVxdID, true, 0.23, 0.1, 0.01, 0.001, 1, 1, 1, 1);
+    SVDCluster clusterU3 = SVDCluster(anotherVxdID, true, 0.23, 0.1, 0.01, 0.001, 1, 1, 1, 1);
 
 
     // normal u+v = 2D Cluster (order of input irrelevant):
@@ -527,8 +527,8 @@ namespace Belle2 {
 
     // create new SVDClusters and fill it with Info getting a Hit which is not at the origin
     // SVDCluster (VxdID sensorID, bool isU, float position, float positionSigma, double clsTime, double clsTimeSigma, float seedCharge, float clsCharge, unsigned short clsSize)
-    SVDCluster clusterU1 = SVDCluster(aVxdID, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1);
-    SVDCluster clusterV1 = SVDCluster(aVxdID, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster clusterU1 = SVDCluster(aVxdID, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1, 1);
+    SVDCluster clusterV1 = SVDCluster(aVxdID, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1, 1);
 
     vector<const SVDCluster*> clusters2d = { &clusterU1, &clusterV1 };
     SpacePoint testPoint2D = SpacePoint(clusters2d, &sensorInfoBase);

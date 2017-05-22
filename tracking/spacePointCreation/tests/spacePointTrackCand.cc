@@ -56,12 +56,12 @@ namespace Belle2 {
 
     VxdID anotherVxdID = VxdID(3, 3, 3);
     VXD::SensorInfoBase anotherSensorInfoBase = createSensorInfo(anotherVxdID, 2.3, 4.2);
-    SVDCluster aUCluster = SVDCluster(anotherVxdID, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1);
-    SVDCluster aVCluster = SVDCluster(anotherVxdID, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster aUCluster = SVDCluster(anotherVxdID, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1, 1.0);
+    SVDCluster aVCluster = SVDCluster(anotherVxdID, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1, 1.0);
     std::vector<const SVDCluster*> a2HitCluster = { &aUCluster, &aVCluster };
     const SpacePoint aSVDSpacePoint = SpacePoint(a2HitCluster, &anotherSensorInfoBase);
 
-    SVDCluster anotherUCluster = SVDCluster(anotherVxdID, true, 0.23, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster anotherUCluster = SVDCluster(anotherVxdID, true, 0.23, 0.1, 0.01, 0.001, 1, 1, 1, 1.0);
     std::vector<const SVDCluster*> a1HitCluster = { &anotherUCluster };
     const SpacePoint anotherSVDSpacePoint = SpacePoint(a1HitCluster, &anotherSensorInfoBase);
 
@@ -101,12 +101,12 @@ namespace Belle2 {
 
     VxdID anotherVxdID = VxdID(3, 3, 3);
     VXD::SensorInfoBase anotherSensorInfoBase = createSensorInfo(anotherVxdID, 2.3, 4.2);
-    SVDCluster aUCluster = SVDCluster(anotherVxdID, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1);
-    SVDCluster aVCluster = SVDCluster(anotherVxdID, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster aUCluster = SVDCluster(anotherVxdID, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1, 1.0);
+    SVDCluster aVCluster = SVDCluster(anotherVxdID, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1, 1.0);
     std::vector<const SVDCluster*> a2HitCluster = { &aUCluster, &aVCluster };
     const SpacePoint aSVDSpacePoint = SpacePoint(a2HitCluster, &anotherSensorInfoBase);
 
-    SVDCluster anotherUCluster = SVDCluster(anotherVxdID, true, 0.23, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster anotherUCluster = SVDCluster(anotherVxdID, true, 0.23, 0.1, 0.01, 0.001, 1, 1, 1, 1.0);
     std::vector<const SVDCluster*> a1HitCluster = { &anotherUCluster };
     const SpacePoint anotherSVDSpacePoint = SpacePoint(a1HitCluster, &anotherSensorInfoBase);
 
@@ -184,8 +184,8 @@ namespace Belle2 {
 
     VxdID aVxdID2 = VxdID(2, 2, 2);
     VXD::SensorInfoBase sensorInfoBase2 = createSensorInfo(aVxdID2, 2.3, 4.2);
-    SVDCluster aUCluster = SVDCluster(aVxdID2, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1);
-    SVDCluster aVCluster = SVDCluster(aVxdID2, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster aUCluster = SVDCluster(aVxdID2, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1, 1.0);
+    SVDCluster aVCluster = SVDCluster(aVxdID2, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1, 1.0);
     std::vector<const SVDCluster*> UVClusterVec1 = { &aUCluster, &aVCluster };
     std::vector<const SVDCluster*> VClusterVec = { &aVCluster };
     std::vector<const SVDCluster*> UClusterVec = { &aUCluster };
@@ -198,8 +198,8 @@ namespace Belle2 {
 
     VxdID aVxdId3 = VxdID(3, 3, 3);
     VXD::SensorInfoBase sensorInfoBase3 = createSensorInfo(aVxdId3, 2.3, 4.2);
-    SVDCluster aUCluster2 = SVDCluster(aVxdId3, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1);
-    SVDCluster aVCluster2 = SVDCluster(aVxdId3, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster aUCluster2 = SVDCluster(aVxdId3, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1, 1.0);
+    SVDCluster aVCluster2 = SVDCluster(aVxdId3, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1, 1.0);
     std::vector<const SVDCluster*> UVClusterVec2 = { &aUCluster2, &aVCluster2 };
     std::vector<const SVDCluster*> VClusterVec2 = { &aVCluster2 };
     std::vector<const SVDCluster*> UClusterVec2 = { &aUCluster2 };
@@ -374,8 +374,8 @@ namespace Belle2 {
 
     VxdID aVxdID2 = VxdID(2, 2, 2);
     VXD::SensorInfoBase sensorInfoBase2 = createSensorInfo(aVxdID2, 2.3, 4.2);
-    SVDCluster aUCluster = SVDCluster(aVxdID2, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1);
-    SVDCluster aVCluster = SVDCluster(aVxdID2, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster aUCluster = SVDCluster(aVxdID2, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1, 1.0);
+    SVDCluster aVCluster = SVDCluster(aVxdID2, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1, 1.0);
     std::vector<const SVDCluster*> UVClusterVec1 = { &aUCluster, &aVCluster };
     std::vector<const SVDCluster*> VClusterVec = { &aVCluster };
     std::vector<const SVDCluster*> UClusterVec = { &aUCluster };
@@ -418,8 +418,8 @@ namespace Belle2 {
 
     VxdID aVxdID2 = VxdID(2, 2, 2);
     VXD::SensorInfoBase sensorInfoBase2 = createSensorInfo(aVxdID2, 2.3, 4.2);
-    SVDCluster aUCluster = SVDCluster(aVxdID2, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1);
-    SVDCluster aVCluster = SVDCluster(aVxdID2, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster aUCluster = SVDCluster(aVxdID2, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1, 1.0);
+    SVDCluster aVCluster = SVDCluster(aVxdID2, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1, 1.0);
     std::vector<const SVDCluster*> UVClusterVec1 = { &aUCluster, &aVCluster };
     std::vector<const SVDCluster*> VClusterVec = { &aVCluster };
     std::vector<const SVDCluster*> UClusterVec = { &aUCluster };
@@ -429,8 +429,8 @@ namespace Belle2 {
 
     VxdID aVxdId3 = VxdID(3, 3, 3);
     VXD::SensorInfoBase sensorInfoBase3 = createSensorInfo(aVxdId3, 2.3, 4.2);
-    SVDCluster aUCluster2 = SVDCluster(aVxdId3, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1);
-    SVDCluster aVCluster2 = SVDCluster(aVxdId3, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1);
+    SVDCluster aUCluster2 = SVDCluster(aVxdId3, true, -0.23, 0.1, 0.01, 0.001, 1, 1, 1, 1.0);
+    SVDCluster aVCluster2 = SVDCluster(aVxdId3, false, 0.42, 0.1, 0.01, 0.001, 1, 1, 1, 1.0);
     std::vector<const SVDCluster*> UVClusterVec2 = { &aUCluster2, &aVCluster2 };
     std::vector<const SVDCluster*> VClusterVec2 = { &aVCluster2 };
     std::vector<const SVDCluster*> UClusterVec2 = { &aUCluster2 };

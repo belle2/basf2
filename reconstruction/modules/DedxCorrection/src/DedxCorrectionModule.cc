@@ -10,10 +10,7 @@
 
 #include <reconstruction/modules/DedxCorrection/DedxCorrectionModule.h>
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/utilities/FileSystem.h>
 
@@ -51,22 +48,16 @@ DedxCorrectionModule::~DedxCorrectionModule() { }
 void DedxCorrectionModule::initialize()
 {
 
-  // required inputs
-  StoreArray<CDCDedxTrack>::required();
-  StoreArray<Track>::required();
-  StoreArray<TrackFitResult>::required();
+  // register in datastore
+  m_cdcDedxTracks.isRequired();
 
-  // register outputs
-  StoreArray<CDCDedxTrack>::registerPersistent();
-
+  // prepare the calibration constants
+  for (auto awire : m_DBGains)
+    m_wireGains[awire.getWireID()] = awire.getWireGain();
 }
 
 void DedxCorrectionModule::event()
 {
-
-  // inputs
-  StoreArray<CDCDedxTrack> dedxTracks;
-  StoreArray<Track> tracks;
 
   // outputs
   StoreArray<CDCDedxTrack> dedxArray;
@@ -77,18 +68,9 @@ void DedxCorrectionModule::event()
   //
   // **************************************************
 
-  for (int iTrack = 0; iTrack < tracks.getEntries(); ++iTrack) {
-    Track* track = tracks[iTrack];
-    CDCDedxTrack* dedxTrack = track->getRelatedTo<CDCDedxTrack>();
-    if (!dedxTrack || dedxTrack->size() != 0) {
+  for (auto dedxTrack : m_cdcDedxTracks) {
+    if (dedxTrack.size() == 0) {
       B2WARNING("No good hits on this track...");
-      continue;
-    }
-
-    // get pion fit hypothesis for now
-    const TrackFitResult* fitResult = track->getTrackFitResult(Const::pion);
-    if (!fitResult) {
-      B2WARNING("No related fit for this track...");
       continue;
     }
 
@@ -99,19 +81,19 @@ void DedxCorrectionModule::event()
     //
     // **************************************************
 
-    int nhits = dedxTrack->size();
+    int nhits = dedxTrack.size();
     for (int i = 0; i < nhits; ++i) {
-      // only look at CDC hits
-      if (dedxTrack->getWire(i) > 15000) continue;
 
-      double newdedx = StandardCorrection(dedxTrack->getWire(i), dedxTrack->getCosTheta(), dedxTrack->getDedx(i));
-      dedxTrack->setDedx(i, newdedx);
+      double newdedx = StandardCorrection(dedxTrack.getWire(i), dedxTrack.getDedx(i));
+      dedxTrack.setDedx(i, newdedx);
     } // end loop over hits
 
-    calculateMeans(&(dedxTrack->m_dedx_avg),
-                   &(dedxTrack->m_dedx_avg_truncated),
-                   &(dedxTrack->m_dedx_avg_truncated_err),
-                   dedxTrack->dedx);
+    calculateMeans(&(dedxTrack.m_dedx_avg),
+                   &(dedxTrack.m_dedx_avg_truncated),
+                   &(dedxTrack.m_dedx_avg_truncated_err),
+                   dedxTrack.dedx);
+
+    //    CDCDedxTrack* newCDCDedxTrack = dedxArray.appendNew(dedxTrack);
   } // end loop over tracks
 }
 
@@ -130,10 +112,6 @@ void DedxCorrectionModule::initializeParameters()
   // debugging. Eventually, this should get the constants from the
   // calibration database.
   m_runGain = 1.0;
-  for (int i = 0; i < c_NCDCWires; ++i) {
-    m_wireGain[i] = 2.0;
-    m_valid[i] = 1.0;
-  }
 
   // these are arbitrary and should be extracted from the calibration
   m_alpha = 1.35630e-02;
@@ -156,21 +134,14 @@ double DedxCorrectionModule::RunGainCorrection(double& dedx) const
 double DedxCorrectionModule::WireGainCorrection(int wireID, double& dedx) const
 {
 
-  if (m_valid[wireID] && m_wireGain[wireID] != 0) {
-    double newDedx = dedx / m_wireGain[wireID];
+  auto it = m_wireGains.find(wireID);
+  if (it != m_wireGains.end()) {
+    //    double cor = it->second/66.18;
+    //    B2INFO("correcting by " << it->second/66.18 << ": " << dedx << "\t" << dedx/cor);
+    double newDedx = dedx / it->second;
     return newDedx;
   } else
     return dedx;
-
-  /*
-  B2INFO("Rescaling wire gains for " << wireID << " = " << m_wireGains[wireID]->getWireID() << " by " << m_wireGains[wireID]->getWireGain());
-
-  if (m_wireGains[wireID]->getWireID() == wireID) {
-    double newDedx = dedx / m_wireGains[wireID]->getWireGain();
-    return newDedx;
-    } else
-  return dedx;
-  */
 }
 
 double DedxCorrectionModule::HadronCorrection(double costheta, double dedx) const
@@ -181,16 +152,16 @@ double DedxCorrectionModule::HadronCorrection(double costheta, double dedx) cons
   return D2I(costheta, I2D(costheta, 1.00) / 1.00 * dedx) * 550;
 }
 
-double DedxCorrectionModule::StandardCorrection(int wireID, double costheta, double dedx) const
+double DedxCorrectionModule::StandardCorrection(int wireID, double dedx) const
 {
 
   double temp = dedx;
 
-  temp = RunGainCorrection(temp);
+  //temp = RunGainCorrection(temp);
 
   temp = WireGainCorrection(wireID, temp);
 
-  temp = HadronCorrection(costheta, temp);
+  //temp = HadronCorrection(costheta, temp);
 
   return temp;
 }

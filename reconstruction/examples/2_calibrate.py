@@ -1,36 +1,56 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 #############################################################
 # 2 - calibrate
-# Run the electron calibration on the sample generated in
-# step 1. For now, this is a dummy calibration for testing.
 #
-# Usage: basf2 2_calibrate.py
+# Run the dE/dx calibration with the CAF:
+#  - collect the samples with the Collector modules
+#  - run the calibrations with the given algorithms
+#  - produce output database files
 #
-# Input: B2Electrons.root (use 1_generate.py)
-# Output: calibration_results/CDCElectronCalibration/outputdb/
-# dbstore_CDCElectronCollector_rev_1.root
+# Usage: basf2 firstDedxAttempt.py
+# Contributors: Jake Bennett
 #
 # Example steering file - 2011 Belle II Collaboration
 #############################################################
 
-import os
 from basf2 import *
-from caf.framework import Calibration, CAF
-from caf import backends
+
+import os
+import sys
+
 import ROOT
+from ROOT.Belle2 import CDCDedxWireGainAlgorithm, CDCDedxRunGainAlgorithm, CDCDedxCosineAlgorithm
+from caf.framework import Calibration, CAF
 
-# Create Calibration object from Collector, Algorithm(s), and input files
-collector = register_module('CDCElectronCollector')
-algorithm = ROOT.Belle2.CDCElectronCalibrationAlgorithm()
-input_files = os.path.expandvars('$BELLE2_LOCAL_DIR/reconstruction/examples/B2Electrons.root')
-cal = Calibration('CDCElectronCalibration', collector, algorithm, input_files)
+# Specify the input file(s)
+input_files = [os.path.abspath('B2Electrons.root')]
 
-# Create a CAF instance to configure how we will run
-cal_fw = CAF()
-cal_fw.max_iterations = 3
-cal_fw.add_calibration(cal)
+# Define the calibration algorithms
+run_gain_alg = CDCDedxRunGainAlgorithm()
+wire_gain_alg = CDCDedxWireGainAlgorithm()
+cosine_alg = CDCDedxCosineAlgorithm()
+
+# Create Calibration objects from Collector, Algorithm(s), and input files
+run_gains = Calibration(
+    name='CDCDedxRunGainCalibration',
+    collector="CDCDedxRunGainCollector",
+    algorithms=run_gain_alg,
+    input_files=input_files)
+wire_gains = Calibration(
+    name='CDCDedxWireGainCalibration',
+    collector="CDCDedxWireGainCollector",
+    algorithms=wire_gain_alg,
+    input_files=input_files)
+cosine = Calibration(
+    name='CDCDedxCosineCalibration',
+    collector="CDCDedxCosineCollector",
+    algorithms=cosine_alg,
+    input_files=input_files)
+
+# Create a CAF instance and add calibrations
+caf = CAF()
+# caf.add_calibration(run_gains)
+caf.add_calibration(wire_gains)
+# caf.add_calibration(cosine)
 
 # Run the calibration
-cal_fw.run()  # Creates local database files when finished (no auto upload)
+caf.run()  # Creates local database files when finished (no auto upload)

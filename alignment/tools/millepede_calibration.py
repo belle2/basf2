@@ -20,11 +20,13 @@ if __name__ == '__main__':
         'scenario',
         action='store',
         type=str,
-        help='Name of the scenario: currently global (defa.for unrecognized) / CDCLayerAlignment')
-    # parser.add_argument('--components', dest='components', action='append', default=[], help='Components to collect/calibrate')
-    # parser.add_argument('--tracks', dest='tracks', action='append', default=[''],
-    # help='Names of RecoTracks array to collect for calibration')
+        help='Name of the scenario: global | CDCLayerAlignment | ... ')
+    parser.add_argument('--magnet-off', dest='magnet_off', action='store_const', const=True,
+                        default=False, help='Special switch to collect sample with no magnetic field')
+
     args = parser.parse_args()
+
+    magnet = not bool(args.magnet_off)
 
     from alignment import MillepedeCalibration
 
@@ -32,7 +34,7 @@ if __name__ == '__main__':
 
     if args.scenario == 'global':
         # Default global config:
-        millepede = MillepedeCalibration([])
+        millepede = MillepedeCalibration([], magnet=magnet)
         # For mis-alignment/mis-calibration done by using "wrong" constants during collection in MC
         millepede.algo.invertSign()
         millepede.algo.steering().command('Fortranfiles')
@@ -41,11 +43,12 @@ if __name__ == '__main__':
     if args.scenario == 'BeamParameters':
         print('For the BeamParameters scenario you need ParticleList named "Z0:mumu" with')
         print('vertex+beam constrained decays (with updated daughters) in your input DST for collection')
-        millepede = MillepedeCalibration(['BeamParameters'], primary_vertices=['Z0:mumu'])
+
+        millepede = MillepedeCalibration(['BeamParameters'], primary_vertices=['Z0:mumu'], magnet=magnet)
         millepede.algo.invertSign()
 
     if args.scenario == 'VXDHalfShellsAlignment':
-        millepede = MillepedeCalibration(['VXDAlignment'])
+        millepede = MillepedeCalibration(['VXDAlignment'], magnet=magnet)
         millepede.algo.invertSign()
         millepede.fixSVDPat()
         for layer in range(1, 7):
@@ -58,7 +61,7 @@ if __name__ == '__main__':
                     pass
 
     if args.scenario == 'VXDAlignment':
-        millepede = MillepedeCalibration(['VXDAlignment'])
+        millepede = MillepedeCalibration(['VXDAlignment'], magnet=magnet)
         millepede.algo.invertSign()
         # Add the constraints (auto-generated from hierarchy), so you can
         # play with unfixing degrees of freedom below
@@ -66,24 +69,26 @@ if __name__ == '__main__':
         millepede.algo.steering().command('constraints.txt')
 
     if args.scenario == 'CDCLayerAlignment':
-        millepede = MillepedeCalibration(['CDCAlignment', 'CDCLayerAlignment'])
+        millepede = MillepedeCalibration(['CDCAlignment', 'CDCLayerAlignment'], magnet=magnet)
         millepede.algo.invertSign()
-        millepede.fixCDCLayerX(0)
-        millepede.fixCDCLayerY(0)
+        millepede.fixCDCLayerX(49)
+        millepede.fixCDCLayerY(49)
+        millepede.fixCDCLayerRot(49)
         millepede.fixCDCLayerX(55)
         millepede.fixCDCLayerY(55)
+        millepede.fixCDCLayerRot(55)
 
     if args.scenario == 'CDCTimeWalks':
-        millepede = MillepedeCalibration(['CDCTimeWalks'])
+        millepede = MillepedeCalibration(['CDCTimeWalks'], magnet=magnet)
         millepede.algo.invertSign()
         millepede.fixCDCTimeWalk(1)
 
     if args.scenario == 'BKLMAlignment':
-        millepede = MillepedeCalibration(['BKLMAlignment'])
+        millepede = MillepedeCalibration(['BKLMAlignment'], magnet=magnet)
         millepede.algo.invertSign()
 
     if args.scenario == 'EKLMAlignment':
-        millepede = MillepedeCalibration(['EKLMAlignment'])
+        millepede = MillepedeCalibration(['EKLMAlignment'], magnet=magnet)
         millepede.algo.invertSign()
 
     if not millepede:

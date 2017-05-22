@@ -8,8 +8,29 @@ from caf.framework import Calibration
 
 
 class MillepedeCalibration():
+    """ The generic Millepede calibration collector+algorithm """
 
-    def __init__(self, components, tracks=[''], particles=[], vertices=[], primary_vertices=[]):
+    def __init__(self, components, tracks=None, particles=None, vertices=None, primary_vertices=None, magnet=True):
+        """
+        components are the names of DB obejcts to calibrate (BeamParameters etc.)
+        tracks are collections of RecoTracks of fitted charged tracks (usually cosmic rays, no associated particle)
+        particles are names of ParticleLists with single charged particles
+        vertices are names ParticleLists with at least two body decays fitted with vertex constraint
+        primary_vertices are names of ParticleLists with at least two body decays fitted with beam+vertex constraint
+        """
+
+        if particles is None:
+            particles = []
+
+        if vertices is None:
+            vertices = []
+
+        if primary_vertices is None:
+            primary_vertices = []
+
+        if tracks is None:
+            tracks = ['']
+
         self.components = components
         self.parameters = []
 
@@ -27,6 +48,8 @@ class MillepedeCalibration():
         self.algo.steering().command('outlierdownweighting 3')
         self.algo.steering().command('dwfractioncut 0.1')
 
+        calibrate_vertex = ((components == []) or ('BeamParameters' in components)) and primary_vertices is not None
+
         self.collector = register_module('MillepedeCollector',
                                          minPValue=0.,
                                          useGblTree=False,
@@ -34,13 +57,18 @@ class MillepedeCalibration():
                                          particles=particles,
                                          vertices=vertices,
                                          primaryVertices=primary_vertices,
-                                         calibrateVertex=True)
+                                         calibrateVertex=calibrate_vertex)
         self.collector.param('components', components)
 
         self.path = create_path()
         self.path.add_module('Progress')
         self.path.add_module('Gearbox')
-        self.path.add_module('Geometry')
+
+        if magnet:
+            self.path.add_module('Geometry')
+        else:
+            self.path.add_module('Geometry', excludedComponents=['MagneticField'])
+
         self.path.add_module('SetupGenfitExtrapolation', noiseBetheBloch=False, noiseCoulomb=False, noiseBrems=False)
         # self.path.add_module('DAFRecoFitter')
 
@@ -92,8 +120,14 @@ class MillepedeCalibration():
     def fixCDCLayerY(self, layer):
         self._fixGlobalParam(Belle2.CDCLayerAlignment.getGlobalUniqueID(), layer, Belle2.CDCLayerAlignment.layerY)
 
-    def fixCDCLayerPhi(self, layer):
+    def fixCDCLayerRot(self, layer):
         self._fixGlobalParam(Belle2.CDCLayerAlignment.getGlobalUniqueID(), layer, Belle2.CDCLayerAlignment.layerPhi)
+
+    def fixCDCTimeWalk(self, board_id):
+        self._fixGlobalParam(Belle2.CDCTimeWalks.getGlobalUniqueID(), board_id, 0)
+
+    def fixCDCTimeZero(self, wire_id):
+        self._fixGlobalParam(Belle2.CDCTimeZeros.getGlobalUniqueID(), wire_id, 0)
 
     def fixVXDid(self, layer, ladder, sensor, segment=0):
         for param in range(1, 7):

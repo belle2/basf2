@@ -202,7 +202,8 @@ namespace Belle2 {
     if (barHit) cout << "delta = " << barHit->getTime() - t0.value - extHit->getTOF()
                        << ", p = " << topTrack.getP()
                        << ", nfot = " << reco.getNumOfPhotons()
-                       << ", slot: " << barHit->getModuleID() << " " << extHit->getCopyID() << endl;
+                       << ", slot: " << barHit->getModuleID()
+                       << " " << extHit->getCopyID() << endl;
 
     if (m_histograms.size() < 100) {
       std::string name = "h" + std::to_string(m_histograms.size());
@@ -214,6 +215,13 @@ namespace Belle2 {
       for (int i = 0; i < m_numBins; i++) h->SetBinContent(i + 1, m_logLikelihoods[i]);
     }
 
+    // subtract T0 in digits
+
+    if (m_applyT0) {
+      for (auto& digit : topDigits) {
+        digit.subtractT0(t0.value);
+      }
+    }
 
   }
 

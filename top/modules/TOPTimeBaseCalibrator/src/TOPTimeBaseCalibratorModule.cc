@@ -423,6 +423,27 @@ namespace Belle2 {
     saveAsHistogram(sampleTimes, "sampleTimes_ch" + to_string(chan),
                     "Time base corrections for " + forWhat, "sample number", "t [ns]");
 
+    // calibrated cal pulse time difference
+
+    std::string name = "timeDiffcal_ch" + to_string(chan);
+    std::string title = "Calibrated cal pulse time difference vs. sample for " + forWhat;
+    TH2F Hcor(name.c_str(), title.c_str(), c_TimeAxisSize, 0, c_TimeAxisSize,
+              100, DeltaT - 0.5, DeltaT + 0.5);
+    Hcor.SetXTitle("sample number");
+    Hcor.SetYTitle("time difference [ns]");
+    Hcor.SetStats(kTRUE);
+
+    TOPSampleTimes timeBase;
+    timeBase.setTimeAxis(sampleTimes, sampleTimes.back() / 2);
+
+    for (const auto& twoTimes : ntuple) {
+      if (!twoTimes.good) continue;
+      double dt = timeBase.getDeltaTime(0, twoTimes.t2, twoTimes.t1);
+      int sample = int(twoTimes.t1) % c_TimeAxisSize;
+      Hcor.Fill(sample, dt);
+    }
+    Hcor.Write();
+
     B2INFO("... channel " << chan << " OK (chi^2/ndf = " << chi2 / ndf
            << ", ndf = " << ndf << ")");
 

@@ -218,6 +218,9 @@ class Backend():
 
     submit_script = "submit.sh"
 
+    def __init__(self):
+        pass
+
     def submit(self, job):
         """
         Base method for submitting collection jobs to the backend type. This MUST be
@@ -242,24 +245,21 @@ class Backend():
 
 class Local(Backend):
     """
-    Backend for local processes i.e. on the same machine but in a subprocess.
-    Attributes:
-        * max_processes=<int> Specifies the size of the process pool that spawns the subjobs.
+    :param max_processes: Integer that specifies the size of the process pool that spawns the subjobs.
         It's the maximium simultaneous subjobs. Try not to specify a large number or a number
         larger than the number of cores. Won't crash the program but it will slow down
         and negatively impact performance. Default = 1
 
+    Backend for local processes i.e. on the same machine but in a subprocess.
+
     Note that you should call the self.join() method to close the pool and wait for any
-    running processes to finish. Once you've called join you will have to set up a new
-    instance of this backend (or set max_processes again) to create a new pool.
-    If you don't call self.join() and don't create a join yourself somewhere then the main
-    python process might end before your pool is done.
+    running processes to finish before exiting the process. Once you've called join you will have to set up a new
+    instance of this backend to create a new pool. If you don't call `Local.join` or don't create a join yourself
+    somewhere, then the main python process might end before your pool is done.
     """
 
     def __init__(self, max_processes=1):
         """
-        Init method for Local Backend. Spawns a multiprocessing pool based on
-        max_processes argument (default=1)
         """
         #: The size of the multiprocessing process pool.
         self.max_processes = max_processes

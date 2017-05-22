@@ -180,6 +180,7 @@ def topological_sort(dependencies):
     node names, and the values are lists of node names that depend on the
     key (including zero dependencies). It should return the sorted
     list of nodes.
+
     >>> dependencies = {}
     >>> dependencies['c'] = ['a','b']
     >>> dependencies['b'] = ['a']
@@ -284,31 +285,30 @@ def method_dispatch(func):
     first argument of the method is always 'self'.
     Just decorate around class methods and their alternate functions:
 
-    @method_dispatch             # Default method
-    def my_method(self, default_type, ...):
-        ...
+    >>> @method_dispatch             # Default method
+    >>> def my_method(self, default_type, ...):
+    >>>     pass
 
-    @my_method.register(list)    # Registers list method for dispatch
-
-    def _(self, list_type, ...):
-        ...
+    >>> @my_method.register(list)    # Registers list method for dispatch
+    >>> def _(self, list_type, ...):
+    >>>     pass
 
     Doesn't work the same for property decorated class methods, as these
     return a property builtin not a function and change the method naming.
     Do this type of decoration to get them to work:
 
-    @property
-    def my_property(self):
-        return self._my_property
+    >>> @property
+    >>> def my_property(self):
+    >>>     return self._my_property
 
-    @my_property.setter
-    @method_dispatch
-    def my_property(self, input_property):
-        ...
+    >>> @my_property.setter
+    >>> @method_dispatch
+    >>> def my_property(self, input_property):
+    >>>     pass
 
-    @my_property.fset.register(list)
-    def _(self, input_list_properties):
-        ...
+    >>> @my_property.fset.register(list)
+    >>> def _(self, input_list_properties):
+    >>>     pass
     """
     dispatcher = singledispatch(func)
 

@@ -10,7 +10,6 @@ framework
 
 .. automodule:: caf.framework
   :members:
-  :special-members:
   :show-inheritance:
 
 utils

@@ -366,7 +366,7 @@ class Machine():
 
 class CalibrationMachine(Machine):
     """
-    A state machine to handle Calibration objects and the flow of
+    A state machine to handle `Calibration` objects and the flow of
     processing for them.
     """
 
@@ -375,7 +375,7 @@ class CalibrationMachine(Machine):
         Takes a Calibration object from the caf framework and lets you
         set the initial state
         """
-        #: States that are defaults to the CalibrationMachine (could override later)
+        #: States that are defaults to the `CalibrationMachine` (could override later)
         self.default_states = [State("init"),
                                State("running_collector", enter=self._log_new_state),
                                State("collector_failed", enter=self._log_new_state),
@@ -1046,7 +1046,7 @@ class AlgorithmMachine(Machine):
 
 class CalibrationRunner(Thread):
     """
-    Runs a CalibrationMachine in a Thread. Will process from intial state
+    Runs a `CalibrationMachine` in a Thread. Will process from intial state
     to the final state.
     """
 
@@ -1054,7 +1054,7 @@ class CalibrationRunner(Thread):
         """
         """
         super().__init__()
-        #: The CalibrationMachine that we will run
+        #: The `CalibrationMachine` that we will run
         self.machine = machine
         #: Allowed transitions that we will use to progress
         self.moves = ["submit_collector", "complete", "run_algorithms", "iterate"]

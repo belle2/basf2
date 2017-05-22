@@ -42,14 +42,8 @@ namespace Belle2 {
       void apply(const std::vector<CDCTrack>& inputTracks, std::vector<CDCTrack>& outputTracks) final;
 
     private:
-      /// Parameter: use a simple approach just based on the number of tracks in the event
-      bool m_param_useSimpleApproach = false;
-
-      /// Parameter: minimal amount of hits a track must have to be used in the merging procedure
-      unsigned int m_param_minimalNumberOfHits = 40;
-
       /// Subfindlet for creating relations of needed
-      WeightedRelationCreator<const CDCTrack, ChooseableTrackRelationFilter> m_trackRelationCreator;
+      ChooseableTrackRelationFilter m_trackRelationFilter;
 
       /// Memory for the relations between tracks to be followed on linking
       std::vector<WeightedRelation<const CDCTrack> > m_trackRelations;

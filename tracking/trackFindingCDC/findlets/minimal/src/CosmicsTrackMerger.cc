@@ -18,7 +18,7 @@ using namespace TrackFindingCDC;
 
 CosmicsTrackMerger::CosmicsTrackMerger()
 {
-  addProcessingSignalListener(&m_trackRelationCreator);
+  addProcessingSignalListener(&m_trackRelationFilter);
 }
 
 std::string CosmicsTrackMerger::getDescription()
@@ -29,22 +29,11 @@ std::string CosmicsTrackMerger::getDescription()
 
 void CosmicsTrackMerger::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter("useSimpleApproach", m_param_useSimpleApproach,
-                                "Use a simple approach just based on the number of tracks in the event",
-                                m_param_useSimpleApproach);
-
-
-  moduleParamList->addParameter("minimalNumberOfHits", m_param_minimalNumberOfHits,
-                                "Minimal amount of hits a track must have to be used in the merging procedure.",
-                                m_param_minimalNumberOfHits);
+  m_trackRelationFilter.exposeParameters(moduleParamList, prefix);
 }
 
 void CosmicsTrackMerger::apply(const std::vector<CDCTrack>& inputTracks, std::vector<CDCTrack>& outputTracks)
 {
-  // Create a list of valid cosmic tracks
-  std::vector<const CDCTrack*> outputTrackPath;
-  outputTrackPath.reserve(inputTracks.size());
-
   // Some simple cases
   if (inputTracks.empty()) {
     return;
@@ -53,58 +42,61 @@ void CosmicsTrackMerger::apply(const std::vector<CDCTrack>& inputTracks, std::ve
     return;
   }
 
-  if (m_param_useSimpleApproach) {
-    const auto& tracksFitTogether = [](const CDCTrack & lhs, const CDCTrack & rhs) {
-      const double lhsPhi = lhs.getStartTrajectory3D().getFlightDirection3DAtSupport().phi();
-      const double rhsPhi = rhs.getStartTrajectory3D().getFlightDirection3DAtSupport().phi();
+  for (const CDCTrack& cdcTrack : inputTracks) {
+    cdcTrack.getAutomatonCell().unsetMaskedFlag();
+  }
 
-      return std::fabs(AngleUtil::normalised(lhsPhi - rhsPhi)) < 0.2;
-    };
+  // Create linking relations
+  m_trackRelations.clear();
 
-    if (inputTracks.size() == 2 and tracksFitTogether(inputTracks.front(), inputTracks.back())) {
-      outputTrackPath.push_back(&inputTracks.front());
-      outputTrackPath.push_back(&inputTracks.back());
-    } else {
-      B2WARNING("Not having found 2 possible candidates. The simple approach does not work here.");
-
-      // Just copy all tracks to the output.
-      for (const CDCTrack& track : inputTracks) {
-        outputTracks.push_back(track);
+  for (auto fromIt = inputTracks.begin(); fromIt != inputTracks.end(); fromIt++) {
+    for (auto toIt = fromIt; toIt != inputTracks.end(); toIt++) {
+      if (fromIt != toIt) {
+        const CDCTrack& from = *fromIt;
+        const CDCTrack& to = *toIt;
+        Weight weight = m_trackRelationFilter(Relation<const CDCTrack>(&from, &to));
+        if (not std::isnan(weight)) {
+          m_trackRelations.emplace_back(&from, weight, &to);
+        }
       }
-
-      return;
-    }
-  } else {
-    // Possibilities:
-    // (1) chi2 with fitting (slow?)
-    // (2) filters (maybe use already created?)
-    // (3) distances etc
-
-    // TODO: should we also work in the minimal hit property here?
-
-    // Create linking relations
-    m_trackRelations.clear();
-    m_trackRelationCreator.apply(inputTracks, m_trackRelations);
-
-    if (not m_trackRelations.empty()) {
-      std::sort(m_trackRelations.begin(), m_trackRelations.end());
-
-      // only use the best two combination
-      outputTrackPath.push_back(m_trackRelations[0].getFrom());
-      outputTrackPath.push_back(m_trackRelations[0].getTo());
     }
   }
 
-  if (not outputTrackPath.empty()) {
-    // Sort the tracks by their start position from top to bottom
-    // TODO: see how we can generalize this
-    const auto& trackSorter = [](const CDCTrack * lhs, const CDCTrack * rhs) {
-      return lhs->getStartRecoPos3D().y() > rhs->getStartRecoPos3D().y();
-    };
-    std::sort(outputTrackPath.begin(), outputTrackPath.end(), trackSorter);
+  // TODO: see how we can generalize this
+  const auto& trackSorter = [](const CDCTrack * lhs, const CDCTrack * rhs) {
+    return lhs->getStartRecoPos3D().y() > rhs->getStartRecoPos3D().y();
+  };
 
+  if (not m_trackRelations.empty()) {
+    std::sort(m_trackRelations.begin(), m_trackRelations.end());
 
-    // As we assume only one track per event, we merge them all together.
-    outputTracks.push_back(CDCTrack::condense(outputTrackPath));
+    for (auto& relation : m_trackRelations) {
+      if (relation.getFrom()->getAutomatonCell().hasMaskedFlag() or relation.getTo()->getAutomatonCell().hasMaskedFlag()) {
+        continue;
+      }
+
+      // Create a list of valid cosmic tracks
+      std::vector<const CDCTrack*> outputTrackPath = {relation.getFrom(), relation.getTo()};
+
+      // Sort the tracks by their start position from top to bottom
+      std::sort(outputTrackPath.begin(), outputTrackPath.end(), trackSorter);
+
+      // As we assume only one track per event, we merge them all together.
+      outputTracks.push_back(CDCTrack::condense(outputTrackPath));
+
+      relation.getFrom()->getAutomatonCell().setMaskedFlag();
+      relation.getTo()->getAutomatonCell().setMaskedFlag();
+    }
+  }
+
+  // also add the rest of the tracks
+  for (const CDCTrack& track : inputTracks) {
+    if (not track.getAutomatonCell().hasMaskedFlag()) {
+      outputTracks.push_back(track);
+    }
+  }
+
+  for (const CDCTrack& cdcTrack : inputTracks) {
+    cdcTrack.getAutomatonCell().unsetMaskedFlag();
   }
 }

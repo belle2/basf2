@@ -72,7 +72,10 @@ retrieve the SectorMaps from SectorMapsInputFile during initialize.", m_readSect
   addParam("WriteSectorMap", m_writeSectorMap, "If set to true \
 at endRun write the SectorMaps to SectorMapsOutputFile.", m_writeSectorMap);
 
-
+  addParam("SetupToRead", m_setupToRead, "If non empty only the setup with the given name will be read"
+           " from the from the root file. All other will be ignored. If empty \"\" (default) all setups are read. Will "
+           "only used if sectormap is retrieved from root file. Case will be ignored!",
+           std::string(""));
 }
 
 void
@@ -407,10 +410,24 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
   tree->SetBranchAddress(c_setupKeyNameBranchName.c_str(),
                          & setupKeyName);
 
+  // ignore case, so only upper case
+  TString setupToRead_upper = m_setupToRead;
+  setupToRead_upper.ToUpper();
+  // to monitor if anything was read from the root files
+  bool read_something = false;
+
   FiltersContainer<SpacePoint>& filtersContainer = FiltersContainer<SpacePoint>::getInstance();
   auto nEntries = tree->GetEntriesFast();
   for (int i = 0;  i < nEntries ; i++) {
     tree->GetEntry(i);
+
+    // if a setup name is specified only read that one
+    if (setupToRead_upper != "") {
+      TString buff = setupKeyName->Data();
+      buff.ToUpper();
+      if (buff != setupToRead_upper) continue;
+    }
+
     rootFile.cd(setupKeyName->Data());
 
     B2DEBUG(1, "Retrieving SectorMap with name " << setupKeyName->Data());
@@ -427,8 +444,10 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
 
     setupKeyName->Clear();
 
+    read_something = true;
   }
 
+  if (!read_something) B2WARNING("No setup was read from the root file! The requested setup name was: " << m_setupToRead);
 
   rootFile.Close();
 

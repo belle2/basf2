@@ -95,6 +95,7 @@ def setup_VXDTF2(path=None,
     if sec_map_file:
         secMapBootStrap.param('SectorMapsInputFile', sec_map_file)
     secMapBootStrap.param('WriteSectorMap', False)
+    secMapBootStrap.param('SetupToRead', "")
     modules.append(secMapBootStrap)
 
     ##################

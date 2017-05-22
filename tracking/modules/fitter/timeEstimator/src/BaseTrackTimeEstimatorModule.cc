@@ -123,18 +123,13 @@ void BaseTrackTimeEstimatorModule::event()
 double BaseTrackTimeEstimatorModule::estimateTimeSeedUsingFittedInformation(RecoTrack& recoTrack,
     const Const::ChargedStable& particleHypothesis) const
 {
-  if (not recoTrack.wasFitSuccessful()) {
+  const int currentPdgCode = TrackFitter::createCorrectPDGCodeForChargedStable(particleHypothesis, recoTrack);
+  const genfit::AbsTrackRep* trackRepresentation = TrackFitter::getTrackRepresentationForPDG(currentPdgCode, recoTrack);
+
+  if (not trackRepresentation or not recoTrack.wasFitSuccessful(trackRepresentation)) {
     B2WARNING("Could not estimate a correct time, as the last fit failed.");
     return 0;
   } else {
-    const int currentPdgCode = TrackFitter::createCorrectPDGCodeForChargedStable(particleHypothesis, recoTrack);
-    const genfit::AbsTrackRep* trackRepresentation = TrackFitter::getTrackRepresentationForPDG(currentPdgCode, recoTrack);
-
-    if (not trackRepresentation) {
-      B2WARNING("Reco Track was not fitted with this hypothesis. Will use the cardinal one.");
-      trackRepresentation = recoTrack.getCardinalRepresentation();
-    }
-
     // If the flight length is clear, just use the s = v * t relation.
     genfit::MeasuredStateOnPlane measuredState = recoTrack.getMeasuredStateOnPlaneFromFirstHit(trackRepresentation);
 

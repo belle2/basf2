@@ -546,7 +546,8 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     ##########################
     use_segment_network_filters = True
     filter_overlapping = True
-    quality_estimator = 'tripletFit'
+    # the 'tripletFit' currently does not work with PXD
+    quality_estimator = 'circleFit'
     overlap_filter = 'hopfield'
     # setting different for pxd and svd:
     if is_pxd_used(components):
@@ -610,6 +611,7 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     cellOmat = register_module('TrackFinderVXDCellOMat')
     cellOmat.param('NetworkName', nameSegNet)
     cellOmat.param('SpacePointTrackCandArrayName', nameSPTCs)
+    cellOmat.param('SpacePoints', nameSPs)
     cellOmat.param('printNetworks', False)
     cellOmat.param('strictSeeding', True)
     path.add_module(cellOmat)
@@ -652,9 +654,11 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
 
         if overlap_filter.lower() == 'hopfield':
             overlapFilter = register_module('TrackSetEvaluatorHopfieldNNDEV')
+            overlapFilter.param('tcArrayName', nameSPTCs)
             overlapFilter.param('tcNetworkName', ovNetworkName)
         elif overlap_filter.lower() == 'greedy':
             overlapFilter = register_module('TrackSetEvaluatorGreedyDEV')
+            overlapFilter.param('NameSpacePointTrackCands', nameSPTCs)
             overlapFilter.param('NameOverlapNetworks', ovNetworkName)
         else:
             print("ERROR! unknown overlap filter " + overlap_filter + " is given - can not proceed!")
@@ -671,7 +675,7 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
 
     converter = register_module('SPTC2RTConverter')
     converter.param('recoTracksStoreArrayName', reco_tracks)
-    converter.param('recoHitInformationStoreArrayName', nameSPTCs)
+    converter.param('spacePointsStoreArrayName', nameSPTCs)
     path.add_module(converter)
 
 

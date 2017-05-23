@@ -5,8 +5,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
-#include <tracking/dataobjects/hitToTrueXP.h>
-#include <tracking/modules/hitToTrueXP/hitToTrueXPModule.h>
+#include <tracking/dataobjects/hitXP.h>
+#include <tracking/modules/hitXP/hitXPModule.h>
 #include <tracking/modules/NoKickCutsEval/NoKickCutsEvalModule.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickCuts.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickRTSel.h>
@@ -18,7 +18,7 @@ namespace Belle2 {
 
   //  This module evaluate the cuts used to select the training sample
   //  of the SectorMap. From simulated data files, during the events create
-  //  for each track a vector of hitToTrueXP (see hitToTrueXP class) with the
+  //  for each track a vector of hitXP (see hitXP class) with the
   //  first hit on each layer of VXD (see NoKickRTSel class for detalis). Than
   //  fills some histogram with the distribution of difference of parameters
   //  betweeen following layers.
@@ -47,7 +47,7 @@ namespace Belle2 {
 
     virtual void terminate() override;
 
-    enum parameters {
+    enum Eparameters {
       omega,
       d0,
       phi0,
@@ -58,7 +58,7 @@ namespace Belle2 {
     //  this method evaluate the difference of a required track parameter "par"
     //  between 2 hit. If is0 is set to true is evaluated the difference between
     //  IP and the first hit.
-    double deltaParEval(hitToTrueXP hit1, hitToTrueXP hit2, parameters par, bool is0 = false)
+    double deltaParEval(hitXP hit1, hitXP hit2, Eparameters par, bool is0 = false)
     {
       double out = OVER;
       int layer1 = hit1.m_sensorLayer;
@@ -112,7 +112,7 @@ namespace Belle2 {
     // double cutFunction(int p, double pwid)
     // {
     //   double out;
-    //   double mom = p * pwid + pmin;
+    //   double mom = p * pwid + c_pmin;
     //   out = -3.971 * pow(10, -7) / pow(mom, 3.373) + 1;
     //   return out;
     // }
@@ -124,16 +124,16 @@ namespace Belle2 {
 
   private:
 
-    const double pmin = 0.025;
-    const double pmax = 1.;
+    const double c_pmin = 0.025;
+    const double c_pmax = 2.;
     const double tmin = 17.*M_PI / 180.; //17 degrees
     const double tmax = 5. / 6.*M_PI; //150 degrees
     const int nbin = 5000;
-    const int nbinp = 20;
+    const int nbinp = 40;
     const int nbinpar = 5;
     const int nbinlay = 7;//present IP too
     const int nbint = 3;
-    double pwidth = (pmax - pmin) / (double)nbinp;
+    double pwidth = (c_pmax - c_pmin) / (double)nbinp;
     double twidth = (tmax - tmin) / (double)nbint;
     const double ext_lim = 1;
     const int OVER = 9999999;

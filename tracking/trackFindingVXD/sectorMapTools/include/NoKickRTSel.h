@@ -1,5 +1,5 @@
 
-#include <tracking/modules/hitToTrueXP/hitToTrueXPModule.h>
+#include <tracking/modules/hitXP/hitXPModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
@@ -9,8 +9,8 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <TFile.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/hitToTrueXPDerivate.h>
-#include <tracking/dataobjects/hitToTrueXP.h>
+#include <tracking/dataobjects/hitXPDerivate.h>
+#include <tracking/dataobjects/hitXP.h>
 #include <TObject.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickCuts.h>
 
@@ -63,11 +63,11 @@ namespace Belle2 {
     //  that cointains the cuts used in selection.
 
   public:
-    std::vector<hitToTrueXP> m_hitToTrueXP;
-    std::set<hitToTrueXP, hitToTrueXP::timeCompare> m_setHitToTrueXP;
-    std::vector<hitToTrueXP> m_8hitTrack;
+    std::vector<hitXP> m_hitXP;
+    std::set<hitXP, hitXP::timeCompare> m_setHitXP;
+    std::vector<hitXP> m_8hitTrack;
     NoKickCuts m_trackCuts;
-    double m_pmax = 1.; //range analyzed with cuts
+    double m_pmax = 2.; //range analyzed with cuts
 
     enum parameters {
       omega,
@@ -94,16 +94,16 @@ namespace Belle2 {
     //Inizialize the class cleaning the member vectors
     void initNoKickRTSel()
     {
-      m_hitToTrueXP.clear();
-      m_setHitToTrueXP.clear();
+      m_hitXP.clear();
+      m_setHitXP.clear();
       m_8hitTrack.clear();
     }
 
-    // this method build a vector of hitToTrueXP from a track. The ouput is the
+    // this method build a vector of hitXP from a track. The ouput is the
     // member of the class.
-    void hitToTrueXPBuilder(const RecoTrack& track);
+    void hitXPBuilder(const RecoTrack& track);
 
-    // this metod build a vector of hitToTrueXP from a track selecting the first
+    // this metod build a vector of hitXP from a track selecting the first
     // hit on each layer of VXD (8 hit for SVD only, counting overlaps). The ouput
     // is the member of the class.
     void hit8TrackBuilder(const RecoTrack& track);
@@ -114,11 +114,11 @@ namespace Belle2 {
     bool trackSelector(const RecoTrack& track);
 
     // This method return true if a couple of hits resects the cuts constraints.
-    bool segmentSelector(hitToTrueXP hit1, hitToTrueXP hit2, std::vector<double> selCut, parameters par, bool is0 = false);
+    bool segmentSelector(hitXP hit1, hitXP hit2, std::vector<double> selCut, parameters par, bool is0 = false);
 
     // This method make some global cuts on the tracks (layer 3 and 6 required, d0 and z0 inside beam pipe).
     //Return false if this filter fails.
-    bool globalCut(const std::vector<hitToTrueXP>& track8);
+    bool globalCut(const std::vector<hitXP>& track8);
 
     ClassDef(NoKickRTSel, 1);
   };

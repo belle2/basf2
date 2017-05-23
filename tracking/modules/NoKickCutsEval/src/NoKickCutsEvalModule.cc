@@ -2,7 +2,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <TFile.h>
-#include <tracking/modules/hitToTrueXP/hitToTrueXPModule.h>
+#include <tracking/modules/hitXP/hitXPModule.h>
 #include <tracking/modules/NoKickCutsEval/NoKickCutsEvalModule.h>
 
 
@@ -140,7 +140,7 @@ void NoKickCutsEvalModule::event()
 
   for (const RecoTrack& track : recoTracks) {
     m_trackSel.hit8TrackBuilder(track);
-    std::vector<hitToTrueXP> XP8 = m_trackSel.m_8hitTrack;
+    std::vector<hitXP> XP8 = m_trackSel.m_8hitTrack;
     bool PriorCut = m_trackSel.globalCut(XP8);
     // std::cout << "size XP8=" << XP8.size() << std::endl;
     // int countee =0;
@@ -152,14 +152,14 @@ void NoKickCutsEvalModule::event()
     // std::cout << "----------------------------------" << std::endl;
 
     m_trackSel.m_8hitTrack.clear();
-    m_trackSel.m_hitToTrueXP.clear();
-    m_trackSel.m_setHitToTrueXP.clear();
+    m_trackSel.m_hitXP.clear();
+    m_trackSel.m_setHitXP.clear();
     if (!PriorCut) {GlobCounter++; continue;}
 
     if (XP8.size() > 0) {
       for (int i = 0; (i + 1) < (int)XP8.size(); i++) {
         for (int par = 0; par < nbinpar; par++) {
-          int p = (int)((XP8.at(i).m_momentum0.Mag() - pmin) / pwidth);
+          int p = (int)((XP8.at(i).m_momentum0.Mag() - c_pmin) / pwidth);
           if (p > nbinp - 1 || p < 0) {
             pCounter++;
             continue;
@@ -170,11 +170,11 @@ void NoKickCutsEvalModule::event()
             tCounter++;
             continue;
           }
-          double deltaPar = deltaParEval(XP8.at(i), XP8.at(i + 1), (parameters)par);
+          double deltaPar = deltaParEval(XP8.at(i), XP8.at(i + 1), (Eparameters)par);
           if (deltaPar == OVER) continue;
           histo.at(par).at(XP8.at(i).m_sensorLayer).at(XP8.at(i + 1).m_sensorLayer).at(t).at(p)->Fill(deltaPar);
           if (i == 0) {
-            deltaPar = deltaParEval(XP8.at(i), XP8.at(i), (parameters)par, true);
+            deltaPar = deltaParEval(XP8.at(i), XP8.at(i), (Eparameters)par, true);
             if (deltaPar == OVER)continue;
             histo.at(par).at(0).at(XP8.at(i).m_sensorLayer).at(t).at(p)->Fill(deltaPar);
           }
@@ -296,9 +296,9 @@ void NoKickCutsEvalModule::endRun()
       std::vector<TH2F*> cut_m_histo_lay1;
       for (int lay2 = 0; lay2 < nbinlay; lay2++) {
         cut_M_histo_lay1.push_back(new TH2F("CUTS_M_" + name_par.at(par) + Form("layer%d_%d", lay1, lay2),
-                                            "CUTS_M_" + name_par.at(par) + Form("_layer%d_%d", lay1, lay2), nbinp, pmin, pmax, nbint, tmin, tmax));
+                                            "CUTS_M_" + name_par.at(par) + Form("_layer%d_%d", lay1, lay2), nbinp, c_pmin, c_pmax, nbint, tmin, tmax));
         cut_m_histo_lay1.push_back(new TH2F("CUTS_m_" + name_par.at(par) + Form("layer%d_%d", lay1, lay2),
-                                            "CUTS_m_" + name_par.at(par) + Form("_layer%d_%d", lay1, lay2), nbinp, pmin, pmax, nbint, tmin, tmax));
+                                            "CUTS_m_" + name_par.at(par) + Form("_layer%d_%d", lay1, lay2), nbinp, c_pmin, c_pmax, nbint, tmin, tmax));
         for (int theta = 1; theta <= nbint; theta++) {
           for (int p = 1; p <= nbinp; p++) {
             cut_M_histo_lay1.at(lay2)->SetBinContent(p, theta, cut_M.at(par).at(lay1).at(lay2).at(theta - 1).at(p - 1));
@@ -336,7 +336,7 @@ void NoKickCutsEvalModule::endRun()
         std::vector<double> cut_out_bkg_lay1;
         for (int lay2 = 0; lay2 < nbinlay; lay2++) {
 
-          TF2* fit_MS  = new TF2("fit_MS", "[0]*1/(TMath::Power(x,[1])*TMath::Sqrt(TMath::Sin(y)))+[2]", pmin, pmax, tmin, tmax);
+          TF2* fit_MS  = new TF2("fit_MS", "[0]*1/(TMath::Power(x,[1])*TMath::Sqrt(TMath::Sin(y)))+[2]", c_pmin, c_pmax, tmin, tmax);
 
           double norm = cut_M.at(par).at(lay1).at(lay2).at(1).at(1);
           double Pow = 1;
@@ -558,7 +558,7 @@ void NoKickCutsEvalModule::endRun()
 
   //------------------_DEBUG------------//
   for (int g = 0; g < nbinp; g++) {
-    double p_out_mom = g * pwidth + pmin;
+    double p_out_mom = g * pwidth + c_pmin;
     double t_out_theta = twidth + tmin;
     std::cout << "momentum=" << p_out_mom << std::endl;
 

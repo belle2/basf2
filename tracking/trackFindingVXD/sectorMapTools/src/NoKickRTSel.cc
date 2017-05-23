@@ -4,7 +4,7 @@
 using namespace Belle2;
 
 
-void NoKickRTSel::hitToTrueXPBuilder(const RecoTrack& track)
+void NoKickRTSel::hitXPBuilder(const RecoTrack& track)
 {
   StoreArray<SVDCluster> SVDClusters;
   StoreArray<SVDTrueHit> SVDTrueHits;
@@ -17,7 +17,7 @@ void NoKickRTSel::hitToTrueXPBuilder(const RecoTrack& track)
     for (const SVDTrueHit& hit : cluster->getRelationsTo<SVDTrueHit>()) {
       VxdID trueHitSensorID = hit.getSensorID();
       const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(trueHitSensorID);
-      hitToTrueXPDerivate entry(hit, *cluster, *particle, sensorInfo);
+      hitXPDerivate entry(hit, *cluster, *particle, sensorInfo);
       int NClusterU = 0;
       int NClusterV = 0;
       for (SVDCluster Ncluster : hit.getRelationsFrom<SVDCluster>()) {
@@ -32,7 +32,7 @@ void NoKickRTSel::hitToTrueXPBuilder(const RecoTrack& track)
         isReconstructed |= aRecoTrack.hasSVDHits();
       entry.setReconstructed(isReconstructed);
 
-      m_setHitToTrueXP.insert(entry);
+      m_setHitXP.insert(entry);
     }
   }
 
@@ -46,21 +46,21 @@ void NoKickRTSel::hitToTrueXPBuilder(const RecoTrack& track)
     for (const PXDTrueHit& hit : cluster->getRelationsTo<PXDTrueHit>()) {
       VxdID trueHitSensorID = hit.getSensorID();
       const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(trueHitSensorID);
-      hitToTrueXPDerivate entry(hit, *particle, sensorInfo);
+      hitXPDerivate entry(hit, *particle, sensorInfo);
 
       bool isReconstructed(false);
       for (const RecoTrack& aRecoTrack : particle->getRelationsFrom<RecoTrack>())
         isReconstructed |= aRecoTrack.hasPXDHits();
       entry.setReconstructed(isReconstructed);
 
-      m_setHitToTrueXP.insert(entry);
+      m_setHitXP.insert(entry);
     }
   }
 
 
 
-  for (auto element : m_setHitToTrueXP) {
-    m_hitToTrueXP.push_back(element);
+  for (auto element : m_setHitXP) {
+    m_hitXP.push_back(element);
   }
 
 
@@ -69,8 +69,8 @@ void NoKickRTSel::hitToTrueXPBuilder(const RecoTrack& track)
 
 void NoKickRTSel::hit8TrackBuilder(const RecoTrack& track)
 {
-  hitToTrueXPBuilder(track);
-  for (const hitToTrueXP XP : m_hitToTrueXP) {
+  hitXPBuilder(track);
+  for (const hitXP XP : m_hitXP) {
     if (m_8hitTrack.size() < 1) {
       m_8hitTrack.push_back(XP);
     } else if (XP.m_sensorLayer != m_8hitTrack.back().m_sensorLayer ||
@@ -82,7 +82,7 @@ void NoKickRTSel::hit8TrackBuilder(const RecoTrack& track)
 
 }
 
-bool NoKickRTSel::globalCut(const std::vector<hitToTrueXP>& track8)
+bool NoKickRTSel::globalCut(const std::vector<hitXP>& track8)
 {
   // int flag3 = 0;
   // int flag6 = 0;
@@ -94,7 +94,7 @@ bool NoKickRTSel::globalCut(const std::vector<hitToTrueXP>& track8)
   int lay4 = 0;
   int lay5 = 0;
   int lay6 = 0;
-  for (hitToTrueXP XP : track8) {
+  for (hitXP XP : track8) {
     if (XP.getSensorLayer() == 3) lay3 = 1;
     if (XP.getSensorLayer() == 4) lay4 = 1;
     if (XP.getSensorLayer() == 5) lay5 = 1;
@@ -122,7 +122,7 @@ bool NoKickRTSel::globalCut(const std::vector<hitToTrueXP>& track8)
   else return false;
 }
 
-bool NoKickRTSel::segmentSelector(hitToTrueXP hit1, hitToTrueXP hit2, std::vector<double> selCut, parameters par, bool is0)
+bool NoKickRTSel::segmentSelector(hitXP hit1, hitXP hit2, std::vector<double> selCut, parameters par, bool is0)
 {
   double deltaPar = 0;
   if (hit2.m_sensorLayer - hit1.m_sensorLayer > 1) return true;

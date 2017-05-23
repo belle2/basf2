@@ -6,7 +6,7 @@
 
 namespace Belle2 {
 
-  class hitToTrueXP: public TObject {
+  class hitXP: public TObject {
 
     //  This class collects some information of a TrueHit, using
     //  SVDCLuster and MCParticle information too.
@@ -19,8 +19,8 @@ namespace Belle2 {
     //  with all the useful information for a track-parameters study.
     //  It is used in evaluate the NoKickCuts.
     //
-    //  To build a hitToTrueXP object is necessary to use the constructor
-    //  of the derivate class hitToTrueXPDerivate.
+    //  To build a hitXP object is necessary to use the constructor
+    //  of the derivate class hitXPDerivate.
 
   public:
 
@@ -58,7 +58,7 @@ namespace Belle2 {
 
 
 
-    hitToTrueXP() {}
+    hitXP() {}
 
     TVector3 getPositionMid() const { return m_positionMid; }
 
@@ -341,12 +341,12 @@ namespace Belle2 {
     double getZ00() const { return z0(m_position0, m_momentum0, m_charge); }
 
 
-    //This structure allows to compare times of 2 hitToTrueXP point
+    //This structure allows to compare times of 2 hitXP point
     struct timeCompare {
-      bool operator()(hitToTrueXP v, hitToTrueXP u) const
+      bool operator()(hitXP v, hitXP u) const
       {return v.m_time < u.m_time;}
     };
 
-    ClassDef(hitToTrueXP, 1);
+    ClassDef(hitXP, 1);
   };
 } //end namespace Belle2

@@ -42,10 +42,10 @@
 #pragma link C++ class Belle2::RecoTrack+;
 #pragma link C++ class Belle2::RecoHitInformation+;
 #pragma link C++ class Belle2::SectorMapConfig+;
-#pragma link C++ class Belle2::hitToTrueXP+;
-#pragma link C++ class Belle2::hitToTrueXPDerivate+;
-#pragma link C++ class std::vector<Belle2::hitToTrueXP>+;
-#pragma link C++ class std::vector<Belle2::hitToTrueXPDerivate>+;
+#pragma link C++ class Belle2::hitXP+;
+#pragma link C++ class Belle2::hitXPDerivate+;
+#pragma link C++ class std::vector<Belle2::hitXP>+;
+#pragma link C++ class std::vector<Belle2::hitXPDerivate>+;
 
 #pragma link C++ class Belle2::SpacePointInfo+;
 #pragma link C++ class Belle2::FilterInfo+;

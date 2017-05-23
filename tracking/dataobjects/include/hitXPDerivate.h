@@ -11,22 +11,22 @@
 #include <TFile.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <tracking/dataobjects/MCParticleInfo.h>
-#include <tracking/dataobjects/hitToTrueXP.h>
+#include <tracking/dataobjects/hitXP.h>
 
 
 
 namespace Belle2 {
 
-  class hitToTrueXPDerivate: public hitToTrueXP {
+  class hitXPDerivate: public hitXP {
 
-    //  This class is the derivate of HitToTrueXP, and complete it with a constructor that use
-    //  all other complex types (classes) of basf2. It is necessary to buld a hitToTrueXP object.
+    //  This class is the derivate of HitXP, and complete it with a constructor that use
+    //  all other complex types (classes) of basf2. It is necessary to buld a hitXP object.
 
 
   public:
-    hitToTrueXPDerivate() {}
+    hitXPDerivate() {}
 
-    hitToTrueXPDerivate(const SVDTrueHit& hit, const SVDCluster cluster, const MCParticle& particle, const VXD::SensorInfoBase& sensor)
+    hitXPDerivate(const SVDTrueHit& hit, const SVDCluster cluster, const MCParticle& particle, const VXD::SensorInfoBase& sensor)
     {
       m_positionMid = sensor.pointToGlobal(TVector3(hit.getU(), hit.getV(), hit.getW()), false);
       m_positionEntry = sensor.pointToGlobal(TVector3(hit.getEntryU(), hit.getEntryV(), hit.getEntryW()), false);
@@ -58,7 +58,7 @@ namespace Belle2 {
       m_charge = particle.getCharge();
     }
 
-    hitToTrueXPDerivate(const PXDTrueHit& hit, const MCParticle& particle, const VXD::SensorInfoBase& sensor)
+    hitXPDerivate(const PXDTrueHit& hit, const MCParticle& particle, const VXD::SensorInfoBase& sensor)
     {
       m_positionMid = sensor.pointToGlobal(TVector3(hit.getU(), hit.getV(), hit.getW()), false);
       m_positionEntry = sensor.pointToGlobal(TVector3(hit.getEntryU(), hit.getEntryV(), hit.getEntryW()), false);
@@ -88,6 +88,6 @@ namespace Belle2 {
       m_charge = particle.getCharge();
     }
 
-    ClassDef(hitToTrueXPDerivate, 1);
+    ClassDef(hitXPDerivate, 1);
   };
 } //end namespace Belle2

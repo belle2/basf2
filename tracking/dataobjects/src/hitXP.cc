@@ -1,4 +1,4 @@
-#include <tracking/dataobjects/hitToTrueXP.h>
+#include <tracking/dataobjects/hitXP.h>
 // #include <framework/core/Module.h>
 // #include <TTree.h>
 // #include <framework/datastore/StoreArray.h>

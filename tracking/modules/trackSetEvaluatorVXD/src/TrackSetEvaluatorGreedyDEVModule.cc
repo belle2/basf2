@@ -25,7 +25,11 @@ TrackSetEvaluatorGreedyDEVModule::TrackSetEvaluatorGreedyDEVModule() : Module()
   setDescription("Expects a container of SpacePointTrackCandidates,\
  selects a subset of non-overlapping TCs using the Greedy algorithm.");
 
-  addParam("NameSpacePointTrackCands", m_nameSpacePointTrackCands, "Name of expected StoreArray.", std::string(""));
+  addParam("NameSpacePointTrackCands", m_nameSpacePointTrackCands, "Name of expected StoreArray of SpacePoint track candidates.",
+           std::string(""));
+
+  addParam("NameOverlapNetworks", m_nameOverlapNetworks, "Name of expected StoreArray with overlap "
+           "networks.", std::string(""));
 }
 
 void TrackSetEvaluatorGreedyDEVModule::event()

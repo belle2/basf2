@@ -482,7 +482,7 @@ def add_cdc_cr_track_finding(path, reco_tracks="RecoTracks", trigger_point=(0, 0
                     RecoTracksStoreArrayName=reco_tracks)
 
 
-def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None):
+def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None, suffix=""):
     """
     Convenience function for adding all vxd track finder modules
     to the path. This is for version1 of the trackfinder
@@ -494,10 +494,13 @@ def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None):
     :param reco_tracks: Name of the output RecoTracks, Defaults to RecoTracks.
     :param components: List of the detector components to be used in the reconstruction. Defaults to None which means all
                 components.
+    :param suffix: all names of intermediate Storearrays will have the suffix appended. Useful in cases someone needs to put several
+                   instances of track finding in one path.
     """
 
     # Temporary array
-    vxd_trackcands = '__VXDGFTrackCands'
+    # add a suffix to be able to have different
+    vxd_trackcands = '__VXDGFTrackCands' + suffix
 
     vxd_trackfinder = path.add_module('VXDTF', GFTrackCandidatesColName=vxd_trackcands)
     # WARNING: workaround for possible clashes between fitting and VXDTF
@@ -523,7 +526,7 @@ def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None):
                     recoTracksStoreArrayName=reco_tracks, recreateSortingParameters=True)
 
 
-def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None):
+def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None, suffix=""):
     """
     Convenience function for adding all vxd track finder Version 2 modules
     to the path.
@@ -534,14 +537,16 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     :param path: basf2 path
     :param reco_tracks: Name of the output RecoTracks, Defaults to RecoTracks.
     :param components: List of the detector components to be used in the reconstruction. Defaults to None which means all
-    components.
+                       components.
+    :param suffix: all names of intermediate Storearrays will have the suffix appended. Useful in cases someone needs to put several
+                   instances of track finding in one path.
     """
     ##########################
     # some setting for VXDTF2
     ##########################
     use_segment_network_filters = True
     filter_overlapping = True
-    quality_estimator = 'circleFit'
+    quality_estimator = 'tripletFit'
     overlap_filter = 'hopfield'
     # setting different for pxd and svd:
     if is_pxd_used(components):
@@ -557,17 +562,18 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     # VXDTF2 Step 0
     # Preparation
     #################
+    nameSPs = 'SpacePoints' + suffix
     if use_pxd:
         spCreatorPXD = register_module('SpacePointCreatorPXD')
         spCreatorPXD.param('NameOfInstance', 'PXDSpacePoints')
-        spCreatorPXD.param('SpacePoints', 'SpacePoints')
+        spCreatorPXD.param('SpacePoints', nameSPs)
         path.add_module(spCreatorPXD)
 
     # always use svd!
     spCreatorSVD = register_module('SpacePointCreatorSVD')
     spCreatorSVD.param('OnlySingleClusterSpacePoints', False)
     spCreatorSVD.param('NameOfInstance', 'SVDSpacePoints')
-    spCreatorSVD.param('SpacePoints', 'SpacePoints')
+    spCreatorSVD.param('SpacePoints', nameSPs)
     path.add_module(spCreatorSVD)
 
     # SecMap Bootstrap
@@ -581,12 +587,12 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     # VXDTF2 Step 1
     # SegmentNet
     ##################
-
+    nameSegNet = 'SegmentNetwork' + suffix
     segNetProducer = register_module('SegmentNetworkProducer')
     segNetProducer.param('CreateNeworks', 3)
-    segNetProducer.param('NetworkOutputName', 'test2Hits')
+    segNetProducer.param('NetworkOutputName', nameSegNet)
     segNetProducer.param('allFiltersOff', not use_segment_network_filters)
-    segNetProducer.param('SpacePointsArrayNames', ['SpacePoints'])
+    segNetProducer.param('SpacePointsArrayNames', [nameSPs])
     segNetProducer.param('printNetworks', False)
     segNetProducer.param('sectorMapName', setup_name)
     segNetProducer.param('addVirtualIP', False)
@@ -598,9 +604,12 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     # TrackFinder
     #################
 
+    # append a suffix to the storearray name
+    nameSPTCs = 'SPTrackCands' + suffix
+
     cellOmat = register_module('TrackFinderVXDCellOMat')
-    cellOmat.param('NetworkName', 'test2Hits')
-    # cellOmat.param('SpacePointTrackCandArrayName', 'SPTCs')
+    cellOmat.param('NetworkName', nameSegNet)
+    cellOmat.param('SpacePointTrackCandArrayName', nameSPTCs)
     cellOmat.param('printNetworks', False)
     cellOmat.param('strictSeeding', True)
     path.add_module(cellOmat)
@@ -613,17 +622,19 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     # Quality
     qualityEstimator = register_module('QualityEstimatorVXD')
     qualityEstimator.param('EstimationMethod', quality_estimator)
-    # qualityEstimator.param('SpacePointTrackCandsStoreArrayName', 'SPTCs')
+    qualityEstimator.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
     path.add_module(qualityEstimator)
 
     # will discard track candidates (with low quality estimators) if the number of TC is above threshold
     maxCandidateSelection = register_module('BestVXDTrackCandidatesSelector')
-    # maxCandidateSelection.param('NameSpacePointTrackCands', 'SPTCs')
-    maxCandidateSelection.param('SubsetCreation', False)
+    maxCandidateSelection.param('NameSpacePointTrackCands', nameSPTCs)
+    maxCandidateSelection.param('NewNameSpacePointTrackCands', nameSPTCs)
+    maxCandidateSelection.param('SubsetCreation', True)
     path.add_module(maxCandidateSelection)
 
     # Properties
     vIPRemover = register_module('SPTCvirtualIPRemover')
+    vIPRemover.param('tcArrayName', nameSPTCs)
     vIPRemover.param('maxTCLengthForVIPKeeping', 0)  # want to remove virtualIP for any track length
     path.add_module(vIPRemover)
 
@@ -633,13 +644,18 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     #################
 
     if filter_overlapping:
+        ovNetworkName = 'OverlapNetwork' + suffix
         overlapNetworkProducer = register_module('SVDOverlapChecker')
+        overlapNetworkProducer.param('NameSpacePointTrackCands', nameSPTCs)
+        overlapNetworkProducer.param('OutputArrayName', ovNetworkName)
         path.add_module(overlapNetworkProducer)
 
         if overlap_filter.lower() == 'hopfield':
             overlapFilter = register_module('TrackSetEvaluatorHopfieldNNDEV')
+            overlapFilter.param('tcNetworkName', ovNetworkName)
         elif overlap_filter.lower() == 'greedy':
             overlapFilter = register_module('TrackSetEvaluatorGreedyDEV')
+            overlapFilter.param('NameOverlapNetworks', ovNetworkName)
         else:
             print("ERROR! unknown overlap filter " + overlap_filter + " is given - can not proceed!")
             exit
@@ -650,10 +666,12 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     # Converter
     #################
     momSeedRetriever = register_module('SPTCmomentumSeedRetriever')
+    momSeedRetriever.param('tcArrayName', nameSPTCs)
     path.add_module(momSeedRetriever)
 
     converter = register_module('SPTC2RTConverter')
     converter.param('recoTracksStoreArrayName', reco_tracks)
+    converter.param('recoHitInformationStoreArrayName', nameSPTCs)
     path.add_module(converter)
 
 

@@ -581,6 +581,7 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     secMapBootStrap = register_module('SectorMapBootstrap')
     secMapBootStrap.param('ReadSectorMap', True)
     secMapBootStrap.param('SectorMapsInputFile', sec_map_file)
+    secMapBootStrap.param('SetupToRead', setup_name)
     secMapBootStrap.param('WriteSectorMap', False)
     path.add_module(secMapBootStrap)
 

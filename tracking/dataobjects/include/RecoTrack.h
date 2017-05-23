@@ -890,11 +890,11 @@ namespace Belle2 {
     template<class HitType>
     RecoHitInformation* getRecoHitInformation(HitType* hit, const std::string& storeArrayNameOfHits) const
     {
-      RelationVector<RecoHitInformation> relatedHitInformationToRecoTrack = getRelationsTo<RecoHitInformation>
-          (m_storeArrayNameOfRecoHitInformation);
+      RelationVector<RecoHitInformation> relatedHitInformationToHit = hit->template getRelationsFrom<RecoHitInformation>
+      (m_storeArrayNameOfRecoHitInformation);
 
-      for (RecoHitInformation& recoHitInformation : relatedHitInformationToRecoTrack) {
-        if (recoHitInformation.getRelatedTo<HitType>(storeArrayNameOfHits) == hit) {
+      for (RecoHitInformation& recoHitInformation : relatedHitInformationToHit) {
+        if (recoHitInformation.getRelatedFrom<RecoTrack>(this->getArrayName()) == this) {
           return &recoHitInformation;
         }
       }

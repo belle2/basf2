@@ -112,6 +112,30 @@ namespace Belle2 {
     /// Merged Reco Tracks Store Array
     StoreArray<RecoTrack> m_mergedRecoTracks;
 
+    template <class AHitType>
+    void combine(const std::vector<std::pair<const RecoTrack*, std::pair<TVector3, std::vector<const AHitType*>>>>& seedsWithHits)
+    {
+      for (const auto& seedWithHits : seedsWithHits) {
+        const RecoTrack* seedTrack = seedWithHits.first;
+        const TVector3& vxdPosition = seedWithHits.second.first;
+        const std::vector<const AHitType*>& hits = seedWithHits.second.second;
+
+        TVector3 trackMomentum;
+        int trackCharge;
+
+        // Extrapolate the seed's track parameters onto the vxdPosition
+        extrapolateMomentum(*seedTrack, vxdPosition, trackMomentum, trackCharge);
+
+        RecoTrack* newVXDOnlyTrack = addNewTrack(vxdPosition, trackMomentum, trackCharge, hits, m_vxdRecoTracks);
+        seedTrack->addRelationTo(newVXDOnlyTrack);
+
+        // Add merged VXD-CDC-track
+        RecoTrack* newMergedTrack = addNewTrack(vxdPosition, trackMomentum, trackCharge, hits, m_mergedRecoTracks);
+        newMergedTrack->addHitsFromRecoTrack(seedTrack, newMergedTrack->getNumberOfTotalHits());
+      }
+    }
+
+  private:
     /// Helper function to get the seed or the measured state on plane from a track
     void extractTrackState(const RecoTrack& recoTrack, TVector3& position, TVector3& momentum, int& charge) const
     {
@@ -144,59 +168,23 @@ namespace Belle2 {
       extrapolatedMomentum = cdcHelix.getMomentumAtArcLength2D(arcLengthOfVXDPosition, bField);
     }
 
-    /**
-     * Combine the vxd and cdc tracks based on the relations between tracks in the Data Store.
-     * Write all vxd tracks to StoreArray and add a CDC track, if there is one.
-     */
-    void relateAndCombineTracks();
+    /// Add a new track to the given store array with the SVD hits and the given track parameters
+    template <class AHitType>
+    RecoTrack* addNewTrack(const TVector3& trackPosition, const TVector3& trackMomentum,
+                           int trackCharge, std::vector<const AHitType*> hits,
+                           StoreArray<RecoTrack>& storeArray) const
+    {
+      // Add vxd-only track for reference
+      RecoTrack* newRecoTrack = storeArray.appendNew(trackPosition, trackMomentum, trackCharge);
+
+      unsigned int hitCounter = 0;
+      for (const auto& hit : hits) {
+        newRecoTrack->addSVDHit(hit, hitCounter);
+        hitCounter++;
+      }
+
+      return newRecoTrack;
+    }
+
   };
-
-  /**
-   * Merge related CDC and VXD tracks together and export them into a third store array.
-   * Also add CDC tracks without a match.
-   */
-  template <class AStateObject>
-  void StoreArrayHandler<AStateObject>::relateAndCombineTracks()
-  {
-    for (const RecoTrack& currentVXDTrack : m_vxdRecoTracks) {
-      // track position will be filled with seed or fitted position of VXD track first.
-      TVector3 trackPosition;
-      TVector3 trackMomentum;
-      int trackCharge;
-
-      extractTrackState(currentVXDTrack, trackPosition, trackMomentum, trackCharge);
-
-      // Now check for the related CDC track
-      RecoTrack* relatedCDCRecoTrack = currentVXDTrack.template getRelated<RecoTrack>(m_param_cdcRecoTrackStoreArrayName);
-
-      if (relatedCDCRecoTrack) {
-        // We construct a helix out of the CDC track parameter and "extrapolate" it to the vxd start position to get
-        // the momentum right
-        extrapolateMomentum(*relatedCDCRecoTrack, trackPosition, trackMomentum, trackCharge);
-      }
-
-      RecoTrack* newRecoTrack = m_mergedRecoTracks.appendNew(trackPosition, trackMomentum, trackCharge);
-      newRecoTrack->addHitsFromRecoTrack(&currentVXDTrack);
-
-      if (relatedCDCRecoTrack) {
-        newRecoTrack->addHitsFromRecoTrack(relatedCDCRecoTrack, newRecoTrack->getNumberOfTotalHits());
-      }
-    }
-
-    // add all unmatched CDCTracks to the StoreArray as well
-    for (const RecoTrack& currentCDCTrack : m_cdcRecoTracks) {
-      RecoTrack* relatedVXDRecoTrack = currentCDCTrack.template getRelated<RecoTrack>(m_param_vxdRecoTrackStoreArrayName);
-
-      if (not relatedVXDRecoTrack) {
-        TVector3 cdcPosition;
-        TVector3 cdcMomentum;
-        int cdcCharge;
-
-        extractTrackState(currentCDCTrack, cdcPosition, cdcMomentum, cdcCharge);
-
-        auto newRecoTrack = m_mergedRecoTracks.appendNew(cdcPosition, cdcMomentum, cdcCharge);
-        newRecoTrack->addHitsFromRecoTrack(&currentCDCTrack);
-      }
-    }
-  }
 }

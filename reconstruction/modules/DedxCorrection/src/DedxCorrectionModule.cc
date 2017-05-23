@@ -68,7 +68,7 @@ void DedxCorrectionModule::event()
   //
   // **************************************************
 
-  for (auto dedxTrack : m_cdcDedxTracks) {
+  for (auto& dedxTrack : m_cdcDedxTracks) {
     if (dedxTrack.size() == 0) {
       B2WARNING("No good hits on this track...");
       continue;

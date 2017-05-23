@@ -18,6 +18,10 @@ class IoV():
     """
     Python class to more easily manipulate an IoV and compare against others.
     Uses the C++ framework IntervalOfValidity internally to do various comparisons.
+
+    Default construction is an 'empty' IoV of -1,-1,-1,-1
+
+    For an IoV that encompasses all experiments and runs use 0,0,-1,-1
     """
 
     def __init__(self, exp_low=-1, run_low=-1, exp_high=-1, run_high=-1):
@@ -133,7 +137,13 @@ def runs_overlapping_iov(iov, vector_of_runs):
     """
     overlapping_runs = ROOT.vector('std::pair<int,int>')()
     for run in vector_of_runs:
-        run_iov = IoV(run.first, run.second, run.first, run.second)
+        exp_low = run.first
+        run_low = run.second
+        if exp_low < 0:
+            exp_low = 0
+        if run_low < 0:
+            run_low = 0
+        run_iov = IoV(exp_low, run_low, run.first, run.second)
         if run_iov.overlaps(iov):
             overlapping_runs.push_back(run)
     return overlapping_runs
@@ -146,11 +156,17 @@ def iov_from_vector(iov_vector):
     a tuple of the form ((exp_low, run_low), (exp_high, run_high))
     It assumes that the vector was in order to begine with.
     """
-    iov_list = [(iov.first, iov.second) for iov in iov_vector]
+    iov_list = [list((iov.first, iov.second)) for iov in iov_vector]
     if len(iov_list) > 1:
         iov_low, iov_high = iov_list[0], iov_list[-1]
     else:
         iov_low, iov_high = iov_list[0], iov_list[0]
+    # Makes sure that we never have exp_low and run_low less than 0
+    # Sets them to 0 if they are
+    if iov_low[0] < 0:
+        iov_low[0] = 0
+    if iov_low[1] < 0:
+        iov_low[1] = 0
     return IoV(iov_low[0], iov_low[1], iov_high[0], iov_high[1])
 
 

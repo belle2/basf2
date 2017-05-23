@@ -684,9 +684,9 @@ class CalibrationMachine(Machine):
                     "CAF_TOOLS_LOCATION=" + os.path.join(os.environ["BELLE2_TOOLS"], "setup_belle2"),
                     "CAF_RELEASE_LOCATION=" + os.environ["BELLE2_LOCAL_DIR"],
                     "source $CAF_TOOLS_LOCATION",
-                    "pushd $CAF_RELEASE_LOCATION",
+                    "pushd $CAF_RELEASE_LOCATION > /dev/null",
                     "setuprel",
-                    "popd"
+                    "popd > /dev/null"
                 ]
             else:
                 job.basf2_release = os.environ["BELLE2_RELEASE"]

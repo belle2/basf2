@@ -28,6 +28,8 @@
 
 // root
 #include <TRandom.h>
+#include <TFile.h>
+#include <TH1F.h>
 
 
 using namespace std;
@@ -73,6 +75,9 @@ namespace Belle2 {
              false);
     addParam("storageWindows", m_storageWindows,
              "number of storage windows (old FW used 64 out of 512)", (unsigned) 512);
+    addParam("outputFileName", m_outputFileName,
+             "if given, sample times will be saved as root histograms in this file",
+             std::string(""));
 
   }
 
@@ -134,6 +139,8 @@ namespace Belle2 {
       B2ERROR("sampleTimeIntervals: size must be 256 or empty");
     }
 
+    if (!m_outputFileName.empty()) storeSampleTimes(m_outputFileName);
+
   }
 
 
@@ -158,6 +165,8 @@ namespace Belle2 {
 
     const auto& chMapper = TOPGeometryPar::Instance()->getChannelMapper();
     const auto& feMapper = TOPGeometryPar::Instance()->getFrontEndMapper();
+
+    double timeError = m_timeResolution / sqrt(2.0); // for single pulse
 
     for (auto moduleID : m_moduleIDs) {
       for (unsigned asic = 0; asic < 64; asic++) {
@@ -187,6 +196,7 @@ namespace Belle2 {
           auto* digit = digits.appendNew(moduleID, pixelID, tdc);
           digit->setFirstWindow(window);
           digit->setTime(time);
+          digit->setTimeError(timeError);
           digit->setChannel(channel);
           digit->setHitQuality(TOPDigit::c_CalPulse);
 
@@ -197,6 +207,7 @@ namespace Belle2 {
           digit = digits.appendNew(moduleID, pixelID, tdc);
           digit->setFirstWindow(window);
           digit->setTime(time);
+          digit->setTimeError(timeError);
           digit->setChannel(channel);
           digit->setHitQuality(TOPDigit::c_CalPulse);
         }
@@ -214,6 +225,95 @@ namespace Belle2 {
   {
   }
 
+
+  void TOPDoublePulseGeneratorModule::storeSampleTimes(std::string fileName)
+  {
+    if (fileName.empty()) return;
+
+    TFile* fout = TFile::Open(fileName.c_str(), "recreate");
+    if (!fout) {
+      B2ERROR("Can't open the output file " << fileName);
+      return;
+    }
+
+    const auto& feMapper = TOPGeometryPar::Instance()->getFrontEndMapper();
+
+    TH1F scrods("scrodID", "scrod ID's mapped to slots/boardstacks", 64, -0.5, 63.5);
+    scrods.SetXTitle("(slot - 1) * 4 + boardstack");
+    scrods.SetYTitle("scrod ID");
+
+    for (auto moduleID : m_moduleIDs) {
+      for (int bs = 0; bs < 4; bs++) {
+        const auto* feMap = feMapper.getMap(moduleID, bs);
+        if (!feMap) {
+          B2ERROR("No front-end mapping available for slot " << moduleID
+                  << " boardstack " << bs);
+          continue;
+        }
+        unsigned scrodID = feMap->getScrodID();
+        std::string subdir = "scrod" + std::to_string(scrodID);
+        int i = (moduleID - 1) * 4 + bs;
+        scrods.SetBinContent(i + 1, scrodID);
+        fout->mkdir(subdir.c_str());
+      }
+    }
+    scrods.Write();
+
+    for (auto moduleID : m_moduleIDs) {
+      for (unsigned asic = 0; asic < 64; asic++) {
+        int bs = asic / 16;
+        const auto* feMap = feMapper.getMap(moduleID, bs);
+        if (!feMap) continue;
+        unsigned scrodID = feMap->getScrodID();
+        std::string subdir = "scrod" + std::to_string(scrodID);
+        fout->cd(subdir.c_str());
+        for (auto asicChannel : m_asicChannels) {
+          unsigned channel = (asic * 8 + asicChannel) % 128;
+          const TOPSampleTimes* sampleTimes = &m_sampleTimes;
+          if (m_useDatabase) {
+            sampleTimes = (*m_timebase)->getSampleTimes(scrodID, channel);
+          }
+          string forWhat = "scrod " + to_string(scrodID) +
+                           " channel " + to_string(channel) +
+                           " (slot" + to_string(moduleID) + ", as" + to_string(asic) +
+                           ", ch" + to_string(asicChannel) + ")";
+          auto timeAxis = sampleTimes->getTimeAxis();
+          saveAsHistogram(timeAxis, "sampleTimes_ch" + to_string(channel),
+                          "Generator input: sample times for " + forWhat,
+                          "sample number", "t [ns]");
+          std::vector<double> dt;
+          for (unsigned i = 1; i < timeAxis.size(); i++) {
+            dt.push_back(timeAxis[i] - timeAxis[i - 1]);
+          }
+          saveAsHistogram(dt, "dt_ch" + to_string(channel),
+                          "Generator input: sample time bins for " + forWhat,
+                          "sample number", "#Delta t [ns]");
+        }
+      }
+    }
+
+    fout->Close();
+
+  }
+
+
+  void TOPDoublePulseGeneratorModule::saveAsHistogram(const std::vector<double>& vec,
+                                                      const std::string& name,
+                                                      const std::string& title,
+                                                      const std::string& xTitle,
+                                                      const std::string& yTitle) const
+  {
+    if (vec.empty()) return;
+
+    TH1F h(name.c_str(), title.c_str(), vec.size(), 0, vec.size());
+    h.SetXTitle(xTitle.c_str());
+    h.SetYTitle(yTitle.c_str());
+    if (name.find("Fit") != string::npos) h.SetLineColor(2);
+
+    for (unsigned i = 0; i < vec.size(); i++) h.SetBinContent(i + 1, vec[i]);
+
+    h.Write();
+  }
 
 } // end Belle2 namespace
 

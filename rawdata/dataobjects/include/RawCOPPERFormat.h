@@ -34,8 +34,8 @@
 #define EKLM_ID  0x08000000 // tentative
 #define TRGDATA_ID  0x10000000 // tentative
 #define CDCTRGDATA_ID  0x11000000 // tentative
-#define ECLTRGDATA_ID  0x12000000 // tentative
-#define TOPTRGDATA_ID  0x13000000 // tentative
+#define TOPTRGDATA_ID  0x12000000 // tentative
+#define ECLTRGDATA_ID  0x13000000 // tentative
 #define KLMTRGDATA_ID  0x14000000 // tentative
 #define GDLTRGDATA_ID  0x15000000 // tentative
 

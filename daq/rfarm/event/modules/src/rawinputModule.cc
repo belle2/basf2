@@ -206,7 +206,7 @@ void RawInputModule::registerRawCOPPERs()
   evtmetadata->setRun(sndhdr.GetRunNum());
   evtmetadata->setSubrun(sndhdr.GetSubRunNum());
   evtmetadata->setEvent(sndhdr.GetEventNumber());
-  if (error_flag) evtmetadata->addErrorFlag(EventMetaData::c_B2LinkCRCError);
+  if (error_flag) evtmetadata->addErrorFlag(EventMetaData::c_B2LinkEventCRCError);
 
   delete[] evtbuf;
   // Copy from Raw2DsModule.cc -- Up to here

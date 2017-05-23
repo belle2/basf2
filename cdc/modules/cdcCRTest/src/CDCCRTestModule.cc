@@ -456,7 +456,7 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
           t -= cdcgeo.getTimeWalk(wireid, adc);
 
           // Second: correct for event time. If this wasn't simulated, m_eventTime can just be set to 0.
-          if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
+          if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasDoubleEventT0()) {
             evtT0 =  m_eventTimeStoreObject->getEventT0();
             t -= evtT0;
           }

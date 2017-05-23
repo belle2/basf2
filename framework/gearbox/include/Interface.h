@@ -442,6 +442,46 @@ namespace Belle2 {
         return getWithUnit(path, defaultValue);
       }
 
+      /**
+       * Get the parameter path as a double converted to the standard frequency unit.
+       *
+       * Gearbox will try to determine the unit with which the parameter was
+       * saved and convert it to the default system. If no unit can be
+       * determinded, it will be assumed that the parameter does not need to be
+       * converted.
+       *
+       * @exception gearbox::PathEmptyError if path is empty or does not exist
+       * @exception gearbox::ConversionError if the value could not converted to a numerical type
+       * @param path Path of the parameter to get
+       * @return value of the parameter
+       */
+      double getFrequency(const std::string& path = "") const noexcept(false)
+      {
+        return getWithUnit(path);
+      }
+
+      /**
+       * Get the parameter path as a double converted to the standard frequency unit.
+       *
+       * Gearbox will try to determine the unit with which the parameter was
+       * saved and convert it to the default system. If no unit can be
+       * determinded, it will be assumed that the parameter does not need to be
+       * converted.
+       *
+       * If the parameter is empty or does not exist, the defaultValue will be
+       * returned.
+       *
+       * @exception gearbox::PathEmptyError if path is empty or does not exist
+       * @exception gearbox::ConversionError if the value could not converted to a numerical type
+       * @param path Path of the parameter to get
+       * @param defaultValue Value to return if the Path es empty or does not exist
+       * @return value of the parameter
+       */
+      double getFrequency(const std::string& path, double defaultValue) const noexcept(false)
+      {
+        return getWithUnit(path, defaultValue);
+      }
+
     protected:
 
       /** make sure the path really corresponds to an XPath node expression by removing trailing slashes */

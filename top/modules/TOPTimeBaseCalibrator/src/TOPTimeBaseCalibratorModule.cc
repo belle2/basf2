@@ -110,8 +110,9 @@ namespace Belle2 {
   {
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     double sampleDivisions = (0x1 << geo->getNominalTDC().getSubBits());
+    double sampleWidth = geo->getNominalTDC().getSampleWidth();
 
-    std::vector<double> hits[c_NumChannels];
+    std::vector<std::pair<double, double> > hits[c_NumChannels];
 
     StoreArray<TOPDigit> digits;
     for (const auto& digit : digits) {
@@ -122,19 +123,31 @@ namespace Belle2 {
         B2ERROR("Got negative sample number - digit ignored");
         continue;
       }
+      double et = digit.getTimeError() / sampleWidth;
+      if (et <= 0) {
+        B2ERROR("Time error is not given - digit ignored");
+        continue;
+      }
+      // add quantization error
+      et = sqrt(et * et + 1 / sampleDivisions / sampleDivisions / 12);
       unsigned channel = digit.getChannel();
-      if (channel < c_NumChannels) hits[channel].push_back(t);
+      if (channel < c_NumChannels) hits[channel].push_back(std::make_pair(t, et));
     }
 
     for (unsigned channel = 0; channel < c_NumChannels; channel++) {
       const auto& channelHits = hits[channel];
       if (channelHits.size() == 2) {
-        auto diff = fabs(channelHits[1] - channelHits[0]); // since not sorted yet
+        double t0 = channelHits[0].first;
+        double t1 = channelHits[1].first;
+        auto diff = fabs(t0 - t1); // since not sorted yet
         if (diff < m_minTimeDiff) continue;
         if (diff > m_maxTimeDiff) continue;
-        m_ntuples[channel].push_back(TwoTimes(channelHits[0], channelHits[1]));
+        double sig0 = channelHits[0].second;
+        double sig1 = channelHits[1].second;
+        double sigma = sqrt(sig0 * sig0 + sig1 * sig1);
+        m_ntuples[channel].push_back(TwoTimes(t0, t1, sigma));
       } else if (channelHits.size() > 2) {
-        B2WARNING("More than two cal pulses per channel found");
+        B2WARNING("More than two cal pulses per channel found - ignored");
       }
     }
 
@@ -183,6 +196,18 @@ namespace Belle2 {
       TH1F Hsuccess("success", "successfuly fitted channels",
                     c_NumScrodChannels, 0, c_NumScrodChannels);
       Hsuccess.SetXTitle("channel number");
+      TH1F Hchi2("chi2", "normalized chi2",
+                 c_NumScrodChannels, 0, c_NumScrodChannels);
+      Hchi2.SetXTitle("channel number");
+      Hchi2.SetYTitle("chi2/ndf");
+      TH1F Hndf("ndf", "degrees of freedom",
+                c_NumScrodChannels, 0, c_NumScrodChannels);
+      Hndf.SetXTitle("channel number");
+      Hndf.SetYTitle("ndf");
+      TH1F HDeltaT("DeltaT", "Fitted double pulse delay time",
+                   c_NumScrodChannels, 0, c_NumScrodChannels);
+      HDeltaT.SetXTitle("channel number");
+      HDeltaT.SetYTitle("#Delta T [ns]");
 
       // loop over channels of a single SCROD
 
@@ -191,7 +216,7 @@ namespace Belle2 {
         auto& ntuple = m_ntuples[channel];
         Hchan.SetBinContent(chan + 1, ntuple.size());
         if (ntuple.size() > m_minHits) {
-          bool ok = calibrateChannel(ntuple, scrodID, chan);
+          bool ok = calibrateChannel(ntuple, scrodID, chan, Hchi2, Hndf, HDeltaT);
           if (ok) Hsuccess.Fill(chan);
         } else {
           B2INFO("... channel " << chan << " statistics too low");
@@ -202,6 +227,9 @@ namespace Belle2 {
 
       Hchan.Write();
       Hsuccess.Write();
+      Hchi2.Write();
+      Hndf.Write();
+      HDeltaT.Write();
       fout->Close();
 
     }
@@ -209,7 +237,9 @@ namespace Belle2 {
 
 
   bool TOPTimeBaseCalibratorModule::calibrateChannel(std::vector<TwoTimes>& ntuple,
-                                                     unsigned scrodID, unsigned chan)
+                                                     unsigned scrodID, unsigned chan,
+                                                     TH1F& Hchi2, TH1F& Hndf,
+                                                     TH1F& HDeltaT)
   {
 
     // determine outlayer removal cuts
@@ -222,36 +252,44 @@ namespace Belle2 {
     prof.SetXTitle("sample number");
     prof.SetYTitle("time difference [samples]");
 
-    std::vector<double> tdcMean(c_TimeAxisSize, (m_maxTimeDiff + m_minTimeDiff) / 2);
-    std::vector<double> tdcSigma(c_TimeAxisSize, (m_maxTimeDiff - m_minTimeDiff) / 6);
+    std::vector<double> profMeans(c_TimeAxisSize, (m_maxTimeDiff + m_minTimeDiff) / 2);
+    double sigma = (m_maxTimeDiff - m_minTimeDiff) / 6;
 
-    for (int iter = 0; iter < 5; iter++) { // TODO: use better approach!
+    for (int iter = 0; iter < 5; iter++) {
       prof.Reset();
+      double x = 0;
+      double x2 = 0;
+      int n = 0;
       for (auto& twoTimes : ntuple) {
         int sample = int(twoTimes.t1) % c_TimeAxisSize;
         double diff = twoTimes.t2 - twoTimes.t1;
-        if (fabs(diff - tdcMean[sample]) < 3 * tdcSigma[sample]) {
+        double Ddiff = diff - profMeans[sample];
+        if (fabs(Ddiff) < 3 * sigma) {
           prof.Fill(sample, diff);
+          x += Ddiff;
+          x2 += Ddiff * Ddiff;
+          n++;
           twoTimes.good = true;
         } else {
           twoTimes.good = false;
         }
       }
       for (int i = 0; i < c_TimeAxisSize; i++) {
-        tdcMean[i] = prof.GetBinContent(i + 1);
-        tdcSigma[i] = prof.GetBinError(i + 1);
+        profMeans[i] = prof.GetBinContent(i + 1);
       }
+      if (n == 0) return false;
+      x2 /= n;
+      x /= n;
+      sigma = sqrt(x2 - x * x);
     }
-
-    // set relative sigma
-
-    for (auto& mean : tdcMean) mean -= int(mean / c_TimeAxisSize) * c_TimeAxisSize;
-    for (auto& twoTimes : ntuple) {
-      int sample = int(twoTimes.t1) % c_TimeAxisSize;
-      twoTimes.sigma = tdcSigma[sample] / tdcMean[sample];
-    }
-
     prof.Write();
+
+    // calculate average time difference
+
+    double meanTimeDifference = 0;
+    for (auto& x : profMeans) meanTimeDifference += x;
+    meanTimeDifference /= profMeans.size();
+    meanTimeDifference -= int(meanTimeDifference / c_TimeAxisSize) * c_TimeAxisSize;
 
     // perform the fit
 
@@ -259,7 +297,8 @@ namespace Belle2 {
       case 0:
         return false;
       case 1:
-        return matrixInversion(ntuple, scrodID, chan, prof);
+        return matrixInversion(ntuple, scrodID, chan, meanTimeDifference,
+                               Hchi2, Hndf, HDeltaT);
       case 2:
         B2ERROR("Iterative method not implemented yet");
         return false;
@@ -276,7 +315,9 @@ namespace Belle2 {
 
   bool TOPTimeBaseCalibratorModule::matrixInversion(const std::vector<TwoTimes>& ntuple,
                                                     unsigned scrodID, unsigned chan,
-                                                    const TProfile& prof)
+                                                    double meanTimeDifference,
+                                                    TH1F& Hchi2, TH1F& Hndf,
+                                                    TH1F& HDeltaT)
   {
 
     // Ax = b: construct matrix A and right side vector b
@@ -295,7 +336,8 @@ namespace Belle2 {
       i2 = i1 + (i2 - i1) % c_TimeAxisSize;
       for (int k = i1 + 1; k < i2; k++) m[k % c_TimeAxisSize] = 1;
 
-      double sig2 = twoTimes.sigma * twoTimes.sigma;
+      double relSigma = twoTimes.sigma / meanTimeDifference;
+      double sig2 = relSigma * relSigma;
 
       for (int jj = i1; jj < i2 + 1; jj++) {
         int j = jj % c_TimeAxisSize;
@@ -346,10 +388,13 @@ namespace Belle2 {
       for (int k = i1 + 1; k < i2; k++) m[k % c_TimeAxisSize] = 1;
       double s = -1.0;
       for (int k = 0; k < c_TimeAxisSize; k++) s += m[k] * x[k];
-      double sig2 = twoTimes.sigma * twoTimes.sigma;
+      double relSigma = twoTimes.sigma / meanTimeDifference;
+      double sig2 = relSigma * relSigma;
       chi2 += s * s / sig2;
       ndf++;
     }
+    Hchi2.SetBinContent(chan + 1, chi2 / ndf);
+    Hndf.SetBinContent(chan + 1, ndf);
 
     // constrain sum of x to 2*syncTimeBase and calculate sample times
 
@@ -361,6 +406,7 @@ namespace Belle2 {
     }
     double DeltaT = 2 * m_syncTimeBase / sum;
     for (auto& xi : x) xi *= DeltaT;
+    HDeltaT.SetBinContent(chan + 1, DeltaT);
 
     std::vector<double> err;
     for (int k = 0; k < c_TimeAxisSize; k++) err.push_back(sqrt(A(k, k)) * DeltaT);
@@ -377,26 +423,29 @@ namespace Belle2 {
     saveAsHistogram(sampleTimes, "sampleTimes_ch" + to_string(chan),
                     "Time base corrections for " + forWhat, "sample number", "t [ns]");
 
-    TOPSampleTimes sTimes;
-    sTimes.setTimeAxis(sampleTimes, m_syncTimeBase);
-    std::vector<double> timeDiff;
-    for (int i = 0; i < c_TimeAxisSize; i++) {
-      double t = sTimes.getTime(0, i) + DeltaT;
-      double k = sTimes.getSample(0, t);
-      timeDiff.push_back(k - i);
-    }
-    double diff = 0;
-    for (int i = 0; i < c_TimeAxisSize; i++) {
-      diff += prof.GetBinContent(i + 1) - timeDiff[i];
-    }
-    diff /= c_TimeAxisSize;
-    diff = int(diff / c_TimeAxisSize + 0.5) * c_TimeAxisSize;
-    for (auto& t : timeDiff) t += diff;
-    saveAsHistogram(timeDiff, "timeDiffFit_ch" + to_string(chan),
-                    "Fitted time difference vs. sample for " + forWhat,
-                    "sample number", "time difference [samples]");
+    // calibrated cal pulse time difference
 
-    B2INFO("... channel " << chan << " OK (chi^2/ndf = " << chi2 / ndf << ")");
+    std::string name = "timeDiffcal_ch" + to_string(chan);
+    std::string title = "Calibrated cal pulse time difference vs. sample for " + forWhat;
+    TH2F Hcor(name.c_str(), title.c_str(), c_TimeAxisSize, 0, c_TimeAxisSize,
+              100, DeltaT - 0.5, DeltaT + 0.5);
+    Hcor.SetXTitle("sample number");
+    Hcor.SetYTitle("time difference [ns]");
+    Hcor.SetStats(kTRUE);
+
+    TOPSampleTimes timeBase;
+    timeBase.setTimeAxis(sampleTimes, sampleTimes.back() / 2);
+
+    for (const auto& twoTimes : ntuple) {
+      if (!twoTimes.good) continue;
+      double dt = timeBase.getDeltaTime(0, twoTimes.t2, twoTimes.t1);
+      int sample = int(twoTimes.t1) % c_TimeAxisSize;
+      Hcor.Fill(sample, dt);
+    }
+    Hcor.Write();
+
+    B2INFO("... channel " << chan << " OK (chi^2/ndf = " << chi2 / ndf
+           << ", ndf = " << ndf << ")");
 
     return true;
   }

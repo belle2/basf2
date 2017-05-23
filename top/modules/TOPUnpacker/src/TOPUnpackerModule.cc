@@ -299,10 +299,10 @@ namespace Belle2 {
 
     short asicChanFix = 0; // temporary fix since it's not given in FE header
 
-    while (array.getRemainingWords() > 15) {
+    while (array.getRemainingWords() > 3) {
 
       unsigned header = array.getWord(); // word 0
-      if (header != 0xaaaa0103 and header != 0xaaaa0100) {
+      if (header != 0xaaaa0104 and header != 0xaaaa0103 and header != 0xaaaa0100) {
         B2ERROR("TOPUnpacker: corrupted data - invalid FE header word");
         B2DEBUG(100, "Invalid FE header word: " << std::hex << header);
         info->setErrorFlag(TOPInterimFEInfo::c_InvalidFEHeader);
@@ -332,49 +332,94 @@ namespace Belle2 {
       asicChanFix++;
       // end fix
 
-      // feature-extracted data (positive signal)
-      word = array.getWord(); // word 3
-      word = array.getWord(); // word 4
-      short samplePeak_p = word & 0xFFFF;
-      short valuePeak_p = (word >> 16) & 0xFFFF;
+      std::vector<TOPRawDigit*> digits; // needed for creating relations to waveforms
 
-      word = array.getWord(); // word 5
-      short sampleRise_p = word & 0xFFFF;
-      short valueRise0_p = (word >> 16) & 0xFFFF;
+      if (header != 0xaaaa0104) {
+        // feature-extracted data (positive signal)
+        word = array.getWord(); // word 3
+        word = array.getWord(); // word 4
+        short samplePeak_p = word & 0xFFFF;
+        short valuePeak_p = (word >> 16) & 0xFFFF;
 
-      word = array.getWord(); // word 6
-      short valueRise1_p = word & 0xFFFF;
-      short sampleFall_p = (word >> 16) & 0xFFFF;
+        word = array.getWord(); // word 5
+        short sampleRise_p = word & 0xFFFF;
+        short valueRise0_p = (word >> 16) & 0xFFFF;
 
-      word = array.getWord(); // word 7
-      short valueFall0_p = word & 0xFFFF;
-      short valueFall1_p = (word >> 16) & 0xFFFF;
+        word = array.getWord(); // word 6
+        short valueRise1_p = word & 0xFFFF;
+        short sampleFall_p = (word >> 16) & 0xFFFF;
 
-      word = array.getWord(); // word 8
-      short integral_p = word & 0xFFFF;
-      //      short qualityFlags_p = (word >> 16) & 0xFFFF;
+        word = array.getWord(); // word 7
+        short valueFall0_p = word & 0xFFFF;
+        short valueFall1_p = (word >> 16) & 0xFFFF;
 
-      // feature-extracted data (negative signal)
-      word = array.getWord(); // word 9
-      word = array.getWord(); // word 10
-      short samplePeak_n = word & 0xFFFF;
-      short valuePeak_n = (word >> 16) & 0xFFFF;
+        word = array.getWord(); // word 8
+        short integral_p = word & 0xFFFF;
+        //      short qualityFlags_p = (word >> 16) & 0xFFFF;
 
-      word = array.getWord(); // word 11
-      short sampleRise_n = word & 0xFFFF;
-      short valueRise0_n = (word >> 16) & 0xFFFF;
+        // feature-extracted data (negative signal)
+        word = array.getWord(); // word 9
+        word = array.getWord(); // word 10
+        short samplePeak_n = word & 0xFFFF;
+        short valuePeak_n = (word >> 16) & 0xFFFF;
 
-      word = array.getWord(); // word 12
-      short valueRise1_n = word & 0xFFFF;
-      short sampleFall_n = (word >> 16) & 0xFFFF;
+        word = array.getWord(); // word 11
+        short sampleRise_n = word & 0xFFFF;
+        short valueRise0_n = (word >> 16) & 0xFFFF;
 
-      word = array.getWord(); // word 13
-      short valueFall0_n = word & 0xFFFF;
-      short valueFall1_n = (word >> 16) & 0xFFFF;
+        word = array.getWord(); // word 12
+        short valueRise1_n = word & 0xFFFF;
+        short sampleFall_n = (word >> 16) & 0xFFFF;
 
-      word = array.getWord(); // word 14
-      short integral_n = word & 0xFFFF;
-      //      short qualityFlags_n = (word >> 16) & 0xFFFF;
+        word = array.getWord(); // word 13
+        short valueFall0_n = word & 0xFFFF;
+        short valueFall1_n = (word >> 16) & 0xFFFF;
+
+        word = array.getWord(); // word 14
+        short integral_n = word & 0xFFFF;
+        //      short qualityFlags_n = (word >> 16) & 0xFFFF;
+
+        if (abs(valuePeak_p) != 9999) {
+          auto* digit = rawDigits.appendNew(scrodID);
+          digit->setCarrierNumber(carrierFE);
+          digit->setASICNumber(asicFE);
+          digit->setASICChannel(asicChannelFE);
+          digit->setASICWindow(convertedAddr);
+          digit->setLastWriteAddr(lastWrAddr);
+          digit->setSampleRise(sampleRise_p);
+          digit->setDeltaSamplePeak(samplePeak_p - sampleRise_p);
+          digit->setDeltaSampleFall(sampleFall_p - sampleRise_p);
+          digit->setValueRise0(valueRise0_p);
+          digit->setValueRise1(valueRise1_p);
+          digit->setValuePeak(valuePeak_p);
+          digit->setValueFall0(valueFall0_p);
+          digit->setValueFall1(valueFall1_p);
+          digit->setIntegral(integral_p);
+          //        digit->setErrorFlags(qualityFlags_p); // not good solution !
+          digit->addRelationTo(info);
+          digits.push_back(digit);
+        }
+        if (abs(valuePeak_n) != 9999) {
+          auto* digit = rawDigits.appendNew(scrodID);
+          digit->setCarrierNumber(carrierFE);
+          digit->setASICNumber(asicFE);
+          digit->setASICChannel(asicChannelFE);
+          digit->setASICWindow(convertedAddr);
+          digit->setLastWriteAddr(lastWrAddr);
+          digit->setSampleRise(sampleRise_n);
+          digit->setDeltaSamplePeak(samplePeak_n - sampleRise_n);
+          digit->setDeltaSampleFall(sampleFall_n - sampleRise_n);
+          digit->setValueRise0(valueRise0_n);
+          digit->setValueRise1(valueRise1_n);
+          digit->setValuePeak(valuePeak_n);
+          digit->setValueFall0(valueFall0_n);
+          digit->setValueFall1(valueFall1_n);
+          digit->setIntegral(integral_n);
+          //        digit->setErrorFlags(qualityFlags_n); // not good solution !
+          digit->addRelationTo(info);
+          digits.push_back(digit);
+        }
+      }
 
       // magic word
       word = array.getWord(); // word 15
@@ -387,47 +432,7 @@ namespace Belle2 {
       }
 
       // store to raw digits
-      std::vector<TOPRawDigit*> digits; // needed for creating relations to waveforms
-      if (abs(valuePeak_p) != 9999) {
-        auto* digit = rawDigits.appendNew(scrodID);
-        digit->setCarrierNumber(carrierFE);
-        digit->setASICNumber(asicFE);
-        digit->setASICChannel(asicChannelFE);
-        digit->setASICWindow(convertedAddr);
-        digit->setLastWriteAddr(lastWrAddr);
-        digit->setSampleRise(sampleRise_p);
-        digit->setDeltaSamplePeak(samplePeak_p - sampleRise_p);
-        digit->setDeltaSampleFall(sampleFall_p - sampleRise_p);
-        digit->setValueRise0(valueRise0_p);
-        digit->setValueRise1(valueRise1_p);
-        digit->setValuePeak(valuePeak_p);
-        digit->setValueFall0(valueFall0_p);
-        digit->setValueFall1(valueFall1_p);
-        digit->setIntegral(integral_p);
-        //        digit->setErrorFlags(qualityFlags_p); // not good solution !
-        digit->addRelationTo(info);
-        digits.push_back(digit);
-      }
-      if (abs(valuePeak_n) != 9999) {
-        auto* digit = rawDigits.appendNew(scrodID);
-        digit->setCarrierNumber(carrierFE);
-        digit->setASICNumber(asicFE);
-        digit->setASICChannel(asicChannelFE);
-        digit->setASICWindow(convertedAddr);
-        digit->setLastWriteAddr(lastWrAddr);
-        digit->setSampleRise(sampleRise_n);
-        digit->setDeltaSamplePeak(samplePeak_n - sampleRise_n);
-        digit->setDeltaSampleFall(sampleFall_n - sampleRise_n);
-        digit->setValueRise0(valueRise0_n);
-        digit->setValueRise1(valueRise1_n);
-        digit->setValuePeak(valuePeak_n);
-        digit->setValueFall0(valueFall0_n);
-        digit->setValueFall1(valueFall1_n);
-        digit->setIntegral(integral_n);
-        //        digit->setErrorFlags(qualityFlags_n); // not good solution !
-        digit->addRelationTo(info);
-        digits.push_back(digit);
-      }
+
       info->incrementFEHeadersCount();
       if (digits.empty()) info->incrementEmptyFEHeadersCount();
 

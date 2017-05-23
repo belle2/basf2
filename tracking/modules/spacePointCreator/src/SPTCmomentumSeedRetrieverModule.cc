@@ -102,7 +102,7 @@ bool SPTCmomentumSeedRetrieverModule::createSPTCmomentumSeed(SpacePointTrackCand
   aTC.set6DSeed(stateSeed);
   aTC.setCovSeed(covSeed);
 
-  double chargeSeed = results.curvatureSign ? *(results.curvatureSign) : 0;
+  double chargeSeed = results.curvatureSign ? -1 * (*(results.curvatureSign)) : 0;
   aTC.setChargeSeed(chargeSeed);
 
   return (results.p && results.curvatureSign);

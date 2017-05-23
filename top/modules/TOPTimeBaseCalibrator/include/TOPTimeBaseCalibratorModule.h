@@ -14,7 +14,8 @@
 #include <string>
 #include <vector>
 #include <TMatrixDSym.h>
-#include "TProfile.h"
+#include <TProfile.h>
+#include <TH1F.h>
 
 
 namespace Belle2 {
@@ -25,13 +26,13 @@ namespace Belle2 {
   struct TwoTimes {
     float t1 = 0; /**< time of the first pulse [samples] */
     float t2 = 0; /**< time of the second pulse [samples] */
-    float sigma = 0; /**< relative sigma of time difference */
+    float sigma = 0; /**< uncertainty of time difference (r.m.s.) */
     bool good = false; /**< flag */
 
     /**
      * Full constructor
      */
-    TwoTimes(double time1, double time2)
+    TwoTimes(double time1, double time2, double sig)
     {
       if (time1 < time2) {
         t1 = time1;
@@ -40,6 +41,7 @@ namespace Belle2 {
         t1 = time2;
         t2 = time1;
       }
+      sigma = sig;
       good = true;
     }
   };
@@ -108,22 +110,30 @@ namespace Belle2 {
      * @param ntuple ntuple data
      * @param scrodID SCROD ID
      * @param scrodChannel channel number within SCROD (0 - 127)
+     * @param Hchi2 histogram to store normalized chi^2
+     * @param Hndf histogram to store degrees of freedom
+     * @param HDeltaT histogram to store fittet double pulse delay
      * @return true on success
      */
     bool calibrateChannel(std::vector<TwoTimes>& ntuple,
-                          unsigned scrodID, unsigned scrodChannel);
+                          unsigned scrodID, unsigned scrodChannel,
+                          TH1F& Hchi2, TH1F& Hndf, TH1F& HDeltaT);
 
     /**
      * Method by matrix inversion
      * @param ntuple ntuple data
      * @param scrodID SCROD ID
      * @param scrodChannel channel number within SCROD (0 - 127)
-     * @param prof profile histogram of time differences vs. sample number
+     * @param meanTimeDifference average time difference [samples]
+     * @param Hchi2 histogram to store normalized chi^2
+     * @param Hndf histogram to store degrees of freedom
+     * @param HDeltaT histogram to store fittet double pulse delay
      * @return true on success
      */
     bool matrixInversion(const std::vector<TwoTimes>& ntuple,
                          unsigned scrodID, unsigned scrodChannel,
-                         const TProfile& prof);
+                         double meanTimeDifference,
+                         TH1F& Hchi2, TH1F& Hndf, TH1F& HDeltaT);
 
     /**
      * Save vector to histogram and write it out

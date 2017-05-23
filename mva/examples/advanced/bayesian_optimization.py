@@ -54,8 +54,8 @@ if __name__ == "__main__":
     num_cycles = 6
     myBopt = GPyOpt.methods.BayesianOptimization(f=grid_search,
                                                  domain=bounds,
-                                                 acquisition_type='EI',
-                                                 exact_feval=True,
+                                                 acquisition_type='MPI',
+                                                 exact_feval=False,
                                                  batch_size=num_parallel_processes,
                                                  num_cores=num_parallel_processes,
                                                  evaluator_type='local_penalization',

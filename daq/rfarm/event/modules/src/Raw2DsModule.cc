@@ -206,7 +206,7 @@ void Raw2DsModule::registerRawCOPPERs()
   evtmetadata->setEvent(sndhdr.GetEventNumber());
   evtmetadata->setTime(mtime);  //time(NULL));
   //  evtmetadata->setTime((unsigned long long int) utime);//time(NULL));
-  if (error_flag) evtmetadata->addErrorFlag(EventMetaData::c_B2LinkCRCError);
+  if (error_flag) evtmetadata->addErrorFlag(EventMetaData::c_B2LinkEventCRCError);
 
   delete[] evtbuf;
 

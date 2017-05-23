@@ -63,7 +63,7 @@ globalPhiRotation = {'201607': 1.875,
 lengthOfCounter = 100.0
 widthOfCounter = 8.0
 triggerPos = []
-normTriggerPlanDirection = []
+normTriggerPlaneDirection = []
 readOutPos = []
 globalPhi = 0.0
 
@@ -73,14 +73,14 @@ def set_cdc_cr_parameters(period):
     global lengthOfCounter
     global widthOfCounter
     global triggerPos
-    global normTriggerPlanDirection
+    global normTriggerPlaneDirection
     global readOutPos
     global globalPhi
 
     lengthOfCounter = triggerSize[period][0]
     widthOfCounter = triggerSize[period][1]
     triggerPos = triggerPosition[period]
-    normTriggerPlanDirection = triggerPlaneDirection[period]
+    normTriggerPlaneDirection = triggerPlaneDirection[period]
     readOutPos = pmtPosition[period]
     globalPhi = globalPhiRotation[period]
 
@@ -149,7 +149,7 @@ def add_cdc_cr_reconstruction(path, eventTimingExtraction=False):
                                            eventTimingExtraction=eventTimingExtraction,
                                            lightPropSpeed=lightPropSpeed,
                                            triggerPos=triggerPos,
-                                           normTriggerPlaneDirection=normTriggerPlanDirection,
+                                           normTriggerPlaneDirection=normTriggerPlaneDirection,
                                            readOutPos=readOutPos
                                            )
 
@@ -166,7 +166,7 @@ def getRunNumber(fname):
     """
     Get run number from file name.
     """
-    run = int((fname.split('/')[-1]).split('.')[3])
+    run = int(((fname.split('/')[-1]).split('.')[3]).split('_')[0])
     return run
 
 

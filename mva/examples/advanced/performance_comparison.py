@@ -54,6 +54,13 @@ if __name__ == "__main__":
     tmva_bdt_options.m_prepareOptions = ("SplitMode=block:V:nTrain_Signal=9691:nTrain_Background=136972:"
                                          "nTest_Signal=1:nTest_Background=1")
 
+    tmva_nn_options = basf2_mva.TMVAOptionsClassification()
+    tmva_nn_options.m_type = "MLP"
+    tmva_nn_options.m_method = "MLP"
+    tmva_nn_options.m_config = ("H:!V:CreateMVAPdfs:VarTransform=N:NCycles=100:HiddenLayers=N+1:TrainingMethod=BFGS")
+    tmva_nn_options.m_prepareOptions = ("SplitMode=block:V:nTrain_Signal=9691:nTrain_Background=136972:"
+                                        "nTest_Signal=1:nTest_Background=1")
+
     sklearn_bdt_options = basf2_mva.PythonOptions()
     sklearn_bdt_options.m_framework = "sklearn"
     param = '{"n_estimators": 100, "learning_rate": 0.2, "max_depth": 3, "random_state": 0, "subsample": 0.5}'
@@ -68,7 +75,7 @@ if __name__ == "__main__":
     stats = []
     test_data = ["test.root"] * 10
     for label, options in [("DataLoading", data_options), ("FastBDT", fastbdt_options), ("FANN", fann_options),
-                           ("TMVA-BDT", tmva_bdt_options),
+                           ("TMVA-BDT", tmva_bdt_options), ("TMVA-NN", tmva_nn_options),
                            ("SKLearn-BDT", sklearn_bdt_options), ("XGBoost", xgboost_options), ("Trivial", trivial_options)]:
         training_start = time.time()
         general_options.m_identifier = label

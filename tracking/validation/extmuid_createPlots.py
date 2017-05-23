@@ -114,7 +114,7 @@ def draw_exthits(file_chain):
     tofKLM.Write()
 
     r = TH1F('r', 'r for non-KLM ExtHits', 40, 0.0, 200.0)
-    file_chain.Draw('ExtHits.m_Position.Perp()>>r', 'ExtHits.m_DetectorID!=7')
+    file_chain.Draw('ExtHits.getPosition().Perp()>>r', 'ExtHits.m_DetectorID!=7')
     r.GetXaxis().SetTitle('r (cm)')
     r.GetListOfFunctions().Add(TNamed('Description', "Radial position in transverse plane of each ExtHit"))
     r.GetListOfFunctions().Add(TNamed('Check', "Peaks at 120 cm and 170 cm"))
@@ -123,7 +123,7 @@ def draw_exthits(file_chain):
     r.Write()
 
     z = TH1F('z', 'z for non-KLM ExtHits', 100, -200.0, 300.0)
-    file_chain.Draw('ExtHits.m_Position.Z()>>z', 'ExtHits.m_DetectorID!=7')
+    file_chain.Draw('ExtHits.getPosition().Z()>>z', 'ExtHits.m_DetectorID!=7')
     z.GetXaxis().SetTitle('z (cm)')
     z.GetListOfFunctions().Add(TNamed('Description', "Axial position of each ExtHit"))
     z.GetListOfFunctions().Add(TNamed('Check', "Broad peak centered at 0 cm"))
@@ -132,7 +132,7 @@ def draw_exthits(file_chain):
     z.Write()
 
     rKLM = TH1F('rKLM', 'r for KLM ExtHits', 50, 100.0, 350.0)
-    file_chain.Draw('ExtHits.m_Position.Perp()>>rKLM', 'ExtHits.m_DetectorID==7')
+    file_chain.Draw('ExtHits.getPosition().Perp()>>rKLM', 'ExtHits.m_DetectorID==7')
     rKLM.GetXaxis().SetTitle('r (cm)')
     rKLM.GetListOfFunctions().Add(TNamed('Description', "Radial position in transverse plane of each ExtHit"))
     rKLM.GetListOfFunctions().Add(TNamed('Check', "Low shoulder below 200 cm (EKLM); comb-like pattern above 200 cm (BKLM)"))
@@ -141,7 +141,7 @@ def draw_exthits(file_chain):
     rKLM.Write()
 
     zKLM = TH1F('zKLM', 'z for KLM ExtHits', 140, -300.0, 400.0)
-    file_chain.Draw('ExtHits.m_Position.Z()>>zKLM', 'ExtHits.m_DetectorID==7')
+    file_chain.Draw('ExtHits.getPosition().Z()>>zKLM', 'ExtHits.m_DetectorID==7')
     zKLM.GetXaxis().SetTitle('z (cm)')
     zKLM.GetListOfFunctions().Add(TNamed('Description', "Axial position of each ExtHit"))
     zKLM.GetListOfFunctions().Add(TNamed('Check', "Comb-like pattern at z<-180 and z>280 cm (EKLM); broad peak at 0 (BKLM)"))
@@ -150,7 +150,7 @@ def draw_exthits(file_chain):
     zKLM.Write()
 
     xy = TH2F('xy', 'y vs x for non-KLM ExtHits', 100, -200.0, 200.0, 100, -200.0, 200.0)
-    file_chain.Draw('ExtHits.m_Position.Y():ExtHits.m_Position.X()>>xy', 'ExtHits.m_DetectorID!=7')
+    file_chain.Draw('ExtHits.getPosition().Y():ExtHits.getPosition().X()>>xy', 'ExtHits.m_DetectorID!=7')
     xy.GetXaxis().SetTitle('x (cm)')
     xy.GetYaxis().SetTitle('y (cm)')
     xy.GetListOfFunctions().Add(TNamed('Description', "Position projected into transverse plane of each ExtHit"))
@@ -160,7 +160,7 @@ def draw_exthits(file_chain):
     xy.Write()
 
     xz = TH2F('xz', 'x vs z for non-KLM ExtHits', 125, -200.0, 300.0, 100, -200.0, 200.0)
-    file_chain.Draw('ExtHits.m_Position.X():ExtHits.m_Position.Z()>>xz', 'ExtHits.m_DetectorID!=7')
+    file_chain.Draw('ExtHits.getPosition().X():ExtHits.getPosition().Z()>>xz', 'ExtHits.m_DetectorID!=7')
     xz.GetXaxis().SetTitle('z (cm)')
     xz.GetYaxis().SetTitle('x (cm)')
     xz.GetListOfFunctions().Add(TNamed('Description', "Position projected into x-z plane of each ExtHit"))
@@ -170,7 +170,7 @@ def draw_exthits(file_chain):
     xz.Write()
 
     yz = TH2F('yz', 'y vs z for non-KLM ExtHits', 125, -200.0, 300.0, 100, -200.0, 200.0)
-    file_chain.Draw('ExtHits.m_Position.Y():ExtHits.m_Position.Z()>>yz', 'ExtHits.m_DetectorID!=7')
+    file_chain.Draw('ExtHits.getPosition().Y():ExtHits.getPosition().Z()>>yz', 'ExtHits.m_DetectorID!=7')
     yz.GetXaxis().SetTitle('z (cm)')
     yz.GetYaxis().SetTitle('y (cm)')
     yz.GetListOfFunctions().Add(TNamed('Description', "Position projected into y-z plane of each ExtHit"))
@@ -180,7 +180,7 @@ def draw_exthits(file_chain):
     yz.Write()
 
     xyKLM = TH2F('xyKLM', 'y vs x for KLM ExtHits', 140, -350.0, 350.0, 140, -350.0, 350.0)
-    file_chain.Draw('ExtHits.m_Position.Y():ExtHits.m_Position.X()>>xyKLM', 'ExtHits.m_DetectorID==7')
+    file_chain.Draw('ExtHits.getPosition().Y():ExtHits.getPosition().X()>>xyKLM', 'ExtHits.m_DetectorID==7')
     xyKLM.GetXaxis().SetTitle('x (cm)')
     xyKLM.GetYaxis().SetTitle('y (cm)')
     xyKLM.GetListOfFunctions().Add(TNamed('Description', "Position projected into transverse plane of each ExtHit"))
@@ -190,7 +190,7 @@ def draw_exthits(file_chain):
     xyKLM.Write()
 
     xzKLM = TH2F('xzKLM', 'x vs z for KLM ExtHits', 140, -300.0, 400.0, 140, -350.0, 350.0)
-    file_chain.Draw('ExtHits.m_Position.X():ExtHits.m_Position.Z()>>xzKLM', 'ExtHits.m_DetectorID==7')
+    file_chain.Draw('ExtHits.getPosition().X():ExtHits.getPosition().Z()>>xzKLM', 'ExtHits.m_DetectorID==7')
     xzKLM.GetXaxis().SetTitle('z (cm)')
     xzKLM.GetYaxis().SetTitle('x (cm)')
     xzKLM.GetListOfFunctions().Add(TNamed('Description', "Position projected into x-z plane of each ExtHit"))
@@ -200,7 +200,7 @@ def draw_exthits(file_chain):
     xzKLM.Write()
 
     yzKLM = TH2F('yzKLM', 'y vs z for KLM ExtHits', 140, -300.0, 400.0, 140, -350.0, 350.0)
-    file_chain.Draw('ExtHits.m_Position.Y():ExtHits.m_Position.Z()>>yzKLM', 'ExtHits.m_DetectorID==7')
+    file_chain.Draw('ExtHits.getPosition().Y():ExtHits.getPosition().Z()>>yzKLM', 'ExtHits.m_DetectorID==7')
     yzKLM.GetXaxis().SetTitle('z (cm)')
     yzKLM.GetYaxis().SetTitle('y (cm)')
     yzKLM.GetListOfFunctions().Add(TNamed('Description', "Position projected into y-z plane of each ExtHit"))

@@ -22,30 +22,6 @@ namespace Belle2 {
   class SVDCluster: public RelationsObject {
   public:
 
-    /** Default constructor for the ROOT IO. */
-    SVDCluster():
-      m_sensorID(0), m_isU(true), m_position(0), m_positionSigma(1), m_clsTime(0), m_clsTimeSigma(1),
-      m_clsCharge(0), m_seedCharge(0), m_clsSize(0)
-    {}
-
-    /** OLD STYLE Constructor, just for backward compatibility. Will be removed soon!!!!!!
-     * @param sensorID Sensor compact ID.
-     * @param isU True if u strips, otherwise false.
-     * @param position Seed strip coordinate.
-     * @param clsTime The average of waveform maxima times of strips in the cluster.
-     * @param clsTimeSigma The standard deviation of waveform maxima times.
-     * @param clsCharge The cluster charge in electrons.
-     * @param seedCharge The charge of the seed strip in electrons.
-     * @param clsSize The size of the cluster in the corresponding strip pitch units.
-     */
-    SVDCluster(VxdID sensorID, bool isU, float position,
-               double clsTime, double clsTimeSigma, float seedCharge, float clsCharge,
-               unsigned short clsSize):
-      m_sensorID(sensorID), m_isU(isU), m_position(position), m_positionSigma(0), m_clsTime(clsTime),
-      m_clsTimeSigma(clsTimeSigma), m_clsCharge(clsCharge),
-      m_seedCharge(seedCharge), m_clsSize(clsSize)
-    {}
-
     /** Constructor.
      * @param sensorID Sensor compact ID.
      * @param isU True if u strips, otherwise false.
@@ -56,13 +32,18 @@ namespace Belle2 {
      * @param clsCharge The cluster charge in electrons.
      * @param seedCharge The charge of the seed strip in electrons.
      * @param clsSize The size of the cluster in the corresponding strip pitch units.
+     * @param clsSNR Signal-to-noise ratio, cluster charge / std error of cluster charge.
      */
     SVDCluster(VxdID sensorID, bool isU, float position, float positionSigma,
                double clsTime, double clsTimeSigma, float seedCharge, float clsCharge,
-               unsigned short clsSize):
+               unsigned short clsSize, float clsSNR):
       m_sensorID(sensorID), m_isU(isU), m_position(position), m_positionSigma(positionSigma), m_clsTime(clsTime),
       m_clsTimeSigma(clsTimeSigma), m_clsCharge(clsCharge),
-      m_seedCharge(seedCharge), m_clsSize(clsSize)
+      m_seedCharge(seedCharge), m_clsSize(clsSize), m_clsSNR(clsSNR)
+    {}
+
+    /** Default constructor for the ROOT IO. */
+    SVDCluster(): SVDCluster(0, true, 0, 100, 0, 100, 0, 0, 0, 0)
     {}
 
     /** Get the sensor ID.
@@ -113,6 +94,11 @@ namespace Belle2 {
      */
     unsigned short getSize() const { return m_clsSize; }
 
+    /** Get cluster SNR.
+     * @return cluster charge / std error of cluster charge
+     */
+    float getSNR() const { return m_clsSNR; }
+
   protected:
     unsigned short m_sensorID; /**< Compressed sensor identifier.*/
     bool m_isU;                /**< True if clusters of u-strips, otherwise false. */
@@ -123,9 +109,9 @@ namespace Belle2 {
     float m_clsCharge;         /**< Deposited charge in electrons. */
     float m_seedCharge;        /**< Cluster seed charge in electrons. */
     unsigned short m_clsSize;  /**< Cluster size in pixels */
+    float m_clsSNR;            /**< Cluster charge signal-to-noise */
 
-
-    ClassDef(SVDCluster, 2)
+    ClassDef(SVDCluster, 3)
 
   };
 

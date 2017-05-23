@@ -34,7 +34,6 @@ ExtModule::ExtModule() :
   m_MinPt(0.0),
   m_MinKE(0.0),
   m_MaxStep(0.0),
-  m_Cosmic(0),
   m_TrackingVerbosity(0),
   m_EnableVisualization(false),
   m_MagneticFieldStepperName(""),
@@ -51,20 +50,20 @@ ExtModule::ExtModule() :
   addParam("TracksColName", m_TracksColName, "Name of collection holding the reconstructed tracks", string(""));
   addParam("RecoTracksColName", m_RecoTracksColName, "Name of collection holding the reconstructed tracks (RecoTrack)", string(""));
   addParam("ExtHitsColName", m_ExtHitsColName, "Name of collection holding the ExtHits from the extrapolation", string(""));
-  addParam("MinPt", m_MinPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated.", double(0.0));
-  addParam("MinKE", m_MinKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation.", double(0.002));
-  addParam("MaxStep", m_MaxStep, "[cm] Maximum step size during extrapolation (use 0 for infinity).", double(25.0));
-  addParam("Cosmic", m_Cosmic, "Particle source (0 = beam, 1 = cosmic ray.", 0);
+  addParam("MinPt", m_MinPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated (default 0.1)",
+           double(0.1));
+  addParam("MinKE", m_MinKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation (default 0.002)", double(0.002));
+  addParam("MaxStep", m_MaxStep, "[cm] Maximum step size during extrapolation (use 0 for infinity) (default 25)", double(25.0));
   // Additional parameters copied from FullSimModule
   addParam("TrackingVerbosity", m_TrackingVerbosity,
-           "Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info.",
+           "Tracking verbosity: 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info",
            0);
-  addParam("EnableVisualization", m_EnableVisualization, "If set to True the Geant4 visualization support is enabled.", false);
-  addParam("magneticField", m_MagneticFieldStepperName,
+  addParam("EnableVisualization", m_EnableVisualization, "If set to True the Geant4 visualization support is enabled", false);
+  addParam("magneticFieldStepper", m_MagneticFieldStepperName,
            "Chooses the magnetic field stepper used by Geant4. possible values are: default, nystrom, expliciteuler, simplerunge",
            string("default"));
   addParam("magneticCacheDistance", m_MagneticCacheDistance,
-           "Minimum distance for BField lookup in cm. If the next requested point is closer than this distance than return the flast BField value. 0 means no caching",
+           "Minimum distance for BField lookup in cm. If the next requested point is closer than this distance than return the last BField value. 0 means no caching",
            0.0);
   addParam("deltaChordInMagneticField", m_DeltaChordInMagneticField,
            "[mm] The maximum miss-distance between the trajectory curve and its linear cord(s) approximation", 0.25);
@@ -130,7 +129,7 @@ void ExtModule::initialize()
   m_Extrapolator->setTracksColName(m_TracksColName);
   m_Extrapolator->setRecoTracksColName(m_RecoTracksColName);
   m_Extrapolator->setExtHitsColName(m_ExtHitsColName);
-  m_Extrapolator->initialize(m_MinPt, m_MinKE, m_Cosmic, m_Hypotheses);
+  m_Extrapolator->initialize(m_MinPt, m_MinKE, m_Hypotheses);
 }
 
 void ExtModule::beginRun()
@@ -141,7 +140,7 @@ void ExtModule::beginRun()
 void ExtModule::event()
 {
   //m_Extrapolator->event(false);
-  m_Extrapolator->eventExt();
+  m_Extrapolator->event(false);
 }
 
 void ExtModule::endRun()

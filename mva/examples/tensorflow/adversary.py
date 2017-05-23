@@ -156,7 +156,7 @@ if __name__ == "__main__":
 
     specific_options = basf2_mva.PythonOptions()
     specific_options.m_framework = "tensorflow"
-    specific_options.m_steering_file = 'mva/examples/tensorflow_adversary.py'
+    specific_options.m_steering_file = 'mva/examples/tensorflow/adversary.py'
     specific_options.m_nIterations = 400
     specific_options.m_mini_batch_size = 100
 

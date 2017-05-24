@@ -19,7 +19,11 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList,
                           const std::string& prefix) final;
 
-    void initialize() override;
+    /// Test if the parameters are valid
+    void initialize() final;
+
+    /// Set the cached B field
+    void beginRun() final;
 
     TrackFindingCDC::Weight operator()(const BaseCDCTrackSpacePointCombinationFilter::Object& currentState) final;
 
@@ -27,5 +31,8 @@ namespace Belle2 {
     std::vector<double> m_param_maximumHelixChi2XYZ {10000, 10000, 10000, 10000};
     std::vector<double> m_param_maximumChi2XY {100, 100, 100, 100};
     std::vector<double> m_param_maximumChi2 {10000, 10000, 10000, 10000};
+
+    /// Cache for the B field at the IP
+    double m_cachedBField;
   };
 }

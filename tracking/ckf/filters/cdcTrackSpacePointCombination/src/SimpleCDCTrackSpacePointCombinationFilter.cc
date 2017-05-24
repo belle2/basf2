@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
 
 #include <framework/core/ModuleParamList.h>
 
@@ -36,6 +37,11 @@ void SimpleCDCTrackSpacePointCombinationFilter::initialize()
   B2ASSERT("You need to provide exactly 4 maximal norms (for four layers).", m_param_maximumHelixChi2XYZ.size() == 4);
   B2ASSERT("You need to provide exactly 4 maximal norms (for four layers).", m_param_maximumChi2XY.size() == 4);
   B2ASSERT("You need to provide exactly 4 maximal norms (for four layers).", m_param_maximumChi2.size() == 4);
+}
+
+void SimpleCDCTrackSpacePointCombinationFilter::beginRun()
+{
+  m_cachedBField = TrackFindingCDC::CDCBFieldUtil::getBFieldZ();
 }
 
 Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackSpacePointCombinationFilter::Object& currentState)
@@ -70,7 +76,7 @@ Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackS
     const RecoTrack* cdcTrack = currentState.getSeedRecoTrack();
 
     const Vector3D momentum(currentState.getMSoPMomentum());
-    const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
+    const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed(), m_cachedBField);
 
     const double arcLength = trajectory.calcArcLength2D(hitPosition);
     const Vector2D& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);

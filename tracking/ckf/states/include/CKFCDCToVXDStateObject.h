@@ -21,7 +21,7 @@ namespace Belle2 {
    *
    * Please remember: the states are reused during the algorithm and only once constructed (in the C++ sense).
    * They are set using the "initialize" and "set" function to reuse resources. To save computation time in
-   * copying, we do not set the mSoP in these functions. It is only set in the advancing step.
+   * copying, we do not set the mSoP in the set function. It is only set in the advancing step and during initialization.
    */
   class CKFCDCToVXDStateObject {
   public:

@@ -27,10 +27,10 @@ namespace Belle2 {
      * Return a range of all possible next child states on the next layer or all hits on the next segment on the same
      * layer for overlaps.
      *
-     * Returned is actually not a vector of states, but begin and end iterators which iterate through
-     * a list of temporarily created states (precisely, they are not recalculated but the ones from before
+     * Returned is actually not a vector of states, but pointers to temporarily created states
+     * (precisely, they are not recalculated but the ones from events/iterations before
      * are reused und reset). As it is very important to keep those states in memory until they are fully
-     * processed, we keep a different vector of states for each number ( = 2 per layer).
+     * processed, we keep a different vector of states for each number ( = two per layer).
      */
     std::vector<CKFCDCToVXDStateObject*> getChildStates(CKFCDCToVXDStateObject& currentState);
 

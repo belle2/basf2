@@ -34,6 +34,10 @@ namespace Belle2 {
    * * filter a last time
    *
    * The filters can be configured independently.
+   *
+   * For performance reasons, we do only return a vector of pointers to states.
+   * The states are actually constructed in the subfindlet CDCToSpacePointMatcher and are kept as
+   * long as needed. This means the ownership still belongs to this module.
    */
   class CDCToSpacePointHitSelector : public TrackFindingCDC::CompositeProcessingSignalListener {
   public:

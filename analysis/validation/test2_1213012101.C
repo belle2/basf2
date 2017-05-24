@@ -9,7 +9,7 @@
 ////////////////////////////////////////////////////////////
 //
 // test2_1213012101.C
-// Check Mbc, DeltaE, MD and MKs
+// Check Mbc, DeltaE, MD, MKs, and Mpi0
 //
 // Constributor: Minakshi Nayak
 // May 17, 2017
@@ -33,13 +33,18 @@ void plot(TFile* pfile, TTree* ptree, TFile *outputFile){
   h_mbc->GetXaxis()->SetTitle("M_{bc} (GeV/c^{2})");
 
 
-  TH1F* h_deltae = new TH1F("h_deltae","#Delta E",100,-0.15,0.15);
+  TH1F* h_deltae = new TH1F("h_deltae","#DeltaE",100,-0.2,0.15);
   ptree->Project("h_deltae", "B_deltae", tmCuts);
-  h_deltae->GetXaxis()->SetTitle("#Delta E (GeV)");
+  h_deltae->GetXaxis()->SetTitle("#DeltaE (GeV)");
 
   TH1F* h_MKs = new TH1F("h_MKs","M_{Ks}",100,0.45,0.55);
   ptree->Project("h_MKs", "B_D0_K_S0_M", tmCuts);
   h_MKs->GetXaxis()->SetTitle("M_{Ks} (GeV/c^{2})");
+
+  TH1F* h_Mpi0 = new TH1F("h_Mpi0","M_{pi0}",100,0.13494,0.13508);
+  ptree->Project("h_Mpi0", "B_D0_pi0_M", tmCuts);
+  h_Mpi0->GetXaxis()->SetTitle("M_{pi0} (GeV/c^{2})");
+
 
   TH1F* h_MD = new TH1F("h_MD","M_{D}",100,1.75,1.95);
   ptree->Project("h_MD", "B_D0_M", tmCuts);
@@ -50,6 +55,7 @@ void plot(TFile* pfile, TTree* ptree, TFile *outputFile){
   h_mbc->Write();
   h_deltae->Write();
   h_MKs->Write();
+  h_Mpi0->Write();
   h_MD->Write();
 }
 

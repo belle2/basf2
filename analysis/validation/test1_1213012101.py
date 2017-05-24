@@ -34,7 +34,7 @@ reconstructDecay('D0:kspi0 -> K_S0:all pi0:looseFit', '1.75 < M < 1.95 and 1.8 <
 matchMCTruth('D0:kspi0')
 
 # reconstruct B+
-reconstructDecay('B-:dk -> D0:kspi0 K-:all', 'Mbc > 5.25 and abs(deltaE) < 0.15')
+reconstructDecay('B-:dk -> D0:kspi0 K-:all', 'Mbc > 5.25 and -0.2 < deltaE < 0.15')
 # vertexKFit('B-:dk', 0.0)
 matchMCTruth('B-:dk')
 
@@ -45,7 +45,7 @@ matchMCTruth('B-:dk')
 # buildContinuumSuppression('B-:dk')
 
 toolsBDk = ['EventMetaData', 'B-']
-toolsBDk += ['InvMass', '^B- -> [^D0:kspi0 -> ^K_S0:all pi0:all] ^K-:all']
+toolsBDk += ['InvMass', '^B- -> [^D0:kspi0 -> ^K_S0:all ^pi0:all] ^K-:all']
 toolsBDk += ['DeltaEMbc', '^B-']
 # toolsBDk += ['CustomFloats[isSignal]', '^B-']
 # toolsBDk += ['CustomFloats[isNotContinuumEvent]', '^B-']

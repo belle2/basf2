@@ -547,8 +547,8 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     use_segment_network_filters = True
     filter_overlapping = True
     # the 'tripletFit' currently does not work with PXD
-    quality_estimator = 'circleFit'
-    overlap_filter = 'hopfield'
+    quality_estimator = 'tripletFit'  # other option is 'circleFit'
+    overlap_filter = 'greedy'  # other option is  'hopfield'
     # setting different for pxd and svd:
     if is_pxd_used(components):
         sec_map_file = Belle2.FileSystem.findFile("data/tracking/SVDPXDDefaultMap.root")
@@ -655,15 +655,13 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
 
         if overlap_filter.lower() == 'hopfield':
             overlapFilter = register_module('TrackSetEvaluatorHopfieldNNDEV')
-            overlapFilter.param('tcArrayName', nameSPTCs)
-            overlapFilter.param('tcNetworkName', ovNetworkName)
         elif overlap_filter.lower() == 'greedy':
             overlapFilter = register_module('TrackSetEvaluatorGreedyDEV')
-            overlapFilter.param('NameSpacePointTrackCands', nameSPTCs)
-            overlapFilter.param('NameOverlapNetworks', ovNetworkName)
         else:
             print("ERROR! unknown overlap filter " + overlap_filter + " is given - can not proceed!")
             exit
+        overlapFilter.param('NameSpacePointTrackCands', nameSPTCs)
+        overlapFilter.param('NameOverlapNetworks', ovNetworkName)
         path.add_module(overlapFilter)
 
     #################
@@ -676,7 +674,7 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
 
     converter = register_module('SPTC2RTConverter')
     converter.param('recoTracksStoreArrayName', reco_tracks)
-    converter.param('spacePointsStoreArrayName', nameSPTCs)
+    converter.param('spacePointsTCsStoreArrayName', nameSPTCs)
     path.add_module(converter)
 
 

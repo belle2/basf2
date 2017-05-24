@@ -80,7 +80,8 @@ def add_cosmics_reconstruction(
         pruneTracks=True,
         skipGeometryAdding=False,
         eventTimingExtraction=False,
-        addClusterExpertModules=True):
+        addClusterExpertModules=True,
+        merge_tracks=True):
     """
     This function adds the standard reconstruction modules for cosmic data to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -97,6 +98,7 @@ def add_cosmics_reconstruction(
         FullGridTrackTimeExtraction modules.
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
+    :param merge_tracks: The upper and lower half of the tracks should be merged together in one track
     """
 
     # Add cdc tracking reconstruction modules
@@ -104,7 +106,8 @@ def add_cosmics_reconstruction(
                                    components=components,
                                    pruneTracks=False,
                                    skipGeometryAdding=skipGeometryAdding,
-                                   eventTimingExtraction=eventTimingExtraction)
+                                   eventTimingExtraction=eventTimingExtraction,
+                                   merge_tracks=merge_tracks)
 
     # Add further reconstruction modules
     add_posttracking_reconstruction(path,

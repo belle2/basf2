@@ -50,7 +50,9 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                         reco_tracks=reco_tracks)
 
 
-def add_cr_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False, eventTimingExtraction=False):
+def add_cr_tracking_reconstruction(path, components=None, pruneTracks=False,
+                                   skipGeometryAdding=False, eventTimingExtraction=False,
+                                   merge_tracks=True):
     """
     This function adds the reconstruction modules for cr tracking to a path.
 
@@ -63,6 +65,7 @@ def add_cr_tracking_reconstruction(path, components=None, pruneTracks=False, ski
         (but you will have to add it on your own).
     :param eventTimingExtraction: extract time with either the TrackTimeExtraction or
         FullGridTrackTimeExtraction modules.
+    :param merge_tracks: The upper and lower half of the tracks should be merged together in one track
     """
 
     # make sure CDC is used
@@ -78,7 +81,7 @@ def add_cr_tracking_reconstruction(path, components=None, pruneTracks=False, ski
         path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
 
     # track finding
-    add_cdc_cr_track_finding(path)
+    add_cdc_cr_track_finding(path, merge_tracks=merge_tracks)
 
     # track fitting
     add_cdc_cr_track_fit_and_track_creator(path, components, pruneTracks, eventTimingExtraction)

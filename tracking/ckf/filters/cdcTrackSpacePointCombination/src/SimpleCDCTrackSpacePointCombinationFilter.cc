@@ -55,8 +55,9 @@ Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackS
   }
 
   const genfit::MeasuredStateOnPlane& mSoP = currentState.getMeasuredStateOnPlaneSavely();
+  mSoP.getPosMomCov(m_position, m_momentum, m_cov);
 
-  Vector3D position = TrackFindingCDC::Vector3D(mSoP.getPos());
+  Vector3D position = TrackFindingCDC::Vector3D(m_position);
   Vector3D hitPosition = TrackFindingCDC::Vector3D(spacePoint->getPosition());
 
   const double& sameHemisphere = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
@@ -67,25 +68,20 @@ Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackS
 
   const double& layer = currentState.extractGeometryLayer();
 
-  Vector3D momentum = TrackFindingCDC::Vector3D(mSoP.getMom());
-  const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
-
-  const double arcLength = trajectory.calcArcLength2D(hitPosition);
-  const auto& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
-  const auto& trackPositionAtHitZ = trajectory.getTrajectorySZ().mapSToZ(arcLength);
-
-  Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
-  Vector3D differenceHelix = trackPositionAtHit - hitPosition;
-  Vector3D difference = position - hitPosition;
-
-  const TMatrixDSym& cov6D = mSoP.get6DCov();
-
   if (not currentState.isFitted() and not currentState.isAdvanced()) {
     // Filter 1
-    // TODO: this is wrong!
-    const double& helix_chi2_xyz = (differenceHelix.x() * differenceHelix.x() / sqrt(cov6D(0, 0)) +
-                                    differenceHelix.y() * differenceHelix.y() / sqrt(cov6D(1, 1)) +
-                                    differenceHelix.z() * differenceHelix.z() / sqrt(cov6D(2, 2)));
+    Vector3D momentum = TrackFindingCDC::Vector3D(m_momentum);
+    const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
+
+    const double arcLength = trajectory.calcArcLength2D(hitPosition);
+    const auto& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
+    const auto& trackPositionAtHitZ = trajectory.getTrajectorySZ().mapSToZ(arcLength);
+    Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
+    Vector3D differenceHelix = trackPositionAtHit - hitPosition;
+
+    const double& helix_chi2_xyz = (differenceHelix.x() * differenceHelix.x() / sqrt(m_cov(0, 0)) +
+                                    differenceHelix.y() * differenceHelix.y() / sqrt(m_cov(1, 1)) +
+                                    differenceHelix.z() * differenceHelix.z() / sqrt(m_cov(2, 2)));
     if (helix_chi2_xyz > m_param_maximumHelixChi2XYZ[layer - 3]) {
       return std::nan("");
     } else {
@@ -93,9 +89,11 @@ Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackS
     }
   } else if (not currentState.isFitted()) {
     // Filter 2
-    const double& chi2_xy = (difference.x() * difference.x() / sqrt(cov6D(0, 0)) +
-                             difference.y() * difference.y() / sqrt(cov6D(1, 1)));
-    const double& chi2_xyz = chi2_xy + difference.z() * difference.z() / sqrt(cov6D(2, 2));
+    Vector3D difference = position - hitPosition;
+
+    const double& chi2_xy = (difference.x() * difference.x() / sqrt(m_cov(0, 0)) +
+                             difference.y() * difference.y() / sqrt(m_cov(1, 1)));
+    const double& chi2_xyz = chi2_xy + difference.z() * difference.z() / sqrt(m_cov(2, 2));
     if (chi2_xy > m_param_maximumChi2XY[layer - 3]) {
       return std::nan("");
     } else {

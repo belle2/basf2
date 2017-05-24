@@ -27,5 +27,12 @@ namespace Belle2 {
     std::vector<double> m_param_maximumHelixChi2XYZ {10000, 10000, 10000, 10000};
     std::vector<double> m_param_maximumChi2XY {100, 100, 100, 100};
     std::vector<double> m_param_maximumChi2 {10000, 10000, 10000, 10000};
+
+    /// Object pool for mSoP position
+    TVector3 m_position;
+    /// Object pool for mSoP momentum
+    TVector3 m_momentum;
+    /// Object pool for mSoP covariance matrix
+    TMatrixDSym m_cov;
   };
 }

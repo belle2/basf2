@@ -259,12 +259,16 @@ void PXDPackerModule::add_frame_to_payload(void)
 void PXDPackerModule::append_int8(unsigned char w)
 {
   m_current_frame.push_back(w);
+  dhe_byte_count++;
+  dhc_byte_count++;
 }
 
 void PXDPackerModule::append_int16(unsigned short w)
 {
   m_current_frame.push_back((unsigned char)(w >> 8));
   m_current_frame.push_back((unsigned char)(w));
+  dhe_byte_count += 2;
+  dhc_byte_count += 2;
 }
 
 void PXDPackerModule::append_int32(unsigned int w)
@@ -273,6 +277,8 @@ void PXDPackerModule::append_int32(unsigned int w)
   m_current_frame.push_back((unsigned char)(w >> 16));
   m_current_frame.push_back((unsigned char)(w >> 8));
   m_current_frame.push_back((unsigned char)(w));
+  dhe_byte_count += 4;
+  dhc_byte_count += 4;
 }
 
 void PXDPackerModule::start_frame(void)
@@ -297,6 +303,7 @@ void PXDPackerModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
 
   /// DHC Start
 
+  dhc_byte_count = 0;
   start_frame();
   append_int32((DHC_FRAME_HEADER_DATA_TYPE_DHC_START << 27) | ((dhc_id & 0xF) << 21) | ((dhe_active & 0x1F) << 16) |
                (m_trigger_nr & 0xFFFF));
@@ -323,10 +330,10 @@ void PXDPackerModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
   //  add_frame_to_payload();
 
   /// DHC End
-
+  unsigned int dlen = (dhc_byte_count / 4); // 32 bit words
   start_frame();
   append_int32((DHC_FRAME_HEADER_DATA_TYPE_DHC_END << 27) | ((dhc_id & 0xF) << 21) | (m_trigger_nr & 0xFFFF));
-  append_int32(0x00000000); // 16 bit word count
+  append_int32(dlen); // 32 bit word count
   append_int32(0x00000000); // Error Flags
   add_frame_to_payload();
 
@@ -345,6 +352,7 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
   }
 
   /// DHE Start
+  dhe_byte_count = 0;
   start_frame();
   append_int32((DHC_FRAME_HEADER_DATA_TYPE_DHE_START << 27) | ((dhe_id & 0x3F) << 20) | ((dhp_active & 0xF) << 16) |
                (m_trigger_nr & 0xFFFF));
@@ -425,9 +433,11 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
   }
 
   /// DHE End
+  unsigned int dlen = (dhe_byte_count / 2); // 16 bit words
   start_frame();
   append_int32((DHC_FRAME_HEADER_DATA_TYPE_DHE_END << 27) | ((dhe_id & 0x3F) << 20) | (m_trigger_nr & 0xFFFF));
-  append_int32(0x00000000);  // 16 bit word count
+  append_int16(dlen & 0xFFFF); // 16 bit word count
+  append_int16((dlen >> 16) & 0xFFFF); // 16 bit word count
   append_int32(0x00000000);  // Error Flags
   add_frame_to_payload();
 }
@@ -531,6 +541,9 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_reformat)
 
   if (empty) {
     B2DEBUG(20, "Found no data for halfladder! DHEID: " << dhe_id << " Chip: " << chip_id);
+    // we DROP the frame, thus we have to correct DHE and DHC counters
+    dhc_byte_count -= 8; // fixed size of Header
+    dhe_byte_count -= 8; // fixed size of Header
     start_frame();
     /// Ghost Frame ... start frame overwrites frame info set above
     append_int32((DHC_FRAME_HEADER_DATA_TYPE_GHOST << 27) | ((dhe_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) |

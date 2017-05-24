@@ -195,33 +195,19 @@ namespace Belle2 {
       return getWeight() < rhs.getWeight();
     }
 
-    // mSoP
-    genfit::MeasuredStateOnPlane& getMeasuredStateOnPlane()
-    {
-      B2ASSERT("Measured on plane is not set", isAdvanced());
-      return m_measuredStateOnPlane;
-    }
-
+    /// Set the mSoP
     void setMeasuredStateOnPlane(const genfit::MeasuredStateOnPlane& mSoP)
     {
       m_measuredStateOnPlane = mSoP;
     }
 
-    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneSavely() const
+    /// Get the mSoP (or from the parent if not set already)
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlane() const
     {
       if (isAdvanced() and m_hitObject) {
         return m_measuredStateOnPlane;
       } else {
         return getMeasuredStateOnPlaneFromParent();
-      }
-    }
-
-    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromParent() const
-    {
-      if (getParent()) {
-        return getParent()->getMeasuredStateOnPlaneSavely();
-      } else {
-        return getSeedRecoTrack()->getMeasuredStateOnPlaneFromFirstHit();
       }
     }
 
@@ -282,6 +268,16 @@ namespace Belle2 {
       while (walkObject != nullptr) {
         f(walkObject);
         walkObject = walkObject->getParent();
+      }
+    }
+
+    /// Helper function to get the mSoP from the parent recursively until the seed track
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromParent() const
+    {
+      if (getParent()) {
+        return getParent()->getMeasuredStateOnPlane();
+      } else {
+        return getSeedRecoTrack()->getMeasuredStateOnPlaneFromFirstHit();
       }
     }
   };

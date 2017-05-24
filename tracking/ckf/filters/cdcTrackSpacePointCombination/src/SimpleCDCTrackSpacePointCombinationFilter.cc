@@ -54,7 +54,7 @@ Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackS
     }
   }
 
-  const genfit::MeasuredStateOnPlane& mSoP = currentState.getMeasuredStateOnPlaneSavely();
+  const genfit::MeasuredStateOnPlane& mSoP = currentState.getMeasuredStateOnPlane();
   mSoP.getPosMomCov(m_position, m_momentum, m_cov);
 
   Vector3D position = TrackFindingCDC::Vector3D(m_position);

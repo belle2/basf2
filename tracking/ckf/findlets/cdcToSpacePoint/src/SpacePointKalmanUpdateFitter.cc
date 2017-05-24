@@ -75,10 +75,11 @@ Weight SpacePointKalmanUpdateFitter::operator()(CKFCDCToVXDStateObject& currentS
     return 1;
   }
 
-  genfit::MeasuredStateOnPlane& measuredStateOnPlane = currentState.getMeasuredStateOnPlane();
+  genfit::MeasuredStateOnPlane measuredStateOnPlane = currentState.getMeasuredStateOnPlane();
 
   const double chi2 = kalmanStep(measuredStateOnPlane, spacePoint);
 
+  currentState.setMeasuredStateOnPlane(measuredStateOnPlane);
   currentState.setChi2(chi2);
   currentState.setFitted();
   return 1;

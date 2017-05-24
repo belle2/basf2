@@ -43,7 +43,7 @@ void CDCToSpacePointHitSelector::exposeParameters(ModuleParamList* moduleParamLi
 }
 
 /// Main function of this findlet: return a range of selected child states for a given current state.
-TrackFindingCDC::VectorRange<CKFCDCToVXDStateObject> CDCToSpacePointHitSelector::getChildStates(
+std::vector<CKFCDCToVXDStateObject*> CDCToSpacePointHitSelector::getChildStates(
   CKFCDCToVXDStateObject& currentState)
 {
   auto childStates = m_hitMatcher.getChildStates(currentState);

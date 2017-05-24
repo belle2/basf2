@@ -1,5 +1,6 @@
 #pragma once
 
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <cmath>
 
 namespace Belle2 {
@@ -20,22 +21,26 @@ namespace Belle2 {
       return;
     }
 
-    auto firstFiniteStateIterator = childStates.begin();
-    for (auto& state : childStates) {
-      const auto weight = predicate(state);
-      if (std::isnan(weight)) {
-        state = *firstFiniteStateIterator;
-        firstFiniteStateIterator = std::next(firstFiniteStateIterator);
-      } else {
-        state.setWeight(weight);
-      }
+    for (auto* state : childStates) {
+      const auto weight = predicate(*state);
+      state->setWeight(weight);
     }
 
-    childStates.first = firstFiniteState;
+    using State = typename AStateList::value_type;
+
+    const auto& weightIsNan = [](const State & state) {
+      return std::isnan(state->getWeight());
+    };
+
+    TrackFindingCDC::erase_remove_if(childStates, weightIsNan);
+
+    const auto& pointerLess = [](const State & lhs, const State & rhs) {
+      return *lhs < *rhs;
+    };
 
     if (useNResults > 0 and childStates.size() > useNResults) {
-      std::sort(childStates.begin(), childStates.end());
-      childStates.second = std::next(childStates.begin(), useNResults);
+      std::sort(childStates.begin(), childStates.end(), pointerLess);
+      childStates.resize(useNResults);
     }
   }
 }

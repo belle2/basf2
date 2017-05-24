@@ -32,7 +32,7 @@ namespace Belle2 {
      * are reused und reset). As it is very important to keep those states in memory until they are fully
      * processed, we keep a different vector of states for each number ( = 2 per layer).
      */
-    TrackFindingCDC::VectorRange<CKFCDCToVXDStateObject> getChildStates(CKFCDCToVXDStateObject& currentState);
+    std::vector<CKFCDCToVXDStateObject*> getChildStates(CKFCDCToVXDStateObject& currentState);
 
     /// Fill the cache of hits for each event
     void initializeEventCache(std::vector<RecoTrack*>& seedsVector, std::vector<const SpacePoint*>& filteredHitVector);
@@ -43,6 +43,7 @@ namespace Belle2 {
       moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "makeHitJumpingPossible"), m_param_makeHitJumpingPossible,
                                     "", m_param_makeHitJumpingPossible);
     }
+
   private:
     /// Cache for sorted hits
     std::map<unsigned int, TrackFindingCDC::VectorRange<const SpacePoint*>> m_cachedHitMap;

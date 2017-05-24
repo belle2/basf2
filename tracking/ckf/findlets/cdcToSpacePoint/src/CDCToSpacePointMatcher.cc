@@ -12,24 +12,32 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-VectorRange<CKFCDCToVXDStateObject> CDCToSpacePointMatcher::getChildStates(CKFCDCToVXDStateObject& currentState)
+std::vector<CKFCDCToVXDStateObject*> CDCToSpacePointMatcher::getChildStates(CKFCDCToVXDStateObject& currentState)
 {
   const auto& matchingHits = getMatchingHits(currentState);
   auto& temporaryStates = m_temporaryStates[currentState.getNumber()];
-  temporaryStates.resize(matchingHits.size() + 1);
+
+  if (matchingHits.size() + 1 > temporaryStates.size()) {
+    temporaryStates.resize(matchingHits.size() + 1);
+  }
+
+  std::vector<CKFCDCToVXDStateObject*> pointersToTemporaryStates;
+  pointersToTemporaryStates.reserve(matchingHits.size() + 1);
 
   auto lastState = temporaryStates.begin();
   for (const auto& hit : matchingHits) {
     lastState->set(&currentState, hit);
+    pointersToTemporaryStates.push_back(&(*lastState));
+
     lastState = std::next(lastState);
   }
 
   if (m_param_makeHitJumpingPossible) {
     lastState->set(&currentState, nullptr);
-    lastState = std::next(lastState);
+    pointersToTemporaryStates.push_back(&(*lastState));
   }
 
-  return VectorRange<CKFCDCToVXDStateObject>(temporaryStates.begin(), lastState);
+  return pointersToTemporaryStates;
 }
 
 VectorRange<const SpacePoint*> CDCToSpacePointMatcher::getMatchingHits(CKFCDCToVXDStateObject& currentState)

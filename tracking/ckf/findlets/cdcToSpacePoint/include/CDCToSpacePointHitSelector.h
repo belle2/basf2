@@ -44,7 +44,7 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
 
     /// Main function of this findlet: return a range of selected child states for a given current state
-    TrackFindingCDC::VectorRange<CKFCDCToVXDStateObject> getChildStates(CKFCDCToVXDStateObject& currentState);
+    std::vector<CKFCDCToVXDStateObject*> getChildStates(CKFCDCToVXDStateObject& currentState);
 
     /// Initialize the cache of the hit matcher with the hits to be used in this event
     void initializeEventCache(std::vector<RecoTrack*>& seedsVector, std::vector<const SpacePoint*>& filteredHitVector)

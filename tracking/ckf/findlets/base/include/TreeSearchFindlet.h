@@ -107,8 +107,8 @@ namespace Belle2 {
         return;
       }
 
-      for (AStateObject& childState : childStates) {
-        std::swap(*nextState, childState);
+      for (AStateObject* childState : childStates) {
+        *nextState = *childState;
         traverseTree(nextState, resultsVector);
       }
     }

@@ -389,7 +389,10 @@ class Algorithm():
         """
         from basf2 import create_path, process
         load_data = create_path()
-        load_data.add_module('RootInput', inputFileNames=input_file_paths, ignoreCommandLineOverride=True)
+        load_data.add_module('RootInput',
+                             inputFileNames=input_file_paths,
+                             ignoreCommandLineOverride=True,
+                             entrySequences=["0"]*len(input_file_paths))
         process(load_data)
 
 

@@ -632,7 +632,7 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     maxCandidateSelection = register_module('BestVXDTrackCandidatesSelector')
     maxCandidateSelection.param('NameSpacePointTrackCands', nameSPTCs)
     maxCandidateSelection.param('NewNameSpacePointTrackCands', nameSPTCs)
-    maxCandidateSelection.param('SubsetCreation', True)
+    maxCandidateSelection.param('SubsetCreation', False)
     path.add_module(maxCandidateSelection)
 
     # Properties
@@ -647,23 +647,10 @@ def add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=None
     #################
 
     if filter_overlapping:
-        ovNetworkName = 'OverlapNetwork' + suffix
-        overlapNetworkProducer = register_module('SVDOverlapChecker')
-        overlapNetworkProducer.param('NameSpacePointTrackCands', nameSPTCs)
-        overlapNetworkProducer.param('OutputArrayName', ovNetworkName)
-        path.add_module(overlapNetworkProducer)
-
-        if overlap_filter.lower() == 'hopfield':
-            overlapFilter = register_module('TrackSetEvaluatorHopfieldNNDEV')
-        elif overlap_filter.lower() == 'greedy':
-            overlapFilter = register_module('TrackSetEvaluatorGreedyDEV')
-        else:
-            print("ERROR! unknown overlap filter " + overlap_filter + " is given - can not proceed!")
-            exit
-        overlapFilter.param('NameSpacePointTrackCands', nameSPTCs)
-        overlapFilter.param('NameOverlapNetworks', ovNetworkName)
-        path.add_module(overlapFilter)
-
+        overlapResolver = register_module('SVDOverlapResolver')
+        overlapResolver.param('NameSpacePointTrackCands', nameSPTCs)
+        overlapResolver.param('ResolveMethod', overlap_filter.lower())
+        path.add_module(overlapResolver)
     #################
     # VXDTF2 Step 5
     # Converter

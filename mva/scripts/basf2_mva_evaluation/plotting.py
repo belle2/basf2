@@ -594,6 +594,7 @@ class Box(Plotter):
     """
     #: @var x_axis_label
     #: Label on x axis
+    x_axis_label = ""
 
     def add(self, data, column, mask=None, weight_column=None):
         """

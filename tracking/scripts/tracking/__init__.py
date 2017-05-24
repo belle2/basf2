@@ -192,11 +192,9 @@ def add_cdc_cr_track_fit_and_track_creator(
                     )
 
     if eventTimingExtraction is True:
-        # Select the tracks for the time extraction.
-        path.add_module("SelectionForTrackTimeExtraction")
-
         # Extract the time
-        path.add_module("FullGridTrackTimeExtraction")
+        path.add_module("FullGridTrackTimeExtraction",
+                        recoTracksStoreArrayName="RecoTracks")
 
         # Track fitting
         path.add_module("DAFRecoFitter",

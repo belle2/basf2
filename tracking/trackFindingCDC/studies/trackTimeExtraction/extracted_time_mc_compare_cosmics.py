@@ -135,9 +135,15 @@ def main(mc_drift, generator_module, track_finder, turns, selection_mode, select
         path.add_module("TrackTimeExtraction", maximalIterations=turns)
     elif turns == 0:
         if selection_mode != "all_tracks":
-            path.add_module("FullGridTrackTimeExtraction", recoTracksStoreArrayName="__SelectedRecoTracks")
+            path.add_module(
+                "FullGridTrackTimeExtraction",
+                recoTracksStoreArrayName="__SelectedRecoTracks",
+                minimalT0Shift=-70,
+                maximalT0Shift=70,
+                numberOfGrids=6)
         else:
-            path.add_module("FullGridTrackTimeExtraction", recoTracksStoreArrayName="RecoTracks")
+            path.add_module("FullGridTrackTimeExtraction", recoTracksStoreArrayName="RecoTracks",
+                            maximalT0Shift=70, minimalT0Shift=-70, numberOfGrids=6)
 
     path.add_module("DAFRecoFitter",
                     pdgCodesToUseForFitting=13)

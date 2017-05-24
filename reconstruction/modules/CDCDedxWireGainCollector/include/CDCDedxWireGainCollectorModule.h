@@ -8,20 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDEDXWIREGAINCOLLECTORMODULE_H
-#define CDCDEDXWIREGAINCOLLECTORMODULE_H
+#pragma once
 
 #include <calibration/CalibrationCollectorModule.h>
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
 
-#include <framework/pcore/ProcHandler.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <TTree.h>
-#include <TFile.h>
-#include <TRandom.h>
-
+#include <vector>
 
 namespace Belle2 {
   /**
@@ -49,12 +44,8 @@ namespace Belle2 {
 
 
   private:
-
-    // event level information
-    int m_evt = -1;    /**< Current event id */
-    int m_run = -1;    /**< Current run id */
-    int m_exp = -1;    /**< Current experiment id */
-    int m_procId = -1; /**< Current process id */
+    // module params
+    int m_maxNumHits;
 
     // track level information
     double m_dedx = -1;  /**< dE/dx truncated mean */
@@ -62,10 +53,8 @@ namespace Belle2 {
     int m_nhits = -1;    /**< number of dE/dx hits on the track */
 
     // hit level information
-    int m_wire[100];       /**< wire number for hit */
-    int m_layer[100];      /**< continuous layer number for hit */
-    double m_dedxhit[100]; /**< dE/dx for hit */
+    std::vector<int> m_wire;       /**< wire number for hit */
+    std::vector<int> m_layer;      /**< continuous layer number for hit */
+    std::vector<double> m_dedxhit; /**< dE/dx for hit */
   };
 }
-
-#endif

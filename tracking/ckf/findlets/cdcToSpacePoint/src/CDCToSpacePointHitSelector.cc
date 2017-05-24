@@ -47,20 +47,26 @@ std::vector<CKFCDCToVXDStateObject*> CDCToSpacePointHitSelector::getChildStates(
   CKFCDCToVXDStateObject& currentState)
 {
   auto childStates = m_hitMatcher.getChildStates(currentState);
+  B2DEBUG(50, "Matcher has found " << childStates.size() << " states");
 
   applyAndFilter(childStates, m_firstFilter, 2 * m_param_useNResults);
+  B2DEBUG(50, "First filter has found " << childStates.size() << " states");
 
   if (m_param_advance) {
     applyAndFilter(childStates, m_advanceAlgorithm);
+    B2DEBUG(50, "Advance has found " << childStates.size() << " states");
   }
 
   applyAndFilter(childStates, m_secondFilter, m_param_useNResults);
+  B2DEBUG(50, "Second filter has found " << childStates.size() << " states");
 
   if (m_param_fit) {
     applyAndFilter(childStates, m_fitterAlgorithm);
+    B2DEBUG(50, "Fit filter has found " << childStates.size() << " states");
   }
 
   applyAndFilter(childStates, m_thirdFilter, m_param_useNResults);
+  B2DEBUG(50, "Third filter has found " << childStates.size() << " states");
 
   return childStates;
 }

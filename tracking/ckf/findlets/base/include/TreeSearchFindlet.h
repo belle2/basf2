@@ -76,10 +76,12 @@ namespace Belle2 {
       m_hitSelector.initializeEventCache(seedsVector, hitVector);
 
       for (SeedPtr seed : seedsVector) {
+        B2DEBUG(50, "Starting with new seed...");
         StateIterator firstStateIterator = m_states.begin();
         firstStateIterator->initialize(seed);
 
         traverseTree(firstStateIterator, results);
+        B2DEBUG(50, "... finished with seed");
       }
     }
 
@@ -93,9 +95,11 @@ namespace Belle2 {
     /// Implementation of the traverseTree function
     void traverseTree(StateIterator currentState, std::vector<ResultObject>& resultsVector)
     {
+      B2DEBUG(50, "Now on layer " << currentState->getNumber());
       StateIterator nextState = std::next(currentState);
 
       if (nextState == m_states.end()) {
+        B2DEBUG(50, "Giving up this route, as this is the last possible state.");
         resultsVector.emplace_back(currentState->finalize());
         return;
       }
@@ -103,10 +107,12 @@ namespace Belle2 {
       const auto& childStates = m_hitSelector.getChildStates(*currentState);
 
       if (childStates.empty()) {
+        B2DEBUG(50, "Giving up this route, as there are no possible child states.");
         resultsVector.emplace_back(currentState->finalize());
         return;
       }
 
+      B2DEBUG(50, "Having found " << childStates.size() << " child states.");
       for (AStateObject* childState : childStates) {
         *nextState = *childState;
         traverseTree(nextState, resultsVector);

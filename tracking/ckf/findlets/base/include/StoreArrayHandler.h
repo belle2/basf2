@@ -53,6 +53,9 @@ namespace Belle2 {
 
       moduleParamList->addParameter("exportTracks", m_param_exportTracks, "Export the result tracks into a StoreArray.",
                                     m_param_exportTracks);
+      moduleParamList->addParameter("exportAlsoMergedTracks", m_param_exportAlsoMergedTracks,
+                                    "Export also the merged tracks into a StoreArray.",
+                                    m_param_exportAlsoMergedTracks);
     }
 
     /// Require/register the store arrays
@@ -101,6 +104,8 @@ namespace Belle2 {
     std::string m_param_mergedRecoTrackStoreArrayName = "MergedRecoTracks";
     /** Export the tracks or not */
     bool m_param_exportTracks = true;
+    /** Export also the merged tracks */
+    bool m_param_exportAlsoMergedTracks = true;
 
     // Store Arrays
     /// CDC Reco Tracks Store Array
@@ -129,9 +134,11 @@ namespace Belle2 {
         RecoTrack* newVXDOnlyTrack = addNewTrack(vxdPosition, trackMomentum, trackCharge, hits, m_vxdRecoTracks);
         seedTrack->addRelationTo(newVXDOnlyTrack);
 
-        // Add merged VXD-CDC-track
-        RecoTrack* newMergedTrack = addNewTrack(vxdPosition, trackMomentum, trackCharge, hits, m_mergedRecoTracks);
-        newMergedTrack->addHitsFromRecoTrack(seedTrack, newMergedTrack->getNumberOfTotalHits());
+        if (m_param_exportAlsoMergedTracks) {
+          // Add merged VXD-CDC-track
+          RecoTrack* newMergedTrack = addNewTrack(vxdPosition, trackMomentum, trackCharge, hits, m_mergedRecoTracks);
+          newMergedTrack->addHitsFromRecoTrack(seedTrack, newMergedTrack->getNumberOfTotalHits());
+        }
       }
     }
 

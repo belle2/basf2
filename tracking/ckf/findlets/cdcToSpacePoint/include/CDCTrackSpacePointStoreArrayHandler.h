@@ -27,8 +27,6 @@ namespace Belle2 {
   public:
     /**
      * Write back the found tracks (VXD only and the merged ones).
-     *
-     * TODO: This method is actually the slowest in the whole CKF module...
      */
     void apply(const std::vector<CKFCDCToVXDStateObject::ResultObject>& cdcTracksWithMatchedSpacePoints) override;
   };

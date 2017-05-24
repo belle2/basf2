@@ -38,12 +38,16 @@ namespace Belle2 {
     void initialize() final;
     /// Check current experiment and run and update if needed, fill into RunRange and collect()
     void event() final;
+    /// Reset the m_runCollect flag to begin collection again
+    void beginRun() final;
 
   protected:
     /// Replacement for initialize(). Register calibration dataobjects here as well
     virtual void prepare() {}
     /// Replacement for event(). Fill you calibration data objects here
     virtual void collect() {}
+    /// Replacement for beginRun(). Do anything you would normally do in beginRun here
+    virtual void prepareRun() {}
 
     /// Register object with name, takes ownership, do not access the pointer beyond prepare()
     template <class T>
@@ -77,6 +81,14 @@ namespace Belle2 {
 
     /// Granularity of data collection = run|all(= no granularity, exp,run=-1,-1)
     std::string m_granularity;
+
+    /// Maximum number of events to be collected at the start of each run (-1 = no maximum)
+    int m_maxEventsPerRun;
+
+    /// Whether or not we will run the collect() function, basically skips the event() function if false
+    bool m_runCollect = true;
+    /// How many events processed this run so far
+    unsigned int m_eventNumInRun = 0;
   };
 } // Belle2 namespace
 

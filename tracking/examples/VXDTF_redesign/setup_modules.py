@@ -44,7 +44,7 @@ def setup_VXDTF2(path=None,
                  quality_estimator='circleFit',
                  overlap_filter='greedy',
                  sec_map_file=None,
-                 setup_name='lowTestRedesign',
+                 setup_name='SVDOnlyDefault',
                  log_level=LogLevel.INFO,
                  debug_level=1):
     """
@@ -95,6 +95,7 @@ def setup_VXDTF2(path=None,
     if sec_map_file:
         secMapBootStrap.param('SectorMapsInputFile', sec_map_file)
     secMapBootStrap.param('WriteSectorMap', False)
+    secMapBootStrap.param('SetupToRead', "")
     modules.append(secMapBootStrap)
 
     ##################

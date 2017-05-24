@@ -352,7 +352,6 @@ namespace DirectedNodeNetworkTests {
       std::vector<DirectedNode<int, VoidMetaInfo>*> oldOuterEnds = intNetwork.getOuterEnds();
       std::vector<DirectedNode<int, VoidMetaInfo>*> oldInnerEnds = intNetwork.getInnerEnds();
 
-      auto& oldNodes = intNetwork.getNodes();
       EXPECT_EQ(3, oldOuterEnds.size());
       EXPECT_TRUE(NULL == intNetwork.getNode(to_string(newOuterInt)));
       unsigned int sizeB4 = intNetwork.size();

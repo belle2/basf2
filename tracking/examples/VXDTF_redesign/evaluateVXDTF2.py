@@ -40,9 +40,9 @@ sec_map_file = arguments.secmap
 usePXD = False
 
 # these are the "default" settings
-setup_name = 'lowTestRedesign'
+setup_name = 'SVDOnlyDefault'
 if usePXD:
-    setup_name = 'lowTestSVDPXD'
+    setup_name = 'SVDPXDDefault'
 
 performFit = True
 

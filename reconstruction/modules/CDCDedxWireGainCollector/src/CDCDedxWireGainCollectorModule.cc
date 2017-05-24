@@ -27,7 +27,8 @@ CDCDedxWireGainCollectorModule::CDCDedxWireGainCollectorModule() : CalibrationCo
   setDescription("A collector module for CDC dE/dx wire gain calibration");
 
   // Parameter definitions
-
+  addParam("maxNumHits", m_maxNumHits,
+           "Maximum number of hits per track. If there is more than this the track will not be collected. ", int(100));
 }
 
 //-----------------------------------------------------------------
@@ -36,25 +37,19 @@ CDCDedxWireGainCollectorModule::CDCDedxWireGainCollectorModule() : CalibrationCo
 
 void CDCDedxWireGainCollectorModule::prepare()
 {
-  StoreObjPtr<EventMetaData>::required();
   StoreArray<CDCDedxTrack>::required();
 
   // Data object creation
   auto ttree = new TTree("dedxTree", "Tree with dE/dx information");
-  ttree->Branch<int>("event", &m_evt);
-  ttree->Branch<int>("run", &m_run);
-  ttree->Branch<int>("exp", &m_exp);
-  ttree->Branch<int>("pid", &m_procId);
-
   ttree->Branch<double>("dedx", &m_dedx);
   ttree->Branch<double>("costh", &m_costh);
-  ttree->Branch<int>("nhits", &m_nhits);
+  // No longer need to store the nhits as the size of the wire/layer/dedxhit vectors are the same as the number of hits
 
-  ttree->Branch("wire", m_wire, "wire[nhits]/I");
-  ttree->Branch("layer", m_layer, "layer[nhits]/I");
-  ttree->Branch("dedxhit", m_dedxhit, "dedxhit[nhits]/D");
+  ttree->Branch("wire", &m_wire);
+  ttree->Branch("layer", &m_layer);
+  ttree->Branch("dedxhit", &m_dedxhit);
 
-  // Data object registration
+  // Collector object registration
   registerObject<TTree>("tree", ttree);
 }
 
@@ -64,27 +59,29 @@ void CDCDedxWireGainCollectorModule::prepare()
 
 void CDCDedxWireGainCollectorModule::collect()
 {
-  StoreObjPtr<EventMetaData> emd;
   StoreArray<CDCDedxTrack> tracks;
-
-  m_procId = ProcHandler::EvtProcID();
-  m_evt = emd->getEvent();
-  m_run = emd->getRun();
-  m_exp = emd->getExperiment();
+  // Collector object access
+  auto& tree = getObject<TTree>("tree");
 
   for (auto track : tracks) {
+    // Make sure to remove all the data in vectors from the previous track
+    m_wire.clear();
+    m_layer.clear();
+    m_dedxhit.clear();
+
+    // Simple numbers don't need to be cleared
     m_dedx = track.getTruncatedMean();
     m_costh = track.getCosTheta();
-    m_nhits = track.getNLayerHits();
+    m_nhits = track.getNLayerHits();  // Used in loop below but not saved to TTree
 
-    if (m_nhits >= 100) continue;
+    if (m_nhits > m_maxNumHits) continue;  // Do you want this maximum if you don't 'have' to have it?
     for (int i = 0; i < m_nhits; ++i) {
-      m_wire[i] = track.getWire(i);
-      m_layer[i] = track.getLayer(i);
-      m_dedxhit[i] = track.getDedx(i);
+      m_wire.push_back(track.getWire(i));
+      m_layer.push_back(track.getLayer(i));
+      m_dedxhit.push_back(track.getDedx(i));
     }
 
-    // Data object access and filling
-    getObject<TTree>("tree").Fill();
+    // Track information filled
+    tree.Fill();
   }
 }

@@ -41,13 +41,11 @@ namespace Belle2 {
 
     /**
      * Initialize the state as a root without a related space point (but with a reco track)
-     *
-     * ATTENTION: We do not set the mSoP here, as this is quite costly. This is only set in advancing
-     * and can not be accessed before!
      */
     void initialize(RecoTrack* seed)
     {
       m_seedRecoTrack = seed;
+      setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
 
       // Reset other state to default.
       m_hitObject = nullptr;
@@ -65,8 +63,9 @@ namespace Belle2 {
     /**
      * Set this state to be related to a space point and as child of the given state.
      *
-     * ATTENTION: We do not set the mSoP here, as this is quite costly. This is only set in advancing
-     * and can not be accessed before!
+     * ATTENTION: We do not set the mSoP here (or the cached positions),
+     * as this is quite costly. This is only set in advancing and can not be accessed before (in all other cases the
+     * parent's properties will be accessed).
      */
     void set(CKFCDCToVXDStateObject* parent, const HitObject* hitObject)
     {
@@ -80,6 +79,7 @@ namespace Belle2 {
 
       m_isFitted = false;
       m_isAdvanced = false;
+      m_hasMSoP = false;
 
       m_weight = 0;
     }
@@ -200,37 +200,47 @@ namespace Belle2 {
     {
       m_measuredStateOnPlane = mSoP;
       mSoP.getPosMomCov(m_mSoPPosition, m_mSoPMomentum, m_mSoPCov);
+      m_hasMSoP = true;
     }
 
     /// Get the mSoP (or from the parent if not set already)
     const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlane() const
     {
-      if (isAdvanced() and m_hitObject) {
+      if (mSoPSet()) {
         return m_measuredStateOnPlane;
       } else {
-        return getMeasuredStateOnPlaneFromParent();
+        return getParent()->getMeasuredStateOnPlane();
       }
     }
 
     /// Get the 3d position of the mSoP (cached)
     const TVector3& getMSoPPosition() const
     {
-      B2ASSERT("MSoP is not set", isAdvanced());
-      return m_mSoPPosition;
+      if (mSoPSet()) {
+        return m_mSoPPosition;
+      } else {
+        return getParent()->getMSoPPosition();
+      }
     }
 
     /// Get the 3d momentum of the mSoP (cached)
     const TVector3& getMSoPMomentum() const
     {
-      B2ASSERT("MSoP is not set", isAdvanced());
-      return m_mSoPMomentum;
+      if (mSoPSet()) {
+        return m_mSoPMomentum;
+      } else {
+        return getParent()->getMSoPMomentum();
+      }
     }
 
     /// Get the 6d covariance matrix of the mSoP (cached)
     const TMatrixDSym& getMSoPCovariance() const
     {
-      B2ASSERT("MSoP is not set", isAdvanced());
-      return m_mSoPCov;
+      if (mSoPSet()) {
+        return m_mSoPCov;
+      } else {
+        return getParent()->getMSoPCovariance();
+      }
     }
 
     /// Shortcut to get the hit position
@@ -246,7 +256,7 @@ namespace Belle2 {
       return m_isFitted;
     }
 
-    /// Set that state was already advanced.
+    /// Set that state was already fitted.
     void setFitted()
     {
       m_isFitted = true;
@@ -262,6 +272,11 @@ namespace Belle2 {
     void setAdvanced()
     {
       m_isAdvanced = true;
+    }
+
+    bool mSoPSet() const
+    {
+      return m_hasMSoP;
     }
 
   private:
@@ -284,6 +299,8 @@ namespace Belle2 {
     bool m_isFitted = false;
     /// Flag, if this state was already advanced.
     bool m_isAdvanced = false;
+    /// Flag, if this state has a valid mSoP
+    bool m_hasMSoP = false;
     /// MSoP after advancing. Is undetermined before extrapolating!
     genfit::MeasuredStateOnPlane m_measuredStateOnPlane;
     /// Temporary storage for the weight (used during overlap check).
@@ -293,7 +310,7 @@ namespace Belle2 {
     /// Cache for the momentum of the mSoP. May be invalid if the mSoP is not set
     TVector3 m_mSoPMomentum;
     /// Cache for the cov of the mSoP. May be invalid if the mSoP is not set
-    TMatrixDSym m_mSoPCov;
+    TMatrixDSym m_mSoPCov {6};
 
     /// Helper function to call a function on this and all parent states until the root.
     void walk(const std::function<void(const CKFCDCToVXDStateObject*)> f) const
@@ -303,16 +320,6 @@ namespace Belle2 {
       while (walkObject != nullptr) {
         f(walkObject);
         walkObject = walkObject->getParent();
-      }
-    }
-
-    /// Helper function to get the mSoP from the parent recursively until the seed track
-    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneFromParent() const
-    {
-      if (getParent()) {
-        return getParent()->getMeasuredStateOnPlane();
-      } else {
-        return getSeedRecoTrack()->getMeasuredStateOnPlaneFromFirstHit();
       }
     }
   };

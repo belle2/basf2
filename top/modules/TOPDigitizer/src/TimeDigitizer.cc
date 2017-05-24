@@ -182,7 +182,7 @@ namespace Belle2 {
 
         auto* digit = digits.appendNew(m_moduleID, m_pixelID, TDCcount);
         digit->setTime(cfdTime);
-        // digit->setTimeError(timeError); TODO!
+        digit->setTimeError(timeJitter);
         digit->setADC(rawDigit->getValuePeak());
         digit->setIntegral(rawDigit->getIntegral());
         digit->setPulseWidth(cfdWidth);
@@ -228,11 +228,11 @@ namespace Belle2 {
       std::vector<unsigned short> windowNumbers;
       windowNumbers.push_back(m_window);
       for (unsigned i = 1; i < tdc.getNumWindows(); i++) {
-        windowNumbers.push_back(windowNumbers.back() + 1);
+        windowNumbers.push_back((windowNumbers.back() + 1) % 512); // TODO: rpl hardcoded
       }
       std::vector<double> baselines(windowNumbers.size(), 0);
-      double rms = m_pulseHeightGenerator.getPedestalRMS();
-      std::vector<double> rmsNoises(windowNumbers.size(), rms);
+      double rmsNoise = m_pulseHeightGenerator.getPedestalRMS();
+      std::vector<double> rmsNoises(windowNumbers.size(), rmsNoise);
       double averagePedestal = tdc.getAveragePedestal();
       std::vector<double> pedestals(windowNumbers.size(), averagePedestal);
       int adcRange = tdc.getADCRange();
@@ -269,6 +269,7 @@ namespace Belle2 {
         rawDigit->setValuePeak(feature.vPeak);
         rawDigit->setIntegral(feature.integral);
         double rawTime = rawDigit->getCFDLeadingTime(); // time in [samples]
+        double rawTimeErr = rawDigit->getCFDLeadingTimeError(rmsNoise); // in [samples]
         int sampleDivisions = 0x1 << tdc.getSubBits();
         int tdcCount = int(rawTime * sampleDivisions);
         unsigned tfine = tdcCount % sampleDivisions;
@@ -280,11 +281,13 @@ namespace Belle2 {
         double width = m_sampleTimes->getDeltaTime(m_window,
                                                    rawDigit->getCFDFallingTime(),
                                                    rawDigit->getCFDLeadingTime());
+        double timeError = rawTimeErr * m_sampleTimes->getTimeBin(m_window,
+                                                                  feature.sampleRise);
 
         // append new digit and set it
         auto* digit = digits.appendNew(m_moduleID, m_pixelID, tdcCount);
         digit->setTime(cfdTime);
-        // digit->setTimeError(timeError); TODO!
+        digit->setTimeError(timeError);
         digit->setADC(rawDigit->getValuePeak());
         digit->setIntegral(rawDigit->getIntegral());
         digit->setPulseWidth(width);

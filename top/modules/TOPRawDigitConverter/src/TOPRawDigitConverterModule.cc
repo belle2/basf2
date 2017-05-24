@@ -70,6 +70,8 @@ namespace Belle2 {
              "if true, use common T0 calibration (needs DB)", true);
     addParam("subtractOffset", m_subtractOffset,
              "if true, subtract offset defined for nominal TDC (required for MC)", false);
+    addParam("pedestalRMS", m_pedestalRMS,
+             "r.m.s of pedestals [ADC counts]", 9.0);
     addParam("calibrationChannel", m_calibrationChannel,
              "calpulse selection: ASIC channel (use -1 to turn off the selection)", -1);
     addParam("calpulseWidthMin", m_calpulseWidthMin,
@@ -183,6 +185,7 @@ namespace Belle2 {
                                          rawDigit.getASICChannel());
       auto pixelID = chMapper.getPixelID(channel);
       double rawTime = rawDigit.getCFDLeadingTime(); // time in [samples]
+      double rawTimeErr = rawDigit.getCFDLeadingTimeError(m_pedestalRMS); // in [samples]
       int tdc = int(rawTime * m_sampleDivisions);
       const auto* sampleTimes = &m_sampleTimes; // equidistant sample times
       if (m_useSampleTimeCalibration) {
@@ -199,11 +202,15 @@ namespace Belle2 {
       if (m_useModuleT0Calibration) time -= (*m_moduleT0)->getT0(moduleID);
       if (m_useCommonT0Calibration) time -= (*m_commonT0)->getT0();
       if (m_subtractOffset) time -= geo->getNominalTDC().getOffset();
-      double width = sampleTimes->getDeltaTime(window, rawDigit.getCFDFallingTime(),
+      double width = sampleTimes->getDeltaTime(window,
+                                               rawDigit.getCFDFallingTime(),
                                                rawDigit.getCFDLeadingTime()); // in [ns]
+      auto sampleRise = rawDigit.getSampleRise();
+      double timeError = rawTimeErr * sampleTimes->getTimeBin(window, sampleRise); // [ns]
+
       auto* digit = digits.appendNew(moduleID, pixelID, tdc);
       digit->setTime(time);
-      // digit->setTimeError(timeError); TODO!
+      digit->setTimeError(timeError);
       digit->setADC(rawDigit.getValuePeak());
       digit->setIntegral(rawDigit.getIntegral());
       digit->setPulseWidth(width);

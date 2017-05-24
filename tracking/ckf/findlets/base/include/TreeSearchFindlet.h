@@ -95,7 +95,7 @@ namespace Belle2 {
     /// Implementation of the traverseTree function
     void traverseTree(StateIterator currentState, std::vector<ResultObject>& resultsVector)
     {
-      B2DEBUG(50, "Now on layer " << currentState->getNumber());
+      B2DEBUG(50, "Now on number " << currentState->getNumber());
       StateIterator nextState = std::next(currentState);
 
       if (nextState == m_states.end()) {

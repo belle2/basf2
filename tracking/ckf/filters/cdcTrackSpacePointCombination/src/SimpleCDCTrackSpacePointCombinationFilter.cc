@@ -57,7 +57,6 @@ Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackS
   const genfit::MeasuredStateOnPlane& mSoP = currentState.getMeasuredStateOnPlaneSavely();
 
   Vector3D position = TrackFindingCDC::Vector3D(mSoP.getPos());
-  Vector3D momentum = TrackFindingCDC::Vector3D(mSoP.getMom());
   Vector3D hitPosition = TrackFindingCDC::Vector3D(spacePoint->getPosition());
 
   const double& sameHemisphere = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
@@ -68,6 +67,7 @@ Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackS
 
   const double& layer = currentState.extractGeometryLayer();
 
+  Vector3D momentum = TrackFindingCDC::Vector3D(mSoP.getMom());
   const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
 
   const double arcLength = trajectory.calcArcLength2D(hitPosition);

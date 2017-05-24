@@ -278,16 +278,18 @@ void RunControlCallback::monitor() throw(RCHandlerException)
       try {
         if (cstate == Enum::UNKNOWN || cstate.isError() || state.isStable()) {
           std::string s;
-          NSMCommunicator::send(NSMMessage(node, RCCommand::STATUS));
-          NSMCommunicator& com(wait(node, RCCommand::OK, 1));
-          NSMMessage msg = com.getMessage();
-          RCCommand cmd(msg.getRequestName());
-          if (cmd == NSMCommand::OK && node.getName() == msg.getNodeName()) {
-            s = msg.getData();
-            cstate_new = RCState(s);
-          }
-          // get(node, "rcstate", s, 1);
-          // cstate_new = RCState(s);
+          /*
+                NSMCommunicator::send(NSMMessage(node, RCCommand::STATUS));
+                NSMCommunicator& com(wait(node, RCCommand::OK, 1));
+                NSMMessage msg = com.getMessage();
+                RCCommand cmd(msg.getRequestName());
+                if (cmd == NSMCommand::OK && node.getName() == msg.getNodeName()) {
+                  s = msg.getData();
+                  cstate_new = RCState(s);
+                }
+          */
+          get(node, "rcstate", s, 1);
+          cstate_new = RCState(s);
         } else {
           cstate_new = cstate;
         }

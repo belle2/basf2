@@ -156,18 +156,19 @@ def iov_from_vector(iov_vector):
     a tuple of the form ((exp_low, run_low), (exp_high, run_high))
     It assumes that the vector was in order to begine with.
     """
-    iov_list = [list((iov.first, iov.second)) for iov in iov_vector]
-    if len(iov_list) > 1:
-        iov_low, iov_high = iov_list[0], iov_list[-1]
+    import copy
+    exprun_list = [list((iov.first, iov.second)) for iov in iov_vector]
+    if len(exprun_list) > 1:
+        exprun_low, exprun_high = exprun_list[0], exprun_list[-1]
     else:
-        iov_low, iov_high = iov_list[0], iov_list[0]
+        exprun_low, exprun_high = exprun_list[0], copy.deepcopy(exprun_list[0])
     # Makes sure that we never have exp_low and run_low less than 0
     # Sets them to 0 if they are
-    if iov_low[0] < 0:
-        iov_low[0] = 0
-    if iov_low[1] < 0:
-        iov_low[1] = 0
-    return IoV(iov_low[0], iov_low[1], iov_high[0], iov_high[1])
+    if exprun_low[0] < 0:
+        exprun_low[0] = 0
+    if exprun_low[1] < 0:
+        exprun_low[1] = 0
+    return IoV(exprun_low[0], exprun_low[1], exprun_high[0], exprun_high[1])
 
 
 def find_sources(dependencies):

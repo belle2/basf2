@@ -20,12 +20,12 @@ namespace Belle2 {
       return;
     }
 
-    auto firstFiniteState = childStates.begin();
+    auto firstFiniteStateIterator = childStates.begin();
     for (auto& state : childStates) {
       const auto weight = predicate(state);
       if (std::isnan(weight)) {
-        std::swap(*firstFiniteState, state);
-        firstFiniteState = std::next(firstFiniteState);
+        state = *firstFiniteStateIterator;
+        firstFiniteStateIterator = std::next(firstFiniteStateIterator);
       } else {
         state.setWeight(weight);
       }

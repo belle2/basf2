@@ -164,6 +164,20 @@ namespace Belle2 {
       return numberOfHoles;
     }
 
+    /// Return the number of times no SP is attached to the track in a non overlap layer in all parents until the root.
+    unsigned int getNumberOfHolesOnNonOverlappingLayers() const
+    {
+      unsigned int numberOfHoles = 0;
+
+      walk([&numberOfHoles](const CKFCDCToVXDStateObject * walkObject) {
+        if (not walkObject->getHit() and not walkObject->isOnOverlapLayer()) {
+          numberOfHoles++;
+        }
+      });
+
+      return numberOfHoles;
+    }
+
     /// Return the chi2 set during fitting. Is only valid after fitting.
     double getChi2() const
     {

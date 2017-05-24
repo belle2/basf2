@@ -42,7 +42,6 @@ Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackS
 {
 
   const SpacePoint* spacePoint = currentState.getHit();
-  const RecoTrack* cdcTrack = currentState.getSeedRecoTrack();
 
   // Allow overlap layers to have no hit
   // TODO: do only allow this in some cases where we actually have no overlap!
@@ -54,11 +53,8 @@ Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackS
     }
   }
 
-  const genfit::MeasuredStateOnPlane& mSoP = currentState.getMeasuredStateOnPlane();
-  mSoP.getPosMomCov(m_position, m_momentum, m_cov);
-
-  Vector3D position = TrackFindingCDC::Vector3D(m_position);
-  Vector3D hitPosition = TrackFindingCDC::Vector3D(spacePoint->getPosition());
+  Vector3D position(currentState.getMSoPPosition());
+  Vector3D hitPosition(currentState.getHitPosition());
 
   const double& sameHemisphere = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
 
@@ -66,11 +62,14 @@ Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackS
     return std::nan("");
   }
 
+  const TMatrixDSym& cov = currentState.getMSoPCovariance();
   const double& layer = currentState.extractGeometryLayer();
 
   if (not currentState.isFitted() and not currentState.isAdvanced()) {
     // Filter 1
-    Vector3D momentum = TrackFindingCDC::Vector3D(m_momentum);
+    const RecoTrack* cdcTrack = currentState.getSeedRecoTrack();
+
+    Vector3D momentum(currentState.getMSoPMomentum());
     const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
 
     const double arcLength = trajectory.calcArcLength2D(hitPosition);

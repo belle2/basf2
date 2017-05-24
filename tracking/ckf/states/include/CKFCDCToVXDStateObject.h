@@ -199,6 +199,7 @@ namespace Belle2 {
     void setMeasuredStateOnPlane(const genfit::MeasuredStateOnPlane& mSoP)
     {
       m_measuredStateOnPlane = mSoP;
+      mSoP.getPosMomCov(m_mSoPPosition, m_mSoPMomentum, m_mSoPCov);
     }
 
     /// Get the mSoP (or from the parent if not set already)
@@ -209,6 +210,34 @@ namespace Belle2 {
       } else {
         return getMeasuredStateOnPlaneFromParent();
       }
+    }
+
+    /// Get the 3d position of the mSoP (cached)
+    const TVector3& getMSoPPosition() const
+    {
+      B2ASSERT("MSoP is not set", isAdvanced());
+      return m_mSoPPosition;
+    }
+
+    /// Get the 3d momentum of the mSoP (cached)
+    const TVector3& getMSoPMomentum() const
+    {
+      B2ASSERT("MSoP is not set", isAdvanced());
+      return m_mSoPMomentum;
+    }
+
+    /// Get the 6d covariance matrix of the mSoP (cached)
+    const TMatrixDSym& getMSoPCovariance() const
+    {
+      B2ASSERT("MSoP is not set", isAdvanced());
+      return m_mSoPCov;
+    }
+
+    /// Shortcut to get the hit position
+    const B2Vector3<double>& getHitPosition() const
+    {
+      B2ASSERT("Hit is invalid", m_hitObject);
+      return m_hitObject->getPosition();
     }
 
     /// Check if state was already fitted.
@@ -259,6 +288,12 @@ namespace Belle2 {
     genfit::MeasuredStateOnPlane m_measuredStateOnPlane;
     /// Temporary storage for the weight (used during overlap check).
     double m_weight = 0;
+    /// Cache for the position of the mSoP. May be invalid if the mSoP is not set
+    TVector3 m_mSoPPosition;
+    /// Cache for the momentum of the mSoP. May be invalid if the mSoP is not set
+    TVector3 m_mSoPMomentum;
+    /// Cache for the cov of the mSoP. May be invalid if the mSoP is not set
+    TMatrixDSym m_mSoPCov;
 
     /// Helper function to call a function on this and all parent states until the root.
     void walk(const std::function<void(const CKFCDCToVXDStateObject*)> f) const

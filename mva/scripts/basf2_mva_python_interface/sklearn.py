@@ -4,7 +4,14 @@
 # Thomas Keck 2016
 
 import numpy as np
-import sklearn
+
+try:
+    import sklearn
+except ImportError:
+    print("Please install sklearn: pip3 install sklearn")
+    import sys
+    sys.exit(1)
+
 import collections
 
 

@@ -18,7 +18,12 @@ class IoV():
     """
     Python class to more easily manipulate an IoV and compare against others.
     Uses the C++ framework IntervalOfValidity internally to do various comparisons.
+
+    Default construction is an 'empty' IoV of -1,-1,-1,-1
+
+    For an IoV that encompasses all experiments and runs use 0,0,-1,-1
     """
+
     def __init__(self, exp_low=-1, run_low=-1, exp_high=-1, run_high=-1):
         """
         """
@@ -99,10 +104,10 @@ class IoV():
         return self._cpp_iov.overlaps(iov._cpp_iov)
 
     def __repr__(self):
-        return "IoV("+(",".join(["exp_low="+str(self.exp_low),
-                                 "run_low="+str(self.run_low),
-                                 "exp_high="+str(self.exp_high),
-                                 "run_high="+str(self.run_high)]))+")"
+        return "IoV(" + (",".join(["exp_low=" + str(self.exp_low),
+                                   "run_low=" + str(self.run_low),
+                                   "exp_high=" + str(self.exp_high),
+                                   "run_high=" + str(self.run_high)])) + ")"
 
 
 @enum.unique
@@ -132,7 +137,13 @@ def runs_overlapping_iov(iov, vector_of_runs):
     """
     overlapping_runs = ROOT.vector('std::pair<int,int>')()
     for run in vector_of_runs:
-        run_iov = IoV(run.first, run.second, run.first, run.second)
+        exp_low = run.first
+        run_low = run.second
+        if exp_low < 0:
+            exp_low = 0
+        if run_low < 0:
+            run_low = 0
+        run_iov = IoV(exp_low, run_low, run.first, run.second)
         if run_iov.overlaps(iov):
             overlapping_runs.push_back(run)
     return overlapping_runs
@@ -145,11 +156,17 @@ def iov_from_vector(iov_vector):
     a tuple of the form ((exp_low, run_low), (exp_high, run_high))
     It assumes that the vector was in order to begine with.
     """
-    iov_list = [(iov.first, iov.second) for iov in iov_vector]
+    iov_list = [list((iov.first, iov.second)) for iov in iov_vector]
     if len(iov_list) > 1:
         iov_low, iov_high = iov_list[0], iov_list[-1]
     else:
         iov_low, iov_high = iov_list[0], iov_list[0]
+    # Makes sure that we never have exp_low and run_low less than 0
+    # Sets them to 0 if they are
+    if iov_low[0] < 0:
+        iov_low[0] = 0
+    if iov_low[1] < 0:
+        iov_low[1] = 0
     return IoV(iov_low[0], iov_low[1], iov_high[0], iov_high[1])
 
 
@@ -179,6 +196,7 @@ def topological_sort(dependencies):
     node names, and the values are lists of node names that depend on the
     key (including zero dependencies). It should return the sorted
     list of nodes.
+
     >>> dependencies = {}
     >>> dependencies['c'] = ['a','b']
     >>> dependencies['b'] = ['a']
@@ -283,31 +301,30 @@ def method_dispatch(func):
     first argument of the method is always 'self'.
     Just decorate around class methods and their alternate functions:
 
-    @method_dispatch             # Default method
-    def my_method(self, default_type, ...):
-        ...
+    >>> @method_dispatch             # Default method
+    >>> def my_method(self, default_type, ...):
+    >>>     pass
 
-    @my_method.register(list)    # Registers list method for dispatch
-
-    def _(self, list_type, ...):
-        ...
+    >>> @my_method.register(list)    # Registers list method for dispatch
+    >>> def _(self, list_type, ...):
+    >>>     pass
 
     Doesn't work the same for property decorated class methods, as these
     return a property builtin not a function and change the method naming.
     Do this type of decoration to get them to work:
 
-    @property
-    def my_property(self):
-        return self._my_property
+    >>> @property
+    >>> def my_property(self):
+    >>>     return self._my_property
 
-    @my_property.setter
-    @method_dispatch
-    def my_property(self, input_property):
-        ...
+    >>> @my_property.setter
+    >>> @method_dispatch
+    >>> def my_property(self, input_property):
+    >>>     pass
 
-    @my_property.fset.register(list)
-    def _(self, input_list_properties):
-        ...
+    >>> @my_property.fset.register(list)
+    >>> def _(self, input_list_properties):
+    >>>     pass
     """
     dispatcher = singledispatch(func)
 

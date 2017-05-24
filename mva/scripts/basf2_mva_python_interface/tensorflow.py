@@ -4,7 +4,7 @@
 # Thomas Keck 2016
 
 import numpy as np
-import tensorflow as tf
+import sys
 import os
 import tempfile
 
@@ -31,6 +31,12 @@ class State(object):
 
     def add_to_collection(self):
         """ Add the stored members to the current tensorflow collection """
+        try:
+            import tensorflow as tf
+        except ImportError:
+            print("Please install tensorflow: pip3 install tensorflow")
+            sys.exit(1)
+
         tf.add_to_collection('x', self.x)
         tf.add_to_collection('y', self.y)
         tf.add_to_collection('activation', self.activation)
@@ -39,6 +45,12 @@ class State(object):
 
     def get_from_collection(self):
         """ Get members from the current tensorflow collection """
+        try:
+            import tensorflow as tf
+        except ImportError:
+            print("Please install tensorflow: pip3 install tensorflow")
+            sys.exit(1)
+
         self.x = tf.get_collection('x')[0]
         self.y = tf.get_collection('y')[0]
         self.activation = tf.get_collection('activation')[0]
@@ -57,6 +69,12 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     """
     Return default tensorflow model
     """
+    try:
+        import tensorflow as tf
+    except ImportError:
+        print("Please install tensorflow: pip3 install tensorflow")
+        sys.exit(1)
+
     x = tf.placeholder("float", [None, number_of_features])
     y = tf.placeholder("float", [None, 1])
     w = tf.placeholder("float", [None, 1])
@@ -89,6 +107,12 @@ def load(obj):
     """
     Load Tensorflow estimator into state
     """
+    try:
+        import tensorflow as tf
+    except ImportError:
+        print("Please install tensorflow: pip3 install tensorflow")
+        sys.exit(1)
+
     tf.reset_default_graph()
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
@@ -138,6 +162,12 @@ def end_fit(state):
     """
     Store tensorflow session in a graph
     """
+    try:
+        import tensorflow as tf
+    except ImportError:
+        print("Please install tensorflow: pip3 install tensorflow")
+        sys.exit(1)
+
     state.add_to_collection()
     saver = tf.train.Saver()
     with tempfile.TemporaryDirectory() as path:

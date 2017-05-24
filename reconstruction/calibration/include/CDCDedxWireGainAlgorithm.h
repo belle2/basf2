@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <reconstruction/dbobjects/CDCDedxWireGain.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include <cdc/dataobjects/WireID.h>
 

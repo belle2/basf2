@@ -26,7 +26,7 @@ using namespace std;
 int main(int argc, char** argv)
 {
   if (argc < 3) {
-    printf("file2sock : filename port poisson_freq\n");
+    printf("file2sock : filename port poisson_freq file_interval\n");
     exit(-1);
   }
 
@@ -41,12 +41,26 @@ int main(int argc, char** argv)
   if (pfreq != 0)
     minterval = 1.0E6 / (double)pfreq;
 
-  // Open file
-  SeqFile* file = new SeqFile(filename.c_str(), "r");
-  if (file->status() <= 0) {
-    perror("file open");
-    exit(-1);
+  vector<string> filelist;
+  // Check file
+  if ((int)filename.rfind(".list") != -1) {
+    FILE* fd = fopen(filename.c_str(), "r");
+    for (;;) {
+      char listfile[1024];
+      int is = fscanf(fd, "%s", listfile);
+      if (is <= 0) break;
+      filelist.push_back(string(listfile));
+    }
+  } else {
+    filelist.push_back(filename);
+    printf("File %s is put ln the list\n", filename.c_str());
   }
+  printf("# of input files = %d\n", (int)filelist.size());
+  for (int i = 0; i < (int)filelist.size(); i++) {
+    printf("file = %s\n", filelist[i].c_str());
+  }
+
+  int fileptr = 0;
 
   // Open EventSocket
   REvtSocketSend* sock = new REvtSocketSend(port);
@@ -54,6 +68,12 @@ int main(int argc, char** argv)
   // Event Buffer
   char* evbuf = new char[MAXEVTSIZE];
 
+  // Open 1st file
+  SeqFile* file = new SeqFile(filelist[fileptr++].c_str(), "r");
+  if (file->status() <= 0) {
+    perror("file open");
+    exit(-1);
+  }
   // Skip the first record (StreamerInfo)
   int is = file->read(evbuf, MAXEVTSIZE);
   if (is <= 0) {
@@ -72,13 +92,29 @@ int main(int argc, char** argv)
   // Loop for event records
   for (;;) {
     int is = file->read(evbuf, MAXEVTSIZE);
-    if (is <= 0) {
+    if (is < 0) {
       printf("Error in reading file : %d\n", is);
       break;
-    }
-    if (is > MAXEVTSIZE) {
+    } else if (is > MAXEVTSIZE) {
       printf("Event size too large : %d\n", is);
       continue;
+    } else if (is == 0) {
+      delete file;
+      if (fileptr == (int)filelist.size()) {
+        printf("End of file list reached. Exitting\n");
+        break;
+      }
+      file = new SeqFile(filelist[fileptr++].c_str(), "r");
+      if (file->status() <= 0) {
+        perror("file open");
+        exit(-1);
+      }
+      // Skip the first record (StreamerInfo)
+      int is = file->read(evbuf, MAXEVTSIZE);
+      if (is <= 0) {
+        printf("Error in reading file : %d\n", is);
+        exit(-1);
+      }
     }
 
     // Put the message to Socket

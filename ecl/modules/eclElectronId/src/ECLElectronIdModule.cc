@@ -80,6 +80,10 @@ void ECLElectronIdModule::event()
     int nClusters = relShowers.size();
 
     for (const auto& eclShower : relShowers) {
+      //////////Cate's addition///////////
+      if (eclShower.getHypothesisId() != 5) continue;
+      if (abs(eclShower.getTime()) > eclShower.getDeltaTime99()) continue;
+      ////////////////////////////////////
       const double shEnergy = eclShower.getEnergy();
       energy += shEnergy;
       if (shEnergy > maxEnergy) {

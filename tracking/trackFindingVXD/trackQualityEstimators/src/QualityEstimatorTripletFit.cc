@@ -87,7 +87,8 @@ double QualityEstimatorTripletFit::estimateQuality(std::vector<SpacePoint const*
     // First get the orientation of the sensor plate for material budged calculation
     double entranceAngle = theta;
     VxdID::baseType sensorID = measurements.at(i + 1)->getVxdID();
-    if (sensorID != 0) {
+    int detID = measurements.at(i + 1)->getType();
+    if (sensorID != 0 and detID == VXD::SensorInfoBase::SVD) {
       const SVD::SensorInfo& sensor = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
       TVector3 sensorOrigin  = sensor.pointToGlobal(TVector3(0, 0, 0), true);
       TVector3 sensoru  = sensor.pointToGlobal(TVector3(1, 0, 0), true);

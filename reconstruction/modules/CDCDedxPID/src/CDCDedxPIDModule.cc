@@ -324,7 +324,7 @@ void CDCDedxPIDModule::event()
 
       // get the global wire ID (between 0 and 14336) and the layer info
       WireID wireID = cdcRecoHit->getWireID();
-      const int wire = wireID.getIWire();
+      const int wire = wireID.getEWire();
       int layer = cdcHit->getILayer();
       int superlayer = cdcHit->getISuperLayer();
       int currentLayer = (superlayer == 0) ? layer : (8 + (superlayer - 1) * 6 + layer);

@@ -3,9 +3,10 @@
 
 """
 Deep FlavorTagger Scripts for Belle II
-Jochen Gemmler 2016
+Jochen Gemmler 2016 - 2017
 
 """
 
-__all__ = ['binning', 'DeepFlavorTagger', 'gpu_pkl_to_cpu_pkl', 'model_to_theano_function', 'networkModel_default',
-           'root_dataset', 'root_to_numpy', 'root_to_array', 'steering_training_data', 'independent_training']
+__all__ = ['binning', 'DeepFlavorTagger',
+           'root_dataset', 'root_to_numpy', 'root_to_array', 'steering_training_data',
+           'tensorflow_dnn_model', 'tensorflow_dnn_interface', 'TfData']

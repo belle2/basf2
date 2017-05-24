@@ -151,13 +151,13 @@ void PXDPackerModule::event()
 {
   StoreObjPtr<EventMetaData> evtPtr;
 
-  B2INFO("PXD Packer --> Event");
+  B2DEBUG(20, "PXD Packer --> Event");
 
 //   B2ERROR("Test : " << evtPtr->getEvent() << ","  << evtPtr->getRun() << "," << evtPtr->getSubrun() << "," << evtPtr->getExperiment() << "," << evtPtr->getTime() << " ==");
 
   int nDigis = storeDigits.getEntries();
 
-  B2INFO("PXD Packer --> Nr of Digis: " << nDigis);
+  B2DEBUG(20, "PXD Packer --> Nr of Digis: " << nDigis);
 
   startOfVxdID.clear();
 
@@ -171,7 +171,7 @@ void PXDPackerModule::event()
     if (currentVxdId != lastVxdId) {
       // do something...
       lastVxdId = currentVxdId;
-      B2INFO("VxdId: " << currentVxdId << " " << (int)currentVxdId);
+      B2DEBUG(20, "VxdId: " << currentVxdId << " " << (int)currentVxdId);
       {
         unsigned int layer, ladder, sensor, segment, dhe_id;
         layer = currentVxdId.getLayerNumber();/// 1 ... 2
@@ -179,12 +179,12 @@ void PXDPackerModule::event()
         sensor = currentVxdId.getSensorNumber();/// 1 ... 2
         segment = currentVxdId.getSegmentNumber();// Frame nr?
         dhe_id = ((layer - 1) << 5) | ((ladder) << 1) | (sensor - 1);
-        B2INFO("Layer: " << layer << " Ladder " << ladder << " Sensor " << sensor << " Segment(Frame) " << segment << " =>DHEID: " <<
-               dhe_id);
+        B2DEBUG(20, "Layer: " << layer << " Ladder " << ladder << " Sensor " << sensor << " Segment(Frame) " << segment << " =>DHEID: " <<
+                dhe_id);
       }
 
       startOfVxdID[currentVxdId] = std::distance(storeDigits.begin(), it);
-      B2INFO("Offset : " << startOfVxdID[currentVxdId]);
+      B2DEBUG(20, "Offset : " << startOfVxdID[currentVxdId]);
     }
   }
 
@@ -210,7 +210,7 @@ void PXDPackerModule::endian_swap_frame(unsigned short* dataptr, int len)
 void PXDPackerModule::pack_event(void)
 {
   int dhe_ids[5] = {0, 0, 0, 0, 0};
-  B2INFO("PXD Packer --> pack_event");
+  B2DEBUG(20, "PXD Packer --> pack_event");
 
   // loop for each DHC in system
   // get active DHCs from a database?
@@ -288,7 +288,7 @@ void PXDPackerModule::start_frame(void)
 
 void PXDPackerModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
 {
-  B2INFO("PXD Packer --> pack_dhc ID " << dhc_id << " DHE act: " << dhe_active);
+  B2DEBUG(20, "PXD Packer --> pack_dhc ID " << dhc_id << " DHE act: " << dhe_active);
 
   /// HLT frame ??? format still t.b.d. TODO
   start_frame();
@@ -341,7 +341,7 @@ void PXDPackerModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
 
 void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
 {
-  B2INFO("PXD Packer --> pack_dhe ID " << dhe_id << " DHP act: " << dhp_active);
+  B2DEBUG(20, "PXD Packer --> pack_dhe ID " << dhe_id << " DHP act: " << dhp_active);
   // dhe_id is not dhe_id ...
   int dhe_reformat = 0; /// unless stated otherwise, DHH will not reformat coordinates
 
@@ -391,11 +391,11 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
     layer = ((dhe_id & 0x20) >> 5) + 1;
     currentVxdId = VxdID(layer, ladder, sensor);
 
-    B2INFO("pack_dhe: VxdId: " << currentVxdId << " " << (int)currentVxdId);
+    B2DEBUG(20, "pack_dhe: VxdId: " << currentVxdId << " " << (int)currentVxdId);
 
     {
       auto it = storeDigits.begin();
-      B2INFO("Advance: " << startOfVxdID[currentVxdId]);
+      B2DEBUG(20, "Advance: " << startOfVxdID[currentVxdId]);
       advance(it, startOfVxdID[currentVxdId]);
       for (; it != storeDigits.end(); it++) {
         auto id = it->getSensorID();
@@ -450,7 +450,7 @@ void PXDPackerModule::do_the_reverse_mapping(unsigned int& /*row*/, unsigned int
 
 void PXDPackerModule::pack_dhp_raw(int chip_id, int dhe_id, bool adcpedestal)
 {
-  B2INFO("PXD Packer --> pack_dhp Raw Chip " << chip_id << " of DHE id: " << dhe_id << " Mode " << adcpedestal);
+  B2DEBUG(20, "PXD Packer --> pack_dhp Raw Chip " << chip_id << " of DHE id: " << dhe_id << " Mode " << adcpedestal);
   start_frame();
   /// DHP data Frame
   append_int32((DHC_FRAME_HEADER_DATA_TYPE_DHP_RAW << 27) | ((dhe_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) |
@@ -496,7 +496,7 @@ void PXDPackerModule::pack_dhp_raw(int chip_id, int dhe_id, bool adcpedestal)
 
 void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_reformat)
 {
-  B2INFO("PXD Packer --> pack_dhp Chip " << chip_id << " of DHE id: " << dhe_id);
+  B2DEBUG(20, "PXD Packer --> pack_dhp Chip " << chip_id << " of DHE id: " << dhe_id);
   // remark: chip_id != port most of the time ...
   bool empty = true;
   unsigned short last_rowstart = 0;
@@ -534,13 +534,13 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_reformat)
     }
   }
   if (!empty && (m_current_frame.size() & 0x3)) {
-    B2INFO("Repeat last rowstart to align to 32bit.");
+    B2DEBUG(20, "Repeat last rowstart to align to 32bit.");
     append_int16(last_rowstart);
   }
 
 
   if (empty) {
-    B2INFO("Found no data for halfladder! DHEID: " << dhe_id << " Chip: " << chip_id);
+    B2DEBUG(20, "Found no data for halfladder! DHEID: " << dhe_id << " Chip: " << chip_id);
     // we DROP the frame, thus we have to correct DHE and DHC counters
     dhc_byte_count -= 8; // fixed size of Header
     dhe_byte_count -= 8; // fixed size of Header
@@ -549,7 +549,7 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_reformat)
     append_int32((DHC_FRAME_HEADER_DATA_TYPE_GHOST << 27) | ((dhe_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) |
                  (m_trigger_nr & 0xFFFF));
   } else {
-    //B2INFO("Found data for halfladder DHEID: " << dhe_id << " Chip: " << chip_id);
+    //B2DEBUG(20,"Found data for halfladder DHEID: " << dhe_id << " Chip: " << chip_id);
   }
   add_frame_to_payload();
 

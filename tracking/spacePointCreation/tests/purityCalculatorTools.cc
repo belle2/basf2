@@ -88,11 +88,11 @@ namespace PurityCalcTests {
       vector<const SVDCluster*> clusters;
 
       if (!nClusters) { // if 0 set both
-        clusters.push_back(new SVDCluster(sensorId, true, u, 0.1, 0.001, 1, 1, 1));
-        clusters.push_back(new SVDCluster(sensorId, false, v, 0.1, 0.001, 1, 1, 1));
+        clusters.push_back(new SVDCluster(sensorId, true, u, 1.0, 0.1, 0.001, 1, 1, 1, 1.0));
+        clusters.push_back(new SVDCluster(sensorId, false, v, 1.0, 0.1, 0.001, 1, 1, 1, 1.0));
       } else { // set only one coordinate
         bool setU = (nClusters > 0);
-        clusters.push_back(new SVDCluster(sensorId, setU, u, 0.1, 0.001, 1, 1, 1)); // position doesnot actually matter!
+        clusters.push_back(new SVDCluster(sensorId, setU, u, 1.0, 0.1, 0.001, 1, 1, 1, 1.0)); // position doesnot actually matter!
       }
       return SpacePoint(clusters, &sensorInfo);
     }

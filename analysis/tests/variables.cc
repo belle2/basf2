@@ -169,6 +169,20 @@ namespace {
       }
 
       {
+        UseReferenceFrame<CMSRotationFrame> dummy(TVector3(1, 0, 0), TVector3(0, 1, 0), TVector3(0, 0, 1));
+        EXPECT_FLOAT_EQ(0.68176979, particleP(&p));
+        EXPECT_FLOAT_EQ(0.80920333, particleE(&p));
+        EXPECT_FLOAT_EQ(0.058562335, particlePx(&p));
+        EXPECT_FLOAT_EQ(-0.40000001, particlePy(&p));
+        EXPECT_FLOAT_EQ(0.54898131, particlePz(&p));
+        EXPECT_FLOAT_EQ(0.40426421, particlePt(&p));
+        EXPECT_FLOAT_EQ(0.80522972, particleCosTheta(&p));
+        EXPECT_FLOAT_EQ(-1.4254233, particlePhi(&p));
+
+        EXPECT_FLOAT_EQ(sqrt(0.2), particlePyErr(&p));
+      }
+
+      {
         Particle pinv({ -0.1 , 0.4, -0.8, 1.0 }, 11);
         UseReferenceFrame<RestFrame> dummy(&pinv);
         Particle p2({ 0.0 , 0.0, 0.0, 0.4358899}, 11);

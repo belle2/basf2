@@ -27,7 +27,14 @@ bool CDCVXDTrackCombinationVarSet::extract(const BaseCDCVXDTrackCombinationFilte
   double chi2_vxd_full = 0;
   double chi2_vxd_max = std::nan("");
   double chi2_vxd_min = std::nan("");
+
+
+  std::vector<bool> layerUsed;
+  layerUsed.resize(7, false);
+
   for (const SpacePoint* spacePoint : spacePoints) {
+    layerUsed[spacePoint->getVxdID().getLayerNumber()] = true;
+
     if (not m_advanceAlgorithm.extrapolate(mSoP, spacePoint)) {
       return std::nan("");
     }
@@ -44,14 +51,24 @@ bool CDCVXDTrackCombinationVarSet::extract(const BaseCDCVXDTrackCombinationFilte
     }
   }
 
+  var<named("weight")>() = result->getWeight();
   var<named("chi2_vxd_full")>() = chi2_vxd_full;
   var<named("chi2_vxd_max")>() = chi2_vxd_max;
   var<named("chi2_vxd_min")>() = chi2_vxd_min;
+  var<named("chi2_vxd_mean")>() = chi2_vxd_full / spacePoints.size();
   var<named("number_of_hits")>() = spacePoints.size();
   var<named("prob")>() = 0; // TODO
   var<named("pt")>() = mSoP.getMom().Pt();
   var<named("chi2_cdc")>() = cdcTrack->getTrackFitStatus()->getChi2();
-  var<named("number_of_holes")>() = 0; // TODO
+  var<named("number_of_holes")>() = std::count(layerUsed.begin(), layerUsed.end(), false) - 3;
+
+  if (spacePoints.empty()) {
+    var<named("last_hit_layer")>() = -1;
+    var<named("first_hit_layer")>() = -1;
+  } else {
+    var<named("last_hit_layer")>() = spacePoints.front()->getVxdID().getLayerNumber();
+    var<named("first_hit_layer")>() = spacePoints.back()->getVxdID().getLayerNumber();
+  }
 
   return true;
 }

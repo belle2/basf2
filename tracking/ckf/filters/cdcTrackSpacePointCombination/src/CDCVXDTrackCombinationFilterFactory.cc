@@ -35,7 +35,6 @@ namespace {
   using RecordingCDCVXDTrackCombinationFilter =
     RecordingFilter<VariadicUnionVarSet<CDCVXDTrackCombinationTruthVarSet, CDCVXDTrackCombinationVarSet>>;
 
-
   /// All filter for VXD - CDC relations.
   using AllCDCVXDTrackCombinationFilter = AllFilter<BaseCDCVXDTrackCombinationFilter>;
 }

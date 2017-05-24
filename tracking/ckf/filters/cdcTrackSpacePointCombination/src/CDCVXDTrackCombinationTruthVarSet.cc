@@ -21,7 +21,7 @@ bool CDCVXDTrackCombinationTruthVarSet::extract(const BaseCDCVXDTrackCombination
   if (not cdcTrack) return false;
 
   StoreObjPtr<EventMetaData> eventMetaData;
-  var<named("event_id")>() = eventMetaData->getEvent();
+  var<named("event_number")>() = eventMetaData->getEvent();
   var<named("cdc_number")>() = cdcTrack->getArrayIndex();
 
   const std::string& cdcTrackStoreArrayName = cdcTrack->getArrayName();
@@ -32,6 +32,7 @@ bool CDCVXDTrackCombinationTruthVarSet::extract(const BaseCDCVXDTrackCombination
   // Default to false
   var<named("truth_number_of_correct_hits")>() = 0;
   var<named("truth")>() = 0;
+  var<named("truth_number_of_mc_hits")>() = 0;
 
   if (not cdcMCTrack) {
     // CDC track is a fake.
@@ -57,7 +58,8 @@ bool CDCVXDTrackCombinationTruthVarSet::extract(const BaseCDCVXDTrackCombination
   }
 
   var<named("truth_number_of_correct_hits")>() = numberOfCorrectHits;
-  var<named("truth")>() = numberOfCorrectHits == result->second.size();
+  var<named("truth_number_of_mc_hits")>() = cdcMCTrack->getNumberOfSVDHits();
+  var<named("truth")>() = numberOfCorrectHits == 2 * result->second.size() and numberOfCorrectHits > 0;
 
   return true;
 }

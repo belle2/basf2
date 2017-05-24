@@ -27,7 +27,10 @@ namespace Belle2 {
     "prob",
     "pt",
     "chi2_cdc",
-    "number_of_holes"
+    "number_of_holes",
+    "last_hit_layer",
+    "first_hit_layer",
+    "weight"
   };
 
   /// Vehicle class to transport the variable names

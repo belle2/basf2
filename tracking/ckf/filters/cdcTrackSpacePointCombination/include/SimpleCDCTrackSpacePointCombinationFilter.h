@@ -32,6 +32,9 @@ namespace Belle2 {
     std::vector<double> m_param_maximumChi2XY {100, 100, 100, 100};
     std::vector<double> m_param_maximumChi2 {10000, 10000, 10000, 10000};
 
+    /// Parameter: make hit jumps possible (missing hits on a layer)
+    bool m_param_makeHitJumpingPossible = false;
+
     /// Cache for the B field at the IP
     double m_cachedBField;
   };

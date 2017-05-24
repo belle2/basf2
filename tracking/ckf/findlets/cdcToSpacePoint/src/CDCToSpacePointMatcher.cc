@@ -32,10 +32,8 @@ std::vector<CKFCDCToVXDStateObject*> CDCToSpacePointMatcher::getChildStates(CKFC
     lastState = std::next(lastState);
   }
 
-  if (m_param_makeHitJumpingPossible) {
-    lastState->set(&currentState, nullptr);
-    pointersToTemporaryStates.push_back(&(*lastState));
-  }
+  lastState->set(&currentState, nullptr);
+  pointersToTemporaryStates.push_back(&(*lastState));
 
   return pointersToTemporaryStates;
 }

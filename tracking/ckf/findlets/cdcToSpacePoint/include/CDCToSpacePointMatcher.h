@@ -37,11 +37,9 @@ namespace Belle2 {
     /// Fill the cache of hits for each event
     void initializeEventCache(std::vector<RecoTrack*>& seedsVector, std::vector<const SpacePoint*>& filteredHitVector);
 
-    /// Expose the hit jump parameters
+    /// Expose parameters (if we would have such a thing)
     void exposeParameters(ModuleParamList* moduleParamList,  const std::string& prefix)
     {
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "makeHitJumpingPossible"), m_param_makeHitJumpingPossible,
-                                    "", m_param_makeHitJumpingPossible);
     }
 
   private:
@@ -53,9 +51,6 @@ namespace Belle2 {
 
     /// Maximal number of ladders per layer
     std::vector<unsigned int> m_maximumLadderNumbers = {8, 12, 7, 10, 12, 16};
-
-    /// Parameter: make hit jumps possible (missing hits on a layer)
-    bool m_param_makeHitJumpingPossible = true;
 
     /// return the next hits for a given state, which are the hits on the next layer (or the same for overlaps)
     TrackFindingCDC::VectorRange<const SpacePoint*> getMatchingHits(CKFCDCToVXDStateObject& currentState);

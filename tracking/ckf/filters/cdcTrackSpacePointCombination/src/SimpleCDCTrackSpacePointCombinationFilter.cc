@@ -28,6 +28,9 @@ void SimpleCDCTrackSpacePointCombinationFilter::exposeParameters(ModuleParamList
                                 m_param_maximumChi2XY, "", m_param_maximumChi2XY);
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumChi2"),
                                 m_param_maximumChi2, "", m_param_maximumChi2);
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "makeHitJumpingPossible"), m_param_makeHitJumpingPossible,
+                                "", m_param_makeHitJumpingPossible);
 }
 
 void SimpleCDCTrackSpacePointCombinationFilter::initialize()
@@ -46,13 +49,12 @@ void SimpleCDCTrackSpacePointCombinationFilter::beginRun()
 
 Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackSpacePointCombinationFilter::Object& currentState)
 {
-
   const SpacePoint* spacePoint = currentState.getHit();
 
-  // Allow overlap layers to have no hit
-  // TODO: do only allow this in some cases where we actually have no overlap!
+  // Allow layers to have no hit
+  // TODO: do only allow this in some cases, where it is reasonable to have to hit
   if (not spacePoint) {
-    if (currentState.isOnOverlapLayer()) {
+    if (currentState.isOnOverlapLayer() or m_param_makeHitJumpingPossible) {
       return 1;
     } else {
       return std::nan("");

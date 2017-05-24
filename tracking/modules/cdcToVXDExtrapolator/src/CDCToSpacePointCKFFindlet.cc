@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <tracking/modules/cdcToVXDExtrapolator/CDCToSpacePointCKFFindlet.h>
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -43,6 +44,12 @@ void CDCToSpacePointCKFFindlet::apply()
   m_storeArrayHandler.fetch(m_cdcRecoTrackVector, m_spacePointVector);
 
   m_treeSearchFindlet.apply(m_cdcRecoTrackVector, m_spacePointVector, m_results);
+
+  // Remove all empty results
+  erase_remove_if(m_results, [](const CKFCDCToVXDStateObject::ResultObject & result) {
+    return result.second.empty();
+  });
+
   B2INFO("Found " << m_results.size() << " tracks");
 
   m_overlapResolver.apply(m_results);

@@ -17,7 +17,7 @@
 namespace TreeFitter {
   extern int vtxverbose ;
 
-  RecoResonance::RecoResonance(Particle* particle, const ParticleBase* mother)
+  RecoResonance::RecoResonance(Belle2::Particle* particle, const ParticleBase* mother)
     : RecoComposite(particle, mother) {}
 
   RecoResonance::~RecoResonance() {}

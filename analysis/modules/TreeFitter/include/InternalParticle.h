@@ -20,7 +20,7 @@ namespace TreeFitter {
 
   class InternalParticle : public ParticleBase {
   public:
-    InternalParticle(Particle* particle, const ParticleBase* mother,
+    InternalParticle(Belle2::Particle* particle, const ParticleBase* mother,
                      bool forceFitAll) ;
     virtual ~InternalParticle() ;
 

@@ -22,7 +22,7 @@
 //#include <framework/geometry/BFieldManager.h>
 
 #include <analysis/dataobjects/Particle.h>
-using namespace Belle2;
+//using namespace Belle2;
 
 namespace TreeFitter {
 
@@ -40,14 +40,14 @@ namespace TreeFitter {
     typedef std::vector<ParticleBase*> ParticleContainer; //FT:fromLHC
 
     // Default constructor
-    ParticleBase(Particle* particle, const ParticleBase* mother) ;
+    ParticleBase(Belle2::Particle* particle, const ParticleBase* mother) ;
 
     // constructor used for InteractionPoint
     //    ParticleBase(const std::string& name);
 
     virtual ~ParticleBase();
 
-    static ParticleBase* createParticle(Particle* particle,
+    static ParticleBase* createParticle(Belle2::Particle* particle,
                                         const ParticleBase* mother,
                                         bool forceFitAll = false) ;
 
@@ -59,10 +59,10 @@ namespace TreeFitter {
     virtual std::string parname(int index) const ;
     virtual void print(const FitParams*) const ;
 
-    const ParticleBase* locate(Particle* particle) const ;
+    const ParticleBase* locate(Belle2::Particle* particle) const ;
     //    void locate(const LHCb::ParticleID& pid, ParticleContainer& result ) ;
 
-    Particle* particle() const { return m_particle ; }
+    Belle2::Particle* particle() const { return m_particle ; }
     int index() const { return m_index ; }
     const ParticleBase* mother() const { return m_mother ; }
     const std::string& name() const { return m_name ; }
@@ -117,7 +117,7 @@ namespace TreeFitter {
     virtual const_iterator begin() const {  return m_daughters.begin() ; }//FT:fromLHC
     virtual const_iterator end()   const {  return m_daughters.end() ; }//FT:fromLHC
 
-    virtual ParticleBase* addDaughter(Particle*, bool forceFitAll = false); //FT:fromLHC
+    virtual ParticleBase* addDaughter(Belle2::Particle*, bool forceFitAll = false); //FT:fromLHC
     virtual void removeDaughter(const ParticleBase* pb); //FT:fromLHC
 
     typedef std::vector< std::pair<const ParticleBase*, int> > indexmap ;
@@ -129,7 +129,7 @@ namespace TreeFitter {
     // collect all particles emitted from vertex with position posindex
     void collectVertexDaughters(daucontainer& particles, int posindex) ;
     virtual int nFinalChargedCandidates() const;
-    void setParticle(Particle* particle) { m_particle = particle ; }
+    void setParticle(Belle2::Particle* particle) { m_particle = particle ; }
 
     // collect all particles emitted from vertex with position posindex
     //    void collectVertexDaughters( daucontainer& particles, int posindex ) ;
@@ -148,8 +148,8 @@ namespace TreeFitter {
 
     //    bool hasMassConstraint() const { return m_hasMassConstraint ; }
   protected:
-    static double pdgLifeTime(Particle* particle)  ;
-    static bool isAResonance(Particle* particle) ;
+    static double pdgLifeTime(Belle2::Particle* particle)  ;
+    static bool isAResonance(Belle2::Particle* particle) ;
     static double bFieldOverC(); // Bz/c
     ErrCode initTau(FitParams* par) const ;
     //
@@ -159,7 +159,7 @@ namespace TreeFitter {
   protected:
     void setIndex(int i) { m_index = i ; }
   private:
-    Particle* m_particle;
+    Belle2::Particle* m_particle;
     const ParticleBase* m_mother ;
     ParticleContainer m_daughters ;//FT:fromLHC
     //    const LHCb::ParticleProperty* m_prop ;

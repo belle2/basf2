@@ -21,7 +21,7 @@
 namespace TreeFitter {
   extern int vtxverbose ;
 
-  RecoParticle::RecoParticle(Particle* particle, const ParticleBase* mother)
+  RecoParticle::RecoParticle(Belle2::Particle* particle, const ParticleBase* mother)
     : ParticleBase(particle, mother)
   {
   }

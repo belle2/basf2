@@ -19,7 +19,7 @@ namespace TreeFitter {
 
   class RecoResonance : public RecoComposite {
   public:
-    RecoResonance(Particle* bc, const ParticleBase* mother) ;
+    RecoResonance(Belle2::Particle* bc, const ParticleBase* mother) ;
     virtual ~RecoResonance() ;
 
     virtual int dim() const { return hasEnergy() ? 4 : 3 ; } // (px,py,pz,(E))

@@ -20,7 +20,7 @@ namespace TreeFitter {
 
   class RecoComposite : public ParticleBase {
   public:
-    RecoComposite(Particle* bc, const ParticleBase* mother) ;
+    RecoComposite(Belle2::Particle* bc, const ParticleBase* mother) ;
     virtual ~RecoComposite() ;
 
     // the number of parameters

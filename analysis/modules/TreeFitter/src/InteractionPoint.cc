@@ -18,7 +18,7 @@
 namespace TreeFitter {
   extern int vtxverbose ;
 
-  InteractionPoint::InteractionPoint(Particle* particle, bool forceFitAll)
+  InteractionPoint::InteractionPoint(Belle2::Particle* particle, bool forceFitAll)
     : InternalParticle(particle, 0, forceFitAll),
       m_constrainXY(false), m_constrainXYZ(false), m_ipPos(), m_ipCov(3),
       m_ipCovInv(3)//the last two matrices should be initialized to identity
@@ -38,7 +38,7 @@ namespace TreeFitter {
   }
   */
 
-  ErrCode InteractionPoint::initBeamSpot(Particle* particle __attribute__((unused)))
+  ErrCode InteractionPoint::initBeamSpot(Belle2::Particle* particle __attribute__((unused)))
   {
 
     ErrCode status ;

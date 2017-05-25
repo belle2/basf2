@@ -59,11 +59,11 @@ namespace TreeFitter {
     return rc ;
   }
 
-  InternalParticle::InternalParticle(Particle* particle, const ParticleBase* mother,
+  InternalParticle::InternalParticle(Belle2::Particle* particle, const ParticleBase* mother,
                                      bool forceFitAll)
     : ParticleBase(particle, mother), m_massconstraint(false), m_lifetimeconstraint(false)
   {
-    BOOST_FOREACH(Particle * daughter, particle->getDaughters())
+    BOOST_FOREACH(Belle2::Particle * daughter, particle->getDaughters())
     addDaughter(daughter, forceFitAll) ;
 
     //FT: old version
@@ -249,8 +249,8 @@ namespace TreeFitter {
           RecoTrack* dau1 = trkdaughters[0] ;
           RecoTrack* dau2 = trkdaughters[1] ;
           //FT: this once again has to use pions
-          std::vector<float> tmphelix1 = dau1->particle()->getTrack()->getTrackFitResult(Const::pion)->getTau();
-          std::vector<float> tmphelix2 = dau2->particle()->getTrack()->getTrackFitResult(Const::pion)->getTau();
+          std::vector<float> tmphelix1 = dau1->particle()->getTrack()->getTrackFitResult(Belle2::Const::pion)->getTau();
+          std::vector<float> tmphelix2 = dau2->particle()->getTrack()->getTrackFitResult(Belle2::Const::pion)->getTau();
           CLHEP::HepVector helix1(5), helix2(5);
           for (int i = 1; i <= 5; ++i) {
             helix1(i) = tmphelix1[i - 1];

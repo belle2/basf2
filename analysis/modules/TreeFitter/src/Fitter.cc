@@ -47,7 +47,7 @@ namespace TreeFitter {
   }
   */
 
-  Fitter::Fitter(Particle* particle, double prec)
+  Fitter::Fitter(Belle2::Particle* particle, double prec)
     : m_particle(particle), m_decaychain(0), m_fitparams(0), m_status(VertexStatus::UnFitted),
       m_chiSquare(-1), m_niter(-1), m_prec(prec)
   {
@@ -222,22 +222,22 @@ namespace TreeFitter {
     return m_fitparams->nDof() ;
   }
 
-  int Fitter::posIndex(Particle* particle) const
+  int Fitter::posIndex(Belle2::Particle* particle) const
   {
     return m_decaychain->posIndex(particle) ;
   }
 
-  int Fitter::momIndex(Particle* particle) const
+  int Fitter::momIndex(Belle2::Particle* particle) const
   {
     return m_decaychain->momIndex(particle) ;
   }
 
-  int Fitter::tauIndex(Particle* particle) const
+  int Fitter::tauIndex(Belle2::Particle* particle) const
   {
     return m_decaychain->tauIndex(particle) ;
   }
 
-  double Fitter::add(Particle& cand)
+  double Fitter::add(Belle2::Particle& cand)
   {
     ParticleBase* bp = m_decaychain->mother()->addDaughter(&cand) ;
     int offset = m_fitparams->dim() ;
@@ -272,7 +272,7 @@ namespace TreeFitter {
     return deltachisq ;
   }
 
-  double Fitter::remove(Particle& cand)
+  double Fitter::remove(Belle2::Particle& cand)
   {
     ParticleBase* pb = const_cast<ParticleBase*>(m_decaychain->locate(&cand)) ;
     ErrCode status ;
@@ -375,17 +375,17 @@ namespace TreeFitter {
   }
   */
 
-  Particle Fitter::getFitted()
+  Belle2::Particle Fitter::getFitted()
   {
-    Particle thecand = *particle() ; //fishy use of pointers...
+    Belle2::Particle thecand = *particle() ; //fishy use of pointers...
     updateCand(thecand) ;
     B2DEBUG(80, "Fitter::getFitted()");
     return thecand ;
   }
 
-  Particle Fitter::getFitted(Particle& cand)
+  Belle2::Particle Fitter::getFitted(Belle2::Particle& cand)
   {
-    Particle thecand = cand ;
+    Belle2::Particle thecand = cand ;
     updateCand(thecand) ;
     return thecand ;
   }
@@ -403,14 +403,14 @@ namespace TreeFitter {
   }
   */
 
-  Particle Fitter::getFittedTree()
+  Belle2::Particle Fitter::getFittedTree()
   {
-    Particle cand = *particle() ;
+    Belle2::Particle cand = *particle() ;
     updateTree(cand) ;
     return cand ;
   }
 
-  bool Fitter::updateCand(Particle& cand) const
+  bool Fitter::updateCand(Belle2::Particle& cand) const
   {
     // assigns fitted parameters to a candidate
     const ParticleBase* pb = m_decaychain->locate(&cand) ;
@@ -427,7 +427,8 @@ namespace TreeFitter {
   }
 
 
-  void Fitter::updateCand(const ParticleBase& pb, Particle& cand) const //FT: this is very delicate, come back here in case of errors
+  void Fitter::updateCand(const ParticleBase& pb,
+                          Belle2::Particle& cand) const //FT: this is very delicate, come back here in case of errors
   {
     B2DEBUG(80, "Updating the candidate " << cand.getName());
     //    assert( pb->particle()->getPDGCode() == cand.getPDGCode() ) ; //sanity check
@@ -517,7 +518,7 @@ namespace TreeFitter {
     }
   }
 
-  void Fitter::updateTree(Particle& cand) const
+  void Fitter::updateTree(Belle2::Particle& cand) const
   {
     B2DEBUG(80, "Fitter::fit: Updating tree " << cand.getName());
     // assigns fitted parameters to all candidates in a decay tree
@@ -528,7 +529,7 @@ namespace TreeFitter {
     if (updateCand(cand)) { // if the mother can be updated, update the daughters
 
       int ndaughters = cand.getNDaughters();
-      Particle* daughter;
+      Belle2::Particle* daughter;
       for (int i = 0; i < ndaughters; i++) {
         daughter = const_cast<Belle2::Particle*>(cand.getDaughter(i));
         updateTree(*daughter);
@@ -536,7 +537,7 @@ namespace TreeFitter {
     }
   }
 
-  TVector2 Fitter::lifeTime(Particle& cand) const
+  TVector2 Fitter::lifeTime(Belle2::Particle& cand) const
   {
     // returns the lifetime in the rest frame of the candidate
     TVector2 rc;
@@ -546,7 +547,7 @@ namespace TreeFitter {
       double tau    = m_fitparams->par()(tauindex + 1) ;
       double taucov = m_fitparams->cov()(tauindex + 1, tauindex + 1) ;
       double mass   = pb->pdgMass() ;
-      double convfac = mass / Const::speedOfLight;
+      double convfac = mass / Belle2::Const::speedOfLight;
       rc = {convfac * tau, convfac* convfac * taucov} ;
     }
     return rc ;
@@ -597,7 +598,7 @@ namespace TreeFitter {
     return rc ; //returns (0,0) if the particle has no decay length
   }
 
-  TVector2 Fitter::decayLength(Particle& cand) const //FT: are all these instances of decayLength required?
+  TVector2 Fitter::decayLength(Belle2::Particle& cand) const //FT: are all these instances of decayLength required?
   {
     TVector2 rc;
     const ParticleBase* pb = m_decaychain->locate(&cand) ;
@@ -655,7 +656,7 @@ namespace TreeFitter {
     return rc ;
   }
 
-  TVector2 Fitter::decayLengthSum(Particle& candA, Particle& candB) const
+  TVector2 Fitter::decayLengthSum(Belle2::Particle& candA, Belle2::Particle& candB) const
   {
     TVector2 rc;
     const ParticleBase* pbA = m_decaychain->locate(&candA) ;

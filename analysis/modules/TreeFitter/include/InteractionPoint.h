@@ -19,13 +19,13 @@ namespace TreeFitter {
 
   class InteractionPoint : public InternalParticle {
   public:
-    InteractionPoint(Particle* particle, bool forceFitAll) ;
+    InteractionPoint(Belle2::Particle* particle, bool forceFitAll) ;
     //    InteractionPoint(Particle* particle, bool forceFitAll,
     //                     bool addupsilon) ; //FT: we don't actually have addupsilon in Belle2, this can be trimmed
 
     virtual ~InteractionPoint() ;
 
-    ErrCode initBeamSpot(Particle* particle) ;
+    ErrCode initBeamSpot(Belle2::Particle* particle) ;
 
     virtual int dim() const { return 3 ; } // (x,y,z)
 

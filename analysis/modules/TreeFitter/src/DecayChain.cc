@@ -31,7 +31,7 @@ namespace TreeFitter {
       it->print(os) ;
   }
 
-  DecayChain::DecayChain(Particle* particle, bool forceFitAll)
+  DecayChain::DecayChain(Belle2::Particle* particle, bool forceFitAll)
     : m_dim(0), m_mother(0), m_isOwner(true)
   {
     m_mother = ParticleBase::createParticle(particle, 0, forceFitAll);
@@ -146,7 +146,7 @@ namespace TreeFitter {
     return m_mother->chiSquare(par) ;
   }
 
-  const ParticleBase* DecayChain::locate(Particle* particle) const   //FT: This needs investigation
+  const ParticleBase* DecayChain::locate(Belle2::Particle* particle) const   //FT: This needs investigation
   {
     const ParticleBase* rc(0);
     // return _mother->locate(bc) ;
@@ -164,7 +164,7 @@ namespace TreeFitter {
     return rc ;
   }
 
-  int DecayChain::index(Particle* particle) const
+  int DecayChain::index(Belle2::Particle* particle) const
   {
     int rc = -1 ;
     const ParticleBase* base = locate(particle);
@@ -172,7 +172,7 @@ namespace TreeFitter {
     return rc;
   }
 
-  int DecayChain::posIndex(Particle* particle) const
+  int DecayChain::posIndex(Belle2::Particle* particle) const
   {
     int rc = -1 ;
     const ParticleBase* base = locate(particle);
@@ -180,7 +180,7 @@ namespace TreeFitter {
     return rc;
   }
 
-  int DecayChain::momIndex(Particle* particle) const
+  int DecayChain::momIndex(Belle2::Particle* particle) const
   {
     int rc = -1 ;
     const ParticleBase* base = locate(particle);
@@ -188,7 +188,7 @@ namespace TreeFitter {
     return rc ;
   }
 
-  int DecayChain::tauIndex(Particle* particle) const
+  int DecayChain::tauIndex(Belle2::Particle* particle) const
   {
     int rc = -1 ;
     const ParticleBase* base = locate(particle) ;

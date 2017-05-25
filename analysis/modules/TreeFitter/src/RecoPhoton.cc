@@ -27,20 +27,20 @@ namespace TreeFitter {
   extern int vtxverbose ;
 
   //FT: this is needed once Klongs become involved
-  bool RecoPhoton::useEnergy(Particle& particle)
+  bool RecoPhoton::useEnergy(Belle2::Particle& particle)
   {
     bool rc = true ;
     int pdg = particle.getPDGCode();
     if (pdg &&
-        Const::ParticleType(pdg) != Const::photon && //   pdg != 22 &&
-        Const::ParticleType(pdg) != Const::pi0) { //   pdg != 111){
+        Belle2::Const::ParticleType(pdg) != Belle2::Const::photon && //   pdg != 22 &&
+        Belle2::Const::ParticleType(pdg) != Belle2::Const::pi0) { //   pdg != 111){
       rc = false ;
     }
     //    B2DEBUG(80, "RecoPhoton::useEnergy = " << rc << " , pdg = " << pdg);
     return rc ;
   }
 
-  RecoPhoton::RecoPhoton(Particle* particle, const ParticleBase* mother)
+  RecoPhoton::RecoPhoton(Belle2::Particle* particle, const ParticleBase* mother)
     : RecoParticle(particle, mother), m_init(false), m_useEnergy(useEnergy(*particle)), m_m(4),
       m_matrixV(4) //FT: hardcoded, should use dimM()+1 as far as I can tell, dimensionality here needs a look over
       //    : RecoParticle(particle,mother),m_init(false),m_useEnergy(useEnergy(*particle)),m_m(dimM()),m_matrixV(dimM())
@@ -84,7 +84,7 @@ namespace TreeFitter {
 
   ErrCode RecoPhoton::updCache()
   {
-    const ECLCluster* recoCalo = particle()->getECLCluster();
+    const Belle2::ECLCluster* recoCalo = particle()->getECLCluster();
     TVector3 centroid = recoCalo->getClusterPosition();
     double energy = recoCalo->getEnergy();
     m_init = true ;

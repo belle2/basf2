@@ -19,7 +19,7 @@
 #include <analysis/modules/TreeFitter/ErrCode.h>
 
 //using namespace CLHEP;
-using namespace Belle2;
+//using namespace Belle2;
 
 namespace TreeFitter {
   class DecayChain ;
@@ -34,12 +34,12 @@ namespace TreeFitter {
     enum VertexType { None = -1, Geometric, Kinematic };
     enum VertexStatus { Success = 0, NonConverged, BadInput, Failed, UnFitted };
 
-    bool printDaughters(Particle* mother);
+    bool printDaughters(Belle2::Particle* mother);
 
     Fitter() : m_particle(0), m_decaychain(0), m_fitparams(0), m_status(VertexStatus::UnFitted),
       m_chiSquare(-1), m_niter(-1), m_prec(0.01) {} //Default constructor
 
-    Fitter(Particle* particle, double prec = 0.01) ;
+    Fitter(Belle2::Particle* particle, double prec = 0.01) ;
     ~Fitter() ;
     bool fit() ; //FT: had to be changed from void to bool
     void print() const ;
@@ -49,9 +49,9 @@ namespace TreeFitter {
     CLHEP::HepSymMatrix cov(const std::vector<int>& indexVec) const ;
     CLHEP::HepVector par(const std::vector<int>& indexVec) const ;
     //const DecayChain* decayChain() const { return _decaychain; }
-    int posIndex(Particle* particle) const ;
-    int momIndex(Particle* particle) const ;
-    int tauIndex(Particle* particle) const ;
+    int posIndex(Belle2::Particle* particle) const ;
+    int momIndex(Belle2::Particle* particle) const ;
+    int tauIndex(Belle2::Particle* particle) const ;
 
     double chiSquare() const { return m_chiSquare ; }
     double globalChiSquare() const ;
@@ -62,27 +62,27 @@ namespace TreeFitter {
     const ErrCode& errCode() { return m_errCode ; }
 
     // must be moved to derived class or so ...
-    double add(Particle& cand) ;
-    double remove(Particle& cand) ;
+    double add(Belle2::Particle& cand) ;
+    double remove(Belle2::Particle& cand) ;
     void updateIndex() ;
     void fitOneStep() ;
 
     // interface to basf2
-    TVector2 decayLength(Particle& particle) const ;
-    TVector2 lifeTime(Particle& particle) const ;
-    TVector2 decayLengthSum(Particle&, Particle&) const ;
+    TVector2 decayLength(Belle2::Particle& particle) const ;
+    TVector2 lifeTime(Belle2::Particle& particle) const ;
+    TVector2 decayLengthSum(Belle2::Particle&, Belle2::Particle&) const ;
 
-    Particle getFitted() ;
-    Particle getFitted(Particle& particle);
-    Particle getFittedTree();
+    Belle2::Particle getFitted() ;
+    Belle2::Particle getFitted(Belle2::Particle& particle);
+    Belle2::Particle getFittedTree();
     //    Particle* fittedCand(Particle& particle, Particle* headoftree);
 
     //    BtaFitParams btaFitParams(Particle& particle) const ;//this passes out the set of particle parameters in BaBar, do the same for basf2
     CLHEP::HepSymMatrix extractCov7(const ParticleBase* pb) const;
 
-    bool updateCand(Particle& particle) const;
-    void updateCand(const ParticleBase& pb, Particle& cand) const ;
-    void updateTree(Particle& particle) const;
+    bool updateCand(Belle2::Particle& particle) const;
+    void updateCand(const ParticleBase& pb, Belle2::Particle& cand) const ;
+    void updateTree(Belle2::Particle& particle) const;
 
     static void setVerbose(int i) { vtxverbose = i ; }
     static void setMassConstraintList(std::vector<int> list) { massConstraintList = list; }
@@ -96,10 +96,10 @@ namespace TreeFitter {
     FitParams* fitparams() { return m_fitparams ; }
     const DecayChain* decaychain() const { return m_decaychain ; }
     const FitParams* fitparams() const { return m_fitparams ; }
-    Particle* particle() { return m_particle; }
+    Belle2::Particle* particle() { return m_particle; }
     static TVector2 decayLength(const ParticleBase* pb, const FitParams*) ;
   private:
-    Particle* m_particle ;
+    Belle2::Particle* m_particle ;
     DecayChain* m_decaychain ;
     FitParams* m_fitparams ;
     int m_status ;

@@ -34,11 +34,11 @@ namespace TreeFitter {
 
   extern int vtxverbose ;
 
-  RecoTrack::RecoTrack(Particle* particle, const ParticleBase* mother)
+  RecoTrack::RecoTrack(Belle2::Particle* particle, const ParticleBase* mother)
     : RecoParticle(particle, mother), m_bfield(0), m_trackfit(0), m_cached(false), m_flt(0), m_m(7), m_matrixV(7)
   {
     //FT: FIX ME: This initialises the BField at the IP. This might not be a correct assumption, but is the easiest and fastest for now. Check the impact of using the field at the perigee, or perhaps at the decay vertex as appropriate, especially for significantly displaced vertices.
-    m_bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T; //Bz in Tesla
+    m_bfield = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() / Belle2::Unit::T; //Bz in Tesla
     B2DEBUG(80, "RecoTrack - Bz from BFieldManager: " << m_bfield);
     //    PdtPid::PidType pidType = PdtPid::pion ;
     //    if( bc()->pdtEntry() ) pidType = bc()->pdtEntry()->pidId() ;
@@ -47,7 +47,7 @@ namespace TreeFitter {
       //FT: this is superflous as m_trackfit has just been initialised, but we'll need the statement in future developments.
 
       //FT: For now we still use the pion track hypothesis. Later: add multiple hypotheses, add a flag to allow users to choose whether they want the "true" hypothesis or just the pion (for cases where the pion works better, for whatever reason)
-      m_trackfit = particle->getTrack()->getTrackFitResult(Const::pion);
+      m_trackfit = particle->getTrack()->getTrackFitResult(Belle2::Const::pion);
     }
   }
 

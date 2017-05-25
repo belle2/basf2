@@ -20,7 +20,7 @@ namespace TreeFitter {
 
   extern int vtxverbose ;
 
-  Resonance::Resonance(Particle* particle, const ParticleBase* mother,
+  Resonance::Resonance(Belle2::Particle* particle, const ParticleBase* mother,
                        bool forceFitAll)
     : InternalParticle(particle, mother, forceFitAll)
   {

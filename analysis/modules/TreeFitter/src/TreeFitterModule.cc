@@ -52,7 +52,7 @@ void TreeFitterModule::initialize()
   //Make sure we have a particle list
   StoreObjPtr<ParticleList>::required(m_particleList);
   //Also make sure we have actual particles
-  StoreArray<Particle> particles;//FT: this can be written better
+  StoreArray<Belle2::Particle> particles;//FT: this can be written better
   particles.isRequired();
 }
 
@@ -71,7 +71,7 @@ void TreeFitterModule::event()
   std::vector<unsigned int> toRemove;
   unsigned int n = plist->getListSize();
   for (unsigned i = 0; i < n; i++) {
-    Particle* particle = plist->getParticle(i);
+    Belle2::Particle* particle = plist->getParticle(i);
     bool ok = doTreeFit(particle);
     if (!ok) particle->setPValue(-1);
     if (particle->getPValue() < m_confidenceLevel) {
@@ -88,7 +88,7 @@ void TreeFitterModule::endRun() {}
 void TreeFitterModule::terminate() {}
 
 //Actual Fit Call
-bool TreeFitterModule::doTreeFit(Particle* head)
+bool TreeFitterModule::doTreeFit(Belle2::Particle* head)
 {
   TreeFitter::Fitter* TreeFitObject = new TreeFitter::Fitter(head, m_precision);
   TreeFitObject->setVerbose(m_verbose);

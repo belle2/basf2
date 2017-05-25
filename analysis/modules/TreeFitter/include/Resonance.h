@@ -18,7 +18,7 @@ namespace TreeFitter {
 
   class Resonance : public InternalParticle {
   public:
-    Resonance(Particle* particle, const ParticleBase* mother,
+    Resonance(Belle2::Particle* particle, const ParticleBase* mother,
               bool forceFitAll) ;
     virtual ~Resonance() ;
 

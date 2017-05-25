@@ -122,12 +122,12 @@ void TOPInterimFENtupleModule::event()
     m_isCalCh[m_nHit] = (digit.getASICChannel() == m_calibrationChannel);
     m_eventNum[m_nHit] = EventNum;
     m_winNum[m_nHit] = (short)digit.getFirstWindow();
-    m_time[m_nHit] = digit.getTime();//Not yet available
-    m_rawTdc[m_nHit] = digit.getTDC() / 16.;
-    m_height[m_nHit] = digit.getADC();
+    m_time[m_nHit] = digit.getTime();
+    m_rawTdc[m_nHit] = digit.getRawTime();
+    m_height[m_nHit] = digit.getPulseHeight();
     m_q[m_nHit] = digit.getIntegral();
     m_width[m_nHit] = digit.getPulseWidth();
-    m_sample[m_nHit] = (digit.getTDC() / 16 + digit.getFirstWindow() * 64) % 256;
+    m_sample[m_nHit] = (int(digit.getRawTime()) + digit.getFirstWindow() * 64) % 256;
     m_quality[m_nHit] = digit.getHitQuality();
     const auto* rawDigit = digit.getRelated<TOPRawDigit>();
     if (rawDigit) {

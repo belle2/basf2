@@ -171,19 +171,19 @@ namespace Belle2 {
         rawDigit->setValuePeak(vPeak);
         rawDigit->setIntegral(integral);
 
-        double cfdTime = rawDigit->getCFDLeadingTime() * tdc.getSampleWidth()
-                         - tdc.getOffset();
+        double rawTime = rawDigit->getCFDLeadingTime();
+        double cfdTime = rawTime * tdc.getSampleWidth() - tdc.getOffset();
         double cfdWidth = rawDigit->getFWHM() * tdc.getSampleWidth();
-        int TDCcount = tdc.getTDCcount(cfdTime);
-        unsigned tfine = TDCcount % (0x1 << tdc.getSubBits());
+        int sampleDivisions = 0x1 << tdc.getSubBits();
+        unsigned tfine = int(rawTime * sampleDivisions) % sampleDivisions; // rawTime<0 ?
         rawDigit->setTFine(tfine);
 
         // append new digit
 
-        auto* digit = digits.appendNew(m_moduleID, m_pixelID, TDCcount);
+        auto* digit = digits.appendNew(m_moduleID, m_pixelID, rawTime);
         digit->setTime(cfdTime);
         digit->setTimeError(timeJitter);
-        digit->setADC(rawDigit->getValuePeak());
+        digit->setPulseHeight(rawDigit->getValuePeak());
         digit->setIntegral(rawDigit->getIntegral());
         digit->setPulseWidth(cfdWidth);
         digit->setChannel(m_channel);
@@ -271,8 +271,7 @@ namespace Belle2 {
         double rawTime = rawDigit->getCFDLeadingTime(); // time in [samples]
         double rawTimeErr = rawDigit->getCFDLeadingTimeError(rmsNoise); // in [samples]
         int sampleDivisions = 0x1 << tdc.getSubBits();
-        int tdcCount = int(rawTime * sampleDivisions);
-        unsigned tfine = tdcCount % sampleDivisions;
+        unsigned tfine = int(rawTime * sampleDivisions) % sampleDivisions; // rawTime<0 ?
         rawDigit->setTFine(tfine);
         rawDigit->addRelationTo(waveform);
 
@@ -285,10 +284,10 @@ namespace Belle2 {
                                                                   feature.sampleRise);
 
         // append new digit and set it
-        auto* digit = digits.appendNew(m_moduleID, m_pixelID, tdcCount);
+        auto* digit = digits.appendNew(m_moduleID, m_pixelID, rawTime);
         digit->setTime(cfdTime);
         digit->setTimeError(timeError);
-        digit->setADC(rawDigit->getValuePeak());
+        digit->setPulseHeight(rawDigit->getValuePeak());
         digit->setIntegral(rawDigit->getIntegral());
         digit->setPulseWidth(width);
         digit->setChannel(m_channel);

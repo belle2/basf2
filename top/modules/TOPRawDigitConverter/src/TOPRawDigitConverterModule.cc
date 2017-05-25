@@ -71,7 +71,8 @@ namespace Belle2 {
     addParam("subtractOffset", m_subtractOffset,
              "if true, subtract offset defined for nominal TDC (required for MC)", false);
     addParam("pedestalRMS", m_pedestalRMS,
-             "r.m.s of pedestals [ADC counts]", 9.0);
+             "r.m.s of pedestals [ADC counts], "
+             "if positive, timeError will be estimated from FE data", 9.0);
     addParam("calibrationChannel", m_calibrationChannel,
              "calpulse selection: ASIC channel (use -1 to turn off the selection)", -1);
     addParam("calpulseWidthMin", m_calpulseWidthMin,
@@ -107,7 +108,6 @@ namespace Belle2 {
     // equidistant sample times in case calibration is not required
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     m_sampleTimes.setTimeAxis(geo->getNominalTDC().getSyncTimeBase());
-    m_sampleDivisions = (0x1 << geo->getNominalTDC().getSubBits());
 
     // either common T0 or TDC offset
     if (m_useCommonT0Calibration and m_subtractOffset)
@@ -185,8 +185,6 @@ namespace Belle2 {
                                          rawDigit.getASICChannel());
       auto pixelID = chMapper.getPixelID(channel);
       double rawTime = rawDigit.getCFDLeadingTime(); // time in [samples]
-      double rawTimeErr = rawDigit.getCFDLeadingTimeError(m_pedestalRMS); // in [samples]
-      int tdc = int(rawTime * m_sampleDivisions);
       const auto* sampleTimes = &m_sampleTimes; // equidistant sample times
       if (m_useSampleTimeCalibration) {
         sampleTimes = (*m_timebase)->getSampleTimes(scrodID, channel % 128);
@@ -205,13 +203,18 @@ namespace Belle2 {
       double width = sampleTimes->getDeltaTime(window,
                                                rawDigit.getCFDFallingTime(),
                                                rawDigit.getCFDLeadingTime()); // in [ns]
-      auto sampleRise = rawDigit.getSampleRise();
-      double timeError = rawTimeErr * sampleTimes->getTimeBin(window, sampleRise); // [ns]
 
-      auto* digit = digits.appendNew(moduleID, pixelID, tdc);
+      double timeError = geo->getNominalTDC().getTimeJitter();
+      if (m_pedestalRMS > 0) {
+        double rawErr = rawDigit.getCFDLeadingTimeError(m_pedestalRMS); // in [samples]
+        auto sampleRise = rawDigit.getSampleRise();
+        timeError = rawErr * sampleTimes->getTimeBin(window, sampleRise); // [ns]
+      }
+
+      auto* digit = digits.appendNew(moduleID, pixelID, rawTime);
       digit->setTime(time);
       digit->setTimeError(timeError);
-      digit->setADC(rawDigit.getValuePeak());
+      digit->setPulseHeight(rawDigit.getValuePeak());
       digit->setIntegral(rawDigit.getIntegral());
       digit->setPulseWidth(width);
       digit->setChannel(channel);
@@ -232,8 +235,8 @@ namespace Belle2 {
       for (auto& digit : digits) {
         if (digit.getHitQuality() != TOPDigit::c_Good) continue;
         if (digit.getASICChannel() != calibrationChannel) continue;
-        if (digit.getADC() < m_calpulseHeightMin) continue;
-        if (digit.getADC() > m_calpulseHeightMax) continue;
+        if (digit.getPulseHeight() < m_calpulseHeightMin) continue;
+        if (digit.getPulseHeight() > m_calpulseHeightMax) continue;
         if (digit.getPulseWidth() < m_calpulseWidthMin) continue;
         if (digit.getPulseWidth() > m_calpulseWidthMax) continue;
         digit.setHitQuality(TOPDigit::c_CalPulse);

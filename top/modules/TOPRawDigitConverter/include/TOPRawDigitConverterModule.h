@@ -90,7 +90,6 @@ namespace Belle2 {
     DBObjPtr<TOPCalModuleT0>* m_moduleT0 = 0;   /**< module T0 calibration constants */
     DBObjPtr<TOPCalCommonT0>* m_commonT0 = 0;   /**< common T0 calibration constants */
     TOPSampleTimes m_sampleTimes; /**< equidistant in case no calibration required */
-    int m_sampleDivisions = 0; /**< number of sample divisions (from TDC subbits) */
 
   };
 

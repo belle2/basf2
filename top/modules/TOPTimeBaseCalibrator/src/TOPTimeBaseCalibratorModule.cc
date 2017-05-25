@@ -109,7 +109,6 @@ namespace Belle2 {
   void TOPTimeBaseCalibratorModule::event()
   {
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-    double sampleDivisions = (0x1 << geo->getNominalTDC().getSubBits());
     double sampleWidth = geo->getNominalTDC().getSampleWidth();
 
     std::vector<std::pair<double, double> > hits[c_NumChannels];
@@ -118,7 +117,7 @@ namespace Belle2 {
     for (const auto& digit : digits) {
       if (digit.getModuleID() != m_moduleID) continue;
       if (digit.getHitQuality() != TOPDigit::c_CalPulse) continue;
-      double t = digit.getTDC() / sampleDivisions + digit.getFirstWindow() * c_WindowSize;
+      double t = digit.getRawTime() + digit.getFirstWindow() * c_WindowSize;
       if (t < 0) {
         B2ERROR("Got negative sample number - digit ignored");
         continue;
@@ -128,8 +127,6 @@ namespace Belle2 {
         B2ERROR("Time error is not given - digit ignored");
         continue;
       }
-      // add quantization error
-      et = sqrt(et * et + 1 / sampleDivisions / sampleDivisions / 12);
       unsigned channel = digit.getChannel();
       if (channel < c_NumChannels) hits[channel].push_back(std::make_pair(t, et));
     }

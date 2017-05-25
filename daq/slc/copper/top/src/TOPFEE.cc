@@ -43,8 +43,9 @@ void TOPFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
   ConfigBoardstack::UpdateRegisterFromDatabase(obj);
   //ConfigBoardstack::PrintRegisterValueMap();
 
-  callback.add(new TOPHandlerLookback("Lookback", callback, hslb, *this, 44));
-  callback.add(new TOPHandlerFEMode("ScrodfeMode", callback, hslb, *this, 3));
+  //callbacks to directly change registers on the board stacks
+  callback.add(new TOPHandlerLookback(StringUtil::form("top[%d].Lookback", hslb.get_finid()), callback, hslb, *this, 44));
+  callback.add(new TOPHandlerFEMode(StringUtil::form("top[%d].ScrodfeMode", hslb.get_finid()), callback, hslb, *this, 3));
 }
 
 void TOPFEE::boot(RCCallback& callback, HSLB& hslb, const DBObject& obj)

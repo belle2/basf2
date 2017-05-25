@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Sam Cunliffe Jan Strube                                  *
+ * Contributors: Sam Cunliffe                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -25,28 +25,26 @@ namespace Belle2 {
    * filled in top/modules/TOPReconstruction/src/TOPReconstructorModule.cc
    */
 
-  class TOPPDFCollection : public RelationsObject {
+  class TOPSmallestPullCollection : public RelationsObject {
 
   public:
     /**
-     * typedef for parameters to describe a Gaussian
-     * position, peak width, nphotons (area)
-     */
-    typedef std::vector<float> gaussian_t;
-
-    /**
      * default constructor
      */
-    TOPPDFCollection() { }
-    void addHypothesisPDFSample(const std::vector<std::vector<gaussian_t>>& pdfSamples, int hypot)
+    TOPSmallestPullCollection() { }
+    /**
+     * saves the smallest pull
+     */
+    void set(const std::vector<float> pulls, const std::vector<int> bestpeaks = {})
     {
-      // TODO Check for existing hypotheses before overriding
-      m_data.insert(std::make_pair(hypot, pdfSamples));
+      m_pulls = pulls;
+      m_ks = bestpeaks; // optional
     }
-    std::map<int, std::vector<std::vector<gaussian_t>>> m_data; /**< collection of samples of the pdf */
+    std::vector<float> m_pulls; /**< the smallest pulls */
+    std::vector<int> m_ks; /**< the index of the peak giving the smallest pull */
 
   private:
-    ClassDef(TOPPDFCollection, 1); /**< ClassDef */
+    ClassDef(TOPSmallestPullCollection, 1); /**< ClassDef */
   };
 } // end namespace Belle2
 

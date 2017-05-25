@@ -83,20 +83,24 @@ for i in range(t.GetEntries()):
     plt.savefig("pdf_%i_logz.pdf" % i)
     plt.clf()
 
-plt.pcolor(X, Y, diff, cmap=gcmap)
-plt.colorbar()
-plt.xlabel('channel, $i_{ch}$')
-plt.ylabel('time of propagation, $t_{TOP}$ (ns)')
-plt.xlim(0, 512)
-plt.ylim(10, 59)
-plt.savefig("pdf_diff0vs1.pdf")
 
-# log z axis
-plt.clf()
-plt.pcolor(X, Y, abs(diff), cmap=gcmap, norm=LogNorm())
-plt.colorbar()
-plt.xlim(0, 512)
-plt.ylim(10, 59)
-plt.xlabel('channel, $i_{ch}$')
-plt.ylabel('time of propagation, $t_{TOP}$ (ns)')
-plt.savefig("pdf_diff0vs1_logz.pdf")
+if len(zarrays) > 1:
+    # then we made more rthan two plots so make a diff of the first two
+    diff = zarrays[0] - zarrays[1]
+    plt.pcolor(X, Y, diff, cmap=gcmap)
+    plt.colorbar()
+    plt.xlabel('channel, $i_{ch}$')
+    plt.ylabel('time of propagation, $t_{TOP}$ (ns)')
+    plt.xlim(0, 512)
+    plt.ylim(10, 59)
+    plt.savefig("pdf_diff0vs1.pdf")
+
+    # log z axis
+    plt.clf()
+    plt.pcolor(X, Y, abs(diff), cmap=gcmap, norm=LogNorm())
+    plt.colorbar()
+    plt.xlim(0, 512)
+    plt.ylim(10, 59)
+    plt.xlabel('channel, $i_{ch}$')
+    plt.ylabel('time of propagation, $t_{TOP}$ (ns)')
+    plt.savefig("pdf_diff0vs1_logz.pdf")

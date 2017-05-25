@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric, Jan Strube, Sam Cunliffe                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -24,6 +24,7 @@
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPLikelihood.h>
 #include <top/dataobjects/TOPPDFCollection.h>
+#include <top/dataobjects/TOPSmallestPullCollection.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPBarHit.h>
 
@@ -84,8 +85,9 @@ namespace Belle2 {
              "PDG code of hypothesis to construct pulls (0 means: use MC truth)",
              211);
     addParam("writeNPdfs", m_writeNPdfs,
-             "Write out the PDF for the first N events. -1 is for all.",
-             0);
+             "Write out the PDF for the first N events. -1 is for all.", 0);
+    addParam("writeNPulls", m_writeNPulls,
+             "Write out pulls for the first N events. -1 is for all.", 0);
 
     for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {m_masses[i] = 0;}
     for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {m_pdgCodes[i] = 0;}
@@ -101,7 +103,6 @@ namespace Belle2 {
   void TOPReconstructorPDFModule::initialize()
   {
     // input
-
     StoreArray<TOPDigit> digits;
     digits.isRequired();
 
@@ -118,7 +119,6 @@ namespace Belle2 {
     barHits.isOptional();
 
     // output
-
     StoreArray<TOPLikelihood> likelihoods;
     likelihoods.registerInDataStore();
     likelihoods.registerRelationTo(extHits);
@@ -128,6 +128,10 @@ namespace Belle2 {
     StoreArray<TOPPDFCollection> pdfCollection;
     pdfCollection.registerInDataStore();
     tracks.registerRelationTo(pdfCollection);
+
+    StoreArray<TOPSmallestPullCollection> pullCollection;
+    pullCollection.registerInDataStore();
+    tracks.registerRelationTo(pullCollection);
 
     // check for module debug level
     if (getLogConfig().getLogLevel() == LogConfig::c_Debug) {
@@ -159,6 +163,7 @@ namespace Belle2 {
     // output: log likelihoods
     StoreArray<TOPLikelihood> likelihoods;
     StoreArray<TOPPDFCollection> pdfCollection;
+    StoreArray<TOPSmallestPullCollection> pullCollection;
 
     // create reconstruction object
     TOPreco reco(Const::ChargedStable::c_SetSize, m_masses, m_minBkgPerBar, m_scaleN0);
@@ -216,27 +221,72 @@ namespace Belle2 {
       topL->addRelationTo(trk.getBarHit());
 
       // write out the pdf if needed
-      reco.redoPDF(m_masses[1]);
-      // FIXME this hard codes muon id ... figure out how to make this better
       if (m_writeNPdfs < 0 or m_iEvent < m_writeNPdfs) {
+        reco.redoPDF(m_masses[1]);
+        // FIXME this hard codes muon id ... figure out how to make this better
+        // I guess we loop over hypotheses in this outer loop -- Sam
 
         // collection of gaussian_t's for each pixel
         vector<vector<TOPPDFCollection::gaussian_t>> channelPDFCollection(512);
 
+        // the mean, width and normalisation for each peak in the pdf
         float position = 0, width = 0, numPhotons = 0;
         for (int pixelID = 1; pixelID <= 512; pixelID++) {
           for (int k = 0; k < reco.getNumOfPDFPeaks(pixelID); k++) {
+
+            // get this peak
             reco.getPDFPeak(pixelID, k, position, width, numPhotons);
+
+            // save the triplet of values using nice pythonic c++11
             auto tp = vector<float> {position, width, numPhotons};
             channelPDFCollection.at(pixelID - 1).push_back(tp);
-          }
-        }
 
+          } // end loop over peaks in the pdf for this pixel
+        } // end loop over pixels
+
+        // add this vector of vector of triplets to the TOPPDFCollection
         TOPPDFCollection* topPDFColl = pdfCollection.appendNew();
         topPDFColl->addHypothesisPDFSample(channelPDFCollection, 13);
         track.addRelationTo(topPDFColl);
-      }
-    }
+
+      } // closes if statement about optional writing out pdfs
+
+      // write out pulls for each digit if needed
+      if (m_writeNPulls < 0 or m_iEvent < m_writeNPdfs) {
+        reco.redoPDF(m_masses[1]);
+        // FIXME as above
+
+        float position = 0, width = 0, numPhotons = 0; //, this_pull = 0;
+        vector<float> smallest_pulls(digits.getEntries(), 10000);
+
+        // FIXME this does not loop over the digits for this track under
+        // whatever hypothesis but ALL digits...
+        for (int i = 0; i < digits.getEntries(); i++) {
+          int pixelID = digits[i]->getPixelID();
+          double t = digits[i]->getTime();
+          for (int k = 0; k < reco.getNumOfPDFPeaks(pixelID); k++) {
+            // get this peak, calculate pull
+            reco.getPDFPeak(pixelID, k, position, width, numPhotons);
+            float this_pull = (t - position) / width;
+
+            // check to see if this is the smallest
+            if (abs(this_pull) < abs(smallest_pulls[i])) {
+              smallest_pulls[i] = this_pull;
+              //cout << "processing digit: " << i << " moduleID=" << digits[i]->getModuleID() << " pixelID=" << pixelID << endl;
+              //cout << this_pull << " = (" << t << " - " << position << ") / " << width << endl;
+            }
+
+          } // end loop over peaks
+        } // end loop over (ALL) digits
+
+        // FIXME should split this up for each TOPDigit and register reltation
+        TOPSmallestPullCollection* tspc = pullCollection.appendNew();
+        tspc->set(smallest_pulls);
+        track.addRelationTo(tspc);
+
+      } // closes if statement about optional writing out pulls
+
+    } // end loop over tracks
     ++m_iEvent;
   }
 

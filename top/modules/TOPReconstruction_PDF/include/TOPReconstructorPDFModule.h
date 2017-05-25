@@ -71,16 +71,17 @@ namespace Belle2 {
   private:
 
     // Module steering parameters
-    double m_minBkgPerBar = 0;    /**< minimal assumed background photons per bar */
-    double m_scaleN0 = 0;         /**< scale factor for N0 */
+    double m_minBkgPerBar = 0; /**< minimal assumed background photons per bar */
+    double m_scaleN0 = 0;      /**< scale factor for N0 */
     double m_sigmaRphi = 0;    /**< track smearing in Rphi (r.m.s) */
     double m_sigmaZ = 0;       /**< track smearing in Z (r.m.s) */
     double m_sigmaTheta = 0;   /**< track smearing in Theta (r.m.s) */
     double m_sigmaPhi = 0;     /**< track smearing in Phi (r.m.s) */
     double m_maxTime = 0;      /**< optional time limit for photons */
-    int m_PDGCode = 0;   /**< PDG code of hypothesis to construct pulls */
-    int m_writeNPdfs = 0; /**< write out the pdfs for the first N events */
-    long long m_iEvent = -1; /**< count the events in the current process */
+    int m_PDGCode = 0;         /**< PDG code of hypothesis to construct pulls */
+    int m_writeNPdfs = 0;      /**< write out pdfs for the first N events */
+    int m_writeNPulls = 0;     /**< write out pulls for the furst N events */
+    long long m_iEvent = -1;   /**< count events in the current process */
 
     // others
     int m_debugLevel = 0;       /**< debug level from logger */

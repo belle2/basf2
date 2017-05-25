@@ -218,12 +218,6 @@ namespace Belle2 {
 
 
       /**
-       * Set/unset relation between CDCHit and CDCRawHit(WaveForm).
-       */
-
-      bool m_setRelationRaw2Hit;
-
-      /**
        * Name of the RawCDC dataobject (suppressed mode).
        */
       std::string m_rawCDCName;

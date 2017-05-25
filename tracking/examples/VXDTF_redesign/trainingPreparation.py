@@ -29,7 +29,7 @@ from setup_modules import setup_Geometry
 set_log_level(LogLevel.ERROR)
 log_to_file('logVXDTF2Preparation.log', append=False)
 # if false PXD hits will be ignored in the trainings data collection
-usePXD = False
+usePXD = True
 
 # ---------------------------------------------------------------------------------------
 # Create paths

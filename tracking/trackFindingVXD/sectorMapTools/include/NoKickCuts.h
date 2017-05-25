@@ -27,12 +27,12 @@ namespace Belle2 {
     int m_nbinpar = 5;
     int m_nbinlay = 7;
 
-    enum minmax {
+    enum Eminmax {
       min,
       max
     };
 
-    enum parameter {
+    enum Eparameter {
       omega,
       d0,
       phi0,
@@ -40,7 +40,7 @@ namespace Belle2 {
       tanlambda
     };
 
-    enum cutname {
+    enum Ecutname {
       Norm,
       Pow,
       Bkg
@@ -51,13 +51,13 @@ namespace Belle2 {
     // method takes the cuts from cutfile using the method getCuts and then
     // evaluate the effective cut using theta and momentum behaviour, from the
     // function  Norm/(p^Pow*sqrt(sin(theta)))+Bkg.
-    std::vector<double> cutSelector(double sintheta, double momentum, int layer1, int layer2, parameter par);
+    std::vector<double> cutSelector(double sintheta, double momentum, int layer1, int layer2, Eparameter par);
 
     // This methods select the cuts as function parameters from TH3F cointained
-    // in cutfile in function of track parameter and layer only. minmax represent
-    // if you want the maximum or minimum cut, instead cutname are the three
+    // in cutfile in function of track parameter and layer only. Eminmax represent
+    // if you want the maximum or minimum cut, instead Ecutname are the three
     // parameters of the theta-p parametrization of the cuts (see the enum type)
-    double getCut(int layer1, int layer2, parameter par, minmax m, cutname cut);
+    double getCut(int layer1, int layer2, Eparameter par, Eminmax m, Ecutname cut);
 
     //  This method fill the cuts (used in NoKickCutsEval method) to create the
     //  cutfile.

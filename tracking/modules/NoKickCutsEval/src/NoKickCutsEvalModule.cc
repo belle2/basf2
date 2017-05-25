@@ -63,29 +63,30 @@ NoKickCutsEvalModule::~NoKickCutsEvalModule()
 void NoKickCutsEvalModule::initialize()
 {
 
-  // lim_temp.push_back(0.0003 * ext_lim);
-  // lim_temp.push_back(0.3 * ext_lim);
-  // lim_temp.push_back(0.05 * ext_lim);
-  // lim_temp.push_back(0.2 * ext_lim);
-  // lim_temp.push_back(0.5 * 0.3 * ext_lim);
-  lim_temp.push_back(0.4 * ext_lim);
-  lim_temp.push_back(1. * ext_lim);
-  lim_temp.push_back(0.3 * ext_lim);
-  lim_temp.push_back(1. * ext_lim);
-  lim_temp.push_back(0.3 * ext_lim);
+  // m_histoLim.push_back(0.0003 * c_multLimit);
+  // m_histoLim.push_back(0.3 * c_multLimit);
+  // m_histoLim.push_back(0.05 * c_multLimit);
+  // m_histoLim.push_back(0.2 * c_multLimit);
+  // m_histoLim.push_back(0.5 * 0.3 * c_multLimit);
+  m_histoLim.push_back(0.4 * c_multLimit);
+  m_histoLim.push_back(1. * c_multLimit);
+  m_histoLim.push_back(0.3 * c_multLimit);
+  m_histoLim.push_back(1. * c_multLimit);
+  m_histoLim.push_back(0.3 * c_multLimit);
 
 
-  for (int par = 0; par < nbinpar; par++) {
+  for (int par = 0; par < c_nbinpar; par++) {
     std::vector<std::vector<std::vector<std::vector<TH1F*>>>> histo_par;
-    for (int lay1 = 0; lay1 < nbinlay; lay1++) {
+    for (int lay1 = 0; lay1 < c_nbinlay; lay1++) {
       std::vector<std::vector<std::vector<TH1F*>>> histo_lay1;
-      for (int lay2 = 0; lay2 < nbinlay; lay2++) {
+      for (int lay2 = 0; lay2 < c_nbinlay; lay2++) {
         std::vector<std::vector<TH1F*>> histo_lay2;
-        for (int theta = 0; theta < nbint; theta++) {
+        for (int theta = 0; theta < c_nbint; theta++) {
           std::vector<TH1F*> histo_theta;
-          for (int p = 0; p < nbinp; p++) {
-            histo_theta.push_back(new TH1F("histo_" + name_par.at(par) + Form("_layer%d-%d_theta%d_p%d", lay1, lay2, theta, p),
-                                           "histo_" + name_par.at(par) + Form("_layer%d-%d_theta%d_p%d", lay1, lay2, theta, p), nbin, -lim_temp.at(par), lim_temp.at(par)));
+          for (int p = 0; p < c_nbinp; p++) {
+            histo_theta.push_back(new TH1F("histo_" + m_namePar.at(par) + Form("_layer%d-%d_theta%d_p%d", lay1, lay2, theta, p),
+                                           "histo_" + m_namePar.at(par) + Form("_layer%d-%d_theta%d_p%d", lay1, lay2, theta, p), c_nbin, -m_histoLim.at(par),
+                                           m_histoLim.at(par)));
           }
           histo_lay2.push_back(histo_theta);
           histo_theta.clear();
@@ -96,7 +97,7 @@ void NoKickCutsEvalModule::initialize()
       histo_par.push_back(histo_lay1);
       histo_lay1.clear();
     }
-    histo.push_back(histo_par);
+    m_histo.push_back(histo_par);
     histo_par.clear();
   }
 
@@ -154,29 +155,29 @@ void NoKickCutsEvalModule::event()
     m_trackSel.m_8hitTrack.clear();
     m_trackSel.m_hitXP.clear();
     m_trackSel.m_setHitXP.clear();
-    if (!PriorCut) {GlobCounter++; continue;}
+    if (!PriorCut) {m_globCounter++; continue;}
 
     if (XP8.size() > 0) {
       for (int i = 0; (i + 1) < (int)XP8.size(); i++) {
-        for (int par = 0; par < nbinpar; par++) {
-          int p = (int)((XP8.at(i).m_momentum0.Mag() - c_pmin) / pwidth);
-          if (p > nbinp - 1 || p < 0) {
-            pCounter++;
+        for (int par = 0; par < c_nbinpar; par++) {
+          int p = (int)((XP8.at(i).m_momentum0.Mag() - c_pmin) / c_pwidth);
+          if (p > c_nbinp - 1 || p < 0) {
+            m_pCounter++;
             continue;
           }
           double sinTheta = abs(XP8.at(i).m_momentum0.Y()) / sqrt(pow(XP8.at(i).m_momentum0.Y(), 2) + pow(XP8.at(i).m_momentum0.Z(), 2));
-          int t = (int)((asin(sinTheta) - tmin) / pwidth);
-          if (t > nbint - 1 || t < 0) {
-            tCounter++;
+          int t = (int)((asin(sinTheta) - c_tmin) / c_pwidth);
+          if (t > c_nbint - 1 || t < 0) {
+            m_tCounter++;
             continue;
           }
           double deltaPar = deltaParEval(XP8.at(i), XP8.at(i + 1), (Eparameters)par);
-          if (deltaPar == OVER) continue;
-          histo.at(par).at(XP8.at(i).m_sensorLayer).at(XP8.at(i + 1).m_sensorLayer).at(t).at(p)->Fill(deltaPar);
+          if (deltaPar == c_over) continue;
+          m_histo.at(par).at(XP8.at(i).m_sensorLayer).at(XP8.at(i + 1).m_sensorLayer).at(t).at(p)->Fill(deltaPar);
           if (i == 0) {
             deltaPar = deltaParEval(XP8.at(i), XP8.at(i), (Eparameters)par, true);
-            if (deltaPar == OVER)continue;
-            histo.at(par).at(0).at(XP8.at(i).m_sensorLayer).at(t).at(p)->Fill(deltaPar);
+            if (deltaPar == c_over)continue;
+            m_histo.at(par).at(0).at(XP8.at(i).m_sensorLayer).at(t).at(p)->Fill(deltaPar);
           }
         }
       }
@@ -196,39 +197,39 @@ void NoKickCutsEvalModule::endRun()
   std::vector<std::vector<std::vector<std::vector<std::vector<double>>>>> cut_m;
   std::vector<std::vector<std::vector<std::vector<std::vector<double>>>>> cut_M;
 
-  for (int par = 0; par < nbinpar; par++) {
+  for (int par = 0; par < c_nbinpar; par++) {
     std::vector<std::vector<std::vector<std::vector<double>>>> cut_M_par;
     std::vector<std::vector<std::vector<std::vector<double>>>> cut_m_par;
-    for (int lay1 = 0; lay1 < nbinlay; lay1++) {
+    for (int lay1 = 0; lay1 < c_nbinlay; lay1++) {
       std::vector<std::vector<std::vector<double>>> cut_M_lay1;
       std::vector<std::vector<std::vector<double>>> cut_m_lay1;
-      for (int lay2 = 0; lay2 < nbinlay; lay2++) {
+      for (int lay2 = 0; lay2 < c_nbinlay; lay2++) {
         std::vector<std::vector<double>> cut_M_lay2;
         std::vector<std::vector<double>> cut_m_lay2;
-        for (int theta = 0; theta < nbint; theta++) {
+        for (int theta = 0; theta < c_nbint; theta++) {
           std::vector<double> cut_M_theta;
           std::vector<double> cut_m_theta;
-          for (int p = 0; p < nbinp; p++) {
+          for (int p = 0; p < c_nbinp; p++) {
 
             //--------------first method to evaluate cuts -------------------------//
             //  TF1 *fit_2gaus  = new TF1("fit_2gaus","[0]*TMath::Gaus(x,[1],[2], kTRUE)+[3]*TMath::Gaus(x,[4],[5],kTRUE)+[6]",-limit.at(par).at(lay1).at(lay2).at(theta).at(p),limit.at(par).at(lay1).at(lay2).at(theta).at(p));
             //
-            //  int N= histo.at(par).at(lay1).at(lay2).at(theta).at(p)->Integral();
-            //  double integral= histo.at(par).at(lay1).at(lay2).at(theta).at(p)->Integral();
-            //  int bin0 = nbin/2;
-            //  int n =histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(bin0);
+            //  int N= m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->Integral();
+            //  double integral= m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->Integral();
+            //  int bin0 = c_nbin/2;
+            //  int n =m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(bin0);
             //  double molt_sigma1=0.5;
             //  double molt_sigma2=2;
-            //  double sigma1=(double)molt_sigma1*(histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetStdDev());
-            //  double sigma2 =(double)molt_sigma2*(histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetStdDev());
+            //  double sigma1=(double)molt_sigma1*(m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetStdDev());
+            //  double sigma2 =(double)molt_sigma2*(m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetStdDev());
             //  double norm1 = sigma1*sqrt(2*3.1415)*0.9*n;
             //  double norm2 = sigma2*sqrt(2*3.1415)*0.1*n;
-            //  double mean1=(double)histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetMean();
-            //  double mean2=(double)histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetMean();
-            //  double bkg = (double)histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(2);
+            //  double mean1=(double)m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetMean();
+            //  double mean2=(double)m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetMean();
+            //  double bkg = (double)m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(2);
             //
             //  fit_2gaus->SetParameters(norm1,mean1,sigma1,norm2,mean2,sigma2,bkg);
-            //  histo.at(par).at(lay1).at(lay2).at(theta).at(p) -> Fit(fit_2gaus,"","",-limit.at(par).at(lay1).at(lay2).at(theta).at(p),limit.at(par).at(lay1).at(lay2).at(theta).at(p));
+            //  m_histo.at(par).at(lay1).at(lay2).at(theta).at(p) -> Fit(fit_2gaus,"","",-limit.at(par).at(lay1).at(lay2).at(theta).at(p),limit.at(par).at(lay1).at(lay2).at(theta).at(p));
             //  //double limit_M =3*(sqrt(fit_2gaus->GetParameter(2)*fit_2gaus->GetParameter(2))+fit_2gaus->GetParameter(1));
             //   cut_M_theta.push_back(3*(sqrt(fit_2gaus->GetParameter(2)*fit_2gaus->GetParameter(2))));
             //  // limit_m =3*(-sqrt(fit_2gaus->GetParameter(2)*fit_2gaus->GetParameter(2))+fit_2gaus->GetParameter(1));
@@ -237,27 +238,27 @@ void NoKickCutsEvalModule::endRun()
 
 
             //--------second method to evaluate (without fit)-----------------//
-            double integral = histo.at(par).at(lay1).at(lay2).at(theta).at(p)->Integral();
-            double sum_M = histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(nbin + 1);
-            double sum_m = histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(0);
-            double percent = 1 - cutFunction(p, pwidth);
+            double integral = m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->Integral();
+            double sum_M = m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(c_nbin + 1);
+            double sum_m = m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(0);
+            double percent = 1 - cutFunction(p, c_pwidth);
 
             int bin_m = 0;
-            int bin_M = nbin + 1;
+            int bin_M = c_nbin + 1;
             while (sum_m < integral * percent / 2) {
               bin_m++;
-              sum_m = sum_m + histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(bin_m);
+              sum_m = sum_m + m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(bin_m);
             }
             while (sum_M < integral * percent / 2) {
               bin_M--;
-              sum_M = sum_M + histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(bin_M);
+              sum_M = sum_M + m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinContent(bin_M);
             }
-            if (histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetEntries() < 100) {
+            if (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetEntries() < 100) {
               bin_m = 0;
-              bin_M = nbin + 1;
+              bin_M = c_nbin + 1;
             }
-            cut_M_theta.push_back(histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinCenter(bin_M));
-            cut_m_theta.push_back(histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinCenter(bin_m));
+            cut_M_theta.push_back(m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinCenter(bin_M));
+            cut_m_theta.push_back(m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetBinCenter(bin_m));
             //-----------------------END of second method ------------------------//
 
           }
@@ -288,19 +289,19 @@ void NoKickCutsEvalModule::endRun()
   std::vector<std::vector<std::vector<TH2F*>>> cut_M_histo;
   std::vector<std::vector<std::vector<TH2F*>>> cut_m_histo;
 
-  for (int par = 0; par < nbinpar; par++) {
+  for (int par = 0; par < c_nbinpar; par++) {
     std::vector<std::vector<TH2F*>> cut_M_histo_par;
     std::vector<std::vector<TH2F*>> cut_m_histo_par;
-    for (int lay1 = 0; lay1 < nbinlay; lay1++) {
+    for (int lay1 = 0; lay1 < c_nbinlay; lay1++) {
       std::vector<TH2F*> cut_M_histo_lay1;
       std::vector<TH2F*> cut_m_histo_lay1;
-      for (int lay2 = 0; lay2 < nbinlay; lay2++) {
-        cut_M_histo_lay1.push_back(new TH2F("CUTS_M_" + name_par.at(par) + Form("layer%d_%d", lay1, lay2),
-                                            "CUTS_M_" + name_par.at(par) + Form("_layer%d_%d", lay1, lay2), nbinp, c_pmin, c_pmax, nbint, tmin, tmax));
-        cut_m_histo_lay1.push_back(new TH2F("CUTS_m_" + name_par.at(par) + Form("layer%d_%d", lay1, lay2),
-                                            "CUTS_m_" + name_par.at(par) + Form("_layer%d_%d", lay1, lay2), nbinp, c_pmin, c_pmax, nbint, tmin, tmax));
-        for (int theta = 1; theta <= nbint; theta++) {
-          for (int p = 1; p <= nbinp; p++) {
+      for (int lay2 = 0; lay2 < c_nbinlay; lay2++) {
+        cut_M_histo_lay1.push_back(new TH2F("CUTS_M_" + m_namePar.at(par) + Form("layer%d_%d", lay1, lay2),
+                                            "CUTS_M_" + m_namePar.at(par) + Form("_layer%d_%d", lay1, lay2), c_nbinp, c_pmin, c_pmax, c_nbint, c_tmin, c_tmax));
+        cut_m_histo_lay1.push_back(new TH2F("CUTS_m_" + m_namePar.at(par) + Form("layer%d_%d", lay1, lay2),
+                                            "CUTS_m_" + m_namePar.at(par) + Form("_layer%d_%d", lay1, lay2), c_nbinp, c_pmin, c_pmax, c_nbint, c_tmin, c_tmax));
+        for (int theta = 1; theta <= c_nbint; theta++) {
+          for (int p = 1; p <= c_nbinp; p++) {
             cut_M_histo_lay1.at(lay2)->SetBinContent(p, theta, cut_M.at(par).at(lay1).at(lay2).at(theta - 1).at(p - 1));
             cut_m_histo_lay1.at(lay2)->SetBinContent(p, theta, cut_m.at(par).at(lay1).at(lay2).at(theta - 1).at(p - 1));
           }
@@ -326,21 +327,21 @@ void NoKickCutsEvalModule::endRun()
     std::vector<std::vector<std::vector<double>>> cut_out_norm_minmax;
     std::vector<std::vector<std::vector<double>>> cut_out_pow_minmax;
     std::vector<std::vector<std::vector<double>>> cut_out_bkg_minmax;
-    for (int par = 0; par < nbinpar; par++) {
+    for (int par = 0; par < c_nbinpar; par++) {
       std::vector<std::vector<double>> cut_out_norm_par;
       std::vector<std::vector<double>> cut_out_pow_par;
       std::vector<std::vector<double>> cut_out_bkg_par;
-      for (int lay1 = 0; lay1 < nbinlay; lay1++) {
+      for (int lay1 = 0; lay1 < c_nbinlay; lay1++) {
         std::vector<double> cut_out_norm_lay1;
         std::vector<double> cut_out_pow_lay1;
         std::vector<double> cut_out_bkg_lay1;
-        for (int lay2 = 0; lay2 < nbinlay; lay2++) {
+        for (int lay2 = 0; lay2 < c_nbinlay; lay2++) {
 
-          TF2* fit_MS  = new TF2("fit_MS", "[0]*1/(TMath::Power(x,[1])*TMath::Sqrt(TMath::Sin(y)))+[2]", c_pmin, c_pmax, tmin, tmax);
+          TF2* fit_MS  = new TF2("fit_MS", "[0]*1/(TMath::Power(x,[1])*TMath::Sqrt(TMath::Sin(y)))+[2]", c_pmin, c_pmax, c_tmin, c_tmax);
 
           double norm = cut_M.at(par).at(lay1).at(lay2).at(1).at(1);
           double Pow = 1;
-          double bkg = cut_M.at(par).at(lay1).at(lay2).at(1).at(nbinp - 1);
+          double bkg = cut_M.at(par).at(lay1).at(lay2).at(1).at(c_nbinp - 1);
           fit_MS->SetParameters(norm, Pow, bkg);
 
           if (minmax == 0) {
@@ -379,7 +380,7 @@ void NoKickCutsEvalModule::endRun()
 
 //----------------------------------------------VALIDATION PLOTS ------------------------------//
 
-  if (validationON) {
+  if (c_validationON) {
 
     TCanvas* c_empty = new TCanvas("c_empty", "c_empty", 800, 600);
     c_empty->cd();
@@ -390,11 +391,11 @@ void NoKickCutsEvalModule::endRun()
 
     for (int minmax = 0; minmax < 2; minmax++) {
       std::vector<std::vector<std::vector<TCanvas*>>> c_fit_minmax;
-      for (int par = 0; par < nbinpar; par++) {
+      for (int par = 0; par < c_nbinpar; par++) {
         std::vector<std::vector<TCanvas*>> c_fit_par;
-        for (int lay1 = 0; lay1 < nbinlay; lay1++) {
+        for (int lay1 = 0; lay1 < c_nbinlay; lay1++) {
           std::vector<TCanvas*> c_fit_lay1;
-          for (int lay2 = 0; lay2 < nbinlay; lay2++) {
+          for (int lay2 = 0; lay2 < c_nbinlay; lay2++) {
             TString name("c_");
             name += minmax;
             name += "_";
@@ -416,9 +417,9 @@ void NoKickCutsEvalModule::endRun()
     }
 
     for (int minmax = 0; minmax < 2; minmax++) {
-      for (int par = 0; par < nbinpar; par++) {
-        for (int lay1 = 0; lay1 < nbinlay; lay1++) {
-          for (int lay2 = 0; lay2 < nbinlay; lay2++) {
+      for (int par = 0; par < c_nbinpar; par++) {
+        for (int lay1 = 0; lay1 < c_nbinlay; lay1++) {
+          for (int lay2 = 0; lay2 < c_nbinlay; lay2++) {
 
             c_fit.at(minmax).at(par).at(lay1).at(lay2)->cd();
 
@@ -427,16 +428,16 @@ void NoKickCutsEvalModule::endRun()
               cut_m_histo.at(par).at(lay1).at(lay2)->GetXaxis()->SetTitle("Momentum [GeV/c]");
               cut_m_histo.at(par).at(lay1).at(lay2)->GetYaxis()->SetTitle("#theta [rad]");
               cut_m_histo.at(par).at(lay1).at(lay2)->SetTitle(Form("Cuts Fit, max, par=%d, lay1=%d, lay2=%d", par, lay1, lay2));
-              cut_m_histo.at(par).at(lay1).at(lay2)->GetYaxis()->SetRange(1, nbint - 1);
-              cut_m_histo.at(par).at(lay1).at(lay2)->GetXaxis()->SetRange(1, nbinp - 1);
+              cut_m_histo.at(par).at(lay1).at(lay2)->GetYaxis()->SetRange(1, c_nbint - 1);
+              cut_m_histo.at(par).at(lay1).at(lay2)->GetXaxis()->SetRange(1, c_nbinp - 1);
             }
             if (minmax == 1) {
               cut_M_histo.at(par).at(lay1).at(lay2)->Draw("LEGO2Z");
               cut_M_histo.at(par).at(lay1).at(lay2)->GetXaxis()->SetTitle("Momentum [GeV/c]");
               cut_M_histo.at(par).at(lay1).at(lay2)->GetYaxis()->SetTitle("#theta [rad]");
               cut_M_histo.at(par).at(lay1).at(lay2)->SetTitle(Form("Cuts Fit, min, par=%d, lay1=%d, lay2=%d", par, lay1, lay2));
-              cut_M_histo.at(par).at(lay1).at(lay2)->GetYaxis()->SetRange(1, nbint - 1);
-              cut_M_histo.at(par).at(lay1).at(lay2)->GetXaxis()->SetRange(1, nbinp - 1);
+              cut_M_histo.at(par).at(lay1).at(lay2)->GetYaxis()->SetRange(1, c_nbint - 1);
+              cut_M_histo.at(par).at(lay1).at(lay2)->GetXaxis()->SetRange(1, c_nbinp - 1);
             }
             if (lay1 > 2 && lay2 > 2) {
               if (lay2 - lay1 > 0 && ((lay2 - lay1) < 3 || (lay1 == 0 && lay2 == 3)))
@@ -449,9 +450,9 @@ void NoKickCutsEvalModule::endRun()
 
 //--------------uncomment to obtain an example of distribution ------------------//
     // std::vector<std::vector<TCanvas*>> c_dist_145;
-    // for(int theta =0; theta<=nbint; theta++){
+    // for(int theta =0; theta<=c_nbint; theta++){
     //   std::vector<TCanvas *> c_dist_theta;
-    //   for(int p =0; p<=nbinp; p++){
+    //   for(int p =0; p<=c_nbinp; p++){
     //     TString name("c_145");
     //     name += "_";
     //     name += theta;
@@ -463,13 +464,13 @@ void NoKickCutsEvalModule::endRun()
     //   c_dist_theta.clear();
     // }
     //
-    // for(int theta =0; theta<=nbint; theta++){
-    //   for(int p =0; p<=nbinp; p++){
+    // for(int theta =0; theta<=c_nbint; theta++){
+    //   for(int p =0; p<=c_nbinp; p++){
     //     c_dist_145.at(theta).at(p)->cd();
-    //     histo.at(1).at(4).at(5).at(theta).at(p)->Draw();
-    //     histo.at(1).at(4).at(5).at(theta).at(p)->GetXaxis()->SetTitle("Delta parameter [??]");
-    //     histo.at(1).at(4).at(5).at(theta).at(p)->GetYaxis()->SetTitle("Number of Events");
-    //     histo.at(1).at(4).at(5).at(theta).at(p)->SetTitle(Form("Delta Parameters distribution, par=%d, lay1=%d, lay2=%d, theta=%d, p=%d",1,4,5,theta,p));
+    //     m_histo.at(1).at(4).at(5).at(theta).at(p)->Draw();
+    //     m_histo.at(1).at(4).at(5).at(theta).at(p)->GetXaxis()->SetTitle("Delta parameter [??]");
+    //     m_histo.at(1).at(4).at(5).at(theta).at(p)->GetYaxis()->SetTitle("Number of Events");
+    //     m_histo.at(1).at(4).at(5).at(theta).at(p)->SetTitle(Form("Delta Parameters distribution, par=%d, lay1=%d, lay2=%d, theta=%d, p=%d",1,4,5,theta,p));
     //     c_dist_145.at(theta).at(p)->Print("NoKickCuts_validation_plots.pdf");
     //   }
     // }
@@ -487,15 +488,15 @@ void NoKickCutsEvalModule::endRun()
       std::vector<std::vector<std::vector<std::vector<std::vector<std::vector<TCanvas*>>>>>> c_dist;
       for (int minmax = 0; minmax < 2; minmax++) {
         std::vector<std::vector<std::vector<std::vector<std::vector<TCanvas*>>>>> c_dist_minmax;
-        for (int par = 0; par < nbinpar; par++) {
+        for (int par = 0; par < c_nbinpar; par++) {
           std::vector<std::vector<std::vector<std::vector<TCanvas*>>>> c_dist_par;
-          for (int lay1 = 0; lay1 < nbinlay; lay1++) {
+          for (int lay1 = 0; lay1 < c_nbinlay; lay1++) {
             std::vector<std::vector<std::vector<TCanvas*>>> c_dist_lay1;
-            for (int lay2 = 0; lay2 < nbinlay; lay2++) {
+            for (int lay2 = 0; lay2 < c_nbinlay; lay2++) {
               std::vector<std::vector<TCanvas*>> c_dist_lay2;
-              for (int theta = 0; theta < nbint; theta++) {
+              for (int theta = 0; theta < c_nbint; theta++) {
                 std::vector<TCanvas*> c_dist_theta;
-                for (int p = 0; p < nbinp; p++) {
+                for (int p = 0; p < c_nbinp; p++) {
                   TString name("c_");
                   name += minmax;
                   name += "_";
@@ -527,17 +528,17 @@ void NoKickCutsEvalModule::endRun()
       }
 
       for (int minmax = 0; minmax < 2; minmax++) {
-        for (int par = 0; par < nbinpar; par++) {
-          for (int lay1 = 0; lay1 < nbinlay; lay1++) {
-            for (int lay2 = 0; lay2 < nbinlay; lay2++) {
+        for (int par = 0; par < c_nbinpar; par++) {
+          for (int lay1 = 0; lay1 < c_nbinlay; lay1++) {
+            for (int lay2 = 0; lay2 < c_nbinlay; lay2++) {
               if (minmax == 0) {
-                for (int theta = 0; theta < nbint; theta++) {
-                  for (int p = 0; p < nbinp; p++) {
+                for (int theta = 0; theta < c_nbint; theta++) {
+                  for (int p = 0; p < c_nbinp; p++) {
                     c_dist.at(minmax).at(par).at(lay1).at(lay2).at(theta).at(p)->cd();
-                    histo.at(par).at(lay1).at(lay2).at(theta).at(p)->Draw();
-                    histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetXaxis()->SetTitle("Delta parameter [??]");
-                    histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetYaxis()->SetTitle("Number of Events");
-                    histo.at(par).at(lay1).at(lay2).at(theta).at(p)->SetTitle(
+                    m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->Draw();
+                    m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetXaxis()->SetTitle("Delta parameter [??]");
+                    m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetYaxis()->SetTitle("Number of Events");
+                    m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->SetTitle(
                       Form("Delta Parameters distribution, par=%d, lay1=%d, lay2=%d, theta=%d, p=%d", par, lay1, lay2, theta, p));
                     if (lay1 == 4 && lay2 == 5 && par == 1)
                       if (abs(lay1 - lay2) < 2) c_dist.at(minmax).at(par).at(lay1).at(lay2).at(theta).at(p)->Print("NoKickCuts_validation_plots.pdf");
@@ -557,9 +558,9 @@ void NoKickCutsEvalModule::endRun()
   }
 
   //------------------_DEBUG------------//
-  for (int g = 0; g < nbinp; g++) {
-    double p_out_mom = g * pwidth + c_pmin;
-    double t_out_theta = twidth + tmin;
+  for (int g = 0; g < c_nbinp; g++) {
+    double p_out_mom = g * c_pwidth + c_pmin;
+    double t_out_theta = c_twidth + c_tmin;
     std::cout << "momentum=" << p_out_mom << std::endl;
 
     std::cout << "d0, 3-4,  Min: " << cut_m.at(1).at(3).at(4).at(1).at(g) << std::endl;
@@ -585,15 +586,15 @@ void NoKickCutsEvalModule::endRun()
   }
 
   m_outputFile->cd();
-  for (int par = 0; par < nbinpar; par++) {
-    for (int lay1 = 0; lay1 < nbinlay; lay1++) {
-      for (int lay2 = 0; lay2 < nbinlay; lay2++) {
-        for (int theta = 0; theta < nbint; theta++) {
-          for (int p = 0; p < nbinp; p++) {
+  for (int par = 0; par < c_nbinpar; par++) {
+    for (int lay1 = 0; lay1 < c_nbinlay; lay1++) {
+      for (int lay2 = 0; lay2 < c_nbinlay; lay2++) {
+        for (int theta = 0; theta < c_nbint; theta++) {
+          for (int p = 0; p < c_nbinp; p++) {
             double layerdiff = lay2 - lay1;
             if (layerdiff >= 0 && (layerdiff < 3 || (lay1 == 0 && lay2 == 3))) {
-              if (histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetEntries() > 0) {
-                histo.at(par).at(lay1).at(lay2).at(theta).at(p)->Write();
+              if (m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->GetEntries() > 0) {
+                m_histo.at(par).at(lay1).at(lay2).at(theta).at(p)->Write();
               }
             }
           }
@@ -601,9 +602,9 @@ void NoKickCutsEvalModule::endRun()
       }
     }
   }
-  for (int par = 0; par < nbinpar; par++) {
-    for (int lay1 = 0; lay1 < nbinlay; lay1++) {
-      for (int lay2 = 0; lay2 < nbinlay; lay2++) {
+  for (int par = 0; par < c_nbinpar; par++) {
+    for (int lay1 = 0; lay1 < c_nbinlay; lay1++) {
+      for (int lay2 = 0; lay2 < c_nbinlay; lay2++) {
         for (int minmax = 0; minmax < 2; minmax++) {
           if (minmax == 0) {
             double layerdiff = lay2 - lay1;
@@ -626,18 +627,18 @@ void NoKickCutsEvalModule::endRun()
 
   //--------------------------------OUTPUT: histogram booking, filling -------------------//
 
-  TH3F* output_norm_m = new TH3F("output_norm_m", "output_norm_m", nbinpar, 0, 4, nbinlay, 0, 4, nbinlay, 0, 4);
-  TH3F* output_pow_m = new TH3F("output_pow_m", "output_pow_m", nbinpar, 0, 4, nbinlay, 0, 4, nbinlay, 0, 4);
-  TH3F* output_bkg_m = new TH3F("output_bkg_m", "output_bkg_m", nbinpar, 0, 4, nbinlay, 0, 4, nbinlay, 0, 4);
+  TH3F* output_norm_m = new TH3F("output_norm_m", "output_norm_m", c_nbinpar, 0, 4, c_nbinlay, 0, 4, c_nbinlay, 0, 4);
+  TH3F* output_pow_m = new TH3F("output_pow_m", "output_pow_m", c_nbinpar, 0, 4, c_nbinlay, 0, 4, c_nbinlay, 0, 4);
+  TH3F* output_bkg_m = new TH3F("output_bkg_m", "output_bkg_m", c_nbinpar, 0, 4, c_nbinlay, 0, 4, c_nbinlay, 0, 4);
 
-  TH3F* output_norm_M = new TH3F("output_norm_M", "output_norm_M", nbinpar, 0, 4, nbinlay, 0, 4, nbinlay, 0, 4);
-  TH3F* output_pow_M = new TH3F("output_pow_M", "output_pow_M", nbinpar, 0, 4, nbinlay, 0, 4, nbinlay, 0, 4);
-  TH3F* output_bkg_M = new TH3F("output_bkg_M", "output_bkg_M", nbinpar, 0, 4, nbinlay, 0, 4, nbinlay, 0, 4);
+  TH3F* output_norm_M = new TH3F("output_norm_M", "output_norm_M", c_nbinpar, 0, 4, c_nbinlay, 0, 4, c_nbinlay, 0, 4);
+  TH3F* output_pow_M = new TH3F("output_pow_M", "output_pow_M", c_nbinpar, 0, 4, c_nbinlay, 0, 4, c_nbinlay, 0, 4);
+  TH3F* output_bkg_M = new TH3F("output_bkg_M", "output_bkg_M", c_nbinpar, 0, 4, c_nbinlay, 0, 4, c_nbinlay, 0, 4);
 
 
-  for (int par = 0; par < nbinpar; par++) {
-    for (int lay1 = 0; lay1 < nbinlay; lay1++) {
-      for (int lay2 = 0; lay2 < nbinlay; lay2++) {
+  for (int par = 0; par < c_nbinpar; par++) {
+    for (int lay1 = 0; lay1 < c_nbinlay; lay1++) {
+      for (int lay2 = 0; lay2 < c_nbinlay; lay2++) {
         output_norm_m->SetBinContent(par, lay1, lay2, cut_out_norm.at(0).at(par).at(lay1).at(lay2));
         output_norm_M->SetBinContent(par, lay1, lay2, cut_out_norm.at(1).at(par).at(lay1).at(lay2));
 
@@ -658,9 +659,9 @@ void NoKickCutsEvalModule::endRun()
   output_bkg_m->Write();
   output_bkg_M->Write();
   //m_outputFile->Close();
-  std::cout << "number of spacepoint with theta out of limits=" << tCounter << std::endl;
-  std::cout << "number of spacepoint with momentum out of limits=" << pCounter << std::endl;
-  std::cout << "number of tracks cutted by global cuts=" << GlobCounter << std::endl;
+  std::cout << "number of spacepoint with theta out of limits=" << m_tCounter << std::endl;
+  std::cout << "number of spacepoint with momentum out of limits=" << m_pCounter << std::endl;
+  std::cout << "number of tracks cutted by global cuts=" << m_globCounter << std::endl;
 
 
 }

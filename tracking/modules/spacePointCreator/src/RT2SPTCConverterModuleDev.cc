@@ -133,11 +133,11 @@ void RT2SPTCConverterModule::event()
     if (m_noKickCutsFile.size() != 0) {
       bool passCut = m_trackSel->trackSelector(recoTrack);
       if (!passCut) {
-        n_cut++;
+        m_ncut++;
         m_momCut->Fill(recoTrack.getMomentumSeed().Mag());
         continue; //exclude tracks with catastrophic multiple scattering interactions
       } else {
-        n_pass++;
+        m_npass++;
         m_momSel->Fill(recoTrack.getMomentumSeed().Mag());
       }
     }
@@ -392,8 +392,8 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
 
 void RT2SPTCConverterModule::endRun()
 {
-  std::cout << "Number of Selected Tracks: " << n_pass << std::endl;
-  std::cout << "Number of Cutted Tracks: " << n_cut << std::endl;
+  std::cout << "Number of Selected Tracks: " << m_npass << std::endl;
+  std::cout << "Number of Cutted Tracks: " << m_ncut << std::endl;
 
   m_cMomentum->cd();
   m_momSel->Draw();

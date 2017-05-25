@@ -98,8 +98,8 @@ namespace Belle2 {
 
     NoKickRTSel* m_trackSel;
     std::string m_noKickCutsFile;
-    int n_cut = 0;
-    int n_pass = 0;
+    int m_ncut = 0;
+    int m_npass = 0;
     TFile* m_momentumTFile;
     TCanvas* m_cMomentum;
     TH1F* m_momSel;

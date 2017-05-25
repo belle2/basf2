@@ -60,7 +60,7 @@ namespace Belle2 {
     //  IP and the first hit.
     double deltaParEval(hitXP hit1, hitXP hit2, Eparameters par, bool is0 = false)
     {
-      double out = OVER;
+      double out = c_over;
       int layer1 = hit1.m_sensorLayer;
       int layer2 = hit2.m_sensorLayer;
       double layerdiff = layer2 - layer1;
@@ -126,29 +126,29 @@ namespace Belle2 {
 
     const double c_pmin = 0.025;
     const double c_pmax = 2.;
-    const double tmin = 17.*M_PI / 180.; //17 degrees
-    const double tmax = 5. / 6.*M_PI; //150 degrees
-    const int nbin = 5000;
-    const int nbinp = 40;
-    const int nbinpar = 5;
-    const int nbinlay = 7;//present IP too
-    const int nbint = 3;
-    double pwidth = (c_pmax - c_pmin) / (double)nbinp;
-    double twidth = (tmax - tmin) / (double)nbint;
-    const double ext_lim = 1;
-    const int OVER = 9999999;
-    int pCounter = 0;
-    int tCounter = 0;
-    int GlobCounter = 0;
-    bool validationON = 0;
+    const double c_tmin = 17.*M_PI / 180.; //17 degrees
+    const double c_tmax = 5. / 6.*M_PI; //150 degrees
+    const int c_nbin = 5000;
+    const int c_nbinp = 40;
+    const int c_nbinpar = 5;
+    const int c_nbinlay = 7;//present IP too
+    const int c_nbint = 3;
+    double c_pwidth = (c_pmax - c_pmin) / (double)c_nbinp;
+    double c_twidth = (c_tmax - c_tmin) / (double)c_nbint;
+    const double c_multLimit = 1;
+    const int c_over = 9999999;
+    int m_pCounter = 0;
+    int m_tCounter = 0;
+    int m_globCounter = 0;
+    bool c_validationON = 0;
 
     NoKickRTSel m_trackSel;
 
 
     TFile* m_outputFile;
-    std::vector<double> lim_temp;
-    std::vector<std::vector<std::vector<std::vector<std::vector<TH1F*>>>>> histo;
-    std::vector<TString> name_par = {
+    std::vector<double> m_histoLim;
+    std::vector<std::vector<std::vector<std::vector<std::vector<TH1F*>>>>> m_histo;
+    std::vector<TString> m_namePar = {
       "#omega",
       "d0",
       "#phi0",
@@ -156,7 +156,7 @@ namespace Belle2 {
       "tan#lambda"
     };
 
-    std::vector<TString> unit_par = {
+    std::vector<TString> m_unitPar = {
       "[cm^{-1}]",
       "[cm]",
       "[rad]",

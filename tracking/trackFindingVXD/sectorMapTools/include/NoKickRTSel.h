@@ -69,7 +69,7 @@ namespace Belle2 {
     NoKickCuts m_trackCuts;
     double m_pmax = 2.; //range analyzed with cuts
 
-    enum parameters {
+    enum Eparameters {
       omega,
       d0,
       phi0,
@@ -114,7 +114,7 @@ namespace Belle2 {
     bool trackSelector(const RecoTrack& track);
 
     // This method return true if a couple of hits resects the cuts constraints.
-    bool segmentSelector(hitXP hit1, hitXP hit2, std::vector<double> selCut, parameters par, bool is0 = false);
+    bool segmentSelector(hitXP hit1, hitXP hit2, std::vector<double> selCut, Eparameters par, bool is0 = false);
 
     // This method make some global cuts on the tracks (layer 3 and 6 required, d0 and z0 inside beam pipe).
     //Return false if this filter fails.

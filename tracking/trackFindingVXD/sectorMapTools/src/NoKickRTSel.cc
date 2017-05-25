@@ -122,7 +122,7 @@ bool NoKickRTSel::globalCut(const std::vector<hitXP>& track8)
   else return false;
 }
 
-bool NoKickRTSel::segmentSelector(hitXP hit1, hitXP hit2, std::vector<double> selCut, parameters par, bool is0)
+bool NoKickRTSel::segmentSelector(hitXP hit1, hitXP hit2, std::vector<double> selCut, Eparameters par, bool is0)
 {
   double deltaPar = 0;
   if (hit2.m_sensorLayer - hit1.m_sensorLayer > 1) return true;
@@ -213,17 +213,17 @@ bool NoKickRTSel::trackSelector(const RecoTrack& track)
 
     for (int j = 0; j < 5; j++) {
       std::vector<double> selCut = m_trackCuts.cutSelector(sinTheta, momentum, m_8hitTrack.at(i).m_sensorLayer,
-                                                           m_8hitTrack.at(i + 1).m_sensorLayer, (NoKickCuts::parameter) j);
-      bool goodSeg = segmentSelector(m_8hitTrack.at(i), m_8hitTrack.at(i + 1), selCut, (parameters) j);
+                                                           m_8hitTrack.at(i + 1).m_sensorLayer, (NoKickCuts::Eparameter) j);
+      bool goodSeg = segmentSelector(m_8hitTrack.at(i), m_8hitTrack.at(i + 1), selCut, (Eparameters) j);
 
       if (!goodSeg) {
         good = false;
       }
       if (i == 0) { //PXD crossing
         std::vector<double> selCut0 = m_trackCuts.cutSelector(sinTheta, momentum, 0, m_8hitTrack.at(i).m_sensorLayer,
-                                                              (NoKickCuts::parameter) j);
+                                                              (NoKickCuts::Eparameter) j);
 
-        bool goodSeg0 = segmentSelector(m_8hitTrack.at(i), m_8hitTrack.at(i), selCut, (parameters) j, true);
+        bool goodSeg0 = segmentSelector(m_8hitTrack.at(i), m_8hitTrack.at(i), selCut, (Eparameters) j, true);
         if (!goodSeg0) {
           good = false;
         }

@@ -57,7 +57,7 @@ void test2_1111440100(){
 
  TFile* sample = new TFile(inputfile);
  TTree* tree = (TTree*)sample->Get("B0");
- TFile* outputFile = new TFile("../1111440100_Validation.root","RECREATE");
+ TFile* outputFile = new TFile("1111440100_Validation.root","RECREATE");
 
  plot_dembc(sample, tree, outputFile);
  outputFile->Close();

@@ -79,6 +79,7 @@ namespace PrepBoardstackData {
     int curphase = Read_Register(hslb, CARRIER_IRSX_phaseRead, carrier, asic);
     cout << "current phase " << curphase << endl;
 
+    int maxTries = 20;
     while (curphase != phase) {
       Write_Asic_Direct_Register(hslb, carrier, asic, 179, 128 + 5 + 64);
       Write_Asic_Direct_Register(hslb, carrier, asic, 179, 5 + 64);
@@ -87,6 +88,12 @@ namespace PrepBoardstackData {
       Write_Register(hslb, CARRIER_IRSX_trigWidth1, 0x00FF0000, carrier, asic);
       curphase = Read_Register(hslb, CARRIER_IRSX_phaseRead, carrier, asic);
       cout << "current phase " << curphase << endl;
+      if (maxTries == 0) {
+        callback.log(LogFile::ERROR, StringUtil::form("could not find valid phase on asic %d carrier %d hslb %d", asic, carrier,
+                                                      hslb.get_finid()));
+        break;
+      }
+      maxTries--;
     }
 
     cout << "--> Current phase set to " << curphase << endl;
@@ -94,7 +101,8 @@ namespace PrepBoardstackData {
 
   void SetLookback(Belle2::HSLB& hslb, const int lookback)
   {
-    for (unsigned carrier = 0; carrier < 4; carrier++) {
+    int carriersDetected = Read_Register(hslb, SCROD_PS_carriersDetected, 0, 0);
+    for (unsigned carrier = 0; carrier < carriersDetected; carrier++) {
       for (unsigned asic = 0; asic < 4; asic++) {
         SetLookback(hslb, carrier, asic, lookback);
       }

@@ -78,10 +78,15 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=None):
     modularAnalysis.fillParticleList("K+:calib", trackcut, path=path)
     modularAnalysis.fillParticleList("p+:calib", trackcut, path=path)
     modularAnalysis.fillParticleList("gamma:calib", 'E>0.05', path=path)
+
+    calib_particle_list = []
+    calib_extraInfo_list = []
     # rho
     modularAnalysis.reconstructDecay('rho0:calib -> pi+:calib pi-:calib', 'abs(dM)<0.5', path=path)
     modularAnalysis.rankByLowest('rho0:calib', 'abs(dM)', 1, path=path)
     modularAnalysis.variablesToExtraInfo('rho0:calib', {'abs(dM)': 'rho0_dM'}, path=path)
+    calib_particle_list.append('rho0:calib')
+    calib_extraInfo_list.append('rho0_dM')
 
     # reconstruct intermediate state
     # D0->Kpi, D*->D0(Kpi) pi
@@ -92,6 +97,10 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=None):
     modularAnalysis.variablesToExtraInfo('D0:calib', {'abs(dM)': 'D0_dM'}, path=path)
     modularAnalysis.rankByLowest('D*+:calib', 'abs(dQ)', 1, path=path)
     modularAnalysis.variablesToExtraInfo('D*+:calib', {'abs(dQ)': 'Dstar_dQ'}, path=path)
+    calib_particle_list.append('D0:calib')
+    calib_extraInfo_list.append('D0_dM')
+    calib_particle_list.append('D*+:calib')
+    calib_extraInfo_list.append('Dstar_dQ')
 
     # Lambda0->p pi-, Xi-->Lambda0 pi-
     modularAnalysis.reconstructDecay('Lambda0:calib -> pi-:calib p+:calib', '', path=path)
@@ -103,6 +112,8 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=None):
     vertex.fitVertex('Xi-:calib', 0.001, fitter='kfitter', path=path)
     modularAnalysis.rankByHighest('Xi-:calib', 'chiProb', 1, path=path)
     modularAnalysis.variablesToExtraInfo('Xi-:calib', {'chiProb': 'Xi_chiProb'}, path=path)
+    calib_particle_list.append('Xi-:calib')
+    calib_extraInfo_list.append('Xi_chiProb')
 
     # Reconstruct D0(Kpi), D+(Kpipi), D*+(D0pi), B+(D0pi+), J/psi(ee/mumu) for hlt-dqm display
     stdFSParticles.stdPi(path=path)
@@ -111,36 +122,46 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=None):
     modularAnalysis.reconstructDecay('D0:dqm -> K-:std pi+:std', '1.8 < M < 1.92', path=path)
     vertex.vertexKFit('D0:dqm', 0.0, path=path)
     modularAnalysis.rankByHighest('D0:dqm', 'chiProb', 1, path=path)
-    modularAnalysis.variablesToExtraInfo('D0:dqm', {'M': 'D0_dqm_M'}, path=path)
+    modularAnalysis.variablesToExtraInfo('D0:dqm', {'M': 'dqm_D0_M'}, path=path)
+    calib_particle_list.append('D0:dqm')
+    calib_extraInfo_list.append('dqm_D0_M')
 
     # D*+->D0 pi-
     modularAnalysis.reconstructDecay('D*+:dqm -> D0:dqm pi+:std',
                                      '1.95 < M <2.05 and 0.0 < Q < 0.020 and 2.5 < useCMSFrame(p) < 5.5', path=path)
     vertex.vertexKFit('D*+:dqm', 0.0, path=path)
     modularAnalysis.rankByHighest('D*+:dqm', 'chiProb', 1, path=path)
-    modularAnalysis.variablesToExtraInfo('D*+:dqm', {'M': 'Dstar_dqm_M'}, path=path)
+    modularAnalysis.variablesToExtraInfo('D*+:dqm', {'M': 'dqm_Dstar_M'}, path=path)
+    calib_particle_list.append('D*+:dqm')
+    calib_extraInfo_list.append('dqm_Dstar_M')
 
     # D+ -> K- pi+ pi+
     modularAnalysis.reconstructDecay('D+:dqm -> K-:std pi+:std pi+:std', '1.8 < M < 1.92', path=path)
     vertex.vertexKFit('D+:dqm', 0.0, path=path)
     modularAnalysis.rankByHighest('D+:dqm', 'chiProb', 1, path=path)
-    modularAnalysis.variablesToExtraInfo('D+:dqm', {'M': 'Dplus_dqm_M'}, path=path)
+    modularAnalysis.variablesToExtraInfo('D+:dqm', {'M': 'dqm_Dplus_M'}, path=path)
+    calib_particle_list.append('D+:dqm')
+    calib_extraInfo_list.append('dqm_Dplus_M')
 
     # Jpsi-> ee
     modularAnalysis.fillParticleList('e+:good', 'eid > 0.2 and d0 < 2 and abs(z0) < 4 ', path=path)
     modularAnalysis.reconstructDecay('J/psi:dqm_ee -> e+:good e-:good', '2.9 < M < 3.2', path=path)
     vertex.massVertexKFit('J/psi:dqm_ee', 0.0, path=path)
     modularAnalysis.rankByHighest('J/psi:dqm_ee', 'chiProb', 1, path=path)
-    modularAnalysis.variablesToExtraInfo('J/psi:dqm_ee', {'M': 'Jpsi_dqm_ee_M'}, path=path)
+    modularAnalysis.variablesToExtraInfo('J/psi:dqm_ee', {'M': 'dqm_Jpsiee_M'}, path=path)
+    calib_particle_list.append('J/psi:dqm_ee')
+    calib_extraInfo_list.append('dqm_Jpsiee_M')
 
     # Jpsi-> mumu
     modularAnalysis.fillParticleList('mu+:good', 'muid > 0.2 and d0 < 2 and abs(z0) < 4 ', path=path)
     modularAnalysis.reconstructDecay('J/psi:dqm_mumu -> mu+:good mu-:good', '2.9 < M < 3.2', path=path)
     vertex.massVertexKFit('J/psi:dqm_mumu', 0.0, path=path)
     modularAnalysis.rankByHighest('J/psi:dqm_mumu', 'chiProb', 1, path=path)
-    modularAnalysis.variablesToExtraInfo('J/psi:dqm_mumu', {'M': 'Jpsi_dqm_mumu_M'}, path=path)
-
-    calibration_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="calib", cutIdentifiers=CALIB_CUTS)
+    modularAnalysis.variablesToExtraInfo('J/psi:dqm_mumu', {'M': 'dqm_Jpsimumu_M'}, path=path)
+    calib_particle_list.append('J/psi:dqm_mumu')
+    calib_extraInfo_list.append('dqm_Jpsimumu_M')
+    calibration_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="calib", cutIdentifiers=CALIB_CUTS,
+                                             calibParticleListName=calib_particle_list, calibExtraInfoName=calib_extraInfo_list)
 
     if store_array_debug_prescale is not None:
         calibration_cut_module.param("preScaleStoreDebugOutputToDataStore", store_array_debug_prescale)

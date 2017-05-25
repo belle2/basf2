@@ -217,9 +217,9 @@ namespace {
                                      pValue);
 
       const TMatrixDSym cov6_2 = uncertainHelix2.getCartesianCovariance(bZ);
-      for (int i : irange(0, 6)) {
-        for (int j : irange(0, 6)) {
-          EXPECT_NEAR(cov6(i, j), cov6_2(i, j), 1e-7);
+      for (int j : irange(0, 6)) {
+        for (int k : irange(0, 6)) {
+          EXPECT_NEAR(cov6(j, k), cov6_2(j, k), 1e-7);
         }
       }
     }
@@ -266,9 +266,9 @@ namespace {
       const TMatrixDSym cov5 = uncertainHelix2.getCovariance();
       EXPECT_EQ(-1, charge);
 
-      for (int i : irange(0, 5)) {
-        for (int j : irange(0, 5)) {
-          EXPECT_NEAR(expectedCov5(i, j), cov5(i, j), 1e-7);
+      for (int j : irange(0, 5)) {
+        for (int k : irange(0, 5)) {
+          EXPECT_NEAR(expectedCov5(j, k), cov5(j, k), 1e-7);
         }
       }
     }

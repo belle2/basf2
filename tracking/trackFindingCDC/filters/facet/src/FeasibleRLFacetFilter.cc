@@ -7,15 +7,20 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/filters/facet/FeasibleRLFacetFilter.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-FeasibleRLFacetFilter::FeasibleRLFacetFilter(bool hardRLCut) :
-  m_param_hardRLCut(hardRLCut)
+FeasibleRLFacetFilter::FeasibleRLFacetFilter(bool hardRLCut)
+  : m_param_hardRLCut(hardRLCut)
 {
 }
 
@@ -32,7 +37,7 @@ void FeasibleRLFacetFilter::exposeParameters(ModuleParamList* moduleParamList,
 
 CellState FeasibleRLFacetFilter::operator()(const CDCFacet& facet)
 {
-  if (isFeasible(facet)) {
+  if (this->isFeasible(facet)) {
     return 3;
   } else {
     return NAN;
@@ -41,10 +46,10 @@ CellState FeasibleRLFacetFilter::operator()(const CDCFacet& facet)
 
 bool FeasibleRLFacetFilter::isFeasible(const CDCRLWireHitTriple& rlWireHitTriple) const
 {
-  CDCRLWireHitTriple::Shape shape = rlWireHitTriple.getShape();
-  short oClockDelta = shape.getOClockDelta();
-  short absOClockDelta = std::abs(oClockDelta);
-  short cellExtend = shape.getCellExtend();
+  const CDCRLWireHitTriple::Shape shape = rlWireHitTriple.getShape();
+  const short oClockDelta = shape.getOClockDelta();
+  const short absOClockDelta = std::abs(oClockDelta);
+  const short cellExtend = shape.getCellExtend();
 
   if (cellExtend + absOClockDelta > 6) {
     // funny formula, but basically checks the triple to be a progressing forward and not turning back in itself.

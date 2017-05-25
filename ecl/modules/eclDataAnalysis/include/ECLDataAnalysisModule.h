@@ -68,7 +68,6 @@ namespace Belle2 {
     bool m_doTracking; /**< if true, info on tracking will be stored, job will fail if doTracking==1 and the tracking modules are not enabled at phyton level */
     bool m_doPureCsIStudy; /**< if true, info on pureCsI upgrade is stored*/
     bool m_doSimulation; /**< if true, info on Hits and SimHits is stored*/
-    bool m_doMC; /**< if true, MC info is stored*/
     std::string m_pure_clusters; /**< Pure CsI clusters StoreArray name*/
     std::string m_pure_digits; /**< Pure CsI digits StoreArray name*/
     std::string m_pure_cal_digits; /**< Pure CsI cal digits StoreArray name*/

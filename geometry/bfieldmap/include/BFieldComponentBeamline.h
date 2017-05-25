@@ -49,7 +49,7 @@ namespace Belle2 {
      * @param point The space point in Cartesian coordinates (x,y,z) in [cm] at which the magnetic field vector should be calculated.
      * @return The magnetic field vector at the given space point in [T]. Returns a zero vector TVector(0,0,0) if the space point lies outside the region described by the component.
      */
-    virtual TVector3 calculate(const TVector3& point) const;
+    virtual B2Vector3D calculate(const B2Vector3D& point) const;
 
     /**
      * Terminates the magnetic field component.
@@ -57,7 +57,21 @@ namespace Belle2 {
      */
     virtual void terminate();
 
-    bool isInRange(const TVector3&) const;
+    /**
+     * Check presence of beamline field at the specific space point in
+     * the detector coordinate frame
+     *
+     * @param point The space point in Cartesian coordinates (x,y,z)
+     * in [cm] at which the magnetic field presence is chcked
+     * @return true is in case of the magnetic field false -- otherwise
+     */
+    bool isInRange(const B2Vector3D& point) const;
+
+    /**
+     * BFieldComponentBeamline instance
+     *
+     * @return reference to the BFieldComponentBeamline instance
+     */
     static BFieldComponentBeamline& Instance();
 
     /**
@@ -123,11 +137,14 @@ namespace Belle2 {
     /** Offset required because the accelerator group defines the Belle center as zero. */
     double m_mapOffset{0};
     /** The min and max boundaries of the map region in r. */
-    double m_mapRegionR[2];
-    /** The sin and cos of the crossing angle of the beams   */
-    double m_sinBeamCrossAngle, m_cosBeamCrossAngle;
-    /** Actual magnetic field interpolation objects */
+    double m_mapRegionR[2] {0};
+    /** The sin of the crossing angle of the beams   */
+    double m_sinBeamCrossAngle{0};
+    /** The cos of the crossing angle of the beams   */
+    double m_cosBeamCrossAngle{1};
+    /** Actual magnetic field interpolation object for HER */
     BeamlineFieldMapInterpolation* m_her{0};
+    /** Actual magnetic field interpolation object for LER */
     BeamlineFieldMapInterpolation* m_ler{0};
   };
 

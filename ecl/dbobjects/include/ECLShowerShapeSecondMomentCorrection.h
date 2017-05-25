@@ -71,9 +71,9 @@ namespace Belle2 {
     void setCorrection(TGraph correction) {m_correction = correction;};
 
   private:
-    int m_hypothesisId; //<** Hypthesis Id */
-    int m_type; //<** Type (e.g. theta) */
-    TGraph m_correction; //<** TGraph that holds corrections*/
+    int m_hypothesisId; //**< Hypthesis Id */
+    int m_type; //**< Type (e.g. theta) */
+    TGraph m_correction; //** <TGraph that holds corrections*/
 
     // 1: Initial version
     ClassDef(ECLShowerShapeSecondMomentCorrection, 1); /**< ClassDef */

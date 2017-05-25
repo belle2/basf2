@@ -5,6 +5,7 @@ import logging
 import os
 import subprocess
 import stat
+import shutil
 
 
 class Cluster:
@@ -15,6 +16,27 @@ class Cluster:
         has finished execution
     - execute(job): Takes a job and executes it by sending it to the cluster
     """
+
+    @staticmethod
+    def is_supported():
+        """
+        Check if the bsub command is available
+        """
+        return shutil.which("bsub") is not None
+
+    @staticmethod
+    def name():
+        """
+        Returns name of this job contol
+        """
+        return "cluster"
+
+    @staticmethod
+    def description():
+        """
+        Returns description of this job control
+        """
+        return "Batch submission to bsub-based cluster"
 
     def __init__(self):
         """!

@@ -206,8 +206,12 @@ void TrackfitDQMModule::event()
       m_hNTracks->Fill("TrackCand, but no Track", 1.0);
       continue;
     }
-    if (!track->checkConsistency())
+
+    try {
+      track->checkConsistency();
+    } catch (genfit::Exception& e) {
       return;
+    }
 
     /* //Data integrity check:
     const genfit::TrackCand* candBackwards = DataStore::getRelatedToObj<genfit::TrackCand>(track, m_storeTrackCandName);

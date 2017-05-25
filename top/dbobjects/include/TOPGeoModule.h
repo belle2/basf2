@@ -310,7 +310,7 @@ namespace Belle2 {
     /** cache for translation vector (from internal to Belle II frame) */
     mutable TVector3* m_translation = 0;  //!
 
-    ClassDef(TOPGeoModule, 1); /**< ClassDef */
+    ClassDef(TOPGeoModule, 2); /**< ClassDef */
 
   };
 

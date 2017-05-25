@@ -28,6 +28,5 @@ namespace Belle2 {
       /// Static getter for an origin circle fitter
       static const CDCRiemannFitter& getOriginCircleFitter();
     };
-
   }
 }

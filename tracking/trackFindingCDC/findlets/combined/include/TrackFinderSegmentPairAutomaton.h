@@ -18,6 +18,8 @@
 
 #include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
+#include <tracking/trackFindingCDC/filters/segmentPairRelation/ChooseableSegmentPairRelationFilter.h>
+
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
@@ -26,9 +28,6 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Findlet implementing the track finding from segments using a cellular automaton over segment pairs
-    template <class ASegmentPairFilter,
-              class ASegmentPairRelationFilter,
-              class ATrackRelationFilter>
     class TrackFinderSegmentPairAutomaton : public Findlet<const CDCSegment2D, CDCTrack> {
 
     private:
@@ -37,75 +36,27 @@ namespace Belle2 {
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
-      TrackFinderSegmentPairAutomaton()
-      {
-        this->addProcessingSignalListener(&m_segmentPairCreator);
-        this->addProcessingSignalListener(&m_segmentPairRelationCreator);
-        this->addProcessingSignalListener(&m_trackCreatorSegmentPairAutomaton);
-        this->addProcessingSignalListener(&m_trackCreatorSingleSegments);
-        this->addProcessingSignalListener(&m_trackLinker);
-        this->addProcessingSignalListener(&m_trackOrienter);
-        this->addProcessingSignalListener(&m_segmentPairSwapper);
-
-        ModuleParamList moduleParamList;
-        const std::string prefix = "";
-        this->exposeParameters(&moduleParamList, prefix);
-        moduleParamList.getParameter<int>("SegmentPairRelationOnlyBest").setDefaultValue(1);
-
-        m_segmentPairs.reserve(100);
-        m_segmentPairRelations.reserve(100);
-        m_preLinkingTracks.reserve(20);
-        m_orientedTracks.reserve(20);
-      }
+      TrackFinderSegmentPairAutomaton();
 
       /// Short description of the findlet
-      std::string getDescription() final {
-        return "Generates tracks from segments using a cellular automaton built from segment pairs.";
-      }
+      std::string getDescription() final;
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
-        m_segmentPairCreator.exposeParameters(moduleParamList, prefixed(prefix, "SegmentPair"));
-        m_segmentPairRelationCreator.exposeParameters(moduleParamList, prefixed(prefix, "SegmentPairRelation"));
-        m_trackCreatorSegmentPairAutomaton.exposeParameters(moduleParamList, prefix);
-        m_trackCreatorSingleSegments.exposeParameters(moduleParamList, prefix);
-        m_trackLinker.exposeParameters(moduleParamList, prefixed(prefix, "TrackRelation"));
-        m_trackOrienter.exposeParameters(moduleParamList, prefix);
-        m_segmentPairSwapper.exposeParameters(moduleParamList, prefix);
-      }
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Signal the beginning of a new event
-      void beginEvent() final {
-        m_segmentPairs.clear();
-        m_segmentPairRelations.clear();
-        m_preLinkingTracks.clear();
-        m_orientedTracks.clear();
-        Super::beginEvent();
-      }
+      void beginEvent() final;
 
       /// Generates the tracks from segments
-      void
-      apply(const std::vector<CDCSegment2D>& inputSegments, std::vector<CDCTrack>& tracks) final {
-        m_segmentPairCreator.apply(inputSegments, m_segmentPairs);
-        m_segmentPairRelationCreator.apply(m_segmentPairs, m_segmentPairRelations);
-        m_trackCreatorSegmentPairAutomaton.apply(m_segmentPairs, m_segmentPairRelations, m_preLinkingTracks);
-
-        m_trackCreatorSingleSegments.apply(inputSegments, m_preLinkingTracks);
-
-        m_trackOrienter.apply(m_preLinkingTracks, m_orientedTracks);
-        m_trackLinker.apply(m_orientedTracks, tracks);
-
-        // Put the segment pairs on the DataStore
-        m_segmentPairSwapper.apply(m_segmentPairs);
-      }
+      void apply(const std::vector<CDCSegment2D>& inputSegments, std::vector<CDCTrack>& tracks) final;
 
     private:
       // Findlets
       /// Findlet responsible for the creation of segment pairs
-      SegmentPairCreator<ASegmentPairFilter> m_segmentPairCreator;
+      SegmentPairCreator m_segmentPairCreator;
 
       /// Findlet responsible for the creation of segment pairs relations of the CA.
-      WeightedRelationCreator<const CDCSegmentPair, ASegmentPairRelationFilter> m_segmentPairRelationCreator;
+      WeightedRelationCreator<const CDCSegmentPair, ChooseableSegmentPairRelationFilter> m_segmentPairRelationCreator;
 
       /// Reference to the relation filter to be used to construct the segment pair network.
       TrackCreatorSegmentPairAutomaton m_trackCreatorSegmentPairAutomaton;
@@ -114,7 +65,7 @@ namespace Belle2 {
       TrackCreatorSingleSegments m_trackCreatorSingleSegments;
 
       /// Findlet responsible for the linking of tracks
-      TrackLinker<ATrackRelationFilter> m_trackLinker;
+      TrackLinker m_trackLinker;
 
       /// Fixes the direction of flight of tracks by a simple chooseable heuristic.
       TrackOrienter m_trackOrienter;

@@ -9,68 +9,17 @@
 **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/utilities/Scalar.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /**
-     *  Class that behaves like T*.
-     *  Needed because you cannot inherit from T* directly in
-     *  a mixin based inheritance structure.
-     *  I cannot believe I have to write this in C++ though...
-     */
-    template<class T>
-    class Ptr {
-    public:
-      /// Wrap the pointer to an object.
-      explicit Ptr(T* obj) : m_obj(obj)
-      {}
-
-      /// Allow explicit unpacking.
-      operator T*& ()&
-      { return m_obj; }
-
-      /// Allow explicit unpacking.
-      operator T* const& () const&
-      { return m_obj; }
-
-      /// Mimic the original item pointer access.
-      T* operator->() const
-      { return m_obj;}
-
-      /// Dereferencing the pointer
-      T& operator*() const
-      { return *m_obj; }
-
-      /// Transport ordering of pointer
-      bool operator<(const Ptr<T>& rhs) const
-      { return m_obj < rhs.m_obj; }
-
-      /// Transport equality of pointer
-      bool operator==(const Ptr<T>& rhs) const
-      { return m_obj == rhs.m_obj; }
-
-    private:
-      /// Reference to the marked items.
-      T* m_obj;
-    };
+    /// Class that behaves like a pointer.
+    template<typename T>
+    using Ptr = ScalarToClass<T*>;
 
     /// Helper type function to replace a T* with Ptr<T> when needed.
     template<class T>
-    struct ReplaceStarWithPtrImpl {
-      /// Base implementation just forwards the original type.
-      using Type = T;
-    };
-
-    /// Helper type function to replace a T* with Ptr<T> when needed.
-    template<class T>
-    struct ReplaceStarWithPtrImpl<T*> {
-      /// Specilisation replaces T* with Ptr<T>.
-      using Type = Ptr<T>;
-    };
-
-    /// Helper type function to replace a T* with Ptr<T> when needed.
-    template<class T>
-    using StarToPtr = typename ReplaceStarWithPtrImpl<T>::Type;
-
+    using StarToPtr = ScalarToClass<T>;
   }
 }

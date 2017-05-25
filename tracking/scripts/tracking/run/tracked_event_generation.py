@@ -120,6 +120,7 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
 
                 tracking_coverage.pop("WhichParticles", None)
                 tracking_coverage.pop("EnergyCut", None)
+                tracking_coverage.pop("UseNLoops", None)
                 mc_track_matcher_module.param({
                     'mcRecoTracksStoreArrayName': 'MCRecoTracks',
                     'MinimalPurity': 0.66,
@@ -176,7 +177,11 @@ finder_modules_by_short_name = {
     'TrackFinderCDCLegendre': lambda path: (path.add_module('WireHitPreparer'),
                                             path.add_module('TrackFinderCDCLegendreTracking')),
     'SegmentFinderCDC': lambda path: (path.add_module('WireHitPreparer'),
-                                      path.add_module('SegmentFinderCDCFacetAutomaton')),
+                                      path.add_module('SegmentFinderCDCFacetAutomaton'),
+                                      path.add_module('TrackCreatorSingleSegments',
+                                                      MinimalHitsBySuperLayerId={sl_id: 0 for sl_id in range(9)}),
+                                      path.add_module('TrackExporter'),
+                                      ),
 }
 
 

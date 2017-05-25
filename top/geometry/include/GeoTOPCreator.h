@@ -187,6 +187,22 @@ namespace Belle2 {
       G4LogicalVolume* createSideRail(const TOPGeoQBB& geo, ESideRailType type);
 
       /**
+       * Assembles front-end electronics
+       * @param geo geometry description
+       * @param N number of board stacks per module
+       * @return assembly volume
+       */
+      G4AssemblyVolume* assembleFrontEnd(const TOPGeoBoardStack& geo, int N);
+
+      /**
+       * Creates board stack
+       * @param geo geometry description
+       * @param N number of board stacks per module
+       * @return logical volume
+       */
+      G4LogicalVolume* createBoardStack(const TOPGeoBoardStack& geo, int N);
+
+      /**
        * Assembles optical components (PMT array, prism and bar segments) along z
        * @param geo geometry description
        * @param pmtArray pre-created PMT array logical volume
@@ -295,6 +311,8 @@ namespace Belle2 {
       G4UnionSolid* m_moduleEnvelope = 0; /**< module envelope solid */
       G4LogicalVolume* m_pmtArray = 0; /**< PMT array logical volume */
       G4AssemblyVolume* m_qbb = 0; /**< QBB assembly volume */
+      G4AssemblyVolume* m_frontEnd = 0; /**< front-end electronics assembly volume */
+
     };
 
   } // namespace TOP

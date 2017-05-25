@@ -1,4 +1,3 @@
-
 #include <tracking/trackFindingCDC/config/CompileConfiguration.h>
 
 #pragma link off all globals;
@@ -8,8 +7,6 @@
 
 #ifdef TRACKFINDINGCDC_USE_ROOT_DICTIONARY
 
-//#pragma link C++ class Belle2::TrackFindingCDC::BaseFacetFilter-;
-
 #pragma link C++ class Belle2::TrackFindingCDC::MCFacetFilter-;
 
 #pragma link C++ class Belle2::TrackFindingCDC::AllFacetFilter-;
@@ -18,4 +15,3 @@
 #pragma link C++ class Belle2::TrackFindingCDC::RealisticFacetFilter-;
 
 #endif
-

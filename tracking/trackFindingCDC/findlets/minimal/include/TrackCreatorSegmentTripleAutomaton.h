@@ -24,15 +24,11 @@ namespace Belle2 {
 
     /// Findlet that generates tracks based on a cellular automaton of segment triples
     class TrackCreatorSegmentTripleAutomaton
-      : public Findlet<const CDCSegmentTriple,
-        const WeightedRelation<const CDCSegmentTriple>,
-        CDCTrack> {
+      : public Findlet<const CDCSegmentTriple, const WeightedRelation<const CDCSegmentTriple>, CDCTrack> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCSegmentTriple,
-            const WeightedRelation<const CDCSegmentTriple>,
-            CDCTrack>;
+      using Super = Findlet<const CDCSegmentTriple, const WeightedRelation<const CDCSegmentTriple>, CDCTrack>;
 
     public:
       /// Short description of the findlet
@@ -49,7 +45,7 @@ namespace Belle2 {
 
     private: // object pools
       /// Memory for the segment triple paths generated from the graph.
-      std::vector< Path<const CDCSegmentTriple> > m_segmentTriplePaths;
+      std::vector<Path<const CDCSegmentTriple>> m_segmentTriplePaths;
     };
   }
 }

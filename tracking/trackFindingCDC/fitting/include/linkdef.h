@@ -9,6 +9,7 @@
 #ifdef TRACKFINDINGCDC_USE_ROOT_DICTIONARY
 
 #pragma link C++ class Belle2::TrackFindingCDC::CDCObservations2D+;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCSZObservations+;
 
 #pragma link C++ class Belle2::TrackFindingCDC::RiemannsMethod-;
 #pragma link C++ class Belle2::TrackFindingCDC::ExtendedRiemannsMethod-;

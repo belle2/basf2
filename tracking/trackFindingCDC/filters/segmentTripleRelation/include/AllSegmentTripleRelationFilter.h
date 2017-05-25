@@ -22,9 +22,6 @@ namespace Belle2 {
       using Super = BaseSegmentTripleRelationFilter;
 
     public:
-      /// Importing all overloads from the super class
-      using Super::operator();
-
       /**
        *  Main filter method returning the weight of the neighborhood relation.
        *  Always return the overlap penatlty accepting all relations.

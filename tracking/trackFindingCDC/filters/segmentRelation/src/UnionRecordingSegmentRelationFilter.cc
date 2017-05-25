@@ -8,7 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentRelation/UnionRecordingSegmentRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentRelation/SegmentRelationVarSets.h>
+
+#include <tracking/trackFindingCDC/filters/segmentRelation/BasicSegmentRelationVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentRelation/HitGapSegmentRelationVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentRelation/FitlessSegmentRelationVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentRelation/FitSegmentRelationVarSet.h>
 
 #include <tracking/trackFindingCDC/filters/segmentRelation/MVAFeasibleSegmentRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentRelation/MVARealisticSegmentRelationFilter.h>

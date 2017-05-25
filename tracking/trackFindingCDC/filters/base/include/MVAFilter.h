@@ -10,10 +10,15 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
+
 #include <tracking/trackFindingCDC/mva/MVAExpert.h>
+
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+
+#include <framework/core/ModuleParamList.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

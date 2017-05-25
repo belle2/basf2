@@ -25,6 +25,7 @@ using namespace std;
 namespace io = boost::iostreams;
 namespace Belle2 {
 
+  /** Triangle structure */
   struct triangle_t {
     /** vertex indicies in a list of xy-points */
     short int j0, j1, j2;
@@ -32,41 +33,11 @@ namespace Belle2 {
     short int n0, n1, n2;
   };
 
+  /** A simple 2d vector stucture */
   struct xy_t {
-    double x, y;
+    double x; /**< x component */
+    double y; /**< y component */
   };
-
-  struct vector3_t {
-    double x, y, z;
-
-    vector3_t& operator +=(const vector3_t& u)
-    {
-      x += u.x;
-      y += u.y;
-      z += u.z;
-      return *this;
-    }
-  };
-
-  vector3_t operator +(const vector3_t& u, const vector3_t& v)
-  {
-    return {u.x + v.x, u.y + v.y, u.z + v.z};
-  }
-
-  vector3_t operator -(const vector3_t& u, const vector3_t& v)
-  {
-    return {u.x - v.x, u.y - v.y, u.z - v.z};
-  }
-
-  vector3_t operator *(const vector3_t& u, double a)
-  {
-    return {u.x * a, u.y * a, u.z * a};
-  }
-
-  vector3_t operator *(double a, const vector3_t& u)
-  {
-    return u * a;
-  }
 
   /**
    * The TriangularInterpolation class.
@@ -85,13 +56,16 @@ namespace Belle2 {
     /** returns list of triangles */
     const vector<triangle_t>& getTriangles() const { return m_triangles;}
 
+    /** Default constructor */
     TriangularInterpolation() {}
 
+    /** More complex constructor */
     TriangularInterpolation(vector<xy_t>& pc, vector<triangle_t>& ts, double d)
     {
       init(pc, ts, d);
     }
 
+    /** Destructor */
     ~TriangularInterpolation() {}
 
     /**
@@ -273,12 +247,21 @@ namespace Belle2 {
     /** Spatial index */
     vector<short int> m_spatialIndex;
     /** Border of the region where the spatial index is constructed */
-    double m_xmin, m_xmax;
-    double m_ymin, m_ymax;
+    double m_xmin;
+    /** Border of the region where the spatial index is constructed */
+    double m_xmax;
+    /** Border of the region where the spatial index is constructed */
+    double m_ymin;
+    /** Border of the region where the spatial index is constructed */
+    double m_ymax;
     /** Spatial index grid size */
-    unsigned int m_nx, m_ny;
+    unsigned int m_nx;
+    /** Spatial index grid size */
+    unsigned int m_ny;
     /** Reciprocals to speedup the index calculation */
-    double m_ixnorm, m_iynorm;
+    double m_ixnorm{1};
+    /** Reciprocals to speedup the index calculation */
+    double m_iynorm{1};
   };
 
   /**
@@ -292,8 +275,19 @@ namespace Belle2 {
    */
   class BeamlineFieldMapInterpolation {
   public:
+    /**
+     * Expose the triangular interpolation to outside
+     *
+     * @return constant reference to the interpolation
+     */
     const TriangularInterpolation& getTriangularInterpolation() const {return m_triInterpol;}
+    /**
+     * Default constructor
+     */
     BeamlineFieldMapInterpolation() {}
+    /**
+     * Default destructor
+     */
     ~BeamlineFieldMapInterpolation() {}
 
     /**
@@ -354,20 +348,19 @@ namespace Belle2 {
       struct cs_t {double c, s;};
       vector<cs_t> cs(nrphi);
       vector<xy_t> pc;
-      vector<vector3_t> tbc;
+      vector<B2Vector3D> tbc;
       pc.reserve(nrphi);
       char cbuf[256]; IN.getline(cbuf, 256);
-      double r, phi, Br, Bphi, Bz;
       double rmax = 0;
       for (int j = 0; j < nrphi; j++) {
         IN.getline(cbuf, 256);
         char* next = cbuf;
-        r    = strtod(next, &next);
-        phi  = strtod(next, &next);
+        double r    = strtod(next, &next);
+        double phi  = strtod(next, &next);
         strtod(next, &next);
-        Br   = strtod(next, &next);
-        Bphi = strtod(next, &next);
-        Bz   = strtod(next, NULL);
+        double Br   = strtod(next, &next);
+        double Bphi = strtod(next, &next);
+        double Bz   = strtod(next, NULL);
         r *= 100;
         rmax = std::max(r, rmax);
         if (phi == 0) {
@@ -451,10 +444,10 @@ namespace Belle2 {
 
       m_triInterpol.init(pc, ts, 0.1);
 
-      vector<vector3_t> bc(m_nxy * m_nz);
+      vector<B2Vector3F> bc(m_nxy * m_nz);
       unsigned int count = 0;
       for (int i = 0; i < nrphi; i++) {
-        if (ip[i]) bc[count++] = tbc[i];
+        if (ip[i]) bc[count++] = B2Vector3F(tbc[i]);
       }
 
       for (int i = 1; i < m_nz; ++i) {
@@ -465,13 +458,13 @@ namespace Belle2 {
           next = strchr(next, ' ');
           next = strchr(next + 1, ' ');
           next = strchr(next + 1, ' ');
-          Br   = strtod(next, &next);
-          Bphi = strtod(next, &next);
-          Bz   = strtod(next, NULL);
+          double Br   = strtod(next, &next);
+          double Bphi = strtod(next, &next);
+          double Bz   = strtod(next, NULL);
           if (cs[j].s == 0) Bphi = 0;
           double Bx = Br * cs[j].c - Bphi * cs[j].s;
           double By = Br * cs[j].s + Bphi * cs[j].c;
-          bc[count++] = {Bx, By, Bz};
+          bc[count++].SetXYZ(Bx, By, Bz);
         }
       }
       assert(count == bc.size());
@@ -520,10 +513,10 @@ namespace Belle2 {
      * [T]. Returns false if the space point lies outside the valid
      * region.
      */
-    bool inRange(const vector3_t& v) const
+    bool inRange(const B2Vector3D& v) const
     {
-      if (std::abs(v.z) > m_zmax) return false;
-      double R2 = v.x * v.x + v.y * v.y;
+      if (std::abs(v.z()) > m_zmax) return false;
+      double R2 = v.x() * v.x() + v.y() * v.y();
       if (R2 > m_rmax * m_rmax) return false;
       return true;
     }
@@ -537,30 +530,30 @@ namespace Belle2 {
      * [T]. Returns a zero vector (0,0,0) if the space point lies
      * outside the region described by the component.
      */
-    vector3_t interpolateField(const vector3_t& v) const
+    B2Vector3D interpolateField(const B2Vector3D& v) const
     {
-      vector3_t res = {0, 0, 0};
-      double R2 = v.x * v.x + v.y * v.y;
+      B2Vector3D res = {0, 0, 0};
+      double R2 = v.x() * v.x() + v.y() * v.y();
       if (R2 > m_rmax * m_rmax) return res;
       double wz1;
-      int iz = zIndexAndWeight(v.z, wz1);
+      int iz = zIndexAndWeight(v.z(), wz1);
       if (iz < 0) return res;
       double wz0 = 1 - wz1;
 
       if (R2 < m_rj2) { // triangular interpolation
-        xy_t xy = {v.x, std::abs(v.y)};
+        xy_t xy = {v.x(), std::abs(v.y())};
         double w0, w1, w2;
         short int it = m_triInterpol.findTriangle(xy);
         m_triInterpol.weights(it, xy, w0, w1, w2);
         vector<triangle_t>::const_iterator t = m_triInterpol.getTriangles().begin() + it;
         int j0 = t->j0, j1 = t->j1, j2 = t->j2;
-        const vector3_t* B = m_B.data() + m_nxy * iz;
-        vector3_t b = (B[j0] * w0 + B[j1] * w1 + B[j2] * w2) * wz0;
+        const B2Vector3F* B = m_B.data() + m_nxy * iz;
+        B2Vector3D b = (B[j0] * w0 + B[j1] * w1 + B[j2] * w2) * wz0;
         B += m_nxy; // next z-slice
         b += (B[j0] * w0 + B[j1] * w1 + B[j2] * w2) * wz1;
         res = b;
       } else {// r-phi grid
-        double r = sqrt(R2), phi = atan2(std::abs(v.y), v.x);
+        double r = sqrt(R2), phi = atan2(std::abs(v.y()), v.x());
         double fr = (r - m_rj) * m_idr;
         double fphi = phi * m_idphi;
 
@@ -579,54 +572,54 @@ namespace Belle2 {
         int j11 = j01 + nr1;
 
         double w00 = wr0 * wphi0, w01 = wphi0 * wr1, w10 = wphi1 * wr0, w11 = wphi1 * wr1;
-        const vector3_t* B = m_B.data() + m_nxy * iz;
-        vector3_t b = (B[j00] * w00 + B[j01] * w01 + B[j10] * w10 + B[j11] * w11) * wz0;
+        const B2Vector3F* B = m_B.data() + m_nxy * iz;
+        B2Vector3D b = (B[j00] * w00 + B[j01] * w01 + B[j10] * w10 + B[j11] * w11) * wz0;
         B += m_nxy; // next z-slice
         b += (B[j00] * w00 + B[j01] * w01 + B[j10] * w10 + B[j11] * w11) * wz1;
         res = b;
       }
-      if (v.y < 0) res.y = -res.y;
+      if (v.y() < 0) res.SetY(-res.y());
       return res;
     }
   protected:
     /** Buffer for the magnetic field map */
-    vector<vector3_t> m_B;
+    vector<B2Vector3F> m_B;
     /** Object to locate point in a triangular mesh */
     TriangularInterpolation m_triInterpol;
     /** Number of field points in XY plane */
-    int m_nxy;
+    int m_nxy{0};
     /** Number of field slices in Z direction */
-    int m_nz;
+    int m_nz{0};
     /** Start Z slice number for the finer Z grid */
-    int m_nz1;
+    int m_nz1{0};
     /** End Z slice number for the finer Z grid */
-    int m_nz2;
+    int m_nz2{0};
     /** Number of grid points in R direction */
-    int m_nr;
+    int m_nr{0};
     /** Number of grid points in Phi direction */
-    int m_nphi;
+    int m_nphi{0};
     /** Separation radius between triangular and cylindrical meshes */
-    double m_rj;
+    double m_rj{0};
     /** Square of the separation radius between triangular and cylindrical meshes */
-    double m_rj2;
+    double m_rj2{0};
     /** Z border of finer Z grid */
-    double m_zj;
+    double m_zj{0};
     /** Coarse Z grid pitch */
-    double m_dz0;
+    double m_dz0{0};
     /** Finer Z grid pitch */
-    double m_dz1;
+    double m_dz1{0};
     /** Inverse of coarse Z grid pitch */
-    double m_idz0;
+    double m_idz0{0};
     /** Inverse of finer Z grid pitch */
-    double m_idz1;
+    double m_idz1{0};
     /** Repciprocal of Phi grid */
-    double m_idphi;
+    double m_idphi{0};
     /** Repciprocal of R grid */
-    double m_idr;
+    double m_idr{0};
     /** Maximal radius where interpolation is still valid */
-    double m_rmax;
+    double m_rmax{0};
     /** Maximal Z where interpolation is still valid */
-    double m_zmax;
+    double m_zmax{0};
   };
 
   void BFieldComponentBeamline::initialize()
@@ -643,38 +636,37 @@ namespace Belle2 {
     if (m_her) delete m_her;
   }
 
-  bool BFieldComponentBeamline::isInRange(const TVector3& p) const
+  bool BFieldComponentBeamline::isInRange(const B2Vector3D& p) const
   {
     if (!m_ler || !m_her) return false;
     double s = m_sinBeamCrossAngle, c = m_cosBeamCrossAngle;
-    vector3_t v = { -p.x(), -p.y(), -p.z()}; // invert coordinates to match ANSYS one
-    double xc = v.x * c, zs = v.z * s, zc = v.z * c, xs = v.x * s;
-    vector3_t hv = {xc - zs, v.y, zc + xs};
-    vector3_t lv = {xc + zs, v.y, zc - xs};
+    B2Vector3D v = -p; // invert coordinates to match ANSYS one
+    double xc = v.x() * c, zs = v.z() * s, zc = v.z() * c, xs = v.x() * s;
+    B2Vector3D hv{xc - zs, v.y(), zc + xs};
+    B2Vector3D lv{xc + zs, v.y(), zc - xs};
     return m_ler->inRange(lv) || m_her->inRange(hv);
   }
 
-  TVector3 BFieldComponentBeamline::calculate(const TVector3& p) const
+  B2Vector3D BFieldComponentBeamline::calculate(const B2Vector3D& p) const
   {
-    TVector3 res;
+    B2Vector3D res;
     double s = m_sinBeamCrossAngle, c = m_cosBeamCrossAngle;
-    vector3_t v = { -p.x(), -p.y(), -p.z()}; // invert coordinates to match ANSYS one
-    double xc = v.x * c, zs = v.z * s, zc = v.z * c, xs = v.x * s;
-    vector3_t hv = {xc - zs, v.y, zc + xs};
-    vector3_t lv = {xc + zs, v.y, zc - xs};
-    vector3_t hb = m_her->interpolateField(hv);
-    vector3_t lb = m_ler->interpolateField(lv);
-    vector3_t rhb = {hb.x* c + hb.z * s, hb.y,  hb.z* c - hb.x * s};
-    vector3_t rlb = {lb.x* c - lb.z * s, lb.y,  lb.z* c + lb.x * s};
+    B2Vector3D v = -p; // invert coordinates to match ANSYS one
+    double xc = v.x() * c, zs = v.z() * s, zc = v.z() * c, xs = v.x() * s;
+    B2Vector3D hv{xc - zs, v.y(), zc + xs};
+    B2Vector3D lv{xc + zs, v.y(), zc - xs};
+    B2Vector3D hb = m_her->interpolateField(hv);
+    B2Vector3D lb = m_ler->interpolateField(lv);
+    B2Vector3D rhb{hb.x()* c + hb.z()* s, hb.y(),  hb.z()* c - hb.x()* s};
+    B2Vector3D rlb{lb.x()* c - lb.z()* s, lb.y(),  lb.z()* c + lb.x()* s};
 
-    double mhb = std::abs(rhb.x) + std::abs(rhb.y) + std::abs(rhb.z);
-    double mlb = std::abs(rlb.x) + std::abs(rlb.y) + std::abs(rlb.z);
+    double mhb = std::abs(rhb.x()) + std::abs(rhb.y()) + std::abs(rhb.z());
+    double mlb = std::abs(rlb.x()) + std::abs(rlb.y()) + std::abs(rlb.z());
 
-    if (mhb < 1e-10) res.SetXYZ(rlb.x, rlb.y, rlb.z);
-    else if (mlb < 1e-10) res.SetXYZ(rhb.x, rhb.y, rhb.z);
+    if (mhb < 1e-10) res = rlb;
+    else if (mlb < 1e-10) res = rhb;
     else {
-      vector3_t t = 0.5 * (rlb + rhb);
-      res.SetXYZ(t.x, t.y, t.z);
+      res = 0.5 * (rlb + rhb);
     }
     return res;
   }

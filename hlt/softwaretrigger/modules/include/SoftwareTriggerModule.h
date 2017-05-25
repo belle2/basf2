@@ -99,6 +99,13 @@ namespace Belle2 {
 
       /// Helper function to store the calculated variables from the calculation either in the TTree or in the data store.
       void makeDebugOutput();
+
+      /// the name list of particles for the calibration and dqm
+      std::vector<std::string> m_particlename;
+
+      /// the extra info name attached to the particles
+      std::vector<std::string> m_extrainfoname;
+
     };
   }
 }

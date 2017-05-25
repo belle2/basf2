@@ -625,6 +625,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       B2DEBUG(175, "old phi: " << oldshowerposition->Phi());
       B2DEBUG(175, "old R: " << oldshowerposition->Mag());
       B2DEBUG(175, "old energy: " << energyEstimation);
+      delete oldshowerposition;
 
       // New position (with reduced number of neighbours)
       // There are some cases where high backgrounds fake local maxima and the splitted centroid position is far
@@ -637,6 +638,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       B2DEBUG(175, "new theta: " << showerposition->Theta());
       B2DEBUG(175, "new phi: " << showerposition->Phi());
       B2DEBUG(175, "new R: " << showerposition->Mag());
+      delete showerposition;
 
       // Get Energy, if requested, set weights to zero for energy calculation.
       double showerEnergy = 0.0;

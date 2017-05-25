@@ -79,7 +79,7 @@ void BFieldComponent3d::initialize()
         Br   = strtod(tmp + 33, &next);
         Bphi = strtod(next, &next);
         Bz   = strtod(next, NULL);
-        m_bmap.push_back({ -Br, -Bphi, -Bz});
+        m_bmap.emplace_back(-Br, -Bphi, -Bz);
       }
     }
   }
@@ -92,10 +92,10 @@ void BFieldComponent3d::initialize()
       for (int i = 0; i < m_mapSize[0]; i++, r += m_gridPitch[0]) { // r
         if (!(r >= m_errRegionR[0] && r < m_errRegionR[1])) { it += m_mapSize[1];  continue;}
         for (int j = 0;  j < m_mapSize[1]; j++) { // phi
-          vector3_t& B = *it;
-          B.x *= m_errB[0];
-          B.y *= m_errB[1];
-          B.z *= m_errB[2];
+          B2Vector3F& B = *it;
+          B.SetX(B.x() * m_errB[0]);
+          B.SetY(B.y() * m_errB[1]);
+          B.SetZ(B.z() * m_errB[2]);
         }
       }
     }
@@ -108,7 +108,7 @@ void BFieldComponent3d::initialize()
   B2INFO(Form("BField3d:: final map region & pitch: r [%.2e,%.2e] %.2e, phi %.2e, z [%.2e,%.2e] %.2e",
               m_mapRegionR[0], m_mapRegionR[1], m_gridPitch[0], m_gridPitch[1],
               m_mapRegionZ[0], m_mapRegionZ[1], m_gridPitch[2]));
-  B2INFO("Memory consumption: " << m_bmap.size()*sizeof(vector3_t) / (1024 * 1024.) << " Mb");
+  B2INFO("Memory consumption: " << m_bmap.size()*sizeof(B2Vector3F) / (1024 * 1024.) << " Mb");
 }
 
 namespace {
@@ -183,7 +183,7 @@ namespace {
   }
 }
 
-TVector3 BFieldComponent3d::calculate(const TVector3& point) const
+B2Vector3D BFieldComponent3d::calculate(const B2Vector3D& point) const
 {
   auto getPhiIndexWeight = [this](double y, double x, double & wphi) -> unsigned int {
     double phi = fast_atan2_minimax<4>(y, x);
@@ -194,7 +194,7 @@ TVector3 BFieldComponent3d::calculate(const TVector3& point) const
     return iphi;
   };
 
-  TVector3 B(0, 0, 0);
+  B2Vector3D B(0, 0, 0);
 
   // If both '3d' and 'Beamline' components are defined in xml file,
   // '3d' component returns zero field where 'Beamline' component is defined.
@@ -236,16 +236,16 @@ TVector3 BFieldComponent3d::calculate(const TVector3& point) const
     unsigned int iphi = getPhiIndexWeight(ay, point.x(), wphi);
 
     // Get B-field values from map
-    vector3_t b = interpolate(ir, iphi, iz, wr, wphi, wz); // in cylindrical system
+    B2Vector3D b = interpolate(ir, iphi, iz, wr, wphi, wz); // in cylindrical system
     double norm = 1 / r;
     double s = ay * norm, c = point.x() * norm;
-    vector3_t bc = { -(b.x * c - b.y * s), -(b.x * s + b.y * c), b.z}; // in cartesian system
-    if (point.y() < 0) bc.y = -bc.y;
-    B.SetXYZ(bc.x, bc.y, bc.z);
+    // Flip sign of By if y<0
+    const double sgny = (point.y() >= 0) - (point.y() < 0);
+    // in cartesian system
+    B.SetXYZ(-(b.x() * c - b.y() * s), -sgny * (b.x() * s + b.y() * c), b.z());
   } else {
-    // Get B-field values from map
-    vector3_t b = interpolate(0, 0, iz, 0, 0, wz); // in cylindrical system
-    B.SetXYZ(b.x, b.y, b.z);// in cartesian system assuming phi=0, so Bx = Br and By = Bphi
+    // Get B-field values from map in cartesian system assuming phi=0, so Bx = Br and By = Bphi
+    B = interpolate(0, 0, iz, 0, 0, wz);
   }
 
   return B;
@@ -255,18 +255,8 @@ void BFieldComponent3d::terminate()
 {
 }
 
-inline BFieldComponent3d::vector3_t operator*(const BFieldComponent3d::vector3_t& v, double a)
-{
-  return {v.x * a, v.y * a, v.z * a};
-}
-
-inline BFieldComponent3d::vector3_t operator+(const BFieldComponent3d::vector3_t& v, const BFieldComponent3d::vector3_t& u)
-{
-  return {v.x + u.x, v.y + u.y, v.z + u.z};
-}
-
-BFieldComponent3d::vector3_t BFieldComponent3d::interpolate(unsigned int ir, unsigned int iphi, unsigned int iz,
-                                                            double wr1, double wphi1, double wz1) const
+B2Vector3D BFieldComponent3d::interpolate(unsigned int ir, unsigned int iphi, unsigned int iz,
+                                          double wr1, double wphi1, double wz1) const
 {
   const unsigned int strideZ = m_mapSize[0] * m_mapSize[1];
   const unsigned int strideR = m_mapSize[1];
@@ -281,9 +271,8 @@ BFieldComponent3d::vector3_t BFieldComponent3d::interpolate(unsigned int ir, uns
   unsigned int j110 = j010 + strideZ;
   unsigned int j111 = j011 + strideZ;
   double w00 = wphi0 * wr0, w10 = wphi0 * wr1, w01 = wphi1 * wr0, w11 = wphi1 * wr1;
-  const vector<vector3_t>& B = m_bmap;
-  vector3_t b =
+  const vector<B2Vector3F>& B = m_bmap;
+  return
     (B[j000] * w00 + B[j001] * w01 + B[j010] * w10 + B[j011] * w11) * wz0 +
     (B[j100] * w00 + B[j101] * w01 + B[j110] * w10 + B[j111] * w11) * wz1;
-  return b;
 }

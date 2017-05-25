@@ -26,12 +26,12 @@ std::string TrackCreatorSingleSegments::getDescription()
 
 void TrackCreatorSingleSegments::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(prefixed(prefix, "MinimalHitsForSingleSegmentTrackBySuperLayerId"),
-                                m_param_minimalHitsForSingleSegmentTrackBySuperLayerId,
+  moduleParamList->addParameter(prefixed(prefix, "MinimalHitsBySuperLayerId"),
+                                m_param_minimalHitsBySuperLayerId,
                                 "Map of super layer ids to minimum hit number, "
                                 "for which left over segments shall be forwarded as tracks, "
                                 "if the exceed the minimal hit requirement. Default empty.",
-                                m_param_minimalHitsForSingleSegmentTrackBySuperLayerId);
+                                m_param_minimalHitsBySuperLayerId);
 }
 
 void TrackCreatorSingleSegments::apply(const std::vector<CDCSegment2D>& segments,
@@ -52,13 +52,13 @@ void TrackCreatorSingleSegments::apply(const std::vector<CDCSegment2D>& segments
     segment.receiveMaskedFlag();
   }
 
-  if (not m_param_minimalHitsForSingleSegmentTrackBySuperLayerId.empty()) {
+  if (not m_param_minimalHitsBySuperLayerId.empty()) {
     for (const CDCSegment2D& segment : segments) {
       if (segment.getAutomatonCell().hasMaskedFlag()) continue;
 
       ISuperLayer iSuperLayer = segment.getISuperLayer();
-      if (m_param_minimalHitsForSingleSegmentTrackBySuperLayerId.count(iSuperLayer) and
-          segment.size() >= m_param_minimalHitsForSingleSegmentTrackBySuperLayerId[iSuperLayer]) {
+      if (m_param_minimalHitsBySuperLayerId.count(iSuperLayer) and
+          segment.size() >= m_param_minimalHitsBySuperLayerId[iSuperLayer]) {
 
         if (segment.getTrajectory2D().isFitted()) {
           tracks.push_back(CDCTrack(segment));

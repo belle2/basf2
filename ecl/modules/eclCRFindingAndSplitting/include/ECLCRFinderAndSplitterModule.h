@@ -60,8 +60,13 @@ namespace Belle2 {
       /** Event number */
       int    m_nEvent;
 
+      /** Calibrated digits */
       StoreArray<ECLCalDigit> m_eclCalDigits;
+
+      /** Showers */
       StoreArray<ECLShower> m_eclShowers;
+
+      /** Connected Regions (CRs) */
       StoreArray<ECLConnectedRegion> m_eclCRs;
     public:
       /** We need names for the data objects to differentiate between PureCsI and default*/

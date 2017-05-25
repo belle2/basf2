@@ -13,9 +13,11 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
+#include <framework/core/ModuleParamList.h>
+#include <framework/logging/Logger.h>
+
 #include <string>
 #include <memory>
-#include <cassert>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

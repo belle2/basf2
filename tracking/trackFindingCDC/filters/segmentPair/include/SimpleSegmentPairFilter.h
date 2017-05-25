@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/segmentPair/BaseSegmentPairFilter.h>
+
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
 namespace Belle2 {
@@ -20,11 +21,7 @@ namespace Belle2 {
     class SimpleSegmentPairFilter : public Filter<CDCSegmentPair> {
 
     public:
-      /// Constructor
-      SimpleSegmentPairFilter();
-
       /// Checks if a pair of segments is a good combination
-
       Weight operator()(const CDCSegmentPair& segmentPair) final;
 
       /// Returns the trajectory of the segment. Also fits it if necessary.
@@ -45,8 +42,6 @@ namespace Belle2 {
     private:
       /// Memory of the Riemann fitter for the circle fits.
       CDCRiemannFitter m_riemannFitter;
-
     };
-
   }
 }

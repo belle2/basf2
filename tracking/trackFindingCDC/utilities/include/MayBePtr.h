@@ -9,8 +9,6 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Ptr.h>
-
 namespace Belle2 {
   namespace TrackFindingCDC {
 

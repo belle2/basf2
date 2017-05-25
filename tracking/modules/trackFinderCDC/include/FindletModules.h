@@ -35,24 +35,11 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCreatorSingleSegments.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/TrackLinker.h>
+#include <tracking/trackFindingCDC/findlets/minimal/TrackCombiner.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackOrienter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackFlightTimeAdjuster.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackExporter.h>
-
-#include <tracking/trackFindingCDC/filters/wireHitRelation/PrimaryWireHitRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/cluster/ChooseableClusterFilter.h>
-#include <tracking/trackFindingCDC/filters/facet/ChooseableFacetFilter.h>
-#include <tracking/trackFindingCDC/filters/facetRelation/ChooseableFacetRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentRelation/ChooseableSegmentRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/ChooseableSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentPairRelation/ChooseableSegmentPairRelationFilter.h>
-
-#include <tracking/trackFindingCDC/filters/axialSegmentPair/ChooseableAxialSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentTriple/ChooseableSegmentTripleFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentTripleRelation/ChooseableSegmentTripleRelationFilter.h>
-
-#include <tracking/trackFindingCDC/filters/trackRelation/ChooseableTrackRelationFilter.h>
 
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 
@@ -95,10 +82,10 @@ namespace Belle2 {
     /**
      * Module implementation using the ClusterRefiner
      */
-    class ClusterRefinerModule : public FindletModule<ClusterRefiner<>> {
+    class ClusterRefinerModule : public FindletModule<ClusterRefiner<BridgingWireHitRelationFilter>> {
 
       /// Type of the base class
-      using Super = FindletModule<ClusterRefiner<>>;
+      using Super = FindletModule<ClusterRefiner<BridgingWireHitRelationFilter>>;
 
     public:
       /// Constructor setting the default store vector names
@@ -111,10 +98,10 @@ namespace Belle2 {
     /**
      * Module implementation using the ClusterBackgroundDetector
      */
-    class ClusterBackgroundDetectorModule
-      : public FindletModule<ClusterBackgroundDetector<ChooseableClusterFilter>> {
+    class ClusterBackgroundDetectorModule : public FindletModule<ClusterBackgroundDetector> {
+
       /// Type of the base class
-      using Super = FindletModule<ClusterBackgroundDetector<ChooseableClusterFilter>>;
+      using Super = FindletModule<ClusterBackgroundDetector>;
 
     public:
       /// Constructor setting the default store vector names
@@ -127,10 +114,10 @@ namespace Belle2 {
     /**
      * Module implementation using the ChooseableFacetFilter
      */
-    class FacetCreatorModule : public FindletModule<FacetCreator<ChooseableFacetFilter>> {
+    class FacetCreatorModule : public FindletModule<FacetCreator> {
 
       /// Type of the base class
-      using Super = FindletModule<FacetCreator<ChooseableFacetFilter>>;
+      using Super = FindletModule<FacetCreator>;
 
     public:
       /// Constructor setting the default store vector names
@@ -159,8 +146,7 @@ namespace Belle2 {
     /**
      * Module implementation using the SegmentLinker
      */
-    class SegmentLinkerModule
-      : public FindletModule<SegmentLinker<ChooseableSegmentRelationFilter>> {
+    class SegmentLinkerModule : public FindletModule<SegmentLinker> {
     };
 
     /**
@@ -200,8 +186,7 @@ namespace Belle2 {
     /**
      * Module implementation using the AxialTrackCreatorSegmentHoughModule
      */
-    class AxialTrackCreatorSegmentHoughModule
-      : public FindletModule<AxialTrackCreatorSegmentHough> {
+    class AxialTrackCreatorSegmentHoughModule : public FindletModule<AxialTrackCreatorSegmentHough> {
 
       /// Type of the base class
       using Super = FindletModule<AxialTrackCreatorSegmentHough>;
@@ -217,11 +202,10 @@ namespace Belle2 {
     /**
      * Module implementation using the ChooseableAxialSegmentPairFilter
      */
-    class AxialSegmentPairCreatorModule
-      : public FindletModule<AxialSegmentPairCreator<ChooseableAxialSegmentPairFilter>> {
+    class AxialSegmentPairCreatorModule : public FindletModule<AxialSegmentPairCreator> {
 
       /// Type of the base class
-      using Super = FindletModule<AxialSegmentPairCreator<ChooseableAxialSegmentPairFilter>>;
+      using Super = FindletModule<AxialSegmentPairCreator>;
 
     public:
       /// Constructor setting the default store vector names
@@ -234,11 +218,10 @@ namespace Belle2 {
     /**
      * Module implementation using the ChooseableSegmentPairFilter
      */
-    class SegmentPairCreatorModule
-      : public FindletModule<SegmentPairCreator<ChooseableSegmentPairFilter>> {
+    class SegmentPairCreatorModule : public FindletModule<SegmentPairCreator> {
 
       /// Type of the base class
-      using Super = FindletModule<SegmentPairCreator<ChooseableSegmentPairFilter>>;
+      using Super = FindletModule<SegmentPairCreator>;
 
     public:
       /// Constructor setting the default store vector names
@@ -251,11 +234,10 @@ namespace Belle2 {
     /**
      * Module implementation using the ChooseableSegmentTripleFilter
      */
-    class SegmentTripleCreatorModule
-      : public FindletModule<SegmentTripleCreator<ChooseableSegmentTripleFilter>> {
+    class SegmentTripleCreatorModule : public FindletModule<SegmentTripleCreator> {
 
       /// Type of the base class
-      using Super = FindletModule<SegmentTripleCreator<ChooseableSegmentTripleFilter>>;
+      using Super = FindletModule<SegmentTripleCreator>;
 
     public:
       /// Constructor setting the default store vector names
@@ -268,8 +250,7 @@ namespace Belle2 {
     /**
      * Module implementation using the TrackCreatorSegmentPairAutomaton
      */
-    class TrackCreatorSegmentPairAutomatonModule
-      : public FindletModule<TrackCreatorSegmentPairAutomaton> {
+    class TrackCreatorSegmentPairAutomatonModule : public FindletModule<TrackCreatorSegmentPairAutomaton> {
 
       /// Type of the base class
       using Super = FindletModule<TrackCreatorSegmentPairAutomaton>;
@@ -285,8 +266,7 @@ namespace Belle2 {
     /**
      * Module implementation using the TrackCreatorSegmentTripleAutomaton
      */
-    class TrackCreatorSegmentTripleAutomatonModule
-      : public FindletModule<TrackCreatorSegmentTripleAutomaton> {
+    class TrackCreatorSegmentTripleAutomatonModule : public FindletModule<TrackCreatorSegmentTripleAutomaton> {
 
       /// Type of the base class
       using Super = FindletModule<TrackCreatorSegmentTripleAutomaton>;
@@ -318,7 +298,13 @@ namespace Belle2 {
     /**
      * Module implementation using the TrackLinker
      */
-    class TrackLinkerModule : public FindletModule<TrackLinker<ChooseableTrackRelationFilter>> {
+    class TrackLinkerModule : public FindletModule<TrackLinker> {
+    };
+
+    /**
+     * Module implementation using the TrackCombiner
+     */
+    class TrackCombinerModule : public FindletModule<TrackCombiner> {
     };
 
     /**
@@ -379,22 +365,15 @@ namespace Belle2 {
     /*
      * Combined Module using a combination of filters for segments
      */
-    class SegmentFinderFacetAutomatonModule
-      : public FindletModule<SegmentFinderFacetAutomaton<ChooseableClusterFilter,
-        ChooseableFacetFilter,
-        ChooseableFacetRelationFilter,
-        ChooseableSegmentRelationFilter>> {
+    class SegmentFinderFacetAutomatonModule : public FindletModule<SegmentFinderFacetAutomaton> {
 
       /// Type of the base class
-      using Super = FindletModule<SegmentFinderFacetAutomaton<ChooseableClusterFilter,
-            ChooseableFacetFilter,
-            ChooseableFacetRelationFilter,
-            ChooseableSegmentRelationFilter>>;
+      using Super = FindletModule<SegmentFinderFacetAutomaton>;
 
     public:
       /// Constructor setting the default store vector names
       SegmentFinderFacetAutomatonModule()
-        : Super{{{"CDCWireHitVector", "CDCSegment2DVector"}}}
+        : Super( {"CDCWireHitVector", "CDCSegment2DVector"})
       {
       }
     };
@@ -403,19 +382,15 @@ namespace Belle2 {
      * Combined Module using a combination of filters on segment pairs
      */
     class TrackFinderSegmentPairAutomatonModule
-      : public FindletModule<TrackFinderSegmentPairAutomaton<ChooseableSegmentPairFilter,
-        ChooseableSegmentPairRelationFilter,
-        ChooseableTrackRelationFilter>> {
+      : public FindletModule<TrackFinderSegmentPairAutomaton> {
 
       /// Type of the base class
-      using Super = FindletModule<TrackFinderSegmentPairAutomaton<ChooseableSegmentPairFilter,
-            ChooseableSegmentPairRelationFilter,
-            ChooseableTrackRelationFilter>>;
+      using Super = FindletModule<TrackFinderSegmentPairAutomaton>;
 
     public:
       /// Constructor setting the default store vector names
       TrackFinderSegmentPairAutomatonModule()
-        : Super{{{"CDCSegment2DVector", "CDCTrackVector"}}}
+        : Super( {"CDCSegment2DVector", "CDCTrackVector"})
       {
       }
     };
@@ -424,21 +399,15 @@ namespace Belle2 {
      * Combined Module using a combination of filters on segment triples
      */
     class TrackFinderSegmentTripleAutomatonModule
-      : public FindletModule<TrackFinderSegmentTripleAutomaton<ChooseableAxialSegmentPairFilter,
-        ChooseableSegmentTripleFilter,
-        ChooseableSegmentTripleRelationFilter,
-        ChooseableTrackRelationFilter>> {
+      : public FindletModule<TrackFinderSegmentTripleAutomaton> {
 
       /// Type of the base class
-      using Super = FindletModule<TrackFinderSegmentTripleAutomaton<ChooseableAxialSegmentPairFilter,
-            ChooseableSegmentTripleFilter,
-            ChooseableSegmentTripleRelationFilter,
-            ChooseableTrackRelationFilter>>;
+      using Super = FindletModule<TrackFinderSegmentTripleAutomaton>;
 
     public:
       /// Constructor setting the default store vector names
       TrackFinderSegmentTripleAutomatonModule()
-        : Super{{{"CDCSegment2DVector", "CDCTrackVector"}}}
+        : Super( {"CDCSegment2DVector", "CDCTrackVector"})
       {
       }
     };

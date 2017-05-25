@@ -1,4 +1,3 @@
-
 #include <tracking/trackFindingCDC/config/CompileConfiguration.h>
 
 #pragma link off all globals;
@@ -8,6 +7,4 @@
 
 #ifdef TRACKFINDINGCDC_USE_ROOT_DICTIONARY
 
-
 #endif
-

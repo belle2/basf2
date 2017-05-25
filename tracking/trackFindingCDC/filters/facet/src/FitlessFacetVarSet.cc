@@ -19,26 +19,26 @@ bool FitlessFacetVarSet::extract(const CDCFacet* ptrFacet)
   if (not ptrFacet) return false;
   const CDCFacet& facet = *ptrFacet;
 
-  CDCFacet::Shape shape = facet.getShape();
+  const CDCFacet::Shape shape = facet.getShape();
 
-  short cellExtend = shape.getCellExtend();
-  short oClockDelta = shape.getOClockDelta();
-  short absOClockDelta = std::abs(oClockDelta);
+  const short cellExtend = shape.getCellExtend();
+  const short oClockDelta = shape.getOClockDelta();
+  const short absOClockDelta = std::abs(oClockDelta);
 
   const ERightLeft startRLInfo = facet.getStartRLInfo();
   const ERightLeft middleRLInfo = facet.getMiddleRLInfo();
   const ERightLeft endRLInfo = facet.getEndRLInfo();
 
-  short stableTwist = -sign(shape.getOClockDelta()) * middleRLInfo;
-  bool startToMiddleIsCrossing = startRLInfo != middleRLInfo;
-  bool middleToEndIsCrossing = middleRLInfo != endRLInfo;
+  const short stableTwist = -sign(shape.getOClockDelta()) * middleRLInfo;
+  const bool startToMiddleIsCrossing = startRLInfo != middleRLInfo;
+  const bool middleToEndIsCrossing = middleRLInfo != endRLInfo;
 
-  bool startToMiddleIsLong = shape.getStartToMiddleCellDistance() > shape.getMiddleToEndCellDistance();
+  const bool startToMiddleIsLong = shape.getStartToMiddleCellDistance() > shape.getMiddleToEndCellDistance();
 
-  bool longArmIsCrossing = startToMiddleIsLong ? startToMiddleIsCrossing : middleToEndIsCrossing;
-  bool shortArmIsCrossing = startToMiddleIsLong ? middleToEndIsCrossing : startToMiddleIsCrossing;
-  short iLayerDifference = facet.getStartWire().getILayer() - facet.getEndWire().getILayer();
-  short absILayerDifference = std::abs(iLayerDifference);
+  const bool longArmIsCrossing = startToMiddleIsLong ? startToMiddleIsCrossing : middleToEndIsCrossing;
+  const bool shortArmIsCrossing = startToMiddleIsLong ? middleToEndIsCrossing : startToMiddleIsCrossing;
+  const short iLayerDifference = facet.getStartWire().getILayer() - facet.getEndWire().getILayer();
+  const short absILayerDifference = std::abs(iLayerDifference);
 
   var<named("superlayer_id")>() = facet.getISuperLayer();
   var<named("cell_extend")>() = cellExtend;

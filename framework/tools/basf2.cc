@@ -133,6 +133,11 @@ int main(int argc, char* argv[])
      "override skipNEvents for EventInfoSetter and RootInput. Skips this many events before starting.")
     ("input,i", prog::value<vector<string> >(),
      "override name of input file for (Seq)RootInput. Can be specified multiple times to use more than one file. For RootInput, wildcards (as in *.root or [1-3].root) can be used, but need to be escaped with \\  or by quoting the argument to avoid expansion by the shell.")
+    ("sequence,S", prog::value<vector<string> >(),
+     "override the number sequence (e.g. 23:42,101) defining the entries (starting from 0) which are processed by RootInput."
+     "Must be specified exactly once for each file to be opened."
+     "This means one sequence per input file AFTER wildcard expansion."
+     "The first event has the number 0.")
     ("output,o", prog::value<string>(), "override name of output file for (Seq)RootOutput")
     ("processes,p", prog::value<int>(), "override number of worker processes (>=1 enables, 0 disables parallel processing)");
 
@@ -228,7 +233,7 @@ int main(int argc, char* argv[])
           "--callgrind-out-file=callgrind." + profileModule + ".%p",
         };
         //As execvp wants non-const char* pointers we have to copy the string contents.
-        for (auto argv : valgrind_argv) { cmd.push_back(strdup(argv.c_str())); }
+        for (auto arg : valgrind_argv) { cmd.push_back(strdup(arg.c_str())); }
         //And now we add our own arguments, including the program name.
         for (int i = 0; i < argc; ++i)  { cmd.push_back(argv[i]); }
         //Finally, execvp wants a nullptr as last argument
@@ -283,6 +288,12 @@ int main(int argc, char* argv[])
     if (varMap.count("input")) {
       const vector<string>& names = varMap["input"].as<vector<string> >();
       Environment::Instance().setInputFilesOverride(names);
+    }
+
+    // -S
+    if (varMap.count("sequence")) {
+      const vector<string>& sequences = varMap["sequence"].as<vector<string> >();
+      Environment::Instance().setEntrySequencesOverride(sequences);
     }
 
     // -o

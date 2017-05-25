@@ -15,14 +15,6 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackFlightTimeAdjuster.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackExporter.h>
 
-#include <tracking/trackFindingCDC/filters/cluster/ChooseableClusterFilter.h>
-#include <tracking/trackFindingCDC/filters/facet/ChooseableFacetFilter.h>
-#include <tracking/trackFindingCDC/filters/facetRelation/ChooseableFacetRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentRelation/ChooseableSegmentRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/ChooseableSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentPairRelation/ChooseableSegmentPairRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/trackRelation/ChooseableTrackRelationFilter.h>
-
 #include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
@@ -61,15 +53,10 @@ namespace Belle2 {
       WireHitPreparer m_wireHitTopologyPreparer;
 
       /// First stage cellular automaton segment finder
-      SegmentFinderFacetAutomaton<ChooseableClusterFilter,
-                                  ChooseableFacetFilter,
-                                  ChooseableFacetRelationFilter,
-                                  ChooseableSegmentRelationFilter> m_segmentFinderFacetAutomaton;
+      SegmentFinderFacetAutomaton m_segmentFinderFacetAutomaton;
 
       /// Second stage cellular automaton track finder from segments
-      TrackFinderSegmentPairAutomaton<ChooseableSegmentPairFilter,
-                                      ChooseableSegmentPairRelationFilter,
-                                      ChooseableTrackRelationFilter> m_trackFinderSegmentPairAutomaton;
+      TrackFinderSegmentPairAutomaton m_trackFinderSegmentPairAutomaton;
 
       /// Adjusts the flight time of the tracks to a setable trigger point
       TrackFlightTimeAdjuster m_trackFlightTimeAdjuster;

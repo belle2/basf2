@@ -8,21 +8,28 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
 #include <tracking/trackFindingCDC/filters/base/FilterVarSet.h>
 
 #include <tracking/trackFindingCDC/varsets/UnionVarSet.h>
+#include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
+
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+
 #include <boost/algorithm/string.hpp>
+
+#include <vector>
+#include <string>
+#include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// A filter that records variables form given objects. It may record native varsets and returned weigths from other filters.
-    template<class AFilterFactory>
-    class UnionRecordingFilter:
-      public Recording<typename AFilterFactory::CreatedFilter> {
+    /// A filter that records variables form given objects. It may record native varsets and/or weigths from other filters.
+    template <class AFilterFactory>
+    class UnionRecordingFilter : public Recording<typename AFilterFactory::CreatedFilter> {
 
     private:
       /// Type of the super class
@@ -40,7 +47,7 @@ namespace Belle2 {
       UnionRecordingFilter(const std::string& defaultRootFileName = "records.root",
                            const std::string& defaultTreeName = "records")
         : Super(makeUnique<UnionVarSet<Object>>(), defaultRootFileName, defaultTreeName)
-        , m_filterFactory("truth")
+        , m_filterFactory()
       {
       }
 
@@ -52,13 +59,13 @@ namespace Belle2 {
         moduleParamList->addParameter(prefixed(prefix, "varSets"),
                                       m_param_varSetNames,
                                       "List of names refering to concrete variable sets."
-                                      "Valid names: " + join(", ", getValidVarSetNames()),
+                                      "Valid names: " + join(", ", this->getValidVarSetNames()),
                                       m_param_varSetNames);
 
         moduleParamList->addParameter(prefixed(prefix, "skim"),
                                       m_param_skim,
                                       "Filter name which object must pass to be recorded."
-                                      "Valid names: " + join(", ", getValidFilterNames()),
+                                      "Valid names: " + join(", ", this->getValidFilterNames()),
                                       m_param_skim);
       }
 

@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/FacetFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
 

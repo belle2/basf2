@@ -8,14 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/filters/segmentRelation/BaseSegmentRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentRelation/BaseSegmentRelationFilter.h>
 
 #include <tracking/trackFindingCDC/filters/segmentRelation/BasicSegmentRelationVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentRelation/HitGapSegmentRelationVarSet.h>
-#include <tracking/trackFindingCDC/filters/segmentRelation/FitlessSegmentRelationVarSet.h>
+
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
+
+#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -28,14 +29,11 @@ namespace Belle2 {
       using Super = MVA<BaseSegmentRelationFilter>;
 
       /// Type of the VarSet the filter is working on
-      using VarSet = VariadicUnionVarSet <
-                     BasicSegmentRelationVarSet,
-                     HitGapSegmentRelationVarSet >;
+      using VarSet = VariadicUnionVarSet<BasicSegmentRelationVarSet, HitGapSegmentRelationVarSet>;
 
     public:
       /// Constructor initialising the MVAFilter with standard training name for this filter.
       MVAFeasibleSegmentRelationFilter();
-
     };
   }
 }

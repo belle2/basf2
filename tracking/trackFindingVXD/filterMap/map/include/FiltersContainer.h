@@ -92,7 +92,11 @@ namespace Belle2 {
     {
       if ((*m_allSetupsFilters).count(setupName)) {
         // case there is already a filter with this name in the container, we dont allow that it is overwritten!
-        B2WARNING("Trying to add a filter which is already in the container! Will not add it!");
+        B2WARNING("Trying to add a filter which is already in the container! Will not add it! And delete it!");
+        // assignFilters assumes that the ownership is taken by the container,
+        // so to not have a mem leak delete it if it is not the same as in the container
+        if (filters && filters != (*m_allSetupsFilters)[ setupName ]) delete filters;
+
         return;
       }
       (*m_allSetupsFilters)[ setupName ] = filters;

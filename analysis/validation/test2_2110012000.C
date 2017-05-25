@@ -2,7 +2,7 @@
 <header>
 <input>../2110012000.ntup.root</input>
 <output>2110012000_Validation.root</output>
-<contact>Giulia Casarosa; giulia.casarosa@pi.infn.it</contact>
+<contact>Jake Bennett; jvbennett@cmu.edu</contact>
 </header>
 */
 
@@ -20,8 +20,6 @@
 #include "TTree.h"
 #include "TH1F.h"
 #include "TGraph.h"
-
-/* Validation script to determine benchmarks for PID cuts. */
 
 void plotStd(TFile* pfile, TTree* ptree, TFile *outputFile){
 

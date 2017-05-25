@@ -5,7 +5,7 @@
 """
 <header>
   <output>../2610030000.dst.root</output>
-  <contact>karim.trabelsi@kek.jp</contact>
+  <contact>Jake Bennett; jvbennett@cmu.edu</contact>
 </header>
 """
 
@@ -17,14 +17,16 @@ from HLTTrigger import add_HLT_Y4S
 from ROOT import Belle2
 import glob
 
+set_random_seed(150922)
+
 # background (collision) files
 bg = glob.glob('./BG/[A-Z]*.root')
 
 # create path
 main = create_path()
 
-decayTable = Belle2.FileSystem.findFile('/decfiles/dec/2610030000.dec')
 # generate continuum events
+decayTable = Belle2.FileSystem.findFile('/decfiles/dec/2610030000.dec')
 generateContinuum(noEvents=100, inclusiveP='D0', decayTable=decayTable, path=main)
 
 # detector simulation

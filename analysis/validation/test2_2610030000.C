@@ -2,7 +2,7 @@
 <header>
 <input>../2610030000.ntup.root</input>
 <output>2610030000_Validation.root</output>
-<contact>Giulia Casarosa; giulia.casarosa@pi.infn.it</contact>
+<contact>Jake Bennett; jvbennett@cmu.edu</contact>
 </header>
 */
 

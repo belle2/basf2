@@ -5,7 +5,7 @@
 <header>
   <input>../2110012000.dst.root</input>
   <output>../2110012000.ntup.root</output>
-  <contact>Giulia Casarosa; giulia.casarosa@pi.infn.it</contact>
+  <contact>Jake Bennett; jvbennett@cmu.edu</contact>
 </header>
 """
 

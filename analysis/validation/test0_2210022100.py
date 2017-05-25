@@ -5,7 +5,7 @@
 """
 <header>
   <output>../2210022100.dst.root</output>
-  <contact>karim.trabelsi@kek.jp</contact>
+  <contact>Jake Bennett; jvbennett@cmu.edu</contact>
 </header>
 """
 
@@ -16,6 +16,8 @@ from reconstruction import add_reconstruction, add_mdst_output
 from HLTTrigger import add_HLT_Y4S
 from ROOT import Belle2
 import glob
+
+set_random_seed(150922)
 
 # background (collision) files
 bg = glob.glob('./BG/[A-Z]*.root')

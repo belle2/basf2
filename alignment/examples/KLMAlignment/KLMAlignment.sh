@@ -39,3 +39,5 @@ basf2 ${BELLE2_LOCAL_DIR}/alignment/examples/KLMAlignment/Alignment.py eetomumu_
 # Comparison of the alignment results and initial displacement.
 root -b -q ${BELLE2_LOCAL_DIR}'/alignment/examples/KLMAlignment/CompareAlignment.C("EKLMDisplacement.root","alignment.root","comparison.root")'
 
+# Graphical comparison of alignment results and initial displacement.
+root -b -q ${BELLE2_LOCAL_DIR}'/alignment/examples/KLMAlignment/ViewAlignment.C("comparison.root")'

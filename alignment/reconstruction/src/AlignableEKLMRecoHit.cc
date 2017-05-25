@@ -81,7 +81,6 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   v = r * v;
   m_StripV.SetX(v.unit().x());
   m_StripV.SetY(v.unit().y());
-  m_StripV.SetZ(0);
   genfit::SharedPlanePtr detPlane(new genfit::DetPlane(origin2, u2, v2, 0));
   setPlane(detPlane, m_Segment.getGlobalNumber());
   globalPosition = hit2ds[0]->getPosition();
@@ -113,13 +112,29 @@ TMatrixD AlignableEKLMRecoHit::derivatives(const genfit::StateOnPlane* sop)
 {
   /* Local parameters. */
   const double dalpha = 0;
+  const double dxs = 0;
+  const double dys = 0;
   const double dy = 0;
   const double sinda = sin(dalpha);
   const double cosda = cos(dalpha);
-  /* Local position. */
+  /* Local position in segment coordinates. */
   TVector2 pos = sop->getPlane()->LabToPlane(sop->getPos());
   double u = pos.X();
   double v = pos.Y();
+  /* Local position in sector coordinates. */
+  HepGeom::Point3D<double> globalPos;
+  HepGeom::Transform3D t;
+  const EKLM::TransformDataGlobalDisplaced* transformData =
+    &(EKLM::TransformDataGlobalDisplaced::Instance());
+  t = (*transformData->getSectorTransform(m_Sector.getEndcap(),
+                                          m_Sector.getLayer(),
+                                          m_Sector.getSector())).inverse();
+  globalPos.setX(sop->getPos().X() / Unit::cm * CLHEP::cm);
+  globalPos.setY(sop->getPos().Y() / Unit::cm * CLHEP::cm);
+  globalPos.setZ(sop->getPos().Z() / Unit::cm * CLHEP::cm);
+  globalPos = t * globalPos;
+  double x = globalPos.x() / CLHEP::cm * Unit::cm;
+  double y = globalPos.y() / CLHEP::cm * Unit::cm;
   /*
    * Matrix of global derivatives (second dimension is added because of
    * resizing in GblFitterInfo::constructGblPoint()).
@@ -130,9 +145,10 @@ TMatrixD AlignableEKLMRecoHit::derivatives(const genfit::StateOnPlane* sop)
   derGlobal(0, 2) = 0;
   derGlobal(0, 3) = 0;
   derGlobal(0, 4) = 0;
-  derGlobal(1, 0) = -m_StripV.X();
-  derGlobal(1, 1) = -m_StripV.Y();
-  derGlobal(1, 2) = 0;
+  derGlobal(1, 0) = -(cosda * m_StripV.X() - sinda * m_StripV.Y());
+  derGlobal(1, 1) = -(sinda * m_StripV.X() + cosda * m_StripV.Y());
+  derGlobal(1, 2) = (x - dxs) * (-sinda * m_StripV.X() - cosda * m_StripV.Y()) +
+                    (y - dys) * (cosda * m_StripV.X() - sinda * m_StripV.Y());
   derGlobal(1, 3) = -cosda;
   derGlobal(1, 4) = -u * cosda - (v - dy) * sinda;
   return derGlobal;

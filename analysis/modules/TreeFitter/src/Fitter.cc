@@ -478,7 +478,7 @@ namespace TreeFitter {
 
     cand.setMomentumVertexErrorMatrix(cov7b2);
 
-    //FT: save lifetime and decay length as ExtraInfo
+    //FT: save lifetime and decay length as ExtraInfo. This is must be interfaced with the FlightInfo NtupleTool.
     TVector2 tau  = decayLength(cand);
     TVector2 life = lifeTime(cand);
     if (cand.hasExtraInfo("decayLength")) {

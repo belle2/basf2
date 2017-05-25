@@ -25,8 +25,9 @@ namespace TreeFitter {
   RecoComposite::RecoComposite(Belle2::Particle* particle, const ParticleBase* mother)
     : ParticleBase(particle, mother), m_m(), m_matrixV(), m_hasEnergy(true)
   {
-    //    bool massconstraint = particle && particle->constraint(BtaConstraint::Mass) ;//FT: this requires the ability to flag a vertex for mass constraining, which we can't easily do right now
-    //    m_hasEnergy = !massconstraint ;                                              //
+    //FT: this requires the ability to flag a vertex for mass constraining, which we can't easily do right now
+    //    bool massconstraint = particle && particle->constraint(BtaConstraint::Mass) ;
+    //    m_hasEnergy = !massconstraint ;
     updCache() ;
   }
 

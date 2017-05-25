@@ -261,8 +261,8 @@ namespace TreeFitter {
   {
     // collect all particles emitted from vertex with position posindex
     if (mother() && mother()->posIndex() == posindex)
-      particles.push_back(
-        this);  //FT: this recursively adds everything that has a vertex reconstructed to the intended vertex, very weird implementation
+      //FT: this recursively adds everything that has a vertex reconstructed to the intended vertex, very weird implementation
+      particles.push_back(this);
     for (daucontainer::const_iterator idau = daughters().begin() ;
          idau != daughters().end() ; ++idau)
       (*idau)->collectVertexDaughters(particles, posindex) ;

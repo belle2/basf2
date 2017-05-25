@@ -81,7 +81,7 @@ namespace TreeFitter {
 #else
     //FT: not using this
     if (vtxverbose >= 8) {
-      std::cout << "KalmanCalculator:: C (this is insane) = " << std::endl << fitparams->cov() << std::endl;
+      std::cout << "KalmanCalculator:: C (this is is a massive printout) = " << std::endl << fitparams->cov() << std::endl;
       std::cout << "KalmanCalculator:: G*C*GT  = " << std::endl << m_matrixRinv << std::endl;
       std::cout << "KalmanCalculator:: Constraint Covariance V = " << std::endl << weight * (*V) << std::endl;
     }

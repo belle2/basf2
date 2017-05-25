@@ -29,7 +29,7 @@ using namespace Belle2;
 REG_MODULE(TreeFitter)
 
 // Constructor
-TreeFitterModule::TreeFitterModule() : Module()//,  m_Bfield(0) //(FT) not used anymore
+TreeFitterModule::TreeFitterModule() : Module()
 {
   setDescription("Tree Fitter module. Performs simultaneous fit of all vertices in a decay chain.");
   //module parameters
@@ -46,13 +46,10 @@ TreeFitterModule::~TreeFitterModule() {}
 // Initializer
 void TreeFitterModule::initialize()
 {
-  // get magnetic field
-  // Commented for now, since it's used by each particle individually (FT)
-  //m_Bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
   //Make sure we have a particle list
   StoreObjPtr<ParticleList>::required(m_particleList);
   //Also make sure we have actual particles
-  StoreArray<Belle2::Particle> particles;//FT: this can be written better
+  StoreArray<Belle2::Particle> particles;
   particles.isRequired();
 }
 

@@ -11,15 +11,6 @@
 //Creates and initialises charged particles using helix parameters. Defines the projection of reconstruction (helix) constraints to the fit.
 
 //#include <stdio.h>
-//#include <Beta/BtaCandidate.hh>
-
-//#include <analysis/dataobjects/Particle.h>
-
-//#include <BetaRecoAdapter/BtaAbsRecoObject.hh>
-//#include <TrkBase/TrkFit.hh>
-//#include <TrkBase/TrkRecoTrk.hh>
-//#include <TrkBase/TrkPoca.hh>
-//#include <TrkBase/TrkDifTraj.hh>
 #include <analysis/modules/TreeFitter/RecoTrack.h>
 #include <analysis/modules/TreeFitter/FitParams.h>
 #include <analysis/modules/TreeFitter/HelixUtils.h>
@@ -27,8 +18,6 @@
 #include <framework/gearbox/Const.h>
 
 #include <TMath.h>
-//using std::cout;
-//using std::endl;
 
 namespace TreeFitter {
 
@@ -40,12 +29,8 @@ namespace TreeFitter {
     //FT: FIX ME: This initialises the BField at the IP. This might not be a correct assumption, but is the easiest and fastest for now. Check the impact of using the field at the perigee, or perhaps at the decay vertex as appropriate, especially for significantly displaced vertices.
     m_bfield = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() / Belle2::Unit::T; //Bz in Tesla
     B2DEBUG(80, "RecoTrack - Bz from BFieldManager: " << m_bfield);
-    //    PdtPid::PidType pidType = PdtPid::pion ;
-    //    if( bc()->pdtEntry() ) pidType = bc()->pdtEntry()->pidId() ;
-    //    _trkFit = bc()->recoTrk()->fitResult(pidType) ;
     if (m_trackfit == 0) {
       //FT: this is superflous as m_trackfit has just been initialised, but we'll need the statement in future developments.
-
       //FT: For now we still use the pion track hypothesis. Later: add multiple hypotheses, add a flag to allow users to choose whether they want the "true" hypothesis or just the pion (for cases where the pion works better, for whatever reason)
       m_trackfit = particle->getTrack()->getTrackFitResult(Belle2::Const::pion);
     }
@@ -83,14 +68,6 @@ namespace TreeFitter {
     //FT: is this correct? Might need to make it 3D
     m_flt = m_trackfit->getHelix().getArcLength2DAtXY(pt.X(), pt.Y());
     // FIX ME: use helix poca to get estimate of flightlength first
-
-    // FT: This needs a control statement...
-    /*
-    double lowrange  = _trkFit->traj().lowRange() ;
-    double highrange = _trkFit->traj().hiRange() ;
-    if(     _flt < lowrange)  _flt = lowrange ;
-    else if(_flt > highrange) _flt = highrange ;
-    */
     return ErrCode() ;
   } ;
 

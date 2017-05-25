@@ -78,6 +78,7 @@ namespace TreeFitter {
 
     const double a  = Bz * Belle2::Unit::T * Belle2::Const::speedOfLight; //FT: a>0 for in Belle2 unlike BaBar
     /*
+    //Compare to (eventually replace with) Belle algebra:
     cout<<"a(BaBar) = " << a <<endl;
     TVector3 position(x,y,z);
     TVector3 momentum(px,py,pz);

@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Valerio Bertacchi                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <tracking/modules/hitXP/hitXPModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -10,41 +20,8 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/hitXPDerivate.h>
 
-
-// #include <cstdio>
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include "TFile.h"
-// #include <TCanvas.h>
-// #include <iostream>
-// #include <fstream>
 #include <string>
-// #include <TRandom3.h>
-// #include <TMinuit.h>
-// #include "TH1.h"
-// #include "TF1.h"
-// #include "TH2.h"
-// #include "TF2.h"
-// #include "TGraphErrors.h"
-// #include "TStyle.h"
 #include "TMath.h"
-// #include "TMatrixDSym.h"
-// #include "TFitResult.h"
-// #include "TLegend.h"
-// #include "TColor.h"
-// #include "TPaveText.h"
-// #include "TPaveStats.h"
-// #include "TGraphAsymmErrors.h"
-// #include "TMacro.h"
-// #include "THStack.h"
-// #include "TLegendEntry.h"
-// #include "TDatime.h"
-// #include "TString.h"
-// #include "TStyle.h"
-// #include "TLatex.h"
-// #include "TRandom3.h"
-// #include "TGraphPainter.h"
-
 #include <algorithm>
 #include <functional>
 
@@ -74,7 +51,6 @@ void hitXPModule::initialize()
   StoreArray<SVDTrueHit> storeTrueHits("");
   StoreArray<MCParticle> storeMCParticles("");
   StoreArray<RecoTrack> recoTracks("");
-  // StoreArray<TrackCandidates> TrackCandidates("");
 
 
   storeDigits.isRequired();
@@ -82,7 +58,6 @@ void hitXPModule::initialize()
   storeTrueHits.isRequired();
   storeMCParticles.isRequired();
   recoTracks.isRequired();
-  // TrackCandidates.isRequired();
 
 
   RelationArray relClusterDigits(storeClusters, storeDigits);
@@ -91,7 +66,6 @@ void hitXPModule::initialize()
   RelationArray relDigitTrueHits(storeDigits, storeTrueHits);
   RelationArray relDigitMCParticles(storeDigits, storeMCParticles);
   RelationArray recoTracksToMCParticles(recoTracks , storeMCParticles);
-  // RelationArray TrackCandidatesToMCParticles(TrackCandidates , storeMCParticles );
 
 
 
@@ -100,14 +74,13 @@ void hitXPModule::initialize()
   m_outputFile = new TFile("TFile_hitXP.root", "RECREATE");
   m_tree = new TTree("TTree_hitXP", "TTree_hitXP");
 
-
   m_tree->Branch("hitXP", &m_hitXP);
   m_tree->Branch("trackNumber", &m_trackNumber);
   m_tree->Branch("eventNumber", &m_eventNumber);
   m_tree->Branch("numberHitPerTrack", &m_numberHitPerTrack);
-  //m_tree->Branch("numberHitPerEvent", &m_numberHitPerEvent);
-  track_iterator = 0;
-  event_iterator = 0;
+
+  m_trackIterator = 0;
+  m_eventIterator = 0;
 
   //-------------------------------------------------------------------------------------------------//
   //------------------------------------selected Tree creation--------------------------------------//
@@ -115,15 +88,10 @@ void hitXPModule::initialize()
   m_outputFileSel = new TFile("TFile_hitXPSel.root", "RECREATE");
   m_treeSel = new TTree("TTree_hitXPSel", "TTree_hitXPSel");
 
-
   m_treeSel->Branch("hitXP", &m_hitXPSel);
   m_treeSel->Branch("trackNumber", &m_trackNumberSel);
   m_treeSel->Branch("eventNumber", &m_eventNumberSel);
   m_treeSel->Branch("numberHitPerTrack", &m_numberHitPerTrackSel);
-
-
-
-
 
 
   //-------------------------------------------------------------------------------------------------//
@@ -132,13 +100,10 @@ void hitXPModule::initialize()
   m_outputFileTiSel = new TFile("TFile_hitXPTiSel.root", "RECREATE");
   m_treeTiSel = new TTree("TTree_hitXPTiSel", "TTree_hitXPTiSel");
 
-
   m_treeTiSel->Branch("hitXP", &m_hitXPTiSel);
   m_treeTiSel->Branch("trackNumber", &m_trackNumberTiSel);
   m_treeTiSel->Branch("eventNumber", &m_eventNumberTiSel);
   m_treeTiSel->Branch("numberHitPerTrack", &m_numberHitPerTrackTiSel);
-
-
 
 
 //-------------------------------------------------------------------------------------------------//
@@ -148,7 +113,6 @@ void hitXPModule::initialize()
 //output tree for complete external use (same datas, but using only root default classes)
   m_outputFileExt = new TFile("TFile_hitXP_ext.root", "RECREATE");
   m_treeExt = new TTree("TTree_hitXP_ext", "TTree_hitXP_ext");
-
 
   m_treeExt->Branch("positionEntryX", &m_EpositionEntryX);
   m_treeExt->Branch("positionEntryY", &m_EpositionEntryY);
@@ -189,8 +153,6 @@ void hitXPModule::initialize()
   m_treeExt->Branch("tanlambda0", &m_Etanlambda0);
   m_treeExt->Branch("primary", &m_Eprimary);
 
-
-
 }
 
 void hitXPModule::beginRun() {}
@@ -204,9 +166,9 @@ void hitXPModule::event()
 
   StoreArray<RecoTrack> recoTracks;
 
-  m_eventNumber = event_iterator;
-  m_EeventNumber = event_iterator; //------------External Tree---------//
-  event_iterator = event_iterator + 1;
+  m_eventNumber = m_eventIterator;
+  m_EeventNumber = m_eventIterator; //------------External Tree---------//
+  m_eventIterator = m_eventIterator + 1;
 
 
   for (const MCParticle& particle : MCParticles) {
@@ -239,9 +201,9 @@ void hitXPModule::event()
 
       }
     }
-    m_trackNumber = track_iterator;
-    m_EtrackNumber = track_iterator; //----------------External Tree ----------------//
-    track_iterator = track_iterator + 1;
+    m_trackNumber = m_trackIterator;
+    m_EtrackNumber = m_trackIterator; //----------------External Tree ----------------//
+    m_trackIterator = m_trackIterator + 1;
 
     for (auto element : m_hitXPSet) {
       m_hitXP.push_back(element);
@@ -375,11 +337,6 @@ void hitXPModule::event()
       for (k = 0; k < 4; k = k + 1) {
         m_hitXPSel.push_back(temp_hitXP[k]);
       }
-      //  if(m_numberHitPerTrack>10){
-      //    int k=0;
-      //     for(k=0; k<4; k=k+1){
-      //       m_hitXPSel.push_back(m_hitXP[k]);
-      //      }}
       m_trackNumberSel =  m_trackNumber;
       m_eventNumberSel = m_eventNumber;
       m_numberHitPerTrackSel = m_hitXPSel.size();
@@ -405,9 +362,6 @@ void hitXPModule::event()
       m_treeTiSel->Fill();
       m_hitXPTiSel.erase(m_hitXPTiSel.begin(), m_hitXPTiSel.end());
     }
-
-
-
     m_hitXP.erase(m_hitXP.begin(), m_hitXP.end());
     m_hitXPSet.clear();
   }
@@ -429,7 +383,6 @@ void hitXPModule::endRun()
   m_outputFileSel->Close();
 
 
-
   //-------------------------------------------------------------------------------------------------//
   //------------------------------------tight selected Tree creation--------------------------------------//
   //-------------------------------------------------------------------------------------------------//
@@ -447,82 +400,3 @@ void hitXPModule::endRun()
 }
 
 void hitXPModule::terminate() {}
-
-
-
-
-
-
-
-
-
-
-
-
-
-//TFile *my_file = TFile::Open("TFile_hitXP.root");
-//TTree *data_tree = (TTree*) my_file->Get("TTree_hitXP");
-
-// int m_trackNumber, m_eventNumber, m_numberHitPerTrack;
-// std::vector<Belle2::hitXP> m_hitXP;
-// data_tree->SetBranchAddress("hitXP", &m_hitXP);
-// data_tree->SetBranchAddress("trackNumber", &m_trackNumber);
-// data_tree->SetBranchAddress("eventNumber", &m_eventNumber);
-// data_tree->SetBranchAddress("numberHitPerTrack", &m_numberHitPerTrack);
-
-// Int_t Nentries = Int_t(m_tree->GetEntries());
-//   for(int i=0; i<Nentries; i++){
-//      m_tree->GetEntry(i);
-//       int f3=0,f4=0,f5=0,f6=0;
-//       int layer_flag = 0;
-//       int j=0;
-//       int brk=0;
-//       std::vector<hitXP> temp_hitXP;
-//       while(j<m_hitXP.size() && brk==0){
-//         if(m_hitXP[j].m_sensorLayer==3) {
-//           f3=1;
-//           temp_hitXP.push_back(m_hitXP[j]);
-//           j++;
-//           while(j<m_hitXP.size() && brk==0){
-//             if(m_hitXP[j].m_sensorLayer==4) {
-//               f4=1;
-//               temp_hitXP.push_back(m_hitXP[j]);
-//               j++;
-//               while(j<m_hitXP.size() && brk==0){
-//                 if(m_hitXP[j].m_sensorLayer==5){
-//                   f5=1;
-//                   temp_hitXP.push_back(m_hitXP[j]);
-//                   j++;
-//                   while(j<m_hitXP.size() && brk==0){
-//                     if(m_hitXP[j].m_sensorLayer==6){
-//                       f6=1;
-//                       temp_hitXP.push_back(m_hitXP[j]);
-//                       brk=1;
-//                       j++;
-//                     }
-//                     j++;
-//                   }
-//                 }
-//                 j++;
-//               }
-//             }
-//             j++;
-//           }
-//         }
-//         j++;
-//       }
-//       layer_flag = f3*f4*f5*f6;
-//       if(layer_flag!=0){
-//         for(int k=0; k<4; k=k++){
-//           m_hitXPSel.push_back(temp_hitXP[k]);
-//         }
-//         m_trackNumberSel=  m_trackNumber;
-//         m_eventNumberSel= m_eventNumber;
-//         m_numberHitPerTrackSel= m_numberHitPerTrack;
-//       }
-//       m_treeSel->Fill();
-//       m_hitXPSel.erase(m_hitXPSel.begin(),m_hitXPSel.end());
-//     }
-
-//  m_outputFile->Close();
-//my_file->Close();

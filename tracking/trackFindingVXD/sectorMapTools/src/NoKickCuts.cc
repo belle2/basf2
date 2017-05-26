@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Valerio Bertacchi                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickCuts.h>
 
 #include "TH3.h"
@@ -10,31 +20,14 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-// #include <TRandom3.h>
-// #include <TMinuit.h>
 #include "TH1.h"
 #include "TF1.h"
 #include "TH2.h"
 #include "TF2.h"
-// #include "TGraphErrors.h"
-// #include "TStyle.h"
 #include "TMath.h"
-// #include "TMatrixDSym.h"
 #include "TFitResult.h"
-// #include "TLegend.h"
-// #include "TColor.h"
-// #include "TPaveText.h"
-// #include "TPaveStats.h"
-// #include "TGraphAsymmErrors.h"
-// #include "TMacro.h"
-// #include "THStack.h"
-// #include "TLegendEntry.h"
-// #include "TDatime.h"
 #include "TString.h"
-// #include "TStyle.h"
 #include "TLatex.h"
-// #include "TRandom3.h"
-// #include "TGraphPainter.h"
 #include <algorithm>
 #include <functional>
 

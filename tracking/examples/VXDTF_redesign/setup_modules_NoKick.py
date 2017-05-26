@@ -13,6 +13,7 @@
 
 
 from basf2 import *
+from ROOT import Belle2
 
 
 def setup_Geometry(path=None):
@@ -272,7 +273,8 @@ def setup_RTCtoSPTCConverters(
     recoTrackCandConverter.param('useSingleClusterSP', False)
     recoTrackCandConverter.param('minSP', 3)
     recoTrackCandConverter.param('skipProblematicCluster', False)
-    recoTrackCandConverter.param('noKickCutsFile', "")
+    NoKickCuts = Belle2.FileSystem.findFile("data/tracking/NoKickCuts.root")
+    recoTrackCandConverter.param('noKickCutsFile', NoKickCuts)
 
     # SpacePointTrackCand referee
     sptcReferee = register_module('SPTCReferee')

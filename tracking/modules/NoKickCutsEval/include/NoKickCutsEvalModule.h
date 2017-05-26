@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Valerio Bertacchi                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #ifndef NOKICKCUTSEVAL_H
 #define NOKICKCUTSEVAL_H
 
@@ -36,17 +46,24 @@ namespace Belle2 {
 
     virtual ~NoKickCutsEvalModule();
 
-
+    /** Initialize the Module.
+     * This method is called only once before the actual event processing starts.   */
     virtual void initialize() override;
 
+    /** Called when entering a new run. */
     virtual void beginRun() override;
 
+    /** This method is the core of the module.
+     * This method is called for each event. All processing of the event has to take place in this method.   */
     virtual void event() override;
 
+    /** This method is called if the current run ends. */
     virtual void endRun() override;
 
+    /** This method is called at the end of the event processing. */
     virtual void terminate() override;
 
+    //enum for the track-parameters
     enum Eparameters {
       omega,
       d0,
@@ -58,57 +75,18 @@ namespace Belle2 {
     //  this method evaluate the difference of a required track parameter "par"
     //  between 2 hit. If is0 is set to true is evaluated the difference between
     //  IP and the first hit.
-    double deltaParEval(hitXP hit1, hitXP hit2, Eparameters par, bool is0 = false)
-    {
-      double out = c_over;
-      int layer1 = hit1.m_sensorLayer;
-      int layer2 = hit2.m_sensorLayer;
-      double layerdiff = layer2 - layer1;
-      if (layerdiff >= 0 && (layerdiff < 3 || (layer1 == 0 && layer2 == 3))) {
-        switch (par) {
-          case 0:
-            out = abs(hit1.getOmegaEntry() - hit2.getOmegaEntry());
-            if (is0) out = abs(hit1.getOmega0() - hit2.getOmegaEntry());
-            break;
+    //input: (first hit, second hit, track parameter, first hit is IP?)
+    //output: Delta(par)
+    double deltaParEval(hitXP hit1, hitXP hit2, Eparameters par, bool is0 = false);
 
-          case 1:
-            out = hit1.getD0Entry() - hit2.getD0Entry();
-            if (is0) out = hit1.getD00() - hit2.getD0Entry();
-            break;
-
-          case 2:
-            out = asin(sin(hit1.getPhi0Entry())) - asin(sin(hit2.getPhi0Entry()));
-            if (is0) out = asin(sin(hit1.getPhi00())) - asin(sin(hit2.getPhi0Entry()));
-            break;
-
-          case 3:
-            out = hit1.getZ0Entry() - hit2.getZ0Entry();
-            if (is0) out = hit1.getZ00() - hit2.getZ0Entry();
-            break;
-
-          case 4:
-            out = hit1.getTanLambdaEntry() - hit2.getTanLambdaEntry();
-            if (is0) out = hit1.getTanLambda0() - hit2.getTanLambdaEntry();
-            break;
-        }
-      }
-      return out;
-    }
 
 //This is the funcion that select the percentage that has to be cut away from
 // deltaPar distributions (function of momentum)
+//input: (momentum, widht of momentum bin)
+//output: (value of the function)
+    double cutFunction(int p, double pwidth);
 
-    //OLD CUTFUNCTION: NOT USED NOW (1/1000 ACCEPTED)
-    double cutFunction(int p, double pwidth)
-    {
-      double out;
-      double mom = p * pwidth;
-      if (mom > 0.04)
-        out = -7.5 * pow(10, -7) / pow(mom, 3.88) + 1;
-      else out = 6.3 * mom + 0.57;
-      return out;
-    }
-
+    //alternative cut function (not used, wider cuts)
     // double cutFunction(int p, double pwid)
     // {
     //   double out;
@@ -117,38 +95,32 @@ namespace Belle2 {
     //   return out;
     // }
 
-
-
-
-
-
   private:
 
-    const double c_pmin = 0.025;
-    const double c_pmax = 2.;
-    const double c_tmin = 17.*M_PI / 180.; //17 degrees
-    const double c_tmax = 5. / 6.*M_PI; //150 degrees
-    const int c_nbin = 5000;
-    const int c_nbinp = 40;
-    const int c_nbinpar = 5;
-    const int c_nbinlay = 7;//present IP too
-    const int c_nbint = 3;
-    double c_pwidth = (c_pmax - c_pmin) / (double)c_nbinp;
-    double c_twidth = (c_tmax - c_tmin) / (double)c_nbint;
-    const double c_multLimit = 1;
-    const int c_over = 9999999;
-    int m_pCounter = 0;
-    int m_tCounter = 0;
-    int m_globCounter = 0;
-    bool c_validationON = 0;
+    const double c_pmin = 0.025; //minimum momentum evaluated
+    const double c_pmax = 2.; //maximum momentum evaluated
+    const double c_tmin = 17.*M_PI / 180.; //17 degrees. minimum theta evaluated
+    const double c_tmax = 5. / 6.*M_PI; //150 degrees. maximum theta evaluated
+    const int c_nbin = 5000; //number of bins of histogram of DeltaX
+    const int c_nbinp = 40; //number of momentum bins
+    const int c_nbinpar = 5; //number of track parameters
+    const int c_nbinlay = 7;//present IP too. number of layers
+    const int c_nbint = 3; //number of theta parameters
+    double c_pwidth = (c_pmax - c_pmin) / (double)c_nbinp; //width of momentum bin
+    double c_twidth = (c_tmax - c_tmin) / (double)c_nbint; //width of theta bin
+    const double c_multLimit = 1; //multiplier of the range limit of the histograms of DeltaX
+    const int c_over = 9999999; //escape flag of some methods
+    int m_pCounter = 0; //conter of hit out of range in momentum
+    int m_tCounter = 0; //counter of hit out of range in theta
+    int m_globCounter = 0; //counter of tracks cutted from global cuts
+    bool c_validationON = 0; //flag to activate some validation plots
 
-    NoKickRTSel m_trackSel;
+    NoKickRTSel m_trackSel; //auxiliary variable to use methods of NoKickRTSel
+    TFile* m_outputFile; //output file of cuts
+    std::vector<double> m_histoLim; //limits of DeltaX histograms
+    std::vector<std::vector<std::vector<std::vector<std::vector<TH1F*>>>>> m_histo; //DeltaX histograms
 
-
-    TFile* m_outputFile;
-    std::vector<double> m_histoLim;
-    std::vector<std::vector<std::vector<std::vector<std::vector<TH1F*>>>>> m_histo;
-    std::vector<TString> m_namePar = {
+    std::vector<TString> m_namePar = { //name of track parameters
       "#omega",
       "d0",
       "#phi0",
@@ -156,7 +128,7 @@ namespace Belle2 {
       "tan#lambda"
     };
 
-    std::vector<TString> m_unitPar = {
+    std::vector<TString> m_unitPar = { //units of tracks parameters
       "[cm^{-1}]",
       "[cm]",
       "[rad]",

@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Valerio Bertacchi                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickRTSel.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickCuts.h>
 
@@ -57,8 +67,6 @@ void NoKickRTSel::hitXPBuilder(const RecoTrack& track)
     }
   }
 
-
-
   for (auto element : m_setHitXP) {
     m_hitXP.push_back(element);
   }
@@ -84,12 +92,8 @@ void NoKickRTSel::hit8TrackBuilder(const RecoTrack& track)
 
 bool NoKickRTSel::globalCut(const std::vector<hitXP>& track8)
 {
-  // int flag3 = 0;
-  // int flag6 = 0;
   int flagd0 = 1;
-  //int flagphi0 = 1;
   int flagz0 = 1;
-  //int flagtanlambda = 1;
   int lay3 = 0;
   int lay4 = 0;
   int lay5 = 0;
@@ -99,24 +103,12 @@ bool NoKickRTSel::globalCut(const std::vector<hitXP>& track8)
     if (XP.getSensorLayer() == 4) lay4 = 1;
     if (XP.getSensorLayer() == 5) lay5 = 1;
     if (XP.getSensorLayer() == 6) lay6 = 1;
-    // if (XP.getSensorLayer() == 3) flag3 = 1;
-    // if (XP.getSensorLayer() == 6) flag6 = 1;
     if (abs(XP.getD0Entry()) > 1.) flagd0 = 0;
-    //if (abs(XP.getPhi0Entry()) > 4) flagphi0 = 0;
     if (abs(XP.getZ0Entry()) > 1.) flagz0 = 0;
-    //if (abs(XP.getTanLambdaEntry()) > 4) flagtanlambda = 0;
   }
-  // if(flag3 ==0) std::cout << "flag3" << std::endl;
-  // if(flag6 ==0) std::cout << "flag6" << std::endl;
-  // if(flagd0 ==0) std::cout << "flagd0" << std::endl;
-  // if(flagphi0 ==0) std::cout << "flagphi0" << std::endl;
-  // if(flagz0 ==0) std::cout << "flagz0" << std::endl;
-  // if(flagtanlambda ==0) std::cout << "flagtanlambda" << std::endl;
   int N_lay = lay3 + lay4 + lay5 + lay6;
   if (N_lay >= 3) N_lay = 1;
   else N_lay = 0;
-  // if(N_lay ==0) std::cout << "N_lay" << std::endl;
-  //int flagTot = flagd0 * flagphi0 * flagz0 * flagtanlambda * N_lay;
   int flagTot = flagd0 * flagz0 * N_lay;
   if (flagTot == 1) return true;
   else return false;
@@ -125,68 +117,64 @@ bool NoKickRTSel::globalCut(const std::vector<hitXP>& track8)
 bool NoKickRTSel::segmentSelector(hitXP hit1, hitXP hit2, std::vector<double> selCut, Eparameters par, bool is0)
 {
   double deltaPar = 0;
+  //double selCutPXD =0;
   if (hit2.m_sensorLayer - hit1.m_sensorLayer > 1) return true;
-//  if (hit2.m_sensorLayer !=4 || hit1.m_sensorLayer !=3) return true;
-//  if(is0) return true;
-  //if (hit2.m_sensorLayer == hit1.m_sensorLayer) return true;
   else {
     switch (par) {
       case 0:
-        return true;//REMOVED OMEGA FROM CUTS
         deltaPar = abs(hit1.getOmegaEntry() - hit2.getOmegaEntry());
         if (is0) deltaPar = abs(hit1.getOmega0() - hit2.getOmegaEntry());
+        //    selCutPXD =0.4;
         break;
 
       case 1:
-        return true;//REMOVED OMEGA FROM CUTS
         deltaPar = hit1.getD0Entry() - hit2.getD0Entry();
         if (is0) deltaPar = hit1.getD00() - hit2.getD0Entry();
+        //  selCutPXD =1;
         break;
 
       case 2:
-        return true;
         deltaPar = asin(sin(hit1.getPhi0Entry())) - asin(sin(hit2.getPhi0Entry()));
         if (is0) deltaPar = asin(sin(hit1.getPhi00())) - asin(sin(hit2.getPhi0Entry()));
+        //  selCutPXD =0.3;
         break;
 
       case 3:
-        return true;
         deltaPar = hit1.getZ0Entry() - hit2.getZ0Entry();
         if (is0) deltaPar = hit1.getZ00() - hit2.getZ0Entry();
-
+        //  selCutPXD =1;
         break;
 
       case 4:
-        return true;
         deltaPar = hit1.getTanLambdaEntry() - hit2.getTanLambdaEntry();
         if (is0) deltaPar = hit1.getTanLambda0() - hit2.getTanLambdaEntry();
-
+        //  selCutPXD =0.3;
         break;
     }
     //DEBUG-----------------------------------------
     double usedCut = 0;
     if (abs(selCut.at(0)) > abs(selCut.at(1))) {
       usedCut = abs(selCut.at(0));
-    }
-    //else usedCut =abs(selCut.at(1));
-    else usedCut = abs(selCut.at(1));
-    //if(par ==1 || par ==3) usedCut=0.5; else usedCut=0.2;
-    if (deltaPar < -usedCut || deltaPar > usedCut) {
-      //if(deltaPar < 1*selCut.at(0) || deltaPar > 1*selCut.at(1)){
-      std::cout << "--------------------------" << std::endl;
-      std::cout << "lay1=" << hit1.m_sensorLayer << std::endl;
-      std::cout << "lay2=" << hit2.m_sensorLayer << std::endl;
-      std::cout << "parametro=" << par << std::endl;
-      std::cout << "Min=" << selCut.at(0) << std::endl;
-      std::cout << "Max=" << selCut.at(1) << std::endl;
-      std::cout << "deltapar=" << deltaPar << std::endl;
-      std::cout << "momentum=" << hit1.m_momentum0.Mag() << std::endl;
+    } else usedCut = abs(selCut.at(1));
 
+    // if (hit2.m_sensorLayer==1 || hit2.m_sensorLayer==2 || hit1.m_sensorLayer==1 || hit1.m_sensorLayer == 2){
+    //   usedCut = selCutPXD;
+    // }
 
-    }
+    //-----some debug lines ----- //
+    // if (deltaPar < -usedCut || deltaPar > usedCut) {
+    //   std::cout << "--------------------------" << std::endl;
+    //   std::cout << "lay1=" << hit1.m_sensorLayer << std::endl;
+    //   std::cout << "lay2=" << hit2.m_sensorLayer << std::endl;
+    //   std::cout << "parametro=" << par << std::endl;
+    //   std::cout << "Min=" << selCut.at(0) << std::endl;
+    //   std::cout << "Max=" << selCut.at(1) << std::endl;
+    //   std::cout << "deltapar=" << deltaPar << std::endl;
+    //   std::cout << "momentum=" << hit1.m_momentum0.Mag() << std::endl;
+    //------some debug lines ----- //
+    // }
 
     if (deltaPar > -usedCut && deltaPar < usedCut) return true;
-    //if (deltaPar > 1*selCut.at(0) && deltaPar < 1*selCut.at(1)) return true;
     else return false;
   }
 }

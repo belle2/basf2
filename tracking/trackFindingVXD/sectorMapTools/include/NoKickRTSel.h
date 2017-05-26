@@ -1,3 +1,12 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Valerio Bertacchi                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #include <tracking/modules/hitXP/hitXPModule.h>
 #include <framework/datastore/StoreArray.h>
@@ -13,8 +22,6 @@
 #include <tracking/dataobjects/hitXP.h>
 #include <TObject.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickCuts.h>
-
-
 #include <cstdio>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,31 +30,12 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-// #include <TRandom3.h>
-// #include <TMinuit.h>
 #include "TH1.h"
 #include "TF1.h"
 #include "TH2.h"
 #include "TF2.h"
-// #include "TGraphErrors.h"
-// #include "TStyle.h"
 #include "TMath.h"
-// #include "TMatrixDSym.h"
-// #include "TFitResult.h"
-// #include "TLegend.h"
-// #include "TColor.h"
-// #include "TPaveText.h"
-// #include "TPaveStats.h"
-// #include "TGraphAsymmErrors.h"
-// #include "TMacro.h"
-// #include "THStack.h"
-// #include "TLegendEntry.h"
-// #include "TDatime.h"
-// #include "TString.h"
-// #include "TStyle.h"
 #include "TLatex.h"
-// #include "TRandom3.h"
-// #include "TGraphPainter.h"
 #include <algorithm>
 #include <functional>
 
@@ -63,13 +51,13 @@ namespace Belle2 {
     //  that cointains the cuts used in selection.
 
   public:
-    std::vector<hitXP> m_hitXP;
-    std::set<hitXP, hitXP::timeCompare> m_setHitXP;
-    std::vector<hitXP> m_8hitTrack;
-    NoKickCuts m_trackCuts;
+    std::vector<hitXP> m_hitXP; //vector of hit, to convert the track
+    std::set<hitXP, hitXP::timeCompare> m_setHitXP; //set of hit to order the hit in time
+    std::vector<hitXP> m_8hitTrack; //vector of selected hit
+    NoKickCuts m_trackCuts; //auxiliary member to apply the cuts
     double m_pmax = 2.; //range analyzed with cuts
 
-    enum Eparameters {
+    enum Eparameters { //name of the track parameters
       omega,
       d0,
       phi0,
@@ -101,23 +89,28 @@ namespace Belle2 {
 
     // this method build a vector of hitXP from a track. The ouput is the
     // member of the class.
+    //input (one reconstructed track)
     void hitXPBuilder(const RecoTrack& track);
 
     // this metod build a vector of hitXP from a track selecting the first
     // hit on each layer of VXD (8 hit for SVD only, counting overlaps). The ouput
     // is the member of the class.
+    //input (one reconstructed track)
     void hit8TrackBuilder(const RecoTrack& track);
 
 
     //  This method return true if every segment (see segmentSelector) of the
     //  input track respects the cuts contraints.
+    //input (one reconstructed track)
     bool trackSelector(const RecoTrack& track);
 
     // This method return true if a couple of hits resects the cuts constraints.
+    //input (first hit, second hit, selected cut to apply, track parameter, it is first hit the IP?)
     bool segmentSelector(hitXP hit1, hitXP hit2, std::vector<double> selCut, Eparameters par, bool is0 = false);
 
     // This method make some global cuts on the tracks (layer 3 and 6 required, d0 and z0 inside beam pipe).
     //Return false if this filter fails.
+    //input (the selected hit of the track)
     bool globalCut(const std::vector<hitXP>& track8);
 
     ClassDef(NoKickRTSel, 1);

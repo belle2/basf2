@@ -96,15 +96,18 @@ namespace Belle2 {
     bool m_useSingleClusterSP; /**< If true use single cluster SpacePoint collection as fallback */
     bool m_markRecoTracks; /**< If True RecoTracks where conversion problems occurred are marked dirty */
 
-    NoKickRTSel* m_trackSel;
-    std::string m_noKickCutsFile;
-    int m_ncut = 0;
-    int m_npass = 0;
-    TFile* m_momentumTFile;
-    TCanvas* m_cMomentum;
-    TH1F* m_momSel;
-    TH1F* m_momCut;
-    TH1F* m_momEff;
+    //NoKickCuts members
+    NoKickRTSel* m_trackSel; //member to call method of NoKickCuts selection
+    std::string m_noKickCutsFile; //name of TFile of the cuts
+    int m_ncut = 0; //counter of the cuttet tracks
+    int m_npass = 0; //counter of the selected tracks
+
+    //validation NoKickCuts members
+    TFile* m_momentumTFile; //validartion output TFile
+    TCanvas* m_cMomentum; //canvas of the momentum distribution in validation
+    TH1F* m_momSel; //histogram of selected tracks
+    TH1F* m_momCut; //histrogram of cutted tracks
+    TH1F* m_momEff; //histogram for efficiency
 
 
     // state variables

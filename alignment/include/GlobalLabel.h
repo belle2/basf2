@@ -15,7 +15,7 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <cdc/dataobjects/WireID.h>
 #include <bklm/dataobjects/BKLMElementID.h>
-#include <eklm/dataobjects/EKLMSegmentID.h>
+#include <eklm/dataobjects/EKLMElementID.h>
 
 #include <framework/gearbox/Const.h>
 
@@ -137,11 +137,11 @@ namespace Belle2 {
     GlobalLabel(BKLMElementID bklmid, gidTYPE paramId);
 
     /**
-     * Constructor from EKLMSegmentID.
-     * @param[in] eklmSegment EKLM segment identifier.
+     * Constructor from EKLMElementID.
+     * @param[in] eklmElement EKLM element identifier.
      * @param[in] paramId     Numeric identifier of alignment parameter.
      */
-    GlobalLabel(EKLMSegmentID eklmSegment, gidTYPE paramId);
+    GlobalLabel(EKLMElementID eklmElement, gidTYPE paramId);
 
     void construct(gidTYPE dbObjId, gidTYPE element, gidTYPE param)
     {
@@ -204,11 +204,11 @@ namespace Belle2 {
     BKLMElementID getBklmID() const;
 
     /**
-     * Get EKLM segment identifier. It should be checked that this label is
+     * Get EKLM element identifier. It should be checked that this label is
      * a EKLM label. If this is not the case, then the function fails with
      * fatal error.
      */
-    EKLMSegmentID getEklmID() const;
+    EKLMElementID getEklmID() const;
 
     //! Is this beam label?
     bool    isBeam()          const {return (eid < vxdOffset);}

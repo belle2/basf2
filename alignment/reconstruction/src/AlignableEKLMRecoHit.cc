@@ -24,7 +24,7 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit()
 
 AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   const EKLMAlignmentHit* hit, const genfit::TrackCandHit* trackCandHit) :
-  genfit::PlanarMeasurement(2)
+  genfit::PlanarMeasurement(1)
 {
   (void)trackCandHit;
   int digit, endcap, layer, sector, plane, segment, strip;
@@ -52,6 +52,11 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   segment = (eklmDigits[digit]->getStrip() - 1) / geoDat->getNStripsSegment()
             + 1;
   strip = (segment - 1) * geoDat->getNStripsSegment() + 1;
+  m_Sector.setType(EKLMElementID::c_Sector);
+  m_Sector.setEndcap(endcap);
+  m_Sector.setLayer(layer);
+  m_Sector.setSector(sector);
+  m_Segment.setType(EKLMElementID::c_Segment);
   m_Segment.setEndcap(endcap);
   m_Segment.setLayer(layer);
   m_Segment.setSector(sector);
@@ -71,18 +76,21 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   v2.SetX(v.x());
   v2.SetY(v.y());
   v2.SetZ(v.z());
+  t = transformData->getSectorTransform(endcap, layer, sector);
+  r = t->getRotation().inverse();
+  v = r * v;
+  m_StripV.SetX(v.unit().x());
+  m_StripV.SetY(v.unit().y());
   genfit::SharedPlanePtr detPlane(new genfit::DetPlane(origin2, u2, v2, 0));
-  setPlane(detPlane, m_Segment.getSegmentGlobalNumber());
+  setPlane(detPlane, m_Segment.getGlobalNumber());
   globalPosition = hit2ds[0]->getPosition();
   /* Projection onto hit plane - only need to change Z. */
   globalPosition.SetZ(origin2.Z());
   localPosition = detPlane->LabToPlane(globalPosition);
-  rawHitCoords_[0] = localPosition.X();
-  rawHitCoords_[1] = localPosition.Y();
-  rawHitCov_[0][0] = pow(geoDat->getStripGeometry()->getWidth(), 2) / 12;
-  rawHitCov_[0][1] = 0;
-  rawHitCov_[1][0] = 0;
-  rawHitCov_[1][1] = rawHitCov_[0][0];
+  rawHitCoords_[0] = localPosition.Y();
+  rawHitCov_[0][0] = pow(geoDat->getStripGeometry()->getWidth() /
+                         CLHEP::cm * Unit::cm, 2) / 12;
+  setStripV();
 }
 
 AlignableEKLMRecoHit::~AlignableEKLMRecoHit()
@@ -92,6 +100,9 @@ AlignableEKLMRecoHit::~AlignableEKLMRecoHit()
 std::vector<int> AlignableEKLMRecoHit::labels()
 {
   std::vector<int> labels;
+  labels.push_back(GlobalLabel(m_Sector, 1));
+  labels.push_back(GlobalLabel(m_Sector, 2));
+  labels.push_back(GlobalLabel(m_Sector, 3));
   labels.push_back(GlobalLabel(m_Segment, 1));
   labels.push_back(GlobalLabel(m_Segment, 2));
   return labels;
@@ -101,19 +112,45 @@ TMatrixD AlignableEKLMRecoHit::derivatives(const genfit::StateOnPlane* sop)
 {
   /* Local parameters. */
   const double dalpha = 0;
+  const double dxs = 0;
+  const double dys = 0;
   const double dy = 0;
   const double sinda = sin(dalpha);
   const double cosda = cos(dalpha);
-  /* Local position. */
+  /* Local position in segment coordinates. */
   TVector2 pos = sop->getPlane()->LabToPlane(sop->getPos());
   double u = pos.X();
   double v = pos.Y();
-  /* Matrix of global derivatives. */
-  TMatrixD derGlobal(2, 2);
-  derGlobal(0, 0) = -sinda;
-  derGlobal(0, 1) = -cosda;
-  derGlobal(1, 0) = -u * sinda + (v - dy) * cosda;
-  derGlobal(1, 1) = -u * cosda + (v + dy) * sinda;
+  /* Local position in sector coordinates. */
+  HepGeom::Point3D<double> globalPos;
+  HepGeom::Transform3D t;
+  const EKLM::TransformDataGlobalDisplaced* transformData =
+    &(EKLM::TransformDataGlobalDisplaced::Instance());
+  t = (*transformData->getSectorTransform(m_Sector.getEndcap(),
+                                          m_Sector.getLayer(),
+                                          m_Sector.getSector())).inverse();
+  globalPos.setX(sop->getPos().X() / Unit::cm * CLHEP::cm);
+  globalPos.setY(sop->getPos().Y() / Unit::cm * CLHEP::cm);
+  globalPos.setZ(sop->getPos().Z() / Unit::cm * CLHEP::cm);
+  globalPos = t * globalPos;
+  double x = globalPos.x() / CLHEP::cm * Unit::cm;
+  double y = globalPos.y() / CLHEP::cm * Unit::cm;
+  /*
+   * Matrix of global derivatives (second dimension is added because of
+   * resizing in GblFitterInfo::constructGblPoint()).
+   */
+  TMatrixD derGlobal(2, 5);
+  derGlobal(0, 0) = 0;
+  derGlobal(0, 1) = 0;
+  derGlobal(0, 2) = 0;
+  derGlobal(0, 3) = 0;
+  derGlobal(0, 4) = 0;
+  derGlobal(1, 0) = -(cosda * m_StripV.X() - sinda * m_StripV.Y());
+  derGlobal(1, 1) = -(sinda * m_StripV.X() + cosda * m_StripV.Y());
+  derGlobal(1, 2) = (x - dxs) * (-sinda * m_StripV.X() - cosda * m_StripV.Y()) +
+                    (y - dys) * (cosda * m_StripV.X() - sinda * m_StripV.Y());
+  derGlobal(1, 3) = -cosda;
+  derGlobal(1, 4) = -u * cosda - (v - dy) * sinda;
   return derGlobal;
 }
 

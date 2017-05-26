@@ -31,7 +31,7 @@
 #include <top/dataobjects/TOPSlowData.h>
 #include <top/dataobjects/TOPInterimFEInfo.h>
 
-
+#include <bitset>
 
 using namespace std;
 
@@ -103,6 +103,7 @@ namespace Belle2 {
     rawDigits.registerRelationTo(info, DataStore::c_Event, DataStore::c_DontWriteOut);
     waveforms.registerRelationTo(info, DataStore::c_Event, DataStore::c_DontWriteOut);
 
+
     // check if front end mappings are available
     const auto& mapper = m_topgp->getFrontEndMapper();
     int mapSize = mapper.getMapSize();
@@ -112,6 +113,7 @@ namespace Belle2 {
 
   void TOPUnpackerModule::beginRun()
   {
+    m_channelStatistics.clear();
   }
 
   void TOPUnpackerModule::event()
@@ -292,8 +294,8 @@ namespace Belle2 {
 
     DataArray array(buffer, bufferSize, m_swapBytes);
 
-    map<unsigned short, int>
-    evtNumCounter; // counts the occurence of carrier-generated event numbers. Asynchronous carrier events numbers in one event are a strong indication of frameshifts occuring in the readout data.
+    map<unsigned short, int> evtNumCounter; //counts the occurence of carrier-generated event numbers.
+    std::array<unsigned short, 128> channelCounter = {0}; //counts occurence of carrier/asic/channel combinations
 
     unsigned word = array.getWord(); // header word 0
     unsigned short scrodID = word & 0x0FFF;
@@ -331,12 +333,17 @@ namespace Belle2 {
       word = array.getWord(); // word 2
       //      unsigned lastWrAddr = word & 0x1FF;
       unsigned lastWrAddr = (word & 0x0FF) << 1;
-      unsigned short asicChannelFE = (word >> 9) & 0x07;
+      //unsigned short asicChannelFE = (word >> 9) & 0x07;
+      unsigned short asicChannelFE = (word >> 8) & 0x07;
       unsigned short asicFE = (word >> 12) & 0x03;
       unsigned short carrierFE = (word >> 14) & 0x03;
+      unsigned short channelID = carrierFE * 32 + asicFE * 8 + asicChannelFE;
+      //B2DEBUG(100, "carrier asic chn " << carrierFE << " " << asicFE << " " << asicChannelFE << " " << channelID << " 0b" << std::bitset<32>(word) );
+
+      channelCounter[channelID] += 1;
 
       // temporary fix since it's not given in FE
-      asicChannelFE = asicChanFix % 8;
+      //asicChannelFE = asicChanFix % 8;
       asicChanFix++;
       // end fix
 
@@ -560,13 +567,42 @@ namespace Belle2 {
     int nASICs = 0;
 
     stringstream evtNumOutputString;
-    evtNumOutputString << "Carrier event numbers and their counts:\n";
+    evtNumOutputString << "Carrier event numbers and their counts for SCROD ID " << scrodID << ":\n";
     for (auto const& it : evtNumCounter) {
       nASICs += it.second;
       evtNumOutputString << it.first << ":\t" << it.second << "\n";
     }
     evtNumOutputString << "Total:\t" << nASICs;
     B2DEBUG(100, evtNumOutputString.str());
+
+    int nChannels = 0;
+    int nChannelsDiff = 0;
+
+    stringstream channelOutputString;
+    channelOutputString << "Detected channels and their counts for SCROD ID (channels with count == 1 are omitted)" << scrodID << ":\n";
+    for (auto it = channelCounter.begin(); it != channelCounter.end(); ++it) {
+      if (*it > 0) {
+        nChannelsDiff += 1;
+      }
+      nChannels += *it;
+
+      int channelID = it - channelCounter.begin();
+      int carrier = channelID / 32;
+      int asic = (channelID % 32) / 8;
+      int chn = channelID % 8;
+
+      if (*it != 1) {
+        channelOutputString << "carrier: " << carrier << " asic: " << asic << " chn: " << chn << " occurence: " << *it << "\n";
+        B2WARNING("carrier: " << carrier << " asic: " << asic << " chn: " << chn << " seen " << *it << " times instead of once");
+      }
+    }
+
+    m_channelStatistics[nChannels] += 1;
+
+    channelOutputString << "Total:\t" << nChannels << " " << nChannelsDiff;
+    B2DEBUG(100, channelOutputString.str());
+
+
 
     return array.getRemainingWords();
 
@@ -708,6 +744,15 @@ namespace Belle2 {
 
   void TOPUnpackerModule::endRun()
   {
+    stringstream channelStatOutputString;
+    //channelStatOutputString << "nChn\tcount" << std::endl;
+    B2INFO("TOPUnpacker: Channels seen per event statistics:");
+    B2INFO("TOPUnpacker: nChn\tcount");
+    for (auto& entry : m_channelStatistics) {
+      //channelStatOutputString << entry.first << "\t" << entry.second << std::endl;
+      B2INFO("TOPUnpacker: " << entry.first << "\t\t" << entry.second);
+    }
+    //B2INFO(channelStatOutputString.str());
   }
 
   void TOPUnpackerModule::terminate()

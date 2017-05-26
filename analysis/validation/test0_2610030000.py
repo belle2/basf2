@@ -27,7 +27,7 @@ main = create_path()
 
 # generate continuum events
 decayTable = Belle2.FileSystem.findFile('/decfiles/dec/2610030000.dec')
-generateContinuum(noEvents=100, inclusiveP='D0', decayTable=decayTable, path=main)
+generateContinuum(noEvents=1000, inclusiveP='D0', decayTable=decayTable, path=main)
 
 # detector simulation
 # add_simulation(main, bkgfiles=bg)

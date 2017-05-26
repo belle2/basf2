@@ -70,16 +70,16 @@ buildRestOfEvent('B0')
 
 # get tag vertex ('breco' is the type of MC association)
 TagV('B0', 'breco')
-buildContinuumSuppression('B0')
+# buildContinuumSuppression('B0')
 
 
 # ACTUAL VARIABLES FOR THE CP ASYMMETRY MEASUREMENT
 tools += ['TagVertex', '^B0']
 
 # Variables for Continuum suppression
-tools += ['ContinuumSuppression', '^B0']
-tools += ['CustomFloats[isContinuumEvent]', "^B0"]
-tools += ['CustomFloats[isSignal]', "^B0 "]
+# tools += ['ContinuumSuppression', '^B0']
+# tools += ['CustomFloats[isContinuumEvent]', "^B0"]
+# tools += ['CustomFloats[isSignal]', "^B0 "]
 
 # MC INFO
 tools += ['MCTruth', "^B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]"]

@@ -38,7 +38,7 @@ evtgeninput.param('ParentParticle', 'Upsilon(5S)')
 evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('/decfiles/dec/1310040140.dec'))
 main.add_module(evtgeninput)
 
-pdg.load(Belle2.FileSystem.findFile('generators/evtgen/decayfiles/Y5S.pdl'))  # to load a different file
+pdg.load(Belle2.FileSystem.findFile('/decfiles/dec/Y5S.pdl'))  # to load a different file
 
 # detector simulation
 add_simulation(main)

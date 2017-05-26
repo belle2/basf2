@@ -42,7 +42,7 @@ evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('/decfiles/dec/41900
 main.add_module(evtgeninput)
 
 # Y(6S) pdl file
-pdg.load(Belle2.FileSystem.findFile('generators/evtgen/decayfiles/Y6S.pdl'))
+pdg.load(Belle2.FileSystem.findFile('/decfiles/dec/Y6S.pdl'))
 
 # detector simulation
 # add_simulation(main, bkgfiles=bg)

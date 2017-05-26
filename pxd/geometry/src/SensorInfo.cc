@@ -8,7 +8,7 @@
 #include <pxd/geometry/SensorInfo.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <geometry/bfieldmap/BFieldMap.h>
+#include <framework/geometry/BFieldManager.h>
 #include <vxd/geometry/GeoCache.h>
 
 using namespace std;
@@ -44,9 +44,9 @@ const TVector3 SensorInfo::getEField(const TVector3& point) const
 const TVector3 SensorInfo::getBField(const TVector3& point) const
 {
   TVector3 pointGlobal = pointToGlobal(point);
-  TVector3 bGlobal = BFieldMap::Instance().getBField(pointGlobal);
+  TVector3 bGlobal = BFieldManager::getField(pointGlobal);
   TVector3 bLocal = vectorToLocal(bGlobal);
-  return Unit::T * bLocal;
+  return bLocal;
 }
 
 const TVector3 SensorInfo::getDriftVelocity(const TVector3& E,

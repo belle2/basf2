@@ -13,7 +13,6 @@
 // framework
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/GearDir.h> // needed for reading xml-files
-#include <geometry/bfieldmap/BFieldMap.h>
 #include <tracking/dataobjects/VXDTFSecMap.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <framework/datastore/StoreObjPtr.h>

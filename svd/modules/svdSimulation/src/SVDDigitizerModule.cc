@@ -9,7 +9,6 @@
 
 #include <svd/modules/svdSimulation/SVDDigitizerModule.h>
 #include <vxd/geometry/GeoCache.h>
-#include <geometry/bfieldmap/BFieldMap.h>
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>

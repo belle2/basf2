@@ -17,9 +17,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <geometry/GeometryManager.h>
-#include <geometry/bfieldmap/BFieldMap.h>
-
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <cdc/dataobjects/CDCHit.h>

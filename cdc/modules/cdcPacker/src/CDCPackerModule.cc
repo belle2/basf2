@@ -175,7 +175,6 @@ void CDCPackerModule::event()
     int ily = (eWire % 4096) / 512;
     int iwire = (eWire % 512);
     short tdc = cdcHits[i]->getTDCCount();
-    //    short tdc2 = cdcHits[i]->getTDCCount2ndHit();
     short adc = cdcHits[i]->getADCCount();
 
     //

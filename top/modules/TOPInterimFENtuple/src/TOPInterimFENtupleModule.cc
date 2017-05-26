@@ -127,7 +127,8 @@ void TOPInterimFENtupleModule::event()
     m_height[m_nHit] = digit.getPulseHeight();
     m_q[m_nHit] = digit.getIntegral();
     m_width[m_nHit] = digit.getPulseWidth();
-    m_sample[m_nHit] = (int(digit.getRawTime()) + digit.getFirstWindow() * 64) % 256;
+    // m_sample[m_nHit] = (int(digit.getRawTime()) + digit.getFirstWindow() * 64) % 256;
+    m_sample[m_nHit] = digit.getModulo256Sample();
     m_quality[m_nHit] = digit.getHitQuality();
     const auto* rawDigit = digit.getRelated<TOPRawDigit>();
     if (rawDigit) {

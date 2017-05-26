@@ -228,6 +228,12 @@ namespace Belle2 {
     double getRawTime() const { return m_rawTime; }
 
     /**
+     * Returns sample number modulo 256
+     * @return sample number modulo 256
+     */
+    int getModulo256Sample() const;
+
+    /**
      * Returns t0-subtracted and calibrated time
      * @return time in [ns]
      */

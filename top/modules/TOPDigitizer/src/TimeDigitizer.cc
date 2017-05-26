@@ -175,7 +175,7 @@ namespace Belle2 {
         double cfdTime = rawTime * tdc.getSampleWidth() - tdc.getOffset();
         double cfdWidth = rawDigit->getFWHM() * tdc.getSampleWidth();
         int sampleDivisions = 0x1 << tdc.getSubBits();
-        unsigned tfine = int(rawTime * sampleDivisions) % sampleDivisions; // rawTime<0 ?
+        unsigned tfine = int(rawTime * sampleDivisions) % sampleDivisions; // TODO rawTime<0 ?
         rawDigit->setTFine(tfine);
 
         // append new digit
@@ -271,7 +271,7 @@ namespace Belle2 {
         double rawTime = rawDigit->getCFDLeadingTime(); // time in [samples]
         double rawTimeErr = rawDigit->getCFDLeadingTimeError(rmsNoise); // in [samples]
         int sampleDivisions = 0x1 << tdc.getSubBits();
-        unsigned tfine = int(rawTime * sampleDivisions) % sampleDivisions; // rawTime<0 ?
+        unsigned tfine = int(rawTime * sampleDivisions) % sampleDivisions; // TODO rawTime<0 ?
         rawDigit->setTFine(tfine);
         rawDigit->addRelationTo(waveform);
 

@@ -18,6 +18,15 @@ using namespace Belle2;
 float TOPDigit::s_doubleHitResolution = 0;
 float TOPDigit::s_pileupTime = 0;
 
+int TOPDigit::getModulo256Sample() const
+{
+  int sample = int(m_rawTime);
+  if (m_rawTime < 0) sample--;
+  sample += (int) m_firstWindow * 64;
+  if (sample < 0) return 256 + sample % 256;
+  return sample % 256;
+}
+
 
 DigitBase::EAppendStatus TOPDigit::addBGDigit(const DigitBase* bg)
 {

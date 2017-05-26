@@ -22,6 +22,13 @@ namespace Belle2 {
       using Super = BaseTrackRelationFilter;
 
     public:
+      /// Export all parameters
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+      {
+        moduleParamList->addParameter("maximalPhiDistance", m_param_maximalPhiDistance, "Maximal Phi distance below "
+                                      "to tracks should be merged.", m_param_maximalPhiDistance);
+      }
+
       /// Implementation of the phi calculation.
       Weight operator()(const CDCTrack& fromTrack, const CDCTrack& toTrack) final {
         const double lhsPhi = fromTrack.getStartTrajectory3D().getFlightDirection3DAtSupport().phi();
@@ -29,13 +36,16 @@ namespace Belle2 {
 
         const double phiDistance = std::fabs(AngleUtil::normalised(lhsPhi - rhsPhi));
 
-        if (phiDistance > 0.2)
+        if (phiDistance > m_param_maximalPhiDistance)
         {
           return std::nan("");
         } else {
           return phiDistance;
         }
       }
+
+    private:
+      double m_param_maximalPhiDistance = 0.2;
     };
   }
 }

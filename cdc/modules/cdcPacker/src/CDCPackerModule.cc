@@ -18,8 +18,6 @@
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 
@@ -77,7 +75,6 @@ void CDCPackerModule::initialize()
 
   B2INFO("CDCPacker: initialize() Called.");
 
-  //  StoreArray<RawCDC>::required(m_rawCDCName);
   StoreArray<RawCDC>::registerPersistent(m_rawCDCName);
 
   StoreArray<CDCRawHitWaveForm> storeCDCRawHitWFs(m_cdcRawHitWaveFormName);
@@ -91,19 +88,6 @@ void CDCPackerModule::initialize()
   StoreArray<CDCHit> storeDigit(m_cdcHitName);
 
   storeDigit.registerInDataStore();
-
-  // Relation.
-  storeDigit.registerRelationTo(storeCDCRawHitWFs);
-  storeDigit.registerRelationTo(storeCDCRawHits);
-
-  // Set default names for the relations.
-  m_relCDCRawHitToCDCHitName = DataStore::relationName(
-                                 DataStore::arrayName<CDCRawHit>(m_cdcRawHitName),
-                                 DataStore::arrayName<CDCHit>(m_cdcHitName));
-
-  m_relCDCRawHitWFToCDCHitName = DataStore::relationName(
-                                   DataStore::arrayName<CDCRawHitWaveForm>(m_cdcRawHitWaveFormName),
-                                   DataStore::arrayName<CDCHit>(m_cdcHitName));
 
   loadMap();
 
@@ -152,13 +136,6 @@ void CDCPackerModule::event()
   StoreArray<CDCRawHitWaveForm> cdcRawHitWFs(m_cdcRawHitWaveFormName);
   StoreArray<CDCRawHit> cdcRawHits(m_cdcRawHitName);
   StoreArray<CDCHit> cdcHits(m_cdcHitName);
-  RelationArray rawCDCsToCDCHits(cdcRawHits, cdcHits, m_relCDCRawHitToCDCHitName); // CDCRawHit <-> CDCHit
-  RelationArray rawCDCWFsToCDCHits(cdcRawHitWFs, cdcHits, m_relCDCRawHitWFToCDCHitName); // CDCRawHitWaveForm <-> CDCHit
-
-  //  printf("NumHits    %d\n", cdcHits.getEntries() ); fflush(stdout);
-
-  //  int eWire_nhit[36882];
-  //  memset(eWire_nhit, 0, sizeof(int) * 36882);
   std::vector<int> eWire_nhit(36882, 0);
 
   int tot_chdata_bytes[302];

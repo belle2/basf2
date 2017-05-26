@@ -195,7 +195,11 @@ def add_cdc_cr_track_fit_and_track_creator(
     if eventTimingExtraction is True:
         # Extract the time
         path.add_module("FullGridTrackTimeExtraction",
-                        recoTracksStoreArrayName="RecoTracks")
+                        recoTracksStoreArrayName="RecoTracks",
+                        maximalT0Shift=70,
+                        minimalT0Shift=-70,
+                        numberOfGrids=6
+                        )
 
         # Track fitting
         path.add_module("DAFRecoFitter",

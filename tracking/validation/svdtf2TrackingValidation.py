@@ -6,11 +6,11 @@
   <contact>tracking@belle2.kek.jp</contact>
   <input>EvtGenSimNoBkg.root</input>
   <output>VXDTF2TrackingValidation.root</output>
-  <description>This module validates that the VXDTF2 is capable of reconstructing tracks in Y(4S) runs.</description>
+  <description>This module validates that the VXDTF2 SVD-ONLY is capable of reconstructing tracks in Y(4S) runs.</description>
 </header>
 """
 
-VALIDATION_OUTPUT_FILE = 'VXDTF2TrackingValidation.root'
+VALIDATION_OUTPUT_FILE = 'SVDTF2TrackingValidation.root'
 N_EVENTS = 1000
 ACTIVE = True
 
@@ -23,9 +23,9 @@ from tracking.validation.run import TrackingValidationRun
 import tracking
 
 
-class VXDTF2(TrackingValidationRun):
+class VXDTF2_SVD_ONLY(TrackingValidationRun):
     """
-    Class for the validation of the VXDTF2 track finder
+    Class for the validation of the VXDTF2 SVD-ONLY track finder
     """
 
     #: number of events to process
@@ -38,15 +38,15 @@ class VXDTF2(TrackingValidationRun):
     components = None
 
     #: lambda method which is used by the validation to add the vxd finder modules
-    finder_module = staticmethod(lambda path: tracking.add_vxd_track_finding_vxdtf2(path, components=["SVD", "PXD"]))
+    finder_module = staticmethod(lambda path: tracking.add_vxd_track_finding_vxdtf2(path, components=["SVD"]))
 
     #: fit the tracks after the track finder
     fit_tracks = True
 
-    #: use only hits from the VXD detectors
+    #: use only hits from the SVD detector
     tracking_coverage = {
-        'WhichParticles': ['SVD', 'PXD'],  # Include all particles seen in the SVD detector, also secondaries
-        'UsePXDHits': True,
+        'WhichParticles': ['SVD'],  # Include all particles seen in the SVD detector, also secondaries
+        'UsePXDHits': False,
         'UseSVDHits': True,
         'UseCDCHits': False,
     }
@@ -60,9 +60,9 @@ class VXDTF2(TrackingValidationRun):
 
 def main():
     """
-    create and execute the VXDTF2 validation
+    create and execute the VXDTF2 SVD-ONLY validation
     """
-    validation_run = VXDTF2()
+    validation_run = VXDTF2_SVD_ONLY()
     validation_run.configure_and_execute_from_commandline()
 
 

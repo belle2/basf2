@@ -3,13 +3,13 @@
  * Copyright(C) 2010-2017  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Heck                                              *
+ * Contributors: Martin Heck, Nils Braun                                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "tracking/trackFindingVXD/trackSetEvaluator/HopfieldNetwork.h"
-
+#include <tracking/trackFindingVXD/trackSetEvaluator/HopfieldNetwork.h>
+#include <Eigen/Dense>
 
 using namespace Belle2;
 
@@ -22,16 +22,15 @@ unsigned short HopfieldNetwork::doHopfield(
   //activiation by the total number of Nodes.
   //Incompatible Nodes get later minus one, which counteracts all activation,
   //if the incompatible Node is active.
-  float compatibilityValue = (1.0 - m_omega) / static_cast<float>(overlapResolverNodeInfos.size() - 1);
+  const float compatibilityValue = (1.0 - m_omega) / static_cast<float>(overlapResolverNodeInfos.size() - 1);
+
+  const size_t overlapSize = overlapResolverNodeInfos.size();
 
   //Weight matrix; knows compatibility between each possible pair of Nodes
-  TMatrixD W(overlapResolverNodeInfos.size(), overlapResolverNodeInfos.size());
+  Eigen::MatrixXd W(overlapSize, overlapSize);
   //A): Set all elements to compatible:
-  for (unsigned int i = 0; i < overlapResolverNodeInfos.size(); i++) {
-    for (unsigned int j = 0; i < overlapResolverNodeInfos.size(); i++) {
-      W(i, j) = compatibilityValue;
-    }
-  }
+  W.fill(compatibilityValue);
+
   //B): Inform weight matrix elements of incompatible neurons:
   for (const auto& aTC : overlapResolverNodeInfos) {
     for (unsigned int overlapIndex : aTC.overlaps) {
@@ -39,18 +38,19 @@ unsigned short HopfieldNetwork::doHopfield(
     }
   }
 
+
   // Neuron values
-  TMatrixD xMatrix(1, overlapResolverNodeInfos.size());
+  Eigen::VectorXd x(overlapSize);
   // randomize neuron values for first iteration:
-  for (unsigned int i = 0; i < overlapResolverNodeInfos.size(); i++) {
-    xMatrix(0, i) = gRandom->Uniform(1.0); // WARNING: original does Un(0;0.1) not Un(0;1)!
+  for (unsigned int i = 0; i < overlapSize; i++) {
+    x(i) = gRandom->Uniform(1.0); // WARNING: original does Un(0;0.1) not Un(0;1)!
   }
 
   //Store for results from last round:
-  TMatrixD xMatrixOld(1, overlapResolverNodeInfos.size());
+  Eigen::VectorXd xOld(overlapSize);
 
   //Order of execution for neuron values:
-  std::vector<unsigned short> sequenceVector(overlapResolverNodeInfos.size());
+  std::vector<unsigned short> sequenceVector(overlapSize);
   //iota fills the vector with 0, 1, 2, ... , (size-1)
   std::iota(sequenceVector.begin(), sequenceVector.end(), 0);
 
@@ -71,27 +71,22 @@ unsigned short HopfieldNetwork::doHopfield(
 
   float T = m_T;
 
-  while (c > m_cmax) {
 
+  while (c > m_cmax) {
     std::shuffle(sequenceVector.begin(), sequenceVector.end(), TRandomWrapper());
 
-    xMatrixOld = xMatrix;
+    xOld = x;
 
     for (unsigned int i : sequenceVector) {
-      float aTempVal = 0.0;
-      for (unsigned int a = 0; a < overlapResolverNodeInfos.size(); a++) {
-        aTempVal += W(i, a) * xMatrix(0, a);
-      }
-
+      float aTempVal = W.row(i).dot(x);
       float act = aTempVal + m_omega * overlapResolverNodeInfos[i].qualityIndex;
-
-      xMatrix(0, i) = 0.5 * (1. + tanh(act / T));
+      x(i) = 0.5 * (1. + tanh(act / T));
     }
 
     T = 0.5 * (T + m_Tmin);
 
     //Determine maximum change in weights:
-    c = ((xMatrix - xMatrixOld).Abs()).Max();
+    c = (x - xOld).cwiseAbs().maxCoeff();
     B2DEBUG(10, "c value is " << c << " at iteration " << iIterations);
     cValues.at(iIterations) = c;
 
@@ -106,8 +101,8 @@ unsigned short HopfieldNetwork::doHopfield(
   }
 
   //Copy Node values into the activity state of the OverlapResolverNodeInfo objects:
-  for (unsigned int i = 0; i < overlapResolverNodeInfos.size(); i++) {
-    overlapResolverNodeInfos[i].activityState = xMatrix(0, i);
+  for (unsigned int i = 0; i < overlapSize; i++) {
+    overlapResolverNodeInfos[i].activityState = x(i);
   }
 
   return iIterations;

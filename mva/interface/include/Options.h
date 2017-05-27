@@ -138,7 +138,7 @@ namespace Belle2 {
     };
 
     template<typename T>
-    std::function<void(T)> check_bounds(T min, T max, std::string name)
+    std::function<void(T)> check_bounds(T min, T max, const std::string& name)
     {
       return [name, min, max](T v) -> void {
         if (v <= min || v >= max)
@@ -150,7 +150,7 @@ namespace Belle2 {
     }
 
     template<typename T>
-    std::function<void(std::vector<T>)> check_bounds_vector(T min, T max, std::string name)
+    std::function<void(std::vector<T>)> check_bounds_vector(T min, T max, const std::string& name)
     {
       return [name, min, max](const std::vector<T>& vec) -> void {
         for (auto v : vec)

@@ -30,7 +30,7 @@ print_params(beamparameters)
 
 # specify number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [100])
+eventinfosetter.param('evtNumList', [1000])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [1])
 main.add_module(eventinfosetter)

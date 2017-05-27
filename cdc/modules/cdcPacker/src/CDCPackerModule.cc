@@ -95,10 +95,6 @@ void CDCPackerModule::initialize()
 
   m_event = 0;
 
-  for (int i = 0; i < 36882; i++) {
-    m_eWire_nhit[ i ] = 0;
-  }
-
 }
 
 void CDCPackerModule::beginRun()
@@ -165,19 +161,18 @@ void CDCPackerModule::event()
     }
 
 
-    if (eWire_nhit[ eWire ] == 0) { // 1 hit timing for one cell.
+    if (eWire_nhit[ eWire ] == 0) { // first hit timing for one cell.
       // increase 8 bytes (4 bhytes).
       //      B2INFO("CDCPacker : 1st hit");
       tot_chdata_bytes[ m_fee_board[ sly ][ ily ][ iwire] ] += ch_data_bytes;
       CDCChannelData chd(m_fee_board[sly][ily][iwire], m_fee_ch[sly][ily][iwire], 8, 0, adc, tdc);
       chDatas.push_back(chd);
-    } else if (eWire_nhit[ eWire ] == 1) { // 2 hit timings for one cell.
+    } else if (eWire_nhit[ eWire ] == 1) { // 2nd hit timings for one cell.
       // increase another 2 bytes (1 word) for 2nd hit timing.
       //      B2INFO("CDCPacker : 2nd hit");
       tot_chdata_bytes[ m_fee_board[ sly ][ ily ][ iwire] ] += 2;
     }
     eWire_nhit[ eWire ]++; // increment the hit number.
-    m_eWire_nhit[ eWire ]++; // same as eWire_nhit.
   }
 
 

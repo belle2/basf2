@@ -275,11 +275,6 @@ namespace Belle2 {
       int m_fee_ch[9][8][384];
 
       /**
-       * Number of hits in the cell.
-       */
-      int m_eWire_nhit[36882];
-
-      /**
        * Enable/Disable to read the channel map
        * from the database.
        */

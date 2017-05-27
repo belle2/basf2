@@ -107,7 +107,8 @@ void MillepedeCollectorModule::prepare()
 
   if (!m_tracks.empty()) {
     for (auto arrayName : m_tracks)
-      StoreArray<RecoTrack>::required(arrayName);
+      continue;
+    // StoreArray<RecoTrack>::required(arrayName);
   }
 
   if (!m_particles.empty() || !m_vertices.empty() || !m_primaryVertices.empty()) {
@@ -115,24 +116,24 @@ void MillepedeCollectorModule::prepare()
     StoreArray<Track> tracks;
     StoreArray<TrackFitResult> trackFitResults;
 
-    recoTracks.isRequired();
-    tracks.isRequired();
-    trackFitResults.isRequired();
+    //recoTracks.isRequired();
+    //tracks.isRequired();
+    //trackFitResults.isRequired();
   }
 
   for (auto listName : m_particles) {
     StoreObjPtr<ParticleList> list(listName);
-    list.isRequired();
+    //list.isRequired();
   }
 
   for (auto listName : m_vertices) {
     StoreObjPtr<ParticleList> list(listName);
-    list.isRequired();
+    //list.isRequired();
   }
 
   for (auto listName : m_primaryVertices) {
     StoreObjPtr<ParticleList> list(listName);
-    list.isRequired();
+    //list.isRequired();
   }
 
   // Register Mille output
@@ -227,6 +228,8 @@ void MillepedeCollectorModule::collect()
 
   for (auto arrayName : m_tracks) {
     StoreArray<RecoTrack> recoTracks(arrayName);
+    if (!recoTracks.isValid())
+      continue;
 
     for (auto& recoTrack : recoTracks) {
       fitRecoTrack(recoTrack);
@@ -255,6 +258,9 @@ void MillepedeCollectorModule::collect()
 
   for (auto listName : m_particles) {
     StoreObjPtr<ParticleList> list(listName);
+    if (!list.isValid())
+      continue;
+
     for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
       for (auto& track : getParticlesTracks({list->getParticle(iParticle)}, false)) {
         auto gblfs = dynamic_cast<genfit::GblFitStatus*>(track->getFitStatus());
@@ -272,6 +278,8 @@ void MillepedeCollectorModule::collect()
 
   for (auto listName : m_vertices) {
     StoreObjPtr<ParticleList> list(listName);
+    if (!list.isValid())
+      continue;
 
     for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
       auto mother = list->getParticle(iParticle);
@@ -305,6 +313,8 @@ void MillepedeCollectorModule::collect()
 
   for (auto listName : m_primaryVertices) {
     StoreObjPtr<ParticleList> list(listName);
+    if (!list.isValid())
+      continue;
 
     for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
       auto mother = list->getParticle(iParticle);

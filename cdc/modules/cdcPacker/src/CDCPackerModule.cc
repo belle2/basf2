@@ -132,7 +132,7 @@ void CDCPackerModule::event()
   StoreArray<CDCRawHitWaveForm> cdcRawHitWFs(m_cdcRawHitWaveFormName);
   StoreArray<CDCRawHit> cdcRawHits(m_cdcRawHitName);
   StoreArray<CDCHit> cdcHits(m_cdcHitName);
-  std::vector<int> eWire_nhit(36882, 0);
+  //  std::vector<int> eWire_nhit(36882, 0);
 
   int tot_chdata_bytes[302];
   memset(tot_chdata_bytes, 0, sizeof(int) * 302);
@@ -142,25 +142,34 @@ void CDCPackerModule::event()
   std::vector<CDCChannelData> chDatas;
   chDatas.clear();
 
-  for (int i = 0; i < cdcHits.getEntries(); i++) {
-    int eWire = (int)(cdcHits[i]->getID());
+  for (const auto& hit : cdcHits) {
+    int eWire = (int)(hit.getID());
     int sly = eWire / 4096;
     int ily = (eWire % 4096) / 512;
     int iwire = (eWire % 512);
-    short tdc = cdcHits[i]->getTDCCount();
-    short adc = cdcHits[i]->getADCCount();
+    short tdc = hit.getTDCCount();
+    short adc = hit.getADCCount();
 
     //
     // If not prepared the map element for this cell, exit.
     //
     if (m_fee_board[ sly ][ ily ][ iwire] < 0 || m_fee_ch[ sly ][ ily ][ iwire] < 0) {
-      printf("Hit %8d WireID %8d SL %3d IL %3d WI %4d BOARD %3d CH %3d\n",
-             i, (int)(cdcHits[i]->getID()), sly, ily , iwire,
+      printf("Hit WireID %8d SL %3d IL %3d WI %4d BOARD %3d CH %3d\n",
+             (int)(hit.getID()), sly, ily , iwire,
              m_fee_board[ sly ][ ily ][ iwire], m_fee_ch[ sly ][ ily ][ iwire]);
       exit(1);
     }
 
 
+    if (hit.is2ndHit() == false) { // first hit timing for one cell.
+      // increase 8 bytes (4 bhytes).
+      B2DEBUG(99, "CDCPacker : first hit");
+      tot_chdata_bytes[ m_fee_board[ sly ][ ily ][ iwire] ] += ch_data_bytes;
+      CDCChannelData chd(m_fee_board[sly][ily][iwire], m_fee_ch[sly][ily][iwire], 8, 0, adc, tdc);
+      chDatas.push_back(chd);
+    }
+
+    /*
     if (eWire_nhit[ eWire ] == 0) { // first hit timing for one cell.
       // increase 8 bytes (4 bhytes).
       //      B2INFO("CDCPacker : 1st hit");
@@ -172,7 +181,8 @@ void CDCPackerModule::event()
       //      B2INFO("CDCPacker : 2nd hit");
       tot_chdata_bytes[ m_fee_board[ sly ][ ily ][ iwire] ] += 2;
     }
-    eWire_nhit[ eWire ]++; // increment the hit number.
+    */
+    //    eWire_nhit[ eWire ]++; // increment the hit number.
   }
 
 

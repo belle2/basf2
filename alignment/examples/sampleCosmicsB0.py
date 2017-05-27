@@ -25,7 +25,7 @@ main.add_module('CDCDigitizer')
 main.add_module('SetupGenfitExtrapolation')
 
 main.add_module('TrackFinderMCTruthRecoTracks', WhichParticles='primary', RecoTracksStoreArrayName='CosmicRecoTracks')
-main.add_module('DAFRecoFitter')
+main.add_module('DAFRecoFitter', recoTracksStoreArrayName='CosmicRecoTracks')
 
 main.add_module('RootOutput')
 main.add_module('Progress')

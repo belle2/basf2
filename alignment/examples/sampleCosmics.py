@@ -22,8 +22,9 @@ main.add_module('SVDDigitizer')
 main.add_module('PXDClusterizer')
 main.add_module('SVDClusterizer')
 main.add_module('CDCDigitizer')
+main.add_module('SetupGenfitExtrapolation')
 
-main.add_module('TrackFinderMCTruthRecoTracks', WhichParticles='primary')
+main.add_module('TrackFinderMCTruthRecoTracks', WhichParticles='primary', RecoTracksStoreArrayName='CosmicRecoTracks')
 main.add_module('DAFRecoFitter')
 
 main.add_module('RootOutput')

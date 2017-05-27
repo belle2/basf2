@@ -4,13 +4,17 @@
 from basf2 import *
 set_log_level(LogLevel.INFO)
 
-
 if __name__ == '__main__':
     import os
     import sys
 
     import ROOT
     from ROOT import Belle2
+
+    # reset_database()
+    # use_database_chain()
+    # use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
+    # use_local_database(Belle2.FileSystem.findFile("localdb/database.txt"))
 
     import argparse
     parser = argparse.ArgumentParser(
@@ -61,12 +65,18 @@ if __name__ == '__main__':
                     pass
 
     if args.scenario == 'VXDAlignment':
-        millepede = MillepedeCalibration(['VXDAlignment'], magnet=magnet)
+        millepede = MillepedeCalibration(
+            ['VXDAlignment'],
+            magnet=magnet,
+            primary_vertices=['Z0:mumu'],
+            particles=['bbmu'],
+            tracks=['CosmicRecoTracks'])
         millepede.algo.invertSign()
         # Add the constraints (auto-generated from hierarchy), so you can
         # play with unfixing degrees of freedom below
-        millepede.algo.steering().command('Fortranfiles')
-        millepede.algo.steering().command('constraints.txt')
+        # millepede.algo.steering().command('Fortranfiles')
+        # millepede.algo.steering().command('constraints.txt')
+        millepede.fixVXDid(1, 1, 1)
 
     if args.scenario == 'CDCLayerAlignment':
         millepede = MillepedeCalibration(['CDCAlignment', 'CDCLayerAlignment'], magnet=magnet)

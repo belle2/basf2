@@ -14,11 +14,15 @@
 #include <framework/gearbox/Const.h>
 #include <TVector3.h>
 #include <TMatrixDSym.h>
+#include <G4ThreeVector.hh>
+#include <G4ErrorSymMatrix.hh>
 
 namespace Belle2 {
 
   //! Define state of extrapolation for each recorded hit
-  enum ExtHitStatus { EXT_FIRST = -1, EXT_ENTER, EXT_EXIT, EXT_STOP, EXT_ESCAPE };
+  enum ExtHitStatus { EXT_FIRST = -1, EXT_ENTER, EXT_EXIT, EXT_STOP, EXT_ESCAPE,
+                      EXT_ECLCROSS, EXT_ECLNEAR
+                    };
 
   //! Store one Ext hit as a ROOT object
   class ExtHit : public RelationsObject {
@@ -37,8 +41,20 @@ namespace Belle2 {
     //! @param r Global position of this hit (cm)
     //! @param p Momentum of extrapolated track at this hit (GeV/c)
     //! @param e Covariance matrix of extrapolation at this hit (GeV/c and cm)
-    ExtHit(int pdgCode, Const::EDetector detector, int element, ExtHitStatus status, double t, const TVector3& r, const TVector3& p,
-           const TMatrixDSym& e);
+    ExtHit(int pdgCode, Const::EDetector detector, int element, ExtHitStatus status, double t,
+           const TVector3& r, const TVector3& p, const TMatrixDSym& e);
+
+    //! Constructor with initial values
+    //! @param pdgCode PDG hypothesis used for this extrapolation
+    //! @param detector Detector containing this hit
+    //! @param element Detector element containing this hit
+    //! @param status State of extrapolation at this hit
+    //! @param t Time of flight from IP to this hit (ns)
+    //! @param r Global position of this hit (cm)
+    //! @param p Momentum of extrapolated track at this hit (GeV/c)
+    //! @param e Covariance matrix of extrapolation at this hit (GeV/c and cm)
+    ExtHit(int pdgCode, Const::EDetector detector, int element, ExtHitStatus status, double t,
+           const G4ThreeVector& r, const G4ThreeVector& p, const G4ErrorSymMatrix& e);
 
     //! Copy constructor
     ExtHit(const ExtHit&);
@@ -68,15 +84,24 @@ namespace Belle2 {
 
     //! Get position of this extrapolation hit
     //! @return position (cm) of this extrapolation hit
-    TVector3 getPosition() const { return m_Position; }
+    TVector3 getPosition() const { return TVector3(m_Position[0], m_Position[1], m_Position[2]); }
 
     //! Get momentum at this extrapolation hit
     //! @return momentum (GeV/c) at this extrapolation hit
-    TVector3 getMomentum() const { return m_Momentum; }
+    TVector3 getMomentum() const { return TVector3(m_Momentum[0], m_Momentum[1], m_Momentum[2]); }
 
     //! Get phase-space covariance at this extrapolation hit
-    //! @return phase-space covariance (6x6, position & momentum, cm & GeV/c) at this extrapolation hit
-    TMatrixDSym getCovariance() const { return m_Covariance; }
+    //! @return phase-space covariance (symmetric 6x6: position & momentum in cm & GeV/c) at this extrapolation hit
+    TMatrixDSym getCovariance() const;
+
+    //! Update the parameters of this extrapolation hit
+    //! @param status State of extrapolation at this hit
+    //! @param t Time of flight from IP to this hit (ns)
+    //! @param r Global position of this hit (cm)
+    //! @param p Momentum of extrapolated track at this hit (GeV/c)
+    //! @param e Covariance matrix of extrapolation at this hit (GeV/c and cm)
+    void update(ExtHitStatus status, double t,
+                const G4ThreeVector& r, const G4ThreeVector& p, const G4ErrorSymMatrix& e);
 
   private:
 
@@ -93,19 +118,19 @@ namespace Belle2 {
     ExtHitStatus m_Status;
 
     //! time of flight (ns)
-    double m_TOF;
+    float m_TOF;
 
     //! position (cm)
-    TVector3 m_Position;
+    float m_Position[3];
 
     //! momentum (GeV/c)
-    TVector3 m_Momentum;
+    float m_Momentum[3];
 
-    //! phase-space covariance (6x6, position & momentum, cm & GeV/c)
-    TMatrixDSym m_Covariance;
+    //! phase-space covariance (symmetric 6x6 linearized to 6*(6+1)/2: position & momentum in cm & GeV/c)
+    float m_Covariance[21];
 
     //! Needed to make the ROOT object storable
-    ClassDef(ExtHit, 3)
+    ClassDef(ExtHit, 4)
 
   };
 }

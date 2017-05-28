@@ -13,6 +13,7 @@
 
 #include <fstream>
 #include <exception>
+#include <cmath>
 
 #include <framework/utilities/FileSystem.h>
 #include <framework/gearbox/Gearbox.h>

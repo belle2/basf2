@@ -86,7 +86,8 @@ bool SPTCmomentumSeedRetrieverModule::createSPTCmomentumSeed(SpacePointTrackCand
 
   QualityEstimationResults results = m_estimator.estimateQualityAndProperties(sortedHits);
 
-  stateSeed(0) = (sortedHits.front()->X()); stateSeed(1) = (sortedHits.front()->Y());
+  stateSeed(0) = (sortedHits.front()->X());
+  stateSeed(1) = (sortedHits.front()->Y());
   stateSeed(2) = (sortedHits.front()->Z());
   if (results.p) {
     auto momentumSeed = *(results.p);

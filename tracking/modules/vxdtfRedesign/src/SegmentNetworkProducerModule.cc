@@ -82,6 +82,10 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
            m_PARAMprintNetworks,
            "If true for each event and each network created a file with a graph is created.", bool(false));
 
+  addParam("printNetworkToMathematica",
+           m_PARAMprintToMathematica,
+           "If true a file containing Mathematica code to generate a graph of the segment network is created.", bool(false));
+
   addParam("allFiltersOff",
            m_PARAMallFiltersOff,
            "For debugging purposes: if true, all filters are deactivated for all hit-combinations and therefore all combinations are accepted.",
@@ -116,7 +120,8 @@ SegmentNetworkProducerModule::initialize()
            filters.size());
 
     m_vxdtfFilters = &filters;
-    SecMapHelper::printStaticSectorRelations(filters, filters.getConfig().secMapName + "segNetProducer", 2, true, true);
+    SecMapHelper::printStaticSectorRelations(filters, filters.getConfig().secMapName + "segNetProducer", 2, m_PARAMprintToMathematica,
+                                             true);
     if (m_vxdtfFilters == nullptr) B2FATAL("SegmentNetworkProducerModule::initialize(): requested secMapName '" << m_PARAMsecMapName <<
                                              "' does not exist! Can not continue...");
     break; // have found our secMap no need for further searching

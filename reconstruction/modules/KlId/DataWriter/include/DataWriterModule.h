@@ -91,6 +91,7 @@ namespace Belle2 {
     /** angle between trach momentum and cluster (measured from ip) */
     Float_t m_KLMTrackClusterSepAngle;
 
+    Float_t m_KLMAngleToMC    ;
 
 
     // variables of closest ECL cluster with respect to KLM cluster
@@ -112,6 +113,43 @@ namespace Belle2 {
     Float_t m_KLMECLEerror;
     /** primitive distance cluster <-> track for associated ECL cluster */
     Float_t m_KLMtrackToECL;
+    /** KlId for that object */
+    Float_t m_KLMKLid;
+    /** momentum of matched mc particle */
+    Float_t m_KLMMCMom;
+    /** phi of matched mc particle */
+    Float_t m_KLMMCPhi;
+    /** theta of matched mc particle */
+    Float_t m_KLMMCTheta;
+    /** measured momentum */
+    Float_t m_KLMMom;
+    /** measured phi  */
+    Float_t m_KLMPhi;
+    /** measured theta */
+    Float_t m_KLMTheta;
+
+    /** MC particles status */
+    Float_t m_KLMMCStatus  ;
+    /** MC partilces life time */
+    Float_t m_KLMMCLifetime;
+    /** pdg code of matched MCparticle */
+    Float_t m_KLMMCPDG     ;
+    /** pdg code of MCparticles mother, for example pi0 for some gammas */
+    Float_t m_KLMMCPrimaryPDG     ;
+    /** hypotheis id of closest ecl cluster 5: gamma, 6:hadron  */
+    Float_t m_KLMECLHypo;
+    /** zernike mva output for closest ECL cluster (based on around 10 z-moments) */
+    Float_t m_KLMECLZMVA;
+    /** zernike moment 4,0 of closest ecl cluster */
+    Float_t m_KLMECLZ40;
+    /** zernike moment 5,1 of closest ECL cluster */
+    Float_t m_KLMECLZ51;
+    /** phi uncertainty oof closeest ecl cluster */
+    Float_t m_KLMECLUncertaintyPhi;
+    /** theta uncertainty of closest ECL cluster */
+    Float_t m_KLMECLUncertaintyTheta;
+    /** mc weight */
+    Float_t m_KLMMCWeight;
 
     // ECL cluster variables for pure ECL Klongs
     /** measured energy */
@@ -124,24 +162,79 @@ namespace Belle2 {
     Float_t m_ECLR;
     /** uncertainty on E measurement in ECL */
     Float_t m_ECLEerror;
-    /** more sophisticated distaqnce to track in ECL, might be removed */
+    /** more sophisticated distaqnce to track in ECL */
     Float_t m_ECLminTrkDistance; // new
-    /** disatance between track entrace into cluster and cluster center */
+    /** distance between track entrace into cluster and cluster center */
     Float_t m_ECLdeltaL; // new
     /** distance cluster to next track in ECL */
     Float_t m_ECLtrackDist;
+
+
+    /** Zernike moment 5,1 see Belle2 note on that */
+    Float_t m_ECLZ51;
+    /** Zernike moment 4,0 see Belle2 note on that */
+    Float_t m_ECLZ40;
+    /** central crystal devided by 3x3 area with it in its center */
+    Float_t m_ECLE1oE9;
+    /** second moment, shower shape */
+    Float_t m_ECL2ndMom;
+    /** number of crystals in the cluster */
+    Float_t m_ECLnumChrystals;
+    /** lateral shower shape */
+    Float_t m_ECLLAT;
+    /** output of a BDT that was fitted on some Zernike Moments on a connected region */
+    Float_t m_ECLZMVA;
+    /** classifier output */
+    Float_t m_ECLKLid;
+    /** mc status, seen in detector etc. ...*/
+    Float_t m_ECLMCStatus  ;
+    /** MC particles lifetime */
+    Float_t m_ECLMCLifetime;
+    /** pdg code of the MCparticle directly related to the cluster */
+    Float_t m_ECLMCPDG     ;
+    /** pdg code of higher order MC particle,
+     * a cluster related to a photon that originates from a pi0 decay get the pi0 code */
+    Float_t m_ECLMCPrimaryPDG     ;
+    /** KlId for that object */
+    Float_t m_ECLDeltaTime        ;
+    /** measured energy uncertainty */
+    Float_t m_ECLUncertaintyEnergy;
+    /** measured uncertainty on theta */
+    Float_t m_ECLUncertaintyTheta ;
+    /** measured uncertainty of phi */
+    Float_t m_ECLUncertaintyPhi   ;
+    /** MC particle momentum; -999 if not MCparticle */
+    Float_t m_ECLMCMom;
+    /** MC particle phi; -999 if not MCparticle  */
+    Float_t m_ECLMCPhi;
+    /** MC particle momentum; -999 if not MCparticle */
+    Float_t m_ECLMCTheta;
+    /** measured momentum */
+    Float_t m_ECLMom;
+    /** measured phi */
+    Float_t m_ECLPhi;
+    /** measured theta */
+    Float_t m_ECLTheta;
+    /** measured Z-coordinate */
+    Float_t m_ECLZ;
     /** ECL trarget variable */
     Float_t m_ECLTruth;
-
     /** is beam bkg */
     Float_t m_isBeamBKG;
+    /** mc weight */
+    Float_t m_ECLMCWeight;
+
+    /** isSignal for the classifier */
+    Float_t m_isSignal;
 
     /** root file */
     TFile* m_f = nullptr; //
     /** tree for klm data */
     TTree* m_treeKLM = nullptr;
-    /** tree for ecl data */
-    TTree* m_treeECL = nullptr;
+    /** tree containing ntuples for ECL cluster with N2 (hadron hypothesis) */
+    TTree* m_treeECLhadron = nullptr;
+    /** tree containing ntuples for ECL cluster with N1 (photon hypothesis) */
+    TTree* m_treeECLgamma = nullptr;
 
   }; // end class
 } // end namespace Belle2

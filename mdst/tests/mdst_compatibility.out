@@ -1,5 +1,5 @@
 [INFO] Steering file: mdst/tests/mdst_compatibility.py
-[?1034h[RESULT] Starting event processing, random seed is set to '1'
+[RESULT] Starting event processing, random seed is set to '1'
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------

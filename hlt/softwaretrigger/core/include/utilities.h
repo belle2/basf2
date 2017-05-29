@@ -16,6 +16,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <analysis/utility/PCmsLabTransform.h>
+#include <analysis/ClusterUtility/ClusterUtils.h>
 #include <TLorentzVector.h>
 
 namespace Belle2 {
@@ -34,7 +35,9 @@ namespace Belle2 {
     template<>
     inline TLorentzVector getFourVector(const ECLCluster& cluster)
     {
-      return TLorentzVector(cluster.getPx(), cluster.getPy(), cluster.getPz(), cluster.getEnergy());
+      ClusterUtils C;
+      const TLorentzVector& v = C.Get4MomentumFromCluster(&cluster);
+      return TLorentzVector(v.Px(), v.Py(), v.Pz(), v.E());
     }
 
     /// Helper function to extract a four vector out of an ECLCluster by combining the momentum information and the pion mass.
@@ -98,8 +101,21 @@ namespace Belle2 {
       if (not entity) {
         return -1;
       }
+
       const TLorentzVector& fourVector = entity->get4Vector();
       return PCmsLabTransform::labToCms(fourVector).Rho();
+    }
+
+    // Template specialization for ECLCluster
+    template<>
+    inline double getRho(const ECLCluster* entity)
+    {
+      if (not entity) {
+        return -1;
+      }
+
+      ClusterUtils C;
+      return PCmsLabTransform::labToCms(C.Get4MomentumFromCluster(entity)).Rho();
     }
 
     /// Helper function to extract the ECL cluster from a particle - either directly or via the attached track.

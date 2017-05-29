@@ -13,6 +13,8 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
+#include <analysis/ClusterUtility/ClusterUtils.h>
+
 #include <analysis/utility/MCMatching.h>
 
 // framework - DataStore
@@ -704,9 +706,10 @@ namespace Belle2 {
               if (momtrack == momtrack) momXchargedtracks += momtrack;
             }
             const auto& ecl = roe->getECLClusters();
+            ClusterUtils C;
             for (auto& x : ecl) {
               if (x == nullptr) continue;
-              TLorentzVector iMomECLCluster = x -> get4Vector();
+              TLorentzVector iMomECLCluster = C.Get4MomentumFromCluster(x);
               if (iMomECLCluster == iMomECLCluster) {
                 if (x->isNeutral()) momXneutralclusters += iMomECLCluster;
                 else if (!(x->isNeutral())) {
@@ -739,7 +742,8 @@ namespace Belle2 {
                 if (x == nullptr) continue;
                 float iEnergy = x -> getEnergy();
                 if (iEnergy == iEnergy) {
-                  if ((T.rotateLabToCms() * x -> get4Vector()).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
+                  ClusterUtils C;
+                  if ((T.rotateLabToCms() * C.Get4MomentumFromCluster(x)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
                 }
                 //       for (auto & i : klm) {
                 //         if ((T.rotateLabToCms() * i -> getMomentum()).Vect().Dot(momW.Vect()) > 0) E_W_90 +=;

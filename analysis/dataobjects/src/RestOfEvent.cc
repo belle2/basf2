@@ -19,6 +19,8 @@
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
+#include <analysis/ClusterUtility/ClusterUtils.h>
+
 #include <framework/logging/Logger.h>
 #include <TLorentzVector.h>
 #include <iostream>
@@ -230,9 +232,10 @@ TLorentzVector RestOfEvent::get4VectorNeutralECLClusters(std::string maskName) c
   TLorentzVector roe4VectorECLClusters;
 
   // Add all momenta from neutral ECLClusters
+  ClusterUtils C;
   for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++) {
     if (roeClusters[iEcl]->isNeutral())
-      roe4VectorECLClusters += roeClusters[iEcl]->get4Vector();
+      roe4VectorECLClusters += C.Get4MomentumFromCluster(roeClusters[iEcl]);
   }
 
   return roe4VectorECLClusters;

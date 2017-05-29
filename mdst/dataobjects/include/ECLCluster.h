@@ -235,34 +235,34 @@ namespace Belle2 {
     /** Return Uncertainty on Phi of Shower */
     double getUncertaintyPhi() const { return (m_sqrtcovmat_11);}
 
-    /** Return Px (GeV/c) */
-    double getPx() const { return getEnergy() * sin(getTheta()) * cos(getPhi()); }
-
-    /** Return Py (GeV/c)  */
-    double getPy() const { return getEnergy() * sin(getTheta()) * sin(getPhi()); }
-
-    /** Return Pz (GeV/c) */
-    double getPz() const { return getEnergy() * cos(getTheta()); }
-
-    /** Return TVector3 momentum (Px,Py,Pz) */
-    TVector3 getMomentum() const;
-
-    /** Return 4Vector  (Px,Py,Pz,E) */
-    TLorentzVector get4Vector() const;
+//    /** Return Px (GeV/c) */
+//    double getPx() const { return getEnergy() * sin(getTheta()) * cos(getPhi()); }
+//
+//    /** Return Py (GeV/c)  */
+//    double getPy() const { return getEnergy() * sin(getTheta()) * sin(getPhi()); }
+//
+//    /** Return Pz (GeV/c) */
+//    double getPz() const { return getEnergy() * cos(getTheta()); }
+//
+//    /** Return TVector3 momentum (Px,Py,Pz) */
+//    TVector3 getMomentum() const;
+//
+//    /** Return 4Vector  (Px,Py,Pz,E) */
+//    TLorentzVector get4Vector() const;
 
     /** Return TVector3 on cluster position (x,y,z) */
     TVector3 getClusterPosition() const;
 
-    /** Return TVector3 on  position on gamma's production
-     By default the position of gamma's production is (0,0,0) */
-    TVector3 getPosition() const;
-
-    /** Return TMatrixDsym 4x4 covariance matrix (order should be: px,py,pz,E) */
-    TMatrixDSym getCovarianceMatrix4x4() const;
-
-    /** Return TMatrixDsym 7x7 covariance matrix (order should be: px,py,pz,E,x,y,z) */
-    TMatrixDSym getCovarianceMatrix7x7() const;
-
+//    /** Return TVector3 on  position on gamma's production
+//     By default the position of gamma's production is (0,0,0) */
+//    TVector3 getPosition() const;
+//
+//    /** Return TMatrixDsym 4x4 covariance matrix (order should be: px,py,pz,E) */
+//    TMatrixDSym getCovarianceMatrix4x4() const;
+//
+//    /** Return TMatrixDsym 7x7 covariance matrix (order should be: px,py,pz,E,x,y,z) */
+//    TMatrixDSym getCovarianceMatrix7x7() const;
+//
     /** Return TMatrixDsym 3x3 covariance matrix for E, Phi and Theta */
     TMatrixDSym getCovarianceMatrix3x3() const;
 
@@ -372,7 +372,8 @@ namespace Belle2 {
     Double32_t  m_logEnergyHighestCrystal;  //[-5, 3., 18]
 
     /** Class definition */
-    ClassDef(ECLCluster, 8);
+    ClassDef(ECLCluster, 9);
+    // 9: Removed all momentum, 4x4, and 7x7 covariance matrix getters.
     // 8: Added clusterId, getUniqueId
     // 7: Changed range of SecondMoment from 0..100 to 0..40
     // 6: Changed stored variances to sqrt(covmat_ii).

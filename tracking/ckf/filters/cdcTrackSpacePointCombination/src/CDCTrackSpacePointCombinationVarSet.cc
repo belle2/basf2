@@ -185,15 +185,19 @@ bool CDCTrackSpacePointCombinationVarSet::extract(const BaseCDCTrackSpacePointCo
 
   const auto* parent = result->getParent();
   if (parent) {
-    const auto* parentSpacePoint = parent->getHit();
-    if (parentSpacePoint) {
-      const auto& parentSensorInfo = parentSpacePoint->getVxdID();
+    // skip the overlap layers
+    parent = parent->getParent();
+    if (parent) {
+      const auto* parentSpacePoint = parent->getHit();
+      if (parentSpacePoint) {
+        const auto& parentSensorInfo = parentSpacePoint->getVxdID();
 
-      var<named("last_layer")>() = parentSensorInfo.getLayerNumber();
-      var<named("last_ladder")>() = parentSensorInfo.getLadderNumber();
-      var<named("last_sensor")>() = parentSensorInfo.getSensorNumber();
-      var<named("last_segment")>() = parentSensorInfo.getSegmentNumber();
-      var<named("last_id")>() = parentSensorInfo.getID();
+        var<named("last_layer")>() = parentSensorInfo.getLayerNumber();
+        var<named("last_ladder")>() = parentSensorInfo.getLadderNumber();
+        var<named("last_sensor")>() = parentSensorInfo.getSensorNumber();
+        var<named("last_segment")>() = parentSensorInfo.getSegmentNumber();
+        var<named("last_id")>() = parentSensorInfo.getID();
+      }
     }
   }
 

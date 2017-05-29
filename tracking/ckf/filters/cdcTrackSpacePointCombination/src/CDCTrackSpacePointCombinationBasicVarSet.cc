@@ -64,7 +64,11 @@ bool CDCTrackSpacePointCombinationBasicVarSet::extract(const BaseCDCTrackSpacePo
   var<named("layer")>() = spacePoint->getVxdID().getLayerNumber();
   var<named("number")>() = result->getNumber();
 
-  var<named("chi2")>() = result->getChi2();
+  if (result->isFitted()) {
+    var<named("chi2")>() = result->getChi2();
+  } else {
+    var<named("chi2")>() = -999;
+  }
 
   return true;
 }

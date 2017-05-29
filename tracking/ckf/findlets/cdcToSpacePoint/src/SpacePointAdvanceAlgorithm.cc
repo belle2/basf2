@@ -51,7 +51,7 @@ Weight SpacePointAdvanceAlgorithm::operator()(CKFCDCToVXDStateObject& currentSta
   genfit::MeasuredStateOnPlane measuredStateOnPlane = currentState.getMeasuredStateOnPlane();
 
   if (not extrapolate(measuredStateOnPlane, spacePoint)) {
-    return std::nan("");
+    return NAN;
   }
 
   currentState.setMeasuredStateOnPlane(measuredStateOnPlane);

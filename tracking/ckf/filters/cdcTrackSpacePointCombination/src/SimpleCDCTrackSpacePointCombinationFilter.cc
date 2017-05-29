@@ -52,7 +52,7 @@ Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackS
   const SpacePoint* spacePoint = currentState.getHit();
 
   // Allow layers to have no hit
-  // TODO: do only allow this in some cases, where it is reasonable to have to hit
+  // TODO: do only allow this in some cases, where it is reasonable to have no hit
   if (not spacePoint) {
     if (currentState.isOnOverlapLayer() or currentState.getNumberOfHolesOnNonOverlappingLayers() <= m_param_hitJumpingUpTo) {
       return 1;
@@ -67,7 +67,7 @@ Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackS
   const double sameHemisphere = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
 
   if (sameHemisphere != 1) {
-    return std::nan("");
+    return NAN;
   }
 
   const TMatrixDSym& cov = currentState.getMSoPCovariance();
@@ -91,7 +91,7 @@ Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackS
                                    differenceHelix.z() * differenceHelix.z() / sqrt(cov(2, 2)));
 
     if (helix_chi2_xyz > m_param_maximumHelixChi2XYZ[layer - 3]) {
-      return std::nan("");
+      return NAN;
     } else {
       return helix_chi2_xyz;
     }
@@ -104,7 +104,7 @@ Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackS
     const double chi2_xyz = chi2_xy + difference.z() * difference.z() / sqrt(cov(2, 2));
 
     if (chi2_xy > m_param_maximumChi2XY[layer - 3]) {
-      return std::nan("");
+      return NAN;
     } else {
       return chi2_xyz;
     }
@@ -112,7 +112,7 @@ Weight SimpleCDCTrackSpacePointCombinationFilter::operator()(const BaseCDCTrackS
     // Filter 3
     const double chi2 = currentState.getChi2();
     if (chi2 > m_param_maximumChi2[layer - 3]) {
-      return std::nan("");
+      return NAN;
     } else {
       return chi2;
     }

@@ -17,7 +17,7 @@ namespace Belle2 {
 
   /**
    * Class to store unpacked raw data (hits in feature-extraction format)
-   * It provides also calculation of 50% CFD leading and falling edge times
+   * It provides also calculation of 50% CFD leading and falling edge times and errors
    */
 
   class TOPRawDigit : public RelationsObject {
@@ -42,7 +42,7 @@ namespace Belle2 {
      * Usefull constructor
      * @param scrodID SCROD ID
      */
-    TOPRawDigit(unsigned short scrodID): m_scrodID(scrodID)
+    explicit TOPRawDigit(unsigned short scrodID): m_scrodID(scrodID)
     {}
 
     /**
@@ -68,6 +68,12 @@ namespace Belle2 {
      * @param window number
      */
     void setASICWindow(unsigned short window) {m_window = window;}
+
+    /**
+     * Sets current (reference) window number
+     * @param window number
+     */
+    void setLastWriteAddr(unsigned short window) {m_lastWriteAddr = window;}
 
     /**
      * Sets fine timing for 50% CFD at rising edge (within two samples)
@@ -162,9 +168,15 @@ namespace Belle2 {
 
     /**
      * Returns ASIC storage window number
-     * @return storage window number
+     * @return window number
      */
     unsigned getASICWindow() const {return m_window;}
+
+    /**
+     * Returns current (reference) ASIC window number
+     * @return window number
+     */
+    unsigned getLastWriteAddr() const {return m_lastWriteAddr;}
 
     /**
      * Returns fine timing for 50% CFD (within two samples)
@@ -258,7 +270,7 @@ namespace Belle2 {
 
     /**
      * Returns leading edge CFD time
-     * @return time [samples] (not in [ns], conversion factor is ~0.368 ns / sample)
+     * @return time [samples] (not in [ns]!)
      */
     double getCFDLeadingTime() const
     {
@@ -267,7 +279,7 @@ namespace Belle2 {
 
     /**
      * Returns falling edge CFD time
-     * @return time [samples] (not in [ns], conversion factor is ~0.368 ns / sample)
+     * @return time [samples] (not in [ns]!)
      */
     double getCFDFallingTime() const
     {
@@ -275,8 +287,28 @@ namespace Belle2 {
     }
 
     /**
+     * Returns leading edge CFD time uncertainty (assuming uncorrelated noise)
+     * @param rmsNoise r.m.s of the pedestal fluctuations [ADC counts]
+     * @return time uncertainty [samples] (not in [ns]!)
+     */
+    double getCFDLeadingTimeError(double rmsNoise) const
+    {
+      return rmsNoise * timeErrorCoefficient(m_VRise0, m_VRise1);
+    }
+
+    /**
+     * Returns falling edge CFD time uncertainty (assuming uncorrelated noise)
+     * @param rmsNoise r.m.s of the pedestal fluctuations [ADC counts]
+     * @return time uncertainty [samples] (not in [ns]!)
+     */
+    double getCFDFallingTimeError(double rmsNoise) const
+    {
+      return rmsNoise * timeErrorCoefficient(m_VFall0, m_VFall1);
+    }
+
+    /**
      * Returns signal full width half maximum
-     * @return FWHM [samples] (not in [ns], conversion factor is ~0.368 ns / sample)
+     * @return FWHM [samples] (not in [ns]!)
      */
     double getFWHM() const {return getCFDFallingTime() - getCFDLeadingTime();}
 
@@ -292,6 +324,43 @@ namespace Belle2 {
      */
     bool isFallingEdgeValid() const {return checkEdge(m_VFall1, m_VFall0, m_VPeak);}
 
+
+    /**
+     * Checks if feature extraction points make sense
+     * @return true if consistent
+     */
+    bool isFEValid() const
+    {
+      if (m_VPeak > 0) {
+        if (m_VRise0 > m_VRise1) return false;
+        if (m_VRise1 > m_VPeak) return false;
+        if (m_VFall0 > m_VPeak) return false;
+        if (m_VFall1 > m_VFall0) return false;
+      } else {
+        if (m_VRise0 < m_VRise1) return false;
+        if (m_VRise1 < m_VPeak) return false;
+        if (m_VFall0 < m_VPeak) return false;
+        if (m_VFall1 < m_VFall0) return false;
+      }
+      return true;
+    }
+
+
+    /**
+     * Checks if feature extraction finds a pedestal jump
+     * @return true if pedestal jump
+     */
+    bool isPedestalJump() const
+    {
+      if (m_sampleRise == 0) {
+        if ((m_dSampleFall + 1) % 64 == 0) return true;
+      } else if ((m_sampleRise + 1) % 64 == 0) {
+        if (m_dSampleFall % 64 == 0) return true;
+      }
+      return false;
+    }
+
+
   private:
 
     /**
@@ -306,6 +375,14 @@ namespace Belle2 {
       if (slope == 0) return sample;
       return (int(m_VPeak) - 2 * value) / (2 * slope) + sample;
     }
+
+    /**
+     * Calculate the coefficient of time error
+     * @param y1 first value (e.g. VRise0 or VFall0)
+     * @param y2 second value (e.g. VRise1 or VFall1)
+     * @return coefficient of time error
+     */
+    double timeErrorCoefficient(double y1, double y2) const;
 
     /**
      * Checks if values v0, v1 and vp are consistent
@@ -331,8 +408,9 @@ namespace Belle2 {
     short m_VFall1 = 0;       /**< ADC value at m_sampleRise + m_dSampleFall + 1 */
     short m_integral = 0;     /**< integral of a pulse (e.g. \propto charge) */
     unsigned short m_errorFlags = 0; /**< feature extraction error flags (see enum) */
+    unsigned short m_lastWriteAddr = 0; /**< current (reference) window number */
 
-    ClassDef(TOPRawDigit, 1); /**< ClassDef */
+    ClassDef(TOPRawDigit, 2); /**< ClassDef */
 
   };
 

@@ -82,10 +82,10 @@ namespace Belle2 {
     /** Get experiment override, or -1 if unset. */
     int getExperimentOverride() const { return m_experiment; }
 
-    /** Get skipNEvents override, or -1 if unset. */
-    void setSkipEventsOverride(int skipEvents) { m_skipNEvents = skipEvents; }
     /** Set skipNEvents override */
-    int getSkipEventsOverride() const { return m_skipNEvents; }
+    void setSkipEventsOverride(unsigned int skipEvents) { m_skipNEvents = skipEvents; }
+    /** Get skipNEvents override, or 0 if unset. */
+    unsigned int getSkipEventsOverride() const { return m_skipNEvents; }
 
     /** Number of generated events (from EventInfoSetter). */
     unsigned int getNumberOfMCEvents() const { return m_mcEvents; }
@@ -102,8 +102,17 @@ namespace Belle2 {
     /** Override output file name for modules */
     void setOutputFileOverride(const std::string& name) { m_outputFileOverride = name; }
 
-    /** Return overriden output file name, or "" if none was set */
-    const std::string& getOutputFileOverride() const { return m_outputFileOverride; }
+    /** Return overriden output file name, or "" if none was set
+     *
+     * Note that this will remove the current value to avoid reuse.
+     * (e.g. subsequent calls will always return "")
+     */
+    std::string getOutputFileOverride()
+    {
+      std::string s = m_outputFileOverride;
+      m_outputFileOverride = "";
+      return s;
+    }
 
     /** Override number of processes to run in parallel.
      *
@@ -220,7 +229,7 @@ namespace Belle2 {
     unsigned int m_mcEvents; /**< counter for number of generated events. */
     int m_run; /**< override run for EventInfoSetter. */
     int m_experiment; /**< override experiment for EventInfoSetter. */
-    int m_skipNEvents; /**< override skipNEvents for EventInfoSetter/RootInput. */
+    unsigned int m_skipNEvents; /**< override skipNEvents for EventInfoSetter/RootInput. */
 
     /**
      *  Set up environment from standard BELLE2_ environment variables.

@@ -2,6 +2,10 @@
 
 #include <TProfile.h>
 #include <TRandom.h>
+#include <TClonesArray.h>
+#include <calibration/dbobjects/TestCalibObject.h>
+#include <calibration/dbobjects/TestCalibMean.h>
+
 
 using namespace std;
 using namespace Belle2;
@@ -20,6 +24,7 @@ TestCalibrationAlgorithm::TestCalibrationAlgorithm(): CalibrationAlgorithm("CaTe
 
 CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
 {
+  // Pulling in data from collector output, we only use the histogram in this test
   auto& histogram1 = getObject<TH1F>("histogram1");
   auto& ttree = getObject<TTree>("tree");
   auto& mille = getObject<MilleData>("test_mille");
@@ -27,22 +32,28 @@ CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
   if (histogram1.GetEntries() < 100 || ttree.GetEntries() < 100 || mille.getFiles().empty())
     return c_NotEnoughData;
 
-  Double_t mean = histogram1.GetMean();
-  Double_t meanerror = histogram1.GetMeanError();
+  Float_t mean = histogram1.GetMean();
+  Float_t meanError = histogram1.GetMeanError();
 
-  if (meanerror <= 0.)
+  if (meanError <= 0.)
     return c_Failure;
 
-  static int nameDistinguisher(0);
-  TH1I* correction = new TH1I(TString(string("constant-in-histo") + to_string(nameDistinguisher)),
-                              "Histogram should have one entry at mean value of calibration test histo", 100, 0, 100);
-  nameDistinguisher++;
-  correction->Fill((int)mean);
+  // Example of saving a DBObject.
+  TestCalibMean* correction = new TestCalibMean(mean, meanError);
+  saveCalibration(correction, "TestCalibMean");
 
-  saveCalibration(correction, getPrefix());
+  // Example of saving a Belle2 DBArray of DBObjects defined in the dbobjects directory
+  TClonesArray* exampleDBArrayConstants = new TClonesArray("Belle2::TestCalibObject", 2);
+  float val = 0.0;
+  for (int i = 0; i < 2; i++) {
+    val += 1.0;
+    new((*exampleDBArrayConstants)[i]) TestCalibObject(val);
+  }
+  saveCalibration(exampleDBArrayConstants, "TestCalibObjects");
 
   // Iterate until we find answer to the most fundamental question...
   B2INFO("mean: " << mean);
+  B2INFO("meanError: " << meanError);
   if (mean - 42. >= 1.)
     return c_Iterate;
 

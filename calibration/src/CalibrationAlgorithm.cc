@@ -1,6 +1,8 @@
 #include <calibration/CalibrationAlgorithm.h>
 #include <boost/algorithm/string.hpp>
 
+#include <TClonesArray.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -123,10 +125,37 @@ IntervalOfValidity CalibrationAlgorithm::getIovFromData()
 
 void CalibrationAlgorithm::saveCalibration(TObject* data, const string& name, const IntervalOfValidity& iov)
 {
-  m_payloads.emplace_back("dbstore", name, data, iov);
+  m_payloads.emplace_back(name, data, iov);
+}
+
+void CalibrationAlgorithm::saveCalibration(TClonesArray* data, const string& name, const IntervalOfValidity& iov)
+{
+  m_payloads.emplace_back(name, data, iov);
 }
 
 void CalibrationAlgorithm::saveCalibration(TObject* data, const string& name)
+{
+  if (m_runs.empty())
+    return;
+
+  IntervalOfValidity iov;
+  IntervalOfValidity caRange(m_runs[0].first, m_runs[0].second, m_runs[m_runs.size() - 1].first, m_runs[m_runs.size() - 1].second);
+
+  if (getRunListFromAllData() == std::vector<ExpRun>({{ -1, -1}})) {
+    // For granularity=all, automatic IOV is defined by range of collected data
+    iov = getIovFromData();
+  } else {
+    int expMin = m_runs[0].first;
+    int runMin = m_runs[0].second;
+    int expMax = m_runs[m_runs.size() - 1].first;
+    int runMax = m_runs[m_runs.size() - 1].second;
+    iov = IntervalOfValidity(expMin, runMin, expMax, runMax);
+  }
+
+  saveCalibration(data, name, iov);
+}
+
+void CalibrationAlgorithm::saveCalibration(TClonesArray* data, const string& name)
 {
   if (m_runs.empty())
     return;

@@ -10,16 +10,20 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/combined/WireHitPreparer.h>
+#include <tracking/trackFindingCDC/findlets/combined/ClusterPreparer.h>
 #include <tracking/trackFindingCDC/findlets/combined/SegmentFinderFacetAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/combined/TrackFinderSegmentPairAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackFlightTimeAdjuster.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackExporter.h>
 
-#include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
+#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -50,7 +54,10 @@ namespace Belle2 {
     private:
       // Findlets
       /// Preparation findlet creating the wire hits from the packed CDCHits
-      WireHitPreparer m_wireHitTopologyPreparer;
+      WireHitPreparer m_wireHitPreparer;
+
+      /// Preparation findlet creating the clusters wire hits forming locally connected groups
+      ClusterPreparer m_clusterPreparer;
 
       /// First stage cellular automaton segment finder
       SegmentFinderFacetAutomaton m_segmentFinderFacetAutomaton;
@@ -76,6 +83,12 @@ namespace Belle2 {
       // Object pools
       /// Memory for the wire hits
       std::vector<CDCWireHit> m_wireHits;
+
+      /// Memory for the wire hits cluster
+      std::vector<CDCWireHitCluster> m_clusters;
+
+      /// Memory for the wire hits super clusters
+      std::vector<CDCWireHitCluster> m_superClusters;
 
       /// Memory for the segments
       std::vector<CDCSegment2D> m_segments;

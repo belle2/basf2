@@ -130,15 +130,17 @@ namespace Belle2 {
     enum { HIT_DIMENSIONS = 2 /**< sensitive Dimensions of the Hit */ };
 
     unsigned short m_sensorID; /**< Unique sensor identifier.*/
-    const PXDTrueHit* m_trueHit; /**< Pointer to the TrueHit used when creating this object */
-    const PXDCluster* m_cluster; /**< Pointer to the Cluster used when creating this object */
+    /** Pointer to the TrueHit used when creating this object */
+    const PXDTrueHit* m_trueHit; //! transient member (not written out during streaming)
+    /** Pointer to the Cluster used when creating this object */
+    const PXDCluster* m_cluster; //! transient member (not written out during streaming)
     float m_energyDep; /**< deposited energy.*/
     //float m_energyDepError; /**< error in dep. energy.*/
 
     /** Set up Detector plane information */
     void setDetectorPlane();
 
-    ClassDef(PXDRecoHit, 6)
+    ClassDef(PXDRecoHit, 7)
   };
 
 } // namespace Belle2

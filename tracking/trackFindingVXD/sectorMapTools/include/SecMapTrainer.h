@@ -20,7 +20,7 @@
 #include <tracking/trackFindingVXD/sectorMapTools/FilterMill.h>
 #include <tracking/trackFindingVXD/sectorMapTools/RawSecMapRootInterface.h>
 //#include <tracking/trackFindingVXD/sectorMapTools/SectorTools.h>
-#include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
+#include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
 
 
 #include <framework/geometry/B2Vector3.h>
@@ -37,16 +37,16 @@
 
 namespace Belle2 {
 
-  /** This class contains all relevant tools for training a sectorMap. */
+  /** This class contains all relevant tools for training a VXDTFFilters. */
   template <class FilterFactoryType>
   class SecMapTrainer {
   protected:
     /** name of the setting to be used for this training */
     const std::string m_nameSetup;
 
-    /** pointer to the SectorMap used for this training. Needed as some information is
-    only accessable from the filters (in the sectormap).  */
-    StoreObjPtr< SectorMap<SpacePoint> >  m_secMapPtr;
+    /** a reference to the singleton FiltersContainer used for this training. Needed as some information are
+    only accessable from the filters (in the container).  */
+    FiltersContainer<SpacePoint>& m_filtersContainer = Belle2::FiltersContainer<SpacePoint>::getInstance();
 
     /** Contains all relevant configurations needed for training a sectorMap.
     Copy of the config in the SectorMap needed as it is modified (the one in VXDTFFilters is const).  */
@@ -98,7 +98,7 @@ namespace Belle2 {
       B2DEBUG(10, "SecMapTrainer::acceptHit: the TC has layerID: " << layerID << " and allowd layers: " << ids << " and was " <<
               (found ? "accepted" : "rejected"));
 
-      return true;
+      return found;
     }
 
 
@@ -294,18 +294,16 @@ namespace Belle2 {
   public:
 
     /** constructor. */
-    SecMapTrainer(StoreObjPtr< SectorMap<SpacePoint> >& sectorMap, std::string setupName , int rngAppendix = 0) :
+    SecMapTrainer(std::string setupName , std::string appendix = "") :
       m_nameSetup(setupName),
-      //WARNING: if someone ever changes the default name or the template class this will break
-      m_secMapPtr(sectorMap),
-      m_config(m_secMapPtr->getFilters(m_nameSetup)->getConfig()),
+      m_config(m_filtersContainer.getFilters(m_nameSetup)->getConfig()),
       m_factory(
         m_config.vIP.X(),
         m_config.vIP.Y(),
         m_config.vIP.Z(),
         m_config.mField),
       m_filterMill(),
-      m_rootInterface(m_config.secMapName, rngAppendix),
+      m_rootInterface(m_config.secMapName, appendix),
       m_expNo(std::numeric_limits<unsigned>::max()),
       m_runNo(std::numeric_limits<unsigned>::max()),
       m_evtNo(std::numeric_limits<unsigned>::max())
@@ -362,8 +360,6 @@ namespace Belle2 {
     /** returns configuration. */
     const SectorMapConfig& getConfig() { return m_config; }
 
-    /** returns pointer to the used sector map */
-    StoreObjPtr< SectorMap<SpacePoint> >*   getSecMapPtr() { return &m_secMapPtr; }
 
     /** returns the name of the setup used for this trainer */
     const std::string getSetupName() { return m_nameSetup; }
@@ -409,7 +405,7 @@ namespace Belle2 {
       for (const SpacePoint* aSP : tc.getHits()) {
         if (!acceptHit(*aSP)) continue;
 
-        FullSecID fSecID = m_secMapPtr->getFilters(m_nameSetup)->getFullID(aSP->getVxdID(),
+        FullSecID fSecID = m_filtersContainer.getFilters(m_nameSetup)->getFullID(aSP->getVxdID(),
                            aSP->getNormalizedLocalU(), aSP->getNormalizedLocalV());
         if (fSecID.getFullSecID() == std::numeric_limits<unsigned int>::max())
         { B2ERROR("a secID for spacePoint not found!"); continue; }

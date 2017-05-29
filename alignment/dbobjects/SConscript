@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['framework', '$ROOT_LIBS', 'vxd_dataobjects', 'vxd']
-#env['SUBLIB'] = True
+env['LIBS'] = ['$ROOT_LIBS', 'calibration']
+env['SUBLIB'] = True
 
 Return('env')

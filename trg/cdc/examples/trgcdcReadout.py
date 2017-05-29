@@ -108,7 +108,7 @@ class TestModule(basf2.Module):
             print(listnames[i], "has", len(tracks), "tracks.")
             for track in tracks:
                 print("phi0[deg] = %.2f" % (track.getPhi0() * 180. / np.pi),
-                      "pt[GeV] = %.3f" % track.getTransverseMomentum(),
+                      "pt[GeV] = %.3f" % track.getTransverseMomentum(1.5),
                       "charge = %d" % track.getChargeSign(),
                       "theta[deg] = %.2f" % (np.arctan2(1., track.getCotTheta()) * 180. / np.pi),
                       "z[cm] = %.2f" % track.getZ0())

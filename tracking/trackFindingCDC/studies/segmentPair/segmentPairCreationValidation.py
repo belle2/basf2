@@ -36,10 +36,10 @@ CONTACT = "oliver.frost@desy.de"
 
 
 class SegmentPairCreationValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
-    segment_finder_module = basf2.register_module("SegmentFinderCDCMCTruth")
+    segment_finder_module = basf2.register_module("TFCDC_SegmentCreatorMCTruth")
     segment_finder_module.param({"MinCDCHits": 4})
 
-    segment_pair_finder_module = basf2.register_module("TrackFinderCDCSegmentPairAutomaton")
+    segment_pair_finder_module = basf2.register_module("TFCDC_TrackFinderSegmentPairAutomaton")
     segment_pair_finder_module.param({
         "WriteSegmentPairs": True,
         "SegmentPairFilter": "all",
@@ -61,7 +61,7 @@ class SegmentPairCreationValidationRun(BrowseTFileOnTerminateRunMixin, StandardE
         segment_finder_module = self.get_basf2_module(self.segment_finder_module)
         main_path.add_module(segment_finder_module)
 
-        main_path.add_module("SegmentFitterModule")
+        main_path.add_module("TFCDC_SegmentFitter")
 
         segment_pair_finder_module = self.get_basf2_module(self.segment_pair_finder_module)
         main_path.add_module(segment_pair_finder_module)

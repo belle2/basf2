@@ -9,8 +9,8 @@ import warnings
 
 import numpy as np
 
-import tracking.validation.harvesting as harvesting
-import tracking.validation.refiners as refiners
+import tracking.harvest.harvesting as harvesting
+import tracking.harvest.refiners as refiners
 import tracking.validation.utilities as utilities
 
 import tracking.harvest.peelers as peelers
@@ -88,20 +88,25 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         fit_result = track_match_look_up.getRelatedTrackFitResult(reco_track)
         fit_crops = peelers.peel_track_fit_result(fit_result)
 
+        # Event Info
+        event_meta_data = Belle2.PyStoreObj("EventMetaData")
+        event_crops = peelers.peel_event_info(event_meta_data)
+
         return dict(
             **mc_particle_crops,
             **hit_content_crops,
             **pr_to_mc_match_info_crops,
             **seed_fit_crops,
             **fit_crops,
+            **event_crops
         )
 
     def peel_pr_to_mc_match_info(self, reco_track):
         track_match_look_up = self.track_match_look_up
-        is_matched = track_match_look_up.isMatchedPRTrackCand(reco_track)
-        is_clone = track_match_look_up.isClonePRTrackCand(reco_track)
-        is_background = track_match_look_up.isBackgroundPRTrackCand(reco_track)
-        is_ghost = track_match_look_up.isGhostPRTrackCand(reco_track)
+        is_matched = track_match_look_up.isMatchedPRRecoTrack(reco_track)
+        is_clone = track_match_look_up.isClonePRRecoTrack(reco_track)
+        is_background = track_match_look_up.isBackgroundPRRecoTrack(reco_track)
+        is_ghost = track_match_look_up.isGhostPRRecoTrack(reco_track)
 
         reco_track_det_hit_ids = utilities.get_det_hit_ids(reco_track)
         n_intersecting_mc_tracks = 0
@@ -117,7 +122,6 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             is_ghost=is_ghost,
             is_clone_or_match=(is_matched or is_clone),
             is_fake=not (is_matched or is_clone),
-            hit_efficiency=track_match_look_up.getRelatedEfficiency(reco_track),
             hit_purity=track_match_look_up.getRelatedPurity(reco_track),
             n_intersecting_mc_tracks=n_intersecting_mc_tracks,
         )

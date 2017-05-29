@@ -93,6 +93,8 @@ namespace Belle2 {
       TH1F* h_qcss_rate2W[48];
 
       /** Energy deposited */
+      TH1F* h_qcss_hitrate0;
+      /** Energy deposited */
       TH1F* h_qcss_hitrate1;
       /** Energy deposited */
       TH1F* h_qcss_hitrate2;

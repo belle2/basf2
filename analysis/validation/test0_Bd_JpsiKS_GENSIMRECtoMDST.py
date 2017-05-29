@@ -38,7 +38,7 @@ set_random_seed(123)
 beamparameters = add_beamparameters(analysis_main, "Y4S")
 
 # generateY4S function is defined in analysis/scripts/modularAnalysis.py
-generateY4S(2000, 'Bd_JpsiKS.dec')
+generateY4S(2000, Belle2.FileSystem.findFile('/analysis/validation/Bd_JpsiKS.dec'))
 
 # Load geometry
 loadGearbox()

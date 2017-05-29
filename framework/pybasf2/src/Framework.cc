@@ -31,7 +31,6 @@
 
 #include <set>
 
-using namespace std;
 using namespace boost::python;
 using namespace Belle2;
 
@@ -57,7 +56,7 @@ Framework::~Framework()
 }
 
 
-void Framework::addModuleSearchPath(const string& path)
+void Framework::addModuleSearchPath(const std::string& path)
 {
   ModuleManager::Instance().addModuleSearchPath(path);
 }
@@ -69,13 +68,13 @@ void Framework::setExternalsPath(const std::string& path)
 }
 
 
-ModulePtr Framework::registerModule(const string& moduleName)
+ModulePtr Framework::registerModule(const std::string& moduleName)
 {
   return ModuleManager::Instance().registerModule(moduleName);
 }
 
 
-ModulePtr Framework::registerModule(const string& moduleName, const string& sharedLibPath)
+ModulePtr Framework::registerModule(const std::string& moduleName, const std::string& sharedLibPath)
 {
   return ModuleManager::Instance().registerModule(moduleName, sharedLibPath);
 }
@@ -182,7 +181,7 @@ boost::python::list Framework::getModuleSearchPathsPython() const
 {
   boost::python::list returnList;
 
-  for (string path : ModuleManager::Instance().getModuleSearchPaths())
+  for (std::string path : ModuleManager::Instance().getModuleSearchPaths())
     returnList.append(boost::python::object(path));
   return returnList;
 }
@@ -221,8 +220,8 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(process_overloads, process, 1, 2)
 void Framework::exposePythonAPI()
 {
   //Overloaded methods
-  ModulePtr(Framework::*registerModule1)(const string&) = &Framework::registerModule;
-  ModulePtr(Framework::*registerModule2)(const string&, const string&) = &Framework::registerModule;
+  ModulePtr(Framework::*registerModule1)(const std::string&) = &Framework::registerModule;
+  ModulePtr(Framework::*registerModule2)(const std::string&, const std::string&) = &Framework::registerModule;
 
   //Expose framework class
   class_<Framework>("Framework")

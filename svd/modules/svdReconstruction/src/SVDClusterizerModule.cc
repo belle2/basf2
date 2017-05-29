@@ -171,8 +171,8 @@ void SVDClusterizerModule::initialize()
   // Warn if tanLorentz set
   if (m_tanLorentzAngle_holes > 0 or m_tanLorentzAngle_electrons > 0)
     B2WARNING("The tanLorentz parameters are obsolete and have no effect!");
-    // Report:
-    B2INFO("SVDClusterizer Parameters (in default system unit, *=cannot be set directly):");
+  // Report:
+  B2INFO("SVDClusterizer Parameters (in default system unit, *=cannot be set directly):");
 
   // Calculate likelihood threshold for time rejection if time fitter is used
   if (m_useFitter) {
@@ -417,7 +417,7 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     } else {
       clusterCharge = cls.getCharge();
     }
-
+    double clusterSNR = clusterCharge / elNoise / sqrt(cls.size());
     //const std::map<unsigned int, float> stripCharges = cls.getStripCharges();
     //const std::map<unsigned int, float> stripCharges = cls.getQFCharges();
     std::map<unsigned int, float> stripCharges;
@@ -565,7 +565,7 @@ void SVDClusterizerModule::writeClusters(VxdID sensorID, int side)
     int clsIndex = storeClusters.getEntries();
     storeClusters.appendNew(SVDCluster(
                               sensorID, side == 0, clusterPosition, clusterPositionError, clusterTime, clusterTimeStd,
-                              clusterSeed.getCharge(), clusterCharge, clusterSize
+                              clusterSeed.getCharge(), clusterCharge, clusterSize, clusterSNR
                             ));
 
     //Create Relations to this Digit
@@ -633,6 +633,7 @@ void SVDClusterizerModule::writeClustersWithTimeFit(VxdID sensorID, int side)
     int nAddedStrips = 0;
     int nAddedSamples = 0;
     std::array<double, 6> stripData;
+    double chargeVariance = 0.0;
     for (auto sample : cls.samples()) {
       short index = sample.getSampleIndex();
       unsigned int strip = sample.getCellID();
@@ -643,6 +644,7 @@ void SVDClusterizerModule::writeClustersWithTimeFit(VxdID sensorID, int side)
         nAddedStrips++;
         nAddedSamples = 0;
         currentNoise = m_noiseMap.getNoise(sample);
+        chargeVariance += currentNoise * currentNoise;
         currentStrip = strip;
       }
       stripData[index] = sample.getCharge();
@@ -652,6 +654,7 @@ void SVDClusterizerModule::writeClustersWithTimeFit(VxdID sensorID, int side)
     //Get time and amplitudes
     auto amplitudes = fitter.getFittedAmplitudes();
     double clusterCharge = std::accumulate(amplitudes.begin(), amplitudes.end(), 0.0);
+    double clusterSNR = clusterCharge / sqrt(chargeVariance);
     auto itSeedStrip = std::max_element(amplitudes.begin(), amplitudes.end());
     int iSeedStrip = std::distance(amplitudes.begin(), itSeedStrip);
     int seedStrip = stripNumbers[iSeedStrip];
@@ -751,7 +754,7 @@ void SVDClusterizerModule::writeClustersWithTimeFit(VxdID sensorID, int side)
     int clsIndex = storeClusters.getEntries();
     storeClusters.appendNew(SVDCluster(
                               sensorID, side == 0, clusterPosition, clusterPositionError,
-                              clusterTime, clusterTimeStd, seedCharge, clusterCharge, clusterSize
+                              clusterTime, clusterTimeStd, seedCharge, clusterCharge, clusterSize, clusterSNR
                             ));
 
     //Create Relations to this Digit
@@ -767,4 +770,5 @@ void SVDClusterizerModule::writeClustersWithTimeFit(VxdID sensorID, int side)
   m_clusters.clear();
   m_cache.clear();
 }
+
 

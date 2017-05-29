@@ -105,7 +105,7 @@ namespace Belle2 {
 
     /**
      * Constructor from a Lorentz vector and PDG code.
-     * All other private members are set to their defalt values (0).
+     * All other private members are set to their default values (0).
      * @param momentum Lorentz vector
      * @param pdgCode PDG code
      */
@@ -128,18 +128,18 @@ namespace Belle2 {
 
     /**
      * Constructor for composite particles.
-     * All other private members are set to their defalt values (0).
+     * All other private members are set to their default values (0).
      * @param momentum Lorentz vector
      * @param pdgCode PDG code
      * @param flavorType decay flavor type
-     * @param daughterIndices vector of daughter indices
+     * @param daughterIndices indices of daughters in StoreArray<Particle>
      * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
      */
     Particle(const TLorentzVector& momentum,
              const int pdgCode,
              EFlavorType flavorType,
              const std::vector<int>& daughterIndices,
-             TClonesArray* arrayPointer = 0);
+             TClonesArray* arrayPointer = nullptr);
 
     /**
      * Constructor from a reconstructed track (mdst object Track);
@@ -257,7 +257,7 @@ namespace Belle2 {
 
     /**
      * Appends index of daughter to daughters index array
-     * @param particleIndex daughter particle store array index
+     * @param particleIndex index of daughter in StoreArray<Particle>
      */
     void appendDaughter(int particleIndex)
     {
@@ -479,10 +479,7 @@ namespace Belle2 {
      * Returns unique identifier of final state particle (needed in particle combiner)
      * @return unique identifier of final state particle
      */
-    int getMdstSource() const
-    {
-      return m_mdstIndex + (m_particleType << 24);
-    }
+    int getMdstSource() const;
 
     /**
      * Returns number of daughter particles
@@ -645,7 +642,10 @@ namespace Belle2 {
      */
     void addExtraInfo(const std::string& name, float value);
 
-    /** Returns the pointer to the store array which holds the daughter particles */
+    /** Returns the pointer to the store array which holds the daughter particles
+     *
+     *  \warning TClonesArray is dangerously easy to misuse, please avoid.
+     */
     TClonesArray* getArrayPointer() const
     {
       if (!m_arrayPointer)
@@ -670,6 +670,15 @@ namespace Belle2 {
     EFlavorType m_flavorType;  /**< flavor type. */
     EParticleType m_particleType;  /**< particle type */
     unsigned m_mdstIndex;  /**< 0-based index of MDST store array object */
+
+    /**
+     * Identifier that can be used to identify whether the particle is unqiue
+     * or is a copy or representation of another. For example a kaon and pion
+     * particles constructed from the same Track are representations of the
+     * same physical object in the detector and cannot be used in the reconstruction
+     * of the same decay chain
+     */
+    int m_identifier = -1;
 
     /** Stores associated user defined values.
      *
@@ -729,7 +738,13 @@ namespace Belle2 {
     void setFlavorType();
 
 
-    ClassDef(Particle, 7); /**< Class to store reconstructed particles. */
+    /**
+     * set mdst array index
+     */
+    void setMdstArrayIndex(const int arrayIndex);
+
+    ClassDef(Particle, 8); /**< Class to store reconstructed particles. */
+    // v8: added identifier, changed getMdstSource
 
     friend class ParticleSubset;
   };

@@ -84,9 +84,13 @@ namespace Belle2 {
       m_recoTrack = recoTracks.appendNew(position, momentum, charge,
                                          m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits,
                                          m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits, m_storeArrayNameOfHitInformation);
+      m_recoTrack2 = recoTracks.appendNew(position, momentum, charge,
+                                          m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits,
+                                          m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits, m_storeArrayNameOfHitInformation);
     }
 
     RecoTrack* m_recoTrack;
+    RecoTrack* m_recoTrack2;
     std::string m_storeArrayNameOfRecoTracks;
     std::string m_storeArrayNameOfCDCHits;
     std::string m_storeArrayNameOfSVDHits;
@@ -173,6 +177,30 @@ namespace Belle2 {
 
     EXPECT_B2FATAL(m_recoTrack->setFoundByTrackFinder(cdcHit, RecoHitInformation::OriginTrackFinder::c_SegmentTrackCombiner));
     EXPECT_B2FATAL(m_recoTrack->setRightLeftInformation(cdcHit, RecoHitInformation::RightLeftInformation::c_left));
+  }
+
+  /** Test simple Correct handling fo the MCFinder hit classification */
+  TEST_F(RecoTrackTest, cdcHitMCFinderCategory)
+  {
+    StoreArray<CDCHit> cdcHits(m_storeArrayNameOfCDCHits);
+
+    EXPECT_FALSE(m_recoTrack->hasCDCHits());
+
+    // Add three cdc hits to the track
+    m_recoTrack->addCDCHit(cdcHits[0], 1, RecoHitInformation::RightLeftInformation::c_right,
+                           RecoHitInformation::OriginTrackFinder::c_MCTrackFinderPriorityHit);
+    m_recoTrack->addCDCHit(cdcHits[1], 0, RecoHitInformation::RightLeftInformation::c_right,
+                           RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit);
+    // the mcfinder prorperty of this hit is not provided explicitly and therefore should be set to undefined
+    m_recoTrack->addCDCHit(cdcHits[2], 2);
+
+    // get the RecoHitInfo and check their category
+    EXPECT_EQ(m_recoTrack->getRecoHitInformation(cdcHits[0])->getFoundByTrackFinder(),
+              RecoHitInformation::OriginTrackFinder::c_MCTrackFinderPriorityHit);
+    EXPECT_EQ(m_recoTrack->getRecoHitInformation(cdcHits[1])->getFoundByTrackFinder(),
+              RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit);
+    EXPECT_EQ(m_recoTrack->getRecoHitInformation(cdcHits[2])->getFoundByTrackFinder(),
+              RecoHitInformation::OriginTrackFinder::c_undefinedTrackFinder);
   }
 
   /** Test conversion to genfit track cands. */
@@ -277,5 +305,28 @@ namespace Belle2 {
       ASSERT_EQ(this_i, sortParam);
       this_i++;
     }
+  }
+
+  /* Test the getRecoHitInformations() function */
+  TEST_F(RecoTrackTest, recoHitInformations)
+  {
+    StoreArray<CDCHit> cdcHits(m_storeArrayNameOfCDCHits);
+
+    m_recoTrack->addCDCHit(cdcHits[0], 1);
+
+    // create a second RecoTrack
+    StoreArray<RecoTrack> recoTracks(m_storeArrayNameOfRecoTracks);
+
+    RecoTrack* recoTrack2 = recoTracks.appendNew(m_recoTrack->getPositionSeed(), m_recoTrack->getMomentumSeed(),
+                                                 m_recoTrack->getChargeSeed(),
+                                                 m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits,
+                                                 m_storeArrayNameOfBKLMHits, m_storeArrayNameOfBKLMHits,
+                                                 m_storeArrayNameOfHitInformation);
+    recoTrack2->addCDCHit(cdcHits[1], 2);
+
+    ASSERT_EQ(m_recoTrack->getRecoHitInformations().size(), 1);
+    ASSERT_EQ(m_recoTrack->getRecoHitInformations()[0]->getSortingParameter(), 1);
+    ASSERT_EQ(recoTrack2->getRecoHitInformations().size(), 1);
+    ASSERT_EQ(recoTrack2->getRecoHitInformations()[0]->getSortingParameter(), 2);
   }
 }

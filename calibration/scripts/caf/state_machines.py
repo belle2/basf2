@@ -11,7 +11,7 @@ import shutil
 
 from basf2 import *
 import ROOT
-from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm
+from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm, IntervalOfValidity
 
 from .utils import method_dispatch
 from .utils import merge_local_databases
@@ -20,7 +20,13 @@ from .utils import iov_from_vector
 from .utils import IoV_Result
 from .utils import IoV
 from .utils import AlgResult
+from .utils import get_iov_from_file
+from .utils import find_absolute_file_paths
+from .utils import runs_overlapping_iov
 from .backends import Job
+from .backends import LSF
+from .backends import PBS
+from .backends import Local
 
 
 class State():
@@ -145,6 +151,7 @@ class Machine():
     This also means that if you call a trigger with arguments e.g. machine.walk(speed=5)
     you MUST use the keyword arguments rather than positional ones e.g. machine.walk(5)
     """
+
     def __init__(self, states=None, initial_state="default_initial"):
         """
         Basic Setup of states and initial_state
@@ -180,7 +187,7 @@ class Machine():
             else:
                 B2WARNING("You asked to add a state {0} but it was already in the machine states.".format(state))
         else:
-                B2WARNING("You asked to add a state ({0}) but it wasn't a State or str object".format(state))
+            B2WARNING("You asked to add a state ({0}) but it wasn't a State or str object".format(state))
 
     @property
     def initial_state(self):
@@ -347,27 +354,28 @@ class Machine():
         Does a simple dot file creation to visualise states and transiitons
         """
         with open(filename, "w") as dotfile:
-            dotfile.write("digraph "+graphname+" {\n")
+            dotfile.write("digraph " + graphname + " {\n")
             for state in self.states.keys():
-                dotfile.write('"'+state+'" [shape=ellipse, color=black]\n')
+                dotfile.write('"' + state + '" [shape=ellipse, color=black]\n')
             for trigger, transition_dicts in self.transitions.items():
                 for transition in transition_dicts:
-                    dotfile.write('"'+transition["source"].name+'" -> "'+transition["dest"].name+'" [label="'+trigger+'"]\n')
+                    dotfile.write('"' + transition["source"].name + '" -> "' +
+                                  transition["dest"].name + '" [label="' + trigger + '"]\n')
             dotfile.write("}\n")
 
 
 class CalibrationMachine(Machine):
     """
-    A state machine to handle Calibration objects and the flow of
+    A state machine to handle `Calibration` objects and the flow of
     processing for them.
     """
 
-    def __init__(self, calibration, initial_state="init", iteration=0):
+    def __init__(self, calibration, iov_to_calibrate=None, initial_state="init", iteration=0):
         """
         Takes a Calibration object from the caf framework and lets you
         set the initial state
         """
-        #: States that are defaults to the CalibrationMachine (could override later)
+        #: States that are defaults to the `CalibrationMachine` (could override later)
         self.default_states = [State("init"),
                                State("running_collector", enter=self._log_new_state),
                                State("collector_failed", enter=self._log_new_state),
@@ -387,18 +395,20 @@ class CalibrationMachine(Machine):
         self.calibration.machine = self
         #: Which iteration step are we in
         self.iteration = iteration
-        #: Maximum allowed iterations
-        self.max_iterations = self.default_max_iterations
         #: Backend used for this calibration machine collector
         self.collector_backend = None
-        #: Result object of collector, filled by submitting to backend
-        self._collector_result = None
         #: Results of each iteration for all algorithms of this calibration
         self._algorithm_results = {}
+        #: IoV to be executed, currently will loop over all runs in IoV
+        self.iov_to_calibrate = iov_to_calibrate
+        #: root directory for this Calibration
+        self.root_dir = os.path.join(os.getcwd(), calibration.name)
 
         self.add_transition("submit_collector", "init", "running_collector",
                             conditions=self.dependencies_completed,
                             before=[self._make_output_dir,
+                                    self._resolve_file_paths,
+                                    self._build_iov_dict,
                                     self._create_collector_job,
                                     self._submit_collector])
         self.add_transition("fail", "running_collector", "collector_failed")
@@ -420,10 +430,61 @@ class CalibrationMachine(Machine):
                             conditions=self._no_require_iteration,
                             before=self._prepare_final_db)
 
+    def files_containing_iov(self, iov):
+        """
+        Lookup function that takes an IoV and returns all files from the input_files that
+        overlap with this IoV
+        """
+        # Files that contain an Exp,Run range that overlaps with given IoV
+        overlapping_files = []
+
+        for file_path, file_iov in self.calibration.files_to_iovs.items():
+            if file_iov.overlaps(iov):
+                overlapping_files.append(file_path)
+        return overlapping_files
+
+    def _iov_requested(self):
+        """
+        """
+        if self.iov_to_calibrate:
+            B2DEBUG(100, "Overall IoV {0} requested for calibration: {1}".format(str(self.iov_to_calibrate), self.calibration.name))
+            return True
+        else:
+            B2DEBUG(100, "No overall IoV requested for calibration: {0}".format(self.calibration.name))
+            return False
+
+    def _resolve_file_paths(self):
+        """
+        """
+        if isinstance(self.collector_backend, Local) or \
+           isinstance(self.collector_backend, PBS) or \
+           isinstance(self.collector_backend, LSF):
+            B2INFO("Resolving absolute paths of input files for calibration: {0}".format(self.calibration.name))
+            self.calibration.input_files = find_absolute_file_paths(self.calibration.input_files)
+
+    def _build_iov_dict(self):
+        """
+        Build IoV file dictionary for each calibration if required.
+        """
+        iov_requested = self._iov_requested()
+        if iov_requested and not self.calibration.files_to_iovs:
+            B2INFO(("Creating IoV dictionaries to map files to (Exp,Run) ranges for calibration: {0}."
+                    " Filling dictionary from input file metadata."
+                    " If this is slow, set the 'files_to_iovs' attribute of each "
+                    "calibration before running.".format(self.calibration.name)))
+
+            files_to_iovs = {}
+            for file_path in self.calibration.input_files:
+                files_to_iovs[file_path] = get_iov_from_file(file_path)
+            self.calibration.files_to_iovs = files_to_iovs
+        elif iov_requested and self.calibration.files_to_iovs:
+            B2INFO(("Using File to IoV mapping from 'files_to_iovs' attribute for calibration: {0}."
+                    "".format(self.calibration.name)))
+
     def _below_max_iterations(self):
         """
         """
-        return self.iteration < self.max_iterations
+        return self.iteration < self.calibration.max_iterations
 
     def _increment_iteration(self):
         """
@@ -438,18 +499,19 @@ class CalibrationMachine(Machine):
 
     def _post_process_collector(self):
         """
+        Runs a merging job on the collector output ROOT files
         """
-        self._collector_result.post_process()
+        pass
 
     def _collector_ready(self):
         """
         """
-        return self._collector_result.ready()
+        return self._collector_job.ready()
 
     def _submit_collector(self):
         """
         """
-        self._collector_result = self.collector_backend.submit(self._collector_job)
+        self.collector_backend.submit(self._collector_job)
 
     def _no_require_iteration(self):
         """
@@ -457,7 +519,7 @@ class CalibrationMachine(Machine):
         if self._require_iteration() and self._below_max_iterations():
             return False
         elif self._require_iteration() and not self._below_max_iterations():
-            B2INFO("Reached maximum number of iterations ({0}), will complete now.".format(self.max_iterations))
+            B2INFO("Reached maximum number of iterations ({0}), will complete now.".format(self.calibration.max_iterations))
             return True
         elif not self._require_iteration():
             return True
@@ -485,8 +547,6 @@ class CalibrationMachine(Machine):
             config.read(config_file_path)
         else:
             B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
-        #: Default max number of iterations
-        self.default_max_iterations = decode_json_string(config['CAF_DEFAULTS']['MaxIterations'])
         #: Default location of the generic collector steering file
         self.default_collector_steering_file_path = ROOT.Belle2.FileSystem.findFile('calibration/scripts/caf/run_collector_path.py')
 
@@ -528,7 +588,7 @@ class CalibrationMachine(Machine):
         """
         """
         try:
-            os.mkdir(self.calibration.name)
+            os.mkdir(self.root_dir)
         except FileExistsError:
             pass
 
@@ -537,14 +597,14 @@ class CalibrationMachine(Machine):
         Creates a basf2 path for the correct collector and serializes it in the
         self.output_dir/<calibration_name>/<iteration>/paths directory
         """
-        path_output_dir = os.path.join(os.getcwd(), self.calibration.name, str(self.iteration), 'paths')
+        path_output_dir = os.path.join(self.root_dir, str(self.iteration), 'paths')
         # Should work fine as we previously make the other directories
         os.makedirs(path_output_dir)
         # Create empty path and add collector to it
         path = create_path()
         path.add_module(self.calibration.collector)
         # Dump the basf2 path to file
-        path_file_name = self.calibration.collector.name()+'.path'
+        path_file_name = self.calibration.collector.name() + '.path'
         path_file_name = os.path.join(path_output_dir, path_file_name)
         with open(path_file_name, 'bw') as serialized_path_file:
             pickle.dump(serialize_path(path), serialized_path_file)
@@ -556,7 +616,7 @@ class CalibrationMachine(Machine):
         Creates a basf2 path for the collectors setup path (Calibration.pre_collector_path) and serializes it in the
         self.output_dir/<calibration_name>/<iteration>/paths directory
         """
-        path_output_dir = os.path.join(os.getcwd(), self.calibration.name, str(self.iteration), 'paths')
+        path_output_dir = os.path.join(self.root_dir, str(self.iteration), 'paths')
         path = self.calibration.pre_collector_path
         # Dump the basf2 path to file
         path_file_name = 'pre_collector.path'
@@ -571,9 +631,10 @@ class CalibrationMachine(Machine):
         Creates a Job object for the collector for this iteration, ready for submission
         to backend
         """
+        iteration_dir = os.path.join(self.root_dir, str(self.iteration))
         job = Job('_'.join([self.calibration.name, 'Collector', 'Iteration', str(self.iteration)]))
-        job.output_dir = os.path.join(os.getcwd(), self.calibration.name, str(self.iteration), 'output')
-        job.working_dir = os.path.join(os.getcwd(), self.calibration.name, str(self.iteration), 'input')
+        job.output_dir = os.path.join(iteration_dir, 'collector_output')
+        job.working_dir = os.path.join(iteration_dir, 'collector_output')
         job.cmd = ['basf2', 'run_collector_path.py']
         job.input_sandbox_files.append(self.default_collector_steering_file_path)
         collector_path_file = self._make_collector_path()
@@ -586,12 +647,13 @@ class CalibrationMachine(Machine):
         list_dependent_databases = []
         # Add previous iteration databases from this calibration
         if self.iteration > 0:
+            previous_iteration_dir = os.path.join(self.root_dir, str(self.iteration - 1))
             for algorithm in self.calibration.algorithms:
                 algorithm_name = algorithm.algorithm.Class_Name().replace('Belle2::', '')
-                database_dir = os.path.join(os.getcwd(), self.calibration.name, str(self.iteration-1), 'output', 'outputdb')
+                database_dir = os.path.join(previous_iteration_dir, AlgorithmMachine.alg_output_dir, 'outputdb')
                 list_dependent_databases.append(database_dir)
                 B2INFO('Adding local database from previous iteration of {0} for use by {1}'.format(algorithm_name,
-                       self.calibration.name))
+                                                                                                    self.calibration.name))
 
         # Here we add the finished databases of previous calibrations that we depend on.
         # We can assume that the databases exist as we can't be here until they have returned
@@ -602,14 +664,40 @@ class CalibrationMachine(Machine):
             list_dependent_databases.append(database_dir)
 
         # Set the location where we will store the merged set of databases.
-        dependent_database_dir = os.path.join(os.getcwd(), self.calibration.name, str(self.iteration), 'inputdb')
+        dependent_database_dir = os.path.join(iteration_dir, 'inputdb')
         # Merge all of the local databases that are required for this calibration into a single directory
         if list_dependent_databases:
             merge_local_databases(list_dependent_databases, dependent_database_dir)
         job.input_sandbox_files.append(dependent_database_dir)
-        # Define the input file list and output patterns to be returned from collector job
-        job.input_files = self.calibration.input_files
+        # Define the input file list
+        input_data_files = self.calibration.input_files
+        # Reduce the input data files to only those that overlap with the optionally requested IoV
+        if self.iov_to_calibrate:
+            iov = self.iov_to_calibrate
+            input_data_files = self.files_containing_iov(iov)
+        job.input_files = input_data_files
+        job.max_files_per_subjob = self.calibration.max_files_per_collector_job
+        # In non-local processing we have to set up the basf2 environment again
+#        if not isinstance(self.collector_backend, Local):
+#            if "BELLE2_LOCAL_DIR" in os.environ:
+#                job.setup_cmds = [
+#                    "CAF_TOOLS_LOCATION=" + os.path.join(os.environ["BELLE2_TOOLS"], "setup_belle2"),
+#                    "CAF_RELEASE_LOCATION=" + os.environ["BELLE2_LOCAL_DIR"],
+#                    "export CAF_TOOLS_LOCATION",
+#                    "export CAF_RELEASE_LOCATION",
+#                    "source $CAF_TOOLS_LOCATION",
+#                    "pushd $CAF_RELEASE_LOCATION > /dev/null",
+#                    "setuprel",
+#                    "popd > /dev/null"
+#                ]
+#            else:
+#                job.basf2_release = os.environ["BELLE2_RELEASE"]
+#                job.basf2_tools = os.path.join(os.environ["BELLE2_TOOLS"], "setup_belle2")
+#                job.add_basf2_setup()
+        job.backend_args = self.calibration.backend_args
+        # Output patterns to be returned from collector job
         job.output_patterns = self.calibration.output_patterns
+        B2DEBUG(100, "Collector job for {0}:\n{1}".format(self.calibration.name, str(job)))
         self._collector_job = job
 
     def _run_algorithms(self):
@@ -628,7 +716,7 @@ class CalibrationMachine(Machine):
         for algorithm in self.calibration.algorithms:
             machine = AlgorithmMachine(algorithm, self)
             child = ctx.Process(target=CalibrationMachine._run_algorithm_over_data,
-                                args=(machine, child_conn))
+                                args=(machine, self.iov_to_calibrate, child_conn))
             child.start()
             # wait for it to finish
             child.join()
@@ -636,59 +724,85 @@ class CalibrationMachine(Machine):
             self._algorithm_results[self.iteration][machine.name] = parent_conn.recv()
 
     @staticmethod
-    def _run_algorithm_over_data(machine, child_conn):
+    def _run_algorithm_over_data(machine, iov_to_calibrate, child_conn):
         """
         Runs a single AlgorithmMachine inside a subprocess over the IoV vector from the
         input data. Should produce the best constants requested and create a list of results
         to send out.
         """
+        B2INFO("Setting up {}".format(machine.name))
         machine.setup_algorithm()
+        B2INFO("Beginning execution of {}".format(machine.name))
 
-        iov_to_execute = ROOT.vector("std::pair<int,int>")()
-        for iov in machine.all_iov:
-            iov_to_execute.push_back(iov)
+        if not iov_to_calibrate:
+            iov_to_execute = ROOT.vector("std::pair<int,int>")()
+            for iov in machine.all_iov_collected:
+                iov_to_execute.push_back(iov)
+                machine.execute_iov(vec_iov=iov_to_execute)
+                readable_iov_to_execute = iov_from_vector(iov_to_execute)
+                if machine.results[-1].result == AlgResult.ok.value:
+                    machine.success(successful_iov=iov_to_execute)
+                    try:
+                        machine.complete()
+                    except ConditionError:
+                        machine.setup_algorithm(vec_iovs=iov_to_execute)
+                elif machine.results[-1].result == AlgResult.iterate.value:
+                    machine.iteration_requested(successful_iov=iov_to_execute)
+                    try:
+                        machine.complete()
+                    except ConditionError:
+                        machine.setup_algorithm(vec_iovs=iov_to_execute)
+                elif machine.results[-1].result == AlgResult.failure.value:
+                    machine.fail()
+                elif machine.results[-1].result == AlgResult.not_enough_data.value:
+                    machine.not_enough_data()
+                    try:  # Try to include next IoV in vector and recalculate
+                        machine.merge_next_iov()
+                    except ConditionError:
+                        try:
+                            merged_iov = ROOT.vector("std::pair<int,int>")()
+                            machine.merge_previous_iov(merged_iov=merged_iov, final_iov=iov_to_execute)
+                            list_payloads = machine.algorithm.algorithm.getPayloads()
+                            list_payloads.pop_back()
+                            machine.execute_iov(vec_iov=merged_iov)
+                        except ConditionError:
+                            machine.fail()  # If there's no next or previous IoVs then there wasn't enough data in the full set
+                            return
+
+            # Commit all the payloads and send out the results
+            machine.algorithm.algorithm.commit()
+            child_conn.send(machine.results)
+        # If we were given a specific IoV to calibrate we just execute all runs in that IoV at once
+        else:
+            iov_to_execute = runs_overlapping_iov(iov_to_calibrate, machine.all_iov_collected)
             machine.execute_iov(vec_iov=iov_to_execute)
             readable_iov_to_execute = iov_from_vector(iov_to_execute)
             if machine.results[-1].result == AlgResult.ok.value:
                 machine.success(successful_iov=iov_to_execute)
-                try:
-                    machine.complete()
-                except ConditionError:
-                    machine.setup_algorithm(vec_iovs=iov_to_execute)
+                machine.complete(single_iov=True)
             elif machine.results[-1].result == AlgResult.iterate.value:
                 machine.iteration_requested(successful_iov=iov_to_execute)
-                try:
-                    machine.complete()
-                except ConditionError:
-                    machine.setup_algorithm(vec_iovs=iov_to_execute)
+                machine.complete(single_iov=True)
             elif machine.results[-1].result == AlgResult.failure.value:
                 machine.fail()
             elif machine.results[-1].result == AlgResult.not_enough_data.value:
                 machine.not_enough_data()
-                try:  # Try to include next IoV in vector and recalculate
-                    machine.merge_next_iov()
-                except ConditionError:
-                    try:
-                        merged_iov = ROOT.vector("std::pair<int,int>")()
-                        machine.merge_previous_iov(merged_iov=merged_iov, final_iov=iov_to_execute)
-                        list_payloads = machine.algorithm.algorithm.getPayloads()
-                        list_payloads.pop_back()
-                        machine.execute_iov(vec_iov=merged_iov)
-                    except ConditionError:
-                        machine.fail()  # If there's no next or previous IoVs then there wasn't enough data in the full set
-                        return
+                machine.fail()  # Since we're only doing one overall IoV and there wasn't enough data, we fail
+                return
 
-        # Commit all the payloads and send out the results
-        machine.algorithm.algorithm.commit()
-        child_conn.send(machine.results)
+            # Commit all the payloads and send out the results
+            machine.algorithm.algorithm.commit()
+            child_conn.send(machine.results)
 
     def _prepare_final_db(self):
         """
         Take the last iteration's outputdb and copy it to a more easily findable place.
         """
-        database_location = os.path.join(self.calibration.name,
-                                         str(self.iteration), 'output', 'outputdb')
-        final_database_location = os.path.join(self.calibration.name, 'outputdb')
+        database_location = os.path.join(self.root_dir,
+                                         str(self.iteration),
+                                         AlgorithmMachine.alg_output_dir,
+                                         'outputdb')
+        final_database_location = os.path.join(self.root_dir, 'outputdb')
         shutil.copytree(database_location, final_database_location)
 
 
@@ -696,6 +810,7 @@ class AlgorithmMachine(Machine):
     """
     A state machine to handle the logic of running the algorithm on the overall IoVs contained in the data.
     """
+    alg_output_dir = "algorithm_output"
 
     def __init__(self, algorithm, cal_machine, initial_state="init"):
         """
@@ -726,12 +841,13 @@ class AlgorithmMachine(Machine):
         #: Results of this iteration for this algorithm
         self.results = []
         #: Highest Exp,Run in collected data
-        self.highest_exprun = None
+        self.highest_exprun_collected = None
         #: Previous successful IoV
         self.previous_iov = None
 
         self.add_transition("setup_algorithm", "init", "ready",
-                            before=[self._setup_database_chain,
+                            before=[self._create_output_dir,
+                                    self._setup_database_chain,
                                     self._setup_logging,
                                     self._get_input_data,
                                     self._pre_algorithm,
@@ -774,6 +890,15 @@ class AlgorithmMachine(Machine):
 
         self.add_transition("finish", "completed_all_iov", "finished")
 
+    def _create_output_dir(self):
+        """
+        Create working/output directory of algorithm
+        """
+        alg_dir = os.path.join(self.cal_machine.root_dir, str(self.iteration), self.alg_output_dir)
+
+        if not os.path.exists(alg_dir):
+            os.mkdir(alg_dir)
+
     def _merge_with_previous(self, **kwargs):
         """
         Take an empty vector of IoV and merge the previous run IoV and merge with the
@@ -799,23 +924,25 @@ class AlgorithmMachine(Machine):
     def _calc_highest_exprun(self):
         """
         """
+        B2INFO("Calculating highest ExpRun")
         #: Update all IoVs in collected input data now that we have grabbed it
-        self.all_iov = self.algorithm.algorithm.getRunListFromAllData()
-        last_exprun_pair = self.all_iov.back()
-        self.highest_exprun = (last_exprun_pair.first, last_exprun_pair.second)
+        self.all_iov_collected = self.algorithm.algorithm.getRunListFromAllData()
+        B2INFO("Number of ExpRuns in collected data = {}".format(str(self.all_iov_collected.size())))
+        last_exprun_pair = self.all_iov_collected.back()
+        self.highest_exprun_collected = (last_exprun_pair.first, last_exprun_pair.second)
 
     def _log_mergenext_attempt(self, **kwargs):
         """
         """
         last_result = self.results[-1]
-        B2INFO("Not enough data in "+str(last_result.iov)+". Attempting to merge with next IoV")
+        B2INFO("Not enough data in " + str(last_result.iov) + ". Attempting to merge with next IoV")
 
     def _log_mergeprev_attempt(self, **kwargs):
         """
         """
         last_result = self.results[-1]
-        B2INFO("Not enough data in "+str(last_result.iov)+" and no more IoVs left to merge with."
-               " Attempting to merge with previous "+str(self.results[-2]))
+        B2INFO("Not enough data in " + str(last_result.iov) + " and no more IoVs left to merge with."
+               " Attempting to merge with previous " + str(self.results[-2]))
 
     @staticmethod
     def clear_vec_iov(**kwargs):
@@ -831,14 +958,17 @@ class AlgorithmMachine(Machine):
     def _all_iov_executed(self, **kwargs):
         """
         """
-        last_iov = self.results[-1].iov
-        return self.highest_exprun == (last_iov.exp_high, last_iov.run_high)
+        try:
+            if kwargs["single_iov"]:
+                return True
+        except KeyError:
+            last_iov = self.results[-1].iov
+            return self.highest_exprun_collected == (last_iov.exp_high, last_iov.run_high)
 
     def _setup_database_chain(self):
         """
         Apply all databases in the correct order
         """
-        os.chdir(self.cal_machine._collector_job.output_dir)
         # Clean everything out just in case
         reset_database()
         # Fall back to previous databases if no payloads are found
@@ -849,18 +979,26 @@ class AlgorithmMachine(Machine):
         # We can assume that the databases exist as we can't be here until they have returned
         # with OK status.
         for calibration in self.cal_machine.calibration.dependencies:
-            database_location = os.path.abspath(os.path.join("../../../", calibration.name, 'outputdb'))
+            database_location = os.path.abspath(os.path.join(self.cal_machine.root_dir, "../", calibration.name, 'outputdb'))
             use_local_database(os.path.join(database_location, 'database.txt'), database_location, True, LogLevel.INFO)
             B2INFO("Adding local database from {0} for use by {1}::{2}".format(
                    calibration.name, self.cal_machine.calibration.name, self.name))
 
         # Here we add the previous iteration's database
         if self.iteration > 0:
-            use_local_database(os.path.abspath(os.path.join("../../", str(self.iteration-1), 'output/outputdb/database.txt')),
-                               os.path.abspath(os.path.join("../../", str(self.iteration-1), 'output/outputdb')),
+            use_local_database(os.path.abspath(os.path.join(self.cal_machine.root_dir,
+                                                            str(self.iteration - 1),
+                                                            self.alg_output_dir,
+                                                            'outputdb/database.txt')),
+                               os.path.abspath(os.path.join(self.cal_machine.root_dir,
+                                                            str(self.iteration - 1),
+                                                            self.alg_output_dir,
+                                                            'outputdb')),
                                True,
                                LogLevel.INFO)
 
+        algo_dir = os.path.join(self.cal_machine.root_dir, str(self.iteration), self.alg_output_dir)
+        os.chdir(algo_dir)
         # Create a directory to store the payloads of this algorithm
         os.mkdir('outputdb')
         # add local database to save payloads
@@ -873,15 +1011,24 @@ class AlgorithmMachine(Machine):
         set_log_level(LogLevel.INFO)
 
         # add logfile for output
-        logging.add_file(self.name+'_b2log')
+        logging.add_file(self.name + '_stdout')
 
     def _get_input_data(self):
-        self.algorithm.data_input()
+        input_files = []
+        if self.cal_machine._collector_job.subjobs:
+            for subjob in self.cal_machine._collector_job.subjobs.values():
+                input_file = os.path.join(subjob.output_dir, "RootOutput.root")
+                input_files.append(input_file)
+        else:
+            input_files.append(os.path.join(self.cal_machine._collector_job.output_dir, "RootOutput.root"))
+
+        self.algorithm.data_input(input_files)
 
     def _pre_algorithm(self, **kwargs):
         """
-        Call the data input function and algorithm setup function to do some setup
+        Call the user defined algorithm setup function
         """
+        B2INFO("Running Pre-Algorithm function (if exists)")
         if self.algorithm.pre_algorithm:
             # We have to re-pass in the algorithm here because an outside user has created this method.
             # So the method isn't bound to the instance properly.
@@ -894,7 +1041,7 @@ class AlgorithmMachine(Machine):
         B2INFO("Running {0} in working directory {1}".format(self.name, os.getcwd()))
 
         vec_iov_to_execute = kwargs["vec_iov"]
-        # Add each exprun to the vector in turn
+        # Create nicer overall IoV for this execution
         iov_readable = iov_from_vector(vec_iov_to_execute)
         B2INFO("Performing execution on {0}".format(iov_readable))
 
@@ -907,7 +1054,7 @@ class AlgorithmMachine(Machine):
 
 class CalibrationRunner(Thread):
     """
-    Runs a CalibrationMachine in a Thread. Will process from intial state
+    Runs a `CalibrationMachine` in a Thread. Will process from intial state
     to the final state.
     """
 
@@ -915,7 +1062,7 @@ class CalibrationRunner(Thread):
         """
         """
         super().__init__()
-        #: The CalibrationMachine that we will run
+        #: The `CalibrationMachine` that we will run
         self.machine = machine
         #: Allowed transitions that we will use to progress
         self.moves = ["submit_collector", "complete", "run_algorithms", "iterate"]
@@ -944,7 +1091,6 @@ class CalibrationRunner(Thread):
         """
         Anything that is setup by outside config files by default goes here.
         """
-        # Not certain if configparser requires that we lock here, but to be on the safe side we do
         config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
         if config_file_path:
             config = configparser.ConfigParser()

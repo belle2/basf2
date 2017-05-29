@@ -34,7 +34,8 @@ class VXDMomentumEnergyEstimator:
         momentum = mc_particle.getMomentum()
         position = mc_particle.getProductionVertex()
         charge = mc_particle.getCharge()
-        helix = Belle2.Helix(position, momentum, charge, 1.5)
+        b_field = Belle2.BFieldManager.getField(position).Z() / Belle2.Unit.T
+        helix = Belle2.Helix(position, momentum, charge, b_field)
 
         for cluster in clusters:
 
@@ -193,7 +194,8 @@ class VXDHarvester(QueueHarvester):
                         track_position = track_cand.getPosSeed()
                         track_charge = track_cand.getChargeSeed()
 
-                    track_helix = Belle2.Helix(track_position, track_momentum, int(track_charge), 1.5)
+                    b_field = Belle2.BFieldManager.getField(track_position).Z() / Belle2.Unit.T
+                    track_helix = Belle2.Helix(track_position, track_momentum, int(track_charge), b_field)
 
                     cluster_charge = tools.getCalibratedCharge(cluster)
                     path_length = tools.getPathLength(cluster, track_helix)
@@ -208,7 +210,8 @@ class VXDHarvester(QueueHarvester):
                     mc_momentum = tools.getEntryMomentumOfMCParticle(cluster)
                     mc_position = tools.getEntryPositionOfMCParticle(cluster)
 
-                    mc_helix = Belle2.Helix(mc_position, mc_momentum, int(track_charge), 1.5)
+                    mc_b_field = Belle2.BFieldManager.getField(mc_position).Z() / Belle2.Unit.T
+                    mc_helix = Belle2.Helix(mc_position, mc_momentum, int(track_charge), mc_b_field)
                     mc_path_length = tools.getPathLength(cluster, mc_helix)
 
                     cluster_is_u = VXDMomentumEnergyEstimator.do_for_each_hit_type(
@@ -241,9 +244,9 @@ class VXDHarvester(QueueHarvester):
                     mc_at_hit_dict = dict(mc_helix_perigee_x=mc_helix.getPerigeeX(),
                                           mc_helix_perigee_y=mc_helix.getPerigeeY(),
                                           mc_helix_perigee_z=mc_helix.getPerigeeZ(),
-                                          mc_helix_momentum_x=mc_helix.getMomentumX(1.5),
-                                          mc_helix_momentum_y=mc_helix.getMomentumY(1.5),
-                                          mc_helix_momentum_z=mc_helix.getMomentumZ(1.5),
+                                          mc_helix_momentum_x=mc_helix.getMomentumX(mc_b_field),
+                                          mc_helix_momentum_y=mc_helix.getMomentumY(mc_b_field),
+                                          mc_helix_momentum_z=mc_helix.getMomentumZ(mc_b_field),
                                           mc_position=mc_position.Mag(),
                                           mc_position_x=mc_position.X(),
                                           mc_position_y=mc_position.Y(),
@@ -267,9 +270,9 @@ class VXDHarvester(QueueHarvester):
                     track_dict = dict(track_helix_perigee_x=track_helix.getPerigeeX(),
                                       track_helix_perigee_y=track_helix.getPerigeeY(),
                                       track_helix_perigee_z=track_helix.getPerigeeZ(),
-                                      track_helix_momentum_x=track_helix.getMomentumX(1.5),
-                                      track_helix_momentum_y=track_helix.getMomentumY(1.5),
-                                      track_helix_momentum_z=track_helix.getMomentumZ(1.5))
+                                      track_helix_momentum_x=track_helix.getMomentumX(b_field),
+                                      track_helix_momentum_y=track_helix.getMomentumY(b_field),
+                                      track_helix_momentum_z=track_helix.getMomentumZ(b_field))
 
                     result_dict = dict()
                     result_dict.update(cluster_dict)

@@ -26,63 +26,66 @@
 
 using namespace std;
 
-namespace Belle2{
+namespace Belle2 {
 
-    std::string TRGCDCLUT::version(void) const{
-	return string("TRGCDCLUT 1.00");
-    }
+  std::string TRGCDCLUT::version(void) const
+  {
+    return string("TRGCDCLUT 1.00");
+  }
 
-    TRGCDCLUT::TRGCDCLUT(){
-    }
+  TRGCDCLUT::TRGCDCLUT()
+  {
+  }
 
-    TRGCDCLUT::~TRGCDCLUT(){
-    }
-	
-  double TRGCDCLUT::getValue(double id) const{
-    int range=pow(2, m_bitsize);
-    if(id>=range){
+  TRGCDCLUT::~TRGCDCLUT()
+  {
+  }
+
+  double TRGCDCLUT::getValue(double id) const
+  {
+    int range = pow(2, m_bitsize);
+    if (id >= range) {
       return 0;
-    }
-    else{
+    } else {
       return double(m_data[id]);
     }
   }
 
-  int TRGCDCLUT::getValue(unsigned id) const{
-    unsigned range=pow(2, m_bitsize);
-    if(id>=range){
+  int TRGCDCLUT::getValue(unsigned id) const
+  {
+    unsigned range = pow(2, m_bitsize);
+    if (id >= range) {
       return 0;
-    }
-    else{
+    } else {
       return m_data[id];
     }
   }
 
-  void TRGCDCLUT::setDataFile(const string & filename, int nInputBit){
-    m_bitsize=nInputBit;
-    m_name= filename;
+  void TRGCDCLUT::setDataFile(const string& filename, int nInputBit)
+  {
+    m_bitsize = nInputBit;
+    m_name = filename;
 
     ifstream openFile;
     string tmpstr;
     int tmpint;
-    int i=0;
-    int range=pow(2,nInputBit);
+    int i = 0;
+    int range = pow(2, nInputBit);
     openFile.open(filename.c_str());
     m_data.resize(range);
-    while(getline(openFile,tmpstr)){
-      if(!(tmpstr.size()==0)){
-      if(tmpstr[0]>='0' && tmpstr[0]<='9'){
-        tmpint=atoi(tmpstr.c_str());
-        m_data[i]=tmpint;
-        i++;
-      }
-      else{
-	continue;
-      }
+    while (getline(openFile, tmpstr)) {
+      if (!(tmpstr.size() == 0)) {
+        if (tmpstr[0] >= '0' && tmpstr[0] <= '9') {
+          tmpint = atoi(tmpstr.c_str());
+          m_data[i] = tmpint;
+          i++;
+        } else {
+          continue;
+        }
 
+      }
     }
-    }
-    
+
   }
 }
 

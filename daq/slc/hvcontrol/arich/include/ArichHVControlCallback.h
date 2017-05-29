@@ -2,7 +2,6 @@
 #define _Belle2_ArichHVControlCallback_h
 
 #include <daq/slc/hvcontrol/HVControlCallback.h>
-#include <daq/slc/hvcontrol/arich/ArichHVCommunicator.h>
 
 #include <vector>
 
@@ -16,10 +15,35 @@ namespace Belle2 {
     virtual ~ArichHVControlCallback() throw() {}
 
   public:
+    virtual void addAll(const HVConfig& config) throw() ;
     virtual void initialize(const HVConfig& hvconf) throw();
+    virtual void deinitialize(int handle) throw();//yone
     virtual void update() throw();
+    virtual void turnon() throw(HVHandlerException);
+    virtual void turnoff() throw(HVHandlerException);//yone
+    virtual void standby() throw(HVHandlerException);//yone
+    virtual void shoulder() throw(HVHandlerException);//yone
+    virtual void peak() throw(HVHandlerException);//yone
+    virtual void all_bias_on() throw(HVHandlerException);//yone
+    virtual void all_bias_off() throw(HVHandlerException);//yone
+    virtual void all_hv_on() throw(HVHandlerException);//yone
+    virtual void all_hv_off() throw(HVHandlerException);//yone
+    virtual void all_guard_on() throw(HVHandlerException);//yone
+    virtual void all_guard_off() throw(HVHandlerException);//yone
+    virtual bool check_all_bias_on() throw(HVHandlerException);//yone
+    virtual bool check_all_hv_on() throw(HVHandlerException);//yone
+    virtual bool check_all_guard_on() throw(HVHandlerException);//yone
+    virtual bool check_all_bias_off() throw(HVHandlerException);//yone
+    virtual bool check_all_hv_off() throw(HVHandlerException);//yone
+    virtual bool check_all_guard_off() throw(HVHandlerException);//yone
+    //    virtual void all_sw(bool sw, char* set_type) throw(HVHandlerException);//yone
+    virtual void all_switch(std::string set_type, bool sw) throw(HVHandlerException);//yone
+    virtual bool check_all_switch(std::string set_type, int sw) throw(HVHandlerException);//yone
+    virtual void configure(const HVConfig&) throw(HVHandlerException);
 
   public:
+    virtual void RecoveryTrip(int handle, int crate, int slot, int channel) throw(IOException);
+    virtual void RecoveryInterlock(int handle, int crate, int slot, int channel) throw(IOException);
     virtual void setSwitch(int crate, int slot, int channel, bool switchon) throw(IOException);
     virtual void setRampUpSpeed(int crate, int slot, int channel, float rampup) throw(IOException);
     virtual void setRampDownSpeed(int crate, int slot, int channel, float rampdown) throw(IOException);
@@ -39,22 +63,10 @@ namespace Belle2 {
 
     virtual void store(int index) throw(IOException);
     virtual void recall(int index) throw(IOException);
-
-  public:
-    int getNAComms() const { return m_acomm.size(); }
-    ArichHVCommunicator& getAComm(int ic) { return m_acomm[ic]; }
+    void clearAlarm(int crate) throw(IOException);
 
   private:
-    class Listener {
-    private:
-      ArichHVCommunicator& m_acomm;
-    public:
-      Listener(ArichHVCommunicator& comm) : m_acomm(comm) {}
-      void run();
-    };
-
-  private:
-    std::vector<ArichHVCommunicator> m_acomm;
+    std::vector<int> m_handle;
 
   };
 

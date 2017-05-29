@@ -76,6 +76,9 @@ throw(HVHandlerException)
           set(vname + "switch", "OFF");
         } else if (loadpars) {
           paramLock();
+          setSwitch(crateid, slot, ch, false);
+          set(vname + "switch", "OFF");
+          ///*
           if (channel.isTurnOn()) {
             if (m_state_demand.isOn() && !getSwitch(crateid, slot, ch)) {
               setSwitch(crateid, slot, ch, true);
@@ -87,15 +90,19 @@ throw(HVHandlerException)
               set(vname + "switch", "OFF");
             }
           }
+          //*/
           setRampUpSpeed(crateid, slot, ch, channel.getRampUpSpeed());
           setRampDownSpeed(crateid, slot, ch, channel.getRampDownSpeed());
-          setVoltageDemand(crateid, slot, ch, (channel.isTurnOn()) ? channel.getVoltageDemand() : -1);
+          LogFile::debug("voltage.demand : %f ", channel.getVoltageDemand());
+          // setVoltageDemand(crateid, slot, ch, (channel.isTurnOn()) ? channel.getVoltageDemand() : 0);
+          setVoltageDemand(crateid, slot, ch, channel.getVoltageDemand());
           setVoltageLimit(crateid, slot, ch, channel.getVoltageLimit());
           setCurrentLimit(crateid, slot, ch, channel.getCurrentLimit());
           paramUnlock();
           set(vname + "rampup", channel.getRampUpSpeed());
           set(vname + "rampdown", channel.getRampDownSpeed());
-          set(vname + "vdemand", (channel.isTurnOn()) ? channel.getVoltageDemand() : -1);
+          //set(vname + "vdemand", (channel.isTurnOn()) ? channel.getVoltageDemand() : -1);
+          set(vname + "vdemand", channel.getVoltageDemand());
           set(vname + "vlimit", channel.getVoltageLimit());
           set(vname + "climit", channel.getCurrentLimit());
         } else {
@@ -107,9 +114,10 @@ throw(HVHandlerException)
       }
     }
   } catch (const IOException& e) {
-    LogFile::error(e.what());
+    LogFile::error("Loading failed %s:%d %s", __FILE__, __LINE__, e.what());
     throw (HVHandlerException(e.what()));
   }
+  LogFile::debug("Loading... done");
 }
 
 void HVControlCallback::init(NSMCommunicator&) throw()
@@ -186,7 +194,7 @@ void HVControlCallback::monitor() throw()
       reply(NSMMessage(NSMCommand::OK, m_state_demand.getLabel()));
     }
   } catch (const std::exception& e) {
-    log(LogFile::ERROR, e.what());
+    log(LogFile::ERROR, "%s:%d %s", __FILE__, __LINE__, e.what());
   }
   unlock();
 }
@@ -199,6 +207,7 @@ throw(IOException)
     DBInterface& db(*m_db);
     const std::string confname = (StringUtil::find(configname_in, "@")) ?
                                  configname_in : getNode().getName() + "@" + configname_in;
+    LogFile::info("config : " + confname);
     if (confname.size() > 0) {
       try {
         DBObject obj = DBObjectLoader::load(db, m_table, confname);

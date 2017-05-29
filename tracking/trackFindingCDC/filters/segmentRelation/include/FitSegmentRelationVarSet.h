@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
-#include <tracking/trackFindingCDC/ca/Relation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -25,7 +25,9 @@ namespace Belle2 {
       "curv",
       "curv_var",
       "chi2",
+      "chi2_no_rl",
       "chi2_per_ndf",
+      "chi2_no_rl_per_ndf",
       "ndf",
       "p_value",
     };

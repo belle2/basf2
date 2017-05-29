@@ -8,14 +8,15 @@ INCDIR  = $(BELLE2_DAQ_SLC)/include
 TMPDIR  = $(BELLE2_DAQ_SLC)/tmp
 LIBDIR  = $(BELLE2_DAQ_SLC)/lib
 
-LIBS    += -lm -lpthread -ldl -lrt -lreadline -lncurses -L$(PGSQL_LIB_PATH) -lpq -lz
+LIBS    += -lm -lpthread -ldl -lrt -lreadline -lncurses -lz -L$(PGSQL_LIB_PATH) -lpq
 LIBS    += -L$(LIBDIR) -ldaq_slc_base -ldaq_slc_system -ldaq_slc_database -ldaq_slc_psql -ldaq_slc_nsm -ldaq_slc_hvcontrol -ldaq_slc_hvcontrol_arich
-LIBS    += -lnsm2_corelib -lnsm2_b2lib
+LIBS    += -lnsm2_corelib -lnsm2_b2lib -lcaenhvwrapper 
 
 CFLAGS   = -g -Wall -fPIC -D_REENTRANT -I$(PGSQL_INC_PATH)
 CFLAGS  += -I$(BELLE2_DAQ_SLC)/include -I.
 
-MAINS   = $(wildcard *.cc)
+MAINS   = arichhvd.cc
+#$(wildcard *.cc)
 TARGETS = $(MAINS:%.cc=$(BINDIR)/%)
 
 SRCS   = $(wildcard $(SRCDIR)/*.cc)
@@ -37,7 +38,7 @@ clean:
 
 $(TARGETS): $(BINDIR)/% : %.cc $(OBJS)
 	@ echo '<< creating executable $@ >>'
-	@ $(CXX) $(CFLAGS) $(LIBS)  $^ -o $@ $(GLIBS) $(LOADLIBES)
+	 $(CXX) $(CFLAGS) $(LIBS)  $^ -o $@ $(GLIBS) $(LOADLIBES)
 	@ $(RM) *~ */*~ \#*\#* */\#*\#*
 	@ echo '<< compiling succeded!! >>'
 

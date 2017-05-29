@@ -136,6 +136,24 @@ namespace Belle2 {
       /** Energy deposited for all section */
       TH1F* h_csi_energy3W[18];
 
+      /** Energy threshold */
+      double m_Thres_hitRate[18][200];
+      /** Energy threshold */
+      double m_Thres_sumE[18][200];
+
+      /** Rate */
+      TH1F* h_csi_drate[153];
+      /** Rate */
+      TH2F* h_csi_rs_drate[153];
+      /** Energy */
+      TH1F* h_csi_dedep[18][153];
+      /** Energy */
+      TH2F* h_csi_rs_dedep[18][153];
+      /** Energy */
+      TH1F* h_csi_denergy[18][153];
+      /** Energy */
+      TH2F* h_csi_rs_denergy[18][153];
+
     };
 
   }

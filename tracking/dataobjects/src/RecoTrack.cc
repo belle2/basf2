@@ -255,7 +255,7 @@ void RecoTrack::prune()
   // "Prune" all RecoHitInformation but the first and the last.
   for (unsigned int i = 1; i < relatedRecoHitInformations.size() - 1; ++i) {
     dynamic_cast<RecoHitInformation*>(relatedRecoHitInformations[i].object)->setFlag(RecoHitInformation::RecoHitFlag::c_pruned);
-    dynamic_cast<RecoHitInformation*>(relatedRecoHitInformations[i].object)->setCreatedTrackPoint(nullptr);
+    dynamic_cast<RecoHitInformation*>(relatedRecoHitInformations[i].object)->setCreatedTrackPointID(-1);
   }
 
 
@@ -300,4 +300,23 @@ void RecoTrack::deleteFittedInformation()
   for (unsigned int i = 0; i < getRepresentations().size(); i++) {
     m_genfitTrack.deleteTrackRep(i);
   }
+}
+
+void RecoTrack::copyStateFromSeed()
+{
+  if (getRepresentations().empty()) {
+    B2FATAL("No representation present, so it is not possible to copy the state!");
+  }
+  const auto& measuredStateFromFirstHit = getMeasuredStateOnPlaneFromFirstHit();
+
+  const auto& position = measuredStateFromFirstHit.getPos();
+  const auto& momentum = measuredStateFromFirstHit.getMom();
+  const auto& charge = measuredStateFromFirstHit.getCharge();
+  const auto& time = measuredStateFromFirstHit.getTime();
+  const auto& covariance = measuredStateFromFirstHit.getCov();
+
+  setPositionAndMomentum(position, momentum);
+  setChargeSeed(charge);
+  setTimeSeed(time);
+  setSeedCovariance(covariance);
 }

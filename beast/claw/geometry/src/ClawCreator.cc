@@ -144,13 +144,13 @@ namespace Belle2 {
         G4double x = activeParams.getLength("x") * CLHEP::cm;
         G4double y = activeParams.getLength("y") * CLHEP::cm;
         G4double z = activeParams.getLength("z_claw") * CLHEP::cm;
-        G4double r = 0;
+        /*G4double r = 0;
         if (x == 0 && y == 0)
           r = activeParams.getLength("r_claw") * CLHEP::cm;
         else
-          r = sqrt(x * x + y * y);
-        G4double phi = activeParams.getAngle("Phi");
-        G4double thetaZ = activeParams.getAngle("ThetaZ");
+        r = sqrt(x * x + y * y);*/
+        //G4double phi = activeParams.getAngle("Phi");
+        //G4double thetaZ = activeParams.getAngle("ThetaZ");
         G4double dx_board = activeParams.getLength("dx_board") / 2.*CLHEP::cm;
         G4double dy_board = activeParams.getLength("dy_board") / 2.*CLHEP::cm;
         G4double dz_board = activeParams.getLength("dz_board") / 2.*CLHEP::cm;

@@ -241,6 +241,49 @@ void B2BIIMdstInputModule::event()
   Belle::Belle_event_Manager& evman = Belle::Belle_event_Manager::get_manager();
   Belle::Belle_event& evt = evman[0];
 
+  // Check if RUNHEAD is available if not create one using the event.
+  // Basf did something similar in Record::convert_to_begin_run.
+  // Some files are missing the RUNHEAD for unknown reasons.
+  Belle::Belle_runhead_Manager& rhdmgr = Belle::Belle_runhead_Manager::get_manager();
+  Belle::Belle_runhead_Manager::const_iterator belleevt = rhdmgr.begin();
+
+  B2DEBUG(90, "Event number " << m_nevt);
+  if (belleevt == rhdmgr.end() || not(*belleevt)) {
+    B2WARNING("Missing RUNHEAD: Creating RUNHEAD from Event. This is as far as we know fine and handled correctly.");
+
+    Belle::Belle_runhead& bgr = rhdmgr.add();
+    bgr.ExpMC(evt.ExpMC());
+    bgr.ExpNo(evt.ExpNo());
+    bgr.RunNo(evt.RunNo());
+    bgr.Time(evt.Time());
+    bgr.Date(evt.Date());
+    bgr.Field(evt.MagFieldID());
+    bgr.MaxField(evt.BField());
+    bgr.Type(0); // basf used 0, and the debug output below of valid entries returned 0 as well
+    bgr.ELER(evt.ELER());
+    bgr.EHER(evt.EHER());
+
+    // In basf the BELLE_RUNHEAD which is created like this is not cleared anymore
+    // m_fd->non_clear("BELLE_RUNHEAD");
+    // However, I think in this case we are going to miss reinitializing the BELLE_RUNHEAD
+    // at the beginning of a new run without a BELLE_RUNHEAD, I'm not sure how this was handled
+    // in basf. I think it is safest to recreate the BELLE_RUNHEAD for each event which is missing
+    // the BELLE_RUNHEAD
+
+  } else {
+    Belle::Belle_runhead& bgr = rhdmgr[0];
+    B2DEBUG(90, "ExpMC " << bgr.ExpMC() << " " << evt.ExpMC());
+    B2DEBUG(90, "ExpNo " << bgr.ExpNo() << " " << evt.ExpNo());
+    B2DEBUG(90, "RunNo " << bgr.RunNo() << " " << evt.RunNo());
+    B2DEBUG(90, "Time " << bgr.Time() << " " << evt.Time());
+    B2DEBUG(90, "Date " << bgr.Date() << " " << evt.Date());
+    B2DEBUG(90, "Field " << bgr.Field() << " " << evt.MagFieldID());
+    B2DEBUG(90, "MaxField " << bgr.MaxField() << " " << evt.BField());
+    B2DEBUG(90, "Type " << bgr.Type());
+    B2DEBUG(90, "ELER " << bgr.ELER() << " " << evt.ELER());
+    B2DEBUG(90, "EHER " << bgr.EHER() << " " << evt.EHER());
+  }
+
   // set exp/run/evt numbers
   evtmetadata->setExperiment(evt.ExpNo());
   evtmetadata->setRun(evt.RunNo());

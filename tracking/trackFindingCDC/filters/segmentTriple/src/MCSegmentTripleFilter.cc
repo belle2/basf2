@@ -61,9 +61,8 @@ Weight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
     // Do fits
     setTrajectoryOf(segmentTriple);
 
-    CellState cellWeight = startSegment.size() + middleSegment.size() + endSegment.size();
+    Weight cellWeight = startSegment.size() + middleSegment.size() + endSegment.size();
     return cellWeight;
-
   }
 
   return NAN;

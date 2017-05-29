@@ -6,6 +6,7 @@ import os
 import subprocess
 import stat
 import shutil
+import validationfunctions
 
 
 class Cluster:
@@ -161,7 +162,8 @@ class Cluster:
         else:
             # .py files are executed with basf2
             # 'options' contains an option-string for basf2, e.g. '-n 100'
-            command = 'basf2 {0} {1}'.format(job.path, options)
+            params = validationfunctions.basf2_command_builder(job.path, options.split())
+            command = subprocess.list2cmdline(params)
 
         # Create a helpfile-shellscript, which contains all the commands that
         # need to be executed by the cluster.
@@ -243,3 +245,9 @@ class Cluster:
         # If no such file exists, the job has not yet finished
         else:
             return [False, 0]
+
+    def terminate(self, job):
+        """!
+        Terminate a running job, not support with this backend so ignore the call
+        """
+        pass

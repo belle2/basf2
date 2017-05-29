@@ -147,6 +147,9 @@ namespace Belle2 {
       /** Particle fit output */
       rave::KinematicParticle m_fittedParticle;
 
+      /** Belle Particle pointers input */
+      std::vector<Particle*> m_belleDaughters;
+
       /** flag determines if the mass fit is performed */
       bool m_massConstFit;
       /** flag determines if the vertex fit is performed */

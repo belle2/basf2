@@ -12,6 +12,8 @@
 #pragma once
 
 #include <top/reconstruction/TOPtrack.h>
+#include <top/dbobjects/TOPCalChannelMask.h>
+#include <framework/database/DBObjPtr.h>
 
 extern "C" {
   void set_beta_rq_(float*);
@@ -19,7 +21,12 @@ extern "C" {
   void set_pdf_opt_(int*);
   float get_logl_(float*, float*, float*);
   int data_getnum_();
-
+  void set_channel_mask_(int*, int*, int*);
+  void print_channel_mask_();
+  void set_channel_effi_(int*, int*, float*);
+  void redo_pdf_(float*);
+  int get_num_peaks_(int*);
+  void get_peak_(int*, int*, float*, float*, float*);
 }
 
 namespace Belle2 {
@@ -51,6 +58,14 @@ namespace Belle2 {
        * @param ScaleN0 scale factor to scale N0
        */
       TOPreco(int NumHyp, double Masses[], double BkgPerModule = 0, double ScaleN0 = 1);
+
+      /**
+       * Set channel mask
+       * @param mask channel mask
+       * @param printMask if true, print masks to std output
+       */
+      static void setChannelMask(const DBObjPtr<TOPCalChannelMask>& mask,
+                                 bool printMask = false);
 
       /**
        * Set hypothesis internal code: 1=e, 2=mu, 3=pi, 4=K, 5=p, 0=other
@@ -94,18 +109,9 @@ namespace Belle2 {
        * Add data
        * @param moduleID module ID
        * @param pixelID pixel ID (e.g. software channel, 1-based)
-       * @param TDC digitized time
-       * @param time t0-corrected time in [ns] converted from TDC
+       * @param time t0-corrected time in [ns]
        */
-      int addData(int moduleID, int pixelID, int TDC, double time);
-
-      /**
-       * Add data (for backward compatibility only)
-       * @param moduleID module ID
-       * @param pixelID pixel ID (e.g. software channel, 1-based)
-       * @param TDC digitized time
-       */
-      int addData(int moduleID, int pixelID, int TDC);
+      int addData(int moduleID, int pixelID, double time);
 
       /**
        * Return size of data list
@@ -242,6 +248,40 @@ namespace Belle2 {
        * @return beta value
        */
       double getBeta() const {return m_beta;};
+
+      /**
+       * Re-calculate PDF for a given particle mass using option c_Fine
+       * @param mass particle mass
+       */
+      void redoPDF(double mass)
+      {
+        float m = mass;
+        redo_pdf_(&m);
+      }
+
+      /**
+       * Returns number of peaks for given pixel describing signal PDF
+       * @param pixelID pixel ID (1-based)
+       * @return number of peaks
+       */
+      int getNumofPDFPeaks(int pixelID) const
+      {
+        pixelID--; // 0-based is used in fortran
+        return get_num_peaks_(&pixelID);
+      }
+
+      /**
+       * Returns k-th PDF peak for given pixel describing signal PDF
+       * @param pixelID pixel ID (1-based)
+       * @param k peak counter (in C++ sense - starts with 0)
+       */
+      void getPDFPeak(int pixelID, int k,
+                      float& position, float& width, float& numPhotons) const
+      {
+        pixelID--; // 0-based is used in fortran
+        k++; // counter starts with 1 in fortran
+        get_peak_(&pixelID, &k, &position, &width, &numPhotons);
+      }
 
 
     private:

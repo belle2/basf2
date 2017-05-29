@@ -35,6 +35,8 @@ SeqRootOutputModule::SeqRootOutputModule() : Module(), m_nevt(0), m_streamer(nul
   setDescription("Save a sequential ROOT file (non-standard I/O format used in DAQ). See https://confluence.desy.de/display/BI/Software+PersistencyModules for further information and a comparison with the .root format.");
   m_file = 0;
   m_msghandler = 0;
+  m_streamerinfo = NULL;
+  m_streamerinfo_size = 0;
 
   vector<string> emptyvector;
   //Parameter definition
@@ -48,7 +50,10 @@ SeqRootOutputModule::SeqRootOutputModule() : Module(), m_nevt(0), m_streamer(nul
 }
 
 
-SeqRootOutputModule::~SeqRootOutputModule() { }
+SeqRootOutputModule::~SeqRootOutputModule()
+{
+  if (m_streamerinfo != NULL) delete m_streamerinfo;
+}
 
 void SeqRootOutputModule::initialize()
 {
@@ -57,7 +62,7 @@ void SeqRootOutputModule::initialize()
     m_outputFileName = outputFileArgument;
 
   // Open output file
-  m_file = new SeqFile(m_outputFileName.c_str(), "w");
+
 
   // Message handler to encode serialized object
   m_msghandler = new MsgHandler(m_compressionLevel);
@@ -67,7 +72,9 @@ void SeqRootOutputModule::initialize()
   m_streamer->setStreamingObjects(m_saveObjs);
 
   //Write StreamerInfo at the beginning of a file
-  writeStreamerInfos();
+  getStreamerInfos();
+
+  m_file = new SeqFile(m_outputFileName.c_str(), "w", m_streamerinfo, m_streamerinfo_size);
 
   B2INFO("SeqRootOutput: initialized.");
 }
@@ -92,7 +99,6 @@ void SeqRootOutputModule::event()
 
   // Store EvtMessage
   int stat = m_file->write(msg->buffer());
-  //  printf("SeqRootOuput : write = %d\n", stat);
 
   // Clean up EvtMessage
   delete msg;
@@ -122,8 +128,6 @@ void SeqRootOutputModule::endRun()
   double sigma2 = avesize2 - avesize * avesize;
   double sigma = sqrt(sigma2);
 
-  //  printf ( "m_size = %f, m_size2 = %f, m_nevt = %d\n", m_size, m_size2, m_nevt );
-  //  printf ( "avesize2 = %f, avesize = %f, avesize*avesize = %f\n", avesize2, avesize, avesize*avesize );
   B2INFO("SeqRootOutput :  " << m_nevt << " events written with total bytes of " << m_size << " kB");
   B2INFO("SeqRootOutput : flow rate = " << flowmb << " (MB/s)");
   B2INFO("SeqRootOutput : event size = " << avesize << " +- " << sigma << " (kB)");
@@ -142,7 +146,7 @@ void SeqRootOutputModule::terminate()
 }
 
 
-void SeqRootOutputModule::writeStreamerInfos()
+void SeqRootOutputModule::getStreamerInfos()
 {
   //
   // Write StreamerInfo to a file
@@ -175,9 +179,26 @@ void SeqRootOutputModule::writeStreamerInfos()
     EvtMessage* msg = m_msghandler->encode_msg(MSG_STREAMERINFO);
     (msg->header())->nObjects = 1;       // No. of objects
     (msg->header())->nArrays = 0;    // No. of arrays
-    int size = m_file->write(msg->buffer());
-    B2INFO("Wrote StreamerInfo to a file : " << size << "bytes");
+
+    //    int size = m_file->write(msg->buffer());
+    m_streamerinfo_size = *((int*)(msg->buffer()));     // nbytes in the buffer at the beginning
+
+    //copy the steamerINfo for later use
+    if (m_streamerinfo_size > 0) {
+      B2INFO("Get StreamerInfo from DataStore : " << m_streamerinfo_size << "bytes");
+      if (m_streamerinfo != NULL) {
+        B2FATAL("getStreamerInfo() is called twice in the same run ");
+      } else {
+        m_streamerinfo = new char[ m_streamerinfo_size ];
+      }
+      memcpy(m_streamerinfo, msg->buffer(), m_streamerinfo_size);
+    } else {
+      B2FATAL("Invalid size of StreamerInfo : " << m_streamerinfo_size << "bytes");
+    }
     delete minilist;
+    delete msg;
+  } else {
+    B2FATAL("Failed to get StreamerInfo : ");
   }
 
   return;

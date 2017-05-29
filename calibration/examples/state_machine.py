@@ -58,7 +58,7 @@ m1.initial_state = "start"
 m1.save_graph(filename="machine_graph.dot", graphname="Machine")
 
 # Run through the states passing in arguments to callbacks
-B2INFO("Currently in "+m1.state.name+" state.")
+B2INFO("Currently in " + m1.state.name + " state.")
 m1.begin(msg_before="About to run", msg_after="Now Running")
 m1.finish(msg_before="Finishing", msg_after="Finished")
-B2INFO("Currently in "+m1.state.name+" state.")
+B2INFO("Currently in " + m1.state.name + " state.")

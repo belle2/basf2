@@ -231,21 +231,39 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_ShowCurlCurv)
   double innerCurlCurv = 1 / innerR;
   double outerCurlCurv = 1 / outerR;
 
-  B2INFO("Maximal curvature reaching the CDC from IP : " << innerOriginCurv);
-  B2INFO("Minimal momentum reaching the CDC from IP : " << CDCBFieldUtil::curvatureToAbsMom2D(innerOriginCurv, 1.5));
+  B2INFO("Maximal curvature still reaching the CDC from IP : " << innerOriginCurv);
+  B2INFO("Minimal momentum still reaching the CDC from IP : " << CDCBFieldUtil::curvatureToAbsMom2D(innerOriginCurv, 1.5) << " GeV");
 
-  B2INFO("Maximal curvature leaving the CDC from IP : " << outerOriginCurv);
-  B2INFO("Minimal momentum leaving the CDC from IP : " << CDCBFieldUtil::curvatureToAbsMom2D(outerOriginCurv, 1.5));
+  B2INFO("Maximal curvature still leaving the CDC from IP : " << outerOriginCurv);
+  B2INFO("Minimal momentum still leaving the CDC from IP : " << CDCBFieldUtil::curvatureToAbsMom2D(outerOriginCurv, 1.5) << " GeV");
 
 
   B2INFO("Minimal curvature not reaching the CDC from VXD : " << innerCurlCurv);
-  B2INFO("Maximal momentum not reaching the CDC from VXD : " << CDCBFieldUtil::curvatureToAbsMom2D(innerCurlCurv, 1.5));
+  B2INFO("Maximal momentum not reaching the CDC from VXD : " << CDCBFieldUtil::curvatureToAbsMom2D(innerCurlCurv, 1.5) << " GeV");
 
   B2INFO("Minimal curvature not leaving the CDC from inside the CDC : " << outerCurlCurv);
-  B2INFO("Maximal momentum not leaving the CDC from inside the CDC : " << CDCBFieldUtil::curvatureToAbsMom2D(outerCurlCurv, 1.5));
+  B2INFO("Maximal momentum not leaving the CDC from inside the CDC : " << CDCBFieldUtil::curvatureToAbsMom2D(outerCurlCurv,
+         1.5) << " GeV");
+
+  for (const CDCWireSuperLayer& wireSuperLayer : theWireTopology.getWireSuperLayers()) {
+    double innerSLCurv = 1 / wireSuperLayer.getInnerCylindricalR();
+    B2INFO("Maximal curvature still reaching SL " << wireSuperLayer.getISuperLayer() << " from IP : " << innerSLCurv);
+    B2INFO("Minimal momentum still reaching SL " << wireSuperLayer.getISuperLayer() << " from IP : " <<
+           CDCBFieldUtil::curvatureToAbsMom2D(innerSLCurv, 1.5) << " GeV");
+  }
 }
 
-
+TEST_F(TrackFindingCDCTestWithTopology, topology_ShowLayerLimits)
+{
+  const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
+  ISuperLayer iL = -1;
+  for (const CDCWireLayer& wireLayer : theWireTopology.getWireLayers()) {
+    ++iL;
+    B2INFO("Layer " << iL << ":");
+    B2INFO("z in " << wireLayer.getForwardZ() << ", " << wireLayer.getBackwardZ());
+    B2INFO("r in " << wireLayer.getInnerCylindricalR() << ", " << wireLayer.getOuterCylindricalR());
+  }
+}
 
 TEST_F(TrackFindingCDCTestWithTopology, topology_CDCGeometryPar_cellId)
 {

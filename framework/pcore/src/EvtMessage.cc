@@ -9,8 +9,9 @@
 
 #include <framework/pcore/EvtMessage.h>
 
+#include <new>
 #include <cstdlib>
-#include <string>
+#include <cstring>
 
 #include <sys/time.h>
 
@@ -34,14 +35,15 @@ EvtMessage::EvtMessage(char* data):
 /// @brief Constructor of EvtMessage allocating new buffer
 /// @param msg  data
 /// @param size Length of the data (TMessage)
-EvtMessage::EvtMessage(const char* sobjs, int size, RECORD_TYPE type = MSG_EVENT)
+/// @param type type of the message
+EvtMessage::EvtMessage(const char* msg, int size, ERecordType type = MSG_EVENT)
 {
   int fullsize = size + sizeof(EvtHeader);
   int bufsize = roundToNearestInt(fullsize);
   m_data = new char[bufsize]; // Allocate new buffer
-  msg(sobjs, size, type);
-  for (int i = bufsize - fullsize; i > 0; i--)
-    m_data[bufsize - i] = '\0'; //zero extra bytes
+  // zero extra bytes
+  memset(m_data + fullsize, 0, bufsize - fullsize);
+  setMsg(msg, size, type);
   m_ownsBuffer = true;
 }
 
@@ -111,12 +113,12 @@ int EvtMessage::msg_size() const
 }
 
 // Record type
-RECORD_TYPE EvtMessage::type() const
+ERecordType EvtMessage::type() const
 {
   return ((reinterpret_cast<EvtHeader*>(m_data))->rectype);
 }
 
-void EvtMessage::type(RECORD_TYPE type)
+void EvtMessage::type(ERecordType type)
 {
   (reinterpret_cast<EvtHeader*>(m_data))->rectype = type;
 }
@@ -151,7 +153,7 @@ struct timeval EvtMessage::time() const {
   return tv;
 }
 
-void EvtMessage::time(struct timeval& tbuf)
+void EvtMessage::setTime(const struct timeval& tbuf)
 {
   (reinterpret_cast<EvtHeader*>(m_data))->time_sec = tbuf.tv_sec;
   (reinterpret_cast<EvtHeader*>(m_data))->time_usec = tbuf.tv_usec;
@@ -163,6 +165,11 @@ EvtHeader* EvtMessage::header()
   return (reinterpret_cast<EvtHeader*>(m_data));
 }
 
+const EvtHeader* EvtMessage::getHeader() const
+{
+  return (reinterpret_cast<const EvtHeader*>(m_data));
+}
+
 // Message body
 char* EvtMessage::msg()
 {
@@ -171,18 +178,13 @@ char* EvtMessage::msg()
 
 // set_message
 
-void EvtMessage::msg(char const* msgin, int size, RECORD_TYPE type)
+void EvtMessage::setMsg(char const* msgin, int size, ERecordType type)
 {
-  EvtHeader* hdr = reinterpret_cast<EvtHeader*>(m_data);
-  hdr->size = size + sizeof(EvtHeader);
-  hdr->rectype = type;
+  //initialize message header properly
+  new(m_data) EvtHeader(size + sizeof(EvtHeader), type);
   struct timeval tv;
   gettimeofday(&tv, NULL);
-  (reinterpret_cast<EvtHeader*>(m_data))->time_sec = tv.tv_sec;
-  (reinterpret_cast<EvtHeader*>(m_data))->time_usec = tv.tv_usec;
-  hdr->src = -1;
-  hdr->dest = -1;
-  //TODO: set durability, nobjs, narrays here?
+  this->setTime(tv);
   if (size > 0)
     memcpy(m_data + sizeof(EvtHeader), msgin, size);
 }

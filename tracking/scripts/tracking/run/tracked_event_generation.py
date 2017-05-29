@@ -28,15 +28,14 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
         'UseSVDHits': True,
         'UseCDCHits': True,
         'UseOnlyAxialCDCHits': False,
-        'WhichParticles': ['primary'],
-        'EnergyCut': 0.1,
+        'UseOnlyBeforeTOP': True,
+        'UseReassignedHits': True,
+        'UseNLoops': 1,
+        'WhichParticles': [],
     }
 
     #: Add the track fitting to the execution
     fit_tracks = False
-
-    #: Determines which fit geometry should be used.
-    fit_geometry = None
 
     def create_argument_parser(self, **kwds):
         argument_parser = super().create_argument_parser(**kwds)
@@ -54,26 +53,10 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
         tracking_argument_group.add_argument(
             '--fit',
             action="store_true",
+            default=self.fit_tracks,
             dest='fit_tracks',
             help='Apply the fitting to the found tracks'
         )
-
-        # Indication with which geometry tracks should be fitted
-        tracking_argument_group.add_argument(
-            '--fit-geometry',
-            choices=['TGeo', 'Geant4', 'default'],
-            default=self.fit_geometry,
-            dest='fit_geometry',
-            help='Geometry to be used with Genfit. (Was used for earlier investigations geometries seem stable now)'
-        )
-
-        tracking_argument_group.add_argument(
-            '-so',
-            '--simulate-only',
-            action='store_true',
-            default=self.simulate_only,
-            dest='simulate_only',
-            help='Only generate and simulate the events, but do not run any tracking or validation code')
 
         return argument_parser
 
@@ -82,19 +65,12 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
         # based on the properties in the base class.
         path = super().create_path()
 
-        # early return if only a simulation run was requested
-        if self.simulate_only:
-            return path
-
         # setting up fitting is only necessary when testing
         # track finding comonenst ex-situ
-        if self.fit_geometry or self.fit_tracks:
+        if self.fit_tracks:
             if 'SetupGenfitExtrapolation' not in path:
                 # Prepare Genfit extrapolation
-                setup_genfit_extrapolation_module = path.add_module('SetupGenfitExtrapolation')
-                # Only update the used geometry if the default is not requested
-                if self.fit_geometry and self.fit_geometry != "default":
-                    setup_genfit_extrapolation_module.param({'whichGeometry': self.fit_geometry})
+                path.add_module('SetupGenfitExtrapolation')
 
         if self.finder_module is not None:
             # Setup track finder
@@ -108,6 +84,15 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
 
             # Include the mc tracks if the monte carlo data is presentx
             if 'MCRecoTracksMatcher' not in path:
+                matching_coverage = {key: value for key, value in tracking_coverage.items()
+                                     if key in ('UsePXDHits', 'UseSVDHits', 'UseCDCHits', 'MinimalEfficiency', 'MinimalPurity')}
+
+                # Removing minimal efficiency and purity as they are only parameters of the matching
+                if "MinimalEfficiency" in tracking_coverage:
+                    tracking_coverage.pop("MinimalEfficiency")
+                if "MinimalPurity" in tracking_coverage:
+                    tracking_coverage.pop("MinimalPurity")
+
                 # Reference Monte Carlo tracks
                 track_finder_mc_truth_module = basf2.register_module('TrackFinderMCTruthRecoTracks')
                 track_finder_mc_truth_module.param({
@@ -118,15 +103,11 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                 # Track matcher
                 mc_track_matcher_module = basf2.register_module('MCRecoTracksMatcher')
 
-                tracking_coverage.pop("WhichParticles", None)
-                tracking_coverage.pop("EnergyCut", None)
-                tracking_coverage.pop("UseNLoops", None)
                 mc_track_matcher_module.param({
                     'mcRecoTracksStoreArrayName': 'MCRecoTracks',
                     'MinimalPurity': 0.66,
-                    'RelateClonesToMCParticles': True,
                     'prRecoTracksStoreArrayName': "RecoTracks",
-                    **tracking_coverage
+                    **matching_coverage
                 })
 
                 path.add_module(IfMCParticlesPresentModule(track_finder_mc_truth_module))
@@ -172,16 +153,41 @@ finder_modules_by_short_name = {
     'MC': 'TrackFinderMCTruthRecoTracks',
     'Reconstruction': add_standard_reconstruction,
     'TrackFinder': add_standard_finder,
-    'TrackFinderCDC': tracking.add_cdc_track_finding,
     'TrackFinderVXD': tracking.add_vxd_track_finding,
-    'TrackFinderCDCLegendre': lambda path: (path.add_module('WireHitPreparer'),
-                                            path.add_module('TrackFinderCDCLegendreTracking')),
-    'SegmentFinderCDC': lambda path: (path.add_module('WireHitPreparer'),
-                                      path.add_module('SegmentFinderCDCFacetAutomaton'),
-                                      path.add_module('TrackCreatorSingleSegments',
+    'TFCDC': lambda path: tracking.add_cdc_track_finding(path, with_ca=True),
+    'TFCDC_Global': tracking.add_cdc_track_finding,
+    'TFCDC_Ca': lambda path: (path.add_module('TFCDC_WireHitPreparer',
+                                              flightTimeEstimation="outwards"),
+                              path.add_module('TFCDC_ClusterPreparer',
+                                              SuperClusterDegree=3,
+                                              SuperClusterExpandOverApogeeGap=True),
+                              path.add_module('TFCDC_SegmentFinderFacetAutomaton'),
+                              path.add_module("TFCDC_TrackFinderSegmentPairAutomaton"),
+                              path.add_module("TFCDC_TrackCreatorSingleSegments",
+                                              MinimalHitsBySuperLayerId={0: 15}),
+                              path.add_module('TFCDC_TrackExporter')),
+    'TFCDC_Axial': lambda path: (path.add_module('TFCDC_WireHitPreparer',
+                                                 flightTimeEstimation="outwards"),
+                                 path.add_module('TFCDC_ClusterPreparer'),
+                                 path.add_module('TFCDC_AxialTrackFinderLegendre'),
+                                 path.add_module('TFCDC_TrackExporter')),
+    'TFCDC_Segments': lambda path: (path.add_module('TFCDC_WireHitPreparer',
+                                                    flightTimeEstimation="outwards"),
+                                    path.add_module('TFCDC_ClusterPreparer'),
+                                    path.add_module('TFCDC_SegmentFinderFacetAutomaton'),
+                                    path.add_module('TFCDC_TrackCreatorSingleSegments',
+                                                    MinimalHitsBySuperLayerId={sl_id: 0 for sl_id in range(9)}),
+                                    path.add_module('TFCDC_TrackExporter')),
+    'TFCDC_MCSegments': lambda path: (path.add_module('TFCDC_WireHitPreparer',
+                                                      flightTimeEstimation="outwards"),
+                                      path.add_module('TFCDC_SegmentCreatorMCTruth'),
+                                      path.add_module('TFCDC_SegmentLinker',
+                                                      segments="CDCSegment2DVector",
+                                                      filter="truth"),
+                                      path.add_module('TFCDC_TrackCreatorSingleSegments',
                                                       MinimalHitsBySuperLayerId={sl_id: 0 for sl_id in range(9)}),
-                                      path.add_module('TrackExporter'),
-                                      ),
+                                      path.add_module('TFCDC_TrackExporter')),
+    'FirstLoop': lambda path: path.add_module('TFCDC_WireHitPreparer', UseNLoops=1.0),
 }
 
 

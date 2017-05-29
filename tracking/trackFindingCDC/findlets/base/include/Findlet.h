@@ -33,14 +33,14 @@ namespace Belle2 {
       template<class T>
       struct ToVectorImpl {
         /// A mutable range of Ts.
-        using Type = std::vector<typename std::remove_reference<T>::type >;
+        using Type = std::vector<typename std::remove_reference<T>::type>;
       };
 
       /// Specialisation to only forward a range for immutable types.
       template<class T>
       struct ToVectorImpl<const T> {
         /// An immutable range of Ts.
-        using Type = const std::vector<T>;
+        using Type = const std::vector<typename std::remove_reference<T>::type>;
       };
 
       /// Short hand for ToRangeImpl
@@ -68,7 +68,7 @@ namespace Belle2 {
       }
 
       /// Main function executing the algorithm
-      virtual void apply(ToVector<AIOTypes>& ... ranges) = 0;
+      virtual void apply(ToVector<AIOTypes>& ... ioVectors) = 0;
     };
   }
 }

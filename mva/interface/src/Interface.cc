@@ -10,7 +10,6 @@
 
 #include <mva/interface/Interface.h>
 #include <mva/methods/FastBDT.h>
-#include <mva/methods/NeuroBayes.h>
 #include <mva/methods/TMVA.h>
 #include <mva/methods/Python.h>
 #include <mva/methods/FANN.h>
@@ -44,9 +43,6 @@ namespace Belle2 {
     void AbstractInterface::initSupportedInterfaces()
     {
       static Interface<FastBDTOptions, FastBDTTeacher, FastBDTExpert> interface_FastBDT;
-#ifndef DEACTIVATE_NEUROBAYES
-      static Interface<NeuroBayesOptions, NeuroBayesTeacher, NeuroBayesExpert> interface_NeuroBayes;
-#endif
       static Interface<FANNOptions, FANNTeacher, FANNExpert> interface_FANN;
       static Interface<TMVAOptionsClassification, TMVATeacherClassification, TMVAExpertClassification>
       interface_TMVAClassification;

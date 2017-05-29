@@ -75,8 +75,7 @@ std::string TakenFlagColorMap::map(int index __attribute__((unused)), const CDCH
 {
   if (m_storedWireHits) {
     const std::vector<CDCWireHit>& wireHits = *m_storedWireHits;
-    ConstVectorRange<CDCWireHit> wireHitRange =
-      std::equal_range(wireHits.begin(), wireHits.end(), hit);
+    ConstVectorRange<CDCWireHit> wireHitRange{std::equal_range(wireHits.begin(), wireHits.end(), hit)};
 
     if (not wireHitRange.empty()) {
       const CDCWireHit& wireHit =  wireHitRange.front();
@@ -90,8 +89,7 @@ std::string TakenFlagColorMap::map(int index __attribute__((unused)), const CDCH
 
 std::string RLColorMap::map(int index __attribute__((unused)), const CDCHit& hit)
 {
-  CDCMCHitLookUp mcHitLookUp;
-  mcHitLookUp.getInstance();
+  const CDCMCHitLookUp& mcHitLookUp = mcHitLookUp.getInstance();
   short int rlInfo = mcHitLookUp.getRLInfo(&hit);
   if (rlInfo == 1) {
     return ("green");
@@ -364,4 +362,16 @@ std::string SimHitIsBkgColorMap::map(int index __attribute__((unused)), const CD
   } else {
     return "red";
   }
+}
+
+std::string NLoopsColorMap::map(int index __attribute__((unused)), const CDCHit& hit)
+{
+  const CDCMCHitLookUp& mcHitLookUp = mcHitLookUp.getInstance();
+
+  int nLoops = mcHitLookUp.getNLoops(&hit);
+
+  if (nLoops < 0) {
+    return c_bkgHitColor;
+  }
+  return Colors::getWheelColor(70 * nLoops);
 }

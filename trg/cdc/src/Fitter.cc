@@ -18,20 +18,24 @@
 
 namespace Belle2 {
 
-TRGCDCFitter::TRGCDCFitter(const std::string & name) : _name(name) {
-}
+  TRGCDCFitter::TRGCDCFitter(const std::string& name) : _name(name)
+  {
+  }
 
-TRGCDCFitter::~TRGCDCFitter() {
-}
+  TRGCDCFitter::~TRGCDCFitter()
+  {
+  }
 
-void
-TRGCDCFitter::fitDone(TCTBase & t) const {
+  void
+  TRGCDCFitter::fitDone(TCTBase& t) const
+  {
     t._fitted = true;
-}
+  }
 
-void
-TRGCDCFitter::dump(const std::string &, const std::string &) const {
-}
+  void
+  TRGCDCFitter::dump(const std::string&, const std::string&) const
+  {
+  }
 
 } // namespace Belle2
 

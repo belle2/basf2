@@ -35,7 +35,7 @@ EKLMTimeCalibrationCollectorModule::EKLMTimeCalibrationCollectorModule() :
   setDescription("Module for EKLM time calibration (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);
   m_nStripDifferent = -1;
-  m_ev = {0, 0};
+  m_ev = {0, 0, 0};
   m_Strip = 0;
   m_TransformData = NULL;
   m_GeoDat = NULL;
@@ -60,6 +60,7 @@ void EKLMTimeCalibrationCollectorModule::prepare()
   t = new TTree("calibration_data", "");
   t->Branch("time", &m_ev.time, "time/F");
   t->Branch("dist", &m_ev.dist, "dist/F");
+  t->Branch("npe", &m_ev.npe, "npe/F");
   t->Branch("strip", &m_Strip, "strip/I");
   registerObject<TTree>("calibration_data", t);
 }
@@ -142,6 +143,7 @@ void EKLMTimeCalibrationCollectorModule::collect()
       hitLocal = (*tr) * hitGlobal;
       m_ev.time = digits[j]->getTime() - hitTime;
       m_ev.dist = 0.5 * l - hitLocal.x() / CLHEP::mm * Unit::mm;
+      m_ev.npe = digits[j]->getNPE();
       m_Strip =
         m_GeoDat->stripNumber(digits[j]->getEndcap(), digits[j]->getLayer(),
                               digits[j]->getSector(), digits[j]->getPlane(),

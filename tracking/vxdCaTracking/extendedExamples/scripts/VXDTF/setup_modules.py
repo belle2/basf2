@@ -156,7 +156,11 @@ def setup_gfTCtoSPTCConverters(
         sptcOutput='checkedSPTCs',
         usePXD=True,
         logLevel=LogLevel.INFO,
-        debugVal=1):
+        debugVal=1,
+        minNumSPs=3,
+        checkCurling=True,  # for the referee
+        splitCurlers=True  # for the referee
+):
     """This function adds the modules needed to convert genfit-TCs to SpacePointTCs to given path.
 
     @param path if set to 0 (standard) the created modules will not be added, but returned.
@@ -223,16 +227,17 @@ def setup_gfTCtoSPTCConverters(
 
     # SpacePointTrackCand referee
     sptcReferee = register_module('SPTCReferee')
-    sptcReferee.logging.log_level = LogLevel.INFO
+    sptcReferee.logging.log_level = logLevel  # LogLevel.INFO
     sptcReferee.param('sptcName', 'SPTracks')
     sptcReferee.param('newArrayName', sptcOutput)
     sptcReferee.param('storeNewArray', True)
-    sptcReferee.param('checkCurling', True)
-    sptcReferee.param('splitCurlers', True)
+    sptcReferee.param('checkCurling', checkCurling)
+    sptcReferee.param('splitCurlers', splitCurlers)
     sptcReferee.param('keepOnlyFirstPart', True)
     sptcReferee.param('kickSpacePoint', True)
     sptcReferee.param('checkSameSensor', True)
     sptcReferee.param('useMCInfo', True)
+    sptcReferee.param('minNumSpacePoints', minNumSPs)
 
     if path is 0:
         return [sp2thConnector, trackCandConverter, sptcReferee]

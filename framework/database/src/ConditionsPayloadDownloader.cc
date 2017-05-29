@@ -58,9 +58,10 @@ namespace {
   {
     std::ostream& stream = *static_cast<std::ostream*>(userp);
     // size in bytes is size*nmemb so copy the correct amount and return it to curl
-    stream.write(static_cast<const char*>(buffer), size * nmemb);
-    if (!stream.good()) {
-      B2ERROR("Writing error while downloading...");
+    try {
+      stream.write(static_cast<const char*>(buffer), size * nmemb);
+    } catch (std::ios_base::failure& e) {
+      B2ERROR("Writing error while downloading: " << e.what());
       return 0;
     }
     return size * nmemb;
@@ -154,7 +155,14 @@ namespace Belle2 {
     if (!m_session->curl) {
       B2FATAL("Cannot intialize libcurl");
     }
+    m_session->headers = curl_slist_append(nullptr, "Accept: application/json");
+    //FIXME: this will of course break any effort by the database people to get some caching in ...
+    m_session->headers = curl_slist_append(m_session->headers, "Cache-Control: no-cache");
     curl_easy_setopt(m_session->curl, CURLOPT_HTTPHEADER, m_session->headers);
+    curl_easy_setopt(m_session->curl, CURLOPT_TCP_KEEPALIVE, 1L);
+    curl_easy_setopt(m_session->curl, CURLOPT_CONNECTTIMEOUT, 60);
+    curl_easy_setopt(m_session->curl, CURLOPT_LOW_SPEED_LIMIT, 10 * 1024); //10 kB/s
+    curl_easy_setopt(m_session->curl, CURLOPT_LOW_SPEED_TIME, 60);
     curl_easy_setopt(m_session->curl, CURLOPT_WRITEFUNCTION, write_function);
     curl_easy_setopt(m_session->curl, CURLOPT_VERBOSE, 1);
     curl_easy_setopt(m_session->curl, CURLOPT_NOPROGRESS, 0);
@@ -163,7 +171,6 @@ namespace Belle2 {
     curl_easy_setopt(m_session->curl, CURLOPT_XFERINFODATA, m_session.get());
     curl_easy_setopt(m_session->curl, CURLOPT_FAILONERROR, true);
     curl_easy_setopt(m_session->curl, CURLOPT_ERRORBUFFER, m_session->errbuf);
-    m_session->headers = curl_slist_append(nullptr, "Accept: application/json");
     return true;
   }
 
@@ -193,8 +200,6 @@ namespace Belle2 {
   {
     //make sure we have an active curl session needed for escaping the tag name ...
     SessionGuard session(*this);
-    //set this to true if we have to parse legacy v1 api reply
-    bool use_legacy_v1(false);
 
     // update all the payload info from the central database
     // so first clear existing information
@@ -213,21 +218,8 @@ namespace Belle2 {
     // and perform the request
     std::stringstream payloads;
     if (!download(url, payloads)) {
-      B2WARNING("Could not get list of payloads from database, trying legacy v1 api");
-      std::string experiment_str = std::to_string(experiment);
-      // possibly replacing the experiment name for the old api
-      auto it = m_mapping.left.find(experiment);
-      if (it != m_mapping.left.end()) {
-        experiment_str = it->second;
-      }
-      const std::string url = urljoin(m_restUrl, "v1/iovPayloads/?gtName=" + escapedTagStr + "&expName=" +
-                                      experiment_str + "&runName=" + std::to_string(run));
-
-      if (!download(url, payloads)) {
-        B2WARNING("Could not get list of payloads with legacy api either, giving up");
-        return false;
-      }
-      use_legacy_v1 = true;
+      B2WARNING("Could not get list of payloads from database");
+      return false;
     }
     // and if that was successful we parse the returned json by resetting the stringstream to its beginning
     payloads.clear();
@@ -248,34 +240,12 @@ namespace Belle2 {
         payloadInfo.digest = payload.get<std::string>("checksum");
         payloadInfo.payloadUrl = payload.get<std::string>("payloadUrl");
         payloadInfo.revision = payload.get<int>("revision", 0);
-
-        // check which reply version we got and proceed accordingly
-        if (!use_legacy_v1) {
-          // new api
-          payloadInfo.baseUrl = payload.get<std::string>("baseUrl");
-          int firstExp = payloadIov.get<int>("expStart");
-          int firstRun = payloadIov.get<int>("runStart");
-          int finalExp = payloadIov.get<int>("expEnd");
-          int finalRun = payloadIov.get<int>("runEnd");
-          payloadInfo.iov = IntervalOfValidity(firstExp, firstRun, finalExp, finalRun);
-        } else {
-          //v1 api, can be removed once the server is fully migrated
-          auto getExpNumber = [&](const std::string & exp) {
-            auto it = m_mapping.right.find(exp);
-            if (it != m_mapping.right.end()) return it->second;
-            try {
-              return stoi(exp);
-            } catch (std::invalid_argument& e) {
-              B2FATAL("Invalid experiment number: '" << exp << "'. Please define the experiment name using 'set_experiment_name'");
-            }
-          };
-          payloadInfo.baseUrl = "http://belle2db.hep.pnnl.gov/";
-          int firstExp = getExpNumber(payloadIov.get<std::string>("initialRunId.experiment.name"));
-          int firstRun = payloadIov.get<int>("initialRunId.name");
-          int finalExp = getExpNumber(payloadIov.get<std::string>("finalRunId.experiment.name"));
-          int finalRun = payloadIov.get<int>("finalRunId.name");
-          payloadInfo.iov = IntervalOfValidity(firstExp, firstRun, finalExp, finalRun);
-        }
+        payloadInfo.baseUrl = payload.get<std::string>("baseUrl");
+        int firstExp = payloadIov.get<int>("expStart");
+        int firstRun = payloadIov.get<int>("runStart");
+        int finalExp = payloadIov.get<int>("expEnd");
+        int finalRun = payloadIov.get<int>("runEnd");
+        payloadInfo.iov = IntervalOfValidity(firstExp, firstRun, finalExp, finalRun);
 
         // make sure we have all fields filled
         if (name.empty() || payloadInfo.payloadUrl.empty() || payloadInfo.digest.empty() || payloadInfo.baseUrl.empty()) {
@@ -458,6 +428,9 @@ namespace Belle2 {
       B2ERROR("Cannot write to stream when downloading " << url);
       return false;
     }
+    // Set the exception flags to notify us of any problem during writing
+    auto oldExceptionMask = buffer.exceptions();
+    buffer.exceptions(std::ios::failbit | std::ios::badbit);
     // build the request ...
     CURLcode res{CURLE_FAILED_INIT};
     // and set all the curl options
@@ -466,6 +439,7 @@ namespace Belle2 {
     // perform the request ...
     res = curl_easy_perform(m_session->curl);
     // flush output
+    buffer.exceptions(oldExceptionMask);
     buffer.flush();
     // and check for errors which occured during download ...
     if (res != CURLE_OK) {
@@ -503,15 +477,5 @@ namespace Belle2 {
       return m_tempfiles[key]->getName();
     }
     return "";
-  }
-
-  bool ConditionsPayloadDownloader::addExperimentName(int experiment, const std::string& name)
-  {
-    auto it = m_mapping.insert(boost::bimap<int, std::string>::value_type(experiment, name));
-    if (!it.second) {
-      B2ERROR("Cannot set experiment name " << experiment << "->'" << name << "': conflict with "
-              << it.first->left << "->'" << it.first->right << "'");
-    }
-    return it.second;
   }
 }

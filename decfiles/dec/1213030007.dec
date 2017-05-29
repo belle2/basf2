@@ -1,0 +1,27 @@
+# EventType: 1213030007
+# Descriptor: [B+ -> [anti-D0 -> K+ K-] K+]
+# NickName: Bu_DK+_DtoK+K-
+# Documentation: B to Charm [phi3 (gamma)] studies.
+# Tested:
+# PhysicsWG: Hadronic B Decay to Open Charm WG
+# Responsible: Hulya Atmacan
+# Email: hulya.atmacan@gmail.com
+# Cuts: None
+# Date: 20161111
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B+ B-sig VSS;
+Enddecay
+
+Decay B+sig
+1.0 anti-D0sig K+ PHOTOS PHSP;
+Enddecay
+CDecay B-sig
+
+Decay anti-D0sig
+1.0 K+ K- PHOTOS PHSP;
+Enddecay
+CDecay D0sig
+
+End

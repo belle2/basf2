@@ -251,7 +251,7 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
     int copper_nwords = copper_buf[ tmp_header.POS_NWORDS ];
     PrintData(copper_buf, copper_nwords);
     // Check whether packet-CRC error has occcured or not.
-    if (copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ] & (0x1 << tmp_header.B2LINK_PACKET_CRC_ERROR)) {
+    if (copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ] & tmp_header.B2LINK_PACKET_CRC_ERROR) {
       //
       // Do not stop data
       //
@@ -284,7 +284,7 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
     // Modify XOR checksum due to adding a bit flag
     copper_buf[ copper_nwords - tmp_trailer.RAWTRAILER_NWORDS + tmp_trailer.POS_CHKSUM ]
     ^= copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ];
-    copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (0x1 << tmp_header.B2LINK_EVENT_CRC_ERROR);
+    copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_EVENT_CRC_ERROR;
     copper_buf[ copper_nwords - tmp_trailer.RAWTRAILER_NWORDS + tmp_trailer.POS_CHKSUM ]
     ^= copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ];
   }

@@ -34,8 +34,8 @@ int RevRb2Sock::SendEvent(void)
   int size;
   while ((size = m_rbuf->remq((int*)m_evtbuf)) == 0) {
     //    printf ( "Rx : evtbuf is not available yet....\n" );
-    usleep(100);
-    //    usleep(20);
+    //    usleep(100);
+    usleep(20);
   }
   m_flow->log(size * 4);
 

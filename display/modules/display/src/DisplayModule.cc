@@ -6,18 +6,17 @@
 #include <display/EveGeometry.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <geometry/GeometryManager.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Gearbox.h>
+#include <framework/core/Path.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <genfit/GFRaveVertex.h>
 
 #include <TApplication.h>
-#include <TGeoManager.h>
 #include <TEveManager.h>
 
 using namespace Belle2;
@@ -90,19 +89,18 @@ void DisplayModule::initialize()
   StoreArray<SVDCluster>::optional();
   StoreArray<CDCHit>::optional();
   StoreArray<ARICHHit>::optional();
+  StoreArray<TOPDigit>::optional();
   StoreArray<ROIid>::optional();
-
-  if (!gGeoManager) { //TGeo geometry not initialized, do it ourselves
-    //convert geant4 geometry to TGeo geometry
-    geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
-    geoManager.createTGeoRepresentation();
-  }
-  if (!gGeoManager) {
-    B2ERROR("Couldn't create TGeo geometry!");
-    return;
-  }
+  StoreArray<RecoHitInformation::UsedPXDHit>::optional();
+  StoreArray<RecoHitInformation::UsedSVDHit>::optional();
+  StoreArray<RecoHitInformation::UsedCDCHit>::optional();
+  StoreArray<TrackCandidateTFInfo>::optional();
+  StoreArray<CellTFInfo>::optional();
+  StoreArray<SectorTFInfo>::optional();
 
   m_display = new DisplayUI(m_automatic);
+  if (hasCondition())
+    m_display->allowFlaggingEvents(getCondition()->getPath()->getPathString());
   //pass some parameters to DisplayUI to be able to change them at run time
   m_display->addParameter("Show full geometry", getParam<bool>("fullGeometry"), 0);
   m_display->addParameter("Show MC info", getParam<bool>("showMCInfo"), 0);
@@ -117,10 +115,9 @@ void DisplayModule::initialize()
   m_display->addParameter("Show candidates and rec. hits", getParam<bool>("showRecoTracks"), 0);
   m_display->addParameter("Show tracks, vertices, gammas", getParam<bool>("showTrackLevelObjects"), 0);
 
-
+  EveGeometry::addGeometry();
   m_visualizer = new EVEVisualization();
   m_visualizer->setOptions(m_options);
-  EveGeometry::addGeometry();
 
   if (!m_fullGeometry and Gearbox::getInstance().exists("Detector/Name")) {
     std::string detectorName = Gearbox::getInstance().getString("Detector/Name");
@@ -136,6 +133,7 @@ void DisplayModule::initialize()
 
 void DisplayModule::event()
 {
+  setReturnValue(false);
   if (!gEve) {
     //window closed?
     B2WARNING("Display window closed, continuing with next module. (hit Ctrl+C to exit)");
@@ -180,9 +178,7 @@ void DisplayModule::event()
     for (std::string colName : recoTrackArrays) {
       StoreArray<RecoTrack> recoTracks(colName);
       for (const RecoTrack& recoTrack : recoTracks) {
-
         m_visualizer->addTrackCandidate(colName, recoTrack);
-
       }
     }
 
@@ -198,6 +194,10 @@ void DisplayModule::event()
     StoreArray<ROIid> ROIs;
     for (int i = 0 ; i < ROIs.getEntries(); i++)
       m_visualizer->addROI(ROIs[i]);
+    //well, non-standard names are used for testbeams?
+    StoreArray<ROIid> testbeamROIs("ROIs");
+    for (int i = 0 ; i < testbeamROIs.getEntries(); i++)
+      m_visualizer->addROI(testbeamROIs[i]);
 
     //special VXDTF objects
     StoreArray<TrackCandidateTFInfo> tfcandTFInfo;
@@ -263,6 +263,8 @@ void DisplayModule::event()
 
       m_visualizer->addKLMCluster(&cluster);
     }
+
+    m_visualizer->addTOPDigits(StoreArray<TOPDigit>());
   }
 
   //all hits/tracks are added, finish visual representations
@@ -276,6 +278,7 @@ void DisplayModule::event()
 
 
   bool reshow = m_display->startDisplay();
+  setReturnValue(m_display->getReturnValue());
   if (!m_display->cumulativeIsOn()) {
     m_visualizer->clearEvent(); //clean up internal state of visualiser
   }

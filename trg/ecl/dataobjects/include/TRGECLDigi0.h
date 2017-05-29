@@ -76,6 +76,7 @@ namespace Belle2 {
       m_ibintime   = 0;
       m_raw_energy = 0;
       m_raw_timing = 0;
+      m_beambkgtag = 0;
 
 
     }
@@ -85,6 +86,7 @@ namespace Belle2 {
       int eventid,
       int tcid,
       int ibintime,
+      int beambkgtag,
       double raw_energy,
       double raw_timing
     )
@@ -94,6 +96,8 @@ namespace Belle2 {
       m_ibintime = ibintime;
       m_raw_energy = raw_energy;
       m_raw_timing = raw_timing;
+      m_beambkgtag = beambkgtag;
+
     }
     //! the class title
     ClassDef(TRGECLDigi0, 1); /*< the class title */

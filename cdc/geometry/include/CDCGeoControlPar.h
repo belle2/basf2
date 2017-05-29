@@ -40,6 +40,14 @@ namespace Belle2 {
       }
 
       /**
+       * Set printMaterialTable flag
+       */
+      void setPrintMaterialTable(bool onoff)
+      {
+        m_printMaterialTable = onoff;
+      }
+
+      /**
        * Set material defition mode
        */
       void setMaterialDefinitionMode(int input)
@@ -162,7 +170,7 @@ namespace Belle2 {
       /**
        * Set input file name for wire displacement
        */
-      void setDisplacementFile(std::string input)
+      void setDisplacementFile(std::string& input)
       {
         m_displacementFile = input;
       }
@@ -170,7 +178,7 @@ namespace Belle2 {
       /**
        * Set input file name for wire alignment
        */
-      void setAlignmentFile(std::string input)
+      void setAlignmentFile(std::string& input)
       {
         m_alignmentFile = input;
       }
@@ -178,7 +186,7 @@ namespace Belle2 {
       /**
        * Set input file name for wire misalignment
        */
-      void setMisalignmentFile(std::string input)
+      void setMisalignmentFile(std::string& input)
       {
         m_misalignmentFile = input;
       }
@@ -186,7 +194,7 @@ namespace Belle2 {
       /**
        * Set input file name for xt-relation
        */
-      void setXtFile(std::string input)
+      void setXtFile(std::string& input)
       {
         m_xtFile = input;
       }
@@ -194,7 +202,7 @@ namespace Belle2 {
       /**
        * Set input file name for sigma
        */
-      void setSigmaFile(std::string input)
+      void setSigmaFile(std::string& input)
       {
         m_sigmaFile = input;
       }
@@ -202,7 +210,7 @@ namespace Belle2 {
       /**
        * Set input file name for prop-speed
        */
-      void setPropSpeedFile(std::string input)
+      void setPropSpeedFile(std::string& input)
       {
         m_propSpeedFile = input;
       }
@@ -210,7 +218,7 @@ namespace Belle2 {
       /**
        * Set input file name for t0
        */
-      void setT0File(std::string input)
+      void setT0File(std::string& input)
       {
         m_t0File = input;
       }
@@ -218,7 +226,7 @@ namespace Belle2 {
       /**
        * Set input file name for time-walk
        */
-      void setTwFile(std::string input)
+      void setTwFile(std::string& input)
       {
         m_twFile = input;
       }
@@ -226,7 +234,7 @@ namespace Belle2 {
       /**
        * Set input file name for bad wire
        */
-      void setBwFile(std::string input)
+      void setBwFile(std::string& input)
       {
         m_bwFile = input;
       }
@@ -234,9 +242,17 @@ namespace Belle2 {
       /**
        * Set input file name for channel map
        */
-      void setChMapFile(std::string input)
+      void setChMapFile(std::string& input)
       {
         m_chMapFile = input;
+      }
+
+      /**
+       * Set max. space resolution (cm)
+       */
+      void setMaxSpaceResolution(double input)
+      {
+        m_maxSpaceResol = input;
       }
 
 
@@ -246,6 +262,14 @@ namespace Belle2 {
       bool getDebug() const
       {
         return m_debug;
+      }
+
+      /**
+       * Get printMaterialTable flag
+       */
+      bool getPrintMaterialTable() const
+      {
+        return m_printMaterialTable;
       }
 
       /**
@@ -448,6 +472,14 @@ namespace Belle2 {
         return m_chMapFile;
       }
 
+      /**
+       * Get max. space resolution
+       */
+      double getMaxSpaceResolution()
+      {
+        return m_maxSpaceResol;
+      }
+
     private:
       /** Singleton class */
       CDCGeoControlPar();
@@ -457,6 +489,7 @@ namespace Belle2 {
       CDCGeoControlPar& operator=(const CDCGeoControlPar&);
 
       bool m_debug = false;                    /*!< Switch for debug printing. */
+      bool m_printMaterialTable = false;       /*!< Switch for printing the G4 material table. */
 
       int m_materialDefinitionMode = 0;     /*!< Material definition mode. */
       int m_senseWireZposMode = 1;     /*!< Sense wire z postion mode. */
@@ -476,13 +509,15 @@ namespace Belle2 {
       bool m_bwInputType = true;  /**< Input type for bad wire. */
       bool m_chMapInputType = true;  /**< Input type for channel map. */
 
+      double m_maxSpaceResol = 2.5 * 0.0130; /**< Max. space resolution allowed (cm) */
+
       std::string m_displacementFile = "displacement_v1.1.dat";  /**< Displacement file. */
       std::string m_alignmentFile = "alignment_v2.dat";  /**< Alignment file. */
       std::string m_misalignmentFile = "misalignment_v2.dat";  /**< Misalignment file. */
-      std::string m_xtFile = "xt_v3.dat";  /**< Xt file. */
-      std::string m_sigmaFile = "sigma_v1.dat";  /**< Sigma file. */
+      std::string m_xtFile = "xt_v3_chebyshev.dat.gz";  /**< Xt file. */
+      std::string m_sigmaFile = "sigma_v2.dat";  /**< Sigma file. */
       std::string m_propSpeedFile = "propspeed_v0.dat";  /**< Prop-apeed file. */
-      std::string m_t0File = "t0.dat";  /**< T0 file. */
+      std::string m_t0File = "t0_v1.dat";  /**< T0 file. */
       std::string m_twFile = "tw_off.dat";  /**< Time walk file. */
       std::string m_bwFile = "badwire_v1.dat";  /**< Bad wire file. */
       std::string m_chMapFile = "ch_map.dat";  /**< Channel map file. */

@@ -15,7 +15,7 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <cdc/dataobjects/WireID.h>
 #include <bklm/dataobjects/BKLMElementID.h>
-#include <eklm/dataobjects/EKLMSegmentID.h>
+#include <eklm/dataobjects/EKLMElementID.h>
 
 #include <framework/gearbox/Const.h>
 
@@ -92,6 +92,9 @@ namespace Belle2 {
     static const gidTYPE bklmOffset  = 300000;  /**< Offset of 300000 in element ids for BKLM */
     static const gidTYPE eklmOffset  = 400000;  /**< Offset of 400000 in element ids for EKLM */
 
+    /// Default constuctor. Members initialized in declaration
+    GlobalLabel() {}
+
     /**
      * @brief Constructor from Pede label
      * Depends on registered time dependent parameters
@@ -134,11 +137,16 @@ namespace Belle2 {
     GlobalLabel(BKLMElementID bklmid, gidTYPE paramId);
 
     /**
-     * Constructor from EKLMSegmentID.
-     * @param[in] eklmSegment EKLM segment identifier.
+     * Constructor from EKLMElementID.
+     * @param[in] eklmElement EKLM element identifier.
      * @param[in] paramId     Numeric identifier of alignment parameter.
      */
-    GlobalLabel(EKLMSegmentID eklmSegment, gidTYPE paramId);
+    GlobalLabel(EKLMElementID eklmElement, gidTYPE paramId);
+
+    void construct(gidTYPE dbObjId, gidTYPE element, gidTYPE param)
+    {
+      construct(100000 * dbObjId + element, param);
+    }
 
     /**
      * @brief Register this Detector element and parameter
@@ -196,11 +204,11 @@ namespace Belle2 {
     BKLMElementID getBklmID() const;
 
     /**
-     * Get EKLM segment identifier. It should be checked that this label is
+     * Get EKLM element identifier. It should be checked that this label is
      * a EKLM label. If this is not the case, then the function fails with
      * fatal error.
      */
-    EKLMSegmentID getEklmID() const;
+    EKLMElementID getEklmID() const;
 
     //! Is this beam label?
     bool    isBeam()          const {return (eid < vxdOffset);}
@@ -346,19 +354,19 @@ namespace Belle2 {
     gidTYPE makeTEIDPID(gidTYPE teid_, gidTYPE pid_) {return pid_ * pidOffset + teid_ * teidOffset;}
 
     //! global id
-    gidTYPE gid;
+    gidTYPE gid {0};
 
     //! element id
-    gidTYPE eid;
+    gidTYPE eid {0};
 
     //! parameter id
-    gidTYPE pid;
+    gidTYPE pid {0};
 
     //! time id
-    gidTYPE tid;
+    gidTYPE tid {0};
 
     //! time identification flag
-    gidTYPE tif;
+    gidTYPE tif {0};
 
   };
 

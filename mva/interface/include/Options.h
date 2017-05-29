@@ -13,10 +13,12 @@
 #define INCLUDE_GUARD_BELLE2_MVA_OPTIONS_HEADER
 
 #include <boost/program_options.hpp>
+#include <boost/program_options/errors.hpp>
 #include <boost/property_tree/ptree_fwd.hpp>
 
 #include <string>
 #include <vector>
+#include <functional>
 
 namespace po = boost::program_options;
 
@@ -80,6 +82,7 @@ namespace Belle2 {
       std::vector<std::string> m_datafiles; /**< Name of the datafiles containing the training data */
       std::string m_treename = "ntuple"; /**< Name of the TTree inside the datafile containing the training data */
       std::vector<std::string> m_variables; /**< Vector of all variables (branch names) used in the training */
+      std::vector<std::string> m_spectators; /**< Vector of all spectators (branch names) used in the training */
       int m_signal_class = 1; /**< Signal class which is used as signal in a classification problem */
       std::string m_target_variable = "isSignal"; /**< Target variable (branch name) defining the target */
       std::string m_weight_variable = "__weight__"; /**< Weight variable (branch name) defining the weights */
@@ -134,6 +137,31 @@ namespace Belle2 {
       bool m_splot_boosted = false; /**< Use boosted sPlot training (aPlot) */
     };
 
+    template<typename T>
+    std::function<void(T)> check_bounds(T min, T max, const std::string& name)
+    {
+      return [name, min, max](T v) -> void {
+        if (v <= min || v >= max)
+        {
+          throw po::validation_error(po::validation_error::invalid_option_value, name,
+          std::to_string(min) + " <= " + name + " <= " + std::to_string(max) + ": provided value " + std::to_string(v));
+        }
+      };
+    }
+
+    template<typename T>
+    std::function<void(std::vector<T>)> check_bounds_vector(T min, T max, const std::string& name)
+    {
+      return [name, min, max](const std::vector<T>& vec) -> void {
+        for (auto v : vec)
+        {
+          if (v <= min || v >= max) {
+            throw po::validation_error(po::validation_error::invalid_option_value, name,
+            std::to_string(min) + " <= " + name + " <= " + std::to_string(max) + ": provided value " + std::to_string(v));
+          }
+        }
+      };
+    }
 
   }
 }

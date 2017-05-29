@@ -95,6 +95,8 @@ namespace Belle2 {
       /** GEMazition of GEM2 */
       TVector2 GEMGeo2(double x1, double y1);
 
+      /** Phase */
+      Int_t m_phase;
       /** Define ToT calib 1 */
       TF1* fctToT_Calib1;
       /** Define ToT calib 2 */
@@ -192,6 +194,10 @@ namespace Belle2 {
       int m_nTPC = 0;
       /** TPC coordinate */
       std::vector<TVector3> m_TPCCenter;
+      /** TPC angle X */
+      std::vector<float> m_TPCAngleX;
+      /** TPC angle Z */
+      std::vector<float> m_TPCAngleZ;
 
       /** Lower timing cut */
       double m_lowerTimingCut = 0;

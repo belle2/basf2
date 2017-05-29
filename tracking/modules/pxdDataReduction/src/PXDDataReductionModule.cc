@@ -44,8 +44,6 @@ PXDDataReductionModule::PXDDataReductionModule() : Module()
 
   addParam("recoTrackListName", m_recoTracksListName, " name of the list of the fitted tracks", std::string(""));
 
-  addParam("numIterKalmanFilter", m_numIterKalmanFilter, " number of iterations of the kalman filter ", int(5));
-
   addParam("tolerancePhi", m_tolerancePhi, "Tolerance by finding sensor in phi coordinate (radians).", double(0.15));
 
   addParam("toleranceZ", m_toleranceZ, "Tolerance by finding sensor in Z coordinate (cm).", double(0.5));
@@ -101,7 +99,6 @@ void PXDDataReductionModule::beginRun()
   m_ROIinfo.recoTracksListName = m_recoTracksListName;
 
   m_thePXDInterceptor = new PXDInterceptor(&m_ROIinfo, m_toleranceZ, m_tolerancePhi);
-  m_thePXDInterceptor->setNumIterKalmanFilter(m_numIterKalmanFilter);
 
   m_thePixelTranslator = new ROIPixelTranslator(&m_ROIinfo);
 

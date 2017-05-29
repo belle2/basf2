@@ -41,7 +41,7 @@ namespace Belle2 {
 
     public:
       /// Constructor from the variable set the filter should use
-      OnVarSet(std::unique_ptr<AVarSet> varSet)
+      explicit OnVarSet(std::unique_ptr<AVarSet> varSet)
         : m_varSet(std::move(varSet))
       {
         B2ASSERT("Varset initialised as nullptr", m_varSet);
@@ -74,8 +74,10 @@ namespace Belle2 {
       /// Function extracting the variables of the object into the variable set.
       Weight operator()(const Object& obj) override
       {
+        Weight weight = Super::operator()(obj);
+        if (std::isnan(weight)) return NAN;
         bool extracted = m_varSet->extract(&obj);
-        return extracted ? 1 : NAN;
+        return extracted ? weight : NAN;
       }
 
     public:

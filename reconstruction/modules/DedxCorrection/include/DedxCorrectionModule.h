@@ -17,6 +17,12 @@
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/DBArray.h>
+
+#include <reconstruction/dbobjects/CDCDedxWireGain.h>
+
 #include <string>
 #include <vector>
 
@@ -59,7 +65,7 @@ namespace Belle2 {
     double WireGainCorrection(int wireID, double& dedx) const;
 
     /** Perform a standard set of corrections */
-    double StandardCorrection(int wireID, double costheta, double dedx) const;
+    double StandardCorrection(int wireID, double dedx) const;
 
     /** Perform a hadron saturation correction.
      * (Set the peak of the truncated mean for electrons to 1) */
@@ -74,6 +80,12 @@ namespace Belle2 {
 
   private:
 
+    /** Store array: CDCDedxTrack */
+    StoreArray<CDCDedxTrack> m_cdcDedxTracks;
+
+    DBArray<CDCDedxWireGain> m_DBGains; /**< Wire gain DB objects */
+    std::map<int, double> m_wireGains; /**< CDC dE/dx wire gains */
+
     /** Recalculate the dE/dx mean values after corrections */
     void calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr, const std::vector<double>& dedx) const;
 
@@ -82,10 +94,6 @@ namespace Belle2 {
     /** upper bound for truncated mean */
     double m_removeHighest;
 
-    /** validity of a particular wire */
-    double m_valid[c_NCDCWires];
-    /** the wire gain correction parameters */
-    double m_wireGain[c_NCDCWires];
     /** the run gain correction parameters */
     double m_runGain;
 

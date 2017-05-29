@@ -147,9 +147,6 @@ void ProcessSubmitter::run()
   for (size_t i = 0; i < m_con->m_arg_v.size(); i++) {
     executor.addArg(m_con->m_arg_v[i]);
   }
-  if (m_con->getExecutable() == "basf2") {
-    executor.addArg("--no-stats");
-  }
   executor.execute();
 }
 

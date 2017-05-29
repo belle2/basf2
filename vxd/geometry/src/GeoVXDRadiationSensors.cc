@@ -36,13 +36,13 @@ namespace Belle2 {
     G4Material* material = geometry::Materials::get(content.getString("material"));
 
     //Now loop over all positions
-    for (GearDir & position : content.getNodes("position")) {
+    for (GearDir& position : content.getNodes("position")) {
       //get the radial and z position
       const double r = position.getLength("radius");
       const double z = position.getLength("z");
       const double theta = position.getAngle("theta");
       //and loop over all phi positions
-      for (GearDir & sensor : position.getNodes("phi")) {
+      for (GearDir& sensor : position.getNodes("phi")) {
         //we need angle and Id
         const double phi = sensor.getAngle();
         const int id = sensor.getInt("@id");
@@ -54,7 +54,8 @@ namespace Belle2 {
         BkgSensitiveDetector* sensitive = new BkgSensitiveDetector(m_subdetector.c_str(), id);
         volume->SetSensitiveDetector(sensitive);
         //and place it at the correct position
-        G4Transform3D transform = G4RotateZ3D(phi - M_PI / 2) * G4Translate3D(0, r * CLHEP::cm, z * CLHEP::cm) * G4RotateX3D(-M_PI / 2 - theta);
+        G4Transform3D transform = G4RotateZ3D(phi - M_PI / 2) * G4Translate3D(0, r * CLHEP::cm,
+                                  z * CLHEP::cm) * G4RotateX3D(-M_PI / 2 - theta);
         new G4PVPlacement(transform, volume, name, top, false, 1);
       }
     }

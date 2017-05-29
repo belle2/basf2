@@ -16,7 +16,6 @@
 
 #include <string>
 #include <framework/core/Module.h>
-#include "trg/ecl/TrgEcl.h"
 
 namespace Belle2 {
 
@@ -59,6 +58,20 @@ namespace Belle2 {
     int _famMethod;
     /** Time interval */
     int _binTimeInterval;
+    /** Waveform */
+    int _waveform;
+    /** save Beam background tag in TRGECLHit table */
+    int _beambkgtag;
+    /** save FAM ana table */
+    int _famana;
+    /** Set Threshold */
+    int _threshold;
+    /** Set Shaping Function */
+    int _FADC;
+
+
+
+
 
     /** Config. file name. */
     std::string _configFilename;
@@ -68,9 +81,21 @@ namespace Belle2 {
 
 
   private:
+    /**  Run number */
+    int    m_nRun;
+    /**  Event number */
+    int    m_nEvent;
+    /** Digitized TC E [GeV] */
+    std::vector<std::vector<double>> TCDigiE;
+    /** Digitized TC T [ns] */
+    std::vector<std::vector<double>> TCDigiT;
+    /** Fit TC E [GeV] */
+    std::vector<std::vector<double>> TCFitE;
+    /** Fit TC T [ns] */
+    std::vector<std::vector<double>> TCFitT;
 
-    int    m_nRun;           /**  Run number */
-    int    m_nEvent;         /**  Event number */
+
+
 
   };
 

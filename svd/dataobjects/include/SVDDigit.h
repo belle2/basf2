@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Martin Ritter, Peter Kvasnicka                           *
+ * Contributors: Peter Kvasnicka                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,8 +12,7 @@
 #define SVD_DIGIT_H
 
 #include <vxd/dataobjects/VxdID.h>
-
-#include <framework/datastore/RelationsObject.h>
+#include <framework/dataobjects/DigitBase.h>
 
 #include <sstream>
 #include <string>
@@ -29,7 +28,7 @@ namespace Belle2 {
    * Also the sensor and cell IDs could be somewhat compressed, if desired.
    */
 
-  class SVDDigit : public RelationsObject {
+  class SVDDigit : public DigitBase {
 
   public:
 
@@ -44,7 +43,8 @@ namespace Belle2 {
     SVDDigit(VxdID sensorID, bool isU, short cellID, float cellPosition,
              float charge, short index, short parent = -1):
       m_sensorID(sensorID), m_isU(isU), m_cellID(cellID),
-      m_cellPosition(cellPosition), m_charge(charge), m_index(index), m_parentTpDigit(parent) {
+      m_cellPosition(cellPosition), m_charge(charge), m_index(index), m_parentTpDigit(parent)
+    {
       m_time = 0.0;
       m_prev_id = -1;
       m_next_id = -1;
@@ -124,7 +124,8 @@ namespace Belle2 {
 
     /** Display main parameters in this object
      */
-    std::string print() {
+    std::string print()
+    {
       VxdID thisSensorID = static_cast<VxdID>(m_sensorID);
       VxdID::baseType id      = thisSensorID.getID();
       VxdID::baseType layer   = thisSensorID.getLayerNumber();
@@ -150,6 +151,25 @@ namespace Belle2 {
       return os.str();
     }
 
+    /**
+    * Implementation of the base class function.
+    * Enables BG overlay module to identify uniquely the physical channel of this Digit.
+    * @return unique channel ID, composed of VxdID (1 - 16), strip side (17), strip number (18-28) and sample number 29-32).
+    */
+    unsigned int getUniqueChannelID() const
+    { return m_index + (m_cellID << 4) + ((m_isU ? 1 : 0) << 15) + (m_sensorID << 16); }
+    /**
+    * Implementation of the base class function.
+    * Pile-up method.
+    * @param bg BG digit
+    * @return append status
+    */
+    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg)
+    {
+      m_charge += dynamic_cast<const SVDDigit*>(bg)->getCharge();
+      return DigitBase::c_DontAppend;
+    }
+
   private:
 
     unsigned short m_sensorID; /**< Compressed sensor identifier.*/
@@ -164,8 +184,7 @@ namespace Belle2 {
     short m_prev_id;     /**< SVDDigit index in StoreArray of previous sample. */
     short m_next_id;     /**< SVDDigit index in StoreArray of next sample. */
 
-    //ClassDef(SVDDigit, 2)
-    ClassDef(SVDDigit, 4)
+    ClassDef(SVDDigit, 5)
 
   }; // class SVDDigit
 

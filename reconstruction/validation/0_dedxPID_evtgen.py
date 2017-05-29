@@ -59,7 +59,7 @@ for m in main.modules():
 
 
 output = register_module('RootOutput')
-output.param('outputFileName', 'EvtGenSimRec_dedx.root')
+output.param('outputFileName', '../EvtGenSimRec_dedx.root')
 # let's keep this small
 output.param('branchNames', ['CDCDedxLikelihoods', 'CDCDedxTracks', 'VXDDedxLikelihoods', 'VXDDedxTracks', 'EventMetaData'])
 main.add_module(output)

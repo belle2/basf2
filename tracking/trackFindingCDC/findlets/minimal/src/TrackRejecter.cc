@@ -33,7 +33,7 @@ void TrackRejecter::exposeParameters(ModuleParamList* moduleParamList, const std
   m_trackFilter.exposeParameters(moduleParamList, prefix);
   moduleParamList->addParameter(prefixed(prefix, "deleteRejected"),
                                 m_param_deleteRejected,
-                                "Delete the rejected tracks instead of marking this as background.",
+                                "Delete the rejected tracks instead of marking them as background.",
                                 m_param_deleteRejected);
 }
 
@@ -41,10 +41,10 @@ void TrackRejecter::apply(std::vector<CDCTrack>& tracks)
 {
   auto reject = [this](CDCTrack & track) {
     double filterWeight = m_trackFilter(track);
-    track.getAutomatonCell().setCellWeight(filterWeight);
+    track->setCellWeight(filterWeight);
     if (std::isnan(filterWeight)) {
-      track.getAutomatonCell().setBackgroundFlag();
-      track.getAutomatonCell().setTakenFlag();
+      track->setBackgroundFlag();
+      track->setTakenFlag();
       return true;
     } else {
       return false;

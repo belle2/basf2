@@ -2,6 +2,7 @@
 ! utility functions
 ! M. Staric, feb-2000, sept-2008, sept-211, 
 !
+! mar-2017: change in some commons
 !-----------------------------------------------------------------------
 
 **** line

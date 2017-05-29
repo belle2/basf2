@@ -48,9 +48,11 @@ namespace Belle2 {
     bool m_debug4Sim;                          /*!< Switch for debug printing. */
     double m_thresholdEnergyDeposit;  /*!< Energy thresh. for G4 step (GeV) */
     double m_minTrackLength;              /*!< Minimum track length for G4 step (cm) */
+    double m_maxSpaceResol;   /**< Max. space resolution allowed (cm). */
 
     //For Geometry
-    bool m_debug4Geo;                /*!< Switch for debug printing. */
+    bool m_debug4Geo;              /*!< Switch for debug printing. */
+    bool m_printMaterialTable;     /*!< Switch for printing the G4 material table. */
     int m_materialDefinitionMode;  /*!< Material definition mode */
     int m_senseWireZposMode;    /*!< Sense wire Z pos. mode */
 

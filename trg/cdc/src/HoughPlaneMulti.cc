@@ -17,64 +17,68 @@
 
 namespace Belle2 {
 
-TRGCDCHoughPlaneMulti::TRGCDCHoughPlaneMulti(const std::string & name,
-                                             const TCHTransformation & trans,
-                                             unsigned nX,
-                                             float xMin,
-                                             float xMax,
-                                             unsigned nY,
-                                             float yMin,
-                                             float yMax,
-                                             unsigned nLayers)
+  TRGCDCHoughPlaneMulti::TRGCDCHoughPlaneMulti(const std::string& name,
+                                               const TCHTransformation& trans,
+                                               unsigned nX,
+                                               float xMin,
+                                               float xMax,
+                                               unsigned nY,
+                                               float yMin,
+                                               float yMax,
+                                               unsigned nLayers)
     : TRGCDCHoughPlane(name, trans, nX, xMin, xMax, nY, yMin, yMax),
-      _nLayers(nLayers) {
+      _nLayers(nLayers)
+  {
 
     for (unsigned i = 0; i < N_LAYERS; i++)
-        _usage[i] = false;
+      _usage[i] = false;
     for (unsigned i = 0; i < _nLayers; i++)
-        _layers[i] = new TRGCDCHoughPlane(name,
-                                          trans,
-                                          nX,
-                                          xMin,
-                                          xMax,
-                                          nY,
-                                          yMin,
-                                          yMax);
+      _layers[i] = new TRGCDCHoughPlane(name,
+                                        trans,
+                                        nX,
+                                        xMin,
+                                        xMax,
+                                        nY,
+                                        yMin,
+                                        yMax);
     if (nLayers > N_LAYERS)
-        std::cout << "Too many layers requested("
-                                                << _nLayers << ") : "
-                                                << "max #layers = "
-                                                << N_LAYERS << std::endl;
-}
+      std::cout << "Too many layers requested("
+                << _nLayers << ") : "
+                << "max #layers = "
+                << N_LAYERS << std::endl;
+  }
 
-TRGCDCHoughPlaneMulti::~TRGCDCHoughPlaneMulti() {
+  TRGCDCHoughPlaneMulti::~TRGCDCHoughPlaneMulti()
+  {
     for (unsigned i = 0; i < _nLayers; i++)
-        delete _layers[i];
-}
+      delete _layers[i];
+  }
 
-void
-TRGCDCHoughPlaneMulti::vote(float rx,
-                       float ry,
-                       float targetCharge,
-                       const TRGCDCHoughTransformation & ,
-                       unsigned weight,
-                       unsigned layerId) {
+  void
+  TRGCDCHoughPlaneMulti::vote(float rx,
+                              float ry,
+                              float targetCharge,
+                              const TRGCDCHoughTransformation&,
+                              unsigned weight,
+                              unsigned layerId)
+  {
 
 #ifdef TRASAN_DEBUG
     if (layerId >= N_LAYERS)
-        std::cout << "TRGCDCHoughPlaneMulti::vote !!! (" << name()
-               << ") given layerId(" << layerId << ") is too big : max="
-               << _nLayers - 1 << std::endl;
+      std::cout << "TRGCDCHoughPlaneMulti::vote !!! (" << name()
+                << ") given layerId(" << layerId << ") is too big : max="
+                << _nLayers - 1 << std::endl;
 #endif
 
 //     const unsigned a = layerId / 32;
 //     _usage[a] |= (1 << (layerId % 32));
     _usage[layerId] = true;
     _layers[layerId]->vote(rx, ry, (int) targetCharge, weight);
-}
+  }
 
-void
-TRGCDCHoughPlaneMulti::merge(void) {
+  void
+  TRGCDCHoughPlaneMulti::merge(void)
+  {
     const unsigned nCells = nX() * nY();
 
 //     for (unsigned i = 0; i < nCells; i++) {
@@ -91,17 +95,18 @@ TRGCDCHoughPlaneMulti::merge(void) {
     for (unsigned j = 0; j < _nLayers; j++) {
 //         const unsigned a = j / 32;
 //         if (! (_usage[a] & (1 << (j % 32)))) continue;
-        if (! _usage[j]) continue;
-         for (unsigned i = 0; i < nCells; i++) {
-             if (_layers[j]->_cell[i])
-                 ++_cell[i];
-         }
+      if (! _usage[j]) continue;
+      for (unsigned i = 0; i < nCells; i++) {
+        if (_layers[j]->_cell[i])
+          ++_cell[i];
+      }
     }
-}
+  }
 
-void
-TRGCDCHoughPlaneMulti::vote(float phi, unsigned layerId, int weight) {
+  void
+  TRGCDCHoughPlaneMulti::vote(float phi, unsigned layerId, int weight)
+  {
     _layers[layerId]->vote(phi, weight);
-}
+  }
 
 } // namespace Belle2

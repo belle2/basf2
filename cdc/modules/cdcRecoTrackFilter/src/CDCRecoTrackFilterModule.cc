@@ -25,9 +25,9 @@ CDCRecoTrackFilterModule::CDCRecoTrackFilterModule() : Module()
 {
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   setDescription("use this module to exclude Layers in fitting, after TrackFinding");
-
-  addParam("RecoTracksColName", m_recoTrackArrayName, "Name of collectrion hold genfit::Track", std::string(""));
-  addParam("ExcludeSLayer", m_excludeSLayer, "Super layers not used in the fitting", std::vector<unsigned short> {});
+  addParam("RecoTracksColName", m_recoTrackArrayName, "Name of collection to hold Belle2::RecoTrack", std::string(""));
+  addParam("ExcludeSLayer", m_excludeSLayer, "Super layers (0-8) not used in the fitting", std::vector<unsigned short> {});
+  addParam("ExcludeICLayer", m_excludeICLayer, "layers (0-55) not used in the fitting", std::vector<unsigned short> {});
 }
 
 CDCRecoTrackFilterModule::~CDCRecoTrackFilterModule()
@@ -54,12 +54,21 @@ void CDCRecoTrackFilterModule::event()
   for (int i = 0; i < nTr; ++i) {
     const RecoTrack* track = recoTracks[i];
     BOOST_FOREACH(const RecoHitInformation::UsedCDCHit * cdchit, track->getCDCHitList()) {
-      unsigned short slay = cdchit->getISuperLayer();
+      WireID wireid(cdchit->getID());
+      unsigned short slay = wireid.getISuperLayer();
+      unsigned short iclay = wireid.getICLayer();
       for (unsigned short j = 0; j < m_excludeSLayer.size(); ++j) {
         if (slay == m_excludeSLayer.at(j)) {
           track->getRecoHitInformation(cdchit)->setUseInFit(false);
         }
       }
+
+      for (unsigned short j = 0; j < m_excludeICLayer.size(); ++j) {
+        if (iclay == m_excludeICLayer.at(j)) {
+          track->getRecoHitInformation(cdchit)->setUseInFit(false);
+        }
+      }
+
     }//end of track (Boost_foreach)
   }//end RecoTrack array
 }//End Event

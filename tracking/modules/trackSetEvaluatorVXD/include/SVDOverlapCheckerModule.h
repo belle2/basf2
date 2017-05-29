@@ -44,7 +44,7 @@ namespace Belle2 {
       m_spacePointTrackCands.isRequired(m_nameSpacePointTrackCands);
       m_svdClusters.isRequired();
 
-      m_overlapNetwork.registerInDataStore();
+      m_overlapNetwork.registerInDataStore(m_outputArrayName, DataStore::c_DontWriteOut);
     }
 
     /** Checks for overlaps and fills the OverlapNetwork. */
@@ -63,6 +63,8 @@ namespace Belle2 {
      *  Kept in a StoreArray instead of ...Object,
      *  as we might want to store one overlapNetwork per pass.
      */
+    /** name of the StoreArray to be stored **/
+    std::string m_outputArrayName;
     StoreArray<OverlapNetwork> m_overlapNetwork;
   };
 }

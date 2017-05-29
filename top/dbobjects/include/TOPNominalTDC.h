@@ -89,11 +89,40 @@ namespace Belle2 {
     {}
 
     /**
+     * Sets the number of ADC bits
+     * @param acdBits number of adcBits
+     */
+    void setADCBits(unsigned adcBits) {m_adcBits = adcBits;}
+
+    /**
+     * Sets average of pedestals
+     * @param averagePedestal average pedestal value
+     */
+    void setAveragePedestal(int averagePedestal) {m_averagePedestal = averagePedestal;}
+
+    /**
+     * Returns the number of ADC bits
+     * @return number of ADC bits
+     */
+    unsigned getADCBits() const {return m_adcBits;}
+
+    /**
+     * Returns ADC range
+     * @return overflow value
+     */
+    unsigned getADCRange() const {return 1 << m_adcBits;}
+
+    /**
+     * Returns average of pedestals
+     * @return average of pedestals
+     */
+    int getAveragePedestal() const {return m_averagePedestal;}
+
+    /**
      * Returns number of ASIC windows per waveform
      * @return number of ASIC windows per waveform
      */
     unsigned getNumWindows() const {return m_numWindows;}
-
     /**
      * Returns number of bits per sample
      * @return number of bits per sample
@@ -250,7 +279,10 @@ namespace Belle2 {
     float m_binWidth = 0; /**< time width of a TDC bin */
     float m_sampleWidth = 0; /**< time between two samples */
 
-    ClassDef(TOPNominalTDC, 2); /**< ClassDef */
+    unsigned m_adcBits = 12; /**< number of ADC bits */
+    int m_averagePedestal = 0; /**< average of pedestals [ADC bins] */
+
+    ClassDef(TOPNominalTDC, 3); /**< ClassDef */
 
   };
 

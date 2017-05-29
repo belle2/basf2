@@ -7,7 +7,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCFacetSegment.h>
@@ -16,6 +15,8 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
 
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/utilities/GetIterator.h>
 
@@ -125,8 +126,8 @@ namespace {
       result.push_back(secondFacetIt->getEndRecoHit2D());
 
     } else { // nFacets > 2
-      FacetIt firstFacetIt = facetIt++;   // facetSegment[0];
-      FacetIt secondFacetIt = facetIt++;  // facetSegment[1];
+      FacetIt firstFacetIt = facetIt++; // facetSegment[0];
+      FacetIt secondFacetIt = facetIt++; // facetSegment[1];
       FacetIt thirdFacetIt = facetIt++;  // facetSegment[2];
 
       result.push_back(firstFacetIt->getStartRecoHit2D());
@@ -139,10 +140,9 @@ namespace {
                                              thirdFacetIt->getStartRecoHit2D()));
 
       while (facetIt != endFacetIt) {
-
-        firstFacetIt = secondFacetIt;                   // facetSegment[iFacet];
-        secondFacetIt = thirdFacetIt;                   // facetSegment[iFacet+1];
-        thirdFacetIt = facetIt++;                     // facetSegment[iFacet+2];
+        firstFacetIt = secondFacetIt; // facetSegment[iFacet];
+        secondFacetIt = thirdFacetIt; // facetSegment[iFacet+1];
+        thirdFacetIt = facetIt++; // facetSegment[iFacet+2];
 
         result.push_back(CDCRecoHit2D::average(firstFacetIt->getEndRecoHit2D(),
                                                secondFacetIt->getMiddleRecoHit2D(),
@@ -198,8 +198,12 @@ CDCSegment2D CDCSegment2D::condense(const std::vector<const CDCSegment2D*>& segm
   for (const CDCSegment2D* ptrSegment2D : segmentPath) {
     assert(ptrSegment2D);
     const CDCSegment2D& segment2D = *ptrSegment2D;
-    for (const CDCRecoHit2D& recoHit2D : segment2D) {
-      result.push_back(recoHit2D);
+    if (result.empty()) {
+      result = segment2D;
+    } else {
+      for (const CDCRecoHit2D& recoHit2D : segment2D) {
+        result.push_back(recoHit2D);
+      }
     }
     aliasScore = aliasScore + segment2D.getAliasScore();
   }
@@ -235,6 +239,23 @@ CDCSegment2D CDCSegment2D::reconstructUsingFacets(const CDCRLWireHitSegment& rlW
     CDCFacetSegment facetSegment = CDCFacetSegment::create(rlWireHitSegment);
     return condense(facetSegment);
   }
+}
+
+Relation<const CDCSegment2D> CDCSegment2D::makeRelation(const CDCSegment2D* segment) const
+{
+  return {this, segment};
+}
+
+WeightedRelation<const CDCSegment2D> CDCSegment2D::makeWeightedRelation(double weight, const CDCSegment2D* segment) const
+{
+  return {this, weight, segment};
+}
+
+bool CDCSegment2D::operator<(const CDCSegment2D& segment2D) const
+{
+  return (this->getISuperLayer() < segment2D.getISuperLayer()) or
+         (not(segment2D.getISuperLayer() < this->getISuperLayer()) and
+          this->getISuperCluster() < segment2D.getISuperCluster());
 }
 
 std::vector<const CDCWire*> CDCSegment2D::getWireSegment() const
@@ -376,4 +397,13 @@ bool CDCSegment2D::isFullyTaken(unsigned int maxNotTaken) const
   }
 
   return true;
+}
+
+void CDCSegment2D::receiveISuperCluster() const
+{
+  auto getISuperClusterOfHit = [](const CDCRecoHit2D & recoHit2d) -> int {
+    return recoHit2d.getWireHit().getISuperCluster();
+  };
+  int iSuperCluster = common(*this, getISuperClusterOfHit, -1);
+  setISuperCluster(iSuperCluster);
 }

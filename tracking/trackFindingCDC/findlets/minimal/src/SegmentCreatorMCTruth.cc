@@ -85,6 +85,7 @@ void SegmentCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHits,
 
     const std::vector<CDCHitVector>& mcSegments = mcSegmentsAndMCParticleIdx.second;
     for (const CDCHitVector& mcSegment : mcSegments) {
+      if (mcSegment.size() < 3) continue;
       outputSegments.push_back(CDCSegment2D());
       CDCSegment2D& segment2D = outputSegments.back();
       for (const CDCHit* ptrHit : mcSegment) {
@@ -144,4 +145,9 @@ void SegmentCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHits,
       }
     }
   }
+
+  for (CDCSegment2D& segment : outputSegments) {
+    segment.receiveISuperCluster();
+  }
+  std::sort(outputSegments.begin(), outputSegments.end());
 }

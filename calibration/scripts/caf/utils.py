@@ -11,7 +11,103 @@ import enum
 import shutil
 
 import ROOT
-from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm
+from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm, IntervalOfValidity
+
+
+class IoV():
+    """
+    Python class to more easily manipulate an IoV and compare against others.
+    Uses the C++ framework IntervalOfValidity internally to do various comparisons.
+
+    Default construction is an 'empty' IoV of -1,-1,-1,-1
+
+    For an IoV that encompasses all experiments and runs use 0,0,-1,-1
+    """
+
+    def __init__(self, exp_low=-1, run_low=-1, exp_high=-1, run_high=-1):
+        """
+        """
+        self._exp_low = exp_low
+        self._exp_high = exp_high
+        self._run_low = run_low
+        self._run_high = run_high
+        self._set_cpp_iov()
+
+    def _set_cpp_iov(self):
+        """
+        Creates and sets the internal C++ IntervalOfValidity variable to the current range.
+        """
+        self._cpp_iov = IntervalOfValidity(self.exp_low, self.run_low, self.exp_high, self.run_high)
+
+    @property
+    def exp_low(self):
+        """
+        """
+        return self._exp_low
+
+    @exp_low.setter
+    def exp_low(self, exp_low):
+        """
+        """
+        self._exp_low = exp_low
+        self._set_cpp_iov()
+
+    @property
+    def exp_high(self):
+        """
+        """
+        return self._exp_high
+
+    @exp_high.setter
+    def exp_high(self, exp_high):
+        """
+        """
+        self._exp_high = exp_high
+        self._set_cpp_iov()
+
+    @property
+    def run_low(self):
+        """
+        """
+        return self._run_low
+
+    @run_low.setter
+    def run_low(self, run_low):
+        """
+        """
+        self._run_low = run_low
+        self._set_cpp_iov()
+
+    @property
+    def run_high(self):
+        """
+        """
+        return self._run_high
+
+    @run_high.setter
+    def run_high(self, run_high):
+        """
+        """
+        self._run_high = run_high
+        self._set_cpp_iov()
+
+    def contains(self, iov):
+        """
+        Check if this IoV contains another one that is passed in.
+        """
+        return self._cpp_iov.contains(iov._cpp_iov)
+
+    def overlaps(self, iov):
+        """
+        Check if this IoV overlaps another one that is passed in.
+        """
+        return self._cpp_iov.overlaps(iov._cpp_iov)
+
+    def __repr__(self):
+        return "IoV(" + (",".join(["exp_low=" + str(self.exp_low),
+                                   "run_low=" + str(self.run_low),
+                                   "exp_high=" + str(self.exp_high),
+                                   "run_high=" + str(self.run_high)])) + ")"
 
 
 @enum.unique
@@ -30,8 +126,27 @@ class AlgResult(enum.Enum):
     #: failure Return code
     failure = CalibrationAlgorithm.c_Failure
 
-IoV = namedtuple('IoV', ['exp_low', 'run_low', 'exp_high', 'run_high'])
 IoV_Result = namedtuple('IoV_Result', ['iov', 'result'])
+
+
+def runs_overlapping_iov(iov, vector_of_runs):
+    """
+    Takes an overall IoV() object and a vector of runs vector<pair<int,int>>
+    and returns a vector containing only those runs that overlap
+    with the IoV range.
+    """
+    overlapping_runs = ROOT.vector('std::pair<int,int>')()
+    for run in vector_of_runs:
+        exp_low = run.first
+        run_low = run.second
+        if exp_low < 0:
+            exp_low = 0
+        if run_low < 0:
+            run_low = 0
+        run_iov = IoV(exp_low, run_low, run.first, run.second)
+        if run_iov.overlaps(iov):
+            overlapping_runs.push_back(run)
+    return overlapping_runs
 
 
 def iov_from_vector(iov_vector):
@@ -41,12 +156,19 @@ def iov_from_vector(iov_vector):
     a tuple of the form ((exp_low, run_low), (exp_high, run_high))
     It assumes that the vector was in order to begine with.
     """
-    iov_list = [(iov.first, iov.second) for iov in iov_vector]
-    if len(iov_list) > 1:
-        iov_low, iov_high = iov_list[0], iov_list[-1]
+    import copy
+    exprun_list = [list((iov.first, iov.second)) for iov in iov_vector]
+    if len(exprun_list) > 1:
+        exprun_low, exprun_high = exprun_list[0], exprun_list[-1]
     else:
-        iov_low, iov_high = iov_list[0], iov_list[0]
-    return IoV(iov_low[0], iov_low[1], iov_high[0], iov_high[1])
+        exprun_low, exprun_high = exprun_list[0], copy.deepcopy(exprun_list[0])
+    # Makes sure that we never have exp_low and run_low less than 0
+    # Sets them to 0 if they are
+    if exprun_low[0] < 0:
+        exprun_low[0] = 0
+    if exprun_low[1] < 0:
+        exprun_low[1] = 0
+    return IoV(exprun_low[0], exprun_low[1], exprun_high[0], exprun_high[1])
 
 
 def find_sources(dependencies):
@@ -75,6 +197,7 @@ def topological_sort(dependencies):
     node names, and the values are lists of node names that depend on the
     key (including zero dependencies). It should return the sorted
     list of nodes.
+
     >>> dependencies = {}
     >>> dependencies['c'] = ['a','b']
     >>> dependencies['b'] = ['a']
@@ -179,31 +302,30 @@ def method_dispatch(func):
     first argument of the method is always 'self'.
     Just decorate around class methods and their alternate functions:
 
-    @method_dispatch             # Default method
-    def my_method(self, default_type, ...):
-        ...
+    >>> @method_dispatch             # Default method
+    >>> def my_method(self, default_type, ...):
+    >>>     pass
 
-    @my_method.register(list)    # Registers list method for dispatch
-
-    def _(self, list_type, ...):
-        ...
+    >>> @my_method.register(list)    # Registers list method for dispatch
+    >>> def _(self, list_type, ...):
+    >>>     pass
 
     Doesn't work the same for property decorated class methods, as these
     return a property builtin not a function and change the method naming.
     Do this type of decoration to get them to work:
 
-    @property
-    def my_property(self):
-        return self._my_property
+    >>> @property
+    >>> def my_property(self):
+    >>>     return self._my_property
 
-    @my_property.setter
-    @method_dispatch
-    def my_property(self, input_property):
-        ...
+    >>> @my_property.setter
+    >>> @method_dispatch
+    >>> def my_property(self, input_property):
+    >>>     pass
 
-    @my_property.fset.register(list)
-    def _(self, input_list_properties):
-        ...
+    >>> @my_property.fset.register(list)
+    >>> def _(self, input_list_properties):
+    >>>     pass
     """
     dispatcher = singledispatch(func)
 
@@ -301,3 +423,45 @@ def merge_local_databases(list_database_dirs, output_database_dir):
                 with open(os.path.join(directory, 'database.txt'), 'r') as f:
                     for line in f.readlines():
                         db_file.write(line)
+
+
+def get_iov_from_file(file_path):
+    """
+    Returns an IoV of the exp/run contained within the given file.
+    Uses the showmetadata basf2 tool.
+    """
+    import subprocess
+    metadata_output = subprocess.check_output(['showmetadata', '--json', file_path])
+    m = json.loads(metadata_output.decode('utf-8'))
+    return IoV(m['experimentLow'], m['runLow'], m['experimentHigh'], m['runHigh'])
+
+
+def find_absolute_file_paths(file_path_patterns):
+    """
+    Takes a file path list (including wildcards) and performs glob.glob()
+    to extract the absolute file paths to all matching files.
+
+    Also uses set() to prevent multiple instances of the same file path
+    but returns a list of file paths.
+
+    Any root:// urls are taken as absolute file paths already and are simply
+    passed through. They should NOT contain wildcard patterns.
+    """
+    import glob
+    existing_file_paths = set()
+    for file_pattern in file_path_patterns:
+        if file_pattern[:7] != "root://":
+            input_files = glob.glob(file_pattern)
+            if not input_files:
+                B2WARNING("No files matching {0} can be found, it will be skipped!".format(file_pattern))
+            else:
+                for file_path in input_files:
+                    file_path = os.path.abspath(file_path)
+                    if os.path.isfile(file_path):
+                        existing_file_paths.add(file_path)
+        else:
+            B2INFO(("Found an xrootd file path {0} it will not be checked for validity.".format(input_file_path)))
+            existing_file_paths.add(file_pattern)
+
+    abs_file_paths = list(existing_file_paths)
+    return abs_file_paths

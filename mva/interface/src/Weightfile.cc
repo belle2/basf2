@@ -205,6 +205,10 @@ namespace Belle2 {
 
       DatabaseRepresentationOfWeightfile* database_representation_of_weightfile = nullptr;
       file.GetObject("Weightfile", database_representation_of_weightfile);
+
+      if (database_representation_of_weightfile == nullptr) {
+        throw std::runtime_error("The provided ROOT file " + filename + " does not contain a valid MVA weightfile.");
+      }
       std::stringstream ss(database_representation_of_weightfile->m_data);
       delete database_representation_of_weightfile;
       return Weightfile::loadFromStream(ss);
@@ -239,7 +243,7 @@ namespace Belle2 {
 
     Weightfile Weightfile::loadFromDatabase(const std::string& identifier, const Belle2::EventMetaData& emd)
     {
-      auto pair = Belle2::Database::Instance().getData(emd, "dbstore", identifier);
+      auto pair = Belle2::Database::Instance().getData(emd, identifier);
 
       if (pair.first == 0) {
         throw std::runtime_error("Given identifier cannot be loaded from the database: " + identifier);

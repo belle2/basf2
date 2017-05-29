@@ -1,5 +1,4 @@
-/**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
+/* BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
@@ -26,7 +25,7 @@
 
 namespace Belle2 {
 
-  void addContinuumSuppression(const Particle* particle)
+  void addContinuumSuppression(const Particle* particle, const std::string& maskName)
   {
     // Output
     StoreArray<ContinuumSuppression> qqArray;
@@ -46,7 +45,7 @@ namespace Belle2 {
     std::vector<float> ksfwFS1;
 
     std::vector<float> cleoConesAll;
-    //std::vector<float> cleoConesRoe;
+    std::vector<float> cleoConesROE;
 
     double et[2];
 
@@ -59,10 +58,6 @@ namespace Belle2 {
     float cosTBz   = -1;
     float R2       = -1;
 
-    // Kinematically allowed maximum momentum for mbc>5.2
-    // sqrt(5.29^2 - 5.2^2) ~ 1.0GeV
-    // 10.58/4 + 1.0/2 = 3.145
-    static const double P_MAX(3.2);
 
     // -- B Cand --------------------------------------------------------------------------
     PCmsLabTransform T;
@@ -73,29 +68,30 @@ namespace Belle2 {
     et[0] = et[1] = 0;
 
     // -- SIG A --- Use B primary daughters - (Belle: use_finalstate_for_sig == 0) --------
-    std::vector<Belle2::Particle*> sigDau = particle->getDaughters();
+    std::vector<Belle2::Particle*> signalDaughters = particle->getDaughters();
 
-    for (unsigned i = 0; i < sigDau.size(); i++) {
+    for (const Belle2::Particle* sigFS0 : signalDaughters) {
       PCmsLabTransform T;
-      TLorentzVector p_cms = T.rotateLabToCms() * sigDau[i]->get4Vector();
+      TLorentzVector p_cms = T.rotateLabToCms() * sigFS0->get4Vector();
 
-      p3_cms_q_sigA.push_back({p_cms.Vect(), sigDau[i]->getCharge()});
+      p3_cms_q_sigA.push_back({p_cms.Vect(), sigFS0->getCharge()});
 
       p_cms_missA -= p_cms;
       et[0] += p_cms.Perp();
     }
 
     // -- SIG B --- Use B final-state daughters - (Belle: use_finalstate_for_sig == 1) ----
-    std::vector<const Belle2::Particle*> sigFsp = particle->getFinalStateDaughters();
+    std::vector<const Belle2::Particle*> signalFSParticles = particle->getFinalStateDaughters();
 
-    for (unsigned i = 0; i < sigFsp.size(); i++) {
+    for (const Belle2::Particle* sigFS1 : signalFSParticles) {
+
       PCmsLabTransform T;
-      TLorentzVector p_cms = T.rotateLabToCms() * sigFsp[i]->get4Vector();
+      TLorentzVector p_cms = T.rotateLabToCms() * sigFS1->get4Vector();
 
       p3_cms_all.push_back(p_cms.Vect());
       p3_cms_sigB.push_back(p_cms.Vect());
 
-      p3_cms_q_sigB.push_back({p_cms.Vect(), sigFsp[i]->getCharge()});
+      p3_cms_q_sigB.push_back({p_cms.Vect(), sigFS1->getCharge()});
 
       p_cms_missB -= p_cms;
       et[1] += p_cms.Perp();
@@ -108,13 +104,11 @@ namespace Belle2 {
 
       // Charged tracks -> Pion
       //
-      std::vector<const Track*> roeTracks = roe->getTracks();
+      std::vector<const Track*> roeTracks = roe->getTracks(maskName);
 
       const Const::ChargedStable charged = Const::pion;
 
-      for (int i = 0; i < roe->getNTracks(); i++) {
-
-        const Track* track = roeTracks[i];
+      for (const Track* track : roeTracks) {
 
         // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
         // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
@@ -124,7 +118,6 @@ namespace Belle2 {
         if (particle.getParticleType() == Particle::c_Track) {
           PCmsLabTransform T;
           TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
-          if (p_cms.Rho() > P_MAX) continue;
 
           p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());
@@ -140,22 +133,17 @@ namespace Belle2 {
 
       // ECLCluster -> Gamma
       //
-      std::vector<const ECLCluster*> roeECLClusters = roe->getECLClusters();
+      std::vector<const ECLCluster*> roeECLClusters = roe->getECLClusters(maskName);
 
-      for (int i = 0; i < roe->getNECLClusters(); i++) {
-
-        const ECLCluster* cluster = roeECLClusters[i];
+      for (const ECLCluster* cluster : roeECLClusters) {
 
         if (cluster->isNeutral()) {
 
           // Create particle from ECLCluster with gamma hypothesis
           Particle particle(cluster);
 
-          TLorentzVector p_lab = particle.get4Vector();
-          if (p_lab.Rho() < 0.05) continue;
           PCmsLabTransform T;
-          TLorentzVector p_cms = T.rotateLabToCms() * p_lab;
-          if (p_cms.Rho() > P_MAX) continue;
+          TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
           p3_cms_all.push_back(p_cms.Vect());
           p3_cms_roe.push_back(p_cms.Vect());
 
@@ -177,12 +165,9 @@ namespace Belle2 {
       cosTBz   = fabs(thrustB.CosTheta());
 
       // Cleo Cones
-      // TODO: make the following option configurable:
-      //       calculate the momentum flow for all particles in the event
-      //       vs only those in the roe.
       CleoCones cc(p3_cms_all, p3_cms_roe, thrustB, true, true);
       cleoConesAll = cc.cleo_cone_with_all();
-      //cleoConesRoe = cc.cleo_cone_with_roe();
+      cleoConesROE = cc.cleo_cone_with_roe();
 
       // Fox-Wolfram Moments: Uses all final-state tracks (= sigB + ROE)
       FoxWolfram FW(p3_cms_all);
@@ -246,6 +231,7 @@ namespace Belle2 {
     }
 
     // Fill ContinuumSuppression with content
+    qqVars->addThrustB(thrustB);
     qqVars->addThrustO(thrustO);
     qqVars->addThrustBm(thrustBm);
     qqVars->addThrustOm(thrustOm);
@@ -254,7 +240,7 @@ namespace Belle2 {
     qqVars->addR2(R2);
     qqVars->addKsfwFS0(ksfwFS0);
     qqVars->addKsfwFS1(ksfwFS1);
-    qqVars->addCleoCones(cleoConesAll);
-    // TODO: add cleo cones calculated from roe only.
+    qqVars->addCleoConesALL(cleoConesAll);
+    qqVars->addCleoConesROE(cleoConesROE);
   }
 }

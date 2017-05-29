@@ -25,16 +25,16 @@
 
 namespace Belle2 {
 
-class TRGCDCWire;
-class TRGCDCWireHit;
-class TRGCDCTrackMC;
+  class TRGCDCWire;
+  class TRGCDCWireHit;
+  class TRGCDCTrackMC;
 
 /// A class to represent a MC wire hit in CDC.
-class TRGCDCWireHitMC {
+  class TRGCDCWireHitMC {
 
   public:
     /// Constructor.
-    TRGCDCWireHitMC(const TRGCDCWire *, const TRGCDCWireHit *);
+    TRGCDCWireHitMC(const TRGCDCWire*, const TRGCDCWireHit*);
 
     /// Destructor
     virtual ~TRGCDCWireHitMC();
@@ -44,32 +44,32 @@ class TRGCDCWireHitMC {
     float distance(void) const;
 
     /// returns hit position.
-    const HepGeom::Point3D<double>  & hitPosition(void) const;
+    const HepGeom::Point3D<double>&   hitPosition(void) const;
 
     /// returns an entrance point.
-    const HepGeom::Point3D<double>  & entrance(void) const;
+    const HepGeom::Point3D<double>&   entrance(void) const;
 
     /// returns vector from entrance to exit point.
-    const HepGeom::Vector3D<double>  & direction(void) const;
+    const HepGeom::Vector3D<double>&   direction(void) const;
 
     /// returns momentum vector at the entrance.
-    const CLHEP::Hep3Vector & momentum(void) const;
+    const CLHEP::Hep3Vector& momentum(void) const;
 
     /// returns left or right.
     int leftRight(void) const;
 
     /// returns a pointer to a TRGCDCWire.
-    const TRGCDCWire * wire(void) const;
+    const TRGCDCWire* wire(void) const;
 
     /// returns a pointer to a GEN_HEPEVT.
-    const TRGCDCTrackMC * hep(void) const;
+    const TRGCDCTrackMC* hep(void) const;
 
     /// returns a pointer to a TRGCDCWireHit.
-    const TRGCDCWireHit * hit(void) const;
+    const TRGCDCWireHit* hit(void) const;
 
   private:
-    const TRGCDCWire * _wire;
-    const TRGCDCWireHit * _hit;
+    const TRGCDCWire* _wire;
+    const TRGCDCWireHit* _hit;
     HepGeom::Point3D<double>  _position;
     HepGeom::Point3D<double>  _entrance;
     HepGeom::Vector3D<double>  _direction;
@@ -77,66 +77,75 @@ class TRGCDCWireHitMC {
     float _distance;
     float _energy;
     int _leftRight;
-    const TRGCDCTrackMC * _hep;
+    const TRGCDCTrackMC* _hep;
 
-  friend class TRGCDC;
-};
+    friend class TRGCDC;
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-float
-TRGCDCWireHitMC::distance(void) const {
+  inline
+  float
+  TRGCDCWireHitMC::distance(void) const
+  {
     return _distance;
-}
+  }
 
-inline
-const HepGeom::Point3D<double>  &
-TRGCDCWireHitMC::hitPosition(void) const {
+  inline
+  const HepGeom::Point3D<double>&
+  TRGCDCWireHitMC::hitPosition(void) const
+  {
     return _position;
-}
+  }
 
-inline
-const HepGeom::Point3D<double>  &
-TRGCDCWireHitMC::entrance(void) const {
+  inline
+  const HepGeom::Point3D<double>&
+  TRGCDCWireHitMC::entrance(void) const
+  {
     return _entrance;
-}
+  }
 
-inline
-const HepGeom::Vector3D<double>  &
-TRGCDCWireHitMC::direction(void) const {
+  inline
+  const HepGeom::Vector3D<double>&
+  TRGCDCWireHitMC::direction(void) const
+  {
     return _direction;
-}
+  }
 
-inline
-int
-TRGCDCWireHitMC::leftRight(void) const {
+  inline
+  int
+  TRGCDCWireHitMC::leftRight(void) const
+  {
     return _leftRight;
-}
+  }
 
-inline
-const TRGCDCWire *
-TRGCDCWireHitMC::wire(void) const {
+  inline
+  const TRGCDCWire*
+  TRGCDCWireHitMC::wire(void) const
+  {
     return _wire;
-}
+  }
 
-inline
-const TRGCDCTrackMC *
-TRGCDCWireHitMC::hep(void) const {
+  inline
+  const TRGCDCTrackMC*
+  TRGCDCWireHitMC::hep(void) const
+  {
     return _hep;
-}
+  }
 
-inline
-const TRGCDCWireHit *
-TRGCDCWireHitMC::hit(void) const {
+  inline
+  const TRGCDCWireHit*
+  TRGCDCWireHitMC::hit(void) const
+  {
     return _hit;
-}
+  }
 
-inline
-const CLHEP::Hep3Vector &
-TRGCDCWireHitMC::momentum(void) const {
+  inline
+  const CLHEP::Hep3Vector&
+  TRGCDCWireHitMC::momentum(void) const
+  {
     return _momentum;
-}
+  }
 
 } // namespace Belle2
 

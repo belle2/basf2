@@ -39,6 +39,7 @@ GeneratorPreselectionModule::GeneratorPreselectionModule() : Module()
   addParam("MinChargedPt", m_MinChargedPt, "minimum charged transverse momentum (pt) [GeV]", 0.1);
   addParam("MinChargedTheta", m_MinChargedTheta, "minimum polar angle of charged particle [deg]", 17.);
   addParam("MaxChargedTheta", m_MaxChargedTheta, "maximum polar angle of charged particle [deg]", 150.);
+  addParam("applyInCMS", m_applyInCMS, "if true apply the P,Pt,theta cuts in the center of mass frame", false);
 
   addParam("nPhotonMin", m_nPhotonMin, "minimum number of photons", 0);
   addParam("nPhotonMax", m_nPhotonMax, "maximum number of photons", 999);
@@ -69,6 +70,9 @@ void GeneratorPreselectionModule::initialize()
   m_MaxPhotonTheta  *= Unit::deg;
 
   m_mcparticles.isRequired(m_particleList);
+  if (m_applyInCMS) {
+    m_initial.isRequired();
+  }
 }
 
 
@@ -102,6 +106,7 @@ void GeneratorPreselectionModule::event()
     retvalue += 10;
   }
 
+  B2DEBUG(250, "return value: " << retvalue);
   setReturnValue(retvalue);
 }
 
@@ -112,6 +117,7 @@ void GeneratorPreselectionModule::terminate()
 void GeneratorPreselectionModule::checkParticle(const MCParticle& mc, int level)
 {
   if (m_onlyPrimaries && !mc.hasStatus(MCParticle::c_PrimaryParticle)) return;
+  if (mc.hasStatus(MCParticle::c_Initial) || mc.hasStatus(MCParticle::c_IsVirtual)) return;
 
   //Only use up to max level
   if (m_maxLevel >= 0 && level > m_maxLevel) return;
@@ -132,6 +138,13 @@ void GeneratorPreselectionModule::checkParticle(const MCParticle& mc, int level)
   double energy     = mc.getEnergy();
   double mom        = p.Mag();
   double theta      = p.Theta();
+
+  if (m_applyInCMS) {
+    const TLorentzVector p_cms = m_initial->getLabToCMS() * mc.get4Vector();
+    energy = p_cms.E();
+    mom = p_cms.P();
+    theta = p_cms.Theta();
+  }
 
   if (mc.getPDG() == 22) {
     B2DEBUG(250, "E = " << energy << " theta=" << theta << " thetamin=" << m_MinPhotonTheta << " thetamax=" << m_MaxPhotonTheta);

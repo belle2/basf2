@@ -26,12 +26,12 @@ namespace Belle2 {
 #define N_LAYERS 6
 
 /// A class to represent a Hough parameter plane.
-class TRGCDCHoughPlaneMulti : public TRGCDCHoughPlane {
+  class TRGCDCHoughPlaneMulti : public TRGCDCHoughPlane {
 
   public:
     /// Contructor.
-    TRGCDCHoughPlaneMulti(const std::string & name,
-                          const TRGCDCHoughTransformation & transformation,
+    TRGCDCHoughPlaneMulti(const std::string& name,
+                          const TRGCDCHoughTransformation& transformation,
                           unsigned nX,
                           float xMin,
                           float xMax,
@@ -47,8 +47,8 @@ class TRGCDCHoughPlaneMulti : public TRGCDCHoughPlane {
     /// returns # of active cells in the pattern.
     virtual unsigned nActiveCellsInPattern(unsigned layerId) const;
 
-    void dump(const std::string & message = std::string(""),
-              const std::string & prefix = std::string("")) const;
+    void dump(const std::string& message = std::string(""),
+              const std::string& prefix = std::string("")) const;
 
   public:// Modifiers
     /// Clears all entries.
@@ -58,7 +58,7 @@ class TRGCDCHoughPlaneMulti : public TRGCDCHoughPlane {
     void vote(float rx,
               float ry,
               float charge,
-              const TRGCDCHoughTransformation & hough,
+              const TRGCDCHoughTransformation& hough,
               unsigned weight,
               unsigned layerId);
     void vote(float phi, unsigned layerId, int weight);
@@ -70,37 +70,41 @@ class TRGCDCHoughPlaneMulti : public TRGCDCHoughPlane {
   private:
 //  AList<TRGCDCHoughPlane> _layers;
     unsigned _nLayers;
-    TRGCDCHoughPlane * _layers[N_LAYERS];
+    TRGCDCHoughPlane* _layers[N_LAYERS];
     bool _usage[N_LAYERS];
-};
+  };
 
-inline
-void
-TRGCDCHoughPlaneMulti::clear(void) {
+  inline
+  void
+  TRGCDCHoughPlaneMulti::clear(void)
+  {
     for (unsigned i = 0; i < N_LAYERS; i++)
-        if (_usage[i])
-            _layers[i]->clear();
+      if (_usage[i])
+        _layers[i]->clear();
     TRGCDCHoughPlane::clear();
-}
+  }
 
-inline
-void
-TRGCDCHoughPlaneMulti::registerPattern(unsigned id) {
+  inline
+  void
+  TRGCDCHoughPlaneMulti::registerPattern(unsigned id)
+  {
     _layers[id]->registerPattern(0);
-}
+  }
 
-inline
-unsigned
-TRGCDCHoughPlaneMulti::nActiveCellsInPattern(unsigned ) const {
+  inline
+  unsigned
+  TRGCDCHoughPlaneMulti::nActiveCellsInPattern(unsigned) const
+  {
 //    return _layers[id]->nActiveCellsInPattern();
     return 999;
-}
+  }
 
-inline
-void
-TRGCDCHoughPlaneMulti::dump(const std::string & a, const std::string & b) const {
+  inline
+  void
+  TRGCDCHoughPlaneMulti::dump(const std::string& a, const std::string& b) const
+  {
     TRGCDCHoughPlaneBase::dump(a, b);
-}
+  }
 
 } // namespace Belle2
 

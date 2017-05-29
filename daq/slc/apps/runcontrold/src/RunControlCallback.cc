@@ -278,6 +278,16 @@ void RunControlCallback::monitor() throw(RCHandlerException)
       try {
         if (cstate == Enum::UNKNOWN || cstate.isError() || state.isStable()) {
           std::string s;
+          /*
+                NSMCommunicator::send(NSMMessage(node, RCCommand::STATUS));
+                NSMCommunicator& com(wait(node, RCCommand::OK, 1));
+                NSMMessage msg = com.getMessage();
+                RCCommand cmd(msg.getRequestName());
+                if (cmd == NSMCommand::OK && node.getName() == msg.getNodeName()) {
+                  s = msg.getData();
+                  cstate_new = RCState(s);
+                }
+          */
           get(node, "rcstate", s, 1);
           cstate_new = RCState(s);
         } else {
@@ -447,9 +457,9 @@ void RunControlCallback::logging_imp(const NSMNode& node, LogFile::Priority pri,
 bool RunControlCallback::addAll(const DBObject& obj) throw()
 {
   RCNodeList node_v;
+  const DBObjectList& objs(obj.getObjects("node"));
   try {
     obj.print();
-    const DBObjectList& objs(obj.getObjects("node"));
     for (size_t i = 0; i < objs.size(); i++) {
       const DBObject& o_node(objs[i]);
       RCNode node(o_node.getText("name"));
@@ -461,7 +471,6 @@ bool RunControlCallback::addAll(const DBObject& obj) throw()
       }
       node.setUsed(o_node.getBool("used"));
       node.setSequential(o_node.getBool("sequential"));
-      /*
       if (o_node.hasText("rcconfig")) {
         const std::string path = o_node.getText("rcconfig");
         log(LogFile::DEBUG, "found rcconfig :%s %s", node.getName().c_str(), path.c_str());
@@ -469,7 +478,6 @@ bool RunControlCallback::addAll(const DBObject& obj) throw()
       } else {
         log(LogFile::WARNING, "Not found rcconfig");
       }
-      */
       node_v.push_back(node);
     }
   } catch (const DBHandlerException& e) {
@@ -497,12 +505,21 @@ bool RunControlCallback::addAll(const DBObject& obj) throw()
     add(new NSMVHandlerRCState(*this, vname + ".rcstate", node));
     add(new NSMVHandlerRCRequest(*this, vname + ".rcrequest", node));
     add(new NSMVHandlerRCNodeUsed(*this, vname + ".used", node));
+    const DBObject& o_node(objs[i]);
+    if (!o_node.getBool("used")) {
+      set(vname + ".rcstate", "OFF");
+      set(vname + ".used", false);
+    }
     vname = StringUtil::form("%s", StringUtil::tolower(node.getName()).c_str());
     add(new NSMVHandlerText(vname + ".dbtable", true, false, table));
     add(new NSMVHandlerText(vname + ".rcconfig", true, false, node.getConfig()));
     add(new NSMVHandlerRCState(*this, vname + ".rcstate", node));
     add(new NSMVHandlerRCRequest(*this, vname + ".rcrequest", node));
     add(new NSMVHandlerRCNodeUsed(*this, vname + ".used", node));
+    if (!o_node.getBool("used")) {
+      set(vname + ".rcstate", "OFF");
+      set(vname + ".used", false);
+    }
   }
   add(new NSMVHandlerText("log.dbtable",  true, false, m_logtable));
   return true;

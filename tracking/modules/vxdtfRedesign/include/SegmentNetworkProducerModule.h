@@ -24,9 +24,12 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/FullSecID.h>
 #include <tracking/dataobjects/SectorMapConfig.h>
-#include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
+#include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFiltersHelperFunctions.h>
 
+
+//root
+#include <TFile.h>
 
 // stl
 #include <string>
@@ -50,6 +53,8 @@ namespace Belle2 {
     /** to improve readability of the code, here the definition of the static sector type. */
     using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
 
+    /** enum to handle the currently implemented observer types */
+    enum eObserverTypes { c_VoidObserver = 0, c_ObserverCheckMCPurity = 1, c_ObserverCheckFilters = 2 };
 
     /** simple struct for collecting raw data for a single sector */
     struct RawSectorData {
@@ -78,42 +83,9 @@ namespace Belle2 {
 
     /** Initializes the Module.
      */
-    virtual void initialize()
-    {
-      InitializeCounters();
+    virtual void initialize();
 
-      // load VXDTFFilters of secMap:
-      m_sectorMap.isRequired();
-      // searching for correct sectorMap:
-      for (auto& setup : m_sectorMap->getAllSetups()) {
-        auto& filters = *(setup.second);
 
-        if (filters.getConfig().secMapName != m_PARAMsecMapName) { continue; }
-        B2INFO("SegmentNetworkProducerModule::initialize(): loading mapName: " << m_PARAMsecMapName << " with nCompactSecIDs: " <<
-               filters.size());
-
-        m_vxdtfFilters = &filters;
-        SecMapHelper::printStaticSectorRelations(filters, filters.getConfig().secMapName + "segNetProducer", 2, true, true);
-        if (m_vxdtfFilters == nullptr) B2FATAL("SegmentNetworkProducerModule::initialize(): requested secMapName '" << m_PARAMsecMapName <<
-                                                 "' does not exist! Can not continue...");
-        break; // have found our secMap no need for further searching
-      }
-
-      if (m_PARAMCreateNeworks < 1 or m_PARAMCreateNeworks > 3) {
-        B2FATAL("SegmentNetworkProducerModule::Initialize(): parameter 'createNeworks' is set to " << m_PARAMCreateNeworks <<
-                "which is invalid, please read the documentation (basf2 - m SegmentNetworkProducer)!");
-      }
-
-      for (std::string& anArrayName : m_PARAMSpacePointsArrayNames) {
-        m_spacePoints.push_back(StoreArray<SpacePoint>(anArrayName));
-        m_spacePoints.back().isRequired();
-      }
-
-      m_network.registerInDataStore(m_PARAMNetworkOutputName, DataStore::c_DontWriteOut);
-
-      // TODO catch cases when m_network already existed in DataStore!
-
-    }
 
 
     /**
@@ -133,12 +105,24 @@ namespace Belle2 {
     }
 
 
-    /** Applies the Greedy algorithm at given sets of TCs. */
+    /** builds the SegmentNetwork and the TrackNodeNetwork  */
     virtual void event();
 
 
     /** Prints a footer for each run which ended. */
     virtual void endRun();
+
+    /** clean up: */
+    void terminate()
+    {
+      // delete the root file if it has been created
+      if (m_tfile) {
+        m_tfile->Write();
+        m_tfile->Close();
+        delete m_tfile;
+      }
+    }
+
 
 
     /** initialize variables to avoid nondeterministic behavior */
@@ -185,11 +169,17 @@ namespace Belle2 {
     void buildActiveSectorNetwork(std::vector< RawSectorData >& collectedData);
 
 
-    /** old name: segFinder. use SpacePoints stored in ActiveSectors to build SpacePoints which will stored and linked in a DirectedNodeNetwork< TrackNode > */
+    /** old name: segFinder. use SpacePoints stored in ActiveSectors to build SpacePoints which will stored and linked in a DirectedNodeNetwork< TrackNode >
+      @param ObserverType: type of the observer which is used to monitor the Filters, use VoidObserver for deactivating observation
+    */
+    template < class ObserverType >
     void buildTrackNodeNetwork();
 
 
-    /** old name: nbFinder. use connected SpacePoints to form segments which will stored and linked in a DirectedNodeNetwork< Segment > */
+    /** old name: nbFinder. use connected SpacePoints to form segments which will stored and linked in a DirectedNodeNetwork< Segment >
+    @param ObserverType : type  of the observer which is used to monitor the Filters, use VoidObserver for deactivating observation
+    */
+    template < class ObserverType >
     void buildSegmentNetwork();
 
 
@@ -230,8 +220,15 @@ namespace Belle2 {
     /** For debugging purposes: if true, all filters are deactivated for all hit-combinations and therefore all combinations are accepted. */
     bool m_PARAMallFiltersOff;
 
+    /** integer switch to decide which observer to use: see enum eObserverTypes
+      NOTE: that observing filters make the code slow! So only use for debugging purposes
+    */
+    int m_PARAMobserverType;
 
 // member variables
+
+    /** pointer to a root file needed to store the filter-variable responses if filter are observed */
+    TFile* m_tfile = nullptr;
 
     /** vector containing global coordinates for virtual IP, is set using module parameters. */
     B2Vector3D m_virtualIPCoordinates;
@@ -240,8 +237,8 @@ namespace Belle2 {
     B2Vector3D m_virtualIPErrors;
 
     // input containers
-    /** contains the sectorMap and with it the VXDTFFilters. */
-    StoreObjPtr< SectorMap<SpacePoint> > m_sectorMap = StoreObjPtr< SectorMap<SpacePoint> >("", DataStore::c_Persistent);
+    /** contains all the sector to filter maps and with it the VXDTFFilters. */
+    FiltersContainer<SpacePoint>& m_filtersContainer = FiltersContainer<SpacePoint>::getInstance();
 
     /** contains all sectorCombinations and Filters including cuts. */
     VXDTFFilters<SpacePoint>* m_vxdtfFilters = nullptr;
@@ -254,9 +251,8 @@ namespace Belle2 {
 
 
     // output containers
-
     /** access to the DirectedNodeNetwork, which will be produced by this module */
-    StoreObjPtr<Belle2::DirectedNodeNetworkContainer> m_network;
+    StoreObjPtr<DirectedNodeNetworkContainer> m_network;
 
 
 // counters

@@ -82,7 +82,7 @@ namespace Belle2 {
       StoreArray<MCParticle>  mcParticles;
       StoreArray<MicrotpcSimHit> simHits;
       RelationArray relMCSimHit(mcParticles, simHits);
-
+      /*
       //find out if the process that created the particle was a neutron process
       bool neuProc = false;
       G4String CPName;
@@ -91,7 +91,7 @@ namespace Belle2 {
         CPName = creator->GetProcessName();
         if (CPName.contains("Neutron")) neuProc = true;
       }
-
+      */
       if (m_trackID != track.GetTrackID()) {
         //TrackID changed, store track informations
         m_trackID = track.GetTrackID();

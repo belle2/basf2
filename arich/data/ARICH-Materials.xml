@@ -26,12 +26,12 @@
 	<value energy="5.0">100</value> 
       </Property> 
       <Property name="RAYLEIGH" unit="eV"> 
-	<value energy="1.5">729.696</value>
-	<value energy="2.2">157.694</value>
-	<value energy="2.9">52.2294</value>
-	<value energy="3.6">21.9936</value>
-	<value energy="4.3">10.8052</value>
-	<value energy="5.0">5.91053</value>
+	<value energy="1.5">820.907</value>
+	<value energy="2.2">177.406</value>
+	<value energy="2.9">58.758</value>
+	<value energy="3.6">24.743</value>
+	<value energy="4.3">12.155</value>
+	<value energy="5.0">6.649</value>
       </Property> 
   </Material> 
   
@@ -61,12 +61,12 @@
 	<value energy="5.0">100</value> 
       </Property> 
       <Property name="RAYLEIGH" unit="eV"> 
-        <value energy="1.5">547.271</value>
-        <value energy="2.2">118.270</value>
-        <value energy="2.9">39.172</value>
-        <value energy="3.6">16.495</value>
-        <value energy="4.3">8.103</value>
-        <value energy="5.0">4.432</value>
+        <value energy="1.5">638.483</value>
+        <value energy="2.2">137.982</value>
+        <value energy="2.9">45.700</value>
+        <value energy="3.6">19.244</value>
+        <value energy="4.3">9.454</value>
+        <value energy="5.0">5.171</value>
       </Property> 
   </Material> 
   

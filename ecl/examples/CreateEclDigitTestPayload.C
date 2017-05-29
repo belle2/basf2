@@ -10,7 +10,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-int CreateEclDigitTestPayload(std::string outfile = "out.root", std::string type = "time"){
+int CreateEclDigitTestPayload(const std::string& outfile = "out.root", const std::string& type = "time"){
   
   // Open output file
   TFile *file = new TFile(outfile.c_str(), "RECREATE");

@@ -1,6 +1,5 @@
 //+
 // File : dumprb.cc
-// Description : Get an event from a SeqRoot file and place it in Rbuf
 //
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 28 - Apr - 2012
@@ -23,11 +22,11 @@ using namespace std;
 int main(int argc, char** argv)
 {
   if (argc < 2) {
-    printf("createrb : rbufname \n");
+    printf("%s: rbufname \n", argv[0]);
     exit(-1);
   }
   RingBuffer* rbuf = new RingBuffer(argv[1]);
-  rbuf->DumpInfo();
+  rbuf->dumpInfo();
 }
 
 

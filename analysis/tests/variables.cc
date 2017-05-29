@@ -29,6 +29,7 @@
 
 #include <gtest/gtest.h>
 
+#include <TMatrixFSym.h>
 #include <TRandom3.h>
 #include <TLorentzVector.h>
 #include <TMath.h>
@@ -52,6 +53,16 @@ namespace {
 
     {
       Particle p({ 0.1 , -0.4, 0.8, 1.0 }, 11);
+
+      TMatrixFSym error(7);
+      error.Zero();
+      error(0, 0) = 0.05;
+      error(1, 1) = 0.2;
+      error(2, 2) = 0.4;
+      error(0, 1) = -0.1;
+      error(0, 2) = 0.9;
+      p.setMomentumVertexErrorMatrix(error);
+
       EXPECT_FLOAT_EQ(0.9, particleP(&p));
       EXPECT_FLOAT_EQ(1.0, particleE(&p));
       EXPECT_FLOAT_EQ(0.1, particlePx(&p));
@@ -60,6 +71,15 @@ namespace {
       EXPECT_FLOAT_EQ(0.412310562, particlePt(&p));
       EXPECT_FLOAT_EQ(0.8 / 0.9, particleCosTheta(&p));
       EXPECT_FLOAT_EQ(-1.325817664, particlePhi(&p));
+
+      EXPECT_FLOAT_EQ(0.737446378, particlePErr(&p));
+      EXPECT_FLOAT_EQ(sqrt(0.05), particlePxErr(&p));
+      EXPECT_FLOAT_EQ(sqrt(0.2), particlePyErr(&p));
+      EXPECT_FLOAT_EQ(sqrt(0.4), particlePzErr(&p));
+      EXPECT_FLOAT_EQ(0.488093530, particlePtErr(&p));
+      EXPECT_FLOAT_EQ(0.156402664, particleCosThetaErr(&p));
+      EXPECT_FLOAT_EQ(0.263066820, particlePhiErr(&p));
+
 
       {
         UseReferenceFrame<CMSFrame> dummy;
@@ -71,6 +91,8 @@ namespace {
         EXPECT_FLOAT_EQ(0.40426421, particlePt(&p));
         EXPECT_FLOAT_EQ(0.80522972, particleCosTheta(&p));
         EXPECT_FLOAT_EQ(-1.4254233, particlePhi(&p));
+
+        EXPECT_FLOAT_EQ(sqrt(0.2), particlePyErr(&p));
       }
 
       {
@@ -81,6 +103,7 @@ namespace {
         EXPECT_ALL_NEAR(0.0, particlePy(&p), 1e-9);
         EXPECT_ALL_NEAR(0.0, particlePz(&p), 1e-9);
         EXPECT_ALL_NEAR(0.0, particlePt(&p), 1e-9);
+
       }
 
       {
@@ -93,6 +116,70 @@ namespace {
         EXPECT_FLOAT_EQ(0.412310562, particlePt(&p));
         EXPECT_FLOAT_EQ(0.8 / 0.9, particleCosTheta(&p));
         EXPECT_FLOAT_EQ(-1.325817664, particlePhi(&p));
+
+        EXPECT_FLOAT_EQ(0.737446378, particlePErr(&p));
+        EXPECT_FLOAT_EQ(sqrt(0.05), particlePxErr(&p));
+        EXPECT_FLOAT_EQ(sqrt(0.2), particlePyErr(&p));
+        EXPECT_FLOAT_EQ(sqrt(0.4), particlePzErr(&p));
+        EXPECT_FLOAT_EQ(0.488093530, particlePtErr(&p));
+        EXPECT_FLOAT_EQ(0.156402664, particleCosThetaErr(&p));
+        EXPECT_FLOAT_EQ(0.263066820, particlePhiErr(&p));
+      }
+
+      {
+        UseReferenceFrame<RotationFrame> dummy(TVector3(1, 0, 0), TVector3(0, 1, 0), TVector3(0, 0, 1));
+        EXPECT_FLOAT_EQ(0.9, particleP(&p));
+        EXPECT_FLOAT_EQ(1.0, particleE(&p));
+        EXPECT_FLOAT_EQ(0.1, particlePx(&p));
+        EXPECT_FLOAT_EQ(-0.4, particlePy(&p));
+        EXPECT_FLOAT_EQ(0.8, particlePz(&p));
+        EXPECT_FLOAT_EQ(0.412310562, particlePt(&p));
+        EXPECT_FLOAT_EQ(0.8 / 0.9, particleCosTheta(&p));
+        EXPECT_FLOAT_EQ(-1.325817664, particlePhi(&p));
+
+        EXPECT_FLOAT_EQ(0.737446378, particlePErr(&p));
+        EXPECT_FLOAT_EQ(sqrt(0.05), particlePxErr(&p));
+        EXPECT_FLOAT_EQ(sqrt(0.2), particlePyErr(&p));
+        EXPECT_FLOAT_EQ(sqrt(0.4), particlePzErr(&p));
+        EXPECT_FLOAT_EQ(0.488093530, particlePtErr(&p));
+        EXPECT_FLOAT_EQ(0.156402664, particleCosThetaErr(&p));
+        EXPECT_FLOAT_EQ(0.263066820, particlePhiErr(&p));
+
+        const auto& frame = ReferenceFrame::GetCurrent();
+        EXPECT_FLOAT_EQ(-0.1, frame.getMomentumErrorMatrix(&p)(0, 1));
+        EXPECT_FLOAT_EQ(0.9, frame.getMomentumErrorMatrix(&p)(0, 2));
+      }
+
+      {
+        UseReferenceFrame<RotationFrame> dummy(TVector3(1, 0, 0), TVector3(0, 0, -1), TVector3(0, 1, 0));
+        EXPECT_FLOAT_EQ(0.9, particleP(&p));
+        EXPECT_FLOAT_EQ(1.0, particleE(&p));
+        EXPECT_FLOAT_EQ(0.1, particlePx(&p));
+        EXPECT_FLOAT_EQ(-0.8, particlePy(&p));
+        EXPECT_FLOAT_EQ(-0.4, particlePz(&p));
+
+        EXPECT_FLOAT_EQ(0.737446378, particlePErr(&p));
+        EXPECT_FLOAT_EQ(sqrt(0.05), particlePxErr(&p));
+        EXPECT_FLOAT_EQ(sqrt(0.4), particlePyErr(&p));
+        EXPECT_FLOAT_EQ(sqrt(0.2), particlePzErr(&p));
+
+        const auto& frame = ReferenceFrame::GetCurrent();
+        EXPECT_FLOAT_EQ(-0.9, frame.getMomentumErrorMatrix(&p)(0, 1));
+        EXPECT_FLOAT_EQ(-0.1, frame.getMomentumErrorMatrix(&p)(0, 2));
+      }
+
+      {
+        UseReferenceFrame<CMSRotationFrame> dummy(TVector3(1, 0, 0), TVector3(0, 1, 0), TVector3(0, 0, 1));
+        EXPECT_FLOAT_EQ(0.68176979, particleP(&p));
+        EXPECT_FLOAT_EQ(0.80920333, particleE(&p));
+        EXPECT_FLOAT_EQ(0.058562335, particlePx(&p));
+        EXPECT_FLOAT_EQ(-0.40000001, particlePy(&p));
+        EXPECT_FLOAT_EQ(0.54898131, particlePz(&p));
+        EXPECT_FLOAT_EQ(0.40426421, particlePt(&p));
+        EXPECT_FLOAT_EQ(0.80522972, particleCosTheta(&p));
+        EXPECT_FLOAT_EQ(-1.4254233, particlePhi(&p));
+
+        EXPECT_FLOAT_EQ(sqrt(0.2), particlePyErr(&p));
       }
 
       {
@@ -269,6 +356,8 @@ namespace {
 
   TEST(ROEVariablesTest, Variable)
   {
+
+    StoreObjPtr<ParticleList> pi0ParticleList("pi0:vartest");
     DataStore::Instance().setInitializeActive(true);
     StoreArray<ECLCluster>::registerPersistent();
     StoreArray<KLMCluster>::registerPersistent();
@@ -277,6 +366,7 @@ namespace {
     StoreArray<PIDLikelihood>::registerPersistent();
     StoreArray<Particle>::registerPersistent();
     StoreArray<RestOfEvent>::registerPersistent();
+    pi0ParticleList.registerInDataStore(DataStore::c_DontWriteOut);
     StoreArray<ECLCluster> myECLClusters;
     StoreArray<KLMCluster> myKLMClusters;
     StoreArray<TrackFitResult> myTFRs;
@@ -287,6 +377,9 @@ namespace {
     myParticles.registerRelationTo(myROEs);
     myTracks.registerRelationTo(myPIDLikelihoods);
     DataStore::Instance().setInitializeActive(false);
+
+    pi0ParticleList.create();
+    pi0ParticleList->initialize(111, "pi0:vartest");
 
     // Neutral ECLCluster on reconstructed side
     ECLCluster myECL;
@@ -458,15 +551,7 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 0.0);
 
-    var = Manager::Instance().getVariable("nROEPi0s()");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 0.0);
-
-    var = Manager::Instance().getVariable("nROEPi0s(0 < M < 1.5)");
-    ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 0.0);
-
-    var = Manager::Instance().getVariable("nROEPi0s(mask2, 0 < M < 1.5)");
+    var = Manager::Instance().getVariable("nParticlesInROE(pi0:vartest)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 0.0);
 

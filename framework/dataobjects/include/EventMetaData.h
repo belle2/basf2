@@ -39,8 +39,9 @@ namespace Belle2 {
 
     /** bit-flag format of m_error_flag  */
     enum EventErrorFlag {
-      c_B2LinkCRCError = 0x1, /**< Belle2link CRC error  is detected in the event */
-      c_HLTError       = 0x2  /**< Error is returned from HLT modules. */
+      c_B2LinkPacketCRCError = 0x1, /**< Belle2link CRC error  is detected in the event */
+      c_B2LinkEventCRCError = 0x2, /**< HSLB_COPPER CRC error  is detected in the event */
+      c_HLTError       = 0x4  /**< Error is returned from HLT modules. */
     };
 
     /** Event Setter.
@@ -98,7 +99,7 @@ namespace Belle2 {
      *
      *  @param parent The LFN of the current parent file.
      */
-    void setParentLfn(std::string parent) { m_parentLfn = parent; }
+    void setParentLfn(const std::string& parent) { m_parentLfn = parent; }
 
     /** Generated Weight Setter.
      *

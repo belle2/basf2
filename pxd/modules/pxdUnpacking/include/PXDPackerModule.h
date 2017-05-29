@@ -50,6 +50,9 @@ namespace Belle2 {
       std::string m_PXDDigitsName;  /**< The name of the StoreArray of PXDDigits to be processed */
       std::string m_RawPXDsName;  /**< The name of the StoreArray of generated RawPXDs */
 
+      unsigned int dhe_byte_count;/**< Byte count in current DHE package */
+      unsigned int dhc_byte_count;/**< Byte count in current DHC package */
+
       /** Parameter dhc<->dhe list, mapping from steering file */
       std::vector< std::vector<int >> m_dhe_to_dhc;
 
@@ -115,6 +118,8 @@ namespace Belle2 {
       void append_int16(unsigned short w);//! cat 16bit value to frame
       void append_int32(unsigned int w);//! cat 32value value to frame
       void add_frame_to_payload(void);//! Add Frame to Event payload
+
+      void do_the_reverse_mapping(unsigned int& row, unsigned int& col, unsigned short layer, unsigned short sensor);
 
       /** Store start of Vxd Detector related digits */
       std::map <VxdID , int> startOfVxdID;

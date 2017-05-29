@@ -176,9 +176,14 @@ namespace Belle2 {
 
     StoreArray<TOPDigit> digits;
     for (const auto& digit : digits) {
-      if (digit.getHitQuality() == TOPDigit::EHitQuality::c_Good)
-        reco.addData(digit.getModuleID(), digit.getPixelID(), digit.getTDC(),
-                     digit.getTime());
+      if (digit.getHitQuality() == TOPDigit::EHitQuality::c_Good) {
+        int returnCode = reco.addData(digit.getModuleID(), digit.getPixelID(),
+                                      digit.getTime());
+        if (returnCode == 0)
+          B2ERROR("TOPReconstructor: Could not add module ID:" << digit.getModuleID()
+                  << " pixel: " << digit.getPixelID()
+                  << " time: " << digit.getTime());
+      }
     }
 
     // reconstruct track-by-track and store the results

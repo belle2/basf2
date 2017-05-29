@@ -1,3 +1,0 @@
-These files give example steerings for the cluster rescue modules.
-Most important steering file is 'PXDClusterRescueAnalysis.py', which runs a full analysis of the neural network rescue mechanism and the region of interest rescue mechanism.
-All other files are just examples for the less important PXDClusterRescue<ROI or NN>Analysis modules, which are mainly for debugging purposes.

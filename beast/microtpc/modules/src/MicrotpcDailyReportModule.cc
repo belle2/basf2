@@ -77,6 +77,28 @@ MicrotpcDailyReportModule::~MicrotpcDailyReportModule()
 //This module is a histomodule. Any histogram created here will be saved by the HistoManager module
 void MicrotpcDailyReportModule::defineHisto()
 {
+  for (int i = 0; i < 8; i ++) {
+    for (int j = 0; j < 5; j ++) {
+      tpc_dose[i][j] = 0;
+    }
+  }
+
+  UInt_t Ti = 1455462000;
+  UInt_t Tf = 1467125998;
+  int bin_nb = (int)((double)(Tf - Ti) / 60. / 60.);
+
+  scFac = (double)(Tf - Ti) / ((double)bin_nb);
+
+  for (int i = 0; i < 10; i ++) {
+    h_tpc_doses[i] = new TH1F(TString::Format("tpc_doses_%d", i), "", bin_nb, Ti, Tf);
+    h_tpc_doses[i]->Sumw2();
+  }
+  h_tpc_rates = new TH1F("tpc_rates", "", 8, 0, 8);
+  h_tpc_rates->Sumw2();
+
+  h_tpc_Doses = new TH1F("tpc_Doses", "", 10, 0, 10);
+  h_tpc_Doses->Sumw2();
+
   for (int i = 0; i < 2; i ++) {
     h_tpc_flow[i] = new TH1F(TString::Format("h_tpc_flow_%d", i), "", 5000, 0., 24.);
     h_tpc_pressure[i] = new TH1F(TString::Format("h_tpc_pressure_%d", i), "", 5000, 0., 24.);
@@ -148,6 +170,7 @@ void MicrotpcDailyReportModule::event()
   //int run = evtMetaData->getRun();
   double IHER = 0, ILER = 0, flagHER = -1, flagLER = -1;
   double TimeStamp = 0;
+  double t = 0;
   for (const auto& MetaHit : MetaHits) {
 
     if (MetaHit.getts_nb() > 0) {
@@ -155,6 +178,8 @@ void MicrotpcDailyReportModule::event()
       TimeStamp = MetaHit.getts_start()[0];
       TimeStamp -= TDatime(m_inputReportDate, 0).Convert();
       TimeStamp /= (60. * 60.);
+
+      t = MetaHit.getts_start()[0];
 
       IHER = MetaHit.getIHER();
       ILER = MetaHit.getILER();
@@ -224,6 +249,53 @@ void MicrotpcDailyReportModule::event()
       side[j] = 0;
       side[j] = aTrack.getside()[j];
     }
+
+    int det = detNb - 2;
+    double dedx = esum / trl;
+    Bool_t Inside = false;
+    if (side[4] == 0 && side[5] == 0 && side[6] == 0 && side[7] == 0) Inside = true;
+    Bool_t Xrays = false;
+    if (pixnb == 1) Xrays = true;
+    Bool_t Electrons = false;
+    if ((2 <= pixnb && pixnb < 30) &&
+        (dedx < 60)) Electrons = true;
+    Bool_t Protons = false;
+    if ((pixnb >= 30) &&
+        (20 < dedx && dedx < 280)) Protons = true;
+    //(20 < dedx && DEDX < 800)) Protons = true;
+    Bool_t Recoils = false;
+    if (dedx >= 280) Recoils = true;
+    //if (DEDX >= 800) Recoils = true;
+    Bool_t Neutrons = false;
+    if (Inside && Recoils) {
+      Neutrons = true;
+    }
+    int type = -1;
+    if (Neutrons) {
+      h_tpc_rates->Fill((det * 5 + 0));
+      type = 0;
+    }
+    if (Protons) {
+      h_tpc_rates->Fill((det * 5 + 1));
+      type = 1;
+    }
+    if (Electrons) {
+      h_tpc_rates->Fill((det * 5 + 2));
+      type = 2;
+    }
+    if (Xrays) {
+      h_tpc_rates->Fill((det * 5 + 3));
+      type = 3;
+    }
+    if (!Xrays && !Recoils && !Protons && !Electrons) {
+      h_tpc_rates->Fill((det * 5 + 4));
+      type = 4;
+    }
+    if (type != -1 && Inside) {
+      tpc_dose[det][type] += esum;
+      h_tpc_doses[det * 5 + type]->Fill(t, tpc_dose[det][type]);
+    }
+
     Bool_t EdgeCuts = false;
     if (side[0] == 0 && side[1] == 0 && side[2] == 0 && side[3] == 0) EdgeCuts = true;
     Bool_t Asource = false;
@@ -419,6 +491,16 @@ void MicrotpcDailyReportModule::terminate()
   cout << "=============== good top calibration alphas measured " << Ctr[5] << endl;
   cout << "=============== neutron candidates measured tight " << Ctr[6] << endl;
   cout << "=============== neutron candidates measured loose " << Ctr[7] << endl;
+
+  for (int i = 0; i < 2; i++) {
+    for (int j = 0; j < 5; j++) {
+      h_tpc_Doses->Fill(i * 5 + j, tpc_dose[i][j]);
+    }
+  }
+
+  for (int i = 0; i < 10; i++) {
+    h_tpc_doses[i]->Scale(1. / scFac);
+  }
 }
 
 

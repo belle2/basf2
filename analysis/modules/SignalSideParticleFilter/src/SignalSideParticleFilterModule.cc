@@ -33,14 +33,20 @@ SignalSideParticleFilterModule::SignalSideParticleFilterModule() : Module()
                  "The module should be executed only in the for_each ROE path.");
 
   // Parameter definitions
-  addParam("particleListName", m_particleListName, "Input ParticleList name", std::string(""));
+  addParam("particleLists", m_particleLists, "Input ParticleList name", std::vector<std::string>());
   addParam("selection", m_selection, "Additional selection criteria", std::string(""));
 }
 
 void SignalSideParticleFilterModule::initialize()
 {
   StoreArray<Particle>::required();
-  m_inputList.isRequired(m_particleListName);
+
+  for (auto& iParticleListName : m_particleLists) {
+
+    StoreObjPtr<ParticleList> iParticlelist;
+    iParticlelist.isRequired(iParticleListName);
+
+  }
 
   m_cut = Variable::Cut::compile(m_selection);
 
@@ -49,25 +55,34 @@ void SignalSideParticleFilterModule::initialize()
 void SignalSideParticleFilterModule::event()
 {
   setReturnValue(false);
-  if (!m_inputList) {
-    B2WARNING("Input list " << m_inputList.getName() << " was not created?");
-    return;
-  }
+  bool inTheLists = false;
 
-  const unsigned int numParticles = m_inputList->getListSize();
-  if (numParticles == 0)
-    return;
-
-  bool inTheList = false;
   StoreObjPtr<RestOfEvent> roe("RestOfEvent");
   if (roe.isValid()) {
     const Particle* particle = roe->getRelated<Particle>();
-    if (particle)
-      if (m_inputList->contains(particle) && m_cut->check(particle))
-        inTheList = true;
-  }
+    if (particle) {
+      if (m_cut->check(particle)) {
+        for (auto& iParticleListName : m_particleLists) {
 
-  setReturnValue(inTheList);
+          StoreObjPtr<ParticleList> iParticlelist(iParticleListName);
+
+          if (!iParticlelist) {
+            B2WARNING("Input list " << iParticlelist.getName() << " was not created?");
+            continue;
+          }
+
+          const unsigned int numParticles = iParticlelist->getListSize();
+          if (numParticles == 0)
+            continue;
+
+          if (iParticlelist->contains(particle)) {
+            inTheLists = true; break;
+          }
+        }
+      }
+    }
+  }
+  setReturnValue(inTheLists);
 }
 
 

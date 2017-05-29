@@ -8,7 +8,9 @@
   <dGlue desc="Thickness of glue+filter btw. PMTs and wedge" unit="mm">2.5</dGlue>
   <glueMaterial>TOPWavelengthFilterIHU340</glueMaterial>
   <stackMaterial>TOPAir</stackMaterial>
-    
+  <airGap descr="gap thickness for decoupled PMTs" unit="mm">0.2</airGap>
+  <decoupledFraction descr="fraction of optically decoupled PMTs">0</decoupledFraction>
+  
   <Module> 
     <wallMaterial>TOPPMTCase</wallMaterial>
     <fillMaterial>TOPVacuum</fillMaterial>

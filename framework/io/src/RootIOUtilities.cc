@@ -1,6 +1,7 @@
 #include <framework/io/RootIOUtilities.h>
 
 #include <framework/datastore/DataStore.h>
+#include <framework/dataobjects/FileMetaData.h>
 #include <framework/logging/Logger.h>
 
 #include <RVersion.h>
@@ -39,12 +40,30 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
       B2WARNING(c_SteerExcludeBranchNames[durability] << " has duplicate entry " << b);
   }
 
-  set<string> out, relations;
+  set<string> out, relations, excluderelations;
   for (string branch : branchesToFilter) {
     if (excludeBranchSet.count(branch))
       continue;
     if (branchSet.empty() or branchSet.count(branch))
       out.insert(branch);
+  }
+  if (!excludeBranchSet.empty()) {
+    //remove relations for excluded things
+    for (string from : branchesToFilter) {
+      for (string to : branchesToFilter) {
+        string branch = DataStore::relationName(from, to);
+        if (out.count(branch) == 0)
+          continue; //not selected
+        if (excludeBranchSet.count(from) == 0 and excludeBranchSet.count(to) == 0)
+          continue; //at least one side should be excluded
+        if (branchSet.count(branch) != 0)
+          continue; //specifically included
+        excluderelations.insert(branch);
+      }
+    }
+    for (string rel : excluderelations) {
+      out.erase(rel);
+    }
   }
   //add relations between accepted branches
   for (string from : out) {
@@ -145,4 +164,31 @@ void RootIOUtilities::loadDictionaries()
   gSystem->Load("libpxd");
   gSystem->Load("libcdc");
   loaded = true;
+}
+
+void RootIOUtilities::setCreationData(FileMetaData& metadata)
+{
+  std::string site;
+  char date[100];
+  auto now = time(0);
+  strftime(date, 100, "%Y-%m-%d %H:%M:%S", gmtime(&now));
+  const char* belle2_site = getenv("BELLE2_SITE");
+  if (belle2_site) {
+    site = belle2_site;
+  } else {
+    char hostname[1024];
+    gethostname(hostname, 1023); //will not work well for ipv6
+    hostname[1023] = '\0'; //if result is truncated, terminating null byte may be missing
+    site = hostname;
+  }
+  const char* user = getenv("BELLE2_USER");
+  if (!user) user = getenv("USER");
+  if (!user) user = getlogin();
+  if (!user) user = "unknown";
+  auto commitid = RootIOUtilities::getCommitID();
+  metadata.setCreationData(date, site, user, commitid);
+}
+std::string RootIOUtilities::getCommitID()
+{
+  return GIT_COMMITID;
 }

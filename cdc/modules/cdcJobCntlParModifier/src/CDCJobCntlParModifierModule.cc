@@ -19,7 +19,9 @@ using namespace CDC;
 REG_MODULE(CDCJobCntlParModifier)
 CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDCSimControlPar::getInstance()),
   m_gcp(CDCGeoControlPar::getInstance()), m_wireSag(), m_modLeftRightFlag(), m_debug4Sim(), m_thresholdEnergyDeposit(),
-  m_minTrackLength(), m_debug4Geo(), m_materialDefinitionMode(), m_senseWireZposMode(), m_displacement(), m_alignment(),
+  m_minTrackLength(), m_maxSpaceResol(), m_debug4Geo(), m_printMaterialTable(), m_materialDefinitionMode(), m_senseWireZposMode(),
+  m_displacement(),
+  m_alignment(),
   m_misalignment(),
   m_displacementInputType(), m_alignmentInputType(), m_misalignmentInputType(), m_xtInputType(), m_sigmaInputType(),
   m_propSpeedInputType(), m_t0InputType(), m_twInputType(), m_bwInputType(), m_chMapInputType(), m_displacementFile(),
@@ -29,7 +31,7 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
 {
   //  B2INFO("CDCJobCntlParModifierModule::constructor called.");
   // Set description
-  setDescription("Change Job contorol parameters.");
+  setDescription("Change job contorol parameters. Please put this module in the path (before Geometry module) with specified input parameters when you want to change them.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //N.B. The following default values must be identical to the ones in xxControlPar objects.
@@ -37,7 +39,9 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   //Switch for debug
   addParam("Debug4Sim", m_debug4Sim, "Switch on/off debug in FullSim.", false);
   //Switch for wire sag
-  addParam("WireSag", m_wireSag, "Switch on/off sense wire (gravitational) sag in FullSim.", true);
+  addParam("WireSag", m_wireSag,
+           "Switch on/off sense wire (gravitational) sag in FullSim. Here, sag means the main part which corresponds to design+displacement in case of wire position. You can control the perturbative part (corresponting to (mis)alignment in case of wire-position) of sag in Digitizer.",
+           true);
   //Switch for modified left/right flag
   addParam("ModLeftRightFlag", m_modLeftRightFlag, "Switch on/off calculation of modified left/right flag in FullSim.", false);
   //energy thresh
@@ -52,6 +56,9 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   //For Geometry
   //Switch for debug
   addParam("Debug4Geo", m_debug4Geo, "Switch on/off debug in Geo.", false);
+  //Switch for printing material table
+  addParam("PrintMaterialTable", m_printMaterialTable,
+           "Switch on/off printing the G4 material table at the stage of CDC geometry creation.", false);
   //material definition mode
   addParam("MaterialDefinitionMode",  m_materialDefinitionMode,
            "Material definition mode: =0: define a mixture of gases and wires in the entire tracking volume; =1: dummy; =2: define all sense and field wires explicitly in the volume.",
@@ -100,19 +107,25 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   addParam("MisalignmentFile", m_misalignmentFile, "Input file name (on cdc/data) for wire misalignment.",
            string("misalignment_v2.dat"));
   //xt-relation
-  addParam("XtFile", m_xtFile, "Input file name (on cdc/data) for xt-relations.",  string("xt_v3.dat"));
+  addParam("XtFile", m_xtFile, "Input file name (on cdc/data) for xt-relations. You can specify either an uncompressed or gzip file.",
+           string("xt_v3_chebyshev.dat.gz"));
   //sigma
-  addParam("SigmaFile", m_sigmaFile, "Input file name (on cdc/data) for sigmas.",  string("sigma_v1.dat"));
+  addParam("SigmaFile", m_sigmaFile, "Input file name (on cdc/data) for sigmas.",  string("sigma_v2.dat"));
   //prop-speed
   addParam("PropSpeedFile", m_propSpeedFile, "Input file name (on cdc/data) for prop-speeds.",  string("propspeed_v0.dat"));
   //t0
-  addParam("T0File", m_t0File, "Input file name (on cdc/data) for t0s.",  string("t0.dat"));
+  addParam("T0File", m_t0File, "Input file name (on cdc/data) for t0s.",  string("t0_v1.dat"));
   //time walk
   addParam("TimeWalkFile", m_twFile, "Input file name (on cdc/data) for time walks.",  string("tw_off.dat"));
   //bad wire
   addParam("BadWireFile", m_bwFile, "Input file name (on cdc/data) for bad wires.",  string("badwire_v1.dat"));
   //channel map
   addParam("ChannelMapFile", m_chMapFile, "Input file name (on cdc/data) for channel map.",  string("ch_map.dat"));
+
+  //max. space resolution
+  addParam("MaxSpaceResol", m_maxSpaceResol,
+           "Maximum space resolution (cm) in CDCGeometryPar::getSigma() to avoid a too large value; from 2011 beam test; a bit larger value may be better...",
+           double(2.5 * 0.0130));
 
 }
 
@@ -156,6 +169,11 @@ void CDCJobCntlParModifierModule::initialize()
   if (m_gcp.getSenseWireZposMode() != m_senseWireZposMode) {
     B2INFO("CDCJobCntlParModifier: senseWireZposMode modified: " << m_gcp.getSenseWireZposMode() << " " << m_senseWireZposMode);
     m_gcp.setSenseWireZposMode(m_senseWireZposMode);
+  }
+
+  if (m_gcp.getPrintMaterialTable() != m_printMaterialTable) {
+    B2INFO("CDCJobCntlParModifier: printMaterialTable modified: " << m_gcp.getPrintMaterialTable() << " to " << m_printMaterialTable);
+    m_gcp.setPrintMaterialTable(m_printMaterialTable);
   }
 
   if (m_gcp.getDebug() != m_debug4Geo) {
@@ -278,6 +296,11 @@ void CDCJobCntlParModifierModule::initialize()
   if (m_gcp.getChMapFile() != m_chMapFile) {
     B2INFO("CDCJobCntlParModifier: chMapFile modified: " << m_gcp.getChMapFile() << " to " << m_chMapFile);
     m_gcp.setChMapFile(m_chMapFile);
+  }
+
+  if (m_gcp.getMaxSpaceResolution() != m_maxSpaceResol) {
+    B2INFO("CDCJobCntlParModifier: maxSpaceResol modified: " << m_gcp.getMaxSpaceResolution() << " to " << m_maxSpaceResol);
+    m_gcp.setMaxSpaceResolution(m_maxSpaceResol);
   }
 }
 

@@ -157,6 +157,9 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
   for (int iFINESSE = 0; iFINESSE < ECL_FINESSES_IN_COPPER; iFINESSE++) {
 
+    m_bitPos = 0;
+    m_bufPos = 0;
+
     m_bufLength = rawCOPPERData->GetDetectorNwords(n, iFINESSE);
 
     if (m_bufLength <= 0) continue;

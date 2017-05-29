@@ -43,7 +43,7 @@ void RxModule::initStreamer()
 void RxModule::readEvent()
 {
   char* evtbuf = new char[EvtMessage::c_MaxEventSize];
-  while (m_rbuf->continueReadingData()) {
+  while (!m_rbuf->isDead()) {
     int size = m_rbuf->remq((int*)evtbuf);
     if (size != 0) {
       B2DEBUG(100, "Rx: got an event from RingBuffer, size=" << size);

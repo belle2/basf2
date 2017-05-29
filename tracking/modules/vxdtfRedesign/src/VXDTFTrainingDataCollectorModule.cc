@@ -8,11 +8,10 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
+#include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
 #include <tracking/trackFindingVXD/sectorMapTools/SecMapTrainer.h>
 
 #include <tracking/modules/vxdtfRedesign/VXDTFTrainingDataCollectorModule.h>
-#include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -40,6 +39,9 @@ VXDTFTrainingDataCollectorModule::VXDTFTrainingDataCollectorModule() :
 
   addParam("SpacePointTrackCandsName", m_PARAMSpacePointTrackCandsName,
            "the name of the storeArray containing the SpacePointTrackCands used for extracting and collecting the training data.", string(""));
+
+  addParam("NameTag", m_PARAMNameTag, "A name tag that will be attached to the name of the output file. If left empty (\"\") a "
+           "random number will be attached!", std::string(""));
 }
 
 /**
@@ -49,18 +51,22 @@ VXDTFTrainingDataCollectorModule::VXDTFTrainingDataCollectorModule() :
 void VXDTFTrainingDataCollectorModule::initialize()
 {
 
-  StoreObjPtr< SectorMap<SpacePoint> >
-  sectorMap("", DataStore::c_Persistent);
-  sectorMap.isRequired();
+  FiltersContainer<SpacePoint>& filtersContainer = Belle2::FiltersContainer<SpacePoint>::getInstance();
 
   m_spacePointTrackCands.isRequired(m_PARAMSpacePointTrackCandsName);
 
-  for (auto setup : sectorMap->getAllSetups()) {
+  for (auto setup : filtersContainer.getAllSetups()) {
     auto config = setup.second->getConfig();
 
-    int randomInt = gRandom->Integer(std::numeric_limits<int>::max());
+    std::string nameAppendix = m_PARAMNameTag;
+    // if the name tag was not set a random number will be attached!
+    if (nameAppendix == std::string("")) {
+      int randomInt = gRandom->Integer(std::numeric_limits<int>::max());
+      nameAppendix = std::to_string(randomInt);
+    }
+
     SecMapTrainer<SelectionVariableFactory<SecMapTrainerHit> >
-    newMap(sectorMap, setup.first, randomInt);
+    newMap(setup.first, nameAppendix);
 
     m_secMapTrainers.push_back(std::move(newMap));
 

@@ -44,7 +44,8 @@ main = create_path()
 
 main.add_module('RootInput')
 main.add_module('Gearbox')
-main.add_module('Geometry')
+geometry = main.add_module('Geometry')
+geometry.param('excludedComponents', ['ECL'])
 
 
 fillParticleList('K-', 'Kid > 0.1', path=main)

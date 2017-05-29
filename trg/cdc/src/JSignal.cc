@@ -55,8 +55,9 @@ namespace Belle2 {
   }
 
   TRGCDCJSignal::TRGCDCJSignal(TRGCDCJSignalData* commonData)
+    : m_name(""),
+      m_vhdlCode("")
   {
-    m_name = "";
     m_type = 1;
     m_bitsize = -1;
     m_int = 0;
@@ -67,7 +68,6 @@ namespace Belle2 {
     m_maxActual = 0;
     m_toReal = 0;
     m_debug = 0;
-    m_vhdlCode = "";
     m_finishClock = -2;
     m_commonData = commonData;
   }
@@ -147,8 +147,8 @@ namespace Belle2 {
   }
 
   TRGCDCJSignal::TRGCDCJSignal(std::vector<bool> const& slvValue, int const& finishClock, TRGCDCJSignalData* commonData)
+    : m_name("")
   {
-    m_name = "";
     m_type = 2;
     m_bitsize = slvValue.size();
     m_slv = slvValue;
@@ -166,7 +166,7 @@ namespace Belle2 {
   }
 
 
-  TRGCDCJSignal& TRGCDCJSignal::assignTo(TRGCDCJSignal const rhs, int targetClock, string& finalCode)
+  TRGCDCJSignal& TRGCDCJSignal::assignTo(TRGCDCJSignal const& rhs, int targetClock, string& finalCode)
   {
 
     TRGCDCJSignal t_rhs(rhs);
@@ -260,13 +260,13 @@ namespace Belle2 {
     return *this;
   }
 
-  TRGCDCJSignal& TRGCDCJSignal::assignTo(TRGCDCJSignal const rhs, int targetClock)
+  TRGCDCJSignal& TRGCDCJSignal::assignTo(TRGCDCJSignal const& rhs, int targetClock)
   {
     string finalCode = "printAssignVhdlCode";
     return assignTo(rhs, targetClock, finalCode);
   }
 
-  TRGCDCJSignal& TRGCDCJSignal::operator<= (TRGCDCJSignal const rhs)
+  TRGCDCJSignal& TRGCDCJSignal::operator<= (TRGCDCJSignal const& rhs)
   {
     string finalCode = "printAssignVhdlCode";
     return assignTo(rhs, -3, finalCode);
@@ -586,7 +586,7 @@ namespace Belle2 {
     return t_signal;
   }
 
-  TRGCDCJSignal const TRGCDCJSignal::offset(TRGCDCJSignal const valueMin) const
+  TRGCDCJSignal const TRGCDCJSignal::offset(TRGCDCJSignal const& valueMin) const
   {
     TRGCDCJSignal t_offset = *this - valueMin;
     // Need to find minimum bitsize
@@ -600,7 +600,7 @@ namespace Belle2 {
     return t_offset;
   }
 
-  TRGCDCJSignal const TRGCDCJSignal::invOffset(TRGCDCJSignal const valueMin) const
+  TRGCDCJSignal const TRGCDCJSignal::invOffset(TRGCDCJSignal const& valueMin) const
   {
     TRGCDCJSignal t_result = *this + valueMin;
     // Set bitsize and type.
@@ -751,7 +751,7 @@ namespace Belle2 {
   }
 
   void TRGCDCJSignal::choose(TRGCDCJSignal& target, TRGCDCJSignal const& targetMin, TRGCDCJSignal const& targetMax,
-                             TRGCDCJSignal const& reference, std::vector<std::vector<TRGCDCJSignal> > data)
+                             TRGCDCJSignal const& reference, std::vector<std::vector<TRGCDCJSignal> >& data)
   {
     choose(target, targetMin, targetMax, reference, data, -3);
   }
@@ -791,7 +791,7 @@ namespace Belle2 {
     choose(target, t_targetMin, t_targetMax, reference, data, targetClock);
   }
 
-  void TRGCDCJSignal::choose(TRGCDCJSignal& target, TRGCDCJSignal const& reference, std::vector<std::vector<TRGCDCJSignal> > data)
+  void TRGCDCJSignal::choose(TRGCDCJSignal& target, TRGCDCJSignal const& reference, std::vector<std::vector<TRGCDCJSignal> >& data)
   {
     choose(target, reference, data, -3);
   }
@@ -1663,7 +1663,7 @@ namespace Belle2 {
     return (signed long long) FpgaUtility::roundInt(value / mother.m_toReal);
   }
 
-  void TRGCDCJSignal::calVhdlTypeBitwidth(TRGCDCJSignal const& first, std::string operation, TRGCDCJSignal const& second, int& type,
+  void TRGCDCJSignal::calVhdlTypeBitwidth(TRGCDCJSignal const& first, std::string& operation, TRGCDCJSignal const& second, int& type,
                                           int& bitwidth)
   {
     if (first.m_type != second.m_type) {
@@ -2150,7 +2150,7 @@ namespace Belle2 {
 
   }
 
-  void TRGCDCJSignal::printVhdl(std::string vhdlCode)
+  void TRGCDCJSignal::printVhdl(std::string& vhdlCode)
   {
     if (m_commonData) {
       ofstream outFile;

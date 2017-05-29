@@ -252,8 +252,10 @@ def process_dir(
                 + 'Dict.cc'
             dict_file = env.RootDict(os.path.join(env['BUILDDIR'],
                                                   dict_filename), linkdef_file)
+            # add the extra cxxflags
+            dict_ccflags = env["CCFLAGS"] + env["ROOTCLING_EXTRA_CCFLAGS"]
             # add current directory to include path for dictionary compilation
-            dict_files.append(env.SharedObject(dict_file, CPPPATH=['.'] + env['CPPPATH']))
+            dict_files.append(env.SharedObject(dict_file, CPPPATH=['.'] + env['CPPPATH'], CCFLAGS=dict_ccflags))
 
             # install corresponding pcm file in lib (for cling)
             pcm_path = str(dict_file[0])[:-3] + '_rdict.pcm'

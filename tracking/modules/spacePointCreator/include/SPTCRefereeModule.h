@@ -71,6 +71,9 @@ namespace Belle2 {
     /** parameter for indicating if only the 'problematic' SpacePoint shall be removed from the SPTC or if the whole SPTC shall be kicked */
     bool m_PARAMkickSpacePoint;
 
+    /** only keep track candidates which have at least m_PARAMminNumSpacePoints space points **/
+    int m_PARAMminNumSpacePoints;
+
     /** parameter for indicating if all checked SpacePointTrackCands should be stored in a new StoreArray
      *NOTE: by storing the SpacePointTrackCands in a new StoreArray all previously registered relations are lost!)
      */

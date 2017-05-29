@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
-#include <tracking/trackFindingCDC/ca/Relation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 #include <boost/range/iterator_range.hpp>
 
@@ -41,7 +41,7 @@ namespace Belle2 {
       virtual Weight operator()(const CDCTrack& from  __attribute__((unused)),
                                 const CDCTrack& to  __attribute__((unused)))
       {
-        return NAN;
+        return 1;
       }
 
       /**
@@ -54,8 +54,8 @@ namespace Belle2 {
         const CDCTrack* ptrFrom(relation.first);
         const CDCTrack* ptrTo(relation.second);
         if (ptrFrom == ptrTo) return NAN; // Prevent relation to same.
-        if (not ptrFrom or not ptrTo) return NAN;
-        return operator()(*ptrFrom, *ptrTo);
+        if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
+        return this->operator()(*ptrFrom, *ptrTo);
       }
     };
   }

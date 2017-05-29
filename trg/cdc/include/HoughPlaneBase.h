@@ -27,13 +27,13 @@
 namespace Belle2 {
 
 /// A class to represent a Hough parameter plane.
-class TRGCDCHoughPlaneBase {
+  class TRGCDCHoughPlaneBase {
 
   public:
 
     /// Contructor.
-    TRGCDCHoughPlaneBase(const std::string & name,
-                         const TRGCDCHoughTransformation & transformation,
+    TRGCDCHoughPlaneBase(const std::string& name,
+                         const TRGCDCHoughTransformation& transformation,
                          unsigned nX,
                          float xMin,
                          float xMax,
@@ -50,7 +50,7 @@ class TRGCDCHoughPlaneBase {
     std::string name(void) const;
 
     /// returns Hough transformation object.
-    const TRGCDCHoughTransformation & transformation(void) const;
+    const TRGCDCHoughTransformation& transformation(void) const;
 
     /// returns charge for this plane.
     float charge(void) const;
@@ -95,10 +95,10 @@ class TRGCDCHoughPlaneBase {
     unsigned serialId(unsigned x, unsigned y) const;
 
     /// returns serial ID for position p.
-    unsigned serialId(const TRGPoint2D & p) const;
+    unsigned serialId(const TRGPoint2D& p) const;
 
     /// returns x and y for serialID.
-    void id(unsigned serialId, unsigned & x, unsigned & y) const;
+    void id(unsigned serialId, unsigned& x, unsigned& y) const;
 
     /// returns position in Hough plain for a cell (x, y)..
     TRGPoint2D position(unsigned x, unsigned y) const;
@@ -111,17 +111,17 @@ class TRGCDCHoughPlaneBase {
                                     unsigned windowSize = 1) const;
 
     /// returns regions.
-    const std::vector<std::vector<unsigned> *> & regions(void) const;
+    const std::vector<std::vector<unsigned> *>& regions(void) const;
 
     /// returns cell positions in the region.
     void locationInPlane(float x0, float y0, float x1, float y1,
-                         unsigned & nFound,
-                         unsigned & iX0, unsigned & iY0,
-                         unsigned & iX1, unsigned & iY1) const;
+                         unsigned& nFound,
+                         unsigned& iX0, unsigned& iY0,
+                         unsigned& iX1, unsigned& iY1) const;
 
     /// dumps debug information.
-    virtual void dump(const std::string & message = std::string(""),
-                      const std::string & prefix = std::string("")) const;
+    virtual void dump(const std::string& message = std::string(""),
+                      const std::string& prefix = std::string("")) const;
 
   public:// Modifiers
 
@@ -164,7 +164,7 @@ class TRGCDCHoughPlaneBase {
     virtual unsigned setEntry(unsigned serialId, unsigned n) = 0;
 
     /// Sets region.
-    void setRegion(std::vector<unsigned> *);
+    void setRegion(std::vector<unsigned>*);
 
     /// Clears regions.
     void clearRegions(void);
@@ -183,7 +183,7 @@ class TRGCDCHoughPlaneBase {
     const std::string _name;
 
     /// Hough transformation.
-    const TRGCDCHoughTransformation & _trans;
+    const TRGCDCHoughTransformation& _trans;
 
     /// Track charge for this plane.
     float _charge;
@@ -217,117 +217,134 @@ class TRGCDCHoughPlaneBase {
 
     /// Regions.
     std::vector<std::vector<unsigned> *> _regions;
-};
+  };
 
 //-----------------------------------------------------------------------------
 
-inline
-float
-TRGCDCHoughPlaneBase::charge(void) const {
+  inline
+  float
+  TRGCDCHoughPlaneBase::charge(void) const
+  {
     return _charge;
-}
+  }
 
-inline
-float
-TRGCDCHoughPlaneBase::charge(float a) {
+  inline
+  float
+  TRGCDCHoughPlaneBase::charge(float a)
+  {
     return _charge = a;
-}
+  }
 
-inline
-std::string
-TRGCDCHoughPlaneBase::name(void) const {
+  inline
+  std::string
+  TRGCDCHoughPlaneBase::name(void) const
+  {
     return _name;
-}
+  }
 
-inline
-unsigned
-TRGCDCHoughPlaneBase::nX(void) const {
+  inline
+  unsigned
+  TRGCDCHoughPlaneBase::nX(void) const
+  {
     return _nX;
-}
+  }
 
-inline
-float
-TRGCDCHoughPlaneBase::xMin(void) const {
+  inline
+  float
+  TRGCDCHoughPlaneBase::xMin(void) const
+  {
     return _xMin;
-}
+  }
 
-inline
-float
-TRGCDCHoughPlaneBase::xMin(float a) {
+  inline
+  float
+  TRGCDCHoughPlaneBase::xMin(float a)
+  {
     _xMin = a;
     _xSize = (_xMax - _xMin) / float(_nX);
     return _xMin;
-}
+  }
 
-inline
-float
-TRGCDCHoughPlaneBase::xMax(void) const {
+  inline
+  float
+  TRGCDCHoughPlaneBase::xMax(void) const
+  {
     return _xMax;
-}
+  }
 
-inline
-float
-TRGCDCHoughPlaneBase::xMax(float a) {
+  inline
+  float
+  TRGCDCHoughPlaneBase::xMax(float a)
+  {
     _xMax = a;
     _xSize = (_xMax - _xMin) / float(_nX);
     return _xMax;
-}
+  }
 
-inline
-float
-TRGCDCHoughPlaneBase::xSize(void) const {
+  inline
+  float
+  TRGCDCHoughPlaneBase::xSize(void) const
+  {
     return _xSize;
-}
+  }
 
-inline
-unsigned
-TRGCDCHoughPlaneBase::nY(void) const {
+  inline
+  unsigned
+  TRGCDCHoughPlaneBase::nY(void) const
+  {
     return _nY;
-}
+  }
 
-inline
-float
-TRGCDCHoughPlaneBase::yMin(void) const {
+  inline
+  float
+  TRGCDCHoughPlaneBase::yMin(void) const
+  {
     return _yMin;
-}
+  }
 
-inline
-float
-TRGCDCHoughPlaneBase::yMin(float a) {
+  inline
+  float
+  TRGCDCHoughPlaneBase::yMin(float a)
+  {
     _yMin = a;
     _ySize = (_yMax - _yMin) / float(_nY);
     return _yMin;
-}
+  }
 
-inline
-float
-TRGCDCHoughPlaneBase::yMax(void) const {
+  inline
+  float
+  TRGCDCHoughPlaneBase::yMax(void) const
+  {
     return _yMax;
-}
+  }
 
-inline
-float
-TRGCDCHoughPlaneBase::yMax(float a) {
+  inline
+  float
+  TRGCDCHoughPlaneBase::yMax(float a)
+  {
     _yMax = a;
     _ySize = (_yMax - _yMin) / float(_nY);
     return _yMax;
-}
+  }
 
-inline
-float
-TRGCDCHoughPlaneBase::ySize(void) const {
+  inline
+  float
+  TRGCDCHoughPlaneBase::ySize(void) const
+  {
     return _ySize;
-}
+  }
 
-inline
-unsigned
-TRGCDCHoughPlaneBase::serialId(unsigned x, unsigned y) const {
+  inline
+  unsigned
+  TRGCDCHoughPlaneBase::serialId(unsigned x, unsigned y) const
+  {
     return _nY * x + y;
-}
+  }
 
-inline
-unsigned
-TRGCDCHoughPlaneBase::serialId(const TRGPoint2D & p) const {
+  inline
+  unsigned
+  TRGCDCHoughPlaneBase::serialId(const TRGPoint2D& p) const
+  {
     static const unsigned invalidPoint = _nX * _nY;
     if ((p.x() < _xMin) || (p.x() > _xMax)) return invalidPoint;
     if ((p.y() < _yMin) || (p.y() > _yMax)) return invalidPoint;
@@ -336,24 +353,26 @@ TRGCDCHoughPlaneBase::serialId(const TRGPoint2D & p) const {
     unsigned x = unsigned((p.x() - _xMin) / _xSize);
     unsigned y = unsigned((p.y() - _yMin) / _ySize);
     return serialId(x, y);
-}
+  }
 
-inline
-TRGPoint2D
-TRGCDCHoughPlaneBase::position(unsigned x, unsigned y) const {
+  inline
+  TRGPoint2D
+  TRGCDCHoughPlaneBase::position(unsigned x, unsigned y) const
+  {
 #ifdef TRASAN_DEBUG_DETAIL
 //   std::cout << "x,y=" << x << "," << y
 //             << ":_xMin,_yMin=" << _xMin << "," << _yMin
 //               << ":_xSize,_ySize=" << _xSize << "," << _ySize << std::endl;
-#endif            
+#endif
 
     return TRGPoint2D(_xMin + (float(x) + 0.5) * _xSize,
-                    _yMin + (float(y) + 0.5) * _ySize);
-}
+                      _yMin + (float(y) + 0.5) * _ySize);
+  }
 
-inline
-std::vector<unsigned>
-TRGCDCHoughPlaneBase::neighbors(unsigned a, unsigned windowSize) const {
+  inline
+  std::vector<unsigned>
+  TRGCDCHoughPlaneBase::neighbors(unsigned a, unsigned windowSize) const
+  {
     const int maxi = _nY * _nX;
     std::vector<unsigned> tmp;
 
@@ -369,136 +388,138 @@ TRGCDCHoughPlaneBase::neighbors(unsigned a, unsigned windowSize) const {
     if (((int) y + ymax) >= (int) _nY) ymax = _nY - (int) y;
 
     for (int i = xmin; i <= xmax; i++) {
-        for (int j = ymin; j <= ymax; j++) {
-            int ii = a + i * _nY + j;
-            if (ii == (int) a) continue;
-            if (ii < 0) ii += maxi;
-            if (ii >= maxi) ii -= maxi;
+      for (int j = ymin; j <= ymax; j++) {
+        int ii = a + i * _nY + j;
+        if (ii == (int) a) continue;
+        if (ii < 0) ii += maxi;
+        if (ii >= maxi) ii -= maxi;
 //            tmp.append(ii);
-            tmp.push_back(ii);
-        }
+        tmp.push_back(ii);
+      }
     }
     return tmp;
-}
+  }
 
-inline
-void
-TRGCDCHoughPlaneBase::setRegion(std::vector<unsigned> * a) {
+  inline
+  void
+  TRGCDCHoughPlaneBase::setRegion(std::vector<unsigned>* a)
+  {
 //  _regions.append(a);
     _regions.push_back(a);
-}
+  }
 
-inline
-const std::vector<std::vector<unsigned> *> &
-TRGCDCHoughPlaneBase::regions(void) const {
+  inline
+  const std::vector<std::vector<unsigned> *>&
+  TRGCDCHoughPlaneBase::regions(void) const
+  {
     return _regions;
-}
+  }
 
-inline
-unsigned
-TRGCDCHoughPlaneBase::neighbor(unsigned id, unsigned dir) const {
+  inline
+  unsigned
+  TRGCDCHoughPlaneBase::neighbor(unsigned id, unsigned dir) const
+  {
     const unsigned maxi = _nY * _nX;
     if (dir == 0) { // top
-        if ((id % _nY) != _nY - 1)
-            return id + 1;
-    }
-    else if (dir == 1) { // top right
-        if ((id % _nY) != _nY - 1) {
-            const unsigned i = id + _nY + 1;
-            if (i < maxi)
-                return i;
-            else
-                return i - maxi;
-        }
-    }
-    else if (dir == 2) { // right
-        const unsigned i = id + _nY;
+      if ((id % _nY) != _nY - 1)
+        return id + 1;
+    } else if (dir == 1) { // top right
+      if ((id % _nY) != _nY - 1) {
+        const unsigned i = id + _nY + 1;
         if (i < maxi)
-            return i;
+          return i;
         else
-            return i - maxi;
-    }
-    else if (dir == 3) { // bottom right
-        if ((id % _nY) != 0) {
-            const unsigned i = id + _nY - 1;
-            if (i < maxi) 
-                return i;
-            else
-                return i - maxi;
-        }
-    }
-    else if (dir == 4) { // bottom
-        if ((id % _nY) != 0)
-            return id - 1;
-    }
-    else if (dir == 5) { // bottom left
-        if ((id % _nY) != 0) {
-            const int i = id + _nY - 1;
-            if (i > 0)
-                return (unsigned) i;
-            else
-                return (unsigned) i + maxi;
-        }
-    }
-    else if (dir == 6) { // left
-        const int i = id - _nY;
+          return i - maxi;
+      }
+    } else if (dir == 2) { // right
+      const unsigned i = id + _nY;
+      if (i < maxi)
+        return i;
+      else
+        return i - maxi;
+    } else if (dir == 3) { // bottom right
+      if ((id % _nY) != 0) {
+        const unsigned i = id + _nY - 1;
+        if (i < maxi)
+          return i;
+        else
+          return i - maxi;
+      }
+    } else if (dir == 4) { // bottom
+      if ((id % _nY) != 0)
+        return id - 1;
+    } else if (dir == 5) { // bottom left
+      if ((id % _nY) != 0) {
+        const int i = id + _nY - 1;
         if (i > 0)
-            return (unsigned) i;
+          return (unsigned) i;
         else
-            return (unsigned) i + maxi;
-    }
-    else if (dir == 7) { // top left
-        if ((id % _nY) != _nY - 1) {
-            const int i = id - _nY + 1;
-            if (i > 0)
-                return (unsigned) i;
-            else
-                return (unsigned) i + maxi;
-        }
+          return (unsigned) i + maxi;
+      }
+    } else if (dir == 6) { // left
+      const int i = id - _nY;
+      if (i > 0)
+        return (unsigned) i;
+      else
+        return (unsigned) i + maxi;
+    } else if (dir == 7) { // top left
+      if ((id % _nY) != _nY - 1) {
+        const int i = id - _nY + 1;
+        if (i > 0)
+          return (unsigned) i;
+        else
+          return (unsigned) i + maxi;
+      }
     }
 
     return id;
-}
+  }
 
-inline
-void
-TRGCDCHoughPlaneBase::id(unsigned serialId, unsigned & x, unsigned & y) const {
+  inline
+  void
+  TRGCDCHoughPlaneBase::id(unsigned serialId, unsigned& x, unsigned& y) const
+  {
     x = serialId / _nY;
     y = serialId % _nY;
-}
+  }
 
-inline
-void
-TRGCDCHoughPlaneBase::clearRegions(void) {
+  inline
+  void
+  TRGCDCHoughPlaneBase::clearRegions(void)
+  {
     // HepAListDeleteAll(_regions);
     _regions.clear();
-}
+  }
 
-inline
-void
-TRGCDCHoughPlaneBase::clear(void) {
+  inline
+  void
+  TRGCDCHoughPlaneBase::clear(void)
+  {
     clearRegions();
-}
+  }
 
-inline
-void
-TRGCDCHoughPlaneBase::vote(float rx,
-                           float ry,
-                           int weight) {
+  inline
+  void
+  TRGCDCHoughPlaneBase::vote(float rx,
+                             float ry,
+                             int weight)
+  {
     vote(rx, ry, 0, weight);
-}
+  }
 
-inline
-void
-TRGCDCHoughPlaneBase::vote(float, int) {
+  inline
+  void
+  TRGCDCHoughPlaneBase::vote(float, int)
+  {
 // do nothing
-}
+  }
 
-inline
-const  TRGCDCHoughTransformation &
-TRGCDCHoughPlaneBase::transformation(void) const {
+  inline
+  const  TRGCDCHoughTransformation&
+  TRGCDCHoughPlaneBase::transformation(void) const
+  {
     return _trans;
-}
+  }
 
 } // namespace Belle
 

@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
-#include <tracking/trackFindingCDC/ca/Relation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -21,6 +21,7 @@ namespace Belle2 {
     /// Names of the variables to be generated
     constexpr
     static char const* const basicFacetRelationVarNames[] = {
+      "superlayer_id",
       "from_middle_phi",
       "to_middle_phi",
     };

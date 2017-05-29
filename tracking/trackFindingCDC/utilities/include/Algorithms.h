@@ -9,9 +9,11 @@
  **************************************************************************/
 #pragma once
 
-#include <iterator>
-#include <vector>
+#include <tracking/trackFindingCDC/utilities/Functional.h>
 #include <tracking/trackFindingCDC/utilities/Range.h>
+
+#include <vector>
+#include <iterator>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -51,8 +53,107 @@ namespace Belle2 {
     template <class Ts, class APredicate>
     void erase_remove_if(Ts& ts, const APredicate& predicate)
     {
-      auto itRemoved = std::remove_if(std::begin(ts), std::end(ts), predicate);
-      ts.erase(itRemoved, std::end(ts));
+      ts.erase(std::remove_if(std::begin(ts), std::end(ts), predicate), std::end(ts));
+    }
+
+    /**
+     *  Erase unique idiom in a more concise form
+     */
+    template <class Ts>
+    void erase_unique(Ts& ts)
+    {
+      ts.erase(std::unique(std::begin(ts), std::end(ts)), std::end(ts));
+    }
+
+    /**
+     *  Erase unique idiom in a more concise form
+     */
+    template <class Ts, class AEqual>
+    void erase_unique(Ts& ts, const AEqual& equal)
+    {
+      ts.erase(std::unique(std::begin(ts), std::end(ts), equal), std::end(ts));
+    }
+
+    /**
+     *  Counts the number of repetitions for each unique value in a range. Unique values must be adjacent.
+     */
+    template <class It>
+    std::vector<std::pair<It, int> > unique_count(It itBegin, It itEnd)
+    {
+      std::vector<std::pair<It, int> > result;
+      if (itBegin == itEnd) return result;
+      It it = itBegin;
+      result.emplace_back(it, 1);
+      ++it;
+      for (; it != itEnd; ++it) {
+        if (*it == *result.back().first) {
+          ++result.back().second;
+        } else {
+          result.emplace_back(it, 1);
+        }
+      }
+      return result;
+    }
+
+    /**
+     *  Counts the number of repetitions for each unique value in a range. Unique values must be adjacent.
+     */
+    template <class It, class AEqual>
+    std::vector<std::pair<It, int> > unique_count(It itBegin, It itEnd, const AEqual& equal)
+    {
+      std::vector<std::pair<It, int> > result;
+      if (itBegin == itEnd) return result;
+      It it = itBegin;
+      result.emplace_back(it, 1);
+      ++it;
+      for (; it != itEnd; ++it) {
+        if (equal(*it, *result.back().first)) {
+          ++result.back().second;
+        } else {
+          result.emplace_back(it, 1);
+        }
+      }
+      return result;
+    }
+
+    /**
+     *  Counts the number of repetitions for each unique value in a range. Unique values must be adjacent.
+     */
+    template <class It>
+    std::vector<Range<It> > unique_ranges(It itBegin, It itEnd)
+    {
+      std::vector<std::pair<It, It> > result;
+      if (itBegin == itEnd) return result;
+      It it1 = itBegin;
+      It it2 = itBegin + 1;
+      result.emplace_back(it1, it2);
+      for (; it2 != itEnd; ++it1, ++it2) {
+        if (not(*it1 == *it2)) {
+          result.emplace_back(it2, it2);
+        }
+        ++result.back().second;
+      }
+      return result;
+    }
+
+    /**
+     *  Counts the number of repetitions for each unique value in a range. Unique values must be adjacent.
+     */
+    template <class It, class AEqual>
+    std::vector<Range<It> > unique_ranges(It itBegin, It itEnd, const AEqual& equal)
+    {
+      std::vector<Range<It> > result;
+      if (itBegin == itEnd) return result;
+      It it1 = itBegin;
+      It it2 = itBegin + 1;
+      result.emplace_back(it1, it2);
+      for (; it2 != itEnd; ++it1, ++it2) {
+        if (not equal(*it1, *it2)) {
+          result.emplace_back(it2, it2);
+        }
+        ++result.back().second;
+      }
+      return result;
     }
 
     /**
@@ -129,5 +230,23 @@ namespace Belle2 {
       }
       return result;
     }
+
+    /**
+     * Shortcut for applying the std::any_of function.
+     */
+    template <class Ts, class AUnaryPredicate>
+    bool any(const Ts& ts, const AUnaryPredicate& comparator)
+    {
+      return std::any_of(std::begin(ts), std::end(ts), comparator);
+    }
+
+    /**
+     * Shortcut for applying std::find(..) != end.
+     */
+    template <class Ts, class AItem>
+    bool is_in(const AItem& item, const Ts& ts)
+    {
+      return std::find(std::begin(ts), std::end(ts), item) != std::end(ts);
+    };
   }
 }

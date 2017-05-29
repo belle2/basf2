@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
-#include <tracking/trackFindingCDC/ca/Relation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 #include <boost/range/iterator_range.hpp>
 
@@ -46,7 +46,7 @@ namespace Belle2 {
       virtual Weight operator()(const CDCSegmentTriple& from  __attribute__((unused)),
                                 const CDCSegmentTriple& to  __attribute__((unused)))
       {
-        return NAN;
+        return 1;
       }
 
       /** Main filter method overriding the filter interface method.
@@ -56,8 +56,8 @@ namespace Belle2 {
       {
         const CDCSegmentTriple* ptrFrom(relation.first);
         const CDCSegmentTriple* ptrTo(relation.second);
-        if (not ptrFrom or not ptrTo) return NAN;
-        return operator()(*ptrFrom, *ptrTo);
+        if ((ptrFrom == nullptr) or (ptrTo == nullptr)) return NAN;
+        return this->operator()(*ptrFrom, *ptrTo);
       }
     };
   }

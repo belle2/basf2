@@ -16,10 +16,10 @@
 #include <arich/dbobjects/ARICHHapdChipInfo.h>
 #include <arich/dbobjects/ARICHHapdInfo.h>
 #include <arich/dbobjects/ARICHHapdQE.h>
+#include <arich/dbobjects/ARICHMagnetTest.h>
 #include <arich/dbobjects/ARICHModuleTest.h>
 #include <arich/dbobjects/ARICHSensorModuleInfo.h>
 #include <arich/dbobjects/ARICHSensorModuleMap.h>
-#include <arich/dbobjects/ARICHGeometryConfig.h>
 
 // database classes used by simulation/reconstruction software
 #include <arich/dbobjects/ARICHChannelMask.h>
@@ -158,6 +158,24 @@ void ARICHDatabaseImporter::importModulesInfo()
   importObj.construct(modInfo);
   importObj.import(iov);
 
+}
+
+void ARICHDatabaseImporter::setHAPDQE(unsigned modID, double qe, bool import)
+{
+
+  DBObjPtr<ARICHModulesInfo> modInfo;
+  if (modID < 1 || modID > 420) { B2ERROR("Module ID out of range!"); return;}
+
+  for (int k = 0; k < 144; k++) {
+    modInfo->setChannelQE(modID, k, qe);
+  }
+
+  if (import) {
+    IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+    DBImportObjPtr<ARICHModulesInfo> importObj;
+    importObj.construct(*modInfo);
+    importObj.import(iov);
+  }
 }
 
 
@@ -555,7 +573,7 @@ void ARICHDatabaseImporter::exportAerogelInfo()
     // Get entries from TClonesArray and print aerogel info
     (*elements).GetEntries();
     for (int i = 0; i < elements->GetSize(); i++) {
-      ARICHAerogelInfo* myelement = (ARICHAerogelInfo*)elements->At(i);
+      ARICHAerogelInfo* myelement = static_cast<ARICHAerogelInfo*>(elements->At(i));
       B2INFO("Version = " << myelement->getAerogelVersion() << ", SN = " << myelement->getAerogelSerial() << ", n = " << myelement->getAerogelRefractiveIndex() << ", trl = " << myelement->getAerogelTransmissionLength() << ", thickness = " << myelement->getAerogelThickness());
     }
   */
@@ -654,7 +672,7 @@ void ARICHDatabaseImporter::exportAerogelInfoEventDep()
   EventMetaData event = EventMetaData(1200, 4, 0); // (event, run, exp)
 
   // Extract object and IOV from database
-  std::pair<TObject*, IntervalOfValidity> podatki = Database::Instance().getData(event, "dbstore", "ARICHAerogelInfoEventDep");
+  std::pair<TObject*, IntervalOfValidity> podatki = Database::Instance().getData(event, "ARICHAerogelInfoEventDep");
 
   // print interval of validity
 //  IntervalOfValidity iov = std::get<1>(podatki);
@@ -2083,12 +2101,12 @@ void ARICHDatabaseImporter::importModuleTest(const std::string& mypath, const st
 
       for (unsigned int i = 0; i < deadChs.size(); i++)  {
         string CH = deadChs.at(i);
-        int channelDelay = 0;
-        if (CH.find("B") != string::npos) channelDelay = 36;
-        if (CH.find("C") != string::npos) channelDelay = 2 * 36;
-        if (CH.find("D") != string::npos) channelDelay = 3 * 36;
+        int CHint = -1;
+        if (CH.find("B") != string::npos) CHint = atoi((CH.substr(1)).c_str()) + 36;
+        else if (CH.find("C") != string::npos) CHint = atoi((CH.substr(1)).c_str()) + 2 * 36;
+        else if (CH.find("D") != string::npos) CHint = atoi((CH.substr(1)).c_str()) + 3 * 36;
+        else CHint = atoi((CH.substr(1)).c_str());
 
-        int CHint = atoi((CH.substr(1)).c_str()) + channelDelay;
         deadChannels.push_back(CHint);
       }
     }
@@ -2295,7 +2313,6 @@ void ARICHDatabaseImporter::exportModuleTest(const std::string& HVtest)
       }
     }
   }
-
 }
 
 void ARICHDatabaseImporter::importSensorModuleInfo()
@@ -2340,7 +2357,7 @@ void ARICHDatabaseImporter::importSensorModuleInfo()
       }
     }
 
-    DBArray<ARICHModuleTest> elementsModule("ARICHModuleTest");
+    DBArray<ARICHModuleTest> elementsModule("ARICHModuleTestHV");
     elementsModule.getEntries();
     for (const auto& element : elementsModule) {
       if (element.getFebSN() == febSerial) {
@@ -2404,8 +2421,6 @@ void ARICHDatabaseImporter::importSensorModuleMap()
   Database::Instance().storeData("ARICHSensorModuleMap", &moduleMapConstants, iov);
 }
 
-
-
 void ARICHDatabaseImporter::exportSensorModuleMap()
 {
   DBArray<ARICHSensorModuleMap> elements("ARICHSensorModuleMap");
@@ -2426,7 +2441,78 @@ void ARICHDatabaseImporter::exportSensorModuleMap()
              newestelement->getGain());
     }
   }
+}
 
+
+void ARICHDatabaseImporter::importMagnetTest()
+{
+  GearDir content = GearDir("/ArichData/AllData/magnetTest");
+
+  // define data array
+  TClonesArray magnetConstants("Belle2::ARICHMagnetTest");
+  int num = 0;
+  string sn = "";
+
+  // loop over xml files and extract the data
+  for (const auto& module : content.getNodes("module")) {
+    // save data as an element of the array
+    new(magnetConstants[num]) ARICHMagnetTest();
+    auto* magnetConst = static_cast<ARICHMagnetTest*>(magnetConstants[num]);
+
+    int snint = module.getInt("hapdID");
+    if (snint < 5000) sn = "KA";
+    else sn = "ZJ";
+    char hapdID[6];
+    sprintf(hapdID, "%s%04d", sn.c_str(), snint);
+    magnetConst->setSerialNumber(hapdID);
+
+    vector<float> deadtimes;
+    for (const auto& time : module.getNodes("deadtime/measurement")) {
+      if (time.getString(".") != "-") {
+        float deadtime = (float) time.getDouble(".");
+        deadtimes.push_back(deadtime);
+      }
+    }
+    magnetConst->setDeadTime(deadtimes);
+
+    if (module.getString("lowerA") != "-") magnetConst->setDeadTimeLowerA((float) module.getDouble("lowerA"));
+    if (module.getString("lowerB") != "-") magnetConst->setDeadTimeLowerB((float) module.getDouble("lowerB"));
+    if (module.getString("lowerC") != "-") magnetConst->setDeadTimeLowerC((float) module.getDouble("lowerC"));
+    if (module.getString("lowerD") != "-") magnetConst->setDeadTimeLowerD((float) module.getDouble("lowerD"));
+
+    bool getter_reactivation = module.getBool("getter");
+    string comment = module.getString("comment");
+    magnetConst->setGetter(getter_reactivation);
+    magnetConst->setComment(comment);
+
+    num++;
+  }
+
+  // define interval of validity
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+
+  // store under default name:
+  Database::Instance().storeData("ARICHMagnetTest", &magnetConstants, iov);
+}
+
+void ARICHDatabaseImporter::exportMagnetTest()
+{
+
+  DBArray<ARICHMagnetTest> elements("ARICHMagnetTest");
+  elements.getEntries();
+
+  for (const auto& element : elements) {
+    string getter = "no";
+    if (element.getGetter() == 1) getter = "yes";
+    B2INFO("SN = " << element.getSerialNumber() << "; after getter reactivation? " << getter);
+    for (int i = 0; i < element.getDeadTimeSize();
+         i++)  B2INFO("dead time = " << element.getDeadTime(i) << " (" << (i + 1) << ". measurement)");
+    if (element.getDeadTimeLowerA() > 0.) B2INFO("lower voltage on chip A = " << element.getDeadTimeLowerA());
+    if (element.getDeadTimeLowerB() > 0.) B2INFO("lower voltage on chip B = " << element.getDeadTimeLowerB());
+    if (element.getDeadTimeLowerC() > 0.) B2INFO("lower voltage on chip C = " << element.getDeadTimeLowerC());
+    if (element.getDeadTimeLowerD() > 0.) B2INFO("lower voltage on chip D = " << element.getDeadTimeLowerD());
+    B2INFO("comment = " << element.getComment());
+  }
 }
 
 void ARICHDatabaseImporter::exportAll()

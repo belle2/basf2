@@ -76,24 +76,24 @@ namespace Belle2 {
       Module(void);
 
       //! Constructor with explicit values (for RPC module)
-      Module(double             phiStripWidth,
-             int                phiStripMin,
-             int                phiStripMax,
-             double             zStripWidth,
-             int                zStripNumber,
-             CLHEP::Hep3Vector  globalOrigin,
-             CLHEP::Hep3Vector  localReconstructionShift,
-             CLHEP::HepRotation rotation);
+      Module(double                    phiStripWidth,
+             int                       phiStripMin,
+             int                       phiStripMax,
+             double                    zStripWidth,
+             int                       zStripNumber,
+             const CLHEP::Hep3Vector&  globalOrigin,
+             const CLHEP::Hep3Vector&  localReconstructionShift,
+             const CLHEP::HepRotation& rotation);
 
       //! Constructor with explicit values (for scint module)
-      Module(double             stripWidth,
-             int                phiStripNumber,
-             int                phiSensorSide,
-             int                zStripNumber,
-             CLHEP::Hep3Vector  globalOrigin,
-             CLHEP::Hep3Vector  localReconstructionShift,
-             CLHEP::HepRotation rotation,
-             bool               isFlipped);
+      Module(double                    stripWidth,
+             int                       phiStripNumber,
+             int                       phiSensorSide,
+             int                       zStripNumber,
+             const CLHEP::Hep3Vector&  globalOrigin,
+             const CLHEP::Hep3Vector&  localReconstructionShift,
+             const CLHEP::HepRotation& rotation,
+             bool                      isFlipped);
 
       //! Copy constructor
       Module(const Module& m);

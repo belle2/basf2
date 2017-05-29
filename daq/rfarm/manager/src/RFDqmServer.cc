@@ -130,6 +130,14 @@ int RFDqmServer::Restart(NSMmsg*, NSMcontext*)
 void RFDqmServer::server()
 {
   while (true) {
+    pid_t pid = m_proc->CheckProcess();
+    if (pid > 0) {
+      printf("RFDqmServer : process dead. pid=%d\n", pid);
+      if (pid == m_pid_dqm)
+        m_log->Error("RFDqmServer : Hserver process dead. pid=%d\n", pid);
+      else if (pid == m_pid_relay)
+        m_log->Error("RFDqmServer : Hrelay process dead. pid=%d\n", pid);
+    }
     int st = m_proc->CheckOutput();
     if (st < 0) {
       perror("RFDqmServer::server");

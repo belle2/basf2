@@ -36,4 +36,8 @@ namespace Belle2 {
   using SVDCoordinateMeasurementCreator = CoordinateMeasurementCreator<RecoHitInformation::UsedSVDHit, Const::SVD>;
   /// Hit to reco hit measurement creator for the PXD.
   using PXDCoordinateMeasurementCreator = CoordinateMeasurementCreator<RecoHitInformation::UsedPXDHit, Const::PXD>;
+  /// Hit to reco hit measurement creator for the BKLM.
+  using BKLMCoordinateMeasurementCreator = CoordinateMeasurementCreator<RecoHitInformation::UsedBKLMHit, Const::BKLM>;
+  /// Hit to reco hit measurement creator for the EKLM.
+  using EKLMCoordinateMeasurementCreator = CoordinateMeasurementCreator<RecoHitInformation::UsedEKLMHit, Const::EKLM>;
 }

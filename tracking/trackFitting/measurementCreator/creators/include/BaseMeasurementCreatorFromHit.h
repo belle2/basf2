@@ -83,6 +83,10 @@ namespace Belle2 {
   using SVDBaseMeasurementCreator = BaseMeasurementCreatorFromHit<RecoHitInformation::UsedSVDHit, Const::SVD>;
   /// Standard base class for PXD measurement creators.
   using PXDBaseMeasurementCreator = BaseMeasurementCreatorFromHit<RecoHitInformation::UsedPXDHit, Const::PXD>;
+  /// Standard base class for BKLM measurement creators.
+  using BKLMBaseMeasurementCreator = BaseMeasurementCreatorFromHit<RecoHitInformation::UsedBKLMHit, Const::BKLM>;
+  /// Standard base class for EKLM measurement creators.
+  using EKLMBaseMeasurementCreator = BaseMeasurementCreatorFromHit<RecoHitInformation::UsedEKLMHit, Const::EKLM>;
 
   /** CDC hits are a special case, as they must be WireTrackCandHits, not TrackCandHits. **/
   template<>

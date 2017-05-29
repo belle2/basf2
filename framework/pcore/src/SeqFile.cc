@@ -23,7 +23,7 @@ using namespace Belle2;
 using namespace std;
 namespace io = boost::iostreams;
 
-SeqFile::SeqFile(const std::string& filename, const std::string& rwflag):
+SeqFile::SeqFile(const std::string& filename, const std::string& rwflag, char* streamerinfo, int streamerinfo_size):
   m_filename(filename)
 {
   if (filename.empty()) {
@@ -37,6 +37,17 @@ SeqFile::SeqFile(const std::string& filename, const std::string& rwflag):
   if (m_compressed) {
     m_filename = filename.substr(0, filename.size() - 3);
   }
+
+
+  // Store StreamerInfo 2017.5.8
+  m_streamerinfo = NULL;
+  m_streamerinfo_size = 0;
+  if (streamerinfo != NULL && streamerinfo_size > 0) {
+    m_streamerinfo_size = streamerinfo_size;
+    m_streamerinfo = new char[ m_streamerinfo_size ];
+    memcpy(m_streamerinfo, streamerinfo, m_streamerinfo_size);
+  }
+
   // open the file
   openFile(m_filename, readonly);
   // if that fails and it's not already assumed to be compressed try again adding .gz to the name
@@ -52,10 +63,12 @@ SeqFile::SeqFile(const std::string& filename, const std::string& rwflag):
   } else {
     B2INFO("SeqFile: " << m_filename << " opened (fd=" << m_fd << ")");
   }
+
 }
 
 void SeqFile::openFile(std::string filename, bool readonly)
 {
+
   // add compression suffix if file is supposed to be compressed
   if (m_compressed) filename += ".gz";
   if (!readonly) {
@@ -66,6 +79,27 @@ void SeqFile::openFile(std::string filename, bool readonly)
     filter->push(io::file_descriptor_sink(m_fd, io::close_handle));
     filter->exceptions(ios_base::badbit | ios_base::failbit);
     m_stream.reset(filter);
+
+    //
+    // Write StreamerInfo  (2017.5.8)
+    //
+    if (m_streamerinfo == NULL || m_streamerinfo_size <= 0) {
+      // If you want to use SeqFile for non-sroot file type, please skip this B2FATAL
+      B2FATAL("Invalid size of StreamerInfo : " << m_streamerinfo_size << "bytes");
+    } else {
+      std::ostream* out = dynamic_cast<std::ostream*>(m_stream.get());
+      if (!out) {
+        B2FATAL("SeqFile::write() called on a file opened in read mode");
+      }
+      try {
+        out->write(m_streamerinfo, m_streamerinfo_size);
+        B2INFO("Wrote StreamerInfo at the begenning of the file. : " << m_streamerinfo_size << "bytes");
+      } catch (ios_base::failure& e) {
+
+        B2ERROR("SeqFile::openFile() error: " << e.what() << ", " << strerror(errno));
+      }
+    }
+
   } else {
     //open file in read mode and set stream correctly
     m_fd = open(filename.c_str(), O_RDONLY);
@@ -75,12 +109,13 @@ void SeqFile::openFile(std::string filename, bool readonly)
     filter->exceptions(ios_base::badbit | ios_base::failbit);
     m_stream.reset(filter);
   }
-  // reset number of written bytes
+  // reset number of written bytes (does not include streamerinfo )
   m_nb = 0;
 }
 
 SeqFile::~SeqFile()
 {
+  if (m_streamerinfo != NULL) delete m_streamerinfo;
   B2INFO("Closing SeqFile " << m_nfile);
   //closed automatically by m_stream.
 }

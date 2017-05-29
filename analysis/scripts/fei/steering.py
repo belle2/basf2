@@ -15,7 +15,7 @@ import ROOT
 
 # Import basf2
 from basf2 import *
-from modularAnalysis import applyCuts, buildRestOfEvent
+from modularAnalysis import applyCuts, buildRestOfEvent, setAnalysisConfigParams
 # Should come after basf2 import
 import pdg
 
@@ -321,6 +321,7 @@ def fullEventInterpretation(signalParticleList, selection_path, particles, datab
             make_code_pickable('import ROOT\n'
                                'from ROOT import Belle2\n'
                                'ROOT.Belle2.BFieldManager.getInstance().setConstantOverride(0, 0, 1.5 * ROOT.Belle2.Unit.T)')
+            setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
         else:
             path.add_module('Gearbox')
             path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])

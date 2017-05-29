@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
-#include <tracking/trackFindingCDC/ca/Relation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -25,6 +25,8 @@ namespace Belle2 {
       "from_middle_cos_delta",
       "to_middle_cos_delta",
 
+
+      "alpha_0",
       "chi2_0",
       "chi2_0_per_s",
       "erf_0",

@@ -5,9 +5,9 @@
 #include <framework/gearbox/Unit.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <framework/dataobjects/EventT0.h>
 
 #include <cmath>
 #include <TFile.h>
@@ -255,7 +255,7 @@ NeuroTrigger::selectMLP(const CDCTriggerTrack& track)
   }
 
   float phi0 = track.getPhi0();
-  float invpt = track.getKappa();
+  float invpt = track.getKappa(1.5);
   float theta = atan2(1., track.getCotTheta());
 
   // find sector
@@ -265,7 +265,7 @@ NeuroTrigger::selectMLP(const CDCTriggerTrack& track)
   for (unsigned isector = 0; isector < m_MLPs.size(); ++isector) {
     if (m_MLPs[isector].inPhiRange(phi0) && m_MLPs[isector].inInvptRange(invpt)
         && m_MLPs[isector].inThetaRange(theta)) {
-      unsigned long hitPattern = getInputPattern(isector);
+      unsigned long hitPattern = getInputPattern(isector, track);
       unsigned long sectorPattern = m_MLPs[isector].getSLpattern();
       B2DEBUG(250, "hitPattern " << hitPattern << " sectorPattern " << sectorPattern);
       // no hit pattern restriction -> keep looking for exact match
@@ -291,24 +291,13 @@ NeuroTrigger::selectMLP(const CDCTriggerTrack& track)
 }
 
 vector<int>
-NeuroTrigger::selectMLPs(const CDCTriggerTrack& track,
-                         const MCParticle& mcparticle, bool selectByMC)
+NeuroTrigger::selectMLPs(float phi0, float invpt, float theta)
 {
   vector<int> indices = {};
 
   if (m_MLPs.size() == 0) {
     B2WARNING("Trying to select MLP before initializing MLPs.");
     return indices;
-  }
-
-  float phi0 = track.getPhi0();
-  float invpt = track.getKappa();
-  float theta = atan2(1., track.getCotTheta());
-
-  if (selectByMC) {
-    phi0 = mcparticle.getMomentum().Phi();
-    invpt = mcparticle.getCharge() / mcparticle.getMomentum().Pt();
-    theta = mcparticle.getMomentum().Theta();
   }
 
   // find all matching sectors
@@ -346,20 +335,19 @@ NeuroTrigger::updateTrack(const CDCTriggerTrack& track)
 void
 NeuroTrigger::updateTrackFix(const CDCTriggerTrack& track)
 {
-  unsigned precisionOmega = m_precision[0];
-  unsigned precisionPhi = m_precision[1];
-  unsigned precisionAlpha = m_precision[2];
-  unsigned precisionId = m_precision[3];
-  unsigned precisionScale = m_precision[4];
+  unsigned precisionPhi = m_precision[0];
+  unsigned precisionAlpha = m_precision[0];
+  unsigned precisionScale = m_precision[1];
+  unsigned precisionId = m_precision[2];
 
-  long omega = round(track.getOmega() * (1 << precisionOmega));
+  double omega = track.getOmega();
   long phi = round(track.getPhi0() * (1 << precisionPhi));
   for (int iSL = 0; iSL < 9; ++iSL) {
     for (int priority = 0; priority < 2; ++priority) {
       // LUT, calculated on the fly here
       m_alpha[iSL][priority] =
-        (m_radius[iSL][priority] * abs(omega) < (2 << precisionOmega)) ?
-        round(asin(m_radius[iSL][priority] * omega / (2 << precisionOmega)) * (1 << precisionAlpha)) :
+        (m_radius[iSL][priority] * abs(omega) < 2) ?
+        round(asin(m_radius[iSL][priority] * omega / 2) * (1 << precisionAlpha)) :
         round(M_PI_2 * (1 << precisionAlpha));
       long dphi = (precisionAlpha >= precisionPhi) ?
                   phi - (long(m_alpha[iSL][priority]) >> (precisionAlpha - precisionPhi)) :
@@ -386,18 +374,46 @@ NeuroTrigger::getRelId(const CDCTriggerSegmentHit& hit)
 }
 
 unsigned long
-NeuroTrigger::getInputPattern(unsigned isector)
+NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track)
 {
-  StoreArray<CDCTriggerSegmentHit> hits;
+  StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
+  StoreObjPtr<EventT0> eventTime(m_eventTimeName);
+  bool hasT0 = eventTime->hasBinnedEventT0(Const::CDC);
+  int T0 = (hasT0) ? eventTime->getBinnedEventT0(Const::CDC) : 0;
   CDCTriggerMLP& expert = m_MLPs[isector];
   unsigned long hitPattern = 0;
   vector<unsigned> nHits;
   nHits.assign(9, 0);
-  // loop over hits
+  // loop over axial hits related to input track
+  RelationVector<CDCTriggerSegmentHit> axialHits =
+    track.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
+  for (unsigned ihit = 0; ihit < axialHits.size(); ++ ihit) {
+    // skip hits with negative relation weight (not selected in finder)
+    if (axialHits.weight(ihit) < 0) continue;
+    unsigned short iSL = axialHits[ihit]->getISuperLayer();
+    // skip stereo hits (should not be related to track, but check anyway)
+    if (iSL % 2 == 1) continue;
+    // get priority time
+    int t = (hasT0) ? axialHits[ihit]->priorityTime() - T0 : 0;
+    if (t < 0 || t > expert.getTMax()) continue;
+    double relId = getRelId(*axialHits[ihit]);
+    if (expert.isRelevant(relId, iSL)) {
+      if (nHits[iSL] < expert.getMaxHitsPerSL()) {
+        hitPattern |= 1 << (iSL + 9 * nHits[iSL]);
+        ++nHits[iSL];
+      }
+      B2DEBUG(250, "hit in SL " << iSL);
+    } else {
+      B2DEBUG(250, "hit in SL " << iSL << " not relevant (relId = " << relId << ")");
+    }
+  }
+  // loop over stereo hits
   for (int ihit = 0; ihit < hits.getEntries(); ++ ihit) {
     unsigned short iSL = hits[ihit]->getISuperLayer();
-    // get priority time (TODO: get event time)
-    int t = hits[ihit]->priorityTime();
+    // skip axial hits
+    if (iSL % 2 == 0) continue;
+    // get priority time
+    int t = (hasT0) ? hits[ihit]->priorityTime() - T0 : 0;
     if (t < 0 || t > expert.getTMax()) continue;
     double relId = getRelId(*hits[ihit]);
     if (expert.isRelevant(relId, iSL)) {
@@ -406,6 +422,8 @@ NeuroTrigger::getInputPattern(unsigned isector)
         ++nHits[iSL];
       }
       B2DEBUG(250, "hit in SL " << iSL);
+    } else {
+      B2DEBUG(250, "hit in SL " << iSL << " not relevant (relId = " << relId << ")");
     }
   }
   B2DEBUG(250, "hitPattern " << hitPattern);
@@ -413,10 +431,15 @@ NeuroTrigger::getInputPattern(unsigned isector)
 }
 
 vector<unsigned>
-NeuroTrigger::selectHits(unsigned isector)
+NeuroTrigger::selectHits(unsigned isector, const CDCTriggerTrack& track,
+                         bool returnAllRelevant)
 {
-  StoreArray<CDCTriggerSegmentHit> hits;
+  StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
+  StoreObjPtr<EventT0> eventTime(m_eventTimeName);
+  bool hasT0 = eventTime->hasBinnedEventT0(Const::CDC);
+  int T0 = (hasT0) ? eventTime->getBinnedEventT0(Const::CDC) : 0;
   CDCTriggerMLP& expert = m_MLPs[isector];
+  vector<unsigned> selectedHitIds = {};
   // prepare vectors to keep best drift times, left/right and selected hit IDs
   vector<int> tMin;
   tMin.assign(expert.nNodesLayer(0), expert.getTMax());
@@ -426,17 +449,74 @@ NeuroTrigger::selectHits(unsigned isector)
   hitIds.assign(expert.nNodesLayer(0), -1);
   vector<unsigned> nHits;
   nHits.assign(9, 0);
-  // loop over hits, choosing up to MaxHitsPerSL per superlayer
-  B2DEBUG(250, "start hit loop");
-  for (int ihit = 0; ihit < hits.getEntries(); ++ ihit) {
-    unsigned short iSL = hits[ihit]->getISuperLayer();
+
+  // loop over axial hits related to input track
+  RelationVector<CDCTriggerSegmentHit> axialHits =
+    track.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
+  B2DEBUG(250, "start axial hit loop");
+  for (unsigned ihit = 0; ihit < axialHits.size(); ++ihit) {
+    // skip hits with negative relation weight (not selected in finder)
+    if (axialHits.weight(ihit) < 0) continue;
+    unsigned short iSL = axialHits[ihit]->getISuperLayer();
+    // skip stereo hits (should not be related to track, but check anyway)
+    if (iSL % 2 == 1) continue;
     if (expert.getSLpatternUnmasked() != 0 &&
         !((expert.getSLpatternUnmasked() >> iSL) & 1)) {
       B2DEBUG(250, "skipping hit in SL " << iSL);
       continue;
     }
-    // get priority time (TODO: get event time) and apply time window cut
-    int t = hits[ihit]->priorityTime();
+    // get priority time and apply time window cut
+    int t = (hasT0) ? axialHits[ihit]->priorityTime() - T0 : 0;
+    if (t < 0 || t > expert.getTMax()) continue;
+    double relId = getRelId(*axialHits[ihit]);
+    if (expert.isRelevant(relId, iSL)) {
+      // get reference hit (worst of existing hits)
+      unsigned short iRef = iSL;
+      if (expert.getMaxHitsPerSL() > 1) {
+        if (nHits[iSL] < expert.getMaxHitsPerSL() &&
+            (expert.getSLpatternUnmasked() >> (iSL + 9 * nHits[iSL])) & 1) {
+          iRef += 9 * nHits[iSL];
+          ++nHits[iSL];
+        } else {
+          for (unsigned compare = iSL; compare < iSL + 9 * nHits[iSL]; compare += 9) {
+            if ((LRknown[iRef] && !LRknown[compare]) ||
+                (LRknown[iRef] == LRknown[compare] && tMin[iRef] < tMin[compare]))
+              iRef = compare;
+          }
+        }
+      }
+      // choose best hit (LR known before LR unknown, then shortest drift time)
+      bool useHit = false;
+      if (LRknown[iRef]) {
+        useHit = (axialHits[ihit]->LRknown() && t <= tMin[iRef]);
+      } else {
+        useHit = (axialHits[ihit]->LRknown() || t <= tMin[iRef]);
+      }
+      B2DEBUG(250, "relevant wire SL " << iSL << " LR " << axialHits[ihit]->getLeftRight()
+              << " t " << t << " iRef " << iRef << " useHit " << useHit);
+      if (useHit) {
+        // keep drift time and LR
+        LRknown[iRef] = axialHits[ihit]->LRknown();
+        tMin[iRef] = t;
+        hitIds[iRef] = axialHits[ihit]->getArrayIndex();
+      }
+      if (returnAllRelevant) selectedHitIds.push_back(axialHits[ihit]->getArrayIndex());
+    }
+  }
+
+  // loop over stereo hits, choosing up to MaxHitsPerSL per superlayer
+  B2DEBUG(250, "start stereo hit loop");
+  for (int ihit = 0; ihit < hits.getEntries(); ++ ihit) {
+    unsigned short iSL = hits[ihit]->getISuperLayer();
+    // skip axial hits
+    if (iSL % 2 == 0) continue;
+    if (expert.getSLpatternUnmasked() != 0 &&
+        !((expert.getSLpatternUnmasked() >> iSL) & 1)) {
+      B2DEBUG(250, "skipping hit in SL " << iSL);
+      continue;
+    }
+    // get priority time and apply time window cut
+    int t = (hasT0) ? hits[ihit]->priorityTime() - T0 : 0;
     if (t < 0 || t > expert.getTMax()) continue;
     double relId = getRelId(*hits[ihit]);
     if (expert.isRelevant(relId, iSL)) {
@@ -470,12 +550,15 @@ NeuroTrigger::selectHits(unsigned isector)
         tMin[iRef] = t;
         hitIds[iRef] = ihit;
       }
+      if (returnAllRelevant) selectedHitIds.push_back(ihit);
     }
   }
+
   // save selected hit Ids
-  vector<unsigned> selectedHitIds = {};
-  for (unsigned iHit = 0; iHit < hitIds.size(); ++iHit) {
-    if (hitIds[iHit] >= 0) selectedHitIds.push_back(hitIds[iHit]);
+  if (!returnAllRelevant) {
+    for (unsigned iHit = 0; iHit < hitIds.size(); ++iHit) {
+      if (hitIds[iHit] >= 0) selectedHitIds.push_back(hitIds[iHit]);
+    }
   }
   return selectedHitIds;
 }
@@ -483,7 +566,10 @@ NeuroTrigger::selectHits(unsigned isector)
 vector<float>
 NeuroTrigger::getInputVector(unsigned isector, const vector<unsigned>& hitIds)
 {
-  StoreArray<CDCTriggerSegmentHit> hits;
+  StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
+  StoreObjPtr<EventT0> eventTime(m_eventTimeName);
+  bool hasT0 = eventTime->hasBinnedEventT0(Const::CDC);
+  int T0 = (hasT0) ? eventTime->getBinnedEventT0(Const::CDC) : 0;
   CDCTriggerMLP& expert = m_MLPs[isector];
   // prepare empty input vector and vectors to keep best drift times
   vector<float> inputVector;
@@ -496,7 +582,7 @@ NeuroTrigger::getInputVector(unsigned isector, const vector<unsigned>& hitIds)
     unsigned short iSL = hits[ihit]->getISuperLayer();
     unsigned short iRef = iSL + 9 * nHits[iSL];
     ++nHits[iSL];
-    int t = hits[ihit]->priorityTime();
+    int t = (hasT0) ? hits[ihit]->priorityTime() - T0 : 0;
     int LR = hits[ihit]->getLeftRight();
     double relId = getRelId(*hits[ihit]);
     int priority = hits[ihit]->getPriorityPosition();
@@ -541,10 +627,10 @@ NeuroTrigger::runMLP(unsigned isector, vector<float> input)
 vector<float>
 NeuroTrigger::runMLPFix(unsigned isector, vector<float> input)
 {
-  unsigned precisionInput = m_precision[5];
-  unsigned precisionWeights = m_precision[6];
-  unsigned precisionLUT = m_precision[7];
-  unsigned precisionTanh = m_precision[5];
+  unsigned precisionInput = m_precision[3];
+  unsigned precisionWeights = m_precision[4];
+  unsigned precisionLUT = m_precision[5];
+  unsigned precisionTanh = m_precision[3];
   unsigned dp = precisionInput + precisionWeights - precisionLUT;
 
   const CDCTriggerMLP& expert = m_MLPs[isector];

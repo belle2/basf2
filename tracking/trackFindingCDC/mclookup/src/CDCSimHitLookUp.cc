@@ -297,8 +297,7 @@ const CDCWireHit* CDCSimHitLookUp::getWireHit(const CDCHit* ptrHit,
                                               const std::vector<CDCWireHit>& wireHits) const
 {
   if (not ptrHit) return nullptr;
-  ConstVectorRange<CDCWireHit> wireHit =
-    std::equal_range(wireHits.begin(), wireHits.end(), *ptrHit);
+  ConstVectorRange<CDCWireHit> wireHit{std::equal_range(wireHits.begin(), wireHits.end(), *ptrHit)};
 
   if (wireHit.empty()) {
     return nullptr;
@@ -314,7 +313,7 @@ CDCRLWireHit CDCSimHitLookUp::getRLWireHit(const CDCHit* ptrHit,
   double driftLength = getDriftLength(ptrHit);
   const CDCWireHit* wireHit = getWireHit(ptrHit, wireHits);
   B2ASSERT("Could not find CDCWireHit for the requested hit", wireHit);
-  return CDCRLWireHit(wireHit, rlInfo, driftLength);
+  return CDCRLWireHit(wireHit, rlInfo, driftLength, CDCWireHit::c_simpleDriftLengthVariance);
 }
 
 CDCRecoHit3D CDCSimHitLookUp::getRecoHit3D(const CDCHit* ptrHit,

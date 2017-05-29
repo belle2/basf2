@@ -72,6 +72,10 @@ SPTCRefereeModule::SPTCRefereeModule() : Module()
            "WARNING: still need to find out the units that are used internally! Reset origin to given point. Used for determining the direction of flight of a particle for a given hit. Needs to be reset for e.g. testbeam, where origin is not at (0,0,0)",
            defaultOrigin);
 
+
+  addParam("minNumSpacePoints", m_PARAMminNumSpacePoints, "minimum number of space points that a track candidate has to "
+           "contain (added later, set to 0 to reproduce old behavior", 0);
+
   // initialize counters (cppcheck)
   initializeCounters();
 }
@@ -124,6 +128,8 @@ void SPTCRefereeModule::initialize()
 // ======================================================================== EVENT =================================================
 void SPTCRefereeModule::event()
 {
+  B2DEBUG(10, endl << "Entering event() function" << endl);
+
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   const int eventCtr = eventMetaDataPtr->getEvent();
   B2DEBUG(10, "SpacePoint2TrueHitConnector::event(). Processing event " << eventCtr << " -----------------------");
@@ -139,6 +145,8 @@ void SPTCRefereeModule::event()
     SpacePointTrackCand* trackCand = trackCands[iTC];
     B2DEBUG(20, "Processing SpacePointTrackCand " << iTC << ": It has " << trackCand->getNHits() << " SpacePoints in it");
 
+
+
     if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 200, PACKAGENAME())) { trackCand->print(); }
     B2DEBUG(50, "refereeStatus of TrackCand before tests: " << trackCand->getRefereeStatus() << " -> " <<
             trackCand->getRefereeStatusString());
@@ -149,6 +157,10 @@ void SPTCRefereeModule::event()
     }
     bool allChecksClean = true; // assume that all tests will be passed, change to false if one of them fails
     CheckInfo prevChecksInfo;
+
+    //added check for the number of space points in the track candidate
+    if ((int)(trackCand->getNHits()) < m_PARAMminNumSpacePoints) allChecksClean = false;
+
 
     if (m_PARAMcheckSameSensor) { // check same sensors if desired
       const std::vector<int> sameSensorInds = checkSameSensor(trackCand);
@@ -256,6 +268,10 @@ const std::vector<int> SPTCRefereeModule::checkSameSensor(Belle2::SpacePointTrac
   std::vector<int> sameSensorInds; // return vector
 
   std::vector<const SpacePoint*> spacePoints = trackCand->getHits();
+
+  // catch cases where the TC has no space points! (Yes that happens!)
+  if (spacePoints.size() == 0) return sameSensorInds;
+
   VxdID lastSensorId = spacePoints.at(0)->getVxdID();
 
   for (unsigned int iSp = 1; iSp < spacePoints.size(); ++iSp) {
@@ -281,6 +297,10 @@ const std::vector<int> SPTCRefereeModule::checkMinDistance(Belle2::SpacePointTra
   std::vector<int> lowDistanceInds; // return vector
 
   std::vector<const SpacePoint*> spacePoints = trackCand->getHits();
+
+  // catch case where the track candidate has no spacepoints
+  if (spacePoints.size() == 0) return lowDistanceInds;
+
   B2Vector3F oldPosition = spacePoints.at(0)->getPosition();
 
   for (unsigned int iSp = 1; iSp < spacePoints.size(); ++iSp) {
@@ -333,6 +353,9 @@ SPTCRefereeModule::removeSpacePoints(Belle2::SpacePointTrackCand* trackCand, con
 const std::vector<int> SPTCRefereeModule::checkCurling(Belle2::SpacePointTrackCand* trackCand, bool useMCInfo)
 {
   std::vector<int> splitInds; // return vector
+
+  //catch cases where there are no space points in the trackCand!
+  if (trackCand->getHits().size() == 0) return splitInds;
 
   // Only do curling checking if useMCInfo is false, OR if useMCInfo is true if the SPTCs SpacePoints have been checked for a relation to TrueHits!
   if (!m_PARAMuseMCInfo || trackCand->hasRefereeStatus(SpacePointTrackCand::c_checkedTrueHits)) {

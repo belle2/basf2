@@ -49,5 +49,6 @@ string DecayDescriptorParticle::getNameSimple() const
   erase_all(strNameSimple, "(");
   erase_all(strNameSimple, ")");
   replace_all(strNameSimple, "*", "ST");
+  replace_all(strNameSimple, "'", "p");
   return strNameSimple;
 }

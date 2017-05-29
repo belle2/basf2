@@ -18,11 +18,11 @@ namespace Belle2 {
     namespace PerigeeBinSpec {
 
       /// Hough tree depth and divisions
-      const size_t maxLevel = 13;
+      const int maxLevel = 13;
 
-      const size_t phi0Divisions = 2;
-      const size_t curvDivisions = 2;
-      const size_t impactDivisions = 2;
+      const int phi0Divisions = 2;
+      const int curvDivisions = 2;
+      const int impactDivisions = 2;
 
 
       // Phi0
@@ -32,9 +32,9 @@ namespace Belle2 {
       // const double maxPhi0 = M_PI;
       // const double minPhi0 = -M_PI;
 
-      const size_t discretePhi0Overlap = 4;
-      const size_t discretePhi0Width = 5;
-      const size_t nPhi0Bins = std::pow(phi0Divisions, maxLevel);
+      const int discretePhi0Overlap = 4;
+      const int discretePhi0Width = 5;
+      const int nPhi0Bins = std::pow(phi0Divisions, maxLevel);
       const Phi0BinsSpec phi0BinsSpec(nPhi0Bins,
                                       discretePhi0Overlap,
                                       discretePhi0Width);
@@ -47,9 +47,9 @@ namespace Belle2 {
       const double minCurv = -0.018;
       const double maxCurvAcceptance = 0.13;
 
-      const size_t discreteCurvOverlap = 4;
-      const size_t discreteCurvWidth = 5;
-      const size_t nCurvBins = std::pow(curvDivisions, maxLevel);
+      const int discreteCurvOverlap = 4;
+      const int discreteCurvWidth = 5;
+      const int nCurvBins = std::pow(curvDivisions, maxLevel);
       const CurvBinsSpec curvBinsSpec(minCurv,
                                       maxCurv,
                                       nCurvBins,
@@ -62,9 +62,9 @@ namespace Belle2 {
       const double maxImpact = 100;
       const double minImpact = -100;
 
-      const size_t discreteImpactOverlap = 1;
-      const size_t discreteImpactWidth = 2;
-      const size_t nImpactBins = std::pow(impactDivisions, maxLevel);
+      const int discreteImpactOverlap = 1;
+      const int discreteImpactWidth = 2;
+      const int nImpactBins = std::pow(impactDivisions, maxLevel);
       const ImpactBinsSpec impactBinsSpec(minImpact,
                                           maxImpact,
                                           nImpactBins,

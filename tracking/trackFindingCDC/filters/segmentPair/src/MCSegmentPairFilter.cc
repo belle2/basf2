@@ -21,6 +21,23 @@ MCSegmentPairFilter::MCSegmentPairFilter(bool allowReverse)
 {
 }
 
+void MCSegmentPairFilter::exposeParameters(ModuleParamList* moduleParamList,
+                                           const std::string& prefix)
+{
+  Super::exposeParameters(moduleParamList, prefix);
+  moduleParamList->addParameter(prefixed(prefix, "requireRLPure"),
+                                m_param_requireRLPure,
+                                "Switch to require the segment combination contain mostly correct rl information",
+                                m_param_requireRLPure);
+
+
+  moduleParamList->addParameter(prefixed(prefix, "minSegmentSize"),
+                                m_param_minSegmentSize,
+                                "Minimum segment size to pass as monte carlo truth",
+                                m_param_minSegmentSize);
+
+}
+
 Weight MCSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 {
   const CDCSegment2D* ptrFromSegment = segmentPair.getFromSegment();
@@ -32,12 +49,19 @@ Weight MCSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
   const CDCSegment2D& fromSegment = *ptrFromSegment;
   const CDCSegment2D& toSegment = *ptrToSegment;
 
-  if (fromSegment.size() < 4 or toSegment.size() < 4) return NAN;
+  if (static_cast<int>(fromSegment.size()) < m_param_minSegmentSize or
+      static_cast<int>(toSegment.size()) < m_param_minSegmentSize) {
+    return NAN;
+  }
 
   const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
 
   // Check if the segments are aligned correctly along the Monte Carlo track
-  EForwardBackward pairFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrFromSegment, ptrToSegment);
+  EForwardBackward pairFBInfo =
+    m_param_requireRLPure
+    ? mcSegmentLookUp.areAlignedInMCTrackWithRLCheck(ptrFromSegment, ptrToSegment)
+    : mcSegmentLookUp.areAlignedInMCTrack(ptrFromSegment, ptrToSegment);
+
   if (pairFBInfo == EForwardBackward::c_Invalid) return NAN;
 
   if (pairFBInfo == EForwardBackward::c_Forward or

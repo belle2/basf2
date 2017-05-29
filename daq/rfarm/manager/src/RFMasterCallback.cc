@@ -150,6 +150,8 @@ void RFMasterCallback::ok(const char* nodename, const char* data) throw()
         setState(node, RCState::READY_S);
       } else if (strcmp(data, "Unconfigured") == 0) {
         setState(node, RCState::NOTREADY_S);
+      } else if (strcmp(data, "Stopped") == 0) {
+        setState(node, RCState::READY_S);
       } else if (strcmp(data, "Running") == 0) {
         setState(node, RCState::RUNNING_S);
       } else if (strcmp(data, "Idle") == 0) {
@@ -176,7 +178,7 @@ void RFMasterCallback::error(const char* nodename, const char* data) throw()
   LogFile::warning("Error from unknwon node %s : %s)", nodename, data);
 }
 
-void RFMasterCallback::load(const DBObject&) throw(RCHandlerException)
+void RFMasterCallback::load(const DBObject& db) throw(RCHandlerException)
 {
   for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); it++) {
     NSMNode& node(*it);
@@ -195,11 +197,21 @@ void RFMasterCallback::load(const DBObject&) throw(RCHandlerException)
       }
     }
     if (node.getState() != RCState::READY_S) {
-      if (NSMCommunicator::send(NSMMessage(node, RFCommand::CONFIGURE))) {
-        setState(node, RCState::LOADING_TS);
-        LogFile::debug("%s >> LOADING", node.getName().c_str());
+      if (node.getName() == "ROISENDER") {
+        std::string enabled = std::string("ROI=") + db("roisender").getText("enabled");
+        if (NSMCommunicator::send(NSMMessage(node, RCCommand::LOAD, enabled))) {
+          setState(node, RCState::LOADING_TS);
+          LogFile::debug("%s >> LOADING", node.getName().c_str());
+        } else {
+          throw (RCHandlerException("Failed to configure %s", node.getName().c_str()));
+        }
       } else {
-        throw (RCHandlerException("Failed to configure %s", node.getName().c_str()));
+        if (NSMCommunicator::send(NSMMessage(node, RCCommand::LOAD))) {
+          setState(node, RCState::LOADING_TS);
+          LogFile::debug("%s >> LOADING", node.getName().c_str());
+        } else {
+          throw (RCHandlerException("Failed to configure %s", node.getName().c_str()));
+        }
       }
     } else {
       LogFile::debug("%s is READY", node.getName().c_str());
@@ -240,7 +252,7 @@ void RFMasterCallback::abort() throw(RCHandlerException)
       }
     }
     if (node.getState() != RCState::NOTREADY_S) {
-      if (NSMCommunicator::send(NSMMessage(node, RFCommand::UNCONFIGURE))) {
+      if (NSMCommunicator::send(NSMMessage(node, RCCommand::ABORT))) {
         setState(node, RCState::ABORTING_RS);
         LogFile::debug("%s >> ABORTING", node.getName().c_str());
       } else {
@@ -284,7 +296,7 @@ void RFMasterCallback::start(int /*expno*/, int /*runno*/) throw(RCHandlerExcept
       }
     }
     if (node.getState() != RCState::RUNNING_S) {
-      if (NSMCommunicator::send(NSMMessage(node, RFCommand::START))) {
+      if (NSMCommunicator::send(NSMMessage(node, RCCommand::START))) {
         setState(node, RCState::STARTING_TS);
         LogFile::debug("%s >> STARTING", node.getName().c_str());
       } else {
@@ -311,9 +323,46 @@ void RFMasterCallback::start(int /*expno*/, int /*runno*/) throw(RCHandlerExcept
 
 void RFMasterCallback::stop() throw(RCHandlerException)
 {
-  if (m_callback != NULL) {
-    m_callback->setState(RCState::READY_S);
+  for (NSMNodeList::reverse_iterator it = m_nodes.rbegin();
+       it != m_nodes.rend(); it++) {
+    NSMNode& node(*it);
+    if (node.getName().find("EVP") == std::string::npos) {
+      while (true) {
+        bool unconfigured = true;
+        for (NSMNodeList::reverse_iterator it2 = m_nodes.rbegin();
+             it2 != it; it2++) {
+          if (it2->getState() != RCState::READY_S)
+            unconfigured = false;
+        }
+        if (unconfigured) break;
+        try {
+          perform(NSMCommunicator::select(30));
+        } catch (const TimeoutException& e) {}
+      }
+    }
+    if (node.getState() != RCState::READY_S) {
+      if (NSMCommunicator::send(NSMMessage(node, RCCommand::STOP))) {
+        setState(node, RCState::STOPPING_TS);
+        LogFile::debug("%s >> STOPPING", node.getName().c_str());
+      } else {
+        throw (RCHandlerException("Failed to stop %s", node.getName().c_str()));
+      }
+    } else {
+      LogFile::debug("%s is READY", node.getName().c_str());
+    }
   }
+  while (true) {
+    bool unconfigured = true;
+    for (NSMNodeList::reverse_iterator it = m_nodes.rbegin(); it != m_nodes.rend(); it++) {
+      if (it->getState() != RCState::READY_S) unconfigured = false;
+    }
+    if (unconfigured) break;
+    try {
+      perform(NSMCommunicator::select(30));
+    } catch (const TimeoutException& e) {}
+  }
+  if (m_callback != NULL)
+    m_callback->setState(RCState::READY_S);
   RCCallback::setState(RCState::READY_S);
 }
 

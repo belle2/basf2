@@ -91,7 +91,6 @@ namespace Belle2 {
     /**
      * Open connection to backend and parse tree
      * @param name Name of the tree to parse
-     * @param database Load from the XML database
      * @param cacheSize maximum cache size in entries
      */
     void open(const std::string& name = "Belle2.xml", size_t cacheSize = c_DefaultCacheSize);
@@ -120,7 +119,7 @@ namespace Belle2 {
      * @param path Path of the parameter to get
      * @return value of the parameter
      */
-    virtual std::string getString(const std::string& path = "") const throw(gearbox::PathEmptyError)
+    virtual std::string getString(const std::string& path = "") const noexcept(false)
     {
       PathValue p = getPathValue(path);
       if (p.numNodes == 0) throw gearbox::PathEmptyError() << path;
@@ -151,7 +150,7 @@ namespace Belle2 {
      * @param path Path of the parameter to get
      * @return value of the parameter
      */
-    virtual std::pair<std::string, std::string> getStringWithUnit(const std::string& path = "") const throw(gearbox::PathEmptyError)
+    virtual std::pair<std::string, std::string> getStringWithUnit(const std::string& path = "") const noexcept(false)
     {
       PathValue p = getPathValue(path);
       if (!p.numNodes) throw gearbox::PathEmptyError() << path;
@@ -167,7 +166,7 @@ namespace Belle2 {
      *         be deleted once it is no longer valid (e.g. after the current
      *         run if it belongs to this run)
      */
-    virtual const TObject* getTObject(const std::string& path) const throw(gearbox::PathEmptyError, gearbox::TObjectConversionError);
+    virtual const TObject* getTObject(const std::string& path) const noexcept(false);
 
     /**
      * Return GearDir representing a given DetectorComponent

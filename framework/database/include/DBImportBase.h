@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/database/Database.h>
+#include <framework/database/DBStore.h>
 #include <framework/database/IntervalOfValidity.h>
 
 namespace Belle2 {
@@ -23,33 +23,20 @@ namespace Belle2 {
 
     /**
      * Constructor
-     * @param module  Name under which the object will be stored in the database
-     * @param package Package name
+     * @param name  Name under which the object will be stored in the database
      */
-    DBImportBase(const std::string& module, const std::string& package):
-      m_module(module),
-      m_package(package)
-    {}
+    DBImportBase(const std::string& name): m_name(name) {}
 
     /**
      * Destructor
      */
-    virtual ~DBImportBase()
-    {
-      for (auto& object : m_objects) delete object;
-    }
+    virtual ~DBImportBase();
 
     /**
      * Returns the name under which the object will be stored in the database
      * @return name
      */
-    const std::string& getName() const {return m_module;}
-
-    /**
-     * Returns the package name under which the object will be stored in the database
-     * @return package name
-     */
-    const std::string& getPackage() const {return m_package;}
+    const std::string& getName() const {return m_name;}
 
     /**
      * add event dependency
@@ -107,8 +94,7 @@ namespace Belle2 {
      */
     void addIntraRunDependency(unsigned long long int tag, EIntraRunDependency type);
 
-    std::string m_module;      /**< object or array name in database */
-    std::string m_package;     /**< package name */
+    std::string m_name;      /**< object or array name in database */
     TObject* m_object = 0;     /**< pointer to allocated object or array */
 
   private:
@@ -134,8 +120,16 @@ namespace Belle2 {
       }
       if (m_object) m_objects.pop_back(); // restore initial state (mandatory!)
 
-      return Database::Instance().storeData(m_package, m_module, &intraRun, iov);
+      return storeData(&intraRun, iov);
     }
+
+    /** Store intra run dependent objects.
+     * This is an extra function to hide implementation details of Database.h
+     *
+     * @param intraRun pointer to the Intra Run implementation which has to inherit from TObject
+     * @param iov interval of validity
+     */
+    bool storeData(TObject* intraRun, const IntervalOfValidity& iov);
 
 
     EIntraRunDependency m_dependency = c_None;  /**< dependency type */

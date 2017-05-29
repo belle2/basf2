@@ -69,7 +69,7 @@ void EventInfoSetterModule::initialize()
   m_eventMetaDataPtr.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
 
   //steering file content overwritten via command line arguments?
-  int numEventsArgument = Environment::Instance().getNumberEventsOverride();
+  unsigned int numEventsArgument = Environment::Instance().getNumberEventsOverride();
   int runOverride = Environment::Instance().getRunOverride();
   int expOverride = Environment::Instance().getExperimentOverride();
   if (numEventsArgument > 0 or runOverride >= 0 or expOverride >= 0) {
@@ -83,8 +83,8 @@ void EventInfoSetterModule::initialize()
       m_expList[0] = expOverride;
   }
 
-  int skipNEventsOverride = Environment::Instance().getSkipEventsOverride();
-  if (skipNEventsOverride >= 0)
+  unsigned int skipNEventsOverride = Environment::Instance().getSkipEventsOverride();
+  if (skipNEventsOverride != 0)
     m_eventsToSkip = skipNEventsOverride;
 
   //Make sure all lists have the same size
@@ -105,6 +105,10 @@ void EventInfoSetterModule::initialize()
         B2ERROR("Experiment " << m_expList[i] << " is out of range, should be in [0, 1023]!");
       if (m_runList[i] < 0)
         B2ERROR("Run " << m_runList[i] << " is out of range, should be >= 0!");
+      unsigned int nevents = m_evtNumList[i];
+      if (nevents == std::numeric_limits<unsigned int>::max()) {
+        B2ERROR("Invalid number of events (valid range: 0.." << std::numeric_limits<unsigned int>::max() - 1 << ")!");
+      }
     }
   }
 
@@ -148,13 +152,13 @@ bool EventInfoSetterModule::advanceEventCounter()
   //    clang:     -18% real time
   //    gcc (opt): -52% real time
   while (true) {
-    if (branch_unlikely(m_evtNumber > static_cast<unsigned int>(m_evtNumList[m_colIndex]))) {
+    if (branch_unlikely(m_evtNumber > m_evtNumList[m_colIndex])) {
 
       //Search for a column where the event number is greater than 0.
       do {
         m_colIndex++;
       } while ((m_colIndex < static_cast<int>(m_expList.size())) &&
-               (m_evtNumList[m_colIndex] <= 0));
+               (m_evtNumList[m_colIndex] == 0));
 
       if (m_colIndex < static_cast<int>(m_expList.size())) {
         m_evtNumber = 1;

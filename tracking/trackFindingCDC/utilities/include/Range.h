@@ -33,6 +33,9 @@ namespace Belle2 {
       /// The type the iterator references
       using Reference = typename std::iterator_traits<AIterator>::reference;
 
+      /// The type the begind the iterator (make it possible to use the range as a "list")
+      using value_type = typename std::iterator_traits<AIterator>::value_type;
+
     public:
       /// Default constructor for ROOT
       Range() = default;
@@ -100,6 +103,13 @@ namespace Belle2 {
     Range<AIterator> asRange(std::pair<AIterator, AIterator> const& x)
     {
       return Range<AIterator>(x);
+    }
+
+    /// Adapter function to make pair of iterators (e.g. from equal_range) into a range usable in range base for loops.
+    template<class AIterator>
+    Range<AIterator> asRange(AIterator const& itBegin, AIterator const& itEnd)
+    {
+      return Range<AIterator>(std::make_pair(itBegin, itEnd));
     }
   }
 }

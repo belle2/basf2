@@ -447,6 +447,20 @@ class Validation:
         # This prints every 30 minutes which scripts are still running
         self.running_script_reporting_interval = 30
 
+        # The maximum time before a script is skipped, if it does not terminate
+        # The curren limit is 10h
+        self.script_max_runtime_in_minutes = 720
+
+    def get_useable_basepath(self):
+        """
+        Checks if a local path is available. If only a central release is available, return the path
+        to this central release
+        """
+        if self.basepaths["local"]:
+            return self.basepaths["local"]
+        else:
+            return self.basepaths["central"]
+
     @staticmethod
     def get_available_job_control():
         """
@@ -859,8 +873,9 @@ class Validation:
         control = selected_control[0][2]()
 
         # read the git hash which is used to produce this validation
-        git_hash = validationfunctions.get_compact_git_hash(self.basepaths["local"])
-        self.log.note("Git hash of repository located at {} is {}".format(self.basepaths["local"],
+        src_basepath = self.get_useable_basepath()
+        git_hash = validationfunctions.get_compact_git_hash(src_basepath)
+        self.log.note("Git hash of repository located at {} is {}".format(src_basepath,
                                                                           git_hash))
 
         # If we do have runtime data, then read them
@@ -959,6 +974,17 @@ class Validation:
 
                             # not finished yet, log time
                             script_object.last_report_time = time.time()
+
+                        # check for the maximum time a script is allow to run and terminate if exceeded
+                        total_runtime_in_minutes = (time.time() - script_object.start_time) / 60.0
+                        if total_runtime_in_minutes > self.script_max_runtime_in_minutes:
+                            script_object.status = ScriptStatus.failed
+                            self.log.warning('Script {0} did not finish after {1} minutes, skipping '
+                                             .format(script_object.path, total_runtime_in_minutes))
+                            # kill the running process
+                            script_object.control.terminate(script_object)
+                            # Skip all dependent scripts
+                            self.skip_script(script_object)
 
                 # Otherwise (the script is waiting) and if it is ready to be
                 # executed

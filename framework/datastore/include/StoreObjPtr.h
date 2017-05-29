@@ -14,6 +14,8 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreAccessorBase.h>
 
+#include <stdexcept>
+
 namespace Belle2 {
 
   /** Type-safe access to single objects in the data store.
@@ -25,7 +27,7 @@ namespace Belle2 {
    *  This example creates a new StoreObjPtr for the EventMetaData object,
    *  using the default name (EventMetaData) and default durability (event).
    *  If no object 'EventMetaData' is found in the data store, the store
-   *  object pointer is invalid.
+   *  object pointer is invalid (accesses to it will cause an exception).
    *  \code
       StoreObjPtr<EventMetaData> eventmetadata;
       if(!eventmetadata) {
@@ -88,7 +90,6 @@ namespace Belle2 {
    *
    *  @sa If you want to store more than a single object of one type, use the StoreArray class.
    *  @sa Data can also be created/accessed from Python modules using PyStoreObj
-   *  @author <a href="mailto:software@belle2.kek.jp?subject=StoreObjPtr">The basf2 developers</a>
    */
   template <class T> class StoreObjPtr : public StoreAccessorBase {
   public:
@@ -179,28 +180,36 @@ namespace Belle2 {
       return assign(t, true);
     }
 
+    //------------------------ Imitate pointer functionality -----------------------------------------------
+    inline T& operator *()  const {return *operator->();}  /**< Imitate pointer functionality. */
+    inline T* operator ->() const {ensureValid(); return static_cast<T*>(*m_storeObjPtr);}   /**< Imitate pointer functionality. */
+    inline operator bool()  const {return isValid();}   /**< Imitate pointer functionality. */
+
+
     /** Return list of object names with matching type.  */
     static std::vector<std::string> getObjectList(DataStore::EDurability durability = DataStore::c_Event)
     {
       return DataStore::Instance().getListOfObjects(T::Class(), durability);
     }
 
-
-    //------------------------ Imitate pointer functionality -----------------------------------------------
-    inline T& operator *()  const {ensureAttached(); return **m_storeObjPtr;}  /**< Imitate pointer functionality. */
-    inline T* operator ->() const {ensureAttached(); return *m_storeObjPtr;}   /**< Imitate pointer functionality. */
-    inline operator bool()  const {return isValid();}   /**< Imitate pointer functionality. */
-
   private:
     /** Ensure that this object is attached. */
     inline void ensureAttached() const
     {
       if (!m_storeObjPtr) {
-        const_cast<StoreObjPtr*>(this)->m_storeObjPtr = reinterpret_cast<T**>(DataStore::Instance().getObject(*this));
+        const_cast<StoreObjPtr*>(this)->m_storeObjPtr = DataStore::Instance().getObject(*this);
       }
     }
-    /** Store of actual pointer. */
-    T** m_storeObjPtr;
+    /** if accesses to this object would crash, throw an std::runtime_error */
+    inline void ensureValid() const
+    {
+      ensureAttached();
+      if (!m_storeObjPtr || !(*m_storeObjPtr))
+        throw std::runtime_error("Trying to access StoreObjPtr " + readableName() +
+                                 ", which was not created. Please check isValid() before accesses if the object is not guaranteed to be created in every event.");
+    }
+    /** Store of actual pointer. Don't make this a T** as this might cause problems with multiple inheritance objects */
+    TObject** m_storeObjPtr;
   };
 } // end namespace Belle2
 

@@ -6,10 +6,10 @@ SRCS   = $(wildcard *.c)
 OBJS   = $(SRCS:%.c=%.o)
 
 HDRS = ftsw.h
-#LVME = -lvme
+LVME = -lvme
 LIBS = $(OBJS) -lm $(LVME) 
 
-#CFLAGS = -DUSE_LINUX_VME_UNIVERSE=1
+CFLAGS = -DUSE_LINUX_VME_UNIVERSE=1
 CFLAGS = -DSTATFT_NSM
 LDFLAGS = -g -DSTATFT_NSM
 

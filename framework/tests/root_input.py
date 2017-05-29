@@ -21,14 +21,13 @@ eventinfo = register_module('EventInfoPrinter')
 printcollections = register_module('PrintCollections')
 
 input.param('inputFileName', Belle2.FileSystem.findFile('framework/tests/root_input.root'))
-# load all branches, minus PXDClusters
+# load all branches, minus PXDClusters (relations with PXDClusters are automatically excluded)
 input.param('branchNames', [
     'EventMetaData',
-    'PXDClustersToPXDDigits',
-    'PXDClustersToPXDTrueHits',
     'PXDDigits',
     'PXDTrueHits',
-    'PXDClusters', ])
+    'PXDClusters'])
+# (yes, we also added PXDClusters in branchNames, to check if it's overridden by excludeBranchNames)
 input.param('excludeBranchNames', ['PXDClusters'])
 input.param('skipNEvents', 1)
 input.logging.log_level = LogLevel.WARNING
@@ -67,29 +66,42 @@ for evtNo in range(1, 6):
 
 # Test eventSequences in detail
 main = create_path()
-input = register_module('RootInput')
-input.param('inputFileNames', [Belle2.FileSystem.findFile('framework/tests/chaintest_1.root'),
-                               Belle2.FileSystem.findFile('framework/tests/chaintest_2.root')])
+input = main.add_module('RootInput', inputFileNames=[
+    Belle2.FileSystem.findFile('framework/tests/chaintest_1.root'),
+    Belle2.FileSystem.findFile('framework/tests/chaintest_2.root')], logLevel=LogLevel.WARNING)
 # The first file contains the following event numbers (in this order)
 # 2, 6, 5, 9, 10, 11, 8, 12, 0, 13, 15, 16
 # We select more event than the file contains, to check if it works anyway
 # The second file contains the following event numbers (in this order)
 # 7, 6, 3, 8, 9, 12, 4, 11, 10, 16, 13, 17, 18, 14, 15
 input.param('entrySequences', ['0,3:4,10:100', '1:2,4,12:13'])
-main.add_module(input)
 
 expected_event_numbers = [2, 9, 10, 15, 16, 6, 3, 9, 18, 14]
 processed_event_numbers = []
 
 
 class TestingModule(Module):
+    """
+    Test module which writes out the processed event numbers
+    into the global processed_event_numbers list
+    """
     def event(self):
+        """
+        Called for each event
+        """
         global processed_event_numbers
         emd = Belle2.PyStoreObj('EventMetaData')
         processed_event_numbers.append(emd.obj().getEvent())
 
+    def terminate(self):
+        """
+        perform check
+        """
+        # We only want to do the check if we actually execute the process() but
+        # since this script is called from basf2_args with --dry-run this is not
+        # always the case
+        assert expected_event_numbers == processed_event_numbers
+
 
 main.add_module(TestingModule())
 process(main)
-
-assert expected_event_numbers == processed_event_numbers

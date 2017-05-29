@@ -82,6 +82,16 @@ namespace Belle2 {
       getPlaneTransform(int endcap, int layer, int sector, int plane) const;
 
       /**
+       * Get additional displacement for plane internal volumes.
+       * @param[in] endcap Endcap number.
+       * @param[in] layer  Layer number.
+       * @param[in] sector Sector number.
+       * @param[in] plane  Plane number.
+       */
+      const HepGeom::Transform3D*
+      getPlaneDisplacement(int endcap, int layer, int sector, int plane) const;
+
+      /**
        * Get segment transformation.
        * @param[in] endcap  Endcap number.
        * @param[in] layer   Layer number.
@@ -157,6 +167,9 @@ namespace Belle2 {
 
       /** Plane transformations. */
       HepGeom::Transform3D**** m_Plane;
+
+      /** Plane internal volumes displacements. */
+      HepGeom::Transform3D**** m_PlaneDisplacement;
 
       /** Segment transformations. */
       HepGeom::Transform3D***** m_Segment;

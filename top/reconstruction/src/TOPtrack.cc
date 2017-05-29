@@ -62,18 +62,26 @@ namespace Belle2 {
       int pdgCode = abs(chargedStable.getPDGCode());
 
       RelationVector<ExtHit> extHits = track->getRelationsWith<ExtHit>();
+      double tmin = 1e10; // some large time
       for (unsigned i = 0; i < extHits.size(); i++) {
         const ExtHit* extHit = extHits[i];
         if (abs(extHit->getPdgCode()) != pdgCode) continue;
         if (extHit->getDetectorID() != myDetID) continue;
-        if (extHit->getCopyID() == 0 || extHit->getCopyID() > numModules) continue;
-        if (extHit->getStatus() != EXT_ENTER) continue;
-        m_extHit = extHit;
+        if (extHit->getCopyID() < 1 or extHit->getCopyID() > numModules) continue;
+        if (extHit->getTOF() < tmin) {
+          tmin = extHit->getTOF();
+          m_extHit = extHit;
+        }
       }
       if (!m_extHit) return;
 
       m_mcParticle = track->getRelated<MCParticle>();
-      if (m_mcParticle) m_barHit = m_mcParticle->getRelated<TOPBarHit>();
+      if (m_mcParticle) {
+        const auto barHits = m_mcParticle->getRelationsWith<TOPBarHit>();
+        for (const auto& barHit : barHits) {
+          if (barHit.getModuleID() == m_extHit->getCopyID()) m_barHit = &barHit;
+        }
+      }
 
       // set track parameters
       m_position = m_extHit->getPosition();

@@ -30,7 +30,7 @@ class TOPDisplay(Module):
     '''
 
     #: 1D histograms
-    hist = [TH1F('h' + str(i), 'module#' + str(i), 128, 0.0, 4096.0) for i in
+    hist = [TH1F('h' + str(i), 'module#' + str(i), 128, 0.0, 256.0) for i in
             range(16)]
     #: canvas
     c1 = TCanvas('c1', 'TOP event display', 1000, 800)
@@ -66,7 +66,7 @@ class TOPDisplay(Module):
         digits = Belle2.PyStoreArray('TOPDigits')
         for digit in digits:
             moduleID = digit.getModuleID()
-            tdc = digit.getTDC()
+            tdc = digit.getRawTime()
             self.hist[moduleID - 1].Fill(tdc)
 
         for i in range(16):

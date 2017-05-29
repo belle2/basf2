@@ -19,6 +19,8 @@ namespace Belle2 {
     virtual void init(RCCallback& callback, HSLB& /*hslb*/, const DBObject& /*obj*/) {}
     virtual void boot(RCCallback& callback, HSLB& hslb, const DBObject& obj) = 0;
     virtual void load(RCCallback& callback, HSLB& hslb, const DBObject& obj) = 0;
+    virtual void start(RCCallback& callback, HSLB& hslb) {}
+    virtual void stop(RCCallback& callback, HSLB& hslb) {}
     virtual void monitor(RCCallback& /*callback*/, HSLB& /*hslb*/) {}
     virtual void readback(RCCallback& callback, HSLB& hslb, const DBObject& obj) {};
 

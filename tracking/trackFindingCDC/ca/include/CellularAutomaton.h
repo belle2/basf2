@@ -10,15 +10,12 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
-
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
-#include <tracking/trackFindingCDC/ca/CellWeight.h>
-#include <tracking/trackFindingCDC/ca/NeighborWeight.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <framework/logging/Logger.h>
 
-#include <vector>
-#include <limits>
+#include <cmath>
 
 namespace Belle2 {
 
@@ -47,27 +44,21 @@ namespace Belle2 {
         // Set all cell states to -inf and the non permanent flags to unset.
         prepareCellFlags(cellHolders);
 
-        ACellHolder* ptrHighestCellHolder = nullptr;
-        CellState highestCellState = NAN;
-
         for (ACellHolder& cellHolder : cellHolders) {
-          if (cellHolder.getAutomatonCell().hasMaskedFlag()) continue;
-          if (cellHolder.getAutomatonCell().hasCycleFlag()) continue;
+          AutomatonCell& cell = cellHolder.getAutomatonCell();
+          if (cell.hasMaskedFlag()) continue;
+          if (cell.hasCycleFlag()) continue;
 
-          if (not cellHolder.getAutomatonCell().hasAssignedFlag()) {
+          if (not cell.hasAssignedFlag()) {
             // Mark this cell as a start point of a long path since we encountered it in
             // at the top level of the recursion.
-            cellHolder.getAutomatonCell().setStartFlag();
+            cell.setStartFlag();
             // The flag will be unset when it appears on the _to_ side of a relation.
           }
 
           try {
-            CellState cellState = getFinalCellState(cellHolder, cellHolderNeighborhood);
-            if (std::isnan(highestCellState) or highestCellState < cellState) {
-              // We have a new best start point.
-              ptrHighestCellHolder = &cellHolder;
-              highestCellState = cellState;
-            }
+            // Assignes flags and the cell state
+            getFinalCellState(cellHolder, cellHolderNeighborhood);
           } catch (CycleException) {
             // TODO: Come up with some handeling for cycles.
             // For now we continue to look for long paths in the graph
@@ -79,7 +70,19 @@ namespace Belle2 {
             // But can we actually distinguish the two situations?
           }
         }
-        return ptrHighestCellHolder;
+
+        auto lessStartCellState = [](ACellHolder & lhs, ACellHolder & rhs) {
+          AutomatonCell& lhsCell = lhs.getAutomatonCell();
+          AutomatonCell& rhsCell = rhs.getAutomatonCell();
+          return (std::make_pair(lhsCell.hasStartFlag(), lhsCell.getCellState()) <
+                  std::make_pair(rhsCell.hasStartFlag(), rhsCell.getCellState()));
+        };
+
+        auto itStartCellHolder =
+          std::max_element(cellHolders.begin(), cellHolders.end(), lessStartCellState);
+        if (itStartCellHolder == cellHolders.end()) return nullptr;
+        if (not itStartCellHolder->getAutomatonCell().hasStartFlag()) return nullptr;
+        return &*itStartCellHolder;
       }
 
     private:
@@ -88,68 +91,80 @@ namespace Belle2 {
        *  Determines it if necessary traversing the graph.
        *  Throws CycleException if it encounters a cycle in the graph.
        */
-      CellState getFinalCellState(ACellHolder& cellHolder,
-                                  const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood) const
+      Weight getFinalCellState(ACellHolder& cellHolder,
+                               const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood) const
       {
+        AutomatonCell& cell = cellHolder.getAutomatonCell();
+
         // Throw if this cell has already been traversed in this recursion cycle
-        if (cellHolder.getAutomatonCell().hasCycleFlag()) {
+        if (cell.hasCycleFlag()) {
           B2DEBUG(100, "Cycle detected");
           throw (CycleException());
         }
 
-        if (cellHolder.getAutomatonCell().hasAssignedFlag()) {
-          return cellHolder.getAutomatonCell().getCellState();
+        if (cell.hasAssignedFlag()) {
+          return cell.getCellState();
 
         } else {
           // Mark cell in order to detect if it was already traversed in this recursion cycle
-          cellHolder.getAutomatonCell().setCycleFlag();
+          cell.setCycleFlag();
 
-          CellState finalCellState = updateState(cellHolder, cellHolderNeighborhood);
+          Weight finalCellState = updateState(cellHolder, cellHolderNeighborhood);
 
           // Unmark the cell
-          cellHolder.getAutomatonCell().unsetCycleFlag();
+          cell.unsetCycleFlag();
           return finalCellState;
         }
       }
 
       /// Updates the state of a cell considering all continuations recursively
-      CellState updateState(ACellHolder& cellHolder,
-                            const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood) const
+      Weight updateState(ACellHolder& cellHolder,
+                         const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood) const
       {
+        AutomatonCell& cell = cellHolder.getAutomatonCell();
+
         //--- blocked cells do not contribute a continuation ---
-        if (cellHolder.getAutomatonCell().hasMaskedFlag()) {
-          cellHolder.getAutomatonCell().setCellState(NAN);
-          cellHolder.getAutomatonCell().setAssignedFlag();
-          return cellHolder.getAutomatonCell().getCellState();
+        if (cell.hasMaskedFlag()) {
+          cell.setCellState(NAN);
+          cell.setAssignedFlag();
+          return cell.getCellState();
         }
 
         //--- Search for neighbors ---
-        CellState maxStateWithContinuation = NAN;
+        Weight maxStateWithContinuation = NAN;
+
+        // Flag to keep track whether the best continuation lies on a prioriy path
+        bool isPriorityPath = false;
 
         // Check neighbors now
-        for (const WeightedRelation<ACellHolder>& relation
-             : cellHolderNeighborhood.equal_range(&cellHolder)) {
+        for (const WeightedRelation<ACellHolder>& relation :
+             cellHolderNeighborhood.equal_range(&cellHolder)) {
           // Advance to valid neighbor
-          ACellHolder* neighborCellHolderPtr = relation.getTo();
-          if (neighborCellHolderPtr and not neighborCellHolderPtr->getAutomatonCell().hasMaskedFlag()) {
+          ACellHolder* neighborCellHolder = relation.getTo();
 
-            ACellHolder& neighborCellHolder = *neighborCellHolderPtr;
+          // Skip dead ends (should not happen)
+          if (not neighborCellHolder) continue;
 
-            // Invalidate a possible start flag since the neighbor has an ancestors
-            neighborCellHolder.getAutomatonCell().unsetStartFlag();
+          AutomatonCell& neighborCell = neighborCellHolder->getAutomatonCell();
+          // Skip masked continuations
+          if (neighborCell.hasMaskedFlag()) continue;
 
-            // Get the value of the neighbor
-            CellState neighborCellState = getFinalCellState(neighborCellHolder, cellHolderNeighborhood);
+          // Invalidate a possible start flag since the neighbor has an ancestors
+          neighborCell.unsetStartFlag();
 
-            // Add the value of the connetion to the gain value
-            CellState stateWithContinuation = neighborCellState + relation.getWeight();
+          // Get the value of the neighbor
+          Weight neighborCellState = getFinalCellState(*neighborCellHolder, cellHolderNeighborhood);
 
-            // Remember only the maximum value of all neighbors
-            if (std::isnan(maxStateWithContinuation) or maxStateWithContinuation < stateWithContinuation) {
-              maxStateWithContinuation = stateWithContinuation;
-            }
+          // Add the value of the connetion to the gain value
+          Weight stateWithContinuation = neighborCellState + relation.getWeight();
 
-          } // end if hasMaskedFlag()
+          // Remember only the maximum value of all neighbors
+          if (std::isnan(maxStateWithContinuation) or maxStateWithContinuation < stateWithContinuation) {
+            maxStateWithContinuation = stateWithContinuation;
+            // Remember whether the best continuation marks a priorty path
+            // construction ensures that priority paths have at least two elements
+            isPriorityPath = neighborCell.hasPriorityFlag() or neighborCell.hasPriorityPathFlag();
+          }
         } // end for relations
 
         if (std::isnan(maxStateWithContinuation)) {
@@ -158,16 +173,17 @@ namespace Belle2 {
         }
 
         // The value of this cell is only its own weight
-        maxStateWithContinuation += cellHolder.getAutomatonCell().getCellWeight();
+        maxStateWithContinuation += cell.getCellWeight();
 
         // Set the value
-        cellHolder.getAutomatonCell().setCellState(maxStateWithContinuation);
+        cell.setCellState(maxStateWithContinuation);
+        cell.setPriorityPathFlag(isPriorityPath);
 
         // Mark this cell as having its final value
-        cellHolder.getAutomatonCell().setAssignedFlag();
+        cell.setAssignedFlag();
 
         // Return the just determined value
-        return cellHolder.getAutomatonCell().getCellState();
+        return cell.getCellState();
       }
 
     private:
@@ -179,8 +195,9 @@ namespace Belle2 {
       void prepareCellFlags(ACellHolderRange& cellHolders) const
       {
         for (ACellHolder& cellHolder : cellHolders) {
-          cellHolder.getAutomatonCell().unsetTemporaryFlags();
-          cellHolder.getAutomatonCell().setCellState(NAN);
+          AutomatonCell& cell = cellHolder.getAutomatonCell();
+          cell.unsetTemporaryFlags();
+          cell.setCellState(NAN);
         }
       }
 

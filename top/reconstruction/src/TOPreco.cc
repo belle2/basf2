@@ -37,6 +37,27 @@ namespace Belle2 {
       setBeta(0); // use default: beta from momentum and mass
     }
 
+
+    void TOPreco::setChannelMask(const DBObjPtr<TOPCalChannelMask>& mask,
+                                 bool printMask)
+    {
+      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+      const auto& mapper = TOPGeometryPar::Instance()->getChannelMapper();
+      int numModules = geo->getNumModules();
+      for (int moduleID = 1; moduleID <= numModules; moduleID++) {
+        unsigned numPixels = geo->getModule(moduleID).getPMTArray().getNumPixels();
+        for (unsigned channel = 0; channel < numPixels; channel++) {
+          int mdn = moduleID - 1; // 0-based used in fortran
+          int ich = mapper.getPixelID(channel) - 1; // 0-base used in fortran
+          int flag = mask->isActive(moduleID, channel);
+          set_channel_mask_(&mdn, &ich, &flag);
+        }
+      }
+
+      if (printMask) print_channel_mask_();
+    }
+
+
     void TOPreco::setHypID(int NumHyp, int HypID[])
     {
       rtra_set_hypid_(&NumHyp, HypID);
@@ -57,24 +78,13 @@ namespace Belle2 {
       rtra_clear_();
     }
 
-    int TOPreco::addData(int moduleID, int pixelID, int TDC, double time)
+    int TOPreco::addData(int moduleID, int pixelID, double time)
     {
       int status;
       moduleID--; // 0-based ID used in fortran
       pixelID--;   // 0-based ID used in fortran
       float t = (float) time;
-      data_put_(&moduleID, &pixelID, &TDC, &t, &status);
-      return status;
-    }
-
-
-    int TOPreco::addData(int moduleID, int pixelID, int TDC)
-    {
-      int status;
-      moduleID--; // 0-based ID used in fortran
-      pixelID--;   // 0-based ID used in fortran
-      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-      float t = geo->getNominalTDC().getTime(TDC);
+      int TDC = 0; // it's not used in Fortran code
       data_put_(&moduleID, &pixelID, &TDC, &t, &status);
       return status;
     }
@@ -240,7 +250,9 @@ namespace Belle2 {
 
     double TOPreco::getPDF(int pixelID, double T, double Mass)
     {
-      float t = (float) T; float mass = (float) Mass;
+      pixelID--;  // 0-based ID used in fortran
+      float t = (float) T;
+      float mass = (float) Mass;
       return get_pdf_(&pixelID, &t, &mass);
     }
 

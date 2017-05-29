@@ -37,8 +37,8 @@ void ClusterBackgroundDetector::exposeParameters(ModuleParamList* moduleParamLis
 void ClusterBackgroundDetector::apply(std::vector<CDCWireHitCluster>& outputClusters)
 {
   for (CDCWireHitCluster& cluster : outputClusters) {
-    CellWeight clusterWeight = m_clusterFilter(cluster);
-    if (isNotACell(clusterWeight)) {
+    Weight clusterWeight = m_clusterFilter(cluster);
+    if (std::isnan(clusterWeight)) {
       // Cluster detected as background
       cluster.setBackgroundFlag(true);
       for (const CDCWireHit* wireHit : cluster) {

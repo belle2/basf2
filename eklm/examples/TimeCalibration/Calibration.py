@@ -8,10 +8,6 @@ from reconstruction import *
 from ROOT import Belle2
 import sys
 
-# Uncomment to upload the result to central database
-# reset_database()
-# use_central_database("eklm_test", LogLevel.INFO)
-
 # Set the global log level
 set_log_level(LogLevel.INFO)
 

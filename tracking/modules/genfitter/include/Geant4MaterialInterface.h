@@ -1,5 +1,5 @@
 /* Copyright 2014, Ludwig-Maximilians-Universität München,
-   Authors: Tobias Schlüter
+   Authors: Tobias Schlüter, Thomas Hauth
 
    Provided as part of the Belle II software framework basf2.  Its
    licenses apply.
@@ -15,9 +15,11 @@ class G4VPhysicalVolume;
 
 namespace Belle2 {
 
-
   /**
-   * @brief AbsMaterialInterface implementation for use with ROOT's TGeoManager.
+   * @brief AbsMaterialInterface implementation for use with Geant4's navigator.
+   *
+   * This allows to look up the material properties from the Geant4 geometry also used for
+   * simulation purposes.
    */
   class Geant4MaterialInterface : public genfit::AbsMaterialInterface {
 
@@ -63,6 +65,11 @@ namespace Belle2 {
 
     /** the volume the extraoplation is currenly located in*/
     const class G4VPhysicalVolume* currentVolume_;
+
+    /** stores whether to call SetGeometricallyLimitedStep() because the full step
+     * length was taken.
+     */
+    bool m_takingFullStep = false;
   };
 
 }

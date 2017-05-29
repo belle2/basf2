@@ -221,6 +221,9 @@ void ECLSplitterN1Module::terminate()
   if (m_fileNOptimalFWD) delete m_fileNOptimalFWD;
   if (m_fileNOptimalBarrel) delete m_fileNOptimalBarrel;
   if (m_fileNOptimalBWD) delete m_fileNOptimalBWD;
+
+  if (m_NeighbourMap9) delete m_NeighbourMap9;
+  if (m_NeighbourMap21) delete m_NeighbourMap21;
 }
 
 void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)

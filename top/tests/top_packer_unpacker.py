@@ -32,7 +32,7 @@ class DigitsTest(Module):
             key=lambda x: (
                 x.getModuleID(),
                 x.getChannel(),
-                x.getTDC())
+                x.getRawTime())
         )
 
     def event(self):
@@ -64,8 +64,8 @@ class DigitsTest(Module):
             # check the content of the digit
             assert digit.getModuleID() == digitUnpacked.getModuleID()
             assert digit.getPixelID() == digitUnpacked.getPixelID()
-            assert digit.getTDC() == digitUnpacked.getTDC()
-            assert digit.getADC() == digitUnpacked.getADC()
+            assert digit.getRawTime() == digitUnpacked.getRawTime()
+            assert digit.getPulseHeight() == digitUnpacked.getPulseHeight()
             assert digit.getIntegral() == digitUnpacked.getIntegral()
             assert digit.getChannel() == digitUnpacked.getChannel()
             assert digit.getHitQuality() == digitUnpacked.getHitQuality()
@@ -174,6 +174,7 @@ converter.param('useChannelT0Calibration', False)
 converter.param('useModuleT0Calibration', False)
 converter.param('useCommonT0Calibration', False)
 converter.param('subtractOffset', True)
+converter.param('pedestalRMS', 0)
 main.add_module(converter)
 
 main.add_module(RawDigitsTest())

@@ -1,0 +1,28 @@
+# EventType: 1213030100
+# Descriptor: [B+ -> pi+ (anti-D0 -> K_S0 pi+ pi-)]cc
+# NickName: Bu_Dpi+_DtoKSpi+pi-
+# Documentation: For phi3 GGSZ studies. Flat phasespace decay of D.
+# Tested: Yes
+# PhysicsWG: HAD
+# Responsible: Ian J. Watson
+# Email: iwatson@hep.phys.s.u-tokyo.ac.jp
+# Cuts: None
+# Date: 20151216
+#
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B+ B-sig VSS;
+Enddecay
+
+Decay B+sig
+1.0 anti-D0sig pi+ PHOTOS PHSP;
+Enddecay
+CDecay B-sig
+
+Decay anti-D0sig
+1.0 K_S0 pi+ pi- PHOTOS PHSP;
+Enddecay
+CDecay D0sig
+
+End

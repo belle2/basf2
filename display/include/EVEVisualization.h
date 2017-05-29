@@ -19,6 +19,7 @@
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <arich/dataobjects/ARICHHit.h>
+#include <top/dataobjects/TOPDigit.h>
 #include <vxd/geometry/GeoCache.h>
 #include <tracking/dataobjects/ROIid.h>
 
@@ -39,7 +40,6 @@
 #include <TEveTrack.h>
 
 #include <string>
-#include <vector>
 
 
 class TEveBox;
@@ -88,17 +88,17 @@ namespace Belle2 {
     };
 
     /** Color for reco hits. */
-    const static int c_recoHitColor = kOrange;
+    const static int c_recoHitColor;
     /** Color for TrackCandidates. */
-    const static int c_recoTrackColor = kAzure - 2;
+    const static int c_recoTrackColor;
     /** Color for tracks. */
-    const static int c_trackColor = kAzure;
+    const static int c_trackColor;
     /** Color for track markers. */
-    const static int c_trackMarkerColor = kSpring;
+    const static int c_trackMarkerColor;
     /** Color for unassigned (reco)hits. */
-    const static int c_unassignedHitColor = kViolet - 5;
+    const static int c_unassignedHitColor;
     /** Color for KLMCluster objects. */
-    const static int c_klmClusterColor = kSpring - 2;
+    const static int c_klmClusterColor;
 
   public:
     /** Constructor.
@@ -202,6 +202,9 @@ namespace Belle2 {
 
     /** show CDCHits directly. */
     void addCDCHit(const CDCHit* hit);
+
+    /** Add TOPDigits (shown aggregated per module). */
+    void addTOPDigits(const StoreArray<TOPDigit>& digits);
 
     /** Generic function to keep track of which objects have which visual representation.
      *
@@ -339,7 +342,9 @@ namespace Belle2 {
     std::set<const TObject*> m_shownRecohits;
 
     /** Unassigned recohits. */
-    TEveStraightLineSet* m_unassignedRecoHits;
+    TEveStraightLineSet* m_unassignedRecoHits = nullptr;
+    /** is m_unassignedRecoHits visible? */
+    bool m_unassignedRecoHitsVisibility = true;
 
     /** don't show MCParticles with momentum below this cutoff. */
     static constexpr double c_minPCut = 0.00;

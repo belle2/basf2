@@ -4,7 +4,14 @@
 # Thomas Keck 2016
 
 import numpy as np
-import xgboost as xgb
+
+try:
+    import xgboost as xgb
+except ImportError:
+    print("Please install xgboost: pip3 install xgboost")
+    import sys
+    sys.exit(1)
+
 import os
 import tempfile
 import collections
@@ -24,11 +31,15 @@ class State(object):
         self.estimator = None
 
 
-def get_model(number_of_features, number_of_events, parameters):
+def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
     """
     Return default xgboost model
     """
     param = {'bst:max_depth': 2, 'bst:eta': 1, 'silent': 1, 'objective': 'binary:logistic'}
+    nTrees = 100
+    if 'nTrees' in parameters:
+        nTrees = parameters['nTrees']
+        del parameters['nTrees']
     if isinstance(parameters, collections.Mapping):
         param.update(parameters)
     return State(100, param)
@@ -60,33 +71,31 @@ def apply(state, X):
     Apply estimator to passed data.
     """
     data = xgb.DMatrix(X)
-    return state.estimator.predict(data)
+    result = state.estimator.predict(data)
+    return np.require(result, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
-def begin_fit(state):
+def begin_fit(state, Xtest, Stest, ytest, wtest):
     """
     Initialize lists which will store the received data
     """
     state.X = []
     state.y = []
     state.w = []
-    state.Xtest = []
-    state.ytest = []
-    state.wtest = []
+    state.Xtest = Xtest
+    state.ytest = ytest.flatten()
+    state.wtest = wtest.flatten()
     return state
 
 
-def partial_fit(state, X, y, w, Xtest, ytest, wtest, epoch):
+def partial_fit(state, X, S, y, w, epoch):
     """
     Stores received training data.
     XGBoost is usually not able to perform a partial fit.
     """
     state.X.append(X)
-    state.y.append(y)
-    state.w.append(w)
-    state.Xtest.append(Xtest)
-    state.ytest.append(ytest)
-    state.wtest.append(wtest)
+    state.y.append(y.flatten())
+    state.w.append(w.flatten())
     return True
 
 
@@ -95,8 +104,13 @@ def end_fit(state):
     Merge received data together and fit estimator
     """
     dtrain = xgb.DMatrix(np.vstack(state.X), label=np.hstack(state.y).astype(int), weight=np.hstack(state.w))
-    dtest = xgb.DMatrix(np.vstack(state.Xtest), label=np.hstack(state.ytest).astype(int), weight=np.hstack(state.wtest))
-    evallist = [(dtest, 'eval'), (dtrain, 'train')]
+
+    if len(state.Xtest) > 0:
+        dtest = xgb.DMatrix(state.Xtest, label=state.ytest.astype(int), weight=state.wtest)
+        evallist = [(dtest, 'eval'), (dtrain, 'train')]
+    else:
+        evallist = [(dtrain, 'train')]
+
     state.estimator = xgb.train(state.parameters, dtrain, state.num_round, evallist)
     f = tempfile.NamedTemporaryFile(delete=False)
     f.close()

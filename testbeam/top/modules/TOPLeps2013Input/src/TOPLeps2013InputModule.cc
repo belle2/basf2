@@ -189,8 +189,9 @@ namespace Belle2 {
   {
     // initialize
     const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
-    m_numPMTchannels = geo->getPMTArray().getPMT().getNumPixels();
-    m_numChannels = geo->getPMTArray().getNumPixels();
+    const auto& pmtArray = geo->getModule(1).getPMTArray();
+    m_numPMTchannels = pmtArray.getPMT().getNumPixels();
+    m_numChannels = pmtArray.getNumPixels();
     if (m_numChannels > 512) B2FATAL("Number of channels > 512");
     m_tdcWidth = geo->getNominalTDC().getBinWidth() * Unit::ns / Unit::ps;
     m_tdcOverflow = geo->getNominalTDC().getOverflowValue();
@@ -233,7 +234,7 @@ namespace Belle2 {
       int ich = (m_top.pmtid_mcp[i] - 1) * m_numPMTchannels + m_top.ch_mcp[i];
       int TDC = t / m_tdcWidth;
       if (TDC < m_tdcOverflow)
-        digits.appendNew(1, getNewNumbering(ich), TDC);
+        digits.appendNew(1, getNewNumbering(ich), t * Unit::ps);
     }
 
     // write track info to data store
@@ -305,9 +306,10 @@ namespace Belle2 {
     if (pixelID == 0) return 0;
 
     const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
-    int Npmtx = geo->getPMTArray().getNumColumns();
-    int Npadx = geo->getPMTArray().getPMT().getNumColumns();
-    int Npady = geo->getPMTArray().getPMT().getNumRows();
+    const auto& pmtArray = geo->getModule(1).getPMTArray();
+    int Npmtx = pmtArray.getNumColumns();
+    int Npadx = pmtArray.getPMT().getNumColumns();
+    int Npady = pmtArray.getPMT().getNumRows();
 
     pixelID--;
     int ix = pixelID % Npadx;

@@ -9,9 +9,6 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithSimpleSimulation.h>
 
-#include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.h>
-#include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.icc.h>
-
 #include <tracking/trackFindingCDC/hough/perigee/SimpleRLTaggedWireHitHoughTree.h>
 #include <tracking/trackFindingCDC/hough/perigee/SimpleSegmentHoughTree.h>
 #include <tracking/trackFindingCDC/hough/perigee/StandardBinSpec.h>
@@ -28,14 +25,14 @@ using namespace PerigeeBinSpec;
 namespace {
 
   // /// Hough tree depth and divisions
-  const size_t maxLevel = 13;
+  const int maxLevel = 13;
 
   // Phi0
   ////////
-  const size_t phi0Divisions = 2;
-  const size_t discretePhi0Overlap = 4;
-  const size_t discretePhi0Width = 5;
-  const size_t nPhi0Bins = std::pow(phi0Divisions, maxLevel);
+  const int phi0Divisions = 2;
+  const int discretePhi0Overlap = 4;
+  const int discretePhi0Width = 5;
+  const int nPhi0Bins = std::pow(phi0Divisions, maxLevel);
   const Phi0BinsSpec phi0BinsSpec(nPhi0Bins,
                                   discretePhi0Overlap,
                                   discretePhi0Width);
@@ -43,14 +40,14 @@ namespace {
 
   // Curv
   ////////
-  const size_t curvDivisions = 2;
+  const int curvDivisions = 2;
   const double maxCurv = 0.13;
   const double minCurv = -0.018;
   const double maxCurvAcceptance = 0.13;
 
-  const size_t discreteCurvOverlap = 4;
-  const size_t discreteCurvWidth = 5;
-  const size_t nCurvBins = std::pow(curvDivisions, maxLevel);
+  const int discreteCurvOverlap = 4;
+  const int discreteCurvWidth = 5;
+  const int nCurvBins = std::pow(curvDivisions, maxLevel);
   const CurvBinsSpec curvBinsSpec(minCurv,
                                   maxCurv,
                                   nCurvBins,
@@ -60,13 +57,13 @@ namespace {
 
   // TanL
   ////////
-  const size_t tanLDivisions = 2;
+  const int tanLDivisions = 2;
   const double maxTanL = 3.27;
   const double minTanL = -1.73;
 
-  const size_t discreteTanLOverlap = 1;
-  const size_t discreteTanLWidth = 2;
-  const size_t nTanLBins = std::pow(tanLDivisions, maxLevel);
+  const int discreteTanLOverlap = 1;
+  const int discreteTanLWidth = 2;
+  const int nTanLBins = std::pow(tanLDivisions, maxLevel);
   ImpactBinsSpec tanLBinsSpec(minTanL,
                               maxTanL,
                               nTanLBins,
@@ -131,7 +128,7 @@ namespace {
     houghTree.fell();
     houghTree.raze();
 
-    size_t iColor = 0;
+    int iColor = 0;
     for (std::pair<HoughBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
       const HoughBox& houghBox = candidate.first;
       const std::vector<CDCRLWireHit>& taggedHits = candidate.second;
@@ -149,7 +146,7 @@ namespace {
       for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {
         B2DEBUG(100, "    " <<
                 "rl = " << static_cast<int>(rlTaggedWireHit.getRLInfo()) << " " <<
-                "dl = " << rlTaggedWireHit->getRefDriftLength());
+                "dl = " << rlTaggedWireHit.getRefDriftLength());
       }
 
       for (const CDCRLWireHit& rlTaggedWireHit : taggedHits) {
@@ -218,12 +215,12 @@ namespace {
     });
 
     /// Test idiom to output statistics about the tree.
-    std::size_t nNodes = houghTree.getTree()->getNNodes();
+    int nNodes = houghTree.getTree()->getNNodes();
     B2INFO("Tree generated " << nNodes << " nodes");
     houghTree.fell();
     houghTree.raze();
 
-    size_t iColor = 0;
+    int iColor = 0;
     for (std::pair<HoughBox, std::vector<const CDCSegment2D*> >& candidate : candidates) {
       const HoughBox& houghBox = candidate.first;
       const std::vector<const CDCSegment2D*>& segments = candidate.second;

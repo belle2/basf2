@@ -220,8 +220,8 @@ void GenFitterVXDTBModule::initialize()
 
   // Create new Translators and give them to the CDCRecoHits.
   // The way, I'm going to do it here will produce some small resource leak, but this will stop, once we go to ROOT 6 and have the possibility to use sharead_ptr
-  CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(), new IdealCDCGeometryTranslator(),
-                             new RealisticTDCCountTranslator());
+  //   CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(), new IdealCDCGeometryTranslator(),
+  //                              new RealisticTDCCountTranslator());
 }
 
 void GenFitterVXDTBModule::beginRun()
@@ -244,10 +244,10 @@ void GenFitterVXDTBModule::event()
   if (trackCandidates.getEntries() == 0)
     B2DEBUG(100, "GenFitter: genfit::TrackCandidatesCollection is empty!");
 
-  StoreArray < CDCHit > cdcHits(m_cdcHitsColName);
-  B2DEBUG(149, "GenFitter: Number of CDCHits: " << cdcHits.getEntries());
-  if (cdcHits.getEntries() == 0)
-    B2DEBUG(100, "GenFitter: CDCHitsCollection is empty!");
+//   StoreArray < CDCHit > cdcHits(m_cdcHitsColName);
+//   B2DEBUG(149, "GenFitter: Number of CDCHits: " << cdcHits.getEntries());
+//   if (cdcHits.getEntries() == 0)
+//     B2DEBUG(100, "GenFitter: CDCHitsCollection is empty!");
 
   StoreArray < SVDTrueHit > svdTrueHits(m_svdHitsColName);
   B2DEBUG(149, "GenFitter: Number of SVDHits: " << svdTrueHits.getEntries());
@@ -366,7 +366,7 @@ void GenFitterVXDTBModule::event()
       genfit::MeasurementProducer <PXDTrueHit, PXDRecoHit>* PXDProducer =  NULL;
       genfit::MeasurementProducer <TelTrueHit, TelRecoHit>* TelProducer =  NULL;
       genfit::MeasurementProducer <SVDTrueHit, SVDRecoHit2D>* SVDProducer =  NULL;
-      genfit::MeasurementProducer <CDCHit, CDCRecoHit>* CDCProducer =  NULL;
+//       genfit::MeasurementProducer <CDCHit, CDCRecoHit>* CDCProducer =  NULL;
 
       genfit::MeasurementProducer <PXDCluster, PXDRecoHit>* pxdClusterProducer = NULL;
       genfit::MeasurementProducer <SVDCluster, SVDRecoHit>* svdClusterProducer = NULL;
@@ -400,10 +400,10 @@ void GenFitterVXDTBModule::event()
           factory.addProducer(Const::SVD, svdClusterProducer);
         }
       }
-      if (cdcHits.getEntries()) {
-        CDCProducer =  new genfit::MeasurementProducer <CDCHit, CDCRecoHit> (cdcHits.getPtr());
-        factory.addProducer(Const::CDC, CDCProducer);
-      }
+//       if (cdcHits.getEntries()) {
+//         CDCProducer =  new genfit::MeasurementProducer <CDCHit, CDCRecoHit> (cdcHits.getPtr());
+//         factory.addProducer(Const::CDC, CDCProducer);
+//       }
 
       // The track fit needs an initial guess for the resolution.  The
       // values should roughly match the actual resolution (squared),

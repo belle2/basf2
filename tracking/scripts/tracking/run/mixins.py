@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from .minimal import EmptyRun
-from tracking.modules import BrowseTFileOnTerminateModule
+import tracking.root_utils as root_utils
 
 import logging
 
@@ -15,14 +15,46 @@ class RunMixin(EmptyRun):
     pass
 
 
-class BrowseTFileOnTerminateRunMixin(RunMixin):
+class PostProcessingRunMixin(EmptyRun):
+    postprocess_only = False
+
+    def create_argument_parser(self, **kwds):
+        argument_parser = super().create_argument_parser(**kwds)
+        postprocess_argument_group = argument_parser.add_argument_group("Postprocessing arguments")
+        postprocess_argument_group.add_argument(
+            '-po',
+            '--postprocess-only',
+            action='store_true',
+            default=self.postprocess_only,
+            dest='postprocess_only',
+            help='Only run the post processing of this run.',)
+
+        return argument_parser
+
+    def run(self, path):
+        if not self.postprocess_only:
+            super().run(path)
+
+        self.postprocess()
+
+    def postprocess(self):
+        pass
+
+
+class BrowseTFileOnTerminateRunMixin(PostProcessingRunMixin):
     output_file_name = None
     show_results = False
 
     def create_argument_parser(self, **kwds):
         argument_parser = super().create_argument_parser(**kwds)
 
-        argument_parser.add_argument(
+        postprocess_argument_group = argument_parser
+        for group in argument_parser._action_groups:
+            if group.title == "Postprocessing arguments":
+                postprocess_argument_group = group
+                break
+
+        postprocess_argument_group.add_argument(
             '-s',
             '--show',
             action='store_true',
@@ -32,16 +64,13 @@ class BrowseTFileOnTerminateRunMixin(RunMixin):
 
         return argument_parser
 
-    def create_path(self):
-        # Sets up a path that plays back pregenerated events or generates events
-        # based on the properties in the base class.
-        path = super().create_path()
-
+    def postprocess(self):
         if self.show_results and self.output_file_name:
-            browse_tfile_on_terminate_module = BrowseTFileOnTerminateModule(self.output_file_name)
-            path.add_module(browse_tfile_on_terminate_module)
+            with root_utils.root_open(self.output_file_name) as tfile:
+                root_utils.root_browse(tfile)
+                input("Close with return key.")
 
-        return path
+        super().postprocess()
 
 
 class RootOutputRunMixin(RunMixin):

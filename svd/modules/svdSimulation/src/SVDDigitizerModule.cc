@@ -321,9 +321,12 @@ void SVDDigitizerModule::event()
       m_sensorThickness = info.getThickness();
       m_depletionVoltage = info.getDepletionVoltage();
       m_biasVoltage = info.getBiasVoltage();
-      m_backplaneCapacitance = info.getBackplaneCapacitance();
-      m_interstripCapacitance = info.getInterstripCapacitance();
-      m_couplingCapacitance = info.getCouplingCapacitance();
+      m_backplaneCapacitanceU = info.getBackplaneCapacitanceU();
+      m_interstripCapacitanceU = info.getInterstripCapacitanceU();
+      m_couplingCapacitanceU = info.getCouplingCapacitanceU();
+      m_backplaneCapacitanceV = info.getBackplaneCapacitanceV();
+      m_interstripCapacitanceV = info.getInterstripCapacitanceV();
+      m_couplingCapacitanceV = info.getCouplingCapacitanceV();
       m_elNoiseU = info.getElectronicNoiseU();
       m_elNoiseV = info.getElectronicNoiseV();
 
@@ -338,9 +341,12 @@ void SVDDigitizerModule::event()
               << " --> Thickness:      " << m_currentSensorInfo->getThickness() << endl
               << " --> Deplet. voltage:" << m_currentSensorInfo->getDepletionVoltage() << endl
               << " --> Bias voltage:   " << m_currentSensorInfo->getBiasVoltage() << endl
-              << " --> Backplane cap.: " << m_currentSensorInfo->getBackplaneCapacitance() << endl
-              << " --> Interstrip cap.:" << m_currentSensorInfo->getInterstripCapacitance() << endl
-              << " --> Coupling cap.:  " << m_currentSensorInfo->getCouplingCapacitance() << endl
+              << " --> Backplane cap.U: " << m_currentSensorInfo->getBackplaneCapacitanceU() << endl
+              << " --> Interstrip cap.U:" << m_currentSensorInfo->getInterstripCapacitanceU() << endl
+              << " --> Coupling cap.U:  " << m_currentSensorInfo->getCouplingCapacitanceU() << endl
+              << " --> Backplane cap.V: " << m_currentSensorInfo->getBackplaneCapacitanceV() << endl
+              << " --> Interstrip cap.V:" << m_currentSensorInfo->getInterstripCapacitanceV() << endl
+              << " --> Coupling cap.V:  " << m_currentSensorInfo->getCouplingCapacitanceV() << endl
               << " --> El. noise U:    " << m_currentSensorInfo->getElectronicNoiseU() << endl
               << " --> El. noise V:    " << m_currentSensorInfo->getElectronicNoiseV() << endl
              );
@@ -497,23 +503,29 @@ void SVDDigitizerModule::driftCharge(const TVector3& position, double carriers, 
     stripCharges.push_back(0);
   }
   // Cross-talk
-  double cNeighbour2 = 0.5 * info.getInterstripCapacitance()
-                       / (0.5 * info.getInterstripCapacitance()
-                          + info.getBackplaneCapacitance()
-                          + info.getCouplingCapacitance());
-  double cNeighbour1 = 0.5;
-  double cSelf = 1.0 - 2.0 * cNeighbour2;
   std::deque<double> readoutCharges;
   std::deque<int> readoutStrips;
   for (std::size_t index = 2; index <  strips.size() - 2; index += 2) {
-    readoutCharges.push_back(
-      cNeighbour2 * stripCharges[index - 2]
-      + cNeighbour1 * stripCharges[index - 1]
-      + cSelf * stripCharges[index]
-      + cNeighbour1 * stripCharges[index + 1]
-      + cNeighbour2 * stripCharges[index + 2]
-    );
-    readoutStrips.push_back(static_cast<int>(strips[index]));
+    int currentStrip = static_cast<int>(strips[index]);
+    double Cc = (have_electrons) ? info.getCouplingCapacitanceU(currentStrip) :
+                info.getCouplingCapacitanceV(currentStrip);
+    double Ci = (have_electrons) ? info.getInterstripCapacitanceU(currentStrip) :
+                info.getInterstripCapacitanceV(currentStrip);
+    double Cb = (have_electrons) ? info.getBackplaneCapacitanceU(currentStrip) :
+                info.getBackplaneCapacitanceV(currentStrip);
+
+    double cNeighbour2 = 0.5 * Ci / (2 * Ci + Cb + Cc);
+    double cNeighbour1 = Ci / (2 * Ci + Cb);
+    double cSelf = Cc / (2 * Ci + Cb + Cc);
+
+    readoutCharges.push_back(cSelf * (
+                               cNeighbour2 * stripCharges[index - 2]
+                               + cNeighbour1 * stripCharges[index - 1]
+                               + stripCharges[index]
+                               + cNeighbour1 * stripCharges[index + 1]
+                               + cNeighbour2 * stripCharges[index + 2]
+                             ));
+    readoutStrips.push_back(currentStrip);
   }
   // Trim at sensor edges
   double tail = 0;

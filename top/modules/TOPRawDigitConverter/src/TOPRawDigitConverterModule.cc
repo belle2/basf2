@@ -25,6 +25,7 @@
 
 // Dataobject classes
 #include <top/dataobjects/TOPRawDigit.h>
+#include <top/dataobjects/TOPRawWaveform.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <framework/dataobjects/EventMetaData.h>
 
@@ -69,7 +70,19 @@ namespace Belle2 {
              "if true, use common T0 calibration (needs DB)", true);
     addParam("subtractOffset", m_subtractOffset,
              "if true, subtract offset defined for nominal TDC (required for MC)", false);
-
+    addParam("pedestalRMS", m_pedestalRMS,
+             "r.m.s of pedestals [ADC counts], "
+             "if positive, timeError will be estimated from FE data", 9.0);
+    addParam("calibrationChannel", m_calibrationChannel,
+             "calpulse selection: ASIC channel (use -1 to turn off the selection)", -1);
+    addParam("calpulseWidthMin", m_calpulseWidthMin,
+             "calpulse selection: minimal width [ns]", 0.0);
+    addParam("calpulseWidthMax", m_calpulseWidthMax,
+             "calpulse selection: maximal width [ns]", 0.0);
+    addParam("calpulseHeightMin", m_calpulseHeightMin,
+             "calpulse selection: minimal height [ns]", 0);
+    addParam("calpulseHeightMax", m_calpulseHeightMax,
+             "calpulse selection: maximal height [ns]", 0);
   }
 
 
@@ -95,7 +108,6 @@ namespace Belle2 {
     // equidistant sample times in case calibration is not required
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     m_sampleTimes.setTimeAxis(geo->getNominalTDC().getSyncTimeBase());
-    m_sampleDivisions = (0x1 << geo->getNominalTDC().getSubBits());
 
     // either common T0 or TDC offset
     if (m_useCommonT0Calibration and m_subtractOffset)
@@ -173,33 +185,62 @@ namespace Belle2 {
                                          rawDigit.getASICChannel());
       auto pixelID = chMapper.getPixelID(channel);
       double rawTime = rawDigit.getCFDLeadingTime(); // time in [samples]
-      int tdc = int(rawTime * m_sampleDivisions);
       const auto* sampleTimes = &m_sampleTimes; // equidistant sample times
       if (m_useSampleTimeCalibration) {
         sampleTimes = (*m_timebase)->getSampleTimes(scrodID, channel % 128);
         if (!sampleTimes->isCalibrated()) {
-          B2ERROR("No sample time calibration available for SCROD " << scrodID
-                  << " channel " << channel % 128 << " - raw digit not converted");
+          B2WARNING("No sample time calibration available for SCROD " << scrodID
+                    << " channel " << channel % 128 << " - raw digit not converted");
           continue;
         }
       }
       auto window = rawDigit.getASICWindow();
-      double time = sampleTimes->getTimeDifference(window, rawTime); // time in [ns]
+      double time = sampleTimes->getTime(window, rawTime); // time in [ns]
       if (m_useChannelT0Calibration) time -= (*m_channelT0)->getT0(moduleID, channel);
       if (m_useModuleT0Calibration) time -= (*m_moduleT0)->getT0(moduleID);
       if (m_useCommonT0Calibration) time -= (*m_commonT0)->getT0();
       if (m_subtractOffset) time -= geo->getNominalTDC().getOffset();
-      double width = sampleTimes->getDeltaTime(window, rawDigit.getCFDFallingTime(),
+      double width = sampleTimes->getDeltaTime(window,
+                                               rawDigit.getCFDFallingTime(),
                                                rawDigit.getCFDLeadingTime()); // in [ns]
-      auto* digit = digits.appendNew(moduleID, pixelID, tdc);
+
+      double timeError = geo->getNominalTDC().getTimeJitter();
+      if (m_pedestalRMS > 0) {
+        double rawErr = rawDigit.getCFDLeadingTimeError(m_pedestalRMS); // in [samples]
+        auto sampleRise = rawDigit.getSampleRise();
+        timeError = rawErr * sampleTimes->getTimeBin(window, sampleRise); // [ns]
+      }
+
+      auto* digit = digits.appendNew(moduleID, pixelID, rawTime);
       digit->setTime(time);
-      // digit->setTimeError(timeError); TODO!
-      digit->setADC(rawDigit.getValuePeak());
+      digit->setTimeError(timeError);
+      digit->setPulseHeight(rawDigit.getValuePeak());
       digit->setIntegral(rawDigit.getIntegral());
       digit->setPulseWidth(width);
       digit->setChannel(channel);
       digit->setFirstWindow(window);
       digit->addRelationTo(&rawDigit);
+      if (!rawDigit.isFEValid() or rawDigit.isPedestalJump())
+        digit->setHitQuality(TOPDigit::c_Junk);
+      const auto* waveform = rawDigit.getRelated<TOPRawWaveform>();
+      if (waveform) {
+        if (!waveform->areWindowsInOrder(rawDigit.getSampleFall() + 1))
+          digit->setHitQuality(TOPDigit::c_Junk);
+      }
+    }
+
+    // select and flag calpulses, if calibration channel given
+    unsigned calibrationChannel = m_calibrationChannel;
+    if (calibrationChannel < 8) {
+      for (auto& digit : digits) {
+        if (digit.getHitQuality() != TOPDigit::c_Good) continue;
+        if (digit.getASICChannel() != calibrationChannel) continue;
+        if (digit.getPulseHeight() < m_calpulseHeightMin) continue;
+        if (digit.getPulseHeight() > m_calpulseHeightMax) continue;
+        if (digit.getPulseWidth() < m_calpulseWidthMin) continue;
+        if (digit.getPulseWidth() > m_calpulseWidthMax) continue;
+        digit.setHitQuality(TOPDigit::c_CalPulse);
+      }
     }
 
   }

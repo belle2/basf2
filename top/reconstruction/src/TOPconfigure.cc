@@ -48,8 +48,8 @@ namespace Belle2 {
       TVector3 Bfield = BFieldMap::Instance().getBField(point);
       setBfield(-Bfield.Z());
 
-      // PMT dimensions
-      const auto& pmt = geo->getPMTArray().getPMT();
+      // PMT dimensions: NOTE reconstruction assumes all modules have the same PMT's
+      const auto& pmt = geo->getModule(1).getPMTArray().getPMT();
       setPMT(pmt.getSizeX(), pmt.getSizeY(),
              pmt.getSensSizeX(), pmt.getSensSizeY(),
              pmt.getNumColumns(), pmt.getNumRows());
@@ -106,7 +106,7 @@ namespace Belle2 {
                            B / 2, B / 2 - prismExit, 0, 0, prismWidth);
 
         double filter = prism.getFilterThickness();
-        const auto& pmtArray = geo->getPMTArray();
+        const auto& pmtArray = module.getPMTArray();
         double pmtWindow = pmtArray.getPMT().getWinThickness();
         setBBoxWindow(id, prismFlat + filter + pmtWindow);
 

@@ -18,12 +18,12 @@
 #include <framework/datastore/RelationVector.h>
 #include <framework/datastore/RelationsObject.h>
 
+#include <tracking/dataobjects/RecoTrack.h>
+#include <mdst/dataobjects/Track.h>
+
 #include <geometry/bfieldmap/BFieldMap.h>
 
 #include <vxd/geometry/GeoCache.h>
-
-#include <genfit/Track.h>
-#include <genfit/TrackCand.h>
 
 #include <root/TTree.h>
 #include <root/TAxis.h>
@@ -68,6 +68,10 @@ void V0findingPerformanceEvaluationModule::initialize()
 
   //create list of histograms to be saved in the rootfile
   m_histoList = new TList;
+  m_histoList_multiplicity = new TList;
+  m_histoList_efficiency = new TList;
+  m_histoList_purity = new TList;
+  m_histoList_trkQuality = new TList;
 
   //set the ROOT File
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
@@ -75,10 +79,13 @@ void V0findingPerformanceEvaluationModule::initialize()
   //now create histograms
 
   //multiplicity histograms
-  m_multiplicityV0s = createHistogram1D("h1nV0", "number of V0s per MC Particle", 8, -0.5, 7.5, "# V0s", m_histoList);
+  m_multiplicityV0s = createHistogram1D("h1nV0", "number of V0s per MC Particle", 8, -0.5, 7.5, "# V0s", m_histoList_multiplicity);
 
   m_multiplicityMCParticles = createHistogram1D("h1nMCPrtcl", "number of MCParticles per V0s", 5, -0.5, 4.5,
-                                                "# MCParticles", m_histoList);
+                                                "# MCParticles", m_histoList_multiplicity);
+
+  m_MCParticlePDGcode = createHistogram1D("h1PDGcode", "PDG code of MCParticles", 6244, -3122, 3122,
+                                          "PDG code", m_histoList_multiplicity);
 
 
   //vertex and momentum parameters errors
@@ -93,8 +100,8 @@ void V0findingPerformanceEvaluationModule::initialize()
   m_h1_vtxX_res = createHistogram1D("h1vtxXres", "vtxX resid", 100, -0.2, 0.2, "vtxX resid (cm)", m_histoList);
   m_h1_vtxY_res = createHistogram1D("h1vtxYres", "vtxY resid", 100, -0.2, 0.2, "vtxY resid (cm)", m_histoList);
   m_h1_vtxZ_res = createHistogram1D("h1vtxZres", "vtxZ resid", 100, -0.5, 0.5, "vtxZ resid (cm)", m_histoList);
-  m_h1_mom_res = createHistogram1D("h1momres", "mom resid", 100, -1.5, 1.5, "mom resid (GeV/c)", m_histoList);
-  m_h1_mass_res = createHistogram1D("h1massres", "mass resid", 100, -1, 1, "mass resid (GeV/c)", m_histoList);
+  m_h1_mom_res = createHistogram1D("h1momres", "mom resid", 1000, -0.5, 0.5, "mom resid (GeV/c)", m_histoList);
+  m_h1_mass_res = createHistogram1D("h1massres", "mass resid", 500, -0.3, 0.3, "mass resid (GeV/c)", m_histoList);
 
   //vertex and momentum parameters pulls
   m_h1_vtxX_pll = createHistogram1D("h1vtxXpll", "vtxX pull", 100, -5, 5, "vtxX pull", m_histoList);
@@ -104,7 +111,7 @@ void V0findingPerformanceEvaluationModule::initialize()
   //  m_h1_mass_pll = createHistogram1D("h1masspll", "mass pull", 100, -5, 5, "momY pull", m_histoList);
 
 
-  m_h1_ChiSquare = createHistogram1D("h1Chi2", "Chi2 of the fit", 100, 0, 20, "Chi2", m_histoList);
+  m_h1_ChiSquare = createHistogram1D("h1Chi2", "Chi2 of the fit", 100, 0, 20, "Chi2", m_histoList_trkQuality);
 
   m_h1_nMatchedDau = createHistogram1D("h1nMatchedDau", "Number of Matched MCParticle Daughters", 3, -0.5, 2.5, "# matched dau",
                                        m_histoList);
@@ -169,14 +176,13 @@ void V0findingPerformanceEvaluationModule::event()
     int nMatchedDau =  nMatchedDaughters(mcParticle);
     m_h1_nMatchedDau->Fill(nMatchedDau);
 
-    //proceed only in case the MCParticle daughters have one associated reconstructed track:
+    //proceed only in case the MCParticle daughters have both one associated reconstructed track:
     if (nMatchedDau != 2)
       continue;
 
     int pdgCode = mcParticle.getPDG();
     B2DEBUG(99, "MCParticle has PDG code " << pdgCode);
-
-    int nV0s = 0;
+    m_MCParticlePDGcode->Fill(mcParticle.getPDG());
 
     MCParticleInfo mcParticleInfo(mcParticle, magField);
 
@@ -194,14 +200,14 @@ void V0findingPerformanceEvaluationModule::event()
 
     //1.0 check if there is a V0
     RelationVector<V0ValidationVertex> V0s_toMCParticle =
-      DataStore::getRelationsToObj<V0ValidationVertex>(&mcParticle, m_V0sName);
+      DataStore::getRelationsWithObj<V0ValidationVertex>(&mcParticle, m_V0sName);
+
+    m_multiplicityV0s->Fill(V0s_toMCParticle.size());
 
     if (V0s_toMCParticle.size() > 0)
       m_h3_V0sPerMCParticle->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
 
     for (int v0 = 0; v0 < (int)V0s_toMCParticle.size(); v0++) {
-
-      nV0s++;
 
       TVector3 V0_vtx = V0s_toMCParticle[v0]->getVertexPosition();
       float V0_mom = V0s_toMCParticle[v0]->getFittedMomentum();
@@ -234,30 +240,31 @@ void V0findingPerformanceEvaluationModule::event()
     }
 
 
-    m_multiplicityV0s->Fill(nV0s);
-
   }
 
 
   B2DEBUG(99, "+++++ 2. loop on V0s");
 
-  //2. retrieve all the MCParticles related to the V0s
+
   StoreArray<V0ValidationVertex> V0s(m_V0sName);
+
 
   BOOST_FOREACH(V0ValidationVertex & v0, V0s) {
 
     int nMCParticles = 0;
 
-    //check if the track has been fitted
+    //    m_h3_V0s>Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
+    //2. retrieve all the MCParticles related to the V0s
     RelationVector<MCParticle> MCParticles_fromV0 =
-      DataStore::getRelationsFromObj<MCParticle>(&v0, m_MCParticlesName);
+      DataStore::getRelationsWithObj<MCParticle>(&v0, m_MCParticlesName);
 
     nMCParticles = MCParticles_fromV0.size();
 
     if (nMCParticles == 0)
       continue;
 
-    //    m_h3_MCParticlesPerV0->Fill
+    MCParticleInfo mcParticleInfo(* MCParticles_fromV0[0], magField);
+    m_h3_MCParticlesPerV0->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
     m_multiplicityMCParticles->Fill(nMCParticles);
 
   }
@@ -296,7 +303,7 @@ void V0findingPerformanceEvaluationModule::endRun()
 void V0findingPerformanceEvaluationModule::terminate()
 {
 
-  TH1F* h_eff_R   = (TH1F*)duplicateHistogram("h_eff_R", "efficiency vs R", m_h1_MCParticle_R, m_histoList);
+  TH1F* h_eff_R   = (TH1F*)duplicateHistogram("h_eff_R", "efficiency vs R", m_h1_MCParticle_R, m_histoList_efficiency);
 
   for (int bin = 0; bin < h_eff_R->GetXaxis()->GetNbins(); bin++) {
     float num = m_h1_V0sPerMCParticle_R->GetBinContent(bin + 1);
@@ -313,17 +320,43 @@ void V0findingPerformanceEvaluationModule::terminate()
     h_eff_R->SetBinError(bin + 1, err);
   }
 
-  addEfficiencyPlots(m_histoList, m_h3_V0sPerMCParticle, m_h3_MCParticle);
+  addEfficiencyPlots(m_histoList_efficiency, m_h3_V0sPerMCParticle, m_h3_MCParticle);
 
-  addInefficiencyPlots(m_histoList, m_h3_V0sPerMCParticle, m_h3_MCParticle);
+  addInefficiencyPlots(m_histoList_efficiency, m_h3_V0sPerMCParticle, m_h3_MCParticle);
 
-  addPurityPlots(m_histoList, m_h3_MCParticlesPerV0, m_h3_V0s);
+  //  addPurityPlots(m_histoList_purity, m_h3_MCParticlesPerV0, m_h3_V0s);
 
   if (m_rootFilePtr != NULL) {
     m_rootFilePtr->cd();
 
-    TIter nextH(m_histoList);
+    TDirectory* oldDir = gDirectory;
+
+    TDirectory* dir_multiplicity = oldDir->mkdir("multiplicity");
+    dir_multiplicity->cd();
+    TIter nextH_multiplicity(m_histoList_multiplicity);
     TObject* obj;
+    while ((obj = nextH_multiplicity()))
+      obj->Write();
+
+    TDirectory* dir_efficiency = oldDir->mkdir("efficiency");
+    dir_efficiency->cd();
+    TIter nextH_efficiency(m_histoList_efficiency);
+    while ((obj = nextH_efficiency()))
+      obj->Write();
+
+    TDirectory* dir_purity = oldDir->mkdir("purity");
+    dir_purity->cd();
+    TIter nextH_purity(m_histoList_purity);
+    while ((obj = nextH_purity()))
+      obj->Write();
+
+    TDirectory* dir_trkQuality = oldDir->mkdir("trkQuality");
+    dir_trkQuality->cd();
+    TIter nextH_trkQuality(m_histoList_trkQuality);
+    while ((obj = nextH_trkQuality()))
+      obj->Write();
+
+    TIter nextH(m_histoList);
     while ((obj = nextH()))
       obj->Write();
 
@@ -353,19 +386,17 @@ bool V0findingPerformanceEvaluationModule::isV0(const MCParticle& the_mcParticle
   if (abs(the_mcParticle.getPDG()) == 3122)
     isLambda = true;
 
+  bool twoProngs = false;
   bool twoChargedProngs = false;
 
   if (the_mcParticle.getDaughters().size() == 2)
-    twoChargedProngs = true;
+    twoProngs = true;
 
-  if (twoChargedProngs)
-    if (the_mcParticle.getDaughters()[0]->getCharge() == 0)
-      twoChargedProngs = false;
+  if (twoProngs)
+    if (the_mcParticle.getDaughters()[0]->getCharge() *  the_mcParticle.getDaughters()[1]->getCharge() < 0)
+      twoChargedProngs = true;
 
   return ((isGamma || isK_S0 || isK_0 || isLambda) && twoChargedProngs);
-  //  return (isGamma && twoChargedProngs);
-  //  return (isLambda && twoChargedProngs);
-  //  return ( (isK_S0 || isK_0) && twoChargedProngs);
 
 }
 
@@ -379,23 +410,14 @@ int V0findingPerformanceEvaluationModule::nMatchedDaughters(const MCParticle& th
   bool first = false;
   bool second = false;
 
-  RelationVector<genfit::TrackCand> TrackCands_fromMCParticle_0 = DataStore::getRelationsToObj<genfit::TrackCand>(MCPart_dau[0]);
+  RelationVector<Track> Tracks_fromMCParticle_0 = DataStore::getRelationsWithObj<Track>(MCPart_dau[0]);
+  if (Tracks_fromMCParticle_0.size() > 0)
+    first = true;
 
-  for (int tc = 0; tc < (int)TrackCands_fromMCParticle_0.size(); tc++)
-    if (TrackCands_fromMCParticle_0.weight(tc) > 0.66) {
-      RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsFromObj<genfit::Track>(TrackCands_fromMCParticle_0[tc]);
-      if (Tracks_fromTrackCand.size() > 0)
-        first = true;
-    }
+  RelationVector<Track> Tracks_fromMCParticle_1 = DataStore::getRelationsWithObj<Track>(MCPart_dau[1]);
+  if (Tracks_fromMCParticle_1.size() > 0)
+    second = true;
 
-  RelationVector<genfit::TrackCand> TrackCands_fromMCParticle_1 = DataStore::getRelationsToObj<genfit::TrackCand>(MCPart_dau[1]);
-
-  for (int tc = 0; tc < (int)TrackCands_fromMCParticle_1.size(); tc++)
-    if (TrackCands_fromMCParticle_1.weight(tc) > 0.66) {
-      RelationVector<genfit::Track> Tracks_fromTrackCand = DataStore::getRelationsFromObj<genfit::Track>(TrackCands_fromMCParticle_1[tc]);
-      if (Tracks_fromTrackCand.size() > 0)
-        second = true;
-    }
 
   if (first)
     nMatchedDau++;

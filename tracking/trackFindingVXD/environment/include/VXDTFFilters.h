@@ -15,36 +15,32 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 
-#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance1DZ.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance3DNormed.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/SlopeRZ.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance1DZSquared.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance2DXYSquared.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance3DSquared.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance1DZ.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DNormed.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/SlopeRZ.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance1DZSquared.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance2DXYSquared.h>
+#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DSquared.h>
 
-#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/Angle3DSimple.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/CosAngleXY.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/AngleRZSimple.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/CircleDist2IP.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/DeltaSlopeRZ.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/DeltaSlopeZoverS.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/DeltaSoverZ.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/HelixParameterFit.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/Pt.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/CircleRadius.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/Angle3DSimple.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/CosAngleXY.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/AngleRZSimple.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/CircleDist2IP.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/DeltaSlopeRZ.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/DeltaSlopeZoverS.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/DeltaSoverZ.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/HelixParameterFit.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/Pt.h>
+#include <tracking/trackFindingVXD/filterMap/threeHitVariables/CircleRadius.h>
 
-#include <tracking/trackFindingVXD/sectorMap/filterFramework/Shortcuts.h>
+#include <tracking/trackFindingVXD/filterMap/filterFramework/Shortcuts.h>
 #include "tracking/trackFindingVXD/filterTools/ObserverPrintResults.h"
-#include <tracking/trackFindingVXD/sectorMap/filterFramework/Observer.h> // empty observer
-#include <tracking/trackFindingVXD/sectorMap/filterFramework/VoidObserver.h> // empty observer
-#include "tracking/trackFindingVXD/filterTools/ObserverCheckMCPurity.h"
-
-#include "tracking/trackFindingVXD/filterTools/Observer3HitPrintResults.h"
+#include <tracking/trackFindingVXD/filterMap/filterFramework/VoidObserver.h> // empty observer
 
 #include <tracking/dataobjects/SectorMapConfig.h>
 
 #include "vxd/dataobjects/VxdID.h"
-#include <tracking/trackFindingVXD/sectorMap/map/CompactSecIDs.h>
+#include <tracking/trackFindingVXD/filterMap/map/CompactSecIDs.h>
 #include "tracking/trackFindingVXD/segmentNetwork/StaticSector.h"
 
 #include <TString.h>
@@ -68,12 +64,12 @@ namespace Belle2 {
     /// big working 2-hits-example used for redesign of VXDTF.
     typedef decltype(
       (
-        (0. <= Distance3DSquared<Belle2::SpacePoint>() <= 0.).observe(ObserverCheckMCPurity())&&
-        (0. <= Distance2DXYSquared<Belle2::SpacePoint>() <= 0.).observe(ObserverCheckMCPurity())&&
-        (0. <= Distance1DZ<Belle2::SpacePoint>() <= 0.).observe(ObserverCheckMCPurity())&&
-        (0. <= SlopeRZ<Belle2::SpacePoint>() <= 0.).observe(ObserverCheckMCPurity())&&
-        (0. <= Distance3DNormed<Belle2::SpacePoint>() <= 0.).observe(ObserverCheckMCPurity())
-      ).observe(ObserverCheckMCPurity())
+        0. <= Distance3DSquared<Belle2::SpacePoint>() <= 0.&&
+        0. <= Distance2DXYSquared<Belle2::SpacePoint>() <= 0.&&
+        0. <= Distance1DZ<Belle2::SpacePoint>() <= 0.&&
+        0. <= SlopeRZ<Belle2::SpacePoint>() <= 0.&&
+        0. <= Distance3DNormed<Belle2::SpacePoint>() <= 0.
+      )
     ) twoHitFilter_t;
 
     // March9th2016: TODO: we want to use a big observer observing everything - Working title: MegaObserver.
@@ -91,16 +87,18 @@ namespace Belle2 {
 
     /// big working example for 3-hits:
     typedef decltype(
-      (0. <= Angle3DSimple<point_t>()   <= 0.).observe(VoidObserver())&&
-      (0. <= CosAngleXY<point_t>()   <= 0.).observe(VoidObserver())&&
-      (0. <= AngleRZSimple<point_t>()   <= 0.).observe(VoidObserver())&&
-      (CircleDist2IP<point_t>()         <= 0.).observe(VoidObserver())&&
-      (0. <= DeltaSlopeRZ<point_t>()    <= 0.).observe(VoidObserver())&&
-      (0. <= DeltaSlopeZoverS<point_t>() <= 0.).observe(VoidObserver())&&
-      (0. <= DeltaSoverZ<point_t>()     <= 0.).observe(VoidObserver())&&
-      (0. <= HelixParameterFit<point_t>() <= 0.).observe(VoidObserver())&&
-      (0. <= Pt<point_t>()              <= 0.).observe(VoidObserver())&&
-      (0. <= CircleRadius<point_t>()    <= 0.).observe(VoidObserver())
+      (
+        0. <= Angle3DSimple<point_t>()   <= 0.&&
+        0. <= CosAngleXY<point_t>()   <= 0.&&
+        0. <= AngleRZSimple<point_t>()   <= 0.&&
+        CircleDist2IP<point_t>()         <= 0.&&
+        0. <= DeltaSlopeRZ<point_t>()    <= 0.&&
+        0. <= DeltaSlopeZoverS<point_t>() <= 0.&&
+        0. <= DeltaSoverZ<point_t>()     <= 0.&&
+        0. <= HelixParameterFit<point_t>() <= 0.&&
+        0. <= Pt<point_t>()              <= 0.&&
+        0. <= CircleRadius<point_t>()    <= 0.
+      )
     ) threeHitFilter_t;
 
 
@@ -217,9 +215,10 @@ namespace Belle2 {
       // catch case when sector is not part of the sectorMap:
       if (staticSector == nullptr)
         return just_in_case;
-      const auto filter = staticSector->getFilter2sp(inner);
-      return filter;
-
+      const auto* filterPtr = staticSector->getFilter2sp(inner);
+      if (filterPtr == NULL)
+        return just_in_case;
+      return *filterPtr;
     }
 
 
@@ -292,6 +291,23 @@ namespace Belle2 {
 
       return true;
     };
+
+    /// during the trainings phase the sublayer ids have to be updated
+    /// @param sector : FullSecID of the sector to be updated (SubLayerID of sector will be ignored while searching for it!)
+    /// @param sublayer : new value for the sublayer, the new SubLayerID will be 0 if sublayer==0, and 1 else
+    bool setSubLayerIDs(FullSecID sector, int sublayer)
+    {
+      // first update the static sector
+      // the static sector is retrieved from the compactid which automatically ignores the sublayer id
+      auto sectorPosition = m_compactSecIDsMap[ sector ];
+      if (sectorPosition == 0) return false;
+      staticSector_t* staticsector = m_staticSectors[ sectorPosition ];
+      if (!staticsector) return false;
+      staticsector->setSubLayerID(sublayer);
+
+      // then update the fullsectorid in the compactsectoridmap, the sublayerid of sector will be ignored when searching for sector to update
+      return m_compactSecIDsMap.setSubLayerID(sector, sublayer);
+    }
 
   private:
 

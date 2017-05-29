@@ -134,8 +134,9 @@ namespace Belle2 {
     m_treeTop->Branch("trk_top_z", &(m_top.trk_top_z), "trk_top_z/F");
 
     const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
-    m_numPMTchannels = geo->getPMTArray().getPMT().getNumPixels();
-    m_numChannels = geo->getPMTArray().getNumPixels();
+    const auto& pmtArray = geo->getModule(1).getPMTArray();
+    m_numPMTchannels = pmtArray.getPMT().getNumPixels();
+    m_numChannels = pmtArray.getNumPixels();
     if (m_numChannels > 512) B2FATAL("Number of channels > 512");
     m_tdcWidth = geo->getNominalTDC().getBinWidth() * Unit::ns / Unit::ps;
     m_tdcOverflow = geo->getNominalTDC().getOverflowValue();
@@ -163,7 +164,7 @@ namespace Belle2 {
     for (int i = 0; i < nEntries; ++i) {
       TOPDigit* digi = topDigits[i];
       int ich = getOldNumbering(digi->getPixelID()) - 1;
-      float tdc(digi->getTDC());
+      float tdc = digi->getRawTime();
       if (m_randomize) {tdc += gRandom->Rndm();}
 
       if (m_multipleHits) {
@@ -215,9 +216,10 @@ namespace Belle2 {
     if (pixelID == 0) return 0;
 
     const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
-    int Npmtx = geo->getPMTArray().getNumColumns();
-    int Npadx = geo->getPMTArray().getPMT().getNumColumns();
-    int Npady = geo->getPMTArray().getPMT().getNumRows();
+    const auto& pmtArray = geo->getModule(1).getPMTArray();
+    int Npmtx = pmtArray.getNumColumns();
+    int Npadx = pmtArray.getPMT().getNumColumns();
+    int Npady = pmtArray.getPMT().getNumRows();
 
     pixelID--;
     int nx = Npmtx * Npadx;

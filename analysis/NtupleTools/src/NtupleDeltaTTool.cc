@@ -24,8 +24,10 @@ void NtupleDeltaTTool::setupTree()
   vector<string> strNames = m_decaydescriptor.getSelectionNames();
   if (strNames.empty()) return;
   m_fDeltaT = 0;
+  m_fDeltaTErr = 0;
 
   m_tree->Branch((strNames[0] + "_DeltaT").c_str(), &m_fDeltaT, (strNames[0] + "_DeltaT/F").c_str());
+  m_tree->Branch((strNames[0] + "_DeltaTErr").c_str(), &m_fDeltaTErr, (strNames[0] + "_DeltaTErr/F").c_str());
 }
 
 void NtupleDeltaTTool::eval(const Particle* particle)
@@ -42,6 +44,7 @@ void NtupleDeltaTTool::eval(const Particle* particle)
 
   if (Ver) {
     m_fDeltaT = Ver->getDeltaT();
+    m_fDeltaTErr = Ver->getDeltaTErr();
   }
 }
 

@@ -11,8 +11,6 @@
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
-#include <tracking/trackFindingCDC/findlets/base/ClassMnemomics.h>
-
 #include <tracking/trackFindingCDC/utilities/GenIndices.h>
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 
@@ -25,7 +23,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Interface for a minimal algorithm part that wants to expose some parameters to a module
+    /// Adapter of a findlet to a module that exposes the parameters of the findlet and manages the IO with the DataStore
     template<class AFindlet>
     class FindletModule : public Module {
 
@@ -33,17 +31,31 @@ namespace Belle2 {
       /// Tuple of input / output types of the findlet
       using IOTypes = typename AFindlet::IOTypes;
 
-      /// Accessor for the individual coordinate difference types.
+      /// Accessor for the individual input / output types of the findlet
       template<std::size_t I>
       using IOType = typename std::tuple_element<I, IOTypes>::type;
 
-      /// Accessor for the individual coordinate difference types.
-      template<std::size_t I>
-      using StrippedIOType = typename std::remove_reference<typename std::remove_const<IOType<I> >::type>::type;
+      /// Type function to strip constant and reference qualification form a given type
+      template<class T>
+      using Stripped = typename std::remove_reference<typename std::remove_const<T>::type>::type;
 
-      /// Accessor for the individual coordinate difference types.
+      /// Accessor for the individual input / output types of the findlet stripped from modifiers
       template<std::size_t I>
-      using StoreVector = StoreWrappedObjPtr< std::vector<StrippedIOType<I> > >;
+      using StrippedIOType = Stripped<IOType<I>>;
+
+      /// Accessor for the individual input / output vectors type registered to the DataStore
+      template <std::size_t I>
+      using StoreVector = StoreWrappedObjPtr<std::vector<StrippedIOType<I>>>;
+
+      /**
+       *  Test if the given io type designates an input store vector.
+       *  Types that are marked as constant and / or reference are input.
+       */
+      template<std::size_t I>
+      static constexpr bool isInputStoreVector()
+      {
+        return std::is_const<IOType<I>>::value or std::is_reference<IOType<I>>::value;
+      }
 
       /// Number of typpes served to the findlet
       static const std::size_t c_nTypes = std::tuple_size<IOTypes>::value;
@@ -56,7 +68,7 @@ namespace Belle2 {
       FindletModule(const std::array<std::string, c_nTypes>& storeVectorNames = {})
         : m_param_storeVectorNames(storeVectorNames)
       {
-        setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
+        this->setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
         std::string description = "Findlet: ";
         if (std::tuple_size<IOTypes>() == 0) {
           // Drop Findlet prefix for full finders with no IOTypes
@@ -66,7 +78,7 @@ namespace Belle2 {
         description += m_findlet.getDescription();
         this->setDescription(description);
 
-        addStoreVectorParameters(Indices());
+        this->addStoreVectorParameters(Indices());
         ModuleParamList moduleParamList = this->getParamList();
         const std::string prefix = "";
         m_findlet.exposeParameters(&moduleParamList, prefix);
@@ -79,7 +91,7 @@ namespace Belle2 {
       /// Initialize the Module before event processing
       virtual void initialize() override
       {
-        requireOrRegisterStoreVectors(Indices());
+        this->requireOrRegisterStoreVectors(Indices());
         m_findlet.initialize();
       }
 
@@ -93,7 +105,7 @@ namespace Belle2 {
       virtual void event() override
       {
         m_findlet.beginEvent();
-        createStoreVectors(Indices());
+        this->createStoreVectors(Indices());
         applyFindlet(Indices());
       }
 
@@ -103,7 +115,7 @@ namespace Belle2 {
         m_findlet.endRun();
       }
 
-      /// Singal to terminate the event processing
+      /// Signal to terminate the event processing
       virtual void terminate() override
       {
         m_findlet.terminate();
@@ -111,30 +123,25 @@ namespace Belle2 {
 
     private:
       /// Get the vectors from the DataStore and apply the findlet
-      template<size_t ... Is>
+      template <size_t... Is>
       void applyFindlet(IndexSequence<Is...>)
-      { m_findlet.apply(*(getStoreVector<Is>())...); }
+      {
+        m_findlet.apply(*(getStoreVector<Is>())...);
+      }
 
       /// Create the vectors on the DataStore
-      template<size_t ... Is>
+      template <size_t... Is>
       void createStoreVectors(IndexSequence<Is...>)
-      { evalVariadic((createStoreVector<Is>(), std::ignore) ...); }
+      {
+        evalVariadic((createStoreVector<Is>(), std::ignore)...);
+      }
 
       /// Require or register the vectors on the DataStore
-      template<size_t ... Is>
+      template <size_t... Is>
       void requireOrRegisterStoreVectors(IndexSequence<Is...>)
       {
         evalVariadic((requireStoreVector<Is>(), std::ignore) ...);
         evalVariadic((registerStoreVector<Is>(), std::ignore) ...);
-      }
-
-      /** Check if the given io type designates an input store vector
-       *  Only types that are marked as constant or reference are input.
-       */
-      template<std::size_t I>
-      bool isInputStoreVector()
-      {
-        return std::is_const<IOType<I> >::value or std::is_reference<IOType<I> >::value;
       }
 
       /** Require the vector with index I to be on the DataStore.
@@ -142,7 +149,7 @@ namespace Belle2 {
        *  the DataStore before this module. Others are generally
        *  output vectors and need to be registered only.
        */
-      template<std::size_t I>
+      template <std::size_t I>
       void requireStoreVector()
       {
         if (isInputStoreVector<I>()) {
@@ -151,7 +158,7 @@ namespace Belle2 {
       }
 
       /** Register the vector with index I to the DataStore.*/
-      template<std::size_t I>
+      template <std::size_t I>
       void registerStoreVector()
       {
         if (not isInputStoreVector<I>()) {
@@ -163,13 +170,6 @@ namespace Belle2 {
       template<std::size_t I>
       void createStoreVector()
       {
-        if (not isInputStoreVector<I>() and getStoreVector<I>().isValid()) {
-          B2WARNING("Output StoreVector for "
-                    << getStoreVectorParameterName<I>()
-                    << " already created in the DataStore with name "
-                    << m_param_storeVectorNames[I]);
-        }
-
         if (not getStoreVector<I>().isValid()) {
           getStoreVector<I>().construct();
         }
@@ -186,7 +186,9 @@ namespace Belle2 {
       /** Expose parameters to set the names of the vectors on the DataStore */
       template<size_t ... Is>
       void addStoreVectorParameters(IndexSequence<Is...>)
-      { evalVariadic((addStoreVectorParameter<Is>(), std::ignore) ...); }
+      {
+        evalVariadic((addStoreVectorParameter<Is>(), std::ignore)...);
+      }
 
       /** Expose parameter to set the names of the vector with index I on the DataStore */
       template<std::size_t I>
@@ -209,33 +211,38 @@ namespace Belle2 {
       }
 
       /** Get parameter name for the StoreVector at index I */
-      template<std::size_t I>
-      std::string getStoreVectorParameterName()
+      template <std::size_t I>
+      std::string getStoreVectorParameterName() const
       {
         bool primary = I == GetIndexInTuple<IOType<I>, IOTypes>::value;
         int order = primary ? 1 : 2;
         bool input = isInputStoreVector<I>();
-        std::string classParameterName = m_classMnemomics.getParameterName(static_cast<StrippedIOType<I>*>(nullptr));
+
+        // Just a little bit of ADL
+        std::string classParameterName = getClassMnemomicParameterName(static_cast<StrippedIOType<I>*>(nullptr));
         return getStoreVectorParameterName(classParameterName, order, input);
       }
 
       /** Get parameter description for the StoreVector at index I */
       template<std::size_t I>
-      std::string getStoreVectorParameterDescription()
+      std::string getStoreVectorParameterDescription() const
       {
         bool primary = I == GetIndexInTuple<IOType<I>, IOTypes>::value;
         int order = primary ? 1 : 2;
         bool input = isInputStoreVector<I>();
-        std::string classParameterDescription = m_classMnemomics.getParameterDescription(static_cast<StrippedIOType<I>*>(nullptr));
+
+        // Just a little bit of ADL
+        std::string classParameterDescription = getClassMnemomicParameterDescription(static_cast<StrippedIOType<I>*>(nullptr));
         return getStoreVectorParameterDescription(classParameterDescription, order, input);
       }
 
       /** Compose a parameter name for the name of the vector on the DataStore.
        *  @param classMnemomic Short name of the value type that is stored in the vector
-       *  @param order In case of mulitple occurances of the same type which occurance is it. 1, 2, 3 are supported.
+       *  @param order In case of mulitple occurances of the same type which occurance is it. 1 and 2  are supported.
        *  @param input Should the parameter name state that this is an input.
        */
-      std::string getStoreVectorParameterName(std::string classMnenomic, int order, bool input)
+      std::string
+      getStoreVectorParameterName(std::string classMnenomic, int order, bool input) const
       {
         std::string orderPrefix;
         if (order == 1) {
@@ -250,7 +257,7 @@ namespace Belle2 {
         if (input or order > 1) {
           classMnenomic[0] = ::toupper(classMnenomic.at(0));
         }
-        if (order > 1) {
+        if (input and order > 1) {
           inputPrefix[0] = ::toupper(inputPrefix.at(0));
         }
 
@@ -259,10 +266,10 @@ namespace Belle2 {
 
       /** Compose a parameter description for the name of the vector on the DataStore.
        *  @param classMnemomic Short name of the value type that is stored in the vector
-       *  @param order In case of mulitple occurances of the same type which occurance is it. 1, 2, 3 are supported.
+       *  @param order In case of mulitple occurances of the same type which occurance is it. 1 and 2 are supported.
        *  @param input Should the parameter name state that this is an input.
        */
-      std::string getStoreVectorParameterDescription(const std::string classMnenomic, int order, bool input)
+      std::string getStoreVectorParameterDescription(const std::string classMnenomic, int order, bool input) const
       {
         std::string orderPrefix;
         if (order == 1) {
@@ -282,10 +289,6 @@ namespace Belle2 {
 
       /// Findlet that implements the algorithm to be executed.
       AFindlet m_findlet;
-
-      /// Helper class to build class depended parameters and according descriptions.
-      ClassMnemomics m_classMnemomics;
     };
-
   }
 }

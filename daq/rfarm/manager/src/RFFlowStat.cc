@@ -95,6 +95,16 @@ void RFFlowStat::fillNodeInfo(int id, RfNodeInfo* info, bool outflag)
 
 }
 
+void RFFlowStat::fillProcessStatus(RfNodeInfo* info, int input, int output, int basf2, int hserver, int hrelay)
+{
+  info->pid_input = input;
+  info->pid_output = output;
+  info->pid_basf2 = basf2;
+  info->pid_hserver = hserver;
+  info->pid_hrelay = hrelay;
+}
+
+
 
 
 

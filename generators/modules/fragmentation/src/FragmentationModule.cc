@@ -56,7 +56,6 @@ FragmentationModule::FragmentationModule() : Module()
            std::string("../modules/fragmentation/data/pythia_default.dat"));
   addParam("ListPYTHIAEvent", m_listEvent, "List event record of PYTHIA after hadronization", 0);
   addParam("UseEvtGen", m_useEvtGen, "Use EvtGen for specific decays", 1);
-  addParam("EvtPdl", m_EvtPdl, "Deprecated", std::string(""));
   addParam("DecFile", m_DecFile, "EvtGen decay file (DECAY.DEC)", std::string(""));
   addParam("UserDecFile", m_UserDecFile, "User EvtGen decay file", std::string(""));
 
@@ -70,12 +69,12 @@ FragmentationModule::FragmentationModule() : Module()
 
   pythia = nullptr;
   PythiaEvent = nullptr;
-
 }
 
 
 FragmentationModule::~FragmentationModule()
 {
+
 }
 
 void FragmentationModule::terminate()
@@ -97,9 +96,6 @@ void FragmentationModule::initialize()
   m_mcparticles.isRequired(m_particleList);
 
   B2INFO("Initialize PYTHIA8");
-  if (getParam<std::string>("EvtPdl").isSetInSteering()) {
-    B2ERROR("The 'pdlFile' parameter is deprecated and will be ignored. Use \"import pdg; pdg.read('pdlFile')\" instead.");
-  }
 
   // Generator and the shorthand PythiaEvent = pythia->event are declared in .h file
   // A simple way to collect all the changes is to store the parameter values in a separate file,

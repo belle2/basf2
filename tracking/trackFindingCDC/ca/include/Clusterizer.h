@@ -111,7 +111,7 @@ namespace Belle2 {
               CellHolderPtr neighborCellHolderPtr = cellHolderRelation.second;
               ++nNeighbors;
 
-              CellState neighborICluster = getCellState(neighborCellHolderPtr);
+              Weight neighborICluster = getCellState(neighborCellHolderPtr);
               if (neighborICluster == -1) {
                 // Neighbor not yet in cluster
                 setCellState(neighborCellHolderPtr, iCluster);
@@ -136,21 +136,21 @@ namespace Belle2 {
       }
 
       /// Setter for the cell state of a pointed object that holds an AutomatonCell
-      void setCellState(CellHolderPtr cellHolderPtr, CellState cellState) const
+      void setCellState(CellHolderPtr cellHolderPtr, Weight cellState) const
       {
         AutomatonCell& automatonCell = cellHolderPtr->getAutomatonCell();
         automatonCell.setCellState(cellState);
       }
 
       /// Getter for the cell state of a pointed object that holds an AutomatonCell
-      CellState getCellState(CellHolderPtr cellHolderPtr) const
+      Weight getCellState(CellHolderPtr cellHolderPtr) const
       {
         const AutomatonCell& automatonCell = cellHolderPtr->getAutomatonCell();
         return automatonCell.getCellState();
       }
 
       /// Setter for the cell weight of a pointed object that holds an AutomatonCell
-      void setCellWeight(CellHolderPtr cellHolderPtr, CellWeight cellWeight) const
+      void setCellWeight(CellHolderPtr cellHolderPtr, Weight cellWeight) const
       {
         AutomatonCell& automatonCell = cellHolderPtr->getAutomatonCell();
         automatonCell.setCellWeight(cellWeight);

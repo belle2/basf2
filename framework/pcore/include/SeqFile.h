@@ -22,7 +22,8 @@ namespace Belle2 {
      *
      * @param rwflag should probably be r or rw
      */
-    SeqFile(const std::string& filename, const std::string& rwflag);
+    SeqFile(const std::string& filename, const std::string& rwflag,
+            char* streamerinfo = NULL, int streamerinfo_size = 0);
     /** Destructor */
     ~SeqFile();
     /** Returns status after constructor call. If success, fd is returned. If not, -1 */
@@ -47,6 +48,13 @@ namespace Belle2 {
     int m_nfile{0}; /**< file counter, starting at 0 (files are split after c_MaxFileSize bytes). */
     bool m_compressed{false}; /**< is file gzipped compressed? */
     std::unique_ptr<std::ios> m_stream; /**< pointer to the filtering input or output stream */
+
+    /** StreamerInfo */
+    char* m_streamerinfo;
+
+    /** size(bytes) of StreamerInfo */
+    int m_streamerinfo_size;
+
   };
 
 }

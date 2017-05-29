@@ -5,7 +5,7 @@
 <header>
   <input>Bu_D0pi_Kpi_GENSIMRECtoDST.dst.root</input>
   <output>Bu_Dpi_Kpi.ntup.root</output>
-  <contact>Luis Pesantez; pesantez@uni-bonn.de</contact>
+  <contact>Jorge Martinez-Ortega; jmartinez@fis.cinvestav.mx</contact>
 </header>
 """
 

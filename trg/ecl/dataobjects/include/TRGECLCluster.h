@@ -10,17 +10,17 @@
 //-----------------------------------------------------------
 // $Log$
 //-----------------------------------------------------------
-#ifndef TRGECLCluster_H
-#define TRGECLCluster_H
 
-
+#pragma once
 #include <TObject.h>
 #include <TVector3.h>
+#include <framework/datastore/RelationsObject.h>
+
 
 namespace Belle2 {
 
   //! Example Detector
-  class TRGECLCluster : public TObject {
+  class TRGECLCluster : public RelationsObject {
   public:
 
 
@@ -32,6 +32,10 @@ namespace Belle2 {
 
     //! The # of TC in Cluster.
     int m_NofTCinCluster;
+
+    //! The # of TC in Cluster.
+    int m_MaxTCId;
+
 
     //! icn_flag -  perfect icn : 1 , icn : 2
     /*!
@@ -56,6 +60,10 @@ namespace Belle2 {
 
     //! The method to set cell id
     void setClusterId(int clusterId) { m_ClusterId = clusterId; }
+
+    //! The method to set maximum energy TC ID
+    void setMaxTCId(int maxtcid) { m_MaxTCId  = maxtcid; }
+
 
     //! The method to set # of output per TC
     void setNofTCinCluster(int NofTC) { m_NofTCinCluster = NofTC; }
@@ -84,6 +92,8 @@ namespace Belle2 {
     int getClusterId() const { return m_ClusterId; }
     //! The method to get cell id
     int getNofTCinCluster() const { return m_NofTCinCluster; }
+    //! The method to get the Maximum TC  id
+    int getMaxTCId() const { return m_MaxTCId; }
 
     //! The method to get deposited energy
     double getEnergyDep() const { return m_edep; }
@@ -112,13 +122,14 @@ namespace Belle2 {
       m_X = 0;
       m_Y = 0;
       m_Z = 0;
-
+      m_MaxTCId = 0;
     }
 
     //! Useful Constructor
     TRGECLCluster(
       int eventId,
       int clusterId,
+      int maxTCId,
       double edep,
       double TimeAve,
       int noftchit,
@@ -127,6 +138,7 @@ namespace Belle2 {
       int z
     )
     {
+      m_MaxTCId = maxTCId;
       m_eventId = eventId;
       m_ClusterId = clusterId;
       m_edep = edep;
@@ -139,10 +151,10 @@ namespace Belle2 {
 
     }
     //! The Class title
-    ClassDef(TRGECLCluster, 1); /*< the class title */
+    ClassDef(TRGECLCluster, 2); /*< the class title */
 
   };
 
 } // end namespace Belle2
 
-#endif
+//#endif

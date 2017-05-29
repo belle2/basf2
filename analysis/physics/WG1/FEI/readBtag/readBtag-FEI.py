@@ -28,19 +28,7 @@ from modularAnalysis import rankByHighest
 from modularAnalysis import copyLists
 from modularAnalysis import buildRestOfEvent
 from modularAnalysis import applyCuts
-
-# this function removes a module from a given path
-# The RootInput module will be taken from the fei path
-# and will be replaced with RootInput module in the
-# analysis_main path
-
-
-def remove_module(path, name):
-    new_path = create_path()
-    for m in path.modules():
-        if name != m.name():
-            new_path.add_module(m)
-    return new_path
+from modularAnalysis import looseMCTruth
 
 # create aliases for the complex functions so that
 # their names in the ntuple are human readable
@@ -49,6 +37,10 @@ variables.addAlias('sigProb', 'extraInfo(SignalProbability)')
 variables.addAlias('rank', 'extraInfo(sigProb_rank)')
 variables.addAlias('dmID', 'extraInfo(decayModeID)')
 variables.addAlias('uniqueSignal', 'extraInfo(uniqueSignal)')
+variables.addAlias('looseMCMotherPDG', 'extraInfo(looseMCMotherPDG)')
+variables.addAlias('looseMCWrongDaughterN', 'extraInfo(looseMCWrongDaughterN)')
+variables.addAlias('looseMCWrongDaughterPDG', 'extraInfo(looseMCWrongDaughterPDG)')
+variables.addAlias('looseMCWrongDaughterBiB', 'extraInfo(looseMCWrongDaughterBiB)')
 variables.addAlias('d0_dmID', 'daughter(0,extraInfo(decayModeID))')
 variables.addAlias('d1_dmID', 'daughter(1,extraInfo(decayModeID))')
 variables.addAlias('d0_d0_dmID', 'daughter(0,daughter(0,extraInfo(decayModeID)))')
@@ -77,9 +69,15 @@ from makeChunks import chunks
 mcFiles = glob.glob(mcLocation + '/*.root')
 fileChunks = chunks(mcFiles, filesPerJob)
 
-# load the FEI reconstruction path
+# TODO: specify the location of database (faster)
+db_location = '/home/belle/zupanc/belle2/physics/FEI/Belle2_Generic_2016_1/fei_database'
+use_central_database('production', LogLevel.WARNING, db_location)
+
+# TODO: load the FEI reconstruction path
 # specify the location of the fei_pickle file
-fei_pickle = ''
+fei_pickle =
+'/home/belle/zupanc/belle2/physics/FEI/Belle2_Generic_2016_1_looseMCMatching/paths/basf2_final_path_without_selection.pickle'
+
 if not os.path.isfile(fei_pickle):
     sys.exit(
         'fei_path.pickle not found at: ' +
@@ -88,10 +86,6 @@ if not os.path.isfile(fei_pickle):
         'Please provide the fei_path.pickle file from an existing FEI training by setting the fei_pickle parameter in this script.')
 
 path = get_path_from_file(fei_pickle)
-path = remove_module(path, 'RootInput')
-path = remove_module(path, 'ProgressBar')
-
-beamparameters = add_beamparameters(path, 'Y4S')
 
 # read the MDST
 # this is stupid, but ...
@@ -102,7 +96,7 @@ for fileChunk in fileChunks:
         theChunk = list(fileChunk)
     i = i + 1
 
-inputMdstList(theChunk)
+inputMdstList('default', theChunk)
 
 # execute path and return back to the analysis_main
 # the skim condition is TRUE for all events
@@ -130,6 +124,9 @@ rankByHighest('B+:generic', 'sigProb')
 rankByHighest('B0:semileptonic', 'sigProb')
 rankByHighest('B+:semileptonic', 'sigProb')
 
+looseMCTruth('B0:generic')
+looseMCTruth('B+:generic')
+
 # create and fill flat Ntuple
 toolsB0 = ['EventMetaData', '^B0']
 toolsB0 += ['DeltaEMbc', '^B0']
@@ -137,7 +134,8 @@ toolsB0 += ['CustomFloats[sigProb:rank:dmID:uniqueSignal]', '^B0']
 toolsB0 += ['CustomFloats[d0_dmID:d1_dmID:d0_d0_dmID:d1_d0_dmID]', '^B0']
 toolsB0 += ['CustomFloats[d1d2_M:d1d3_M:d1d4_M:d2d3_M:d2d4_M:d3d4_M]', '^B0']
 toolsB0 += ['CustomFloats[d1d2d3_M:d2d3d4_M:d1d2d3d4_M]', '^B0']
-toolsB0 += ['CustomFloats[isSignal:isExtendedSignal]', '^B0']
+toolsB0 += ['CustomFloats[isSignal:isExtendedSignal:looseMCMotherPDG:looseMCWrongDaughterN]', '^B0']
+toolsB0 += ['CustomFloats[looseMCWrongDaughterBiB:looseMCWrongDaughterPDG]', '^B0']
 toolsB0 += ['MCTruth', '^B0']
 
 toolsBP = ['EventMetaData', '^B+']
@@ -146,7 +144,8 @@ toolsBP += ['CustomFloats[sigProb:rank:dmID:uniqueSignal]', '^B+']
 toolsBP += ['CustomFloats[d0_dmID:d1_dmID:d0_d0_dmID:d1_d0_dmID]', '^B+']
 toolsBP += ['CustomFloats[d1d2_M:d1d3_M:d1d4_M:d2d3_M:d2d4_M:d3d4_M]', '^B+']
 toolsBP += ['CustomFloats[d1d2d3_M:d2d3d4_M:d1d2d3d4_M]', '^B+']
-toolsBP += ['CustomFloats[isSignal:isExtendedSignal]', '^B+']
+toolsBP += ['CustomFloats[isSignal:isExtendedSignal:looseMCMotherPDG:looseMCWrongDaughterN]', '^B+']
+toolsBP += ['CustomFloats[looseMCWrongDaughterBiB:looseMCWrongDaughterPDG]', '^B+']
 toolsBP += ['MCTruth', '^B+']
 
 toolsB0SL = ['EventMetaData', '^B0']

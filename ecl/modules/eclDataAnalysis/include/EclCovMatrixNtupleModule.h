@@ -17,8 +17,6 @@
 #include <TTree.h>
 #include <TFile.h>
 
-using namespace Belle2;
-
 namespace Belle2 {
 
   class EclCovMatrixNtupleModule : public Module {
@@ -37,6 +35,7 @@ namespace Belle2 {
     /** Initializes the module. */
     virtual void initialize();
 
+    /** Terminates the module. */
     virtual void terminate();
 
     /** Method is called for each event. */
@@ -46,22 +45,32 @@ namespace Belle2 {
     /** output root file name (given as Module parameter) */
     std::string m_dataOutFileName, m_dspArrayName, m_digiArrayName;
 
-    /** Root tree and file for saving the output */
+    /** Root tree name */
     TTree* m_tree;
+    /** Root file for saving the output */
     TFile* m_rootFile;
 
     double m_energy;
-
+    /** Event number */
     int m_nevt;
+    /** Number of eclHits */
     int m_nhits;
 
+    /** Crystal ID */
     int m_cellID[8736];
+    /** Crystal Theta ID */
     int m_theta[8736];
+    /** Crystal Phi ID */
     int m_phi[8736];
+    /** eclDsp sample Array */
     int m_DspHit[8736][31];
+    /** eclHit Energy */
     double m_hitE[8736];
+    /** eclHit Time */
     double m_hitTime[8736];
+    /** eclDigit Time */
     int m_DigiTime[8736];
+    /** eclTrig Time */
     double m_DeltaT[8736];
   };
 

@@ -99,7 +99,7 @@ void SegmentTripleCreator::create(const CDCAxialSegmentPair& axialSegmentPair,
     // Ask the filter to assess this triple
     Weight weight = m_segmentTripleFilter(segmentTriple);
 
-    if (not isNotACell(weight)) {
+    if (not std::isnan(weight)) {
       segmentTriple.getAutomatonCell().setCellWeight(weight);
       segmentTriples.insert(segmentTriples.end(), segmentTriple);
     }

@@ -72,6 +72,11 @@ namespace Belle2 {
     void printModulesInfo();
 
     /**
+     *  Example function for importing HAPD QE to database class (ARICHModulesInfo)
+     */
+    void setHAPDQE(unsigned modID, double qe = 0.27, bool import = false);
+
+    /**
      * Import channel mask for all HAPD modules from the database (list of dead channels)
      * Goes through the list of installed modules in ARICH-InstalledModules.xml,
      * finds corresponding lists of dead channels in the database and imports lightweight
@@ -169,7 +174,7 @@ namespace Belle2 {
     void importAsicInfo();
 
     /**
-     * Import ARICH ASICs data in the database.
+     * Import large histograms from ARICH ASICs data in the database.
      */
     void importAsicInfoRoot();
 
@@ -200,6 +205,10 @@ namespace Belle2 {
      * Import ARICH FEB test data in the database.
      */
     void importFebTest();
+
+    /**
+     * Import large histograms from ARICH FEB test data in the database.
+     */
     void importFebTestRoot();
 
     /**
@@ -364,6 +373,16 @@ namespace Belle2 {
      * Export module sensor map and info classes from database
      */
     void exportSensorModuleMap();
+
+    /**
+     * Import results of magnet test
+     */
+    void importMagnetTest();
+
+    /**
+     * Export results of magnet test
+     */
+    void exportMagnetTest();
 
     /**
      * Export all the data

@@ -12,39 +12,14 @@
 #define EXTMODULE_H
 
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
-#include <tracking/dataobjects/ExtHit.h>
 #include <framework/gearbox/Const.h>
-#include <simulation/kernel/ExtCylSurfaceTarget.h>
-
-#include <G4TouchableHandle.hh>
-#include <G4ErrorTrajErr.hh>
-#include <TMatrixDSym.h>
 
 #include <string>
 #include <vector>
 
-class G4ErrorPropagator;
-class G4ErrorRunManagerHelper;
-class G4RunManager;
-class G4MagneticField;
-class G4Mag_UsualEqRhs;
-class G4MagIntegratorStepper;
-class G4ChordFinder;
-class G4VisManager;
-class G4VUserPhysicsList;
-class G4UserTrackingAction;
-class G4UserSteppingAction;
-class G4VPhysicalVolume;
-class G4ErrorFreeTrajState;
-class G4String;
-namespace genfit { class Track; }
-
 namespace Belle2 {
 
-  class Track;
   class TrackExtrapolateG4e;
-  namespace Simulation { class ExtManager; }
 
   /** The geant4e-based track extrapolation module.
    *
@@ -86,6 +61,18 @@ namespace Belle2 {
     //! User-selected PDG codes to extrapolate (anti-particles are included implicitly)
     std::vector<int> m_PDGCodes;
 
+    //!  ChargedStable hypotheses
+    std::vector<Const::ChargedStable> m_Hypotheses;
+
+    //! User-defined name of the Track collection of the reconstructed tracks to be extrapolated
+    std::string m_TracksColName;
+
+    //! Name of the RecoTrack collection of the reconstructed tracks to be extrapolated
+    std::string m_RecoTracksColName;
+
+    //! User-defined name of the extHit collection of the extrapolation hits
+    std::string m_ExtHitsColName;
+
     //! User-defined minimum transverse momentum in GeV/c for extrapolation to be started
     double m_MinPt;
 
@@ -97,12 +84,6 @@ namespace Belle2 {
 
     //! User-defined flag for source (0 = beam, 1 = cosmic ray)
     int    m_Cosmic;
-
-    //! User-defined name of the Track collection of the reconstructed tracks to be extrapolated
-    std::string m_TracksColName;
-
-    //! User-defined name of the extHit collection of the extrapolation hits
-    std::string m_ExtHitsColName;
 
     //! User-defined tracking verbosity:
     //! 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info

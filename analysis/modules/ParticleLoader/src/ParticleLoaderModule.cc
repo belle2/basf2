@@ -71,8 +71,11 @@ namespace Belle2 {
     addParam("addDaughters", m_addDaughters,
              "If true, the particles from the bottom part of the selected particle's decay chain will also be created in the datastore and mother-daughter relations are recursively set",
              false);
-  }
 
+    addParam("trackHypothesis", m_trackHypothesis,
+             "Track hypothesis to use when loading the particle. By default, use the particle's own hypothesis.",
+             0);
+  }
 
   void ParticleLoaderModule::initialize()
   {
@@ -345,10 +348,15 @@ namespace Belle2 {
 
       for (auto track2Plist : m_Tracks2Plists) {
         string listName = get<c_PListName>(track2Plist);
-        int pdgCode = get<c_PListPDGCode>(track2Plist);
         auto& cut = get<c_CutPointer>(track2Plist);
         StoreObjPtr<ParticleList> plist(listName);
 
+        //if no track hypothesis is requested, use the particle's own
+        int pdgCode;
+        if (m_trackHypothesis == 0)
+          pdgCode = get<c_PListPDGCode>(track2Plist);
+        else pdgCode = m_trackHypothesis;
+        //
         Const::ChargedStable type(abs(pdgCode));
 
         // skip tracks with charge = 0
@@ -415,6 +423,14 @@ namespace Belle2 {
 
       if (!cluster->isNeutral())
         continue;
+
+      // TODO: can we get hypothesis enumerator instead of hard coded values
+      if (cluster->getHypothesisId() != 5 && cluster->getHypothesisId() != 1)
+        continue;
+
+      // TODO: allow at some point
+      //cluster->getHypothesisId() != 3)
+
 
       // const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
       // ECLCluster can be matched to multiple MCParticles

@@ -13,6 +13,7 @@
 #include <framework/datastore/RelationsObject.h>
 #include <vector>
 #include <string>
+#include <algorithm>
 
 namespace Belle2 {
 
@@ -23,6 +24,28 @@ namespace Belle2 {
    */
   class TOPRawWaveform : public RelationsObject {
   public:
+
+    /**
+     * Various constants
+     */
+    enum {c_WindowSize = 64 /**< number of samples per window */
+         };
+
+    /**
+     * Feature extraction data
+     */
+    struct FeatureExtraction {
+      int sampleRise = 0; /**< sample number just before 50% CFD crossing */
+      int samplePeak = 0; /**< sample number at maximum */
+      int sampleFall = 0; /**< same for falling edge */
+      short vRise0 = 0;   /**< ADC value at sampleRise */
+      short vRise1 = 0;   /**< ADC value at sampleRise + 1 */
+      short vPeak = 0;    /**< ADC value at samplePeak */
+      short vFall0 = 0;   /**< ADC value at sampleFall */
+      short vFall1 = 0;   /**< ADC value at sampleFall + 1 */
+      short integral = 0; /**< integral of a pulse (e.g. \propto charge) */
+    };
+
 
     /**
      * Default constructor
@@ -41,6 +64,7 @@ namespace Belle2 {
      * @param flags event flags
      * @param referenceASIC reference ASIC window number
      * @param segmentASIC segment ASIC window number (storage window)
+     * @param windows storage windows of waveform segments
      * @param electronicType electronic type (see ChannelMapper::EType)
      * @param electronicName electronic name (e.g. "IRS3B", "IRSX", etc.)
      * @param data waveform ADC values (samples)
@@ -54,22 +78,18 @@ namespace Belle2 {
                    unsigned flags,
                    unsigned referenceASIC,
                    unsigned segmentASIC,
+                   const std::vector<unsigned short>& windows,
                    unsigned electronicType,
-                   std::string electronicName,
+                   const std::string& electronicName,
                    const std::vector<short>& data):
-      m_data(data),  m_electronicName(electronicName)
+      m_moduleID(moduleID), m_pixelID(pixelID), m_channel(channel),
+      m_freezeDate(freezeDate), m_triggerType(triggerType), m_flags(flags),
+      m_referenceASIC(referenceASIC), m_segmentASIC(segmentASIC),
+      m_windows(windows), m_data(data),  m_electronicType(electronicType),
+      m_electronicName(electronicName)
     {
-      m_moduleID = moduleID;
-      m_pixelID = pixelID;
-      m_channel = channel;
       m_scrodID = scrod & 0xFFFF;
       m_scrodRevision = (scrod >> 16) & 0x00FF;
-      m_freezeDate = freezeDate;
-      m_triggerType = triggerType;
-      m_flags = flags;
-      m_referenceASIC = referenceASIC;
-      m_segmentASIC = segmentASIC;
-      m_electronicType = electronicType;
     }
 
     /**
@@ -164,6 +184,13 @@ namespace Belle2 {
     unsigned getReferenceWindow() const { return m_referenceASIC; }
 
     /**
+     * This corresponds to the last window in the analog memory sampled.
+     * All timing is a "look-back" from this window.
+     * @return reference window number
+     */
+    const std::vector<unsigned short>& getReferenceWindows() const { return m_windows; }
+
+    /**
      * Returns IRS analog storage window this waveform was taken from.
      * @return segment window number
      */
@@ -179,25 +206,13 @@ namespace Belle2 {
      * Returns ASIC number
      * @return ASIC number
      */
-    unsigned getASICNumber() const { return ((m_segmentASIC >> 14) & 0x0003);}
+    unsigned getASICNumber() const { return ((m_segmentASIC >> 12) & 0x0003);}
 
     /**
      * Returns carrier board number
      * @return carrier number
      */
-    unsigned getCarrierNumber() const { return ((m_segmentASIC >> 12) & 0x0003);}
-
-    /**
-     * Returns ASIC row (IRS3B naming convention)
-     * @return row number
-     */
-    unsigned getASICRow() const { return getCarrierNumber();}
-
-    /**
-     * Returns ASIC column (IRS3B naming convention)
-     * @return column number
-     */
-    unsigned getASICCol() const { return getASICNumber();}
+    unsigned getCarrierNumber() const { return ((m_segmentASIC >> 14) & 0x0003);}
 
     /**
      * Returns type of electronic used to measure this waveform
@@ -226,6 +241,45 @@ namespace Belle2 {
       return m_data;
     }
 
+    /**
+     * Checks if storage windows come in the consecutive order before the last sample
+     * (no gaps in between before the last sample)
+     * @param lastSample last sample
+     * @param storageDepth storage depth
+     * @return true, if no gaps before the last sample
+     */
+    bool areWindowsInOrder(unsigned lastSample = 0xFFFFFFFF,
+                           unsigned short storageDepth = 512) const
+    {
+      unsigned last = lastSample / c_WindowSize + 1;
+      unsigned size = m_windows.size();
+      for (unsigned i = 1; i < std::min(last, size); i++) {
+        auto diff = m_windows[i] - m_windows[i - 1];
+        if (diff < 0) diff += storageDepth;
+        if (diff != 1) return false;
+      }
+      return true;
+    }
+
+    /**
+     * Do feature extraction
+     * @param threshold pulse height threshold [ADC counts]
+     * @param hysteresis threshold hysteresis [ADC counts]
+     * @param thresholdCount minimal number of samples above threshold
+     * @return number of feature extraction data (hits found)
+     */
+    int featureExtraction(int threshold, int hysteresis, int thresholdCount) const;
+
+    /**
+     * Returns feature extraction data
+     * @return FE data
+     */
+    const std::vector<FeatureExtraction>& getFeatureExtractionData() const
+    {
+      return m_features;
+    }
+
+
   private:
 
     int m_moduleID = 0;                 /**< module ID */
@@ -238,15 +292,18 @@ namespace Belle2 {
     unsigned short m_flags = 0;         /**< event flags (bits 0:7) */
     unsigned short m_referenceASIC = 0; /**< reference ASIC window */
     unsigned short m_segmentASIC = 0;   /**< segment ASIC window (storage window) */
-    std::vector<short> m_data;  /**< waveform ADC values */
-    unsigned m_electronicType = 0;      /**< electronic type (see ChannelMapper::EType) */
+    std::vector<unsigned short> m_windows; /**< storage windows of waveform segments */
+    std::vector<short> m_data;      /**< waveform ADC values */
+    unsigned m_electronicType = 0;  /**< electronic type (see ChannelMapper::EType) */
     std::string m_electronicName;   /**< electronic name */
-    bool m_pedestalSubtracted = false; /**< true, if pedestal already subtracted */
+    bool m_pedestalSubtracted = false; /**< true, if pedestals already subtracted */
 
-    ClassDef(TOPRawWaveform, 5); /**< ClassDef */
+    /** cache for feature extraction data */
+    mutable std::vector<FeatureExtraction> m_features; //!
+
+    ClassDef(TOPRawWaveform, 7); /**< ClassDef */
 
   };
 
 
 } // end namespace Belle2
-

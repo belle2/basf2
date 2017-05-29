@@ -14,7 +14,6 @@
 #ifndef TRGECLTCMAPPING_FLAG_
 #define TRGECLTCMAPPING_FLAG_
 
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -44,7 +43,7 @@ namespace Belle2 {
 
     /** get [TC ID] from [Xtal ID] */
     int getTCIdFromXtalId(int);
-    /** get [Xtal ID] from [TC ID] */
+    /** get [Xtal ID] from [TC ID] (Output as a vector)*/
     std::vector<int> getXtalIdFromTCId(int);
     /** get [TC sub ID] from [Xtal ID]*/
     int getTCSubIdFromXtalId(int);
@@ -58,13 +57,13 @@ namespace Belle2 {
   private:
 
 
-    /** */
+    /** TC Id */
     int _tcid;       // ID = 1-576
-    /** */
+    /** TC Sub Id*/
     int _tcsubid;    // ID = 0-1
-    /** */
+    /** TC Theta Id*/
     int _tcthetaid;  // ID = 0-16
-    /** */
+    /** TC Phi Id*/
     int _tcphiid;    // ID = 0-35(0-31 for both endcap)
 
     /** Matrix of the relation of TC and Xtal*/

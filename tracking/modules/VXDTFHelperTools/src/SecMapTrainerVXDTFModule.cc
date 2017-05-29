@@ -76,20 +76,18 @@ SecMapTrainerVXDTFModule::SecMapTrainerVXDTFModule() :
   testData1.rarenessThreshold = 0.001;
   testData1.quantiles = {0.005, 0.005};
 
-  //needed to  store the config
-  StoreObjPtr< SectorMap<SpacePoint> > sectorMap("", DataStore::c_Persistent);
-  //sectorMap.required();
-
   std::string setupName = "testData1";
   VXDTFFilters<SpacePoint>* filters = new VXDTFFilters<SpacePoint>();
   filters->setConfig(testData1);
-  // the sectormap takes the ownership
-  sectorMap->assignFilters(setupName, filters);
+
+  // the filtesrsContainer taked ownership of the filters!
+  FiltersContainer<SpacePoint>& filtersContainer = Belle2::FiltersContainer<SpacePoint>::getInstance();
+  filtersContainer.assignFilters(setupName, filters);
 
 
-  SecMapTrainer<XHitFilterFactory<SecMapTrainerHit> > newMap(sectorMap, setupName, rngAppendix());
+  SecMapTrainer<XHitFilterFactory<SecMapTrainerHit> > newTrainer(setupName, std::to_string(rngAppendix()));
 
-  m_secMapTrainers.push_back(std::move(newMap));
+  m_secMapTrainers.push_back(std::move(newTrainer));
 }
 
 

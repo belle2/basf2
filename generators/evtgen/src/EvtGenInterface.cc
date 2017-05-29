@@ -48,6 +48,9 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pa
 {
   B2INFO("Begin initialisation of EvtGen Interface.");
 
+  //tauola prints normal things to stderr.. oh well.
+  IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Info, LogConfig::c_Info);
+  initLogCapture.start();
   EvtRandom::setRandomEngine((EvtRandomEngine*)&m_eng);
 
   // Official BelleII models
@@ -73,6 +76,7 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pa
 
   // Setup Parent Particle in rest frame
   m_ParentParticle = EvtPDL::getId(parentParticle);
+  initLogCapture.finish();
 
   B2INFO("End initialisation of EvtGen Interface.");
 
@@ -91,9 +95,11 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParen
 
   bool we_got_inclusive_particle = false;
   do {
+    m_logCapture.start();
     m_parent = EvtParticleFactory::particleFactory(m_ParentParticle, m_pinit);
     m_parent->setVectorSpinDensity();
     m_Generator->generateDecay(m_parent);
+    m_logCapture.finish();
 
     if (inclusiveType != 0) {
       EvtParticle* p = m_parent;
@@ -138,10 +144,8 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParen
 int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph, TVector3 pPrimaryVertex)
 {
   //Fill top particle in the tree & starting the queue:
-  int position = graph.size();
-  int nParticles = 0;
-  graph.addParticle(); nParticles++;
-  MCParticleGraph::GraphParticle* p = &graph[position];
+  const int existingParticles = graph.size();
+  MCParticleGraph::GraphParticle* p = &graph.addParticle();
   updateGraphParticle(top, p, pPrimaryVertex);
 
   typedef pair<MCParticleGraph::GraphParticle*, EvtParticle*> halfFamily;
@@ -163,11 +167,8 @@ int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph
     EvtParticle* currDaughter = currFamily.second;
 
     //putting the daughter in the graph:
-    position = graph.size();
-    graph.addParticle(); nParticles++;
-    MCParticleGraph::GraphParticle* graphDaughter = &graph[position];
+    MCParticleGraph::GraphParticle* graphDaughter = &graph.addParticle();
     updateGraphParticle(currDaughter, graphDaughter, pPrimaryVertex);
-    position = graph.size();
 
     //add relation between mother and daughter to graph:
     currMother->decaysInto((*graphDaughter));
@@ -188,7 +189,7 @@ int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph
     }
   }
 
-  return nParticles;
+  return graph.size() - existingParticles;
 }
 
 

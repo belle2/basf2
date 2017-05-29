@@ -1,0 +1,26 @@
+#
+# Login to Belle II Monitor
+#
+
+hostname : ropc02.kek.jp
+port : 9090
+nsmhost : 172.22.32.11
+nsmport : 8122
+nsmnode : MON2
+nsmtarget : ECL02
+data00.dataname : STORAGE_STATUS
+data00.format : storage_status
+data00.revision : 5
+data01.dataname : HLT_STATUS
+data01.format : rfunitinfo
+data01.revision : 3
+data02.dataname : ECL01_STATUS
+data02.format : rorc_status
+data02.revision : 1
+data03.dataname : ECL02_STATUS
+data03.format : rorc_status
+data03.revision : 1
+
+#
+#
+#

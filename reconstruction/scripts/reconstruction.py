@@ -6,6 +6,7 @@ from basf2 import *
 from tracking import (
     add_mc_tracking_reconstruction,
     add_tracking_reconstruction,
+    add_cr_tracking_reconstruction,
     add_mc_track_finding,
     add_track_finding,
     add_prune_tracks,
@@ -41,12 +42,12 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
         not make any trigger decisions itself.
     :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
-        determine, if the geometry is already loaded. This flag can be used o just turn off the geometry adding at
+        determine, if the geometry is already loaded. This flag can be used to just turn off the geometry adding at
         all (but you will have to add it on your own then).
     :param additionalTrackFitHypotheses: Change the additional fitted track fit hypotheses. If no argument is given,
         the additional fitted hypotheses are muon, kaon and proton, i.e. [13, 321, 2212].
-    :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to improve
-        reconstruction performance.
+    :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
+        execution time.
     """
 
     # Add tracking reconstruction modules
@@ -67,10 +68,50 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
 
     # Add the modules calculating the software trigger cuts (but not performing them)
     if trigger_mode == "all" and (not components or (
-            "CDC" in components and "SVD" in components and "ECL" in components and "EKLM" in components and "BKLM" in components)):
+            "CDC" in components and "ECL" in components and "EKLM" in components and "BKLM" in components)):
         add_fast_reco_software_trigger(path)
         add_hlt_software_trigger(path)
         add_calibration_software_trigger(path)
+
+
+def add_cosmics_reconstruction(
+        path,
+        components=None,
+        pruneTracks=True,
+        skipGeometryAdding=False,
+        eventTimingExtraction=False,
+        addClusterExpertModules=True):
+    """
+    This function adds the standard reconstruction modules for cosmic data to a path.
+    Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
+    plus the modules to calculate the software trigger cuts.
+
+    :param path: Add the modules to this path.
+    :param components: list of geometry components to include reconstruction for, or None for all components.
+    :param pruneTracks: Delete all hits except the first and last of the tracks after the dEdX modules.
+    :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
+        if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
+        determine, if the geometry is already loaded. This flag can be used to just turn off the geometry adding at
+        all (but you will have to add it on your own then).
+    :param eventTimingExtraction: extract time with either the TrackTimeExtraction or
+        FullGridTrackTimeExtraction modules.
+    :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
+        execution time.
+    """
+
+    # Add cdc tracking reconstruction modules
+    add_cr_tracking_reconstruction(path,
+                                   components=components,
+                                   pruneTracks=False,
+                                   skipGeometryAdding=skipGeometryAdding,
+                                   eventTimingExtraction=eventTimingExtraction)
+
+    # Add further reconstruction modules
+    add_posttracking_reconstruction(path,
+                                    components=components,
+                                    pruneTracks=pruneTracks,
+                                    addClusterExpertModules=addClusterExpertModules,
+                                    trigger_mode="all")
 
 
 def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True):
@@ -103,8 +144,8 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     :param components: list of geometry components to include reconstruction for, or None for all components.
     :param pruneTracks: Delete all hits except the first and last after the dEdX modules.
     :param trigger_mode: Please see add_reconstruction for a description of all trigger modes.
-    :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to improve
-        reconstruction performance.
+    :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
+        execution time.
     """
 
     if trigger_mode in ["hlt", "all"]:
@@ -131,7 +172,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
         add_pid_module(path, components)
 
     if trigger_mode in ["all"] and addClusterExpertModules:
-        # FIXME: Disabled for HLT until performance bug is fixed
+        # FIXME: Disabled for HLT until execution time bug is fixed
         add_cluster_expert_modules(path, components)
 
 
@@ -140,6 +181,7 @@ def add_mdst_output(
     mc=True,
     filename='mdst.root',
     additionalBranches=[],
+    dataDescription=None,
 ):
     """
     This function adds the MDST output modules to a path, saving only objects defined as part of the MDST data format.
@@ -148,6 +190,8 @@ def add_mdst_output(
     @param mc Save Monte Carlo quantities? (MCParticles and corresponding relations)
     @param filename Output file name.
     @param additionalBranches Additional objects/arrays of event durability to save
+    @param dataDescription Additional key->value pairs to be added as data description
+           fields to the output FileMetaData
     """
 
     output = register_module('RootOutput')
@@ -173,7 +217,15 @@ def add_mdst_output(
     branches += additionalBranches
     output.param('branchNames', branches)
     output.param('branchNamesPersistent', persistentBranches)
+    # set dataDescription correctly
+    if dataDescription is None:
+        dataDescription = {}
+    # set dataLevel to mdst if it's not already set to something else (which
+    # might happen for udst output since that calls this function)
+    dataDescription.setdefault("dataLevel", "mdst")
+    output.param("additionalDataDescription", dataDescription)
     path.add_module(output)
+    return output
 
 
 def add_arich_modules(path, components=None):
@@ -199,6 +251,8 @@ def add_top_modules(path, components=None):
     """
     # TOP reconstruction
     if components is None or 'TOP' in components:
+        top_cm = register_module('TOPChannelMasker')
+        path.add_module(top_cm)
         top_rec = register_module('TOPReconstructor')
         path.add_module(top_rec)
 
@@ -217,9 +271,6 @@ def add_cluster_expert_modules(path, components=None):
 
         ECLClassifier = register_module('ECLExpert')
         path.add_module(ECLClassifier)
-
-        ClusterMatcher = register_module('ClusterMatcher')
-        path.add_module(ClusterMatcher)
 
 
 def add_pid_module(path, components=None):

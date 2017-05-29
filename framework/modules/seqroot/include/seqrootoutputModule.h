@@ -44,7 +44,7 @@ namespace Belle2 {
   private:
 
     ///! Write StreamerInfos to a file
-    void writeStreamerInfos();
+    void getStreamerInfos();
 
     //! File name
     std::string m_outputFileName;
@@ -63,6 +63,12 @@ namespace Belle2 {
 
     //! DataStoreStreamer
     DataStoreStreamer* m_streamer;
+
+    //! StreamerInfo to be written
+    char* m_streamerinfo;
+
+    //! The size of the StreamerInfo
+    int m_streamerinfo_size;
 
     //! Time
     struct timeval m_t0; /**< time at begin of current run. */

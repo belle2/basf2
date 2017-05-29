@@ -1,9 +1,4 @@
 #include <topcaf/modules/PedestalModule/PedestalModule.h>
-#include <topcaf/dataobjects/topFileMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/conditions/ConditionsService.h>
-
 
 #include <iostream>
 #include <cstdlib>
@@ -51,26 +46,28 @@ void PedestalModule::initialize()
       m_out_ped_file->Close();
     }
   }
+  m_metadata_ptr.isRequired();
+  m_evtwaves_ptr.isRequired();
+  m_evthead_ptr.isRequired();
 }
 
 void PedestalModule::beginRun()
 {
-  StoreObjPtr<topFileMetaData> metadata_ptr;
-  metadata_ptr.isRequired();
-
-  if (metadata_ptr) {
-    m_experiment = metadata_ptr->getExperiment();
-    m_run = metadata_ptr->getRun();
+  if (m_metadata_ptr) {
+    m_experiment = m_metadata_ptr->getExperiment();
+    m_run = m_metadata_ptr->getRun();
   }
-
   if (m_mode == 1) { // read pedestals
     TList* list;
     if (m_conditions == 1) { // read peds using conditions service
-      B2INFO("Retrieving pedestal data from service.");
-      std::string filename = (ConditionsService::getInstance()->getPayloadFileURL(this));
-      m_in_ped_file = TFile::Open(filename.c_str(), "READ");
+//      B2INFO("Retrieving pedestal data from service.");
+      B2INFO("Should retrieve pedestal data from service. Code waiting modification!!!");
 
-      B2INFO("Retrieving pedestal data from service. done");
+      /* FIXME      std::string filename = (ConditionsService::getInstance()->getPayloadFileURL(this));
+            m_in_ped_file = TFile::Open(filename.c_str(), "READ");
+
+            B2INFO("Retrieving pedestal data from service. done");
+      */
     } else if (m_conditions == 0) { // read peds from local file
       m_in_ped_file = TFile::Open(m_in_ped_filename.c_str(), "READ");
     }
@@ -102,14 +99,10 @@ void PedestalModule::beginRun()
 void PedestalModule::event()
 {
   //Get Waveform from datastore
-  StoreObjPtr<EventHeaderPacket> evthead_ptr;
-  StoreArray<EventWaveformPacket> evtwaves_ptr;
-  evtwaves_ptr.isRequired();
-  evthead_ptr.isRequired();
 
-  if (evtwaves_ptr) {
-    for (int c = 0; c < evtwaves_ptr.getEntries(); c++) {
-      EventWaveformPacket* evtwave_ptr = evtwaves_ptr[c];
+  if (m_evtwaves_ptr) {
+    for (int c = 0; c < m_evtwaves_ptr.getEntries(); c++) {
+      EventWaveformPacket* evtwave_ptr = m_evtwaves_ptr[c];
 
       topcaf_channel_id_t channel_name = evtwave_ptr->GetChannelID() + evtwave_ptr->GetASICWindow();
       if (m_mode == 0) { // Calculate pedestals from waveform
@@ -133,9 +126,9 @@ void PedestalModule::event()
         //Look up reference pedestal and correct
         TProfile* ped_profile = m_sample2ped[channel_name];
         if (not ped_profile) {
-          if (evthead_ptr->GetEventFlag() < 100) {
+          if (m_evthead_ptr->GetEventFlag() < 100) {
             B2WARNING("Problem retrieving itop pedestal data for channel " << channel_name << "!!!");
-            evthead_ptr->SetFlag(405);
+            m_evthead_ptr->SetFlag(405);
           }
         } else {
           std::vector<double> v_pedcorr_samples;
@@ -183,7 +176,7 @@ void  PedestalModule::terminate()
         m_sample2ped[key]->Write();
       }
       m_out_ped_file->Close();
-      ConditionsService::getInstance()->writePayloadFile(tempFile, this);
+//FIXME      ConditionsService::getInstance()->writePayloadFile(tempFile, this);
     }
     if (m_writefile == 1) {
       B2INFO("writing itop pedestal file manually to " << m_out_ped_filename);

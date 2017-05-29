@@ -46,7 +46,7 @@ void BoardStackStatus::InitNSMCallbacks(Belle2::HSLB& hslb, Belle2::RCCallback& 
   }
 }
 
-void BoardStackStatus::UpdateNSMCallbacks(Belle2::HSLB& hslb, Belle2::RCCallback& callback)
+bool BoardStackStatus::UpdateNSMCallbacks(Belle2::HSLB& hslb, Belle2::RCCallback& callback)
 {
   UpdateARMLiveCounters(hslb, callback);
   ReadSCRODObervables(hslb);
@@ -60,8 +60,10 @@ void BoardStackStatus::UpdateNSMCallbacks(Belle2::HSLB& hslb, Belle2::RCCallback
   std::string vname = StringUtil::form("top[%d].scrod.", hslb.get_finid());
   if (boardstackIsGood) {
     callback.set(vname + "statusOK", 1);
+    return true;
   } else {
     callback.set(vname + "statusOK", 0);
+    return false;
   }
 }
 
@@ -275,7 +277,7 @@ void BoardStackStatus::UpdateARMLiveCounters(Belle2::HSLB& hslb, Belle2::RCCallb
   int sliveCounter1 = Read_Register(hslb, SCROD_PS_liveCounter);
   for (unsigned i = 0; i < m_nCarriers; ++i) {
     int liveCounter = Read_Register(hslb, CARRIER_PS_livecounter, i);
-    if (liveCounter != 0xDEADBEEF) sliveCounterCarriers.push_back(liveCounter);
+    if ((unsigned) liveCounter != 0xDEADBEEF) sliveCounterCarriers.push_back(liveCounter);
     else sliveCounterCarriers.push_back(-1);
   }
 
@@ -286,7 +288,7 @@ void BoardStackStatus::UpdateARMLiveCounters(Belle2::HSLB& hslb, Belle2::RCCallb
   else m_boardstackObservables.sARMState = "Stopped";
   for (unsigned i = 0; i < m_nCarriers; ++i) {
     int liveCounter = Read_Register(hslb, CARRIER_PS_livecounter, i);
-    if (liveCounter == 0xDEADBEEF) m_boardstackObservables.cARMState.at(i) = "Unknown";
+    if ((unsigned) liveCounter == 0xDEADBEEF) m_boardstackObservables.cARMState.at(i) = "Unknown";
     else if (sliveCounterCarriers.at(i) != liveCounter) m_boardstackObservables.cARMState.at(i) = "Running";
     else m_boardstackObservables.cARMState.at(i) = "Stopped";
   }

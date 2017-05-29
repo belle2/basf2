@@ -101,7 +101,7 @@ namespace PrepBoardstackData {
 
   void SetLookback(Belle2::HSLB& hslb, const int lookback)
   {
-    int carriersDetected = Read_Register(hslb, SCROD_PS_carriersDetected, 0, 0);
+    unsigned carriersDetected = Read_Register(hslb, SCROD_PS_carriersDetected, 0, 0);
     for (unsigned carrier = 0; carrier < carriersDetected; carrier++) {
       for (unsigned asic = 0; asic < 4; asic++) {
         SetLookback(hslb, carrier, asic, lookback);

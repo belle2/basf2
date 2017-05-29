@@ -22,6 +22,8 @@
 #include <tracking/dataobjects/TrackClusterSeparation.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <analysis/ClusterUtility/ClusterUtils.h>
+
 #include <TTree.h>
 #include <TFile.h>
 #include <genfit/Exception.h>
@@ -404,7 +406,9 @@ void DataWriterModule::event()
     m_ECLPhi               = clusterPos.Phi();
     m_ECLTheta             = clusterPos.Theta();
     m_ECLZ                 = clusterPos.Z();
-    m_ECLMom               = cluster.getMomentum().Mag2();
+
+    ClusterUtils C;
+    m_ECLMom               = C.Get4MomentumFromCluster(&cluster).Vect().Mag2();
     m_ECLDeltaTime         = cluster.getDeltaTime99();
 
     m_ECLUncertaintyEnergy = cluster.getUncertaintyEnergy();

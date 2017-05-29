@@ -44,7 +44,6 @@ from ROOT import Belle2
 # at KEKCC /home/belle2/tkeck/fei/Belle2_Generic_2017_Track14_1/ )
 use_central_database('test_merola', LogLevel.WARNING, 'fei_database')
 
-gb2_setuprel = "release-00-08-00"
 
 from variables import variables
 
@@ -154,7 +153,7 @@ variables.addAlias('tau_piid', 'daughter(0, daughter(0,piid))')
 variables.addAlias('tau_Kid', 'daughter(0, daughter(0,Kid))')
 
 
-outputRootFile = "../1290310000.ntup.root"
+outputRootFile = "1290310000.ntup.root"
 
 path = create_path()
 
@@ -172,7 +171,7 @@ if not os.path.isfile(fei_pickle):
 fei_path = get_path_from_file(fei_pickle)
 path.add_path(fei_path)
 
-filelist = [""]
+filelist = ["../1290310000.dst.root"]
 
 inputMdstList('default', filelist)
 
@@ -266,8 +265,8 @@ applyCuts('Upsilon(4S):BhadBtaunu', 'nAllROETracks==0')
 applyCuts('Upsilon(4S):BslBtaunu', 'nAllROETracks==0')
 
 
-buildContinuumSuppression('B+:genericRank')
-buildContinuumSuppression('B+:semileptonicRank')
+buildContinuumSuppression('B+:genericRank', '')
+buildContinuumSuppression('B+:semileptonicRank', '')
 
 
 # perform MC matching

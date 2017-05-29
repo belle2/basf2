@@ -30,7 +30,7 @@ namespace Belle2 {
     "number_of_holes",
     "last_hit_layer",
     "first_hit_layer",
-    "weight"
+    "state_weight"
   };
 
   /// Vehicle class to transport the variable names

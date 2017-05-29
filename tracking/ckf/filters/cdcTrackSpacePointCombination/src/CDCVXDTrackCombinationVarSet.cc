@@ -51,7 +51,7 @@ bool CDCVXDTrackCombinationVarSet::extract(const BaseCDCVXDTrackCombinationFilte
     }
   }
 
-  var<named("weight")>() = result->getWeight();
+  var<named("state_weight")>() = result->getWeight();
   var<named("chi2_vxd_full")>() = chi2_vxd_full;
   var<named("chi2_vxd_max")>() = chi2_vxd_max;
   var<named("chi2_vxd_min")>() = chi2_vxd_min;

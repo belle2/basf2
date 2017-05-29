@@ -15,6 +15,8 @@
 #include <framework/database/LocalDatabase.h>
 #include <boost/filesystem/operations.hpp>
 
+#include <TFile.h>
+
 #include <fstream>
 
 #include <gtest/gtest.h>
@@ -249,6 +251,10 @@ namespace {
     auto loaded = MVA::Weightfile::loadFromROOTFile("MVAInterfaceTest.root");
 
     EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
+
+    TFile file("invalid_weightfile.root", "RECREATE");
+    file.Close();
+    EXPECT_THROW(MVA::Weightfile::loadFromROOTFile("invalid_weightfile.root"), std::runtime_error);
 
   }
 

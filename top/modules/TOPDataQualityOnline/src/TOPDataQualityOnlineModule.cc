@@ -135,7 +135,7 @@ namespace Belle2 {
     for (int c = 0; c < digits_ptr.getEntries(); c++) {
       TOPDigit* digit = digits_ptr[c];
       double width = digit->getPulseWidth();
-      double height = digit->getADC();
+      double height = digit->getPulseHeight();
       //int flag=digit->getFlag();
       //double corr_time=digit->getCorrTime();
       if (width > 3 && width < 10 && height > 100 && height < 2048) {

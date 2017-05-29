@@ -60,5 +60,5 @@ void dedx4_internals()
 {
   gROOT->SetStyle("Plain");
 
-  plot("EvtGenSimRec_dedx.root");
+  plot("../EvtGenSimRec_dedx.root");
 }

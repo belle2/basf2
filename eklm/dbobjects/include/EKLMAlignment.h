@@ -18,7 +18,8 @@
 /* External headers. */
 #include <TObject.h>
 
-/* Belle2 Headers. */
+/* Belle2 headers. */
+#include <eklm/dataobjects/EKLMElementID.h>
 #include <eklm/dbobjects/EKLMAlignmentData.h>
 
 namespace Belle2 {
@@ -41,30 +42,51 @@ namespace Belle2 {
     ~EKLMAlignment();
 
     /**
-     * Set alignment data.
+     * Set sector alignment data.
+     * @param[in] sector Sector number.
+     * @param[in] dat    Alignment data.
+     */
+    void setSectorAlignment(uint16_t sector, EKLMAlignmentData* dat);
+
+    /**
+     * Get sector alignment data.
+     * @param[in] sector Sector number.
+     */
+    EKLMAlignmentData* getSectorAlignment(uint16_t sector);
+
+    /**
+     * Set segment alignment data.
      * @param[in] segment Segment number.
      * @param[in] dat     Alignment data.
      */
-    void setAlignmentData(uint16_t segment, EKLMAlignmentData* dat);
+    void setSegmentAlignment(uint16_t segment, EKLMAlignmentData* dat);
 
     /**
-     * Get alignment data.
+     * Get segment alignment data.
      * @param[in] segment Segment number.
      */
-    EKLMAlignmentData* getAlignmentData(uint16_t segment);
+    EKLMAlignmentData* getSegmentAlignment(uint16_t segment);
 
     /**
-     * Clean alignment data.
+     * Add correction.
+     * @param[in] element    Element identifier.
+     * @param[in] parameter  Parameter number.
+     * @param[in] correction Correction.
+     * @param[in] invertSign Whether to invert the correction sign.
      */
-    void cleanAlignmentData();
+    void add(EKLMElementID element, int parameter, double correction,
+             bool invertSign);
 
   private:
 
-    /** Alignment data. */
-    std::map<uint16_t, EKLMAlignmentData> m_Data;
+    /** Sector alignment. */
+    std::map<uint16_t, EKLMAlignmentData> m_SectorAlignment;
+
+    /** Segment alignment. */
+    std::map<uint16_t, EKLMAlignmentData> m_SegmentAlignment;
 
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMAlignment, 1);
+    ClassDef(Belle2::EKLMAlignment, 2);
 
   };
 

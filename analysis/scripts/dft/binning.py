@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Jochen Gemmler 2016
+# Jochen Gemmler 2016 - 2017
 
 from __future__ import division, print_function
 import numpy as np
+
+# Purity transformations
 
 
 def get_bins(arr, bin_count=1024):
@@ -81,7 +83,7 @@ def get_modified_bin_limits(arr, bin_count=1024):
         bin_values[i_idx] = (current_bin + np.sum(range(bin_weight + 1)) / (bin_weight + 1)) * step_len
         current_bin += bin_weight
 
-    # transfer bin values from [0, 1] -> [-1, 1]
+    # transform bin values from [0, 1] -> [-1, 1]
     bin_values = 2 * bin_values - 1
 
     return new_bin_limits, bin_values
@@ -97,16 +99,6 @@ def transform_value(value, new_bin_limits, bin_values):
     if np.isnan(value):
         return 0
     return bin_values[np.digitize(value, new_bin_limits)]
-
-
-def transform_value_comp(value, trafo_list):
-    """ wrapper to transform value that accepts a list
-    :param value:
-    :param trafo_list:
-    :return:
-    """
-    print('DEPRECATED WARNING. (binning.transform_value_comp). Use transform_value(value, *trafo_list) instead.')
-    return transform_value(value, trafo_list[0], trafo_list[1])
 
 
 def transform_array(arr, new_bin_limits, bin_values):
@@ -125,11 +117,9 @@ def transform_array(arr, new_bin_limits, bin_values):
     arr[nan_idx] = 0
     return arr
 
-    # probability transformations
-
 
 def get_transform_to_probability_map(df, bins=100):
-    """ returns a transformation map to probabilility for a signal/background = 1 ratio
+    """ returns a transformation map to probability for a signal/background = 1 ratio
     :param df: pandas.DataFrame with truth: 'y', and network output: 'y_hat'
     :param bins: integer with number of bins
     :return: numpy array for bin mapping
@@ -151,6 +141,36 @@ def get_transform_to_probability_map(df, bins=100):
     b_map = (grouped.sum() / grouped.count()).values
 
     return b_map
+
+
+def transform_to_probability(value, b_map):
+    """ transforms a given value to probability according to a bin map
+    :param value:
+    :param b_map:
+    :return: float transformed value
+    """
+
+    if value < 0 or value > 1:
+        raise ValueError(value)
+
+    # shift -1 for array index purpose
+    return b_map[int(value * (len(b_map) - 1))]
+
+
+def transform_array_to_probability(arr, b_map):
+    """ transforms a given arr to probability according to a bin map
+    :param arr: numpy array to transform
+    :param b_map:
+    :return: numpy array: transformed array
+    """
+
+    if not np.all(np.isfinite(arr)):
+        raise ValueError('Array not finite.')
+    if not np.min(arr) >= 0 and not np.max(arr) <= 1:
+        raise ValueError('Unexpected input values')
+
+    map_entries = len(b_map)
+    return b_map[(arr * (map_entries - 1)).astype(int)]
 
 
 def get_signal_background_pdf(df, bins=100):
@@ -176,44 +196,12 @@ def get_signal_background_pdf(df, bins=100):
     return sig_pdf, back_pdf
 
 
-def transform_to_probability(value, b_map):
-    """ transforms a given value to probability according to a bin map
-    :param value:
-    :param b_map:
-    :return: float transformed value
-    """
-
-    if value < 0 or value > 1:
-        # print("Unexpected value %f. Returning NaN." % value)
-        # return np.nan
-        raise ValueError(value)
-
-    # shift -1 for array index purpose
-    return b_map[int(value * (len(b_map) - 1))]
-
-
-def transform_array_to_probability(arr, b_map):
-    """ transforms a given arr to probability according to a bin map
-    :param arr: numpy array to transform
-    :param b_map:
-    :return: numpy array: transformed array
-    """
-
-    if not np.all(np.isfinite(arr)):
-        raise ValueError('Array not finite.')
-    if not np.min(arr) >= 0 and not np.max(arr) <= 1:
-        raise ValueError('Unexpected input values')
-
-    map_entries = len(b_map)
-    return b_map[(arr * (map_entries - 1)).astype(int)]
-
-
 def trafo_to_prob_sf_func(p_signal, p_background, signal_fraction):
     """
     :param p_signal: signal_pdf value or array
     :param p_background: signal_pdf value or array
     :param signal_fraction:
-    :return: (single value, np array) signal fraction dependent to probabiltiy transformation
+    :return: (single value, np array) signal fraction dependent to probability transformation
     """
 
     return (p_signal * signal_fraction) / (p_signal * signal_fraction + p_background * (1 - signal_fraction))
@@ -238,7 +226,7 @@ def transform_to_probability_sf(value, sig_back_tuple, signal_fraction):
 
 
 def transform_array_to_probability_sf(arr, sig_back_tuple, signal_fraction):
-    """ transformation to probabiltiy. if smother output ("not peaky") is required, please implement spline
+    """ transformation to probability. if smother output ("not peaky") is required, please implement spline
     interpolation
     :param arr: array to transform
     :param sig_back_tuple: np.array, signal pdf, background pdf of the trained classifier
@@ -267,13 +255,12 @@ def get_signal_fraction(arr, weights=None):
     if not np.all(np.isfinite(arr)):
         raise ValueError('Array not finite.')
     if not np.min(arr) >= 0 and not np.max(arr) <= 1:
-        raise ValueError('Unexpected input values')
+        raise ValueError('Unexpected input values.')
 
     return np.sum(arr) / len(arr)
 
+
 # new MVA interface adaptions
-
-
 def get_ndarray_binning_parameters(ndarr, bin_count=1024):
     """
     :param ndarr: numpy.ndarray with variables to transform (may contain NaN values)
@@ -315,3 +302,26 @@ def transform_variable_vector(arr, binning_parameters):
         arr[i] = transform_value(arr[i], *param_tuple)
 
     return None
+
+
+def sanitize_labels(arr):
+    """
+    checks for a binary classification problem
+    transforms the two class labels to {0,1}
+
+    @param arr          numpy array,
+    @:return            None, inplace, will not change dtype
+    """
+    # not binary
+    assert len(np.unique(arr)) == 2, 'Not a binary classification!'
+
+    # reject corner cases when classes would have special values
+    if arr.min() > 0:
+        arr[arr == arr.min()] = 0
+
+    if arr.max() != 1:
+        arr[arr == arr.max()] = 1
+
+    # transform labels
+    if arr.min() != 0:
+        arr[arr == arr.min()] = 0

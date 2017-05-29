@@ -100,7 +100,7 @@ void DQMHistAnalysisInputPVSrvModule::initialize()
   m_expno = m_runno = 0;
   m_count = 0;
   m_eventMetaDataPtr.registerInDataStore();
-  if (m_server) m_serv = new THttpServer("http:8082");
+  //if (m_server) m_serv = new THttpServer("http:8082");
 
 #ifdef _BELLE2_EPICS
   SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
@@ -270,7 +270,7 @@ void DQMHistAnalysisInputPVSrvModule::event()
   }
 #endif
   do { // call at least once!
-    if (m_serv) m_serv->ProcessRequests();
+    //if (m_serv) m_serv->ProcessRequests();
     gSystem->Sleep(10);  // 10 ms sleep
   } while (!t.CheckTimer(gSystem->Now()));
 

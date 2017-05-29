@@ -48,9 +48,9 @@ class WFDisplay(Module):
             P = 1
             abc = eval(input('Type <CR> to continue, P to print or Q to quit '))
             if abc == 1:
-                self.pdfFile = self.pdfFile + '.pdf'
-                self.c1.SaveAs(self.pdfFile)
-                print('Canvas saved to file:', self.pdfFile)
+                filename = self.pdfFile + '.pdf'
+                self.c1.SaveAs(filename)
+                print('Canvas saved to file:', filename)
                 return False
             else:
                 evtMetaData = Belle2.PyStoreObj('EventMetaData')

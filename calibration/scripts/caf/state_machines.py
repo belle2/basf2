@@ -366,7 +366,7 @@ class Machine():
 
 class CalibrationMachine(Machine):
     """
-    A state machine to handle Calibration objects and the flow of
+    A state machine to handle `Calibration` objects and the flow of
     processing for them.
     """
 
@@ -375,7 +375,7 @@ class CalibrationMachine(Machine):
         Takes a Calibration object from the caf framework and lets you
         set the initial state
         """
-        #: States that are defaults to the CalibrationMachine (could override later)
+        #: States that are defaults to the `CalibrationMachine` (could override later)
         self.default_states = [State("init"),
                                State("running_collector", enter=self._log_new_state),
                                State("collector_failed", enter=self._log_new_state),
@@ -678,20 +678,22 @@ class CalibrationMachine(Machine):
         job.input_files = input_data_files
         job.max_files_per_subjob = self.calibration.max_files_per_collector_job
         # In non-local processing we have to set up the basf2 environment again
-        if not isinstance(self.collector_backend, Local):
-            if "BELLE2_LOCAL_DIR" in os.environ:
-                job.setup_cmds = [
-                    "CAF_TOOLS_LOCATION=" + os.path.join(os.environ["BELLE2_TOOLS"], "setup_belle2"),
-                    "CAF_RELEASE_LOCATION=" + os.environ["BELLE2_LOCAL_DIR"],
-                    "source $CAF_TOOLS_LOCATION",
-                    "pushd $CAF_RELEASE_LOCATION",
-                    "setuprel",
-                    "popd"
-                ]
-            else:
-                job.basf2_release = os.environ["BELLE2_RELEASE"]
-                job.basf2_tools = os.path.join(os.environ["BELLE2_TOOLS"], "setup_belle2")
-                job.add_basf2_setup()
+#        if not isinstance(self.collector_backend, Local):
+#            if "BELLE2_LOCAL_DIR" in os.environ:
+#                job.setup_cmds = [
+#                    "CAF_TOOLS_LOCATION=" + os.path.join(os.environ["BELLE2_TOOLS"], "setup_belle2"),
+#                    "CAF_RELEASE_LOCATION=" + os.environ["BELLE2_LOCAL_DIR"],
+#                    "export CAF_TOOLS_LOCATION",
+#                    "export CAF_RELEASE_LOCATION",
+#                    "source $CAF_TOOLS_LOCATION",
+#                    "pushd $CAF_RELEASE_LOCATION > /dev/null",
+#                    "setuprel",
+#                    "popd > /dev/null"
+#                ]
+#            else:
+#                job.basf2_release = os.environ["BELLE2_RELEASE"]
+#                job.basf2_tools = os.path.join(os.environ["BELLE2_TOOLS"], "setup_belle2")
+#                job.add_basf2_setup()
         job.backend_args = self.calibration.backend_args
         # Output patterns to be returned from collector job
         job.output_patterns = self.calibration.output_patterns
@@ -728,7 +730,9 @@ class CalibrationMachine(Machine):
         input data. Should produce the best constants requested and create a list of results
         to send out.
         """
+        B2INFO("Setting up {}".format(machine.name))
         machine.setup_algorithm()
+        B2INFO("Beginning execution of {}".format(machine.name))
 
         if not iov_to_calibrate:
             iov_to_execute = ROOT.vector("std::pair<int,int>")()
@@ -920,8 +924,10 @@ class AlgorithmMachine(Machine):
     def _calc_highest_exprun(self):
         """
         """
+        B2INFO("Calculating highest ExpRun")
         #: Update all IoVs in collected input data now that we have grabbed it
         self.all_iov_collected = self.algorithm.algorithm.getRunListFromAllData()
+        B2INFO("Number of ExpRuns in collected data = {}".format(str(self.all_iov_collected.size())))
         last_exprun_pair = self.all_iov_collected.back()
         self.highest_exprun_collected = (last_exprun_pair.first, last_exprun_pair.second)
 
@@ -1015,12 +1021,14 @@ class AlgorithmMachine(Machine):
                 input_files.append(input_file)
         else:
             input_files.append(os.path.join(self.cal_machine._collector_job.output_dir, "RootOutput.root"))
+
         self.algorithm.data_input(input_files)
 
     def _pre_algorithm(self, **kwargs):
         """
         Call the user defined algorithm setup function
         """
+        B2INFO("Running Pre-Algorithm function (if exists)")
         if self.algorithm.pre_algorithm:
             # We have to re-pass in the algorithm here because an outside user has created this method.
             # So the method isn't bound to the instance properly.
@@ -1046,7 +1054,7 @@ class AlgorithmMachine(Machine):
 
 class CalibrationRunner(Thread):
     """
-    Runs a CalibrationMachine in a Thread. Will process from intial state
+    Runs a `CalibrationMachine` in a Thread. Will process from intial state
     to the final state.
     """
 
@@ -1054,7 +1062,7 @@ class CalibrationRunner(Thread):
         """
         """
         super().__init__()
-        #: The CalibrationMachine that we will run
+        #: The `CalibrationMachine` that we will run
         self.machine = machine
         #: Allowed transitions that we will use to progress
         self.moves = ["submit_collector", "complete", "run_algorithms", "iterate"]

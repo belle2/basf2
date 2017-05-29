@@ -91,6 +91,8 @@ SecMapTrainerBase = register_module('VXDTFTrainingDataCollector')
 SecMapTrainerBase.param('SpacePointTrackCandsName', 'checkedSPTCs')
 path.add_module(SecMapTrainerBase)
 
+# this can take quite long so it is good to know if it is still running
+path.add_module('Progress')
 
 process(path)
 

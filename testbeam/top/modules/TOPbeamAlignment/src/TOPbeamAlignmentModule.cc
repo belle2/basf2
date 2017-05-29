@@ -172,11 +172,9 @@ namespace Belle2 {
 
     StoreArray<TOPDigit> topDigits;
     int nHits = topDigits.getEntries();
-    const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
     for (int i = 0; i < nHits; ++i) {
       TOPDigit* data = topDigits[i];
-      m_ringImage->Fill(m_rowWiseChannelID[data->getPixelID() - 1],
-                        geo->getNominalTDC().getTime(data->getTDC()));
+      m_ringImage->Fill(m_rowWiseChannelID[data->getPixelID() - 1], data->getTime());
     }
     m_numEvents++;
 

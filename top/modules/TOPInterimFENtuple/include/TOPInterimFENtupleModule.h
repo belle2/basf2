@@ -91,10 +91,10 @@ namespace Belle2 {
     short m_winNum[c_NMaxHit] = {0}; /**< "m_firstWindow" in TOPDigit */
     float m_time[c_NMaxHit] = {0}; /**< "m_time" in TOPDigit, hit time after time base correction (thus in ns unit), but not yet available */
 
-    float m_rawTdc[c_NMaxHit] = {0}; /**< "m_TDC" in TOPDigit, divided by 16 to make it in sample unit */
+    float m_rawTdc[c_NMaxHit] = {0}; /**< "m_rawTime" in TOPDigit, sample unit */
     float m_refTdc[c_NMaxHit] = {0}; /**< "m_rawTdc" in cal. channel */
     unsigned short m_quality[c_NMaxHit] = {0}; /**< hit quality, from TOPDigit: c_Junk = 0, c_Good = 1, c_ChargeShare = 2, c_CrossTalk = 3, c_CalPulse = 4 */
-    unsigned short m_sample[c_NMaxHit] = {0}; /**< Actual 50% crossing sample in the whole waveform, calculated as (digit.getTDC() / 16 + digit.getFirstWindow() * 64) % 256. */
+    unsigned short m_sample[c_NMaxHit] = {0}; /**< Actual 50% crossing sample in the whole waveform, calculated as (int(digit.getRawTime()) + digit.getFirstWindow() * 64) % 256. */
 
     float m_height[c_NMaxHit] = {0}; /**< "m_ADC" in TOPDigit */
     float m_q[c_NMaxHit] = {0}; /**< "m_integral" in TOPDigit, but not available */

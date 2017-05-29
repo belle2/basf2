@@ -20,7 +20,7 @@ SPTC2RTConverterModule::SPTC2RTConverterModule() : Module()
   setDescription("Converts the given SpacePointTrackCandidates to RecoTracks and stores them in the given RecoTracksStoreArray");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("spacePointsStoreArrayName", m_param_spacePointTCsStoreArrayName,
+  addParam("spacePointsTCsStoreArrayName", m_param_spacePointTCsStoreArrayName,
            "StoreArray name of the input SpacePointTrackCandidates.", std::string(""));
   addParam("recoTracksStoreArrayName", m_param_recoTracksStoreArrayName,
            "StoreArray name of the output RecoTracks.", std::string(""));
@@ -61,8 +61,8 @@ void SPTC2RTConverterModule::initialize()
                                        m_param_recoHitInformationStoreArrayName);
   m_recoTracks.registerRelationTo(m_spacePointTCs);
 
-  StoreArray<PXDCluster>::required(m_param_pxdClustersName);
-  StoreArray<SVDCluster>::required(m_param_svdClustersName);
+  StoreArray<PXDCluster>::optional(m_param_pxdClustersName);
+  StoreArray<SVDCluster>::optional(m_param_svdClustersName);
 
 }
 

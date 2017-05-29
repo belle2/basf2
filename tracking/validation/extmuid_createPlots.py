@@ -293,6 +293,8 @@ def draw_likelihoods(file_chain):
     fakerate_phi_denom.Sumw2(1)
 
     for entry in file_chain:
+        mcps = entry.MCParticles
+        momentum = mcps[0].getMomentum()
         muids = entry.Muids
         for i in range(muids.GetEntriesFast()):
             outcome.Fill(muids[i].getOutcome())
@@ -307,8 +309,7 @@ def draw_likelihoods(file_chain):
                 rchisq = -1.0
                 if ndof > 0:
                     rchisq = chisq / ndof
-                momentum = muids[i].getMomentum()
-                p = momentum.Mag() / 1000.0
+                p = momentum.Mag()
                 theta = momentum.Theta() * 180.0 / np.pi
                 phi = momentum.Phi() * 180.0 / np.pi
                 if phi < 0.0:

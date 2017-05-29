@@ -148,6 +148,9 @@ namespace Belle2 {
       sortedDigits[feemap->getIndex()].push_back(&digit);
     }
 
+    auto subBits = m_topgp->getGeometry()->getNominalTDC().getSubBits();
+    int sampleDivisions = 0x1 << subBits;
+
     for (const auto& copperID : mapper.getCopperIDs()) {
       vector<int> Buffer[4];
       for (int finesse = 0; finesse < 4; finesse++) {
@@ -157,7 +160,8 @@ namespace Belle2 {
         unsigned dataFormat = static_cast<unsigned>(TOP::RawDataType::c_Draft);
         Buffer[finesse].push_back(scrodID + (dataFormat << 16));
         for (const auto& digit : sortedDigits[feemap->getIndex()]) {
-          unsigned tdc = digit->getTDC() & 0xFFFF;
+          double rawTime = digit->getRawTime();
+          unsigned tdc = int(rawTime * sampleDivisions) & 0xFFFF;
           unsigned chan = digit->getChannel() % 128;
           unsigned flags = (unsigned) digit->getHitQuality();
           Buffer[finesse].push_back(tdc + (chan << 16) + (flags << 24));

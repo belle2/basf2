@@ -109,7 +109,6 @@ namespace Belle2 {
   void TOPTimeBaseCalibratorModule::event()
   {
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-    double sampleDivisions = (0x1 << geo->getNominalTDC().getSubBits());
     double sampleWidth = geo->getNominalTDC().getSampleWidth();
 
     std::vector<std::pair<double, double> > hits[c_NumChannels];
@@ -118,7 +117,7 @@ namespace Belle2 {
     for (const auto& digit : digits) {
       if (digit.getModuleID() != m_moduleID) continue;
       if (digit.getHitQuality() != TOPDigit::c_CalPulse) continue;
-      double t = digit.getTDC() / sampleDivisions + digit.getFirstWindow() * c_WindowSize;
+      double t = digit.getRawTime() + digit.getFirstWindow() * c_WindowSize;
       if (t < 0) {
         B2ERROR("Got negative sample number - digit ignored");
         continue;
@@ -128,8 +127,6 @@ namespace Belle2 {
         B2ERROR("Time error is not given - digit ignored");
         continue;
       }
-      // add quantization error
-      et = sqrt(et * et + 1 / sampleDivisions / sampleDivisions / 12);
       unsigned channel = digit.getChannel();
       if (channel < c_NumChannels) hits[channel].push_back(std::make_pair(t, et));
     }
@@ -422,6 +419,27 @@ namespace Belle2 {
                     "sample number", "#Delta t [ns]");
     saveAsHistogram(sampleTimes, "sampleTimes_ch" + to_string(chan),
                     "Time base corrections for " + forWhat, "sample number", "t [ns]");
+
+    // calibrated cal pulse time difference
+
+    std::string name = "timeDiffcal_ch" + to_string(chan);
+    std::string title = "Calibrated cal pulse time difference vs. sample for " + forWhat;
+    TH2F Hcor(name.c_str(), title.c_str(), c_TimeAxisSize, 0, c_TimeAxisSize,
+              100, DeltaT - 0.5, DeltaT + 0.5);
+    Hcor.SetXTitle("sample number");
+    Hcor.SetYTitle("time difference [ns]");
+    Hcor.SetStats(kTRUE);
+
+    TOPSampleTimes timeBase;
+    timeBase.setTimeAxis(sampleTimes, sampleTimes.back() / 2);
+
+    for (const auto& twoTimes : ntuple) {
+      if (!twoTimes.good) continue;
+      double dt = timeBase.getDeltaTime(0, twoTimes.t2, twoTimes.t1);
+      int sample = int(twoTimes.t1) % c_TimeAxisSize;
+      Hcor.Fill(sample, dt);
+    }
+    Hcor.Write();
 
     B2INFO("... channel " << chan << " OK (chi^2/ndf = " << chi2 / ndf
            << ", ndf = " << ndf << ")");

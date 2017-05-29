@@ -29,9 +29,9 @@ TrackSetEvaluatorHopfieldNNDEVModule::TrackSetEvaluatorHopfieldNNDEVModule() : M
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("tcArrayName", m_PARAMtcArrayName, "Sets the name of expected StoreArray with SpacePointTrackCand in it.",
+  addParam("NameSpacePointTrackCands", m_PARAMtcArrayName, "Sets the name of expected StoreArray with SpacePointTrackCand in it.",
            std::string(""));
-  addParam("tcNetworkName", m_PARAMtcNetworkName, "Sets the name of expected StoreArray<OverlapNetwork>.",
+  addParam("NameOverlapNetworks", m_PARAMtcNetworkName, "Sets the name of expected StoreArray<OverlapNetwork>.",
            std::string(""));
   addParam("minActivityState", m_minActivityState, "Sets the minimal value of activity (Neuron Value) for acceptance.",
            float(0.7));

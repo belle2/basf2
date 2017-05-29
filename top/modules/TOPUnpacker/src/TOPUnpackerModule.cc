@@ -194,14 +194,17 @@ namespace Belle2 {
     const auto& mapper = m_topgp->getChannelMapper();
 
     const auto* geo = m_topgp->getGeometry();
+    auto subBits = geo->getNominalTDC().getSubBits();
+    int sampleDivisions = 0x1 << subBits;
 
     for (int i = 1; i < bufferSize; i++) {
       int word = buffer[i];
       int tdc = word & 0xFFFF;
+      double rawTime = double(tdc) / sampleDivisions;
       unsigned chan = ((word >> 16) & 0x7F) + boardstack * 128;
       unsigned flags = (word >> 24) & 0xFF;
       int pixelID = mapper.getPixelID(chan);
-      auto* digit = digits.appendNew(moduleID, pixelID, tdc);
+      auto* digit = digits.appendNew(moduleID, pixelID, rawTime);
       digit->setTime(geo->getNominalTDC().getTime(tdc));
       digit->setChannel(chan);
       digit->setHitQuality((TOPDigit::EHitQuality) flags);

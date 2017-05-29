@@ -29,7 +29,6 @@ CDCDedxWireGainAlgorithm::CDCDedxWireGainAlgorithm() : CalibrationAlgorithm("CDC
 
 CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
 {
-
   // Get data objects
   auto& ttree = getObject<TTree>("tree");
 
@@ -37,35 +36,27 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   if (ttree.GetEntries() < 100)
     return c_NotEnoughData;
 
-  int nhits;
-  int wire[100];
-  int layer[100];
-  double dedxhit[100];
-  ttree.SetBranchAddress("nhits", &nhits);
-  ttree.SetBranchAddress("wire", wire);
-  ttree.SetBranchAddress("layer", layer);
-  ttree.SetBranchAddress("dedxhit", dedxhit);
+  // You HAVE to set these pointers to 0!
+  std::vector<int>* wire = 0;
+  std::vector<double>* dedxhit = 0;
+
+  ttree.SetBranchAddress("wire", &wire);
+  ttree.SetBranchAddress("dedxhit", &dedxhit);
 
   std::map<int, std::vector<double> > wirededx;
   for (int i = 0; i < ttree.GetEntries(); ++i) {
     ttree.GetEvent(i);
-    for (int j = 0; j < nhits; ++j) {
-      int wireid = WireID(layer[j], wire[j]).getEWire();
-      wirededx[wireid].push_back(dedxhit[j]);
+    for (unsigned int j = 0; j < wire->size(); ++j) {
+      wirededx[wire->at(j)].push_back(dedxhit->at(j));
     }
   }
 
   B2INFO("dE/dx Calibration done for " << wirededx.size() << " CDC wires");
 
-  //  if( wirededx.size() < 14336 ) return c_Failure;
-
-  TH2F* gains = new TH2F("CDCDedxWireGains", "CDC dE/dx wire gains", 14337, -0.5, 14336.5, 2, -0.5, 1.5);
-  int counter = 1;
+  TClonesArray* gains = new TClonesArray("Belle2::CDCDedxWireGain");
+  int counter = 0;
   for (auto const& awire : wirededx) {
-    B2INFO("Wire " << awire.first << ": " << calculateMean(awire.second, 0.05, 0.25));
-    gains->SetBinContent(counter, 1, awire.first);
-    gains->SetBinContent(counter, 2, calculateMean(awire.second, 0.05, 0.25));
-    counter++;
+    new((*gains)[counter++]) CDCDedxWireGain(awire.first, calculateMean(awire.second, 0.05, 0.25));
   }
   saveCalibration(gains, "CDCDedxWireGains");
 

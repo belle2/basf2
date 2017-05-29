@@ -209,12 +209,11 @@ namespace Belle2 {
 
       const auto& hits = waveform.getHits();
       for (const auto& hit : hits) {
-        int tdc = int(hit.time * m_sampleDivisions);
         float time = sampleTimes->getTime(firstWindow, hit.time);
-        auto* digit = digits.appendNew(moduleID, pixelID, tdc);
+        auto* digit = digits.appendNew(moduleID, pixelID, hit.time);
         digit->setTime(time + t0);
         digit->setTimeError(hit.timeErr);  // TODO: convert to [ns]
-        digit->setADC(hit.height);
+        digit->setPulseHeight(hit.height);
         digit->setIntegral(hit.area);
         digit->setPulseWidth(hit.width);  // TODO: convert to [ns], give FWHM!
         digit->setChannel(channel);

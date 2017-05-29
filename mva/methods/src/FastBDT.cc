@@ -149,7 +149,12 @@ namespace Belle2 {
     {
 
       unsigned int numberOfFeatures = training_data.getNumberOfFeatures();
+#if FastBDT_VERSION_MAJOR >= 4
       unsigned int numberOfSpectators = training_data.getNumberOfSpectators();
+#else
+      // Deactivate support for spectators below version 4!
+      unsigned int numberOfSpectators = 0;
+#endif
 
       // FastBDT Version 4 has a simplified interface with a sklearn style Classifier
 #if FastBDT_VERSION_MAJOR >= 5
@@ -190,11 +195,6 @@ namespace Belle2 {
       }
       classifier.fit(X, y, w);
 #else
-
-      // Deactivate support for spectators below version 4!
-#if FastBDT_VERSION_MAJOR < 4
-      numberOfSpectators = 0;
-#endif
 
       std::vector<FastBDT::FeatureBinning<float>> featureBinnings;
       std::vector<unsigned int> nBinningLevels;

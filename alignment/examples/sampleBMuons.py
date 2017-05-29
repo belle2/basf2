@@ -4,21 +4,15 @@
 from basf2 import *
 from ROOT import Belle2
 
-set_log_level(LogLevel.INFO)
-
-"""
-reset_database()
-use_database_chain()
-use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
-use_local_database('database.txt')
-"""
-
-from ROOT import Belle2
-
 import beamparameters as beam
 import simulation as sim
 import reconstruction as reco
 import modularAnalysis as ana
+
+reset_database()
+use_database_chain()
+use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
+use_local_database('localdb/database.txt')
 
 main = create_path()
 

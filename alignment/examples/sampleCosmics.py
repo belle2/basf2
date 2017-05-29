@@ -6,6 +6,12 @@ import sys
 from basf2 import *
 from ROOT import Belle2
 
+
+reset_database()
+use_database_chain()
+use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
+use_local_database('localdb/database.txt')
+
 # set_random_seed(101)
 # set_log_level(LogLevel.INFO)
 

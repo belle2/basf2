@@ -4,6 +4,11 @@
 from basf2 import *
 from ROOT import Belle2
 
+reset_database()
+use_database_chain()
+use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"))
+use_local_database('localdb/database.txt')
+
 import beamparameters as beam
 import simulation as sim
 import reconstruction as reco

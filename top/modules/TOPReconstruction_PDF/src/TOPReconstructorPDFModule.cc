@@ -258,6 +258,7 @@ namespace Belle2 {
 
         float position = 0, width = 0, numPhotons = 0; //, this_pull = 0;
         vector<float> smallest_pulls(digits.getEntries(), 10000);
+        vector<float> pulls_from_smallest_diffs(digits.getEntries(), 10000);
 
         // FIXME this does not loop over the digits for this track under
         // whatever hypothesis but ALL digits...
@@ -267,13 +268,16 @@ namespace Belle2 {
           for (int k = 0; k < reco.getNumOfPDFPeaks(pixelID); k++) {
             // get this peak, calculate pull
             reco.getPDFPeak(pixelID, k, position, width, numPhotons);
-            float this_pull = (t - position) / width;
+            float this_diff = (t - position);
+            float this_pull = this_diff / width;
 
-            // check to see if this is the smallest
+            // check to see if this is the smallest diff
+            if (abs(this_diff) < abs(pulls_from_smallest_diffs[i])) {
+              pulls_from_smallest_diffs[i] = this_pull;
+            }
+            // check to see if this is the smallest pull
             if (abs(this_pull) < abs(smallest_pulls[i])) {
               smallest_pulls[i] = this_pull;
-              //cout << "processing digit: " << i << " moduleID=" << digits[i]->getModuleID() << " pixelID=" << pixelID << endl;
-              //cout << this_pull << " = (" << t << " - " << position << ") / " << width << endl;
             }
 
           } // end loop over peaks
@@ -281,7 +285,8 @@ namespace Belle2 {
 
         // FIXME should split this up for each TOPDigit and register reltation
         TOPSmallestPullCollection* tspc = pullCollection.appendNew();
-        tspc->set(smallest_pulls);
+        tspc->setSmallestPulls(smallest_pulls);
+        tspc->setPullsFromSmallestDiff(pulls_from_smallest_diffs);
         track.addRelationTo(tspc);
 
       } // closes if statement about optional writing out pulls
